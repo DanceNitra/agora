@@ -21,7 +21,9 @@ DB_PATH = settings.database_url.replace("sqlite+aiosqlite:///", "")
 
 
 async def init_db(app: FastAPI):
-    db = await aiosqlite.connect(DB_PATH)
+    db_url = settings.database_url
+    db_path = db_url.replace("sqlite+aiosqlite:///", "")
+    db = await aiosqlite.connect(db_path)
     db.row_factory = aiosqlite.Row
     app.state.db = db
 
@@ -47,7 +49,7 @@ async def init_db(app: FastAPI):
     if row and row["cnt"] == 0:
         await seed_agents(db)
 
-    print(f"[Agora] DB initialized at {DB_PATH}")
+    print(f"[Agora] DB initialized at {db_path}")
 
 
 async def seed_agents(db):

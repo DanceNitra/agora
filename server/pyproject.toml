@@ -41,3 +41,7 @@ Repository = "https://github.com/DanceNitra/agora"
 [tool.setuptools.packages.find]
 where = ["."]
 include = ["agora*"]
+
+[tool.pytest.ini_options]
+asyncio_mode = "auto"
+testpaths = ["tests"]
