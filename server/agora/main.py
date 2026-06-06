@@ -15,6 +15,8 @@ from agora.config import settings
 from agora.coordination.ess_protocol import TrustEngine
 from agora.coordination.stigmergy import StigmergyPool
 from agora.coordination.economy import EconomyEngine
+from agora.execution.task_executor import TaskExecutor
+from agora.lifecycle.agent_lifecycle import AgentLifecycle
 from agora.api import agents as agents_api, tasks as tasks_api, god as god_api, graph as graph_api, dungeon as dungeon_api, economy as economy_api
 from agora.api import dungeon_persistence as persistence_api
 
@@ -42,6 +44,8 @@ async def init_db(app: FastAPI):
     await app.state.stigmergy.load_from_db()
     app.state.economy = EconomyEngine(db)
     await app.state.economy.init_resources()
+    app.state.task_executor = TaskExecutor(db)
+    app.state.agent_lifecycle = AgentLifecycle(db)
     app.state.active_connections = []
     app.state.tick_count = 0
 
@@ -243,19 +247,34 @@ async def tick_loop(app: FastAPI):
             trust_engine = app.state.trust
             stigmergy = app.state.stigmergy
 
-            # Get active agents
+            # ── 1. DEATH DETECTION (before replenish) ──
+            try:
+                life_events = await app.state.agent_lifecycle.tick(app)
+                for ev in life_events:
+                    await broadcast(app, ev["type"], ev["payload"])
+            except Exception as e:
+                print(f"[Lifecycle] Tick error: {e}")
+
+            # ── 2. REFRESH active agents after lifecycle changes ──
             cursor = await db.execute(
                 "SELECT agent_id, role, trust_score, energy_balance, genome "
                 "FROM agent_identities WHERE status='active'"
             )
             agents = await cursor.fetchall()
 
-            # Replenish energy for all active agents each tick
+            # ── 3. Replenish + passive drain ──
             for agent in agents:
                 aid = agent["agent_id"]
                 await db.execute(
                     "UPDATE agent_identities SET energy_balance=MIN(energy_balance+3, 100.0) "
                     "WHERE agent_id=?",
+                    (aid,),
+                )
+            for agent in agents:
+                aid = agent["agent_id"]
+                await db.execute(
+                    "UPDATE agent_identities SET energy_balance=MAX(energy_balance-1, 0) "
+                    "WHERE agent_id=? AND energy_balance > 0",
                     (aid,),
                 )
 
@@ -325,6 +344,14 @@ async def tick_loop(app: FastAPI):
                     await _process_agent_thought(app, db, trust_engine, stigmergy, agent, partner_id, tier, thought, app.state.tick_count)
 
             await db.commit()
+
+            # Task pipeline tick
+            try:
+                task_events = await app.state.task_executor.tick(app)
+                for ev in task_events:
+                    await broadcast(app, ev["type"], ev["payload"])
+            except Exception as e:
+                print(f"[Tasks] Tick error: {e}")
 
             if app.state.tick_count % 5 == 0:
                 best_agents = {}

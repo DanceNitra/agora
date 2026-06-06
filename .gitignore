@@ -7,3 +7,7 @@ dist/
 build/
 .DS_Store
 *.db
+*.db
+*.db-journal
+*.db-wal
+*.db-shm

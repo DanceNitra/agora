@@ -71,6 +71,65 @@ function parseWsMessage(data: string): TimelineEvent | null {
       };
     }
 
+    // Task pipeline events
+    if (parsed.type === 'task_posted' && parsed.payload) {
+      const p = parsed.payload;
+      return {
+        id: `tp-${p.task_id}`,
+        type: 'task',
+        agentName: 'System',
+        message: `📋 Task posted: "${p.title}" (${p.task_type}, dif=${p.difficulty})`,
+        timestamp: parsed.timestamp || new Date().toISOString(),
+        details: p,
+      };
+    }
+    if (parsed.type === 'task_assigned' && parsed.payload) {
+      const p = parsed.payload;
+      return {
+        id: `ta-${p.task_id}`,
+        type: 'task',
+        agentName: p.agent_id || '?',
+        message: `📌 ${p.role}: ${p.title || '?'} → ${p.agent_id || '?'} (bid=${p.bid_amount})`,
+        timestamp: parsed.timestamp || new Date().toISOString(),
+        details: p,
+      };
+    }
+    if (parsed.type === 'task_completed' && parsed.payload) {
+      const p = parsed.payload;
+      return {
+        id: `tc-${p.task_id}`,
+        type: 'artifact',
+        agentName: p.agent_id || '?',
+        message: `✅ ${p.title || '?'} — +${p.reward_energy || 0}⚡ +${((p.trust_boost || 0) * 100).toFixed(1)}% trust`,
+        timestamp: parsed.timestamp || new Date().toISOString(),
+        details: p,
+      };
+    }
+
+    // Agent lifecycle events
+    if (parsed.type === 'agent_died' && parsed.payload) {
+      const p = parsed.payload;
+      return {
+        id: `die-${p.agent_id}-${parsed.timestamp}`,
+        type: 'alert',
+        agentName: p.agent_id || '?',
+        message: `💀 Agent died: ${p.agent_id} (${p.role || '?'}) gen=${p.generation || 0} total_deaths=${p.total_deaths || 0}`,
+        timestamp: parsed.timestamp || new Date().toISOString(),
+        details: p,
+      };
+    }
+    if (parsed.type === 'agent_reborn' && parsed.payload) {
+      const p = parsed.payload;
+      return {
+        id: `reb-${p.agent_id}-${parsed.timestamp}`,
+        type: 'genesis',
+        agentName: p.agent_id || '?',
+        message: `✨ Agent reborn: ${p.agent_id} (${p.role}) gen=${p.new_generation} ⚡${p.starting_energy} trust=${p.starting_trust}`,
+        timestamp: parsed.timestamp || new Date().toISOString(),
+        details: p,
+      };
+    }
+
     // Old tick events (fallback)
     if (parsed.type === 'tick' && parsed.payload) {
       return {
