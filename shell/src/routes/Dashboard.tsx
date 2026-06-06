@@ -6,6 +6,30 @@ interface DashboardMetrics {
   tick: number;
 }
 
+interface Resource {
+  id: number;
+  name: string;
+  total_supply: number;
+  base_price: number;
+  current_price: number;
+}
+
+interface Trade {
+  buyer_name: string;
+  seller_name: string;
+  resource_id: number;
+  quantity: number;
+  total_energy: number;
+}
+
+interface Offer {
+  agent_name: string;
+  offer_type: string;
+  resource_id: number;
+  quantity: number;
+  price_per_unit: number;
+}
+
 const trustColor = (score: number) => {
   if (score >= 0.7) return '#22c55e';
   if (score >= 0.4) return '#eab308';
@@ -15,21 +39,33 @@ const trustColor = (score: number) => {
 const Dashboard: React.FC = () => {
   const { liveAgents, openAgentByName, wsConnected } = useAgent();
   const [metrics, setMetrics] = useState<DashboardMetrics>({ totalTasks: 0, tick: 0 });
+  const [resources, setResources] = useState<Resource[]>([]);
+  const [trades, setTrades] = useState<Trade[]>([]);
+  const [offers, setOffers] = useState<Offer[]>([]);
 
   // Fetch supplemental metrics (not agent-specific)
   useEffect(() => {
     const fetchMetrics = async () => {
       try {
-        const [healthRes, tasksRes] = await Promise.all([
+        const [healthRes, tasksRes, ecoRes, tradesRes, offersRes] = await Promise.all([
           fetch('/api/v1/health'),
           fetch('/api/v1/tasks/'),
+          fetch('/api/v1/economy/resources'),
+          fetch('/api/v1/economy/history?limit=5'),
+          fetch('/api/v1/economy/offers'),
         ]);
         const health = healthRes.ok ? await healthRes.json() : {};
         const tasksJson = tasksRes.ok ? await tasksRes.json() : {};
+        const ecoData = ecoRes.ok ? await ecoRes.json() : {};
+        const tradesData = tradesRes.ok ? await tradesRes.json() : {};
+        const offersData = offersRes.ok ? await offersRes.json() : {};
         setMetrics({
           totalTasks: tasksJson.total || 0,
           tick: health.tick || 0,
         });
+        setResources(ecoData.resources || []);
+        setTrades((tradesData.history || []).slice(0, 5));
+        setOffers(offersData.offers || []);
       } catch { /* silent */ }
     };
     fetchMetrics();
@@ -127,6 +163,60 @@ const Dashboard: React.FC = () => {
           </div>
         </div>
       </div>
+
+      {/* Economy section */}
+      <div style={{ ...styles.section, marginTop: 16 }}>
+        <h3 style={styles.sectionTitle}>💰 Economy</h3>
+        <div style={{ display: 'flex', gap: 24, flexWrap: 'wrap' }}>
+
+          {/* Resource prices */}
+          <div style={{ flex: '1 1 200px' }}>
+            <div style={{ fontSize: 12, color: '#6b7280', marginBottom: 6 }}>Resource Prices</div>
+            {resources.map((r) => (
+              <div key={r.id} style={styles.trustRow}>
+                <span style={{ flex: 1, fontSize: 13, textTransform: 'capitalize' }}>{r.name.replace(/_/g, ' ')}</span>
+                <span style={{ fontSize: 12, color: '#fbbf24' }}>${r.current_price?.toFixed(2)}</span>
+                <span style={{ fontSize: 11, color: '#6b7280', marginLeft: 8 }}>{r.total_supply?.toFixed(1)}</span>
+              </div>
+            ))}
+          </div>
+
+          {/* Active offers */}
+          <div style={{ flex: '1 1 250px' }}>
+            <div style={{ fontSize: 12, color: '#6b7280', marginBottom: 6 }}>Active Offers ({offers.length})</div>
+            {offers.length === 0 && <div style={{ fontSize: 12, color: '#525252', fontStyle: 'italic' }}>No active offers</div>}
+            {offers.map((o, i) => (
+              <div key={i} style={styles.trustRow}>
+                <span style={{ fontSize: 11, color: o.offer_type === 'sell' ? '#ef4444' : '#22c55e', fontWeight: 600, width: 32 }}>
+                  {o.offer_type === 'sell' ? 'SELL' : 'BUY'}
+                </span>
+                <span style={{ flex: 1, fontSize: 12 }}>{o.agent_name}</span>
+                <span style={{ fontSize: 11, color: '#6b7280' }}>#{o.resource_id}</span>
+                <span style={{ fontSize: 12, color: '#d4d4d4' }}>{o.quantity?.toFixed(1)}</span>
+                <span style={{ fontSize: 12, color: '#fbbf24' }}>@{o.price_per_unit?.toFixed(2)}</span>
+              </div>
+            ))}
+          </div>
+
+          {/* Recent trades */}
+          <div style={{ flex: '1 1 250px' }}>
+            <div style={{ fontSize: 12, color: '#6b7280', marginBottom: 6 }}>Recent Trades ({trades.length})</div>
+            {trades.length === 0 && <div style={{ fontSize: 12, color: '#525252', fontStyle: 'italic' }}>No trades yet</div>}
+            {trades.map((t, i) => (
+              <div key={i} style={styles.trustRow}>
+                <span style={{ fontSize: 11, color: '#22c55e' }}>{t.seller_name}</span>
+                <span style={{ fontSize: 11, color: '#6b7280' }}>→</span>
+                <span style={{ fontSize: 11, color: '#88ccff' }}>{t.buyer_name}</span>
+                <span style={{ flex: 1 }} />
+                <span style={{ fontSize: 12, color: '#d4d4d4' }}>#{t.resource_id}</span>
+                <span style={{ fontSize: 12, color: '#fbbf24' }}>{t.total_energy?.toFixed(1)}⚡</span>
+              </div>
+            ))}
+          </div>
+
+        </div>
+      </div>
+
     </div>
   );
 };

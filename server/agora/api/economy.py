@@ -1,5 +1,16 @@
 """Economy API — resource pool, trading, market."""
 from fastapi import APIRouter, Request, HTTPException
+from agora.api.dungeon import DUNGEON_AGENT_IDS
+
+# UUID -> NPC name reverse lookup
+UUID_TO_NAME = {v: k for k, v in DUNGEON_AGENT_IDS.items()}
+
+
+def _resolve_name(agent_id: str) -> str:
+    if agent_id in UUID_TO_NAME:
+        return UUID_TO_NAME[agent_id]
+    return agent_id[:8]
+
 
 router = APIRouter(prefix="/api/v1/economy", tags=["economy"])
 
@@ -44,6 +55,8 @@ async def create_offer(
 async def list_offers(request: Request, resource_id: int | None = None):
     eco = get_economy(request)
     offers = await eco.get_open_offers(resource_id)
+    for o in offers:
+        o["agent_name"] = _resolve_name(o["agent_id"])
     return {"offers": offers, "total": len(offers)}
 
 
@@ -51,6 +64,9 @@ async def list_offers(request: Request, resource_id: int | None = None):
 async def trade_history(request: Request, limit: int = 20):
     eco = get_economy(request)
     history = await eco.get_trade_history(limit)
+    for h in history:
+        h["buyer_name"] = _resolve_name(h["buyer_id"])
+        h["seller_name"] = _resolve_name(h["seller_id"])
     return {"history": history, "total": len(history)}
 
 

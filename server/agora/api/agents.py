@@ -50,10 +50,40 @@ async def get_db(request: Request):
     return request.app.state.db
 
 
+def _safe_parse_json(val, default=None):
+    """Parse a JSON string or return the value as-is if already a list/dict."""
+    import json
+    if isinstance(val, (list, dict)):
+        return val
+    if isinstance(val, str):
+        try:
+            return json.loads(val)
+        except (json.JSONDecodeError, TypeError):
+            pass
+    return default or ([] if isinstance(default, list) else {})
+
+
 def _merge_dungeon_data(row, agent_only: dict | None = None) -> dict:
     """Merge agent_identities row with dungeon NPC name mapping."""
     agent = dict(row)
-    agent_id = agent.get("agent_id", "")
+    agent_id = agent.get("agent_id") or ""
+    agent["agent_id"] = agent_id  # ensure it's always a string
+
+    # Parse JSON fields that come as strings from DB
+    inv = agent.get("inventory")
+    agent["inventory"] = _safe_parse_json(inv, [])
+    genome_val = agent.get("genome")
+    agent["genome"] = _safe_parse_json(genome_val, {})
+    # Ensure scalar fields are never None
+    for key in ("objective", "created_at"):
+        if agent.get(key) is None:
+            agent[key] = ""
+    for key in ("health", "pos_x", "pos_y"):
+        if agent.get(key) is None:
+            agent[key] = 0.0
+    for key in ("trust_score", "energy_balance"):
+        if agent.get(key) is None:
+            agent[key] = 0.0
 
     # First try UUID-to-name mapping
     name_from_uuid = UUID_TO_NAME.get(agent_id, "")
@@ -64,14 +94,19 @@ def _merge_dungeon_data(row, agent_only: dict | None = None) -> dict:
     except (KeyError, IndexError, TypeError):
         npc_name = None
 
-    actual_name = npc_name or name_from_uuid or agent_id[:8]
+    actual_name = npc_name or name_from_uuid
+    if not actual_name:
+        actual_name = agent_id[:8] if agent_id else "unknown"
     agent["name"] = actual_name
 
     if npc_name or name_from_uuid:
         agent["objective"] = agent.get("objective") or f"Operating as {actual_name}"
-        agent["health"] = agent.get("health") or 100
-        agent["pos_x"] = agent.get("pos_x") or 0
-        agent["pos_y"] = agent.get("pos_y") or 0
+        if not agent.get("health"):
+            agent["health"] = 100
+        if not agent.get("pos_x"):
+            agent["pos_x"] = 0
+        if not agent.get("pos_y"):
+            agent["pos_y"] = 0
     return agent
 
 
@@ -91,10 +126,7 @@ async def list_agents(db=Depends(get_db)):
     agents = []
     for row in rows:
         merged = _merge_dungeon_data(row, row)
-        try:
-            genome = json.loads(merged.get("genome", "{}"))
-        except (json.JSONDecodeError, TypeError):
-            genome = {}
+        genome = merged.get("genome", {})
         agents.append(AgentResponse(
             agent_id=merged["agent_id"],
             name=merged.get("name", "") or "",
@@ -141,10 +173,7 @@ async def get_agent(agent_id: str, db=Depends(get_db)):
         raise HTTPException(status_code=404, detail="Agent not found")
 
     merged = _merge_dungeon_data(row, row)
-    try:
-        genome = json.loads(merged.get("genome", "{}"))
-    except (json.JSONDecodeError, TypeError):
-        genome = {}
+    genome = merged.get("genome", {})
     return AgentResponse(
         agent_id=merged["agent_id"],
         name=merged.get("name", "") or "",
@@ -176,14 +205,15 @@ async def get_agent_tasks(agent_id: str, db=Depends(get_db)):
     rows = await cursor.fetchall()
     tasks = []
     for row in rows:
+        r = dict(row)
         tasks.append({
-            "id": row["id"],
-            "title": row.get("title", ""),
-            "description": row.get("description", ""),
-            "status": row.get("status", "pending"),
-            "difficulty": row.get("difficulty", 1),
-            "reward": row.get("reward", 0),
-            "created_at": row.get("created_at", ""),
+            "id": r["id"],
+            "title": r.get("title", ""),
+            "description": r.get("description", ""),
+            "status": r.get("status", "pending"),
+            "difficulty": r.get("difficulty", 1),
+            "reward": r.get("reward", 0),
+            "created_at": r.get("created_at", ""),
         })
     return {"tasks": tasks, "total": len(tasks)}
 

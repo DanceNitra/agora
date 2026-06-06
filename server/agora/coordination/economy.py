@@ -167,7 +167,25 @@ class EconomyEngine:
         buyer_id = match["agent_id"] if match["offer_type"] == "buy" else offer["agent_id"]
         seller_id = offer["agent_id"] if offer["offer_type"] == "sell" else match["agent_id"]
 
-        # Check buyer has energy
+        # ── D2: Reputation-based pricing ──
+        # Look up mutual trust between buyer and seller
+        trust_adjustment = 1.0  # 1.0 = no change
+        cursor_trust = await self.db.execute(
+            "SELECT score FROM trust_scores "
+            "WHERE ((source_id=? AND target_id=?) OR (source_id=? AND target_id=?)) "
+            "ORDER BY last_updated DESC LIMIT 1",
+            (buyer_id, seller_id, seller_id, buyer_id),
+        )
+        trust_row = await cursor_trust.fetchone()
+        if trust_row:
+            trust = trust_row["score"]
+            if trust >= 0.7:
+                trust_adjustment = 0.9   # 10% discount for trusted partners
+            elif trust <= 0.3:
+                trust_adjustment = 1.15  # 15% premium for low-trust partners
+
+        trade_price = round(offer["price_per_unit"] * trust_adjustment, 2)
+        trade_qty = min(offer["quantity"], match["quantity"])
         cursor = await self.db.execute(
             "SELECT energy_balance FROM agent_identities WHERE agent_id=?",
             (buyer_id,),

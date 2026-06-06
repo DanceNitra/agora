@@ -13,6 +13,7 @@ import aiosqlite
 
 from agora.config import settings
 from agora.coordination.ess_protocol import TrustEngine
+from agora.coordination.economy_config import get_role_config, ROLE_ECONOMY
 from agora.coordination.stigmergy import StigmergyPool
 from agora.coordination.economy import EconomyEngine
 from agora.execution.task_executor import TaskExecutor
@@ -54,6 +55,33 @@ async def init_db(app: FastAPI):
     await app.state.stigmergy.load_from_db()
     app.state.economy = EconomyEngine(db)
     await app.state.economy.init_resources()
+
+    # Seed initial agent inventories for dungeon NPCs
+    cursor = await db.execute(
+        "SELECT COUNT(*) as c FROM agent_inventory"
+    )
+    row = await cursor.fetchone()
+    if row and row["c"] == 0:
+        seed_data = [
+            ("00000000-0000-0000-0000-000000000001", 1, 5.0),   # Kael: gold_ore
+            ("00000000-0000-0000-0000-000000000002", 2, 4.0),   # Lyra: herbs
+            ("00000000-0000-0000-0000-000000000003", 5, 3.0),   # Mordecai: scroll_fragment
+            ("00000000-0000-0000-0000-000000000003", 3, 2.0),   # Mordecai: crystal_shards
+            ("00000000-0000-0000-0000-000000000004", 4, 4.0),   # Grom: iron_ingot
+            ("00000000-0000-0000-0000-000000000004", 1, 2.0),   # Grom: gold_ore
+            ("00000000-0000-0000-0000-000000000005", 2, 5.0),   # Zara: herbs
+            ("00000000-0000-0000-0000-000000000005", 3, 1.0),   # Zara: crystal_shards
+            ("00000000-0000-0000-0000-000000000006", 1, 3.0),   # Finn: gold_ore (trading capital)
+            ("00000000-0000-0000-0000-000000000006", 4, 3.0),   # Finn: iron_ingot
+            ("00000000-0000-0000-0000-000000000007", 4, 2.0),   # Guard: iron_ingot
+        ]
+        for agent_id, res_id, qty in seed_data:
+            await db.execute(
+                "INSERT INTO agent_inventory (agent_id, resource_id, quantity) VALUES (?, ?, ?)",
+                (agent_id, res_id, qty),
+            )
+        await db.commit()
+        print(f"[Economy] Seeded inventories for {len(set(a[0] for a in seed_data))} agents")
     app.state.task_executor = TaskExecutor(db)
     app.state.agent_lifecycle = AgentLifecycle(db)
     app.state.csd_monitor = CSDMonitor(window_size=200, z_threshold_warning=2.0, z_threshold_critical=3.5)
@@ -225,6 +253,88 @@ async def ws_endpoint(websocket: WebSocket):
             await broadcast(websocket.app, "message", {"text": data})
     except WebSocketDisconnect:
         websocket.app.state.active_connections.remove(websocket)
+
+
+async def _economy_tick(app: FastAPI):
+    """Production, consumption, and auto-trading for all active agents."""
+    eco = app.state.economy
+    db = app.state.db
+
+    # Get active agents with their roles
+    cursor = await db.execute(
+        "SELECT a.agent_id, a.role, a.energy_balance, d.npc_name "
+        "FROM agent_identities a "
+        "LEFT JOIN dungeon_npcs d ON a.agent_id = d.npc_id "
+        "WHERE a.status='active'"
+    )
+    agents = await cursor.fetchall()
+
+    for agent in agents:
+        agent_id = agent["agent_id"]
+        role = agent["role"]
+        npc_name = agent["npc_name"] or ""
+        energy = agent["energy_balance"] or 0
+
+        # Determine config by NPC name first, then by role
+        cfg = get_role_config(npc_name)
+        if not cfg.get("produces") and not cfg.get("consumes"):
+            cfg = get_role_config(role)
+
+        # Skip if agent has no production/consumption (generic agents)
+        if not cfg.get("produces") and not cfg.get("consumes"):
+            continue
+
+        # 1. PRODUCTION — each tick, agents produce role-specific resources
+        for res_id, qty in cfg.get("produces", []):
+            if energy >= 5:  # need at least some energy to produce
+                await eco.add_to_inventory(agent_id, res_id, qty)
+                await db.execute(
+                    "UPDATE agent_identities SET energy_balance=MAX(energy_balance-1, 0) WHERE agent_id=?",
+                    (agent_id,),
+                )
+
+        # 2. CONSUMPTION — agents consume resources they need
+        for res_id, qty in cfg.get("consumes", []):
+            removed = await eco.remove_from_inventory(agent_id, res_id, qty)
+            if not removed:
+                # Can't consume → auto-create a buy offer
+                open_offers = await eco.get_open_offers(res_id)
+                existing_buy = [o for o in open_offers if o["agent_id"] == agent_id and o["offer_type"] == "buy"]
+                if not existing_buy:  # don't spam duplicate offers
+                    # Price: 80% of market → competitive buy
+                    price = await eco.get_market_price(res_id)
+                    await eco.create_offer(agent_id, "buy", res_id, qty * 2, round(price * 0.8, 2))
+
+        # 3. AUTO-SELL — surplus resources → create sell offers
+        surplus = cfg.get("surplus_threshold", 3.0)
+        deficit = cfg.get("deficit_threshold", 1.0)
+
+        # Check inventory for resources this role produces
+        inv = await eco.get_agent_inventory(agent_id)
+        for item in inv:
+            res_id = item["resource_id"]
+            qty = item["quantity"]
+
+            # Is this a resource the role produces?
+            produces_ids = [p[0] for p in cfg.get("produces", [])]
+            if res_id in produces_ids and qty > surplus:
+                # Sell surplus
+                sell_qty = qty - deficit
+                if sell_qty > 0.5:
+                    open_offers = await eco.get_open_offers(res_id)
+                    existing_sell = [o for o in open_offers if o["agent_id"] == agent_id and o["offer_type"] == "sell"]
+                    if not existing_sell:
+                        price = await eco.get_market_price(res_id)
+                        result = await eco.create_offer(agent_id, "sell", res_id, sell_qty, round(price * 1.1, 2))
+                        if result.get("status") == "filled":
+                            await app.state.stigmergy.write_trace(
+                                agent_id=agent_id,
+                                task_type="trade",
+                                result=f"[{npc_name or role}] Sold {sell_qty:.1f}x resource #{res_id} for {result.get('total_energy', 0)} energy",
+                                trust_delta=0.05,
+                            )
+
+    await db.commit()
 
 
 async def tick_loop(app: FastAPI):
@@ -409,6 +519,38 @@ async def tick_loop(app: FastAPI):
                 print(f"[Tasks] Tick error: {e}")
                 import traceback
                 traceback.print_exc()
+
+            # ── 9. Economy tick (production, consumption, auto-trade) ──
+            if app.state.tick_count % 2 == 0:  # every 2 ticks
+                try:
+                    await _economy_tick(app)
+                except Exception as e:
+                    print(f"[Economy] Tick error: {e}")
+                    import traceback
+                    traceback.print_exc()
+
+            # ── 10. Stigmergic economy signals (every 10 ticks) ──
+            if app.state.tick_count > 0 and app.state.tick_count % 10 == 0:
+                try:
+                    resources = await app.state.economy.get_all_resources()
+                    price_signals = []
+                    for r in resources:
+                        price = await app.state.economy.get_market_price(r["id"])
+                        price_signals.append(f"{r['name']}={price}")
+                    await app.state.stigmergy.write_trace(
+                        agent_id="system",
+                        task_type="market_prices",
+                        result=" | ".join(price_signals),
+                        trust_delta=0.0,
+                    )
+                    await app.state.stigmergy.write_trace(
+                        agent_id="system",
+                        task_type="market_activity",
+                        result=f"Active agents: {len(agents)}. Total energy: {sum(a['energy_balance'] for a in agents):.0f}",
+                        trust_delta=0.0,
+                    )
+                except Exception as e:
+                    print(f"[Stigmergy] Market signal error: {e}")
 
             if app.state.tick_count % 5 == 0:
                 best_agents = {}
