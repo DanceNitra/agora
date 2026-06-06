@@ -7,7 +7,7 @@ class Settings(BaseSettings):
     database_url: str = "sqlite+aiosqlite:///./agora.db"
     redis_url: str = "redis://localhost:6379/0"
     use_redis: bool = False
-    tick_interval: int = 5
+    tick_interval: int = 10
     max_agents: int = 30
     debug: bool = True
     api_key: str = ""

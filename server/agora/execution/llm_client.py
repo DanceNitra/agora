@@ -139,7 +139,7 @@ def agent_think(role: str, context: str, tier: str = "cheap") -> dict:
         user_prompt=f"Current context: {context}\n\nRespond with a JSON object. What do you do?",
         tier=tier,
         temperature=0.7,
-        max_tokens=300,
+        max_tokens=1000,
         response_format={"type": "json_object"},
     )
 
