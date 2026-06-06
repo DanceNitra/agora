@@ -200,13 +200,14 @@ class TaskExecutor:
         return resolved
 
     async def _resolve_and_assign(self, tasks, db, require_bids: bool = True) -> list[dict]:
-        """Assign each task to best bidder or random fallback."""
+        """Assign each task to best bidder or prefer assigned NPC as fallback."""
         resolved = []
 
         for task in tasks:
             task_id = task["id"]
             meta = json.loads(task["metadata"] or "{}")
             target_ticks = meta.get("target_ticks", 3)
+            assigned_npc = meta.get("assigned_npc", "")
 
             if require_bids:
                 # Find highest bid
@@ -225,21 +226,64 @@ class TaskExecutor:
                     bid_amount = best["bid_amount"]
                     bid_reason = "highest bidder"
                 else:
-                    # No bids (edge case) — skip for this pass
                     continue
             else:
-                # Auto-assign to random active agent
-                cursor = await db.execute(
-                    "SELECT agent_id, role FROM agent_identities WHERE status='active' "
-                    "ORDER BY RANDOM() LIMIT 1"
-                )
-                random_agent = await cursor.fetchone()
-                if not random_agent:
-                    continue
-                agent_id = random_agent["agent_id"]
-                role = random_agent["role"]
-                bid_amount = 0.5
-                bid_reason = "auto-assigned (no bids)"
+                # Auto-assign: prefer the assigned NPC's agent_id
+                if assigned_npc:
+                    from agora.api.dungeon import DUNGEON_AGENT_IDS
+                    npc_agent_id = DUNGEON_AGENT_IDS.get(assigned_npc)
+                    if npc_agent_id:
+                        # Check if NPC agent exists and is active
+                        cursor = await db.execute(
+                            "SELECT agent_id, role FROM agent_identities "
+                            "WHERE agent_id=? AND status='active'",
+                            (npc_agent_id,),
+                        )
+                        npc = await cursor.fetchone()
+                        if npc:
+                            agent_id = npc["agent_id"]
+                            role = npc["role"]
+                            bid_amount = 0.7
+                            bid_reason = f"assigned to {assigned_npc} (preferred)"
+                        else:
+                            # NPC not active — random fallback
+                            cursor = await db.execute(
+                                "SELECT agent_id, role FROM agent_identities WHERE status='active' "
+                                "ORDER BY RANDOM() LIMIT 1"
+                            )
+                            random_agent = await cursor.fetchone()
+                            if not random_agent:
+                                continue
+                            agent_id = random_agent["agent_id"]
+                            role = random_agent["role"]
+                            bid_amount = 0.5
+                            bid_reason = "auto-assigned (NPC unavailable)"
+                    else:
+                        # NPC not in DUNGEON_AGENT_IDS — random fallback
+                        cursor = await db.execute(
+                            "SELECT agent_id, role FROM agent_identities WHERE status='active' "
+                            "ORDER BY RANDOM() LIMIT 1"
+                        )
+                        random_agent = await cursor.fetchone()
+                        if not random_agent:
+                            continue
+                        agent_id = random_agent["agent_id"]
+                        role = random_agent["role"]
+                        bid_amount = 0.5
+                        bid_reason = "auto-assigned (NPC unknown)"
+                else:
+                    # No NPC assignment — random fallback
+                    cursor = await db.execute(
+                        "SELECT agent_id, role FROM agent_identities WHERE status='active' "
+                        "ORDER BY RANDOM() LIMIT 1"
+                    )
+                    random_agent = await cursor.fetchone()
+                    if not random_agent:
+                        continue
+                    agent_id = random_agent["agent_id"]
+                    role = random_agent["role"]
+                    bid_amount = 0.5
+                    bid_reason = "auto-assigned (no bids)"
 
             # Accept bid / assign task
             await db.execute(
