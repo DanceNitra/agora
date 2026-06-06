@@ -8,7 +8,7 @@
 
 | Phase | Status | Tasks | Completion |
 |:------|:------:|:-----:|:----------:|
-| 🏗️ **Phase 0** — Foundations | ⬜ | 6 | 0/6 |
+| 🏗️ **Phase 0** — Foundations | ✅ | 6 | **6/6** |
 | 🤖 **Phase 1** — Fake Agents | ⬜ | 5 | 0/5 |
 | 🧠 **Phase 2** — One Real Agent | ⬜ | 5 | 0/5 |
 | 👥 **Phase 3** — Multi-Agent + Orchestrator | ⬜ | 6 | 0/6 |
@@ -24,12 +24,12 @@
 
 ### Questy
 
-- [ ] **Q0.1** — TypeScript fundamentals (types, interfaces, classes, modules)
-- [ ] **Q0.2** — Phaser 3: create a scene, load assets, render a sprite
-- [ ] **Q0.3** — Tilemap: draw a dungeon room, load Tiled JSON map
-- [ ] **Q0.4** — Player movement: keyboard input, camera follows player
-- [ ] **Q0.5** — Collision: walls block movement, basic overlap detection
-- [ ] **Q0.6** — Camera: scrolling, zoom, world bounds
+- [x] **Q0.1** — TypeScript fundamentals (types, interfaces, classes, modules)
+- [x] **Q0.2** — Phaser 3: create a scene, load assets, render a sprite
+- [x] **Q0.3** — Tilemap: draw a dungeon room, load Tiled JSON map
+- [x] **Q0.4** — Player movement: keyboard input, camera follows player
+- [x] **Q0.5** — Collision: walls block movement, basic overlap detection
+- [x] **Q0.6** — Camera: scrolling, zoom, world bounds
 
 ### 📚 Literature
 
