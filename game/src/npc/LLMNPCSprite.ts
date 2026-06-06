@@ -62,6 +62,7 @@ export class LLMNPCSprite extends Phaser.Physics.Arcade.Sprite {
   private label!: Phaser.GameObjects.Text;
   private speechBubble!: Phaser.GameObjects.Text;
   private memoryBubble!: Phaser.GameObjects.Text;
+  private healthBar!: Phaser.GameObjects.Graphics;
 
   // LLM state
   private pendingDecision: LLMDecision | null = null;
@@ -131,6 +132,10 @@ export class LLMNPCSprite extends Phaser.Physics.Arcade.Sprite {
     this.memoryBubble = scene.add.text(x, y - 50, '', {
       ...bubbleStyle, fontSize: '7px', color: '#88dd88',
     }).setOrigin(0.5).setDepth(10).setAlpha(0);
+
+    // Health bar
+    this.healthBar = scene.add.graphics();
+    this.healthBar.setDepth(10);
 
     this.buildTree();
   }
@@ -564,6 +569,28 @@ export class LLMNPCSprite extends Phaser.Physics.Arcade.Sprite {
     this.label.setDepth(this.y + 1);
     this.speechBubble.setDepth(this.y + 1);
     this.memoryBubble.setDepth(this.y + 1);
+
+    // Health bar
+    this.drawHealthBar();
+  }
+
+  private drawHealthBar(): void {
+    this.healthBar.clear();
+    this.healthBar.setPosition(this.x - 12, this.y - 30);
+
+    // Background (dark red)
+    this.healthBar.fillStyle(0x441111, 1);
+    this.healthBar.fillRect(0, 0, 24, 3);
+
+    // Health fill (green → yellow → red)
+    const ratio = Math.max(0, this.health / 100);
+    const hColor = ratio > 0.6 ? 0x44cc44 : ratio > 0.3 ? 0xcccc44 : 0xcc4444;
+    this.healthBar.fillStyle(hColor, 1);
+    this.healthBar.fillRect(0, 0, 24 * ratio, 3);
+
+    // Border
+    this.healthBar.lineStyle(1, 0xffffff, 0.3);
+    this.healthBar.strokeRect(0, 0, 24, 3);
   }
 
   destroy() {

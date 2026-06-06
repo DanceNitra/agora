@@ -15,6 +15,7 @@ export class GameScene extends Phaser.Scene {
   private npcSprites: Phaser.Physics.Arcade.Sprite[] = [];
   private cursors!: Phaser.Types.Input.Keyboard.CursorKeys;
   private wasd!: Record<string, Phaser.Input.Keyboard.Key>;
+  private minimap!: Phaser.GameObjects.Graphics;
 
   constructor() {
     super({ key: 'GameScene' });
@@ -179,6 +180,12 @@ export class GameScene extends Phaser.Scene {
     cam.startFollow(this.player, true, 0.09, 0.09);
     cam.setZoom(1.5);
 
+    // --- MINIMAP (Q4.2) ---
+    this.minimap = this.add.graphics();
+    this.minimap.setScrollFactor(0);
+    this.minimap.setDepth(999);
+    this.minimap.setAlpha(0.7);
+
     // --- INPUT ---
     if (this.input.keyboard) {
       this.cursors = this.input.keyboard.createCursorKeys();
@@ -219,6 +226,65 @@ export class GameScene extends Phaser.Scene {
     for (const npc of this.npcs) {
       npc.update(delta);
     }
+
+    // --- MINIMAP (Q4.2) ---
+    this.drawMiniMap();
+  }
+
+  private drawMiniMap(): void {
+    this.minimap.clear();
+
+    const mmW = 120;
+    const mmH = 100;
+    const mmX = this.cameras.main.width - mmW - 8;
+    const mmY = this.cameras.main.height - mmH - 8;
+    const scaleX = mmW / (MAP_W * TILE);
+    const scaleY = mmH / (MAP_H * TILE);
+
+    // Background
+    this.minimap.fillStyle(0x000000, 0.6);
+    this.minimap.fillRect(mmX, mmY, mmW, mmH);
+    this.minimap.lineStyle(1, 0x444466, 0.8);
+    this.minimap.strokeRect(mmX, mmY, mmW, mmH);
+
+    // Walls
+    this.minimap.fillStyle(0x444455, 0.8);
+    for (let y = 0; y < MAP_H; y++) {
+      for (let x = 0; x < MAP_W; x++) {
+        if (DUNGEON_MAP[y]?.[x] === 1) {
+          this.minimap.fillRect(
+            mmX + x * TILE * scaleX,
+            mmY + y * TILE * scaleY,
+            Math.max(1, TILE * scaleX),
+            Math.max(1, TILE * scaleY),
+          );
+        }
+      }
+    }
+
+    // NPCs (green dots)
+    for (const npc of this.npcSprites) {
+      this.minimap.fillStyle(0x44ff88, 1);
+      this.minimap.fillCircle(
+        mmX + npc.x * scaleX,
+        mmY + npc.y * scaleY,
+        2,
+      );
+    }
+
+    // Player (blue dot, larger)
+    this.minimap.fillStyle(0x4488ff, 1);
+    this.minimap.fillCircle(
+      mmX + this.player.x * scaleX,
+      mmY + this.player.y * scaleY,
+      3,
+    );
+    this.minimap.lineStyle(1, 0x88bbff, 0.8);
+    this.minimap.strokeCircle(
+      mmX + this.player.x * scaleX,
+      mmY + this.player.y * scaleY,
+      3,
+    );
   }
 
   /** Spawn a new LLM NPC dynamically (God Console !spawn). */

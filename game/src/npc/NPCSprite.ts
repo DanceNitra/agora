@@ -12,6 +12,7 @@ interface WorkStation {
 export class NPCSprite extends Phaser.Physics.Arcade.Sprite {
   public brain: NPCBrain;
   public role: NPCRole;
+  public health: number = 100;
 
   private boredom: number = 0;
   private workTimer: number = 0;
@@ -23,6 +24,7 @@ export class NPCSprite extends Phaser.Physics.Arcade.Sprite {
   // Visual indicators
   private stateLabel!: Phaser.GameObjects.Text;
   private roleLabel!: Phaser.GameObjects.Text;
+  private healthBar!: Phaser.GameObjects.Graphics;
 
   constructor(
     scene: Phaser.Scene,
@@ -61,6 +63,10 @@ export class NPCSprite extends Phaser.Physics.Arcade.Sprite {
       backgroundColor: '#00000088',
       padding: { x: 2, y: 1 },
     }).setOrigin(0.5).setDepth(10);
+
+    // Health bar
+    this.healthBar = scene.add.graphics();
+    this.healthBar.setDepth(10);
 
     // Create FSM brain
     this.brain = new NPCBrain({
@@ -104,6 +110,22 @@ export class NPCSprite extends Phaser.Physics.Arcade.Sprite {
     this.setDepth(this.y);
     this.stateLabel.setDepth(this.y + 1);
     this.roleLabel.setDepth(this.y + 1);
+
+    // Health bar
+    this.drawHealthBar();
+  }
+
+  private drawHealthBar(): void {
+    this.healthBar.clear();
+    this.healthBar.setPosition(this.x - 12, this.y - 34);
+    this.healthBar.fillStyle(0x441111, 1);
+    this.healthBar.fillRect(0, 0, 24, 3);
+    const ratio = Math.max(0, this.health / 100);
+    const hColor = ratio > 0.6 ? 0x44cc44 : ratio > 0.3 ? 0xcccc44 : 0xcc4444;
+    this.healthBar.fillStyle(hColor, 1);
+    this.healthBar.fillRect(0, 0, 24 * ratio, 3);
+    this.healthBar.lineStyle(1, 0xffffff, 0.3);
+    this.healthBar.strokeRect(0, 0, 24, 3);
   }
 
   private beIdle(): void {
