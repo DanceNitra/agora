@@ -21,13 +21,13 @@ DEFAULT_TIERS = [
     ),
     TierConfig(
         name="medium",
-        model="deepseek-v4",
+        model="deepseek-v4-flash",
         cost_per_token=0.000_000_60,
         description="Balanced model for general reasoning tasks.",
     ),
     TierConfig(
         name="expert",
-        model="deepseek-v4-ultra",
+        model="deepseek-v4-flash",
         cost_per_token=0.000_003_00,
         description="Highest-quality model for complex reasoning and codegen.",
     ),
