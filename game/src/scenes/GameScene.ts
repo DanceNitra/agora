@@ -1,10 +1,10 @@
 import Phaser from 'phaser';
+import { NPCSprite, NPCRole } from '../npc/NPCSprite';
 
 const TILE = 32;
-const MAP_W = 25; // tiles
-const MAP_H = 19; // tiles
+const MAP_W = 25;
+const MAP_H = 19;
 
-// 0=floor, 1=wall, 2=door
 const DUNGEON_MAP: number[][] = [
   [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1],
   [1,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],
@@ -31,6 +31,7 @@ export class GameScene extends Phaser.Scene {
   private player!: Phaser.Physics.Arcade.Sprite;
   private walls!: Phaser.Physics.Arcade.StaticGroup;
   private doors!: Phaser.Physics.Arcade.StaticGroup;
+  private npcs: NPCSprite[] = [];
   private cursors!: Phaser.Types.Input.Keyboard.CursorKeys;
   private wasd!: Record<string, Phaser.Input.Keyboard.Key>;
 
@@ -39,7 +40,7 @@ export class GameScene extends Phaser.Scene {
   }
 
   create(): void {
-    // --- TILEMAP (Q0.3) ---
+    // --- TILEMAP ---
     this.walls = this.physics.add.staticGroup();
     this.doors = this.physics.add.staticGroup();
 
@@ -52,28 +53,61 @@ export class GameScene extends Phaser.Scene {
         if (tile === 0) {
           this.add.image(px, py, 'floor');
         } else if (tile === 1) {
-          const wall = this.walls.create(px, py, 'wall') as Phaser.Physics.Arcade.Sprite;
-          wall.refreshBody();
+          const w = this.walls.create(px, py, 'wall') as Phaser.Physics.Arcade.Sprite;
+          w.refreshBody();
         } else if (tile === 2) {
-          const door = this.doors.create(px, py, 'door') as Phaser.Physics.Arcade.Sprite;
-          door.refreshBody();
+          const d = this.doors.create(px, py, 'door') as Phaser.Physics.Arcade.Sprite;
+          d.refreshBody();
         }
       }
     }
 
-    // --- PLAYER (Q0.2 + Q0.4) ---
-    // Spawn in the middle of the open area
+    // --- WORKSTATIONS (Q1.5) ---
+    const stations = [
+      { x: 3.5 * TILE, y: 14 * TILE, texture: 'anvil', name: 'Anvil' },
+      { x: 20 * TILE, y: 3 * TILE, texture: 'cauldron', name: 'Cauldron' },
+      { x: 3.5 * TILE, y: 3.5 * TILE, texture: 'counter', name: 'Counter' },
+    ];
+    for (const s of stations) {
+      this.add.image(s.x, s.y, s.texture).setDepth(s.y);
+    }
+
+    // --- NPCS (Q1.4) ---
+    const npcDefs: { x: number; y: number; name: string; role: NPCRole; stationIdx: number | null }[] = [
+      { x: 5 * TILE, y: 10 * TILE, name: 'Grom', role: 'blacksmith', stationIdx: 0 },
+      { x: 15 * TILE, y: 3 * TILE, name: 'Zara', role: 'alchemist', stationIdx: 1 },
+      { x: 5 * TILE, y: 4 * TILE, name: 'Finn', role: 'merchant', stationIdx: 2 },
+    ];
+
+    for (const def of npcDefs) {
+      const ws = def.stationIdx !== null ? {
+        x: stations[def.stationIdx].x,
+        y: stations[def.stationIdx].y,
+        name: stations[def.stationIdx].name,
+      } : null;
+
+      const npc = new NPCSprite(this, def.x, def.y, def.name, def.role, ws);
+      this.npcs.push(npc);
+
+      // NPC collides with walls and doors
+      this.physics.add.collider(npc, this.walls);
+      this.physics.add.collider(npc, this.doors);
+    }
+
+    // --- PLAYER ---
     this.player = this.physics.add.sprite(12 * TILE, 10 * TILE, 'player');
     this.player.setCollideWorldBounds(true);
 
-    // --- COLLISIONS (Q0.5) ---
+    // Player collides with walls, doors, and NPCs
     this.physics.add.collider(this.player, this.walls);
     this.physics.add.collider(this.player, this.doors);
+    for (const npc of this.npcs) {
+      this.physics.add.collider(this.player, npc);
+    }
 
-    // World bounds = map size
     this.physics.world.setBounds(0, 0, MAP_W * TILE, MAP_H * TILE);
 
-    // --- CAMERA (Q0.4 + Q0.6) ---
+    // --- CAMERA ---
     const cam = this.cameras.main;
     cam.setBounds(0, 0, MAP_W * TILE, MAP_H * TILE);
     cam.startFollow(this.player, true, 0.09, 0.09);
@@ -91,7 +125,8 @@ export class GameScene extends Phaser.Scene {
     }
   }
 
-  update(): void {
+  update(_time: number, delta: number): void {
+    // --- PLAYER MOVEMENT ---
     if (!this.player || !this.cursors) return;
 
     const speed = 160;
@@ -100,16 +135,18 @@ export class GameScene extends Phaser.Scene {
 
     if (this.cursors.left.isDown || this.wasd.A.isDown) vx = -speed;
     else if (this.cursors.right.isDown || this.wasd.D.isDown) vx = speed;
-
     if (this.cursors.up.isDown || this.wasd.W.isDown) vy = -speed;
     else if (this.cursors.down.isDown || this.wasd.S.isDown) vy = speed;
 
-    // Normalize diagonal
     if (vx !== 0 && vy !== 0) {
       vx *= 0.707;
       vy *= 0.707;
     }
-
     this.player.setVelocity(vx, vy);
+
+    // --- NPC UPDATES (Q1.2 + Q1.5) ---
+    for (const npc of this.npcs) {
+      npc.update(delta);
+    }
   }
 }

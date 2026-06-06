@@ -67,5 +67,34 @@ export class BootScene extends Phaser.Scene {
       g.lineStyle(1, 0x88ff88, 0.8);
       g.strokeCircle(12, 12, 10);
     });
+
+    // Workbench — anvil (for blacksmith)
+    makeTex('anvil', 28, 24, (g) => {
+      g.fillStyle(0x666688, 1);
+      g.fillRect(4, 14, 20, 10);
+      g.fillTriangle(6, 14, 22, 14, 14, 2);
+      g.lineStyle(1, 0x8888aa, 0.8);
+      g.strokeRect(4, 14, 20, 10);
+    });
+
+    // Workbench — cauldron (for alchemist)
+    makeTex('cauldron', 24, 24, (g) => {
+      g.fillStyle(0x664488, 1);
+      g.fillCircle(12, 14, 10);
+      g.fillRect(4, 4, 16, 10);
+      g.lineStyle(1, 0x8866aa, 0.8);
+      g.strokeCircle(12, 14, 10);
+    });
+
+    // Workbench — counter (for merchant)
+    makeTex('counter', 32, 20, (g) => {
+      g.fillStyle(0x886644, 1);
+      g.fillRect(0, 4, 32, 16);
+      g.lineStyle(1, 0xaa8866, 0.8);
+      g.strokeRect(0, 4, 32, 16);
+      g.fillStyle(0x664422, 1);
+      g.fillRect(2, 14, 12, 6);
+      g.fillRect(18, 14, 12, 6);
+    });
   }
 }
