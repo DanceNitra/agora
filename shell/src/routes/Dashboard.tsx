@@ -13,7 +13,7 @@ const trustColor = (score: number) => {
 };
 
 const Dashboard: React.FC = () => {
-  const { liveAgents, setSelectedAgent, wsConnected } = useAgent();
+  const { liveAgents, openAgentByName, wsConnected } = useAgent();
   const [metrics, setMetrics] = useState<DashboardMetrics>({ totalTasks: 0, tick: 0 });
 
   // Fetch supplemental metrics (not agent-specific)
@@ -70,7 +70,7 @@ const Dashboard: React.FC = () => {
             {agents.length === 0 && <div style={styles.emptyText}>No agents connected</div>}
             <div style={styles.agentTable}>
               {agents.map((a) => (
-                <AgentRow key={a.id} agent={a} onClick={() => setSelectedAgent(a)} />
+                <AgentRow key={a.id} agent={a} onClick={() => openAgentByName(a.name)} />
               ))}
             </div>
           </div>
@@ -85,7 +85,7 @@ const Dashboard: React.FC = () => {
               <div
                 key={a.id}
                 style={styles.trustRow}
-                onClick={() => setSelectedAgent(a)}
+                onClick={() => openAgentByName(a.name)}
               >
                 <span style={{ flex: 1, cursor: 'pointer' }}>{a.name}</span>
                 <div style={styles.trustBarOuter}>
@@ -109,7 +109,7 @@ const Dashboard: React.FC = () => {
               <div
                 key={a.id}
                 style={styles.trustRow}
-                onClick={() => setSelectedAgent(a)}
+                onClick={() => openAgentByName(a.name)}
               >
                 <span style={{ flex: 1, cursor: 'pointer' }}>{a.name}</span>
                 <div style={styles.trustBarOuter}>
