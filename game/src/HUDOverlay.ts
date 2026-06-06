@@ -57,23 +57,35 @@ export class HUDOverlay {
     playerY: number;
     nearNPCs: { name: string; health: number; objective?: string }[];
     tasks: { id: number; description: string; status: string; assignedTo?: string }[];
+    quests?: { npcName: string; activeQuestTitle: string; questStatus: string }[];
   }): void {
     // Stats
     this.statsEl.innerHTML = `
       <div>📍 [${data.playerX.toFixed(0)}, ${data.playerY.toFixed(0)}]</div>
     `;
 
-    // Quests / nearby NPCs
-    let questHtml = '';
+    // Active quests section
+    let activeQuestHtml = '';
+    if (data.quests && data.quests.length > 0) {
+      for (const q of data.quests) {
+        activeQuestHtml += `<div style="color:#88ff88">📜 ${q.npcName}: ${q.activeQuestTitle}</div>`;
+      }
+    }
+    const questSection = activeQuestHtml
+      ? `<div style="color:#888; margin-bottom:2px;">━━ Active Quests ━━</div>${activeQuestHtml}`
+      : '';
+
+    // Nearby NPCs
+    let npcHtml = '';
     for (const npc of data.nearNPCs) {
       const hpColor = npc.health > 60 ? '#44cc44' : npc.health > 30 ? '#cccc44' : '#cc4444';
-      questHtml += `<div style="color:${hpColor}">${npc.name} ${npc.objective ? `— ${npc.objective}` : ''}</div>`;
+      npcHtml += `<div style="color:${hpColor}">${npc.name} ${npc.objective ? `— ${npc.objective}` : ''}</div>`;
     }
-    if (questHtml) {
-      this.questsEl.innerHTML = `<div style="color:#888; margin-bottom:2px;">━━ NPCs ━━</div>${questHtml}`;
-    } else {
-      this.questsEl.innerHTML = '';
-    }
+    const npcSection = npcHtml
+      ? `<div style="color:#888; margin-bottom:2px;">━━ Nearby ━━</div>${npcHtml}`
+      : '';
+
+    this.questsEl.innerHTML = questSection + (questSection && npcSection ? '<br>' : '') + npcSection;
 
     // Tasks
     let taskHtml = '';

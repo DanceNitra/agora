@@ -10,12 +10,34 @@ import { HUDOverlay } from '../HUDOverlay';
 
 interface Updatable { update(delta?: number): void; }
 
+const PERSIST_API = 'http://localhost:8000/api/v1/dungeon/persist';
+
+interface PersistedNPC {
+  npc_id: string;
+  npc_name: string;
+  role: string;
+  pos_x: number;
+  pos_y: number;
+  health: number;
+  inventory: string[];
+  status: string;
+  objective: string;
+}
+
+interface PersistedQuest {
+  quest_id: string;
+  title: string;
+  status: string;
+  progress: Record<string, any>;
+}
+
 export class GameScene extends Phaser.Scene {
   private player!: Phaser.Physics.Arcade.Sprite;
   private walls!: Phaser.Physics.Arcade.StaticGroup;
   private doors!: Phaser.Physics.Arcade.StaticGroup;
   private npcs: Updatable[] = [];
   private npcSprites: Phaser.Physics.Arcade.Sprite[] = [];
+  private llmNPCs: LLMNPCSprite[] = [];
   private cursors!: Phaser.Types.Input.Keyboard.CursorKeys;
   private wasd!: Record<string, Phaser.Input.Keyboard.Key>;
   private playerDust!: Phaser.GameObjects.Particles.ParticleEmitter;
@@ -25,12 +47,17 @@ export class GameScene extends Phaser.Scene {
   private minimapOverlay!: MinimapOverlay;
   public audio!: AudioManager;
   private hud!: HUDOverlay;
+  private persistTimer: number = 0;
+  private npcQuests: Map<string, PersistedQuest[]> = new Map();
 
   constructor() {
     super({ key: 'GameScene' });
   }
 
   create(): void {
+    // Load NPC state from persistence API first
+    this.loadPersistedState();
+
     // --- LIGHTING (Q4.4) ---
     this.lights.enable().setAmbientColor(0x444466);
 
@@ -148,7 +175,7 @@ export class GameScene extends Phaser.Scene {
     this.physics.add.collider(guard, this.walls);
     this.physics.add.collider(guard, this.doors);
 
-    // --- LLM NPCs (Phase 2+3 — multiple agents) ---
+    // --- LLM NPCs (Phase 2+3 — persistent state) ---
     const allNPCs = [
       { name: 'Grom', role: 'blacksmith', x: 5 * TILE, y: 10 * TILE },
       { name: 'Zara', role: 'alchemist', x: 15 * TILE, y: 3 * TILE },
@@ -156,35 +183,38 @@ export class GameScene extends Phaser.Scene {
       { name: 'Guard', role: 'guard', x: 19.5 * TILE, y: 9 * TILE },
     ];
 
-    const llmNPCs = [
-      {
-        name: 'Kael', x: 10 * TILE, y: 16 * TILE, color: 0x44aaff,
-        objective: 'Find the Crystal of Eternity',
-        inventory: ['Rusty Key'],
-      },
-      {
-        name: 'Lyra', x: 3 * TILE, y: 17 * TILE, color: 0x44ff88,
-        objective: 'Map the eastern catacombs',
-        inventory: ['Torch', 'Map Fragment'],
-      },
-      {
-        name: 'Mordecai', x: 20 * TILE, y: 16 * TILE, color: 0xcc88ff,
-        objective: 'Research ancient artifacts in the dungeon',
-        inventory: ['Runic Stone', 'Ancient Scroll'],
-      },
+    const defaultLLMs = [
+      { id: 'kael', name: 'Kael', role: 'adventurer', x: 10 * TILE, y: 16 * TILE, color: 0x44aaff, objective: 'Find the Crystal of Eternity', inventory: ['Rusty Key'] },
+      { id: 'lyra', name: 'Lyra', role: 'scout', x: 3 * TILE, y: 17 * TILE, color: 0x44ff88, objective: 'Map the eastern catacombs', inventory: ['Torch', 'Map Fragment'] },
+      { id: 'mordecai', name: 'Mordecai', role: 'sage', x: 20 * TILE, y: 16 * TILE, color: 0xcc88ff, objective: 'Research ancient artifacts in the dungeon', inventory: ['Runic Stone', 'Ancient Scroll'] },
     ];
 
-    for (const lnpc of llmNPCs) {
-      const texKey = `npc_${lnpc.name.toLowerCase()}`;
-      const n = new LLMNPCSprite(this, lnpc.x, lnpc.y, lnpc.name, this.player, texKey);
-      n.currentObjective = lnpc.objective;
-      n.inventory = lnpc.inventory;
+    // Apply any persisted NPC state over defaults
+    const persisted = this._persistedNPCs;
+    for (const def of defaultLLMs) {
+      const saved = persisted.find(p => p.npc_id === def.id);
+      const texKey = `npc_${def.name.toLowerCase()}`;
+      const n = new LLMNPCSprite(
+        this,
+        saved?.pos_x ?? def.x,
+        saved?.pos_y ?? def.y,
+        def.name,
+        this.player,
+        texKey,
+      );
+      n.currentObjective = saved?.objective ?? def.objective;
+      n.inventory = saved?.inventory ?? def.inventory;
+      n.health = saved?.health ?? 100;
       n.nearbyNPCs = allNPCs.map(p => ({ ...p }));
       this.npcs.push(n);
       this.npcSprites.push(n);
+      this.llmNPCs.push(n);
       this.physics.add.collider(n, this.walls);
       this.physics.add.collider(n, this.doors);
     }
+
+    // Load quest progress for each LLM NPC
+    this.loadQuestProgress();
 
     // Set Light2D on all NPCs
     for (const npc of this.npcSprites) {
@@ -328,12 +358,93 @@ export class GameScene extends Phaser.Scene {
         health: (npc as any).health ?? 100,
         objective: (npc as any).currentObjective,
       }));
+
+    // Build quest info for HUD
+    const questInfo: { npcName: string; activeQuestTitle: string; questStatus: string }[] = [];
+    const llmNames = ['kael', 'lyra', 'mordecai'];
+    const nameMap: Record<string, string> = { kael: 'Kael', lyra: 'Lyra', mordecai: 'Mordecai' };
+    for (const id of llmNames) {
+      const quests = this.npcQuests.get(id) || [];
+      const active = quests.find(q => q.status === 'active');
+      if (active) {
+        questInfo.push({ npcName: nameMap[id] || id, activeQuestTitle: active.title, questStatus: 'active' });
+      }
+    }
+
     this.hud.update({
       playerX: this.player.x,
       playerY: this.player.y,
       nearNPCs,
       tasks: [],
+      quests: questInfo,
     });
+
+    // Periodic persistence save every 10s
+    this.persistTimer += delta;
+    if (this.persistTimer > 10000) {
+      this.persistTimer = 0;
+      const ids = ['kael', 'lyra', 'mordecai'];
+      for (let i = 0; i < this.llmNPCs.length; i++) {
+        this.saveNPCState(this.llmNPCs[i], ids[i] || 'unknown');
+      }
+    }
+  }
+
+  /** Load NPC positions from persistence API (async). */
+  private _persistedNPCs: PersistedNPC[] = [];
+
+  private async loadPersistedState(): Promise<void> {
+    try {
+      // Load all persisted NPCs
+      // We use XMLHttpRequest since Phaser scenes can't easily await in constructor
+      const resp = await fetch(`${PERSIST_API}/npcs`);
+      const data = await resp.json();
+      this._persistedNPCs = data.npcs || [];
+      console.log('[Persist] Loaded', this._persistedNPCs.length, 'NPCs from DB');
+    } catch (err) {
+      console.warn('[Persist] Failed to load NPC state, using defaults:', err);
+      this._persistedNPCs = [];
+    }
+  }
+
+  /** Save an NPC's state to persistence API. */
+  private async saveNPCState(npc: LLMNPCSprite, npcId: string): Promise<void> {
+    try {
+      await fetch(`${PERSIST_API}/npc`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          npc_id: npcId,
+          npc_name: npc.agentName,
+          role: 'adventurer',
+          pos_x: Math.round(npc.x),
+          pos_y: Math.round(npc.y),
+          health: npc.health,
+          inventory: npc.inventory,
+          status: 'active',
+          objective: npc.currentObjective,
+        }),
+      });
+    } catch (err) {
+      // Silent — persistence is best-effort
+    }
+  }
+
+  /** Load quest progress for all LLM NPCs. */
+  private async loadQuestProgress(): Promise<void> {
+    const npcIds = ['kael', 'lyra', 'mordecai'];
+    for (const id of npcIds) {
+      try {
+        const resp = await fetch(`${PERSIST_API}/quests/progress/${id}`);
+        const data = await resp.json();
+        if (data.quests) {
+          this.npcQuests.set(id, data.quests);
+        }
+      } catch {
+        // Silent
+      }
+    }
+    console.log('[Persist] Loaded quest progress for', npcIds.length, 'NPCs');
   }
 
   /** Spawn a new LLM NPC dynamically (God Console !spawn). */
