@@ -332,10 +332,16 @@ export class LLMNPCSprite extends Phaser.Physics.Arcade.Sprite {
     // Show speech
     if (d.message) {
       this.showSpeech(d.message);
+    } else if (d.thought) {
+      // If no message but has thought, show the thought as internal monologue
+      this.showSpeech(`💭 ${d.thought}`);
     }
 
-    // Show thought in label
-    this.label.setText(`${agentName}:${d.action}`);
+    // Show thought in label (truncated)
+    const labelText = d.thought
+      ? `${agentName}: ${d.thought.slice(0, 25)}${d.thought.length > 25 ? '…' : ''}`
+      : `${agentName}:${d.action}`;
+    this.label.setText(labelText);
 
     switch (d.action) {
       case 'move':
@@ -458,10 +464,13 @@ export class LLMNPCSprite extends Phaser.Physics.Arcade.Sprite {
         this.addMemory(decision.thought, 7, ['llm', 'reasoning']);
       }
 
-      // Show speech
-      if (decision.message && !['talk', 'interact'].includes(decision.action)) {
+      // Show speech — show thought alongside message for richer display
+      const bubbleContent = decision.message
+        ? (decision.thought ? `${decision.message} 💭 ${decision.thought}` : decision.message)
+        : (decision.thought ? `💭 ${decision.thought}` : '');
+      if (bubbleContent && !['talk', 'interact'].includes(decision.action)) {
         // For talk/interact, speech is shown during execution when we arrive
-        this.showSpeech(decision.message);
+        this.showSpeech(bubbleContent);
       }
 
     } catch (err) {
@@ -550,10 +559,18 @@ export class LLMNPCSprite extends Phaser.Physics.Arcade.Sprite {
   // ── Visual Feedback ──
 
   public showSpeech(text: string): void {
-    this.speechBubble.setText(`"${text}"`);
+    const displayText = text.length > 120 ? text.slice(0, 117) + '...' : text;
+    this.speechBubble.setText(`"${displayText}"`);
     this.speechBubble.setAlpha(1);
-    this.scene.time.delayedCall(4000, () => {
+    // Duration proportional to text length: min 3s, ~100ms per char, max 12s
+    const duration = Math.max(3000, Math.min(12000, text.length * 100));
+    // Clear any existing timer to avoid overlap
+    if ((this as any).__speechTimer) {
+      this.scene.time.removeEvent((this as any).__speechTimer);
+    }
+    (this as any).__speechTimer = this.scene.time.delayedCall(duration, () => {
       this.speechBubble.setAlpha(0);
+      (this as any).__speechTimer = null;
     });
     // Sparkle burst — create temporary bright sprites
     // Audio sparkle

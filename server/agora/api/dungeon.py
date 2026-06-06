@@ -60,7 +60,7 @@ router = APIRouter(prefix="/api/v1/dungeon", tags=["dungeon"])
 
 # ── Dungeon Config (default: simulated LLM for fast tests) ──
 
-_dungeon_config: dict[str, Any] = {"llm_enabled": False, "llm_tier": "cheap"}
+_dungeon_config: dict[str, Any] = {"llm_enabled": True, "llm_tier": "cheap"}
 _announced_tasks: list[int] = []  # task IDs announced in this session
 
 # ── Per-Agent Memory Store ──
@@ -226,7 +226,7 @@ async def dungeon_agent_action(state: DungeonState, request: Request):
             user_prompt=context,
             tier=cfg.get("llm_tier", "cheap"),
             temperature=0.8,
-            max_tokens=300,
+            max_tokens=1000,
             response_format={"type": "json_object"},
         )
     else:
