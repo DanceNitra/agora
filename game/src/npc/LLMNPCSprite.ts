@@ -488,6 +488,16 @@ export class LLMNPCSprite extends Phaser.Physics.Arcade.Sprite {
         this.addMemory(decision.thought, 7, ['llm', 'reasoning']);
       }
 
+      // Handle quest completion notification
+      if ((decision as any)._quest) {
+        const questData = (decision as any)._quest;
+        const questMsg = questData.message || '';
+        const nextQ = questData.next_quest;
+        const notification = `✨ Quest Complete! ${questMsg}` + (nextQ ? ` | 📜 New: ${nextQ.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase())}` : '');
+        this.showSpeech(notification);
+        this.addMemory(notification, 10, ['quest', 'completed']);
+      }
+
       // Show speech — show thought alongside message for richer display
       const bubbleContent = decision.message
         ? (decision.thought ? `${decision.message} 💭 ${decision.thought}` : decision.message)

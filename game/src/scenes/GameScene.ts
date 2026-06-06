@@ -48,6 +48,7 @@ export class GameScene extends Phaser.Scene {
   public audio!: AudioManager;
   private hud!: HUDOverlay;
   private persistTimer: number = 0;
+  private questRefreshTimer: number = 0;
   private npcQuests: Map<string, PersistedQuest[]> = new Map();
 
   constructor() {
@@ -387,6 +388,13 @@ export class GameScene extends Phaser.Scene {
       for (let i = 0; i < this.llmNPCs.length; i++) {
         this.saveNPCState(this.llmNPCs[i], ids[i] || 'unknown');
       }
+    }
+
+    // Refresh quest progress from DB every 15s (catches auto-started quests)
+    this.questRefreshTimer += delta;
+    if (this.questRefreshTimer > 15000) {
+      this.questRefreshTimer = 0;
+      this.loadQuestProgress();
     }
   }
 

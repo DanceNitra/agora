@@ -13,6 +13,7 @@ from fastapi import APIRouter, Request
 from pydantic import BaseModel
 
 from agora.execution.llm_client import call_llm
+from agora.execution import quest_manager
 
 import uuid
 
@@ -154,9 +155,13 @@ async def dungeon_agent_action(state: DungeonState, request: Request):
     """Receive game state → LLM decides action → return decision."""
     agent_name = state.agent_name
     memories = _mem(agent_name)
+    db = request.app.state.db
 
     # Ensure dungeon agents exist in DB for trust tracking
     await _ensure_dungeon_agents_seeded(request)
+
+    # Auto-assign quests if not yet assigned
+    await quest_manager.auto_assign_quests(db)
 
     # Build context with relevant past memories
     context = _build_context(state)
@@ -164,6 +169,9 @@ async def dungeon_agent_action(state: DungeonState, request: Request):
     if relevant:
         mem_text = "\n".join(f"- {m['summary']}" for m in relevant)
         context += f"\n\nYour memories:\n{mem_text}"
+
+    # Inject quest context (active quest info drives NPC behavior)
+    context, active_quest = await quest_manager.inject_quest_context(db, agent_name, context)
 
     # Add inbox messages (from other agents talking to us)
     msgs = _inbox(agent_name)
@@ -298,6 +306,25 @@ async def dungeon_agent_action(state: DungeonState, request: Request):
                 decision["message"] = f"I bid {bid_amount:.1f} on task #{task_id}."
             except Exception:
                 pass  # bid failed silently
+
+    # Check quest progress (did this action complete a quest step?)
+    # First: override decision if NPC isn't progressing their quest
+    decision, overridden = await quest_manager.override_decision_for_quest(
+        db, agent_name, decision, (state.agent_x, state.agent_y)
+    )
+    
+    npc_positions = {a: (0, 0) for a in ("Kael", "Lyra", "Mordecai")}
+    npc_positions[agent_name] = (state.agent_x, state.agent_y)
+    quest_update = await quest_manager.check_quest_progress(db, agent_name, decision, npc_positions)
+    if quest_update:
+        decision["_quest"] = quest_update
+        # Add quest completion message to speech
+        msg = quest_update.get("message", "")
+        if msg:
+            decision["message"] = f"{decision.get('message', '')} | {msg}"
+            next_q = quest_update.get("next_quest")
+            if next_q:
+                decision["message"] += f" | Next: {next_q.replace('_', ' ').title()}"
 
     return decision
 
