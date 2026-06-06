@@ -41,6 +41,13 @@ async def init_db(app: FastAPI):
         else:
             print(f"[Agora] Schema note: {e} (tables likely already exist)")
 
+    # Migration: add content column to artifacts
+    try:
+        await db.execute("ALTER TABLE artifacts ADD COLUMN content TEXT DEFAULT ''")
+        await db.commit()
+    except Exception:
+        pass  # column already exists
+
     await db.commit()
     app.state.trust = TrustEngine(db)
     app.state.stigmergy = StigmergyPool(redis_client=None, db=db)
@@ -109,17 +116,6 @@ app.include_router(dungeon_api.router)
 app.include_router(economy_api.router)
 app.include_router(persistence_api.router)
 app.include_router(artifacts_api.router)
-
-# Add content column if missing (migration)
-@app.on_event("startup")
-async def migrate_artifacts():
-    try:
-        await app.state.db.execute(
-            "ALTER TABLE artifacts ADD COLUMN content TEXT DEFAULT ''"
-        )
-        await app.state.db.commit()
-    except Exception:
-        pass  # column already exists
 
 
 async def broadcast(app: FastAPI, event_type: str, payload: dict):
@@ -400,6 +396,8 @@ async def tick_loop(app: FastAPI):
                     await broadcast(app, ev["type"], ev["payload"])
             except Exception as e:
                 print(f"[Tasks] Tick error: {e}")
+                import traceback
+                traceback.print_exc()
 
             if app.state.tick_count % 5 == 0:
                 best_agents = {}

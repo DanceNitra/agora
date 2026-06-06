@@ -79,6 +79,7 @@ class TaskExecutor:
                 })
 
         # 2. RESOLVE bidding tasks (pick highest bidder)
+        resolved_before = len(self._running_tasks)
         resolved = await self._resolve_bidding(db, app)
         for r in resolved:
             events.append({
@@ -86,6 +87,8 @@ class TaskExecutor:
                 "payload": r,
             })
             self._running_tasks[r["task_id"]] = r["target_ticks"]
+        if resolved:
+            print(f"[Tasks] Assigned {len(resolved)} tasks (running: {len(self._running_tasks)})")
 
         # 3. EXECUTE: decrement running tasks
         completed_ids = []
@@ -102,6 +105,8 @@ class TaskExecutor:
                     "type": "task_completed",
                     "payload": result,
                 })
+            else:
+                print(f"[Tasks] _complete_task returned None for #{task_id}")
             del self._running_tasks[task_id]
 
         return events
@@ -281,7 +286,7 @@ class TaskExecutor:
                 resource_rewarded = {"name": res["name"], "quantity": qty}
 
         # Create artifact with generated content
-        content = self._generate_artifact_content(task["title"], task_type, task.get("description", ""),
+        content = self._generate_artifact_content(task["title"], task_type, task["title"],
                                                    agent_id, role, difficulty)
         await db.execute(
             "INSERT INTO artifacts (agent_id, title, artifact_type, storage_path, "
