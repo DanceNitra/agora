@@ -16,6 +16,7 @@ from agora.coordination.ess_protocol import TrustEngine
 from agora.coordination.economy_config import get_role_config, ROLE_ECONOMY
 from agora.coordination.stigmergy import StigmergyPool
 from agora.coordination.economy import EconomyEngine
+from agora.agent_os.agent_os import AgentOS
 from agora.execution.task_executor import TaskExecutor
 from agora.lifecycle.agent_lifecycle import AgentLifecycle
 from agora.lifecycle.epoch_engine import EpochEngine
@@ -23,6 +24,7 @@ from agora.observability.csd import CSDMonitor
 from agora.api import agents as agents_api, tasks as tasks_api, god as god_api, graph as graph_api, dungeon as dungeon_api, economy as economy_api
 from agora.api import dungeon_persistence as persistence_api
 from agora.api import artifacts as artifacts_api
+from agora.api import agent_os_api
 
 
 async def init_db(app: FastAPI):
@@ -83,6 +85,8 @@ async def init_db(app: FastAPI):
         await db.commit()
         print(f"[Economy] Seeded inventories for {len(set(a[0] for a in seed_data))} agents")
     app.state.task_executor = TaskExecutor(db)
+    app.state.agent_os = AgentOS(db)
+    await app.state.agent_os.ensure_os_initialized()
     app.state.agent_lifecycle = AgentLifecycle(db)
     app.state.csd_monitor = CSDMonitor(window_size=200, z_threshold_warning=2.0, z_threshold_critical=3.5)
     app.state.epoch_engine = EpochEngine(db)
@@ -144,6 +148,7 @@ app.include_router(dungeon_api.router)
 app.include_router(economy_api.router)
 app.include_router(persistence_api.router)
 app.include_router(artifacts_api.router)
+app.include_router(agent_os_api.router)
 
 
 async def broadcast(app: FastAPI, event_type: str, payload: dict):
@@ -643,6 +648,15 @@ async def tick_loop(app: FastAPI):
                     )
                 except Exception as e:
                     print(f"[Stigmergy] Market signal error: {e}")
+
+            # ── 11. Agent OS tick (soul, brain, body, help-seeking) ──
+            if app.state.tick_count % 3 == 0:  # every 3 ticks
+                try:
+                    await app.state.agent_os.tick(broadcast_fn=lambda t, p: broadcast(app, t, p))
+                except Exception as e:
+                    print(f"[AgentOS] Tick error: {e}")
+                    import traceback
+                    traceback.print_exc()
 
             if app.state.tick_count % 5 == 0:
                 best_agents = {}

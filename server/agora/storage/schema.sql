@@ -34,6 +34,77 @@ CREATE TABLE IF NOT EXISTS stigmergy_traces (
     created_at      TEXT NOT NULL DEFAULT (datetime('now'))
 );
 
+-- ═══════════════════════════════════════════
+-- AGENT OPERATING SYSTEM — Soul, Brain, Body, Abilities, Skills
+-- ═══════════════════════════════════════════
+
+CREATE TABLE IF NOT EXISTS agent_soul (
+    npc_id          TEXT PRIMARY KEY REFERENCES dungeon_npcs(npc_id) ON DELETE CASCADE,
+    personality     TEXT NOT NULL DEFAULT '{}',
+    "values"        TEXT NOT NULL DEFAULT '{}',
+    emotional_state TEXT NOT NULL DEFAULT 'neutral',
+    moral_alignment TEXT NOT NULL DEFAULT 'neutral',
+    archetype       TEXT NOT NULL DEFAULT 'explorer',
+    created_at      TEXT NOT NULL DEFAULT (datetime('now')),
+    updated_at      TEXT NOT NULL DEFAULT (datetime('now'))
+);
+
+CREATE TABLE IF NOT EXISTS agent_brain (
+    npc_id          TEXT PRIMARY KEY REFERENCES dungeon_npcs(npc_id) ON DELETE CASCADE,
+    current_goal    TEXT NOT NULL DEFAULT 'Explore the dungeon',
+    plan_stack      TEXT NOT NULL DEFAULT '[]',
+    memory          TEXT NOT NULL DEFAULT '[]',
+    state_of_mind   TEXT NOT NULL DEFAULT 'focused',
+    last_decision   TEXT NOT NULL DEFAULT '',
+    last_decision_at TEXT,
+    created_at      TEXT NOT NULL DEFAULT (datetime('now')),
+    updated_at      TEXT NOT NULL DEFAULT (datetime('now'))
+);
+
+CREATE TABLE IF NOT EXISTS agent_body (
+    npc_id          TEXT PRIMARY KEY REFERENCES dungeon_npcs(npc_id) ON DELETE CASCADE,
+    stamina         REAL NOT NULL DEFAULT 100.0,
+    hunger          REAL NOT NULL DEFAULT 0.0,
+    fatigue         REAL NOT NULL DEFAULT 0.0,
+    awareness       REAL NOT NULL DEFAULT 1.0,
+    status_effects  TEXT NOT NULL DEFAULT '[]'
+);
+
+CREATE TABLE IF NOT EXISTS agent_abilities (
+    id              INTEGER PRIMARY KEY AUTOINCREMENT,
+    npc_id          TEXT NOT NULL REFERENCES dungeon_npcs(npc_id) ON DELETE CASCADE,
+    ability_name    TEXT NOT NULL,
+    description     TEXT NOT NULL DEFAULT '',
+    power_level     REAL NOT NULL DEFAULT 1.0 CHECK (power_level >= 0 AND power_level <= 10),
+    is_passive      INTEGER NOT NULL DEFAULT 0,
+    UNIQUE(npc_id, ability_name)
+);
+
+CREATE TABLE IF NOT EXISTS agent_skills (
+    id              INTEGER PRIMARY KEY AUTOINCREMENT,
+    npc_id          TEXT NOT NULL REFERENCES dungeon_npcs(npc_id) ON DELETE CASCADE,
+    skill_name      TEXT NOT NULL,
+    level           INTEGER NOT NULL DEFAULT 1 CHECK (level >= 0 AND level <= 100),
+    xp              REAL NOT NULL DEFAULT 0.0,
+    xp_to_next      REAL NOT NULL DEFAULT 100.0,
+    last_used_at    TEXT,
+    UNIQUE(npc_id, skill_name)
+);
+
+CREATE TABLE IF NOT EXISTS agent_help_requests (
+    id              INTEGER PRIMARY KEY AUTOINCREMENT,
+    requester_id    TEXT NOT NULL REFERENCES dungeon_npcs(npc_id) ON DELETE CASCADE,
+    helper_id       TEXT NOT NULL REFERENCES dungeon_npcs(npc_id) ON DELETE CASCADE,
+    problem_type    TEXT NOT NULL,
+    description     TEXT NOT NULL DEFAULT '',
+    status          TEXT NOT NULL DEFAULT 'pending',
+    requester_task  TEXT,
+    helper_reply    TEXT,
+    created_at      TEXT NOT NULL DEFAULT (datetime('now')),
+    accepted_at     TEXT,
+    resolved_at     TEXT
+);
+
 CREATE TABLE IF NOT EXISTS artifacts (
     id              INTEGER PRIMARY KEY AUTOINCREMENT,
     agent_id        TEXT NOT NULL REFERENCES agent_identities(agent_id),
@@ -157,6 +228,77 @@ CREATE TABLE IF NOT EXISTS dungeon_quests (
     created_at      TEXT NOT NULL DEFAULT (datetime('now'))
 );
 
+-- ═══════════════════════════════════════════
+-- AGENT OPERATING SYSTEM — Soul, Brain, Body, Abilities, Skills
+-- ═══════════════════════════════════════════
+
+CREATE TABLE IF NOT EXISTS agent_soul (
+    npc_id          TEXT PRIMARY KEY REFERENCES dungeon_npcs(npc_id) ON DELETE CASCADE,
+    personality     TEXT NOT NULL DEFAULT '{}',
+    "values"        TEXT NOT NULL DEFAULT '{}',
+    emotional_state TEXT NOT NULL DEFAULT 'neutral',
+    moral_alignment TEXT NOT NULL DEFAULT 'neutral',
+    archetype       TEXT NOT NULL DEFAULT 'explorer',
+    created_at      TEXT NOT NULL DEFAULT (datetime('now')),
+    updated_at      TEXT NOT NULL DEFAULT (datetime('now'))
+);
+
+CREATE TABLE IF NOT EXISTS agent_brain (
+    npc_id          TEXT PRIMARY KEY REFERENCES dungeon_npcs(npc_id) ON DELETE CASCADE,
+    current_goal    TEXT NOT NULL DEFAULT 'Explore the dungeon',
+    plan_stack      TEXT NOT NULL DEFAULT '[]',
+    memory          TEXT NOT NULL DEFAULT '[]',
+    state_of_mind   TEXT NOT NULL DEFAULT 'focused',
+    last_decision   TEXT NOT NULL DEFAULT '',
+    last_decision_at TEXT,
+    created_at      TEXT NOT NULL DEFAULT (datetime('now')),
+    updated_at      TEXT NOT NULL DEFAULT (datetime('now'))
+);
+
+CREATE TABLE IF NOT EXISTS agent_body (
+    npc_id          TEXT PRIMARY KEY REFERENCES dungeon_npcs(npc_id) ON DELETE CASCADE,
+    stamina         REAL NOT NULL DEFAULT 100.0,
+    hunger          REAL NOT NULL DEFAULT 0.0,
+    fatigue         REAL NOT NULL DEFAULT 0.0,
+    awareness       REAL NOT NULL DEFAULT 1.0,
+    status_effects  TEXT NOT NULL DEFAULT '[]'
+);
+
+CREATE TABLE IF NOT EXISTS agent_abilities (
+    id              INTEGER PRIMARY KEY AUTOINCREMENT,
+    npc_id          TEXT NOT NULL REFERENCES dungeon_npcs(npc_id) ON DELETE CASCADE,
+    ability_name    TEXT NOT NULL,
+    description     TEXT NOT NULL DEFAULT '',
+    power_level     REAL NOT NULL DEFAULT 1.0 CHECK (power_level >= 0 AND power_level <= 10),
+    is_passive      INTEGER NOT NULL DEFAULT 0,
+    UNIQUE(npc_id, ability_name)
+);
+
+CREATE TABLE IF NOT EXISTS agent_skills (
+    id              INTEGER PRIMARY KEY AUTOINCREMENT,
+    npc_id          TEXT NOT NULL REFERENCES dungeon_npcs(npc_id) ON DELETE CASCADE,
+    skill_name      TEXT NOT NULL,
+    level           INTEGER NOT NULL DEFAULT 1 CHECK (level >= 0 AND level <= 100),
+    xp              REAL NOT NULL DEFAULT 0.0,
+    xp_to_next      REAL NOT NULL DEFAULT 100.0,
+    last_used_at    TEXT,
+    UNIQUE(npc_id, skill_name)
+);
+
+CREATE TABLE IF NOT EXISTS agent_help_requests (
+    id              INTEGER PRIMARY KEY AUTOINCREMENT,
+    requester_id    TEXT NOT NULL REFERENCES dungeon_npcs(npc_id) ON DELETE CASCADE,
+    helper_id       TEXT NOT NULL REFERENCES dungeon_npcs(npc_id) ON DELETE CASCADE,
+    problem_type    TEXT NOT NULL,
+    description     TEXT NOT NULL DEFAULT '',
+    status          TEXT NOT NULL DEFAULT 'pending',
+    requester_task  TEXT,
+    helper_reply    TEXT,
+    created_at      TEXT NOT NULL DEFAULT (datetime('now')),
+    accepted_at     TEXT,
+    resolved_at     TEXT
+);
+
 CREATE TABLE IF NOT EXISTS dungeon_quest_progress (
     id              INTEGER PRIMARY KEY AUTOINCREMENT,
     npc_id          TEXT NOT NULL REFERENCES dungeon_npcs(npc_id),
@@ -177,4 +319,75 @@ CREATE TABLE IF NOT EXISTS trade_history (
     price_per_unit  REAL NOT NULL,
     total_energy    REAL NOT NULL,
     created_at      TEXT NOT NULL DEFAULT (datetime('now'))
+);
+
+-- ═══════════════════════════════════════════
+-- AGENT OPERATING SYSTEM — Soul, Brain, Body, Abilities, Skills
+-- ═══════════════════════════════════════════
+
+CREATE TABLE IF NOT EXISTS agent_soul (
+    npc_id          TEXT PRIMARY KEY REFERENCES dungeon_npcs(npc_id) ON DELETE CASCADE,
+    personality     TEXT NOT NULL DEFAULT '{}',
+    "values"        TEXT NOT NULL DEFAULT '{}',
+    emotional_state TEXT NOT NULL DEFAULT 'neutral',
+    moral_alignment TEXT NOT NULL DEFAULT 'neutral',
+    archetype       TEXT NOT NULL DEFAULT 'explorer',
+    created_at      TEXT NOT NULL DEFAULT (datetime('now')),
+    updated_at      TEXT NOT NULL DEFAULT (datetime('now'))
+);
+
+CREATE TABLE IF NOT EXISTS agent_brain (
+    npc_id          TEXT PRIMARY KEY REFERENCES dungeon_npcs(npc_id) ON DELETE CASCADE,
+    current_goal    TEXT NOT NULL DEFAULT 'Explore the dungeon',
+    plan_stack      TEXT NOT NULL DEFAULT '[]',
+    memory          TEXT NOT NULL DEFAULT '[]',
+    state_of_mind   TEXT NOT NULL DEFAULT 'focused',
+    last_decision   TEXT NOT NULL DEFAULT '',
+    last_decision_at TEXT,
+    created_at      TEXT NOT NULL DEFAULT (datetime('now')),
+    updated_at      TEXT NOT NULL DEFAULT (datetime('now'))
+);
+
+CREATE TABLE IF NOT EXISTS agent_body (
+    npc_id          TEXT PRIMARY KEY REFERENCES dungeon_npcs(npc_id) ON DELETE CASCADE,
+    stamina         REAL NOT NULL DEFAULT 100.0,
+    hunger          REAL NOT NULL DEFAULT 0.0,
+    fatigue         REAL NOT NULL DEFAULT 0.0,
+    awareness       REAL NOT NULL DEFAULT 1.0,
+    status_effects  TEXT NOT NULL DEFAULT '[]'
+);
+
+CREATE TABLE IF NOT EXISTS agent_abilities (
+    id              INTEGER PRIMARY KEY AUTOINCREMENT,
+    npc_id          TEXT NOT NULL REFERENCES dungeon_npcs(npc_id) ON DELETE CASCADE,
+    ability_name    TEXT NOT NULL,
+    description     TEXT NOT NULL DEFAULT '',
+    power_level     REAL NOT NULL DEFAULT 1.0 CHECK (power_level >= 0 AND power_level <= 10),
+    is_passive      INTEGER NOT NULL DEFAULT 0,
+    UNIQUE(npc_id, ability_name)
+);
+
+CREATE TABLE IF NOT EXISTS agent_skills (
+    id              INTEGER PRIMARY KEY AUTOINCREMENT,
+    npc_id          TEXT NOT NULL REFERENCES dungeon_npcs(npc_id) ON DELETE CASCADE,
+    skill_name      TEXT NOT NULL,
+    level           INTEGER NOT NULL DEFAULT 1 CHECK (level >= 0 AND level <= 100),
+    xp              REAL NOT NULL DEFAULT 0.0,
+    xp_to_next      REAL NOT NULL DEFAULT 100.0,
+    last_used_at    TEXT,
+    UNIQUE(npc_id, skill_name)
+);
+
+CREATE TABLE IF NOT EXISTS agent_help_requests (
+    id              INTEGER PRIMARY KEY AUTOINCREMENT,
+    requester_id    TEXT NOT NULL REFERENCES dungeon_npcs(npc_id) ON DELETE CASCADE,
+    helper_id       TEXT NOT NULL REFERENCES dungeon_npcs(npc_id) ON DELETE CASCADE,
+    problem_type    TEXT NOT NULL,
+    description     TEXT NOT NULL DEFAULT '',
+    status          TEXT NOT NULL DEFAULT 'pending',
+    requester_task  TEXT,
+    helper_reply    TEXT,
+    created_at      TEXT NOT NULL DEFAULT (datetime('now')),
+    accepted_at     TEXT,
+    resolved_at     TEXT
 );
