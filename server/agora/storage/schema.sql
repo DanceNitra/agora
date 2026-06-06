@@ -81,3 +81,14 @@ CREATE TABLE IF NOT EXISTS tasks (
     created_at      TEXT NOT NULL DEFAULT (datetime('now')),
     updated_at      TEXT NOT NULL DEFAULT (datetime('now'))
 );
+
+CREATE TABLE IF NOT EXISTS task_bids (
+    id              INTEGER PRIMARY KEY AUTOINCREMENT,
+    task_id         INTEGER NOT NULL REFERENCES tasks(id),
+    agent_id        TEXT NOT NULL REFERENCES agent_identities(agent_id),
+    bid_amount      REAL NOT NULL DEFAULT 0.5 CHECK (bid_amount >= 0 AND bid_amount <= 1),
+    bid_reason      TEXT,
+    status          TEXT NOT NULL DEFAULT 'pending',
+    created_at      TEXT NOT NULL DEFAULT (datetime('now')),
+    UNIQUE(task_id, agent_id)
+);

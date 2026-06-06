@@ -174,4 +174,34 @@ export class GameScene extends Phaser.Scene {
       npc.update(delta);
     }
   }
+
+  /** Spawn a new LLM NPC dynamically (God Console !spawn). */
+  public spawnLLMNPC(
+    name: string,
+    x: number,
+    y: number,
+    color: number,
+    objective: string = 'Explore the dungeon',
+    inventory: string[] = [],
+  ): LLMNPCSprite {
+    const allNPCs = [
+      { name: 'Grom', role: 'blacksmith', x: 5 * 32, y: 10 * 32 },
+      { name: 'Zara', role: 'alchemist', x: 15 * 32, y: 3 * 32 },
+      { name: 'Finn', role: 'merchant', x: 5 * 32, y: 4 * 32 },
+      { name: 'Guard', role: 'guard', x: 19.5 * 32, y: 9 * 32 },
+    ];
+
+    const n = new LLMNPCSprite(this, x, y, name, this.player);
+    n.setTint(color);
+    n.currentObjective = objective;
+    n.inventory = inventory.length > 0 ? inventory : ['Rusty Key'];
+    n.nearbyNPCs = allNPCs.map(p => ({ ...p }));
+    this.npcs.push(n);
+    this.npcSprites.push(n);
+    this.physics.add.collider(n, this.walls);
+    this.physics.add.collider(n, this.doors);
+    this.physics.add.collider(this.player, n);
+
+    return n;
+  }
 }

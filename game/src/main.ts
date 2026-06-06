@@ -1,6 +1,7 @@
 import Phaser from 'phaser';
 import { BootScene } from './scenes/BootScene';
 import { GameScene } from './scenes/GameScene';
+import { GodConsole } from './GodConsole';
 
 const config: Phaser.Types.Core.GameConfig = {
   type: Phaser.AUTO,
@@ -21,4 +22,7 @@ const config: Phaser.Types.Core.GameConfig = {
   },
 };
 
-new Phaser.Game(config);
+const game = new Phaser.Game(config);
+
+// Initialize God Console (overlay)
+new GodConsole(game);

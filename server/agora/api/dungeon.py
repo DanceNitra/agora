@@ -61,6 +61,7 @@ router = APIRouter(prefix="/api/v1/dungeon", tags=["dungeon"])
 # ── Dungeon Config (default: simulated LLM for fast tests) ──
 
 _dungeon_config: dict[str, Any] = {"llm_enabled": False, "llm_tier": "cheap"}
+_announced_tasks: list[int] = []  # task IDs announced in this session
 
 # ── Per-Agent Memory Store ──
 
@@ -112,10 +113,16 @@ def _get_prompt(agent_name: str) -> str:
         f"Your trust with other agents affects how they cooperate with you.\n"
         f"Higher trust means they will help you more.\n"
         f"Build trust by talking and cooperating with them.\n\n"
+        f"When there are OPEN TASKS available, you can bid on them using the 'bid' action.\n"
+        f"A higher bid_amount (0.0–1.0) means you want the task more.\n"
+        f"If you win the bid, you will be assigned to complete the task.\n"
+        f"Bid on tasks that match your skills and personality.\n\n"
         f"Respond ONLY with a valid JSON object containing:\n"
-        f'{{{{"action":"move|interact|talk|cooperate|wait|use|explore",'
+        f'{{{{"action":"move|interact|talk|cooperate|wait|use|explore|bid",'
         f'"target_x":<optional number>,"target_y":<optional number>,'
         f'"target_npc":"<optional NPC name>",'
+        f'"task_id":<optional task number>,'
+        f'"bid_amount":<optional 0.0-1.0>,'
         f'"message":"<what you say or do, 1 sentence>",'
         f'"thought":"<your internal reasoning, 1 sentence>"}}}}'
         f"\n\nActions:\n"
@@ -184,6 +191,31 @@ async def dungeon_agent_action(state: DungeonState, request: Request):
     except Exception:
         pass  # trust engine not available
 
+    # Add open tasks (Contract Net bidding)
+    try:
+        db = request.app.state.db
+        cursor = await db.execute(
+            "SELECT id, title, description, priority, metadata "
+            "FROM tasks WHERE status='bidding' ORDER BY priority DESC LIMIT 3"
+        )
+        open_tasks = await cursor.fetchall()
+        if open_tasks:
+            task_lines = ["\nOPEN TASKS available for bidding:"]
+            for t in open_tasks:
+                meta = json.loads(t["metadata"] or "{}")
+                task_lines.append(
+                    f"  #{t['id']}: \"{t['title']}\" "
+                    f"(difficulty={meta.get('difficulty', 1)}, "
+                    f"reward={meta.get('reward_energy', 10)} energy)"
+                )
+            task_lines.append(
+                "\nTo bid, respond with: {\"action\": \"bid\", \"task_id\": <#>, "
+                "\"bid_amount\": <0.0-1.0>, \"message\": \"I want this task!\"}"
+            )
+            context += "\n" + "\n".join(task_lines)
+    except Exception:
+        pass  # tasks not available
+
     # Call LLM
     cfg = _dungeon_config
     use_llm = cfg.get("llm_enabled", False)
@@ -247,6 +279,23 @@ async def dungeon_agent_action(state: DungeonState, request: Request):
             await trust_engine.record_interaction(source_id, target_id, "cooperate")
     except Exception:
         pass  # trust engine not available for this interaction
+
+    # Handle bid action (Contract Net)
+    if decision.get("action") == "bid":
+        task_id = decision.get("task_id")
+        bid_amount = decision.get("bid_amount", 0.5)
+        if task_id:
+            try:
+                bid_body = BidSubmission(
+                    agent_name=agent_name,
+                    task_id=int(task_id),
+                    bid_amount=float(max(0.0, min(1.0, bid_amount))),
+                    bid_reason=str(decision.get("message", "I want this task!")),
+                )
+                await submit_bid(bid_body, request)
+                decision["message"] = f"I bid {bid_amount:.1f} on task #{task_id}."
+            except Exception:
+                pass  # bid failed silently
 
     return decision
 
@@ -466,3 +515,311 @@ async def set_config(config: dict):
     """Set dungeon agent config (LLM tier, enabled flag)."""
     _dungeon_config.update(config)
     return {"status": "config_updated", "config": _dungeon_config}
+
+
+# ── Contract Net (Q3.4) ──
+
+
+class TaskAnnouncement(BaseModel):
+    title: str
+    description: str = ""
+    difficulty: int = 1
+    reward_energy: int = 10
+    task_type: str = "exploration"
+    announced_by: str = "orchestrator"
+
+
+class BidSubmission(BaseModel):
+    agent_name: str
+    task_id: int
+    bid_amount: float = 0.5  # 0.0–1.0
+    bid_reason: str = ""
+
+
+@router.post("/announce-task")
+async def announce_task(body: TaskAnnouncement, request: Request):
+    """Announce a new task for dungeon agents to bid on (Contract Net)."""
+    db = request.app.state.db
+    metadata = json.dumps({
+        "difficulty": body.difficulty,
+        "reward_energy": body.reward_energy,
+        "task_type": body.task_type,
+        "announced_by": body.announced_by,
+    })
+    cursor = await db.execute(
+        "INSERT INTO tasks (title, description, status, priority, metadata, assignee_id) "
+        "VALUES (?, ?, 'bidding', ?, ?, NULL)",
+        (body.title, body.description, body.difficulty, metadata),
+    )
+    await db.commit()
+    task_id = cursor.lastrowid
+    _announced_tasks.append(task_id)
+    return {
+        "status": "task_announced",
+        "task_id": task_id,
+        "title": body.title,
+        "description": body.description,
+        "difficulty": body.difficulty,
+        "reward_energy": body.reward_energy,
+        "task_type": body.task_type,
+        "bidding_open": True,
+    }
+
+
+@router.post("/bid")
+async def submit_bid(body: BidSubmission, request: Request):
+    """Submit a bid from a dungeon agent on an open task."""
+    db = request.app.state.db
+
+    # Check task exists and is in bidding state
+    cursor = await db.execute(
+        "SELECT id, status, assignee_id FROM tasks WHERE id=?", (body.task_id,)
+    )
+    task = await cursor.fetchone()
+    if not task:
+        return {"status": "error", "error": "task_not_found"}
+    if task["status"] != "bidding":
+        return {"status": "error", "error": f"task_not_bidding (status={task['status']})"}
+
+    # Look up agent_id from name
+    agent_id = DUNGEON_AGENT_IDS.get(body.agent_name)
+    if not agent_id:
+        return {"status": "error", "error": "unknown_agent"}
+
+    # Upsert bid
+    try:
+        cursor = await db.execute(
+            "INSERT INTO task_bids (task_id, agent_id, bid_amount, bid_reason) "
+            "VALUES (?, ?, ?, ?) "
+            "ON CONFLICT(task_id, agent_id) DO UPDATE SET "
+            "bid_amount=excluded.bid_amount, bid_reason=excluded.bid_reason, status='pending'",
+            (body.task_id, agent_id, max(0.0, min(1.0, body.bid_amount)), body.bid_reason),
+        )
+        await db.commit()
+    except Exception as e:
+        return {"status": "error", "error": str(e)}
+
+    return {
+        "status": "bid_recorded",
+        "agent_name": body.agent_name,
+        "task_id": body.task_id,
+        "bid_amount": body.bid_amount,
+        "bid_reason": body.bid_reason,
+    }
+
+
+@router.post("/assign-best/{task_id}")
+async def assign_task_best_bidder(task_id: int, request: Request):
+    """Assign a task to the agent with the highest bid (lowest = best if competitive)."""
+    db = request.app.state.db
+
+    # Check task
+    cursor = await db.execute(
+        "SELECT id, status, assignee_id FROM tasks WHERE id=?", (task_id,)
+    )
+    task = await cursor.fetchone()
+    if not task:
+        return {"status": "error", "error": "task_not_found"}
+    if task["status"] != "bidding":
+        return {"status": "error", "error": f"task_not_bidding (status={task['status']})"}
+
+    # Find best bid (highest bid_amount)
+    cursor = await db.execute(
+        "SELECT tb.id, tb.agent_id, tb.bid_amount, tb.bid_reason, ai.role "
+        "FROM task_bids tb "
+        "JOIN agent_identities ai ON tb.agent_id = ai.agent_id "
+        "WHERE tb.task_id=? AND tb.status='pending' "
+        "ORDER BY tb.bid_amount DESC LIMIT 1",
+        (task_id,),
+    )
+    best_bid = await cursor.fetchone()
+    if not best_bid:
+        return {"status": "error", "error": "no_bids"}
+
+    # Accept this bid, reject others
+    await db.execute(
+        "UPDATE task_bids SET status='accepted' WHERE task_id=? AND agent_id=?",
+        (task_id, best_bid["agent_id"]),
+    )
+    await db.execute(
+        "UPDATE task_bids SET status='rejected' WHERE task_id=? AND agent_id!=?",
+        (task_id, best_bid["agent_id"]),
+    )
+    # Assign task
+    await db.execute(
+        "UPDATE tasks SET status='assigned', assignee_id=?, updated_at=datetime('now') WHERE id=?",
+        (best_bid["agent_id"], task_id),
+    )
+    await db.commit()
+
+    # Map agent_id back to name
+    winner_name = "unknown"
+    for name, aid in DUNGEON_AGENT_IDS.items():
+        if aid == best_bid["agent_id"]:
+            winner_name = name
+            break
+
+    return {
+        "status": "task_assigned",
+        "task_id": task_id,
+        "winner": winner_name,
+        "winner_role": best_bid["role"],
+        "bid_amount": best_bid["bid_amount"],
+        "bid_reason": best_bid["bid_reason"],
+    }
+
+
+@router.get("/tasks")
+async def list_dungeon_tasks(request: Request):
+    """List open tasks visible to dungeon agents, with bids."""
+    db = request.app.state.db
+    cursor = await db.execute(
+        "SELECT id, title, description, status, priority, assignee_id, metadata, created_at "
+        "FROM tasks WHERE status IN ('bidding', 'assigned') "
+        "ORDER BY priority DESC, created_at ASC"
+    )
+    rows = await cursor.fetchall()
+
+    tasks = []
+    for row in rows:
+        task_id = row["id"]
+        meta = json.loads(row["metadata"] or "{}")
+        task_info = {
+            "id": task_id,
+            "title": row["title"],
+            "description": row["description"],
+            "status": row["status"],
+            "difficulty": meta.get("difficulty", 1),
+            "reward_energy": meta.get("reward_energy", 10),
+            "task_type": meta.get("task_type", "exploration"),
+        }
+
+        # Get bids for this task
+        bid_cursor = await db.execute(
+            "SELECT tb.bid_amount, tb.bid_reason, ai.agent_id "
+            "FROM task_bids tb "
+            "JOIN agent_identities ai ON tb.agent_id = ai.agent_id "
+            "WHERE tb.task_id=? AND tb.status='pending'",
+            (task_id,),
+        )
+        bids = await bid_cursor.fetchall()
+        task_info["bids"] = [
+            {
+                "agent_name": next((n for n, a in DUNGEON_AGENT_IDS.items() if a == b["agent_id"]), b["agent_id"]),
+                "bid_amount": b["bid_amount"],
+                "bid_reason": b["bid_reason"],
+            }
+            for b in bids
+        ]
+
+        # If assigned, show assignee
+        if row["status"] == "assigned" and row["assignee_id"]:
+            task_info["assignee"] = next(
+                (n for n, a in DUNGEON_AGENT_IDS.items() if a == row["assignee_id"]),
+                row["assignee_id"],
+            )
+
+        tasks.append(task_info)
+
+    return {"tasks": tasks, "total": len(tasks)}
+
+
+@router.post("/tasks")
+async def create_dungeon_task(body: TaskAnnouncement, request: Request):
+    """Convenience: announce + return task info visible to dungeon agents."""
+    result = await announce_task(body, request)
+    if result.get("status") != "task_announced":
+        return result
+    return await list_dungeon_tasks(request)
+
+
+# ── God Console Endpoints (Q3.5) ──
+
+
+class SpawnRequest(BaseModel):
+    agent_name: str
+    role: str = "explorer"
+    agent_x: float = 10
+    agent_y: float = 10
+
+
+@router.post("/spawn-agent")
+async def spawn_agent(body: SpawnRequest, request: Request):
+    """Dynamically spawn a new dungeon agent (from God Console !spawn)."""
+    await _ensure_dungeon_agents_seeded(request)
+
+    # Generate stable UUID for this new agent
+    agent_id = str(uuid.uuid4())
+    name = body.agent_name
+
+    # Add to dungeon agent tracking
+    DUNGEON_AGENT_IDS[name] = agent_id
+    DUNGEON_AGENT_ROLES[name] = body.role
+
+    # Create in DB
+    db = request.app.state.db
+    genome = json.dumps({
+        "role": body.role,
+        "tools": ["move", "talk", "interact"],
+        "dungeon_agent": True,
+        "spawned_via": "god_console",
+        "personality_traits": {"curiosity": 0.7, "cooperativeness": 0.6},
+    })
+    await db.execute(
+        "INSERT INTO agent_identities (agent_id, public_key, generation, genome, trust_score, energy_balance, role, status) "
+        "VALUES (?, ?, 0, ?, 0.5, 100, ?, 'active')",
+        (agent_id, f"dungeon_{name.lower()}", genome, body.role),
+    )
+    await db.commit()
+
+    # Color based on role
+    color_map = {
+        "warrior": 0xff4444, "explorer": 0xffaa44, "mage": 0xaa44ff,
+        "healer": 0x44ffaa, "rogue": 0x888888, "ranger": 0x44dd44,
+    }
+    color = color_map.get(body.role, 0xaaaaaa)
+
+    return {
+        "status": "spawned",
+        "agent_name": name,
+        "agent_id": agent_id,
+        "role": body.role,
+        "position": {"x": body.agent_x, "y": body.agent_y},
+        "color": color,
+        "energy_balance": 100,
+        "trust_score": 0.5,
+    }
+
+
+class RewardRequest(BaseModel):
+    agent_name: str
+    amount: float = 10
+
+
+@router.post("/reward-agent")
+async def reward_agent(body: RewardRequest, request: Request):
+    """Reward an agent with energy (from God Console !reward)."""
+    agent_id = DUNGEON_AGENT_IDS.get(body.agent_name)
+    if not agent_id:
+        return {"status": "error", "error": "unknown_agent"}
+
+    db = request.app.state.db
+    await db.execute(
+        "UPDATE agent_identities SET energy_balance = energy_balance + ?, updated_at = datetime('now') "
+        "WHERE agent_id=?",
+        (body.amount, agent_id),
+    )
+    await db.commit()
+
+    cursor = await db.execute(
+        "SELECT energy_balance, trust_score FROM agent_identities WHERE agent_id=?",
+        (agent_id,),
+    )
+    row = await cursor.fetchone()
+    return {
+        "status": "rewarded",
+        "agent_name": body.agent_name,
+        "reward_amount": body.amount,
+        "new_energy_balance": row["energy_balance"] if row else "?",
+        "trust_score": row["trust_score"] if row else "?",
+    }
