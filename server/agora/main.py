@@ -275,20 +275,31 @@ async def tick_loop(app: FastAPI):
             )
             agents = await cursor.fetchall()
 
-            # ── 3. Replenish + passive drain ──
+            # ── 3. Energy: variable replenish + drain (hunger system) ──
             for agent in agents:
                 aid = agent["agent_id"]
+                energy = agent["energy_balance"]
+                # Less replenish when energy is high, more when starving
+                if energy < 20:
+                    replenish = 4  # starving agents get a boost
+                elif energy < 50:
+                    replenish = 2  # moderate
+                else:
+                    replenish = 1  # well-fed agents get minimal
                 await db.execute(
-                    "UPDATE agent_identities SET energy_balance=MIN(energy_balance+3, 100.0) "
+                    "UPDATE agent_identities SET energy_balance=MIN(energy_balance+?, 100.0) "
                     "WHERE agent_id=?",
-                    (aid,),
+                    (replenish, aid),
                 )
             for agent in agents:
                 aid = agent["agent_id"]
+                energy = agent["energy_balance"]
+                # Passive drain scales with energy level (rich agents burn more)
+                drain = -2 if energy > 50 else -1
                 await db.execute(
-                    "UPDATE agent_identities SET energy_balance=MAX(energy_balance-1, 0) "
+                    "UPDATE agent_identities SET energy_balance=MAX(energy_balance-?, 0) "
                     "WHERE agent_id=? AND energy_balance > 0",
-                    (aid,),
+                    (abs(drain), aid),
                 )
 
             if len(agents) < 2:
