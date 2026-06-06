@@ -33,6 +33,27 @@ services:
     volumes:
       - qdrant_storage:/qdrant/storage
 
+  agora-server:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "8000:8000"
+    environment:
+      AGORA_DATABASE_URL: sqlite+aiosqlite:///./agora.db
+      AGORA_USE_REDIS: "false"
+      AGORA_TICK_INTERVAL: "5"
+      AGORA_MAX_AGENTS: "30"
+      AGORA_LLM_ENABLED: "false"
+    volumes:
+      - agora_data:/app
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8000/api/v1/health')"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 10s
+
   # EventStoreDB is optional. Uncomment below to enable.
   # eventstore:
   #   image: eventstore/eventstore:latest
@@ -54,4 +75,5 @@ services:
 volumes:
   pgdata:
   qdrant_storage:
+  agora_data:
   # eventstore_data:
