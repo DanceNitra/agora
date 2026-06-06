@@ -3,6 +3,7 @@ Dungeon Agent API — Phase 3: Multi-Agent with per-agent personalities and memo
 Receives game state → calls LLM → returns action decision.
 """
 
+import asyncio
 import json
 import math
 import time
@@ -221,7 +222,8 @@ async def dungeon_agent_action(state: DungeonState, request: Request):
     use_llm = cfg.get("llm_enabled", False)
 
     if use_llm:
-        raw = call_llm(
+        raw = await asyncio.to_thread(
+            call_llm,
             system_prompt=_get_prompt(agent_name),
             user_prompt=context,
             tier=cfg.get("llm_tier", "cheap"),
