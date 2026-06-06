@@ -12,10 +12,17 @@ export class AudioManager {
   /** Initialise (must be called from user gesture — click/keydown). */
   init(): void {
     if (this.ctx) return;
+    console.log('[Audio] init() called — creating AudioContext');
     this.ctx = new AudioContext();
+    // Resume if suspended (some browsers keep it suspended even after user gesture)
+    if (this.ctx.state === 'suspended') {
+      console.log('[Audio] AudioContext is suspended, calling resume()');
+      this.ctx.resume();
+    }
     this.masterGain = this.ctx.createGain();
     this.masterGain.gain.value = 0.3;
     this.masterGain.connect(this.ctx.destination);
+    console.log('[Audio] AudioContext ready, state:', this.ctx.state);
     this.startAmbience();
   }
 

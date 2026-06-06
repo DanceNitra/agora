@@ -244,9 +244,21 @@ export class GameScene extends Phaser.Scene {
       };
     }
 
-    // Audio — init on first keyboard press (browser policy)
+    // Audio — init on first user interaction (browser autoplay policy)
     this.audio = new AudioManager();
-    this.input.keyboard?.once('keydown', () => this.audio.init());
+    const initAudio = () => { this.audio.init(); };
+    // Try Phaser keyboard first
+    this.input.keyboard?.once('keydown', initAudio);
+    // Also listen for click/tap on the canvas
+    this.input.once('pointerdown', initAudio);
+    // And a global document-level fallback (catches non-Phaser events)
+    const docHandler = () => {
+      document.removeEventListener('keydown', docHandler);
+      document.removeEventListener('click', docHandler);
+      initAudio();
+    };
+    document.addEventListener('keydown', docHandler, { once: true });
+    document.addEventListener('click', docHandler, { once: true });
 
     // H toggle for HUD
     this.input.keyboard?.on('keydown-H', () => this.hud.toggle());
