@@ -17,6 +17,7 @@ from agora.coordination.economy_config import get_role_config, ROLE_ECONOMY
 from agora.coordination.stigmergy import StigmergyPool
 from agora.coordination.economy import EconomyEngine
 from agora.agent_os.agent_os import AgentOS
+from agora.agent_os.physical_world import PhysicalWorld
 from agora.execution.task_executor import TaskExecutor
 from agora.lifecycle.agent_lifecycle import AgentLifecycle
 from agora.lifecycle.epoch_engine import EpochEngine
@@ -25,6 +26,7 @@ from agora.api import agents as agents_api, tasks as tasks_api, god as god_api, 
 from agora.api import dungeon_persistence as persistence_api
 from agora.api import artifacts as artifacts_api
 from agora.api import agent_os_api
+from agora.api import physical_api
 
 
 async def init_db(app: FastAPI):
@@ -87,6 +89,7 @@ async def init_db(app: FastAPI):
     app.state.task_executor = TaskExecutor(db)
     app.state.agent_os = AgentOS(db)
     await app.state.agent_os.ensure_os_initialized()
+    app.state.physical_world = PhysicalWorld(db, llm_enabled=settings.llm_enabled)
     app.state.agent_lifecycle = AgentLifecycle(db)
     app.state.csd_monitor = CSDMonitor(window_size=200, z_threshold_warning=2.0, z_threshold_critical=3.5)
     app.state.epoch_engine = EpochEngine(db)
@@ -149,6 +152,7 @@ app.include_router(economy_api.router)
 app.include_router(persistence_api.router)
 app.include_router(artifacts_api.router)
 app.include_router(agent_os_api.router)
+app.include_router(physical_api.router)
 
 
 async def broadcast(app: FastAPI, event_type: str, payload: dict):
@@ -657,6 +661,16 @@ async def tick_loop(app: FastAPI):
                     print(f"[AgentOS] Tick error: {e}")
                     import traceback
                     traceback.print_exc()
+
+            # ── 12. Physical world tick (movement, interactions, library) ──
+            try:
+                await app.state.physical_world.physical_help_tick(broadcast_fn=lambda t, p: broadcast(app, t, p))
+                # Move each active NPC one step along their path
+                for npc_id in list(app.state.physical_world._pending_moves.keys()):
+                    if app.state.physical_world._pending_moves.get(npc_id):
+                        nx, ny = await app.state.physical_world.move_npc_toward(npc_id, 0, 0)
+            except Exception as e:
+                print(f"[PhysicalWorld] Tick error: {e}")
 
             if app.state.tick_count % 5 == 0:
                 best_agents = {}
