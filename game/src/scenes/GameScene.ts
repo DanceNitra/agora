@@ -16,6 +16,8 @@ export class GameScene extends Phaser.Scene {
   private cursors!: Phaser.Types.Input.Keyboard.CursorKeys;
   private wasd!: Record<string, Phaser.Input.Keyboard.Key>;
   private minimap!: Phaser.GameObjects.Graphics;
+  private playerDust!: Phaser.GameObjects.Particles.ParticleEmitter;
+  private playerWalkTimer: number = 0;
 
   constructor() {
     super({ key: 'GameScene' });
@@ -165,6 +167,17 @@ export class GameScene extends Phaser.Scene {
     this.player = this.physics.add.sprite(12 * TILE, 10 * TILE, 'player');
     this.player.setCollideWorldBounds(true);
 
+    // Player dust particles
+    this.playerDust = this.add.particles(0, 0, 'dust', {
+      speed: { min: 5, max: 15 },
+      lifespan: 300,
+      scale: { start: 1, end: 0 },
+      alpha: { start: 0.5, end: 0 },
+      frequency: 100,
+      emitting: false,
+    });
+    this.playerDust.setDepth(5);
+
     // Player collides with walls, doors, and NPCs
     this.physics.add.collider(this.player, this.walls);
     this.physics.add.collider(this.player, this.doors);
@@ -218,8 +231,25 @@ export class GameScene extends Phaser.Scene {
         vy *= 0.707;
       }
       this.player.setVelocity(vx, vy);
+
+      // Player walk animation
+      const moving = vx !== 0 || vy !== 0;
+      if (moving) {
+        this.playerWalkTimer += 0.1;
+        const pulse = 1 + Math.sin(this.playerWalkTimer) * 0.03;
+        this.player.setScale(pulse);
+        // Dust particles
+        this.playerDust.emitting = true;
+        this.playerDust.setPosition(this.player.x, this.player.y + 10);
+      } else {
+        this.playerWalkTimer = 0;
+        this.player.setScale(1);
+        this.playerDust.emitting = false;
+      }
     } else {
       this.player.setVelocity(0, 0);
+      this.player.setScale(1);
+      this.playerDust.emitting = false;
     }
 
     // --- NPC UPDATES (Q1.2 + Q1.5) ---

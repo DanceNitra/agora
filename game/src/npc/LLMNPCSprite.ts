@@ -87,6 +87,11 @@ export class LLMNPCSprite extends Phaser.Physics.Arcade.Sprite {
   public currentObjective: string = 'Find the Crystal of Eternity';
   public nearbyNPCs: { name: string; role: string; x: number; y: number }[] = [];
 
+  // Animation
+  private walkBobTimer: number = 0;
+  private baseY: number;
+  private sparkleEmitter!: Phaser.GameObjects.Particles.ParticleEmitter;
+
   // Callbacks
   public onMemoryUpdated: ((memories: MemoryEntry[]) => void) | null = null;
 
@@ -102,6 +107,7 @@ export class LLMNPCSprite extends Phaser.Physics.Arcade.Sprite {
     scene.add.existing(this);
     scene.physics.add.existing(this);
 
+    this.baseY = y;
     this.setScale(1.3);
 
     const body = this.body as Phaser.Physics.Arcade.Body;
@@ -136,6 +142,16 @@ export class LLMNPCSprite extends Phaser.Physics.Arcade.Sprite {
     // Health bar
     this.healthBar = scene.add.graphics();
     this.healthBar.setDepth(10);
+
+    // Sparkle particle emitter (burst on talk)
+    this.sparkleEmitter = scene.add.particles(0, 0, 'sparkle', {
+      speed: { min: 20, max: 60 },
+      lifespan: 400,
+      scale: { start: 1, end: 0 },
+      alpha: { start: 1, end: 0 },
+      emitting: false,
+    });
+    this.sparkleEmitter.setDepth(20);
 
     this.buildTree();
   }
@@ -554,6 +570,8 @@ export class LLMNPCSprite extends Phaser.Physics.Arcade.Sprite {
     this.scene.time.delayedCall(4000, () => {
       this.speechBubble.setAlpha(0);
     });
+    // Sparkle burst
+    this.sparkleEmitter.explode(8, this.x, this.y - 10);
   }
 
   // ── Update ──
@@ -572,6 +590,21 @@ export class LLMNPCSprite extends Phaser.Physics.Arcade.Sprite {
 
     // Health bar
     this.drawHealthBar();
+
+    // Walk animation — subtle scale pulse
+    const body = this.body as Phaser.Physics.Arcade.Body;
+    const moving = Math.abs(body.velocity.x) > 5 || Math.abs(body.velocity.y) > 5;
+    if (moving) {
+      this.walkBobTimer += 0.08;
+      const pulse = 1.3 + Math.sin(this.walkBobTimer) * 0.05;
+      this.setScale(pulse);
+    } else {
+      this.walkBobTimer = 0;
+      this.setScale(1.3);
+    }
+
+    // Update sparkle emitter position
+    this.sparkleEmitter.setPosition(this.x, this.y - 10);
   }
 
   private drawHealthBar(): void {
