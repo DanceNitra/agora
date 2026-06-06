@@ -92,3 +92,48 @@ CREATE TABLE IF NOT EXISTS task_bids (
     created_at      TEXT NOT NULL DEFAULT (datetime('now')),
     UNIQUE(task_id, agent_id)
 );
+
+-- ═══════════════════════════════════════════
+-- ESS ECONOMY — resource pool + trading
+-- ═══════════════════════════════════════════
+
+CREATE TABLE IF NOT EXISTS resources (
+    id              INTEGER PRIMARY KEY AUTOINCREMENT,
+    name            TEXT NOT NULL UNIQUE,
+    total_supply    REAL NOT NULL DEFAULT 0,
+    base_price      REAL NOT NULL DEFAULT 1.0,
+    volatility      REAL NOT NULL DEFAULT 0.1,
+    created_at      TEXT NOT NULL DEFAULT (datetime('now')),
+    updated_at      TEXT NOT NULL DEFAULT (datetime('now'))
+);
+
+CREATE TABLE IF NOT EXISTS agent_inventory (
+    id              INTEGER PRIMARY KEY AUTOINCREMENT,
+    agent_id        TEXT NOT NULL REFERENCES agent_identities(agent_id),
+    resource_id     INTEGER NOT NULL REFERENCES resources(id),
+    quantity        REAL NOT NULL DEFAULT 0,
+    UNIQUE(agent_id, resource_id)
+);
+
+CREATE TABLE IF NOT EXISTS trade_offers (
+    id              INTEGER PRIMARY KEY AUTOINCREMENT,
+    agent_id        TEXT NOT NULL REFERENCES agent_identities(agent_id),
+    offer_type      TEXT NOT NULL CHECK (offer_type IN ('buy', 'sell')),
+    resource_id     INTEGER NOT NULL REFERENCES resources(id),
+    quantity        REAL NOT NULL CHECK (quantity > 0),
+    price_per_unit  REAL NOT NULL CHECK (price_per_unit > 0),
+    status          TEXT NOT NULL DEFAULT 'open' CHECK (status IN ('open', 'filled', 'cancelled')),
+    created_at      TEXT NOT NULL DEFAULT (datetime('now')),
+    filled_at       TEXT
+);
+
+CREATE TABLE IF NOT EXISTS trade_history (
+    id              INTEGER PRIMARY KEY AUTOINCREMENT,
+    buyer_id        TEXT NOT NULL,
+    seller_id       TEXT NOT NULL,
+    resource_id     INTEGER NOT NULL REFERENCES resources(id),
+    quantity        REAL NOT NULL,
+    price_per_unit  REAL NOT NULL,
+    total_energy    REAL NOT NULL,
+    created_at      TEXT NOT NULL DEFAULT (datetime('now'))
+);

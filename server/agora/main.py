@@ -14,7 +14,8 @@ import aiosqlite
 from agora.config import settings
 from agora.coordination.ess_protocol import TrustEngine
 from agora.coordination.stigmergy import StigmergyPool
-from agora.api import agents as agents_api, tasks as tasks_api, god as god_api, graph as graph_api, dungeon as dungeon_api
+from agora.coordination.economy import EconomyEngine
+from agora.api import agents as agents_api, tasks as tasks_api, god as god_api, graph as graph_api, dungeon as dungeon_api, economy as economy_api
 
 
 async def init_db(app: FastAPI):
@@ -38,6 +39,8 @@ async def init_db(app: FastAPI):
     app.state.trust = TrustEngine(db)
     app.state.stigmergy = StigmergyPool(redis_client=None, db=db)
     await app.state.stigmergy.load_from_db()
+    app.state.economy = EconomyEngine(db)
+    await app.state.economy.init_resources()
     app.state.active_connections = []
     app.state.tick_count = 0
 
@@ -93,6 +96,7 @@ app.include_router(tasks_api.router, prefix="/api/v1/tasks", tags=["tasks"])
 app.include_router(god_api.router, prefix="/api/v1/god", tags=["god"])
 app.include_router(graph_api.router, prefix="/api/v1", tags=["graph"])
 app.include_router(dungeon_api.router)
+app.include_router(economy_api.router)
 
 
 async def broadcast(app: FastAPI, event_type: str, payload: dict):
@@ -244,6 +248,15 @@ async def tick_loop(app: FastAPI):
                     result=f"[{role}] {insight[:200]}",
                     trust_delta=trust_delta,
                 )
+
+                # Economy: random resource drop from exploration
+                if role in ("explorer", "scout", "adventurer") or task_type == "exploration":
+                    drop = await app.state.economy.random_resource_drop(agent_id)
+                    if drop:
+                        await broadcast(app, "resource_drop", {
+                            "agent_id": agent_id[:8], "role": role,
+                            "resource": drop["resource"], "quantity": drop["quantity"],
+                        })
 
                 energy_cost = 10 if tier == "expert" else 5 if tier == "medium" else 3
                 trust_change = trust_delta if outcome == "cooperate" else trust_delta * 2
