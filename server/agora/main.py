@@ -16,6 +16,7 @@ from agora.coordination.ess_protocol import TrustEngine
 from agora.coordination.stigmergy import StigmergyPool
 from agora.coordination.economy import EconomyEngine
 from agora.api import agents as agents_api, tasks as tasks_api, god as god_api, graph as graph_api, dungeon as dungeon_api, economy as economy_api
+from agora.api import dungeon_persistence as persistence_api
 
 
 async def init_db(app: FastAPI):
@@ -97,6 +98,7 @@ app.include_router(god_api.router, prefix="/api/v1/god", tags=["god"])
 app.include_router(graph_api.router, prefix="/api/v1", tags=["graph"])
 app.include_router(dungeon_api.router)
 app.include_router(economy_api.router)
+app.include_router(persistence_api.router)
 
 
 async def broadcast(app: FastAPI, event_type: str, payload: dict):

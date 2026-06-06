@@ -127,6 +127,47 @@ CREATE TABLE IF NOT EXISTS trade_offers (
     filled_at       TEXT
 );
 
+-- ═══════════════════════════════════════════
+-- DUNGEON PERSISTENCE — NPCs, quests, items
+-- ═══════════════════════════════════════════
+
+CREATE TABLE IF NOT EXISTS dungeon_npcs (
+    npc_id          TEXT PRIMARY KEY,
+    npc_name        TEXT NOT NULL,
+    role            TEXT NOT NULL,
+    pos_x           REAL NOT NULL DEFAULT 320,
+    pos_y           REAL NOT NULL DEFAULT 240,
+    health          REAL NOT NULL DEFAULT 100,
+    inventory       TEXT NOT NULL DEFAULT '[]',
+    status          TEXT NOT NULL DEFAULT 'active',
+    objective       TEXT NOT NULL DEFAULT 'Explore the dungeon',
+    created_at      TEXT NOT NULL DEFAULT (datetime('now')),
+    updated_at      TEXT NOT NULL DEFAULT (datetime('now'))
+);
+
+CREATE TABLE IF NOT EXISTS dungeon_quests (
+    id              INTEGER PRIMARY KEY AUTOINCREMENT,
+    quest_id        TEXT NOT NULL UNIQUE,
+    title           TEXT NOT NULL,
+    description     TEXT NOT NULL DEFAULT '',
+    quest_type      TEXT NOT NULL DEFAULT 'exploration',
+    prerequisites   TEXT NOT NULL DEFAULT '[]',  -- list of quest_ids that must be completed first
+    rewards         TEXT NOT NULL DEFAULT '{}',  -- {"items": ["..."], "xp": 10, "unlocks": ["..."]}
+    starting_npc    TEXT,                         -- which NPC gives this quest
+    created_at      TEXT NOT NULL DEFAULT (datetime('now'))
+);
+
+CREATE TABLE IF NOT EXISTS dungeon_quest_progress (
+    id              INTEGER PRIMARY KEY AUTOINCREMENT,
+    npc_id          TEXT NOT NULL REFERENCES dungeon_npcs(npc_id),
+    quest_id        TEXT NOT NULL REFERENCES dungeon_quests(quest_id),
+    status          TEXT NOT NULL DEFAULT 'available',  -- available, active, completed, failed
+    progress        TEXT NOT NULL DEFAULT '{}',         -- {"step": 1, "total": 3, "details": {...}}
+    started_at      TEXT,
+    completed_at    TEXT,
+    UNIQUE(npc_id, quest_id)
+);
+
 CREATE TABLE IF NOT EXISTS trade_history (
     id              INTEGER PRIMARY KEY AUTOINCREMENT,
     buyer_id        TEXT NOT NULL,
