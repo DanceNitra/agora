@@ -1,215 +1,301 @@
-"""Agora server — main FastAPI application.
-
-Sets up lifespan (DB, Redis, subsystems, seed agents), WebSocket /ws endpoint,
-tick_loop background task, and global AgoraState.
-"""
+"""Agora — FastAPI server entry point (SQLite dev mode)."""
 
 import asyncio
 import json
-import logging
+import random
+import uuid
 from contextlib import asynccontextmanager
-from dataclasses import dataclass, field
-from typing import Optional
+from datetime import datetime
 
-from fastapi import FastAPI, WebSocket, WebSocketDisconnect
+from fastapi import FastAPI, WebSocket, WebSocketDisconnect, Request
 from fastapi.middleware.cors import CORSMiddleware
+import aiosqlite
 
-# Import API routers
-from agora.api import agents, tasks, timeline, god
-
-logger = logging.getLogger("agora")
-
-
-# ---------- Global State ----------
-
-@dataclass
-class AgoraState:
-    """Holds all top-level subsystem references for the running server."""
-
-    db: Optional[object] = None
-    redis: Optional[object] = None
-    agent_manager: Optional[object] = None
-    task_manager: Optional[object] = None
-    timeline_service: Optional[object] = None
-    god_engine: Optional[object] = None
-    websocket_connections: list = field(default_factory=list)
-    tick_interval: float = 1.0  # seconds
+from agora.config import settings
+from agora.coordination.ess_protocol import TrustEngine
+from agora.coordination.stigmergy import StigmergyPool
+from agora.api import agents as agents_api, tasks as tasks_api, god as god_api, graph as graph_api
 
 
-# Singleton state instance
-state = AgoraState()
+DB_PATH = settings.database_url.replace("sqlite+aiosqlite:///", "")
 
 
-# ---------- Lifespan ----------
+async def init_db(app: FastAPI):
+    db = await aiosqlite.connect(DB_PATH)
+    db.row_factory = aiosqlite.Row
+    app.state.db = db
+
+    schema_path = __file__.replace("main.py", "storage/schema.sql")
+    try:
+        with open(schema_path) as f:
+            await db.executescript(f.read())
+    except (FileNotFoundError, Exception) as e:
+        if isinstance(e, FileNotFoundError):
+            pass
+        else:
+            print(f"[Agora] Schema note: {e} (tables likely already exist)")
+
+    await db.commit()
+    app.state.trust = TrustEngine(db)
+    app.state.stigmergy = StigmergyPool(redis_client=None)
+    app.state.active_connections = []
+    app.state.tick_count = 0
+
+    # Seed agents if empty
+    cursor = await db.execute("SELECT COUNT(*) as cnt FROM agent_identities")
+    row = await cursor.fetchone()
+    if row and row["cnt"] == 0:
+        await seed_agents(db)
+
+    print(f"[Agora] DB initialized at {DB_PATH}")
+
+
+async def seed_agents(db):
+    seed_roles = [
+        {"role": "researcher", "tools": ["web_search", "read_file", "summarize"]},
+        {"role": "writer", "tools": ["write_file", "format", "cite"]},
+        {"role": "critic", "tools": ["review", "validate", "score"]},
+    ]
+    for s in seed_roles:
+        aid = str(uuid.uuid4())
+        genome = json.dumps({
+            "role": s["role"], "tools": s["tools"],
+            "model_tier": "cheap", "temperature": 0.7,
+            "personality_traits": {"curiosity": 0.8, "thoroughness": 0.7,
+                                   "cooperativeness": 0.85}
+        })
+        await db.execute(
+            """INSERT INTO agent_identities (agent_id, public_key, generation, genome,
+               trust_score, energy_balance, role, status)
+               VALUES (?, ?, 0, ?, 0.5, 100, ?, 'active')""",
+            (aid, f"key_{aid[:8]}", genome, s["role"])
+        )
+        print(f"  [Seed] {s['role']}-{aid[:8]} created")
+    await db.commit()
+
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    """Startup and shutdown lifecycle.
+    await init_db(app)
+    loop = asyncio.get_event_loop()
+    loop.create_task(tick_loop(app))
+    yield
+    if hasattr(app.state, 'db') and app.state.db:
+        await app.state.db.close()
 
-    On startup:
-      - Connect to database
-      - Connect to Redis
-      - Initialize subsystems (agent manager, task manager, timeline, god)
-      - Create seed agents
-      - Start background tick loop
+app = FastAPI(title="Agora", version="0.1.0", lifespan=lifespan)
+app.add_middleware(CORSMiddleware, allow_origins=["*"],
+                   allow_methods=["*"], allow_headers=["*"])
 
-    On shutdown:
-      - Stop tick loop
-      - Tear down subsystems
-      - Close Redis / DB connections
-    """
-    logger.info("Agora server starting up...")
-
-    # ---- Startup ----
-
-    # 1. Database connection (placeholder)
-    # state.db = await create_async_engine("postgresql+asyncpg://...")
-    logger.info("Database connection established (placeholder)")
-
-    # 2. Redis connection (placeholder)
-    # state.redis = await aioredis.from_url("redis://localhost:6379")
-    logger.info("Redis connection established (placeholder)")
-
-    # 3. Initialize subsystems (placeholder)
-    # state.agent_manager = AgentManager(db=state.db, redis=state.redis)
-    # state.task_manager = TaskManager(db=state.db)
-    # state.timeline_service = TimelineService()
-    # state.god_engine = GodEngine(...)
-    logger.info("Subsystems initialized (placeholder)")
-
-    # 4. Create seed agents (placeholder)
-    # await state.agent_manager.spawn("helper", "A general-purpose helper", name="Athena")
-    # await state.agent_manager.spawn("critic", "Reviews and critiques output", name="Socrates")
-    logger.info("Seed agents created (placeholder)")
-
-    # 5. Start background tick loop
-    tick_task = asyncio.create_task(tick_loop())
-
-    yield  # Application runs here
-
-    # ---- Shutdown ----
-
-    logger.info("Agora server shutting down...")
-
-    tick_task.cancel()
-    try:
-        await tick_task
-    except asyncio.CancelledError:
-        pass
-
-    # Tear down subsystems
-    # await state.agent_manager.shutdown()
-    # await state.task_manager.shutdown()
-    # await state.timeline_service.shutdown()
-
-    # Close connections
-    # if state.redis:
-    #     await state.redis.close()
-    # if state.db:
-    #     await state.db.dispose()
-
-    logger.info("Agora server shutdown complete.")
+# Mount API routes
+app.include_router(agents_api.router, prefix="/api/v1/agents", tags=["agents"])
+app.include_router(tasks_api.router, prefix="/api/v1/tasks", tags=["tasks"])
+app.include_router(god_api.router, prefix="/api/v1/god", tags=["god"])
+app.include_router(graph_api.router, prefix="/api/v1", tags=["graph"])
 
 
-# ---------- Background Tick Loop ----------
-
-async def tick_loop():
-    """Periodic background task that drives the agent simulation loop."""
-    while True:
+async def broadcast(app: FastAPI, event_type: str, payload: dict):
+    event = {"type": event_type, "payload": payload,
+             "timestamp": datetime.utcnow().isoformat()}
+    for ws in app.state.active_connections:
         try:
-            # 1. Process queued agent actions
-            # 2. Check for timed-out tasks
-            # 3. Emit heartbeats to WebSocket clients
-            # 4. Persist state snapshots
-
-            # Broadcast tick to connected WebSocket clients
-            payload = json.dumps({"type": "tick", "ts": asyncio.get_event_loop().time()})
-            dead_connections = []
-            for ws in state.websocket_connections:
-                try:
-                    await ws.send_text(payload)
-                except Exception:
-                    dead_connections.append(ws)
-
-            for ws in dead_connections:
-                state.websocket_connections.remove(ws)
-
-        except asyncio.CancelledError:
-            break
-        except Exception as exc:
-            logger.exception("Error in tick_loop: %s", exc)
-
-        await asyncio.sleep(state.tick_interval)
+            await ws.send_json(event)
+        except Exception:
+            pass
 
 
-# ---------- WebSocket Endpoint ----------
+@app.get("/api/v1/health")
+async def health(request: Request):
+    db = request.app.state.db
+    cursor = await db.execute("SELECT COUNT(*) as c FROM agent_identities WHERE status='active'")
+    row = await cursor.fetchone()
+    count = row["c"] if row else 0
+    return {"status": "ok", "agents": count,
+            "tick": request.app.state.tick_count}
 
-async def handle_websocket(websocket: WebSocket):
-    """Handle an individual WebSocket connection lifecycle."""
+
+@app.websocket("/ws")
+async def ws_endpoint(websocket: WebSocket):
     await websocket.accept()
-    state.websocket_connections.append(websocket)
-    logger.info("WebSocket client connected (%d total)", len(state.websocket_connections))
-
+    websocket.app.state.active_connections.append(websocket)
     try:
         while True:
             data = await websocket.receive_text()
-            # Process incoming messages (e.g. agent commands, chat)
-            try:
-                msg = json.loads(data)
-                # Handle message dispatch...
-                # e.g. if msg.get("type") == "command":
-                #     await state.god_engine.handle(msg["command"])
-                response = {"type": "ack", "original": msg}
-                await websocket.send_text(json.dumps(response))
-            except json.JSONDecodeError:
-                await websocket.send_text(json.dumps({"type": "error", "detail": "Invalid JSON"}))
+            await broadcast(websocket.app, "message", {"text": data})
     except WebSocketDisconnect:
-        logger.info("WebSocket client disconnected")
-    except Exception as exc:
-        logger.exception("WebSocket error: %s", exc)
-    finally:
-        if websocket in state.websocket_connections:
-            state.websocket_connections.remove(websocket)
+        websocket.app.state.active_connections.remove(websocket)
 
 
-# ---------- FastAPI Application ----------
+async def tick_loop(app: FastAPI):
+    """Main loop: agent interactions every N seconds (simulated thoughts when LLM disabled)."""
+    from agora.execution.llm_client import agent_think
+    task_types = ["research", "writing", "review", "analysis", "exploration"]
+    use_llm = settings.llm_enabled
 
-def create_app() -> FastAPI:
-    """Build and configure the FastAPI application."""
-    app = FastAPI(
-        title="Agora Server",
-        description="Multi-agent orchestration server",
-        version="0.1.0",
-        lifespan=lifespan,
-    )
+    # Simulated responses per role (no API calls, no token cost)
+    SIMULATED_THOUGHTS = {
+        "researcher": [
+            {"action": "research", "topic": "pattern analysis", "insight": "Analyzing recent trace patterns for emergent behavior.", "confidence": 0.75},
+            {"action": "propose", "topic": "coordination strategy", "insight": "Proposing improved agent coordination based on trust signals.", "confidence": 0.7},
+            {"action": "respond", "topic": "data synthesis", "insight": "Synthesizing findings from multi-agent traces.", "confidence": 0.8},
+        ],
+        "writer": [
+            {"action": "write", "title": "system report", "content_preview": "Drafting system status report from agent outputs.", "confidence": 0.75},
+            {"action": "edit", "title": "trace log", "content_preview": "Editing trace log for clarity and structure.", "confidence": 0.7},
+            {"action": "format", "title": "insight summary", "content_preview": "Formatting collected insights into readable summary.", "confidence": 0.8},
+        ],
+        "critic": [
+            {"action": "review", "target": "agent outputs", "feedback": "Outputs show adequate quality, improvement area in novelty.", "score": 0.65},
+            {"action": "validate", "target": "trust model", "feedback": "Trust distribution appears healthy, no anomalies detected.", "score": 0.8},
+            {"action": "score", "target": "system health", "feedback": "System operating within normal parameters.", "score": 0.75},
+        ],
+    }
 
-    # CORS
-    app.add_middleware(
-        CORSMiddleware,
-        allow_origins=["*"],
-        allow_credentials=True,
-        allow_methods=["*"],
-        allow_headers=["*"],
-    )
+    while True:
+        await asyncio.sleep(settings.tick_interval)
+        app.state.tick_count += 1
+        db = app.state.db
+        trust_engine = app.state.trust
+        stigmergy = app.state.stigmergy
 
-    # Register API routers
-    app.include_router(agents.router)
-    app.include_router(tasks.router)
-    app.include_router(timeline.router)
-    app.include_router(god.router)
+        # Get active agents
+        cursor = await db.execute(
+            "SELECT agent_id, role, trust_score, energy_balance, genome "
+            "FROM agent_identities WHERE status='active'"
+        )
+        agents = await cursor.fetchall()
 
-    # WebSocket endpoint
-    @app.websocket("/ws")
-    async def websocket_endpoint(websocket: WebSocket):
-        await handle_websocket(websocket)
+        # Replenish energy for all active agents each tick
+        for agent in agents:
+            aid = agent["agent_id"]
+            await db.execute(
+                "UPDATE agent_identities SET energy_balance=MIN(energy_balance+3, 100.0) "
+                "WHERE agent_id=?",
+                (aid,),
+            )
 
-    # Health check
-    @app.get("/health")
-    async def health():
-        return {"status": "ok", "agents_online": len(state.websocket_connections)}
+        if len(agents) < 2:
+            await broadcast(app, "heartbeat", {
+                "tick": app.state.tick_count, "agents": len(agents),
+                "message": "Not enough agents for interaction"
+            })
+            continue
 
-    return app
+        # Only 1-2 agents think per tick
+        thinking_agents = random.sample(agents, min(2, len(agents)))
 
+        for agent in thinking_agents:
+            agent_id = agent["agent_id"]
+            role = agent["role"]
+            agent_trust = agent["trust_score"]
+            agent_energy = agent["energy_balance"]
 
-# Instantiate the app
-app = create_app()
+            if agent_energy < 5:
+                continue  # Too tired to think
+
+            # Pick a random partner for context
+            partner = random.choice([a for a in agents if a["agent_id"] != agent_id])
+            partner_id = partner["agent_id"] if partner else None
+
+            # Choose model tier based on trust score
+            tier = "expert" if agent_trust >= 0.7 else "medium" if agent_trust >= 0.4 else "cheap"
+
+            # Build context from recent traces
+            recent_traces = await stigmergy.recent_alerts(limit=3)
+            context_parts = [f"I am a {role} agent. Current trust: {agent_trust:.2f}."]
+            for t in recent_traces:
+                context_parts.append(f"Recent: {t.get('result_preview', '')[:100]}")
+            context = " | ".join(context_parts)
+
+            if use_llm:
+                # Real LLM call (sync call in async context)
+                thought = await asyncio.to_thread(agent_think, role, context, tier)
+            else:
+                # Simulated thought — no API call, no token cost
+                role_thoughts = SIMULATED_THOUGHTS.get(role, SIMULATED_THOUGHTS["researcher"])
+                thought = random.choice(role_thoughts)
+
+            action = thought.get("action", "unknown")
+            insight = thought.get("insight", thought.get("content_preview", thought.get("feedback", thought.get("discovery", json.dumps(thought)))))
+
+            # TFT interaction with partner
+            if partner_id:
+                current_trust = await trust_engine.get_trust(agent_id, partner_id)
+                cursor_check = await db.execute(
+                    "SELECT COUNT(*) as cnt FROM trust_scores WHERE source_id=? AND target_id=?",
+                    (agent_id, partner_id),
+                )
+                row_check = await cursor_check.fetchone()
+                is_first = row_check["cnt"] == 0
+
+                if is_first or current_trust >= 0.2:
+                    outcome = "cooperate"
+                    trust_delta = 0.1
+                else:
+                    outcome = "defect"
+                    trust_delta = -0.3
+
+                await trust_engine.record_interaction(agent_id, partner_id, outcome)
+            else:
+                outcome = "cooperate"
+                trust_delta = 0.0
+
+            # Store agent's work as an artifact
+            task_type = random.choice(task_types)
+            await stigmergy.write_trace(
+                agent_id=agent_id,
+                task_type=task_type,
+                result=f"[{role}] {insight[:200]}",
+                trust_delta=trust_delta,
+            )
+
+            # Update agent state
+            energy_cost = 10 if tier == "expert" else 5 if tier == "medium" else 3
+            trust_change = trust_delta if outcome == "cooperate" else trust_delta * 2
+            updated_trust = min(1.0, max(0.0, agent_trust + trust_change))
+            await db.execute(
+                "UPDATE agent_identities SET trust_score=?, energy_balance=energy_balance-?, "
+                "updated_at=datetime('now') WHERE agent_id=?",
+                (updated_trust, energy_cost, agent_id),
+            )
+
+            # Broadcast the agent's thought
+            await broadcast(app, "agent_thought", {
+                "agent_id": agent_id[:8],
+                "role": role,
+                "tier": tier,
+                "action": action,
+                "insight": insight[:200],
+                "trust": round(updated_trust, 3),
+                "energy_cost": energy_cost,
+            })
+
+            # Every 5th agent thought: store artifact in DB
+            if app.state.tick_count % 5 == 0 and action != "error":
+                await db.execute(
+                    "INSERT INTO artifacts (agent_id, title, artifact_type, storage_path, metadata) "
+                    "VALUES (?, ?, ?, ?, ?)",
+                    (agent_id, f"{role} thought #{app.state.tick_count}", task_type,
+                     f"memory/tick-{app.state.tick_count}", json.dumps(thought)),
+                )
+
+        await db.commit()
+
+        # Every 5 ticks: stigmergy insight
+        if app.state.tick_count % 5 == 0:
+            best_agents = {}
+            for tt in task_types:
+                best = await stigmergy.best_agent(tt, min_traces=2)
+                if best:
+                    best_agents[tt] = best
+            await broadcast(app, "stigmergy_insight", {
+                "tick": app.state.tick_count, "best_agents": best_agents,
+            })
+
+        # Heartbeat
+        total_energy = sum(a["energy_balance"] for a in agents)
+        await broadcast(app, "heartbeat", {
+            "tick": app.state.tick_count, "agents": len(agents),
+            "total_energy": total_energy,
+            "thinking_agents": len(thinking_agents),
+        })

@@ -1,5 +1,12 @@
 import { useState, useCallback } from 'react';
 
+interface GodApiResponse {
+  parsed_command: string;
+  args: Record<string, unknown>;
+  result: string;
+  success: boolean;
+}
+
 interface CommandResult {
   success: boolean;
   output?: string;
@@ -14,10 +21,6 @@ interface UseGodCommandsReturn {
   error: string | null;
 }
 
-/**
- * React hook that sends God Console commands to POST /api/v1/god/command
- * and returns the result.
- */
 export function useGodCommands(): UseGodCommandsReturn {
   const [loading, setLoading] = useState(false);
   const [lastResult, setLastResult] = useState<CommandResult | null>(null);
@@ -37,31 +40,24 @@ export function useGodCommands(): UseGodCommandsReturn {
 
         if (!res.ok) {
           const errText = await res.text().catch(() => `HTTP ${res.status}`);
-          const result: CommandResult = {
-            success: false,
-            error: errText,
-          };
+          const result: CommandResult = { success: false, error: errText };
           setLastResult(result);
           setError(errText);
           return result;
         }
 
-        const data: CommandResult = await res.json();
+        const data: GodApiResponse = await res.json();
         const result: CommandResult = {
-          success: data.success ?? true,
-          output: data.output,
-          error: data.error,
-          data: data.data,
+          success: data.success,
+          output: data.result,
+          error: data.success ? undefined : data.result,
+          data: data.args as Record<string, unknown>,
         };
         setLastResult(result);
         return result;
       } catch (err: any) {
-        // Network error — return a structured result instead of throwing
         const errMsg = err.message ?? String(err);
-        const result: CommandResult = {
-          success: false,
-          error: `Network error: ${errMsg}`,
-        };
+        const result: CommandResult = { success: false, error: `Network error: ${errMsg}` };
         setLastResult(result);
         setError(errMsg);
         return result;

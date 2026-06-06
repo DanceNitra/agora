@@ -2,17 +2,32 @@ import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { useGodCommands } from '../hooks/useGodCommands';
 
 const COMMANDS = [
-  '!status',
-  '!agents',
-  '!spawn',
-  '!shutdown',
-  '!broadcast',
-  '!metrics',
-  '!config',
-  '!log',
-  '!reset',
+  '!spawn <role> "<goal>"',
+  '!list',
+  '!reward <agent_id> <amount>',
+  '!punish <agent_id> <amount>',
+  '!pause <agent_id>',
+  '!resume <agent_id>',
+  '!inspect <agent_id>',
+  '!inject <agent_id> <message>',
+  '!rollback <agent_id>',
+  '!reset all',
+  '!broadcast <message>',
   '!help',
 ];
+
+const HELP_TEXT = `Available commands:
+  !spawn <role> "<goal>"   — Create a new agent
+  !list                    — List all agents
+  !reward <id> <amt>       — Increase agent trust
+  !punish <id> <amt>       — Decrease agent trust
+  !pause <id>              — Pause an agent
+  !resume <id>             — Resume paused agent
+  !inspect <id>            — View agent details
+  !inject <id> <msg>       — Send message to agent
+  !rollback <id>           — Rollback agent state
+  !reset all               — Reset entire system
+  !broadcast <msg>         — Broadcast to all agents`;
 
 interface HistoryEntry {
   command: string;
@@ -37,10 +52,10 @@ const GodConsole: React.FC = () => {
   const inputRef = useRef<HTMLInputElement>(null);
   const { sendCommand } = useGodCommands();
 
-  // WebSocket connection
+  // WebSocket connection to the main /ws endpoint
   useEffect(() => {
     const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
-    const wsUrl = `${protocol}//${window.location.host}/api/v1/god/ws`;
+    const wsUrl = `${protocol}//${window.location.host}/ws`;
     let reconnectTimer: ReturnType<typeof setTimeout>;
 
     const connect = () => {
@@ -84,6 +99,17 @@ const GodConsole: React.FC = () => {
     async (cmd: string) => {
       const trimmed = cmd.trim();
       if (!trimmed) return;
+
+      // Handle !help locally
+      if (trimmed === '!help') {
+        setHistory((prev) => [
+          ...prev,
+          { command: trimmed, output: HELP_TEXT, timestamp: new Date() },
+        ]);
+        setInput('');
+        setSuggestions([]);
+        return;
+      }
 
       setHistory((prev) => [
         ...prev,
@@ -144,7 +170,6 @@ const GodConsole: React.FC = () => {
         return;
       }
 
-      // Tab completion
       if (e.key === 'Tab' && suggestions.length > 0) {
         e.preventDefault();
         const pick = selectedSuggestion >= 0 ? suggestions[selectedSuggestion] : suggestions[0];
@@ -163,7 +188,6 @@ const GodConsole: React.FC = () => {
 
   return (
     <div style={styles.container}>
-      {/* Header */}
       <div style={styles.header}>
         <span style={styles.title}>⛁ God Console</span>
         <span
@@ -176,8 +200,12 @@ const GodConsole: React.FC = () => {
         </span>
       </div>
 
-      {/* History output */}
       <div style={styles.outputArea}>
+        {history.length === 0 && (
+          <div style={styles.hint}>
+            Type !help to see available commands, or !list to view agents.
+          </div>
+        )}
         {history.map((entry, idx) => (
           <div key={idx} style={styles.historyRow}>
             <span style={styles.prompt}>&gt;</span>
@@ -190,21 +218,17 @@ const GodConsole: React.FC = () => {
           </div>
         ))}
 
-        {/* Real-time WS log */}
         {wsLog.length > 0 && (
           <div style={styles.wsSection}>
             <div style={styles.wsLabel}>📡 Live feed</div>
             {wsLog.map((msg, i) => (
-              <div key={i} style={styles.wsLine}>
-                {msg}
-              </div>
+              <div key={i} style={styles.wsLine}>{msg}</div>
             ))}
           </div>
         )}
         <div ref={historyEndRef} />
       </div>
 
-      {/* Input row with suggestions */}
       <div style={styles.inputArea}>
         {suggestions.length > 0 && (
           <div style={styles.suggestionsDropdown}>
@@ -213,10 +237,7 @@ const GodConsole: React.FC = () => {
                 key={s}
                 style={{
                   ...styles.suggestionItem,
-                  background:
-                    i === selectedSuggestion
-                      ? 'rgba(251,191,36,0.25)'
-                      : 'transparent',
+                  background: i === selectedSuggestion ? 'rgba(251,191,36,0.25)' : 'transparent',
                 }}
                 onMouseDown={() => {
                   setInput(s + ' ');
@@ -263,97 +284,32 @@ const styles: Record<string, React.CSSProperties> = {
     background: '#2a2a2a',
     borderBottom: '1px solid #3a3a3a',
   },
-  title: {
-    color: '#fbbf24',
-    fontWeight: 700,
-    fontSize: '16px',
-  },
-  badge: {
-    padding: '2px 10px',
-    borderRadius: '4px',
-    color: '#fff',
-    fontSize: '11px',
-    fontWeight: 600,
-  },
-  outputArea: {
-    flex: 1,
-    overflowY: 'auto',
-    padding: '12px 16px',
-  },
-  historyRow: {
-    marginBottom: '10px',
-    lineHeight: 1.5,
-  },
-  prompt: {
-    color: '#fbbf24',
-    marginRight: '8px',
-    fontWeight: 700,
-  },
-  commandText: {
-    color: '#fbbf24',
-    fontWeight: 600,
-  },
-  outputText: {
-    color: '#a3a3a3',
-    whiteSpace: 'pre-wrap',
-    display: 'block',
-    marginLeft: '14px',
-  },
-  timestamp: {
-    color: '#525252',
-    fontSize: '11px',
-    marginLeft: '12px',
-  },
-  wsSection: {
-    marginTop: '16px',
-    borderTop: '1px dashed #3a3a3a',
-    paddingTop: '8px',
-  },
-  wsLabel: {
-    color: '#22d3ee',
-    fontSize: '12px',
-    fontWeight: 600,
-    marginBottom: '4px',
-  },
-  wsLine: {
-    color: '#6b7280',
-    fontSize: '12px',
-    lineHeight: 1.4,
-  },
+  title: { color: '#fbbf24', fontWeight: 700, fontSize: '16px' },
+  badge: { padding: '2px 10px', borderRadius: '4px', color: '#fff', fontSize: '11px', fontWeight: 600 },
+  outputArea: { flex: 1, overflowY: 'auto', padding: '12px 16px' },
+  hint: { color: '#525252', fontStyle: 'italic', fontSize: '13px', textAlign: 'center', marginTop: 40 },
+  historyRow: { marginBottom: '10px', lineHeight: 1.5 },
+  prompt: { color: '#fbbf24', marginRight: '8px', fontWeight: 700 },
+  commandText: { color: '#fbbf24', fontWeight: 600 },
+  outputText: { color: '#a3a3a3', whiteSpace: 'pre-wrap', display: 'block', marginLeft: '14px' },
+  timestamp: { color: '#525252', fontSize: '11px', marginLeft: '12px' },
+  wsSection: { marginTop: '16px', borderTop: '1px dashed #3a3a3a', paddingTop: '8px' },
+  wsLabel: { color: '#22d3ee', fontSize: '12px', fontWeight: 600, marginBottom: '4px' },
+  wsLine: { color: '#6b7280', fontSize: '12px', lineHeight: 1.4 },
   inputArea: {
-    display: 'flex',
-    alignItems: 'center',
-    padding: '10px 16px',
-    background: '#2a2a2a',
-    borderTop: '1px solid #3a3a3a',
-    position: 'relative',
+    display: 'flex', alignItems: 'center', padding: '10px 16px',
+    background: '#2a2a2a', borderTop: '1px solid #3a3a3a', position: 'relative',
   },
   input: {
-    flex: 1,
-    background: 'transparent',
-    border: 'none',
-    outline: 'none',
-    color: '#d4d4d4',
-    fontFamily: "'Fira Code', 'JetBrains Mono', monospace",
-    fontSize: '14px',
+    flex: 1, background: 'transparent', border: 'none', outline: 'none',
+    color: '#d4d4d4', fontFamily: "'Fira Code', 'JetBrains Mono', monospace", fontSize: '14px',
   },
   suggestionsDropdown: {
-    position: 'absolute',
-    bottom: '100%',
-    left: '16px',
-    right: '16px',
-    background: '#2a2a2a',
-    border: '1px solid #3a3a3a',
-    borderRadius: '4px 4px 0 0',
-    maxHeight: '160px',
-    overflowY: 'auto',
+    position: 'absolute', bottom: '100%', left: '16px', right: '16px',
+    background: '#2a2a2a', border: '1px solid #3a3a3a', borderRadius: '4px 4px 0 0',
+    maxHeight: '160px', overflowY: 'auto',
   },
-  suggestionItem: {
-    padding: '6px 12px',
-    cursor: 'pointer',
-    color: '#fbbf24',
-    fontSize: '13px',
-  },
+  suggestionItem: { padding: '6px 12px', cursor: 'pointer', color: '#fbbf24', fontSize: '13px' },
 };
 
 export default GodConsole;

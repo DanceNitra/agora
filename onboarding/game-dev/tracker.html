@@ -1,0 +1,341 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>🎮 Agora Dungeon — Study Tracker</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Fira+Code:wght@400;600&display=swap');
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    background: #0a0a0f;
+    color: #c8c8d4;
+    font-family: 'Inter', system-ui, sans-serif;
+    min-height: 100vh;
+    padding: 24px;
+    background-image:
+      radial-gradient(ellipse at 20% 50%, rgba(147, 51, 234, 0.06) 0%, transparent 60%),
+      radial-gradient(ellipse at 80% 50%, rgba(59, 130, 246, 0.04) 0%, transparent 60%);
+  }
+  .container { max-width: 880px; margin: 0 auto; }
+  header {
+    text-align: center; padding: 32px 0 24px;
+    border-bottom: 1px solid #1e1e2e;
+    margin-bottom: 32px;
+  }
+  h1 { font-size: 28px; font-weight: 800; color: #fbbf24; letter-spacing: -0.5px; }
+  h1 span { color: #6366f1; }
+  .subtitle { color: #6b7280; font-size: 14px; margin-top: 6px; }
+  .rank-section {
+    display: flex; justify-content: space-between; align-items: center;
+    margin: 20px 0 24px; padding: 16px 20px;
+    background: rgba(30,30,46,0.6); border-radius: 12px;
+    border: 1px solid #1e1e2e;
+  }
+  .rank { font-size: 18px; font-weight: 700; }
+  .rank-value { color: #fbbf24; }
+  .overall-bar { flex: 1; margin: 0 20px; }
+  .bar-track {
+    height: 8px; background: #1a1a2a; border-radius: 4px; overflow: hidden;
+  }
+  .bar-fill {
+    height: 100%; background: linear-gradient(90deg, #6366f1, #fbbf24);
+    border-radius: 4px; transition: width 0.5s ease; width: 0%;
+  }
+  .percent { font-family: 'Fira Code', monospace; font-size: 14px; color: #6b7280; }
+  .phase {
+    background: rgba(20,20,35,0.7); border-radius: 12px;
+    border: 1px solid #1e1e2e; margin-bottom: 16px;
+    overflow: hidden; transition: border-color 0.3s;
+  }
+  .phase.completed { border-color: #22c55e40; }
+  .phase.in-progress { border-color: #6366f140; }
+  .phase-header {
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 16px 20px; cursor: pointer;
+    background: rgba(30,30,46,0.4);
+    transition: background 0.2s;
+    user-select: none;
+  }
+  .phase-header:hover { background: rgba(30,30,46,0.7); }
+  .phase-title { font-size: 16px; font-weight: 600; color: #e4e4f0; }
+  .phase-title .icon { margin-right: 8px; }
+  .phase-meta { display: flex; align-items: center; gap: 12px; font-size: 13px; }
+  .phase-meta .count { color: #6b7280; }
+  .bar-mini { width: 60px; height: 6px; background: #1a1a2a; border-radius: 3px; overflow: hidden; }
+  .bar-mini-fill { height: 100%; border-radius: 3px; transition: width 0.3s; }
+  .phase-status { font-size: 18px; }
+  .phase-body { padding: 0 20px 16px; display: none; }
+  .phase.open .phase-body { display: block; }
+  .quest { display: flex; align-items: flex-start; gap: 10px; padding: 8px 0; }
+  .quest input[type="checkbox"] {
+    margin-top: 3px; width: 16px; height: 16px; accent-color: #6366f1;
+    cursor: pointer; flex-shrink: 0;
+  }
+  .quest label { cursor: pointer; font-size: 14px; line-height: 1.5; color: #a3a3b0; }
+  .quest.done label { color: #22c55e; text-decoration: line-through; opacity: 0.7; }
+  .phase-resources { margin-top: 12px; padding-top: 12px; border-top: 1px solid #1a1a2a; }
+  .phase-resources summary { cursor: pointer; font-size: 13px; color: #6b7280; font-weight: 500; }
+  .resource { font-size: 13px; padding: 4px 0; color: #7c7c8a; }
+  .resource a { color: #818cf8; text-decoration: none; }
+  .resource a:hover { color: #a5b4fc; text-decoration: underline; }
+  .resource .tag {
+    display: inline-block; padding: 1px 6px; border-radius: 3px;
+    font-size: 11px; font-weight: 600; margin-right: 6px;
+  }
+  .tag-free { background: #22c55e20; color: #4ade80; }
+  .tag-paper { background: #6366f120; color: #818cf8; }
+  .tag-book { background: #f59e0b20; color: #fbbf24; }
+  .tag-doc { background: #3b82f620; color: #60a5fa; }
+  .controls { display: flex; gap: 8px; justify-content: center; margin-top: 24px; }
+  .btn {
+    padding: 8px 16px; border-radius: 8px; border: 1px solid #1e1e2e;
+    background: rgba(30,30,46,0.4); color: #a3a3b0; font-size: 13px;
+    cursor: pointer; font-family: inherit; transition: all 0.15s;
+  }
+  .btn:hover { background: rgba(30,30,46,0.8); color: #e4e4f0; }
+  .btn-danger { color: #f87171; }
+  .btn-danger:hover { background: rgba(239,68,68,0.15); border-color: #ef444440; }
+  footer { text-align: center; margin-top: 32px; color: #52525b; font-size: 12px; }
+  .empty-quest { color: #52525b; font-style: italic; font-size: 13px; padding: 8px 0; }
+
+  /* Ranks */
+  .rank-apprentice { color: #a3a3a3; }
+  .rank-novice { color: #22c55e; }
+  .rank-journeyman { color: #3b82f6; }
+  .rank-expert { color: #818cf8; }
+  .rank-master { color: #fbbf24; }
+  .rank-archmage { color: #ef4444; text-shadow: 0 0 20px rgba(239,68,68,0.3); }
+</style>
+</head>
+<body>
+<div class="container">
+  <header>
+    <h1>🏛️ Agora <span>Dungeon</span></h1>
+    <div class="subtitle">Game Development — Study Campaign</div>
+  </header>
+
+  <div class="rank-section" id="rank-section">
+    <div class="rank">🏅 <span class="rank-value rank-apprentice" id="rank-display">Apprentice</span></div>
+    <div class="overall-bar">
+      <div class="bar-track"><div class="bar-fill" id="bar-overall"></div></div>
+    </div>
+    <div class="percent"><span id="percent-display">0</span>%</div>
+  </div>
+
+  <div id="phases"></div>
+
+  <div class="controls">
+    <button class="btn" onclick="expandAll()">▼ Expand All</button>
+    <button class="btn" onclick="collapseAll()">▲ Collapse All</button>
+    <button class="btn btn-danger" onclick="resetAll()">✕ Reset Progress</button>
+  </div>
+
+  <footer>Progress auto-saves in your browser • Agora Dungeon Campaign</footer>
+</div>
+
+<script>
+const PHASES = [
+  {
+    id: 0, icon: "🏗️", title: "Foundations", duration: "2–4 weeks",
+    quests: [
+      "Q0.1 — TypeScript fundamentals (types, interfaces, classes, modules)",
+      "Q0.2 — Phaser 3: scene, asset loading, sprite rendering",
+      "Q0.3 — Tilemap: dungeon room, Tiled JSON map import",
+      "Q0.4 — Player movement: keyboard input, camera follow",
+      "Q0.5 — Collision: walls, basic overlap detection",
+      "Q0.6 — Camera: scrolling, zoom, world bounds"
+    ],
+    resources: [
+      { name: "TypeScript Handbook", url: "https://typescriptlang.org/docs", tag: "doc" },
+      { name: "Eloquent JavaScript (free)", url: "https://eloquentjavascript.net", tag: "free" },
+      { name: "Phaser 3 Examples", url: "https://phaser.io/examples", tag: "doc" },
+      { name: "Game Programming Patterns (free)", url: "https://gameprogrammingpatterns.com", tag: "free" },
+      { name: "MDN Game Dev Guides", url: "https://developer.mozilla.org/en-US/docs/Games", tag: "doc" }
+    ]
+  },
+  {
+    id: 1, icon: "🤖", title: "Fake Agents", duration: "2–3 weeks",
+    quests: [
+      "Q1.1 — NPC class: idle, wander, work states",
+      "Q1.2 — Finite State Machine for NPC behavior",
+      "Q1.3 — Behavior Tree: sequence, selector, condition",
+      "Q1.4 — Multiple NPCs with different roles on map",
+      "Q1.5 — NPC ↔ workbench interaction, NPC → player messages"
+    ],
+    resources: [
+      { name: "Programming Game AI by Example (Buckland)", url: "https://www.amazon.com/Programming-Game-Example-Mat-Buckland/dp/1556220782", tag: "book" },
+      { name: "Behavior Trees in Robotics", url: "https://arxiv.org/abs/1709.00084", tag: "paper" },
+      { name: "Artificial Intelligence for Games (Millington)", url: "https://www.amazon.com/Artificial-Intelligence-Games-Ian-Millington/dp/0123747317", tag: "book" }
+    ]
+  },
+  {
+    id: 2, icon: "🧠", title: "One Real Agent", duration: "2–3 weeks",
+    quests: [
+      "Q2.1 — Node.js + Express backend, API endpoint",
+      "Q2.2 — Call LLM API with structured JSON output",
+      "Q2.3 — Perceive → Decide → Act loop",
+      "Q2.4 — Agent follows LLM decisions in game world",
+      "Q2.5 — Agent memory: short-term + long-term"
+    ],
+    resources: [
+      { name: "Anthropic Docs: Building Agents", url: "https://docs.anthropic.com", tag: "doc" },
+      { name: "ReAct paper (Yao et al.)", url: "https://arxiv.org/abs/2210.03629", tag: "paper" },
+      { name: "Generative Agents (Park et al.)", url: "https://arxiv.org/abs/2304.03442", tag: "paper" },
+      { name: "Generative Agents repo (GitHub)", url: "https://github.com/joonspk-research/generative_agents", tag: "free" },
+      { name: "Voyager paper (Wang et al.)", url: "https://arxiv.org/abs/2305.16291", tag: "paper" }
+    ]
+  },
+  {
+    id: 3, icon: "👥", title: "Multi-Agent + Orchestrator", duration: "4–8 weeks",
+    quests: [
+      "Q3.1 — Multi-agent message passing / coordination",
+      "Q3.2 — Agent roles: miner, crafter, trader, builder, scout",
+      "Q3.3 — Orchestrator UI: assign tasks via dashboard",
+      "Q3.4 — Task graph with resources, dependencies, goals",
+      "Q3.5 — Economy: resource collection, crafting, trading",
+      "Q3.6 — React dashboard: agent status, task queue, map"
+    ],
+    resources: [
+      { name: "LangGraph: Multi-agent systems", url: "https://langchain-ai.github.io/langgraph/", tag: "doc" },
+      { name: "CrewAI: Orchestrator/Worker", url: "https://docs.crewai.com/", tag: "doc" },
+      { name: "Multi-Agent Systems (Weiss)", url: "https://www.amazon.com/Multiagent-Systems-Gerhard-Weiss/dp/0262731312", tag: "book" },
+      { name: "Anthropic: Multi-agent blog", url: "https://www.anthropic.com/engineering", tag: "doc" }
+    ]
+  },
+  {
+    id: 4, icon: "✨", title: "Immersive Polish", duration: "flexible",
+    quests: [
+      "Q4.1 — Dynamic lighting: torches, glow effects",
+      "Q4.2 — Particle systems: dust, fire, magic",
+      "Q4.3 — Sprite animations: idle, walk, work, interact",
+      "Q4.4 — Sound: ambient dungeon, footsteps, UI",
+      "Q4.5 — OS-style God Console overlay interface"
+    ],
+    resources: [
+      { name: "Phaser 3 Particles", url: "https://phaser.io/examples/v3/particles", tag: "doc" },
+      { name: "Game Feel (Steve Swink)", url: "https://www.amazon.com/Game-Feel-Sensation-Required-Everything/dp/0123747341", tag: "book" },
+      { name: "Juice It Or Lose It (GDC)", url: "https://www.youtube.com/watch?v=Fy0aCDmgnxg", tag: "free" },
+      { name: "Web Audio API (MDN)", url: "https://developer.mozilla.org/en-US/docs/Web/API/Web_Audio_API", tag: "doc" },
+      { name: "Tiled Map Editor", url: "https://www.mapeditor.org/", tag: "free" }
+    ]
+  }
+];
+
+const RANKS = [
+  { min: 0, name: "Apprentice", cls: "rank-apprentice" },
+  { min: 20, name: "Novice", cls: "rank-novice" },
+  { min: 40, name: "Journeyman", cls: "rank-journeyman" },
+  { min: 60, name: "Expert", cls: "rank-expert" },
+  { min: 80, name: "Master", cls: "rank-master" },
+  { min: 100, name: "Archmage", cls: "rank-archmage" }
+];
+
+const STORAGE_KEY = 'agora-dungeon-tracker';
+
+function loadProgress() {
+  try { return JSON.parse(localStorage.getItem(STORAGE_KEY) || '{}'); } catch { return {}; }
+}
+function saveProgress(p) {
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(p));
+}
+
+function getCompleted(phaseId) {
+  const p = loadProgress();
+  return p[phaseId] || [];
+}
+
+function render() {
+  const container = document.getElementById('phases');
+  container.innerHTML = '';
+
+  let totalDone = 0, totalAll = 0;
+
+  PHASES.forEach((phase, idx) => {
+    totalAll += phase.quests.length;
+    const done = getCompleted(phase.id);
+    const doneCount = done.length;
+    const pct = phase.quests.length > 0 ? Math.round((doneCount / phase.quests.length) * 100) : 0;
+    totalDone += doneCount;
+
+    const color = pct === 100 ? '#22c55e' : pct > 0 ? '#6366f1' : '#3a3a4a';
+
+    const div = document.createElement('div');
+    div.className = `phase${pct === 100 ? ' completed' : pct > 0 ? ' in-progress' : ''}`;
+    div.id = `phase-${phase.id}`;
+
+    div.innerHTML = `
+      <div class="phase-header" onclick="toggle(${phase.id})">
+        <div class="phase-title"><span class="icon">${phase.icon}</span>Phase ${phase.id} — ${phase.title}</div>
+        <div class="phase-meta">
+          <span class="count">${doneCount}/${phase.quests.length}</span>
+          <div class="bar-mini"><div class="bar-mini-fill" style="width:${pct}%;background:${color}"></div></div>
+          <span class="phase-status">${pct === 100 ? '✅' : pct > 0 ? '🔄' : '⏳'}</span>
+        </div>
+      </div>
+      <div class="phase-body" id="body-${phase.id}">
+        ${phase.quests.map((q, qi) => {
+          const checked = done.includes(qi) ? 'checked' : '';
+          return `<div class="quest${checked ? ' done' : ''}">
+            <input type="checkbox" ${checked} onchange="toggleQuest(${phase.id}, ${qi})" id="q-${phase.id}-${qi}">
+            <label for="q-${phase.id}-${qi}">${q}</label>
+          </div>`;
+        }).join('')}
+        <details class="phase-resources">
+          <summary>📚 Resources (${phase.resources.length})</summary>
+          ${phase.resources.map(r => {
+            const tagClass = `tag-${r.tag}`;
+            return `<div class="resource"><span class="tag ${tagClass}">${r.tag}</span><a href="${r.url}" target="_blank">${r.name}</a></div>`;
+          }).join('')}
+        </details>
+      </div>
+    `;
+    container.appendChild(div);
+  });
+
+  const pct = totalAll > 0 ? Math.round((totalDone / totalAll) * 100) : 0;
+  document.getElementById('bar-overall').style.width = pct + '%';
+  document.getElementById('percent-display').textContent = pct;
+
+  const rank = RANKS.slice().reverse().find(r => pct >= r.min) || RANKS[0];
+  const rankEl = document.getElementById('rank-display');
+  rankEl.textContent = rank.name;
+  rankEl.className = `rank-value ${rank.cls}`;
+}
+
+function toggle(id) {
+  const body = document.getElementById(`body-${id}`);
+  const phase = document.getElementById(`phase-${id}`);
+  body.style.display = body.style.display === 'block' ? 'none' : 'block';
+  phase.classList.toggle('open');
+}
+
+function toggleQuest(phaseId, questIdx) {
+  const p = loadProgress();
+  if (!p[phaseId]) p[phaseId] = [];
+  const idx = p[phaseId].indexOf(questIdx);
+  if (idx > -1) p[phaseId].splice(idx, 1);
+  else p[phaseId].push(questIdx);
+  saveProgress(p);
+  render();
+}
+
+function expandAll() {
+  document.querySelectorAll('.phase-body').forEach(b => b.style.display = 'block');
+  document.querySelectorAll('.phase').forEach(p => p.classList.add('open'));
+}
+function collapseAll() {
+  document.querySelectorAll('.phase-body').forEach(b => b.style.display = 'none');
+  document.querySelectorAll('.phase').forEach(p => p.classList.remove('open'));
+}
+function resetAll() {
+  if (confirm('Reset all progress?')) {
+    localStorage.removeItem(STORAGE_KEY);
+    render();
+  }
+}
+
+render();
+</script>
+</body>
+</html>

@@ -1,11 +1,14 @@
 """Tasks API router for Agora server."""
 
-from fastapi import APIRouter, Depends, HTTPException
-from typing import List, Optional
-from pydantic import BaseModel
+import json
+import uuid
 from datetime import datetime
 
-router = APIRouter(prefix="/api/tasks", tags=["tasks"])
+from fastapi import APIRouter, Depends, HTTPException, Request
+from typing import List, Optional
+from pydantic import BaseModel
+
+router = APIRouter(tags=["tasks"])
 
 
 # ---------- Schemas ----------
@@ -18,15 +21,14 @@ class TaskPost(BaseModel):
 
 
 class TaskResponse(BaseModel):
-    id: str
+    id: int
     title: str
-    description: str
+    description: Optional[str]
     priority: int
-    status: str  # open, assigned, completed, failed
-    assigned_to: Optional[str] = None
-    created_at: datetime
-    updated_at: datetime
-    completed_at: Optional[datetime] = None
+    status: str
+    assignee_id: Optional[str] = None
+    created_at: str
+    updated_at: str
 
 
 class TaskListResponse(BaseModel):
@@ -34,101 +36,150 @@ class TaskListResponse(BaseModel):
     total: int
 
 
-# ---------- Dependency: database session ----------
+# ---------- Dependency ----------
 
-def get_db():
-    """Placeholder: yields a database session."""
-    yield None
-
-
-# ---------- Helpers ----------
-
-def _task_to_response(task_row) -> TaskResponse:
-    """Convert a database task row to a TaskResponse."""
-    return TaskResponse(
-        id=task_row.id,
-        title=task_row.title,
-        description=task_row.description,
-        priority=task_row.priority,
-        status=task_row.status,
-        assigned_to=getattr(task_row, "assigned_to", None),
-        created_at=task_row.created_at,
-        updated_at=task_row.updated_at,
-        completed_at=getattr(task_row, "completed_at", None),
-    )
+async def get_db(request: Request):
+    return request.app.state.db
 
 
 # ---------- Routes ----------
 
 @router.get("/", response_model=TaskListResponse)
 async def list_open_tasks(db=Depends(get_db)):
-    """List all open (non-completed, non-failed) tasks."""
-    # tasks = (
-    #     db.query(TaskModel)
-    #     .filter(TaskModel.status.in_(["open", "assigned"]))
-    #     .order_by(TaskModel.priority.desc(), TaskModel.created_at.asc())
-    #     .all()
-    # )
-    tasks = []  # placeholder
-    return TaskListResponse(
-        tasks=[_task_to_response(t) for t in tasks],
-        total=len(tasks),
+    """List all open tasks."""
+    cursor = await db.execute(
+        "SELECT id, title, description, priority, status, assignee_id, created_at, updated_at "
+        "FROM tasks WHERE status NOT IN ('completed', 'failed', 'cancelled') "
+        "ORDER BY priority DESC, created_at ASC"
     )
+    rows = await cursor.fetchall()
+    tasks = [TaskResponse(
+        id=row["id"],
+        title=row["title"],
+        description=row["description"],
+        priority=row["priority"],
+        status=row["status"],
+        assignee_id=row["assignee_id"],
+        created_at=row["created_at"],
+        updated_at=row["updated_at"],
+    ) for row in rows]
+    return TaskListResponse(tasks=tasks, total=len(tasks))
 
 
 @router.post("/", response_model=TaskResponse, status_code=201)
 async def post_task(body: TaskPost, db=Depends(get_db)):
-    """Create (post) a new task."""
-    # task = TaskModel(
-    #     title=body.title,
-    #     description=body.description,
-    #     priority=body.priority,
-    #     status="open",
-    #     assigned_to=body.assigned_to,
-    # )
-    # db.add(task)
-    # db.commit()
-    # db.refresh(task)
-    raise HTTPException(status_code=501, detail="Not implemented — database integration pending")
+    """Create a new task."""
+    cursor = await db.execute(
+        "INSERT INTO tasks (title, description, priority, status, assignee_id, metadata) "
+        "VALUES (?, ?, ?, 'pending', ?, '{}')",
+        (body.title, body.description, body.priority, body.assigned_to),
+    )
+    await db.commit()
+    task_id = cursor.lastrowid
+    cursor2 = await db.execute(
+        "SELECT id, title, description, priority, status, assignee_id, created_at, updated_at "
+        "FROM tasks WHERE id=?",
+        (task_id,),
+    )
+    row = await cursor2.fetchone()
+    return TaskResponse(
+        id=row["id"],
+        title=row["title"],
+        description=row["description"],
+        priority=row["priority"],
+        status=row["status"],
+        assignee_id=row["assignee_id"],
+        created_at=row["created_at"],
+        updated_at=row["updated_at"],
+    )
 
 
 @router.get("/{task_id}", response_model=TaskResponse)
-async def get_task_status(task_id: str, db=Depends(get_db)):
-    """Get a single task's status by ID."""
-    # task = db.query(TaskModel).filter(TaskModel.id == task_id).first()
-    # if not task:
-    #     raise HTTPException(status_code=404, detail="Task not found")
-    # return _task_to_response(task)
-    raise HTTPException(status_code=501, detail="Not implemented — database integration pending")
+async def get_task_status(task_id: int, db=Depends(get_db)):
+    """Get a single task by ID."""
+    cursor = await db.execute(
+        "SELECT id, title, description, priority, status, assignee_id, created_at, updated_at "
+        "FROM tasks WHERE id=?",
+        (task_id,),
+    )
+    row = await cursor.fetchone()
+    if not row:
+        raise HTTPException(status_code=404, detail="Task not found")
+    return TaskResponse(
+        id=row["id"],
+        title=row["title"],
+        description=row["description"],
+        priority=row["priority"],
+        status=row["status"],
+        assignee_id=row["assignee_id"],
+        created_at=row["created_at"],
+        updated_at=row["updated_at"],
+    )
 
 
 @router.post("/{task_id}/assign/{agent_id}", response_model=TaskResponse)
-async def assign_task(task_id: str, agent_id: str, db=Depends(get_db)):
+async def assign_task(task_id: int, agent_id: str, db=Depends(get_db)):
     """Assign an open task to an agent."""
-    # task = db.query(TaskModel).filter(TaskModel.id == task_id).first()
-    # if not task:
-    #     raise HTTPException(status_code=404, detail="Task not found")
-    # if task.status != "open":
-    #     raise HTTPException(status_code=400, detail=f"Task is {task.status}, cannot assign")
-    # task.status = "assigned"
-    # task.assigned_to = agent_id
-    # task.updated_at = datetime.utcnow()
-    # db.commit()
-    # db.refresh(task)
-    raise HTTPException(status_code=501, detail="Not implemented — database integration pending")
+    cursor = await db.execute("SELECT status FROM tasks WHERE id=?", (task_id,))
+    row = await cursor.fetchone()
+    if not row:
+        raise HTTPException(status_code=404, detail="Task not found")
+    if row["status"] != "pending":
+        raise HTTPException(status_code=400, detail=f"Task is {row['status']}, cannot assign")
+    # Verify agent exists
+    cursor2 = await db.execute(
+        "SELECT agent_id FROM agent_identities WHERE agent_id=?", (agent_id,)
+    )
+    if not await cursor2.fetchone():
+        raise HTTPException(status_code=404, detail="Agent not found")
+    await db.execute(
+        "UPDATE tasks SET status='assigned', assignee_id=?, updated_at=datetime('now') WHERE id=?",
+        (agent_id, task_id),
+    )
+    await db.commit()
+    cursor3 = await db.execute(
+        "SELECT id, title, description, priority, status, assignee_id, created_at, updated_at "
+        "FROM tasks WHERE id=?", (task_id,),
+    )
+    row = await cursor3.fetchone()
+    return TaskResponse(
+        id=row["id"],
+        title=row["title"],
+        description=row["description"],
+        priority=row["priority"],
+        status=row["status"],
+        assignee_id=row["assignee_id"],
+        created_at=row["created_at"],
+        updated_at=row["updated_at"],
+    )
 
 
 @router.post("/{task_id}/complete", response_model=TaskResponse)
-async def complete_task(task_id: str, db=Depends(get_db)):
+async def complete_task(task_id: int, db=Depends(get_db)):
     """Mark a task as completed."""
-    # task = db.query(TaskModel).filter(TaskModel.id == task_id).first()
-    # if not task:
-    #     raise HTTPException(status_code=404, detail="Task not found")
-    # if task.status not in ("open", "assigned"):
-    #     raise HTTPException(status_code=400, detail=f"Task is {task.status}, cannot complete")
-    # task.status = "completed"
-    # task.completed_at = datetime.utcnow()
-    # task.updated_at = datetime.utcnow()
-    # db.commit()
-    # db.refresh(task)
-    raise HTTPException(status_code=501, detail="Not implemented — database integration pending")
+    cursor = await db.execute("SELECT status FROM tasks WHERE id=?", (task_id,))
+    row = await cursor.fetchone()
+    if not row:
+        raise HTTPException(status_code=404, detail="Task not found")
+    if row["status"] not in ("pending", "assigned", "in_progress"):
+        raise HTTPException(status_code=400, detail=f"Task is {row['status']}, cannot complete")
+    await db.execute(
+        "UPDATE tasks SET status='completed', updated_at=datetime('now') WHERE id=?",
+        (task_id,),
+    )
+    await db.commit()
+    cursor2 = await db.execute(
+        "SELECT id, title, description, priority, status, assignee_id, created_at, updated_at "
+        "FROM tasks WHERE id=?", (task_id,),
+    )
+    row = await cursor2.fetchone()
+    return TaskResponse(
+        id=row["id"],
+        title=row["title"],
+        description=row["description"],
+        priority=row["priority"],
+        status=row["status"],
+        assignee_id=row["assignee_id"],
+        created_at=row["created_at"],
+        updated_at=row["updated_at"],
+    )

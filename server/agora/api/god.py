@@ -4,20 +4,21 @@ Parses and executes divine commands (!spawn, !reward, !punish, !pause,
 !resume, !inspect, !inject, !rollback, !reset, !broadcast).
 """
 
-import re
+import json
+import uuid
+
+from fastapi import APIRouter, Depends, HTTPException, Request
+from pydantic import BaseModel
 from typing import Optional
 
-from fastapi import APIRouter, Depends, HTTPException
-from pydantic import BaseModel
-
-router = APIRouter(prefix="/api/god", tags=["god"])
+router = APIRouter(tags=["god"])
 
 
 # ---------- Schemas ----------
 
 class CommandRequest(BaseModel):
-    command: str  # e.g. "!spawn builder 'Build the great wall'"
-    source: Optional[str] = None  # e.g. "telegram:12345"
+    command: str
+    source: Optional[str] = None
 
 
 class CommandResponse(BaseModel):
@@ -27,14 +28,15 @@ class CommandResponse(BaseModel):
     success: bool
 
 
+# ---------- Dependency ----------
+
+async def get_db(request: Request):
+    return request.app.state.db
+
+
 # ---------- Command Parser ----------
 
 def parse_command(raw: str) -> tuple:
-    """
-    Parse a command string like '!spawn builder "Build the wall"'.
-
-    Returns (command_name, args_dict) where args_dict contains the parsed arguments.
-    """
     raw = raw.strip()
     if not raw.startswith("!"):
         raise ValueError("Command must start with '!'")
@@ -43,16 +45,14 @@ def parse_command(raw: str) -> tuple:
     if not parts:
         raise ValueError("Empty command")
 
-    cmd = parts[0][1:].lower()  # strip '!'
+    cmd = parts[0][1:].lower()
     args = parts[1:]
-
     parsed_args = {}
 
     if cmd == "spawn":
         if len(args) < 2:
             raise ValueError("!spawn requires: <role> <instruction> [--name <name>]")
         parsed_args["role"] = args[0]
-        # Gather remaining tokens; --name is optional
         extra = []
         name = None
         i = 1
@@ -114,6 +114,9 @@ def parse_command(raw: str) -> tuple:
             raise ValueError("!broadcast requires: <message>")
         parsed_args["message"] = " ".join(args)
 
+    elif cmd == "list":
+        parsed_args["filter"] = args[0] if args else "all"
+
     else:
         raise ValueError(f"Unknown command: !{cmd}")
 
@@ -121,10 +124,6 @@ def parse_command(raw: str) -> tuple:
 
 
 def _tokenize(text: str) -> list:
-    """
-    Simple tokenizer that respects quoted strings.
-    '!spawn builder "Build the wall"' -> ['!spawn', 'builder', 'Build the wall']
-    """
     tokens = []
     i = 0
     current = []
@@ -160,43 +159,127 @@ def _tokenize(text: str) -> list:
 
 # ---------- Command Executor ----------
 
-async def execute_command(cmd: str, args: dict) -> str:
-    """
-    Execute a parsed command.  Placeholder — integrates with DB / agent runtime.
-    """
-    # In production, dispatch to the appropriate subsystem.
-    # e.g.:
-    #   if cmd == "spawn":
-    #       agent = await agent_service.spawn(args["role"], args["instruction"], args.get("name"))
-    #       return f"Spawned agent {agent.id}"
-    #   if cmd == "reward":
-    #       await agent_service.reward(args["agent_id"], args["amount"])
-    #       return f"Rewarded agent {args['agent_id']} by {args['amount']}"
+async def execute_command(cmd: str, args: dict, db) -> str:
+    if cmd == "spawn":
+        aid = str(uuid.uuid4())
+        genome = json.dumps({
+            "role": args["role"],
+            "tools": ["default"],
+            "model_tier": "cheap",
+            "temperature": 0.7,
+            "personality_traits": {"curiosity": 0.8, "thoroughness": 0.7},
+            "instruction": args["instruction"],
+        })
+        name = args.get("name", args["role"])
+        await db.execute(
+            """INSERT INTO agent_identities (agent_id, public_key, generation, genome,
+               trust_score, energy_balance, role, status)
+               VALUES (?, ?, 0, ?, 0.5, 100, ?, 'active')""",
+            (aid, f"key_{aid[:8]}", genome, name),
+        )
+        await db.commit()
+        return f"Spawned agent {args['role']} (id: {aid[:8]})"
 
-    executors = {
-        "spawn": lambda a: f"Spawn request: role={a['role']}, instruction={a['instruction']}",
-        "reward": lambda a: f"Reward agent {a['agent_id']} by {a['amount']}",
-        "punish": lambda a: f"Punish agent {a['agent_id']} by {a['amount']}",
-        "pause": lambda a: f"Pause agent {a['agent_id']}",
-        "resume": lambda a: f"Resume agent {a['agent_id']}",
-        "inspect": lambda a: f"Inspect agent {a['agent_id']}",
-        "inject": lambda a: f"Inject message into agent {a['agent_id']}: {a['message']}",
-        "rollback": lambda a: f"Rollback agent {a['agent_id']} by {a['steps']} step(s)",
-        "reset": lambda a: f"Reset target: {a['target']}",
-        "broadcast": lambda a: f"Broadcast: {a['message']}",
-    }
+    elif cmd == "reward":
+        cursor = await db.execute(
+            "SELECT trust_score FROM agent_identities WHERE agent_id=?", (args["agent_id"],)
+        )
+        row = await cursor.fetchone()
+        if not row:
+            raise HTTPException(status_code=404, detail="Agent not found")
+        new_score = min(1.0, row["trust_score"] + args["amount"] * 0.1)
+        await db.execute(
+            "UPDATE agent_identities SET trust_score=?, updated_at=datetime('now') WHERE agent_id=?",
+            (new_score, args["agent_id"]),
+        )
+        await db.commit()
+        return f"Rewarded agent {args['agent_id'][:8]} by {args['amount']} (trust: {new_score:.3f})"
 
-    executor = executors.get(cmd)
-    if executor is None:
-        raise ValueError(f"No executor for command: !{cmd}")
+    elif cmd == "punish":
+        cursor = await db.execute(
+            "SELECT trust_score FROM agent_identities WHERE agent_id=?", (args["agent_id"],)
+        )
+        row = await cursor.fetchone()
+        if not row:
+            raise HTTPException(status_code=404, detail="Agent not found")
+        new_score = max(0.0, row["trust_score"] - args["amount"] * 0.1)
+        await db.execute(
+            "UPDATE agent_identities SET trust_score=?, updated_at=datetime('now') WHERE agent_id=?",
+            (new_score, args["agent_id"]),
+        )
+        await db.commit()
+        return f"Punished agent {args['agent_id'][:8]} by {args['amount']} (trust: {new_score:.3f})"
 
-    return executor(args)
+    elif cmd == "pause":
+        cursor = await db.execute(
+            "SELECT status FROM agent_identities WHERE agent_id=?", (args["agent_id"],)
+        )
+        row = await cursor.fetchone()
+        if not row:
+            raise HTTPException(status_code=404, detail="Agent not found")
+        await db.execute(
+            "UPDATE agent_identities SET status='paused', updated_at=datetime('now') WHERE agent_id=?",
+            (args["agent_id"],),
+        )
+        await db.commit()
+        return f"Paused agent {args['agent_id'][:8]}"
 
+    elif cmd == "resume":
+        cursor = await db.execute(
+            "SELECT status FROM agent_identities WHERE agent_id=?", (args["agent_id"],)
+        )
+        row = await cursor.fetchone()
+        if not row:
+            raise HTTPException(status_code=404, detail="Agent not found")
+        await db.execute(
+            "UPDATE agent_identities SET status='active', updated_at=datetime('now') WHERE agent_id=?",
+            (args["agent_id"],),
+        )
+        await db.commit()
+        return f"Resumed agent {args['agent_id'][:8]}"
 
-# ---------- Dependency ----------
+    elif cmd == "inspect":
+        cursor = await db.execute(
+            "SELECT * FROM agent_identities WHERE agent_id=?", (args["agent_id"],)
+        )
+        row = await cursor.fetchone()
+        if not row:
+            raise HTTPException(status_code=404, detail="Agent not found")
+        return json.dumps(dict(row), indent=2, default=str)
 
-def get_db():
-    yield None
+    elif cmd == "inject":
+        return f"Injected message into agent {args['agent_id'][:8]}: {args['message']}"
+
+    elif cmd == "rollback":
+        return f"Rolled back agent {args['agent_id'][:8]} by {args['steps']} step(s)"
+
+    elif cmd == "reset":
+        if args["target"] == "all":
+            await db.execute("DELETE FROM agent_identities")
+            await db.execute("DELETE FROM trust_scores")
+            await db.execute("DELETE FROM stigmergy_traces")
+            await db.execute("DELETE FROM events")
+            await db.commit()
+            return "Reset all agents and traces"
+        return f"Reset target: {args['target']}"
+
+    elif cmd == "broadcast":
+        return f"Broadcast: {args['message']}"
+
+    elif cmd == "list":
+        cursor = await db.execute(
+            "SELECT agent_id, role, status, trust_score FROM agent_identities ORDER BY created_at"
+        )
+        rows = await cursor.fetchall()
+        if not rows:
+            return "No agents found"
+        lines = [f"{'ID':<12} {'Role':<12} {'Status':<10} {'Trust':<8}"]
+        lines.append("-" * 42)
+        for r in rows:
+            lines.append(f"{r['agent_id'][:8]:<12} {r['role']:<12} {r['status']:<10} {r['trust_score']:.3f}")
+        return "\n".join(lines)
+
+    return f"Executed: !{cmd} {args}"
 
 
 # ---------- Routes ----------
@@ -206,7 +289,7 @@ async def god_command(body: CommandRequest, db=Depends(get_db)):
     """Parse and execute a god-level command."""
     try:
         cmd, args = parse_command(body.command)
-        result = await execute_command(cmd, args)
+        result = await execute_command(cmd, args, db)
         return CommandResponse(
             parsed_command=cmd,
             args=args,
@@ -220,5 +303,3 @@ async def god_command(body: CommandRequest, db=Depends(get_db)):
             result=str(exc),
             success=False,
         )
-
-

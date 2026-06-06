@@ -3,6 +3,7 @@ uvicorn[standard]
 pydantic
 pydantic-settings
 sqlalchemy[asyncio]
+aiosqlite
 asyncpg
 redis[hiredis]
 httpx

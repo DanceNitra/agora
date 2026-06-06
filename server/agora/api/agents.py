@@ -1,11 +1,12 @@
 """Agents API router for Agora server."""
 
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, Request
+import json
 from typing import List, Optional
 from pydantic import BaseModel
 from datetime import datetime
 
-router = APIRouter(prefix="/api/agents", tags=["agents"])
+router = APIRouter(tags=["agents"])
 
 
 # ---------- Schemas ----------
@@ -18,15 +19,13 @@ class AgentCreate(BaseModel):
 
 
 class AgentResponse(BaseModel):
-    id: str
-    name: str
+    agent_id: str
     role: str
-    model: str
-    status: str  # active, paused, archived
-    system_prompt: Optional[str] = None
-    created_at: datetime
-    updated_at: datetime
-    reward_score: float = 0.0
+    trust_score: float
+    energy_balance: float
+    status: str
+    genome: dict
+    created_at: str
 
 
 class AgentListResponse(BaseModel):
@@ -34,116 +33,135 @@ class AgentListResponse(BaseModel):
     total: int
 
 
-# ---------- Dependency: database session ----------
+# ---------- Dependency ----------
 
-def get_db():
-    """Placeholder: yields a database session."""
-    # In production, replace with actual sessionmaker yield.
-    # db = SessionLocal()
-    # try:
-    #     yield db
-    # finally:
-    #     db.close()
-    yield None
-
-
-# ---------- Route Helpers ----------
-
-def _agent_to_response(agent_row) -> AgentResponse:
-    """Convert a database agent row to an AgentResponse."""
-    return AgentResponse(
-        id=agent_row.id,
-        name=agent_row.name,
-        role=agent_row.role,
-        model=agent_row.model,
-        status=agent_row.status,
-        system_prompt=getattr(agent_row, "system_prompt", None),
-        created_at=agent_row.created_at,
-        updated_at=agent_row.updated_at,
-        reward_score=getattr(agent_row, "reward_score", 0.0),
-    )
+async def get_db(request: Request):
+    return request.app.state.db
 
 
 # ---------- Routes ----------
 
 @router.get("/", response_model=AgentListResponse)
 async def list_agents(db=Depends(get_db)):
-    """List all agents."""
-    # agents = db.query(AgentModel).all()
-    agents = []  # placeholder
-    return AgentListResponse(
-        agents=[_agent_to_response(a) for a in agents],
-        total=len(agents),
+    """List all active agents."""
+    cursor = await db.execute(
+        "SELECT agent_id, role, trust_score, energy_balance, status, genome, created_at "
+        "FROM agent_identities WHERE status='active' ORDER BY created_at ASC"
     )
-
-
-@router.post("/", response_model=AgentResponse, status_code=201)
-async def create_agent(body: AgentCreate, db=Depends(get_db)):
-    """Create a new agent."""
-    # agent = AgentModel(name=body.name, role=body.role, ...)
-    # db.add(agent)
-    # db.commit()
-    # db.refresh(agent)
-    raise HTTPException(status_code=501, detail="Not implemented — database integration pending")
+    rows = await cursor.fetchall()
+    agents = []
+    for row in rows:
+        try:
+            genome = json.loads(row["genome"])
+        except (json.JSONDecodeError, TypeError):
+            genome = {}
+        agents.append(AgentResponse(
+            agent_id=row["agent_id"],
+            role=row["role"],
+            trust_score=row["trust_score"],
+            energy_balance=row["energy_balance"],
+            status=row["status"],
+            genome=genome,
+            created_at=row["created_at"],
+        ))
+    return AgentListResponse(agents=agents, total=len(agents))
 
 
 @router.get("/{agent_id}", response_model=AgentResponse)
 async def get_agent(agent_id: str, db=Depends(get_db)):
     """Get a single agent by ID."""
-    # agent = db.query(AgentModel).filter(AgentModel.id == agent_id).first()
-    # if not agent:
-    #     raise HTTPException(status_code=404, detail="Agent not found")
-    # return _agent_to_response(agent)
-    raise HTTPException(status_code=501, detail="Not implemented — database integration pending")
+    cursor = await db.execute(
+        "SELECT agent_id, role, trust_score, energy_balance, status, genome, created_at "
+        "FROM agent_identities WHERE agent_id=?",
+        (agent_id,),
+    )
+    row = await cursor.fetchone()
+    if not row:
+        raise HTTPException(status_code=404, detail="Agent not found")
+    try:
+        genome = json.loads(row["genome"])
+    except (json.JSONDecodeError, TypeError):
+        genome = {}
+    return AgentResponse(
+        agent_id=row["agent_id"],
+        role=row["role"],
+        trust_score=row["trust_score"],
+        energy_balance=row["energy_balance"],
+        status=row["status"],
+        genome=genome,
+        created_at=row["created_at"],
+    )
 
 
-@router.post("/{agent_id}/pause", response_model=AgentResponse)
+@router.post("/{agent_id}/pause")
 async def pause_agent(agent_id: str, db=Depends(get_db)):
     """Pause an agent."""
-    # agent = db.query(AgentModel).filter(AgentModel.id == agent_id).first()
-    # if not agent:
-    #     raise HTTPException(status_code=404, detail="Agent not found")
-    # agent.status = "paused"
-    # agent.updated_at = datetime.utcnow()
-    # db.commit()
-    # db.refresh(agent)
-    raise HTTPException(status_code=501, detail="Not implemented — database integration pending")
+    cursor = await db.execute(
+        "SELECT status FROM agent_identities WHERE agent_id=?", (agent_id,)
+    )
+    row = await cursor.fetchone()
+    if not row:
+        raise HTTPException(status_code=404, detail="Agent not found")
+    if row["status"] != "active":
+        raise HTTPException(status_code=400, detail=f"Agent is {row['status']}, cannot pause")
+    await db.execute(
+        "UPDATE agent_identities SET status='paused', updated_at=datetime('now') WHERE agent_id=?",
+        (agent_id,),
+    )
+    await db.commit()
+    return {"status": "paused", "agent_id": agent_id}
 
 
-@router.post("/{agent_id}/resume", response_model=AgentResponse)
+@router.post("/{agent_id}/resume")
 async def resume_agent(agent_id: str, db=Depends(get_db)):
     """Resume a paused agent."""
-    # agent = db.query(AgentModel).filter(AgentModel.id == agent_id).first()
-    # if not agent:
-    #     raise HTTPException(status_code=404, detail="Agent not found")
-    # agent.status = "active"
-    # agent.updated_at = datetime.utcnow()
-    # db.commit()
-    # db.refresh(agent)
-    raise HTTPException(status_code=501, detail="Not implemented — database integration pending")
+    cursor = await db.execute(
+        "SELECT status FROM agent_identities WHERE agent_id=?", (agent_id,)
+    )
+    row = await cursor.fetchone()
+    if not row:
+        raise HTTPException(status_code=404, detail="Agent not found")
+    if row["status"] != "paused":
+        raise HTTPException(status_code=400, detail=f"Agent is {row['status']}, cannot resume")
+    await db.execute(
+        "UPDATE agent_identities SET status='active', updated_at=datetime('now') WHERE agent_id=?",
+        (agent_id,),
+    )
+    await db.commit()
+    return {"status": "active", "agent_id": agent_id}
 
 
-@router.post("/{agent_id}/reward", response_model=AgentResponse)
+@router.post("/{agent_id}/reward")
 async def reward_agent(agent_id: str, amount: float = 1.0, db=Depends(get_db)):
     """Apply a positive reward to an agent."""
-    # agent = db.query(AgentModel).filter(AgentModel.id == agent_id).first()
-    # if not agent:
-    #     raise HTTPException(status_code=404, detail="Agent not found")
-    # agent.reward_score = (agent.reward_score or 0) + amount
-    # agent.updated_at = datetime.utcnow()
-    # db.commit()
-    # db.refresh(agent)
-    raise HTTPException(status_code=501, detail="Not implemented — database integration pending")
+    cursor = await db.execute(
+        "SELECT trust_score FROM agent_identities WHERE agent_id=?", (agent_id,)
+    )
+    row = await cursor.fetchone()
+    if not row:
+        raise HTTPException(status_code=404, detail="Agent not found")
+    new_score = min(1.0, row["trust_score"] + amount * 0.1)
+    await db.execute(
+        "UPDATE agent_identities SET trust_score=?, updated_at=datetime('now') WHERE agent_id=?",
+        (new_score, agent_id),
+    )
+    await db.commit()
+    return {"agent_id": agent_id, "trust_score": new_score}
 
 
-@router.post("/{agent_id}/punish", response_model=AgentResponse)
+@router.post("/{agent_id}/punish")
 async def punish_agent(agent_id: str, amount: float = 1.0, db=Depends(get_db)):
-    """Apply a punishment (negative reward) to an agent."""
-    # agent = db.query(AgentModel).filter(AgentModel.id == agent_id).first()
-    # if not agent:
-    #     raise HTTPException(status_code=404, detail="Agent not found")
-    # agent.reward_score = (agent.reward_score or 0) - amount
-    # agent.updated_at = datetime.utcnow()
-    # db.commit()
-    # db.refresh(agent)
-    raise HTTPException(status_code=501, detail="Not implemented — database integration pending")
+    """Apply a punishment to an agent."""
+    cursor = await db.execute(
+        "SELECT trust_score FROM agent_identities WHERE agent_id=?", (agent_id,)
+    )
+    row = await cursor.fetchone()
+    if not row:
+        raise HTTPException(status_code=404, detail="Agent not found")
+    new_score = max(0.0, row["trust_score"] - amount * 0.1)
+    await db.execute(
+        "UPDATE agent_identities SET trust_score=?, updated_at=datetime('now') WHERE agent_id=?",
+        (new_score, agent_id),
+    )
+    await db.commit()
+    return {"agent_id": agent_id, "trust_score": new_score}

@@ -1,5 +1,10 @@
 import React from 'react';
 import { Routes, Route, NavLink } from 'react-router-dom';
+import Timeline from './routes/Timeline';
+import Graph from './routes/Graph';
+import Dashboard from './routes/Dashboard';
+import GodConsole from './routes/GodConsole';
+import Arena from './routes/Arena';
 
 const navItems = [
   { path: '/timeline', label: '📜 Timeline' },
@@ -8,12 +13,6 @@ const navItems = [
   { path: '/god-console', label: '⚡ God Console' },
   { path: '/arena', label: '🧬 Arena' },
 ];
-
-const PlaceholderPage: React.FC<{ title: string }> = ({ title }) => (
-  <div className="flex items-center justify-center h-full text-gray-400 text-xl">
-    {title}
-  </div>
-);
 
 const App: React.FC = () => {
   return (
@@ -45,12 +44,12 @@ const App: React.FC = () => {
       {/* Main content area */}
       <main className="flex-1 overflow-auto">
         <Routes>
-          <Route path="/" element={<PlaceholderPage title="Welcome to Agora" />} />
-          <Route path="/timeline" element={<PlaceholderPage title="📜 Timeline" />} />
-          <Route path="/graph" element={<PlaceholderPage title="🕸️ Graph" />} />
-          <Route path="/dashboard" element={<PlaceholderPage title="📊 Dashboard" />} />
-          <Route path="/god-console" element={<PlaceholderPage title="⚡ God Console" />} />
-          <Route path="/arena" element={<PlaceholderPage title="🧬 Arena" />} />
+          <Route path="/" element={<Dashboard />} />
+          <Route path="/timeline" element={<Timeline />} />
+          <Route path="/graph" element={<Graph />} />
+          <Route path="/dashboard" element={<Dashboard />} />
+          <Route path="/god-console" element={<GodConsole />} />
+          <Route path="/arena" element={<Arena />} />
         </Routes>
       </main>
     </div>
