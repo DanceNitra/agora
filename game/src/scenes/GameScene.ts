@@ -56,6 +56,8 @@ export class GameScene extends Phaser.Scene {
   private interactionPrompt!: Phaser.GameObjects.Text;
   private lastInteractionTime: number = 0;
   private interactKey!: Phaser.Input.Keyboard.Key;
+  private doorData: Map<string, { sprite: Phaser.Physics.Arcade.Sprite; open: boolean; name: string; allowedNpcs: string[] }> = new Map();
+  private doorClickTargets: Map<string, Phaser.GameObjects.Image> = new Map();
   private vermin: VerminSprite[] = [];
   private attackTimer: number = 0;
 
@@ -90,6 +92,22 @@ export class GameScene extends Phaser.Scene {
           const d = this.doors.create(px, py, 'door') as Phaser.Physics.Arcade.Sprite;
           d.refreshBody();
           d.setPipeline('Light2D');
+
+          // Track door with access control pre-prepared
+          const doorKey = `${x},${y}`;
+          const roomName = y <= 5 ? 'Library' : y <= 11 ? 'Treasury' : 'Crypt';
+          this.doorData.set(doorKey, {
+            sprite: d,
+            open: false,
+            name: `${roomName} Door`,
+            allowedNpcs: ['*'], // '*' = everyone allowed (future: restrict to specific NPCs)
+          });
+
+          // Make door clickable — with separate interactive overlay
+          const doorImg = this.add.image(px, py, 'door').setDepth(py + 0.5).setAlpha(0).setPipeline('Light2D');
+          doorImg.setInteractive({ useHandCursor: true });
+          doorImg.on('pointerdown', () => this.toggleDoor(doorKey));
+          this.doorClickTargets.set(doorKey, doorImg);
         }
       }
     }
@@ -240,7 +258,7 @@ export class GameScene extends Phaser.Scene {
       this.npcSprites.push(n);
       this.llmNPCs.push(n);
       this.physics.add.collider(n, this.walls);
-      this.physics.add.collider(n, this.doors);
+      // No door collider — NPCs walk through doors freely
     }
 
     // Load quest progress for each LLM NPC
@@ -273,7 +291,7 @@ export class GameScene extends Phaser.Scene {
       const v = new VerminSprite(this, s.x, s.y, this.player);
       this.vermin.push(v);
       this.physics.add.collider(v, this.walls);
-      this.physics.add.collider(v, this.doors);
+      // No door collider — vermin scurry through doors
     }
 
     // --- PLAYER ---
@@ -448,7 +466,7 @@ export class GameScene extends Phaser.Scene {
 
     // --- INTERACTIVE OBJECT PROXIMITY ---
     let nearestObj: InteractiveStation | null = null;
-    let nearestDist = 80; // interaction range
+    let nearestDist = 80;
     for (const obj of this.interactiveObjects) {
       const d = Phaser.Math.Distance.Between(this.player.x, this.player.y, obj.x, obj.y);
       if (d < nearestDist) {
@@ -461,7 +479,19 @@ export class GameScene extends Phaser.Scene {
       this.interactionPrompt.setText(`[E] ${nearestObj.name}`);
       this.interactionPrompt.setAlpha(1);
     } else {
-      this.interactionPrompt.setAlpha(0);
+      // Check door proximity
+      const nearestDoor = this.getNearestDoor();
+      if (nearestDoor) {
+        const doorInfo = this.doorData.get(nearestDoor)!;
+        const label = doorInfo.open ? '[E] Close' : '[E] Open';
+        const sx = doorInfo.sprite.x;
+        const sy = doorInfo.sprite.y;
+        this.interactionPrompt.setPosition(sx, sy - 28);
+        this.interactionPrompt.setText(`${label} ${doorInfo.name}`);
+        this.interactionPrompt.setAlpha(1);
+      } else {
+        this.interactionPrompt.setAlpha(0);
+      }
     }
 
     // --- MINIMAP (Q4.2) DOM overlay ---
@@ -600,7 +630,7 @@ export class GameScene extends Phaser.Scene {
     this.npcs.push(n);
     this.npcSprites.push(n);
     this.physics.add.collider(n, this.walls);
-    this.physics.add.collider(n, this.doors);
+    // No door collider — dynamically spawned NPCs also walk through doors
     this.physics.add.collider(this.player, n);
 
     // Spawn sound
@@ -646,8 +676,9 @@ export class GameScene extends Phaser.Scene {
     }).catch(() => { /* silent */ });
   }
 
-  /** Called when player presses E near an interactable object. */
+  /** Called when player presses E near an interactable object or door. */
   private checkInteractionProximity(): void {
+    // Check workstation objects first
     for (const obj of this.interactiveObjects) {
       const d = Phaser.Math.Distance.Between(this.player.x, this.player.y, obj.x, obj.y);
       if (d < 80) {
@@ -655,5 +686,69 @@ export class GameScene extends Phaser.Scene {
         return;
       }
     }
+    // Check doors
+    const nearestDoor = this.getNearestDoor();
+    if (nearestDoor) {
+      this.toggleDoor(nearestDoor);
+      return;
+    }
+  }
+
+  /** Get the nearest door key within interaction range, or null. */
+  private getNearestDoor(): string | null {
+    let nearestKey: string | null = null;
+    let nearestDist = 80;
+    for (const [key, info] of this.doorData) {
+      const d = Phaser.Math.Distance.Between(this.player.x, this.player.y, info.sprite.x, info.sprite.y);
+      if (d < nearestDist) {
+        nearestDist = d;
+        nearestKey = key;
+      }
+    }
+    return nearestKey;
+  }
+
+  /** Check if the player can open a specific door (access control pre-prepared). */
+  private canOpenDoor(doorKey: string): boolean {
+    const info = this.doorData.get(doorKey);
+    if (!info) return false;
+    // '*' = everyone allowed (for now). Future: check npc name against allowedNpcs
+    return info.allowedNpcs.includes('*');
+  }
+
+  /** Toggle a door open/closed. Only the player can toggle (NPCs walk through). */
+  private toggleDoor(doorKey: string): void {
+    if (!this.canOpenDoor(doorKey)) {
+      this.showFloatingText(this.player.x, this.player.y - 30, '🔒 Locked');
+      return;
+    }
+    const info = this.doorData.get(doorKey);
+    if (!info) return;
+
+    info.open = !info.open;
+    const body = info.sprite.body as Phaser.Physics.Arcade.StaticBody;
+    if (info.open) {
+      body.enable = false;
+      info.sprite.setAlpha(0.3); // visual feedback — faded door
+      this.showFloatingText(info.sprite.x, info.sprite.y - 20, '🚪 Open');
+    } else {
+      body.enable = true;
+      info.sprite.setAlpha(1);
+      this.showFloatingText(info.sprite.x, info.sprite.y - 20, '🚪 Closed');
+    }
+    this.audio.playInteract();
+  }
+
+  /** Show a floating text that fades out. */
+  private showFloatingText(x: number, y: number, msg: string): void {
+    const text = this.add.text(x, y, msg, {
+      fontSize: '10px', color: '#ffff88',
+      backgroundColor: '#000000aa',
+      padding: { x: 3, y: 1 },
+    }).setOrigin(0.5).setDepth(20);
+    this.tweens.add({
+      targets: text, alpha: 0, y: y - 20, duration: 1200,
+      onComplete: () => text.destroy(),
+    });
   }
 }
