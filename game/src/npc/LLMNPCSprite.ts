@@ -556,6 +556,9 @@ export class LLMNPCSprite extends Phaser.Physics.Arcade.Sprite {
       this.speechBubble.setAlpha(0);
     });
     // Sparkle burst — create temporary bright sprites
+    // Audio sparkle
+    const gs = this.scene as any;
+    if (gs.audio) gs.audio.playSparkle();
     for (let i = 0; i < 8; i++) {
       const angle = (Math.PI * 2 / 8) * i + Math.random() * 0.5;
       const dist = 10 + Math.random() * 20;

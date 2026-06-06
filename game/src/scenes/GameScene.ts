@@ -5,6 +5,8 @@ import { LLMNPCSprite } from '../npc/LLMNPCSprite';
 import { TILE, MAP_W, MAP_H, DUNGEON_MAP } from '../config/map';
 import { GodConsole } from '../GodConsole';
 import { MinimapOverlay } from '../MinimapOverlay';
+import { AudioManager } from '../audio/AudioManager';
+import { HUDOverlay } from '../HUDOverlay';
 
 interface Updatable { update(delta?: number): void; }
 
@@ -18,8 +20,11 @@ export class GameScene extends Phaser.Scene {
   private wasd!: Record<string, Phaser.Input.Keyboard.Key>;
   private playerDust!: Phaser.GameObjects.Particles.ParticleEmitter;
   private playerWalkTimer: number = 0;
+  private stepTimer: number = 0;
   private playerLight!: Phaser.GameObjects.Light;
   private minimapOverlay!: MinimapOverlay;
+  public audio!: AudioManager;
+  private hud!: HUDOverlay;
 
   constructor() {
     super({ key: 'GameScene' });
@@ -225,6 +230,9 @@ export class GameScene extends Phaser.Scene {
     // --- MINIMAP (Q4.2) DOM overlay ---
     this.minimapOverlay = new MinimapOverlay();
 
+    // --- HUD (Q4.6) DOM overlay ---
+    this.hud = new HUDOverlay();
+
     // --- INPUT ---
     if (this.input.keyboard) {
       this.cursors = this.input.keyboard.createCursorKeys();
@@ -235,6 +243,13 @@ export class GameScene extends Phaser.Scene {
         D: this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.D),
       };
     }
+
+    // Audio — init on first keyboard press (browser policy)
+    this.audio = new AudioManager();
+    this.input.keyboard?.once('keydown', () => this.audio.init());
+
+    // H toggle for HUD
+    this.input.keyboard?.on('keydown-H', () => this.hud.toggle());
   }
 
   update(_time: number, delta: number): void {
@@ -267,9 +282,16 @@ export class GameScene extends Phaser.Scene {
         // Dust particles
         this.playerDust.emitting = true;
         this.playerDust.setPosition(this.player.x, this.player.y + 10);
+        // Footstep sound every ~350ms
+        this.stepTimer += delta;
+        if (this.stepTimer > 350) {
+          this.stepTimer = 0;
+          this.audio.playFootstep();
+        }
       } else {
         this.playerWalkTimer = 0;
         this.playerDust.emitting = false;
+        this.stepTimer = 0;
       }
     } else {
       this.player.setVelocity(0, 0);
@@ -285,6 +307,21 @@ export class GameScene extends Phaser.Scene {
     // --- MINIMAP (Q4.2) DOM overlay ---
     const npcPositions = this.npcSprites.map(npc => ({ x: npc.x, y: npc.y }));
     this.minimapOverlay.update(this.player.x, this.player.y, npcPositions);
+
+    // --- HUD (Q4.6) ---
+    const nearNPCs = this.npcSprites
+      .filter(npc => Phaser.Math.Distance.Between(this.player.x, this.player.y, npc.x, npc.y) < 200)
+      .map(npc => ({
+        name: (npc as any)._name || npc.texture.key,
+        health: (npc as any).health ?? 100,
+        objective: (npc as any).currentObjective,
+      }));
+    this.hud.update({
+      playerX: this.player.x,
+      playerY: this.player.y,
+      nearNPCs,
+      tasks: [],
+    });
   }
 
   /** Spawn a new LLM NPC dynamically (God Console !spawn). */
@@ -314,6 +351,9 @@ export class GameScene extends Phaser.Scene {
     this.physics.add.collider(n, this.walls);
     this.physics.add.collider(n, this.doors);
     this.physics.add.collider(this.player, n);
+
+    // Spawn sound
+    this.audio.playSpawn();
 
     return n;
   }
