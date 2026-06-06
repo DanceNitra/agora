@@ -268,23 +268,30 @@ async def dungeon_agent_action(state: DungeonState, request: Request):
     except Exception:
         pass  # trust engine not available
 
-    # Add open tasks (Contract Net bidding)
+    # Add open tasks (Contract Net bidding) — highlight NPC-specific tasks
     try:
         db = request.app.state.db
         cursor = await db.execute(
             "SELECT id, title, description, priority, metadata "
-            "FROM tasks WHERE status='bidding' ORDER BY priority DESC LIMIT 3"
+            "FROM tasks WHERE status='bidding' ORDER BY priority DESC LIMIT 5"
         )
         open_tasks = await cursor.fetchall()
         if open_tasks:
-            task_lines = ["\nOPEN TASKS available for bidding:"]
+            task_lines = ["\n══ OPEN TASKS available for bidding ══"]
             for t in open_tasks:
                 meta = json.loads(t["metadata"] or "{}")
+                assigned_npc = meta.get("assigned_npc", "")
+                # Highlight tasks meant for this NPC
+                is_for_me = assigned_npc == agent_name
+                prefix = "  ▶ " if is_for_me else "  • "
+                npc_tag = f" [for {assigned_npc}]" if assigned_npc else ""
                 task_lines.append(
-                    f"  #{t['id']}: \"{t['title']}\" "
-                    f"(difficulty={meta.get('difficulty', 1)}, "
-                    f"reward={meta.get('reward_energy', 10)} energy)"
+                    f"{prefix}#{t['id']}: \"{t['title']}\" "
+                    f"(dif={meta.get('difficulty', 1)}, "
+                    f"reward={meta.get('reward_energy', 10)} energy){npc_tag}"
                 )
+                if is_for_me:
+                    task_lines.append(f"     ← This task is meant for you, {agent_name}!")
             task_lines.append(
                 "\nTo bid, respond with: {\"action\": \"bid\", \"task_id\": <#>, "
                 "\"bid_amount\": <0.0-1.0>, \"message\": \"I want this task!\"}"
