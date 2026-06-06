@@ -17,8 +17,11 @@ from agora.coordination.stigmergy import StigmergyPool
 from agora.coordination.economy import EconomyEngine
 from agora.execution.task_executor import TaskExecutor
 from agora.lifecycle.agent_lifecycle import AgentLifecycle
+from agora.lifecycle.epoch_engine import EpochEngine
+from agora.observability.csd import CSDMonitor
 from agora.api import agents as agents_api, tasks as tasks_api, god as god_api, graph as graph_api, dungeon as dungeon_api, economy as economy_api
 from agora.api import dungeon_persistence as persistence_api
+from agora.api import artifacts as artifacts_api
 
 
 async def init_db(app: FastAPI):
@@ -46,6 +49,8 @@ async def init_db(app: FastAPI):
     await app.state.economy.init_resources()
     app.state.task_executor = TaskExecutor(db)
     app.state.agent_lifecycle = AgentLifecycle(db)
+    app.state.csd_monitor = CSDMonitor(window_size=200, z_threshold_warning=2.0, z_threshold_critical=3.5)
+    app.state.epoch_engine = EpochEngine(db)
     app.state.active_connections = []
     app.state.tick_count = 0
 
@@ -103,6 +108,18 @@ app.include_router(graph_api.router, prefix="/api/v1", tags=["graph"])
 app.include_router(dungeon_api.router)
 app.include_router(economy_api.router)
 app.include_router(persistence_api.router)
+app.include_router(artifacts_api.router)
+
+# Add content column if missing (migration)
+@app.on_event("startup")
+async def migrate_artifacts():
+    try:
+        await app.state.db.execute(
+            "ALTER TABLE artifacts ADD COLUMN content TEXT DEFAULT ''"
+        )
+        await app.state.db.commit()
+    except Exception:
+        pass  # column already exists
 
 
 async def broadcast(app: FastAPI, event_type: str, payload: dict):
@@ -345,7 +362,38 @@ async def tick_loop(app: FastAPI):
 
             await db.commit()
 
-            # Task pipeline tick
+            # ── 6. CSD monitoring (metrics + drift detection) ──
+            try:
+                monitor = app.state.csd_monitor
+                for agent in agents:
+                    monitor.push_metric("trust_score", agent["trust_score"],
+                                        labels={"agent": agent["agent_id"][:8], "role": agent["role"]})
+                    monitor.push_metric("energy_level", agent["energy_balance"],
+                                        labels={"agent": agent["agent_id"][:8], "role": agent["role"]})
+                monitor.push_metric("active_agents", len(agents))
+                if app.state.tick_count % 5 == 0:
+                    alerts = monitor.check_all()
+                    for alert in alerts:
+                        await broadcast(app, "csd_alert", {
+                            "metric": alert.metric_name,
+                            "severity": alert.severity.value,
+                            "current": round(alert.current_value, 2),
+                            "baseline_mean": round(alert.baseline_mean, 2),
+                            "z_score": alert.deviation_z,
+                            "message": alert.message,
+                        })
+            except Exception as e:
+                print(f"[CSD] Error: {e}")
+
+            # ── 7. Epoch lifecycle ──
+            try:
+                epoch_events = await app.state.epoch_engine.tick(app)
+                for ev in epoch_events:
+                    await broadcast(app, ev["type"], ev["payload"])
+            except Exception as e:
+                print(f"[Epoch] Error: {e}")
+
+            # ── 8. Task pipeline tick ──
             try:
                 task_events = await app.state.task_executor.tick(app)
                 for ev in task_events:

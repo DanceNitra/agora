@@ -5,11 +5,13 @@ import Graph from './routes/Graph';
 import Dashboard from './routes/Dashboard';
 import GodConsole from './routes/GodConsole';
 import Arena from './routes/Arena';
+import Artifacts from './routes/Artifacts';
 
 const navItems = [
   { path: '/timeline', label: '📜 Timeline' },
   { path: '/graph', label: '🕸️ Graph' },
   { path: '/dashboard', label: '📊 Dashboard' },
+  { path: '/artifacts', label: '📦 Artifacts' },
   { path: '/god-console', label: '⚡ God Console' },
   { path: '/arena', label: '🧬 Arena' },
 ];
@@ -50,6 +52,7 @@ const App: React.FC = () => {
           <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/god-console" element={<GodConsole />} />
           <Route path="/arena" element={<Arena />} />
+          <Route path="/artifacts" element={<Artifacts />} />
         </Routes>
       </main>
     </div>
