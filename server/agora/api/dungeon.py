@@ -173,6 +173,74 @@ async def dungeon_agent_action(state: DungeonState, request: Request):
     # Inject quest context (active quest info drives NPC behavior)
     context, active_quest = await quest_manager.inject_quest_context(db, agent_name, context)
 
+    # ── Inject system events as "Dungeon Rumors" ──
+    try:
+        cursor = await db.execute(
+            "SELECT event_type, source_id, payload, occurred_at FROM events "
+            "ORDER BY id DESC LIMIT 5"
+        )
+        recent_events = await cursor.fetchall()
+        if recent_events:
+            rumor_lines = ["\n\n══ Dungeon Rumors (recent system activity) ══"]
+            for ev in recent_events:
+                try:
+                    p = json.loads(ev["payload"])
+                except (json.JSONDecodeError, TypeError):
+                    p = {}
+                event_type = ev["event_type"]
+                src = ev["source_id"][:8] if ev["source_id"] else "?"
+                if event_type == "agent_died":
+                    rumor_lines.append(f"  💀 Rumor: An agent ({p.get('role','?')}) was lost in the depths.")
+                elif event_type == "agent_reborn":
+                    rumor_lines.append(f"  ✨ Rumor: A fallen agent ({p.get('role','?')}) has returned, changed.")
+                elif event_type == "agent_culled":
+                    rumor_lines.append(f"  ⚠️ Rumor: A low-trust agent ({p.get('role','?')}) was banished.")
+                elif event_type == "epoch_advanced":
+                    rumor_lines.append(f"  📯 Rumor: A new age (epoch {p.get('epoch')}) has begun in the dungeon.")
+                elif event_type == "epoch_end":
+                    rumor_lines.append(f"  📜 Rumor: An age ended — {p.get('tasks_completed',0)} tasks done, {p.get('artifacts_created',0)} artifacts found.")
+                elif event_type == "task_completed":
+                    rumor_lines.append(f"  ✅ Rumor: Someone completed \"{p.get('title','?')}\" and was rewarded.")
+                else:
+                    rumor_lines.append(f"  📡 Rumor: {event_type} — {src}")
+            context += "\n".join(rumor_lines)
+    except Exception:
+        pass  # events not available
+
+    # ── Inject recent artifact discoveries ──
+    try:
+        cursor = await db.execute(
+            "SELECT title, artifact_type, substr(content,1,80) as snippet "
+            "FROM artifacts WHERE content IS NOT NULL AND content != '' "
+            "ORDER BY id DESC LIMIT 3"
+        )
+        recent_arts = await cursor.fetchall()
+        if recent_arts:
+            art_lines = ["\n══ Recent Discoveries (artifacts found) ══"]
+            for art in recent_arts:
+                snippet = (art["snippet"] or "").strip()[:60]
+                art_lines.append(f"  📄 \"{art['title']}\" — {snippet}..." if snippet else f"  📄 \"{art['title']}\"")
+            context += "\n".join(art_lines)
+    except Exception:
+        pass  # artifacts table not available
+
+    # ── Inject system agent activity summary ──
+    try:
+        cursor = await db.execute(
+            "SELECT role, COUNT(*) as cnt, ROUND(AVG(trust_score),2) as avg_trust, "
+            "ROUND(AVG(energy_balance),0) as avg_energy "
+            "FROM agent_identities WHERE status='active' AND agent_id NOT LIKE '00000000%' "
+            "GROUP BY role"
+        )
+        sys_agents = await cursor.fetchall()
+        if sys_agents:
+            sys_lines = ["\n══ System Activity (beyond the dungeon) ══"]
+            for sa in sys_agents:
+                sys_lines.append(f"  🏛️ The {sa['role']}s ({sa['cnt']}) — trust {sa['avg_trust']}, energy {sa['avg_energy']}")
+            context += "\n".join(sys_lines)
+    except Exception:
+        pass
+
     # Add inbox messages (from other agents talking to us)
     msgs = _inbox(agent_name)
     if msgs:

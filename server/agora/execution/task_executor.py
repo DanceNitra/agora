@@ -38,6 +38,27 @@ AUTO_TASKS = [
      "task_type": "writing", "difficulty": 1, "reward_energy": 8, "target_ticks": 2},
     {"title": "Peer review recent artifacts", "description": "Cross-check recently created artifacts for quality and accuracy.",
      "task_type": "review", "difficulty": 2, "reward_energy": 10, "target_ticks": 3},
+    # ── Dungeon-relevant tasks (NPCs can participate) ──
+    {"title": "Map the eastern dungeon chambers", "description": "Survey and map the unexplored eastern corridors for hazards and resources.",
+     "task_type": "exploration", "difficulty": 2, "reward_energy": 12, "target_ticks": 3},
+    {"title": "Catalog ancient inscriptions", "description": "Document the runic inscriptions found in the lower crypts before they fade.",
+     "task_type": "research", "difficulty": 3, "reward_energy": 14, "target_ticks": 4},
+    {"title": "Restock healing herbs", "description": "Gather medicinal herbs from the dungeon's fungal groves for the alchemist.",
+     "task_type": "exploration", "difficulty": 1, "reward_energy": 8, "target_ticks": 2},
+    {"title": "Investigate strange noises", "description": "Scout the source of unusual sounds reported near the western wall.",
+     "task_type": "exploration", "difficulty": 2, "reward_energy": 10, "target_ticks": 3},
+    {"title": "Forge replacement tools", "description": "Collect scrap metal and forge replacement tools for the workshop.",
+     "task_type": "writing", "difficulty": 1, "reward_energy": 8, "target_ticks": 2},
+    {"title": "Update dungeon bestiary", "description": "Document newly discovered creatures and update the dungeon bestiary records.",
+     "task_type": "writing", "difficulty": 2, "reward_energy": 10, "target_ticks": 3},
+    {"title": "Analyze crystal resonance", "description": "Study the resonant frequencies of crystal formations in the deep caves.",
+     "task_type": "analysis", "difficulty": 3, "reward_energy": 14, "target_ticks": 4},
+    {"title": "Verify guard patrol routes", "description": "Review and optimize the guard patrol schedules for maximum coverage.",
+     "task_type": "review", "difficulty": 1, "reward_energy": 8, "target_ticks": 2},
+    {"title": "Mediate resource dispute", "description": "Help resolve a disagreement between scouts over resource claim boundaries.",
+     "task_type": "review", "difficulty": 2, "reward_energy": 10, "target_ticks": 3},
+    {"title": "Decode ancient map fragment", "description": "Piece together and translate a fragment of an ancient dungeon map.",
+     "task_type": "research", "difficulty": 3, "reward_energy": 14, "target_ticks": 4},
 ]
 
 RESOURCE_REWARDS_BY_TYPE = {
@@ -312,6 +333,20 @@ class TaskExecutor:
 
         # Broadcast via inlined websocket push
         try:
+            # Also log to events table for NPC context
+            await db.execute(
+                "INSERT INTO events (event_type, source_id, aggregate_type, aggregate_id, payload) "
+                "VALUES ('task_completed', ?, 'task', ?, ?)",
+                (agent_id, str(task_id), json.dumps({
+                    "title": task["title"],
+                    "task_type": task_type,
+                    "reward_energy": reward_energy,
+                    "trust_boost": round(trust_boost, 3),
+                    "difficulty": difficulty,
+                })),
+            )
+            await db.commit()
+
             import json as _json
             from datetime import datetime as _dt
             event = {
