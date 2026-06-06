@@ -13,8 +13,8 @@ class Settings(BaseSettings):
     api_key: str = ""
     api_base_url: str = "https://api.deepseek.com/v1"
     llm_model_cheap: str = "deepseek-v4-flash"
-    llm_model_medium: str = "deepseek-v4-pro"
-    llm_model_expert: str = "deepseek-v4-pro"
+    llm_model_medium: str = "deepseek-v4-flash"
+    llm_model_expert: str = "deepseek-v4-flash"
     llm_enabled: bool = True
 
     model_config = {"env_prefix": "AGORA_", "env_file": ".env"}

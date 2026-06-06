@@ -68,7 +68,13 @@ export class LLMNPCSprite extends Phaser.Physics.Arcade.Sprite {
   private pendingDecision: LLMDecision | null = null;
   private isWaiting: boolean = false;
   private lastCallTime: number = 0;
-  private readonly CALL_COOLDOWN = 3000;
+  private readonly CALL_COOLDOWN = 8000;
+  private callCount: number = 0;
+  private lastStateHash: string = '';
+  private idleCooldownMultiplier: number = 1;
+
+  // Cooldown when nothing changed
+  private readonly IDLE_COOLDOWN_MAX = 30000; // max 30s between calls
 
   // Action queue (multi-step)
   private actionQueue: QueuedAction[] = [];
@@ -163,8 +169,20 @@ export class LLMNPCSprite extends Phaser.Physics.Arcade.Sprite {
       // Priority 4: Call LLM
       this.makeSeq('Think', [
         new BTCondition('Can think?', () => {
+          if (this.isWaiting || this.pendingDecision) return false;
           const now = Date.now();
-          return !this.isWaiting && (now - this.lastCallTime) > this.CALL_COOLDOWN;
+          const effectiveCooldown = this.CALL_COOLDOWN * this.idleCooldownMultiplier;
+          if ((now - this.lastCallTime) <= effectiveCooldown) return false;
+
+          // State hash — only call LLM if something actually changed
+          const hash = `${Math.round(this.x)},${Math.round(this.y)}|h:${Math.round(this.health)}|inv:${this.inventory.length}|npc:${this.nearbyNPCs.map(n=>n.name).sort().join(',')}`;
+          if (hash === this.lastStateHash && this.callCount > 0) {
+            // Nothing changed — back off more
+            this.idleCooldownMultiplier = Math.min(this.idleCooldownMultiplier * 2, this.IDLE_COOLDOWN_MAX / this.CALL_COOLDOWN);
+            this.lastCallTime = now; // reset timer to use the longer cooldown
+            return false;
+          }
+          return true;
         }),
         new BTAction('Call LLM', () => {
           this.isWaiting = true;
@@ -427,6 +445,12 @@ export class LLMNPCSprite extends Phaser.Physics.Arcade.Sprite {
 
   private async callLLM(): Promise<void> {
     this.label.setText(`${this.agentName}: thinking...`);
+
+    this.callCount++;
+    this.lastCallTime = Date.now();
+
+    // Update state hash after successful call
+    this.idleCooldownMultiplier = 1;
 
     try {
       const recentMemories = this.memories.slice(-5).map(m => m.text);
