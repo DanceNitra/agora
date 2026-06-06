@@ -81,22 +81,43 @@ export class GameScene extends Phaser.Scene {
     this.physics.add.collider(guard, this.walls);
     this.physics.add.collider(guard, this.doors);
 
-    // --- LLM NPC (Phase 2 — calls Python backend) ---
-    const npcRefs = [guard];
-    const llmNPC = (() => {
-      const n = new LLMNPCSprite(this, 10 * TILE, 16 * TILE, 'Kael', this.player);
-      n.nearbyNPCs = [
-        { name: 'Grom', role: 'blacksmith', x: 5 * TILE, y: 10 * TILE },
-        { name: 'Zara', role: 'alchemist', x: 15 * TILE, y: 3 * TILE },
-        { name: 'Finn', role: 'merchant', x: 5 * TILE, y: 4 * TILE },
-        { name: 'Guard', role: 'guard', x: 19.5 * TILE, y: 9 * TILE },
-      ];
-      return n;
-    })();
-    this.npcs.push(llmNPC);
-    this.npcSprites.push(llmNPC);
-    this.physics.add.collider(llmNPC, this.walls);
-    this.physics.add.collider(llmNPC, this.doors);
+    // --- LLM NPCs (Phase 2+3 — multiple agents) ---
+    const allNPCs = [
+      { name: 'Grom', role: 'blacksmith', x: 5 * TILE, y: 10 * TILE },
+      { name: 'Zara', role: 'alchemist', x: 15 * TILE, y: 3 * TILE },
+      { name: 'Finn', role: 'merchant', x: 5 * TILE, y: 4 * TILE },
+      { name: 'Guard', role: 'guard', x: 19.5 * TILE, y: 9 * TILE },
+    ];
+
+    const llmNPCs = [
+      {
+        name: 'Kael', x: 10 * TILE, y: 16 * TILE, color: 0x44aaff,
+        objective: 'Find the Crystal of Eternity',
+        inventory: ['Rusty Key'],
+      },
+      {
+        name: 'Lyra', x: 3 * TILE, y: 17 * TILE, color: 0x44ff88,
+        objective: 'Map the eastern catacombs',
+        inventory: ['Torch', 'Map Fragment'],
+      },
+      {
+        name: 'Mordecai', x: 20 * TILE, y: 16 * TILE, color: 0xcc88ff,
+        objective: 'Research ancient artifacts in the dungeon',
+        inventory: ['Runic Stone', 'Ancient Scroll'],
+      },
+    ];
+
+    for (const lnpc of llmNPCs) {
+      const n = new LLMNPCSprite(this, lnpc.x, lnpc.y, lnpc.name, this.player);
+      n.setTint(lnpc.color);
+      n.currentObjective = lnpc.objective;
+      n.inventory = lnpc.inventory;
+      n.nearbyNPCs = allNPCs.map(p => ({ ...p }));
+      this.npcs.push(n);
+      this.npcSprites.push(n);
+      this.physics.add.collider(n, this.walls);
+      this.physics.add.collider(n, this.doors);
+    }
 
     // --- PLAYER ---
     this.player = this.physics.add.sprite(12 * TILE, 10 * TILE, 'player');

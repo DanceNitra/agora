@@ -1,7 +1,6 @@
 """
-Dungeon Agent API — Phase 2: One Real Agent with LLM.
+Dungeon Agent API — Phase 3: Multi-Agent with per-agent personalities and memory.
 Receives game state → calls LLM → returns action decision.
-Memory system with importance scoring, decay, and relevance retrieval.
 """
 
 import json
@@ -16,31 +15,67 @@ from agora.execution.llm_client import call_llm
 
 router = APIRouter(prefix="/api/v1/dungeon", tags=["dungeon"])
 
-# ── Memory Store ──
+# ── Per-Agent Memory Store ──
 
-_memories: list[dict[str, Any]] = []
+_memories: dict[str, list[dict[str, Any]]] = {}
 
-DUNGEON_SYSTEM_PROMPT = """You are an AI agent named Kael in a dungeon game world.
-You can see your surroundings and have a set of possible actions.
-Your goal is to explore the dungeon, interact with NPCs, and complete tasks.
+# ── Message Inboxes (NPC-to-NPC communication) ──
+_inboxes: dict[str, list[dict[str, Any]]] = {}
 
-Respond ONLY with a valid JSON object containing:
-{
-  "action": "move|interact|talk|wait|use|explore",
-  "target_x": <optional number>,
-  "target_y": <optional number>,
-  "target_npc": "<optional NPC name>",
-  "message": "<what you say or do, 1 sentence>",
-  "thought": "<your internal reasoning, 1 sentence>"
-}
 
-Actions:
-- "move": walk to coordinates (target_x, target_y)
-- "interact": use a workstation or object
-- "talk": speak to an NPC (target_npc)
-- "wait": stay in place and observe
-- "use": use an inventory item
-- "explore": move toward unexplored area"""
+def _inbox(agent_name: str) -> list[dict[str, Any]]:
+    """Get or create message inbox for an agent."""
+    if agent_name not in _inboxes:
+        _inboxes[agent_name] = []
+    return _inboxes[agent_name]
+
+
+def _mem(agent_name: str) -> list[dict[str, Any]]:
+    """Get or create memory bank for a specific agent."""
+    if agent_name not in _memories:
+        _memories[agent_name] = []
+    return _memories[agent_name]
+
+
+# ── Agent Personalities ──
+
+def _get_prompt(agent_name: str) -> str:
+    agents = {
+        "Kael": (
+            "You are Kael, an adventurer seeking the Crystal of Eternity. "
+            "You are brave, curious, and determined. You explore the dungeon to find the legendary artifact. "
+            "You know Grom (blacksmith), Zara (alchemist), Finn (merchant), Lyra (scout), Mordecai (sage), and the Guard."
+        ),
+        "Lyra": (
+            "You are Lyra, a scout and cartographer mapping the dungeon. "
+            "You are swift, observant, and cautious. Your mission is to explore every corner of the dungeon, "
+            "note dangers, and report back. You work alongside Kael, Mordecai, Grom, Zara, Finn, and the Guard."
+        ),
+        "Mordecai": (
+            "You are Mordecai, a sage studying ancient artifacts and dungeon lore. "
+            "You are wise, patient, and scholarly. You seek ancient knowledge, magical items, and hidden "
+            "secrets. You advise Kael, Lyra, and the others with your wisdom."
+        ),
+    }
+    personality = agents.get(agent_name, f"You are {agent_name}, an agent in a dungeon game world.")
+
+    return (
+        f"{personality}\n\n"
+        f"You can see your surroundings and have a set of possible actions.\n\n"
+        f"Respond ONLY with a valid JSON object containing:\n"
+        f'{{{{"action":"move|interact|talk|wait|use|explore",'
+        f'"target_x":<optional number>,"target_y":<optional number>,'
+        f'"target_npc":"<optional NPC name>",'
+        f'"message":"<what you say or do, 1 sentence>",'
+        f'"thought":"<your internal reasoning, 1 sentence>"}}}}'
+        f"\n\nActions:\n"
+        f'- "move": walk to coordinates (target_x, target_y)\n'
+        f'- "interact": use a workstation or object\n'
+        f'- "talk": speak to an NPC (target_npc)\n'
+        f'- "wait": stay in place and observe\n'
+        f'- "use": use an inventory item\n'
+        f'- "explore": move toward unexplored area'
+    )
 
 
 class DungeonState(BaseModel):
@@ -58,15 +93,25 @@ class DungeonState(BaseModel):
 @router.post("/agent-action")
 async def dungeon_agent_action(state: DungeonState, request: Request):
     """Receive game state → LLM decides action → return decision."""
+    agent_name = state.agent_name
+    memories = _mem(agent_name)
 
-    # Build context from game state
+    # Build context with relevant past memories
     context = _build_context(state)
-
-    # Add relevant past memories (retrieved by relevance, not just recent)
-    relevant = _retrieve_relevant_memories(context, limit=5)
+    relevant = _retrieve_relevant_memories(agent_name, context, limit=5)
     if relevant:
         mem_text = "\n".join(f"- {m['summary']}" for m in relevant)
         context += f"\n\nYour memories:\n{mem_text}"
+
+    # Add inbox messages (from other agents talking to us)
+    msgs = _inbox(agent_name)
+    if msgs:
+        inbox_text = "\n".join(
+            f"- {m['from']} says: \"{m['message']}\""
+            for m in msgs[-3:]  # last 3 messages
+        )
+        context += f"\n\nMessages you received:\n{inbox_text}"
+        msgs.clear()  # consumed
 
     # Call LLM
     cfg = getattr(request.app.state, 'dungeon_config', {})
@@ -74,7 +119,7 @@ async def dungeon_agent_action(state: DungeonState, request: Request):
 
     if use_llm:
         raw = call_llm(
-            system_prompt=DUNGEON_SYSTEM_PROMPT,
+            system_prompt=_get_prompt(agent_name),
             user_prompt=context,
             tier=cfg.get("llm_tier", "cheap"),
             temperature=0.8,
@@ -87,7 +132,7 @@ async def dungeon_agent_action(state: DungeonState, request: Request):
             "target_x": state.agent_x + 64,
             "target_y": state.agent_y,
             "message": "I'll explore this corridor.",
-            "thought": "I see an unexplored passage to the east."
+            "thought": f"I see an unexplored passage to the east."
         })
 
     # Parse response
@@ -101,59 +146,85 @@ async def dungeon_agent_action(state: DungeonState, request: Request):
         }
 
     # Store memory with importance scoring
-    _store_memory(
-        state=state,
-        decision=decision,
-    )
+    _store_memory(agent_name, state, decision)
+
+    # Route messages: if "talk" with target_npc, deliver to that agent's inbox
+    if decision.get("action") == "talk" and decision.get("target_npc"):
+        target = decision["target_npc"]
+        msg = decision.get("message", "")
+        if target in ("Grom", "Zara", "Finn", "Guard", "Lyra", "Mordecai", "Kael"):
+            _inbox(target).append({
+                "from": agent_name,
+                "message": msg,
+                "timestamp": time.time(),
+            })
 
     return decision
 
 
 @router.get("/memories")
-async def get_memories(limit: int = 10, min_importance: float = 1.0):
+async def get_memories(agent_name: str = "Kael", limit: int = 10, min_importance: float = 1.0):
     """Retrieve agent memories, sorted by importance × recency."""
-    scored = _score_all_memories()
+    scored = _score_all_memories(agent_name)
     filtered = [m for m in scored if m["score"] >= min_importance]
-    return {"memories": filtered[:limit]}
+    return {"agent": agent_name, "memories": filtered[:limit]}
 
 
 @router.get("/memories/search")
-async def search_memories(q: str = "", limit: int = 5):
-    """Search memories by keyword relevance."""
+async def search_memories(agent_name: str = "Kael", q: str = "", limit: int = 5):
+    """Search agent memories by keyword relevance."""
+    memories = _mem(agent_name)
     q = q.lower().strip()
     if not q:
-        return {"memories": _score_all_memories()[:limit]}
+        scored = _score_all_memories(agent_name)
+        return {"agent": agent_name, "memories": scored[:limit]}
 
     results = []
-    for m in reversed(_memories):
+    for m in reversed(memories):
         text = (m.get("summary", "") + " " + m.get("state_summary", "")).lower()
         if q in text:
             results.append(m)
             if len(results) >= limit:
                 break
-    return {"memories": results}
+    return {"agent": agent_name, "memories": results}
+
+
+@router.get("/agents")
+async def list_agents():
+    """List all agents that have memories stored."""
+    return {"agents": list(_memories.keys())}
+
+
+@router.get("/inbox")
+async def get_inbox(agent_name: str = "Kael"):
+    """Get pending messages for an agent."""
+    msgs = list(_inbox(agent_name))  # copy
+    return {"agent": agent_name, "messages": msgs}
 
 
 @router.post("/memories/clear")
-async def clear_memories():
-    """Clear all memories (new session)."""
-    _memories.clear()
-    return {"status": "cleared"}
+async def clear_memories(agent_name: str = ""):
+    """Clear memories for an agent (or all if agent_name empty)."""
+    if agent_name:
+        _memories[agent_name] = []
+    else:
+        _memories.clear()
+    return {"status": "cleared", "agent": agent_name or "all"}
 
 
 # ── Memory Engine ──
 
-def _store_memory(state: DungeonState, decision: dict):
+def _store_memory(agent_name: str, state: DungeonState, decision: dict):
     """Store a memory with automatic importance scoring."""
+    memories = _mem(agent_name)
     action = decision.get("action", "unknown")
     thought = decision.get("thought", "")
     message = decision.get("message", "")
     summary = thought or message or f"Performed action: {action}"
 
-    # Score importance based on action type and context
     importance = _score_importance(action, thought, state)
 
-    _memories.append({
+    memories.append({
         "timestamp": time.time(),
         "state_summary": f"At ({state.agent_x:.0f}, {state.agent_y:.0f}) HP:{state.health:.0f}",
         "decision": action,
@@ -162,30 +233,16 @@ def _store_memory(state: DungeonState, decision: dict):
         "tags": _infer_tags(action, thought),
     })
 
-    # Decay old memories
-    _decay_memories()
-
-    # Prune if over limit
-    if len(_memories) > 100:
-        _prune_memories()
+    _decay_memories(agent_name)
+    if len(memories) > 100:
+        _prune_memories(agent_name)
 
 
 def _score_importance(action: str, thought: str, state: DungeonState) -> float:
-    """Score memory importance 1-10 based on content."""
-    score = 3.0  # baseline
-
-    # Action-based boosts
-    action_weights = {
-        "talk": 5.0,
-        "interact": 5.0,
-        "use": 4.0,
-        "explore": 3.5,
-        "move": 2.0,
-        "wait": 1.5,
-    }
+    score = 3.0
+    action_weights = {"talk": 5.0, "interact": 5.0, "use": 4.0, "explore": 3.5, "move": 2.0, "wait": 1.5}
     score += action_weights.get(action, 2.0)
 
-    # Thought content boosts
     thought_lower = (thought or "").lower()
     important_keywords = [
         "crystal", "eternity", "discover", "found", "secret", "treasure",
@@ -197,7 +254,6 @@ def _score_importance(action: str, thought: str, state: DungeonState) -> float:
         if kw in thought_lower:
             score += 1.0
 
-    # NPC interaction boost
     if state.nearby_npcs and action in ("talk", "interact"):
         score += 1.5
 
@@ -205,11 +261,9 @@ def _score_importance(action: str, thought: str, state: DungeonState) -> float:
 
 
 def _infer_tags(action: str, thought: str) -> list[str]:
-    """Infer memory tags from content."""
     tags = [action]
     thought_lower = (thought or "").lower()
-
-    if any(w in thought_lower for w in ["npc", "grom", "zara", "finn", "guard", "talk"]):
+    if any(w in thought_lower for w in ["npc", "grom", "zara", "finn", "guard", "lyra", "mordecai", "talk"]):
         tags.append("npc_interaction")
     if any(w in thought_lower for w in ["explor", "room", "corridor", "passage", "north", "south"]):
         tags.append("exploration")
@@ -217,56 +271,47 @@ def _infer_tags(action: str, thought: str) -> list[str]:
         tags.append("item")
     if any(w in thought_lower for w in ["danger", "enemy", "monster", "trap", "alert"]):
         tags.append("danger")
-
     return tags
 
 
-def _decay_memories():
-    """Reduce importance of old memories over time."""
+def _decay_memories(agent_name: str):
     now = time.time()
-    for m in _memories:
-        age = (now - m["timestamp"]) / 60  # minutes
+    for m in _mem(agent_name):
+        age = (now - m["timestamp"]) / 60
         if age > 1:
             decay = 0.3 * math.log(age + 1)
             m["importance"] = max(1.0, m["importance"] - decay)
 
 
-def _prune_memories():
-    """Keep only the most valuable memories."""
-    scored = _score_all_memories()
+def _prune_memories(agent_name: str):
+    memories = _mem(agent_name)
+    scored = _score_all_memories(agent_name)
     scored.sort(key=lambda x: x["score"], reverse=True)
     keep_ids = {id(m) for m in scored[:80]}
-    _memories[:] = [m for m in _memories if id(m) in keep_ids]
+    memories[:] = [m for m in memories if id(m) in keep_ids]
 
 
-def _score_all_memories() -> list[dict]:
-    """Score all memories by importance × recency factor."""
+def _score_all_memories(agent_name: str) -> list[dict]:
     now = time.time()
     scored = []
-    for m in reversed(_memories):
-        age = (now - m["timestamp"]) / 60  # minutes
+    for m in reversed(_mem(agent_name)):
+        age = (now - m["timestamp"]) / 60
         recency_boost = max(0.5, 1.0 - 0.1 * age)
         score = m.get("importance", 3.0) * recency_boost
         scored.append({**m, "score": round(score, 2)})
     return scored
 
 
-def _retrieve_relevant_memories(context: str, limit: int = 5) -> list[dict]:
-    """Retrieve memories relevant to current context using keyword overlap."""
-    if not _memories:
+def _retrieve_relevant_memories(agent_name: str, context: str, limit: int = 5) -> list[dict]:
+    memories = _mem(agent_name)
+    if not memories:
         return []
 
-    # Extract context keywords
     context_lower = context.lower()
-    # Score each memory by keyword overlap
     scored = []
-    for m in reversed(_memories):
+    for m in reversed(memories):
         text = (m.get("summary", "") + " " + m.get("state_summary", "")).lower()
-        # Simple overlap score
-        overlap = 0
-        for word in context_lower.split():
-            if len(word) > 3 and word in text:
-                overlap += 1
+        overlap = sum(1 for word in context_lower.split() if len(word) > 3 and word in text)
         relevance = m.get("importance", 3.0) + overlap * 0.5
         scored.append((relevance, m))
 
@@ -277,7 +322,6 @@ def _retrieve_relevant_memories(context: str, limit: int = 5) -> list[dict]:
 # ── Context Builder ──
 
 def _build_context(state: DungeonState) -> str:
-    """Build a detailed context string from game state."""
     parts = [f"You are {state.agent_name} at position ({state.agent_x:.0f}, {state.agent_y:.0f})."]
     parts.append(f"Health: {state.health:.0f}/100.")
 
@@ -310,5 +354,4 @@ def _build_context(state: DungeonState) -> str:
 
 @router.post("/config")
 async def set_config(config: dict):
-    """Set dungeon agent config (LLM tier, enabled flag)."""
     return {"status": "config_updated"}
