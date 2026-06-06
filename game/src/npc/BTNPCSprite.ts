@@ -34,7 +34,6 @@ export class BTNPCSprite extends Phaser.Physics.Arcade.Sprite {
 
     this.homeX = x;
     this.homeY = y;
-    this.setTint(0xff6644); // Orange = guard
 
     const body = this.body as Phaser.Physics.Arcade.Body;
     body.setCollideWorldBounds(true);

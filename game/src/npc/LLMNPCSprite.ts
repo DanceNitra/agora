@@ -95,12 +95,12 @@ export class LLMNPCSprite extends Phaser.Physics.Arcade.Sprite {
     y: number,
     public agentName: string = 'Kael',
     public playerRef: Phaser.GameObjects.Sprite | null = null,
+    textureKey: string = 'npc',
   ) {
-    super(scene, x, y, 'npc');
+    super(scene, x, y, textureKey);
     scene.add.existing(this);
     scene.physics.add.existing(this);
 
-    this.setTint(0x44aaff);
     this.setScale(1.3);
 
     const body = this.body as Phaser.Physics.Arcade.Body;

@@ -53,6 +53,35 @@ export class GameScene extends Phaser.Scene {
       this.add.image(s.x, s.y, s.texture).setDepth(s.y);
     }
 
+    // --- DECORATIVE ELEMENTS (Q4.1) ---
+    // Torches
+    const torches = [
+      { x: 1.5 * TILE, y: 1.5 * TILE },
+      { x: 22.5 * TILE, y: 1.5 * TILE },
+      { x: 1.5 * TILE, y: 18.5 * TILE },
+      { x: 22.5 * TILE, y: 18.5 * TILE },
+    ];
+    for (const t of torches) {
+      this.add.image(t.x, t.y, 'torch').setDepth(t.y);
+    }
+
+    // Pillars
+    const pillars = [
+      { x: 8 * TILE, y: 7 * TILE },
+      { x: 16 * TILE, y: 7 * TILE },
+      { x: 8 * TILE, y: 13 * TILE },
+      { x: 16 * TILE, y: 13 * TILE },
+    ];
+    for (const p of pillars) {
+      this.add.image(p.x, p.y, 'pillar').setDepth(p.y);
+    }
+
+    // Rug in center
+    this.add.image(12 * TILE, 10 * TILE, 'rug').setDepth(10 * TILE + 0.5);
+
+    // Chest
+    this.add.image(1.5 * TILE, 17 * TILE, 'chest').setDepth(17 * TILE);
+
     // --- NPCS (Q1.4) ---
     const npcDefs: { x: number; y: number; name: string; role: NPCRole; stationIdx: number | null }[] = [
       { x: 5 * TILE, y: 10 * TILE, name: 'Grom', role: 'blacksmith', stationIdx: 0 },
@@ -67,7 +96,16 @@ export class GameScene extends Phaser.Scene {
         name: stations[def.stationIdx].name,
       } : null;
 
-      const npc = new NPCSprite(this, def.x, def.y, def.name, def.role, ws);
+      // Role-specific NPC texture
+      const texMap: Record<string, string> = {
+        blacksmith: 'npc_blacksmith',
+        alchemist: 'npc_alchemist',
+        merchant: 'npc_merchant',
+        guard: 'npc_guard',
+      };
+      const npcTex = texMap[def.role] || 'npc';
+
+      const npc = new NPCSprite(this, def.x, def.y, def.name, def.role, ws, npcTex);
       this.npcs.push(npc);
       this.npcSprites.push(npc);
 
@@ -77,6 +115,8 @@ export class GameScene extends Phaser.Scene {
 
     // --- BT GUARD NPC (Q1.3) ---
     const guard = new BTNPCSprite(this, 19.5 * TILE, 9 * TILE, 'Guard', this.player);
+    guard.setTexture('npc_guard');
+    guard.setScale(1.3);
     this.npcs.push(guard);
     this.npcSprites.push(guard);
     this.physics.add.collider(guard, this.walls);
@@ -109,8 +149,8 @@ export class GameScene extends Phaser.Scene {
     ];
 
     for (const lnpc of llmNPCs) {
-      const n = new LLMNPCSprite(this, lnpc.x, lnpc.y, lnpc.name, this.player);
-      n.setTint(lnpc.color);
+      const texKey = `npc_${lnpc.name.toLowerCase()}`;
+      const n = new LLMNPCSprite(this, lnpc.x, lnpc.y, lnpc.name, this.player, texKey);
       n.currentObjective = lnpc.objective;
       n.inventory = lnpc.inventory;
       n.nearbyNPCs = allNPCs.map(p => ({ ...p }));
@@ -198,6 +238,7 @@ export class GameScene extends Phaser.Scene {
     ];
 
     const n = new LLMNPCSprite(this, x, y, name, this.player);
+    n.setTexture('npc_adventurer');
     n.setTint(color);
     n.currentObjective = objective;
     n.inventory = inventory.length > 0 ? inventory : ['Rusty Key'];

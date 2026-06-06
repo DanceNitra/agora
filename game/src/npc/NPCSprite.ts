@@ -30,23 +30,16 @@ export class NPCSprite extends Phaser.Physics.Arcade.Sprite {
     y: number,
     name: string,
     role: NPCRole,
-    public workstation: WorkStation | null = null
+    public workstation: WorkStation | null = null,
+    textureKey: string = 'npc',
   ) {
-    super(scene, x, y, 'npc');
+    super(scene, x, y, textureKey);
     scene.add.existing(this);
     scene.physics.add.existing(this);
 
     this.homeX = x;
     this.homeY = y;
     this.role = role;
-
-    // Each npc gets its own tint based on role
-    const tints: Record<NPCRole, number> = {
-      blacksmith: 0xff8844,
-      alchemist: 0xcc44ff,
-      merchant: 0x44ffcc,
-    };
-    this.setTint(tints[role]);
 
     // Physics body
     const body = this.body as Phaser.Physics.Arcade.Body;
