@@ -213,6 +213,11 @@ async def tick_loop(app: FastAPI):
 
                 if use_llm:
                     thought = await asyncio.to_thread(agent_think, role, context, tier)
+                    if thought.get("action") == "error" or not thought.get("insight", "").strip():
+                        print(f"[Tick] LLM returned error for {role}: {str(thought)[:100]}")
+                        role_thoughts = SIMULATED_THOUGHTS.get(role, SIMULATED_THOUGHTS["researcher"])
+                        thought = random.choice(role_thoughts)
+                        print(f"[Tick] Falling back to simulated for {role}")
                 else:
                     role_thoughts = SIMULATED_THOUGHTS.get(role, SIMULATED_THOUGHTS["researcher"])
                     thought = random.choice(role_thoughts)
