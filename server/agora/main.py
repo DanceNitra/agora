@@ -17,9 +17,6 @@ from agora.coordination.stigmergy import StigmergyPool
 from agora.api import agents as agents_api, tasks as tasks_api, god as god_api, graph as graph_api, dungeon as dungeon_api
 
 
-DB_PATH = settings.database_url.replace("sqlite+aiosqlite:///", "")
-
-
 async def init_db(app: FastAPI):
     db_url = settings.database_url
     db_path = db_url.replace("sqlite+aiosqlite:///", "")
@@ -39,7 +36,8 @@ async def init_db(app: FastAPI):
 
     await db.commit()
     app.state.trust = TrustEngine(db)
-    app.state.stigmergy = StigmergyPool(redis_client=None)
+    app.state.stigmergy = StigmergyPool(redis_client=None, db=db)
+    await app.state.stigmergy.load_from_db()
     app.state.active_connections = []
     app.state.tick_count = 0
 
@@ -156,149 +154,140 @@ async def tick_loop(app: FastAPI):
 
     while True:
         await asyncio.sleep(settings.tick_interval)
-        app.state.tick_count += 1
-        db = app.state.db
-        trust_engine = app.state.trust
-        stigmergy = app.state.stigmergy
+        try:
+            app.state.tick_count += 1
+            db = app.state.db
+            trust_engine = app.state.trust
+            stigmergy = app.state.stigmergy
 
-        # Get active agents
-        cursor = await db.execute(
-            "SELECT agent_id, role, trust_score, energy_balance, genome "
-            "FROM agent_identities WHERE status='active'"
-        )
-        agents = await cursor.fetchall()
-
-        # Replenish energy for all active agents each tick
-        for agent in agents:
-            aid = agent["agent_id"]
-            await db.execute(
-                "UPDATE agent_identities SET energy_balance=MIN(energy_balance+3, 100.0) "
-                "WHERE agent_id=?",
-                (aid,),
+            # Get active agents
+            cursor = await db.execute(
+                "SELECT agent_id, role, trust_score, energy_balance, genome "
+                "FROM agent_identities WHERE status='active'"
             )
+            agents = await cursor.fetchall()
 
-        if len(agents) < 2:
+            # Replenish energy for all active agents each tick
+            for agent in agents:
+                aid = agent["agent_id"]
+                await db.execute(
+                    "UPDATE agent_identities SET energy_balance=MIN(energy_balance+3, 100.0) "
+                    "WHERE agent_id=?",
+                    (aid,),
+                )
+
+            if len(agents) < 2:
+                await broadcast(app, "heartbeat", {
+                    "tick": app.state.tick_count, "agents": len(agents),
+                    "message": "Not enough agents for interaction"
+                })
+                await db.commit()
+                continue
+
+            # Only 1-2 agents think per tick
+            thinking_agents = random.sample(agents, min(2, len(agents)))
+
+            for agent in thinking_agents:
+                agent_id = agent["agent_id"]
+                role = agent["role"]
+                agent_trust = agent["trust_score"]
+                agent_energy = agent["energy_balance"]
+
+                if agent_energy < 5:
+                    continue  # Too tired to think
+
+                partner = random.choice([a for a in agents if a["agent_id"] != agent_id])
+                partner_id = partner["agent_id"] if partner else None
+
+                tier = "expert" if agent_trust >= 0.7 else "medium" if agent_trust >= 0.4 else "cheap"
+
+                recent_traces = await stigmergy.recent_alerts(limit=3)
+                context_parts = [f"I am a {role} agent. Current trust: {agent_trust:.2f}."]
+                for t in recent_traces:
+                    context_parts.append(f"Recent: {t.get('result_preview', '')[:100]}")
+                context = " | ".join(context_parts)
+
+                if use_llm:
+                    thought = await asyncio.to_thread(agent_think, role, context, tier)
+                else:
+                    role_thoughts = SIMULATED_THOUGHTS.get(role, SIMULATED_THOUGHTS["researcher"])
+                    thought = random.choice(role_thoughts)
+
+                action = thought.get("action", "unknown")
+                insight = thought.get("insight", thought.get("content_preview", thought.get("feedback", thought.get("discovery", json.dumps(thought)))))
+
+                if partner_id:
+                    current_trust = await trust_engine.get_trust(agent_id, partner_id)
+                    cursor_check = await db.execute(
+                        "SELECT COUNT(*) as cnt FROM trust_scores WHERE source_id=? AND target_id=?",
+                        (agent_id, partner_id),
+                    )
+                    row_check = await cursor_check.fetchone()
+                    is_first = row_check["cnt"] == 0
+
+                    if is_first or current_trust >= 0.2:
+                        outcome = "cooperate"
+                        trust_delta = 0.1
+                    else:
+                        outcome = "defect"
+                        trust_delta = -0.3
+
+                    await trust_engine.record_interaction(agent_id, partner_id, outcome)
+                else:
+                    outcome = "cooperate"
+                    trust_delta = 0.0
+
+                task_type = random.choice(task_types)
+                await stigmergy.write_trace(
+                    agent_id=agent_id,
+                    task_type=task_type,
+                    result=f"[{role}] {insight[:200]}",
+                    trust_delta=trust_delta,
+                )
+
+                energy_cost = 10 if tier == "expert" else 5 if tier == "medium" else 3
+                trust_change = trust_delta if outcome == "cooperate" else trust_delta * 2
+                updated_trust = min(1.0, max(0.0, agent_trust + trust_change))
+                await db.execute(
+                    "UPDATE agent_identities SET trust_score=?, energy_balance=energy_balance-?, "
+                    "updated_at=datetime('now') WHERE agent_id=?",
+                    (updated_trust, energy_cost, agent_id),
+                )
+
+                await broadcast(app, "agent_thought", {
+                    "agent_id": agent_id[:8], "role": role, "tier": tier,
+                    "action": action, "insight": insight[:200],
+                    "trust": round(updated_trust, 3), "energy_cost": energy_cost,
+                })
+
+                if app.state.tick_count % 5 == 0 and action != "error":
+                    await db.execute(
+                        "INSERT INTO artifacts (agent_id, title, artifact_type, storage_path, metadata) "
+                        "VALUES (?, ?, ?, ?, ?)",
+                        (agent_id, f"{role} thought #{app.state.tick_count}", task_type,
+                         f"memory/tick-{app.state.tick_count}", json.dumps(thought)),
+                    )
+
+            await db.commit()
+
+            if app.state.tick_count % 5 == 0:
+                best_agents = {}
+                for tt in task_types:
+                    best = await stigmergy.best_agent(tt, min_traces=2)
+                    if best:
+                        best_agents[tt] = best
+                await broadcast(app, "stigmergy_insight", {
+                    "tick": app.state.tick_count, "best_agents": best_agents,
+                })
+
+            total_energy = sum(a["energy_balance"] for a in agents)
             await broadcast(app, "heartbeat", {
                 "tick": app.state.tick_count, "agents": len(agents),
-                "message": "Not enough agents for interaction"
+                "total_energy": total_energy,
+                "thinking_agents": len(thinking_agents),
             })
-            continue
-
-        # Only 1-2 agents think per tick
-        thinking_agents = random.sample(agents, min(2, len(agents)))
-
-        for agent in thinking_agents:
-            agent_id = agent["agent_id"]
-            role = agent["role"]
-            agent_trust = agent["trust_score"]
-            agent_energy = agent["energy_balance"]
-
-            if agent_energy < 5:
-                continue  # Too tired to think
-
-            # Pick a random partner for context
-            partner = random.choice([a for a in agents if a["agent_id"] != agent_id])
-            partner_id = partner["agent_id"] if partner else None
-
-            # Choose model tier based on trust score
-            tier = "expert" if agent_trust >= 0.7 else "medium" if agent_trust >= 0.4 else "cheap"
-
-            # Build context from recent traces
-            recent_traces = await stigmergy.recent_alerts(limit=3)
-            context_parts = [f"I am a {role} agent. Current trust: {agent_trust:.2f}."]
-            for t in recent_traces:
-                context_parts.append(f"Recent: {t.get('result_preview', '')[:100]}")
-            context = " | ".join(context_parts)
-
-            if use_llm:
-                # Real LLM call (sync call in async context)
-                thought = await asyncio.to_thread(agent_think, role, context, tier)
-            else:
-                # Simulated thought — no API call, no token cost
-                role_thoughts = SIMULATED_THOUGHTS.get(role, SIMULATED_THOUGHTS["researcher"])
-                thought = random.choice(role_thoughts)
-
-            action = thought.get("action", "unknown")
-            insight = thought.get("insight", thought.get("content_preview", thought.get("feedback", thought.get("discovery", json.dumps(thought)))))
-
-            # TFT interaction with partner
-            if partner_id:
-                current_trust = await trust_engine.get_trust(agent_id, partner_id)
-                cursor_check = await db.execute(
-                    "SELECT COUNT(*) as cnt FROM trust_scores WHERE source_id=? AND target_id=?",
-                    (agent_id, partner_id),
-                )
-                row_check = await cursor_check.fetchone()
-                is_first = row_check["cnt"] == 0
-
-                if is_first or current_trust >= 0.2:
-                    outcome = "cooperate"
-                    trust_delta = 0.1
-                else:
-                    outcome = "defect"
-                    trust_delta = -0.3
-
-                await trust_engine.record_interaction(agent_id, partner_id, outcome)
-            else:
-                outcome = "cooperate"
-                trust_delta = 0.0
-
-            # Store agent's work as an artifact
-            task_type = random.choice(task_types)
-            await stigmergy.write_trace(
-                agent_id=agent_id,
-                task_type=task_type,
-                result=f"[{role}] {insight[:200]}",
-                trust_delta=trust_delta,
-            )
-
-            # Update agent state
-            energy_cost = 10 if tier == "expert" else 5 if tier == "medium" else 3
-            trust_change = trust_delta if outcome == "cooperate" else trust_delta * 2
-            updated_trust = min(1.0, max(0.0, agent_trust + trust_change))
-            await db.execute(
-                "UPDATE agent_identities SET trust_score=?, energy_balance=energy_balance-?, "
-                "updated_at=datetime('now') WHERE agent_id=?",
-                (updated_trust, energy_cost, agent_id),
-            )
-
-            # Broadcast the agent's thought
-            await broadcast(app, "agent_thought", {
-                "agent_id": agent_id[:8],
-                "role": role,
-                "tier": tier,
-                "action": action,
-                "insight": insight[:200],
-                "trust": round(updated_trust, 3),
-                "energy_cost": energy_cost,
-            })
-
-            # Every 5th agent thought: store artifact in DB
-            if app.state.tick_count % 5 == 0 and action != "error":
-                await db.execute(
-                    "INSERT INTO artifacts (agent_id, title, artifact_type, storage_path, metadata) "
-                    "VALUES (?, ?, ?, ?, ?)",
-                    (agent_id, f"{role} thought #{app.state.tick_count}", task_type,
-                     f"memory/tick-{app.state.tick_count}", json.dumps(thought)),
-                )
-
-        await db.commit()
-
-        # Every 5 ticks: stigmergy insight
-        if app.state.tick_count % 5 == 0:
-            best_agents = {}
-            for tt in task_types:
-                best = await stigmergy.best_agent(tt, min_traces=2)
-                if best:
-                    best_agents[tt] = best
-            await broadcast(app, "stigmergy_insight", {
-                "tick": app.state.tick_count, "best_agents": best_agents,
-            })
-
-        # Heartbeat
-        total_energy = sum(a["energy_balance"] for a in agents)
-        await broadcast(app, "heartbeat", {
-            "tick": app.state.tick_count, "agents": len(agents),
-            "total_energy": total_energy,
-            "thinking_agents": len(thinking_agents),
-        })
+        except Exception as e:
+            print(f"[Tick] Error at tick {app.state.tick_count}: {e}")
+            import traceback
+            traceback.print_exc()
+            await asyncio.sleep(1)
