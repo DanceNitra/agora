@@ -1,0 +1,12 @@
+fastapi
+uvicorn[standard]
+pydantic
+pydantic-settings
+sqlalchemy[asyncio]
+asyncpg
+redis[hiredis]
+httpx
+websockets
+cryptography
+numpy
+aiosqlite
