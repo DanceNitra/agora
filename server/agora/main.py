@@ -109,6 +109,83 @@ async def broadcast(app: FastAPI, event_type: str, payload: dict):
             pass
 
 
+async def _process_agent_thought(
+    app: FastAPI, db, trust_engine, stigmergy,
+    agent, partner_id, tier, thought, tick_count
+):
+    """Process a single agent's thought: trust update, trace, economy, broadcast."""
+    agent_id = agent["agent_id"]
+    role = agent["role"]
+    agent_trust = agent["trust_score"]
+
+    action = thought.get("action", "unknown")
+    insight = thought.get("insight", thought.get("content_preview",
+              thought.get("feedback", thought.get("discovery", json.dumps(thought)))))
+
+    task_types = ["research", "writing", "review", "analysis", "exploration"]
+    task_type = random.choice(task_types)
+
+    if partner_id:
+        current_trust = await trust_engine.get_trust(agent_id, partner_id)
+        cursor_check = await db.execute(
+            "SELECT COUNT(*) as cnt FROM trust_scores WHERE source_id=? AND target_id=?",
+            (agent_id, partner_id),
+        )
+        row_check = await cursor_check.fetchone()
+        is_first = row_check["cnt"] == 0
+
+        if is_first or current_trust >= 0.2:
+            outcome = "cooperate"
+            trust_delta = 0.1
+        else:
+            outcome = "defect"
+            trust_delta = -0.3
+
+        await trust_engine.record_interaction(agent_id, partner_id, outcome)
+    else:
+        outcome = "cooperate"
+        trust_delta = 0.0
+
+    await stigmergy.write_trace(
+        agent_id=agent_id,
+        task_type=task_type,
+        result=f"[{role}] {str(insight)[:200]}",
+        trust_delta=trust_delta,
+    )
+
+    # Economy: random resource drop from exploration
+    if role in ("explorer", "scout", "adventurer") or task_type == "exploration":
+        drop = await app.state.economy.random_resource_drop(agent_id)
+        if drop:
+            await broadcast(app, "resource_drop", {
+                "agent_id": agent_id[:8], "role": role,
+                "resource": drop["resource"], "quantity": drop["quantity"],
+            })
+
+    energy_cost = 10 if tier == "expert" else 5 if tier == "medium" else 3
+    trust_change = trust_delta if outcome == "cooperate" else trust_delta * 2
+    updated_trust = min(1.0, max(0.0, agent_trust + trust_change))
+    await db.execute(
+        "UPDATE agent_identities SET trust_score=?, energy_balance=energy_balance-?, "
+        "updated_at=datetime('now') WHERE agent_id=?",
+        (updated_trust, energy_cost, agent_id),
+    )
+
+    await broadcast(app, "agent_thought", {
+        "agent_id": agent_id[:8], "role": role, "tier": tier,
+        "action": action, "insight": str(insight)[:200],
+        "trust": round(updated_trust, 3), "energy_cost": energy_cost,
+    })
+
+    if tick_count % 5 == 0 and action != "error":
+        await db.execute(
+            "INSERT INTO artifacts (agent_id, title, artifact_type, storage_path, metadata) "
+            "VALUES (?, ?, ?, ?, ?)",
+            (agent_id, f"{role} thought #{tick_count}", task_type,
+             f"memory/tick-{tick_count}", json.dumps(thought)),
+        )
+
+
 @app.get("/api/v1/health")
 async def health(request: Request):
     db = request.app.state.db
@@ -188,9 +265,11 @@ async def tick_loop(app: FastAPI):
                 await db.commit()
                 continue
 
-            # Only 1-2 agents think per tick
+            # Only 1-2 agents think per tick (parallel LLM calls)
             thinking_agents = random.sample(agents, min(2, len(agents)))
 
+            # Prepare contexts and parameters for all thinking agents
+            thinking_params = []
             for agent in thinking_agents:
                 agent_id = agent["agent_id"]
                 role = agent["role"]
@@ -211,80 +290,37 @@ async def tick_loop(app: FastAPI):
                     context_parts.append(f"Recent: {t.get('result_preview', '')[:100]}")
                 context = " | ".join(context_parts)
 
-                if use_llm:
-                    thought = await asyncio.to_thread(agent_think, role, context, tier)
-                    if thought.get("action") == "error" or not thought.get("insight", "").strip():
-                        print(f"[Tick] LLM returned error for {role}: {str(thought)[:100]}")
+                thinking_params.append((agent, partner_id, tier, role, context))
+
+            # Gather LLM thoughts in parallel
+            if use_llm and thinking_params:
+                llm_coros = [asyncio.to_thread(agent_think, p[3], p[4], p[2]) for p in thinking_params]
+                llm_results = await asyncio.gather(*llm_coros, return_exceptions=True)
+
+                thoughts_with_params = []
+                for idx, (params, result) in enumerate(zip(thinking_params, llm_results)):
+                    agent, partner_id, tier, role, context = params
+                    if isinstance(result, Exception):
+                        print(f"[Tick] LLM exception for {role}: {result}")
                         role_thoughts = SIMULATED_THOUGHTS.get(role, SIMULATED_THOUGHTS["researcher"])
                         thought = random.choice(role_thoughts)
-                        print(f"[Tick] Falling back to simulated for {role}")
-                else:
+                    elif result.get("action") == "error" and not str(result.get("insight", "")).strip():  # type: ignore[union-attr]
+                        print(f"[Tick] LLM empty for {role}, falling back to simulated")
+                        role_thoughts = SIMULATED_THOUGHTS.get(role, SIMULATED_THOUGHTS["researcher"])
+                        thought = random.choice(role_thoughts)
+                    else:
+                        thought = result
+                    thoughts_with_params.append((agent, partner_id, tier, thought))
+
+                # Process all thoughts sequentially (DB writes are fast)
+                for agent, partner_id, tier, thought in thoughts_with_params:
+                    await _process_agent_thought(app, db, trust_engine, stigmergy, agent, partner_id, tier, thought, app.state.tick_count)
+            elif thinking_params:
+                # Simulated thoughts
+                for agent, partner_id, tier, role, context in thinking_params:
                     role_thoughts = SIMULATED_THOUGHTS.get(role, SIMULATED_THOUGHTS["researcher"])
                     thought = random.choice(role_thoughts)
-
-                action = thought.get("action", "unknown")
-                insight = thought.get("insight", thought.get("content_preview", thought.get("feedback", thought.get("discovery", json.dumps(thought)))))
-
-                if partner_id:
-                    current_trust = await trust_engine.get_trust(agent_id, partner_id)
-                    cursor_check = await db.execute(
-                        "SELECT COUNT(*) as cnt FROM trust_scores WHERE source_id=? AND target_id=?",
-                        (agent_id, partner_id),
-                    )
-                    row_check = await cursor_check.fetchone()
-                    is_first = row_check["cnt"] == 0
-
-                    if is_first or current_trust >= 0.2:
-                        outcome = "cooperate"
-                        trust_delta = 0.1
-                    else:
-                        outcome = "defect"
-                        trust_delta = -0.3
-
-                    await trust_engine.record_interaction(agent_id, partner_id, outcome)
-                else:
-                    outcome = "cooperate"
-                    trust_delta = 0.0
-
-                task_type = random.choice(task_types)
-                await stigmergy.write_trace(
-                    agent_id=agent_id,
-                    task_type=task_type,
-                    result=f"[{role}] {insight[:200]}",
-                    trust_delta=trust_delta,
-                )
-
-                # Economy: random resource drop from exploration
-                if role in ("explorer", "scout", "adventurer") or task_type == "exploration":
-                    drop = await app.state.economy.random_resource_drop(agent_id)
-                    if drop:
-                        await broadcast(app, "resource_drop", {
-                            "agent_id": agent_id[:8], "role": role,
-                            "resource": drop["resource"], "quantity": drop["quantity"],
-                        })
-
-                energy_cost = 10 if tier == "expert" else 5 if tier == "medium" else 3
-                trust_change = trust_delta if outcome == "cooperate" else trust_delta * 2
-                updated_trust = min(1.0, max(0.0, agent_trust + trust_change))
-                await db.execute(
-                    "UPDATE agent_identities SET trust_score=?, energy_balance=energy_balance-?, "
-                    "updated_at=datetime('now') WHERE agent_id=?",
-                    (updated_trust, energy_cost, agent_id),
-                )
-
-                await broadcast(app, "agent_thought", {
-                    "agent_id": agent_id[:8], "role": role, "tier": tier,
-                    "action": action, "insight": insight[:200],
-                    "trust": round(updated_trust, 3), "energy_cost": energy_cost,
-                })
-
-                if app.state.tick_count % 5 == 0 and action != "error":
-                    await db.execute(
-                        "INSERT INTO artifacts (agent_id, title, artifact_type, storage_path, metadata) "
-                        "VALUES (?, ?, ?, ?, ?)",
-                        (agent_id, f"{role} thought #{app.state.tick_count}", task_type,
-                         f"memory/tick-{app.state.tick_count}", json.dumps(thought)),
-                    )
+                    await _process_agent_thought(app, db, trust_engine, stigmergy, agent, partner_id, tier, thought, app.state.tick_count)
 
             await db.commit()
 
