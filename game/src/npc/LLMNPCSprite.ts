@@ -90,7 +90,6 @@ export class LLMNPCSprite extends Phaser.Physics.Arcade.Sprite {
   // Animation
   private walkBobTimer: number = 0;
   private baseY: number;
-  private sparkleEmitter!: Phaser.GameObjects.Particles.ParticleEmitter;
 
   // Callbacks
   public onMemoryUpdated: ((memories: MemoryEntry[]) => void) | null = null;
@@ -142,16 +141,6 @@ export class LLMNPCSprite extends Phaser.Physics.Arcade.Sprite {
     // Health bar
     this.healthBar = scene.add.graphics();
     this.healthBar.setDepth(10);
-
-    // Sparkle particle emitter (burst on talk)
-    this.sparkleEmitter = scene.add.particles(0, 0, 'sparkle', {
-      speed: { min: 20, max: 60 },
-      lifespan: 400,
-      scale: { start: 1, end: 0 },
-      alpha: { start: 1, end: 0 },
-      emitting: false,
-    });
-    this.sparkleEmitter.setDepth(20);
 
     this.buildTree();
   }
@@ -570,8 +559,23 @@ export class LLMNPCSprite extends Phaser.Physics.Arcade.Sprite {
     this.scene.time.delayedCall(4000, () => {
       this.speechBubble.setAlpha(0);
     });
-    // Sparkle burst
-    this.sparkleEmitter.explode(8, this.x, this.y - 10);
+    // Sparkle burst — create temporary bright sprites
+    for (let i = 0; i < 8; i++) {
+      const angle = (Math.PI * 2 / 8) * i + Math.random() * 0.5;
+      const dist = 10 + Math.random() * 20;
+      const sx = this.x + Math.cos(angle) * dist;
+      const sy = (this.y - 10) + Math.sin(angle) * dist;
+      const star = this.scene.add.circle(sx, sy, 2 + Math.random() * 1, 0xffffaa, 1);
+      star.setDepth(50);
+      this.scene.tweens.add({
+        targets: star,
+        alpha: 0,
+        scale: 1.5,
+        duration: 300 + Math.random() * 200,
+        ease: 'Quad.easeOut',
+        onComplete: () => star.destroy(),
+      });
+    }
   }
 
   // ── Update ──
@@ -602,9 +606,6 @@ export class LLMNPCSprite extends Phaser.Physics.Arcade.Sprite {
       this.walkBobTimer = 0;
       this.setScale(1.3);
     }
-
-    // Update sparkle emitter position
-    this.sparkleEmitter.setPosition(this.x, this.y - 10);
   }
 
   private drawHealthBar(): void {

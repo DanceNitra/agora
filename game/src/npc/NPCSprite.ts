@@ -25,7 +25,6 @@ export class NPCSprite extends Phaser.Physics.Arcade.Sprite {
   private stateLabel!: Phaser.GameObjects.Text;
   private roleLabel!: Phaser.GameObjects.Text;
   private healthBar!: Phaser.GameObjects.Graphics;
-  private sparkleEmitter!: Phaser.GameObjects.Particles.ParticleEmitter;
   private walkBobTimer: number = 0;
 
   constructor(
@@ -69,16 +68,6 @@ export class NPCSprite extends Phaser.Physics.Arcade.Sprite {
     // Health bar
     this.healthBar = scene.add.graphics();
     this.healthBar.setDepth(10);
-
-    // Sparkle particle emitter
-    this.sparkleEmitter = scene.add.particles(0, 0, 'sparkle', {
-      speed: { min: 20, max: 50 },
-      lifespan: 300,
-      scale: { start: 0.8, end: 0 },
-      alpha: { start: 1, end: 0 },
-      emitting: false,
-    });
-    this.sparkleEmitter.setDepth(20);
 
     // Create FSM brain
     this.brain = new NPCBrain({
@@ -137,9 +126,6 @@ export class NPCSprite extends Phaser.Physics.Arcade.Sprite {
       this.walkBobTimer = 0;
       this.setScale(1);
     }
-
-    // Sparkle emitter position
-    this.sparkleEmitter.setPosition(this.x, this.y - 10);
   }
 
   private drawHealthBar(): void {
