@@ -261,18 +261,14 @@ export class GameScene extends Phaser.Scene {
       // Update player light position
       this.playerLight.setPosition(this.player.x, this.player.y);
 
-      // Player walk animation
+      // Player walk animation (placeholder — needs sprite frames)
       const moving = vx !== 0 || vy !== 0;
       if (moving) {
-        this.playerWalkTimer += 0.1;
-        const pulse = 1 + Math.sin(this.playerWalkTimer) * 0.03;
-        this.player.setScale(pulse);
         // Dust particles
         this.playerDust.emitting = true;
         this.playerDust.setPosition(this.player.x, this.player.y + 10);
       } else {
         this.playerWalkTimer = 0;
-        this.player.setScale(1);
         this.playerDust.emitting = false;
       }
     } else {

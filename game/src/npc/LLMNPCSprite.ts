@@ -88,9 +88,6 @@ export class LLMNPCSprite extends Phaser.Physics.Arcade.Sprite {
   public nearbyNPCs: { name: string; role: string; x: number; y: number }[] = [];
 
   // Animation
-  private walkBobTimer: number = 0;
-  private baseY: number;
-
   // Callbacks
   public onMemoryUpdated: ((memories: MemoryEntry[]) => void) | null = null;
 
@@ -106,7 +103,6 @@ export class LLMNPCSprite extends Phaser.Physics.Arcade.Sprite {
     scene.add.existing(this);
     scene.physics.add.existing(this);
 
-    this.baseY = y;
     this.setScale(1.3);
 
     const body = this.body as Phaser.Physics.Arcade.Body;
@@ -595,17 +591,7 @@ export class LLMNPCSprite extends Phaser.Physics.Arcade.Sprite {
     // Health bar
     this.drawHealthBar();
 
-    // Walk animation — subtle scale pulse
-    const body = this.body as Phaser.Physics.Arcade.Body;
-    const moving = Math.abs(body.velocity.x) > 5 || Math.abs(body.velocity.y) > 5;
-    if (moving) {
-      this.walkBobTimer += 0.08;
-      const pulse = 1.3 + Math.sin(this.walkBobTimer) * 0.05;
-      this.setScale(pulse);
-    } else {
-      this.walkBobTimer = 0;
-      this.setScale(1.3);
-    }
+    // Walk animation placeholder
   }
 
   private drawHealthBar(): void {

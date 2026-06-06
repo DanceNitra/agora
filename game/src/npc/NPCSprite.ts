@@ -25,7 +25,6 @@ export class NPCSprite extends Phaser.Physics.Arcade.Sprite {
   private stateLabel!: Phaser.GameObjects.Text;
   private roleLabel!: Phaser.GameObjects.Text;
   private healthBar!: Phaser.GameObjects.Graphics;
-  private walkBobTimer: number = 0;
 
   constructor(
     scene: Phaser.Scene,
@@ -115,17 +114,7 @@ export class NPCSprite extends Phaser.Physics.Arcade.Sprite {
     // Health bar
     this.drawHealthBar();
 
-    // Walk animation — scale pulse
-    const body = this.body as Phaser.Physics.Arcade.Body;
-    const moving = Math.abs(body.velocity.x) > 5 || Math.abs(body.velocity.y) > 5;
-    if (moving) {
-      this.walkBobTimer += 0.08;
-      const pulse = 1 + Math.sin(this.walkBobTimer) * 0.04;
-      this.setScale(pulse);
-    } else {
-      this.walkBobTimer = 0;
-      this.setScale(1);
-    }
+    // Walk animation placeholder
   }
 
   private drawHealthBar(): void {
