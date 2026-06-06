@@ -23,12 +23,20 @@ DUNGEON_AGENT_IDS = {
     "Kael": "00000000-0000-0000-0000-000000000001",
     "Lyra": "00000000-0000-0000-0000-000000000002",
     "Mordecai": "00000000-0000-0000-0000-000000000003",
+    "Grom": "00000000-0000-0000-0000-000000000004",
+    "Zara": "00000000-0000-0000-0000-000000000005",
+    "Finn": "00000000-0000-0000-0000-000000000006",
+    "Guard": "00000000-0000-0000-0000-000000000007",
 }
 
 DUNGEON_AGENT_ROLES = {
     "Kael": "adventurer",
     "Lyra": "scout",
     "Mordecai": "sage",
+    "Grom": "blacksmith",
+    "Zara": "alchemist",
+    "Finn": "merchant",
+    "Guard": "guard",
 }
 
 _DUNGEON_SEEDED = False
@@ -139,7 +147,7 @@ def _get_prompt(agent_name: str) -> str:
 
 
 class DungeonState(BaseModel):
-    agent_name: str = "Kael"
+    agent_name: str
     agent_x: float
     agent_y: float
     health: float = 100
@@ -148,6 +156,30 @@ class DungeonState(BaseModel):
     nearby_objects: list[dict[str, Any]] = []
     recent_memories: list[str] = []
     current_objective: str = "Explore the dungeon"
+
+
+class InteractRequest(BaseModel):
+    player_x: int
+    player_y: int
+    object_name: str
+    description: str = ""
+
+
+@router.post("/interact")
+async def dungeon_interact(req: InteractRequest, request: Request):
+    """Log a workstation interaction from the game."""
+    db = request.app.state.db
+    await db.execute(
+        "INSERT INTO logs (kind, data, created_at) VALUES (?, ?, ?)",
+        ("interact", json.dumps({
+            "object": req.object_name,
+            "player_x": req.player_x,
+            "player_y": req.player_y,
+            "description": req.description,
+        }), time.time())
+    )
+    await db.commit()
+    return {"status": "ok", "object": req.object_name}
 
 
 @router.post("/agent-action")

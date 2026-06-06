@@ -10,10 +10,11 @@ from typing import Any
 
 # Which NPC is the "quest-doer" for each quest
 QUEST_ASSIGNMENTS = {
+    # ── Kael's chain (main quest) ──
     "talk_to_sage": {
         "agent": "Kael",
         "target_npc": "Mordecai",
-        "target_x": 20 * 32,  # Mordecai's position
+        "target_x": 20 * 32,
         "target_y": 16 * 32,
         "required_action": "talk",
         "progress_step": "Consulted the Sage",
@@ -37,10 +38,110 @@ QUEST_ASSIGNMENTS = {
     "find_crystal": {
         "agent": "Kael",
         "target_npc": None,
-        "target_x": 22 * 32,  # Deepest chamber
+        "target_x": 22 * 32,
         "target_y": 18 * 32,
         "required_action": "explore",
         "progress_step": "Found the Crystal of Eternity",
+    },
+    # ── Lyra's chain (scout) ──
+    "explore_crypt": {
+        "agent": "Lyra",
+        "target_npc": None,
+        "target_x": 30 * 32,  # Crypt center
+        "target_y": 15 * 32,
+        "required_action": "explore",
+        "progress_step": "Explored the crypt",
+    },
+    "map_catacombs": {
+        "agent": "Lyra",
+        "target_npc": "Kael",
+        "target_x": 10 * 32,
+        "target_y": 16 * 32,
+        "required_action": "talk",
+        "progress_step": "Delivered crypt map to Kael",
+    },
+    "scout_treasury": {
+        "agent": "Lyra",
+        "target_npc": None,
+        "target_x": 28 * 32,  # Treasury
+        "target_y": 9 * 32,
+        "required_action": "explore",
+        "progress_step": "Scouted the treasury",
+    },
+    # ── Mordecai's chain (sage) ──
+    "study_runes": {
+        "agent": "Mordecai",
+        "target_npc": None,
+        "target_x": 34 * 32,  # Library
+        "target_y": 3 * 32,
+        "required_action": "explore",
+        "progress_step": "Studied ancient runes in the library",
+    },
+    "decipher_scroll": {
+        "agent": "Mordecai",
+        "target_npc": "Kael",
+        "target_x": 10 * 32,
+        "target_y": 16 * 32,
+        "required_action": "talk",
+        "progress_step": "Deciphered scroll for Kael",
+    },
+    "unlock_vault": {
+        "agent": "Mordecai",
+        "target_npc": None,
+        "target_x": 29 * 32,  # Treasury vault
+        "target_y": 9 * 32,
+        "required_action": "explore",
+        "progress_step": "Unlocked the ancient vault",
+    },
+    # ── Grom's chain (blacksmith) ──
+    "collect_ore": {
+        "agent": "Grom",
+        "target_npc": None,
+        "target_x": 35 * 32,  # Crypt - ore deposits
+        "target_y": 16 * 32,
+        "required_action": "explore",
+        "progress_step": "Collected iron ore from the crypt",
+    },
+    "forge_weapons": {
+        "agent": "Grom",
+        "target_npc": "Zara",
+        "target_x": 15 * 32,
+        "target_y": 3 * 32,
+        "required_action": "talk",
+        "progress_step": "Got quenching potion from Zara",
+    },
+    "arm_guard": {
+        "agent": "Grom",
+        "target_npc": "Guard",
+        "target_x": 19.5 * 32,
+        "target_y": 9 * 32,
+        "required_action": "talk",
+        "progress_step": "Armed the Guard with new weapons",
+    },
+    # ── Zara's chain (alchemist) ──
+    "gather_herbs": {
+        "agent": "Zara",
+        "target_npc": None,
+        "target_x": 28 * 32,  # Crypt - glowing mushrooms
+        "target_y": 16 * 32,
+        "required_action": "explore",
+        "progress_step": "Gathered glowing herbs from the crypt",
+    },
+    "brew_potion": {
+        "agent": "Zara",
+        "target_npc": "Finn",
+        "target_x": 5 * 32,
+        "target_y": 4 * 32,
+        "required_action": "talk",
+        "progress_step": "Got rare ingredients from Finn",
+    },
+    "heal_npcs": {
+        "agent": "Zara",
+        "target_npc": "Grom",
+        "target_x": 5 * 32,
+        "target_y": 10 * 32,
+        "required_action": "talk",
+        "progress_step": "Delivered healing potions to Grom",
     },
 }
 
@@ -63,8 +164,43 @@ QUEST_RESPONSES = {
     "Grom": {
         "forge_key": (
             "An ancient key, eh? I can forge one, but I need iron ingots from the "
-            "mine and a scroll fragment with the key pattern. Once you have those, "
-            "bring them to me and I'll make the key."
+            "crypt and a quenching potion from Zara. Bring those and I'll make the key."
+        ),
+        "heal_npcs": (
+            "Thank you, Zara! These healing potions will keep the expedition alive. "
+            "The Guard especially needed them after that scuffle in the treasury."
+        ),
+    },
+    "Zara": {
+        "forge_weapons": (
+            "A quenching potion? Of course! I've been brewing just the thing. "
+            "Tell Grom to use it sparingly — a few drops are enough for the strongest steel."
+        ),
+        "brew_potion": (
+            "Finn! Do you have those rare ingredients I asked for? "
+            "The glowing stag horn and crystallized honey would make a powerful healing draught."
+        ),
+    },
+    "Finn": {
+        "brew_potion": (
+            "Right here, Zara! I traded with a merchant from the surface for the stag horn. "
+            "And I found the crystallized honey in an old beehive in the eastern ruins."
+        ),
+    },
+    "Guard": {
+        "arm_guard": (
+            "New weapons! About time. These goblins in the crypt have been getting bolder. "
+            "Thank Grom for me — this spear is perfectly balanced."
+        ),
+    },
+    "Kael": {
+        "map_catacombs": (
+            "Excellent work, Lyra! This map of the crypt is exactly what I needed. "
+            "Now finish scouting the treasury while I prepare the expedition."
+        ),
+        "decipher_scroll": (
+            "Mordecai, you've done it! With this translation, we can finally open the vault. "
+            "The Crystal of Eternity must be close."
         ),
     },
 }
@@ -87,6 +223,58 @@ QUEST_OUTCOMES = {
         "memory": "I found the legendary Crystal of Eternity in the deepest chamber!",
         "inventory_add": ["Crystal of Eternity"],
     },
+    # ── Lyra ──
+    "explore_crypt": {
+        "memory": "I mapped the crypt — dangerous but full of ancient secrets. Need to tell Kael.",
+        "inventory_add": ["Crypt Map"],
+    },
+    "map_catacombs": {
+        "memory": "Delivered the crypt map to Kael. He wants me to scout the treasury next.",
+        "inventory_add": [],
+    },
+    "scout_treasury": {
+        "memory": "The treasury is heavily guarded but contains valuable artifacts. Ready for next mission.",
+        "inventory_add": ["Treasury Key"],
+    },
+    # ── Mordecai ──
+    "study_runes": {
+        "memory": "The library's runes describe a vault beneath the treasury. I must decipher the scroll for Kael.",
+        "inventory_add": ["Rune Translation"],
+    },
+    "decipher_scroll": {
+        "memory": "Kael has the translation now. The vault location is clear — beneath the treasury.",
+        "inventory_add": [],
+    },
+    "unlock_vault": {
+        "memory": "I unlocked the ancient vault! The secrets within are beyond anything I imagined.",
+        "inventory_add": ["Ancient Relic"],
+    },
+    # ── Grom ──
+    "collect_ore": {
+        "memory": "Found rich iron deposits in the crypt walls. Enough to forge weapons for everyone.",
+        "inventory_add": ["Iron Ore"],
+    },
+    "forge_weapons": {
+        "memory": "Zara's quenching potion worked perfectly. The steel is the finest I've ever forged.",
+        "inventory_add": ["Quenching Potion"],
+    },
+    "arm_guard": {
+        "memory": "The Guard is properly armed now. The expedition is much safer with upgraded weapons.",
+        "inventory_add": ["Forged Spear"],
+    },
+    # ── Zara ──
+    "gather_herbs": {
+        "memory": "Found rare glowing mushrooms in the crypt. Perfect for healing potions.",
+        "inventory_add": ["Glowing Herbs"],
+    },
+    "brew_potion": {
+        "memory": "Finn came through with the rare ingredients! The healing potions are ready.",
+        "inventory_add": ["Healing Potion"],
+    },
+    "heal_npcs": {
+        "memory": "Grom and the Guard have their healing potions. The whole expedition is grateful.",
+        "inventory_add": [],
+    },
 }
 
 # ── Public API ──
@@ -95,37 +283,47 @@ _quests_assigned = False
 
 
 async def auto_assign_quests(db) -> None:
-    """Assign the first quest in the chain to Kael at startup."""
+    """Assign the first quest in each chain to the appropriate NPC at startup."""
     global _quests_assigned
     if _quests_assigned:
         return
 
     try:
-        # Check if Kael already has an active quest
-        cursor = await db.execute(
-            "SELECT 1 FROM dungeon_quest_progress WHERE npc_id=? AND status='active'",
-            ("kael",),
-        )
-        if await cursor.fetchone():
-            _quests_assigned = True
-            return
+        first_quests = {
+            "kael": "talk_to_sage",
+            "lyra": "explore_crypt",
+            "mordecai": "study_runes",
+            "grom": "collect_ore",
+            "zara": "gather_herbs",
+        }
 
-        # Start the first quest for Kael
-        cursor = await db.execute(
-            "SELECT quest_id FROM dungeon_quests WHERE quest_id='talk_to_sage'",
-        )
-        if not await cursor.fetchone():
-            # Quests not seeded yet — don't fail
-            return
+        for npc_id, quest_id in first_quests.items():
+            # Check if NPC already has an active quest
+            cursor = await db.execute(
+                "SELECT 1 FROM dungeon_quest_progress WHERE npc_id=? AND status='active'",
+                (npc_id,),
+            )
+            if await cursor.fetchone():
+                continue
 
-        await db.execute(
-            """INSERT INTO dungeon_quest_progress (npc_id, quest_id, status, progress, started_at)
-               VALUES ('kael', 'talk_to_sage', 'active', '{}', datetime('now'))
-               ON CONFLICT(npc_id, quest_id) DO UPDATE SET status='active'""",
-        )
+            # Check if quest exists in DB
+            cursor = await db.execute(
+                "SELECT quest_id FROM dungeon_quests WHERE quest_id=?",
+                (quest_id,),
+            )
+            if not await cursor.fetchone():
+                continue
+
+            await db.execute(
+                """INSERT INTO dungeon_quest_progress (npc_id, quest_id, status, progress, started_at)
+                   VALUES (?, ?, 'active', '{}', datetime('now'))
+                   ON CONFLICT(npc_id, quest_id) DO UPDATE SET status='active'""",
+                (npc_id, quest_id),
+            )
+            print(f"[QuestManager] Assigned {quest_id} to {npc_id}")
+
         await db.commit()
         _quests_assigned = True
-        print("[QuestManager] Assigned talk_to_sage to Kael")
     except Exception as e:
         print(f"[QuestManager] auto_assign error: {e}")
 
@@ -134,7 +332,7 @@ async def inject_quest_context(db, agent_name: str, context: str) -> tuple[str, 
     """Inject quest info into LLM context.
     Returns (updated_context, active_quest_info_or_None).
     """
-    if agent_name not in ("Kael", "Lyra", "Mordecai"):
+    if agent_name not in ("Kael", "Lyra", "Mordecai", "Grom", "Zara", "Finn", "Guard"):
         return context, None
 
     npc_id = agent_name.lower()
@@ -192,6 +390,9 @@ async def inject_quest_context(db, agent_name: str, context: str) -> tuple[str, 
                         "Lyra": "(3*32, 17*32) — near the chest",
                         "Grom": "(5*32, 10*32) — near the anvil",
                         "Kael": "(10*32, 16*32) — center area",
+                        "Zara": "(15*32, 3*32) — near the cauldron",
+                        "Finn": "(5*32, 4*32) — near the counter",
+                        "Guard": "(19.5*32, 9*32) — near the door",
                     }.get(assignment["target_npc"], "somewhere in the dungeon")
                     context += f"\n📍 {assignment['target_npc']} is at {target_pos}. Go there and talk to them.\n"
 
@@ -220,7 +421,7 @@ async def override_decision_for_quest(
 ) -> tuple[dict, bool]:
     """If NPC has an active quest step and their decision doesn't progress it,
     override the decision. Returns (decision, was_overridden)."""
-    if agent_name not in ("Kael",):
+    if agent_name not in ("Kael", "Lyra", "Mordecai", "Grom", "Zara"):
         return decision, False
 
     npc_id = agent_name.lower()
@@ -300,7 +501,7 @@ async def check_quest_progress(
     """After an LLM decision, check if the NPC progressed their quest.
     Returns a quest update dict or None.
     """
-    if agent_name not in ("Kael", "Lyra", "Mordecai"):
+    if agent_name not in ("Kael", "Lyra", "Mordecai", "Grom", "Zara", "Finn", "Guard"):
         return None
 
     npc_id = agent_name.lower()
@@ -411,13 +612,20 @@ async def check_quest_progress(
 
 def _get_next_quest(current_quest_id: str) -> str | None:
     """Return the next quest in the chain, or None."""
-    chain = ["talk_to_sage", "map_dungeon", "forge_key", "find_crystal"]
-    try:
-        idx = chain.index(current_quest_id)
-        if idx + 1 < len(chain):
-            return chain[idx + 1]
-    except ValueError:
-        pass
+    chains = [
+        ["talk_to_sage", "map_dungeon", "forge_key", "find_crystal"],  # Kael
+        ["explore_crypt", "map_catacombs", "scout_treasury"],          # Lyra
+        ["study_runes", "decipher_scroll", "unlock_vault"],            # Mordecai
+        ["collect_ore", "forge_weapons", "arm_guard"],                 # Grom
+        ["gather_herbs", "brew_potion", "heal_npcs"],                  # Zara
+    ]
+    for chain in chains:
+        try:
+            idx = chain.index(current_quest_id)
+            if idx + 1 < len(chain):
+                return chain[idx + 1]
+        except ValueError:
+            continue
     return None
 
 

@@ -94,6 +94,9 @@ export class LLMNPCSprite extends Phaser.Physics.Arcade.Sprite {
   public nearbyNPCs: { name: string; role: string; x: number; y: number }[] = [];
 
   // Animation
+  private walkAnimTime: number = 0;
+  private readonly WALK_BOUNCE_AMP = 1.5;  // Y-offset pixels
+  private readonly WALK_SCALE_WOBBLE = 0.04;  // scale oscillation
   // Callbacks
   public onMemoryUpdated: ((memories: MemoryEntry[]) => void) | null = null;
 
@@ -630,13 +633,13 @@ export class LLMNPCSprite extends Phaser.Physics.Arcade.Sprite {
 
   // ── Update ──
 
-  update(_delta: number): void {
+  update(delta: number): void {
     this.tree.tick();
 
-    // Position labels
-    this.label.setPosition(this.x, this.y - 22);
-    this.speechBubble.setPosition(this.x, this.y - 38);
-    this.memoryBubble.setPosition(this.x, this.y - 52);
+    // Position labels (with walk animation offset)
+    this.label.setPosition(this.x, this.y - 22 + this.offsetY);
+    this.speechBubble.setPosition(this.x, this.y - 38 + this.offsetY);
+    this.memoryBubble.setPosition(this.x, this.y - 52 + this.offsetY);
     this.setDepth(this.y);
     this.label.setDepth(this.y + 1);
     this.speechBubble.setDepth(this.y + 1);
@@ -645,8 +648,30 @@ export class LLMNPCSprite extends Phaser.Physics.Arcade.Sprite {
     // Health bar
     this.drawHealthBar();
 
-    // Walk animation placeholder
+    // ── Walk animation (2-frame wobble) ──
+    const vel = (this.body as Phaser.Physics.Arcade.Body).velocity;
+    const moving = Math.abs(vel.x) > 5 || Math.abs(vel.y) > 5;
+
+    if (moving) {
+      this.walkAnimTime += delta * 0.01;
+      // Y-bounce: oscillate -1..+1 pixels
+      const bounce = Math.sin(this.walkAnimTime) * this.WALK_BOUNCE_AMP;
+      // Scale wobble: slight squash/stretch
+      const scaleWobble = Math.abs(Math.sin(this.walkAnimTime * 2)) * this.WALK_SCALE_WOBBLE;
+      // Flip sprite based on direction
+      this.setFlipX(vel.x < 0);
+      // Apply offset directly to y (not via setY which breaks physics)
+      this.offsetY = bounce;
+      this.setScale(1.3 + scaleWobble, 1.3 - scaleWobble * 0.5);
+    } else {
+      this.walkAnimTime = 0;
+      this.offsetY = 0;
+      this.setScale(1.3);
+    }
   }
+
+  // Walk animation Y-offset (applied in label positioning, not physics body)
+  private offsetY: number = 0;
 
   private drawHealthBar(): void {
     this.healthBar.clear();

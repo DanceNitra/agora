@@ -610,5 +610,125 @@ export class BootScene extends Phaser.Scene {
     makeLLMNPC('npc_lyra', 0x228844, 0x116633, 0x553311);
     makeLLMNPC('npc_mordecai', 0x7733aa, 0x552288, 0x442244);
     makeLLMNPC('npc_adventurer', 0x666677, 0x444455, 0x553322);
+
+    // ═══════════════════════════════════════════
+    // Phase A — New Room Decorations
+    // ═══════════════════════════════════════════
+
+    // Bookshelf (library)
+    makeTex('bookshelf', 24, 32, (g) => {
+      // Frame
+      g.fillStyle(0x5a3a1a, 1);
+      g.fillRect(0, 0, 24, 32);
+      // Shelves
+      g.fillStyle(0x7a5a3a, 1);
+      g.fillRect(2, 2, 20, 6);
+      g.fillRect(2, 12, 20, 6);
+      g.fillRect(2, 22, 20, 6);
+      // Books
+      const bookColors = [0xcc4444, 0x44aa44, 0x4444cc, 0xcccc44, 0xcc44cc, 0x44cccc];
+      for (let shelf = 0; shelf < 3; shelf++) {
+        const sy = 2 + shelf * 10;
+        let bx = 3;
+        for (let i = 0; i < 4; i++) {
+          const bw = 2 + Math.floor(Math.random() * 3);
+          const bh = 5 + Math.floor(Math.random() * 2);
+          g.fillStyle(bookColors[(shelf + i) % bookColors.length], 1);
+          g.fillRect(bx, sy + (6 - bh), bw, bh);
+          bx += bw + 1;
+        }
+      }
+      // Top highlight
+      g.lineStyle(1, 0x8a6a4a, 0.5);
+      g.lineBetween(0, 0, 24, 0);
+    });
+
+    // Table (library reading area)
+    makeTex('table', 32, 20, (g) => {
+      // Top
+      g.fillStyle(0x6b4a2a, 1);
+      g.fillRect(0, 0, 32, 4);
+      // Legs
+      g.fillStyle(0x5a3a1a, 1);
+      g.fillRect(2, 4, 3, 16);
+      g.fillRect(27, 4, 3, 16);
+      // Top highlight
+      g.lineStyle(1, 0x8a6a4a, 0.4);
+      g.lineBetween(0, 0, 32, 0);
+      // Scroll on table
+      g.fillStyle(0xddcc88, 1);
+      g.fillEllipse(16, 3, 14, 6);
+    });
+
+    // Treasure pile (glowing coins)
+    makeTex('treasure', 20, 12, (g) => {
+      // Base pile
+      g.fillStyle(0x886622, 1);
+      g.fillCircle(10, 8, 8);
+      // Coins
+      for (let i = 0; i < 8; i++) {
+        const cx = 4 + Math.random() * 12;
+        const cy = 3 + Math.random() * 6;
+        g.fillStyle(i % 2 === 0 ? 0xffcc44 : 0xccaa33, 1);
+        g.fillCircle(cx, cy, 2.5);
+      }
+      // Glow
+      g.fillStyle(0xffdd66, 0.15);
+      g.fillCircle(10, 7, 10);
+    });
+
+    // Tomb (crypt)
+    makeTex('tomb', 24, 20, (g) => {
+      // Base
+      g.fillStyle(0x444466, 1);
+      g.fillRect(2, 8, 20, 12);
+      // Lid
+      g.fillStyle(0x555577, 1);
+      g.fillRect(0, 4, 24, 6);
+      // Lid highlight
+      g.lineStyle(1, 0x7777aa, 0.4);
+      g.lineBetween(1, 4, 23, 4);
+      // Engraving
+      g.lineStyle(1, 0x333355, 0.6);
+      g.lineBetween(4, 12, 20, 12);
+      g.lineBetween(4, 16, 20, 16);
+      // Skull symbol
+      g.fillStyle(0x666688, 1);
+      g.fillCircle(12, 14, 3);
+      g.fillStyle(0x444466, 1);
+      g.fillCircle(11, 13, 1);
+      g.fillCircle(13, 13, 1);
+      // Cracks
+      g.lineStyle(1, 0x333355, 0.3);
+      g.lineBetween(6, 4, 10, 8);
+    });
+
+    // ═══════════════════════════════════════════
+    // Phase A — Roaming Vermin
+    // ═══════════════════════════════════════════
+
+    // Vermin (rat/slime/spider)
+    makeTex('vermin', 16, 12, (g) => {
+      // Body
+      g.fillStyle(0x664422, 1);
+      g.fillEllipse(8, 7, 12, 8);
+      // Head
+      g.fillStyle(0x774433, 1);
+      g.fillCircle(12, 5, 4);
+      // Eyes
+      g.fillStyle(0xffff44, 1);
+      g.fillCircle(13, 4, 1.5);
+      g.fillStyle(0x000000, 1);
+      g.fillCircle(13.5, 4, 0.8);
+      // Tail
+      g.lineStyle(1, 0x553311, 1);
+      g.lineBetween(2, 7, 0, 5);
+      g.lineBetween(0, 5, -1, 7);
+      // Legs
+      g.lineStyle(1, 0x553311, 0.6);
+      g.lineBetween(5, 10, 3, 12);
+      g.lineBetween(8, 10, 6, 12);
+      g.lineBetween(11, 10, 9, 12);
+    });
   }
 }
