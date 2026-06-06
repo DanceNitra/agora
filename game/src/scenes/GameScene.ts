@@ -4,6 +4,7 @@ import { BTNPCSprite } from '../npc/BTNPCSprite';
 import { LLMNPCSprite } from '../npc/LLMNPCSprite';
 import { TILE, MAP_W, MAP_H, DUNGEON_MAP } from '../config/map';
 import { GodConsole } from '../GodConsole';
+import { MinimapOverlay } from '../MinimapOverlay';
 
 interface Updatable { update(delta?: number): void; }
 
@@ -15,15 +16,19 @@ export class GameScene extends Phaser.Scene {
   private npcSprites: Phaser.Physics.Arcade.Sprite[] = [];
   private cursors!: Phaser.Types.Input.Keyboard.CursorKeys;
   private wasd!: Record<string, Phaser.Input.Keyboard.Key>;
-  private minimap!: Phaser.GameObjects.Graphics;
   private playerDust!: Phaser.GameObjects.Particles.ParticleEmitter;
   private playerWalkTimer: number = 0;
+  private playerLight!: Phaser.GameObjects.Light;
+  private minimapOverlay!: MinimapOverlay;
 
   constructor() {
     super({ key: 'GameScene' });
   }
 
   create(): void {
+    // --- LIGHTING (Q4.4) ---
+    this.lights.enable().setAmbientColor(0x444466);
+
     // --- TILEMAP ---
     this.walls = this.physics.add.staticGroup();
     this.doors = this.physics.add.staticGroup();
@@ -35,13 +40,15 @@ export class GameScene extends Phaser.Scene {
         const py = y * TILE + TILE / 2;
 
         if (tile === 0) {
-          this.add.image(px, py, 'floor');
+          this.add.image(px, py, 'floor').setDepth(tile).setPipeline('Light2D');
         } else if (tile === 1) {
           const w = this.walls.create(px, py, 'wall') as Phaser.Physics.Arcade.Sprite;
           w.refreshBody();
+          w.setPipeline('Light2D');
         } else if (tile === 2) {
           const d = this.doors.create(px, py, 'door') as Phaser.Physics.Arcade.Sprite;
           d.refreshBody();
+          d.setPipeline('Light2D');
         }
       }
     }
@@ -53,7 +60,7 @@ export class GameScene extends Phaser.Scene {
       { x: 3.5 * TILE, y: 3.5 * TILE, texture: 'counter', name: 'Counter' },
     ];
     for (const s of stations) {
-      this.add.image(s.x, s.y, s.texture).setDepth(s.y);
+      this.add.image(s.x, s.y, s.texture).setDepth(s.y).setPipeline('Light2D');
     }
 
     // --- DECORATIVE ELEMENTS (Q4.1) ---
@@ -65,7 +72,7 @@ export class GameScene extends Phaser.Scene {
       { x: 22.5 * TILE, y: 18.5 * TILE },
     ];
     for (const t of torches) {
-      this.add.image(t.x, t.y, 'torch').setDepth(t.y);
+      this.add.image(t.x, t.y, 'torch').setDepth(t.y).setPipeline('Light2D');
     }
 
     // Pillars
@@ -76,14 +83,25 @@ export class GameScene extends Phaser.Scene {
       { x: 16 * TILE, y: 13 * TILE },
     ];
     for (const p of pillars) {
-      this.add.image(p.x, p.y, 'pillar').setDepth(p.y);
+      this.add.image(p.x, p.y, 'pillar').setDepth(p.y).setPipeline('Light2D');
     }
 
     // Rug in center
-    this.add.image(12 * TILE, 10 * TILE, 'rug').setDepth(10 * TILE + 0.5);
+    this.add.image(12 * TILE, 10 * TILE, 'rug').setDepth(10 * TILE + 0.5).setPipeline('Light2D');
 
     // Chest
-    this.add.image(1.5 * TILE, 17 * TILE, 'chest').setDepth(17 * TILE);
+    this.add.image(1.5 * TILE, 17 * TILE, 'chest').setDepth(17 * TILE).setPipeline('Light2D');
+
+    // --- LIGHT SOURCES ---
+    // Torch lights
+    for (const t of torches) {
+      this.lights.addLight(t.x, t.y, 200, 0xff6622, 1.5);
+    }
+
+    // Workstation lights
+    this.lights.addLight(3.5 * TILE, 14 * TILE, 140, 0xff8844, 1.0); // Anvil
+    this.lights.addLight(20 * TILE, 3 * TILE, 140, 0x88ff44, 0.8);   // Cauldron
+    this.lights.addLight(3.5 * TILE, 3.5 * TILE, 140, 0xffcc44, 0.8); // Counter
 
     // --- NPCS (Q1.4) ---
     const npcDefs: { x: number; y: number; name: string; role: NPCRole; stationIdx: number | null }[] = [
@@ -163,9 +181,20 @@ export class GameScene extends Phaser.Scene {
       this.physics.add.collider(n, this.doors);
     }
 
+    // Set Light2D on all NPCs
+    for (const npc of this.npcSprites) {
+      npc.setPipeline('Light2D');
+    }
+
     // --- PLAYER ---
     this.player = this.physics.add.sprite(12 * TILE, 10 * TILE, 'player');
     this.player.setCollideWorldBounds(true);
+    this.player.setPipeline('Light2D');
+
+    // Player light (follows player)
+    this.playerLight = this.lights.addLight(
+      this.player.x, this.player.y, 200, 0x8888ff, 1.8
+    );
 
     // Player dust particles
     this.playerDust = this.add.particles(0, 0, 'dust', {
@@ -193,11 +222,8 @@ export class GameScene extends Phaser.Scene {
     cam.startFollow(this.player, true, 0.09, 0.09);
     cam.setZoom(1.5);
 
-    // --- MINIMAP (Q4.2) ---
-    this.minimap = this.add.graphics();
-    this.minimap.setScrollFactor(0);
-    this.minimap.setDepth(999);
-    this.minimap.setAlpha(0.7);
+    // --- MINIMAP (Q4.2) DOM overlay ---
+    this.minimapOverlay = new MinimapOverlay();
 
     // --- INPUT ---
     if (this.input.keyboard) {
@@ -232,6 +258,9 @@ export class GameScene extends Phaser.Scene {
       }
       this.player.setVelocity(vx, vy);
 
+      // Update player light position
+      this.playerLight.setPosition(this.player.x, this.player.y);
+
       // Player walk animation
       const moving = vx !== 0 || vy !== 0;
       if (moving) {
@@ -257,64 +286,9 @@ export class GameScene extends Phaser.Scene {
       npc.update(delta);
     }
 
-    // --- MINIMAP (Q4.2) ---
-    this.drawMiniMap();
-  }
-
-  private drawMiniMap(): void {
-    this.minimap.clear();
-
-    const mmW = 120;
-    const mmH = 100;
-    const mmX = this.cameras.main.width - mmW - 8;
-    const mmY = this.cameras.main.height - mmH - 8;
-    const scaleX = mmW / (MAP_W * TILE);
-    const scaleY = mmH / (MAP_H * TILE);
-
-    // Background
-    this.minimap.fillStyle(0x000000, 0.6);
-    this.minimap.fillRect(mmX, mmY, mmW, mmH);
-    this.minimap.lineStyle(1, 0x444466, 0.8);
-    this.minimap.strokeRect(mmX, mmY, mmW, mmH);
-
-    // Walls
-    this.minimap.fillStyle(0x444455, 0.8);
-    for (let y = 0; y < MAP_H; y++) {
-      for (let x = 0; x < MAP_W; x++) {
-        if (DUNGEON_MAP[y]?.[x] === 1) {
-          this.minimap.fillRect(
-            mmX + x * TILE * scaleX,
-            mmY + y * TILE * scaleY,
-            Math.max(1, TILE * scaleX),
-            Math.max(1, TILE * scaleY),
-          );
-        }
-      }
-    }
-
-    // NPCs (green dots)
-    for (const npc of this.npcSprites) {
-      this.minimap.fillStyle(0x44ff88, 1);
-      this.minimap.fillCircle(
-        mmX + npc.x * scaleX,
-        mmY + npc.y * scaleY,
-        2,
-      );
-    }
-
-    // Player (blue dot, larger)
-    this.minimap.fillStyle(0x4488ff, 1);
-    this.minimap.fillCircle(
-      mmX + this.player.x * scaleX,
-      mmY + this.player.y * scaleY,
-      3,
-    );
-    this.minimap.lineStyle(1, 0x88bbff, 0.8);
-    this.minimap.strokeCircle(
-      mmX + this.player.x * scaleX,
-      mmY + this.player.y * scaleY,
-      3,
-    );
+    // --- MINIMAP (Q4.2) DOM overlay ---
+    const npcPositions = this.npcSprites.map(npc => ({ x: npc.x, y: npc.y }));
+    this.minimapOverlay.update(this.player.x, this.player.y, npcPositions);
   }
 
   /** Spawn a new LLM NPC dynamically (God Console !spawn). */
