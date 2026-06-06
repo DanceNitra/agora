@@ -13,7 +13,54 @@ from pydantic import BaseModel
 
 from agora.execution.llm_client import call_llm
 
+import uuid
+
+# ── Dungeon Agent IDs (stable UUIDs for Trust Engine) ──
+
+DUNGEON_AGENT_IDS = {
+    "Kael": "00000000-0000-0000-0000-000000000001",
+    "Lyra": "00000000-0000-0000-0000-000000000002",
+    "Mordecai": "00000000-0000-0000-0000-000000000003",
+}
+
+DUNGEON_AGENT_ROLES = {
+    "Kael": "adventurer",
+    "Lyra": "scout",
+    "Mordecai": "sage",
+}
+
+_DUNGEON_SEEDED = False
+
+
+async def _ensure_dungeon_agents_seeded(request: Request):
+    """Lazily seed dungeon agents into the database on first use."""
+    global _DUNGEON_SEEDED
+    if _DUNGEON_SEEDED:
+        return
+    db = request.app.state.db
+    for name, aid in DUNGEON_AGENT_IDS.items():
+        cursor = await db.execute("SELECT 1 FROM agent_identities WHERE agent_id=?", (aid,))
+        exists = await cursor.fetchone()
+        if not exists:
+            role = DUNGEON_AGENT_ROLES.get(name, "explorer")
+            genome = json.dumps({
+                "role": role,
+                "tools": ["move", "talk", "interact"],
+                "dungeon_agent": True,
+                "personality_traits": {"curiosity": 0.9, "cooperativeness": 0.8},
+            })
+            await db.execute(
+                "INSERT INTO agent_identities (agent_id, public_key, generation, genome, trust_score, energy_balance, role, status) VALUES (?, ?, 0, ?, 0.5, 100, ?, 'active')",
+                (aid, f"dungeon_{name.lower()}", genome, role),
+            )
+    await db.commit()
+    _DUNGEON_SEEDED = True
+
 router = APIRouter(prefix="/api/v1/dungeon", tags=["dungeon"])
+
+# ── Dungeon Config (default: simulated LLM for fast tests) ──
+
+_dungeon_config: dict[str, Any] = {"llm_enabled": False, "llm_tier": "cheap"}
 
 # ── Per-Agent Memory Store ──
 
@@ -62,8 +109,11 @@ def _get_prompt(agent_name: str) -> str:
     return (
         f"{personality}\n\n"
         f"You can see your surroundings and have a set of possible actions.\n\n"
+        f"Your trust with other agents affects how they cooperate with you.\n"
+        f"Higher trust means they will help you more.\n"
+        f"Build trust by talking and cooperating with them.\n\n"
         f"Respond ONLY with a valid JSON object containing:\n"
-        f'{{{{"action":"move|interact|talk|wait|use|explore",'
+        f'{{{{"action":"move|interact|talk|cooperate|wait|use|explore",'
         f'"target_x":<optional number>,"target_y":<optional number>,'
         f'"target_npc":"<optional NPC name>",'
         f'"message":"<what you say or do, 1 sentence>",'
@@ -72,6 +122,7 @@ def _get_prompt(agent_name: str) -> str:
         f'- "move": walk to coordinates (target_x, target_y)\n'
         f'- "interact": use a workstation or object\n'
         f'- "talk": speak to an NPC (target_npc)\n'
+        f'- "cooperate": work together with an NPC (target_npc)\n'
         f'- "wait": stay in place and observe\n'
         f'- "use": use an inventory item\n'
         f'- "explore": move toward unexplored area'
@@ -96,6 +147,9 @@ async def dungeon_agent_action(state: DungeonState, request: Request):
     agent_name = state.agent_name
     memories = _mem(agent_name)
 
+    # Ensure dungeon agents exist in DB for trust tracking
+    await _ensure_dungeon_agents_seeded(request)
+
     # Build context with relevant past memories
     context = _build_context(state)
     relevant = _retrieve_relevant_memories(agent_name, context, limit=5)
@@ -113,9 +167,26 @@ async def dungeon_agent_action(state: DungeonState, request: Request):
         context += f"\n\nMessages you received:\n{inbox_text}"
         msgs.clear()  # consumed
 
+    # Add trust scores for nearby agents
+    try:
+        trust_engine = request.app.state.trust
+        agent_id = DUNGEON_AGENT_IDS.get(agent_name)
+        if agent_id:
+            trust_lines = []
+            for npc in state.nearby_npcs:
+                npc_name = npc.get("name", "")
+                npc_id = DUNGEON_AGENT_IDS.get(npc_name)
+                if npc_id:
+                    trust_val = await trust_engine.get_trust(agent_id, npc_id)
+                    trust_lines.append(f"{npc_name}: {trust_val:.2f}")
+            if trust_lines:
+                context += f"\n\nYour trust with nearby agents:\n" + "\n".join(trust_lines)
+    except Exception:
+        pass  # trust engine not available
+
     # Call LLM
-    cfg = getattr(request.app.state, 'dungeon_config', {})
-    use_llm = cfg.get("llm_enabled", True)
+    cfg = _dungeon_config
+    use_llm = cfg.get("llm_enabled", False)
 
     if use_llm:
         raw = call_llm(
@@ -127,13 +198,20 @@ async def dungeon_agent_action(state: DungeonState, request: Request):
             response_format={"type": "json_object"},
         )
     else:
-        raw = json.dumps({
-            "action": "move",
-            "target_x": state.agent_x + 64,
-            "target_y": state.agent_y,
-            "message": "I'll explore this corridor.",
-            "thought": f"I see an unexplored passage to the east."
-        })
+        # Simulated response for testing — vary per agent personality
+        import random
+        sim_actions = [
+            json.dumps({"action": "move", "target_x": state.agent_x + 64,
+                        "target_y": state.agent_y, "message": "I will explore this area.",
+                        "thought": "I see unexplored territory ahead."}),
+            json.dumps({"action": "talk", "target_npc": "Lyra",
+                        "message": "Lyra, what have you discovered?",
+                        "thought": "I should check in with Lyra on her findings."}),
+            json.dumps({"action": "talk", "target_npc": "Mordecai",
+                        "message": "Mordecai, any news on the artifacts?",
+                        "thought": "The sage may have new insights."}),
+        ]
+        raw = random.choice(sim_actions)
 
     # Parse response
     try:
@@ -158,6 +236,17 @@ async def dungeon_agent_action(state: DungeonState, request: Request):
                 "message": msg,
                 "timestamp": time.time(),
             })
+
+    # Record trust interactions (talk/cooperate → trust bonus)
+    try:
+        trust_engine = request.app.state.trust
+        source_id = DUNGEON_AGENT_IDS.get(agent_name)
+        target_name = decision.get("target_npc", "")
+        target_id = DUNGEON_AGENT_IDS.get(target_name)
+        if source_id and target_id and decision.get("action") in ("talk", "interact", "cooperate"):
+            await trust_engine.record_interaction(source_id, target_id, "cooperate")
+    except Exception:
+        pass  # trust engine not available for this interaction
 
     return decision
 
@@ -200,6 +289,26 @@ async def get_inbox(agent_name: str = "Kael"):
     """Get pending messages for an agent."""
     msgs = list(_inbox(agent_name))  # copy
     return {"agent": agent_name, "messages": msgs}
+
+
+@router.get("/trust")
+async def get_trust(agent_name: str = "Kael", request: Request = None):
+    """Get trust scores between this agent and all other dungeon agents."""
+    agent_id = DUNGEON_AGENT_IDS.get(agent_name)
+    if not agent_id or not request:
+        return {"agent": agent_name, "trust": {}}
+
+    scores = {}
+    trust_engine = request.app.state.trust
+    for other_name, other_id in DUNGEON_AGENT_IDS.items():
+        if other_name == agent_name:
+            continue
+        try:
+            val = await trust_engine.get_trust(agent_id, other_id)
+            scores[other_name] = round(val, 3)
+        except Exception:
+            scores[other_name] = 0.3  # baseline
+    return {"agent": agent_name, "trust": scores}
 
 
 @router.post("/memories/clear")
@@ -354,4 +463,6 @@ def _build_context(state: DungeonState) -> str:
 
 @router.post("/config")
 async def set_config(config: dict):
-    return {"status": "config_updated"}
+    """Set dungeon agent config (LLM tier, enabled flag)."""
+    _dungeon_config.update(config)
+    return {"status": "config_updated", "config": _dungeon_config}
