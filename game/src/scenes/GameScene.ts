@@ -1,6 +1,7 @@
 import Phaser from 'phaser';
 import { NPCSprite, NPCRole } from '../npc/NPCSprite';
 import { BTNPCSprite } from '../npc/BTNPCSprite';
+import { LLMNPCSprite } from '../npc/LLMNPCSprite';
 
 const TILE = 32;
 const MAP_W = 25;
@@ -105,7 +106,23 @@ export class GameScene extends Phaser.Scene {
     this.physics.add.collider(guard, this.walls);
     this.physics.add.collider(guard, this.doors);
 
-    // --- PLAYER ---
+    // --- LLM NPC (Phase 2 — calls Python backend) ---
+    const npcRefs = [guard];
+    const llmNPC = (() => {
+      const n = new LLMNPCSprite(this, 10 * TILE, 16 * TILE, 'Kael', this.player);
+      n.nearbyNPCs = [
+        { name: 'Grom', role: 'blacksmith', x: 5 * TILE, y: 10 * TILE },
+        { name: 'Zara', role: 'alchemist', x: 15 * TILE, y: 3 * TILE },
+        { name: 'Finn', role: 'merchant', x: 5 * TILE, y: 4 * TILE },
+        { name: 'Guard', role: 'guard', x: 19.5 * TILE, y: 9 * TILE },
+      ];
+      return n;
+    })();
+    this.npcs.push(llmNPC);
+    this.npcSprites.push(llmNPC);
+    this.physics.add.collider(llmNPC, this.walls);
+    this.physics.add.collider(llmNPC, this.doors);
+
     // --- PLAYER ---
     this.player = this.physics.add.sprite(12 * TILE, 10 * TILE, 'player');
     this.player.setCollideWorldBounds(true);
