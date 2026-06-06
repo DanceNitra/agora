@@ -123,15 +123,37 @@ export class GodConsole {
     }
   }
 
+  private wasdBlocker: ((e: KeyboardEvent) => void) | null = null;
+
   show(): void {
     GodConsole.visible = true;
     this.overlay.style.display = 'flex';
     this.input.focus();
+
+    // Blur the Phaser canvas so it stops swallowing keyboard events
+    const canvas = this.game.canvas;
+    if (canvas) canvas.blur();
+
+    // Block WASD at the capture phase so Phaser never sees them
+    this.wasdBlocker = (e: KeyboardEvent) => {
+      if (!GodConsole.visible) return;
+      const key = e.key.toLowerCase();
+      if (['w', 'a', 's', 'd', 'e', ' '].includes(key) || e.key === '`' || e.key === '°') {
+        e.stopPropagation();
+      }
+    };
+    window.addEventListener('keydown', this.wasdBlocker, true); // capture phase
   }
 
   hide(): void {
     GodConsole.visible = false;
     this.overlay.style.display = 'none';
+
+    // Remove the blocker
+    if (this.wasdBlocker) {
+      window.removeEventListener('keydown', this.wasdBlocker, true);
+      this.wasdBlocker = null;
+    }
   }
 
   isVisible(): boolean {
