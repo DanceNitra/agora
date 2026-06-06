@@ -135,10 +135,23 @@ export class GodConsole {
     if (canvas) canvas.blur();
 
     // Block WASD at the capture phase so Phaser never sees them
+    // Also handle backtick toggle and escape here since normal handler won't fire
     this.wasdBlocker = (e: KeyboardEvent) => {
       if (!GodConsole.visible) return;
+      // Handle toggle keys directly in capture phase
+      if (e.key === '`' || e.key === '°') {
+        e.stopPropagation();
+        this.hide();
+        return;
+      }
+      if (e.key === 'Escape') {
+        e.stopPropagation();
+        this.hide();
+        return;
+      }
+      // Block typed keys from reaching Phaser
       const key = e.key.toLowerCase();
-      if (['w', 'a', 's', 'd', 'e', ' '].includes(key) || e.key === '`' || e.key === '°') {
+      if (['w', 'a', 's', 'd', 'e', ' '].includes(key)) {
         e.stopPropagation();
       }
     };
