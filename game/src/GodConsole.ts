@@ -21,10 +21,10 @@ interface SpawnResult {
 }
 
 export class GodConsole {
+  public static visible: boolean = false;
   private overlay: HTMLDivElement;
   private output: HTMLDivElement;
   private input: HTMLInputElement;
-  private visible: boolean = false;
   private game: Phaser.Game;
   private logLines: string[] = [];
 
@@ -44,7 +44,7 @@ export class GodConsole {
         e.preventDefault();
         this.toggle();
       }
-      if (e.key === 'Escape' && this.visible) {
+      if (e.key === 'Escape' && GodConsole.visible) {
         this.hide();
       }
     });
@@ -116,7 +116,7 @@ export class GodConsole {
   }
 
   toggle(): void {
-    if (this.visible) {
+    if (GodConsole.visible) {
       this.hide();
     } else {
       this.show();
@@ -124,18 +124,18 @@ export class GodConsole {
   }
 
   show(): void {
-    this.visible = true;
+    GodConsole.visible = true;
     this.overlay.style.display = 'flex';
     this.input.focus();
   }
 
   hide(): void {
-    this.visible = false;
+    GodConsole.visible = false;
     this.overlay.style.display = 'none';
   }
 
   isVisible(): boolean {
-    return this.visible;
+    return GodConsole.visible;
   }
 
   private log(msg: string, color: string = '#00ff88'): void {

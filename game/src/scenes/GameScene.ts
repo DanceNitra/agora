@@ -3,6 +3,7 @@ import { NPCSprite, NPCRole } from '../npc/NPCSprite';
 import { BTNPCSprite } from '../npc/BTNPCSprite';
 import { LLMNPCSprite } from '../npc/LLMNPCSprite';
 import { TILE, MAP_W, MAP_H, DUNGEON_MAP } from '../config/map';
+import { GodConsole } from '../GodConsole';
 
 interface Updatable { update(delta?: number): void; }
 
@@ -154,20 +155,25 @@ export class GameScene extends Phaser.Scene {
     // --- PLAYER MOVEMENT ---
     if (!this.player || !this.cursors) return;
 
-    const speed = 160;
-    let vx = 0;
-    let vy = 0;
+    // Don't move when God Console is open
+    if (!GodConsole.visible) {
+      const speed = 160;
+      let vx = 0;
+      let vy = 0;
 
-    if (this.cursors.left.isDown || this.wasd.A.isDown) vx = -speed;
-    else if (this.cursors.right.isDown || this.wasd.D.isDown) vx = speed;
-    if (this.cursors.up.isDown || this.wasd.W.isDown) vy = -speed;
-    else if (this.cursors.down.isDown || this.wasd.S.isDown) vy = speed;
+      if (this.cursors.left.isDown || this.wasd.A.isDown) vx = -speed;
+      else if (this.cursors.right.isDown || this.wasd.D.isDown) vx = speed;
+      if (this.cursors.up.isDown || this.wasd.W.isDown) vy = -speed;
+      else if (this.cursors.down.isDown || this.wasd.S.isDown) vy = speed;
 
-    if (vx !== 0 && vy !== 0) {
-      vx *= 0.707;
-      vy *= 0.707;
+      if (vx !== 0 && vy !== 0) {
+        vx *= 0.707;
+        vy *= 0.707;
+      }
+      this.player.setVelocity(vx, vy);
+    } else {
+      this.player.setVelocity(0, 0);
     }
-    this.player.setVelocity(vx, vy);
 
     // --- NPC UPDATES (Q1.2 + Q1.5) ---
     for (const npc of this.npcs) {
