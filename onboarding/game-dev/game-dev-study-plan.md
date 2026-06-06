@@ -9,7 +9,7 @@
 | Phase | Status | Tasks | Completion |
 |:------|:------:|:-----:|:----------:|
 | 🏗️ **Phase 0** — Foundations | ✅ | 6 | **6/6** |
-| 🤖 **Phase 1** — Fake Agents | ⬜ | 5 | 0/5 |
+| 🤖 **Phase 1** — Fake Agents | ✅ | 5 | **5/5** |
 | 🧠 **Phase 2** — One Real Agent | ⬜ | 5 | 0/5 |
 | 👥 **Phase 3** — Multi-Agent + Orchestrator | ⬜ | 6 | 0/6 |
 | ✨ **Phase 4** — Immersive Polish | ⬜ | 5 | 0/5 |
@@ -51,11 +51,11 @@
 
 ### Questy
 
-- [ ] **Q1.1** — NPC class: idle, wander, work states
-- [ ] **Q1.2** — Finite State Machine (FSM) for NPC behavior
-- [ ] **Q1.3** — Behavior Tree: sequence/selector/condition nodes
-- [ ] **Q1.4** — Multiple NPCs with different roles visible on map
-- [ ] **Q1.5** — Basic interaction: NPC ↔ workbench, NPC → player messages
+- [x] **Q1.1** — NPC class: idle, wander, work states
+- [x] **Q1.2** — Finite State Machine (FSM) for NPC behavior
+- [x] **Q1.3** — Behavior Tree: sequence/selector/condition nodes
+- [x] **Q1.4** — Multiple NPCs with different roles visible on map
+- [x] **Q1.5** — Basic interaction: NPC ↔ workbench, NPC → player messages
 
 ### 📚 Literature
 

@@ -1,5 +1,6 @@
 import Phaser from 'phaser';
 import { NPCSprite, NPCRole } from '../npc/NPCSprite';
+import { BTNPCSprite } from '../npc/BTNPCSprite';
 
 const TILE = 32;
 const MAP_W = 25;
@@ -27,11 +28,14 @@ const DUNGEON_MAP: number[][] = [
   [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1],
 ];
 
+interface Updatable { update(delta?: number): void; }
+
 export class GameScene extends Phaser.Scene {
   private player!: Phaser.Physics.Arcade.Sprite;
   private walls!: Phaser.Physics.Arcade.StaticGroup;
   private doors!: Phaser.Physics.Arcade.StaticGroup;
-  private npcs: NPCSprite[] = [];
+  private npcs: Updatable[] = [];
+  private npcSprites: Phaser.Physics.Arcade.Sprite[] = [];
   private cursors!: Phaser.Types.Input.Keyboard.CursorKeys;
   private wasd!: Record<string, Phaser.Input.Keyboard.Key>;
 
@@ -88,12 +92,20 @@ export class GameScene extends Phaser.Scene {
 
       const npc = new NPCSprite(this, def.x, def.y, def.name, def.role, ws);
       this.npcs.push(npc);
+      this.npcSprites.push(npc);
 
-      // NPC collides with walls and doors
       this.physics.add.collider(npc, this.walls);
       this.physics.add.collider(npc, this.doors);
     }
 
+    // --- BT GUARD NPC (Q1.3) ---
+    const guard = new BTNPCSprite(this, 19.5 * TILE, 9 * TILE, 'Guard', this.player);
+    this.npcs.push(guard);
+    this.npcSprites.push(guard);
+    this.physics.add.collider(guard, this.walls);
+    this.physics.add.collider(guard, this.doors);
+
+    // --- PLAYER ---
     // --- PLAYER ---
     this.player = this.physics.add.sprite(12 * TILE, 10 * TILE, 'player');
     this.player.setCollideWorldBounds(true);
@@ -101,7 +113,7 @@ export class GameScene extends Phaser.Scene {
     // Player collides with walls, doors, and NPCs
     this.physics.add.collider(this.player, this.walls);
     this.physics.add.collider(this.player, this.doors);
-    for (const npc of this.npcs) {
+    for (const npc of this.npcSprites) {
       this.physics.add.collider(this.player, npc);
     }
 
