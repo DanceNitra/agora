@@ -10,4 +10,5 @@ httpx
 websockets
 cryptography
 numpy
-aiosqlite
+openai
+fakeredis

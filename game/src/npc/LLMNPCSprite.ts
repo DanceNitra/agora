@@ -496,7 +496,7 @@ export class LLMNPCSprite extends Phaser.Physics.Arcade.Sprite {
         const questData = (decision as any)._quest;
         const questMsg = questData.message || '';
         const nextQ = questData.next_quest;
-        const notification = `✨ Quest Complete! ${questMsg}` + (nextQ ? ` | 📜 New: ${nextQ.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase())}` : '');
+        const notification = `✨ Quest Complete! ${questMsg}` + (nextQ ? ` | 📜 New: ${nextQ.replace(/_/g, ' ').replace(/\b\w/g, (c: string) => c.toUpperCase())}` : '');
         this.showSpeech(notification);
         this.addMemory(notification, 10, ['quest', 'completed']);
       }
