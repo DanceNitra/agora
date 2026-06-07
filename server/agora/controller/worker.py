@@ -1,108 +1,197 @@
-"""Worker — spracúva room cluster tick v separátnom procese (Phase IIIb/IIIc).
+"""Worker — spracúva room cluster tick v separátnom procese (Phase IIIb).
 
-Worker dostane:
-  - room_name: ktorú room tickovať
-  - npc_ids: ktoré NPC patria do tej room
-  - Úloha: zavolať AgentOS + PhysicalWorld pre daný cluster
+Architektúra:
+  1. CONTROLLER (main process): gather → serializable room data
+  2. WORKER (subprocess): compute → serializable state changes
+  3. CONTROLLER (main process): apply → DB + Redis writes
 
-Aktuálne: interface pre budúce multiprocessing nasadenie.
-Worker bude serializovaný cez pickle a poslaný ProcessPoolExecutoru.
+Worker NIKDY nepíše do DB — len vracia zmeny stavu ako dict.
+Hlavný proces sekvenčne commitne výsledky (nemáme SQLite write contention).
 """
 
 import json
+import math
+import random
 import time
 from typing import Any, Optional
 
 
 class WorkerTask:
-    """Serializable task pre worker proces.
+    """Serializable task pre worker proces — čisto dáta, žiadne objekty."""
 
-    Obsahuje všetky dáta potrebné pre room tick.
-    """
-
-    def __init__(self, room: str, npc_ids: list[str], tick_count: int,
-                 npc_names: list[str] = None):
+    def __init__(self, room: str, npcs: list[dict], tick_count: int):
+        """
+        npcs: list of dicts so všetkými dátami potrebnými pre tick
+              [{npc_id, npc_name, health, stamina, hunger, fatigue,
+                state_of_mind, current_goal}]
+        """
         self.room = room
-        self.npc_ids = npc_ids
-        self.npc_names = npc_names or []
+        self.npcs = npcs
         self.tick_count = tick_count
 
     def to_dict(self) -> dict:
         return {
             "room": self.room,
-            "npc_ids": self.npc_ids,
-            "npc_names": self.npc_names,
+            "npcs": self.npcs,
             "tick_count": self.tick_count,
         }
 
     @classmethod
-    def from_dict(cls, data: dict) -> 'WorkerTask':
+    def from_dict(cls, data: dict) -> "WorkerTask":
         return cls(
             room=data["room"],
-            npc_ids=data["npc_ids"],
-            tick_count=data["tick_count"],
-            npc_names=data.get("npc_names", []),
+            npcs=data.get("npcs", []),
+            tick_count=data.get("tick_count", 0),
         )
 
 
 class WorkerResult:
-    """Result from a worker process after completing a room tick."""
+    """Serializable výsledok z worker procesu."""
 
-    def __init__(self, room: str, success: bool, npcs_ticked: int = 0,
-                 duration_ms: float = 0.0, error: str = "",
-                 events: list[dict] = None):
+    def __init__(
+        self,
+        room: str,
+        success: bool,
+        npc_updates: Optional[list[dict]] = None,
+        events: Optional[list[dict]] = None,
+        duration_ms: float = 0.0,
+        error: str = "",
+    ):
         self.room = room
         self.success = success
-        self.npcs_ticked = npcs_ticked
+        self.npc_updates = npc_updates or []
+        self.events = events or []
         self.duration_ms = duration_ms
         self.error = error
-        self.events = events or []
 
     def to_dict(self) -> dict:
         return {
             "room": self.room,
             "success": self.success,
-            "npcs_ticked": self.npcs_ticked,
+            "npc_updates": self.npc_updates,
+            "events": self.events,
             "duration_ms": self.duration_ms,
             "error": self.error,
-            "events": self.events,
         }
 
     @classmethod
-    def from_dict(cls, data: dict) -> 'WorkerResult':
+    def from_dict(cls, data: dict) -> "WorkerResult":
         return cls(
             room=data["room"],
             success=data["success"],
-            npcs_ticked=data.get("npcs_ticked", 0),
+            npc_updates=data.get("npc_updates", []),
+            events=data.get("events", []),
             duration_ms=data.get("duration_ms", 0.0),
             error=data.get("error", ""),
-            events=data.get("events", []),
         )
 
 
-def run_worker_task(task_dict: dict) -> dict:
-    """Execute a worker task in a subprocess.
+# ══════════════════════════════════════════════════════════════
+# COMPUTATION LOGIC (pure functions, run in subprocess)
+# ══════════════════════════════════════════════════════════════
 
-    Táto funkcia je entry point pre ProcessPoolExecutor.
-    Serializuje task → vykoná → vráti výsledok.
 
-    NOTE: V aktuálnej Phase IIIa beží všetko in-process cez Controller.
-    Tento modul je pripravený pre Phase IIIb multiprocessing.
+def _compute_body_update(npc: dict) -> dict:
+    """Čisto matematický výpočet body zmien — žiadne I/O."""
+    stamina = max(0.0, npc.get("stamina", 100) - random.uniform(0.5, 2.0))
+    hunger = min(100.0, npc.get("hunger", 0) + random.uniform(0.2, 0.8))
+    fatigue = min(100.0, npc.get("fatigue", 0) + random.uniform(0.3, 1.0))
+    health = npc.get("health", 100)
+
+    # Health penalties
+    if hunger > 80:
+        health = max(0, health - 0.5)
+    if fatigue > 80:
+        health = max(0, health - 0.3)
+    if stamina < 10:
+        health = max(0, health - 0.2)
+
+    return {
+        "stamina": round(stamina, 1),
+        "hunger": round(hunger, 1),
+        "fatigue": round(fatigue, 1),
+        "health": round(health, 1),
+    }
+
+
+def _compute_state_of_mind(npc: dict) -> str:
+    """Čisto logické vyhodnotenie state_of_mind — žiadne I/O."""
+    health = npc.get("health", 100)
+    stamina = npc.get("stamina", 100)
+    fatigue = npc.get("fatigue", 0)
+
+    if health < 20:
+        return "panicked"
+    elif fatigue > 70 or stamina < 20:
+        return "resting"
+    elif health < 50:
+        return "confused"
+    else:
+        plan_stack = json.loads(npc.get("plan_stack", "[]"))
+        current_goal = npc.get("current_goal")
+        if not plan_stack and current_goal:
+            return "planning"
+        else:
+            return "focused"
+
+
+def process_room_worker(task_dict: dict) -> dict:
+    """Entry point pre ProcessPoolExecutor — čisto computation.
+
+    Dostane serializované NPC dáta, vráti zmeny stavu.
+    ŽIADNE DB/Redis/I/O volania.
     """
     task = WorkerTask.from_dict(task_dict)
     start = time.monotonic()
 
     try:
-        # V Phase IIIb: worker by mal vlastné DB spojenie + Redis
-        # a volal by AgentOS.cluster_tick() priamo
-        print(f"[Worker:{task.room}] Task received: {len(task.npc_ids)} NPCs, tick {task.tick_count}")
+        npc_updates = []
+        events = []
 
+        for npc in task.npcs:
+            npc_id = npc.get("npc_id", "")
+            npc_name = npc.get("npc_name", "")
+
+            # 1. Compute body updates
+            body_update = _compute_body_update(npc)
+
+            # 2. Compute state of mind
+            merged = {**npc, **body_update}
+            new_state = _compute_state_of_mind(merged)
+
+            # 3. Build state change
+            update = {
+                "npc_id": npc_id,
+                "npc_name": npc_name,
+                "stamina": body_update["stamina"],
+                "hunger": body_update["hunger"],
+                "fatigue": body_update["fatigue"],
+                "health": body_update["health"],
+                "state_of_mind": new_state,
+            }
+            npc_updates.append(update)
+
+            # 4. Event for state change
+            if new_state != npc.get("state_of_mind"):
+                events.append({
+                    "type": "npc_state_change",
+                    "payload": {
+                        "npc_id": npc_id,
+                        "npc_name": npc_name,
+                        "from": npc.get("state_of_mind", "unknown"),
+                        "to": new_state,
+                    },
+                })
+
+        duration = round((time.monotonic() - start) * 1000, 1)
         result = WorkerResult(
             room=task.room,
             success=True,
-            npcs_ticked=len(task.npc_ids),
-            duration_ms=round((time.monotonic() - start) * 1000, 1),
+            npc_updates=npc_updates,
+            events=events,
+            duration_ms=duration,
         )
+
     except Exception as e:
         result = WorkerResult(
             room=task.room,

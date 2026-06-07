@@ -26,7 +26,6 @@ from agora.harness.context_manager import ContextManager
 from agora.harness.evaluation import EpochEvaluator
 from agora.scheduler.room_cluster import RoomClusterScheduler
 from agora.controller.controller import Controller
-from agora.controller.worker import WorkerTask, WorkerResult, run_worker_task
 from agora.execution.task_executor import TaskExecutor
 from agora.lifecycle.agent_lifecycle import AgentLifecycle
 from agora.lifecycle.epoch_engine import EpochEngine
@@ -117,6 +116,7 @@ async def init_db(app: FastAPI):
     app.state.physical_world = PhysicalWorld(db, llm_enabled=settings.llm_enabled)
     app.state.scheduler = RoomClusterScheduler(db)
     app.state.controller = Controller(app, db, app.state.state_store)
+    app.state.controller._enable_multiprocessing(max_workers=4)
     app.state.agent_lifecycle = AgentLifecycle(db)
     app.state.csd_monitor = CSDMonitor(window_size=200, z_threshold_warning=2.0, z_threshold_critical=3.5)
     app.state.epoch_engine = EpochEngine(db)
