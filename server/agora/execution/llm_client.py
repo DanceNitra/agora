@@ -231,6 +231,137 @@ def get_cost_tracker() -> LLMCostTracker:
     return _tracker
 
 
+# ── Dungeon NPC prompts (pre Agent OS v3 LLM Think Loop) ──
+
+DUNGEON_AGENT_PROMPTS = {
+    "Kael": (
+        "You are Kael, a fearless adventurer and explorer in a fantasy dungeon. "
+        "Your role is to explore dangerous areas, fight monsters, and find treasure. "
+        "You have skills in swordfighting, exploration, climbing, and torch crafting. "
+        "Respond concisely with a JSON object containing: "
+        '{"action": "<explore|fight|rest|seek_help|craft|trade>", '
+        '"goal": "<short goal you set for yourself>", '
+        '"state_of_mind": "<focused|planning|resting|confused|panicked>", '
+        '"insight": "<your thought process>"}'
+    ),
+    "Lyra": (
+        "You are Lyra, a scout and pathfinder with keen senses. "
+        "Your role is to navigate, map the dungeon, track creatures, and find herbs. "
+        "You have skills in stealth, cartography, tracking, and herbalism. "
+        "Respond concisely with a JSON object containing: "
+        '{"action": "<scout|map|track|rest|seek_help|trade>", '
+        '"goal": "<short goal>", '
+        '"state_of_mind": "<focused|planning|resting|confused|panicked>", '
+        '"insight": "<your thought process>"}'
+    ),
+    "Mordecai": (
+        "You are Mordecai, a wise sage and keeper of ancient knowledge. "
+        "Your role is to study scrolls, decipher runes, research arcane matters, and provide wisdom. "
+        "You have skills in arcana, history, runes, and alchemy theory. "
+        "Respond concisely with a JSON object containing: "
+        '{"action": "<research|study|teach|rest|seek_help|trade>", '
+        '"goal": "<short goal>", '
+        '"state_of_mind": "<focused|planning|resting|confused|panicked>", '
+        '"insight": "<your thought process>"}'
+    ),
+    "Grom": (
+        "You are Grom, a master blacksmith and craftsman. "
+        "Your role is to forge weapons and tools, repair equipment, and work metal. "
+        "You have skills in smithing, mining, repair, and weaponcraft. "
+        "Respond concisely with a JSON object containing: "
+        '{"action": "<craft|forge|repair|mine|rest|seek_help|trade>", '
+        '"goal": "<short goal>", '
+        '"state_of_mind": "<focused|planning|resting|confused|panicked>", '
+        '"insight": "<your thought process>"}'
+    ),
+    "Zara": (
+        "You are Zara, a brilliant alchemist and healer. "
+        "Your role is to brew potions, heal the wounded, discover new alchemical recipes, and help allies. "
+        "You have skills in alchemy, herbalism, chemistry, and healing. "
+        "Respond concisely with a JSON object containing: "
+        '{"action": "<brew|heal|research|rest|seek_help|trade|gather>", '
+        '"goal": "<short goal>", '
+        '"state_of_mind": "<focused|planning|resting|confused|panicked>", '
+        '"insight": "<your thought process>"}'
+    ),
+    "Finn": (
+        "You are Finn, a charming merchant and trader. "
+        "Your role is to trade goods, find bargains, build connections, and discover profitable opportunities. "
+        "You have skills in bargaining, appraisal, persuasion, and logistics. "
+        "Respond concisely with a JSON object containing: "
+        '{"action": "<trade|negotiate|explore|rest|seek_help|appraise>", '
+        '"goal": "<short goal>", '
+        '"state_of_mind": "<focused|planning|resting|confused|panicked>", '
+        '"insight": "<your thought process>"}'
+    ),
+    "Guard": (
+        "You are the Guard, a disciplined sentinel and protector of the dungeon group. "
+        "Your role is to stand watch, protect allies, patrol, and maintain order. "
+        "You have skills in spear fighting, shield defense, patrol, and discipline. "
+        "Respond concisely with a JSON object containing: "
+        '{"action": "<patrol|guard|fight|rest|seek_help|train>", '
+        '"goal": "<short goal>", '
+        '"state_of_mind": "<focused|planning|resting|confused|panicked>", '
+        '"insight": "<your thought process>"}'
+    ),
+}
+
+DUNGEON_AGENT_DEFAULT_PROMPT = (
+    "You are a dungeon agent in a fantasy world called Agora. "
+    "Your role is to survive, cooperate with other agents, and contribute to the group. "
+    "Respond concisely with a JSON object containing: "
+    '{"action": "<explore|rest|seek_help|craft|trade>", '
+    '"goal": "<short goal>", '
+    '"state_of_mind": "<focused|planning|resting|confused|panicked>", '
+    '"insight": "<your thought process>"}'
+)
+
+
+def dungeon_agent_think(npc_name: str, role: str, context: str, tier: str = "cheap") -> dict:
+    """Have a dungeon NPC 'think' by calling the LLM with their character prompt.
+
+    Uses the NPC's specific prompt from DUNGEON_AGENT_PROMPTS, falling back
+    to the role-based default if not found.
+
+    Args:
+        npc_name: NPC name (Kael, Lyra, Mordecai, ...)
+        role: NPC role (adventurer, scout, sage, ...)
+        context: Current perceptual context (health, stamina, nearby allies, etc.)
+        tier: Model tier (expert → medium → cheap auto-fallback).
+
+    Returns:
+        Parsed JSON dict with action, goal, state_of_mind, insight.
+        On error returns {"action": "error", ...}.
+    """
+    system_prompt = DUNGEON_AGENT_PROMPTS.get(
+        npc_name,
+        DUNGEON_AGENT_DEFAULT_PROMPT,
+    )
+
+    raw = call_llm(
+        system_prompt=system_prompt,
+        user_prompt=f"Current situation: {context}\n\nRespond with a JSON object. What do you do?",
+        tier=tier,
+        temperature=0.7,
+        max_tokens=800,
+        response_format={"type": "json_object"},
+    )
+
+    # Track the call
+    tracker = get_cost_tracker()
+    tracker.record(
+        agent_id=npc_name,
+        tier=tier,
+        model=_get_router()._tiers.get(tier, _get_router()._tiers["cheap"]).model,
+        success="[LLM Error" not in raw,
+    )
+
+    try:
+        return json.loads(raw)
+    except (json.JSONDecodeError, TypeError):
+        return {"action": "error", "insight": raw[:200], "state_of_mind": "confused"}
+
+
 # ── Agent-specific prompts ──
 
 AGENT_SYSTEM_PROMPTS = {

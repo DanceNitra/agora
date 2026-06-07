@@ -1,4 +1,5 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
+import { useWebSocket, WSEvent, WSThoughtUpdate, WSTickUpdate } from '../hooks/useWebSocket';
 
 // ═══════════════════════════════════════════
 // TYPES
@@ -75,8 +76,95 @@ const GodConsoleV2: React.FC = () => {
   const [healthData, setHealthData] = useState<any>(null);
   const [trustData, setTrustData] = useState<TrustMatrixData | null>(null);
   const [loading, setLoading] = useState<boolean>(false);
+  const [wsConnected, setWsConnected] = useState<boolean>(false);
 
   const api = (path: string) => `${window.location.origin}${path}`;
+
+  const refreshNpcs = useCallback(async () => {
+    try {
+      const res = await fetch(api('/api/v2/god/npcs'));
+      if (res.ok) setNpcs((await res.json()).npcs || []);
+    } catch {}
+  }, [api]);
+
+  const refreshOsSummary = useCallback(async () => {
+    try {
+      const res = await fetch(api('/api/v2/god/agent-os/summary'));
+      if (res.ok) setOsSummary(await res.json());
+    } catch {}
+  }, [api]);
+
+  const refreshTrust = useCallback(async () => {
+    try {
+      const res = await fetch(api('/api/v1/eval/trust/matrix'));
+      if (res.ok) setTrustData(await res.json());
+    } catch {}
+  }, [api]);
+
+  const refreshHealth = useCallback(async () => {
+    try {
+      const res = await fetch(api('/api/v2/god/health'));
+      if (res.ok) setHealthData(await res.json());
+    } catch {}
+  }, [api]);
+
+  const refreshViolations = useCallback(async () => {
+    try {
+      const res = await fetch(api('/api/v2/god/violations'));
+      if (res.ok) setViolations((await res.json()).violations || []);
+    } catch {}
+  }, [api]);
+
+  // ── WebSocket live updates ──
+  const { connected, subscribe } = useWebSocket({
+    onEvent: (event: WSEvent) => {
+      // Update health tick counter on heartbeat
+      if (event.type === 'heartbeat') {
+        setHealthData((prev: any) => prev ? { ...prev, tick: event.payload.tick } : prev);
+      }
+    },
+    onThought: (thought: WSThoughtUpdate) => {
+      // Update NPC health/trust in the list when an agent thinks
+      setNpcs((prev: NPC[]) => {
+        if (!thought.agent_id || thought.trust === undefined) return prev;
+        return prev.map((n: NPC) =>
+          n.npc_id?.slice(0, 8) === thought.agent_id
+            ? { ...n, trust: thought.trust }
+            : n
+        );
+      });
+    },
+    onHeartbeat: (hb: WSTickUpdate) => {
+      // Update tick count in health data
+      setHealthData((prev: any) => prev ? { ...prev, tick: hb.tick, active_npcs: hb.agents } : prev);
+    },
+    onCSDAlert: () => {
+      // Refresh violations on alert
+      refreshViolations();
+    },
+    onEpochUpdate: () => {
+      // Refresh trust matrix + OS summary on epoch
+      refreshTrust();
+      refreshOsSummary();
+      refreshNpcs();
+    },
+    onHelpRequest: () => {
+      refreshOsSummary();
+    },
+    onHelpAccepted: () => {
+      refreshOsSummary();
+    },
+    onError: () => {},
+  });
+
+  // Track WS connection state
+  useEffect(() => {
+    setWsConnected(connected);
+    const interval = setInterval(() => {
+      // Check if we're still connected (ref approach in hook)
+    }, 5000);
+    return () => clearInterval(interval);
+  }, [connected]);
 
   // Fetch data based on active tab
   useEffect(() => {
@@ -84,28 +172,23 @@ const GodConsoleV2: React.FC = () => {
       setLoading(true);
       try {
         if (activeTab === 'agents' || activeTab === 'health') {
-          const res = await fetch(api('/api/v2/god/npcs'));
-          if (res.ok) setNpcs((await res.json()).npcs || []);
+          await refreshNpcs();
         }
         if (activeTab === 'violations' || activeTab === 'health') {
-          const res = await fetch(api('/api/v2/god/violations'));
-          if (res.ok) setViolations((await res.json()).violations || []);
+          await refreshViolations();
         }
         if (activeTab === 'os' || activeTab === 'health') {
-          const res = await fetch(api('/api/v2/god/agent-os/summary'));
-          if (res.ok) setOsSummary(await res.json());
+          await refreshOsSummary();
         }
         if (activeTab === 'controller' || activeTab === 'health') {
           const res = await fetch(api('/api/v2/god/controller'));
           if (res.ok) setControllerStats(await res.json());
         }
         if (activeTab === 'health') {
-          const res = await fetch(api('/api/v2/god/health'));
-          if (res.ok) setHealthData(await res.json());
+          await refreshHealth();
         }
         if (activeTab === 'trust') {
-          const res = await fetch(api('/api/v1/eval/trust/matrix'));
-          if (res.ok) setTrustData(await res.json());
+          await refreshTrust();
         }
       } catch (e) {
         console.error('Fetch error:', e);
@@ -114,9 +197,9 @@ const GodConsoleV2: React.FC = () => {
       }
     };
     fetchData();
-    const interval = setInterval(fetchData, 10000);
+    const interval = setInterval(fetchData, 3000);
     return () => clearInterval(interval);
-  }, [activeTab]);
+  }, [activeTab, refreshNpcs, refreshOsSummary, refreshTrust, refreshHealth, refreshViolations, api]);
 
   const loadNpcDetail = async (npc: NPC) => {
     setSelectedNpc(npc);
@@ -132,9 +215,7 @@ const GodConsoleV2: React.FC = () => {
   const toggleNpcStatus = async (npc: NPC, action: 'pause' | 'resume') => {
     try {
       await fetch(api(`/api/v2/god/npcs/${npc.npc_id}/${action}`), { method: 'POST' });
-      // Refresh list
-      const res = await fetch(api('/api/v2/god/npcs'));
-      if (res.ok) setNpcs((await res.json()).npcs || []);
+      await refreshNpcs();
     } catch (e) {
       console.error('Toggle error:', e);
     }
@@ -159,10 +240,23 @@ const GodConsoleV2: React.FC = () => {
 
   return (
     <div style={styles.container}>
+      {/* Pulse animation keyframes */}
+      <style>{`
+        @keyframes pulse {
+          0%, 100% { opacity: 1; }
+          50% { opacity: 0.5; }
+        }
+      `}</style>
       {/* Header */}
       <div style={styles.header}>
         <h2 style={styles.title}>⚡ God Console 2.0</h2>
-        <span style={styles.liveBadge}>🔴 LIVE</span>
+        <span style={{
+          ...styles.liveBadge,
+          background: wsConnected ? '#22c55e' : '#ef4444',
+          animation: wsConnected ? 'pulse 2s infinite' : 'none',
+        }}>
+          {wsConnected ? '🔴 LIVE' : '⏹️ OFFLINE'}
+        </span>
       </div>
 
       {/* Tabs */}

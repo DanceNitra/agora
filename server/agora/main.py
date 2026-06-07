@@ -109,7 +109,7 @@ async def init_db(app: FastAPI):
     app.state.epoch_evaluator = EpochEvaluator(
         app.state.state_store, db, app.state.lifecycle_hooks
     )
-    app.state.agent_os = AgentOS(db, state_store=app.state.state_store)
+    app.state.agent_os = AgentOS(db, state_store=app.state.state_store, llm_enabled=settings.llm_enabled)
     await app.state.agent_os.ensure_os_initialized()
     app.state.physical_world = PhysicalWorld(db, llm_enabled=settings.llm_enabled)
     app.state.scheduler = RoomClusterScheduler(db)

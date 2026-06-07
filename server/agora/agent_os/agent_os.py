@@ -185,9 +185,10 @@ HELP_MATRIX = {
 class AgentOS:
     """Operating System for dungeon NPCs — duša, mozog, telo, zručnosti a help-seeking."""
 
-    def __init__(self, db, state_store=None):
+    def __init__(self, db, state_store=None, llm_enabled: bool = False):
         self.db = db
         self.state_store = state_store
+        self.llm_enabled = llm_enabled
 
     async def ensure_os_initialized(self):
         """Seed OS data for all 7 NPCs if not already present."""
@@ -343,7 +344,88 @@ class AgentOS:
                 )
 
     async def _think(self, npc_id: str, name: str) -> str:
-        """Evaluate state and decide state_of_mind."""
+        """Evaluate state and decide state_of_mind.
+
+        When LLM is enabled, calls the dungeon agent think model for
+        richer decision-making. Falls back to rule-based on error.
+        """
+        brain = await self.state_store.get_brain(npc_id) if self.state_store else None
+        npc = await self.state_store.get_npc(npc_id) if self.state_store else None
+        body = await self.state_store.get_body(npc_id) if self.state_store else None
+
+        if not brain or not npc:
+            # Fallback: direct DB
+            return await self._think_rule_based(npc_id)
+
+        health = npc.get("health", 100)
+        stamina = body.get("stamina", 100) if body else 100
+        fatigue = body.get("fatigue", 0) if body else 0
+
+        # ── LLM think (if enabled, not critically injured) ──
+        if self.llm_enabled and health >= 15:
+            try:
+                from agora.execution.llm_client import dungeon_agent_think
+                import asyncio
+
+                # Build context for LLM
+                role = npc.get("role", "")
+                state_of_mind = brain.get("state_of_mind", "focused")
+                current_goal = brain.get("current_goal", "")
+                plan_stack = json.loads(brain.get("plan_stack", "[]") or "[]")
+                memories = json.loads(brain.get("memory", "[]") or "[]")
+
+                # Nearby NPCs
+                nearby_str = ""
+                try:
+                    all_npcs = await self.state_store.get_all_active_npcs()
+                    my_room = ""
+                    from agora.agent_os.dungeon_map import get_room_at
+                    my_room = get_room_at(npc.get("pos_x", 0), npc.get("pos_y", 0))
+                    nearby_names = []
+                    for other in all_npcs:
+                        if other["npc_id"] != npc_id:
+                            other_room = get_room_at(other.get("pos_x", 0), other.get("pos_y", 0))
+                            if other_room == my_room:
+                                nearby_names.append(other.get("npc_name", ""))
+                    if nearby_names:
+                        nearby_str = f"Nearby: {', '.join(nearby_names)}"
+                except Exception:
+                    pass
+
+                context = (
+                    f"Health={health:.0f}%, Stamina={stamina:.0f}%, Fatigue={fatigue:.0f}%. "
+                    f"State of mind: {state_of_mind}. "
+                    f"Goal: {current_goal or 'none'}. "
+                    f"Plans remaining: {len(plan_stack)}. "
+                    f"{nearby_str}. "
+                    f"Recent memories: {memories[-3:] if memories else 'none'}."
+                )
+
+                # Run LLM in thread (it's synchronous)
+                decision = await asyncio.to_thread(
+                    dungeon_agent_think, name, role, context, "cheap",
+                )
+
+                new_state = decision.get("state_of_mind", "focused")
+                new_goal = decision.get("goal", "")
+
+                # Update brain with LLM's decision
+                update = {"state_of_mind": new_state}
+                if new_goal:
+                    update["current_goal"] = new_goal
+                await self.state_store.update_brain(npc_id, update)
+
+                return new_state
+
+            except Exception as e:
+                print(f"[AgentOS/LLM] {name} think error: {e}")
+                # Fall through to rule-based
+
+        # ── Rule-based fallback ──
+        return await self._think_rule_based(npc_id)
+
+    async def _think_rule_based(self, npc_id: str, name: str | None = None) -> str:
+        """Rule-based state_of_mind decision (backup when LLM unavailable)."""
         if self.state_store:
             brain = await self.state_store.get_brain(npc_id)
             npc = await self.state_store.get_npc(npc_id)
