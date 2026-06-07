@@ -353,3 +353,48 @@ async def get_recent_events(request: Request, topic: str, limit: int = 20):
         return {"error": "EventBus not initialized"}
     events = event_bus.get_recent(topic, limit=limit)
     return {"topic": topic, "count": len(events), "events": events}
+
+
+# ═══════════════════════════════════════════════
+# DUNGEON OS: osState
+# ═══════════════════════════════════════════════
+
+
+@router.get("/os")
+async def get_os_state(request: Request):
+    """Get current OS state — all 5 subsystems + boot status."""
+    os_state = getattr(request.app.state, "os_state", None)
+    if not os_state:
+        return {"error": "OsState not initialized"}
+    return os_state.get_stats()
+
+
+@router.get("/os/boot-progress")
+async def get_boot_progress(request: Request):
+    """Get boot progress as percentage per subsystem."""
+    os_state = getattr(request.app.state, "os_state", None)
+    if not os_state:
+        return {"error": "OsState not initialized"}
+    return {
+        "progress": os_state.get_boot_progress(),
+        "threshold": 70,
+        "ready": os_state.is_boot_ready(),
+        "booted": os_state.is_booted(),
+    }
+
+
+@router.post("/os/raise")
+async def raise_subsystem(request: Request, body: dict):
+    """Raise a subsystem (for testing/quest completions)."""
+    os_state = getattr(request.app.state, "os_state", None)
+    if not os_state:
+        return {"error": "OsState not initialized"}
+    subsystem = body.get("subsystem", "")
+    amount = body.get("amount", 5)
+    new_value = await os_state.raise_subsystem(subsystem, amount)
+    return {
+        "subsystem": subsystem,
+        "new_value": new_value,
+        "boot_ready": os_state.is_boot_ready(),
+        "boot_triggered": os_state.is_booted(),
+    }

@@ -320,8 +320,8 @@ DUNGEON_AGENT_DEFAULT_PROMPT = (
 def dungeon_agent_think(npc_name: str, role: str, context: str, tier: str = "cheap") -> dict:
     """Have a dungeon NPC 'think' by calling the LLM with their character prompt.
 
-    Uses the NPC's specific prompt from DUNGEON_AGENT_PROMPTS, falling back
-    to the role-based default if not found.
+    Uses the Dungeon OS soul/agent/skills prompt separation (roles.py).
+    Falls back to DUNGEON_AGENT_PROMPTS for NPCs without an OS role definition.
 
     Args:
         npc_name: NPC name (Kael, Lyra, Mordecai, ...)
@@ -333,10 +333,17 @@ def dungeon_agent_think(npc_name: str, role: str, context: str, tier: str = "che
         Parsed JSON dict with action, goal, state_of_mind, insight.
         On error returns {"action": "error", ...}.
     """
-    system_prompt = DUNGEON_AGENT_PROMPTS.get(
-        npc_name,
-        DUNGEON_AGENT_DEFAULT_PROMPT,
-    )
+    # Try Dungeon OS role prompt first
+    from agora.dungeon_os.roles import build_role_prompt
+    system_prompt = build_role_prompt(npc_name, role)
+
+    # If Dungeon OS returned fallback, use old DUNGEON_AGENT_PROMPTS
+    if "fantasy dungeon called Agora" in system_prompt:
+        old_prompt = DUNGEON_AGENT_PROMPTS.get(
+            npc_name,
+            DUNGEON_AGENT_DEFAULT_PROMPT,
+        )
+        system_prompt = old_prompt
 
     raw = call_llm(
         system_prompt=system_prompt,

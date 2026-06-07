@@ -19,6 +19,8 @@ from agora.coordination.eigen_trust import EigenTrustSolver
 from agora.coordination.economy_config import get_role_config, ROLE_ECONOMY
 from agora.coordination.stigmergy import StigmergyPool
 from agora.coordination.economy import EconomyEngine
+from agora.dungeon_os.state import OsState, ensure_os_state_tables
+from agora.dungeon_os.roles import build_role_prompt, NPC_ROLE_MAP
 from agora.agent_os.agent_os import AgentOS
 from agora.agent_os.physical_world import PhysicalWorld
 from agora.harness.state_store import StateStore
@@ -124,6 +126,11 @@ async def init_db(app: FastAPI):
     await app.state.event_bus.start()
     app.state.active_connections = []
     app.state.tick_count = 0
+
+    # ── Dungeon OS: osState ──
+    await ensure_os_state_tables(db)
+    app.state.os_state = OsState(db)
+    await app.state.os_state.load()
 
     # Seed agents if empty
     cursor = await db.execute("SELECT COUNT(*) as cnt FROM agent_identities")
