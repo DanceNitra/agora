@@ -51,8 +51,8 @@ const panelStyles: Record<string, React.CSSProperties> = {
     padding: 10,
     backdropFilter: 'blur(4px)',
     display: 'flex', flexDirection: 'column',
-    flex: 1,
-    minHeight: 0,
+    maxHeight: 180,
+    flexShrink: 0,
   },
   header: {
     fontSize: 13, fontWeight: 600, color: '#d4d4d4',
