@@ -29,6 +29,7 @@ def get_worker(request: Request):
             "log_dir": "/tmp/hermes-logs",
             "vault_path": os.path.expanduser("~/Obsidian Vault"),
             "telegram_chat_id": os.getenv("HERMES_TELEGRAM_CHAT_ID"),
+            "telegram_bot_token": os.getenv("HERMES_TELEGRAM_BOT_TOKEN"),
         }
         worker = AgentWorker(qe, db, config)
         request.app.state.agent_worker = worker

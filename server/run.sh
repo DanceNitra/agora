@@ -1,7 +1,6 @@
-#!/usr/bin/env bash
-set -euo pipefail
-cd /home/vboxuser/agora/server
-rm -f agora.db
-export PYTHONPATH=.
-export PYTHONUNBUFFERED=1
-exec /home/vboxuser/agora/server/.venv/bin/uvicorn agora.main:app --host 127.0.0.1 --port 8000 --log-level debug 2>&1
+#!/bin/bash
+# Start Agora Dungeon OS server with Telegram integration
+set -a
+source "$(dirname "$0")/.env"
+set +a
+exec uvicorn agora.main:app --host 127.0.0.1 --port 8000 --log-level warning

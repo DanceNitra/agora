@@ -20,7 +20,7 @@ class Settings(BaseSettings):
     openrouter_key: str = ""
     openrouter_referer: str = "https://github.com/DanceNitra/agora"
 
-    model_config = {"env_prefix": "AGORA_", "env_file": ".env"}
+    model_config = {"env_prefix": "AGORA_", "env_file": ".env", "extra": "ignore"}
 
     @property
     def llm_api_key(self) -> str:
