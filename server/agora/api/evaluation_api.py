@@ -168,3 +168,24 @@ async def get_trust_matrix_raw(request: Request, min_interactions: int = 1):
         return {"error": "EigenTrust not initialized"}
     result = await eigen.get_raw_matrix(min_interactions=min_interactions)
     return result
+
+
+# ═══════════════════════════════════════════════
+# LLM COST TRACKING ENDPOINT
+# ═══════════════════════════════════════════════
+
+
+@router.get("/llm/stats")
+async def get_llm_cost_stats(request: Request):
+    """Get LLM cost tracking stats across all agents."""
+    from agora.execution.llm_client import get_cost_tracker
+    tracker = get_cost_tracker()
+    return tracker.get_all_stats()
+
+
+@router.get("/llm/stats/{agent_role}")
+async def get_agent_llm_stats(request: Request, agent_role: str):
+    """Get LLM usage stats for a specific agent role."""
+    from agora.execution.llm_client import get_cost_tracker
+    tracker = get_cost_tracker()
+    return tracker.get_agent_stats(agent_role)

@@ -1,4 +1,8 @@
-"""Model router for selecting LLM tiers based on task complexity and cost."""
+"""Model router for selecting LLM tiers based on task complexity and cost.
+
+All models are free via OpenRouter (Nemotron family from NVIDIA).
+Zero cost — no API spending, no credit limits.
+"""
 
 from dataclasses import dataclass, field
 from typing import Optional
@@ -8,28 +12,29 @@ from typing import Optional
 class TierConfig:
     name: str
     model: str
-    cost_per_token: float  # USD per token (approximate)
+    cost_per_token: float  # USD per token (0 for free models)
     description: str
 
 
+# ── Free model tiers (OpenRouter, Nemotron family) ──
 DEFAULT_TIERS = [
     TierConfig(
         name="cheap",
-        model="deepseek-v4-flash",
-        cost_per_token=0.000_000_15,
-        description="Fast, low-cost model for simple queries and classification.",
+        model="nvidia/nemotron-3-super-120b-a12b:free",
+        cost_per_token=0.0,
+        description="Free: Nemotron 3 Super 120B MoE — fast for simple queries and classification.",
     ),
     TierConfig(
         name="medium",
-        model="deepseek-v4-flash",
-        cost_per_token=0.000_000_60,
-        description="Balanced model for general reasoning tasks.",
+        model="nvidia/nemotron-3-ultra-550b-a55b:free",
+        cost_per_token=0.0,
+        description="Free: Nemotron 3 Ultra 550B MoE — balanced for general reasoning.",
     ),
     TierConfig(
         name="expert",
-        model="deepseek-v4-flash",
-        cost_per_token=0.000_003_00,
-        description="Highest-quality model for complex reasoning and codegen.",
+        model="nvidia/nemotron-3-ultra-550b-a55b:free",
+        cost_per_token=0.0,
+        description="Free: Nemotron 3 Ultra 550B MoE — top quality for complex reasoning.",
     ),
 ]
 
@@ -91,10 +96,27 @@ class ModelRouter:
         # Default to cheap
         return self._tiers["cheap"]
 
+    def get_fallback_chain(self, tier_name: str) -> list[TierConfig]:
+        """Return fallback chain: started tier → next cheaper tier(s).
+
+        If the primary tier fails, fall back down the chain so that
+        even degraded service keeps working.
+        """
+        order = ["expert", "medium", "cheap"]
+        try:
+            idx = order.index(tier_name)
+        except ValueError:
+            return [self._tiers.get(tier_name, self._tiers["cheap"])]
+        chain = [self._tiers[o] for o in order[idx:] if o in self._tiers]
+        return chain if chain else [self._tiers["cheap"]]
+
     def estimate_cost(
         self, tier_name: str, input_tokens: int, output_tokens: int
     ) -> float:
         """Estimate the USD cost for a given tier and token counts.
+
+        All tiers are $0 (free models), but this method exists for
+        future paid-model compatibility.
 
         Args:
             tier_name: One of "cheap", "medium", "expert".
