@@ -15,6 +15,8 @@ from datetime import datetime
 from pathlib import Path
 from typing import Optional
 
+from agora.dungeon_os.actions.role_prompts import get_role_prompt
+
 
 # ═══════════════════════════════════════════
 # SCOUT — Horizon Scanner
@@ -359,7 +361,7 @@ async def action_store_knowledge(config: dict, quest: dict, params: dict) -> dic
             "## Key Findings",
             "",
         ])
-        for f in findings[:10]:
+        for f in findings:
             if isinstance(f, dict):
                 content_parts.append(f"- **{f.get('researcher', 'unknown')}:** {f.get('summary', '')[:300]}")
             else:
@@ -380,7 +382,7 @@ async def action_store_knowledge(config: dict, quest: dict, params: dict) -> dic
 
     content = "\n".join(content_parts)
 
-    # Write to vault
+    # Write to vault — agora-research/
     vault = Path(vault_path)
     research_dir = vault / "agora-research"
     research_dir.mkdir(parents=True, exist_ok=True)
@@ -390,6 +392,10 @@ async def action_store_knowledge(config: dict, quest: dict, params: dict) -> dic
     filepath = research_dir / filename
 
     filepath.write_text(content)
+
+    # Also write to agora-proposals/ for vetted proposals
+    proposals_dir = vault / "agora-proposals"
+    proposals_dir.mkdir(parents=True, exist_ok=True)
 
     # Update quest with findings path
     qe = config.get("quest_engine")
@@ -426,11 +432,11 @@ async def action_evaluate_proposal(config: dict, quest: dict, params: dict) -> d
     subsystem = quest.get("subsystem", "knowledge")
 
     # CTO evaluation (technical)
-    cto_verdict = _cto_evaluate(title, research_summary, subsystem)
+    cto_verdict = await _cto_evaluate_llm(title, research_summary, subsystem)
     # CEO evaluation (strategic)
-    ceo_verdict = _ceo_evaluate(title, research_summary)
+    ceo_verdict = await _ceo_evaluate_llm(title, research_summary)
 
-    approved = cto_verdict["approved"] and ceo_verdict["approved"]
+    approved = cto_verdict.get("approved", False) and ceo_verdict.get("approved", False)
     priority = "HIGH" if approved and cto_verdict["priority"] == "high" else "MEDIUM"
 
     # If approved, advance quest to PATA phase
@@ -463,57 +469,105 @@ async def action_evaluate_proposal(config: dict, quest: dict, params: dict) -> d
     }
 
 
-def _cto_evaluate(title: str, summary: str, subsystem: str) -> dict:
-    """CTO evaluates technical merit."""
-    combined = (title + " " + summary).lower()
+async def _cto_evaluate_llm(title: str, summary: str, subsystem: str) -> dict:
+    """CTO evaluates technical merit using LLM."""
+    from agora.execution.llm_client import call_llm
 
-    # Technical red flags
-    red_flags = ["deprecated", "breaking change", "incompatible",
-                 "requires rewrite", "experimental"]
-    for flag in red_flags:
-        if flag in combined:
-            return {"approved": False, "rationale": f"Red flag: '{flag}' detected", "priority": "low"}
+    prompt = get_role_prompt("cto")
+    user_msg = (
+        f"## Research Proposal: {title}\n\n"
+        f"### Technical Summary\n{summary[:1000]}\n\n"
+        f"### Current Subsystem\n{subsystem}\n\n"
+        f"### Evaluation Required\n"
+        f"Assess this proposal on:\n"
+        f"1. Technical merit (is this sound?)\n"
+        f"2. Architecture impact (does it improve or complicate our system?)\n"
+        f"3. Integration complexity (how hard to implement?)\n"
+        f"4. Performance implications (faster, slower?)\n\n"
+        f"Respond with JSON:\n"
+        f'{{"approved": true/false, "rationale": "reason", "priority": "high/medium/low", "score": 0-100}}'
+    )
 
-    # Technical green flags
-    score = 50
-    green_flags = ["performance", "optimization", "render", "webgl",
-                   "new feature", "upgrade", "api", "compatible"]
-    for flag in green_flags:
-        if flag in combined:
-            score += 8
+    try:
+        # Run sync LLM call in thread to avoid blocking event loop
+        import asyncio
+        raw = await asyncio.to_thread(
+            call_llm,
+            system_prompt=prompt,
+            user_prompt=user_msg,
+            tier="cheap",
+            temperature=0.3,
+            max_tokens=400,
+            response_format={"type": "json_object"},
+        )
+        parsed = json.loads(raw)
+        return {
+            "approved": parsed.get("approved", False),
+            "rationale": parsed.get("rationale", "LLM evaluation unavailable"),
+            "priority": parsed.get("priority", "medium"),
+            "score": parsed.get("score", 50),
+        }
+    except Exception as e:
+        import traceback
+        print(f"[CTO] LLM eval failed: {e}\n{traceback.format_exc()[:200]}")
+        # Fallback to heuristic
+        combined = (title + " " + summary).lower()
+        score = 50
+        for kw in ["performance", "render", "webgl", "optimization", "new feature", "upgrade"]:
+            if kw in combined:
+                score += 10
+        return {
+            "approved": score >= 60,
+            "rationale": f"Heuristic fallback (LLM failed): technical score {score}/100",
+            "priority": "high" if score >= 75 else "medium",
+            "score": score,
+        }
 
-    # Subsystem alignment
-    if subsystem in combined:
-        score += 10
 
-    approved = score >= 60
-    priority = "high" if score >= 75 else "medium"
+async def _ceo_evaluate_llm(title: str, summary: str) -> dict:
+    """CEO evaluates strategic/business value using LLM."""
+    from agora.execution.llm_client import call_llm
 
-    return {
-        "approved": approved,
-        "rationale": f"Technical score: {score}/100. {'Approved' if approved else 'Needs more evidence'}.",
-        "priority": priority,
-        "score": score,
-    }
+    prompt = get_role_prompt("ceo")
+    user_msg = (
+        f"Proposal: {title}\n\n"
+        f"Summary: {summary[:600]}\n\n"
+        f"Assess strategic value, user impact, and opportunity cost. "
+        f"Respond with JSON:\n"
+        f'{{"approved": true/false, "rationale": "reason", "score": 0-100}}'
+    )
 
-
-def _ceo_evaluate(title: str, summary: str) -> dict:
-    """CEO evaluates strategic/business value."""
-    combined = (title + " " + summary).lower()
-
-    score = 50
-    strategic_flags = ["player", "user", "experience", "graphics",
-                       "new feature", "community", "engagement", "ui"]
-    for flag in strategic_flags:
-        if flag in combined:
-            score += 8
-
-    approved = score >= 60
-    return {
-        "approved": approved,
-        "rationale": f"Strategic score: {score}/100. {'Has user value' if approved else 'Low immediate impact'}.",
-        "score": score,
-    }
+    try:
+        import asyncio
+        raw = await asyncio.to_thread(
+            call_llm,
+            system_prompt=prompt,
+            user_prompt=user_msg,
+            tier="cheap",
+            temperature=0.3,
+            max_tokens=400,
+            response_format={"type": "json_object"},
+        )
+        parsed = json.loads(raw)
+        return {
+            "approved": parsed.get("approved", False),
+            "rationale": parsed.get("rationale", "LLM evaluation unavailable"),
+            "score": parsed.get("score", 50),
+        }
+    except Exception as e:
+        import traceback
+        print(f"[CEO] LLM eval failed: {e}\n{traceback.format_exc()[:200]}")
+        # Fallback to heuristic
+        combined = (title + " " + summary).lower()
+        score = 50
+        for kw in ["player", "user", "experience", "graphics", "new feature", "community", "ui"]:
+            if kw in combined:
+                score += 10
+        return {
+            "approved": score >= 60,
+            "rationale": f"Heuristic fallback (LLM failed): strategic score {score}/100",
+            "score": score,
+        }
 
 
 # ═══════════════════════════════════════════
