@@ -114,18 +114,28 @@ export class ParticleSystem {
     this.container = new Container();
     parent.addChild(this.container);
 
-    // Torch positions from the map (corners of rooms)
+    // Torch positions from the new map layout
     this.torchSources = [
-      { x: 1.5 * TILE, y: 1.5 * TILE },
-      { x: 22.5 * TILE, y: 1.5 * TILE },
-      { x: 1.5 * TILE, y: 18.5 * TILE },
-      { x: 22.5 * TILE, y: 18.5 * TILE },
+      // Entrance
+      { x: 4 * TILE, y: 1 * TILE },
+      { x: 4 * TILE, y: 3 * TILE },
+      // Grand Hall
+      { x: 10 * TILE, y: 4 * TILE },
+      { x: 28 * TILE, y: 4 * TILE },
+      { x: 14 * TILE, y: 10 * TILE },
+      { x: 24 * TILE, y: 10 * TILE },
+      { x: 10 * TILE, y: 17 * TILE },
+      { x: 28 * TILE, y: 17 * TILE },
+      // Tavern
+      { x: 4 * TILE, y: 7 * TILE },
       // Library
-      { x: 30 * TILE, y: 3 * TILE },
+      { x: 34 * TILE, y: 2 * TILE },
       // Treasury
-      { x: 29 * TILE, y: 9 * TILE },
+      { x: 34 * TILE, y: 8 * TILE },
       // Crypt
-      { x: 31 * TILE, y: 15 * TILE },
+      { x: 34 * TILE, y: 14 * TILE },
+      // Armory
+      { x: 4 * TILE, y: 14 * TILE },
     ];
 
     this.bounds = { w: mapW * TILE, h: mapH * TILE };

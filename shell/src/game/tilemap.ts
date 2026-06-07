@@ -29,69 +29,64 @@ interface DecorTextures {
 
 // ── Decoration positions (tile coords) ──
 const DECORATIONS: { tx: number; ty: number; key: keyof DecorTextures; tint?: number }[] = [
-  // Pillars (corners of the main hall)
-  { tx: 6, ty: 4, key: 'pillar' },
-  { tx: 6, ty: 16, key: 'pillar' },
-  { tx: 16, ty: 4, key: 'pillar' },
-  { tx: 16, ty: 16, key: 'pillar' },
+  // Entrance hall pillars
+  { tx: 2, ty: 1, key: 'pillar' },
+  { tx: 6, ty: 1, key: 'pillar' },
 
-  // Library pillars
-  { tx: 26, ty: 3, key: 'pillar' },
-  { tx: 35, ty: 3, key: 'pillar' },
-  { tx: 26, ty: 9, key: 'pillar' },
-  { tx: 35, ty: 9, key: 'pillar' },
+  // Grand Hall pillars (center)
+  { tx: 18, ty: 8, key: 'pillar' },
+  { tx: 20, ty: 8, key: 'pillar' },
+  { tx: 18, ty: 12, key: 'pillar' },
+  { tx: 20, ty: 12, key: 'pillar' },
 
-  // Crypt pillars
-  { tx: 26, ty: 11, key: 'pillar' },
-  { tx: 35, ty: 11, key: 'pillar' },
-  { tx: 26, ty: 18, key: 'pillar' },
-  { tx: 35, ty: 18, key: 'pillar' },
+  // Grand Hall — rug in center
+  { tx: 19, ty: 10, key: 'rug' },
 
-  // Rug (center of tavern area)
-  { tx: 8, ty: 11, key: 'rug' },
+  // Library bookshelves
+  { tx: 33, ty: 1, key: 'bookshelf' },
+  { tx: 36, ty: 1, key: 'bookshelf' },
+  { tx: 33, ty: 2, key: 'bookshelf' },
+  { tx: 36, ty: 2, key: 'bookshelf' },
+  { tx: 35, ty: 1, key: 'table' },
 
-  // Chests
-  { tx: 34, ty: 3, key: 'chest' },
-  { tx: 28, ty: 17, key: 'chest' },
-  { tx: 6, ty: 2, key: 'chest' },
+  // Treasury
+  { tx: 33, ty: 7, key: 'chest' },
+  { tx: 36, ty: 7, key: 'chest' },
+  { tx: 34, ty: 8, key: 'treasure' },
+  { tx: 35, ty: 8, key: 'treasure' },
 
-  // Bookshelves in library
-  { tx: 27, ty: 3, key: 'bookshelf' },
-  { tx: 34, ty: 6, key: 'bookshelf' },
-  { tx: 30, ty: 3, key: 'bookshelf' },
+  // Crypt tombs
+  { tx: 33, ty: 14, key: 'tomb' },
+  { tx: 35, ty: 14, key: 'tomb' },
+  { tx: 34, ty: 16, key: 'tomb' },
+  { tx: 33, ty: 15, key: 'chest' },
 
-  // Tables
-  { tx: 10, ty: 5, key: 'table' },
-  { tx: 12, ty: 5, key: 'table' },
-  { tx: 21, ty: 3, key: 'table' },
-  { tx: 22, ty: 3, key: 'table' },
+  // Armory
+  { tx: 2, ty: 14, key: 'anvil' },
+  { tx: 6, ty: 14, key: 'table' },
+  { tx: 3, ty: 13, key: 'chest' },
 
-  // Tombs in crypt
-  { tx: 28, ty: 14, key: 'tomb' },
-  { tx: 30, ty: 14, key: 'tomb' },
-  { tx: 32, ty: 14, key: 'tomb' },
-  { tx: 34, ty: 14, key: 'tomb' },
-  { tx: 28, ty: 18, key: 'tomb' },
-  { tx: 32, ty: 18, key: 'tomb' },
+  // Tavern
+  { tx: 6, ty: 8, key: 'table' },
+  { tx: 2, ty: 8, key: 'table' },
 
-  // Treasure in treasury
-  { tx: 29, ty: 9, key: 'treasure' },
-  { tx: 30, ty: 10, key: 'treasure' },
+  // Entrance counter
+  { tx: 3, ty: 2, key: 'counter' },
 
-  // Workstation items
-  { tx: 3, ty: 14, key: 'anvil' },
-  { tx: 20, ty: 3, key: 'cauldron' },
-  { tx: 3, ty: 3, key: 'counter' },
+  // Crypt cauldron
+  { tx: 35, ty: 13, key: 'cauldron' },
 
-  // Torches on walls
-  { tx: 8, ty: 1, key: 'torch' },
-  { tx: 14, ty: 1, key: 'torch' },
-  { tx: 28, ty: 1, key: 'torch' },
-  { tx: 34, ty: 1, key: 'torch' },
-  { tx: 8, ty: 18, key: 'torch' },
-  { tx: 14, ty: 18, key: 'torch' },
-  { tx: 28, ty: 10, key: 'torch' },
-  { tx: 34, ty: 10, key: 'torch' },
+  // Wall torches
+  { tx: 10, ty: 4, key: 'torch' },
+  { tx: 28, ty: 4, key: 'torch' },
+  { tx: 10, ty: 17, key: 'torch' },
+  { tx: 28, ty: 17, key: 'torch' },
+  { tx: 14, ty: 10, key: 'torch' },
+  { tx: 24, ty: 10, key: 'torch' },
+  { tx: 1, ty: 4, key: 'torch' },
+  { tx: 1, ty: 10, key: 'torch' },
+  { tx: 38, ty: 4, key: 'torch' },
+  { tx: 38, ty: 10, key: 'torch' },
 ];
 
 export function buildTilemap(container: Container, textures: TileTextures & DecorTextures): void {

@@ -69,60 +69,70 @@ export const MAP_H = 19;
 // 0=floor, 1=wall, 2=door
 export const DUNGEON_MAP: number[][] = [
   [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1],
-  [1,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],
-  [1,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,2,0,0,0,1,1,0,0,0,0,0,0,0,0,0,1],
-  [1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],
-  [1,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,1,1,1,1,0,0,0,0,1,0,0,0,1,1,0,0,0,0,0,0,0,0,0,1],
-  [1,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,1,0,0,0,0,0,2,0,0,0,0,0,0,0,0,1],
-  [1,1,1,1,0,0,1,1,1,1,1,1,1,1,1,1,1,0,0,0,0,0,0,0,1,1,1,1,1,1,0,1,1,1,1,1,1,1,1,1],
-  [1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],
-  [1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,2,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],
-  [1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,1,0,0,0,1,0,0,0,0,0,0,1],
-  [1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],
-  [1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,1,0,2,0,1,0,0,0,0,0,0,1],
-  [1,1,1,1,0,0,1,1,1,1,2,1,1,1,1,1,1,0,0,0,0,0,0,0,1,1,1,1,1,1,0,1,1,1,1,1,1,1,1,1],
-  [1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],
-  [1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,2,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],
-  [1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],
-  [1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,1,1,0,0,0,0,0,0,0,0,0,1],
-  [1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],
+  [1,0,0,0,0,0,0,0,0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,0,0,0,0,0,0,0,0,1],
+  [1,0,0,0,0,0,0,0,0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,0,0,0,0,0,0,0,0,1],
+  [1,0,0,0,0,0,0,0,0,2,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,2,1,0,0,0,0,0,0,0,0,1],
+  [1,1,1,1,1,1,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,1,1,1,1,1,1,1,1,1],
+  [1,0,0,0,0,0,0,0,0,2,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,2,1,0,0,0,0,0,0,0,0,1],
+  [1,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,0,0,0,0,0,0,0,0,1],
+  [1,0,0,0,1,1,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,0,0,0,0,0,0,0,0,1],
+  [1,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,1,1,1,1,0,0,0,0,0,0,0,1,1,0,0,0,0,0,0,0,0,1],
+  [1,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,0,0,0,0,0,0,0,0,1],
+  [1,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,0,0,0,0,0,0,0,0,1],
+  [1,1,1,1,1,1,1,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,1,1,1,1,1,1,1,1,1],
+  [1,0,0,0,0,0,0,0,0,2,0,0,0,0,0,0,0,0,1,1,1,1,0,0,0,0,0,0,0,2,1,0,0,0,0,0,0,0,0,1],
+  [1,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,0,0,0,0,0,0,0,0,1],
+  [1,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,0,0,0,0,0,0,0,0,1],
+  [1,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,0,0,0,0,0,0,0,0,1],
+  [1,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,0,0,0,0,0,0,0,0,1],
+  [1,1,1,1,1,1,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,1,1,1,1,1,1,1,1],
   [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1],
 ];
 
 // ── Initial agents (from GameScene llmDefs) ────────────
 
 const DEFAULT_AGENTS: AgentView[] = [
-  { id: 'kael', name: 'Kael', role: 'adventurer', pos: [10*32, 16*32], color: 0x44aaff, objective: 'Find the Crystal of Eternity', status: 'idle', health: 100 },
-  { id: 'lyra', name: 'Lyra', role: 'scout', pos: [3*32, 17*32], color: 0x44ff88, objective: 'Map the eastern catacombs', status: 'idle', health: 100 },
-  { id: 'mordecai', name: 'Mordecai', role: 'sage', pos: [20*32, 16*32], color: 0xcc88ff, objective: 'Research ancient artifacts', status: 'idle', health: 100 },
-  { id: 'grom', name: 'Grom', role: 'blacksmith', pos: [5*32, 10*32], color: 0xff8844, objective: 'Forge weapons for the expedition', status: 'idle', health: 100 },
-  { id: 'zara', name: 'Zara', role: 'alchemist', pos: [15*32, 3*32], color: 0x44ffaa, objective: 'Brew potions from dungeon herbs', status: 'idle', health: 100 },
-  { id: 'finn', name: 'Finn', role: 'merchant', pos: [5*32, 4*32], color: 0xffff44, objective: 'Trade supplies with dungeon explorers', status: 'idle', health: 100 },
-  { id: 'guard', name: 'Guard', role: 'guard', pos: [19.5*32, 9*32], color: 0x8888cc, objective: 'Patrol the dungeon entrance', status: 'idle', health: 100 },
+  { id: 'kael', name: 'Kael', role: 'adventurer', pos: [5*32, 7*32], color: 0x44aaff, objective: 'Explore the Grand Hall', status: 'idle', health: 100 },
+  { id: 'lyra', name: 'Lyra', role: 'scout', pos: [15*32, 6*32], color: 0x44ff88, objective: 'Map the Grand Hall corridors', status: 'idle', health: 100 },
+  { id: 'mordecai', name: 'Mordecai', role: 'sage', pos: [34*32, 2*32], color: 0xcc88ff, objective: 'Research in the Library', status: 'idle', health: 100 },
+  { id: 'grom', name: 'Grom', role: 'blacksmith', pos: [4*32, 14*32], color: 0xff8844, objective: 'Forge weapons in the Armory', status: 'idle', health: 100 },
+  { id: 'zara', name: 'Zara', role: 'alchemist', pos: [34*32, 14*32], color: 0x44ffaa, objective: 'Brew potions in the Crypt lab', status: 'idle', health: 100 },
+  { id: 'finn', name: 'Finn', role: 'merchant', pos: [4*32, 2*32], color: 0xffff44, objective: 'Trade at the Entrance', status: 'idle', health: 100 },
+  { id: 'guard', name: 'Guard', role: 'guard', pos: [10*32, 7*32], color: 0x8888cc, objective: 'Patrol the Grand Hall', status: 'idle', health: 100 },
 ];
 
 const DEFAULT_STATIONS = [
-  { name: 'Anvil', x: 3.5 * 32, y: 14 * 32, description: 'A heavy anvil. Sparks still glow on its surface.' },
-  { name: 'Cauldron', x: 20 * 32, y: 3 * 32, description: 'A bubbling cauldron filled with luminous green liquid.' },
-  { name: 'Counter', x: 3.5 * 32, y: 3.5 * 32, description: 'A wooden counter cluttered with curious trinkets.' },
+  { name: 'Anvil', x: 4 * 32, y: 14 * 32, description: 'A heavy anvil in the Armory. Sparks still glow on its surface.' },
+  { name: 'Cauldron', x: 34 * 32, y: 14 * 32, description: 'A bubbling cauldron in the Crypt, filled with luminous green liquid.' },
+  { name: 'Counter', x: 4 * 32, y: 2 * 32, description: 'A wooden counter at the Entrance, cluttered with curious trinkets.' },
+  { name: 'Bookshelf', x: 34 * 32, y: 2 * 32, description: 'Ancient tomes line the Library shelves.' },
+  { name: 'Bar', x: 5 * 32, y: 7 * 32, description: 'A sturdy oak bar in the Tavern.' },
 ];
 
 const DEFAULT_LIGHTS: RoomLight[] = [
-  // Torches
-  { x: 1.5*32, y: 1.5*32, radius: 200, color: 0xff6622, intensity: 1.5 },
-  { x: 22.5*32, y: 1.5*32, radius: 200, color: 0xff6622, intensity: 1.5 },
-  { x: 1.5*32, y: 18.5*32, radius: 200, color: 0xff6622, intensity: 1.5 },
-  { x: 22.5*32, y: 18.5*32, radius: 200, color: 0xff6622, intensity: 1.5 },
-  // Workstations
-  { x: 3.5*32, y: 14*32, radius: 140, color: 0xff8844, intensity: 1.0 },
-  { x: 20*32, y: 3*32, radius: 140, color: 0x88ff44, intensity: 0.8 },
-  { x: 3.5*32, y: 3.5*32, radius: 140, color: 0xffcc44, intensity: 0.8 },
+  // Entrance
+  { x: 4*32, y: 1*32, radius: 150, color: 0xff6622, intensity: 1.2 },
+  { x: 4*32, y: 3*32, radius: 150, color: 0xff6622, intensity: 1.2 },
+  // Grand Hall torches
+  { x: 10*32, y: 4*32, radius: 180, color: 0xff6622, intensity: 1.5 },
+  { x: 28*32, y: 4*32, radius: 180, color: 0xff6622, intensity: 1.5 },
+  { x: 14*32, y: 10*32, radius: 160, color: 0xff6622, intensity: 1.3 },
+  { x: 24*32, y: 10*32, radius: 160, color: 0xff6622, intensity: 1.3 },
+  { x: 10*32, y: 17*32, radius: 180, color: 0xff6622, intensity: 1.5 },
+  { x: 28*32, y: 17*32, radius: 180, color: 0xff6622, intensity: 1.5 },
+  // Tavern
+  { x: 4*32, y: 7*32, radius: 160, color: 0xff8844, intensity: 1.0 },
   // Library
-  { x: 30*32, y: 3*32, radius: 160, color: 0x8888ff, intensity: 1.0 },
+  { x: 34*32, y: 2*32, radius: 160, color: 0x8888ff, intensity: 1.2 },
   // Treasury
-  { x: 29*32, y: 9*32, radius: 160, color: 0xffcc44, intensity: 1.3 },
+  { x: 34*32, y: 8*32, radius: 160, color: 0xffcc44, intensity: 1.5 },
   // Crypt
-  { x: 31*32, y: 15*32, radius: 180, color: 0x6644aa, intensity: 0.7 },
+  { x: 34*32, y: 14*32, radius: 160, color: 0x6644aa, intensity: 0.8 },
+  // Armory
+  { x: 4*32, y: 14*32, radius: 160, color: 0xff6644, intensity: 1.0 },
+  // Pillar corner lights (Grand Hall center)
+  { x: 19*32, y: 8*32, radius: 140, color: 0x88aaff, intensity: 0.6 },
+  { x: 19*32, y: 12*32, radius: 140, color: 0x88aaff, intensity: 0.6 },
 ];
 
 // ── Zustand Store ──────────────────────────────────────
@@ -153,7 +163,7 @@ export const useWorldStore = create<WorldStore>((set, get) => ({
   agents: buildAgentRecord(),
   quests: [],
   osState: { comms: 25, knowledge: 40, tooling: 30, economy: 15, safety: 50 },
-  playerPos: [12 * TILE, 10 * TILE],
+  playerPos: [4 * TILE, 2 * TILE],
   lights: DEFAULT_LIGHTS,
   stations: DEFAULT_STATIONS,
   log: [],
