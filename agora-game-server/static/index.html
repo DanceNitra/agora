@@ -45,6 +45,7 @@
 <script type="module">
 import * as THREE from 'three';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 
 // === SETUP ===
 const scene = new THREE.Scene();
@@ -88,6 +89,35 @@ if (!renderer.getContext()) {
   scene.add(tileGroup);
   scene.add(lightGroup);
   scene.add(entityGroup);
+
+  // GLTF Model cache
+  const MODEL_MAP = {
+    king: 'King',
+    guard_l: 'Adventurer',
+    guard_r: 'Adventurer',
+    priest: 'Adventurer',
+    thief: 'Worker',
+    scholar: 'Adventurer',
+  };
+  const gltfCache = {};
+  let modelsLoaded = false;
+  const gltfLoader = new GLTFLoader();
+
+  async function loadModels() {
+    const models = ['King', 'Adventurer', 'Worker'];
+    const promises = models.map(name =>
+      gltfLoader.loadAsync(`/models/${name}.gltf`).then(gltf => {
+        gltfCache[name] = gltf;
+        console.log(`Loaded: ${name}.gltf`);
+      }).catch(err => console.warn(`Failed to load ${name}.gltf:`, err))
+    );
+    await Promise.all(promises);
+    modelsLoaded = true;
+    console.log('All models loaded, re-rendering entities...');
+    // Trigger re-build if dungeon already exists
+    if (window.__lastState) buildDungeon(window.__lastState);
+  }
+  loadModels();
 
   // Shared materials (NEVER dispose these)
   const mWall = new THREE.MeshStandardMaterial({ color: 0x2a2a3e, roughness: 0.8 });
@@ -199,7 +229,7 @@ if (!renderer.getContext()) {
       }
     }
 
-    // --- Entities (agents) ---
+    // --- Entities (agents) rendered via GLTF models ---
     while (entityGroup.children.length) {
       const c = entityGroup.children[0];
       if (c.geometry) c.geometry.dispose();
@@ -207,15 +237,50 @@ if (!renderer.getContext()) {
       entityGroup.remove(c);
     }
     // Track entities for animation
+    const mixers = [];
+    window.__mixers = mixers;
     window.__entities = {};
 
-    if (state.entities) {
-      for (const [id, ent] of Object.entries(state.entities)) {
-        const group = new THREE.Group();
-        const ex = ent.x - cx, ez = ent.y - cy;
-        group.position.set(ex, 0, ez);
+    function buildEntity(ent, id, cx, cy) {
+      const ex = ent.x - cx, ez = ent.y - cy;
+      const group = new THREE.Group();
+      group.position.set(ex, 0, ez);
 
-        // Body (cylinder)
+      // Try GLTF model first
+      const modelName = MODEL_MAP[id];
+      const gltf = modelName ? gltfCache[modelName] : null;
+
+      if (gltf && modelsLoaded) {
+        // Clone the model scene
+        const modelScene = gltf.scene.clone(true);
+        // Scale to fit dungeon grid (models are ~1.7m, we want ~0.8 in our 1-unit grid)
+        modelScene.scale.set(0.5, 0.5, 0.5);
+        modelScene.position.y = 0;
+        // Rotate to face forward in isometric view
+        modelScene.rotation.y = Math.PI / 4;
+        // Enable shadows
+        modelScene.traverse(child => {
+          if (child.isMesh) {
+            child.castShadow = true;
+            child.receiveShadow = true;
+          }
+        });
+        group.add(modelScene);
+
+        // Animation mixer
+        const mixer = new THREE.AnimationMixer(modelScene);
+        // Find idle animation
+        const anims = gltf.animations || [];
+        const idleAnim = anims.find(a => a.name.includes('Idle') && !a.name.includes('Gun'))
+                      || anims.find(a => a.name.includes('Idle'))
+                      || anims[0];
+        if (idleAnim) {
+          const action = mixer.clipAction(idleAnim);
+          action.play();
+        }
+        mixers.push(mixer);
+      } else {
+        // Fallback: cylinder + sphere (while loading)
         const bodyMat = new THREE.MeshStandardMaterial({
           color: parseInt(ent.color.replace('#', ''), 16),
           roughness: 0.5, metalness: 0.3
@@ -225,7 +290,6 @@ if (!renderer.getContext()) {
         body.castShadow = true;
         group.add(body);
 
-        // Head (sphere)
         const headMat = new THREE.MeshStandardMaterial({
           color: parseInt(ent.color.replace('#', ''), 16),
           roughness: 0.3, metalness: 0.1
@@ -234,48 +298,51 @@ if (!renderer.getContext()) {
         head.position.y = 0.7;
         head.castShadow = true;
         group.add(head);
+      }
 
-        // Name label (sprite from canvas)
-        const canvas = document.createElement('canvas');
-        canvas.width = 256; canvas.height = 64;
-        const ctx = canvas.getContext('2d');
-        ctx.fillStyle = 'rgba(0,0,0,0.6)';
-        ctx.roundRect(0, 8, 256, 48, 8);
-        ctx.fill();
-        ctx.font = 'bold 22px monospace';
-        ctx.textAlign = 'center';
-        ctx.fillStyle = '#ffffff';
-        ctx.fillText(ent.name, 128, 42);
-        const nameTex = new THREE.CanvasTexture(canvas);
-        const nameMat = new THREE.SpriteMaterial({ map: nameTex, transparent: true, depthWrite: false });
-        const nameSprite = new THREE.Sprite(nameMat);
-        nameSprite.position.y = 1.2;
-        nameSprite.scale.set(1.2, 0.3, 1);
-        group.add(nameSprite);
+      // Name label (sprite from canvas) - always shown
+      const canvas = document.createElement('canvas');
+      canvas.width = 256; canvas.height = 64;
+      const ctx = canvas.getContext('2d');
+      ctx.fillStyle = 'rgba(0,0,0,0.6)';
+      ctx.beginPath();
+      ctx.roundRect(0, 8, 256, 48, 8);
+      ctx.fill();
+      ctx.font = 'bold 22px monospace';
+      ctx.textAlign = 'center';
+      ctx.fillStyle = '#ffffff';
+      ctx.fillText(ent.name, 128, 42);
+      const nameTex = new THREE.CanvasTexture(canvas);
+      const nameMat = new THREE.SpriteMaterial({ map: nameTex, transparent: true, depthWrite: false });
+      const nameSprite = new THREE.Sprite(nameMat);
+      nameSprite.position.y = 1.5;
+      nameSprite.scale.set(1.2, 0.3, 1);
+      group.add(nameSprite);
 
-        // Health bar (sprite)
-        const hbCanvas = document.createElement('canvas');
-        hbCanvas.width = 64; hbCanvas.height = 8;
-        const hbCtx = hbCanvas.getContext('2d');
-        // Background
-        hbCtx.fillStyle = '#333333';
-        hbCtx.fillRect(0, 0, 64, 8);
-        // Health fill
-        const pct = (ent.health || 100) / (ent.max_health || 100);
-        hbCtx.fillStyle = pct > 0.5 ? '#27ae60' : pct > 0.25 ? '#f39c12' : '#e74c3c';
-        hbCtx.fillRect(1, 1, Math.max(0, (62) * pct), 6);
-        const hbTex = new THREE.CanvasTexture(hbCanvas);
-        const hbMat = new THREE.SpriteMaterial({ map: hbTex, transparent: true, depthWrite: false });
-        const hbSprite = new THREE.Sprite(hbMat);
-        hbSprite.position.y = 1.0;
-        hbSprite.scale.set(0.5, 0.06, 1);
-        group.add(hbSprite);
+      // Health bar (sprite)
+      const hbCanvas = document.createElement('canvas');
+      hbCanvas.width = 64; hbCanvas.height = 8;
+      const hbCtx = hbCanvas.getContext('2d');
+      hbCtx.fillStyle = '#333333';
+      hbCtx.fillRect(0, 0, 64, 8);
+      const pct = (ent.health || 100) / (ent.max_health || 100);
+      hbCtx.fillStyle = pct > 0.5 ? '#27ae60' : pct > 0.25 ? '#f39c12' : '#e74c3c';
+      hbCtx.fillRect(1, 1, Math.max(0, 62 * pct), 6);
+      const hbTex = new THREE.CanvasTexture(hbCanvas);
+      const hbMat = new THREE.SpriteMaterial({ map: hbTex, transparent: true, depthWrite: false });
+      const hbSprite = new THREE.Sprite(hbMat);
+      hbSprite.position.y = 1.3;
+      hbSprite.scale.set(0.5, 0.06, 1);
+      group.add(hbSprite);
 
-        // Store entity group and data for animation
-        group.userData = { entityId: id, baseY: 0, period: 2 + Math.random() * 1.5, phase: Math.random() * Math.PI * 2 };
-        window.__entities[id] = { group, data: ent };
+      group.userData = { entityId: id, baseY: 0, period: 2 + Math.random() * 1.5, phase: Math.random() * Math.PI * 2 };
+      window.__entities[id] = { group, data: ent };
+      entityGroup.add(group);
+    }
 
-        entityGroup.add(group);
+    if (state.entities) {
+      for (const [id, ent] of Object.entries(state.entities)) {
+        buildEntity(ent, id, cx, cy);
       }
     }
 
@@ -296,6 +363,7 @@ if (!renderer.getContext()) {
       try {
         const data = JSON.parse(msg.data);
         if (data._type === 'snapshot') {
+          window.__lastState = data;
           buildDungeon(data);
           loadingEl.classList.add('hidden');
           statusEl.textContent = `Dungeon OS — ${data.width}×${data.height} · ${data.lights?.length || 0} lights · ${data.entities ? Object.keys(data.entities).length : 0} entities · tick ${data.tick || 0}`;
@@ -306,19 +374,34 @@ if (!renderer.getContext()) {
   }
   connect();
 
+  // Animation clock
+  const clock = new THREE.Clock();
+
   function animate() {
     requestAnimationFrame(animate);
 
-    // Idle breathing animation for entities
+    const delta = clock.getDelta();
+
+    // Update GLTF animation mixers
+    const mixers = window.__mixers || [];
+    for (const mixer of mixers) {
+      mixer.update(delta);
+    }
+
+    // Idle breathing for fallback cylinder+sphere entities
     const ents = window.__entities || {};
     const t = performance.now() / 1000;
     for (const [id, obj] of Object.entries(ents)) {
-      if (obj.group) {
-        const ud = obj.group.userData;
-        const breath = Math.sin(t * ud.period + ud.phase) * 0.03;
-        obj.group.position.y = ud.baseY + breath;
-        // Slight rotation sway
-        obj.group.rotation.z = Math.sin(t * ud.period * 0.5 + ud.phase) * 0.02;
+      if (obj.group && obj.group.children.length > 0) {
+        const firstChild = obj.group.children[0];
+        // Only apply breathing to cylinder fallback (not GLTF models)
+        if (firstChild.type === 'Mesh' && firstChild.geometry?.type === 'CylinderGeometry') {
+          const ud = obj.group.userData;
+          const breath = Math.sin(t * ud.period + ud.phase) * 0.03;
+          obj.group.position.y = ud.baseY + breath;
+          // Slight rotation sway
+          obj.group.rotation.z = Math.sin(t * ud.period * 0.5 + ud.phase) * 0.02;
+        }
       }
     }
 
