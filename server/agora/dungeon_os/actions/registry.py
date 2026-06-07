@@ -109,6 +109,13 @@ def _register_builtins(registry: ActionRegistry):
         action_verify_quest,
         action_sandbox,
     )
+    from agora.dungeon_os.actions.corporation import (
+        action_scan_horizon,
+        action_deep_research,
+        action_store_knowledge,
+        action_evaluate_proposal,
+        action_compound,
+    )
 
     # Hermes
     for skill in ("send_message", "relay", "broadcast", "deliver"):
@@ -129,6 +136,19 @@ def _register_builtins(registry: ActionRegistry):
     # Warden
     registry.register("warden", "verify", action_verify_quest)
     registry.register("warden", "sandbox", action_sandbox)
+
+    # Corporation roles
+    registry.register("scout", "scan_horizon", action_scan_horizon)
+    registry.register("scout", "research", action_deep_research)
+    registry.register("researcher", "deep_research", action_deep_research)
+    registry.register("researcher", "repo_analysis", action_deep_research)
+    registry.register("researcher", "docs_analysis", action_deep_research)
+    registry.register("researcher", "best_practices", action_deep_research)
+    registry.register("brainmaster", "store_knowledge", action_store_knowledge)
+    registry.register("brainmaster", "synthesize", action_store_knowledge)
+    registry.register("ceo", "evaluate_proposal", action_evaluate_proposal)
+    registry.register("cto", "evaluate_proposal", action_evaluate_proposal)
+    registry.register("warden", "compound", action_compound)
 
     # Generic fallbacks
     registry.register("*", "wait", _action_wait)

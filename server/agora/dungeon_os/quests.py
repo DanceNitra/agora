@@ -63,10 +63,14 @@ class QuestEngine:
         reward: int = 0,
         owner: Optional[str] = None,
         depends_on: Optional[list[str]] = None,
+        phase: str = "head",
+        research_source: Optional[str] = None,
     ) -> dict:
         """Create a new quest and add it to the board."""
         if subsystem not in SUBSYSTEMS:
             return {"error": f"Invalid subsystem: {subsystem}"}
+        if phase not in ("head", "pata", "compound"):
+            return {"error": f"Invalid phase: {phase}"}
 
         # Check duplicate
         existing = await self._find_quest(quest_id)
@@ -75,8 +79,8 @@ class QuestEngine:
 
         await self.db.execute(
             """INSERT INTO quests (id, title, goal, subsystem, success_criteria, reward,
-               owner, depends_on, status, created_at)
-               VALUES (?, ?, ?, ?, ?, ?, ?, ?, 'open', datetime('now'))""",
+               owner, depends_on, status, phase, research_source, created_at)
+               VALUES (?, ?, ?, ?, ?, ?, ?, ?, 'open', ?, ?, datetime('now'))""",
             (
                 quest_id,
                 title,
@@ -86,6 +90,8 @@ class QuestEngine:
                 reward,
                 owner,
                 json.dumps(depends_on or []),
+                phase,
+                research_source,
             ),
         )
         await self.db.commit()
@@ -571,6 +577,12 @@ class QuestEngine:
             "reward": row["reward"],
             "owner": _safe_get("owner"),
             "status": row["status"],
+            "phase": _safe_get("phase", "pata"),
+            "research_source": _safe_get("research_source"),
+            "findings_path": _safe_get("findings_path"),
+            "proposal_status": _safe_get("proposal_status", "pending"),
+            "compound_lessons": _safe_get("compound_lessons"),
+            "research_summary": _safe_get("research_summary"),
             "depends_on": json.loads(row["depends_on"] or "[]"),
             "denial_reason": _safe_get("denial_reason"),
             "denial_fix": _safe_get("denial_fix"),
@@ -580,7 +592,6 @@ class QuestEngine:
             "assigned_at": _safe_get("assigned_at"),
             "completed_at": _safe_get("completed_at"),
         }
-
 
 async def ensure_quest_tables(db):
     """Create quest table if it doesn't exist."""
@@ -603,6 +614,35 @@ async def ensure_quest_tables(db):
             assigned_at       TEXT,
             submitted_at      TEXT,
             completed_at      TEXT
+        )
+    """)
+    await db.commit()
+
+    # Migration: add HEAD/PATA columns (safe — may already exist)
+    for col, col_type in [
+        ("phase", "TEXT NOT NULL DEFAULT 'pata'"),
+        ("research_source", "TEXT"),
+        ("findings_path", "TEXT"),
+        ("proposal_status", "TEXT DEFAULT 'pending'"),
+        ("compound_lessons", "TEXT"),
+        ("research_summary", "TEXT"),
+    ]:
+        try:
+            await db.execute(f"ALTER TABLE quests ADD COLUMN {col} {col_type}")
+        except Exception:
+            pass
+    await db.commit()
+
+    # HEAD-specific metastore for parallel research results
+    await db.execute("""
+        CREATE TABLE IF NOT EXISTS research_findings (
+            id          INTEGER PRIMARY KEY AUTOINCREMENT,
+            quest_id    TEXT NOT NULL,
+            researcher  TEXT NOT NULL,
+            source_url  TEXT,
+            summary     TEXT NOT NULL,
+            impact      TEXT,
+            created_at  TEXT DEFAULT (datetime('now'))
         )
     """)
     await db.commit()

@@ -4,7 +4,7 @@ import os
 
 from fastapi import APIRouter, HTTPException, Request
 
-from agora.dungeon_os.agent_worker import AgentWorker
+from agora.dungeon_os.agent_worker import CorporationWorker
 
 router = APIRouter(prefix="/api/v2/dungeon-os", tags=["dungeon-os"])
 
@@ -31,7 +31,7 @@ def get_worker(request: Request):
             "telegram_chat_id": os.getenv("HERMES_TELEGRAM_CHAT_ID"),
             "telegram_bot_token": os.getenv("HERMES_TELEGRAM_BOT_TOKEN"),
         }
-        worker = AgentWorker(qe, db, config)
+        worker = CorporationWorker(qe, db, config)
         request.app.state.agent_worker = worker
     return worker
 
@@ -279,9 +279,15 @@ async def poll_watch_dir(request: Request):
 @router.post("/tick")
 async def run_worker_tick(request: Request):
     """Run one agent worker tick — NPCs work on claimed quests."""
-    worker = get_worker(request)
-    result = await worker.tick()
-    return result
+    import traceback
+    try:
+        worker = get_worker(request)
+        result = await worker.tick()
+        return result
+    except Exception as e:
+        tb = traceback.format_exc()
+        print(f"[TICK] CRASH: {e}\n{tb[:2000]}")
+        raise
 
 
 @router.get("/worker/stats")
