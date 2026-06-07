@@ -1,6 +1,7 @@
 """Evaluation API — epoch metrics, agent scoring, and context inspection."""
 
 from fastapi import APIRouter, Request
+from agora.coordination.tft_verifier import TFTVerifier
 
 router = APIRouter(prefix="/api/v1/eval", tags=["eval"])
 
@@ -94,3 +95,51 @@ async def get_agent_actions(request: Request, agent_id: str):
         return {"error": "Execution engine not initialized"}
     history = ee.get_action_history(agent_id)
     return {"agent_id": agent_id[:8], "count": len(history), "actions": history}
+
+
+# ═══════════════════════════════════════════════
+# TFT VERIFIER ENDPOINTS
+# ═══════════════════════════════════════════════
+
+# IMPORTANT: /tft/all MUST come before /tft/{agent_id} to avoid
+# FastAPI path param capture of "all" as an agent_id
+
+
+@router.get("/tft/all")
+async def get_all_tft_scores(request: Request):
+    """Get TFT compliance scores for all agents that have interactions."""
+    tft: TFTVerifier = request.app.state.tft_verifier
+    if not tft:
+        return {"error": "TFT Verifier not initialized"}
+    results = await tft.evaluate_all()
+    return {"count": len(results), "agents": results}
+
+
+@router.get("/tft/pair/{agent_id}/{partner_id}")
+async def get_tft_pair_score(request: Request, agent_id: str, partner_id: str):
+    """Get TFT compliance score for interactions between two agents."""
+    tft: TFTVerifier = request.app.state.tft_verifier
+    if not tft:
+        return {"error": "TFT Verifier not initialized"}
+    result = await tft.evaluate_pair(agent_id, partner_id)
+    return result
+
+
+@router.get("/tft/{agent_id}")
+async def get_tft_score(request: Request, agent_id: str):
+    """Get TFT compliance score for a single agent."""
+    tft: TFTVerifier = request.app.state.tft_verifier
+    if not tft:
+        return {"error": "TFT Verifier not initialized"}
+    result = await tft.evaluate(agent_id)
+    return result
+
+
+@router.get("/tft/log/{agent_id}")
+async def get_tft_log(request: Request, agent_id: str, limit: int = 50):
+    """Get raw interaction log for an agent."""
+    tft: TFTVerifier = request.app.state.tft_verifier
+    if not tft:
+        return {"error": "TFT Verifier not initialized"}
+    history = await tft.load_history(agent_id, limit=limit)
+    return {"agent_id": agent_id[:8], "count": len(history), "interactions": history}

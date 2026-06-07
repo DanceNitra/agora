@@ -48,14 +48,14 @@ Tento roadmap definuje upgrade Agory z **0.1.0 (dungeon playground)** na **1.0.0
 ### Layer 2 — Consensus & Trust ⚠️
 - ESS Engine (basic — trust scores exist)
 - Stigmergy Processor (traces, alerts, best-agent selection)
-- **TFT Verifier — CHYBAJÚCI** (Tit-for-Tat nie je implementovaný)
+- **TFT Verifier ✅** (Tit-for-Tat: nice/retaliatory/forgiving/clear detectors, 30% blend into trust)
 
 ### Layer 1 — Storage ⚠️
 - Redis (geo queries, NPC positions — funguje)
-- **PostgreSQL — CHYBAJÚCI** (SQLite dev-only)
+- **PostgreSQL ✅** (SQLAlchemy 2.0 + Alembic, Docker Compose)
 - **S3/MinIO — CHYBAJÚCI**
 - **Firecracker microVM — CHYBAJÚCI**
-- **Alembic migrations — CHYBAJÚCI**
+- **Alembic migrations ✅** (001 baseline + 002 TFT interaction_log)
 
 ---
 
@@ -73,12 +73,12 @@ Pool:        connection pool (min=5, max=20)
 ```
 
 **Čo treba spraviť:**
-- [ ] Prepísať `storage/connection.py` na asyncpg namiesto aiosqlite
-- [ ] Vytvoriť Alembic baseline migráciu z aktuálneho SQLite schema
-- [ ] Nahradiť všetky `cursor = await db.execute(...)` SQLAlchemy Core/ORM volaniami
-- [ ] Pridať `AGORA_DATABASE_URL` podporu pre `postgresql+asyncpg://`
+- [x] Prepísať `storage/connection.py` na asyncpg namiesto aiosqlite
+- [x] Vytvoriť Alembic baseline migráciu z aktuálneho SQLite schema
+- [x] Nahradiť všetky `cursor = await db.execute(...)` SQLAlchemy Core/ORM volaniami
+- [x] Pridať `AGORA_DATABASE_URL` podporu pre `postgresql+asyncpg://`
 - [ ] Migration skript: SQLite → PostgreSQL data export
-- [ ] Pridať Docker Compose pre PostgreSQL službu
+- [x] Pridať Docker Compose pre PostgreSQL službu
 
 ### 1.2 Redis Production Ready
 
@@ -151,14 +151,14 @@ class TFTVerifier:
         """Vráti nice/retaliatory/forgiving/clear scores."""
 ```
 
-- [ ] Interakčný log (kto s kým, kedy, výsledok)
-- [ ] Nice detector: prvý ťah vždy cooperate?
-- [ ] Retaliatory detector: defection → defection response?
-- [ ] Forgiving detector: po cooperácii reset?
-- [ ] Clear detector: konzistentné správanie?
-- [ ] TFT skóre = funkcia 4 dimenzií
-- [ ] Weighting do ESS trust skóre (30% TFT, 70% výsledky)
-- [ ] API: `/api/v1/trust/tft/{agent_id}`
+- [x] Interakčný log (kto s kým, kedy, výsledok)
+- [x] Nice detector: prvý ťah vždy cooperate?
+- [x] Retaliatory detector: defection → defection response?
+- [x] Forgiving detector: po cooperácii reset?
+- [x] Clear detector: konzistentné správanie?
+- [x] TFT skóre = funkcia 4 dimenzií
+- [x] Weighting do ESS trust skóre (30% TFT, 70% výsledky)
+- [x] API: `/api/v1/trust/tft/{agent_id}`
 
 ### 2.3 Stigmergy Processor v2
 

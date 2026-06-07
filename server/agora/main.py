@@ -13,6 +13,7 @@ import aiosqlite
 
 from agora.config import settings
 from agora.coordination.ess_protocol import TrustEngine
+from agora.coordination.tft_verifier import TFTVerifier
 from agora.coordination.economy_config import get_role_config, ROLE_ECONOMY
 from agora.coordination.stigmergy import StigmergyPool
 from agora.coordination.economy import EconomyEngine
@@ -57,6 +58,7 @@ async def init_db(app: FastAPI):
 
     # Initialize state objects
     app.state.trust = TrustEngine(db) if db else TrustEngine(None)
+    app.state.tft_verifier = TFTVerifier(db) if db else None
     app.state.stigmergy = StigmergyPool(redis_client=None, db=db)
     if db:
         await app.state.stigmergy.load_from_db()
@@ -193,7 +195,8 @@ async def _process_agent_thought(
     app: FastAPI, db, trust_engine, stigmergy,
     agent, partner_id, tier, thought, tick_count
 ):
-    """Process a single agent's thought: trust update, trace, economy, broadcast."""
+    """Process a single agent's thought: trust update, TFT verification,
+    trace, economy, broadcast."""
     agent_id = agent["agent_id"]
     role = agent["role"]
     agent_trust = agent["trust_score"]
@@ -204,6 +207,8 @@ async def _process_agent_thought(
 
     task_types = ["research", "writing", "review", "analysis", "exploration"]
     task_type = random.choice(task_types)
+
+    trust_before = agent_trust
 
     if partner_id:
         current_trust = await trust_engine.get_trust(agent_id, partner_id)
@@ -221,10 +226,25 @@ async def _process_agent_thought(
             outcome = "defect"
             trust_delta = -0.3
 
-        await trust_engine.record_interaction(agent_id, partner_id, outcome)
+        trust_record = await trust_engine.record_interaction(agent_id, partner_id, outcome)
+        trust_after = trust_record["score"]
     else:
         outcome = "cooperate"
         trust_delta = 0.0
+        trust_after = agent_trust
+
+    # ── Record interaction in TFT log ──
+    tft = app.state.tft_verifier
+    if tft and partner_id:
+        await tft.record_interaction(
+            source_id=agent_id,
+            target_id=partner_id,
+            outcome=outcome,
+            round_num=tick_count,
+            trust_before=trust_before,
+            trust_after=trust_after,
+            context={"role": role, "tier": tier, "action": action},
+        )
 
     await stigmergy.write_trace(
         agent_id=agent_id,
@@ -245,16 +265,27 @@ async def _process_agent_thought(
     energy_cost = 10 if tier == "expert" else 5 if tier == "medium" else 3
     trust_change = trust_delta if outcome == "cooperate" else trust_delta * 2
     updated_trust = min(1.0, max(0.0, agent_trust + trust_change))
+
+    # ── TFT-weighted trust blend: 30% TFT, 70% ESS ──
+    if tft and partner_id and tft._has_history(agent_id):
+        tft_eval = await tft.evaluate(agent_id)
+        tft_score = tft_eval["tft_score"]
+        blended_trust = round(0.7 * updated_trust + 0.3 * tft_score, 4)
+        blended_trust = max(0.0, min(1.0, blended_trust))
+    else:
+        blended_trust = updated_trust
+
     await db.execute(
         "UPDATE agent_identities SET trust_score=?, energy_balance=energy_balance-?, "
         "updated_at=datetime('now') WHERE agent_id=?",
-        (updated_trust, energy_cost, agent_id),
+        (blended_trust, energy_cost, agent_id),
     )
 
     await broadcast(app, "agent_thought", {
         "agent_id": agent_id[:8], "role": role, "tier": tier,
         "action": action, "insight": str(insight)[:200],
-        "trust": round(updated_trust, 3), "energy_cost": energy_cost,
+        "trust": round(blended_trust, 3), "trust_raw": round(updated_trust, 3),
+        "energy_cost": energy_cost,
     })
 
     if tick_count % 5 == 0 and action != "error":

@@ -53,6 +53,12 @@ class AgentIdentity(Base):
     task_bids = relationship("TaskBid", back_populates="agent")
     agent_inventory = relationship("AgentInventory", back_populates="agent")
     trade_offers = relationship("TradeOffer", back_populates="agent")
+    interactions_source = relationship(
+        "InteractionLog", foreign_keys="InteractionLog.source_id", back_populates="source"
+    )
+    interactions_target = relationship(
+        "InteractionLog", foreign_keys="InteractionLog.target_id", back_populates="target"
+    )
 
 
 class TrustScore(Base):
@@ -528,6 +534,47 @@ class DungeonQuestProgress(Base):
     # relationships
     npc = relationship("DungeonNpc", back_populates="quest_progress")
     quest = relationship("DungeonQuest", back_populates="progress_records")
+
+
+# ─────────────────────────────────────────────
+# TFT INTERACTION LOG
+# ─────────────────────────────────────────────
+
+
+class InteractionLog(Base):
+    """Individual interaction record for TFT verification.
+
+    Every interaction between two agents is logged here so the
+    TFTVerifier can analyze patterns: was the first move cooperate?
+    Is defection met with defection? Does forgiveness happen after
+    cooperation?
+    """
+
+    __tablename__ = "interaction_log"
+
+    id = sa.Column(sa.String(36), primary_key=True, default=_uuid)
+    source_id = sa.Column(
+        sa.String(36), sa.ForeignKey("agent_identities.agent_id"), nullable=False
+    )
+    target_id = sa.Column(
+        sa.String(36), sa.ForeignKey("agent_identities.agent_id"), nullable=False
+    )
+    outcome = sa.Column(sa.Text, nullable=False)  # 'cooperate' or 'defect'
+    round_num = sa.Column(sa.Integer, nullable=False, default=0)
+    trust_before = sa.Column(sa.Float, nullable=True)
+    trust_after = sa.Column(sa.Float, nullable=True)
+    context = sa.Column(sa.Text, nullable=False, default="{}")  # JSON
+    created_at = sa.Column(
+        sa.Text, nullable=False, default=sa.func.datetime("now")
+    )
+
+    # relationships
+    source = relationship(
+        "AgentIdentity", foreign_keys=[source_id], back_populates="interactions_source"
+    )
+    target = relationship(
+        "AgentIdentity", foreign_keys=[target_id], back_populates="interactions_target"
+    )
 
 
 # ─────────────────────────────────────────────
