@@ -37,6 +37,7 @@ from agora.api import agent_os_api
 from agora.api import physical_api
 from agora.api import tool_registry_api as tool_registry_api
 from agora.api import evaluation_api
+from agora.api import god_console_v2
 
 
 async def init_db(app: FastAPI):
@@ -182,6 +183,7 @@ app.include_router(agent_os_api.router)
 app.include_router(physical_api.router)
 app.include_router(tool_registry_api.router)
 app.include_router(evaluation_api.router)
+app.include_router(god_console_v2.router)
 
 
 async def broadcast(app: FastAPI, event_type: str, payload: dict):

@@ -1,315 +1,659 @@
-import React, { useState, useEffect, useRef, useCallback } from 'react';
-import { useGodCommands } from '../hooks/useGodCommands';
+import React, { useEffect, useState } from 'react';
 
-const COMMANDS = [
-  '!spawn <role> "<goal>"',
-  '!list',
-  '!reward <agent_id> <amount>',
-  '!punish <agent_id> <amount>',
-  '!pause <agent_id>',
-  '!resume <agent_id>',
-  '!inspect <agent_id>',
-  '!inject <agent_id> <message>',
-  '!rollback <agent_id>',
-  '!reset all',
-  '!broadcast <message>',
-  '!help',
-];
+// ═══════════════════════════════════════════
+// TYPES
+// ═══════════════════════════════════════════
 
-const HELP_TEXT = `Available commands:
-  !spawn <role> "<goal>"   — Create a new agent
-  !list                    — List all agents
-  !reward <id> <amt>       — Increase agent trust
-  !punish <id> <amt>       — Decrease agent trust
-  !pause <id>              — Pause an agent
-  !resume <id>             — Resume paused agent
-  !inspect <id>            — View agent details
-  !inject <id> <msg>       — Send message to agent
-  !rollback <id>           — Rollback agent state
-  !reset all               — Reset entire system
-  !broadcast <msg>         — Broadcast to all agents`;
-
-interface HistoryEntry {
-  command: string;
-  output: string;
-  timestamp: Date;
+interface NPC {
+  npc_id: string; npc_name: string; role: string;
+  health: number; status: string; pos_x: number; pos_y: number;
+  stamina: number; hunger: number; fatigue: number;
+  state_of_mind: string; current_goal: string; plan_stack: string;
+  personality: string; archetype: string; emotional_state: string;
 }
 
-const suggestionsFromCommand = (cmd: string): string[] => {
-  if (!cmd.startsWith('!')) return [];
-  return COMMANDS.filter((c) => c.startsWith(cmd));
-};
+interface NPCDetail {
+  npc: any; body: any; brain: any; soul: any;
+  abilities: any[]; skills: any[]; memories: any[]; inventory: any[];
+}
 
-const GodConsole: React.FC = () => {
-  const [input, setInput] = useState('');
-  const [history, setHistory] = useState<HistoryEntry[]>([]);
-  const [suggestions, setSuggestions] = useState<string[]>([]);
-  const [selectedSuggestion, setSelectedSuggestion] = useState(-1);
-  const [wsConnected, setWsConnected] = useState(false);
-  const [wsLog, setWsLog] = useState<string[]>([]);
-  const wsRef = useRef<WebSocket | null>(null);
-  const historyEndRef = useRef<HTMLDivElement>(null);
-  const inputRef = useRef<HTMLInputElement>(null);
-  const { sendCommand } = useGodCommands();
+interface StateDist {
+  state_of_mind: string; count: number;
+  avg_health: number; avg_stamina: number; avg_hunger: number; avg_fatigue: number;
+}
 
-  // WebSocket connection to the main /ws endpoint
+interface AOSSummary {
+  state_distribution: StateDist[];
+  help_requests: { total: number; completed: number };
+  all_npcs: { npc_name: string; state_of_mind: string; current_goal: string; health: number }[];
+}
+
+interface Violation {
+  id?: number; event_type?: string; source_id?: string; payload?: string;
+  type?: string; detail?: string; severity?: string; npc_id?: string;
+  created_at?: string;
+}
+
+interface ControllerStats {
+  tick: number; rooms: string[]; priorities: Record<string, number>;
+  multiprocessing: boolean;
+}
+
+type TabId = 'agents' | 'violations' | 'os' | 'controller' | 'health';
+
+const TABS: { id: TabId; label: string; icon: string }[] = [
+  { id: 'agents', label: 'Agent Management', icon: '👤' },
+  { id: 'violations', label: 'Byzantine', icon: '⚠️' },
+  { id: 'os', label: 'Agent OS', icon: '🧠' },
+  { id: 'controller', label: 'Controller', icon: '⚙️' },
+  { id: 'health', label: 'Health', icon: '💚' },
+];
+
+// ═══════════════════════════════════════════
+// MAIN COMPONENT
+// ═══════════════════════════════════════════
+
+const GodConsoleV2: React.FC = () => {
+  const [activeTab, setActiveTab] = useState<TabId>('health');
+  const [npcs, setNpcs] = useState<NPC[]>([]);
+  const [selectedNpc, setSelectedNpc] = useState<NPC | null>(null);
+  const [npcDetail, setNpcDetail] = useState<NPCDetail | null>(null);
+  const [violations, setViolations] = useState<Violation[]>([]);
+  const [osSummary, setOsSummary] = useState<AOSSummary | null>(null);
+  const [controllerStats, setControllerStats] = useState<ControllerStats | null>(null);
+  const [healthData, setHealthData] = useState<any>(null);
+  const [loading, setLoading] = useState<boolean>(false);
+
+  const api = (path: string) => `${window.location.origin}${path}`;
+
+  // Fetch data based on active tab
   useEffect(() => {
-    const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
-    const wsUrl = `${protocol}//${window.location.host}/ws`;
-    let reconnectTimer: ReturnType<typeof setTimeout>;
-
-    const connect = () => {
-      const ws = new WebSocket(wsUrl);
-      wsRef.current = ws;
-
-      ws.onopen = () => setWsConnected(true);
-      ws.onclose = () => {
-        setWsConnected(false);
-        reconnectTimer = setTimeout(connect, 3000);
-      };
-      ws.onerror = () => ws.close();
-      ws.onmessage = (evt) => {
-        setWsLog((prev) => [...prev.slice(-199), evt.data]);
-      };
-    };
-
-    connect();
-    return () => {
-      clearTimeout(reconnectTimer);
-      wsRef.current?.close();
-    };
-  }, []);
-
-  // Auto-scroll
-  useEffect(() => {
-    historyEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-  }, [history, wsLog]);
-
-  const handleInputChange = useCallback(
-    (e: React.ChangeEvent<HTMLInputElement>) => {
-      const val = e.target.value;
-      setInput(val);
-      setSuggestions(suggestionsFromCommand(val));
-      setSelectedSuggestion(-1);
-    },
-    [],
-  );
-
-  const executeCommand = useCallback(
-    async (cmd: string) => {
-      const trimmed = cmd.trim();
-      if (!trimmed) return;
-
-      // Handle !help locally
-      if (trimmed === '!help') {
-        setHistory((prev) => [
-          ...prev,
-          { command: trimmed, output: HELP_TEXT, timestamp: new Date() },
-        ]);
-        setInput('');
-        setSuggestions([]);
-        return;
-      }
-
-      setHistory((prev) => [
-        ...prev,
-        { command: trimmed, output: '⏳ Sending…', timestamp: new Date() },
-      ]);
-      setInput('');
-      setSuggestions([]);
-
+    const fetchData = async () => {
+      setLoading(true);
       try {
-        const result = await sendCommand(trimmed);
-        setHistory((prev) => {
-          const copy = [...prev];
-          copy[copy.length - 1] = {
-            ...copy[copy.length - 1],
-            output: result.output ?? result.error ?? '(empty response)',
-          };
-          return copy;
-        });
-      } catch (err: any) {
-        setHistory((prev) => {
-          const copy = [...prev];
-          copy[copy.length - 1] = {
-            ...copy[copy.length - 1],
-            output: `❌ ${err.message ?? String(err)}`,
-          };
-          return copy;
-        });
-      }
-    },
-    [sendCommand],
-  );
-
-  const handleKeyDown = useCallback(
-    (e: React.KeyboardEvent) => {
-      if (e.key === 'Enter') {
-        e.preventDefault();
-        if (selectedSuggestion >= 0 && suggestions[selectedSuggestion]) {
-          executeCommand(suggestions[selectedSuggestion]);
-        } else {
-          executeCommand(input);
+        if (activeTab === 'agents' || activeTab === 'health') {
+          const res = await fetch(api('/api/v2/god/npcs'));
+          if (res.ok) setNpcs((await res.json()).npcs || []);
         }
-        return;
+        if (activeTab === 'violations' || activeTab === 'health') {
+          const res = await fetch(api('/api/v2/god/violations'));
+          if (res.ok) setViolations((await res.json()).violations || []);
+        }
+        if (activeTab === 'os' || activeTab === 'health') {
+          const res = await fetch(api('/api/v2/god/agent-os/summary'));
+          if (res.ok) setOsSummary(await res.json());
+        }
+        if (activeTab === 'controller' || activeTab === 'health') {
+          const res = await fetch(api('/api/v2/god/controller'));
+          if (res.ok) setControllerStats(await res.json());
+        }
+        if (activeTab === 'health') {
+          const res = await fetch(api('/api/v2/god/health'));
+          if (res.ok) setHealthData(await res.json());
+        }
+      } catch (e) {
+        console.error('Fetch error:', e);
+      } finally {
+        setLoading(false);
       }
+    };
+    fetchData();
+    const interval = setInterval(fetchData, 10000);
+    return () => clearInterval(interval);
+  }, [activeTab]);
 
-      if (e.key === 'ArrowDown' && suggestions.length > 0) {
-        e.preventDefault();
-        setSelectedSuggestion((prev) =>
-          prev < suggestions.length - 1 ? prev + 1 : 0,
-        );
-        return;
-      }
+  const loadNpcDetail = async (npc: NPC) => {
+    setSelectedNpc(npc);
+    setNpcDetail(null);
+    try {
+      const res = await fetch(api(`/api/v2/god/npcs/${npc.npc_id}/detail`));
+      if (res.ok) setNpcDetail(await res.json());
+    } catch (e) {
+      console.error('Detail fetch error:', e);
+    }
+  };
 
-      if (e.key === 'ArrowUp' && suggestions.length > 0) {
-        e.preventDefault();
-        setSelectedSuggestion((prev) =>
-          prev > 0 ? prev - 1 : suggestions.length - 1,
-        );
-        return;
-      }
+  const toggleNpcStatus = async (npc: NPC, action: 'pause' | 'resume') => {
+    try {
+      await fetch(api(`/api/v2/god/npcs/${npc.npc_id}/${action}`), { method: 'POST' });
+      // Refresh list
+      const res = await fetch(api('/api/v2/god/npcs'));
+      if (res.ok) setNpcs((await res.json()).npcs || []);
+    } catch (e) {
+      console.error('Toggle error:', e);
+    }
+  };
 
-      if (e.key === 'Tab' && suggestions.length > 0) {
-        e.preventDefault();
-        const pick = selectedSuggestion >= 0 ? suggestions[selectedSuggestion] : suggestions[0];
-        setInput(pick + ' ');
-        setSuggestions([]);
-        setSelectedSuggestion(-1);
-      }
+  const stateColor = (s: string) => {
+    switch (s) {
+      case 'focused': return '#22c55e';
+      case 'planning': return '#88ccff';
+      case 'resting': return '#eab308';
+      case 'confused': return '#f97316';
+      case 'panicked': return '#ef4444';
+      default: return '#6b7280';
+    }
+  };
 
-      if (e.key === 'Escape') {
-        setSuggestions([]);
-        setSelectedSuggestion(-1);
-      }
-    },
-    [input, suggestions, selectedSuggestion, executeCommand],
-  );
+  const trustColor = (s: string) => {
+    if (s === 'active') return '#22c55e';
+    if (s === 'paused') return '#eab308';
+    return '#6b7280';
+  };
 
   return (
     <div style={styles.container}>
+      {/* Header */}
       <div style={styles.header}>
-        <span style={styles.title}>⛁ God Console</span>
-        <span
-          style={{
-            ...styles.badge,
-            background: wsConnected ? '#22c55e' : '#ef4444',
-          }}
-        >
-          {wsConnected ? '● LIVE' : '○ DISCONNECTED'}
-        </span>
+        <h2 style={styles.title}>⚡ God Console 2.0</h2>
+        <span style={styles.liveBadge}>🔴 LIVE</span>
       </div>
 
-      <div style={styles.outputArea}>
-        {history.length === 0 && (
-          <div style={styles.hint}>
-            Type !help to see available commands, or !list to view agents.
-          </div>
-        )}
-        {history.map((entry, idx) => (
-          <div key={idx} style={styles.historyRow}>
-            <span style={styles.prompt}>&gt;</span>
-            <span style={styles.commandText}>{entry.command}</span>
-            <br />
-            <span style={styles.outputText}>{entry.output}</span>
-            <span style={styles.timestamp}>
-              {entry.timestamp.toLocaleTimeString()}
-            </span>
-          </div>
+      {/* Tabs */}
+      <div style={styles.tabRow}>
+        {TABS.map((t) => (
+          <button
+            key={t.id}
+            onClick={() => setActiveTab(t.id)}
+            style={{
+              ...styles.tab,
+              ...(activeTab === t.id ? styles.tabActive : {}),
+            }}
+          >
+            {t.icon} {t.label}
+          </button>
         ))}
-
-        {wsLog.length > 0 && (
-          <div style={styles.wsSection}>
-            <div style={styles.wsLabel}>📡 Live feed</div>
-            {wsLog.map((msg, i) => (
-              <div key={i} style={styles.wsLine}>{msg}</div>
-            ))}
-          </div>
-        )}
-        <div ref={historyEndRef} />
       </div>
 
-      <div style={styles.inputArea}>
-        {suggestions.length > 0 && (
-          <div style={styles.suggestionsDropdown}>
-            {suggestions.map((s, i) => (
-              <div
-                key={s}
-                style={{
-                  ...styles.suggestionItem,
-                  background: i === selectedSuggestion ? 'rgba(251,191,36,0.25)' : 'transparent',
-                }}
-                onMouseDown={() => {
-                  setInput(s + ' ');
-                  setSuggestions([]);
-                  inputRef.current?.focus();
-                }}
-              >
-                {s}
-              </div>
-            ))}
-          </div>
-        )}
-        <span style={styles.prompt}>&gt;</span>
-        <input
-          ref={inputRef}
-          type="text"
-          value={input}
-          onChange={handleInputChange}
-          onKeyDown={handleKeyDown}
-          placeholder="Type a command…"
-          style={styles.input}
+      {loading && <div style={styles.loading}>Loading...</div>}
+
+      {/* Tab content */}
+      {activeTab === 'agents' && (
+        <AgentManagementTab
+          npcs={npcs}
+          selectedNpc={selectedNpc}
+          npcDetail={npcDetail}
+          onSelectNpc={loadNpcDetail}
+          onToggleStatus={toggleNpcStatus}
+          onCloseDetail={() => { setSelectedNpc(null); setNpcDetail(null); }}
+          stateColor={stateColor}
+          trustColor={trustColor}
         />
+      )}
+
+      {activeTab === 'violations' && (
+        <ViolationsTab violations={violations} stateColor={stateColor} />
+      )}
+
+      {activeTab === 'os' && (
+        <AgentOSTab osSummary={osSummary} stateColor={stateColor} />
+      )}
+
+      {activeTab === 'controller' && (
+        <ControllerTab stats={controllerStats} />
+      )}
+
+      {activeTab === 'health' && (
+        <HealthTab
+          health={healthData}
+          npcs={npcs}
+          violations={violations}
+          osSummary={osSummary}
+          controllerStats={controllerStats}
+        />
+      )}
+    </div>
+  );
+};
+
+// ═══════════════════════════════════════════
+// TAB 1: AGENT MANAGEMENT
+// ═══════════════════════════════════════════
+
+const AgentManagementTab: React.FC<{
+  npcs: NPC[]; selectedNpc: NPC | null; npcDetail: NPCDetail | null;
+  onSelectNpc: (n: NPC) => void; onToggleStatus: (n: NPC, a: 'pause' | 'resume') => void;
+  onCloseDetail: () => void; stateColor: (s: string) => string; trustColor: (s: string) => string;
+}> = ({ npcs, selectedNpc, npcDetail, onSelectNpc, onToggleStatus, onCloseDetail, stateColor, trustColor }) => (
+  <div style={styles.tabContent}>
+    <div style={styles.twoCol}>
+      {/* NPC List */}
+      <div style={{ flex: 1, minWidth: 400 }}>
+        <h3 style={styles.sectionTitle}>All NPCs ({npcs.length})</h3>
+        <div style={styles.table}>
+          <div style={styles.tableHeader}>
+            <span style={{ flex: 2 }}>Name</span>
+            <span style={{ flex: 1 }}>Role</span>
+            <span style={{ flex: 1 }}>State</span>
+            <span style={{ flex: 1, textAlign: 'center' }}>❤️</span>
+            <span style={{ flex: 1, textAlign: 'center' }}>⚡</span>
+            <span style={{ flex: 0.8 }}>Status</span>
+            <span style={{ flex: 1 }}>Actions</span>
+          </div>
+          {npcs.map((n) => (
+            <div
+              key={n.npc_id}
+              style={{
+                ...styles.tableRow,
+                background: selectedNpc?.npc_id === n.npc_id ? '#2a3a4a' : 'transparent',
+                cursor: 'pointer',
+              }}
+              onClick={() => onSelectNpc(n)}
+            >
+              <span style={{ flex: 2, fontWeight: 600 }}>{n.npc_name}</span>
+              <span style={{ flex: 1, fontSize: 12, textTransform: 'capitalize' }}>{n.role}</span>
+              <span style={{ flex: 1, fontSize: 12, color: stateColor(n.state_of_mind) }}>
+                {n.state_of_mind}
+              </span>
+              <span style={{ flex: 1, textAlign: 'center', fontSize: 13 }}>
+                {n.health?.toFixed(0)}
+              </span>
+              <span style={{ flex: 1, textAlign: 'center', fontSize: 13 }}>
+                {n.stamina?.toFixed(0)}
+              </span>
+              <span style={{ flex: 0.8, fontSize: 11 }}>
+                <span style={{
+                  display: 'inline-block', width: 8, height: 8, borderRadius: '50%',
+                  background: trustColor(n.status), marginRight: 4,
+                }} />
+                {n.status}
+              </span>
+              <span style={{ flex: 1, display: 'flex', gap: 4 }}>
+                {n.status === 'active' ? (
+                  <button style={styles.smallBtn} onClick={(e) => { e.stopPropagation(); onToggleStatus(n, 'pause'); }}>
+                    ⏸️
+                  </button>
+                ) : (
+                  <button style={styles.smallBtn} onClick={(e) => { e.stopPropagation(); onToggleStatus(n, 'resume'); }}>
+                    ▶️
+                  </button>
+                )}
+              </span>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* NPC Detail */}
+      {npcDetail && selectedNpc && (
+        <div style={{ flex: 1, minWidth: 350, background: '#1f2937', borderRadius: 8, padding: 12, border: '1px solid #374151' }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
+            <h3 style={{ fontSize: 16, fontWeight: 700, color: '#fbbf24', margin: 0 }}>
+              {selectedNpc.npc_name}
+            </h3>
+            <button onClick={onCloseDetail} style={{ ...styles.smallBtn, fontSize: 14 }}>✕</button>
+          </div>
+          <DetailPanel npcDetail={npcDetail} stateColor={stateColor} />
+        </div>
+      )}
+    </div>
+  </div>
+);
+
+const DetailPanel: React.FC<{ npcDetail: NPCDetail; stateColor: (s: string) => string }> = ({ npcDetail, stateColor }) => {
+  const n = npcDetail.npc;
+  const brain = npcDetail.brain || {};
+  const body = npcDetail.body || {};
+  const soul = npcDetail.soul || {};
+
+  return (
+    <div>
+      {/* Quick stats */}
+      <div style={styles.statGrid}>
+        <Stat label="Health" value={n.health?.toFixed(0)} color="#ef4444" />
+        <Stat label="Stamina" value={body.stamina?.toFixed(0)} color="#22c55e" />
+        <Stat label="Hunger" value={body.hunger?.toFixed(0)} color="#eab308" />
+        <Stat label="Fatigue" value={body.fatigue?.toFixed(0)} color="#f97316" />
+        <Stat label="Position" value={`(${n.pos_x},${n.pos_y})`} color="#88ccff" />
+        <Stat label="Status" value={n.status} color={n.status === 'active' ? '#22c55e' : '#6b7280'} />
+      </div>
+
+      {/* Brain */}
+      <div style={{ marginTop: 10 }}>
+        <div style={styles.subtitle}>🧠 Brain</div>
+        <div style={styles.keyVal}>
+          <span>State: <b style={{ color: stateColor(brain.state_of_mind || 'unknown') }}>{brain.state_of_mind || '—'}</b></span>
+          <span>Goal: {brain.current_goal || '—'}</span>
+          <span>Plan: {brain.plan_stack ? (JSON.parse(brain.plan_stack)?.length || 0) + ' steps' : '0 steps'}</span>
+          <span>Last: {brain.last_decision || '—'}</span>
+        </div>
+      </div>
+
+      {/* Soul */}
+      <div style={{ marginTop: 10 }}>
+        <div style={styles.subtitle}>💎 Soul</div>
+        <div style={styles.keyVal}>
+          <span>Archetype: {soul.archetype || '—'}</span>
+          <span>Emotion: {soul.emotional_state || '—'}</span>
+          <span>Alignment: {soul.moral_alignment || '—'}</span>
+          <span>Personality: {renderJson(soul.personality, ['openness', 'conscientiousness'])}</span>
+        </div>
+      </div>
+
+      {/* Skills & Abilities */}
+      <div style={{ marginTop: 10, display: 'flex', gap: 16 }}>
+        <div style={{ flex: 1 }}>
+          <div style={styles.subtitle}>📚 Skills ({npcDetail.skills.length})</div>
+          {npcDetail.skills.slice(0, 5).map((s, i) => (
+            <div key={i} style={styles.inlineItem}>
+              <span>{s.skill_name}</span>
+              <span style={{ color: '#88ccff' }}>Lv.{s.level}</span>
+              <span style={{ fontSize: 11, color: '#6b7280' }}>{s.xp}/{s.xp_to_next}XP</span>
+            </div>
+          ))}
+        </div>
+        <div style={{ flex: 1 }}>
+          <div style={styles.subtitle}>⚡ Abilities ({npcDetail.abilities.length})</div>
+          {npcDetail.abilities.slice(0, 5).map((a, i) => (
+            <div key={i} style={styles.inlineItem}>
+              <span>{a.ability_name}</span>
+              <span style={{ color: '#fbbf24' }}>Pw.{a.power_level}</span>
+              <span style={{ fontSize: 11, color: a.is_passive ? '#22c55e' : '#f97316' }}>
+                {a.is_passive ? 'passive' : 'active'}
+              </span>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* Inventory */}
+      <div style={{ marginTop: 10 }}>
+        <div style={styles.subtitle}>📦 Inventory ({npcDetail.inventory.length})</div>
+        <div style={styles.inlineRow}>
+          {npcDetail.inventory.map((i, idx) => (
+            <span key={idx} style={styles.tag}>
+              {i.name} x{i.quantity?.toFixed(1)}
+            </span>
+          ))}
+        </div>
       </div>
     </div>
   );
 };
 
-const styles: Record<string, React.CSSProperties> = {
-  container: {
-    display: 'flex',
-    flexDirection: 'column',
-    height: '100%',
-    background: '#1a1a1a',
-    color: '#d4d4d4',
-    fontFamily: "'Fira Code', 'JetBrains Mono', monospace",
-    fontSize: '14px',
-    overflow: 'hidden',
-  },
-  header: {
-    display: 'flex',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    padding: '10px 16px',
-    background: '#2a2a2a',
-    borderBottom: '1px solid #3a3a3a',
-  },
-  title: { color: '#fbbf24', fontWeight: 700, fontSize: '16px' },
-  badge: { padding: '2px 10px', borderRadius: '4px', color: '#fff', fontSize: '11px', fontWeight: 600 },
-  outputArea: { flex: 1, overflowY: 'auto', padding: '12px 16px' },
-  hint: { color: '#525252', fontStyle: 'italic', fontSize: '13px', textAlign: 'center', marginTop: 40 },
-  historyRow: { marginBottom: '10px', lineHeight: 1.5 },
-  prompt: { color: '#fbbf24', marginRight: '8px', fontWeight: 700 },
-  commandText: { color: '#fbbf24', fontWeight: 600 },
-  outputText: { color: '#a3a3a3', whiteSpace: 'pre-wrap', display: 'block', marginLeft: '14px' },
-  timestamp: { color: '#525252', fontSize: '11px', marginLeft: '12px' },
-  wsSection: { marginTop: '16px', borderTop: '1px dashed #3a3a3a', paddingTop: '8px' },
-  wsLabel: { color: '#22d3ee', fontSize: '12px', fontWeight: 600, marginBottom: '4px' },
-  wsLine: { color: '#6b7280', fontSize: '12px', lineHeight: 1.4 },
-  inputArea: {
-    display: 'flex', alignItems: 'center', padding: '10px 16px',
-    background: '#2a2a2a', borderTop: '1px solid #3a3a3a', position: 'relative',
-  },
-  input: {
-    flex: 1, background: 'transparent', border: 'none', outline: 'none',
-    color: '#d4d4d4', fontFamily: "'Fira Code', 'JetBrains Mono', monospace", fontSize: '14px',
-  },
-  suggestionsDropdown: {
-    position: 'absolute', bottom: '100%', left: '16px', right: '16px',
-    background: '#2a2a2a', border: '1px solid #3a3a3a', borderRadius: '4px 4px 0 0',
-    maxHeight: '160px', overflowY: 'auto',
-  },
-  suggestionItem: { padding: '6px 12px', cursor: 'pointer', color: '#fbbf24', fontSize: '13px' },
+const Stat: React.FC<{ label: string; value: string; color: string }> = ({ label, value, color }) => (
+  <div style={styles.stat}>
+    <div style={{ fontSize: 11, color: '#6b7280' }}>{label}</div>
+    <div style={{ fontSize: 18, fontWeight: 700, color }}>{value}</div>
+  </div>
+);
+
+// ═══════════════════════════════════════════
+// TAB 2: BYZANTINE VIOLATIONS
+// ═══════════════════════════════════════════
+
+const ViolationsTab: React.FC<{ violations: Violation[]; stateColor: (s: string) => string }> = ({ violations, stateColor }) => (
+  <div style={styles.tabContent}>
+    <h3 style={styles.sectionTitle}>⚠️ Byzantine Violations ({violations.length})</h3>
+    {violations.length === 0 ? (
+      <div style={{ color: '#22c55e', fontSize: 16, textAlign: 'center', padding: 40 }}>
+        ✅ No violations detected — system is clean
+      </div>
+    ) : (
+      <div style={styles.table}>
+        <div style={styles.tableHeader}>
+          <span style={{ flex: 1 }}>Time</span>
+          <span style={{ flex: 2 }}>Type</span>
+          <span style={{ flex: 1 }}>NPC</span>
+          <span style={{ flex: 3 }}>Detail</span>
+          <span style={{ flex: 0.8 }}>Severity</span>
+        </div>
+        {violations.map((v, i) => (
+          <div key={v.id || i} style={styles.tableRow}>
+            <span style={{ flex: 1, fontSize: 11, color: '#6b7280' }}>{v.created_at?.slice(11, 19) || '—'}</span>
+            <span style={{ flex: 2, fontSize: 12, color: stateColor(v.type || v.event_type || '') }}>
+              {v.type || v.event_type || '—'}
+            </span>
+            <span style={{ flex: 1, fontSize: 12 }}>{v.source_id?.slice(0, 8) || v.npc_id || '—'}</span>
+            <span style={{ flex: 3, fontSize: 11, color: '#9ca3af' }}>{v.detail || v.payload || '—'}</span>
+            <span style={{ flex: 0.8, fontSize: 11, color: v.severity === 'critical' ? '#ef4444' : '#eab308' }}>
+              {v.severity || 'warning'}
+            </span>
+          </div>
+        ))}
+      </div>
+    )}
+  </div>
+);
+
+// ═══════════════════════════════════════════
+// TAB 3: AGENT OS MONITORING
+// ═══════════════════════════════════════════
+
+const AgentOSTab: React.FC<{ osSummary: AOSSummary | null; stateColor: (s: string) => string }> = ({ osSummary, stateColor }) => {
+  if (!osSummary) return <div style={styles.tabContent}>No Agent OS data available</div>;
+
+  return (
+    <div style={styles.tabContent}>
+      <div style={styles.twoCol}>
+        {/* State Distribution */}
+        <div style={{ flex: 1 }}>
+          <h3 style={styles.sectionTitle}>🌀 State Distribution</h3>
+          <div style={styles.card}>
+            {osSummary.state_distribution.map((s) => (
+              <div key={s.state_of_mind} style={{ marginBottom: 8 }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 4 }}>
+                  <span style={{ color: stateColor(s.state_of_mind), fontWeight: 600, textTransform: 'capitalize' }}>
+                    {s.state_of_mind}
+                  </span>
+                  <span style={{ color: '#d4d4d4' }}>{s.count} agents</span>
+                </div>
+                <div style={styles.barOuter}>
+                  <div style={{
+                    ...styles.barInner, width: `${(s.count / Math.max(...osSummary.state_distribution.map(x => x.count))) * 100}%`,
+                    background: stateColor(s.state_of_mind),
+                  }} />
+                </div>
+                <div style={{ fontSize: 11, color: '#6b7280', marginTop: 2 }}>
+                  ❤️{s.avg_health} ⚡{s.avg_stamina} 🍖{s.avg_hunger} 💤{s.avg_fatigue}
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* Help Stats */}
+        <div style={{ flex: 1 }}>
+          <h3 style={styles.sectionTitle}>🆘 Help Requests</h3>
+          <div style={styles.card}>
+            <div style={{ display: 'flex', gap: 24 }}>
+              <Stat label="Total" value={String(osSummary.help_requests.total)} color="#fbbf24" />
+              <Stat label="Completed" value={String(osSummary.help_requests.completed)} color="#22c55e" />
+              <Stat label="Pending" value={String(osSummary.help_requests.total - osSummary.help_requests.completed)} color="#f97316" />
+            </div>
+          </div>
+
+          {/* All NPCs */}
+          <h3 style={{ ...styles.sectionTitle, marginTop: 16 }}>👤 NPC Status Overview</h3>
+          <div style={styles.card}>
+            {osSummary.all_npcs.map((n, i) => (
+              <div key={i} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '4px 0', borderBottom: '1px solid #2a2a2a' }}>
+                <span style={{ fontWeight: 600, fontSize: 13 }}>{n.npc_name}</span>
+                <span style={{ fontSize: 12, color: stateColor(n.state_of_mind), textTransform: 'capitalize' }}>
+                  {n.state_of_mind}
+                </span>
+                <span style={{ fontSize: 11, color: '#6b7280', maxWidth: 200, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                  {n.current_goal || '—'}
+                </span>
+                <span style={{ fontSize: 12, color: n.health < 50 ? '#ef4444' : '#22c55e' }}>
+                  ❤️{n.health?.toFixed(0)}
+                </span>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+    </div>
+  );
 };
 
-export default GodConsole;
+// ═══════════════════════════════════════════
+// TAB 4: CONTROLLER STATS
+// ═══════════════════════════════════════════
+
+const ControllerTab: React.FC<{ stats: ControllerStats | null }> = ({ stats }) => {
+  if (!stats) return <div style={styles.tabContent}>No controller data available</div>;
+
+  return (
+    <div style={styles.tabContent}>
+      <div style={styles.twoCol}>
+        <div style={{ flex: 1 }}>
+          <h3 style={styles.sectionTitle}>⚙️ Controller Status</h3>
+          <div style={styles.card}>
+            <div style={styles.keyVal}>
+              <span>Tick: <b>#{stats.tick}</b></span>
+              <span>Mode: <b style={{ color: stats.multiprocessing ? '#22c55e' : '#eab308' }}>
+                {stats.multiprocessing ? '⚡ Multiprocessing' : '🔄 Single Process'}
+              </b></span>
+              <span>Active Rooms: {stats.rooms?.length || 0}</span>
+            </div>
+          </div>
+        </div>
+
+        <div style={{ flex: 1 }}>
+          <h3 style={styles.sectionTitle}>🏠 Room Priorities</h3>
+          <div style={styles.card}>
+            {!stats.priorities || Object.keys(stats.priorities).length === 0 ? (
+              <div style={{ color: '#6b7280', fontStyle: 'italic' }}>No tick data yet — waiting for next tick...</div>
+            ) : (
+              Object.entries(stats.priorities).sort((a, b) => b[1] - a[1]).map(([room, priority]) => (
+                <div key={room} style={{ display: 'flex', justifyContent: 'space-between', padding: '6px 0', borderBottom: '1px solid #2a2a2a' }}>
+                  <span style={{ fontWeight: 600, textTransform: 'capitalize', fontSize: 13 }}>{room.replace(/_/g, ' ')}</span>
+                  <span style={{ color: priority > 20 ? '#ef4444' : priority > 10 ? '#f97316' : '#22c55e', fontSize: 13 }}>
+                    {priority.toFixed(1)}
+                  </span>
+                </div>
+              ))
+            )}
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+// ═══════════════════════════════════════════
+// TAB 5: HEALTH
+// ═══════════════════════════════════════════
+
+const HealthTab: React.FC<{
+  health: any; npcs: NPC[]; violations: Violation[];
+  osSummary: AOSSummary | null; controllerStats: ControllerStats | null;
+}> = ({ health, npcs, violations, osSummary, controllerStats }) => (
+  <div style={styles.tabContent}>
+    <div style={styles.cardRow}>
+      <HealthCard value={health?.active_npcs ?? npcs.length} label="Active NPCs" color="#22c55e" />
+      <HealthCard value={`#${health?.tick ?? 0}`} label="Tick" color="#88ccff" />
+      <HealthCard value={health?.total_agents ?? 0} label="Thinking Agents" color="#fbbf24" />
+      <HealthCard
+        value={violations.length}
+        label="Violations"
+        color={violations.length > 0 ? '#ef4444' : '#22c55e'}
+      />
+      <HealthCard
+        value={health?.multiprocessing ? 'ON' : 'OFF'}
+        label="MP Mode"
+        color={health?.multiprocessing ? '#22c55e' : '#6b7280'}
+      />
+      <HealthCard
+        value={health?.redis_connected ? 'OK' : 'DOWN'}
+        label="Redis"
+        color={health?.redis_connected ? '#22c55e' : '#ef4444'}
+      />
+    </div>
+
+    <div style={styles.twoCol}>
+      {/* State of mind pie-style */}
+      <div style={{ flex: 1 }}>
+        <h3 style={styles.sectionTitle}>🌀 State of Mind</h3>
+        <div style={styles.card}>
+          {osSummary ? osSummary.state_distribution.map((s) => (
+            <div key={s.state_of_mind} style={{ marginBottom: 6 }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 13 }}>
+                <span style={{ textTransform: 'capitalize' }}>{s.state_of_mind}</span>
+                <span>{s.count}</span>
+              </div>
+              <div style={styles.barOuter}>
+                <div style={{
+                  ...styles.barInner, width: `${(s.count / Math.max(1, ...osSummary.state_distribution.map(x => x.count))) * 100}%`,
+                  background: s.state_of_mind === 'focused' ? '#22c55e' : s.state_of_mind === 'confused' ? '#f97316' : '#eab308',
+                }} />
+              </div>
+            </div>
+          )) : <div style={{ color: '#6b7280' }}>Loading...</div>}
+        </div>
+      </div>
+
+      {/* Room info */}
+      <div style={{ flex: 1 }}>
+        <h3 style={styles.sectionTitle}>🏠 Rooms</h3>
+        <div style={styles.card}>
+          {health && health.rooms?.length > 0 ? health.rooms.map((r: string) => (
+            <div key={r} style={{ padding: '4px 0', fontSize: 13, textTransform: 'capitalize' }}>
+              {r.replace(/_/g, ' ')}
+            </div>
+          )) : <div style={{ color: '#6b7280', fontStyle: 'italic' }}>Waiting for first tick...</div>}
+        </div>
+      </div>
+    </div>
+  </div>
+);
+
+const HealthCard: React.FC<{ value: string | number; label: string; color: string }> = ({ value, label, color }) => (
+  <div style={styles.card}>
+    <div style={{ fontSize: 24, fontWeight: 700, color }}>{value}</div>
+    <div style={{ fontSize: 12, color: '#6b7280', marginTop: 4 }}>{label}</div>
+  </div>
+);
+
+// ═══════════════════════════════════════════
+// HELPERS
+// ═══════════════════════════════════════════
+
+const renderJson = (raw: string | null, keys?: string[]): string => {
+  if (!raw) return '—';
+  try {
+    const obj = typeof raw === 'string' ? JSON.parse(raw) : raw;
+    if (keys) {
+      return keys.map((k) => `${k}:${obj[k]}`).join(' ');
+    }
+    return Object.entries(obj).slice(0, 3).map(([k, v]) => `${k}:${v}`).join(' ');
+  } catch {
+    return raw.slice(0, 60);
+  }
+};
+
+// ═══════════════════════════════════════════
+// STYLES
+// ═══════════════════════════════════════════
+
+const styles: Record<string, React.CSSProperties> = {
+  container: { display: 'flex', flexDirection: 'column', height: '100%', background: '#1a1a1a', color: '#d4d4d4', fontFamily: "'Inter', system-ui, sans-serif", overflowY: 'auto', padding: '0 16px 24px' },
+  header: { display: 'flex', alignItems: 'center', justifyContent: 'space-between' },
+  title: { fontSize: '20px', fontWeight: 700, color: '#fbbf24', margin: '12px 0' },
+  liveBadge: { fontSize: 10, padding: '2px 10px', borderRadius: 4, background: '#22c55e', color: '#fff', fontWeight: 600 },
+  tabRow: { display: 'flex', gap: 4, marginBottom: 12, flexWrap: 'wrap' as const },
+  tab: { padding: '8px 16px', borderRadius: 6, border: 'none', background: '#2a2a2a', color: '#9ca3af', fontSize: 13, fontWeight: 600, cursor: 'pointer', transition: 'all 0.1s' },
+  tabActive: { background: '#1a365d', color: '#88ccff', borderBottom: '2px solid #88ccff' },
+  loading: { color: '#6b7280', fontSize: 13, textAlign: 'center', padding: 20 },
+  tabContent: { flex: 1 },
+  sectionTitle: { fontSize: 14, fontWeight: 600, color: '#d4d4d4', margin: '0 0 10px' },
+  subtitle: { fontSize: 13, fontWeight: 600, color: '#9ca3af', marginBottom: 6, borderBottom: '1px solid #2a2a2a', paddingBottom: 4 },
+  cardRow: { display: 'flex', gap: '10px', marginBottom: '16px', flexWrap: 'wrap' as const },
+  card: { background: '#2a2a2a', borderRadius: '8px', padding: '14px', border: '1px solid #3a3a3a' },
+  twoCol: { display: 'flex', gap: '16px', flexWrap: 'wrap' as const },
+  table: { background: '#2a2a2a', borderRadius: 8, border: '1px solid #3a3a3a', overflow: 'hidden' },
+  tableHeader: { display: 'flex', padding: '8px 12px', background: '#1f2937', fontSize: 11, color: '#6b7280', fontWeight: 600, borderBottom: '1px solid #374151' },
+  tableRow: { display: 'flex', padding: '8px 12px', alignItems: 'center', borderBottom: '1px solid #2a2a2a', fontSize: 13, transition: 'background 0.1s' },
+  statGrid: { display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 8 },
+  stat: { textAlign: 'center', padding: 8, borderRadius: 6, background: '#1f2937' },
+  keyVal: { display: 'flex', flexDirection: 'column', gap: 4, fontSize: 13 },
+  inlineItem: { display: 'flex', justifyContent: 'space-between', gap: 8, padding: '2px 0', fontSize: 12, borderBottom: '1px solid #1f2937' },
+  inlineRow: { display: 'flex', flexWrap: 'wrap' as const, gap: 6 },
+  tag: { padding: '2px 8px', borderRadius: 4, background: '#1f2937', fontSize: 12, border: '1px solid #374151' },
+  barOuter: { height: 10, background: '#3a3a3a', borderRadius: 5, overflow: 'hidden' },
+  barInner: { height: '100%', borderRadius: 5, transition: 'width 0.3s' },
+  smallBtn: { padding: '2px 6px', background: '#374151', border: '1px solid #4a4a4a', borderRadius: 4, color: '#d4d4d4', cursor: 'pointer', fontSize: 12 },
+};
+
+export default GodConsoleV2;
