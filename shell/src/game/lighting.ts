@@ -15,7 +15,7 @@ import { AdvancedBloomFilter, GlowFilter } from 'pixi-filters';
 import { useWorldStore, RoomLight, TILE } from '../state/world';
 
 // ── Config ──
-const AMBIENT_ALPHA = 0.65; // 0 = full bright, 1 = full dark
+const AMBIENT_ALPHA = 0.50; // 0 = full bright, 1 = full dark
 const LIGHT_BLEND = 'add' as const;
 
 // ── Generate a radial gradient light texture ──

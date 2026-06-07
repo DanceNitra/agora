@@ -12,7 +12,7 @@ import React, { useRef, useEffect, useState } from 'react';
 import { Container } from 'pixi.js';
 import { createPixiApp, destroyPixiApp } from './pixiApp';
 import { buildTilemap } from './tilemap';
-import { generatePixiTextures } from './graphicsTiles';
+import { generateAllTextures } from './textures';
 import { buildAgents, tickAgents } from './agents';
 import { buildLighting, tickLighting, applyTorchGlow, applyStageBloom } from './lighting';
 import { ParticleSystem } from './particles';
@@ -41,8 +41,8 @@ const DungeonCanvas: React.FC = () => {
         return;
       }
 
-      // Generate textures using PixiJS Graphics API (vector, clean)
-      const tex = generatePixiTextures(app);
+      // Generate textures (Canvas2D - working approach)
+      const tex = generateAllTextures();
 
       // Root dungeon container (everything inside gets bloom)
       const dungeonContainer = new Container();
