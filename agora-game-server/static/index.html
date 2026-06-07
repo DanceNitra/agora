@@ -46,6 +46,8 @@
 import * as THREE from 'three';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
+import { OBJLoader } from 'three/addons/loaders/OBJLoader.js';
+import { MTLLoader } from 'three/addons/loaders/MTLLoader.js';
 
 // === SETUP ===
 const scene = new THREE.Scene();
@@ -123,6 +125,54 @@ if (!renderer.getContext()) {
   const mWall = new THREE.MeshStandardMaterial({ color: 0x2a2a3e, roughness: 0.8 });
   const mWallTop = new THREE.MeshStandardMaterial({ color: 0x333350, roughness: 0.6 });
 
+  // === Ruins OBJ Models ===
+  const RUINS_PATH = '/models/ruins/OBJ/';
+  const ruinsCache = {};
+  let ruinsLoaded = false;
+
+  const RUINS_MODELS = {
+    wall: 'Wall',
+    pillar: 'Column_Round',
+    torch: 'Torch',
+    chest: 'Chest',
+    chestGold: 'Chest_Gold',
+    arch: 'Arch_Gothic',
+    door: 'Doors_GothicArch',
+    floor: 'Floor_Standard',
+  };
+
+  function loadOBJWithMTL(name) {
+    return new Promise((resolve, reject) => {
+      const mtlLoader = new MTLLoader();
+      mtlLoader.setPath(RUINS_PATH);
+      mtlLoader.load(name + '.mtl', (materials) => {
+        materials.preload();
+        const objLoader = new OBJLoader();
+        objLoader.setMaterials(materials);
+        objLoader.setPath(RUINS_PATH);
+        objLoader.load(name + '.obj', (obj) => resolve(obj), (xhr) => {
+          if (xhr.total) console.log(`${name}: ${Math.round(xhr.loaded/xhr.total*100)}%`);
+        }, reject);
+      }, undefined, reject);
+    });
+  }
+
+  async function loadRuins() {
+    const models = ['Wall', 'Column_Round', 'Torch', 'Chest', 'Chest_Gold'];
+    for (const name of models) {
+      try {
+        ruinsCache[name] = await loadOBJWithMTL(name);
+        console.log(`Ruins ✓ ${name}`);
+      } catch(e) {
+        console.warn(`Ruins ✗ ${name}:`, e.message);
+      }
+    }
+    ruinsLoaded = true;
+    console.log('Ruins models loaded');
+    if (window.__lastState) buildDungeon(window.__lastState);
+  }
+  loadRuins();
+
   // === BUILD DUNGEON ===
   function buildDungeon(state) {
     // Clear tile group - dispose ONLY per-instance materials, NOT shared ones
@@ -137,6 +187,24 @@ if (!renderer.getContext()) {
     const cx = width / 2 - 0.5, cy = height / 2 - 0.5;
     let count = 0;
 
+    // Helper: place an OBJ model or fallback box
+    function placeAsset(name, px, pz, opts = {}) {
+      const model = ruinsCache[name];
+      const scale = opts.scale || 1;
+      if (model && ruinsLoaded) {
+        const clone = model.clone(true);
+        clone.position.set(px, opts.y || 0, pz);
+        clone.scale.set(scale, scale, scale);
+        if (opts.rotY) clone.rotation.y = opts.rotY;
+        clone.traverse(c => {
+          if (c.isMesh) { c.castShadow = true; if (opts.receiveShadow) c.receiveShadow = true; }
+        });
+        tileGroup.add(clone);
+        return true;
+      }
+      return false; // signal fallback needed
+    }
+
     for (let y = 0; y < height; y++) {
       for (let x = 0; x < width; x++) {
         const tile = tiles?.[y]?.[x];
@@ -147,50 +215,55 @@ if (!renderer.getContext()) {
         if (type === 'void') continue;
 
         else if (type === 'wall') {
-          // Wall block
-          const w = new THREE.Mesh(new THREE.BoxGeometry(1, 1.5, 1), mWall);
-          w.position.set(px, 0.75, pz); w.castShadow = true; tileGroup.add(w);
-          // Wall top rim
-          const rim = new THREE.Mesh(new THREE.BoxGeometry(1.05, 0.05, 1.05), mWallTop);
-          rim.position.set(px, 1.525, pz); tileGroup.add(rim);
+          // Try ruins Wall model, fallback to box
+          if (!placeAsset('Wall', px, pz, { scale: 0.9, rotY: 0 })) {
+            const w = new THREE.Mesh(new THREE.BoxGeometry(1, 1.5, 1), mWall);
+            w.position.set(px, 0.75, pz); w.castShadow = true; tileGroup.add(w);
+            const rim = new THREE.Mesh(new THREE.BoxGeometry(1.05, 0.05, 1.05), mWallTop);
+            rim.position.set(px, 1.525, pz); tileGroup.add(rim);
+          }
         }
 
         else if (type === 'pillar') {
           const col = parseInt((tile.color || '#4a4a5e').replace('#', ''), 16);
-          const mat = new THREE.MeshStandardMaterial({ color: col, roughness: 0.4, metalness: 0.4 });
-          const p = new THREE.Mesh(new THREE.CylinderGeometry(0.35, 0.4, 1.5, 8), mat);
-          p.position.set(px, 0.75, pz); p.castShadow = true; tileGroup.add(p);
-          // Top cap
-          const cap = new THREE.Mesh(new THREE.CylinderGeometry(0.4, 0.35, 0.08, 8),
-            new THREE.MeshStandardMaterial({ color: col, roughness: 0.3, metalness: 0.5 }));
-          cap.position.set(px, 1.54, pz); tileGroup.add(cap);
+          if (!placeAsset('Column_Round', px, pz, { scale: 0.65, rotY: 0 })) {
+            const mat = new THREE.MeshStandardMaterial({ color: col, roughness: 0.4, metalness: 0.4 });
+            const p = new THREE.Mesh(new THREE.CylinderGeometry(0.35, 0.4, 1.5, 8), mat);
+            p.position.set(px, 0.75, pz); p.castShadow = true; tileGroup.add(p);
+            const cap = new THREE.Mesh(new THREE.CylinderGeometry(0.4, 0.35, 0.08, 8),
+              new THREE.MeshStandardMaterial({ color: col, roughness: 0.3, metalness: 0.5 }));
+            cap.position.set(px, 1.54, pz); tileGroup.add(cap);
+          }
         }
 
         else if (type === 'torch') {
-          // Floor under torch
-          const f = new THREE.Mesh(new THREE.BoxGeometry(1, 0.3, 1),
-            new THREE.MeshStandardMaterial({ color: 0x3a3a48, roughness: 0.7 }));
-          f.position.set(px, -0.15, pz); tileGroup.add(f);
-          // Pole
-          const pole = new THREE.Mesh(new THREE.CylinderGeometry(0.04, 0.06, 0.7, 6),
-            new THREE.MeshStandardMaterial({ color: 0x553311, roughness: 0.9 }));
-          pole.position.set(px, 0.15, pz); tileGroup.add(pole);
-          // Flame
-          const flame = new THREE.Mesh(new THREE.SphereGeometry(0.1, 6, 6),
-            new THREE.MeshBasicMaterial({ color: 0xff6622 }));
-          flame.position.set(px, 0.55, pz); tileGroup.add(flame);
+          if (!placeAsset('Torch', px, pz, { scale: 0.8, rotY: 0 })) {
+            const f = new THREE.Mesh(new THREE.BoxGeometry(1, 0.3, 1),
+              new THREE.MeshStandardMaterial({ color: 0x3a3a48, roughness: 0.7 }));
+            f.position.set(px, -0.15, pz); tileGroup.add(f);
+            const pole = new THREE.Mesh(new THREE.CylinderGeometry(0.04, 0.06, 0.7, 6),
+              new THREE.MeshStandardMaterial({ color: 0x553311, roughness: 0.9 }));
+            pole.position.set(px, 0.15, pz); tileGroup.add(pole);
+            const flame = new THREE.Mesh(new THREE.SphereGeometry(0.1, 6, 6),
+              new THREE.MeshBasicMaterial({ color: 0xff6622 }));
+            flame.position.set(px, 0.55, pz); tileGroup.add(flame);
+          }
         }
 
         else if (type === 'chest') {
-          const chest = new THREE.Mesh(new THREE.BoxGeometry(0.6, 0.4, 0.5),
-            new THREE.MeshStandardMaterial({ color: 0x8a6a3a, roughness: 0.6, metalness: 0.3 }));
-          chest.position.set(px, 0.05, pz); tileGroup.add(chest);
-          const lid = new THREE.Mesh(new THREE.BoxGeometry(0.5, 0.06, 0.4),
-            new THREE.MeshStandardMaterial({ color: 0x9a7a4a, roughness: 0.5, metalness: 0.4 }));
-          lid.position.set(px, 0.28, pz); tileGroup.add(lid);
+          const isGold = tile.color === '#8a6a3a';
+          if (!placeAsset(isGold ? 'Chest_Gold' : 'Chest', px, pz, { scale: 0.4, rotY: 0 })) {
+            const chest = new THREE.Mesh(new THREE.BoxGeometry(0.6, 0.4, 0.5),
+              new THREE.MeshStandardMaterial({ color: 0x8a6a3a, roughness: 0.6, metalness: 0.3 }));
+            chest.position.set(px, 0.05, pz); tileGroup.add(chest);
+            const lid = new THREE.Mesh(new THREE.BoxGeometry(0.5, 0.06, 0.4),
+              new THREE.MeshStandardMaterial({ color: 0x9a7a4a, roughness: 0.5, metalness: 0.4 }));
+            lid.position.set(px, 0.28, pz); tileGroup.add(lid);
+          }
         }
 
         else if (type === 'throne') {
+          // Keep box throne (no good OBJ alternative)
           const t = new THREE.Mesh(new THREE.BoxGeometry(1, 0.3, 1),
             new THREE.MeshStandardMaterial({ color: 0x6a3a2a, roughness: 0.6, metalness: 0.3 }));
           t.position.set(px, -0.15, pz); tileGroup.add(t);
@@ -203,7 +276,7 @@ if (!renderer.getContext()) {
         }
 
         else {
-          // Floor tile
+          // Floor tile (keep box for speed - 2500 tiles)
           const c = tile.color ? parseInt(tile.color.replace('#', ''), 16) : 0x3a3a50;
           const isAlt = (x + y) % 2 === 0;
           const finalColor = isAlt ? new THREE.Color(c).multiplyScalar(1.08).getHex() : c;
