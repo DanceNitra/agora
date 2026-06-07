@@ -158,7 +158,7 @@ if (!renderer.getContext()) {
   }
 
   async function loadRuins() {
-    const models = ['Wall', 'Column_Round', 'Torch', 'Chest', 'Chest_Gold'];
+    const models = ['Wall', 'Wall_Half', 'Column_Round', 'Torch', 'Chest', 'Chest_Gold', 'Floor_Diamond', 'Statue_Fox', 'Flag_Wall', 'Bush_2x2'];
     for (const name of models) {
       try {
         ruinsCache[name] = await loadOBJWithMTL(name);
@@ -187,13 +187,13 @@ if (!renderer.getContext()) {
     const cx = width / 2 - 0.5, cy = height / 2 - 0.5;
     let count = 0;
 
-    // Helper: place an OBJ model or fallback box
     function placeAsset(name, px, pz, opts = {}) {
       const model = ruinsCache[name];
       const scale = opts.scale || 1;
       if (model && ruinsLoaded) {
         const clone = model.clone(true);
-        clone.position.set(px, opts.y || 0, pz);
+        const yPos = opts.y !== undefined ? opts.y : 0;
+        clone.position.set(px, yPos, pz);
         clone.scale.set(scale, scale, scale);
         if (opts.rotY) clone.rotation.y = opts.rotY;
         clone.traverse(c => {
@@ -202,7 +202,14 @@ if (!renderer.getContext()) {
         tileGroup.add(clone);
         return true;
       }
-      return false; // signal fallback needed
+      return false;
+    }
+
+    // Wall type mapping: different OBJ for different wall types
+    function placeWall(px, pz, tile) {
+      const subType = (tile && tile.variant === 1) ? 'Wall_Half' : 'Wall';
+      const s = subType === 'Wall_Half' ? 1.0 : 0.5;
+      return placeAsset(subType, px, pz, { scale: s, y: 0 });
     }
 
     for (let y = 0; y < height; y++) {
@@ -215,8 +222,9 @@ if (!renderer.getContext()) {
         if (type === 'void') continue;
 
         else if (type === 'wall') {
-          // Try ruins Wall model, fallback to box
-          if (!placeAsset('Wall', px, pz, { scale: 0.9, rotY: 0 })) {
+          // Wall.obj (scale 0.5) for double-width or Wall_Half.obj (scale 1) for single
+          if (!placeWall(px, pz, tile)) {
+            // Fallback box
             const w = new THREE.Mesh(new THREE.BoxGeometry(1, 1.5, 1), mWall);
             w.position.set(px, 0.75, pz); w.castShadow = true; tileGroup.add(w);
             const rim = new THREE.Mesh(new THREE.BoxGeometry(1.05, 0.05, 1.05), mWallTop);
@@ -225,8 +233,8 @@ if (!renderer.getContext()) {
         }
 
         else if (type === 'pillar') {
-          const col = parseInt((tile.color || '#4a4a5e').replace('#', ''), 16);
-          if (!placeAsset('Column_Round', px, pz, { scale: 0.65, rotY: 0 })) {
+          if (!placeAsset('Column_Round', px, pz, { scale: 0.4, y: 0 })) {
+            const col = parseInt((tile.color || '#4a4a5e').replace('#', ''), 16);
             const mat = new THREE.MeshStandardMaterial({ color: col, roughness: 0.4, metalness: 0.4 });
             const p = new THREE.Mesh(new THREE.CylinderGeometry(0.35, 0.4, 1.5, 8), mat);
             p.position.set(px, 0.75, pz); p.castShadow = true; tileGroup.add(p);
@@ -237,7 +245,7 @@ if (!renderer.getContext()) {
         }
 
         else if (type === 'torch') {
-          if (!placeAsset('Torch', px, pz, { scale: 0.8, rotY: 0 })) {
+          if (!placeAsset('Torch', px, pz, { scale: 1.0, y: 0 })) {
             const f = new THREE.Mesh(new THREE.BoxGeometry(1, 0.3, 1),
               new THREE.MeshStandardMaterial({ color: 0x3a3a48, roughness: 0.7 }));
             f.position.set(px, -0.15, pz); tileGroup.add(f);
@@ -252,7 +260,7 @@ if (!renderer.getContext()) {
 
         else if (type === 'chest') {
           const isGold = tile.color === '#8a6a3a';
-          if (!placeAsset(isGold ? 'Chest_Gold' : 'Chest', px, pz, { scale: 0.4, rotY: 0 })) {
+          if (!placeAsset(isGold ? 'Chest_Gold' : 'Chest', px, pz, { scale: 0.5, y: 0 })) {
             const chest = new THREE.Mesh(new THREE.BoxGeometry(0.6, 0.4, 0.5),
               new THREE.MeshStandardMaterial({ color: 0x8a6a3a, roughness: 0.6, metalness: 0.3 }));
             chest.position.set(px, 0.05, pz); tileGroup.add(chest);
@@ -273,6 +281,16 @@ if (!renderer.getContext()) {
           const glow = new THREE.Mesh(new THREE.SphereGeometry(0.15, 6, 6),
             new THREE.MeshBasicMaterial({ color: 0xff66aa, transparent: true, opacity: 0.4 }));
           glow.position.set(px, 0.05, pz); tileGroup.add(glow);
+        }
+
+        else if (type === 'floor_vip') {
+          // Diamond patterned floor
+          if (!placeAsset('Floor_Diamond', px, pz, { scale: 0.5, y: -0.1, receiveShadow: true })) {
+            const c = tile.color ? parseInt(tile.color.replace('#', ''), 16) : 0x5a3a5a;
+            const t = new THREE.Mesh(new THREE.BoxGeometry(1, 0.3, 1),
+              new THREE.MeshStandardMaterial({ color: c, roughness: 0.5 }));
+            t.position.set(px, -0.15, pz); t.receiveShadow = true; tileGroup.add(t);
+          }
         }
 
         else {

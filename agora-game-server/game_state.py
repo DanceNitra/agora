@@ -133,8 +133,8 @@ class GameEngine:
         if self._auto_broadcast and self._broadcast_fn:
             self._broadcast_fn(entry)
 
-    def create_default_dungeon(self, width: int = 50, height: int = 50) -> None:
-        """Generate a simple, clean dungeon layout with rooms along perimeter and open center."""
+    def create_default_dungeon(self, width: int = 24, height: int = 20) -> None:
+        """Generate a medieval dungeon layout with proper rooms, walls, and archways."""
         W, H = width, height
         self.state.width = W
         self.state.height = H
@@ -147,134 +147,186 @@ class GameEngine:
                 row.append(Tile(x, y, "floor", (x + y) % 4, True, "#3a3a50"))
             self.state.tiles.append(row)
 
-        # Step 2: Outer walls (border)
+        # Step 2: Outer walls (border) - variant 1 = Wall_Half.obj (1×1 tile)
         for x in range(W):
-            self.state.tiles[0][x] = Tile(x, 0, "wall", 0, False, "#2a2a3e")
-            self.state.tiles[H-1][x] = Tile(x, H-1, "wall", 0, False, "#2a2a3e")
+            self.state.tiles[0][x] = Tile(x, 0, "wall", 1, False, "#2a2a3e")
+            self.state.tiles[H-1][x] = Tile(x, H-1, "wall", 1, False, "#2a2a3e")
         for y in range(H):
-            self.state.tiles[y][0] = Tile(0, y, "wall", 0, False, "#2a2a3e")
-            self.state.tiles[y][W-1] = Tile(W-1, y, "wall", 0, False, "#2a2a3e")
+            self.state.tiles[y][0] = Tile(0, y, "wall", 1, False, "#2a2a3e")
+            self.state.tiles[y][W-1] = Tile(W-1, y, "wall", 1, False, "#2a2a3e")
 
-        # Step 3: Zone floor colors
-        # Top zone (y=3 to y=9) - Throne Room center, Library left, Treasury right
-        for y in range(3, 10):
-            for x in range(3, 47):
+        # Step 3: Inner walls separating rooms (variant 0 = Wall.obj scale 0.5, spans 2 tiles)
+        # Inner walls between Throne Room and side chambers
+        WALL_H = [
+            # Top row: Library | Throne Room | Treasury (y=1 to y=4)
+            (6, 1, 4),    # x=6 between Library(1-5) and Throne(7-16)
+            (17, 1, 4),   # x=17 between Throne(7-16) and Treasury(18-22)
+            # Bottom row: Barracks | Entrance | Armory (y=16 to y=19)
+            (6, 16, 19),  # x=6 between Barracks(1-5) and Entrance(7-16)
+            (17, 16, 19), # x=17 between Entrance(7-16) and Armory(18-22)
+        ]
+        # Middle wall rows with archway gaps: y=5 and y=15
+        # y=5 separates throne zone from great hall
+        # y=15 separates great hall from entrance zone
+        WALL_ROW_Y = [5, 15]
+        WALL_COLS = range(1, W-1)  # inner columns
+
+        # Draw vertical inner walls
+        for wx, y_start, y_end in WALL_H:
+            for wy in range(y_start, y_end + 1):
+                if self.state.tiles[wy][wx].type == "floor":
+                    self.state.tiles[wy][wx] = Tile(wx, wy, "wall", 0, False, "#2a2a3e")
+
+        # Draw horizontal inner wall rows with archway gaps
+        for wy in WALL_ROW_Y:
+            for wx in WALL_COLS:
+                # Archway gaps: 3-tile-wide openings between rooms
+                is_archway = (
+                    # Between Library and Throne Room (left arch)
+                    (8 <= wx <= 10) or
+                    # Between Throne Room and Treasury (right arch)  
+                    (13 <= wx <= 15) or
+                    # Center arch (entrance to great hall)
+                    (wx in [11, 12])
+                )
+                if not is_archway and self.state.tiles[wy][wx].type == "floor":
+                    self.state.tiles[wy][wx] = Tile(wx, wy, "wall", 0, False, "#2a2a3e")
+
+        # Step 4: Zone floor colors
+        # Throne Room (y=1 to y=4, x=7 to x=16)
+        for y in range(1, 5):
+            for x in range(7, 17):
                 t = self.state.tiles[y][x]
                 if t.type == "floor":
-                    if x <= 15:
-                        t.color = "#3a3a50"   # Library
-                    elif 17 <= x <= 33:
-                        t.color = "#4a2a4a"   # Throne Room
-                    else:
-                        t.color = "#4a4a30"   # Treasury
+                    t.color = "#4a2a4a"  # Regal purple
 
-        # Great Hall (y=10 to y=35)
-        for y in range(10, 36):
-            for x in range(3, 47):
-                if self.state.tiles[y][x].type == "floor":
-                    self.state.tiles[y][x].color = "#3a4a5a"
-
-        # Central aisle markers (slightly different shade down the middle)
-        for y in range(10, 36):
-            for x in [23, 24, 25, 26]:
-                if self.state.tiles[y][x].type == "floor":
-                    self.state.tiles[y][x].color = "#3a4a62"
-
-        # Throne platform (raised colour area in great hall, near top)
-        for y in range(12, 16):
-            for x in range(22, 28):
-                if self.state.tiles[y][x].type == "floor":
-                    self.state.tiles[y][x].color = "#5a2a4a"
-
-        # Bottom zone (y=36 to y=41) - Entrance center, Barracks left, Armory right
-        for y in range(36, 42):
-            for x in range(3, 47):
+        # Library (y=1 to y=4, x=1 to x=5)
+        for y in range(1, 5):
+            for x in range(1, 6):
                 t = self.state.tiles[y][x]
                 if t.type == "floor":
-                    if x <= 15:
-                        t.color = "#3a3a3a"   # Barracks
-                    elif 17 <= x <= 33:
-                        t.color = "#3a4050"   # Entrance
-                    else:
-                        t.color = "#3d4040"   # Armory
+                    t.color = "#3a3a50"  # Deep blue
 
-        # Gate bottom (y=42 to y=47) - entrance area
-        for y in range(42, 48):
-            for x in range(18, 32):
-                if self.state.tiles[y][x].type == "floor":
-                    self.state.tiles[y][x].color = "#3a4050"
+        # Treasury (y=1 to y=4, x=18 to x=22)
+        for y in range(1, 5):
+            for x in range(18, 23):
+                t = self.state.tiles[y][x]
+                if t.type == "floor":
+                    t.color = "#4a4a30"  # Gold-ish
 
-        # Step 4: Pillars (columns between rooms + great hall)
+        # Great Hall (y=6 to y=14)
+        for y in range(6, 15):
+            for x in range(1, 23):
+                t = self.state.tiles[y][x]
+                if t.type == "floor":
+                    t.color = "#3a4a5a"  # Stone blue
+
+        # Central aisle in great hall (darker strip)
+        for y in range(6, 15):
+            for x in [10, 11, 12, 13]:
+                t = self.state.tiles[y][x]
+                if t.type == "floor":
+                    t.color = "#3a4a62"
+
+        # Throne platform (raised area before throne room)
+        for y in range(6, 8):
+            for x in range(10, 14):
+                t = self.state.tiles[y][x]
+                if t.type == "floor":
+                    t.color = "#5a2a4a"
+
+        # Entrance Hall (y=16 to y=18, x=7 to x=16)
+        for y in range(16, 19):
+            for x in range(7, 17):
+                t = self.state.tiles[y][x]
+                if t.type == "floor":
+                    t.color = "#3a4050"
+
+        # Barracks (y=16 to y=18, x=1 to x=5)
+        for y in range(16, 19):
+            for x in range(1, 6):
+                t = self.state.tiles[y][x]
+                if t.type == "floor":
+                    t.color = "#3a3a3a"
+
+        # Armory (y=16 to y=18, x=18 to x=22)
+        for y in range(16, 19):
+            for x in range(18, 23):
+                t = self.state.tiles[y][x]
+                if t.type == "floor":
+                    t.color = "#3d4040"
+
+        # Gate path (x=10 to x=13, opens south)
+        for y in range(19, 20):
+            for x in range(10, 14):
+                t = self.state.tiles[y][x]
+                if t.type == "floor":
+                    t.color = "#3a4050"
+
+        # Break the outer wall for the gate entrance
+        for x in range(10, 14):
+            if self.state.tiles[H-2][x].type == "wall":
+                self.state.tiles[H-2][x] = Tile(x, H-2, "floor", 0, True, "#3a4050")
+
+        # Step 5: Pillars in Great Hall (3 columns × 3 rows = 9 total)
         PILLARS = []
-        # Between Library and Throne Room
-        for py in range(4, 9):
-            PILLARS.append((16, py))
-        # Between Throne Room and Treasury
-        for py in range(4, 9):
-            PILLARS.append((34, py))
-
-        # Great Hall pillars (regular grid, like a basilica)
-        for px in [8, 15, 22, 28, 35, 42]:
-            for py in [12, 16, 20, 24, 28, 32]:
+        for px in [5, 12, 18]:
+            for py in [8, 11]:
                 PILLARS.append((px, py))
-
-        # Between Barracks and Entrance
-        for py in range(37, 41):
-            PILLARS.append((16, py))
-        # Between Entrance and Armory
-        for py in range(37, 41):
-            PILLARS.append((34, py))
-
-        # Gate pillars
-        for px in [20, 25, 30]:
-            for py in [44, 46]:
+        # Additional framing pillars
+        for px in [5, 18]:
+            for py in [7, 12]:
                 PILLARS.append((px, py))
 
         for px, py in PILLARS:
             if 0 < px < W-1 and 0 < py < H-1:
-                col = "#5a3a5a" if (18 <= px <= 32 and 3 <= py <= 9) else "#4a4a5e"
-                self.state.tiles[py][px] = Tile(px, py, "pillar", 0, False, col)
+                self.state.tiles[py][px] = Tile(px, py, "pillar", 0, False, "#4a4a5e")
 
-        # Step 5: Decorative elements
-        # Throne at center of throne zone
-        for tx, ty in [(24, 4), (25, 4), (24, 5), (25, 5)]:
+        # Step 6: Decorative elements
+        # Throne at center of throne room
+        for tx, ty in [(11, 2), (12, 2)]:
             self.state.tiles[ty][tx] = Tile(tx, ty, "throne", 0, True, "#6a3a2a")
+
         # Chests in Treasury
-        for cx, cy in [(38, 6), (44, 6), (41, 7), (45, 5)]:
+        for cx, cy in [(19, 2), (21, 3), (20, 2)]:
             self.state.tiles[cy][cx] = Tile(cx, cy, "chest", 0, False, "#8a6a3a")
 
-        # Step 6: Torches along outer walls (left and right edges)
+        # Step 7: Torches along walls (spaced every 3 tiles)
         TORCHES = []
-        # Left wall torches
-        for ty in [5, 8, 13, 18, 22, 27, 32, 37, 40]:
-            TORCHES.append((3, ty))
-        # Right wall torches
-        for ty in [5, 8, 13, 18, 22, 27, 32, 37, 40]:
-            TORCHES.append((46, ty))
-        # Bottom gate torches
-        for tx in [18, 24, 30]:
-            TORCHES.append((tx, 47))
+        # Left wall
+        for ty in [3, 7, 10, 13, 17]:
+            TORCHES.append((1, ty))
+        # Right wall
+        for ty in [3, 7, 10, 13, 17]:
+            TORCHES.append((22, ty))
+        # Side walls of throne room
+        for tx in [7, 16]:
+            for ty in [3, 4]:
+                TORCHES.append((tx, ty))
+        # Gate torches
+        for tx in [9, 14]:
+            TORCHES.append((tx, 18))
+
         for tx, ty in TORCHES:
             if 0 < tx < W-1 and 0 < ty < H-1:
                 self.state.tiles[ty][tx] = Tile(tx, ty, "torch", 0, False, "#553311")
 
-        # Step 7: Lighting — DISABLED (lights cause visual artifacts on walls)
+        # Step 8: Floor decorations (Diamond pattern in throne room)
+        for dx, dy in [(11, 3), (12, 3)]:
+            if self.state.tiles[dy][dx].type == "floor":
+                self.state.tiles[dy][dx] = Tile(dx, dy, "floor_vip", 0, True, "#5a3a5a")
+
+        # Step 9: Lighting — DISABLED
         self.state.lights = []
 
-        # Step 8: Entities (agents)
+        # Step 10: Entities (agents)
         self.state.entities = {}
-        # King — center throne room
-        self.add_entity("king", "King Aldric", "agent", 24.5, 5.5, "#c0392b")
-        # Guard — left of entrance gate
-        self.add_entity("guard_l", "Sergeant Voss", "agent", 13, 44, "#2980b9")
-        # Guard — right of entrance gate
-        self.add_entity("guard_r", "Dame Elara", "agent", 37, 44, "#2980b9")
-        # Priest — near throne platform in great hall
-        self.add_entity("priest", "High Priest Orin", "agent", 16, 14, "#8e44ad")
-        # Thief — lurking in shadows near treasury
-        self.add_entity("thief", "Shadow Kael", "agent", 42, 10, "#7f8c8d")
-        # Scholar — in library
-        self.add_entity("scholar", "Sage Mira", "agent", 9, 7, "#f39c12")
+        self.add_entity("king", "King Aldric", "agent", 12.5, 3.5, "#c0392b")
+        self.add_entity("guard_l", "Sergeant Voss", "agent", 10, 18, "#2980b9")
+        self.add_entity("guard_r", "Dame Elara", "agent", 14, 18, "#2980b9")
+        self.add_entity("priest", "High Priest Orin", "agent", 12, 7, "#8e44ad")
+        self.add_entity("thief", "Shadow Kael", "agent", 20, 11, "#7f8c8d")
+        self.add_entity("scholar", "Sage Mira", "agent", 4, 3, "#f39c12")
 
         self.state.tick = 0
         self.state.last_updated = time.time()

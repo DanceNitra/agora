@@ -1,0 +1,25 @@
+
+  _  _              _____      _   _         
+ | || |_____ __ __ |_   _|__  | | | |___ ___ 
+ | __ / _ \ V  V /   | |/ _ \ | |_| (_-</ -_)
+ |_||_\___/\_/\_/    |_|\___/  \___//__/\___|
+                                             
+
+This pack works on a 1x1 grid system, there is only one thing to keep in mind:
+Due to the way walls fit together, when doing 90º turns, the new wall has to be rotated 180 degrees vertically for edges to fit 
+otherwise the corners will overlap.
+
+For curves there are two different models, which do this 180º rotation for you. (Because they use the space of two walls)
+
+I've included a Preview file you can open in Blender if you want to check it out.
+
+Thanks for downloading! Consider supporting me on Patreon :)
+
+https://www.patreon.com/quaternius
+-------------------------------------------------------
+
+License:
+CC0 1.0 Universal (CC0 1.0) 
+Public Domain Dedication
+https://creativecommons.org/publicdomain/zero/1.0/
+
