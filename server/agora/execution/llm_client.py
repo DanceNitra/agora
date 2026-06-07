@@ -357,7 +357,16 @@ def dungeon_agent_think(npc_name: str, role: str, context: str, tier: str = "che
     )
 
     try:
-        return json.loads(raw)
+        result = json.loads(raw)
+        # Normalize keys: Nemotron sometimes adds colons to keys
+        cleaned = {}
+        for k, v in result.items():
+            clean_key = k.strip().lstrip(':').strip()
+            # Also clean values (Nemotron sometimes adds colons there too)
+            if isinstance(v, str):
+                v = v.strip().lstrip(':').strip()
+            cleaned[clean_key] = v
+        return cleaned
     except (json.JSONDecodeError, TypeError):
         return {"action": "error", "insight": raw[:200], "state_of_mind": "confused"}
 
@@ -435,6 +444,15 @@ def agent_think(role: str, context: str, tier: str = "cheap") -> dict:
     )
 
     try:
-        return json.loads(raw)
+        result = json.loads(raw)
+        # Normalize keys: Nemotron sometimes adds colons to keys
+        cleaned = {}
+        for k, v in result.items():
+            clean_key = k.strip().lstrip(':').strip()
+            # Also clean values
+            if isinstance(v, str):
+                v = v.strip().lstrip(':').strip()
+            cleaned[clean_key] = v
+        return cleaned
     except (json.JSONDecodeError, TypeError):
         return {"action": "error", "insight": raw[:200]}
