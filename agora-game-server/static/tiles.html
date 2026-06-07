@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Dungeon Test - Tiles</title>
+<style>
+  * { margin: 0; padding: 0; }
+  html, body { width: 100%; height: 100%; background: #0a0a12; overflow: hidden; }
+  canvas { display: block; }
+</style>
+</head>
+<body>
+
+<div id="info" style="position:fixed;bottom:20px;left:50%;transform:translateX(-50%);color:#888;font-family:monospace;font-size:14px;z-index:10;background:rgba(0,0,0,0.7);padding:8px 16px;border-radius:4px;">
+  Loading...
+</div>
+
+<script type="importmap">
+{
+  "imports": {
+    "three": "/node_modules/three/build/three.module.js"
+  }
+}
+</script>
+
+<script type="module">
+import * as THREE from 'three';
+
+const scene = new THREE.Scene();
+scene.background = new THREE.Color(0x0a0a12);
+
+// Perspective camera (same as test that worked)
+const camera = new THREE.PerspectiveCamera(50, window.innerWidth / window.innerHeight, 0.1, 100);
+camera.position.set(15, 12, 15);
+camera.lookAt(0, 0, 0);
+
+const renderer = new THREE.WebGLRenderer({ antialias: true });
+renderer.setSize(window.innerWidth, window.innerHeight);
+renderer.setPixelRatio(window.devicePixelRatio);
+renderer.shadowMap.enabled = true;
+document.body.prepend(renderer.domElement);
+const gl = renderer.getContext();
+const info = document.getElementById('info');
+
+if (!gl) {
+  info.textContent = '❌ No WebGL';
+  info.style.color = '#f44';
+} else {
+  info.textContent = 'Building dungeon...';
+
+  // Lights
+  scene.add(new THREE.AmbientLight(0x222244, 0.5));
+  const dir = new THREE.DirectionalLight(0xffeedd, 1);
+  dir.position.set(10, 15, 5);
+  dir.castShadow = true;
+  dir.shadow.mapSize.width = 1024;
+  dir.shadow.mapSize.height = 1024;
+  scene.add(dir);
+
+  // Add tiles - just a 10x10 grid
+  const W = 10, H = 10;
+  const mat1 = new THREE.MeshStandardMaterial({ color: 0x3a3a50, roughness: 0.7 });
+  const mat2 = new THREE.MeshStandardMaterial({ color: 0x444460, roughness: 0.7 });
+
+  for (let y = 0; y < H; y++) {
+    for (let x = 0; x < W; x++) {
+      const isAlt = (x + y) % 2 === 0;
+      const tile = new THREE.Mesh(
+        new THREE.BoxGeometry(1, 0.3, 1),
+        isAlt ? mat2 : mat1
+      );
+      tile.position.set(x - W/2, -0.15, y - H/2);
+      tile.receiveShadow = true;
+      scene.add(tile);
+    }
+  }
+
+  // Border walls
+  const wallMat = new THREE.MeshStandardMaterial({ color: 0x2a2a3e, roughness: 0.8 });
+  for (let x = -1; x <= W; x++) {
+    for (const z of [-1, H]) {
+      const wall = new THREE.Mesh(
+        new THREE.BoxGeometry(1, 1.5, 1),
+        wallMat
+      );
+      wall.position.set(x - W/2, 0.75, z - H/2);
+      wall.castShadow = true;
+      scene.add(wall);
+    }
+  }
+
+  // Some pillars
+  const pillarMat = new THREE.MeshStandardMaterial({ color: 0x4a4a5e, roughness: 0.4, metalness: 0.4 });
+  const pPositions = [[2, 2], [W-3, 2], [2, H-3], [W-3, H-3]];
+  for (const [px, pz] of pPositions) {
+    const pillar = new THREE.Mesh(
+      new THREE.CylinderGeometry(0.35, 0.4, 1.5, 8),
+      pillarMat
+    );
+    pillar.position.set(px - W/2, 0.75, pz - H/2);
+    pillar.castShadow = true;
+    scene.add(pillar);
+  }
+
+  info.textContent = `✅ Dungeon ${W}×${H} - you should see tiles, walls, pillars`;
+  info.style.color = '#88cc88';
+
+  // Animate
+  function animate() {
+    requestAnimationFrame(animate);
+    renderer.render(scene, camera);
+  }
+  animate();
+}
+
+window.addEventListener('resize', () => {
+  camera.aspect = window.innerWidth / window.innerHeight;
+  camera.updateProjectionMatrix();
+  renderer.setSize(window.innerWidth, window.innerHeight);
+});
+</script>
+</body>
+</html>

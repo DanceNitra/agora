@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Dungeon Test - Camera</title>
+<style>
+  * { margin: 0; padding: 0; }
+  html, body { width: 100%; height: 100%; background: #0a0a12; overflow: hidden; }
+  canvas { display: block; }
+</style>
+</head>
+<body>
+
+<div id="info" style="position:fixed;bottom:20px;left:50%;transform:translateX(-50%);color:#888;font-family:monospace;font-size:14px;z-index:10;background:rgba(0,0,0,0.7);padding:8px 16px;border-radius:4px;">
+  Loading...
+</div>
+
+<script type="importmap">
+{
+  "imports": {
+    "three": "/node_modules/three/build/three.module.js",
+    "three/addons/": "/node_modules/three/examples/jsm/"
+  }
+}
+</script>
+
+<script type="module">
+import * as THREE from 'three';
+import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+
+const info = document.getElementById('info');
+const scene = new THREE.Scene();
+scene.background = new THREE.Color(0x0a0a12);
+
+// SAME camera as dungeon index.html
+const aspect = window.innerWidth / window.innerHeight;
+const d = 14; // dungeon value
+const camera = new THREE.OrthographicCamera(-d * aspect, d * aspect, d, -d, 0.1, 100);
+
+const isoAngle = Math.PI / 4;
+const isoDip = Math.PI / 6;
+const dist = 30;
+camera.position.set(
+  dist * Math.sin(isoAngle) * Math.cos(isoDip),
+  dist * Math.sin(isoDip),
+  dist * Math.cos(isoAngle) * Math.cos(isoDip),
+);
+camera.lookAt(0, 0, 0);
+
+const renderer = new THREE.WebGLRenderer({ antialias: true });
+renderer.setSize(window.innerWidth, window.innerHeight);
+renderer.setPixelRatio(window.devicePixelRatio);
+renderer.shadowMap.enabled = true;
+document.body.prepend(renderer.domElement);
+
+if (!renderer.getContext()) {
+  info.textContent = '❌ No WebGL';
+  info.style.color = '#f44';
+} else {
+  info.textContent = 'Building...';
+
+  const controls = new OrbitControls(camera, renderer.domElement);
+  controls.target.set(0, 0, 0);
+  controls.update();
+
+  scene.add(new THREE.AmbientLight(0x222244, 0.5));
+  const dir = new THREE.DirectionalLight(0xffeedd, 1);
+  dir.position.set(10, 15, 5);
+  dir.castShadow = true;
+  scene.add(dir);
+
+  // SAME 10×10 tiles as tiles2
+  const W = 10, H = 10;
+  const mat1 = new THREE.MeshStandardMaterial({ color: 0x3a3a50, roughness: 0.7 });
+  const mat2 = new THREE.MeshStandardMaterial({ color: 0x444460, roughness: 0.7 });
+  const cx = W / 2 - 0.5, cy = H / 2 - 0.5;
+
+  for (let y = 0; y < H; y++) {
+    for (let x = 0; x < W; x++) {
+      const isAlt = (x + y) % 2 === 0;
+      const tile = new THREE.Mesh(new THREE.BoxGeometry(1, 0.3, 1), isAlt ? mat2 : mat1);
+      tile.position.set(x - cx, -0.15, y - cy);
+      tile.receiveShadow = true;
+      scene.add(tile);
+    }
+  }
+
+  const wallMat = new THREE.MeshStandardMaterial({ color: 0x2a2a3e, roughness: 0.8 });
+  for (let x = -1; x <= W; x++) {
+    for (const z of [-1, H]) {
+      const w = new THREE.Mesh(new THREE.BoxGeometry(1, 1.5, 1), wallMat);
+      w.position.set(x - cx, 0.75, z - cy); w.castShadow = true; scene.add(w);
+    }
+  }
+
+  info.textContent = '✅ Campaign = dungeon index.html - should see tiles from isometric angle';
+
+  function animate() {
+    requestAnimationFrame(animate);
+    controls.update();
+    renderer.render(scene, camera);
+  }
+  animate();
+}
+
+window.addEventListener('resize', () => {
+  const a = window.innerWidth / window.innerHeight;
+  camera.left = -d * a; camera.right = d * a;
+  camera.updateProjectionMatrix();
+  renderer.setSize(window.innerWidth, window.innerHeight);
+});
+</script>
+</body>
+</html>

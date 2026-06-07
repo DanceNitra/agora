@@ -1,0 +1,339 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>🏛️ Dungeon OS</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html, body { width: 100%; height: 100%; overflow: hidden; background: #0a0a12; }
+  canvas { display: block; }
+  #status {
+    position: fixed; bottom: 12px; left: 50%; transform: translateX(-50%);
+    color: #666; font-size: 0.7rem; opacity: 0.5; z-index: 10;
+    font-family: monospace; pointer-events: none;
+  }
+  #thought-bubble {
+    position: fixed; pointer-events: none; z-index: 15; display: none;
+    background: rgba(0,0,0,0.85); border: 1px solid #ffaa44; border-radius: 8px;
+    padding: 8px 14px; color: #ffcc88; font-size: 0.85rem; max-width: 280px;
+  }
+  #loading {
+    position: fixed; inset: 0; display: flex; align-items: center; justify-content: center;
+    background: #0a0a12; color: #8888aa; font-size: 1.2rem; z-index: 100;
+    transition: opacity 0.8s; font-family: sans-serif;
+  }
+  #loading.hidden { opacity: 0; pointer-events: none; }
+  #loading span { animation: pulse 1.5s infinite; }
+  @keyframes pulse { 0%, 100% { opacity: 0.3; } 50% { opacity: 1; } }
+</style>
+</head>
+<body>
+
+<div id="loading"><span>✦ Initializing Dungeon...</span></div>
+<div id="thought-bubble"></div>
+<div id="status">Dungeon OS — Connecting...</div>
+
+<script type="importmap">
+{
+  "imports": {
+    "three": "/node_modules/three/build/three.module.js",
+    "three/addons/": "/node_modules/three/examples/jsm/"
+  }
+}
+</script>
+
+<script type="module">
+import * as THREE from 'three';
+import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+
+// === SETUP ===
+const scene = new THREE.Scene();
+scene.background = new THREE.Color(0x0a0a12);
+
+const aspect = window.innerWidth / window.innerHeight;
+const d = 26;
+const camera = new THREE.OrthographicCamera(-d * aspect, d * aspect, d, -d, 0.1, 100);
+const iA = Math.PI / 4, iD = Math.PI / 6;
+camera.position.set(40 * Math.sin(iA) * Math.cos(iD), 40 * Math.sin(iD), 40 * Math.cos(iA) * Math.cos(iD));
+camera.lookAt(0, 0, 0);
+
+const renderer = new THREE.WebGLRenderer({ antialias: true });
+renderer.setSize(window.innerWidth, window.innerHeight);
+renderer.setPixelRatio(window.devicePixelRatio);
+renderer.shadowMap.enabled = true;
+document.body.prepend(renderer.domElement);
+
+const statusEl = document.getElementById('status');
+const loadingEl = document.getElementById('loading');
+
+if (!renderer.getContext()) {
+  statusEl.textContent = '❌ WebGL not available';
+} else {
+  const controls = new OrbitControls(camera, renderer.domElement);
+  controls.target.set(0, 0, 0);
+  controls.update();
+
+  // Ambient + directional base lights
+  const ambient = new THREE.AmbientLight(0x222244, 0.3);
+  scene.add(ambient);
+  const dl = new THREE.DirectionalLight(0xffeedd, 0.6);
+  dl.position.set(10, 20, 5);
+  dl.castShadow = true;
+  scene.add(dl);
+
+  // Groups
+  const tileGroup = new THREE.Group();
+  const lightGroup = new THREE.Group();
+  const entityGroup = new THREE.Group();
+  scene.add(tileGroup);
+  scene.add(lightGroup);
+  scene.add(entityGroup);
+
+  // Shared materials (NEVER dispose these)
+  const mWall = new THREE.MeshStandardMaterial({ color: 0x2a2a3e, roughness: 0.8 });
+  const mWallTop = new THREE.MeshStandardMaterial({ color: 0x333350, roughness: 0.6 });
+
+  // === BUILD DUNGEON ===
+  function buildDungeon(state) {
+    // Clear tile group - dispose ONLY per-instance materials, NOT shared ones
+    while (tileGroup.children.length) {
+      const c = tileGroup.children[0];
+      if (c.geometry) c.geometry.dispose();
+      // Only dispose non-shared materials (materials created with 'new' in this function)
+      tileGroup.remove(c);
+    }
+
+    const { width, height, tiles } = state;
+    const cx = width / 2 - 0.5, cy = height / 2 - 0.5;
+    let count = 0;
+
+    for (let y = 0; y < height; y++) {
+      for (let x = 0; x < width; x++) {
+        const tile = tiles?.[y]?.[x];
+        if (!tile) continue;
+        const px = x - cx, pz = y - cy;
+        const type = tile.type || 'floor';
+
+        if (type === 'void') continue;
+
+        else if (type === 'wall') {
+          // Wall block
+          const w = new THREE.Mesh(new THREE.BoxGeometry(1, 1.5, 1), mWall);
+          w.position.set(px, 0.75, pz); w.castShadow = true; tileGroup.add(w);
+          // Wall top rim
+          const rim = new THREE.Mesh(new THREE.BoxGeometry(1.05, 0.05, 1.05), mWallTop);
+          rim.position.set(px, 1.525, pz); tileGroup.add(rim);
+        }
+
+        else if (type === 'pillar') {
+          const col = parseInt((tile.color || '#4a4a5e').replace('#', ''), 16);
+          const mat = new THREE.MeshStandardMaterial({ color: col, roughness: 0.4, metalness: 0.4 });
+          const p = new THREE.Mesh(new THREE.CylinderGeometry(0.35, 0.4, 1.5, 8), mat);
+          p.position.set(px, 0.75, pz); p.castShadow = true; tileGroup.add(p);
+          // Top cap
+          const cap = new THREE.Mesh(new THREE.CylinderGeometry(0.4, 0.35, 0.08, 8),
+            new THREE.MeshStandardMaterial({ color: col, roughness: 0.3, metalness: 0.5 }));
+          cap.position.set(px, 1.54, pz); tileGroup.add(cap);
+        }
+
+        else if (type === 'torch') {
+          // Floor under torch
+          const f = new THREE.Mesh(new THREE.BoxGeometry(1, 0.3, 1),
+            new THREE.MeshStandardMaterial({ color: 0x3a3a48, roughness: 0.7 }));
+          f.position.set(px, -0.15, pz); tileGroup.add(f);
+          // Pole
+          const pole = new THREE.Mesh(new THREE.CylinderGeometry(0.04, 0.06, 0.7, 6),
+            new THREE.MeshStandardMaterial({ color: 0x553311, roughness: 0.9 }));
+          pole.position.set(px, 0.15, pz); tileGroup.add(pole);
+          // Flame
+          const flame = new THREE.Mesh(new THREE.SphereGeometry(0.1, 6, 6),
+            new THREE.MeshBasicMaterial({ color: 0xff6622 }));
+          flame.position.set(px, 0.55, pz); tileGroup.add(flame);
+        }
+
+        else if (type === 'chest') {
+          const chest = new THREE.Mesh(new THREE.BoxGeometry(0.6, 0.4, 0.5),
+            new THREE.MeshStandardMaterial({ color: 0x8a6a3a, roughness: 0.6, metalness: 0.3 }));
+          chest.position.set(px, 0.05, pz); tileGroup.add(chest);
+          const lid = new THREE.Mesh(new THREE.BoxGeometry(0.5, 0.06, 0.4),
+            new THREE.MeshStandardMaterial({ color: 0x9a7a4a, roughness: 0.5, metalness: 0.4 }));
+          lid.position.set(px, 0.28, pz); tileGroup.add(lid);
+        }
+
+        else if (type === 'throne') {
+          const t = new THREE.Mesh(new THREE.BoxGeometry(1, 0.3, 1),
+            new THREE.MeshStandardMaterial({ color: 0x6a3a2a, roughness: 0.6, metalness: 0.3 }));
+          t.position.set(px, -0.15, pz); tileGroup.add(t);
+          const back = new THREE.Mesh(new THREE.BoxGeometry(0.1, 0.6, 0.6),
+            new THREE.MeshStandardMaterial({ color: 0x7a4a3a, roughness: 0.5, metalness: 0.5 }));
+          back.position.set(px, 0.3, pz + 0.2); tileGroup.add(back);
+          const glow = new THREE.Mesh(new THREE.SphereGeometry(0.15, 6, 6),
+            new THREE.MeshBasicMaterial({ color: 0xff66aa, transparent: true, opacity: 0.4 }));
+          glow.position.set(px, 0.05, pz); tileGroup.add(glow);
+        }
+
+        else {
+          // Floor tile
+          const c = tile.color ? parseInt(tile.color.replace('#', ''), 16) : 0x3a3a50;
+          const isAlt = (x + y) % 2 === 0;
+          const finalColor = isAlt ? new THREE.Color(c).multiplyScalar(1.08).getHex() : c;
+          const t = new THREE.Mesh(new THREE.BoxGeometry(1, 0.3, 1),
+            new THREE.MeshStandardMaterial({ color: finalColor, roughness: 0.7 }));
+          t.position.set(px, -0.15, pz); t.receiveShadow = true; tileGroup.add(t);
+        }
+        count++;
+      }
+    }
+
+    // --- Lights from state ---
+    while (lightGroup.children.length) {
+      const c = lightGroup.children[0];
+      lightGroup.remove(c);
+    }
+    if (state.lights) {
+      for (const lt of state.lights) {
+        const color = parseInt((lt.color || '#ffaa44').replace('#', ''), 16);
+        const pl = new THREE.PointLight(color, lt.intensity || 0.5, lt.radius || 5);
+        pl.position.set(lt.x - cx, 1.5, lt.y - cy);
+        lightGroup.add(pl);
+      }
+    }
+
+    // --- Entities (agents) ---
+    while (entityGroup.children.length) {
+      const c = entityGroup.children[0];
+      if (c.geometry) c.geometry.dispose();
+      if (c.material) c.material.dispose();
+      entityGroup.remove(c);
+    }
+    // Track entities for animation
+    window.__entities = {};
+
+    if (state.entities) {
+      for (const [id, ent] of Object.entries(state.entities)) {
+        const group = new THREE.Group();
+        const ex = ent.x - cx, ez = ent.y - cy;
+        group.position.set(ex, 0, ez);
+
+        // Body (cylinder)
+        const bodyMat = new THREE.MeshStandardMaterial({
+          color: parseInt(ent.color.replace('#', ''), 16),
+          roughness: 0.5, metalness: 0.3
+        });
+        const body = new THREE.Mesh(new THREE.CylinderGeometry(0.3, 0.35, 0.6, 8), bodyMat);
+        body.position.y = 0.3;
+        body.castShadow = true;
+        group.add(body);
+
+        // Head (sphere)
+        const headMat = new THREE.MeshStandardMaterial({
+          color: parseInt(ent.color.replace('#', ''), 16),
+          roughness: 0.3, metalness: 0.1
+        });
+        const head = new THREE.Mesh(new THREE.SphereGeometry(0.18, 8, 8), headMat);
+        head.position.y = 0.7;
+        head.castShadow = true;
+        group.add(head);
+
+        // Name label (sprite from canvas)
+        const canvas = document.createElement('canvas');
+        canvas.width = 256; canvas.height = 64;
+        const ctx = canvas.getContext('2d');
+        ctx.fillStyle = 'rgba(0,0,0,0.6)';
+        ctx.roundRect(0, 8, 256, 48, 8);
+        ctx.fill();
+        ctx.font = 'bold 22px monospace';
+        ctx.textAlign = 'center';
+        ctx.fillStyle = '#ffffff';
+        ctx.fillText(ent.name, 128, 42);
+        const nameTex = new THREE.CanvasTexture(canvas);
+        const nameMat = new THREE.SpriteMaterial({ map: nameTex, transparent: true, depthWrite: false });
+        const nameSprite = new THREE.Sprite(nameMat);
+        nameSprite.position.y = 1.2;
+        nameSprite.scale.set(1.2, 0.3, 1);
+        group.add(nameSprite);
+
+        // Health bar (sprite)
+        const hbCanvas = document.createElement('canvas');
+        hbCanvas.width = 64; hbCanvas.height = 8;
+        const hbCtx = hbCanvas.getContext('2d');
+        // Background
+        hbCtx.fillStyle = '#333333';
+        hbCtx.fillRect(0, 0, 64, 8);
+        // Health fill
+        const pct = (ent.health || 100) / (ent.max_health || 100);
+        hbCtx.fillStyle = pct > 0.5 ? '#27ae60' : pct > 0.25 ? '#f39c12' : '#e74c3c';
+        hbCtx.fillRect(1, 1, Math.max(0, (62) * pct), 6);
+        const hbTex = new THREE.CanvasTexture(hbCanvas);
+        const hbMat = new THREE.SpriteMaterial({ map: hbTex, transparent: true, depthWrite: false });
+        const hbSprite = new THREE.Sprite(hbMat);
+        hbSprite.position.y = 1.0;
+        hbSprite.scale.set(0.5, 0.06, 1);
+        group.add(hbSprite);
+
+        // Store entity group and data for animation
+        group.userData = { entityId: id, baseY: 0, period: 2 + Math.random() * 1.5, phase: Math.random() * Math.PI * 2 };
+        window.__entities[id] = { group, data: ent };
+
+        entityGroup.add(group);
+      }
+    }
+
+    console.log(`Dungeon built: ${count} tiles, ${state.lights?.length || 0} lights, ${state.entities ? Object.keys(state.entities).length : 0} entities`);
+    controls.target.set(0, 0, 0);
+    controls.update();
+  }
+
+  // === WEBSOCKET ===
+  let ws = null;
+  function connect() {
+    statusEl.textContent = 'Connecting...';
+    try { ws = new WebSocket(`ws://${location.hostname}:5175`); } catch(e) {
+      setTimeout(connect, 2000); return;
+    }
+    ws.onopen = () => console.log('WS connected');
+    ws.onmessage = (msg) => {
+      try {
+        const data = JSON.parse(msg.data);
+        if (data._type === 'snapshot') {
+          buildDungeon(data);
+          loadingEl.classList.add('hidden');
+          statusEl.textContent = `Dungeon OS — ${data.width}×${data.height} · ${data.lights?.length || 0} lights · ${data.entities ? Object.keys(data.entities).length : 0} entities · tick ${data.tick || 0}`;
+        }
+      } catch(e) { console.warn('WS err:', e); }
+    };
+    ws.onclose = () => { statusEl.textContent = 'Disconnected...'; setTimeout(connect, 2000); };
+  }
+  connect();
+
+  function animate() {
+    requestAnimationFrame(animate);
+
+    // Idle breathing animation for entities
+    const ents = window.__entities || {};
+    const t = performance.now() / 1000;
+    for (const [id, obj] of Object.entries(ents)) {
+      if (obj.group) {
+        const ud = obj.group.userData;
+        const breath = Math.sin(t * ud.period + ud.phase) * 0.03;
+        obj.group.position.y = ud.baseY + breath;
+        // Slight rotation sway
+        obj.group.rotation.z = Math.sin(t * ud.period * 0.5 + ud.phase) * 0.02;
+      }
+    }
+
+    controls.update();
+    renderer.render(scene, camera);
+  }
+  animate();
+}
+
+window.addEventListener('resize', () => {
+  const a = window.innerWidth / window.innerHeight;
+  camera.left = -d * a; camera.right = d * a;
+  camera.updateProjectionMatrix();
+  renderer.setSize(window.innerWidth, window.innerHeight);
+});
+</script>
+</body>
+</html>

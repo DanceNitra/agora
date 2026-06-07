@@ -1,3 +1,5 @@
+Removed pixi.js
+Removed pixi-filters
 {
   "name": "agora-shell",
   "private": true,
@@ -11,8 +13,6 @@
   "dependencies": {
     "@tanstack/react-query": "^5.51.0",
     "d3": "^7.9.0",
-    "pixi-filters": "^6.1.5",
-    "pixi.js": "^8.19.0",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
     "react-router-dom": "^6.26.0",
