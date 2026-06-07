@@ -73,8 +73,8 @@ class StimulusEngine:
             Created quest dict or error dict.
         """
         quest_id = f"{stimulus_type}-{source.replace(':', '-').replace('/', '-')}-{int(time.time())}"
-        # Truncate ID to reasonable length
-        quest_id = quest_id[:60]
+        # Truncate ID to reasonable length and remove special URL chars
+        quest_id = "".join(c if c.isalnum() or c in "-_" else "_" for c in quest_id)[:60]
 
         # Determine best NPC for this stimulus
         route = STIMULUS_ROUTING.get(stimulus_type, {})

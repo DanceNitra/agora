@@ -1,6 +1,10 @@
 """Dungeon OS — Quest API endpoints."""
 
+import os
+
 from fastapi import APIRouter, HTTPException, Request
+
+from agora.dungeon_os.agent_worker import AgentWorker
 
 router = APIRouter(prefix="/api/v2/dungeon-os", tags=["dungeon-os"])
 
@@ -10,6 +14,25 @@ def get_qe(request: Request):
     if qe is None:
         raise HTTPException(500, "Quest engine not initialized")
     return qe
+
+
+def get_worker(request: Request):
+    """Get or create the AgentWorker."""
+    worker = getattr(request.app.state, "agent_worker", None)
+    if worker is None:
+        qe = get_qe(request)
+        os_state = getattr(request.app.state, "os_state", None)
+        db = getattr(request.app.state, "db", None)
+        config = {
+            "quest_engine": qe,
+            "os_state": os_state,
+            "log_dir": "/tmp/hermes-logs",
+            "vault_path": os.path.expanduser("~/Obsidian Vault"),
+            "telegram_chat_id": os.getenv("HERMES_TELEGRAM_CHAT_ID"),
+        }
+        worker = AgentWorker(qe, db, config)
+        request.app.state.agent_worker = worker
+    return worker
 
 
 @router.get("/quests")
@@ -246,3 +269,22 @@ async def poll_watch_dir(request: Request):
         raise HTTPException(400, "No stimulus engine initialized")
     new_quests = await engine.poll_watch_dir()
     return {"new_quests": len(new_quests), "quests": new_quests}
+
+
+# ═══════════════════════════════════════════
+# AGENT WORKER — quest-driven NPC tick
+# ═══════════════════════════════════════════
+
+@router.post("/tick")
+async def run_worker_tick(request: Request):
+    """Run one agent worker tick — NPCs work on claimed quests."""
+    worker = get_worker(request)
+    result = await worker.tick()
+    return result
+
+
+@router.get("/worker/stats")
+async def get_worker_stats(request: Request):
+    """Get agent worker statistics."""
+    worker = get_worker(request)
+    return worker.get_stats()
