@@ -3,16 +3,16 @@
  *
  * Lifecycle:
  *   1. useEffect → createPixiApp(containerDiv)
- *   2. Generate textures → build tilemap container
+ *   2. Generate textures (PixiJS Graphics API) → build tilemap
  *   3. Start ticker that reads world.ts state and updates sprites
- *   4. On unmount → app.destroy() (cleanup, no WebGL leaks)
+ *   4. On unmount → cleanup
  */
 
 import React, { useRef, useEffect, useState } from 'react';
 import { Container } from 'pixi.js';
 import { createPixiApp, destroyPixiApp } from './pixiApp';
 import { buildTilemap } from './tilemap';
-import { generateAllTextures } from './textures';
+import { generatePixiTextures } from './graphicsTiles';
 import { buildAgents, tickAgents } from './agents';
 import { buildLighting, tickLighting, applyTorchGlow, applyStageBloom } from './lighting';
 import { ParticleSystem } from './particles';
@@ -41,18 +41,18 @@ const DungeonCanvas: React.FC = () => {
         return;
       }
 
-      // Generate textures
-      const tex = generateAllTextures();
+      // Generate textures using PixiJS Graphics API (vector, clean)
+      const tex = generatePixiTextures(app);
 
       // Root dungeon container (everything inside gets bloom)
       const dungeonContainer = new Container();
 
-      // Build tilemap container with all textures
+      // Build tilemap container with PixiJS textures
       const worldContainer = new Container();
-      buildTilemap(worldContainer, tex);
+      buildTilemap(worldContainer, tex as any);
       dungeonContainer.addChild(worldContainer);
 
-      // Build agent sprites
+      // Build agent sprites (PixiJS vector agents)
       const agentLayer = new Container();
       buildAgents(agentLayer);
       dungeonContainer.addChild(agentLayer);
@@ -71,12 +71,13 @@ const DungeonCanvas: React.FC = () => {
 
       setReady(true);
 
-      // Ticker: read world state and animate agents
+      // Ticker
       app.ticker.add(() => {
         tickAgents();
         tickLighting(lightLayer);
         particleSystem.tick();
       });
+
       // Store for cleanup
       (div as any).__pixiApp = app;
       (div as any).__particleSystem = particleSystem;
