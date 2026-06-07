@@ -206,10 +206,17 @@ if (!renderer.getContext()) {
     }
 
     // Wall type mapping: different OBJ for different wall types
-    function placeWall(px, pz, tile) {
+    function placeWall(px, pz, tile, rotY = 0) {
       const subType = (tile && tile.variant === 1) ? 'Wall_Half' : 'Wall';
       const s = subType === 'Wall_Half' ? 1.0 : 0.5;
-      return placeAsset(subType, px, pz, { scale: s, y: 0 });
+      return placeAsset(subType, px, pz, { scale: s, y: 0, rotY });
+    }
+
+    function placeWallFallback(px, pz) {
+      const w = new THREE.Mesh(new THREE.BoxGeometry(1, 1.5, 1), mWall);
+      w.position.set(px, 0.75, pz); w.castShadow = true; tileGroup.add(w);
+      const rim = new THREE.Mesh(new THREE.BoxGeometry(1.05, 0.05, 1.05), mWallTop);
+      rim.position.set(px, 1.525, pz); tileGroup.add(rim);
     }
 
     for (let y = 0; y < height; y++) {
@@ -222,13 +229,29 @@ if (!renderer.getContext()) {
         if (type === 'void') continue;
 
         else if (type === 'wall') {
-          // Wall.obj (scale 0.5) for double-width or Wall_Half.obj (scale 1) for single
-          if (!placeWall(px, pz, tile)) {
-            // Fallback box
-            const w = new THREE.Mesh(new THREE.BoxGeometry(1, 1.5, 1), mWall);
-            w.position.set(px, 0.75, pz); w.castShadow = true; tileGroup.add(w);
-            const rim = new THREE.Mesh(new THREE.BoxGeometry(1.05, 0.05, 1.05), mWallTop);
-            rim.position.set(px, 1.525, pz); tileGroup.add(rim);
+          // Determine wall orientation from neighbors
+          const hasLeft = x > 0 && tiles?.[y]?.[x-1]?.type === 'wall';
+          const hasRight = x < width-1 && tiles?.[y]?.[x+1]?.type === 'wall';
+          const hasUp = y > 0 && tiles?.[y-1]?.[x]?.type === 'wall';
+          const hasDown = y < height-1 && tiles?.[y+1]?.[x]?.type === 'wall';
+
+          const isHorizontal = hasLeft || hasRight;
+          const isVertical = hasUp || hasDown;
+
+          if (isHorizontal && isVertical) {
+            // Corner: place both horizontal and vertical wall segments
+            if (!placeWall(px, pz, tile, 0))
+              placeWallFallback(px, pz);
+            if (!placeWall(px, pz, tile, Math.PI / 2))
+              placeWallFallback(px, pz);
+          } else if (isVertical) {
+            // Vertical wall: rotate 90°
+            if (!placeWall(px, pz, tile, Math.PI / 2))
+              placeWallFallback(px, pz);
+          } else {
+            // Horizontal or isolated: default rotation
+            if (!placeWall(px, pz, tile, 0))
+              placeWallFallback(px, pz);
           }
         }
 
