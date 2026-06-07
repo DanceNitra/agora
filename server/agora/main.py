@@ -25,6 +25,8 @@ from agora.harness.execution_loop import ExecutionEngine
 from agora.harness.context_manager import ContextManager
 from agora.harness.evaluation import EpochEvaluator
 from agora.scheduler.room_cluster import RoomClusterScheduler
+from agora.controller.controller import Controller
+from agora.controller.worker import WorkerTask, WorkerResult, run_worker_task
 from agora.execution.task_executor import TaskExecutor
 from agora.lifecycle.agent_lifecycle import AgentLifecycle
 from agora.lifecycle.epoch_engine import EpochEngine
@@ -114,6 +116,7 @@ async def init_db(app: FastAPI):
     await app.state.agent_os.ensure_os_initialized()
     app.state.physical_world = PhysicalWorld(db, llm_enabled=settings.llm_enabled)
     app.state.scheduler = RoomClusterScheduler(db)
+    app.state.controller = Controller(app, db, app.state.state_store)
     app.state.agent_lifecycle = AgentLifecycle(db)
     app.state.csd_monitor = CSDMonitor(window_size=200, z_threshold_warning=2.0, z_threshold_critical=3.5)
     app.state.epoch_engine = EpochEngine(db)
@@ -536,16 +539,14 @@ async def tick_loop(app: FastAPI):
             except Exception as e:
                 print(f"[LifecycleHooks] Pre-tick error: {e}")
 
-            # ── 3. ROOM CLUSTER SCHEDULER — per-room ticks ──
-            # Each room = independent cluster (OOOE: FREE state)
-            # NPCs in different rooms advance independently
+            # ── 3. CONTROLLER — room cluster dispatch ──
+            # Each room = independent cluster dispatched by Controller
             try:
-                await app.state.scheduler.tick(
-                    app,
-                    broadcast_fn=lambda t, p: broadcast(app, t, p),
-                )
+                controller_events = await app.state.controller.tick()
+                for ev in controller_events:
+                    await broadcast(app, ev["type"], ev["payload"])
             except Exception as e:
-                print(f"[Scheduler] Error: {e}")
+                print(f"[Controller] Error: {e}")
                 import traceback
                 traceback.print_exc()
 
