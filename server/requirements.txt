@@ -12,3 +12,4 @@ cryptography
 numpy
 openai
 fakeredis
+alembic~=1.14.0

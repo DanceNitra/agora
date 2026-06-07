@@ -41,62 +41,55 @@ from agora.api import god_console_v2
 
 
 async def init_db(app: FastAPI):
-    db_url = settings.database_url
-    db_path = db_url.replace("sqlite+aiosqlite:///", "")
-    db = await aiosqlite.connect(db_path)
-    db.row_factory = aiosqlite.Row
-    app.state.db = db
+    """Initialize database connections (SQLite dev or PostgreSQL prod)."""
+    from agora.storage.db import init_database
 
-    schema_path = __file__.replace("main.py", "storage/schema.sql")
-    try:
-        with open(schema_path) as f:
-            await db.executescript(f.read())
-    except (FileNotFoundError, Exception) as e:
-        if isinstance(e, FileNotFoundError):
-            pass
-        else:
-            print(f"[Agora] Schema note: {e} (tables likely already exist)")
+    await init_database(app, settings.database_url)
+    db = app.state.db
 
-    # Migration: add content column to artifacts
-    try:
-        await db.execute("ALTER TABLE artifacts ADD COLUMN content TEXT DEFAULT ''")
-        await db.commit()
-    except Exception:
-        pass  # column already exists
+    # Migration: add content column to artifacts (if SQLite)
+    if db:
+        try:
+            await db.execute("ALTER TABLE artifacts ADD COLUMN content TEXT DEFAULT ''")
+            await db.commit()
+        except Exception:
+            pass  # column already exists
 
-    await db.commit()
-    app.state.trust = TrustEngine(db)
+    # Initialize state objects
+    app.state.trust = TrustEngine(db) if db else TrustEngine(None)
     app.state.stigmergy = StigmergyPool(redis_client=None, db=db)
-    await app.state.stigmergy.load_from_db()
+    if db:
+        await app.state.stigmergy.load_from_db()
     app.state.economy = EconomyEngine(db)
     await app.state.economy.init_resources()
 
     # Seed initial agent inventories for dungeon NPCs
-    cursor = await db.execute(
-        "SELECT COUNT(*) as c FROM agent_inventory"
-    )
-    row = await cursor.fetchone()
-    if row and row["c"] == 0:
-        seed_data = [
-            ("00000000-0000-0000-0000-000000000001", 1, 5.0),   # Kael: gold_ore
-            ("00000000-0000-0000-0000-000000000002", 2, 4.0),   # Lyra: herbs
-            ("00000000-0000-0000-0000-000000000003", 5, 3.0),   # Mordecai: scroll_fragment
-            ("00000000-0000-0000-0000-000000000003", 3, 2.0),   # Mordecai: crystal_shards
-            ("00000000-0000-0000-0000-000000000004", 4, 4.0),   # Grom: iron_ingot
-            ("00000000-0000-0000-0000-000000000004", 1, 2.0),   # Grom: gold_ore
-            ("00000000-0000-0000-0000-000000000005", 2, 5.0),   # Zara: herbs
-            ("00000000-0000-0000-0000-000000000005", 3, 1.0),   # Zara: crystal_shards
-            ("00000000-0000-0000-0000-000000000006", 1, 3.0),   # Finn: gold_ore (trading capital)
-            ("00000000-0000-0000-0000-000000000006", 4, 3.0),   # Finn: iron_ingot
-            ("00000000-0000-0000-0000-000000000007", 4, 2.0),   # Guard: iron_ingot
-        ]
-        for agent_id, res_id, qty in seed_data:
-            await db.execute(
-                "INSERT INTO agent_inventory (agent_id, resource_id, quantity) VALUES (?, ?, ?)",
-                (agent_id, res_id, qty),
-            )
-        await db.commit()
-        print(f"[Economy] Seeded inventories for {len(set(a[0] for a in seed_data))} agents")
+    if db:
+        cursor = await db.execute(
+            "SELECT COUNT(*) as c FROM agent_inventory"
+        )
+        row = await cursor.fetchone()
+        if row and row["c"] == 0:
+            seed_data = [
+                ("00000000-0000-0000-0000-000000000001", 1, 5.0),   # Kael: gold_ore
+                ("00000000-0000-0000-0000-000000000002", 2, 4.0),   # Lyra: herbs
+                ("00000000-0000-0000-0000-000000000003", 5, 3.0),   # Mordecai: scroll_fragment
+                ("00000000-0000-0000-0000-000000000003", 3, 2.0),   # Mordecai: crystal_shards
+                ("00000000-0000-0000-0000-000000000004", 4, 4.0),   # Grom: iron_ingot
+                ("00000000-0000-0000-0000-000000000004", 1, 2.0),   # Grom: gold_ore
+                ("00000000-0000-0000-0000-000000000005", 2, 5.0),   # Zara: herbs
+                ("00000000-0000-0000-0000-000000000005", 3, 1.0),   # Zara: crystal_shards
+                ("00000000-0000-0000-0000-000000000006", 1, 3.0),   # Finn: gold_ore (trading capital)
+                ("00000000-0000-0000-0000-000000000006", 4, 3.0),   # Finn: iron_ingot
+                ("00000000-0000-0000-0000-000000000007", 4, 2.0),   # Guard: iron_ingot
+            ]
+            for agent_id, res_id, qty in seed_data:
+                await db.execute(
+                    "INSERT INTO agent_inventory (agent_id, resource_id, quantity) VALUES (?, ?, ?)",
+                    (agent_id, res_id, qty),
+                )
+            await db.commit()
+            print(f"[Economy] Seeded inventories for {len(set(a[0] for a in seed_data))} agents")
     app.state.task_executor = TaskExecutor(db)
     app.state.state_store = StateStore(db)
     app.state.lifecycle_hooks = LifecycleHooks(app.state.state_store, db)
@@ -130,7 +123,7 @@ async def init_db(app: FastAPI):
     if row and row["cnt"] == 0:
         await seed_agents(db)
 
-    print(f"[Agora] DB initialized at {db_path}")
+    print(f"[Agora] DB initialized ({settings.database_url[:50]}...)")
 
 
 async def seed_agents(db):
