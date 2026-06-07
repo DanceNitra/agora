@@ -40,47 +40,60 @@ function rgba(hex: number, alpha: number = 1) {
 // ── Floor tile ──
 export function floorTexture(): Texture {
   return generateTexture('floor', 32, 32, (ctx) => {
-    // Base stone
-    ctx.fillStyle = '#2a2a3a';
+    // Random stone variation (different shades per tile)
+    const baseColors = ['#2a2a3a', '#2e2e40', '#262638', '#303046', '#282840'];
+    const baseColor = baseColors[Math.floor(Math.random() * baseColors.length)];
+    ctx.fillStyle = baseColor;
     ctx.fillRect(0, 0, 32, 32);
 
-    // Noise dots
-    for (let i = 0; i < 20; i++) {
+    // Subtle noisy stone grain
+    for (let i = 0; i < 30; i++) {
       const x = Math.random() * 32;
       const y = Math.random() * 32;
-      ctx.fillStyle = Math.random() > 0.5 ? '#33334a' : '#222233';
-      ctx.globalAlpha = 0.4;
-      ctx.fillRect(x, y, 3, 3);
+      ctx.fillStyle = Math.random() > 0.5 ? 'rgba(255,255,255,0.03)' : 'rgba(0,0,0,0.03)';
+      ctx.fillRect(x, y, 4, 4);
     }
-    ctx.globalAlpha = 1;
 
-    // Mortar lines
-    ctx.strokeStyle = '#1a1a2a';
+    // Stone slab outline (individual stones, not grid)
+    ctx.strokeStyle = '#1a1a28';
     ctx.lineWidth = 1;
-    ctx.globalAlpha = 0.7;
+    ctx.globalAlpha = 0.5;
+
+    // Random stone crack pattern
     ctx.beginPath();
-    ctx.moveTo(0, 8); ctx.lineTo(32, 8);
-    ctx.moveTo(0, 16); ctx.lineTo(32, 16);
-    ctx.moveTo(0, 24); ctx.lineTo(32, 24);
-    ctx.moveTo(8, 0); ctx.lineTo(8, 8);
-    ctx.moveTo(24, 0); ctx.lineTo(24, 8);
-    ctx.moveTo(16, 8); ctx.lineTo(16, 16);
-    ctx.moveTo(8, 16); ctx.lineTo(8, 24);
-    ctx.moveTo(24, 16); ctx.lineTo(24, 24);
-    ctx.moveTo(16, 24); ctx.lineTo(16, 32);
+    if (Math.random() > 0.4) {
+      ctx.moveTo(0, Math.random() * 32);
+      ctx.lineTo(32, Math.random() * 32);
+    }
+    if (Math.random() > 0.4) {
+      ctx.moveTo(Math.random() * 32, 0);
+      ctx.lineTo(Math.random() * 32, 32);
+    }
     ctx.stroke();
 
-    // Highlight top-left
-    ctx.strokeStyle = '#44445a';
+    // Sub-tile cracks
+    ctx.strokeStyle = '#151522';
+    ctx.lineWidth = 0.5;
     ctx.globalAlpha = 0.3;
+    ctx.beginPath();
+    for (let i = 0; i < 3; i++) {
+      const sx = Math.random() * 32;
+      const sy = Math.random() * 32;
+      ctx.moveTo(sx, sy);
+      ctx.lineTo(sx + (Math.random() - 0.5) * 16, sy + (Math.random() - 0.5) * 16);
+    }
+    ctx.stroke();
+
+    // Edge highlights (top-left light source)
+    ctx.strokeStyle = 'rgba(255,255,255,0.06)';
+    ctx.lineWidth = 1;
     ctx.beginPath();
     ctx.moveTo(0, 0); ctx.lineTo(32, 0);
     ctx.moveTo(0, 0); ctx.lineTo(0, 32);
     ctx.stroke();
 
-    // Shadow bottom-right
-    ctx.strokeStyle = '#111122';
-    ctx.globalAlpha = 0.3;
+    // Edge shadows (bottom-right)
+    ctx.strokeStyle = 'rgba(0,0,0,0.08)';
     ctx.beginPath();
     ctx.moveTo(0, 31); ctx.lineTo(32, 31);
     ctx.moveTo(31, 0); ctx.lineTo(31, 32);
@@ -92,46 +105,75 @@ export function floorTexture(): Texture {
 // ── Wall tile ──
 export function wallTexture(): Texture {
   return generateTexture('wall', 32, 32, (ctx) => {
+    // Dark stone base
     ctx.fillStyle = '#3a3a50';
     ctx.fillRect(0, 0, 32, 32);
 
-    // Brick row 1
-    ctx.fillStyle = '#4a4a66';
-    ctx.fillRect(1, 1, 14, 14);
-    ctx.fillRect(17, 1, 14, 14);
-    // Brick row 2 offset
-    ctx.fillStyle = '#444460';
-    ctx.fillRect(9, 17, 14, 14);
+    // Subtle noise
+    for (let i = 0; i < 20; i++) {
+      ctx.fillStyle = Math.random() > 0.5 ? 'rgba(255,255,255,0.02)' : 'rgba(0,0,0,0.03)';
+      ctx.fillRect(Math.random() * 32, Math.random() * 32, 5, 5);
+    }
 
-    // Highlights
-    ctx.strokeStyle = '#5a5a76';
+    // Individual bricks with 3D bevel effect
+    const bricks = [
+      { x: 0, y: 0, w: 15, h: 7 },
+      { x: 17, y: 0, w: 15, h: 7 },
+      { x: 8, y: 8, w: 15, h: 7 },
+      { x: 0, y: 16, w: 15, h: 7 },
+      { x: 17, y: 16, w: 15, h: 7 },
+      { x: 8, y: 24, w: 15, h: 7 },
+    ];
+
+    for (const brick of bricks) {
+      // Base brick color (random warm variation)
+      const r = Math.floor(55 + Math.random() * 20);
+      const g = Math.floor(45 + Math.random() * 15);
+      const b = Math.floor(65 + Math.random() * 20);
+      ctx.fillStyle = `rgb(${r},${g},${b})`;
+      ctx.fillRect(brick.x + 1, brick.y + 1, brick.w - 2, brick.h - 2);
+
+      // Top highlight
+      ctx.fillStyle = `rgba(255,255,255,0.08)`;
+      ctx.fillRect(brick.x + 1, brick.y + 1, brick.w - 2, 1);
+
+      // Left highlight
+      ctx.fillStyle = `rgba(255,255,255,0.05)`;
+      ctx.fillRect(brick.x + 1, brick.y + 1, 1, brick.h - 2);
+
+      // Bottom shadow
+      ctx.fillStyle = `rgba(0,0,0,0.1)`;
+      ctx.fillRect(brick.x + 1, brick.y + brick.h - 2, brick.w - 2, 1);
+
+      // Right shadow
+      ctx.fillStyle = `rgba(0,0,0,0.08)`;
+      ctx.fillRect(brick.x + brick.w - 2, brick.y + 1, 1, brick.h - 2);
+    }
+
+    // Mortar lines
+    ctx.strokeStyle = '#252540';
     ctx.lineWidth = 1;
-    ctx.globalAlpha = 0.5;
-    ctx.beginPath();
-    ctx.moveTo(1, 1); ctx.lineTo(15, 1);
-    ctx.moveTo(17, 1); ctx.lineTo(31, 1);
-    ctx.moveTo(9, 17); ctx.lineTo(23, 17);
-    ctx.stroke();
-
-    // Shadows
-    ctx.strokeStyle = '#2a2a46';
-    ctx.beginPath();
-    ctx.moveTo(1, 15); ctx.lineTo(15, 15);
-    ctx.moveTo(17, 15); ctx.lineTo(31, 15);
-    ctx.moveTo(9, 31); ctx.lineTo(23, 31);
-    ctx.stroke();
-
-    // Mortar
-    ctx.strokeStyle = '#2a2a40';
     ctx.globalAlpha = 0.8;
-    ctx.lineWidth = 1;
     ctx.beginPath();
-    ctx.moveTo(0, 16); ctx.lineTo(32, 16);
-    ctx.moveTo(16, 0); ctx.lineTo(16, 16);
-    ctx.moveTo(0, 16); ctx.lineTo(0, 32);
-    ctx.moveTo(24, 16); ctx.lineTo(24, 32);
+    ctx.moveTo(0, 7); ctx.lineTo(32, 7);
+    ctx.moveTo(0, 15); ctx.lineTo(32, 15);
+    ctx.moveTo(0, 23); ctx.lineTo(32, 23);
+    ctx.moveTo(15, 0); ctx.lineTo(15, 7);
+    ctx.moveTo(7, 8); ctx.lineTo(7, 15);
+    ctx.moveTo(23, 8); ctx.lineTo(23, 15);
+    ctx.moveTo(15, 16); ctx.lineTo(15, 23);
+    ctx.moveTo(7, 24); ctx.lineTo(7, 31);
+    ctx.moveTo(23, 24); ctx.lineTo(23, 31);
     ctx.stroke();
     ctx.globalAlpha = 1;
+
+    // Top overall light sweep
+    ctx.fillStyle = 'rgba(255,255,255,0.04)';
+    ctx.fillRect(0, 0, 32, 4);
+
+    // Bottom overall shadow
+    ctx.fillStyle = 'rgba(0,0,0,0.06)';
+    ctx.fillRect(0, 28, 32, 4);
   });
 }
 

@@ -15,6 +15,7 @@ import { buildTilemap } from './tilemap';
 import { generateAllTextures } from './textures';
 import { buildAgents, tickAgents } from './agents';
 import { buildLighting, tickLighting, applyTorchGlow, applyStageBloom } from './lighting';
+import { ParticleSystem } from './particles';
 import { startDungeonSocket, stopDungeonSocket } from '../net/dungeonSocket';
 import { startSimulation, stopSimulation } from './agentSimulation';
 
@@ -46,19 +47,18 @@ const DungeonCanvas: React.FC = () => {
       // Root dungeon container (everything inside gets bloom)
       const dungeonContainer = new Container();
 
-      // Build tilemap container
+      // Build tilemap container with all textures
       const worldContainer = new Container();
-      buildTilemap(worldContainer, {
-        floor: tex.floor,
-        wall: tex.wall,
-        door: tex.door,
-      });
+      buildTilemap(worldContainer, tex);
       dungeonContainer.addChild(worldContainer);
 
       // Build agent sprites
       const agentLayer = new Container();
       buildAgents(agentLayer);
       dungeonContainer.addChild(agentLayer);
+
+      // Particles (sparks + dust)
+      const particleSystem = new ParticleSystem(dungeonContainer, 40, 19);
 
       // Lighting layer (darkness overlay + glow sprites)
       const lightLayer = new Container();
@@ -75,15 +75,18 @@ const DungeonCanvas: React.FC = () => {
       app.ticker.add(() => {
         tickAgents();
         tickLighting(lightLayer);
+        particleSystem.tick();
       });
       // Store for cleanup
       (div as any).__pixiApp = app;
+      (div as any).__particleSystem = particleSystem;
     })();
 
     return () => {
       destroyed = true;
       stopDungeonSocket();
       stopSimulation();
+      (div as any).__particleSystem?.destroy();
       const app = (div as any).__pixiApp;
       if (app) {
         app.destroy(true, { children: true, texture: true });
