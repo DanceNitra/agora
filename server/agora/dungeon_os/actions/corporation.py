@@ -425,16 +425,34 @@ async def action_evaluate_proposal(config: dict, quest: dict, params: dict) -> d
 
     Adversarial filtering: the CTO critiques technical merit,
     CEO evaluates business value. Only if both approve → PATA phase.
+
+    Phase 3: supports enriched prompts via params['enriched_prompt'].
+    The registry calls this for both 'ceo' and 'cto', and params
+    carries the role-specific enriched prompt built by PromptEngine.
     """
     quest_id = quest.get("id", "")
     title = quest.get("title", "")
     research_summary = quest.get("research_summary") or quest.get("goal", "")
     subsystem = quest.get("subsystem", "knowledge")
 
-    # CTO evaluation (technical)
-    cto_verdict = await _cto_evaluate_llm(title, research_summary, subsystem)
-    # CEO evaluation (strategic)
-    ceo_verdict = await _ceo_evaluate_llm(title, research_summary)
+    # Phase 3: use enriched prompt if provided (built by PromptEngine)
+    enriched_prompt = params.get("enriched_prompt", "")
+    if enriched_prompt:
+        # The action is called for both ceo and cto — the enriched_prompt
+        # already has the correct role injected from PromptEngine.
+        # We pass it along as an override to the LLM call.
+        cto_verdict = await _cto_evaluate_llm(
+            title, research_summary, subsystem,
+            enriched_prompt=enriched_prompt,
+        )
+        ceo_verdict = await _ceo_evaluate_llm(
+            title, research_summary,
+            enriched_prompt=enriched_prompt,
+        )
+    else:
+        # Standard evaluation (no memory injection)
+        cto_verdict = await _cto_evaluate_llm(title, research_summary, subsystem)
+        ceo_verdict = await _ceo_evaluate_llm(title, research_summary)
 
     approved = cto_verdict.get("approved", False) and ceo_verdict.get("approved", False)
     priority = "HIGH" if approved and cto_verdict["priority"] == "high" else "MEDIUM"
@@ -469,11 +487,15 @@ async def action_evaluate_proposal(config: dict, quest: dict, params: dict) -> d
     }
 
 
-async def _cto_evaluate_llm(title: str, summary: str, subsystem: str) -> dict:
-    """CTO evaluates technical merit using LLM."""
+async def _cto_evaluate_llm(title: str, summary: str, subsystem: str, enriched_prompt: str = "") -> dict:
+    """CTO evaluates technical merit using LLM.
+
+    Phase 3: uses enriched_prompt if provided (built by PromptEngine
+    with corporation memory injection). Falls back to standard prompt.
+    """
     from agora.execution.llm_client import call_llm
 
-    prompt = get_role_prompt("cto")
+    prompt = enriched_prompt or get_role_prompt("cto")
     user_msg = (
         f"## Research Proposal: {title}\n\n"
         f"### Technical Summary\n{summary[:1000]}\n\n"
@@ -524,11 +546,15 @@ async def _cto_evaluate_llm(title: str, summary: str, subsystem: str) -> dict:
         }
 
 
-async def _ceo_evaluate_llm(title: str, summary: str) -> dict:
-    """CEO evaluates strategic/business value using LLM."""
+async def _ceo_evaluate_llm(title: str, summary: str, enriched_prompt: str = "") -> dict:
+    """CEO evaluates strategic/business value using LLM.
+
+    Phase 3: uses enriched_prompt if provided (built by PromptEngine
+    with corporation memory injection). Falls back to standard prompt.
+    """
     from agora.execution.llm_client import call_llm
 
-    prompt = get_role_prompt("ceo")
+    prompt = enriched_prompt or get_role_prompt("ceo")
     user_msg = (
         f"Proposal: {title}\n\n"
         f"Summary: {summary[:600]}\n\n"

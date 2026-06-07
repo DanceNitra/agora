@@ -116,6 +116,11 @@ def _register_builtins(registry: ActionRegistry):
         action_evaluate_proposal,
         action_compound,
     )
+    from agora.dungeon_os.actions.pata_executor import (
+        action_design,
+        action_implement,
+        action_verify_implementation,
+    )
 
     # Hermes
     for skill in ("send_message", "relay", "broadcast", "deliver"):
@@ -149,6 +154,14 @@ def _register_builtins(registry: ActionRegistry):
     registry.register("ceo", "evaluate_proposal", action_evaluate_proposal)
     registry.register("cto", "evaluate_proposal", action_evaluate_proposal)
     registry.register("warden", "compound", action_compound)
+
+    # Phase 4 — PATA Executor
+    registry.register("designer", "design", action_design)
+    registry.register("designer", "generate_adr", action_design)
+    registry.register("developer", "implement", action_implement)
+    registry.register("developer", "write_code", action_implement)
+    registry.register("qa", "verify", action_verify_implementation)
+    registry.register("qa", "validate", action_verify_implementation)
 
     # Generic fallbacks
     registry.register("*", "wait", _action_wait)

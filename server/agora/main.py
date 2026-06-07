@@ -887,6 +887,33 @@ async def tick_loop(app: FastAPI):
                 except Exception as e:
                     print(f"[Stigmergy] Market signal error: {e}")
 
+            # ── 11. CORPORATION WORKER TICK (every 18 ticks ~ 90s) ──
+            if app.state.tick_count > 0 and app.state.tick_count % 18 == 0:
+                try:
+                    worker = getattr(app.state, "agent_worker", None)
+                    if worker is None:
+                        qe = getattr(app.state, "quest_engine", None)
+                        if qe:
+                            from agora.dungeon_os.agent_worker import CorporationWorker
+                            db = app.state.db
+                            config = {
+                                "quest_engine": qe,
+                                "os_state": getattr(app.state, "os_state", None),
+                                "log_dir": "/tmp/hermes-logs",
+                                "vault_path": os.path.expanduser("~/Obsidian Vault"),
+                                "telegram_chat_id": os.getenv("HERMES_TELEGRAM_CHAT_ID"),
+                                "telegram_bot_token": os.getenv("HERMES_TELEGRAM_BOT_TOKEN"),
+                            }
+                            worker = CorporationWorker(qe, db, config)
+                            app.state.agent_worker = worker
+                    if worker:
+                        corp_result = await worker.tick(tick_count=app.state.tick_count)
+                        print(f"[Corporation] Tick #{corp_result['tick']} done in {corp_result['duration_seconds']}s ({len(corp_result['results'])} steps)")
+                except Exception as e:
+                    print(f"[Corporation] Tick error: {e}")
+                    import traceback
+                    traceback.print_exc()
+
             if app.state.tick_count % 5 == 0:
                 best_agents = {}
                 for tt in task_types:

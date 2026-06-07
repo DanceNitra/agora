@@ -3,6 +3,16 @@ import react from '@vitejs/plugin-react';
 
 export default defineConfig({
   plugins: [react()],
+  resolve: {
+    conditions: ['import', 'default'],
+  },
+  optimizeDeps: {
+    include: ['pixi.js', 'pixi-filters'],
+    force: true,
+  },
+  ssr: {
+    noExternal: ['pixi.js', 'pixi-filters'],
+  },
   server: {
     port: 5173,
     proxy: {

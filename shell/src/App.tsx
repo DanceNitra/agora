@@ -6,6 +6,7 @@ import Dashboard from './routes/Dashboard';
 import GodConsole from './routes/GodConsole';
 import Arena from './routes/Arena';
 import Artifacts from './routes/Artifacts';
+import Dungeon from './routes/Dungeon';
 import { AgentProvider } from './context/AgentContext';
 import AgentDetailPanel from './components/AgentDetailPanel';
 import LiveIndicator from './components/LiveIndicator';
@@ -14,6 +15,7 @@ const navItems = [
   { path: '/dashboard', label: '📊 Dashboard' },
   { path: '/timeline', label: '📜 Timeline' },
   { path: '/graph', label: '🕸️ Graph' },
+  { path: '/dungeon', label: '🏚️ Dungeon' },
   { path: '/artifacts', label: '📦 Artifacts' },
   { path: '/god-console', label: '⚡ God Console' },
   { path: '/arena', label: '🧬 Arena' },
@@ -55,6 +57,7 @@ const App: React.FC = () => {
             <Route path="/timeline" element={<Timeline />} />
             <Route path="/graph" element={<Graph />} />
             <Route path="/dashboard" element={<Dashboard />} />
+            <Route path="/dungeon" element={<Dungeon />} />
             <Route path="/god-console" element={<GodConsole />} />
             <Route path="/arena" element={<Arena />} />
             <Route path="/artifacts" element={<Artifacts />} />

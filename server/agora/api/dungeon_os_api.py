@@ -295,3 +295,109 @@ async def get_worker_stats(request: Request):
     """Get agent worker statistics."""
     worker = get_worker(request)
     return worker.get_stats()
+
+
+# ═══════════════════════════════════════════
+# PHASE 3 — Recursive Self-Improvement endpoints
+# ═══════════════════════════════════════════
+
+@router.get("/phase3/memory")
+async def get_corporation_memory(request: Request, role: str = "", category: str = "", limit: int = 20):
+    """Get corporation memory (compound lessons)."""
+    worker = get_worker(request)
+    if hasattr(worker, '_memory') and worker._memory:
+        memories = await worker._memory.get_memories(
+            role_target=role, category=category, limit=limit
+        )
+        stats = await worker._memory.get_stats()
+        return {"memories": memories, "stats": stats}
+    return {"memories": [], "stats": {"initialized": False}}
+
+
+@router.get("/phase3/memory/stats")
+async def get_memory_stats(request: Request):
+    """Get corporation memory aggregate statistics."""
+    worker = get_worker(request)
+    if hasattr(worker, '_memory') and worker._memory:
+        return await worker._memory.get_stats()
+    return {"initialized": False}
+
+
+@router.get("/phase3/quality")
+async def get_quality_stats(request: Request):
+    """Get quality tracking statistics."""
+    worker = get_worker(request)
+    if hasattr(worker, '_quality_tracker') and worker._quality_tracker:
+        approval = await worker._quality_tracker.get_approval_rate()
+        quality = await worker._quality_tracker.get_average_quality()
+        trends = await worker._quality_tracker.get_trends(limit=20)
+        return {
+            "approval_rate": approval,
+            "avg_quality": quality,
+            "trends": trends,
+        }
+    return {"initialized": False}
+
+
+@router.get("/phase3/meta")
+async def get_meta_scanner_stats(request: Request):
+    """Get MetaScanner statistics."""
+    worker = get_worker(request)
+    if hasattr(worker, '_meta_scanner') and worker._meta_scanner:
+        stats = worker._meta_scanner.get_stats()
+        return stats
+    return {"initialized": False}
+
+
+@router.get("/phase3")
+async def get_phase3_overview(request: Request):
+    """Get complete Phase 3 overview."""
+    worker = get_worker(request)
+    if hasattr(worker, 'get_phase3_stats'):
+        return await worker.get_phase3_stats()
+    return {"phase3_initialized": False}
+
+
+@router.post("/phase3/memory/store")
+async def store_memory(request: Request):
+    """Manually store a corporation memory entry."""
+    worker = get_worker(request)
+    if not hasattr(worker, '_memory') or not worker._memory:
+        return {"error": "Corporation memory not initialized"}
+
+    try:
+        body = await request.json()
+    except Exception:
+        return {"error": "Invalid JSON body"}
+
+    lesson = body.get("lesson", "").strip()
+    if not lesson:
+        return {"error": "Missing 'lesson' field"}
+
+    mem_id = await worker._memory.store_lesson(
+        lesson=lesson,
+        source_quest=body.get("source_quest", "api"),
+        source_phase=body.get("source_phase", "manual"),
+        role_target=body.get("role_target", ""),
+        category=body.get("category", "general"),
+        impact_score=float(body.get("impact_score", 0.5)),
+    )
+    return {"id": mem_id, "stored": True}
+
+
+@router.get("/phase3/memory/prompts/{role}")
+async def get_enriched_prompt(role: str, request: Request):
+    """Get the enriched prompt for a role (shows memory injection)."""
+    worker = get_worker(request)
+    if hasattr(worker, '_prompt_engine') and worker._prompt_engine:
+        prompt = await worker._prompt_engine.build_prompt(role)
+        memory_count = 0
+        if hasattr(worker, '_memory') and worker._memory:
+            memories = await worker._memory.get_memories(role_target=role, limit=5)
+            memory_count = len(memories)
+        return {
+            "role": role,
+            "memories_injected": memory_count,
+            "prompt": prompt,
+        }
+    return {"error": "PromptEngine not initialized"}

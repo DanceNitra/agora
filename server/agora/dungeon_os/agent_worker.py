@@ -1,17 +1,20 @@
 """Agent Worker — HEAD→PATA→Compound quest lifecycle for Dungeon OS NPCs.
 
+PHASE 3: Recursive Self-Improvement Loop.
+  - Corporation memory: lessons modify agent prompts recursively
+  - MetaScanner: system creates meta-quests to improve itself
+  - QualityTracker: every evaluation scored and trended
+
 Each 15-min tick:
   1. SCOUT scans GitHub for opportunities
-  2. If opportunity found → creates HEAD research quest
-  3. HEAD quest: 3x parallel researchers (repo, docs, best-practices)
-  4. BRAINMASTER synthesizes → stores to vault
-  5. CEO/CTO evaluates → either moves to PATA or rejects
-  6. PATA quest: Designer/Developer implements → QA verifies
-  7. COMPOUND: lessons extracted → AGENTS.md updated
-  8. Hermes sends Telegram report of the cycle
-
-This transforms Dungeon OS from a static quest board
-into a self-improving autonomous corporation.
+  2. MetaScanner (every 20 ticks) — creates self-improvement quests
+  3. HEAD research (3x parallel)
+  4. BRAINMASTER synthesizes → vault
+  5. CEO/CTO evaluates (with PromptEngine memory injection)
+  6. PATA execution
+  7. COMPOUND: lessons → corporation_memory → improves future prompts
+  8. Quality trends recorded
+  9. Telegram report
 """
 
 import json
@@ -22,8 +25,10 @@ from typing import Optional
 
 from agora.dungeon_os.actions.registry import get_registry
 
-# ── Corporation Agent workflow map ──
-# Maps phase → agent → skill_action
+# ═══════════════════════════════════════════
+# STEP MAP
+# ═══════════════════════════════════════════
+
 CORPORATION_FLOW = {
     "scout": {
         "scout": {"skill": "scan_horizon", "params": {}},
@@ -52,70 +57,158 @@ CORPORATION_FLOW = {
 
 
 class CorporationWorker:
-    """Autonomous Corporation worker — runs the full HEAD→PATA→Compound cycle."""
+    """Autonomous Corporation worker — runs the full HEAD→PATA→Compound cycle.
+
+    Phase 3 additions:
+      - corporation_memory / PromptEngine for recursive prompt improvement
+      - MetaScanner for self-analysis meta-quests
+      - QualityTracker for evaluation quality trending
+    """
 
     def __init__(self, quest_engine, db=None, config: Optional[dict] = None):
         self.qe = quest_engine
         self.db = db
         self.config = config or {}
         self.registry = get_registry()
+
+        # ── Phase 3 modules (lazy-init) ──
+        self._memory = None
+        self._prompt_engine = None
+        self._meta_scanner = None
+        self._quality_tracker = None
+        self._phase3_initialized = False
+
         self._stats = {
             "ticks": 0,
             "scout_runs": 0,
             "head_completed": 0,
             "pata_completed": 0,
             "lessons_extracted": 0,
+            "meta_quests_created": 0,
+            "quality_records": 0,
         }
 
-    async def tick(self) -> dict:
-        """Run one full corporation tick."""
+    # ═══════════════════════════════════════════
+    # Phase 3 lazy init
+    # ═══════════════════════════════════════════
+
+    async def _ensure_phase3(self):
+        """Initialize Phase 3 modules on first use."""
+        if self._phase3_initialized or not self.db:
+            return
+
+        from agora.dungeon_os.corporation_memory import CorporationMemory, PromptEngine
+        from agora.dungeon_os.meta_scanner import MetaScanner
+        from agora.dungeon_os.quality_scoring import QualityTracker
+
+        self._memory = CorporationMemory(self.db)
+        await self._memory.ensure_tables()
+
+        self._prompt_engine = PromptEngine(self._memory)
+        self._meta_scanner = MetaScanner(self.db, self.qe, self._memory)
+        self._quality_tracker = QualityTracker(self.db)
+        await self._quality_tracker.ensure_tables()
+
+        self._phase3_initialized = True
+        print("[Phase3] Corporation Memory, MetaScanner, QualityTracker initialized")
+
+    # ═══════════════════════════════════════════
+    # MAIN TICK
+    # ═══════════════════════════════════════════
+
+    async def tick(self, tick_count: int = 0) -> dict:
+        """Run one full corporation tick.
+
+        Args:
+            tick_count: Current global tick count (for MetaScanner interval)
+
+        Returns dict with all step results.
+        """
+        await self._ensure_phase3()
+
         self._stats["ticks"] += 1
         tick_start = datetime.now()
         results = []
 
-        # ── Step 1: SCOUT — scan horizon for opportunities ──
+        # ── STEP 0: META SCANNER (every 20 ticks) ──
+        if self._meta_scanner:
+            meta_results = await self._meta_scanner.scan_and_act(tick_count)
+            for mr in meta_results:
+                results.append({"stage": "meta", **mr})
+                if "quest_id" in mr:
+                    self._stats["meta_quests_created"] += 1
+
+        # ── STEP 1: SCOUT ──
         scout_result = await self._run_scout()
         if scout_result:
             results.append(scout_result)
 
-        # ── Step 2: Find HEAD quests and process them ──
+        # ── STEP 2: HEAD research ──
         head_quests = await self._get_quests_by_phase("head")
         for quest in head_quests:
             head_result = await self._process_head(quest)
             results.append(head_result)
 
-        # ── Step 3: Find quests awaiting synthesis ──
+        # ── STEP 3: SYNTHESIS (Brainmaster) ──
         syn_quests = await self._get_quests_with_pending_synthesis()
         for quest in syn_quests:
             syn_result = await self._process_synthesis(quest)
             results.append(syn_result)
 
-        # ── Step 4: Find quests awaiting evaluation ──
+        # ── STEP 4: EVALUATION (CEO/CTO with PromptEngine) ──
         eval_quests = await self._get_quests_awaiting_evaluation()
         for quest in eval_quests:
             eval_result = await self._process_evaluation(quest)
             results.append(eval_result)
 
-        # ── Step 5: Find PATA quests and process them ──
+            # Phase 3: record quality
+            if eval_result and self._quality_tracker:
+                await self._quality_tracker.record_evaluation(
+                    quest_id=eval_result.get("quest_id", ""),
+                    evaluator_role="ceo",
+                    approved=eval_result.get("ceo_approved", False),
+                    score=eval_result.get("ceo_score", 50),
+                )
+                await self._quality_tracker.record_evaluation(
+                    quest_id=eval_result.get("quest_id", ""),
+                    evaluator_role="cto",
+                    approved=eval_result.get("cto_approved", False),
+                    score=eval_result.get("cto_score", 50),
+                )
+                # Update findings quality
+                if eval_result.get("approved"):
+                    await self._quality_tracker.update_finding_quality(
+                        quest_id=eval_result.get("quest_id", ""),
+                        quality_score=max(
+                            eval_result.get("cto_score", 50),
+                            eval_result.get("ceo_score", 50),
+                        ) / 100.0,
+                        feedback=f"CTO: {eval_result.get('cto_rationale', '')[:100]}\nCEO: {eval_result.get('ceo_rationale', '')[:100]}",
+                    )
+                self._stats["quality_records"] += 2
+
+        # ── STEP 5: PATA execution ──
         pata_quests = await self._get_quests_by_phase("pata")
         for quest in pata_quests:
             pata_result = await self._process_pata(quest)
             results.append(pata_result)
 
-        # ── Step 6: COMPOUND — extract lessons from completed quests ──
+        # ── STEP 6: COMPOUND → CORPORATION MEMORY ──
         compound_result = await self._run_compound()
         if compound_result:
             results.append(compound_result)
 
-        # Clean up empty results
-        results = [r for r in results if r]
+            # Phase 3: also record quality trend periodically
+            if self._quality_tracker and tick_count % 10 == 0:
+                summary = await self._quality_tracker.compute_quality_summary(tick_count)
+                results.append({"stage": "quality_trend", "data": summary})
+                self._stats["quality_records"] += 1
 
+        # Clean up
+        results = [r for r in results if r]
         elapsed = (datetime.now() - tick_start).total_seconds()
 
-        # Build Telegram summary
         summary = self._build_summary(results)
-
-        # Send Telegram report
         await self._send_report(summary)
 
         return {
@@ -150,7 +243,6 @@ class CorporationWorker:
             return {"stage": "scout", "status": "nothing_new", "detail": "No interesting findings"}
 
         top = result.get("top_finding", {})
-        # Create a HEAD quest from the top finding
         quest_id = f"research-{top.get('source', 'github').replace(':', '-')}-{datetime.now().strftime('%Y%m%d')}"
         quest_title = f"Research: {top['title'][:80]}"
         quest_goal = f"Deep research on: {top['title']}\nSource: {top.get('url', top.get('source', ''))}\nSummary: {top.get('summary', '')[:300]}"
@@ -173,8 +265,18 @@ class CorporationWorker:
         if "error" in create_result:
             return {"stage": "scout", "status": "create_failed", "error": create_result["error"]}
 
-        # Assign to scout for HEAD research
         await self.qe.assign_quest(quest_id, "scout")
+
+        # Phase 3: also store this finding as a memory
+        if self._memory:
+            await self._memory.store_lesson(
+                lesson=f"Scout discovered: {top['title']} (relevance {top.get('score', 50)})",
+                source_quest=quest_id,
+                source_phase="scout",
+                role_target="scout",
+                category="general",
+                impact_score=min(1.0, top.get("score", 50) / 100),
+            )
 
         return {
             "stage": "scout",
@@ -195,29 +297,36 @@ class CorporationWorker:
         url = quest.get("research_source", "")
         title = quest.get("title", "")
 
-        # If no URL, try to extract from goal
         if not url:
             for line in quest_goal.split("\n"):
                 if line.startswith("Source: "):
                     url = line.replace("Source: ", "").strip()
                     break
 
-        # Run 3 parallel research actions (sequential for now, parallel later)
+        # ══ Phase 3: build enriched researcher prompts with corporation memory ══
         research_results = []
         for res_type in ["repo", "docs", "best-practices"]:
+            # Inject memory-enriched context if available
+            enriched_params = {
+                "url": url,
+                "researcher_type": res_type,
+            }
+            if self._prompt_engine:
+                enriched_prompt = await self._prompt_engine.build_prompt(
+                    "researcher",
+                    extra_context=f"Research target: {title}\nURL: {url}\nType: {res_type}",
+                )
+                enriched_params["enriched_prompt"] = enriched_prompt
+
             res_result = await self.registry.execute(
                 npc_name="researcher",
                 skill_name="deep_research",
                 config=self.config,
                 quest=quest,
-                params={
-                    "url": url,
-                    "researcher_type": res_type,
-                },
+                params=enriched_params,
             )
             research_results.append({"type": res_type, "result": res_result})
 
-        # Collect all findings
         all_findings = []
         for rr in research_results:
             r = rr["result"]
@@ -230,7 +339,6 @@ class CorporationWorker:
                     "impact": syn.get("impact", "medium"),
                 })
 
-        # Advance quest: mark synthesis as pending
         if all_findings:
             await self.qe.submit_for_review(quest_id, "scout")
 
@@ -253,7 +361,6 @@ class CorporationWorker:
         quest_id = quest.get("id", "")
         title = quest.get("title", "")
 
-        # Get research findings from DB
         findings = []
         if self.db:
             try:
@@ -290,106 +397,195 @@ class CorporationWorker:
         }
 
     # ═══════════════════════════════════════════
-    # STEP 4: EVALUATION — CEO/CTO
+    # STEP 4: EVALUATION — CEO/CTO with PromptEngine
     # ═══════════════════════════════════════════
 
     async def _process_evaluation(self, quest: dict) -> Optional[dict]:
-        """CEO and CTO evaluate the research proposal."""
+        """CEO and CTO evaluate the research proposal.
+
+        Phase 3: enriched prompts with corporation memory injection.
+        """
         quest_id = quest.get("id", "")
         title = quest.get("title", "")
 
-        # CTO evaluates
+        # ══ Phase 3: inject memory-enriched prompts into params ══
+        cto_params = {}
+        ceo_params = {}
+
+        if self._prompt_engine:
+            # Build enriched contexts with relevant past lessons
+            cto_context = await self._prompt_engine.build_prompt(
+                "cto",
+                extra_context=f"Evaluating proposal: {title}\nSummary: {quest.get('research_summary', '')[:200]}",
+            )
+            ceo_context = await self._prompt_engine.build_prompt(
+                "ceo",
+                extra_context=f"Evaluating proposal: {title}\nSummary: {quest.get('research_summary', '')[:200]}",
+            )
+            cto_params["enriched_prompt"] = cto_context
+            ceo_params["enriched_prompt"] = ceo_context
+
         cto_result = await self.registry.execute(
             npc_name="cto",
             skill_name="evaluate_proposal",
             config=self.config,
             quest=quest,
-            params={},
+            params=cto_params,
         )
 
-        # CEO evaluates (re-using same action with different config bias)
         ceo_result = await self.registry.execute(
             npc_name="ceo",
             skill_name="evaluate_proposal",
             config=self.config,
             quest=quest,
-            params={},
+            params=ceo_params,
         )
 
-        approved = cto_result.get("approved", False) and ceo_result.get("approved", False)
+        cto_approved = cto_result.get("approved", False)
+        ceo_approved = ceo_result.get("approved", False)
+        approved = cto_approved and ceo_approved
+
+        cto_score = cto_result.get("cto", {}).get("score", 50) if isinstance(cto_result.get("cto"), dict) else 50
+        ceo_score = ceo_result.get("ceo", {}).get("score", 50) if isinstance(ceo_result.get("ceo"), dict) else 50
 
         return {
             "stage": "evaluation",
             "quest_id": quest_id,
             "title": title,
-            "cto_approved": cto_result.get("approved", False),
-            "ceo_approved": ceo_result.get("approved", False),
+            "cto_approved": cto_approved,
+            "ceo_approved": ceo_approved,
             "approved": approved,
             "priority": cto_result.get("priority", "low"),
-            "cto_rationale": cto_result.get("cto", {}).get("rationale", ""),
-            "ceo_rationale": ceo_result.get("ceo", {}).get("rationale", ""),
+            "cto_rationale": cto_result.get("cto", {}).get("rationale", "") if isinstance(cto_result.get("cto"), dict) else cto_result.get("output", ""),
+            "ceo_rationale": ceo_result.get("ceo", {}).get("rationale", "") if isinstance(ceo_result.get("ceo"), dict) else ceo_result.get("output", ""),
+            "cto_score": cto_score,
+            "ceo_score": ceo_score,
         }
-
-    # ═══════════════════════════════════════════
-    # STEP 5: PATA — Execution phase
-    # ═══════════════════════════════════════════
-
     async def _process_pata(self, quest: dict) -> Optional[dict]:
-        """Process a PATA quest: execute the approved changes.
+        """Process a PATA quest: execute real implementation via Designer → Developer → QA.
 
-        For now, the PATA phase logs a detailed action plan.
-        In later phases, this will spawn Developer/Designer subagents.
+        Phase 4: Instead of logging a plan file, this produces real artifacts:
+          1. Designer generates ADR + design spec + code outline
+          2. Developer generates actual code files → writes to repo
+          3. QA verifies output (syntax check, criteria match)
+          4. Quest completes only if QA passes
+
+        Args:
+            quest: The quest dict with research_summary, success_criteria, etc.
+
+        Returns:
+            dict with stage results and file paths
         """
         quest_id = quest.get("id", "")
         title = quest.get("title", "")
         research_summary = quest.get("research_summary") or ""
+        criteria = quest.get("success_criteria", [])
 
-        # Log PATA execution plan
         log_dir = self.config.get("log_dir", "/tmp/hermes-logs")
         os.makedirs(log_dir, exist_ok=True)
 
-        plan = [
-            f"# PATA Execution Plan: {title}",
-            f"",
-            f"**Quest:** {quest_id}",
-            f"**Date:** {datetime.now().strftime('%Y-%m-%d %H:%M')}",
-            f"**Research:** {research_summary[:300]}",
-            f"",
-            "## Implementation Steps",
-            f"",
-            f"1. Designer: Create technical design based on research findings",
-            f"2. Developer: Implement the changes in code",
-            f"3. QA: Verify changes meet criteria",
-            f"4. Deploy: Merge and apply changes",
-            f"",
-            "---",
-            f"*PATA phase initiated by Autonomous Corporation Worker*",
-        ]
-        plan_file = f"{log_dir}/pata_{quest_id}.md"
-        with open(plan_file, "w") as f:
-            f.write("\n".join(plan))
+        # ══ STEP 1: DESIGNER — generate ADR + design spec ══
+        design_result = await self.registry.execute(
+            npc_name="designer",
+            skill_name="design",
+            config=self.config,
+            quest=quest,
+            params={
+                "title": title,
+                "research_summary": research_summary,
+                "success_criteria": criteria,
+            },
+        )
+        design_files = design_result.get("files", [])
+        design_ok = design_result.get("status") == "ok"
 
-        # Mark as done for now (in later phases, real implementation happens)
-        await self.qe.submit_for_review(quest_id, "developer")
-        verify_result = await self.qe.verify_quest(quest_id, runs=1)
+        # ══ STEP 2: DEVELOPER — generate code from design ══
+        impl_result = await self.registry.execute(
+            npc_name="developer",
+            skill_name="implement",
+            config=self.config,
+            quest=quest,
+            params={
+                "title": title,
+                "research_summary": research_summary,
+                "design_files": design_files,
+                "success_criteria": criteria,
+            },
+        )
+        code_files = impl_result.get("files_created", [])
+        impl_ok = impl_result.get("status") == "ok"
+        syntax_check = impl_result.get("syntax_check", {})
+
+        # ══ STEP 3: QA — verify everything ══
+        qa_result = await self.registry.execute(
+            npc_name="qa",
+            skill_name="verify",
+            config=self.config,
+            quest=quest,
+            params={
+                "files_to_check": code_files,
+                "design_files": design_files,
+                "success_criteria": criteria,
+            },
+        )
+        qa_ok = qa_result.get("status") == "passed"
+
+        # ══ Step 4: Auto-commit to git if QA passed ══
+        commit_result = {}
+        if qa_ok:
+            # Stage and commit the new files
+            commit_result = self._git_commit(quest_id, title, code_files + design_files)
+            
+            await self.qe.submit_for_review(quest_id, "developer")
+            verify_result = await self.qe.verify_quest(quest_id, runs=1)
+            quest_status = verify_result.get("status", "done")
+        else:
+            # QA flagged — still progress, but log the issues
+            quest_status = "flagged"
+            print(f"[PATA] QA flagged {quest_id}: {qa_result.get('output', '')}")
 
         self._stats["pata_completed"] += 1
+
+        # Build summary
+        summary_parts = []
+        if design_ok:
+            summary_parts.append(f"🎨 Design: {len(design_files)} files")
+        if impl_ok:
+            summary_parts.append(f"💻 Code: {len(code_files)} files (syntax: {syntax_check.get('passed', 0)}/{syntax_check.get('total', 0)})")
+        summary_parts.append(f"🛡️ QA: {'PASSED' if qa_ok else 'FLAGGED'}")
 
         return {
             "stage": "pata",
             "quest_id": quest_id,
             "title": title,
-            "status": verify_result.get("status", "done"),
-            "plan_file": plan_file,
+            "status": quest_status,
+            "design": {
+                "ok": design_ok,
+                "files": design_files,
+            },
+            "implementation": {
+                "ok": impl_ok,
+                "files": code_files,
+                "syntax": syntax_check,
+            },
+            "qa": {
+                "passed": qa_ok,
+                "report": qa_result.get("report_file", ""),
+                "output": qa_result.get("output", ""),
+            },
+            "git_commit": commit_result,
+            "summary": " | ".join(summary_parts),
         }
 
     # ═══════════════════════════════════════════
-    # STEP 6: COMPOUND — Lessons learned
+    # STEP 6: COMPOUND → Corporation Memory
     # ═══════════════════════════════════════════
 
     async def _run_compound(self) -> Optional[dict]:
-        """Extract lessons from recently completed quests."""
-        # Find recently done quests without compound lessons
+        """Extract lessons from recently completed quests.
+
+        Phase 3: lessons go to corporation_memory AND update agent prompts.
+        """
         cursor = await self.db.execute(
             "SELECT * FROM quests WHERE status='done' AND (compound_lessons IS NULL OR compound_lessons = '') ORDER BY completed_at DESC LIMIT 3"
         )
@@ -401,6 +597,8 @@ class CorporationWorker:
         results = []
         for quest in done_quests:
             quest_dict = self._quest_to_dict(quest)
+
+            # ── Run compound action ──
             result = await self.registry.execute(
                 npc_name="warden",
                 skill_name="compound",
@@ -408,20 +606,59 @@ class CorporationWorker:
                 quest=quest_dict,
                 params={},
             )
+            lessons = result.get("lessons", [])
+
+            # ══ Phase 3: store lessons in corporation_memory ══
+            if self._memory and lessons:
+                for lesson in lessons:
+                    # Determine which role this lesson applies to
+                    role_target = "general"
+                    lesson_lower = lesson.lower()
+                    if "research" in lesson_lower or "findings" in lesson_lower or "knowledge" in lesson_lower:
+                        role_target = "researcher"
+                    elif "technical" in lesson_lower or "code" in lesson_lower or "implement" in lesson_lower:
+                        role_target = "developer"
+                    elif "design" in lesson_lower or "visual" in lesson_lower or "ui" in lesson_lower:
+                        role_target = "designer"
+                    elif "approve" in lesson_lower or "evaluate" in lesson_lower or "strategic" in lesson_lower:
+                        role_target = "ceo"
+                    elif "architect" in lesson_lower or "performance" in lesson_lower:
+                        role_target = "cto"
+                    elif "scout" in lesson_lower or "discover" in lesson_lower:
+                        role_target = "scout"
+
+                    await self._memory.store_lesson(
+                        lesson=lesson,
+                        source_quest=quest_dict.get("id", ""),
+                        source_phase=quest_dict.get("phase", ""),
+                        role_target=role_target,
+                        category="general",
+                        impact_score=0.5,
+                    )
+
+            # ══ Phase 3: build enriched prompts with new lessons ══
+            if self._prompt_engine and lessons:
+                for role in ["scout", "researcher", "ceo", "cto", "developer", "designer"]:
+                    await self._prompt_engine.build_prompt(role)
+
             results.append({
                 "quest_id": quest_dict.get("id"),
-                "lessons": result.get("lessons", []),
+                "lessons": lessons,
+                "memories_stored": len(lessons) if self._memory else 0,
             })
 
         self._stats["lessons_extracted"] += len(results)
-        return {"stage": "compound", "quests_processed": len(results), "details": results}
+        return {
+            "stage": "compound",
+            "quests_processed": len(results),
+            "details": results,
+        }
 
     # ═══════════════════════════════════════════
     # HELPERS
     # ═══════════════════════════════════════════
 
     async def _get_quests_by_phase(self, phase: str) -> list[dict]:
-        """Get quests in a specific lifecycle phase."""
         if not self.db:
             return []
         try:
@@ -435,7 +672,6 @@ class CorporationWorker:
             return []
 
     async def _get_quests_with_pending_synthesis(self) -> list[dict]:
-        """Get quests in review status that need Brainmaster synthesis."""
         if not self.db:
             return []
         try:
@@ -448,7 +684,6 @@ class CorporationWorker:
             return []
 
     async def _get_quests_awaiting_evaluation(self) -> list[dict]:
-        """Get quests that have findings but haven't been evaluated yet."""
         if not self.db:
             return []
         try:
@@ -461,7 +696,6 @@ class CorporationWorker:
             return []
 
     def _quest_to_dict(self, row) -> dict:
-        """Convert sqlite3.Row to dict."""
         def _safe_get(key, default=None):
             try:
                 val = row[key]
@@ -490,31 +724,51 @@ class CorporationWorker:
 
     def _build_summary(self, results: list[dict]) -> str:
         """Build a Telegram summary of this tick."""
-        parts = [f"🏢 **Corporation Tick #{self._stats['ticks']}**", ""]
+        parts = [f"🏢 **Corp Tick #{self._stats['ticks']}** (Phase 3)", ""]
 
         for r in results:
             stage = r.get("stage", "")
-            if stage == "scout":
+            if stage == "meta":
+                if "quest_id" in r:
+                    parts.append(f"🤖 Meta: `{r.get('quest_id', '')}` — {r.get('title', '')[:50]}")
+                else:
+                    parts.append(f"🤖 Meta: System healthy ✓")
+            elif stage == "scout":
                 status = r.get("status", "")
                 if status == "new_quest":
-                    parts.append(f"👁️ Scout: *{r.get('title', '')}*")
+                    parts.append(f"👁️ Scout: *{r.get('title', '')[:60]}*")
                 elif status == "nothing_new":
-                    parts.append(f"👁️ Scout: Nothing new found")
+                    parts.append(f"👁️ Scout: Nothing new")
             elif stage == "head":
-                parts.append(f"🔬 HEAD: *{r.get('title', '')}* — {r.get('researchers_run', 0)} researchers")
+                parts.append(f"🔬 HEAD: *{r.get('title', '')[:50]}* — {r.get('findings_count', 0)} findings")
             elif stage == "synthesis":
                 parts.append(f"🧠 Brainmaster: Knowledge stored → vault")
             elif stage == "evaluation":
-                verdict = "✅ Approved" if r.get("approved") else "❌ Rejected"
-                parts.append(f"👔 CEO/CTO: {verdict} — *{r.get('title', '')}*")
+                verdict = "✅" if r.get("approved") else "❌"
+                parts.append(f"👔 CEO/CTO: {verdict} *{r.get('title', '')[:40]}* (CTO:{r.get('cto_score', 50):.0f}/CEO:{r.get('ceo_score', 50):.0f})")
             elif stage == "pata":
-                parts.append(f"🛠️ PATA: *{r.get('title', '')}* — executed")
+                summary = r.get("summary", "")
+                commit = r.get("git_commit", {}).get("sha", "")
+                if summary:
+                    line = f"🛠️ PATA: *{r.get('title', '')[:35]}* — {summary}"
+                    if commit:
+                        line += f" [`{commit}`]"
+                    parts.append(line)
+                else:
+                    parts.append(f"🛠️ PATA: *{r.get('title', '')[:40]}* — executed ✓")
             elif stage == "compound":
-                parts.append(f"📚 Compound: {r.get('quests_processed', 0)} quests → lessons extracted")
+                n = r.get("quests_processed", 0)
+                mem = sum(d.get("memories_stored", 0) for d in r.get("details", []))
+                parts.append(f"📚 Compound: {n} quests → {mem} memories")
+            elif stage == "quality_trend":
+                data = r.get("data", {})
+                ar = data.get("approval_rate", {}).get("approval_rate", 0)
+                q = data.get("quality", {}).get("avg_quality", 0)
+                parts.append(f"📊 Quality: {ar:.0%} approval / {q:.0%} avg score")
 
         parts.extend([
             "",
-            f"📊 Stats: {self._stats['head_completed']} HEAD / {self._stats['pata_completed']} PATA / {self._stats['lessons_extracted']} lessons",
+            f"📊 Stats: {self._stats['head_completed']} HEAD / {self._stats['pata_completed']} PATA / {self._stats['meta_quests_created']} meta / {self._stats['lessons_extracted']} lessons",
             f"╰ {datetime.now().strftime('%H:%M:%S')}",
         ])
 
@@ -529,5 +783,76 @@ class CorporationWorker:
             {"message": message, "title": "🏢 Corporation Report", "channel": "telegram"},
         )
 
+    def _git_commit(self, quest_id: str, title: str, files: list) -> dict:
+        """Auto-commit Phase 4 output files to git.
+
+        Stages the generated files and creates a commit
+        with the quest title as message.
+        """
+        import subprocess
+        repo_path = self.config.get("repo_path") or os.path.expanduser("/home/vboxuser/agora")
+
+        if not files:
+            return {"committed": False, "reason": "No files to commit"}
+
+        try:
+            # Stage files (only those that exist)
+            for f in files:
+                if os.path.exists(f):
+                    # Get relative path from repo root
+                    rel = os.path.relpath(f, repo_path)
+                    subprocess.run(
+                        ["git", "add", rel],
+                        cwd=repo_path, capture_output=True, text=True, timeout=10,
+                    )
+
+            # Commit
+            commit_msg = f"🤖 Phase 4: {title[:60]}\n\nAuto-generated by Dungeon OS Agent Worker\nQuest: {quest_id}"
+            result = subprocess.run(
+                ["git", "commit", "-m", commit_msg],
+                cwd=repo_path, capture_output=True, text=True, timeout=15,
+            )
+
+            sha = ""
+            for line in result.stdout.split("\n"):
+                if "commit" in line:
+                    sha = line.strip()
+                    break
+
+            committed = result.returncode == 0
+            if committed:
+                print(f"[Git] Committed {len(files)} files: {sha[:20]}")
+            else:
+                print(f"[Git] Commit skipped: {result.stdout[:100]}")
+
+            return {
+                "committed": committed,
+                "sha": sha[:20] if sha else "",
+                "files_staged": len(files),
+                "message": result.stdout[:100] if not committed else sha[:20],
+            }
+        except Exception as e:
+            print(f"[Git] Commit error: {e}")
+            return {"committed": False, "error": str(e)}
+
     def get_stats(self) -> dict:
         return dict(self._stats)
+
+    async def get_phase3_stats(self) -> dict:
+        """Get additional Phase 3 statistics."""
+        if not self._memory:
+            return {"phase3_initialized": False}
+        memory_stats = await self._memory.get_stats()
+        meta_stats = self._meta_scanner.get_stats() if self._meta_scanner else {}
+        quality_stats = {}
+        if self._quality_tracker:
+            quality_stats["approval"] = await self._quality_tracker.get_approval_rate()
+            quality_stats["avg_quality"] = await self._quality_tracker.get_average_quality()
+            quality_stats["trends"] = await self._quality_tracker.get_trends(limit=5)
+
+        return {
+            "phase3_initialized": self._phase3_initialized,
+            "memory": memory_stats,
+            "meta_scanner": meta_stats,
+            "quality": quality_stats,
+        }
