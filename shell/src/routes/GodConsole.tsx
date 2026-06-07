@@ -39,7 +39,17 @@ interface ControllerStats {
   multiprocessing: boolean;
 }
 
-type TabId = 'agents' | 'violations' | 'os' | 'controller' | 'health';
+interface TrustAgent {
+  id: string; role: string; eigen_trust: number; ess_trust: number;
+}
+
+interface TrustMatrixData {
+  agents: TrustAgent[];
+  top_agents: TrustAgent[];
+  matrix_stats: { n: number; pairs: number; density: number; mean_trust: number; };
+}
+
+type TabId = 'agents' | 'violations' | 'os' | 'controller' | 'health' | 'trust';
 
 const TABS: { id: TabId; label: string; icon: string }[] = [
   { id: 'agents', label: 'Agent Management', icon: '👤' },
@@ -47,6 +57,7 @@ const TABS: { id: TabId; label: string; icon: string }[] = [
   { id: 'os', label: 'Agent OS', icon: '🧠' },
   { id: 'controller', label: 'Controller', icon: '⚙️' },
   { id: 'health', label: 'Health', icon: '💚' },
+  { id: 'trust', label: 'Trust Matrix', icon: '🔗' },
 ];
 
 // ═══════════════════════════════════════════
@@ -62,6 +73,7 @@ const GodConsoleV2: React.FC = () => {
   const [osSummary, setOsSummary] = useState<AOSSummary | null>(null);
   const [controllerStats, setControllerStats] = useState<ControllerStats | null>(null);
   const [healthData, setHealthData] = useState<any>(null);
+  const [trustData, setTrustData] = useState<TrustMatrixData | null>(null);
   const [loading, setLoading] = useState<boolean>(false);
 
   const api = (path: string) => `${window.location.origin}${path}`;
@@ -90,6 +102,10 @@ const GodConsoleV2: React.FC = () => {
         if (activeTab === 'health') {
           const res = await fetch(api('/api/v2/god/health'));
           if (res.ok) setHealthData(await res.json());
+        }
+        if (activeTab === 'trust') {
+          const res = await fetch(api('/api/v1/eval/trust/matrix'));
+          if (res.ok) setTrustData(await res.json());
         }
       } catch (e) {
         console.error('Fetch error:', e);
@@ -201,6 +217,10 @@ const GodConsoleV2: React.FC = () => {
           osSummary={osSummary}
           controllerStats={controllerStats}
         />
+      )}
+
+      {activeTab === 'trust' && (
+        <TrustTab data={trustData} />
       )}
     </div>
   );
@@ -598,6 +618,117 @@ const HealthTab: React.FC<{
     </div>
   </div>
 );
+
+// ═══════════════════════════════════════════
+// TAB 6: TRUST MATRIX
+// ═══════════════════════════════════════════
+
+const TrustTab: React.FC<{ data: TrustMatrixData | null }> = ({ data }) => {
+  if (!data) return <div style={styles.tabContent}>No trust data available</div>;
+
+  const { agents, matrix_stats, top_agents } = data;
+  const N = agents.length;
+  const W = 600, H = 400;
+  const cx = W / 2, cy = H / 2;
+  const radius = Math.min(W, H) / 2.5;
+
+  // Position nodes in a circle
+  const positions = agents.map((_, i) => {
+    const angle = (2 * Math.PI * i) / N - Math.PI / 2;
+    return { x: cx + radius * Math.cos(angle), y: cy + radius * Math.sin(angle) };
+  });
+
+  const maxTrust = Math.max(...agents.map(a => a.eigen_trust), 0.01);
+  const minTrust = Math.min(...agents.map(a => a.eigen_trust), 0);
+
+  const nodeRadius = (trust: number) => Math.max(8, 16 + (trust - minTrust) / (maxTrust - minTrust) * 20);
+
+  const trustColorScale = (v: number) => {
+    if (v >= 0.1) return '#22c55e';
+    if (v >= 0.095) return '#88ccff';
+    if (v >= 0.09) return '#fbbf24';
+    return '#ef4444';
+  };
+
+  return (
+    <div style={styles.tabContent}>
+      {/* Stats cards */}
+      <div style={styles.cardRow}>
+        <HealthCard value={matrix_stats.n} label="Agents" color="#22c55e" />
+        <HealthCard value={matrix_stats.pairs} label="Trust Pairs" color="#88ccff" />
+        <HealthCard value={`${(matrix_stats.density * 100).toFixed(1)}%`} label="Density" color="#fbbf24" />
+        <HealthCard value={matrix_stats.mean_trust.toFixed(3)} label="Mean Trust" color="#22c55e" />
+      </div>
+
+      <div style={{ display: 'flex', gap: 16, marginTop: 12 }}>
+        {/* SVG force-directed graph */}
+        <div style={{ flex: 2, ...styles.card, padding: 8 }}>
+          <svg width={W} height={H} style={{ background: '#1a1a1a', borderRadius: 8 }}>
+            {agents.flatMap((a, i) =>
+              agents.slice(i + 1).map((b, j) => {
+                const avgTrust = (a.eigen_trust + b.eigen_trust) / 2;
+                if (avgTrust < 0.09) return null;
+                const p1 = positions[i], p2 = positions[i + 1 + j];
+                return (
+                  <line key={`e-${i}`}
+                    x1={p1.x} y1={p1.y} x2={p2.x} y2={p2.y}
+                    stroke={trustColorScale(avgTrust)}
+                    strokeWidth={Math.max(0.5, avgTrust * 8)}
+                    opacity={0.4}
+                  />
+                );
+              })
+            )}
+            {agents.map((a, i) => {
+              const p = positions[i];
+              const r = nodeRadius(a.eigen_trust);
+              return (
+                <g key={`n-${i}`}>
+                  <circle cx={p.x} cy={p.y} r={r}
+                    fill={trustColorScale(a.eigen_trust)}
+                    opacity={0.85} stroke="#fff" strokeWidth={1}
+                  />
+                  <text x={p.x} y={p.y + r + 13}
+                    textAnchor="middle" fill="#d4d4d4"
+                    fontSize={10} fontWeight={600}
+                  >{a.role}</text>
+                  <title>{a.role}: eigen={a.eigen_trust.toFixed(4)} ess={a.ess_trust.toFixed(4)}</title>
+                </g>
+              );
+            })}
+          </svg>
+        </div>
+
+        {/* Ranking */}
+        <div style={{ flex: 1, ...styles.card }}>
+          <h3 style={{ ...styles.sectionTitle, marginTop: 0 }}>🏆 Trust Ranking</h3>
+          {top_agents.map((a, i) => (
+            <div key={i} style={{
+              display: 'flex', justifyContent: 'space-between', alignItems: 'center',
+              padding: '6px 0', borderBottom: '1px solid #2a2a2a',
+            }}>
+              <span style={{ fontWeight: 600, fontSize: 13, color: trustColorScale(a.eigen_trust) }}>
+                #{i + 1} {a.role}
+              </span>
+              <span style={{ fontSize: 12, color: '#d4d4d4' }}>
+                {a.eigen_trust.toFixed(4)}
+              </span>
+            </div>
+          ))}
+          <div style={{ marginTop: 12, fontSize: 11, color: '#6b7280', borderTop: '1px solid #2a2a2a', paddingTop: 8 }}>
+            <div>All {agents.length} agents:</div>
+            {agents.map((a, i) => (
+              <div key={i} style={{ display: 'flex', justifyContent: 'space-between', padding: '2px 0', fontSize: 11 }}>
+                <span>#{i + 1} {a.role}</span>
+                <span style={{ color: trustColorScale(a.eigen_trust) }}>{a.eigen_trust.toFixed(4)}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
 
 const HealthCard: React.FC<{ value: string | number; label: string; color: string }> = ({ value, label, color }) => (
   <div style={styles.card}>

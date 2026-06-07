@@ -129,12 +129,12 @@ def eigenvector_centrality(
     """Globálne trust skóre = dominantný eigenvektor."""
 ```
 
-- [ ] Matica dôvery (N×N medzi všetkými agentmi)
-- [ ] Iteratívny výpočet: `t^(k+1) = (1-d)·e + d·C·t^(k)`
-- [ ] Normalizácia na [0, 1] pre každý riadok
-- [ ] Per-epoch recompute (na konci každej epochy)
-- [ ] API endpoint: `/api/v1/trust/matrix` — kompletná trust heatmap
-- [ ] Vizualizácia v God Console: trust graf (nodes=agents, edges=trust)
+- [x] Matica dôvery (N×N medzi všetkými agentmi)
+- [x] Iteratívny výpočet: `t^(k+1) = (1-d)·e + d·C·t^(k)`
+- [x] Normalizácia na [0, 1] pre každý riadok
+- [x] Per-epoch recompute (na konci každej epochy)
+- [x] API endpoint: `/api/v1/trust/matrix` — kompletná trust heatmap
+- [x] Vizualizácia v God Console: trust graf (nodes=agents, edges=trust)
 
 ### 2.2 TFT Verifier — Tit-for-Tat
 
@@ -324,9 +324,9 @@ Deploy:      Render / Fly.io / self-hosted
 
 ### Odporúčaný order
 
-```
-Týždeň 1:  PostgreSQL + TFT Verifier + WebSocket Event System
-Týždeň 2:  ESS v2 + Auth + Multi-Model Router
+```yaml
+Týždeň 1:  PostgreSQL + TFT Verifier + WebSocket Event System ✅
+Týždeň 2:  ESS v2 🔵 + Auth + Multi-Model Router
 Týždeň 3:  God Console v3 (WebSocket live) + Agent OS v3 (LLM think)
 Týždeň 4:  CI/CD + Firecracker + Agent Auto-Scaling + Documentation
 ```

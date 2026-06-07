@@ -143,3 +143,28 @@ async def get_tft_log(request: Request, agent_id: str, limit: int = 50):
         return {"error": "TFT Verifier not initialized"}
     history = await tft.load_history(agent_id, limit=limit)
     return {"agent_id": agent_id[:8], "count": len(history), "interactions": history}
+
+
+# ═══════════════════════════════════════════════
+# EIGENTRUST MATRIX ENDPOINT
+# ═══════════════════════════════════════════════
+
+
+@router.get("/trust/matrix")
+async def get_trust_matrix(request: Request):
+    """Get the full EigenTrust matrix + eigenvector scores for all agents."""
+    eigen = getattr(request.app.state, "eigen_trust", None)
+    if not eigen:
+        return {"error": "EigenTrust not initialized"}
+    result = await eigen.compute(damping=0.85)
+    return result
+
+
+@router.get("/trust/matrix/raw")
+async def get_trust_matrix_raw(request: Request, min_interactions: int = 1):
+    """Get the raw N×N trust matrix (JSON-safe lists)."""
+    eigen = getattr(request.app.state, "eigen_trust", None)
+    if not eigen:
+        return {"error": "EigenTrust not initialized"}
+    result = await eigen.get_raw_matrix(min_interactions=min_interactions)
+    return result

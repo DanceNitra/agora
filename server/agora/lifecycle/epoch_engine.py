@@ -105,6 +105,44 @@ class EpochEngine:
         if evaluator:
             try:
                 epoch_report = await evaluator.finalize_epoch(self._current_epoch)
+
+                # ── EigenTrust recompute ──
+                eigen = getattr(app.state, 'eigen_trust', None)
+                if eigen:
+                    try:
+                        result = await eigen.compute(damping=0.85)
+                        if result.get("trust_vector"):
+                            eigen_weight = 0.3
+                            # Get full agent IDs for lookup
+                            cursor = await db.execute(
+                                "SELECT agent_id FROM agent_identities WHERE status='active'"
+                            )
+                            full_ids = [r["agent_id"] for r in await cursor.fetchall()]
+                            id_map = {aid[:8]: aid for aid in full_ids}
+
+                            for agent in result["agents"]:
+                                short_id = agent["id"]
+                                full_id = id_map.get(short_id)
+                                if not full_id:
+                                    continue
+                                eigen_score = agent["eigen_trust"]
+                                ess_score = agent["ess_trust"]
+                                blended = (1 - eigen_weight) * ess_score + eigen_weight * eigen_score
+                                blended = max(0.0, min(1.0, round(blended, 4)))
+                                await db.execute(
+                                    "UPDATE agent_identities SET trust_score=?, "
+                                    "updated_at=datetime('now') WHERE agent_id=?",
+                                    (blended, full_id),
+                                )
+                            await db.commit()
+                            epoch_report["eigen_trust"] = {
+                                "top_agents": result["top_agents"],
+                                "matrix_density": result["matrix_stats"]["density"],
+                            }
+                            print(f"[Epoch] EigenTrust blended trust for {len(result['agents'])} agents")
+                    except Exception as e:
+                        print(f"[Epoch] EigenTrust error: {e}")
+
                 summary = json.dumps(epoch_report)
             except Exception as e:
                 print(f"[Epoch] Evaluation error: {e}")

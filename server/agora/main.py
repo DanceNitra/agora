@@ -15,6 +15,7 @@ from agora.config import settings
 from agora.coordination.ess_protocol import TrustEngine
 from agora.coordination.tft_verifier import TFTVerifier
 from agora.coordination.event_bus import EventBus
+from agora.coordination.eigen_trust import EigenTrustSolver
 from agora.coordination.economy_config import get_role_config, ROLE_ECONOMY
 from agora.coordination.stigmergy import StigmergyPool
 from agora.coordination.economy import EconomyEngine
@@ -117,6 +118,7 @@ async def init_db(app: FastAPI):
     app.state.agent_lifecycle = AgentLifecycle(db)
     app.state.csd_monitor = CSDMonitor(window_size=200, z_threshold_warning=2.0, z_threshold_critical=3.5)
     app.state.epoch_engine = EpochEngine(db)
+    app.state.eigen_trust = EigenTrustSolver(db) if db else None
     # EventBus — topic-based pub/sub
     app.state.event_bus = EventBus(app)
     await app.state.event_bus.start()
