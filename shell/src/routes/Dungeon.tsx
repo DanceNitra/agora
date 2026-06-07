@@ -1,16 +1,7 @@
 /**
- * Dungeon.tsx — route page: square canvas + scrollable panel sidebar.
+ * Dungeon.tsx — simple working layout.
  *
- * Layout:
- *   ┌───────────────────────┬──────────────────────────────┐
- *   │                       │  🎯 QuestBoard               │
- *   │   SQUARE CANVAS       │  ⚙️ OS Meters                │
- *   │   (height × height)   │  👤 AgentList                │
- *   │                       │  📜 LogStream (max 180px)    │
- *   └───────────────────────┴──────────────────────────────┘
- *
- * Canvas is always square (height = width), fills the full height.
- * Sidebar takes the remaining width, scrollable.
+ * Canvas left (flex: 1), sidebar right (fixed 300px).
  */
 import React from 'react';
 import DungeonCanvas from '../game/DungeonCanvas';
@@ -22,14 +13,9 @@ import LogStream from '../game/panels/LogStream';
 const Dungeon: React.FC = () => {
   return (
     <div style={layout.container}>
-      {/* Left: Square canvas */}
       <div style={layout.canvasWrapper}>
-        <div style={layout.canvasInner}>
-          <DungeonCanvas />
-        </div>
+        <DungeonCanvas />
       </div>
-
-      {/* Right: Scrollable panels */}
       <div style={layout.sidebar}>
         <QuestBoard />
         <OsMeters />
@@ -49,17 +35,13 @@ const layout: Record<string, React.CSSProperties> = {
     overflow: 'hidden',
   },
   canvasWrapper: {
-    height: '100%',
-    aspectRatio: '1 / 1',
-    flexShrink: 0,
+    flex: 1,
     position: 'relative',
-  },
-  canvasInner: {
-    position: 'absolute',
-    inset: 0,
+    minWidth: 0,
   },
   sidebar: {
-    flex: 1,
+    width: 300,
+    flexShrink: 0,
     display: 'flex',
     flexDirection: 'column',
     gap: 6,
@@ -67,8 +49,6 @@ const layout: Record<string, React.CSSProperties> = {
     borderLeft: '1px solid #2a2a3a',
     background: '#12121a',
     overflowY: 'auto',
-    scrollbarWidth: 'thin',
-    scrollbarColor: '#3a3a4a transparent',
   },
 };
 
