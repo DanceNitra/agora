@@ -50,7 +50,24 @@ interface TrustMatrixData {
   matrix_stats: { n: number; pairs: number; density: number; mean_trust: number; };
 }
 
-type TabId = 'agents' | 'violations' | 'os' | 'controller' | 'health' | 'trust';
+// Quest types
+interface Quest {
+  id: string; title: string; goal: string; subsystem: string;
+  success_criteria: string[]; reward: number; owner: string | null;
+  status: string; depends_on: string[]; denial_reason: string | null;
+  denial_fix: string | null; block_reason: string | null;
+  verification_runs: number | null;
+  created_at: string | null; assigned_at: string | null; completed_at: string | null;
+}
+
+interface QuestDashboard {
+  quests: Quest[];
+  counts: Record<string, number>;
+  agents: string[];
+  os_state: any;
+}
+
+type TabId = 'agents' | 'violations' | 'os' | 'controller' | 'health' | 'trust' | 'quests';
 
 const TABS: { id: TabId; label: string; icon: string }[] = [
   { id: 'agents', label: 'Agent Management', icon: '👤' },
@@ -59,6 +76,7 @@ const TABS: { id: TabId; label: string; icon: string }[] = [
   { id: 'controller', label: 'Controller', icon: '⚙️' },
   { id: 'health', label: 'Health', icon: '💚' },
   { id: 'trust', label: 'Trust Matrix', icon: '🔗' },
+  { id: 'quests', label: 'Orchestrator', icon: '🎯' },
 ];
 
 // ═══════════════════════════════════════════
@@ -75,6 +93,8 @@ const GodConsoleV2: React.FC = () => {
   const [controllerStats, setControllerStats] = useState<ControllerStats | null>(null);
   const [healthData, setHealthData] = useState<any>(null);
   const [trustData, setTrustData] = useState<TrustMatrixData | null>(null);
+  const [questData, setQuestData] = useState<QuestDashboard | null>(null);
+  const [questAction, setQuestAction] = useState<string>('');
   const [loading, setLoading] = useState<boolean>(false);
   const [wsConnected, setWsConnected] = useState<boolean>(false);
 
@@ -98,6 +118,13 @@ const GodConsoleV2: React.FC = () => {
     try {
       const res = await fetch(api('/api/v1/eval/trust/matrix'));
       if (res.ok) setTrustData(await res.json());
+    } catch {}
+  }, [api]);
+
+  const refreshQuests = useCallback(async () => {
+    try {
+      const res = await fetch(api('/api/v2/god/quests'));
+      if (res.ok) setQuestData(await res.json());
     } catch {}
   }, [api]);
 
@@ -190,6 +217,9 @@ const GodConsoleV2: React.FC = () => {
         if (activeTab === 'trust') {
           await refreshTrust();
         }
+        if (activeTab === 'quests') {
+          await refreshQuests();
+        }
       } catch (e) {
         console.error('Fetch error:', e);
       } finally {
@@ -199,7 +229,7 @@ const GodConsoleV2: React.FC = () => {
     fetchData();
     const interval = setInterval(fetchData, 3000);
     return () => clearInterval(interval);
-  }, [activeTab, refreshNpcs, refreshOsSummary, refreshTrust, refreshHealth, refreshViolations, api]);
+  }, [activeTab, refreshNpcs, refreshOsSummary, refreshTrust, refreshHealth, refreshViolations, refreshQuests, api]);
 
   const loadNpcDetail = async (npc: NPC) => {
     setSelectedNpc(npc);
@@ -219,6 +249,28 @@ const GodConsoleV2: React.FC = () => {
     } catch (e) {
       console.error('Toggle error:', e);
     }
+  };
+
+  const performQuestAction = async (questId: string, action: string, agent?: string) => {
+    setQuestAction(`${action} ${questId}...`);
+    try {
+      const base = `/api/v2/dungeon-os/quests/${questId}/${action}`;
+      const body = agent ? JSON.stringify({ agent }) : JSON.stringify({ runs: 3 });
+      const res = await fetch(api(base), {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body,
+      });
+      const data = await res.json();
+      if (data.error || data.detail) {
+        alert(`Error: ${data.error || data.detail}`);
+      }
+      await refreshQuests();
+    } catch (e) {
+      console.error('Quest action error:', e);
+      alert(`Action failed: ${e}`);
+    }
+    setQuestAction('');
   };
 
   const stateColor = (s: string) => {
@@ -315,6 +367,18 @@ const GodConsoleV2: React.FC = () => {
 
       {activeTab === 'trust' && (
         <TrustTab data={trustData} />
+      )}
+
+      {activeTab === 'quests' && (
+        <QuestsTab
+          questData={questData}
+          agents={questData?.agents || []}
+          onAssign={(qId, agent) => performQuestAction(qId, 'assign', agent)}
+          onSubmit={(qId, agent) => performQuestAction(qId, 'submit', agent)}
+          onVerify={(qId) => performQuestAction(qId, 'verify')}
+          questAction={questAction}
+          stateColor={stateColor}
+        />
       )}
     </div>
   );
@@ -833,6 +897,220 @@ const HealthCard: React.FC<{ value: string | number; label: string; color: strin
 
 // ═══════════════════════════════════════════
 // HELPERS
+// ═══════════════════════════════════════════
+// TAB 7: QUESTS (Orchestrator Dashboard)
+// ═══════════════════════════════════════════
+
+const QuestsTab: React.FC<{
+  questData: QuestDashboard | null;
+  agents: string[];
+  onAssign: (qId: string, agent: string) => void;
+  onSubmit: (qId: string, agent: string) => void;
+  onVerify: (qId: string) => void;
+  questAction: string;
+  stateColor: (s: string) => string;
+}> = ({ questData, agents, onAssign, onSubmit, onVerify, questAction, stateColor }) => {
+  const [selectedQuest, setSelectedQuest] = useState<Quest | null>(null);
+  const [assignAgent, setAssignAgent] = useState<string>('');
+
+  if (!questData) {
+    return <div style={styles.loading}>Loading quest data...</div>;
+  }
+
+  const statusColor = (s: string) => {
+    switch (s) {
+      case 'open': return '#22c55e';
+      case 'claimed': return '#eab308';
+      case 'review': return '#88ccff';
+      case 'done': return '#6b7280';
+      case 'blocked': return '#ef4444';
+      default: return '#6b7280';
+    }
+  };
+
+  const counts = questData.counts;
+  const osState = questData.os_state?.state || {};
+  const bootProgress = questData.os_state?.boot_progress || {};
+
+  return (
+    <div style={styles.tabContent}>
+      {/* Summary cards */}
+      <div style={styles.cardRow}>
+        <div style={{ ...styles.card, flex: 1, minWidth: 120 }}>
+          <div style={{ fontSize: 11, color: '#6b7280' }}>🟢 Open</div>
+          <div style={{ fontSize: 24, fontWeight: 700, color: '#22c55e' }}>{counts.open || 0}</div>
+        </div>
+        <div style={{ ...styles.card, flex: 1, minWidth: 120 }}>
+          <div style={{ fontSize: 11, color: '#6b7280' }}>🟡 Claimed</div>
+          <div style={{ fontSize: 24, fontWeight: 700, color: '#eab308' }}>{counts.claimed || 0}</div>
+        </div>
+        <div style={{ ...styles.card, flex: 1, minWidth: 120 }}>
+          <div style={{ fontSize: 11, color: '#6b7280' }}>🔵 Review</div>
+          <div style={{ fontSize: 24, fontWeight: 700, color: '#88ccff' }}>{counts.review || 0}</div>
+        </div>
+        <div style={{ ...styles.card, flex: 1, minWidth: 120 }}>
+          <div style={{ fontSize: 11, color: '#6b7280' }}>✅ Done</div>
+          <div style={{ fontSize: 24, fontWeight: 700, color: '#6b7280' }}>{counts.done || 0}</div>
+        </div>
+      </div>
+
+      {/* osState Boot Progress */}
+      {osState && Object.keys(osState).length > 0 && (
+        <div style={{ ...styles.card, marginBottom: 16 }}>
+          <div style={styles.sectionTitle}>🖥️ osState Boot Progress (threshold: 70)</div>
+          <div style={{ display: 'flex', gap: 16, flexWrap: 'wrap', marginTop: 8 }}>
+            {Object.entries(bootProgress).map(([sub, pct]: [string, any]) => (
+              <div key={sub} style={{ flex: 1, minWidth: 140 }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 12, marginBottom: 2 }}>
+                  <span style={{ textTransform: 'capitalize' }}>{sub}</span>
+                  <span style={{ color: pct >= 100 ? '#22c55e' : '#88ccff' }}>{osState[sub]}/70</span>
+                </div>
+                <div style={styles.barOuter}>
+                  <div style={{ ...styles.barInner, width: `${Math.min(100, pct)}%`, background: pct >= 100 ? '#22c55e' : '#88ccff' }} />
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* Quest action status */}
+      {questAction && (
+        <div style={{ fontSize: 12, color: '#88ccff', marginBottom: 8 }}>
+          ⏳ {questAction}
+        </div>
+      )}
+
+      {/* Quest table */}
+      <div style={styles.table}>
+        <div style={styles.tableHeader}>
+          <span style={{ flex: 2 }}>Quest</span>
+          <span style={{ flex: 1 }}>Subsystem</span>
+          <span style={{ flex: 1, textAlign: 'center' }}>Status</span>
+          <span style={{ flex: 1 }}>Owner</span>
+          <span style={{ flex: 2 }}>Actions</span>
+        </div>
+        {questData.quests.map((q) => (
+          <div
+            key={q.id}
+            style={{
+              ...styles.tableRow,
+              background: selectedQuest?.id === q.id ? '#2a3a4a' : 'transparent',
+              cursor: 'pointer',
+            }}
+            onClick={() => setSelectedQuest(q)}
+          >
+            <span style={{ flex: 2, fontWeight: 600 }}>{q.title}</span>
+            <span style={{ flex: 1, fontSize: 11, textTransform: 'capitalize' }}>{q.subsystem}</span>
+            <span style={{ flex: 1, textAlign: 'center' }}>
+              <span style={{
+                display: 'inline-block', padding: '2px 6px', borderRadius: 4,
+                fontSize: 10, fontWeight: 600, color: '#fff',
+                background: statusColor(q.status),
+              }}>
+                {q.status.toUpperCase()}
+              </span>
+            </span>
+            <span style={{ flex: 1, fontSize: 12 }}>{q.owner || '—'}</span>
+            <span style={{ flex: 2, display: 'flex', gap: 4, alignItems: 'center' }}>
+              {q.status === 'open' && agents.length > 0 && (
+                <>
+                  <select
+                    style={{ ...styles.smallBtn, padding: '3px 4px', fontSize: 11, width: 80 }}
+                    value={assignAgent}
+                    onChange={(e) => setAssignAgent(e.target.value)}
+                    onClick={(e) => e.stopPropagation()}
+                  >
+                    <option value="">Agent...</option>
+                    {agents.map((a) => <option key={a} value={a}>{a}</option>)}
+                  </select>
+                  <button
+                    style={{ ...styles.smallBtn, background: '#22c55e33', borderColor: '#22c55e' }}
+                    disabled={!assignAgent}
+                    onClick={(e) => { e.stopPropagation(); if (assignAgent) { onAssign(q.id, assignAgent); setAssignAgent(''); } }}
+                  >
+                    Assign
+                  </button>
+                </>
+              )}
+              {q.status === 'claimed' && (
+                <button
+                  style={{ ...styles.smallBtn, background: '#eab30833', borderColor: '#eab308' }}
+                  onClick={(e) => { e.stopPropagation(); onSubmit(q.id, q.owner || ''); }}
+                >
+                  Submit
+                </button>
+              )}
+              {q.status === 'review' && (
+                <button
+                  style={{ ...styles.smallBtn, background: '#88ccff33', borderColor: '#88ccff' }}
+                  onClick={(e) => { e.stopPropagation(); onVerify(q.id); }}
+                >
+                  Verify (N-run)
+                </button>
+              )}
+              <span style={{ fontSize: 10, color: '#6b7280', marginLeft: 4 }}>
+                {q.verification_runs ? `×${q.verification_runs}` : ''}
+              </span>
+            </span>
+          </div>
+        ))}
+      </div>
+
+      {/* Quest detail panel */}
+      {selectedQuest && (
+        <div style={{ marginTop: 16, background: '#1f2937', borderRadius: 8, padding: 12, border: '1px solid #374151' }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
+            <h3 style={{ fontSize: 15, fontWeight: 700, color: '#fbbf24', margin: 0 }}>
+              {selectedQuest.title}
+            </h3>
+            <button onClick={() => setSelectedQuest(null)} style={{ ...styles.smallBtn, fontSize: 14 }}>✕</button>
+          </div>
+          <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap', marginBottom: 8 }}>
+            <div style={{ fontSize: 12, color: '#9ca3af' }}>
+              <b>ID:</b> {selectedQuest.id}
+            </div>
+            <div style={{ fontSize: 12, color: '#9ca3af' }}>
+              <b>Subsystem:</b> {selectedQuest.subsystem}
+            </div>
+            <div style={{ fontSize: 12, color: '#9ca3af' }}>
+              <b>Reward:</b> {selectedQuest.reward} pts
+            </div>
+            <div style={{ fontSize: 12, color: '#9ca3af' }}>
+              <b>Status:</b>{' '}
+              <span style={{ color: statusColor(selectedQuest.status), fontWeight: 600 }}>
+                {selectedQuest.status.toUpperCase()}
+              </span>
+            </div>
+          </div>
+          <div style={{ fontSize: 13, color: '#d4d4d4', marginBottom: 8 }}>
+            <b>Goal:</b> {selectedQuest.goal}
+          </div>
+          {selectedQuest.success_criteria && selectedQuest.success_criteria.length > 0 && (
+            <div style={{ marginBottom: 8 }}>
+              <div style={{ fontSize: 12, fontWeight: 600, color: '#9ca3af', marginBottom: 4 }}>Success Criteria:</div>
+              <ul style={{ margin: 0, paddingLeft: 16, fontSize: 12, color: '#6b7280' }}>
+                {selectedQuest.success_criteria.map((c, i) => <li key={i}>{c}</li>)}
+              </ul>
+            </div>
+          )}
+          {selectedQuest.depends_on && selectedQuest.depends_on.length > 0 && (
+            <div style={{ fontSize: 12, color: '#6b7280' }}>
+              <b>Depends on:</b> {selectedQuest.depends_on.join(', ')}
+            </div>
+          )}
+          {selectedQuest.denial_reason && (
+            <div style={{ marginTop: 8, padding: 8, borderRadius: 6, background: '#ef444422', border: '1px solid #ef444455' }}>
+              <div style={{ fontSize: 11, fontWeight: 600, color: '#ef4444' }}>⛔ Denial Reason</div>
+              <div style={{ fontSize: 12, color: '#d4d4d4', marginTop: 2 }}>{selectedQuest.denial_reason}</div>
+            </div>
+          )}
+        </div>
+      )}
+    </div>
+  );
+};
+
 // ═══════════════════════════════════════════
 
 const renderJson = (raw: string | null, keys?: string[]): string => {

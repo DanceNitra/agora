@@ -398,3 +398,47 @@ async def raise_subsystem(request: Request, body: dict):
         "boot_ready": os_state.is_boot_ready(),
         "boot_triggered": os_state.is_booted(),
     }
+
+
+# ═══════════════════════════════════════════
+# QUEST MANAGEMENT (Orchestrator Dashboard)
+# ═══════════════════════════════════════════
+
+@router.get("/quests")
+async def get_quest_dashboard(request: Request):
+    """Consolidated quest dashboard data for Orchestrator."""
+    try:
+        qe = getattr(request.app.state, "quest_engine", None)
+        os_state = getattr(request.app.state, "os_state", None)
+        db = request.app.state.db
+
+        if not qe:
+            return {"error": "Quest engine not initialized"}
+
+        quests = await qe.list_quests()
+        os_stats = os_state.get_stats() if os_state else {}
+
+        # Get available agents for assignment
+        cursor = await db.execute(
+            "SELECT npc_name FROM dungeon_npcs ORDER BY npc_name"
+        )
+        rows = await cursor.fetchall()
+        agents = [r["npc_name"] for r in rows]
+
+        # Summary counts
+        counts = {"open": 0, "claimed": 0, "review": 0, "done": 0, "blocked": 0}
+        for q in quests:
+            s = q.get("status", "")
+            if s in counts:
+                counts[s] += 1
+
+        return {
+            "quests": quests,
+            "counts": counts,
+            "agents": agents,
+            "os_state": os_stats,
+        }
+    except Exception as e:
+        import traceback
+        print(f"[GodV2] /quests error: {e}\n{traceback.format_exc()[:500]}")
+        return {"error": str(e)}

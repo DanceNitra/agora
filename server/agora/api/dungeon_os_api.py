@@ -126,3 +126,18 @@ async def get_dungeon_os_stats(request: Request):
         },
         "os_state": os_state.get_stats() if os_state else None,
     }
+
+
+@router.get("/verification-log/{quest_id}")
+async def get_verification_log(quest_id: str, request: Request):
+    """Get all Warden verification runs for a quest."""
+    qe = get_qe(request)
+    log = await qe.get_verification_log(quest_id)
+    return {"quest_id": quest_id, "runs": log}
+
+
+@router.get("/verification-stats")
+async def get_verification_stats(request: Request):
+    """Get aggregate Warden verification statistics."""
+    qe = get_qe(request)
+    return await qe.get_verification_stats()
