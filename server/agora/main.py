@@ -21,6 +21,7 @@ from agora.coordination.stigmergy import StigmergyPool
 from agora.coordination.economy import EconomyEngine
 from agora.dungeon_os.state import OsState, ensure_os_state_tables
 from agora.dungeon_os.roles import build_role_prompt, NPC_ROLE_MAP
+from agora.dungeon_os.quests import QuestEngine, ensure_quest_tables
 from agora.agent_os.agent_os import AgentOS
 from agora.agent_os.physical_world import PhysicalWorld
 from agora.harness.state_store import StateStore
@@ -43,6 +44,7 @@ from agora.api import physical_api
 from agora.api import tool_registry_api as tool_registry_api
 from agora.api import evaluation_api
 from agora.api import god_console_v2
+from agora.api import dungeon_os_api
 
 
 async def init_db(app: FastAPI):
@@ -132,6 +134,11 @@ async def init_db(app: FastAPI):
     app.state.os_state = OsState(db)
     await app.state.os_state.load()
 
+    # ── Dungeon OS: Quest Engine ──
+    await ensure_quest_tables(db)
+    app.state.quest_engine = QuestEngine(db, os_state=app.state.os_state)
+    await app.state.quest_engine.seed_default_quests()
+
     # Seed agents if empty
     cursor = await db.execute("SELECT COUNT(*) as cnt FROM agent_identities")
     row = await cursor.fetchone()
@@ -192,6 +199,7 @@ app.include_router(physical_api.router)
 app.include_router(tool_registry_api.router)
 app.include_router(evaluation_api.router)
 app.include_router(god_console_v2.router)
+app.include_router(dungeon_os_api.router)
 
 
 # ── Event topic mapping ───────────────────────────────────────
