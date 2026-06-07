@@ -128,6 +128,42 @@ async def get_dungeon_os_stats(request: Request):
     }
 
 
+@router.post("/quests/create")
+async def create_quest_new(request: Request):
+    """Create a new quest from external stimulus (Orchestrator command)."""
+    qe = get_qe(request)
+    try:
+        body = await request.json()
+    except Exception:
+        raise HTTPException(400, "Invalid JSON body")
+    
+    quest_id = body.get("id", "").strip()
+    title = body.get("title", "").strip()
+    goal = body.get("goal", "").strip()
+    subsystem = body.get("subsystem", "").strip()
+    success_criteria = body.get("success_criteria", [])
+    reward = body.get("reward", 30)
+    depends_on = body.get("depends_on", [])
+
+    if not quest_id or not title or not goal or not subsystem:
+        raise HTTPException(400, "Missing required fields: id, title, goal, subsystem")
+    if not success_criteria or not isinstance(success_criteria, list):
+        raise HTTPException(400, "success_criteria must be a non-empty list")
+
+    result = await qe.create_quest(
+        quest_id=quest_id,
+        title=title,
+        goal=goal,
+        subsystem=subsystem,
+        success_criteria=success_criteria,
+        reward=reward,
+        depends_on=depends_on,
+    )
+    if "error" in result:
+        raise HTTPException(400, result["error"])
+    return result
+
+
 @router.get("/verification-log/{quest_id}")
 async def get_verification_log(quest_id: str, request: Request):
     """Get all Warden verification runs for a quest."""
@@ -141,3 +177,72 @@ async def get_verification_stats(request: Request):
     """Get aggregate Warden verification statistics."""
     qe = get_qe(request)
     return await qe.get_verification_stats()
+
+
+# ═══════════════════════════════════════════
+# STIMULUS ENGINE — external event injection
+# ═══════════════════════════════════════════
+
+@router.post("/stimulus")
+async def inject_stimulus(request: Request):
+    """Inject an external stimulus → auto-creates a quest."""
+    from agora.dungeon_os.stimulus import StimulusEngine
+    qe = get_qe(request)
+    os_state = getattr(request.app.state, "os_state", None)
+    db = getattr(request.app.state, "db", None)
+
+    try:
+        body = await request.json()
+    except Exception:
+        raise HTTPException(400, "Invalid JSON body")
+
+    engine = StimulusEngine(qe, os_state, db)
+    result = await engine.inject_stimulus(
+        stimulus_type=body.get("type", "alert"),
+        source=body.get("source", "api"),
+        title=body.get("title", "External stimulus"),
+        description=body.get("description", ""),
+        subsystem=body.get("subsystem", "knowledge"),
+        priority=body.get("priority", 5),
+    )
+    if "error" in result:
+        raise HTTPException(400, result["error"])
+    return result
+
+
+@router.post("/stimulus/health")
+async def trigger_health_check(request: Request):
+    """Trigger a scheduled health check → creates maintenance quests."""
+    from agora.dungeon_os.stimulus import StimulusEngine
+    qe = get_qe(request)
+    os_state = getattr(request.app.state, "os_state", None)
+    db = getattr(request.app.state, "db", None)
+
+    engine = StimulusEngine(qe, os_state, db)
+    result = await engine.inject_health_stimulus()
+    return result
+
+
+@router.post("/stimulus/watch/{directory:path}")
+async def watch_directory(directory: str, request: Request):
+    """Set a directory to watch for new files → auto-quests."""
+    from agora.dungeon_os.stimulus import StimulusEngine
+    qe = get_qe(request)
+    os_state = getattr(request.app.state, "os_state", None)
+    db = getattr(request.app.state, "db", None)
+
+    engine = StimulusEngine(qe, os_state, db)
+    await engine.set_watch_dir(f"/{directory}")
+    request.app.state.stimulus_engine = engine
+    return {"status": "watching", "directory": f"/{directory}"}
+
+
+@router.post("/stimulus/poll")
+async def poll_watch_dir(request: Request):
+    """Poll the watch directory for new files."""
+    from agora.dungeon_os.stimulus import get_stimulus_engine
+    engine = await get_stimulus_engine(request)
+    if not engine:
+        raise HTTPException(400, "No stimulus engine initialized")
+    new_quests = await engine.poll_watch_dir()
+    return {"new_quests": len(new_quests), "quests": new_quests}

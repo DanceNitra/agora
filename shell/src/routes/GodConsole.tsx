@@ -327,7 +327,17 @@ const GodConsoleV2: React.FC = () => {
         ))}
       </div>
 
-      {loading && <div style={styles.loading}>Loading...</div>}
+      <div style={{ height: 24, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+        <div style={{
+          ...styles.loading,
+          opacity: loading ? 1 : 0,
+          transition: 'opacity 0.2s',
+          position: 'absolute' as const,
+          pointerEvents: loading ? 'auto' : 'none',
+        }}>
+          {loading ? 'Loading...' : ''}
+        </div>
+      </div>
 
       {/* Tab content */}
       {activeTab === 'agents' && (
