@@ -319,6 +319,7 @@ class Controller:
                         broadcast_fn=lambda t, p: result["events"].append(
                             {"type": t, "payload": p}
                         ),
+                        skip_body_update=True,  # worker už spravil body update
                     )
                 except Exception as e:
                     result["errors"].append(f"AgentOS error: {e}")
@@ -444,6 +445,7 @@ class Controller:
                         broadcast_fn=lambda t, p: result["events"].append(
                             {"type": t, "payload": p}
                         ),
+                        skip_body_update=True,  # worker už spravil body update
                     )
                 except Exception as e:
                     result["errors"].append(f"AgentOS error: {e}")

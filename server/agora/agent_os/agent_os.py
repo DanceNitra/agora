@@ -243,8 +243,15 @@ class AgentOS:
         await self.db.commit()
         print(f"[AgentOS] Seeded {len(NPC_DEFS)} NPCs (soul, brain, body, abilities, skills)")
 
-    async def cluster_tick(self, npc_ids: list[str], broadcast_fn=None):
-        """Run Agent OS tick for a specific set of NPCs (room cluster)."""
+    async def cluster_tick(self, npc_ids: list[str], broadcast_fn=None, skip_body_update: bool = False):
+        """Run Agent OS tick for a specific set of NPCs (room cluster).
+
+        Args:
+            npc_ids: List of NPC UUIDs to tick.
+            broadcast_fn: Optional broadcast callback for events.
+            skip_body_update: If True, skip body stamina/hunger/fatigue update
+                              (used when the Controller worker already handled it).
+        """
         if not npc_ids:
             return
 
@@ -260,8 +267,9 @@ class AgentOS:
             npc_id = npc["npc_id"]
             name = npc["npc_name"]
 
-            # 1. BODY update
-            await self._update_body(npc_id)
+            # 1. BODY update (skip if controller already did it)
+            if not skip_body_update:
+                await self._update_body(npc_id)
 
             # 2. BRAIN — evaluate state
             state_of_mind = await self._think(npc_id, name)
