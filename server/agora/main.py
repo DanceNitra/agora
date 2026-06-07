@@ -71,33 +71,6 @@ async def init_db(app: FastAPI):
     app.state.economy = EconomyEngine(db)
     await app.state.economy.init_resources()
 
-    # Seed initial agent inventories for dungeon NPCs
-    if db:
-        cursor = await db.execute(
-            "SELECT COUNT(*) as c FROM agent_inventory"
-        )
-        row = await cursor.fetchone()
-        if row and row["c"] == 0:
-            seed_data = [
-                ("00000000-0000-0000-0000-000000000001", 1, 5.0),   # Kael: gold_ore
-                ("00000000-0000-0000-0000-000000000002", 2, 4.0),   # Lyra: herbs
-                ("00000000-0000-0000-0000-000000000003", 5, 3.0),   # Mordecai: scroll_fragment
-                ("00000000-0000-0000-0000-000000000003", 3, 2.0),   # Mordecai: crystal_shards
-                ("00000000-0000-0000-0000-000000000004", 4, 4.0),   # Grom: iron_ingot
-                ("00000000-0000-0000-0000-000000000004", 1, 2.0),   # Grom: gold_ore
-                ("00000000-0000-0000-0000-000000000005", 2, 5.0),   # Zara: herbs
-                ("00000000-0000-0000-0000-000000000005", 3, 1.0),   # Zara: crystal_shards
-                ("00000000-0000-0000-0000-000000000006", 1, 3.0),   # Finn: gold_ore (trading capital)
-                ("00000000-0000-0000-0000-000000000006", 4, 3.0),   # Finn: iron_ingot
-                ("00000000-0000-0000-0000-000000000007", 4, 2.0),   # Guard: iron_ingot
-            ]
-            for agent_id, res_id, qty in seed_data:
-                await db.execute(
-                    "INSERT INTO agent_inventory (agent_id, resource_id, quantity) VALUES (?, ?, ?)",
-                    (agent_id, res_id, qty),
-                )
-            await db.commit()
-            print(f"[Economy] Seeded inventories for {len(set(a[0] for a in seed_data))} agents")
     app.state.task_executor = TaskExecutor(db)
     app.state.state_store = StateStore(db)
     app.state.lifecycle_hooks = LifecycleHooks(app.state.state_store, db)
@@ -115,6 +88,10 @@ async def init_db(app: FastAPI):
     )
     app.state.agent_os = AgentOS(db, state_store=app.state.state_store, llm_enabled=settings.llm_enabled)
     await app.state.agent_os.ensure_os_initialized()
+
+    # Seed inventories for dungeon NPCs (must come AFTER ensure_os_initialized creates NPC agent identities)
+    if db:
+        await _seed_npc_inventories(db)
     app.state.physical_world = PhysicalWorld(db, llm_enabled=settings.llm_enabled)
     app.state.scheduler = RoomClusterScheduler(db)
     app.state.controller = Controller(app, db, app.state.state_store)
@@ -136,8 +113,15 @@ async def init_db(app: FastAPI):
 
     # ── Dungeon OS: Quest Engine ──
     await ensure_quest_tables(db)
-    app.state.quest_engine = QuestEngine(db, os_state=app.state.os_state)
-    await app.state.quest_engine.seed_default_quests()
+    try:
+        app.state.quest_engine = QuestEngine(db, os_state=app.state.os_state)
+        await app.state.quest_engine.seed_default_quests()
+        print(f"[Quests] Engine initialized OK")
+    except Exception as e:
+        print(f"[ERROR] Quest engine init failed: {e}")
+        import traceback
+        traceback.print_exc()
+        app.state.quest_engine = None
 
     # Seed agents if empty
     cursor = await db.execute("SELECT COUNT(*) as cnt FROM agent_identities")
@@ -172,9 +156,53 @@ async def seed_agents(db):
     await db.commit()
 
 
+async def _seed_npc_inventories(db):
+    """Seed initial agent inventories for dungeon NPCs."""
+    cursor = await db.execute(
+        "SELECT COUNT(*) as c FROM agent_inventory"
+    )
+    row = await cursor.fetchone()
+    if row and row["c"] == 0:
+        import uuid
+        cursor = await db.execute("SELECT id, name FROM resources")
+        rows = await cursor.fetchall()
+        res_by_name = {r["name"]: r["id"] for r in rows}
+        seed_data = [
+            ("00000000-0000-0000-0000-000000000001", "gold_ore", 5.0),
+            ("00000000-0000-0000-0000-000000000002", "herbs", 4.0),
+            ("00000000-0000-0000-0000-000000000003", "scroll_fragment", 3.0),
+            ("00000000-0000-0000-0000-000000000003", "crystal_shards", 2.0),
+            ("00000000-0000-0000-0000-000000000004", "iron_ingot", 4.0),
+            ("00000000-0000-0000-0000-000000000004", "gold_ore", 2.0),
+            ("00000000-0000-0000-0000-000000000005", "herbs", 5.0),
+            ("00000000-0000-0000-0000-000000000005", "crystal_shards", 1.0),
+            ("00000000-0000-0000-0000-000000000006", "gold_ore", 3.0),
+            ("00000000-0000-0000-0000-000000000006", "iron_ingot", 3.0),
+            ("00000000-0000-0000-0000-000000000007", "iron_ingot", 2.0),
+        ]
+        for agent_id, res_name, qty in seed_data:
+            rid = res_by_name.get(res_name)
+            if not rid:
+                print(f"[WARN] Resource '{res_name}' not found, skipping")
+                continue
+            inv_id = str(uuid.uuid4())
+            await db.execute(
+                "INSERT INTO agent_inventory (id, agent_id, resource_id, quantity) VALUES (?, ?, ?, ?)",
+                (inv_id, agent_id, rid, qty),
+            )
+        await db.commit()
+        print(f"[Economy] Seeded inventories for {len(set(a[0] for a in seed_data))} agents")
+
+
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    await init_db(app)
+    try:
+        await init_db(app)
+    except Exception as e:
+        print(f"[FATAL] Lifespan init_db failed: {e}", flush=True)
+        import traceback
+        traceback.print_exc()
+        raise
     loop = asyncio.get_event_loop()
     loop.create_task(tick_loop(app))
     yield

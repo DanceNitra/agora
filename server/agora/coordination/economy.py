@@ -28,11 +28,15 @@ class EconomyEngine:
         cursor = await self.db.execute("SELECT COUNT(*) as c FROM resources")
         row = await cursor.fetchone()
         if row and row["c"] == 0:
+            import uuid
+            from datetime import datetime, timezone
+            now = datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M:%S")
             for r in self.DEFAULT_RESOURCES:
+                rid = str(uuid.uuid4())
                 await self.db.execute(
-                    "INSERT INTO resources (name, total_supply, base_price, volatility) "
-                    "VALUES (?, 0, ?, ?)",
-                    (r["name"], r["base_price"], r["volatility"]),
+                    "INSERT INTO resources (id, name, total_supply, base_price, volatility, created_at, updated_at) "
+                    "VALUES (?, ?, 0, ?, ?, ?, ?)",
+                    (rid, r["name"], r["base_price"], r["volatility"], now, now),
                 )
             await self.db.commit()
             print(f"[Economy] Seeded {len(self.DEFAULT_RESOURCES)} resources")

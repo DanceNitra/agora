@@ -37,8 +37,8 @@ class AgentIdentity(Base):
     energy_balance = sa.Column(sa.Float, nullable=False, default=100.0)
     role = sa.Column(sa.Text, nullable=False)
     status = sa.Column(sa.Text, nullable=False, default="active")
-    created_at = sa.Column(sa.Text, nullable=False, default=sa.func.datetime("now"))
-    updated_at = sa.Column(sa.Text, nullable=False, default=sa.func.datetime("now"))
+    created_at = sa.Column(sa.Text, nullable=False, server_default=sa.func.datetime("now"))
+    updated_at = sa.Column(sa.Text, nullable=False, server_default=sa.func.datetime("now"))
 
     # relationships
     trust_scores_source = relationship(
@@ -74,7 +74,7 @@ class TrustScore(Base):
     score = sa.Column(sa.Float, nullable=False, default=0.5)
     interaction_count = sa.Column(sa.Integer, nullable=False, default=0)
     last_updated = sa.Column(
-        sa.Text, nullable=False, default=sa.func.datetime("now")
+        sa.Text, nullable=False, server_default=sa.func.datetime("now")
     )
 
     __table_args__ = (sa.UniqueConstraint("source_id", "target_id"),)
@@ -100,7 +100,7 @@ class StigmergyTrace(Base):
     ttl_seconds = sa.Column(sa.Integer, nullable=False, default=3600)
     expires_at = sa.Column(sa.Text, nullable=False)
     created_at = sa.Column(
-        sa.Text, nullable=False, default=sa.func.datetime("now")
+        sa.Text, nullable=False, server_default=sa.func.datetime("now")
     )
 
     # relationships
@@ -126,10 +126,10 @@ class AgentSoul(Base):
     moral_alignment = sa.Column(sa.Text, nullable=False, default="neutral")
     archetype = sa.Column(sa.Text, nullable=False, default="explorer")
     created_at = sa.Column(
-        sa.Text, nullable=False, default=sa.func.datetime("now")
+        sa.Text, nullable=False, server_default=sa.func.datetime("now")
     )
     updated_at = sa.Column(
-        sa.Text, nullable=False, default=sa.func.datetime("now")
+        sa.Text, nullable=False, server_default=sa.func.datetime("now")
     )
 
     # relationships
@@ -151,10 +151,10 @@ class AgentBrain(Base):
     last_decision = sa.Column(sa.Text, nullable=False, default="")
     last_decision_at = sa.Column(sa.Text, nullable=True)
     created_at = sa.Column(
-        sa.Text, nullable=False, default=sa.func.datetime("now")
+        sa.Text, nullable=False, server_default=sa.func.datetime("now")
     )
     updated_at = sa.Column(
-        sa.Text, nullable=False, default=sa.func.datetime("now")
+        sa.Text, nullable=False, server_default=sa.func.datetime("now")
     )
 
     # relationships
@@ -240,7 +240,7 @@ class AgentHelpRequest(Base):
     requester_task = sa.Column(sa.Text, nullable=True)
     helper_reply = sa.Column(sa.Text, nullable=True)
     created_at = sa.Column(
-        sa.Text, nullable=False, default=sa.func.datetime("now")
+        sa.Text, nullable=False, server_default=sa.func.datetime("now")
     )
     accepted_at = sa.Column(sa.Text, nullable=True)
     resolved_at = sa.Column(sa.Text, nullable=True)
@@ -275,10 +275,10 @@ class Artifact(Base):
     meta_data = sa.Column("metadata", sa.Text, default="{}")  # JSON
     is_published = sa.Column(sa.Boolean, default=False)
     created_at = sa.Column(
-        sa.Text, nullable=False, default=sa.func.datetime("now")
+        sa.Text, nullable=False, server_default=sa.func.datetime("now")
     )
     updated_at = sa.Column(
-        sa.Text, nullable=False, default=sa.func.datetime("now")
+        sa.Text, nullable=False, server_default=sa.func.datetime("now")
     )
 
     # relationships
@@ -295,7 +295,7 @@ class Event(Base):
     aggregate_id = sa.Column(sa.Text, nullable=True)
     payload = sa.Column(sa.Text, nullable=False, default="{}")  # JSON
     occurred_at = sa.Column(
-        sa.Text, nullable=False, default=sa.func.datetime("now")
+        sa.Text, nullable=False, server_default=sa.func.datetime("now")
     )
 
 
@@ -310,7 +310,7 @@ class Epoch(Base):
     id = sa.Column(sa.String(36), primary_key=True, default=_uuid)
     epoch_number = sa.Column(sa.Integer, nullable=False, unique=True)
     started_at = sa.Column(
-        sa.Text, nullable=False, default=sa.func.datetime("now")
+        sa.Text, nullable=False, server_default=sa.func.datetime("now")
     )
     ended_at = sa.Column(sa.Text, nullable=True)
     status = sa.Column(sa.Text, nullable=False, default="active")
@@ -339,10 +339,10 @@ class Task(Base):
     )
     meta_data = sa.Column("metadata", sa.Text, default="{}")  # JSON
     created_at = sa.Column(
-        sa.Text, nullable=False, default=sa.func.datetime("now")
+        sa.Text, nullable=False, server_default=sa.func.datetime("now")
     )
     updated_at = sa.Column(
-        sa.Text, nullable=False, default=sa.func.datetime("now")
+        sa.Text, nullable=False, server_default=sa.func.datetime("now")
     )
 
     # relationships
@@ -373,7 +373,7 @@ class TaskBid(Base):
     bid_reason = sa.Column(sa.Text, nullable=True)
     status = sa.Column(sa.Text, nullable=False, default="pending")
     created_at = sa.Column(
-        sa.Text, nullable=False, default=sa.func.datetime("now")
+        sa.Text, nullable=False, server_default=sa.func.datetime("now")
     )
 
     __table_args__ = (sa.UniqueConstraint("task_id", "agent_id"),)
@@ -397,10 +397,10 @@ class Resource(Base):
     base_price = sa.Column(sa.Float, nullable=False, default=1.0)
     volatility = sa.Column(sa.Float, nullable=False, default=0.1)
     created_at = sa.Column(
-        sa.Text, nullable=False, default=sa.func.datetime("now")
+        sa.Text, nullable=False, server_default=sa.func.datetime("now")
     )
     updated_at = sa.Column(
-        sa.Text, nullable=False, default=sa.func.datetime("now")
+        sa.Text, nullable=False, server_default=sa.func.datetime("now")
     )
 
     # relationships
@@ -443,7 +443,7 @@ class TradeOffer(Base):
     price_per_unit = sa.Column(sa.Float, nullable=False)
     status = sa.Column(sa.Text, nullable=False, default="open")
     created_at = sa.Column(
-        sa.Text, nullable=False, default=sa.func.datetime("now")
+        sa.Text, nullable=False, server_default=sa.func.datetime("now")
     )
     filled_at = sa.Column(sa.Text, nullable=True)
 
@@ -470,10 +470,10 @@ class DungeonNpc(Base):
     status = sa.Column(sa.Text, nullable=False, default="active")
     objective = sa.Column(sa.Text, nullable=False, default="Explore the dungeon")
     created_at = sa.Column(
-        sa.Text, nullable=False, default=sa.func.datetime("now")
+        sa.Text, nullable=False, server_default=sa.func.datetime("now")
     )
     updated_at = sa.Column(
-        sa.Text, nullable=False, default=sa.func.datetime("now")
+        sa.Text, nullable=False, server_default=sa.func.datetime("now")
     )
 
     # relationships
@@ -507,7 +507,7 @@ class DungeonQuest(Base):
     rewards = sa.Column(sa.Text, nullable=False, default="{}")  # JSON
     starting_npc = sa.Column(sa.Text, nullable=True)
     created_at = sa.Column(
-        sa.Text, nullable=False, default=sa.func.datetime("now")
+        sa.Text, nullable=False, server_default=sa.func.datetime("now")
     )
 
     # relationships
@@ -565,7 +565,7 @@ class InteractionLog(Base):
     trust_after = sa.Column(sa.Float, nullable=True)
     context = sa.Column(sa.Text, nullable=False, default="{}")  # JSON
     created_at = sa.Column(
-        sa.Text, nullable=False, default=sa.func.datetime("now")
+        sa.Text, nullable=False, server_default=sa.func.datetime("now")
     )
 
     # relationships
@@ -595,7 +595,7 @@ class TradeHistory(Base):
     price_per_unit = sa.Column(sa.Float, nullable=False)
     total_energy = sa.Column(sa.Float, nullable=False)
     created_at = sa.Column(
-        sa.Text, nullable=False, default=sa.func.datetime("now")
+        sa.Text, nullable=False, server_default=sa.func.datetime("now")
     )
 
     # relationships

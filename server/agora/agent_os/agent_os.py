@@ -200,6 +200,33 @@ class AgentOS:
         for name, defs in NPC_DEFS.items():
             npc_id = NPC_UUIDS[name]
 
+            # ── First: ensure dungeon_npcs row exists (FK target) ──
+            cursor = await self.db.execute(
+                "SELECT COUNT(*) as c FROM dungeon_npcs WHERE npc_id=?",
+                (npc_id,),
+            )
+            row = await cursor.fetchone()
+            if not row or row["c"] == 0:
+                await self.db.execute(
+                    "INSERT INTO dungeon_npcs (npc_id, npc_name, role, pos_x, pos_y, health, inventory, status, objective) "
+                    "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)",
+                    (npc_id, name, defs["role"], 320.0, 240.0, 100.0, "[]", "active", defs.get("objective", f"Operate as {name}")),
+                )
+
+            # ── Also ensure agent_identities row exists (FK target for agent_inventory) ──
+            cursor = await self.db.execute(
+                "SELECT COUNT(*) as c FROM agent_identities WHERE agent_id=?",
+                (npc_id,),
+            )
+            row = await cursor.fetchone()
+            if not row or row["c"] == 0:
+                genome = json.dumps({"role": defs["role"], "personality": defs["personality"]})
+                await self.db.execute(
+                    "INSERT INTO agent_identities (agent_id, public_key, generation, genome, trust_score, energy_balance, role, status) "
+                    "VALUES (?, ?, 0, ?, 0.5, 100, ?, 'active')",
+                    (npc_id, f"key_{npc_id[:8]}", genome, defs["role"]),
+                )
+
             # Soul
             await self.db.execute(
                 "INSERT INTO agent_soul (npc_id, personality, \"values\", emotional_state, moral_alignment, archetype) "
@@ -210,10 +237,10 @@ class AgentOS:
 
             # Brain
             await self.db.execute(
-                "INSERT INTO agent_brain (npc_id, current_goal, plan_stack, memory, state_of_mind) "
-                "VALUES (?, ?, ?, ?, ?)",
+                "INSERT INTO agent_brain (npc_id, current_goal, plan_stack, memory, state_of_mind, last_decision) "
+                "VALUES (?, ?, ?, ?, ?, ?)",
                 (npc_id, defs.get("objective", f"Operate as {name}"),
-                 json.dumps([]), json.dumps([]), "focused"),
+                 json.dumps([]), json.dumps([]), "focused", ""),
             )
 
             # Body

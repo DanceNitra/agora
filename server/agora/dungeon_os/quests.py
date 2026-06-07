@@ -103,7 +103,7 @@ class QuestEngine:
             return {"error": f"Quest '{quest_id}' not found"}
         if quest["status"] != "claimed":
             return {"error": f"Quest '{quest_id}' is {quest['status']}, not claimed"}
-        if quest.get("owner") != agent_name:
+        if quest["owner"] != agent_name:
             return {"error": f"Quest '{quest_id}' is owned by {quest['owner']}, not {agent_name}"}
 
         await self.db.execute(
@@ -137,7 +137,7 @@ class QuestEngine:
 
         # Raise osState subsystem
         subsystem = quest["subsystem"]
-        reward = quest.get("reward", 10)
+        reward = quest["reward"] or 10
         if self.os_state:
             await self.os_state.raise_subsystem(subsystem, amount=reward // 5)
 
@@ -306,6 +306,13 @@ class QuestEngine:
         return row["c"] if row else 0
 
     def _to_dict(self, row) -> dict:
+        # sqlite3.Row in Python 3.11 doesn't have .get() — use try/except instead
+        def _safe_get(key, default=None):
+            try:
+                val = row[key]
+                return val if val is not None else default
+            except (KeyError, IndexError, TypeError):
+                return default
         return {
             "id": row["id"],
             "title": row["title"],
@@ -313,16 +320,16 @@ class QuestEngine:
             "subsystem": row["subsystem"],
             "success_criteria": json.loads(row["success_criteria"] or "[]"),
             "reward": row["reward"],
-            "owner": row.get("owner"),
+            "owner": _safe_get("owner"),
             "status": row["status"],
             "depends_on": json.loads(row["depends_on"] or "[]"),
-            "denial_reason": row.get("denial_reason"),
-            "denial_fix": row.get("denial_fix"),
-            "block_reason": row.get("block_reason"),
-            "verification_runs": row.get("verification_runs"),
-            "created_at": row.get("created_at"),
-            "assigned_at": row.get("assigned_at"),
-            "completed_at": row.get("completed_at"),
+            "denial_reason": _safe_get("denial_reason"),
+            "denial_fix": _safe_get("denial_fix"),
+            "block_reason": _safe_get("block_reason"),
+            "verification_runs": _safe_get("verification_runs"),
+            "created_at": _safe_get("created_at"),
+            "assigned_at": _safe_get("assigned_at"),
+            "completed_at": _safe_get("completed_at"),
         }
 
 
