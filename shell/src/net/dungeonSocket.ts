@@ -121,11 +121,18 @@ function handleEvent(type: string, payload: any): void {
     }
 
     case 'message': {
-      if (payload.text) {
+      if (payload.text && !payload.text.includes('ping') && !payload.text.includes('PING') && payload.text !== '{"type":"ping"}') {
         store.pushLog({ agent: 'System', text: payload.text.slice(0, 200) });
       }
       break;
     }
+    // Ignore ping/pong/heartbeat debug
+    case 'ping':
+    case 'pong':
+    case 'subscribed':
+    case 'unsubscribed':
+    case 'replayed':
+      break;
   }
 }
 
