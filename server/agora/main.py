@@ -5,7 +5,7 @@ import json
 import random
 import uuid
 from contextlib import asynccontextmanager
-from datetime import datetime
+from datetime import datetime, timezone
 
 from fastapi import FastAPI, WebSocket, WebSocketDisconnect, Request
 from fastapi.middleware.cors import CORSMiddleware
@@ -14,6 +14,7 @@ import aiosqlite
 from agora.config import settings
 from agora.coordination.ess_protocol import TrustEngine
 from agora.coordination.tft_verifier import TFTVerifier
+from agora.coordination.event_bus import EventBus
 from agora.coordination.economy_config import get_role_config, ROLE_ECONOMY
 from agora.coordination.stigmergy import StigmergyPool
 from agora.coordination.economy import EconomyEngine
@@ -116,6 +117,9 @@ async def init_db(app: FastAPI):
     app.state.agent_lifecycle = AgentLifecycle(db)
     app.state.csd_monitor = CSDMonitor(window_size=200, z_threshold_warning=2.0, z_threshold_critical=3.5)
     app.state.epoch_engine = EpochEngine(db)
+    # EventBus — topic-based pub/sub
+    app.state.event_bus = EventBus(app)
+    await app.state.event_bus.start()
     app.state.active_connections = []
     app.state.tick_count = 0
 
@@ -181,14 +185,62 @@ app.include_router(evaluation_api.router)
 app.include_router(god_console_v2.router)
 
 
+# ── Event topic mapping ───────────────────────────────────────
+
+_EVENT_TOPIC_MAP = {
+    "agent_thought": "system",
+    "resource_drop": "economy",
+    "heartbeat": "system",
+    "byzantine_violation": "byzantine",
+    "csd_alert": "csd",
+    "stigmergy_insight": "stigmergy",
+    "death": "system",
+    "respawn": "system",
+    "trade": "economy",
+    "epoch_update": "epoch",
+    "violation": "byzantine",
+}
+
+
+def _topics_for_event(event_type: str, payload: dict) -> list[str]:
+    """Derive topic(s) from event type and payload.
+
+    Returns a list of topics this event should be published to.
+    """
+    base = _EVENT_TOPIC_MAP.get(event_type, "system")
+    topics = [base]
+    # Agent-specific topic if payload has agent_id
+    if isinstance(payload, dict):
+        aid = payload.get("agent_id") or payload.get("npc_id")
+        if aid:
+            topics.append(f"agent:{aid}")
+        # Room-specific topic
+        room = payload.get("room") or payload.get("room_name")
+        if room:
+            topics.append(f"room:{room}")
+    return topics
+
+
 async def broadcast(app: FastAPI, event_type: str, payload: dict):
-    event = {"type": event_type, "payload": payload,
-             "timestamp": datetime.utcnow().isoformat()}
-    for ws in app.state.active_connections:
-        try:
-            await ws.send_json(event)
-        except Exception:
-            pass
+    """Publish event via EventBus (topic-based routing + Redis pub/sub).
+
+    Falls back to legacy direct WebSocket broadcast if EventBus is not
+    initialised (backward compat).
+    """
+    event_bus = getattr(app.state, "event_bus", None)
+    if event_bus:
+        topics = _topics_for_event(event_type, payload)
+        for topic in topics:
+            await event_bus.publish(topic, event_type, payload)
+    else:
+        # Legacy fallback
+        event = {"type": event_type, "payload": payload,
+                 "timestamp": datetime.now(timezone.utc).isoformat()}
+        for ws in app.state.active_connections:
+            try:
+                await ws.send_json(event)
+            except Exception:
+                pass
 
 
 async def _process_agent_thought(
@@ -310,13 +362,62 @@ async def health(request: Request):
 @app.websocket("/ws")
 async def ws_endpoint(websocket: WebSocket):
     await websocket.accept()
-    websocket.app.state.active_connections.append(websocket)
+    event_bus = getattr(websocket.app.state, "event_bus", None)
+    if event_bus:
+        # Default: subscribe to 'all' topic (receives everything)
+        await event_bus.subscribe(websocket, ["all"])
+    else:
+        # Legacy mode
+        websocket.app.state.active_connections.append(websocket)
+
     try:
         while True:
             data = await websocket.receive_text()
-            await broadcast(websocket.app, "message", {"text": data})
+            try:
+                msg = json.loads(data)
+            except json.JSONDecodeError:
+                continue
+
+            msg_type = msg.get("type", "")
+            if msg_type == "subscribe" and event_bus:
+                topics = msg.get("topics", [])
+                await event_bus.subscribe(websocket, topics)
+                # Send confirmation + replay
+                replay_count = await event_bus.replay(websocket, topics, limit=20)
+                await websocket.send_json({
+                    "type": "subscribed",
+                    "topics": topics,
+                    "replayed": replay_count,
+                })
+            elif msg_type == "unsubscribe" and event_bus:
+                topics = msg.get("topics", [])
+                await event_bus.unsubscribe(websocket, topics)
+                await websocket.send_json({
+                    "type": "unsubscribed",
+                    "topics": topics,
+                })
+            elif msg_type == "replay" and event_bus:
+                topics = msg.get("topics", ["all"])
+                limit = msg.get("limit", 20)
+                count = await event_bus.replay(websocket, topics, limit=limit)
+                await websocket.send_json({
+                    "type": "replayed",
+                    "topics": topics,
+                    "count": count,
+                })
+            elif msg_type == "list" and event_bus:
+                # Keep the old broadcast for generic text messages
+                await broadcast(websocket.app, "message", {"text": data})
+            else:
+                await broadcast(websocket.app, "message", {"text": data})
     except WebSocketDisconnect:
-        websocket.app.state.active_connections.remove(websocket)
+        if event_bus:
+            await event_bus._remove_websocket(websocket)
+        else:
+            try:
+                websocket.app.state.active_connections.remove(websocket)
+            except ValueError:
+                pass
 
 
 async def _economy_tick(app: FastAPI):

@@ -329,3 +329,27 @@ async def get_system_health(request: Request, db=Depends(get_db)):
         info["redis_connected"] = False
 
     return info
+
+
+# ═══════════════════════════════════════════════
+# EVENT BUS
+# ═══════════════════════════════════════════════
+
+
+@router.get("/events/stats")
+async def get_event_bus_stats(request: Request):
+    """Get EventBus stats: subscribers, topics, recent event counts."""
+    event_bus = getattr(request.app.state, "event_bus", None)
+    if not event_bus:
+        return {"error": "EventBus not initialized"}
+    return event_bus.stats()
+
+
+@router.get("/events/recent/{topic}")
+async def get_recent_events(request: Request, topic: str, limit: int = 20):
+    """Get recent events for a specific topic."""
+    event_bus = getattr(request.app.state, "event_bus", None)
+    if not event_bus:
+        return {"error": "EventBus not initialized"}
+    events = event_bus.get_recent(topic, limit=limit)
+    return {"topic": topic, "count": len(events), "events": events}

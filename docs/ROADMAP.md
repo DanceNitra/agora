@@ -29,7 +29,7 @@ Tento roadmap definuje upgrade Agory z **0.1.0 (dungeon playground)** na **1.0.0
 ### Layer 5 — Interface ✅
 - God Console 2.0 (5 tabov: Agent Mgmt, Byzantine, Agent OS, Controller, Health)
 - REST API (FastAPI, ~30 endpointov)
-- WebSocket (event stream)
+- **WebSocket v2 ✅** (topic-based subscribe/unsubscribe/replay cez EventBus)
 - Dashboard (trust, energy, economy, system health)
 - Game (Phaser 3 dungeon, minimapa, HUD)
 
@@ -38,6 +38,7 @@ Tento roadmap definuje upgrade Agory z **0.1.0 (dungeon playground)** na **1.0.0
 - Epoch engine (lifecycle/batches)
 - Task executor (task pipeline)
 - Economy engine (resources, trade offers, auto-trade)
+- **EventBus ✅** (topic-based Redis pub/sub, in-process fallback, event replay)
 
 ### Layer 3 — Agent Logic ✅
 - Agent OS (body, brain, soul, abilities, skills)
@@ -87,10 +88,10 @@ Aktuálne:    len geo NPC positions
 Cieľ:        cache + pub/sub + rate limiting + session store
 ```
 
-- [ ] Redis pub/sub pre notifikácie namiesto broadcast v main.py
+- [x] Redis pub/sub pre notifikácie namiesto broadcast v main.py
 - [ ] Cache layer pre časté DB dopyty (agent list, trust scores)
 - [ ] Rate limiting pre API endpointy
-- [ ] Session store pre WebSocket spojenia
+- [x] Session store pre WebSocket spojenia
 
 ### 1.3 S3/MinIO Artifact Storage
 
@@ -251,13 +252,13 @@ Cieľ:        LLM-driven decisions + memory consolidation
 
 ```yaml
 Aktuálne:    jeden /ws endpoint, broadcast všetkým
-Cieľ:        topic-based pub/sub cez Redis
+Aktuálne:    topic-based pub/sub cez EventBus (Redis + in-process)
 ```
 
-- [ ] Redis pub/sub channels per topic
-- [ ] Topicy: `agent:{id}`, `room:{name}`, `system`, `epoch`
-- [ ] Subscribe/unsubscribe per WebSocket spojenie
-- [ ] Event replay (pripoj sa → dostaneš posledných N eventov)
+- [x] Redis pub/sub channels per topic
+- [x] Topicy: `agent:{id}`, `room:{name}`, `system`, `epoch`
+- [x] Subscribe/unsubscribe per WebSocket spojenie
+- [x] Event replay (pripoj sa → dostaneš posledných N eventov)
 - [ ] Event persistence v PostgreSQL
 
 ### 4.3 God Console v3 — Real-Time
