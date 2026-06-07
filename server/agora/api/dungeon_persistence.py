@@ -43,15 +43,35 @@ async def save_npc(body: NPCSave, request: Request):
     inventory_json = json.dumps(body.inventory)
     now = datetime.utcnow().isoformat()
     
+    # Canonical UUID mapping for dungeon NPCs
+    CANONICAL_UUIDS = {
+        "Kael":     "00000000-0000-0000-0000-000000000001",
+        "Lyra":     "00000000-0000-0000-0000-000000000002",
+        "Mordecai": "00000000-0000-0000-0000-000000000003",
+        "Grom":     "00000000-0000-0000-0000-000000000004",
+        "Zara":     "00000000-0000-0000-0000-000000000005",
+        "Finn":     "00000000-0000-0000-0000-000000000006",
+        "Guard":    "00000000-0000-0000-0000-000000000007",
+    }
+
+    # Check if this NPC name already exists — preserve its original npc_id
+    cursor = await db.execute(
+        "SELECT npc_id FROM dungeon_npcs WHERE npc_name=?", (body.npc_name,)
+    )
+    existing = await cursor.fetchone()
+    # Force canonical UUID for known dungeon NPCs
+    canonical = CANONICAL_UUIDS.get(body.npc_name)
+    actual_npc_id = canonical or (existing["npc_id"] if existing else body.npc_id)
+
     await db.execute(
         """INSERT INTO dungeon_npcs (npc_id, npc_name, role, pos_x, pos_y, health, inventory, status, objective, updated_at)
            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-           ON CONFLICT(npc_id) DO UPDATE SET
-               pos_x=excluded.pos_x, pos_y=excluded.pos_y,
+           ON CONFLICT(npc_name) DO UPDATE SET
+               npc_id=excluded.npc_id, pos_x=excluded.pos_x, pos_y=excluded.pos_y,
                health=excluded.health, inventory=excluded.inventory,
                status=excluded.status, objective=excluded.objective,
                updated_at=excluded.updated_at""",
-        (body.npc_id, body.npc_name, body.role, body.pos_x, body.pos_y,
+        (actual_npc_id, body.npc_name, body.role, body.pos_x, body.pos_y,
          body.health, inventory_json, body.status, body.objective, now),
     )
     await db.commit()

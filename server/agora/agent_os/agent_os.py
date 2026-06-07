@@ -185,8 +185,9 @@ HELP_MATRIX = {
 class AgentOS:
     """Operating System for dungeon NPCs — duša, mozog, telo, zručnosti a help-seeking."""
 
-    def __init__(self, db):
+    def __init__(self, db, state_store=None):
         self.db = db
+        self.state_store = state_store
 
     async def ensure_os_initialized(self):
         """Seed OS data for all 7 NPCs if not already present."""
@@ -241,6 +242,34 @@ class AgentOS:
         await self.db.commit()
         print(f"[AgentOS] Seeded {len(NPC_DEFS)} NPCs (soul, brain, body, abilities, skills)")
 
+    async def cluster_tick(self, npc_ids: list[str], broadcast_fn=None):
+        """Run Agent OS tick for a specific set of NPCs (room cluster)."""
+        if not npc_ids:
+            return
+
+        placeholders = ",".join("?" * len(npc_ids))
+        cursor = await self.db.execute(
+            f"SELECT d.npc_id, d.npc_name, d.role, d.health, d.status "
+            f"FROM dungeon_npcs d WHERE d.status='active' AND d.npc_id IN ({placeholders})",
+            npc_ids,
+        )
+        npcs = await cursor.fetchall()
+
+        for npc in npcs:
+            npc_id = npc["npc_id"]
+            name = npc["npc_name"]
+
+            # 1. BODY update
+            await self._update_body(npc_id)
+
+            # 2. BRAIN — evaluate state
+            state_of_mind = await self._think(npc_id, name)
+
+            if state_of_mind in ("confused", "panicked"):
+                await self._seek_help_auto(npc_id, name, broadcast_fn)
+
+        await self.db.commit()
+
     async def tick(self, broadcast_fn=None):
         """Run one tick of the Agent OS for all active NPCs."""
         cursor = await self.db.execute(
@@ -263,90 +292,130 @@ class AgentOS:
                 # Agent doesn't know what to do → seek help
                 await self._seek_help_auto(npc_id, name, broadcast_fn)
 
-        # Process pending help requests
-        await self._process_help_requests(broadcast_fn)
-
         await self.db.commit()
 
     async def _update_body(self, npc_id: str):
         """Update body stats: stamina decreases, hunger/fatigue increase."""
-        cursor = await self.db.execute(
-            "SELECT stamina, hunger, fatigue FROM agent_body WHERE npc_id=?",
-            (npc_id,),
-        )
-        row = await cursor.fetchone()
-        if not row:
-            return
-
-        # Passive changes per tick
-        new_stamina = min(100.0, max(0.0, row["stamina"] - random.uniform(0.5, 2.0)))
-        new_hunger = min(100.0, row["hunger"] + random.uniform(0.2, 0.8))
-        new_fatigue = min(100.0, row["fatigue"] + random.uniform(0.3, 1.0))
-
-        await self.db.execute(
-            "UPDATE agent_body SET stamina=?, hunger=?, fatigue=?, updated_at=datetime('now') WHERE npc_id=?",
-            (new_stamina, new_hunger, new_fatigue, npc_id),
-        )
-
-        # If starving or exhausted → impact health
-        health_cursor = await self.db.execute(
-            "SELECT health FROM dungeon_npcs WHERE npc_id=?", (npc_id,)
-        )
-        health_row = await health_cursor.fetchone()
-        if health_row:
-            new_health = health_row["health"]
-            if new_hunger > 80:
-                new_health = max(0, new_health - 0.5)
-            if new_fatigue > 80:
-                new_health = max(0, new_health - 0.3)
-            if new_stamina < 10:
-                new_health = max(0, new_health - 0.2)
-
-            await self.db.execute(
-                "UPDATE dungeon_npcs SET health=? WHERE npc_id=?", (new_health, npc_id)
+        if self.state_store:
+            body = await self.state_store.get_body(npc_id)
+            if not body:
+                return
+            new_stamina = min(100.0, max(0.0, body["stamina"] - random.uniform(0.5, 2.0)))
+            new_hunger = min(100.0, body["hunger"] + random.uniform(0.2, 0.8))
+            new_fatigue = min(100.0, body["fatigue"] + random.uniform(0.3, 1.0))
+            await self.state_store.update_body(npc_id, {
+                "stamina": new_stamina, "hunger": new_hunger, "fatigue": new_fatigue,
+            })
+            npc = await self.state_store.get_npc(npc_id)
+            if npc:
+                new_health = npc["health"]
+                if new_hunger > 80: new_health = max(0, new_health - 0.5)
+                if new_fatigue > 80: new_health = max(0, new_health - 0.3)
+                if new_stamina < 10: new_health = max(0, new_health - 0.2)
+                if new_health != npc["health"]:
+                    await self.state_store.update_npc(npc_id, {"health": new_health})
+        else:
+            # Fallback: direct DB (pre-state-store compatibility)
+            cursor = await self.db.execute(
+                "SELECT stamina, hunger, fatigue FROM agent_body WHERE npc_id=?", (npc_id,)
             )
+            row = await cursor.fetchone()
+            if not row:
+                return
+            new_stamina = min(100.0, max(0.0, row["stamina"] - random.uniform(0.5, 2.0)))
+            new_hunger = min(100.0, row["hunger"] + random.uniform(0.2, 0.8))
+            new_fatigue = min(100.0, row["fatigue"] + random.uniform(0.3, 1.0))
+            await self.db.execute(
+                "UPDATE agent_body SET stamina=?, hunger=?, fatigue=? WHERE npc_id=?",
+                (new_stamina, new_hunger, new_fatigue, npc_id),
+            )
+            health_cursor = await self.db.execute(
+                "SELECT health FROM dungeon_npcs WHERE npc_id=?", (npc_id,)
+            )
+            health_row = await health_cursor.fetchone()
+            if health_row:
+                new_health = health_row["health"]
+                if new_hunger > 80: new_health = max(0, new_health - 0.5)
+                if new_fatigue > 80: new_health = max(0, new_health - 0.3)
+                if new_stamina < 10: new_health = max(0, new_health - 0.2)
+                await self.db.execute(
+                    "UPDATE dungeon_npcs SET health=? WHERE npc_id=?", (new_health, npc_id)
+                )
 
     async def _think(self, npc_id: str, name: str) -> str:
         """Evaluate state and decide state_of_mind."""
-        cursor = await self.db.execute(
-            "SELECT b.current_goal, b.plan_stack, b.state_of_mind, "
-            "d.health, bd.stamina, bd.fatigue "
-            "FROM agent_brain b "
-            "JOIN dungeon_npcs d ON d.npc_id = b.npc_id "
-            "JOIN agent_body bd ON bd.npc_id = b.npc_id "
-            "WHERE b.npc_id=?",
-            (npc_id,),
-        )
-        row = await cursor.fetchone()
-        if not row:
-            return "confused"
+        if self.state_store:
+            brain = await self.state_store.get_brain(npc_id)
+            npc = await self.state_store.get_npc(npc_id)
+            body = await self.state_store.get_body(npc_id)
+            if not brain or not npc:
+                return "confused"
 
-        health = row["health"]
-        stamina = row["stamina"]
-        fatigue = row["fatigue"]
+            health = npc["health"]
+            stamina = body["stamina"] if body else 100
+            fatigue = body["fatigue"] if body else 0
 
-        # Determine state based on body stats
-        if health < 20:
-            new_state = "panicked"
-        elif fatigue > 70 or stamina < 20:
-            new_state = "resting"
-        elif health < 50:
-            new_state = "confused"
-        else:
-            # Has a goal and energy → focused
-            plan_stack = json.loads(row["plan_stack"] or "[]")
-            if not plan_stack and row["current_goal"]:
-                # Need to create a plan
-                new_state = "planning"
+            if health < 20:
+                new_state = "panicked"
+            elif fatigue > 70 or stamina < 20:
+                new_state = "resting"
+            elif health < 50:
+                new_state = "confused"
             else:
-                new_state = "focused"
+                plan_stack = json.loads(brain.get("plan_stack", "[]"))
+                if not plan_stack and brain.get("current_goal"):
+                    new_state = "planning"
+                else:
+                    new_state = "focused"
 
-        await self.db.execute(
-            "UPDATE agent_brain SET state_of_mind=?, updated_at=datetime('now') WHERE npc_id=?",
-            (new_state, npc_id),
-        )
+            await self.state_store.update_brain(npc_id, {"state_of_mind": new_state})
+            return new_state
+        else:
+            # Legacy path
+            cursor = await self.db.execute(
+                "SELECT b.current_goal, b.plan_stack, b.state_of_mind, "
+                "d.health, bd.stamina, bd.fatigue "
+                "FROM agent_brain b "
+                "JOIN dungeon_npcs d ON d.npc_id = b.npc_id "
+                "JOIN agent_body bd ON bd.npc_id = b.npc_id "
+                "WHERE b.npc_id=?",
+                (npc_id,),
+            )
+            row = await cursor.fetchone()
+            if not row:
+                return "confused"
+
+            health = row["health"]
+            stamina = row["stamina"]
+            fatigue = row["fatigue"]
+
+            if health < 20:
+                new_state = "panicked"
+            elif fatigue > 70 or stamina < 20:
+                new_state = "resting"
+            elif health < 50:
+                new_state = "confused"
+            else:
+                plan_stack = json.loads(row["plan_stack"] or "[]")
+                if not plan_stack and row["current_goal"]:
+                    new_state = "planning"
+                else:
+                    new_state = "focused"
+
+            await self.db.execute(
+                "UPDATE agent_brain SET state_of_mind=?, updated_at=datetime('now') WHERE npc_id=?",
+                (new_state, npc_id),
+            )
 
         return new_state
+
+    async def _npc_id_by_name(self, name: str) -> str | None:
+        """Lookup NPC UUID by name from DB (dynamic, not hardcoded)."""
+        cursor = await self.db.execute(
+            "SELECT npc_id FROM dungeon_npcs WHERE npc_name=?", (name,)
+        )
+        row = await cursor.fetchone()
+        return row["npc_id"] if row else NPC_UUIDS.get(name)
 
     async def _seek_help_auto(self, npc_id: str, name: str, broadcast_fn=None):
         """Automatically find the best agent to help with current problem."""
@@ -366,15 +435,38 @@ class AgentOS:
         if not helper:
             return
 
-        helper_id = NPC_UUIDS[helper["name"]]
+        # Use dynamic lookup instead of hardcoded NPC_UUIDS
+        helper_id = await self._npc_id_by_name(helper["name"])
+        if not helper_id:
+            return
+
+        # Check if there's already a pending request from this NPC
+        if self.state_store:
+            existing = await self.state_store.get_pending_request_for_npc(npc_id)
+            if existing:
+                return
+        else:
+            cursor_check = await self.db.execute(
+                "SELECT COUNT(*) as c FROM agent_help_requests "
+                "WHERE requester_id=? AND status IN ('pending', 'in_progress')",
+                (npc_id,),
+            )
+            existing = await cursor_check.fetchone()
+            if existing and existing["c"] > 0:
+                return
 
         # Create help request
         description = f"{name} needs help with '{goal}' — classified as {problem_type} problem"
-        await self.db.execute(
-            "INSERT INTO agent_help_requests (requester_id, helper_id, problem_type, description, status, requester_task) "
-            "VALUES (?, ?, ?, ?, 'pending', ?)",
-            (npc_id, helper_id, problem_type, description, goal),
-        )
+        if self.state_store:
+            await self.state_store.create_help_request(
+                npc_id, helper_id, problem_type, description, goal,
+            )
+        else:
+            await self.db.execute(
+                "INSERT INTO agent_help_requests (requester_id, helper_id, problem_type, description, status, requester_task) "
+                "VALUES (?, ?, ?, ?, 'pending', ?)",
+                (npc_id, helper_id, problem_type, description, goal),
+            )
 
         msg = f"[AgentOS] {name} (confused) → seeking {helper['name']} for {problem_type}"
         print(msg)
@@ -426,7 +518,8 @@ class AgentOS:
             return None
 
         for helper_name, skill_check, _ in helpers:
-            helper_id = NPC_UUIDS.get(helper_name)
+            # Use dynamic lookup
+            helper_id = await self._npc_id_by_name(helper_name)
             if not helper_id or helper_id == requester_id:
                 continue
 
@@ -447,13 +540,13 @@ class AgentOS:
             if skill_row and skill_row["level"] >= 5:
                 return {"name": helper_name, "skill": skill_check, "level": skill_row["level"]}
 
-        # Fallback: return first available active helper
+        # Fallback: return first available active helper (name-based)
         for helper_name, _, desc in helpers:
-            helper_id = NPC_UUIDS.get(helper_name)
-            if helper_id and helper_id != requester_id:
+            h_id = await self._npc_id_by_name(helper_name)
+            if h_id and h_id != requester_id:
                 cursor = await self.db.execute(
                     "SELECT 1 FROM dungeon_npcs WHERE npc_id=? AND status='active'",
-                    (helper_id,),
+                    (h_id,),
                 )
                 if await cursor.fetchone():
                     return {"name": helper_name, "skill": "any", "level": 1}
@@ -522,30 +615,117 @@ class AgentOS:
 
     async def _gain_skill_xp(self, npc_id: str, skill_name: str, xp_amount: float):
         """Add XP to a skill, level up if threshold reached."""
-        cursor = await self.db.execute(
-            "SELECT level, xp, xp_to_next FROM agent_skills WHERE npc_id=? AND skill_name=?",
-            (npc_id, skill_name),
-        )
-        row = await cursor.fetchone()
-        if not row:
+        if self.state_store:
+            skills = await self.state_store.get_all_skills(npc_id)
+            skill = next((s for s in skills if s["skill_name"] == skill_name), None)
+            if not skill:
+                return
+            new_xp = skill["xp"] + xp_amount
+            level = skill["level"]
+            xp_to_next = skill["xp_to_next"]
+
+            while new_xp >= xp_to_next and level < 100:
+                new_xp -= xp_to_next
+                level += 1
+                xp_to_next = 50 + level * 25
+
+            await self.state_store.update_skill(skill["id"], {
+                "level": level, "xp": new_xp, "xp_to_next": xp_to_next,
+            })
+
+            if level > skill["level"]:
+                print(f"[AgentOS] {npc_id[:8]}.. {skill_name} ↑ level {skill['level']} → {level}")
+        else:
+            cursor = await self.db.execute(
+                "SELECT level, xp, xp_to_next FROM agent_skills WHERE npc_id=? AND skill_name=?",
+                (npc_id, skill_name),
+            )
+            row = await cursor.fetchone()
+            if not row:
+                return
+
+            new_xp = row["xp"] + xp_amount
+            level = row["level"]
+            xp_to_next = row["xp_to_next"]
+
+            while new_xp >= xp_to_next and level < 100:
+                new_xp -= xp_to_next
+                level += 1
+                xp_to_next = 50 + level * 25
+
+            await self.db.execute(
+                "UPDATE agent_skills SET level=?, xp=?, xp_to_next=?, last_used_at=datetime('now') WHERE npc_id=? AND skill_name=?",
+                (level, new_xp, xp_to_next, npc_id, skill_name),
+            )
+
+            if level > row["level"]:
+                print(f"[AgentOS] {npc_id[:8]}.. {skill_name} ↑ level {row['level']} → {level}")
+
+    async def complete_help(self, req_id: int, helper_name: str, problem_type: str, broadcast_fn=None):
+        """Called by PhysicalWorld when helper and requester are physically together."""
+        if self.state_store:
+            # Read pending requests from state_store
+            all_pending = await self.state_store.get_pending_help_requests()
+            req = next((r for r in all_pending if r["id"] == req_id), None)
+        else:
+            cursor = await self.db.execute(
+                "SELECT hr.*, r.npc_name as requester_name, h.npc_name as helper_name "
+                "FROM agent_help_requests hr "
+                "JOIN dungeon_npcs r ON r.npc_id = hr.requester_id "
+                "JOIN dungeon_npcs h ON h.npc_id = hr.helper_id "
+                "WHERE hr.id=?",
+                (req_id,),
+            )
+            req = await cursor.fetchone()
+
+        if not req or req["status"] in ("completed", "resolved"):
             return
 
-        new_xp = row["xp"] + xp_amount
-        level = row["level"]
-        xp_to_next = row["xp_to_next"]
+        requester_id = req["requester_id"]
+        helper_id = req["helper_id"]
+        requester_name = req["requester_name"]
 
-        while new_xp >= xp_to_next and level < 100:
-            new_xp -= xp_to_next
-            level += 1
-            xp_to_next = 50 + level * 25  # harder each level
+        # Grant XP to helper for the skill used
+        helpers_for_problem = HELP_MATRIX.get(problem_type, [])
+        for hname, skill, _ in helpers_for_problem:
+            if hname == helper_name:
+                await self._gain_skill_xp(helper_id, skill, 10.0)
+                break
 
+        # Mark completed
+        if self.state_store:
+            await self.state_store.update_help_request(req_id, {"status": "completed", "resolved_at": datetime.utcnow().isoformat()})
+        else:
+            await self.db.execute(
+                "UPDATE agent_help_requests SET status='completed', resolved_at=datetime('now') WHERE id=?",
+                (req_id,),
+            )
+
+        # Create artifact recording the interaction
+        artifact_content = (
+            f"[Physical Interaction] {requester_name} walked to {helper_name} for help with {problem_type}. "
+            f"{helper_name} used their skill to assist. Interaction completed at {datetime.utcnow().isoformat()}."
+        )
         await self.db.execute(
-            "UPDATE agent_skills SET level=?, xp=?, xp_to_next=?, last_used_at=datetime('now') WHERE npc_id=? AND skill_name=?",
-            (level, new_xp, xp_to_next, npc_id, skill_name),
+            "INSERT INTO artifacts (agent_id, title, artifact_type, storage_path, content) "
+            "VALUES (?, ?, ?, ?, ?)",
+            (helper_id, f"Help: {requester_name} → {helper_name} ({problem_type})",
+             "interaction", f"help/{requester_id[:8]}-{req_id}", artifact_content),
         )
 
-        if level > row["level"]:
-            print(f"[AgentOS] {npc_id[:8]}.. {skill_name} ↑ level {row['level']} → {level}")
+        if not self.state_store:
+            await self.db.commit()
+
+        msg = f"[PhysicalWorld] {requester_name} physically reached {helper_name} → help completed ({problem_type})"
+        print(msg)
+
+        if broadcast_fn:
+            await broadcast_fn("agent_help_completed", {
+                "requester": requester_name,
+                "helper": helper_name,
+                "problem": problem_type,
+                "description": artifact_content[:100],
+            })
 
     async def get_full_status(self, npc_id: str) -> dict | None:
         """Get complete OS status for an NPC."""

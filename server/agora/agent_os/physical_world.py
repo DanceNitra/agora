@@ -50,6 +50,16 @@ class PhysicalWorld:
         self._pending_moves: dict[str, list[tuple[float, float]]] = {}  # npc_id -> path
         self._active_requests: dict[int, dict] = {}  # help_request_id -> state
 
+    async def _npc_id_by_name(self, name: str) -> str | None:
+        """Lookup NPC UUID by name from DB."""
+        cursor = await self.db.execute(
+            "SELECT npc_id FROM dungeon_npcs WHERE npc_name=?", (name,)
+        )
+        row = await cursor.fetchone()
+        if row:
+            return row["npc_id"]
+        return NPC_IDS.get(name)
+
     async def load_positions(self) -> dict[str, dict]:
         """Load current NPC positions from DB."""
         cursor = await self.db.execute(
@@ -199,11 +209,12 @@ class PhysicalWorld:
             ]
             answer = random.choice(responses)
 
-        # Record the query
+        # Record the query — use dynamic NPC ID lookup
+        npc_id = await self._npc_id_by_name(npc_name) or "system"
         await self.db.execute(
             "INSERT INTO artifacts (agent_id, title, artifact_type, storage_path, content) "
             "VALUES (?, ?, ?, ?, ?)",
-            (NPC_IDS.get(npc_name, "system"), f"Library Query: {question[:50]}",
+            (npc_id, f"Library Query: {question[:50]}",
              "knowledge", f"library/query-{datetime.utcnow().isoformat()}", answer),
         )
         await self.db.commit()
@@ -217,11 +228,15 @@ class PhysicalWorld:
 
         return answer
 
-    async def physical_help_tick(self, broadcast_fn=None):
-        """One tick of physical help-seeking and movement."""
+    async def physical_help_tick(self, broadcast_fn=None, complete_help_fn=None):
+        """One tick of physical help-seeking and movement.
+
+        - pending: requester walks toward helper's room
+        - When same room + interact range → call complete_help_fn()
+        """
         npcs = await self.load_positions()
 
-        # Find pending help requests that need physical movement
+        # Find pending/in_progress help requests that need physical movement
         cursor = await self.db.execute(
             "SELECT hr.*, r.npc_name as requester_name, h.npc_name as helper_name, "
             "r.pos_x as rx, r.pos_y as ry, h.pos_x as hx, h.pos_y as hy "
@@ -238,8 +253,8 @@ class PhysicalWorld:
             helper_id = req["helper_id"]
             requester_name = req["requester_name"]
             helper_name = req["helper_name"]
+            problem_type = req["problem_type"]
 
-            # Get current positions
             r_pos = npcs.get(requester_id)
             h_pos = npcs.get(helper_id)
             if not r_pos or not h_pos:
@@ -248,33 +263,27 @@ class PhysicalWorld:
             rx, ry = r_pos["x"], r_pos["y"]
             hx, hy = h_pos["x"], h_pos["y"]
 
-            if req["status"] == "pending":
-                # Requester needs to move toward helper (or vice versa)
+            if self.is_in_same_room(rx, ry, hx, hy) and self.can_interact(rx, ry, hx, hy):
+                # ✅ Physical proximity achieved — complete the help!
+                if complete_help_fn:
+                    await complete_help_fn(req_id, helper_name, problem_type, broadcast_fn)
+                if broadcast_fn:
+                    await broadcast_fn("agent_interaction", {
+                        "npc1": requester_name,
+                        "npc2": helper_name,
+                        "action": f"{requester_name} reached {helper_name} for {problem_type}",
+                    })
+            else:
+                # Not yet in same room → keep moving requester toward helper
                 if not self.is_in_same_room(rx, ry, hx, hy):
-                    # Plan movement — requester moves to helper's room
                     await self.move_to_npc(requester_id, helper_id)
-                    message = f"{requester_name} is traveling to {helper_name} for help"
-                    if broadcast_fn:
+                    if broadcast_fn and not self._pending_moves.get(requester_id):
                         await broadcast_fn("npc_movement", {
                             "npc": requester_name,
                             "target": helper_name,
-                            "reason": req["problem_type"],
+                            "reason": problem_type,
                             "from_room": get_room_at(rx, ry),
                         })
-                else:
-                    # Same room → interaction possible
-                    if self.can_interact(rx, ry, hx, hy):
-                        # Close enough! Mark as in_progress
-                        await self.db.execute(
-                            "UPDATE agent_help_requests SET status='in_progress', accepted_at=datetime('now') WHERE id=?",
-                            (req_id,),
-                        )
-                        if broadcast_fn:
-                            await broadcast_fn("agent_interaction", {
-                                "npc1": requester_name,
-                                "npc2": helper_name,
-                                "action": f"{requester_name} reached {helper_name} for {req['problem_type']}",
-                            })
 
         # Move all NPCs that are traveling
         for npc_id in list(self._pending_moves.keys()):

@@ -100,12 +100,28 @@ class EpochEngine:
         cursor = await db.execute("SELECT COUNT(*) as c FROM artifacts")
         artifact_count = (await cursor.fetchone())["c"]
 
-        summary = json.dumps({
-            "active_agents": active_count,
-            "tasks_completed": tasks_done,
-            "artifacts_created": artifact_count,
-            "phase": "reset",
-        })
+        # Epoch evaluation (V harness)
+        evaluator = getattr(app.state, 'epoch_evaluator', None)
+        if evaluator:
+            try:
+                epoch_report = await evaluator.finalize_epoch(self._current_epoch)
+                summary = json.dumps(epoch_report)
+            except Exception as e:
+                print(f"[Epoch] Evaluation error: {e}")
+                summary = json.dumps({
+                    "active_agents": active_count,
+                    "tasks_completed": tasks_done,
+                    "artifacts_created": artifact_count,
+                    "phase": "reset",
+                })
+        else:
+            summary = json.dumps({
+                "active_agents": active_count,
+                "tasks_completed": tasks_done,
+                "artifacts_created": artifact_count,
+                "phase": "reset",
+            })
+
         await db.execute(
             "UPDATE epochs SET status='completed', ended_at=datetime('now'), summary=? "
             "WHERE epoch_number=? AND status='active'",

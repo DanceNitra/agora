@@ -18,6 +18,13 @@ from agora.coordination.stigmergy import StigmergyPool
 from agora.coordination.economy import EconomyEngine
 from agora.agent_os.agent_os import AgentOS
 from agora.agent_os.physical_world import PhysicalWorld
+from agora.harness.state_store import StateStore
+from agora.harness.lifecycle_hooks import LifecycleHooks
+from agora.harness.tool_registry import ToolRegistry
+from agora.harness.execution_loop import ExecutionEngine
+from agora.harness.context_manager import ContextManager
+from agora.harness.evaluation import EpochEvaluator
+from agora.scheduler.room_cluster import RoomClusterScheduler
 from agora.execution.task_executor import TaskExecutor
 from agora.lifecycle.agent_lifecycle import AgentLifecycle
 from agora.lifecycle.epoch_engine import EpochEngine
@@ -27,6 +34,8 @@ from agora.api import dungeon_persistence as persistence_api
 from agora.api import artifacts as artifacts_api
 from agora.api import agent_os_api
 from agora.api import physical_api
+from agora.api import tool_registry_api as tool_registry_api
+from agora.api import evaluation_api
 
 
 async def init_db(app: FastAPI):
@@ -87,9 +96,24 @@ async def init_db(app: FastAPI):
         await db.commit()
         print(f"[Economy] Seeded inventories for {len(set(a[0] for a in seed_data))} agents")
     app.state.task_executor = TaskExecutor(db)
-    app.state.agent_os = AgentOS(db)
+    app.state.state_store = StateStore(db)
+    app.state.lifecycle_hooks = LifecycleHooks(app.state.state_store, db)
+    app.state.tool_registry = ToolRegistry(app.state.state_store, db)
+    # LLM client setup (for execution loop think)
+    from agora.execution.llm_client import agent_think
+    app.state.execution_engine = ExecutionEngine(
+        app.state.state_store, app.state.tool_registry, db,
+        llm_client=lambda prompt: agent_think("system", prompt).get("insight", prompt[:200])
+        if settings.llm_enabled else None,
+    )
+    app.state.context_manager = ContextManager(app.state.state_store, db)
+    app.state.epoch_evaluator = EpochEvaluator(
+        app.state.state_store, db, app.state.lifecycle_hooks
+    )
+    app.state.agent_os = AgentOS(db, state_store=app.state.state_store)
     await app.state.agent_os.ensure_os_initialized()
     app.state.physical_world = PhysicalWorld(db, llm_enabled=settings.llm_enabled)
+    app.state.scheduler = RoomClusterScheduler(db)
     app.state.agent_lifecycle = AgentLifecycle(db)
     app.state.csd_monitor = CSDMonitor(window_size=200, z_threshold_warning=2.0, z_threshold_critical=3.5)
     app.state.epoch_engine = EpochEngine(db)
@@ -153,6 +177,8 @@ app.include_router(persistence_api.router)
 app.include_router(artifacts_api.router)
 app.include_router(agent_os_api.router)
 app.include_router(physical_api.router)
+app.include_router(tool_registry_api.router)
+app.include_router(evaluation_api.router)
 
 
 async def broadcast(app: FastAPI, event_type: str, payload: dict):
@@ -471,7 +497,7 @@ async def tick_loop(app: FastAPI):
             trust_engine = app.state.trust
             stigmergy = app.state.stigmergy
 
-            # ── 1. DEATH DETECTION (before replenish) ──
+            # ── 1. DEATH DETECTION (before replenish, global) ──
             try:
                 life_events = await app.state.agent_lifecycle.tick(app)
                 for ev in life_events:
@@ -486,33 +512,6 @@ async def tick_loop(app: FastAPI):
             )
             agents = await cursor.fetchall()
 
-            # ── 3. Energy: variable replenish + drain (hunger system) ──
-            for agent in agents:
-                aid = agent["agent_id"]
-                energy = agent["energy_balance"]
-                # Less replenish when energy is high, more when starving
-                if energy < 20:
-                    replenish = 4  # starving agents get a boost
-                elif energy < 50:
-                    replenish = 2  # moderate
-                else:
-                    replenish = 1  # well-fed agents get minimal
-                await db.execute(
-                    "UPDATE agent_identities SET energy_balance=MIN(energy_balance+?, 100.0) "
-                    "WHERE agent_id=?",
-                    (replenish, aid),
-                )
-            for agent in agents:
-                aid = agent["agent_id"]
-                energy = agent["energy_balance"]
-                # Passive drain scales with energy level (rich agents burn more)
-                drain = -2 if energy > 50 else -1
-                await db.execute(
-                    "UPDATE agent_identities SET energy_balance=MAX(energy_balance-?, 0) "
-                    "WHERE agent_id=? AND energy_balance > 0",
-                    (abs(drain), aid),
-                )
-
             if len(agents) < 2:
                 await broadcast(app, "heartbeat", {
                     "tick": app.state.tick_count, "agents": len(agents),
@@ -521,9 +520,73 @@ async def tick_loop(app: FastAPI):
                 await db.commit()
                 continue
 
-            # Only 1-2 agents think per tick (parallel LLM calls)
-            thinking_agents = random.sample(agents, min(2, len(agents)))
+            # ── 2.5. LIFECYCLE HOOKS — pre-tick byzantine validation ──
+            npc_ids = []
+            try:
+                hooks = app.state.lifecycle_hooks
+                all_active_npcs = await app.state.state_store.get_all_active_npcs()
+                npc_ids = [n["npc_id"] for n in all_active_npcs]
+                pre_violations = await hooks.pre_tick(npc_ids)
+                for v in pre_violations:
+                    await broadcast(app, "byzantine_violation", {
+                        "phase": "pre_tick",
+                        "type": v["type"],
+                        "detail": v["detail"],
+                    })
+            except Exception as e:
+                print(f"[LifecycleHooks] Pre-tick error: {e}")
 
+            # ── 3. ROOM CLUSTER SCHEDULER — per-room ticks ──
+            # Each room = independent cluster (OOOE: FREE state)
+            # NPCs in different rooms advance independently
+            try:
+                await app.state.scheduler.tick(
+                    app,
+                    broadcast_fn=lambda t, p: broadcast(app, t, p),
+                )
+            except Exception as e:
+                print(f"[Scheduler] Error: {e}")
+                import traceback
+                traceback.print_exc()
+
+            # ── 3.5. LIFECYCLE HOOKS — post-tick byzantine validation ──
+            try:
+                hooks = app.state.lifecycle_hooks
+                post_violations = await hooks.post_tick(npc_ids)
+                for v in post_violations:
+                    await broadcast(app, "byzantine_violation", {
+                        "phase": "post_tick",
+                        "type": v["type"],
+                        "severity": v.get("severity", "warning"),
+                        "detail": v["detail"],
+                    })
+
+                # Periodic deep checks (every 10 ticks)
+                if app.state.tick_count % 10 == 0:
+                    for nid in npc_ids:
+                        skill_v = await hooks.validate_skill_limits(nid)
+                        if skill_v:
+                            await broadcast(app, "byzantine_violation", {
+                                "phase": "deep_check",
+                                "type": skill_v["type"],
+                                "severity": skill_v.get("severity", "warning"),
+                                "detail": skill_v["detail"],
+                            })
+
+                    dup_violations = await hooks.detect_duplicate_help_requests()
+                    for v in dup_violations:
+                        await broadcast(app, "byzantine_violation", {
+                            "phase": "deep_check",
+                            "type": v["type"],
+                            "severity": v.get("severity", "warning"),
+                            "detail": v["detail"],
+                        })
+            except Exception as e:
+                print(f"[LifecycleHooks] Post-tick error: {e}")
+
+            # Only 1-2 agents think per tick (parallel LLM calls, global pool)
+            thinking_agents = random.sample(agents, min(2, len(agents)))
+            # ── 4. PROCESS THOUGHTS (global — LLM inferences batch) ──
             # Prepare contexts and parameters for all thinking agents
             thinking_params = []
             for agent in thinking_agents:
@@ -533,7 +596,7 @@ async def tick_loop(app: FastAPI):
                 agent_energy = agent["energy_balance"]
 
                 if agent_energy < 5:
-                    continue  # Too tired to think
+                    continue
 
                 partner = random.choice([a for a in agents if a["agent_id"] != agent_id])
                 partner_id = partner["agent_id"] if partner else None
@@ -560,7 +623,7 @@ async def tick_loop(app: FastAPI):
                         print(f"[Tick] LLM exception for {role}: {result}")
                         role_thoughts = SIMULATED_THOUGHTS.get(role, SIMULATED_THOUGHTS["researcher"])
                         thought = random.choice(role_thoughts)
-                    elif result.get("action") == "error" and not str(result.get("insight", "")).strip():  # type: ignore[union-attr]
+                    elif result.get("action") == "error" and not str(result.get("insight", "")).strip():
                         print(f"[Tick] LLM empty for {role}, falling back to simulated")
                         role_thoughts = SIMULATED_THOUGHTS.get(role, SIMULATED_THOUGHTS["researcher"])
                         thought = random.choice(role_thoughts)
@@ -568,11 +631,9 @@ async def tick_loop(app: FastAPI):
                         thought = result
                     thoughts_with_params.append((agent, partner_id, tier, thought))
 
-                # Process all thoughts sequentially (DB writes are fast)
                 for agent, partner_id, tier, thought in thoughts_with_params:
                     await _process_agent_thought(app, db, trust_engine, stigmergy, agent, partner_id, tier, thought, app.state.tick_count)
             elif thinking_params:
-                # Simulated thoughts
                 for agent, partner_id, tier, role, context in thinking_params:
                     role_thoughts = SIMULATED_THOUGHTS.get(role, SIMULATED_THOUGHTS["researcher"])
                     thought = random.choice(role_thoughts)
@@ -652,25 +713,6 @@ async def tick_loop(app: FastAPI):
                     )
                 except Exception as e:
                     print(f"[Stigmergy] Market signal error: {e}")
-
-            # ── 11. Agent OS tick (soul, brain, body, help-seeking) ──
-            if app.state.tick_count % 3 == 0:  # every 3 ticks
-                try:
-                    await app.state.agent_os.tick(broadcast_fn=lambda t, p: broadcast(app, t, p))
-                except Exception as e:
-                    print(f"[AgentOS] Tick error: {e}")
-                    import traceback
-                    traceback.print_exc()
-
-            # ── 12. Physical world tick (movement, interactions, library) ──
-            try:
-                await app.state.physical_world.physical_help_tick(broadcast_fn=lambda t, p: broadcast(app, t, p))
-                # Move each active NPC one step along their path
-                for npc_id in list(app.state.physical_world._pending_moves.keys()):
-                    if app.state.physical_world._pending_moves.get(npc_id):
-                        nx, ny = await app.state.physical_world.move_npc_toward(npc_id, 0, 0)
-            except Exception as e:
-                print(f"[PhysicalWorld] Tick error: {e}")
 
             if app.state.tick_count % 5 == 0:
                 best_agents = {}
