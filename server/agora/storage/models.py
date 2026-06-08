@@ -497,6 +497,26 @@ class DungeonNpc(Base):
         back_populates="helper",
     )
     quest_progress = relationship("DungeonQuestProgress", back_populates="npc")
+    # Agentic OS v3 — emócie, život, metamemory
+    emotion = relationship("AgentEmotion", back_populates="npc", uselist=False)
+    lifecycle = relationship("AgentLifecycle", back_populates="npc", uselist=False)
+    dreams = relationship("AgentDream", back_populates="npc")
+    diaries = relationship("AgentDiary", back_populates="npc")
+    metamemories = relationship("AgentMetaMemory", back_populates="npc")
+    relationships_a = relationship(
+        "AgentRelationship", foreign_keys="AgentRelationship.agent_a_id",
+        back_populates="agent_a",
+    )
+    relationships_b = relationship(
+        "AgentRelationship", foreign_keys="AgentRelationship.agent_b_id",
+        back_populates="agent_b",
+    )
+    conflicts_a = relationship(
+        "AgentConflict", foreign_keys="AgentConflict.agent_a_id",
+    )
+    conflicts_b = relationship(
+        "AgentConflict", foreign_keys="AgentConflict.agent_b_id",
+    )
 
 
 class DungeonQuest(Base):
@@ -604,4 +624,215 @@ class TradeHistory(Base):
 
     # relationships
     resource = relationship("Resource", back_populates="trade_history")
+
+
+# ═══════════════════════════════════════════════
+# AGENTIC OS v3 — Emócie, Vzťahy, Život, Príbehy
+# ═══════════════════════════════════════════════
+
+
+class AgentEmotion(Base):
+    """Current emotional state of each agent.
+    
+    Emócie sú krátkodobé reakcie na udalosti (na rozdiel od moodu,
+    ktorý je dlhodobý). Každý agent má jednu primárnu emóciu,
+    ktorá sa mení podľa triggerov a decayuje v čase.
+    """
+    __tablename__ = "agent_emotions"
+
+    npc_id = sa.Column(
+        sa.String(36),
+        sa.ForeignKey("dungeon_npcs.npc_id", ondelete="CASCADE"),
+        primary_key=True,
+    )
+    current = sa.Column(sa.Text, nullable=False, default="neutral")
+    # neutral, happy, sad, angry, fearful, surprised, curious, trusted, betrayed, grateful, hopeful, lonely
+    intensity = sa.Column(sa.Float, nullable=False, default=0.5)
+    valence = sa.Column(sa.Float, nullable=False, default=0.0)       # -1 (negative) to +1 (positive)
+    arousal = sa.Column(sa.Float, nullable=False, default=0.5)       # 0 (calm) to 1 (excited)
+    trigger = sa.Column(sa.Text, nullable=False, default="")
+    # JSON history of last 10 emotions with triggers
+    history = sa.Column(sa.Text, nullable=False, default="[]")
+    decay_rate = sa.Column(sa.Float, nullable=False, default=0.1)    # how fast emotion fades per tick
+    mood = sa.Column(sa.Float, nullable=False, default=0.7)           # 0=terrible, 1=euphoric (long-term)
+    updated_at = sa.Column(sa.Text, nullable=False, server_default=sa.func.datetime("now"))
+
+    # relationships
+    npc = relationship("DungeonNpc", back_populates="emotion")
+
+
+class AgentRelationship(Base):
+    """Multi-dimensional relationship between two agents.
+    
+    Každý pár agentov má viacrozmerný vzťah — nie len ESS trust (0-1),
+    ale aj priateľstvo, rešpekt, rivalita, sympatia, dlh a história.
+    """
+    __tablename__ = "agent_relationships"
+
+    id = sa.Column(sa.String(36), primary_key=True, default=_uuid)
+    agent_a_id = sa.Column(
+        sa.String(36), sa.ForeignKey("dungeon_npcs.npc_id", ondelete="CASCADE"),
+        nullable=False,
+    )
+    agent_b_id = sa.Column(
+        sa.String(36), sa.ForeignKey("dungeon_npcs.npc_id", ondelete="CASCADE"),
+        nullable=False,
+    )
+    # Multi-dimensional scores
+    friendship = sa.Column(sa.Float, nullable=False, default=0.3)
+    respect = sa.Column(sa.Float, nullable=False, default=0.5)
+    rivalry = sa.Column(sa.Float, nullable=False, default=0.0)
+    attraction = sa.Column(sa.Float, nullable=False, default=0.0)
+    debt = sa.Column(sa.Float, nullable=False, default=0.0)  # positive = A owes B
+    conversations_count = sa.Column(sa.Integer, nullable=False, default=0)
+    last_topic = sa.Column(sa.Text, nullable=True)
+    # Labels: trusted_allies, mentor_pupil, rivals, strangers, friends, lovers, enemies
+    emotional_bond = sa.Column(sa.Text, nullable=False, default="strangers")
+    # JSON array of significant events: [{event:, impact:, tick:, description:}]
+    history = sa.Column(sa.Text, nullable=False, default="[]")
+    created_at = sa.Column(sa.Text, nullable=False, server_default=sa.func.datetime("now"))
+    updated_at = sa.Column(sa.Text, nullable=False, server_default=sa.func.datetime("now"))
+
+    __table_args__ = (sa.UniqueConstraint("agent_a_id", "agent_b_id"),)
+
+    # relationships
+    agent_a = relationship("DungeonNpc", foreign_keys=[agent_a_id])
+    agent_b = relationship("DungeonNpc", foreign_keys=[agent_b_id])
+
+
+class AgentLifecycle(Base):
+    """Lifecycle stage and growth metrics for each agent.
+    
+    Agenti sa rodia, rastú, starnú a odchádzajú. Tento model
+    sleduje ich vek, múdrosť, životný cieľ a legacy.
+    """
+    __tablename__ = "agent_lifecycles"
+
+    npc_id = sa.Column(
+        sa.String(36),
+        sa.ForeignKey("dungeon_npcs.npc_id", ondelete="CASCADE"),
+        primary_key=True,
+    )
+    age_ticks = sa.Column(sa.Integer, nullable=False, default=0)
+    stage = sa.Column(sa.Text, nullable=False, default="infancy")
+    # infancy -> childhood -> adulthood -> elder -> retiring
+    maturity = sa.Column(sa.Float, nullable=False, default=0.0)   # 0-1
+    wisdom = sa.Column(sa.Float, nullable=False, default=0.0)     # rastie s insightmi
+    total_decisions = sa.Column(sa.Integer, nullable=False, default=0)
+    total_vault_notes = sa.Column(sa.Integer, nullable=False, default=0)
+    total_conversations = sa.Column(sa.Integer, nullable=False, default=0)
+    legacy = sa.Column(sa.Text, nullable=False, default="")
+    mentor_id = sa.Column(
+        sa.String(36), sa.ForeignKey("dungeon_npcs.npc_id"), nullable=True,
+    )
+    life_goal = sa.Column(sa.Text, nullable=False, default="")
+    life_goal_progress = sa.Column(sa.Float, nullable=False, default=0.0)
+    peak_experience = sa.Column(sa.Text, nullable=False, default="")
+    created_at = sa.Column(sa.Text, nullable=False, server_default=sa.func.datetime("now"))
+    updated_at = sa.Column(sa.Text, nullable=False, server_default=sa.func.datetime("now"))
+
+    npc = relationship("DungeonNpc", back_populates="lifecycle")
+
+
+class AgentDream(Base):
+    """Dreams and inspirations generated by agents during rest."""
+    __tablename__ = "agent_dreams"
+
+    id = sa.Column(sa.String(36), primary_key=True, default=_uuid)
+    npc_id = sa.Column(
+        sa.String(36), sa.ForeignKey("dungeon_npcs.npc_id", ondelete="CASCADE"),
+        nullable=False,
+    )
+    dream_type = sa.Column(sa.Text, nullable=False, default="dream")  # dream, inspiration, nightmare, vision
+    content = sa.Column(sa.Text, nullable=False, default="")
+    emotion_felt = sa.Column(sa.Text, nullable=False, default="neutral")
+    impact_mood = sa.Column(sa.Float, nullable=False, default=0.0)     # how much it changed mood
+    impact_goal = sa.Column(sa.Text, nullable=True)                    # new goal if any
+    created_at = sa.Column(sa.Text, nullable=False, server_default=sa.func.datetime("now"))
+
+
+class AgentDiary(Base):
+    """Diary entries written by agents — their personal narrative."""
+    __tablename__ = "agent_diaries"
+
+    id = sa.Column(sa.String(36), primary_key=True, default=_uuid)
+    npc_id = sa.Column(
+        sa.String(36), sa.ForeignKey("dungeon_npcs.npc_id", ondelete="CASCADE"),
+        nullable=False,
+    )
+    entry_type = sa.Column(sa.Text, nullable=False, default="diary")
+    # diary, reflection, autobiography, letter
+    title = sa.Column(sa.Text, nullable=False, default="")
+    content = sa.Column(sa.Text, nullable=False, default="")
+    mood_at_time = sa.Column(sa.Float, nullable=False, default=0.7)
+    emotion_at_time = sa.Column(sa.Text, nullable=False, default="neutral")
+    tick = sa.Column(sa.Integer, nullable=False, default=0)
+    vault_note_path = sa.Column(sa.Text, nullable=True)   # if exported to vault
+    created_at = sa.Column(sa.Text, nullable=False, server_default=sa.func.datetime("now"))
+
+
+class AgentCulture(Base):
+    """Emergent culture — shared jokes, rituals, norms, taboos, collective memory."""
+    __tablename__ = "agent_culture"
+
+    id = sa.Column(sa.String(36), primary_key=True, default=_uuid)
+    culture_type = sa.Column(sa.Text, nullable=False)  # joke, ritual, norm, taboo, collective_memory
+    content = sa.Column(sa.Text, nullable=False)
+    originator_id = sa.Column(
+        sa.String(36), sa.ForeignKey("dungeon_npcs.npc_id"), nullable=True,
+    )
+    originator_name = sa.Column(sa.Text, nullable=False, default="")
+    spread_count = sa.Column(sa.Integer, nullable=False, default=1)   # how many agents know it
+    is_active = sa.Column(sa.Boolean, nullable=False, default=True)
+    created_at = sa.Column(sa.Text, nullable=False, server_default=sa.func.datetime("now"))
+    last_used_at = sa.Column(sa.Text, nullable=True)
+
+
+class AgentConflict(Base):
+    """Conflicts between agents and their resolution status."""
+    __tablename__ = "agent_conflicts"
+
+    id = sa.Column(sa.String(36), primary_key=True, default=_uuid)
+    agent_a_id = sa.Column(
+        sa.String(36), sa.ForeignKey("dungeon_npcs.npc_id", ondelete="CASCADE"),
+        nullable=False,
+    )
+    agent_b_id = sa.Column(
+        sa.String(36), sa.ForeignKey("dungeon_npcs.npc_id", ondelete="CASCADE"),
+        nullable=False,
+    )
+    issue = sa.Column(sa.Text, nullable=False)
+    conflict_type = sa.Column(sa.Text, nullable=False, default="dispute")
+    # dispute, goal_clash, personality_clash, trust_violation, resource_conflict
+    severity = sa.Column(sa.Integer, nullable=False, default=5)   # 1-10
+    status = sa.Column(sa.Text, nullable=False, default="active")
+    # active, mediated, resolved, escalated
+    mediator_id = sa.Column(
+        sa.String(36), sa.ForeignKey("dungeon_npcs.npc_id"), nullable=True,
+    )
+    resolution = sa.Column(sa.Text, nullable=True)
+    created_at = sa.Column(sa.Text, nullable=False, server_default=sa.func.datetime("now"))
+    resolved_at = sa.Column(sa.Text, nullable=True)
+
+
+class AgentMetaMemory(Base):
+    """Meta-memory — agents remember how their own opinions changed.
+    
+    This creates GEB-style strange loops: an agent remembering
+    that it used to believe X, and now believes Y, and reflecting
+    on why it changed.
+    """
+    __tablename__ = "agent_metamemory"
+
+    id = sa.Column(sa.String(36), primary_key=True, default=_uuid)
+    npc_id = sa.Column(
+        sa.String(36), sa.ForeignKey("dungeon_npcs.npc_id", ondelete="CASCADE"),
+        nullable=False,
+    )
+    topic = sa.Column(sa.Text, nullable=False)                    # "What the runes mean"
+    old_belief = sa.Column(sa.Text, nullable=False, default="")
+    new_belief = sa.Column(sa.Text, nullable=False, default="")
+    trigger_event = sa.Column(sa.Text, nullable=False, default="")  # What changed my mind
+    significance = sa.Column(sa.Float, nullable=False, default=0.5)  # How important was this change
+    created_at = sa.Column(sa.Text, nullable=False, server_default=sa.func.datetime("now"))
 

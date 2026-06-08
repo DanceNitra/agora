@@ -12,6 +12,7 @@ Každý tick:
 import json
 import random
 import sqlite3
+import uuid
 from datetime import datetime
 
 # ── NPC agent IDs ──
@@ -273,8 +274,87 @@ class AgentOS:
                     (npc_id, skill_name, level, 0.0, xp_to_next),
                 )
 
+            # ── Agentic OS v3 — emócie ──
+            await self.db.execute(
+                "INSERT OR IGNORE INTO agent_emotions (npc_id, current, intensity, valence, arousal, trigger, mood) "
+                "VALUES (?, ?, ?, ?, ?, ?, ?)",
+                (npc_id, defs["emotional_state"], 0.5,
+                 0.0, 0.5, "initialized",
+                 0.7 if defs["emotional_state"] in ("happy", "curious") else 0.5),
+            )
+
+            # ── Agentic OS v3 — lifecycle ──
+            default_goals = {
+                "Kael": "Map the entire dungeon and find the Crystal of Eternity",
+                "Lyra": "Chart every room and passage in the dungeon",
+                "Mordecai": "Decipher all ancient runes and unlock the library's secrets",
+                "Grom": "Forge the perfect weapon and arm every agent",
+                "Zara": "Discover the ultimate healing potion recipe",
+                "Finn": "Build the most prosperous trading network in the dungeon",
+                "Guard": "Protect every agent from harm and maintain order",
+            }
+            await self.db.execute(
+                "INSERT OR IGNORE INTO agent_lifecycles (npc_id, age_ticks, stage, maturity, wisdom, life_goal) "
+                "VALUES (?, 0, 'childhood', ?, 0.1, ?)",
+                (npc_id, 0.15, default_goals.get(name, f"Explore the dungeon as {name}")),
+            )
+
+        # ── Seed relationships (all pairs, initial values) ──
+        npc_ids = list(NPC_UUIDS.values())
+        npc_names = list(NPC_UUIDS.keys())
+        for i in range(len(npc_ids)):
+            for j in range(i + 1, len(npc_ids)):
+                cursor = await self.db.execute(
+                    "SELECT COUNT(*) as c FROM agent_relationships WHERE agent_a_id=? AND agent_b_id=?",
+                    (npc_ids[i], npc_ids[j]),
+                )
+                row = await cursor.fetchone()
+                if row and row["c"] > 0:
+                    continue
+                # Determine initial relationship based on archetypes
+                a_defs = NPC_DEFS[npc_names[i]]
+                b_defs = NPC_DEFS[npc_names[j]]
+                a_arch = a_defs["archetype"]
+                b_arch = b_defs["archetype"]
+
+                # Sage respects everyone, merchant is friendly with everyone, guard is neutral
+                if "sage" in (a_arch, b_arch):
+                    respect = 0.7
+                    friendship = 0.4
+                elif "merchant" in (a_arch, b_arch):
+                    friendship = 0.6
+                    respect = 0.5
+                elif "guardian" in (a_arch, b_arch):
+                    friendship = 0.4
+                    respect = 0.6
+                else:
+                    friendship = 0.5
+                    respect = 0.5
+
+                # Adventurer + scout = natural allies
+                if {"explorer", "scout"} == {a_arch, b_arch}:
+                    friendship = 0.7
+                    respect = 0.6
+                # Alchemist + craftsman = work well together
+                if {"alchemist", "craftsman"} == {a_arch, b_arch}:
+                    friendship = 0.6
+                    respect = 0.7
+
+                bond = "strangers"
+                if friendship > 0.6 and respect > 0.5:
+                    bond = "acquaintances"
+
+                await self.db.execute(
+                    "INSERT INTO agent_relationships (id, agent_a_id, agent_b_id, "
+                    "friendship, respect, emotional_bond) VALUES (?, ?, ?, ?, ?, ?)",
+                    (str(uuid.uuid4()), npc_ids[i], npc_ids[j],
+                     friendship, respect, bond),
+                )
+
         await self.db.commit()
-        print(f"[AgentOS] Seeded {len(NPC_DEFS)} NPCs (soul, brain, body, abilities, skills)")
+        print(f"[AgentOS] Seeded {len(NPC_DEFS)} NPCs with OS v3 (emotions, lifecycles, relationships)")
+
+        await self.db.commit()
 
     async def cluster_tick(self, npc_ids: list[str], broadcast_fn=None, skip_body_update: bool = False):
         """Run Agent OS tick for a specific set of NPCs (room cluster).
@@ -1346,3 +1426,53 @@ class AgentOS:
         result["skills"] = [dict(r) for r in await skills_cursor.fetchall()]
 
         return result
+
+    async def _get_npc_name(self, npc_id: str) -> str | None:
+        """Lookup NPC name by UUID."""
+        cursor = await self.db.execute(
+            "SELECT npc_name FROM dungeon_npcs WHERE npc_id=?", (npc_id,)
+        )
+        row = await cursor.fetchone()
+        return row["npc_name"] if row else None
+
+    async def _get_nearby_npcs(self, npc_id: str, room_based: bool = True) -> list[dict]:
+        """Find NPCs in the same room or nearby."""
+        try:
+            cursor = await self.db.execute(
+                "SELECT pos_x, pos_y FROM dungeon_npcs WHERE npc_id=?", (npc_id,)
+            )
+            me = await cursor.fetchone()
+            if not me:
+                return []
+            if room_based:
+                from agora.agent_os.dungeon_map import get_room_at
+                my_room = get_room_at(me["pos_x"], me["pos_y"])
+                cursor = await self.db.execute(
+                    "SELECT npc_id, npc_name FROM dungeon_npcs WHERE status='active' AND npc_id!=?",
+                    (npc_id,),
+                )
+                all_npcs = await cursor.fetchall()
+                nearby = []
+                for other in all_npcs:
+                    cursor_o = await self.db.execute(
+                        "SELECT pos_x, pos_y FROM dungeon_npcs WHERE npc_id=?",
+                        (other["npc_id"],),
+                    )
+                    o_pos = await cursor_o.fetchone()
+                    if o_pos and get_room_at(o_pos["pos_x"], o_pos["pos_y"]) == my_room:
+                        nearby.append(dict(other))
+                return nearby
+            else:
+                # Distance-based: within 200px
+                cursor = await self.db.execute(
+                    "SELECT npc_id, npc_name, pos_x, pos_y FROM dungeon_npcs "
+                    "WHERE status='active' AND npc_id!=?", (npc_id,)
+                )
+                all_npcs = await cursor.fetchall()
+                return [
+                    dict(n) for n in all_npcs
+                    if abs(n["pos_x"] - me["pos_x"]) < 200
+                    and abs(n["pos_y"] - me["pos_y"]) < 200
+                ]
+        except Exception:
+            return []

@@ -173,6 +173,117 @@ async def init_db(app: FastAPI):
         )
         await db.commit()
     app.state.event_store = EventStore(db)
+
+    # ── Agentic OS v3 — emócie, vzťahy, život, príbehy ──
+    if db:
+        await db.executescript(
+            """
+            CREATE TABLE IF NOT EXISTS agent_emotions (
+                npc_id          TEXT PRIMARY KEY REFERENCES dungeon_npcs(npc_id) ON DELETE CASCADE,
+                current         TEXT NOT NULL DEFAULT 'neutral',
+                intensity       REAL NOT NULL DEFAULT 0.5,
+                valence         REAL NOT NULL DEFAULT 0.0,
+                arousal         REAL NOT NULL DEFAULT 0.5,
+                trigger         TEXT NOT NULL DEFAULT '',
+                history         TEXT NOT NULL DEFAULT '[]',
+                decay_rate      REAL NOT NULL DEFAULT 0.1,
+                mood            REAL NOT NULL DEFAULT 0.7,
+                updated_at      TEXT NOT NULL DEFAULT (datetime('now'))
+            );
+            CREATE TABLE IF NOT EXISTS agent_relationships (
+                id              TEXT PRIMARY KEY,
+                agent_a_id      TEXT NOT NULL REFERENCES dungeon_npcs(npc_id) ON DELETE CASCADE,
+                agent_b_id      TEXT NOT NULL REFERENCES dungeon_npcs(npc_id) ON DELETE CASCADE,
+                friendship      REAL NOT NULL DEFAULT 0.3,
+                respect         REAL NOT NULL DEFAULT 0.5,
+                rivalry         REAL NOT NULL DEFAULT 0.0,
+                attraction      REAL NOT NULL DEFAULT 0.0,
+                debt            REAL NOT NULL DEFAULT 0.0,
+                conversations_count INTEGER NOT NULL DEFAULT 0,
+                last_topic      TEXT,
+                emotional_bond  TEXT NOT NULL DEFAULT 'strangers',
+                history         TEXT NOT NULL DEFAULT '[]',
+                created_at      TEXT NOT NULL DEFAULT (datetime('now')),
+                updated_at      TEXT NOT NULL DEFAULT (datetime('now')),
+                UNIQUE(agent_a_id, agent_b_id)
+            );
+            CREATE TABLE IF NOT EXISTS agent_lifecycles (
+                npc_id          TEXT PRIMARY KEY REFERENCES dungeon_npcs(npc_id) ON DELETE CASCADE,
+                age_ticks       INTEGER NOT NULL DEFAULT 0,
+                stage           TEXT NOT NULL DEFAULT 'infancy',
+                maturity        REAL NOT NULL DEFAULT 0.0,
+                wisdom          REAL NOT NULL DEFAULT 0.0,
+                total_decisions INTEGER NOT NULL DEFAULT 0,
+                total_vault_notes INTEGER NOT NULL DEFAULT 0,
+                total_conversations INTEGER NOT NULL DEFAULT 0,
+                legacy          TEXT NOT NULL DEFAULT '',
+                mentor_id       TEXT REFERENCES dungeon_npcs(npc_id),
+                life_goal       TEXT NOT NULL DEFAULT '',
+                life_goal_progress REAL NOT NULL DEFAULT 0.0,
+                peak_experience TEXT NOT NULL DEFAULT '',
+                created_at      TEXT NOT NULL DEFAULT (datetime('now')),
+                updated_at      TEXT NOT NULL DEFAULT (datetime('now'))
+            );
+            CREATE TABLE IF NOT EXISTS agent_dreams (
+                id              TEXT PRIMARY KEY,
+                npc_id          TEXT NOT NULL REFERENCES dungeon_npcs(npc_id) ON DELETE CASCADE,
+                dream_type      TEXT NOT NULL DEFAULT 'dream',
+                content         TEXT NOT NULL DEFAULT '',
+                emotion_felt    TEXT NOT NULL DEFAULT 'neutral',
+                impact_mood     REAL NOT NULL DEFAULT 0.0,
+                impact_goal     TEXT,
+                created_at      TEXT NOT NULL DEFAULT (datetime('now'))
+            );
+            CREATE TABLE IF NOT EXISTS agent_diaries (
+                id              TEXT PRIMARY KEY,
+                npc_id          TEXT NOT NULL REFERENCES dungeon_npcs(npc_id) ON DELETE CASCADE,
+                entry_type      TEXT NOT NULL DEFAULT 'diary',
+                title           TEXT NOT NULL DEFAULT '',
+                content         TEXT NOT NULL DEFAULT '',
+                mood_at_time    REAL NOT NULL DEFAULT 0.7,
+                emotion_at_time TEXT NOT NULL DEFAULT 'neutral',
+                tick            INTEGER NOT NULL DEFAULT 0,
+                vault_note_path TEXT,
+                created_at      TEXT NOT NULL DEFAULT (datetime('now'))
+            );
+            CREATE TABLE IF NOT EXISTS agent_culture (
+                id              TEXT PRIMARY KEY,
+                culture_type    TEXT NOT NULL,
+                content         TEXT NOT NULL,
+                originator_id   TEXT REFERENCES dungeon_npcs(npc_id),
+                originator_name TEXT NOT NULL DEFAULT '',
+                spread_count    INTEGER NOT NULL DEFAULT 1,
+                is_active       INTEGER NOT NULL DEFAULT 1,
+                created_at      TEXT NOT NULL DEFAULT (datetime('now')),
+                last_used_at    TEXT
+            );
+            CREATE TABLE IF NOT EXISTS agent_conflicts (
+                id              TEXT PRIMARY KEY,
+                agent_a_id      TEXT NOT NULL REFERENCES dungeon_npcs(npc_id) ON DELETE CASCADE,
+                agent_b_id      TEXT NOT NULL REFERENCES dungeon_npcs(npc_id) ON DELETE CASCADE,
+                issue           TEXT NOT NULL,
+                conflict_type   TEXT NOT NULL DEFAULT 'dispute',
+                severity        INTEGER NOT NULL DEFAULT 5,
+                status          TEXT NOT NULL DEFAULT 'active',
+                mediator_id     TEXT REFERENCES dungeon_npcs(npc_id),
+                resolution      TEXT,
+                created_at      TEXT NOT NULL DEFAULT (datetime('now')),
+                resolved_at     TEXT
+            );
+            CREATE TABLE IF NOT EXISTS agent_metamemory (
+                id              TEXT PRIMARY KEY,
+                npc_id          TEXT NOT NULL REFERENCES dungeon_npcs(npc_id) ON DELETE CASCADE,
+                topic           TEXT NOT NULL,
+                old_belief      TEXT NOT NULL DEFAULT '',
+                new_belief      TEXT NOT NULL DEFAULT '',
+                trigger_event   TEXT NOT NULL DEFAULT '',
+                significance    REAL NOT NULL DEFAULT 0.5,
+                created_at      TEXT NOT NULL DEFAULT (datetime('now'))
+            );
+            """
+        )
+        await db.commit()
+        print("[Agentic OS v3] Tables created (emotions, relationships, lifecycles, dreams, diaries, culture, conflicts, metamemory)")
     # Wire the event store into the coordination subsystems
     if getattr(app.state, "trust", None):
         app.state.trust.event_store = app.state.event_store
@@ -315,6 +426,26 @@ async def init_db(app: FastAPI):
         import traceback
         traceback.print_exc()
         app.state.quest_engine = None
+
+    # ── Agentic OS v3 — init engines ──
+    from agora.agent_os.emotion_engine import EmotionEngine
+    from agora.agent_os.relationship_web import RelationshipWeb
+    from agora.agent_os.dream_engine import DreamEngine
+    from agora.agent_os.diary_engine import DiaryEngine
+    from agora.agent_os.culture_engine import CultureEngine
+    from agora.agent_os.conflict_engine import ConflictEngine
+    from agora.agent_os.meta_memory import MetaMemory
+    app.state.emotion_engine = EmotionEngine(db) if db else None
+    app.state.relationship_web = RelationshipWeb(db) if db else None
+    app.state.dream_engine = DreamEngine(db) if db else None
+    app.state.diary_engine = DiaryEngine(db) if db else None
+    app.state.culture_engine = CultureEngine(db) if db else None
+    app.state.conflict_engine = ConflictEngine(db) if db else None
+    app.state.meta_memory = MetaMemory(db) if db else None
+    # Wire vault_writer into diary engine for vault exports
+    if app.state.diary_engine and getattr(app.state, "vault_writer", None):
+        app.state.diary_engine.vault_writer = app.state.vault_writer
+    print(f"[Agentic OS v3] Engines initialized (emotion, relationships, dreams, diary, culture, conflict, metamemory)")
 
     # Seed agents if empty
     cursor = await db.execute("SELECT COUNT(*) as cnt FROM agent_identities")
@@ -1143,6 +1274,127 @@ async def tick_loop(app: FastAPI):
                     await _process_agent_thought(app, db, trust_engine, stigmergy, agent, partner_id, tier, thought, app.state.tick_count)
 
             await db.commit()
+
+            # ── Agentic OS v3 — emócie, vzťahy, sny, denníky, kultúra, konflikty ──
+            try:
+                v3_tick = app.state.tick_count
+
+                # Decay emotions every tick
+                if app.state.emotion_engine:
+                    await app.state.emotion_engine.decay_all()
+
+                # Get all active NPCs for v3 processing
+                cursor_npcs = await db.execute(
+                    "SELECT d.npc_id, d.npc_name, d.role, b.current_goal, b.state_of_mind, "
+                    "e.current as emotion, e.mood "
+                    "FROM dungeon_npcs d "
+                    "LEFT JOIN agent_brain b ON b.npc_id = d.npc_id "
+                    "LEFT JOIN agent_emotions e ON e.npc_id = d.npc_id "
+                    "WHERE d.status='active'"
+                )
+                all_npcs = await cursor_npcs.fetchall()
+
+                for npc in all_npcs:
+                    npc_id = npc["npc_id"]
+                    name = npc["npc_name"]
+                    role = npc["role"]
+                    goal = npc.get("current_goal", "")
+                    emotion = npc.get("emotion", "neutral")
+                    mood = npc.get("mood", 0.7)
+
+                    # Random vault insight broadcast (every 5 ticks)
+                    if v3_tick % 5 == 0 and v3_tick > 0:
+                        vault_reader = getattr(app.state, "vault_reader", None)
+                        if vault_reader:
+                            try:
+                                insight = await vault_reader.get_random_insight()
+                                if insight:
+                                    await broadcast(app, "vault_insight", {
+                                        "agent": name,
+                                        "book": insight.get("book", ""),
+                                        "text": insight.get("text", "")[:150],
+                                    })
+                            except Exception:
+                                pass
+
+                    # Dreams (every 15 ticks)
+                    if v3_tick > 0 and v3_tick % 15 == 0 and app.state.dream_engine:
+                        # Get recent memories
+                        mem_cursor = await db.execute(
+                            "SELECT content FROM agent_memories WHERE npc_id=? "
+                            "ORDER BY created_at DESC LIMIT 5",
+                            (npc_id,),
+                        )
+                        recent_mems = [dict(r) for r in await mem_cursor.fetchall()]
+                        await app.state.dream_engine.generate_dream(
+                            npc_id, name, role, recent_mems, mood,
+                            broadcast_fn=lambda t, p: broadcast(app, t, p),
+                        )
+
+                    # Inspirations (every 30 ticks)
+                    if v3_tick > 0 and v3_tick % 30 == 0 and app.state.dream_engine:
+                        vault_reader = getattr(app.state, "vault_reader", None)
+                        await app.state.dream_engine.generate_inspiration(
+                            npc_id, name, role, vault_reader,
+                            broadcast_fn=lambda t, p: broadcast(app, t, p),
+                        )
+
+                    # Diary entries (every 20 ticks)
+                    if v3_tick > 0 and v3_tick % 20 == 0 and app.state.diary_engine:
+                        mem_cursor = await db.execute(
+                            "SELECT content FROM agent_memories WHERE npc_id=? "
+                            "ORDER BY created_at DESC LIMIT 3",
+                            (npc_id,),
+                        )
+                        recent_mems = [dict(r) for r in await mem_cursor.fetchall()]
+                        await app.state.diary_engine.write_entry(
+                            npc_id, name, role, goal, mood, emotion,
+                            recent_mems, v3_tick,
+                            vault_reader=getattr(app.state, "vault_reader", None),
+                            broadcast_fn=lambda t, p: broadcast(app, t, p),
+                        )
+
+                # Conflicts (every 3 ticks, 5% chance each)
+                if v3_tick > 0 and v3_tick % 3 == 0 and app.state.conflict_engine:
+                    for npc in all_npcs:
+                        nearby_ids_list = []
+                        if app.state.agent_os:
+                            try:
+                                nearby = await app.state.agent_os._get_nearby_npcs(npc["npc_id"])
+                                nearby_ids_list = [n["npc_id"] for n in nearby]
+                            except Exception:
+                                pass
+                        await app.state.conflict_engine.check_for_conflicts(
+                            npc["npc_id"], npc["npc_name"],
+                            npc.get("current_goal", ""), nearby_ids_list,
+                            broadcast_fn=lambda t, p: broadcast(app, t, p),
+                        )
+                    # Try to resolve active conflicts
+                    cursor_conflicts = await db.execute(
+                        "SELECT id FROM agent_conflicts WHERE status IN ('active', 'mediated')"
+                    )
+                    active_conflicts = await cursor_conflicts.fetchall()
+                    for c in active_conflicts:
+                        await app.state.conflict_engine.attempt_resolution(
+                            c["id"],
+                            broadcast_fn=lambda t, p: broadcast(app, t, p),
+                        )
+
+                # Culture spread (every 8 ticks)
+                if v3_tick > 0 and v3_tick % 8 == 0 and app.state.culture_engine:
+                    await app.state.culture_engine.spread(
+                        "system",
+                        broadcast_fn=lambda t, p: broadcast(app, t, p),
+                    )
+
+                # Update lifecycle tracking
+                if app.state.relationship_web:
+                    pass  # relationships are updated via record_interaction
+
+            except Exception as e:
+                print(f"[v3 Tick] Error: {e}")
+                import traceback
+                traceback.print_exc()
 
             # ── 6. CSD monitoring (metrics + drift detection) ──
             try:

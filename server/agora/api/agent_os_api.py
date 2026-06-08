@@ -284,3 +284,223 @@ async def start_converse(npc_name: str, request: Request):
     session_id = await os_engine._start_conversation(
         speaker_id, target_id, body["topic"], intent=body.get("intent", "chat"))
     return {"status": "started", "session_id": session_id}
+# ═══════════════════════════════════════════════
+# AGENTIC OS v3 — Emócie, Vzťahy, Denníky, Sny, Kultúra, Konflikty
+# ═══════════════════════════════════════════════
+
+def _get_v3_engine(request: Request, name: str):
+    """Get a v3 engine by attribute name, or raise 503."""
+    engine = getattr(request.app.state, name, None)
+    if not engine:
+        raise HTTPException(503, f"Engine '{name}' not initialised")
+    return engine
+
+
+# ── EMOTIONS ──
+
+
+@router.get("/{npc_name}/emotion")
+async def get_emotion(npc_name: str, request: Request):
+    """Get current emotional state for an NPC."""
+    npc_id = DUNGEON_AGENT_IDS.get(npc_name) or npc_name
+    engine = _get_v3_engine(request, "emotion_engine")
+    state = await engine.get_state(npc_id)
+    if not state:
+        raise HTTPException(404, f"NPC {npc_name} not found")
+    return state
+
+
+@router.get("/emotions")
+async def get_all_emotions(request: Request):
+    """Get emotional states of all agents."""
+    engine = _get_v3_engine(request, "emotion_engine")
+    return {"agents": await engine.get_all_states()}
+
+
+@router.post("/{npc_name}/emotion")
+async def trigger_emotion(npc_name: str, request: Request):
+    """Manually trigger an emotion for an NPC."""
+    npc_id = DUNGEON_AGENT_IDS.get(npc_name) or npc_name
+    engine = _get_v3_engine(request, "emotion_engine")
+    body = await request.json()
+    emotion = body.get("emotion", "neutral")
+    intensity = float(body.get("intensity", 0.5))
+    trigger = body.get("trigger", "api")
+    from agora.api.dungeon import broadcast
+    result = await engine.trigger(npc_id, emotion, intensity, trigger,
+                                   broadcast_fn=lambda t, p: None)
+    return result or {"error": "not found"}
+
+
+# ── RELATIONSHIPS ──
+
+
+@router.get("/{npc_name}/relationships")
+async def get_relationships(npc_name: str, request: Request):
+    """Get all relationships for an NPC."""
+    npc_id = DUNGEON_AGENT_IDS.get(npc_name) or npc_name
+    engine = _get_v3_engine(request, "relationship_web")
+    return {"relationships": await engine.get_all_for_agent(npc_id)}
+
+
+@router.get("/relationships/{npc_a}/{npc_b}")
+async def get_relationship_between(npc_a: str, npc_b: str, request: Request):
+    """Get relationship between two specific NPCs."""
+    id_a = DUNGEON_AGENT_IDS.get(npc_a) or npc_a
+    id_b = DUNGEON_AGENT_IDS.get(npc_b) or npc_b
+    engine = _get_v3_engine(request, "relationship_web")
+    rel = await engine.get_relationship(id_a, id_b)
+    if not rel:
+        raise HTTPException(404, f"No relationship data between {npc_a} and {npc_b}")
+    return rel
+
+
+# ── DIARIES ──
+
+
+@router.get("/{npc_name}/diary")
+async def get_diary(npc_name: str, request: Request, limit: int = 20):
+    """Get diary entries for an NPC."""
+    npc_id = DUNGEON_AGENT_IDS.get(npc_name) or npc_name
+    engine = _get_v3_engine(request, "diary_engine")
+    return {"entries": await engine.get_entries(npc_id, limit)}
+
+
+# ── DREAMS ──
+
+
+@router.get("/{npc_name}/dreams")
+async def get_dreams(npc_name: str, request: Request):
+    """Get dreams for an NPC."""
+    npc_id = DUNGEON_AGENT_IDS.get(npc_name) or npc_name
+    db = request.app.state.db
+    cursor = await db.execute(
+        "SELECT * FROM agent_dreams WHERE npc_id=? ORDER BY created_at DESC LIMIT 20",
+        (npc_id,),
+    )
+    return {"dreams": [dict(r) for r in await cursor.fetchall()]}
+
+
+# ── CULTURE ──
+
+
+@router.get("/culture")
+async def get_culture(request: Request):
+    """Get all active culture items."""
+    db = request.app.state.db
+    cursor = await db.execute(
+        "SELECT * FROM agent_culture WHERE is_active=1 ORDER BY spread_count DESC"
+    )
+    return {"culture": [dict(r) for r in await cursor.fetchall()]}
+
+
+# ── CONFLICTS ──
+
+
+@router.get("/{npc_name}/conflicts")
+async def get_conflicts(npc_name: str, request: Request):
+    """Get active conflicts for an NPC."""
+    npc_id = DUNGEON_AGENT_IDS.get(npc_name) or npc_name
+    engine = _get_v3_engine(request, "conflict_engine")
+    return {"conflicts": await engine.get_active(npc_id)}
+
+
+@router.get("/conflicts")
+async def get_all_conflicts(request: Request):
+    """Get all conflicts."""
+    db = request.app.state.db
+    cursor = await db.execute(
+        "SELECT c.*, a1.npc_name as name_a, a2.npc_name as name_b "
+        "FROM agent_conflicts c "
+        "JOIN dungeon_npcs a1 ON a1.npc_id = c.agent_a_id "
+        "JOIN dungeon_npcs a2 ON a2.npc_id = c.agent_b_id "
+        "WHERE c.status IN ('active', 'mediated') ORDER BY c.severity DESC"
+    )
+    return {"conflicts": [dict(r) for r in await cursor.fetchall()]}
+
+
+# ── METAMEMORY ──
+
+
+@router.get("/{npc_name}/metamemory")
+async def get_metamemory(npc_name: str, request: Request):
+    """Get meta-memory (belief changes) for an NPC."""
+    npc_id = DUNGEON_AGENT_IDS.get(npc_name) or npc_name
+    engine = _get_v3_engine(request, "meta_memory")
+    return {"belief_changes": await engine.get_recent_changes(npc_id)}
+
+
+# ── LIFECYCLE ──
+
+
+@router.get("/{npc_name}/lifecycle")
+async def get_lifecycle(npc_name: str, request: Request):
+    """Get lifecycle info for an NPC."""
+    npc_id = DUNGEON_AGENT_IDS.get(npc_name) or npc_name
+    db = request.app.state.db
+    cursor = await db.execute(
+        "SELECT * FROM agent_lifecycles WHERE npc_id=?", (npc_id,)
+    )
+    row = await cursor.fetchone()
+    if not row:
+        raise HTTPException(404, f"NPC {npc_name} not found")
+    return dict(row)
+
+
+# ── FULL V3 STATUS ──
+
+
+@router.get("/{npc_name}/v3")
+async def get_v3_status(npc_name: str, request: Request):
+    """Get complete v3 status for an NPC."""
+    npc_id = DUNGEON_AGENT_IDS.get(npc_name) or npc_name
+    db = request.app.state.db
+
+    emotion = None
+    ee = getattr(request.app.state, "emotion_engine", None)
+    if ee:
+        emotion = await ee.get_state(npc_id)
+
+    relationships = []
+    rw = getattr(request.app.state, "relationship_web", None)
+    if rw:
+        relationships = await rw.get_all_for_agent(npc_id)
+
+    cursor = await db.execute(
+        "SELECT * FROM agent_lifecycles WHERE npc_id=?", (npc_id,)
+    )
+    lifecycle = await cursor.fetchone()
+    lifecycle = dict(lifecycle) if lifecycle else None
+
+    cursor = await db.execute(
+        "SELECT * FROM agent_diaries WHERE npc_id=? ORDER BY created_at DESC LIMIT 5",
+        (npc_id,),
+    )
+    diary = [dict(r) for r in await cursor.fetchall()]
+
+    cursor = await db.execute(
+        "SELECT COUNT(*) as c FROM agent_dreams WHERE npc_id=?", (npc_id,)
+    )
+    dream_count = (await cursor.fetchone())["c"]
+
+    conflicts = []
+    ce = getattr(request.app.state, "conflict_engine", None)
+    if ce:
+        conflicts = await ce.get_active(npc_id)
+
+    metamemory = []
+    mm = getattr(request.app.state, "meta_memory", None)
+    if mm:
+        metamemory = await mm.get_recent_changes(npc_id)
+
+    return {
+        "name": npc_name,
+        "emotion": emotion,
+        "relationships": relationships,
+        "lifecycle": lifecycle,
+        "diary_entries": diary,
+        "total_dreams": dream_count,
+        "active_conflicts": len(conflicts),
+        "conflicts": conflicts,
+        "belief_changes": metamemory,
+    }
