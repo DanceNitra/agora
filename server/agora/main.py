@@ -45,6 +45,7 @@ from agora.api import tool_registry_api as tool_registry_api
 from agora.api import evaluation_api
 from agora.api import god_console_v2
 from agora.api import dungeon_os_api
+from agora.api import ess as ess_api
 
 
 async def init_db(app: FastAPI):
@@ -296,6 +297,7 @@ app.include_router(tool_registry_api.router)
 app.include_router(evaluation_api.router)
 app.include_router(god_console_v2.router)
 app.include_router(dungeon_os_api.router)
+app.include_router(ess_api.router)
 
 
 # ── Event topic mapping ───────────────────────────────────────
