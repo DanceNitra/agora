@@ -33,11 +33,17 @@
 |---|------|--------|--------|-------|
 | **2.0** | **Agentic OS v2 — Brain Ecosystem** — per-agent memory system (episodic/semantic/procedural), personality engine (Big 5 shapes decisions), conversation engine (multi-turn NPC dialogue), brainstorming engine (agents generate + build on ideas together), collective knowledge pool (dungeon vault), thought journal, self-improvement proposals, integrated tick cycle | 🟢 | 2d1c1a9 | agora-builder: done, verified (all 8 layers, 4 milestones, tested) |
 
-## Phase 2.1 — VaultBridge (Vault ↔ Dungeon Bridge)
+## Phase 2.1 — VaultBridge (Vault ↔ Dungeon Bridge) ✅ DONE
 
 | # | Task | Status | Commit | Agent |
 |---|------|--------|--------|-------|
-| **2.1** | **VaultBridge** — VaultReader + VaultWriter, číta z `~/my-second-brain/04 Resources/Concepts/*.md` (vault repo clone), keyword search + FAISS RAG fallback, agenti píšu `.md` notes + git commit/push, vault insights v LLM prompte, 3 built-in mock koncepty keď vault_path nie je nastavený, config: `AGORA_VAULT_PATH` | 🟡 | — | tg-hermes: handoff ready (25KB) |
+| **2.1** | **VaultBridge** — VaultReader + VaultWriter, číta z `~/my-second-brain/04 Resources/Concepts/*.md` (vault repo clone), keyword search + FAISS RAG fallback, agenti píšu `.md` notes + git commit/push, vault insights v LLM prompte, 3 built-in mock koncepty keď vault_path nie je nastavený, config: `AGORA_VAULT_PATH` | 🟢 | c0a6d44 | tg-hermes: implemented (VaultReader, VaultWriter, factory, config, tick integration) |
+
+## Phase 2.2 — Agentic OS v3 (Emócie, Vzťahy, Život, Príbehy) ✅ CODE DONE — ready for deployment
+
+| # | Task | Status | Commit | Agent |
+|---|------|--------|--------|-------|
+| **2.2** | **Agentic OS v3** — 8 new engines: EmotionEngine (12 emócií, decay, mood drift), RelationshipWeb (multi-dimenzionálne vzťahy, bond labels), DreamEngine (sny, inšpirácie, vízie), DiaryEngine (denníky, autobiografie, legacy vault export), CultureEngine (emergentné vtipy, rituály, normy, tabu), ConflictEngine (konflikty, mediácia, rezolúcia), MetaMemory (GEB-style belief changes), Lifecycle (age_ticks, stage, maturity, wisdom). 15 API endpointov. SQL modely + DDL + seedovanie + tick integracia. | 🟢 | c0a6d44 | tg-hermes: code done (11 files, 2000+ lines) |
 
 ## Phase 2b — Framework Plugins
 
