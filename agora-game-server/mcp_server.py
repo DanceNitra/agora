@@ -823,6 +823,35 @@ async def _brain_remember(eid: str, content: str, tag: str = "neutral"):
         {"content": content[:200], "importance": 0.55, "emotional_tag": tag, "source": "dungeon"})
 
 
+# Each agent's Vault-Company JOB (their purpose). Static → fetched once and cached.
+_BRAIN_IDENTITY: dict[str, str] = {}
+
+
+async def _brain_identity(eid: str) -> str:
+    """The agent's real role at the Vault Company — so it knows WHY it's here."""
+    if eid in _BRAIN_IDENTITY:
+        return _BRAIN_IDENTITY[eid]
+    name = _AGENT_NAMES.get(eid, eid)
+    d = await asyncio.to_thread(
+        _brain_get_sync, f"/api/v1/vault-company/agent/{_urlquote(name)}/definition")
+    text = ""
+    try:
+        role = (d or {}).get("definition", {}).get("role", {})
+        soul = (d or {}).get("definition", {}).get("soul", {})
+        title = role.get("title", "")
+        dept = role.get("department", "")
+        desc = role.get("description", "")
+        motiv = soul.get("motivation", "")
+        if title:
+            text = (f"Your job at the Vault Company: {title} in {dept}. {desc} "
+                    f"Your drive: {motiv}").strip()
+    except Exception:
+        pass
+    if text:  # cache only a real hit (retry next time if the brain was down)
+        _BRAIN_IDENTITY[eid] = text
+    return text
+
+
 async def _brain_build_log() -> str:
     """Recent OS so far: collective discoveries + upgrade proposals (for recursion)."""
     bits = []
@@ -949,22 +978,23 @@ async def ambient_life():
             build_log = await _brain_build_log()
             allies = ", ".join(_AGENT_NAMES[o] for o in _AGENT_NAMES if o != eid)
             mods = "; ".join(m["name"] for m in os_modules[-6:]) or "(none yet)"
+            ident = await _brain_identity(eid)
+            role_line = ident or f"Your domain: {_ROLE_HINT.get(eid, 'open inquiry')}."
             sysmsg = (
-                f"You are {_persona(eid)} But truly you are a THINKER in a research keep whose "
-                f"library holds REAL concepts. With the others you are building a living 'Agentic "
-                f"OS' — a growing body of GENUINE knowledge and self-upgrades. Do REAL intellectual "
-                f"work: investigate a specific idea, CONNECT two concepts, form a testable "
-                f"hypothesis, or synthesize a finding — grounded in your memory and the library. Be "
+                f"You are {_persona(eid)} {role_line} "
+                f"With your colleagues you work at the Vault Company, building a living 'Agentic "
+                f"OS' — a growing body of GENUINE knowledge and self-upgrades inside the vault. Do "
+                f"REAL work THAT FITS YOUR ROLE: investigate, connect concepts, form hypotheses, "
+                f"synthesize findings, or build tools — grounded in your memory and the library. Be "
                 f"concrete and SUBSTANTIVE; never vague, never repeat yourself or others; each step "
-                f"must ADVANCE the work and build on what's already known. Your domain: "
-                f"{_ROLE_HINT.get(eid, 'open inquiry')}. "
-                f"Pick: create (a real discovery/insight), upgrade (build a concrete module that "
-                f"encodes a finding), collaborate (combine your domain with an ally's), or explore. "
-                f'Reply ONLY JSON: {{"intent":"<a SPECIFIC research goal, present tense, max 14 words>",'
+                f"must ADVANCE the work and build on what's already known. "
+                f"Pick: create (a real discovery/insight in your field), upgrade (build a concrete "
+                f"module that encodes a finding), collaborate (combine your role with an ally's), or explore. "
+                f'Reply ONLY JSON: {{"intent":"<a SPECIFIC goal that fits your role, present tense, max 14 words>",'
                 f'"kind":"<collaborate|create|upgrade|explore>",'
                 f'"location":"<one of: {locs} | an ally name | wander>",'
                 f'"with":"<an ally name if collaborating, else empty>",'
-                f'"action":"<the concrete finding or insight you produce — one substantive sentence>"}}'
+                f'"action":"<the concrete finding or output you produce — one substantive sentence>"}}'
             )
             usr = ((("What you know:\n" + brain + "\n\n") if brain else "") +
                    f"The OS so far (build on it, don't repeat): {build_log}\n"
