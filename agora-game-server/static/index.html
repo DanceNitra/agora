@@ -812,6 +812,40 @@ if (!renderer.getContext()) {
     (window.__effects ||= []).push({ mesh, type, born: performance.now(), dur, maxScale });
   }
 
+  // Persistent structure an agent BUILT into the OS (obelisk + glow + label).
+  window.__modules = window.__modules || {};
+  function makeLabelSprite(text, colorHex) {
+    const cv = document.createElement('canvas'); cv.width = 256; cv.height = 64;
+    const g = cv.getContext('2d');
+    g.font = 'bold 21px monospace'; g.fillStyle = colorHex || '#ffcf5a';
+    g.textAlign = 'center'; g.textBaseline = 'middle';
+    g.fillText((text || '').slice(0, 24), 128, 32);
+    const tex = new THREE.CanvasTexture(cv); tex.colorSpace = THREE.SRGBColorSpace;
+    const spr = new THREE.Sprite(new THREE.SpriteMaterial({ map: tex, transparent: true, depthWrite: false }));
+    spr.scale.set(2.6, 0.65, 1);
+    return spr;
+  }
+  function buildModule(name, gx, gy, colorHex) {
+    if (!name || window.__modules[name]) return;
+    const c = window.__center || { cx: 0, cy: 0 };
+    const col = parseInt((colorHex || '#ffcf5a').replace('#', ''), 16);
+    const grp = new THREE.Group();
+    grp.position.set(gx - c.cx, 0, gy - c.cy);
+    const obe = new THREE.Mesh(new THREE.ConeGeometry(0.24, 1.15, 6),
+      new THREE.MeshStandardMaterial({ color: col, emissive: col, emissiveIntensity: 1.1,
+        flatShading: true, metalness: 0.2, roughness: 0.5 }));
+    obe.position.y = 0.6; grp.add(obe);
+    const glow = new THREE.Mesh(new THREE.SphereGeometry(0.34, 12, 12),
+      new THREE.MeshBasicMaterial({ color: col, transparent: true, opacity: 0.32,
+        blending: THREE.AdditiveBlending, depthWrite: false }));
+    glow.position.y = 0.35; grp.add(glow);
+    const label = makeLabelSprite(name, colorHex);
+    if (label) { label.position.y = 1.55; grp.add(label); }
+    scene.add(grp);
+    window.__modules[name] = grp;
+    (window.__moduleSpin ||= []).push(obe);
+  }
+
   // Apply an incremental event broadcast by the server
   function applyEvent(ev) {
     HUD.onEvent(ev);
@@ -882,6 +916,12 @@ if (!renderer.getContext()) {
         break;
       case 'os_snapshot':
         OSHUD.snapshot(ev.log);
+        break;
+      case 'os_module':
+        buildModule(ev.name, ev.x, ev.y, ev.color);
+        break;
+      case 'os_modules_snapshot':
+        (ev.modules || []).forEach(m => buildModule(m.name, m.tile[0], m.tile[1], m.color));
         break;
     }
   }
@@ -1151,6 +1191,14 @@ if (!renderer.getContext()) {
       // Auto-hide stale thought bubbles
       if (rec.thought && rec.thought.sprite.visible && nowMs > rec.thought.hideAt)
         rec.thought.sprite.visible = false;
+    }
+
+    // OS module obelisks: gentle spin + bob so built structures feel alive
+    if (window.__moduleSpin) {
+      for (const o of window.__moduleSpin) {
+        o.rotation.y += 0.01;
+        o.position.y = 0.6 + Math.sin(nowMs / 600 + o.id) * 0.04;
+      }
     }
 
     // Visual effects: expand + fade, then dispose

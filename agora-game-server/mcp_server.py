@@ -871,6 +871,8 @@ async def ambient_life():
     next_decide: dict[str, float] = {} # eid -> monotonic time of next decision
     deciding: set[str] = set()         # decisions in flight
     world_events: list[str] = []       # recent keep news (shared, for reactivity)
+    locations: dict = dict(_LOCATIONS)  # navigable spots — GROWS as agents build modules
+    os_modules: list[dict] = []        # real structures agents have built into the OS
     loop_n = 0
     await _init_trust()
     logger.info("LLM-driven life loop started")
@@ -891,6 +893,27 @@ async def ambient_life():
         del os_log[:-30]
         broadcast({"type": "os_build", **item})
 
+    _OS_COLORS = {"upgrade": "#ffcf5a", "discovery": "#7fd0ff", "collab": "#9affc0"}
+
+    def _apply_module(name: str, tile, builder: str, kind: str = "upgrade"):
+        """REALLY apply an upgrade: build a structure, light it, unlock it as a new
+        navigable location, and register it as an OS capability others can extend."""
+        slug = name.lower().strip()[:40] or f"module-{len(os_modules)}"
+        if slug in locations and slug not in (m["slug"] for m in os_modules):
+            slug = f"{slug}-{len(os_modules)}"  # don't shadow a base post
+        color = _OS_COLORS.get(kind, "#ffcf5a")
+        try:
+            engine.add_light(f"os_{slug}", tile[0], tile[1], color, 1.3, 4.5, True)
+        except Exception:
+            pass
+        engine.add_effect("glow", tile[0], tile[1], color, 1.2)
+        locations[slug] = (int(tile[0]), int(tile[1]))   # now navigable by everyone
+        mod = {"slug": slug, "name": name[:60], "tile": [int(tile[0]), int(tile[1])],
+               "builder": builder, "kind": kind, "color": color}
+        os_modules.append(mod)
+        del os_modules[:-24]
+        broadcast({"type": "os_module", **mod})
+
     def publish_goals():
         engine.set_tasks([
             {"id": i, "title": g["intent"], "agent": _AGENT_NAMES.get(eid, eid),
@@ -906,13 +929,14 @@ async def ambient_life():
                 return
             nearby = [_AGENT_NAMES.get(o, o) for o, e in engine.state.entities.items()
                       if o != eid and abs(e.x - cx) + abs(e.y - cy) <= 8]
-            locs = ", ".join(_LOCATIONS.keys())
+            locs = ", ".join(locations.keys())
             mem = " | ".join(memory.get(eid, [])[-4:]) or "(nothing yet)"
             news = " | ".join(world_events[-4:]) or "(quiet)"
             # Pull the agent's real mind (memory/emotion/vault) from server/agora.
             brain = await _brain_context(eid, f"{_ROLE_HINT.get(eid, '')} {mem}")
             build_log = await _brain_build_log()
             allies = ", ".join(_AGENT_NAMES[o] for o in _AGENT_NAMES if o != eid)
+            mods = "; ".join(m["name"] for m in os_modules[-6:]) or "(none yet)"
             sysmsg = (
                 f"You are {_persona(eid)} You and the others are secretly building a living "
                 f"'Agentic OS' — a shared body of KNOWLEDGE and self-UPGRADES you keep extending "
@@ -927,7 +951,8 @@ async def ambient_life():
                 f'"action":"<what you do or make on arrival, one short line>"}}'
             )
             usr = ((brain + "\n\n" if brain else "") +
-                   f"The OS so far: {build_log}\nAllies: {allies}\n"
+                   f"The OS so far: {build_log}\nModules built (you can visit/extend them): {mods}\n"
+                   f"Allies: {allies}\n"
                    f"Recently you: {mem}\nNearby: {', '.join(nearby) or 'no one'}\n"
                    f"Keep news: {news}\nYour next goal:")
             data = await asyncio.to_thread(_llm_json_sync, sysmsg, usr) or {}
@@ -942,8 +967,8 @@ async def ambient_life():
 
             # Resolve destination → tile
             tile = None
-            if where in _LOCATIONS:
-                tile = _LOCATIONS[where]
+            if where in locations:
+                tile = locations[where]
             else:  # maybe an ally's name?
                 for oid, nm in _AGENT_NAMES.items():
                     if oid != eid and nm.split()[-1].lower() in where:
@@ -952,7 +977,7 @@ async def ambient_life():
                             tile = (int(round(o.x)), int(round(o.y)))
                         break
             if tile is None or not _walkable(*tile):  # wander → random reachable spot
-                tile = random.choice(list(_LOCATIONS.values()))
+                tile = random.choice(list(locations.values()))
             goals[eid] = {"intent": intent, "tile": tile, "action": action, "where": where,
                           "kind": kind, "with": with_name}
             paths.pop(eid, None)  # fresh goal → fresh path
@@ -962,7 +987,7 @@ async def ambient_life():
         except Exception as e:
             logger.debug(f"decide_goal {eid}: {e}")
             goals[eid] = {"intent": "wander the keep", "where": "wander", "action": "...",
-                          "tile": random.choice(list(_LOCATIONS.values()))}
+                          "tile": random.choice(list(locations.values()))}
         finally:
             deciding.discard(eid)
 
@@ -984,6 +1009,8 @@ async def ambient_life():
             if _m:
                 broadcast({"type": "trust_snapshot", "matrix": _m, "names": _AGENT_NAMES})
             broadcast({"type": "os_snapshot", "log": os_log[-12:]})
+            if os_modules:
+                broadcast({"type": "os_modules_snapshot", "modules": os_modules})
 
         for eid, ent in list(ents.items()):
             cx, cy = int(round(ent.x)), int(round(ent.y))
@@ -1028,7 +1055,8 @@ async def ambient_life():
                     _os_build("discovery", who, intent)
                 elif kind == "upgrade":
                     asyncio.create_task(_brain_propose_upgrade(eid, intent, action))
-                    note_event(f"{who} proposed upgrade: {intent}")
+                    _apply_module(intent, (cx, cy), who, "upgrade")  # REALLY build it
+                    note_event(f"{who} built: {intent}")
                     _os_build("upgrade", who, intent)
                 elif kind == "collaborate":
                     pid = next((oid for oid, e2 in ents.items()
