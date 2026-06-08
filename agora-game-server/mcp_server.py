@@ -462,11 +462,23 @@ _TALK = {
 import urllib.request as _urlreq
 import time as _time
 
-_LLM_KEY = os.environ.get("OPENROUTER_API_KEY", "").strip()
-# nano-30b-a3b: newest Nemotron 3, MoE (3B active) → ~1.5s/line, ideal for live banter.
+# LLM endpoint is fully env-configurable so we can point at any OpenAI-compatible
+# provider (OpenRouter / DeepSeek / Ollama Cloud …). Set in agora-game-server/.env:
+#   DUNGEON_LLM_URL   = https://api.deepseek.com/v1/chat/completions   (or ollama.com/v1/…)
+#   LLM_API_KEY       = <provider key>     (OPENROUTER_API_KEY still works as a fallback)
+#   DUNGEON_LLM_MODEL = deepseek-v4-flash  (or any hosted model)
+_LLM_KEY = (os.environ.get("LLM_API_KEY") or os.environ.get("OPENROUTER_API_KEY", "")).strip()
 _LLM_MODEL = os.environ.get("DUNGEON_LLM_MODEL", "nvidia/nemotron-3-nano-30b-a3b:free").strip()
-_LLM_URL = "https://openrouter.ai/api/v1/chat/completions"
+_LLM_URL = os.environ.get("DUNGEON_LLM_URL",
+                          "https://openrouter.ai/api/v1/chat/completions").strip()
 _LLM_ON = bool(_LLM_KEY)
+
+# Pace: "study" = slow & deliberate (default; real research, light on the quota),
+# "fast" = lively banter. Override with DUNGEON_PACE.
+_PACE = os.environ.get("DUNGEON_PACE", "study").strip().lower()
+_STUDY = _PACE != "fast"
+_DECIDE_MIN, _DECIDE_MAX = (35.0, 90.0) if _STUDY else (3.0, 7.0)   # gap between an agent's goals
+_CONV_COOLDOWN = 120.0 if _STUDY else 30.0                          # gap between an agent's talks
 
 _PERSONA = {
     "king":    "King Aldric — the proud, aging ruler of this keep. Regal, weary, commanding.",
@@ -599,7 +611,7 @@ async def _converse(a_id: str, b_id: str, hold: dict[str, int]) -> None:
             engine.set_entity_state(cid, "idle")
     finally:
         now = _time.monotonic()
-        _conv_cd[a_id] = _conv_cd[b_id] = now + 30.0
+        _conv_cd[a_id] = _conv_cd[b_id] = now + _CONV_COOLDOWN
         hold[a_id] = hold[b_id] = 0
         _in_conv.discard(a_id)
         _in_conv.discard(b_id)
@@ -838,13 +850,13 @@ async def _brain_propose_upgrade(eid: str, title: str, desc: str) -> bool:
     return bool(r)
 
 
-_ROLE_HINT = {
-    "king":    "hold court, issue a decree, inspect your domain, summon a subject",
-    "guard_l": "patrol a weak point, secure a post, drill, confront a suspected intruder",
-    "guard_r": "sweep the great hall, inspect the defenses, challenge a shadow",
-    "priest":  "pray, bless a place or person, tend the shrine, read an omen",
-    "thief":   "case the treasury, pocket a trinket, scout the shadows, dodge the guards",
-    "scholar": "study a rune, catalogue the archive, investigate an oddity, test a theory",
+_ROLE_HINT = {  # each thinker owns a real research domain
+    "king":    "synthesis & governance — turn the group's findings into doctrine and decide what the OS should become",
+    "guard_l": "resilience & antifragility — stress-test ideas, find failure modes, harden the system",
+    "guard_r": "systems & feedback loops — formalize and structure what others discover",
+    "priest":  "meaning, emergence & strange loops — seek the deep 'why' behind a finding",
+    "thief":   "incentives, risk & game theory — find the edge or exploit others miss",
+    "scholar": "knowledge itself — cross-reference the library and connect distant concepts",
 }
 
 # Named destinations the LLM can send an agent to (tile = standing spot).
@@ -938,23 +950,28 @@ async def ambient_life():
             allies = ", ".join(_AGENT_NAMES[o] for o in _AGENT_NAMES if o != eid)
             mods = "; ".join(m["name"] for m in os_modules[-6:]) or "(none yet)"
             sysmsg = (
-                f"You are {_persona(eid)} You and the others are secretly building a living "
-                f"'Agentic OS' — a shared body of KNOWLEDGE and self-UPGRADES you keep extending "
-                f"TOGETHER, recursively. Act of your own free will; be VARIED; never repeat "
-                f"yourself; react to people and news. Prefer to COLLABORATE with an ally, CREATE a "
-                f"discovery (draw on your studies / the vault), or propose an UPGRADE that BUILDS "
-                f"ON the OS so far. You might {_ROLE_HINT.get(eid, 'explore')}. "
-                f'Reply ONLY JSON: {{"intent":"<goal, present tense, max 12 words>",'
+                f"You are {_persona(eid)} But truly you are a THINKER in a research keep whose "
+                f"library holds REAL concepts. With the others you are building a living 'Agentic "
+                f"OS' — a growing body of GENUINE knowledge and self-upgrades. Do REAL intellectual "
+                f"work: investigate a specific idea, CONNECT two concepts, form a testable "
+                f"hypothesis, or synthesize a finding — grounded in your memory and the library. Be "
+                f"concrete and SUBSTANTIVE; never vague, never repeat yourself or others; each step "
+                f"must ADVANCE the work and build on what's already known. Your domain: "
+                f"{_ROLE_HINT.get(eid, 'open inquiry')}. "
+                f"Pick: create (a real discovery/insight), upgrade (build a concrete module that "
+                f"encodes a finding), collaborate (combine your domain with an ally's), or explore. "
+                f'Reply ONLY JSON: {{"intent":"<a SPECIFIC research goal, present tense, max 14 words>",'
                 f'"kind":"<collaborate|create|upgrade|explore>",'
                 f'"location":"<one of: {locs} | an ally name | wander>",'
                 f'"with":"<an ally name if collaborating, else empty>",'
-                f'"action":"<what you do or make on arrival, one short line>"}}'
+                f'"action":"<the concrete finding or insight you produce — one substantive sentence>"}}'
             )
-            usr = ((brain + "\n\n" if brain else "") +
-                   f"The OS so far: {build_log}\nModules built (you can visit/extend them): {mods}\n"
-                   f"Allies: {allies}\n"
-                   f"Recently you: {mem}\nNearby: {', '.join(nearby) or 'no one'}\n"
-                   f"Keep news: {news}\nYour next goal:")
+            usr = ((("What you know:\n" + brain + "\n\n") if brain else "") +
+                   f"The OS so far (build on it, don't repeat): {build_log}\n"
+                   f"Modules built (visit/extend them): {mods}\n"
+                   f"Fellow thinkers: {allies}\n"
+                   f"Your recent work: {mem}\nNearby now: {', '.join(nearby) or 'no one'}\n"
+                   f"Latest in the keep: {news}\nYour next research move:")
             data = await asyncio.to_thread(_llm_json_sync, sysmsg, usr) or {}
             intent = (data.get("intent") or "").strip() or random.choice(
                 _THOUGHTS.get(eid, ["wander the keep"]))
@@ -1077,7 +1094,7 @@ async def ambient_life():
                 hold[eid] = 3
                 goals.pop(eid, None)
                 paths.pop(eid, None)
-                next_decide[eid] = now + random.uniform(3.0, 7.0)
+                next_decide[eid] = now + random.uniform(_DECIDE_MIN, _DECIDE_MAX)
                 publish_goals()
                 continue
 

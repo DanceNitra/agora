@@ -16,26 +16,22 @@ class TierConfig:
     description: str
 
 
-# ── Free model tiers (OpenRouter, Nemotron family) ──
+import os as _os
+
+# A single override model for every tier (e.g. deepseek-v4-flash via DeepSeek/Ollama).
+# Set AGORA_LLM_MODEL to switch the whole stack off the free Nemotron tier.
+_OVERRIDE = _os.environ.get("AGORA_LLM_MODEL", "").strip()
+_CHEAP = _OVERRIDE or "nvidia/nemotron-3-nano-30b-a3b:free"
+_BIG = _OVERRIDE or "nvidia/nemotron-3-ultra-550b-a55b:free"
+
+# ── Model tiers (override-aware) ──
 DEFAULT_TIERS = [
-    TierConfig(
-        name="cheap",
-        model="nvidia/nemotron-3-nano-30b-a3b:free",
-        cost_per_token=0.0,
-        description="Free: Nemotron 3 Nano 30B MoE (3B active) — ~1.5s/call, ideal for real-time NPC/brain dialogue.",
-    ),
-    TierConfig(
-        name="medium",
-        model="nvidia/nemotron-3-ultra-550b-a55b:free",
-        cost_per_token=0.0,
-        description="Free: Nemotron 3 Ultra 550B MoE — balanced for general reasoning.",
-    ),
-    TierConfig(
-        name="expert",
-        model="nvidia/nemotron-3-ultra-550b-a55b:free",
-        cost_per_token=0.0,
-        description="Free: Nemotron 3 Ultra 550B MoE — top quality for complex reasoning.",
-    ),
+    TierConfig(name="cheap", model=_CHEAP, cost_per_token=0.0,
+               description="Cheap tier — fast model for real-time NPC/brain dialogue."),
+    TierConfig(name="medium", model=_BIG, cost_per_token=0.0,
+               description="Medium tier — balanced reasoning."),
+    TierConfig(name="expert", model=_BIG, cost_per_token=0.0,
+               description="Expert tier — top quality for complex reasoning."),
 ]
 
 
