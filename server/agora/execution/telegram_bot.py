@@ -216,6 +216,12 @@ async def _handle(app, text: str) -> None:
         from agora.config import settings
         from agora.execution.scientist import hypothesize_and_test, format_hypothesis
         await send(format_hypothesis(await hypothesize_and_test(topic, settings.vault_path)))
+    elif low.startswith(("frontier ", "/frontier ")):
+        topic = text.split(" ", 1)[1].strip()
+        await send("🔭 _Finding your vault's frontier…_")
+        from agora.config import settings
+        from agora.execution.knowledge_graph import frontier, format_frontier
+        await send(format_frontier(await frontier(topic, settings.vault_path, 8)))
     elif low in ("/gaps", "gaps"):
         from agora.execution.semantic_index import SemanticIndex
         si = SemanticIndex()

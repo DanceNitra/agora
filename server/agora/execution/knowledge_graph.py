@@ -80,6 +80,27 @@ async def believe(topic: str, vault_path: str, k: int = 8) -> dict:
     return {"topic": topic, "claims": claims, "contradictions": contradictions, "sources": sources}
 
 
+async def frontier(topic: str, vault_path: str, k: int = 8) -> dict:
+    """The vault's UNCERTAIN edges on a topic — low-confidence claims + contradictions = where to
+    research next (Pillar 1 → 3: knowing what the vault is least sure about)."""
+    b = await believe(topic, vault_path, k)
+    weak = sorted([c for c in b.get("claims", []) if c.get("conf", 1) < 0.6],
+                  key=lambda c: c.get("conf", 1))
+    return {"topic": topic, "weak": weak, "contradictions": b.get("contradictions", [])}
+
+
+def format_frontier(f: dict) -> str:
+    if not f.get("weak") and not f.get("contradictions"):
+        return f"🔭 *{f['topic'][:60]}* — your vault is confident here; little frontier to push."
+    lines = [f"🔭 *Research frontier — {f['topic'][:50]}* (where your vault is least sure)\n"]
+    for c in f.get("weak", [])[:6]:
+        lines.append(f"🟠 {c['conf']:.0%} · {c['s']} {c['r']} {c['o']}  _[[{c['src']}]]_")
+    for c in f.get("contradictions", [])[:3]:
+        lines.append(f"⚔️ {c.get('why', '')[:90]}")
+    lines.append("\n→ `hypothesize <one of these>` to push the frontier")
+    return "\n".join(lines)
+
+
 def format_belief(b: dict) -> str:
     """Compact markdown — what the vault believes about the topic."""
     claims = sorted(b.get("claims", []), key=lambda c: -c.get("conf", 0))

@@ -320,6 +320,14 @@ async def brain_hypothesize(q: str):
     return {"status": "ok", **await hypothesize_and_test(q, settings.vault_path)}
 
 
+@router.get("/brain/frontier")
+async def brain_frontier(q: str, k: int = 8):
+    """AGORA 2.0 — the vault's uncertain edges on a topic (low-confidence claims + contradictions)."""
+    from agora.config import settings
+    from agora.execution.knowledge_graph import frontier
+    return {"status": "ok", **await frontier(q, settings.vault_path, k)}
+
+
 @router.get("/brain/bridges")
 async def brain_bridges(n: int = 6, rationale: bool = True):
     """Pairs of the user's notes that are deeply related yet UNLINKED — missing connections.
