@@ -408,18 +408,20 @@ import random
 
 _WALKABLE_TYPES = {"floor", "floor_vip", "throne", "arch", "door", "grass"}
 
+# Idle/fallback musings — each agent ponders their REAL vault-research role.
 _THOUGHTS = {
-    "king": ["The realm is restless tonight.", "Bring me the treasury ledger.",
-             "Who dares approach my throne?"],
-    "guard_l": ["All quiet at the gate.", "Halt — state your business.",
-                "Another long watch ahead."],
-    "guard_r": ["Steel at the ready.", "Something stirs in the hall.", "For the crown!"],
-    "priest": ["The old gods are listening.", "A blessing upon this hall.",
-               "Dark omens gather..."],
-    "thief": ["So much gold, so little time.", "Nobody's watching the chests...",
-              "The shadows are my ally."],
-    "scholar": ["Fascinating runes on that wall.", "Knowledge is the true treasure.",
-                "I must record this at once."],
+    "king":    ["These findings must cohere into doctrine.", "What should the OS become next?",
+                "Time to turn this idea into a tool."],          # Aldric — Engineering Lead
+    "guard_l": ["Where would this claim break?", "Stress-test it before it ships.",
+                "Rigor first — prove it's robust."],             # Voss — Quality Assurance
+    "guard_r": ["These two notes want connecting.", "This needs a feedback loop.",
+                "A bridge is missing here."],                    # Elara — Bridge Builder
+    "priest":  ["What's the deeper why here?", "A strange loop hides in this.",
+                "Two distant ideas could fuse."],                # Orin — Idea Alchemist
+    "thief":   ["Where's the gap no one sees?", "The frontier shifted again.",
+                "The vault is silent on this."],                 # Kael — Research Scout
+    "scholar": ["Cross-reference this with the vault.", "Knowledge wants structure.",
+                "This deserves an evergreen note."],             # Mira — Knowledge Curator
 }
 
 
@@ -445,13 +447,13 @@ _ACT_LINES = {
     "casting":  ["Blessings bestowed.", "The rite is complete.", "Spirits, hear me."],
     "guard":    ["Post secured.", "Nothing to report.", "All quiet here."],
 }
-_TALK = {
-    "king": ["You may approach.", "Speak, then."],
-    "guard_l": ["On guard!", "Spar with me!"],
-    "guard_r": ["Have at thee!", "For the crown!"],
-    "priest": ["Blessings upon you.", "Peace, friend."],
-    "thief": ["...didn't see me.", "Move along."],
-    "scholar": ["A word, colleague?", "Most curious!"],
+_TALK = {  # research-shop openers (fallbacks)
+    "king":    ["What did you find?", "Does that hold up?"],
+    "guard_l": ["Where does this break?", "Prove it's robust."],
+    "guard_r": ["I see a connection.", "These two notes link."],
+    "priest":  ["What if we fused them?", "There's a deeper pattern."],
+    "thief":   ["Found a gap in the vault.", "The frontier moved."],
+    "scholar": ["I documented that.", "Let me cross-reference it."],
 }
 
 
@@ -481,12 +483,12 @@ _DECIDE_MIN, _DECIDE_MAX = (35.0, 90.0) if _STUDY else (3.0, 7.0)   # gap betwee
 _CONV_COOLDOWN = 120.0 if _STUDY else 30.0                          # gap between an agent's talks
 
 _PERSONA = {
-    "king":    "King Aldric — the proud, aging ruler of this keep. Regal, weary, commanding.",
-    "guard_l": "Sergeant Voss — a gruff veteran gate guard. Blunt, loyal, watchful.",
-    "guard_r": "Dame Elara — a sharp knight of the great hall. Disciplined, dry-witted.",
-    "priest":  "High Priest Orin — keeper of the shrine. Solemn, cryptic, kindly.",
-    "thief":   "Shadow Kael — a sly rogue eyeing the treasury. Sarcastic, quick, greedy.",
-    "scholar": "Sage Mira — an obsessive archivist. Curious, precise, easily distracted.",
+    "king":    "King Aldric — the keep's engineer-king who builds the tools and turns findings into doctrine. Commanding, decisive.",
+    "guard_l": "Sergeant Voss — the keep's quality gate. Blunt, rigorous; stress-tests every claim before it ships.",
+    "guard_r": "Dame Elara — the keep's bridge-builder. Sharp, dry-witted; finds the links between ideas others miss.",
+    "priest":  "High Priest Orin — the idea alchemist. Solemn, cryptic; fuses distant concepts into new ones.",
+    "thief":   "Shadow Kael — the frontier scout. Sly, quick, curious; hunts the gaps in the vault no one else sees.",
+    "scholar": "Sage Mira — the obsessive archivist. Precise; structures raw research into evergreen knowledge.",
 }
 
 # Per-agent throttles (monotonic timestamps) + in-conversation guard.
@@ -575,8 +577,8 @@ def _schedule_thought(eid: str, situation: str, fallback: str) -> None:
     asyncio.create_task(_run())
 
 
-async def _converse(a_id: str, b_id: str, hold: dict[str, int]) -> None:
-    """Two agents exchange a few in-character lines as sequential speech bubbles."""
+async def _converse(a_id: str, b_id: str, hold: dict[str, int], memory: dict) -> None:
+    """Two researchers talk shop about their CURRENT vault work — a few speech bubbles."""
     ents = engine.state.entities
     a, b = ents.get(a_id), ents.get(b_id)
     if not a or not b or a_id in _in_conv or b_id in _in_conv:
@@ -595,12 +597,17 @@ async def _converse(a_id: str, b_id: str, hold: dict[str, int]) -> None:
         turns = [(a_id, a.name, b.name), (b_id, b.name, a.name), (a_id, a.name, b.name)]
         history: list[str] = []
         for sid, sname, oname in turns:
-            sysmsg = (f"You are {_persona(sid)} You are in a torch-lit dungeon keep, speaking "
-                      f"with {oname}. Reply ONLY with JSON "
-                      f'{{"line":"<one short spoken line, max 14 words>"}}.')
-            convo = "  ".join(history) if history else "(you speak first)"
-            fb = random.choice(_TALK.get(sid, ["Well met.", "..."]))
-            line = await _llm_say(sysmsg, f"Dialogue so far: {convo}\nReply to {oname}.", fb)
+            my_work = " | ".join(memory.get(sid, [])[-3:]) or "(just arrived)"
+            sysmsg = (f"You are {_persona(sid)} You are a researcher at the Vault Company talking "
+                      f"shop with your colleague {oname}. Discuss your CURRENT research — a finding, "
+                      f"a gap, a concept worth connecting, or a friendly debate about an idea drawn "
+                      f"from the vault. Be concrete and substantive; NEVER dungeon chit-chat (no "
+                      f"prisoners, smells, gold, guards, thrones, omens). Reply ONLY JSON "
+                      f'{{"line":"<one spoken line about the work, max 16 words>"}}.')
+            convo = "  ".join(history) if history else "(you open)"
+            fb = random.choice(_TALK.get(sid, ["What did you find?", "..."]))
+            line = await _llm_say(sysmsg, f"Your recent work: {my_work}\n"
+                                  f"Dialogue so far: {convo}\nReply to {oname} about the research.", fb)
             engine.set_entity_thought(sid, line)
             history.append(f"{sname}: {line}")
             await asyncio.sleep(2.4)
@@ -617,8 +624,8 @@ async def _converse(a_id: str, b_id: str, hold: dict[str, int]) -> None:
         _in_conv.discard(b_id)
 
 
-def _maybe_start_conversation(ents, dead: dict[str, int], hold: dict[str, int]) -> None:
-    """Find one eligible nearby pair and start a conversation (at most one per tick)."""
+def _maybe_start_conversation(ents, dead: dict[str, int], hold: dict[str, int], memory: dict) -> None:
+    """Find one eligible nearby pair and start a research conversation (one per tick)."""
     now = _time.monotonic()
     ids = [e for e in ents if e not in _in_conv
            and dead.get(e, 0) == 0 and now >= _conv_cd.get(e, 0.0)]
@@ -629,7 +636,7 @@ def _maybe_start_conversation(ents, dead: dict[str, int], hold: dict[str, int]) 
                 continue  # two guards spar instead of chatting
             ea, eb = ents[a], ents[b]
             if abs(ea.x - eb.x) + abs(ea.y - eb.y) <= 2:  # within 2 tiles
-                asyncio.create_task(_converse(a, b, hold))
+                asyncio.create_task(_converse(a, b, hold, memory))
                 return
 
 
@@ -1128,8 +1135,8 @@ async def ambient_life():
             hold[eid] = max(0, hold.get(eid, 0) - 1)
             cooldown[eid] = max(0, cooldown.get(eid, 0) - 1)
 
-        # Agents that wander near each other strike up a conversation.
-        _maybe_start_conversation(ents, dead, hold)
+        # Agents that wander near each other talk shop about their research.
+        _maybe_start_conversation(ents, dead, hold, memory)
 
         loop_n += 1
         if loop_n % 10 == 1:
