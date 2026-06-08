@@ -493,6 +493,40 @@ async def get_v3_status(npc_name: str, request: Request):
     }
 
 
+# ── Bridge endpoints (used by the dungeon to feed experiences in + read the vault) ──
+
+@router.post("/{npc_name}/memories")
+async def add_memory(npc_name: str, request: Request):
+    """Store a memory for an agent (the dungeon feeds lived experiences back here)."""
+    from agora.agent_os.memory_agent import MemoryAgent
+    body = await request.json()
+    content = (body.get("content") or "").strip()
+    if not content:
+        raise HTTPException(400, "Missing field: content")
+    npc_id = DUNGEON_AGENT_IDS.get(npc_name) or npc_name
+    mem = MemoryAgent(request.app.state.db, npc_id)
+    mem_id = await mem.store_memory(
+        content,
+        memory_type=body.get("memory_type", "episodic"),
+        importance=float(body.get("importance", 0.5)),
+        emotional_tag=body.get("emotional_tag", "neutral"),
+        source=body.get("source", "experience"),
+        related_npc_id=body.get("related_npc_id"),
+    )
+    return {"status": "stored", "id": mem_id}
+
+
+@router.get("/brain/vault")
+async def query_vault(request: Request, q: str = "", k: int = 3):
+    """Query the Obsidian vault (the agents' shared knowledge base)."""
+    reader = getattr(request.app.state, "vault_reader", None)
+    if not reader:
+        return {"results": [], "vault": "unavailable"}
+    results = await reader.query(q, top_k=k) if q else [await reader.get_random_insight()]
+    results = [r for r in results if r]
+    return {"results": results, "real_vault": reader.is_real()}
+
+
 # ── Bare single-segment catch-all — MUST be registered LAST so specific static
 #    routes (/emotions, /culture, /conflicts, /brain/*) are matched first. ──
 @router.get("/{npc_name}")

@@ -742,6 +742,75 @@ def _astar(start: tuple[int, int], goal: tuple[int, int]) -> list[tuple[int, int
     return None
 
 
+# ── Brain bridge → server/agora (:8000): real memory, emotion, vault ──────────
+# The dungeon is the BODY; each agent's MIND lives in server/agora. Best-effort:
+# if :8000 is down, these no-op and the local goal engine still runs.
+from urllib.parse import quote as _urlquote
+
+_BRAIN_URL = os.environ.get("AGORA_BRAIN_URL", "http://localhost:8000").rstrip("/")
+_BRAIN_ID = {   # dungeon entity → server/agora NPC UUID (names already aligned)
+    "thief":   "00000000-0000-0000-0000-000000000001",  # Shadow Kael
+    "scholar": "00000000-0000-0000-0000-000000000002",  # Sage Mira
+    "priest":  "00000000-0000-0000-0000-000000000003",  # High Priest Orin
+    "king":    "00000000-0000-0000-0000-000000000004",  # King Aldric
+    "guard_r": "00000000-0000-0000-0000-000000000005",  # Dame Elara
+    "guard_l": "00000000-0000-0000-0000-000000000007",  # Sergeant Voss
+}
+
+
+def _brain_get_sync(path: str):
+    try:
+        req = _urlreq.Request(_BRAIN_URL + path, headers={"Accept": "application/json"})
+        with _urlreq.urlopen(req, timeout=4) as r:
+            return json.loads(r.read())
+    except Exception:
+        return None
+
+
+def _brain_post_sync(path: str, body: dict):
+    try:
+        req = _urlreq.Request(_BRAIN_URL + path, data=json.dumps(body).encode(),
+                              headers={"Content-Type": "application/json"})
+        with _urlreq.urlopen(req, timeout=4) as r:
+            return json.loads(r.read())
+    except Exception:
+        return None
+
+
+async def _brain_context(eid: str, situation: str) -> str:
+    """Pull this agent's MIND from server/agora: emotion + relevant memories + a vault insight."""
+    bid = _BRAIN_ID.get(eid)
+    if not bid:
+        return ""
+    q = _urlquote(situation[:120])
+    lines = []
+    em = await asyncio.to_thread(_brain_get_sync, f"/api/v1/agent-os/{bid}/emotion")
+    if em and em.get("current"):
+        lines.append(f"Right now you feel {em['current']} (mood {float(em.get('mood', 0.7)):.2f}).")
+    mq = await asyncio.to_thread(
+        _brain_get_sync, f"/api/v1/agent-os/{bid}/memories/recall?q={q}&limit=4")
+    if mq and mq.get("memories"):
+        mems = "; ".join((m.get("content") or "")[:80] for m in mq["memories"][:3])
+        if mems:
+            lines.append(f"You remember: {mems}")
+    vq = await asyncio.to_thread(_brain_get_sync, f"/api/v1/agent-os/brain/vault?q={q}&k=1")
+    if vq and vq.get("results"):
+        v = vq["results"][0]
+        if v and v.get("text"):
+            lines.append(f"From your studies ({v.get('title', '')}): {v['text'][:140]}")
+    return "\n".join(lines)
+
+
+async def _brain_remember(eid: str, content: str, tag: str = "neutral"):
+    """Persist a lived experience back into the agent's server/agora memory."""
+    bid = _BRAIN_ID.get(eid)
+    if not bid:
+        return
+    await asyncio.to_thread(
+        _brain_post_sync, f"/api/v1/agent-os/{bid}/memories",
+        {"content": content[:200], "importance": 0.55, "emotional_tag": tag, "source": "dungeon"})
+
+
 _ROLE_HINT = {
     "king":    "hold court, issue a decree, inspect your domain, summon a subject",
     "guard_l": "patrol a weak point, secure a post, drill, confront a suspected intruder",
@@ -805,6 +874,8 @@ async def ambient_life():
             locs = ", ".join(_LOCATIONS.keys())
             mem = " | ".join(memory.get(eid, [])[-4:]) or "(nothing yet)"
             news = " | ".join(world_events[-4:]) or "(quiet)"
+            # Pull the agent's real mind (memory/emotion/vault) from server/agora.
+            brain = await _brain_context(eid, f"{_ROLE_HINT.get(eid, '')} {mem}")
             sysmsg = (
                 f"You are {_persona(eid)} You roam a torch-lit dungeon keep and act of "
                 f"your OWN free will. Be proactive and VARIED — do NOT repeat what you "
@@ -814,7 +885,8 @@ async def ambient_life():
                 f'"location":"<one of: {locs} | an ally\'s name | wander>",'
                 f'"action":"<what you do on arrival, one short line>"}}'
             )
-            usr = (f"Recently you: {mem}\nNearby: {', '.join(nearby) or 'no one'}\n"
+            usr = ((brain + "\n\n" if brain else "") +
+                   f"Recently you: {mem}\nNearby: {', '.join(nearby) or 'no one'}\n"
                    f"Keep news: {news}\nYour next goal:")
             data = await asyncio.to_thread(_llm_json_sync, sysmsg, usr) or {}
             intent = (data.get("intent") or "").strip() or random.choice(
@@ -931,6 +1003,8 @@ async def ambient_life():
                 engine.add_effect("glow", cx, cy, "#ffd27a", 0.9)
                 remember(eid, goal["intent"])
                 note_event(f"{_AGENT_NAMES.get(eid, eid)}: {goal['intent']}")
+                # Persist the lived experience back into the agent's server/agora memory.
+                asyncio.create_task(_brain_remember(eid, f"{goal['intent']} — {goal['action']}"))
                 # If the goal was aimed at an ally standing here, that's cooperation.
                 for oid, e2 in ents.items():
                     if oid != eid and abs(e2.x - cx) + abs(e2.y - cy) <= 1:
