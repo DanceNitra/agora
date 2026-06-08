@@ -62,9 +62,25 @@ async def init_db(app: FastAPI):
         except Exception:
             pass  # column already exists
 
+    # Migration (ESS 1.4): trust_scores forgiveness state + sliding window (existing DBs)
+    if db:
+        for _col_ddl in (
+            "ALTER TABLE trust_scores ADD COLUMN consecutive_cooperations INTEGER NOT NULL DEFAULT 0",
+            "ALTER TABLE trust_scores ADD COLUMN consecutive_defections INTEGER NOT NULL DEFAULT 0",
+            "ALTER TABLE trust_scores ADD COLUMN sliding_window TEXT NOT NULL DEFAULT '[]'",
+        ):
+            try:
+                await db.execute(_col_ddl)
+                await db.commit()
+            except Exception:
+                pass  # column already exists
+
     # Initialize state objects
     app.state.trust = TrustEngine(db) if db else TrustEngine(None)
     app.state.tft_verifier = TFTVerifier(db) if db else None
+    # Wire TFTVerifier → TrustEngine for provokability queries (ESS 1.4)
+    if app.state.tft_verifier:
+        app.state.tft_verifier.trust_engine = app.state.trust
     app.state.stigmergy = StigmergyPool(redis_client=None, db=db)
     if db:
         await app.state.stigmergy.load_from_db()

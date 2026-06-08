@@ -307,6 +307,26 @@ class TFTVerifier:
             + W_CLEAR * clear
         )
 
+        # Provokability — average ESS-stability across this agent's partners (ESS 1.4)
+        provokability = {"provokability_score": 0.5, "is_stable": False}
+        trust_engine = getattr(self, "trust_engine", None)
+        if trust_engine:
+            partners = set()
+            for h in history:
+                partners.add(h["target_id"] if h["agent_is_source"] else h["source_id"])
+            scores = []
+            for p in partners:
+                result = await trust_engine.compute_provokability(agent_id, p)
+                scores.append(result["provokability_score"])
+            if scores:
+                provokability = {
+                    "provokability_score": round(sum(scores) / len(scores), 4),
+                    "is_stable": all(
+                        s >= trust_engine.PROVOKABILITY_THRESHOLD for s in scores
+                    ),
+                    "pair_count": len(scores),
+                }
+
         return {
             "agent_id": agent_id[:8],
             "tft_score": round(tft_score, 4),
@@ -316,6 +336,7 @@ class TFTVerifier:
                 "forgiving": round(forgiving, 4),
                 "clear": round(clear, 4),
             },
+            "provokability": provokability,
             "interaction_count": len(history),
             "weights": {
                 "nice": W_NICE,

@@ -73,6 +73,10 @@ class TrustScore(Base):
     )
     score = sa.Column(sa.Float, nullable=False, default=0.5)
     interaction_count = sa.Column(sa.Integer, nullable=False, default=0)
+    # ESS 1.4 — production-ready trust engine
+    consecutive_cooperations = sa.Column(sa.Integer, nullable=False, default=0)
+    consecutive_defections = sa.Column(sa.Integer, nullable=False, default=0)
+    sliding_window = sa.Column(sa.Text, nullable=False, default="[]")
     last_updated = sa.Column(
         sa.Text, nullable=False, server_default=sa.func.datetime("now")
     )

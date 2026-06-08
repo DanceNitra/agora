@@ -20,6 +20,9 @@ CREATE TABLE IF NOT EXISTS trust_scores (
     target_id       TEXT NOT NULL REFERENCES agent_identities(agent_id),
     score           REAL NOT NULL DEFAULT 0.5 CHECK (score >= 0 AND score <= 1),
     interaction_count INTEGER NOT NULL DEFAULT 0,
+    consecutive_cooperations INTEGER NOT NULL DEFAULT 0,  -- ESS 1.4: forgiveness state survives restart
+    consecutive_defections   INTEGER NOT NULL DEFAULT 0,
+    sliding_window  TEXT NOT NULL DEFAULT '[]',           -- ESS 1.4: last N interactions (JSON)
     last_updated    TEXT NOT NULL DEFAULT (datetime('now')),
     UNIQUE(source_id, target_id)
 );
