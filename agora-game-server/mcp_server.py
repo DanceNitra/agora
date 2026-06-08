@@ -1178,6 +1178,16 @@ async def _consume_guidance(eid: str) -> str:
     return (d or {}).get("guidance") or ""
 
 
+async def _run_verification() -> None:
+    """Voss autonomously fact-checks recent findings and incorporates the VERIFIED ones into the
+    vault — so the OS keeps only knowledge that holds up against real sources, hands-free."""
+    d = await asyncio.to_thread(_brain_post_sync, "/api/v1/agent-os/brain/verify-findings?n=6", {})
+    inc = (d or {}).get("incorporated", 0)
+    if inc:
+        broadcast({"type": "os_build", "kind": "collab", "who": "Sergeant Voss",
+                   "text": f"verified + incorporated {inc} finding(s) into the vault"})
+
+
 async def _broadcast_trust_graph():
     """One unified graph for the dungeon: ESS pairwise trust + learning (teach) edges +
     each agent's standing — persisted so the trust-weighted curator (AutoLinker) can read it."""
@@ -1693,6 +1703,9 @@ async def ambient_life():
             if _now.tm_hour >= 7 and _report_state["last"] != _today:
                 _report_state["last"] = _today
                 asyncio.create_task(_send_morning_report())
+        # Voss autonomously fact-checks recent findings and incorporates the VERIFIED ones (~6 min).
+        if loop_n % 450 == 200:
+            asyncio.create_task(_run_verification())
 
         for eid, ent in list(ents.items()):
             cx, cy = int(round(ent.x)), int(round(ent.y))
