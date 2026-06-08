@@ -30,7 +30,8 @@ def _embed_batch(texts: list[str]) -> list[list[float]]:
         return json.loads(r.read()).get("embeddings", [])
 
 
-def _note_text(path: Path) -> str | None:
+def _note_text(path: Path) -> tuple[str, int] | None:
+    """Return (embed_text, full_body_length) or None for stubs."""
     try:
         t = path.read_text(encoding="utf-8", errors="replace")
     except Exception:
@@ -43,7 +44,7 @@ def _note_text(path: Path) -> str | None:
     body = re.sub(r"\s+", " ", body).strip()
     if len(body) < 40:
         return None
-    return f"{path.stem}. {body[:500]}"
+    return f"{path.stem}. {body[:500]}", len(body)
 
 
 def build_index(vault: str, batch: int = 64) -> dict:
@@ -53,18 +54,19 @@ def build_index(vault: str, batch: int = 64) -> dict:
     for p in vroot.rglob("*.md"):
         if any(s in p.parts or s in str(p) for s in SKIP):
             continue
-        txt = _note_text(p)
-        if txt:
-            items.append((p.relative_to(vroot).as_posix(), p.stem, txt))
+        res = _note_text(p)
+        if res:
+            embed_txt, full_len = res
+            items.append((p.relative_to(vroot).as_posix(), p.stem, embed_txt, full_len))
     vecs, meta = [], []
     t0 = time.time()
     for i in range(0, len(items), batch):
         chunk = items[i:i + batch]
         embs = _embed_batch([c[2] for c in chunk])
-        for (rel, title, txt), e in zip(chunk, embs):
+        for (rel, title, _embed, full_len), e in zip(chunk, embs):
             if e:
                 vecs.append(e)
-                meta.append({"path": rel, "title": title, "len": len(txt)})
+                meta.append({"path": rel, "title": title, "len": full_len})
     arr = np.array(vecs, dtype=np.float32)
     arr /= (np.linalg.norm(arr, axis=1, keepdims=True) + 1e-9)   # L2-normalize
     # nearest-neighbour similarity per note (isolation signal for gap detection)
@@ -99,15 +101,19 @@ class SemanticIndex:
         except Exception:
             self.vecs, self.nn, self.meta = None, None, []
 
-    def find_gaps(self, n: int = 12, min_len: int = 300) -> list[dict]:
-        """The user's most ISOLATED yet SUBSTANTIVE notes — seeds they planted but never grew
-        (semantically disconnected, real content). These are the gaps worth real research."""
+    # tooling / reference / templates — not knowledge gaps
+    _NOT_KNOWLEDGE = ("System/Skills", "06 System", "Templates", "templates",
+                      "Backups", ".meta", "Sessions", "Daily", "Inbox", "Fleeting")
+
+    def find_gaps(self, n: int = 12, min_len: int = 900) -> list[dict]:
+        """The user's most ISOLATED yet SUBSTANTIVE knowledge notes — seeds they invested in but
+        never grew (semantically disconnected, real content, not tooling). Real research gaps."""
         if not self.ready or self.nn is None:
             return []
         gaps = []
         for i in np.argsort(self.nn):                # most isolated first
             m = self.meta[i]
-            if m.get("len", 0) >= min_len:
+            if m.get("len", 0) >= min_len and not any(s in m["path"] for s in self._NOT_KNOWLEDGE):
                 gaps.append({"title": m["title"], "path": m["path"],
                              "isolation": round(float(1 - self.nn[i]), 3)})
             if len(gaps) >= n:

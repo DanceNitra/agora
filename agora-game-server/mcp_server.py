@@ -888,6 +888,15 @@ async def _brain_vault_search(query: str) -> list:
     return (d or {}).get("results", [])
 
 
+_report_state = {"last": ""}
+
+
+async def _send_morning_report() -> None:
+    """Once per morning, ask the brain to build + Telegram a digest of overnight findings."""
+    await asyncio.to_thread(_brain_post_sync,
+                            "/api/v1/agent-os/brain/morning-report?send=true", {})
+
+
 _GAP_CACHE = {"gaps": [], "ts": 0.0}
 
 
@@ -1417,6 +1426,14 @@ async def ambient_life():
                 asyncio.create_task(_run_consolidation("scholar", _stm.get("scholar", 0.5)))
             if loop_n % 1000 == 300 and not orchestration["running"]:  # Aldric: doctrine + GitHub (~14 min)
                 asyncio.create_task(_run_orchestration("king", _stm.get("king", 0.5)))
+
+        # Morning report → Telegram, once per day after 07:00 local.
+        if loop_n % 200 == 100:
+            _now = _time.localtime()
+            _today = _time.strftime("%Y-%m-%d", _now)
+            if _now.tm_hour >= 7 and _report_state["last"] != _today:
+                _report_state["last"] = _today
+                asyncio.create_task(_send_morning_report())
 
         for eid, ent in list(ents.items()):
             cx, cy = int(round(ent.x)), int(round(ent.y))
