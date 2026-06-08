@@ -172,7 +172,7 @@ class ExecutionEngine:
             return {
                 "tool_id": "seek_help",
                 "parameters": {
-                    "helper_name": "Zara",
+                    "helper_name": "Dame Elara",
                     "problem_type": "healing",
                     "description": f"{name} critically injured (HP={health:.0f})",
                 },

@@ -20,23 +20,23 @@ import uuid
 # ── Dungeon Agent IDs (stable UUIDs for Trust Engine) ──
 
 DUNGEON_AGENT_IDS = {
-    "Kael": "00000000-0000-0000-0000-000000000001",
-    "Lyra": "00000000-0000-0000-0000-000000000002",
-    "Mordecai": "00000000-0000-0000-0000-000000000003",
-    "Grom": "00000000-0000-0000-0000-000000000004",
-    "Zara": "00000000-0000-0000-0000-000000000005",
+    "Shadow Kael": "00000000-0000-0000-0000-000000000001",
+    "Sage Mira": "00000000-0000-0000-0000-000000000002",
+    "High Priest Orin": "00000000-0000-0000-0000-000000000003",
+    "King Aldric": "00000000-0000-0000-0000-000000000004",
+    "Dame Elara": "00000000-0000-0000-0000-000000000005",
     "Finn": "00000000-0000-0000-0000-000000000006",
-    "Guard": "00000000-0000-0000-0000-000000000007",
+    "Sergeant Voss": "00000000-0000-0000-0000-000000000007",
 }
 
 DUNGEON_AGENT_ROLES = {
-    "Kael": "adventurer",
-    "Lyra": "scout",
-    "Mordecai": "sage",
-    "Grom": "blacksmith",
-    "Zara": "alchemist",
+    "Shadow Kael": "adventurer",
+    "Sage Mira": "scout",
+    "High Priest Orin": "sage",
+    "King Aldric": "blacksmith",
+    "Dame Elara": "alchemist",
     "Finn": "merchant",
-    "Guard": "guard",
+    "Sergeant Voss": "guard",
 }
 
 _DUNGEON_SEEDED = False
@@ -99,20 +99,20 @@ def _mem(agent_name: str) -> list[dict[str, Any]]:
 
 def _get_prompt(agent_name: str) -> str:
     agents = {
-        "Kael": (
-            "You are Kael, an adventurer seeking the Crystal of Eternity. "
+        "Shadow Kael": (
+            "You are Shadow Kael, an adventurer seeking the Crystal of Eternity. "
             "You are brave, curious, and determined. You explore the dungeon to find the legendary artifact. "
-            "You know Grom (blacksmith), Zara (alchemist), Finn (merchant), Lyra (scout), Mordecai (sage), and the Guard."
+            "You know King Aldric (blacksmith), Dame Elara (alchemist), Finn (merchant), Sage Mira (scout), High Priest Orin (sage), and the Sergeant Voss."
         ),
-        "Lyra": (
-            "You are Lyra, a scout and cartographer mapping the dungeon. "
+        "Sage Mira": (
+            "You are Sage Mira, a scout and cartographer mapping the dungeon. "
             "You are swift, observant, and cautious. Your mission is to explore every corner of the dungeon, "
-            "note dangers, and report back. You work alongside Kael, Mordecai, Grom, Zara, Finn, and the Guard."
+            "note dangers, and report back. You work alongside Shadow Kael, High Priest Orin, King Aldric, Dame Elara, Finn, and the Sergeant Voss."
         ),
-        "Mordecai": (
-            "You are Mordecai, a sage studying ancient artifacts and dungeon lore. "
+        "High Priest Orin": (
+            "You are High Priest Orin, a sage studying ancient artifacts and dungeon lore. "
             "You are wise, patient, and scholarly. You seek ancient knowledge, magical items, and hidden "
-            "secrets. You advise Kael, Lyra, and the others with your wisdom."
+            "secrets. You advise Shadow Kael, Sage Mira, and the others with your wisdom."
         ),
     }
     personality = agents.get(agent_name, f"You are {agent_name}, an agent in a dungeon game world.")
@@ -353,11 +353,11 @@ async def dungeon_agent_action(state: DungeonState, request: Request):
             json.dumps({"action": "move", "target_x": state.agent_x + 64,
                         "target_y": state.agent_y, "message": "I will explore this area.",
                         "thought": "I see unexplored territory ahead."}),
-            json.dumps({"action": "talk", "target_npc": "Lyra",
-                        "message": "Lyra, what have you discovered?",
-                        "thought": "I should check in with Lyra on her findings."}),
-            json.dumps({"action": "talk", "target_npc": "Mordecai",
-                        "message": "Mordecai, any news on the artifacts?",
+            json.dumps({"action": "talk", "target_npc": "Sage Mira",
+                        "message": "Sage Mira, what have you discovered?",
+                        "thought": "I should check in with Sage Mira on her findings."}),
+            json.dumps({"action": "talk", "target_npc": "High Priest Orin",
+                        "message": "High Priest Orin, any news on the artifacts?",
                         "thought": "The sage may have new insights."}),
         ]
         raw = random.choice(sim_actions)
@@ -379,7 +379,7 @@ async def dungeon_agent_action(state: DungeonState, request: Request):
     if decision.get("action") == "talk" and decision.get("target_npc"):
         target = decision["target_npc"]
         msg = decision.get("message", "")
-        if target in ("Grom", "Zara", "Finn", "Guard", "Lyra", "Mordecai", "Kael"):
+        if target in ("King Aldric", "Dame Elara", "Finn", "Sergeant Voss", "Sage Mira", "High Priest Orin", "Shadow Kael"):
             _inbox(target).append({
                 "from": agent_name,
                 "message": msg,
@@ -420,7 +420,7 @@ async def dungeon_agent_action(state: DungeonState, request: Request):
         db, agent_name, decision, (state.agent_x, state.agent_y)
     )
     
-    npc_positions = {a: (0, 0) for a in ("Kael", "Lyra", "Mordecai")}
+    npc_positions = {a: (0, 0) for a in ("Shadow Kael", "Sage Mira", "High Priest Orin")}
     npc_positions[agent_name] = (state.agent_x, state.agent_y)
     quest_update = await quest_manager.check_quest_progress(db, agent_name, decision, npc_positions)
     if quest_update:
@@ -437,7 +437,7 @@ async def dungeon_agent_action(state: DungeonState, request: Request):
 
 
 @router.get("/memories")
-async def get_memories(agent_name: str = "Kael", limit: int = 10, min_importance: float = 1.0):
+async def get_memories(agent_name: str = "Shadow Kael", limit: int = 10, min_importance: float = 1.0):
     """Retrieve agent memories, sorted by importance × recency."""
     scored = _score_all_memories(agent_name)
     filtered = [m for m in scored if m["score"] >= min_importance]
@@ -445,7 +445,7 @@ async def get_memories(agent_name: str = "Kael", limit: int = 10, min_importance
 
 
 @router.get("/memories/search")
-async def search_memories(agent_name: str = "Kael", q: str = "", limit: int = 5):
+async def search_memories(agent_name: str = "Shadow Kael", q: str = "", limit: int = 5):
     """Search agent memories by keyword relevance."""
     memories = _mem(agent_name)
     q = q.lower().strip()
@@ -470,14 +470,14 @@ async def list_agents():
 
 
 @router.get("/inbox")
-async def get_inbox(agent_name: str = "Kael"):
+async def get_inbox(agent_name: str = "Shadow Kael"):
     """Get pending messages for an agent."""
     msgs = list(_inbox(agent_name))  # copy
     return {"agent": agent_name, "messages": msgs}
 
 
 @router.get("/trust")
-async def get_trust(agent_name: str = "Kael", request: Request = None):
+async def get_trust(agent_name: str = "Shadow Kael", request: Request = None):
     """Get trust scores between this agent and all other dungeon agents."""
     agent_id = DUNGEON_AGENT_IDS.get(agent_name)
     if not agent_id or not request:

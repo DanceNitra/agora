@@ -202,13 +202,13 @@ ROLE_SKILLS = {
 
 # Map NPC names to Dungeon OS roles
 NPC_ROLE_MAP = {
-    "Kael": "openclaw",
-    "Lyra": "hermes",
-    "Mordecai": "scribe",
-    "Grom": "forge",
-    "Zara": "scribe",  # dual: knowledge + crafting; closest to Scribe
+    "Shadow Kael": "openclaw",
+    "Sage Mira": "hermes",
+    "High Priest Orin": "scribe",
+    "King Aldric": "forge",
+    "Dame Elara": "scribe",  # dual: knowledge + crafting; closest to Scribe
     "Finn": "ledger",
-    "Guard": "warden",
+    "Sergeant Voss": "warden",
     # Generic agents keep their roles
 }
 

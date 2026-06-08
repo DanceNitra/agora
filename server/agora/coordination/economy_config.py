@@ -15,31 +15,31 @@ Each role has:
 
 # NPC name → economy config
 ROLE_ECONOMY = {
-    "Kael": {
+    "Shadow Kael": {
         "produces": [(1, 0.5)],              # gold_ore
         "consumes": [(3, 0.2)],              # crystal_shards (for enchantments)
         "surplus_threshold": 3.0,            # sell when inventory > this
         "deficit_threshold": 1.0,            # buy when inventory < this
     },
-    "Lyra": {
+    "Sage Mira": {
         "produces": [(2, 0.6)],              # herbs
         "consumes": [(5, 0.2)],              # scroll_fragment (maps/knowledge)
         "surplus_threshold": 3.0,
         "deficit_threshold": 1.0,
     },
-    "Mordecai": {
+    "High Priest Orin": {
         "produces": [(5, 0.4)],              # scroll_fragment
         "consumes": [(3, 0.3)],              # crystal_shards (for research)
         "surplus_threshold": 2.0,
         "deficit_threshold": 0.5,
     },
-    "Grom": {
+    "King Aldric": {
         "produces": [(4, 0.5)],              # iron_ingot
         "consumes": [(1, 0.3)],              # gold_ore (for smithing)
         "surplus_threshold": 2.0,
         "deficit_threshold": 0.5,
     },
-    "Zara": {
+    "Dame Elara": {
         "produces": [(2, 0.4)],              # herbs
         "consumes": [(4, 0.2), (3, 0.1)],   # iron_ingot (tools) + crystal_shards (alchemy)
         "surplus_threshold": 3.0,
@@ -52,7 +52,7 @@ ROLE_ECONOMY = {
         "deficit_threshold": 0.0,
         "trader": True,                       # Finn is a trader — exploits price differences
     },
-    "Guard": {
+    "Sergeant Voss": {
         "produces": [],                       # guard produces nothing
         "consumes": [(4, 0.1)],              # iron_ingot (weapon maintenance)
         "surplus_threshold": 1.0,

@@ -17,13 +17,13 @@ from datetime import datetime
 
 # ── NPC agent IDs ──
 NPC_UUIDS = {
-    "Kael":     "00000000-0000-0000-0000-000000000001",
-    "Lyra":     "00000000-0000-0000-0000-000000000002",
-    "Mordecai": "00000000-0000-0000-0000-000000000003",
-    "Grom":     "00000000-0000-0000-0000-000000000004",
-    "Zara":     "00000000-0000-0000-0000-000000000005",
+    "Shadow Kael":     "00000000-0000-0000-0000-000000000001",
+    "Sage Mira":     "00000000-0000-0000-0000-000000000002",
+    "High Priest Orin": "00000000-0000-0000-0000-000000000003",
+    "King Aldric":     "00000000-0000-0000-0000-000000000004",
+    "Dame Elara":     "00000000-0000-0000-0000-000000000005",
     "Finn":     "00000000-0000-0000-0000-000000000006",
-    "Guard":    "00000000-0000-0000-0000-000000000007",
+    "Sergeant Voss":    "00000000-0000-0000-0000-000000000007",
 }
 
 UUID_TO_NAME = {v: k for k, v in NPC_UUIDS.items()}
@@ -34,8 +34,8 @@ UUID_TO_NAME = {v: k for k, v in NPC_UUIDS.items()}
 # ═══════════════════════════════════════════
 
 NPC_DEFS = {
-    "Kael": {
-        "name": "Kael",
+    "Shadow Kael": {
+        "name": "Shadow Kael",
         "role": "adventurer",
         "archetype": "explorer",
         "personality": {"openness": 0.8, "conscientiousness": 0.6, "extraversion": 0.7, "agreeableness": 0.6, "neuroticism": 0.3},
@@ -49,8 +49,8 @@ NPC_DEFS = {
         ],
         "skills": [("swordfighting", 8), ("exploration", 7), ("climbing", 6), ("torch_crafting", 4)],
     },
-    "Lyra": {
-        "name": "Lyra",
+    "Sage Mira": {
+        "name": "Sage Mira",
         "role": "scout",
         "archetype": "scout",
         "personality": {"openness": 0.9, "conscientiousness": 0.5, "extraversion": 0.6, "agreeableness": 0.7, "neuroticism": 0.4},
@@ -64,8 +64,8 @@ NPC_DEFS = {
         ],
         "skills": [("stealth", 8), ("cartography", 7), ("tracking", 6), ("herbalism", 5)],
     },
-    "Mordecai": {
-        "name": "Mordecai",
+    "High Priest Orin": {
+        "name": "High Priest Orin",
         "role": "sage",
         "archetype": "sage",
         "personality": {"openness": 0.7, "conscientiousness": 0.9, "extraversion": 0.2, "agreeableness": 0.5, "neuroticism": 0.6},
@@ -79,8 +79,8 @@ NPC_DEFS = {
         ],
         "skills": [("arcana", 9), ("history", 8), ("runes", 7), ("alchemy_theory", 6)],
     },
-    "Grom": {
-        "name": "Grom",
+    "King Aldric": {
+        "name": "King Aldric",
         "role": "blacksmith",
         "archetype": "craftsman",
         "personality": {"openness": 0.4, "conscientiousness": 0.9, "extraversion": 0.5, "agreeableness": 0.7, "neuroticism": 0.2},
@@ -94,8 +94,8 @@ NPC_DEFS = {
         ],
         "skills": [("smithing", 9), ("mining", 7), ("repair", 6), ("weaponcraft", 8)],
     },
-    "Zara": {
-        "name": "Zara",
+    "Dame Elara": {
+        "name": "Dame Elara",
         "role": "alchemist",
         "archetype": "alchemist",
         "personality": {"openness": 0.8, "conscientiousness": 0.7, "extraversion": 0.5, "agreeableness": 0.6, "neuroticism": 0.5},
@@ -124,8 +124,8 @@ NPC_DEFS = {
         ],
         "skills": [("bargaining", 9), ("appraisal", 8), ("persuasion", 7), ("logistics", 6)],
     },
-    "Guard": {
-        "name": "Guard",
+    "Sergeant Voss": {
+        "name": "Sergeant Voss",
         "role": "guard",
         "archetype": "guardian",
         "personality": {"openness": 0.3, "conscientiousness": 0.9, "extraversion": 0.4, "agreeableness": 0.6, "neuroticism": 0.2},
@@ -149,36 +149,36 @@ NPC_DEFS = {
 HELP_MATRIX = {
     # problem_type -> [(helper_name, skill_check, description)]
     "combat": [
-        ("Guard", "spear_fighting", "Guard je najlepší bojovník v družine"),
-        ("Kael", "swordfighting", "Kael má skúsenosti z dungeonov"),
+        ("Sergeant Voss", "spear_fighting", "Sergeant Voss je najlepší bojovník v družine"),
+        ("Shadow Kael", "swordfighting", "Shadow Kael má skúsenosti z dungeonov"),
     ],
     "crafting": [
-        ("Grom", "smithing", "Grom je majster kováč"),
-        ("Zara", "alchemy", "Zara dokáže vytvoriť alchymické nástroje"),
+        ("King Aldric", "smithing", "King Aldric je majster kováč"),
+        ("Dame Elara", "alchemy", "Dame Elara dokáže vytvoriť alchymické nástroje"),
     ],
     "knowledge": [
-        ("Mordecai", "arcana", "Mordecai ovláda staroveké vedomosti"),
-        ("Lyra", "cartography", "Lyra pozná mapy a terén"),
+        ("High Priest Orin", "arcana", "High Priest Orin ovláda staroveké vedomosti"),
+        ("Sage Mira", "cartography", "Sage Mira pozná mapy a terén"),
     ],
     "navigation": [
-        ("Lyra", "tracking", "Lyra je najlepšia stopárka"),
-        ("Kael", "exploration", "Kael pozná dungeon ako svoju dlaň"),
+        ("Sage Mira", "tracking", "Sage Mira je najlepšia stopárka"),
+        ("Shadow Kael", "exploration", "Shadow Kael pozná dungeon ako svoju dlaň"),
     ],
     "alchemy": [
-        ("Zara", "alchemy", "Zara je majster alchýmie"),
-        ("Mordecai", "alchemy_theory", "Mordecai pozná teóriu"),
+        ("Dame Elara", "alchemy", "Dame Elara je majster alchýmie"),
+        ("High Priest Orin", "alchemy_theory", "High Priest Orin pozná teóriu"),
     ],
     "trading": [
         ("Finn", "bargaining", "Finn je najlepší vyjednávač"),
         ("Finn", "appraisal", "Finn pozná cenu všetkého"),
     ],
     "healing": [
-        ("Zara", "healing", "Zara varí liečivé elixíry"),
-        ("Mordecai", "arcana", "Mordecai pozná liečivé rituály"),
+        ("Dame Elara", "healing", "Dame Elara varí liečivé elixíry"),
+        ("High Priest Orin", "arcana", "High Priest Orin pozná liečivé rituály"),
     ],
     "repair": [
-        ("Grom", "repair", "Grom opraví čokoľvek z kovu"),
-        ("Grom", "smithing", "Grom dokáže vykovať náhradné diely"),
+        ("King Aldric", "repair", "King Aldric opraví čokoľvek z kovu"),
+        ("King Aldric", "smithing", "King Aldric dokáže vykovať náhradné diely"),
     ],
 }
 
@@ -285,13 +285,13 @@ class AgentOS:
 
             # ── Agentic OS v3 — lifecycle ──
             default_goals = {
-                "Kael": "Map the entire dungeon and find the Crystal of Eternity",
-                "Lyra": "Chart every room and passage in the dungeon",
-                "Mordecai": "Decipher all ancient runes and unlock the library's secrets",
-                "Grom": "Forge the perfect weapon and arm every agent",
-                "Zara": "Discover the ultimate healing potion recipe",
+                "Shadow Kael": "Map the entire dungeon and find the Crystal of Eternity",
+                "Sage Mira": "Chart every room and passage in the dungeon",
+                "High Priest Orin": "Decipher all ancient runes and unlock the library's secrets",
+                "King Aldric": "Forge the perfect weapon and arm every agent",
+                "Dame Elara": "Discover the ultimate healing potion recipe",
                 "Finn": "Build the most prosperous trading network in the dungeon",
-                "Guard": "Protect every agent from harm and maintain order",
+                "Sergeant Voss": "Protect every agent from harm and maintain order",
             }
             await self.db.execute(
                 "INSERT OR IGNORE INTO agent_lifecycles (npc_id, age_ticks, stage, maturity, wisdom, life_goal) "

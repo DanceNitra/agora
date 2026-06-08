@@ -48,7 +48,7 @@ class DreamEngine:
             new_goal = random.choice([
                 f"Follow the vision: explore where the dream led",
                 f"Seek answers about {random.choice(['the runes', 'the crystal', 'the ancient ones', 'the hidden passage'])}",
-                f"Share this vision with {random.choice(['Mordecai', 'Lyra', 'Kael'])}",
+                f"Share this vision with {random.choice(['High Priest Orin', 'Sage Mira', 'Shadow Kael'])}",
             ])
 
         await self.db.execute(

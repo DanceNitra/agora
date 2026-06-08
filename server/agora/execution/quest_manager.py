@@ -10,42 +10,42 @@ from typing import Any
 
 # Which NPC is the "quest-doer" for each quest
 QUEST_ASSIGNMENTS = {
-    # ── Kael's chain (main quest) ──
+    # ── Shadow Kael's chain (main quest) ──
     "talk_to_sage": {
-        "agent": "Kael",
-        "target_npc": "Mordecai",
+        "agent": "Shadow Kael",
+        "target_npc": "High Priest Orin",
         "target_x": 20 * 32,
         "target_y": 16 * 32,
         "required_action": "talk",
         "progress_step": "Consulted the Sage",
     },
     "map_dungeon": {
-        "agent": "Kael",
-        "target_npc": "Lyra",
+        "agent": "Shadow Kael",
+        "target_npc": "Sage Mira",
         "target_x": 3 * 32,
         "target_y": 17 * 32,
         "required_action": "talk",
         "progress_step": "Got the Dungeon Map",
     },
     "forge_key": {
-        "agent": "Kael",
-        "target_npc": "Grom",
+        "agent": "Shadow Kael",
+        "target_npc": "King Aldric",
         "target_x": 5 * 32,
         "target_y": 10 * 32,
         "required_action": "talk",
         "progress_step": "Forged the Ancient Key",
     },
     "find_crystal": {
-        "agent": "Kael",
+        "agent": "Shadow Kael",
         "target_npc": None,
         "target_x": 22 * 32,
         "target_y": 18 * 32,
         "required_action": "explore",
         "progress_step": "Found the Crystal of Eternity",
     },
-    # ── Lyra's chain (scout) ──
+    # ── Sage Mira's chain (scout) ──
     "explore_crypt": {
-        "agent": "Lyra",
+        "agent": "Sage Mira",
         "target_npc": None,
         "target_x": 30 * 32,  # Crypt center
         "target_y": 15 * 32,
@@ -53,24 +53,24 @@ QUEST_ASSIGNMENTS = {
         "progress_step": "Explored the crypt",
     },
     "map_catacombs": {
-        "agent": "Lyra",
-        "target_npc": "Kael",
+        "agent": "Sage Mira",
+        "target_npc": "Shadow Kael",
         "target_x": 10 * 32,
         "target_y": 16 * 32,
         "required_action": "talk",
-        "progress_step": "Delivered crypt map to Kael",
+        "progress_step": "Delivered crypt map to Shadow Kael",
     },
     "scout_treasury": {
-        "agent": "Lyra",
+        "agent": "Sage Mira",
         "target_npc": None,
         "target_x": 28 * 32,  # Treasury
         "target_y": 9 * 32,
         "required_action": "explore",
         "progress_step": "Scouted the treasury",
     },
-    # ── Mordecai's chain (sage) ──
+    # ── High Priest Orin's chain (sage) ──
     "study_runes": {
-        "agent": "Mordecai",
+        "agent": "High Priest Orin",
         "target_npc": None,
         "target_x": 34 * 32,  # Library
         "target_y": 3 * 32,
@@ -78,24 +78,24 @@ QUEST_ASSIGNMENTS = {
         "progress_step": "Studied ancient runes in the library",
     },
     "decipher_scroll": {
-        "agent": "Mordecai",
-        "target_npc": "Kael",
+        "agent": "High Priest Orin",
+        "target_npc": "Shadow Kael",
         "target_x": 10 * 32,
         "target_y": 16 * 32,
         "required_action": "talk",
-        "progress_step": "Deciphered scroll for Kael",
+        "progress_step": "Deciphered scroll for Shadow Kael",
     },
     "unlock_vault": {
-        "agent": "Mordecai",
+        "agent": "High Priest Orin",
         "target_npc": None,
         "target_x": 29 * 32,  # Treasury vault
         "target_y": 9 * 32,
         "required_action": "explore",
         "progress_step": "Unlocked the ancient vault",
     },
-    # ── Grom's chain (blacksmith) ──
+    # ── King Aldric's chain (blacksmith) ──
     "collect_ore": {
-        "agent": "Grom",
+        "agent": "King Aldric",
         "target_npc": None,
         "target_x": 35 * 32,  # Crypt - ore deposits
         "target_y": 16 * 32,
@@ -103,24 +103,24 @@ QUEST_ASSIGNMENTS = {
         "progress_step": "Collected iron ore from the crypt",
     },
     "forge_weapons": {
-        "agent": "Grom",
-        "target_npc": "Zara",
+        "agent": "King Aldric",
+        "target_npc": "Dame Elara",
         "target_x": 15 * 32,
         "target_y": 3 * 32,
         "required_action": "talk",
-        "progress_step": "Got quenching potion from Zara",
+        "progress_step": "Got quenching potion from Dame Elara",
     },
     "arm_guard": {
-        "agent": "Grom",
-        "target_npc": "Guard",
+        "agent": "King Aldric",
+        "target_npc": "Sergeant Voss",
         "target_x": 19.5 * 32,
         "target_y": 9 * 32,
         "required_action": "talk",
-        "progress_step": "Armed the Guard with new weapons",
+        "progress_step": "Armed the Sergeant Voss with new weapons",
     },
-    # ── Zara's chain (alchemist) ──
+    # ── Dame Elara's chain (alchemist) ──
     "gather_herbs": {
-        "agent": "Zara",
+        "agent": "Dame Elara",
         "target_npc": None,
         "target_x": 28 * 32,  # Crypt - glowing mushrooms
         "target_y": 16 * 32,
@@ -128,7 +128,7 @@ QUEST_ASSIGNMENTS = {
         "progress_step": "Gathered glowing herbs from the crypt",
     },
     "brew_potion": {
-        "agent": "Zara",
+        "agent": "Dame Elara",
         "target_npc": "Finn",
         "target_x": 5 * 32,
         "target_y": 4 * 32,
@@ -136,45 +136,45 @@ QUEST_ASSIGNMENTS = {
         "progress_step": "Got rare ingredients from Finn",
     },
     "heal_npcs": {
-        "agent": "Zara",
-        "target_npc": "Grom",
+        "agent": "Dame Elara",
+        "target_npc": "King Aldric",
         "target_x": 5 * 32,
         "target_y": 10 * 32,
         "required_action": "talk",
-        "progress_step": "Delivered healing potions to Grom",
+        "progress_step": "Delivered healing potions to King Aldric",
     },
 }
 
 # What the target NPC should say when asked about a quest
 QUEST_RESPONSES = {
-    "Mordecai": {
+    "High Priest Orin": {
         "talk_to_sage": (
             "Ah, you seek the Crystal of Eternity! I have studied the ancient texts. "
-            "To find it, you must first map the dungeon. Speak with Lyra the scout — "
+            "To find it, you must first map the dungeon. Speak with Sage Mira the scout — "
             "she has explored the eastern chambers and can give you a map."
         ),
     },
-    "Lyra": {
+    "Sage Mira": {
         "map_dungeon": (
             "I've mapped most of the dungeon! But there's a sealed door in the "
-            "northern corridor that requires an ancient key. Grom the blacksmith "
+            "northern corridor that requires an ancient key. King Aldric the blacksmith "
             "knows how to forge one, but he needs materials."
         ),
     },
-    "Grom": {
+    "King Aldric": {
         "forge_key": (
             "An ancient key, eh? I can forge one, but I need iron ingots from the "
-            "crypt and a quenching potion from Zara. Bring those and I'll make the key."
+            "crypt and a quenching potion from Dame Elara. Bring those and I'll make the key."
         ),
         "heal_npcs": (
-            "Thank you, Zara! These healing potions will keep the expedition alive. "
-            "The Guard especially needed them after that scuffle in the treasury."
+            "Thank you, Dame Elara! These healing potions will keep the expedition alive. "
+            "The Sergeant Voss especially needed them after that scuffle in the treasury."
         ),
     },
-    "Zara": {
+    "Dame Elara": {
         "forge_weapons": (
             "A quenching potion? Of course! I've been brewing just the thing. "
-            "Tell Grom to use it sparingly — a few drops are enough for the strongest steel."
+            "Tell King Aldric to use it sparingly — a few drops are enough for the strongest steel."
         ),
         "brew_potion": (
             "Finn! Do you have those rare ingredients I asked for? "
@@ -183,23 +183,23 @@ QUEST_RESPONSES = {
     },
     "Finn": {
         "brew_potion": (
-            "Right here, Zara! I traded with a merchant from the surface for the stag horn. "
+            "Right here, Dame Elara! I traded with a merchant from the surface for the stag horn. "
             "And I found the crystallized honey in an old beehive in the eastern ruins."
         ),
     },
-    "Guard": {
+    "Sergeant Voss": {
         "arm_guard": (
             "New weapons! About time. These goblins in the crypt have been getting bolder. "
-            "Thank Grom for me — this spear is perfectly balanced."
+            "Thank King Aldric for me — this spear is perfectly balanced."
         ),
     },
-    "Kael": {
+    "Shadow Kael": {
         "map_catacombs": (
-            "Excellent work, Lyra! This map of the crypt is exactly what I needed. "
+            "Excellent work, Sage Mira! This map of the crypt is exactly what I needed. "
             "Now finish scouting the treasury while I prepare the expedition."
         ),
         "decipher_scroll": (
-            "Mordecai, you've done it! With this translation, we can finally open the vault. "
+            "High Priest Orin, you've done it! With this translation, we can finally open the vault. "
             "The Crystal of Eternity must be close."
         ),
     },
@@ -208,61 +208,61 @@ QUEST_RESPONSES = {
 # What the quest-doer learns (stored as memory/inventory)
 QUEST_OUTCOMES = {
     "talk_to_sage": {
-        "memory": "Mordecai told me I need to map the dungeon first. Lyra can help.",
+        "memory": "High Priest Orin told me I need to map the dungeon first. Sage Mira can help.",
         "inventory_add": [],
     },
     "map_dungeon": {
-        "memory": "Lyra gave me the Dungeon Map. The sealed door needs an ancient key from Grom.",
+        "memory": "Sage Mira gave me the Dungeon Map. The sealed door needs an ancient key from King Aldric.",
         "inventory_add": ["Dungeon Map"],
     },
     "forge_key": {
-        "memory": "Grom forged the Ancient Key! Now I can open the sealed door.",
+        "memory": "King Aldric forged the Ancient Key! Now I can open the sealed door.",
         "inventory_add": ["Ancient Key"],
     },
     "find_crystal": {
         "memory": "I found the legendary Crystal of Eternity in the deepest chamber!",
         "inventory_add": ["Crystal of Eternity"],
     },
-    # ── Lyra ──
+    # ── Sage Mira ──
     "explore_crypt": {
-        "memory": "I mapped the crypt — dangerous but full of ancient secrets. Need to tell Kael.",
+        "memory": "I mapped the crypt — dangerous but full of ancient secrets. Need to tell Shadow Kael.",
         "inventory_add": ["Crypt Map"],
     },
     "map_catacombs": {
-        "memory": "Delivered the crypt map to Kael. He wants me to scout the treasury next.",
+        "memory": "Delivered the crypt map to Shadow Kael. He wants me to scout the treasury next.",
         "inventory_add": [],
     },
     "scout_treasury": {
         "memory": "The treasury is heavily guarded but contains valuable artifacts. Ready for next mission.",
         "inventory_add": ["Treasury Key"],
     },
-    # ── Mordecai ──
+    # ── High Priest Orin ──
     "study_runes": {
-        "memory": "The library's runes describe a vault beneath the treasury. I must decipher the scroll for Kael.",
+        "memory": "The library's runes describe a vault beneath the treasury. I must decipher the scroll for Shadow Kael.",
         "inventory_add": ["Rune Translation"],
     },
     "decipher_scroll": {
-        "memory": "Kael has the translation now. The vault location is clear — beneath the treasury.",
+        "memory": "Shadow Kael has the translation now. The vault location is clear — beneath the treasury.",
         "inventory_add": [],
     },
     "unlock_vault": {
         "memory": "I unlocked the ancient vault! The secrets within are beyond anything I imagined.",
         "inventory_add": ["Ancient Relic"],
     },
-    # ── Grom ──
+    # ── King Aldric ──
     "collect_ore": {
         "memory": "Found rich iron deposits in the crypt walls. Enough to forge weapons for everyone.",
         "inventory_add": ["Iron Ore"],
     },
     "forge_weapons": {
-        "memory": "Zara's quenching potion worked perfectly. The steel is the finest I've ever forged.",
+        "memory": "Dame Elara's quenching potion worked perfectly. The steel is the finest I've ever forged.",
         "inventory_add": ["Quenching Potion"],
     },
     "arm_guard": {
-        "memory": "The Guard is properly armed now. The expedition is much safer with upgraded weapons.",
+        "memory": "The Sergeant Voss is properly armed now. The expedition is much safer with upgraded weapons.",
         "inventory_add": ["Forged Spear"],
     },
-    # ── Zara ──
+    # ── Dame Elara ──
     "gather_herbs": {
         "memory": "Found rare glowing mushrooms in the crypt. Perfect for healing potions.",
         "inventory_add": ["Glowing Herbs"],
@@ -272,7 +272,7 @@ QUEST_OUTCOMES = {
         "inventory_add": ["Healing Potion"],
     },
     "heal_npcs": {
-        "memory": "Grom and the Guard have their healing potions. The whole expedition is grateful.",
+        "memory": "King Aldric and the Sergeant Voss have their healing potions. The whole expedition is grateful.",
         "inventory_add": [],
     },
 }
@@ -332,7 +332,7 @@ async def inject_quest_context(db, agent_name: str, context: str) -> tuple[str, 
     """Inject quest info into LLM context.
     Returns (updated_context, active_quest_info_or_None).
     """
-    if agent_name not in ("Kael", "Lyra", "Mordecai", "Grom", "Zara", "Finn", "Guard"):
+    if agent_name not in ("Shadow Kael", "Sage Mira", "High Priest Orin", "King Aldric", "Dame Elara", "Finn", "Sergeant Voss"):
         return context, None
 
     npc_id = agent_name.lower()
@@ -386,13 +386,13 @@ async def inject_quest_context(db, agent_name: str, context: str) -> tuple[str, 
                 # Help with navigation — tell NPC where the target is
                 if assignment["target_npc"]:
                     target_pos = {
-                        "Mordecai": "(20*32, 16*32) — southeast area",
-                        "Lyra": "(3*32, 17*32) — near the chest",
-                        "Grom": "(5*32, 10*32) — near the anvil",
-                        "Kael": "(10*32, 16*32) — center area",
-                        "Zara": "(15*32, 3*32) — near the cauldron",
+                        "High Priest Orin": "(20*32, 16*32) — southeast area",
+                        "Sage Mira": "(3*32, 17*32) — near the chest",
+                        "King Aldric": "(5*32, 10*32) — near the anvil",
+                        "Shadow Kael": "(10*32, 16*32) — center area",
+                        "Dame Elara": "(15*32, 3*32) — near the cauldron",
                         "Finn": "(5*32, 4*32) — near the counter",
-                        "Guard": "(19.5*32, 9*32) — near the door",
+                        "Sergeant Voss": "(19.5*32, 9*32) — near the door",
                     }.get(assignment["target_npc"], "somewhere in the dungeon")
                     context += f"\n📍 {assignment['target_npc']} is at {target_pos}. Go there and talk to them.\n"
 
@@ -421,7 +421,7 @@ async def override_decision_for_quest(
 ) -> tuple[dict, bool]:
     """If NPC has an active quest step and their decision doesn't progress it,
     override the decision. Returns (decision, was_overridden)."""
-    if agent_name not in ("Kael", "Lyra", "Mordecai", "Grom", "Zara"):
+    if agent_name not in ("Shadow Kael", "Sage Mira", "High Priest Orin", "King Aldric", "Dame Elara"):
         return decision, False
 
     npc_id = agent_name.lower()
@@ -501,7 +501,7 @@ async def check_quest_progress(
     """After an LLM decision, check if the NPC progressed their quest.
     Returns a quest update dict or None.
     """
-    if agent_name not in ("Kael", "Lyra", "Mordecai", "Grom", "Zara", "Finn", "Guard"):
+    if agent_name not in ("Shadow Kael", "Sage Mira", "High Priest Orin", "King Aldric", "Dame Elara", "Finn", "Sergeant Voss"):
         return None
 
     npc_id = agent_name.lower()
@@ -613,11 +613,11 @@ async def check_quest_progress(
 def _get_next_quest(current_quest_id: str) -> str | None:
     """Return the next quest in the chain, or None."""
     chains = [
-        ["talk_to_sage", "map_dungeon", "forge_key", "find_crystal"],  # Kael
-        ["explore_crypt", "map_catacombs", "scout_treasury"],          # Lyra
-        ["study_runes", "decipher_scroll", "unlock_vault"],            # Mordecai
-        ["collect_ore", "forge_weapons", "arm_guard"],                 # Grom
-        ["gather_herbs", "brew_potion", "heal_npcs"],                  # Zara
+        ["talk_to_sage", "map_dungeon", "forge_key", "find_crystal"],  # Shadow Kael
+        ["explore_crypt", "map_catacombs", "scout_treasury"],          # Sage Mira
+        ["study_runes", "decipher_scroll", "unlock_vault"],            # High Priest Orin
+        ["collect_ore", "forge_weapons", "arm_guard"],                 # King Aldric
+        ["gather_herbs", "brew_potion", "heal_npcs"],                  # Dame Elara
     ]
     for chain in chains:
         try:

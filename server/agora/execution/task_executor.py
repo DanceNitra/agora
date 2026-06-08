@@ -18,41 +18,41 @@ from typing import Any, Optional
 # ── Task types the system auto-generates ──
 
 AUTO_TASKS = [
-    # ── Kael (adventurer) — quest-style exploration ──
+    # ── Shadow Kael (adventurer) — quest-style exploration ──
     {"title": "Map the eastern chambers", "description": "Survey the unexplored eastern corridors beyond the crypt.",
-     "task_type": "exploration", "difficulty": 2, "reward_energy": 12, "target_ticks": 3, "assigned_npc": "Kael"},
+     "task_type": "exploration", "difficulty": 2, "reward_energy": 12, "target_ticks": 3, "assigned_npc": "Shadow Kael"},
     {"title": "Retrieve the buried relic", "description": "Dig through the collapsed passage in sector 4 to recover the buried relic.",
-     "task_type": "exploration", "difficulty": 3, "reward_energy": 16, "target_ticks": 4, "assigned_npc": "Kael"},
+     "task_type": "exploration", "difficulty": 3, "reward_energy": 16, "target_ticks": 4, "assigned_npc": "Shadow Kael"},
     {"title": "Rescue the trapped scout", "description": "A scout is trapped behind a cave-in near the western wall. Clear the rubble.",
-     "task_type": "exploration", "difficulty": 3, "reward_energy": 18, "target_ticks": 4, "assigned_npc": "Kael"},
-    # ── Lyra (scout) — reconnaissance ──
+     "task_type": "exploration", "difficulty": 3, "reward_energy": 18, "target_ticks": 4, "assigned_npc": "Shadow Kael"},
+    # ── Sage Mira (scout) — reconnaissance ──
     {"title": "Scout the fungal groves", "description": "Explore the fungal grove tunnels and report back on creature activity.",
-     "task_type": "exploration", "difficulty": 1, "reward_energy": 8, "target_ticks": 2, "assigned_npc": "Lyra"},
+     "task_type": "exploration", "difficulty": 1, "reward_energy": 8, "target_ticks": 2, "assigned_npc": "Sage Mira"},
     {"title": "Investigate strange noises", "description": "Scout the source of rhythmic tapping sounds near the eastern wall.",
-     "task_type": "exploration", "difficulty": 2, "reward_energy": 10, "target_ticks": 3, "assigned_npc": "Lyra"},
+     "task_type": "exploration", "difficulty": 2, "reward_energy": 10, "target_ticks": 3, "assigned_npc": "Sage Mira"},
     {"title": "Mark safe passages", "description": "Update the patrol map with newly discovered safe routes through the lower level.",
-     "task_type": "exploration", "difficulty": 1, "reward_energy": 8, "target_ticks": 2, "assigned_npc": "Lyra"},
-    # ── Mordecai (sage) — research & lore ──
+     "task_type": "exploration", "difficulty": 1, "reward_energy": 8, "target_ticks": 2, "assigned_npc": "Sage Mira"},
+    # ── High Priest Orin (sage) — research & lore ──
     {"title": "Decode the rune tablet", "description": "Translate the ancient runic inscription found in the library ruins.",
-     "task_type": "research", "difficulty": 3, "reward_energy": 14, "target_ticks": 4, "assigned_npc": "Mordecai"},
+     "task_type": "research", "difficulty": 3, "reward_energy": 14, "target_ticks": 4, "assigned_npc": "High Priest Orin"},
     {"title": "Catalog crystal resonance", "description": "Document the resonant frequencies of the crystal formations in the deep caves.",
-     "task_type": "analysis", "difficulty": 2, "reward_energy": 12, "target_ticks": 3, "assigned_npc": "Mordecai"},
+     "task_type": "analysis", "difficulty": 2, "reward_energy": 12, "target_ticks": 3, "assigned_npc": "High Priest Orin"},
     {"title": "Study the ancient map", "description": "Compare the newly found map fragment with existing dungeon cartography.",
-     "task_type": "research", "difficulty": 2, "reward_energy": 10, "target_ticks": 3, "assigned_npc": "Mordecai"},
-    # ── Grom (blacksmith) — crafting ──
+     "task_type": "research", "difficulty": 2, "reward_energy": 10, "target_ticks": 3, "assigned_npc": "High Priest Orin"},
+    # ── King Aldric (blacksmith) — crafting ──
     {"title": "Forge patrol blades", "description": "Smelt iron ingots and forge replacement blades for the guard patrol.",
-     "task_type": "writing", "difficulty": 1, "reward_energy": 8, "target_ticks": 2, "assigned_npc": "Grom"},
+     "task_type": "writing", "difficulty": 1, "reward_energy": 8, "target_ticks": 2, "assigned_npc": "King Aldric"},
     {"title": "Reinforce the portcullis", "description": "Weld new iron bars onto the weakened portcullis in the main gate.",
-     "task_type": "writing", "difficulty": 2, "reward_energy": 10, "target_ticks": 3, "assigned_npc": "Grom"},
+     "task_type": "writing", "difficulty": 2, "reward_energy": 10, "target_ticks": 3, "assigned_npc": "King Aldric"},
     {"title": "Craft lockpicks", "description": "Fashion a set of thin lockpicks for opening ancient chests in the vault.",
-     "task_type": "writing", "difficulty": 1, "reward_energy": 8, "target_ticks": 2, "assigned_npc": "Grom"},
-    # ── Zara (alchemist) — potions & herbs ──
+     "task_type": "writing", "difficulty": 1, "reward_energy": 8, "target_ticks": 2, "assigned_npc": "King Aldric"},
+    # ── Dame Elara (alchemist) — potions & herbs ──
     {"title": "Brew healing salves", "description": "Crush herbs and brew a batch of healing salves for the infirmary.",
-     "task_type": "analysis", "difficulty": 1, "reward_energy": 8, "target_ticks": 2, "assigned_npc": "Zara"},
+     "task_type": "analysis", "difficulty": 1, "reward_energy": 8, "target_ticks": 2, "assigned_npc": "Dame Elara"},
     {"title": "Identify strange mushrooms", "description": "Analyze the glowing mushrooms found in the deep caves for alchemical properties.",
-     "task_type": "research", "difficulty": 2, "reward_energy": 10, "target_ticks": 3, "assigned_npc": "Zara"},
+     "task_type": "research", "difficulty": 2, "reward_energy": 10, "target_ticks": 3, "assigned_npc": "Dame Elara"},
     {"title": "Neutralize the poison seep", "description": "Mix a neutralizing agent for the toxic gas seeping from the fissure in sector 7.",
-     "task_type": "analysis", "difficulty": 3, "reward_energy": 14, "target_ticks": 4, "assigned_npc": "Zara"},
+     "task_type": "analysis", "difficulty": 3, "reward_energy": 14, "target_ticks": 4, "assigned_npc": "Dame Elara"},
     # ── Finn (merchant) — trade & barter ──
     {"title": "Audit supply inventory", "description": "Count the remaining supplies and update the inventory ledger.",
      "task_type": "review", "difficulty": 1, "reward_energy": 8, "target_ticks": 2, "assigned_npc": "Finn"},
@@ -60,11 +60,11 @@ AUTO_TASKS = [
      "task_type": "review", "difficulty": 2, "reward_energy": 10, "target_ticks": 3, "assigned_npc": "Finn"},
     {"title": "Price the crystal haul", "description": "Appraise the recent crystal shard haul and set fair market prices.",
      "task_type": "review", "difficulty": 1, "reward_energy": 8, "target_ticks": 2, "assigned_npc": "Finn"},
-    # ── Guard — security & patrol ──
+    # ── Sergeant Voss — security & patrol ──
     {"title": "Verify patrol routes", "description": "Walk the full patrol circuit and verify all checkpoints are secure.",
-     "task_type": "review", "difficulty": 1, "reward_energy": 8, "target_ticks": 2, "assigned_npc": "Guard"},
+     "task_type": "review", "difficulty": 1, "reward_energy": 8, "target_ticks": 2, "assigned_npc": "Sergeant Voss"},
     {"title": "Secure the supply cache", "description": "Move the emergency supply cache to a more defensible location.",
-     "task_type": "exploration", "difficulty": 2, "reward_energy": 10, "target_ticks": 3, "assigned_npc": "Guard"},
+     "task_type": "exploration", "difficulty": 2, "reward_energy": 10, "target_ticks": 3, "assigned_npc": "Sergeant Voss"},
 ]
 
 RESOURCE_REWARDS_BY_TYPE = {
@@ -461,7 +461,7 @@ class TaskExecutor:
 
         # Add real state from the DB at the time of completion (captured via query in caller)
         # If the agent is a dungeon NPC, note the narrative connection
-        dungeon_npcs = {"Kael", "Lyra", "Mordecai", "Grom", "Zara", "Finn", "Guard"}
+        dungeon_npcs = {"Shadow Kael", "Sage Mira", "High Priest Orin", "King Aldric", "Dame Elara", "Finn", "Sergeant Voss"}
         if role in dungeon_npcs or agent_id[:8] in {n[:8] for n in dungeon_npcs}:
             lines.append(f"- This task was part of the dungeon ecosystem.")
             lines.append(f"- The {role} was involved in the dungeon narrative.")
