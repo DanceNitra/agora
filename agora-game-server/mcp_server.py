@@ -646,6 +646,136 @@ def _maybe_start_conversation(ents, dead: dict[str, int], hold: dict[str, int], 
                 return
 
 
+# ── Meaningful collaboration: agents co-produce REAL grounded findings, varied + seeded ──
+_collab_cd: dict = {}        # eid -> next monotonic time it may collaborate
+_collab_recent: list = []    # recent "a|b" pairs, to vary partners
+_collab_rot = {"i": 0}
+_COLLAB_COOLDOWN = 80
+
+# what each role best CONTRIBUTES when joining another agent's work
+_ROLE_CONTRIB = {
+    "thief":   "scout sharper evidence and adjacent frontier work",
+    "scholar": "curate it into one crisp, structured claim",
+    "priest":  "connect it across domains into a novel idea",
+    "king":    "turn it into something buildable — an experiment or a tool",
+    "guard_r": "find what in the vault it should link to",
+    "guard_l": "stress-test it — name the weakest assumption or the hole",
+}
+
+
+async def _pick_collab_seed():
+    """Rotate the seed across the real research surface (findings / gaps / bridges) so topics vary."""
+    i = _collab_rot["i"] % 3
+    _collab_rot["i"] += 1
+    try:
+        if i == 0:
+            d = await asyncio.to_thread(_brain_get_sync, "/api/v1/agent-os/brain/collective?limit=8")
+            ks = [k for k in (d or {}).get("knowledge", []) if (k.get("content") or "")]
+            if ks:
+                k = random.choice(ks)
+                return ("finding", (k.get("title") or "a recent finding")[:80],
+                        (k.get("content") or "")[:240])
+        elif i == 1:
+            d = await asyncio.to_thread(_brain_get_sync, "/api/v1/agent-os/brain/gaps?n=8")
+            gs = (d or {}).get("gaps", [])
+            if gs:
+                g = random.choice(gs)
+                return ("gap", g["title"][:80], f"The vault is thin on: {g['title']}")
+        else:
+            d = await asyncio.to_thread(
+                _brain_get_sync, "/api/v1/agent-os/brain/bridges?n=4&rationale=false")
+            bs = (d or {}).get("bridges", [])
+            if bs:
+                b = random.choice(bs)
+                return ("bridge", f"{b['a']} ↔ {b['b']}"[:80],
+                        f"Two related but unlinked ideas to fuse: {b['a']} and {b['b']}")
+    except Exception:
+        pass
+    return None
+
+
+async def _collaborate(a_id, b_id, seed_kind, seed_title, seed_text, hold) -> None:
+    """Two agents co-produce a REAL grounded joint finding from a shared seed — visible + posted."""
+    ents = engine.state.entities
+    a, b = ents.get(a_id), ents.get(b_id)
+    if not a or not b or a_id in _in_conv or b_id in _in_conv:
+        return
+    _in_conv.add(a_id)
+    _in_conv.add(b_id)
+    an, bn = a.name, b.name
+    try:
+        engine.face_entity(a_id, int(round(b.x)), int(round(b.y)))
+        engine.face_entity(b_id, int(round(a.x)), int(round(a.y)))
+        engine.set_entity_state(a_id, "thinking")
+        engine.set_entity_state(b_id, "thinking")
+        hold[a_id] = hold[b_id] = 99
+        sources = await _brain_research(seed_title)
+        a_line = await _llm_say(
+            f"You are {_persona(a_id)} You and your colleague {bn} are co-working a {seed_kind}.",
+            f"The {seed_kind}: '{seed_text}'. In ONE line (max 18 words), tell {bn} what it is "
+            f"and exactly what you need from them.",
+            f"{bn}, let's develop {seed_title} together.")
+        engine.set_entity_thought(a_id, a_line)
+        broadcast({"type": "converse", "from": a_id, "to": b_id})
+        await asyncio.sleep(2.4)
+        contrib = _ROLE_CONTRIB.get(b_id, "add your angle")
+        b_line = await _llm_say(
+            f"You are {_persona(b_id)} Your colleague {an} brought you a {seed_kind} to work on.",
+            f"It is: '{seed_text}'. Your job: {contrib}. Real sources: {sources[:400]}. "
+            f"In ONE line (max 20 words), give your concrete contribution.",
+            f"Here is my angle on {seed_title}.")
+        engine.set_entity_thought(b_id, b_line)
+        broadcast({"type": "converse", "from": b_id, "to": a_id})
+        await asyncio.sleep(2.4)
+        joint = await asyncio.to_thread(
+            _llm_content_sync,
+            f"Synthesize the exchange between {an} and {bn} into ONE concrete joint research FINDING "
+            f"(2 sentences) grounded in the real sources — cite one. NEVER invent sources.",
+            f"Seed ({seed_kind}): {seed_text}\n{an}: {a_line}\n{bn}: {b_line}\n\nReal sources:\n{sources}")
+        if joint and joint.strip():
+            src = ""
+            if sources and "(no external" not in sources:
+                src = "\nSource: " + sources.splitlines()[0].lstrip("- ").strip()[:140]
+            await _brain_contribute(a_id, f"{an} + {bn}: {seed_title}", joint.strip()[:420] + src)
+            broadcast({"type": "os_build", "kind": "collab", "who": f"{an} + {bn}",
+                       "text": f"co-produced: {seed_title}"})
+        await record_trust(a_id, b_id, "cooperate")
+        for cid in (a_id, b_id):
+            engine.set_entity_thought(cid, "")
+            engine.set_entity_state(cid, "idle")
+    except Exception as e:
+        logger.debug(f"collaborate {an}+{bn}: {e}")
+    finally:
+        now = _time.monotonic()
+        _conv_cd[a_id] = _conv_cd[b_id] = now + _CONV_COOLDOWN
+        _collab_cd[a_id] = _collab_cd[b_id] = now + _COLLAB_COOLDOWN
+        hold[a_id] = hold[b_id] = 0
+        _in_conv.discard(a_id)
+        _in_conv.discard(b_id)
+
+
+async def _maybe_collaborate(hold) -> None:
+    """Pick an initiator + a complementary, NON-recent partner + a real seed → co-produce."""
+    now = _time.monotonic()
+    free = [e for e in _AGENT_NAMES if e not in _in_conv
+            and now >= _collab_cd.get(e, 0.0) and now >= _conv_cd.get(e, 0.0)]
+    if len(free) < 2:
+        return
+    seed = await _pick_collab_seed()
+    if not seed:
+        return
+    random.shuffle(free)
+    a_id = free[0]
+    for b_id in free[1:]:
+        pair = "|".join(sorted((a_id, b_id)))
+        if pair in _collab_recent[-4:]:
+            continue                                   # don't repeat the same pair
+        _collab_recent.append(pair)
+        del _collab_recent[:-8]
+        asyncio.create_task(_collaborate(a_id, b_id, *seed, hold))
+        return
+
+
 # ── ESS Trust Bridge ────────────────────────────────────────────
 # The dungeon's social interactions feed the REAL server/agora TrustEngine
 # (Axelrod TFT: cooperate +, defect −, forgiveness, decay). Conversation →
@@ -1437,6 +1567,10 @@ async def ambient_life():
         _maybe_start_conversation(ents, dead, hold, memory)
 
         loop_n += 1
+        # Meaningful collaboration: a varied pair co-produces a real grounded finding from a
+        # rotating seed (recent finding / gap / bridge) — the OS actually doing work.
+        if loop_n % 45 == 20:
+            asyncio.create_task(_maybe_collaborate(hold))
         if loop_n % 10 == 1:
             _m = await _trust_matrix()
             if _m:
