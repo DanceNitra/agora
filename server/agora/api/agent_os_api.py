@@ -247,6 +247,71 @@ async def vault_search(q: str, k: int = 8):
     return {"status": "ok", "query": q, "ready": _SEM_INDEX.ready, "results": results}
 
 
+@router.get("/brain/gaps")
+async def brain_gaps(n: int = 10):
+    """The user's underdeveloped areas — isolated-but-substantive notes (seeds never grown) —
+    so agents can do GAP-DRIVEN research aimed at what the user actually lacks."""
+    global _SEM_INDEX
+    from agora.execution.semantic_index import SemanticIndex
+    if _SEM_INDEX is None or not _SEM_INDEX.ready:
+        _SEM_INDEX = SemanticIndex()
+    return {"status": "ok", "gaps": _SEM_INDEX.find_gaps(n) if _SEM_INDEX.ready else []}
+
+
+async def _send_telegram(text: str) -> bool:
+    """Send a message to the user via Telegram (HERMES_TELEGRAM_* env). No-op if unset."""
+    import asyncio
+    import os
+    import subprocess
+    token, chat = os.getenv("HERMES_TELEGRAM_BOT_TOKEN", ""), os.getenv("HERMES_TELEGRAM_CHAT_ID", "")
+    if not token or not chat:
+        return False
+
+    def _s():
+        payload = json.dumps({"chat_id": chat, "text": text[:4000], "parse_mode": "Markdown"})
+        r = subprocess.run(
+            ["curl", "-s", "--max-time", "12", "-X", "POST",
+             f"https://api.telegram.org/bot{token}/sendMessage",
+             "-H", "Content-Type: application/json", "-d", payload],
+            capture_output=True, text=True, timeout=15)
+        return '"ok":true' in (r.stdout or "")
+    return await asyncio.to_thread(_s)
+
+
+@router.post("/brain/morning-report")
+async def morning_report(request: Request, send: bool = True):
+    """Build a morning digest of the agents' overnight research and send it to Telegram:
+    the strongest grounded findings + the gaps they targeted + what's worth attention."""
+    from datetime import datetime, timezone
+    db = request.app.state.db
+    cur = await db.execute(
+        "SELECT title, content, contributor_name FROM collective_knowledge "
+        "WHERE knowledge_type='discovery' ORDER BY created_at DESC LIMIT 6")
+    findings = await cur.fetchall()
+    from agora.execution.semantic_index import SemanticIndex
+    global _SEM_INDEX
+    if _SEM_INDEX is None or not _SEM_INDEX.ready:
+        _SEM_INDEX = SemanticIndex()
+    gaps = _SEM_INDEX.find_gaps(4) if _SEM_INDEX.ready else []
+
+    day = datetime.now(timezone.utc).strftime("%Y-%m-%d")
+    lines = [f"☀️ *Agora — ranný report* ({day})", ""]
+    if findings:
+        lines.append(f"🔬 *Cez noc — {len(findings)} grounded zistení:*")
+        for f in findings[:5]:
+            lines.append(f"• {(f['content'] or '')[:160]}")
+        lines.append("")
+    if gaps:
+        lines.append("🎯 *Tvoje medzery, na ktoré mieria:*")
+        for g in gaps:
+            lines.append(f"• {g['title']}")
+        lines.append("")
+    lines.append("_grounded v reálnych zdrojoch (OpenAlex/arXiv) + napojené na tvoje noty_")
+    text = "\n".join(lines)
+    sent = await _send_telegram(text) if send else False
+    return {"status": "ok", "sent": sent, "report": text}
+
+
 @router.get("/brain/brainstorm")
 async def list_brainstorm(request: Request, limit: int = 10):
     """Recent brainstorm sessions with their top idea."""

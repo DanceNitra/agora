@@ -888,6 +888,21 @@ async def _brain_vault_search(query: str) -> list:
     return (d or {}).get("results", [])
 
 
+_GAP_CACHE = {"gaps": [], "ts": 0.0}
+
+
+async def _brain_gaps() -> list:
+    """The user's REAL knowledge gaps (isolated substantive notes), cached 5 min."""
+    now = _time.monotonic()
+    if _GAP_CACHE["gaps"] and now - _GAP_CACHE["ts"] < 300:
+        return _GAP_CACHE["gaps"]
+    d = await asyncio.to_thread(_brain_get_sync, "/api/v1/agent-os/brain/gaps?n=12")
+    gaps = (d or {}).get("gaps", [])
+    if gaps:
+        _GAP_CACHE["gaps"], _GAP_CACHE["ts"] = gaps, now
+    return _GAP_CACHE["gaps"]
+
+
 # ── Trust Graph: ESS live trust + Vault-Company cross-agent learning, in the dungeon ──
 _BRAIN_NAME2EID = {v: k for k, v in _AGENT_NAMES.items()}
 _LEARN_GRAPH = {"edges": [], "ts": 0.0}
@@ -1305,6 +1320,10 @@ async def ambient_life():
             build_log = await _brain_build_log()
             allies = ", ".join(_AGENT_NAMES[o] for o in _AGENT_NAMES if o != eid)
             mods = "; ".join(m["name"] for m in os_modules[-6:]) or "(none yet)"
+            # The user's REAL knowledge gaps — aim research at what they actually lack.
+            _gaps = await _brain_gaps()
+            gap_txt = "; ".join(g["title"] for g in random.sample(_gaps, min(4, len(_gaps)))) \
+                if _gaps else "(unknown)"
             ident = await _brain_identity(eid)
             role_line = ident or f"Your domain: {_ROLE_HINT.get(eid, 'open inquiry')}."
             sysmsg = (
@@ -1328,9 +1347,10 @@ async def ambient_life():
                    f"The OS so far (build on it, don't repeat): {build_log}\n"
                    f"Modules built (visit/extend them): {mods}\n"
                    f"Fellow thinkers: {allies}\n"
+                   f"The user's REAL knowledge GAPS — isolated notes worth developing (AIM HERE): {gap_txt}\n"
                    f"Your recent work: {mem}\nAlready completed (do NOT repeat): {done}\n"
                    f"Nearby now: {', '.join(nearby) or 'no one'}\nLatest in the keep: {news}\n"
-                   f"Your quest log (3 next moves):")
+                   f"Your quest log (3 next moves — prefer ones that DEVELOP a real gap above):")
             data = await asyncio.to_thread(_llm_json_sync, sysmsg, usr) or {}
             added = 0
             for q in (data.get("quests") or [])[:4]:

@@ -61,14 +61,19 @@ def build_index(vault: str, batch: int = 64) -> dict:
     for i in range(0, len(items), batch):
         chunk = items[i:i + batch]
         embs = _embed_batch([c[2] for c in chunk])
-        for (rel, title, _), e in zip(chunk, embs):
+        for (rel, title, txt), e in zip(chunk, embs):
             if e:
                 vecs.append(e)
-                meta.append({"path": rel, "title": title})
+                meta.append({"path": rel, "title": title, "len": len(txt)})
     arr = np.array(vecs, dtype=np.float32)
     arr /= (np.linalg.norm(arr, axis=1, keepdims=True) + 1e-9)   # L2-normalize
+    # nearest-neighbour similarity per note (isolation signal for gap detection)
+    sims = arr @ arr.T
+    np.fill_diagonal(sims, -1.0)
+    nn = sims.max(axis=1).astype(np.float32)
     CACHE.mkdir(parents=True, exist_ok=True)
     np.save(CACHE / "vectors.npy", arr)
+    np.save(CACHE / "nn.npy", nn)
     (CACHE / "meta.json").write_text(json.dumps(meta), encoding="utf-8")
     return {"notes": len(meta), "dim": arr.shape[1] if arr.size else 0,
             "seconds": round(time.time() - t0, 1)}
@@ -79,6 +84,7 @@ class SemanticIndex:
 
     def __init__(self):
         self.vecs = None
+        self.nn = None
         self.meta = []
         self._load()
 
@@ -86,8 +92,27 @@ class SemanticIndex:
         try:
             self.vecs = np.load(CACHE / "vectors.npy")
             self.meta = json.loads((CACHE / "meta.json").read_text(encoding="utf-8"))
+            try:
+                self.nn = np.load(CACHE / "nn.npy")
+            except Exception:
+                self.nn = None
         except Exception:
-            self.vecs, self.meta = None, []
+            self.vecs, self.nn, self.meta = None, None, []
+
+    def find_gaps(self, n: int = 12, min_len: int = 300) -> list[dict]:
+        """The user's most ISOLATED yet SUBSTANTIVE notes — seeds they planted but never grew
+        (semantically disconnected, real content). These are the gaps worth real research."""
+        if not self.ready or self.nn is None:
+            return []
+        gaps = []
+        for i in np.argsort(self.nn):                # most isolated first
+            m = self.meta[i]
+            if m.get("len", 0) >= min_len:
+                gaps.append({"title": m["title"], "path": m["path"],
+                             "isolation": round(float(1 - self.nn[i]), 3)})
+            if len(gaps) >= n:
+                break
+        return gaps
 
     @property
     def ready(self) -> bool:
