@@ -222,11 +222,11 @@ async def write_vault_note(request: Request):
 
 @router.get("/brain/research")
 async def brain_research(q: str, n: int = 4):
-    """Real frontier research grounding — returns actual arXiv papers for a query so agents
-    can write notes grounded in real sources (not hallucinated citations)."""
+    """Real research grounding across ALL fields — OpenAlex (cited) + arXiv (preprints), so
+    agents write notes grounded in real sources (not hallucinated citations)."""
     import asyncio
-    from agora.execution.research_tool import arxiv_search, format_for_prompt
-    papers = await asyncio.to_thread(arxiv_search, q, n)
+    from agora.execution.research_tool import research, format_for_prompt
+    papers = await asyncio.to_thread(research, q, n)
     return {"status": "ok", "query": q, "papers": papers,
             "formatted": format_for_prompt(papers)}
 
