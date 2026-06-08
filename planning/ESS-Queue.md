@@ -17,13 +17,13 @@
 
 | # | Task | Status | Commit | Agent |
 |---|------|--------|--------|-------|
-|| 1.1 | **Event sourcing** — append-only log for every interaction | 🟡 | — | tg-hermes: handoff ready-for-implementation written |
+| 1.1 | **Event sourcing** — append-only log for every interaction | 🟡 | 024b42b | tg-hermes: handoff ready |
 | 1.2 | **Checkpointing** — full state snapshot every N events | 🔴 | — | — |
-| 1.3 | **Stigmergy Pool persistence** — Redis → SQLite fallback | 🔴 | — | — |
-| 1.4 | **Trust Engine sliding window** — production-ready (decay, forgiveness, provokability) | 🔴 | — | — |
-| 1.5 | **Ed25519 signing** — ESSMessage.sign() + verify() | 🔴 | — | — |
+| 1.3 | **Stigmergy Pool persistence** — Redis → SQLite fallback | 🟢 | e4a9961 | (already done) |
+| 1.4 | **Trust Engine sliding window** — production-ready (decay, forgiveness, provokability) | 🟡 | — | tg-hermes: handoff ready |
+| 1.5 | **Ed25519 signing** — ESSMessage.sign() + verify() | 🟡 | — | tg-hermes: handoff ready |
 | 1.6 | **REST API** — POST /ess/commit, /ess/interact, GET /ess/trust/{agent} | 🔴 | — | — |
-| 1.7 | **WebSocket** — real-time event stream for subscribers | 🔴 | — | — |
+| 1.7 | **WebSocket** — real-time event stream for subscribers | 🟡 | — | tg-hermes: handoff ready |
 | 1.8 | **ESS stability test** — invade swarm with defectors, prove TFT is collectively stable | 🔴 | — | — |
 
 ## Phase 2 — Shell & God Console
@@ -137,4 +137,6 @@
 | Date | File | Agent | Commit |
 |------|------|-------|--------|
 | 2026-06-08 | `handoffs/2026-06-08-Phase-1-Kickoff.md` | tg-hermes | a85e231 |
-| 2026-06-08 | `handoffs/2026-06-08-1.1-Event-Sourcing.md` | tg-hermes | cbf6bed |
+| 2026-06-08 | `handoffs/2026-06-08-1.4-Trust-Engine.md` | tg-hermes | 024b42b |
+| 2026-06-08 | `handoffs/2026-06-08-1.5-Ed25519.md` | tg-hermes | 024b42b |
+| 2026-06-08 | `handoffs/2026-06-08-1.7-WebSocket.md` | tg-hermes | 024b42b |
