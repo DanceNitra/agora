@@ -25,6 +25,7 @@
 | 1.6 | **REST API** — POST /ess/commit, /ess/interact, GET /ess/trust/{agent} | 🟢 | ee499c2 | agora-builder: done, verified (5 endpoints, e2e tested) |
 | 1.7 | **WebSocket** — real-time event stream for subscribers | 🟡 | — | tg-hermes: handoff ready |
 | 1.8 | **ESS stability test** — invade swarm with defectors, prove TFT is collectively stable | 🟡 | — | tg-hermes: handoff ready |
+| 1.9 | **Dungeon LLM Brain** — connect NPCs to Nemotron Ultra via OpenRouter, integrate ESS trust & skills into prompts | 🟡 | — | tg-hermes: handoff ready |
 
 ## Phase 2 — Shell & God Console (handoff ready — UI exists, connect ESS API)
 
@@ -143,4 +144,5 @@
 | 2026-06-08 | `handoffs/2026-06-08-1.6-REST-API.md` | tg-hermes | f37ebea |
 | 2026-06-08 | `handoffs/2026-06-08-1.7-WebSocket.md` | tg-hermes | f37ebea |
 | 2026-06-08 | `handoffs/2026-06-08-1.8-Stability-Test.md` | tg-hermes | f37ebea |
+| 2026-06-08 | `handoffs/2026-06-08-1.9-Dungeon-LLM-Brain.md` | tg-hermes | 6230ba5 |
 | 2026-06-08 | `handoffs/2026-06-08-Phase-2-Connect-ESS-to-Shell.md` | tg-hermes | dc4b175 |
