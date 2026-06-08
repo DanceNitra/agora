@@ -204,6 +204,12 @@ async def _handle(app, text: str) -> None:
             await send(f"✅ Added *{(d or {}).get('links_added', 0)}* links to your notes "
                        f"('## Related (Agora bridges)' section).")
             _bridges_cache["bridges"] = []
+    elif low.startswith(("believe ", "/believe ")):
+        topic = text.split(" ", 1)[1].strip()
+        await send("🧠 _Reading what your vault believes…_")
+        from agora.config import settings
+        from agora.execution.knowledge_graph import believe, format_belief
+        await send(format_belief(await believe(topic, settings.vault_path, 8)))
     elif low in ("/gaps", "gaps"):
         from agora.execution.semantic_index import SemanticIndex
         si = SemanticIndex()
@@ -216,6 +222,7 @@ async def _handle(app, text: str) -> None:
         await send("🏰 *Agora — research + control*\n\n"
                    "*Research (agents):*\n"
                    "`<question>` → grounded brief, then `keep`\n"
+                   "`believe <topic>` → what your vault claims (+contradictions)\n"
                    "`verify` · `bridges`/`connect` · `gaps` · `report` · `status` · `fix <g>`\n\n"
                    "*Control Claude Code:*\n"
                    "`build <task>` / `cc <task>` → hand me a build/implementation task; "

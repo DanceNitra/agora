@@ -302,6 +302,15 @@ async def brain_gaps(n: int = 10):
     return {"status": "ok", "gaps": _SEM_INDEX.find_gaps(n) if _SEM_INDEX.ready else []}
 
 
+@router.get("/brain/believe")
+async def brain_believe(q: str, k: int = 8):
+    """AGORA 2.0 / Pillar 1 — what the vault BELIEVES about a topic: structured claims
+    (subject·relation·object) with confidence + sources + contradictions. The vault thinks."""
+    from agora.config import settings
+    from agora.execution.knowledge_graph import believe
+    return {"status": "ok", **await believe(q, settings.vault_path, k)}
+
+
 @router.get("/brain/bridges")
 async def brain_bridges(n: int = 6, rationale: bool = True):
     """Pairs of the user's notes that are deeply related yet UNLINKED — missing connections.
