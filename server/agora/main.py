@@ -455,6 +455,20 @@ async def init_db(app: FastAPI):
         app.state.diary_engine.vault_writer = app.state.vault_writer
     print(f"[Agentic OS v3] Engines initialized (emotion, relationships, dreams, diary, culture, conflict, metamemory)")
 
+    # ── Real Action Engine (Phase 2.3) ──
+    from agora.agent_os.real_action_engine import RealActionEngine
+    vault_reader = getattr(app.state, "vault_reader", None)
+    vault_writer = getattr(app.state, "vault_writer", None)
+    app.state.real_action_engine = RealActionEngine(
+        vault_writer=vault_writer,
+        vault_reader=vault_reader,
+        db=db,
+    )
+    # Wire into agent_os so LLM decisions can trigger real actions
+    if getattr(app.state, "agent_os", None):
+        app.state.agent_os.set_real_action_engine(app.state.real_action_engine)
+    print(f"[RealAction] Engine initialized (send_telegram, write_note, write_article, run_script, git_commit)")
+
     # Seed agents if empty
     cursor = await db.execute("SELECT COUNT(*) as cnt FROM agent_identities")
     row = await cursor.fetchone()
@@ -1019,6 +1033,7 @@ async def _economy_tick(app: FastAPI):
                                 trust_delta=0.05,
                             )
 
+<<<<<<< HEAD
 # DISABLED     # ── D6: Finn arbitrage — buy low, sell high ──
 # DISABLED     finn_id = "00000000-0000-0000-0000-000000000006"
 # DISABLED 
@@ -1028,6 +1043,8 @@ async def _economy_tick(app: FastAPI):
     # (Finn arbitrage block fully disabled — Finn removed from the 6-NPC roster)
 
     await db.commit()
+=======
+>>>>>>> 3f1d707 (ess: 2.3 — RealActionEngine: agents send Telegram, write notes/articles, run scripts, git commit. Wired into LLM decisions. 3 API endpoints.)
 
 
 async def tick_loop(app: FastAPI):

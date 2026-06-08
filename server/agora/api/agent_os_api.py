@@ -493,6 +493,7 @@ async def get_v3_status(npc_name: str, request: Request):
     }
 
 
+<<<<<<< HEAD
 # ── Bridge endpoints (used by the dungeon to feed experiences in + read the vault) ──
 
 @router.post("/{npc_name}/memories")
@@ -538,3 +539,66 @@ async def get_agent_os(npc_name: str, request: Request):
     if not status:
         raise HTTPException(status_code=404, detail=f"NPC {npc_name} not found")
     return status
+=======
+# ═══════════════════════════════════════════════
+# REAL ACTIONS
+# ═══════════════════════════════════════════════
+
+
+@router.post("/{npc_name}/action")
+async def execute_action(npc_name: str, request: Request):
+    """Execute a real action on behalf of an agent.
+    
+    Body: {"action": "send_telegram|write_note|write_article|run_script",
+           "params": {...}}
+    """
+    npc_id = DUNGEON_AGENT_IDS.get(npc_name) or npc_name
+    engine = getattr(request.app.state, "real_action_engine", None)
+    if not engine:
+        raise HTTPException(503, "Real action engine not initialised")
+    
+    body = await request.json()
+    action = body.get("action", "")
+    params = body.get("params", {})
+    
+    if not action:
+        raise HTTPException(400, "Missing 'action' field")
+    
+    result = await engine.execute(action, params, agent_name=npc_name)
+    return result
+
+
+@router.post("/actions/send-telegram")
+async def send_telegram(request: Request):
+    """Send a Telegram message as an agent.
+    
+    Body: {"agent": "Shadow Kael", "message": "Hello!", "params": {}}
+    """
+    body = await request.json()
+    agent = body.get("agent", "System")
+    message = body.get("message", "")
+    engine = getattr(request.app.state, "real_action_engine", None)
+    if not engine:
+        raise HTTPException(503, "Real action engine not initialised")
+    result = await engine.execute("send_telegram", {"message": message}, agent_name=agent)
+    return result
+
+
+@router.post("/actions/write-note")
+async def write_note(request: Request):
+    """Write a .md note to the vault as an agent.
+    
+    Body: {"agent": "Shadow Kael", "title": "...", "content": "...", "tags": [...]}
+    """
+    body = await request.json()
+    agent = body.get("agent", "System")
+    engine = getattr(request.app.state, "real_action_engine", None)
+    if not engine:
+        raise HTTPException(503, "Real action engine not initialised")
+    result = await engine.execute("write_note", {
+        "title": body.get("title", "Note"),
+        "content": body.get("content", ""),
+        "tags": body.get("tags", []),
+    }, agent_name=agent)
+    return result
+>>>>>>> 3f1d707 (ess: 2.3 — RealActionEngine: agents send Telegram, write notes/articles, run scripts, git commit. Wired into LLM decisions. 3 API endpoints.)

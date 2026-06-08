@@ -178,6 +178,13 @@ class AgentOS:
         self.trust_engine = None   # coordination.ess_protocol.TrustEngine
         self.stigmergy = None      # coordination.stigmergy.StigmergyPool
         self.event_bus = None      # coordination.event_bus.EventBus
+        # ── Real Action Engine (Phase 2.3) ──
+        self._real_action_engine = None
+        self._vault_reader = None
+        self._vault_writer = None
+
+    def set_real_action_engine(self, engine):
+        self._real_action_engine = engine
 
     async def ensure_os_initialized(self):
         """Seed OS data for all 7 NPCs if not already present."""
@@ -579,6 +586,15 @@ class AgentOS:
                 if nearby_str:
                     context_lines.append(nearby_str)
 
+                # ── Real Action context (Phase 2.3) ──
+                if self._real_action_engine:
+                    try:
+                        action_context = await self._real_action_engine.get_action_context(name, role)
+                        if action_context:
+                            context_lines.append(action_context)
+                    except Exception:
+                        pass
+
                 # Response-format hint (dungeon_agent_think embeds this in the prompt).
                 # state_of_mind values must be ones StateStore accepts, else they
                 # are coerced to "confused" (which would trigger seek-help).
@@ -767,6 +783,30 @@ class AgentOS:
                 })
             except Exception:
                 pass
+
+        # ── Real action execution ──
+        real_action = decision.get("real_action")
+        real_params = decision.get("real_params", {})
+        if real_action and self._real_action_engine:
+            try:
+                result = await self._real_action_engine.execute(
+                    action_type=real_action,
+                    params=real_params,
+                    agent_name=name,
+                    broadcast_fn=lambda t, p: None,
+                )
+                if result.get("status") in ("ok", "written", "sent"):
+                    print(f"[RealAction] {name}: {real_action} → {result.get('output', '')[:80]}")
+                    # Store as memory of the action
+                    mem_text = f"You performed a real action: {real_action}. Result: {result.get('output', '')[:100]}"
+                    try:
+                        from agora.agent_os.memory_agent import MemoryAgent
+                        mem = MemoryAgent(self.db, npc_id)
+                        await mem.store_memory(mem_text, "episodic", 0.7, "satisfied", "action")
+                    except Exception:
+                        pass
+            except Exception as e:
+                print(f"[RealAction] {name} error: {e}")
 
     async def _adjust_mood(self, npc_id: str, delta: float):
         """Adjust agent_soul.mood by delta, clamped to [0, 1] (Phase 2.0 Layer 3)."""
