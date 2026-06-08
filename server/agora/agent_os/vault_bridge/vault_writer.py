@@ -33,10 +33,12 @@ class VaultWriter:
 
     async def write_note(self, title: str, content: str, tags: list[str],
                          agent_name: str = "agent") -> str:
-        """Write an Obsidian note with frontmatter. Returns the file path."""
-        self.base.mkdir(parents=True, exist_ok=True)
+        """Write an Obsidian note with frontmatter into a dated subfolder. Returns the path."""
+        day = datetime.now(timezone.utc).strftime("%Y-%m-%d")
+        target_dir = self.base / day      # …/Agora Agents/2026-06-08/
+        target_dir.mkdir(parents=True, exist_ok=True)
         slug = _slug(title) or _slug(agent_name) or "note"
-        path = self.base / f"{slug}.md"
+        path = target_dir / f"{slug}.md"
 
         tag_list = ", ".join(tags or [])
         now = datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M")
