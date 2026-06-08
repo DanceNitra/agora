@@ -220,6 +220,50 @@ async def write_vault_note(request: Request):
     return {"status": "written", "path": path, "score": q["score"]}
 
 
+_VERIFIED: set = set()   # finding titles already fact-checked (so we work through the backlog)
+
+
+@router.post("/brain/verify-findings")
+async def verify_findings(request: Request, n: int = 4, incorporate: bool = True):
+    """Fact-check recent UN-checked findings against real sources; incorporate the VERIFIED ones
+    into the vault as validated notes. Run repeatedly to work through the backlog gradually."""
+    from agora.execution.verifier import verify_finding
+    db = request.app.state.db
+    cur = await db.execute(
+        "SELECT title, content FROM collective_knowledge WHERE knowledge_type='discovery' "
+        "ORDER BY created_at DESC LIMIT 25")
+    rows = await cur.fetchall()
+    writer = getattr(request.app.state, "vault_writer", None)
+    results = []
+    for r in rows:
+        if len(results) >= n:
+            break
+        title = (r["title"] or "").strip()
+        content = (r["content"] or "").strip()
+        if len(content) < 60 or title in _VERIFIED:
+            continue
+        _VERIFIED.add(title)
+        v = await verify_finding(title, content)
+        inc = False
+        if v["verdict"] in ("VERIFIED", "OVERSTATED") and incorporate and writer:
+            ok = v["verdict"] == "VERIFIED"
+            stamp = "✓ Verified against real sources" if ok else "⚠️ Partially supported (overstated)"
+            note = f"{content}\n\n## Verification\n{stamp} — {v['reason']}\nSource: {v['source']}"
+            try:
+                await writer.write_note(
+                    title=f"{'✓' if ok else '~'} {title[:70]}", content=note,
+                    tags=["agora", "verified" if ok else "overstated"], agent_name="Sergeant Voss")
+                inc = True
+            except Exception:
+                pass
+        results.append({"title": title[:60], "verdict": v["verdict"],
+                        "reason": v["reason"], "incorporated": inc})
+    return {"status": "ok",
+            "verified": sum(1 for x in results if x["verdict"] == "VERIFIED"),
+            "incorporated": sum(1 for x in results if x["incorporated"]),
+            "total": len(results), "results": results}
+
+
 @router.get("/brain/research")
 async def brain_research(q: str, n: int = 4):
     """Real research grounding across ALL fields — OpenAlex (cited) + arXiv (preprints), so

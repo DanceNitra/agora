@@ -148,6 +148,20 @@ async def _handle(app, text: str) -> None:
                 lines.append(f"• *{e['agent']}* ({e['mins_ago']}m ago): {e['problem'][:140]}")
             lines.append("\n→ Reply `fix <guidance>` to unblock the latest.")
             await send("\n".join(lines))
+    elif low in ("verify", "/verify"):
+        await send("🔬 _Fact-checking recent findings against real sources…_")
+        d = await asyncio.to_thread(_brain_post, "/api/v1/agent-os/brain/verify-findings", {})
+        res = (d or {}).get("results", [])
+        if not res:
+            await send("_No new findings to verify._")
+        else:
+            icon = {"VERIFIED": "✅", "OVERSTATED": "⚠️", "UNSUPPORTED": "❌"}
+            lines = ["🔬 *Verification vs real sources:*\n"]
+            for r in res:
+                lines.append(f"{icon.get(r['verdict'], '•')} {r['title'][:42]}\n   _{r['reason'][:90]}_")
+            lines.append(f"\n→ *{d.get('incorporated', 0)}/{d.get('total', 0)}* incorporated into "
+                         f"the vault ({d.get('verified', 0)} fully verified).")
+            await send("\n".join(lines))
     elif low in ("keep", "/keep"):
         if not _last["brief"]:
             await send("_Nothing to save — ask a question first._")
@@ -189,6 +203,7 @@ async def _handle(app, text: str) -> None:
     elif low in ("/start", "/help", "help"):
         await send("🏰 *Agora research assistant*\n\n"
                    "`<question>` → grounded brief, then `keep` to save it\n"
+                   "`verify` → fact-check findings & incorporate the verified\n"
                    "`bridges` → missing links · `connect` → add them\n"
                    "`gaps` → your gaps · `report` → morning report\n"
                    "`status` → stuck agents · `fix <guidance>` → unblock one")
