@@ -13,6 +13,17 @@ for _stream in (_sys.stdout, _sys.stderr):
         _stream.reconfigure(encoding="utf-8", errors="replace")
     except Exception:
         pass
+
+# Load server/.env into os.environ so non-pydantic consumers (e.g. Telegram) see it too.
+import os as _os
+from pathlib import Path as _Path
+_envf = _Path(__file__).resolve().parent.parent / ".env"
+if _envf.exists():
+    for _ln in _envf.read_text(encoding="utf-8", errors="replace").splitlines():
+        _ln = _ln.strip()
+        if _ln and not _ln.startswith("#") and "=" in _ln:
+            _k, _v = _ln.split("=", 1)
+            _os.environ.setdefault(_k.strip(), _v.strip())
 from contextlib import asynccontextmanager
 from datetime import datetime, timezone
 
