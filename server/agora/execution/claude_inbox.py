@@ -15,6 +15,27 @@ import uuid
 from pathlib import Path
 
 INBOX = Path(__file__).resolve().parents[2] / ".claude_inbox.json"   # server/.claude_inbox.json
+FEED = Path(__file__).resolve().parents[2] / ".telegram_feed.json"   # everything sent to Telegram
+
+
+def feed_append(text: str) -> None:
+    """Record an outgoing Telegram message so Claude Code can read the same feed the user sees."""
+    try:
+        items = json.loads(FEED.read_text(encoding="utf-8"))
+    except Exception:
+        items = []
+    items.append({"ts": time.time(), "text": (text or "")[:1500]})
+    try:
+        FEED.write_text(json.dumps(items[-80:], ensure_ascii=False), encoding="utf-8")
+    except Exception:
+        pass
+
+
+def feed_recent(n: int = 20) -> list:
+    try:
+        return json.loads(FEED.read_text(encoding="utf-8"))[-n:]
+    except Exception:
+        return []
 
 
 def _load() -> list:

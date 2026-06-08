@@ -499,6 +499,7 @@ _PERSONA = {
 _speech_cd: dict[str, float] = {}
 _conv_cd: dict[str, float] = {}
 _in_conv: set[str] = set()
+_in_conv_seen: dict[str, float] = {}   # eid -> when it entered _in_conv (watchdog against leaks)
 
 
 def _persona(eid: str) -> str:
@@ -796,6 +797,7 @@ async def _pipeline_tick(hold) -> None:
     if _pipeline["busy"]:
         return
     _pipeline["busy"] = True
+    active = None
     try:
         item = _pipeline["item"]
         if not item:                                    # Aldric opens a new pipeline
@@ -812,6 +814,7 @@ async def _pipeline_tick(hold) -> None:
         stage = item["stage"]
         eid, label, task = _PIPELINE_STAGES[stage]
         _in_conv.add(eid)
+        active = eid                                    # so the finally can release it on error
         hold[eid] = 12                                  # pause this agent so you see it work
         prior = "  ".join(item["artifact"]) or "(you are first — start it)"
         line = await _llm_say(
@@ -828,6 +831,7 @@ async def _pipeline_tick(hold) -> None:
         if stage + 1 < len(_PIPELINE_STAGES):           # hand off to the next role (packet)
             broadcast({"type": "converse", "from": eid, "to": _PIPELINE_STAGES[stage + 1][0]})
         _in_conv.discard(eid)
+        active = None
         item["stage"] += 1
         if item["stage"] >= len(_PIPELINE_STAGES):      # ship it
             chain = "\n".join(item["artifact"])
@@ -855,6 +859,8 @@ async def _pipeline_tick(hold) -> None:
         logger.debug(f"pipeline: {e}")
         _pipeline["item"] = None
     finally:
+        if active:
+            _in_conv.discard(active)                    # never leak a frozen agent
         _pipeline["busy"] = False
 
 
@@ -1652,6 +1658,15 @@ async def ambient_life():
         ents = engine.state.entities
         occupied = {(int(round(e.x)), int(round(e.y))): eid for eid, e in ents.items()}
         now = _time.monotonic()
+        # Watchdog: a real conversation/pipeline stage lasts < ~20s. If an agent has been stuck in
+        # _in_conv longer, it leaked (an exception skipped cleanup) — release it so it never freezes.
+        for _e in list(_in_conv):
+            _in_conv_seen.setdefault(_e, now)
+            if now - _in_conv_seen[_e] > 75:
+                _in_conv.discard(_e)
+                _in_conv_seen.pop(_e, None)
+        for _e in [k for k in _in_conv_seen if k not in _in_conv]:
+            _in_conv_seen.pop(_e, None)
         for eid in list(ents.keys()):
             hold[eid] = max(0, hold.get(eid, 0) - 1)
             cooldown[eid] = max(0, cooldown.get(eid, 0) - 1)

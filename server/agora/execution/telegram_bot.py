@@ -34,6 +34,8 @@ def _api(method: str, params: dict) -> dict:
 
 
 async def send(text: str) -> None:
+    from agora.execution.claude_inbox import feed_append
+    feed_append(text)                               # Claude Code reads the same feed the user sees
     if not _tok() or not _chat():
         return
     try:

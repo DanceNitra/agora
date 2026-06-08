@@ -360,6 +360,8 @@ async def _send_telegram(text: str) -> bool:
     import json
     import os
     import subprocess
+    from agora.execution.claude_inbox import feed_append
+    feed_append(text)                               # so Claude Code reads the same feed the user sees
     token, chat = os.getenv("HERMES_TELEGRAM_BOT_TOKEN", ""), os.getenv("HERMES_TELEGRAM_CHAT_ID", "")
     if not token or not chat:
         return False
@@ -373,6 +375,13 @@ async def _send_telegram(text: str) -> bool:
             capture_output=True, text=True, timeout=15)
         return '"ok":true' in (r.stdout or "")
     return await asyncio.to_thread(_s)
+
+
+@router.get("/brain/telegram-feed")
+async def telegram_feed(n: int = 20):
+    """The recent messages sent to the user's Telegram — so Claude Code can read what they see."""
+    from agora.execution.claude_inbox import feed_recent
+    return {"feed": feed_recent(n)}
 
 
 _PLAN_META = ("build ", "together we", "draft ", "create a collaborative", "design and",

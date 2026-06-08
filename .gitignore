@@ -21,3 +21,4 @@ server/.semantic_cache/
 
 # Claude Code remote-control inbox (local)
 server/.claude_inbox.json
+server/.telegram_feed.json
