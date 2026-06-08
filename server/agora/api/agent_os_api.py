@@ -378,7 +378,8 @@ async def _send_telegram(text: str) -> bool:
 _PLAN_META = ("build ", "together we", "draft ", "create a collaborative", "design and",
               "no real papers", "your vault contains no", "begin by", "we will", "let's",
               "i will", "propose to", "no paper", "the closest are", "no relevant",
-              "cannot cite", "does not support", "no source")
+              "cannot cite", "does not support", "no source", "compose ", "collaborate with",
+              "co-author", "integrating ", "evergreen note", "let us ", "i propose")
 
 
 async def _build_morning_report(app) -> str:
