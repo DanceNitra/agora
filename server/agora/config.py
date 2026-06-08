@@ -19,6 +19,9 @@ class Settings(BaseSettings):
     # OpenRouter-specific
     openrouter_key: str = ""
     openrouter_referer: str = "https://github.com/DanceNitra/agora"
+    # VaultBridge — Obsidian "second brain" (local clone of the private repo)
+    vault_path: str = ""
+    vault_git_ssh_key: str = ""
 
     model_config = {"env_prefix": "AGORA_", "env_file": ".env", "extra": "ignore"}
 

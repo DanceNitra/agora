@@ -442,6 +442,14 @@ async def init_db(app: FastAPI):
     app.state.culture_engine = CultureEngine(db) if db else None
     app.state.conflict_engine = ConflictEngine(db) if db else None
     app.state.meta_memory = MetaMemory(db) if db else None
+
+    # ── VaultBridge (2.1) — connect agents to the Obsidian "second brain" ──
+    from agora.agent_os.vault_bridge import create_vault_reader, create_vault_writer
+    app.state.vault_reader = create_vault_reader(settings)
+    app.state.vault_writer = create_vault_writer(settings)
+    _vault_mode = "REAL vault" if app.state.vault_reader.is_real() else "mock concepts"
+    print(f"[VaultBridge] reader+writer ready ({_vault_mode}; path={settings.vault_path or '(unset)'})")
+
     # Wire vault_writer into diary engine for vault exports
     if app.state.diary_engine and getattr(app.state, "vault_writer", None):
         app.state.diary_engine.vault_writer = app.state.vault_writer
