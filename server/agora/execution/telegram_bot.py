@@ -210,6 +210,12 @@ async def _handle(app, text: str) -> None:
         from agora.config import settings
         from agora.execution.knowledge_graph import believe, format_belief
         await send(format_belief(await believe(topic, settings.vault_path, 8)))
+    elif low.startswith(("hypothesize ", "/hypothesize ", "hypothesis ")):
+        topic = text.split(" ", 1)[1].strip()
+        await send("🔬 _Forming a hypothesis and testing it against real literature…_")
+        from agora.config import settings
+        from agora.execution.scientist import hypothesize_and_test, format_hypothesis
+        await send(format_hypothesis(await hypothesize_and_test(topic, settings.vault_path)))
     elif low in ("/gaps", "gaps"):
         from agora.execution.semantic_index import SemanticIndex
         si = SemanticIndex()
@@ -223,6 +229,7 @@ async def _handle(app, text: str) -> None:
                    "*Research (agents):*\n"
                    "`<question>` → grounded brief, then `keep`\n"
                    "`believe <topic>` → what your vault claims (+contradictions)\n"
+                   "`hypothesize <topic>` → form + test a new hypothesis (AGORA 2.0)\n"
                    "`verify` · `bridges`/`connect` · `gaps` · `report` · `status` · `fix <g>`\n\n"
                    "*Control Claude Code:*\n"
                    "`build <task>` / `cc <task>` → hand me a build/implementation task; "

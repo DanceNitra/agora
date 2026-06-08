@@ -311,6 +311,15 @@ async def brain_believe(q: str, k: int = 8):
     return {"status": "ok", **await believe(q, settings.vault_path, k)}
 
 
+@router.get("/brain/hypothesize")
+async def brain_hypothesize(q: str):
+    """AGORA 2.0 / Pillar 2 — agents as scientists: take what the vault believes, form a NEW
+    testable hypothesis, test it against real literature, return verdict + evidence + falsifier."""
+    from agora.config import settings
+    from agora.execution.scientist import hypothesize_and_test
+    return {"status": "ok", **await hypothesize_and_test(q, settings.vault_path)}
+
+
 @router.get("/brain/bridges")
 async def brain_bridges(n: int = 6, rationale: bool = True):
     """Pairs of the user's notes that are deeply related yet UNLINKED — missing connections.
