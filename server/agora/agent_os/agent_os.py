@@ -413,7 +413,15 @@ class AgentOS:
                 state_of_mind = brain.get("state_of_mind", "focused")
                 current_goal = brain.get("current_goal", "")
                 plan_stack = json.loads(brain.get("plan_stack", "[]") or "[]")
-                memories = json.loads(brain.get("memory", "[]") or "[]")
+                # ── Memory recall (Phase 2.0 Layer 1) ──
+                memories_str = "Recent memories: none"
+                try:
+                    from agora.agent_os.memory_agent import MemoryAgent
+                    mem_agent = MemoryAgent(self.db, npc_id)
+                    memories_str = await mem_agent.get_relevant_memories_for_prompt(
+                        f"{current_goal} {state_of_mind}", max_memories=6)
+                except Exception:
+                    pass
 
                 context_lines = [
                     f"=== {name} ===",
@@ -422,7 +430,7 @@ class AgentOS:
                     f"State of mind: {state_of_mind}",
                     f"Current goal: {current_goal or 'none'}",
                     f"Plans remaining: {len(plan_stack)}",
-                    f"Recent memories: {memories[-3:] if memories else 'none'}",
+                    memories_str,
                 ]
 
                 # ── Nearby NPCs (names + UUIDs) ──
@@ -526,6 +534,17 @@ class AgentOS:
                 if new_goal:
                     update["current_goal"] = new_goal
                 await self.state_store.update_brain(npc_id, update)
+
+                # ── Thought journal (Phase 2.0 Layer 6) ──
+                try:
+                    await self.db.execute(
+                        "INSERT INTO agent_thoughts (npc_id, thought_type, content, context, importance) "
+                        "VALUES (?, 'decision', ?, ?, 0.5)",
+                        (npc_id, (decision.get("insight") or new_state)[:240],
+                         (current_goal or "")[:120]))
+                    await self.db.commit()
+                except Exception:
+                    pass
 
                 # Execute the decision visibly + record in ESS (best-effort).
                 try:
@@ -645,6 +664,27 @@ class AgentOS:
             except Exception:
                 pass
 
+        # ── Memory + mood (Phase 2.0 Layers 1 & 3) ──
+        try:
+            from agora.agent_os.memory_agent import MemoryAgent
+            mem = MemoryAgent(self.db, npc_id)
+            tname = next((n for i, n in nearby if i == target_id), "someone") if target_id else ""
+            if action in ("cooperate", "share") and target_id:
+                await mem.store_memory(f"I cooperated with {tname}. {insight}".strip(),
+                                       "episodic", importance=0.6, emotional_tag="trusted",
+                                       source="experience", related_npc_id=target_id)
+                await self._adjust_mood(npc_id, 0.1)
+            elif action == "defect" and target_id:
+                await mem.store_memory(f"I turned on {tname}. {insight}".strip(),
+                                       "episodic", importance=0.7, emotional_tag="betrayed",
+                                       source="experience", related_npc_id=target_id)
+                await self._adjust_mood(npc_id, -0.2)
+            elif insight:
+                await mem.store_memory(insight, "episodic", importance=0.4,
+                                       source="self_reflection")
+        except Exception:
+            pass
+
         # ── Broadcast a thought bubble to the dungeon view ──
         if self.event_bus and insight:
             try:
@@ -657,6 +697,20 @@ class AgentOS:
                 })
             except Exception:
                 pass
+
+    async def _adjust_mood(self, npc_id: str, delta: float):
+        """Adjust agent_soul.mood by delta, clamped to [0, 1] (Phase 2.0 Layer 3)."""
+        try:
+            cursor = await self.db.execute(
+                "SELECT mood FROM agent_soul WHERE npc_id=?", (npc_id,))
+            row = await cursor.fetchone()
+            if row is not None and row["mood"] is not None:
+                new_mood = max(0.0, min(1.0, row["mood"] + delta))
+                await self.db.execute(
+                    "UPDATE agent_soul SET mood=? WHERE npc_id=?", (new_mood, npc_id))
+                await self.db.commit()
+        except Exception:
+            pass
 
     async def _think_rule_based(self, npc_id: str, name: str | None = None) -> str:
         """Rule-based state_of_mind decision (backup when LLM unavailable)."""

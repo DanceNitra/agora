@@ -185,6 +185,117 @@ async def init_db(app: FastAPI):
     from agora.coordination.checkpointer import Checkpointer
     app.state.checkpointer = Checkpointer(db, app.state.event_store)
 
+    # ── Agentic OS v2 (Phase 2.0) — Brain Ecosystem tables (idempotent) ──
+    if db:
+        await db.executescript(
+            """
+            CREATE TABLE IF NOT EXISTS agent_memories (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                npc_id TEXT NOT NULL,
+                memory_type TEXT NOT NULL DEFAULT 'episodic',
+                content TEXT NOT NULL,
+                importance REAL NOT NULL DEFAULT 0.5,
+                emotional_tag TEXT DEFAULT 'neutral',
+                source TEXT DEFAULT 'experience',
+                related_npc_id TEXT,
+                decay_factor REAL NOT NULL DEFAULT 1.0,
+                created_at TEXT NOT NULL DEFAULT (datetime('now')),
+                last_recalled_at TEXT
+            );
+            CREATE INDEX IF NOT EXISTS idx_memories_npc ON agent_memories(npc_id, memory_type);
+            CREATE INDEX IF NOT EXISTS idx_memories_importance ON agent_memories(npc_id, importance DESC);
+
+            CREATE TABLE IF NOT EXISTS agent_conversations (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                session_id TEXT NOT NULL,
+                speaker_id TEXT NOT NULL,
+                target_id TEXT NOT NULL,
+                message TEXT NOT NULL,
+                intent TEXT DEFAULT 'chat',
+                turn_number INTEGER NOT NULL DEFAULT 1,
+                speaker_name TEXT NOT NULL DEFAULT '',
+                target_name TEXT NOT NULL DEFAULT '',
+                created_at TEXT NOT NULL DEFAULT (datetime('now'))
+            );
+            CREATE INDEX IF NOT EXISTS idx_conv_session ON agent_conversations(session_id);
+            CREATE INDEX IF NOT EXISTS idx_conv_npcs ON agent_conversations(speaker_id, target_id);
+
+            CREATE TABLE IF NOT EXISTS agent_brainstorm_sessions (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                session_id TEXT NOT NULL UNIQUE,
+                topic TEXT NOT NULL,
+                initiator_id TEXT NOT NULL,
+                status TEXT NOT NULL DEFAULT 'active',
+                created_at TEXT NOT NULL DEFAULT (datetime('now')),
+                completed_at TEXT
+            );
+            CREATE TABLE IF NOT EXISTS agent_brainstorm_ideas (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                session_id TEXT NOT NULL,
+                npc_id TEXT NOT NULL,
+                idea_content TEXT NOT NULL,
+                idea_type TEXT DEFAULT 'concept',
+                builds_on_id INTEGER,
+                votes INTEGER NOT NULL DEFAULT 0,
+                impact_score REAL DEFAULT 0.5,
+                feasibility REAL DEFAULT 0.5,
+                created_at TEXT NOT NULL DEFAULT (datetime('now'))
+            );
+            CREATE INDEX IF NOT EXISTS idx_bs_session ON agent_brainstorm_ideas(session_id);
+            CREATE INDEX IF NOT EXISTS idx_bs_npc ON agent_brainstorm_ideas(npc_id);
+
+            CREATE TABLE IF NOT EXISTS collective_knowledge (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                title TEXT NOT NULL,
+                content TEXT NOT NULL,
+                contributor_id TEXT NOT NULL,
+                contributor_name TEXT NOT NULL DEFAULT '',
+                knowledge_type TEXT DEFAULT 'observation',
+                confidence REAL DEFAULT 0.7,
+                verification_count INTEGER DEFAULT 0,
+                tags TEXT DEFAULT '[]',
+                created_at TEXT NOT NULL DEFAULT (datetime('now')),
+                updated_at TEXT
+            );
+            CREATE INDEX IF NOT EXISTS idx_ck_type ON collective_knowledge(knowledge_type);
+
+            CREATE TABLE IF NOT EXISTS agent_thoughts (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                npc_id TEXT NOT NULL,
+                thought_type TEXT NOT NULL DEFAULT 'reasoning',
+                content TEXT NOT NULL,
+                context TEXT DEFAULT '',
+                importance REAL DEFAULT 0.5,
+                related_npc_id TEXT,
+                created_at TEXT NOT NULL DEFAULT (datetime('now'))
+            );
+            CREATE INDEX IF NOT EXISTS idx_thoughts_npc ON agent_thoughts(npc_id, created_at DESC);
+
+            CREATE TABLE IF NOT EXISTS system_upgrade_proposals (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                proposer_id TEXT NOT NULL,
+                proposer_name TEXT NOT NULL DEFAULT '',
+                title TEXT NOT NULL,
+                description TEXT NOT NULL,
+                upgrade_type TEXT NOT NULL DEFAULT 'feature',
+                impact_estimate TEXT DEFAULT 'medium',
+                effort_estimate TEXT DEFAULT 'medium',
+                status TEXT NOT NULL DEFAULT 'proposed',
+                vote_count INTEGER DEFAULT 0,
+                implemented_by TEXT,
+                created_at TEXT NOT NULL DEFAULT (datetime('now')),
+                implemented_at TEXT
+            );
+            """
+        )
+        await db.commit()
+        # agent_soul.mood — idempotent ALTER (existing DBs)
+        try:
+            await db.execute("ALTER TABLE agent_soul ADD COLUMN mood REAL NOT NULL DEFAULT 0.7")
+            await db.commit()
+        except Exception:
+            pass  # column already exists
+
     app.state.active_connections = []
     app.state.tick_count = 0
 
