@@ -482,7 +482,8 @@ _LLM_ON = bool(_LLM_KEY)
 # "fast" = lively banter. Override with DUNGEON_PACE.
 _PACE = os.environ.get("DUNGEON_PACE", "study").strip().lower()
 _STUDY = _PACE != "fast"
-_DECIDE_MIN, _DECIDE_MAX = (35.0, 90.0) if _STUDY else (3.0, 7.0)   # gap between an agent's goals
+_DECIDE_MIN, _DECIDE_MAX = (20.0, 45.0) if _STUDY else (3.0, 7.0)   # gap before PLANNING new goals
+_BACKLOG_MIN, _BACKLOG_MAX = (4.0, 9.0)                             # gap to pull the NEXT queued quest
 _CONV_COOLDOWN = 120.0 if _STUDY else 30.0                          # gap between an agent's talks
 
 _PERSONA = {
@@ -673,8 +674,8 @@ async def _pick_collab_seed():
             ks = [k for k in (d or {}).get("knowledge", []) if (k.get("content") or "")]
             if ks:
                 k = random.choice(ks)
-                return ("finding", (k.get("title") or "a recent finding")[:80],
-                        (k.get("content") or "")[:240])
+                title = (k.get("title") or "a recent finding").replace("Pipeline: ", "").strip()
+                return ("finding", title[:80], (k.get("content") or "")[:240])
         elif i == 1:
             d = await asyncio.to_thread(_brain_get_sync, "/api/v1/agent-os/brain/gaps?n=8")
             gs = (d or {}).get("gaps", [])
@@ -729,8 +730,9 @@ async def _collaborate(a_id, b_id, seed_kind, seed_title, seed_text, hold) -> No
         await asyncio.sleep(2.4)
         joint = await asyncio.to_thread(
             _llm_content_sync,
-            f"Synthesize the exchange between {an} and {bn} into ONE concrete joint research FINDING "
-            f"(2 sentences) grounded in the real sources — cite one. NEVER invent sources.",
+            f"Combine {an} and {bn}'s exchange into ONE joint FINDING (2 sentences) that a specific "
+            f"source below DIRECTLY supports — paraphrase that paper's actual result and name it "
+            f"(Author Year). Stay close to the evidence; do NOT over-generalize. NEVER invent sources.",
             f"Seed ({seed_kind}): {seed_text}\n{an}: {a_line}\n{bn}: {b_line}\n\nReal sources:\n{sources}")
         if joint and joint.strip():
             src = ""
@@ -831,8 +833,9 @@ async def _pipeline_tick(hold) -> None:
             chain = "\n".join(item["artifact"])
             final = await asyncio.to_thread(
                 _llm_content_sync,
-                "Synthesize this research assembly line into ONE final grounded finding (2-3 "
-                "sentences), citing a real source. NEVER invent sources.",
+                "Distill this assembly line into ONE final finding (2-3 sentences) that a specific "
+                "source below DIRECTLY supports — paraphrase that paper's actual result and name it "
+                "(Author Year). Stay close to the evidence; do NOT over-reach. NEVER invent sources.",
                 f"Topic: {item['seed']}\nChain:\n{chain}\n\nSources:\n{item['sources']}")
             if final and final.strip():
                 src = ""
@@ -1210,9 +1213,10 @@ async def _grounded_discovery(eid: str, intent: str) -> None:
         or "(the user's vault is thin on this — a real gap)"
     finding = await asyncio.to_thread(
         _llm_content_sync,
-        f"You are {_persona(eid)} State ONE concrete research FINDING (a specific claim/insight, "
-        f"NOT a plan) grounded in the real papers below — cite one — and CONNECT it to the user's "
-        f"existing notes, or flag the GAP if the vault is thin. Max 2 sentences. NEVER invent sources.",
+        f"You are {_persona(eid)} State ONE research FINDING that a specific paper below DIRECTLY "
+        f"supports: paraphrase that paper's actual result and name it (Author Year). Stay close to "
+        f"what the source literally shows — do NOT extrapolate or synthesize beyond it. Then, if apt, "
+        f"link the user's notes. If no paper fits, say so plainly. Max 2 sentences. NEVER invent sources.",
         f"Topic: {intent}\n\nReal papers:\n{sources or '(none found)'}\n\n"
         f"User's relevant existing notes: {rel}") or intent
     src = ""
@@ -1773,7 +1777,9 @@ async def ambient_life():
                 hold[eid] = 3
                 goals.pop(eid, None)
                 paths.pop(eid, None)
-                next_decide[eid] = now + random.uniform(_DECIDE_MIN, _DECIDE_MAX)
+                # Work through the backlog promptly; only pause for the study gap before planning anew.
+                next_decide[eid] = now + (random.uniform(_BACKLOG_MIN, _BACKLOG_MAX)
+                                          if quests.get(eid) else random.uniform(_DECIDE_MIN, _DECIDE_MAX))
                 publish_goals()
                 continue
 
