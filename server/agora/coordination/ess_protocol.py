@@ -22,6 +22,12 @@ from cryptography.hazmat.primitives.asymmetric.ed25519 import (
 from cryptography.hazmat.primitives import serialization
 from cryptography.exceptions import InvalidSignature
 
+# ── ESS Topic Constants (task 1.7) ──
+ESS_TOPIC_TRUST = "ess:trust"          # Trust score updates
+ESS_TOPIC_TFT = "ess:tft"              # TFT compliance evaluations
+ESS_TOPIC_STABILITY = "ess:stability"  # Provokability / ESS stability tests
+ESS_TOPICS = [ESS_TOPIC_TRUST, ESS_TOPIC_TFT, ESS_TOPIC_STABILITY]
+
 
 class MessageType(str, Enum):
     """The fixed ESS message vocabulary (Axelrod TFT: Clear)."""
@@ -138,9 +144,10 @@ class TrustEngine:
     SLIDING_WINDOW_SIZE = 20       # Only the last N interactions matter
     PROVOKABILITY_THRESHOLD = 0.7  # ESS stability threshold
 
-    def __init__(self, db, event_store=None):
+    def __init__(self, db, event_store=None, event_bus=None):
         self.db = db
         self.event_store = event_store  # Optional event-sourcing integration
+        self.event_bus = event_bus      # Optional EventBus for real-time streaming (1.7)
 
     async def record_interaction(self, agent_id: str, target_id: str, outcome: str) -> dict:
         trust = await self._get_trust(agent_id, target_id)
@@ -191,6 +198,25 @@ class TrustEngine:
                 )
             except Exception:
                 pass  # Event store failure should not break trust recording
+
+        # Real-time publish via EventBus (non-blocking, best-effort) — task 1.7
+        if self.event_bus:
+            try:
+                await self.event_bus.publish(
+                    topic=ESS_TOPIC_TRUST,
+                    event_type=f"trust_{outcome}",
+                    payload={
+                        "agent_id": agent_id,
+                        "target_id": target_id,
+                        "outcome": outcome,
+                        "score": trust["score"],
+                        "interactions": trust["interactions"],
+                        "consecutive_cooperations": trust.get("consecutive_cooperations", 0),
+                        "consecutive_defections": trust.get("consecutive_defections", 0),
+                    },
+                )
+            except Exception:
+                pass
 
         await self._persist(agent_id, target_id, trust)
         return trust

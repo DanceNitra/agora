@@ -46,6 +46,7 @@ from agora.api import evaluation_api
 from agora.api import god_console_v2
 from agora.api import dungeon_os_api
 from agora.api import ess as ess_api
+from agora.coordination.ess_protocol import ESS_TOPICS
 
 
 async def init_db(app: FastAPI):
@@ -120,6 +121,12 @@ async def init_db(app: FastAPI):
     # EventBus — topic-based pub/sub
     app.state.event_bus = EventBus(app)
     await app.state.event_bus.start()
+
+    # ── 1.7: stream ESS events in real time via the EventBus (ess:trust / ess:tft) ──
+    if getattr(app.state, "trust", None):
+        app.state.trust.event_bus = app.state.event_bus
+    if getattr(app.state, "tft_verifier", None):
+        app.state.tft_verifier.event_bus = app.state.event_bus
 
     # ── 1.9: give the dungeon NPC brain access to ESS trust, stigmergy, event bus ──
     if getattr(app.state, "agent_os", None):
@@ -537,6 +544,47 @@ async def ws_endpoint(websocket: WebSocket):
                 await broadcast(websocket.app, "message", {"text": data})
             else:
                 await broadcast(websocket.app, "message", {"text": data})
+    except WebSocketDisconnect:
+        if event_bus:
+            await event_bus._remove_websocket(websocket)
+        else:
+            try:
+                websocket.app.state.active_connections.remove(websocket)
+            except ValueError:
+                pass
+
+
+@app.websocket("/ws/ess")
+async def ws_ess_endpoint(websocket: WebSocket):
+    """WebSocket pre-subscribed to all ESS topics (ess:trust, ess:tft, ess:stability).
+
+    Connect to /ws/ess to receive only ESS events (trust updates, TFT evaluations,
+    stability checks) — no dungeon/heartbeat noise. Receive-only apart from ping/pong.
+    """
+    await websocket.accept()
+    event_bus = getattr(websocket.app.state, "event_bus", None)
+    if event_bus:
+        await event_bus.subscribe(websocket, ESS_TOPICS)
+        # Replay recent ESS events so a fresh subscriber sees current state.
+        try:
+            replayed = await event_bus.replay(websocket, ESS_TOPICS, limit=20)
+            await websocket.send_json({
+                "type": "subscribed", "topics": ESS_TOPICS, "replayed": replayed,
+            })
+        except Exception:
+            pass
+    else:
+        websocket.app.state.active_connections.append(websocket)
+
+    try:
+        while True:
+            data = await websocket.receive_text()
+            try:
+                msg = json.loads(data)
+            except json.JSONDecodeError:
+                continue
+            if msg.get("type") == "ping":
+                await websocket.send_json({"type": "pong"})
     except WebSocketDisconnect:
         if event_bus:
             await event_bus._remove_websocket(websocket)

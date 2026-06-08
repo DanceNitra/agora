@@ -30,8 +30,9 @@ DEFECT = "defect"
 class TFTVerifier:
     """Analyses interaction history and computes TFT-compliance scores."""
 
-    def __init__(self, db):
+    def __init__(self, db, event_bus=None):
         self.db = db
+        self.event_bus = event_bus  # Optional EventBus for real-time streaming (1.7)
 
     # ═══════════════════════════════════════════════
     # RECORD INTERACTION
@@ -327,7 +328,7 @@ class TFTVerifier:
                     "pair_count": len(scores),
                 }
 
-        return {
+        result = {
             "agent_id": agent_id[:8],
             "tft_score": round(tft_score, 4),
             "components": {
@@ -345,6 +346,20 @@ class TFTVerifier:
                 "clear": W_CLEAR,
             },
         }
+
+        # Real-time publish via EventBus (non-blocking, best-effort) — task 1.7
+        if getattr(self, "event_bus", None):
+            try:
+                from agora.coordination.ess_protocol import ESS_TOPIC_TFT
+                await self.event_bus.publish(
+                    topic=ESS_TOPIC_TFT,
+                    event_type="tft_evaluation",
+                    payload=result,
+                )
+            except Exception:
+                pass
+
+        return result
 
     async def evaluate_pair(
         self, agent_id: str, partner_id: str
