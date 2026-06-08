@@ -886,12 +886,34 @@ async def _brain_learning_graph() -> list[dict]:
     return _LEARN_GRAPH["edges"]
 
 
+def _compute_standing(trust: list[dict]) -> dict:
+    """Each agent's reputation (0..1) = average pairwise ESS trust. This is the curation
+    authority: high standing → that agent's curation auto-applies to the vault."""
+    acc = {e: [] for e in _AGENT_NAMES}
+    for p in trust:
+        if p["a"] in acc:
+            acc[p["a"]].append(p["score"])
+        if p["b"] in acc:
+            acc[p["b"]].append(p["score"])
+    return {e: round(sum(v) / len(v), 3) if v else 0.5 for e, v in acc.items()}
+
+
 async def _broadcast_trust_graph():
-    """One unified graph for the dungeon: ESS pairwise trust + learning (teach) edges."""
+    """One unified graph for the dungeon: ESS pairwise trust + learning (teach) edges +
+    each agent's standing — persisted so the trust-weighted curator (AutoLinker) can read it."""
     trust = await _trust_matrix()                       # [{a,b,score}]  ESS, live
     learn = await _brain_learning_graph()               # [{from,to,skill}]  who teaches whom
-    nodes = [{"eid": e, "name": _AGENT_NAMES.get(e, e)} for e in _AGENT_NAMES]
+    standing = _compute_standing(trust)                 # eid -> 0..1
+    nodes = [{"eid": e, "name": _AGENT_NAMES.get(e, e), "standing": standing.get(e, 0.5)}
+             for e in _AGENT_NAMES]
     broadcast({"type": "trust_graph", "nodes": nodes, "trust": trust, "learn": learn})
+    try:
+        import json as _json
+        by_name = {_AGENT_NAMES[e]: standing.get(e, 0.5) for e in _AGENT_NAMES}
+        (Path(__file__).parent / "agent_standing.json").write_text(
+            _json.dumps({"standing": by_name, "updated": _time.time()}))
+    except Exception:
+        pass
 
 
 async def _brain_contribute(eid: str, title: str, content: str) -> bool:

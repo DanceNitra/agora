@@ -18,6 +18,7 @@ Usage:
 from __future__ import annotations
 
 import argparse
+import json
 import math
 import re
 from collections import Counter, defaultdict
@@ -69,6 +70,14 @@ def main() -> None:
     ap.add_argument("--apply-threshold", type=float, default=0.32)
     ap.add_argument("--orphans-only", action="store_true",
                     help="only suggest/apply for notes that currently have NO links")
+    ap.add_argument("--trust-weighted", action="store_true",
+                    help="gate auto-apply on the curator agent's live trust standing")
+    ap.add_argument("--curator", default="Dame Elara",
+                    help="which Vault-Company agent owns this curation (links → Bridge Builder)")
+    ap.add_argument("--standing-gate", type=float, default=0.55)
+    ap.add_argument("--standing-file",
+                    default=str(Path(__file__).resolve().parent.parent
+                                / "agora-game-server" / "agent_standing.json"))
     args = ap.parse_args()
 
     vault = Path(args.vault)
@@ -195,7 +204,27 @@ def main() -> None:
     rep_path.write_text("\n".join(rep), encoding="utf-8")
     pend_path.write_text("\n".join(pend), encoding="utf-8")
 
-    # ── 7. (optional) apply strong links into the notes ─────
+    # ── 7. trust-weighted gate: the curator's standing decides auto-apply vs pending ──
+    provenance = ""
+    if args.trust_weighted:
+        standing = {}
+        try:
+            sf = json.loads(Path(args.standing_file).read_text(encoding="utf-8"))
+            standing = sf.get("standing", sf)
+        except Exception as e:
+            print(f"[AutoLinker] standing unavailable ({e}); curator assumed neutral 0.50")
+        cur = float(standing.get(args.curator, 0.5))
+        provenance = f"  —  curated by {args.curator} (trust {cur:.2f})"
+        if cur >= args.standing_gate:
+            args.apply = True
+            print(f"[AutoLinker] {args.curator} standing {cur:.2f} >= {args.standing_gate} "
+                  f"-> AUTO-CURATING (links applied to the vault)")
+        else:
+            args.apply = False
+            print(f"[AutoLinker] {args.curator} standing {cur:.2f} < {args.standing_gate} "
+                  f"-> links held in PENDING for review (not enough trust)")
+
+    # ── 8. (optional) apply strong links into the notes ─────
     if args.apply:
         applied_notes = applied_links = 0
         for stem, cands in suggestions:
@@ -221,7 +250,7 @@ def main() -> None:
             if MARK in txt:
                 txt = txt.rstrip() + "\n" + block + "\n"   # extend existing section
             else:
-                txt = txt.rstrip() + f"\n\n{MARK}\n" + block + "\n"
+                txt = txt.rstrip() + f"\n\n{MARK}{provenance}\n" + block + "\n"
             try:
                 note["path"].write_text(txt, encoding="utf-8")
                 applied_notes += 1
