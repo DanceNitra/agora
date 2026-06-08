@@ -462,10 +462,10 @@ This helps me perform better in my own role because I now understand
     
     async def get_all_learning_status(self) -> dict:
         """Get learning status for all agents."""
-        from .agent_definitions import NPC_UUIDS
-        
+        from .agent_definitions import VAULT_ROLES
+
         all_stats = {}
-        for agent_name in NPC_UUIDS:
+        for agent_name in VAULT_ROLES:
             all_stats[agent_name] = await self.get_agent_learning_status(agent_name)
         
         return all_stats

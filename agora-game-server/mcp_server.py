@@ -864,6 +864,36 @@ async def _brain_build_log() -> str:
     return " | ".join(bits) or "(nothing built yet)"
 
 
+# ── Trust Graph: ESS live trust + Vault-Company cross-agent learning, in the dungeon ──
+_BRAIN_NAME2EID = {v: k for k, v in _AGENT_NAMES.items()}
+_LEARN_GRAPH = {"edges": [], "ts": 0.0}
+
+
+async def _brain_learning_graph() -> list[dict]:
+    """Who-teaches-whom edges from the Vault Company, mapped to dungeon eids (cached 60s)."""
+    now = _time.monotonic()
+    if _LEARN_GRAPH["edges"] and now - _LEARN_GRAPH["ts"] < 60:
+        return _LEARN_GRAPH["edges"]
+    g = await asyncio.to_thread(_brain_get_sync, "/api/v1/vault-company/learning/graph")
+    edges = []
+    for e in (g or {}).get("edges", []):
+        a = _BRAIN_NAME2EID.get(e.get("source"))
+        b = _BRAIN_NAME2EID.get(e.get("target"))
+        if a and b:
+            edges.append({"from": a, "to": b, "skill": e.get("skill", "")})
+    if edges:
+        _LEARN_GRAPH["edges"], _LEARN_GRAPH["ts"] = edges, now
+    return _LEARN_GRAPH["edges"]
+
+
+async def _broadcast_trust_graph():
+    """One unified graph for the dungeon: ESS pairwise trust + learning (teach) edges."""
+    trust = await _trust_matrix()                       # [{a,b,score}]  ESS, live
+    learn = await _brain_learning_graph()               # [{from,to,skill}]  who teaches whom
+    nodes = [{"eid": e, "name": _AGENT_NAMES.get(e, e)} for e in _AGENT_NAMES]
+    broadcast({"type": "trust_graph", "nodes": nodes, "trust": trust, "learn": learn})
+
+
 async def _brain_contribute(eid: str, title: str, content: str) -> bool:
     r = await asyncio.to_thread(
         _brain_post_sync, "/api/v1/agent-os/brain/collective",
@@ -1055,6 +1085,7 @@ async def ambient_life():
             _m = await _trust_matrix()
             if _m:
                 broadcast({"type": "trust_snapshot", "matrix": _m, "names": _AGENT_NAMES})
+            await _broadcast_trust_graph()          # ESS trust + cross-agent learning
             broadcast({"type": "os_snapshot", "log": os_log[-12:]})
             if os_modules:
                 broadcast({"type": "os_modules_snapshot", "modules": os_modules})

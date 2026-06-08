@@ -846,6 +846,65 @@ if (!renderer.getContext()) {
     (window.__moduleSpin ||= []).push(obe);
   }
 
+  // Trust Graph: 3D edges between agents (color = ESS trust) + "knowledge packets"
+  // (glowing motes) flowing along the Vault-Company cross-agent learning edges.
+  const TrustGraph = (() => {
+    const lines = {};      // "a|b" -> THREE.Line
+    const packets = {};    // "from>to" -> {mesh, t, e}
+    let data = { trust: [], learn: [] };
+    const key = (a, b) => [a, b].sort().join('|');
+    const pos = id => window.__entities?.[id]?.group?.position || null;
+    function ensureLine(a, b) {
+      const k = key(a, b);
+      if (lines[k]) return;
+      const geo = new THREE.BufferGeometry();
+      geo.setAttribute('position', new THREE.BufferAttribute(new Float32Array(6), 3));
+      const line = new THREE.Line(geo, new THREE.LineBasicMaterial({
+        transparent: true, opacity: 0.4, depthWrite: false }));
+      line.renderOrder = 2; line.frustumCulled = false;
+      scene.add(line); lines[k] = line;
+    }
+    function ensurePacket(e) {
+      const k = e.from + '>' + e.to;
+      if (packets[k]) return;
+      const m = new THREE.Mesh(new THREE.SphereGeometry(0.13, 8, 8),
+        new THREE.MeshBasicMaterial({ color: 0x9fe0ff, transparent: true, opacity: 0.95,
+          blending: THREE.AdditiveBlending, depthWrite: false }));
+      m.frustumCulled = false; scene.add(m);
+      packets[k] = { mesh: m, t: Math.random(), e };
+    }
+    function update(ev) {
+      data = { trust: ev.trust || [], learn: ev.learn || [] };
+      data.trust.forEach(t => ensureLine(t.a, t.b));
+      data.learn.forEach(ensurePacket);
+    }
+    function frame(dt) {
+      const _c = new THREE.Color();
+      data.trust.forEach(t => {
+        const A = pos(t.a), B = pos(t.b), line = lines[key(t.a, t.b)];
+        if (!A || !B || !line) return;
+        const s = t.score > 1 ? t.score / 100 : t.score;   // accept 0..1 or 0..100
+        const p = line.geometry.attributes.position.array;
+        p[0] = A.x; p[1] = 1.05; p[2] = A.z; p[3] = B.x; p[4] = 1.05; p[5] = B.z;
+        line.geometry.attributes.position.needsUpdate = true;
+        _c.setHSL(Math.max(0, Math.min(1, s)) * 0.33, 0.85, 0.5);  // red→green
+        line.material.color.copy(_c);
+        line.material.opacity = 0.18 + 0.55 * Math.max(0, Math.min(1, s));
+      });
+      for (const k in packets) {
+        const pk = packets[k], A = pos(pk.e.from), B = pos(pk.e.to);
+        if (!A || !B) { pk.mesh.visible = false; continue; }
+        pk.mesh.visible = true;
+        pk.t = (pk.t + dt * 0.35) % 1;                    // teacher → student flow
+        const e = pk.t;
+        pk.mesh.position.set(A.x + (B.x - A.x) * e, 1.05 + Math.sin(e * Math.PI) * 0.5,
+                             A.z + (B.z - A.z) * e);
+      }
+    }
+    return { update, frame };
+  })();
+  window.__TrustGraph = TrustGraph;
+
   // Apply an incremental event broadcast by the server
   function applyEvent(ev) {
     HUD.onEvent(ev);
@@ -919,6 +978,9 @@ if (!renderer.getContext()) {
         break;
       case 'os_module':
         buildModule(ev.name, ev.x, ev.y, ev.color);
+        break;
+      case 'trust_graph':
+        TrustGraph.update(ev);
         break;
       case 'os_modules_snapshot':
         (ev.modules || []).forEach(m => buildModule(m.name, m.tile[0], m.tile[1], m.color));
@@ -1192,6 +1254,9 @@ if (!renderer.getContext()) {
       if (rec.thought && rec.thought.sprite.visible && nowMs > rec.thought.hideAt)
         rec.thought.sprite.visible = false;
     }
+
+    // Trust Graph: keep edges glued to the moving agents + flow learning packets
+    TrustGraph.frame(delta);
 
     // OS module obelisks: gentle spin + bob so built structures feel alive
     if (window.__moduleSpin) {

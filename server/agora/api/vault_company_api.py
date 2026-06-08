@@ -212,11 +212,33 @@ async def agent_think_get(agent_name: str, phase: str = "research_scan", request
 # CROSS-AGENT LEARNING ENDPOINTS
 # ═══════════════════════════════════════════════════════════════
 
+@router.get("/learning/graph")
+async def get_learning_graph(request: "Request"):
+    """The cross-agent trust/learning graph: who teaches whom + live learning weights.
+    (Registered before /learning/{agent_name} so 'graph' isn't captured as a name.)"""
+    from agora.agent_os.vault_company.cross_agent_learning import (
+        CrossAgentLearningEngine, LEARNING_AFFINITIES)
+    from agora.agent_os.vault_company.agent_definitions import VAULT_ROLES
+
+    phase_agent = {role.get("night_cycle"): name for name, role in VAULT_ROLES.items()}
+    edges = []
+    for src_phase, target, skill, *_ in LEARNING_AFFINITIES:
+        src = phase_agent.get(src_phase)
+        if src and target:
+            edges.append({"source": src, "target": target, "skill": skill})
+    try:
+        learning = await CrossAgentLearningEngine().get_all_learning_status()
+    except Exception:
+        learning = {}
+    return {"status": "ok", "nodes": list(VAULT_ROLES.keys()),
+            "edges": edges, "learning": learning}
+
+
 @router.get("/learning/{agent_name}")
 async def get_agent_learning(agent_name: str, request: "Request"):
     """Get learning status for a vault company agent."""
     from agora.agent_os.vault_company.cross_agent_learning import CrossAgentLearningEngine
-    
+
     engine = CrossAgentLearningEngine()
     status = await engine.get_agent_learning_status(agent_name)
     return {"status": "ok", "learning": status}
