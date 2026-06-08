@@ -22,7 +22,7 @@
 | 1.3 | **Stigmergy Pool persistence** — Redis → SQLite fallback | 🟢 | e4a9961 | (already done) |
 | 1.4 | **Trust Engine sliding window** — production-ready (decay, forgiveness, provokability) | 🟢 | 4bc2e49 | agora-builder: done, verified (all test criteria pass) |
 | 1.5 | **Ed25519 signing** — ESSMessage.sign() + verify() | 🟡 | — | tg-hermes: handoff ready |
-| 1.6 | **REST API** — POST /ess/commit, /ess/interact, GET /ess/trust/{agent} | 🟡 | — | tg-hermes: handoff ready |
+| 1.6 | **REST API** — POST /ess/commit, /ess/interact, GET /ess/trust/{agent} | 🟢 | ee499c2 | agora-builder: done, verified (5 endpoints, e2e tested) |
 | 1.7 | **WebSocket** — real-time event stream for subscribers | 🟡 | — | tg-hermes: handoff ready |
 | 1.8 | **ESS stability test** — invade swarm with defectors, prove TFT is collectively stable | 🟡 | — | tg-hermes: handoff ready |
 
