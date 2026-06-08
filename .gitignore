@@ -11,3 +11,6 @@ build/
 *.db-journal
 *.db-wal
 *.db-shm
+# runtime artifacts (dungeon writes these live)
+agent_standing.json
+agora-game-server/agent_standing.json
