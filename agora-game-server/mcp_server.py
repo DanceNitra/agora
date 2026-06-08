@@ -431,15 +431,17 @@ _GUARDS = {"guard_l", "guard_r"}
 
 # Posts around the keep that tasks send agents to. Each tile is a walkable standing
 # spot; `role` is the agent who prefers it (others take it only if nothing else fits).
+# Work spaces around the keep — RESEARCH names (these are the "location" choices the LLM
+# sees, so they must not read as a dungeon). Tiles/visuals are unchanged.
 _POSTS = {
-    "throne":   {"tile": (11, 4),  "title": "Attend the throne",    "role": "king",    "act": "interact", "fx": "#ff66cc"},
-    "treasury": {"tile": (19, 4),  "title": "Inspect the treasury", "role": "thief",   "act": "interact", "fx": "#ffd24d"},
-    "library":  {"tile": (3, 3),   "title": "Study the archives",   "role": "scholar", "act": "interact", "fx": "#88aaff"},
-    "shrine":   {"tile": (11, 8),  "title": "Bless the nave",       "role": "priest",  "act": "casting",  "fx": "#a98bff"},
-    "gate":     {"tile": (11, 17), "title": "Hold the gate",        "role": "guard_l", "act": "guard",    "fx": "#aaccff"},
-    "hall":     {"tile": (6, 11),  "title": "Patrol the great hall","role": "guard_r", "act": "guard",    "fx": "#ffae66"},
-    "barracks": {"tile": (4, 16),  "title": "Sweep the barracks",   "role": None,      "act": "guard",    "fx": "#cfcfcf"},
-    "armory":   {"tile": (19, 16), "title": "Secure the armory",    "role": None,      "act": "interact", "fx": "#d4a35a"},
+    "workshop":     {"tile": (11, 4),  "title": "Build at the workshop",  "role": "king",    "act": "interact", "fx": "#ff66cc"},
+    "frontier":     {"tile": (19, 4),  "title": "Scan the frontier desk", "role": "thief",   "act": "interact", "fx": "#ffd24d"},
+    "library":      {"tile": (3, 3),   "title": "Work in the library",    "role": "scholar", "act": "interact", "fx": "#88aaff"},
+    "atelier":      {"tile": (11, 8),  "title": "Ideate in the atelier",  "role": "priest",  "act": "casting",  "fx": "#a98bff"},
+    "review-bench": {"tile": (11, 17), "title": "Review at the bench",    "role": "guard_l", "act": "interact", "fx": "#aaccff"},
+    "atlas":        {"tile": (6, 11),  "title": "Map links at the atlas", "role": "guard_r", "act": "interact", "fx": "#ffae66"},
+    "commons":      {"tile": (4, 16),  "title": "Meet in the commons",    "role": None,      "act": "interact", "fx": "#cfcfcf"},
+    "forge":        {"tile": (19, 16), "title": "Prototype at the forge", "role": None,      "act": "interact", "fx": "#d4a35a"},
 }
 
 _ACT_LINES = {
@@ -1086,8 +1088,11 @@ async def ambient_life():
                 f"inside the vault. PLAN YOUR NEXT 3 RESEARCH MOVES as a quest list. Each must be a "
                 f"SPECIFIC, substantive step that fits your role, draws on your memory + the library, "
                 f"builds on the OS so far, and does NOT repeat what you've already done. Vary the kinds. "
-                f"kind: create (a discovery) | upgrade (build a module) | collaborate (with an ally, "
-                f"builds trust) | challenge (contest an ally's weak finding, costs trust) | explore. "
+                f"This is a RESEARCH keep, not a combat dungeon — NEVER invent traps, treasure, "
+                f"prisoners, guards, gates, or defenses; only real knowledge work (concepts, notes, "
+                f"connections, tools, experiments). A 'module' is a knowledge artifact, not a trap. "
+                f"kind: create (a discovery) | upgrade (build a knowledge module) | collaborate (with an "
+                f"ally, builds trust) | challenge (contest an ally's weak finding, costs trust) | explore. "
                 f'Reply ONLY JSON: {{"quests":[{{"intent":"<specific, present tense, max 14 words>",'
                 f'"kind":"<create|upgrade|collaborate|challenge|explore>",'
                 f'"location":"<one of: {locs} | an ally name | wander>",'
