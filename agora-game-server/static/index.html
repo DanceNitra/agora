@@ -879,6 +879,11 @@ if (!renderer.getContext()) {
       data.trust.forEach(t => ensureLine(t.a, t.b));
       data.learn.forEach(ensurePacket);
     }
+    function reset() {                 // drop stale edges/packets on (re)connect
+      for (const k in lines) { scene.remove(lines[k]); delete lines[k]; }
+      for (const k in packets) { scene.remove(packets[k].mesh); delete packets[k]; }
+      data = { trust: [], learn: [] };
+    }
     function frame(dt) {
       const _c = new THREE.Color();
       data.trust.forEach(t => {
@@ -902,9 +907,16 @@ if (!renderer.getContext()) {
                              A.z + (B.z - A.z) * e);
       }
     }
-    return { update, frame };
+    return { update, frame, reset };
   })();
   window.__TrustGraph = TrustGraph;
+
+  // Drop stale OS-module obelisks on (re)connect so they don't pile up.
+  function resetModules() {
+    for (const k in (window.__modules || {})) scene.remove(window.__modules[k]);
+    window.__modules = {};
+    window.__moduleSpin = [];
+  }
 
   // Apply an incremental event broadcast by the server
   function applyEvent(ev) {
@@ -1067,11 +1079,17 @@ if (!renderer.getContext()) {
       while (wrap.children.length > 12) wrap.lastChild.remove();
       if (flash) { void div.offsetWidth; div.classList.add('flash'); }
     }
+    function reset() {
+      wrap.innerHTML = '<div id="hud-os-empty">agents are starting to build…</div>';
+    }
     return {
       build(ev) { add(ev, true); },
-      snapshot(log) {
-        if (document.getElementById('hud-os-empty')) (log || []).forEach(it => add(it, false));
+      snapshot(log) {                 // REPLACE the log with the server's current state
+        wrap.innerHTML = '';
+        if (log && log.length) log.forEach(it => add(it, false));
+        else reset();
       },
+      reset,
     };
   })();
 
@@ -1175,6 +1193,9 @@ if (!renderer.getContext()) {
           buildDungeon(data);
           HUD.buildRoster(data);
           HUD.setTasks(data.tasks || []);
+          OSHUD.reset();          // clear stale build log on (re)connect
+          TrustGraph.reset();     // clear stale trust edges
+          resetModules();         // clear stale OS modules
           loadingEl.classList.add('hidden');
           statusEl.textContent = `Dungeon OS — ${data.width}×${data.height} · ${data.lights?.length || 0} lights · ${data.entities ? Object.keys(data.entities).length : 0} entities · tick ${data.tick || 0}`;
         } else if (data.type) {

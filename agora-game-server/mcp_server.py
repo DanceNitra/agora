@@ -1132,7 +1132,7 @@ async def ambient_life():
         _maybe_start_conversation(ents, dead, hold)
 
         loop_n += 1
-        if loop_n % 18 == 1:
+        if loop_n % 10 == 1:
             _m = await _trust_matrix()
             if _m:
                 broadcast({"type": "trust_snapshot", "matrix": _m, "names": _AGENT_NAMES})
