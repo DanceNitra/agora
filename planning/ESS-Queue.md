@@ -31,7 +31,7 @@
 
 | # | Task | Status | Commit | Agent |
 |---|------|--------|--------|-------|
-| **2.0** | **Agentic OS v2 — Brain Ecosystem** — per-agent memory system (episodic/semantic/procedural), personality engine (Big 5 shapes decisions), conversation engine (multi-turn NPC dialogue), brainstorming engine (agents generate + build on ideas together), collective knowledge pool (dungeon vault), thought journal, self-improvement proposals, integrated tick cycle | 🟡 | — | tg-hermes: handoff ready (59KB) |
+| **2.0** | **Agentic OS v2 — Brain Ecosystem** — per-agent memory system (episodic/semantic/procedural), personality engine (Big 5 shapes decisions), conversation engine (multi-turn NPC dialogue), brainstorming engine (agents generate + build on ideas together), collective knowledge pool (dungeon vault), thought journal, self-improvement proposals, integrated tick cycle | 🟢 | 2d1c1a9 | agora-builder: done, verified (all 8 layers, 4 milestones, tested) |
 
 ## Phase 2.1 — VaultBridge (Vault ↔ Dungeon Bridge)
 
