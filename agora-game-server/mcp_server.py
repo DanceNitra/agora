@@ -874,6 +874,13 @@ async def _brain_build_log() -> str:
     return " | ".join(bits) or "(nothing built yet)"
 
 
+async def _brain_research(query: str) -> str:
+    """Real frontier sources (arXiv) for grounding — formatted markdown, via the brain."""
+    d = await asyncio.to_thread(
+        _brain_get_sync, f"/api/v1/agent-os/brain/research?q={_urlquote(query[:120])}&n=4")
+    return (d or {}).get("formatted", "")
+
+
 # ── Trust Graph: ESS live trust + Vault-Company cross-agent learning, in the dungeon ──
 _BRAIN_NAME2EID = {v: k for k, v in _AGENT_NAMES.items()}
 _LEARN_GRAPH = {"edges": [], "ts": 0.0}
@@ -1112,13 +1119,18 @@ async def ambient_life():
             engine.set_entity_thought(eid, "» consolidating discoveries…")
             bullets = "\n".join(f"- **{k['title']}** — {(k.get('content') or '')[:140]}"
                                 for k in new[:6])
+            # Ground the digest in REAL frontier papers (arXiv) — no invented citations.
+            theme = " ".join((new[0].get("title") or "").split()[:8])
+            sources = await _brain_research(theme) if theme else ""
             synth = await asyncio.to_thread(
                 _llm_content_sync,
-                "You are Sage Mira, Knowledge Curator. Synthesize these recent discoveries into "
-                "2-3 sentences: the emerging theme and what to pursue next. Concrete, substantive.",
-                bullets) or ""
+                "You are Sage Mira, Knowledge Curator. Synthesize these discoveries into 2-3 "
+                "sentences GROUNDED in the real papers provided: the emerging theme + what to "
+                "pursue next. Reference a real paper where relevant. NEVER invent sources.",
+                f"Discoveries:\n{bullets}\n\nReal papers (cite these, do not invent):\n{sources}") or ""
             content = (f"## Recent discoveries\n{bullets}\n\n"
-                       f"## Synthesis — Sage Mira\n{synth.strip()}")
+                       f"## Synthesis — Sage Mira\n{synth.strip()}"
+                       + (f"\n\n## Sources (arXiv)\n{sources}" if sources else ""))
             title = f"Vault Digest {_time.strftime('%Y-%m-%d %H%M')}"
             resp = await asyncio.to_thread(
                 _brain_post_sync, "/api/v1/agent-os/brain/vault-note",
