@@ -20,9 +20,9 @@ class TierConfig:
 DEFAULT_TIERS = [
     TierConfig(
         name="cheap",
-        model="nvidia/nemotron-3-super-120b-a12b:free",
+        model="nvidia/nemotron-3-nano-30b-a3b:free",
         cost_per_token=0.0,
-        description="Free: Nemotron 3 Super 120B MoE — fast for simple queries and classification.",
+        description="Free: Nemotron 3 Nano 30B MoE (3B active) — ~1.5s/call, ideal for real-time NPC/brain dialogue.",
     ),
     TierConfig(
         name="medium",
