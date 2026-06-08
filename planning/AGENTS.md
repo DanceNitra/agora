@@ -36,14 +36,18 @@ Examples:
   ess: 1.8 — wrote ESS stability test with defector invasion
 ```
 
-## Queue Status Colors
+## How Instances Identify Themselves
 
-| Status | Color | Meaning |
-|--------|-------|---------|
-| TODO | 🔴 | Not started, available |
-| INBOX | 🟡 | Being worked on by an agent |
-| DONE | 🟢 | Implemented, committed, pushed |
-| BLOCKED | ⛔ | Can't proceed without X |
+| Instance | Name | Role | Context |
+|----------|------|------|---------|
+| Telegram Hermes | `tg-hermes` | **PLANNER** — task breakdown, design decisions, handoffs | Has vault access, chats with Rasto |
+| Agora Build Server | `agora-builder` | **EXECUTOR** — reads handoffs → implements → commits → pushes | Has agora server runtime |
+
+**Division of labor:**
+- `tg-hermes` writes handoffs with precise implementation specs.
+- `agora-builder` reads the latest handoff, implements exactly what's specified, commits, pushes, and writes a brief DONE handoff.
+- `tg-hermes` reviews the committed code, plans the next task, writes the next handoff.
+- Both agents update `ESS-Queue.md` with their commit hashes.
 
 ## Handoff Format (V4A-Compatible)
 
@@ -54,9 +58,9 @@ Every handoff is a markdown file in `planning/handoffs/YYYY-MM-DD-<task>.md`.
 ```markdown
 ---
 type: handoff
-agent: "<instance name>"
-target: "<other instance name>"
-status: done | wip | blocked
+agent: "tg-hermes | agora-builder"
+target: "tg-hermes | agora-builder"
+status: planning | ready-for-implementation | done
 task: "<task-id: description>"
 commit: "<commit hash>"
 created: YYYY-MM-DD
@@ -64,24 +68,18 @@ created: YYYY-MM-DD
 
 ## HANDOFF — <date> | <task>
 
-**Agent:** <who wrote this>
-**Status:** 🟢 DONE | 🟡 WIP | ⛔ BLOCKED
+**From:** <who wrote this>
+**To:** <who should act>
+**Status:** 🟢 PLANNING → 🟡 READY → 🟢 DONE
 
-### What Was Done
-- Bullet list of concrete changes
+### Spec (for executor)
+Exactly what to implement. Files, classes, signatures, logic.
 
-### Files Changed
-- `path/to/file.py` — what changed
+### Test Criteria
+How to verify the implementation works.
 
-### Open Questions / Decisions Made
-- ...
-
-### What's Next (for the other agent)
-1. Step-by-step instructions
-2. ...
-
-### State Snapshot (if applicable)
-Key variables, trust scores, agent population — anything the other agent can't see in their filesystem.
+### What's Next
+For the other agent.
 ```
 
 ## Code Review Convention

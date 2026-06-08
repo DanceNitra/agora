@@ -17,7 +17,7 @@
 
 | # | Task | Status | Commit | Agent |
 |---|------|--------|--------|-------|
-| 1.1 | **Event sourcing** — append-only log for every interaction | 🔴 | — | — |
+|| 1.1 | **Event sourcing** — append-only log for every interaction | 🟡 | — | tg-hermes: handoff ready-for-implementation written |
 | 1.2 | **Checkpointing** — full state snapshot every N events | 🔴 | — | — |
 | 1.3 | **Stigmergy Pool persistence** — Redis → SQLite fallback | 🔴 | — | — |
 | 1.4 | **Trust Engine sliding window** — production-ready (decay, forgiveness, provokability) | 🔴 | — | — |
@@ -137,3 +137,4 @@
 | Date | File | Agent | Commit |
 |------|------|-------|--------|
 | 2026-06-08 | `handoffs/2026-06-08-Phase-1-Kickoff.md` | tg-hermes | a85e231 |
+| 2026-06-08 | `handoffs/2026-06-08-1.1-Event-Sourcing.md` | tg-hermes | cbf6bed |
