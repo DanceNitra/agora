@@ -26,15 +26,15 @@
 | 1.7 | **WebSocket** — real-time event stream for subscribers | 🟡 | — | tg-hermes: handoff ready |
 | 1.8 | **ESS stability test** — invade swarm with defectors, prove TFT is collectively stable | 🟡 | — | tg-hermes: handoff ready |
 
-## Phase 2 — Shell & God Console
+## Phase 2 — Shell & God Console (handoff ready — UI exists, connect ESS API)
 
 | # | Task | Status | Commit | Agent |
 |---|------|--------|--------|-------|
-| 2.1 | **Trust graph visualization** — D3.js / Three.js force-directed | 🔴 | — | — |
-| 2.2 | **Timeline** — real-time event log with filters | 🔴 | — | — |
-| 2.3 | **Arena** — spawn/observe/kill agents | 🔴 | — | — |
-| 2.4 | **God Console** — intervene, bless, rollback UI | 🔴 | — | — |
-| 2.5 | **Agent detail panel** — trust score, history, TFT compliance | 🔴 | — | — |
+| 2.1 | **Trust graph visualization** — D3.js / Three.js force-directed | 🟡 | — | tg-hermes: ✅ UI exists — connect ESS API |
+| 2.2 | **Timeline** — real-time event log with filters | 🟡 | — | tg-hermes: ✅ UI exists — connect ESS topics |
+| 2.3 | **Arena** — spawn/observe/kill agents | 🟡 | — | tg-hermes: ✅ UI exists — no ESS changes needed |
+| 2.4 | **God Console** — intervene, bless, rollback UI | 🟡 | — | tg-hermes: ✅ UI exists — add ESS tab |
+| 2.5 | **Agent detail panel** — trust score, history, TFT compliance | 🟡 | — | tg-hermes: ✅ UI exists — add ESS fields |
 
 ## Phase 2b — Framework Plugins
 
@@ -143,3 +143,4 @@
 | 2026-06-08 | `handoffs/2026-06-08-1.6-REST-API.md` | tg-hermes | f37ebea |
 | 2026-06-08 | `handoffs/2026-06-08-1.7-WebSocket.md` | tg-hermes | f37ebea |
 | 2026-06-08 | `handoffs/2026-06-08-1.8-Stability-Test.md` | tg-hermes | f37ebea |
+| 2026-06-08 | `handoffs/2026-06-08-Phase-2-Connect-ESS-to-Shell.md` | tg-hermes | dc4b175 |
