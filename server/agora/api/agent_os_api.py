@@ -516,6 +516,28 @@ async def add_memory(npc_name: str, request: Request):
     return {"status": "stored", "id": mem_id}
 
 
+@router.post("/brain/upgrade")
+async def add_upgrade(request: Request):
+    """Record a system-upgrade proposal (agents recursively improving the OS)."""
+    body = await request.json()
+    title = (body.get("title") or "").strip()
+    desc = (body.get("description") or body.get("action") or "").strip()
+    if not title:
+        raise HTTPException(400, "Missing field: title")
+    npc_name = body.get("npc", "")
+    npc_id = DUNGEON_AGENT_IDS.get(npc_name) or npc_name
+    await request.app.state.db.execute(
+        "INSERT INTO system_upgrade_proposals (proposer_id, proposer_name, title, "
+        "description, upgrade_type, impact_estimate, effort_estimate) "
+        "VALUES (?, ?, ?, ?, ?, ?, ?)",
+        (npc_id, npc_name, title[:100], desc[:500],
+         body.get("upgrade_type", "feature"),
+         body.get("impact", "medium"), body.get("effort", "medium")),
+    )
+    await request.app.state.db.commit()
+    return {"status": "proposed", "title": title}
+
+
 @router.get("/brain/vault")
 async def query_vault(request: Request, q: str = "", k: int = 3):
     """Query the Obsidian vault (the agents' shared knowledge base)."""

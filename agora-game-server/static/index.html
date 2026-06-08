@@ -82,6 +82,22 @@
   .trust-bar > i { display: block; height: 100%; width: 30%; background: #888; transition: width .5s, background .5s; }
   .trust-row.flash { animation: trustflash 0.9s ease-out; }
   @keyframes trustflash { from { background: rgba(255,255,255,0.22); } to { background: transparent; } }
+  /* ── HUD: Agentic OS build log ─────────────────────────────── */
+  #hud-os {
+    position: fixed; top: 12px; left: 50%; transform: translateX(-50%); z-index: 12;
+    width: 380px; padding: 7px 10px; border-radius: 6px; font-family: monospace;
+    font-size: 11px; background: rgba(8,6,14,0.80); border: 1px solid #3a3358;
+    pointer-events: none; backdrop-filter: blur(2px);
+  }
+  #hud-os-lines { display: flex; flex-direction: column; gap: 3px; }
+  #hud-os-empty { color: #6f6a86; font-style: italic; font-size: 10px; }
+  .os-line { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; color: #cfc9e6; }
+  .os-line .who { opacity: .65; }
+  .os-line.k-discovery { color: #8fd3ff; }
+  .os-line.k-upgrade   { color: #ffd27a; }
+  .os-line.k-collab    { color: #9affc0; }
+  .os-line.flash { animation: osflash 1.1s ease-out; }
+  @keyframes osflash { from { background: rgba(255,255,255,0.20); } to { background: transparent; } }
 </style>
 </head>
 <body>
@@ -93,6 +109,7 @@
 <div id="hud-tasks"><div class="hud-log-title">📜 QUEST BOARD</div><div id="hud-task-lines"></div></div>
 <div id="hud-log"><div class="hud-log-title">⚔ EVENT LOG</div><div id="hud-log-lines"></div></div>
 <div id="hud-trust"><div class="hud-log-title">🤝 RELATIONSHIPS · ESS TRUST</div><div id="hud-trust-lines"><div id="hud-trust-empty">building bonds…</div></div></div>
+<div id="hud-os"><div class="hud-log-title">⚙ AGENTIC OS — BUILD LOG</div><div id="hud-os-lines"><div id="hud-os-empty">agents are starting to build…</div></div></div>
 
 <script type="importmap">
 {
@@ -860,6 +877,12 @@ if (!renderer.getContext()) {
       case 'trust_snapshot':
         TrustHUD.snapshot(ev.matrix, ev.names);
         break;
+      case 'os_build':
+        OSHUD.build(ev);
+        break;
+      case 'os_snapshot':
+        OSHUD.snapshot(ev.log);
+        break;
     }
   }
 
@@ -922,6 +945,29 @@ if (!renderer.getContext()) {
         else
           logLine(`⚔ ${an} & ${bn} fell out (${ev.score.toFixed(2)})`);
         reorder();
+      },
+    };
+  })();
+
+  // === AGENTIC OS BUILD LOG HUD ===
+  const OSHUD = (() => {
+    const wrap = document.getElementById('hud-os-lines');
+    const icon = { discovery: '🔍', upgrade: '⬆', collab: '🤝' };
+    function add(it, flash) {
+      if (!it || !it.text) return;
+      const empty = document.getElementById('hud-os-empty');
+      if (empty) empty.remove();
+      const div = document.createElement('div');
+      div.className = 'os-line k-' + (it.kind || '');
+      div.innerHTML = `${icon[it.kind] || '•'} <span class="who">${it.who || ''}</span> — ${it.text}`;
+      wrap.prepend(div);
+      while (wrap.children.length > 12) wrap.lastChild.remove();
+      if (flash) { void div.offsetWidth; div.classList.add('flash'); }
+    }
+    return {
+      build(ev) { add(ev, true); },
+      snapshot(log) {
+        if (document.getElementById('hud-os-empty')) (log || []).forEach(it => add(it, false));
       },
     };
   })();

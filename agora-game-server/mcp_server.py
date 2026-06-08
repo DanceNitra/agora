@@ -811,6 +811,33 @@ async def _brain_remember(eid: str, content: str, tag: str = "neutral"):
         {"content": content[:200], "importance": 0.55, "emotional_tag": tag, "source": "dungeon"})
 
 
+async def _brain_build_log() -> str:
+    """Recent OS so far: collective discoveries + upgrade proposals (for recursion)."""
+    bits = []
+    ck = await asyncio.to_thread(_brain_get_sync, "/api/v1/agent-os/brain/collective?limit=4")
+    for k in (ck or {}).get("knowledge", [])[:3]:
+        bits.append(f"knowledge: {k.get('title', '')}")
+    up = await asyncio.to_thread(_brain_get_sync, "/api/v1/agent-os/brain/upgrades?limit=4")
+    for u in (up or {}).get("proposals", [])[:3]:
+        bits.append(f"upgrade: {u.get('title', '')}")
+    return " | ".join(bits) or "(nothing built yet)"
+
+
+async def _brain_contribute(eid: str, title: str, content: str) -> bool:
+    r = await asyncio.to_thread(
+        _brain_post_sync, "/api/v1/agent-os/brain/collective",
+        {"npc": _AGENT_NAMES.get(eid, eid), "title": title[:90],
+         "content": content[:400], "knowledge_type": "discovery"})
+    return bool(r)
+
+
+async def _brain_propose_upgrade(eid: str, title: str, desc: str) -> bool:
+    r = await asyncio.to_thread(
+        _brain_post_sync, "/api/v1/agent-os/brain/upgrade",
+        {"npc": _AGENT_NAMES.get(eid, eid), "title": title[:90], "description": desc[:400]})
+    return bool(r)
+
+
 _ROLE_HINT = {
     "king":    "hold court, issue a decree, inspect your domain, summon a subject",
     "guard_l": "patrol a weak point, secure a post, drill, confront a suspected intruder",
@@ -856,6 +883,14 @@ async def ambient_life():
         world_events.append(text)
         del world_events[:-6]
 
+    os_log: list[dict] = []   # the emerging Agentic OS: discoveries / upgrades / collabs
+
+    def _os_build(kind, who, text):
+        item = {"kind": kind, "who": who, "text": text}
+        os_log.append(item)
+        del os_log[:-30]
+        broadcast({"type": "os_build", **item})
+
     def publish_goals():
         engine.set_tasks([
             {"id": i, "title": g["intent"], "agent": _AGENT_NAMES.get(eid, eid),
@@ -876,23 +911,34 @@ async def ambient_life():
             news = " | ".join(world_events[-4:]) or "(quiet)"
             # Pull the agent's real mind (memory/emotion/vault) from server/agora.
             brain = await _brain_context(eid, f"{_ROLE_HINT.get(eid, '')} {mem}")
+            build_log = await _brain_build_log()
+            allies = ", ".join(_AGENT_NAMES[o] for o in _AGENT_NAMES if o != eid)
             sysmsg = (
-                f"You are {_persona(eid)} You roam a torch-lit dungeon keep and act of "
-                f"your OWN free will. Be proactive and VARIED — do NOT repeat what you "
-                f"recently did; react to the keep's news and the people around you. "
-                f"You might {_ROLE_HINT.get(eid, 'explore and act in character')}. "
-                f'Reply ONLY JSON: {{"intent":"<your goal, present tense, max 12 words>",'
-                f'"location":"<one of: {locs} | an ally\'s name | wander>",'
-                f'"action":"<what you do on arrival, one short line>"}}'
+                f"You are {_persona(eid)} You and the others are secretly building a living "
+                f"'Agentic OS' — a shared body of KNOWLEDGE and self-UPGRADES you keep extending "
+                f"TOGETHER, recursively. Act of your own free will; be VARIED; never repeat "
+                f"yourself; react to people and news. Prefer to COLLABORATE with an ally, CREATE a "
+                f"discovery (draw on your studies / the vault), or propose an UPGRADE that BUILDS "
+                f"ON the OS so far. You might {_ROLE_HINT.get(eid, 'explore')}. "
+                f'Reply ONLY JSON: {{"intent":"<goal, present tense, max 12 words>",'
+                f'"kind":"<collaborate|create|upgrade|explore>",'
+                f'"location":"<one of: {locs} | an ally name | wander>",'
+                f'"with":"<an ally name if collaborating, else empty>",'
+                f'"action":"<what you do or make on arrival, one short line>"}}'
             )
             usr = ((brain + "\n\n" if brain else "") +
+                   f"The OS so far: {build_log}\nAllies: {allies}\n"
                    f"Recently you: {mem}\nNearby: {', '.join(nearby) or 'no one'}\n"
                    f"Keep news: {news}\nYour next goal:")
             data = await asyncio.to_thread(_llm_json_sync, sysmsg, usr) or {}
             intent = (data.get("intent") or "").strip() or random.choice(
                 _THOUGHTS.get(eid, ["wander the keep"]))
+            kind = (data.get("kind") or "explore").strip().lower()
+            if kind not in ("collaborate", "create", "upgrade", "explore"):
+                kind = "explore"
             where = (data.get("location") or "wander").strip().lower()
             action = (data.get("action") or "...").strip()
+            with_name = (data.get("with") or "").strip()
 
             # Resolve destination → tile
             tile = None
@@ -907,7 +953,8 @@ async def ambient_life():
                         break
             if tile is None or not _walkable(*tile):  # wander → random reachable spot
                 tile = random.choice(list(_LOCATIONS.values()))
-            goals[eid] = {"intent": intent, "tile": tile, "action": action, "where": where}
+            goals[eid] = {"intent": intent, "tile": tile, "action": action, "where": where,
+                          "kind": kind, "with": with_name}
             paths.pop(eid, None)  # fresh goal → fresh path
             engine.set_entity_thought(eid, "» " + intent[:90])
             engine.set_entity_state(eid, "walking")
@@ -936,6 +983,7 @@ async def ambient_life():
             _m = await _trust_matrix()
             if _m:
                 broadcast({"type": "trust_snapshot", "matrix": _m, "names": _AGENT_NAMES})
+            broadcast({"type": "os_snapshot", "log": os_log[-12:]})
 
         for eid, ent in list(ents.items()):
             cx, cy = int(round(ent.x)), int(round(ent.y))
@@ -951,42 +999,7 @@ async def ambient_life():
             if hold.get(eid, 0) > 0 or eid in _in_conv:
                 continue
 
-            # Guards spar if they end up next to each other
-            if eid in _GUARDS and cooldown.get(eid, 0) == 0:
-                sparred = False
-                for oid in _GUARDS:
-                    if oid == eid:
-                        continue
-                    o = ents.get(oid)
-                    if not o or dead.get(oid, 0) > 0 or hold.get(oid, 0) > 0:
-                        continue
-                    ox, oy = int(round(o.x)), int(round(o.y))
-                    if max(abs(ox - cx), abs(oy - cy)) == 1:
-                        engine.face_entity(eid, ox, oy)
-                        engine.face_entity(oid, cx, cy)
-                        engine.set_entity_state(eid, "attack")
-                        engine.set_entity_state(oid, "hit")
-                        engine.add_effect("spark", ox, oy, "#ffd27a", 0.5)
-                        hp = o.health - 18
-                        if hp <= 24:
-                            engine.set_entity_health(oid, 0)
-                            engine.set_entity_state(oid, "dead")
-                            engine.set_entity_thought(oid, "Aargh!")
-                            engine.set_entity_thought(eid, "Yield!")
-                            dead[oid] = 6
-                            note_event(f"{_AGENT_NAMES.get(eid, eid)} bested "
-                                       f"{_AGENT_NAMES.get(oid, oid)} in a spar")
-                        else:
-                            engine.set_entity_health(oid, hp)
-                        hold[eid] = hold[oid] = 2
-                        cooldown[eid] = cooldown[oid] = 5
-                        await record_trust(eid, oid, "defect")
-                        goals.pop(eid, None)  # combat interrupts the plan
-                        sparred = True
-                        break
-                if sparred:
-                    continue
-
+            # (Guards no longer auto-spar — everyone is a collaborator building the OS.)
             goal = goals.get(eid)
 
             # No goal → ask the LLM (throttled, one decision in flight per agent)
@@ -996,20 +1009,43 @@ async def ambient_life():
                     asyncio.create_task(decide_goal(eid, cx, cy))
                 continue
 
-            # Arrived → narrate the action, remember it, reward cooperation
+            # Arrived → act on the goal's KIND; create/upgrade/collaborate make real
+            # artifacts in the shared brain. Everything is remembered.
             if (cx, cy) == goal["tile"]:
-                engine.set_entity_state(eid, "interact")
-                engine.set_entity_thought(eid, goal["action"][:100])
-                engine.add_effect("glow", cx, cy, "#ffd27a", 0.9)
-                remember(eid, goal["intent"])
-                note_event(f"{_AGENT_NAMES.get(eid, eid)}: {goal['intent']}")
-                # Persist the lived experience back into the agent's server/agora memory.
-                asyncio.create_task(_brain_remember(eid, f"{goal['intent']} — {goal['action']}"))
-                # If the goal was aimed at an ally standing here, that's cooperation.
-                for oid, e2 in ents.items():
-                    if oid != eid and abs(e2.x - cx) + abs(e2.y - cy) <= 1:
-                        await record_trust(eid, oid, "cooperate")
-                        break
+                kind = goal.get("kind", "explore")
+                intent, action = goal["intent"], goal["action"]
+                who = _AGENT_NAMES.get(eid, eid)
+                engine.set_entity_state(eid, "casting" if kind in ("create", "upgrade") else "interact")
+                engine.set_entity_thought(eid, action[:100])
+                engine.add_effect("glow", cx, cy,
+                                  "#7fd0ff" if kind == "create" else
+                                  "#ffcf5a" if kind == "upgrade" else "#ffd27a", 0.9)
+                remember(eid, intent)
+
+                if kind == "create":
+                    asyncio.create_task(_brain_contribute(eid, intent, action))
+                    note_event(f"{who} discovered: {intent}")
+                    _os_build("discovery", who, intent)
+                elif kind == "upgrade":
+                    asyncio.create_task(_brain_propose_upgrade(eid, intent, action))
+                    note_event(f"{who} proposed upgrade: {intent}")
+                    _os_build("upgrade", who, intent)
+                elif kind == "collaborate":
+                    pid = next((oid for oid, e2 in ents.items()
+                                if oid != eid and abs(e2.x - cx) + abs(e2.y - cy) <= 2), None)
+                    if pid:
+                        await record_trust(eid, pid, "cooperate")
+                        partner = _AGENT_NAMES.get(pid, pid)
+                        asyncio.create_task(
+                            _brain_contribute(eid, f"{intent} (with {partner})", action))
+                        note_event(f"{who} & {partner}: {intent}")
+                        _os_build("collab", f"{who} + {partner}", intent)
+                    else:
+                        note_event(f"{who}: {intent}")
+                else:
+                    note_event(f"{who}: {intent}")
+
+                asyncio.create_task(_brain_remember(eid, f"{intent} — {action}"))
                 hold[eid] = 3
                 goals.pop(eid, None)
                 paths.pop(eid, None)
