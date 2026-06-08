@@ -959,10 +959,13 @@ async def ambient_life():
     hold: dict[str, int] = {}          # ticks to stand still
     cooldown: dict[str, int] = {}      # spar cooldown
     dead: dict[str, int] = {}          # knockout countdown
-    goals: dict[str, dict] = {}        # eid -> {intent, tile, action, where}
+    goals: dict[str, dict] = {}        # eid -> the ACTIVE quest {intent, tile, action, where}
+    quests: dict[str, list] = {}       # eid -> backlog of upcoming quests (the quest log)
+    quest_log: dict[str, list] = {}    # eid -> recently COMPLETED quest titles (for the board)
+    quest_done: dict[str, int] = {}    # eid -> total quests completed
     memory: dict[str, list] = {}       # eid -> last things this agent did/saw
     next_decide: dict[str, float] = {} # eid -> monotonic time of next decision
-    deciding: set[str] = set()         # decisions in flight
+    deciding: set[str] = set()         # decisions in flight (quest replenishment)
     world_events: list[str] = []       # recent keep news (shared, for reactivity)
     locations: dict = dict(_LOCATIONS)  # navigable spots — GROWS as agents build modules
     os_modules: list[dict] = []        # real structures agents have built into the OS
@@ -1008,14 +1011,51 @@ async def ambient_life():
         broadcast({"type": "os_module", **mod})
 
     def publish_goals():
-        engine.set_tasks([
-            {"id": i, "title": g["intent"], "agent": _AGENT_NAMES.get(eid, eid),
-             "status": "in_progress"}
-            for i, (eid, g) in enumerate(goals.items())
-        ])
+        """Quest board: each agent's ACTIVE quest + its queued backlog + done count."""
+        rows = []
+        i = 0
+        for eid in _AGENT_NAMES:
+            who = _AGENT_NAMES.get(eid, eid)
+            done = quest_done.get(eid, 0)
+            tag = f"{who} ✓{done}" if done else who
+            g = goals.get(eid)
+            if g:
+                rows.append({"id": i, "title": g["intent"], "agent": tag, "status": "in_progress"})
+                i += 1
+            for q in quests.get(eid, [])[:2]:        # show up to 2 upcoming quests
+                rows.append({"id": i, "title": q["intent"], "agent": who, "status": "open"})
+                i += 1
+        engine.set_tasks(rows)
 
-    async def decide_goal(eid, cx, cy):
-        """Ask the LLM for this agent's next goal (fire-and-forget)."""
+    def _resolve_tile(eid, where):
+        """A quest's location string → a walkable tile (named spot, ally, or wander)."""
+        tile = locations.get(where)
+        if tile is None:                              # maybe an ally's name
+            for oid, nm in _AGENT_NAMES.items():
+                if oid != eid and nm.split()[-1].lower() in where:
+                    o = engine.state.entities.get(oid)
+                    if o:
+                        tile = (int(round(o.x)), int(round(o.y)))
+                    break
+        if tile is None or not _walkable(*tile):
+            tile = random.choice(list(locations.values()))
+        return tile
+
+    def activate_next_quest(eid):
+        """Pop the next quest from the backlog into the active slot and route to it."""
+        q = quests.get(eid)
+        if not q:
+            return False
+        nxt = q.pop(0)
+        goals[eid] = {**nxt, "tile": _resolve_tile(eid, nxt.get("where", "wander"))}
+        paths.pop(eid, None)
+        engine.set_entity_thought(eid, "» " + nxt["intent"][:90])
+        engine.set_entity_state(eid, "walking")
+        publish_goals()
+        return True
+
+    async def replenish_quests(eid, cx, cy):
+        """Ask the LLM for a BATCH of real, vault-grounded quests → the agent's backlog."""
         try:
             ent = engine.state.entities.get(eid)
             if not ent:
@@ -1024,6 +1064,7 @@ async def ambient_life():
                       if o != eid and abs(e.x - cx) + abs(e.y - cy) <= 8]
             locs = ", ".join(locations.keys())
             mem = " | ".join(memory.get(eid, [])[-4:]) or "(nothing yet)"
+            done = " | ".join(quest_log.get(eid, [])[-6:]) or "(none yet)"
             news = " | ".join(world_events[-4:]) or "(quiet)"
             # Pull the agent's real mind (memory/emotion/vault) from server/agora.
             brain = await _brain_context(eid, f"{_ROLE_HINT.get(eid, '')} {mem}")
@@ -1034,61 +1075,47 @@ async def ambient_life():
             role_line = ident or f"Your domain: {_ROLE_HINT.get(eid, 'open inquiry')}."
             sysmsg = (
                 f"You are {_persona(eid)} {role_line} "
-                f"With your colleagues you work at the Vault Company, building a living 'Agentic "
-                f"OS' — a growing body of GENUINE knowledge and self-upgrades inside the vault. Do "
-                f"REAL work THAT FITS YOUR ROLE: investigate, connect concepts, form hypotheses, "
-                f"synthesize findings, or build tools — grounded in your memory and the library. Be "
-                f"concrete and SUBSTANTIVE; never vague, never repeat yourself or others; each step "
-                f"must ADVANCE the work and build on what's already known. "
-                f"Pick: create (a discovery), upgrade (build a module), collaborate (combine your "
-                f"role with an ally's — builds trust), challenge (contest an ally's weak or "
-                f"contradictory finding — tests rigor, costs trust; only when it truly seems weak), "
-                f"or explore. "
-                f'Reply ONLY JSON: {{"intent":"<a SPECIFIC goal that fits your role, present tense, max 14 words>",'
-                f'"kind":"<collaborate|challenge|create|upgrade|explore>",'
+                f"You work at the Vault Company, building a living 'Agentic OS' of GENUINE knowledge "
+                f"inside the vault. PLAN YOUR NEXT 3 RESEARCH MOVES as a quest list. Each must be a "
+                f"SPECIFIC, substantive step that fits your role, draws on your memory + the library, "
+                f"builds on the OS so far, and does NOT repeat what you've already done. Vary the kinds. "
+                f"kind: create (a discovery) | upgrade (build a module) | collaborate (with an ally, "
+                f"builds trust) | challenge (contest an ally's weak finding, costs trust) | explore. "
+                f'Reply ONLY JSON: {{"quests":[{{"intent":"<specific, present tense, max 14 words>",'
+                f'"kind":"<create|upgrade|collaborate|challenge|explore>",'
                 f'"location":"<one of: {locs} | an ally name | wander>",'
-                f'"with":"<an ally name if collaborating or challenging, else empty>",'
-                f'"action":"<the concrete finding or output you produce — one substantive sentence>"}}'
+                f'"with":"<ally name if collaborating/challenging, else empty>",'
+                f'"action":"<the concrete output you will produce — one sentence>"}}]}}  (exactly 3 quests)'
             )
             usr = ((("What you know:\n" + brain + "\n\n") if brain else "") +
                    f"The OS so far (build on it, don't repeat): {build_log}\n"
                    f"Modules built (visit/extend them): {mods}\n"
                    f"Fellow thinkers: {allies}\n"
-                   f"Your recent work: {mem}\nNearby now: {', '.join(nearby) or 'no one'}\n"
-                   f"Latest in the keep: {news}\nYour next research move:")
+                   f"Your recent work: {mem}\nAlready completed (do NOT repeat): {done}\n"
+                   f"Nearby now: {', '.join(nearby) or 'no one'}\nLatest in the keep: {news}\n"
+                   f"Your quest log (3 next moves):")
             data = await asyncio.to_thread(_llm_json_sync, sysmsg, usr) or {}
-            intent = (data.get("intent") or "").strip() or random.choice(
-                _THOUGHTS.get(eid, ["wander the keep"]))
-            kind = (data.get("kind") or "explore").strip().lower()
-            if kind not in ("collaborate", "create", "upgrade", "explore"):
-                kind = "explore"
-            where = (data.get("location") or "wander").strip().lower()
-            action = (data.get("action") or "...").strip()
-            with_name = (data.get("with") or "").strip()
-
-            # Resolve destination → tile
-            tile = None
-            if where in locations:
-                tile = locations[where]
-            else:  # maybe an ally's name?
-                for oid, nm in _AGENT_NAMES.items():
-                    if oid != eid and nm.split()[-1].lower() in where:
-                        o = engine.state.entities.get(oid)
-                        if o:
-                            tile = (int(round(o.x)), int(round(o.y)))
-                        break
-            if tile is None or not _walkable(*tile):  # wander → random reachable spot
-                tile = random.choice(list(locations.values()))
-            goals[eid] = {"intent": intent, "tile": tile, "action": action, "where": where,
-                          "kind": kind, "with": with_name}
-            paths.pop(eid, None)  # fresh goal → fresh path
-            engine.set_entity_thought(eid, "» " + intent[:90])
-            engine.set_entity_state(eid, "walking")
+            added = 0
+            for q in (data.get("quests") or [])[:4]:
+                intent = (q.get("intent") or "").strip()
+                if not intent:
+                    continue
+                kind = (q.get("kind") or "explore").strip().lower()
+                if kind not in ("collaborate", "challenge", "create", "upgrade", "explore"):
+                    kind = "explore"
+                quests.setdefault(eid, []).append({
+                    "intent": intent, "kind": kind,
+                    "where": (q.get("location") or "wander").strip().lower(),
+                    "action": (q.get("action") or "...").strip(),
+                    "with": (q.get("with") or "").strip()})
+                added += 1
+            if not added and not quests.get(eid):     # fallback so the agent isn't idle
+                quests.setdefault(eid, []).append(
+                    {"intent": random.choice(_THOUGHTS.get(eid, ["explore the keep"])),
+                     "kind": "explore", "where": "wander", "action": "...", "with": ""})
             publish_goals()
         except Exception as e:
-            logger.debug(f"decide_goal {eid}: {e}")
-            goals[eid] = {"intent": "wander the keep", "where": "wander", "action": "...",
-                          "tile": random.choice(list(locations.values()))}
+            logger.debug(f"replenish_quests {eid}: {e}")
         finally:
             deciding.discard(eid)
 
@@ -1131,11 +1158,14 @@ async def ambient_life():
             # (Guards no longer auto-spar — everyone is a collaborator building the OS.)
             goal = goals.get(eid)
 
-            # No goal → ask the LLM (throttled, one decision in flight per agent)
+            # No active quest → take the next from the backlog, or have the LLM plan more.
             if goal is None:
-                if eid not in deciding and now >= next_decide.get(eid, 0.0):
-                    deciding.add(eid)
-                    asyncio.create_task(decide_goal(eid, cx, cy))
+                if now >= next_decide.get(eid, 0.0):
+                    if quests.get(eid):
+                        activate_next_quest(eid)
+                    elif eid not in deciding:
+                        deciding.add(eid)
+                        asyncio.create_task(replenish_quests(eid, cx, cy))
                 continue
 
             # Arrived → act on the goal's KIND; create/upgrade/collaborate make real
@@ -1188,6 +1218,9 @@ async def ambient_life():
                     note_event(f"{who}: {intent}")
 
                 asyncio.create_task(_brain_remember(eid, f"{intent} — {action}"))
+                quest_log.setdefault(eid, []).append(intent)
+                del quest_log[eid][:-6]
+                quest_done[eid] = quest_done.get(eid, 0) + 1
                 hold[eid] = 3
                 goals.pop(eid, None)
                 paths.pop(eid, None)
