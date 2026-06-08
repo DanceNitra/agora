@@ -1056,7 +1056,8 @@ async def ambient_life():
                 except Exception:
                     return 0
 
-            if "pending" in text.lower():               # trust too low → queued for review
+            gated = ("held in pending" in text.lower()) or ("held to pending" in text.lower())
+            if gated:                                    # trust too low → queued for review
                 note_event(f"{curator}'s {'audit' if mode=='duplicates' else 'curation'} "
                            f"held for review (trust {standing:.2f})")
                 logger.info(f"[curation] {curator} held to pending (standing {standing:.2f})")
