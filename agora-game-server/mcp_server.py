@@ -881,6 +881,13 @@ async def _brain_research(query: str) -> str:
     return (d or {}).get("formatted", "")
 
 
+async def _brain_vault_search(query: str) -> list:
+    """The user's OWN semantically-relevant notes (titles + scores), via the brain."""
+    d = await asyncio.to_thread(
+        _brain_get_sync, f"/api/v1/agent-os/brain/vault-search?q={_urlquote(query[:120])}&k=5")
+    return (d or {}).get("results", [])
+
+
 # ── Trust Graph: ESS live trust + Vault-Company cross-agent learning, in the dungeon ──
 _BRAIN_NAME2EID = {v: k for k, v in _AGENT_NAMES.items()}
 _LEARN_GRAPH = {"edges": [], "ts": 0.0}
@@ -942,15 +949,19 @@ async def _brain_contribute(eid: str, title: str, content: str) -> bool:
 
 
 async def _grounded_discovery(eid: str, intent: str) -> None:
-    """Turn a 'create' goal into a REAL finding grounded in arXiv — a concrete claim with a
-    real source, not a vague plan. This keeps shallow 'action items' out of the pipeline."""
+    """Turn a 'create' goal into a REAL finding grounded in arXiv AND connected to the user's
+    own notes (or flagging a real gap) — a concrete claim, not a vague plan."""
     sources = await _brain_research(intent)
+    related = await _brain_vault_search(intent)
+    rel = "; ".join(f"[[{r['title']}]]" for r in related[:3] if r.get("score", 0) > 0.45) \
+        or "(the user's vault is thin on this — a real gap)"
     finding = await asyncio.to_thread(
         _llm_content_sync,
-        f"You are {_persona(eid)} State ONE concrete research FINDING — a specific claim or "
-        f"insight (NOT a plan or action item) — grounded in the real papers below, citing one. "
-        f"Max 2 sentences. NEVER invent sources.",
-        f"Topic: {intent}\n\nReal papers:\n{sources or '(none found)'}") or intent
+        f"You are {_persona(eid)} State ONE concrete research FINDING (a specific claim/insight, "
+        f"NOT a plan) grounded in the real papers below — cite one — and CONNECT it to the user's "
+        f"existing notes, or flag the GAP if the vault is thin. Max 2 sentences. NEVER invent sources.",
+        f"Topic: {intent}\n\nReal papers:\n{sources or '(none found)'}\n\n"
+        f"User's relevant existing notes: {rel}") or intent
     src = ""
     if sources and "(no external" not in sources and "(none" not in sources:
         first = sources.splitlines()[0].lstrip("- ").strip()

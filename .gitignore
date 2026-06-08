@@ -14,3 +14,7 @@ build/
 # runtime artifacts (dungeon writes these live)
 agent_standing.json
 agora-game-server/agent_standing.json
+
+# semantic index cache (built locally)
+server/.semantic_cache/
+.semantic_cache/

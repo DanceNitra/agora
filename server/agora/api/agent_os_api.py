@@ -231,6 +231,22 @@ async def brain_research(q: str, n: int = 4):
             "formatted": format_for_prompt(papers)}
 
 
+_SEM_INDEX = None
+
+
+@router.get("/brain/vault-search")
+async def vault_search(q: str, k: int = 8):
+    """Semantic search over the USER's own notes (embeddings, not keywords) — lets agents
+    find what the user already knows + spot real gaps."""
+    global _SEM_INDEX
+    import asyncio
+    from agora.execution.semantic_index import SemanticIndex
+    if _SEM_INDEX is None or not _SEM_INDEX.ready:
+        _SEM_INDEX = SemanticIndex()                 # (re)load cache (built async)
+    results = await asyncio.to_thread(_SEM_INDEX.search, q, k) if _SEM_INDEX.ready else []
+    return {"status": "ok", "query": q, "ready": _SEM_INDEX.ready, "results": results}
+
+
 @router.get("/brain/brainstorm")
 async def list_brainstorm(request: Request, limit: int = 10):
     """Recent brainstorm sessions with their top idea."""
