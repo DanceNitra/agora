@@ -134,6 +134,6 @@
 
 ## Handoff History
 
-| Date | File | Agent |
-|------|------|-------|
-| — | — | — |
+| Date | File | Agent | Commit |
+|------|------|-------|--------|
+| 2026-06-08 | `handoffs/2026-06-08-Phase-1-Kickoff.md` | tg-hermes | a85e231 |
