@@ -117,6 +117,18 @@ class VaultCompanyEngine:
         print(f"📊 {len(self.cycle_results['phases'])} phases executed")
         print(f"{'='*60}")
         
+        # ── Cross-Agent Learning ──
+        try:
+            from .cross_agent_learning import CrossAgentLearningEngine
+            learning_engine = CrossAgentLearningEngine()
+            learning_result = await learning_engine.run_learning_cycle(self.cycle_results)
+            self.cycle_results["learning"] = learning_result
+            print(f"🎓 Cross-Agent Learning: {learning_result['lessons_extracted']} lessons, "
+                  f"{learning_result['skills_transferred']} skill transfers, "
+                  f"{learning_result['feedbacks_applied']} feedbacks applied")
+        except Exception as e:
+            print(f"⚠️ Cross-Agent Learning failed: {e}")
+        
         return self.cycle_results
     
     # ═══════════════════════════════════════════════

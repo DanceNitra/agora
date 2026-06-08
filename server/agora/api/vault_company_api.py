@@ -206,3 +206,41 @@ async def agent_think_get(agent_name: str, phase: str = "research_scan", request
         tier="cheap",
     )
     return {"status": "ok", "agent": agent_name, "phase": phase, "result": result}
+
+
+# ═══════════════════════════════════════════════════════════════
+# CROSS-AGENT LEARNING ENDPOINTS
+# ═══════════════════════════════════════════════════════════════
+
+@router.get("/learning/{agent_name}")
+async def get_agent_learning(agent_name: str, request: "Request"):
+    """Get learning status for a vault company agent."""
+    from agora.agent_os.vault_company.cross_agent_learning import CrossAgentLearningEngine
+    
+    engine = CrossAgentLearningEngine()
+    status = await engine.get_agent_learning_status(agent_name)
+    return {"status": "ok", "learning": status}
+
+
+@router.get("/learning")
+async def get_all_learning(request: "Request"):
+    """Get learning status for all agents."""
+    from agora.agent_os.vault_company.cross_agent_learning import CrossAgentLearningEngine
+    
+    engine = CrossAgentLearningEngine()
+    all_status = await engine.get_all_learning_status()
+    return {"status": "ok", "learning": all_status}
+
+
+@router.get("/learning/{agent_name}/lessons")
+async def get_agent_lessons(agent_name: str, request: "Request"):
+    """List learning files for an agent."""
+    from agora.agent_os.vault_company import AgentDirectoryManager
+    
+    mgr = AgentDirectoryManager()
+    learning_file = await mgr.read_file(agent_name, "learning/lessons.jsonl")
+    if not learning_file:
+        return {"status": "ok", "lessons": [], "count": 0}
+    
+    lines = [l for l in learning_file.strip().split("\n") if l.strip()]
+    return {"status": "ok", "agent": agent_name, "lessons_count": len(lines), "lessons": lines[-10:]}
