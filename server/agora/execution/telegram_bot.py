@@ -132,7 +132,7 @@ async def _handle(app, text: str) -> None:
         await send("🎯 *Tvoje medzery:*\n" + "\n".join(f"• {g['title']}" for g in gaps))
     elif low in ("/report", "report"):
         from agora.api.agent_os_api import _build_morning_report
-        await send(await _build_morning_report(app, send_it=False))
+        await send(await _build_morning_report(app))
     elif low in ("/start", "/help", "help"):
         await send("🏰 *Agora research assistant*\nNapíš otázku → grounded brief.\n"
                    "`research <téma>` · `gaps` · `report`")
