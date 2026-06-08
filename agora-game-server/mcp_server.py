@@ -1023,6 +1023,8 @@ async def ambient_life():
     # ── Autonomous vault curation: a trusted curator runs AutoLinker over the vault ──
     _VAULT = os.environ.get("AGORA_VAULT_PATH", "C:/Users/Danculus/my-second-brain")
     _AUTOLINKER = str(Path(__file__).resolve().parent.parent / "tools" / "autolinker.py")
+    _SAFEPUSH = str(Path(__file__).resolve().parent.parent / "tools" / "safe_vault_push.py")
+    _AUTOPUSH = os.environ.get("DUNGEON_AUTOPUSH", "1") != "0"   # King Aldric commits to GitHub
     curation = {"running": False}
 
     async def _run_curation(eid, standing, mode="links"):
@@ -1133,6 +1135,64 @@ async def ambient_life():
             logger.warning(f"[consolidation] {eid} failed: {e!r}")
         finally:
             consolidation["running"] = False
+            engine.set_entity_state(eid, "idle")
+            engine.set_entity_thought(eid, "")
+
+    orchestration = {"running": False}
+
+    async def _run_orchestration(eid, standing):
+        """King Aldric (Orchestrator) sets the 'State of the OS' doctrine and commits the
+        agents' accumulated vault work to GitHub (durability). Gated by his standing."""
+        if orchestration["running"]:
+            return
+        orchestration["running"] = True
+        king = _AGENT_NAMES.get(eid, eid)
+        logger.info(f"[orchestration] starting for {king} (standing {standing:.2f})…")
+        try:
+            if standing < 0.55:
+                note_event(f"{king}'s governance held (trust {standing:.2f})")
+                return
+            engine.set_entity_state(eid, "casting")
+            engine.set_entity_thought(eid, "» governing the OS…")
+            build = await _brain_build_log()
+            synth = await asyncio.to_thread(
+                _llm_content_sync,
+                "You are King Aldric, Engineering Lead and steward of the Vault Company's Agentic "
+                "OS. Write a brief 'State of the OS': what the collective has built, the emerging "
+                "direction, and the ONE priority to pursue next. Decisive, concrete, 3-4 sentences.",
+                f"The OS so far: {build}") or ""
+            if synth.strip():
+                await asyncio.to_thread(
+                    _brain_post_sync, "/api/v1/agent-os/brain/vault-note",
+                    {"title": f"State of the OS {_time.strftime('%Y-%m-%d %H%M')}",
+                     "content": f"## State of the OS — King Aldric\n{synth.strip()}",
+                     "agent": king, "tags": ["doctrine", "governance"]})
+                note_event(f"{king} set the OS doctrine")
+                _os_build("upgrade", king, f"set OS doctrine: {synth.strip()[:50]}")
+            # Commit the agents' accumulated vault work to GitHub (safe: refuses on deletions).
+            if _AUTOPUSH and Path(_SAFEPUSH).exists():
+                def _push():
+                    subprocess.run(["git", "-C", _VAULT, "fetch", "origin", "main", "-q"],
+                                   capture_output=True, timeout=60)
+                    return subprocess.run(
+                        [sys.executable, _SAFEPUSH,
+                         f"Agora agents: autonomous vault update ({_time.strftime('%Y-%m-%d %H%M')})"],
+                        capture_output=True, text=True, encoding="utf-8",
+                        errors="replace", timeout=300)
+                res = await asyncio.to_thread(_push)
+                out = (res.stdout or "") + (res.stderr or "")
+                if "main -> main" in out:
+                    note_event(f"{king} committed the OS to GitHub")
+                    _os_build("curation", king, "committed the agents' work to GitHub")
+                    logger.info(f"[orchestration] {king} pushed vault to GitHub")
+                elif "ABORT" in out:
+                    logger.warning(f"[orchestration] push aborted: {out[-200:]}")
+                else:
+                    logger.info(f"[orchestration] push: {out[-160:]}")
+        except Exception as e:
+            logger.warning(f"[orchestration] {eid} failed: {e!r}")
+        finally:
+            orchestration["running"] = False
             engine.set_entity_state(eid, "idle")
             engine.set_entity_thought(eid, "")
 
@@ -1278,7 +1338,8 @@ async def ambient_life():
         # Autonomous curation: Dame Elara (Bridge Builder) tends the vault's links and
         # Sage Mira (Curator) consolidates live discoveries into vault notes — each gated
         # by their OWN standing, on offset cadences.
-        if loop_n % 70 == 7 or loop_n % 110 == 50 or loop_n % 130 == 90:
+        if (loop_n % 70 == 7 or loop_n % 110 == 50 or loop_n % 130 == 90
+                or loop_n % 1000 == 300):
             _stm = _compute_standing(await _trust_matrix())
             if loop_n % 70 == 7 and not curation["running"]:        # Elara: connect links
                 asyncio.create_task(_run_curation("guard_r", _stm.get("guard_r", 0.5)))
@@ -1286,6 +1347,8 @@ async def ambient_life():
                 asyncio.create_task(_run_curation("guard_l", _stm.get("guard_l", 0.5), "duplicates"))
             if loop_n % 110 == 50 and not consolidation["running"]:  # Mira: consolidate digest
                 asyncio.create_task(_run_consolidation("scholar", _stm.get("scholar", 0.5)))
+            if loop_n % 1000 == 300 and not orchestration["running"]:  # Aldric: doctrine + GitHub (~14 min)
+                asyncio.create_task(_run_orchestration("king", _stm.get("king", 0.5)))
 
         for eid, ent in list(ents.items()):
             cx, cy = int(round(ent.x)), int(round(ent.y))
