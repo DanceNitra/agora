@@ -18,3 +18,6 @@ agora-game-server/agent_standing.json
 # semantic index cache (built locally)
 server/.semantic_cache/
 .semantic_cache/
+
+# Claude Code remote-control inbox (local)
+server/.claude_inbox.json

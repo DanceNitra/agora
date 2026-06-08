@@ -137,6 +137,16 @@ async def _handle(app, text: str) -> None:
             await send(f"✅ Guidance sent to *{d['agent']}* — it will pick it up and unblock.")
         else:
             await send("_No stuck agent is waiting right now._")
+    elif low.startswith(("cc ", "claude ", "build ", "task ", "implement ", "hej claude")):
+        task = text
+        for p in ("hej claude ", "cc ", "claude "):           # strip only the addressing prefix
+            if low.startswith(p):
+                task = text[len(p):].strip()
+                break
+        d = await asyncio.to_thread(_brain_post, "/api/v1/agent-os/brain/claude-inbox",
+                                    {"text": task})
+        await send(f"📥 Task queued for *Claude Code* (#{(d or {}).get('id', '?')}). "
+                   f"It'll pick this up on its next check and report back here.")
     elif low in ("status", "/status", "agents"):
         d = await asyncio.to_thread(_brain_get, "/api/v1/agent-os/brain/escalations")
         open_ = [e for e in (d or {}).get("escalations", []) if not e["resolved"]]
@@ -201,12 +211,13 @@ async def _handle(app, text: str) -> None:
         from agora.api.agent_os_api import _build_morning_report
         await send(await _build_morning_report(app))
     elif low in ("/start", "/help", "help"):
-        await send("🏰 *Agora research assistant*\n\n"
-                   "`<question>` → grounded brief, then `keep` to save it\n"
-                   "`verify` → fact-check findings & incorporate the verified\n"
-                   "`bridges` → missing links · `connect` → add them\n"
-                   "`gaps` → your gaps · `report` → morning report\n"
-                   "`status` → stuck agents · `fix <guidance>` → unblock one")
+        await send("🏰 *Agora — research + control*\n\n"
+                   "*Research (agents):*\n"
+                   "`<question>` → grounded brief, then `keep`\n"
+                   "`verify` · `bridges`/`connect` · `gaps` · `report` · `status` · `fix <g>`\n\n"
+                   "*Control Claude Code:*\n"
+                   "`build <task>` / `cc <task>` → hand me a build/implementation task; "
+                   "I pick it up and report back here.")
     else:
         q = text.split(" ", 1)[1] if low.startswith(("research ", "/research ")) else text
         await send("🔬 _Researching… a few seconds._")

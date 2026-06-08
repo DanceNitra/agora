@@ -489,6 +489,34 @@ async def list_escalations():
         for a, e in sorted(_ESCALATIONS.items(), key=lambda kv: -kv[1]["ts"])]}
 
 
+# ── Remote control: the user hands Claude Code build/implementation tasks via Telegram ──
+@router.post("/brain/claude-inbox")
+async def claude_inbox_add(request: Request):
+    """Queue a task the user texted to Claude Code (the brain poller routes it here)."""
+    from agora.execution.claude_inbox import add_task
+    body = await request.json()
+    text = (body.get("text") or "").strip()
+    if not text:
+        return {"status": "empty"}
+    return {"status": "queued", "id": add_task(text)}
+
+
+@router.get("/brain/claude-inbox")
+async def claude_inbox_list():
+    """Claude Code reads its pending tasks here on each wake."""
+    from agora.execution.claude_inbox import pending
+    return {"pending": pending()}
+
+
+@router.post("/brain/claude-inbox/done")
+async def claude_inbox_done(request: Request):
+    """Claude Code marks a task done with a short result."""
+    from agora.execution.claude_inbox import mark_done
+    body = await request.json()
+    mark_done(body.get("id") or "", body.get("result") or "")
+    return {"status": "ok"}
+
+
 @router.get("/brain/brainstorm")
 async def list_brainstorm(request: Request, limit: int = 10):
     """Recent brainstorm sessions with their top idea."""
