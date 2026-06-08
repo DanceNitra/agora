@@ -587,7 +587,16 @@ class VaultCompanyEngine:
     async def _write_vault_note(self, vault_base: str, subpath: str,
                                  title: str, content: str, tags: list,
                                  agent_name: str) -> Optional[str]:
-        """Write a note to the vault."""
+        """Write a note to the vault — only if it passes the quality gate (shallow → skipped)."""
+        try:
+            from agora.execution.quality_gate import assess_quality
+            q = await assess_quality(title, content)
+            if not q["pass"] and "unavailable" not in q["reason"]:
+                print(f"[VaultCompany] ✗ rejected shallow note ({q['score']}/10): "
+                      f"{title} — {q['reason']}")
+                return None
+        except Exception:
+            pass
         if self.vault_writer:
             try:
                 fpath = await self.vault_writer.write_note(

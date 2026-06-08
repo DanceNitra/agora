@@ -1120,17 +1120,21 @@ async def ambient_life():
             content = (f"## Recent discoveries\n{bullets}\n\n"
                        f"## Synthesis — Sage Mira\n{synth.strip()}")
             title = f"Vault Digest {_time.strftime('%Y-%m-%d %H%M')}"
-            ok = await asyncio.to_thread(
+            resp = await asyncio.to_thread(
                 _brain_post_sync, "/api/v1/agent-os/brain/vault-note",
                 {"title": title, "content": content, "agent": curator,
                  "tags": ["digest", "consolidation"]})
-            if ok:
-                for k in new[:6]:
-                    consolidation["seen"].add(k["title"])
+            for k in new[:6]:
+                consolidation["seen"].add(k["title"])   # don't re-process this material either way
+            if resp and resp.get("status") == "written":
                 note_event(f"{curator} consolidated {len(new[:6])} discoveries into a vault note")
                 _os_build("curation", curator,
-                          f"consolidated {len(new[:6])} discoveries into a vault note (trust {standing:.2f})")
-                logger.info(f"[consolidation] {curator} wrote a digest of {len(new[:6])} discoveries")
+                          f"consolidated {len(new[:6])} discoveries (quality {resp.get('score')}/10)")
+                logger.info(f"[consolidation] {curator} wrote a digest (quality {resp.get('score')}/10)")
+            elif resp and resp.get("status") == "rejected":
+                note_event(f"{curator}'s digest rejected as shallow: {resp.get('reason', '')}")
+                logger.info(f"[consolidation] {curator} digest REJECTED ({resp.get('score')}/10): "
+                            f"{resp.get('reason')}")
         except Exception as e:
             logger.warning(f"[consolidation] {eid} failed: {e!r}")
         finally:
@@ -1162,13 +1166,17 @@ async def ambient_life():
                 "direction, and the ONE priority to pursue next. Decisive, concrete, 3-4 sentences.",
                 f"The OS so far: {build}") or ""
             if synth.strip():
-                await asyncio.to_thread(
+                resp = await asyncio.to_thread(
                     _brain_post_sync, "/api/v1/agent-os/brain/vault-note",
                     {"title": f"State of the OS {_time.strftime('%Y-%m-%d %H%M')}",
                      "content": f"## State of the OS — King Aldric\n{synth.strip()}",
                      "agent": king, "tags": ["doctrine", "governance"]})
-                note_event(f"{king} set the OS doctrine")
-                _os_build("upgrade", king, f"set OS doctrine: {synth.strip()[:50]}")
+                if resp and resp.get("status") == "written":
+                    note_event(f"{king} set the OS doctrine")
+                    _os_build("upgrade", king, f"set OS doctrine: {synth.strip()[:50]}")
+                elif resp and resp.get("status") == "rejected":
+                    note_event(f"{king}'s doctrine rejected as shallow: {resp.get('reason', '')}")
+                    logger.info(f"[orchestration] doctrine REJECTED: {resp.get('reason')}")
             # Commit the agents' accumulated vault work to GitHub (safe: refuses on deletions).
             if _AUTOPUSH and Path(_SAFEPUSH).exists():
                 def _push():

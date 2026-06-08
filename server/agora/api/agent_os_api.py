@@ -195,12 +195,21 @@ async def add_collective(request: Request):
 
 @router.post("/brain/vault-note")
 async def write_vault_note(request: Request):
-    """Persist an agent's note into the Obsidian vault (dated Agora Agents subfolder)."""
+    """Persist an agent's note into the vault — but ONLY if it passes the quality gate.
+    Shallow / ungrounded / generic notes are rejected and never written."""
+    from agora.execution.quality_gate import assess_quality
     body = await request.json()
     title = (body.get("title") or "").strip()
     content = (body.get("content") or "").strip()
     if not title or not content:
         raise HTTPException(400, "Missing title or content")
+    # QUALITY GATE — keep shallow notes out of the vault (skippable only with gate=false)
+    if body.get("gate", True):
+        q = await assess_quality(title, content, int(body.get("min_score", 6)))
+        if not q["pass"]:
+            return {"status": "rejected", "score": q["score"], "reason": q["reason"]}
+    else:
+        q = {"score": None}
     writer = getattr(request.app.state, "vault_writer", None)
     if not writer:
         raise HTTPException(503, "vault writer not available")
@@ -208,7 +217,7 @@ async def write_vault_note(request: Request):
         title=title, content=content,
         tags=body.get("tags") or ["agora", "consolidation"],
         agent_name=body.get("agent") or "Sage Mira")
-    return {"status": "written", "path": path}
+    return {"status": "written", "path": path, "score": q["score"]}
 
 
 @router.get("/brain/brainstorm")
