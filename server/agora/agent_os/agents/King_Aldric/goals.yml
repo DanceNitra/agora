@@ -1,23 +1,37 @@
 # Goals — King Aldric
-# Short-term, long-term, and life goals.
+# Short-term and long-term objectives.
 
-life_goal:
-  objective: "Build tools that automate 80% of vault operations"
+## life_goal
+  objective: "Build tools that automate 80% of manual vault operations"
   deadline: "ongoing"
-  progress: 0.0
+  progress: 0.15
   status: "active"
+  kpi: "Operations automated / total operations"
 
-skills_goal:
-  objective: "Reach code_building level 10"
+## long_term_goal
+  objective: "Reach code_building level 10 and tool_design level 9"
   deadline: "2026-09"
+  progress: 0.25
+  status: "active"
+  kpi: "Skill levels"
+
+## quarterly_goal
+  objective: "Ship at least 5 production-ready vault tools with documentation"
+  deadline: "2026-08"
+  progress: 0.10
+  status: "active"
+  kpi: "Tools shipped with README"
+
+## weekly_goal
+  objective: "Build or improve at least 1 tool per night cycle"
+  deadline: "weekly"
   progress: 0.0
   status: "active"
+  kpi: "Tools built per cycle"
 
-short_goal:
-  objective: "Build one new vault tool from idea backlog"
+## daily_goal
+  objective: "Review all new ideas from High Priest Orin, give feasibility score"
   deadline: "daily"
   progress: 0.0
   status: "active"
-
-# 3 active goals
-# Last updated: 2026-06-08
+  kpi: "Ideas reviewed per cycle"

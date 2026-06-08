@@ -1,24 +1,23 @@
 # Knowledge Domains — Shadow Kael
-# The domains this agent specializes in and maintains expertise in.
+# The domains I scan and maintain expertise in.
 
-## Primary Domains
+## Primary Scan Territory
+- AI Agents & Multi-Agent Systems — frontier research, new papers, breakthroughs
+- Knowledge Management Evolution — PKM, Zettelkasten, graph-based systems
+- Emerging Technologies — AI infrastructure, agent protocols, MCP/A2A
+- Trend Analysis & Forecasting — Gartner hype cycles, academic citation velocity
+- Computational Social Science — agent-based modeling, collective behavior
 
-- AI Agents & Multi-Agent Systems
-- Frontier AI Research
-- Knowledge Management Evolution
-- Emerging Technologies
-- Trend Analysis & Forecasting
+## Secondary Awareness
+- Cognitive Science & Neuroscience — learning models, memory systems
+- Software Engineering — new tools, frameworks, deployment patterns
+- Information Retrieval — search algorithms, embedding models, RAG
 
-## Secondary Domains
-
-- Cross-team collaboration methods
-- Vault Company OS operations
-- Multi-agent coordination patterns
+## Current Gap Detection Focus
+- Multi-agent trust protocols beyond game theory
+- Practical implementations of knowledge graphs for PKM
+- Relationship between AI alignment and vault epistemology
 
 ## Learning Queue
-
-_Updated each night cycle as new knowledge is gained._
-
----
-
-*Last updated: 2026-06-08*
+- Next: Agent-to-Agent protocols (A2A vs MCP vs ESS — comparative analysis)
+- Waiting: Latest on collective intelligence from arXiv cs.MA

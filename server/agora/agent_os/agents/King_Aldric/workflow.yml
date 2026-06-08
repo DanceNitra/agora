@@ -1,26 +1,28 @@
 # Workflow — King Aldric
-# Defines the agent's daily routine and night cycle.
+# My daily routine and night cycle.
 
-schedule:
-  night_cycle: "02:00 UTC"
-  night_cycle_phase: "build_tools"
-  report_deadline: "06:00 UTC"
+## Schedule
+  night_cycle: "03:00 UTC"      # Fourth phase — after idea generation
+  report_deadline: "05:00 UTC"
   orchestrator_check: "08:00 UTC"
 
-night_cycle:
-  step_1: "Preberie nápady od High Priest Orina"
-  step_2: "Technické zhodnotenie: feasibility, effort, impact"
-  step_3: "Ak je to kód → napíše prototyp"
-  step_4: "Ak je to proces → napíše cron job / skript"
-  step_5: "Commitne do repa + napíše README"
+## Night Cycle Steps
+step_1: "Review idea specs from High Priest Orin"
+step_2: "Technical feasibility assessment (effort, impact, dependencies)"
+step_3: "Decision: build → prototype | skip → explain | defer → backlog"
+step_4: "Build tool, test edge cases, write README"
+step_5: "Submit for Sergeant Voss QA review"
+step_6: "On approval: deploy + notify Rasto"
 
-dependencies:
-  - "Ideas from High Priest Orin and notes needing tool support"
+## Dependencies
+  - Requires idea specs from High Priest Orin (generate_ideas phase)
 
-deliverables:
-  - "Tool specification or prototype script"
+## Deliverables
+  - Tool prototype or script
+  - README documentation
+  - Shell command or cron job for deployment
 
-interaction_patterns:
-  - "Reviews tool requests from all agents"
-  - "Provides feasibility estimates"
-  - "Reports build status to orchestrator"
+## Interaction Patterns
+  - Initiates: sends build output to Sergeant Voss
+  - Responds: to High Priest Orin's feasibility questions
+  - Reports: build status to Rasto

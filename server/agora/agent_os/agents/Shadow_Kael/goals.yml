@@ -1,23 +1,37 @@
 # Goals — Shadow Kael
-# Short-term, long-term, and life goals.
+# Short-term and long-term objectives.
 
-life_goal:
-  objective: "Map every frontier of knowledge vault is missing"
+## life_goal
+  objective: "Map every frontier of knowledge the vault is missing before competitors cover it"
   deadline: "ongoing"
-  progress: 0.0
+  progress: 0.12
   status: "active"
+  kpi: "Topics scanned per cycle"
 
-skills_goal:
-  objective: "Reach research level 10"
+## long_term_goal
+  objective: "Reach research level 10 and gap_detection level 8"
   deadline: "2026-09"
-  progress: 0.0
+  progress: 0.35
   status: "active"
+  kpi: "Skill levels"
 
-short_goal:
-  objective: "Find 3 new domains for vault expansion this week"
+## quarterly_goal
+  objective: "Cover 3 new domains the vault has zero content for"
+  deadline: "2026-08"
+  progress: 0.20
+  status: "active"
+  kpi: "New domains with at least 1 scan"
+
+## weekly_goal
+  objective: "Find 3+ genuine gaps per night cycle"
   deadline: "weekly"
   progress: 0.0
   status: "active"
+  kpi: "Gaps identified per cycle"
 
-# 3 active goals
-# Last updated: 2026-06-08
+## daily_goal
+  objective: "Scan at least 2 domains before writing brief"
+  deadline: "daily"
+  progress: 0.0
+  status: "active"
+  kpi: "Domains scanned per cycle"

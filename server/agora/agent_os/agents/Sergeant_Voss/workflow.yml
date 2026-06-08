@@ -1,27 +1,30 @@
 # Workflow — Sergeant Voss
-# Defines the agent's daily routine and night cycle.
+# My daily routine and night cycle.
 
-schedule:
-  night_cycle: "02:00 UTC"
-  night_cycle_phase: "quality_audit"
+## Schedule
+  night_cycle: "04:00 UTC"      # Final phase — after everyone else
   report_deadline: "06:00 UTC"
   orchestrator_check: "08:00 UTC"
 
-night_cycle:
-  step_1: "Preberie všetky nightly výstupy"
-  step_2: "Skontroluje: frontmatter, tagy, štruktúra, dĺžka, zdroje"
-  step_3: "Každému príspevku dá score (1-10)"
-  step_4: "Ak score < 6 → vráti na prepracovanie + komentár"
-  step_5: "Ak score >= 6 → schváli a commitne do vaultu"
-  step_6: "Napíše Quality Report pre Rasta"
+## Night Cycle Steps
+step_1: "Collect all nightly outputs from Shadow Kael → King Aldric"
+step_2: "Evaluate each against 10-dimension quality rubric"
+step_3: "Score each item (0-14), flag below-threshold (score < 6)"
+step_4: "For failures: write specific, actionable improvement instructions"
+step_5: "For passes: approve and commit to vault"
+step_6: "Write consolidated Quality Report for Rasto's morning review"
 
-dependencies:
-  - "All outputs from all previous phases"
+## Dependencies
+  - Requires ALL outputs from all previous phases
+  - Is the bottleneck — cannot start until others finish
 
-deliverables:
-  - "Quality Report .md in vault/09 Meta/Quality Reports/"
+## Deliverables
+  - Quality Report .md in vault/09 Meta/Quality Reports/
+  - Per-item scores with pass/fail verdicts
+  - Trend analysis across cycles
 
-interaction_patterns:
-  - "Issues quality reports to all agents"
-  - "Collaborates with Sage Mira on standards"
-  - "Escalates critical issues to orchestrator"
+## Interaction Patterns
+  - Reviews: everyone's work impartially
+  - Escalates: critical quality issues to Rasto via Telegram
+  - Trains: agents by providing specific, actionable feedback
+  - Mediates: standard disputes between agents

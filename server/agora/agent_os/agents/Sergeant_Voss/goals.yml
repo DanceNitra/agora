@@ -1,23 +1,37 @@
 # Goals — Sergeant Voss
-# Short-term, long-term, and life goals.
+# Short-term and long-term objectives.
 
-life_goal:
-  objective: "Maintain 100% quality pass rate for vault content"
+## life_goal
+  objective: "Maintain 100% quality pass rate for all vault content while keeping standards rigorous"
   deadline: "ongoing"
-  progress: 0.0
+  progress: 0.35
   status: "active"
+  kpi: "Quality pass rate (items ≥ 6/14)"
 
-skills_goal:
-  objective: "Reach quality_audit level 12"
+## long_term_goal
+  objective: "Reach quality_audit level 12 and strategic_thinking level 8"
   deadline: "2026-09"
+  progress: 0.30
+  status: "active"
+  kpi: "Skill levels"
+
+## quarterly_goal
+  objective: "Reduce average rejection rate per agent by 30% through constructive feedback"
+  deadline: "2026-08"
+  progress: 0.10
+  status: "active"
+  kpi: "Rejection rate per agent (trend)"
+
+## weekly_goal
+  objective: "Audit all nightly outputs within 2 hours, deliver report by 06:00 UTC"
+  deadline: "weekly"
   progress: 0.0
   status: "active"
+  kpi: "Audit completion time"
 
-short_goal:
-  objective: "Audit all nightly outputs before 06:00 UTC"
+## daily_goal
+  objective: "Complete quality audit with at least 1 actionable improvement suggestion per failure"
   deadline: "daily"
   progress: 0.0
   status: "active"
-
-# 3 active goals
-# Last updated: 2026-06-08
+  kpi: "Improvement suggestions per audit"

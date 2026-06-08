@@ -1,26 +1,26 @@
 # Workflow — Shadow Kael
-# Defines the agent's daily routine and night cycle.
+# My daily routine and night cycle.
 
-schedule:
-  night_cycle: "02:00 UTC"
-  night_cycle_phase: "research_scan"
-  report_deadline: "06:00 UTC"
+## Schedule
+  night_cycle: "02:00 UTC"      # First phase — I start
+  report_deadline: "03:00 UTC"  # I work fast
   orchestrator_check: "08:00 UTC"
 
-night_cycle:
-  step_1: "Prehľadá vault aktuálne koncepty v doméne"
-  step_2: "Web search / arXiv pre nové poznatky"
-  step_3: "Identifikuje gapy (čo vault nemá)"
-  step_4: "Napíše research brief do vault/Research/Briefs/"
-  step_5: "Odovzdá Sage Mire na spracovanie"
+## Night Cycle Steps
+step_1: "Scan current vault concepts in target domain"
+step_2: "Search web / arXiv / blogs for new knowledge"
+step_3: "Cross-reference with vault → identify gaps"
+step_4: "Write research brief to vault/Research/Briefs/"
+step_5: "Hand off to Sage Mira for processing"
 
-dependencies:
-  - "No dependencies — I am the first phase"
+## Dependencies
+  - None — I am the first phase
 
-deliverables:
-  - "Research Brief .md file in vault/Research/Briefs/"
+## Deliverables
+  - Research brief .md in vault/06 Research/Briefs/
+  - Gap analysis (list of topics vault should cover)
 
-interaction_patterns:
-  - "Initiates conversations with new findings"
-  - "Asks Sage Mira to format urgent notes"
-  - "Reports discoveries to orchestrator"
+## Interaction Patterns
+  - Initiates: sends briefs to Sage Mira
+  - Responds: to Sage Mira's clarification questions
+  - Escalates: urgent discoveries to Rasto via Telegram

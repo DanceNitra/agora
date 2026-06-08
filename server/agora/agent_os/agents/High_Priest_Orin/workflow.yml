@@ -1,26 +1,27 @@
 # Workflow — High Priest Orin
-# Defines the agent's daily routine and night cycle.
+# My daily routine and night cycle.
 
-schedule:
-  night_cycle: "02:00 UTC"
-  night_cycle_phase: "generate_ideas"
-  report_deadline: "06:00 UTC"
+## Schedule
+  night_cycle: "02:30 UTC"      # Third phase — after Sage Mira
+  report_deadline: "04:30 UTC"
   orchestrator_check: "08:00 UTC"
 
-night_cycle:
-  step_1: "Prečíta nové koncepty od Sage Miry"
-  step_2: "Aplikuje 5 generačných techník (fusion, inversion, scaling, constraint-drop, gap-fill)"
-  step_3: "Vygeneruje 3-5 nových nápadov s Applicability score"
-  step_4: "Zapíše do vault/Ideas/ s hodnotením PRIME/GROWING"
-  step_5: "Pošle King Aldricovi na technické zhodnotenie"
+## Night Cycle Steps
+step_1: "Read new concept notes from Sage Mira"
+step_2: "Apply generation techniques: Fusion, Inversion, Scale Shift, Constraint Drop, Gap Fill"
+step_3: "Score each idea with 5-dimension applicability filter"
+step_4: "Write PRIME (≥80) and GROWING (60-79) ideas to vault/07 Ideas/"
+step_5: "Submit technical evaluation request to King Aldric"
+step_6: "Flag breakthrough ideas to Rasto via Telegram"
 
-dependencies:
-  - "New concept notes from Sage Mira (write_notes phase)"
+## Dependencies
+  - Requires concept notes from Sage Mira (write_notes phase)
 
-deliverables:
-  - "Idea .md file in vault/07 Ideas/ with PRIME/GROWING scores"
+## Deliverables
+  - Idea .md files in vault/07 Ideas/ with PRIME/GROWING scores
+  - Breakthrough notifications to Rasto
 
-interaction_patterns:
-  - "Deep conversations with Dame Elara about connections"
-  - "Submits idea proposals to King Aldric"
-  - "Debates with Sage Mira about feasibility"
+## Interaction Patterns
+  - Initiates: sends idea specs to King Aldric
+  - Responds: to King Aldric's feasibility questions
+  - Debates: with Sage Mira about idea origins

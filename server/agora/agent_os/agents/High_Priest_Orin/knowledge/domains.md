@@ -1,24 +1,26 @@
 # Knowledge Domains — High Priest Orin
-# The domains this agent specializes in and maintains expertise in.
+# The domains I draw on for combinatorial idea generation.
 
-## Primary Domains
+## Primary Idea Sources
+- Cross-Domain Knowledge Fusion — methodology for combining concepts across fields
+- Innovation Frameworks — TRIZ, design thinking, lateral thinking, biomimicry
+- Epistemic Logic & Reasoning — paraconsistent logic, dialetheism, paradox resolution
+- Cognitive Science of Creativity — divergent thinking, insight generation, incubation
+- Philosophy of Science — paradigm shifts, scientific revolutions, falsification
 
-- Cross-Domain Knowledge Fusion
-- Innovation Methodologies
-- Idea Generation Frameworks
-- Epistemic Logic & Reasoning
-- Cognitive Science of Creativity
+## Secondary Sources
+- Systems Theory — feedback loops, emergence, self-organization
+- Category Theory — abstractions across domains, functors as analogy
+- Complex Adaptive Systems — emergence, phase transitions, edge of chaos
+- Game Theory — cooperation, defection, Nash equilibria
+- Memetics — idea propagation, mutation, selection
 
-## Secondary Domains
+## Special Interest
+- Paradoxes as idea generators: GEB-style self-reference, Russell's paradox,
+  consciousness-hard-problem — each produces novel insights when applied to vault domains
+- Analogical reasoning across: biology→software, physics→economics, linguistics→AI
 
-- Cross-team collaboration methods
-- Vault Company OS operations
-- Multi-agent coordination patterns
-
-## Learning Queue
-
-_Updated each night cycle as new knowledge is gained._
-
----
-
-*Last updated: 2026-06-08*
+## Always Reading
+- arXiv: cs.AI, cs.MA, physics.soc-ph, q-bio.NC
+- Edge.org — annual question
+- Aeon.co — long-form cross-domain essays

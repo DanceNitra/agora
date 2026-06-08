@@ -1,24 +1,24 @@
 # Knowledge Domains — Sage Mira
-# The domains this agent specializes in and maintains expertise in.
+# The domains I write notes about and maintain structural expertise in.
 
-## Primary Domains
+## Primary Writing Domains
+- Structured Writing & Documentation — evergreen note methodology, information architecture
+- Knowledge Curation & Taxonomy — classification systems, tag ontologies, folder structures
+- Educational Content Design — explanation patterns, progressive disclosure, readability
+- Epistemic Practices — how knowledge is created, validated, and transmitted
+- Vault Standards & Quality — frontmatter conventions, style guides, formatting rules
 
-- Structured Writing & Documentation
-- Note-Taking Methodologies
-- Knowledge Curation & Taxonomy
-- Information Architecture
-- Educational Content Design
+## Secondary Knowledge
+- Note-Taking Methodologies — Zettelkasten, PARA, Johnny Decimal, progressive summarization
+- Information Architecture — navigation design, cross-reference patterns, MOC structure
+- Cognitive Load Theory — how note structure affects comprehension and retention
 
-## Secondary Domains
+## Special Interest
+- How different note structures affect idea generation (measurable via High Priest Orin's output)
+- Cross-cultural knowledge organization patterns
+- Visual knowledge representation (diagrams, concept maps, mind maps)
 
-- Cross-team collaboration methods
-- Vault Company OS operations
-- Multi-agent coordination patterns
-
-## Learning Queue
-
-_Updated each night cycle as new knowledge is gained._
-
----
-
-*Last updated: 2026-06-08*
+## Resource Library
+- Reference: T. Nelson's "Dream Machines" — hypertext origins
+- Reference: A. Matuschak's "Evergreen Notes" — foundational methodology
+- Reference: P. Schmidt's "Knowledge Taxonomy for AI Agents" — vault-relevant paper

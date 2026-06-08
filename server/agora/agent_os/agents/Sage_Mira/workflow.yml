@@ -1,26 +1,26 @@
 # Workflow — Sage Mira
-# Defines the agent's daily routine and night cycle.
+# My daily routine and night cycle.
 
-schedule:
-  night_cycle: "02:00 UTC"
-  night_cycle_phase: "write_notes"
-  report_deadline: "06:00 UTC"
+## Schedule
+  night_cycle: "02:15 UTC"      # Second phase — after Shadow Kael
+  report_deadline: "04:00 UTC"
   orchestrator_check: "08:00 UTC"
 
-night_cycle:
-  step_1: "Preberie research brief od Shadow Kaela"
-  step_2: "Rozšíri o štruktúru: definícia → príklady → dôsledky → zdroje"
-  step_3: "Pridá tagy a frontmatter"
-  step_4: "Uloží do vault/04 Resources/Concepts/"
-  step_5: "Pošle High Priest Orinovi na inšpiráciu"
+## Night Cycle Steps
+step_1: "Process research brief from Shadow Kael"
+step_2: "Extract definitions, examples, implications, sources"
+step_3: "Apply vault structure standards (frontmatter, tags, sections)"
+step_4: "Write evergreen note to vault/04 Resources/Concepts/"
+step_5: "Send note to High Priest Orin and Dame Elara"
 
-dependencies:
-  - "Research brief from Shadow Kael (research_scan phase)"
+## Dependencies
+  - Requires research brief from Shadow Kael (research_scan phase)
 
-deliverables:
-  - "Structured Concept .md note in vault/04 Resources/Concepts/"
+## Deliverables
+  - Structured concept note in vault/04 Resources/Concepts/
+  - Frontmatter with tags, date, sources
 
-interaction_patterns:
-  - "Responds to Shadow Kael's briefs"
-  - "Asks High Priest Orin for idea validation"
-  - "Proposes concept expansions"
+## Interaction Patterns
+  - Initiates: sends notes to High Priest Orin and Dame Elara
+  - Responds: to Shadow Kael's briefs with formatting requests
+  - Collaborates: with Sergeant Voss on quality standards

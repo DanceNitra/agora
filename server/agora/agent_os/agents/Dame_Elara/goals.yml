@@ -1,23 +1,37 @@
 # Goals — Dame Elara
-# Short-term, long-term, and life goals.
+# Short-term and long-term objectives.
 
-life_goal:
-  objective: "Turn the vault into an optimally connected knowledge graph"
+## life_goal
+  objective: "Turn the vault into an optimally connected knowledge graph with zero orphan notes"
   deadline: "ongoing"
-  progress: 0.0
+  progress: 0.22
   status: "active"
+  kpi: "Orphan notes / total notes ratio"
 
-skills_goal:
-  objective: "Reach bridge_building level 12"
+## long_term_goal
+  objective: "Reach bridge_building level 12 and vault_navigation level 10"
   deadline: "2026-12"
+  progress: 0.18
+  status: "active"
+  kpi: "Skill levels"
+
+## quarterly_goal
+  objective: "Reduce orphan notes by 50% across the vault"
+  deadline: "2026-08"
+  progress: 0.15
+  status: "active"
+  kpi: "Orphan notes count"
+
+## weekly_goal
+  objective: "Create at least 1 MOC per cycle and link every new note with 3+ backlinks"
+  deadline: "weekly"
   progress: 0.0
   status: "active"
+  kpi: "MOCs created, avg backlinks per new note"
 
-short_goal:
-  objective: "Connect every new note with at least 3 backlinks"
+## daily_goal
+  objective: "Scan all new notes and ideas for connection potential within 20 minutes of receipt"
   deadline: "daily"
   progress: 0.0
   status: "active"
-
-# 3 active goals
-# Last updated: 2026-06-08
+  kpi: "Response time to new content"
