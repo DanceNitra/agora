@@ -127,14 +127,6 @@ QUEST_ASSIGNMENTS = {
         "required_action": "explore",
         "progress_step": "Gathered glowing herbs from the crypt",
     },
-    "brew_potion": {
-        "agent": "Dame Elara",
-        "target_npc": "Finn",
-        "target_x": 5 * 32,
-        "target_y": 4 * 32,
-        "required_action": "talk",
-        "progress_step": "Got rare ingredients from Finn",
-    },
     "heal_npcs": {
         "agent": "Dame Elara",
         "target_npc": "King Aldric",
@@ -177,14 +169,7 @@ QUEST_RESPONSES = {
             "Tell King Aldric to use it sparingly — a few drops are enough for the strongest steel."
         ),
         "brew_potion": (
-            "Finn! Do you have those rare ingredients I asked for? "
             "The glowing stag horn and crystallized honey would make a powerful healing draught."
-        ),
-    },
-    "Finn": {
-        "brew_potion": (
-            "Right here, Dame Elara! I traded with a merchant from the surface for the stag horn. "
-            "And I found the crystallized honey in an old beehive in the eastern ruins."
         ),
     },
     "Sergeant Voss": {
@@ -267,10 +252,6 @@ QUEST_OUTCOMES = {
         "memory": "Found rare glowing mushrooms in the crypt. Perfect for healing potions.",
         "inventory_add": ["Glowing Herbs"],
     },
-    "brew_potion": {
-        "memory": "Finn came through with the rare ingredients! The healing potions are ready.",
-        "inventory_add": ["Healing Potion"],
-    },
     "heal_npcs": {
         "memory": "King Aldric and the Sergeant Voss have their healing potions. The whole expedition is grateful.",
         "inventory_add": [],
@@ -332,7 +313,7 @@ async def inject_quest_context(db, agent_name: str, context: str) -> tuple[str, 
     """Inject quest info into LLM context.
     Returns (updated_context, active_quest_info_or_None).
     """
-    if agent_name not in ("Shadow Kael", "Sage Mira", "High Priest Orin", "King Aldric", "Dame Elara", "Finn", "Sergeant Voss"):
+    if agent_name not in ("Shadow Kael", "Sage Mira", "High Priest Orin", "King Aldric", "Dame Elara", "Sergeant Voss"):
         return context, None
 
     npc_id = agent_name.lower()
@@ -391,7 +372,6 @@ async def inject_quest_context(db, agent_name: str, context: str) -> tuple[str, 
                         "King Aldric": "(5*32, 10*32) — near the anvil",
                         "Shadow Kael": "(10*32, 16*32) — center area",
                         "Dame Elara": "(15*32, 3*32) — near the cauldron",
-                        "Finn": "(5*32, 4*32) — near the counter",
                         "Sergeant Voss": "(19.5*32, 9*32) — near the door",
                     }.get(assignment["target_npc"], "somewhere in the dungeon")
                     context += f"\n📍 {assignment['target_npc']} is at {target_pos}. Go there and talk to them.\n"
@@ -501,7 +481,7 @@ async def check_quest_progress(
     """After an LLM decision, check if the NPC progressed their quest.
     Returns a quest update dict or None.
     """
-    if agent_name not in ("Shadow Kael", "Sage Mira", "High Priest Orin", "King Aldric", "Dame Elara", "Finn", "Sergeant Voss"):
+    if agent_name not in ("Shadow Kael", "Sage Mira", "High Priest Orin", "King Aldric", "Dame Elara", "Sergeant Voss"):
         return None
 
     npc_id = agent_name.lower()

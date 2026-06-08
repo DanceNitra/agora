@@ -207,7 +207,6 @@ NPC_ROLE_MAP = {
     "High Priest Orin": "scribe",
     "King Aldric": "forge",
     "Dame Elara": "scribe",  # dual: knowledge + crafting; closest to Scribe
-    "Finn": "ledger",
     "Sergeant Voss": "warden",
     # Generic agents keep their roles
 }

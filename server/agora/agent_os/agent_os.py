@@ -18,12 +18,11 @@ from datetime import datetime
 # ── NPC agent IDs ──
 NPC_UUIDS = {
     "Shadow Kael":     "00000000-0000-0000-0000-000000000001",
-    "Sage Mira":     "00000000-0000-0000-0000-000000000002",
+    "Sage Mira":      "00000000-0000-0000-0000-000000000002",
     "High Priest Orin": "00000000-0000-0000-0000-000000000003",
     "King Aldric":     "00000000-0000-0000-0000-000000000004",
     "Dame Elara":     "00000000-0000-0000-0000-000000000005",
-    "Finn":     "00000000-0000-0000-0000-000000000006",
-    "Sergeant Voss":    "00000000-0000-0000-0000-000000000007",
+    "Sergeant Voss":  "00000000-0000-0000-0000-000000000007",
 }
 
 UUID_TO_NAME = {v: k for k, v in NPC_UUIDS.items()}
@@ -109,21 +108,6 @@ NPC_DEFS = {
         ],
         "skills": [("alchemy", 9), ("herbalism", 8), ("chemistry", 7), ("healing", 6)],
     },
-    "Finn": {
-        "name": "Finn",
-        "role": "merchant",
-        "archetype": "merchant",
-        "personality": {"openness": 0.7, "conscientiousness": 0.6, "extraversion": 0.9, "agreeableness": 0.8, "neuroticism": 0.3},
-        "values": {"wealth": 1.0, "connections": 0.9, "knowledge": 0.5, "bargaining": 0.9, "harmony": 0.6},
-        "emotional_state": "happy",
-        "moral_alignment": "neutral",
-        "abilities": [
-            ("Silver Tongue", "Dokáže presvedčiť kohokoľvek", 9.0, True),
-            ("Trade Instinct", "Vyciťuje výhodné obchody", 8.0, True),
-            ("Networker", "Pozná ľudí a ich potreby", 7.0, False),
-        ],
-        "skills": [("bargaining", 9), ("appraisal", 8), ("persuasion", 7), ("logistics", 6)],
-    },
     "Sergeant Voss": {
         "name": "Sergeant Voss",
         "role": "guard",
@@ -169,8 +153,6 @@ HELP_MATRIX = {
         ("High Priest Orin", "alchemy_theory", "High Priest Orin pozná teóriu"),
     ],
     "trading": [
-        ("Finn", "bargaining", "Finn je najlepší vyjednávač"),
-        ("Finn", "appraisal", "Finn pozná cenu všetkého"),
     ],
     "healing": [
         ("Dame Elara", "healing", "Dame Elara varí liečivé elixíry"),
@@ -290,7 +272,6 @@ class AgentOS:
                 "High Priest Orin": "Decipher all ancient runes and unlock the library's secrets",
                 "King Aldric": "Forge the perfect weapon and arm every agent",
                 "Dame Elara": "Discover the ultimate healing potion recipe",
-                "Finn": "Build the most prosperous trading network in the dungeon",
                 "Sergeant Voss": "Protect every agent from harm and maintain order",
             }
             await self.db.execute(

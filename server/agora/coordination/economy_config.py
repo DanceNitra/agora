@@ -45,13 +45,6 @@ ROLE_ECONOMY = {
         "surplus_threshold": 3.0,
         "deficit_threshold": 1.0,
     },
-    "Finn": {
-        "produces": [],                       # merchant produces nothing
-        "consumes": [],                       # but also consumes nothing directly
-        "surplus_threshold": 5.0,             # holds inventory for arbitrage
-        "deficit_threshold": 0.0,
-        "trader": True,                       # Finn is a trader — exploits price differences
-    },
     "Sergeant Voss": {
         "produces": [],                       # guard produces nothing
         "consumes": [(4, 0.1)],              # iron_ingot (weapon maintenance)

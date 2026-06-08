@@ -1005,13 +1005,12 @@ async def _economy_tick(app: FastAPI):
                                 trust_delta=0.05,
                             )
 
-    # ── D6: Finn arbitrage — buy low, sell high ──
-    finn_id = "00000000-0000-0000-0000-000000000006"
-    finn_name = "Finn"
-
-    # Is Finn active?
-    cursor = await db.execute(
-        "SELECT energy_balance FROM agent_identities WHERE agent_id=? AND status='active'",
+# DISABLED     # ── D6: Finn arbitrage — buy low, sell high ──
+# DISABLED     finn_id = "00000000-0000-0000-0000-000000000006"
+# DISABLED 
+# DISABLED     # Is Finn active?
+# DISABLED     cursor = await db.execute(
+# DISABLED         "SELECT energy_balance FROM agent_identities WHERE agent_id=? AND status='active'",
         (finn_id,),
     )
     finn = await cursor.fetchone()

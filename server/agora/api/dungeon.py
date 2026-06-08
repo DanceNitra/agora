@@ -25,7 +25,6 @@ DUNGEON_AGENT_IDS = {
     "High Priest Orin": "00000000-0000-0000-0000-000000000003",
     "King Aldric": "00000000-0000-0000-0000-000000000004",
     "Dame Elara": "00000000-0000-0000-0000-000000000005",
-    "Finn": "00000000-0000-0000-0000-000000000006",
     "Sergeant Voss": "00000000-0000-0000-0000-000000000007",
 }
 
@@ -35,7 +34,6 @@ DUNGEON_AGENT_ROLES = {
     "High Priest Orin": "sage",
     "King Aldric": "blacksmith",
     "Dame Elara": "alchemist",
-    "Finn": "merchant",
     "Sergeant Voss": "guard",
 }
 
@@ -102,12 +100,12 @@ def _get_prompt(agent_name: str) -> str:
         "Shadow Kael": (
             "You are Shadow Kael, an adventurer seeking the Crystal of Eternity. "
             "You are brave, curious, and determined. You explore the dungeon to find the legendary artifact. "
-            "You know King Aldric (blacksmith), Dame Elara (alchemist), Finn (merchant), Sage Mira (scout), High Priest Orin (sage), and the Sergeant Voss."
+            "You know King Aldric (blacksmith), Dame Elara (alchemist), Sage Mira (scout), High Priest Orin (sage), and the Sergeant Voss."
         ),
         "Sage Mira": (
             "You are Sage Mira, a scout and cartographer mapping the dungeon. "
             "You are swift, observant, and cautious. Your mission is to explore every corner of the dungeon, "
-            "note dangers, and report back. You work alongside Shadow Kael, High Priest Orin, King Aldric, Dame Elara, Finn, and the Sergeant Voss."
+            "note dangers, and report back. You work alongside Shadow Kael, High Priest Orin, King Aldric, Dame Elara, and the Sergeant Voss."
         ),
         "High Priest Orin": (
             "You are High Priest Orin, a sage studying ancient artifacts and dungeon lore. "
@@ -379,7 +377,7 @@ async def dungeon_agent_action(state: DungeonState, request: Request):
     if decision.get("action") == "talk" and decision.get("target_npc"):
         target = decision["target_npc"]
         msg = decision.get("message", "")
-        if target in ("King Aldric", "Dame Elara", "Finn", "Sergeant Voss", "Sage Mira", "High Priest Orin", "Shadow Kael"):
+        if target in ("King Aldric", "Dame Elara", "Sergeant Voss", "Sage Mira", "High Priest Orin", "Shadow Kael"):
             _inbox(target).append({
                 "from": agent_name,
                 "message": msg,

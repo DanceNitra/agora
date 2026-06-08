@@ -53,15 +53,7 @@ AUTO_TASKS = [
      "task_type": "research", "difficulty": 2, "reward_energy": 10, "target_ticks": 3, "assigned_npc": "Dame Elara"},
     {"title": "Neutralize the poison seep", "description": "Mix a neutralizing agent for the toxic gas seeping from the fissure in sector 7.",
      "task_type": "analysis", "difficulty": 3, "reward_energy": 14, "target_ticks": 4, "assigned_npc": "Dame Elara"},
-    # ── Finn (merchant) — trade & barter ──
-    {"title": "Audit supply inventory", "description": "Count the remaining supplies and update the inventory ledger.",
-     "task_type": "review", "difficulty": 1, "reward_energy": 8, "target_ticks": 2, "assigned_npc": "Finn"},
-    {"title": "Negotiate with the traders", "description": "Meet with the surface traders at the entrance and negotiate better prices for ore.",
-     "task_type": "review", "difficulty": 2, "reward_energy": 10, "target_ticks": 3, "assigned_npc": "Finn"},
-    {"title": "Price the crystal haul", "description": "Appraise the recent crystal shard haul and set fair market prices.",
-     "task_type": "review", "difficulty": 1, "reward_energy": 8, "target_ticks": 2, "assigned_npc": "Finn"},
-    # ── Sergeant Voss — security & patrol ──
-    {"title": "Verify patrol routes", "description": "Walk the full patrol circuit and verify all checkpoints are secure.",
+    {"title": "Patrol the outer perimeter", "description": "Secure the outer perimeter against intruders.",
      "task_type": "review", "difficulty": 1, "reward_energy": 8, "target_ticks": 2, "assigned_npc": "Sergeant Voss"},
     {"title": "Secure the supply cache", "description": "Move the emergency supply cache to a more defensible location.",
      "task_type": "exploration", "difficulty": 2, "reward_energy": 10, "target_ticks": 3, "assigned_npc": "Sergeant Voss"},
@@ -461,7 +453,7 @@ class TaskExecutor:
 
         # Add real state from the DB at the time of completion (captured via query in caller)
         # If the agent is a dungeon NPC, note the narrative connection
-        dungeon_npcs = {"Shadow Kael", "Sage Mira", "High Priest Orin", "King Aldric", "Dame Elara", "Finn", "Sergeant Voss"}
+        dungeon_npcs = {"Shadow Kael", "Sage Mira", "High Priest Orin", "King Aldric", "Dame Elara", "Sergeant Voss"}
         if role in dungeon_npcs or agent_id[:8] in {n[:8] for n in dungeon_npcs}:
             lines.append(f"- This task was part of the dungeon ecosystem.")
             lines.append(f"- The {role} was involved in the dungeon narrative.")
