@@ -207,6 +207,7 @@ async def seed_agents(db):
         {"role": "writer", "tools": ["write_file", "format", "cite"]},
         {"role": "critic", "tools": ["review", "validate", "score"]},
     ]
+    from agora.coordination.ess_protocol import ESSMessage
     for s in seed_roles:
         aid = str(uuid.uuid4())
         genome = json.dumps({
@@ -215,13 +216,18 @@ async def seed_agents(db):
             "personality_traits": {"curiosity": 0.8, "thoroughness": 0.7,
                                    "cooperativeness": 0.85}
         })
+        # Real Ed25519 identity for ESS message signing (task 1.5).
+        priv_key, pub_key = ESSMessage.generate_keypair()
+        pub_key_hex = ESSMessage.public_key_to_hex(pub_key)
+        priv_key_hex = ESSMessage.private_key_to_hex(priv_key)
         await db.execute(
             """INSERT INTO agent_identities (agent_id, public_key, generation, genome,
                trust_score, energy_balance, role, status)
                VALUES (?, ?, 0, ?, 0.5, 100, ?, 'active')""",
-            (aid, f"key_{aid[:8]}", genome, s["role"])
+            (aid, pub_key_hex, genome, s["role"])
         )
-        print(f"  [Seed] {s['role']}-{aid[:8]} created")
+        # Dev only: private keys belong in a secrets manager in production.
+        print(f"  [Seed] {s['role']}-{aid[:8]} pub={pub_key_hex[:16]}... priv={priv_key_hex[:16]}...")
     await db.commit()
 
 

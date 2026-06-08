@@ -10,7 +10,121 @@ Implements Axelrod's Tit-for-Tat with four properties:
 """
 
 import json
+from dataclasses import dataclass, field
 from datetime import datetime, timezone
+from enum import Enum
+from typing import Optional
+
+from cryptography.hazmat.primitives.asymmetric.ed25519 import (
+    Ed25519PrivateKey,
+    Ed25519PublicKey,
+)
+from cryptography.hazmat.primitives import serialization
+from cryptography.exceptions import InvalidSignature
+
+
+class MessageType(str, Enum):
+    """The fixed ESS message vocabulary (Axelrod TFT: Clear)."""
+
+    COMMIT = "commit"
+    COOPERATE = "cooperate"
+    DEFECT = "defect"
+    ALERT = "alert"          # retaliation / defection notice
+    ACK = "ack"
+
+
+@dataclass
+class ESSMessage:
+    """A signed ESS protocol message.
+
+    Wire schema is fixed (Clear). Signing covers type+agent_id+payload+timestamp;
+    target_id is routing metadata and is intentionally not part of the signed body.
+    """
+
+    type: MessageType
+    agent_id: str
+    target_id: str
+    payload: dict = field(default_factory=dict)
+    timestamp: str = field(default_factory=lambda: datetime.now(timezone.utc).isoformat())
+    trust_sig: str = ""
+
+    # ── Canonical signing body ──────────────────
+    def _signed_data(self) -> bytes:
+        """Deterministic bytes that sign() and verify() both operate on."""
+        type_str = self.type.value if isinstance(self.type, MessageType) else str(self.type)
+        data = f"{type_str}:{self.agent_id}:{json.dumps(self.payload, sort_keys=True)}:{self.timestamp}"
+        return data.encode()
+
+    def sign(self, private_key: Ed25519PrivateKey) -> str:
+        """Sign the message with an Ed25519 private key.
+
+        Returns the full 64-byte signature as a 128-char hex string and stores it
+        in ``self.trust_sig`` as a side effect.
+        """
+        sig_hex = private_key.sign(self._signed_data()).hex()
+        self.trust_sig = sig_hex
+        return sig_hex
+
+    def verify(self, public_key: Ed25519PublicKey) -> bool:
+        """Verify the Ed25519 signature against a public key.
+
+        Returns True only if the signature matches the current message content.
+        Never raises.
+        """
+        if not self.trust_sig:
+            return False
+        try:
+            signature = bytes.fromhex(self.trust_sig)
+            public_key.verify(signature, self._signed_data())
+            return True
+        except (InvalidSignature, ValueError, TypeError):
+            return False
+
+    def to_dict(self) -> dict:
+        """Serialise for transport / WS broadcast."""
+        type_str = self.type.value if isinstance(self.type, MessageType) else str(self.type)
+        return {
+            "type": type_str,
+            "agent_id": self.agent_id,
+            "target_id": self.target_id,
+            "payload": self.payload,
+            "timestamp": self.timestamp,
+            "trust_sig": self.trust_sig,
+        }
+
+    # ── Key (de)serialisation helpers ───────────
+    @staticmethod
+    def public_key_to_hex(pub_key: Ed25519PublicKey) -> str:
+        """Serialise an Ed25519 public key to a hex string (for DB storage)."""
+        return pub_key.public_bytes(
+            encoding=serialization.Encoding.Raw,
+            format=serialization.PublicFormat.Raw,
+        ).hex()
+
+    @staticmethod
+    def hex_to_public_key(hex_str: str) -> Ed25519PublicKey:
+        """Deserialise a hex string back into an Ed25519PublicKey."""
+        return Ed25519PublicKey.from_public_bytes(bytes.fromhex(hex_str))
+
+    @staticmethod
+    def private_key_to_hex(priv_key: Ed25519PrivateKey) -> str:
+        """Serialise a private key to hex (dev/secure storage)."""
+        return priv_key.private_bytes(
+            encoding=serialization.Encoding.Raw,
+            format=serialization.PrivateFormat.Raw,
+            encryption_algorithm=serialization.NoEncryption(),
+        ).hex()
+
+    @staticmethod
+    def hex_to_private_key(hex_str: str) -> Ed25519PrivateKey:
+        """Deserialise a hex string back into an Ed25519PrivateKey."""
+        return Ed25519PrivateKey.from_private_bytes(bytes.fromhex(hex_str))
+
+    @staticmethod
+    def generate_keypair() -> "tuple[Ed25519PrivateKey, Ed25519PublicKey]":
+        """Generate a fresh Ed25519 key pair."""
+        private_key = Ed25519PrivateKey.generate()
+        return private_key, private_key.public_key()
 
 
 class TrustEngine:
@@ -206,3 +320,27 @@ class TrustEngine:
             },
             "is_stable": provokability >= self.PROVOKABILITY_THRESHOLD,
         }
+
+
+def demo_sign_verify() -> bool:
+    """Quick sanity check for Ed25519 signing (sync; no DB)."""
+    priv, pub = ESSMessage.generate_keypair()
+
+    msg = ESSMessage(
+        type=MessageType.COMMIT,
+        agent_id="test-agent",
+        target_id="test-partner",
+        payload={"goal": "test"},
+        timestamp=datetime.now(timezone.utc).isoformat(),
+    )
+
+    sig = msg.sign(priv)
+    assert len(sig) == 128, f"Expected 128 hex chars, got {len(sig)}"
+    assert msg.verify(pub), "Signature should verify"
+
+    # Tampered message must NOT verify
+    msg.payload = {"goal": "tampered"}
+    assert not msg.verify(pub), "Tampered message should NOT verify"
+
+    print(f"[ESS] Ed25519 signing OK: {sig[:16]}...")
+    return True
