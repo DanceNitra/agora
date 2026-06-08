@@ -86,7 +86,7 @@ class Controller:
                     "type": "npc",
                     "id": npc["npc_id"],
                     "name": npc["npc_name"],
-                    "role": npc.get("role", ""),
+                    "role": npc["role"],
                     "x": npc["pos_x"],
                     "y": npc["pos_y"],
                 })

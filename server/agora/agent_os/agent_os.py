@@ -257,9 +257,11 @@ class AgentOS:
                 )
 
             # ── Agentic OS v3 — emócie ──
+            # All NOT NULL columns explicit (create_all uses Python defaults only).
             await self.db.execute(
-                "INSERT OR IGNORE INTO agent_emotions (npc_id, current, intensity, valence, arousal, trigger, mood) "
-                "VALUES (?, ?, ?, ?, ?, ?, ?)",
+                "INSERT OR IGNORE INTO agent_emotions (npc_id, current, intensity, valence, "
+                "arousal, trigger, history, decay_rate, mood) "
+                "VALUES (?, ?, ?, ?, ?, ?, '[]', 0.1, ?)",
                 (npc_id, defs["emotional_state"], 0.5,
                  0.0, 0.5, "initialized",
                  0.7 if defs["emotional_state"] in ("happy", "curious") else 0.5),
@@ -275,8 +277,10 @@ class AgentOS:
                 "Sergeant Voss": "Protect every agent from harm and maintain order",
             }
             await self.db.execute(
-                "INSERT OR IGNORE INTO agent_lifecycles (npc_id, age_ticks, stage, maturity, wisdom, life_goal) "
-                "VALUES (?, 0, 'childhood', ?, 0.1, ?)",
+                "INSERT OR IGNORE INTO agent_lifecycles (npc_id, age_ticks, stage, maturity, "
+                "wisdom, total_decisions, total_vault_notes, total_conversations, legacy, "
+                "life_goal, life_goal_progress, peak_experience) "
+                "VALUES (?, 0, 'childhood', ?, 0.1, 0, 0, 0, '', ?, 0.0, '')",
                 (npc_id, 0.15, default_goals.get(name, f"Explore the dungeon as {name}")),
             )
 
@@ -325,9 +329,14 @@ class AgentOS:
                 if friendship > 0.6 and respect > 0.5:
                     bond = "acquaintances"
 
+                # Provide every NOT NULL column explicitly: create_all builds this
+                # table from the ORM model (Python-side defaults only), so omitted
+                # columns would insert NULL and fail the NOT NULL constraint.
                 await self.db.execute(
                     "INSERT INTO agent_relationships (id, agent_a_id, agent_b_id, "
-                    "friendship, respect, emotional_bond) VALUES (?, ?, ?, ?, ?, ?)",
+                    "friendship, respect, rivalry, attraction, debt, "
+                    "conversations_count, emotional_bond, history) "
+                    "VALUES (?, ?, ?, ?, ?, 0.0, 0.0, 0.0, 0, ?, '[]')",
                     (str(uuid.uuid4()), npc_ids[i], npc_ids[j],
                      friendship, respect, bond),
                 )

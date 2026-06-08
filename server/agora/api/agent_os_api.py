@@ -13,19 +13,6 @@ def get_os(request: Request):
     return request.app.state.agent_os
 
 
-@router.get("/{npc_name}")
-async def get_agent_os(npc_name: str, request: Request):
-    """Get full OS status for an NPC by name or UUID."""
-    # Resolve name to UUID
-    npc_id = DUNGEON_AGENT_IDS.get(npc_name) or npc_name
-
-    os_engine = get_os(request)
-    status = await os_engine.get_full_status(npc_id)
-    if not status:
-        raise HTTPException(status_code=404, detail=f"NPC {npc_name} not found")
-    return status
-
-
 @router.get("/{npc_name}/soul")
 async def get_agent_soul(npc_name: str, request: Request):
     """Get soul status for an NPC."""
@@ -504,3 +491,16 @@ async def get_v3_status(npc_name: str, request: Request):
         "conflicts": conflicts,
         "belief_changes": metamemory,
     }
+
+
+# ── Bare single-segment catch-all — MUST be registered LAST so specific static
+#    routes (/emotions, /culture, /conflicts, /brain/*) are matched first. ──
+@router.get("/{npc_name}")
+async def get_agent_os(npc_name: str, request: Request):
+    """Get full OS status for an NPC by name or UUID."""
+    npc_id = DUNGEON_AGENT_IDS.get(npc_name) or npc_name
+    os_engine = get_os(request)
+    status = await os_engine.get_full_status(npc_id)
+    if not status:
+        raise HTTPException(status_code=404, detail=f"NPC {npc_name} not found")
+    return status
