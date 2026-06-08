@@ -853,6 +853,114 @@ class AgentOS:
         except Exception as e:
             print(f"[Upgrade] {name} proposal error: {e}")
 
+    # ── Conversation Engine (Phase 2.0 Layer 2) ──
+    async def _start_conversation(self, speaker_id: str, target_id: str, topic: str,
+                                  intent: str = "chat", broadcast_fn=None) -> str:
+        """Two agents hold a 2-turn dialogue (persisted + remembered by both)."""
+        import uuid as _uuid
+        import asyncio as _asyncio
+        from agora.execution.llm_client import dungeon_agent_think
+        from agora.agent_os.memory_agent import MemoryAgent
+
+        session_id = str(_uuid.uuid4())
+        speaker_name = await self._get_npc_name(speaker_id)
+        target_name = await self._get_npc_name(target_id)
+        if not speaker_name or not target_name:
+            return session_id
+
+        speaker_prompt = (
+            f"You are {speaker_name}. You want to talk to {target_name} about '{topic}' "
+            f"(intent: {intent}). Write what you say — a natural {intent} message, 1-2 sentences, "
+            f'in-character. Respond with JSON: {{"message": "...", "feeling": "..."}}'
+        )
+        sd = await _asyncio.to_thread(dungeon_agent_think, speaker_name, "conversation",
+                                      speaker_prompt, "cheap")
+        speaker_msg = sd.get("message") or f"Hey {target_name}, let's talk about {topic}."
+        speaker_feeling = sd.get("feeling", "curious")
+
+        await self.db.execute(
+            "INSERT INTO agent_conversations (session_id, speaker_id, target_id, message, "
+            "intent, turn_number, speaker_name, target_name) VALUES (?, ?, ?, ?, ?, 1, ?, ?)",
+            (session_id, speaker_id, target_id, speaker_msg, intent, speaker_name, target_name))
+        await MemoryAgent(self.db, speaker_id).store_memory(
+            f"You started a conversation with {target_name} about '{topic}': \"{speaker_msg[:100]}\"",
+            memory_type="episodic", importance=0.6, emotional_tag=speaker_feeling,
+            source="conversation", related_npc_id=target_id)
+
+        target_mem = MemoryAgent(self.db, target_id)
+        recalled = await target_mem.recall(speaker_name, limit=3, min_importance=0.3)
+        mem_str = "\n".join(f"  - {m['content'][:100]}" for m in recalled) if recalled else ""
+
+        target_prompt = (
+            f"You are {target_name}. {speaker_name} just said to you: \"{speaker_msg}\"\n"
+            f"They started a conversation about '{topic}'.\n"
+            f"{('Your memories of ' + speaker_name + ':' + chr(10) + mem_str) if mem_str else ''}\n"
+            f"Respond naturally, in-character, 1-2 sentences. "
+            f'Respond with JSON: {{"message": "...", "feeling": "..."}}'
+        )
+        td = await _asyncio.to_thread(dungeon_agent_think, target_name, "conversation",
+                                      target_prompt, "cheap")
+        target_msg = td.get("message") or f"Interesting topic, {speaker_name}!"
+        target_feeling = td.get("feeling", "curious")
+
+        await self.db.execute(
+            "INSERT INTO agent_conversations (session_id, speaker_id, target_id, message, "
+            "intent, turn_number, speaker_name, target_name) VALUES (?, ?, ?, ?, ?, 2, ?, ?)",
+            (session_id, target_id, speaker_id, target_msg, intent, target_name, speaker_name))
+        await target_mem.store_memory(
+            f"{speaker_name} talked to you about '{topic}': \"{speaker_msg[:80]}\". "
+            f"You replied: \"{target_msg[:80]}\"",
+            memory_type="episodic", importance=0.6, emotional_tag=target_feeling,
+            source="conversation", related_npc_id=speaker_id)
+        await self.db.commit()
+
+        if broadcast_fn:
+            await broadcast_fn("agent_conversation", {
+                "session_id": session_id, "speaker": speaker_name, "target": target_name,
+                "topic": topic, "turns": [
+                    {"name": speaker_name, "message": speaker_msg, "feeling": speaker_feeling},
+                    {"name": target_name, "message": target_msg, "feeling": target_feeling}]})
+        return session_id
+
+    async def _continue_conversation(self, session_id: str, speaker_id: str,
+                                     target_id: str, broadcast_fn=None) -> bool:
+        """Continue a conversation by one more turn. False if the speaker ends it."""
+        import asyncio as _asyncio
+        from agora.execution.llm_client import dungeon_agent_think
+
+        cursor = await self.db.execute(
+            "SELECT * FROM agent_conversations WHERE session_id=? "
+            "ORDER BY turn_number DESC LIMIT 2", (session_id,))
+        turns = await cursor.fetchall()
+        if not turns:
+            return False
+        current_turn = turns[0]["turn_number"]
+        speaker_name = await self._get_npc_name(speaker_id)
+        target_name = await self._get_npc_name(target_id)
+
+        prompt = (
+            f"You are {speaker_name}, talking with {target_name} (turn {current_turn}). "
+            f"The last thing said was: \"{turns[0]['message'][:100]}\"\n"
+            f"Continue or end the conversation? "
+            f'Respond with JSON: {{"continue": true/false, "message": "..."}}'
+        )
+        cd = await _asyncio.to_thread(dungeon_agent_think, speaker_name, "conversation",
+                                      prompt, "cheap")
+        if not cd.get("continue", True):
+            return False
+        new_msg = cd.get("message") or "..."
+        await self.db.execute(
+            "INSERT INTO agent_conversations (session_id, speaker_id, target_id, message, "
+            "intent, turn_number, speaker_name, target_name) VALUES (?, ?, ?, ?, 'chat', ?, ?, ?)",
+            (session_id, speaker_id, target_id, new_msg, current_turn + 1,
+             speaker_name, target_name))
+        await self.db.commit()
+        if broadcast_fn:
+            await broadcast_fn("agent_conversation_turn", {
+                "session_id": session_id, "speaker": speaker_name, "target": target_name,
+                "message": new_msg, "turn": current_turn + 1})
+        return True
+
     # ── Collective Knowledge Pool (Phase 2.0 Layer 5) ──
     async def _contribute_to_collective(self, npc_id: str, title: str, content: str,
                                         knowledge_type: str = "observation",

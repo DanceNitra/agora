@@ -747,6 +747,21 @@ async def _brain_ecosystem_tick(app: FastAPI):
         except Exception:
             pass
 
+    # A 2-turn conversation between two agents (background; Layer 2)
+    if len(npcs) >= 2 and random.random() < 0.6:
+        async def _run_convo():
+            try:
+                a, b = random.sample(npcs, 2)
+                topics = ["the dungeon's secrets", "a new discovery",
+                          "how to improve cooperation", "ancient artifacts",
+                          "a threat in the dungeon"]
+                await agent_os._start_conversation(
+                    a["npc_id"], b["npc_id"], random.choice(topics),
+                    intent="chat", broadcast_fn=_bcast)
+            except Exception as e:
+                print(f"[BrainEcosystem] conversation error: {e}")
+        asyncio.create_task(_run_convo())
+
     # Group brainstorm — every 30 ticks (background so it never blocks the tick)
     if tick % 30 == 0 and len(npcs) >= 2:
         async def _run_brainstorm():

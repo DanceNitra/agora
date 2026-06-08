@@ -259,3 +259,28 @@ async def reflect(npc_name: str, request: Request):
     os_engine = get_os(request)
     await os_engine._propose_upgrade(npc_id)
     return {"status": "reflected", "npc": npc_name}
+
+
+@router.get("/{npc_name}/conversations")
+async def get_conversations(npc_name: str, request: Request, limit: int = 20):
+    """Get an agent's recent conversation turns (as speaker or target)."""
+    npc_id = DUNGEON_AGENT_IDS.get(npc_name) or npc_name
+    cursor = await request.app.state.db.execute(
+        "SELECT session_id, speaker_name, target_name, message, intent, turn_number, created_at "
+        "FROM agent_conversations WHERE speaker_id=? OR target_id=? "
+        "ORDER BY created_at DESC LIMIT ?", (npc_id, npc_id, limit))
+    return {"npc": npc_name, "turns": [dict(r) for r in await cursor.fetchall()]}
+
+
+@router.post("/{npc_name}/converse")
+async def start_converse(npc_name: str, request: Request):
+    """Start a conversation from this agent to another. Body: {target, topic, intent?}."""
+    body = await request.json()
+    if not body.get("target") or not body.get("topic"):
+        raise HTTPException(400, "Missing field: target and/or topic")
+    speaker_id = DUNGEON_AGENT_IDS.get(npc_name) or npc_name
+    target_id = DUNGEON_AGENT_IDS.get(body["target"]) or body["target"]
+    os_engine = get_os(request)
+    session_id = await os_engine._start_conversation(
+        speaker_id, target_id, body["topic"], intent=body.get("intent", "chat"))
+    return {"status": "started", "session_id": session_id}
