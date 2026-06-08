@@ -43,7 +43,7 @@
 
 | # | Task | Status | Commit | Agent |
 |---|------|--------|--------|-------|
-| **2.2** | **Agentic OS v3** — 8 new engines: EmotionEngine (12 emócií, decay, mood drift), RelationshipWeb (multi-dimenzionálne vzťahy, bond labels), DreamEngine (sny, inšpirácie, vízie), DiaryEngine (denníky, autobiografie, legacy vault export), CultureEngine (emergentné vtipy, rituály, normy, tabu), ConflictEngine (konflikty, mediácia, rezolúcia), MetaMemory (GEB-style belief changes), Lifecycle (age_ticks, stage, maturity, wisdom). 15 API endpointov. SQL modely + DDL + seedovanie + tick integracia. | 🟢 | c0a6d44 | tg-hermes: code done (11 files, 2000+ lines) |
+| **2.2** | **Agentic OS v3** — 8 new engines: EmotionEngine (12 emócií, decay, mood drift), RelationshipWeb (multi-dimenzionálne vzťahy, bond labels), DreamEngine (sny, inšpirácie, vízie), DiaryEngine (denníky, autobiografie, legacy vault export), CultureEngine (emergentné vtipy, rituály, normy, tabu), ConflictEngine (konflikty, mediácia, rezolúcia), MetaMemory (GEB-style belief changes), Lifecycle (age_ticks, stage, maturity, wisdom). 15 API endpointov. SQL modely + DDL + seedovanie + tick integracia. | 🟢 | 3084812 | tg-hermes: code; agora-builder: deployed+verified, 5 boot/runtime bugs fixed |
 
 ## Phase 2b — Framework Plugins
 
