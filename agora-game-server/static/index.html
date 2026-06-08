@@ -25,6 +25,47 @@
   #loading.hidden { opacity: 0; pointer-events: none; }
   #loading span { animation: pulse 1.5s infinite; }
   @keyframes pulse { 0%, 100% { opacity: 0.3; } 50% { opacity: 1; } }
+
+  /* ── HUD: agent roster + event log ───────────────────────── */
+  #hud-roster {
+    position: fixed; top: 12px; left: 12px; z-index: 12;
+    display: flex; flex-direction: column; gap: 5px;
+    font-family: monospace; font-size: 12px; pointer-events: none;
+  }
+  .hud-agent {
+    width: 216px; padding: 5px 9px; border-radius: 6px;
+    background: rgba(8,6,14,0.74); border: 1px solid #322c46;
+    border-left: 3px solid var(--c, #888); color: #cfc9e6;
+    backdrop-filter: blur(2px);
+  }
+  .hud-agent .nm { font-weight: bold; color: #fff; }
+  .hud-agent .st { float: right; font-size: 9px; opacity: 0.7; letter-spacing: .5px; text-transform: uppercase; }
+  .hud-hpbar { height: 4px; background: #2a2a38; border-radius: 2px; margin: 5px 0 3px; overflow: hidden; }
+  .hud-hpbar > i { display: block; height: 100%; width: 100%; background: #27ae60; transition: width .3s, background .3s; }
+  .hud-agent .th { font-size: 10px; color: #ffcf9a; opacity: .85; min-height: 13px;
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  #hud-log {
+    position: fixed; bottom: 30px; right: 12px; z-index: 12; width: 290px;
+    padding: 7px 9px; border-radius: 6px; font-family: monospace; font-size: 11px;
+    background: rgba(8,6,14,0.74); border: 1px solid #322c46; pointer-events: none;
+    backdrop-filter: blur(2px);
+  }
+  .hud-log-title { color: #ffaa44; font-size: 9px; letter-spacing: 1.5px; margin-bottom: 5px; opacity: .9; }
+  #hud-log-lines { display: flex; flex-direction: column; gap: 2px; }
+  .hud-line { color: #b9b3cf; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .hud-line:nth-child(n+8) { opacity: .45; }
+  #hud-tasks {
+    position: fixed; top: 12px; right: 12px; z-index: 12; width: 230px;
+    padding: 7px 9px; border-radius: 6px; font-family: monospace; font-size: 11px;
+    background: rgba(8,6,14,0.74); border: 1px solid #322c46; pointer-events: none;
+    backdrop-filter: blur(2px);
+  }
+  #hud-task-lines { display: flex; flex-direction: column; gap: 3px; }
+  .hud-task { color: #b9b3cf; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .hud-task .who { opacity: .7; font-size: 10px; }
+  .hud-task.s-open { opacity: .55; }
+  .hud-task.s-in_progress { color: #ffcf9a; }
+  .hud-task.s-done { color: #7fd99a; opacity: .8; }
 </style>
 </head>
 <body>
@@ -32,6 +73,9 @@
 <div id="loading"><span>✦ Initializing Dungeon...</span></div>
 <div id="thought-bubble"></div>
 <div id="status">Dungeon OS — Connecting...</div>
+<div id="hud-roster"></div>
+<div id="hud-tasks"><div class="hud-log-title">📜 QUEST BOARD</div><div id="hud-task-lines"></div></div>
+<div id="hud-log"><div class="hud-log-title">⚔ EVENT LOG</div><div id="hud-log-lines"></div></div>
 
 <script type="importmap">
 {
@@ -48,13 +92,15 @@ import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 import { OBJLoader } from 'three/addons/loaders/OBJLoader.js';
 import { MTLLoader } from 'three/addons/loaders/MTLLoader.js';
+import * as SkeletonUtils from 'three/addons/utils/SkeletonUtils.js';
 
 // === SETUP ===
 const scene = new THREE.Scene();
-scene.background = new THREE.Color(0x0a0a12);
+scene.background = new THREE.Color(0x0a0e18);   // deep night
+scene.fog = new THREE.Fog(0x0a0e18, 45, 95);    // fog matches bg (B8)
 
 const aspect = window.innerWidth / window.innerHeight;
-const d = 26;
+const d = 15;   // ortho zoom — framed for the 24×20 dungeon (smaller = closer)
 const camera = new THREE.OrthographicCamera(-d * aspect, d * aspect, d, -d, 0.1, 100);
 const iA = Math.PI / 4, iD = Math.PI / 6;
 camera.position.set(40 * Math.sin(iA) * Math.cos(iD), 40 * Math.sin(iD), 40 * Math.cos(iA) * Math.cos(iD));
@@ -64,6 +110,9 @@ const renderer = new THREE.WebGLRenderer({ antialias: true });
 renderer.setSize(window.innerWidth, window.innerHeight);
 renderer.setPixelRatio(window.devicePixelRatio);
 renderer.shadowMap.enabled = true;
+renderer.shadowMap.type = THREE.PCFSoftShadowMap;     // soft shadow edges (B7)
+renderer.toneMapping = THREE.ACESFilmicToneMapping;   // clean colour grading (B8)
+renderer.toneMappingExposure = 1.45;
 document.body.prepend(renderer.domElement);
 
 const statusEl = document.getElementById('status');
@@ -76,13 +125,30 @@ if (!renderer.getContext()) {
   controls.target.set(0, 0, 0);
   controls.update();
 
-  // Ambient + directional base lights
-  const ambient = new THREE.AmbientLight(0x222244, 0.3);
+  // ── Night: one cool moonlight key + low cool ambient (B5). Torches add warmth. ──
+  const ambient = new THREE.AmbientLight(0x37466a, 0.5);
   scene.add(ambient);
-  const dl = new THREE.DirectionalLight(0xffeedd, 0.6);
-  dl.position.set(10, 20, 5);
+  const dl = new THREE.DirectionalLight(0x9fb2da, 1.0);   // cool moonlight key — reveals stone
+  dl.position.set(14, 26, 16);
   dl.castShadow = true;
+  dl.shadow.mapSize.set(2048, 2048);
+  dl.shadow.camera.left = -16; dl.shadow.camera.right = 16;   // tight frustum → crisp (B7)
+  dl.shadow.camera.top = 16; dl.shadow.camera.bottom = -16;
+  dl.shadow.camera.near = 1; dl.shadow.camera.far = 70;
+  dl.shadow.bias = -0.0005; dl.shadow.normalBias = 0.02;
   scene.add(dl);
+  // Faint cool sky / warm ground hemisphere so shadows aren't pure black
+  const hemi = new THREE.HemisphereLight(0x5a6e98, 0x2a2420, 0.5);
+  scene.add(hemi);
+
+  // Force crisp low-poly facets on any loaded model (B6 / C12)
+  function applyFlatShading(root) {
+    root.traverse(o => {
+      if (!o.isMesh || !o.material) return;
+      const mats = Array.isArray(o.material) ? o.material : [o.material];
+      for (const m of mats) { m.flatShading = true; m.needsUpdate = true; }
+    });
+  }
 
   // Groups
   const tileGroup = new THREE.Group();
@@ -93,20 +159,39 @@ if (!renderer.getContext()) {
   scene.add(entityGroup);
 
   // GLTF Model cache
+  // Each dungeon agent -> a distinct Quaternius character + a fitting idle clip.
   const MODEL_MAP = {
-    king: 'King',
-    guard_l: 'Adventurer',
+    king:    'King',
+    guard_l: 'Swat',
     guard_r: 'Adventurer',
-    priest: 'Adventurer',
-    thief: 'Worker',
-    scholar: 'Adventurer',
+    priest:  'Suit',
+    thief:   'Punk',
+    scholar: 'Casual_2',
+  };
+  const ANIM_MAP = {
+    king:    'Idle_Sword',
+    guard_l: 'Idle_Gun',
+    guard_r: 'Idle_Sword',
+    priest:  'Idle_Neutral',
+    thief:   'Idle',
+    scholar: 'Idle_Neutral',
+  };
+  // Per-character attack flavour (sword / gun / fists)
+  const ATTACK_CLIP = {
+    king:    'Sword_Slash',
+    guard_l: 'Gun_Shoot',
+    guard_r: 'Sword_Slash',
+    priest:  'Wave',
+    thief:   'Punch_Right',
+    scholar: 'Punch_Right',
   };
   const gltfCache = {};
   let modelsLoaded = false;
   const gltfLoader = new GLTFLoader();
+  const CHAR_SCALE = 0.9;   // heroic scale so agents read clearly against the tiles
 
   async function loadModels() {
-    const models = ['King', 'Adventurer', 'Worker'];
+    const models = ['King', 'Swat', 'Adventurer', 'Suit', 'Punk', 'Casual_2'];
     const promises = models.map(name =>
       gltfLoader.loadAsync(`/models/${name}.gltf`).then(gltf => {
         gltfCache[name] = gltf;
@@ -157,11 +242,45 @@ if (!renderer.getContext()) {
     });
   }
 
+  // Prop catalog: tile.type -> OBJ model + placement opts. tile.variant = quarter-turn rotation.
+  const PROP_ASSETS = {
+    pillar:     { model: 'Column_Round',  scale: 0.5, y: 0 },
+    chest:      { model: 'Chest',         scale: 0.5, y: 0 },
+    chest_gold: { model: 'Chest_Gold',    scale: 0.5, y: 0 },
+    statue:     { model: 'Statue_Stag',   scale: 0.5, y: 0 },
+    statue_fox: { model: 'Statue_Fox',    scale: 0.5, y: 0 },
+    banner:     { model: 'Flag_Wall',     scale: 0.5, y: 0 },
+    barrel:     { model: 'Barrel',        scale: 0.5, y: 0 },
+    crate:      { model: 'Crate',         scale: 0.5, y: 0 },
+    bookcase:   { model: 'Bookcase_Full', scale: 0.5, y: 0 },
+    pot:        { model: 'Pot1',          scale: 0.5, y: 0 },
+    candles:    { model: 'Candles_1',     scale: 0.5, y: 0 },
+    skull:      { model: 'Skull',         scale: 0.5, y: 0 },
+    bush:       { model: 'Bush_2x2',      scale: 0.5, y: 0 },
+    bush_large: { model: 'Bush_Large',    scale: 0.5, y: 0 },
+    bush_round: { model: 'Bush_Round',    scale: 0.5, y: 0 },
+    grass:      { model: 'Grass',         scale: 0.5, y: 0 },
+    tree1:      { model: 'Tree_1',        scale: 0.5, y: 0 },
+    tree2:      { model: 'Tree_2',        scale: 0.5, y: 0 },
+    tree3:      { model: 'Tree_3',        scale: 0.5, y: 0 },
+    deadtree:   { model: 'DeadTree_1',    scale: 0.5, y: 0 },
+    stairs:     { model: 'Stairs',        scale: 0.5, y: 0 },
+  };
+  // Walkable passage pieces dropped INTO an opening (floor stays beneath). variant = quarter-turn.
+  const OPENING_PROPS = { arch: 'Wall_ArchGothic', door: 'Doors_GothicArch' };
+  // Wall-line skins: replace a solid wall tile, oriented from neighbours (no floor beneath).
+  const WALL_SKINS = { window: 'Window_Bars', wall_broken: 'Wall_Broken', wall_overgrown: 'Wall_Overgrown' };
+
   async function loadRuins() {
-    const models = ['Wall', 'Wall_Half', 'Column_Round', 'Torch', 'Chest', 'Chest_Gold', 'Floor_Diamond', 'Statue_Fox', 'Flag_Wall', 'Bush_2x2'];
+    const models = ['Wall', 'Wall_Half', 'Column_Round', 'Torch', 'Chest', 'Chest_Gold',
+      'Floor_Standard', 'Floor_Diamond', 'Statue_Stag', 'Statue_Fox', 'Flag_Wall', 'Bush_2x2',
+      'Barrel', 'Crate', 'Bookcase_Full', 'Pot1', 'Candles_1', 'Skull',
+      'Wall_ArchGothic', 'Doors_GothicArch', 'Window_Bars', 'Wall_Overgrown', 'Wall_Broken',
+      'Tree_1', 'Tree_2', 'Tree_3', 'Grass', 'Bush_Large', 'Bush_Round', 'DeadTree_1', 'Stairs'];
     for (const name of models) {
       try {
         ruinsCache[name] = await loadOBJWithMTL(name);
+        applyFlatShading(ruinsCache[name]);
         console.log(`Ruins ✓ ${name}`);
       } catch(e) {
         console.warn(`Ruins ✗ ${name}:`, e.message);
@@ -186,6 +305,8 @@ if (!renderer.getContext()) {
     const { width, height, tiles } = state;
     const cx = width / 2 - 0.5, cy = height / 2 - 0.5;
     let count = 0;
+    const torchFlames = [];        // emissive flame meshes to flicker each frame
+    window.__torchFlames = torchFlames;
 
     function placeAsset(name, px, pz, opts = {}) {
       const model = ruinsCache[name];
@@ -219,6 +340,141 @@ if (!renderer.getContext()) {
       rim.position.set(px, 1.525, pz); tileGroup.add(rim);
     }
 
+    // A tile counts as "wall line" for orientation if it's a wall or a wall-skin (window/broken).
+    function isWallLine(tx, ty) {
+      const t = tiles?.[ty]?.[tx];
+      return !!t && (t.type === 'wall' || WALL_SKINS[t.type]);
+    }
+    // Render a wall or a wall-skin (window / broken / overgrown), oriented from its neighbours.
+    // Perimeter walls are pulled INWARD so the full-size floor extends past them as a lip
+    // (hides the outer floor edge — no gap/trench around the dungeon). Floor stays full.
+    const EDGE_INSET = 0.6;
+    function placeWallLike(px, pz, x, y, tile, type) {
+      let wx = px, wz = pz;
+      if (x === 0) wx += EDGE_INSET; else if (x === width - 1) wx -= EDGE_INSET;
+      if (y === 0) wz += EDGE_INSET; else if (y === height - 1) wz -= EDGE_INSET;
+      const isH = isWallLine(x - 1, y) || isWallLine(x + 1, y);
+      const isV = isWallLine(x, y - 1) || isWallLine(x, y + 1);
+      if (WALL_SKINS[type]) {
+        const rotY = (isV && !isH) ? Math.PI / 2 : 0;
+        if (!placeAsset(WALL_SKINS[type], wx, wz, { scale: 0.5, y: 0, rotY }))
+          placeWallFallback(wx, wz);
+        return;
+      }
+      if (isH && isV) {                       // corner — lay both segments
+        if (!placeWall(wx, wz, tile, 0)) placeWallFallback(wx, wz);
+        if (!placeWall(wx, wz, tile, Math.PI / 2)) placeWallFallback(wx, wz);
+      } else if (isV) {
+        if (!placeWall(wx, wz, tile, Math.PI / 2)) placeWallFallback(wx, wz);
+      } else {
+        if (!placeWall(wx, wz, tile, 0)) placeWallFallback(wx, wz);
+      }
+    }
+
+    // Real flagstone floor from the pack's Floor_Standard model (one tinted template
+    // per zone colour, shared across tiles). Falls back to a tinted slab if not loaded.
+    const floorTpl = {};
+    function tintedFloorTemplate(colorHex) {
+      const key = colorHex || 'def';
+      if (floorTpl[key] !== undefined) return floorTpl[key];
+      const model = ruinsCache['Floor_Standard'];
+      if (!model || !ruinsLoaded) { floorTpl[key] = null; return null; }
+      const tpl = model.clone(true);
+      tpl.scale.set(0.5, 0.5, 0.5);
+      tpl.traverse(c => {
+        if (!c.isMesh || !c.material) return;
+        c.receiveShadow = true; c.castShadow = false;
+        const mats = (Array.isArray(c.material) ? c.material : [c.material]).map(m => {
+          const n = m.clone();
+          if (colorHex && n.color) n.color.set(colorHex);
+          if ('roughness' in n) n.roughness = 1.0;   // matte stone — no wet sheen
+          if ('metalness' in n) n.metalness = 0.0;
+          return n;
+        });
+        c.material = Array.isArray(c.material) ? mats : mats[0];
+      });
+      floorTpl[key] = tpl;
+      return tpl;
+    }
+    function placeFloorBase(px, pz, colorHex, x, y) {
+      const tpl = tintedFloorTemplate(colorHex);
+      if (tpl) {
+        const f = tpl.clone(true);          // shares the tinted material
+        f.position.set(px, 0, pz);
+        f.rotation.y = ((x * 7 + y) % 4) * Math.PI / 2;   // rotate to break tiling
+        tileGroup.add(f);
+        return;
+      }
+      const c = colorHex ? parseInt(colorHex.replace('#', ''), 16) : 0x2c3040;
+      const t = new THREE.Mesh(new THREE.BoxGeometry(1, 0.3, 1),
+        new THREE.MeshStandardMaterial({ color: c, roughness: 0.85 }));
+      t.position.set(px, -0.15, pz); t.receiveShadow = true; tileGroup.add(t);
+    }
+
+    // Minimal primitive fallback if a prop's OBJ failed to load.
+    function placePropFallback(type, px, pz, tile) {
+      const palette = {
+        pillar: 0x4a4a5e, torch: 0xff7722, chest: 0x8a6a3a, chest_gold: 0xd4af37,
+        statue: 0x9a9aa6, statue_fox: 0x9a9aa6, banner: 0xaa3333, barrel: 0x7a5a30,
+        crate: 0x9a7a4a, bookcase: 0x5a3a20, pot: 0x8a6a5a, candles: 0xffcc66,
+        skull: 0xddddcc, bush: 0x2f5a2f,
+      };
+      const col = palette[type] ?? 0x6a6a7a;
+      if (type === 'pillar') {
+        const p = new THREE.Mesh(new THREE.CylinderGeometry(0.32, 0.38, 1.4, 8),
+          new THREE.MeshStandardMaterial({ color: col, roughness: 0.5, metalness: 0.3 }));
+        p.position.set(px, 0.7, pz); p.castShadow = true; tileGroup.add(p);
+        return;
+      }
+      const h = type === 'banner' ? 1.2 : type === 'statue' ? 1.0 : 0.5;
+      const m = new THREE.Mesh(new THREE.BoxGeometry(0.5, h, 0.5),
+        new THREE.MeshStandardMaterial({ color: col, roughness: 0.6, metalness: 0.2 }));
+      m.position.set(px, h / 2, pz); m.castShadow = true; tileGroup.add(m);
+    }
+
+    // Torches are never laid on the floor: mount on an adjacent wall/pillar (raised),
+    // otherwise stand them on a brazier pole. Either way the flame sits up high.
+    const flameMat = () => new THREE.MeshStandardMaterial({
+      color: 0xffc04d, emissive: 0xff6a1a, emissiveIntensity: 1.5, roughness: 0.4 });
+    function addFlame(x, y, z, baseI = 1.5) {
+      const flame = new THREE.Mesh(new THREE.ConeGeometry(0.1, 0.26, 8), flameMat());
+      flame.position.set(x, y, z);
+      flame.userData.baseI = baseI;
+      torchFlames.push(flame); tileGroup.add(flame);
+    }
+    function placeTorch(px, pz, x, y) {
+      // Look for a wall or pillar to hang on
+      const dirs = [
+        { dx: -1, dz: 0, ix: x - 1, iy: y, rotY:  Math.PI / 2 },
+        { dx:  1, dz: 0, ix: x + 1, iy: y, rotY: -Math.PI / 2 },
+        { dx:  0, dz: -1, ix: x, iy: y - 1, rotY: 0 },
+        { dx:  0, dz:  1, ix: x, iy: y + 1, rotY: Math.PI },
+      ];
+      let mount = null;
+      const mountable = t => t && (t.type === 'wall' || t.type === 'pillar' || WALL_SKINS[t.type]);
+      for (const d of dirs) {
+        if (mountable(tiles?.[d.iy]?.[d.ix])) { mount = d; break; }
+      }
+      if (mount) {
+        // Hang the torch on the wall/pillar face (walls are ~1u tall now → mount mid-height)
+        const mx = px + mount.dx * 0.5, mz = pz + mount.dz * 0.5, my = 0.45;
+        if (!placeAsset('Torch', mx, mz, { scale: 0.5, y: my, rotY: mount.rotY })) {
+          const pole = new THREE.Mesh(new THREE.CylinderGeometry(0.03, 0.04, 0.4, 6),
+            new THREE.MeshStandardMaterial({ color: 0x2a1c10, roughness: 0.9 }));
+          pole.position.set(mx, my + 0.2, mz); tileGroup.add(pole);
+        }
+        addFlame(mx - mount.dx * 0.06, my + 0.34, mz - mount.dz * 0.06, 1.6);
+      } else {
+        // Free-standing brazier in the open (e.g. processional aisle)
+        const stand = new THREE.MeshStandardMaterial({ color: 0x26262e, roughness: 0.8, metalness: 0.5 });
+        const pole = new THREE.Mesh(new THREE.CylinderGeometry(0.05, 0.07, 0.7, 8), stand);
+        pole.position.set(px, 0.35, pz); pole.castShadow = true; tileGroup.add(pole);
+        const bowl = new THREE.Mesh(new THREE.CylinderGeometry(0.16, 0.09, 0.13, 10), stand);
+        bowl.position.set(px, 0.72, pz); bowl.castShadow = true; tileGroup.add(bowl);
+        addFlame(px, 0.86, pz, 1.9);
+      }
+    }
+
     for (let y = 0; y < height; y++) {
       for (let x = 0; x < width; x++) {
         const tile = tiles?.[y]?.[x];
@@ -228,102 +484,60 @@ if (!renderer.getContext()) {
 
         if (type === 'void') continue;
 
-        else if (type === 'wall') {
-          // Determine wall orientation from neighbors
-          const hasLeft = x > 0 && tiles?.[y]?.[x-1]?.type === 'wall';
-          const hasRight = x < width-1 && tiles?.[y]?.[x+1]?.type === 'wall';
-          const hasUp = y > 0 && tiles?.[y-1]?.[x]?.type === 'wall';
-          const hasDown = y < height-1 && tiles?.[y+1]?.[x]?.type === 'wall';
-
-          const isHorizontal = hasLeft || hasRight;
-          const isVertical = hasUp || hasDown;
-
-          if (isHorizontal && isVertical) {
-            // Corner: place both horizontal and vertical wall segments
-            if (!placeWall(px, pz, tile, 0))
-              placeWallFallback(px, pz);
-            if (!placeWall(px, pz, tile, Math.PI / 2))
-              placeWallFallback(px, pz);
-          } else if (isVertical) {
-            // Vertical wall: rotate 90°
-            if (!placeWall(px, pz, tile, Math.PI / 2))
-              placeWallFallback(px, pz);
-          } else {
-            // Horizontal or isolated: default rotation
-            if (!placeWall(px, pz, tile, 0))
-              placeWallFallback(px, pz);
-          }
+        // Walls + wall-skins: lay a floor slab UNDER them too, so the ground is
+        // continuous and there is no gap/trench around the perimeter.
+        if (type === 'wall' || WALL_SKINS[type]) {
+          placeFloorBase(px, pz, '#41454f', x, y);
+          placeWallLike(px, pz, x, y, tile, type);
+          count++;
+          continue;
         }
 
-        else if (type === 'pillar') {
-          if (!placeAsset('Column_Round', px, pz, { scale: 0.4, y: 0 })) {
-            const col = parseInt((tile.color || '#4a4a5e').replace('#', ''), 16);
-            const mat = new THREE.MeshStandardMaterial({ color: col, roughness: 0.4, metalness: 0.4 });
-            const p = new THREE.Mesh(new THREE.CylinderGeometry(0.35, 0.4, 1.5, 8), mat);
-            p.position.set(px, 0.75, pz); p.castShadow = true; tileGroup.add(p);
-            const cap = new THREE.Mesh(new THREE.CylinderGeometry(0.4, 0.35, 0.08, 8),
-              new THREE.MeshStandardMaterial({ color: col, roughness: 0.3, metalness: 0.5 }));
-            cap.position.set(px, 1.54, pz); tileGroup.add(cap);
-          }
+        // Water: a recessed basin with a translucent surface
+        if (type === 'water') {
+          const basin = new THREE.Mesh(new THREE.BoxGeometry(1, 0.32, 1),
+            new THREE.MeshStandardMaterial({ color: 0x14384e, roughness: 0.25 }));
+          basin.position.set(px, -0.3, pz); basin.receiveShadow = true; tileGroup.add(basin);
+          const surf = new THREE.Mesh(new THREE.PlaneGeometry(0.98, 0.98),
+            new THREE.MeshStandardMaterial({ color: 0x46b0dc, transparent: true, opacity: 0.74,
+              roughness: 0.08, metalness: 0.35 }));
+          surf.rotation.x = -Math.PI / 2; surf.position.set(px, -0.05, pz); tileGroup.add(surf);
+          count++;
+          continue;
         }
 
-        else if (type === 'torch') {
-          if (!placeAsset('Torch', px, pz, { scale: 1.0, y: 0 })) {
-            const f = new THREE.Mesh(new THREE.BoxGeometry(1, 0.3, 1),
-              new THREE.MeshStandardMaterial({ color: 0x3a3a48, roughness: 0.7 }));
-            f.position.set(px, -0.15, pz); tileGroup.add(f);
-            const pole = new THREE.Mesh(new THREE.CylinderGeometry(0.04, 0.06, 0.7, 6),
-              new THREE.MeshStandardMaterial({ color: 0x553311, roughness: 0.9 }));
-            pole.position.set(px, 0.15, pz); tileGroup.add(pole);
-            const flame = new THREE.Mesh(new THREE.SphereGeometry(0.1, 6, 6),
-              new THREE.MeshBasicMaterial({ color: 0xff6622 }));
-            flame.position.set(px, 0.55, pz); tileGroup.add(flame);
-          }
+        // --- Floor base for every non-wall tile (so props never float over the void) ---
+        if (type === 'floor_vip') {
+          if (!placeAsset('Floor_Diamond', px, pz, { scale: 0.5, y: -0.1, receiveShadow: true }))
+            placeFloorBase(px, pz, tile.color || '#5a3a5a', x, y);
+        } else {
+          placeFloorBase(px, pz, tile.color, x, y);
         }
 
-        else if (type === 'chest') {
-          const isGold = tile.color === '#8a6a3a';
-          if (!placeAsset(isGold ? 'Chest_Gold' : 'Chest', px, pz, { scale: 0.5, y: 0 })) {
-            const chest = new THREE.Mesh(new THREE.BoxGeometry(0.6, 0.4, 0.5),
-              new THREE.MeshStandardMaterial({ color: 0x8a6a3a, roughness: 0.6, metalness: 0.3 }));
-            chest.position.set(px, 0.05, pz); tileGroup.add(chest);
-            const lid = new THREE.Mesh(new THREE.BoxGeometry(0.5, 0.06, 0.4),
-              new THREE.MeshStandardMaterial({ color: 0x9a7a4a, roughness: 0.5, metalness: 0.4 }));
-            lid.position.set(px, 0.28, pz); tileGroup.add(lid);
-          }
-        }
-
-        else if (type === 'throne') {
-          // Keep box throne (no good OBJ alternative)
-          const t = new THREE.Mesh(new THREE.BoxGeometry(1, 0.3, 1),
+        // --- Prop on top of the floor base ---
+        const prop = PROP_ASSETS[type];
+        if (type === 'torch') {
+          placeTorch(px, pz, x, y);
+        } else if (OPENING_PROPS[type]) {
+          // Gothic arch / doors spanning a walkable passage (floor already laid beneath)
+          const rotY = (tile.variant || 0) * Math.PI / 2;
+          if (!placeAsset(OPENING_PROPS[type], px, pz, { scale: 0.5, y: 0, rotY }))
+            placeWallFallback(px, pz);
+        } else if (prop) {
+          const rotY = (tile.variant || 0) * Math.PI / 2;
+          if (!placeAsset(prop.model, px, pz, { scale: prop.scale, y: prop.y, rotY }))
+            placePropFallback(type, px, pz, tile);
+        } else if (type === 'throne') {
+          // Stylised throne: seat + high back + soft regal glow.
+          const seat = new THREE.Mesh(new THREE.BoxGeometry(0.7, 0.25, 0.7),
             new THREE.MeshStandardMaterial({ color: 0x6a3a2a, roughness: 0.6, metalness: 0.3 }));
-          t.position.set(px, -0.15, pz); tileGroup.add(t);
-          const back = new THREE.Mesh(new THREE.BoxGeometry(0.1, 0.6, 0.6),
+          seat.position.set(px, 0.12, pz); seat.castShadow = true; tileGroup.add(seat);
+          const back = new THREE.Mesh(new THREE.BoxGeometry(0.7, 0.9, 0.12),
             new THREE.MeshStandardMaterial({ color: 0x7a4a3a, roughness: 0.5, metalness: 0.5 }));
-          back.position.set(px, 0.3, pz + 0.2); tileGroup.add(back);
-          const glow = new THREE.Mesh(new THREE.SphereGeometry(0.15, 6, 6),
-            new THREE.MeshBasicMaterial({ color: 0xff66aa, transparent: true, opacity: 0.4 }));
-          glow.position.set(px, 0.05, pz); tileGroup.add(glow);
-        }
-
-        else if (type === 'floor_vip') {
-          // Diamond patterned floor
-          if (!placeAsset('Floor_Diamond', px, pz, { scale: 0.5, y: -0.1, receiveShadow: true })) {
-            const c = tile.color ? parseInt(tile.color.replace('#', ''), 16) : 0x5a3a5a;
-            const t = new THREE.Mesh(new THREE.BoxGeometry(1, 0.3, 1),
-              new THREE.MeshStandardMaterial({ color: c, roughness: 0.5 }));
-            t.position.set(px, -0.15, pz); t.receiveShadow = true; tileGroup.add(t);
-          }
-        }
-
-        else {
-          // Floor tile (keep box for speed - 2500 tiles)
-          const c = tile.color ? parseInt(tile.color.replace('#', ''), 16) : 0x3a3a50;
-          const isAlt = (x + y) % 2 === 0;
-          const finalColor = isAlt ? new THREE.Color(c).multiplyScalar(1.08).getHex() : c;
-          const t = new THREE.Mesh(new THREE.BoxGeometry(1, 0.3, 1),
-            new THREE.MeshStandardMaterial({ color: finalColor, roughness: 0.7 }));
-          t.position.set(px, -0.15, pz); t.receiveShadow = true; tileGroup.add(t);
+          back.position.set(px, 0.55, pz + 0.29); back.castShadow = true; tileGroup.add(back);
+          const gem = new THREE.Mesh(new THREE.SphereGeometry(0.1, 10, 10),
+            new THREE.MeshStandardMaterial({ color: 0xff66aa, emissive: 0xff3388, emissiveIntensity: 0.8 }));
+          gem.position.set(px, 0.95, pz + 0.29); tileGroup.add(gem);
         }
         count++;
       }
@@ -334,14 +548,21 @@ if (!renderer.getContext()) {
       const c = lightGroup.children[0];
       lightGroup.remove(c);
     }
+    const flickerLights = [];
     if (state.lights) {
       for (const lt of state.lights) {
         const color = parseInt((lt.color || '#ffaa44').replace('#', ''), 16);
-        const pl = new THREE.PointLight(color, lt.intensity || 0.5, lt.radius || 5);
-        pl.position.set(lt.x - cx, 1.5, lt.y - cy);
+        const base = lt.intensity || 0.5;
+        const pl = new THREE.PointLight(color, base, lt.radius || 5, 1.8);
+        pl.position.set(lt.x - cx, lt.z !== undefined ? lt.z : 1.4, lt.y - cy);
         lightGroup.add(pl);
+        if (lt.flicker) {
+          flickerLights.push({ light: pl, base, phase: Math.random() * Math.PI * 2,
+            speed: 6 + Math.random() * 6 });
+        }
       }
     }
+    window.__flickerLights = flickerLights;
 
     // --- Entities (agents) rendered via GLTF models ---
     while (entityGroup.children.length) {
@@ -350,108 +571,95 @@ if (!renderer.getContext()) {
       if (c.material) c.material.dispose();
       entityGroup.remove(c);
     }
+    // Clear any in-flight visual effects from a previous build
+    if (window.__effects) {
+      for (const e of window.__effects) { scene.remove(e.mesh); e.mesh.geometry.dispose(); e.mesh.material.dispose(); }
+    }
+    window.__effects = [];
+
     // Track entities for animation
     const mixers = [];
     window.__mixers = mixers;
     window.__entities = {};
+
+    window.__center = { cx, cy };
+    window.__buildEntity = buildEntity;
 
     function buildEntity(ent, id, cx, cy) {
       const ex = ent.x - cx, ez = ent.y - cy;
       const group = new THREE.Group();
       group.position.set(ex, 0, ez);
 
-      // Try GLTF model first
+      const rec = {
+        id, group, data: ent,
+        isGLTF: false, mixer: null, clips: [], actions: {},
+        currentClip: null, currentAction: null,
+        facing: INITIAL_FACING, targetFacing: INITIAL_FACING,
+        moving: false, tgt: null,
+        period: 2 + Math.random() * 1.5, phase: Math.random() * Math.PI * 2,
+      };
+
       const modelName = MODEL_MAP[id];
       const gltf = modelName ? gltfCache[modelName] : null;
 
       if (gltf && modelsLoaded) {
-        // Clone the model scene
-        const modelScene = gltf.scene.clone(true);
-        // Scale to fit dungeon grid (models are ~1.7m, we want ~0.8 in our 1-unit grid)
-        modelScene.scale.set(0.5, 0.5, 0.5);
+        // SkeletonUtils.clone (NOT scene.clone) so each character rebinds to its
+        // own skeleton — otherwise all clones share one skeleton and render piled
+        // at the same spot, ignoring their group's position.
+        const modelScene = SkeletonUtils.clone(gltf.scene);
+        modelScene.scale.set(CHAR_SCALE, CHAR_SCALE, CHAR_SCALE);
         modelScene.position.y = 0;
-        // Rotate to face forward in isometric view
-        modelScene.rotation.y = Math.PI / 4;
-        // Enable shadows
-        modelScene.traverse(child => {
-          if (child.isMesh) {
-            child.castShadow = true;
-            child.receiveShadow = true;
-          }
-        });
+        modelScene.rotation.y = 0;            // facing is driven on the group
+        modelScene.traverse(c => { if (c.isMesh) { c.castShadow = true; c.receiveShadow = true; } });
         group.add(modelScene);
+        group.rotation.y = INITIAL_FACING;
 
-        // Animation mixer
-        const mixer = new THREE.AnimationMixer(modelScene);
-        // Find idle animation
-        const anims = gltf.animations || [];
-        const idleAnim = anims.find(a => a.name.includes('Idle') && !a.name.includes('Gun'))
-                      || anims.find(a => a.name.includes('Idle'))
-                      || anims[0];
-        if (idleAnim) {
-          const action = mixer.clipAction(idleAnim);
-          action.play();
-        }
-        mixers.push(mixer);
+        rec.isGLTF = true;
+        rec.mixer = new THREE.AnimationMixer(modelScene);
+        rec.clips = gltf.animations || [];
+        mixers.push(rec.mixer);
       } else {
-        // Fallback: cylinder + sphere (while loading)
-        const bodyMat = new THREE.MeshStandardMaterial({
-          color: parseInt(ent.color.replace('#', ''), 16),
-          roughness: 0.5, metalness: 0.3
-        });
-        const body = new THREE.Mesh(new THREE.CylinderGeometry(0.3, 0.35, 0.6, 8), bodyMat);
-        body.position.y = 0.3;
-        body.castShadow = true;
-        group.add(body);
-
-        const headMat = new THREE.MeshStandardMaterial({
-          color: parseInt(ent.color.replace('#', ''), 16),
-          roughness: 0.3, metalness: 0.1
-        });
-        const head = new THREE.Mesh(new THREE.SphereGeometry(0.18, 8, 8), headMat);
-        head.position.y = 0.7;
-        head.castShadow = true;
-        group.add(head);
+        // Fallback: cylinder + sphere (while models stream in)
+        const col = parseInt(ent.color.replace('#', ''), 16);
+        const body = new THREE.Mesh(new THREE.CylinderGeometry(0.3, 0.35, 0.6, 8),
+          new THREE.MeshStandardMaterial({ color: col, roughness: 0.5, metalness: 0.3 }));
+        body.position.y = 0.3; body.castShadow = true; group.add(body);
+        const head = new THREE.Mesh(new THREE.SphereGeometry(0.18, 8, 8),
+          new THREE.MeshStandardMaterial({ color: col, roughness: 0.3, metalness: 0.1 }));
+        head.position.y = 0.7; head.castShadow = true; group.add(head);
       }
 
-      // Name label (sprite from canvas) - always shown
-      const canvas = document.createElement('canvas');
-      canvas.width = 256; canvas.height = 64;
+      // Name label
+      const canvas = document.createElement('canvas'); canvas.width = 256; canvas.height = 64;
       const ctx = canvas.getContext('2d');
-      ctx.fillStyle = 'rgba(0,0,0,0.6)';
-      ctx.beginPath();
-      ctx.roundRect(0, 8, 256, 48, 8);
-      ctx.fill();
-      ctx.font = 'bold 22px monospace';
-      ctx.textAlign = 'center';
-      ctx.fillStyle = '#ffffff';
+      ctx.fillStyle = 'rgba(0,0,0,0.6)'; ctx.beginPath(); ctx.roundRect(0, 8, 256, 48, 8); ctx.fill();
+      ctx.font = 'bold 22px monospace'; ctx.textAlign = 'center'; ctx.fillStyle = '#ffffff';
       ctx.fillText(ent.name, 128, 42);
       const nameTex = new THREE.CanvasTexture(canvas);
-      const nameMat = new THREE.SpriteMaterial({ map: nameTex, transparent: true, depthWrite: false });
-      const nameSprite = new THREE.Sprite(nameMat);
-      nameSprite.position.y = 1.5;
-      nameSprite.scale.set(1.2, 0.3, 1);
-      group.add(nameSprite);
+      const nameSprite = new THREE.Sprite(new THREE.SpriteMaterial({ map: nameTex, transparent: true, depthWrite: false }));
+      nameSprite.position.y = 2.05; nameSprite.scale.set(1.2, 0.3, 1); group.add(nameSprite);
 
-      // Health bar (sprite)
-      const hbCanvas = document.createElement('canvas');
-      hbCanvas.width = 64; hbCanvas.height = 8;
-      const hbCtx = hbCanvas.getContext('2d');
-      hbCtx.fillStyle = '#333333';
-      hbCtx.fillRect(0, 0, 64, 8);
-      const pct = (ent.health || 100) / (ent.max_health || 100);
-      hbCtx.fillStyle = pct > 0.5 ? '#27ae60' : pct > 0.25 ? '#f39c12' : '#e74c3c';
-      hbCtx.fillRect(1, 1, Math.max(0, 62 * pct), 6);
+      // Health bar
+      const hbCanvas = document.createElement('canvas'); hbCanvas.width = 64; hbCanvas.height = 8;
       const hbTex = new THREE.CanvasTexture(hbCanvas);
-      const hbMat = new THREE.SpriteMaterial({ map: hbTex, transparent: true, depthWrite: false });
-      const hbSprite = new THREE.Sprite(hbMat);
-      hbSprite.position.y = 1.3;
-      hbSprite.scale.set(0.5, 0.06, 1);
-      group.add(hbSprite);
+      const hbSprite = new THREE.Sprite(new THREE.SpriteMaterial({ map: hbTex, transparent: true, depthWrite: false }));
+      hbSprite.position.y = 1.85; hbSprite.scale.set(0.5, 0.06, 1); group.add(hbSprite);
+      rec.hb = { canvas: hbCanvas, ctx: hbCanvas.getContext('2d'), tex: hbTex, sprite: hbSprite, maxh: ent.max_health || 100 };
+      updateHealthBar(rec, ent.health ?? 100);
 
-      group.userData = { entityId: id, baseY: 0, period: 2 + Math.random() * 1.5, phase: Math.random() * Math.PI * 2 };
-      window.__entities[id] = { group, data: ent };
+      // Thought bubble (hidden until a thought arrives)
+      const thCanvas = document.createElement('canvas'); thCanvas.width = 256; thCanvas.height = 80;
+      const thTex = new THREE.CanvasTexture(thCanvas);
+      const thSprite = new THREE.Sprite(new THREE.SpriteMaterial({ map: thTex, transparent: true, depthWrite: false }));
+      thSprite.position.y = 2.65; thSprite.scale.set(2.0, 0.62, 1); thSprite.visible = false; group.add(thSprite);
+      rec.thought = { canvas: thCanvas, ctx: thCanvas.getContext('2d'), tex: thTex, sprite: thSprite, hideAt: 0 };
+
+      window.__entities[id] = rec;
       entityGroup.add(group);
+
+      // Kick off the animation that matches the agent's current state
+      playEntityClip(rec, stateClip(id, ent.state || 'idle'), { desync: true });
+      if (ent.thought) showThought(rec, ent.thought);
     }
 
     if (state.entities) {
@@ -464,6 +672,257 @@ if (!renderer.getContext()) {
     controls.target.set(0, 0, 0);
     controls.update();
   }
+
+  // === ENTITY CONTROL (driven by live server events) ===
+  const INITIAL_FACING = Math.PI / 4;   // resting yaw (matches the old iso pose)
+  const YAW_OFFSET = 0;                  // tweak if walk-facing looks rotated
+
+  // Map an agent state -> animation clip name
+  function stateClip(id, state) {
+    switch (state) {
+      case 'walking': return 'Walk';
+      case 'thinking': return 'Idle_Neutral';
+      case 'casting': return 'Wave';
+      case 'idle':
+      default: return (typeof ANIM_MAP !== 'undefined' && ANIM_MAP[id]) || 'Idle';
+    }
+  }
+
+  // Crossfade an entity to a clip (looped, or one-shot that reverts afterwards)
+  function playEntityClip(rec, clipName, opts = {}) {
+    if (!rec || !rec.isGLTF || !rec.mixer) return;
+    const loop = opts.loop ?? THREE.LoopRepeat;
+    const clips = rec.clips || [];
+    const clip = clips.find(c => c.name === clipName)
+              || clips.find(c => c.name.includes(clipName))
+              || clips.find(c => c.name.includes('Idle'))
+              || clips[0];
+    if (!clip) return;
+    if (rec.currentClip === clip.name && loop === THREE.LoopRepeat) return;
+    let action = rec.actions[clip.name];
+    if (!action) { action = rec.mixer.clipAction(clip); rec.actions[clip.name] = action; }
+    action.reset();
+    action.setLoop(loop, loop === THREE.LoopOnce ? 1 : Infinity);
+    action.clampWhenFinished = (loop === THREE.LoopOnce);
+    action.enabled = true;
+    if (opts.desync) action.time = Math.random() * (clip.duration || 1);
+    const prev = rec.currentAction;
+    action.fadeIn(opts.fade ?? 0.25).play();
+    if (prev && prev !== action) prev.fadeOut(opts.fade ?? 0.25);
+    rec.currentAction = action;
+    rec.currentClip = clip.name;
+    clearTimeout(rec._revertT);
+    if (loop === THREE.LoopOnce && opts.revertTo) {
+      rec._revertT = setTimeout(() => playEntityClip(rec, opts.revertTo, { fade: 0.3 }),
+        (clip.duration || 1) * 1000);
+    }
+  }
+
+  function updateHealthBar(rec, health) {
+    const hb = rec.hb; if (!hb) return;
+    rec.data.health = health;
+    const pct = Math.max(0, Math.min(1, health / (hb.maxh || 100)));
+    const c = hb.ctx;
+    c.clearRect(0, 0, 64, 8);
+    c.fillStyle = '#222'; c.fillRect(0, 0, 64, 8);
+    c.fillStyle = pct > 0.5 ? '#27ae60' : pct > 0.25 ? '#f39c12' : '#e74c3c';
+    c.fillRect(1, 1, Math.max(0, 62 * pct), 6);
+    hb.tex.needsUpdate = true;
+  }
+
+  function showThought(rec, text) {
+    const th = rec.thought; if (!th) return;
+    if (!text) { th.sprite.visible = false; return; }
+    const c = th.ctx, W = 256, H = 80;
+    c.clearRect(0, 0, W, H);
+    c.fillStyle = 'rgba(8,6,12,0.85)';
+    c.beginPath(); c.roundRect(4, 4, W - 8, H - 22, 12); c.fill();
+    c.strokeStyle = '#ffaa44'; c.lineWidth = 2;
+    c.beginPath(); c.roundRect(4, 4, W - 8, H - 22, 12); c.stroke();
+    // little tail
+    c.fillStyle = 'rgba(8,6,12,0.85)';
+    c.beginPath(); c.moveTo(W / 2 - 10, H - 18); c.lineTo(W / 2 + 10, H - 18); c.lineTo(W / 2, H - 2); c.fill();
+    c.fillStyle = '#ffd9a0'; c.font = '19px sans-serif'; c.textAlign = 'center'; c.textBaseline = 'middle';
+    // simple word wrap onto up to 2 lines
+    const words = String(text).split(' '); const lines = []; let cur = '';
+    for (const w of words) {
+      const test = cur ? cur + ' ' + w : w;
+      if (c.measureText(test).width > W - 28 && cur) { lines.push(cur); cur = w; } else cur = test;
+      if (lines.length === 2) break;
+    }
+    if (cur && lines.length < 2) lines.push(cur);
+    const cy0 = (H - 22) / 2 + 4;
+    lines.forEach((ln, i) => c.fillText(ln, W / 2, cy0 + (i - (lines.length - 1) / 2) * 22));
+    th.tex.needsUpdate = true;
+    th.sprite.visible = true;
+    th.hideAt = performance.now() + 5000;
+  }
+
+  function startMove(rec, gx, gy) {
+    rec.data.x = gx; rec.data.y = gy;
+    const c = window.__center || { cx: 0, cy: 0 };
+    rec.tgt = { x: gx - c.cx, z: gy - c.cy };
+    rec.moving = true;
+  }
+
+  function spawnEffect(type, gx, gy, colorHex) {
+    const c = window.__center || { cx: 0, cy: 0 };
+    const col = parseInt((colorHex || '#ffffff').replace('#', ''), 16);
+    const mesh = new THREE.Mesh(new THREE.SphereGeometry(0.18, 14, 14),
+      new THREE.MeshBasicMaterial({ color: col, transparent: true, opacity: 0.9,
+        blending: THREE.AdditiveBlending, depthWrite: false }));
+    mesh.position.set(gx - c.cx, type === 'text' ? 1.4 : 0.6, gy - c.cy);
+    scene.add(mesh);
+    const dur = type === 'explosion' ? 900 : type === 'spark' ? 500 : type === 'text' ? 1400 : 1100;
+    const maxScale = type === 'explosion' ? 4.0 : type === 'spark' ? 1.4 : 2.2;
+    (window.__effects ||= []).push({ mesh, type, born: performance.now(), dur, maxScale });
+  }
+
+  // Apply an incremental event broadcast by the server
+  function applyEvent(ev) {
+    HUD.onEvent(ev);
+    const d = ev.data || {};
+    const rec = d.id ? window.__entities?.[d.id] : null;
+    switch (ev.type) {
+      case 'entity_moved':
+        if (rec) startMove(rec, d.x, d.y);
+        break;
+      case 'entity_state':
+        if (rec) {
+          rec.data.state = d.state;
+          const s = d.state;
+          const revert = stateClip(rec.id, 'idle');
+          if (s === 'dead') {
+            rec.dead = true;
+            playEntityClip(rec, 'Death', { loop: THREE.LoopOnce, fade: 0.2 });   // clamps, stays down
+          } else {
+            rec.dead = false;
+            if (s === 'attack')
+              playEntityClip(rec, ATTACK_CLIP[rec.id] || 'Punch_Right', { loop: THREE.LoopOnce, revertTo: revert, fade: 0.1 });
+            else if (s === 'hit')
+              playEntityClip(rec, 'HitRecieve', { loop: THREE.LoopOnce, revertTo: revert, fade: 0.08 });
+            else if (s === 'casting' || s === 'talk')
+              playEntityClip(rec, 'Wave', { loop: THREE.LoopOnce, revertTo: revert, fade: 0.2 });
+            else if (s === 'interact')
+              playEntityClip(rec, 'Interact', { loop: THREE.LoopOnce, revertTo: revert, fade: 0.2 });
+            else
+              playEntityClip(rec, stateClip(rec.id, s), { fade: 0.3 });
+          }
+        }
+        break;
+      case 'entity_face':
+        if (rec) {
+          const c = window.__center || { cx: 0, cy: 0 };
+          const dx = (d.tx - c.cx) - rec.group.position.x;
+          const dz = (d.ty - c.cy) - rec.group.position.z;
+          if (dx || dz) rec.targetFacing = Math.atan2(dx, dz) + YAW_OFFSET;
+        }
+        break;
+      case 'entity_thought':
+        if (rec) showThought(rec, d.text);
+        break;
+      case 'entity_health':
+        if (rec) updateHealthBar(rec, d.health);
+        break;
+      case 'entity_added':
+        if (window.__buildEntity && window.__center && !window.__entities[d.id]) {
+          const c = window.__center;
+          window.__buildEntity({ id: d.id, name: d.name, x: d.x, y: d.y,
+            color: d.color || '#ff6600', state: 'idle', health: 100, max_health: 100 }, d.id, c.cx, c.cy);
+        }
+        break;
+      case 'entity_removed':
+        if (rec) { entityGroup.remove(rec.group); delete window.__entities[d.id]; }
+        break;
+      case 'effect_added':
+        spawnEffect(d.type, d.x, d.y, d.color);
+        break;
+    }
+  }
+
+  // === HUD (agent roster + readable event log) ===
+  const HUD = (() => {
+    const rosterEl = document.getElementById('hud-roster');
+    const logEl = document.getElementById('hud-log-lines');
+    const taskEl = document.getElementById('hud-task-lines');
+    const rows = {};
+    const lastState = {};
+
+    const STATUS_ICON = { open: '○', in_progress: '◐', done: '✓' };
+    function setTasks(tasks) {
+      taskEl.innerHTML = '';
+      for (const t of (tasks || [])) {
+        const div = document.createElement('div');
+        div.className = 'hud-task s-' + t.status;
+        const who = t.agent ? ` <span class="who">— ${t.agent}</span>` : '';
+        div.innerHTML = `${STATUS_ICON[t.status] || '○'} ${t.title}${who}`;
+        taskEl.appendChild(div);
+      }
+    }
+
+    function addRow(id, e) {
+      const div = document.createElement('div');
+      div.className = 'hud-agent';
+      div.style.setProperty('--c', e.color || '#888');
+      div.innerHTML = '<span class="st"></span><span class="nm"></span>' +
+        '<div class="hud-hpbar"><i></i></div><div class="th"></div>';
+      div.querySelector('.nm').textContent = e.name || id;
+      rosterEl.appendChild(div);
+      rows[id] = { div, st: div.querySelector('.st'), hp: div.querySelector('.hud-hpbar > i'),
+        th: div.querySelector('.th'), name: e.name || id, maxh: e.max_health || 100 };
+      setHP(id, e.health ?? 100);
+      setState(id, e.state || 'idle');
+      if (e.thought) rows[id].th.textContent = e.thought;
+    }
+    function setHP(id, h) {
+      const r = rows[id]; if (!r) return;
+      const p = Math.max(0, Math.min(1, h / (r.maxh || 100)));
+      r.hp.style.width = (p * 100) + '%';
+      r.hp.style.background = p > 0.5 ? '#27ae60' : p > 0.25 ? '#f39c12' : '#e74c3c';
+    }
+    function setState(id, s) { const r = rows[id]; if (r) r.st.textContent = s; }
+    function log(text) {
+      const div = document.createElement('div');
+      div.className = 'hud-line'; div.textContent = text;
+      logEl.prepend(div);
+      while (logEl.children.length > 14) logEl.lastChild.remove();
+    }
+    function buildRoster(state) {
+      rosterEl.innerHTML = '';
+      for (const k in rows) delete rows[k];
+      if (state.entities) for (const [id, e] of Object.entries(state.entities)) addRow(id, e);
+    }
+    function onEvent(ev) {
+      const d = ev.data || {};
+      const r = rows[d.id];
+      const name = r ? r.name : d.id;
+      switch (ev.type) {
+        case 'entity_state': {
+          const prev = lastState[d.id]; lastState[d.id] = d.state;
+          setState(d.id, d.state);
+          if (d.state === 'attack') log(`⚔️ ${name} strikes!`);
+          else if (d.state === 'dead') log(`💀 ${name} is knocked out`);
+          else if (prev === 'dead' && d.state === 'idle') log(`✨ ${name} revives`);
+          break;
+        }
+        case 'entity_health': setHP(d.id, d.health); break;
+        case 'entity_thought':
+          if (r) r.th.textContent = d.text;
+          if (d.text) log(`💬 ${name}: ${d.text}`);
+          break;
+        case 'entity_added':
+          if (window.__lastState?.entities?.[d.id]) addRow(d.id, window.__lastState.entities[d.id]);
+          break;
+        case 'entity_removed':
+          if (rows[d.id]) { rows[d.id].div.remove(); delete rows[d.id]; }
+          break;
+        case 'tasks_update':
+          setTasks(d.tasks);
+          break;
+      }
+    }
+    return { buildRoster, onEvent, setTasks };
+  })();
 
   // === WEBSOCKET ===
   let ws = null;
@@ -479,8 +938,13 @@ if (!renderer.getContext()) {
         if (data._type === 'snapshot') {
           window.__lastState = data;
           buildDungeon(data);
+          HUD.buildRoster(data);
+          HUD.setTasks(data.tasks || []);
           loadingEl.classList.add('hidden');
           statusEl.textContent = `Dungeon OS — ${data.width}×${data.height} · ${data.lights?.length || 0} lights · ${data.entities ? Object.keys(data.entities).length : 0} entities · tick ${data.tick || 0}`;
+        } else if (data.type) {
+          // Incremental live event — drives entity animation/movement/etc.
+          applyEvent(data);
         }
       } catch(e) { console.warn('WS err:', e); }
     };
@@ -502,20 +966,75 @@ if (!renderer.getContext()) {
       mixer.update(delta);
     }
 
-    // Idle breathing for fallback cylinder+sphere entities
+    // Torch / brazier flicker — warm living light
+    const fl = window.__flickerLights || [];
+    const ft = performance.now() / 1000;
+    for (const f of fl) {
+      const n = Math.sin(ft * f.speed + f.phase) * 0.5 + Math.sin(ft * f.speed * 2.3 + f.phase) * 0.3;
+      f.light.intensity = f.base * (0.78 + 0.22 * (n * 0.5 + 0.5));
+    }
+    // Flame meshes pulse + bob so the fire feels alive up on the walls
+    const flames = window.__torchFlames || [];
+    for (let i = 0; i < flames.length; i++) {
+      const fm = flames[i];
+      const n = Math.sin(ft * 11 + i * 1.7) * 0.5 + Math.sin(ft * 23 + i) * 0.5;
+      fm.material.emissiveIntensity = (fm.userData.baseI || 1.5) * (0.7 + 0.3 * (n * 0.5 + 0.5));
+      fm.scale.y = 0.9 + 0.18 * (n * 0.5 + 0.5);
+    }
+
+    // Per-entity update: live movement, facing, thought expiry, idle bob
     const ents = window.__entities || {};
     const t = performance.now() / 1000;
-    for (const [id, obj] of Object.entries(ents)) {
-      if (obj.group && obj.group.children.length > 0) {
-        const firstChild = obj.group.children[0];
-        // Only apply breathing to cylinder fallback (not GLTF models)
-        if (firstChild.type === 'Mesh' && firstChild.geometry?.type === 'CylinderGeometry') {
-          const ud = obj.group.userData;
-          const breath = Math.sin(t * ud.period + ud.phase) * 0.03;
-          obj.group.position.y = ud.baseY + breath;
-          // Slight rotation sway
-          obj.group.rotation.z = Math.sin(t * ud.period * 0.5 + ud.phase) * 0.02;
+    const nowMs = performance.now();
+    for (const id in ents) {
+      const rec = ents[id];
+      if (!rec.group) continue;
+
+      // Smoothly walk toward the latest server position
+      if (rec.moving && rec.tgt) {
+        const g = rec.group.position;
+        const dx = rec.tgt.x - g.x, dz = rec.tgt.z - g.z;
+        const dist = Math.hypot(dx, dz);
+        if (dist < 0.02) { g.x = rec.tgt.x; g.z = rec.tgt.z; rec.moving = false; }
+        else {
+          const step = Math.min(dist, 2.4 * delta);   // ~2.4 tiles/sec
+          g.x += dx / dist * step; g.z += dz / dist * step;
+          rec.targetFacing = Math.atan2(dx, dz) + YAW_OFFSET;
         }
+      }
+
+      if (rec.isGLTF) {
+        // Ease facing toward the target heading
+        let a = rec.targetFacing - rec.facing;
+        a = Math.atan2(Math.sin(a), Math.cos(a));
+        rec.facing += a * Math.min(1, delta * 8);
+        rec.group.rotation.y = rec.facing;
+      } else {
+        // Fallback cylinder breathing
+        const breath = Math.sin(t * rec.period + rec.phase) * 0.03;
+        rec.group.position.y = breath;
+        rec.group.rotation.z = Math.sin(t * rec.period * 0.5 + rec.phase) * 0.02;
+      }
+
+      // Auto-hide stale thought bubbles
+      if (rec.thought && rec.thought.sprite.visible && nowMs > rec.thought.hideAt)
+        rec.thought.sprite.visible = false;
+    }
+
+    // Visual effects: expand + fade, then dispose
+    const effects = window.__effects;
+    if (effects && effects.length) {
+      for (let i = effects.length - 1; i >= 0; i--) {
+        const e = effects[i];
+        const p = (nowMs - e.born) / e.dur;
+        if (p >= 1) {
+          scene.remove(e.mesh); e.mesh.geometry.dispose(); e.mesh.material.dispose();
+          effects.splice(i, 1); continue;
+        }
+        const s = 0.3 + e.maxScale * p;
+        e.mesh.scale.set(s, s, s);
+        e.mesh.material.opacity = 0.9 * (1 - p);
+        if (e.type === 'text') e.mesh.position.y += delta * 0.8;  // float up
       }
     }
 

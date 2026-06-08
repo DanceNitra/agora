@@ -43,6 +43,22 @@ logger = logging.getLogger("dungeon.mcp_server")
 
 HERE = Path(__file__).parent
 STATIC_DIR = HERE / "static"
+
+
+def _load_dotenv() -> None:
+    """Load KEY=VALUE pairs from a local .env (gitignored) into the environment."""
+    envf = HERE / ".env"
+    if not envf.exists():
+        return
+    for raw in envf.read_text(encoding="utf-8").splitlines():
+        line = raw.strip()
+        if not line or line.startswith("#") or "=" not in line:
+            continue
+        key, _, val = line.partition("=")
+        os.environ.setdefault(key.strip(), val.strip().strip('"').strip("'"))
+
+
+_load_dotenv()
 HTTP_PORT = int(os.environ.get("DUNGEON_HTTP_PORT", "5174"))
 WS_PORT = int(os.environ.get("DUNGEON_WS_PORT", "5175"))
 
@@ -386,6 +402,440 @@ async def run_http_server():
         await server.serve_forever()
 
 
+# ── Ambient Life (autonomous entity behaviour for the standalone demo) ──
+
+import random
+
+_WALKABLE_TYPES = {"floor", "floor_vip", "throne", "arch", "door", "grass"}
+
+_THOUGHTS = {
+    "king": ["The realm is restless tonight.", "Bring me the treasury ledger.",
+             "Who dares approach my throne?"],
+    "guard_l": ["All quiet at the gate.", "Halt — state your business.",
+                "Another long watch ahead."],
+    "guard_r": ["Steel at the ready.", "Something stirs in the hall.", "For the crown!"],
+    "priest": ["The old gods are listening.", "A blessing upon this hall.",
+               "Dark omens gather..."],
+    "thief": ["So much gold, so little time.", "Nobody's watching the chests...",
+              "The shadows are my ally."],
+    "scholar": ["Fascinating runes on that wall.", "Knowledge is the true treasure.",
+                "I must record this at once."],
+}
+
+
+import heapq
+
+_GUARDS = {"guard_l", "guard_r"}
+
+# Posts around the keep that tasks send agents to. Each tile is a walkable standing
+# spot; `role` is the agent who prefers it (others take it only if nothing else fits).
+_POSTS = {
+    "throne":   {"tile": (11, 4),  "title": "Attend the throne",    "role": "king",    "act": "interact", "fx": "#ff66cc"},
+    "treasury": {"tile": (19, 4),  "title": "Inspect the treasury", "role": "thief",   "act": "interact", "fx": "#ffd24d"},
+    "library":  {"tile": (3, 3),   "title": "Study the archives",   "role": "scholar", "act": "interact", "fx": "#88aaff"},
+    "shrine":   {"tile": (11, 8),  "title": "Bless the nave",       "role": "priest",  "act": "casting",  "fx": "#a98bff"},
+    "gate":     {"tile": (11, 17), "title": "Hold the gate",        "role": "guard_l", "act": "guard",    "fx": "#aaccff"},
+    "hall":     {"tile": (6, 11),  "title": "Patrol the great hall","role": "guard_r", "act": "guard",    "fx": "#ffae66"},
+    "barracks": {"tile": (4, 16),  "title": "Sweep the barracks",   "role": None,      "act": "guard",    "fx": "#cfcfcf"},
+    "armory":   {"tile": (19, 16), "title": "Secure the armory",    "role": None,      "act": "interact", "fx": "#d4a35a"},
+}
+
+_ACT_LINES = {
+    "interact": ["Done.", "All in order.", "As commanded."],
+    "casting":  ["Blessings bestowed.", "The rite is complete.", "Spirits, hear me."],
+    "guard":    ["Post secured.", "Nothing to report.", "All quiet here."],
+}
+_TALK = {
+    "king": ["You may approach.", "Speak, then."],
+    "guard_l": ["On guard!", "Spar with me!"],
+    "guard_r": ["Have at thee!", "For the crown!"],
+    "priest": ["Blessings upon you.", "Peace, friend."],
+    "thief": ["...didn't see me.", "Move along."],
+    "scholar": ["A word, colleague?", "Most curious!"],
+}
+
+
+# ── LLM Brain (OpenRouter / Nemotron) ───────────────────────────
+# Agents think and converse in-character via a small, fast Nemotron model.
+# Falls back to the canned _THOUGHTS/_TALK/_ACT_LINES tables when no key is set
+# or any call fails, so the dungeon always runs.
+import urllib.request as _urlreq
+import time as _time
+
+_LLM_KEY = os.environ.get("OPENROUTER_API_KEY", "").strip()
+# nano-30b-a3b: newest Nemotron 3, MoE (3B active) → ~1.5s/line, ideal for live banter.
+_LLM_MODEL = os.environ.get("DUNGEON_LLM_MODEL", "nvidia/nemotron-3-nano-30b-a3b:free").strip()
+_LLM_URL = "https://openrouter.ai/api/v1/chat/completions"
+_LLM_ON = bool(_LLM_KEY)
+
+_PERSONA = {
+    "king":    "King Aldric — the proud, aging ruler of this keep. Regal, weary, commanding.",
+    "guard_l": "Sergeant Voss — a gruff veteran gate guard. Blunt, loyal, watchful.",
+    "guard_r": "Dame Elara — a sharp knight of the great hall. Disciplined, dry-witted.",
+    "priest":  "High Priest Orin — keeper of the shrine. Solemn, cryptic, kindly.",
+    "thief":   "Shadow Kael — a sly rogue eyeing the treasury. Sarcastic, quick, greedy.",
+    "scholar": "Sage Mira — an obsessive archivist. Curious, precise, easily distracted.",
+}
+
+# Per-agent throttles (monotonic timestamps) + in-conversation guard.
+_speech_cd: dict[str, float] = {}
+_conv_cd: dict[str, float] = {}
+_in_conv: set[str] = set()
+
+
+def _persona(eid: str) -> str:
+    return _PERSONA.get(eid, "a weary dungeon dweller")
+
+
+def _llm_say_sync(system: str, user: str) -> str | None:
+    """Blocking OpenRouter call → one short line, or None on any failure."""
+    if not _LLM_ON:
+        return None
+    payload = json.dumps({
+        "model": _LLM_MODEL,
+        "messages": [{"role": "system", "content": system},
+                     {"role": "user", "content": user}],
+        "temperature": 0.95,
+        "max_tokens": 350,
+        "response_format": {"type": "json_object"},
+    }).encode()
+    req = _urlreq.Request(_LLM_URL, data=payload, headers={
+        "Authorization": f"Bearer {_LLM_KEY}",
+        "Content-Type": "application/json",
+        "HTTP-Referer": "https://github.com/DanceNitra/agora",
+        "X-Title": "Dungeon OS",
+    })
+    try:
+        with _urlreq.urlopen(req, timeout=25) as r:
+            data = json.loads(r.read())
+        content = data["choices"][0]["message"]["content"]
+        line = (json.loads(content).get("line") or "").strip()
+        return line[:120] or None
+    except Exception as e:
+        logger.debug(f"LLM say failed: {e}")
+        return None
+
+
+async def _llm_say(system: str, user: str, fallback: str) -> str:
+    line = await asyncio.to_thread(_llm_say_sync, system, user)
+    return line or fallback
+
+
+def _schedule_thought(eid: str, situation: str, fallback: str) -> None:
+    """Show the fallback line instantly, then replace it with an LLM line when ready."""
+    engine.set_entity_thought(eid, fallback)
+    if not _LLM_ON or eid in _in_conv:
+        return
+    now = _time.monotonic()
+    if now < _speech_cd.get(eid, 0.0):
+        return
+    _speech_cd[eid] = now + 14.0
+
+    async def _run():
+        sysmsg = (f"You are {_persona(eid)} You are in a torch-lit medieval dungeon keep. "
+                  f'Reply ONLY with JSON {{"line":"<one short in-character line, max 12 words>"}}.')
+        line = await _llm_say(sysmsg, situation + " Your line:", fallback)
+        if eid not in _in_conv:  # don't stomp an active conversation
+            engine.set_entity_thought(eid, line)
+
+    asyncio.create_task(_run())
+
+
+async def _converse(a_id: str, b_id: str, hold: dict[str, int]) -> None:
+    """Two agents exchange a few in-character lines as sequential speech bubbles."""
+    ents = engine.state.entities
+    a, b = ents.get(a_id), ents.get(b_id)
+    if not a or not b or a_id in _in_conv or b_id in _in_conv:
+        return
+    _in_conv.add(a_id)
+    _in_conv.add(b_id)
+    try:
+        ax, ay = int(round(a.x)), int(round(a.y))
+        bx, by = int(round(b.x)), int(round(b.y))
+        engine.face_entity(a_id, bx, by)
+        engine.face_entity(b_id, ax, ay)
+        engine.set_entity_state(a_id, "thinking")
+        engine.set_entity_state(b_id, "thinking")
+        hold[a_id] = hold[b_id] = 99  # pause both while they talk
+
+        turns = [(a_id, a.name, b.name), (b_id, b.name, a.name), (a_id, a.name, b.name)]
+        history: list[str] = []
+        for sid, sname, oname in turns:
+            sysmsg = (f"You are {_persona(sid)} You are in a torch-lit dungeon keep, speaking "
+                      f"with {oname}. Reply ONLY with JSON "
+                      f'{{"line":"<one short spoken line, max 14 words>"}}.')
+            convo = "  ".join(history) if history else "(you speak first)"
+            fb = random.choice(_TALK.get(sid, ["Well met.", "..."]))
+            line = await _llm_say(sysmsg, f"Dialogue so far: {convo}\nReply to {oname}.", fb)
+            engine.set_entity_thought(sid, line)
+            history.append(f"{sname}: {line}")
+            await asyncio.sleep(2.4)
+        await asyncio.sleep(1.0)
+        for cid in (a_id, b_id):
+            engine.set_entity_thought(cid, "")
+            engine.set_entity_state(cid, "idle")
+    finally:
+        now = _time.monotonic()
+        _conv_cd[a_id] = _conv_cd[b_id] = now + 30.0
+        hold[a_id] = hold[b_id] = 0
+        _in_conv.discard(a_id)
+        _in_conv.discard(b_id)
+
+
+def _maybe_start_conversation(ents, dead: dict[str, int], hold: dict[str, int]) -> None:
+    """Find one eligible nearby pair and start a conversation (at most one per tick)."""
+    now = _time.monotonic()
+    ids = [e for e in ents if e not in _in_conv
+           and dead.get(e, 0) == 0 and now >= _conv_cd.get(e, 0.0)]
+    for i in range(len(ids)):
+        for j in range(i + 1, len(ids)):
+            a, b = ids[i], ids[j]
+            if a in _GUARDS and b in _GUARDS:
+                continue  # two guards spar instead of chatting
+            ea, eb = ents[a], ents[b]
+            if abs(ea.x - eb.x) + abs(ea.y - eb.y) <= 2:  # within 2 tiles
+                asyncio.create_task(_converse(a, b, hold))
+                return
+
+
+def _walkable(x: int, y: int) -> bool:
+    s = engine.state
+    if not (0 <= x < s.width and 0 <= y < s.height):
+        return False
+    t = s.tiles[y][x]
+    return t.walkable and t.type in _WALKABLE_TYPES
+
+
+def _astar(start: tuple[int, int], goal: tuple[int, int]) -> list[tuple[int, int]] | None:
+    """4-directional A* over walkable tiles. Returns the path incl. start & goal, or None."""
+    if start == goal:
+        return [start]
+    if not _walkable(*goal):
+        return None
+    came: dict[tuple[int, int], tuple[int, int] | None] = {start: None}
+    g = {start: 0}
+    openh = [(abs(start[0] - goal[0]) + abs(start[1] - goal[1]), start)]
+    while openh:
+        _, cur = heapq.heappop(openh)
+        if cur == goal:
+            path = []
+            while cur is not None:
+                path.append(cur)
+                cur = came[cur]
+            return path[::-1]
+        for dx, dy in ((1, 0), (-1, 0), (0, 1), (0, -1)):
+            nb = (cur[0] + dx, cur[1] + dy)
+            if not _walkable(*nb):
+                continue
+            ng = g[cur] + 1
+            if nb not in g or ng < g[nb]:
+                g[nb] = ng
+                came[nb] = cur
+                f = ng + abs(nb[0] - goal[0]) + abs(nb[1] - goal[1])
+                heapq.heappush(openh, (f, nb))
+    return None
+
+
+async def ambient_life():
+    """Task-driven simulation: a quest board hands out posts across the whole keep,
+    agents A*-path to them, perform the action, and report done. Guards still spar
+    when they cross paths (attack → hit → HP → knockout → revive). The board and all
+    state stream to the client. Disable with DUNGEON_AMBIENT=0 (e.g. Hermes drives).
+    """
+    if os.environ.get("DUNGEON_AMBIENT", "1") == "0":
+        return
+    await asyncio.sleep(2.0)  # let the first browser connect
+
+    tasks: list[dict] = []          # the live quest board
+    next_id = 1
+    paths: dict[str, list] = {}     # remaining path tiles per agent
+    task_of: dict[str, int] = {}    # agent -> task id
+    hold: dict[str, int] = {}       # ticks to stand still (action / combat anim)
+    cooldown: dict[str, int] = {}   # spar cooldown
+    dead: dict[str, int] = {}       # knockout countdown
+    logger.info("Task simulation loop started")
+
+    def publish():
+        engine.set_tasks([
+            {"id": t["id"], "title": t["title"], "agent": t["agent"], "status": t["status"]}
+            for t in tasks
+        ])
+
+    while True:
+        await asyncio.sleep(0.85)
+        ents = engine.state.entities
+        occupied = {(int(round(e.x)), int(round(e.y))): eid for eid, e in ents.items()}
+        for eid in list(ents.keys()):
+            hold[eid] = max(0, hold.get(eid, 0) - 1)
+            cooldown[eid] = max(0, cooldown.get(eid, 0) - 1)
+
+        # Keep the board topped up; retire old completed quests
+        changed = False
+        done = [t for t in tasks if t["status"] == "done"]
+        if len(done) > 2:
+            for t in done[:-2]:
+                tasks.remove(t)
+            changed = True
+        # At most ONE active task per post → agents spread to distinct spots (no pile-ups)
+        open_n = sum(1 for t in tasks if t["status"] == "open")
+        active_posts = {t["post"] for t in tasks if t["status"] != "done"}
+        avail = [k for k in _POSTS if k not in active_posts]
+        random.shuffle(avail)
+        while open_n < 3 and avail:
+            key = avail.pop()
+            p = _POSTS[key]
+            tasks.append({"id": next_id, "post": key, "title": p["title"], "tile": p["tile"],
+                          "role": p["role"], "act": p["act"], "fx": p["fx"],
+                          "status": "open", "agent": None})
+            next_id += 1
+            open_n += 1
+            changed = True
+        if changed:
+            publish()
+
+        # Agents that wander near each other strike up a conversation.
+        _maybe_start_conversation(ents, dead, hold)
+
+        for eid, ent in list(ents.items()):
+            cx, cy = int(round(ent.x)), int(round(ent.y))
+
+            if dead.get(eid, 0) > 0:
+                dead[eid] -= 1
+                if dead[eid] == 0:
+                    engine.set_entity_health(eid, 100)
+                    engine.set_entity_state(eid, "idle")
+                    engine.set_entity_thought(eid, "")
+                continue
+            if hold.get(eid, 0) > 0:
+                continue
+            if eid in _in_conv:
+                continue  # busy in a conversation — handled by _converse
+
+            # Guards spar if they end up next to each other (interrupts the patrol)
+            if eid in _GUARDS and cooldown.get(eid, 0) == 0:
+                sparred = False
+                for oid in _GUARDS:
+                    if oid == eid:
+                        continue
+                    o = ents.get(oid)
+                    if not o or dead.get(oid, 0) > 0 or hold.get(oid, 0) > 0:
+                        continue
+                    ox, oy = int(round(o.x)), int(round(o.y))
+                    if max(abs(ox - cx), abs(oy - cy)) == 1:
+                        engine.face_entity(eid, ox, oy)
+                        engine.face_entity(oid, cx, cy)
+                        engine.set_entity_state(eid, "attack")
+                        engine.set_entity_state(oid, "hit")
+                        engine.add_effect("spark", ox, oy, "#ffd27a", 0.5)
+                        hp = o.health - 18
+                        if hp <= 24:
+                            engine.set_entity_health(oid, 0)
+                            engine.set_entity_state(oid, "dead")
+                            engine.set_entity_thought(oid, "Aargh!")
+                            engine.set_entity_thought(eid, "Yield!")
+                            dead[oid] = 6
+                        else:
+                            engine.set_entity_health(oid, hp)
+                        hold[eid] = hold[oid] = 2
+                        cooldown[eid] = cooldown[oid] = 5
+                        sparred = True
+                        break
+                if sparred:
+                    continue
+
+            # Claim a task if free
+            tid = task_of.get(eid)
+            task = next((t for t in tasks if t["id"] == tid), None)
+            if task is None or task["status"] == "done":
+                task_of.pop(eid, None)
+                paths.pop(eid, None)
+                cand = ([t for t in tasks if t["status"] == "open" and t["role"] == eid]
+                        or [t for t in tasks if t["status"] == "open" and t["role"] is None]
+                        or [t for t in tasks if t["status"] == "open"])
+                # Take the nearest task we can actually reach
+                chosen, chosen_path = None, None
+                for c in sorted(cand, key=lambda t: abs(t["tile"][0] - cx) + abs(t["tile"][1] - cy)):
+                    pp = _astar((cx, cy), c["tile"])
+                    if pp is not None:
+                        chosen, chosen_path = c, pp
+                        break
+                if chosen is None:
+                    roll = random.random()
+                    if roll < 0.25:
+                        engine.set_entity_state(eid, "thinking")
+                        _schedule_thought(
+                            eid, "You stand idle in the keep with no task right now.",
+                            random.choice(_THOUGHTS.get(eid, ["..."])))
+                        hold[eid] = 2
+                    elif roll < 0.7:
+                        # Wander one walkable step so paths cross → conversations happen.
+                        steps = [(1, 0), (-1, 0), (0, 1), (0, -1)]
+                        random.shuffle(steps)
+                        for dx, dy in steps:
+                            nx, ny = cx + dx, cy + dy
+                            if _walkable(nx, ny) and (nx, ny) not in occupied:
+                                engine.set_entity_state(eid, "walking")
+                                engine.move_entity(eid, nx, ny)
+                                occupied.pop((cx, cy), None)
+                                occupied[(nx, ny)] = eid
+                                break
+                    continue
+                chosen["status"] = "in_progress"
+                chosen["agent"] = ent.name
+                task_of[eid] = chosen["id"]
+                paths[eid] = chosen_path[1:]
+                engine.set_entity_state(eid, "walking")
+                engine.set_entity_thought(eid, "» " + chosen["title"])
+                publish()
+                continue
+
+            # Arrived → perform the action, then mark the quest done
+            if (cx, cy) == task["tile"]:
+                act = task["act"]
+                state = "casting" if act == "casting" else ("thinking" if act == "guard" else "interact")
+                engine.set_entity_state(eid, state)
+                _schedule_thought(
+                    eid, f"You just finished the task: '{task['title']}'. React briefly.",
+                    random.choice(_ACT_LINES.get(act, ["Done."])))
+                engine.add_effect("glow" if act != "guard" else "spark", cx, cy, task["fx"], 0.9)
+                hold[eid] = 3
+                task["status"] = "done"
+                task["agent"] = ent.name
+                task_of.pop(eid, None)
+                paths.pop(eid, None)
+                publish()
+                continue
+
+            # Walk the path (replanning if it ran out or the next step is blocked)
+            def _abandon():
+                task["status"] = "open"
+                task["agent"] = None
+                task_of.pop(eid, None)
+                paths.pop(eid, None)
+                publish()
+
+            path = paths.get(eid) or []
+            if not path:
+                p = _astar((cx, cy), task["tile"])
+                if p is None:
+                    _abandon(); continue            # goal no longer reachable → release it
+                paths[eid] = path = p[1:]
+            if not path:
+                continue
+            nx, ny = path[0]
+            if (nx, ny) in occupied and occupied[(nx, ny)] != eid:
+                p = _astar((cx, cy), task["tile"])  # someone's in the way → reroute
+                if p is None:
+                    _abandon(); continue
+                paths[eid] = p[1:]
+                continue
+            engine.set_entity_state(eid, "walking")
+            engine.move_entity(eid, nx, ny)
+            occupied.pop((cx, cy), None)
+            occupied[(nx, ny)] = eid
+            path.pop(0)
+
+
 # ── Main ────────────────────────────────────────────────────
 
 
@@ -423,7 +873,7 @@ def main():
             await asyncio.gather(
                 run_ws_server(),
                 run_http_server(),
-                # Health check server
+                ambient_life(),
             )
 
         engine.create_default_dungeon()
