@@ -33,6 +33,12 @@
 |---|------|--------|--------|-------|
 | **2.0** | **Agentic OS v2 — Brain Ecosystem** — per-agent memory system (episodic/semantic/procedural), personality engine (Big 5 shapes decisions), conversation engine (multi-turn NPC dialogue), brainstorming engine (agents generate + build on ideas together), collective knowledge pool (dungeon vault), thought journal, self-improvement proposals, integrated tick cycle | 🟡 | — | tg-hermes: handoff ready (59KB) |
 
+## Phase 2.1 — VaultBridge (Vault ↔ Dungeon Bridge)
+
+| # | Task | Status | Commit | Agent |
+|---|------|--------|--------|-------|
+| **2.1** | **VaultBridge** — VaultReader + VaultWriter abstract interface, DevMockVaultReader (12 book concepts in repo, git-tracked), LocalFSVaultReader (real vault via FAISS RAG), DevMockVaultWriter (writes to /tmp mock), GitVaultWriter (real vault + git push via deploy key), vault knowledge injection into agent prompts, vault write actions from LLM decisions, config.py vault_strategy=mock/local | 🟡 | — | tg-hermes: handoff ready (44KB) |
+
 ## Phase 2b — Framework Plugins
 
 | # | Task | Status | Commit | Agent |
