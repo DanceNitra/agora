@@ -852,7 +852,7 @@ if (!renderer.getContext()) {
   // (glowing motes) flowing along the Vault-Company cross-agent learning edges.
   const TrustGraph = (() => {
     const lines = {};      // "a|b" -> THREE.Line
-    const packets = {};    // "from>to" -> {mesh, t, e}
+    const sparks = [];     // one-shot packets, emitted only on a real NPC↔NPC conversation
     let data = { trust: [], learn: [] };
     const key = (a, b) => [a, b].sort().join('|');
     const pos = id => window.__entities?.[id]?.group?.position || null;
@@ -866,23 +866,21 @@ if (!renderer.getContext()) {
       line.renderOrder = 2; line.frustumCulled = false;
       scene.add(line); lines[k] = line;
     }
-    function ensurePacket(e) {
-      const k = e.from + '>' + e.to;
-      if (packets[k]) return;
-      const m = new THREE.Mesh(new THREE.SphereGeometry(0.13, 8, 8),
+    function spark(from, to) {          // fire ONE packet when from actually talks to to
+      const m = new THREE.Mesh(new THREE.SphereGeometry(0.16, 10, 10),
         new THREE.MeshBasicMaterial({ color: 0x9fe0ff, transparent: true, opacity: 0.95,
           blending: THREE.AdditiveBlending, depthWrite: false }));
       m.frustumCulled = false; scene.add(m);
-      packets[k] = { mesh: m, t: Math.random(), e };
+      sparks.push({ mesh: m, t: 0, from, to });
     }
-    function update(ev) {
+    function update(ev) {               // trust LINES are persistent; packets are not
       data = { trust: ev.trust || [], learn: ev.learn || [] };
       data.trust.forEach(t => ensureLine(t.a, t.b));
-      data.learn.forEach(ensurePacket);
     }
-    function reset() {                 // drop stale edges/packets on (re)connect
+    function reset() {                  // drop stale edges/sparks on (re)connect
       for (const k in lines) { scene.remove(lines[k]); delete lines[k]; }
-      for (const k in packets) { scene.remove(packets[k].mesh); delete packets[k]; }
+      for (const s of sparks) scene.remove(s.mesh);
+      sparks.length = 0;
       data = { trust: [], learn: [] };
     }
     function frame(dt) {
@@ -898,17 +896,18 @@ if (!renderer.getContext()) {
         line.material.color.copy(_c);
         line.material.opacity = 0.18 + 0.55 * Math.max(0, Math.min(1, s));
       });
-      for (const k in packets) {
-        const pk = packets[k], A = pos(pk.e.from), B = pos(pk.e.to);
-        if (!A || !B) { pk.mesh.visible = false; continue; }
-        pk.mesh.visible = true;
-        pk.t = (pk.t + dt * 0.35) % 1;                    // teacher → student flow
+      for (let i = sparks.length - 1; i >= 0; i--) {     // one-shot packets: travel once, fade, die
+        const pk = sparks[i], A = pos(pk.from), B = pos(pk.to);
+        if (!A || !B) { scene.remove(pk.mesh); sparks.splice(i, 1); continue; }
+        pk.t += dt * 0.7;                                 // speaker → listener
+        if (pk.t >= 1) { scene.remove(pk.mesh); sparks.splice(i, 1); continue; }
         const e = pk.t;
-        pk.mesh.position.set(A.x + (B.x - A.x) * e, 1.05 + Math.sin(e * Math.PI) * 0.5,
+        pk.mesh.position.set(A.x + (B.x - A.x) * e, 1.05 + Math.sin(e * Math.PI) * 0.6,
                              A.z + (B.z - A.z) * e);
+        pk.mesh.material.opacity = 0.95 * Math.sin(e * Math.PI);
       }
     }
-    return { update, frame, reset };
+    return { update, frame, reset, spark };
   })();
   window.__TrustGraph = TrustGraph;
 
@@ -995,6 +994,9 @@ if (!renderer.getContext()) {
         break;
       case 'trust_graph':
         TrustGraph.update(ev);
+        break;
+      case 'converse':
+        TrustGraph.spark(ev.from, ev.to);   // a real NPC↔NPC talk → one packet flies
         break;
       case 'os_modules_snapshot':
         (ev.modules || []).forEach(m => buildModule(m.name, m.tile[0], m.tile[1], m.color));

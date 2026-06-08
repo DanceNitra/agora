@@ -258,6 +258,58 @@ async def brain_gaps(n: int = 10):
     return {"status": "ok", "gaps": _SEM_INDEX.find_gaps(n) if _SEM_INDEX.ready else []}
 
 
+@router.get("/brain/bridges")
+async def brain_bridges(n: int = 6, rationale: bool = True):
+    """Pairs of the user's notes that are deeply related yet UNLINKED — missing connections.
+    Turns the vault from islands into a connected graph."""
+    global _SEM_INDEX
+    import asyncio
+    from agora.execution.semantic_index import SemanticIndex
+    from agora.config import settings
+    if _SEM_INDEX is None or not _SEM_INDEX.ready:
+        _SEM_INDEX = SemanticIndex()
+    bridges = (await asyncio.to_thread(_SEM_INDEX.find_bridges, settings.vault_path, n)
+               if _SEM_INDEX.ready else [])
+    if rationale and bridges:
+        from agora.execution.llm_client import call_llm
+        for b in bridges:
+            b["why"] = (await asyncio.to_thread(
+                call_llm,
+                "In ONE concise sentence, why are these two note topics deeply related and worth "
+                "linking? Be specific, no preamble.",
+                f"Note A: {b['a']}\nNote B: {b['b']}", "cheap", 0.3, 90) or "").strip()
+    return {"status": "ok", "bridges": bridges}
+
+
+def _add_link(root: str, rel: str, target: str, why: str) -> int:
+    from pathlib import Path
+    f = Path(root) / rel
+    try:
+        txt = f.read_text(encoding="utf-8", errors="replace")
+    except Exception:
+        return 0
+    if f"[[{target}]]" in txt:
+        return 0                                            # already linked
+    marker = "## Related (Agora bridges)"
+    add = f"- [[{target}]]" + (f" — {why}" if why else "")
+    txt = txt.rstrip() + (f"\n{add}\n" if marker in txt else f"\n\n{marker}\n{add}\n")
+    f.write_text(txt, encoding="utf-8")
+    return 1
+
+
+@router.post("/brain/bridges/apply")
+async def apply_bridges(request: Request):
+    """Apply chosen bridges — add a [[wikilink]] (with rationale) to BOTH notes so the vault
+    becomes more connected. Reversible: a clearly-marked '## Related (Agora bridges)' section."""
+    from agora.config import settings
+    body = await request.json()
+    added = 0
+    for b in body.get("bridges", []):
+        added += _add_link(settings.vault_path, b.get("a_path", ""), b.get("b", ""), b.get("why", ""))
+        added += _add_link(settings.vault_path, b.get("b_path", ""), b.get("a", ""), b.get("why", ""))
+    return {"status": "ok", "links_added": added}
+
+
 async def _send_telegram(text: str) -> bool:
     """Send a message to the user via Telegram (HERMES_TELEGRAM_* env). No-op if unset."""
     import asyncio

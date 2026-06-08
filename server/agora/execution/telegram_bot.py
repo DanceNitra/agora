@@ -46,8 +46,21 @@ async def send(text: str) -> None:
             pass
 
 
+def _brain_get(path: str) -> dict:
+    with urllib.request.urlopen(f"http://127.0.0.1:8000{path}", timeout=70) as r:
+        return json.loads(r.read())
+
+
+def _brain_post(path: str, body: dict) -> dict:
+    req = urllib.request.Request(f"http://127.0.0.1:8000{path}", data=json.dumps(body).encode(),
+                                 headers={"Content-Type": "application/json"})
+    with urllib.request.urlopen(req, timeout=70) as r:
+        return json.loads(r.read())
+
+
 # the last brief, kept in memory so the user can reply "keep" to save it to their vault
 _last = {"query": "", "brief": "", "sources": ""}
+_bridges_cache = {"bridges": []}
 
 
 async def research_brief(query: str) -> str:
@@ -125,6 +138,29 @@ async def _handle(app, text: str) -> None:
                 await send(f"✅ Uložené do vaultu — *{_last['query'][:60]}*")
             else:
                 await send("✗ uloženie zlyhalo")
+    elif low in ("bridges", "/bridges", "mosty"):
+        await send("🌉 _hľadám chýbajúce spojenia v tvojom vaulte… (chvíľu)_")
+        d = await asyncio.to_thread(_brain_get, "/api/v1/agent-os/brain/bridges?n=6&rationale=true")
+        bridges = (d or {}).get("bridges", [])
+        _bridges_cache["bridges"] = bridges
+        if not bridges:
+            await send("_žiadne nové mosty_")
+        else:
+            lines = ["🌉 *Chýbajúce spojenia v tvojom vaulte:*\n"]
+            for i, b in enumerate(bridges, 1):
+                lines.append(f"{i}. [[{b['a']}]] ↔ [[{b['b']}]]\n   _{b.get('why', '')}_")
+            lines.append("\n→ odpíš `connect` a pridám tieto linky do tvojich nót")
+            await send("\n".join(lines))
+    elif low in ("connect", "/connect", "apply", "prepoj"):
+        bridges = _bridges_cache.get("bridges", [])
+        if not bridges:
+            await send("_najprv napíš `bridges`_")
+        else:
+            d = await asyncio.to_thread(_brain_post, "/api/v1/agent-os/brain/bridges/apply",
+                                        {"bridges": bridges})
+            await send(f"✅ Pridaných *{(d or {}).get('links_added', 0)}* liniek do tvojich nót "
+                       f"(sekcia '## Related (Agora bridges)')")
+            _bridges_cache["bridges"] = []
     elif low in ("/gaps", "gaps", "medzery"):
         from agora.execution.semantic_index import SemanticIndex
         si = SemanticIndex()
@@ -134,8 +170,10 @@ async def _handle(app, text: str) -> None:
         from agora.api.agent_os_api import _build_morning_report
         await send(await _build_morning_report(app))
     elif low in ("/start", "/help", "help"):
-        await send("🏰 *Agora research assistant*\nNapíš otázku → grounded brief.\n"
-                   "`research <téma>` · `gaps` · `report`")
+        await send("🏰 *Agora research assistant*\nNapíš otázku → grounded brief, potom `keep`.\n\n"
+                   "`<otázka>` → brief · `keep` → ulož do vaultu\n"
+                   "`bridges` → chýbajúce spojenia · `connect` → prepoj ich\n"
+                   "`gaps` → tvoje medzery · `report` → ranný report")
     else:
         q = text.split(" ", 1)[1] if low.startswith(("research ", "/research ", "skumaj ")) else text
         await send("🔬 _skúmam… pár sekúnd_")

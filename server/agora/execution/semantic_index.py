@@ -124,6 +124,55 @@ class SemanticIndex:
     def ready(self) -> bool:
         return self.vecs is not None and len(self.meta) > 0
 
+    def _link_graph(self, vault_root: str) -> dict:
+        """title(lower) → set of titles it links via [[wikilinks]]. Scanned once, cached."""
+        if getattr(self, "_links", None) is not None:
+            return self._links
+        wl = re.compile(r"\[\[([^\]|#]+)")
+        root = Path(vault_root)
+        links = {}
+        for m in self.meta:
+            try:
+                txt = (root / m["path"]).read_text(encoding="utf-8", errors="replace")
+            except Exception:
+                txt = ""
+            links[m["title"].lower()] = {t.strip().lower() for t in wl.findall(txt)}
+        self._links = links
+        return links
+
+    def find_bridges(self, vault_root: str, n: int = 8,
+                     lo: float = 0.70, hi: float = 0.90, scan: int = 600) -> list[dict]:
+        """Pairs of the user's notes that are semantically close (lo<sim<hi, so related but not
+        duplicates) yet NOT linked to each other — missing connections worth bridging."""
+        if not self.ready:
+            return []
+        sims = self.vecs @ self.vecs.T
+        np.fill_diagonal(sims, -1.0)
+        # top-2 neighbours per note → candidate pairs in [lo, hi]
+        top2 = np.argpartition(-sims, 2, axis=1)[:, :2]
+        pairs = {}
+        for i in range(len(self.meta)):
+            for j in top2[i]:
+                j = int(j)
+                s = float(sims[i, j])
+                if lo < s < hi:
+                    pairs[(min(i, j), max(i, j))] = s
+        cand = sorted(pairs.items(), key=lambda kv: -kv[1])[:scan]
+        links = self._link_graph(vault_root)
+        bridges = []
+        for (a, b), s in cand:
+            ta, tb = self.meta[a]["title"], self.meta[b]["title"]
+            la, lb = ta.lower(), tb.lower()
+            if lb in links.get(la, set()) or la in links.get(lb, set()):
+                continue                                   # already linked
+            if la == lb:
+                continue
+            bridges.append({"a": ta, "b": tb, "sim": round(s, 3),
+                            "a_path": self.meta[a]["path"], "b_path": self.meta[b]["path"]})
+            if len(bridges) >= n:
+                break
+        return bridges
+
     def search(self, query: str, top_k: int = 8) -> list[dict]:
         if not self.ready:
             return []

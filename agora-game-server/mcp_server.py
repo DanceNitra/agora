@@ -600,6 +600,7 @@ async def _converse(a_id: str, b_id: str, hold: dict[str, int], memory: dict) ->
         turns = [(a_id, a.name, b.name), (b_id, b.name, a.name), (a_id, a.name, b.name)]
         history: list[str] = []
         for sid, sname, oname in turns:
+            oid = b_id if sid == a_id else a_id
             my_work = " | ".join(memory.get(sid, [])[-3:]) or "(just arrived)"
             sysmsg = (f"You are {_persona(sid)} You are a researcher at the Vault Company talking "
                       f"shop with your colleague {oname}. Discuss your CURRENT research — a finding, "
@@ -612,6 +613,8 @@ async def _converse(a_id: str, b_id: str, hold: dict[str, int], memory: dict) ->
             line = await _llm_say(sysmsg, f"Your recent work: {my_work}\n"
                                   f"Dialogue so far: {convo}\nReply to {oname} about the research.", fb)
             engine.set_entity_thought(sid, line)
+            # one-shot knowledge packet, speaker → listener, so you SEE who talks to whom
+            broadcast({"type": "converse", "from": sid, "to": oid})
             history.append(f"{sname}: {line}")
             await asyncio.sleep(2.4)
         await asyncio.sleep(1.0)
