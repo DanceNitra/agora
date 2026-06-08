@@ -21,6 +21,7 @@ import asyncio
 import json
 import logging
 import os
+import subprocess
 import sys
 import threading
 import time
@@ -1019,6 +1020,58 @@ async def ambient_life():
         del os_modules[:-24]
         broadcast({"type": "os_module", **mod})
 
+    # ── Autonomous vault curation: a trusted curator runs AutoLinker over the vault ──
+    _VAULT = os.environ.get("AGORA_VAULT_PATH", "C:/Users/Danculus/my-second-brain")
+    _AUTOLINKER = str(Path(__file__).resolve().parent.parent / "tools" / "autolinker.py")
+    curation = {"running": False}
+
+    async def _run_curation(eid, standing):
+        """A high-standing curator autonomously runs AutoLinker (background subprocess).
+        Trust gates it inside the tool: enough standing → links applied; else held to pending."""
+        if curation["running"] or not Path(_VAULT).exists() or not Path(_AUTOLINKER).exists():
+            logger.info(f"[curation] skip (running={curation['running']} "
+                        f"vault={Path(_VAULT).exists()} tool={Path(_AUTOLINKER).exists()})")
+            return
+        curation["running"] = True
+        curator = _AGENT_NAMES.get(eid, eid)
+        logger.info(f"[curation] starting for {curator}…")
+        try:
+            engine.set_entity_state(eid, "casting")
+            engine.set_entity_thought(eid, "» curating the vault graph…")
+            out_dir = str(Path(_VAULT) / "04 Resources" / "Concepts" / "Agora Agents")
+            def _runit():
+                return subprocess.run(
+                    [sys.executable, _AUTOLINKER, "--vault", _VAULT, "--out", out_dir,
+                     "--orphans-only", "--trust-weighted", "--curator", curator],
+                    capture_output=True, text=True, encoding="utf-8",
+                    errors="replace", timeout=120)
+            res = await asyncio.to_thread(_runit)
+            text = (res.stdout or "") + (res.stderr or "")
+            n = 0
+            if "APPLIED" in text:
+                try:
+                    n = int(text.split("APPLIED", 1)[1].split("links")[0].strip())
+                except Exception:
+                    n = 0
+            if "PENDING" in text:                       # trust too low → queued for review
+                note_event(f"{curator}'s curation held for review (trust {standing:.2f})")
+                logger.info(f"[curation] {curator} held to pending (standing {standing:.2f})")
+            elif n > 0:                                  # trusted → links landed
+                note_event(f"{curator} curated {n} links into the vault")
+                _os_build("curation", curator, f"connected {n} vault notes (trust {standing:.2f})")
+                e2 = engine.state.entities.get(eid)
+                if e2:
+                    engine.add_effect("glow", int(round(e2.x)), int(round(e2.y)), "#9fe0ff", 1.3)
+                logger.info(f"[curation] {curator} applied {n} links (standing {standing:.2f})")
+            else:                                        # trusted, but nothing new to connect
+                logger.info(f"[curation] {curator} — vault graph already well-connected")
+        except Exception as e:
+            logger.warning(f"[curation] {eid} failed: {e!r}")
+        finally:
+            curation["running"] = False
+            engine.set_entity_state(eid, "idle")
+            engine.set_entity_thought(eid, "")
+
     def publish_goals():
         """Quest board: each agent's ACTIVE quest + its queued backlog + done count."""
         rows = []
@@ -1152,6 +1205,13 @@ async def ambient_life():
             broadcast({"type": "os_snapshot", "log": os_log[-12:]})
             if os_modules:
                 broadcast({"type": "os_modules_snapshot", "modules": os_modules})
+
+        # Autonomous curation: Dame Elara (Bridge Builder) periodically tends the vault
+        # graph — trust decides whether her links land or wait for review.
+        if loop_n % 70 == 7 and not curation["running"]:
+            _cur = "guard_r"
+            _stm = _compute_standing(await _trust_matrix())
+            asyncio.create_task(_run_curation(_cur, _stm.get(_cur, 0.5)))
 
         for eid, ent in list(ents.items()):
             cx, cy = int(round(ent.x)), int(round(ent.y))

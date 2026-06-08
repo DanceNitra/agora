@@ -97,6 +97,7 @@
   .os-line.k-upgrade   { color: #ffd27a; }
   .os-line.k-collab    { color: #9affc0; }
   .os-line.k-challenge { color: #ff8a8a; }
+  .os-line.k-curation  { color: #9fe0ff; }
   .os-line.flash { animation: osflash 1.1s ease-out; }
   @keyframes osflash { from { background: rgba(255,255,255,0.20); } to { background: transparent; } }
 </style>
@@ -1067,7 +1068,7 @@ if (!renderer.getContext()) {
   // === AGENTIC OS BUILD LOG HUD ===
   const OSHUD = (() => {
     const wrap = document.getElementById('hud-os-lines');
-    const icon = { discovery: '🔍', upgrade: '⬆', collab: '🤝', challenge: '⚔' };
+    const icon = { discovery: '🔍', upgrade: '⬆', collab: '🤝', challenge: '⚔', curation: '🔗' };
     function add(it, flash) {
       if (!it || !it.text) return;
       const empty = document.getElementById('hud-os-empty');
