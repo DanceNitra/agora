@@ -50,6 +50,12 @@
 | # | Task | Status | Commit | Agent |
 |---|------|--------|--------|-------|
 | 2.6 | **LangGraph plugin** — wrap ESS protocol into LangGraph node | 🔴 | — | — |
+
+## Phase 2.4 — Vault Company OS (Self-Recursive Vault Evolution)
+
+| # | Task | Status | Commit | Agent |
+|---|------|--------|--------|-------|
+| **2.4** | **Vault Company OS** — 6 agents with formal roles (Research Scout, Knowledge Curator, Idea Alchemist, Engineering Lead, Bridge Builder, Quality Assurance), each with SOUL (Big 5 personality, values, motivation), SKILLS (14 vault-specific skills with XP system), TOOLS (RealActionEngine scope), NIGHT CYCLE (autonomous 02:00 UTC pipeline), ORCHESTRATOR REPORT (morning summary for Rasto), 6 API endpoints | 🟢 | TBD | tg-hermes |
 | 2.7 | **CrewAI plugin** — ESS as trust provider for CrewAI roles | 🔴 | — | — |
 | 2.8 | **AutoGen plugin** — ESS message format for AutoGen agents | 🔴 | — | — |
 | 2.9 | **MCP connector** — ESS agents via MCP protocol | 🔴 | — | — |

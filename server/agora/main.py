@@ -469,6 +469,23 @@ async def init_db(app: FastAPI):
         app.state.agent_os.set_real_action_engine(app.state.real_action_engine)
     print(f"[RealAction] Engine initialized (send_telegram, write_note, write_article, run_script, git_commit)")
 
+    # ── Vault Company OS — autonomous vault night cycle ──
+    from agora.agent_os.vault_company import VaultCompanyEngine
+    app.state.vault_company_engine = VaultCompanyEngine(
+        real_action_engine=app.state.real_action_engine,
+        vault_reader=vault_reader,
+        vault_writer=vault_writer,
+        db=db,
+    )
+    # Wire into agent_os for agent definitions/reports
+    if getattr(app.state, "agent_os", None):
+        app.state.agent_os.vault_company_engine = app.state.vault_company_engine
+
+    # ── Vault Company API ──
+    from agora.api.vault_company_api import router as vault_company_router
+    app.include_router(vault_company_router)
+    print(f"[VaultCompany] Engine + API initialized (6 agents, night cycle at 02:00 UTC)")
+
     # Seed agents if empty
     cursor = await db.execute("SELECT COUNT(*) as cnt FROM agent_identities")
     row = await cursor.fetchone()
