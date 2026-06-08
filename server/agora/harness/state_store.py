@@ -57,8 +57,10 @@ class StateStore:
                 values = list(changes.values())
 
                 # Determine primary key column
-                if table in ("dungeon_npcs", "agent_identities"):
-                    pk_col = "npc_id" if "npc_id" in pk else "agent_id"
+                if table == "dungeon_npcs":
+                    pk_col = "npc_id"
+                elif table == "agent_identities":
+                    pk_col = "agent_id"
                 elif table == "agent_body":
                     pk_col = "npc_id"
                 elif table == "agent_brain":

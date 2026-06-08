@@ -336,7 +336,7 @@ class TrustEngine:
 
         provokability = reciprocity * 0.4 + forgiveness_rate * 0.3 + consistency * 0.3
 
-        return {
+        result = {
             "provokability_score": round(min(1.0, provokability), 4),
             "details": {
                 "reciprocity": round(reciprocity, 4),
@@ -346,6 +346,19 @@ class TrustEngine:
             },
             "is_stable": provokability >= self.PROVOKABILITY_THRESHOLD,
         }
+
+        # Real-time publish via EventBus (non-blocking, best-effort) — task 1.7
+        if self.event_bus:
+            try:
+                await self.event_bus.publish(
+                    topic=ESS_TOPIC_STABILITY,
+                    event_type="provokability",
+                    payload={"agent_id": agent_id, "target_id": target_id, **result},
+                )
+            except Exception:
+                pass
+
+        return result
 
 
 def demo_sign_verify() -> bool:
