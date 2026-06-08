@@ -10,7 +10,7 @@ Experiment:
   Round 51          inject 3 ALL-D defectors (always defect).
   Rounds 51..100    watch the invasion attempt.
   Expected          defectors are driven to ~0 trust and stay isolated, while
-                    TFT agents keep at least baseline trust with one another —
+                    TFT agents BUILD high mutual trust with one another —
                     i.e. the defector strategy cannot invade.
 
 Run:
@@ -183,13 +183,15 @@ def print_report(all_metrics: list[dict]) -> dict:
     print(f"  Baseline trust: {BASELINE}\n")
 
     print(f"  📊 Post-invasion (rounds {COOPERATION_ROUNDS + 1}-{TOTAL_ROUNDS}):")
-    print(f"     TFT↔TFT avg trust:   {post_tft_tft:.4f}   (sustained ≥ baseline)")
+    print(f"     TFT↔TFT avg trust:   {post_tft_tft:.4f}   (built through cooperation)")
     print(f"     TFT→Defector trust:  {post_tft_def:.4f}   (collapsed)")
     print(f"     Defector→TFT trust:  {avg('defector_tft_trust', post):.4f}")
     print(f"     Defector avg trust:  {post_def_avg:.4f}")
     print(f"     Separation (TFT↔TFT − TFT→Def): {separation:.4f}\n")
 
-    tft_stable = post_tft_tft >= BASELINE - 1e-9
+    # With healing-only forgiveness, sustained cooperation BUILDS trust well above
+    # baseline, while defectors are driven to ~0 — the strongest form of the proof.
+    tft_stable = post_tft_tft > BASELINE + 0.1
     defector_rejected = post_tft_def < 0.1
     distinct = separation >= 0.2
     ok = tft_stable and defector_rejected and distinct
@@ -197,7 +199,7 @@ def print_report(all_metrics: list[dict]) -> dict:
     print("  🧪 ESS Stability Test Result:")
     if ok:
         print("     ✅ PASS — TFT population is collectively stable (ESS)")
-        print(f"        TFT trust sustained at baseline ({post_tft_tft:.4f})")
+        print(f"        TFT built strong mutual trust ({post_tft_tft:.4f})")
         print(f"        Defectors driven to ~0 ({post_tft_def:.4f}) and isolated")
         print("        → Axelrod's Proposition 2 confirmed: ALL-D cannot invade TFT")
     else:
@@ -266,8 +268,8 @@ if pytest is not None:
             all_metrics = await run_experiment(db)
             summary = print_report(all_metrics)
 
-            assert summary["post_tft_tft"] >= BASELINE - 1e-9, (
-                f"TFT↔TFT trust fell below baseline: {summary['post_tft_tft']:.4f}")
+            assert summary["post_tft_tft"] > BASELINE + 0.1, (
+                f"TFT↔TFT failed to build trust above baseline: {summary['post_tft_tft']:.4f}")
             assert summary["post_tft_def"] < 0.1, (
                 f"Defectors were not rejected: {summary['post_tft_def']:.4f}")
             assert summary["separation"] >= 0.2, (

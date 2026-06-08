@@ -87,9 +87,10 @@ class Checkpointer:
             state["consecutive_defections"] = state.get("consecutive_defections", 0) + 1
             state["consecutive_cooperations"] = 0
 
-        # Forgiveness — a run of cooperations resets trust to baseline
+        # Forgiveness (healing-only) — lifts a damaged bond up to at least baseline,
+        # never caps a trusting bond. Mirrors TrustEngine.record_interaction.
         if state.get("consecutive_cooperations", 0) >= FORGIVENESS_THRESHOLD:
-            state["score"] = BASELINE_TRUST
+            state["score"] = max(state.get("score", BASELINE_TRUST), BASELINE_TRUST)
 
         # Sliding window (bounded)
         window = state.get("sliding_window", [])

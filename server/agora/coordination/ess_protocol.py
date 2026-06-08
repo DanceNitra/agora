@@ -161,9 +161,12 @@ class TrustEngine:
             trust["consecutive_defections"] += 1
             trust["consecutive_cooperations"] = 0
 
-        # Forgiveness: after N consecutive cooperations since last defection
+        # Forgiveness (TFT, healing-only): a sustained run of cooperation HEALS a bond.
+        # It only ever lifts trust UP to at least the neutral baseline (forgiving past
+        # defections) — it never pulls an already-trusting relationship back down. So
+        # sustained cooperation keeps building trust toward 1.0 (talking = bonding).
         if trust["consecutive_cooperations"] >= self.FORGIVENESS_THRESHOLD:
-            trust["score"] = self.BASELINE_TRUST
+            trust["score"] = max(trust["score"], self.BASELINE_TRUST)
 
         trust["interactions"] += 1
         trust["last_interaction_at"] = datetime.now(timezone.utc).isoformat()
