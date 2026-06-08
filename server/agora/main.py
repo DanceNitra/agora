@@ -601,6 +601,11 @@ async def lifespan(app: FastAPI):
         raise
     loop = asyncio.get_event_loop()
     loop.create_task(tick_loop(app))
+    try:
+        from agora.execution.telegram_bot import poll_loop
+        loop.create_task(poll_loop(app))           # two-way Telegram command center
+    except Exception as _e:
+        print(f"[Telegram] poller not started: {_e}")
     yield
     if hasattr(app.state, 'db') and app.state.db:
         await app.state.db.close()

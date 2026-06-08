@@ -261,6 +261,7 @@ async def brain_gaps(n: int = 10):
 async def _send_telegram(text: str) -> bool:
     """Send a message to the user via Telegram (HERMES_TELEGRAM_* env). No-op if unset."""
     import asyncio
+    import json
     import os
     import subprocess
     token, chat = os.getenv("HERMES_TELEGRAM_BOT_TOKEN", ""), os.getenv("HERMES_TELEGRAM_CHAT_ID", "")
@@ -278,16 +279,29 @@ async def _send_telegram(text: str) -> bool:
     return await asyncio.to_thread(_s)
 
 
-@router.post("/brain/morning-report")
-async def morning_report(request: Request, send: bool = True):
-    """Build a morning digest of the agents' overnight research and send it to Telegram:
-    the strongest grounded findings + the gaps they targeted + what's worth attention."""
+_PLAN_META = ("build ", "together we", "draft ", "create a collaborative", "design and",
+              "no real papers", "your vault contains no", "begin by", "we will", "let's",
+              "i will", "propose to")
+
+
+async def _build_morning_report(app) -> str:
+    """Build the morning digest — only REAL grounded findings (plans/meta filtered) + gaps."""
     from datetime import datetime, timezone
-    db = request.app.state.db
+    db = app.state.db
     cur = await db.execute(
-        "SELECT title, content, contributor_name FROM collective_knowledge "
-        "WHERE knowledge_type='discovery' ORDER BY created_at DESC LIMIT 6")
-    findings = await cur.fetchall()
+        "SELECT content FROM collective_knowledge WHERE knowledge_type='discovery' "
+        "ORDER BY created_at DESC LIMIT 20")
+    rows = await cur.fetchall()
+    findings = []
+    for r in rows:
+        c = (r["content"] or "").strip()
+        if len(c) < 60:
+            continue
+        if any(b in c.lower()[:45] for b in _PLAN_META):     # drop plans / meta-statements
+            continue
+        findings.append(c)
+        if len(findings) >= 5:
+            break
     from agora.execution.semantic_index import SemanticIndex
     global _SEM_INDEX
     if _SEM_INDEX is None or not _SEM_INDEX.ready:
@@ -297,17 +311,23 @@ async def morning_report(request: Request, send: bool = True):
     day = datetime.now(timezone.utc).strftime("%Y-%m-%d")
     lines = [f"☀️ *Agora — ranný report* ({day})", ""]
     if findings:
-        lines.append(f"🔬 *Cez noc — {len(findings)} grounded zistení:*")
-        for f in findings[:5]:
-            lines.append(f"• {(f['content'] or '')[:160]}")
+        lines.append("🔬 *Cez noc — grounded zistenia:*")
+        for f in findings:
+            lines.append(f"• {f[:200]}")
         lines.append("")
     if gaps:
-        lines.append("🎯 *Tvoje medzery, na ktoré mieria:*")
+        lines.append("🎯 *Tvoje medzery (agenti na ne mieria):*")
         for g in gaps:
             lines.append(f"• {g['title']}")
         lines.append("")
-    lines.append("_grounded v reálnych zdrojoch (OpenAlex/arXiv) + napojené na tvoje noty_")
-    text = "\n".join(lines)
+    lines.append("_Napíš otázku → grounded brief · `gaps` · `report`_")
+    return "\n".join(lines)
+
+
+@router.post("/brain/morning-report")
+async def morning_report(request: Request, send: bool = True):
+    """Build a morning digest (real grounded findings + targeted gaps) and Telegram it."""
+    text = await _build_morning_report(request.app)
     sent = await _send_telegram(text) if send else False
     return {"status": "ok", "sent": sent, "report": text}
 
