@@ -487,8 +487,8 @@ def _persona(eid: str) -> str:
     return _PERSONA.get(eid, "a weary dungeon dweller")
 
 
-def _llm_say_sync(system: str, user: str) -> str | None:
-    """Blocking OpenRouter call → one short line, or None on any failure."""
+def _llm_content_sync(system: str, user: str) -> str | None:
+    """Blocking OpenRouter call → raw assistant message content, or None on failure."""
     if not _LLM_ON:
         return None
     payload = json.dumps({
@@ -508,11 +508,33 @@ def _llm_say_sync(system: str, user: str) -> str | None:
     try:
         with _urlreq.urlopen(req, timeout=25) as r:
             data = json.loads(r.read())
-        content = data["choices"][0]["message"]["content"]
+        return data["choices"][0]["message"]["content"]
+    except Exception as e:
+        logger.debug(f"LLM call failed: {e}")
+        return None
+
+
+def _llm_say_sync(system: str, user: str) -> str | None:
+    """OpenRouter call expecting {"line": "..."} → the line, or None."""
+    content = _llm_content_sync(system, user)
+    if not content:
+        return None
+    try:
         line = (json.loads(content).get("line") or "").strip()
         return line[:120] or None
-    except Exception as e:
-        logger.debug(f"LLM say failed: {e}")
+    except Exception:
+        return None
+
+
+def _llm_json_sync(system: str, user: str) -> dict | None:
+    """OpenRouter call expecting a JSON object → the parsed dict, or None."""
+    content = _llm_content_sync(system, user)
+    if not content:
+        return None
+    try:
+        obj = json.loads(content)
+        return obj if isinstance(obj, dict) else None
+    except Exception:
         return None
 
 
@@ -720,69 +742,123 @@ def _astar(start: tuple[int, int], goal: tuple[int, int]) -> list[tuple[int, int
     return None
 
 
+_ROLE_HINT = {
+    "king":    "hold court, issue a decree, inspect your domain, summon a subject",
+    "guard_l": "patrol a weak point, secure a post, drill, confront a suspected intruder",
+    "guard_r": "sweep the great hall, inspect the defenses, challenge a shadow",
+    "priest":  "pray, bless a place or person, tend the shrine, read an omen",
+    "thief":   "case the treasury, pocket a trinket, scout the shadows, dodge the guards",
+    "scholar": "study a rune, catalogue the archive, investigate an oddity, test a theory",
+}
+
+# Named destinations the LLM can send an agent to (tile = standing spot).
+_LOCATIONS = {k: v["tile"] for k, v in _POSTS.items()}  # throne, treasury, library, ...
+
+
 async def ambient_life():
-    """Task-driven simulation: a quest board hands out posts across the whole keep,
-    agents A*-path to them, perform the action, and report done. Guards still spar
-    when they cross paths (attack → hit → HP → knockout → revive). The board and all
-    state stream to the client. Disable with DUNGEON_AMBIENT=0 (e.g. Hermes drives).
+    """LLM-driven emergent simulation. Each agent decides its OWN goal via the LLM
+    based on its persona, recent memory, who's nearby and the latest keep news — then
+    pursues it (A*), narrates it, and remembers it so it never repeats itself. Guards
+    still spar; agents who meet converse; everything feeds the ESS trust engine.
+    Disable with DUNGEON_AMBIENT=0.
     """
     if os.environ.get("DUNGEON_AMBIENT", "1") == "0":
         return
     await asyncio.sleep(2.0)  # let the first browser connect
 
-    tasks: list[dict] = []          # the live quest board
-    next_id = 1
-    paths: dict[str, list] = {}     # remaining path tiles per agent
-    task_of: dict[str, int] = {}    # agent -> task id
-    hold: dict[str, int] = {}       # ticks to stand still (action / combat anim)
-    cooldown: dict[str, int] = {}   # spar cooldown
-    dead: dict[str, int] = {}       # knockout countdown
+    paths: dict[str, list] = {}        # remaining A* tiles per agent
+    hold: dict[str, int] = {}          # ticks to stand still
+    cooldown: dict[str, int] = {}      # spar cooldown
+    dead: dict[str, int] = {}          # knockout countdown
+    goals: dict[str, dict] = {}        # eid -> {intent, tile, action, where}
+    memory: dict[str, list] = {}       # eid -> last things this agent did/saw
+    next_decide: dict[str, float] = {} # eid -> monotonic time of next decision
+    deciding: set[str] = set()         # decisions in flight
+    world_events: list[str] = []       # recent keep news (shared, for reactivity)
     loop_n = 0
     await _init_trust()
-    logger.info("Task simulation loop started")
+    logger.info("LLM-driven life loop started")
 
-    def publish():
+    def remember(eid, text):
+        memory.setdefault(eid, []).append(text)
+        memory[eid] = memory[eid][-8:]
+
+    def note_event(text):
+        world_events.append(text)
+        del world_events[:-6]
+
+    def publish_goals():
         engine.set_tasks([
-            {"id": t["id"], "title": t["title"], "agent": t["agent"], "status": t["status"]}
-            for t in tasks
+            {"id": i, "title": g["intent"], "agent": _AGENT_NAMES.get(eid, eid),
+             "status": "in_progress"}
+            for i, (eid, g) in enumerate(goals.items())
         ])
+
+    async def decide_goal(eid, cx, cy):
+        """Ask the LLM for this agent's next goal (fire-and-forget)."""
+        try:
+            ent = engine.state.entities.get(eid)
+            if not ent:
+                return
+            nearby = [_AGENT_NAMES.get(o, o) for o, e in engine.state.entities.items()
+                      if o != eid and abs(e.x - cx) + abs(e.y - cy) <= 8]
+            locs = ", ".join(_LOCATIONS.keys())
+            mem = " | ".join(memory.get(eid, [])[-4:]) or "(nothing yet)"
+            news = " | ".join(world_events[-4:]) or "(quiet)"
+            sysmsg = (
+                f"You are {_persona(eid)} You roam a torch-lit dungeon keep and act of "
+                f"your OWN free will. Be proactive and VARIED — do NOT repeat what you "
+                f"recently did; react to the keep's news and the people around you. "
+                f"You might {_ROLE_HINT.get(eid, 'explore and act in character')}. "
+                f'Reply ONLY JSON: {{"intent":"<your goal, present tense, max 12 words>",'
+                f'"location":"<one of: {locs} | an ally\'s name | wander>",'
+                f'"action":"<what you do on arrival, one short line>"}}'
+            )
+            usr = (f"Recently you: {mem}\nNearby: {', '.join(nearby) or 'no one'}\n"
+                   f"Keep news: {news}\nYour next goal:")
+            data = await asyncio.to_thread(_llm_json_sync, sysmsg, usr) or {}
+            intent = (data.get("intent") or "").strip() or random.choice(
+                _THOUGHTS.get(eid, ["wander the keep"]))
+            where = (data.get("location") or "wander").strip().lower()
+            action = (data.get("action") or "...").strip()
+
+            # Resolve destination → tile
+            tile = None
+            if where in _LOCATIONS:
+                tile = _LOCATIONS[where]
+            else:  # maybe an ally's name?
+                for oid, nm in _AGENT_NAMES.items():
+                    if oid != eid and nm.split()[-1].lower() in where:
+                        o = engine.state.entities.get(oid)
+                        if o:
+                            tile = (int(round(o.x)), int(round(o.y)))
+                        break
+            if tile is None or not _walkable(*tile):  # wander → random reachable spot
+                tile = random.choice(list(_LOCATIONS.values()))
+            goals[eid] = {"intent": intent, "tile": tile, "action": action, "where": where}
+            paths.pop(eid, None)  # fresh goal → fresh path
+            engine.set_entity_thought(eid, "» " + intent[:90])
+            engine.set_entity_state(eid, "walking")
+            publish_goals()
+        except Exception as e:
+            logger.debug(f"decide_goal {eid}: {e}")
+            goals[eid] = {"intent": "wander the keep", "where": "wander", "action": "...",
+                          "tile": random.choice(list(_LOCATIONS.values()))}
+        finally:
+            deciding.discard(eid)
 
     while True:
         await asyncio.sleep(0.85)
         ents = engine.state.entities
         occupied = {(int(round(e.x)), int(round(e.y))): eid for eid, e in ents.items()}
+        now = _time.monotonic()
         for eid in list(ents.keys()):
             hold[eid] = max(0, hold.get(eid, 0) - 1)
             cooldown[eid] = max(0, cooldown.get(eid, 0) - 1)
 
-        # Keep the board topped up; retire old completed quests
-        changed = False
-        done = [t for t in tasks if t["status"] == "done"]
-        if len(done) > 2:
-            for t in done[:-2]:
-                tasks.remove(t)
-            changed = True
-        # At most ONE active task per post → agents spread to distinct spots (no pile-ups)
-        open_n = sum(1 for t in tasks if t["status"] == "open")
-        active_posts = {t["post"] for t in tasks if t["status"] != "done"}
-        avail = [k for k in _POSTS if k not in active_posts]
-        random.shuffle(avail)
-        while open_n < 3 and avail:
-            key = avail.pop()
-            p = _POSTS[key]
-            tasks.append({"id": next_id, "post": key, "title": p["title"], "tile": p["tile"],
-                          "role": p["role"], "act": p["act"], "fx": p["fx"],
-                          "status": "open", "agent": None})
-            next_id += 1
-            open_n += 1
-            changed = True
-        if changed:
-            publish()
-
         # Agents that wander near each other strike up a conversation.
         _maybe_start_conversation(ents, dead, hold)
 
-        # Periodically push the full trust matrix so late-joining clients sync.
         loop_n += 1
         if loop_n % 18 == 1:
             _m = await _trust_matrix()
@@ -798,13 +874,12 @@ async def ambient_life():
                     engine.set_entity_health(eid, 100)
                     engine.set_entity_state(eid, "idle")
                     engine.set_entity_thought(eid, "")
+                    note_event(f"{_AGENT_NAMES.get(eid, eid)} rose again")
                 continue
-            if hold.get(eid, 0) > 0:
+            if hold.get(eid, 0) > 0 or eid in _in_conv:
                 continue
-            if eid in _in_conv:
-                continue  # busy in a conversation — handled by _converse
 
-            # Guards spar if they end up next to each other (interrupts the patrol)
+            # Guards spar if they end up next to each other
             if eid in _GUARDS and cooldown.get(eid, 0) == 0:
                 sparred = False
                 for oid in _GUARDS:
@@ -827,100 +902,65 @@ async def ambient_life():
                             engine.set_entity_thought(oid, "Aargh!")
                             engine.set_entity_thought(eid, "Yield!")
                             dead[oid] = 6
+                            note_event(f"{_AGENT_NAMES.get(eid, eid)} bested "
+                                       f"{_AGENT_NAMES.get(oid, oid)} in a spar")
                         else:
                             engine.set_entity_health(oid, hp)
                         hold[eid] = hold[oid] = 2
                         cooldown[eid] = cooldown[oid] = 5
-                        await record_trust(eid, oid, "defect")  # crossing blades erodes trust
+                        await record_trust(eid, oid, "defect")
+                        goals.pop(eid, None)  # combat interrupts the plan
                         sparred = True
                         break
                 if sparred:
                     continue
 
-            # Claim a task if free
-            tid = task_of.get(eid)
-            task = next((t for t in tasks if t["id"] == tid), None)
-            if task is None or task["status"] == "done":
-                task_of.pop(eid, None)
-                paths.pop(eid, None)
-                cand = ([t for t in tasks if t["status"] == "open" and t["role"] == eid]
-                        or [t for t in tasks if t["status"] == "open" and t["role"] is None]
-                        or [t for t in tasks if t["status"] == "open"])
-                # Take the nearest task we can actually reach
-                chosen, chosen_path = None, None
-                for c in sorted(cand, key=lambda t: abs(t["tile"][0] - cx) + abs(t["tile"][1] - cy)):
-                    pp = _astar((cx, cy), c["tile"])
-                    if pp is not None:
-                        chosen, chosen_path = c, pp
+            goal = goals.get(eid)
+
+            # No goal → ask the LLM (throttled, one decision in flight per agent)
+            if goal is None:
+                if eid not in deciding and now >= next_decide.get(eid, 0.0):
+                    deciding.add(eid)
+                    asyncio.create_task(decide_goal(eid, cx, cy))
+                continue
+
+            # Arrived → narrate the action, remember it, reward cooperation
+            if (cx, cy) == goal["tile"]:
+                engine.set_entity_state(eid, "interact")
+                engine.set_entity_thought(eid, goal["action"][:100])
+                engine.add_effect("glow", cx, cy, "#ffd27a", 0.9)
+                remember(eid, goal["intent"])
+                note_event(f"{_AGENT_NAMES.get(eid, eid)}: {goal['intent']}")
+                # If the goal was aimed at an ally standing here, that's cooperation.
+                for oid, e2 in ents.items():
+                    if oid != eid and abs(e2.x - cx) + abs(e2.y - cy) <= 1:
+                        await record_trust(eid, oid, "cooperate")
                         break
-                if chosen is None:
-                    roll = random.random()
-                    if roll < 0.25:
-                        engine.set_entity_state(eid, "thinking")
-                        _schedule_thought(
-                            eid, "You stand idle in the keep with no task right now.",
-                            random.choice(_THOUGHTS.get(eid, ["..."])))
-                        hold[eid] = 2
-                    elif roll < 0.7:
-                        # Wander one walkable step so paths cross → conversations happen.
-                        steps = [(1, 0), (-1, 0), (0, 1), (0, -1)]
-                        random.shuffle(steps)
-                        for dx, dy in steps:
-                            nx, ny = cx + dx, cy + dy
-                            if _walkable(nx, ny) and (nx, ny) not in occupied:
-                                engine.set_entity_state(eid, "walking")
-                                engine.move_entity(eid, nx, ny)
-                                occupied.pop((cx, cy), None)
-                                occupied[(nx, ny)] = eid
-                                break
-                    continue
-                chosen["status"] = "in_progress"
-                chosen["agent"] = ent.name
-                task_of[eid] = chosen["id"]
-                paths[eid] = chosen_path[1:]
-                engine.set_entity_state(eid, "walking")
-                engine.set_entity_thought(eid, "» " + chosen["title"])
-                publish()
-                continue
-
-            # Arrived → perform the action, then mark the quest done
-            if (cx, cy) == task["tile"]:
-                act = task["act"]
-                state = "casting" if act == "casting" else ("thinking" if act == "guard" else "interact")
-                engine.set_entity_state(eid, state)
-                _schedule_thought(
-                    eid, f"You just finished the task: '{task['title']}'. React briefly.",
-                    random.choice(_ACT_LINES.get(act, ["Done."])))
-                engine.add_effect("glow" if act != "guard" else "spark", cx, cy, task["fx"], 0.9)
                 hold[eid] = 3
-                task["status"] = "done"
-                task["agent"] = ent.name
-                task_of.pop(eid, None)
+                goals.pop(eid, None)
                 paths.pop(eid, None)
-                publish()
+                next_decide[eid] = now + random.uniform(3.0, 7.0)
+                publish_goals()
                 continue
 
-            # Walk the path (replanning if it ran out or the next step is blocked)
-            def _abandon():
-                task["status"] = "open"
-                task["agent"] = None
-                task_of.pop(eid, None)
-                paths.pop(eid, None)
-                publish()
-
+            # Walk toward the goal (replan if blocked)
             path = paths.get(eid) or []
             if not path:
-                p = _astar((cx, cy), task["tile"])
+                p = _astar((cx, cy), goal["tile"])
                 if p is None:
-                    _abandon(); continue            # goal no longer reachable → release it
+                    goals.pop(eid, None)        # unreachable → pick a new goal soon
+                    next_decide[eid] = now + 1.0
+                    continue
                 paths[eid] = path = p[1:]
             if not path:
+                goals.pop(eid, None)
                 continue
             nx, ny = path[0]
             if (nx, ny) in occupied and occupied[(nx, ny)] != eid:
-                p = _astar((cx, cy), task["tile"])  # someone's in the way → reroute
+                p = _astar((cx, cy), goal["tile"])
                 if p is None:
-                    _abandon(); continue
+                    goals.pop(eid, None); paths.pop(eid, None)
+                    continue
                 paths[eid] = p[1:]
                 continue
             engine.set_entity_state(eid, "walking")
