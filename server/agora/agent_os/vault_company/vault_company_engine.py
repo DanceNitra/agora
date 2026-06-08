@@ -36,11 +36,12 @@ class VaultCompanyEngine:
     """
     
     def __init__(self, real_action_engine=None, vault_reader=None,
-                 vault_writer=None, db=None):
+                 vault_writer=None, db=None, llm_enabled: bool = False):
         self.real_action_engine = real_action_engine
         self.vault_reader = vault_reader
         self.vault_writer = vault_writer
         self.db = db
+        self.llm_enabled = llm_enabled
         
         # Track current night cycle state
         self.current_cycle_id = None
@@ -200,15 +201,11 @@ class VaultCompanyEngine:
         context: dict, tools: dict, skills: dict,
     ) -> dict:
         """
-        Execute the agent's assigned work for this phase.
+        Execute the agent's assigned work using real LLM think.
         
-        Each phase has a specific output type:
-          - research_scan: search web/vault → write research brief
-          - write_notes: research brief → structured concept notes
-          - generate_ideas: concepts → novel idea combinations
-          - bridge_notes: notes → wikilinks + MOC files
-          - build_tools: ideas → scripts/code/tools
-          - quality_audit: everything → quality score + report
+        When llm_enabled=True, calls vault_company_think() which reads the agent's
+        directory files and generates real, character-authentic output.
+        Falls back to template text when LLM is disabled or unavailable.
         """
         output = {
             "summary": "",
@@ -220,10 +217,82 @@ class VaultCompanyEngine:
             "agent_thought": "",
         }
         
-        # Determine vault path based on phase
-        vault_base = os.path.expanduser("~/my-second-brain" if os.path.exists(
-            os.path.expanduser("~/my-second-brain")
-        ) else "/tmp/agora-vault")
+        primary_skills = skills.get("primary", [])
+        output["skills_used"] = [s[0] for s in primary_skills if s[1] >= 3]
+        output["tools_used"] = tools.get("night_cycle_tools", [])
+        
+        # ── LLM MODE: use real agent thinking ──
+        if self.llm_enabled:
+            try:
+                from .vault_company_think import vault_company_think
+                
+                context_str = json.dumps({
+                    "phase": phase_name,
+                    "agent": agent_name,
+                    "previous_phases": context.get("previous_phases", []),
+                    "time": datetime.now().isoformat(),
+                }, ensure_ascii=False)
+                
+                llm_result = await vault_company_think(
+                    agent_name=agent_name,
+                    phase_name=phase_name,
+                    context=context_str,
+                    tier="cheap",
+                )
+                
+                output["summary"] = llm_result.get("summary", "LLM phase completed")
+                output["quality_score"] = llm_result.get("quality_score", 6) / 10.0
+                output["agent_thought"] = llm_result.get("agent_thought", "")
+                output["llm_raw"] = llm_result
+                
+                # For phases that generate files, extract content
+                vault_base = os.path.expanduser(
+                    "~/my-second-brain" if os.path.exists(
+                        os.path.expanduser("~/my-second-brain")
+                    ) else "/tmp/agora-vault"
+                )
+                
+                if phase_name == "write_notes" and llm_result.get("note_content"):
+                    title = llm_result.get("note_title", f"Concept - {datetime.now().strftime('%Y-%m-%d')}")
+                    content = llm_result.get("note_content", "")
+                    tags = llm_result.get("concepts_covered", ["concept", "night-cycle"])
+                    fpath = await self._write_vault_note(
+                        vault_base, VAULT_OUTPUT_PATHS["concept_note"],
+                        title, content, tags, agent_name,
+                    )
+                    if fpath:
+                        output["files_created"].append(fpath)
+                
+                elif phase_name == "generate_ideas" and llm_result.get("ideas"):
+                    ideas_raw = llm_result.get("ideas", [])
+                    ideas_content = self._format_ideas_from_llm(ideas_raw)
+                    fpath = await self._write_vault_note(
+                        vault_base, VAULT_OUTPUT_PATHS["idea"],
+                        f"Ideas - {datetime.now().strftime('%Y-%m-%d')}",
+                        ideas_content,
+                        tags=["ideas", "night-cycle", agent_name.lower().replace(" ", "-")],
+                        agent_name=agent_name,
+                    )
+                    if fpath:
+                        output["files_created"].append(fpath)
+                
+                elif phase_name == "research_scan":
+                    brief_content = self._generate_research_brief(agent_name, [], {})
+                    output["summary"] = llm_result.get("summary", "Research scan completed")
+                
+                return output
+            
+            except Exception as e:
+                print(f"[VaultCompany] ⚠️ LLM think failed for {agent_name}/{phase_name}: {e}")
+                print(f"[VaultCompany] Falling back to template mode")
+                # Fall through to template mode
+        
+        # ── TEMPLATE MODE (fallback) ──
+        vault_base = os.path.expanduser(
+            "~/my-second-brain" if os.path.exists(
+                os.path.expanduser("~/my-second-brain")
+            ) else "/tmp/agora-vault"
+        )
         
         # ── Phase-specific execution ──
         
@@ -696,6 +765,38 @@ their specialized knowledge to form a collective insight.
         
         lines.append("---")
         lines.append(f"*Generated by High Priest Orin | Cycle {self.current_cycle_id}*")
+        return "\n".join(lines)
+
+    def _format_ideas_from_llm(self, ideas_raw: list) -> str:
+        """Format LLM-generated ideas as vault markdown."""
+        lines = [
+            f"# Ideas Generated — {datetime.now().strftime('%Y-%m-%d')}",
+            "",
+            f"**Generated via:** LLM with agent personality injection",
+            f"**Cycle:** {self.current_cycle_id}",
+            "",
+            "---",
+            "",
+        ]
+        for idea in ideas_raw:
+            name = idea.get("name", "Unnamed Idea")
+            desc = idea.get("description", "")
+            technique = idea.get("technique_used", "fusion")
+            score = idea.get("applicability_score", 50)
+            category = idea.get("category", "GROWING" if score < 80 else "PRIME")
+            emoji = "🟢" if score >= 80 else "🟡"
+            
+            lines.append(f"### {emoji} {name} (Score: {score})")
+            lines.append("")
+            lines.append(f"**Technique:** {technique}")
+            lines.append("")
+            lines.append(desc)
+            lines.append("")
+            lines.append(f"**Category:** {category}")
+            lines.append("")
+
+        lines.append("---")
+        lines.append(f"*Generated by LLM Agent Vault Think | Cycle {self.current_cycle_id}*")
         return "\n".join(lines)
 
     def _generate_moc(self, agent_name, files):

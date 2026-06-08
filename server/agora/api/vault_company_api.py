@@ -171,3 +171,38 @@ async def log_agent_action(agent_name: str, req: LogActionRequest, request: "Req
     if not success:
         raise HTTPException(status_code=400, detail=f"Invalid log_type: {req.log_type}. Use: actions, decisions, or episodic.")
     return {"status": "ok", "agent": agent_name, "log_type": req.log_type, "logged": True}
+
+
+class ThinkRequest(BaseModel):
+    agent_name: str
+    phase: str = "research_scan"
+    context: str = ""
+    tier: str = "cheap"
+
+
+@router.post("/think")
+async def agent_think_llm(req: ThinkRequest, request: "Request"):
+    """Have a vault company agent 'think' using real LLM with their personality."""
+    from agora.agent_os.vault_company.vault_company_think import vault_company_think
+    
+    result = await vault_company_think(
+        agent_name=req.agent_name,
+        phase_name=req.phase,
+        context=req.context,
+        tier=req.tier,
+    )
+    return {"status": "ok", "agent": req.agent_name, "phase": req.phase, "result": result}
+
+
+@router.get("/think/{agent_name}/{phase}")
+async def agent_think_get(agent_name: str, phase: str = "research_scan", request: "Request" = None, context: str = ""):
+    """Quick GET endpoint to have an agent think (for testing)."""
+    from agora.agent_os.vault_company.vault_company_think import vault_company_think
+    
+    result = await vault_company_think(
+        agent_name=agent_name,
+        phase_name=phase,
+        context=context,
+        tier="cheap",
+    )
+    return {"status": "ok", "agent": agent_name, "phase": phase, "result": result}

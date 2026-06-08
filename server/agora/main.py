@@ -476,6 +476,7 @@ async def init_db(app: FastAPI):
         vault_reader=vault_reader,
         vault_writer=vault_writer,
         db=db,
+        llm_enabled=settings.llm_enabled,
     )
     # Wire into agent_os for agent definitions/reports
     if getattr(app.state, "agent_os", None):
