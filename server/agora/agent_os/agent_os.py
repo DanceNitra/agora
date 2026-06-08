@@ -189,6 +189,12 @@ class AgentOS:
         self.db = db
         self.state_store = state_store
         self.llm_enabled = llm_enabled
+        # ── ESS / dungeon integration (task 1.9) ──
+        # Wired from main.py after the coordinators exist; optional so AgentOS
+        # still works standalone (tests, fresh boot) when they are absent.
+        self.trust_engine = None   # coordination.ess_protocol.TrustEngine
+        self.stigmergy = None      # coordination.stigmergy.StigmergyPool
+        self.event_bus = None      # coordination.event_bus.EventBus
 
     async def ensure_os_initialized(self):
         """Seed OS data for all 7 NPCs if not already present."""
@@ -409,32 +415,103 @@ class AgentOS:
                 plan_stack = json.loads(brain.get("plan_stack", "[]") or "[]")
                 memories = json.loads(brain.get("memory", "[]") or "[]")
 
-                # Nearby NPCs
+                context_lines = [
+                    f"=== {name} ===",
+                    f"Role: {role}",
+                    f"Status: Health={health:.0f}%, Stamina={stamina:.0f}%, Fatigue={fatigue:.0f}%",
+                    f"State of mind: {state_of_mind}",
+                    f"Current goal: {current_goal or 'none'}",
+                    f"Plans remaining: {len(plan_stack)}",
+                    f"Recent memories: {memories[-3:] if memories else 'none'}",
+                ]
+
+                # ── Nearby NPCs (names + UUIDs) ──
                 nearby_str = ""
+                nearby = []  # list of (npc_id, name)
                 try:
                     all_npcs = await self.state_store.get_all_active_npcs()
-                    my_room = ""
                     from agora.agent_os.dungeon_map import get_room_at
                     my_room = get_room_at(npc.get("pos_x", 0), npc.get("pos_y", 0))
-                    nearby_names = []
                     for other in all_npcs:
                         if other["npc_id"] != npc_id:
                             other_room = get_room_at(other.get("pos_x", 0), other.get("pos_y", 0))
                             if other_room == my_room:
-                                nearby_names.append(other.get("npc_name", ""))
-                    if nearby_names:
-                        nearby_str = f"Nearby: {', '.join(nearby_names)}"
+                                nearby.append((other["npc_id"], other.get("npc_name", "")))
+                    if nearby:
+                        nearby_str = "Nearby: " + ", ".join(n for _, n in nearby)
                 except Exception:
                     pass
 
-                context = (
-                    f"Health={health:.0f}%, Stamina={stamina:.0f}%, Fatigue={fatigue:.0f}%. "
-                    f"State of mind: {state_of_mind}. "
-                    f"Goal: {current_goal or 'none'}. "
-                    f"Plans remaining: {len(plan_stack)}. "
-                    f"{nearby_str}. "
-                    f"Recent memories: {memories[-3:] if memories else 'none'}."
-                )
+                # ── Skills ──
+                try:
+                    cursor = await self.db.execute(
+                        "SELECT skill_name, level FROM agent_skills WHERE npc_id=? "
+                        "ORDER BY level DESC LIMIT 5",
+                        (npc_id,),
+                    )
+                    rows = await cursor.fetchall()
+                    if rows:
+                        context_lines.append(
+                            "Skills: " + "; ".join(f"{r['skill_name']} (lvl {r['level']})" for r in rows))
+                except Exception:
+                    pass
+
+                # ── Abilities ──
+                try:
+                    cursor = await self.db.execute(
+                        "SELECT ability_name, power_level FROM agent_abilities "
+                        "WHERE npc_id=? AND is_passive=0 ORDER BY power_level DESC LIMIT 3",
+                        (npc_id,),
+                    )
+                    rows = await cursor.fetchall()
+                    if rows:
+                        context_lines.append(
+                            "Active abilities: " + "; ".join(
+                                f"{r['ability_name']} ({r['power_level']}/10)" for r in rows))
+                except Exception:
+                    pass
+
+                # ── ESS trust scores for nearby agents ──
+                if self.trust_engine and nearby:
+                    try:
+                        trust_bits = []
+                        for other_id, other_name in nearby:
+                            tv = await self.trust_engine.get_trust(npc_id, other_id)
+                            trust_bits.append(f"{other_name}: {tv:.2f}")
+                        if trust_bits:
+                            context_lines.append("Trust scores: " + " | ".join(trust_bits))
+                    except Exception:
+                        pass
+
+                # ── Stigmergy swarm signals ──
+                if self.stigmergy:
+                    try:
+                        traces = await self.stigmergy.recent_alerts(limit=5)
+                        bits = []
+                        for t in traces:
+                            txt = (t.get("result_preview") or t.get("result")
+                                   or t.get("message") or "")
+                            if txt:
+                                bits.append(str(txt)[:60])
+                        if bits:
+                            context_lines.append("Recent swarm signals: " + "; ".join(bits))
+                    except Exception:
+                        pass
+
+                if nearby_str:
+                    context_lines.append(nearby_str)
+
+                # Response-format hint (dungeon_agent_think embeds this in the prompt).
+                # state_of_mind values must be ones StateStore accepts, else they
+                # are coerced to "confused" (which would trigger seek-help).
+                context_lines.append(
+                    "\nRespond with a JSON object including: "
+                    '"action" (explore|cooperate|defect|seek_help|rest|share|move_to), '
+                    '"target_id" (a nearby name or null), "goal", '
+                    '"state_of_mind" (focused|planning|resting|confused|panicked|blocked), '
+                    '"insight" (1 sentence), "skill_to_use" (a skill name or null).')
+
+                context = "\n".join(context_lines)
 
                 # Run LLM in thread (it's synchronous)
                 decision = await asyncio.to_thread(
@@ -450,6 +527,12 @@ class AgentOS:
                     update["current_goal"] = new_goal
                 await self.state_store.update_brain(npc_id, update)
 
+                # Execute the decision visibly + record in ESS (best-effort).
+                try:
+                    await self._execute_llm_decision(npc_id, name, decision, npc, nearby)
+                except Exception as ex:
+                    print(f"[AgentOS/1.9] {name} execute error: {ex}")
+
                 return new_state
 
             except Exception as e:
@@ -458,6 +541,122 @@ class AgentOS:
 
         # ── Rule-based fallback ──
         return await self._think_rule_based(npc_id)
+
+    async def _resolve_target(self, target, nearby: list) -> str | None:
+        """Resolve an LLM-supplied target (a name or a UUID) to a real npc_id."""
+        if not target or not isinstance(target, str):
+            return None
+        # Already a known nearby UUID?
+        for oid, oname in nearby:
+            if target == oid:
+                return oid
+        # A nearby name (case-insensitive)?
+        for oid, oname in nearby:
+            if oname and target.strip().lower() == oname.strip().lower():
+                return oid
+        # Fall back to a global name lookup.
+        try:
+            return await self._npc_id_by_name(target)
+        except Exception:
+            return None
+
+    async def _execute_llm_decision(self, npc_id, name, decision, npc, nearby):
+        """Execute an LLM decision visibly in the dungeon and record it in ESS.
+
+        Best-effort: every sub-action is guarded so a malformed LLM response can
+        never break the tick. `nearby` is a list of (npc_id, name) tuples.
+        """
+        action = (decision.get("action") or "explore").strip().lower()
+        insight = decision.get("insight", "") or ""
+        skill_to_use = decision.get("skill_to_use")
+        new_state = decision.get("state_of_mind", "focused")
+        target_id = await self._resolve_target(decision.get("target_id"), nearby)
+
+        # NOTE: execution-phase writes go DIRECT to the DB (not via the StateStore
+        # write-buffer), so visible side effects are immediate and independent of
+        # whether the caller wraps the tick in begin_tick/commit_tick.
+
+        # Record the chosen action on the brain for observability.
+        try:
+            await self.db.execute(
+                "UPDATE agent_brain SET last_decision=?, last_decision_at=datetime('now') "
+                "WHERE npc_id=?", (insight[:240], npc_id))
+        except Exception:
+            pass
+
+        # ── Visible dungeon actions ──
+        if action == "move_to" and target_id:
+            try:
+                tnpc = await self.state_store.get_npc(target_id)
+                if tnpc:
+                    nx, ny = npc.get("pos_x", 320), npc.get("pos_y", 240)
+                    tx, ty = tnpc.get("pos_x", nx), tnpc.get("pos_y", ny)
+                    step = 20  # px per tick, toward the target (smooth)
+                    nx += (1 if tx > nx else -1 if tx < nx else 0) * min(step, abs(tx - nx))
+                    ny += (1 if ty > ny else -1 if ty < ny else 0) * min(step, abs(ty - ny))
+                    await self.db.execute(
+                        "UPDATE dungeon_npcs SET pos_x=?, pos_y=? WHERE npc_id=?",
+                        (nx, ny, npc_id))
+            except Exception:
+                pass
+
+        elif action in ("cooperate", "share") and target_id:
+            if self.trust_engine:
+                try:
+                    await self.trust_engine.record_interaction(npc_id, target_id, "cooperate")
+                except Exception:
+                    pass
+            try:  # cooperation reward: small heal for the partner
+                await self.db.execute(
+                    "UPDATE dungeon_npcs SET health=MIN(100, health + 2) WHERE npc_id=?",
+                    (target_id,))
+            except Exception:
+                pass
+
+        elif action == "defect" and target_id:
+            if self.trust_engine:
+                try:
+                    await self.trust_engine.record_interaction(npc_id, target_id, "defect")
+                except Exception:
+                    pass
+
+        elif action == "seek_help":
+            try:
+                await self._seek_help_auto(npc_id, name, broadcast_fn=None)
+            except Exception:
+                pass
+
+        elif action == "rest":
+            try:
+                await self.db.execute(
+                    "UPDATE agent_body SET stamina=MIN(100, stamina + 15) WHERE npc_id=?",
+                    (npc_id,))
+            except Exception:
+                pass
+
+        # ── Skill XP gain ──
+        if skill_to_use:
+            try:
+                await self.db.execute(
+                    "UPDATE agent_skills SET xp = COALESCE(xp, 0) + 5, "
+                    "last_used_at = datetime('now') WHERE npc_id=? AND skill_name=?",
+                    (npc_id, skill_to_use),
+                )
+            except Exception:
+                pass
+
+        # ── Broadcast a thought bubble to the dungeon view ──
+        if self.event_bus and insight:
+            try:
+                await self.event_bus.publish("agent:events", "agent_thought", {
+                    "agent_id": name,
+                    "action": action,
+                    "insight": insight[:120],
+                    "state_of_mind": new_state,
+                    "target_id": target_id,
+                })
+            except Exception:
+                pass
 
     async def _think_rule_based(self, npc_id: str, name: str | None = None) -> str:
         """Rule-based state_of_mind decision (backup when LLM unavailable)."""

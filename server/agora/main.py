@@ -121,6 +121,12 @@ async def init_db(app: FastAPI):
     app.state.event_bus = EventBus(app)
     await app.state.event_bus.start()
 
+    # ── 1.9: give the dungeon NPC brain access to ESS trust, stigmergy, event bus ──
+    if getattr(app.state, "agent_os", None):
+        app.state.agent_os.trust_engine = getattr(app.state, "trust", None)
+        app.state.agent_os.stigmergy = getattr(app.state, "stigmergy", None)
+        app.state.agent_os.event_bus = app.state.event_bus
+
     # ── Event Sourcing: append-only EventStore (ESS 1.1) ──
     from agora.coordination.event_store import EventStore
     if db:
