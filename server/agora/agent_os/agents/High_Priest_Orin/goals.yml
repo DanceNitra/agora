@@ -1,0 +1,23 @@
+# Goals — High Priest Orin
+# Short-term, long-term, and life goals.
+
+life_goal:
+  objective: "Generate one PRIME idea every week"
+  deadline: "ongoing"
+  progress: 0.0
+  status: "active"
+
+skills_goal:
+  objective: "Reach idea_generation level 12"
+  deadline: "2026-12"
+  progress: 0.0
+  status: "active"
+
+short_goal:
+  objective: "Generate 5 new ideas from latest concept notes"
+  deadline: "daily"
+  progress: 0.0
+  status: "active"
+
+# 3 active goals
+# Last updated: 2026-06-08

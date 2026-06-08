@@ -1,0 +1,27 @@
+# Workflow — Sergeant Voss
+# Defines the agent's daily routine and night cycle.
+
+schedule:
+  night_cycle: "02:00 UTC"
+  night_cycle_phase: "quality_audit"
+  report_deadline: "06:00 UTC"
+  orchestrator_check: "08:00 UTC"
+
+night_cycle:
+  step_1: "Preberie všetky nightly výstupy"
+  step_2: "Skontroluje: frontmatter, tagy, štruktúra, dĺžka, zdroje"
+  step_3: "Každému príspevku dá score (1-10)"
+  step_4: "Ak score < 6 → vráti na prepracovanie + komentár"
+  step_5: "Ak score >= 6 → schváli a commitne do vaultu"
+  step_6: "Napíše Quality Report pre Rasta"
+
+dependencies:
+  - "All outputs from all previous phases"
+
+deliverables:
+  - "Quality Report .md in vault/09 Meta/Quality Reports/"
+
+interaction_patterns:
+  - "Issues quality reports to all agents"
+  - "Collaborates with Sage Mira on standards"
+  - "Escalates critical issues to orchestrator"

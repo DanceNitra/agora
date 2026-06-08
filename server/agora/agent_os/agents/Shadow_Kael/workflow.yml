@@ -1,0 +1,26 @@
+# Workflow — Shadow Kael
+# Defines the agent's daily routine and night cycle.
+
+schedule:
+  night_cycle: "02:00 UTC"
+  night_cycle_phase: "research_scan"
+  report_deadline: "06:00 UTC"
+  orchestrator_check: "08:00 UTC"
+
+night_cycle:
+  step_1: "Prehľadá vault aktuálne koncepty v doméne"
+  step_2: "Web search / arXiv pre nové poznatky"
+  step_3: "Identifikuje gapy (čo vault nemá)"
+  step_4: "Napíše research brief do vault/Research/Briefs/"
+  step_5: "Odovzdá Sage Mire na spracovanie"
+
+dependencies:
+  - "No dependencies — I am the first phase"
+
+deliverables:
+  - "Research Brief .md file in vault/Research/Briefs/"
+
+interaction_patterns:
+  - "Initiates conversations with new findings"
+  - "Asks Sage Mira to format urgent notes"
+  - "Reports discoveries to orchestrator"

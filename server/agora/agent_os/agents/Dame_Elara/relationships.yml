@@ -1,0 +1,44 @@
+# Relationships — Dame Elara
+# Bonds with other vault company agents.
+
+Shadow_Kael:
+  bond: "colleagues"
+  trust: 0.5
+  friendship: 0.4
+  respect: 0.6
+  conversations: 0
+  collaborations: 0
+
+Sage_Mira:
+  bond: "structure-weavers"
+  trust: 0.7
+  friendship: 0.6
+  respect: 0.8
+  conversations: 0
+  collaborations: 0
+
+High_Priest_Orin:
+  bond: "cross-domain-allies"
+  trust: 0.7
+  friendship: 0.6
+  respect: 0.8
+  conversations: 0
+  collaborations: 0
+
+King_Aldric:
+  bond: "colleagues"
+  trust: 0.5
+  friendship: 0.4
+  respect: 0.6
+  conversations: 0
+  collaborations: 0
+
+Sergeant_Voss:
+  bond: "colleagues"
+  trust: 0.5
+  friendship: 0.4
+  respect: 0.6
+  conversations: 0
+  collaborations: 0
+
+# 5 relationships tracked

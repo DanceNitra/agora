@@ -117,3 +117,57 @@ async def get_cycle_history(request: "Request"):
             "report": cycle.get("orchestrator_report"),
         },
     }
+
+
+# ═══════════════════════════════════════════════════════════════
+# AGENT DIRECTORY ENDPOINTS
+# ═══════════════════════════════════════════════════════════════
+
+@router.get("/agent/{agent_name}/directory")
+async def list_agent_directory(agent_name: str, request: "Request"):
+    """List all files in an agent's directory."""
+    from agora.agent_os.vault_company import AgentDirectoryManager
+    
+    mgr = AgentDirectoryManager()
+    files = await mgr.list_files(agent_name)
+    return {"status": "ok", "agent": agent_name, "files": files, "count": len(files)}
+
+
+@router.get("/agent/{agent_name}/directory/{file_path:path}")
+async def read_agent_file(agent_name: str, file_path: str, request: "Request"):
+    """Read a specific file from an agent's directory."""
+    from agora.agent_os.vault_company import AgentDirectoryManager
+    
+    mgr = AgentDirectoryManager()
+    content = await mgr.read_file(agent_name, file_path)
+    if content is None:
+        raise HTTPException(status_code=404, detail=f"File '{file_path}' not found for agent '{agent_name}'")
+    return {"status": "ok", "agent": agent_name, "file": file_path, "content": content, "size": len(content)}
+
+
+@router.get("/agent/{agent_name}/summary")
+async def get_agent_directory_summary(agent_name: str, request: "Request"):
+    """Get summary of an agent from their directory files."""
+    from agora.agent_os.vault_company import AgentDirectoryManager
+    
+    mgr = AgentDirectoryManager()
+    summary = await mgr.get_agent_summary(agent_name)
+    return {"status": "ok", "agent": summary}
+
+
+class LogActionRequest(BaseModel):
+    agent_name: str
+    log_type: str  # "actions" or "decisions" or "episodic"
+    entry: dict
+
+
+@router.post("/agent/{agent_name}/log")
+async def log_agent_action(agent_name: str, req: LogActionRequest, request: "Request"):
+    """Append an entry to an agent's log."""
+    from agora.agent_os.vault_company import AgentDirectoryManager
+    
+    mgr = AgentDirectoryManager()
+    success = await mgr.append_log(agent_name, req.log_type, req.entry)
+    if not success:
+        raise HTTPException(status_code=400, detail=f"Invalid log_type: {req.log_type}. Use: actions, decisions, or episodic.")
+    return {"status": "ok", "agent": agent_name, "log_type": req.log_type, "logged": True}

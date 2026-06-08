@@ -1,0 +1,23 @@
+# Goals — Sage Mira
+# Short-term, long-term, and life goals.
+
+life_goal:
+  objective: "Transform the entire vault into interconnected evergreen notes"
+  deadline: "ongoing"
+  progress: 0.0
+  status: "active"
+
+skills_goal:
+  objective: "Reach writing level 10 and SEO level 8"
+  deadline: "2026-09"
+  progress: 0.0
+  status: "active"
+
+short_goal:
+  objective: "Process all research briefs from last cycle into notes"
+  deadline: "daily"
+  progress: 0.0
+  status: "active"
+
+# 3 active goals
+# Last updated: 2026-06-08

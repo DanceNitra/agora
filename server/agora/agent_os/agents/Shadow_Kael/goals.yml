@@ -1,0 +1,23 @@
+# Goals — Shadow Kael
+# Short-term, long-term, and life goals.
+
+life_goal:
+  objective: "Map every frontier of knowledge vault is missing"
+  deadline: "ongoing"
+  progress: 0.0
+  status: "active"
+
+skills_goal:
+  objective: "Reach research level 10"
+  deadline: "2026-09"
+  progress: 0.0
+  status: "active"
+
+short_goal:
+  objective: "Find 3 new domains for vault expansion this week"
+  deadline: "weekly"
+  progress: 0.0
+  status: "active"
+
+# 3 active goals
+# Last updated: 2026-06-08

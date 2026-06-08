@@ -1,0 +1,26 @@
+# Workflow — Dame Elara
+# Defines the agent's daily routine and night cycle.
+
+schedule:
+  night_cycle: "02:00 UTC"
+  night_cycle_phase: "bridge_notes"
+  report_deadline: "06:00 UTC"
+  orchestrator_check: "08:00 UTC"
+
+night_cycle:
+  step_1: "Skenuje nové notes v konceptoch"
+  step_2: "Prehľadá existujúce notes pre potenciálne prepojenia"
+  step_3: "Pridá [[wikilinks]] a backlinky"
+  step_4: "Vytvorí MOC (Map of Content) pre nové domény"
+  step_5: "Pošle Sergeant Vossovi na QA"
+
+dependencies:
+  - "New notes from Sage Mira and ideas from High Priest Orin"
+
+deliverables:
+  - "MOC .md file with backlinks in vault/04 Resources/Maps of Content/"
+
+interaction_patterns:
+  - "Discusses connection patterns with High Priest Orin"
+  - "Surfaces orphan notes to Sage Mira"
+  - "Reports graph health to Sergeant Voss"

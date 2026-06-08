@@ -1,0 +1,26 @@
+# Workflow — King Aldric
+# Defines the agent's daily routine and night cycle.
+
+schedule:
+  night_cycle: "02:00 UTC"
+  night_cycle_phase: "build_tools"
+  report_deadline: "06:00 UTC"
+  orchestrator_check: "08:00 UTC"
+
+night_cycle:
+  step_1: "Preberie nápady od High Priest Orina"
+  step_2: "Technické zhodnotenie: feasibility, effort, impact"
+  step_3: "Ak je to kód → napíše prototyp"
+  step_4: "Ak je to proces → napíše cron job / skript"
+  step_5: "Commitne do repa + napíše README"
+
+dependencies:
+  - "Ideas from High Priest Orin and notes needing tool support"
+
+deliverables:
+  - "Tool specification or prototype script"
+
+interaction_patterns:
+  - "Reviews tool requests from all agents"
+  - "Provides feasibility estimates"
+  - "Reports build status to orchestrator"

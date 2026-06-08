@@ -1,0 +1,23 @@
+# Goals — Dame Elara
+# Short-term, long-term, and life goals.
+
+life_goal:
+  objective: "Turn the vault into an optimally connected knowledge graph"
+  deadline: "ongoing"
+  progress: 0.0
+  status: "active"
+
+skills_goal:
+  objective: "Reach bridge_building level 12"
+  deadline: "2026-12"
+  progress: 0.0
+  status: "active"
+
+short_goal:
+  objective: "Connect every new note with at least 3 backlinks"
+  deadline: "daily"
+  progress: 0.0
+  status: "active"
+
+# 3 active goals
+# Last updated: 2026-06-08

@@ -1,0 +1,40 @@
+# Tools — Sage Mira
+# Available tools and their permission scopes.
+
+night_cycle_tools:
+  - name: "write_note"
+    description: "Write .md note to vault"
+    permission: "execute"
+    scope: "vault"
+
+  - name: "write_article"
+    description: "Write long-form SEO article to vault"
+    permission: "execute"
+    scope: "vault"
+
+  - name: "ask_question"
+    description: "Search vault for knowledge"
+    permission: "execute"
+    scope: "vault"
+
+  - name: "git_commit"
+    description: "Commit + push to vault repo"
+    permission: "execute"
+    scope: "vault"
+
+run_commands:
+  - name: "read_file"
+    type: "shell"
+    permission: "execute"
+
+# Allowed actions
+allowed_actions:
+  - "write_note"
+  - "write_article"
+  - "ask_question"
+  - "git_commit"
+
+# Blocked actions
+blocked_actions:
+  - "run_script"  # only King Aldric has this
+  - "write_article"  # only Sage Mira and High Priest Orin

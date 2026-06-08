@@ -5,9 +5,10 @@ from .agent_definitions import (
     VAULT_COMPANY_ORG_CHART,
 )
 from .vault_company_engine import VaultCompanyEngine
+from .agent_directory import AgentDirectoryManager
 
 __all__ = [
     "VAULT_ROLES", "VAULT_DEPARTMENTS", "VAULT_ROLE_SKILLS", "VAULT_SOUL",
     "VAULT_TOOLS", "AGENT_VAULT_DEFS", "VAULT_SKILL_DESCRIPTIONS",
-    "VAULT_COMPANY_ORG_CHART", "VaultCompanyEngine",
+    "VAULT_COMPANY_ORG_CHART", "VaultCompanyEngine", "AgentDirectoryManager",
 ]

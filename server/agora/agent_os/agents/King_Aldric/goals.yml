@@ -1,0 +1,23 @@
+# Goals — King Aldric
+# Short-term, long-term, and life goals.
+
+life_goal:
+  objective: "Build tools that automate 80% of vault operations"
+  deadline: "ongoing"
+  progress: 0.0
+  status: "active"
+
+skills_goal:
+  objective: "Reach code_building level 10"
+  deadline: "2026-09"
+  progress: 0.0
+  status: "active"
+
+short_goal:
+  objective: "Build one new vault tool from idea backlog"
+  deadline: "daily"
+  progress: 0.0
+  status: "active"
+
+# 3 active goals
+# Last updated: 2026-06-08

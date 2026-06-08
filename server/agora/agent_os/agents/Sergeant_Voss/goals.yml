@@ -1,0 +1,23 @@
+# Goals — Sergeant Voss
+# Short-term, long-term, and life goals.
+
+life_goal:
+  objective: "Maintain 100% quality pass rate for vault content"
+  deadline: "ongoing"
+  progress: 0.0
+  status: "active"
+
+skills_goal:
+  objective: "Reach quality_audit level 12"
+  deadline: "2026-09"
+  progress: 0.0
+  status: "active"
+
+short_goal:
+  objective: "Audit all nightly outputs before 06:00 UTC"
+  deadline: "daily"
+  progress: 0.0
+  status: "active"
+
+# 3 active goals
+# Last updated: 2026-06-08

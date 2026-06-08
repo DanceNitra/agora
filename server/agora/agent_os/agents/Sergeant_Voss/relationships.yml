@@ -1,0 +1,44 @@
+# Relationships — Sergeant Voss
+# Bonds with other vault company agents.
+
+Shadow_Kael:
+  bond: "colleagues"
+  trust: 0.4
+  friendship: 0.3
+  respect: 0.5
+  conversations: 0
+  collaborations: 0
+
+Sage_Mira:
+  bond: "standards-keepers"
+  trust: 0.6
+  friendship: 0.5
+  respect: 0.7
+  conversations: 0
+  collaborations: 0
+
+High_Priest_Orin:
+  bond: "colleagues"
+  trust: 0.4
+  friendship: 0.3
+  respect: 0.5
+  conversations: 0
+  collaborations: 0
+
+King_Aldric:
+  bond: "colleagues"
+  trust: 0.6
+  friendship: 0.5
+  respect: 0.7
+  conversations: 0
+  collaborations: 0
+
+Dame_Elara:
+  bond: "colleagues"
+  trust: 0.5
+  friendship: 0.4
+  respect: 0.6
+  conversations: 0
+  collaborations: 0
+
+# 5 relationships tracked
