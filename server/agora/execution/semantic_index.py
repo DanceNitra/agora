@@ -140,10 +140,23 @@ class SemanticIndex:
         self._links = links
         return links
 
+    _TOOLING_HINT = (".py", "vault_connectome", "obsidian vault", "skills", "template",
+                     "readme", "index", "map of content", " moc", "untitled")
+
+    def _is_knowledge(self, m: dict) -> bool:
+        """A real idea note — substantive and not tooling/meta/mis-filed."""
+        if m.get("len", 0) < 400:
+            return False
+        if any(s in m["path"] for s in self._NOT_KNOWLEDGE):
+            return False
+        t = m["title"].lower()
+        return not any(h in t for h in self._TOOLING_HINT)
+
     def find_bridges(self, vault_root: str, n: int = 8,
                      lo: float = 0.70, hi: float = 0.90, scan: int = 600) -> list[dict]:
         """Pairs of the user's notes that are semantically close (lo<sim<hi, so related but not
-        duplicates) yet NOT linked to each other — missing connections worth bridging."""
+        duplicates) yet NOT linked to each other — missing connections worth bridging. Only
+        between substantive knowledge notes (tooling/meta/mis-filed excluded)."""
         if not self.ready:
             return []
         sims = self.vecs @ self.vecs.T
@@ -161,6 +174,8 @@ class SemanticIndex:
         links = self._link_graph(vault_root)
         bridges = []
         for (a, b), s in cand:
+            if not (self._is_knowledge(self.meta[a]) and self._is_knowledge(self.meta[b])):
+                continue                                   # skip tooling / meta / stubs
             ta, tb = self.meta[a]["title"], self.meta[b]["title"]
             la, lb = ta.lower(), tb.lower()
             if lb in links.get(la, set()) or la in links.get(lb, set()):

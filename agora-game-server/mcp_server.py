@@ -949,6 +949,23 @@ def _compute_standing(trust: list[dict]) -> dict:
     return {e: round(sum(v) / len(v), 3) if v else 0.5 for e, v in acc.items()}
 
 
+_plan_fails: dict = {}    # eid -> consecutive planning failures (for escalation)
+
+
+async def _escalate(eid: str, problem: str) -> None:
+    """Raise a SIGNIFICANT blocker to the user via Telegram (throttled brain-side)."""
+    await asyncio.to_thread(_brain_post_sync, "/api/v1/agent-os/brain/escalate",
+                            {"agent": _AGENT_NAMES.get(eid, eid), "problem": problem})
+
+
+async def _consume_guidance(eid: str) -> str:
+    """Pick up any guidance the user left for this agent via Telegram `fix` (once)."""
+    d = await asyncio.to_thread(
+        _brain_get_sync,
+        f"/api/v1/agent-os/brain/guidance?agent={_urlquote(_AGENT_NAMES.get(eid, eid))}")
+    return (d or {}).get("guidance") or ""
+
+
 async def _broadcast_trust_graph():
     """One unified graph for the dungeon: ESS pairwise trust + learning (teach) edges +
     each agent's standing — persisted so the trust-weighted curator (AutoLinker) can read it."""
@@ -1321,6 +1338,15 @@ async def ambient_life():
             ent = engine.state.entities.get(eid)
             if not ent:
                 return
+            # User guidance (Telegram `fix`) takes priority — it becomes the next quest.
+            guide = await _consume_guidance(eid)
+            if guide:
+                quests.setdefault(eid, []).insert(0, {
+                    "intent": guide[:90], "kind": "create", "where": "wander",
+                    "action": f"Act on the user's directive: {guide}", "with": ""})
+                note_event(f"{_AGENT_NAMES.get(eid, eid)} got direction from Rasto: {guide[:48]}")
+                publish_goals()
+                return
             nearby = [_AGENT_NAMES.get(o, o) for o, e in engine.state.entities.items()
                       if o != eid and abs(e.x - cx) + abs(e.y - cy) <= 8]
             locs = ", ".join(locations.keys())
@@ -1378,10 +1404,20 @@ async def ambient_life():
                     "action": (q.get("action") or "...").strip(),
                     "with": (q.get("with") or "").strip()})
                 added += 1
-            if not added and not quests.get(eid):     # fallback so the agent isn't idle
-                quests.setdefault(eid, []).append(
-                    {"intent": random.choice(_THOUGHTS.get(eid, ["explore the keep"])),
-                     "kind": "explore", "where": "wander", "action": "...", "with": ""})
+            if added:
+                _plan_fails[eid] = 0
+            else:
+                _plan_fails[eid] = _plan_fails.get(eid, 0) + 1
+                if _plan_fails[eid] >= 3:               # a real, significant blocker → tell the user
+                    _plan_fails[eid] = 0
+                    asyncio.create_task(_escalate(
+                        eid, "I can't plan my next research — the planner returned nothing 3 times "
+                        "(the LLM may be down or rate-limited), so I'm only wandering, not working. "
+                        "Reply `fix <topic>` to point me at something."))
+                if not quests.get(eid):                 # fallback so the agent isn't idle
+                    quests.setdefault(eid, []).append(
+                        {"intent": random.choice(_THOUGHTS.get(eid, ["explore the keep"])),
+                         "kind": "explore", "where": "wander", "action": "...", "with": ""})
             publish_goals()
         except Exception as e:
             logger.debug(f"replenish_quests {eid}: {e}")

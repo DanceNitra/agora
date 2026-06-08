@@ -361,18 +361,18 @@ async def _build_morning_report(app) -> str:
     gaps = _SEM_INDEX.find_gaps(4) if _SEM_INDEX.ready else []
 
     day = datetime.now(timezone.utc).strftime("%Y-%m-%d")
-    lines = [f"☀️ *Agora — ranný report* ({day})", ""]
+    lines = [f"☀️ *Agora — morning report* ({day})", ""]
     if findings:
-        lines.append("🔬 *Cez noc — grounded zistenia:*")
+        lines.append("🔬 *Overnight — grounded findings:*")
         for f in findings:
             lines.append(f"• {f[:200]}")
         lines.append("")
     if gaps:
-        lines.append("🎯 *Tvoje medzery (agenti na ne mieria):*")
+        lines.append("🎯 *Your gaps (the agents are aiming here):*")
         for g in gaps:
             lines.append(f"• {g['title']}")
         lines.append("")
-    lines.append("_Napíš otázku → grounded brief · `gaps` · `report`_")
+    lines.append("_Text a question → grounded brief · `gaps` · `report` · `status`_")
     return "\n".join(lines)
 
 
@@ -382,6 +382,65 @@ async def morning_report(request: Request, send: bool = True):
     text = await _build_morning_report(request.app)
     sent = await _send_telegram(text) if send else False
     return {"status": "ok", "sent": sent, "report": text}
+
+
+# ── Agent escalation: an agent raises a SIGNIFICANT blocker to the user via Telegram,
+#    and the user resolves it back through the same channel. ──
+_ESCALATIONS: dict = {}     # agent -> {"problem", "ts", "resolved"}
+_GUIDANCE: dict = {}        # agent -> guidance text the user left (consumed by the agent)
+_ESC_COOLDOWN = 1800        # don't re-nag about the same stuck agent within 30 min
+
+
+@router.post("/brain/escalate")
+async def escalate(request: Request):
+    """An agent reports it is genuinely stuck. Throttled per agent, then pushed to Telegram."""
+    import time
+    body = await request.json()
+    agent = (body.get("agent") or "Agent").strip()
+    problem = (body.get("problem") or "").strip()
+    if not problem:
+        return {"status": "empty"}
+    now = time.time()
+    prev = _ESCALATIONS.get(agent)
+    if prev and not prev.get("resolved") and now - prev["ts"] < _ESC_COOLDOWN:
+        return {"status": "throttled"}                  # already waiting on the user
+    _ESCALATIONS[agent] = {"problem": problem, "ts": now, "resolved": False}
+    sent = await _send_telegram(
+        f"⚠️ *{agent} is stuck*\n\n{problem}\n\n→ Reply `fix <guidance>` to unblock it (or `status`).")
+    return {"status": "sent" if sent else "no-telegram"}
+
+
+@router.post("/brain/resolve")
+async def resolve_escalation(request: Request):
+    """The user's guidance for the most-recently stuck agent (or a named one)."""
+    body = await request.json()
+    guidance = (body.get("guidance") or "").strip()
+    agent = body.get("agent")
+    if not agent:
+        pend = [(a, e) for a, e in _ESCALATIONS.items() if not e.get("resolved")]
+        if not pend:
+            return {"status": "none"}
+        agent = max(pend, key=lambda ae: ae[1]["ts"])[0]
+    _GUIDANCE[agent] = guidance
+    if agent in _ESCALATIONS:
+        _ESCALATIONS[agent]["resolved"] = True
+    return {"status": "ok", "agent": agent}
+
+
+@router.get("/brain/guidance")
+async def get_guidance(agent: str):
+    """An agent consumes any pending guidance the user left for it (once)."""
+    return {"guidance": _GUIDANCE.pop(agent, None)}
+
+
+@router.get("/brain/escalations")
+async def list_escalations():
+    import time
+    now = time.time()
+    return {"escalations": [
+        {"agent": a, "problem": e["problem"], "resolved": e["resolved"],
+         "mins_ago": round((now - e["ts"]) / 60)}
+        for a, e in sorted(_ESCALATIONS.items(), key=lambda kv: -kv[1]["ts"])]}
 
 
 @router.get("/brain/brainstorm")

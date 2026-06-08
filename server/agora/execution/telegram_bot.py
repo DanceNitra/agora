@@ -129,54 +129,72 @@ async def _save_to_vault(query: str, brief: str, sources: str) -> dict:
 
 async def _handle(app, text: str) -> None:
     low = text.lower().strip()
-    if low in ("keep", "/keep", "uloz", "ulož"):
+    if low.startswith(("fix ", "/fix ")):
+        guidance = text.split(" ", 1)[1].strip()
+        d = await asyncio.to_thread(_brain_post, "/api/v1/agent-os/brain/resolve",
+                                    {"guidance": guidance})
+        if (d or {}).get("status") == "ok":
+            await send(f"✅ Guidance sent to *{d['agent']}* — it will pick it up and unblock.")
+        else:
+            await send("_No stuck agent is waiting right now._")
+    elif low in ("status", "/status", "agents"):
+        d = await asyncio.to_thread(_brain_get, "/api/v1/agent-os/brain/escalations")
+        open_ = [e for e in (d or {}).get("escalations", []) if not e["resolved"]]
+        if not open_:
+            await send("✅ *All clear* — no agent is stuck.")
+        else:
+            lines = ["⚠️ *Agents needing help:*\n"]
+            for e in open_:
+                lines.append(f"• *{e['agent']}* ({e['mins_ago']}m ago): {e['problem'][:140]}")
+            lines.append("\n→ Reply `fix <guidance>` to unblock the latest.")
+            await send("\n".join(lines))
+    elif low in ("keep", "/keep"):
         if not _last["brief"]:
-            await send("_nič na uloženie — najprv sa niečo opýtaj_")
+            await send("_Nothing to save — ask a question first._")
         else:
             r = await _save_to_vault(_last["query"], _last["brief"], _last["sources"])
-            if r and r.get("status") == "written":
-                await send(f"✅ Uložené do vaultu — *{_last['query'][:60]}*")
-            else:
-                await send("✗ uloženie zlyhalo")
-    elif low in ("bridges", "/bridges", "mosty"):
-        await send("🌉 _hľadám chýbajúce spojenia v tvojom vaulte… (chvíľu)_")
+            await send(f"✅ Saved to your vault — *{_last['query'][:60]}*"
+                       if r and r.get("status") == "written" else "✗ Save failed.")
+    elif low in ("bridges", "/bridges"):
+        await send("🌉 _Finding missing connections in your vault…_")
         d = await asyncio.to_thread(_brain_get, "/api/v1/agent-os/brain/bridges?n=6&rationale=true")
         bridges = (d or {}).get("bridges", [])
         _bridges_cache["bridges"] = bridges
         if not bridges:
-            await send("_žiadne nové mosty_")
+            await send("_No new bridges found._")
         else:
-            lines = ["🌉 *Chýbajúce spojenia v tvojom vaulte:*\n"]
+            lines = ["🌉 *Missing connections in your vault:*\n"]
             for i, b in enumerate(bridges, 1):
                 lines.append(f"{i}. [[{b['a']}]] ↔ [[{b['b']}]]\n   _{b.get('why', '')}_")
-            lines.append("\n→ odpíš `connect` a pridám tieto linky do tvojich nót")
+            lines.append("\n→ Reply `connect` to add these links to your notes.")
             await send("\n".join(lines))
-    elif low in ("connect", "/connect", "apply", "prepoj"):
+    elif low in ("connect", "/connect", "apply"):
         bridges = _bridges_cache.get("bridges", [])
         if not bridges:
-            await send("_najprv napíš `bridges`_")
+            await send("_Run `bridges` first._")
         else:
             d = await asyncio.to_thread(_brain_post, "/api/v1/agent-os/brain/bridges/apply",
                                         {"bridges": bridges})
-            await send(f"✅ Pridaných *{(d or {}).get('links_added', 0)}* liniek do tvojich nót "
-                       f"(sekcia '## Related (Agora bridges)')")
+            await send(f"✅ Added *{(d or {}).get('links_added', 0)}* links to your notes "
+                       f"('## Related (Agora bridges)' section).")
             _bridges_cache["bridges"] = []
-    elif low in ("/gaps", "gaps", "medzery"):
+    elif low in ("/gaps", "gaps"):
         from agora.execution.semantic_index import SemanticIndex
         si = SemanticIndex()
         gaps = si.find_gaps(8) if si.ready else []
-        await send("🎯 *Tvoje medzery:*\n" + "\n".join(f"• {g['title']}" for g in gaps))
+        await send("🎯 *Your knowledge gaps:*\n" + "\n".join(f"• {g['title']}" for g in gaps))
     elif low in ("/report", "report"):
         from agora.api.agent_os_api import _build_morning_report
         await send(await _build_morning_report(app))
     elif low in ("/start", "/help", "help"):
-        await send("🏰 *Agora research assistant*\nNapíš otázku → grounded brief, potom `keep`.\n\n"
-                   "`<otázka>` → brief · `keep` → ulož do vaultu\n"
-                   "`bridges` → chýbajúce spojenia · `connect` → prepoj ich\n"
-                   "`gaps` → tvoje medzery · `report` → ranný report")
+        await send("🏰 *Agora research assistant*\n\n"
+                   "`<question>` → grounded brief, then `keep` to save it\n"
+                   "`bridges` → missing links · `connect` → add them\n"
+                   "`gaps` → your gaps · `report` → morning report\n"
+                   "`status` → stuck agents · `fix <guidance>` → unblock one")
     else:
-        q = text.split(" ", 1)[1] if low.startswith(("research ", "/research ", "skumaj ")) else text
-        await send("🔬 _skúmam… pár sekúnd_")
+        q = text.split(" ", 1)[1] if low.startswith(("research ", "/research ")) else text
+        await send("🔬 _Researching… a few seconds._")
         await send(await research_brief(q))
 
 

@@ -240,9 +240,12 @@ def build_role_prompt(npc_name: str, role: str) -> str:
             "Respond concisely with a JSON object."
         )
 
+    # The agent's REAL identity is npc_name. Drop the crew-soul's own name claim
+    # ("You are OpenClaw, ...") so it never thinks it is someone else — keep only the traits.
+    traits = soul.split(". ", 1)[1] if ". " in soul else soul
     return (
-        f"=== WHO YOU ARE (soul) ===\n"
-        f"{soul}\n"
+        f"=== WHO YOU ARE ===\n"
+        f"You are {npc_name}, an autonomous researcher on the Agora crew. {traits}\n"
         f"\n"
         f"{agent}\n"
         f"\n"
