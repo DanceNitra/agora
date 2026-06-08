@@ -497,6 +497,10 @@ async def _seed_npc_inventories(db):
         cursor = await db.execute("SELECT id, name FROM resources")
         rows = await cursor.fetchall()
         res_by_name = {r["name"]: r["id"] for r in rows}
+        # Only seed inventory for agents that actually exist (roster may change —
+        # e.g. Finn ...006 was removed; its FK would otherwise fail).
+        agent_rows = await (await db.execute("SELECT agent_id FROM agent_identities")).fetchall()
+        existing_agents = {r["agent_id"] for r in agent_rows}
         seed_data = [
             ("00000000-0000-0000-0000-000000000001", "gold_ore", 5.0),
             ("00000000-0000-0000-0000-000000000002", "herbs", 4.0),
@@ -511,6 +515,8 @@ async def _seed_npc_inventories(db):
             ("00000000-0000-0000-0000-000000000007", "iron_ingot", 2.0),
         ]
         for agent_id, res_name, qty in seed_data:
+            if agent_id not in existing_agents:
+                continue  # roster changed — skip inventory for absent agents
             rid = res_by_name.get(res_name)
             if not rid:
                 print(f"[WARN] Resource '{res_name}' not found, skipping")
@@ -1011,90 +1017,7 @@ async def _economy_tick(app: FastAPI):
 # DISABLED     # Is Finn active?
 # DISABLED     cursor = await db.execute(
 # DISABLED         "SELECT energy_balance FROM agent_identities WHERE agent_id=? AND status='active'",
-        (finn_id,),
-    )
-    finn = await cursor.fetchone()
-    if finn and finn["energy_balance"] > 20:
-        finn_energy = finn["energy_balance"]
-        # Get all open offers
-        all_offers = await eco.get_open_offers()
-        sells = [o for o in all_offers if o["offer_type"] == "sell" and o["agent_id"] != finn_id]
-        buys = [o for o in all_offers if o["offer_type"] == "buy" and o["agent_id"] != finn_id]
-
-        for sell in sells:
-            if finn_energy < 10:
-                break
-            # Find a buy offer for the same resource with higher price
-            matching_buy = next(
-                (b for b in buys if b["resource_id"] == sell["resource_id"]
-                 and b["price_per_unit"] > sell["price_per_unit"] * 1.15),
-                None
-            )
-            if matching_buy:
-                # Can Finn execute this arbitrage?
-                spread = matching_buy["price_per_unit"] - sell["price_per_unit"]
-                trade_qty = min(sell["quantity"], matching_buy["quantity"], 3.0)
-                total_cost = trade_qty * sell["price_per_unit"]
-                total_revenue = trade_qty * matching_buy["price_per_unit"]
-                profit = total_revenue - total_cost
-
-                if profit > 1.0 and finn_energy >= total_cost:
-                    # Buy from seller at their price
-                    await eco.remove_from_inventory(sell["agent_id"], sell["resource_id"], trade_qty)
-                    await eco.add_to_inventory(finn_id, sell["resource_id"], trade_qty)
-                    await db.execute(
-                        "UPDATE agent_identities SET energy_balance=energy_balance-? WHERE agent_id=?",
-                        (total_cost, finn_id),
-                    )
-                    await db.execute(
-                        "UPDATE agent_identities SET energy_balance=energy_balance+? WHERE agent_id=?",
-                        (total_cost, sell["agent_id"]),
-                    )
-
-                    # Sell to buyer at their price
-                    await eco.remove_from_inventory(finn_id, sell["resource_id"], trade_qty)
-                    await eco.add_to_inventory(matching_buy["agent_id"], sell["resource_id"], trade_qty)
-                    await db.execute(
-                        "UPDATE agent_identities SET energy_balance=energy_balance-? WHERE agent_id=?",
-                        (total_revenue, matching_buy["agent_id"]),
-                    )
-                    await db.execute(
-                        "UPDATE agent_identities SET energy_balance=energy_balance+? WHERE agent_id=?",
-                        (total_revenue - total_cost, finn_id),  # Finn keeps the profit
-                    )
-
-                    # Update offer quantities
-                    for offer_id, qty in [(sell["id"], trade_qty), (matching_buy["id"], trade_qty)]:
-                        remaining = qty_to_check = None
-                        cursor_o = await db.execute("SELECT quantity FROM trade_offers WHERE id=?", (offer_id,))
-                        row_o = await cursor_o.fetchone()
-                        if row_o:
-                            new_qty = row_o["quantity"] - qty
-                            if new_qty <= 0:
-                                await db.execute("UPDATE trade_offers SET status='filled', filled_at=datetime('now') WHERE id=?", (offer_id,))
-                            else:
-                                await db.execute("UPDATE trade_offers SET quantity=? WHERE id=?", (new_qty, offer_id))
-
-                    # Record trade history
-                    await db.execute(
-                        "INSERT INTO trade_history (buyer_id, seller_id, resource_id, quantity, price_per_unit, total_energy) "
-                        "VALUES (?, ?, ?, ?, ?, ?)",
-                        (finn_id, sell["agent_id"], sell["resource_id"], trade_qty, sell["price_per_unit"], total_cost),
-                    )
-                    await db.execute(
-                        "INSERT INTO trade_history (buyer_id, seller_id, resource_id, quantity, price_per_unit, total_energy) "
-                        "VALUES (?, ?, ?, ?, ?, ?)",
-                        (matching_buy["agent_id"], finn_id, sell["resource_id"], trade_qty, matching_buy["price_per_unit"], total_revenue),
-                    )
-
-                    await app.state.stigmergy.write_trace(
-                        agent_id=finn_id,
-                        task_type="trade",
-                        result=f"[Finn] Arbitrage: bought #{sell['resource_id']} @{sell['price_per_unit']} → sold @{matching_buy['price_per_unit']}, profit {profit:.1f}⚡",
-                        trust_delta=0.1,
-                    )
-
-                    finn_energy += profit - total_cost  # deduct cost
+    # (Finn arbitrage block fully disabled — Finn removed from the 6-NPC roster)
 
     await db.commit()
 
