@@ -706,6 +706,80 @@ async def ws_ess_endpoint(websocket: WebSocket):
                 pass
 
 
+async def _brain_ecosystem_tick(app: FastAPI):
+    """Agentic OS v2 (Phase 2.0) cognition — gated internally by tick count.
+
+    - memory decay for every NPC (every 20 ticks)
+    - a group brainstorm session (every 30 ticks; runs in the background)
+    - a self-improvement proposal (every 50 ticks; background)
+
+    Per-agent memory recall, mood, and thought-journaling already happen inside
+    AgentOS._think (driven by cluster_tick). This drives the *collective* layers.
+    """
+    db = getattr(app.state, "db", None)
+    agent_os = getattr(app.state, "agent_os", None)
+    if not db or not agent_os:
+        return
+    tick = getattr(app.state, "tick_count", 0)
+    if tick <= 0 or tick % 20 != 0:
+        return  # cheapest gate: only do anything on 20-tick boundaries
+
+    cursor = await db.execute(
+        "SELECT npc_id, npc_name FROM dungeon_npcs WHERE status='active'")
+    npcs = [dict(r) for r in await cursor.fetchall()]
+    if not npcs:
+        return
+
+    from agora.agent_os.memory_agent import MemoryAgent
+    event_bus = getattr(app.state, "event_bus", None)
+
+    async def _bcast(etype, payload):
+        if event_bus:
+            try:
+                await event_bus.publish("agent:events", etype, payload)
+            except Exception:
+                pass
+
+    # Memory decay (fast, inline) — every 20 ticks
+    for n in npcs:
+        try:
+            await MemoryAgent(db, n["npc_id"]).decay_all()
+        except Exception:
+            pass
+
+    # Group brainstorm — every 30 ticks (background so it never blocks the tick)
+    if tick % 30 == 0 and len(npcs) >= 2:
+        async def _run_brainstorm():
+            try:
+                from agora.agent_os.brainstorm_engine import BrainstormEngine
+                topics = ["How can we make the dungeon safer?",
+                          "What new resources should we seek?",
+                          "How can agents help each other better?",
+                          "How can we improve our coordination?"]
+                bm = BrainstormEngine(db)
+                init = npcs[0]
+                sid = await bm.start_session(random.choice(topics), init["npc_name"], init["npc_id"])
+                ids = [n["npc_id"] for n in npcs]
+                ideas = await bm.generate_ideas(sid, ids, broadcast_fn=_bcast)
+                await bm.build_on_ideas(sid, ids, broadcast_fn=_bcast)
+                ranked = await bm.vote_on_ideas(sid, ids)
+                await bm.complete_session(sid)
+                top = ranked[0]["votes"] if ranked else 0
+                print(f"[BrainEcosystem] brainstorm {sid[:8]} — {len(ideas)} ideas, top votes {top}")
+            except Exception as e:
+                print(f"[BrainEcosystem] brainstorm error: {e}")
+        asyncio.create_task(_run_brainstorm())
+
+    # Self-improvement proposal — every 50 ticks (background)
+    if tick % 50 == 0:
+        async def _run_upgrade():
+            try:
+                await agent_os._propose_upgrade(random.choice(npcs)["npc_id"], broadcast_fn=_bcast)
+            except Exception as e:
+                print(f"[BrainEcosystem] upgrade error: {e}")
+        asyncio.create_task(_run_upgrade())
+
+
 async def _economy_tick(app: FastAPI):
     """Production, consumption, and auto-trading for all active agents."""
     eco = app.state.economy
@@ -1168,6 +1242,12 @@ async def tick_loop(app: FastAPI):
                               f"{len(cp_trust)} trust, {len(cp_tft)} tft snapshots")
                 except Exception as e:
                     print(f"[Checkpoint] Tick error: {e}")
+
+            # ── 13. Agentic OS v2 (Phase 2.0) — brain ecosystem cognition ──
+            try:
+                await _brain_ecosystem_tick(app)
+            except Exception as e:
+                print(f"[BrainEcosystem] Tick error: {e}")
 
             if app.state.tick_count % 5 == 0:
                 best_agents = {}

@@ -795,6 +795,64 @@ class AgentOS:
         row = await cursor.fetchone()
         return row["npc_name"] if row else None
 
+    async def _get_npc_role(self, npc_id: str) -> str:
+        cursor = await self.db.execute(
+            "SELECT role FROM dungeon_npcs WHERE npc_id=?", (npc_id,)
+        )
+        row = await cursor.fetchone()
+        return (row["role"] if row else "") or "dungeon dweller"
+
+    # ── Self-Improvement Proposals (Phase 2.0 Layer 7) ──
+    async def _propose_upgrade(self, npc_id: str, broadcast_fn=None):
+        """An agent reflects on recent issues and proposes a system upgrade."""
+        from agora.agent_os.memory_agent import MemoryAgent
+        name = await self._get_npc_name(npc_id)
+        if not name:
+            return
+        memory_agent = MemoryAgent(self.db, npc_id)
+        recent = await memory_agent.remember_recent(limit=20)
+        issues = [m["content"] for m in recent
+                  if any(w in (m.get("content") or "").lower()
+                         for w in ("problem", "issue", "difficult", "turned on", "betray"))]
+
+        prompt = (
+            f"You are {name}, a {await self._get_npc_role(npc_id)} in the Agora dungeon system.\n"
+            "You've noticed these issues recently:\n"
+            + ("\n".join(f"  - {i[:100]}" for i in issues[:3]) if issues else "  No specific issues.")
+            + "\n\nPropose a system upgrade that would improve the dungeon or agent capabilities. "
+            "Be specific and technical. "
+            'Respond with JSON: {"title": "...", "description": "...", '
+            '"upgrade_type": "feature/optimization/config/new_system", '
+            '"impact": "low/medium/high/critical", "effort": "small/medium/large"}'
+        )
+        try:
+            import asyncio
+            from agora.execution.llm_client import dungeon_agent_think
+            decision = await asyncio.to_thread(
+                dungeon_agent_think, name, "brainstorm", prompt, "cheap")
+            title = (decision.get("title") or "").strip()
+            desc = (decision.get("description") or "").strip()
+            if title and desc:
+                await self.db.execute(
+                    "INSERT INTO system_upgrade_proposals (proposer_id, proposer_name, title, "
+                    "description, upgrade_type, impact_estimate, effort_estimate) "
+                    "VALUES (?, ?, ?, ?, ?, ?, ?)",
+                    (npc_id, name, title[:100], desc[:500],
+                     decision.get("upgrade_type", "feature"),
+                     decision.get("impact", "medium"),
+                     decision.get("effort", "medium")),
+                )
+                await self.db.commit()
+                await memory_agent.store_memory(
+                    f"You proposed a system upgrade: {title}",
+                    memory_type="episodic", importance=0.9, emotional_tag="excited",
+                    source="self_reflection")
+                if broadcast_fn:
+                    await broadcast_fn("system_upgrade_proposed",
+                                       {"proposer": name, "title": title, "description": desc[:200]})
+        except Exception as e:
+            print(f"[Upgrade] {name} proposal error: {e}")
+
     # ── Collective Knowledge Pool (Phase 2.0 Layer 5) ──
     async def _contribute_to_collective(self, npc_id: str, title: str, content: str,
                                         knowledge_type: str = "observation",
