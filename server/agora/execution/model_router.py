@@ -16,13 +16,12 @@ class TierConfig:
     description: str
 
 
-import os as _os
-
-# A single override model for every tier (e.g. deepseek-v4-flash via DeepSeek/Ollama).
-# Set AGORA_LLM_MODEL to switch the whole stack off the free Nemotron tier.
-_OVERRIDE = _os.environ.get("AGORA_LLM_MODEL", "").strip()
-_CHEAP = _OVERRIDE or "nvidia/nemotron-3-nano-30b-a3b:free"
-_BIG = _OVERRIDE or "nvidia/nemotron-3-ultra-550b-a55b:free"
+# Model comes from config (which reads server/.env). AGORA_LLM_MODEL overrides every
+# tier (e.g. deepseek-v4-flash via Ollama Cloud); otherwise per-tier defaults apply.
+from agora.config import settings as _settings
+_OVERRIDE = (_settings.llm_model or "").strip()
+_CHEAP = _OVERRIDE or _settings.llm_model_cheap or "nvidia/nemotron-3-nano-30b-a3b:free"
+_BIG = _OVERRIDE or _settings.llm_model_medium or "nvidia/nemotron-3-ultra-550b-a55b:free"
 
 # ── Model tiers (override-aware) ──
 DEFAULT_TIERS = [

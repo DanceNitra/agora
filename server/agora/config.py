@@ -15,6 +15,7 @@ class Settings(BaseSettings):
     llm_model_cheap: str = "deepseek-v4-flash"
     llm_model_medium: str = "deepseek-v4-flash"
     llm_model_expert: str = "deepseek-v4-flash"
+    llm_model: str = ""   # single override for ALL tiers (AGORA_LLM_MODEL)
     llm_enabled: bool = True
     # OpenRouter-specific
     openrouter_key: str = ""
