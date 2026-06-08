@@ -27,6 +27,8 @@ from pathlib import Path
 WIKILINK = re.compile(r"\[\[([^\]|#]+)")
 TOKEN = re.compile(r"[A-Za-z][A-Za-z'\-]{2,}")
 FM_TAGS = re.compile(r"tags:\s*\[(.*?)\]", re.S)
+DATE_TITLE = re.compile(r"^\d{4}[-_]\d{2}[-_]\d{2}")   # daily notes → noisy to cross-link
+MARK = "## Related (AutoLinker)"
 
 STOPWORDS = set("""
 the a an and or but if then else of to in on at by for with from into over under
@@ -62,6 +64,11 @@ def main() -> None:
     ap.add_argument("--threshold", type=float, default=0.18)
     ap.add_argument("--max-per-note", type=int, default=5)
     ap.add_argument("--top-terms", type=int, default=40)
+    ap.add_argument("--apply", action="store_true",
+                    help="insert the strong links into the notes (## Related section)")
+    ap.add_argument("--apply-threshold", type=float, default=0.32)
+    ap.add_argument("--orphans-only", action="store_true",
+                    help="only suggest/apply for notes that currently have NO links")
     args = ap.parse_args()
 
     vault = Path(args.vault)
@@ -79,7 +86,11 @@ def main() -> None:
         except Exception:
             continue
         tags, body, links = parse_note(text)
-        toks = [w.lower() for w in TOKEN.findall(body) if w.lower() not in STOPWORDS]
+        # Idempotency: tokenize the note WITHOUT its own AutoLinker section, so applying
+        # links doesn't drift the tf-idf vectors on re-runs.
+        mi = body.find(MARK)
+        core = body[:mi] if mi != -1 else body
+        toks = [w.lower() for w in TOKEN.findall(core) if w.lower() not in STOPWORDS]
         # tags weigh extra (they're curated signal)
         toks += [t.lower() for t in tags for _ in range(3)]
         if len(toks) < 8:
@@ -127,11 +138,19 @@ def main() -> None:
                 if other != stem:
                     scores[other] += w * w2
         note = notes[stem]
+        if args.orphans_only and note["links"]:
+            continue                               # only connect isolated notes
+        if DATE_TITLE.match(note["title"]):
+            continue                               # daily notes — skip as source
         cands = []
         for other, s in sorted(scores.items(), key=lambda kv: kv[1], reverse=True):
             if s < args.threshold:
                 break
             o = notes[other]
+            if DATE_TITLE.match(o["title"]):
+                continue                           # don't link to daily notes
+            if o["title"].lower() == note["title"].lower():
+                continue                           # duplicate-named note
             # skip if already linked either direction
             if o["title"].lower() in note["links"] or note["title"].lower() in o["links"]:
                 continue
@@ -175,6 +194,42 @@ def main() -> None:
     pend_path = out_dir / f"autolinker_pending_{day}.md"
     rep_path.write_text("\n".join(rep), encoding="utf-8")
     pend_path.write_text("\n".join(pend), encoding="utf-8")
+
+    # ── 7. (optional) apply strong links into the notes ─────
+    if args.apply:
+        applied_notes = applied_links = 0
+        for stem, cands in suggestions:
+            note = notes[stem]
+            seen = set(note["links"])          # already-linked targets (lowercased)
+            new = []
+            for s, other in cands:
+                if s < args.apply_threshold:
+                    break
+                ot = notes[other]["title"]
+                key = ot.lower()
+                if key == note["title"].lower() or key in seen:
+                    continue                   # self / duplicate / already linked
+                seen.add(key)
+                new.append(ot)
+            if not new:
+                continue
+            try:
+                txt = note["path"].read_text(encoding="utf-8", errors="replace")
+            except Exception:
+                continue
+            block = "\n".join(f"- [[{t}]]" for t in new)
+            if MARK in txt:
+                txt = txt.rstrip() + "\n" + block + "\n"   # extend existing section
+            else:
+                txt = txt.rstrip() + f"\n\n{MARK}\n" + block + "\n"
+            try:
+                note["path"].write_text(txt, encoding="utf-8")
+                applied_notes += 1
+                applied_links += len(new)
+            except Exception:
+                pass
+        print(f"[AutoLinker] APPLIED {applied_links} links into {applied_notes} notes "
+              f"(threshold {args.apply_threshold})")
 
     print(f"[AutoLinker] {n} notes · {len(orphans)} orphans · "
           f"{total} candidate links across {len(suggestions)} notes")
