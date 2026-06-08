@@ -493,7 +493,6 @@ async def get_v3_status(npc_name: str, request: Request):
     }
 
 
-<<<<<<< HEAD
 # ── Bridge endpoints (used by the dungeon to feed experiences in + read the vault) ──
 
 @router.post("/{npc_name}/memories")
@@ -539,7 +538,6 @@ async def get_agent_os(npc_name: str, request: Request):
     if not status:
         raise HTTPException(status_code=404, detail=f"NPC {npc_name} not found")
     return status
-=======
 # ═══════════════════════════════════════════════
 # REAL ACTIONS
 # ═══════════════════════════════════════════════
@@ -601,4 +599,3 @@ async def write_note(request: Request):
         "tags": body.get("tags", []),
     }, agent_name=agent)
     return result
->>>>>>> 3f1d707 (ess: 2.3 — RealActionEngine: agents send Telegram, write notes/articles, run scripts, git commit. Wired into LLM decisions. 3 API endpoints.)

@@ -1033,18 +1033,6 @@ async def _economy_tick(app: FastAPI):
                                 trust_delta=0.05,
                             )
 
-<<<<<<< HEAD
-# DISABLED     # ── D6: Finn arbitrage — buy low, sell high ──
-# DISABLED     finn_id = "00000000-0000-0000-0000-000000000006"
-# DISABLED 
-# DISABLED     # Is Finn active?
-# DISABLED     cursor = await db.execute(
-# DISABLED         "SELECT energy_balance FROM agent_identities WHERE agent_id=? AND status='active'",
-    # (Finn arbitrage block fully disabled — Finn removed from the 6-NPC roster)
-
-    await db.commit()
-=======
->>>>>>> 3f1d707 (ess: 2.3 — RealActionEngine: agents send Telegram, write notes/articles, run scripts, git commit. Wired into LLM decisions. 3 API endpoints.)
 
 
 async def tick_loop(app: FastAPI):
