@@ -1040,12 +1040,14 @@ async def ambient_life():
                 f"synthesize findings, or build tools — grounded in your memory and the library. Be "
                 f"concrete and SUBSTANTIVE; never vague, never repeat yourself or others; each step "
                 f"must ADVANCE the work and build on what's already known. "
-                f"Pick: create (a real discovery/insight in your field), upgrade (build a concrete "
-                f"module that encodes a finding), collaborate (combine your role with an ally's), or explore. "
+                f"Pick: create (a discovery), upgrade (build a module), collaborate (combine your "
+                f"role with an ally's — builds trust), challenge (contest an ally's weak or "
+                f"contradictory finding — tests rigor, costs trust; only when it truly seems weak), "
+                f"or explore. "
                 f'Reply ONLY JSON: {{"intent":"<a SPECIFIC goal that fits your role, present tense, max 14 words>",'
-                f'"kind":"<collaborate|create|upgrade|explore>",'
+                f'"kind":"<collaborate|challenge|create|upgrade|explore>",'
                 f'"location":"<one of: {locs} | an ally name | wander>",'
-                f'"with":"<an ally name if collaborating, else empty>",'
+                f'"with":"<an ally name if collaborating or challenging, else empty>",'
                 f'"action":"<the concrete finding or output you produce — one substantive sentence>"}}'
             )
             usr = ((("What you know:\n" + brain + "\n\n") if brain else "") +
@@ -1146,7 +1148,8 @@ async def ambient_life():
                 engine.set_entity_thought(eid, action[:100])
                 engine.add_effect("glow", cx, cy,
                                   "#7fd0ff" if kind == "create" else
-                                  "#ffcf5a" if kind == "upgrade" else "#ffd27a", 0.9)
+                                  "#ffcf5a" if kind == "upgrade" else
+                                  "#ff6a6a" if kind == "challenge" else "#ffd27a", 0.9)
                 remember(eid, intent)
 
                 if kind == "create":
@@ -1168,6 +1171,17 @@ async def ambient_life():
                             _brain_contribute(eid, f"{intent} (with {partner})", action))
                         note_event(f"{who} & {partner}: {intent}")
                         _os_build("collab", f"{who} + {partner}", intent)
+                    else:
+                        note_event(f"{who}: {intent}")
+                elif kind == "challenge":
+                    # An intellectual dispute: contest a weak/contradictory finding → trust down.
+                    pid = next((oid for oid, e2 in ents.items()
+                                if oid != eid and abs(e2.x - cx) + abs(e2.y - cy) <= 2), None)
+                    if pid:
+                        await record_trust(eid, pid, "defect")   # standing of both can shift
+                        rival = _AGENT_NAMES.get(pid, pid)
+                        note_event(f"{who} challenged {rival}: {intent}")
+                        _os_build("challenge", f"{who} ⟂ {rival}", intent)
                     else:
                         note_event(f"{who}: {intent}")
                 else:
