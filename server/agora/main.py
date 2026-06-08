@@ -3,7 +3,16 @@
 import asyncio
 import json
 import random
+import sys as _sys
 import uuid
+
+# Make stdout/stderr UTF-8 so emoji/Slovak prints don't crash on a non-UTF-8 console
+# (Windows cp1250) — otherwise any print() inside a request handler 500s the request.
+for _stream in (_sys.stdout, _sys.stderr):
+    try:
+        _stream.reconfigure(encoding="utf-8", errors="replace")
+    except Exception:
+        pass
 from contextlib import asynccontextmanager
 from datetime import datetime, timezone
 

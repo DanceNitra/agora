@@ -196,6 +196,34 @@ class VaultCompanyEngine:
         
         return context
     
+    async def _llm_content(self, agent_name: str, phase_name: str,
+                           task: str, context_text: str) -> str | None:
+        """Produce REAL markdown for this agent's phase via the LLM (deepseek).
+
+        Returns None on failure so the caller falls back to the template.
+        """
+        try:
+            import asyncio
+            from agora.execution.llm_client import call_llm
+            role = VAULT_ROLES.get(agent_name, {})
+            soul = VAULT_SOUL.get(agent_name, {})
+            system = (
+                f"You are {agent_name}, {role.get('title', '')} in "
+                f"{role.get('department', '')} at the Vault Company. "
+                f"{role.get('description', '')} Your drive: {soul.get('motivation', '')}. "
+                f"Produce REAL, specific, substantive work — publishable Markdown for the "
+                f"vault. No placeholders, no filler, no meta-commentary. Be concrete, build on "
+                f"the given context, and write only the note body."
+            )
+            user = (f"Your task this night cycle: {task}\n\n"
+                    f"Context to build on:\n{context_text[:2500]}\n\nWrite the full note now:")
+            out = await asyncio.to_thread(call_llm, system, user, "cheap", 0.7, 1400)
+            if out and "[LLM" not in out and len(out.strip()) > 60:
+                return out.strip()
+        except Exception as e:
+            print(f"[VaultCompany] LLM content failed {agent_name}/{phase_name}: {e}")
+        return None
+
     async def _execute_agent_work(
         self, agent_name: str, phase_name: str,
         context: dict, tools: dict, skills: dict,
@@ -320,9 +348,12 @@ class VaultCompanyEngine:
                         research_results[domain] = []
             
             # Write research brief
-            brief_content = self._generate_research_brief(
-                agent_name, domains, research_results
-            )
+            brief_content = await self._llm_content(
+                agent_name, "research_scan",
+                "Scan the frontier of these domains and find GAPS in the vault. Write a "
+                "research brief: concrete findings, what's missing, and sharp open questions.",
+                f"Domains: {', '.join(domains)}\nVault notes already present: {research_results}"
+            ) or self._generate_research_brief(agent_name, domains, research_results)
             
             fpath = await self._write_vault_note(
                 vault_base, VAULT_OUTPUT_PATHS["research_brief"],
@@ -355,9 +386,12 @@ class VaultCompanyEngine:
                     research_data = p.get("output_summary", "")
             
             # Write concept note from research
-            note_content = self._generate_concept_note(
-                agent_name, research_data
-            )
+            note_content = await self._llm_content(
+                agent_name, "write_notes",
+                "Turn the research brief into a structured, evergreen concept note: clear "
+                "definition, key ideas, examples, and links to adjacent concepts.",
+                f"Research brief from Shadow Kael:\n{research_data}"
+            ) or self._generate_concept_note(agent_name, research_data)
             
             fpath = await self._write_vault_note(
                 vault_base, VAULT_OUTPUT_PATHS["concept_note"],
@@ -394,7 +428,12 @@ class VaultCompanyEngine:
             ideas = self._generate_ideas(agent_name, notes_data)
             
             # Write ideas vault note
-            ideas_content = self._format_ideas(ideas)
+            ideas_content = await self._llm_content(
+                agent_name, "generate_ideas",
+                "From the current concepts, generate 3-5 NOVEL ideas via cross-domain fusion. "
+                "For each: a name, the combination, why it's non-obvious, a concrete next step.",
+                f"Concept notes from Sage Mira:\n{notes_data}"
+            ) or self._format_ideas(ideas)
             fpath = await self._write_vault_note(
                 vault_base, VAULT_OUTPUT_PATHS["idea"],
                 f"Ideas - {datetime.now().strftime('%Y-%m-%d')}",
@@ -425,7 +464,12 @@ class VaultCompanyEngine:
                     all_files.extend(p.get("output", {}).get("files_created", []))
             
             # Create MOC (Map of Content)
-            moc_content = self._generate_moc(agent_name, all_files)
+            moc_content = await self._llm_content(
+                agent_name, "bridge_notes",
+                "Build a Map of Content connecting tonight's notes and ideas: group them, draw "
+                "the conceptual bridges/backlinks between them, and name the emergent themes.",
+                f"Notes/ideas created tonight: {all_files}"
+            ) or self._generate_moc(agent_name, all_files)
             fpath = await self._write_vault_note(
                 vault_base, VAULT_OUTPUT_PATHS["bridge_moc"],
                 f"MOC - Night Cycle {datetime.now().strftime('%Y-%m-%d')}",
@@ -456,7 +500,12 @@ class VaultCompanyEngine:
                     ideas_data = p.get("output_summary", "")
             
             # Generate tool spec
-            tool_spec = self._generate_tool_spec(agent_name, ideas_data)
+            tool_spec = await self._llm_content(
+                agent_name, "build_tools",
+                "Pick the most promising idea and spec a concrete tool/script for the vault: "
+                "purpose, inputs/outputs, a step-by-step plan, and pseudocode.",
+                f"Ideas from High Priest Orin:\n{ideas_data}"
+            ) or self._generate_tool_spec(agent_name, ideas_data)
             
             fpath = await self._write_vault_note(
                 vault_base, VAULT_OUTPUT_PATHS["tool_doc"],
@@ -484,7 +533,15 @@ class VaultCompanyEngine:
             audit_result = self._audit_cycle()
             
             # Write quality report
-            audit_content = self._generate_audit_report(audit_result)
+            _prev = "; ".join(f"{p.get('agent')}: {p.get('output', {}).get('summary', '')}"
+                              for p in self.cycle_results.get("phases", []))
+            audit_content = await self._llm_content(
+                agent_name, "quality_audit",
+                "Critically review tonight's work as QA: what's strong, what's weak or "
+                "unsubstantiated, and the single highest-leverage thing to pursue tomorrow. "
+                "Give an honest quality score out of 10.",
+                f"Tonight's phase outputs:\n{_prev}\nAudit metrics: {audit_result}"
+            ) or self._generate_audit_report(audit_result)
             fpath = await self._write_vault_note(
                 vault_base, VAULT_OUTPUT_PATHS["quality_report"],
                 f"Quality Report - {datetime.now().strftime('%Y-%m-%d')}",
