@@ -1025,46 +1025,61 @@ async def ambient_life():
     _AUTOLINKER = str(Path(__file__).resolve().parent.parent / "tools" / "autolinker.py")
     curation = {"running": False}
 
-    async def _run_curation(eid, standing):
+    async def _run_curation(eid, standing, mode="links"):
         """A high-standing curator autonomously runs AutoLinker (background subprocess).
-        Trust gates it inside the tool: enough standing → links applied; else held to pending."""
+        mode 'links' = Elara connects orphans; 'duplicates' = Voss QA-flags near-duplicates.
+        Trust gates it inside the tool: enough standing → applies; else held to pending."""
         if curation["running"] or not Path(_VAULT).exists() or not Path(_AUTOLINKER).exists():
-            logger.info(f"[curation] skip (running={curation['running']} "
-                        f"vault={Path(_VAULT).exists()} tool={Path(_AUTOLINKER).exists()})")
             return
         curation["running"] = True
         curator = _AGENT_NAMES.get(eid, eid)
-        logger.info(f"[curation] starting for {curator}…")
+        logger.info(f"[curation] starting {mode} for {curator}…")
         try:
             engine.set_entity_state(eid, "casting")
-            engine.set_entity_thought(eid, "» curating the vault graph…")
+            engine.set_entity_thought(eid, "» auditing the vault…" if mode == "duplicates"
+                                      else "» curating the vault graph…")
             out_dir = str(Path(_VAULT) / "04 Resources" / "Concepts" / "Agora Agents")
+            extra = ["--duplicates"] if mode == "duplicates" else ["--orphans-only"]
+
             def _runit():
                 return subprocess.run(
                     [sys.executable, _AUTOLINKER, "--vault", _VAULT, "--out", out_dir,
-                     "--orphans-only", "--trust-weighted", "--curator", curator],
+                     "--trust-weighted", "--curator", curator, *extra],
                     capture_output=True, text=True, encoding="utf-8",
                     errors="replace", timeout=120)
             res = await asyncio.to_thread(_runit)
             text = (res.stdout or "") + (res.stderr or "")
-            n = 0
-            if "APPLIED" in text:
+
+            def _num(after, before):
                 try:
-                    n = int(text.split("APPLIED", 1)[1].split("links")[0].strip())
+                    return int(text.split(after, 1)[1].split(before)[0].strip())
                 except Exception:
-                    n = 0
-            if "PENDING" in text:                       # trust too low → queued for review
-                note_event(f"{curator}'s curation held for review (trust {standing:.2f})")
+                    return 0
+
+            if "pending" in text.lower():               # trust too low → queued for review
+                note_event(f"{curator}'s {'audit' if mode=='duplicates' else 'curation'} "
+                           f"held for review (trust {standing:.2f})")
                 logger.info(f"[curation] {curator} held to pending (standing {standing:.2f})")
-            elif n > 0:                                  # trusted → links landed
-                note_event(f"{curator} curated {n} links into the vault")
-                _os_build("curation", curator, f"connected {n} vault notes (trust {standing:.2f})")
-                e2 = engine.state.entities.get(eid)
-                if e2:
-                    engine.add_effect("glow", int(round(e2.x)), int(round(e2.y)), "#9fe0ff", 1.3)
-                logger.info(f"[curation] {curator} applied {n} links (standing {standing:.2f})")
-            else:                                        # trusted, but nothing new to connect
-                logger.info(f"[curation] {curator} — vault graph already well-connected")
+            elif mode == "duplicates":
+                n = _num("FLAGGED", "duplicate")
+                if n > 0:
+                    note_event(f"{curator} flagged {n} duplicate notes for review")
+                    _os_build("curation", curator,
+                              f"flagged {n} duplicate notes (trust {standing:.2f})")
+                    logger.info(f"[curation] {curator} flagged {n} duplicates")
+                else:
+                    logger.info(f"[curation] {curator} — no duplicates found")
+            else:
+                n = _num("APPLIED", "links")
+                if n > 0:
+                    note_event(f"{curator} curated {n} links into the vault")
+                    _os_build("curation", curator, f"connected {n} vault notes (trust {standing:.2f})")
+                    e2 = engine.state.entities.get(eid)
+                    if e2:
+                        engine.add_effect("glow", int(round(e2.x)), int(round(e2.y)), "#9fe0ff", 1.3)
+                    logger.info(f"[curation] {curator} applied {n} links (standing {standing:.2f})")
+                else:
+                    logger.info(f"[curation] {curator} — vault graph already well-connected")
         except Exception as e:
             logger.warning(f"[curation] {eid} failed: {e!r}")
         finally:
@@ -1254,14 +1269,21 @@ async def ambient_life():
             if os_modules:
                 broadcast({"type": "os_modules_snapshot", "modules": os_modules})
 
+        # Reputation decay: nudge all trust toward baseline so standing stays DYNAMIC —
+        # bonds you don't reinforce fade, so curation authority genuinely shifts over time.
+        if loop_n % 40 == 20 and _trust_engine:
+            await _trust_engine.apply_decay(0.02)
+
         # Autonomous curation: Dame Elara (Bridge Builder) tends the vault's links and
         # Sage Mira (Curator) consolidates live discoveries into vault notes — each gated
         # by their OWN standing, on offset cadences.
-        if (loop_n % 70 == 7 or loop_n % 110 == 50) and not (curation["running"] and consolidation["running"]):
+        if loop_n % 70 == 7 or loop_n % 110 == 50 or loop_n % 130 == 90:
             _stm = _compute_standing(await _trust_matrix())
-            if loop_n % 70 == 7 and not curation["running"]:
+            if loop_n % 70 == 7 and not curation["running"]:        # Elara: connect links
                 asyncio.create_task(_run_curation("guard_r", _stm.get("guard_r", 0.5)))
-            if loop_n % 110 == 50 and not consolidation["running"]:
+            if loop_n % 130 == 90 and not curation["running"]:      # Voss: QA flag duplicates
+                asyncio.create_task(_run_curation("guard_l", _stm.get("guard_l", 0.5), "duplicates"))
+            if loop_n % 110 == 50 and not consolidation["running"]:  # Mira: consolidate digest
                 asyncio.create_task(_run_consolidation("scholar", _stm.get("scholar", 0.5)))
 
         for eid, ent in list(ents.items()):

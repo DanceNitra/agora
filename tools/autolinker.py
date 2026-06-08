@@ -78,6 +78,9 @@ def main() -> None:
     ap.add_argument("--standing-file",
                     default=str(Path(__file__).resolve().parent.parent
                                 / "agora-game-server" / "agent_standing.json"))
+    ap.add_argument("--duplicates", action="store_true",
+                    help="QA mode: flag near-duplicate notes into a quality report (no links)")
+    ap.add_argument("--dup-threshold", type=float, default=0.90)
     args = ap.parse_args()
 
     vault = Path(args.vault)
@@ -139,6 +142,7 @@ def main() -> None:
 
     # ── 5. sparse cosine + candidate links ───────────────────
     suggestions: list[tuple[str, list[tuple[float, str]]]] = []
+    dup_pairs: set = set()
     total = 0
     for stem, vec in vecs.items():
         scores: dict[str, float] = defaultdict(float)
@@ -146,6 +150,10 @@ def main() -> None:
             for other, w2 in inv.get(term, ()):
                 if other != stem:
                     scores[other] += w * w2
+        if args.duplicates:                        # QA: collect near-identical pairs
+            for other, s in scores.items():
+                if s >= args.dup_threshold and other != stem:
+                    dup_pairs.add(frozenset((stem, other)))
         note = notes[stem]
         if args.orphans_only and note["links"]:
             continue                               # only connect isolated notes
@@ -218,11 +226,29 @@ def main() -> None:
         if cur >= args.standing_gate:
             args.apply = True
             print(f"[AutoLinker] {args.curator} standing {cur:.2f} >= {args.standing_gate} "
-                  f"-> AUTO-CURATING (links applied to the vault)")
+                  f"-> AUTO-CURATING")
         else:
             args.apply = False
             print(f"[AutoLinker] {args.curator} standing {cur:.2f} < {args.standing_gate} "
-                  f"-> links held in PENDING for review (not enough trust)")
+                  f"-> held in PENDING for review (not enough trust)")
+
+    # ── 7b. QA mode (Sergeant Voss): flag near-duplicate notes, no link apply ──
+    if args.duplicates:
+        if args.trust_weighted and not args.apply:
+            print(f"[AutoLinker] {args.curator} duplicate-flagging held to pending")
+            return
+        clusters = [sorted(p, key=lambda s: notes[s]["title"]) for p in dup_pairs]
+        lines = [f"# Quality Report — near-duplicate notes — {day}", "",
+                 f"- Curator: **{args.curator}**",
+                 f"- Near-duplicate pairs (similarity >= {args.dup_threshold}): **{len(clusters)}**",
+                 "", "These notes look near-identical — review and merge.", "", "---", ""]
+        for pair in clusters:
+            a, b = pair[0], pair[-1]
+            lines.append(f"- [[{notes[a]['title']}]]  ≈  [[{notes[b]['title']}]]")
+        qpath = out_dir / f"quality_report_duplicates_{day}.md"
+        qpath.write_text("\n".join(lines), encoding="utf-8")
+        print(f"[AutoLinker] FLAGGED {len(clusters)} duplicate note pairs -> {qpath.name}")
+        return
 
     # ── 8. (optional) apply strong links into the notes ─────
     if args.apply:

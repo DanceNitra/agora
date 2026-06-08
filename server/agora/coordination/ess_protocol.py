@@ -235,6 +235,18 @@ class TrustEngine:
         decayed = trust["score"] * (self.DECAY_RATE ** hours_since)
         return max(0.0, min(1.0, decayed))
 
+    async def apply_decay(self, step: float = 0.02) -> None:
+        """Activity decay: nudge every stored trust score toward baseline so reputation
+        stays DYNAMIC (must be re-earned). Complements the time-based decay in get_trust;
+        callers tick this on their own cadence (e.g. the dungeon every ~30s)."""
+        try:
+            await self.db.execute(
+                "UPDATE trust_scores SET score = score * (1 - ?) + ? * ?",
+                (step, self.BASELINE_TRUST, step))
+            await self.db.commit()
+        except Exception:
+            pass
+
     async def _get_trust(self, agent_id: str, target_id: str) -> dict:
         cursor = await self.db.execute(
             "SELECT score, interaction_count, consecutive_cooperations, "
