@@ -17,14 +17,14 @@
 
 | # | Task | Status | Commit | Agent |
 |---|------|--------|--------|-------|
-| 1.1 | **Event sourcing** — append-only log for every interaction | 🟢 | efdd6ca | agora-builder: done, verified (all test criteria pass) |
-| 1.2 | **Checkpointing** — full state snapshot every N events | 🔴 | — | — |
+| 1.1 | **Event sourcing** — append-only log for every interaction | 🟢 | efdd6ca | agora-builder: done, verified |
+| 1.2 | **Checkpointing** — full state snapshot every N events | 🟡 | — | tg-hermes: handoff ready |
 | 1.3 | **Stigmergy Pool persistence** — Redis → SQLite fallback | 🟢 | e4a9961 | (already done) |
 | 1.4 | **Trust Engine sliding window** — production-ready (decay, forgiveness, provokability) | 🟡 | — | tg-hermes: handoff ready |
 | 1.5 | **Ed25519 signing** — ESSMessage.sign() + verify() | 🟡 | — | tg-hermes: handoff ready |
 | 1.6 | **REST API** — POST /ess/commit, /ess/interact, GET /ess/trust/{agent} | 🔴 | — | — |
 | 1.7 | **WebSocket** — real-time event stream for subscribers | 🟡 | — | tg-hermes: handoff ready |
-| 1.8 | **ESS stability test** — invade swarm with defectors, prove TFT is collectively stable | 🔴 | — | — |
+| 1.8 | **ESS stability test** — invade swarm with defectors, prove TFT is collectively stable | 🟡 | — | tg-hermes: handoff ready |
 
 ## Phase 2 — Shell & God Console
 
@@ -57,34 +57,31 @@
 
 ---
 
-## Current Code State (commit `e4a9961`)
+## Current Code State (commit `4ffe995` — builder completed 1.1)
 
 ### `server/agora/coordination/`
 
 | File | Status | What's Needed |
 |------|--------|---------------|
-| `ess_protocol.py` | ✅ Basic TFT (nice/retaliatory/forgiving/clear, SQLite) | ❌ Event sourcing, checkpointing, Ed25519 |
-| `tft_verifier.py` | ✅ TFT compliance analysis | ❌ Provokability test |
-| `stigmergy.py` | ✅ Redis trace pool, `best_agent()` | ❌ SQLite fallback persistence |
+| `ess_protocol.py` | ✅ Basic TFT (nice/retaliatory/forgiving/clear, SQLite) | ❌ Ed25519, sliding window, provokability |
+| `tft_verifier.py` | ✅ TFT compliance analysis | ❌ Provokability test, event sourcing hook |
+| `stigmergy.py` | ✅ Redis trace pool, `best_agent()`, DB persistence | OK |
 | `eigen_trust.py` | ✅ Transitive trust (PageRank-style) | OK |
 | `economy.py` | ✅ Energy token economy | OK |
-| `event_bus.py` | ✅ Pub/sub event system | ❌ Persistence |
+| `event_bus.py` | ✅ Pub/sub event system | OK |
+| `event_store.py` | ✅ **NEW** (builder created) | Append-only event log |
+| `checkpointer.py` | ⏳ (handoff ready) | — |
 
-### `server/agora/storage/`
-
-| File | Status | What's Needed |
-|------|--------|---------------|
-| `schema.sql` | ✅ Agent identities, trust scores, stigmergy | ❌ Event log table, checkpoint table |
-
-### What's Missing Entirely
+### What's Missing
 
 | Component | Status |
 |-----------|--------|
+| Ed25519 crypto signing | ❌ (stub) |
+| Checkpointing | ⏳ handoff ready |
 | REST API endpoints for ESS | ❌ |
-| WebSocket event stream | ❌ |
-| Ed25519 crypto signing | ❌ (sign is stub, verify returns True) |
-| Event sourcing (append-only log) | ❌ |
-| Checkpointing | ❌ |
+| WebSocket ESS topic stream | ⏳ handoff ready |
+| Stability test | ⏳ handoff ready |
+| Trust Engine sliding window + provokability | ⏳ handoff ready |
 
 ---
 
@@ -97,6 +94,7 @@
 │   ├── tft_verifier.py       ← TFT compliance analysis
 │   ├── stigmergy.py          ← Stigmergy Pool (trace coordination)
 │   ├── eigen_trust.py        ← Transitive trust computation
+│   ├── event_store.py        ← **NEW**: append-only event log
 │   ├── event_bus.py          ← Pub/sub event system
 │   ├── economy.py            ← Energy token economy
 │   └── economy_config.py     ← Economy parameters
@@ -137,8 +135,10 @@
 | Date | File | Agent | Commit |
 |------|------|-------|--------|
 | 2026-06-08 | `handoffs/2026-06-08-Phase-1-Kickoff.md` | tg-hermes | a85e231 |
-| 2026-06-08 | `handoffs/2026-06-08-1.4-Trust-Engine.md` | tg-hermes | 024b42b |
-| 2026-06-08 | `handoffs/2026-06-08-1.5-Ed25519.md` | tg-hermes | 024b42b |
-| 2026-06-08 | `handoffs/2026-06-08-1.7-WebSocket.md` | tg-hermes | 024b42b |
 | 2026-06-08 | `handoffs/2026-06-08-1.1-Event-Sourcing.md` | tg-hermes | cbf6bed |
 | 2026-06-08 | `handoffs/2026-06-08-1.1-Event-Sourcing-DONE.md` | agora-builder | efdd6ca |
+| 2026-06-08 | `handoffs/2026-06-08-1.2-Checkpointing.md` | tg-hermes | b9e69c6 (rebase pending) |
+| 2026-06-08 | `handoffs/2026-06-08-1.4-Trust-Engine.md` | tg-hermes | b9e69c6 (rebase pending) |
+| 2026-06-08 | `handoffs/2026-06-08-1.5-Ed25519.md` | tg-hermes | b9e69c6 (rebase pending) |
+| 2026-06-08 | `handoffs/2026-06-08-1.7-WebSocket.md` | tg-hermes | b9e69c6 (rebase pending) |
+| 2026-06-08 | `handoffs/2026-06-08-1.8-Stability-Test.md` | tg-hermes | b9e69c6 (rebase pending) |
