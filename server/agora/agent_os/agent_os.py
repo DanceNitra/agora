@@ -787,6 +787,47 @@ class AgentOS:
         row = await cursor.fetchone()
         return row["npc_id"] if row else NPC_UUIDS.get(name)
 
+    async def _get_npc_name(self, npc_id: str) -> str | None:
+        """Lookup NPC name by UUID."""
+        cursor = await self.db.execute(
+            "SELECT npc_name FROM dungeon_npcs WHERE npc_id=?", (npc_id,)
+        )
+        row = await cursor.fetchone()
+        return row["npc_name"] if row else None
+
+    # ── Collective Knowledge Pool (Phase 2.0 Layer 5) ──
+    async def _contribute_to_collective(self, npc_id: str, title: str, content: str,
+                                        knowledge_type: str = "observation",
+                                        broadcast_fn=None):
+        """An agent contributes knowledge to the shared dungeon 'vault'."""
+        name = await self._get_npc_name(npc_id)
+        await self.db.execute(
+            "INSERT INTO collective_knowledge (title, content, contributor_id, "
+            "contributor_name, knowledge_type, confidence) VALUES (?, ?, ?, ?, ?, 0.7)",
+            (title, content[:500], npc_id, name or "", knowledge_type),
+        )
+        await self.db.commit()
+        if broadcast_fn:
+            await broadcast_fn("collective_knowledge_added",
+                               {"contributor": name, "title": title, "type": knowledge_type})
+
+    async def _query_collective(self, query: str, limit: int = 5) -> list[dict]:
+        """Keyword search across the collective knowledge pool."""
+        keywords = [w for w in query.lower().split() if len(w) > 3]
+        if not keywords:
+            return []
+        conditions = " OR ".join(
+            "(LOWER(title) LIKE ? OR LOWER(content) LIKE ?)" for _ in keywords)
+        params: list = []
+        for kw in keywords:
+            params.extend([f"%{kw}%", f"%{kw}%"])
+        cursor = await self.db.execute(
+            f"SELECT * FROM collective_knowledge WHERE {conditions} "
+            f"ORDER BY verification_count DESC, confidence DESC LIMIT ?",
+            params + [limit],
+        )
+        return [dict(r) for r in await cursor.fetchall()]
+
     async def _seek_help_auto(self, npc_id: str, name: str, broadcast_fn=None):
         """Automatically find the best agent to help with current problem."""
         cursor = await self.db.execute(
