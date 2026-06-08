@@ -571,6 +571,7 @@ async def _converse(a_id: str, b_id: str, hold: dict[str, int]) -> None:
             history.append(f"{sname}: {line}")
             await asyncio.sleep(2.4)
         await asyncio.sleep(1.0)
+        await record_trust(a_id, b_id, "cooperate")  # a friendly talk builds trust
         for cid in (a_id, b_id):
             engine.set_entity_thought(cid, "")
             engine.set_entity_state(cid, "idle")
@@ -596,6 +597,89 @@ def _maybe_start_conversation(ents, dead: dict[str, int], hold: dict[str, int]) 
             if abs(ea.x - eb.x) + abs(ea.y - eb.y) <= 2:  # within 2 tiles
                 asyncio.create_task(_converse(a, b, hold))
                 return
+
+
+# ── ESS Trust Bridge ────────────────────────────────────────────
+# The dungeon's social interactions feed the REAL server/agora TrustEngine
+# (Axelrod TFT: cooperate +, defect −, forgiveness, decay). Conversation →
+# cooperate; guards sparring → defect. Scores persist + stream to the client.
+import importlib.util as _ilu
+
+_TRUST_DB_PATH = str(HERE / "dungeon_trust.db")
+_AGENT_NAMES = {
+    "king": "King Aldric", "guard_l": "Sergeant Voss", "guard_r": "Dame Elara",
+    "priest": "High Priest Orin", "thief": "Shadow Kael", "scholar": "Sage Mira",
+}
+_trust_engine = None
+_trust_db = None
+
+
+async def _init_trust() -> None:
+    """Load the real TrustEngine from server/agora and back it with a local DB."""
+    global _trust_engine, _trust_db
+    if _trust_engine is not None:
+        return
+    try:
+        import aiosqlite
+        _trust_db = await aiosqlite.connect(_TRUST_DB_PATH)
+        _trust_db.row_factory = aiosqlite.Row
+        await _trust_db.executescript(
+            """
+            CREATE TABLE IF NOT EXISTS trust_scores (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                source_id TEXT NOT NULL, target_id TEXT NOT NULL,
+                score REAL NOT NULL DEFAULT 0.3,
+                interaction_count INTEGER NOT NULL DEFAULT 0,
+                consecutive_cooperations INTEGER NOT NULL DEFAULT 0,
+                consecutive_defections INTEGER NOT NULL DEFAULT 0,
+                sliding_window TEXT NOT NULL DEFAULT '[]',
+                last_updated TEXT,
+                UNIQUE(source_id, target_id)
+            );
+            """
+        )
+        await _trust_db.commit()
+        path = HERE.parent / "server" / "agora" / "coordination" / "ess_protocol.py"
+        spec = _ilu.spec_from_file_location("ess_protocol_dungeon", str(path))
+        mod = _ilu.module_from_spec(spec)
+        spec.loader.exec_module(mod)
+        _trust_engine = mod.TrustEngine(_trust_db)
+        logger.info("ESS TrustEngine bridged (real server/agora code, db=%s)", _TRUST_DB_PATH)
+    except Exception as e:
+        logger.warning("Trust bridge unavailable (%s) — dungeon runs without trust", e)
+        _trust_engine = None
+
+
+async def _trust_matrix() -> list[dict]:
+    """Current pairwise trust for every unordered agent pair."""
+    if not _trust_engine:
+        return []
+    out = []
+    eids = list(_AGENT_NAMES)
+    for i, a in enumerate(eids):
+        for b in eids[i + 1:]:
+            try:
+                out.append({"a": a, "b": b, "score": round(await _trust_engine.get_trust(a, b), 3)})
+            except Exception:
+                pass
+    return out
+
+
+async def record_trust(a: str, b: str, outcome: str) -> None:
+    """Record a dungeon interaction into the ESS trust engine + broadcast it."""
+    if not _trust_engine or a == b:
+        return
+    try:
+        await _trust_engine.record_interaction(a, b, outcome)
+        await _trust_engine.record_interaction(b, a, outcome)
+        score = round(await _trust_engine.get_trust(a, b), 3)
+        broadcast({
+            "type": "trust_update", "a": a, "b": b,
+            "a_name": _AGENT_NAMES.get(a, a), "b_name": _AGENT_NAMES.get(b, b),
+            "outcome": outcome, "score": score,
+        })
+    except Exception as e:
+        logger.debug("trust record failed: %s", e)
 
 
 def _walkable(x: int, y: int) -> bool:
@@ -653,6 +737,8 @@ async def ambient_life():
     hold: dict[str, int] = {}       # ticks to stand still (action / combat anim)
     cooldown: dict[str, int] = {}   # spar cooldown
     dead: dict[str, int] = {}       # knockout countdown
+    loop_n = 0
+    await _init_trust()
     logger.info("Task simulation loop started")
 
     def publish():
@@ -696,6 +782,13 @@ async def ambient_life():
         # Agents that wander near each other strike up a conversation.
         _maybe_start_conversation(ents, dead, hold)
 
+        # Periodically push the full trust matrix so late-joining clients sync.
+        loop_n += 1
+        if loop_n % 18 == 1:
+            _m = await _trust_matrix()
+            if _m:
+                broadcast({"type": "trust_snapshot", "matrix": _m, "names": _AGENT_NAMES})
+
         for eid, ent in list(ents.items()):
             cx, cy = int(round(ent.x)), int(round(ent.y))
 
@@ -738,6 +831,7 @@ async def ambient_life():
                             engine.set_entity_health(oid, hp)
                         hold[eid] = hold[oid] = 2
                         cooldown[eid] = cooldown[oid] = 5
+                        await record_trust(eid, oid, "defect")  # crossing blades erodes trust
                         sparred = True
                         break
                 if sparred:

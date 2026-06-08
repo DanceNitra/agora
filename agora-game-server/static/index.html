@@ -66,6 +66,22 @@
   .hud-task.s-open { opacity: .55; }
   .hud-task.s-in_progress { color: #ffcf9a; }
   .hud-task.s-done { color: #7fd99a; opacity: .8; }
+  /* ── HUD: ESS trust relationships ─────────────────────────── */
+  #hud-trust {
+    position: fixed; bottom: 30px; left: 12px; z-index: 12; width: 232px;
+    padding: 7px 9px; border-radius: 6px; font-family: monospace; font-size: 11px;
+    background: rgba(8,6,14,0.74); border: 1px solid #322c46; pointer-events: none;
+    backdrop-filter: blur(2px);
+  }
+  #hud-trust-lines { display: flex; flex-direction: column; gap: 5px; }
+  #hud-trust-empty { color: #6f6a86; font-size: 10px; font-style: italic; }
+  .trust-row { padding: 1px 2px; border-radius: 4px; }
+  .trust-pair { display: flex; justify-content: space-between; color: #cfc9e6; font-size: 10px; }
+  .trust-pair .sc { font-weight: bold; }
+  .trust-bar { height: 4px; background: #2a2a38; border-radius: 2px; margin-top: 2px; overflow: hidden; }
+  .trust-bar > i { display: block; height: 100%; width: 30%; background: #888; transition: width .5s, background .5s; }
+  .trust-row.flash { animation: trustflash 0.9s ease-out; }
+  @keyframes trustflash { from { background: rgba(255,255,255,0.22); } to { background: transparent; } }
 </style>
 </head>
 <body>
@@ -76,6 +92,7 @@
 <div id="hud-roster"></div>
 <div id="hud-tasks"><div class="hud-log-title">📜 QUEST BOARD</div><div id="hud-task-lines"></div></div>
 <div id="hud-log"><div class="hud-log-title">⚔ EVENT LOG</div><div id="hud-log-lines"></div></div>
+<div id="hud-trust"><div class="hud-log-title">🤝 RELATIONSHIPS · ESS TRUST</div><div id="hud-trust-lines"><div id="hud-trust-empty">building bonds…</div></div></div>
 
 <script type="importmap">
 {
@@ -837,8 +854,77 @@ if (!renderer.getContext()) {
       case 'effect_added':
         spawnEffect(d.type, d.x, d.y, d.color);
         break;
+      case 'trust_update':
+        TrustHUD.update(ev);
+        break;
+      case 'trust_snapshot':
+        TrustHUD.snapshot(ev.matrix, ev.names);
+        break;
     }
   }
+
+  // === ESS TRUST RELATIONSHIPS HUD ===
+  const TrustHUD = (() => {
+    const wrap = document.getElementById('hud-trust-lines');
+    const logEl = document.getElementById('hud-log-lines');
+    const pairs = {};                       // "a|b" -> {row, sc, bar, score}
+    const short = (n) => (n || '').split(' ').pop();
+    const key = (a, b) => (a < b ? a + '|' + b : b + '|' + a);
+
+    function logLine(text) {
+      const div = document.createElement('div');
+      div.className = 'hud-line'; div.textContent = text;
+      logEl.prepend(div);
+      while (logEl.children.length > 14) logEl.lastChild.remove();
+    }
+    function ensure(a, b, an, bn) {
+      const k = key(a, b);
+      if (pairs[k]) return pairs[k];
+      const empty = document.getElementById('hud-trust-empty');
+      if (empty) empty.remove();
+      const row = document.createElement('div');
+      row.className = 'trust-row';
+      row.innerHTML = `<div class="trust-pair"><span>${short(an)} ⇄ ${short(bn)}</span>` +
+                      `<span class="sc"></span></div><div class="trust-bar"><i></i></div>`;
+      wrap.appendChild(row);
+      return pairs[k] = { row, sc: row.querySelector('.sc'),
+                          bar: row.querySelector('.trust-bar > i'), score: 0.3 };
+    }
+    function paint(p, score) {
+      p.score = score;
+      const hue = Math.max(0, Math.min(120, score * 120));   // 0=red … 120=green
+      p.sc.textContent = score.toFixed(2);
+      p.sc.style.color = `hsl(${hue},75%,66%)`;
+      p.bar.style.width = Math.round(score * 100) + '%';
+      p.bar.style.background = `hsl(${hue},70%,50%)`;
+    }
+    function reorder() {  // most notable bonds/rivalries first
+      Object.values(pairs)
+        .sort((a, b) => Math.abs(b.score - 0.3) - Math.abs(a.score - 0.3))
+        .forEach(p => wrap.appendChild(p.row));
+    }
+    return {
+      snapshot(matrix, names) {
+        (matrix || []).forEach(m => {
+          if (Math.abs(m.score - 0.3) < 1e-6) return;   // skip untouched baseline
+          paint(ensure(m.a, m.b, names?.[m.a] || m.a, names?.[m.b] || m.b), m.score);
+        });
+        reorder();
+      },
+      update(ev) {
+        const p = ensure(ev.a, ev.b, ev.a_name, ev.b_name);
+        const before = p.score;
+        paint(p, ev.score);
+        p.row.classList.remove('flash'); void p.row.offsetWidth; p.row.classList.add('flash');
+        const an = short(ev.a_name), bn = short(ev.b_name);
+        if (ev.outcome === 'cooperate')
+          logLine(`🤝 ${an} & ${bn} grew closer (${ev.score.toFixed(2)})`);
+        else
+          logLine(`⚔ ${an} & ${bn} fell out (${ev.score.toFixed(2)})`);
+        reorder();
+      },
+    };
+  })();
 
   // === HUD (agent roster + readable event log) ===
   const HUD = (() => {
