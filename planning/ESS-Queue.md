@@ -18,7 +18,7 @@
 | # | Task | Status | Commit | Agent |
 |---|------|--------|--------|-------|
 | 1.1 | **Event sourcing** — append-only log for every interaction | 🟢 | efdd6ca | agora-builder: done, verified |
-| 1.2 | **Checkpointing** — full state snapshot every N events | 🟡 | — | tg-hermes: handoff ready |
+| 1.2 | **Checkpointing** — full state snapshot every N events | 🟢 | b57e42f | agora-builder: done, verified (all test criteria pass) |
 | 1.3 | **Stigmergy Pool persistence** — Redis → SQLite fallback | 🟢 | e4a9961 | (already done) |
 | 1.4 | **Trust Engine sliding window** — production-ready (decay, forgiveness, provokability) | 🟢 | 4bc2e49 | agora-builder: done, verified (all test criteria pass) |
 | 1.5 | **Ed25519 signing** — ESSMessage.sign() + verify() | 🟡 | — | tg-hermes: handoff ready |
