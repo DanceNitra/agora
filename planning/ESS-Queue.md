@@ -37,7 +37,7 @@
 
 | # | Task | Status | Commit | Agent |
 |---|------|--------|--------|-------|
-| **2.1** | **VaultBridge** — VaultReader + VaultWriter abstract interface, DevMockVaultReader (12 book concepts in repo, git-tracked), LocalFSVaultReader (real vault via FAISS RAG), DevMockVaultWriter (writes to /tmp mock), GitVaultWriter (real vault + git push via deploy key), vault knowledge injection into agent prompts, vault write actions from LLM decisions, config.py vault_strategy=mock/local | 🟡 | — | tg-hermes: handoff ready (44KB) |
+| **2.1** | **VaultBridge** — VaultReader + VaultWriter, číta z `~/my-second-brain/04 Resources/Concepts/*.md` (vault repo clone), keyword search + FAISS RAG fallback, agenti píšu `.md` notes + git commit/push, vault insights v LLM prompte, 3 built-in mock koncepty keď vault_path nie je nastavený, config: `AGORA_VAULT_PATH` | 🟡 | — | tg-hermes: handoff ready (25KB) |
 
 ## Phase 2b — Framework Plugins
 
