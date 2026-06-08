@@ -142,6 +142,19 @@ async def init_db(app: FastAPI):
                 ON event_store(aggregate_type, aggregate_id);
             CREATE INDEX IF NOT EXISTS idx_event_store_sequence
                 ON event_store(aggregate_type, aggregate_id, sequence_number);
+
+            CREATE TABLE IF NOT EXISTS checkpoints (
+                id              INTEGER PRIMARY KEY AUTOINCREMENT,
+                aggregate_type  TEXT NOT NULL,
+                aggregate_id    TEXT NOT NULL,
+                sequence_number INTEGER NOT NULL,
+                state           TEXT NOT NULL DEFAULT '{}',
+                checksum        TEXT NOT NULL DEFAULT '',
+                created_at      TEXT NOT NULL DEFAULT (datetime('now')),
+                UNIQUE(aggregate_type, aggregate_id, sequence_number)
+            );
+            CREATE INDEX IF NOT EXISTS idx_checkpoints_lookup
+                ON checkpoints(aggregate_type, aggregate_id, sequence_number DESC);
             """
         )
         await db.commit()
@@ -153,6 +166,10 @@ async def init_db(app: FastAPI):
         app.state.tft_verifier.event_store = app.state.event_store
     if getattr(app.state, "stigmergy", None):
         app.state.stigmergy.event_store = app.state.event_store
+
+    # Checkpointer — state snapshots from event streams (ESS 1.2)
+    from agora.coordination.checkpointer import Checkpointer
+    app.state.checkpointer = Checkpointer(db, app.state.event_store)
 
     app.state.active_connections = []
     app.state.tick_count = 0
@@ -964,6 +981,20 @@ async def tick_loop(app: FastAPI):
                     print(f"[Corporation] Tick error: {e}")
                     import traceback
                     traceback.print_exc()
+
+            # ── 12. Checkpointing (ESS 1.2) — snapshot trust/tft state ──
+            from agora.coordination.checkpointer import CHECKPOINT_INTERVAL
+            if (app.state.tick_count > 0
+                    and app.state.tick_count % CHECKPOINT_INTERVAL == 0
+                    and getattr(app.state, "checkpointer", None)):
+                try:
+                    cp_trust = await app.state.checkpointer.checkpoint_all("trust")
+                    cp_tft = await app.state.checkpointer.checkpoint_all("tft")
+                    if cp_trust or cp_tft:
+                        print(f"[Checkpoint] tick {app.state.tick_count}: "
+                              f"{len(cp_trust)} trust, {len(cp_tft)} tft snapshots")
+                except Exception as e:
+                    print(f"[Checkpoint] Tick error: {e}")
 
             if app.state.tick_count % 5 == 0:
                 best_agents = {}

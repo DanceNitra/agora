@@ -151,6 +151,22 @@ CREATE TABLE IF NOT EXISTS event_store (
 CREATE INDEX IF NOT EXISTS idx_event_store_aggregate ON event_store(aggregate_type, aggregate_id);
 CREATE INDEX IF NOT EXISTS idx_event_store_sequence ON event_store(aggregate_type, aggregate_id, sequence_number);
 
+-- ═══════════════════════════════════════════
+-- CHECKPOINTS — State snapshots from event streams
+-- ═══════════════════════════════════════════
+
+CREATE TABLE IF NOT EXISTS checkpoints (
+    id              INTEGER PRIMARY KEY AUTOINCREMENT,
+    aggregate_type  TEXT NOT NULL,
+    aggregate_id    TEXT NOT NULL,
+    sequence_number INTEGER NOT NULL,        -- The event this snapshot is based on
+    state           TEXT NOT NULL DEFAULT '{}',  -- JSON: full reconstructed state
+    checksum        TEXT NOT NULL DEFAULT '',    -- SHA256 of state for integrity
+    created_at      TEXT NOT NULL DEFAULT (datetime('now')),
+    UNIQUE(aggregate_type, aggregate_id, sequence_number)
+);
+CREATE INDEX IF NOT EXISTS idx_checkpoints_lookup ON checkpoints(aggregate_type, aggregate_id, sequence_number DESC);
+
 CREATE TABLE IF NOT EXISTS epochs (
     id              INTEGER PRIMARY KEY AUTOINCREMENT,
     epoch_number    INTEGER NOT NULL UNIQUE,
