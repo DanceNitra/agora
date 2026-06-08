@@ -937,8 +937,25 @@ async def _brain_contribute(eid: str, title: str, content: str) -> bool:
     r = await asyncio.to_thread(
         _brain_post_sync, "/api/v1/agent-os/brain/collective",
         {"npc": _AGENT_NAMES.get(eid, eid), "title": title[:90],
-         "content": content[:400], "knowledge_type": "discovery"})
+         "content": content[:600], "knowledge_type": "discovery"})
     return bool(r)
+
+
+async def _grounded_discovery(eid: str, intent: str) -> None:
+    """Turn a 'create' goal into a REAL finding grounded in arXiv — a concrete claim with a
+    real source, not a vague plan. This keeps shallow 'action items' out of the pipeline."""
+    sources = await _brain_research(intent)
+    finding = await asyncio.to_thread(
+        _llm_content_sync,
+        f"You are {_persona(eid)} State ONE concrete research FINDING — a specific claim or "
+        f"insight (NOT a plan or action item) — grounded in the real papers below, citing one. "
+        f"Max 2 sentences. NEVER invent sources.",
+        f"Topic: {intent}\n\nReal papers:\n{sources or '(none found)'}") or intent
+    src = ""
+    if sources and "(no external" not in sources and "(none" not in sources:
+        first = sources.splitlines()[0].lstrip("- ").strip()
+        src = f"\nSource: {first[:140]}"
+    await _brain_contribute(eid, intent, finding.strip()[:420] + src)
 
 
 async def _brain_propose_upgrade(eid: str, title: str, desc: str) -> bool:
@@ -1412,7 +1429,7 @@ async def ambient_life():
                 remember(eid, intent)
 
                 if kind == "create":
-                    asyncio.create_task(_brain_contribute(eid, intent, action))
+                    asyncio.create_task(_grounded_discovery(eid, intent))
                     note_event(f"{who} discovered: {intent}")
                     _os_build("discovery", who, intent)
                 elif kind == "upgrade":
