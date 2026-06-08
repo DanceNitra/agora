@@ -130,6 +130,24 @@ CREATE TABLE IF NOT EXISTS events (
     occurred_at     TEXT NOT NULL DEFAULT (datetime('now'))
 );
 
+-- ═══════════════════════════════════════════
+-- EVENT SOURCING — Append-only event store
+-- ═══════════════════════════════════════════
+
+CREATE TABLE IF NOT EXISTS event_store (
+    id              INTEGER PRIMARY KEY AUTOINCREMENT,
+    aggregate_type  TEXT NOT NULL,           -- e.g. 'trust', 'tft', 'stigmergy', 'economy'
+    aggregate_id    TEXT NOT NULL,           -- e.g. 'agent:alice:agent:bob', 'stigmergy:research'
+    sequence_number INTEGER NOT NULL,        -- Monotonic per aggregate, starts at 1
+    event_type      TEXT NOT NULL,           -- e.g. 'trust_updated', 'defection_recorded', 'trace_written'
+    payload         TEXT NOT NULL DEFAULT '{}',  -- JSON: the actual event data
+    metadata        TEXT NOT NULL DEFAULT '{}',  -- JSON: causation/correlation IDs, caller identity
+    occurred_at     TEXT NOT NULL DEFAULT (datetime('now')),
+    UNIQUE(aggregate_type, aggregate_id, sequence_number)
+);
+CREATE INDEX IF NOT EXISTS idx_event_store_aggregate ON event_store(aggregate_type, aggregate_id);
+CREATE INDEX IF NOT EXISTS idx_event_store_sequence ON event_store(aggregate_type, aggregate_id, sequence_number);
+
 CREATE TABLE IF NOT EXISTS epochs (
     id              INTEGER PRIMARY KEY AUTOINCREMENT,
     epoch_number    INTEGER NOT NULL UNIQUE,

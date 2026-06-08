@@ -22,8 +22,9 @@ class TrustEngine:
     FORGIVENESS_THRESHOLD = 5
     DECAY_RATE = 0.95
 
-    def __init__(self, db):
+    def __init__(self, db, event_store=None):
         self.db = db
+        self.event_store = event_store  # Optional event-sourcing integration
 
     async def record_interaction(self, agent_id: str, target_id: str, outcome: str) -> dict:
         trust = await self._get_trust(agent_id, target_id)
@@ -43,6 +44,28 @@ class TrustEngine:
 
         trust["interactions"] += 1
         trust["last_interaction_at"] = datetime.now(timezone.utc).isoformat()
+
+        # Event sourcing integration (non-blocking, best-effort)
+        if self.event_store:
+            try:
+                await self.event_store.append(
+                    aggregate_type="trust",
+                    aggregate_id=f"{agent_id}:{target_id}",
+                    event_type=f"trust_{outcome}",
+                    payload={
+                        "agent_id": agent_id,
+                        "target_id": target_id,
+                        "outcome": outcome,
+                        "score": trust["score"],
+                        "interactions": trust["interactions"],
+                        "consecutive_cooperations": trust["consecutive_cooperations"],
+                        "consecutive_defections": trust["consecutive_defections"],
+                    },
+                    metadata={"caller": "TrustEngine.record_interaction"},
+                )
+            except Exception:
+                pass  # Event store failure should not break trust recording
+
         await self._persist(agent_id, target_id, trust)
         return trust
 

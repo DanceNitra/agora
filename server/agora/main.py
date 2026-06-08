@@ -103,6 +103,41 @@ async def init_db(app: FastAPI):
     # EventBus — topic-based pub/sub
     app.state.event_bus = EventBus(app)
     await app.state.event_bus.start()
+
+    # ── Event Sourcing: append-only EventStore (ESS 1.1) ──
+    from agora.coordination.event_store import EventStore
+    if db:
+        # schema.sql is not auto-applied at runtime (ORM create_all is used),
+        # so ensure the event_store table exists here (idempotent).
+        await db.executescript(
+            """
+            CREATE TABLE IF NOT EXISTS event_store (
+                id              INTEGER PRIMARY KEY AUTOINCREMENT,
+                aggregate_type  TEXT NOT NULL,
+                aggregate_id    TEXT NOT NULL,
+                sequence_number INTEGER NOT NULL,
+                event_type      TEXT NOT NULL,
+                payload         TEXT NOT NULL DEFAULT '{}',
+                metadata        TEXT NOT NULL DEFAULT '{}',
+                occurred_at     TEXT NOT NULL DEFAULT (datetime('now')),
+                UNIQUE(aggregate_type, aggregate_id, sequence_number)
+            );
+            CREATE INDEX IF NOT EXISTS idx_event_store_aggregate
+                ON event_store(aggregate_type, aggregate_id);
+            CREATE INDEX IF NOT EXISTS idx_event_store_sequence
+                ON event_store(aggregate_type, aggregate_id, sequence_number);
+            """
+        )
+        await db.commit()
+    app.state.event_store = EventStore(db)
+    # Wire the event store into the coordination subsystems
+    if getattr(app.state, "trust", None):
+        app.state.trust.event_store = app.state.event_store
+    if getattr(app.state, "tft_verifier", None):
+        app.state.tft_verifier.event_store = app.state.event_store
+    if getattr(app.state, "stigmergy", None):
+        app.state.stigmergy.event_store = app.state.event_store
+
     app.state.active_connections = []
     app.state.tick_count = 0
 

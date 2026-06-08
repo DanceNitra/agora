@@ -60,6 +60,28 @@ class TFTVerifier:
              trust_before, trust_after, ctx_json),
         )
         await self.db.commit()
+
+        # Event sourcing integration (non-blocking, best-effort)
+        if getattr(self, "event_store", None):
+            try:
+                await self.event_store.append(
+                    aggregate_type="tft",
+                    aggregate_id=f"{source_id}:{target_id}",
+                    event_type=f"tft_{outcome}",
+                    payload={
+                        "id": log_id,
+                        "source_id": source_id,
+                        "target_id": target_id,
+                        "outcome": outcome,
+                        "round_num": round_num,
+                        "trust_before": trust_before,
+                        "trust_after": trust_after,
+                    },
+                    metadata={"caller": "TFTVerifier.record_interaction"},
+                )
+            except Exception:
+                pass
+
         return {
             "id": log_id,
             "source_id": source_id,

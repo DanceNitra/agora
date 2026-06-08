@@ -74,6 +74,24 @@ class StigmergyPool:
             except Exception as e:
                 print(f"[Stigmergy] DB write error: {e}")
 
+        # Event sourcing integration (non-blocking, best-effort)
+        if getattr(self, "event_store", None):
+            try:
+                await self.event_store.append(
+                    aggregate_type="stigmergy",
+                    aggregate_id=f"{task_type}",
+                    event_type="trace_written",
+                    payload={
+                        "agent_id": agent_id,
+                        "task_type": task_type,
+                        "result_preview": result[:200],
+                        "trust_delta": trust_delta,
+                    },
+                    metadata={"caller": "StigmergyPool.write_trace"},
+                )
+            except Exception:
+                pass
+
     async def best_agent(self, task_type: str, min_traces: int = 3) -> dict | None:
         key = f"stigmergy:{task_type}"
         traces = self._memory.get(key, [])
