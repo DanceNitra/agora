@@ -776,6 +776,85 @@ async def _maybe_collaborate(hold) -> None:
         return
 
 
+# ── Orchestrated research pipeline: ONE artifact flows through every role, each adds value ──
+_PIPELINE_STAGES = [
+    ("thief",   "scout",    "Scout the frontier and state the core claim, citing a real source."),
+    ("priest",  "connect",  "Add ONE novel cross-domain connection or reframing."),
+    ("scholar", "curate",   "Curate it into one crisp, well-structured claim."),
+    ("guard_r", "link",     "Name which of the user's vault ideas this should connect to."),
+    ("guard_l", "validate", "Stress-test it: name the weakest assumption, or say it holds and why."),
+    ("king",    "commit",   "Synthesize the whole chain into the final, concrete finding."),
+]
+_pipeline = {"item": None, "busy": False}
+
+
+async def _pipeline_tick(hold) -> None:
+    """Aldric's assembly line: advance one stage per call; each role builds on the last; the
+    finished artifact is committed to the vault. One pipeline at a time, so it's watchable."""
+    if _pipeline["busy"]:
+        return
+    _pipeline["busy"] = True
+    try:
+        item = _pipeline["item"]
+        if not item:                                    # Aldric opens a new pipeline
+            seed = await _pick_collab_seed()
+            if not seed:
+                return
+            _kind, title, text = seed
+            _pipeline["item"] = {"title": title, "seed": text,
+                                 "sources": await _brain_research(title),
+                                 "stage": 0, "artifact": [], "by": []}
+            broadcast({"type": "os_build", "kind": "collab", "who": "King Aldric",
+                       "text": f"opened a pipeline → {title[:42]}"})
+            return
+        stage = item["stage"]
+        eid, label, task = _PIPELINE_STAGES[stage]
+        _in_conv.add(eid)
+        hold[eid] = 12                                  # pause this agent so you see it work
+        prior = "  ".join(item["artifact"]) or "(you are first — start it)"
+        line = await _llm_say(
+            f"You are {_persona(eid)} You are the '{label}' stage of a research assembly line.",
+            f"Topic: {item['seed']}\nReal sources: {item['sources'][:450]}\n"
+            f"Work so far: {prior}\nYour task: {task} Reply in ONE line (max 20 words).",
+            f"{label}: {item['title']}")
+        engine.set_entity_thought(eid, line)
+        engine.set_entity_state(eid, "thinking")
+        item["artifact"].append(f"{_AGENT_NAMES[eid]} ({label}): {line}")
+        item["by"].append(_AGENT_NAMES[eid])
+        broadcast({"type": "os_build", "kind": "collab", "who": _AGENT_NAMES[eid],
+                   "text": f"{label} → {item['title'][:40]}"})
+        if stage + 1 < len(_PIPELINE_STAGES):           # hand off to the next role (packet)
+            broadcast({"type": "converse", "from": eid, "to": _PIPELINE_STAGES[stage + 1][0]})
+        _in_conv.discard(eid)
+        item["stage"] += 1
+        if item["stage"] >= len(_PIPELINE_STAGES):      # ship it
+            chain = "\n".join(item["artifact"])
+            final = await asyncio.to_thread(
+                _llm_content_sync,
+                "Synthesize this research assembly line into ONE final grounded finding (2-3 "
+                "sentences), citing a real source. NEVER invent sources.",
+                f"Topic: {item['seed']}\nChain:\n{chain}\n\nSources:\n{item['sources']}")
+            if final and final.strip():
+                src = ""
+                if item["sources"] and "(no external" not in item["sources"]:
+                    src = "\nSource: " + item["sources"].splitlines()[0].lstrip("- ").strip()[:140]
+                await _brain_contribute("king", f"Pipeline: {item['title']}",
+                                        final.strip()[:430] + src)
+                broadcast({"type": "os_build", "kind": "collab", "who": " → ".join(item["by"]),
+                           "text": f"shipped: {item['title'][:40]}"})
+            stages = [s[0] for s in _PIPELINE_STAGES]   # consecutive handoffs build trust
+            for x in range(len(stages) - 1):
+                await record_trust(stages[x], stages[x + 1], "cooperate")
+            for cid in stages:
+                engine.set_entity_thought(cid, "")
+            _pipeline["item"] = None
+    except Exception as e:
+        logger.debug(f"pipeline: {e}")
+        _pipeline["item"] = None
+    finally:
+        _pipeline["busy"] = False
+
+
 # ── ESS Trust Bridge ────────────────────────────────────────────
 # The dungeon's social interactions feed the REAL server/agora TrustEngine
 # (Axelrod TFT: cooperate +, defect −, forgiveness, decay). Conversation →
@@ -1571,6 +1650,9 @@ async def ambient_life():
         # rotating seed (recent finding / gap / bridge) — the OS actually doing work.
         if loop_n % 45 == 20:
             asyncio.create_task(_maybe_collaborate(hold))
+        # Orchestrated pipeline: advance one stage of Aldric's assembly line (one role at a time).
+        if loop_n % 9 == 4:
+            asyncio.create_task(_pipeline_tick(hold))
         if loop_n % 10 == 1:
             _m = await _trust_matrix()
             if _m:
