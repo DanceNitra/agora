@@ -22,7 +22,7 @@
 | 1.3 | **Stigmergy Pool persistence** — Redis → SQLite fallback | 🟢 | e4a9961 | (already done) |
 | 1.4 | **Trust Engine sliding window** — production-ready (decay, forgiveness, provokability) | 🟢 | 4bc2e49 | agora-builder: done, verified (all test criteria pass) |
 | 1.5 | **Ed25519 signing** — ESSMessage.sign() + verify() | 🟡 | — | tg-hermes: handoff ready |
-| 1.6 | **REST API** — POST /ess/commit, /ess/interact, GET /ess/trust/{agent} | 🔴 | — | — |
+| 1.6 | **REST API** — POST /ess/commit, /ess/interact, GET /ess/trust/{agent} | 🟡 | — | tg-hermes: handoff ready |
 | 1.7 | **WebSocket** — real-time event stream for subscribers | 🟡 | — | tg-hermes: handoff ready |
 | 1.8 | **ESS stability test** — invade swarm with defectors, prove TFT is collectively stable | 🟡 | — | tg-hermes: handoff ready |
 
@@ -57,31 +57,30 @@
 
 ---
 
-## Current Code State (commit `4ffe995` — builder completed 1.1)
+## Current Code State (commit `f37ebea` — Phase 1: 1 task done, 6 planned)
 
 ### `server/agora/coordination/`
 
 | File | Status | What's Needed |
 |------|--------|---------------|
-| `ess_protocol.py` | ✅ Basic TFT (nice/retaliatory/forgiving/clear, SQLite) | ❌ Ed25519, sliding window, provokability |
-| `tft_verifier.py` | ✅ TFT compliance analysis | ❌ Provokability test, event sourcing hook |
-| `stigmergy.py` | ✅ Redis trace pool, `best_agent()`, DB persistence | OK |
-| `eigen_trust.py` | ✅ Transitive trust (PageRank-style) | OK |
-| `economy.py` | ✅ Energy token economy | OK |
-| `event_bus.py` | ✅ Pub/sub event system | OK |
-| `event_store.py` | ✅ **NEW** (builder created) | Append-only event log |
-| `checkpointer.py` | ⏳ (handoff ready) | — |
+| `ess_protocol.py` | ✅ Basic TFT | ❌ Ed25519, sliding window, provokability, event_bus pub |
+| `tft_verifier.py` | ✅ TFT compliance | ❌ Provokability hook, event_bus pub |
+| `event_store.py` | ✅ **NEW** (builder) | Append-only event log, all CRUD methods |
+| `stigmergy.py` | ✅ Redis + DB persistence | ❌ Event sourcing hook |
+| `eigen_trust.py` | ✅ Transitive trust | OK |
+| `economy.py` | ✅ Energy tokens | OK |
+| `event_bus.py` | ✅ Pub/sub | OK |
 
-### What's Missing
+### What's Left in Phase 1
 
-| Component | Status |
-|-----------|--------|
-| Ed25519 crypto signing | ❌ (stub) |
-| Checkpointing | ⏳ handoff ready |
-| REST API endpoints for ESS | ❌ |
-| WebSocket ESS topic stream | ⏳ handoff ready |
-| Stability test | ⏳ handoff ready |
-| Trust Engine sliding window + provokability | ⏳ handoff ready |
+| Component | Status | Handoff |
+|-----------|--------|---------|
+| Checkpointing | 🟡 READY | `1.2-Checkpointing.md` (19KB) |
+| Trust Engine upgrade | 🟡 READY | `1.4-Trust-Engine.md` (10KB) |
+| Ed25519 signing | 🟡 READY | `1.5-Ed25519.md` (7.5KB) |
+| REST API | 🟡 READY | `1.6-REST-API.md` (13.5KB) |
+| WebSocket ESS stream | 🟡 READY | `1.7-WebSocket.md` (7KB) |
+| Stability Test | 🟡 READY | `1.8-Stability-Test.md` (15KB) |
 
 ---
 
@@ -137,9 +136,10 @@
 | 2026-06-08 | `handoffs/2026-06-08-Phase-1-Kickoff.md` | tg-hermes | a85e231 |
 | 2026-06-08 | `handoffs/2026-06-08-1.1-Event-Sourcing.md` | tg-hermes | cbf6bed |
 | 2026-06-08 | `handoffs/2026-06-08-1.1-Event-Sourcing-DONE.md` | agora-builder | efdd6ca |
-| 2026-06-08 | `handoffs/2026-06-08-1.2-Checkpointing.md` | tg-hermes | b9e69c6 |
-| 2026-06-08 | `handoffs/2026-06-08-1.4-Trust-Engine.md` | tg-hermes | b9e69c6 |
-| 2026-06-08 | `handoffs/2026-06-08-1.5-Ed25519.md` | tg-hermes | b9e69c6 |
-| 2026-06-08 | `handoffs/2026-06-08-1.7-WebSocket.md` | tg-hermes | b9e69c6 |
-| 2026-06-08 | `handoffs/2026-06-08-1.8-Stability-Test.md` | tg-hermes | b9e69c6 |
+| 2026-06-08 | `handoffs/2026-06-08-1.2-Checkpointing.md` | tg-hermes | f37ebea |
+| 2026-06-08 | `handoffs/2026-06-08-1.4-Trust-Engine.md` | tg-hermes | f37ebea |
 | 2026-06-08 | `handoffs/2026-06-08-1.4-Trust-Engine-DONE.md` | agora-builder | 4bc2e49 |
+| 2026-06-08 | `handoffs/2026-06-08-1.5-Ed25519.md` | tg-hermes | f37ebea |
+| 2026-06-08 | `handoffs/2026-06-08-1.6-REST-API.md` | tg-hermes | f37ebea |
+| 2026-06-08 | `handoffs/2026-06-08-1.7-WebSocket.md` | tg-hermes | f37ebea |
+| 2026-06-08 | `handoffs/2026-06-08-1.8-Stability-Test.md` | tg-hermes | f37ebea |
