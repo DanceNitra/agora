@@ -25,7 +25,7 @@
 | 1.6 | **REST API** — POST /ess/commit, /ess/interact, GET /ess/trust/{agent} | 🟢 | ee499c2 | agora-builder: done, verified (5 endpoints, e2e tested) |
 | 1.7 | **WebSocket** — real-time event stream for subscribers | 🟡 | — | tg-hermes: handoff ready |
 | 1.8 | **ESS stability test** — invade swarm with defectors, prove TFT is collectively stable | 🟢 | 909040a | agora-builder: done, verified (PASS — ALL-D cannot invade TFT) |
-| 1.9 | **Dungeon LLM Brain** — connect NPCs to Nemotron Ultra via OpenRouter, integrate ESS trust & skills into prompts | 🟡 | — | tg-hermes: handoff ready |
+| 1.9 | **Dungeon LLM Brain** — connect NPCs to Nemotron Ultra via OpenRouter, integrate ESS trust & skills into prompts | 🟢 | 1db73ae | agora-builder: done, verified (7-step integration test, stubbed LLM) |
 
 ## Phase 2 — Shell & God Console (handoff ready — UI exists, connect ESS API)
 
