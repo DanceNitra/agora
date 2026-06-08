@@ -193,6 +193,24 @@ async def add_collective(request: Request):
     return {"status": "added", "title": body["title"]}
 
 
+@router.post("/brain/vault-note")
+async def write_vault_note(request: Request):
+    """Persist an agent's note into the Obsidian vault (dated Agora Agents subfolder)."""
+    body = await request.json()
+    title = (body.get("title") or "").strip()
+    content = (body.get("content") or "").strip()
+    if not title or not content:
+        raise HTTPException(400, "Missing title or content")
+    writer = getattr(request.app.state, "vault_writer", None)
+    if not writer:
+        raise HTTPException(503, "vault writer not available")
+    path = await writer.write_note(
+        title=title, content=content,
+        tags=body.get("tags") or ["agora", "consolidation"],
+        agent_name=body.get("agent") or "Sage Mira")
+    return {"status": "written", "path": path}
+
+
 @router.get("/brain/brainstorm")
 async def list_brainstorm(request: Request, limit: int = 10):
     """Recent brainstorm sessions with their top idea."""

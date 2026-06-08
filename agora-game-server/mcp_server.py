@@ -1072,6 +1072,54 @@ async def ambient_life():
             engine.set_entity_state(eid, "idle")
             engine.set_entity_thought(eid, "")
 
+    consolidation = {"running": False, "seen": set()}
+
+    async def _run_consolidation(eid, standing):
+        """Sage Mira consolidates the agents' live discoveries into a real vault note —
+        so live research reaches the vault (then Elara links it). Gated by her standing."""
+        if consolidation["running"]:
+            return
+        consolidation["running"] = True
+        curator = _AGENT_NAMES.get(eid, eid)
+        try:
+            if standing < 0.55:
+                note_event(f"{curator}'s consolidation held for review (trust {standing:.2f})")
+                return
+            ck = await asyncio.to_thread(_brain_get_sync, "/api/v1/agent-os/brain/collective?limit=8")
+            disc = [k for k in (ck or {}).get("knowledge", []) if k.get("title")]
+            new = [k for k in disc if k["title"] not in consolidation["seen"]]
+            if len(new) < 2:                              # wait for enough fresh material
+                return
+            engine.set_entity_state(eid, "casting")
+            engine.set_entity_thought(eid, "» consolidating discoveries…")
+            bullets = "\n".join(f"- **{k['title']}** — {(k.get('content') or '')[:140]}"
+                                for k in new[:6])
+            synth = await asyncio.to_thread(
+                _llm_content_sync,
+                "You are Sage Mira, Knowledge Curator. Synthesize these recent discoveries into "
+                "2-3 sentences: the emerging theme and what to pursue next. Concrete, substantive.",
+                bullets) or ""
+            content = (f"## Recent discoveries\n{bullets}\n\n"
+                       f"## Synthesis — Sage Mira\n{synth.strip()}")
+            title = f"Vault Digest {_time.strftime('%Y-%m-%d %H%M')}"
+            ok = await asyncio.to_thread(
+                _brain_post_sync, "/api/v1/agent-os/brain/vault-note",
+                {"title": title, "content": content, "agent": curator,
+                 "tags": ["digest", "consolidation"]})
+            if ok:
+                for k in new[:6]:
+                    consolidation["seen"].add(k["title"])
+                note_event(f"{curator} consolidated {len(new[:6])} discoveries into a vault note")
+                _os_build("curation", curator,
+                          f"consolidated {len(new[:6])} discoveries into a vault note (trust {standing:.2f})")
+                logger.info(f"[consolidation] {curator} wrote a digest of {len(new[:6])} discoveries")
+        except Exception as e:
+            logger.warning(f"[consolidation] {eid} failed: {e!r}")
+        finally:
+            consolidation["running"] = False
+            engine.set_entity_state(eid, "idle")
+            engine.set_entity_thought(eid, "")
+
     def publish_goals():
         """Quest board: each agent's ACTIVE quest + its queued backlog + done count."""
         rows = []
@@ -1206,12 +1254,15 @@ async def ambient_life():
             if os_modules:
                 broadcast({"type": "os_modules_snapshot", "modules": os_modules})
 
-        # Autonomous curation: Dame Elara (Bridge Builder) periodically tends the vault
-        # graph — trust decides whether her links land or wait for review.
-        if loop_n % 70 == 7 and not curation["running"]:
-            _cur = "guard_r"
+        # Autonomous curation: Dame Elara (Bridge Builder) tends the vault's links and
+        # Sage Mira (Curator) consolidates live discoveries into vault notes — each gated
+        # by their OWN standing, on offset cadences.
+        if (loop_n % 70 == 7 or loop_n % 110 == 50) and not (curation["running"] and consolidation["running"]):
             _stm = _compute_standing(await _trust_matrix())
-            asyncio.create_task(_run_curation(_cur, _stm.get(_cur, 0.5)))
+            if loop_n % 70 == 7 and not curation["running"]:
+                asyncio.create_task(_run_curation("guard_r", _stm.get("guard_r", 0.5)))
+            if loop_n % 110 == 50 and not consolidation["running"]:
+                asyncio.create_task(_run_consolidation("scholar", _stm.get("scholar", 0.5)))
 
         for eid, ent in list(ents.items()):
             cx, cy = int(round(ent.x)), int(round(ent.y))
