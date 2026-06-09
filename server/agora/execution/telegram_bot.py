@@ -222,6 +222,11 @@ async def _handle(app, text: str) -> None:
         from agora.config import settings
         from agora.execution.knowledge_graph import frontier, format_frontier
         await send(format_frontier(await frontier(topic, settings.vault_path, 8)))
+    elif low in ("directions", "/directions", "harvest"):
+        await send("🧭 _Harvesting findings into next directions…_")
+        d = await asyncio.to_thread(_brain_get, "/api/v1/agent-os/brain/directions?n=14")
+        from agora.execution.harvest import format_directions
+        await send(format_directions(d or {}))
     elif low in ("/gaps", "gaps"):
         from agora.execution.semantic_index import SemanticIndex
         si = SemanticIndex()

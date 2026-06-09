@@ -406,6 +406,7 @@ async def run_http_server():
 # ── Ambient Life (autonomous entity behaviour for the standalone demo) ──
 
 import random
+import re
 
 _WALKABLE_TYPES = {"floor", "floor_vip", "throne", "arch", "door", "grass"}
 
@@ -1137,8 +1138,14 @@ async def _renewable_quests(eid: str, want: int = 3) -> list:
     """A GUARANTEED, inexhaustible supply of real work drawn from the vault's surface — gaps to
     develop, bridges to connect, findings to deepen. The vault always has these, so agents NEVER
     run out of meaningful tasks (the flaky LLM planner becomes just a bonus, not a dependency)."""
-    pool = []
+    pool, priority = [], []
     try:
+        # HARVESTED DIRECTIONS first (priority) — so research follows the synthesis and COMPOUNDS.
+        dd = await asyncio.to_thread(_brain_get_sync, "/api/v1/agent-os/brain/directions/current")
+        for d in (dd or {}).get("directions", []):
+            if d.get("kind") == "research":          # upgrade-directions go to the user, not agents
+                priority.append((f"Pursue direction: {d['title']}",
+                                 f"Advance this with real evidence — {d.get('why', '')}"))
         gaps = await _brain_gaps()
         for g in random.sample(gaps, min(3, len(gaps))):
             pool.append((f"Develop the gap: {g['title']}",
@@ -1151,13 +1158,17 @@ async def _renewable_quests(eid: str, want: int = 3) -> list:
         fd = await asyncio.to_thread(_brain_get_sync, "/api/v1/agent-os/brain/collective?limit=8")
         finds = [k for k in (fd or {}).get("knowledge", []) if (k.get("content") or "")]
         for k in random.sample(finds, min(3, len(finds))):
-            pool.append((f"Deepen: {(k.get('title') or '')[:60]}",
-                         "Test or extend this finding with a new real source"))
+            # findings → HYPOTHESIZE quests: form + test a new hypothesis that deepens the finding
+            # (the self-deepening engine — each finding raises the next testable question).
+            pool.append((f"Hypothesize on: {(k.get('title') or '')[:55]}",
+                         "Form + test a new hypothesis that deepens this finding", "hypothesize"))
     except Exception as e:
         logger.debug(f"renewable_quests {eid}: {e}")
     random.shuffle(pool)
-    return [{"intent": i[:90], "kind": "create", "where": "wander", "action": a, "with": ""}
-            for i, a in pool[:want]]
+    combined = priority + pool                        # directions first, then the renewable surface
+    return [{"intent": x[0][:90], "kind": (x[2] if len(x) > 2 else "create"),
+             "where": "wander", "action": x[1], "with": ""}
+            for x in combined[:want]]
 
 
 # ── Trust Graph: ESS live trust + Vault-Company cross-agent learning, in the dungeon ──
@@ -1221,6 +1232,16 @@ async def _run_verification() -> None:
                    "text": f"verified + incorporated {inc} finding(s) into the vault"})
 
 
+async def _run_harvest() -> None:
+    """Aldric harvests recent findings into NEXT DIRECTIONS (research questions + system upgrades)
+    so the work compounds — directions are surfaced to the user and seed the agents' next quests."""
+    d = await asyncio.to_thread(_brain_get_sync, "/api/v1/agent-os/brain/directions?n=14")
+    dirs = (d or {}).get("directions", [])
+    if dirs:
+        broadcast({"type": "os_build", "kind": "collab", "who": "King Aldric",
+                   "text": f"charted {len(dirs)} next directions from recent findings"})
+
+
 async def _broadcast_trust_graph():
     """One unified graph for the dungeon: ESS pairwise trust + learning (teach) edges +
     each agent's standing — persisted so the trust-weighted curator (AutoLinker) can read it."""
@@ -1267,6 +1288,24 @@ async def _grounded_discovery(eid: str, intent: str) -> None:
         first = sources.splitlines()[0].lstrip("- ").strip()
         src = f"\nSource: {first[:140]}"
     await _brain_contribute(eid, intent, finding.strip()[:420] + src)
+
+
+async def _hypothesis_discovery(eid: str, topic: str) -> None:
+    """AGORA 2.0 Pillar 2 in the dungeon loop — the self-deepening engine: form a NEW testable
+    hypothesis from the topic and TEST it against real literature, yielding a finding WITH a verdict,
+    evidence and a falsifier. Each tested hypothesis raises the next question → research deepens itself."""
+    # strip any quest prefix ("Hypothesize:"/"Pursue direction:"/"Deepen:") down to the real topic
+    t = re.sub(r"^(Hypothesize|Pursue direction|Deepen|Develop the gap|Connect)\s*:?\s*", "", topic, flags=re.I)
+    d = await asyncio.to_thread(
+        _brain_get_sync, f"/api/v1/agent-os/brain/hypothesize?q={_urlquote(t[:100])}")
+    if not d or not d.get("hypothesis"):
+        await _grounded_discovery(eid, topic)            # fall back to a grounded finding
+        return
+    content = (f"Hypothesis: {d['hypothesis']} — {d.get('verdict', 'UNCERTAIN')} "
+               f"({float(d.get('confidence', 0.5)):.0%}). {d.get('evidence', '')} "
+               f"Falsifier: {d.get('falsifier', '')}")
+    src = f"\nSource: {d.get('source', '')}" if d.get("source") else ""
+    await _brain_contribute(eid, f"Hypothesis: {t[:70]}", content[:430] + src)
 
 
 async def _brain_propose_upgrade(eid: str, title: str, desc: str) -> bool:
@@ -1752,6 +1791,9 @@ async def ambient_life():
         # Voss autonomously fact-checks recent findings and incorporates the VERIFIED ones (~6 min).
         if loop_n % 450 == 200:
             asyncio.create_task(_run_verification())
+        # Aldric harvests findings into next directions (~13 min) — work compounds toward them.
+        if loop_n % 950 == 600:
+            asyncio.create_task(_run_harvest())
 
         for eid, ent in list(ents.items()):
             cx, cy = int(round(ent.x)), int(round(ent.y))
@@ -1794,7 +1836,11 @@ async def ambient_life():
                                   "#ff6a6a" if kind == "challenge" else "#ffd27a", 0.9)
                 remember(eid, intent)
 
-                if kind == "create":
+                if kind == "hypothesize":
+                    asyncio.create_task(_hypothesis_discovery(eid, intent))
+                    note_event(f"{who} forms a hypothesis: {intent}")
+                    _os_build("discovery", who, intent)
+                elif kind == "create":
                     asyncio.create_task(_grounded_discovery(eid, intent))
                     note_event(f"{who} discovered: {intent}")
                     _os_build("discovery", who, intent)

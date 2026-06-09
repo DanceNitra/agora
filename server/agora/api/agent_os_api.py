@@ -328,6 +328,33 @@ async def brain_frontier(q: str, k: int = 8):
     return {"status": "ok", **await frontier(q, settings.vault_path, k)}
 
 
+_DIRECTIONS: dict = {"themes": [], "insight": "", "directions": [], "ts": 0}
+
+
+@router.get("/brain/directions")
+async def brain_directions(request: Request, n: int = 14):
+    """HARVEST: turn the agents' recent findings into emerging themes + the strongest insight +
+    3 concrete NEXT DIRECTIONS (research or system upgrade). Stored so agents pursue them — the
+    missing layer that makes research compound into directions, not just pile up as notes."""
+    import time
+    db = request.app.state.db
+    cur = await db.execute(
+        "SELECT content FROM collective_knowledge WHERE knowledge_type='discovery' "
+        "ORDER BY created_at DESC LIMIT ?", (n,))
+    findings = [r["content"] for r in await cur.fetchall() if r["content"]]
+    from agora.execution.harvest import synthesize_directions
+    d = await synthesize_directions(findings)
+    global _DIRECTIONS
+    _DIRECTIONS = {**d, "ts": time.time()}
+    return {"status": "ok", **d}
+
+
+@router.get("/brain/directions/current")
+async def current_directions():
+    """The latest harvested directions — agents pull these to pursue them (closing the loop)."""
+    return {"directions": _DIRECTIONS.get("directions", []), "themes": _DIRECTIONS.get("themes", [])}
+
+
 @router.get("/brain/bridges")
 async def brain_bridges(n: int = 6, rationale: bool = True):
     """Pairs of the user's notes that are deeply related yet UNLINKED — missing connections.
@@ -453,7 +480,15 @@ async def _build_morning_report(app) -> str:
         for g in gaps:
             lines.append(f"• {g['title']}")
         lines.append("")
-    lines.append("_Text a question → grounded brief · `gaps` · `report` · `status`_")
+    # Harvested NEXT DIRECTIONS — what the research points to (esp. upgrades, for you to act on).
+    dirs = _DIRECTIONS.get("directions", [])
+    if dirs:
+        lines.append("🧭 *Next directions (from overnight findings):*")
+        for x in dirs:
+            icon = "🛠️" if x.get("kind") == "upgrade" else "🔬"
+            lines.append(f"{icon} {x['title']}")
+        lines.append("")
+    lines.append("_Text a question · `directions` · `gaps` · `report` · `status`_")
     return "\n".join(lines)
 
 
