@@ -85,6 +85,10 @@ reuses `export_insights`; weekly dungeon trigger PROPOSES (never auto-runs).
 
 ---
 
+**STATUS (2026-06-09):** 1, 2 and 4 are SHIPPED (`2ac086b`, `5c42822`, `20f9f57` — first exam
+graded 7/8). Remaining: 3 (Memory Economy — wants retrieval logging running first), 5 (Mind
+Chamber), 6 (Research Exchange).
+
 **Recommended order:** 1 → 2 → 4 (each small, each closes a real loop), then 3, then 5/6.
 One frontier at a time; every step keeps the safety rules (small reversible commits,
 py_compile, both servers 200, revert on breakage).
