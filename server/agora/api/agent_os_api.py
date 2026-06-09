@@ -672,6 +672,29 @@ async def brain_memory_economy(n: int = 12):
             "report": format_economy(notes, cands)}
 
 
+@router.get("/brain/library-inputs")
+async def brain_library_inputs(q: str = ""):
+    """THE LIBRARY — one unread paper's full text (ar5iv) for Claude to digest into a
+    structured paper note (claims, evidence strength, limitations, links to the vault)."""
+    from agora.execution.library import gather_paper_inputs
+    return {"status": "ok", **await gather_paper_inputs(q)}
+
+
+@router.post("/brain/library-record")
+async def brain_library_record(request: Request):
+    """Mark a paper read in the bibliography ledger."""
+    from agora.execution.library import record_paper
+    b = await request.json()
+    return {"status": "ok", "record": record_paper(
+        b.get("arxiv_id", ""), b.get("title", ""), b.get("url", ""), b.get("note", ""))}
+
+
+@router.get("/brain/library")
+async def brain_library():
+    from agora.execution.library import format_library, _load
+    return {"status": "ok", "report": format_library(), "papers": _load()[-12:]}
+
+
 @router.get("/brain/experiments")
 async def brain_experiments():
     """CAUSAL SELF-EXPERIMENTS — variant arms, sample sizes, means, decided winners."""

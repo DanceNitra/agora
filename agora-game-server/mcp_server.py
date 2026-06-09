@@ -1590,6 +1590,22 @@ async def _run_memory_economy() -> None:
         _mind_spark("#c9a14a")        # amber — the custodian governs
 
 
+async def _queue_library_read() -> None:
+    """THE LIBRARY: find one unread full-text paper and queue it for Claude to read deeply
+    (a structured paper note — the system's grounding goes from abstract-deep to read-deep)."""
+    d = await asyncio.to_thread(_brain_get_sync, "/api/v1/agent-os/brain/library-inputs", 60)
+    aid = (d or {}).get("arxiv_id", "")
+    if not aid:
+        return
+    if await _task_already_pending("Read paper"):
+        return
+    await asyncio.to_thread(_brain_post_sync, "/api/v1/agent-os/brain/claude-inbox",
+                            {"text": f"Read paper [{aid}]: {(d.get('title') or '')[:80]}"})
+    broadcast({"type": "os_build", "kind": "discovery", "who": "Sage Mira",
+               "text": f"pulled a full paper to read deeply: {(d.get('title') or '')[:40]}"})
+    _mind_spark("#8fd3ff")        # cyan — deep reading
+
+
 async def _run_interview() -> None:
     """THE INTERVIEW: once a day, ask the owner the single most valuable question (Telegram).
     The brain skips it when an unanswered question is still fresh."""
@@ -2329,6 +2345,9 @@ async def ambient_life():
         # THE INTERVIEW — ask the owner the one question Agora most needs answered (~daily).
         if loop_n % 64000 == 47000:
             asyncio.create_task(_run_interview())
+        # THE LIBRARY — read ONE full paper and queue it for Claude to digest (~daily, offset).
+        if loop_n % 64000 == 55000:
+            asyncio.create_task(_queue_library_read())
 
         for eid, ent in list(ents.items()):
             cx, cy = int(round(ent.x)), int(round(ent.y))
