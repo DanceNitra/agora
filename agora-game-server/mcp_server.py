@@ -1616,6 +1616,12 @@ async def _broadcast_mind_state() -> None:
              for p in ordered[:4]]
     ex = await asyncio.to_thread(_brain_get_sync, "/api/v1/agent-os/brain/exams")
     graded = [s for s in (ex or {}).get("series", []) if s.get("score") is not None]
+    # THE MIND CHAMBER — the worldview as a living place above the throne (3D view of the same data)
+    broadcast({"type": "mind_chamber",
+               "beliefs": len(mi.get("beliefs", [])),
+               "questions": (mi.get("flywheel", {}) or {}).get("open", 0),
+               "outcomes": [p.get("status") for p in plist
+                            if p.get("status") in ("correct", "incorrect")][-12:]})
     broadcast({"type": "mind_state",
                "board": board,
                "exam": (f"{graded[-1]['score']}/{graded[-1]['max']}" if graded else "—"),

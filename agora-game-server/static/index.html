@@ -975,6 +975,106 @@ if (!renderer.getContext()) {
     }
   };
 
+  // ── THE MIND CHAMBER — Agora's worldview as a living place levitating above the throne.
+  //    Belief crystals orbit the worldview core; open flywheel questions are dim amber portals
+  //    on the outer ring; resolved predictions fall as green/red shards. Pure view of
+  //    mind_chamber events — reads state, never writes it.
+  const MindChamber = {
+    group: null, beliefs: null, portals: null, core: null, shards: [],
+    nBeliefs: 0, nPortals: 0, seenOutcomes: 0, pulse: 0,
+    MAXB: 16, MAXP: 8,
+    _dummy: new THREE.Object3D(),
+    _shardGeo: new THREE.TetrahedronGeometry(0.13, 0),
+
+    _ensure() {
+      if (this.group) return;
+      const c = window.__center || { cx: 0, cy: 0 };
+      this.group = new THREE.Group();
+      this.group.position.set(12 - c.cx, 3.1, 2 - c.cy);   // above the throne dais
+      this.core = new THREE.Mesh(new THREE.IcosahedronGeometry(0.34, 0),
+        new THREE.MeshStandardMaterial({ color: 0x8a6cff, emissive: 0x6a4cdc,
+          emissiveIntensity: 1.4, flatShading: true, roughness: 0.35, metalness: 0.2 }));
+      this.group.add(this.core);
+      this.beliefs = new THREE.InstancedMesh(new THREE.OctahedronGeometry(0.16, 0),
+        new THREE.MeshStandardMaterial({ color: 0xb89bff, emissive: 0x7a55e8,
+          emissiveIntensity: 1.1, flatShading: true, roughness: 0.4, metalness: 0.1 }),
+        this.MAXB);
+      this.beliefs.count = 0;
+      this.group.add(this.beliefs);
+      this.portals = new THREE.InstancedMesh(new THREE.TorusGeometry(0.15, 0.035, 6, 14),
+        new THREE.MeshStandardMaterial({ color: 0xffc36a, emissive: 0xc98a2e,
+          emissiveIntensity: 0.8, flatShading: true, roughness: 0.5, metalness: 0.1 }),
+        this.MAXP);
+      this.portals.count = 0;
+      this.group.add(this.portals);
+      scene.add(this.group);
+    },
+
+    update(ev) {
+      this._ensure();
+      this.nBeliefs = Math.min(this.MAXB, ev.beliefs ?? 0);
+      this.nPortals = Math.min(this.MAXP, ev.questions ?? 0);
+      this.beliefs.count = this.nBeliefs;
+      this.portals.count = this.nPortals;
+      const outcomes = ev.outcomes || [];
+      if (outcomes.length > this.seenOutcomes)
+        outcomes.slice(this.seenOutcomes).forEach((st, i) => this._spawnShard(st === 'correct', i));
+      this.seenOutcomes = Math.max(this.seenOutcomes, outcomes.length);
+      this.pulse = 1;                                       // visible heartbeat on update
+    },
+
+    _spawnShard(ok, i) {
+      const m = new THREE.Mesh(this._shardGeo,
+        new THREE.MeshStandardMaterial({ color: ok ? 0x9affc0 : 0xff9a9a,
+          emissive: ok ? 0x35c97a : 0xc94545, emissiveIntensity: 1.6,
+          flatShading: true, transparent: true, opacity: 1 }));
+      m.position.copy(this.group.position);
+      m.position.x += (Math.random() - 0.5) * 1.4;
+      m.position.z += (Math.random() - 0.5) * 1.4;
+      scene.add(m);
+      this.shards.push({ m, born: performance.now() + i * 200, vy: 0 });
+    },
+
+    tick(dt) {
+      if (!this.group) return;
+      const t = performance.now() / 1000;
+      this.core.rotation.y = t * 0.4;
+      this.core.rotation.x = Math.sin(t * 0.3) * 0.25;
+      this.pulse = Math.max(0, this.pulse - dt * 0.8);
+      this.core.material.emissiveIntensity = 1.4 + this.pulse * 2.2;
+      for (let i = 0; i < this.nBeliefs; i++) {
+        const a = t * 0.35 + (i / Math.max(1, this.nBeliefs)) * Math.PI * 2;
+        this._dummy.position.set(Math.cos(a) * 0.9, Math.sin(t * 1.1 + i * 2.1) * 0.22, Math.sin(a) * 0.9);
+        this._dummy.rotation.set(0, a + i, t * 0.6 + i);
+        this._dummy.updateMatrix();
+        this.beliefs.setMatrixAt(i, this._dummy.matrix);
+      }
+      if (this.nBeliefs) this.beliefs.instanceMatrix.needsUpdate = true;
+      for (let i = 0; i < this.nPortals; i++) {
+        const a = -t * 0.15 + (i / Math.max(1, this.nPortals)) * Math.PI * 2;
+        this._dummy.position.set(Math.cos(a) * 1.55, Math.sin(t * 0.7 + i) * 0.1, Math.sin(a) * 1.55);
+        this._dummy.rotation.set(Math.PI / 2, 0, a);
+        this._dummy.updateMatrix();
+        this.portals.setMatrixAt(i, this._dummy.matrix);
+      }
+      if (this.nPortals) this.portals.instanceMatrix.needsUpdate = true;
+      const now = performance.now();
+      this.shards = this.shards.filter(s => {
+        if (now < s.born) return true;                      // staggered start
+        const age = (now - s.born) / 1000;
+        s.vy += dt * 1.6;                                   // gentle gravity
+        s.m.position.y -= s.vy * dt;
+        s.m.rotation.x += dt * 3; s.m.rotation.y += dt * 2;
+        s.m.material.opacity = Math.max(0, 1 - age / 2.4);
+        if (age > 2.4 || s.m.position.y < 0.15) {
+          scene.remove(s.m); s.m.material.dispose();        // geometry is shared — keep it
+          return false;
+        }
+        return true;
+      });
+    }
+  };
+
   // Apply an incremental event broadcast by the server
   function applyEvent(ev) {
     HUD.onEvent(ev);
@@ -1060,6 +1160,9 @@ if (!renderer.getContext()) {
         break;
       case 'mind_state':
         MindHUD.update(ev);
+        break;
+      case 'mind_chamber':
+        MindChamber.update(ev);
         break;
     }
   }
@@ -1284,6 +1387,9 @@ if (!renderer.getContext()) {
     for (const mixer of mixers) {
       mixer.update(delta);
     }
+
+    // The Mind Chamber lives and breathes above the throne
+    MindChamber.tick(delta);
 
     // Torch / brazier flicker — warm living light
     const fl = window.__flickerLights || [];
