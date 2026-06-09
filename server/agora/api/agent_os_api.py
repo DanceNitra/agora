@@ -355,6 +355,14 @@ async def current_directions():
     return {"directions": _DIRECTIONS.get("directions", []), "themes": _DIRECTIONS.get("themes", [])}
 
 
+@router.get("/brain/self-upgrades")
+async def brain_self_upgrades(request: Request):
+    """Agora reflects on its OWN mechanisms + metrics and proposes concrete upgrades to ITSELF —
+    the recursive self-improvement loop. Claude Code reads these and implements the breakthrough ones."""
+    from agora.execution.self_upgrade import propose_self_upgrades
+    return {"status": "ok", **await propose_self_upgrades(request.app.state.db)}
+
+
 @router.get("/brain/bridges")
 async def brain_bridges(n: int = 6, rationale: bool = True):
     """Pairs of the user's notes that are deeply related yet UNLINKED — missing connections.

@@ -1134,6 +1134,9 @@ async def _brain_gaps() -> list:
     return _GAP_CACHE["gaps"]
 
 
+_recent_intents: list = []   # recently-issued quest intents, to avoid repetition (self-upgrade #1)
+
+
 async def _renewable_quests(eid: str, want: int = 3) -> list:
     """A GUARANTEED, inexhaustible supply of real work drawn from the vault's surface — gaps to
     develop, bridges to connect, findings to deepen. The vault always has these, so agents NEVER
@@ -1166,9 +1169,15 @@ async def _renewable_quests(eid: str, want: int = 3) -> list:
         logger.debug(f"renewable_quests {eid}: {e}")
     random.shuffle(pool)
     combined = priority + pool                        # directions first, then the renewable surface
+    # SELF-UPGRADE #1: don't re-pursue a topic done recently — avoid the repetition the OS fell into.
+    fresh = [x for x in combined if x[0] not in _recent_intents]
+    chosen = (fresh or combined)[:want]
+    for x in chosen:
+        _recent_intents.append(x[0])
+        del _recent_intents[:-50]
     return [{"intent": x[0][:90], "kind": (x[2] if len(x) > 2 else "create"),
              "where": "wander", "action": x[1], "with": ""}
-            for x in combined[:want]]
+            for x in chosen]
 
 
 # ── Trust Graph: ESS live trust + Vault-Company cross-agent learning, in the dungeon ──
@@ -1301,11 +1310,20 @@ async def _hypothesis_discovery(eid: str, topic: str) -> None:
     if not d or not d.get("hypothesis"):
         await _grounded_discovery(eid, topic)            # fall back to a grounded finding
         return
-    content = (f"Hypothesis: {d['hypothesis']} — {d.get('verdict', 'UNCERTAIN')} "
-               f"({float(d.get('confidence', 0.5)):.0%}). {d.get('evidence', '')} "
-               f"Falsifier: {d.get('falsifier', '')}")
+    # SELF-UPGRADE #3: a hypothesis the literature can't settle is NOT a weak claim — it's a
+    # DISCOVERED FRONTIER (a documented known-unknown marking where real research is needed). So the
+    # engine is value-positive either way: SUPPORTED → a verified claim; else → a research frontier.
+    verdict = str(d.get("verdict", "UNCERTAIN")).upper()
+    conf = float(d.get("confidence", 0.5)) if isinstance(d.get("confidence", 0.5), (int, float)) else 0.5
     src = f"\nSource: {d.get('source', '')}" if d.get("source") else ""
-    await _brain_contribute(eid, f"Hypothesis: {t[:70]}", content[:430] + src)
+    if verdict == "SUPPORTED":
+        content = (f"Hypothesis (SUPPORTED, {conf:.0%}): {d['hypothesis']} {d.get('evidence', '')} "
+                   f"Falsifier: {d.get('falsifier', '')}")
+        await _brain_contribute(eid, f"Hypothesis: {t[:70]}", content[:430] + src)
+    else:
+        content = (f"Open frontier ({verdict}): {d['hypothesis']} The literature does not yet settle "
+                   f"this. {d.get('evidence', '')} What would resolve it: {d.get('falsifier', '')}")
+        await _brain_contribute(eid, f"Frontier: {t[:70]}", content[:430] + src)
 
 
 async def _brain_propose_upgrade(eid: str, title: str, desc: str) -> bool:
