@@ -1765,6 +1765,22 @@ async def _run_night_shift() -> None:
         _mind_spark("#6a5a98", "spark")
 
 
+async def _run_salon() -> None:
+    """THE SALON: sense the followed minds; at most one contestable external claim a day goes
+    into the dialectic — named disagreement beats self-generated challenge."""
+    if await _task_already_pending("Dialectic:"):
+        return
+    d = await asyncio.to_thread(_brain_post_sync, "/api/v1/agent-os/brain/salon/sense", {}, 180)
+    c = (d or {}).get("claim")
+    if c:
+        broadcast({"type": "os_build", "kind": "discovery", "who": "High Priest Orin",
+                   "text": f"salon: challenging {c['author']} — {c['claim'][:42]}"})
+        _mind_spark("#ff9ad1")
+    elif d:
+        broadcast({"type": "os_build", "kind": "collab", "who": "High Priest Orin",
+                   "text": f"salon: read {d.get('new_items', 0)} new pieces, no claim worth contesting"})
+
+
 async def _run_desk() -> None:
     """THE DESK: lay out the owner's working context for whatever he touched most recently —
     his notes, fresh papers, the open questions that touch it (Telegram + a Desk vault note)."""
@@ -2678,6 +2694,9 @@ async def ambient_life():
         # THE DESK — lay out the owner's working context for today (~daily, morning-ish offset).
         if loop_n % 64000 == 36000:
             asyncio.create_task(_run_desk())
+        # THE SALON — sense the followed external minds; one contestable claim a day (~daily).
+        if loop_n % 64000 == 17000:
+            asyncio.create_task(_run_salon())
         # THE WATCHDOG — keep the brain alive (one supervision beat ~every 5 min).
         if loop_n % 220 == 117:
             asyncio.create_task(_watch_brain())

@@ -689,6 +689,33 @@ async def brain_memory_economy(n: int = 12):
             "report": format_economy(notes, cands)}
 
 
+@router.post("/brain/salon/sense")
+async def brain_salon_sense(request: Request):
+    """THE SALON — pull new pieces from the followed minds; extract at most ONE contestable
+    claim and queue it for the dialectic (named external disagreement)."""
+    import asyncio as _aio
+    from agora.execution.salon import sense_salon, extract_claim, record_claim
+    fresh = await _aio.to_thread(sense_salon)
+    claim_rec = None
+    for it in fresh[:6]:
+        if len(it.get("summary", "")) < 120:
+            continue
+        claim = await _aio.to_thread(extract_claim, it)
+        if claim:
+            record_claim(it["author"], it["title"], claim)
+            from agora.execution.claude_inbox import add_task
+            add_task(f"Dialectic: {claim[:140]} (per {it['author']})")
+            claim_rec = {"author": it["author"], "claim": claim}
+            break
+    return {"status": "ok", "new_items": len(fresh), "claim": claim_rec}
+
+
+@router.get("/brain/salon")
+async def brain_salon():
+    from agora.execution.salon import format_salon
+    return {"status": "ok", "report": format_salon()}
+
+
 @router.post("/brain/board/agenda")
 async def brain_board_agenda(request: Request):
     """THE BOARD MEETING — prepare the weekly agenda and send it to the owner."""
