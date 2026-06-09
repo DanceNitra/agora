@@ -1547,6 +1547,11 @@ async def _sense_and_queue() -> None:
     topic = (now or {}).get("hottest", "")
     if not topic:
         return
+    # DEDUP: a topic can stay hottest for days — don't re-queue it once an insight exists or waits.
+    covered = await asyncio.to_thread(_covered_note_themes, "insight*.md")
+    covered += await _pending_task_themes("Synthesize insight:")
+    if _theme_is_covered(topic, covered):
+        return
     await asyncio.to_thread(
         _brain_post_sync, "/api/v1/agent-os/brain/claude-inbox",
         {"text": f"Synthesize insight: {topic[:90]} (what is live in the world right now)"})
