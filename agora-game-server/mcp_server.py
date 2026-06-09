@@ -1348,14 +1348,14 @@ def _theme_words(text: str) -> set[str]:
             if len(w) > 3 and w not in _THEME_STOP}
 
 
-def _covered_insight_themes() -> list[set[str]]:
-    """Word-sets of every insight already in the vault — the frontmatter title when readable
-    (the slugified filename is truncated at ~60 chars), else the filename."""
+def _covered_note_themes(pattern: str = "insight*.md") -> list[set[str]]:
+    """Word-sets of every matching Agora note already in the vault — the frontmatter title when
+    readable (the slugified filename is truncated at ~60 chars), else the filename."""
     vault = os.environ.get("AGORA_VAULT_PATH", "C:/Users/Danculus/my-second-brain")
     notes = Path(vault) / "04 Resources" / "Concepts" / "Agora Agents"
     out = []
     try:
-        for p in notes.rglob("insight*.md"):
+        for p in notes.rglob(pattern):
             text = p.stem.replace("-", " ")
             try:
                 for line in p.read_text(encoding="utf-8", errors="ignore")[:600].splitlines():
@@ -1371,10 +1371,18 @@ def _covered_insight_themes() -> list[set[str]]:
 
 
 def _theme_is_covered(theme: str, covered: list[set[str]]) -> bool:
-    """A theme is covered when an existing insight shares >=2 and >=half of its significant words."""
+    """A theme is covered when an existing item shares >=2 and >=half of its significant words."""
     tw = _theme_words(theme)
     return bool(tw) and any(len(tw & cw) >= 2 and len(tw & cw) >= 0.5 * len(tw)
                             for cw in covered)
+
+
+async def _pending_task_themes(prefix: str) -> list[set[str]]:
+    """Word-sets of the pending Claude-inbox tasks of one kind (e.g. 'Predict:')."""
+    inbox = await asyncio.to_thread(_brain_get_sync, "/api/v1/agent-os/brain/claude-inbox")
+    return [_theme_words(t["text"].split(":", 1)[1])
+            for t in (inbox or {}).get("pending", [])
+            if t.get("text", "").startswith(prefix)]
 
 
 async def _queue_insight_theme() -> None:
@@ -1388,11 +1396,8 @@ async def _queue_insight_theme() -> None:
         return
     # DEDUP: drop themes that already have a vault insight or a pending 'Synthesize insight:' task
     # (blind re-queueing produced duplicate backlogs Claude had to editorial-skip).
-    covered = await asyncio.to_thread(_covered_insight_themes)
-    inbox = await asyncio.to_thread(_brain_get_sync, "/api/v1/agent-os/brain/claude-inbox")
-    covered += [_theme_words(t.get("text", "").split(":", 1)[1])
-                for t in (inbox or {}).get("pending", [])
-                if t.get("text", "").startswith("Synthesize insight:")]
+    covered = await asyncio.to_thread(_covered_note_themes, "insight*.md")
+    covered += await _pending_task_themes("Synthesize insight:")
     pool = [t for t in pool if not _theme_is_covered(t, covered)]
     if not pool:
         broadcast({"type": "os_build", "kind": "collab", "who": "High Priest Orin",
@@ -1434,6 +1439,14 @@ async def _run_predictions() -> None:
     pool = [d["title"] for d in (dd or {}).get("directions", []) if d.get("title")]
     pool += [g["title"] for g in (await _brain_gaps())]
     if pool:
+        # DEDUP: skip themes that already have an OPEN prediction or a pending 'Predict:' task —
+        # a second forecast on the same theme adds no accountability, just ledger noise.
+        led = await asyncio.to_thread(_brain_get_sync, "/api/v1/agent-os/brain/predictions")
+        covered = [_theme_words(p.get("theme", "")) for p in (led or {}).get("predictions", [])
+                   if p.get("status") == "pending"]
+        covered += await _pending_task_themes("Predict:")
+        pool = [t for t in pool if not _theme_is_covered(_strip_quest_prefix(t), covered)]
+    if pool:
         theme = _strip_quest_prefix(random.choice(pool))
         await asyncio.to_thread(_brain_post_sync, "/api/v1/agent-os/brain/claude-inbox",
                                 {"text": f"Predict: {theme[:80]}"})
@@ -1450,6 +1463,12 @@ async def _queue_dialectic() -> None:
     if not claims:
         dd = await asyncio.to_thread(_brain_get_sync, "/api/v1/agent-os/brain/directions/current")
         claims = [d["title"] for d in (dd or {}).get("directions", []) if d.get("title")]
+    if not claims:
+        return
+    # DEDUP: skip claims already stress-tested (a vault dialectic note) or already queued.
+    covered = await asyncio.to_thread(_covered_note_themes, "dialectic*.md")
+    covered += await _pending_task_themes("Dialectic:")
+    claims = [c for c in claims if not _theme_is_covered(c, covered)]
     if not claims:
         return
     claim = random.choice(claims)
