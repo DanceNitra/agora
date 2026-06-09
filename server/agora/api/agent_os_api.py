@@ -672,6 +672,51 @@ async def brain_memory_economy(n: int = 12):
             "report": format_economy(notes, cands)}
 
 
+@router.post("/brain/campaign/start")
+async def brain_campaign_start(request: Request):
+    """CAMPAIGNS — open a multi-day research campaign: decompose the goal, register the
+    sub-questions as standing priorities, harvest findings over days."""
+    from agora.execution.campaigns import start_campaign
+    b = await request.json()
+    q = (b.get("question") or "").strip()
+    if not q:
+        return {"status": "empty"}
+    return {"status": "ok", "campaign": await start_campaign(q, int(b.get("horizon_days", 5)))}
+
+
+@router.post("/brain/campaign/tick")
+async def brain_campaign_tick(request: Request):
+    """One day's harvest for a campaign — update per-sub-question coverage from accumulated findings."""
+    from agora.execution.campaigns import harvest_tick, list_campaigns
+    b = await request.json()
+    cid = b.get("id") or next((c["id"] for c in list_campaigns() if c["status"] == "running"), "")
+    if not cid:
+        return {"status": "none_running"}
+    return {"status": "ok", **await harvest_tick(cid, request.app.state.db)}
+
+
+@router.get("/brain/campaign/dossier-inputs")
+async def brain_campaign_dossier_inputs(id: str):
+    """The evidence for a campaign's final dossier (per sub-question literature + coverage)."""
+    from agora.execution.campaigns import gather_dossier_inputs
+    return {"status": "ok", **await gather_dossier_inputs(id)}
+
+
+@router.post("/brain/campaign/complete")
+async def brain_campaign_complete(request: Request):
+    """Mark a campaign complete (dossier written)."""
+    from agora.execution.campaigns import mark_complete
+    b = await request.json()
+    mark_complete(b.get("id") or "", b.get("dossier") or "")
+    return {"status": "ok"}
+
+
+@router.get("/brain/campaigns")
+async def brain_campaigns():
+    from agora.execution.campaigns import format_campaigns, list_campaigns
+    return {"status": "ok", "report": format_campaigns(), "campaigns": list_campaigns()}
+
+
 @router.get("/brain/library-inputs")
 async def brain_library_inputs(q: str = ""):
     """THE LIBRARY — one unread paper's full text (ar5iv) for Claude to digest into a

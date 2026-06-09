@@ -364,6 +364,19 @@ async def _handle(app, text: str) -> None:
     elif low in ("library", "/library", "papers"):
         d = await asyncio.to_thread(_brain_get, "/api/v1/agent-os/brain/library")
         await send((d or {}).get("report", "_Library empty._"))
+    elif low.startswith(("campaign ", "/campaign ")):
+        q = text.split(" ", 1)[1].strip()
+        await send("🎯 _Opening a multi-day campaign — decomposing the goal…_")
+        d = await asyncio.to_thread(_brain_post, "/api/v1/agent-os/brain/campaign/start",
+                                    {"question": q})
+        c = (d or {}).get("campaign", {})
+        await send(f"🎯 *Campaign launched* `{c.get('id','?')}`:\n"
+                   + "\n".join(f"• {s}" for s in c.get("subquestions", []))
+                   + "\n\n_the agents pursue these for days; I'll synthesize the dossier when ready_"
+                   if c else "_Couldn't start a campaign._")
+    elif low in ("campaigns", "/campaigns"):
+        d = await asyncio.to_thread(_brain_get, "/api/v1/agent-os/brain/campaigns")
+        await send((d or {}).get("report", "_No campaigns._"))
     elif low in ("economy", "/economy", "memory economy"):
         await send("🏛 _Auditing the memory economy (a minute)…_")
         d = await asyncio.to_thread(_brain_get, "/api/v1/agent-os/brain/memory-economy")
