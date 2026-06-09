@@ -672,6 +672,22 @@ async def brain_memory_economy(n: int = 12):
             "report": format_economy(notes, cands)}
 
 
+@router.post("/brain/attention/report")
+async def brain_attention_report(request: Request):
+    """ATTENTION ECONOMY — a trigger reports whether its run yielded anything."""
+    from agora.execution.attention import report
+    b = await request.json()
+    report((b.get("trigger") or "?")[:40], bool(b.get("yielded")))
+    return {"status": "ok"}
+
+
+@router.get("/brain/attention")
+async def brain_attention():
+    """Run-probability per trigger (yield-weighted, bounded [0.4, 1.0]) + a readable report."""
+    from agora.execution.attention import policy, format_attention
+    return {"status": "ok", "policy": policy(), "report": format_attention()}
+
+
 @router.post("/brain/forge/scan")
 async def brain_forge_scan(request: Request):
     """CAPABILITY FORGE — scan the system's own failure traces for missing capabilities."""

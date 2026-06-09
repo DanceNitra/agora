@@ -395,6 +395,9 @@ async def _handle(app, text: str) -> None:
         g = (d or {}).get("gap")
         await send(f"🔨 Gap registered `{g['id']}` — the Forge will queue it for a build."
                    if g else "_Already on record (or too short)._")
+    elif low in ("attention", "/attention"):
+        d = await asyncio.to_thread(_brain_get, "/api/v1/agent-os/brain/attention")
+        await send((d or {}).get("report", "_No attention data._"))
     elif low in ("forge", "/forge"):
         d = await asyncio.to_thread(_brain_get, "/api/v1/agent-os/brain/forge")
         await send((d or {}).get("report", "_Forge empty._"))

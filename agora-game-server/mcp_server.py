@@ -1325,21 +1325,27 @@ async def _run_reality_check() -> None:
     DATA (Hacker News / Wikipedia / World Bank), making the agents empirical scientists, not just
     literature synthesizers. Posts a 'Reality:' finding ONLY when real data actually bears on the claim
     (SUPPORTED/REFUTED/MIXED); skips INSUFFICIENT so it stays signal, not noise."""
+    if not await _attn_ok("reality_check"):
+        return
     fd = await asyncio.to_thread(_brain_get_sync, "/api/v1/agent-os/brain/collective?limit=12")
     finds = [k for k in (fd or {}).get("knowledge", [])
              if len(k.get("content") or "") > 120 and not (k.get("title") or "").startswith("Reality:")]
     if not finds:
+        _attn_report("reality_check", False)
         return
     k = random.choice(finds)
     body = (k.get("content") or "").split("Source:")[0].strip()
     claim = re.split(r"(?<=[.!?])\s", body)[0][:160]     # the finding's first sentence = its claim
     if len(claim) < 25:
+        _attn_report("reality_check", False)
         return
     d = await asyncio.to_thread(
         _brain_get_sync, f"/api/v1/agent-os/brain/empirical-test?q={_urlquote(claim)}", 90)
     verdict = (d or {}).get("verdict")
     if not verdict or verdict == "INSUFFICIENT":
+        _attn_report("reality_check", False)
         return                                            # no signal at all → don't pollute
+    _attn_report("reality_check", True)
     mode = "real-world traction" if (d or {}).get("mode") == "traction" else "empirical"
     content = (f"Reality check ({verdict}): {claim} — {d.get('evidence', '')} "
                f"[{mode}, via {d.get('source')}]")
@@ -1398,6 +1404,30 @@ async def _pending_task_themes(prefix: str) -> list[set[str]]:
             if t.get("text", "").startswith(prefix)]
 
 
+_attn_cache: dict = {"policy": {}, "fetched": 0.0}
+
+
+async def _attn_ok(trigger: str) -> bool:
+    """ATTENTION ECONOMY gate: run-probability follows the trigger's recent yield (the brain
+    keeps the ledger; bounded [0.4, 1.0] so a cold trigger slows down but keeps sampling)."""
+    if _time.time() - _attn_cache["fetched"] > 3600:
+        d = await asyncio.to_thread(_brain_get_sync, "/api/v1/agent-os/brain/attention")
+        if d and isinstance(d.get("policy"), dict):
+            _attn_cache["policy"] = d["policy"]
+        _attn_cache["fetched"] = _time.time()
+    return random.random() < _attn_cache["policy"].get(trigger, 1.0)
+
+
+def _attn_report(trigger: str, yielded: bool) -> None:
+    """Fire-and-forget yield report back to the attention ledger."""
+    try:
+        asyncio.get_running_loop().run_in_executor(
+            None, _brain_post_sync, "/api/v1/agent-os/brain/attention/report",
+            {"trigger": trigger, "yielded": yielded})
+    except Exception:
+        pass
+
+
 async def _task_already_pending(prefix: str) -> bool:
     """True when a task of this kind is already waiting in the Claude inbox (for the fixed-text
     daily tasks — a second copy adds nothing, Claude would just editorial-skip it)."""
@@ -1409,10 +1439,13 @@ async def _queue_insight_theme() -> None:
     """Insight Engine workflow: Agora GATHERS + QUEUES a rich theme; Claude Opus SYNTHESIZES it when
     active (the flash model is too weak for the synthesis). Picks a theme from the user's harvest
     directions / real gaps and drops it in the Claude inbox as 'Synthesize insight: <theme>'."""
+    if not await _attn_ok("insight_queue"):
+        return
     dd = await asyncio.to_thread(_brain_get_sync, "/api/v1/agent-os/brain/directions/current")
     pool = [d["title"] for d in (dd or {}).get("directions", []) if d.get("title")]
     pool += [g["title"] for g in (await _brain_gaps())]
     if not pool:
+        _attn_report("insight_queue", False)
         return
     # DEDUP: drop themes that already have a vault insight or a pending 'Synthesize insight:' task
     # (blind re-queueing produced duplicate backlogs Claude had to editorial-skip).
@@ -1422,7 +1455,9 @@ async def _queue_insight_theme() -> None:
     if not pool:
         broadcast({"type": "os_build", "kind": "collab", "who": "High Priest Orin",
                    "text": "every candidate theme already has an insight — nothing new to queue"})
+        _attn_report("insight_queue", False)
         return
+    _attn_report("insight_queue", True)
     theme = random.choice(pool)
     await asyncio.to_thread(_brain_post_sync, "/api/v1/agent-os/brain/claude-inbox",
                             {"text": f"Synthesize insight: {theme}"})
@@ -1434,16 +1469,21 @@ async def _queue_insight_theme() -> None:
 async def _queue_deepening() -> None:
     """Compounding Flywheel (second half): queue an insight's falsifier for Claude to RE-TEST against
     the fresh evidence and DEEPEN the insight — outputs come back as sharper outputs, knowledge deepens."""
+    if not await _attn_ok("deepen_queue"):
+        return
     fw = await asyncio.to_thread(_brain_get_sync, "/api/v1/agent-os/brain/flywheel/questions?n=5")
     qs = (fw or {}).get("open", [])
     if not qs:
+        _attn_report("deepen_queue", False)
         return
     # DEDUP: don't re-queue a falsifier that is already waiting in the Claude inbox (matched by qid).
     inbox = await asyncio.to_thread(_brain_get_sync, "/api/v1/agent-os/brain/claude-inbox")
     pending_texts = [t.get("text", "") for t in (inbox or {}).get("pending", [])]
     qs = [q for q in qs if not any(f"[{q['id']}]" in txt for txt in pending_texts)]
     if not qs:
+        _attn_report("deepen_queue", False)
         return
+    _attn_report("deepen_queue", True)
     q = random.choice(qs)
     await asyncio.to_thread(
         _brain_post_sync, "/api/v1/agent-os/brain/claude-inbox",
@@ -1510,19 +1550,24 @@ async def _run_predictions() -> None:
 async def _queue_dialectic() -> None:
     """Queue a contentious claim for CLAUDE to run the dialectic on (quality thesis/antithesis/
     synthesis — the flash version is weak). Picks a flywheel falsifier or a harvest direction."""
+    if not await _attn_ok("dialectic_queue"):
+        return
     fw = await asyncio.to_thread(_brain_get_sync, "/api/v1/agent-os/brain/flywheel/questions?n=4")
     claims = [q["question"] for q in (fw or {}).get("open", [])]
     if not claims:
         dd = await asyncio.to_thread(_brain_get_sync, "/api/v1/agent-os/brain/directions/current")
         claims = [d["title"] for d in (dd or {}).get("directions", []) if d.get("title")]
     if not claims:
+        _attn_report("dialectic_queue", False)
         return
     # DEDUP: skip claims already stress-tested (a vault dialectic note) or already queued.
     covered = await asyncio.to_thread(_covered_note_themes, "dialectic*.md")
     covered += await _pending_task_themes("Dialectic:")
     claims = [c for c in claims if not _theme_is_covered(c, covered)]
     if not claims:
+        _attn_report("dialectic_queue", False)
         return
+    _attn_report("dialectic_queue", True)
     claim = random.choice(claims)
     await asyncio.to_thread(_brain_post_sync, "/api/v1/agent-os/brain/claude-inbox",
                             {"text": f"Dialectic: {claim[:120]}"})
