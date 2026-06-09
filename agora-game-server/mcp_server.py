@@ -1564,6 +1564,20 @@ def _mind_spark(color: str = "#b89bff", kind: str = "explosion") -> None:
         pass
 
 
+async def _run_exam() -> None:
+    """THE EXAM: Agora sits a Socratic exam over the vault's core concepts; Claude grades it
+    (inbox task queued by the brain). The graded scores become a capability time series."""
+    if await _task_already_pending("Grade exam"):
+        return
+    d = await asyncio.to_thread(_brain_post_sync, "/api/v1/agent-os/brain/exam/generate",
+                                {"n": 6}, 300)
+    if d and d.get("id"):
+        broadcast({"type": "os_build", "kind": "collab", "who": "Sage Mira",
+                   "text": f"Agora sat an exam — {len(d.get('questions', []))} questions answered, "
+                           "awaiting Claude's grade"})
+        _mind_spark("#ffd27a")        # gold — self-measurement
+
+
 async def _broadcast_mind_state() -> None:
     """Make Agora's cognition VISIBLE in the dungeon — broadcast its live mind state to the HUD: the
     worldview headline, prediction track-record, lessons learned, and open questions."""
@@ -1588,8 +1602,11 @@ async def _broadcast_mind_state() -> None:
               "conf": round(100 * float(p.get("confidence", 0))), "status": p.get("status", "pending"),
               "days_left": max(0, round((p.get("resolve_ts", 0) - time.time()) / 86400))}
              for p in ordered[:4]]
+    ex = await asyncio.to_thread(_brain_get_sync, "/api/v1/agent-os/brain/exams")
+    graded = [s for s in (ex or {}).get("series", []) if s.get("score") is not None]
     broadcast({"type": "mind_state",
                "board": board,
+               "exam": (f"{graded[-1]['score']}/{graded[-1]['max']}" if graded else "—"),
                "worldview": headline or "synthesizing a worldview…",
                "beliefs": len(mi.get("beliefs", [])),
                "predictions": cal.get("total", 0),
@@ -2220,6 +2237,9 @@ async def ambient_life():
         # Agora's Senses — perceive what's live in the user's world + queue an insight on it (~daily).
         if loop_n % 64000 == 21000:
             asyncio.create_task(_sense_and_queue())
+        # THE EXAM — a measurable capability benchmark over the vault's core concepts (~weekly).
+        if loop_n % 448000 == 31000:
+            asyncio.create_task(_run_exam())
 
         for eid, ent in list(ents.items()):
             cx, cy = int(round(ent.x)), int(round(ent.y))

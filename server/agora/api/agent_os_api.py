@@ -625,6 +625,36 @@ async def brain_agent_forecasts():
     return {"status": "ok", "scores": agent_scores()}
 
 
+@router.post("/brain/exam/generate")
+async def brain_exam_generate(request: Request):
+    """THE EXAM — generate a Socratic exam from core vault concepts; Agora self-answers (flash)
+    and the sheet waits for Claude's grading. Capability growth becomes a time series."""
+    from agora.config import settings
+    from agora.execution.exam import generate_exam
+    b = await request.json()
+    vault = settings.vault_path or "C:/Users/Danculus/my-second-brain"
+    exam = await generate_exam(vault, int(b.get("n", 6)))
+    if exam.get("id"):        # the spread puts the exam's own status (answered) over "ok"
+        from agora.execution.claude_inbox import add_task
+        add_task(f"Grade exam [{exam['id']}]")
+    return exam
+
+
+@router.post("/brain/exam/grade")
+async def brain_exam_grade(request: Request):
+    """Record Claude's grading of an exam (one 0-2 score per question)."""
+    from agora.execution.exam import grade_exam
+    b = await request.json()
+    return grade_exam(b.get("id") or "", b.get("scores") or [], b.get("feedback") or "")
+
+
+@router.get("/brain/exams")
+async def brain_exams():
+    """Exam ledger: the score time series + the latest full sheet."""
+    from agora.execution.exam import exam_history
+    return {"status": "ok", **exam_history()}
+
+
 @router.get("/brain/flywheel/questions")
 async def brain_flywheel_questions(n: int = 8):
     """COMPOUNDING FLYWHEEL — the open research questions Agora derived from its own insights'

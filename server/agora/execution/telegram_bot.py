@@ -13,6 +13,7 @@ from __future__ import annotations
 import asyncio
 import json
 import os
+import time
 import urllib.parse
 import urllib.request
 
@@ -325,6 +326,19 @@ async def _handle(app, text: str) -> None:
     elif low in ("lessons", "/lessons", "learnings"):
         from agora.execution.learning import format_lessons
         await send(format_lessons())
+    elif low in ("exam", "/exam", "test me"):
+        await send("📝 _Composing an exam from your core concepts (a minute)…_")
+        d = await asyncio.to_thread(_brain_post, "/api/v1/agent-os/brain/exam/generate", {"n": 6})
+        from agora.execution.exam import format_exam_questions
+        await send(format_exam_questions(d or {}) if (d or {}).get("status") == "ok"
+                   else "_Couldn't compose an exam right now._")
+    elif low in ("exams", "/exams", "scores"):
+        d = await asyncio.to_thread(_brain_get, "/api/v1/agent-os/brain/exams")
+        rows = [f"• {time.strftime('%m-%d', time.localtime(s['ts']))}: "
+                + (f"*{s['score']}/{s['max']}*" if s.get("score") is not None else "_awaiting grade_")
+                for s in (d or {}).get("series", [])]
+        await send("📊 *Agora's exam scores*\n" + "\n".join(rows) if rows
+                   else "_No exams taken yet._")
     elif low in ("actions", "/actions", "hands"):
         from agora.execution.hands import format_actions
         await send(format_actions())

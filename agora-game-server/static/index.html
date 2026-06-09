@@ -954,7 +954,8 @@ if (!renderer.getContext()) {
           `<span>beliefs <b>${ev.beliefs ?? 0}</b></span>`
         + `<span>predictions <b>${ev.predictions ?? 0}</b> · <b>${ev.hit_rate || '—'}</b> right</span>`
         + `<span>lessons <b>${ev.lessons ?? 0}</b></span>`
-        + `<span>flywheel <b>${ev.flywheel_open ?? 0}</b> open</span>`;
+        + `<span>flywheel <b>${ev.flywheel_open ?? 0}</b> open</span>`
+        + `<span>exam <b>${ev.exam || '—'}</b></span>`;
       const b = document.getElementById('hud-mind-board');
       if (b && Array.isArray(ev.board)) {
         b.innerHTML = ev.board.map(p => {
