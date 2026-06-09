@@ -33,14 +33,15 @@ async def hypothesize_and_test(topic: str, vault_path: str) -> dict:
         or "(the vault is thin here)"
 
     # 1) generate ONE new, specific, testable hypothesis that goes beyond what's already claimed
-    hyp = await asyncio.to_thread(
-        call_llm,
-        "Given what a research vault ALREADY claims about a topic, propose ONE NEW, specific, "
-        "TESTABLE hypothesis that extends or challenges it — NOT something already claimed. It must "
-        "be a single declarative sentence a real paper could support or refute. Reply ONLY the "
-        "hypothesis sentence.",
-        f"Topic: {topic}\nAlready claimed:\n{known}", "cheap", 0.5, 120) or ""
-    hyp = hyp.strip().strip('"')
+    sysmsg = (
+        "Propose ONE NEW, specific, TESTABLE hypothesis about the topic — a single declarative "
+        "sentence a real paper could support or refute. If prior claims are given, extend or "
+        "challenge them (don't restate). If little is known, propose a sharp first hypothesis from "
+        "the topic itself. Reply ONLY the hypothesis sentence, nothing else.")
+    usr = f"Topic: {topic}\nAlready claimed:\n{known}"
+    hyp = (await asyncio.to_thread(call_llm, sysmsg, usr, "cheap", 0.5, 160) or "").strip().strip('"')
+    if not hyp:                                         # the LLM occasionally returns empty — retry once
+        hyp = (await asyncio.to_thread(call_llm, sysmsg, usr, "cheap", 0.7, 200) or "").strip().strip('"')
     if not hyp:
         return {"topic": topic, "hypothesis": "", "verdict": "NONE", "known": b.get("claims", [])}
 
