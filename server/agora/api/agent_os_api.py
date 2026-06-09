@@ -650,6 +650,46 @@ async def brain_action_inputs(q: str, kind: str = "brief"):
     return {"status": "ok", **await gather_action_inputs(q, kind, vault)}
 
 
+@router.get("/brain/dialectic")
+async def brain_dialectic(q: str):
+    """DIALECTIC ENGINE — thesis → antithesis → synthesis on a claim. Truth through opposition."""
+    from agora.config import settings
+    from agora.execution.dialectic import run_dialectic
+    vault = settings.vault_path or "C:/Users/Danculus/my-second-brain"
+    return {"status": "ok", **await run_dialectic(q, vault)}
+
+
+@router.get("/brain/program/start")
+async def brain_program_start(q: str):
+    """RESEARCH PROGRAMS — decompose a big question into sub-questions the agents pursue (directed science)."""
+    from agora.execution.research_program import start_program
+    return {"status": "ok", **await start_program(q)}
+
+
+@router.get("/brain/program/list")
+async def brain_program_list():
+    from agora.execution.research_program import programs
+    return {"status": "ok", "programs": programs()}
+
+
+@router.get("/brain/program/findings")
+async def brain_program_findings(pid: str):
+    """Gather a program's evidence for Claude to synthesize an answer to the main question."""
+    from agora.config import settings
+    from agora.execution.research_program import gather_program_findings
+    vault = settings.vault_path or "C:/Users/Danculus/my-second-brain"
+    return {"status": "ok", **await gather_program_findings(pid, vault)}
+
+
+@router.get("/brain/user-model")
+async def brain_user_model(force: bool = False):
+    """PERSONAL CONTEXT MODEL — who the vault's owner is (domains / projects / style), to personalize."""
+    from agora.config import settings
+    from agora.execution.user_model import build_user_model
+    vault = settings.vault_path or "C:/Users/Danculus/my-second-brain"
+    return {"status": "ok", **await build_user_model(vault, force)}
+
+
 @router.get("/brain/bridges")
 async def brain_bridges(n: int = 6, rationale: bool = True):
     """Pairs of the user's notes that are deeply related yet UNLINKED — missing connections.

@@ -294,6 +294,29 @@ async def _handle(app, text: str) -> None:
                                     {"text": "Draft " + text.split(" ", 1)[1].strip()})
         await send(f"📝 Queued for Claude to draft (#{(d or {}).get('id', '?')}). I'll produce the "
                    f"artifact on my next check and drop it in your vault.\n_kinds: brief · essay · plan · spec_")
+    elif low.startswith(("debate ", "/debate ", "dialectic ")):
+        import urllib.parse
+        claim = text.split(" ", 1)[1].strip()
+        await send("⚖️ _Running the dialectic — thesis vs antithesis…_")
+        d = await asyncio.to_thread(
+            _brain_get, "/api/v1/agent-os/brain/dialectic?q=" + urllib.parse.quote(claim))
+        from agora.execution.dialectic import format_dialectic
+        await send(format_dialectic(d or {}))
+    elif low.startswith(("program ", "/program ")):
+        import urllib.parse
+        q = text.split(" ", 1)[1].strip()
+        await send("🎯 _Launching a research program — decomposing your question…_")
+        d = await asyncio.to_thread(
+            _brain_get, "/api/v1/agent-os/brain/program/start?q=" + urllib.parse.quote(q))
+        subs = (d or {}).get("subquestions", [])
+        await send(f"🎯 *Research program launched* (#{(d or {}).get('id', '?')}):\n"
+                   + "\n".join(f"• {s}" for s in subs)
+                   + "\n\n_the agents will research these; the synthesis lands later_")
+    elif low in ("model", "/model", "about me"):
+        await send("🧭 _Building your context model…_")
+        d = await asyncio.to_thread(_brain_get, "/api/v1/agent-os/brain/user-model")
+        from agora.execution.user_model import format_model
+        await send(format_model(d or {}))
     elif low in ("upgrades", "/upgrades", "self-upgrades"):
         await send("🔧 _Agora reflecting on its own mechanisms…_")
         d = await asyncio.to_thread(_brain_get, "/api/v1/agent-os/brain/self-upgrades")
