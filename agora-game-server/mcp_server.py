@@ -1133,6 +1133,33 @@ async def _brain_gaps() -> list:
     return _GAP_CACHE["gaps"]
 
 
+async def _renewable_quests(eid: str, want: int = 3) -> list:
+    """A GUARANTEED, inexhaustible supply of real work drawn from the vault's surface — gaps to
+    develop, bridges to connect, findings to deepen. The vault always has these, so agents NEVER
+    run out of meaningful tasks (the flaky LLM planner becomes just a bonus, not a dependency)."""
+    pool = []
+    try:
+        gaps = await _brain_gaps()
+        for g in random.sample(gaps, min(3, len(gaps))):
+            pool.append((f"Develop the gap: {g['title']}",
+                         f"Find real evidence to develop '{g['title']}'"))
+        bd = await asyncio.to_thread(
+            _brain_get_sync, "/api/v1/agent-os/brain/bridges?n=5&rationale=false")
+        for b in (bd or {}).get("bridges", [])[:3]:
+            pool.append((f"Connect {b['a']} <-> {b['b']}",
+                         f"Ground how {b['a']} relates to {b['b']}, citing a real paper"))
+        fd = await asyncio.to_thread(_brain_get_sync, "/api/v1/agent-os/brain/collective?limit=8")
+        finds = [k for k in (fd or {}).get("knowledge", []) if (k.get("content") or "")]
+        for k in random.sample(finds, min(3, len(finds))):
+            pool.append((f"Deepen: {(k.get('title') or '')[:60]}",
+                         "Test or extend this finding with a new real source"))
+    except Exception as e:
+        logger.debug(f"renewable_quests {eid}: {e}")
+    random.shuffle(pool)
+    return [{"intent": i[:90], "kind": "create", "where": "wander", "action": a, "with": ""}
+            for i, a in pool[:want]]
+
+
 # ── Trust Graph: ESS live trust + Vault-Company cross-agent learning, in the dungeon ──
 _BRAIN_NAME2EID = {v: k for k, v in _AGENT_NAMES.items()}
 _LEARN_GRAPH = {"edges": [], "ts": 0.0}
@@ -1633,20 +1660,24 @@ async def ambient_life():
                     "action": (q.get("action") or "...").strip(),
                     "with": (q.get("with") or "").strip()})
                 added += 1
-            if added:
+            # GUARANTEE work: if the (flaky) LLM planner came up short, draw REAL quests from the
+            # vault's inexhaustible surface — gaps, bridges, findings. Agents never run dry.
+            if len(quests.get(eid, [])) < 2:
+                for q in await _renewable_quests(eid, 3):
+                    quests.setdefault(eid, []).append(q)
+            if quests.get(eid):
                 _plan_fails[eid] = 0
             else:
+                # even gaps/bridges/findings were empty → the brain is likely unreachable: a REAL blocker
                 _plan_fails[eid] = _plan_fails.get(eid, 0) + 1
-                if _plan_fails[eid] >= 3:               # a real, significant blocker → tell the user
+                if _plan_fails[eid] >= 3:
                     _plan_fails[eid] = 0
                     asyncio.create_task(_escalate(
-                        eid, "I can't plan my next research — the planner returned nothing 3 times "
-                        "(the LLM may be down or rate-limited), so I'm only wandering, not working. "
-                        "Reply `fix <topic>` to point me at something."))
-                if not quests.get(eid):                 # fallback so the agent isn't idle
-                    quests.setdefault(eid, []).append(
-                        {"intent": random.choice(_THOUGHTS.get(eid, ["explore the keep"])),
-                         "kind": "explore", "where": "wander", "action": "...", "with": ""})
+                        eid, "I have no work AND the vault's gap/bridge/finding sources are all empty "
+                        "or unreachable — the brain may be down. Reply `fix <topic>` to point me at something."))
+                quests.setdefault(eid, []).append(
+                    {"intent": random.choice(_THOUGHTS.get(eid, ["study the vault"])),
+                     "kind": "explore", "where": "wander", "action": "...", "with": ""})
             publish_goals()
         except Exception as e:
             logger.debug(f"replenish_quests {eid}: {e}")
