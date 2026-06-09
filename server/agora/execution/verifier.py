@@ -17,16 +17,20 @@ async def verify_finding(title: str, claim: str) -> dict:
     from agora.execution.research_tool import research, format_for_prompt
     from agora.execution.llm_client import call_llm
 
-    # Prefer the paper the finding actually cited; else the title's clean topic.
-    cited = re.search(r"Source:\s*[\"']?(.+)", claim)
+    # Re-fetch by the TOPIC the claim is ABOUT (the title minus quest prefixes), NOT the cited paper
+    # title. Findings sometimes mis-cite (e.g. a particle-physics paper attached to an unrelated
+    # claim); re-fetching that wrong paper guaranteed a false UNSUPPORTED. The topic gives literature
+    # actually relevant to the claim, so the reviewer judges the claim, not a citation accident.
     body = re.sub(r"\bSource:.*$", "", claim, flags=re.DOTALL).strip()
-    topic = title.rsplit(": ", 1)[-1].strip()
-    if cited:
-        query = re.sub(r"\(.*$", "", cited.group(1)).strip()[:90]   # paper title, drop "(authors…)"
-    elif len(topic) > 8:
-        query = topic
-    else:
-        query = " ".join(body.split()[:12])
+    topic = title
+    for _ in range(4):                       # peel any stacked quest/finding prefixes to the real topic
+        new = re.sub(r"^(?:Hypothesize on|Pursue direction|Deepen|Develop the gap|Connect|Frontier|"
+                     r"Hypothesis|Pipeline)\s*:?\s*", "", topic, flags=re.I).strip()
+        if new == topic:
+            break
+        topic = new
+    topic = re.sub(r"\s*<->\s*", " and ", topic)         # bridge titles "A <-> B" -> "A and B"
+    query = topic[:90] if len(topic) > 10 else " ".join(body.split()[:12])
     papers = await asyncio.to_thread(research, query, 5)
     sources = format_for_prompt(papers)
 
