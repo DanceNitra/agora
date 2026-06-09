@@ -9,13 +9,37 @@ Features:
   - Token counting for cost estimation
 """
 
+import hashlib
 import json
+import re
 import time
 from typing import Any, Optional
 
 from openai import OpenAI
 
 from agora.execution.model_router import ModelRouter
+
+# ── Policy Reuse (LLM response cache) ──────────────────────────────────────
+# Skip the LLM for REPEATED judgment/decision calls (low temperature = meant to be
+# deterministic: quality gate, verifier, believe, harvest, etc.). Creative calls
+# (temperature > _CACHE_TEMP_MAX: discovery, quest planning, hypothesis generation)
+# are NEVER cached, so findings stay varied. Cuts repeated calls → fewer flaky-empty
+# failures + lower cost + faster. In-process, short TTL.
+_LLM_CACHE: dict[str, tuple[str, float]] = {}
+_LLM_CACHE_TTL = 900.0          # 15 min — long enough to catch bursts, short enough to stay fresh
+_CACHE_TEMP_MAX = 0.4           # only reuse decisions at/below this temperature
+_LLM_CACHE_STATS = {"hits": 0, "misses": 0, "skipped": 0}
+
+
+def _cache_key(system: str, user: str, temperature: float, max_tokens: int) -> str:
+    norm = re.sub(r"\s+", " ", (user or "")).strip().lower()[:6000]
+    raw = f"{system[:300]}\x00{norm}\x00{round(temperature, 2)}\x00{max_tokens}"
+    return hashlib.sha256(raw.encode("utf-8", "replace")).hexdigest()
+
+
+def llm_cache_stats() -> dict:
+    """Policy-reuse stats — how many LLM calls were skipped by reusing a cached decision."""
+    return dict(_LLM_CACHE_STATS)
 
 # Lazy imports to avoid circular deps
 _settings = None
@@ -83,6 +107,20 @@ def call_llm(
     api_key = cfg.llm_api_key
     base_url = cfg.api_base_url
 
+    # POLICY REUSE: for low-temperature judgment calls, reuse a recent identical decision
+    # instead of hitting the (flaky) LLM again. Creative calls (higher temp) are never cached.
+    cache_eligible = temperature <= _CACHE_TEMP_MAX
+    ckey = ""
+    if cache_eligible:
+        ckey = _cache_key(system_prompt, user_prompt, temperature, max_tokens)
+        hit = _LLM_CACHE.get(ckey)
+        if hit and (time.time() - hit[1]) < _LLM_CACHE_TTL:
+            _LLM_CACHE_STATS["hits"] += 1
+            return hit[0]
+        _LLM_CACHE_STATS["misses"] += 1
+    else:
+        _LLM_CACHE_STATS["skipped"] += 1
+
     fallback_chain = router.get_fallback_chain(tier)
 
     errors = []
@@ -120,6 +158,12 @@ def call_llm(
                 if errors:
                     print(f"[LLM] Fallback: {tier} → {tier_name} ({model}) OK")
 
+                # Store a non-empty decision for reuse by identical low-temp calls.
+                if cache_eligible and content.strip():
+                    _LLM_CACHE[ckey] = (content, time.time())
+                    if len(_LLM_CACHE) > 500:                # bound memory: drop oldest half
+                        for k in sorted(_LLM_CACHE, key=lambda k: _LLM_CACHE[k][1])[:250]:
+                            _LLM_CACHE.pop(k, None)
                 return content
 
             except Exception as e:

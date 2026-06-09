@@ -66,13 +66,18 @@ async def build_pulse(db, vault_path: str, hours: int = 4) -> dict:
     focus = sorted(topics, key=lambda k: -topics[k])[:3]
 
     vault = vault_status(vault_path)
+    try:
+        from agora.execution.llm_client import llm_cache_stats
+        cache = llm_cache_stats()
+    except Exception:
+        cache = {"hits": 0, "misses": 0}
     return {
         "hours": hours,
         "findings": len(findings), "hypotheses": len(hyp), "frontiers": len(frontier),
         "meaningful": sum(1 for f in findings if meaningful(f)),
         "best": {"title": best[0], "content": best[1][:200]} if best else None,
         "a_frontier": {"title": a_frontier[0], "content": a_frontier[1][:160]} if a_frontier else None,
-        "focus": focus, "vault": vault,
+        "focus": focus, "vault": vault, "cache": cache,
     }
 
 
@@ -135,5 +140,10 @@ def format_pulse(p: dict, gaps: list | None = None, directions: list | None = No
         lines.append(f"🟢 *Productive* — {v['new_today']} new notes reached your second-brain.")
     else:
         lines.append("🟡 *Modest* — a little landed; mostly groundwork.")
+    c = p.get("cache", {})
+    total = c.get("hits", 0) + c.get("misses", 0)
+    if c.get("hits", 0):
+        pct = round(100 * c["hits"] / total) if total else 0
+        lines.append(f"♻️ *Policy reuse:* {c['hits']} LLM calls skipped via cache ({pct}% of decisions)")
     lines.append("\n_`pulse` anytime · `directions` · `upgrades` · reply a number to build_")
     return "\n".join(lines)
