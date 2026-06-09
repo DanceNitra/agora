@@ -236,6 +236,10 @@ async def _handle(app, text: str) -> None:
         d = await asyncio.to_thread(_brain_get, "/api/v1/agent-os/brain/directions?n=14")
         from agora.execution.harvest import format_directions
         await send(format_directions(d or {}))
+    elif low in ("pulse", "/pulse", "report+"):
+        await send("📊 _Reading the system's pulse…_")
+        d = await asyncio.to_thread(_brain_get, "/api/v1/agent-os/brain/pulse?hours=4")
+        await send((d or {}).get("report", "_No pulse available right now._"))
     elif low in ("upgrades", "/upgrades", "self-upgrades"):
         await send("🔧 _Agora reflecting on its own mechanisms…_")
         d = await asyncio.to_thread(_brain_get, "/api/v1/agent-os/brain/self-upgrades")

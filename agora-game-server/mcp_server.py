@@ -1262,6 +1262,13 @@ async def _run_self_reflection() -> None:
                    "text": f"proposed {len(ups)} upgrades to itself"})
 
 
+async def _run_pulse() -> None:
+    """Push a plain-language Pulse to Telegram — regular, human-readable visibility into what the
+    system is researching + why + what reached the vault (so the user isn't blind to the dungeon)."""
+    await asyncio.to_thread(_brain_get_sync, "/api/v1/agent-os/brain/pulse?hours=3&notify=true")
+    broadcast({"type": "os_build", "kind": "collab", "who": "Agora", "text": "sent a Pulse report"})
+
+
 async def _broadcast_trust_graph():
     """One unified graph for the dungeon: ESS pairwise trust + learning (teach) edges +
     each agent's standing — persisted so the trust-weighted curator (AutoLinker) can read it."""
@@ -1826,6 +1833,9 @@ async def ambient_life():
         # Agora reflects on itself and Telegrams upgrade proposals (~3 h) — recurring self-improvement.
         if loop_n % 13000 == 800:
             asyncio.create_task(_run_self_reflection())
+        # Pulse — a plain-language visibility report to Telegram (~every 3 h, offset from the rest).
+        if loop_n % 11000 == 5000:
+            asyncio.create_task(_run_pulse())
 
         for eid, ent in list(ents.items()):
             cx, cy = int(round(ent.x)), int(round(ent.y))

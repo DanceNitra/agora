@@ -413,6 +413,29 @@ async def pick_self_upgrade(request: Request):
     return {"status": "queued", "id": tid, "title": u["title"]}
 
 
+@router.get("/brain/pulse")
+async def brain_pulse(request: Request, hours: int = 4, notify: bool = False):
+    """PULSE — a plain-language heartbeat: what's being researched + why, how much is meaningful,
+    and what actually reached the Obsidian vault / GitHub second-brain. The visibility layer."""
+    from agora.config import settings
+    from agora.execution.pulse import build_pulse, format_pulse
+    vault = settings.vault_path or "C:/Users/Danculus/my-second-brain"
+    p = await build_pulse(request.app.state.db, vault, hours)
+    gaps = []
+    try:
+        from agora.execution.semantic_index import SemanticIndex
+        global _SEM_INDEX
+        if _SEM_INDEX is None or not _SEM_INDEX.ready:
+            _SEM_INDEX = SemanticIndex()
+        gaps = _SEM_INDEX.find_gaps(3) if _SEM_INDEX.ready else []
+    except Exception:
+        pass
+    report = format_pulse(p, gaps, _DIRECTIONS.get("directions", []))
+    if notify:
+        await _send_telegram(report)
+    return {"status": "ok", "pulse": p, "report": report}
+
+
 @router.get("/brain/bridges")
 async def brain_bridges(n: int = 6, rationale: bool = True):
     """Pairs of the user's notes that are deeply related yet UNLINKED — missing connections.
