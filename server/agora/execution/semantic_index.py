@@ -20,6 +20,32 @@ OLLAMA_EMBED = "http://localhost:11434/api/embed"
 MODEL = "nomic-embed-text"
 CACHE = Path(__file__).resolve().parents[2] / ".semantic_cache"   # server/.semantic_cache
 SKIP = (".git", ".obsidian", ".meta", "_vault_quarantine")
+RETRIEVAL_LOG = Path(__file__).resolve().parents[2] / ".retrieval_log.json"
+
+
+def log_retrieval(paths: list[str]) -> None:
+    """Per-note demand counters — which notes searches actually surface. Feeds the Memory
+    Economy's value accounting (a note that is never retrieved isn't earning its keep)."""
+    try:
+        log = json.loads(RETRIEVAL_LOG.read_text(encoding="utf-8"))
+    except Exception:
+        log = {}
+    now = time.time()
+    for p in paths:
+        e = log.setdefault(p, {"n": 0})
+        e["n"] += 1
+        e["last"] = now
+    try:
+        RETRIEVAL_LOG.write_text(json.dumps(log, ensure_ascii=False), encoding="utf-8")
+    except Exception:
+        pass
+
+
+def retrieval_counts() -> dict:
+    try:
+        return json.loads(RETRIEVAL_LOG.read_text(encoding="utf-8"))
+    except Exception:
+        return {}
 
 
 def _embed_batch(texts: list[str]) -> list[list[float]]:
@@ -198,5 +224,7 @@ class SemanticIndex:
         qv /= (np.linalg.norm(qv) + 1e-9)
         sims = self.vecs @ qv
         idx = np.argsort(-sims)[:top_k]
-        return [{"title": self.meta[i]["title"], "path": self.meta[i]["path"],
+        hits = [{"title": self.meta[i]["title"], "path": self.meta[i]["path"],
                  "score": round(float(sims[i]), 3)} for i in idx]
+        log_retrieval([h["path"] for h in hits if h["score"] > 0.4])   # demand signal (Memory Economy)
+        return hits

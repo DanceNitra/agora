@@ -23,7 +23,7 @@ _ACTIONS = Path(__file__).resolve().parents[2] / ".actions.json"
 OUTPUT_DIR = Path(__file__).resolve().parents[2].parent / "agora_output"
 
 SAFE_KINDS = {"build_tool", "build_file", "analysis", "export_insights", "digest"}  # local → auto
-GATED_KINDS = {"publish", "send", "repo", "external", "gist"}   # outward / irreversible → needs approval
+GATED_KINDS = {"publish", "send", "repo", "external", "gist", "curate"}  # outward/irreversible → approval
 
 
 def _load() -> list:
@@ -129,6 +129,12 @@ def execute_action(aid: str, vault_path: str = "") -> dict:
             result = _export_insights(vault_path)
         elif a["kind"] == "digest":
             result = _run_digest()
+        elif a["kind"] == "curate":
+            # Memory Economy: quarantine the approved batch (reversible move + manifest)
+            from agora.execution.memory_economy import quarantine_notes
+            q = quarantine_notes(vault_path, a.get("payload", {}).get("paths", []))
+            result = f"quarantined {q['moved']} note(s) → {q['batch']}" if q["moved"] \
+                else "nothing to quarantine (paths gone or excluded)"
         else:
             return {"error": f"kind '{a['kind']}' must be carried out by Claude, not the auto-executor"}
         set_status(aid, "done", result)

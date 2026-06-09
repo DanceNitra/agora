@@ -1578,6 +1578,18 @@ async def _run_exam() -> None:
         _mind_spark("#ffd27a")        # gold — self-measurement
 
 
+async def _run_memory_economy() -> None:
+    """MEMORY ECONOMY: value-account the vault and PROPOSE archiving the dead weight as a gated
+    curate action — Rasto approves from Telegram, notes move to quarantine (reversible)."""
+    d = await asyncio.to_thread(_brain_post_sync, "/api/v1/agent-os/brain/memory-economy/propose",
+                                {"n": 12}, 180)
+    if d and d.get("status") == "proposed":
+        broadcast({"type": "os_build", "kind": "collab", "who": "Sage Mira",
+                   "text": f"Memory Economy: proposed archiving {d.get('candidates')} dead-weight "
+                           "notes (awaiting Rasto's approval)"})
+        _mind_spark("#c9a14a")        # amber — the custodian governs
+
+
 async def _broadcast_mind_state() -> None:
     """Make Agora's cognition VISIBLE in the dungeon — broadcast its live mind state to the HUD: the
     worldview headline, prediction track-record, lessons learned, and open questions."""
@@ -2240,6 +2252,9 @@ async def ambient_life():
         # THE EXAM — a measurable capability benchmark over the vault's core concepts (~weekly).
         if loop_n % 448000 == 31000:
             asyncio.create_task(_run_exam())
+        # MEMORY ECONOMY — the Custodian proposes archiving dead weight (GATED, ~weekly offset).
+        if loop_n % 448000 == 250000:
+            asyncio.create_task(_run_memory_economy())
 
         for eid, ent in list(ents.items()):
             cx, cy = int(round(ent.x)), int(round(ent.y))

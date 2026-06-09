@@ -342,14 +342,27 @@ async def _handle(app, text: str) -> None:
     elif low in ("actions", "/actions", "hands"):
         from agora.execution.hands import format_actions
         await send(format_actions())
+    elif low in ("economy", "/economy", "memory economy"):
+        await send("🏛 _Auditing the memory economy (a minute)…_")
+        d = await asyncio.to_thread(_brain_get, "/api/v1/agent-os/brain/memory-economy")
+        await send((d or {}).get("report", "_No economy data._"))
     elif low.startswith(("approve ", "/approve ", "reject ", "/reject ")):
         approve = low.startswith(("approve", "/approve"))
         aid = text.split(" ", 1)[1].strip()
         d = await asyncio.to_thread(_brain_post, "/api/v1/agent-os/brain/action-decide",
                                     {"id": aid, "approve": approve})
         a = (d or {}).get("action")
-        await send((f"✅ Approved `{aid}` — Agora will carry it out." if approve else f"🚫 Rejected `{aid}`.")
-                   if a else f"_No action {aid}._")
+        if not a:
+            await send(f"_No action {aid}._")
+        elif not approve:
+            await send(f"🚫 Rejected `{aid}`.")
+        elif a.get("kind") in ("export_insights", "digest", "curate", "gist"):
+            # deterministic executor kinds run immediately on approval
+            r = await asyncio.to_thread(_brain_post, "/api/v1/agent-os/brain/action-execute",
+                                        {"id": aid})
+            await send(f"✅ Approved `{aid}` — executed: {(r or {}).get('result', (r or {}).get('error', '?'))}")
+        else:
+            await send(f"✅ Approved `{aid}` — Agora will carry it out.")
     elif low in ("now", "/now", "pulse", "world"):
         await send("🌐 _Sensing what's live in your world…_")
         d = await asyncio.to_thread(_brain_get, "/api/v1/agent-os/brain/now")

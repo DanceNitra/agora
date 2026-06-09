@@ -655,6 +655,50 @@ async def brain_exams():
     return {"status": "ok", **exam_history()}
 
 
+@router.get("/brain/memory-economy")
+async def brain_memory_economy(n: int = 12):
+    """MEMORY ECONOMY — per-note value accounting + the current dead-weight candidates (preview,
+    no side effects). The Custodian Principle applied to the vault itself."""
+    import asyncio as _aio
+    from agora.config import settings
+    from agora.execution.memory_economy import score_notes, prune_candidates, format_economy
+    vault = settings.vault_path or "C:/Users/Danculus/my-second-brain"
+    notes = await _aio.to_thread(score_notes, vault)
+    cands = sorted([x for x in notes
+                    if not x["evergreen"] and x["age_days"] > 30 and x["chars"] < 700
+                    and x["inlinks"] == 0 and x["retrievals"] == 0 and x["value"] <= 2],
+                   key=lambda x: (x["value"], -x["age_days"]))[:n]
+    return {"status": "ok", "total": len(notes), "candidates": cands,
+            "report": format_economy(notes, cands)}
+
+
+@router.post("/brain/memory-economy/propose")
+async def brain_memory_economy_propose(request: Request):
+    """Propose archiving the current dead weight as a GATED curate action (runs only after
+    Rasto approves from Telegram; notes are quarantined reversibly, never deleted)."""
+    import asyncio as _aio
+    from agora.config import settings
+    from agora.execution.memory_economy import prune_candidates
+    from agora.execution.hands import propose_action, pending_approvals
+    b = await request.json()
+    if any(x.get("kind") == "curate" for x in pending_approvals()):
+        return {"status": "already_pending"}
+    vault = settings.vault_path or "C:/Users/Danculus/my-second-brain"
+    cands = await _aio.to_thread(prune_candidates, vault, int(b.get("n", 12)))
+    if not cands:
+        return {"status": "nothing_to_prune"}
+    titles = ", ".join(c["title"][:30] for c in cands[:5])
+    rec = propose_action(
+        "curate", f"Archive {len(cands)} dead-weight notes (quarantine, reversible)",
+        f"Old, unlinked, never-retrieved stubs: {titles}…",
+        {"paths": [c["path"] for c in cands]})
+    await _send_telegram(
+        f"🏛 Memory Economy proposal `{rec['id']}`: archive {len(cands)} dead-weight notes "
+        f"(old+unlinked+unretrieved stubs) to quarantine (reversible).\n"
+        f"e.g. {titles}\nReply `approve {rec['id']}` or `reject {rec['id']}`.")
+    return {"status": "proposed", "action": rec, "candidates": len(cands)}
+
+
 @router.get("/brain/flywheel/questions")
 async def brain_flywheel_questions(n: int = 8):
     """COMPOUNDING FLYWHEEL — the open research questions Agora derived from its own insights'
