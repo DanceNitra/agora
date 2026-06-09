@@ -672,6 +672,34 @@ async def brain_memory_economy(n: int = 12):
             "report": format_economy(notes, cands)}
 
 
+@router.get("/brain/belief-challenge-target")
+async def brain_belief_challenge_target():
+    """BELIEF REVISION — the belief that has gone longest untested (the challenge sweep's prey)."""
+    from agora.config import settings
+    from agora.execution.belief_revision import pick_challenge_target
+    vault = settings.vault_path or "C:/Users/Danculus/my-second-brain"
+    t = pick_challenge_target(vault)
+    return {"status": "ok", "target": t}
+
+
+@router.post("/brain/belief-revise")
+async def brain_belief_revise(request: Request):
+    """Record a challenge outcome on the belief note itself: survived / revised / retired.
+    Superseded notes stay in the vault — stamped and bannered, never deleted."""
+    from agora.execution.belief_revision import stamp_belief
+    b = await request.json()
+    return stamp_belief(b.get("path") or "", b.get("verdict") or "",
+                        b.get("by_note") or "", b.get("reason") or "")
+
+
+@router.get("/brain/beliefs")
+async def brain_beliefs():
+    from agora.config import settings
+    from agora.execution.belief_revision import format_beliefs, list_beliefs
+    vault = settings.vault_path or "C:/Users/Danculus/my-second-brain"
+    return {"status": "ok", "report": format_beliefs(vault), "beliefs": list_beliefs(vault)}
+
+
 @router.post("/brain/campaign/start")
 async def brain_campaign_start(request: Request):
     """CAMPAIGNS — open a multi-day research campaign: decompose the goal, register the

@@ -1590,6 +1590,22 @@ async def _run_memory_economy() -> None:
         _mind_spark("#c9a14a")        # amber — the custodian governs
 
 
+async def _queue_belief_challenge() -> None:
+    """BELIEF REVISION: the challenge sweep — pick the belief longest without a test and have
+    Claude actively try to kill it. Survived beliefs harden; failed ones get revised or buried."""
+    if await _task_already_pending("Challenge belief:"):
+        return
+    d = await asyncio.to_thread(_brain_get_sync, "/api/v1/agent-os/brain/belief-challenge-target", 30)
+    t = (d or {}).get("target")
+    if not t:
+        return
+    await asyncio.to_thread(_brain_post_sync, "/api/v1/agent-os/brain/claude-inbox",
+                            {"text": f"Challenge belief: {t['title'][:90]} || path: {t['path']}"})
+    broadcast({"type": "os_build", "kind": "collab", "who": "Sergeant Voss",
+               "text": f"challenge sweep: trying to kill '{t['title'][:38]}'"})
+    _mind_spark("#ff9a9a")        # red — a belief under fire
+
+
 async def _tick_campaign() -> None:
     """CAMPAIGNS: advance the running campaign one harvest; when its sub-questions are covered
     (or the horizon passes), queue the dossier for Claude to synthesize."""
@@ -2369,6 +2385,9 @@ async def ambient_life():
         # CAMPAIGNS — advance the running campaign one harvest; queue its dossier when ready (~daily).
         if loop_n % 64000 == 61000:
             asyncio.create_task(_tick_campaign())
+        # BELIEF REVISION — challenge the belief longest without a test (~2 days).
+        if loop_n % 128000 == 90000:
+            asyncio.create_task(_queue_belief_challenge())
 
         for eid, ent in list(ents.items()):
             cx, cy = int(round(ent.x)), int(round(ent.y))
