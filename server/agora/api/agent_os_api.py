@@ -178,6 +178,22 @@ async def query_collective(request: Request, q: str = "", limit: int = 20):
     return {"knowledge": [dict(r) for r in await cursor.fetchall()]}
 
 
+def _garbage_finding(title: str, content: str):
+    """Conservative quality filter — reject only CLEARLY broken findings (self-upgrade: completion
+    filter). Returns a reason string if garbage, else None."""
+    t, c = (title or "").strip(), (content or "").strip()
+    cl, tl = c.lower(), t.lower()
+    for p in ("hypothesize on:", "pursue direction:", "develop the gap:", "deepen:"):
+        if cl.count(p) >= 2 or tl.count(p) >= 2:          # nested quest prefixes
+            return "nested quest prefix"
+    body = cl.split("source:")[0].strip()
+    if len(body) < 50:
+        return "too short"
+    if body.strip(". ") == tl.strip(". "):               # content merely restates the title
+        return "content restates title (no real finding)"
+    return None
+
+
 @router.post("/brain/collective")
 async def add_collective(request: Request):
     """Add an entry to the collective knowledge pool."""
@@ -185,6 +201,11 @@ async def add_collective(request: Request):
     for f in ("npc", "title", "content"):
         if not body.get(f):
             raise HTTPException(400, f"Missing field: {f}")
+    # Completion filter — keep clearly-broken findings (nested prefixes, echoes, stubs) out.
+    if body.get("knowledge_type", "observation") == "discovery":
+        g = _garbage_finding(body["title"], body["content"])
+        if g:
+            return {"status": "rejected", "reason": g}
     npc_id = DUNGEON_AGENT_IDS.get(body["npc"]) or body["npc"]
     os_engine = get_os(request)
     await os_engine._contribute_to_collective(
