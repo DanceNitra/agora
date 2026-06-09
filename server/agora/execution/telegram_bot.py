@@ -374,6 +374,21 @@ async def _handle(app, text: str) -> None:
                    + "\n".join(f"• {s}" for s in c.get("subquestions", []))
                    + "\n\n_the agents pursue these for days; I'll synthesize the dossier when ready_"
                    if c else "_Couldn't start a campaign._")
+    elif low.startswith(("got", "forgot")) and len(low.split()) <= 2:
+        parts = low.replace("/", "").split()
+        idx = int(parts[1]) if len(parts) == 2 and parts[1].isdigit() else 1
+        ok = parts[0] == "got"
+        d = await asyncio.to_thread(_brain_post, "/api/v1/agent-os/brain/tutor/grade",
+                                    {"idx": idx, "ok": ok})
+        if (d or {}).get("status") == "ok":
+            await send(f"{'✅' if ok else '🔁'} _{d['concept'][:40]} comes back in "
+                       f"{d['next_in_days']}d._")
+        else:
+            await send("_No quiz card waiting under that number._")
+    elif low in ("quiz me", "/tutor", "tutor"):
+        d = await asyncio.to_thread(_brain_post, "/api/v1/agent-os/brain/tutor/daily", {})
+        if not (d or {}).get("n"):
+            await send("_Nothing due — your memory is ahead of schedule._")
     elif low in ("canon", "/canon"):
         d = await asyncio.to_thread(_brain_get, "/api/v1/agent-os/brain/canon")
         c = (d or {}).get("canon", "").strip()

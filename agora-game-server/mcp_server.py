@@ -1590,6 +1590,15 @@ async def _run_memory_economy() -> None:
         _mind_spark("#c9a14a")        # amber — the custodian governs
 
 
+async def _run_tutor() -> None:
+    """THE TUTOR: send the owner today's spaced-repetition micro-quiz (SM-2 over his own
+    evergreen notes; retention feeds the vitals)."""
+    d = await asyncio.to_thread(_brain_post_sync, "/api/v1/agent-os/brain/tutor/daily", {}, 120)
+    if d and d.get("n"):
+        broadcast({"type": "os_build", "kind": "collab", "who": "Sage Mira",
+                   "text": f"sent the owner {d['n']} recall card(s) (spaced repetition)"})
+
+
 async def _queue_canon_update() -> None:
     """THE CANON: when >=2 artifacts landed since the last canon update, queue the merge —
     Claude rewrites the living book (merge, never append)."""
@@ -2406,6 +2415,9 @@ async def ambient_life():
         # THE CANON — when enough new artifacts landed, queue the living-book merge (~2 days).
         if loop_n % 128000 == 30000:
             asyncio.create_task(_queue_canon_update())
+        # THE TUTOR — the owner's daily spaced-repetition micro-quiz (~daily offset).
+        if loop_n % 64000 == 26000:
+            asyncio.create_task(_run_tutor())
 
         for eid, ent in list(ents.items()):
             cx, cy = int(round(ent.x)), int(round(ent.y))

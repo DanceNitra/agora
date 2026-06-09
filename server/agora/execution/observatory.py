@@ -23,6 +23,14 @@ def _load() -> list:
         return []
 
 
+def _tutor_retention():
+    try:
+        from agora.execution.tutor import retention_rate
+        return retention_rate()
+    except Exception:
+        return None
+
+
 def _save(snaps: list) -> None:
     try:
         _STORE.write_text(json.dumps(snaps, ensure_ascii=False, indent=1), encoding="utf-8")
@@ -78,7 +86,8 @@ async def take_snapshot(db, vault_path: str) -> dict:
             "hit_rate": (round(cal["hit_rate"], 2) if cal.get("hit_rate") is not None else None),
             "predictions_resolved": cal.get("resolved", 0),
             "findings_total": findings,
-            "verified_notes": verified}
+            "verified_notes": verified,
+            "tutor_retention": _tutor_retention()}
     snaps = _load()
     snaps.append(snap)
     _save(snaps[-260:])          # ~5 years of weekly readings

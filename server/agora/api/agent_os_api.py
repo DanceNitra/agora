@@ -672,6 +672,26 @@ async def brain_memory_economy(n: int = 12):
             "report": format_economy(notes, cands)}
 
 
+@router.post("/brain/tutor/daily")
+async def brain_tutor_daily(request: Request):
+    """THE TUTOR — today's spaced-repetition micro-quiz, sent to the owner on Telegram."""
+    from agora.config import settings
+    from agora.execution.tutor import daily_quiz, format_quiz
+    vault = settings.vault_path or "C:/Users/Danculus/my-second-brain"
+    q = await daily_quiz(vault)
+    if q["cards"]:
+        await _send_telegram(format_quiz(q["cards"]))
+    return {"status": "ok", "n": len(q["cards"])}
+
+
+@router.post("/brain/tutor/grade")
+async def brain_tutor_grade(request: Request):
+    """Record the owner's recall result (got/forgot) — SM-2 reschedules the card."""
+    from agora.execution.tutor import grade
+    b = await request.json()
+    return grade(int(b.get("idx", 1)), bool(b.get("ok")))
+
+
 @router.get("/brain/canon-inputs")
 async def brain_canon_inputs():
     """THE CANON — current canon text + artifacts that landed since, for Claude to MERGE."""
