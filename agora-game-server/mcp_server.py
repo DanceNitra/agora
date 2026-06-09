@@ -1590,6 +1590,18 @@ async def _run_memory_economy() -> None:
         _mind_spark("#c9a14a")        # amber — the custodian governs
 
 
+async def _run_research_exchange() -> None:
+    """RESEARCH EXCHANGE: compose the public digest and PROPOSE publishing it (gated —
+    Rasto approves from Telegram; only then does it leave the machine)."""
+    d = await asyncio.to_thread(_brain_post_sync, "/api/v1/agent-os/brain/exchange/propose",
+                                {}, 120)
+    if d and d.get("status") == "proposed":
+        broadcast({"type": "os_build", "kind": "collab", "who": "King Aldric",
+                   "text": f"Research Exchange: digest of {d.get('insights')} insights composed "
+                           "— publication awaits Rasto's approval"})
+        _mind_spark("#7ad7ff")        # ice blue — reaching outward
+
+
 async def _broadcast_mind_state() -> None:
     """Make Agora's cognition VISIBLE in the dungeon — broadcast its live mind state to the HUD: the
     worldview headline, prediction track-record, lessons learned, and open questions."""
@@ -2261,6 +2273,9 @@ async def ambient_life():
         # MEMORY ECONOMY — the Custodian proposes archiving dead weight (GATED, ~weekly offset).
         if loop_n % 448000 == 250000:
             asyncio.create_task(_run_memory_economy())
+        # RESEARCH EXCHANGE — compose + propose the public digest (GATED, ~weekly offset).
+        if loop_n % 448000 == 120000:
+            asyncio.create_task(_run_research_exchange())
 
         for eid, ent in list(ents.items()):
             cx, cy = int(round(ent.x)), int(round(ent.y))

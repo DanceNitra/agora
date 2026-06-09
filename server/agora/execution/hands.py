@@ -135,6 +135,14 @@ def execute_action(aid: str, vault_path: str = "") -> dict:
             q = quarantine_notes(vault_path, a.get("payload", {}).get("paths", []))
             result = f"quarantined {q['moved']} note(s) → {q['batch']}" if q["moved"] \
                 else "nothing to quarantine (paths gone or excluded)"
+        elif a["kind"] == "publish":
+            # Research Exchange: re-compose fresh, then push the digest to the public repo
+            from agora.execution.research_exchange import compose_digest, publish_digest
+            compose_digest(vault_path)
+            p = publish_digest()
+            if p.get("error"):
+                raise RuntimeError(p["error"])
+            result = f"published → {p['url']}" + (f" ({p['note']})" if p.get("note") else "")
         else:
             return {"error": f"kind '{a['kind']}' must be carried out by Claude, not the auto-executor"}
         set_status(aid, "done", result)

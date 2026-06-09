@@ -672,6 +672,30 @@ async def brain_memory_economy(n: int = 12):
             "report": format_economy(notes, cands)}
 
 
+@router.post("/brain/exchange/propose")
+async def brain_exchange_propose(request: Request):
+    """RESEARCH EXCHANGE — compose the public digest (preview on disk) and propose publishing
+    it as a GATED action. Nothing leaves the machine until Rasto approves from Telegram."""
+    import asyncio as _aio
+    from agora.config import settings
+    from agora.execution.research_exchange import compose_digest, PUBLIC_URL
+    from agora.execution.hands import propose_action, pending_approvals
+    if any(x.get("kind") == "publish" for x in pending_approvals()):
+        return {"status": "already_pending"}
+    vault = settings.vault_path or "C:/Users/Danculus/my-second-brain"
+    d = await _aio.to_thread(compose_digest, vault)
+    if not d.get("insights"):
+        return {"status": "nothing_to_publish"}
+    rec = propose_action(
+        "publish", f"Publish the research digest ({d['insights']} insights) to the public repo",
+        f"Composed at {d['path']} ({d['chars']} bytes) → {PUBLIC_URL}", {})
+    await _send_telegram(
+        f"📡 Research Exchange proposal `{rec['id']}`: publish {d['insights']} insights as a "
+        f"public digest.\nPreview: {d['path']}\nTarget: {PUBLIC_URL}\n"
+        f"Reply `approve {rec['id']}` or `reject {rec['id']}`.")
+    return {"status": "proposed", "action": rec, **d}
+
+
 @router.post("/brain/memory-economy/propose")
 async def brain_memory_economy_propose(request: Request):
     """Propose archiving the current dead weight as a GATED curate action (runs only after

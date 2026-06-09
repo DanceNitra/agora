@@ -356,7 +356,7 @@ async def _handle(app, text: str) -> None:
             await send(f"_No action {aid}._")
         elif not approve:
             await send(f"🚫 Rejected `{aid}`.")
-        elif a.get("kind") in ("export_insights", "digest", "curate", "gist"):
+        elif a.get("kind") in ("export_insights", "digest", "curate", "gist", "publish"):
             # deterministic executor kinds run immediately on approval
             r = await asyncio.to_thread(_brain_post, "/api/v1/agent-os/brain/action-execute",
                                         {"id": aid})
