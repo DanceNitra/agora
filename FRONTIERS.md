@@ -85,9 +85,11 @@ reuses `export_insights`; weekly dungeon trigger PROPOSES (never auto-runs).
 
 ---
 
-**STATUS (2026-06-09):** 1, 2 and 4 are SHIPPED (`2ac086b`, `5c42822`, `20f9f57` — first exam
-graded 7/8). Remaining: 3 (Memory Economy — wants retrieval logging running first), 5 (Mind
-Chamber), 6 (Research Exchange).
+**STATUS (2026-06-09): ALL SIX SHIPPED.** 1 `2ac086b` (first tournament recorded), 2 `5c42822`,
+4 `20f9f57` (first exam 7/8), 3 `e9d60da` (live audit: 4710 notes, 0 dead weight — young vault,
+candidates will age in), 5 `a366cef` (verified live over WS: 10 belief crystals, 9 portals,
+2 shards), 6 `c40a59b` (digest of 8 insights composed; publish proposal `907b62` awaits
+`approve` on Telegram → goes to public/research_digest.md in this repo).
 
 **Recommended order:** 1 → 2 → 4 (each small, each closes a real loop), then 3, then 5/6.
 One frontier at a time; every step keeps the safety rules (small reversible commits,
