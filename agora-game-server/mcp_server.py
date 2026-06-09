@@ -1540,7 +1540,17 @@ async def _broadcast_mind_state() -> None:
         if m:
             headline = re.sub(r"\s+", " ", re.sub(r"[*>#]", "", m.group(1))).strip()[:160]
     lessons_lines = [ln for ln in (mi.get("lessons", "") or "").splitlines() if ln.strip()]
+    # Prediction board: the open forecasts first (newest), recent resolved fill the rest.
+    preds = await asyncio.to_thread(_brain_get_sync, "/api/v1/agent-os/brain/predictions")
+    plist = (preds or {}).get("predictions", [])
+    ordered = ([p for p in reversed(plist) if p.get("status") == "pending"]
+               + [p for p in reversed(plist) if p.get("status") != "pending"])
+    board = [{"theme": p.get("theme", "")[:44], "dir": p.get("direction", "?"),
+              "conf": round(100 * float(p.get("confidence", 0))), "status": p.get("status", "pending"),
+              "days_left": max(0, round((p.get("resolve_ts", 0) - time.time()) / 86400))}
+             for p in ordered[:4]]
     broadcast({"type": "mind_state",
+               "board": board,
                "worldview": headline or "synthesizing a worldview…",
                "beliefs": len(mi.get("beliefs", [])),
                "predictions": cal.get("total", 0),

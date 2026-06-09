@@ -115,6 +115,14 @@
   #hud-mind .mind-stats b { color: #d6cff0; font-weight: bold; }
   #hud-mind .lesson { color: #8fd3ff; font-size: 10px; margin-top: 5px; opacity: .82;
     white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  #hud-mind .pred-board { margin-top: 5px; font-size: 10px; color: #948cba; }
+  #hud-mind .pred-row { display: flex; gap: 7px; white-space: nowrap; overflow: hidden; }
+  #hud-mind .pred-row .theme { flex: 1; overflow: hidden; text-overflow: ellipsis; }
+  #hud-mind .pred-row .dir-up { color: #9affc0; }
+  #hud-mind .pred-row .dir-down { color: #ff9a9a; }
+  #hud-mind .pred-row .dir-flat { color: #d6cff0; }
+  #hud-mind .pred-row .ok { color: #9affc0; }
+  #hud-mind .pred-row .bad { color: #ff9a9a; }
   #hud-mind.pulse { animation: mindpulse 1.4s ease-out; }
   @keyframes mindpulse { from { box-shadow: 0 0 34px rgba(150,110,240,0.45); } to { box-shadow: 0 0 22px rgba(130,95,210,0.16); } }
 </style>
@@ -129,7 +137,7 @@
 <div id="hud-log"><div class="hud-log-title">⚔ EVENT LOG</div><div id="hud-log-lines"></div></div>
 <div id="hud-trust"><div class="hud-log-title">🤝 RELATIONSHIPS · ESS TRUST</div><div id="hud-trust-lines"><div id="hud-trust-empty">building bonds…</div></div></div>
 <div id="hud-os"><div class="hud-log-title">⚙ AGENTIC OS — BUILD LOG</div><div id="hud-os-lines"><div id="hud-os-empty">agents are starting to build…</div></div></div>
-<div id="hud-mind"><div class="hud-log-title">🧠 AGORA'S MIND — LIVE COGNITION</div><div class="wv" id="hud-mind-wv">awakening…</div><div class="mind-stats" id="hud-mind-stats"></div><div class="lesson" id="hud-mind-lesson"></div></div>
+<div id="hud-mind"><div class="hud-log-title">🧠 AGORA'S MIND — LIVE COGNITION</div><div class="wv" id="hud-mind-wv">awakening…</div><div class="mind-stats" id="hud-mind-stats"></div><div class="pred-board" id="hud-mind-board"></div><div class="lesson" id="hud-mind-lesson"></div></div>
 
 <script type="importmap">
 {
@@ -947,6 +955,18 @@ if (!renderer.getContext()) {
         + `<span>predictions <b>${ev.predictions ?? 0}</b> · <b>${ev.hit_rate || '—'}</b> right</span>`
         + `<span>lessons <b>${ev.lessons ?? 0}</b></span>`
         + `<span>flywheel <b>${ev.flywheel_open ?? 0}</b> open</span>`;
+      const b = document.getElementById('hud-mind-board');
+      if (b && Array.isArray(ev.board)) {
+        b.innerHTML = ev.board.map(p => {
+          const arrow = p.dir === 'UP' ? '▲' : (p.dir === 'DOWN' ? '▼' : '►');
+          const cls = p.dir === 'UP' ? 'dir-up' : (p.dir === 'DOWN' ? 'dir-down' : 'dir-flat');
+          const tail = p.status === 'pending' ? `${p.days_left}d`
+            : (p.status === 'correct' ? '<span class="ok">✓</span>' : '<span class="bad">✗</span>');
+          const theme = String(p.theme || '').replace(/[<>&]/g, c => ({'<':'&lt;','>':'&gt;','&':'&amp;'}[c]));
+          return `<div class="pred-row"><span class="${cls}">${arrow} ${p.conf}%</span>`
+            + `<span class="theme">${theme}</span><span>${tail}</span></div>`;
+        }).join('');
+      }
       const l = document.getElementById('hud-mind-lesson');
       if (l) l.textContent = ev.lesson ? ('🎓 ' + ev.lesson) : '';
       const box = document.getElementById('hud-mind');
