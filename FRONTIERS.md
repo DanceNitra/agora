@@ -17,7 +17,21 @@
 >   `campaign <goal>`/`campaigns`.
 >
 > New loop task kinds: A9 grade-exam, A10 hypothesize, A11 read-paper, A12 campaign-dossier.
-> What's left for a future wave: deeper Mind Chamber, calendar OAuth, more Hands action kinds.
+>
+> **Wave 4 — integrity (all SHIPPED 2026-06-09 late):**
+> - **12 Belief Revision** (`f136fba`): belief lifecycle active→survived/revised/retired;
+>   challenge sweep ~2d picks the longest-untested belief; loop A13. Telegram `beliefs`.
+> - **13 The Canon** (`90dd4e4`): one living "What Agora Currently Believes" vault doc,
+>   Claude-merged when >=2 new artifacts (loop A14); v1 seeded. Telegram `canon`.
+> - **14 The Tutor** (`7fd4404`): SM-2 spaced repetition over the owner's evergreen notes,
+>   one-tap grading (`got 1`/`forgot 1`), retention feeds vitals. Telegram `quiz me`.
+> - **15 Capability Forge** (`bac28f8`): gap registry + failure-trace detectors; weekly the
+>   oldest gap queues as a build (loop A15). Telegram `gap <desc>` / `forge`.
+> - **16 Attention Economy** (`4f72815`): yield-weighted run-probability [0.4,1.0] gates the
+>   four noisy triggers; compute follows value. Telegram `attention`.
+>
+> Future-wave ideas parked: deeper Mind Chamber, calendar OAuth, more Hands action kinds,
+> within-owner randomized OS-assistance experiment (the dossier's tier-3 attack).
 
 ---
 
