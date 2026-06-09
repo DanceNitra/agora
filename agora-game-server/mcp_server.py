@@ -1418,6 +1418,12 @@ async def _queue_deepening() -> None:
     qs = (fw or {}).get("open", [])
     if not qs:
         return
+    # DEDUP: don't re-queue a falsifier that is already waiting in the Claude inbox (matched by qid).
+    inbox = await asyncio.to_thread(_brain_get_sync, "/api/v1/agent-os/brain/claude-inbox")
+    pending_texts = [t.get("text", "") for t in (inbox or {}).get("pending", [])]
+    qs = [q for q in qs if not any(f"[{q['id']}]" in txt for txt in pending_texts)]
+    if not qs:
+        return
     q = random.choice(qs)
     await asyncio.to_thread(
         _brain_post_sync, "/api/v1/agent-os/brain/claude-inbox",

@@ -611,6 +611,16 @@ async def brain_flywheel_questions(n: int = 8):
     return {"status": "ok", "open": open_questions(n), "stats": stats()}
 
 
+@router.post("/brain/flywheel/mark-deepened")
+async def brain_flywheel_mark_deepened(request: Request):
+    """Close the flywheel turn: Claude marks a question deepened after shipping the sharper v2.
+    Without this the question stays open forever and gets re-queued infinitely."""
+    from agora.execution.flywheel import mark_deepened, stats
+    body = await request.json()
+    mark_deepened((body.get("id") or "").strip())
+    return {"status": "ok", **stats()}
+
+
 @router.get("/brain/flywheel/deepen-inputs")
 async def brain_flywheel_deepen_inputs(title: str, falsifier: str = ""):
     """Test an insight's falsifier against fresh research + reality — the evidence Claude uses to
