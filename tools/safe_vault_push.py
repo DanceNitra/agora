@@ -131,6 +131,9 @@ def main() -> None:
     adds = [ln for ln in stat.splitlines() if ln.startswith("A")]
     mods = [ln for ln in stat.splitlines() if ln.startswith("M")]
     print(f"diff vs base: {len(adds)} A, {len(mods)} M, {len(dels)} D")
+    if not adds and not mods and not dels:
+        print("no real changes — nothing to push")
+        return
     if dels:
         print("ABORT — deletions present:")
         for d in dels[:10]:
