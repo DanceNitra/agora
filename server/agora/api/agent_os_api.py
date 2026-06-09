@@ -361,8 +361,8 @@ async def verify_findings(request: Request, n: int = 4, incorporate: bool = True
     from agora.execution.verifier import verify_finding
     db = request.app.state.db
     cur = await db.execute(
-        "SELECT title, content FROM collective_knowledge WHERE knowledge_type='discovery' "
-        "ORDER BY created_at DESC LIMIT 25")
+        "SELECT title, content, contributor_name FROM collective_knowledge "
+        "WHERE knowledge_type='discovery' ORDER BY created_at DESC LIMIT 25")
     rows = await cur.fetchall()
     writer = getattr(request.app.state, "vault_writer", None)
     results = []
@@ -377,7 +377,9 @@ async def verify_findings(request: Request, n: int = 4, incorporate: bool = True
         v = await verify_finding(title, content)
         try:
             from agora.execution.source_reliability import record as _src_record
+            from agora.execution.mastery import record as _mastery_record
             _src_record(v.get("source", ""), v.get("verdict", ""))
+            _mastery_record(r["contributor_name"] or "", v.get("verdict", ""))
         except Exception:
             pass
         if v["verdict"] == "INCONCLUSIVE":
@@ -683,6 +685,13 @@ async def brain_memory_economy(n: int = 12):
                    key=lambda x: (x["value"], -x["age_days"]))[:n]
     return {"status": "ok", "total": len(notes), "candidates": cands,
             "report": format_economy(notes, cands)}
+
+
+@router.get("/brain/agent-mastery")
+async def brain_agent_mastery():
+    """AGENT MASTERY — whose findings survive verification (feeds standing in the dungeon)."""
+    from agora.execution.mastery import scores, format_mastery
+    return {"status": "ok", "scores": scores(), "report": format_mastery()}
 
 
 @router.get("/brain/source-reliability")

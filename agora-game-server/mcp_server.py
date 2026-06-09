@@ -880,6 +880,7 @@ _AGENT_NAMES = {
 _FORECASTER_EID = {"Kael": "thief", "Mira": "scholar", "Orin": "priest",
                    "Aldric": "king", "Elara": "guard_r", "Voss": "guard_l"}
 _forecast_scores: dict = {}     # eid -> {"total", "correct", "hit_rate"} (refreshed by _run_predictions)
+_mastery_scores: dict = {}      # eid -> verification rate (whose findings survive checking)
 _trust_engine = None
 _trust_db = None
 
@@ -1250,6 +1251,9 @@ def _compute_standing(trust: list[dict]) -> dict:
         fc = _forecast_scores.get(e) or {}
         if fc.get("hit_rate") is not None:
             s = 0.8 * s + 0.2 * fc["hit_rate"]
+        ms = _mastery_scores.get(e)
+        if ms is not None:                      # findings that survive verification → authority
+            s = 0.85 * s + 0.15 * ms
         out[e] = round(s, 3)
     return out
 
@@ -1589,6 +1593,13 @@ async def _refresh_forecast_scores() -> None:
         eid = _FORECASTER_EID.get(name)
         if eid:
             _forecast_scores[eid] = sc
+    # Agent Mastery: verification rate per contributor (full names) → standing blend
+    m = await asyncio.to_thread(_brain_get_sync, "/api/v1/agent-os/brain/agent-mastery")
+    by_full = {v: k for k, v in _AGENT_NAMES.items()}
+    for full, sc in ((m or {}).get("scores") or {}).items():
+        eid = by_full.get(full)
+        if eid and sc.get("rate") is not None:
+            _mastery_scores[eid] = sc["rate"]
 
 
 async def _run_predictions() -> None:

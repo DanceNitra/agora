@@ -412,6 +412,9 @@ async def _handle(app, text: str) -> None:
         d = await asyncio.to_thread(_brain_get, "/api/v1/agent-os/brain/canon")
         c = (d or {}).get("canon", "").strip()
         await send(("📖 " + c[:3400]) if c else "_No canon written yet._")
+    elif low in ("mastery", "/mastery"):
+        d = await asyncio.to_thread(_brain_get, "/api/v1/agent-os/brain/agent-mastery")
+        await send((d or {}).get("report", "_No mastery data._"))
     elif low in ("sources", "/sources"):
         d = await asyncio.to_thread(_brain_get, "/api/v1/agent-os/brain/source-reliability")
         await send((d or {}).get("report", "_No source data._"))
