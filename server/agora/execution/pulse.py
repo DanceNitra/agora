@@ -25,10 +25,14 @@ def vault_status(vault: str) -> dict:
     """Is the second-brain actually being updated on GitHub? Last push, note count, unpushed work."""
     last = _git(vault, "log", "-1", "--format=%ct").strip()
     last_ts = int(last) if last.isdigit() else 0
-    notes = _git(vault, "ls-files", "04 Resources/Concepts/Agora Agents/")
-    note_count = sum(1 for l in notes.splitlines() if l.endswith(".md"))
-    today = datetime.now(timezone.utc).strftime("%Y-%m-%d")
-    new_today = sum(1 for l in notes.splitlines() if l.endswith(".md") and f"/{today}/" in l)
+    # Count from the COMMITTED tree (ls-tree HEAD), NOT the index (ls-files): on Windows the vault's
+    # ':'-named files break the index so ls-files undercounts and shows fresh notes as deleted. The
+    # committed tree is the truth of what's actually on GitHub.
+    notes = _git(vault, "ls-tree", "-r", "--name-only", "HEAD", "04 Resources/Concepts/Agora Agents/")
+    note_lines = [l for l in notes.splitlines() if l.endswith(".md")]
+    note_count = len(note_lines)
+    today = datetime.now().strftime("%Y-%m-%d")          # local date (matches the writer's folders)
+    new_today = sum(1 for l in note_lines if f"/{today}/" in l)
     unpushed = _git(vault, "rev-list", "--count", "origin/main..main").strip()
     return {"last_push_ts": last_ts, "note_count": note_count, "new_today": new_today,
             "unpushed": int(unpushed) if unpushed.isdigit() else 0}
