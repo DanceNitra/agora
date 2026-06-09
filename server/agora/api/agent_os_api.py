@@ -640,6 +640,16 @@ async def brain_learn_next():
     return {"status": "ok", **await what_to_learn_next(vault)}
 
 
+@router.get("/brain/action-inputs")
+async def brain_action_inputs(q: str, kind: str = "brief"):
+    """ACTION ENGINE — gather grounded material (vault notes + Agora's insights) on a theme so Claude
+    can DRAFT a usable artifact of the requested kind (brief / essay / plan / spec). Knowledge → leverage."""
+    from agora.config import settings
+    from agora.execution.action_engine import gather_action_inputs
+    vault = settings.vault_path or "C:/Users/Danculus/my-second-brain"
+    return {"status": "ok", **await gather_action_inputs(q, kind, vault)}
+
+
 @router.get("/brain/bridges")
 async def brain_bridges(n: int = 6, rationale: bool = True):
     """Pairs of the user's notes that are deeply related yet UNLINKED — missing connections.

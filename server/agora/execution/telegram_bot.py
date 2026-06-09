@@ -289,6 +289,11 @@ async def _handle(app, text: str) -> None:
         d = await asyncio.to_thread(_brain_get, "/api/v1/agent-os/brain/learn-next")
         from agora.execution.socratic import format_learn_next
         await send(format_learn_next(d or {}))
+    elif low.startswith(("draft ", "/draft ")):
+        d = await asyncio.to_thread(_brain_post, "/api/v1/agent-os/brain/claude-inbox",
+                                    {"text": "Draft " + text.split(" ", 1)[1].strip()})
+        await send(f"📝 Queued for Claude to draft (#{(d or {}).get('id', '?')}). I'll produce the "
+                   f"artifact on my next check and drop it in your vault.\n_kinds: brief · essay · plan · spec_")
     elif low in ("upgrades", "/upgrades", "self-upgrades"):
         await send("🔧 _Agora reflecting on its own mechanisms…_")
         d = await asyncio.to_thread(_brain_get, "/api/v1/agent-os/brain/self-upgrades")
