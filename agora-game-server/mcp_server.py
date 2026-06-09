@@ -1385,6 +1385,13 @@ async def _pending_task_themes(prefix: str) -> list[set[str]]:
             if t.get("text", "").startswith(prefix)]
 
 
+async def _task_already_pending(prefix: str) -> bool:
+    """True when a task of this kind is already waiting in the Claude inbox (for the fixed-text
+    daily tasks — a second copy adds nothing, Claude would just editorial-skip it)."""
+    inbox = await asyncio.to_thread(_brain_get_sync, "/api/v1/agent-os/brain/claude-inbox")
+    return any(t.get("text", "").startswith(prefix) for t in (inbox or {}).get("pending", []))
+
+
 async def _queue_insight_theme() -> None:
     """Insight Engine workflow: Agora GATHERS + QUEUES a rich theme; Claude Opus SYNTHESIZES it when
     active (the flash model is too weak for the synthesis). Picks a theme from the user's harvest
@@ -1487,6 +1494,8 @@ async def _queue_dialectic() -> None:
 async def _queue_mind_reflection() -> None:
     """THE AGORA MIND: queue a metacognitive reflection for Claude — synthesize the worldview from
     Agora's full cognitive state and decide what to think about next. The toolbox becomes a mind."""
+    if await _task_already_pending("Reflect: state of mind"):
+        return
     await asyncio.to_thread(_brain_post_sync, "/api/v1/agent-os/brain/claude-inbox",
                             {"text": "Reflect: state of mind"})
     broadcast({"type": "os_build", "kind": "collab", "who": "King Aldric",
@@ -1498,6 +1507,8 @@ async def _queue_learning() -> None:
     """THE LEARNING LOOP: queue a review of Agora's own track record for Claude to derive applied
     lessons (what works, what to change) that feed back into future judgments. Agora improves itself."""
     await asyncio.to_thread(_brain_post_sync, "/api/v1/agent-os/brain/resolve-predictions", {})
+    if await _task_already_pending("Learn from outcomes"):
+        return
     await asyncio.to_thread(_brain_post_sync, "/api/v1/agent-os/brain/claude-inbox",
                             {"text": "Learn from outcomes"})
     broadcast({"type": "os_build", "kind": "collab", "who": "Sergeant Voss",
