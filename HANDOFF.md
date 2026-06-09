@@ -97,8 +97,9 @@ file. Inbox task kinds the loop knows: `Synthesize insight:`, `Deepen insight [i
 `Dialectic:`, `Predict:`, `Reflect: state of mind`, `Learn from outcomes`, and numeric `Implement Agora
 self-upgrade` picks.
 
-**Open candidate self-upgrade (for an idle cycle):** dedupe `_queue_insight_theme` so it stops
-re-queueing themes that already have a vault insight (this produced a 4-duplicate backlog this session).
+**Candidate self-upgrade DONE (`4de6627`, 2026-06-09):** `_queue_insight_theme` now dedupes against
+existing vault insights (frontmatter titles) + pending inbox tasks via word-overlap. No open candidate —
+an idle cycle should look for a new clearly-safe, fully-testable improvement or do nothing.
 
 ---
 
