@@ -262,25 +262,69 @@ async def promote_findings(request: Request, n: int = 3):
         "SELECT title, content FROM collective_knowledge WHERE knowledge_type='discovery' "
         "ORDER BY created_at DESC LIMIT 40")
     rows = await cur.fetchall()
-    promoted, checked = [], 0
+    import re as _re
+    # 1) gather the window's eligible candidates (cheap filters; don't consume _PROMOTED yet)
+    cands = []
     for r in rows:
-        if len(promoted) >= n:
-            break
         title = (r["title"] or "").strip()
         content = (r["content"] or "").strip()
         tl = title.lower()
         if (title in _PROMOTED or len(content) < 160 or "Source:" not in content
                 or tl.count("hypothesize on:") >= 2 or tl.count("pursue direction:") >= 2):
             continue
-        # Citation rigor: reject a CLEAR citation mismatch — the in-text year differs from the cited
-        # Source paper's year (the finding likely cites the wrong paper). Only fires when both have a
-        # year, so consistent / year-less findings still pass (low false-positive).
-        import re as _re
-        _body, _, _src = content.partition("Source:")
+        _body, _, _src = content.partition("Source:")     # citation-year-mismatch rigor
         _by = _re.search(r"\b(?:19|20)\d{2}\b", _body)
         _sy = _re.search(r"\b(?:19|20)\d{2}\b", _src)
         if _by and _sy and _by.group(0) != _sy.group(0):
             continue
+        cands.append((title, content))
+        if len(cands) >= 14:                              # bound the scoring cost
+            break
+
+    # 2) CRITICAL-WINDOW LOAD BALANCER (Agora's own insight, applied to itself): the consolidation
+    #    budget (n) is limited, so ration it to the highest FUTURE-RETRIEVAL-VALUE findings in the
+    #    window — connectedness to the existing vault (semantic fit) + citation specificity — rather
+    #    than the first-seen. Promote the best, not the soonest.
+    si = None
+    try:
+        from agora.execution.semantic_index import SemanticIndex
+        global _SEM_INDEX
+        if _SEM_INDEX is None or not _SEM_INDEX.ready:
+            _SEM_INDEX = SemanticIndex()
+        si = _SEM_INDEX if _SEM_INDEX.ready else None
+    except Exception:
+        si = None
+
+    def _score_all():
+        import numpy as np
+        conns = [0.5] * len(cands)
+        if si:
+            try:
+                from agora.execution.semantic_index import _embed_batch
+                cvecs = _embed_batch([(t + " " + c)[:300] for t, c in cands])  # ONE batched embed call
+                V = si.vecs
+                for i, cv in enumerate(cvecs):
+                    if not cv:
+                        continue
+                    v = np.array(cv, dtype=np.float32)
+                    v /= (np.linalg.norm(v) + 1e-9)
+                    sims = V @ v                                  # cosine sim to every vault note
+                    conns[i] = float(np.sort(sims)[-3:].mean())   # connectedness = mean top-3
+            except Exception:
+                pass
+        scored = []
+        for i, (t, c) in enumerate(cands):
+            spec = 0.3 if _re.search(r"\([A-Z][a-zA-Z]+(?: et al\.?)?,? \d{4}\)", c) else 0.0
+            scored.append((conns[i] + spec, t, c))
+        return sorted(scored, key=lambda x: -x[0])
+    import asyncio
+    ranked = await asyncio.to_thread(_score_all)
+
+    # 3) promote the top-valued candidates that pass the quality gate
+    promoted, checked = [], 0
+    for _v, title, content in ranked:
+        if len(promoted) >= n:
+            break
         _PROMOTED.add(title)
         checked += 1
         q = await assess_quality(title, content)
