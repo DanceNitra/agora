@@ -1737,6 +1737,20 @@ async def _run_memory_economy() -> None:
 
 
 _night_state = {"last": ""}
+_annals_state = {"last": ""}
+
+
+async def _run_annals(sunday: bool = False) -> None:
+    """THE ANNALS: write today's chronicle (idempotent vault note); Sundays also queue the
+    weekly retrospective for Claude (loop kind A17)."""
+    d = await asyncio.to_thread(_brain_post_sync, "/api/v1/agent-os/brain/annals/today", {}, 120)
+    if d and d.get("day"):
+        broadcast({"type": "os_build", "kind": "collab", "who": "Sage Mira",
+                   "text": f"chronicled the day: {len(d.get('commits', []))} commits, "
+                           f"{len(d.get('artifacts', []))} artifacts"})
+    if sunday and not await _task_already_pending("Write weekly retrospective"):
+        await asyncio.to_thread(_brain_post_sync, "/api/v1/agent-os/brain/claude-inbox",
+                                {"text": "Write weekly retrospective"})
 
 
 async def _run_night_shift() -> None:
@@ -2553,6 +2567,14 @@ async def ambient_life():
             if 2 <= _ns_now.tm_hour < 6 and _night_state["last"] != _ns_today:
                 _night_state["last"] = _ns_today
                 asyncio.create_task(_run_night_shift())
+        # THE ANNALS — write today's chronicle late evening (22:00-23:59, once/day);
+        # Sundays also queue the weekly retrospective for Claude.
+        if loop_n % 400 == 320:
+            _an_now = _time.localtime()
+            _an_today = _time.strftime("%Y-%m-%d", _an_now)
+            if _an_now.tm_hour >= 22 and _annals_state["last"] != _an_today:
+                _annals_state["last"] = _an_today
+                asyncio.create_task(_run_annals(_an_now.tm_wday == 6))
         # Morning report → Telegram, once per day after 07:00 local.
         if loop_n % 200 == 100:
             _now = _time.localtime()

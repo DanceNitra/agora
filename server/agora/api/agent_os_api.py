@@ -687,6 +687,37 @@ async def brain_memory_economy(n: int = 12):
             "report": format_economy(notes, cands)}
 
 
+@router.post("/brain/annals/today")
+async def brain_annals_today(request: Request):
+    """THE ANNALS — write/refresh today's chronicle as an idempotent vault note."""
+    import asyncio as _aio
+    from agora.config import settings
+    from agora.execution.annals import compose_day, chronicle_text
+    b = await request.json()
+    vault = settings.vault_path or "C:/Users/Danculus/my-second-brain"
+    d = await _aio.to_thread(compose_day, vault, b.get("day") or "")
+    writer = getattr(request.app.state, "vault_writer", None)
+    path = None
+    if writer:
+        try:
+            path = await writer.write_note(
+                title=f"Annals {d['day']}", content=chronicle_text(d),
+                tags=["agora", "annals"], agent_name="Agora")
+        except Exception:
+            pass
+    return {"status": "ok", "note": path, **d}
+
+
+@router.get("/brain/annals")
+async def brain_annals(day: str = ""):
+    import asyncio as _aio
+    from agora.config import settings
+    from agora.execution.annals import compose_day, format_annals
+    vault = settings.vault_path or "C:/Users/Danculus/my-second-brain"
+    d = await _aio.to_thread(compose_day, vault, day)
+    return {"status": "ok", "report": format_annals(d), **d}
+
+
 @router.post("/brain/lab/run")
 async def brain_lab_run(request: Request):
     """THE LABORATORY — execute a Claude-written experiment script (deterministic runner:

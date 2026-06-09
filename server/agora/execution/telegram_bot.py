@@ -412,6 +412,9 @@ async def _handle(app, text: str) -> None:
         d = await asyncio.to_thread(_brain_get, "/api/v1/agent-os/brain/canon")
         c = (d or {}).get("canon", "").strip()
         await send(("📖 " + c[:3400]) if c else "_No canon written yet._")
+    elif low in ("annals", "/annals", "diary"):
+        d = await asyncio.to_thread(_brain_get, "/api/v1/agent-os/brain/annals")
+        await send((d or {}).get("report", "_No annals._"))
     elif low in ("lab", "/lab", "experiments lab"):
         d = await asyncio.to_thread(_brain_get, "/api/v1/agent-os/brain/lab")
         await send((d or {}).get("report", "_Lab dark._"))
