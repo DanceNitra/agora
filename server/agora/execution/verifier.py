@@ -42,17 +42,20 @@ async def verify_finding(title: str, claim: str) -> dict:
         "contradicted by the evidence.",
         f"CLAIM: {body[:600]}\n\nREAL LITERATURE (abstracts):\n{sources}", "cheap", 0.1, 220) or ""
 
-    verdict, reason = "UNSUPPORTED", "no verdict returned"
+    # INCONCLUSIVE (not UNSUPPORTED) when we got no real judgment — the flaky LLM returns nothing
+    # ~half the time, and defaulting that to UNSUPPORTED wrongly condemns groundable findings forever.
+    # INCONCLUSIVE findings are re-checked later instead of being permanently rejected.
+    verdict, reason = "INCONCLUSIVE", "no judgment returned (verifier LLM empty)"
     m = re.search(r"\{.*\}", raw, re.DOTALL)
     if m:
         try:
             d = json.loads(m.group(0))
-            verdict = (d.get("verdict") or "UNSUPPORTED").upper().strip()
+            verdict = (d.get("verdict") or "INCONCLUSIVE").upper().strip()
             reason = (d.get("reason") or "").strip()
         except Exception:
             pass
-    if verdict not in ("VERIFIED", "OVERSTATED", "UNSUPPORTED"):
-        verdict = "UNSUPPORTED"
+    if verdict not in ("VERIFIED", "OVERSTATED", "UNSUPPORTED", "INCONCLUSIVE"):
+        verdict = "INCONCLUSIVE"
     top = ""
     if sources and "(no external" not in sources:
         top = sources.splitlines()[0].lstrip("- ").strip()[:140]

@@ -315,6 +315,9 @@ async def verify_findings(request: Request, n: int = 4, incorporate: bool = True
             continue
         _VERIFIED.add(title)
         v = await verify_finding(title, content)
+        if v["verdict"] == "INCONCLUSIVE":
+            _VERIFIED.discard(title)        # not actually judged → allow a re-check later
+            continue
         inc = False
         if v["verdict"] in ("VERIFIED", "OVERSTATED") and incorporate and writer:
             ok = v["verdict"] == "VERIFIED"
