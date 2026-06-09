@@ -803,6 +803,17 @@ async def brain_action_result(request: Request):
                                                   "done" if b.get("ok") else "failed", b.get("result", ""))}
 
 
+@router.post("/brain/action-execute")
+async def brain_action_execute(request: Request):
+    """Carry out an approved deterministic safe action (export_insights / digest)."""
+    import asyncio
+    from agora.config import settings
+    from agora.execution.hands import execute_action
+    b = await request.json()
+    vault = settings.vault_path or "C:/Users/Danculus/my-second-brain"
+    return {"status": "ok", **await asyncio.to_thread(execute_action, b.get("id", ""), vault)}
+
+
 @router.get("/brain/now")
 async def brain_now():
     """AGORA'S SENSES — perceive the live present in the user's own domains (current discussion + fresh

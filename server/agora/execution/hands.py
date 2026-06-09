@@ -22,8 +22,8 @@ from pathlib import Path
 _ACTIONS = Path(__file__).resolve().parents[2] / ".actions.json"
 OUTPUT_DIR = Path(__file__).resolve().parents[2].parent / "agora_output"
 
-SAFE_KINDS = {"build_tool", "build_file", "analysis"}          # local + reversible → auto
-GATED_KINDS = {"publish", "send", "repo", "external"}          # outward / irreversible → needs approval
+SAFE_KINDS = {"build_tool", "build_file", "analysis", "export_insights", "digest"}  # local → auto
+GATED_KINDS = {"publish", "send", "repo", "external", "gist"}   # outward / irreversible → needs approval
 
 
 def _load() -> list:
@@ -91,6 +91,51 @@ def ready_to_execute() -> list:
 
 def pending_approvals() -> list:
     return [x for x in _load() if x.get("status") == "awaiting_approval"]
+
+
+def _export_insights(vault_path: str) -> str:
+    """Combine all of Agora's Claude-synthesized insights into one shareable markdown file."""
+    import glob
+    OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
+    src = Path(vault_path) / "04 Resources" / "Concepts" / "Agora Agents"
+    files = sorted(glob.glob(str(src / "**" / "insight-*.md"), recursive=True))
+    parts = ["# Agora — Insights Digest\n", f"_{len(files)} insights synthesized by Claude via Agora._\n"]
+    for f in files:
+        parts.append("\n---\n\n" + Path(f).read_text(encoding="utf-8", errors="replace"))
+    out = OUTPUT_DIR / "insights_digest.md"
+    out.write_text("\n".join(parts), encoding="utf-8")
+    return f"exported {len(files)} insights → {out}"
+
+
+def _run_digest() -> str:
+    """Run the digest tool Agora built and capture its output."""
+    import subprocess
+    import sys
+    tool = OUTPUT_DIR / "agora_digest.py"
+    if not tool.exists():
+        return "digest tool not built yet"
+    r = subprocess.run([sys.executable, str(tool)], capture_output=True, text=True, timeout=30)
+    return (r.stdout or r.stderr or "")[-400:]
+
+
+def execute_action(aid: str, vault_path: str = "") -> dict:
+    """Carry out an APPROVED deterministic safe action. (build_tool/build_file need Claude; these are
+    parameterized actions Agora can run by itself.)"""
+    a = get_action(aid)
+    if not a or a.get("status") != "approved":
+        return {"error": "not approved or not found"}
+    try:
+        if a["kind"] == "export_insights":
+            result = _export_insights(vault_path)
+        elif a["kind"] == "digest":
+            result = _run_digest()
+        else:
+            return {"error": f"kind '{a['kind']}' must be carried out by Claude, not the auto-executor"}
+        set_status(aid, "done", result)
+        return {"ok": True, "result": result}
+    except Exception as e:
+        set_status(aid, "failed", str(e)[:200])
+        return {"error": str(e)[:200]}
 
 
 def format_actions() -> str:
