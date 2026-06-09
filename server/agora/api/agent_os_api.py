@@ -621,6 +621,25 @@ async def brain_flywheel_deepen_inputs(title: str, falsifier: str = ""):
     return {"status": "ok", **await gather_deepening_inputs(title, falsifier, vault)}
 
 
+@router.get("/brain/socratic")
+async def brain_socratic(q: str):
+    """SOCRATIC AGORA — the vault as a tutor: probing questions drawn from the learner's own notes
+    that test depth, expose assumptions, and reveal the frontier of what they don't yet know."""
+    from agora.config import settings
+    from agora.execution.socratic import socratic_questions
+    vault = settings.vault_path or "C:/Users/Danculus/my-second-brain"
+    return {"status": "ok", **await socratic_questions(q, vault)}
+
+
+@router.get("/brain/learn-next")
+async def brain_learn_next():
+    """The single highest-value thing to learn next, from the vault's real gaps."""
+    from agora.config import settings
+    from agora.execution.socratic import what_to_learn_next
+    vault = settings.vault_path or "C:/Users/Danculus/my-second-brain"
+    return {"status": "ok", **await what_to_learn_next(vault)}
+
+
 @router.get("/brain/bridges")
 async def brain_bridges(n: int = 6, rationale: bool = True):
     """Pairs of the user's notes that are deeply related yet UNLINKED — missing connections.

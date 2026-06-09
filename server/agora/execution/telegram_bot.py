@@ -277,6 +277,18 @@ async def _handle(app, text: str) -> None:
     elif low in ("predictions", "/predictions", "ledger"):
         d = await asyncio.to_thread(_brain_get, "/api/v1/agent-os/brain/predictions")
         await send((d or {}).get("report", "_No predictions yet._"))
+    elif low.startswith(("quiz ", "/quiz ", "socratic ")):
+        import urllib.parse
+        topic = text.split(" ", 1)[1].strip()
+        await send("🎓 _Drawing Socratic questions from your notes…_")
+        d = await asyncio.to_thread(_brain_get, "/api/v1/agent-os/brain/socratic?q=" + urllib.parse.quote(topic))
+        from agora.execution.socratic import format_socratic
+        await send(format_socratic(d or {}))
+    elif low in ("learn", "/learn", "learn next", "what next"):
+        await send("🎓 _Finding your highest-value next topic…_")
+        d = await asyncio.to_thread(_brain_get, "/api/v1/agent-os/brain/learn-next")
+        from agora.execution.socratic import format_learn_next
+        await send(format_learn_next(d or {}))
     elif low in ("upgrades", "/upgrades", "self-upgrades"):
         await send("🔧 _Agora reflecting on its own mechanisms…_")
         d = await asyncio.to_thread(_brain_get, "/api/v1/agent-os/brain/self-upgrades")
