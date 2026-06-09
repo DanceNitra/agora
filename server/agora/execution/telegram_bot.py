@@ -325,6 +325,17 @@ async def _handle(app, text: str) -> None:
     elif low in ("lessons", "/lessons", "learnings"):
         from agora.execution.learning import format_lessons
         await send(format_lessons())
+    elif low in ("actions", "/actions", "hands"):
+        from agora.execution.hands import format_actions
+        await send(format_actions())
+    elif low.startswith(("approve ", "/approve ", "reject ", "/reject ")):
+        approve = low.startswith(("approve", "/approve"))
+        aid = text.split(" ", 1)[1].strip()
+        d = await asyncio.to_thread(_brain_post, "/api/v1/agent-os/brain/action-decide",
+                                    {"id": aid, "approve": approve})
+        a = (d or {}).get("action")
+        await send((f"✅ Approved `{aid}` — Agora will carry it out." if approve else f"🚫 Rejected `{aid}`.")
+                   if a else f"_No action {aid}._")
     elif low in ("upgrades", "/upgrades", "self-upgrades"):
         await send("🔧 _Agora reflecting on its own mechanisms…_")
         d = await asyncio.to_thread(_brain_get, "/api/v1/agent-os/brain/self-upgrades")

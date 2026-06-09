@@ -767,6 +767,42 @@ async def brain_lessons_record(request: Request):
     return {"status": "ok", **record_lessons(b.get("lessons", []))}
 
 
+@router.get("/brain/actions")
+async def brain_actions():
+    """AGORA'S HANDS — the action queue. Safe actions auto-approve; outward ones await Rasto."""
+    from agora.execution.hands import list_actions, ready_to_execute, pending_approvals
+    return {"status": "ok", "actions": list_actions(), "ready": ready_to_execute(),
+            "awaiting_approval": pending_approvals()}
+
+
+@router.post("/brain/action-propose")
+async def brain_action_propose(request: Request):
+    """Propose an action (safe kinds run; gated kinds wait for approval)."""
+    from agora.execution.hands import propose_action
+    b = await request.json()
+    return {"status": "ok", **propose_action(b.get("kind", "build_tool"), b.get("title", ""),
+                                             b.get("spec", ""), b.get("payload"))}
+
+
+@router.post("/brain/action-decide")
+async def brain_action_decide(request: Request):
+    """Rasto approves or rejects a gated action."""
+    from agora.execution.hands import approve_action, reject_action
+    b = await request.json()
+    fn = approve_action if b.get("approve") else reject_action
+    r = fn(b.get("id", ""))
+    return {"status": "ok", "action": r}
+
+
+@router.post("/brain/action-result")
+async def brain_action_result(request: Request):
+    """Record the outcome of an executed action."""
+    from agora.execution.hands import set_status
+    b = await request.json()
+    return {"status": "ok", "action": set_status(b.get("id", ""),
+                                                  "done" if b.get("ok") else "failed", b.get("result", ""))}
+
+
 @router.get("/brain/bridges")
 async def brain_bridges(n: int = 6, rationale: bool = True):
     """Pairs of the user's notes that are deeply related yet UNLINKED — missing connections.
