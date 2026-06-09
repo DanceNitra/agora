@@ -1,9 +1,27 @@
-# AGORA — FRONTIER UPGRADE PLANS (v2, 2026-06-09)
+# AGORA — FRONTIER UPGRADE PLANS (2026-06-09)
 
-> The first frontier wave is DONE (Insight Engine → Prediction Ledger → Flywheel → Mind →
-> Learning → Hands → Senses → visible HUD). These are the NEXT frontiers — each numbered so
-> Rasto can pick one from Telegram (`cc frontier N`) or in chat. Each plan: WHAT / WHY /
-> BUILD / TEST / RISK. Ordered by leverage-to-effort.
+> Wave 1 DONE (Insight Engine → Prediction Ledger → Flywheel → Mind → Learning → Hands →
+> Senses → visible HUD). **Wave 2 (#1-6) ALL SHIPPED.** **Wave 3 (#7-11) ALL SHIPPED.**
+>
+> **Wave 3 — the self-aware research organism (all live):**
+> - **7 Observatory** (`8d3ddd7`): weekly vital-signs ledger `.vitals.json` (dead-weight, link
+>   density, flywheel closure latency, exam, hit-rate). Telegram `vitals`. Baseline day 0 set.
+> - **8 The Interview** (`931b974`): daily one highest-value question to Rasto; answers become
+>   `owner-knowledge` vault notes feeding the user model. Telegram `answer`/`interview`/`ask me`.
+> - **9 Causal Self-Experiments** (`8e33196`): variant registry + stable hash assignment +
+>   auto-decision; first live A/B = exam answer style, graded by Claude. Telegram `experiments`.
+> - **10 The Library** (`a17a3aa`): reads ONE full paper/day via ar5iv → structured paper note
+>   (claims, evidence strength, limitations, vault links). Loop A11. Telegram `library`.
+> - **11 Campaigns** (`f0db19d`): multi-day research — decompose, harvest findings per
+>   sub-question over days, Claude writes a confidence-graded dossier. Loop A12. Telegram
+>   `campaign <goal>`/`campaigns`.
+>
+> New loop task kinds: A9 grade-exam, A10 hypothesize, A11 read-paper, A12 campaign-dossier.
+> What's left for a future wave: deeper Mind Chamber, calendar OAuth, more Hands action kinds.
+
+---
+
+## (Wave 2, all shipped) The Forecasting Tournament etc. — original plans below
 
 ---
 
