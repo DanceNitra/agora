@@ -1329,6 +1329,22 @@ async def _run_reality_check() -> None:
                "text": f"reality-tested a finding: {verdict} (vs {d.get('source')})"})
 
 
+async def _queue_insight_theme() -> None:
+    """Insight Engine workflow: Agora GATHERS + QUEUES a rich theme; Claude Opus SYNTHESIZES it when
+    active (the flash model is too weak for the synthesis). Picks a theme from the user's harvest
+    directions / real gaps and drops it in the Claude inbox as 'Synthesize insight: <theme>'."""
+    dd = await asyncio.to_thread(_brain_get_sync, "/api/v1/agent-os/brain/directions/current")
+    pool = [d["title"] for d in (dd or {}).get("directions", []) if d.get("title")]
+    pool += [g["title"] for g in (await _brain_gaps())]
+    if not pool:
+        return
+    theme = random.choice(pool)
+    await asyncio.to_thread(_brain_post_sync, "/api/v1/agent-os/brain/claude-inbox",
+                            {"text": f"Synthesize insight: {theme}"})
+    broadcast({"type": "os_build", "kind": "collab", "who": "High Priest Orin",
+               "text": f"queued a theme for Claude to synthesize: {theme[:40]}"})
+
+
 async def _broadcast_trust_graph():
     """One unified graph for the dungeon: ESS pairwise trust + learning (teach) edges +
     each agent's standing — persisted so the trust-weighted curator (AutoLinker) can read it."""
@@ -1903,6 +1919,9 @@ async def ambient_life():
         # Reality Bridge — Orin empirically tests a recent finding vs real-world data (~12 min).
         if loop_n % 850 == 350:
             asyncio.create_task(_run_reality_check())
+        # Insight Engine — Agora queues a rich theme for Claude Opus to synthesize (~3 h, premium).
+        if loop_n % 13000 == 1100:
+            asyncio.create_task(_queue_insight_theme())
 
         for eid, ent in list(ents.items()):
             cx, cy = int(round(ent.x)), int(round(ent.y))
