@@ -374,6 +374,10 @@ async def _handle(app, text: str) -> None:
                    + "\n".join(f"• {s}" for s in c.get("subquestions", []))
                    + "\n\n_the agents pursue these for days; I'll synthesize the dossier when ready_"
                    if c else "_Couldn't start a campaign._")
+    elif low in ("canon", "/canon"):
+        d = await asyncio.to_thread(_brain_get, "/api/v1/agent-os/brain/canon")
+        c = (d or {}).get("canon", "").strip()
+        await send(("📖 " + c[:3400]) if c else "_No canon written yet._")
     elif low in ("beliefs", "/beliefs"):
         d = await asyncio.to_thread(_brain_get, "/api/v1/agent-os/brain/beliefs")
         await send((d or {}).get("report", "_No beliefs._"))

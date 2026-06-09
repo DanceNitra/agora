@@ -1590,6 +1590,21 @@ async def _run_memory_economy() -> None:
         _mind_spark("#c9a14a")        # amber — the custodian governs
 
 
+async def _queue_canon_update() -> None:
+    """THE CANON: when >=2 artifacts landed since the last canon update, queue the merge —
+    Claude rewrites the living book (merge, never append)."""
+    if await _task_already_pending("Update canon"):
+        return
+    d = await asyncio.to_thread(_brain_get_sync, "/api/v1/agent-os/brain/canon-inputs", 60)
+    if len((d or {}).get("new_artifacts", [])) < 2:
+        return
+    await asyncio.to_thread(_brain_post_sync, "/api/v1/agent-os/brain/claude-inbox",
+                            {"text": "Update canon"})
+    broadcast({"type": "os_build", "kind": "collab", "who": "Sage Mira",
+               "text": f"{len(d['new_artifacts'])} new artifacts since the canon — queued the merge"})
+    _mind_spark("#ffd27a")        # gold — the book rewrites itself
+
+
 async def _queue_belief_challenge() -> None:
     """BELIEF REVISION: the challenge sweep — pick the belief longest without a test and have
     Claude actively try to kill it. Survived beliefs harden; failed ones get revised or buried."""
@@ -2388,6 +2403,9 @@ async def ambient_life():
         # BELIEF REVISION — challenge the belief longest without a test (~2 days).
         if loop_n % 128000 == 90000:
             asyncio.create_task(_queue_belief_challenge())
+        # THE CANON — when enough new artifacts landed, queue the living-book merge (~2 days).
+        if loop_n % 128000 == 30000:
+            asyncio.create_task(_queue_canon_update())
 
         for eid, ent in list(ents.items()):
             cx, cy = int(round(ent.x)), int(round(ent.y))

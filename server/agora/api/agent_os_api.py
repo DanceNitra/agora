@@ -672,6 +672,36 @@ async def brain_memory_economy(n: int = 12):
             "report": format_economy(notes, cands)}
 
 
+@router.get("/brain/canon-inputs")
+async def brain_canon_inputs():
+    """THE CANON — current canon text + artifacts that landed since, for Claude to MERGE."""
+    from agora.config import settings
+    from agora.execution.canon import gather_canon_inputs
+    vault = settings.vault_path or "C:/Users/Danculus/my-second-brain"
+    return {"status": "ok", **gather_canon_inputs(vault)}
+
+
+@router.post("/brain/canon-write")
+async def brain_canon_write(request: Request):
+    """Replace the Canon with the merged text (history lives in git)."""
+    from agora.config import settings
+    from agora.execution.canon import write_canon
+    b = await request.json()
+    vault = settings.vault_path or "C:/Users/Danculus/my-second-brain"
+    content = (b.get("content") or "").strip()
+    if len(content) < 200:
+        return {"status": "too_short"}
+    return {"status": "written", "path": write_canon(vault, content)}
+
+
+@router.get("/brain/canon")
+async def brain_canon():
+    from agora.config import settings
+    from agora.execution.canon import read_canon
+    vault = settings.vault_path or "C:/Users/Danculus/my-second-brain"
+    return {"status": "ok", "canon": read_canon(vault)[:8000]}
+
+
 @router.get("/brain/belief-challenge-target")
 async def brain_belief_challenge_target():
     """BELIEF REVISION — the belief that has gone longest untested (the challenge sweep's prey)."""
