@@ -1590,6 +1590,24 @@ async def _run_memory_economy() -> None:
         _mind_spark("#c9a14a")        # amber — the custodian governs
 
 
+async def _run_forge() -> None:
+    """CAPABILITY FORGE: scan the system's failure traces for capability gaps, then queue the
+    oldest open gap for Claude to close with the smallest new organ (tested, like any upgrade)."""
+    if await _task_already_pending("Forge capability:"):
+        return
+    d = await asyncio.to_thread(_brain_post_sync, "/api/v1/agent-os/brain/forge/scan", {}, 60)
+    top = (d or {}).get("top_open")
+    if not top:
+        return
+    await asyncio.to_thread(_brain_post_sync, "/api/v1/agent-os/brain/claude-inbox",
+                            {"text": f"Forge capability: {top['description'][:140]} || id: {top['id']}"})
+    await asyncio.to_thread(_brain_post_sync, "/api/v1/agent-os/brain/forge/status",
+                            {"id": top["id"], "status": "queued"})
+    broadcast({"type": "os_build", "kind": "collab", "who": "King Aldric",
+               "text": f"forge: queued a capability build — {top['description'][:46]}"})
+    _mind_spark("#c9a14a")        # amber — the forge lights
+
+
 async def _run_tutor() -> None:
     """THE TUTOR: send the owner today's spaced-repetition micro-quiz (SM-2 over his own
     evergreen notes; retention feeds the vitals)."""
@@ -2418,6 +2436,9 @@ async def ambient_life():
         # THE TUTOR — the owner's daily spaced-repetition micro-quiz (~daily offset).
         if loop_n % 64000 == 26000:
             asyncio.create_task(_run_tutor())
+        # CAPABILITY FORGE — scan failure traces for gaps + queue the top one (~weekly offset).
+        if loop_n % 448000 == 180000:
+            asyncio.create_task(_run_forge())
 
         for eid, ent in list(ents.items()):
             cx, cy = int(round(ent.x)), int(round(ent.y))

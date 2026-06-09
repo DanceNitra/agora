@@ -389,6 +389,15 @@ async def _handle(app, text: str) -> None:
         d = await asyncio.to_thread(_brain_post, "/api/v1/agent-os/brain/tutor/daily", {})
         if not (d or {}).get("n"):
             await send("_Nothing due — your memory is ahead of schedule._")
+    elif low.startswith(("gap ", "/gap ")):
+        d = await asyncio.to_thread(_brain_post, "/api/v1/agent-os/brain/forge/add",
+                                    {"description": text.split(" ", 1)[1].strip()})
+        g = (d or {}).get("gap")
+        await send(f"🔨 Gap registered `{g['id']}` — the Forge will queue it for a build."
+                   if g else "_Already on record (or too short)._")
+    elif low in ("forge", "/forge"):
+        d = await asyncio.to_thread(_brain_get, "/api/v1/agent-os/brain/forge")
+        await send((d or {}).get("report", "_Forge empty._"))
     elif low in ("canon", "/canon"):
         d = await asyncio.to_thread(_brain_get, "/api/v1/agent-os/brain/canon")
         c = (d or {}).get("canon", "").strip()

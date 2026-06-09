@@ -672,6 +672,36 @@ async def brain_memory_economy(n: int = 12):
             "report": format_economy(notes, cands)}
 
 
+@router.post("/brain/forge/scan")
+async def brain_forge_scan(request: Request):
+    """CAPABILITY FORGE — scan the system's own failure traces for missing capabilities."""
+    from agora.execution.forge import detect_gaps, top_open_gap
+    found = await detect_gaps(request.app.state.db)
+    return {"status": "ok", "new_gaps": found, "top_open": top_open_gap()}
+
+
+@router.post("/brain/forge/add")
+async def brain_forge_add(request: Request):
+    """Register a capability gap by hand (Telegram `gap <desc>`)."""
+    from agora.execution.forge import add_gap
+    b = await request.json()
+    g = add_gap(b.get("description") or "", kind="manual")
+    return {"status": "ok" if g else "duplicate_or_short", "gap": g}
+
+
+@router.post("/brain/forge/status")
+async def brain_forge_status(request: Request):
+    from agora.execution.forge import set_status
+    b = await request.json()
+    return {"status": "ok", "gap": set_status(b.get("id") or "", b.get("status") or "open")}
+
+
+@router.get("/brain/forge")
+async def brain_forge():
+    from agora.execution.forge import format_forge, _load
+    return {"status": "ok", "report": format_forge(), "gaps": _load()[-20:]}
+
+
 @router.post("/brain/tutor/daily")
 async def brain_tutor_daily(request: Request):
     """THE TUTOR — today's spaced-repetition micro-quiz, sent to the owner on Telegram."""
