@@ -672,6 +672,13 @@ async def brain_memory_economy(n: int = 12):
             "report": format_economy(notes, cands)}
 
 
+@router.get("/brain/experiments")
+async def brain_experiments():
+    """CAUSAL SELF-EXPERIMENTS — variant arms, sample sizes, means, decided winners."""
+    from agora.execution.experiments import _load, format_experiments
+    return {"status": "ok", "experiments": _load(), "report": format_experiments()}
+
+
 @router.post("/brain/interview/ask")
 async def brain_interview_ask(request: Request):
     """THE INTERVIEW — compose today's one highest-value question and ask the owner on

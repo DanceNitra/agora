@@ -59,9 +59,20 @@ async def generate_exam(vault_path: str, n: int = 6) -> dict:
     """Draw one probing question per core concept, then have Agora (flash) answer open-book.
     The answer sheet is stored ungraded — Claude grades it against the snippets (inbox task)."""
     from agora.execution.llm_client import call_llm
+    from agora.execution import experiments
     concepts = await asyncio.to_thread(_core_concepts, vault_path, n)
     if not concepts:
         return {"status": "empty", "reason": "no evergreen concepts found"}
+    # Causal self-experiment: which answer style earns better Claude grades?
+    experiments.define("exam_answer_style", ["mechanism_first", "structured"],
+                       "Does mechanism-first prose or claim/mechanism/example structure score higher?")
+    _STYLE_PROMPT = {
+        "mechanism_first": "Answer the exam question in 3-5 sentences using the note as your "
+                           "source. Be precise; state mechanisms, not platitudes.",
+        "structured": "Answer the exam question grounded in the note, EXACTLY in this shape: "
+                      "CLAIM: <1 sentence>. MECHANISM: <2-3 sentences>. EDGE CASE: <1 sentence "
+                      "where it breaks>.",
+    }
 
     def _q_and_a(c: dict) -> dict | None:
         q = call_llm(
@@ -72,14 +83,14 @@ async def generate_exam(vault_path: str, n: int = 6) -> dict:
         q = q.strip().splitlines()[0][:240] if q.strip() else ""
         if len(q) < 15:
             return None
+        style = experiments.assign("exam_answer_style", c["title"]) or "mechanism_first"
         a = call_llm(
-            "Answer the exam question in 3-5 sentences using the note as your source. Be precise; "
-            "state mechanisms, not platitudes.",
+            _STYLE_PROMPT.get(style, _STYLE_PROMPT["mechanism_first"]),
             f"NOTE ({c['title']}):\n{c['snippet'][:1500]}\n\nQUESTION: {q}", "cheap", 0.4, 400) or ""
         if len(a.strip()) < 30:
             return None
         return {"concept": c["title"], "question": q, "agora_answer": a.strip()[:900],
-                "snippet": c["snippet"][:900]}
+                "snippet": c["snippet"][:900], "variant": style}
 
     # sequential on purpose: concurrent flash calls get rate-limited into empty outputs
     questions = []
@@ -104,8 +115,11 @@ def grade_exam(exam_id: str, scores: list, feedback: str = "") -> dict:
         if e.get("id") == exam_id and e.get("status") == "answered":
             qs = e.get("questions", [])
             clean = [max(0, min(2, int(s))) for s in scores][:len(qs)]
+            from agora.execution import experiments
             for q, s in zip(qs, clean):
                 q["score"] = s
+                if q.get("variant"):        # outcome flows into the causal self-experiment
+                    experiments.record("exam_answer_style", q["concept"], s)
             e["score"] = sum(clean)
             e["max"] = 2 * len(qs)
             e["feedback"] = (feedback or "")[:600]
