@@ -1412,6 +1412,16 @@ async def _queue_mind_reflection() -> None:
                "text": "queued a metacognitive reflection for Claude (the Agora Mind)"})
 
 
+async def _queue_learning() -> None:
+    """THE LEARNING LOOP: queue a review of Agora's own track record for Claude to derive applied
+    lessons (what works, what to change) that feed back into future judgments. Agora improves itself."""
+    await asyncio.to_thread(_brain_post_sync, "/api/v1/agent-os/brain/resolve-predictions", {})
+    await asyncio.to_thread(_brain_post_sync, "/api/v1/agent-os/brain/claude-inbox",
+                            {"text": "Learn from outcomes"})
+    broadcast({"type": "os_build", "kind": "collab", "who": "Sergeant Voss",
+               "text": "queued a track-record review for Claude (the Learning Loop)"})
+
+
 async def _broadcast_trust_graph():
     """One unified graph for the dungeon: ESS pairwise trust + learning (teach) edges +
     each agent's standing — persisted so the trust-weighted curator (AutoLinker) can read it."""
@@ -2001,6 +2011,9 @@ async def ambient_life():
         # The Agora Mind — metacognitive reflection: synthesize the worldview + self-direct (~daily).
         if loop_n % 64000 == 33000:
             asyncio.create_task(_queue_mind_reflection())
+        # The Learning Loop — review the track record + derive applied lessons (~daily, offset).
+        if loop_n % 64000 == 9000:
+            asyncio.create_task(_queue_learning())
 
         for eid, ent in list(ents.items()):
             cx, cy = int(round(ent.x)), int(round(ent.y))

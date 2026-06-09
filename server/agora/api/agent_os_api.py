@@ -672,7 +672,8 @@ async def brain_dialectic_inputs(q: str):
 async def brain_predict_baseline(q: str):
     """Current real-world metrics for a theme so CLAUDE makes the reasoned prediction (quality)."""
     from agora.execution.prediction_ledger import gather_prediction_baseline
-    return {"status": "ok", **await gather_prediction_baseline(q)}
+    from agora.execution.learning import lessons_text
+    return {"status": "ok", "lessons": lessons_text(), **await gather_prediction_baseline(q)}
 
 
 @router.post("/brain/predict-record")
@@ -723,8 +724,9 @@ async def brain_mind_inputs():
     for Claude to synthesize a coherent worldview + decide what to think about next. Metacognition."""
     from agora.config import settings
     from agora.execution.mind import gather_mind_state
+    from agora.execution.learning import lessons_text
     vault = settings.vault_path or "C:/Users/Danculus/my-second-brain"
-    return {"status": "ok", **await gather_mind_state(vault)}
+    return {"status": "ok", "lessons": lessons_text(), **await gather_mind_state(vault)}
 
 
 @router.get("/brain/worldview")
@@ -740,6 +742,29 @@ async def brain_worldview_record(request: Request):
     from agora.execution.mind import record_worldview
     b = await request.json()
     return {"status": "ok", "path": record_worldview(b.get("content", ""))}
+
+
+@router.get("/brain/learning-inputs")
+async def brain_learning_inputs():
+    """THE LEARNING LOOP — the measurable outcomes of Agora's own judgments (prediction calibration,
+    resolved calls, funnel/flywheel shape), for Claude to derive applied LESSONS. Agora improves itself."""
+    from agora.execution.learning import gather_outcomes
+    return {"status": "ok", **await gather_outcomes()}
+
+
+@router.get("/brain/lessons")
+async def brain_lessons():
+    """The lessons Agora has learned about itself (read by future predictions / insights / reflections)."""
+    from agora.execution.learning import get_lessons
+    return {"status": "ok", "lessons": get_lessons()}
+
+
+@router.post("/brain/lessons-record")
+async def brain_lessons_record(request: Request):
+    """Store the lessons Claude derived from Agora's track record."""
+    from agora.execution.learning import record_lessons
+    b = await request.json()
+    return {"status": "ok", **record_lessons(b.get("lessons", []))}
 
 
 @router.get("/brain/bridges")
