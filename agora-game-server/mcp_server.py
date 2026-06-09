@@ -1136,6 +1136,22 @@ async def _brain_gaps() -> list:
 
 _recent_intents: list = []   # recently-issued quest intents, to avoid repetition (self-upgrade #1)
 
+_QUEST_PREFIX_RE = re.compile(
+    r"^(?:Hypothesize on|Pursue direction|Deepen|Develop the gap|Connect|Frontier|Hypothesis)\s*:?\s*",
+    re.I)
+
+
+def _strip_quest_prefix(title: str) -> str:
+    """Peel any stacked quest/finding prefix so new intents don't nest into garbage like
+    'Hypothesize on: Hypothesize on: Pursue direction: ...' (wastes LLM calls + pollutes titles)."""
+    t = (title or "").strip()
+    for _ in range(4):
+        new = _QUEST_PREFIX_RE.sub("", t).strip()
+        if new == t:
+            break
+        t = new
+    return t
+
 
 async def _renewable_quests(eid: str, want: int = 3) -> list:
     """A GUARANTEED, inexhaustible supply of real work drawn from the vault's surface — gaps to
@@ -1163,7 +1179,10 @@ async def _renewable_quests(eid: str, want: int = 3) -> list:
         for k in random.sample(finds, min(3, len(finds))):
             # findings → HYPOTHESIZE quests: form + test a new hypothesis that deepens the finding
             # (the self-deepening engine — each finding raises the next testable question).
-            pool.append((f"Hypothesize on: {(k.get('title') or '')[:55]}",
+            topic = _strip_quest_prefix(k.get("title") or "")[:55]
+            if not topic:
+                continue
+            pool.append((f"Hypothesize on: {topic}",
                          "Form + test a new hypothesis that deepens this finding", "hypothesize"))
     except Exception as e:
         logger.debug(f"renewable_quests {eid}: {e}")
