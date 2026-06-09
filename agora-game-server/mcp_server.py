@@ -1161,7 +1161,13 @@ async def _renewable_quests(eid: str, want: int = 3) -> list:
     run out of meaningful tasks (the flaky LLM planner becomes just a bonus, not a dependency)."""
     pool, priority = [], []
     try:
-        # HARVESTED DIRECTIONS first (priority) — so research follows the synthesis and COMPOUNDS.
+        # COMPOUNDING FLYWHEEL first — the agents test the FALSIFIERS of Agora's own insights (its
+        # claims' weak points), so the system's outputs become its next research + knowledge deepens.
+        fw = await asyncio.to_thread(_brain_get_sync, "/api/v1/agent-os/brain/flywheel/questions?n=3")
+        for q in (fw or {}).get("open", []):
+            priority.append((f"Test Agora's claim: {q['question'][:55]}",
+                             f"Find real evidence on whether this holds: {q['question']}", "hypothesize"))
+        # HARVESTED DIRECTIONS next (priority) — so research follows the synthesis and COMPOUNDS.
         dd = await asyncio.to_thread(_brain_get_sync, "/api/v1/agent-os/brain/directions/current")
         for d in (dd or {}).get("directions", []):
             if d.get("kind") == "research":          # upgrade-directions go to the user, not agents
@@ -1343,6 +1349,21 @@ async def _queue_insight_theme() -> None:
                             {"text": f"Synthesize insight: {theme}"})
     broadcast({"type": "os_build", "kind": "collab", "who": "High Priest Orin",
                "text": f"queued a theme for Claude to synthesize: {theme[:40]}"})
+
+
+async def _queue_deepening() -> None:
+    """Compounding Flywheel (second half): queue an insight's falsifier for Claude to RE-TEST against
+    the fresh evidence and DEEPEN the insight — outputs come back as sharper outputs, knowledge deepens."""
+    fw = await asyncio.to_thread(_brain_get_sync, "/api/v1/agent-os/brain/flywheel/questions?n=5")
+    qs = (fw or {}).get("open", [])
+    if not qs:
+        return
+    q = random.choice(qs)
+    await asyncio.to_thread(
+        _brain_post_sync, "/api/v1/agent-os/brain/claude-inbox",
+        {"text": f"Deepen insight [{q['id']}]: {q.get('origin', '')} || falsifier: {q['question']}"})
+    broadcast({"type": "os_build", "kind": "collab", "who": "High Priest Orin",
+               "text": f"queued an insight to deepen (flywheel): {q.get('origin', '')[:30]}"})
 
 
 async def _run_predictions() -> None:
@@ -1942,6 +1963,9 @@ async def ambient_life():
         # Insight Engine — Agora queues a rich theme for Claude Opus to synthesize (~3 h, premium).
         if loop_n % 13000 == 1100:
             asyncio.create_task(_queue_insight_theme())
+        # Flywheel — queue an insight's falsifier for Claude to re-test + deepen (~4 h, offset).
+        if loop_n % 17000 == 9000:
+            asyncio.create_task(_queue_deepening())
         # Prediction Ledger — resolve due predictions vs reality + record a new one (~2 h).
         if loop_n % 9000 == 2500:
             asyncio.create_task(_run_predictions())

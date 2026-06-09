@@ -241,6 +241,16 @@ async def write_vault_note(request: Request):
         title=title, content=content,
         tags=body.get("tags") or ["agora", "consolidation"],
         agent_name=body.get("agent") or "Sage Mira")
+    # Compounding Flywheel: when an INSIGHT lands, register its falsifier as an open research question
+    # so the agents go test the insight's weak point — outputs become the next inputs.
+    if "insight" in (body.get("tags") or []):
+        try:
+            from agora.execution.flywheel import extract_falsifier, register_question
+            fals = extract_falsifier(content)
+            if fals:
+                register_question(fals, origin=title[:90])
+        except Exception:
+            pass
     return {"status": "written", "path": path, "score": q["score"]}
 
 
@@ -591,6 +601,24 @@ async def brain_resolve_predictions(force: bool = False):
     from agora.execution.prediction_ledger import resolve_due, calibration
     resolved = await resolve_due(force)
     return {"status": "ok", "resolved": len(resolved), "calibration": calibration()}
+
+
+@router.get("/brain/flywheel/questions")
+async def brain_flywheel_questions(n: int = 8):
+    """COMPOUNDING FLYWHEEL — the open research questions Agora derived from its own insights'
+    falsifiers (its claims' weak points), which the agents go investigate so knowledge deepens."""
+    from agora.execution.flywheel import open_questions, stats
+    return {"status": "ok", "open": open_questions(n), "stats": stats()}
+
+
+@router.get("/brain/flywheel/deepen-inputs")
+async def brain_flywheel_deepen_inputs(title: str, falsifier: str = ""):
+    """Test an insight's falsifier against fresh research + reality — the evidence Claude uses to
+    DEEPEN the insight (the second half of the flywheel: outputs come back as sharper outputs)."""
+    from agora.config import settings
+    from agora.execution.flywheel import gather_deepening_inputs
+    vault = settings.vault_path or "C:/Users/Danculus/my-second-brain"
+    return {"status": "ok", **await gather_deepening_inputs(title, falsifier, vault)}
 
 
 @router.get("/brain/bridges")
