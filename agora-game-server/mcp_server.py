@@ -1137,8 +1137,8 @@ async def _brain_gaps() -> list:
 _recent_intents: list = []   # recently-issued quest intents, to avoid repetition (self-upgrade #1)
 
 _QUEST_PREFIX_RE = re.compile(
-    r"^(?:Hypothesize on|Pursue direction|Deepen|Develop the gap|Connect|Frontier|Hypothesis)\s*:?\s*",
-    re.I)
+    r"^(?:Hypothesize on|Pursue direction|Deepen|Develop the gap|Connect|Frontier|Hypothesis|Pipeline)"
+    r"\s*:?\s*", re.I)
 
 
 def _strip_quest_prefix(title: str) -> str:
@@ -1351,8 +1351,8 @@ async def _hypothesis_discovery(eid: str, topic: str) -> None:
     """AGORA 2.0 Pillar 2 in the dungeon loop — the self-deepening engine: form a NEW testable
     hypothesis from the topic and TEST it against real literature, yielding a finding WITH a verdict,
     evidence and a falsifier. Each tested hypothesis raises the next question → research deepens itself."""
-    # strip any quest prefix ("Hypothesize:"/"Pursue direction:"/"Deepen:") down to the real topic
-    t = re.sub(r"^(Hypothesize|Pursue direction|Deepen|Develop the gap|Connect)\s*:?\s*", "", topic, flags=re.I)
+    # strip any stacked quest/finding prefix down to the real topic (shared, loop-peeling stripper)
+    t = _strip_quest_prefix(topic)
     d = await asyncio.to_thread(
         _brain_get_sync, f"/api/v1/agent-os/brain/hypothesize?q={_urlquote(t[:100])}")
     if not d or not d.get("hypothesis"):
