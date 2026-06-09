@@ -96,6 +96,54 @@ def fetch_crypto(query: str, **_) -> dict:
 # it works as code but CoinGecko's TLS chain fails to verify in this environment; re-add it once that
 # is resolved (or behind a verified SSL context). The three below verify cleanly and cover trends,
 # facts, and real statistics.
+def fetch_github(query: str, **_) -> dict:
+    """Real-world SOFTWARE adoption of a technology/idea — repo count + stars (is it actually built?)."""
+    url = (f"https://api.github.com/search/repositories?q={urllib.parse.quote(query)}"
+           f"&sort=stars&per_page=5")
+    d = _get_json(url)
+    top = [{"repo": i.get("full_name"), "stars": i.get("stargazers_count"),
+            "desc": (i.get("description") or "")[:70]} for i in d.get("items", [])]
+    return {"source": "GitHub", "total_repos": d.get("total_count", 0), "top": top}
+
+
+def fetch_pubmed(query: str, **_) -> dict:
+    """Volume of peer-reviewed BIOMEDICAL/life-science research on a topic (health, neuro, biology)."""
+    url = (f"https://eutils.ncbi.nlm.nih.gov/entrez/eutils/esearch.fcgi?db=pubmed"
+           f"&term={urllib.parse.quote(query)}&retmode=json&retmax=3&sort=relevance")
+    d = _get_json(url)
+    er = d.get("esearchresult", {})
+    return {"source": "PubMed", "paper_count": er.get("count", "0"),
+            "sample_pmids": er.get("idlist", [])[:3]}
+
+
+def fetch_restcountries(query: str, **_) -> dict:
+    """Demographic/geographic facts about a country (population, region, area)."""
+    try:
+        d = _get_json(f"https://restcountries.com/v3.1/name/{urllib.parse.quote(query)}"
+                      f"?fields=name,population,region,area,languages")
+        c = d[0] if isinstance(d, list) and d else {}
+        return {"source": "REST Countries", "country": (c.get("name") or {}).get("common"),
+                "population": c.get("population"), "region": c.get("region"), "area_km2": c.get("area")}
+    except Exception:
+        return {"source": "REST Countries", "found": False}
+
+
+def fetch_climate(query: str = "", **_) -> dict:
+    """Real GLOBAL temperature/climate trend (NASA GISTEMP land anomaly) — for climate/warming claims."""
+    try:
+        d = _get_json("https://global-warming.org/api/temperature-api")
+        res = d.get("result", [])
+        if not res:
+            return {"source": "Global Temperature (NASA GISTEMP)", "series": []}
+        latest = res[-1]
+        decade_ago = res[-121] if len(res) > 121 else res[0]
+        return {"source": "Global Temperature (NASA GISTEMP)", "latest": latest,
+                "ten_years_ago": decade_ago,
+                "note": "land temperature anomaly (degrees C) vs the 1951-1980 baseline"}
+    except Exception as e:
+        return {"source": "Global Temperature", "error": str(e)[:80]}
+
+
 def traction_check(topic: str, **_) -> dict:
     """Real-world TRACTION of a topic via Hacker News — is it actively discussed right now? Always
     returns a signal (the reliable fallback when a claim isn't directly testable): ACTIVE (lots of
@@ -124,6 +172,14 @@ SOURCES = {
     "worldbank": ("real development/economic statistics over time — pick an indicator from "
                   + ", ".join(_WB_INDICATORS) + " and optionally a 3-letter country code (default WLD)",
                   fetch_worldbank),
+    "github": ("real-world SOFTWARE adoption of a technology/tool/idea — how many repositories exist "
+               "and their stars (is it actually built and used?)", fetch_github),
+    "pubmed": ("the VOLUME of peer-reviewed biomedical / life-science / health / neuroscience research "
+               "on a topic (how much real science backs it)", fetch_pubmed),
+    "restcountries": ("demographic / geographic facts about a country (population, region, area)",
+                      fetch_restcountries),
+    "climate": ("real global temperature / climate-warming trend data (for any climate or global-"
+                "warming claim)", fetch_climate),
 }
 
 
