@@ -687,6 +687,25 @@ async def brain_memory_economy(n: int = 12):
             "report": format_economy(notes, cands)}
 
 
+@router.post("/brain/lab/run")
+async def brain_lab_run(request: Request):
+    """THE LABORATORY — execute a Claude-written experiment script (deterministic runner:
+    hard timeout, output cap, results ledgered with source 'simulation')."""
+    import asyncio as _aio
+    from agora.execution.lab import run_experiment
+    b = await request.json()
+    code = b.get("code") or ""
+    if len(code) < 20:
+        return {"status": "empty"}
+    return {"status": "ok", **await _aio.to_thread(run_experiment, b.get("name") or "", code)}
+
+
+@router.get("/brain/lab")
+async def brain_lab():
+    from agora.execution.lab import format_lab, recent
+    return {"status": "ok", "report": format_lab(), "experiments": recent()}
+
+
 @router.post("/brain/night-shift")
 async def brain_night_shift(request: Request):
     """THE NIGHT SHIFT — nightly consolidation: re-embed the vault (fresh semantic memory by
