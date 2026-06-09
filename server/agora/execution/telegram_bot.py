@@ -317,6 +317,11 @@ async def _handle(app, text: str) -> None:
         d = await asyncio.to_thread(_brain_get, "/api/v1/agent-os/brain/user-model")
         from agora.execution.user_model import format_model
         await send(format_model(d or {}))
+    elif low in ("mind", "/mind", "worldview", "state of mind"):
+        d = await asyncio.to_thread(_brain_get, "/api/v1/agent-os/brain/worldview")
+        wv = (d or {}).get("worldview", "").strip()
+        await send(("🧠 *Agora's state of mind*\n\n" + wv[:3400]) if wv
+                   else "🧠 _No worldview synthesized yet — Agora reflects on itself ~daily._")
     elif low in ("upgrades", "/upgrades", "self-upgrades"):
         await send("🔧 _Agora reflecting on its own mechanisms…_")
         d = await asyncio.to_thread(_brain_get, "/api/v1/agent-os/brain/self-upgrades")

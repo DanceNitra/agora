@@ -717,6 +717,31 @@ async def brain_user_model(force: bool = False):
     return {"status": "ok", **await build_user_model(vault, force)}
 
 
+@router.get("/brain/mind-inputs")
+async def brain_mind_inputs():
+    """THE AGORA MIND — Agora's entire current cognitive state (beliefs, predictions, tensions, gaps),
+    for Claude to synthesize a coherent worldview + decide what to think about next. Metacognition."""
+    from agora.config import settings
+    from agora.execution.mind import gather_mind_state
+    vault = settings.vault_path or "C:/Users/Danculus/my-second-brain"
+    return {"status": "ok", **await gather_mind_state(vault)}
+
+
+@router.get("/brain/worldview")
+async def brain_worldview():
+    """Agora's current synthesized worldview (what it believes + is uncertain about)."""
+    from agora.execution.mind import get_worldview
+    return {"status": "ok", "worldview": get_worldview()}
+
+
+@router.post("/brain/worldview-record")
+async def brain_worldview_record(request: Request):
+    """Store the worldview Claude synthesized (the Agora Mind's current state)."""
+    from agora.execution.mind import record_worldview
+    b = await request.json()
+    return {"status": "ok", "path": record_worldview(b.get("content", ""))}
+
+
 @router.get("/brain/bridges")
 async def brain_bridges(n: int = 6, rationale: bool = True):
     """Pairs of the user's notes that are deeply related yet UNLINKED — missing connections.

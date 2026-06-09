@@ -1403,6 +1403,15 @@ async def _queue_dialectic() -> None:
                "text": f"queued a claim for Claude to stress-test (dialectic): {claim[:30]}"})
 
 
+async def _queue_mind_reflection() -> None:
+    """THE AGORA MIND: queue a metacognitive reflection for Claude — synthesize the worldview from
+    Agora's full cognitive state and decide what to think about next. The toolbox becomes a mind."""
+    await asyncio.to_thread(_brain_post_sync, "/api/v1/agent-os/brain/claude-inbox",
+                            {"text": "Reflect: state of mind"})
+    broadcast({"type": "os_build", "kind": "collab", "who": "King Aldric",
+               "text": "queued a metacognitive reflection for Claude (the Agora Mind)"})
+
+
 async def _broadcast_trust_graph():
     """One unified graph for the dungeon: ESS pairwise trust + learning (teach) edges +
     each agent's standing — persisted so the trust-weighted curator (AutoLinker) can read it."""
@@ -1989,6 +1998,9 @@ async def ambient_life():
         # Dialectic — queue a contentious claim for Claude to stress-test (~5 h, offset).
         if loop_n % 19000 == 7000:
             asyncio.create_task(_queue_dialectic())
+        # The Agora Mind — metacognitive reflection: synthesize the worldview + self-direct (~daily).
+        if loop_n % 64000 == 33000:
+            asyncio.create_task(_queue_mind_reflection())
 
         for eid, ent in list(ents.items()):
             cx, cy = int(round(ent.x)), int(round(ent.y))
