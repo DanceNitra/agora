@@ -672,6 +672,15 @@ async def brain_memory_economy(n: int = 12):
             "report": format_economy(notes, cands)}
 
 
+@router.get("/brain/hypothesis-inputs")
+async def brain_hypothesis_inputs(request: Request):
+    """HYPOTHESIS INDUCTION — one coherent cross-agent cluster of recent findings, as raw
+    material for Claude to unify into a falsifiable hypothesis (whose falsifier the flywheel
+    auto-registers, so the agents then test it)."""
+    from agora.execution.hypothesis_induction import gather_hypothesis_inputs
+    return {"status": "ok", **await gather_hypothesis_inputs(request.app.state.db)}
+
+
 @router.post("/brain/exchange/propose")
 async def brain_exchange_propose(request: Request):
     """RESEARCH EXCHANGE — compose the public digest (preview on disk) and propose publishing

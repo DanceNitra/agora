@@ -1590,6 +1590,25 @@ async def _run_memory_economy() -> None:
         _mind_spark("#c9a14a")        # amber — the custodian governs
 
 
+async def _queue_hypothesis_induction() -> None:
+    """HYPOTHESIS INDUCTION: when a coherent cross-agent finding cluster exists, queue it for
+    Claude to unify into ONE falsifiable hypothesis (the falsifier auto-registers in the
+    flywheel, so the agents then go test the conjecture — findings become science)."""
+    d = await asyncio.to_thread(_brain_get_sync, "/api/v1/agent-os/brain/hypothesis-inputs", 60)
+    theme = (d or {}).get("theme", "")
+    if not theme or len((d or {}).get("cluster", [])) < 3:
+        return
+    covered = await asyncio.to_thread(_covered_note_themes, "hypothesis*.md")
+    covered += await _pending_task_themes("Hypothesize from findings:")
+    if _theme_is_covered(theme, covered):
+        return
+    await asyncio.to_thread(_brain_post_sync, "/api/v1/agent-os/brain/claude-inbox",
+                            {"text": f"Hypothesize from findings: {theme[:90]}"})
+    broadcast({"type": "os_build", "kind": "collab", "who": "High Priest Orin",
+               "text": f"found a cross-agent finding cluster — queued a hypothesis: {theme[:34]}"})
+    _mind_spark("#b89bff")        # violet — a conjecture forms
+
+
 async def _run_research_exchange() -> None:
     """RESEARCH EXCHANGE: compose the public digest and PROPOSE publishing it (gated —
     Rasto approves from Telegram; only then does it leave the machine)."""
@@ -2276,6 +2295,9 @@ async def ambient_life():
         # RESEARCH EXCHANGE — compose + propose the public digest (GATED, ~weekly offset).
         if loop_n % 448000 == 120000:
             asyncio.create_task(_run_research_exchange())
+        # HYPOTHESIS INDUCTION — bridge a finding cluster into a testable conjecture (~8 h).
+        if loop_n % 22000 == 15000:
+            asyncio.create_task(_queue_hypothesis_induction())
 
         for eid, ent in list(ents.items()):
             cx, cy = int(round(ent.x)), int(round(ent.y))
