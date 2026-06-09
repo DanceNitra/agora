@@ -496,6 +496,14 @@ async def brain_pulse(request: Request, hours: int = 4, notify: bool = False):
     return {"status": "ok", "pulse": p, "report": report}
 
 
+@router.get("/brain/empirical-test")
+async def brain_empirical_test(q: str):
+    """REALITY BRIDGE — test a claim against REAL-WORLD DATA from a free public API (Hacker News /
+    Wikipedia / World Bank): route → fetch → judge. Empirical grounding beyond the paper literature."""
+    from agora.execution.data_tool import empirical_test
+    return {"status": "ok", **await empirical_test(q)}
+
+
 @router.get("/brain/bridges")
 async def brain_bridges(n: int = 6, rationale: bool = True):
     """Pairs of the user's notes that are deeply related yet UNLINKED — missing connections.

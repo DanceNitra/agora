@@ -240,6 +240,17 @@ async def _handle(app, text: str) -> None:
         await send("📊 _Reading the system's pulse…_")
         d = await asyncio.to_thread(_brain_get, "/api/v1/agent-os/brain/pulse?hours=4")
         await send((d or {}).get("report", "_No pulse available right now._"))
+    elif low.startswith(("reality ", "/reality ", "test ")):
+        import urllib.parse
+        claim = text.split(" ", 1)[1].strip()
+        await send("🌐 _Reality check — testing against real-world data…_")
+        d = await asyncio.to_thread(
+            _brain_get, "/api/v1/agent-os/brain/empirical-test?q=" + urllib.parse.quote(claim))
+        if d and d.get("verdict"):
+            from agora.execution.data_tool import format_empirical
+            await send(format_empirical(d))
+        else:
+            await send("_Could not run the reality check right now._")
     elif low in ("upgrades", "/upgrades", "self-upgrades"):
         await send("🔧 _Agora reflecting on its own mechanisms…_")
         d = await asyncio.to_thread(_brain_get, "/api/v1/agent-os/brain/self-upgrades")
