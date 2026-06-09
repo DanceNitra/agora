@@ -241,9 +241,9 @@ async def write_vault_note(request: Request):
         title=title, content=content,
         tags=body.get("tags") or ["agora", "consolidation"],
         agent_name=body.get("agent") or "Sage Mira")
-    # Compounding Flywheel: when an INSIGHT lands, register its falsifier as an open research question
-    # so the agents go test the insight's weak point — outputs become the next inputs.
-    if "insight" in (body.get("tags") or []):
+    # Compounding Flywheel: when an INSIGHT or HYPOTHESIS lands, register its falsifier as an open
+    # research question so the agents go test the weak point — outputs become the next inputs.
+    if {"insight", "hypothesis"} & set(body.get("tags") or []):
         try:
             from agora.execution.flywheel import extract_falsifier, register_question
             fals = extract_falsifier(content)
