@@ -672,6 +672,52 @@ async def brain_memory_economy(n: int = 12):
             "report": format_economy(notes, cands)}
 
 
+@router.post("/brain/interview/ask")
+async def brain_interview_ask(request: Request):
+    """THE INTERVIEW — compose today's one highest-value question and ask the owner on
+    Telegram. Skips if an unanswered question is still fresh (no nagging)."""
+    import time as _t
+    from agora.config import settings
+    from agora.execution.interview import compose_question, open_question
+    oq = open_question()
+    if oq and _t.time() - oq.get("ts", 0) < 3 * 86400:
+        return {"status": "already_open", "question": oq}
+    vault = settings.vault_path or "C:/Users/Danculus/my-second-brain"
+    rec = await compose_question(vault)
+    await _send_telegram(f"💬 Agora asks ({rec['why']}):\n\n{rec['question']}\n\n"
+                         f"_reply:_ `answer <your answer>`")
+    return {"status": "asked", "question": rec}
+
+
+@router.post("/brain/interview/answer")
+async def brain_interview_answer(request: Request):
+    """Record the owner's answer and persist it as a first-class vault note — owner knowledge
+    flows back into the system (user model, semantic search, future syntheses)."""
+    from agora.execution.interview import record_answer
+    b = await request.json()
+    rec = record_answer(b.get("text") or "")
+    if not rec:
+        return {"status": "no_open_question"}
+    writer = getattr(request.app.state, "vault_writer", None)
+    path = None
+    if writer:
+        try:
+            path = await writer.write_note(
+                title=f"Interview: {rec['question'][:64]}",
+                content=(f"## Question (Agora)\n{rec['question']}\n\n## Answer (Rasto)\n"
+                         f"{rec['answer']}\n\n_Asked because: {rec.get('why', '')}_"),
+                tags=["agora", "interview", "owner-knowledge"], agent_name="Agora")
+        except Exception:
+            pass
+    return {"status": "answered", "question": rec, "note": path}
+
+
+@router.get("/brain/interview")
+async def brain_interview():
+    from agora.execution.interview import format_interview, _load
+    return {"status": "ok", "report": format_interview(), "items": _load()[-10:]}
+
+
 @router.post("/brain/vitals/snapshot")
 async def brain_vitals_snapshot(request: Request):
     """THE OBSERVATORY — take one vital-signs reading (dead-weight, link density, flywheel

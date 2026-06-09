@@ -342,6 +342,19 @@ async def _handle(app, text: str) -> None:
     elif low in ("actions", "/actions", "hands"):
         from agora.execution.hands import format_actions
         await send(format_actions())
+    elif low.startswith(("answer ", "/answer ")):
+        d = await asyncio.to_thread(_brain_post, "/api/v1/agent-os/brain/interview/answer",
+                                    {"text": text.split(" ", 1)[1].strip()})
+        st = (d or {}).get("status")
+        await send("✅ _Answer recorded — it's in your vault and feeds the user model._"
+                   if st == "answered" else "_No open question right now._")
+    elif low in ("interview", "/interview", "questions"):
+        d = await asyncio.to_thread(_brain_get, "/api/v1/agent-os/brain/interview")
+        await send((d or {}).get("report", "_No interview yet._"))
+    elif low in ("ask me", "/ask"):
+        d = await asyncio.to_thread(_brain_post, "/api/v1/agent-os/brain/interview/ask", {})
+        if (d or {}).get("status") == "already_open":
+            await send("_There's already an open question — see_ `interview`.")
     elif low in ("vitals", "/vitals", "health"):
         d = await asyncio.to_thread(_brain_get, "/api/v1/agent-os/brain/vitals")
         await send((d or {}).get("report", "_No vitals yet._"))

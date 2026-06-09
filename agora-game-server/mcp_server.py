@@ -1590,6 +1590,17 @@ async def _run_memory_economy() -> None:
         _mind_spark("#c9a14a")        # amber — the custodian governs
 
 
+async def _run_interview() -> None:
+    """THE INTERVIEW: once a day, ask the owner the single most valuable question (Telegram).
+    The brain skips it when an unanswered question is still fresh."""
+    d = await asyncio.to_thread(_brain_post_sync, "/api/v1/agent-os/brain/interview/ask",
+                                {}, 120)
+    if d and d.get("status") == "asked":
+        broadcast({"type": "os_build", "kind": "collab", "who": "King Aldric",
+                   "text": f"asked the owner: {d['question']['question'][:48]}"})
+        _mind_spark("#ff9ad1")        # pink — reaching toward the owner
+
+
 async def _run_vitals() -> None:
     """THE OBSERVATORY: take a vital-signs snapshot — the longitudinal ledger Agora's own
     falsifiers (dead-weight trend, closure latency, bridge signals) need to ever resolve."""
@@ -2315,6 +2326,9 @@ async def ambient_life():
         # THE OBSERVATORY — one vital-signs reading of the whole organism (~weekly offset).
         if loop_n % 448000 == 350000:
             asyncio.create_task(_run_vitals())
+        # THE INTERVIEW — ask the owner the one question Agora most needs answered (~daily).
+        if loop_n % 64000 == 47000:
+            asyncio.create_task(_run_interview())
 
         for eid, ent in list(ents.items()):
             cx, cy = int(round(ent.x)), int(round(ent.y))
