@@ -149,6 +149,15 @@ async def _handle(app, text: str) -> None:
                                     {"text": task})
         await send(f"📥 Task queued for *Claude Code* (#{(d or {}).get('id', '?')}). "
                    f"It'll pick this up on its next check and report back here.")
+    elif low.isdigit() and 1 <= int(low) <= 9:
+        # a bare number = pick that numbered self-upgrade proposal → Claude implements it
+        d = await asyncio.to_thread(_brain_post, "/api/v1/agent-os/brain/self-upgrades/pick",
+                                    {"n": int(low)})
+        if (d or {}).get("status") == "queued":
+            await send(f"✅ Got it — queued for *Claude Code*: implement *{d['title']}* (#{d['id']}). "
+                       f"I'll build it and report back here.")
+        else:
+            await send("_No numbered proposal to pick — run `upgrades` first._")
     elif low in ("status", "/status", "agents"):
         d = await asyncio.to_thread(_brain_get, "/api/v1/agent-os/brain/escalations")
         open_ = [e for e in (d or {}).get("escalations", []) if not e["resolved"]]
@@ -234,10 +243,9 @@ async def _handle(app, text: str) -> None:
         if not ups:
             await send("_No upgrade proposals right now._")
         else:
-            lines = ["🔧 *Agora proposes upgrades to itself:*\n"]
-            for u in ups:
-                lines.append(f"• *{u['title']}*\n  _{u.get('why', '')[:90]}_")
-            lines.append("\n_Reply `cc implement <which>` and Claude will build it._")
+            lines = ["🔧 *Agora proposes upgrades to itself — reply a number to build it:*\n"]
+            for i, u in enumerate(ups, 1):
+                lines.append(f"*{i}.* {u['title']}\n   _{u.get('why', '')[:90]}_")
             await send("\n".join(lines))
     elif low in ("/gaps", "gaps"):
         from agora.execution.semantic_index import SemanticIndex

@@ -355,20 +355,41 @@ async def current_directions():
     return {"directions": _DIRECTIONS.get("directions", []), "themes": _DIRECTIONS.get("themes", [])}
 
 
+_LAST_UPGRADES: list = []   # the last self-upgrade proposals (numbered) — pick one by replying its number
+
+
 @router.get("/brain/self-upgrades")
 async def brain_self_upgrades(request: Request, notify: bool = False):
     """Agora reflects on its OWN mechanisms + metrics and proposes concrete upgrades to ITSELF —
-    the recursive self-improvement loop. Claude Code reads these and implements the breakthrough ones.
+    the recursive self-improvement loop. NUMBERED so the user can reply a number to implement one.
     With notify=true, the proposals are pushed to Telegram (the recurring routine)."""
     from agora.execution.self_upgrade import propose_self_upgrades
+    global _LAST_UPGRADES
     d = await propose_self_upgrades(request.app.state.db)
-    if notify and d.get("upgrades"):
-        lines = ["🔧 *Agora proposes upgrades to itself:*\n"]
-        for u in d["upgrades"]:
-            lines.append(f"• *{u['title']}*\n  _{u.get('why', '')[:90]}_")
-        lines.append("\n_Reply `cc implement <which>` and Claude will build it._")
+    _LAST_UPGRADES = d.get("upgrades", [])
+    if notify and _LAST_UPGRADES:
+        lines = ["🔧 *Agora proposes upgrades to itself — reply a number to build it:*\n"]
+        for i, u in enumerate(_LAST_UPGRADES, 1):
+            lines.append(f"*{i}.* {u['title']}\n   _{u.get('why', '')[:90]}_")
         await _send_telegram("\n".join(lines))
     return {"status": "ok", **d}
+
+
+@router.post("/brain/self-upgrades/pick")
+async def pick_self_upgrade(request: Request):
+    """The user picked a numbered self-upgrade → queue it for Claude Code to implement."""
+    from agora.execution.claude_inbox import add_task
+    body = await request.json()
+    try:
+        n = int(body.get("n", 0))
+    except Exception:
+        n = 0
+    if not (1 <= n <= len(_LAST_UPGRADES)):
+        return {"status": "out-of-range", "count": len(_LAST_UPGRADES)}
+    u = _LAST_UPGRADES[n - 1]
+    tid = add_task(f"Implement Agora self-upgrade: {u['title']}. Why: {u.get('why', '')}. "
+                   f"How: {u.get('how', '')}")
+    return {"status": "queued", "id": tid, "title": u["title"]}
 
 
 @router.get("/brain/bridges")
@@ -462,10 +483,10 @@ _PLAN_META = ("build ", "together we", "draft ", "create a collaborative", "desi
 
 async def _build_morning_report(app) -> str:
     """Build the morning digest — only REAL grounded findings (plans/meta filtered) + gaps."""
-    from datetime import datetime, timezone
+    from datetime import datetime, timezone, timedelta
     db = app.state.db
     cur = await db.execute(
-        "SELECT content FROM collective_knowledge WHERE knowledge_type='discovery' "
+        "SELECT content, created_at FROM collective_knowledge WHERE knowledge_type='discovery' "
         "ORDER BY created_at DESC LIMIT 20")
     rows = await cur.fetchall()
     findings = []
@@ -475,7 +496,12 @@ async def _build_morning_report(app) -> str:
             continue
         if any(b in c.lower()[:45] for b in _PLAN_META):     # drop plans / meta-statements
             continue
-        findings.append(c)
+        try:                                                 # created_at is UTC; show local (UTC+2)
+            hhmm = (datetime.strptime(r["created_at"], "%Y-%m-%d %H:%M:%S")
+                    + timedelta(hours=2)).strftime("%H:%M")
+        except Exception:
+            hhmm = "--:--"
+        findings.append((hhmm, c))
         if len(findings) >= 5:
             break
     from agora.execution.semantic_index import SemanticIndex
@@ -487,9 +513,9 @@ async def _build_morning_report(app) -> str:
     day = datetime.now(timezone.utc).strftime("%Y-%m-%d")
     lines = [f"☀️ *Agora — morning report* ({day})", ""]
     if findings:
-        lines.append("🔬 *Overnight — grounded findings:*")
-        for f in findings:
-            lines.append(f"• {f[:200]}")
+        lines.append("🔬 *Overnight — grounded findings (newest first, local time):*")
+        for hhmm, f in findings:
+            lines.append(f"`{hhmm}` {f[:190]}")
         lines.append("")
     if gaps:
         lines.append("🎯 *Your gaps (the agents are aiming here):*")
@@ -504,7 +530,16 @@ async def _build_morning_report(app) -> str:
             icon = "🛠️" if x.get("kind") == "upgrade" else "🔬"
             lines.append(f"{icon} {x['title']}")
         lines.append("")
-    lines.append("_Text a question · `directions` · `gaps` · `report` · `status`_")
+    # How often the dungeon had questions — for you (escalations) and for Claude (inbox tasks), 24h.
+    import time
+    from agora.execution.claude_inbox import _load
+    day_ago = time.time() - 86400
+    esc_24h = sum(1 for e in _ESCALATIONS.values() if e.get("ts", 0) > day_ago)
+    open_esc = sum(1 for e in _ESCALATIONS.values() if not e.get("resolved") and e.get("ts", 0) > day_ago)
+    inbox_24h = sum(1 for t in _load() if t.get("ts", 0) > day_ago)
+    lines.append(f"❓ *Questions (24h):* you {esc_24h} (escalations, {open_esc} open) · "
+                 f"Claude {inbox_24h} (tasks)")
+    lines.append("\n_Text a question · `directions` · `upgrades` · `status` · reply a number to build an upgrade_")
     return "\n".join(lines)
 
 
