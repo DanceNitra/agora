@@ -1700,7 +1700,7 @@ async def ambient_life():
         # Sage Mira (Curator) consolidates live discoveries into vault notes — each gated
         # by their OWN standing, on offset cadences.
         if (loop_n % 70 == 7 or loop_n % 110 == 50 or loop_n % 130 == 90
-                or loop_n % 1000 == 300):
+                or loop_n % 17000 == 300):
             _stm = _compute_standing(await _trust_matrix())
             if loop_n % 70 == 7 and not curation["running"]:        # Elara: connect links
                 asyncio.create_task(_run_curation("guard_r", _stm.get("guard_r", 0.5)))
@@ -1708,7 +1708,7 @@ async def ambient_life():
                 asyncio.create_task(_run_curation("guard_l", _stm.get("guard_l", 0.5), "duplicates"))
             if loop_n % 110 == 50 and not consolidation["running"]:  # Mira: consolidate digest
                 asyncio.create_task(_run_consolidation("scholar", _stm.get("scholar", 0.5)))
-            if loop_n % 1000 == 300 and not orchestration["running"]:  # Aldric: doctrine + GitHub (~14 min)
+            if loop_n % 17000 == 300 and not orchestration["running"]:  # Aldric: doctrine + GitHub (~4 h)
                 asyncio.create_task(_run_orchestration("king", _stm.get("king", 0.5)))
 
         # Morning report → Telegram, once per day after 07:00 local.

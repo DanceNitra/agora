@@ -95,6 +95,10 @@ def merge(base_tree_sha: str | None, dir_rel: str) -> str:
             sub_sha = sub[2] if (sub and sub[1] == "tree") else None
             result[name] = ("040000", "tree", merge(sub_sha, rel))
         elif full.is_file():
+            # AutoLinker pending/report files are regenerated every cycle (working artifacts) and
+            # caused 600+/600- line churn commits — never push their changes (keep base, skip new).
+            if name.startswith(("autolinker_pending_", "autolinker_report_")):
+                continue
             if rel in MODIFIED or name not in base:
                 blob = hash_file(rel)
                 if blob:
