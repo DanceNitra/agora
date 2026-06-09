@@ -1404,6 +1404,96 @@ async def _pending_task_themes(prefix: str) -> list[set[str]]:
             if t.get("text", "").startswith(prefix)]
 
 
+# ── THE WATCHDOG (dungeon side): keep the BRAIN alive — mirror of server watchdog.py ──
+_wd_state = {"misses": 0, "restarts": [], "muted_until": 0.0}
+_SERVER_DIR = str(Path(__file__).resolve().parent.parent / "server")
+
+
+def _wd_should_restart(state: dict, now: float, window: int = 3600, max_restarts: int = 3) -> bool:
+    state["restarts"] = [t for t in state["restarts"] if now - t < window]
+    return len(state["restarts"]) < max_restarts
+
+
+def _wd_kill_brain() -> int:
+    killed = 0
+    try:
+        import psutil
+        for p in psutil.process_iter(["cmdline", "name"]):
+            try:
+                cmd = " ".join(p.info.get("cmdline") or [])
+                if ("uvicorn" in cmd or "agora.main" in cmd) \
+                        and "python" in (p.info.get("name") or "").lower() and " -c " not in cmd:
+                    p.kill()
+                    killed += 1
+            except Exception:
+                continue
+    except Exception:
+        pass
+    return killed
+
+
+def _wd_start_brain() -> bool:
+    try:
+        env = dict(os.environ)
+        env["PYTHONPATH"] = "."
+        env["PYTHONUNBUFFERED"] = "1"
+        flags = 0x08000008          # DETACHED_PROCESS | CREATE_NO_WINDOW
+        with open(Path(_SERVER_DIR) / "_brain.err", "ab") as err:
+            subprocess.Popen([sys.executable, "-m", "uvicorn", "agora.main:app",
+                              "--host", "127.0.0.1", "--port", "8000"],
+                             cwd=_SERVER_DIR, env=env, creationflags=flags, stderr=err)
+        return True
+    except Exception:
+        return False
+
+
+def _wd_alert(text: str) -> None:
+    """Telegram alert straight from the dungeon (the brain may be the thing that's down)."""
+    try:
+        tok = chat = ""
+        for line in (Path(_SERVER_DIR) / ".env").read_text(encoding="utf-8").splitlines():
+            if line.startswith("HERMES_TELEGRAM_BOT_TOKEN="):
+                tok = line.split("=", 1)[1].strip()
+            elif line.startswith("HERMES_TELEGRAM_CHAT_ID="):
+                chat = line.split("=", 1)[1].strip()
+        if tok and chat:
+            from urllib.parse import urlencode
+            req = _urlreq.Request(f"https://api.telegram.org/bot{tok}/sendMessage",
+                                  data=urlencode({"chat_id": chat,
+                                                  "text": "🐶 Watchdog: " + text}).encode())
+            _urlreq.urlopen(req, timeout=15).read()
+    except Exception:
+        pass
+
+
+async def _watch_brain() -> None:
+    """One supervision beat (~5 min cadence): two consecutive misses → restart the brain;
+    crash-loop guard (3/hour) → back off + alert the owner instead of thrashing."""
+    up = bool(await asyncio.to_thread(
+        _brain_get_sync, "/api/v1/vault-company/org-chart", 10))
+    if up:
+        _wd_state["misses"] = 0
+        return
+    _wd_state["misses"] += 1
+    if _wd_state["misses"] < 2:
+        return
+    now = _time.time()
+    if not _wd_should_restart(_wd_state, now):
+        if now > _wd_state["muted_until"]:
+            await asyncio.to_thread(_wd_alert,
+                                    "brain is DOWN and in a crash loop — backing off, needs a human.")
+            _wd_state["muted_until"] = now + 3600
+        _wd_state["misses"] = 0
+        return
+    await asyncio.to_thread(_wd_kill_brain)
+    ok = await asyncio.to_thread(_wd_start_brain)
+    _wd_state["restarts"].append(now)
+    _wd_state["misses"] = 0
+    broadcast({"type": "os_build", "kind": "collab", "who": "Sergeant Voss",
+               "text": "watchdog: the brain was down — restarted it"})
+    await asyncio.to_thread(_wd_alert, f"brain was down — restarted it ({'ok' if ok else 'START FAILED'}).")
+
+
 _attn_cache: dict = {"policy": {}, "fetched": 0.0}
 
 
@@ -2497,6 +2587,9 @@ async def ambient_life():
         # THE DESK — lay out the owner's working context for today (~daily, morning-ish offset).
         if loop_n % 64000 == 36000:
             asyncio.create_task(_run_desk())
+        # THE WATCHDOG — keep the brain alive (one supervision beat ~every 5 min).
+        if loop_n % 220 == 117:
+            asyncio.create_task(_watch_brain())
 
         for eid, ent in list(ents.items()):
             cx, cy = int(round(ent.x)), int(round(ent.y))

@@ -606,6 +606,11 @@ async def lifespan(app: FastAPI):
         loop.create_task(poll_loop(app))           # two-way Telegram command center
     except Exception as _e:
         print(f"[Telegram] poller not started: {_e}")
+    try:
+        from agora.execution.watchdog import watch_dungeon_forever
+        loop.create_task(watch_dungeon_forever())  # the brain keeps the dungeon alive
+    except Exception as _e:
+        print(f"[Watchdog] not started: {_e}")
     yield
     if hasattr(app.state, 'db') and app.state.db:
         await app.state.db.close()
