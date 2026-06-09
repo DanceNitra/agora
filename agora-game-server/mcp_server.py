@@ -1241,6 +1241,17 @@ async def _run_verification() -> None:
                    "text": f"verified + incorporated {inc} finding(s) into the vault"})
 
 
+async def _run_promotion() -> None:
+    """Promote the best recent findings into the vault through the quality gate (~every 20 min) —
+    the RELIABLE research→vault funnel so the Obsidian second-brain actually grows (verification
+    incorporates ~0, so this is what keeps real notes flowing in)."""
+    d = await asyncio.to_thread(_brain_post_sync, "/api/v1/agent-os/brain/promote-findings?n=3", {})
+    p = (d or {}).get("promoted", 0)
+    if p:
+        broadcast({"type": "os_build", "kind": "collab", "who": "Sage Mira",
+                   "text": f"promoted {p} grounded finding(s) into the vault"})
+
+
 async def _run_harvest() -> None:
     """Aldric harvests recent findings into NEXT DIRECTIONS (research questions + system upgrades)
     so the work compounds — directions are surfaced to the user and seed the agents' next quests."""
@@ -1827,6 +1838,10 @@ async def ambient_life():
         # Voss autonomously fact-checks recent findings and incorporates the VERIFIED ones (~6 min).
         if loop_n % 450 == 200:
             asyncio.create_task(_run_verification())
+        # Mira promotes the best grounded findings into the vault via the quality gate (~20 min) —
+        # the reliable research→vault funnel so the second-brain actually grows.
+        if loop_n % 1500 == 700:
+            asyncio.create_task(_run_promotion())
         # Aldric harvests findings into next directions (~13 min) — work compounds toward them.
         if loop_n % 950 == 600:
             asyncio.create_task(_run_harvest())

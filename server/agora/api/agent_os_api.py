@@ -241,6 +241,47 @@ async def write_vault_note(request: Request):
     return {"status": "written", "path": path, "score": q["score"]}
 
 
+_PROMOTED: set = set()   # finding titles already promoted to the vault (avoid duplicates)
+
+
+@router.post("/brain/promote-findings")
+async def promote_findings(request: Request, n: int = 3):
+    """Promote the best recent findings into the vault through the (reliable) quality gate — the
+    research→vault path that actually flows. Verification incorporates ~0 (too strict), so without
+    this, grounded findings pile up only in the brain and never reach the Obsidian second-brain."""
+    from agora.execution.quality_gate import assess_quality
+    db = request.app.state.db
+    writer = getattr(request.app.state, "vault_writer", None)
+    if not writer:
+        return {"status": "no-writer", "promoted": 0}
+    cur = await db.execute(
+        "SELECT title, content FROM collective_knowledge WHERE knowledge_type='discovery' "
+        "ORDER BY created_at DESC LIMIT 40")
+    rows = await cur.fetchall()
+    promoted, checked = [], 0
+    for r in rows:
+        if len(promoted) >= n:
+            break
+        title = (r["title"] or "").strip()
+        content = (r["content"] or "").strip()
+        tl = title.lower()
+        if (title in _PROMOTED or len(content) < 160 or "Source:" not in content
+                or tl.count("hypothesize on:") >= 2 or tl.count("pursue direction:") >= 2):
+            continue
+        _PROMOTED.add(title)
+        checked += 1
+        q = await assess_quality(title, content)
+        if not q["pass"]:
+            continue
+        try:
+            await writer.write_note(title=title[:70], content=content,
+                                    tags=["agora", "research"], agent_name="Sage Mira")
+            promoted.append(title[:50])
+        except Exception:
+            pass
+    return {"status": "ok", "promoted": len(promoted), "checked": checked, "titles": promoted}
+
+
 _VERIFIED: set = set()   # finding titles already fact-checked (so we work through the backlog)
 
 
