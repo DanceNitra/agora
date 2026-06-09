@@ -1777,6 +1777,28 @@ async def _queue_canon_update() -> None:
     _mind_spark("#ffd27a")        # gold — the book rewrites itself
 
 
+async def _run_contradiction_sweep() -> None:
+    """CONTRADICTION SWEEP: judge close note pairs for incompatibility, then feed the top open
+    contradiction into the dialectic pipeline (thesis/antithesis/synthesis resolves it)."""
+    d = await asyncio.to_thread(_brain_post_sync, "/api/v1/agent-os/brain/contradictions/scan",
+                                {}, 240)
+    if d and d.get("found"):
+        broadcast({"type": "os_build", "kind": "discovery", "who": "Sergeant Voss",
+                   "text": f"contradiction sweep: found {d['found']} place(s) where the vault "
+                           "disagrees with itself"})
+        _mind_spark("#ff9a9a")
+    od = await asyncio.to_thread(_brain_get_sync, "/api/v1/agent-os/brain/contradictions", 30)
+    for c in (od or {}).get("open", [])[:1]:
+        if c.get("claim") and not await _task_already_pending("Dialectic:"):
+            await asyncio.to_thread(_brain_post_sync, "/api/v1/agent-os/brain/claude-inbox",
+                                    {"text": f"Dialectic: {c['claim'][:120]}"})
+            await asyncio.to_thread(_brain_post_sync,
+                                    "/api/v1/agent-os/brain/contradictions/status",
+                                    {"id": c["id"], "status": "queued"})
+            broadcast({"type": "os_build", "kind": "collab", "who": "Sergeant Voss",
+                       "text": f"queued the contradiction for dialectic resolution: {c['claim'][:38]}"})
+
+
 async def _queue_belief_challenge() -> None:
     """BELIEF REVISION: the challenge sweep — pick the belief longest without a test and have
     Claude actively try to kill it. Survived beliefs harden; failed ones get revised or buried."""
@@ -2575,6 +2597,9 @@ async def ambient_life():
         # BELIEF REVISION — challenge the belief longest without a test (~2 days).
         if loop_n % 128000 == 90000:
             asyncio.create_task(_queue_belief_challenge())
+        # CONTRADICTION SWEEP — find where the vault disagrees with itself (~2 days, offset).
+        if loop_n % 128000 == 60000:
+            asyncio.create_task(_run_contradiction_sweep())
         # THE CANON — when enough new artifacts landed, queue the living-book merge (~2 days).
         if loop_n % 128000 == 30000:
             asyncio.create_task(_queue_canon_update())

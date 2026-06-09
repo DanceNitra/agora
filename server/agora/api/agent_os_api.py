@@ -672,6 +672,29 @@ async def brain_memory_economy(n: int = 12):
             "report": format_economy(notes, cands)}
 
 
+@router.post("/brain/contradictions/scan")
+async def brain_contradictions_scan(request: Request):
+    """CONTRADICTION SWEEP — judge the closest unjudged note pairs for incompatibility."""
+    from agora.config import settings
+    from agora.execution.contradictions import sweep
+    vault = settings.vault_path or "C:/Users/Danculus/my-second-brain"
+    return await sweep(vault)
+
+
+@router.get("/brain/contradictions")
+async def brain_contradictions():
+    from agora.execution.contradictions import format_contradictions, open_contradictions
+    return {"status": "ok", "report": format_contradictions(), "open": open_contradictions()}
+
+
+@router.post("/brain/contradictions/status")
+async def brain_contradictions_status(request: Request):
+    from agora.execution.contradictions import set_status
+    b = await request.json()
+    set_status(b.get("id") or "", b.get("status") or "open")
+    return {"status": "ok"}
+
+
 @router.get("/brain/desk")
 async def brain_desk(request: Request, q: str = "", notify: bool = False, note: bool = False):
     """THE DESK — lay out the owner's working context (his notes + fresh papers + open
