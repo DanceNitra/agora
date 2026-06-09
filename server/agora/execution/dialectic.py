@@ -52,6 +52,26 @@ async def run_dialectic(claim: str, vault_path: str) -> dict:
             "based_on": [h["title"] for h in hits]}
 
 
+async def gather_dialectic_inputs(claim: str, vault_path: str) -> dict:
+    """Gather the vault + literature on a claim WITHOUT running the (weak) flash dialectic — so Claude
+    Opus produces the thesis/antithesis/synthesis itself, for quality."""
+    from agora.execution.semantic_index import SemanticIndex
+    from agora.execution.research_tool import research, format_for_prompt
+    si = SemanticIndex()
+    hits = si.search(claim, 5) if si.ready else []
+    root = Path(vault_path)
+    snips = []
+    for h in hits:
+        try:
+            txt = (root / h["path"]).read_text(encoding="utf-8", errors="replace")
+            snips.append(f"- [{h['title']}] {txt[:300]}")
+        except Exception:
+            pass
+    papers = await asyncio.to_thread(research, claim[:100], 5)
+    return {"claim": claim, "vault": "\n".join(snips)[:1600],
+            "literature": format_for_prompt(papers)[:1600]}
+
+
 def format_dialectic(d: dict) -> str:
     if not d.get("synthesis"):
         return f"⚖️ Couldn't run the dialectic on _{d.get('claim', '')[:50]}_."

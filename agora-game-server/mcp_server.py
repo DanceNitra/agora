@@ -1374,16 +1374,33 @@ async def _run_predictions() -> None:
     if n:
         broadcast({"type": "os_build", "kind": "collab", "who": "Sergeant Voss",
                    "text": f"resolved {n} prediction(s) against reality"})
+    # Queue a NEW prediction for CLAUDE to make (reasoned, high-quality — the flash forecast is weak).
     dd = await asyncio.to_thread(_brain_get_sync, "/api/v1/agent-os/brain/directions/current")
     pool = [d["title"] for d in (dd or {}).get("directions", []) if d.get("title")]
     pool += [g["title"] for g in (await _brain_gaps())]
     if pool:
         theme = _strip_quest_prefix(random.choice(pool))
-        d = await asyncio.to_thread(
-            _brain_get_sync, f"/api/v1/agent-os/brain/predict?q={_urlquote(theme[:80])}", 60)
-        if d and d.get("direction"):
-            broadcast({"type": "os_build", "kind": "collab", "who": "Shadow Kael",
-                       "text": f"predicted {d['direction']} {d.get('metric_label', '')} for {theme[:30]}"})
+        await asyncio.to_thread(_brain_post_sync, "/api/v1/agent-os/brain/claude-inbox",
+                                {"text": f"Predict: {theme[:80]}"})
+        broadcast({"type": "os_build", "kind": "collab", "who": "Shadow Kael",
+                   "text": f"queued a prediction for Claude: {theme[:35]}"})
+
+
+async def _queue_dialectic() -> None:
+    """Queue a contentious claim for CLAUDE to run the dialectic on (quality thesis/antithesis/
+    synthesis — the flash version is weak). Picks a flywheel falsifier or a harvest direction."""
+    fw = await asyncio.to_thread(_brain_get_sync, "/api/v1/agent-os/brain/flywheel/questions?n=4")
+    claims = [q["question"] for q in (fw or {}).get("open", [])]
+    if not claims:
+        dd = await asyncio.to_thread(_brain_get_sync, "/api/v1/agent-os/brain/directions/current")
+        claims = [d["title"] for d in (dd or {}).get("directions", []) if d.get("title")]
+    if not claims:
+        return
+    claim = random.choice(claims)
+    await asyncio.to_thread(_brain_post_sync, "/api/v1/agent-os/brain/claude-inbox",
+                            {"text": f"Dialectic: {claim[:120]}"})
+    broadcast({"type": "os_build", "kind": "collab", "who": "Sergeant Voss",
+               "text": f"queued a claim for Claude to stress-test (dialectic): {claim[:30]}"})
 
 
 async def _broadcast_trust_graph():
@@ -1966,9 +1983,12 @@ async def ambient_life():
         # Flywheel — queue an insight's falsifier for Claude to re-test + deepen (~4 h, offset).
         if loop_n % 17000 == 9000:
             asyncio.create_task(_queue_deepening())
-        # Prediction Ledger — resolve due predictions vs reality + record a new one (~2 h).
+        # Prediction Ledger — resolve due predictions vs reality + queue a new one for Claude (~2 h).
         if loop_n % 9000 == 2500:
             asyncio.create_task(_run_predictions())
+        # Dialectic — queue a contentious claim for Claude to stress-test (~5 h, offset).
+        if loop_n % 19000 == 7000:
+            asyncio.create_task(_queue_dialectic())
 
         for eid, ent in list(ents.items()):
             cx, cy = int(round(ent.x)), int(round(ent.y))

@@ -91,6 +91,38 @@ async def make_prediction(theme: str, horizon_days: int = 14) -> dict:
     return pred
 
 
+async def gather_prediction_baseline(theme: str) -> dict:
+    """The current real-world metrics for a theme WITHOUT the (weak) flash forecast — so Claude Opus
+    makes the reasoned prediction itself, for quality."""
+    from agora.execution.data_tool import fetch_hackernews, fetch_github, fetch_pubmed
+    hn, gh, pm = (await asyncio.to_thread(fetch_hackernews, theme),
+                  await asyncio.to_thread(fetch_github, theme),
+                  await asyncio.to_thread(fetch_pubmed, theme))
+    baselines = {"hackernews_stories": int(hn.get("total_stories_ever", 0) or 0),
+                 "github_repos": int(gh.get("total_repos", 0) or 0),
+                 "pubmed_papers": int(pm.get("paper_count", 0) or 0)}
+    metric = max(baselines, key=lambda k: baselines[k])
+    return {"theme": theme, "metric": metric, "metric_label": _METRIC_LABEL[metric],
+            "baseline": baselines[metric], "all_baselines": baselines}
+
+
+def record_prediction(theme: str, metric: str, baseline: int, direction: str,
+                      confidence: float, why: str, horizon_days: int = 14) -> dict:
+    """Store a prediction MADE BY CLAUDE (reasoned, high-quality) into the ledger."""
+    pred = {"id": uuid.uuid4().hex[:8], "theme": theme[:120], "metric": metric,
+            "metric_label": _METRIC_LABEL.get(metric, metric), "baseline": int(baseline),
+            "all_baselines": {metric: int(baseline)},
+            "direction": str(direction).upper().strip()[:5] if str(direction).upper().strip()[:4] in
+            ("UP", "DOWN", "FLAT") else "FLAT",
+            "confidence": max(0.0, min(1.0, float(confidence))), "why": why[:240], "by": "claude",
+            "made_ts": time.time(), "resolve_ts": time.time() + horizon_days * 86400,
+            "horizon_days": horizon_days, "status": "pending"}
+    preds = _load()
+    preds.append(pred)
+    _save(preds)
+    return pred
+
+
 async def resolve_due(force: bool = False) -> list:
     """Re-fetch each due prediction's metric and resolve it correct/incorrect (the accountability)."""
     preds = _load()

@@ -659,6 +659,33 @@ async def brain_dialectic(q: str):
     return {"status": "ok", **await run_dialectic(q, vault)}
 
 
+@router.get("/brain/dialectic-inputs")
+async def brain_dialectic_inputs(q: str):
+    """Gather vault + literature on a claim so CLAUDE produces the dialectic (quality, not flash)."""
+    from agora.config import settings
+    from agora.execution.dialectic import gather_dialectic_inputs
+    vault = settings.vault_path or "C:/Users/Danculus/my-second-brain"
+    return {"status": "ok", **await gather_dialectic_inputs(q, vault)}
+
+
+@router.get("/brain/predict-baseline")
+async def brain_predict_baseline(q: str):
+    """Current real-world metrics for a theme so CLAUDE makes the reasoned prediction (quality)."""
+    from agora.execution.prediction_ledger import gather_prediction_baseline
+    return {"status": "ok", **await gather_prediction_baseline(q)}
+
+
+@router.post("/brain/predict-record")
+async def brain_predict_record(request: Request):
+    """Record a CLAUDE-made prediction (reasoned, high-quality) into the ledger."""
+    from agora.execution.prediction_ledger import record_prediction
+    b = await request.json()
+    return {"status": "ok", **record_prediction(
+        b.get("theme", ""), b.get("metric", "hackernews_stories"), int(b.get("baseline", 0)),
+        b.get("direction", "FLAT"), float(b.get("confidence", 0.6)), b.get("why", ""),
+        int(b.get("horizon_days", 14)))}
+
+
 @router.get("/brain/program/start")
 async def brain_program_start(q: str):
     """RESEARCH PROGRAMS — decompose a big question into sub-questions the agents pursue (directed science)."""
