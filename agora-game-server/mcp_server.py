@@ -1349,6 +1349,7 @@ async def _queue_insight_theme() -> None:
                             {"text": f"Synthesize insight: {theme}"})
     broadcast({"type": "os_build", "kind": "collab", "who": "High Priest Orin",
                "text": f"queued a theme for Claude to synthesize: {theme[:40]}"})
+    _mind_spark("#b89bff")        # violet — a new insight forms
 
 
 async def _queue_deepening() -> None:
@@ -1384,6 +1385,7 @@ async def _run_predictions() -> None:
                                 {"text": f"Predict: {theme[:80]}"})
         broadcast({"type": "os_build", "kind": "collab", "who": "Shadow Kael",
                    "text": f"queued a prediction for Claude: {theme[:35]}"})
+        _mind_spark("#8fd3ff")        # cyan — a forecast cast forward
 
 
 async def _queue_dialectic() -> None:
@@ -1410,6 +1412,7 @@ async def _queue_mind_reflection() -> None:
                             {"text": "Reflect: state of mind"})
     broadcast({"type": "os_build", "kind": "collab", "who": "King Aldric",
                "text": "queued a metacognitive reflection for Claude (the Agora Mind)"})
+    _mind_spark("#ffd27a", "explosion")        # gold — the mind reflects on itself
 
 
 async def _queue_learning() -> None:
@@ -1420,6 +1423,16 @@ async def _queue_learning() -> None:
                             {"text": "Learn from outcomes"})
     broadcast({"type": "os_build", "kind": "collab", "who": "Sergeant Voss",
                "text": "queued a track-record review for Claude (the Learning Loop)"})
+    _mind_spark("#9affc0")        # green — a lesson learned
+
+
+def _mind_spark(color: str = "#b89bff", kind: str = "explosion") -> None:
+    """A burst of light at the throne — the Mind — when Agora has a cognitive moment. Visible thought.
+    insight=violet · prediction=cyan · reflection=gold · learning=green · heartbeat=dim violet."""
+    try:
+        broadcast({"type": "effect_added", "data": {"type": kind, "x": 12, "y": 2, "color": color}})
+    except Exception:
+        pass
 
 
 async def _broadcast_mind_state() -> None:
@@ -1445,6 +1458,7 @@ async def _broadcast_mind_state() -> None:
                "lessons": len(lessons_lines),
                "flywheel_open": (mi.get("flywheel", {}) or {}).get("open", 0),
                "lesson": (lessons_lines[0].lstrip("- ")[:80] if lessons_lines else "")})
+    _mind_spark("#6a5a98", "spark")        # a soft heartbeat — the mind is alive
 
 
 async def _broadcast_trust_graph():
