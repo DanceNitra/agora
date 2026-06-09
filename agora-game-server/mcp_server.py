@@ -1299,6 +1299,33 @@ async def _run_pulse() -> None:
     broadcast({"type": "os_build", "kind": "collab", "who": "Agora", "text": "sent a Pulse report"})
 
 
+async def _run_reality_check() -> None:
+    """REALITY BRIDGE in the loop — High Priest Orin tests a recent finding's claim against REAL-WORLD
+    DATA (Hacker News / Wikipedia / World Bank), making the agents empirical scientists, not just
+    literature synthesizers. Posts a 'Reality:' finding ONLY when real data actually bears on the claim
+    (SUPPORTED/REFUTED/MIXED); skips INSUFFICIENT so it stays signal, not noise."""
+    fd = await asyncio.to_thread(_brain_get_sync, "/api/v1/agent-os/brain/collective?limit=12")
+    finds = [k for k in (fd or {}).get("knowledge", [])
+             if len(k.get("content") or "") > 120 and not (k.get("title") or "").startswith("Reality:")]
+    if not finds:
+        return
+    k = random.choice(finds)
+    body = (k.get("content") or "").split("Source:")[0].strip()
+    claim = re.split(r"(?<=[.!?])\s", body)[0][:160]     # the finding's first sentence = its claim
+    if len(claim) < 25:
+        return
+    d = await asyncio.to_thread(
+        _brain_get_sync, f"/api/v1/agent-os/brain/empirical-test?q={_urlquote(claim)}")
+    verdict = (d or {}).get("verdict")
+    if verdict not in ("SUPPORTED", "REFUTED", "MIXED"):
+        return                                            # INSUFFICIENT / no data → don't pollute
+    content = (f"Reality check ({verdict}): {claim} — {d.get('evidence', '')} "
+               f"[empirical, real data via {d.get('source')}]")
+    await _brain_contribute("priest", f"Reality: {claim[:60]}", content[:430])
+    broadcast({"type": "os_build", "kind": "collab", "who": "High Priest Orin",
+               "text": f"reality-tested a finding: {verdict} (vs {d.get('source')})"})
+
+
 async def _broadcast_trust_graph():
     """One unified graph for the dungeon: ESS pairwise trust + learning (teach) edges +
     each agent's standing — persisted so the trust-weighted curator (AutoLinker) can read it."""
@@ -1870,6 +1897,9 @@ async def ambient_life():
         # Pulse — a plain-language visibility report to Telegram (~every 3 h, offset from the rest).
         if loop_n % 11000 == 5000:
             asyncio.create_task(_run_pulse())
+        # Reality Bridge — Orin empirically tests a recent finding vs real-world data (~12 min).
+        if loop_n % 850 == 350:
+            asyncio.create_task(_run_reality_check())
 
         for eid, ent in list(ents.items()):
             cx, cy = int(round(ent.x)), int(round(ent.y))
