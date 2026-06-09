@@ -672,6 +672,29 @@ async def brain_memory_economy(n: int = 12):
             "report": format_economy(notes, cands)}
 
 
+@router.get("/brain/desk")
+async def brain_desk(request: Request, q: str = "", notify: bool = False, note: bool = False):
+    """THE DESK — lay out the owner's working context (his notes + fresh papers + open
+    questions) for what he's actually working on. Deterministic gathering, no LLM."""
+    from agora.config import settings
+    from agora.execution.desk import compose_desk, format_desk, desk_note
+    vault = settings.vault_path or "C:/Users/Danculus/my-second-brain"
+    d = await compose_desk(vault, q.strip())
+    report = format_desk(d)
+    if notify and d.get("topic"):
+        await _send_telegram(report)
+    path = None
+    writer = getattr(request.app.state, "vault_writer", None)
+    if note and d.get("topic") and writer:
+        try:
+            path = await writer.write_note(
+                title=f"Desk: {d['topic'][:60]}", content=desk_note(d),
+                tags=["agora", "desk"], agent_name="Agora")
+        except Exception:
+            pass
+    return {"status": "ok", "report": report, "note": path, **d}
+
+
 @router.post("/brain/attention/report")
 async def brain_attention_report(request: Request):
     """ATTENTION ECONOMY — a trigger reports whether its run yielded anything."""

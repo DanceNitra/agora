@@ -395,6 +395,13 @@ async def _handle(app, text: str) -> None:
         g = (d or {}).get("gap")
         await send(f"🔨 Gap registered `{g['id']}` — the Forge will queue it for a build."
                    if g else "_Already on record (or too short)._")
+    elif low.startswith(("desk ", "/desk ")) or low in ("desk", "/desk"):
+        import urllib.parse as _up
+        topic = text.split(" ", 1)[1].strip() if " " in text else ""
+        await send("🗂 _Laying out your desk…_")
+        d = await asyncio.to_thread(_brain_get,
+                                    "/api/v1/agent-os/brain/desk?q=" + _up.quote(topic))
+        await send((d or {}).get("report", "_Couldn't lay out the desk._"))
     elif low in ("attention", "/attention"):
         d = await asyncio.to_thread(_brain_get, "/api/v1/agent-os/brain/attention")
         await send((d or {}).get("report", "_No attention data._"))

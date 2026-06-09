@@ -1635,6 +1635,16 @@ async def _run_memory_economy() -> None:
         _mind_spark("#c9a14a")        # amber — the custodian governs
 
 
+async def _run_desk() -> None:
+    """THE DESK: lay out the owner's working context for whatever he touched most recently —
+    his notes, fresh papers, the open questions that touch it (Telegram + a Desk vault note)."""
+    d = await asyncio.to_thread(_brain_get_sync,
+                                "/api/v1/agent-os/brain/desk?notify=true&note=true", 120)
+    if d and d.get("topic"):
+        broadcast({"type": "os_build", "kind": "collab", "who": "Sage Mira",
+                   "text": f"laid out the owner's desk: {d['topic'][:42]}"})
+
+
 async def _run_forge() -> None:
     """CAPABILITY FORGE: scan the system's failure traces for capability gaps, then queue the
     oldest open gap for Claude to close with the smallest new organ (tested, like any upgrade)."""
@@ -2484,6 +2494,9 @@ async def ambient_life():
         # CAPABILITY FORGE — scan failure traces for gaps + queue the top one (~weekly offset).
         if loop_n % 448000 == 180000:
             asyncio.create_task(_run_forge())
+        # THE DESK — lay out the owner's working context for today (~daily, morning-ish offset).
+        if loop_n % 64000 == 36000:
+            asyncio.create_task(_run_desk())
 
         for eid, ent in list(ents.items()):
             cx, cy = int(round(ent.x)), int(round(ent.y))
