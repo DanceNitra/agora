@@ -600,7 +600,29 @@ async def brain_resolve_predictions(force: bool = False):
     """Re-fetch due predictions' real-world metrics and resolve them correct/incorrect."""
     from agora.execution.prediction_ledger import resolve_due, calibration
     resolved = await resolve_due(force)
-    return {"status": "ok", "resolved": len(resolved), "calibration": calibration()}
+    return {"status": "ok", "resolved": len(resolved), "calibration": calibration(),
+            "records": [{"theme": p.get("theme"), "actual": p.get("actual"),
+                         "status": p.get("status"), "by": p.get("by", ""),
+                         "calls": p.get("calls", [])} for p in resolved]}
+
+
+@router.post("/brain/predict-tournament")
+async def brain_predict_tournament(request: Request):
+    """FORECASTING TOURNAMENT — every agent persona calls the same theme; each builds a personal
+    track record and (dungeon-side) accuracy feeds standing. Reputation follows truth."""
+    from agora.execution.prediction_ledger import run_tournament
+    b = await request.json()
+    theme = (b.get("theme") or "").strip()
+    if not theme:
+        return {"status": "empty"}
+    return await run_tournament(theme, int(b.get("horizon_days", 14)))
+
+
+@router.get("/brain/agent-forecasts")
+async def brain_agent_forecasts():
+    """Per-agent forecasting track record (resolved tournament calls)."""
+    from agora.execution.prediction_ledger import agent_scores
+    return {"status": "ok", "scores": agent_scores()}
 
 
 @router.get("/brain/flywheel/questions")

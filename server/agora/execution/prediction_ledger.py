@@ -91,13 +91,90 @@ async def make_prediction(theme: str, horizon_days: int = 14) -> dict:
     return pred
 
 
+# ── The Forecasting Tournament: every agent calls the same theme; trust follows truth ──
+_FORECASTERS = {
+    "Kael":   "Shadow Kael, the Research Scout — drawn to the new; leans into emerging signals.",
+    "Mira":   "Sage Mira, the Knowledge Curator — conservative; trusts established base rates.",
+    "Orin":   "High Priest Orin, the Idea Alchemist — contrarian; looks for the consensus to be wrong.",
+    "Aldric": "King Aldric, the Engineering Lead — pragmatic; weighs base size and momentum only.",
+    "Elara":  "Dame Elara, the Bridge Builder — integrative; reads the cross-domain spillovers.",
+    "Voss":   "Sergeant Voss, Quality Assurance — skeptical; demands strong evidence before calling a move.",
+}
+
+
+async def run_tournament(theme: str, horizon_days: int = 14) -> dict:
+    """Every agent makes its OWN call on the same theme (one labeled-text flash call for all six).
+    Stored as a single ledger record with per-agent calls; resolve_due scores each agent, and the
+    dungeon blends each agent's hit-rate into its standing — reputation follows truth."""
+    from agora.execution.llm_client import call_llm
+    base = await gather_prediction_baseline(theme)
+
+    def _one_call(name: str, persona: str) -> dict | None:
+        # one tiny labeled-text call per agent — flash returns EMPTY on anything bigger
+        raw = call_llm(
+            f"You are {persona} Forecast the metric's move over {horizon_days} days. "
+            "Reply EXACTLY one line: DIRECTION CONFIDENCE  (e.g. 'UP 70'). "
+            "DIRECTION is UP, DOWN or FLAT. Nothing else.",
+            f"THEME: {theme}\nMETRIC: {base['metric_label']} = {base['baseline']} now",
+            "cheap", 0.6, 150) or ""        # >=120: flash spends tokens reasoning before output
+        m = re.search(r"\b(UP|DOWN|FLAT)\b\s*(\d+)?", raw, re.I)
+        if not m:
+            return None
+        return {"agent": name, "direction": m.group(1).upper(),
+                "confidence": min(100, int(m.group(2) or 60)) / 100}
+
+    results = await asyncio.gather(
+        *[asyncio.to_thread(_one_call, n, p) for n, p in _FORECASTERS.items()])
+    calls = [c for c in results if c]
+    if len(calls) < 3:          # flash returned junk — don't store a hollow tournament
+        return {"status": "skipped", "reason": "fewer than 3 parseable calls"}
+    dirs = [c["direction"] for c in calls]
+    majority = max(set(dirs), key=dirs.count)
+    pred = {"id": uuid.uuid4().hex[:8], "theme": theme[:120], "metric": base["metric"],
+            "metric_label": base["metric_label"], "baseline": int(base["baseline"]),
+            "all_baselines": base["all_baselines"], "direction": majority,
+            "confidence": round(sum(c["confidence"] for c in calls if c["direction"] == majority)
+                                / max(1, dirs.count(majority)), 2),
+            "why": "tournament majority", "by": "tournament", "calls": calls,
+            "made_ts": time.time(), "resolve_ts": time.time() + horizon_days * 86400,
+            "horizon_days": horizon_days, "status": "pending"}
+    preds = _load()
+    preds.append(pred)
+    _save(preds)
+    return {"status": "ok", **pred}
+
+
+def agent_scores() -> dict:
+    """Each agent's forecasting track record across resolved tournament calls."""
+    out = {n: {"total": 0, "correct": 0} for n in _FORECASTERS}
+    for p in _load():
+        actual = p.get("actual")
+        if p.get("status") not in ("correct", "incorrect") or not actual:
+            continue
+        for c in p.get("calls", []):
+            s = out.get(c.get("agent"))
+            if s is not None:
+                s["total"] += 1
+                s["correct"] += 1 if c.get("direction") == actual else 0
+    for n, s in out.items():
+        s["hit_rate"] = round(s["correct"] / s["total"], 3) if s["total"] else None
+    return out
+
+
 async def gather_prediction_baseline(theme: str) -> dict:
     """The current real-world metrics for a theme WITHOUT the (weak) flash forecast — so Claude Opus
     makes the reasoned prediction itself, for quality."""
     from agora.execution.data_tool import fetch_hackernews, fetch_github, fetch_pubmed
-    hn, gh, pm = (await asyncio.to_thread(fetch_hackernews, theme),
-                  await asyncio.to_thread(fetch_github, theme),
-                  await asyncio.to_thread(fetch_pubmed, theme))
+
+    def _safe(fetch):
+        # any single source may be transiently down (PubMed 500s happen) — degrade, don't fail
+        try:
+            return fetch(theme)
+        except Exception:
+            return {}
+    hn, gh, pm = (await asyncio.to_thread(_safe, fetch_hackernews),
+                  await asyncio.to_thread(_safe, fetch_github),
+                  await asyncio.to_thread(_safe, fetch_pubmed))
     baselines = {"hackernews_stories": int(hn.get("total_stories_ever", 0) or 0),
                  "github_repos": int(gh.get("total_repos", 0) or 0),
                  "pubmed_papers": int(pm.get("paper_count", 0) or 0)}

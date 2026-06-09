@@ -876,6 +876,10 @@ _AGENT_NAMES = {
     "king": "King Aldric", "guard_l": "Sergeant Voss", "guard_r": "Dame Elara",
     "priest": "High Priest Orin", "thief": "Shadow Kael", "scholar": "Sage Mira",
 }
+# Forecasting Tournament: ledger short name <-> dungeon eid; per-agent hit-rates cached here.
+_FORECASTER_EID = {"Kael": "thief", "Mira": "scholar", "Orin": "priest",
+                   "Aldric": "king", "Elara": "guard_r", "Voss": "guard_l"}
+_forecast_scores: dict = {}     # eid -> {"total", "correct", "hit_rate"} (refreshed by _run_predictions)
 _trust_engine = None
 _trust_db = None
 
@@ -1013,11 +1017,12 @@ def _brain_get_sync(path: str, timeout: int = 4):
         return None
 
 
-def _brain_post_sync(path: str, body: dict):
+def _brain_post_sync(path: str, body: dict, timeout: int = 4):
+    # default 4s for the fast endpoints; pass a longer timeout for slow LLM endpoints.
     try:
         req = _urlreq.Request(_BRAIN_URL + path, data=json.dumps(body).encode(),
                               headers={"Content-Type": "application/json"})
-        with _urlreq.urlopen(req, timeout=4) as r:
+        with _urlreq.urlopen(req, timeout=timeout) as r:
             return json.loads(r.read())
     except Exception:
         return None
@@ -1230,15 +1235,23 @@ async def _brain_learning_graph() -> list[dict]:
 
 
 def _compute_standing(trust: list[dict]) -> dict:
-    """Each agent's reputation (0..1) = average pairwise ESS trust. This is the curation
-    authority: high standing → that agent's curation auto-applies to the vault."""
+    """Each agent's reputation (0..1): average pairwise ESS trust, BLENDED with its forecasting
+    hit-rate once it has resolved tournament calls (Forecasting Tournament — reputation follows
+    truth, not just cooperation). This is the curation authority."""
     acc = {e: [] for e in _AGENT_NAMES}
     for p in trust:
         if p["a"] in acc:
             acc[p["a"]].append(p["score"])
         if p["b"] in acc:
             acc[p["b"]].append(p["score"])
-    return {e: round(sum(v) / len(v), 3) if v else 0.5 for e, v in acc.items()}
+    out = {}
+    for e, v in acc.items():
+        s = sum(v) / len(v) if v else 0.5
+        fc = _forecast_scores.get(e) or {}
+        if fc.get("hit_rate") is not None:
+            s = 0.8 * s + 0.2 * fc["hit_rate"]
+        out[e] = round(s, 3)
+    return out
 
 
 _plan_fails: dict = {}    # eid -> consecutive planning failures (for escalation)
@@ -1439,14 +1452,33 @@ async def _queue_deepening() -> None:
                "text": f"queued an insight to deepen (flywheel): {q.get('origin', '')[:30]}"})
 
 
+async def _refresh_forecast_scores() -> None:
+    """Pull each agent's tournament track record into the standing blend (+ trust-graph nodes)."""
+    d = await asyncio.to_thread(_brain_get_sync, "/api/v1/agent-os/brain/agent-forecasts")
+    for name, sc in ((d or {}).get("scores") or {}).items():
+        eid = _FORECASTER_EID.get(name)
+        if eid:
+            _forecast_scores[eid] = sc
+
+
 async def _run_predictions() -> None:
     """The Accountable Mind: resolve any DUE predictions against current reality (score), then record
     a NEW falsifiable prediction on a current theme. Over time this builds Agora's track record."""
-    res = await asyncio.to_thread(_brain_post_sync, "/api/v1/agent-os/brain/resolve-predictions", {})
+    res = await asyncio.to_thread(_brain_post_sync, "/api/v1/agent-os/brain/resolve-predictions",
+                                  {}, 120)
     n = (res or {}).get("resolved", 0)
     if n:
         broadcast({"type": "os_build", "kind": "collab", "who": "Sergeant Voss",
                    "text": f"resolved {n} prediction(s) against reality"})
+        # Tournament outcomes: who called reality right? Accuracy flows into standing.
+        for rec in (res or {}).get("records", []):
+            for c in rec.get("calls", []):
+                ok = c.get("direction") == rec.get("actual")
+                nm = _AGENT_NAMES.get(_FORECASTER_EID.get(c.get("agent"), ""), c.get("agent"))
+                broadcast({"type": "os_build", "kind": "collab" if ok else "discovery", "who": nm,
+                           "text": f"called {c.get('direction')} on '{rec.get('theme', '')[:30]}' — "
+                                   f"{'CORRECT (+standing)' if ok else 'wrong (-standing)'}"})
+        await _refresh_forecast_scores()
     # Queue a NEW prediction for CLAUDE to make (reasoned, high-quality — the flash forecast is weak).
     dd = await asyncio.to_thread(_brain_get_sync, "/api/v1/agent-os/brain/directions/current")
     pool = [d["title"] for d in (dd or {}).get("directions", []) if d.get("title")]
@@ -1466,6 +1498,13 @@ async def _run_predictions() -> None:
         broadcast({"type": "os_build", "kind": "collab", "who": "Shadow Kael",
                    "text": f"queued a prediction for Claude: {theme[:35]}"})
         _mind_spark("#8fd3ff")        # cyan — a forecast cast forward
+        # FORECASTING TOURNAMENT: all six agents call the same theme (their accuracy → standing).
+        t = await asyncio.to_thread(_brain_post_sync, "/api/v1/agent-os/brain/predict-tournament",
+                                    {"theme": theme[:80]}, 120)
+        if t and t.get("calls"):
+            broadcast({"type": "os_build", "kind": "collab", "who": "King Aldric",
+                       "text": f"forecasting tournament: 6 agents called '{theme[:28]}' "
+                               f"(majority {t.get('direction')})"})
 
 
 async def _queue_dialectic() -> None:
@@ -1587,7 +1626,8 @@ async def _broadcast_trust_graph():
     trust = await _trust_matrix()                       # [{a,b,score}]  ESS, live
     learn = await _brain_learning_graph()               # [{from,to,skill}]  who teaches whom
     standing = _compute_standing(trust)                 # eid -> 0..1
-    nodes = [{"eid": e, "name": _AGENT_NAMES.get(e, e), "standing": standing.get(e, 0.5)}
+    nodes = [{"eid": e, "name": _AGENT_NAMES.get(e, e), "standing": standing.get(e, 0.5),
+              "forecast": (_forecast_scores.get(e) or {}).get("hit_rate")}
              for e in _AGENT_NAMES]
     broadcast({"type": "trust_graph", "nodes": nodes, "trust": trust, "learn": learn})
     try:
@@ -1703,6 +1743,7 @@ async def ambient_life():
     os_modules: list[dict] = []        # real structures agents have built into the OS
     loop_n = 0
     await _init_trust()
+    await _refresh_forecast_scores()        # tournament hit-rates feed the standing blend
     logger.info("LLM-driven life loop started")
 
     def remember(eid, text):
