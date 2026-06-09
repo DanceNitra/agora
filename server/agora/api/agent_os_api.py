@@ -375,6 +375,11 @@ async def verify_findings(request: Request, n: int = 4, incorporate: bool = True
             continue
         _VERIFIED.add(title)
         v = await verify_finding(title, content)
+        try:
+            from agora.execution.source_reliability import record as _src_record
+            _src_record(v.get("source", ""), v.get("verdict", ""))
+        except Exception:
+            pass
         if v["verdict"] == "INCONCLUSIVE":
             _VERIFIED.discard(title)        # not actually judged → allow a re-check later
             continue
@@ -555,7 +560,13 @@ async def brain_empirical_test(q: str):
     """REALITY BRIDGE — test a claim against REAL-WORLD DATA from a free public API (Hacker News /
     Wikipedia / World Bank): route → fetch → judge. Empirical grounding beyond the paper literature."""
     from agora.execution.data_tool import empirical_test
-    return {"status": "ok", **await empirical_test(q)}
+    r = await empirical_test(q)
+    try:
+        from agora.execution.source_reliability import record as _src_record
+        _src_record(r.get("source", ""), r.get("verdict", ""))
+    except Exception:
+        pass
+    return {"status": "ok", **r}
 
 
 @router.get("/brain/insight")
@@ -575,8 +586,10 @@ async def brain_insight_inputs(q: str):
     synthesizing — so a stronger model (Claude Opus) can do the creative synthesis itself."""
     from agora.config import settings
     from agora.execution.insight_engine import gather_insight_inputs
+    from agora.execution.source_reliability import reliability_text
     vault = settings.vault_path or "C:/Users/Danculus/my-second-brain"
-    return {"status": "ok", **await gather_insight_inputs(q, vault)}
+    return {"status": "ok", "source_reliability": reliability_text(),
+            **await gather_insight_inputs(q, vault)}
 
 
 @router.get("/brain/predict")
@@ -670,6 +683,13 @@ async def brain_memory_economy(n: int = 12):
                    key=lambda x: (x["value"], -x["age_days"]))[:n]
     return {"status": "ok", "total": len(notes), "candidates": cands,
             "report": format_economy(notes, cands)}
+
+
+@router.get("/brain/source-reliability")
+async def brain_source_reliability():
+    """SOURCE RELIABILITY — how often each evidence source delivers a decisive verdict."""
+    from agora.execution.source_reliability import format_sources, weights
+    return {"status": "ok", "report": format_sources(), "weights": weights()}
 
 
 @router.post("/brain/contradictions/scan")
