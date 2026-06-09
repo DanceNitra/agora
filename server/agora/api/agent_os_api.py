@@ -803,6 +803,17 @@ async def brain_action_result(request: Request):
                                                   "done" if b.get("ok") else "failed", b.get("result", ""))}
 
 
+@router.get("/brain/now")
+async def brain_now():
+    """AGORA'S SENSES — perceive the live present in the user's own domains (current discussion + fresh
+    research). The vault is the past; this is the now."""
+    from agora.config import settings
+    from agora.execution.senses import sense_now, hottest_topic
+    vault = settings.vault_path or "C:/Users/Danculus/my-second-brain"
+    r = await sense_now(vault)
+    return {"status": "ok", "hottest": hottest_topic(r), **r}
+
+
 @router.get("/brain/bridges")
 async def brain_bridges(n: int = 6, rationale: bool = True):
     """Pairs of the user's notes that are deeply related yet UNLINKED — missing connections.

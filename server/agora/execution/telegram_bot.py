@@ -336,6 +336,11 @@ async def _handle(app, text: str) -> None:
         a = (d or {}).get("action")
         await send((f"✅ Approved `{aid}` — Agora will carry it out." if approve else f"🚫 Rejected `{aid}`.")
                    if a else f"_No action {aid}._")
+    elif low in ("now", "/now", "pulse", "world"):
+        await send("🌐 _Sensing what's live in your world…_")
+        d = await asyncio.to_thread(_brain_get, "/api/v1/agent-os/brain/now")
+        from agora.execution.senses import format_now
+        await send(format_now(d or {}))
     elif low in ("upgrades", "/upgrades", "self-upgrades"):
         await send("🔧 _Agora reflecting on its own mechanisms…_")
         d = await asyncio.to_thread(_brain_get, "/api/v1/agent-os/brain/self-upgrades")

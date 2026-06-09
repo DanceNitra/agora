@@ -1461,6 +1461,21 @@ async def _broadcast_mind_state() -> None:
     _mind_spark("#6a5a98", "spark")        # a soft heartbeat — the mind is alive
 
 
+async def _sense_and_queue() -> None:
+    """Agora's Senses feed cognition: perceive what's hottest in the user's world NOW and queue an
+    insight on it — so Agora thinks about the live present, not only the archived vault."""
+    now = await asyncio.to_thread(_brain_get_sync, "/api/v1/agent-os/brain/now", 45)
+    topic = (now or {}).get("hottest", "")
+    if not topic:
+        return
+    await asyncio.to_thread(
+        _brain_post_sync, "/api/v1/agent-os/brain/claude-inbox",
+        {"text": f"Synthesize insight: {topic[:90]} (what is live in the world right now)"})
+    broadcast({"type": "os_build", "kind": "discovery", "who": "Shadow Kael",
+               "text": f"sensed a live topic + queued it: {topic[:34]}"})
+    _mind_spark("#ff9ad1")        # pink — a perception from the outside world
+
+
 async def _broadcast_trust_graph():
     """One unified graph for the dungeon: ESS pairwise trust + learning (teach) edges +
     each agent's standing — persisted so the trust-weighted curator (AutoLinker) can read it."""
@@ -2056,6 +2071,9 @@ async def ambient_life():
         # The Mind HUD — make Agora's live cognition visible in the dungeon (~every 4 min).
         if loop_n % 300 == 60:
             asyncio.create_task(_broadcast_mind_state())
+        # Agora's Senses — perceive what's live in the user's world + queue an insight on it (~daily).
+        if loop_n % 64000 == 21000:
+            asyncio.create_task(_sense_and_queue())
 
         for eid, ent in list(ents.items()):
             cx, cy = int(round(ent.x)), int(round(ent.y))
