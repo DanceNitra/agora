@@ -100,6 +100,23 @@
   .os-line.k-curation  { color: #9fe0ff; }
   .os-line.flash { animation: osflash 1.1s ease-out; }
   @keyframes osflash { from { background: rgba(255,255,255,0.20); } to { background: transparent; } }
+  /* ── HUD: Agora's Mind (live cognition) ────────────────────── */
+  #hud-mind {
+    position: fixed; bottom: 12px; left: 50%; transform: translateX(-50%); z-index: 13;
+    width: 470px; max-width: 72vw; padding: 8px 13px; border-radius: 8px;
+    font-family: monospace; font-size: 11px; background: rgba(10,7,20,0.85);
+    border: 1px solid #4a3f72; pointer-events: none; backdrop-filter: blur(3px);
+    box-shadow: 0 0 22px rgba(130,95,210,0.16);
+  }
+  #hud-mind .hud-log-title { color: #b89bff; }
+  #hud-mind .wv { color: #ddd4fb; font-style: italic; margin-bottom: 6px; line-height: 1.4;
+    white-space: normal; }
+  #hud-mind .mind-stats { display: flex; gap: 15px; color: #948cba; font-size: 10px; flex-wrap: wrap; }
+  #hud-mind .mind-stats b { color: #d6cff0; font-weight: bold; }
+  #hud-mind .lesson { color: #8fd3ff; font-size: 10px; margin-top: 5px; opacity: .82;
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  #hud-mind.pulse { animation: mindpulse 1.4s ease-out; }
+  @keyframes mindpulse { from { box-shadow: 0 0 34px rgba(150,110,240,0.45); } to { box-shadow: 0 0 22px rgba(130,95,210,0.16); } }
 </style>
 </head>
 <body>
@@ -112,6 +129,7 @@
 <div id="hud-log"><div class="hud-log-title">⚔ EVENT LOG</div><div id="hud-log-lines"></div></div>
 <div id="hud-trust"><div class="hud-log-title">🤝 RELATIONSHIPS · ESS TRUST</div><div id="hud-trust-lines"><div id="hud-trust-empty">building bonds…</div></div></div>
 <div id="hud-os"><div class="hud-log-title">⚙ AGENTIC OS — BUILD LOG</div><div id="hud-os-lines"><div id="hud-os-empty">agents are starting to build…</div></div></div>
+<div id="hud-mind"><div class="hud-log-title">🧠 AGORA'S MIND — LIVE COGNITION</div><div class="wv" id="hud-mind-wv">awakening…</div><div class="mind-stats" id="hud-mind-stats"></div><div class="lesson" id="hud-mind-lesson"></div></div>
 
 <script type="importmap">
 {
@@ -918,6 +936,24 @@ if (!renderer.getContext()) {
     window.__moduleSpin = [];
   }
 
+  // Agora's Mind — renders the live cognitive state (worldview, predictions, lessons) into the HUD
+  const MindHUD = {
+    update(ev) {
+      const wv = document.getElementById('hud-mind-wv');
+      if (wv && ev.worldview) wv.textContent = ev.worldview;
+      const s = document.getElementById('hud-mind-stats');
+      if (s) s.innerHTML =
+          `<span>beliefs <b>${ev.beliefs ?? 0}</b></span>`
+        + `<span>predictions <b>${ev.predictions ?? 0}</b> · <b>${ev.hit_rate || '—'}</b> right</span>`
+        + `<span>lessons <b>${ev.lessons ?? 0}</b></span>`
+        + `<span>flywheel <b>${ev.flywheel_open ?? 0}</b> open</span>`;
+      const l = document.getElementById('hud-mind-lesson');
+      if (l) l.textContent = ev.lesson ? ('🎓 ' + ev.lesson) : '';
+      const box = document.getElementById('hud-mind');
+      if (box) { box.classList.remove('pulse'); void box.offsetWidth; box.classList.add('pulse'); }
+    }
+  };
+
   // Apply an incremental event broadcast by the server
   function applyEvent(ev) {
     HUD.onEvent(ev);
@@ -1000,6 +1036,9 @@ if (!renderer.getContext()) {
         break;
       case 'os_modules_snapshot':
         (ev.modules || []).forEach(m => buildModule(m.name, m.tile[0], m.tile[1], m.color));
+        break;
+      case 'mind_state':
+        MindHUD.update(ev);
         break;
     }
   }

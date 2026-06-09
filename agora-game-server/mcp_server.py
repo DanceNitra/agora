@@ -1422,6 +1422,31 @@ async def _queue_learning() -> None:
                "text": "queued a track-record review for Claude (the Learning Loop)"})
 
 
+async def _broadcast_mind_state() -> None:
+    """Make Agora's cognition VISIBLE in the dungeon — broadcast its live mind state to the HUD: the
+    worldview headline, prediction track-record, lessons learned, and open questions."""
+    mi = await asyncio.to_thread(_brain_get_sync, "/api/v1/agent-os/brain/mind-inputs", 30)
+    if not mi:
+        return
+    cal = mi.get("calibration", {}) or {}
+    wv = await asyncio.to_thread(_brain_get_sync, "/api/v1/agent-os/brain/worldview")
+    headline = ""
+    if wv and wv.get("worldview"):
+        # prefer the principle stated in the blockquote (> **...**); else the first bold claim
+        m = re.search(r">\s*\*\*(.+?)\*\*", wv["worldview"]) or re.search(r"\*\*(.+?)\*\*", wv["worldview"])
+        if m:
+            headline = re.sub(r"\s+", " ", re.sub(r"[*>#]", "", m.group(1))).strip()[:160]
+    lessons_lines = [ln for ln in (mi.get("lessons", "") or "").splitlines() if ln.strip()]
+    broadcast({"type": "mind_state",
+               "worldview": headline or "synthesizing a worldview…",
+               "beliefs": len(mi.get("beliefs", [])),
+               "predictions": cal.get("total", 0),
+               "hit_rate": (f"{cal['hit_rate']:.0%}" if cal.get("hit_rate") is not None else "—"),
+               "lessons": len(lessons_lines),
+               "flywheel_open": (mi.get("flywheel", {}) or {}).get("open", 0),
+               "lesson": (lessons_lines[0].lstrip("- ")[:80] if lessons_lines else "")})
+
+
 async def _broadcast_trust_graph():
     """One unified graph for the dungeon: ESS pairwise trust + learning (teach) edges +
     each agent's standing — persisted so the trust-weighted curator (AutoLinker) can read it."""
@@ -2014,6 +2039,9 @@ async def ambient_life():
         # The Learning Loop — review the track record + derive applied lessons (~daily, offset).
         if loop_n % 64000 == 9000:
             asyncio.create_task(_queue_learning())
+        # The Mind HUD — make Agora's live cognition visible in the dungeon (~every 4 min).
+        if loop_n % 300 == 60:
+            asyncio.create_task(_broadcast_mind_state())
 
         for eid, ent in list(ents.items()):
             cx, cy = int(round(ent.x)), int(round(ent.y))
