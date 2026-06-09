@@ -525,6 +525,30 @@ async def brain_insight_inputs(q: str):
     return {"status": "ok", **await gather_insight_inputs(q, vault)}
 
 
+@router.get("/brain/predict")
+async def brain_predict(q: str, horizon_days: int = 14):
+    """PREDICTION LEDGER — record a falsifiable forecast: the current real-world metric for a theme +
+    a prediction of its direction. The Reality Bridge resolves it later (the Accountable Mind)."""
+    from agora.execution.prediction_ledger import make_prediction
+    return {"status": "ok", **await make_prediction(q, horizon_days)}
+
+
+@router.get("/brain/predictions")
+async def brain_predictions():
+    """The prediction ledger + Agora's track record (hit-rate + calibration)."""
+    from agora.execution.prediction_ledger import _load, calibration, format_predictions
+    return {"status": "ok", "predictions": _load()[-20:], "calibration": calibration(),
+            "report": format_predictions(10)}
+
+
+@router.post("/brain/resolve-predictions")
+async def brain_resolve_predictions(force: bool = False):
+    """Re-fetch due predictions' real-world metrics and resolve them correct/incorrect."""
+    from agora.execution.prediction_ledger import resolve_due, calibration
+    resolved = await resolve_due(force)
+    return {"status": "ok", "resolved": len(resolved), "calibration": calibration()}
+
+
 @router.get("/brain/bridges")
 async def brain_bridges(n: int = 6, rationale: bool = True):
     """Pairs of the user's notes that are deeply related yet UNLINKED — missing connections.

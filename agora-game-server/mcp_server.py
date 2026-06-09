@@ -1345,6 +1345,26 @@ async def _queue_insight_theme() -> None:
                "text": f"queued a theme for Claude to synthesize: {theme[:40]}"})
 
 
+async def _run_predictions() -> None:
+    """The Accountable Mind: resolve any DUE predictions against current reality (score), then record
+    a NEW falsifiable prediction on a current theme. Over time this builds Agora's track record."""
+    res = await asyncio.to_thread(_brain_post_sync, "/api/v1/agent-os/brain/resolve-predictions", {})
+    n = (res or {}).get("resolved", 0)
+    if n:
+        broadcast({"type": "os_build", "kind": "collab", "who": "Sergeant Voss",
+                   "text": f"resolved {n} prediction(s) against reality"})
+    dd = await asyncio.to_thread(_brain_get_sync, "/api/v1/agent-os/brain/directions/current")
+    pool = [d["title"] for d in (dd or {}).get("directions", []) if d.get("title")]
+    pool += [g["title"] for g in (await _brain_gaps())]
+    if pool:
+        theme = _strip_quest_prefix(random.choice(pool))
+        d = await asyncio.to_thread(
+            _brain_get_sync, f"/api/v1/agent-os/brain/predict?q={_urlquote(theme[:80])}", 60)
+        if d and d.get("direction"):
+            broadcast({"type": "os_build", "kind": "collab", "who": "Shadow Kael",
+                       "text": f"predicted {d['direction']} {d.get('metric_label', '')} for {theme[:30]}"})
+
+
 async def _broadcast_trust_graph():
     """One unified graph for the dungeon: ESS pairwise trust + learning (teach) edges +
     each agent's standing — persisted so the trust-weighted curator (AutoLinker) can read it."""
@@ -1922,6 +1942,9 @@ async def ambient_life():
         # Insight Engine — Agora queues a rich theme for Claude Opus to synthesize (~3 h, premium).
         if loop_n % 13000 == 1100:
             asyncio.create_task(_queue_insight_theme())
+        # Prediction Ledger — resolve due predictions vs reality + record a new one (~2 h).
+        if loop_n % 9000 == 2500:
+            asyncio.create_task(_run_predictions())
 
         for eid, ent in list(ents.items()):
             cx, cy = int(round(ent.x)), int(round(ent.y))

@@ -262,6 +262,21 @@ async def _handle(app, text: str) -> None:
             await send(format_insight(d))
         else:
             await send("_Couldn't synthesize an insight right now (too little to connect, or LLM hiccup)._")
+    elif low.startswith(("predict ", "/predict ")):
+        import urllib.parse
+        theme = text.split(" ", 1)[1].strip()
+        await send("🔮 _Recording a falsifiable prediction…_")
+        d = await asyncio.to_thread(
+            _brain_get, "/api/v1/agent-os/brain/predict?q=" + urllib.parse.quote(theme))
+        if d and d.get("direction"):
+            await send(f"🔮 *Prediction:* {d['metric_label']} for _{theme[:50]}_ will go "
+                       f"*{d['direction']}* in {d['horizon_days']}d (conf {d['confidence']:.0%})\n"
+                       f"_{d.get('why', '')}_\n_baseline {d['baseline']} — resolves automatically_")
+        else:
+            await send("_Couldn't record a prediction right now._")
+    elif low in ("predictions", "/predictions", "ledger"):
+        d = await asyncio.to_thread(_brain_get, "/api/v1/agent-os/brain/predictions")
+        await send((d or {}).get("report", "_No predictions yet._"))
     elif low in ("upgrades", "/upgrades", "self-upgrades"):
         await send("🔧 _Agora reflecting on its own mechanisms…_")
         d = await asyncio.to_thread(_brain_get, "/api/v1/agent-os/brain/self-upgrades")
