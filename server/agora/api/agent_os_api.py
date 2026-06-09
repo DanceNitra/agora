@@ -268,6 +268,15 @@ async def promote_findings(request: Request, n: int = 3):
         if (title in _PROMOTED or len(content) < 160 or "Source:" not in content
                 or tl.count("hypothesize on:") >= 2 or tl.count("pursue direction:") >= 2):
             continue
+        # Citation rigor: reject a CLEAR citation mismatch — the in-text year differs from the cited
+        # Source paper's year (the finding likely cites the wrong paper). Only fires when both have a
+        # year, so consistent / year-less findings still pass (low false-positive).
+        import re as _re
+        _body, _, _src = content.partition("Source:")
+        _by = _re.search(r"\b(?:19|20)\d{2}\b", _body)
+        _sy = _re.search(r"\b(?:19|20)\d{2}\b", _src)
+        if _by and _sy and _by.group(0) != _sy.group(0):
+            continue
         _PROMOTED.add(title)
         checked += 1
         q = await assess_quality(title, content)
