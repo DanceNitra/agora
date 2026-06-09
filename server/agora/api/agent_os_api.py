@@ -589,8 +589,10 @@ async def brain_insight_inputs(q: str):
     from agora.config import settings
     from agora.execution.insight_engine import gather_insight_inputs
     from agora.execution.source_reliability import reliability_text
+    from agora.execution.board import priorities_text
     vault = settings.vault_path or "C:/Users/Danculus/my-second-brain"
     return {"status": "ok", "source_reliability": reliability_text(),
+            "owner_priorities": priorities_text(),
             **await gather_insight_inputs(q, vault)}
 
 
@@ -685,6 +687,29 @@ async def brain_memory_economy(n: int = 12):
                    key=lambda x: (x["value"], -x["age_days"]))[:n]
     return {"status": "ok", "total": len(notes), "candidates": cands,
             "report": format_economy(notes, cands)}
+
+
+@router.post("/brain/board/agenda")
+async def brain_board_agenda(request: Request):
+    """THE BOARD MEETING — prepare the weekly agenda and send it to the owner."""
+    from agora.execution.board import prepare_agenda, format_agenda
+    a = await prepare_agenda(request.app.state.db)
+    await _send_telegram(format_agenda(a))
+    return {"status": "ok", "agenda": a}
+
+
+@router.post("/brain/board/decide")
+async def brain_board_decide(request: Request):
+    """Record the owner's directives — they become standing priorities for all synthesis."""
+    from agora.execution.board import record_directives
+    b = await request.json()
+    return {"status": "ok", "agenda": record_directives(b.get("text") or "")}
+
+
+@router.get("/brain/board")
+async def brain_board():
+    from agora.execution.board import format_board, priorities_text
+    return {"status": "ok", "report": format_board(), "priorities": priorities_text()}
 
 
 @router.post("/brain/annals/today")
@@ -1209,7 +1234,9 @@ async def brain_predict_baseline(q: str):
     """Current real-world metrics for a theme so CLAUDE makes the reasoned prediction (quality)."""
     from agora.execution.prediction_ledger import gather_prediction_baseline
     from agora.execution.learning import lessons_text
-    return {"status": "ok", "lessons": lessons_text(), **await gather_prediction_baseline(q)}
+    from agora.execution.board import priorities_text
+    return {"status": "ok", "lessons": lessons_text(), "owner_priorities": priorities_text(),
+            **await gather_prediction_baseline(q)}
 
 
 @router.post("/brain/predict-record")
@@ -1261,8 +1288,10 @@ async def brain_mind_inputs():
     from agora.config import settings
     from agora.execution.mind import gather_mind_state
     from agora.execution.learning import lessons_text
+    from agora.execution.board import priorities_text
     vault = settings.vault_path or "C:/Users/Danculus/my-second-brain"
-    return {"status": "ok", "lessons": lessons_text(), **await gather_mind_state(vault)}
+    return {"status": "ok", "lessons": lessons_text(), "owner_priorities": priorities_text(),
+            **await gather_mind_state(vault)}
 
 
 @router.get("/brain/worldview")

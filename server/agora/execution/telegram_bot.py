@@ -412,6 +412,14 @@ async def _handle(app, text: str) -> None:
         d = await asyncio.to_thread(_brain_get, "/api/v1/agent-os/brain/canon")
         c = (d or {}).get("canon", "").strip()
         await send(("📖 " + c[:3400]) if c else "_No canon written yet._")
+    elif low.startswith(("board ", "/board ")):
+        d = await asyncio.to_thread(_brain_post, "/api/v1/agent-os/brain/board/decide",
+                                    {"text": text.split(" ", 1)[1].strip()})
+        await send("🏛 _Directives recorded — they now steer every synthesis until the next board._"
+                   if (d or {}).get("agenda") else "_Couldn't record directives._")
+    elif low in ("board", "/board"):
+        d = await asyncio.to_thread(_brain_get, "/api/v1/agent-os/brain/board")
+        await send((d or {}).get("report", "_No board yet._"))
     elif low in ("annals", "/annals", "diary"):
         d = await asyncio.to_thread(_brain_get, "/api/v1/agent-os/brain/annals")
         await send((d or {}).get("report", "_No annals._"))

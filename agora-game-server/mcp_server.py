@@ -1775,6 +1775,14 @@ async def _run_desk() -> None:
                    "text": f"laid out the owner's desk: {d['topic'][:42]}"})
 
 
+async def _run_board() -> None:
+    """THE BOARD MEETING: weekly agenda to the owner — his reply becomes standing priorities."""
+    d = await asyncio.to_thread(_brain_post_sync, "/api/v1/agent-os/brain/board/agenda", {}, 60)
+    if d and d.get("agenda"):
+        broadcast({"type": "os_build", "kind": "collab", "who": "King Aldric",
+                   "text": "board meeting: agenda sent to the owner"})
+
+
 async def _run_forge() -> None:
     """CAPABILITY FORGE: scan the system's failure traces for capability gaps, then queue the
     oldest open gap for Claude to close with the smallest new organ (tested, like any upgrade)."""
@@ -2664,6 +2672,9 @@ async def ambient_life():
         # CAPABILITY FORGE — scan failure traces for gaps + queue the top one (~weekly offset).
         if loop_n % 448000 == 180000:
             asyncio.create_task(_run_forge())
+        # THE BOARD MEETING — weekly agenda to the owner; directives steer all synthesis.
+        if loop_n % 448000 == 410000:
+            asyncio.create_task(_run_board())
         # THE DESK — lay out the owner's working context for today (~daily, morning-ish offset).
         if loop_n % 64000 == 36000:
             asyncio.create_task(_run_desk())
