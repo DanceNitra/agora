@@ -96,6 +96,27 @@ def fetch_crypto(query: str, **_) -> dict:
 # it works as code but CoinGecko's TLS chain fails to verify in this environment; re-add it once that
 # is resolved (or behind a verified SSL context). The three below verify cleanly and cover trends,
 # facts, and real statistics.
+def traction_check(topic: str, **_) -> dict:
+    """Real-world TRACTION of a topic via Hacker News — is it actively discussed right now? Always
+    returns a signal (the reliable fallback when a claim isn't directly testable): ACTIVE (lots of
+    recent discussion), EMERGING (some), or DORMANT (little/none)."""
+    d = fetch_hackernews(topic, n=20)
+    top = d.get("top", [])
+    total = d.get("total_stories_ever", 0)
+    recent = sum(1 for h in top if (h.get("date") or "") >= "2023")
+    points = sum((h.get("points") or 0) for h in top)
+    if total >= 50 and recent >= 2:
+        verdict = "ACTIVE"
+    elif total >= 5:
+        verdict = "EMERGING"
+    else:
+        verdict = "DORMANT"
+    ev = (f"{total} Hacker News stories ever, {recent} of the top {len(top)} since 2023, "
+          f"{points} combined points — real-world discussion of '{topic[:50]}'")
+    return {"source": "Hacker News (traction)", "verdict": verdict, "evidence": ev,
+            "mode": "traction", "data": d}
+
+
 SOURCES = {
     "hackernews": ("how much + how strongly a tech/idea topic is actually discussed online "
                    "(real story counts, points, comments)", fetch_hackernews),
@@ -156,13 +177,21 @@ async def empirical_test(claim: str) -> dict:
             pass
     if verdict not in ("SUPPORTED", "REFUTED", "MIXED", "INSUFFICIENT"):
         verdict = "INSUFFICIENT"
-    return {"claim": claim, "source": data.get("source"), "query": query,
+    if verdict == "INSUFFICIENT":
+        # the claim isn't directly testable against this data → fall back to the topic's real-world
+        # TRACTION (Hacker News always returns a signal), so every reality check yields something.
+        tr = await asyncio.to_thread(traction_check, query)
+        return {"claim": claim, "source": tr["source"], "query": query, "mode": "traction",
+                "verdict": tr["verdict"], "evidence": tr["evidence"], "data": tr["data"]}
+    return {"claim": claim, "source": data.get("source"), "query": query, "mode": "claim",
             "verdict": verdict, "evidence": evidence, "data": data}
 
 
 def format_empirical(r: dict) -> str:
-    icon = {"SUPPORTED": "✅", "REFUTED": "❌", "MIXED": "🟡", "INSUFFICIENT": "⚪"}
+    icon = {"SUPPORTED": "✅", "REFUTED": "❌", "MIXED": "🟡", "INSUFFICIENT": "⚪",
+            "ACTIVE": "🔥", "EMERGING": "🌱", "DORMANT": "💤"}
+    kind = "real-world traction" if r.get("mode") == "traction" else "vs real data"
     lines = [f"🌐 *Reality check* — _{r['claim'][:120]}_\n",
-             f"{icon.get(r['verdict'], '•')} *{r['verdict']}* (vs real data from {r['source']})",
+             f"{icon.get(r['verdict'], '•')} *{r['verdict']}* ({kind}, {r['source']})",
              f"_{r['evidence']}_"]
     return "\n".join(lines)

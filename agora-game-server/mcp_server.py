@@ -1002,10 +1002,12 @@ _BRAIN_ID = {   # dungeon entity → server/agora NPC UUID (names already aligne
 }
 
 
-def _brain_get_sync(path: str):
+def _brain_get_sync(path: str, timeout: int = 4):
+    # default 4s for the fast endpoints; pass a longer timeout for slow LLM endpoints
+    # (hypothesize, empirical-test) which otherwise always time out -> None.
     try:
         req = _urlreq.Request(_BRAIN_URL + path, headers={"Accept": "application/json"})
-        with _urlreq.urlopen(req, timeout=4) as r:
+        with _urlreq.urlopen(req, timeout=timeout) as r:
             return json.loads(r.read())
     except Exception:
         return None
@@ -1315,12 +1317,13 @@ async def _run_reality_check() -> None:
     if len(claim) < 25:
         return
     d = await asyncio.to_thread(
-        _brain_get_sync, f"/api/v1/agent-os/brain/empirical-test?q={_urlquote(claim)}")
+        _brain_get_sync, f"/api/v1/agent-os/brain/empirical-test?q={_urlquote(claim)}", 90)
     verdict = (d or {}).get("verdict")
-    if verdict not in ("SUPPORTED", "REFUTED", "MIXED"):
-        return                                            # INSUFFICIENT / no data → don't pollute
+    if not verdict or verdict == "INSUFFICIENT":
+        return                                            # no signal at all → don't pollute
+    mode = "real-world traction" if (d or {}).get("mode") == "traction" else "empirical"
     content = (f"Reality check ({verdict}): {claim} — {d.get('evidence', '')} "
-               f"[empirical, real data via {d.get('source')}]")
+               f"[{mode}, via {d.get('source')}]")
     await _brain_contribute("priest", f"Reality: {claim[:60]}", content[:430])
     broadcast({"type": "os_build", "kind": "collab", "who": "High Priest Orin",
                "text": f"reality-tested a finding: {verdict} (vs {d.get('source')})"})
@@ -1381,7 +1384,7 @@ async def _hypothesis_discovery(eid: str, topic: str) -> None:
     # strip any stacked quest/finding prefix down to the real topic (shared, loop-peeling stripper)
     t = _strip_quest_prefix(topic)
     d = await asyncio.to_thread(
-        _brain_get_sync, f"/api/v1/agent-os/brain/hypothesize?q={_urlquote(t[:100])}")
+        _brain_get_sync, f"/api/v1/agent-os/brain/hypothesize?q={_urlquote(t[:100])}", 75)
     if not d or not d.get("hypothesis"):
         await _grounded_discovery(eid, topic)            # fall back to a grounded finding
         return
