@@ -342,6 +342,9 @@ async def _handle(app, text: str) -> None:
     elif low in ("actions", "/actions", "hands"):
         from agora.execution.hands import format_actions
         await send(format_actions())
+    elif low in ("vitals", "/vitals", "health"):
+        d = await asyncio.to_thread(_brain_get, "/api/v1/agent-os/brain/vitals")
+        await send((d or {}).get("report", "_No vitals yet._"))
     elif low in ("economy", "/economy", "memory economy"):
         await send("🏛 _Auditing the memory economy (a minute)…_")
         d = await asyncio.to_thread(_brain_get, "/api/v1/agent-os/brain/memory-economy")

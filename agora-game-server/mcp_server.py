@@ -1590,6 +1590,20 @@ async def _run_memory_economy() -> None:
         _mind_spark("#c9a14a")        # amber — the custodian governs
 
 
+async def _run_vitals() -> None:
+    """THE OBSERVATORY: take a vital-signs snapshot — the longitudinal ledger Agora's own
+    falsifiers (dead-weight trend, closure latency, bridge signals) need to ever resolve."""
+    d = await asyncio.to_thread(_brain_post_sync, "/api/v1/agent-os/brain/vitals/snapshot",
+                                {}, 240)
+    s = (d or {}).get("snapshot")
+    if s:
+        broadcast({"type": "os_build", "kind": "collab", "who": "Sergeant Voss",
+                   "text": f"vital signs recorded: {s['vault_notes']} notes, "
+                           f"dead-weight {s['dead_weight_frac']:.1%}, "
+                           f"flywheel {s['flywheel_open']} open"})
+        _mind_spark("#9affc0", "spark")        # green — self-measurement heartbeat
+
+
 async def _queue_hypothesis_induction() -> None:
     """HYPOTHESIS INDUCTION: when a coherent cross-agent finding cluster exists, queue it for
     Claude to unify into ONE falsifiable hypothesis (the falsifier auto-registers in the
@@ -2298,6 +2312,9 @@ async def ambient_life():
         # HYPOTHESIS INDUCTION — bridge a finding cluster into a testable conjecture (~8 h).
         if loop_n % 22000 == 15000:
             asyncio.create_task(_queue_hypothesis_induction())
+        # THE OBSERVATORY — one vital-signs reading of the whole organism (~weekly offset).
+        if loop_n % 448000 == 350000:
+            asyncio.create_task(_run_vitals())
 
         for eid, ent in list(ents.items()):
             cx, cy = int(round(ent.x)), int(round(ent.y))

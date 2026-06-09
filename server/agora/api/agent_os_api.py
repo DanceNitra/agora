@@ -672,6 +672,23 @@ async def brain_memory_economy(n: int = 12):
             "report": format_economy(notes, cands)}
 
 
+@router.post("/brain/vitals/snapshot")
+async def brain_vitals_snapshot(request: Request):
+    """THE OBSERVATORY — take one vital-signs reading (dead-weight, link density, flywheel
+    latency, exam, hit-rate, findings). Agora's own falsifiers demanded this ledger."""
+    from agora.config import settings
+    from agora.execution.observatory import take_snapshot
+    vault = settings.vault_path or "C:/Users/Danculus/my-second-brain"
+    return {"status": "ok", "snapshot": await take_snapshot(request.app.state.db, vault)}
+
+
+@router.get("/brain/vitals")
+async def brain_vitals(n: int = 12):
+    """The vital-signs time series + a formatted report."""
+    from agora.execution.observatory import series, format_vitals
+    return {"status": "ok", "series": series(n), "report": format_vitals()}
+
+
 @router.get("/brain/hypothesis-inputs")
 async def brain_hypothesis_inputs(request: Request):
     """HYPOTHESIS INDUCTION — one coherent cross-agent cluster of recent findings, as raw
