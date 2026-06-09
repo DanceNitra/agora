@@ -1335,6 +1335,48 @@ async def _run_reality_check() -> None:
                "text": f"reality-tested a finding: {verdict} (vs {d.get('source')})"})
 
 
+_THEME_STOP = frozenset({
+    "the", "and", "for", "with", "what", "when", "where", "from", "into", "under", "over",
+    "this", "that", "your", "their", "does", "have", "between", "about", "toward", "towards",
+    "agora", "vault", "research", "knowledge", "insight", "note", "notes",
+})
+
+
+def _theme_words(text: str) -> set[str]:
+    """Significant, lightly-stemmed words of a theme (or note slug) for overlap matching."""
+    return {w.rstrip("s") for w in re.findall(r"[a-z]+", text.lower())
+            if len(w) > 3 and w not in _THEME_STOP}
+
+
+def _covered_insight_themes() -> list[set[str]]:
+    """Word-sets of every insight already in the vault — the frontmatter title when readable
+    (the slugified filename is truncated at ~60 chars), else the filename."""
+    vault = os.environ.get("AGORA_VAULT_PATH", "C:/Users/Danculus/my-second-brain")
+    notes = Path(vault) / "04 Resources" / "Concepts" / "Agora Agents"
+    out = []
+    try:
+        for p in notes.rglob("insight*.md"):
+            text = p.stem.replace("-", " ")
+            try:
+                for line in p.read_text(encoding="utf-8", errors="ignore")[:600].splitlines():
+                    if line.startswith("title:"):
+                        text = line[6:]
+                        break
+            except Exception:
+                pass
+            out.append(_theme_words(text))
+    except Exception:
+        pass
+    return out
+
+
+def _theme_is_covered(theme: str, covered: list[set[str]]) -> bool:
+    """A theme is covered when an existing insight shares >=2 and >=half of its significant words."""
+    tw = _theme_words(theme)
+    return bool(tw) and any(len(tw & cw) >= 2 and len(tw & cw) >= 0.5 * len(tw)
+                            for cw in covered)
+
+
 async def _queue_insight_theme() -> None:
     """Insight Engine workflow: Agora GATHERS + QUEUES a rich theme; Claude Opus SYNTHESIZES it when
     active (the flash model is too weak for the synthesis). Picks a theme from the user's harvest
@@ -1343,6 +1385,18 @@ async def _queue_insight_theme() -> None:
     pool = [d["title"] for d in (dd or {}).get("directions", []) if d.get("title")]
     pool += [g["title"] for g in (await _brain_gaps())]
     if not pool:
+        return
+    # DEDUP: drop themes that already have a vault insight or a pending 'Synthesize insight:' task
+    # (blind re-queueing produced duplicate backlogs Claude had to editorial-skip).
+    covered = await asyncio.to_thread(_covered_insight_themes)
+    inbox = await asyncio.to_thread(_brain_get_sync, "/api/v1/agent-os/brain/claude-inbox")
+    covered += [_theme_words(t.get("text", "").split(":", 1)[1])
+                for t in (inbox or {}).get("pending", [])
+                if t.get("text", "").startswith("Synthesize insight:")]
+    pool = [t for t in pool if not _theme_is_covered(t, covered)]
+    if not pool:
+        broadcast({"type": "os_build", "kind": "collab", "who": "High Priest Orin",
+                   "text": "every candidate theme already has an insight — nothing new to queue"})
         return
     theme = random.choice(pool)
     await asyncio.to_thread(_brain_post_sync, "/api/v1/agent-os/brain/claude-inbox",
