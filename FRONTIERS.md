@@ -42,6 +42,21 @@
 > - **21 Agent Mastery** (`b16d986`): verification verdicts attributed to contributors;
 >   standing now blends trust + forecast accuracy + mastery. Telegram `mastery`.
 >
+> **Wave 6 — time, computation, society (all SHIPPED 2026-06-10 early):**
+> - **22 Night Shift** (`c982490`): nightly memory consolidation — full vault re-embed
+>   (FIXED a silent defect: the index never rebuilt, fresh notes were unsearchable),
+>   retrieval-log trim, bridge application. First run: 5685 notes, 4.1 min.
+> - **23 Laboratory** (`73b0b21`): simulation as the third evidence channel — Claude-written
+>   scripts, deterministic runner (60s cap), ledgered with source "simulation". Loop A16.
+>   First result: the vault value distribution is bimodal (1227@4 vs 2845@8).
+> - **24 Annals** (`e9047cd`): deterministic daily chronicle from real traces + Sunday Claude
+>   retrospective (A17). First chronicle: 2026-06-09 (20+ commits, 25 artifacts).
+> - **25 Board Meeting** (`1e303a8`): weekly agenda → owner directives become STANDING
+>   PRIORITIES injected into mind/insight/predict inputs. Telegram `board <text>`.
+> - **26 Salon** (`3bc0364`): 8 live-verified external feeds (Willison, Gelman, ACX, Quanta,
+>   Interconnects, MR, Lil'Log, Appleton); one contestable claim a day into the dialectic.
+>   First salon dialectic shipped (Willison on Apple Intelligence).
+>
 > Future-wave ideas parked: deeper Mind Chamber, calendar OAuth, more Hands action kinds,
 > within-owner randomized OS-assistance experiment (the dossier's tier-3 attack).
 
