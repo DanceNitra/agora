@@ -103,12 +103,18 @@ def call_llm(
         if response_format:
             kwargs["response_format"] = response_format
 
-        # Retry loop per model (rate limit backoff)
-        for attempt in range(2):
+        # Retry loop per model (rate-limit backoff + intermittent empty-completion retry)
+        for attempt in range(3):
             try:
                 client = _get_client(api_key, base_url)
                 resp = client.chat.completions.create(**kwargs)
                 content = resp.choices[0].message.content or ""
+
+                # deepseek-v4-flash intermittently returns an empty completion (finish=stop,
+                # no error) — retry a couple times before giving up on this call.
+                if not content.strip() and attempt < 2:
+                    time.sleep(0.4)
+                    continue
 
                 # Log successful fallback (so we know when it happens)
                 if errors:

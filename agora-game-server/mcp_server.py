@@ -1251,6 +1251,17 @@ async def _run_harvest() -> None:
                    "text": f"charted {len(dirs)} next directions from recent findings"})
 
 
+async def _run_self_reflection() -> None:
+    """Recurring self-improvement: Agora reflects on its OWN mechanisms and Telegrams upgrade
+    proposals for Claude (and the user) to implement — the OS critiquing + improving itself."""
+    d = await asyncio.to_thread(
+        _brain_get_sync, "/api/v1/agent-os/brain/self-upgrades?notify=true")
+    ups = (d or {}).get("upgrades", [])
+    if ups:
+        broadcast({"type": "os_build", "kind": "collab", "who": "Agora",
+                   "text": f"proposed {len(ups)} upgrades to itself"})
+
+
 async def _broadcast_trust_graph():
     """One unified graph for the dungeon: ESS pairwise trust + learning (teach) edges +
     each agent's standing — persisted so the trust-weighted curator (AutoLinker) can read it."""
@@ -1812,6 +1823,9 @@ async def ambient_life():
         # Aldric harvests findings into next directions (~13 min) — work compounds toward them.
         if loop_n % 950 == 600:
             asyncio.create_task(_run_harvest())
+        # Agora reflects on itself and Telegrams upgrade proposals (~3 h) — recurring self-improvement.
+        if loop_n % 13000 == 800:
+            asyncio.create_task(_run_self_reflection())
 
         for eid, ent in list(ents.items()):
             cx, cy = int(round(ent.x)), int(round(ent.y))

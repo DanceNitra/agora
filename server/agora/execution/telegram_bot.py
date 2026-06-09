@@ -227,6 +227,18 @@ async def _handle(app, text: str) -> None:
         d = await asyncio.to_thread(_brain_get, "/api/v1/agent-os/brain/directions?n=14")
         from agora.execution.harvest import format_directions
         await send(format_directions(d or {}))
+    elif low in ("upgrades", "/upgrades", "self-upgrades"):
+        await send("🔧 _Agora reflecting on its own mechanisms…_")
+        d = await asyncio.to_thread(_brain_get, "/api/v1/agent-os/brain/self-upgrades")
+        ups = (d or {}).get("upgrades", [])
+        if not ups:
+            await send("_No upgrade proposals right now._")
+        else:
+            lines = ["🔧 *Agora proposes upgrades to itself:*\n"]
+            for u in ups:
+                lines.append(f"• *{u['title']}*\n  _{u.get('why', '')[:90]}_")
+            lines.append("\n_Reply `cc implement <which>` and Claude will build it._")
+            await send("\n".join(lines))
     elif low in ("/gaps", "gaps"):
         from agora.execution.semantic_index import SemanticIndex
         si = SemanticIndex()

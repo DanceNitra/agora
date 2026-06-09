@@ -356,11 +356,19 @@ async def current_directions():
 
 
 @router.get("/brain/self-upgrades")
-async def brain_self_upgrades(request: Request):
+async def brain_self_upgrades(request: Request, notify: bool = False):
     """Agora reflects on its OWN mechanisms + metrics and proposes concrete upgrades to ITSELF —
-    the recursive self-improvement loop. Claude Code reads these and implements the breakthrough ones."""
+    the recursive self-improvement loop. Claude Code reads these and implements the breakthrough ones.
+    With notify=true, the proposals are pushed to Telegram (the recurring routine)."""
     from agora.execution.self_upgrade import propose_self_upgrades
-    return {"status": "ok", **await propose_self_upgrades(request.app.state.db)}
+    d = await propose_self_upgrades(request.app.state.db)
+    if notify and d.get("upgrades"):
+        lines = ["🔧 *Agora proposes upgrades to itself:*\n"]
+        for u in d["upgrades"]:
+            lines.append(f"• *{u['title']}*\n  _{u.get('why', '')[:90]}_")
+        lines.append("\n_Reply `cc implement <which>` and Claude will build it._")
+        await _send_telegram("\n".join(lines))
+    return {"status": "ok", **d}
 
 
 @router.get("/brain/bridges")
