@@ -1736,6 +1736,21 @@ async def _run_memory_economy() -> None:
         _mind_spark("#c9a14a")        # amber — the custodian governs
 
 
+_night_state = {"last": ""}
+
+
+async def _run_night_shift() -> None:
+    """THE NIGHT SHIFT: nightly memory consolidation — fresh semantic index by morning."""
+    broadcast({"type": "os_build", "kind": "collab", "who": "Sage Mira",
+               "text": "night shift: consolidating memory (re-embedding the vault)…"})
+    d = await asyncio.to_thread(_brain_post_sync, "/api/v1/agent-os/brain/night-shift", {}, 900)
+    if d and d.get("date"):
+        broadcast({"type": "os_build", "kind": "collab", "who": "Sage Mira",
+                   "text": f"night shift done: {d.get('indexed', '?')} notes re-embedded, "
+                           f"{d.get('bridges_applied', 0)} bridges applied ({d.get('minutes')} min)"})
+        _mind_spark("#6a5a98", "spark")
+
+
 async def _run_desk() -> None:
     """THE DESK: lay out the owner's working context for whatever he touched most recently —
     his notes, fresh papers, the open questions that touch it (Telegram + a Desk vault note)."""
@@ -2531,6 +2546,13 @@ async def ambient_life():
             if loop_n % 17000 == 300 and not orchestration["running"]:  # Aldric: doctrine + GitHub (~4 h)
                 asyncio.create_task(_run_orchestration("king", _stm.get("king", 0.5)))
 
+        # THE NIGHT SHIFT — consolidate memory while the owner sleeps (02:00-05:59, once/day).
+        if loop_n % 400 == 250:
+            _ns_now = _time.localtime()
+            _ns_today = _time.strftime("%Y-%m-%d", _ns_now)
+            if 2 <= _ns_now.tm_hour < 6 and _night_state["last"] != _ns_today:
+                _night_state["last"] = _ns_today
+                asyncio.create_task(_run_night_shift())
         # Morning report → Telegram, once per day after 07:00 local.
         if loop_n % 200 == 100:
             _now = _time.localtime()

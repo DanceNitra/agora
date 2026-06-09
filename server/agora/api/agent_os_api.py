@@ -687,6 +687,16 @@ async def brain_memory_economy(n: int = 12):
             "report": format_economy(notes, cands)}
 
 
+@router.post("/brain/night-shift")
+async def brain_night_shift(request: Request):
+    """THE NIGHT SHIFT — nightly consolidation: re-embed the vault (fresh semantic memory by
+    morning), trim the retrieval log, apply a couple of waiting bridges."""
+    from agora.config import settings
+    from agora.execution.night_shift import run_night_shift
+    vault = settings.vault_path or "C:/Users/Danculus/my-second-brain"
+    return {"status": "ok", **await run_night_shift(vault)}
+
+
 @router.get("/brain/agent-mastery")
 async def brain_agent_mastery():
     """AGENT MASTERY — whose findings survive verification (feeds standing in the dungeon)."""
