@@ -504,6 +504,27 @@ async def brain_empirical_test(q: str):
     return {"status": "ok", **await empirical_test(q)}
 
 
+@router.get("/brain/insight")
+async def brain_insight(q: str):
+    """INSIGHT ENGINE — synthesize ONE genuinely new, falsifiable insight on a theme by connecting the
+    vault's beliefs + the literature + real-world data into something stated in none of them. The leap
+    from knowledge collector to knowledge CREATOR."""
+    from agora.config import settings
+    from agora.execution.insight_engine import synthesize_insight
+    vault = settings.vault_path or "C:/Users/Danculus/my-second-brain"
+    return {"status": "ok", **await synthesize_insight(q, vault)}
+
+
+@router.get("/brain/insight-inputs")
+async def brain_insight_inputs(q: str):
+    """Gather the three groundings (vault notes + literature + real-world data) for a theme WITHOUT
+    synthesizing — so a stronger model (Claude Opus) can do the creative synthesis itself."""
+    from agora.config import settings
+    from agora.execution.insight_engine import gather_insight_inputs
+    vault = settings.vault_path or "C:/Users/Danculus/my-second-brain"
+    return {"status": "ok", **await gather_insight_inputs(q, vault)}
+
+
 @router.get("/brain/bridges")
 async def brain_bridges(n: int = 6, rationale: bool = True):
     """Pairs of the user's notes that are deeply related yet UNLINKED — missing connections.

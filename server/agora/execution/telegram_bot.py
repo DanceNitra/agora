@@ -251,6 +251,17 @@ async def _handle(app, text: str) -> None:
             await send(format_empirical(d))
         else:
             await send("_Could not run the reality check right now._")
+    elif low.startswith(("insight ", "/insight ", "synthesize ")):
+        import urllib.parse
+        theme = text.split(" ", 1)[1].strip()
+        await send("💡 _Synthesizing a new insight from vault + literature + reality…_")
+        d = await asyncio.to_thread(
+            _brain_get, "/api/v1/agent-os/brain/insight?q=" + urllib.parse.quote(theme))
+        if d and d.get("insight"):
+            from agora.execution.insight_engine import format_insight
+            await send(format_insight(d))
+        else:
+            await send("_Couldn't synthesize an insight right now (too little to connect, or LLM hiccup)._")
     elif low in ("upgrades", "/upgrades", "self-upgrades"):
         await send("🔧 _Agora reflecting on its own mechanisms…_")
         d = await asyncio.to_thread(_brain_get, "/api/v1/agent-os/brain/self-upgrades")
