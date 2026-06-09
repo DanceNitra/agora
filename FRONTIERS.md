@@ -30,6 +30,18 @@
 > - **16 Attention Economy** (`4f72815`): yield-weighted run-probability [0.4,1.0] gates the
 >   four noisy triggers; compute follows value. Telegram `attention`.
 >
+> **Wave 5 — the organism meets reality (all SHIPPED 2026-06-10 ~00:00):**
+> - **17 The Desk** (`6b584f4`): activity-aware working context — owner's notes + fresh papers
+>   + open questions for what he's actually working on; daily + `desk <topic>`.
+> - **18 The Watchdog** (`94b275b`): mutual process supervision (brain⇄dungeon kill+restart,
+>   crash-loop guard + Telegram alert), Startup-folder autostart for reboots.
+> - **19 Contradiction Sweep** (`a6b761a`): close note pairs judged for INCOMPATIBILITY;
+>   genuine contradictions feed the dialectic pipeline. Telegram `contradictions`.
+> - **20 Source Reliability** (`92b8dc9`): per-source verdict ledger (hits vs non-answers),
+>   weights injected into insight-inputs. Telegram `sources`.
+> - **21 Agent Mastery** (`b16d986`): verification verdicts attributed to contributors;
+>   standing now blends trust + forecast accuracy + mastery. Telegram `mastery`.
+>
 > Future-wave ideas parked: deeper Mind Chamber, calendar OAuth, more Hands action kinds,
 > within-owner randomized OS-assistance experiment (the dossier's tier-3 attack).
 
