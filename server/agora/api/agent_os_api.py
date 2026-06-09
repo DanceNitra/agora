@@ -183,9 +183,12 @@ def _garbage_finding(title: str, content: str):
     filter). Returns a reason string if garbage, else None."""
     t, c = (title or "").strip(), (content or "").strip()
     cl, tl = c.lower(), t.lower()
-    for p in ("hypothesize on:", "pursue direction:", "develop the gap:", "deepen:"):
-        if cl.count(p) >= 2 or tl.count(p) >= 2:          # nested quest prefixes
-            return "nested quest prefix"
+    _PREFIXES = ("hypothesize on:", "pursue direction:", "develop the gap:", "deepen:",
+                 "connect:", "frontier:", "hypothesis:", "pipeline:")
+    # Reject ANY 2+ stacked prefixes in the title (e.g. 'Hypothesize on: Pipeline: X'), not just a
+    # doubled single one — the old check missed mixed nesting. Also reject a doubled prefix in the body.
+    if sum(tl.count(p) for p in _PREFIXES) >= 2 or any(cl.count(p) >= 2 for p in _PREFIXES):
+        return "nested quest prefix"
     body = cl.split("source:")[0].strip()
     if len(body) < 50:
         return "too short"
