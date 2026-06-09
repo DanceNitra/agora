@@ -50,11 +50,14 @@ async def hypothesize_and_test(topic: str, vault_path: str) -> dict:
     sources = format_for_prompt(papers)
     raw = await asyncio.to_thread(
         call_llm,
-        "Test the HYPOTHESIS against the REAL abstracts below. Be strict and evidence-based. "
+        "Test the HYPOTHESIS against the REAL abstracts below. Be strict and evidence-based. The "
+        "evidence MUST cite ONE SPECIFIC result from a real paper — a concrete finding, number, or "
+        "named mechanism, with author/year — not a vague 'this paper is related'. If no abstract "
+        "states such a specific supporting result, the verdict is UNCERTAIN. "
         "Reply ONLY JSON: {\"verdict\":\"SUPPORTED|REFUTED|UNCERTAIN\",\"evidence\":\"<one sentence "
-        "citing a real paper by author/year>\",\"confidence\":0.0,\"falsifier\":\"<what observation "
-        "would prove it wrong>\"}.",
-        f"HYPOTHESIS: {hyp}\n\nREAL ABSTRACTS:\n{sources}", "cheap", 0.1, 320)
+        "with the specific result + author/year>\",\"confidence\":0.0,\"falsifier\":\"<what "
+        "observation would prove it wrong>\"}.",
+        f"HYPOTHESIS: {hyp}\n\nREAL ABSTRACTS:\n{sources}", "cheap", 0.1, 360)
     d = _json(raw)
     verdict = str(d.get("verdict", "UNCERTAIN")).upper()
     if verdict not in ("SUPPORTED", "REFUTED", "UNCERTAIN"):
