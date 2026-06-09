@@ -141,6 +141,13 @@ def format_pulse(p: dict, gaps: list | None = None, directions: list | None = No
     else:
         lines.append("🟡 *Modest* — a little landed; mostly groundwork.")
     c = p.get("cache", {})
+    # Research ROI — value (notes that survived the quality gate into the vault) vs effort.
+    pr = p.get("promote", {})
+    if pr.get("checked", 0):
+        land = round(100 * pr.get("promoted", 0) / pr["checked"])
+        calls = c.get("misses", 0) + c.get("skipped", 0)
+        lines.append(f"🎯 *Research ROI:* {pr.get('promoted', 0)} notes landed / {pr['checked']} vetted "
+                     f"({land}% land rate)" + (f" · ~{calls} LLM calls" if calls else ""))
     total = c.get("hits", 0) + c.get("misses", 0)
     if c.get("hits", 0):
         pct = round(100 * c["hits"] / total) if total else 0

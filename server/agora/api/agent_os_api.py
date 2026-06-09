@@ -245,6 +245,7 @@ async def write_vault_note(request: Request):
 
 
 _PROMOTED: set = set()   # finding titles already promoted to the vault (avoid duplicates)
+_PROMOTE_STATS = {"promoted": 0, "checked": 0}   # cumulative funnel stats for the research-ROI metric
 
 
 @router.post("/brain/promote-findings")
@@ -291,6 +292,8 @@ async def promote_findings(request: Request, n: int = 3):
             promoted.append(title[:50])
         except Exception:
             pass
+    _PROMOTE_STATS["promoted"] += len(promoted)
+    _PROMOTE_STATS["checked"] += checked
     return {"status": "ok", "promoted": len(promoted), "checked": checked, "titles": promoted}
 
 
@@ -477,6 +480,7 @@ async def brain_pulse(request: Request, hours: int = 4, notify: bool = False):
     from agora.execution.pulse import build_pulse, format_pulse
     vault = settings.vault_path or "C:/Users/Danculus/my-second-brain"
     p = await build_pulse(request.app.state.db, vault, hours)
+    p["promote"] = dict(_PROMOTE_STATS)          # cumulative funnel stats for the research-ROI line
     gaps = []
     try:
         from agora.execution.semantic_index import SemanticIndex
