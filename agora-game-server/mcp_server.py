@@ -3298,17 +3298,17 @@ async def ambient_life():
         # Reality Bridge — Orin empirically tests a recent finding vs real-world data (~12 min).
         if loop_n % 850 == 350:
             asyncio.create_task(_run_reality_check())
-        # Insight Engine — Agora queues a rich theme for Claude to synthesize (~45 min, premium).
-        if loop_n % 3200 == 1100:
+        # Insight Engine — Agora queues a rich theme for Claude to synthesize (~95 min, premium).
+        if loop_n % 6700 == 1100:
             asyncio.create_task(_queue_insight_theme())
-        # Flywheel — queue an insight's falsifier for Claude to re-test + deepen (~40 min).
-        if loop_n % 2800 == 1500:
+        # Flywheel — queue an insight's falsifier for Claude to re-test + deepen (~80 min).
+        if loop_n % 5600 == 1500:
             asyncio.create_task(_queue_deepening())
-        # Prediction Ledger — resolve due predictions + queue a new one for Claude (~45 min).
-        if loop_n % 3200 == 1500:
+        # Prediction Ledger — resolve due predictions + queue a new one for Claude (~90 min).
+        if loop_n % 6300 == 1500:
             asyncio.create_task(_run_predictions())
-        # Dialectic — queue a contentious claim for Claude to stress-test (~40 min, offset).
-        if loop_n % 2800 == 400:
+        # Dialectic — queue a contentious claim for Claude to stress-test (~80 min, offset).
+        if loop_n % 5600 == 400:
             asyncio.create_task(_queue_dialectic())
         # The Agora Mind — metacognitive reflection: synthesize the worldview + self-direct (~daily).
         if loop_n % 64000 == 33000:
@@ -3331,8 +3331,8 @@ async def ambient_life():
         # RESEARCH EXCHANGE — compose + propose the public digest (GATED, ~weekly offset).
         if loop_n % 448000 == 120000:
             asyncio.create_task(_run_research_exchange())
-        # HYPOTHESIS INDUCTION — bridge a finding cluster into a testable conjecture (~45 min).
-        if loop_n % 3200 == 2000:
+        # HYPOTHESIS INDUCTION — bridge a finding cluster into a testable conjecture (~95 min).
+        if loop_n % 6700 == 2000:
             asyncio.create_task(_queue_hypothesis_induction())
         # THE OBSERVATORY — one vital-signs reading of the whole organism (~weekly offset).
         if loop_n % 448000 == 350000:
@@ -3364,26 +3364,27 @@ async def ambient_life():
             asyncio.create_task(_tick_campaign())
         # ── THE SCIENCE ORGANS ─────────────────────────────────────────────
         # These only QUEUE a task for Claude and each is capped by _task_already_pending
-        # (at most one of its kind pending), so a fast cadence cannot flood — it just keeps
-        # Claude's bench always stocked. ~0.85s/tick, so these fire every ~30-50 min, staggered.
-        if loop_n % 2800 == 900:                       # Analogy Forge  (~40 min)
+        # (at most one of its kind pending). Cadence is matched to Claude's realistic drain
+        # rate (~1 wake/15 min, a few tasks each) so the bench stays stocked WITHOUT a
+        # perpetual backlog that starves low-priority work. ~0.85s/tick → ~75-110 min, staggered.
+        if loop_n % 7000 == 900:                       # Analogy Forge  (~100 min)
             asyncio.create_task(_queue_analogy_forge())
-        if loop_n % 3500 == 1200:                      # Belief revision  (~50 min)
+        if loop_n % 6500 == 1200:                      # Belief revision  (~92 min)
             asyncio.create_task(_queue_belief_challenge())
-        if loop_n % 2800 == 2100:                      # The Court — structured debate  (~40 min)
+        if loop_n % 5500 == 2100:                      # The Court — structured debate  (~78 min)
             asyncio.create_task(_run_debate())
-        if loop_n % 2500 == 600:                       # Replication Unit (Rooke)  (~35 min)
+        if loop_n % 5500 == 600:                       # Replication Unit (Rooke)  (~78 min)
             asyncio.create_task(_queue_replication())
-        if loop_n % 2500 == 1700:                      # Cartographer (Wren)  (~35 min)
+        if loop_n % 6000 == 1700:                      # Cartographer (Wren)  (~85 min)
             asyncio.create_task(_queue_cartography())
-        if loop_n % 2500 == 1100:                      # Kael's Red Team  (~35 min)
+        if loop_n % 6000 == 1100:                      # Kael's Red Team  (~85 min)
             asyncio.create_task(_run_red_team())
-        if loop_n % 3000 == 2600:                      # Orin's Synthesis Detector  (~42 min; fires only when due)
+        if loop_n % 5000 == 2600:                      # Orin's Synthesis Detector  (~70 min; fires only when due)
             asyncio.create_task(_run_synthesis_detector())
-        if loop_n % 3000 == 800:                       # Elara's Coherence Audit  (~42 min, offset)
+        if loop_n % 6500 == 800:                       # Elara's Coherence Audit  (~92 min, offset)
             asyncio.create_task(_run_coherence_audit())
-        # CONTRADICTION SWEEP — find where the vault disagrees with itself (~50 min, offset).
-        if loop_n % 3500 == 2400:
+        # CONTRADICTION SWEEP — find where the vault disagrees with itself (~95 min, offset).
+        if loop_n % 6700 == 2400:
             asyncio.create_task(_run_contradiction_sweep())
         # COHERENCE AUDIT — does AGORA contradict itself? one new belief per day (~daily offset).
         if loop_n % 64000 == 50000:
@@ -3391,8 +3392,8 @@ async def ambient_life():
         # THE COUNTERFACTUAL SELF — weekly review of history replayed under other policies.
         if loop_n % 448000 == 330000:
             asyncio.create_task(_queue_counterfactual_review())
-        # THE THEORY ENGINE — run one mechanistic belief as a formal model (~50 min, offset).
-        if loop_n % 3500 == 3000:
+        # THE THEORY ENGINE — run one mechanistic belief as a formal model (~95 min, offset).
+        if loop_n % 6700 == 3000:
             asyncio.create_task(_queue_theory_run())
         # THE CORRESPONDENT — compose outreach ~2x/week (gated); harvest replies every ~6h
         # (a public conversation deserves a same-day answer, not a tomorrow one).
