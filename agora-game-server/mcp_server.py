@@ -1421,9 +1421,12 @@ def _covered_note_themes(pattern: str = "insight*.md") -> list[set[str]]:
 
 
 def _theme_is_covered(theme: str, covered: list[set[str]]) -> bool:
-    """A theme is covered when an existing item shares >=2 and >=half of its significant words."""
+    """A theme is covered when an existing item shares >=2 and >=half of its significant words.
+    Single-word themes need only that word matched — the flat >=2 floor made them UNMATCHABLE,
+    so a skipped 'Serotonin' re-queued forever past the gatekeeper."""
     tw = _theme_words(theme)
-    return bool(tw) and any(len(tw & cw) >= 2 and len(tw & cw) >= 0.5 * len(tw)
+    floor = min(2, len(tw))
+    return bool(tw) and any(len(tw & cw) >= floor and len(tw & cw) >= 0.5 * len(tw)
                             for cw in covered)
 
 
