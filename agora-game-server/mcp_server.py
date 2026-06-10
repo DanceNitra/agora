@@ -1822,6 +1822,14 @@ async def _run_desk() -> None:
                    "text": f"laid out the owner's desk: {d['topic'][:42]}"})
 
 
+async def _run_atlas() -> None:
+    """THE ATLAS: refresh the per-domain Maps of Content — the owner's navigation front doors."""
+    d = await asyncio.to_thread(_brain_post_sync, "/api/v1/agent-os/brain/atlas/build", {}, 300)
+    if d and d.get("domains"):
+        broadcast({"type": "os_build", "kind": "collab", "who": "Dame Elara",
+                   "text": f"atlas refreshed: {len(d['domains'])} domain maps of content"})
+
+
 async def _run_board() -> None:
     """THE BOARD MEETING: weekly agenda to the owner — his reply becomes standing priorities."""
     d = await asyncio.to_thread(_brain_post_sync, "/api/v1/agent-os/brain/board/agenda", {}, 60)
@@ -2724,6 +2732,9 @@ async def ambient_life():
         # THE BOARD MEETING — weekly agenda to the owner; directives steer all synthesis.
         if loop_n % 448000 == 410000:
             asyncio.create_task(_run_board())
+        # THE ATLAS — refresh the owner's per-domain maps of content (~weekly offset).
+        if loop_n % 448000 == 90000:
+            asyncio.create_task(_run_atlas())
         # THE DESK — lay out the owner's working context for today (~daily, morning-ish offset).
         if loop_n % 64000 == 36000:
             asyncio.create_task(_run_desk())

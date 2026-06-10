@@ -689,6 +689,17 @@ async def brain_memory_economy(n: int = 12):
             "report": format_economy(notes, cands)}
 
 
+@router.post("/brain/atlas/build")
+async def brain_atlas_build(request: Request):
+    """THE ATLAS — (re)build the per-domain Maps of Content (idempotent direct writes)."""
+    import asyncio as _aio
+    from agora.config import settings
+    from agora.execution.atlas import build_atlas, format_atlas
+    vault = settings.vault_path or "C:/Users/Danculus/my-second-brain"
+    d = await _aio.to_thread(build_atlas, vault)
+    return {"status": "ok", "report": format_atlas(d), **d}
+
+
 @router.post("/brain/gatekeeper/skip")
 async def brain_gatekeeper_skip(request: Request):
     """THE GATEKEEPER — Claude records an editorial skip so queue generators stop re-offering it."""

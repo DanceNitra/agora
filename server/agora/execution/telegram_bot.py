@@ -420,6 +420,10 @@ async def _handle(app, text: str) -> None:
     elif low in ("board", "/board"):
         d = await asyncio.to_thread(_brain_get, "/api/v1/agent-os/brain/board")
         await send((d or {}).get("report", "_No board yet._"))
+    elif low in ("atlas", "/atlas"):
+        await send("🗺 _Rebuilding the domain maps (a minute)…_")
+        d = await asyncio.to_thread(_brain_post, "/api/v1/agent-os/brain/atlas/build", {})
+        await send((d or {}).get("report", "_Atlas build failed._"))
     elif low in ("salon", "/salon"):
         d = await asyncio.to_thread(_brain_get, "/api/v1/agent-os/brain/salon")
         await send((d or {}).get("report", "_Salon quiet._"))
