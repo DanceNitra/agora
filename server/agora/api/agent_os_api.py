@@ -1202,6 +1202,14 @@ async def brain_library_inputs(q: str = ""):
     return {"status": "ok", **await gather_paper_inputs(q)}
 
 
+@router.post("/brain/library/queue")
+async def brain_library_queue(request: Request):
+    """Add curated arXiv IDs to the Library's priority reading list."""
+    from agora.execution.library import queue_reading
+    b = await request.json()
+    return {"status": "ok", **queue_reading(b.get("arxiv_ids") or [], b.get("source") or "")}
+
+
 @router.post("/brain/library-record")
 async def brain_library_record(request: Request):
     """Mark a paper read in the bibliography ledger."""

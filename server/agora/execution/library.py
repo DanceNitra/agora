@@ -17,6 +17,37 @@ import urllib.request
 from pathlib import Path
 
 _STORE = Path(__file__).resolve().parents[2] / ".library.json"
+_READLIST = Path(__file__).resolve().parents[2] / ".reading_list.json"
+
+
+def _read_list() -> list:
+    try:
+        return json.loads(_READLIST.read_text(encoding="utf-8"))
+    except Exception:
+        return []
+
+
+def _save_read_list(items: list) -> None:
+    try:
+        _READLIST.write_text(json.dumps(items, ensure_ascii=False, indent=1), encoding="utf-8")
+    except Exception:
+        pass
+
+
+def queue_reading(arxiv_ids: list[str], source: str = "") -> dict:
+    """Add curated arXiv IDs to the priority reading list (the Library reads these before it
+    falls back to domain search). Skips already-read and already-queued."""
+    rl = _read_list()
+    have = {x["arxiv_id"] for x in rl} | _already_read()
+    added = 0
+    for aid in arxiv_ids:
+        aid = (aid or "").strip()
+        if re.fullmatch(r"\d{4}\.\d{4,5}", aid) and aid not in have:
+            rl.append({"arxiv_id": aid, "source": source[:80], "ts": time.time()})
+            have.add(aid)
+            added += 1
+    _save_read_list(rl[-200:])
+    return {"added": added, "queued_total": len(rl)}
 
 
 def _load() -> list:
@@ -64,6 +95,26 @@ async def gather_paper_inputs(query: str = "") -> dict:
     digest into a structured note. Query defaults to the user's top domain."""
     import asyncio
     from agora.execution.research_tool import arxiv_search
+    # PRIORITY: serve the curated reading list first (deep-read what we deliberately queued)
+    seen0 = _already_read()
+    rl = _read_list()
+    for entry in list(rl):
+        aid = entry["arxiv_id"]
+        if aid in seen0:
+            rl.remove(entry)
+            continue
+        text = await asyncio.to_thread(_fetch_fulltext, aid)
+        if len(text) < 2500:
+            rl.remove(entry)                 # ar5iv miss → drop, try next time
+            _save_read_list(rl)
+            continue
+        meta = await asyncio.to_thread(arxiv_search, aid, 1)
+        title = (meta[0]["title"] if meta and not meta[0].get("error") else aid)
+        rl.remove(entry)
+        _save_read_list(rl)
+        return {"arxiv_id": aid, "title": title, "authors": "", "from_reading_list": True,
+                "url": f"http://arxiv.org/abs/{aid}", "published": "", "query": entry.get("source", ""),
+                "fulltext": text[:14000]}
     if not query:
         try:
             from agora.execution.user_model import build_user_model
