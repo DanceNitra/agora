@@ -2185,6 +2185,29 @@ async def _queue_hypothesis_induction() -> None:
     _mind_spark("#b89bff")        # violet — a conjecture forms
 
 
+async def _queue_press() -> None:
+    """THE PRESS: Mira (editor-in-chief) picks the strongest unpublished artifact and queues
+    Claude to draft a polished standalone public post — gated, the owner approves from
+    Telegram. Results that die in the vault build no reputation; the Press is the storefront."""
+    if await _task_already_pending("Draft press piece"):
+        return
+    d = await asyncio.to_thread(_brain_get_sync, "/api/v1/agent-os/brain/press-target", 30)
+    t = (d or {}).get("target") or {}
+    if not t.get("title") or t.get("score", 0) < 4:
+        return                                # nothing measured enough to be worth publishing
+    await asyncio.to_thread(
+        _brain_post_sync, "/api/v1/agent-os/brain/claude-inbox",
+        {"text": f"Draft press piece: {t['title'][:120]} || source: {t['path']} || Rewrite the "
+                 f"note as a polished STANDALONE public post (a stranger must understand it "
+                 f"without our vault): the claim, the measured numbers, the method in two "
+                 f"sentences, the falsifier, what would change our mind. No internal jargon or "
+                 f"agent names in the body. Then POST /brain/press/draft {{title, body, source}} "
+                 f"- gated, owner approves."})
+    broadcast({"type": "os_build", "kind": "collab", "who": "Sage Mira",
+               "text": f"editor's desk: '{t['title'][:40]}' goes to press"})
+    _mind_spark("#f39c12")        # amber — a piece heads for the storefront
+
+
 async def _queue_roadmap() -> None:
     """KING ALDRIC — THE ROADMAP (his second ability): read the whole organism's instrument
     panel (organ yields, bottleneck, synthesis pressure, open gaps) and queue Claude to
@@ -3231,6 +3254,9 @@ async def ambient_life():
         # THE ROADMAP — Aldric synthesizes a data-backed next move for the owner (~daily, offset).
         if loop_n % 64000 == 12000:
             asyncio.create_task(_queue_roadmap())
+        # THE PRESS — Mira sends the strongest unpublished artifact to the editor's desk (~6h).
+        if loop_n % 25000 == 6000:
+            asyncio.create_task(_queue_press())
         # THE LIBRARY — read ONE full paper and queue it for Claude to digest (~daily, offset).
         if loop_n % 64000 == 55000:
             asyncio.create_task(_queue_library_read())

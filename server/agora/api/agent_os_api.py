@@ -1259,6 +1259,43 @@ async def brain_cartography_record(request: Request):
                                              b.get("note") or "", b.get("outcome") or "")}
 
 
+@router.post("/brain/press/draft")
+async def brain_press_draft(request: Request):
+    """THE PRESS — store Claude's polished piece and propose the GATED publish action.
+    Nothing reaches public/posts/ until the owner approves from Telegram."""
+    from agora.execution.press import save_piece
+    from agora.execution.hands import propose_action, pending_approvals
+    b = await request.json()
+    title, body = (b.get("title") or "").strip(), (b.get("body") or "").strip()
+    if len(title) < 10 or len(body) < 300:
+        return {"status": "too_short"}
+    if any(x.get("kind") == "press" for x in pending_approvals()):
+        return {"status": "already_pending"}
+    rec = save_piece(title, body, b.get("source") or "")
+    act = propose_action("press", f"Publish press piece: {title[:60]}",
+                         body[:300], {"press_id": rec["id"]})
+    await _send_telegram(f"📰 Press proposal `{act['id']}`: standalone public post\n"
+                         f"*{title[:80]}*\n_{body[:180]}…_\n"
+                         f"Reply `approve {act['id']}` or `reject {act['id']}`.")
+    return {"status": "proposed", "piece": rec, "action": act}
+
+
+@router.get("/brain/press-target")
+async def brain_press_target():
+    """The strongest unpublished artifact awaiting a press draft."""
+    import asyncio as _aio
+    from agora.config import settings
+    from agora.execution.press import pick_target
+    vault = settings.vault_path or "C:/Users/Danculus/my-second-brain"
+    return {"status": "ok", "target": await _aio.to_thread(pick_target, vault)}
+
+
+@router.get("/brain/press")
+async def brain_press():
+    from agora.execution.press import format_press, _load
+    return {"status": "ok", "report": format_press(), "items": _load()[-10:]}
+
+
 @router.get("/brain/roadmap-inputs")
 async def brain_roadmap_inputs():
     """THE ROADMAP — Aldric's organ instrument panel for a data-backed next-move synthesis."""
