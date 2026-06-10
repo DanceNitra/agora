@@ -722,7 +722,12 @@ async def brain_correspondent_harvest(request: Request):
     for c in fresh[:3]:
         from agora.execution.claude_inbox import add_task
         safe = wrap_as_data(f"GitHub user {c['by']}", c["text"])
-        add_task(f"Correspondence reply on '{c['title'][:50]}'. {safe}")
+        add_task(f"Correspondence reply by {c['by']} on '{c['title'][:50]}' "
+                 f"(corr {c['corr_id']}, thread {c['repo']}#{c['issue']}). {safe}\n"
+                 f"If (and only if) a substantive reply is warranted, draft one back into the "
+                 f"SAME thread via POST /brain/correspondent/draft "
+                 f"{{title, body, repo: '{c['repo']}', issue_number: {c['issue']}}} — "
+                 f"gated by owner approval, never automatic.")
     return {"status": "ok", "new_replies": len(fresh)}
 
 

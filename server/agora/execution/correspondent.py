@@ -98,23 +98,41 @@ def post_outreach(corr_id: str) -> dict:
     return {"status": "posted", "url": rec["issue_url"]}
 
 
+def _iso_to_ts(iso: str) -> float:
+    try:
+        from datetime import datetime, timezone
+        return datetime.strptime(iso, "%Y-%m-%dT%H:%M:%SZ").replace(tzinfo=timezone.utc).timestamp()
+    except Exception:
+        return 0.0
+
+
 def harvest_replies() -> list[dict]:
-    """New comments on posted correspondences — named external challenge coming home."""
+    """New comments on posted correspondences — named external challenge coming home.
+    External threads (target_repo) are read from THAT repo; only comments created after our
+    post count as replies, and Agora's own footer-marked comments are excluded so the loop
+    never feeds on its own words."""
     items = _load()
     fresh = []
     for rec in items:
         if rec.get("status") != "posted" or not rec.get("issue_number"):
             continue
+        repo = rec.get("target_repo") or _REPO
+        posted = rec.get("posted_ts", 0)
         try:
-            comments = _api("GET", f"/repos/{_REPO}/issues/{rec['issue_number']}/comments")
+            comments = _api("GET", f"/repos/{repo}/issues/{rec['issue_number']}/comments"
+                            f"?per_page=100")
         except Exception:
             continue
-        new = comments[rec.get("replies_seen", 0):]
+        replies = [c for c in comments
+                   if _iso_to_ts(c.get("created_at") or "") > posted
+                   and "Drafted by [Agora]" not in (c.get("body") or "")]
+        new = replies[rec.get("replies_seen", 0):]
         for c in new:
             fresh.append({"corr_id": rec["id"], "title": rec["title"],
+                          "repo": repo, "issue": rec["issue_number"],
                           "by": (c.get("user") or {}).get("login", "?"),
                           "text": (c.get("body") or "")[:500]})
-        rec["replies_seen"] = len(comments)
+        rec["replies_seen"] = len(replies)
     if fresh:
         _save(items)
     return fresh
