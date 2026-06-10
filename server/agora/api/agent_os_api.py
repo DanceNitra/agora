@@ -689,6 +689,21 @@ async def brain_memory_economy(n: int = 12):
             "report": format_economy(notes, cands)}
 
 
+@router.post("/brain/gatekeeper/skip")
+async def brain_gatekeeper_skip(request: Request):
+    """THE GATEKEEPER — Claude records an editorial skip so queue generators stop re-offering it."""
+    from agora.execution.gatekeeper import record_skip
+    b = await request.json()
+    return {"status": "ok", "recorded": bool(record_skip(b.get("theme") or "", b.get("reason") or ""))}
+
+
+@router.get("/brain/gatekeeper/skips")
+async def brain_gatekeeper_skips():
+    """Recently refused themes (for the dungeon's upstream queue filtering)."""
+    from agora.execution.gatekeeper import skipped_themes, format_skips
+    return {"status": "ok", "themes": skipped_themes(), "report": format_skips()}
+
+
 @router.post("/brain/salon/sense")
 async def brain_salon_sense(request: Request):
     """THE SALON — pull new pieces from the followed minds; extract at most ONE contestable

@@ -34,6 +34,14 @@ async def propose_self_upgrades(db) -> dict:
     findings = [(r[0] or "")[:150] for r in await cur.fetchall() if r and r[0]]
     metrics = await agora_metrics(db)
     sample = "\n".join(f"- {f}" for f in findings[:12])
+    # Gatekeeper: tell the architect what ALREADY EXISTS so it stops proposing built organs.
+    built = ("ALREADY BUILT (never propose these): hypothesis induction from finding clusters; "
+             "prediction ledger + forecasting tournament + per-agent mastery; exam + A/B "
+             "self-experiments; observatory vitals; belief revision (challenge sweeps); canon; "
+             "tutor (SM-2); interview; desk; campaigns/dossiers; full-paper library; contradiction "
+             "sweep; source reliability; salon feeds; sandboxed compute lab; annals; board "
+             "priorities; attention economy; nightly index rebuild; watchdogs; memory-economy "
+             "curation; public digest publishing; capability forge.")
     raw = await asyncio.to_thread(
         call_llm,
         "You are the systems architect of AGORA — an autonomous research OS: 6 agents research the "
@@ -42,9 +50,9 @@ async def propose_self_upgrades(db) -> dict:
         "below, propose 2-3 CONCRETE upgrades to AGORA'S OWN MECHANISMS that would most improve it — "
         "e.g. raise how many findings survive fact-checking, cut repetition, deepen reasoning, make the "
         "loop compound. These must be upgrades to the SYSTEM (prompts, pipeline, verification, quests, "
-        "graph), NOT research topics. Reply ONLY JSON: "
+        "graph), NOT research topics, and NOT anything on the already-built list. Reply ONLY JSON: "
         '{"upgrades":[{"title":"<short>","why":"<the system weakness it fixes>","how":"<concrete change>"}]}.',
-        f"Metrics: {metrics}\n\nRecent agent findings:\n{sample}", "cheap", 0.4, 1100) or ""
+        f"{built}\n\nMetrics: {metrics}\n\nRecent agent findings:\n{sample}", "cheap", 0.4, 1100) or ""
     m = re.search(r"\{.*\}", raw, re.DOTALL)
     ups = []
     if m:

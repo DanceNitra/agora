@@ -1498,6 +1498,35 @@ async def _watch_brain() -> None:
     await asyncio.to_thread(_wd_alert, f"brain was down — restarted it ({'ok' if ok else 'START FAILED'}).")
 
 
+# ── THE GATEKEEPER: board priorities + skip ledger applied BEFORE queueing ──
+_gate_cache: dict = {"skips": [], "prio": set(), "fetched": 0.0}
+_PRIO_STOP = frozenset({"priority", "prioritie", "ship", "fewer", "deeper", "close", "closing",
+                        "question", "theme", "standing", "week", "owner", "open", "opening"})
+
+
+async def _gate_refresh() -> None:
+    if _time.time() - _gate_cache["fetched"] < 3600:
+        return
+    s = await asyncio.to_thread(_brain_get_sync, "/api/v1/agent-os/brain/gatekeeper/skips")
+    b = await asyncio.to_thread(_brain_get_sync, "/api/v1/agent-os/brain/board")
+    _gate_cache["skips"] = [_theme_words(t) for t in (s or {}).get("themes", [])]
+    pr = (b or {}).get("priorities", "") or ""
+    _gate_cache["prio"] = {w for w in _theme_words(pr) if w not in _PRIO_STOP}
+    _gate_cache["fetched"] = _time.time()
+
+
+async def _gate_filter(pool: list[str]) -> list[str]:
+    """Drop editorially-refused themes; when board priorities exist and any candidate matches
+    them, queue ONLY the on-priority ones (off-priority themes wait their turn)."""
+    await _gate_refresh()
+    pool = [t for t in pool if not _theme_is_covered(t, _gate_cache["skips"])]
+    if _gate_cache["prio"]:
+        on = [t for t in pool if _theme_words(t) & _gate_cache["prio"]]
+        if on:
+            return on
+    return pool
+
+
 _attn_cache: dict = {"policy": {}, "fetched": 0.0}
 
 
@@ -1546,6 +1575,7 @@ async def _queue_insight_theme() -> None:
     covered = await asyncio.to_thread(_covered_note_themes, "insight*.md")
     covered += await _pending_task_themes("Synthesize insight:")
     pool = [t for t in pool if not _theme_is_covered(t, covered)]
+    pool = await _gate_filter(pool)        # GATEKEEPER: skip ledger + board priorities upstream
     if not pool:
         broadcast({"type": "os_build", "kind": "collab", "who": "High Priest Orin",
                    "text": "every candidate theme already has an insight — nothing new to queue"})
@@ -1632,6 +1662,7 @@ async def _run_predictions() -> None:
                    if p.get("status") == "pending"]
         covered += await _pending_task_themes("Predict:")
         pool = [t for t in pool if not _theme_is_covered(_strip_quest_prefix(t), covered)]
+        pool = await _gate_filter(pool)    # GATEKEEPER: skip ledger + board priorities upstream
     if pool:
         theme = _strip_quest_prefix(random.choice(pool))
         await asyncio.to_thread(_brain_post_sync, "/api/v1/agent-os/brain/claude-inbox",
@@ -2025,6 +2056,8 @@ async def _sense_and_queue() -> None:
     covered = await asyncio.to_thread(_covered_note_themes, "insight*.md")
     covered += await _pending_task_themes("Synthesize insight:")
     if _theme_is_covered(topic, covered):
+        return
+    if not await _gate_filter([topic]):    # GATEKEEPER: refused or off-priority while on-priority work exists
         return
     await asyncio.to_thread(
         _brain_post_sync, "/api/v1/agent-os/brain/claude-inbox",
