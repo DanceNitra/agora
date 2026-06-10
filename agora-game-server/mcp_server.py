@@ -2170,6 +2170,71 @@ async def _queue_hypothesis_induction() -> None:
     _mind_spark("#b89bff")        # violet — a conjecture forms
 
 
+async def _run_debate() -> None:
+    """STRUCTURED DEBATE: thesis → attack → defense over a live belief, then Claude judges.
+    One-shot dialectics were a single text; this is an actual adversarial exchange with skin
+    in the game — the verdict (via belief-revise) changes the belief's status, pays Voss's
+    bounty on a kill, and auto-buries the loser. Flash models can attack and defend when the
+    format is this narrow; Claude is the judge, not the whole court."""
+    if await _task_already_pending("Judge debate"):
+        return
+    d = await asyncio.to_thread(_brain_get_sync, "/api/v1/agent-os/brain/beliefs")
+    beliefs = [b for b in (d or {}).get("beliefs", [])
+               if b.get("belief_status") in ("active", "survived") and b.get("path")]
+    if not beliefs:
+        return
+    # the least-tested beliefs face the court first
+    beliefs.sort(key=lambda b: (b.get("survived", 0), b.get("last_challenged") or ""))
+    b = random.choice(beliefs[:5])
+    claim, path = b.get("title", ""), b.get("path", "")
+    mira, voss = "scholar", "guard_l"
+    _in_conv.add(mira)
+    _in_conv.add(voss)
+    try:
+        broadcast({"type": "os_build", "kind": "challenge", "who": "Sergeant Voss",
+                   "text": f"summons '{claim[:40]}' before the court"})
+        thesis = await _llm_say(
+            f"You are {_persona(mira)} You DEFEND a belief before the court.",
+            f"The belief: '{claim}'. In ONE line (max 22 words), state its strongest, most "
+            f"specific case — the evidence or mechanism that carries it.",
+            f"The belief '{claim[:40]}' stands on its evidence.")
+        engine.set_entity_thought(mira, thesis)
+        broadcast({"type": "converse", "from": mira, "to": voss})
+        await asyncio.sleep(2.0)
+        attack = await _llm_say(
+            f"You are {_persona(voss)} You PROSECUTE weak beliefs; your standing grows on kills.",
+            f"The belief: '{claim}'. The defense said: '{thesis}'. In ONE line (max 22 words), "
+            f"state the single sharpest objection — a confound, a counterexample, or a missing "
+            f"control. Attack the argument, not the speaker.",
+            f"The weakest assumption in '{claim[:40]}' is untested.")
+        engine.set_entity_thought(voss, attack)
+        broadcast({"type": "converse", "from": voss, "to": mira})
+        await asyncio.sleep(2.0)
+        defense = await _llm_say(
+            f"You are {_persona(mira)} You answer the prosecution directly.",
+            f"The belief: '{claim}'. The objection: '{attack}'. In ONE line (max 22 words), "
+            f"answer THAT objection specifically — concede what is true, save what survives.",
+            f"The objection misses the core mechanism.")
+        engine.set_entity_thought(mira, defense)
+        broadcast({"type": "converse", "from": mira, "to": voss})
+        await asyncio.to_thread(
+            _brain_post_sync, "/api/v1/agent-os/brain/claude-inbox",
+            {"text": f"Judge debate [{path}]: {claim[:80]} || THESIS (Mira): {thesis[:200]} || "
+                     f"ATTACK (Voss): {attack[:200]} || DEFENSE (Mira): {defense[:200]} || "
+                     f"Rule via POST /brain/belief-revise {{path, verdict: survived|revised|retired, "
+                     f"reason, challenger: 'Sergeant Voss', resurrect_when (when killing)}} - the "
+                     f"verdict changes belief status, pays the Bounty, auto-buries kills. Judge the "
+                     f"ARGUMENTS as presented + your own knowledge; if the attack surfaced a "
+                     f"genuinely new line, also write a short dialectic vault note."})
+        broadcast({"type": "os_build", "kind": "collab", "who": "King Aldric",
+                   "text": f"debate transcript sent to the judge: {claim[:36]}"})
+        _mind_spark("#ff9a9a")        # red — a belief on trial
+    finally:
+        for cid in (mira, voss):
+            _in_conv.discard(cid)
+            engine.set_entity_state(cid, "idle")
+
+
 async def _queue_analogy_forge() -> None:
     """ANALOGY FORGE: pair the vault's most mechanism-dense concept note with a board-priority
     domain and demand a STRUCTURAL mapping (same skeleton, different flesh) — the move that
@@ -2965,6 +3030,9 @@ async def ambient_life():
         # BELIEF REVISION — challenge the belief longest without a test (~2 days).
         if loop_n % 128000 == 90000:
             asyncio.create_task(_queue_belief_challenge())
+        # THE COURT — structured debate (thesis→attack→defense) over a live belief (~2 days, offset).
+        if loop_n % 128000 == 45000:
+            asyncio.create_task(_run_debate())
         # CONTRADICTION SWEEP — find where the vault disagrees with itself (~2 days, offset).
         if loop_n % 128000 == 60000:
             asyncio.create_task(_run_contradiction_sweep())
