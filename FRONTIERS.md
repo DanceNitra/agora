@@ -70,6 +70,15 @@
 > - **31 Thread** (`cdcdc32`): rolling 6-exchange Telegram memory (2h TTL) — follow-up questions
 >   resolve against the conversation.
 >
+> **Wave 8 — skin in the game (in progress):**
+> - **32 The Oracle** (`cf0b417`, SHIPPED): live Polymarket markets → independent Agora
+>   probability vs market price, edge logged, Brier-scored vs hard reality on resolution
+>   (loop A18; daily scan+resolve; Telegram `oracle`). First position: Anthropic best-model
+>   EOJune — market 92%, agora 90%.
+> - 33 Metabolism (cost-aware cognition), 34 Theory Engine (runnable beliefs),
+>   35 Counterfactual Self (replay own history under alternative policies),
+>   36 Correspondent (gated outbound contact) — PLANNED, not yet built.
+>
 > Future-wave ideas parked: deeper Mind Chamber, calendar OAuth, more Hands action kinds,
 > within-owner randomized OS-assistance experiment (the dossier's tier-3 attack).
 
