@@ -233,6 +233,7 @@ class GameEngine:
         self.add_entity("priest", "High Priest Orin", "agent", 11.5, 9, "#8e44ad")
         self.add_entity("thief", "Shadow Kael", "agent", 20, 4, "#7f8c8d")
         self.add_entity("scholar", "Sage Mira", "agent", 3, 4, "#f39c12")
+        self.add_entity("artificer", "Artificer Rooke", "agent", 17, 12, "#16a085")
 
         self.state.tick = 0
         self.state.last_updated = time.time()

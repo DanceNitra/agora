@@ -424,6 +424,8 @@ _THOUGHTS = {
                 "The vault is silent on this."],                 # Kael — Research Scout
     "scholar": ["Cross-reference this with the vault.", "Knowledge wants structure.",
                 "This deserves an evergreen note."],             # Mira — Knowledge Curator
+    "artificer": ["Claimed — but does it compute?", "Re-run it from scratch.",
+                  "A failed replication is still a result."],    # Rooke — Replication Unit
 }
 
 
@@ -444,6 +446,7 @@ _POSTS = {
     "atlas":        {"tile": (6, 11),  "title": "Map links at the atlas", "role": "guard_r", "act": "interact", "fx": "#ffae66"},
     "commons":      {"tile": (4, 16),  "title": "Meet in the commons",    "role": None,      "act": "interact", "fx": "#cfcfcf"},
     "forge":        {"tile": (19, 16), "title": "Prototype at the forge", "role": None,      "act": "interact", "fx": "#d4a35a"},
+    "rep-bench":    {"tile": (17, 11), "title": "Replicate at the bench", "role": "artificer", "act": "casting", "fx": "#16a085"},
 }
 
 _ACT_LINES = {
@@ -458,6 +461,7 @@ _TALK = {  # research-shop openers (fallbacks)
     "priest":  ["What if we fused them?", "There's a deeper pattern."],
     "thief":   ["Found a gap in the vault.", "The frontier moved."],
     "scholar": ["I documented that.", "Let me cross-reference it."],
+    "artificer": ["Show me the numbers.", "I re-ran it — want the result?"],
 }
 
 
@@ -494,6 +498,7 @@ _PERSONA = {
     "priest":  "High Priest Orin — the idea alchemist. Solemn, cryptic; fuses distant concepts into new ones.",
     "thief":   "Shadow Kael — the frontier scout. Sly, quick, curious; hunts the gaps in the vault no one else sees.",
     "scholar": "Sage Mira — the obsessive archivist. Precise; structures raw research into evergreen knowledge.",
+    "artificer": "Artificer Rooke — the replicator. Skeptical tinkerer; re-runs other people's claims as minimal models and trusts only what computes.",
 }
 
 # Per-agent throttles (monotonic timestamps) + in-conversation guard.
@@ -663,6 +668,7 @@ _ROLE_CONTRIB = {
     "king":    "turn it into something buildable — an experiment or a tool",
     "guard_r": "find what in the vault it should link to",
     "guard_l": "stress-test it — name the weakest assumption or the hole",
+    "artificer": "say what a MINIMAL computational model of it would be and what number it must show",
 }
 
 
@@ -884,10 +890,12 @@ _TRUST_DB_PATH = str(HERE / "dungeon_trust.db")
 _AGENT_NAMES = {
     "king": "King Aldric", "guard_l": "Sergeant Voss", "guard_r": "Dame Elara",
     "priest": "High Priest Orin", "thief": "Shadow Kael", "scholar": "Sage Mira",
+    "artificer": "Artificer Rooke",
 }
 # Forecasting Tournament: ledger short name <-> dungeon eid; per-agent hit-rates cached here.
 _FORECASTER_EID = {"Kael": "thief", "Mira": "scholar", "Orin": "priest",
-                   "Aldric": "king", "Elara": "guard_r", "Voss": "guard_l"}
+                   "Aldric": "king", "Elara": "guard_r", "Voss": "guard_l",
+                   "Rooke": "artificer"}
 _forecast_scores: dict = {}     # eid -> {"total", "correct", "hit_rate"} (refreshed by _run_predictions)
 _mastery_scores: dict = {}      # eid -> verification rate (whose findings survive checking)
 _bounty_scores: dict = {}       # eid -> kill-authority (whose challenges actually fell beliefs)
@@ -1032,6 +1040,7 @@ _BRAIN_ID = {   # dungeon entity → server/agora NPC UUID (names already aligne
     "king":    "00000000-0000-0000-0000-000000000004",  # King Aldric
     "guard_r": "00000000-0000-0000-0000-000000000005",  # Dame Elara
     "guard_l": "00000000-0000-0000-0000-000000000007",  # Sergeant Voss
+    "artificer": "00000000-0000-0000-0000-000000000008",  # Artificer Rooke
 }
 
 
@@ -2170,6 +2179,31 @@ async def _queue_hypothesis_induction() -> None:
     _mind_spark("#b89bff")        # violet — a conjecture forms
 
 
+async def _queue_replication() -> None:
+    """THE REPLICATION UNIT: Artificer Rooke picks a sourced claim from the collective
+    knowledge and queues it for Claude to re-run as a MINIMAL computational model in the Lab.
+    REPRODUCED hardens the claim, FAILED is a publishable result (science's rarest export),
+    NOT_COMPUTABLE is an honest pass — every outcome lands in Rooke's track record."""
+    if await _task_already_pending("Replicate claim"):
+        return
+    d = await asyncio.to_thread(_brain_get_sync, "/api/v1/agent-os/brain/replication-target", 30)
+    t = (d or {}).get("target") or {}
+    if not t.get("claim"):
+        return
+    await asyncio.to_thread(
+        _brain_post_sync, "/api/v1/agent-os/brain/claude-inbox",
+        {"text": f"Replicate claim: {t['claim'][:180]} || Source: {t['source'][:140]} || "
+                 f"Build the SMALLEST computational model of the claim's mechanism via "
+                 f"/brain/lab/run (cite 'simulation'); judge REPRODUCED | FAILED | "
+                 f"NOT_COMPUTABLE -> POST /brain/replication-record {{claim,source,outcome,"
+                 f"lab_id,note}}. A FAILED replication with a clean model is publishable - "
+                 f"consider a gated outreach draft. If the claim has no computable core, "
+                 f"record NOT_COMPUTABLE and move on."})
+    broadcast({"type": "os_build", "kind": "discovery", "who": "Artificer Rooke",
+               "text": f"took a claim to the bench: {t['claim'][:42]}"})
+    _mind_spark("#16a085")        # teal — a claim under re-computation
+
+
 async def _run_debate() -> None:
     """STRUCTURED DEBATE: thesis → attack → defense over a live belief, then Claude judges.
     One-shot dialectics were a single text; this is an actual adversarial exchange with skin
@@ -2470,6 +2504,7 @@ _ROLE_HINT = {  # each thinker owns a real research domain
     "priest":  "meaning, emergence & strange loops — seek the deep 'why' behind a finding",
     "thief":   "incentives, risk & game theory — find the edge or exploit others miss",
     "scholar": "knowledge itself — cross-reference the library and connect distant concepts",
+    "artificer": "replication & computational verification — re-run claimed results as minimal models; trust only what computes",
 }
 
 # Named destinations the LLM can send an agent to (tile = standing spot).
@@ -3035,6 +3070,9 @@ async def ambient_life():
         # _task_already_pending keeps at most one transcript waiting for the judge).
         if loop_n % 21000 == 16000:
             asyncio.create_task(_run_debate())
+        # THE REPLICATION UNIT — Rooke benches one sourced claim for a Lab re-run (~2x/day).
+        if loop_n % 32000 == 11000:
+            asyncio.create_task(_queue_replication())
         # CONTRADICTION SWEEP — find where the vault disagrees with itself (~daily, offset).
         if loop_n % 64000 == 20000:
             asyncio.create_task(_run_contradiction_sweep())

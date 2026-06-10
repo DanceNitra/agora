@@ -1216,6 +1216,29 @@ async def brain_graveyard():
             "items": _load()[-15:]}
 
 
+@router.get("/brain/replication-target")
+async def brain_replication_target(request: Request):
+    """THE REPLICATION UNIT — the next sourced claim awaiting a minimal computational re-run."""
+    from agora.execution.replication import pick_target
+    return {"status": "ok", "target": await pick_target(request.app.state.db)}
+
+
+@router.post("/brain/replication-record")
+async def brain_replication_record(request: Request):
+    """Ledger one replication attempt: REPRODUCED | FAILED | NOT_COMPUTABLE."""
+    from agora.execution.replication import record
+    b = await request.json()
+    r = record(b.get("claim") or "", b.get("source") or "", b.get("outcome") or "",
+               b.get("lab_id") or "", b.get("note") or "")
+    return {"status": "ok" if r else "invalid", "record": r}
+
+
+@router.get("/brain/replications")
+async def brain_replications():
+    from agora.execution.replication import format_replications, _load
+    return {"status": "ok", "report": format_replications(), "items": _load()[-12:]}
+
+
 @router.get("/brain/analogies")
 async def brain_analogies():
     from agora.execution.analogy_forge import format_analogies, _load
