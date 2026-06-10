@@ -689,6 +689,15 @@ async def brain_memory_economy(n: int = 12):
             "report": format_economy(notes, cands)}
 
 
+@router.get("/brain/counterfactual")
+async def brain_counterfactual():
+    """THE COUNTERFACTUAL SELF — the system's history replayed under alternative policies."""
+    import asyncio as _aio
+    from agora.execution.counterfactual import full_report, format_counterfactual
+    r = await _aio.to_thread(full_report)
+    return {"status": "ok", "report": format_counterfactual(), **r}
+
+
 @router.get("/brain/metabolism")
 async def brain_metabolism():
     """THE METABOLISM — per-organ token spend, value points, and ROI (value/kilotoken)."""

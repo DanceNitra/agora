@@ -1880,6 +1880,17 @@ async def _queue_canon_update() -> None:
     _mind_spark("#ffd27a")        # gold — the book rewrites itself
 
 
+async def _queue_counterfactual_review() -> None:
+    """COUNTERFACTUAL SELF: weekly, have Claude interpret the policy replays and turn deltas
+    into design lessons (causal inference pointed at the system's own history)."""
+    if await _task_already_pending("Counterfactual review"):
+        return
+    await asyncio.to_thread(_brain_post_sync, "/api/v1/agent-os/brain/claude-inbox",
+                            {"text": "Counterfactual review"})
+    broadcast({"type": "os_build", "kind": "collab", "who": "King Aldric",
+               "text": "queued the weekly counterfactual review — what would other policies have done?"})
+
+
 async def _run_oracle_scan() -> None:
     """THE ORACLE: pick the most liquid unjudged in-domain market and queue it for Claude's
     independent probability call (skin in the game — scored against hard reality)."""
@@ -2767,6 +2778,9 @@ async def ambient_life():
         # COHERENCE AUDIT — does AGORA contradict itself? one new belief per day (~daily offset).
         if loop_n % 64000 == 50000:
             asyncio.create_task(_run_coherence())
+        # THE COUNTERFACTUAL SELF — weekly review of history replayed under other policies.
+        if loop_n % 448000 == 330000:
+            asyncio.create_task(_queue_counterfactual_review())
         # THE ORACLE — pick one live market for an independent call (~daily) + resolve (~daily).
         if loop_n % 64000 == 7000:
             asyncio.create_task(_run_oracle_scan())
