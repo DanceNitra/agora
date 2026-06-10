@@ -51,10 +51,29 @@ def signals() -> dict:
 
     # combined pressure: coupling accelerating AND closure not keeping up
     pressure = round(b_accel * (1 + open_falsifiers / 12) / (1 + deepened_recent), 2)
-    due = b_accel >= 1.5 and open_falsifiers >= 6 and pressure >= 1.8
+    # COOLDOWN: a synthesis RELIEVES the pressure it was built from — firing again from the same
+    # elevated signal just re-requests a law we already wrote. Stay quiet for 3 days after the
+    # last grand-synthesis vault note (the phase transition has already happened).
+    cooled = _recent_synthesis_age() < 3 * 86400
+    due = (not cooled) and b_accel >= 1.5 and open_falsifiers >= 6 and pressure >= 1.8
     return {"bridge_recent": b_recent, "bridge_prior": b_prior, "bridge_accel": b_accel,
             "open_falsifiers": open_falsifiers, "deepened_recent": deepened_recent,
-            "insights_recent": i_recent, "pressure": pressure, "due": due}
+            "insights_recent": i_recent, "pressure": pressure, "due": due, "cooled": cooled}
+
+
+def _recent_synthesis_age() -> float:
+    """Seconds since the most recent grand-synthesis note in the vault (huge if none)."""
+    import time as _t
+    from pathlib import Path as _P
+    try:
+        from agora.config import settings
+        vault = _P(settings.vault_path or "C:/Users/Danculus/my-second-brain")
+        notes = vault / "04 Resources" / "Concepts" / "Agora Agents"
+        ages = [_t.time() - p.stat().st_mtime
+                for p in notes.rglob("synthesis-*.md")]
+        return min(ages) if ages else 1e12
+    except Exception:
+        return 1e12
 
 
 def format_synthesis() -> str:
