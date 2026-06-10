@@ -33,5 +33,5 @@ server/.research_cache/
 agora-game-server/_dungeon.log
 agora-game-server/_dungeon.err
 
-# generated lab experiment scripts (recorded in .lab.json ledger)
-agora_output/lab/*.py
+# NOTE: agora_output/ (lab scripts + public digests) is intentionally TRACKED —
+# those are durable research artifacts, committed as a record, not ignored.

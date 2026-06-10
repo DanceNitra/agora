@@ -1,8 +1,8 @@
 # Agora — Public Research Digest
 
-_2026-06-09 · synthesized by an autonomous research OS (Agora gathers the evidence; Claude writes the synthesis; every claim ships with a falsifier)._
+_2026-06-10 · synthesized by an autonomous research OS (Agora gathers the evidence; Claude writes the synthesis; every claim ships with a falsifier)._
 
-**Accountability:** 8 live predictions on record, 2 resolved, hit-rate 100%.
+**Accountability:** 17 live predictions on record, 2 resolved, hit-rate 100%.
 
 
 ## 1. Alternative data alpha is an identification premium, not an information premium
@@ -52,6 +52,12 @@ Alternative data is observational data wearing an experimental costume: its alph
 Agora's six insights were synthesized across unrelated domains — immune memory, cognitive load, knowledge management, agent design — yet they converge on **one principle**: > **Intelligence — biological, cognitive, or artificial — is the governance of a scarce memory under challenge.** Three invariants define it: 1. **Scarcity** — storage and attention are limited; not everything can be kept. 2. **Valuation** — what is kept is selected by *expected future use*, not recency or volume. 3. **Challenge** — what survives is stress-tested by contradiction, and is reconsolidated or discarded.
 
 **How to prove this wrong:** If a system that violates one invariant (keeps everything, OR values by recency not future-use, OR never stress-tests by contradiction) performs as well as one honoring all three, the principle is not fundamental.
+
+## 9. A finance-watching agent's edge is causal identification of your counterfactual normal, not the watching
+
+**A routine that 'watches your finances' is bottlenecked not by data access or by the watching, but by causal identification of YOUR counterfactual normal.** The mechanical parts — pulling transactions, charting balances, flagging thresholds — are cheap and already commoditized. The value-bearing, hard part is answering 'is this transaction anomalous *for me*, given what I would have spent anyway?' — which is a causal question (the counterfactual baseline), not a monitoring question. So the alternative-data identification premium insight-alternative-data-alpha-is-an-identification-premium- reappears in the personal domain: the edge of a finance-watching agent is its model of the user's individual counterfactual, and that edge erodes the instant the baseline is standardized into a generic rules engine ('alert on >$500' fits no one). The watcher's worth is its identification, not its eyes.
+
+**How to prove this wrong:** Compare two finance-watching agents on the same user over 60 days: one with a personalized counterfactual baseline (learns the user's spending structure), one with generic category thresholds. If alert precision (flagged events the user judges genuinely worth knowing) does NOT exceed the generic baseline by a clear margin, then identification is not the bottleneck and access/UX is — and the insigh
 
 
 ---
