@@ -50,6 +50,13 @@ def gather() -> dict:
     # the bottleneck = the organ idle the longest (excluding never-run, which are "not wired yet")
     ran = [o for o in organs if o["idle_h"] < 1e8]
     bottleneck = max(ran, key=lambda o: o["idle_h"])["organ"] if ran else "(no organ has produced yet)"
+
+    # CFO view — value per kilotoken from the Metabolism ledger (only organs with real spend)
+    from agora.execution.metabolism import roi_report
+    rr = roi_report()
+    priced = {k: v for k, v in rr["organs"].items() if v.get("roi") is not None and v["ktok"] >= 3}
+    best_roi = max(priced.items(), key=lambda kv: kv[1]["roi"]) if priced else None
+    worst_roi = min(priced.items(), key=lambda kv: kv[1]["roi"]) if priced else None
     return {
         "organs": organs,
         "bounty_authority": bounty_scores(),
@@ -57,6 +64,9 @@ def gather() -> dict:
         "open_falsifiers": fw["open"], "deepened": fw["deepened"],
         "forge_open_gaps": forge_open, "failed_replications": rep_fail,
         "bottleneck": bottleneck,
+        "total_ktok": rr["total_ktok"],
+        "best_roi": {"organ": best_roi[0], **best_roi[1]} if best_roi else None,
+        "worst_roi": {"organ": worst_roi[0], **worst_roi[1]} if worst_roi else None,
     }
 
 
@@ -72,4 +82,9 @@ def format_roadmap() -> str:
     lines.append(f"_open forge gaps_ {g['forge_open_gaps']} · "
                  f"_failed replications (publishable)_ {g['failed_replications']}")
     lines.append(f"⛔ _longest-idle organ:_ {g['bottleneck']}")
+    lines.append(f"\n💰 _CFO:_ {g['total_ktok']}k tok metered"
+                 + (f" · best ROI: {g['best_roi']['organ']} ({g['best_roi']['roi']}/ktok)"
+                    if g.get("best_roi") else "")
+                 + (f" · worst: {g['worst_roi']['organ']} ({g['worst_roi']['roi']}/ktok)"
+                    if g.get("worst_roi") else ""))
     return "\n".join(lines)

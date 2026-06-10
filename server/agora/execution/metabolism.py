@@ -94,7 +94,54 @@ def value_snapshot() -> dict:
     pts["tutor"] = 0.5 * tutor_reviews
     oracle = j(".oracle.json", [])
     pts["oracle"] = 1.0 * len(oracle) + 3.0 * sum(1 for p in oracle if p.get("beat_market"))
+    # the 2026-06-10 organs — value read from the ledgers each one already keeps
+    bounty = j(".bounty.json", [])
+    pts["bounty"] = 3.0 * sum(1 for x in bounty if x.get("kill")) \
+        + 0.75 * sum(1 for x in bounty if not x.get("kill"))
+    reps = j(".replications.json", [])
+    pts["replication"] = (4.0 * sum(1 for r in reps if r.get("outcome") == "FAILED")     # publishable
+                          + 2.0 * sum(1 for r in reps if r.get("outcome") == "REPRODUCED")
+                          + 0.5 * sum(1 for r in reps if r.get("outcome") == "NOT_COMPUTABLE"))
+    ana = j(".analogies.json", [])
+    pts["analogy"] = 4.0 * sum(1 for a in ana if "survived" in (a.get("outcome") or "").lower()) \
+        + 1.0 * sum(1 for a in ana if "survived" not in (a.get("outcome") or "").lower())
+    carto = j(".cartography.json", [])
+    pts["cartography"] = 4.0 * sum(1 for c in carto if c.get("status") == "bridged") \
+        + 1.0 * sum(1 for c in carto if c.get("status") == "charted")
+    graves = j(".graveyard.json", [])
+    pts["graveyard"] = 1.0 * len(graves) + 2.0 * sum(1 for g in graves
+                                                     if g.get("status") == "resurrected")
+    press = j(".press.json", [])
+    pts["press"] = 5.0 * sum(1 for p in press if p.get("status") == "published") \
+        + 1.0 * sum(1 for p in press if p.get("status") != "published")
+    scout = j(".scout.json", [])
+    pts["scout"] = 2.0 * sum(1 for s in scout if s.get("outcome") == "drafted") \
+        + 0.5 * sum(1 for s in scout if s.get("outcome") != "drafted")
+    fly = j(".flywheel.json", [])
+    pts["flywheel"] = 2.0 * sum(1 for q in fly if q.get("status") == "deepened")
+    camps = j(".campaigns.json", [])
+    pts["campaigns"] = 3.0 * sum(1 for c in camps if c.get("status") == "complete")
     return pts
+
+
+# spend keys are ROUTE segments (set by the middleware); value keys are LEDGER buckets.
+# This map joins the clean pairs so ROI is computed on real correspondences, not key luck.
+_SPEND2VALUE = {
+    "verify-findings": "mastery_verified",
+    "exam": "exam",
+    "predict-tournament": "prediction_ledger",
+    "predict-baseline": "prediction_ledger",
+    "oracle": "oracle",
+    "salon": "salon",
+    "tutor": "tutor",
+    "contradictions": "contradictions",
+    "hypothesize": "flywheel",          # hypotheses' downstream value lands as deepened falsifiers
+    "analogy-inputs": "analogy",
+    "replication-target": "replication",
+    "cartography-hole": "cartography",
+    "scout-target": "scout",
+    "press-target": "press",
+}
 
 
 def roi_report() -> dict:
@@ -104,12 +151,13 @@ def roi_report() -> dict:
     organs = {}
     for organ, e in spend.items():
         ktok = (e["tok_in"] + e["tok_out"]) / 1000.0
-        v = value.get(organ, 0.0)
+        v = value.get(_SPEND2VALUE.get(organ, organ), 0.0)
         organs[organ] = {"calls": e["calls"], "ktok": round(ktok, 1), "value": v,
                          "roi": round(v / ktok, 2) if ktok > 0.05 else None}
     total_ktok = round(sum(o["ktok"] for o in organs.values()), 1)
+    mapped = set(_SPEND2VALUE.get(o, o) for o in organs)
     return {"organs": organs, "total_ktok": total_ktok,
-            "unmetered_value": {k: v for k, v in value.items() if k not in organs and v}}
+            "unmetered_value": {k: v for k, v in value.items() if k not in mapped and v}}
 
 
 def format_metabolism() -> str:
