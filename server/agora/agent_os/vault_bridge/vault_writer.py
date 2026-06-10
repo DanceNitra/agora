@@ -20,6 +20,24 @@ from typing import Optional
 # Where agents drop their notes inside the vault.
 AGENT_NOTES_SUBDIR = "04 Resources/Concepts/Agora Agents"
 
+# Paraphrase-dedup at WRITE time. Agents repeatedly ship the same finding lightly reworded
+# (observed: three near-identical "Di Pompeo & Tucci" notes in one day) — the daily quality
+# report only detects those after the fact. Metric: CONTAINMENT (shared / smaller vocabulary),
+# which unlike Jaccard survives a short paraphrase of a long note. Measured on the real cases:
+# true dupes 0.73-0.85, related-but-distinct notes <=0.37, so 0.55 splits with margin.
+_DEDUP_THRESHOLD = 0.55
+_DEDUP_LOOKBACK_DIRS = 3          # today + two previous dated folders
+_DEDUP_MAX_FILES = 250
+_WORD_RE = re.compile(r"[A-Za-z][A-Za-z\-]{3,}")
+_DEDUP_STOP = frozenset(
+    "what which does that this with from have been their there these those about into than "
+    "under over only also when where very more most much many some such then they them will "
+    "would could should agora dungeon agent source created author title tags note".split())
+
+
+def _content_words(text: str) -> set[str]:
+    return {w.lower() for w in _WORD_RE.findall(text or "") if w.lower() not in _DEDUP_STOP}
+
 
 class VaultWriter:
     def __init__(self, vault_path: Optional[str] = None):
@@ -31,9 +49,39 @@ class VaultWriter:
             self.base = Path(tempfile.gettempdir()) / "agora-vault-output"
             self.real = False
 
+    def _find_duplicate(self, title: str, content: str) -> Optional[str]:
+        """Path of a recent note that is a paraphrase of this one, else None."""
+        new_words = _content_words(title + " " + content[:2500])
+        if len(new_words) < 12:           # too short to judge honestly
+            return None
+        try:
+            recent_dirs = sorted((d for d in self.base.iterdir() if d.is_dir()),
+                                 key=lambda d: d.name, reverse=True)[:_DEDUP_LOOKBACK_DIRS]
+        except OSError:
+            return None
+        checked = 0
+        for d in recent_dirs:
+            for f in sorted(d.glob("*.md"), key=lambda p: -p.stat().st_mtime):
+                if checked >= _DEDUP_MAX_FILES:
+                    return None
+                checked += 1
+                try:
+                    existing = _content_words(f.read_text(encoding="utf-8")[:2500])
+                except Exception:
+                    continue
+                smaller = max(min(len(new_words), len(existing)), 8)
+                if len(new_words & existing) / smaller >= _DEDUP_THRESHOLD:
+                    return str(f)
+        return None
+
     async def write_note(self, title: str, content: str, tags: list[str],
                          agent_name: str = "agent") -> str:
-        """Write an Obsidian note with frontmatter into a dated subfolder. Returns the path."""
+        """Write an Obsidian note with frontmatter into a dated subfolder. Returns the path.
+        Near-duplicates of a recent note are NOT rewritten — the existing path is returned."""
+        dup = await asyncio.to_thread(self._find_duplicate, title, content)
+        if dup:
+            print(f"[VaultWriter] dedup: '{title[:60]}' is a paraphrase of {Path(dup).name} — skipped")
+            return dup
         day = datetime.now(timezone.utc).strftime("%Y-%m-%d")
         target_dir = self.base / day      # …/Agora Agents/2026-06-08/
         target_dir.mkdir(parents=True, exist_ok=True)
