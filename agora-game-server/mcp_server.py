@@ -2185,6 +2185,53 @@ async def _queue_hypothesis_induction() -> None:
     _mind_spark("#b89bff")        # violet — a conjecture forms
 
 
+async def _run_coherence_audit() -> None:
+    """DAME ELARA — COHERENCE AUDIT (her second ability): the bridge-builder runs the inverse of
+    bridging. She scans the load-bearing BELIEF set for the pair that should cohere but actually
+    CONFLICT, and sends that head-to-head to the Court — Claude judges which survives and revises
+    the loser via belief-revise (→ Bounty + Graveyard). A belief system that never checks itself
+    for internal conflict is a pile; this keeps it a system."""
+    if await _task_already_pending("Resolve belief conflict"):
+        return
+    d = await asyncio.to_thread(_brain_get_sync, "/api/v1/agent-os/brain/beliefs")
+    beliefs = [b for b in (d or {}).get("beliefs", [])
+               if b.get("belief_status") in ("active", "survived") and b.get("path")]
+    if len(beliefs) < 4:
+        return
+    titles = [b.get("title", "") for b in beliefs[:14]]
+    numbered = "\n".join(f"{i}. {t}" for i, t in enumerate(titles))
+    pick = await _llm_say(
+        f"You are {_persona('guard_r')} You audit the belief set for INTERNAL CONFLICT — two "
+        f"beliefs that cannot both be fully true, or that pull in opposite directions.",
+        f"The beliefs:\n{numbered}\n\nName the ONE pair in the sharpest tension and why, in this "
+        f"exact form: 'i vs j: <the conflict in <=18 words>'. If none genuinely conflict, reply "
+        f"'none'.",
+        "Where does the belief set contradict itself?")
+    m = re.match(r"\s*(\d+)\s*(?:vs|VS|x|×|,)\s*(\d+)\s*:?\s*(.*)", pick or "")
+    if not m:
+        broadcast({"type": "os_build", "kind": "collab", "who": "Dame Elara",
+                   "text": "coherence audit: the belief set holds together — no sharp conflict"})
+        return
+    i, j = int(m.group(1)), int(m.group(2))
+    if not (0 <= i < len(beliefs) and 0 <= j < len(beliefs) and i != j):
+        return
+    ba, bb, why = beliefs[i], beliefs[j], (m.group(3) or "")[:160]
+    await asyncio.to_thread(
+        _brain_post_sync, "/api/v1/agent-os/brain/claude-inbox",
+        {"text": f"Resolve belief conflict: '{ba.get('title', '')[:60]}' VS "
+                 f"'{bb.get('title', '')[:60]}' || Elara's read: {why} || pathA: {ba.get('path')} "
+                 f"|| pathB: {bb.get('path')} || Judge the head-to-head with your own knowledge: "
+                 f"do they truly conflict? If yes, which is better-grounded - revise/retire the "
+                 f"WEAKER via POST /brain/belief-revise {{path, verdict, reason, challenger: "
+                 f"'Dame Elara', resurrect_when}} (pays Bounty, auto-buries); if they reconcile "
+                 f"under a distinction, write a short note stating it. A false-alarm is fine - "
+                 f"record it as 'beliefs cohere'."})
+    broadcast({"type": "os_build", "kind": "challenge", "who": "Dame Elara",
+               "text": f"coherence conflict → Court: '{ba.get('title', '')[:26]}' vs "
+                       f"'{bb.get('title', '')[:26]}'"})
+    _mind_spark("#ffae66")        # amber — a fault line in the belief set
+
+
 async def _run_synthesis_detector() -> None:
     """HIGH PRIEST ORIN — SYNTHESIS DETECTOR (his second ability): instrument the canon's own
     phase-transition precursors (bridge-rate acceleration, falsifier-closure slowing) and, only
@@ -3182,6 +3229,8 @@ async def ambient_life():
             asyncio.create_task(_run_red_team())
         if loop_n % 3000 == 2600:                      # Orin's Synthesis Detector  (~42 min; fires only when due)
             asyncio.create_task(_run_synthesis_detector())
+        if loop_n % 3000 == 800:                       # Elara's Coherence Audit  (~42 min, offset)
+            asyncio.create_task(_run_coherence_audit())
         # CONTRADICTION SWEEP — find where the vault disagrees with itself (~50 min, offset).
         if loop_n % 3500 == 2400:
             asyncio.create_task(_run_contradiction_sweep())
