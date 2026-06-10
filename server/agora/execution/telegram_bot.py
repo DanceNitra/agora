@@ -420,6 +420,9 @@ async def _handle(app, text: str) -> None:
     elif low in ("board", "/board"):
         d = await asyncio.to_thread(_brain_get, "/api/v1/agent-os/brain/board")
         await send((d or {}).get("report", "_No board yet._"))
+    elif low in ("dashboard", "/dashboard", "gauges"):
+        await send("📟 Gauges: http://127.0.0.1:8000/api/v1/agent-os/dashboard "
+                   "(open on the machine running Agora)")
     elif low in ("atlas", "/atlas"):
         await send("🗺 _Rebuilding the domain maps (a minute)…_")
         d = await asyncio.to_thread(_brain_post, "/api/v1/agent-os/brain/atlas/build", {})

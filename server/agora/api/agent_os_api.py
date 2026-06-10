@@ -689,6 +689,14 @@ async def brain_memory_economy(n: int = 12):
             "report": format_economy(notes, cands)}
 
 
+@router.get("/dashboard")
+async def brain_dashboard():
+    """THE GAUGES — the whole organism on one page (read-only HTML, SVG sparklines)."""
+    from fastapi.responses import HTMLResponse
+    from agora.execution.dashboard import render_dashboard
+    return HTMLResponse(render_dashboard())
+
+
 @router.post("/brain/atlas/build")
 async def brain_atlas_build(request: Request):
     """THE ATLAS — (re)build the per-domain Maps of Content (idempotent direct writes)."""
