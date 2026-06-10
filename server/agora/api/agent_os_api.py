@@ -1259,6 +1259,30 @@ async def brain_cartography_record(request: Request):
                                              b.get("note") or "", b.get("outcome") or "")}
 
 
+@router.get("/brain/scout-target")
+async def brain_scout_target():
+    """THE OPPORTUNITY SCOUT — the best-fit open GitHub issue Agora's vault could answer."""
+    import asyncio as _aio
+    from agora.execution.scout import find_opportunity
+    return {"status": "ok", "target": await _aio.to_thread(find_opportunity)}
+
+
+@router.post("/brain/scout-record")
+async def brain_scout_record(request: Request):
+    """Ledger a contacted issue so the Scout never pitches the same one twice."""
+    from agora.execution.scout import record_contacted
+    b = await request.json()
+    r = record_contacted(b.get("url") or "", b.get("repo") or "", int(b.get("issue") or 0),
+                         b.get("outcome") or "drafted")
+    return {"status": "ok" if r else "duplicate", "record": r}
+
+
+@router.get("/brain/scout")
+async def brain_scout():
+    from agora.execution.scout import format_scout, _load
+    return {"status": "ok", "report": format_scout(), "items": _load()[-12:]}
+
+
 @router.post("/brain/press/draft")
 async def brain_press_draft(request: Request):
     """THE PRESS — store Claude's polished piece and propose the GATED publish action.

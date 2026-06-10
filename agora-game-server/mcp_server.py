@@ -2185,6 +2185,33 @@ async def _queue_hypothesis_induction() -> None:
     _mind_spark("#b89bff")        # violet — a conjecture forms
 
 
+async def _queue_scout() -> None:
+    """THE OPPORTUNITY SCOUT: Shadow Kael hunts an open GitHub issue Agora can answer with
+    evidence and queues Claude to judge + draft a GATED outreach reply. Systematizes the
+    first public win (answer someone else's open problem with running architecture + numbers).
+    Owner-facing trust surface, so ~6h and strictly gated."""
+    if await _task_already_pending("Scout outreach"):
+        return
+    d = await asyncio.to_thread(_brain_get_sync, "/api/v1/agent-os/brain/scout-target", 30)
+    t = (d or {}).get("target") or {}
+    if not t.get("url") or t.get("error"):
+        return
+    await asyncio.to_thread(
+        _brain_post_sync, "/api/v1/agent-os/brain/claude-inbox",
+        {"text": f"Scout outreach: {t['repo']}#{t['issue_number']} (fit {t.get('score')}) || "
+                 f"TITLE: {t['title']} || BODY: {t['body'][:500]} || Judge HONESTLY: does Agora's "
+                 f"vault genuinely answer this with EVIDENCE (real mechanism + a measured number "
+                 f"from our notes/Lab)? If yes, draft a gated outreach comment via POST "
+                 f"/brain/correspondent/draft {{title, body, repo: '{t['repo']}', issue_number: "
+                 f"{t['issue_number']}}} - helpful, specific, no overselling, mapped to their pain. "
+                 f"Then POST /brain/scout-record {{url: '{t['url']}', repo: '{t['repo']}', issue: "
+                 f"{t['issue_number']}, outcome}}. If we cannot genuinely help, record outcome "
+                 f"'no real fit' and DO NOT draft - reputation dies on a bad pitch."})
+    broadcast({"type": "os_build", "kind": "discovery", "who": "Shadow Kael",
+               "text": f"scouted an opportunity: {t['repo']}#{t['issue_number']}"})
+    _mind_spark("#8fd3ff")        # cyan — a lead spotted outside the walls
+
+
 async def _queue_press() -> None:
     """THE PRESS: Mira (editor-in-chief) picks the strongest unpublished artifact and queues
     Claude to draft a polished standalone public post — gated, the owner approves from
@@ -3257,6 +3284,9 @@ async def ambient_life():
         # THE PRESS — Mira sends the strongest unpublished artifact to the editor's desk (~6h).
         if loop_n % 25000 == 6000:
             asyncio.create_task(_queue_press())
+        # THE OPPORTUNITY SCOUT — Kael hunts an answerable open GitHub issue (~6h, offset, gated).
+        if loop_n % 25000 == 18000:
+            asyncio.create_task(_queue_scout())
         # THE LIBRARY — read ONE full paper and queue it for Claude to digest (~daily, offset).
         if loop_n % 64000 == 55000:
             asyncio.create_task(_queue_library_read())
