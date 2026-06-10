@@ -882,6 +882,24 @@ _FORECASTER_EID = {"Kael": "thief", "Mira": "scholar", "Orin": "priest",
 _forecast_scores: dict = {}     # eid -> {"total", "correct", "hit_rate"} (refreshed by _run_predictions)
 _mastery_scores: dict = {}      # eid -> verification rate (whose findings survive checking)
 _bounty_scores: dict = {}       # eid -> kill-authority (whose challenges actually fell beliefs)
+_standing_cache: dict = {}      # eid -> standing (refreshed by _broadcast_trust_graph)
+_market_stats: dict = {"won": {}, "lost": {}}    # eid -> counts (the attention market's books)
+
+
+def _market_won(eid: str) -> tuple[bool, float]:
+    """ATTENTION MARKET: standing buys cognition. An agent's chance of winning a discovery
+    slot (an LLM + research spend) scales with its standing RELATIVE to the others — the top
+    agent always runs, the bottom one runs half the time. Differential reproduction, not
+    starvation: everyone keeps sampling, the productive compound."""
+    if not _standing_cache:
+        return True, 1.0                     # market not open yet (no standing computed)
+    s = _standing_cache.get(eid, 0.5)
+    lo, hi = min(_standing_cache.values()), max(_standing_cache.values())
+    p = 1.0 if hi - lo < 1e-9 else 0.5 + 0.5 * (s - lo) / (hi - lo)
+    won = random.random() < p
+    _market_stats["won" if won else "lost"][eid] = \
+        _market_stats["won" if won else "lost"].get(eid, 0) + 1
+    return won, p
 _trust_engine = None
 _trust_db = None
 
@@ -2244,6 +2262,7 @@ async def _broadcast_trust_graph():
     trust = await _trust_matrix()                       # [{a,b,score}]  ESS, live
     learn = await _brain_learning_graph()               # [{from,to,skill}]  who teaches whom
     standing = _compute_standing(trust)                 # eid -> 0..1
+    _standing_cache.update(standing)                    # the attention market reads this
     nodes = [{"eid": e, "name": _AGENT_NAMES.get(e, e), "standing": standing.get(e, 0.5),
               "forecast": (_forecast_scores.get(e) or {}).get("hit_rate")}
              for e in _AGENT_NAMES]
@@ -2972,14 +2991,21 @@ async def ambient_life():
                                   "#ff6a6a" if kind == "challenge" else "#ffd27a", 0.9)
                 remember(eid, intent)
 
-                if kind == "hypothesize":
-                    asyncio.create_task(_hypothesis_discovery(eid, intent))
-                    note_event(f"{who} forms a hypothesis: {intent}")
-                    _os_build("discovery", who, intent)
-                elif kind == "create":
-                    asyncio.create_task(_grounded_discovery(eid, intent))
-                    note_event(f"{who} discovered: {intent}")
-                    _os_build("discovery", who, intent)
+                if kind in ("hypothesize", "create"):
+                    # ATTENTION MARKET: a discovery slot costs an LLM+research spend —
+                    # standing decides who gets to spend (the productive compound).
+                    won, p = _market_won(eid)
+                    if not won:
+                        engine.set_entity_thought(eid, "priced out this round — earn standing")
+                        note_event(f"{who} was priced out of the discovery market (p={p:.2f})")
+                    elif kind == "hypothesize":
+                        asyncio.create_task(_hypothesis_discovery(eid, intent))
+                        note_event(f"{who} forms a hypothesis: {intent}")
+                        _os_build("discovery", who, intent)
+                    else:
+                        asyncio.create_task(_grounded_discovery(eid, intent))
+                        note_event(f"{who} discovered: {intent}")
+                        _os_build("discovery", who, intent)
                 elif kind == "upgrade":
                     asyncio.create_task(_brain_propose_upgrade(eid, intent, action))
                     _apply_module(intent, (cx, cy), who, "upgrade")  # REALLY build it
