@@ -1349,6 +1349,11 @@ async def _run_reality_check() -> None:
     if not verdict or verdict == "INSUFFICIENT":
         _attn_report("reality_check", False)
         return                                            # no signal at all → don't pollute
+    # ZERO-BASELINE GUARD: a DORMANT traction verdict with literally no data ("0 stories ever,
+    # 0 points") measures nothing — shipping it as a Reality note is noise in an empirical costume.
+    if verdict == "DORMANT" and not ((d or {}).get("data") or {}).get("total_stories_ever"):
+        _attn_report("reality_check", False)
+        return
     _attn_report("reality_check", True)
     mode = "real-world traction" if (d or {}).get("mode") == "traction" else "empirical"
     content = (f"Reality check ({verdict}): {claim} — {d.get('evidence', '')} "
@@ -1663,8 +1668,26 @@ async def _run_predictions() -> None:
         covered += await _pending_task_themes("Predict:")
         pool = [t for t in pool if not _theme_is_covered(_strip_quest_prefix(t), covered)]
         pool = await _gate_filter(pool)    # GATEKEEPER: skip ledger + board priorities upstream
+    theme = ""
     if pool:
-        theme = _strip_quest_prefix(random.choice(pool))
+        # ZERO-BASELINE FILTER (forge 18c917): only queue themes with a non-zero real-world
+        # metric — internal project/feature names score 0 everywhere and yield vacuous FLAT
+        # predictions. Zero-baseline candidates go to the gatekeeper skip ledger instead.
+        random.shuffle(pool)
+        for cand in pool[:4]:
+            cand = _strip_quest_prefix(cand)
+            bd = await asyncio.to_thread(
+                _brain_get_sync,
+                f"/api/v1/agent-os/brain/predict-baseline?q={_urlquote(cand[:80])}", 90)
+            if any((bd or {}).get("all_baselines", {}).values()):
+                theme = cand
+                break
+            await asyncio.to_thread(
+                _brain_post_sync, "/api/v1/agent-os/brain/gatekeeper/skip",
+                {"theme": cand[:80],
+                 "reason": "zero real-world baseline on every metric (internal/vacuous theme) "
+                           "- filtered at queue time"})
+    if theme:
         await asyncio.to_thread(_brain_post_sync, "/api/v1/agent-os/brain/claude-inbox",
                                 {"text": f"Predict: {theme[:80]}"})
         broadcast({"type": "os_build", "kind": "collab", "who": "Shadow Kael",
