@@ -1151,6 +1151,10 @@ async def brain_belief_revise(request: Request):
     if not res.get("error"):
         record_challenge(b.get("verdict") or "", Path(b.get("path") or "").stem,
                          b.get("challenger") or "Sergeant Voss")
+        if (b.get("verdict") or "").lower() in ("revised", "retired"):
+            from agora.execution.graveyard import bury
+            bury(Path(b.get("path") or "").stem, b.get("reason") or "challenge succeeded",
+                 b.get("resurrect_when") or "", b.get("challenger") or "Sergeant Voss")
     return res
 
 
@@ -1173,11 +1177,43 @@ async def brain_analogy_inputs():
 
 @router.post("/brain/analogy-record")
 async def brain_analogy_record(request: Request):
-    """Ledger one forging (mechanism → target domain) so the forge rotates, never repeats."""
+    """Ledger one forging (mechanism → target domain) so the forge rotates, never repeats.
+    A dead forging is buried with its cause — also data."""
     from agora.execution.analogy_forge import record_forged
     b = await request.json()
+    outcome = b.get("outcome") or ""
+    if "no viable mapping" in outcome.lower():
+        from agora.execution.graveyard import bury
+        bury(f"analogy: {b.get('mechanism', '')} -> {b.get('target', '')}", outcome,
+             "a structural (not surface) correspondence is actually demonstrated", "Sage Mira")
     return {"status": "ok", **record_forged(b.get("mechanism") or "", b.get("target") or "",
-                                            b.get("note") or "", b.get("outcome") or "")}
+                                            b.get("note") or "", outcome)}
+
+
+@router.post("/brain/graveyard/bury")
+async def brain_graveyard_bury(request: Request):
+    """THE GRAVEYARD — bury a dead idea with its cause of death + resurrection condition."""
+    from agora.execution.graveyard import bury
+    b = await request.json()
+    g = bury(b.get("claim") or "", b.get("cause") or "", b.get("resurrect_when") or "",
+             b.get("killed_by") or "")
+    return {"status": "ok" if g else "duplicate_or_short", "grave": g}
+
+
+@router.post("/brain/graveyard/resurrect")
+async def brain_graveyard_resurrect(request: Request):
+    """Deliberate resurrection — new evidence overturned a recorded death."""
+    from agora.execution.graveyard import resurrect
+    b = await request.json()
+    g = resurrect(b.get("id") or "", b.get("reason") or "")
+    return {"status": "ok" if g else "no_such_grave", "grave": g}
+
+
+@router.get("/brain/graveyard")
+async def brain_graveyard():
+    from agora.execution.graveyard import format_graveyard, epitaphs, _load
+    return {"status": "ok", "report": format_graveyard(), "epitaphs": epitaphs(),
+            "items": _load()[-15:]}
 
 
 @router.get("/brain/analogies")

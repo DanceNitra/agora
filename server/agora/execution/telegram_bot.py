@@ -513,6 +513,15 @@ async def _handle(app, text: str) -> None:
     elif low in ("campaigns", "/campaigns"):
         d = await asyncio.to_thread(_brain_get, "/api/v1/agent-os/brain/campaigns")
         await send((d or {}).get("report", "_No campaigns._"))
+    elif low in ("graveyard", "/graveyard", "graves"):
+        d = await asyncio.to_thread(_brain_get, "/api/v1/agent-os/brain/graveyard")
+        await send((d or {}).get("report", "_The graveyard is empty._"))
+    elif low in ("bounty", "/bounty", "kills"):
+        d = await asyncio.to_thread(_brain_get, "/api/v1/agent-os/brain/bounty")
+        await send((d or {}).get("report", "_The bounty board is empty._"))
+    elif low in ("analogies", "/analogies", "forge log"):
+        d = await asyncio.to_thread(_brain_get, "/api/v1/agent-os/brain/analogies")
+        await send((d or {}).get("report", "_The forge is cold._"))
     elif low in ("economy", "/economy", "memory economy"):
         await send("🏛 _Auditing the memory economy (a minute)…_")
         d = await asyncio.to_thread(_brain_get, "/api/v1/agent-os/brain/memory-economy")

@@ -1557,6 +1557,18 @@ async def _gate_filter(pool: list[str]) -> list[str]:
     return pool
 
 
+_graves_cache: dict = {"epitaphs": [], "fetched": 0.0}
+
+
+async def _brain_graves() -> list[str]:
+    """Epitaphs of dead ideas (1h cache) — the planner shows agents where NOT to dig again."""
+    if _time.time() - _graves_cache["fetched"] > 3600:
+        d = await asyncio.to_thread(_brain_get_sync, "/api/v1/agent-os/brain/graveyard")
+        _graves_cache["epitaphs"] = (d or {}).get("epitaphs") or []
+        _graves_cache["fetched"] = _time.time()
+    return _graves_cache["epitaphs"]
+
+
 _attn_cache: dict = {"policy": {}, "fetched": 0.0}
 
 
@@ -2730,11 +2742,15 @@ async def ambient_life():
                 f'"with":"<ally name if collaborating/challenging, else empty>",'
                 f'"action":"<the concrete output you will produce — one sentence>"}}]}}  (exactly 3 quests)'
             )
+            graves = await _brain_graves()
+            grave_txt = ("\nDEAD ENDS (tried, killed — do NOT re-walk these): "
+                         + "; ".join(graves[:4])) if graves else ""
             usr = ((("What you know:\n" + brain + "\n\n") if brain else "") +
                    f"The OS so far (build on it, don't repeat): {build_log}\n"
                    f"Modules built (visit/extend them): {mods}\n"
                    f"Fellow thinkers: {allies}\n"
-                   f"The user's REAL knowledge GAPS — isolated notes worth developing (AIM HERE): {gap_txt}\n"
+                   f"The user's REAL knowledge GAPS — isolated notes worth developing (AIM HERE): {gap_txt}"
+                   f"{grave_txt}\n"
                    f"Your recent work: {mem}\nAlready completed (do NOT repeat): {done}\n"
                    f"Nearby now: {', '.join(nearby) or 'no one'}\nLatest in the keep: {news}\n"
                    f"Your quest log (3 next moves — prefer ones that DEVELOP a real gap above):")
