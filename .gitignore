@@ -22,3 +22,16 @@ server/.semantic_cache/
 # Claude Code remote-control inbox (local)
 server/.claude_inbox.json
 server/.telegram_feed.json
+
+# brain runtime state — regenerated live each loop cycle, never source
+server/.*.json
+server/.worldview.md
+server/.research_cache/
+
+# process logs
+*_brain.err
+agora-game-server/_dungeon.log
+agora-game-server/_dungeon.err
+
+# generated lab experiment scripts (recorded in .lab.json ledger)
+agora_output/lab/*.py
