@@ -57,6 +57,19 @@
 >   Interconnects, MR, Lil'Log, Appleton); one contestable claim a day into the dialectic.
 >   First salon dialectic shipped (Willison on Apple Intelligence).
 >
+> **Wave 7 — signal hygiene + owner experience (all SHIPPED 2026-06-10 morning):**
+> - **27 Gatekeeper** (`5d61c0e`): skip ledger + board priorities INSIDE the queue generators
+>   (insight/predict/sense); capability map in the self-upgrade architect prompt. Seeded with
+>   the night's 4 refusals.
+> - **28 Atlas** (`fc166c7`): 12 auto-maintained per-domain Maps of Content + index (value-ranked
+>   core concepts, fresh arrivals, orphans). Telegram `atlas`.
+> - **29 Gauges** (`5acafcb`): GET /api/v1/agent-os/dashboard — every ledger on one dark page
+>   with SVG sparklines. Telegram `dashboard`.
+> - **30 Coherence Audit** (`6834574`): one new belief/day judged against its closest siblings;
+>   tensions auto-queue internal dialectics. Telegram `coherence`.
+> - **31 Thread** (`cdcdc32`): rolling 6-exchange Telegram memory (2h TTL) — follow-up questions
+>   resolve against the conversation.
+>
 > Future-wave ideas parked: deeper Mind Chamber, calendar OAuth, more Hands action kinds,
 > within-owner randomized OS-assistance experiment (the dossier's tier-3 attack).
 
