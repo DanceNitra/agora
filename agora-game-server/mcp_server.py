@@ -2279,7 +2279,32 @@ async def _broadcast_trust_graph():
         pass
 
 
+_REFUSAL_RE = re.compile(
+    r"^\s*(?:i|we)\s+(?:cannot|can't|am\s+unable|are\s+unable|apologi[sz]e|am\s+sorry|notice\s+your)"
+    r"|^\s*(?:i'm|we're)\s+(?:sorry|unable)\b"
+    r"|^\s*as\s+an\s+ai\b"
+    r"|\byour\s+request\s+asks\b"
+    r"|\bthe\s+required\s+source\s+is\s+missing\b"
+    r"|\bno\s+(?:paper|source)\s+(?:fits|matches|was\s+provided)\b"
+    r"|^\s*(?:none|neither)\s+of\s+the\s+provided\b"
+    r"|^\s*neither\s+(?:paper|source)s?\b"
+    r"|^\s*the\s+provided\s+(?:real\s+)?(?:paper|source|literature)s?[^.\n]{0,40}\b"
+    r"(?:do(?:es)?\s+not|don't|doesn't|are\s+unrelated|is\s+unrelated)",
+    re.IGNORECASE)
+
+
+def _is_refusal(text: str) -> bool:
+    """True when the LLM output is a refusal / no-fit meta-statement, not a finding. Shipping
+    these as discoveries polluted the vault and the morning report ('I cannot complete this
+    task' as a grounded finding) — a non-answer is a wasted slot, never knowledge."""
+    return bool(_REFUSAL_RE.search((text or "")[:300]))
+
+
 async def _brain_contribute(eid: str, title: str, content: str) -> bool:
+    if _is_refusal(content) or _is_refusal(title):
+        broadcast({"type": "os_build", "kind": "collab", "who": _AGENT_NAMES.get(eid, eid),
+                   "text": "discarded a non-finding (refusal/no-fit) — the slot yielded nothing"})
+        return False
     r = await asyncio.to_thread(
         _brain_post_sync, "/api/v1/agent-os/brain/collective",
         {"npc": _AGENT_NAMES.get(eid, eid), "title": title[:90],
