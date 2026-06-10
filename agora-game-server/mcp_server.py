@@ -1582,6 +1582,21 @@ async def _gate_filter(pool: list[str]) -> list[str]:
 
 
 _graves_cache: dict = {"epitaphs": [], "fetched": 0.0}
+_academy_cache: dict = {"lessons": {}, "fetched": 0.0}
+
+
+async def _academy_lesson(eid: str) -> str:
+    """The active mentor's rule for this agent (1h cache) — injected into discovery prompts."""
+    if _time.time() - _academy_cache["fetched"] > 3600:
+        _academy_cache["lessons"] = {}
+        for e, full in _AGENT_NAMES.items():
+            d = await asyncio.to_thread(
+                _brain_get_sync, f"/api/v1/agent-os/brain/academy?agent={_urlquote(full)}")
+            les = (d or {}).get("lesson") or ""
+            if les:
+                _academy_cache["lessons"][e] = les
+        _academy_cache["fetched"] = _time.time()
+    return _academy_cache["lessons"].get(eid, "")
 
 
 async def _brain_graves() -> list[str]:
@@ -2185,6 +2200,29 @@ async def _queue_hypothesis_induction() -> None:
     _mind_spark("#b89bff")        # violet — a conjecture forms
 
 
+async def _run_academy() -> None:
+    """THE ACADEMY: pair the weakest verifier with the strongest mentor; the mentee's discovery
+    prompts carry the mentor's rule until the verification rate MEASURABLY improves. The firm
+    trains its own people — and checks whether the training worked."""
+    d = await asyncio.to_thread(_brain_post_sync, "/api/v1/agent-os/brain/academy/tick", {}, 30)
+    st = (d or {}).get("status")
+    if st == "enrolled":
+        _academy_cache["fetched"] = 0.0          # refresh lessons immediately
+        broadcast({"type": "os_build", "kind": "collab", "who": d.get("mentor", "?"),
+                   "text": f"the academy opens: mentoring {d.get('mentee', '?')} "
+                           f"(verification rate {d.get('rate', 0):.0%})"})
+    elif st == "graduated":
+        _academy_cache["fetched"] = 0.0
+        broadcast({"type": "os_build", "kind": "collab", "who": d.get("mentee", "?"),
+                   "text": f"graduated the academy: +{d.get('gain', 0):.0%} verification rate "
+                           f"(taught by {d.get('mentor', '?')})"})
+        _mind_spark("#7dffa0")        # green — a colleague measurably improved
+    elif st == "rotated":
+        _academy_cache["fetched"] = 0.0
+        broadcast({"type": "os_build", "kind": "collab", "who": d.get("mentor", "?"),
+                   "text": f"lesson didn't take ({d.get('gain', 0):+.0%}) — rotating the curriculum"})
+
+
 async def _run_portfolio() -> None:
     """THE PORTFOLIO: Voss keeps the public scientific track record (forecasts, replications,
     self-challenges) current, and proposes the GATED publish ONLY when the record is thick
@@ -2689,12 +2727,14 @@ async def _grounded_discovery(eid: str, intent: str) -> None:
     related = await _brain_vault_search(intent)
     rel = "; ".join(f"[[{r['title']}]]" for r in related[:3] if r.get("score", 0) > 0.45) \
         or "(the user's vault is thin on this — a real gap)"
+    lesson = await _academy_lesson(eid)
     finding = await asyncio.to_thread(
         _llm_content_sync,
         f"You are {_persona(eid)} State ONE research FINDING that a specific paper below DIRECTLY "
         f"supports: paraphrase that paper's actual result and name it (Author Year). Stay close to "
         f"what the source literally shows — do NOT extrapolate or synthesize beyond it. Then, if apt, "
-        f"link the user's notes. If no paper fits, say so plainly. Max 2 sentences. NEVER invent sources.",
+        f"link the user's notes. If no paper fits, say so plainly. Max 2 sentences. NEVER invent sources."
+        + (f" {lesson}" if lesson else ""),
         f"Topic: {intent}\n\nReal papers:\n{sources or '(none found)'}\n\n"
         f"User's relevant existing notes: {rel}") or intent
     src = ""
@@ -3306,6 +3346,9 @@ async def ambient_life():
         # THE PORTFOLIO — Voss keeps the public track record current, proposes publish if credible (~12h).
         if loop_n % 50000 == 30000:
             asyncio.create_task(_run_portfolio())
+        # THE ACADEMY — enroll/measure the mentor-mentee pair (~12h, offset).
+        if loop_n % 50000 == 10000:
+            asyncio.create_task(_run_academy())
         # THE LIBRARY — read ONE full paper and queue it for Claude to digest (~daily, offset).
         if loop_n % 64000 == 55000:
             asyncio.create_task(_queue_library_read())

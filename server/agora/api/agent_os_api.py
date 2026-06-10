@@ -1259,6 +1259,24 @@ async def brain_cartography_record(request: Request):
                                              b.get("note") or "", b.get("outcome") or "")}
 
 
+@router.post("/brain/academy/tick")
+async def brain_academy_tick():
+    """THE ACADEMY — enroll the weakest verifier with the strongest mentor, or measure the
+    active mentee for graduation (+0.10 verification-rate on >=4 new attempts)."""
+    from agora.execution.academy import tick
+    return {"status": "ok", **tick()}
+
+
+@router.get("/brain/academy")
+async def brain_academy(agent: str = ""):
+    """The academy report; with ?agent= returns that agent's active mentor lesson (or '')."""
+    from agora.execution.academy import format_academy, lesson_for, _load
+    out = {"status": "ok", "report": format_academy(), "items": _load()[-8:]}
+    if agent:
+        out["lesson"] = lesson_for(agent)
+    return out
+
+
 @router.get("/brain/portfolio")
 async def brain_portfolio():
     """THE PORTFOLIO — Agora's public scientific track record (preview + credibility gate)."""
