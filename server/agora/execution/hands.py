@@ -23,7 +23,8 @@ _ACTIONS = Path(__file__).resolve().parents[2] / ".actions.json"
 OUTPUT_DIR = Path(__file__).resolve().parents[2].parent / "agora_output"
 
 SAFE_KINDS = {"build_tool", "build_file", "analysis", "export_insights", "digest"}  # local → auto
-GATED_KINDS = {"publish", "send", "repo", "external", "gist", "curate", "outreach", "press"}  # → approval
+GATED_KINDS = {"publish", "send", "repo", "external", "gist", "curate", "outreach", "press",
+               "portfolio"}  # → approval
 
 
 def _load() -> list:
@@ -157,6 +158,14 @@ def execute_action(aid: str, vault_path: str = "") -> dict:
             if p.get("error"):
                 raise RuntimeError(p["error"])
             result = f"published → {p['url']}"
+        elif a["kind"] == "portfolio":
+            # The Portfolio: re-compose fresh, then publish the public track record
+            from agora.execution.portfolio import compose, publish
+            compose()
+            p = publish()
+            if p.get("error"):
+                raise RuntimeError(p["error"])
+            result = f"published → {p['url']}" + (f" ({p['note']})" if p.get("note") else "")
         else:
             return {"error": f"kind '{a['kind']}' must be carried out by Claude, not the auto-executor"}
         set_status(aid, "done", result)

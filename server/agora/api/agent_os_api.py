@@ -1259,6 +1259,34 @@ async def brain_cartography_record(request: Request):
                                              b.get("note") or "", b.get("outcome") or "")}
 
 
+@router.get("/brain/portfolio")
+async def brain_portfolio():
+    """THE PORTFOLIO — Agora's public scientific track record (preview + credibility gate)."""
+    import asyncio as _aio
+    from agora.execution.portfolio import format_portfolio, record
+    return {"status": "ok", "report": await _aio.to_thread(format_portfolio),
+            **await _aio.to_thread(record)}
+
+
+@router.post("/brain/portfolio/propose")
+async def brain_portfolio_propose(request: Request):
+    """Compose the track record; if credible, propose the GATED publish (owner approves)."""
+    import asyncio as _aio
+    from agora.execution.portfolio import compose
+    from agora.execution.hands import propose_action, pending_approvals
+    r = await _aio.to_thread(compose)
+    if not r.get("credible"):
+        return {"status": "too_thin", "resolved_total": r["resolved_total"]}
+    if any(x.get("kind") == "portfolio" for x in pending_approvals()):
+        return {"status": "already_pending"}
+    act = propose_action("portfolio", "Publish public track record",
+                         f"{r['resolved_total']} resolved accountability items", {})
+    await _send_telegram(f"📊 Track-record proposal `{act['id']}`: publish the public scientific "
+                         f"track record ({r['resolved_total']} resolved items).\n"
+                         f"Reply `approve {act['id']}` or `reject {act['id']}`.")
+    return {"status": "proposed", "action": act}
+
+
 @router.get("/brain/scout-target")
 async def brain_scout_target():
     """THE OPPORTUNITY SCOUT — the best-fit open GitHub issue Agora's vault could answer."""

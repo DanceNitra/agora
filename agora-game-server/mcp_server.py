@@ -2185,6 +2185,22 @@ async def _queue_hypothesis_induction() -> None:
     _mind_spark("#b89bff")        # violet — a conjecture forms
 
 
+async def _run_portfolio() -> None:
+    """THE PORTFOLIO: Voss keeps the public scientific track record (forecasts, replications,
+    self-challenges) current, and proposes the GATED publish ONLY when the record is thick
+    enough to be credible — a thin 100%-at-n=2 record is a liability, so the self-gate IS the
+    credibility. Deterministic from the ledgers; the owner approves the publish."""
+    d = await asyncio.to_thread(_brain_post_sync, "/api/v1/agent-os/brain/portfolio/propose", {}, 30)
+    st = (d or {}).get("status")
+    if st == "proposed":
+        broadcast({"type": "os_build", "kind": "collab", "who": "Sergeant Voss",
+                   "text": "track record is credible — proposed publishing the public receipts"})
+    elif st == "too_thin":
+        broadcast({"type": "os_build", "kind": "collab", "who": "Sergeant Voss",
+                   "text": f"track record held back ({d.get('resolved_total')} resolved) — "
+                           f"not yet honest to publish"})
+
+
 async def _queue_scout() -> None:
     """THE OPPORTUNITY SCOUT: Shadow Kael hunts an open GitHub issue Agora can answer with
     evidence and queues Claude to judge + draft a GATED outreach reply. Systematizes the
@@ -3287,6 +3303,9 @@ async def ambient_life():
         # THE OPPORTUNITY SCOUT — Kael hunts an answerable open GitHub issue (~6h, offset, gated).
         if loop_n % 25000 == 18000:
             asyncio.create_task(_queue_scout())
+        # THE PORTFOLIO — Voss keeps the public track record current, proposes publish if credible (~12h).
+        if loop_n % 50000 == 30000:
+            asyncio.create_task(_run_portfolio())
         # THE LIBRARY — read ONE full paper and queue it for Claude to digest (~daily, offset).
         if loop_n % 64000 == 55000:
             asyncio.create_task(_queue_library_read())
