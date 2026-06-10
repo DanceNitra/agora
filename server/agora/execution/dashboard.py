@@ -98,6 +98,18 @@ def render_dashboard() -> str:
                  for s in skips[-6:])
     cards.append(sec(f"Skip ledger ({len(skips)})", f"<ul>{sk or '<li class=dim>empty</li>'}</ul>"))
 
+    met = _j(".metabolism.json", {})
+    mt = "".join(f"<li>{html.escape(o)}: {round((e['tok_in'] + e['tok_out']) / 1000, 1)}k tok "
+                 f"<span class='dim'>{e['calls']} calls</span></li>"
+                 for o, e in sorted(met.items(), key=lambda kv: -(kv[1]['tok_in'] + kv[1]['tok_out']))[:8])
+    cards.append(sec("Metabolism (token spend by organ)", f"<ul>{mt or '<li class=dim>meter just started</li>'}</ul>"))
+
+    orc = _j(".oracle.json", [])
+    oc = "".join(f"<li>{'⏳' if p['status'] == 'open' else ('🏆' if p.get('beat_market') else '📉')} "
+                 f"{html.escape(p['question'][:46])} <span class='dim'>m {p['market_prob']:.0%} / "
+                 f"a {p['agora_prob']:.0%}</span></li>" for p in orc[-6:])
+    cards.append(sec(f"Oracle ({len(orc)} positions)", f"<ul>{oc or '<li class=dim>none</li>'}</ul>"))
+
     return f"""<!DOCTYPE html><html><head><meta charset="utf-8"><title>Agora — Gauges</title>
 <meta http-equiv="refresh" content="300"><style>
 body{{background:#0a0e18;color:#cfc9e6;font-family:monospace;margin:20px}}

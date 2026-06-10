@@ -689,6 +689,13 @@ async def brain_memory_economy(n: int = 12):
             "report": format_economy(notes, cands)}
 
 
+@router.get("/brain/metabolism")
+async def brain_metabolism():
+    """THE METABOLISM — per-organ token spend, value points, and ROI (value/kilotoken)."""
+    from agora.execution.metabolism import format_metabolism, roi_report
+    return {"status": "ok", "report": format_metabolism(), **roi_report()}
+
+
 @router.get("/brain/oracle/scan")
 async def brain_oracle_scan():
     """THE ORACLE — open, liquid, in-domain prediction markets worth an independent call."""

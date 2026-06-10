@@ -619,6 +619,20 @@ app = FastAPI(title="Agora", version="0.1.0", lifespan=lifespan)
 app.add_middleware(CORSMiddleware, allow_origins=["*"],
                    allow_methods=["*"], allow_headers=["*"])
 
+
+@app.middleware("http")
+async def _tag_organ(request, call_next):
+    """METABOLISM: tag the request's organ from the route's last path segment so every LLM call
+    it makes (even via asyncio.to_thread) is attributed to that capability."""
+    try:
+        seg = [s for s in request.url.path.split("/") if s]
+        if seg:
+            from agora.execution.metabolism import set_organ
+            set_organ(seg[-1])
+    except Exception:
+        pass
+    return await call_next(request)
+
 # Mount API routes
 app.include_router(agents_api.router, prefix="/api/v1/agents", tags=["agents"])
 app.include_router(tasks_api.router, prefix="/api/v1/tasks", tags=["tasks"])

@@ -148,6 +148,15 @@ def call_llm(
                 resp = client.chat.completions.create(**kwargs)
                 content = resp.choices[0].message.content or ""
 
+                # METABOLISM: meter every real call against its organ (never breaks the call)
+                try:
+                    from agora.execution.metabolism import record_call as _meter
+                    u = getattr(resp, "usage", None)
+                    _meter(getattr(u, "prompt_tokens", 0) or (len(system_prompt) + len(user_prompt)) // 4,
+                           getattr(u, "completion_tokens", 0) or len(content) // 4)
+                except Exception:
+                    pass
+
                 # deepseek-v4-flash intermittently returns an empty completion (finish=stop,
                 # no error) — retry a couple times before giving up on this call.
                 if not content.strip() and attempt < 2:
