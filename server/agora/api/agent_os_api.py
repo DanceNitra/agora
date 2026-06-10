@@ -1,4 +1,6 @@
 """Agent OS API — soul, brain, body, abilities, skills, help requests."""
+from pathlib import Path
+
 from fastapi import APIRouter, Request, HTTPException
 
 from agora.api.dungeon import DUNGEON_AGENT_IDS
@@ -1139,11 +1141,24 @@ async def brain_belief_challenge_target():
 @router.post("/brain/belief-revise")
 async def brain_belief_revise(request: Request):
     """Record a challenge outcome on the belief note itself: survived / revised / retired.
-    Superseded notes stay in the vault — stamped and bannered, never deleted."""
+    Superseded notes stay in the vault — stamped and bannered, never deleted.
+    Every resolved challenge also pays the Bounty Ledger — kills feed standing."""
     from agora.execution.belief_revision import stamp_belief
+    from agora.execution.bounty import record_challenge
     b = await request.json()
-    return stamp_belief(b.get("path") or "", b.get("verdict") or "",
-                        b.get("by_note") or "", b.get("reason") or "")
+    res = stamp_belief(b.get("path") or "", b.get("verdict") or "",
+                       b.get("by_note") or "", b.get("reason") or "")
+    if not res.get("error"):
+        record_challenge(b.get("verdict") or "", Path(b.get("path") or "").stem,
+                         b.get("challenger") or "Sergeant Voss")
+    return res
+
+
+@router.get("/brain/bounty")
+async def brain_bounty():
+    """THE BOUNTY LEDGER — kill-authority per challenger (science pays for kills)."""
+    from agora.execution.bounty import format_bounty, scores
+    return {"status": "ok", "report": format_bounty(), "scores": scores()}
 
 
 @router.get("/brain/beliefs")

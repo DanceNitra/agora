@@ -881,6 +881,7 @@ _FORECASTER_EID = {"Kael": "thief", "Mira": "scholar", "Orin": "priest",
                    "Aldric": "king", "Elara": "guard_r", "Voss": "guard_l"}
 _forecast_scores: dict = {}     # eid -> {"total", "correct", "hit_rate"} (refreshed by _run_predictions)
 _mastery_scores: dict = {}      # eid -> verification rate (whose findings survive checking)
+_bounty_scores: dict = {}       # eid -> kill-authority (whose challenges actually fell beliefs)
 _trust_engine = None
 _trust_db = None
 
@@ -1254,6 +1255,9 @@ def _compute_standing(trust: list[dict]) -> dict:
         ms = _mastery_scores.get(e)
         if ms is not None:                      # findings that survive verification → authority
             s = 0.85 * s + 0.15 * ms
+        ka = _bounty_scores.get(e)
+        if ka is not None:                      # challenges that fell beliefs → authority (kills pay)
+            s = 0.9 * s + 0.1 * ka
         out[e] = round(s, 3)
     return out
 
@@ -1635,6 +1639,12 @@ async def _refresh_forecast_scores() -> None:
         eid = by_full.get(full)
         if eid and sc.get("rate") is not None:
             _mastery_scores[eid] = sc["rate"]
+    # The Bounty Ledger: kill-authority per challenger → standing blend (rigor pays)
+    bo = await asyncio.to_thread(_brain_get_sync, "/api/v1/agent-os/brain/bounty")
+    for full, ka in ((bo or {}).get("scores") or {}).items():
+        eid = by_full.get(full)
+        if eid:
+            _bounty_scores[eid] = ka
 
 
 async def _run_predictions() -> None:
@@ -2109,7 +2119,10 @@ async def _queue_hypothesis_induction() -> None:
     if _theme_is_covered(theme, covered):
         return
     await asyncio.to_thread(_brain_post_sync, "/api/v1/agent-os/brain/claude-inbox",
-                            {"text": f"Hypothesize from findings: {theme[:90]}"})
+                            {"text": f"Hypothesize from findings: {theme[:90]} || SEVERE-TEST RULE: "
+                                     f"the hypothesis must ship WITH a runnable Lab test - run the "
+                                     f"baseline via /brain/lab/run in this same task and put the "
+                                     f"measured number in the note; no runnable test, no hypothesis"})
     broadcast({"type": "os_build", "kind": "collab", "who": "High Priest Orin",
                "text": f"found a cross-agent finding cluster — queued a hypothesis: {theme[:34]}"})
     _mind_spark("#b89bff")        # violet — a conjecture forms
