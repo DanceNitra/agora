@@ -718,9 +718,11 @@ async def brain_correspondent_harvest(request: Request):
     import asyncio as _aio
     from agora.execution.correspondent import harvest_replies
     fresh = await _aio.to_thread(harvest_replies)
+    from agora.execution.input_shield import wrap_as_data
     for c in fresh[:3]:
         from agora.execution.claude_inbox import add_task
-        add_task(f"Correspondence reply by {c['by']} on '{c['title'][:50]}': {c['text'][:200]}")
+        safe = wrap_as_data(f"GitHub user {c['by']}", c["text"])
+        add_task(f"Correspondence reply on '{c['title'][:50]}'. {safe}")
     return {"status": "ok", "new_replies": len(fresh)}
 
 
