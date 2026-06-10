@@ -3024,17 +3024,19 @@ async def ambient_life():
         # its coverage is enough, so check often (~3h), not daily.
         if loop_n % 8000 == 5000:
             asyncio.create_task(_tick_campaign())
-        # THE ANALOGY FORGE — one structural cross-domain mapping a day (~daily, offset).
-        if loop_n % 64000 == 36000:
+        # THE ANALOGY FORGE — a structural cross-domain mapping ~3x/day (the dedup +
+        # mechanism-rotation ledger keep extra runs cheap and non-repeating).
+        if loop_n % 21000 == 9000:
             asyncio.create_task(_queue_analogy_forge())
-        # BELIEF REVISION — challenge the belief longest without a test (~2 days).
-        if loop_n % 128000 == 90000:
+        # BELIEF REVISION — challenge the belief longest without a test (~daily).
+        if loop_n % 64000 == 42000:
             asyncio.create_task(_queue_belief_challenge())
-        # THE COURT — structured debate (thesis→attack→defense) over a live belief (~2 days, offset).
-        if loop_n % 128000 == 45000:
+        # THE COURT — structured debate (thesis→attack→defense) over a live belief (~3x/day;
+        # _task_already_pending keeps at most one transcript waiting for the judge).
+        if loop_n % 21000 == 16000:
             asyncio.create_task(_run_debate())
-        # CONTRADICTION SWEEP — find where the vault disagrees with itself (~2 days, offset).
-        if loop_n % 128000 == 60000:
+        # CONTRADICTION SWEEP — find where the vault disagrees with itself (~daily, offset).
+        if loop_n % 64000 == 20000:
             asyncio.create_task(_run_contradiction_sweep())
         # COHERENCE AUDIT — does AGORA contradict itself? one new belief per day (~daily offset).
         if loop_n % 64000 == 50000:
@@ -3042,13 +3044,14 @@ async def ambient_life():
         # THE COUNTERFACTUAL SELF — weekly review of history replayed under other policies.
         if loop_n % 448000 == 330000:
             asyncio.create_task(_queue_counterfactual_review())
-        # THE THEORY ENGINE — run one mechanistic belief as a formal model (~2 days, offset).
-        if loop_n % 128000 == 110000:
+        # THE THEORY ENGINE — run one mechanistic belief as a formal model (~daily, offset).
+        if loop_n % 64000 == 58000:
             asyncio.create_task(_queue_theory_run())
-        # THE CORRESPONDENT — compose outreach weekly (gated); harvest replies daily.
-        if loop_n % 448000 == 270000:
+        # THE CORRESPONDENT — compose outreach ~2x/week (gated); harvest replies every ~6h
+        # (a public conversation deserves a same-day answer, not a tomorrow one).
+        if loop_n % 224000 == 100000:
             asyncio.create_task(_queue_outreach())
-        if loop_n % 64000 == 59000:
+        if loop_n % 16000 == 3000:
             asyncio.create_task(_run_reply_harvest())
         # THE ORACLE — pick one live market for an independent call (~daily) + resolve (~daily).
         if loop_n % 64000 == 7000:
