@@ -4,12 +4,44 @@ Fact-check agent findings against REAL sources before they are trusted/incorpora
 For a claim, re-fetch real papers on its topic and ask a strict critic LLM whether the abstracts
 actually support it: VERIFIED / OVERSTATED / UNSUPPORTED. This is the gate between "an agent said
 it" and "we incorporate it into the vault as knowledge".
+
+A verdict is only as honest as the literature it judges against. When the corpus has nothing on
+the claim's subject, the fetch returns *unrelated* papers — and a "synthesis counts" reviewer
+rubber-stamps VERIFIED with an irrelevant Source: attached (observed live: a 2023
+software-architecture claim "verified" against a 2010 Faà di Bruno combinatorics paper). So
+before any LLM sees them, papers pass a deterministic RELEVANCE GATE (content-word overlap with
+the claim); with no relevant literature the verdict is INCONCLUSIVE and nothing is incorporated —
+a fake ✓ is worse than no ✓.
 """
 from __future__ import annotations
 
 import asyncio
 import json
 import re
+
+_WORD = re.compile(r"[A-Za-z][A-Za-z\-]{3,}")
+
+
+def _content_words(text: str) -> set[str]:
+    from agora.execution.research_tool import _STOP
+    return {w.lower() for w in _WORD.findall(text or "") if w.lower() not in _STOP}
+
+
+def _relevant_papers(topic: str, body: str, papers: list[dict]) -> list[tuple[float, dict]]:
+    """Papers that actually share vocabulary with the claim, best first.
+    Relevant = >=3 distinctive claim words appear in the paper's title+abstract AND they cover
+    >=10% of the claim's vocabulary — unrelated fields (the Faà di Bruno case) score ~0."""
+    cw = _content_words(topic + " " + body[:600])
+    scored = []
+    for p in papers:
+        if p.get("error"):
+            continue
+        pw = _content_words((p.get("title") or "") + " " + (p.get("summary") or ""))
+        shared = len(cw & pw)
+        share = shared / max(len(cw), 8)
+        if shared >= 3 and share >= 0.10:
+            scored.append((share, p))
+    return sorted(scored, key=lambda x: -x[0])
 
 
 async def verify_finding(title: str, claim: str) -> dict:
@@ -32,7 +64,15 @@ async def verify_finding(title: str, claim: str) -> dict:
     topic = re.sub(r"\s*<->\s*", " and ", topic)         # bridge titles "A <-> B" -> "A and B"
     query = topic[:90] if len(topic) > 10 else " ".join(body.split()[:12])
     papers = await asyncio.to_thread(research, query, 5)
-    sources = format_for_prompt(papers)
+
+    # RELEVANCE GATE — only literature that is actually about the claim's subject may judge it.
+    relevant = _relevant_papers(topic, body, papers)
+    if not relevant:
+        return {"verdict": "INCONCLUSIVE",
+                "reason": "no relevant literature retrieved for this claim's subject "
+                          "(corpus gap) — refusing to judge against unrelated papers",
+                "source": ""}
+    sources = format_for_prompt([p for _, p in relevant])
 
     raw = await asyncio.to_thread(
         call_llm,
