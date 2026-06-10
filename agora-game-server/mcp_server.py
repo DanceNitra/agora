@@ -1880,6 +1880,27 @@ async def _queue_canon_update() -> None:
     _mind_spark("#ffd27a")        # gold — the book rewrites itself
 
 
+async def _queue_outreach() -> None:
+    """CORRESPONDENT: weekly, have Claude compose a public outreach from the strongest belief
+    (the post is GATED — nothing leaves until the owner approves)."""
+    if await _task_already_pending("Compose outreach"):
+        return
+    await asyncio.to_thread(_brain_post_sync, "/api/v1/agent-os/brain/claude-inbox",
+                            {"text": "Compose outreach"})
+    broadcast({"type": "os_build", "kind": "collab", "who": "King Aldric",
+               "text": "correspondent: queued the weekly public letter (gated on the owner)"})
+
+
+async def _run_reply_harvest() -> None:
+    """CORRESPONDENT: pull new replies on posted letters — external challenge coming home."""
+    d = await asyncio.to_thread(_brain_post_sync, "/api/v1/agent-os/brain/correspondent/harvest",
+                                {}, 60)
+    if d and d.get("new_replies"):
+        broadcast({"type": "os_build", "kind": "discovery", "who": "Shadow Kael",
+                   "text": f"correspondent: {d['new_replies']} new repl(ies) from outside — challenge inbound"})
+        _mind_spark("#ff9ad1", "explosion")
+
+
 async def _queue_theory_run() -> None:
     """THEORY ENGINE: queue the next mechanistic belief for Claude to build + run as a formal
     model — beliefs stop being prose and start being executables."""
@@ -2800,6 +2821,11 @@ async def ambient_life():
         # THE THEORY ENGINE — run one mechanistic belief as a formal model (~2 days, offset).
         if loop_n % 128000 == 110000:
             asyncio.create_task(_queue_theory_run())
+        # THE CORRESPONDENT — compose outreach weekly (gated); harvest replies daily.
+        if loop_n % 448000 == 270000:
+            asyncio.create_task(_queue_outreach())
+        if loop_n % 64000 == 59000:
+            asyncio.create_task(_run_reply_harvest())
         # THE ORACLE — pick one live market for an independent call (~daily) + resolve (~daily).
         if loop_n % 64000 == 7000:
             asyncio.create_task(_run_oracle_scan())

@@ -23,7 +23,7 @@ _ACTIONS = Path(__file__).resolve().parents[2] / ".actions.json"
 OUTPUT_DIR = Path(__file__).resolve().parents[2].parent / "agora_output"
 
 SAFE_KINDS = {"build_tool", "build_file", "analysis", "export_insights", "digest"}  # local → auto
-GATED_KINDS = {"publish", "send", "repo", "external", "gist", "curate"}  # outward/irreversible → approval
+GATED_KINDS = {"publish", "send", "repo", "external", "gist", "curate", "outreach"}  # → approval
 
 
 def _load() -> list:
@@ -135,6 +135,13 @@ def execute_action(aid: str, vault_path: str = "") -> dict:
             q = quarantine_notes(vault_path, a.get("payload", {}).get("paths", []))
             result = f"quarantined {q['moved']} note(s) → {q['batch']}" if q["moved"] \
                 else "nothing to quarantine (paths gone or excluded)"
+        elif a["kind"] == "outreach":
+            # Correspondent: post the approved draft as a public GitHub issue
+            from agora.execution.correspondent import post_outreach
+            p = post_outreach(a.get("payload", {}).get("corr_id", ""))
+            if p.get("error"):
+                raise RuntimeError(p["error"])
+            result = f"posted → {p['url']}"
         elif a["kind"] == "publish":
             # Research Exchange: re-compose fresh, then push the digest to the public repo
             from agora.execution.research_exchange import compose_digest, publish_digest

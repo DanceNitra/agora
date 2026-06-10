@@ -458,6 +458,9 @@ async def _handle(app, text: str) -> None:
     elif low in ("board", "/board"):
         d = await asyncio.to_thread(_brain_get, "/api/v1/agent-os/brain/board")
         await send((d or {}).get("report", "_No board yet._"))
+    elif low in ("correspondence", "/correspondence", "letters"):
+        d = await asyncio.to_thread(_brain_get, "/api/v1/agent-os/brain/correspondence")
+        await send((d or {}).get("report", "_No correspondence._"))
     elif low in ("theory", "/theory"):
         d = await asyncio.to_thread(_brain_get, "/api/v1/agent-os/brain/theory")
         await send((d or {}).get("report", "_No theory runs._"))
@@ -518,7 +521,7 @@ async def _handle(app, text: str) -> None:
             await send(f"_No action {aid}._")
         elif not approve:
             await send(f"🚫 Rejected `{aid}`.")
-        elif a.get("kind") in ("export_insights", "digest", "curate", "gist", "publish"):
+        elif a.get("kind") in ("export_insights", "digest", "curate", "gist", "publish", "outreach"):
             # deterministic executor kinds run immediately on approval
             r = await asyncio.to_thread(_brain_post, "/api/v1/agent-os/brain/action-execute",
                                         {"id": aid})

@@ -689,6 +689,45 @@ async def brain_memory_economy(n: int = 12):
             "report": format_economy(notes, cands)}
 
 
+@router.post("/brain/correspondent/draft")
+async def brain_correspondent_draft(request: Request):
+    """THE CORRESPONDENT — store Claude's composed outreach and propose the GATED action.
+    Nothing leaves the machine until the owner approves from Telegram."""
+    from agora.execution.correspondent import save_draft
+    from agora.execution.hands import propose_action, pending_approvals
+    b = await request.json()
+    title, body = (b.get("title") or "").strip(), (b.get("body") or "").strip()
+    if len(title) < 10 or len(body) < 100:
+        return {"status": "too_short"}
+    if any(x.get("kind") == "outreach" for x in pending_approvals()):
+        return {"status": "already_pending"}
+    rec = save_draft(title, body)
+    act = propose_action("outreach", f"Post public outreach: {title[:70]}",
+                         body[:300], {"corr_id": rec["id"]})
+    await _send_telegram(f"✉️ Correspondent proposal `{act['id']}`: post a public GitHub issue\n"
+                         f"*{title[:80]}*\n_{body[:180]}…_\n"
+                         f"Reply `approve {act['id']}` or `reject {act['id']}`.")
+    return {"status": "proposed", "draft": rec, "action": act}
+
+
+@router.post("/brain/correspondent/harvest")
+async def brain_correspondent_harvest(request: Request):
+    """Pull new replies to posted correspondences — external challenge coming home."""
+    import asyncio as _aio
+    from agora.execution.correspondent import harvest_replies
+    fresh = await _aio.to_thread(harvest_replies)
+    for c in fresh[:3]:
+        from agora.execution.claude_inbox import add_task
+        add_task(f"Correspondence reply by {c['by']} on '{c['title'][:50]}': {c['text'][:200]}")
+    return {"status": "ok", "new_replies": len(fresh)}
+
+
+@router.get("/brain/correspondence")
+async def brain_correspondence():
+    from agora.execution.correspondent import format_correspondence, _load
+    return {"status": "ok", "report": format_correspondence(), "items": _load()[-10:]}
+
+
 @router.get("/brain/theory/target")
 async def brain_theory_target():
     """THEORY ENGINE — the next mechanistic belief awaiting a model run."""
