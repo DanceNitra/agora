@@ -1880,6 +1880,22 @@ async def _queue_canon_update() -> None:
     _mind_spark("#ffd27a")        # gold — the book rewrites itself
 
 
+async def _queue_theory_run() -> None:
+    """THEORY ENGINE: queue the next mechanistic belief for Claude to build + run as a formal
+    model — beliefs stop being prose and start being executables."""
+    if await _task_already_pending("Model belief:"):
+        return
+    d = await asyncio.to_thread(_brain_get_sync, "/api/v1/agent-os/brain/theory/target", 30)
+    t = (d or {}).get("target")
+    if not t:
+        return
+    await asyncio.to_thread(_brain_post_sync, "/api/v1/agent-os/brain/claude-inbox",
+                            {"text": f"Model belief: {t['title'][:100]} || path: {t['path']}"})
+    broadcast({"type": "os_build", "kind": "collab", "who": "High Priest Orin",
+               "text": f"theory engine: queued a belief to RUN as a model — {t['title'][:38]}"})
+    _mind_spark("#b89bff", "explosion")
+
+
 async def _queue_counterfactual_review() -> None:
     """COUNTERFACTUAL SELF: weekly, have Claude interpret the policy replays and turn deltas
     into design lessons (causal inference pointed at the system's own history)."""
@@ -2781,6 +2797,9 @@ async def ambient_life():
         # THE COUNTERFACTUAL SELF — weekly review of history replayed under other policies.
         if loop_n % 448000 == 330000:
             asyncio.create_task(_queue_counterfactual_review())
+        # THE THEORY ENGINE — run one mechanistic belief as a formal model (~2 days, offset).
+        if loop_n % 128000 == 110000:
+            asyncio.create_task(_queue_theory_run())
         # THE ORACLE — pick one live market for an independent call (~daily) + resolve (~daily).
         if loop_n % 64000 == 7000:
             asyncio.create_task(_run_oracle_scan())

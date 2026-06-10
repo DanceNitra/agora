@@ -689,6 +689,30 @@ async def brain_memory_economy(n: int = 12):
             "report": format_economy(notes, cands)}
 
 
+@router.get("/brain/theory/target")
+async def brain_theory_target():
+    """THEORY ENGINE — the next mechanistic belief awaiting a model run."""
+    from agora.config import settings
+    from agora.execution.theory import pick_target
+    vault = settings.vault_path or "C:/Users/Danculus/my-second-brain"
+    return {"status": "ok", "target": pick_target(vault)}
+
+
+@router.post("/brain/theory/record")
+async def brain_theory_record(request: Request):
+    """Ledger a theory run and stamp the belief (corroborated/strained/unmodelable)."""
+    from agora.execution.theory import record_run
+    b = await request.json()
+    return record_run(b.get("title") or "", b.get("path") or "", b.get("verdict") or "",
+                      b.get("lab") or "", b.get("summary") or "")
+
+
+@router.get("/brain/theory")
+async def brain_theory():
+    from agora.execution.theory import format_theory, _load
+    return {"status": "ok", "report": format_theory(), "runs": _load()[-15:]}
+
+
 @router.get("/brain/counterfactual")
 async def brain_counterfactual():
     """THE COUNTERFACTUAL SELF — the system's history replayed under alternative policies."""
