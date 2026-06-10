@@ -2408,13 +2408,16 @@ async def _run_red_team() -> None:
     try:
         broadcast({"type": "os_build", "kind": "challenge", "who": "Shadow Kael",
                    "text": f"red-teams the keep's strongest belief: '{claim[:38]}'"})
+        fallback = f"Even '{claim[:36]}' has a crack."
         attack = await _llm_say(
             f"You are {_persona('thief')} You are RED-TEAMING the system's strongest, most-relied-on "
             f"belief — the more it has survived, the more dangerous it is if wrong.",
             f"The belief: '{claim}'. In ONE line (max 22 words), construct the single sharpest "
             f"disconfirming case: a concrete counterexample, a hidden confound, or a measurable "
             f"prediction where it should FAIL. Be specific and adversarial.",
-            f"Even '{claim[:36]}' has a crack.")
+            fallback)
+        if attack.strip() == fallback:
+            return                                # the LLM failed — a canned line is not a case
         engine.set_entity_thought("thief", attack)
         _mind_spark("#ff6a6a", "explosion")
         await asyncio.to_thread(
@@ -2514,12 +2517,15 @@ async def _run_debate() -> None:
         engine.set_entity_thought(mira, thesis)
         broadcast({"type": "converse", "from": mira, "to": voss})
         await asyncio.sleep(2.0)
+        atk_fallback = f"The weakest assumption in '{claim[:40]}' is untested."
         attack = await _llm_say(
             f"You are {_persona(voss)} You PROSECUTE weak beliefs; your standing grows on kills.",
             f"The belief: '{claim}'. The defense said: '{thesis}'. In ONE line (max 22 words), "
             f"state the single sharpest objection — a confound, a counterexample, or a missing "
             f"control. Attack the argument, not the speaker.",
-            f"The weakest assumption in '{claim[:40]}' is untested.")
+            atk_fallback)
+        if attack.strip() == atk_fallback:
+            return                                # no real prosecution today — adjourn, don't fake it
         engine.set_entity_thought(voss, attack)
         broadcast({"type": "converse", "from": voss, "to": mira})
         await asyncio.sleep(2.0)
