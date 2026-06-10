@@ -3088,17 +3088,17 @@ async def ambient_life():
         # Reality Bridge — Orin empirically tests a recent finding vs real-world data (~12 min).
         if loop_n % 850 == 350:
             asyncio.create_task(_run_reality_check())
-        # Insight Engine — Agora queues a rich theme for Claude Opus to synthesize (~3 h, premium).
-        if loop_n % 13000 == 1100:
+        # Insight Engine — Agora queues a rich theme for Claude to synthesize (~45 min, premium).
+        if loop_n % 3200 == 1100:
             asyncio.create_task(_queue_insight_theme())
-        # Flywheel — queue an insight's falsifier for Claude to re-test + deepen (~4 h, offset).
-        if loop_n % 17000 == 9000:
+        # Flywheel — queue an insight's falsifier for Claude to re-test + deepen (~40 min).
+        if loop_n % 2800 == 1500:
             asyncio.create_task(_queue_deepening())
-        # Prediction Ledger — resolve due predictions vs reality + queue a new one for Claude (~2 h).
-        if loop_n % 9000 == 2500:
+        # Prediction Ledger — resolve due predictions + queue a new one for Claude (~45 min).
+        if loop_n % 3200 == 1500:
             asyncio.create_task(_run_predictions())
-        # Dialectic — queue a contentious claim for Claude to stress-test (~5 h, offset).
-        if loop_n % 19000 == 7000:
+        # Dialectic — queue a contentious claim for Claude to stress-test (~40 min, offset).
+        if loop_n % 2800 == 400:
             asyncio.create_task(_queue_dialectic())
         # The Agora Mind — metacognitive reflection: synthesize the worldview + self-direct (~daily).
         if loop_n % 64000 == 33000:
@@ -3121,8 +3121,8 @@ async def ambient_life():
         # RESEARCH EXCHANGE — compose + propose the public digest (GATED, ~weekly offset).
         if loop_n % 448000 == 120000:
             asyncio.create_task(_run_research_exchange())
-        # HYPOTHESIS INDUCTION — bridge a finding cluster into a testable conjecture (~8 h).
-        if loop_n % 22000 == 15000:
+        # HYPOTHESIS INDUCTION — bridge a finding cluster into a testable conjecture (~45 min).
+        if loop_n % 3200 == 2000:
             asyncio.create_task(_queue_hypothesis_induction())
         # THE OBSERVATORY — one vital-signs reading of the whole organism (~weekly offset).
         if loop_n % 448000 == 350000:
@@ -3137,28 +3137,24 @@ async def ambient_life():
         # its coverage is enough, so check often (~3h), not daily.
         if loop_n % 8000 == 5000:
             asyncio.create_task(_tick_campaign())
-        # THE ANALOGY FORGE — a structural cross-domain mapping ~3x/day (the dedup +
-        # mechanism-rotation ledger keep extra runs cheap and non-repeating).
-        if loop_n % 21000 == 9000:
+        # ── THE SCIENCE ORGANS ─────────────────────────────────────────────
+        # These only QUEUE a task for Claude and each is capped by _task_already_pending
+        # (at most one of its kind pending), so a fast cadence cannot flood — it just keeps
+        # Claude's bench always stocked. ~0.85s/tick, so these fire every ~30-50 min, staggered.
+        if loop_n % 2800 == 900:                       # Analogy Forge  (~40 min)
             asyncio.create_task(_queue_analogy_forge())
-        # BELIEF REVISION — challenge the belief longest without a test (~daily).
-        if loop_n % 64000 == 42000:
+        if loop_n % 3500 == 1200:                      # Belief revision  (~50 min)
             asyncio.create_task(_queue_belief_challenge())
-        # THE COURT — structured debate (thesis→attack→defense) over a live belief (~3x/day;
-        # _task_already_pending keeps at most one transcript waiting for the judge).
-        if loop_n % 21000 == 16000:
+        if loop_n % 2800 == 2100:                      # The Court — structured debate  (~40 min)
             asyncio.create_task(_run_debate())
-        # THE REPLICATION UNIT — Rooke benches one sourced claim for a Lab re-run (~2x/day).
-        if loop_n % 32000 == 11000:
+        if loop_n % 2500 == 600:                       # Replication Unit (Rooke)  (~35 min)
             asyncio.create_task(_queue_replication())
-        # THE CARTOGRAPHER — Wren charts the widest structural hole in the map (~2x/day, offset).
-        if loop_n % 32000 == 27000:
+        if loop_n % 2500 == 1700:                      # Cartographer (Wren)  (~35 min)
             asyncio.create_task(_queue_cartography())
-        # KAEL'S RED TEAM — adversarial attack on the STRONGEST belief (~2x/day, offset).
-        if loop_n % 32000 == 19000:
+        if loop_n % 2500 == 1100:                      # Kael's Red Team  (~35 min)
             asyncio.create_task(_run_red_team())
-        # CONTRADICTION SWEEP — find where the vault disagrees with itself (~daily, offset).
-        if loop_n % 64000 == 20000:
+        # CONTRADICTION SWEEP — find where the vault disagrees with itself (~50 min, offset).
+        if loop_n % 3500 == 2400:
             asyncio.create_task(_run_contradiction_sweep())
         # COHERENCE AUDIT — does AGORA contradict itself? one new belief per day (~daily offset).
         if loop_n % 64000 == 50000:
@@ -3166,8 +3162,8 @@ async def ambient_life():
         # THE COUNTERFACTUAL SELF — weekly review of history replayed under other policies.
         if loop_n % 448000 == 330000:
             asyncio.create_task(_queue_counterfactual_review())
-        # THE THEORY ENGINE — run one mechanistic belief as a formal model (~daily, offset).
-        if loop_n % 64000 == 58000:
+        # THE THEORY ENGINE — run one mechanistic belief as a formal model (~50 min, offset).
+        if loop_n % 3500 == 3000:
             asyncio.create_task(_queue_theory_run())
         # THE CORRESPONDENT — compose outreach ~2x/week (gated); harvest replies every ~6h
         # (a public conversation deserves a same-day answer, not a tomorrow one).
