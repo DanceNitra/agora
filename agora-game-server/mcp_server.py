@@ -1880,6 +1880,20 @@ async def _queue_canon_update() -> None:
     _mind_spark("#ffd27a")        # gold — the book rewrites itself
 
 
+async def _run_coherence() -> None:
+    """COHERENCE AUDIT: check one new belief against its closest siblings; tensions queue an
+    internal dialectic — Agora's belief set stays a system, not a pile."""
+    d = await asyncio.to_thread(_brain_post_sync, "/api/v1/agent-os/brain/coherence/audit",
+                                {}, 180)
+    if d and d.get("status") == "ok":
+        msg = (f"coherence: audited '{(d.get('audited') or '')[:38]}' — "
+               + (f"{d['tensions_found']} internal tension(s) → dialectic"
+                  if d.get("tensions_found") else "consistent with the belief set"))
+        broadcast({"type": "os_build", "kind": "collab", "who": "Sergeant Voss", "text": msg})
+        if d.get("tensions_found"):
+            _mind_spark("#ff9a9a")
+
+
 async def _run_contradiction_sweep() -> None:
     """CONTRADICTION SWEEP: judge close note pairs for incompatibility, then feed the top open
     contradiction into the dialectic pipeline (thesis/antithesis/synthesis resolves it)."""
@@ -2720,6 +2734,9 @@ async def ambient_life():
         # CONTRADICTION SWEEP — find where the vault disagrees with itself (~2 days, offset).
         if loop_n % 128000 == 60000:
             asyncio.create_task(_run_contradiction_sweep())
+        # COHERENCE AUDIT — does AGORA contradict itself? one new belief per day (~daily offset).
+        if loop_n % 64000 == 50000:
+            asyncio.create_task(_run_coherence())
         # THE CANON — when enough new artifacts landed, queue the living-book merge (~2 days).
         if loop_n % 128000 == 30000:
             asyncio.create_task(_queue_canon_update())

@@ -689,6 +689,21 @@ async def brain_memory_economy(n: int = 12):
             "report": format_economy(notes, cands)}
 
 
+@router.post("/brain/coherence/audit")
+async def brain_coherence_audit(request: Request):
+    """COHERENCE AUDIT — check one new belief against its closest siblings for incompatibility."""
+    from agora.config import settings
+    from agora.execution.coherence import audit_once
+    vault = settings.vault_path or "C:/Users/Danculus/my-second-brain"
+    return await audit_once(vault)
+
+
+@router.get("/brain/coherence")
+async def brain_coherence():
+    from agora.execution.coherence import format_coherence, _load
+    return {"status": "ok", "report": format_coherence(), **_load()}
+
+
 @router.get("/dashboard")
 async def brain_dashboard():
     """THE GAUGES — the whole organism on one page (read-only HTML, SVG sparklines)."""
