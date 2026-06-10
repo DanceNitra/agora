@@ -2185,6 +2185,33 @@ async def _queue_hypothesis_induction() -> None:
     _mind_spark("#b89bff")        # violet — a conjecture forms
 
 
+async def _run_synthesis_detector() -> None:
+    """HIGH PRIEST ORIN — SYNTHESIS DETECTOR (his second ability): instrument the canon's own
+    phase-transition precursors (bridge-rate acceleration, falsifier-closure slowing) and, only
+    when they cross threshold, queue Claude to attempt ONE new unifying principle subsuming >=3
+    insights. Orin doesn't synthesize on a timer — he waits for the system to be ABOUT to."""
+    if await _task_already_pending("Attempt grand synthesis"):
+        return
+    d = await asyncio.to_thread(_brain_get_sync, "/api/v1/agent-os/brain/synthesis-signals", 30)
+    if not d or not d.get("due"):
+        return                                        # not poised — stay silent
+    await asyncio.to_thread(
+        _brain_post_sync, "/api/v1/agent-os/brain/claude-inbox",
+        {"text": f"Attempt grand synthesis: the phase-transition precursors crossed threshold "
+                 f"(bridge accel x{d.get('bridge_accel')}, {d.get('open_falsifiers')} open "
+                 f"falsifiers, pressure {d.get('pressure')}). Look across the active insights/"
+                 f"beliefs (GET /brain/beliefs + /brain/canon-inputs) and attempt ONE NEW unifying "
+                 f"principle that genuinely SUBSUMES >=3 of them (not a restatement). If a real "
+                 f"synthesis exists: write it, merge into Canon (/brain/canon-write), push. If the "
+                 f"precursors fired but no honest unification exists, record that the signal was a "
+                 f"false alarm (a vault note 'synthesis not yet') - a measured non-event TESTS our "
+                 f"own phase-transition belief, which is the point."})
+    broadcast({"type": "os_build", "kind": "discovery", "who": "High Priest Orin",
+               "text": f"the precursors are aligning — a grand synthesis may be near "
+                       f"(pressure {d.get('pressure')})"})
+    _mind_spark("#ffd27a", "explosion")        # gold — a phase transition impends
+
+
 async def _run_red_team() -> None:
     """SHADOW KAEL — RED TEAM (his second ability): the scout turns saboteur and attacks the
     system's STRONGEST belief, not its weakest. Most-survived = most load-bearing = most
@@ -3153,6 +3180,8 @@ async def ambient_life():
             asyncio.create_task(_queue_cartography())
         if loop_n % 2500 == 1100:                      # Kael's Red Team  (~35 min)
             asyncio.create_task(_run_red_team())
+        if loop_n % 3000 == 2600:                      # Orin's Synthesis Detector  (~42 min; fires only when due)
+            asyncio.create_task(_run_synthesis_detector())
         # CONTRADICTION SWEEP — find where the vault disagrees with itself (~50 min, offset).
         if loop_n % 3500 == 2400:
             asyncio.create_task(_run_contradiction_sweep())

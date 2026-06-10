@@ -1259,6 +1259,13 @@ async def brain_cartography_record(request: Request):
                                              b.get("note") or "", b.get("outcome") or "")}
 
 
+@router.get("/brain/synthesis-signals")
+async def brain_synthesis_signals():
+    """THE SYNTHESIS DETECTOR — phase-transition precursors on Agora's own knowledge dynamics."""
+    from agora.execution.synthesis_detector import signals, format_synthesis
+    return {"status": "ok", "report": format_synthesis(), **signals()}
+
+
 @router.get("/brain/cartography")
 async def brain_cartography():
     """The map ledger — with the Cartographer's yield refreshed (charted holes since bridged)."""

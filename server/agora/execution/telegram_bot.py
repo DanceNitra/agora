@@ -529,6 +529,9 @@ async def _handle(app, text: str) -> None:
         await send("🗺 _Measuring the map (a moment)…_")
         d = await asyncio.to_thread(_brain_get, "/api/v1/agent-os/brain/cartography")
         await send((d or {}).get("report", "_The map is blank._"))
+    elif low in ("synthesis", "/synthesis", "orin"):
+        d = await asyncio.to_thread(_brain_get, "/api/v1/agent-os/brain/synthesis-signals")
+        await send((d or {}).get("report", "_No synthesis signal._"))
     elif low in ("economy", "/economy", "memory economy"):
         await send("🏛 _Auditing the memory economy (a minute)…_")
         d = await asyncio.to_thread(_brain_get, "/api/v1/agent-os/brain/memory-economy")
