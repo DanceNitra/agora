@@ -66,6 +66,42 @@ _last = {"query": "", "brief": "", "sources": ""}
 _bridges_cache = {"bridges": []}
 
 
+# ── THE THREAD: rolling multi-turn memory so follow-up questions work like a dialogue ──
+from pathlib import Path as _TPath
+
+_THREAD_FILE = _TPath(__file__).resolve().parents[2] / ".thread.json"
+_THREAD_TTL = 2 * 3600          # a thread goes stale after 2h of silence
+
+
+def _thread_load() -> list:
+    try:
+        import time as _t
+        items = json.loads(_THREAD_FILE.read_text(encoding="utf-8"))
+        if items and _t.time() - items[-1].get("ts", 0) > _THREAD_TTL:
+            return []           # stale thread — start fresh
+        return items
+    except Exception:
+        return []
+
+
+def _thread_add(q: str, a: str) -> None:
+    try:
+        import time as _t
+        items = _thread_load()
+        items.append({"q": (q or "")[:200], "a": (a or "")[:300], "ts": _t.time()})
+        _THREAD_FILE.write_text(json.dumps(items[-6:], ensure_ascii=False), encoding="utf-8")
+    except Exception:
+        pass
+
+
+def _thread_text() -> str:
+    items = _thread_load()
+    if not items:
+        return ""
+    return "RECENT CONVERSATION (use to resolve follow-ups like 'and what about X?'):\n" + \
+        "\n".join(f"- They asked: {x['q']} | You answered: {x['a']}" for x in items)
+
+
 async def research_brief(query: str) -> str:
     """Grounded research brief on demand: real cross-field sources + the user's own notes.
     Disambiguates the query in the user's context first (so 'vault' ≠ cryptography)."""
@@ -85,8 +121,9 @@ async def research_brief(query: str) -> str:
         "papers. The user keeps a personal research knowledge-vault (a 'second brain') on AI, "
         "complex systems, causal inference, neuroscience, finance, knowledge management. "
         "Disambiguate domain terms to THEIR context — e.g. 'vault' means a personal knowledge "
-        "base / second brain, NOT cryptography. Reply with ONLY the search query, nothing else.",
-        f"Request: {query}\nTheir related notes: {rel_titles}", "cheap", 0.1, 60)
+        "base / second brain, NOT cryptography. If the request is a FOLLOW-UP, resolve it "
+        "against the recent conversation. Reply with ONLY the search query, nothing else.",
+        f"Request: {query}\nTheir related notes: {rel_titles}\n{_thread_text()}", "cheap", 0.1, 160)
     refined = (refined or query).strip().strip('"')[:110] or query
 
     papers = await asyncio.to_thread(research, refined, 4)
@@ -97,8 +134,8 @@ async def research_brief(query: str) -> str:
         "below, write a tight grounded brief (4-6 sentences): the key finding(s), citing real "
         "papers by author/year, and connect it to the user's notes. NEVER invent sources, and "
         "stay on the user's actual topic.",
-        f"User's question: {query}\nSearch used: {refined}\n\nReal papers:\n{sources}\n\n"
-        f"User's relevant notes: {rel}", "cheap", 0.3, 700) or "(no answer)"
+        f"User's question: {query}\nSearch used: {refined}\n{_thread_text()}\n\n"
+        f"Real papers:\n{sources}\n\nUser's relevant notes: {rel}", "cheap", 0.3, 700) or "(no answer)"
 
     # show the most RELEVANT paper (research() returns by relevance), not the most-cited
     real = [p for p in papers if not p.get("error") and p.get("title")]
@@ -108,6 +145,7 @@ async def research_brief(query: str) -> str:
     _last.update(query=query, brief=brief.strip(),
                  sources="\n".join(f"- {p['title']} ({p.get('citations', 0)} cit.) {p['url']}"
                                    for p in real[:3]))
+    _thread_add(query, brief.strip())          # the Thread: this exchange feeds the next one
     return f"🔬 *{query[:80]}*\n\n{brief.strip()}\n\n{src_line}\n🔗 your notes: {rel}"
 
 
