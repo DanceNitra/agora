@@ -35,3 +35,5 @@ agora-game-server/_dungeon.err
 
 # NOTE: agora_output/ (lab scripts + public digests) is intentionally TRACKED —
 # those are durable research artifacts, committed as a record, not ignored.
+# EXCEPT audit clones: foreign repos we measure are not ours to commit.
+agora_output/audits/
