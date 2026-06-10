@@ -2185,6 +2185,30 @@ async def _queue_hypothesis_induction() -> None:
     _mind_spark("#b89bff")        # violet — a conjecture forms
 
 
+async def _queue_roadmap() -> None:
+    """KING ALDRIC — THE ROADMAP (his second ability): read the whole organism's instrument
+    panel (organ yields, bottleneck, synthesis pressure, open gaps) and queue Claude to
+    synthesize ONE concrete, data-backed next move FOR THE OWNER. Owner-facing, so it runs
+    ~daily, not on the science cadence — direction, not noise."""
+    if await _task_already_pending("Synthesize roadmap"):
+        return
+    d = await asyncio.to_thread(_brain_get_sync, "/api/v1/agent-os/brain/roadmap-inputs", 30)
+    if not d or d.get("status") != "ok":
+        return
+    await asyncio.to_thread(
+        _brain_post_sync, "/api/v1/agent-os/brain/claude-inbox",
+        {"text": f"Synthesize roadmap: read /brain/roadmap-inputs (panel: {d.get('report', '')[:400]}) "
+                 f"and write ONE concrete, DATA-BACKED next move for the owner - what to build or "
+                 f"prioritize next and WHY, citing the specific metric (idle organ, bottleneck, "
+                 f"synthesis pressure, failed replications worth publishing, open forge gaps). "
+                 f"Telegram it as a short numbered recommendation (<=4 lines). Direction, not a "
+                 f"status dump - say what you would do next and the number that justifies it."})
+    broadcast({"type": "os_build", "kind": "collab", "who": "King Aldric",
+               "text": f"reads the instrument panel — drafting the next move (bottleneck: "
+                       f"{d.get('bottleneck', '?')[:30]})"})
+    _mind_spark("#c0392b")        # crimson — the king sets direction
+
+
 async def _run_coherence_audit() -> None:
     """DAME ELARA — COHERENCE AUDIT (her second ability): the bridge-builder runs the inverse of
     bridging. She scans the load-bearing BELIEF set for the pair that should cohere but actually
@@ -3204,6 +3228,9 @@ async def ambient_life():
         # THE INTERVIEW — ask the owner the one question Agora most needs answered (~daily).
         if loop_n % 64000 == 47000:
             asyncio.create_task(_run_interview())
+        # THE ROADMAP — Aldric synthesizes a data-backed next move for the owner (~daily, offset).
+        if loop_n % 64000 == 12000:
+            asyncio.create_task(_queue_roadmap())
         # THE LIBRARY — read ONE full paper and queue it for Claude to digest (~daily, offset).
         if loop_n % 64000 == 55000:
             asyncio.create_task(_queue_library_read())

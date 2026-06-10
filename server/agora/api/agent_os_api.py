@@ -1259,6 +1259,15 @@ async def brain_cartography_record(request: Request):
                                              b.get("note") or "", b.get("outcome") or "")}
 
 
+@router.get("/brain/roadmap-inputs")
+async def brain_roadmap_inputs():
+    """THE ROADMAP — Aldric's organ instrument panel for a data-backed next-move synthesis."""
+    import asyncio as _aio
+    from agora.execution.roadmap import gather, format_roadmap
+    g = await _aio.to_thread(gather)
+    return {"status": "ok", "report": await _aio.to_thread(format_roadmap), **g}
+
+
 @router.get("/brain/synthesis-signals")
 async def brain_synthesis_signals():
     """THE SYNTHESIS DETECTOR — phase-transition precursors on Agora's own knowledge dynamics."""
