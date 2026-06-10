@@ -2128,6 +2128,37 @@ async def _queue_hypothesis_induction() -> None:
     _mind_spark("#b89bff")        # violet — a conjecture forms
 
 
+async def _queue_analogy_forge() -> None:
+    """ANALOGY FORGE: pair the vault's most mechanism-dense concept note with a board-priority
+    domain and demand a STRUCTURAL mapping (same skeleton, different flesh) — the move that
+    produced the system's best idea (phase transitions → knowledge dynamics), made routine."""
+    if await _task_already_pending("Forge analogy"):
+        return
+    d = await asyncio.to_thread(_brain_get_sync, "/api/v1/agent-os/brain/analogy-inputs", 60)
+    mech = (d or {}).get("mechanism") or {}
+    if not mech.get("title"):
+        return
+    targets = [g["title"] for g in (await _brain_gaps())]
+    bd = await asyncio.to_thread(_brain_get_sync, "/api/v1/agent-os/brain/board")
+    m = re.search(r"Priority:\s*([^;]+)", (bd or {}).get("priorities") or "")
+    if m:
+        targets += [t.strip() for t in re.split(r"[+,]", m.group(1)) if len(t.strip()) > 3]
+    if not targets:
+        return
+    target = random.choice(targets)
+    await asyncio.to_thread(
+        _brain_post_sync, "/api/v1/agent-os/brain/claude-inbox",
+        {"text": f"Forge analogy: mechanism '{mech['title'][:60]}' -> domain '{target[:60]}' || "
+                 f"path: {mech.get('path', '')} || STRUCTURAL mapping (same skeleton, different "
+                 f"flesh), not surface similarity; ship the mapped hypothesis + falsifier + "
+                 f"Lab-run baseline (severe-test rule) as a vault note tags "
+                 f"['agora','analogy','claude-synthesis'], then POST /brain/analogy-record "
+                 f"{{mechanism,target,note,outcome}}"})
+    broadcast({"type": "os_build", "kind": "collab", "who": "Sage Mira",
+               "text": f"the forge is lit: '{mech['title'][:32]}' hammered toward {target[:28]}"})
+    _mind_spark("#ffb3e6")        # pink — a cross-domain spark
+
+
 async def _run_research_exchange() -> None:
     """RESEARCH EXCHANGE: compose the public digest and PROPOSE publishing it (gated —
     Rasto approves from Telegram; only then does it leave the machine)."""
@@ -2847,6 +2878,9 @@ async def ambient_life():
         # its coverage is enough, so check often (~3h), not daily.
         if loop_n % 8000 == 5000:
             asyncio.create_task(_tick_campaign())
+        # THE ANALOGY FORGE — one structural cross-domain mapping a day (~daily, offset).
+        if loop_n % 64000 == 36000:
+            asyncio.create_task(_queue_analogy_forge())
         # BELIEF REVISION — challenge the belief longest without a test (~2 days).
         if loop_n % 128000 == 90000:
             asyncio.create_task(_queue_belief_challenge())

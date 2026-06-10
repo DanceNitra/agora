@@ -1161,6 +1161,31 @@ async def brain_bounty():
     return {"status": "ok", "report": format_bounty(), "scores": scores()}
 
 
+@router.get("/brain/analogy-inputs")
+async def brain_analogy_inputs():
+    """ANALOGY FORGE — the vault's most mechanism-dense un-forged concept note."""
+    import asyncio as _aio
+    from agora.config import settings
+    from agora.execution.analogy_forge import pick_mechanism
+    vault = settings.vault_path or "C:/Users/Danculus/my-second-brain"
+    return {"status": "ok", "mechanism": await _aio.to_thread(pick_mechanism, vault)}
+
+
+@router.post("/brain/analogy-record")
+async def brain_analogy_record(request: Request):
+    """Ledger one forging (mechanism → target domain) so the forge rotates, never repeats."""
+    from agora.execution.analogy_forge import record_forged
+    b = await request.json()
+    return {"status": "ok", **record_forged(b.get("mechanism") or "", b.get("target") or "",
+                                            b.get("note") or "", b.get("outcome") or "")}
+
+
+@router.get("/brain/analogies")
+async def brain_analogies():
+    from agora.execution.analogy_forge import format_analogies, _load
+    return {"status": "ok", "report": format_analogies(), "items": _load()[-10:]}
+
+
 @router.get("/brain/beliefs")
 async def brain_beliefs():
     from agora.config import settings
