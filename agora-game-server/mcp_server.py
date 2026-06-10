@@ -426,6 +426,8 @@ _THOUGHTS = {
                 "This deserves an evergreen note."],             # Mira — Knowledge Curator
     "artificer": ["Claimed — but does it compute?", "Re-run it from scratch.",
                   "A failed replication is still a result."],    # Rooke — Replication Unit
+    "cartographer": ["Two continents, no bridge.", "The map shows a hole here.",
+                     "Dense inside, silent between."],           # Wren — Cartographer
 }
 
 
@@ -462,6 +464,7 @@ _TALK = {  # research-shop openers (fallbacks)
     "thief":   ["Found a gap in the vault.", "The frontier moved."],
     "scholar": ["I documented that.", "Let me cross-reference it."],
     "artificer": ["Show me the numbers.", "I re-ran it — want the result?"],
+    "cartographer": ["Your domains don't talk.", "I found a hole in the map."],
 }
 
 
@@ -499,6 +502,7 @@ _PERSONA = {
     "thief":   "Shadow Kael — the frontier scout. Sly, quick, curious; hunts the gaps in the vault no one else sees.",
     "scholar": "Sage Mira — the obsessive archivist. Precise; structures raw research into evergreen knowledge.",
     "artificer": "Artificer Rooke — the replicator. Skeptical tinkerer; re-runs other people's claims as minimal models and trusts only what computes.",
+    "cartographer": "Cartographer Wren — the map-maker. Quiet, far-sighted; charts the shape of the whole knowledge graph and points at the holes between continents.",
 }
 
 # Per-agent throttles (monotonic timestamps) + in-conversation guard.
@@ -669,6 +673,7 @@ _ROLE_CONTRIB = {
     "guard_r": "find what in the vault it should link to",
     "guard_l": "stress-test it — name the weakest assumption or the hole",
     "artificer": "say what a MINIMAL computational model of it would be and what number it must show",
+    "cartographer": "name which DISTANT vault domain this should bridge to, and why the hole matters",
 }
 
 
@@ -890,12 +895,12 @@ _TRUST_DB_PATH = str(HERE / "dungeon_trust.db")
 _AGENT_NAMES = {
     "king": "King Aldric", "guard_l": "Sergeant Voss", "guard_r": "Dame Elara",
     "priest": "High Priest Orin", "thief": "Shadow Kael", "scholar": "Sage Mira",
-    "artificer": "Artificer Rooke",
+    "artificer": "Artificer Rooke", "cartographer": "Cartographer Wren",
 }
 # Forecasting Tournament: ledger short name <-> dungeon eid; per-agent hit-rates cached here.
 _FORECASTER_EID = {"Kael": "thief", "Mira": "scholar", "Orin": "priest",
                    "Aldric": "king", "Elara": "guard_r", "Voss": "guard_l",
-                   "Rooke": "artificer"}
+                   "Rooke": "artificer", "Wren": "cartographer"}
 _forecast_scores: dict = {}     # eid -> {"total", "correct", "hit_rate"} (refreshed by _run_predictions)
 _mastery_scores: dict = {}      # eid -> verification rate (whose findings survive checking)
 _bounty_scores: dict = {}       # eid -> kill-authority (whose challenges actually fell beliefs)
@@ -1041,6 +1046,7 @@ _BRAIN_ID = {   # dungeon entity → server/agora NPC UUID (names already aligne
     "guard_r": "00000000-0000-0000-0000-000000000005",  # Dame Elara
     "guard_l": "00000000-0000-0000-0000-000000000007",  # Sergeant Voss
     "artificer": "00000000-0000-0000-0000-000000000008",  # Artificer Rooke
+    "cartographer": "00000000-0000-0000-0000-000000000009",  # Cartographer Wren
 }
 
 
@@ -2179,6 +2185,32 @@ async def _queue_hypothesis_induction() -> None:
     _mind_spark("#b89bff")        # violet — a conjecture forms
 
 
+async def _queue_cartography() -> None:
+    """THE CARTOGRAPHER: Wren scans the whole knowledge graph for the widest structural hole
+    (two substantial domains with the fewest bridges) and queues it for Claude to bridge with
+    ONE honest mechanism note — brokerage across holes is where new ideas live. His yield is
+    measured later: did bridges actually appear where he pointed?"""
+    if await _task_already_pending("Chart structural hole"):
+        return
+    d = await asyncio.to_thread(_brain_get_sync, "/api/v1/agent-os/brain/cartography-hole", 90)
+    h = (d or {}).get("hole") or {}
+    if not h.get("a"):
+        return
+    await asyncio.to_thread(
+        _brain_post_sync, "/api/v1/agent-os/brain/claude-inbox",
+        {"text": f"Chart structural hole: {h['a']} x {h['b']} || bridges now: {h.get('bridges', 0)} "
+                 f"|| {h['a']} notes: {', '.join(h.get('a_notes', [])[:3])} || {h['b']} notes: "
+                 f"{', '.join(h.get('b_notes', [])[:3])} || Write ONE bridge note connecting the "
+                 f"strongest pair via a REAL shared mechanism (not surface similarity), tags "
+                 f"['agora','bridge','claude-synthesis'], push; then POST /brain/cartography-record "
+                 f"{{a,b,bridges_then,note,outcome}}. If no honest bridge exists, record outcome "
+                 f"'no honest bridge' without a note - a charted dead hole is also a map."})
+    broadcast({"type": "os_build", "kind": "discovery", "who": "Cartographer Wren",
+               "text": f"charted a hole in the map: {h['a'][:22]} × {h['b'][:22]} "
+                       f"({h.get('bridges', 0)} bridges)"})
+    _mind_spark("#5dade2")        # blue — a hole appears on the map
+
+
 async def _queue_replication() -> None:
     """THE REPLICATION UNIT: Artificer Rooke picks a sourced claim from the collective
     knowledge and queues it for Claude to re-run as a MINIMAL computational model in the Lab.
@@ -2505,6 +2537,7 @@ _ROLE_HINT = {  # each thinker owns a real research domain
     "thief":   "incentives, risk & game theory — find the edge or exploit others miss",
     "scholar": "knowledge itself — cross-reference the library and connect distant concepts",
     "artificer": "replication & computational verification — re-run claimed results as minimal models; trust only what computes",
+    "cartographer": "the shape of the knowledge graph — find structural holes between domains and point research across them",
 }
 
 # Named destinations the LLM can send an agent to (tile = standing spot).
@@ -3073,6 +3106,9 @@ async def ambient_life():
         # THE REPLICATION UNIT — Rooke benches one sourced claim for a Lab re-run (~2x/day).
         if loop_n % 32000 == 11000:
             asyncio.create_task(_queue_replication())
+        # THE CARTOGRAPHER — Wren charts the widest structural hole in the map (~2x/day, offset).
+        if loop_n % 32000 == 27000:
+            asyncio.create_task(_queue_cartography())
         # CONTRADICTION SWEEP — find where the vault disagrees with itself (~daily, offset).
         if loop_n % 64000 == 20000:
             asyncio.create_task(_run_contradiction_sweep())

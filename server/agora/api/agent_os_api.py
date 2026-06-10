@@ -1239,6 +1239,37 @@ async def brain_replications():
     return {"status": "ok", "report": format_replications(), "items": _load()[-12:]}
 
 
+@router.get("/brain/cartography-hole")
+async def brain_cartography_hole():
+    """THE CARTOGRAPHER — the widest un-charted structural hole between vault domains."""
+    import asyncio as _aio
+    from agora.config import settings
+    from agora.execution.cartography import find_hole
+    vault = settings.vault_path or "C:/Users/Danculus/my-second-brain"
+    return {"status": "ok", "hole": await _aio.to_thread(find_hole, vault)}
+
+
+@router.post("/brain/cartography-record")
+async def brain_cartography_record(request: Request):
+    """Ledger one charted hole (and its bridge note, when one was honestly possible)."""
+    from agora.execution.cartography import record_charted
+    b = await request.json()
+    return {"status": "ok", **record_charted(b.get("a") or "", b.get("b") or "",
+                                             int(b.get("bridges_then") or 0),
+                                             b.get("note") or "", b.get("outcome") or "")}
+
+
+@router.get("/brain/cartography")
+async def brain_cartography():
+    """The map ledger — with the Cartographer's yield refreshed (charted holes since bridged)."""
+    import asyncio as _aio
+    from agora.config import settings
+    from agora.execution.cartography import format_cartography, measure_yield
+    vault = settings.vault_path or "C:/Users/Danculus/my-second-brain"
+    items = await _aio.to_thread(measure_yield, vault)
+    return {"status": "ok", "report": format_cartography(), "items": items[-12:]}
+
+
 @router.get("/brain/analogies")
 async def brain_analogies():
     from agora.execution.analogy_forge import format_analogies, _load
