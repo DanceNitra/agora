@@ -713,6 +713,8 @@ async def _collaborate(a_id, b_id, seed_kind, seed_title, seed_text, hold) -> No
         engine.set_entity_state(b_id, "thinking")
         hold[a_id] = hold[b_id] = 99
         sources = await _brain_research(seed_title)
+        if not sources or "(no external" in sources:
+            sources = await _brain_research(seed_text[:90])    # second angle: the seed text itself
         a_line = await _llm_say(
             f"You are {_persona(a_id)} You and your colleague {bn} are co-working a {seed_kind}.",
             f"The {seed_kind}: '{seed_text}'. In ONE line (max 18 words), tell {bn} what it is "
@@ -730,19 +732,26 @@ async def _collaborate(a_id, b_id, seed_kind, seed_title, seed_text, hold) -> No
         engine.set_entity_thought(b_id, b_line)
         broadcast({"type": "converse", "from": b_id, "to": a_id})
         await asyncio.sleep(2.4)
-        joint = await asyncio.to_thread(
-            _llm_content_sync,
-            f"Combine {an} and {bn}'s exchange into ONE joint FINDING (2 sentences) that a specific "
-            f"source below DIRECTLY supports — paraphrase that paper's actual result and name it "
-            f"(Author Year). Stay close to the evidence; do NOT over-generalize. NEVER invent sources.",
-            f"Seed ({seed_kind}): {seed_text}\n{an}: {a_line}\n{bn}: {b_line}\n\nReal sources:\n{sources}")
-        if joint and joint.strip():
-            src = ""
-            if sources and "(no external" not in sources:
-                src = "\nSource: " + sources.splitlines()[0].lstrip("- ").strip()[:140]
-            await _brain_contribute(a_id, f"{an} + {bn}: {seed_title}", joint.strip()[:420] + src)
+        # NO SOURCES, NO FINDING: with an empty literature block the joint-LLM (told NEVER to
+        # invent sources) can only refuse — and those refusals were shipping as findings
+        # ("Please provide the source you intend me to use" in the morning report). The agent's
+        # source IS the internet fetch above; when both query angles return nothing, the honest
+        # move is to skip the slot, not to beg a human for a citation.
+        if not sources or "(no external" in sources:
             broadcast({"type": "os_build", "kind": "collab", "who": f"{an} + {bn}",
-                       "text": f"co-produced: {seed_title}"})
+                       "text": f"no real source found for '{seed_title[:36]}' — joint finding skipped"})
+        else:
+            joint = await asyncio.to_thread(
+                _llm_content_sync,
+                f"Combine {an} and {bn}'s exchange into ONE joint FINDING (2 sentences) that a specific "
+                f"source below DIRECTLY supports — paraphrase that paper's actual result and name it "
+                f"(Author Year). Stay close to the evidence; do NOT over-generalize. NEVER invent sources.",
+                f"Seed ({seed_kind}): {seed_text}\n{an}: {a_line}\n{bn}: {b_line}\n\nReal sources:\n{sources}")
+            if joint and joint.strip():
+                src = "\nSource: " + sources.splitlines()[0].lstrip("- ").strip()[:140]
+                await _brain_contribute(a_id, f"{an} + {bn}: {seed_title}", joint.strip()[:420] + src)
+                broadcast({"type": "os_build", "kind": "collab", "who": f"{an} + {bn}",
+                           "text": f"co-produced: {seed_title}"})
         await record_trust(a_id, b_id, "cooperate")
         for cid in (a_id, b_id):
             engine.set_entity_thought(cid, "")
@@ -2301,7 +2310,11 @@ _REFUSAL_RE = re.compile(
     r"|^\s*(?:none|neither)\s+of\s+the\s+provided\b"
     r"|^\s*neither\s+(?:paper|source)s?\b"
     r"|^\s*the\s+provided\s+(?:real\s+)?(?:paper|source|literature)s?[^.\n]{0,40}\b"
-    r"(?:do(?:es)?\s+not|don't|doesn't|are\s+unrelated|is\s+unrelated)",
+    r"(?:do(?:es)?\s+not|don't|doesn't|are\s+unrelated|is\s+unrelated)"
+    r"|^\s*(?:i|we)\s+need\s+a\b[^.\n]{0,30}\bsource"
+    r"|^\s*you\s+did\s+not\s+provide"
+    r"|\bno\s+(?:real\s+|specific\s+)?source[^.\n]{0,40}\b(?:is|was)\s+provided\b"
+    r"|\bplease\s+(?:provide|supply)\b[^.\n]{0,40}\bsource",
     re.IGNORECASE)
 
 
@@ -2328,6 +2341,11 @@ async def _grounded_discovery(eid: str, intent: str) -> None:
     """Turn a 'create' goal into a REAL finding grounded in arXiv AND connected to the user's
     own notes (or flagging a real gap) — a concrete claim, not a vague plan."""
     sources = await _brain_research(intent)
+    if not sources or "(no external" in sources:
+        # no literature, no finding — the LLM would only refuse (it may NEVER invent sources)
+        broadcast({"type": "os_build", "kind": "collab", "who": _AGENT_NAMES.get(eid, eid),
+                   "text": f"no real source found for '{intent[:36]}' — discovery slot skipped"})
+        return
     related = await _brain_vault_search(intent)
     rel = "; ".join(f"[[{r['title']}]]" for r in related[:3] if r.get("score", 0) > 0.45) \
         or "(the user's vault is thin on this — a real gap)"
