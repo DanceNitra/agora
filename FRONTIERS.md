@@ -78,8 +78,11 @@
 > - **33 Metabolism** (`af0d2a0`, SHIPPED): every LLM call metered + attributed to its organ
 >   (HTTP-middleware contextvar, survives asyncio.to_thread); ROI = value-points/kilotoken from
 >   existing ledgers. Telegram `metabolism`, dashboard card.
-> - 34 Theory Engine (runnable beliefs), 35 Counterfactual Self (replay own history under
->   alternative policies), 36 Correspondent (gated outbound contact) — PLANNED, not yet built.
+> - **35 Counterfactual Self** (`8271699`, SHIPPED): own history replayed under alternative
+>   policies — prediction Brier by policy, editorial skip trace (Gatekeeper's measured causal
+>   value: ~10% of all cycles), tournament follow-policies; weekly A19 review. Telegram
+>   `counterfactual`.
+> - 34 Theory Engine (runnable beliefs), 36 Correspondent (gated outbound contact) — PLANNED.
 >
 > Future-wave ideas parked: deeper Mind Chamber, calendar OAuth, more Hands action kinds,
 > within-owner randomized OS-assistance experiment (the dossier's tier-3 attack).
