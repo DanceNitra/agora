@@ -43,9 +43,10 @@ def list_campaigns(n: int = 10) -> list:
     return sorted(_load(), key=lambda c: -c.get("ts", 0))[:n]
 
 
-async def start_campaign(question: str, horizon_days: int = 5) -> dict:
-    """Decompose the goal into sub-questions (reusing the program decomposer), register them as
-    standing research priorities, and open a multi-day campaign that harvests over time."""
+async def start_campaign(question: str, horizon_days: int = 1) -> dict:
+    """Decompose the goal into sub-questions and open a campaign. Claude synthesizes the dossier
+    the SAME session from accumulated evidence + its own knowledge — these resolve in minutes,
+    not days; the horizon is only a backstop, never a wait."""
     from agora.execution.research_program import start_program
     prog = await start_program(question)          # decompose + register on the flywheel
     camp = {"id": uuid.uuid4().hex[:8], "question": question[:200],

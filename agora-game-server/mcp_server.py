@@ -2185,6 +2185,51 @@ async def _queue_hypothesis_induction() -> None:
     _mind_spark("#b89bff")        # violet — a conjecture forms
 
 
+async def _run_red_team() -> None:
+    """SHADOW KAEL — RED TEAM (his second ability): the scout turns saboteur and attacks the
+    system's STRONGEST belief, not its weakest. Most-survived = most load-bearing = most
+    dangerous if wrong; Kael constructs the sharpest disconfirming case (a counterexample or a
+    Lab-runnable refutation) and Claude adjudicates via belief-revise (→ Court/Bounty/Graveyard).
+    Complacency is the failure mode of a belief that keeps winning; this is the cure."""
+    if await _task_already_pending("Red-team belief"):
+        return
+    d = await asyncio.to_thread(_brain_get_sync, "/api/v1/agent-os/brain/beliefs")
+    beliefs = [b for b in (d or {}).get("beliefs", [])
+               if b.get("belief_status") in ("active", "survived") and b.get("path")]
+    if not beliefs:
+        return
+    # the MOST load-bearing belief faces the red team (most survived, then most recently affirmed)
+    beliefs.sort(key=lambda b: (b.get("survived", 0), b.get("last_challenged") or ""), reverse=True)
+    b = beliefs[0]
+    claim, path = b.get("title", ""), b.get("path", "")
+    _in_conv.add("thief")
+    try:
+        broadcast({"type": "os_build", "kind": "challenge", "who": "Shadow Kael",
+                   "text": f"red-teams the keep's strongest belief: '{claim[:38]}'"})
+        attack = await _llm_say(
+            f"You are {_persona('thief')} You are RED-TEAMING the system's strongest, most-relied-on "
+            f"belief — the more it has survived, the more dangerous it is if wrong.",
+            f"The belief: '{claim}'. In ONE line (max 22 words), construct the single sharpest "
+            f"disconfirming case: a concrete counterexample, a hidden confound, or a measurable "
+            f"prediction where it should FAIL. Be specific and adversarial.",
+            f"Even '{claim[:36]}' has a crack.")
+        engine.set_entity_thought("thief", attack)
+        _mind_spark("#ff6a6a", "explosion")
+        await asyncio.to_thread(
+            _brain_post_sync, "/api/v1/agent-os/brain/claude-inbox",
+            {"text": f"Red-team belief [{path}]: {claim[:80]} || KAEL'S ATTACK: {attack[:240]} || "
+                     f"This is the system's STRONGEST belief under deliberate adversarial pressure. "
+                     f"Evaluate Kael's disconfirming case with your own knowledge; if it has teeth, "
+                     f"run a Lab refutation to MEASURE it, then rule via POST /brain/belief-revise "
+                     f"{{path, verdict: survived|revised|retired, reason, challenger: 'Shadow Kael', "
+                     f"resurrect_when}} - survival here strengthens the canon, a kill reshapes it."})
+        broadcast({"type": "os_build", "kind": "discovery", "who": "Shadow Kael",
+                   "text": f"red-team dossier sent to the judge: {claim[:34]}"})
+    finally:
+        _in_conv.discard("thief")
+        engine.set_entity_state("thief", "idle")
+
+
 async def _queue_cartography() -> None:
     """THE CARTOGRAPHER: Wren scans the whole knowledge graph for the widest structural hole
     (two substantial domains with the fewest bridges) and queues it for Claude to bridge with
@@ -3109,6 +3154,9 @@ async def ambient_life():
         # THE CARTOGRAPHER — Wren charts the widest structural hole in the map (~2x/day, offset).
         if loop_n % 32000 == 27000:
             asyncio.create_task(_queue_cartography())
+        # KAEL'S RED TEAM — adversarial attack on the STRONGEST belief (~2x/day, offset).
+        if loop_n % 32000 == 19000:
+            asyncio.create_task(_run_red_team())
         # CONTRADICTION SWEEP — find where the vault disagrees with itself (~daily, offset).
         if loop_n % 64000 == 20000:
             asyncio.create_task(_run_contradiction_sweep())
