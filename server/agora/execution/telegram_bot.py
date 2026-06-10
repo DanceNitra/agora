@@ -458,6 +458,12 @@ async def _handle(app, text: str) -> None:
     elif low in ("board", "/board"):
         d = await asyncio.to_thread(_brain_get, "/api/v1/agent-os/brain/board")
         await send((d or {}).get("report", "_No board yet._"))
+    elif low.startswith(("recall ", "/recall ")):
+        import urllib.parse as _up
+        q = text.split(" ", 1)[1].strip()
+        d = await asyncio.to_thread(_brain_get, "/api/v1/agent-os/brain/recall?q=" + _up.quote(q))
+        from agora.execution.recall import format_recall
+        await send(format_recall(d or {}))
     elif low in ("correspondence", "/correspondence", "letters"):
         d = await asyncio.to_thread(_brain_get, "/api/v1/agent-os/brain/correspondence")
         await send((d or {}).get("report", "_No correspondence._"))

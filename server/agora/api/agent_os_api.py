@@ -1202,6 +1202,21 @@ async def brain_library_inputs(q: str = ""):
     return {"status": "ok", **await gather_paper_inputs(q)}
 
 
+@router.get("/brain/recall")
+async def brain_recall(q: str, k: int = 6, fmt: str = "json"):
+    """RECALL — Agora's curated, value-ranked, connected memory for external agents (a memory
+    provider primitive: Hermes / any MCP client queries the librarian's best notes)."""
+    import asyncio as _aio
+    from agora.config import settings
+    from agora.execution.recall import recall, format_recall
+    vault = settings.vault_path or "C:/Users/Danculus/my-second-brain"
+    d = await _aio.to_thread(recall, q, vault, max(1, min(12, k)))
+    if fmt == "text":
+        from fastapi.responses import PlainTextResponse
+        return PlainTextResponse(format_recall(d))
+    return {"status": "ok", **d}
+
+
 @router.post("/brain/library/queue")
 async def brain_library_queue(request: Request):
     """Add curated arXiv IDs to the Library's priority reading list."""
