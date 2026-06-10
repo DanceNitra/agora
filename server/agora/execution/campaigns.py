@@ -128,6 +128,6 @@ def format_campaigns(n: int = 6) -> str:
         done = sum(1 for v in cov.values() if v >= 3)
         flag = {"running": "▶️", "complete": "✅"}.get(c["status"], "•")
         lines.append(f"{flag} `{c['id']}` {c['question'][:54]}")
-        lines.append(f"    {done}/{len(cov)} sub-questions covered · day {c.get('ticks', 0)}"
+        lines.append(f"    {done}/{len(cov)} sub-questions covered · harvest {c.get('ticks', 0)}"
                      + (" · ready" if c.get("ready") and c["status"] == "running" else ""))
     return "\n".join(lines)

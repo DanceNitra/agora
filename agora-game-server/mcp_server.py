@@ -2011,21 +2011,25 @@ async def _queue_belief_challenge() -> None:
 
 
 async def _tick_campaign() -> None:
-    """CAMPAIGNS: advance the running campaign one harvest; when its sub-questions are covered
-    (or the horizon passes), queue the dossier for Claude to synthesize."""
+    """CAMPAIGNS: advance EVERY running campaign one harvest; when a campaign's sub-questions
+    are covered (or its horizon passes), queue its dossier for Claude to synthesize."""
     d = await asyncio.to_thread(_brain_post_sync, "/api/v1/agent-os/brain/campaign/tick", {}, 90)
     if not d or d.get("status") != "ok":
         return
-    cid, cov = d.get("id"), d.get("coverage", {})
-    done = sum(1 for v in cov.values() if v >= 3)
-    broadcast({"type": "os_build", "kind": "collab", "who": "King Aldric",
-               "text": f"campaign harvest: {done}/{len(cov)} sub-questions covered (day {d.get('ticks')})"})
-    if d.get("ready") and not await _task_already_pending(f"Synthesize campaign dossier [{cid}]"):
-        await asyncio.to_thread(_brain_post_sync, "/api/v1/agent-os/brain/claude-inbox",
-                                {"text": f"Synthesize campaign dossier [{cid}]"})
+    for r in d.get("results") or [d]:
+        cid, cov = r.get("id"), r.get("coverage", {})
+        if not cid:
+            continue
+        done = sum(1 for v in cov.values() if v >= 3)
         broadcast({"type": "os_build", "kind": "collab", "who": "King Aldric",
-                   "text": f"campaign {cid} ready — queued the dossier for Claude"})
-        _mind_spark("#ffd27a", "explosion")        # gold — a campaign concludes
+                   "text": f"campaign harvest: {done}/{len(cov)} sub-questions covered "
+                           f"(harvest {r.get('ticks')})"})
+        if r.get("ready") and not await _task_already_pending(f"Synthesize campaign dossier [{cid}]"):
+            await asyncio.to_thread(_brain_post_sync, "/api/v1/agent-os/brain/claude-inbox",
+                                    {"text": f"Synthesize campaign dossier [{cid}]"})
+            broadcast({"type": "os_build", "kind": "collab", "who": "King Aldric",
+                       "text": f"campaign {cid} ready — queued the dossier for Claude"})
+            _mind_spark("#ffd27a", "explosion")        # gold — a campaign concludes
 
 
 async def _queue_library_read() -> None:
@@ -2803,8 +2807,9 @@ async def ambient_life():
         # THE LIBRARY — read ONE full paper and queue it for Claude to digest (~daily, offset).
         if loop_n % 64000 == 55000:
             asyncio.create_task(_queue_library_read())
-        # CAMPAIGNS — advance the running campaign one harvest; queue its dossier when ready (~daily).
-        if loop_n % 64000 == 61000:
+        # CAMPAIGNS — advance ALL running campaigns one harvest; a campaign closes as soon as
+        # its coverage is enough, so check often (~3h), not daily.
+        if loop_n % 8000 == 5000:
             asyncio.create_task(_tick_campaign())
         # BELIEF REVISION — challenge the belief longest without a test (~2 days).
         if loop_n % 128000 == 90000:

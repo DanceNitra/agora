@@ -1168,13 +1168,16 @@ async def brain_campaign_start(request: Request):
 
 @router.post("/brain/campaign/tick")
 async def brain_campaign_tick(request: Request):
-    """One day's harvest for a campaign — update per-sub-question coverage from accumulated findings."""
+    """One harvest pass — update per-sub-question coverage for EVERY running campaign
+    (or a single one when an id is given). Campaigns advance in parallel."""
     from agora.execution.campaigns import harvest_tick, list_campaigns
     b = await request.json()
-    cid = b.get("id") or next((c["id"] for c in list_campaigns() if c["status"] == "running"), "")
-    if not cid:
+    ids = [b["id"]] if b.get("id") else \
+        [c["id"] for c in list_campaigns() if c["status"] == "running"]
+    if not ids:
         return {"status": "none_running"}
-    return {"status": "ok", **await harvest_tick(cid, request.app.state.db)}
+    results = [await harvest_tick(cid, request.app.state.db) for cid in ids]
+    return {"status": "ok", "results": results, **results[0]}
 
 
 @router.get("/brain/campaign/dossier-inputs")
