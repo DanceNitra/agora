@@ -689,6 +689,40 @@ async def brain_memory_economy(n: int = 12):
             "report": format_economy(notes, cands)}
 
 
+@router.get("/brain/oracle/scan")
+async def brain_oracle_scan():
+    """THE ORACLE — open, liquid, in-domain prediction markets worth an independent call."""
+    import asyncio as _aio
+    from agora.execution.oracle import fetch_candidates
+    return {"status": "ok", "candidates": await _aio.to_thread(fetch_candidates)}
+
+
+@router.post("/brain/oracle/call")
+async def brain_oracle_call(request: Request):
+    """Record Agora's independent probability vs the market price (a paper position)."""
+    from agora.execution.oracle import record_call
+    b = await request.json()
+    return {"status": "ok", **record_call(
+        b.get("market_id") or "", b.get("question") or "", float(b.get("market_prob", 0.5)),
+        b.get("ends") or "", float(b.get("agora_prob", 0.5)), b.get("reasoning") or "")}
+
+
+@router.post("/brain/oracle/resolve")
+async def brain_oracle_resolve(request: Request):
+    """Score open positions whose markets have resolved — Brier vs hard reality, vs the market."""
+    import asyncio as _aio
+    from agora.execution.oracle import resolve_open, scorecard
+    resolved = await _aio.to_thread(resolve_open)
+    return {"status": "ok", "resolved": resolved, **scorecard()}
+
+
+@router.get("/brain/oracle")
+async def brain_oracle():
+    from agora.execution.oracle import format_oracle, scorecard, _load
+    return {"status": "ok", "report": format_oracle(), "scorecard": scorecard(),
+            "positions": _load()[-15:]}
+
+
 @router.post("/brain/coherence/audit")
 async def brain_coherence_audit(request: Request):
     """COHERENCE AUDIT — check one new belief against its closest siblings for incompatibility."""

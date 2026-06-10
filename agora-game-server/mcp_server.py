@@ -1880,6 +1880,36 @@ async def _queue_canon_update() -> None:
     _mind_spark("#ffd27a")        # gold — the book rewrites itself
 
 
+async def _run_oracle_scan() -> None:
+    """THE ORACLE: pick the most liquid unjudged in-domain market and queue it for Claude's
+    independent probability call (skin in the game — scored against hard reality)."""
+    if await _task_already_pending("Oracle call:"):
+        return
+    d = await asyncio.to_thread(_brain_get_sync, "/api/v1/agent-os/brain/oracle/scan", 60)
+    cands = (d or {}).get("candidates", [])
+    if not cands:
+        return
+    c = cands[0]
+    await asyncio.to_thread(
+        _brain_post_sync, "/api/v1/agent-os/brain/claude-inbox",
+        {"text": f"Oracle call: {c['question'][:140]} || market_id: {c['market_id']} "
+                 f"|| market_prob: {c['market_prob']} || ends: {c['ends']}"})
+    broadcast({"type": "os_build", "kind": "discovery", "who": "Shadow Kael",
+               "text": f"oracle: queued a market for an independent call — {c['question'][:40]}"})
+    _mind_spark("#8fd3ff")
+
+
+async def _run_oracle_resolve() -> None:
+    """THE ORACLE: score open positions whose markets resolved — Brier vs hard reality."""
+    d = await asyncio.to_thread(_brain_post_sync, "/api/v1/agent-os/brain/oracle/resolve", {}, 120)
+    for p in (d or {}).get("resolved", []):
+        won = "BEAT the market" if p.get("beat_market") else "lost to the market"
+        broadcast({"type": "os_build", "kind": "collab", "who": "Sergeant Voss",
+                   "text": f"oracle resolved: {p['question'][:36]} — {won} "
+                           f"(Brier {p['brier_agora']} vs {p['brier_market']})"})
+        _mind_spark("#9affc0" if p.get("beat_market") else "#ff9a9a", "explosion")
+
+
 async def _run_coherence() -> None:
     """COHERENCE AUDIT: check one new belief against its closest siblings; tensions queue an
     internal dialectic — Agora's belief set stays a system, not a pile."""
@@ -2737,6 +2767,11 @@ async def ambient_life():
         # COHERENCE AUDIT — does AGORA contradict itself? one new belief per day (~daily offset).
         if loop_n % 64000 == 50000:
             asyncio.create_task(_run_coherence())
+        # THE ORACLE — pick one live market for an independent call (~daily) + resolve (~daily).
+        if loop_n % 64000 == 7000:
+            asyncio.create_task(_run_oracle_scan())
+        if loop_n % 64000 == 33000:
+            asyncio.create_task(_run_oracle_resolve())
         # THE CANON — when enough new artifacts landed, queue the living-book merge (~2 days).
         if loop_n % 128000 == 30000:
             asyncio.create_task(_queue_canon_update())
