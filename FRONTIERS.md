@@ -86,7 +86,10 @@
 >   Lab (A20); verdicts stamped into the notes (theory_status), strains feed the challenge
 >   pipeline. First run: critical-window consolidation CORROBORATED with a scarcity multiplier
 >   (governance buys 1.8× at loose budgets → 6.7× at starved ones). Telegram `theory`.
-> - 36 Correspondent (gated outbound contact) — PLANNED.
+> - **36 Correspondent** (`e830305`, SHIPPED): Claude-composed public letters (claim + evidence
+>   + falsifier + "what would break this?") posted as GitHub issues ONLY after owner approval;
+>   replies harvested daily as named external challenge. First letter (the scarcity-multiplier
+>   result) drafted + proposed — awaiting `approve e591b7`. **WAVE 8 COMPLETE.**
 >
 > Future-wave ideas parked: deeper Mind Chamber, calendar OAuth, more Hands action kinds,
 > within-owner randomized OS-assistance experiment (the dossier's tier-3 attack).
