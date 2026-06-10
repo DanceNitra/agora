@@ -1,8 +1,35 @@
-# AGORA — SESSION HANDOFF (2026-06-09)
+# AGORA — SESSION HANDOFF
 
-> Resume doc for a fresh Claude Code session. Read this + the auto-memory (`MEMORY.md` →
-> `dungeon-recursive-loop.md`) and you can continue with zero context loss. Chat in **Slovak**;
-> all code + user-facing strings in **English**.
+> Resume doc for a fresh Claude Code session. Chat in **Slovak**; code + user-facing strings **English**.
+
+## ⚡ RESUME HERE (2026-06-10)
+**Read first:** auto-memory `agora-session-state.md` (the freshest, fullest state — 8 frontier waves
+detailed) + `HANDOFF_LOOP_PROMPT.txt` (verbatim loop prompt to paste).
+
+**State at handoff:** both servers **200**, ONE dungeon, ONE :8000 listener, **inbox empty**.
+agora repo HEAD `e74cf67`; vault HEAD `d7d1f9a`. **36 frontiers / 8 waves + GitHub-leverage builds
+ALL SHIPPED.** First public act LIVE: a comment on NousResearch/hermes-agent#10771.
+
+**Agora runs INDEPENDENTLY of the Claude session** — two processes (uvicorn :8000 + mcp_server.py
+:5174), kept alive by the watchdogs + the user Startup-folder autostart. Clearing context does NOT
+stop Agora; it only stops Claude driving the inbox loop.
+
+**To continue after /clear (the cheap path):** in a fresh session, paste the contents of
+`HANDOFF_LOOP_PROMPT.txt` as the `/loop` input. A fresh session reads only this doc + memory (small,
+cached) instead of replaying a 100+ message history every wakeup — that is what was burning tokens.
+
+**If a server is down:** restart per §2 below (kill ALL uvicorn first → one; dungeon: kill
+mcp_server.py → one). Verify both 200 + exactly one :8000 listener.
+
+**Latest capability layers (beyond the original frontiers below):** Oracle (live Polymarket,
+Brier-scored), Metabolism (per-organ token ROI), Theory Engine (beliefs run as Lab models),
+Counterfactual Self (replay own history), Correspondent (gated public GitHub posts + Input Shield
+on replies), Gatekeeper (upstream skip ledger + board priorities), Atlas (domain MOCs), Gauges
+(/api/v1/agent-os/dashboard), Coherence Audit, Recall (/brain/recall — memory provider for external
+agents), Library reading list. Full per-frontier detail in `agora-session-state.md`.
+
+---
+# (original handoff, 2026-06-09)
 
 ---
 
