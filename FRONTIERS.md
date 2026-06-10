@@ -82,7 +82,11 @@
 >   policies — prediction Brier by policy, editorial skip trace (Gatekeeper's measured causal
 >   value: ~10% of all cycles), tournament follow-policies; weekly A19 review. Telegram
 >   `counterfactual`.
-> - 34 Theory Engine (runnable beliefs), 36 Correspondent (gated outbound contact) — PLANNED.
+> - **34 Theory Engine** (`7921ee1`, SHIPPED): mechanistic beliefs run as formal models in the
+>   Lab (A20); verdicts stamped into the notes (theory_status), strains feed the challenge
+>   pipeline. First run: critical-window consolidation CORROBORATED with a scarcity multiplier
+>   (governance buys 1.8× at loose budgets → 6.7× at starved ones). Telegram `theory`.
+> - 36 Correspondent (gated outbound contact) — PLANNED.
 >
 > Future-wave ideas parked: deeper Mind Chamber, calendar OAuth, more Hands action kinds,
 > within-owner randomized OS-assistance experiment (the dossier's tier-3 attack).
