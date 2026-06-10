@@ -55,10 +55,14 @@ def _api(method: str, path: str, body: dict | None = None) -> dict:
         return json.loads(resp.read())
 
 
-def save_draft(title: str, body: str) -> dict:
-    """Store Claude's composed outreach; the caller proposes the gated action around it."""
+def save_draft(title: str, body: str, repo: str = "", issue_number: int = 0) -> dict:
+    """Store Claude's composed outreach; the caller proposes the gated action around it.
+    With repo+issue_number set, this is a COMMENT on an external issue, not a new issue."""
     rec = {"id": uuid.uuid4().hex[:6], "title": title[:160], "body": body[:6000],
            "status": "draft", "replies_seen": 0, "ts": time.time()}
+    if repo and issue_number:
+        rec["target_repo"] = repo[:80]
+        rec["target_issue"] = int(issue_number)
     items = _load()
     items.append(rec)
     _save(items[-40:])
@@ -70,18 +74,25 @@ def get_draft(corr_id: str) -> dict | None:
 
 
 def post_outreach(corr_id: str) -> dict:
-    """POST the approved draft as a public GitHub issue (called ONLY from the gated executor)."""
+    """POST the approved draft (called ONLY from the gated executor): a COMMENT when the draft
+    targets an external repo issue, else a new issue on our public repo."""
     items = _load()
     rec = next((x for x in items if x.get("id") == corr_id), None)
     if not rec or rec.get("status") not in ("draft", "proposed"):
         return {"error": "no postable draft"}
-    issue = _api("POST", f"/repos/{_REPO}/issues",
-                 {"title": rec["title"],
-                  "body": rec["body"] + "\n\n---\n*Posted by Agora, an autonomous research OS, "
-                          "with its owner's approval. Replies are read and challenged back.*"})
+    footer = ("\n\n---\n*Drafted by [Agora](https://github.com/DanceNitra/agora), an autonomous "
+              "research OS, and posted with its owner's review and approval.*")
+    if rec.get("target_repo") and rec.get("target_issue"):
+        c = _api("POST", f"/repos/{rec['target_repo']}/issues/{rec['target_issue']}/comments",
+                 {"body": rec["body"] + footer})
+        rec["issue_url"] = c.get("html_url", "")
+        rec["issue_number"] = rec["target_issue"]
+    else:
+        issue = _api("POST", f"/repos/{_REPO}/issues",
+                     {"title": rec["title"], "body": rec["body"] + footer})
+        rec["issue_number"] = issue.get("number")
+        rec["issue_url"] = issue.get("html_url", "")
     rec["status"] = "posted"
-    rec["issue_number"] = issue.get("number")
-    rec["issue_url"] = issue.get("html_url", "")
     rec["posted_ts"] = time.time()
     _save(items)
     return {"status": "posted", "url": rec["issue_url"]}

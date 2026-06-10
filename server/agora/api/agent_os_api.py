@@ -701,10 +701,12 @@ async def brain_correspondent_draft(request: Request):
         return {"status": "too_short"}
     if any(x.get("kind") == "outreach" for x in pending_approvals()):
         return {"status": "already_pending"}
-    rec = save_draft(title, body)
-    act = propose_action("outreach", f"Post public outreach: {title[:70]}",
+    repo, issue_no = (b.get("repo") or "").strip(), int(b.get("issue_number") or 0)
+    rec = save_draft(title, body, repo, issue_no)
+    where = f"comment on {repo}#{issue_no}" if repo and issue_no else "new public GitHub issue"
+    act = propose_action("outreach", f"Post public outreach ({where}): {title[:60]}",
                          body[:300], {"corr_id": rec["id"]})
-    await _send_telegram(f"✉️ Correspondent proposal `{act['id']}`: post a public GitHub issue\n"
+    await _send_telegram(f"✉️ Correspondent proposal `{act['id']}`: {where}\n"
                          f"*{title[:80]}*\n_{body[:180]}…_\n"
                          f"Reply `approve {act['id']}` or `reject {act['id']}`.")
     return {"status": "proposed", "draft": rec, "action": act}
