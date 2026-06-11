@@ -3361,6 +3361,9 @@ async def ambient_life():
                     "action": f"Extend {_pname}'s result — {_ptext[:90]}", "with": _pname})
                 logger.info(f"[collective] {_AGENT_NAMES.get(eid, eid)} -> collaborate with {_pname} "
                             f"(score {_sc:.2f}) on: {_ptext[:60]}")
+            # Planning-quality signal: how many quests the LLM itself produced (0 = it failed and we
+            # fell back to deterministic gaps). Lets us compare models live (flash ~0 vs deepseek-v4-pro).
+            logger.info(f"[plan] {_AGENT_NAMES.get(eid, eid)}: LLM_quests={added}")
             # GUARANTEE work: if the (flaky) LLM planner came up short, draw REAL quests from the
             # vault's inexhaustible surface — gaps, bridges, findings. Agents never run dry.
             if len(quests.get(eid, [])) < 2:
