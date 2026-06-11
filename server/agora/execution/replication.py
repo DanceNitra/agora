@@ -33,8 +33,69 @@ def _save(items: list) -> None:
         pass
 
 
+# Computational/methods topics where a published claim has a SIMULABLE core (a number, an
+# exponent, a threshold, a rate) — the regime where replication can actually REPRODUCE or FAIL,
+# instead of NOT_COMPUTABLE on a descriptive claim. Rotated so Rooke covers fresh ground.
+_REPLICABLE_TOPICS = [
+    "branching process critical exponent survival probability",
+    "random graph percolation threshold giant component",
+    "epidemic threshold network SIR basic reproduction number",
+    "stochastic gradient descent convergence rate convex",
+    "multi-armed bandit regret bound logarithmic",
+    "directed percolation absorbing state phase transition exponent",
+    "preferential attachment power-law degree exponent",
+    "reinforcement learning sample complexity bound",
+    "Kuramoto model synchronization critical coupling",
+    "contagion cascade threshold fraction network",
+]
+# a sentence carries a REPLICABLE result if it has a number AND a result-signal word
+_RESULT = re.compile(
+    r"(\d+(?:\.\d+)?\s*%|\bexponent\b|\bthreshold\b|\bcritical\b|\bscal\w+\b|\brate\b|"
+    r"\bbound\b|\bprobabilit\w+\b|\bconverge\w*\b|\bregret\b|\bpower[- ]law\b|"
+    r"\d+(?:\.\d+)?\s*(?:times|x|fold)|=\s*\d|\bproportional to\b)", re.IGNORECASE)
+_NUM = re.compile(r"\d")
+
+
+def _best_claim(summ: str) -> tuple[str, int]:
+    """The abstract sentence with the strongest measurable-result signal, and its score."""
+    best, score = "", 0
+    for s in re.split(r"(?<=[.!?])\s", summ):
+        if len(s) < 50:
+            continue
+        sc = len(_RESULT.findall(s)) * 2 + (1 if _NUM.search(s) else 0)
+        if sc > score:
+            best, score = s[:240], sc
+    return best, score
+
+
+def pick_paper_target() -> dict | None:
+    """A REAL arXiv paper with a quantitative, simulable claim — the input Rooke needs to produce
+    a genuine REPRODUCED/FAILED (not NOT_COMPUTABLE on an internal/descriptive finding). Picks the
+    paper whose abstract carries the strongest measurable result, deduped against what's attempted."""
+    from agora.execution.research_tool import openalex_search, arxiv_search
+    attempted = {(r.get("claim") or "")[:60].lower() for r in _load()}
+    rot = int(time.time() // 3600) % len(_REPLICABLE_TOPICS)
+    topic = _REPLICABLE_TOPICS[rot]
+    papers = [p for p in (arxiv_search(topic, 6) + openalex_search(topic, 4)) if not p.get("error")]
+    best = None
+    for p in papers:
+        claim, score = _best_claim((p.get("summary") or "").strip())
+        if score < 2 or len(claim) < 40 or claim[:60].lower() in attempted:   # need a real result-signal
+            continue
+        if best is None or score > best["score"]:
+            src = f"{p.get('title','')[:90]} ({p.get('authors','')[:50]}, {p.get('published','')[:10]})"
+            best = {"claim": claim, "source": src[:160], "title": (p.get("title") or "")[:90],
+                    "url": p.get("url", ""), "topic": topic, "score": score}
+    return best
+
+
 async def pick_target(db) -> dict | None:
-    """A recent sourced finding not yet attempted — the claim plus its citation."""
+    """The replication target. PREFER a real arXiv paper with a simulable quantitative claim
+    (Aldric's roadmap: feed Rooke real papers); fall back to a recent sourced internal finding."""
+    import asyncio as _aio
+    paper = await _aio.to_thread(pick_paper_target)
+    if paper:
+        return paper
     attempted = {(r.get("claim") or "")[:60].lower() for r in _load()}
     cur = await db.execute(
         "SELECT title, content FROM collective_knowledge WHERE knowledge_type='discovery' "
