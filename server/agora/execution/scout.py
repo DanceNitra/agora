@@ -20,6 +20,8 @@ from pathlib import Path
 _STORE = Path(__file__).resolve().parents[2] / ".scout.json"
 
 # Agora's areas of genuine, evidenced strength — the Scout only pitches where we have real notes.
+# Mix of the proven memory/causal themes (landed the zeroclaw win) + frontier-aligned themes
+# (Science of Better Thinking + Future of Work) where our vault can still answer with EVIDENCE.
 _THEMES = [
     "agent memory consolidation",
     "LLM long-term memory",
@@ -29,6 +31,13 @@ _THEMES = [
     "personal knowledge management note decay",
     "vector store memory pruning",
     "experience replay catastrophic forgetting",
+    # frontier-aligned (only where we have measured evidence to back a reply)
+    "LLM agent reasoning evaluation",
+    "forecasting calibration prediction scoring",
+    "multi-agent coordination orchestration",
+    "knowledge graph completion link prediction",
+    "causal inference machine learning treatment effect",
+    "early warning critical slowing down detection",
 ]
 _STOP = frozenset("the a an of for to in on and or is are how do does can with this that your you "
                   "what when where why who which from into our we us it its as be by at".split())

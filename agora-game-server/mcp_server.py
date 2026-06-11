@@ -3387,8 +3387,10 @@ async def ambient_life():
         # clears the last. Publishing stays gated until the owner sets an auto-post policy.
         if loop_n % 8000 == 2000:
             asyncio.create_task(_queue_press())
-        # THE OPPORTUNITY SCOUT — Kael hunts an answerable open GitHub issue (~6h, offset, gated).
-        if loop_n % 25000 == 18000:
+        # THE OPPORTUNITY SCOUT — Kael actively hunts an answerable open GitHub issue in the frontier
+        # domains (~2.4h, offset). Gated: drafts a reply only where the vault answers with evidence;
+        # the owner approves before anything posts. Active outreach = the reputation/name engine.
+        if loop_n % 10000 == 4000:
             asyncio.create_task(_queue_scout())
         # THE PORTFOLIO — Voss keeps the public track record current, proposes publish if credible (~12h).
         if loop_n % 50000 == 30000:
