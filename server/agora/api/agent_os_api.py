@@ -1570,6 +1570,15 @@ async def brain_library_queue(request: Request):
     return {"status": "ok", **queue_reading(b.get("arxiv_ids") or [], b.get("source") or "")}
 
 
+@router.post("/brain/frontier/harvest")
+async def brain_frontier_harvest(per_topic: int = 5):
+    """FRONTIER HARVEST — pull fresh arXiv papers in the standing-frontier domains and stock the
+    reading list, so the OS always has new external material to digest (unbounded, on-frontier)."""
+    import asyncio as _aio
+    from agora.execution.frontier_harvest import harvest
+    return {"status": "ok", **await _aio.to_thread(harvest, per_topic)}
+
+
 @router.post("/brain/library-record")
 async def brain_library_record(request: Request):
     """Mark a paper read in the bibliography ledger."""

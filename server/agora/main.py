@@ -610,6 +610,22 @@ async def envoy_watch_loop(app: FastAPI):
         await _aio.sleep(1800)                            # every 30 min
 
 
+async def frontier_harvest_loop(app: FastAPI):
+    """Background feed for the standing frontier: every couple of hours, pull fresh arXiv papers in
+    the frontier domains and stock the Library's reading list, so the OS never idles for lack of
+    new external material to digest. Read-only (search + queue); the gated outreach path is untouched."""
+    import asyncio as _aio
+    await _aio.sleep(120)                                    # let startup settle
+    while True:
+        try:
+            from agora.execution.frontier_harvest import harvest
+            r = await _aio.to_thread(harvest, 5)
+            print(f"[FrontierHarvest] {r.get('topic')}: +{r.get('queued', 0)} papers queued")
+        except Exception as e:
+            print(f"[FrontierHarvest] error: {e}")
+        await _aio.sleep(7200)                               # every 2 hours
+
+
 async def lifespan(app: FastAPI):
     try:
         await init_db(app)
@@ -634,6 +650,10 @@ async def lifespan(app: FastAPI):
         loop.create_task(envoy_watch_loop(app))    # the Envoy watches our outreach for replies
     except Exception as _e:
         print(f"[Envoy] watch loop not started: {_e}")
+    try:
+        loop.create_task(frontier_harvest_loop(app))  # keep the frontier reading list stocked
+    except Exception as _e:
+        print(f"[FrontierHarvest] not started: {_e}")
     yield
     if hasattr(app.state, 'db') and app.state.db:
         await app.state.db.close()
