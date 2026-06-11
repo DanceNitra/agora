@@ -485,6 +485,10 @@ _LLM_MODEL = os.environ.get("DUNGEON_LLM_MODEL", "nvidia/nemotron-3-nano-30b-a3b
 _LLM_URL = os.environ.get("DUNGEON_LLM_URL",
                           "https://openrouter.ai/api/v1/chat/completions").strip()
 _LLM_ON = bool(_LLM_KEY)
+# Output budget + reasoning toggle (reasoning models like Kimi K2.6 spend tokens on a `reasoning`
+# channel and emit EMPTY content under a small budget — they need a bigger cap and/or think=false).
+_LLM_MAX_TOKENS = int(os.environ.get("DUNGEON_LLM_MAX_TOKENS", "350"))
+_LLM_THINK = os.environ.get("DUNGEON_LLM_THINK", "").strip().lower()  # "false" disables thinking
 
 # Pace: "study" = slow & deliberate (default; real research, light on the quota),
 # "fast" = lively banter. Override with DUNGEON_PACE.
@@ -633,14 +637,17 @@ def _llm_content_sync(system: str, user: str) -> str | None:
     """Blocking OpenRouter call → raw assistant message content, or None on failure."""
     if not _LLM_ON:
         return None
-    payload = json.dumps({
+    body = {
         "model": _LLM_MODEL,
         "messages": [{"role": "system", "content": system},
                      {"role": "user", "content": user}],
         "temperature": 0.95,
-        "max_tokens": 350,
+        "max_tokens": _LLM_MAX_TOKENS,
         "response_format": {"type": "json_object"},
-    }).encode()
+    }
+    if _LLM_THINK == "false":     # reasoning models (Kimi K2.6): emit content directly, no reasoning channel
+        body["think"] = False
+    payload = json.dumps(body).encode()
     req = _urlreq.Request(_LLM_URL, data=payload, headers={
         "Authorization": f"Bearer {_LLM_KEY}",
         "Content-Type": "application/json",
@@ -648,7 +655,7 @@ def _llm_content_sync(system: str, user: str) -> str | None:
         "X-Title": "Dungeon OS",
     })
     try:
-        with _urlreq.urlopen(req, timeout=25) as r:
+        with _urlreq.urlopen(req, timeout=45) as r:
             data = json.loads(r.read())
         return data["choices"][0]["message"]["content"]
     except Exception as e:
