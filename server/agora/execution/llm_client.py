@@ -382,6 +382,15 @@ def dungeon_agent_think(npc_name: str, role: str, context: str, tier: str = "che
         Parsed JSON dict with action, goal, state_of_mind, insight.
         On error returns {"action": "error", ...}.
     """
+    # METABOLISM: dungeon NPC dialogue/roleplay cognition, dispatched via asyncio.to_thread with
+    # no HTTP route context. Tag explicitly (the in-thread stack can't see the caller) so this
+    # spend lands in 'agent-dialogue' rather than 'unknown'.
+    try:
+        from agora.execution.metabolism import set_organ as _set_organ
+        _set_organ("agent-dialogue")
+    except Exception:
+        pass
+
     # Try Dungeon OS role prompt first
     from agora.dungeon_os.roles import build_role_prompt
     system_prompt = build_role_prompt(npc_name, role)
@@ -475,6 +484,15 @@ def agent_think(role: str, context: str, tier: str = "cheap") -> dict:
     Returns:
         Parsed JSON response dict.  On error returns {"action": "error", ...}.
     """
+    # METABOLISM: this is the autonomous tick-loop cognition (agents "thinking" each tick),
+    # run via asyncio.to_thread with no HTTP route context. Tag it explicitly so its spend is
+    # attributed to 'agent-think' instead of collapsing into 'unknown'.
+    try:
+        from agora.execution.metabolism import set_organ as _set_organ
+        _set_organ("agent-think")
+    except Exception:
+        pass
+
     system_prompt = AGENT_SYSTEM_PROMPTS.get(
         role,
         "You are an AI agent in a multi-agent system. Respond with a JSON object "

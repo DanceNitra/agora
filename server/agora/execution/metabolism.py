@@ -17,7 +17,10 @@ import time
 from pathlib import Path
 
 _STORE = Path(__file__).resolve().parents[2] / ".metabolism.json"
-_SKIP_MODULES = {"llm_client", "metabolism", "model_router"}
+_SKIP_MODULES = {"llm_client", "metabolism", "model_router", "main"}
+# Agora subsystems whose modules count as organs when found on the call stack.
+_ORGAN_NAMESPACES = (".execution.", ".api.", ".agent_os.", ".controller.",
+                     ".coordination.", ".harness.", ".scheduler.", ".dungeon_os.")
 
 # Set by the HTTP middleware from the route path; asyncio.to_thread copies the context into the
 # worker thread, so call_llm can read it even when it runs via to_thread (the dominant pattern).
@@ -44,14 +47,20 @@ def _save(d: dict) -> None:
 
 def _caller_organ() -> str:
     """The organ: the route context (set by the HTTP middleware, copied into worker threads),
-    falling back to the nearest agora module up the stack, then 'unknown'."""
+    falling back to the nearest agora module up the stack, then 'unknown'.
+
+    The stack-walk recognises every Agora subsystem that makes LLM calls — not just the HTTP
+    routes (.api.) and research organs (.execution.), but also the autonomous tick-loop
+    cognition (.agent_os., .controller., .coordination., .harness., .scheduler., .dungeon_os.).
+    Before this was added, the background tick loop's calls climbed past every matched namespace
+    to agora.main and collapsed into 'unknown' — ~70% of all spend, invisibly."""
     ctx = _ORGAN.get()
     if ctx:
         return ctx
     try:
-        for fr in inspect.stack()[2:14]:
+        for fr in inspect.stack()[2:16]:
             mod = fr.frame.f_globals.get("__name__", "")
-            if ".execution." in mod or ".api." in mod:
+            if any(ns in mod for ns in _ORGAN_NAMESPACES):
                 name = mod.rsplit(".", 1)[-1]
                 if name not in _SKIP_MODULES:
                     return name[:30]
