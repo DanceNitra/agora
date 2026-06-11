@@ -2853,6 +2853,14 @@ async def _brain_contribute(eid: str, title: str, content: str) -> bool:
     return bool(r)
 
 
+# Novelty-at-generation gate: ~71% of grounded findings were TRUE restatements of notes the vault
+# already has (caught at write-time by dedup, but only after wasting the generation). Calibrated:
+# well-covered topics score ~0.74-0.80 on vault-search, genuinely novel ones ~0.50-0.58 — 0.72 splits
+# them cleanly. Above it, skip the discovery (the vault already knows this) and free the slot for new
+# ground. The write-time dedup stays as the backstop.
+_NOVELTY_GATE = float(os.environ.get("DUNGEON_NOVELTY_GATE", "0.72"))
+
+
 async def _grounded_discovery(eid: str, intent: str) -> None:
     """Turn a 'create' goal into a REAL finding grounded in arXiv AND connected to the user's
     own notes (or flagging a real gap) — a concrete claim, not a vague plan."""
@@ -2863,6 +2871,13 @@ async def _grounded_discovery(eid: str, intent: str) -> None:
                    "text": f"no real source found for '{intent[:36]}' — discovery slot skipped"})
         return
     related = await _brain_vault_search(intent)
+    top_sim = (related[0].get("score", 0.0) if related else 0.0)
+    if top_sim >= _NOVELTY_GATE:     # the vault already covers this — generating would just dup it
+        logger.info(f"[novelty-gate] {_AGENT_NAMES.get(eid, eid)} skipped '{intent[:40]}' "
+                    f"(vault sim {top_sim:.2f} >= {_NOVELTY_GATE}) — steering to novel ground")
+        broadcast({"type": "os_build", "kind": "collab", "who": _AGENT_NAMES.get(eid, eid),
+                   "text": f"'{intent[:32]}' already in the vault (sim {top_sim:.2f}) — seeking new ground"})
+        return
     rel = "; ".join(f"[[{r['title']}]]" for r in related[:3] if r.get("score", 0) > 0.45) \
         or "(the user's vault is thin on this — a real gap)"
     lesson = await _academy_lesson(eid)
