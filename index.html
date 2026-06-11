@@ -374,6 +374,7 @@ m.contradictions()              <span style="color:var(--faint)"># flag, never d
       <div data-reveal style="display:flex;flex-direction:column;gap:12px">
         <div class="rep" style="margin:0"><div class="tag">APPEND-ONLY</div><h3>Raw memory is never rewritten</h3><p>Consolidation adds a derived layer — links, staleness markers — but never edits the source. No silent accuracy drift.</p></div>
         <div class="rep" style="margin:0"><div class="tag">VALUE-RANKED</div><h3>Retention tracks value, not recency</h3><p>Measured: ranking what to keep beats FIFO super-linearly as the budget shrinks.</p></div>
+        <div class="rep" style="margin:0"><div class="tag">MCP-READY</div><h3>Drop-in memory for any agent</h3><p>An MCP server exposes remember / recall / consolidate to Claude, Cursor or any MCP client — value-ranked, not a recency buffer.</p></div>
       </div>
     </div>
     <div class="ctas" data-reveal style="margin-top:26px;justify-content:flex-start">

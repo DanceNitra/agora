@@ -42,6 +42,39 @@ m.value_by_cohort()                            # value reported per tag/time-blo
 Bring any text→vector function as `embed=` for semantic recall; with none, `mnemo` falls back to a
 forgiving lexical match so it **runs anywhere, today**.
 
+## Use it as an MCP server (any Claude / Cursor / agent client)
+
+`mnemo` ships an [MCP](https://modelcontextprotocol.io) stdio server so any MCP-compatible agent can
+use it as long-term memory — `remember`, value-ranked `recall`, `consolidate`, `contradictions`,
+`value_by_cohort`. `mnemo.py` stays zero-dependency; only the server needs the SDK:
+
+```bash
+pip install "mcp[cli]"
+curl -O https://raw.githubusercontent.com/DanceNitra/agora/main/mnemo/mnemo.py
+curl -O https://raw.githubusercontent.com/DanceNitra/agora/main/mnemo/mnemo_mcp.py
+MNEMO_PATH=./agent_memory.json python mnemo_mcp.py      # speaks MCP over stdio
+```
+
+Register it with a client — e.g. Claude Code (`.mcp.json`) or Claude Desktop
+(`claude_desktop_config.json`):
+
+```json
+{
+  "mcpServers": {
+    "mnemo": {
+      "command": "python",
+      "args": ["/abs/path/to/mnemo/mnemo_mcp.py"],
+      "env": { "MNEMO_PATH": "/abs/path/to/agent_memory.json" }
+    }
+  }
+}
+```
+
+For **semantic** recall, point it at any OpenAI-compatible embeddings endpoint via
+`MNEMO_EMBED_URL` / `MNEMO_EMBED_MODEL` / `MNEMO_EMBED_KEY`; with none set it uses the lexical
+fallback. The agent then calls `recall(query)` before reasoning and `remember(fact)` as it learns —
+its memory is value-ranked and append-only, not a recency buffer.
+
 ## The four operations
 
 | op | what it does |
@@ -78,7 +111,8 @@ forgiving lexical match so it **runs anywhere, today**.
 
 ## Status
 
-`v0.1` — the core, honest and runnable. Roadmap: pluggable vector stores, a hosted tier, an MCP
-server so any Claude/agent client can use `mnemo` as its memory. Open-core; the core stays free.
+`v0.1` — the core, honest and runnable, **now with an MCP server** so any Claude/agent client can use
+`mnemo` as its memory (above). Roadmap: pluggable vector stores, a hosted tier. Open-core; the core
+stays free.
 
 MIT-licensed · part of [Agora](https://github.com/DanceNitra/agora).
