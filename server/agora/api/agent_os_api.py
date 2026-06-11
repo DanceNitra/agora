@@ -1360,6 +1360,15 @@ async def brain_scout():
     return {"status": "ok", "report": format_scout(), "items": _load()[-12:]}
 
 
+@router.get("/brain/agent-activity")
+async def brain_agent_activity(n: int = 8):
+    """Recent agent-attributed work across all organ ledgers — for the dungeon build log so every
+    agent's real output is visible, not just the vault-graph curator."""
+    import asyncio as _aio
+    from agora.execution.agent_activity import recent
+    return {"status": "ok", "events": await _aio.to_thread(recent, n)}
+
+
 @router.get("/brain/envoy")
 async def brain_envoy():
     """THE ENVOY — current outward engagement on every posted thread (read-only)."""

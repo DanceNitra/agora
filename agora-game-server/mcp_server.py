@@ -2947,6 +2947,29 @@ async def ambient_life():
             engine.set_entity_thought(eid, "")
 
     consolidation = {"running": False, "seen": set()}
+    agent_activity = {"seen": set()}     # ts of brain events already shown in the build log
+
+    async def _surface_agent_activity() -> None:
+        """Pull every agent's REAL recent work from the brain (replications, analogies, bridges,
+        belief rulings, theory runs, outreach) and show it in the build log — so the keep displays
+        ALL its agents working, not just the vault-graph curator on her minute loop."""
+        d = await asyncio.to_thread(_brain_get_sync, "/api/v1/agent-os/brain/agent-activity?n=6")
+        events = (d or {}).get("events", [])
+        if not events:
+            return
+        seen = agent_activity["seen"]
+        fresh = [e for e in events if e.get("ts") and e["ts"] not in seen]
+        for e in reversed(fresh[:3]):                     # oldest-first, at most 3 per poll
+            seen.add(e["ts"])
+            name = e.get("agent", "Agora")
+            _os_build("collab", name, e.get("text", ""))
+            eid2 = next((k for k, v in _AGENT_NAMES.items() if v == name), None)  # avatar, if any
+            if eid2:
+                ent = engine.state.entities.get(eid2)
+                if ent:
+                    engine.add_effect("glow", int(round(ent.x)), int(round(ent.y)), "#9affc0", 1.2)
+        if len(seen) > 500:                               # keep only the most recent timestamps
+            agent_activity["seen"] = set(sorted(seen)[-200:])
 
     async def _run_consolidation(eid, standing):
         """Sage Mira consolidates the agents' live discoveries into a real vault note —
@@ -3266,6 +3289,11 @@ async def ambient_life():
                 asyncio.create_task(_run_consolidation("scholar", _stm.get("scholar", 0.5)))
             if loop_n % 17000 == 300 and not orchestration["running"]:  # Aldric: doctrine + GitHub (~4 h)
                 asyncio.create_task(_run_orchestration("king", _stm.get("king", 0.5)))
+
+        # SURFACE every agent's REAL brain work into the build log (~every 30 s, offset cadence),
+        # so the keep shows Rooke replicating, Wren bridging, Orin theorising — not only the curator.
+        if loop_n % 38 == 21:
+            asyncio.create_task(_surface_agent_activity())
 
         # THE NIGHT SHIFT — consolidate memory while the owner sleeps (02:00-05:59, once/day).
         if loop_n % 400 == 250:
