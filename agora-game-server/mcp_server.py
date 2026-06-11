@@ -3381,8 +3381,11 @@ async def ambient_life():
         # THE ROADMAP — Aldric synthesizes a data-backed next move for the owner (~daily, offset).
         if loop_n % 64000 == 12000:
             asyncio.create_task(_queue_roadmap())
-        # THE PRESS — Mira sends the strongest unpublished artifact to the editor's desk (~6h).
-        if loop_n % 25000 == 6000:
+        # THE PRESS — Mira sends the strongest unpublished artifact to the editor's desk (~2h).
+        # Distribution stream: propose a fresh publish-ready post often; the one-pending-approval
+        # gate (in /brain/press/draft) keeps it from flooding — the next is drafted once the owner
+        # clears the last. Publishing stays gated until the owner sets an auto-post policy.
+        if loop_n % 8000 == 2000:
             asyncio.create_task(_queue_press())
         # THE OPPORTUNITY SCOUT — Kael hunts an answerable open GitHub issue (~6h, offset, gated).
         if loop_n % 25000 == 18000:
