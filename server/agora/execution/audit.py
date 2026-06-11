@@ -203,7 +203,7 @@ def demand_gap(issues_repo: str, docs_base: Path, max_issues: int = 200) -> dict
                     and (not tw or max(tw.count(x) for x in set(tw)) <= 2)):
                 questions.append({"title": title[:140], "words": w})
 
-    # docs as word-sets, per page (the unit of an answer)
+    # docs as (path, word-set, excerpt) per page — keep text so the LLM judge can read the candidate
     doc_pages = []
     for p in list(docs_base.rglob("*.md")) + list(docs_base.rglob("*.mdx")):
         if any(part.startswith(".") for part in p.relative_to(docs_base).parts):
@@ -212,13 +212,21 @@ def demand_gap(issues_repo: str, docs_base: Path, max_issues: int = 200) -> dict
             text = p.read_text(encoding="utf-8", errors="replace")[:6000]
         except Exception:
             continue
-        doc_pages.append(set(_content_words(p.stem.replace("-", " ") + " " + text)))
+        doc_pages.append({"path": str(p.relative_to(docs_base)),
+                          "words": set(_content_words(p.stem.replace("-", " ") + " " + text)),
+                          "excerpt": text})
 
-    # PER-QUESTION coverage: best topic overlap with any single doc page
+    # PER-QUESTION coverage: best topic overlap with any single doc page (+ remember WHICH page)
     scored = []
     for q in questions:
-        best = max((len(q["words"] & dp) / len(q["words"]) for dp in doc_pages), default=0.0)
-        scored.append({"title": q["title"], "words": q["words"], "coverage": round(best, 2)})
+        best_ov, best_pg = 0.0, None
+        for dp in doc_pages:
+            ov = len(q["words"] & dp["words"]) / len(q["words"])
+            if ov > best_ov:
+                best_ov, best_pg = ov, dp
+        scored.append({"title": q["title"], "words": q["words"], "coverage": round(best_ov, 2),
+                       "best_page": best_pg["path"] if best_pg else "",
+                       "best_excerpt": best_pg["excerpt"][:1400] if best_pg else ""})
     scored.sort(key=lambda x: x["coverage"])
     weak = scored[:10]                     # the 10 least-covered questions — always actionable
     thin = [s for s in scored if s["coverage"] < 0.34]
@@ -236,8 +244,52 @@ def demand_gap(issues_repo: str, docs_base: Path, max_issues: int = 200) -> dict
     return {"issues_seen": len(issues), "questions": len(questions),
             "doc_notes": len(doc_pages), "uncovered": len(thin),
             "median_coverage": median_cov,
-            "weakest": [{"title": w["title"], "coverage": w["coverage"]} for w in weak],
+            "weakest": [{"title": w["title"], "coverage": w["coverage"],
+                         "best_page": w["best_page"], "best_excerpt": w["best_excerpt"]}
+                        for w in weak],
             "uncovered_sample": [w["title"] for w in weak], "gaps": gaps[:12]}
+
+
+def judge_coverage(weakest: list[dict]) -> list[dict]:
+    """LLM coverage judge: word-overlap only PRE-FILTERS to the weakest questions; the LLM then
+    reads the best-matching doc page and rules whether it ACTUALLY answers the question. This turns
+    a topic-overlap proxy into an answer-quality verdict — the precision the word metric lacks."""
+    from agora.execution.llm_client import call_llm
+    out = []
+    for w in weakest:
+        excerpt = (w.get("best_excerpt") or "").strip()
+        if not excerpt:
+            out.append({**{k: w[k] for k in ("title", "coverage", "best_page")},
+                        "verdict": "UNANSWERED", "why": "no candidate doc page at all"})
+            continue
+        # SEQUENTIAL flash calls rate-limit to empties — small spacing + one retry on a blank
+        raw = ""
+        for attempt in range(2):
+            raw = call_llm(
+                "You judge whether a documentation page ANSWERS a specific user question. Reply ONLY "
+                'JSON {"verdict":"ANSWERED|PARTIAL|UNANSWERED","why":"<=12 words"}. ANSWERED = a reader '
+                "with this question would find their answer here; PARTIAL = related but the specific "
+                "ask is not resolved; UNANSWERED = the page does not address the question.",
+                f"QUESTION: {w['title']}\n\nBEST-MATCHING DOC PAGE ({w.get('best_page','')}):\n{excerpt[:1400]}",
+                "cheap", 0.1, 120) or ""
+            if re.search(r"\{.*\}", raw, re.DOTALL):
+                break
+            time.sleep(1.5 * (attempt + 1))
+        verdict, why = "INCONCLUSIVE", "judge returned nothing (rate-limited)"
+        m = re.search(r"\{.*\}", raw, re.DOTALL)
+        if m:
+            try:
+                d = json.loads(m.group(0))
+                verdict = (d.get("verdict") or "UNANSWERED").upper().strip()
+                why = (d.get("why") or "").strip()[:80]
+            except Exception:
+                pass
+        if verdict not in ("ANSWERED", "PARTIAL", "UNANSWERED"):
+            verdict = "INCONCLUSIVE"
+        out.append({"title": w["title"], "coverage": w["coverage"],
+                    "best_page": w.get("best_page", ""), "verdict": verdict, "why": why})
+        time.sleep(3.0)                          # generous spacing — this runs on-demand, not in the loop
+    return out
 
 
 def compose_demand_report(issues_repo: str, docs_repo: str, dg: dict, out_dir: Path) -> Path:
@@ -252,8 +304,19 @@ def compose_demand_report(issues_repo: str, docs_repo: str, dg: dict, out_dir: P
          f"best-matching doc page). **{dg['uncovered']} of {n} questions ({pct}%) fall below the "
          f"0.34 coverage line** — the docs barely touch their topic.",
          "\n## Your 10 least-covered user questions (write these first)"]
-    for w in dg.get("weakest", []):
-        L.append(f"- _{w['title']}_ — coverage {w['coverage']:.0%}")
+    judged = dg.get("judged")
+    if judged and not all(j["verdict"] == "INCONCLUSIVE" for j in judged):
+        unans = sum(1 for j in judged if j["verdict"] == "UNANSWERED")
+        partial = sum(1 for j in judged if j["verdict"] == "PARTIAL")
+        L.append(f"_LLM coverage judge on the shortlist: **{unans} truly UNANSWERED**, {partial} "
+                 f"PARTIAL — verified by reading the best-matching page, not just word overlap._\n")
+        _icon = {"UNANSWERED": "❌", "PARTIAL": "🟡", "ANSWERED": "✅", "INCONCLUSIVE": "❔"}
+        for j in judged:
+            L.append(f"- {_icon.get(j['verdict'],'•')} **{j['verdict']}** — _{j['title']}_ "
+                     f"(best page: `{j['best_page']}`)" + (f" — {j['why']}" if j.get('why') else ""))
+    else:
+        for w in dg.get("weakest", []):
+            L.append(f"- _{w['title']}_ — coverage {w['coverage']:.0%}")
     if dg["gaps"]:
         L.append("\n## Recurring uncovered themes")
         for g in dg["gaps"]:
@@ -284,18 +347,24 @@ def run_audit(repo: str, subdir: str = "") -> dict:
             "holes": s["holes"][:4], "dupes_found": len(s["dupes"])}
 
 
-def run_demand_audit(issues_repo: str, docs_subdir: str = "", docs_repo: str = "") -> dict:
+def run_demand_audit(issues_repo: str, docs_subdir: str = "", docs_repo: str = "",
+                     llm_judge: bool = True) -> dict:
     """End to end demand-gap: ingest the docs repo, mine the issues repo's questions, score
-    coverage, write the report. docs_repo defaults to issues_repo (docs live with the code)."""
+    coverage, optionally LLM-judge the weakest shortlist for answer-quality, write the report.
+    docs_repo defaults to issues_repo (docs live with the code)."""
     docs_repo = docs_repo or issues_repo
     base = ingest(docs_repo)
     docs_base = base / docs_subdir if docs_subdir else base
     dg = demand_gap(issues_repo, docs_base, max_issues=200)
     if dg.get("error"):
         return dg
+    if llm_judge and dg.get("weakest"):
+        dg["judged"] = judge_coverage(dg["weakest"][:6])  # precise verdict on the cheap shortlist
     report = compose_demand_report(issues_repo, docs_repo + (f"/{docs_subdir}" if docs_subdir else ""),
                                    dg, base.parent)
+    j = dg.get("judged") or []
     return {"issues_repo": issues_repo, "docs_repo": docs_repo, "report": str(report),
             "questions": dg["questions"], "doc_notes": dg["doc_notes"],
             "median_coverage": dg["median_coverage"], "uncovered": dg["uncovered"],
-            "weakest": dg["weakest"][:5], "themes": dg["gaps"][:5]}
+            "truly_unanswered": sum(1 for x in j if x["verdict"] == "UNANSWERED"),
+            "judged": j[:6], "themes": dg["gaps"][:5]}
