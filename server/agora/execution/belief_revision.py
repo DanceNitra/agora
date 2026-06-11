@@ -52,17 +52,26 @@ def list_beliefs(vault_path: str) -> list[dict]:
     return out
 
 
-def pick_challenge_target(vault_path: str) -> dict | None:
+def pick_challenge_target(vault_path: str, recent_blob: str = "") -> dict | None:
     """The belief longest without a test: never-challenged first (oldest file), then the
-    stalest last_challenged. Superseded notes are out of the game."""
+    stalest last_challenged. Superseded notes are out of the game. `recent_blob` (recent inbox
+    task texts) lets us SKIP beliefs already worked in the window — so the picker rotates across
+    the whole canon instead of re-handing the same belief that an UPHELD verdict never stamps."""
     alive = [b for b in list_beliefs(vault_path)
              if b["belief_status"] in ("active", "survived")]
     if not alive:
         return None
-    never = [b for b in alive if not b["last_challenged"]]
+    blob = (recent_blob or "").lower()
+
+    def handled(b) -> bool:
+        bn = Path(b["path"]).name.lower()
+        return bool(blob) and (bn in blob or (b.get("title", "")[:40].lower() in blob))
+
+    fresh = [b for b in alive if not handled(b)] or alive    # if all recent, fall back to all
+    never = [b for b in fresh if not b["last_challenged"]]
     if never:
         return sorted(never, key=lambda b: Path(b["path"]).stat().st_mtime)[0]
-    return sorted(alive, key=lambda b: b["last_challenged"])[0]
+    return sorted(fresh, key=lambda b: b["last_challenged"])[0]
 
 
 def stamp_belief(path: str, verdict: str, by_note: str = "", reason: str = "") -> dict:

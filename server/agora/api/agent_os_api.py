@@ -1144,8 +1144,9 @@ async def brain_belief_challenge_target():
     """BELIEF REVISION — the belief that has gone longest untested (the challenge sweep's prey)."""
     from agora.config import settings
     from agora.execution.belief_revision import pick_challenge_target
+    from agora.execution.claude_inbox import recent_texts
     vault = settings.vault_path or "C:/Users/Danculus/my-second-brain"
-    t = pick_challenge_target(vault)
+    t = pick_challenge_target(vault, recent_blob=" || ".join(recent_texts()))
     return {"status": "ok", "target": t}
 
 

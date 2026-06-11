@@ -44,6 +44,23 @@ def _github_token() -> str:
                  if l.startswith("password=")), "")
 
 
+_our_login_cache = {"login": ""}
+
+
+def our_login() -> str:
+    """The GitHub account Agora posts as — so a reply that QUOTES our footer is not mistaken for
+    our own comment (the bug that hid the first real zeroclaw reply). Cached; falls back to the
+    repo owner."""
+    if _our_login_cache["login"]:
+        return _our_login_cache["login"]
+    try:
+        u = _api("GET", "/user")
+        _our_login_cache["login"] = (u.get("login") or "DanceNitra")
+    except Exception:
+        _our_login_cache["login"] = "DanceNitra"
+    return _our_login_cache["login"]
+
+
 def _api(method: str, path: str, body: dict | None = None) -> dict:
     tok = _github_token()
     req = urllib.request.Request(
@@ -123,9 +140,10 @@ def harvest_replies() -> list[dict]:
                             f"?per_page=100")
         except Exception:
             continue
+        mine_login = our_login().lower()
         replies = [c for c in comments
                    if _iso_to_ts(c.get("created_at") or "") > posted
-                   and "Drafted by [Agora]" not in (c.get("body") or "")]
+                   and (c.get("user") or {}).get("login", "").lower() != mine_login]
         new = replies[rec.get("replies_seen", 0):]
         for c in new:
             fresh.append({"corr_id": rec["id"], "title": rec["title"],

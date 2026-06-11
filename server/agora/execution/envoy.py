@@ -45,7 +45,7 @@ def _iso_to_ts(iso: str) -> float:
 def engagement_status() -> list[dict]:
     """Per posted thread: how our outreach landed — reactions on our words, human replies after us,
     and how fresh the thread is. Read-only GitHub reads via the Correspondent's authed client."""
-    from agora.execution.correspondent import _api, _load as _corr_load, _REPO
+    from agora.execution.correspondent import _api, _load as _corr_load, _REPO, our_login as _our_login
     out = []
     for rec in _corr_load():
         if rec.get("status") != "posted" or not rec.get("issue_number"):
@@ -64,15 +64,16 @@ def engagement_status() -> list[dict]:
             out.append(item)
             continue
         posted = rec.get("posted_ts", 0)
+        mine_login = _our_login().lower()
         for c in comments:
             cts = _iso_to_ts(c.get("created_at") or "")
             item["last_activity_ts"] = max(item["last_activity_ts"], cts)
-            mine = _AGORA_FOOTER in (c.get("body") or "")
+            login = (c.get("user") or {}).get("login", "")
+            mine = login.lower() == mine_login   # by AUTHOR — a reply that quotes our footer is NOT ours
             if mine and kind == "comment":
                 item["our_reactions"] = (c.get("reactions") or {}).get("total_count", 0)
             elif cts > posted and not mine:
                 item["replies"] += 1
-                login = (c.get("user") or {}).get("login")
                 if login and login not in item["repliers"]:
                     item["repliers"].append(login)
         if kind == "issue":
