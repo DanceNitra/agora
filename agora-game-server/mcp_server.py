@@ -553,6 +553,59 @@ def _recall_mem(eid: str, query: str, k: int = 4) -> str:
         return ""
 
 
+def _collective_recall(query: str, k: int = 4, exclude: str | None = None) -> str:
+    """The keep as ONE mind: top-k value-ranked memories across ALL agents' mnemo stores, attributed
+    by author — so an agent builds on a colleague's prior finding instead of re-deriving it."""
+    if _Mnemo is None:
+        return ""
+    pooled = []
+    for oid in _AGENT_NAMES:
+        if oid == exclude:
+            continue
+        m = _agent_mnemo(oid)
+        if m is None:
+            continue
+        try:
+            for h in m.recall(query, k=k):
+                pooled.append((h.get("score", 0.0), oid, h.get("text", "")))
+        except Exception:
+            pass
+    pooled.sort(key=lambda x: -x[0])
+    seen, out = set(), []
+    for _s, oid, text in pooled:
+        key = text[:60]
+        if not text or key in seen:
+            continue
+        seen.add(key)
+        out.append(f"{_AGENT_NAMES.get(oid, oid).split()[-1]}: {text[:90]}")
+        if len(out) >= k:
+            break
+    return " | ".join(out)
+
+
+def _keep_memory_signal() -> dict:
+    """Reflect on the COLLECTIVE memory: the densest-value cohort + any flagged contradiction across
+    all agents' stores. Uses mnemo's value_by_cohort + contradictions — the product, on ourselves."""
+    if _Mnemo is None:
+        return {}
+    cohorts, contras = {}, []
+    for oid in _AGENT_NAMES:
+        m = _agent_mnemo(oid)
+        if m is None:
+            continue
+        try:
+            for tag, c in m.value_by_cohort().items():
+                agg = cohorts.setdefault(tag, {"count": 0, "value": 0.0})
+                agg["count"] += c["count"]; agg["value"] += c["value"]
+            contras.extend(m.contradictions())
+        except Exception:
+            pass
+    top = max(cohorts.items(), key=lambda kv: kv[1]["value"], default=None)
+    return {"top_cohort": (top[0] if top else None),
+            "top_value": (round(top[1]["value"], 1) if top else 0.0),
+            "contradictions": len(contras)}
+
+
 def _llm_content_sync(system: str, user: str) -> str | None:
     """Blocking OpenRouter call → raw assistant message content, or None on failure."""
     if not _LLM_ON:
@@ -3200,6 +3253,8 @@ async def ambient_life():
             # recency list as a fallback when mnemo is empty/unavailable.
             _q = f"{_ROLE_HINT.get(eid, '')} {(memory.get(eid) or ['research'])[-1]}"
             mem = _recall_mem(eid, _q) or " | ".join(memory.get(eid, [])[-4:]) or "(nothing yet)"
+            # Collective recall — what colleagues already found that's relevant to this agent's focus.
+            colleague_mem = _collective_recall(_q, exclude=eid)
             done = " | ".join(quest_log.get(eid, [])[-6:]) or "(none yet)"
             news = " | ".join(world_events[-4:]) or "(quiet)"
             # Pull the agent's real mind (memory/emotion/vault) from server/agora.
@@ -3240,7 +3295,10 @@ async def ambient_life():
                    f"The user's REAL knowledge GAPS — isolated notes worth developing (AIM HERE): {gap_txt}"
                    f"{grave_txt}\n"
                    f"Your recent work: {mem}\nAlready completed (do NOT repeat): {done}\n"
-                   f"Nearby now: {', '.join(nearby) or 'no one'}\nLatest in the keep: {news}\n"
+                   + (f"What the keep already knows (colleagues' relevant findings — BUILD ON these, "
+                      f"don't re-derive; collaborate with that author if it fits): {colleague_mem}\n"
+                      if colleague_mem else "")
+                   + f"Nearby now: {', '.join(nearby) or 'no one'}\nLatest in the keep: {news}\n"
                    f"Your quest log (3 next moves — prefer ones that DEVELOP a real gap above):")
             data = await asyncio.to_thread(_llm_json_sync, sysmsg, usr) or {}
             added = 0
@@ -3350,7 +3408,19 @@ async def ambient_life():
                             mm.consolidate(keep=150)
                         except Exception:
                             pass
-            asyncio.create_task(asyncio.to_thread(_consolidate_agent_mem))
+                return _keep_memory_signal()
+            async def _reflect():
+                sig = await asyncio.to_thread(_consolidate_agent_mem)
+                # Surface what the collective memory values most + any self-contradiction it flags.
+                if sig.get("top_cohort"):
+                    note_event(f"the keep's memory leans on '{sig['top_cohort']}' "
+                               f"(value {sig['top_value']})"
+                               + (f"; {sig['contradictions']} memory contradiction(s) flagged"
+                                  if sig.get("contradictions") else ""))
+                if sig.get("contradictions"):
+                    _os_build("challenge", "the keep", f"mnemo flagged {sig['contradictions']} "
+                              f"contradictory memories for review")
+            asyncio.create_task(_reflect())
 
         # SURFACE every agent's REAL brain work into the build log (~every 30 s, offset cadence),
         # so the keep shows Rooke replicating, Wren bridging, Orin theorising — not only the curator.
