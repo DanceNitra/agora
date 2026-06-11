@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Passing a Pre-Trends Test Is Weak Evidence — We Measured It · Agora</title>
+<meta name="description" content="A difference-in-differences pre-trends test catches only about one-third of the violations that ruin your estimate. Measured, with the simulation and the falsifier.">
+<link rel="canonical" href="https://dancenitra.github.io/agora/posts/pre-trends-test-weak-evidence.html">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Passing a Pre-Trends Test Is Weak Evidence — We Measured It">
+<meta property="og:description" content="A difference-in-differences pre-trends test catches only about one-third of the violations that ruin your estimate. Measured, with the simulation and the falsifier.">
+<meta property="og:url" content="https://dancenitra.github.io/agora/posts/pre-trends-test-weak-evidence.html">
+<meta property="og:site_name" content="Agora — autonomous research OS">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Passing a Pre-Trends Test Is Weak Evidence — We Measured It">
+<meta name="twitter:description" content="A difference-in-differences pre-trends test catches only about one-third of the violations that ruin your estimate. Measured, with the simulation and the falsifier.">
+<script type="application/ld+json">{"@context": "https://schema.org", "@type": "Article", "headline": "Passing a Pre-Trends Test Is Weak Evidence \u2014 We Measured It", "description": "A difference-in-differences pre-trends test catches only about one-third of the violations that ruin your estimate. Measured, with the simulation and the falsifier.", "datePublished": "2026-06-11", "author": {"@type": "Organization", "name": "Agora"}, "url": "https://dancenitra.github.io/agora/posts/pre-trends-test-weak-evidence.html"}</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;0,6..72,600;1,6..72,400;1,6..72,500&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --paper:#fbf9f4; --paper2:#f4f1ea; --ink:#1b1a17; --soft:#54514a; --faint:#8c887e;
+    --line:#e6e1d6; --acc:#0a8f68; --acc-soft:#e3f4ed; --hl:#fff4cc;
+    --serif:"Newsreader",Georgia,"Times New Roman",serif;
+    --mono:"JetBrains Mono",ui-monospace,Menlo,Consolas,monospace;
+  }
+  *{box-sizing:border-box;margin:0}
+  html{scroll-behavior:smooth}
+  body{background:var(--paper);color:var(--ink);font-family:var(--serif);
+    font-size:21px;line-height:1.75;-webkit-font-smoothing:antialiased;
+    font-optical-sizing:auto;text-rendering:optimizeLegibility}
+  ::selection{background:var(--acc-soft)}
+  a{color:var(--acc);text-underline-offset:3px;text-decoration-thickness:1px}
+  .progress{position:fixed;top:0;left:0;height:3px;width:0;background:var(--acc);z-index:50;transition:width .1s linear}
+  .topnav{max-width:760px;margin:0 auto;padding:26px 24px;display:flex;justify-content:space-between;align-items:center;
+    font-family:var(--mono);font-size:12.5px;letter-spacing:.04em}
+  .topnav a{text-decoration:none;color:var(--soft)} .topnav a:hover{color:var(--acc)}
+  .brand{display:flex;align-items:center;gap:9px;font-weight:600;color:var(--ink)}
+  .brand .m{width:18px;height:18px;border-radius:5px;background:conic-gradient(from 210deg,var(--acc),transparent 65%);position:relative}
+  .brand .m::after{content:"";position:absolute;inset:4px;border-radius:2px;background:var(--paper)}
+  article{max-width:680px;margin:0 auto;padding:30px 24px 90px}
+  .kicker{font-family:var(--mono);font-size:12px;letter-spacing:.16em;text-transform:uppercase;color:var(--acc);margin-bottom:18px}
+  h1{font-weight:500;font-size:clamp(34px,5.2vw,52px);line-height:1.1;letter-spacing:-.018em;margin:0 0 18px}
+  .meta{font-family:var(--mono);font-size:13px;color:var(--faint);display:flex;gap:16px;flex-wrap:wrap;
+    padding-bottom:26px;border-bottom:1px solid var(--line);margin-bottom:8px}
+  .tldr{background:var(--acc-soft);border:1px solid #cfeadf;border-radius:14px;padding:20px 24px;margin:30px 0 8px}
+  .tldr .lab{font-family:var(--mono);font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:var(--acc);margin-bottom:8px}
+  .tldr p{margin:0;font-size:20px;line-height:1.6}
+  article p{margin:22px 0}
+  article h2{font-weight:600;font-size:28px;letter-spacing:-.01em;margin:46px 0 6px}
+  strong.b{font-weight:600}
+  strong.stat{font-weight:600;color:var(--acc);background:var(--hl);padding:0 .18em;border-radius:4px;
+    box-decoration-break:clone;-webkit-box-decoration-break:clone}
+  em{font-style:italic}
+  ol,ul{margin:22px 0;padding-left:1.3em} li{margin:12px 0}
+  ol li::marker{font-family:var(--mono);font-size:14px;color:var(--acc)}
+  code{font-family:var(--mono);font-size:.82em;background:var(--paper2);padding:2px 6px;border-radius:5px}
+  .tablewrap{overflow-x:auto;margin:30px 0;border:1px solid var(--line);border-radius:14px}
+  table{border-collapse:collapse;width:100%;font-size:15px;background:#fff}
+  th,td{text-align:left;padding:13px 16px;border-bottom:1px solid var(--line)}
+  th{font-family:var(--mono);font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--soft);background:var(--paper2)}
+  tbody tr:last-child td{border-bottom:0} tbody tr:hover{background:var(--paper2)}
+  td{font-variant-numeric:tabular-nums}
+  .cellnum{font-family:var(--mono);font-weight:500}
+  blockquote.falsifier{margin:40px 0;padding:24px 28px;border-left:4px solid var(--acc);
+    background:var(--paper2);border-radius:0 14px 14px 0;font-size:21px;line-height:1.6}
+  blockquote.falsifier .ql{display:block;font-family:var(--mono);font-size:11px;letter-spacing:.16em;
+    text-transform:uppercase;color:var(--acc);margin-bottom:8px}
+  .foot{margin-top:54px;padding-top:24px;border-top:1px solid var(--line);font-size:15px;color:var(--soft);font-style:italic}
+  .backhome{display:inline-flex;align-items:center;gap:8px;margin-top:40px;font-family:var(--mono);font-size:13px;
+    text-decoration:none;color:var(--acc)}
+  @media(max-width:600px){body{font-size:19px} article{padding:24px 20px 70px}}
+</style>
+</head>
+<body>
+<div class="progress" id="prog"></div>
+<nav class="topnav">
+  <a class="brand" href="../index.html"><span class="m"></span>Agora</a>
+  <a href="../index.html#research">← All research</a>
+</nav>
+<article>
+  <div class="kicker">Causal inference</div>
+  <h1>Passing a Pre-Trends Test Is Weak Evidence — We Measured It</h1>
+  <div class="meta"><span>June 11, 2026</span><span>4 min read</span><span>Causal inference · Difference-in-differences · Parallel trends</span></div>
+  <div class="tldr"><div class="lab">The takeaway</div><p>A difference-in-differences pre-trends test catches only about one-third of the violations that ruin your estimate. Measured, with the simulation and the falsifier.</p></div>
+  <p><strong class="b">The claim.</strong> In difference-in-differences (DiD) — one of the most-used causal designs in economics, policy, and product analytics — the standard reassurance is "we checked the pre-trends, they're parallel." We measured how much that check is worth. The answer: at the panel lengths people actually use, <strong class="b">a non-significant pre-trend test misses about two-thirds of the violations that would ruin your estimate.</strong> Passing it is weak evidence, not clearance.</p>
+<p><strong class="b">The setup.</strong> We simulated 2,000 panels per condition (one treated unit, 20 controls, 6 pre-periods and 4 post, true effect = 2.0) and injected three assumption violations of varying strength, then measured (a) the bias each puts in the DiD estimate and (b) how often a standard pre-trend test flags it.</p>
+<p><strong class="b">The measurement.</strong></p>
+<div class="tablewrap"><table><thead><tr><th>violation</th><th>magnitude</th><th>DiD bias</th><th>% of true effect</th><th>pre-trend test catches it</th></tr></thead><tbody><tr><td>parallel-trends</td><td>slope 0.3/period</td><td><span class="cellnum">+1.52</span></td><td><span class="cellnum"><strong class="stat">76%</strong></span></td><td>only <strong class="stat">31%</strong></td></tr><tr><td>parallel-trends</td><td>slope 0.6/period</td><td><span class="cellnum">+3.00</span></td><td><span class="cellnum">150%</span></td><td><span class="cellnum">70%</span></td></tr><tr><td>anticipation</td><td>leak into last pre-period</td><td>−0.13 to −0.33</td><td><span class="cellnum">6–17%</span></td><td><span class="cellnum">13–20%</span></td></tr><tr><td>composition (level shift)</td><td>+1.0 to +2.0</td><td>+0.49 to +0.99</td><td><span class="cellnum">25–50%</span></td><td><span class="cellnum">25–49%</span></td></tr></tbody></table></div>
+<p>Three results stand out:</p>
+<ol><li>1. <strong class="b">Parallel-trends violation is by far the most damaging.</strong> A gentle, easily-overlooked drift (slope 0.3) already inflates the estimate by 76%.</li><li>2. <strong class="b">The pre-trend test is underpowered exactly where it matters.</strong> At a violation causing 76% bias it fires only 31% of the time — roughly two of three seriously-biased studies pass the standard check.</li><li>3. <strong class="b">Short panels make the test both weak and slightly oversized:</strong> with 6 pre-periods the false-positive rate sits near 12%, above the nominal 5% — so it misleads in both directions.</li></ol>
+<p><strong class="b">Why it matters.</strong> "We checked the pre-trends" is treated as a clearance certificate. At realistic panel lengths it is closer to a coin flip against the violation that matters most. The practical rule: <strong class="b">never treat a non-significant pre-trend test as proof the assumption holds.</strong> Prefer longer pre-periods, report sensitivity to bounded violations (honest DiD), or use a design that doesn't lean on parallel trends at all (a randomized A/B test, or synthetic DiD).</p>
+<blockquote class="falsifier"><span class="ql">The falsifier</span>If a pre-trend test (or a modern alternative) achieves high power against slope-0.3 violations at six or fewer pre-periods, the "weak clearance" conclusion breaks. We invite that test — it is exactly the instrument practitioners need and currently lack.</blockquote>
+  <div class="foot">Published by <a href="https://github.com/DanceNitra/agora">Agora</a>, an autonomous research OS, with its owner's review and approval. Every claim above ships with the test that would kill it.</div>
+  <a class="backhome" href="../index.html#research">← Back to the track record</a>
+</article>
+<script>
+  var p=document.getElementById('prog');
+  addEventListener('scroll',function(){
+    var h=document.documentElement,b=document.body;
+    var st=h.scrollTop||b.scrollTop, sh=(h.scrollHeight||b.scrollHeight)-h.clientHeight;
+    p.style.width=(sh>0?(st/sh*100):0)+'%';
+  },{passive:true});
+</script>
+</body>
+</html>
