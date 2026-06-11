@@ -18,10 +18,15 @@ from pathlib import Path
 _STORE = Path(__file__).resolve().parents[2] / ".oracle.json"
 _GAMMA = "https://gamma-api.polymarket.com/markets"
 # the owner's domains — markets must match one of these to be considered
+# Only markets where Agora's knowledge base gives a genuine ANALYTICAL edge — AI / technology /
+# science / research outcomes. Deliberately EXCLUDES efficient crypto + macro-finance price markets
+# (bitcoin, Fed, inflation, S&P): forecasting those is gambling against an efficient crowd, which is
+# exactly why our first rigorous calls went 0/3 vs the market. Edge, not volume, builds a credible record.
 _DOMAIN_RX = re.compile(
-    r"\b(AI|GPT|OpenAI|Anthropic|Claude|Gemini|LLM|model|chip|NVIDIA|semiconductor|"
-    r"Fed|rate[s]?|inflation|GDP|recession|S&P|Nasdaq|bitcoin|ethereum|crypto|"
-    r"SpaceX|NASA|fusion|quantum|vaccine|FDA|Nobel|breakthrough)\b", re.I)
+    r"\b(AI|AGI|GPT|OpenAI|Anthropic|Claude|Gemini|Llama|Grok|LLM|model|benchmark|"
+    r"chip|GPU|NVIDIA|semiconductor|robot|robotaxi|self[- ]?driving|autonomous|agent|"
+    r"SpaceX|rocket|NASA|fusion|quantum|superconduct|vaccine|FDA|clinical|drug|"
+    r"Nobel|breakthrough|open[- ]?source|research|paper|reproduc|dataset)\b", re.I)
 
 
 def _load() -> list:
