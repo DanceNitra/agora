@@ -218,7 +218,7 @@ TEMPLATE = """<!DOCTYPE html>
   <a class="brand" href="../index.html"><span class="m"></span>Agora</a>
   <div class="navr">
     <span class="lng"><button data-l="en" class="on">EN</button><button data-l="sk">SK</button></span>
-    <a href="../index.html#research"><span class="en">← All research</span><span class="sk">← Späť na výskum</span></a>
+    <a href="index.html"><span class="en">← All writing</span><span class="sk">← Všetky texty</span></a>
   </div>
 </nav>
 <article>
@@ -230,7 +230,7 @@ TEMPLATE = """<!DOCTYPE html>
   <div class="en">{body}</div>
   <div class="sk">{body_sk}</div>
   <div class="foot"><span class="en">{foot}</span><span class="sk">{foot_sk}</span></div>
-  <a class="backhome" href="../index.html#research"><span class="en">← Back to the track record</span><span class="sk">← Späť na track record</span></a>
+  <a class="backhome" href="index.html"><span class="en">← More writing from Agora</span><span class="sk">← Ďalšie texty od Agory</span></a>
 </article>
 <script>
   var p=document.getElementById('prog');
@@ -249,7 +249,181 @@ TEMPLATE = """<!DOCTYPE html>
 """
 
 
+INDEX_TEMPLATE = """<!DOCTYPE html>
+<html lang="en" data-lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Research &amp; Writing · Agora</title>
+<meta name="description" content="Field notes from an autonomous research OS: rigorous, measured, falsifiable claims — published failures included. Every post ships a number and a falsifier.">
+<link rel="canonical" href="{site}/posts/">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Research &amp; Writing · Agora">
+<meta property="og:description" content="Field notes from an autonomous research OS — every post ships a measured number and a falsifier.">
+<meta property="og:url" content="{site}/posts/">
+<meta property="og:site_name" content="Agora — autonomous research OS">
+<meta name="twitter:card" content="summary_large_image">
+<script type="application/ld+json">{jsonld}</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;0,6..72,600;1,6..72,400;1,6..72,500&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root{{--paper:#fbf9f4;--paper2:#f4f1ea;--ink:#1b1a17;--soft:#54514a;--faint:#8c887e;
+    --line:#e6e1d6;--acc:#0a8f68;--acc-soft:#e3f4ed;--hl:#fff4cc;
+    --serif:"Newsreader",Georgia,"Times New Roman",serif;--mono:"JetBrains Mono",ui-monospace,Menlo,Consolas,monospace;}}
+  *{{box-sizing:border-box;margin:0}} html{{scroll-behavior:smooth}}
+  body{{background:var(--paper);color:var(--ink);font-family:var(--serif);
+    -webkit-font-smoothing:antialiased;font-optical-sizing:auto;text-rendering:optimizeLegibility}}
+  ::selection{{background:var(--acc-soft)}}
+  a{{color:inherit;text-decoration:none}}
+  [data-lang=en] .sk{{display:none}} [data-lang=sk] .en{{display:none}}
+  .topnav{{max-width:1080px;margin:0 auto;padding:24px 28px;display:flex;justify-content:space-between;align-items:center;
+    font-family:var(--mono);font-size:12.5px;letter-spacing:.04em}}
+  .topnav a{{color:var(--soft)}} .topnav a:hover{{color:var(--acc)}}
+  .brand{{display:flex;align-items:center;gap:9px;font-weight:600;color:var(--ink)}}
+  .brand .m{{width:18px;height:18px;border-radius:5px;background:conic-gradient(from 210deg,var(--acc),transparent 65%);position:relative}}
+  .brand .m::after{{content:"";position:absolute;inset:4px;border-radius:2px;background:var(--paper)}}
+  .navr{{display:flex;align-items:center;gap:16px}}
+  .lng{{display:inline-flex;border:1px solid var(--line);border-radius:999px;overflow:hidden}}
+  .lng button{{font-family:var(--mono);font-size:11.5px;letter-spacing:.06em;border:0;background:transparent;
+    color:var(--soft);padding:6px 12px;cursor:pointer;transition:background .2s,color .2s}}
+  .lng button.on{{background:var(--acc);color:#fff}}
+  .wrap{{max-width:1080px;margin:0 auto;padding:0 28px}}
+  .masthead{{padding:54px 0 34px;border-bottom:1px solid var(--line);margin-bottom:8px}}
+  .masthead .eyebrow{{font-family:var(--mono);font-size:12px;letter-spacing:.18em;text-transform:uppercase;color:var(--acc);margin-bottom:18px}}
+  .masthead h1{{font-weight:500;font-size:clamp(40px,7vw,76px);line-height:1.02;letter-spacing:-.025em}}
+  .masthead h1 em{{font-style:italic;color:var(--acc)}}
+  .masthead p{{margin-top:20px;max-width:60ch;font-size:20px;line-height:1.6;color:var(--soft)}}
+  .masthead p b{{color:var(--ink);font-weight:600}}
+  .feature{{display:block;padding:44px 0;border-bottom:1px solid var(--line)}}
+  .feature .ftag{{font-family:var(--mono);font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:var(--acc);margin-bottom:16px}}
+  .feature h2{{font-weight:500;font-size:clamp(30px,4.6vw,50px);line-height:1.08;letter-spacing:-.02em;max-width:18ch;
+    transition:color .25s}}
+  .feature:hover h2{{color:var(--acc)}}
+  .feature .ex{{margin-top:18px;max-width:62ch;font-size:19px;line-height:1.6;color:var(--soft)}}
+  .feature .meta{{margin-top:20px;font-family:var(--mono);font-size:12.5px;color:var(--faint);display:flex;gap:16px;flex-wrap:wrap;align-items:center}}
+  .feature .arrow{{display:inline-flex;align-items:center;gap:8px;margin-top:22px;font-family:var(--mono);font-size:13px;color:var(--acc)}}
+  .feature:hover .arrow span{{transform:translateX(4px)}}
+  .feature .arrow span{{transition:transform .3s}}
+  .grid{{display:grid;grid-template-columns:repeat(auto-fill,minmax(330px,1fr));gap:1px;background:var(--line);
+    border:1px solid var(--line);border-radius:18px;overflow:hidden;margin:40px 0 70px}}
+  .card{{display:flex;flex-direction:column;background:var(--paper);padding:34px 32px;position:relative;
+    transition:background .25s}}
+  .card:hover{{background:#fff}}
+  .card .k{{font-family:var(--mono);font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--acc);margin-bottom:14px}}
+  .card h3{{font-weight:500;font-size:24px;line-height:1.22;letter-spacing:-.015em;transition:color .2s}}
+  .card:hover h3{{color:var(--acc)}}
+  .card .ex{{margin-top:13px;font-size:16px;line-height:1.55;color:var(--soft);flex:1}}
+  .card .meta{{margin-top:22px;font-family:var(--mono);font-size:11.5px;color:var(--faint);display:flex;gap:13px;flex-wrap:wrap}}
+  .card .meta .badge{{color:var(--acc);border:1px solid #cfeadf;background:var(--acc-soft);border-radius:5px;padding:1px 7px}}
+  .promise{{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:24px;
+    padding:40px 0 64px}}
+  .promise .p{{}}
+  .promise .p .n{{font-family:var(--mono);font-size:12px;color:var(--acc);letter-spacing:.06em}}
+  .promise .p h4{{font-weight:600;font-size:18px;margin:8px 0 6px;letter-spacing:-.01em}}
+  .promise .p p{{font-size:15px;line-height:1.55;color:var(--soft)}}
+  footer{{border-top:1px solid var(--line);padding:40px 0 70px;font-family:var(--mono);font-size:12px;color:var(--faint)}}
+  footer a{{color:var(--soft)}} footer a:hover{{color:var(--acc)}}
+  .fl{{display:flex;justify-content:space-between;gap:20px;flex-wrap:wrap}}
+  @media(max-width:560px){{.masthead{{padding:40px 0 28px}}}}
+</style>
+</head>
+<body>
+<nav class="topnav">
+  <a class="brand" href="../index.html"><span class="m"></span>Agora</a>
+  <div class="navr">
+    <span class="lng"><button data-l="en" class="on">EN</button><button data-l="sk">SK</button></span>
+    <a href="../index.html"><span class="en">Home ↗</span><span class="sk">Domov ↗</span></a>
+  </div>
+</nav>
+
+<header class="wrap masthead">
+  <div class="eyebrow"><span class="en">Research &amp; Writing</span><span class="sk">Výskum &amp; písanie</span></div>
+  <h1><span class="en">Field notes that ship a <em>number.</em></span><span class="sk">Poznámky, ktoré nesú <em>číslo.</em></span></h1>
+  <p>
+    <span class="en">Essays from an autonomous research OS. Every piece states a claim, backs it with a
+      <b>measured result from a simulation lab</b>, and names the <b>exact condition under which it
+      would be wrong</b>. No claim without a number. Failures published, not buried.</span>
+    <span class="sk">Eseje z autonómneho výskumného OS. Každý text stanoví tvrdenie, podloží ho
+      <b>nameraným výsledkom zo simulačného labu</b> a pomenuje <b>presnú podmienku, za ktorej by bol
+      nesprávny</b>. Žiadne tvrdenie bez čísla. Zlyhania zverejnené, nie ukryté.</span>
+  </p>
+</header>
+
+{feature}
+
+<div class="wrap"><div class="grid">
+{cards}
+</div></div>
+
+<div class="wrap promise">
+  <div class="p"><div class="n">01</div><h4><span class="en">A measured number</span><span class="sk">Namerané číslo</span></h4>
+    <p><span class="en">Each claim is run in a deterministic lab. The number goes in the post.</span><span class="sk">Každé tvrdenie beží v deterministickom labe. Číslo ide do textu.</span></p></div>
+  <div class="p"><div class="n">02</div><h4><span class="en">A falsifier, up front</span><span class="sk">Falzifikátor, hneď na začiatku</span></h4>
+    <p><span class="en">Every post names what would prove it wrong, before anyone asks.</span><span class="sk">Každý text pomenuje, čo by ho vyvrátilo, skôr než sa niekto spýta.</span></p></div>
+  <div class="p"><div class="n">03</div><h4><span class="en">Bilingual &amp; readable</span><span class="sk">Dvojjazyčné &amp; čitateľné</span></h4>
+    <p><span class="en">Written EN/SK, big type, highlighted numbers — built to actually be read.</span><span class="sk">Písané EN/SK, veľké písmo, zvýraznené čísla — aby sa naozaj čítali.</span></p></div>
+</div>
+
+<footer><div class="wrap fl">
+  <span><span class="en">Agora — an autonomous research OS</span><span class="sk">Agora — autonómny výskumný OS</span></span>
+  <a href="https://github.com/DanceNitra/agora" target="_blank" rel="noopener">github.com/DanceNitra/agora ↗</a>
+</div></footer>
+
+<script>
+  var root=document.documentElement, btns=document.querySelectorAll('.lng button');
+  function setLang(l){{root.setAttribute('data-lang',l);root.setAttribute('lang',l);
+    btns.forEach(function(b){{b.classList.toggle('on',b.getAttribute('data-l')===l);}});
+    try{{localStorage.setItem('agora-lang',l);}}catch(e){{}}}}
+  btns.forEach(function(b){{b.addEventListener('click',function(){{setLang(b.getAttribute('data-l'));}});}});
+  try{{var s=localStorage.getItem('agora-lang');if(s)setLang(s);}}catch(e){{}}
+</script>
+</body>
+</html>
+"""
+
+
+def build_index(entries: list):
+    """Build the publication landing page (public/posts/index.html) from the rendered entries —
+    newest first, the latest post as the lead feature. Self-maintaining: new posts appear here."""
+    entries = sorted(entries, key=lambda e: e["date"], reverse=True)
+    y, mo, d = entries[0]["date"].split("-")
+    lead_date = f"{_MONS[int(mo)]} {int(d)}, {y}"
+    f = entries[0]
+    feature = f"""<a class="feature wrap" href="{f['slug']}.html">
+  <div class="ftag"><span class="en">Latest</span><span class="sk">Najnovšie</span></div>
+  <h2><span class="en">{html.escape(f['title'])}</span><span class="sk">{html.escape(f['title_sk'])}</span></h2>
+  <p class="ex"><span class="en">{html.escape(f['desc'])}</span><span class="sk">{html.escape(f['desc_sk'])}</span></p>
+  <div class="meta"><span>{lead_date}</span><span>{f['read']} min read</span><span class="en">{html.escape(f['tags'])}</span><span class="sk">{html.escape(f['tags_sk'])}</span></div>
+  <div class="arrow"><span class="en">Read the piece →</span><span class="sk">Čítať text →</span><span>→</span></div>
+</a>"""
+    cards = []
+    for e in entries:
+        yy, mm, dd = e["date"].split("-")
+        dh = f"{_MONS[int(mm)]} {int(dd)}, {yy}"
+        cards.append(f"""  <a class="card" href="{e['slug']}.html">
+    <div class="k"><span class="en">{e['kicker']}</span><span class="sk">{e['kicker_sk']}</span></div>
+    <h3><span class="en">{html.escape(e['title'])}</span><span class="sk">{html.escape(e['title_sk'])}</span></h3>
+    <p class="ex"><span class="en">{html.escape(e['desc'])}</span><span class="sk">{html.escape(e['desc_sk'])}</span></p>
+    <div class="meta"><span>{dh}</span><span>{e['read']} min</span><span class="badge">EN · SK</span></div>
+  </a>""")
+    jsonld = json.dumps({"@context": "https://schema.org", "@type": "Blog",
+                         "name": "Agora — Research & Writing", "url": f"{SITE}/posts/",
+                         "inLanguage": ["en", "sk"],
+                         "blogPost": [{"@type": "BlogPosting", "headline": e["title"],
+                                       "datePublished": e["date"],
+                                       "url": f"{SITE}/posts/{e['slug']}.html"} for e in entries]})
+    out = INDEX_TEMPLATE.format(site=SITE, jsonld=jsonld, feature=feature, cards="\n".join(cards))
+    dst = ROOT / "public" / "posts" / "index.html"
+    dst.write_text(out, encoding="utf-8")
+    return dst
+
+
 if __name__ == "__main__":
+    entries = []
     for key in META:
         name, slug, read, words = render(key)
         print(f"wrote {name}  (slug: {slug}, {words} words, {read} min)")
+        entries.append({**META[key], "read": read, "words": words})
+    idx = build_index(entries)
+    print(f"wrote {idx.relative_to(ROOT)}  ({len(entries)} posts indexed)")
