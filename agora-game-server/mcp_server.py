@@ -1465,7 +1465,9 @@ async def _run_promotion() -> None:
     """Promote the best recent findings into the vault through the quality gate (~every 20 min) —
     the RELIABLE research→vault funnel so the Obsidian second-brain actually grows (verification
     incorporates ~0, so this is what keeps real notes flowing in)."""
-    d = await asyncio.to_thread(_brain_post_sync, "/api/v1/agent-os/brain/promote-findings?n=3", {})
+    # local judge ~2.4s × up to 24 candidates + writes → needs a generous timeout (default 4s would
+    # cut the funnel off mid-run, which is part of why so little was landing).
+    d = await asyncio.to_thread(_brain_post_sync, "/api/v1/agent-os/brain/promote-findings?n=8", {}, 150)
     p = (d or {}).get("promoted", 0)
     if p:
         broadcast({"type": "os_build", "kind": "collab", "who": "Sage Mira",

@@ -261,10 +261,13 @@ _PROMOTE_STATS = {"promoted": 0, "checked": 0}   # cumulative funnel stats for t
 
 
 @router.post("/brain/promote-findings")
-async def promote_findings(request: Request, n: int = 3):
+async def promote_findings(request: Request, n: int = 8):
     """Promote the best recent findings into the vault through the (reliable) quality gate — the
     research→vault path that actually flows. Verification incorporates ~0 (too strict), so without
-    this, grounded findings pile up only in the brain and never reach the Obsidian second-brain."""
+    this, grounded findings pile up only in the brain and never reach the Obsidian second-brain.
+    Throughput note: the LLM judge is now LOCAL (free), so the old scarce-budget rationing (last-40
+    window, promote 3) starved a ~1000-finding backlog — most never got vetted. We widen the window
+    and promote more per run so genuine gems land instead of rotting (quality gate + dedup unchanged)."""
     from agora.execution.quality_gate import assess_quality
     db = request.app.state.db
     writer = getattr(request.app.state, "vault_writer", None)
@@ -272,7 +275,7 @@ async def promote_findings(request: Request, n: int = 3):
         return {"status": "no-writer", "promoted": 0}
     cur = await db.execute(
         "SELECT title, content FROM collective_knowledge WHERE knowledge_type='discovery' "
-        "ORDER BY created_at DESC LIMIT 40")
+        "ORDER BY created_at DESC LIMIT 150")
     rows = await cur.fetchall()
     import re as _re
     # 1) gather the window's eligible candidates (cheap filters; don't consume _PROMOTED yet)
@@ -290,7 +293,7 @@ async def promote_findings(request: Request, n: int = 3):
         if _by and _sy and _by.group(0) != _sy.group(0):
             continue
         cands.append((title, content))
-        if len(cands) >= 14:                              # bound the scoring cost
+        if len(cands) >= 24:                              # bound the scoring cost (local judge is cheap)
             break
 
     # 2) CRITICAL-WINDOW LOAD BALANCER (Agora's own insight, applied to itself): the consolidation
