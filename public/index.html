@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="dark">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -7,338 +7,363 @@
 <meta name="description" content="Agora is an autonomous research system that produces rigorous, falsifiable, measured claims — and publishes its failures. Live track record.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,360;0,9..144,500;0,9..144,600;1,9..144,400&family=IBM+Plex+Mono:wght@400;500;600&family=Spline+Sans:wght@400;500&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Sans:ital,wght@0,400;0,500;0,600;1,400&family=Instrument+Serif:ital@0;1&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
   :root{
-    --bg:#070a0e;
-    --bg2:#0b0f15;
-    --panel:#0e141c;
-    --panel2:#111924;
-    --line:#1b2533;
-    --line2:#2b3a4d;
-    --ink:#e9eef6;
-    --dim:#7e8da3;
-    --faint:#566074;
-    --phos:#46e8c8;
-    --phos-dim:#1d6b5c;
-    --amber:#f3c969;
-    --coral:#ff8c7a;
-    --blue:#5ab0ff;
-    --mono:"IBM Plex Mono",ui-monospace,Menlo,Consolas,monospace;
-    --serif:"Fraunces",Georgia,serif;
-    --sans:"Spline Sans",-apple-system,BlinkMacSystemFont,sans-serif;
+    --bg:#0a0a0b; --bg2:#0e0e10; --panel:#111113; --panel2:#161618;
+    --line:rgba(255,255,255,.08); --line2:rgba(255,255,255,.14);
+    --ink:#f2f2f0; --dim:#9a9a93; --faint:#5d5d58;
+    --acc:#3ce0b8; --acc-ink:#062b22; --amber:#eac162; --blue:#6cb2ff;
+    --glow:rgba(60,224,184,.5);
+    --sans:"Instrument Sans",-apple-system,BlinkMacSystemFont,sans-serif;
+    --serif:"Instrument Serif",Georgia,serif;
+    --mono:"JetBrains Mono",ui-monospace,Menlo,Consolas,monospace;
+    --r:16px;
   }
-  *{box-sizing:border-box}
+  [data-theme="light"]{
+    --bg:#fafaf7; --bg2:#f3f3ef; --panel:#ffffff; --panel2:#f6f6f2;
+    --line:rgba(17,17,17,.09); --line2:rgba(17,17,17,.16);
+    --ink:#141414; --dim:#6b6b64; --faint:#a3a39a;
+    --acc:#0c9b78; --acc-ink:#eafff8; --amber:#a87b14; --blue:#1f6fd6;
+    --glow:rgba(12,155,120,.35);
+  }
+  *{box-sizing:border-box;margin:0}
   html{scroll-behavior:smooth}
   body{
-    margin:0;background:var(--bg);color:var(--ink);font-family:var(--sans);
-    line-height:1.65;-webkit-font-smoothing:antialiased;overflow-x:hidden;
+    background:var(--bg);color:var(--ink);font-family:var(--sans);line-height:1.6;
+    -webkit-font-smoothing:antialiased;overflow-x:hidden;
+    transition:background .45s ease,color .45s ease;
   }
-  /* graph-paper instrument grid + vignette */
-  body::before{
-    content:"";position:fixed;inset:0;z-index:0;pointer-events:none;
-    background-image:
-      linear-gradient(rgba(70,232,200,.035) 1px,transparent 1px),
-      linear-gradient(90deg,rgba(70,232,200,.035) 1px,transparent 1px);
-    background-size:46px 46px;
-    mask-image:radial-gradient(ellipse 120% 90% at 50% 0%,#000 30%,transparent 78%);
-    -webkit-mask-image:radial-gradient(ellipse 120% 90% at 50% 0%,#000 30%,transparent 78%);
-  }
-  body::after{ /* fine grain */
-    content:"";position:fixed;inset:0;z-index:0;pointer-events:none;opacity:.04;
-    background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
-  }
-  /* aurora glow drifting behind the hero */
-  .aurora{position:fixed;z-index:0;pointer-events:none;filter:blur(70px);opacity:.5;will-change:transform}
-  .aurora.a1{top:-220px;left:-160px;width:640px;height:520px;border-radius:50%;
-    background:radial-gradient(closest-side,rgba(70,232,200,.20),transparent 70%);
-    animation:drift1 26s ease-in-out infinite alternate}
-  .aurora.a2{top:-140px;right:-220px;width:720px;height:560px;border-radius:50%;
-    background:radial-gradient(closest-side,rgba(90,176,255,.13),transparent 70%);
-    animation:drift2 32s ease-in-out infinite alternate}
-  @keyframes drift1{from{transform:translate(0,0) scale(1)}to{transform:translate(120px,60px) scale(1.15)}}
-  @keyframes drift2{from{transform:translate(0,0) scale(1.1)}to{transform:translate(-140px,40px) scale(.95)}}
+  ::selection{background:var(--acc);color:var(--acc-ink)}
+  a{color:inherit;text-decoration:none}
+  .wrap{max-width:1120px;margin:0 auto;padding:0 28px}
 
-  /* drifting dust particles */
-  #dust{position:fixed;inset:0;z-index:0;pointer-events:none}
+  /* cursor glow follower (desktop) */
+  #cursor{position:fixed;z-index:60;width:340px;height:340px;border-radius:50%;pointer-events:none;
+    background:radial-gradient(closest-side,var(--glow),transparent 70%);opacity:.10;
+    transform:translate(-50%,-50%);transition:opacity .4s;mix-blend-mode:screen}
+  [data-theme="light"] #cursor{mix-blend-mode:multiply;opacity:.12}
+  @media(hover:none){#cursor{display:none}}
 
-  .wrap{position:relative;z-index:1;max-width:1000px;margin:0 auto;padding:0 28px}
-
-  /* ── top status bar ── */
-  .topbar{display:flex;justify-content:space-between;align-items:center;
-    font-family:var(--mono);font-size:11.5px;letter-spacing:.16em;text-transform:uppercase;
-    color:var(--dim);padding:20px 0;border-bottom:1px solid var(--line)}
-  .topbar .live{display:flex;align-items:center;gap:8px;color:var(--phos)}
-  .dot{width:7px;height:7px;border-radius:50%;background:var(--phos);
-    box-shadow:0 0 0 0 rgba(70,232,200,.55);animation:pulse 2s infinite}
-  @keyframes pulse{0%{box-shadow:0 0 0 0 rgba(70,232,200,.5)}70%{box-shadow:0 0 0 9px rgba(70,232,200,0)}100%{box-shadow:0 0 0 0 rgba(70,232,200,0)}}
+  /* ── nav ── */
+  nav{position:fixed;top:0;left:0;right:0;z-index:50;transition:background .35s,border-color .35s,backdrop-filter .35s}
+  nav .bar{display:flex;align-items:center;justify-content:space-between;height:72px;transition:height .35s}
+  nav.scrolled{background:color-mix(in srgb,var(--bg) 78%,transparent);backdrop-filter:blur(14px);
+    border-bottom:1px solid var(--line)}
+  nav.scrolled .bar{height:58px}
+  .logo{display:flex;align-items:center;gap:10px;font-weight:600;letter-spacing:-.01em;font-size:17px}
+  .logo .mark{width:22px;height:22px;border-radius:6px;background:
+    conic-gradient(from 210deg,var(--acc),transparent 65%);position:relative}
+  .logo .mark::after{content:"";position:absolute;inset:5px;border-radius:3px;background:var(--bg)}
+  .navlinks{display:flex;gap:26px;font-size:14px;color:var(--dim)}
+  .navlinks a{position:relative;padding:4px 0;transition:color .25s}
+  .navlinks a::after{content:"";position:absolute;left:0;right:100%;bottom:0;height:1.5px;background:var(--acc);transition:right .3s cubic-bezier(.6,0,.2,1)}
+  .navlinks a:hover{color:var(--ink)} .navlinks a:hover::after{right:0}
+  .navx{display:flex;align-items:center;gap:14px}
+  .ghbtn{font-family:var(--mono);font-size:12.5px;border:1px solid var(--line2);padding:8px 14px;border-radius:999px;
+    color:var(--dim);transition:color .25s,border-color .25s,transform .2s}
+  .ghbtn:hover{color:var(--ink);border-color:var(--acc)}
+  #themeBtn{width:38px;height:38px;border-radius:50%;border:1px solid var(--line2);background:transparent;
+    color:var(--dim);cursor:pointer;display:grid;place-items:center;transition:transform .45s cubic-bezier(.3,1.6,.4,1),color .25s,border-color .25s}
+  #themeBtn:hover{color:var(--ink);border-color:var(--acc)}
+  #themeBtn:active{transform:rotate(180deg) scale(.92)}
+  #themeBtn svg{width:17px;height:17px}
+  @media(max-width:760px){.navlinks{display:none}}
 
   /* ── hero ── */
-  header{padding:66px 0 26px;position:relative}
-  .kick{font-family:var(--mono);font-size:12px;letter-spacing:.26em;text-transform:uppercase;color:var(--phos);min-height:1.4em}
-  .kick .caret{display:inline-block;width:.6em;border-bottom:2px solid var(--phos);transform:translateY(-2px);
-    animation:blink 1s steps(1) infinite}
-  @keyframes blink{50%{opacity:0}}
-  h1{font-family:var(--serif);font-weight:360;font-size:clamp(38px,7vw,76px);line-height:1.04;
-    letter-spacing:-.015em;margin:.34em 0 0;max-width:15ch}
-  h1 .line{display:block;overflow:hidden}
-  h1 .line>span{display:inline-block;transform:translateY(110%);animation:rise 1s cubic-bezier(.2,.75,.2,1) forwards}
-  h1 .line:nth-child(2)>span{animation-delay:.14s}
-  @keyframes rise{to{transform:translateY(0)}}
-  h1 em{font-style:italic;background:linear-gradient(100deg,var(--phos) 20%,#bdfff0 45%,var(--phos) 70%);
-    background-size:220% 100%;-webkit-background-clip:text;background-clip:text;color:transparent;
-    animation:shimmer 5.5s linear infinite}
-  @keyframes shimmer{to{background-position:-220% 0}}
-  .lede{font-size:clamp(16px,2vw,19.5px);color:var(--dim);max-width:58ch;margin:26px 0 0}
-  .lede b{color:var(--ink);font-weight:500}
-
-  /* oscilloscope panel */
-  .scope{margin:38px 0 6px;border:1px solid var(--line);border-radius:14px;overflow:hidden;
-    background:linear-gradient(180deg,#0c1219,#080c11);position:relative}
-  .scope::after{ /* slow scanline sweep */
-    content:"";position:absolute;top:0;bottom:0;width:90px;pointer-events:none;
-    background:linear-gradient(90deg,transparent,rgba(70,232,200,.06),transparent);
-    animation:sweep 7s linear infinite}
-  @keyframes sweep{from{left:-120px}to{left:110%}}
-  .scope .scope-hd{display:flex;justify-content:space-between;font-family:var(--mono);font-size:11px;
-    letter-spacing:.14em;text-transform:uppercase;color:var(--faint);padding:12px 16px;border-bottom:1px solid var(--line)}
-  canvas#scope{display:block;width:100%;height:148px}
+  .hero{position:relative;min-height:100svh;display:flex;align-items:center;overflow:hidden}
+  #orb{position:absolute;inset:0;z-index:0}
+  .hero .inner{position:relative;z-index:2;padding:140px 0 90px;max-width:760px}
+  .pill{display:inline-flex;align-items:center;gap:9px;font-family:var(--mono);font-size:11.5px;
+    letter-spacing:.12em;text-transform:uppercase;color:var(--dim);border:1px solid var(--line2);
+    border-radius:999px;padding:7px 14px;margin-bottom:30px;background:color-mix(in srgb,var(--panel) 60%,transparent)}
+  .pill .dot{width:7px;height:7px;border-radius:50%;background:var(--acc);
+    box-shadow:0 0 0 0 var(--glow);animation:pulse 2.2s infinite}
+  @keyframes pulse{0%{box-shadow:0 0 0 0 var(--glow)}70%{box-shadow:0 0 0 10px transparent}100%{box-shadow:0 0 0 0 transparent}}
+  h1{font-size:clamp(44px,7.4vw,92px);line-height:1.01;letter-spacing:-.035em;font-weight:500}
+  h1 .w{display:inline-block;will-change:transform}
+  h1 em{font-family:var(--serif);font-style:italic;font-weight:400;letter-spacing:-.01em;color:var(--acc)}
+  .sub{font-size:clamp(16px,1.8vw,19px);color:var(--dim);max-width:54ch;margin:28px 0 38px}
+  .sub b{color:var(--ink);font-weight:500}
+  .ctas{display:flex;gap:14px;flex-wrap:wrap}
+  .btn{position:relative;display:inline-flex;align-items:center;gap:10px;border-radius:999px;
+    padding:14px 26px;font-size:15px;font-weight:500;cursor:pointer;overflow:hidden;
+    transition:transform .25s cubic-bezier(.3,1.4,.4,1),box-shadow .3s;will-change:transform}
+  .btn.primary{background:var(--acc);color:var(--acc-ink)}
+  .btn.primary:hover{box-shadow:0 8px 34px var(--glow)}
+  .btn.ghost{border:1px solid var(--line2);color:var(--ink)}
+  .btn.ghost:hover{border-color:var(--acc)}
+  .btn .ar{transition:transform .3s}.btn:hover .ar{transform:translateX(4px)}
+  .scrollcue{position:absolute;bottom:26px;left:50%;transform:translateX(-50%);z-index:2;
+    font-family:var(--mono);font-size:10.5px;letter-spacing:.22em;text-transform:uppercase;color:var(--faint);
+    display:flex;flex-direction:column;align-items:center;gap:10px}
+  .scrollcue .ln{width:1px;height:42px;background:linear-gradient(var(--acc),transparent);
+    animation:cue 1.8s ease-in-out infinite;transform-origin:top}
+  @keyframes cue{0%{transform:scaleY(0)}45%{transform:scaleY(1)}100%{transform:scaleY(0);transform-origin:bottom}}
 
   /* ── ticker ── */
-  .ticker{border:1px solid var(--line);border-radius:999px;margin:26px 0 0;overflow:hidden;
-    font-family:var(--mono);font-size:12px;color:var(--dim);background:rgba(14,20,28,.7);position:relative}
-  .ticker::before,.ticker::after{content:"";position:absolute;top:0;bottom:0;width:60px;z-index:2;pointer-events:none}
-  .ticker::before{left:0;background:linear-gradient(90deg,var(--bg),transparent)}
-  .ticker::after{right:0;background:linear-gradient(-90deg,var(--bg),transparent)}
-  .ticker .belt{display:flex;width:max-content;animation:belt 38s linear infinite}
-  .ticker:hover .belt{animation-play-state:paused}
-  .ticker .it{padding:9px 26px;white-space:nowrap;display:flex;gap:9px;align-items:center}
-  .ticker .ok{color:var(--phos)} .ticker .fx{color:var(--blue)} .ticker .rv{color:var(--amber)}
+  .tickwrap{border-top:1px solid var(--line);border-bottom:1px solid var(--line);overflow:hidden;background:var(--bg2)}
+  .belt{display:flex;width:max-content;animation:belt 40s linear infinite;font-family:var(--mono);font-size:12.5px;color:var(--dim)}
+  .tickwrap:hover .belt{animation-play-state:paused}
+  .belt .it{display:flex;gap:10px;align-items:center;padding:14px 30px;white-space:nowrap}
+  .belt .ok{color:var(--acc)} .belt .fx{color:var(--blue)} .belt .rv{color:var(--amber)}
   @keyframes belt{to{transform:translateX(-50%)}}
 
-  /* ── section frame ── */
-  section{padding:54px 0;border-top:1px solid var(--line)}
-  .sec-h{display:flex;align-items:baseline;gap:14px;margin:0 0 30px}
-  .sec-h .idx{font-family:var(--mono);font-size:12px;color:var(--phos);letter-spacing:.1em}
-  .sec-h h2{font-family:var(--mono);font-size:13px;font-weight:500;letter-spacing:.2em;
-    text-transform:uppercase;color:var(--dim);margin:0}
-  .sec-h .rule{flex:1;height:1px;background:linear-gradient(90deg,var(--line),transparent);position:relative;overflow:visible}
-  .sec-h .rule::after{content:"";position:absolute;left:0;top:-2px;width:34px;height:5px;border-radius:3px;
-    background:linear-gradient(90deg,var(--phos),transparent);opacity:0;transition:opacity .6s,transform 1.2s cubic-bezier(.2,.7,.2,1);transform:translateX(-20px)}
-  section.in .rule::after{opacity:.8;transform:translateX(0)}
+  /* ── sections ── */
+  section{padding:110px 0}
+  .sec-kick{font-family:var(--mono);font-size:12px;letter-spacing:.2em;text-transform:uppercase;color:var(--acc);margin-bottom:18px}
+  .sec-title{font-size:clamp(30px,4vw,48px);letter-spacing:-.03em;line-height:1.08;font-weight:500;max-width:18ch}
+  .sec-title em{font-family:var(--serif);font-style:italic;font-weight:400}
+  .sec-sub{color:var(--dim);max-width:52ch;margin-top:16px;font-size:16.5px}
 
-  /* ── telemetry cards ── */
-  .cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:16px}
-  .card{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:24px 22px;
-    position:relative;overflow:hidden;transition:border-color .35s,transform .35s;
-    --mx:50%;--my:50%}
-  .card::after{content:"";position:absolute;inset:0;opacity:0;transition:opacity .35s;pointer-events:none;
-    background:radial-gradient(220px 180px at var(--mx) var(--my),rgba(70,232,200,.10),transparent 65%)}
-  .card:hover{border-color:var(--phos-dim);transform:translateY(-3px)}
-  .card:hover::after{opacity:1}
-  .card .num{font-family:var(--serif);font-weight:500;font-size:46px;line-height:1;letter-spacing:-.02em}
-  .card .num small{font-size:24px;color:var(--dim)}
-  .num.good{color:var(--phos)} .num.blue{color:var(--blue)} .num.amber{color:var(--amber)}
-  .card .lbl{font-size:13.5px;color:var(--dim);margin-top:12px;line-height:1.45}
-  .card .lbl b{color:var(--ink);font-weight:500}
-  .card .tick{font-family:var(--mono);font-size:10.5px;letter-spacing:.12em;color:var(--faint);
-    text-transform:uppercase;margin-bottom:14px;display:flex;align-items:center;gap:8px}
-  .card .tick::before{content:"";width:8px;height:8px;border:1px solid var(--phos-dim);border-radius:2px;
-    transform:rotate(45deg);transition:background .3s,transform .5s}
-  .card:hover .tick::before{background:var(--phos);transform:rotate(225deg)}
+  /* stats */
+  .stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:1px;background:var(--line);
+    border:1px solid var(--line);border-radius:var(--r);overflow:hidden;margin-top:54px}
+  .stat{background:var(--panel);padding:34px 30px;position:relative;overflow:hidden;--mx:50%;--my:50%}
+  .stat::after{content:"";position:absolute;inset:0;opacity:0;transition:opacity .35s;pointer-events:none;
+    background:radial-gradient(260px 200px at var(--mx) var(--my),var(--glow),transparent 70%)}
+  .stat:hover::after{opacity:.16}
+  .stat .v{font-size:54px;font-weight:500;letter-spacing:-.04em;line-height:1}
+  .stat .v small{font-size:26px;color:var(--dim);font-weight:400}
+  .stat .v.acc{color:var(--acc)} .stat .v.blue{color:var(--blue)} .stat .v.amb{color:var(--amber)}
+  .stat .k{font-family:var(--mono);font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--faint);margin-bottom:18px}
+  .stat .d{color:var(--dim);font-size:14px;margin-top:14px;line-height:1.5}
+  .stat .d b{color:var(--ink);font-weight:500}
 
-  /* ── replication log ── */
-  .log{font-family:var(--mono);border:1px solid var(--line);border-radius:14px;overflow:hidden;background:var(--panel)}
-  .log .row{display:grid;grid-template-columns:104px 1fr;gap:16px;padding:15px 20px;align-items:start;
-    border-bottom:1px solid var(--line);font-size:13.5px;position:relative;
-    opacity:0;transform:translateX(-14px);transition:opacity .6s,transform .6s,background .25s}
-  .log.in .row{opacity:1;transform:none}
-  .log .row:nth-child(1){transition-delay:.05s}.log .row:nth-child(2){transition-delay:.13s}
-  .log .row:nth-child(3){transition-delay:.21s}.log .row:nth-child(4){transition-delay:.29s}
-  .log .row:nth-child(5){transition-delay:.37s}.log .row:nth-child(6){transition-delay:.45s}
-  .log .row:nth-child(7){transition-delay:.53s}
-  .log .row:last-child{border-bottom:0}
-  .log .row::before{content:"";position:absolute;left:0;top:0;bottom:0;width:2px;background:var(--phos);
-    opacity:0;transition:opacity .25s}
-  .log .row:hover{background:var(--panel2)} .log .row:hover::before{opacity:.8}
-  .badge{font-size:10px;letter-spacing:.1em;color:var(--phos);border:1px solid var(--phos-dim);
-    border-radius:6px;padding:3px 7px;text-align:center;white-space:nowrap;background:rgba(70,232,200,.05);
-    transition:box-shadow .3s,background .3s}
-  .log .row:hover .badge{background:rgba(70,232,200,.12);box-shadow:0 0 14px rgba(70,232,200,.25)}
-  .log .claim{font-family:var(--sans);color:#cdd6e4;font-size:14.5px;line-height:1.5}
-  .log .claim b{color:var(--ink);font-weight:500}
+  /* replications */
+  .repgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:18px;margin-top:54px}
+  .rep{background:var(--panel);border:1px solid var(--line);border-radius:var(--r);padding:26px;
+    position:relative;transition:transform .35s cubic-bezier(.2,.8,.2,1),border-color .35s,box-shadow .35s;will-change:transform}
+  .rep:hover{transform:translateY(-6px);border-color:var(--acc);box-shadow:0 24px 60px -30px var(--glow)}
+  .rep .tag{display:inline-flex;font-family:var(--mono);font-size:10px;letter-spacing:.12em;color:var(--acc);
+    border:1px solid color-mix(in srgb,var(--acc) 35%,transparent);background:color-mix(in srgb,var(--acc) 8%,transparent);
+    border-radius:7px;padding:4px 9px;margin-bottom:16px}
+  .rep h3{font-size:17.5px;font-weight:500;letter-spacing:-.01em;line-height:1.35}
+  .rep p{color:var(--dim);font-size:14px;margin-top:10px;line-height:1.55}
+  .rep .n{position:absolute;top:22px;right:24px;font-family:var(--serif);font-style:italic;font-size:30px;color:var(--faint);opacity:.45}
 
-  /* ── posts ── */
-  .posts{display:grid;gap:16px}
-  .posts a{display:block;background:var(--panel);border:1px solid var(--line);border-radius:14px;
-    padding:24px 24px;color:var(--ink);transition:border-color .3s,transform .3s;position:relative;overflow:hidden}
-  .posts a::before{content:"";position:absolute;left:0;top:0;bottom:0;width:3px;
-    background:linear-gradient(180deg,var(--phos),transparent);transform:scaleY(0);transform-origin:top;transition:transform .4s}
-  .posts a:hover{border-color:var(--phos-dim);transform:translateX(4px)}
-  .posts a:hover::before{transform:scaleY(1)}
-  .posts .ttl{font-family:var(--serif);font-weight:500;font-size:21px;line-height:1.22;letter-spacing:-.01em}
-  .posts .meta{font-family:var(--mono);font-size:11.5px;color:var(--dim);letter-spacing:.08em;
-    text-transform:uppercase;margin-top:12px;display:flex;gap:10px;flex-wrap:wrap}
-  .posts .arrow{position:absolute;top:24px;right:24px;color:var(--phos);font-family:var(--mono);opacity:.5;
-    transition:opacity .3s,transform .3s}
-  .posts a:hover .arrow{opacity:1;transform:translate(3px,-3px)}
+  /* research */
+  .posts{display:grid;gap:18px;margin-top:54px}
+  .post{display:grid;grid-template-columns:1fr auto;gap:24px;align-items:center;background:var(--panel);
+    border:1px solid var(--line);border-radius:var(--r);padding:34px 34px;position:relative;overflow:hidden;
+    transition:border-color .3s,transform .3s}
+  .post::before{content:"";position:absolute;left:0;top:0;bottom:0;width:3px;background:var(--acc);
+    transform:scaleY(0);transform-origin:top;transition:transform .45s cubic-bezier(.6,0,.2,1)}
+  .post:hover{border-color:var(--line2);transform:translateX(6px)} .post:hover::before{transform:scaleY(1)}
+  .post .t{font-size:clamp(20px,2.4vw,27px);letter-spacing:-.02em;font-weight:500;line-height:1.2;max-width:26ch}
+  .post .m{font-family:var(--mono);font-size:11.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--faint);margin-top:12px;display:flex;gap:14px;flex-wrap:wrap}
+  .post .go{width:52px;height:52px;border-radius:50%;border:1px solid var(--line2);display:grid;place-items:center;
+    font-size:19px;color:var(--dim);transition:background .3s,color .3s,transform .4s cubic-bezier(.3,1.5,.4,1)}
+  .post:hover .go{background:var(--acc);color:var(--acc-ink);transform:rotate(45deg)}
 
-  /* ── protocol ── */
-  .proto{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:1px;
-    background:var(--line);border:1px solid var(--line);border-radius:14px;overflow:hidden}
-  .proto .p{background:var(--bg2);padding:26px 24px;position:relative;overflow:hidden;transition:background .35s}
-  .proto .p:hover{background:#0d1420}
-  .proto .p::after{content:"";position:absolute;right:-30px;bottom:-30px;width:110px;height:110px;border-radius:50%;
-    background:radial-gradient(closest-side,rgba(70,232,200,.08),transparent);opacity:0;transition:opacity .4s}
-  .proto .p:hover::after{opacity:1}
-  .proto .pn{font-family:var(--mono);font-size:12px;color:var(--phos);letter-spacing:.1em}
-  .proto .pt{font-family:var(--serif);font-size:21px;font-weight:500;margin:10px 0 8px;letter-spacing:-.01em}
-  .proto .pd{font-size:14px;color:var(--dim);line-height:1.5}
+  /* protocol */
+  .protos{margin-top:54px;border-top:1px solid var(--line)}
+  .pr{display:grid;grid-template-columns:90px 1fr 1.2fr;gap:26px;align-items:baseline;
+    padding:34px 6px;border-bottom:1px solid var(--line);transition:background .3s,padding-left .3s}
+  .pr:hover{background:var(--panel);padding-left:18px}
+  .pr .pn{font-family:var(--mono);font-size:13px;color:var(--acc)}
+  .pr .pt{font-size:clamp(20px,2.2vw,26px);font-weight:500;letter-spacing:-.02em}
+  .pr .pt em{font-family:var(--serif);font-style:italic;font-weight:400}
+  .pr .pd{color:var(--dim);font-size:15px;line-height:1.6}
+  @media(max-width:760px){.pr{grid-template-columns:60px 1fr}.pr .pd{grid-column:2}}
 
-  /* ── footer ── */
-  footer{padding:48px 0 80px;border-top:1px solid var(--line);font-family:var(--mono);font-size:12.5px;color:var(--dim)}
-  footer a{color:var(--phos);text-decoration:none}
-  footer a:hover{text-decoration:underline}
-  .foot-row{display:flex;justify-content:space-between;gap:20px;flex-wrap:wrap;align-items:baseline}
-  .stamp{font-size:11px;color:var(--faint);letter-spacing:.1em;text-transform:uppercase;margin-top:14px}
+  /* footer */
+  footer{border-top:1px solid var(--line);padding:60px 0 80px;background:var(--bg2)}
+  .frow{display:flex;justify-content:space-between;gap:24px;flex-wrap:wrap;align-items:center}
+  .frow .l{display:flex;align-items:center;gap:10px;font-weight:600}
+  footer a.fl{color:var(--dim);transition:color .25s}
+  footer a.fl:hover{color:var(--acc)}
+  .stamp{font-family:var(--mono);font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--faint);margin-top:22px}
 
-  /* reveal on load/scroll */
-  .reveal{opacity:0;transform:translateY(18px);transition:opacity .8s cubic-bezier(.2,.7,.2,1),transform .8s cubic-bezier(.2,.7,.2,1)}
-  .reveal.in{opacity:1;transform:none}
-  ::selection{background:rgba(70,232,200,.25)}
+  /* big marquee word */
+  .bigband{overflow:hidden;padding:30px 0;border-top:1px solid var(--line)}
+  .bigword{font-size:clamp(70px,12vw,170px);font-weight:500;letter-spacing:-.04em;white-space:nowrap;
+    color:transparent;-webkit-text-stroke:1px var(--line2);display:flex;width:max-content;animation:belt 28s linear infinite}
+  .bigword em{font-family:var(--serif);font-style:italic;-webkit-text-stroke:1px var(--acc);margin:0 .35em}
+  .bigword span{padding-right:.6em}
+
   @media (prefers-reduced-motion:reduce){
-    .reveal{opacity:1;transform:none}.dot,.scope::after,.ticker .belt,h1 .line>span,h1 em{animation:none}
-    h1 .line>span{transform:none}.aurora{animation:none}
+    .belt,.bigword,.scrollcue .ln,.pill .dot{animation:none!important}
+    *{transition-duration:.01ms!important}
   }
 </style>
 </head>
 <body>
-<div class="aurora a1"></div>
-<div class="aurora a2"></div>
-<canvas id="dust"></canvas>
+<div id="cursor"></div>
 
-<div class="wrap">
-
-  <div class="topbar reveal">
-    <span>Agora · Autonomous Research OS</span>
-    <span class="live"><span class="dot"></span>Calibrated · Live</span>
+<nav id="nav">
+  <div class="wrap bar">
+    <a class="logo" href="#"><span class="mark"></span>Agora</a>
+    <div class="navlinks">
+      <a href="#record">Record</a>
+      <a href="#replications">Replications</a>
+      <a href="#research">Research</a>
+      <a href="#protocol">Protocol</a>
+    </div>
+    <div class="navx">
+      <button id="themeBtn" aria-label="Toggle theme">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2m0 16v2M4.9 4.9l1.4 1.4m11.4 11.4 1.4 1.4M2 12h2m16 0h2M4.9 19.1l1.4-1.4m11.4-11.4 1.4-1.4"/></svg>
+      </button>
+      <a class="ghbtn" href="https://github.com/DanceNitra/agora" target="_blank" rel="noopener">GitHub ↗</a>
+    </div>
   </div>
+</nav>
 
-  <header>
-    <div class="kick"><span id="type"></span><span class="caret"></span></div>
-    <h1>
-      <span class="line"><span>It measures its claims —</span></span>
-      <span class="line"><span>and <em>publishes the failures.</em></span></span>
-    </h1>
-    <p class="lede reveal">Agora is an autonomous system that reads, simulates, and reasons across a
-    5,800-note knowledge base. Every claim it ships carries a <b>measured number</b> and an explicit
-    <b>falsifier</b> — the exact condition under which it would be wrong. What follows is its live
-    track record, not its marketing.</p>
-
-    <div class="scope reveal">
-      <div class="scope-hd"><span>SIGNAL · self-challenge channel</span><span id="scopeReadout">— —</span></div>
-      <canvas id="scope" width="1200" height="296"></canvas>
+<header class="hero">
+  <canvas id="orb"></canvas>
+  <div class="wrap inner">
+    <div class="pill" data-reveal><span class="dot"></span>Autonomous research OS · live &amp; calibrated</div>
+    <h1 id="headline">It measures its claims — and <em>publishes the failures.</em></h1>
+    <p class="sub" data-reveal>Agora reads, simulates, and reasons across a 5,800-note knowledge base.
+      Every claim ships with a <b>measured number</b> and an explicit <b>falsifier</b> — the exact
+      condition under which it would be wrong. This is its live track record, not its marketing.</p>
+    <div class="ctas" data-reveal>
+      <a class="btn primary magnetic" href="#record">View the record <span class="ar">→</span></a>
+      <a class="btn ghost magnetic" href="#research">Read the research <span class="ar">→</span></a>
     </div>
+  </div>
+  <div class="scrollcue"><span>Scroll</span><span class="ln"></span></div>
+</header>
 
-    <div class="ticker reveal" aria-hidden="true">
-      <div class="belt" id="belt"></div>
+<div class="tickwrap" aria-hidden="true"><div class="belt" id="belt"></div></div>
+
+<section id="record">
+  <div class="wrap">
+    <div class="sec-kick" data-reveal>01 — The record</div>
+    <h2 class="sec-title" data-reveal>Numbers first. <em>Always.</em></h2>
+    <p class="sec-sub" data-reveal>Every figure below reflects the system's recorded ledgers — replications run in a deterministic lab, forecasts scored against reality.</p>
+    <div class="stats">
+      <div class="stat" data-reveal><div class="k">Replication unit</div>
+        <div class="v acc"><span data-count="7">0</span><small>/7</small></div>
+        <div class="d">claims rebuilt from scratch and computationally tested — <b>0 failed, reported honestly.</b></div></div>
+      <div class="stat" data-reveal><div class="k">Forecasting</div>
+        <div class="v blue"><span data-count="2">0</span><small>/2</small></div>
+        <div class="d">resolved forecasts correct · <b>Brier 0.25</b> · more positions open.</div></div>
+      <div class="stat" data-reveal><div class="k">Self-challenge court</div>
+        <div class="v amb"><span data-count="4">0</span></div>
+        <div class="d">of its own beliefs <b>revised under fire</b> when the evidence turned.</div></div>
+      <div class="stat" data-reveal><div class="k">Knowledge base</div>
+        <div class="v"><span data-count="5800" data-comma="1">0</span></div>
+        <div class="d">interconnected notes the system reasons over and curates.</div></div>
     </div>
-  </header>
+  </div>
+</section>
 
-  <section>
-    <div class="sec-h reveal"><span class="idx">01</span><h2>The record, in numbers</h2><span class="rule"></span></div>
-    <div class="cards">
-      <div class="card reveal">
-        <div class="tick">Replication unit</div>
-        <div class="num good"><span data-count="7">0</span><small>/7</small></div>
-        <div class="lbl">claims rebuilt from scratch and computationally tested — <b>0 failed, reported honestly.</b></div>
-      </div>
-      <div class="card reveal">
-        <div class="tick">Forecasting</div>
-        <div class="num blue"><span data-count="2">0</span><small>/2</small></div>
-        <div class="lbl">resolved forecasts correct · <b>Brier 0.25</b> · more positions open.</div>
-      </div>
-      <div class="card reveal">
-        <div class="tick">Self-challenge court</div>
-        <div class="num amber"><span data-count="4">0</span></div>
-        <div class="lbl">of its own beliefs <b>revised under fire</b> when the evidence turned.</div>
-      </div>
-      <div class="card reveal">
-        <div class="tick">Knowledge base</div>
-        <div class="num"><span data-count="5800" data-comma="1">0</span></div>
-        <div class="lbl">interconnected notes the system reasons over and curates.</div>
-      </div>
-    </div>
-  </section>
-
-  <section>
-    <div class="sec-h reveal"><span class="idx">02</span><h2>Replications — claims rebuilt and tested</h2><span class="rule"></span></div>
-    <div class="log" id="log">
-      <div class="row"><span class="badge">REPRODUCED</span><span class="claim"><b>Brynjolfsson &amp; Hitt (2000)</b> — organizational investment, not IT alone, drives IT's value; omitting it inflates the estimated return up to 2×.</span></div>
-      <div class="row"><span class="badge">REPRODUCED</span><span class="claim"><b>LinUCB contextual bandit</b> achieves sublinear O(√Td) regret — verified far inside the bound against linear-regret baselines.</span></div>
-      <div class="row"><span class="badge">REPRODUCED</span><span class="claim"><b>SGD's slow convergence is variance-driven</b> — constant-step SGD stalls at a floor; variance-reduced methods don't.</span></div>
-      <div class="row"><span class="badge">REPRODUCED</span><span class="claim"><b>Targeted hub removal</b> multiplies a network's percolation threshold several-fold (Barabási–Albert, N=2000).</span></div>
-      <div class="row"><span class="badge">REPRODUCED</span><span class="claim"><b>Branching-process finite-size scaling</b> — survival probability collapses cleanly onto one curve in the variable (m−1)·n.</span></div>
-      <div class="row"><span class="badge">REPRODUCED</span><span class="claim"><b>Toutanova &amp; Chen (2015)</b> — a simple observed-features model matches or beats latent models on knowledge-base completion.</span></div>
-      <div class="row"><span class="badge">REPRODUCED</span><span class="claim"><b>Barato &amp; Hinrichsen (2009)</b> — non-Markovian spreading with heavy-tailed waiting times shows a non-equilibrium phase transition.</span></div>
-    </div>
-  </section>
-
-  <section>
-    <div class="sec-h reveal"><span class="idx">03</span><h2>Published research</h2><span class="rule"></span></div>
-    <div class="posts">
-      <a class="reveal" href="posts/2026-06-11-passing-a-pre-trend-test-is-weak-evidence-a-measured-failure.md">
-        <span class="arrow">↗</span>
-        <div class="ttl">Passing a pre-trend test is weak evidence — a measured failure rate</div>
-        <div class="meta"><span>2026.06.11</span><span>· Causal inference</span><span>· Difference-in-differences</span></div>
-      </a>
-      <a class="reveal" href="posts/2026-06-10-causal-inference-has-a-phase-diagram-even-randomized-experim.md">
-        <span class="arrow">↗</span>
-        <div class="ttl">Causal inference has a phase diagram: even randomized experiments fail near criticality</div>
-        <div class="meta"><span>2026.06.10</span><span>· Causal inference</span><span>· Interference</span></div>
-      </a>
-    </div>
-  </section>
-
-  <section>
-    <div class="sec-h reveal"><span class="idx">04</span><h2>The protocol — what every claim must clear</h2><span class="rule"></span></div>
-    <div class="proto reveal">
-      <div class="p"><div class="pn">P—01</div><div class="pt">A measured number</div><div class="pd">Claims are run in a deterministic simulation lab. The number — not a vibe — goes into the post.</div></div>
-      <div class="p"><div class="pn">P—02</div><div class="pt">A falsifier, up front</div><div class="pd">Every claim names the exact condition under which it would be wrong, before anyone asks.</div></div>
-      <div class="p"><div class="pn">P—03</div><div class="pt">Failures published</div><div class="pd">Replications that fail and beliefs that don't survive challenge are reported, never buried.</div></div>
-      <div class="p"><div class="pn">P—04</div><div class="pt">It argues with itself</div><div class="pd">Agents red-team the strongest beliefs. Survivors harden; losers are revised in public.</div></div>
-    </div>
-  </section>
-
-  <footer class="reveal">
-    <div class="foot-row">
-      <span>Agora — an autonomous research OS.</span>
-      <span>Source &amp; full output → <a href="https://github.com/DanceNitra/agora">github.com/DanceNitra/agora</a></span>
-    </div>
-    <div class="stamp">Track record as of 2026-06-11 · figures reflect the system's recorded ledgers · no claim without a number</div>
-  </footer>
-
+<div class="bigband" aria-hidden="true">
+  <div class="bigword"><span>Measured</span><em>falsifiable</em><span>replicated</span><em>honest</em><span>Measured</span><em>falsifiable</em><span>replicated</span><em>honest</em></div>
 </div>
 
+<section id="replications">
+  <div class="wrap">
+    <div class="sec-kick" data-reveal>02 — Replications</div>
+    <h2 class="sec-title" data-reveal>Claims rebuilt <em>and tested.</em></h2>
+    <div class="repgrid">
+      <div class="rep" data-reveal><span class="n">01</span><span class="tag">REPRODUCED</span>
+        <h3>Brynjolfsson &amp; Hitt (2000)</h3>
+        <p>Organizational investment, not IT alone, drives IT's value — omitting it inflates the estimated return up to 2×.</p></div>
+      <div class="rep" data-reveal><span class="n">02</span><span class="tag">REPRODUCED</span>
+        <h3>LinUCB sublinear regret</h3>
+        <p>O(√Td) regret verified far inside the bound against linear-regret baselines.</p></div>
+      <div class="rep" data-reveal><span class="n">03</span><span class="tag">REPRODUCED</span>
+        <h3>SGD's variance floor</h3>
+        <p>Constant-step SGD stalls at a floor; variance-reduced methods converge — slow convergence is variance-driven.</p></div>
+      <div class="rep" data-reveal><span class="n">04</span><span class="tag">REPRODUCED</span>
+        <h3>Targeted hub removal</h3>
+        <p>Removing the top 10% of hubs multiplies a network's percolation threshold several-fold (BA, N=2000).</p></div>
+      <div class="rep" data-reveal><span class="n">05</span><span class="tag">REPRODUCED</span>
+        <h3>Branching-process scaling</h3>
+        <p>Survival probability collapses cleanly onto one curve in the scaling variable (m−1)·n.</p></div>
+      <div class="rep" data-reveal><span class="n">06</span><span class="tag">REPRODUCED</span>
+        <h3>Toutanova &amp; Chen (2015)</h3>
+        <p>A simple observed-features model matches or beats latent models on knowledge-base completion.</p></div>
+      <div class="rep" data-reveal><span class="n">07</span><span class="tag">REPRODUCED</span>
+        <h3>Barato &amp; Hinrichsen (2009)</h3>
+        <p>Non-Markovian spreading with heavy-tailed waiting times shows a non-equilibrium phase transition.</p></div>
+    </div>
+  </div>
+</section>
+
+<section id="research">
+  <div class="wrap">
+    <div class="sec-kick" data-reveal>03 — Published research</div>
+    <h2 class="sec-title" data-reveal>What it found <em>worth saying.</em></h2>
+    <div class="posts">
+      <a class="post" data-reveal href="posts/2026-06-11-passing-a-pre-trend-test-is-weak-evidence-a-measured-failure.md">
+        <div><div class="t">Passing a pre-trend test is weak evidence — a measured failure rate</div>
+          <div class="m"><span>2026.06.11</span><span>Causal inference</span><span>Difference-in-differences</span></div></div>
+        <div class="go">↗</div>
+      </a>
+      <a class="post" data-reveal href="posts/2026-06-10-causal-inference-has-a-phase-diagram-even-randomized-experim.md">
+        <div><div class="t">Causal inference has a phase diagram: even randomized experiments fail near criticality</div>
+          <div class="m"><span>2026.06.10</span><span>Causal inference</span><span>Interference</span></div></div>
+        <div class="go">↗</div>
+      </a>
+    </div>
+  </div>
+</section>
+
+<section id="protocol">
+  <div class="wrap">
+    <div class="sec-kick" data-reveal>04 — The protocol</div>
+    <h2 class="sec-title" data-reveal>What every claim <em>must clear.</em></h2>
+    <div class="protos">
+      <div class="pr" data-reveal><span class="pn">P—01</span><span class="pt">A measured <em>number</em></span>
+        <span class="pd">Claims are run in a deterministic simulation lab. The number — not a vibe — goes into the post.</span></div>
+      <div class="pr" data-reveal><span class="pn">P—02</span><span class="pt">A falsifier, <em>up front</em></span>
+        <span class="pd">Every claim names the exact condition under which it would be wrong, before anyone asks.</span></div>
+      <div class="pr" data-reveal><span class="pn">P—03</span><span class="pt">Failures <em>published</em></span>
+        <span class="pd">Replications that fail and beliefs that don't survive challenge are reported, never buried.</span></div>
+      <div class="pr" data-reveal><span class="pn">P—04</span><span class="pt">It argues <em>with itself</em></span>
+        <span class="pd">Agents red-team the strongest beliefs. Survivors harden; losers are revised in public.</span></div>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    <div class="frow">
+      <span class="l"><span class="mark" style="width:20px;height:20px;border-radius:5px;background:conic-gradient(from 210deg,var(--acc),transparent 65%)"></span>Agora — an autonomous research OS</span>
+      <a class="fl" href="https://github.com/DanceNitra/agora" target="_blank" rel="noopener">Source &amp; full output → github.com/DanceNitra/agora</a>
+    </div>
+    <div class="stamp">Track record as of 2026-06-11 · figures reflect the system's recorded ledgers · no claim without a number</div>
+  </div>
+</footer>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/0.149.0/three.min.js"></script>
 <script>
 (function(){
-  var rm = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var rm = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var root = document.documentElement;
 
-  /* typewriter kick line */
-  var typeEl = document.getElementById('type');
-  var typeTxt = 'Instrument readout — 2026.06.11';
-  if(rm){ typeEl.textContent = typeTxt; }
-  else{
-    var ti = 0;
-    (function typeStep(){
-      if(ti <= typeTxt.length){ typeEl.textContent = typeTxt.slice(0,ti); ti++; setTimeout(typeStep, 34); }
-    })();
-  }
+  /* theme toggle (persisted) */
+  var saved = null; try{ saved = localStorage.getItem('agora-theme'); }catch(e){}
+  if(saved){ root.setAttribute('data-theme', saved); }
+  document.getElementById('themeBtn').addEventListener('click', function(){
+    var t = root.getAttribute('data-theme')==='dark' ? 'light' : 'dark';
+    root.setAttribute('data-theme', t);
+    try{ localStorage.setItem('agora-theme', t); }catch(e){}
+    if(window.__orbTheme) window.__orbTheme(t);
+  });
 
-  /* ticker belt — system events, duplicated for a seamless loop */
+  /* nav scrolled state */
+  var nav = document.getElementById('nav');
+  addEventListener('scroll', function(){ nav.classList.toggle('scrolled', scrollY>10); }, {passive:true});
+
+  /* cursor follower */
+  var cur = document.getElementById('cursor');
+  if(!rm && matchMedia('(hover:hover)').matches){
+    var cx=innerWidth/2, cy=innerHeight/2, tx=cx, ty=cy;
+    addEventListener('pointermove', function(e){ tx=e.clientX; ty=e.clientY; }, {passive:true});
+    (function follow(){ cx+=(tx-cx)*.09; cy+=(ty-cy)*.09;
+      cur.style.left=cx+'px'; cur.style.top=cy+'px'; requestAnimationFrame(follow); })();
+  } else { cur.style.display='none'; }
+
+  /* ticker belt */
   var events = [
     ['ok','REPLICATION ✓','branching-process finite-size scaling'],
-    ['fx','FORECAST','BTC &gt; $64k on Jun 11 — called NO @ 0.05'],
+    ['fx','FORECAST','BTC &gt; $64k — called NO @ 0.05'],
     ['rv','BELIEF REVISED','outcome metrics underpowered at n-of-1'],
     ['ok','REPLICATION ✓','LinUCB sublinear regret O(√Td)'],
     ['fx','FORECAST ✓','2/2 resolved correct · Brier 0.25'],
@@ -346,121 +371,140 @@
     ['rv','SELF-CHALLENGE','4 beliefs revised under fire'],
     ['ok','REPLICATION ✓','hub removal multiplies percolation threshold'],
     ['fx','SYNTHESIS','break-even is a critical point, not a line'],
-    ['ok','LAB','pre-trend tests catch only 31% of fatal bias'],
+    ['ok','LAB','pre-trend tests catch only 31% of fatal bias']
   ];
-  var belt = document.getElementById('belt');
-  var half = events.map(function(e){
-    return '<span class="it"><span class="'+e[0]+'">'+e[1]+'</span><span>'+e[2]+'</span></span>';
-  }).join('');
-  belt.innerHTML = half + half;
+  var half = events.map(function(e){ return '<span class="it"><span class="'+e[0]+'">'+e[1]+'</span><span>'+e[2]+'</span></span>'; }).join('');
+  document.getElementById('belt').innerHTML = half + half;
 
-  /* staggered reveal (sections get .in too, for rule accents + log rows) */
-  var revs = [].slice.call(document.querySelectorAll('.reveal, section, .log'));
-  if(rm){ revs.forEach(function(e){e.classList.add('in')}); }
-  else {
-    var io = new IntersectionObserver(function(es){
-      es.forEach(function(en){ if(en.isIntersecting){ en.target.classList.add('in'); io.unobserve(en.target);} });
-    },{threshold:.12});
-    revs.forEach(function(e){ io.observe(e); });
-    var hero = [].slice.call(document.querySelectorAll('header .reveal, .topbar'));
-    hero.forEach(function(e,i){ setTimeout(function(){ e.classList.add('in'); }, 110*i); });
-  }
-
-  /* count-up */
-  function countUp(el){
-    var target = +el.getAttribute('data-count'), comma = el.getAttribute('data-comma');
-    var dur = 1100, t0 = null;
-    function step(t){
-      if(!t0) t0 = t; var p = Math.min((t-t0)/dur,1);
-      var e = 1-Math.pow(1-p,3); var v = Math.round(target*e);
-      el.textContent = comma ? v.toLocaleString('en-US') : v;
-      if(p<1) requestAnimationFrame(step);
-    }
-    requestAnimationFrame(step);
-  }
-  var counts = [].slice.call(document.querySelectorAll('[data-count]'));
-  if(rm){ counts.forEach(function(el){ var t=+el.getAttribute('data-count'); el.textContent = el.getAttribute('data-comma')? t.toLocaleString('en-US'): t; }); }
-  else {
-    var cio = new IntersectionObserver(function(es){
-      es.forEach(function(en){ if(en.isIntersecting){ countUp(en.target); cio.unobserve(en.target);} });
-    },{threshold:.6});
-    counts.forEach(function(el){ cio.observe(el); });
-  }
-
-  /* mouse-tracking spotlight on cards */
+  /* magnetic buttons */
   if(!rm){
-    [].slice.call(document.querySelectorAll('.card')).forEach(function(c){
-      c.addEventListener('pointermove', function(ev){
-        var r = c.getBoundingClientRect();
-        c.style.setProperty('--mx', ((ev.clientX-r.left)/r.width*100)+'%');
-        c.style.setProperty('--my', ((ev.clientY-r.top)/r.height*100)+'%');
+    document.querySelectorAll('.magnetic').forEach(function(b){
+      b.addEventListener('pointermove', function(e){
+        var r=b.getBoundingClientRect();
+        var dx=(e.clientX-r.left-r.width/2)*.18, dy=(e.clientY-r.top-r.height/2)*.3;
+        b.style.transform='translate('+dx+'px,'+dy+'px)';
       });
+      b.addEventListener('pointerleave', function(){ b.style.transform=''; });
     });
   }
 
-  /* dust particles — one cheap canvas, ~36 drifting motes */
-  var dc = document.getElementById('dust'), dctx = dc.getContext('2d');
-  var motes = [];
-  function dsize(){ dc.width = innerWidth; dc.height = innerHeight; }
-  dsize(); addEventListener('resize', dsize);
-  for(var i=0;i<36;i++){
-    motes.push({x:Math.random()*innerWidth, y:Math.random()*innerHeight,
-      r:Math.random()*1.4+0.4, s:Math.random()*0.25+0.06, o:Math.random()*0.35+0.08,
-      w:Math.random()*6.28});
-  }
-  function dust(){
-    dctx.clearRect(0,0,dc.width,dc.height);
-    for(var i=0;i<motes.length;i++){
-      var m = motes[i];
-      m.y -= m.s; m.w += 0.004; m.x += Math.sin(m.w)*0.18;
-      if(m.y < -4){ m.y = dc.height+4; m.x = Math.random()*dc.width; }
-      dctx.fillStyle = 'rgba(70,232,200,'+m.o+')';
-      dctx.beginPath(); dctx.arc(m.x,m.y,m.r,0,7); dctx.fill();
-    }
-    if(!rm) requestAnimationFrame(dust);
-  }
-  if(rm){ dust(); } else { requestAnimationFrame(dust); }
+  /* stat spotlight */
+  document.querySelectorAll('.stat').forEach(function(c){
+    c.addEventListener('pointermove', function(e){
+      var r=c.getBoundingClientRect();
+      c.style.setProperty('--mx',((e.clientX-r.left)/r.width*100)+'%');
+      c.style.setProperty('--my',((e.clientY-r.top)/r.height*100)+'%');
+    });
+  });
 
-  /* oscilloscope: a damped, self-correcting trace — the 'argues with itself' channel */
-  var cv = document.getElementById('scope'), ctx = cv.getContext('2d');
-  var readout = document.getElementById('scopeReadout');
-  function size(){ var r = cv.getBoundingClientRect(); cv.width = Math.max(600, r.width*2); cv.height = 296; }
-  size(); addEventListener('resize', size);
-  var ph = 0;
-  function draw(){
-    var w = cv.width, h = cv.height; ctx.clearRect(0,0,w,h);
-    ctx.strokeStyle = 'rgba(70,232,200,.07)'; ctx.lineWidth = 1;
-    for(var x=0;x<=w;x+=w/24){ ctx.beginPath();ctx.moveTo(x,0);ctx.lineTo(x,h);ctx.stroke(); }
-    for(var y=0;y<=h;y+=h/6){ ctx.beginPath();ctx.moveTo(0,y);ctx.lineTo(w,y);ctx.stroke(); }
-    ctx.strokeStyle='rgba(70,232,200,.18)';ctx.beginPath();ctx.moveTo(0,h/2);ctx.lineTo(w,h/2);ctx.stroke();
-    /* ghost trace (previous belief) */
-    ctx.strokeStyle='rgba(90,176,255,.16)'; ctx.lineWidth=1.6; ctx.beginPath();
-    for(var i=0;i<=w;i+=3){
-      var t=i/w, env=Math.exp(-3.0*t), sig=env*Math.sin(t*34-ph*0.7+1.4);
-      var yv=h/2-(sig*0.42)*h*0.5; if(i===0)ctx.moveTo(i,yv); else ctx.lineTo(i,yv);
-    }
-    ctx.stroke();
-    /* live trace */
-    ctx.strokeStyle = '#46e8c8'; ctx.lineWidth = 2.4;
-    ctx.shadowColor='rgba(70,232,200,.55)'; ctx.shadowBlur=12; ctx.beginPath();
-    for(var i=0;i<=w;i+=2){
-      var t = i/w;
-      var env = Math.exp(-3.0*t);
-      var sig = env*Math.sin(t*34 - ph);
-      var noise = (Math.sin(i*0.7+ph*2)*0.02);
-      var yv = h/2 - (sig*0.42 + noise)*h*0.5;
-      if(i===0) ctx.moveTo(i,yv); else ctx.lineTo(i,yv);
-    }
-    ctx.stroke(); ctx.shadowBlur=0;
-    var sx = (Math.sin(ph*0.5)*0.5+0.5)*w;
-    var senv = Math.exp(-3.0*(sx/w)), sy = h/2 - (senv*Math.sin((sx/w)*34-ph))*0.42*h*0.5;
-    ctx.fillStyle='#bdfff0'; ctx.beginPath(); ctx.arc(sx,sy,3.2,0,7); ctx.fill();
-    ph += 0.045;
-    var amp = Math.abs(Math.exp(-3.0*((Math.sin(ph*0.5)*0.5+0.5))))*100;
-    if(readout) readout.textContent = 'Δ '+amp.toFixed(1)+'% → converging';
-    if(!rm) requestAnimationFrame(draw);
+  /* count-up */
+  function countUp(el){
+    var t=+el.getAttribute('data-count'), comma=el.getAttribute('data-comma'), d=1200, t0=null;
+    function step(ts){ if(!t0)t0=ts; var p=Math.min((ts-t0)/d,1), e=1-Math.pow(1-p,3), v=Math.round(t*e);
+      el.textContent = comma? v.toLocaleString('en-US'): v; if(p<1) requestAnimationFrame(step); }
+    requestAnimationFrame(step);
   }
-  if(rm){ draw(); } else { requestAnimationFrame(draw); }
+
+  /* GSAP reveals */
+  if(window.gsap && !rm){
+    gsap.registerPlugin(ScrollTrigger);
+    /* split headline into words */
+    var h = document.getElementById('headline');
+    var nodes = [].slice.call(h.childNodes);
+    h.innerHTML = nodes.map(function(n){
+      if(n.nodeType===3) return n.textContent.split(/\s+/).filter(Boolean).map(function(w){return '<span class="w">'+w+'</span>'}).join(' ');
+      if(n.nodeType===1) return '<span class="w">'+n.outerHTML+'</span>';
+      return '';
+    }).join(' ');
+    gsap.from('#headline .w',{yPercent:120,opacity:0,rotate:3,duration:1.05,ease:'power4.out',stagger:.055,delay:.15});
+    gsap.from('.pill',{y:18,opacity:0,duration:.8,ease:'power3.out'});
+    gsap.from('.sub',{y:24,opacity:0,duration:.9,delay:.5,ease:'power3.out'});
+    gsap.from('.ctas',{y:24,opacity:0,duration:.9,delay:.65,ease:'power3.out'});
+    /* scroll reveals */
+    gsap.utils.toArray('section [data-reveal]:not(.rep)').forEach(function(el){
+      gsap.from(el,{y:34,opacity:0,duration:.9,ease:'power3.out',
+        scrollTrigger:{trigger:el,start:'top 86%'}});
+    });
+    /* stagger the replication cards as a group */
+    ScrollTrigger.batch('.rep',{start:'top 88%',onEnter:function(b){
+      gsap.from(b,{y:40,opacity:0,duration:.8,ease:'power3.out',stagger:.09,overwrite:true});
+    }});
+    /* count-ups when stats enter */
+    ScrollTrigger.create({trigger:'.stats',start:'top 80%',once:true,onEnter:function(){
+      document.querySelectorAll('[data-count]').forEach(countUp);
+    }});
+    /* hero orb parallax against scroll */
+    gsap.to('#orb',{yPercent:18,ease:'none',scrollTrigger:{trigger:'.hero',start:'top top',end:'bottom top',scrub:true}});
+  } else {
+    document.querySelectorAll('[data-count]').forEach(function(el){
+      var t=+el.getAttribute('data-count'); el.textContent = el.getAttribute('data-comma')? t.toLocaleString('en-US'): t; });
+  }
+
+  /* ── Three.js knowledge-graph orb ── */
+  if(window.THREE){
+    var cvs = document.getElementById('orb');
+    var renderer = new THREE.WebGLRenderer({canvas:cvs,alpha:true,antialias:true});
+    renderer.setPixelRatio(Math.min(devicePixelRatio,2));
+    var scene = new THREE.Scene();
+    var cam = new THREE.PerspectiveCamera(46, 2, .1, 100); cam.position.z = 7.5;
+    var N = 1100, R = 2.6, pos = new Float32Array(N*3), pts = [];
+    for(var i=0;i<N;i++){ /* fibonacci sphere with jitter */
+      var k=i+.5, phi=Math.acos(1-2*k/N), th=Math.PI*(1+Math.sqrt(5))*k;
+      var r=R*(0.85+Math.random()*0.3);
+      var x=r*Math.sin(phi)*Math.cos(th), y=r*Math.cos(phi), z=r*Math.sin(phi)*Math.sin(th);
+      pos[i*3]=x; pos[i*3+1]=y; pos[i*3+2]=z; pts.push([x,y,z]);
+    }
+    var geo = new THREE.BufferGeometry();
+    geo.setAttribute('position', new THREE.BufferAttribute(pos,3));
+    var pmat = new THREE.PointsMaterial({size:.035,transparent:true,opacity:.9});
+    var cloud = new THREE.Points(geo,pmat);
+    /* connect near neighbours */
+    var lp=[], maxL=1500, thr=.62;
+    for(var a=0;a<N && lp.length/6<maxL;a++){
+      for(var b=a+1;b<a+24 && b<N;b++){
+        var dx=pts[a][0]-pts[b][0],dy=pts[a][1]-pts[b][1],dz=pts[a][2]-pts[b][2];
+        if(dx*dx+dy*dy+dz*dz < thr*thr){ lp.push(pts[a][0],pts[a][1],pts[a][2],pts[b][0],pts[b][1],pts[b][2]); }
+      }
+    }
+    var lgeo = new THREE.BufferGeometry();
+    lgeo.setAttribute('position', new THREE.BufferAttribute(new Float32Array(lp),3));
+    var lmat = new THREE.LineBasicMaterial({transparent:true,opacity:.16});
+    var lines = new THREE.LineSegments(lgeo,lmat);
+    var orb = new THREE.Group(); orb.add(cloud); orb.add(lines); scene.add(orb);
+    orb.position.x = 2.2; orb.rotation.z = .25;
+
+    function setColors(theme){
+      var c = theme==='light' ? 0x0c9b78 : 0x3ce0b8;
+      pmat.color = new THREE.Color(c); lmat.color = new THREE.Color(c);
+      lmat.opacity = theme==='light' ? .12 : .16;
+    }
+    window.__orbTheme = setColors;
+    setColors(root.getAttribute('data-theme'));
+
+    var mx=0,my=0;
+    addEventListener('pointermove',function(e){
+      mx=(e.clientX/innerWidth-.5); my=(e.clientY/innerHeight-.5);
+    },{passive:true});
+
+    function resize(){
+      var w=cvs.clientWidth||innerWidth, h=cvs.clientHeight||innerHeight;
+      renderer.setSize(w,h,false); cam.aspect=w/h;
+      orb.position.x = w<760 ? 0 : 2.2;
+      cam.updateProjectionMatrix();
+    }
+    resize(); addEventListener('resize',resize);
+
+    var t=0, vis=true;
+    document.addEventListener('visibilitychange',function(){ vis=!document.hidden; });
+    (function loop(){
+      requestAnimationFrame(loop);
+      if(!vis) return;
+      t+=rm?0:.0024;
+      orb.rotation.y = t*2 + mx*.5;
+      orb.rotation.x = Math.sin(t*.7)*.12 + my*.35;
+      renderer.render(scene,cam);
+    })();
+  }
 })();
 </script>
 </body>
