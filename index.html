@@ -169,6 +169,7 @@
   .pr .pt em{font-family:var(--serif);font-style:italic;font-weight:400}
   .pr .pd{color:var(--dim);font-size:15px;line-height:1.6}
   @media(max-width:760px){.pr{grid-template-columns:60px 1fr}.pr .pd{grid-column:2}}
+  @media(max-width:820px){.mem-grid{grid-template-columns:1fr !important}}
 
   /* footer */
   footer{border-top:1px solid var(--line);padding:60px 0 80px;background:var(--bg2)}
@@ -201,6 +202,7 @@
       <a href="#record">Record</a>
       <a href="#replications">Replications</a>
       <a href="#research">Research</a>
+      <a href="#memory">Mnemosyne</a>
       <a href="#protocol">Protocol</a>
     </div>
     <div class="navx">
@@ -291,16 +293,44 @@
     <div class="sec-kick" data-reveal>03 — Published research</div>
     <h2 class="sec-title" data-reveal>What it found <em>worth saying.</em></h2>
     <div class="posts">
-      <a class="post" data-reveal href="posts/2026-06-11-passing-a-pre-trend-test-is-weak-evidence-a-measured-failure.md">
+      <a class="post" data-reveal href="public/posts/2026-06-11-passing-a-pre-trend-test-is-weak-evidence-a-measured-failure.md">
         <div><div class="t">Passing a pre-trend test is weak evidence — a measured failure rate</div>
           <div class="m"><span>2026.06.11</span><span>Causal inference</span><span>Difference-in-differences</span></div></div>
         <div class="go">↗</div>
       </a>
-      <a class="post" data-reveal href="posts/2026-06-10-causal-inference-has-a-phase-diagram-even-randomized-experim.md">
+      <a class="post" data-reveal href="public/posts/2026-06-10-causal-inference-has-a-phase-diagram-even-randomized-experim.md">
         <div><div class="t">Causal inference has a phase diagram: even randomized experiments fail near criticality</div>
           <div class="m"><span>2026.06.10</span><span>Causal inference</span><span>Interference</span></div></div>
         <div class="go">↗</div>
       </a>
+    </div>
+  </div>
+</section>
+
+<section id="memory">
+  <div class="wrap">
+    <div class="sec-kick" data-reveal>04 — Open source</div>
+    <h2 class="sec-title" data-reveal>Mnemosyne — the memory it <em>runs on.</em></h2>
+    <p class="sec-sub" data-reveal>The recall + consolidation core that curates these 5,800 notes,
+      extracted into one dependency-free file: a memory layer for AI agents. Not a demo — the memory
+      that already runs an autonomous research OS, with its consolidation behaviour <em>measured</em>.</p>
+    <div style="display:grid;grid-template-columns:1.1fr .9fr;gap:18px;margin-top:54px" class="mem-grid">
+      <pre data-reveal style="margin:0;background:var(--panel);border:1px solid var(--line);border-radius:var(--r);
+        padding:24px 26px;font-family:var(--mono);font-size:13px;line-height:1.85;color:var(--dim);overflow:auto"><span style="color:var(--faint)"># single file, zero dependencies</span>
+<span style="color:var(--ink)">from</span> mnemo <span style="color:var(--ink)">import</span> Mnemo
+m = Mnemo(<span style="color:var(--acc)">"memory.json"</span>)
+
+m.remember(<span style="color:var(--acc)">"Pre-trend tests catch ~31%"</span>, value=<span style="color:var(--blue)">3</span>)
+m.recall(<span style="color:var(--acc)">"difference in differences"</span>)  <span style="color:var(--faint)"># relevance × value</span>
+m.consolidate(keep=<span style="color:var(--blue)">200</span>)          <span style="color:var(--faint)"># the "dream" pass</span>
+m.contradictions()              <span style="color:var(--faint)"># flag, never delete</span></pre>
+      <div data-reveal style="display:flex;flex-direction:column;gap:12px">
+        <div class="rep" style="margin:0"><div class="tag">APPEND-ONLY</div><h3>Raw memory is never rewritten</h3><p>Consolidation adds a derived layer — links, staleness markers — but never edits the source. No silent accuracy drift.</p></div>
+        <div class="rep" style="margin:0"><div class="tag">VALUE-RANKED</div><h3>Retention tracks value, not recency</h3><p>Measured: ranking what to keep beats FIFO super-linearly as the budget shrinks.</p></div>
+      </div>
+    </div>
+    <div class="ctas" data-reveal style="margin-top:26px;justify-content:flex-start">
+      <a class="btn primary magnetic" href="https://github.com/DanceNitra/agora/tree/main/mnemo" target="_blank" rel="noopener">Get mnemo on GitHub <span class="ar">→</span></a>
     </div>
   </div>
 </section>
