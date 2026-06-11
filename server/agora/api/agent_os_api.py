@@ -727,7 +727,7 @@ async def brain_memory_economy(n: int = 12):
 async def brain_correspondent_draft(request: Request):
     """THE CORRESPONDENT — store Claude's composed outreach and propose the GATED action.
     Nothing leaves the machine until the owner approves from Telegram."""
-    from agora.execution.correspondent import save_draft
+    from agora.execution.correspondent import save_draft, novelty_report, format_novelty
     from agora.execution.hands import propose_action, pending_approvals
     b = await request.json()
     title, body = (b.get("title") or "").strip(), (b.get("body") or "").strip()
@@ -737,13 +737,16 @@ async def brain_correspondent_draft(request: Request):
         return {"status": "already_pending"}
     repo, issue_no = (b.get("repo") or "").strip(), int(b.get("issue_number") or 0)
     rec = save_draft(title, body, repo, issue_no)
+    nov = novelty_report(body, exclude_id=rec["id"])     # catch templated repetition BEFORE it posts
     where = f"comment on {repo}#{issue_no}" if repo and issue_no else "new public GitHub issue"
     act = propose_action("outreach", f"Post public outreach ({where}): {title[:60]}",
                          body[:300], {"corr_id": rec["id"]})
+    nov_line = format_novelty(nov)
     await _send_telegram(f"✉️ Correspondent proposal `{act['id']}`: {where}\n"
                          f"*{title[:80]}*\n_{body[:180]}…_\n"
-                         f"Reply `approve {act['id']}` or `reject {act['id']}`.")
-    return {"status": "proposed", "draft": rec, "action": act}
+                         + (nov_line + "\n" if nov_line else "")
+                         + f"Reply `approve {act['id']}` or `reject {act['id']}`.")
+    return {"status": "proposed", "draft": rec, "action": act, "novelty": nov}
 
 
 @router.post("/brain/correspondent/harvest")

@@ -11,6 +11,7 @@ The GitHub token comes from the git credential manager in-process and is never l
 from __future__ import annotations
 
 import json
+import re
 import subprocess
 import time
 import urllib.request
@@ -33,6 +34,81 @@ def _save(items: list) -> None:
         _STORE.write_text(json.dumps(items, ensure_ascii=False, indent=1), encoding="utf-8")
     except Exception:
         pass
+
+
+# ── Novelty guard: stop templated outreach (same stats / same self-promo plug / copy-pasted
+#    sentences across different threads) — that reads as astroturf and erodes the credibility the
+#    genuine engagement was meant to build. Surfaced in the gated proposal BEFORE anything posts. ──
+_PLUG_RX = re.compile(r"open[- ]?source|reference implementation|zero[- ]?dependency|\bmnemo\b", re.I)
+_NUM_RX = re.compile(r"\d+(?:\.\d+)?\s?(?:x|×|%)", re.I)
+
+
+def _sentences(text: str) -> list[str]:
+    return [s.strip() for s in re.split(r"(?<=[.!?])\s+|\n+", text or "") if len(s.strip()) > 25]
+
+
+def _toks(s: str) -> set:
+    return {w for w in re.findall(r"[a-z0-9.]+", (s or "").lower()) if len(w) > 2}
+
+
+def _containment(a: set, b: set) -> float:
+    if not a or not b:
+        return 0.0
+    return len(a & b) / min(len(a), len(b))
+
+
+def novelty_report(body: str, exclude_id: str | None = None) -> dict:
+    """Compare a new outreach body against our already-public posts. Returns an overlap level +
+    the specific repeated sentences / reused stats / reused self-promo so the owner can tailor."""
+    priors = [x for x in _load() if x.get("id") != exclude_id and x.get("body")
+              and x.get("status") in ("posted", "proposed", "draft")]
+    new_sents = _sentences(body)
+    new_tok = [_toks(s) for s in new_sents]
+    new_nums = set(n.replace(" ", "") for n in _NUM_RX.findall(body or ""))
+    worst_ov, worst_p = 0.0, None
+    repeated: list[dict] = []
+    prior_nums: set = set()
+    for p in priors:
+        p_tok = [_toks(s) for s in _sentences(p["body"])]
+        prior_nums |= set(n.replace(" ", "") for n in _NUM_RX.findall(p["body"] or ""))
+        where = f"{p.get('target_repo') or 'agora'}#{p.get('target_issue') or p.get('issue_number') or '?'}"
+        dup = 0
+        for i, t in enumerate(new_tok):
+            if max((_containment(t, pt) for pt in p_tok), default=0.0) >= 0.6:
+                dup += 1
+                repeated.append({"sentence": new_sents[i][:110], "where": where})
+        ov = dup / len(new_tok) if new_tok else 0.0
+        if ov > worst_ov:
+            worst_ov, worst_p = ov, p
+    reused_stats = sorted(new_nums & prior_nums)
+    reused_plug = bool(_PLUG_RX.search(body or "")) and any(_PLUG_RX.search(p["body"] or "") for p in priors)
+    seen, reps = set(), []
+    for r in repeated:
+        if r["sentence"] not in seen:
+            seen.add(r["sentence"]); reps.append(r)
+    level = ("HIGH" if (worst_ov >= 0.5 or (len(reused_stats) >= 2 and reused_plug))
+             else "MED" if (worst_ov >= 0.3 or reused_stats or reused_plug) else "OK")
+    worst_match = (f"{worst_p.get('target_repo') or 'agora'}#"
+                   f"{worst_p.get('target_issue') or worst_p.get('issue_number') or '?'}") if worst_p else None
+    return {"level": level, "max_overlap": round(worst_ov, 2), "worst_match": worst_match,
+            "repeated_sentences": reps[:4], "reused_stats": reused_stats, "reused_plug": reused_plug}
+
+
+def format_novelty(nr: dict) -> str:
+    if not nr or nr.get("level") == "OK":
+        return ""
+    icon = "🚨" if nr["level"] == "HIGH" else "⚠️"
+    lines = [f"{icon} Novelty {nr['level']} — overlaps our earlier public posts:"]
+    if nr.get("worst_match") and nr["max_overlap"] > 0:
+        lines.append(f"• {int(nr['max_overlap']*100)}% sentence overlap with {nr['worst_match']}")
+    if nr.get("reused_stats"):
+        lines.append(f"• reused stats: {', '.join(nr['reused_stats'])}")
+    if nr.get("reused_plug"):
+        lines.append("• repeats the open-source/mnemo plug used before")
+    if nr.get("repeated_sentences"):
+        lines.append(f'• e.g. "{nr["repeated_sentences"][0]["sentence"]}…"')
+    lines.append("Tailor to THEIR specific point; plug sparingly.")
+    return "\n".join(lines)
 
 
 def _github_token() -> str:
