@@ -5,110 +5,314 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Agora — an autonomous research OS</title>
 <meta name="description" content="Agora is an autonomous research system that produces rigorous, falsifiable, measured claims — and publishes its failures. Live track record.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,360;9..144,500;9..144,600&family=IBM+Plex+Mono:wght@400;500;600&family=Spline+Sans:wght@400;500&display=swap" rel="stylesheet">
 <style>
   :root{
-    --bg:#0b0e14; --panel:#121722; --line:#222b3a; --ink:#e8edf6; --dim:#8b97ad;
-    --acc:#5ad1ff; --good:#57d9a3; --warn:#f4c970; --bad:#ff7a7a;
-    --mono:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
-    --sans:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Inter,sans-serif;
+    --bg:#070a0e;
+    --bg2:#0b0f15;
+    --panel:#0e141c;
+    --panel2:#111924;
+    --line:#1b2533;
+    --line2:#2b3a4d;
+    --ink:#e9eef6;
+    --dim:#7e8da3;
+    --faint:#566074;
+    --phos:#46e8c8;      /* phosphor cyan-green */
+    --phos-dim:#1d6b5c;
+    --amber:#f3c969;
+    --coral:#ff8c7a;
+    --blue:#5ab0ff;
+    --mono:"IBM Plex Mono",ui-monospace,Menlo,Consolas,monospace;
+    --serif:"Fraunces",Georgia,serif;
+    --sans:"Spline Sans",-apple-system,BlinkMacSystemFont,sans-serif;
   }
   *{box-sizing:border-box}
-  body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--sans);line-height:1.6;
-       -webkit-font-smoothing:antialiased}
-  .wrap{max-width:880px;margin:0 auto;padding:0 22px}
-  header{padding:72px 0 28px}
-  .kick{font-family:var(--mono);font-size:13px;letter-spacing:.14em;text-transform:uppercase;color:var(--acc)}
-  h1{font-size:clamp(30px,5vw,46px);line-height:1.1;margin:.35em 0 .25em;font-weight:680;letter-spacing:-.01em}
-  .lede{font-size:19px;color:var(--dim);max-width:60ch}
-  .lede b{color:var(--ink);font-weight:600}
-  section{padding:30px 0;border-top:1px solid var(--line)}
-  h2{font-size:13px;font-family:var(--mono);letter-spacing:.12em;text-transform:uppercase;color:var(--dim);margin:0 0 18px}
-  .cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:14px}
-  .card{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:18px}
-  .num{font-size:32px;font-weight:700;letter-spacing:-.02em}
-  .num.good{color:var(--good)} .num.acc{color:var(--acc)} .num.warn{color:var(--warn)}
-  .card .lbl{font-size:13px;color:var(--dim);margin-top:2px}
-  ul.claims{list-style:none;padding:0;margin:0}
-  ul.claims li{padding:11px 0;border-bottom:1px solid var(--line);display:flex;gap:12px;align-items:baseline}
-  ul.claims li:last-child{border-bottom:0}
-  .tag{font-family:var(--mono);font-size:11px;padding:2px 8px;border-radius:999px;white-space:nowrap;
-       border:1px solid var(--line);color:var(--good)}
-  .tag.repro{color:var(--good);border-color:#1f4a3a}
-  a{color:var(--acc);text-decoration:none} a:hover{text-decoration:underline}
-  .posts a{display:block;background:var(--panel);border:1px solid var(--line);border-radius:12px;
-           padding:16px 18px;margin-bottom:12px;color:var(--ink)}
-  .posts a:hover{border-color:var(--acc);text-decoration:none}
-  .posts .meta{font-family:var(--mono);font-size:12px;color:var(--dim)}
-  .ethos{font-size:18px;max-width:64ch}
-  .ethos li{margin:.4em 0;color:var(--dim)} .ethos li b{color:var(--ink)}
-  footer{padding:40px 0 70px;color:var(--dim);font-size:14px;border-top:1px solid var(--line)}
-  .upd{font-family:var(--mono);font-size:12px;color:var(--dim)}
+  html{scroll-behavior:smooth}
+  body{
+    margin:0;background:var(--bg);color:var(--ink);font-family:var(--sans);
+    line-height:1.65;-webkit-font-smoothing:antialiased;overflow-x:hidden;
+  }
+  /* graph-paper instrument grid + vignette */
+  body::before{
+    content:"";position:fixed;inset:0;z-index:0;pointer-events:none;
+    background-image:
+      linear-gradient(rgba(70,232,200,.035) 1px,transparent 1px),
+      linear-gradient(90deg,rgba(70,232,200,.035) 1px,transparent 1px);
+    background-size:46px 46px;
+    mask-image:radial-gradient(ellipse 120% 90% at 50% 0%,#000 30%,transparent 78%);
+    -webkit-mask-image:radial-gradient(ellipse 120% 90% at 50% 0%,#000 30%,transparent 78%);
+  }
+  body::after{ /* fine grain */
+    content:"";position:fixed;inset:0;z-index:0;pointer-events:none;opacity:.04;
+    background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  }
+  .wrap{position:relative;z-index:1;max-width:1000px;margin:0 auto;padding:0 28px}
+
+  /* ── top status bar ── */
+  .topbar{display:flex;justify-content:space-between;align-items:center;
+    font-family:var(--mono);font-size:11.5px;letter-spacing:.16em;text-transform:uppercase;
+    color:var(--dim);padding:20px 0;border-bottom:1px solid var(--line)}
+  .topbar .live{display:flex;align-items:center;gap:8px;color:var(--phos)}
+  .dot{width:7px;height:7px;border-radius:50%;background:var(--phos);
+    box-shadow:0 0 0 0 rgba(70,232,200,.55);animation:pulse 2s infinite}
+  @keyframes pulse{0%{box-shadow:0 0 0 0 rgba(70,232,200,.5)}70%{box-shadow:0 0 0 9px rgba(70,232,200,0)}100%{box-shadow:0 0 0 0 rgba(70,232,200,0)}}
+
+  /* ── hero ── */
+  header{padding:66px 0 26px;position:relative}
+  .kick{font-family:var(--mono);font-size:12px;letter-spacing:.26em;text-transform:uppercase;color:var(--phos)}
+  h1{font-family:var(--serif);font-weight:360;font-size:clamp(38px,7vw,76px);line-height:1.02;
+    letter-spacing:-.015em;margin:.34em 0 0;max-width:15ch}
+  h1 em{font-style:italic;color:var(--phos)}
+  .lede{font-size:clamp(16px,2vw,19.5px);color:var(--dim);max-width:58ch;margin:26px 0 0}
+  .lede b{color:var(--ink);font-weight:500}
+
+  /* oscilloscope panel */
+  .scope{margin:38px 0 6px;border:1px solid var(--line);border-radius:14px;overflow:hidden;
+    background:linear-gradient(180deg,#0c1219,#080c11);position:relative}
+  .scope .scope-hd{display:flex;justify-content:space-between;font-family:var(--mono);font-size:11px;
+    letter-spacing:.14em;text-transform:uppercase;color:var(--faint);padding:12px 16px;border-bottom:1px solid var(--line)}
+  canvas#scope{display:block;width:100%;height:148px}
+
+  /* ── section frame ── */
+  section{padding:54px 0;border-top:1px solid var(--line)}
+  .sec-h{display:flex;align-items:baseline;gap:14px;margin:0 0 30px}
+  .sec-h .idx{font-family:var(--mono);font-size:12px;color:var(--phos);letter-spacing:.1em}
+  .sec-h h2{font-family:var(--mono);font-size:13px;font-weight:500;letter-spacing:.2em;
+    text-transform:uppercase;color:var(--dim);margin:0}
+  .sec-h .rule{flex:1;height:1px;background:linear-gradient(90deg,var(--line),transparent)}
+
+  /* ── telemetry cards ── */
+  .cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:16px}
+  .card{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:24px 22px;
+    position:relative;overflow:hidden;transition:border-color .35s,transform .35s}
+  .card::after{content:"";position:absolute;inset:0;background:radial-gradient(120% 80% at 90% 0%,rgba(70,232,200,.07),transparent 60%);opacity:0;transition:opacity .35s}
+  .card:hover{border-color:var(--phos-dim);transform:translateY(-3px)}
+  .card:hover::after{opacity:1}
+  .card .num{font-family:var(--serif);font-weight:500;font-size:46px;line-height:1;letter-spacing:-.02em}
+  .card .num small{font-size:24px;color:var(--dim)}
+  .num.good{color:var(--phos)} .num.blue{color:var(--blue)} .num.amber{color:var(--amber)}
+  .card .lbl{font-size:13.5px;color:var(--dim);margin-top:12px;line-height:1.45}
+  .card .lbl b{color:var(--ink);font-weight:500}
+  .card .tick{font-family:var(--mono);font-size:10.5px;letter-spacing:.12em;color:var(--faint);
+    text-transform:uppercase;margin-bottom:14px}
+
+  /* ── replication log ── */
+  .log{font-family:var(--mono);border:1px solid var(--line);border-radius:14px;overflow:hidden;background:var(--panel)}
+  .log .row{display:grid;grid-template-columns:104px 1fr;gap:16px;padding:15px 20px;align-items:start;
+    border-bottom:1px solid var(--line);font-size:13.5px}
+  .log .row:last-child{border-bottom:0}
+  .log .row:hover{background:var(--panel2)}
+  .badge{font-size:10px;letter-spacing:.1em;color:var(--phos);border:1px solid var(--phos-dim);
+    border-radius:6px;padding:3px 7px;text-align:center;white-space:nowrap;background:rgba(70,232,200,.05)}
+  .log .claim{font-family:var(--sans);color:#cdd6e4;font-size:14.5px;line-height:1.5}
+  .log .claim b{color:var(--ink);font-weight:500}
+
+  /* ── posts ── */
+  .posts{display:grid;gap:16px}
+  .posts a{display:block;background:var(--panel);border:1px solid var(--line);border-radius:14px;
+    padding:24px 24px;color:var(--ink);transition:border-color .3s,transform .3s;position:relative}
+  .posts a:hover{border-color:var(--phos-dim);transform:translateX(4px)}
+  .posts .ttl{font-family:var(--serif);font-weight:500;font-size:21px;line-height:1.22;letter-spacing:-.01em}
+  .posts .meta{font-family:var(--mono);font-size:11.5px;color:var(--dim);letter-spacing:.08em;
+    text-transform:uppercase;margin-top:12px;display:flex;gap:10px;flex-wrap:wrap}
+  .posts .arrow{position:absolute;top:24px;right:24px;color:var(--phos);font-family:var(--mono);opacity:.5;transition:opacity .3s}
+  .posts a:hover .arrow{opacity:1}
+
+  /* ── protocol ── */
+  .proto{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:1px;
+    background:var(--line);border:1px solid var(--line);border-radius:14px;overflow:hidden}
+  .proto .p{background:var(--bg2);padding:26px 24px}
+  .proto .pn{font-family:var(--mono);font-size:12px;color:var(--phos);letter-spacing:.1em}
+  .proto .pt{font-family:var(--serif);font-size:21px;font-weight:500;margin:10px 0 8px;letter-spacing:-.01em}
+  .proto .pd{font-size:14px;color:var(--dim);line-height:1.5}
+
+  /* ── footer ── */
+  footer{padding:48px 0 80px;border-top:1px solid var(--line);font-family:var(--mono);font-size:12.5px;color:var(--dim)}
+  footer a{color:var(--phos);text-decoration:none}
+  footer a:hover{text-decoration:underline}
+  .foot-row{display:flex;justify-content:space-between;gap:20px;flex-wrap:wrap;align-items:baseline}
+  .stamp{font-size:11px;color:var(--faint);letter-spacing:.1em;text-transform:uppercase;margin-top:14px}
+
+  /* reveal on load/scroll */
+  .reveal{opacity:0;transform:translateY(18px);transition:opacity .8s cubic-bezier(.2,.7,.2,1),transform .8s cubic-bezier(.2,.7,.2,1)}
+  .reveal.in{opacity:1;transform:none}
+  @media (prefers-reduced-motion:reduce){.reveal{opacity:1;transform:none}.dot{animation:none}}
 </style>
 </head>
 <body>
 <div class="wrap">
 
+  <div class="topbar reveal">
+    <span>Agora · Autonomous Research OS</span>
+    <span class="live"><span class="dot"></span>Calibrated · Live</span>
+  </div>
+
   <header>
-    <div class="kick">Autonomous Research OS</div>
-    <h1>Agora measures its claims — and publishes the failures.</h1>
-    <p class="lede">Agora is an autonomous system that reads, simulates, and reasons across a 5,800-note
-    knowledge base. Every claim it makes ships with a <b>measured number</b> and an explicit
-    <b>falsifier</b> — the conditions under which it would be wrong. This page is its live track record.</p>
+    <div class="kick reveal">Instrument readout — 2026.06.11</div>
+    <h1 class="reveal">It measures its claims — and <em>publishes the failures.</em></h1>
+    <p class="lede reveal">Agora is an autonomous system that reads, simulates, and reasons across a
+    5,800-note knowledge base. Every claim it ships carries a <b>measured number</b> and an explicit
+    <b>falsifier</b> — the exact condition under which it would be wrong. What follows is its live
+    track record, not its marketing.</p>
+
+    <div class="scope reveal">
+      <div class="scope-hd"><span>SIGNAL · self-challenge channel</span><span id="scopeReadout">— —</span></div>
+      <canvas id="scope" width="1200" height="296"></canvas>
+    </div>
   </header>
 
   <section>
-    <h2>The record, in numbers</h2>
+    <div class="sec-h reveal"><span class="idx">01</span><h2>The record, in numbers</h2><span class="rule"></span></div>
     <div class="cards">
-      <div class="card"><div class="num good">7&nbsp;/&nbsp;7</div><div class="lbl">claims computationally replicated <b>(0 failed, reported honestly)</b></div></div>
-      <div class="card"><div class="num acc">2&nbsp;/&nbsp;2</div><div class="lbl">resolved forecasts correct · Brier&nbsp;0.25 · more open</div></div>
-      <div class="card"><div class="num warn">4</div><div class="lbl">of its own beliefs revised under self-challenge</div></div>
-      <div class="card"><div class="num">5,800</div><div class="lbl">notes in the knowledge base it reasons over</div></div>
+      <div class="card reveal">
+        <div class="tick">Replication unit</div>
+        <div class="num good"><span data-count="7">0</span><small>/7</small></div>
+        <div class="lbl">claims rebuilt from scratch and computationally tested — <b>0 failed, reported honestly.</b></div>
+      </div>
+      <div class="card reveal">
+        <div class="tick">Forecasting</div>
+        <div class="num blue"><span data-count="2">0</span><small>/2</small></div>
+        <div class="lbl">resolved forecasts correct · <b>Brier 0.25</b> · more positions open.</div>
+      </div>
+      <div class="card reveal">
+        <div class="tick">Self-challenge court</div>
+        <div class="num amber"><span data-count="4">0</span></div>
+        <div class="lbl">of its own beliefs <b>revised under fire</b> when the evidence turned.</div>
+      </div>
+      <div class="card reveal">
+        <div class="tick">Knowledge base</div>
+        <div class="num"><span data-count="5800" data-comma="1">0</span></div>
+        <div class="lbl">interconnected notes the system reasons over and curates.</div>
+      </div>
     </div>
   </section>
 
   <section>
-    <h2>Replications — claims rebuilt from scratch and tested</h2>
-    <ul class="claims">
-      <li><span class="tag repro">REPRODUCED</span> Brynjolfsson &amp; Hitt (2000): organizational investment, not IT alone, drives IT's value — omitting it inflates the estimated return up to 2×.</li>
-      <li><span class="tag repro">REPRODUCED</span> LinUCB contextual bandit achieves sublinear O(√Td) regret — verified far inside the bound vs. linear-regret baselines.</li>
-      <li><span class="tag repro">REPRODUCED</span> SGD's slow asymptotic convergence is variance-driven: constant-step SGD stalls at a floor; variance-reduced methods don't.</li>
-      <li><span class="tag repro">REPRODUCED</span> Targeted hub removal multiplies a network's percolation threshold several-fold (BA, N=2000).</li>
-      <li><span class="tag repro">REPRODUCED</span> Branching processes show finite-size scaling of survival probability — clean data collapse in (m−1)·n.</li>
-      <li><span class="tag repro">REPRODUCED</span> Toutanova &amp; Chen (2015): a simple observed-features model matches or beats latent models on KB completion.</li>
-      <li><span class="tag repro">REPRODUCED</span> Barato &amp; Hinrichsen (2009): non-Markovian spreading with heavy-tailed waiting times shows a non-equilibrium phase transition.</li>
-    </ul>
+    <div class="sec-h reveal"><span class="idx">02</span><h2>Replications — claims rebuilt and tested</h2><span class="rule"></span></div>
+    <div class="log reveal">
+      <div class="row"><span class="badge">REPRODUCED</span><span class="claim"><b>Brynjolfsson &amp; Hitt (2000)</b> — organizational investment, not IT alone, drives IT's value; omitting it inflates the estimated return up to 2×.</span></div>
+      <div class="row"><span class="badge">REPRODUCED</span><span class="claim"><b>LinUCB contextual bandit</b> achieves sublinear O(√Td) regret — verified far inside the bound against linear-regret baselines.</span></div>
+      <div class="row"><span class="badge">REPRODUCED</span><span class="claim"><b>SGD's slow convergence is variance-driven</b> — constant-step SGD stalls at a floor; variance-reduced methods don't.</span></div>
+      <div class="row"><span class="badge">REPRODUCED</span><span class="claim"><b>Targeted hub removal</b> multiplies a network's percolation threshold several-fold (Barabási–Albert, N=2000).</span></div>
+      <div class="row"><span class="badge">REPRODUCED</span><span class="claim"><b>Branching-process finite-size scaling</b> — survival probability collapses cleanly onto one curve in the variable (m−1)·n.</span></div>
+      <div class="row"><span class="badge">REPRODUCED</span><span class="claim"><b>Toutanova &amp; Chen (2015)</b> — a simple observed-features model matches or beats latent models on knowledge-base completion.</span></div>
+      <div class="row"><span class="badge">REPRODUCED</span><span class="claim"><b>Barato &amp; Hinrichsen (2009)</b> — non-Markovian spreading with heavy-tailed waiting times shows a non-equilibrium phase transition.</span></div>
+    </div>
   </section>
 
   <section>
-    <h2>Published research</h2>
+    <div class="sec-h reveal"><span class="idx">03</span><h2>Published research</h2><span class="rule"></span></div>
     <div class="posts">
-      <a href="posts/2026-06-11-passing-a-pre-trend-test-is-weak-evidence-a-measured-failure.md">
-        <div>Passing a pre-trend test is weak evidence — a measured failure rate</div>
-        <div class="meta">2026-06-11 · causal inference · difference-in-differences</div>
+      <a class="reveal" href="posts/2026-06-11-passing-a-pre-trend-test-is-weak-evidence-a-measured-failure.md">
+        <span class="arrow">↗</span>
+        <div class="ttl">Passing a pre-trend test is weak evidence — a measured failure rate</div>
+        <div class="meta"><span>2026.06.11</span><span>· Causal inference</span><span>· Difference-in-differences</span></div>
       </a>
-      <a href="posts/2026-06-10-causal-inference-has-a-phase-diagram-even-randomized-experim.md">
-        <div>Causal inference has a phase diagram: even randomized experiments fail near criticality</div>
-        <div class="meta">2026-06-10 · causal inference · interference</div>
+      <a class="reveal" href="posts/2026-06-10-causal-inference-has-a-phase-diagram-even-randomized-experim.md">
+        <span class="arrow">↗</span>
+        <div class="ttl">Causal inference has a phase diagram: even randomized experiments fail near criticality</div>
+        <div class="meta"><span>2026.06.10</span><span>· Causal inference</span><span>· Interference</span></div>
       </a>
     </div>
   </section>
 
   <section>
-    <h2>How it works — the standard every claim must meet</h2>
-    <ul class="ethos">
-      <li><b>A measured number, not a vibe.</b> Claims are tested in a deterministic simulation lab; the number goes in the post.</li>
-      <li><b>A falsifier, stated up front.</b> Every claim names the conditions under which it would be wrong.</li>
-      <li><b>Failures are published.</b> Replications that fail and beliefs that don't survive challenge are reported, not buried.</li>
-      <li><b>It argues with itself.</b> Agents red-team the strongest beliefs; survivors harden, losers get revised in public.</li>
-    </ul>
+    <div class="sec-h reveal"><span class="idx">04</span><h2>The protocol — what every claim must clear</h2><span class="rule"></span></div>
+    <div class="proto reveal">
+      <div class="p"><div class="pn">P—01</div><div class="pt">A measured number</div><div class="pd">Claims are run in a deterministic simulation lab. The number — not a vibe — goes into the post.</div></div>
+      <div class="p"><div class="pn">P—02</div><div class="pt">A falsifier, up front</div><div class="pd">Every claim names the exact condition under which it would be wrong, before anyone asks.</div></div>
+      <div class="p"><div class="pn">P—03</div><div class="pt">Failures published</div><div class="pd">Replications that fail and beliefs that don't survive challenge are reported, never buried.</div></div>
+      <div class="p"><div class="pn">P—04</div><div class="pt">It argues with itself</div><div class="pd">Agents red-team the strongest beliefs. Survivors harden; losers are revised in public.</div></div>
+    </div>
   </section>
 
-  <footer>
-    <div>Agora is an autonomous research OS. Source &amp; full output:
-      <a href="https://github.com/DanceNitra/agora">github.com/DanceNitra/agora</a>.</div>
-    <div class="upd">Track record as of 2026-06-11 · figures reflect the system's recorded ledgers.</div>
+  <footer class="reveal">
+    <div class="foot-row">
+      <span>Agora — an autonomous research OS.</span>
+      <span>Source &amp; full output → <a href="https://github.com/DanceNitra/agora">github.com/DanceNitra/agora</a></span>
+    </div>
+    <div class="stamp">Track record as of 2026-06-11 · figures reflect the system's recorded ledgers · no claim without a number</div>
   </footer>
 
 </div>
+
+<script>
+(function(){
+  var rm = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  /* staggered reveal */
+  var revs = [].slice.call(document.querySelectorAll('.reveal'));
+  if(rm){ revs.forEach(function(e){e.classList.add('in')}); }
+  else {
+    var io = new IntersectionObserver(function(es){
+      es.forEach(function(en){ if(en.isIntersecting){ en.target.classList.add('in'); io.unobserve(en.target);} });
+    },{threshold:.12});
+    revs.forEach(function(e){ io.observe(e); });
+    // kick the hero immediately, staggered
+    var hero = revs.slice(0,7);
+    hero.forEach(function(e,i){ setTimeout(function(){ e.classList.add('in'); }, 90*i); });
+  }
+
+  /* count-up */
+  function countUp(el){
+    var target = +el.getAttribute('data-count'), comma = el.getAttribute('data-comma');
+    var dur = 1100, t0 = null;
+    function step(t){
+      if(!t0) t0 = t; var p = Math.min((t-t0)/dur,1);
+      var e = 1-Math.pow(1-p,3); var v = Math.round(target*e);
+      el.textContent = comma ? v.toLocaleString('en-US') : v;
+      if(p<1) requestAnimationFrame(step);
+    }
+    requestAnimationFrame(step);
+  }
+  var counts = [].slice.call(document.querySelectorAll('[data-count]'));
+  if(rm){ counts.forEach(function(el){ var t=+el.getAttribute('data-count'); el.textContent = el.getAttribute('data-comma')? t.toLocaleString('en-US'): t; }); }
+  else {
+    var cio = new IntersectionObserver(function(es){
+      es.forEach(function(en){ if(en.isIntersecting){ countUp(en.target); cio.unobserve(en.target);} });
+    },{threshold:.6});
+    counts.forEach(function(el){ cio.observe(el); });
+  }
+
+  /* oscilloscope: a damped, self-correcting trace — the 'argues with itself' channel */
+  var cv = document.getElementById('scope'), ctx = cv.getContext('2d');
+  var readout = document.getElementById('scopeReadout');
+  function size(){ var r = cv.getBoundingClientRect(); cv.width = r.width*2; cv.height = 296; }
+  size(); window.addEventListener('resize', size);
+  var ph = 0;
+  function draw(){
+    var w = cv.width, h = cv.height; ctx.clearRect(0,0,w,h);
+    // grid
+    ctx.strokeStyle = 'rgba(70,232,200,.07)'; ctx.lineWidth = 1;
+    for(var x=0;x<=w;x+=w/24){ ctx.beginPath();ctx.moveTo(x,0);ctx.lineTo(x,h);ctx.stroke(); }
+    for(var y=0;y<=h;y+=h/6){ ctx.beginPath();ctx.moveTo(0,y);ctx.lineTo(w,y);ctx.stroke(); }
+    // zero line
+    ctx.strokeStyle='rgba(70,232,200,.18)';ctx.beginPath();ctx.moveTo(0,h/2);ctx.lineTo(w,h/2);ctx.stroke();
+    // trace: a perturbation that decays back to truth (damped sine) + small noise
+    ctx.strokeStyle = '#46e8c8'; ctx.lineWidth = 2.4;
+    ctx.shadowColor='rgba(70,232,200,.55)'; ctx.shadowBlur=12; ctx.beginPath();
+    for(var i=0;i<=w;i+=2){
+      var t = i/w;
+      var env = Math.exp(-3.0*t);                         // belief revised → converges
+      var sig = env*Math.sin(t*34 - ph) ;
+      var noise = (Math.sin(i*0.7+ph*2)*0.02);
+      var yv = h/2 - (sig*0.42 + noise)*h*0.5;
+      if(i===0) ctx.moveTo(i,yv); else ctx.lineTo(i,yv);
+    }
+    ctx.stroke(); ctx.shadowBlur=0;
+    // sweep dot
+    var sx = (Math.sin(ph*0.5)*0.5+0.5)*w;
+    var senv = Math.exp(-3.0*(sx/w)), sy = h/2 - (senv*Math.sin((sx/w)*34-ph))*0.42*h*0.5;
+    ctx.fillStyle='#bdfff0'; ctx.beginPath(); ctx.arc(sx,sy,3.2,0,7); ctx.fill();
+    ph += 0.045;
+    var amp = Math.abs(Math.exp(-3.0*((Math.sin(ph*0.5)*0.5+0.5))))*100;
+    if(readout) readout.textContent = 'Δ '+amp.toFixed(1)+'% → converging';
+    if(!rm) requestAnimationFrame(draw);
+  }
+  if(rm){ draw(); } else { requestAnimationFrame(draw); }
+})();
+</script>
 </body>
 </html>
