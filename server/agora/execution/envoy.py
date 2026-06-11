@@ -46,10 +46,19 @@ def engagement_status() -> list[dict]:
     """Per posted thread: how our outreach landed — reactions on our words, human replies after us,
     and how fresh the thread is. Read-only GitHub reads via the Correspondent's authed client."""
     from agora.execution.correspondent import _api, _load as _corr_load, _REPO, our_login as _our_login
-    out = []
+    # One thread can hold several of our comments (an opener + replies). Collapse them to ONE record
+    # per repo#issue, keeping the EARLIEST post as the baseline — so every human reply after our first
+    # engagement is counted, and the sweep's repo#issue-keyed seen-state can't flip-flop.
+    by_thread: dict[str, dict] = {}
     for rec in _corr_load():
         if rec.get("status") != "posted" or not rec.get("issue_number"):
             continue
+        key = f"{rec.get('target_repo') or _REPO}#{rec['issue_number']}"
+        cur = by_thread.get(key)
+        if cur is None or rec.get("posted_ts", 0) < cur.get("posted_ts", 0):
+            by_thread[key] = rec
+    out = []
+    for rec in by_thread.values():
         repo = rec.get("target_repo") or _REPO
         num = rec["issue_number"]
         kind = "comment" if rec.get("target_repo") else "issue"
