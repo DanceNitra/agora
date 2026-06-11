@@ -18,6 +18,10 @@ from pathlib import Path
 
 _LEDGER = Path(__file__).resolve().parents[2] / ".predictions.json"
 
+# A prediction younger than this must NOT resolve — re-measuring a monotonic count the same day
+# it was made yields a vacuous FLAT and poisons the track record. Binds even under force.
+_MIN_RESOLVE_AGE = 86400  # 1 day
+
 
 def _load() -> list:
     try:
@@ -206,15 +210,23 @@ async def resolve_due(force: bool = False) -> list:
     now = time.time()
     resolved = []
     for p in preds:
-        if p.get("status") != "pending" or (not force and now < p.get("resolve_ts", 0)):
+        if p.get("status") != "pending":
+            continue
+        if now - p.get("made_ts", now) < _MIN_RESOLVE_AGE:   # too young — binds even under force
+            continue
+        if not force and now < p.get("resolve_ts", 0):
             continue
         new = await asyncio.to_thread(_metric_value, p["metric"], p["theme"])
         base = p.get("baseline", 0)
         thresh = max(1, base * 0.05)
         actual = "UP" if new > base + thresh else ("DOWN" if new < base - thresh else "FLAT")
+        correct = actual == p["direction"]
         p["resolved_value"] = new
         p["actual"] = actual
-        p["status"] = "correct" if actual == p["direction"] else "incorrect"
+        p["status"] = "correct" if correct else "incorrect"
+        # Brier score for the called direction (prob = confidence, outcome = 1 if right): lower better,
+        # 0.25 = a coin-flip 50% call. This is what makes the record CALIBRATION, not just hit-rate.
+        p["brier"] = round((p.get("confidence", 0.5) - (1.0 if correct else 0.0)) ** 2, 4)
         p["resolved_ts"] = now
         resolved.append(p)
     if resolved:
@@ -223,18 +235,29 @@ async def resolve_due(force: bool = False) -> list:
 
 
 def calibration() -> dict:
-    """Agora's track record — hit-rate overall and split by its own stated confidence."""
+    """Agora's track record — hit-rate, mean Brier, and a confidence split. A resolution counts
+    only if it matured at least the minimum age; a same-day re-measure is VOID (not skill)."""
     preds = _load()
-    done = [p for p in preds if p.get("status") in ("correct", "incorrect")]
+
+    def _valid(p):
+        return (p.get("status") in ("correct", "incorrect")
+                and (p.get("resolved_ts", 0) - p.get("made_ts", 0)) >= _MIN_RESOLVE_AGE)
+
+    done = [p for p in preds if _valid(p)]
+    pending = [p for p in preds if p.get("status") == "pending"]
+    voided = sum(1 for p in preds if p.get("status") in ("correct", "incorrect") and not _valid(p))
     correct = sum(1 for p in done if p["status"] == "correct")
+    briers = [p["brier"] for p in done if isinstance(p.get("brier"), (int, float))]
+    brier = round(sum(briers) / len(briers), 3) if briers else None
     bins = {"low (<50%)": [0, 0], "med (50-75%)": [0, 0], "high (>75%)": [0, 0]}
     for p in done:
         c = p.get("confidence", 0.5)
         b = "low (<50%)" if c < 0.5 else ("med (50-75%)" if c <= 0.75 else "high (>75%)")
         bins[b][0] += 1
         bins[b][1] += 1 if p["status"] == "correct" else 0
-    return {"total": len(preds), "resolved": len(done), "pending": len(preds) - len(done),
+    return {"total": len(preds), "resolved": len(done), "pending": len(pending), "voided": voided,
             "correct": correct, "hit_rate": (correct / len(done)) if done else None,
+            "brier": brier,
             "by_confidence": {k: f"{v[1]}/{v[0]}" for k, v in bins.items() if v[0]}}
 
 
@@ -244,8 +267,11 @@ def format_predictions(limit: int = 8) -> str:
     lines = ["🔮 *Prediction Ledger*"]
     if cal["resolved"]:
         hr = f"{cal['hit_rate']:.0%}" if cal["hit_rate"] is not None else "—"
-        lines.append(f"_Track record: {cal['correct']}/{cal['resolved']} correct ({hr}) · "
+        br = f" · Brier {cal['brier']:.3f}" if cal.get("brier") is not None else ""
+        lines.append(f"_Track record: {cal['correct']}/{cal['resolved']} correct ({hr}){br} · "
                      f"{cal['pending']} pending_")
+    else:
+        lines.append(f"_Track record: 0 resolved yet · {cal['pending']} pending (maturing)_")
     icon = {"correct": "✅", "incorrect": "❌", "pending": "⏳"}
     for p in preds[:limit]:
         lines.append(f"{icon.get(p['status'], '•')} *{p['direction']}* {p['metric_label']} for "
