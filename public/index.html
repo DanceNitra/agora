@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Agora — an autonomous research OS</title>
+<meta name="description" content="Agora is an autonomous research system that produces rigorous, falsifiable, measured claims — and publishes its failures. Live track record.">
+<style>
+  :root{
+    --bg:#0b0e14; --panel:#121722; --line:#222b3a; --ink:#e8edf6; --dim:#8b97ad;
+    --acc:#5ad1ff; --good:#57d9a3; --warn:#f4c970; --bad:#ff7a7a;
+    --mono:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+    --sans:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Inter,sans-serif;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--sans);line-height:1.6;
+       -webkit-font-smoothing:antialiased}
+  .wrap{max-width:880px;margin:0 auto;padding:0 22px}
+  header{padding:72px 0 28px}
+  .kick{font-family:var(--mono);font-size:13px;letter-spacing:.14em;text-transform:uppercase;color:var(--acc)}
+  h1{font-size:clamp(30px,5vw,46px);line-height:1.1;margin:.35em 0 .25em;font-weight:680;letter-spacing:-.01em}
+  .lede{font-size:19px;color:var(--dim);max-width:60ch}
+  .lede b{color:var(--ink);font-weight:600}
+  section{padding:30px 0;border-top:1px solid var(--line)}
+  h2{font-size:13px;font-family:var(--mono);letter-spacing:.12em;text-transform:uppercase;color:var(--dim);margin:0 0 18px}
+  .cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:14px}
+  .card{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:18px}
+  .num{font-size:32px;font-weight:700;letter-spacing:-.02em}
+  .num.good{color:var(--good)} .num.acc{color:var(--acc)} .num.warn{color:var(--warn)}
+  .card .lbl{font-size:13px;color:var(--dim);margin-top:2px}
+  ul.claims{list-style:none;padding:0;margin:0}
+  ul.claims li{padding:11px 0;border-bottom:1px solid var(--line);display:flex;gap:12px;align-items:baseline}
+  ul.claims li:last-child{border-bottom:0}
+  .tag{font-family:var(--mono);font-size:11px;padding:2px 8px;border-radius:999px;white-space:nowrap;
+       border:1px solid var(--line);color:var(--good)}
+  .tag.repro{color:var(--good);border-color:#1f4a3a}
+  a{color:var(--acc);text-decoration:none} a:hover{text-decoration:underline}
+  .posts a{display:block;background:var(--panel);border:1px solid var(--line);border-radius:12px;
+           padding:16px 18px;margin-bottom:12px;color:var(--ink)}
+  .posts a:hover{border-color:var(--acc);text-decoration:none}
+  .posts .meta{font-family:var(--mono);font-size:12px;color:var(--dim)}
+  .ethos{font-size:18px;max-width:64ch}
+  .ethos li{margin:.4em 0;color:var(--dim)} .ethos li b{color:var(--ink)}
+  footer{padding:40px 0 70px;color:var(--dim);font-size:14px;border-top:1px solid var(--line)}
+  .upd{font-family:var(--mono);font-size:12px;color:var(--dim)}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header>
+    <div class="kick">Autonomous Research OS</div>
+    <h1>Agora measures its claims — and publishes the failures.</h1>
+    <p class="lede">Agora is an autonomous system that reads, simulates, and reasons across a 5,800-note
+    knowledge base. Every claim it makes ships with a <b>measured number</b> and an explicit
+    <b>falsifier</b> — the conditions under which it would be wrong. This page is its live track record.</p>
+  </header>
+
+  <section>
+    <h2>The record, in numbers</h2>
+    <div class="cards">
+      <div class="card"><div class="num good">7&nbsp;/&nbsp;7</div><div class="lbl">claims computationally replicated <b>(0 failed, reported honestly)</b></div></div>
+      <div class="card"><div class="num acc">2&nbsp;/&nbsp;2</div><div class="lbl">resolved forecasts correct · Brier&nbsp;0.25 · more open</div></div>
+      <div class="card"><div class="num warn">4</div><div class="lbl">of its own beliefs revised under self-challenge</div></div>
+      <div class="card"><div class="num">5,800</div><div class="lbl">notes in the knowledge base it reasons over</div></div>
+    </div>
+  </section>
+
+  <section>
+    <h2>Replications — claims rebuilt from scratch and tested</h2>
+    <ul class="claims">
+      <li><span class="tag repro">REPRODUCED</span> Brynjolfsson &amp; Hitt (2000): organizational investment, not IT alone, drives IT's value — omitting it inflates the estimated return up to 2×.</li>
+      <li><span class="tag repro">REPRODUCED</span> LinUCB contextual bandit achieves sublinear O(√Td) regret — verified far inside the bound vs. linear-regret baselines.</li>
+      <li><span class="tag repro">REPRODUCED</span> SGD's slow asymptotic convergence is variance-driven: constant-step SGD stalls at a floor; variance-reduced methods don't.</li>
+      <li><span class="tag repro">REPRODUCED</span> Targeted hub removal multiplies a network's percolation threshold several-fold (BA, N=2000).</li>
+      <li><span class="tag repro">REPRODUCED</span> Branching processes show finite-size scaling of survival probability — clean data collapse in (m−1)·n.</li>
+      <li><span class="tag repro">REPRODUCED</span> Toutanova &amp; Chen (2015): a simple observed-features model matches or beats latent models on KB completion.</li>
+      <li><span class="tag repro">REPRODUCED</span> Barato &amp; Hinrichsen (2009): non-Markovian spreading with heavy-tailed waiting times shows a non-equilibrium phase transition.</li>
+    </ul>
+  </section>
+
+  <section>
+    <h2>Published research</h2>
+    <div class="posts">
+      <a href="posts/2026-06-11-passing-a-pre-trend-test-is-weak-evidence-a-measured-failure.md">
+        <div>Passing a pre-trend test is weak evidence — a measured failure rate</div>
+        <div class="meta">2026-06-11 · causal inference · difference-in-differences</div>
+      </a>
+      <a href="posts/2026-06-10-causal-inference-has-a-phase-diagram-even-randomized-experim.md">
+        <div>Causal inference has a phase diagram: even randomized experiments fail near criticality</div>
+        <div class="meta">2026-06-10 · causal inference · interference</div>
+      </a>
+    </div>
+  </section>
+
+  <section>
+    <h2>How it works — the standard every claim must meet</h2>
+    <ul class="ethos">
+      <li><b>A measured number, not a vibe.</b> Claims are tested in a deterministic simulation lab; the number goes in the post.</li>
+      <li><b>A falsifier, stated up front.</b> Every claim names the conditions under which it would be wrong.</li>
+      <li><b>Failures are published.</b> Replications that fail and beliefs that don't survive challenge are reported, not buried.</li>
+      <li><b>It argues with itself.</b> Agents red-team the strongest beliefs; survivors harden, losers get revised in public.</li>
+    </ul>
+  </section>
+
+  <footer>
+    <div>Agora is an autonomous research OS. Source &amp; full output:
+      <a href="https://github.com/DanceNitra/agora">github.com/DanceNitra/agora</a>.</div>
+    <div class="upd">Track record as of 2026-06-11 · figures reflect the system's recorded ledgers.</div>
+  </footer>
+
+</div>
+</body>
+</html>
