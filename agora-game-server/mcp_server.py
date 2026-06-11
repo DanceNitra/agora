@@ -678,24 +678,34 @@ _ROLE_CONTRIB = {
 
 
 async def _pick_collab_seed():
-    """Rotate the seed across the real research surface (findings / gaps / bridges) so topics vary."""
-    i = _collab_rot["i"] % 3
+    """Rotate the seed across the real research surface. The FRONTIER (under-explored thin
+    domains + structural holes) gets 2 of every 4 slots so research is pushed to the EDGE, not
+    the dense centre the agents churn on; findings/gaps/bridges fill the other two."""
+    i = _collab_rot["i"] % 4
     _collab_rot["i"] += 1
     try:
-        if i == 0:
+        if i in (0, 2):                                   # FRONTIER — priority, novelty by default
+            d = await asyncio.to_thread(_brain_get_sync, "/api/v1/agent-os/brain/frontier-seed", 75)
+            t = (d or {}).get("target") or {}
+            if t.get("target"):
+                kind = "frontier-hole" if t.get("kind") == "hole" else "frontier-thin"
+                return (kind, t["target"][:80], t.get("prompt", "")[:300])
+            # frontier exhausted (everything bridged/developed) → fall through to a finding
+        if i == 1:
+            d = await asyncio.to_thread(_brain_get_sync, "/api/v1/agent-os/brain/gaps?n=8")
+            gs = (d or {}).get("gaps", [])
+            if gs:
+                g = random.choice(gs)
+                return ("gap", g["title"][:80], f"The vault is thin on: {g['title']}")
+        if i == 3:
             d = await asyncio.to_thread(_brain_get_sync, "/api/v1/agent-os/brain/collective?limit=8")
             ks = [k for k in (d or {}).get("knowledge", []) if (k.get("content") or "")]
             if ks:
                 k = random.choice(ks)
                 title = (k.get("title") or "a recent finding").replace("Pipeline: ", "").strip()
                 return ("finding", title[:80], (k.get("content") or "")[:240])
-        elif i == 1:
-            d = await asyncio.to_thread(_brain_get_sync, "/api/v1/agent-os/brain/gaps?n=8")
-            gs = (d or {}).get("gaps", [])
-            if gs:
-                g = random.choice(gs)
-                return ("gap", g["title"][:80], f"The vault is thin on: {g['title']}")
-        else:
+        # any slot can fall back to a bridge seed if its own source came up empty
+        if True:
             d = await asyncio.to_thread(
                 _brain_get_sync, "/api/v1/agent-os/brain/bridges?n=4&rationale=false")
             bs = (d or {}).get("bridges", [])

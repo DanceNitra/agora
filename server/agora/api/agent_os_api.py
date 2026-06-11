@@ -1250,6 +1250,26 @@ async def brain_replications():
     return {"status": "ok", "report": format_replications(), "items": _load()[-12:]}
 
 
+@router.get("/brain/frontier-seed")
+async def brain_frontier_seed():
+    """THE FRONTIER — an under-explored vault target (thin domain or structural hole) to aim
+    research at the EDGE, breaking the agents' churn on dense clusters."""
+    import asyncio as _aio
+    from agora.config import settings
+    from agora.execution.frontier import frontier_target, record_seeded
+    vault = settings.vault_path or "C:/Users/Danculus/my-second-brain"
+    t = await _aio.to_thread(frontier_target, vault)
+    if t:
+        record_seeded(t["target"], t.get("kind", ""))
+    return {"status": "ok", "target": t}
+
+
+@router.get("/brain/frontier")
+async def brain_frontier():
+    from agora.execution.frontier import format_frontier, _load
+    return {"status": "ok", "report": format_frontier(), "items": _load()[-12:]}
+
+
 @router.get("/brain/cartography-hole")
 async def brain_cartography_hole():
     """THE CARTOGRAPHER — the widest un-charted structural hole between vault domains."""
