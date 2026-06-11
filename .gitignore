@@ -37,3 +37,6 @@ agora-game-server/_dungeon.err
 # those are durable research artifacts, committed as a record, not ignored.
 # EXCEPT audit clones: foreign repos we measure are not ours to commit.
 agora_output/audits/
+
+# Dungeon agents mnemo working memory (runtime state)
+agora-game-server/.agent_memory/

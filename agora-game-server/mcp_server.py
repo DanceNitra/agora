@@ -516,6 +516,43 @@ def _persona(eid: str) -> str:
     return _PERSONA.get(eid, "a weary dungeon dweller")
 
 
+# ── Dogfood: the agents' working memory runs on mnemo (Agora's own open-source memory layer) ──
+# Each agent gets a mnemo store; recall is value-ranked (relevance × accrued value), not recency.
+# Guarded so a missing/broken mnemo never takes the dungeon down — it falls back to the plain list.
+try:
+    sys.path.insert(0, str(Path(__file__).resolve().parent.parent / "mnemo"))
+    from mnemo import Mnemo as _Mnemo
+except Exception:
+    _Mnemo = None
+_AGENT_MEM_DIR = Path(__file__).resolve().parent / ".agent_memory"
+_agent_mem_stores: dict = {}
+
+
+def _agent_mnemo(eid: str):
+    if _Mnemo is None:
+        return None
+    m = _agent_mem_stores.get(eid)
+    if m is None:
+        try:
+            _AGENT_MEM_DIR.mkdir(exist_ok=True)
+            m = _Mnemo(str(_AGENT_MEM_DIR / f"{eid}.json"))
+            _agent_mem_stores[eid] = m
+        except Exception:
+            return None
+    return m
+
+
+def _recall_mem(eid: str, query: str, k: int = 4) -> str:
+    """Value-ranked recall from the agent's mnemo store — relevant past work, not just recent."""
+    m = _agent_mnemo(eid)
+    if m is None:
+        return ""
+    try:
+        return " | ".join(h.get("text", "") for h in m.recall(query, k=k))
+    except Exception:
+        return ""
+
+
 def _llm_content_sync(system: str, user: str) -> str | None:
     """Blocking OpenRouter call → raw assistant message content, or None on failure."""
     if not _LLM_ON:
@@ -2842,6 +2879,12 @@ async def ambient_life():
     def remember(eid, text):
         memory.setdefault(eid, []).append(text)
         memory[eid] = memory[eid][-8:]
+        m = _agent_mnemo(eid)                       # dogfood: persist into the agent's mnemo store
+        if m is not None:
+            try:
+                m.remember(str(text)[:300], tags=[eid])
+            except Exception:
+                pass
 
     def note_event(text):
         world_events.append(text)
@@ -3153,7 +3196,10 @@ async def ambient_life():
             nearby = [_AGENT_NAMES.get(o, o) for o, e in engine.state.entities.items()
                       if o != eid and abs(e.x - cx) + abs(e.y - cy) <= 8]
             locs = ", ".join(locations.keys())
-            mem = " | ".join(memory.get(eid, [])[-4:]) or "(nothing yet)"
+            # Value-ranked recall from the agent's mnemo store (relevant past work), with the plain
+            # recency list as a fallback when mnemo is empty/unavailable.
+            _q = f"{_ROLE_HINT.get(eid, '')} {(memory.get(eid) or ['research'])[-1]}"
+            mem = _recall_mem(eid, _q) or " | ".join(memory.get(eid, [])[-4:]) or "(nothing yet)"
             done = " | ".join(quest_log.get(eid, [])[-6:]) or "(none yet)"
             news = " | ".join(world_events[-4:]) or "(quiet)"
             # Pull the agent's real mind (memory/emotion/vault) from server/agora.
@@ -3292,6 +3338,19 @@ async def ambient_life():
                 asyncio.create_task(_run_consolidation("scholar", _stm.get("scholar", 0.5)))
             if loop_n % 17000 == 300 and not orchestration["running"]:  # Aldric: doctrine + GitHub (~4 h)
                 asyncio.create_task(_run_orchestration("king", _stm.get("king", 0.5)))
+
+        # Dogfood: run mnemo's consolidation "dream pass" over each agent's memory (~every 28 min) —
+        # value-rank under a keep-budget + link near-duplicates. Agora's product, on Agora's agents.
+        if loop_n % 2000 == 123 and _Mnemo is not None:
+            def _consolidate_agent_mem():
+                for _eid in list(_AGENT_NAMES):
+                    mm = _agent_mnemo(_eid)
+                    if mm is not None:
+                        try:
+                            mm.consolidate(keep=150)
+                        except Exception:
+                            pass
+            asyncio.create_task(asyncio.to_thread(_consolidate_agent_mem))
 
         # SURFACE every agent's REAL brain work into the build log (~every 30 s, offset cadence),
         # so the keep shows Rooke replicating, Wren bridging, Orin theorising — not only the curator.
