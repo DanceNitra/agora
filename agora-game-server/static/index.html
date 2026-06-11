@@ -155,6 +155,10 @@ import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 import { OBJLoader } from 'three/addons/loaders/OBJLoader.js';
 import { MTLLoader } from 'three/addons/loaders/MTLLoader.js';
 import * as SkeletonUtils from 'three/addons/utils/SkeletonUtils.js';
+import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js';
+import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';
+import { UnrealBloomPass } from 'three/addons/postprocessing/UnrealBloomPass.js';
+import { OutputPass } from 'three/addons/postprocessing/OutputPass.js';
 
 // === SETUP ===
 const scene = new THREE.Scene();
@@ -177,6 +181,22 @@ renderer.toneMapping = THREE.ACESFilmicToneMapping;   // clean colour grading (B
 renderer.toneMappingExposure = 1.45;
 document.body.prepend(renderer.domElement);
 
+// ── Stage 1 post-FX: bloom (torches/emissives glow). OutputPass applies the renderer's
+// tone-mapping + sRGB as the LAST step (composer buffers stay linear, so no double
+// tone-map). One-line revert: set BLOOM = false. ──
+const BLOOM = true;
+let composer = null, bloomPass = null;
+if (BLOOM) {
+  composer = new EffectComposer(renderer);
+  composer.setPixelRatio(renderer.getPixelRatio());
+  composer.addPass(new RenderPass(scene, camera));
+  bloomPass = new UnrealBloomPass(
+    new THREE.Vector2(window.innerWidth, window.innerHeight),
+    0.55 /* strength */, 0.7 /* radius */, 0.85 /* threshold */);
+  composer.addPass(bloomPass);
+  composer.addPass(new OutputPass());
+}
+
 const statusEl = document.getElementById('status');
 const loadingEl = document.getElementById('loading');
 
@@ -185,6 +205,10 @@ if (!renderer.getContext()) {
 } else {
   const controls = new OrbitControls(camera, renderer.domElement);
   controls.target.set(0, 0, 0);
+  // Stage 2: protect the iso look in a demo — pan + clamped zoom only, no free orbit.
+  controls.enableRotate = false;
+  controls.screenSpacePanning = true;
+  controls.minZoom = 0.6; controls.maxZoom = 3.0;
   controls.update();
 
   // ── Night: one cool moonlight key + low cool ambient (B5). Torches add warmth. ──
@@ -1475,7 +1499,8 @@ if (!renderer.getContext()) {
     }
 
     controls.update();
-    renderer.render(scene, camera);
+    if (composer) composer.render();
+    else renderer.render(scene, camera);
   }
   animate();
 }
@@ -1485,6 +1510,10 @@ window.addEventListener('resize', () => {
   camera.left = -d * a; camera.right = d * a;
   camera.updateProjectionMatrix();
   renderer.setSize(window.innerWidth, window.innerHeight);
+  if (composer) {
+    composer.setSize(window.innerWidth, window.innerHeight);
+    bloomPass.setSize(window.innerWidth, window.innerHeight);
+  }
 });
 </script>
 </body>
