@@ -448,12 +448,38 @@ async def vault_search(q: str, k: int = 8):
 @router.get("/brain/gaps")
 async def brain_gaps(n: int = 10):
     """The user's underdeveloped areas — isolated-but-substantive notes (seeds never grown) —
-    so agents can do GAP-DRIVEN research aimed at what the user actually lacks."""
+    so agents can do GAP-DRIVEN research aimed at what the user actually lacks.
+
+    ROTATION: find_gaps() sorts most-isolated-first, deterministically, and researching a gap does
+    not relink the note — so a broad isolated note (e.g. 'Malware Analysis') stays at the top and
+    gets picked forever. We pull a WIDER pool and order it least-recently-served first, so agents
+    cover the whole isolated set instead of fixating on the few broadest never-closing notes."""
     global _SEM_INDEX
+    import json
+    import time
     from agora.execution.semantic_index import SemanticIndex
     if _SEM_INDEX is None or not _SEM_INDEX.ready:
         _SEM_INDEX = SemanticIndex()
-    return {"status": "ok", "gaps": _SEM_INDEX.find_gaps(n) if _SEM_INDEX.ready else []}
+    if not _SEM_INDEX.ready:
+        return {"status": "ok", "gaps": []}
+    pool = _SEM_INDEX.find_gaps(max(n * 4, 40))         # wide candidate pool, not just the top n
+    store = Path(__file__).resolve().parents[2] / ".gap_rotation.json"
+    now = time.time()
+    try:
+        served = json.loads(store.read_text(encoding="utf-8"))
+    except Exception:
+        served = {}
+    # least-recently-served first (never-served = 0 = highest priority), tie-break by isolation
+    pool.sort(key=lambda g: (served.get(g["title"], 0.0), -g.get("isolation", 0.0)))
+    chosen = pool[:n]
+    for g in chosen:
+        served[g["title"]] = now
+    try:
+        store.write_text(json.dumps({k: v for k, v in served.items()
+                                     if now - v <= 7 * 86400}), encoding="utf-8")  # forget after a week
+    except Exception:
+        pass
+    return {"status": "ok", "gaps": chosen}
 
 
 @router.get("/brain/believe")
