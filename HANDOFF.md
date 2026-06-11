@@ -2,6 +2,40 @@
 
 > Resume doc for a fresh Claude Code session. Chat in **Slovak**; code + user-facing strings **English**.
 
+## ⚡⚡ RESUME HERE (2026-06-11 EVENING — latest)
+
+**This session pivoted Agora from internal research OS → a public, credibility-earning FIRM, and
+shipped the first product.** Memory auto-loads strategy (`agora-roadmap-firm-os`,
+`agora-frontier-direction`, `agora-outward-engagement`, `verify-ui-with-headless-edge`).
+
+**System:** Brain = `uvicorn agora.main:app` :8000; Dungeon = `python -u mcp_server.py` in
+`agora-game-server/`. Check vitals → 200, ONE of each `python3.12`. /loop runs ~10 min. **Batch edits
+to avoid repeated dungeon restarts** (each restart re-fires startup tasks → morning-report spam).
+
+**Firm roadmap status:**
+- **A1 storefront — LIVE:** `https://dancenitra.github.io/agora/` (source = `index.html` at repo root;
+  Pages serves main/root, `.nojekyll`). Three.js orb + GSAP + theme toggle + a **Mnemosyne** section.
+- **A2 distribution — RUNNING:** 2 live gated-then-posted outreach threads — zeroclaw#5849 (got 🚀) +
+  jerseycheese/Narraitor#441. Envoy watches replies. **OPEN: pick broad channel (X/blog/HN).**
+- **A3 track record — fixed:** Oracle retargeted to AI/tech/science markets (edge) not crypto
+  (`oracle.py _DOMAIN_RX`); resolvers auto-run; record grows ~2 wks. 8 REPRODUCED / 0 FAILED reps.
+- **A5 product — DEFINED + BUILT:** open-source **memory layer for AI agents**, founder-first,
+  open-core, credibility vehicle. **Mnemosyne** (handle `mnemo`): `mnemo/mnemo.py` (zero-dep ref impl,
+  dogfooded), `mnemo/README.md`, storefront section.
+- **Posts:** rebuilt as beautiful **EN/SK bilingual** SEO-slugged HTML via `tools/render_post.py`
+  (`public/posts/src/{name}.{en,sk}.md` → `{slug}.html`; computed read-time).
+
+**NEXT (priority):**
+1. OWNER DECISIONS: A2 channel; auto-post policy (all outreach/press currently GATED → `approve <id>`).
+2. **Wire `tools/render_post.py` into the Press organ** so future posts auto-render bilingual HTML.
+3. Mnemosyne MCP server (any agent uses `mnemo` as memory) + examples.
+4. Inbox task `8da953` (Lee-Spekkens causal-geometry synthesis) — loop will take it.
+
+**Gotchas:** screenshot UI before claiming done (headless Edge, see memory); Telegram one-liners ASCII
+from `server/.env`; vault push via `DUNGEON_AUTOPUSH=1 python -X utf8 tools/safe_vault_push.py "msg"`.
+
+---
+
 ## ⚡ RESUME HERE (2026-06-10)
 **Read first:** auto-memory `agora-session-state.md` (the freshest, fullest state — 8 frontier waves
 detailed) + `HANDOFF_LOOP_PROMPT.txt` (verbatim loop prompt to paste).
