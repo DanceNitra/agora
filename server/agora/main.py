@@ -1215,8 +1215,14 @@ async def tick_loop(app: FastAPI):
             except Exception as e:
                 print(f"[LifecycleHooks] Post-tick error: {e}")
 
-            # Only 1-2 agents think per tick (parallel LLM calls, global pool)
-            thinking_agents = random.sample(agents, min(2, len(agents)))
+            # THROTTLE: roleplay cognition is a 0-direct-value cost centre (see Metabolism). Cap
+            # how often and how many agents think per tick; the freed flash rate-limit headroom
+            # flows to the value-producing organs that share the same API budget.
+            if random.random() < settings.roleplay_think_pct:
+                n_think = max(1, min(settings.roleplay_agents_per_tick, len(agents)))
+                thinking_agents = random.sample(agents, n_think)
+            else:
+                thinking_agents = []
             # ── 4. PROCESS THOUGHTS (global — LLM inferences batch) ──
             # Prepare contexts and parameters for all thinking agents
             thinking_params = []

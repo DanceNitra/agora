@@ -9,6 +9,12 @@ class Settings(BaseSettings):
     use_redis: bool = False
     tick_interval: int = 10
     max_agents: int = 30
+    # Roleplay-cognition throttle (the tick-loop "thinking" is a 0-direct-value cost centre that
+    # shares the flash rate-limit with the value-producing organs). think_pct = fraction of ticks
+    # on which agents think at all; agents_per_tick = how many think when they do. Lowering either
+    # frees flash budget for research/replication/prediction. 1.0 + 2 reproduces the old behaviour.
+    roleplay_think_pct: float = 0.5
+    roleplay_agents_per_tick: int = 1
     debug: bool = True
     api_key: str = ""
     api_base_url: str = "https://api.deepseek.com/v1"
