@@ -333,12 +333,22 @@ async def promote_findings(request: Request, n: int = 3):
     ranked = await asyncio.to_thread(_score_all)
 
     # 3) promote the top-valued candidates that pass the quality gate
-    promoted, checked = [], 0
+    promoted, checked, deduped = [], 0, 0
+    import asyncio as _asyncio
     for _v, title, content in ranked:
         if len(promoted) >= n:
             break
         _PROMOTED.add(title)
         checked += 1
+        # DEDUP-AWARE: don't burn the slot on a near-duplicate of an existing vault note — the
+        # write would be silently skipped anyway, leaving "promoted" inflated and 0 notes landed.
+        # Skip it and try the next-best NOVEL candidate (reuses the writer's own dedup metric).
+        try:
+            if await _asyncio.to_thread(writer._find_duplicate, title, content):
+                deduped += 1
+                continue
+        except Exception:
+            pass
         q = await assess_quality(title, content)
         if not q["pass"]:
             continue
@@ -350,7 +360,8 @@ async def promote_findings(request: Request, n: int = 3):
             pass
     _PROMOTE_STATS["promoted"] += len(promoted)
     _PROMOTE_STATS["checked"] += checked
-    return {"status": "ok", "promoted": len(promoted), "checked": checked, "titles": promoted}
+    return {"status": "ok", "promoted": len(promoted), "checked": checked,
+            "deduped": deduped, "titles": promoted}
 
 
 _VERIFIED: set = set()   # finding titles already fact-checked (so we work through the backlog)
