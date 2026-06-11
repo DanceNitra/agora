@@ -94,12 +94,19 @@ class Mnemo:
         return mid
 
     # ── retrieval (value-ranked) ──────────────────────────────────────────────
-    def _similarity(self, query: str, rec: dict) -> float:
-        if self.embed and rec.get("vec"):
-            try:
-                return max(0.0, _cosine(self.embed(query), rec["vec"]))
-            except Exception:
-                pass
+    def _qvec(self, query: str):
+        """Embed a query ONCE per scan, or None (no embedder / failure). Callers pass the result
+        into _similarity so a recall over N memories costs 1 embedding, not N."""
+        if not self.embed:
+            return None
+        try:
+            return self.embed(query)
+        except Exception:
+            return None
+
+    def _similarity(self, query: str, rec: dict, qvec=None) -> float:
+        if qvec is not None and rec.get("vec"):
+            return max(0.0, _cosine(qvec, rec["vec"]))
         q, t = _tokens(query), _tokens(rec["text"])
         if not q or not t:
             return 0.0
@@ -108,9 +115,10 @@ class Mnemo:
     def recall(self, query: str, k: int = 6, include_superseded: bool = False) -> list[dict]:
         """Top-k memories by RELEVANCE × VALUE — high-value memories outrank merely-similar ones."""
         pool = [r for r in self.items if include_superseded or r["status"] == "active"]
+        qvec = self._qvec(query)                     # embed the query once, reuse across the pool
         scored = []
         for r in pool:
-            sim = self._similarity(query, r)
+            sim = self._similarity(query, r, qvec)
             if sim <= 0:
                 continue
             score = sim * (1.0 + math.log1p(max(0.0, r["value"])))
@@ -135,10 +143,11 @@ class Mnemo:
         linked = 0
         # link near-duplicates to the higher-value memory (so retrieval can dedup, not delete)
         for i, a in enumerate(active):
+            avec = self._qvec(a["text"])             # embed each anchor once, not once per partner
             for b in active[i + 1:]:
                 if b["id"] in a["links"]:
                     continue
-                if self._similarity(a["text"], b) >= dup_threshold:
+                if self._similarity(a["text"], b, avec) >= dup_threshold:
                     a["links"].append(b["id"]); linked += 1
         staled = 0
         if keep is not None and len(active) > keep:
@@ -156,8 +165,9 @@ class Mnemo:
         active = [r for r in self.items if r["status"] == "active"]
         flags = []
         for i, a in enumerate(active):
+            avec = self._qvec(a["text"])             # embed each anchor once, not once per partner
             for b in active[i + 1:]:
-                if self._similarity(a["text"], b) >= sim_threshold and inc(a["text"], b["text"]):
+                if self._similarity(a["text"], b, avec) >= sim_threshold and inc(a["text"], b["text"]):
                     flags.append({"a": a["id"], "b": b["id"],
                                   "a_text": a["text"][:120], "b_text": b["text"][:120]})
         return flags
