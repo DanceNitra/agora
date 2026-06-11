@@ -3337,16 +3337,16 @@ async def ambient_life():
         if loop_n % 850 == 350:
             asyncio.create_task(_run_reality_check())
         # Insight Engine — Agora queues a rich theme for Claude to synthesize (~95 min, premium).
-        if loop_n % 6700 == 1100:
+        if loop_n % 3400 == 1100:
             asyncio.create_task(_queue_insight_theme())
         # Flywheel — queue an insight's falsifier for Claude to re-test + deepen (~80 min).
-        if loop_n % 5600 == 1500:
+        if loop_n % 2800 == 1500:
             asyncio.create_task(_queue_deepening())
         # Prediction Ledger — resolve due predictions + queue a new one for Claude (~90 min).
         if loop_n % 6300 == 1500:
             asyncio.create_task(_run_predictions())
         # Dialectic — queue a contentious claim for Claude to stress-test (~80 min, offset).
-        if loop_n % 5600 == 400:
+        if loop_n % 2800 == 400:
             asyncio.create_task(_queue_dialectic())
         # The Agora Mind — metacognitive reflection: synthesize the worldview + self-direct (~daily).
         if loop_n % 64000 == 33000:
@@ -3410,19 +3410,19 @@ async def ambient_life():
         # (at most one of its kind pending). Cadence is matched to Claude's realistic drain
         # rate (~1 wake/15 min, a few tasks each) so the bench stays stocked WITHOUT a
         # perpetual backlog that starves low-priority work. ~0.85s/tick → ~75-110 min, staggered.
-        if loop_n % 7000 == 900:                       # Analogy Forge  (~100 min)
+        if loop_n % 3500 == 900:                       # Analogy Forge  (~50 min)
             asyncio.create_task(_queue_analogy_forge())
-        if loop_n % 6500 == 1200:                      # Belief revision  (~92 min)
+        if loop_n % 3300 == 1200:                      # Belief revision  (~47 min)
             asyncio.create_task(_queue_belief_challenge())
         if loop_n % 5500 == 2100:                      # The Court — structured debate  (~78 min)
             asyncio.create_task(_run_debate())
-        if loop_n % 5500 == 600:                       # Replication Unit (Rooke)  (~78 min)
+        if loop_n % 2800 == 600:                       # Replication Unit (Rooke)  (~40 min)
             asyncio.create_task(_queue_replication())
-        if loop_n % 6000 == 1700:                      # Cartographer (Wren)  (~85 min)
+        if loop_n % 3000 == 1700:                      # Cartographer (Wren)  (~43 min)
             asyncio.create_task(_queue_cartography())
         if loop_n % 6000 == 1100:                      # Kael's Red Team  (~85 min)
             asyncio.create_task(_run_red_team())
-        if loop_n % 5000 == 2600:                      # Orin's Synthesis Detector  (~70 min; fires only when due)
+        if loop_n % 2500 == 1200:                      # Orin's Synthesis Detector  (~35 min; fires only when due)
             asyncio.create_task(_run_synthesis_detector())
         if loop_n % 6500 == 800:                       # Elara's Coherence Audit  (~92 min, offset)
             asyncio.create_task(_run_coherence_audit())

@@ -146,6 +146,30 @@ class SemanticIndex:
                 break
         return gaps
 
+    def rotated_gaps(self, n: int = 10) -> list[dict]:
+        """find_gaps + least-recently-served rotation. Shared by the agents AND the reports so both
+        cycle through the whole isolated-note set instead of fixating on the deterministic top few
+        (the 'why do I still see the same gaps in the report' bug — reports called find_gaps directly)."""
+        import json as _json
+        import time as _time
+        pool = self.find_gaps(max(n * 8, 600))
+        store = Path(__file__).resolve().parents[2] / ".gap_rotation.json"
+        now = _time.time()
+        try:
+            served = _json.loads(store.read_text(encoding="utf-8"))
+        except Exception:
+            served = {}
+        pool.sort(key=lambda g: (served.get(g["title"], 0.0), -g.get("isolation", 0.0)))
+        chosen = pool[:n]
+        for g in chosen:
+            served[g["title"]] = now
+        try:
+            store.write_text(_json.dumps({k: v for k, v in served.items() if now - v <= 7 * 86400}),
+                             encoding="utf-8")
+        except Exception:
+            pass
+        return chosen
+
     @property
     def ready(self) -> bool:
         return self.vecs is not None and len(self.meta) > 0

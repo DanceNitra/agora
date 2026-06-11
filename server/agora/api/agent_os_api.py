@@ -462,24 +462,7 @@ async def brain_gaps(n: int = 10):
         _SEM_INDEX = SemanticIndex()
     if not _SEM_INDEX.ready:
         return {"status": "ok", "gaps": []}
-    pool = _SEM_INDEX.find_gaps(max(n * 8, 600))        # huge candidate pool (the vault has 1000+)
-    store = Path(__file__).resolve().parents[2] / ".gap_rotation.json"
-    now = time.time()
-    try:
-        served = json.loads(store.read_text(encoding="utf-8"))
-    except Exception:
-        served = {}
-    # least-recently-served first (never-served = 0 = highest priority), tie-break by isolation
-    pool.sort(key=lambda g: (served.get(g["title"], 0.0), -g.get("isolation", 0.0)))
-    chosen = pool[:n]
-    for g in chosen:
-        served[g["title"]] = now
-    try:
-        store.write_text(json.dumps({k: v for k, v in served.items()
-                                     if now - v <= 7 * 86400}), encoding="utf-8")  # forget after a week
-    except Exception:
-        pass
-    return {"status": "ok", "gaps": chosen}
+    return {"status": "ok", "gaps": _SEM_INDEX.rotated_gaps(n)}
 
 
 @router.get("/brain/believe")
@@ -587,7 +570,7 @@ async def brain_pulse(request: Request, hours: int = 4, notify: bool = False):
         global _SEM_INDEX
         if _SEM_INDEX is None or not _SEM_INDEX.ready:
             _SEM_INDEX = SemanticIndex()
-        gaps = _SEM_INDEX.find_gaps(3) if _SEM_INDEX.ready else []
+        gaps = _SEM_INDEX.rotated_gaps(3) if _SEM_INDEX.ready else []
     except Exception:
         pass
     report = format_pulse(p, gaps, _DIRECTIONS.get("directions", []))
@@ -2076,7 +2059,7 @@ async def _build_morning_report(app) -> str:
     global _SEM_INDEX
     if _SEM_INDEX is None or not _SEM_INDEX.ready:
         _SEM_INDEX = SemanticIndex()
-    gaps = _SEM_INDEX.find_gaps(4) if _SEM_INDEX.ready else []
+    gaps = _SEM_INDEX.rotated_gaps(4) if _SEM_INDEX.ready else []
 
     day = datetime.now(timezone.utc).strftime("%Y-%m-%d")
     lines = [f"☀️ *Agora — morning report* ({day})", ""]
