@@ -114,32 +114,84 @@ def md_to_html(md: str):
     return title, "\n".join(out), foot_html, words
 
 
+_MANIFEST = ROOT / "public" / "posts" / "posts.json"
+
+
+def _load_manifest() -> list:
+    try:
+        return json.loads(_MANIFEST.read_text(encoding="utf-8"))
+    except Exception:
+        return []
+
+
+def _upsert_manifest(entry: dict) -> None:
+    """One row per slug, newest first — the single source of truth for the index page."""
+    items = [x for x in _load_manifest() if x.get("slug") != entry["slug"]]
+    items.append(entry)
+    items.sort(key=lambda e: e.get("date", ""), reverse=True)
+    _MANIFEST.write_text(json.dumps(items, ensure_ascii=False, indent=1), encoding="utf-8")
+
+
+def _emit_html(m: dict, body_en, foot_en, body_sk, foot_sk, read: int, bilingual: bool) -> None:
+    """Write {slug}.html from the editorial template and record the post in the manifest.
+    Mono-lingual (bilingual=False) hides the language toggle and shows EN only."""
+    y, mo, d = m["date"].split("-")
+    datehuman = f"{_MONS[int(mo)]} {int(d)}, {y}"
+    title_sk = m.get("title_sk") or m["title"]
+    desc_sk = m.get("desc_sk") or m["desc"]
+    tags_sk = m.get("tags_sk") or m["tags"]
+    kicker_sk = m.get("kicker_sk") or m["kicker"]
+    jsonld = json.dumps({"@context": "https://schema.org", "@type": "Article",
+                         "headline": m["title"], "description": m["desc"], "datePublished": m["date"],
+                         "author": {"@type": "Organization", "name": "Agora"},
+                         "inLanguage": ["en", "sk"] if bilingual else ["en"],
+                         "url": f"{SITE}/posts/{m['slug']}.html"})
+    out = TEMPLATE.format(
+        mono="" if bilingual else " data-mono",
+        title=html.escape(m["title"]), title_sk=html.escape(title_sk),
+        desc=html.escape(m["desc"]), slug=m["slug"], site=SITE, jsonld=jsonld,
+        kicker=m["kicker"], kicker_sk=kicker_sk, datehuman=datehuman, read=read,
+        tags=m["tags"], tags_sk=tags_sk,
+        tldr=html.escape(m["desc"]), tldr_sk=html.escape(desc_sk),
+        body=body_en, body_sk=body_sk, foot=foot_en, foot_sk=foot_sk)
+    (ROOT / "public" / "posts" / f"{m['slug']}.html").write_text(out, encoding="utf-8")
+    _upsert_manifest({"slug": m["slug"], "title": m["title"], "title_sk": title_sk,
+                      "desc": m["desc"], "desc_sk": desc_sk, "date": m["date"],
+                      "tags": m["tags"], "tags_sk": tags_sk, "kicker": m["kicker"],
+                      "kicker_sk": kicker_sk, "read": read, "bilingual": bilingual})
+
+
 def render(key: str):
+    """Render a hand-curated bilingual post from public/posts/src/{key}.{en,sk}.md + META[key]."""
     m = META[key]
     src = ROOT / "public" / "posts" / "src"
     _, body_en, foot_en, words = md_to_html((src / f"{key}.en.md").read_text(encoding="utf-8"))
     _, body_sk, foot_sk, _ = md_to_html((src / f"{key}.sk.md").read_text(encoding="utf-8"))
     read = max(1, round(words / 200))
-    y, mo, d = m["date"].split("-")
-    datehuman = f"{_MONS[int(mo)]} {int(d)}, {y}"
-    jsonld = json.dumps({"@context": "https://schema.org", "@type": "Article",
-                         "headline": m["title"], "description": m["desc"], "datePublished": m["date"],
-                         "author": {"@type": "Organization", "name": "Agora"},
-                         "inLanguage": ["en", "sk"], "url": f"{SITE}/posts/{m['slug']}.html"})
-    out = TEMPLATE.format(
-        title=html.escape(m["title"]), title_sk=html.escape(m["title_sk"]),
-        desc=html.escape(m["desc"]), slug=m["slug"], site=SITE, jsonld=jsonld,
-        kicker=m["kicker"], kicker_sk=m["kicker_sk"], datehuman=datehuman, read=read,
-        tags=m["tags"], tags_sk=m["tags_sk"],
-        tldr=html.escape(m["desc"]), tldr_sk=html.escape(m["desc_sk"]),
-        body=body_en, body_sk=body_sk, foot=foot_en, foot_sk=foot_sk)
-    dst = ROOT / "public" / "posts" / f"{m['slug']}.html"
-    dst.write_text(out, encoding="utf-8")
-    return dst.name, m["slug"], read, words
+    _emit_html(m, body_en, foot_en, body_sk, foot_sk, read, bilingual=True)
+    return f"{m['slug']}.html", m["slug"], read, words
+
+
+def render_piece(d: dict):
+    """Render ONE post from an inline spec (the Press organ's auto-publish path). EN markdown in
+    d['body']; optional d['body_sk'] makes it bilingual, else it renders English-only."""
+    _, body_en, foot_en, words = md_to_html(d["body"])
+    read = max(1, round(words / 200))
+    bilingual = bool(d.get("body_sk"))
+    if bilingual:
+        _, body_sk, foot_sk, _ = md_to_html(d["body_sk"])
+    else:
+        body_sk, foot_sk = "", ""
+    m = {"slug": d["slug"], "title": d["title"], "title_sk": d.get("title_sk"),
+         "desc": d["desc"], "desc_sk": d.get("desc_sk"), "date": d["date"],
+         "tags": d.get("tags", ""), "tags_sk": d.get("tags_sk"),
+         "kicker": d.get("kicker", "Research"), "kicker_sk": d.get("kicker_sk")}
+    _emit_html(m, body_en, foot_en, body_sk, foot_sk, read, bilingual)
+    return d["slug"], read
 
 
 TEMPLATE = """<!DOCTYPE html>
-<html lang="en" data-lang="en">
+<html lang="en" data-lang="en"{mono}>
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -168,6 +220,7 @@ TEMPLATE = """<!DOCTYPE html>
   ::selection{{background:var(--acc-soft)}}
   a{{color:var(--acc);text-underline-offset:3px;text-decoration-thickness:1px}}
   [data-lang=en] .sk{{display:none}} [data-lang=sk] .en{{display:none}}
+  [data-mono] .lng{{display:none}}   /* English-only posts: hide the language toggle */
   .progress{{position:fixed;top:0;left:0;height:3px;width:0;background:var(--acc);z-index:50;transition:width .1s linear}}
   .topnav{{max-width:760px;margin:0 auto;padding:24px 24px;display:flex;justify-content:space-between;align-items:center;
     font-family:var(--mono);font-size:12.5px;letter-spacing:.04em}}
@@ -383,10 +436,14 @@ INDEX_TEMPLATE = """<!DOCTYPE html>
 """
 
 
-def build_index(entries: list):
-    """Build the publication landing page (public/posts/index.html) from the rendered entries —
-    newest first, the latest post as the lead feature. Self-maintaining: new posts appear here."""
-    entries = sorted(entries, key=lambda e: e["date"], reverse=True)
+def build_index(entries: list | None = None):
+    """Build the publication landing page (public/posts/index.html) from the manifest (or an
+    explicit list) — newest first, the latest post as the lead feature. Self-maintaining: any post
+    rendered via render()/render_piece() is in the manifest, so it appears here automatically."""
+    entries = sorted(entries if entries is not None else _load_manifest(),
+                     key=lambda e: e.get("date", ""), reverse=True)
+    if not entries:
+        return None
     y, mo, d = entries[0]["date"].split("-")
     lead_date = f"{_MONS[int(mo)]} {int(d)}, {y}"
     f = entries[0]
@@ -405,7 +462,7 @@ def build_index(entries: list):
     <div class="k"><span class="en">{e['kicker']}</span><span class="sk">{e['kicker_sk']}</span></div>
     <h3><span class="en">{html.escape(e['title'])}</span><span class="sk">{html.escape(e['title_sk'])}</span></h3>
     <p class="ex"><span class="en">{html.escape(e['desc'])}</span><span class="sk">{html.escape(e['desc_sk'])}</span></p>
-    <div class="meta"><span>{dh}</span><span>{e['read']} min</span><span class="badge">EN · SK</span></div>
+    <div class="meta"><span>{dh}</span><span>{e['read']} min</span><span class="badge">{'EN · SK' if e.get('bilingual', True) else 'EN'}</span></div>
   </a>""")
     jsonld = json.dumps({"@context": "https://schema.org", "@type": "Blog",
                          "name": "Agora — Research & Writing", "url": f"{SITE}/posts/",
@@ -420,10 +477,16 @@ def build_index(entries: list):
 
 
 if __name__ == "__main__":
-    entries = []
-    for key in META:
-        name, slug, read, words = render(key)
-        print(f"wrote {name}  (slug: {slug}, {words} words, {read} min)")
-        entries.append({**META[key], "read": read, "words": words})
-    idx = build_index(entries)
-    print(f"wrote {idx.relative_to(ROOT)}  ({len(entries)} posts indexed)")
+    import sys
+    if len(sys.argv) >= 3 and sys.argv[1] == "--piece":
+        # Press auto-publish: render ONE post from a JSON spec, then rebuild the index.
+        spec = json.loads(Path(sys.argv[2]).read_text(encoding="utf-8"))
+        slug, read = render_piece(spec)
+        build_index()
+        print(f"wrote {slug}.html  ({read} min) + rebuilt index ({len(_load_manifest())} posts)")
+    else:
+        for key in META:
+            name, slug, read, words = render(key)
+            print(f"wrote {name}  (slug: {slug}, {words} words, {read} min)")
+        build_index()
+        print(f"wrote index.html  ({len(_load_manifest())} posts in manifest)")

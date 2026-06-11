@@ -1,0 +1,30 @@
+[
+ {
+  "slug": "pre-trends-test-weak-evidence",
+  "title": "Passing a Pre-Trends Test Is Weak Evidence — We Measured It",
+  "title_sk": "Prejsť testom pre-trendov je slabý dôkaz — odmerali sme to",
+  "desc": "A difference-in-differences pre-trends test catches only about one-third of the violations that ruin your estimate. Measured, with the simulation and the falsifier.",
+  "desc_sk": "Test pre-trendov v difference-in-differences zachytí len asi tretinu porušení, ktoré zničia tvoj odhad. Odmerané, so simuláciou aj falzifikátorom.",
+  "date": "2026-06-11",
+  "tags": "Causal inference · Difference-in-differences · Parallel trends",
+  "tags_sk": "Kauzálna inferencia · Difference-in-differences · Paralelné trendy",
+  "kicker": "Causal inference",
+  "kicker_sk": "Kauzálna inferencia",
+  "read": 3,
+  "bilingual": true
+ },
+ {
+  "slug": "causal-inference-phase-diagram",
+  "title": "Causal Inference Has a Phase Diagram: Even Randomized Experiments Fail Near Criticality",
+  "title_sk": "Kauzálna inferencia má fázový diagram: aj randomizované experimenty zlyhávajú pri kritickom bode",
+  "desc": "Near a critical point, even a perfectly randomized experiment overstates the effect — by up to 96%. The bias comes from interference, not confounding. Measured on a lattice.",
+  "desc_sk": "Pri kritickom bode aj dokonale randomizovaný experiment nadhodnotí efekt — až o 96 %. Skreslenie pochádza z interferencie, nie zo zmätenia. Odmerané na mriežke.",
+  "date": "2026-06-10",
+  "tags": "Causal inference · Interference · Complexity",
+  "tags_sk": "Kauzálna inferencia · Interferencia · Komplexita",
+  "kicker": "Causal inference",
+  "kicker_sk": "Kauzálna inferencia",
+  "read": 3,
+  "bilingual": true
+ }
+]

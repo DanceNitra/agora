@@ -13,6 +13,7 @@ from __future__ import annotations
 import json
 import re
 import subprocess
+import sys
 import time
 import uuid
 from pathlib import Path
@@ -42,6 +43,18 @@ def _slug(text: str) -> str:
     return re.sub(r"[ _]+", "-", s)[:60] or "post"
 
 
+def _derive_desc(body: str) -> str:
+    """First real paragraph of the piece → the post's SEO/og description + index excerpt."""
+    for para in (body or "").split("\n\n"):
+        t = para.strip()
+        if not t or t[0] in "#|>":
+            continue
+        t = re.sub(r"[*`#>\[\]]", "", t).replace("\n", " ").strip()
+        if len(t) > 40:
+            return t[:200]
+    return (body or "").strip()[:200]
+
+
 def save_piece(title: str, body: str, source_note: str = "") -> dict:
     """Store Claude's polished piece; the caller proposes the gated 'press' action around it."""
     rec = {"id": uuid.uuid4().hex[:6], "title": (title or "")[:160], "body": (body or "")[:12000],
@@ -63,19 +76,40 @@ def publish_piece(pid: str) -> dict:
     rec = next((x for x in items if x.get("id") == pid), None)
     if not rec or rec.get("status") not in ("draft", "proposed"):
         return {"error": "no publishable piece"}
-    fname = f"{time.strftime('%Y-%m-%d')}-{_slug(rec['title'])}.md"
-    rel = f"{POSTS_REL}/{fname}"
-    dst = AGORA_REPO / rel
+    slug = _slug(rec["title"])
+    date = time.strftime("%Y-%m-%d")
+    rel_md = f"{POSTS_REL}/{date}-{slug}.md"          # markdown source archive
+    dst = AGORA_REPO / rel_md
     dst.parent.mkdir(parents=True, exist_ok=True)
     footer = ("\n\n---\n*Published by [Agora](https://github.com/DanceNitra/agora), an "
               "autonomous research OS, with its owner's review and approval. Every claim above "
               "ships with the test that would kill it.*\n")
-    dst.write_text(rec["body"] + footer, encoding="utf-8")
+    body_md = rec["body"] + footer
+    dst.write_text(body_md, encoding="utf-8")
+
+    # Render the polished standalone HTML post + rebuild the publication index, reusing the same
+    # editorial template as the hand-curated posts (English-only renders mono-lingual).
+    html_rel = f"{POSTS_REL}/{slug}.html"
+    rendered = False
+    try:
+        spec = {"slug": slug, "title": rec["title"], "desc": _derive_desc(rec["body"]),
+                "date": date, "tags": "Research", "kicker": "Research", "body": body_md}
+        tmp = AGORA_REPO / "tools" / f"_press_{pid}.json"
+        tmp.write_text(json.dumps(spec, ensure_ascii=False), encoding="utf-8")
+        r = subprocess.run([sys.executable, "-X", "utf8",
+                            str(AGORA_REPO / "tools" / "render_post.py"), "--piece", str(tmp)],
+                           capture_output=True, text=True, timeout=120)
+        tmp.unlink(missing_ok=True)
+        rendered = r.returncode == 0
+    except Exception:
+        rendered = False
 
     def _git(*args):
         return subprocess.run(["git", "-C", str(AGORA_REPO), *args],
                               capture_output=True, text=True, timeout=60)
-    _git("add", rel)
+    add = [rel_md] + ([html_rel, f"{POSTS_REL}/index.html", f"{POSTS_REL}/posts.json"]
+                      if rendered else [])
+    _git("add", *add)
     c = _git("commit", "-m", f"Press: {rec['title'][:60]}")
     if "nothing to commit" in (c.stdout + c.stderr):
         return {"error": "nothing to commit (identical piece already published?)"}
@@ -83,10 +117,11 @@ def publish_piece(pid: str) -> dict:
     if p.returncode != 0:
         return {"error": ("push failed: " + (p.stderr or p.stdout))[:200]}
     rec["status"] = "published"
-    rec["url"] = f"{_REPO_URL}/{rel}"
+    rec["url"] = (f"https://dancenitra.github.io/agora/{html_rel}" if rendered
+                  else f"{_REPO_URL}/{rel_md}")
     rec["published_ts"] = time.time()
     _save(items)
-    return {"url": rec["url"]}
+    return {"url": rec["url"], "rendered": rendered}
 
 
 def pick_target(vault: str) -> dict | None:
