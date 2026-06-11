@@ -555,6 +555,18 @@ async def pick_self_upgrade(request: Request):
     return {"status": "queued", "id": tid, "title": u["title"]}
 
 
+@router.get("/brain/finding-diversity")
+async def brain_finding_diversity(request: Request, n: int = 60, threshold: float = 0.6,
+                                  notify: bool = False):
+    """Measure the RAW (pre-promotion) findings stream: near-duplicate rate + source concentration.
+    Turns 'the system keeps re-deriving the same findings' into a number we can watch over time."""
+    from agora.execution.finding_diversity import finding_diversity, format_diversity
+    d = await finding_diversity(request.app.state.db, n=n, threshold=threshold)
+    if notify:
+        await _send_telegram(format_diversity(d))
+    return {"status": "ok", **d}
+
+
 @router.get("/brain/pulse")
 async def brain_pulse(request: Request, hours: int = 4, notify: bool = False):
     """PULSE — a plain-language heartbeat: what's being researched + why, how much is meaningful,

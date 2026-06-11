@@ -71,13 +71,22 @@ async def build_pulse(db, vault_path: str, hours: int = 4) -> dict:
         cache = llm_cache_stats()
     except Exception:
         cache = {"hits": 0, "misses": 0}
+    # churn signal: fraction of THIS period's raw findings with a near-duplicate (containment >= 0.6)
+    try:
+        from agora.execution.finding_diversity import _tokens, _containment, _claim
+        _tk = [_tokens((t or "") + " " + _claim(c or "")) for t, c in findings]
+        _near = sum(1 for i in range(len(_tk))
+                    if any(i != j and _containment(_tk[i], _tk[j]) >= 0.6 for j in range(len(_tk))))
+        near_dup_rate = round(_near / len(_tk), 3) if _tk else 0.0
+    except Exception:
+        near_dup_rate = None
     return {
         "hours": hours,
         "findings": len(findings), "hypotheses": len(hyp), "frontiers": len(frontier),
         "meaningful": sum(1 for f in findings if meaningful(f)),
         "best": {"title": best[0], "content": best[1][:200]} if best else None,
         "a_frontier": {"title": a_frontier[0], "content": a_frontier[1][:160]} if a_frontier else None,
-        "focus": focus, "vault": vault, "cache": cache,
+        "focus": focus, "vault": vault, "cache": cache, "near_dup_rate": near_dup_rate,
     }
 
 
@@ -118,6 +127,9 @@ def format_pulse(p: dict, gaps: list | None = None, directions: list | None = No
         lines.append("• Why: filling your gaps — " + "; ".join(w[:40] for w in why if w))
     lines.append(f"• {p['findings']} findings this period · {p['meaningful']} substantive "
                  f"({p['hypotheses']} tested hypotheses, {p['frontiers']} open frontiers)")
+    if p.get("near_dup_rate") is not None and p.get("findings"):
+        lines.append(f"• ♻️ finding overlap: *{p['near_dup_rate']:.0%}* near-duplicates this period "
+                     f"(lower = more diverse research)")
     lines.append("")
 
     # 3. The single most meaningful thing (signal, not noise)
