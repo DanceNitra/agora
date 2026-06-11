@@ -583,6 +583,29 @@ def _collective_recall(query: str, k: int = 4, exclude: str | None = None) -> st
     return " | ".join(out)
 
 
+def _collective_top(query: str, exclude: str | None = None, min_score: float = 1.0):
+    """The single strongest colleague memory for `query` across all other agents' mnemo stores.
+    Returns (colleague_eid, text, score) if it clears `min_score`, else None — the deterministic
+    hook that lets an agent collaborate on a colleague's finding even when the flaky planner LLM
+    returns nothing."""
+    if _Mnemo is None:
+        return None
+    best = None
+    for oid in _AGENT_NAMES:
+        if oid == exclude:
+            continue
+        m = _agent_mnemo(oid)
+        if m is None:
+            continue
+        try:
+            for h in m.recall(query, k=2):
+                if best is None or h.get("score", 0.0) > best[2]:
+                    best = (oid, h.get("text", ""), h.get("score", 0.0))
+        except Exception:
+            pass
+    return best if (best and best[2] >= min_score and best[1]) else None
+
+
 def _keep_memory_signal() -> dict:
     """Reflect on the COLLECTIVE memory: the densest-value cohort + any flagged contradiction across
     all agents' stores. Uses mnemo's value_by_cohort + contradictions — the product, on ourselves."""
@@ -3315,6 +3338,22 @@ async def ambient_life():
                     "action": (q.get("action") or "...").strip(),
                     "with": (q.get("with") or "").strip()})
                 added += 1
+            # Leverage collective recall DETERMINISTICALLY: when a colleague's value-ranked memory is
+            # strongly relevant and the agent isn't already collaborating, seed a collaborate quest on
+            # that finding. Makes agents build on each other even when the flaky planner LLM returns
+            # nothing — the product's recall, not the LLM, drives the cross-pollination.
+            _top = _collective_top(_q, exclude=eid, min_score=1.0)
+            if _top and random.random() < 0.6 and not any(
+                    (qq.get("kind") == "collaborate") for qq in quests.get(eid, [])):
+                _pid, _ptext, _sc = _top
+                _pname = _AGENT_NAMES.get(_pid, _pid)
+                _sur = _pname.split()[-1]
+                quests.setdefault(eid, []).insert(0, {
+                    "intent": f"build on {_sur}'s finding: {_ptext[:48]}"[:90],
+                    "kind": "collaborate", "where": _sur.lower(),
+                    "action": f"Extend {_pname}'s result — {_ptext[:90]}", "with": _pname})
+                logger.info(f"[collective] {_AGENT_NAMES.get(eid, eid)} -> collaborate with {_pname} "
+                            f"(score {_sc:.2f}) on: {_ptext[:60]}")
             # GUARANTEE work: if the (flaky) LLM planner came up short, draw REAL quests from the
             # vault's inexhaustible surface — gaps, bridges, findings. Agents never run dry.
             if len(quests.get(eid, [])) < 2:
