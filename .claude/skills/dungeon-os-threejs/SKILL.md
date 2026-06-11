@@ -1,277 +1,133 @@
 ---
 name: dungeon-os-threejs
-description: Build and extend the Dungeon OS 3D game world using Three.js. Use this skill whenever the task involves rendering the dungeon, placing or moving agent characters, lighting, cameras, the isometric/2.5D view, loading 3D models or tiles, post-processing/bloom, or wiring the Three.js scene to game state. Trigger on any mention of the dungeon scene, the 3D world, agent avatars in 3D, tilemap-to-3D, or "the game looks bad/flat/laggy". Do NOT use for the LLM agent logic, the React dashboard panels, or the Node backend — those are separate.
+description: Build and extend the Dungeon OS 3D world (the live Three.js renderer in agora-game-server/static/index.html). Use whenever the task touches the dungeon scene, agent avatars in 3D, tiles/walls/props, lighting, the isometric camera, post-processing/bloom, sprites/labels, or "the game looks flat/cheap/laggy/should look presentable". NOT for the LLM agent loop (mcp_server.py), the brain (server/agora), or the React dashboard.
 ---
 
 # Dungeon OS — Three.js World Builder
 
-You are building the **3D dungeon world** for Dungeon OS: a 2.5D isometric dungeon
-where LLM-driven NPC agents move around, do quests, and transform the dungeon
-into an "Agentic OS." This skill gives you the hard rules to produce a polished,
-smooth, atmospheric result instead of a flat tutorial-grade scene.
+The **3D dungeon** is a 2.5-D isometric night scene where six LLM-driven agents move
+around and build an "Agentic OS." The renderer is a **view** of game state — it reads
+state over a WebSocket and never owns game logic.
 
-> **First read.** Before writing any rendering code, read the **REALITY BRIDGE**
-> below (it tells you what is *actually built today* vs. the target), then the live
-> source of truth: `agora-game-server/game_state.py` and the renderer
-> `agora-game-server/static/index.html`. The Three.js layer is a **view** of game
-> state. It never owns game logic.
-
----
-
-## ⚠️ REALITY BRIDGE — what is actually built today (READ FIRST)
-
-The rules further down describe the **target** architecture (TypeScript/React +
-WebGPU + InstancedMesh + bloom). The **current** Dungeon OS does NOT match that yet —
-do not assume those files exist. Here is the real, running implementation:
-
-### Where the code lives (this is the truth, `src/game/*.tsx` does NOT exist)
-| Concern | Target (rules below) | **Actual today** |
-|---|---|---|
-| Source of truth (state) | `src/state/world.ts` | **`agora-game-server/game_state.py`** (`GameEngine`, `DungeonState`) |
-| Renderer / scene | `src/game/*.tsx` (React) | **`agora-game-server/static/index.html`** — single-file vanilla ESM Three.js |
-| Backend / agent loop | Node `backend/` | **`agora-game-server/mcp_server.py`** — FastMCP + WebSocket `:5175` + HTTP `:5174`; `ambient_life()` task sim + A* |
-| Build/bundler | Vite/React | none — `index.html` served raw; `three` via `<script type="importmap">` from `/node_modules/three` |
-
-Run it: `cd agora-game-server && python mcp_server.py` → open `http://localhost:5174`.
-
-### How the real renderer works right now
-- **WebGLRenderer** (NOT WebGPU; no `await init()`). `PCFSoftShadowMap`,
-  `ACESFilmicToneMapping`, `toneMappingExposure ≈ 1.45`.
-- **Grid = 1 world tile = 1 unit**, BUT the Quaternius "Ultimate Modular Ruins Pack"
-  models are authored on a **2-unit grid**, so EVERY ruins model is placed at a
-  **consistent `scale 0.5`** (2u model → 1u tile). This is the single most important
-  scaling fact — inconsistent scales (0.4/0.5/0.6) are what made it look broken.
-  Model pivots are centred on X/Z with base at y=0.
-- **Floors are real `Floor_Standard` models** (tinted per zone, matte:
-  `roughness=1, metalness=0`), one clone per tile — NOT colored boxes, NOT yet
-  InstancedMesh.
-- **Camera:** `OrthographicCamera` iso, `d ≈ 15`, with `OrbitControls` (rotation not
-  hard-locked yet).
-- **Night lighting:** ONE cool moonlight `DirectionalLight` + low cool `AmbientLight`
-  + `HemisphereLight` + **~9 warm torch `PointLight`s only** (sparse on purpose) +
-  `FogExp2`-style fog matching the dark bg. `flatShading` is forced on every loaded
-  model after load. Torches also have cheap emissive flame meshes (no light).
-- **Agents = 6** (King Aldric, Sgt Voss, Dame Elara, High Priest Orin, Shadow Kael,
-  Sage Mira) — NOT the 7-NPC roster named below. They are **Quaternius glTF**
-  characters: clone with **`SkeletonUtils.clone`** (plain `.clone()` shares the
-  skeleton and piles all bodies at one spot — known bug we already hit),
-  `AnimationMixer` per agent, tweened movement, billboard name + HP + thought sprites.
-- **State → view wiring (matches the architecture rule):** client opens a WS, gets a
-  `snapshot`, then applies incremental events: `entity_moved/state/health/thought/face`,
-  `tasks_update`, `effect_added`. Client **reads, never writes**. Server drives a
-  quest board + A* pathfinding (`_astar`) + `ambient_life()` social sim.
-- **Layout = corner-stone night dungeon:** only NORTH (y=0) & WEST (x=0) are solid
-  walls (backdrop); SOUTH/EAST and interior divisions are **open pillar colonnades**
-  so the fixed iso camera always sees into rooms (no front-wall occlusion). Central
-  **chasm (`void` tiles) + bridge**, throne dais + statues at the back, vault /
-  library / barracks / crossroads / armory zones.
-
-### Gaps from here to the target (the actual TODO toward the rules below)
-- ❏ Tiles → **InstancedMesh** (still one clone per tile; fine at 24×20, won't scale).
-- ❏ **Bloom / post-processing** (none yet) — biggest cheap visual win remaining.
-- ❏ Optional **WebGPURenderer** migration (then `await renderer.init()` becomes mandatory).
-- ❏ Lock camera rotation to protect the iso look.
-- ❏ If/when ported to React/TS, adopt the `src/game/` layout below.
-
-**When extending the world, match the ACTUAL files above.** Use the rules below as
-the quality bar and the direction of travel, not as a description of today's tree.
+> **Before writing render code, read the two source-of-truth files** (don't trust memory):
+> - `agora-game-server/static/index.html` — the entire renderer (single-file vanilla ESM Three.js, ~1500 lines).
+> - `agora-game-server/game_state.py` — `GameEngine`/`DungeonState` (the tilemap + entities the scene renders).
+> Run it: `cd agora-game-server && python mcp_server.py` → open `http://localhost:5174`.
+> The dungeon process is launched/restarted by the loop's standard procedure; after editing
+> `index.html` you only need a **browser hard-refresh** (it's served raw, no build step).
 
 ---
 
-## NON-NEGOTIABLE RULES (most failures come from breaking these)
+## GROUND TRUTH — the actual stack (build to match this, not a target)
 
-### Version & API
-- Target a modern Three.js (**r184+** for new work). Import as ESM: `import * as THREE from 'three'`.
-- **Do NOT** copy old tutorial code. Forbidden/legacy patterns: `Geometry`
-  (use `BufferGeometry`), `THREE.Math` (use `THREE.MathUtils`), `outputEncoding`
-  (use `renderer.outputColorSpace = THREE.SRGBColorSpace`), `physicallyCorrectLights`
-  (removed; it's the default now), `WebGL1Renderer` (gone).
-- Color management is ON by default in modern Three. Set texture color spaces
-  explicitly: `texture.colorSpace = THREE.SRGBColorSpace` for color maps, leave
-  data maps (normal/roughness) in linear.
+| Concern | Reality |
+|---|---|
+| Three.js | **r0.170.0**, vendored at `agora-game-server/node_modules/three`. ESM via `<script type="importmap">`: `"three" → /node_modules/three/build/three.module.js`, `"three/addons/" → /node_modules/three/examples/jsm/`. |
+| Renderer | **`WebGLRenderer({ antialias:true })`** — synchronous, **no `await init()`**. `setPixelRatio(min(dpr,2))`, `shadowMap.enabled`, `PCFSoftShadowMap`, `ACESFilmicToneMapping`, `toneMappingExposure ≈ 1.45`. *(A WebGPU build `three.webgpu.js` is vendored but UNUSED — see Upgrade Path before touching it.)* |
+| Camera | **`OrthographicCamera`** iso, `d ≈ 15`, `position (d,d,d)` looking at `(0,0,0)`, **`OrbitControls`** (rotation NOT locked yet). |
+| Atmosphere | `scene.background = 0x0a0e18` (deep night); `scene.fog = new THREE.Fog(0x0a0e18, 45, 95)` (linear, matches bg). |
+| Lights | `AmbientLight(0x37466a, .5)` + cool moonlight `DirectionalLight(0x9fb2da, 1.0)` with a **tight shadow frustum (±16)** for crisp shadows + `HemisphereLight(0x5a6e98, 0x2a2420, .5)` + **~9 warm torch `PointLight`s from state** (`radius`, `decay 1.8`) + cheap **emissive flame meshes** flickered each frame. Point lights are sparse ON PURPOSE. |
+| Floors/walls/props | The **Quaternius "Ultimate Modular Ruins Pack"** (`Floor_Standard`, `Floor_Diamond`, `Wall*`, `Statue_*`, `Flag_Wall`, columns…). Loaded once into a `ruinsCache`, then **one clone per tile** (floors are real models, not boxes; one tinted template per zone colour). |
+| Agents | **6** (King Aldric, Sgt Voss, Dame Elara, High Priest Orin, Shadow Kael, Sage Mira). Quaternius **glTF**, cloned with **`SkeletonUtils.clone`**, one `AnimationMixer` each, tweened movement, `CanvasTexture` **Sprite** labels (name / HP bar / thought bubble). |
+| State→view | Client opens WS `:5175`, gets a `snapshot`, applies incremental events (`entity_moved/state/health/thought/face`, `tasks_update`, `effect_added`, `os_build`, trust/HUD). **Reads, never writes.** HTTP is `:5174`. |
+| Post-processing | **NONE yet.** `EffectComposer`, `UnrealBloomPass`, `SSAOPass`, `GTAOPass`, `SMAAPass`, `OutputPass` are all present in `node_modules/three/examples/jsm/postprocessing/` and unused. **This is the single biggest visual win available.** |
 
-### Renderer
-- Prefer **WebGPURenderer** with automatic WebGL2 fallback. It requires **async
-  init** — this is the single most common silent-failure point:
-  ```js
-  import { WebGPURenderer } from 'three/webgpu';
-  const renderer = new WebGPURenderer({ antialias: true });
-  await renderer.init();           // MANDATORY — without it, nothing renders
-  ```
-  If the project explicitly wants WebGL only, use `WebGLRenderer` (no async init).
-  Decide once, document it, don't mix. *(Today Dungeon OS uses WebGLRenderer — see Reality Bridge.)*
-- Always set: `renderer.setPixelRatio(Math.min(devicePixelRatio, 2))`,
-  `renderer.setSize(...)`, `renderer.shadowMap.enabled = true`.
-
-### Materials & lighting (this is why scenes look "flat/cheap")
-- **Never** light a scene with `MeshBasicMaterial` and expect depth — it ignores
-  lights. Use `MeshStandardMaterial` (PBR) for dungeon geometry and agents.
-- Every scene MUST have: one soft ambient/hemisphere light for base fill, plus
-  motivated point/spot lights (torches, glowing station screens). A scene with a
-  single directional light looks dead.
-- Use **fog** (`scene.fog = new THREE.FogExp2(color, density)`) for atmosphere and
-  depth — essential for the dungeon mood.
-- For the stylised low-poly Quaternius look, force `material.flatShading = true`
-  (set it after loading OBJ/glTF, then `material.needsUpdate = true`).
-
-### Units, scale, and the grid
-- **One tile = 1 world unit.** All dungeon geometry sits on an integer grid.
-  Agents occupy tile centers. Never use arbitrary float positions for tiles.
-- **Asset scale:** the ruins pack is a 2-unit kit → place every ruins model at a
-  **single consistent `scale 0.5`**. Never hand-tune per-model scales.
-- Y is up. The dungeon floor is the XZ plane at y=0. Walls rise in +Y.
-- Map tile coords `[x, z]` directly to world `(x, 0, z)`. Keep this mapping in ONE
-  helper; never inline it.
-
-### Performance (why it gets laggy)
-- Repeated geometry (floor tiles, wall blocks) MUST use **`InstancedMesh`**, not
-  one `Mesh` per tile. A 40×40 dungeon = 1600 tiles; as separate meshes that's
-  1600 draw calls and it will stutter. Instanced = ~1 draw call per tile type.
-- **Dispose** everything you remove: `geometry.dispose()`, `material.dispose()`,
-  `texture.dispose()`. On React unmount, dispose the renderer and cancel the
-  animation frame. Memory leaks here cause the "fine at first, then chugs" bug.
-- Reuse geometries and materials across instances. Don't `new` a material per object.
-- Use one `requestAnimationFrame` loop. Clamp work with a fixed-timestep
-  accumulator for movement so it's framerate-independent.
-
-### Camera (why it looks "wrong")
-- Default to an **OrthographicCamera** for the isometric look (see below), not a
-  Perspective camera — perspective makes a top-down dungeon feel off.
-- Position the camera at an iso angle, looking at the dungeon center. Keep camera
-  setup in one place; expose pan/zoom but lock rotation to preserve the iso feel.
+### The hard-won facts (breaking these is what made it look broken before)
+- **One tile = 1 world unit.** The ruins kit is authored on a **2-unit grid**, so EVERY
+  ruins model is placed at a **single consistent `scale 0.5`** (2u → 1u). Never hand-tune
+  per-model scales (0.4/0.5/0.6 is what looked wrong). Pivots are centred on X/Z, base at y=0.
+- **`SkeletonUtils.clone(gltf.scene)`**, never `gltf.scene.clone()` — plain clone shares the
+  skeleton and stacks every body at one point (a bug already hit).
+- **Corner-stone layout:** the iso camera looks from the south-east, so SOUTH/EAST faces are
+  open **pillar colonnades** and only far NORTH (z=0) & WEST (x=0) are solid (backdrop). This
+  removes front-wall occlusion without dynamic culling. Central **chasm (`void` tiles) + bridge**,
+  throne dais + statues at the back, zoned floors (vault / library / barracks / crossroads / armory).
+- After loading any model, force **`material.flatShading = true; material.needsUpdate = true`** for the stylised low-poly look.
+- Color management is on by default; set **`texture.colorSpace = THREE.SRGBColorSpace`** on colour/label textures (already done for sprite labels); leave data maps (normal/roughness) linear.
 
 ---
 
-## THE RECOMMENDED DUNGEON APPROACH (2.5D isometric)
+## NON-NEGOTIABLE RULES (r0.170, this codebase)
 
-This is the look to build unless told otherwise. It reads as a premium isometric
-dungeon AND lets the player see all agents at once (the point of the dashboard).
+- **Lit geometry uses `MeshStandardMaterial`** (PBR), never `MeshBasicMaterial` (ignores lights → flat). Floors are matte (`roughness 1, metalness 0`); glows use `emissive` + `emissiveIntensity`.
+- **Modern API only:** `BufferGeometry` (not `Geometry`), `THREE.MathUtils` (not `THREE.Math`), `renderer.outputColorSpace = SRGBColorSpace` (not `outputEncoding`). No `physicallyCorrectLights` (default now), no `WebGL1Renderer`.
+- **The grid→world mapping lives in ONE place** (`tile [x,z] → (x, 0, z)`); never inline it elsewhere.
+- **Movement is tweened, never teleported** — lerp avatars toward target tiles each frame and face the travel direction.
+- **The renderer reads state, never writes it.** Anything that should change the world goes through a server tool/event, not a sprite edit.
+- **Dispose on teardown / when removing objects:** `geometry.dispose()`, `material.dispose()`, `texture.dispose()`; keep the single `requestAnimationFrame` loop (cancel it on teardown). Leaks here cause "fine, then chugs".
+- **Keep it WebGL** unless a task explicitly migrates to WebGPU. If migrating: import from `three/webgpu`, `await renderer.init()` becomes **mandatory** (the #1 silent-failure), and post-FX must move to the WebGPU/TSL node pipeline. Decide once; don't mix.
 
-### Camera setup (isometric)
+---
+
+## THE UPGRADE PATH — staged, ordered by visual-payoff ÷ risk
+
+Each stage is independently shippable and reversible. Do them in order; hard-refresh and eyeball after each. Keep `renderer.info.render.calls` in the low hundreds and the frame smooth.
+
+### Stage 1 — Bloom + tone (the 80/20 win)
+Route rendering through an `EffectComposer` so torches, flame meshes, emissive OS screens, and the boot glow actually *bloom*. This single change moves the scene from "tutorial" to "atmospheric."
 ```js
-const aspect = w / h;
-const d = 20; // zoom: half-height of view in world units
-const camera = new THREE.OrthographicCamera(-d*aspect, d*aspect, d, -d, 0.1, 1000);
-camera.position.set(20, 20, 20);   // equal x,y,z gives the classic iso angle
-camera.lookAt(0, 0, 0);
+import { EffectComposer }  from 'three/addons/postprocessing/EffectComposer.js';
+import { RenderPass }      from 'three/addons/postprocessing/RenderPass.js';
+import { UnrealBloomPass } from 'three/addons/postprocessing/UnrealBloomPass.js';
+import { OutputPass }      from 'three/addons/postprocessing/OutputPass.js';
+
+const composer = new EffectComposer(renderer);
+composer.addPass(new RenderPass(scene, camera));
+const bloom = new UnrealBloomPass(new THREE.Vector2(W, H),
+  0.55 /*strength*/, 0.7 /*radius*/, 0.85 /*threshold*/);
+composer.addPass(bloom);
+composer.addPass(new OutputPass());   // OutputPass now owns tone-map + sRGB
+// loop:   composer.render();          // INSTEAD of renderer.render(scene, camera)
+// resize: composer.setSize(W, H); bloom.setSize(W, H);
 ```
-Pan by moving camera + target together; zoom by scaling `d` and updating the
-projection. Do NOT let the user orbit freely — it breaks the iso aesthetic.
+- **threshold ≈ 0.85** so only emissive/torch pixels bloom, not the stone; **strength 0.4–0.6** (tasteful).
+- `OutputPass` does the tone-map/sRGB, so REMOVE the duplicate `renderer.toneMapping` work or you double-tone-map → washed out. If the scene brightened, lower exposure.
+- Gate behind a `const BLOOM = true` so it's a one-line revert.
 
-### Layout doctrine (corner-stone, so the fixed iso camera sees inside rooms)
-- The camera looks from the south-east. SOUTH/EAST faces are nearest and would
-  occlude interiors → build them as **open pillar colonnades**, not solid walls.
-- Make only the far NORTH & WEST perimeter solid (the backdrop). Define rooms with
-  corner columns + arches + floor-colour zones, not sealed boxes. This is the
-  "corner-stone" technique and it removes the need for dynamic wall culling.
-- Favour Jaquaying loops (multiple paths), 2–3 entrances, and a central focal
-  feature (a chasm of `void` tiles + a narrow bridge).
+### Stage 2 — Lock the iso camera + presentation framing
+- **Lock rotation** (`controls.enableRotate = false`) so a demo can't break the iso look; keep pan (`screenSpacePanning = true`) and zoom (clamp `minZoom/maxZoom`). Optionally add a slow idle **auto-rotation of the dungeon *group*** (a few degrees), not the camera, for a "living diorama."
+- Add a one-key **cinematic toggle** that hides the HUD/sprites and slow-dollies, for clean screenshots/recordings.
 
-### Building the dungeon from the tilemap
-1. Read the grid from game state. Tile types: floor, wall, door, pillar/column,
-   arch, window, void (pit), throne, stairs, plus props.
-2. For each repeated tile **type**, build ONE `InstancedMesh` sized to its count.
-3. Walk the grid; set each instance matrix at `tileToWorld(x, z)`.
-   - Floor: the pack's `Floor_*` model (matte), base at y≈0.
-   - Wall: `Wall`/`Wall_Half` model; orient from neighbours.
-   - Door/throne/stairs: a few unique meshes (too few to need instancing).
-4. Group everything under one `dungeon` Group so the camera frames it easily.
+### Stage 3 — Contact shadows / ambient occlusion (grounding)
+Props and feet float slightly. Add **`GTAOPass`** (preferred in r0.170; `SSAOPass` as fallback) after `RenderPass`, before bloom, for soft darkening in crevices and under agents. Keep intensity/radius LOW (AO is easy to overdo) and put it behind an `AO = true` flag — it's the most expensive pass, so watch draw cost.
 
-### Agent avatars
-- Each agent is one model at `tileToWorld(agent.pos)`, y on the floor.
-- glTF characters (Quaternius): clone with **`SkeletonUtils.clone`** (never plain
-  `.clone()` — it shares skeletons and stacks every body at one point). One
-  `AnimationMixer` per agent; map state → clip (idle/walk/attack/hit/cast/dead).
-- **Movement = smooth tween, never teleport.** Each frame lerp the avatar toward
-  its target tile; face the direction of travel.
-- Float a small label/billboard with the agent's name (and HP / thought) above each.
+### Stage 4 — Tiles → `InstancedMesh` (perf headroom)
+Today every floor/wall is a clone (fine at 24×20). Before growing the map or adding density, convert each **repeated tile type** to one `InstancedMesh` sized to its count; set each instance matrix via the single `tileToWorld` helper; keep unique pieces (throne, statues, bridge) as plain meshes. Enabling work, not a visual change — do it *after* bloom, *before* lots more tiles.
 
-### Atmosphere & "stunning" (where the payoff lives)
-- **Torches/braziers:** a FEW warm `PointLight`s (~0xffa844), modest range; jitter
-  intensity for flicker. Keep point lights sparse (they are expensive); use cheap
-  emissive flame meshes for the rest.
-- **Fog:** dark, low density — depth without hiding agents; match it to the bg colour.
-- **Bloom (post-processing):** add an `UnrealBloomPass` (WebGL) or the WebGPU bloom
-  node so torches and screens *glow*. This single effect does most of the visual
-  heavy lifting. Tasteful threshold/strength, not blown out. *(Not yet in Dungeon OS.)*
-- **OS-boot moment:** when subsystems cross threshold, animate the scene "coming
-  online" — ramp emissive, increase bloom, shift fog cooler. Drive from state, tween.
+### Stage 5 — Material & texture polish
+- Floor variation: 2–3 tint templates per zone + a low-strength normal/roughness map on the shared floor material so flagstones catch the moonlight.
+- **Emissive "screen" materials** on OS modules with an animated `emissiveIntensity` pulse → they read as live tech and bloom from Stage 1.
+- Torch life: a tiny additive flame sprite + the existing emissive mesh, jitter scale+intensity with `sin(t)+noise`.
+
+### Stage 6 — The "OS coming online" set-piece (state-driven drama)
+On an `os_build`/threshold event, tween a **boot sequence**: ramp module `emissiveIntensity`, briefly raise `bloom.strength`, shift fog/ambient cooler, pulse a ground ring. **Drive every value from state via tweens, never hard-cut.** This is the moment that sells "an OS is being built," and it's cheap once bloom exists.
+
+### Later / optional — WebGPU
+Only if a task demands it: `three/webgpu` + `await renderer.init()` + bloom as a TSL node (`three/examples/jsm/tsl/display/…`). Higher ceiling, real migration cost; not needed for a great WebGL demo.
 
 ---
 
-## HOW THE SCENE CONNECTS TO STATE (the architecture rule)
+## HOW THE SCENE CONNECTS TO STATE
 
 ```
-game state (source of truth)  ──WS snapshot + events──▶  Three.js scene (this skill)
-        ▲                                                       │
-        │ mutations from the agent loop / MCP tools             │ reads, never writes
-   backend (agent loop + LLM)                                   ▼
-                                                        renders avatars/tiles/lights
+game_state.py (truth) ──WS snapshot+events(:5175)──▶ index.html Three.js scene
+        ▲                                                   │ reads, never writes
+   mcp_server.py (agent loop, A*, ambient_life)             ▼ renders tiles/agents/lights/FX
 ```
-
-- The render loop reconciles the scene to incoming state each frame/event (move
-  avatars toward targets, update HP/thought, spawn effects).
-- The scene **never** mutates game state. Player input that should change state
-  goes through a state action / server tool, not a direct sprite edit.
-- Keep all Three.js code in the renderer layer; keep dashboard UI and backend out
-  of scope for this skill.
+The loop reconciles the scene to incoming events: move avatars toward target tiles, update HP/thought sprites, spawn `effect_added`, light up `os_build` modules. Intent that changes the world flows through server tools, not the renderer.
 
 ---
 
-## FILE LAYOUT FOR THE 3D LAYER (TARGET, if/when ported to React/TS)
+## DEFINITION OF DONE (self-check before claiming a visual upgrade)
 
-> Today there is no `src/game/`; the renderer is the single
-> `agora-game-server/static/index.html`. Use this layout only when refactoring
-> toward the target stack.
+1. Scene renders after a hard-refresh; no console errors; `renderer.info.render.calls` low hundreds; frame smooth.
+2. If post-FX added: rendering goes through `composer.render()`; `OutputPass` owns tone-map/sRGB (no double tone-map); resize updates composer + every pass; a one-line revert flag exists.
+3. Camera stays **orthographic iso**; rotation locked for presentation; pan/zoom clamped.
+4. Geometry is `MeshStandardMaterial`; lights = ambient/hemi fill + moonlight key + a FEW flickering torches + fog; emissive things bloom.
+5. All 6 agents distinct, on correct tiles, **tween** smoothly, keep their name/HP/thought sprites.
+6. Ruins models all at **`scale 0.5`**; agents via **`SkeletonUtils.clone`**; corner-stone layout preserved (no new solid S/E walls that occlude interiors).
+7. No game logic added to the renderer; it only reads state.
+8. Anything removed is disposed; the single rAF loop intact.
 
-```
-src/game/
-├─ DungeonScene.tsx     # React component: mounts renderer, runs the loop, disposes on unmount
-├─ renderer.ts          # creates WebGPU/WebGL renderer (async init), handles resize
-├─ camera.ts            # ortho iso camera + pan/zoom (rotation locked)
-├─ tileToWorld.ts       # the ONE grid→world mapping helper
-├─ dungeon.ts           # builds InstancedMesh tiles from the map
-├─ agents3d.ts          # avatar meshes/models + tweened movement + labels
-├─ lighting.ts          # ambient/hemi + torches (flicker) + fog
-├─ postfx.ts            # bloom / post-processing pipeline
-└─ assets.ts            # GLTF/texture loading, colorSpace + dispose helpers
-```
-
----
-
-## DEFINITION OF DONE (self-check before claiming success)
-
-1. Renderer initializes (async `init()` if WebGPU) and the scene actually shows.
-2. Dungeon is built from the tilemap; repeated tiles via **InstancedMesh** (target).
-3. Camera is **orthographic isometric**, framing the dungeon, rotation locked.
-4. Lighting present: ambient/hemi fill + flickering torch point lights + fog.
-   Geometry uses `MeshStandardMaterial`, not `MeshBasicMaterial`.
-5. All agents render as **visually distinct** avatars at correct tile positions and
-   **move smoothly** (tweened) toward their state targets.
-6. Bloom/post-processing active; torches and screens glow.
-7. No game logic in the renderer; scene reads state, never writes it.
-8. On unmount: animation frame cancelled, renderer + geometries + materials +
-   textures disposed (no WebGL/WebGPU context leak).
-9. Frame stays smooth on a 40×40 dungeon (`renderer.info` draw calls in the tens,
-   not thousands).
-
-If any item fails, fix it before moving on. A scene that "renders something" but
-fails 2, 4, 5, or 8 is exactly the weak result this skill exists to prevent.
-
----
-
-## QUICK ANTI-PATTERNS CHECKLIST (scan your own output for these)
-
-- ❌ `MeshBasicMaterial` on lit geometry → ✅ `MeshStandardMaterial`
-- ❌ one `Mesh` per tile → ✅ `InstancedMesh`
-- ❌ per-model hand-tuned scales → ✅ one consistent `scale 0.5` for the 2-unit ruins kit
-- ❌ glTF `scene.clone()` for skinned agents → ✅ `SkeletonUtils.clone`
-- ❌ avatars snapping between tiles → ✅ tweened movement
-- ❌ PerspectiveCamera for the dungeon → ✅ OrthographicCamera iso
-- ❌ solid front (S/E) walls that hide interiors → ✅ open corner-stone colonnades
-- ❌ no `await renderer.init()` on WebGPU → ✅ awaited
-- ❌ no fog / single light / dozens of point lights → ✅ fog + ambient + a FEW torches
-- ❌ creating materials/geometries in the loop → ✅ created once, reused
-- ❌ no dispose on unmount → ✅ full teardown
-- ❌ copying r140-era API → ✅ r184 API (BufferGeometry, MathUtils, colorSpace)
-- ❌ renderer owning state → ✅ renderer reads game state, never writes it
+## ANTI-PATTERNS (scan your own diff)
+❌ `MeshBasicMaterial` on lit geometry · ❌ double tone-mapping (renderer **and** OutputPass) · ❌ per-model hand-tuned scales (use one `0.5`) · ❌ `gltf.scene.clone()` for agents (use `SkeletonUtils.clone`) · ❌ avatars snapping (tween) · ❌ Perspective camera · ❌ new solid S/E walls hiding rooms · ❌ dozens of point lights (keep torches sparse; use emissive + bloom instead) · ❌ materials/geometries created in the loop · ❌ `composer` without resize handling · ❌ touching `three/webgpu` without `await renderer.init()` · ❌ renderer mutating game state · ❌ r140-era API (`Geometry`/`THREE.Math`/`outputEncoding`).
