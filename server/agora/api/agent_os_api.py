@@ -462,7 +462,7 @@ async def brain_gaps(n: int = 10):
         _SEM_INDEX = SemanticIndex()
     if not _SEM_INDEX.ready:
         return {"status": "ok", "gaps": []}
-    pool = _SEM_INDEX.find_gaps(max(n * 4, 40))         # wide candidate pool, not just the top n
+    pool = _SEM_INDEX.find_gaps(max(n * 8, 600))        # huge candidate pool (the vault has 1000+)
     store = Path(__file__).resolve().parents[2] / ".gap_rotation.json"
     now = time.time()
     try:
