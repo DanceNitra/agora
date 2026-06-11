@@ -51,10 +51,13 @@
   nav.scrolled{background:color-mix(in srgb,var(--bg) 78%,transparent);backdrop-filter:blur(14px);
     border-bottom:1px solid var(--line)}
   nav.scrolled .bar{height:58px}
-  .logo{display:flex;align-items:center;gap:10px;font-weight:600;letter-spacing:-.01em;font-size:17px}
-  .logo .mark{width:22px;height:22px;border-radius:6px;background:
-    conic-gradient(from 210deg,var(--acc),transparent 65%);position:relative}
-  .logo .mark::after{content:"";position:absolute;inset:5px;border-radius:3px;background:var(--bg)}
+  .logo{display:flex;align-items:center;gap:11px;font-weight:600;letter-spacing:-.01em;font-size:18px}
+  .logo .word em{font-family:var(--serif);font-style:italic;font-weight:400;color:var(--acc)}
+  .logo svg{width:26px;height:26px;display:block;transition:transform .6s cubic-bezier(.3,1.4,.4,1)}
+  .logo:hover svg{transform:rotate(120deg)}
+  .logo svg .ring{stroke:var(--acc);opacity:.85}
+  .logo svg .node{fill:var(--acc)}
+  .logo svg .edge{stroke:var(--acc);opacity:.45}
   .navlinks{display:flex;gap:26px;font-size:14px;color:var(--dim)}
   .navlinks a{position:relative;padding:4px 0;transition:color .25s}
   .navlinks a::after{content:"";position:absolute;left:0;right:100%;bottom:0;height:1.5px;background:var(--acc);transition:right .3s cubic-bezier(.6,0,.2,1)}
@@ -73,7 +76,10 @@
   /* ── hero ── */
   .hero{position:relative;min-height:100svh;display:flex;align-items:center;overflow:hidden}
   #orb{position:absolute;inset:0;z-index:0}
-  .hero .inner{position:relative;z-index:2;padding:140px 0 90px;max-width:760px}
+  .hero .inner{position:relative;z-index:2;padding:140px 0 90px;max-width:820px;
+    margin:0 auto;text-align:center;display:flex;flex-direction:column;align-items:center}
+  .hero .sub{margin-left:auto;margin-right:auto}
+  .hero .ctas{justify-content:center}
   .pill{display:inline-flex;align-items:center;gap:9px;font-family:var(--mono);font-size:11.5px;
     letter-spacing:.12em;text-transform:uppercase;color:var(--dim);border:1px solid var(--line2);
     border-radius:999px;padding:7px 14px;margin-bottom:30px;background:color-mix(in srgb,var(--panel) 60%,transparent)}
@@ -193,7 +199,19 @@
 
 <nav id="nav">
   <div class="wrap bar">
-    <a class="logo" href="#"><span class="mark"></span>Agora</a>
+    <a class="logo" href="#">
+      <svg viewBox="0 0 26 26" fill="none" aria-hidden="true">
+        <circle class="ring" cx="13" cy="13" r="11" stroke-width="1.4" stroke-dasharray="52 17"/>
+        <line class="edge" x1="13" y1="13" x2="19.5" y2="8.5" stroke-width="1.2"/>
+        <line class="edge" x1="13" y1="13" x2="8" y2="19" stroke-width="1.2"/>
+        <line class="edge" x1="13" y1="13" x2="6.5" y2="9" stroke-width="1.2"/>
+        <circle class="node" cx="13" cy="13" r="2.4"/>
+        <circle class="node" cx="19.5" cy="8.5" r="1.7"/>
+        <circle class="node" cx="8" cy="19" r="1.7"/>
+        <circle class="node" cx="6.5" cy="9" r="1.4"/>
+      </svg>
+      <span class="word">Ag<em>o</em>ra</span>
+    </a>
     <div class="navlinks">
       <a href="#record">Record</a>
       <a href="#replications">Replications</a>
@@ -322,7 +340,7 @@
 <footer>
   <div class="wrap">
     <div class="frow">
-      <span class="l"><span class="mark" style="width:20px;height:20px;border-radius:5px;background:conic-gradient(from 210deg,var(--acc),transparent 65%)"></span>Agora — an autonomous research OS</span>
+      <span class="l">Ag<em style="font-family:var(--serif);font-style:italic;font-weight:400;color:var(--acc)">o</em>ra — an autonomous research OS</span>
       <a class="fl" href="https://github.com/DanceNitra/agora" target="_blank" rel="noopener">Source &amp; full output → github.com/DanceNitra/agora</a>
     </div>
     <div class="stamp">Track record as of 2026-06-11 · figures reflect the system's recorded ledgers · no claim without a number</div>
@@ -456,7 +474,7 @@
     }
     var geo = new THREE.BufferGeometry();
     geo.setAttribute('position', new THREE.BufferAttribute(pos,3));
-    var pmat = new THREE.PointsMaterial({size:.035,transparent:true,opacity:.9});
+    var pmat = new THREE.PointsMaterial({size:.035,transparent:true,opacity:.55});
     var cloud = new THREE.Points(geo,pmat);
     /* connect near neighbours */
     var lp=[], maxL=1500, thr=.62;
@@ -468,15 +486,15 @@
     }
     var lgeo = new THREE.BufferGeometry();
     lgeo.setAttribute('position', new THREE.BufferAttribute(new Float32Array(lp),3));
-    var lmat = new THREE.LineBasicMaterial({transparent:true,opacity:.16});
+    var lmat = new THREE.LineBasicMaterial({transparent:true,opacity:.10});
     var lines = new THREE.LineSegments(lgeo,lmat);
     var orb = new THREE.Group(); orb.add(cloud); orb.add(lines); scene.add(orb);
-    orb.position.x = 2.2; orb.rotation.z = .25;
+    orb.position.x = 0; orb.rotation.z = .25;   // centered behind the whole hero
 
     function setColors(theme){
       var c = theme==='light' ? 0x0c9b78 : 0x3ce0b8;
       pmat.color = new THREE.Color(c); lmat.color = new THREE.Color(c);
-      lmat.opacity = theme==='light' ? .12 : .16;
+      lmat.opacity = theme==='light' ? .08 : .10;
     }
     window.__orbTheme = setColors;
     setColors(root.getAttribute('data-theme'));
@@ -489,7 +507,6 @@
     function resize(){
       var w=cvs.clientWidth||innerWidth, h=cvs.clientHeight||innerHeight;
       renderer.setSize(w,h,false); cam.aspect=w/h;
-      orb.position.x = w<760 ? 0 : 2.2;
       cam.updateProjectionMatrix();
     }
     resize(); addEventListener('resize',resize);
