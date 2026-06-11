@@ -877,14 +877,55 @@ if (!renderer.getContext()) {
     spr.scale.set(2.6, 0.65, 1);
     return spr;
   }
-  function buildModule(name, gx, gy, colorHex) {
+  // Stage 6 set-piece: when a module comes ONLINE (live event, not snapshot rebuild),
+  // play a boot sequence — emissive overshoot, an expanding ground ring, and a brief
+  // bloom surge. Every value is tweened from t, never hard-cut.
+  const bootFX = [];                     // { t, obe, glow, ring, baseEmissive }
+  const BLOOM_BASE = 0.55;
+  function startBoot(grp, obe, glow, col) {
+    const ring = new THREE.Mesh(
+      new THREE.RingGeometry(0.32, 0.44, 40),
+      new THREE.MeshBasicMaterial({ color: col, transparent: true, opacity: 0.85,
+        blending: THREE.AdditiveBlending, depthWrite: false, side: THREE.DoubleSide }));
+    ring.rotation.x = -Math.PI / 2; ring.position.y = 0.05;
+    grp.add(ring);
+    bootFX.push({ t: 0, obe, glow, ring, grp, baseEmissive: 1.1 });
+  }
+  function updateBootFX(delta) {
+    let bloomBoost = 0;
+    for (let i = bootFX.length - 1; i >= 0; i--) {
+      const b = bootFX[i];
+      b.t += delta / 2.6;                              // ~2.6s sequence
+      const t = Math.min(b.t, 1);
+      // emissive: fast overshoot to ~3.6, ease back to the resting 1.1
+      const up = Math.min(t / 0.25, 1), down = Math.max((t - 0.25) / 0.75, 0);
+      b.obe.material.emissiveIntensity = b.baseEmissive + (3.6 - b.baseEmissive) * up * (1 - down * down);
+      // glow sphere breathes with the boot
+      b.glow.material.opacity = 0.32 + 0.45 * up * (1 - down);
+      // ground ring expands + fades
+      const rs = 0.3 + 3.2 * t;
+      b.ring.scale.set(rs, rs, rs);
+      b.ring.material.opacity = 0.85 * (1 - t) * (1 - t);
+      bloomBoost = Math.max(bloomBoost, Math.sin(Math.min(t * Math.PI, Math.PI)) * 0.5);
+      if (b.t >= 1) {                                  // done — settle + dispose the ring
+        b.obe.material.emissiveIntensity = b.baseEmissive;
+        b.glow.material.opacity = 0.32;
+        b.grp.remove(b.ring);
+        b.ring.geometry.dispose(); b.ring.material.dispose();
+        bootFX.splice(i, 1);
+      }
+    }
+    if (bloomPass) bloomPass.strength = BLOOM_BASE + bloomBoost;
+  }
+  function buildModule(name, gx, gy, colorHex, boot = false) {
     if (!name || window.__modules[name]) return;
     const c = window.__center || { cx: 0, cy: 0 };
     const col = parseInt((colorHex || '#ffcf5a').replace('#', ''), 16);
     const grp = new THREE.Group();
     grp.position.set(gx - c.cx, 0, gy - c.cy);
     const obe = new THREE.Mesh(new THREE.ConeGeometry(0.24, 1.15, 6),
-      new THREE.MeshStandardMaterial({ color: col, emissive: col, emissiveIntensity: 1.1,
+      new THREE.MeshStandardMaterial({ color: col, emissive: col,
+        emissiveIntensity: boot ? 0.05 : 1.1,         // boots ramp UP from dark
         flatShading: true, metalness: 0.2, roughness: 0.5 }));
     obe.position.y = 0.6; grp.add(obe);
     const glow = new THREE.Mesh(new THREE.SphereGeometry(0.34, 12, 12),
@@ -896,7 +937,9 @@ if (!renderer.getContext()) {
     scene.add(grp);
     window.__modules[name] = grp;
     (window.__moduleSpin ||= []).push(obe);
+    if (boot) startBoot(grp, obe, glow, col);
   }
+  window.__buildModule = buildModule;     // exposed for demos + headless visual tests
 
   // Trust Graph: 3D edges between agents (color = ESS trust) + "knowledge packets"
   // (glowing motes) flowing along the Vault-Company cross-agent learning edges.
@@ -1171,7 +1214,7 @@ if (!renderer.getContext()) {
         OSHUD.snapshot(ev.log);
         break;
       case 'os_module':
-        buildModule(ev.name, ev.x, ev.y, ev.color);
+        buildModule(ev.name, ev.x, ev.y, ev.color, true);   // live build → boot set-piece
         break;
       case 'trust_graph':
         TrustGraph.update(ev);
@@ -1472,6 +1515,8 @@ if (!renderer.getContext()) {
 
     // Trust Graph: keep edges glued to the moving agents + flow learning packets
     TrustGraph.frame(delta);
+
+    updateBootFX(delta);   // Stage 6: modules coming online (emissive ramp + ring + bloom surge)
 
     // OS module obelisks: gentle spin + bob so built structures feel alive
     if (window.__moduleSpin) {
