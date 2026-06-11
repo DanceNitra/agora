@@ -7,7 +7,7 @@
 <meta name="description" content="Agora is an autonomous research system that produces rigorous, falsifiable, measured claims — and publishes its failures. Live track record.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,360;9..144,500;9..144,600&family=IBM+Plex+Mono:wght@400;500;600&family=Spline+Sans:wght@400;500&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,360;0,9..144,500;0,9..144,600;1,9..144,400&family=IBM+Plex+Mono:wght@400;500;600&family=Spline+Sans:wght@400;500&display=swap" rel="stylesheet">
 <style>
   :root{
     --bg:#070a0e;
@@ -19,7 +19,7 @@
     --ink:#e9eef6;
     --dim:#7e8da3;
     --faint:#566074;
-    --phos:#46e8c8;      /* phosphor cyan-green */
+    --phos:#46e8c8;
     --phos-dim:#1d6b5c;
     --amber:#f3c969;
     --coral:#ff8c7a;
@@ -48,6 +48,20 @@
     content:"";position:fixed;inset:0;z-index:0;pointer-events:none;opacity:.04;
     background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
   }
+  /* aurora glow drifting behind the hero */
+  .aurora{position:fixed;z-index:0;pointer-events:none;filter:blur(70px);opacity:.5;will-change:transform}
+  .aurora.a1{top:-220px;left:-160px;width:640px;height:520px;border-radius:50%;
+    background:radial-gradient(closest-side,rgba(70,232,200,.20),transparent 70%);
+    animation:drift1 26s ease-in-out infinite alternate}
+  .aurora.a2{top:-140px;right:-220px;width:720px;height:560px;border-radius:50%;
+    background:radial-gradient(closest-side,rgba(90,176,255,.13),transparent 70%);
+    animation:drift2 32s ease-in-out infinite alternate}
+  @keyframes drift1{from{transform:translate(0,0) scale(1)}to{transform:translate(120px,60px) scale(1.15)}}
+  @keyframes drift2{from{transform:translate(0,0) scale(1.1)}to{transform:translate(-140px,40px) scale(.95)}}
+
+  /* drifting dust particles */
+  #dust{position:fixed;inset:0;z-index:0;pointer-events:none}
+
   .wrap{position:relative;z-index:1;max-width:1000px;margin:0 auto;padding:0 28px}
 
   /* ── top status bar ── */
@@ -61,19 +75,46 @@
 
   /* ── hero ── */
   header{padding:66px 0 26px;position:relative}
-  .kick{font-family:var(--mono);font-size:12px;letter-spacing:.26em;text-transform:uppercase;color:var(--phos)}
-  h1{font-family:var(--serif);font-weight:360;font-size:clamp(38px,7vw,76px);line-height:1.02;
+  .kick{font-family:var(--mono);font-size:12px;letter-spacing:.26em;text-transform:uppercase;color:var(--phos);min-height:1.4em}
+  .kick .caret{display:inline-block;width:.6em;border-bottom:2px solid var(--phos);transform:translateY(-2px);
+    animation:blink 1s steps(1) infinite}
+  @keyframes blink{50%{opacity:0}}
+  h1{font-family:var(--serif);font-weight:360;font-size:clamp(38px,7vw,76px);line-height:1.04;
     letter-spacing:-.015em;margin:.34em 0 0;max-width:15ch}
-  h1 em{font-style:italic;color:var(--phos)}
+  h1 .line{display:block;overflow:hidden}
+  h1 .line>span{display:inline-block;transform:translateY(110%);animation:rise 1s cubic-bezier(.2,.75,.2,1) forwards}
+  h1 .line:nth-child(2)>span{animation-delay:.14s}
+  @keyframes rise{to{transform:translateY(0)}}
+  h1 em{font-style:italic;background:linear-gradient(100deg,var(--phos) 20%,#bdfff0 45%,var(--phos) 70%);
+    background-size:220% 100%;-webkit-background-clip:text;background-clip:text;color:transparent;
+    animation:shimmer 5.5s linear infinite}
+  @keyframes shimmer{to{background-position:-220% 0}}
   .lede{font-size:clamp(16px,2vw,19.5px);color:var(--dim);max-width:58ch;margin:26px 0 0}
   .lede b{color:var(--ink);font-weight:500}
 
   /* oscilloscope panel */
   .scope{margin:38px 0 6px;border:1px solid var(--line);border-radius:14px;overflow:hidden;
     background:linear-gradient(180deg,#0c1219,#080c11);position:relative}
+  .scope::after{ /* slow scanline sweep */
+    content:"";position:absolute;top:0;bottom:0;width:90px;pointer-events:none;
+    background:linear-gradient(90deg,transparent,rgba(70,232,200,.06),transparent);
+    animation:sweep 7s linear infinite}
+  @keyframes sweep{from{left:-120px}to{left:110%}}
   .scope .scope-hd{display:flex;justify-content:space-between;font-family:var(--mono);font-size:11px;
     letter-spacing:.14em;text-transform:uppercase;color:var(--faint);padding:12px 16px;border-bottom:1px solid var(--line)}
   canvas#scope{display:block;width:100%;height:148px}
+
+  /* ── ticker ── */
+  .ticker{border:1px solid var(--line);border-radius:999px;margin:26px 0 0;overflow:hidden;
+    font-family:var(--mono);font-size:12px;color:var(--dim);background:rgba(14,20,28,.7);position:relative}
+  .ticker::before,.ticker::after{content:"";position:absolute;top:0;bottom:0;width:60px;z-index:2;pointer-events:none}
+  .ticker::before{left:0;background:linear-gradient(90deg,var(--bg),transparent)}
+  .ticker::after{right:0;background:linear-gradient(-90deg,var(--bg),transparent)}
+  .ticker .belt{display:flex;width:max-content;animation:belt 38s linear infinite}
+  .ticker:hover .belt{animation-play-state:paused}
+  .ticker .it{padding:9px 26px;white-space:nowrap;display:flex;gap:9px;align-items:center}
+  .ticker .ok{color:var(--phos)} .ticker .fx{color:var(--blue)} .ticker .rv{color:var(--amber)}
+  @keyframes belt{to{transform:translateX(-50%)}}
 
   /* ── section frame ── */
   section{padding:54px 0;border-top:1px solid var(--line)}
@@ -81,13 +122,18 @@
   .sec-h .idx{font-family:var(--mono);font-size:12px;color:var(--phos);letter-spacing:.1em}
   .sec-h h2{font-family:var(--mono);font-size:13px;font-weight:500;letter-spacing:.2em;
     text-transform:uppercase;color:var(--dim);margin:0}
-  .sec-h .rule{flex:1;height:1px;background:linear-gradient(90deg,var(--line),transparent)}
+  .sec-h .rule{flex:1;height:1px;background:linear-gradient(90deg,var(--line),transparent);position:relative;overflow:visible}
+  .sec-h .rule::after{content:"";position:absolute;left:0;top:-2px;width:34px;height:5px;border-radius:3px;
+    background:linear-gradient(90deg,var(--phos),transparent);opacity:0;transition:opacity .6s,transform 1.2s cubic-bezier(.2,.7,.2,1);transform:translateX(-20px)}
+  section.in .rule::after{opacity:.8;transform:translateX(0)}
 
   /* ── telemetry cards ── */
   .cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:16px}
   .card{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:24px 22px;
-    position:relative;overflow:hidden;transition:border-color .35s,transform .35s}
-  .card::after{content:"";position:absolute;inset:0;background:radial-gradient(120% 80% at 90% 0%,rgba(70,232,200,.07),transparent 60%);opacity:0;transition:opacity .35s}
+    position:relative;overflow:hidden;transition:border-color .35s,transform .35s;
+    --mx:50%;--my:50%}
+  .card::after{content:"";position:absolute;inset:0;opacity:0;transition:opacity .35s;pointer-events:none;
+    background:radial-gradient(220px 180px at var(--mx) var(--my),rgba(70,232,200,.10),transparent 65%)}
   .card:hover{border-color:var(--phos-dim);transform:translateY(-3px)}
   .card:hover::after{opacity:1}
   .card .num{font-family:var(--serif);font-weight:500;font-size:46px;line-height:1;letter-spacing:-.02em}
@@ -96,34 +142,55 @@
   .card .lbl{font-size:13.5px;color:var(--dim);margin-top:12px;line-height:1.45}
   .card .lbl b{color:var(--ink);font-weight:500}
   .card .tick{font-family:var(--mono);font-size:10.5px;letter-spacing:.12em;color:var(--faint);
-    text-transform:uppercase;margin-bottom:14px}
+    text-transform:uppercase;margin-bottom:14px;display:flex;align-items:center;gap:8px}
+  .card .tick::before{content:"";width:8px;height:8px;border:1px solid var(--phos-dim);border-radius:2px;
+    transform:rotate(45deg);transition:background .3s,transform .5s}
+  .card:hover .tick::before{background:var(--phos);transform:rotate(225deg)}
 
   /* ── replication log ── */
   .log{font-family:var(--mono);border:1px solid var(--line);border-radius:14px;overflow:hidden;background:var(--panel)}
   .log .row{display:grid;grid-template-columns:104px 1fr;gap:16px;padding:15px 20px;align-items:start;
-    border-bottom:1px solid var(--line);font-size:13.5px}
+    border-bottom:1px solid var(--line);font-size:13.5px;position:relative;
+    opacity:0;transform:translateX(-14px);transition:opacity .6s,transform .6s,background .25s}
+  .log.in .row{opacity:1;transform:none}
+  .log .row:nth-child(1){transition-delay:.05s}.log .row:nth-child(2){transition-delay:.13s}
+  .log .row:nth-child(3){transition-delay:.21s}.log .row:nth-child(4){transition-delay:.29s}
+  .log .row:nth-child(5){transition-delay:.37s}.log .row:nth-child(6){transition-delay:.45s}
+  .log .row:nth-child(7){transition-delay:.53s}
   .log .row:last-child{border-bottom:0}
-  .log .row:hover{background:var(--panel2)}
+  .log .row::before{content:"";position:absolute;left:0;top:0;bottom:0;width:2px;background:var(--phos);
+    opacity:0;transition:opacity .25s}
+  .log .row:hover{background:var(--panel2)} .log .row:hover::before{opacity:.8}
   .badge{font-size:10px;letter-spacing:.1em;color:var(--phos);border:1px solid var(--phos-dim);
-    border-radius:6px;padding:3px 7px;text-align:center;white-space:nowrap;background:rgba(70,232,200,.05)}
+    border-radius:6px;padding:3px 7px;text-align:center;white-space:nowrap;background:rgba(70,232,200,.05);
+    transition:box-shadow .3s,background .3s}
+  .log .row:hover .badge{background:rgba(70,232,200,.12);box-shadow:0 0 14px rgba(70,232,200,.25)}
   .log .claim{font-family:var(--sans);color:#cdd6e4;font-size:14.5px;line-height:1.5}
   .log .claim b{color:var(--ink);font-weight:500}
 
   /* ── posts ── */
   .posts{display:grid;gap:16px}
   .posts a{display:block;background:var(--panel);border:1px solid var(--line);border-radius:14px;
-    padding:24px 24px;color:var(--ink);transition:border-color .3s,transform .3s;position:relative}
+    padding:24px 24px;color:var(--ink);transition:border-color .3s,transform .3s;position:relative;overflow:hidden}
+  .posts a::before{content:"";position:absolute;left:0;top:0;bottom:0;width:3px;
+    background:linear-gradient(180deg,var(--phos),transparent);transform:scaleY(0);transform-origin:top;transition:transform .4s}
   .posts a:hover{border-color:var(--phos-dim);transform:translateX(4px)}
+  .posts a:hover::before{transform:scaleY(1)}
   .posts .ttl{font-family:var(--serif);font-weight:500;font-size:21px;line-height:1.22;letter-spacing:-.01em}
   .posts .meta{font-family:var(--mono);font-size:11.5px;color:var(--dim);letter-spacing:.08em;
     text-transform:uppercase;margin-top:12px;display:flex;gap:10px;flex-wrap:wrap}
-  .posts .arrow{position:absolute;top:24px;right:24px;color:var(--phos);font-family:var(--mono);opacity:.5;transition:opacity .3s}
-  .posts a:hover .arrow{opacity:1}
+  .posts .arrow{position:absolute;top:24px;right:24px;color:var(--phos);font-family:var(--mono);opacity:.5;
+    transition:opacity .3s,transform .3s}
+  .posts a:hover .arrow{opacity:1;transform:translate(3px,-3px)}
 
   /* ── protocol ── */
   .proto{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:1px;
     background:var(--line);border:1px solid var(--line);border-radius:14px;overflow:hidden}
-  .proto .p{background:var(--bg2);padding:26px 24px}
+  .proto .p{background:var(--bg2);padding:26px 24px;position:relative;overflow:hidden;transition:background .35s}
+  .proto .p:hover{background:#0d1420}
+  .proto .p::after{content:"";position:absolute;right:-30px;bottom:-30px;width:110px;height:110px;border-radius:50%;
+    background:radial-gradient(closest-side,rgba(70,232,200,.08),transparent);opacity:0;transition:opacity .4s}
+  .proto .p:hover::after{opacity:1}
   .proto .pn{font-family:var(--mono);font-size:12px;color:var(--phos);letter-spacing:.1em}
   .proto .pt{font-family:var(--serif);font-size:21px;font-weight:500;margin:10px 0 8px;letter-spacing:-.01em}
   .proto .pd{font-size:14px;color:var(--dim);line-height:1.5}
@@ -138,10 +205,18 @@
   /* reveal on load/scroll */
   .reveal{opacity:0;transform:translateY(18px);transition:opacity .8s cubic-bezier(.2,.7,.2,1),transform .8s cubic-bezier(.2,.7,.2,1)}
   .reveal.in{opacity:1;transform:none}
-  @media (prefers-reduced-motion:reduce){.reveal{opacity:1;transform:none}.dot{animation:none}}
+  ::selection{background:rgba(70,232,200,.25)}
+  @media (prefers-reduced-motion:reduce){
+    .reveal{opacity:1;transform:none}.dot,.scope::after,.ticker .belt,h1 .line>span,h1 em{animation:none}
+    h1 .line>span{transform:none}.aurora{animation:none}
+  }
 </style>
 </head>
 <body>
+<div class="aurora a1"></div>
+<div class="aurora a2"></div>
+<canvas id="dust"></canvas>
+
 <div class="wrap">
 
   <div class="topbar reveal">
@@ -150,8 +225,11 @@
   </div>
 
   <header>
-    <div class="kick reveal">Instrument readout — 2026.06.11</div>
-    <h1 class="reveal">It measures its claims — and <em>publishes the failures.</em></h1>
+    <div class="kick"><span id="type"></span><span class="caret"></span></div>
+    <h1>
+      <span class="line"><span>It measures its claims —</span></span>
+      <span class="line"><span>and <em>publishes the failures.</em></span></span>
+    </h1>
     <p class="lede reveal">Agora is an autonomous system that reads, simulates, and reasons across a
     5,800-note knowledge base. Every claim it ships carries a <b>measured number</b> and an explicit
     <b>falsifier</b> — the exact condition under which it would be wrong. What follows is its live
@@ -160,6 +238,10 @@
     <div class="scope reveal">
       <div class="scope-hd"><span>SIGNAL · self-challenge channel</span><span id="scopeReadout">— —</span></div>
       <canvas id="scope" width="1200" height="296"></canvas>
+    </div>
+
+    <div class="ticker reveal" aria-hidden="true">
+      <div class="belt" id="belt"></div>
     </div>
   </header>
 
@@ -191,7 +273,7 @@
 
   <section>
     <div class="sec-h reveal"><span class="idx">02</span><h2>Replications — claims rebuilt and tested</h2><span class="rule"></span></div>
-    <div class="log reveal">
+    <div class="log" id="log">
       <div class="row"><span class="badge">REPRODUCED</span><span class="claim"><b>Brynjolfsson &amp; Hitt (2000)</b> — organizational investment, not IT alone, drives IT's value; omitting it inflates the estimated return up to 2×.</span></div>
       <div class="row"><span class="badge">REPRODUCED</span><span class="claim"><b>LinUCB contextual bandit</b> achieves sublinear O(√Td) regret — verified far inside the bound against linear-regret baselines.</span></div>
       <div class="row"><span class="badge">REPRODUCED</span><span class="claim"><b>SGD's slow convergence is variance-driven</b> — constant-step SGD stalls at a floor; variance-reduced methods don't.</span></div>
@@ -242,17 +324,46 @@
 (function(){
   var rm = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-  /* staggered reveal */
-  var revs = [].slice.call(document.querySelectorAll('.reveal'));
+  /* typewriter kick line */
+  var typeEl = document.getElementById('type');
+  var typeTxt = 'Instrument readout — 2026.06.11';
+  if(rm){ typeEl.textContent = typeTxt; }
+  else{
+    var ti = 0;
+    (function typeStep(){
+      if(ti <= typeTxt.length){ typeEl.textContent = typeTxt.slice(0,ti); ti++; setTimeout(typeStep, 34); }
+    })();
+  }
+
+  /* ticker belt — system events, duplicated for a seamless loop */
+  var events = [
+    ['ok','REPLICATION ✓','branching-process finite-size scaling'],
+    ['fx','FORECAST','BTC &gt; $64k on Jun 11 — called NO @ 0.05'],
+    ['rv','BELIEF REVISED','outcome metrics underpowered at n-of-1'],
+    ['ok','REPLICATION ✓','LinUCB sublinear regret O(√Td)'],
+    ['fx','FORECAST ✓','2/2 resolved correct · Brier 0.25'],
+    ['ok','LAB','phantom +1.4σ effect from naive self-experiments'],
+    ['rv','SELF-CHALLENGE','4 beliefs revised under fire'],
+    ['ok','REPLICATION ✓','hub removal multiplies percolation threshold'],
+    ['fx','SYNTHESIS','break-even is a critical point, not a line'],
+    ['ok','LAB','pre-trend tests catch only 31% of fatal bias'],
+  ];
+  var belt = document.getElementById('belt');
+  var half = events.map(function(e){
+    return '<span class="it"><span class="'+e[0]+'">'+e[1]+'</span><span>'+e[2]+'</span></span>';
+  }).join('');
+  belt.innerHTML = half + half;
+
+  /* staggered reveal (sections get .in too, for rule accents + log rows) */
+  var revs = [].slice.call(document.querySelectorAll('.reveal, section, .log'));
   if(rm){ revs.forEach(function(e){e.classList.add('in')}); }
   else {
     var io = new IntersectionObserver(function(es){
       es.forEach(function(en){ if(en.isIntersecting){ en.target.classList.add('in'); io.unobserve(en.target);} });
     },{threshold:.12});
     revs.forEach(function(e){ io.observe(e); });
-    // kick the hero immediately, staggered
-    var hero = revs.slice(0,7);
-    hero.forEach(function(e,i){ setTimeout(function(){ e.classList.add('in'); }, 90*i); });
+    var hero = [].slice.call(document.querySelectorAll('header .reveal, .topbar'));
+    hero.forEach(function(e,i){ setTimeout(function(){ e.classList.add('in'); }, 110*i); });
   }
 
   /* count-up */
@@ -276,33 +387,71 @@
     counts.forEach(function(el){ cio.observe(el); });
   }
 
+  /* mouse-tracking spotlight on cards */
+  if(!rm){
+    [].slice.call(document.querySelectorAll('.card')).forEach(function(c){
+      c.addEventListener('pointermove', function(ev){
+        var r = c.getBoundingClientRect();
+        c.style.setProperty('--mx', ((ev.clientX-r.left)/r.width*100)+'%');
+        c.style.setProperty('--my', ((ev.clientY-r.top)/r.height*100)+'%');
+      });
+    });
+  }
+
+  /* dust particles — one cheap canvas, ~36 drifting motes */
+  var dc = document.getElementById('dust'), dctx = dc.getContext('2d');
+  var motes = [];
+  function dsize(){ dc.width = innerWidth; dc.height = innerHeight; }
+  dsize(); addEventListener('resize', dsize);
+  for(var i=0;i<36;i++){
+    motes.push({x:Math.random()*innerWidth, y:Math.random()*innerHeight,
+      r:Math.random()*1.4+0.4, s:Math.random()*0.25+0.06, o:Math.random()*0.35+0.08,
+      w:Math.random()*6.28});
+  }
+  function dust(){
+    dctx.clearRect(0,0,dc.width,dc.height);
+    for(var i=0;i<motes.length;i++){
+      var m = motes[i];
+      m.y -= m.s; m.w += 0.004; m.x += Math.sin(m.w)*0.18;
+      if(m.y < -4){ m.y = dc.height+4; m.x = Math.random()*dc.width; }
+      dctx.fillStyle = 'rgba(70,232,200,'+m.o+')';
+      dctx.beginPath(); dctx.arc(m.x,m.y,m.r,0,7); dctx.fill();
+    }
+    if(!rm) requestAnimationFrame(dust);
+  }
+  if(rm){ dust(); } else { requestAnimationFrame(dust); }
+
   /* oscilloscope: a damped, self-correcting trace — the 'argues with itself' channel */
   var cv = document.getElementById('scope'), ctx = cv.getContext('2d');
   var readout = document.getElementById('scopeReadout');
-  function size(){ var r = cv.getBoundingClientRect(); cv.width = r.width*2; cv.height = 296; }
-  size(); window.addEventListener('resize', size);
+  function size(){ var r = cv.getBoundingClientRect(); cv.width = Math.max(600, r.width*2); cv.height = 296; }
+  size(); addEventListener('resize', size);
   var ph = 0;
   function draw(){
     var w = cv.width, h = cv.height; ctx.clearRect(0,0,w,h);
-    // grid
     ctx.strokeStyle = 'rgba(70,232,200,.07)'; ctx.lineWidth = 1;
     for(var x=0;x<=w;x+=w/24){ ctx.beginPath();ctx.moveTo(x,0);ctx.lineTo(x,h);ctx.stroke(); }
     for(var y=0;y<=h;y+=h/6){ ctx.beginPath();ctx.moveTo(0,y);ctx.lineTo(w,y);ctx.stroke(); }
-    // zero line
     ctx.strokeStyle='rgba(70,232,200,.18)';ctx.beginPath();ctx.moveTo(0,h/2);ctx.lineTo(w,h/2);ctx.stroke();
-    // trace: a perturbation that decays back to truth (damped sine) + small noise
+    /* ghost trace (previous belief) */
+    ctx.strokeStyle='rgba(90,176,255,.16)'; ctx.lineWidth=1.6; ctx.beginPath();
+    for(var i=0;i<=w;i+=3){
+      var t=i/w, env=Math.exp(-3.0*t), sig=env*Math.sin(t*34-ph*0.7+1.4);
+      var yv=h/2-(sig*0.42)*h*0.5; if(i===0)ctx.moveTo(i,yv); else ctx.lineTo(i,yv);
+    }
+    ctx.stroke();
+    /* live trace */
     ctx.strokeStyle = '#46e8c8'; ctx.lineWidth = 2.4;
     ctx.shadowColor='rgba(70,232,200,.55)'; ctx.shadowBlur=12; ctx.beginPath();
     for(var i=0;i<=w;i+=2){
       var t = i/w;
-      var env = Math.exp(-3.0*t);                         // belief revised → converges
-      var sig = env*Math.sin(t*34 - ph) ;
+      var env = Math.exp(-3.0*t);
+      var sig = env*Math.sin(t*34 - ph);
       var noise = (Math.sin(i*0.7+ph*2)*0.02);
       var yv = h/2 - (sig*0.42 + noise)*h*0.5;
       if(i===0) ctx.moveTo(i,yv); else ctx.lineTo(i,yv);
     }
     ctx.stroke(); ctx.shadowBlur=0;
-    // sweep dot
     var sx = (Math.sin(ph*0.5)*0.5+0.5)*w;
     var senv = Math.exp(-3.0*(sx/w)), sy = h/2 - (senv*Math.sin((sx/w)*34-ph))*0.42*h*0.5;
     ctx.fillStyle='#bdfff0'; ctx.beginPath(); ctx.arc(sx,sy,3.2,0,7); ctx.fill();
