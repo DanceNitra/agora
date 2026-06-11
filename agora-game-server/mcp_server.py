@@ -2932,11 +2932,14 @@ async def ambient_life():
                 n = _num("APPLIED", "links")
                 if n > 0:
                     note_event(f"{curator} curated {n} links into the vault")
-                    _os_build("curation", curator, f"connected {n} vault notes (trust {standing:.2f})")
                     e2 = engine.state.entities.get(eid)
                     if e2:
                         engine.add_effect("glow", int(round(e2.x)), int(round(e2.y)), "#9fe0ff", 1.3)
                     logger.info(f"[curation] {curator} applied {n} links (standing {standing:.2f})")
+                    # Only headline SUBSTANTIAL curation in the OS build feed — routine 1-3 link
+                    # gardening every cycle was drowning out the (rarer) research discoveries.
+                    if n >= 4:
+                        _os_build("curation", curator, f"connected {n} vault notes (trust {standing:.2f})")
                 else:
                     logger.info(f"[curation] {curator} — vault graph already well-connected")
         except Exception as e:
@@ -3278,12 +3281,12 @@ async def ambient_life():
         # Autonomous curation: Dame Elara (Bridge Builder) tends the vault's links and
         # Sage Mira (Curator) consolidates live discoveries into vault notes — each gated
         # by their OWN standing, on offset cadences.
-        if (loop_n % 70 == 7 or loop_n % 110 == 50 or loop_n % 130 == 90
+        if (loop_n % 850 == 7 or loop_n % 110 == 50 or loop_n % 1200 == 90
                 or loop_n % 17000 == 300):
             _stm = _compute_standing(await _trust_matrix())
-            if loop_n % 70 == 7 and not curation["running"]:        # Elara: connect links
+            if loop_n % 850 == 7 and not curation["running"]:       # Elara: connect links (~12 min)
                 asyncio.create_task(_run_curation("guard_r", _stm.get("guard_r", 0.5)))
-            if loop_n % 130 == 90 and not curation["running"]:      # Voss: QA flag duplicates
+            if loop_n % 1200 == 90 and not curation["running"]:     # Voss: QA flag duplicates (~17 min)
                 asyncio.create_task(_run_curation("guard_l", _stm.get("guard_l", 0.5), "duplicates"))
             if loop_n % 110 == 50 and not consolidation["running"]:  # Mira: consolidate digest
                 asyncio.create_task(_run_consolidation("scholar", _stm.get("scholar", 0.5)))
