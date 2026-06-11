@@ -130,6 +130,11 @@ def value_snapshot() -> dict:
     pts["flywheel"] = 2.0 * sum(1 for q in fly if q.get("status") == "deepened")
     camps = j(".campaigns.json", [])
     pts["campaigns"] = 3.0 * sum(1 for c in camps if c.get("status") == "complete")
+    # Envoy — outward reputation, read from the last sweep's cache (no network here): 2 per human
+    # reply earned + 1 per reaction across all posted threads.
+    env_seen = j(".envoy.json", {}).get("seen", {})
+    pts["envoy"] = sum(2.0 * v.get("replies", 0) + 1.0 * v.get("our_reactions", 0)
+                       for v in env_seen.values())
     return pts
 
 

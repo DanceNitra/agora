@@ -1360,6 +1360,23 @@ async def brain_scout():
     return {"status": "ok", "report": format_scout(), "items": _load()[-12:]}
 
 
+@router.get("/brain/envoy")
+async def brain_envoy():
+    """THE ENVOY — current outward engagement on every posted thread (read-only)."""
+    import asyncio as _aio
+    from agora.execution.envoy import format_envoy, engagement_status
+    status = await _aio.to_thread(engagement_status)
+    return {"status": "ok", "report": await _aio.to_thread(format_envoy), "threads": status}
+
+
+@router.post("/brain/envoy/sweep")
+async def brain_envoy_sweep():
+    """One Envoy pass: harvest new replies + engagement, return only events new since last sweep."""
+    import asyncio as _aio
+    from agora.execution.envoy import sweep
+    return {"status": "ok", **await _aio.to_thread(sweep)}
+
+
 @router.post("/brain/press/draft")
 async def brain_press_draft(request: Request):
     """THE PRESS — store Claude's polished piece and propose the GATED publish action.

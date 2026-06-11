@@ -591,6 +591,25 @@ async def _seed_npc_inventories(db):
 
 
 @asynccontextmanager
+async def envoy_watch_loop(app: FastAPI):
+    """The Envoy's heartbeat: sweep every posted outreach thread on a slow cadence and alert the
+    owner via Telegram the moment a real human reply or reaction appears — so no one has to watch
+    a GitHub tab. Read-only; never posts (the reply itself stays gated through the Correspondent)."""
+    import asyncio as _aio
+    await _aio.sleep(60)                                  # let startup settle
+    while True:
+        try:
+            from agora.execution.envoy import sweep
+            from agora.api.agent_os_api import _send_telegram
+            r = await _aio.to_thread(sweep)
+            for ev in r.get("new_events", []):
+                await _send_telegram(f"🛰 *Envoy* — someone engaged our outreach:\n{ev}\n"
+                                     f"_reply `envoy` for the full picture_")
+        except Exception as e:
+            print(f"[Envoy] sweep error: {e}")
+        await _aio.sleep(1800)                            # every 30 min
+
+
 async def lifespan(app: FastAPI):
     try:
         await init_db(app)
@@ -611,6 +630,10 @@ async def lifespan(app: FastAPI):
         loop.create_task(watch_dungeon_forever())  # the brain keeps the dungeon alive
     except Exception as _e:
         print(f"[Watchdog] not started: {_e}")
+    try:
+        loop.create_task(envoy_watch_loop(app))    # the Envoy watches our outreach for replies
+    except Exception as _e:
+        print(f"[Envoy] watch loop not started: {_e}")
     yield
     if hasattr(app.state, 'db') and app.state.db:
         await app.state.db.close()

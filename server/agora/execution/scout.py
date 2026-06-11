@@ -52,6 +52,14 @@ def _words(text: str) -> set[str]:
     return {w for w in re.findall(r"[a-z][a-z\-]{2,}", (text or "").lower()) if w not in _STOP}
 
 
+def _iso_to_ts(iso: str) -> float:
+    try:
+        from datetime import datetime, timezone
+        return datetime.strptime(iso, "%Y-%m-%dT%H:%M:%SZ").replace(tzinfo=timezone.utc).timestamp()
+    except Exception:
+        return 0.0
+
+
 def find_opportunity() -> dict | None:
     """Search GitHub open issues across a rotating strength-theme; return the best-fit candidate
     not already contacted, with a fit score and its text for Claude to judge."""
@@ -66,9 +74,17 @@ def find_opportunity() -> dict | None:
     except Exception as e:
         return {"error": str(e)[:120], "theme": theme}
     best = None
+    now = time.time()
     for it in res.get("items", []):
         url = it.get("html_url", "")
         if not url or url in seen or it.get("pull_request"):
+            continue
+        m = re.match(r"https://github\.com/([^/]+/[^/]+)/issues/(\d+)", url)
+        if not m:
+            continue
+        repo = m.group(1)
+        # never pitch our own repo (no audience there) — that is announcing, not engaging
+        if repo.lower().startswith("dancenitra/"):
             continue
         title, body = it.get("title", ""), (it.get("body") or "")[:1200]
         # fit = how much the issue overlaps our strength theme + is it actually a question
@@ -76,14 +92,18 @@ def find_opportunity() -> dict | None:
         asks = 1 if ("?" in title or "?" in body[:400]
                      or re.search(r"\bhow\b|\bwhy\b|\bbest way\b", (title + body[:200]).lower())) else 0
         reactions = (it.get("reactions") or {}).get("total_count", 0)
-        score = overlap * 2 + asks * 3 + min(reactions, 5)
+        # FRESHNESS — a reply only lands if the participants are still present. Reward recently
+        # active threads and skip cold ones (we revived a month-dead thread once; no one answered).
+        upd = it.get("updated_at") or ""
+        age_d = (now - _iso_to_ts(upd)) / 86400 if upd else 999
+        if age_d > 45:                      # cold thread — engaging it is shouting into a void
+            continue
+        fresh = 3 if age_d <= 7 else 2 if age_d <= 21 else 0
+        score = overlap * 2 + asks * 3 + min(reactions, 5) + fresh
         if score >= 5 and (best is None or score > best["score"]):
-            m = re.match(r"https://github\.com/([^/]+/[^/]+)/issues/(\d+)", url)
-            if not m:
-                continue
-            best = {"url": url, "repo": m.group(1), "issue_number": int(m.group(2)),
+            best = {"url": url, "repo": repo, "issue_number": int(m.group(2)),
                     "title": title[:160], "body": body[:900], "theme": theme,
-                    "score": score, "reactions": reactions}
+                    "score": score, "reactions": reactions, "age_days": round(age_d, 1)}
     return best
 
 
