@@ -55,6 +55,8 @@
   .hud-line { color: #b9b3cf; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
   .hud-line.conv { color: #cdb6ff; white-space: normal; line-height: 1.3; }
   .hud-line.conv b { color: #efe6ff; }
+  .hud-line.done { color: #9affc0; }
+  .hud-line.done b { color: #c9ffdd; }
   .hud-line:nth-child(n+10) { opacity: .4; }
   #hud-tasks {
     position: fixed; top: 12px; right: 12px; z-index: 12; width: 300px;
@@ -1211,7 +1213,8 @@ if (!renderer.getContext()) {
     return { mark, pct, initial };
   })();
 
-  // Render the dungeon quest list (who works on what + a live meter)
+  // Render the dungeon quest list — REAL progress from the server (how far each agent is along
+  // its goal), not a fake animation. Updated on every server tasks_update (~1.7s).
   let _lastTasks = [];
   function renderQuestRows() {
     const el = document.getElementById('hud-task-lines');
@@ -1219,9 +1222,7 @@ if (!renderer.getContext()) {
     el.innerHTML = (_lastTasks || []).map(t => {
       const working = t.status === 'in_progress';
       const done = t.status === 'done';
-      const key = 't:' + (t.id != null ? t.id : t.title);
-      Progress.mark(key, working, done);
-      const p = Math.round(Progress.pct(key));
+      const p = (typeof t.progress === 'number') ? Math.round(t.progress) : (done ? 100 : working ? 50 : 6);
       const ini = Progress.initial(t.agent);
       const cls = done ? 'done' : working ? 'working' : 'queued';
       return `<div class="q-row ${cls}"><div class="q-init" title="${_esc(t.agent||'')}">${_esc(ini)}</div>` +
@@ -1230,7 +1231,6 @@ if (!renderer.getContext()) {
              `<div class="q-pct">${p}%</div></div>`;
     }).join('');
   }
-  setInterval(renderQuestRows, 3000);   // animate the meters
 
   // Apply an incremental event broadcast by the server
   function applyEvent(ev) {
@@ -1313,6 +1313,9 @@ if (!renderer.getContext()) {
         TrustGraph.spark(ev.from, ev.to);   // a real NPC↔NPC talk → one packet flies
         if (ev.text)                        // show the actual exchange — who says what to whom
           logEvent(`💬 <b>${_esc(_shortNm(ev.from_name))}</b> → ${_esc(_shortNm(ev.to_name))}: ${_esc(ev.text)}`, 'conv');
+        break;
+      case 'quest_done':                    // a quest finished → announce it; the next takes its place
+        logEvent(`✅ <b>${_esc(_shortNm(ev.agent))}</b> completed: ${_esc(ev.title)}`, 'done');
         break;
       case 'os_modules_snapshot':
         (ev.modules || []).forEach(m => buildModule(m.name, m.tile[0], m.tile[1], m.color));
@@ -1535,14 +1538,22 @@ if (!renderer.getContext()) {
       const box = document.getElementById('hud-research-lines');
       if (!box) return;
       if (!_quests.length) { box.innerHTML = '<div id="hud-research-empty">no research ideas yet…</div>'; return; }
+      // REAL phase-based progress (honest: a stuck quest shows it's stuck, not a fake climb).
+      const realPct = (q) => {
+        const ph = q.phase, st = q.status;
+        if (st === 'done' || st === 'completed' || ph === 'compound') return 100;
+        if (ph === 'pata') return 88;
+        if (st === 'review') return 75;
+        if (st === 'claimed' || st === 'in_progress') return 45;
+        if (st === 'open') return 10;
+        return 20;
+      };
       box.innerHTML = _quests.slice(0, 6).map(q => {
         const title = (q.title || 'untitled').replace(/^Research( question)?:\s*/i, '');
         const st = q.status || 'open';
-        const working = ['claimed', 'in_progress', 'review'].includes(st);
         const done = st === 'done' || st === 'completed' || q.phase === 'compound';
-        const key = 'q:' + (q.id || title);
-        Progress.mark(key, working, done);
-        const p = Math.round(Progress.pct(key));
+        const working = !done && ['claimed', 'in_progress', 'review'].includes(st);
+        const p = realPct(q);
         const ini = Progress.initial(q.assignee || q.owner || 'scout');
         const cls = done ? 'done' : working ? 'working' : 'queued';
         return `<div class="q-row ${cls}"><div class="q-init" title="${_esc(q.owner||'')}">${_esc(ini)}</div>` +
@@ -1561,8 +1572,7 @@ if (!renderer.getContext()) {
       } catch (e) { /* brain may be restarting — keep last render */ }
     }
     refresh();
-    setInterval(refresh, 12000);   // re-fetch statuses
-    setInterval(render, 3000);     // animate the meters
+    setInterval(refresh, 8000);    // re-fetch real statuses every 8s
     return { refresh };
   })();
 

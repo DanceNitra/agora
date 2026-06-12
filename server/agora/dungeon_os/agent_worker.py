@@ -384,6 +384,11 @@ class CorporationWorker:
         url = quest.get("research_source", "")
         title = quest.get("title", "")
 
+        # A frontier-seeded quest carries a LABEL (e.g. 'frontier:contradiction'), not a fetchable
+        # URL. Treating it as a URL made the researcher fetch a bad target → 0 findings → the quest
+        # stuck at 'claimed' forever. Non-http sources mean "research the TOPIC", so clear the url.
+        if url and not url.startswith(("http://", "https://")):
+            url = ""
         if not url:
             for line in quest_goal.split("\n"):
                 if line.startswith("Source: "):

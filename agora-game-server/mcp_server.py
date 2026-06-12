@@ -3249,10 +3249,21 @@ async def ambient_life():
             tag = f"{who} ✓{done}" if done else who
             g = goals.get(eid)
             if g:
-                rows.append({"id": i, "title": g["intent"], "agent": tag, "status": "in_progress"})
+                # REAL progress: how far this agent is from its goal tile (fills as it walks,
+                # ~90% on arrival, then completes) — per-agent, not a synced fake animation.
+                ent = engine.state.entities.get(eid)
+                gt = g.get("tile")
+                if ent and gt:
+                    dist = abs(int(round(ent.x)) - gt[0]) + abs(int(round(ent.y)) - gt[1])
+                    prog = 92 if dist == 0 else max(12, min(85, 88 - dist * 7))
+                else:
+                    prog = 30
+                rows.append({"id": i, "key": f"{eid}:{g['intent'][:24]}", "title": g["intent"],
+                             "agent": tag, "status": "in_progress", "progress": prog})
                 i += 1
             for q in quests.get(eid, [])[:2]:        # show up to 2 upcoming quests
-                rows.append({"id": i, "title": q["intent"], "agent": who, "status": "open"})
+                rows.append({"id": i, "key": f"{eid}:q:{q['intent'][:24]}", "title": q["intent"],
+                             "agent": who, "status": "open", "progress": 6})
                 i += 1
         engine.set_tasks(rows)
 
@@ -3677,6 +3688,9 @@ async def ambient_life():
         if loop_n % 220 == 117:
             asyncio.create_task(_watch_brain())
 
+        if loop_n % 2 == 0:        # refresh the board ~every 1.7s so meters track real movement
+            publish_goals()
+
         for eid, ent in list(ents.items()):
             cx, cy = int(round(ent.x)), int(round(ent.y))
 
@@ -3777,6 +3791,9 @@ async def ambient_life():
                 quest_log.setdefault(eid, []).append(intent)
                 del quest_log[eid][:-6]
                 quest_done[eid] = quest_done.get(eid, 0) + 1
+                # Real completion → the board announces "✓ Done" and the next quest takes over.
+                broadcast({"type": "quest_done", "agent": who, "title": intent[:90],
+                           "kind": kind, "total": quest_done[eid]})
                 hold[eid] = 3
                 goals.pop(eid, None)
                 paths.pop(eid, None)
