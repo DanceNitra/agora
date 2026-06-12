@@ -2,7 +2,64 @@
 
 > Resume doc for a fresh Claude Code session. Chat in **Slovak**; code + user-facing strings **English**.
 
-## ⚡⚡ RESUME HERE (2026-06-11 EVENING — latest)
+## ⚡⚡⚡ RESUME HERE (2026-06-12 — LATEST)
+
+> Chat **Slovak**. Auto-memory loads: read `agora-session-state`, `agora-frontier-direction`,
+> `gated-approval-briefing`, `corporation-subsystem-decision`, `agora-db-integrity-pattern`.
+
+**BIGGEST CHANGE — MODEL IS NOW CLOUD `deepseek-v4-pro`, NOT local qwen3-coder.** Local was the root
+of slowness + weak corp research + GPU contention; owner approved reverting. Both `server/.env`
+(`AGORA_API_BASE_URL=https://ollama.com/v1`, `AGORA_API_KEY=df8301…`, `AGORA_LLM_MODEL=deepseek-v4-pro`)
+and `agora-game-server/.env` (cloud URL + key, `DUNGEON_LLM_MODEL=deepseek-v4-pro`, MAX_TOKENS=3000,
+THINK=false) point to cloud. LOCAL_BACKUP revert lines are in both .env comments. GPU freed (qwen3-coder
+unloaded). LLM now ~2-4s + smart. **This costs the Ollama Cloud subscription** — owner accepted.
+
+**RAISED BAR (critical, see `agora-frontier-direction`):** owner rejected "fewer/deeper insights" — he
+wants **rigorous, scientifically-tested SERIOUS research + genuinely GROUNDBREAKING ideas, NOT re-deriving
+textbook results.** Standing priorities updated via `/brain/board/decide`. My loop work delivers Lab-backed,
+falsifiable, ORIGINAL notes. Shipped this session: the **collective-intelligence trilogy** (cascade
+N_eff=3 / Lab e8b881; topology k_c=2 / 678a9c; the cure needs ~80% independence / aa23bf) + **self-refinement
+amplifies the critic** (sub-coinflip critic iterated → collapses to 0 / ea3869) + collider-bias, static-IV,
+finance vol-drag. These are the real value engine.
+
+**CORP PIPELINE — fixed end-to-end (it was 100% stuck/rejected):** (1) `research_summary` now populated
+from findings so CEO/CTO evaluate real research; (2) eval verdict now PERSISTS (was re-evaluating forever);
+(3) `_topic_research` grounds findings in REAL literature (OpenAlex+arXiv) not bare LLM; (4) eval gate
+SOFTENED (`approved = cto OR ceo OR max_score≥60`) — corp surfaces LEADS, **Claude is the real filter via
+Ship-review**; (5) corp tick runs as a BACKGROUND task (was blocking the brain loop); (6) MetaScanner
+meta-quests ("agents stuck", "rejecting too many") are now one-shot ALERTS (terminal on creation) — they
+were re-researching forever (90+ findings, the "stuck agents" the owner kept seeing). Approved corp research
+→ Ship-review task in Claude's inbox → I develop+ship the good ones.
+
+**OUTREACH — LIVE + the briefing workflow:** posted comment on **mem0ai/mem0#5330** (value-ranked vs
+frequency decay) + published press piece "Why crowds get dumber…" to `public/posts/`. Real inbound: on
+zeroclaw#5849 / deer-flow#1898 we got a 🚀 reaction, **@DanceNitra cited by `ferhimedamine` ("strongly
+agree")**, validated 2× in their production. **WORKFLOW (see `gated-approval-briefing`):** before ANY
+`approve <id>`, give owner a Slovak briefing — their question + our answer + how we use it. Envoy watches
+replies; when one lands, brief owner + propose our reply.
+
+**DUNGEON UI (owner cares a lot):** QuestBoard shows multi-agent initials (left of quest), REAL
+per-agent progress meters (distance-to-goal), a zero-cost **PULSE** live counter (findings/exchanges/done),
+event log shows real Q&A "💬 X → Y: …" + "✅ done" (NOT trust "grew closer"), panels capped (no overlap),
+agents DIVERGE not herd (applied our own research). Cadence faster on cloud.
+
+**VAULT FUNNEL WIDENED (this request):** `promote-findings` n 8→16, candidate cap 24→40, cadence ~20→10min
+(`mcp_server.py _run_promotion` + `loop_n % 750 == 350`). ~1947 discoveries → more gems now land in the vault.
+
+**NEXT (priority):**
+1. Keep delivering AMBITIOUS ORIGINAL Lab-backed research (the raised bar) + expand outreach to strong fits
+   (mem0-style: map our measured findings to a real open issue, gated, brief owner first).
+2. Watch corp pipeline now produce APPROVED research on v4-pro → Ship-reviews → develop them.
+3. Watch mem0#5330 thread for replies (Envoy) → brief owner + propose reply.
+4. **Do NOT rabbit-hole on dungeon cosmetics** — owner's redirect: focus on the WHOLE self-improving system
+   (research + outreach + business plan), not banalities.
+
+**Pending gated (owner acts):** none right now (mem0 + press both just approved+executed). GitHub Pages
+deploy may still be blocked (billing) — `public/` files committed regardless.
+
+---
+
+## ⚡⚡ RESUME HERE (2026-06-11 EVENING)
 
 **This session pivoted Agora from internal research OS → a public, credibility-earning FIRM, and
 shipped the first product.** Memory auto-loads strategy (`agora-roadmap-firm-os`,

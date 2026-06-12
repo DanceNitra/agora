@@ -275,7 +275,7 @@ _PROMOTE_STATS = {"promoted": 0, "checked": 0}   # cumulative funnel stats for t
 
 
 @router.post("/brain/promote-findings")
-async def promote_findings(request: Request, n: int = 8):
+async def promote_findings(request: Request, n: int = 16):
     """Promote the best recent findings into the vault through the (reliable) quality gate — the
     research→vault path that actually flows. Verification incorporates ~0 (too strict), so without
     this, grounded findings pile up only in the brain and never reach the Obsidian second-brain.
@@ -307,7 +307,7 @@ async def promote_findings(request: Request, n: int = 8):
         if _by and _sy and _by.group(0) != _sy.group(0):
             continue
         cands.append((title, content))
-        if len(cands) >= 24:                              # bound the scoring cost (local judge is cheap)
+        if len(cands) >= 40:                              # wider funnel — more gems reach the vault
             break
 
     # 2) CRITICAL-WINDOW LOAD BALANCER (Agora's own insight, applied to itself): the consolidation

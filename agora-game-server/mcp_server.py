@@ -1471,7 +1471,7 @@ async def _run_promotion() -> None:
     incorporates ~0, so this is what keeps real notes flowing in)."""
     # local judge ~2.4s × up to 24 candidates + writes → needs a generous timeout (default 4s would
     # cut the funnel off mid-run, which is part of why so little was landing).
-    d = await asyncio.to_thread(_brain_post_sync, "/api/v1/agent-os/brain/promote-findings?n=8", {}, 150)
+    d = await asyncio.to_thread(_brain_post_sync, "/api/v1/agent-os/brain/promote-findings?n=16", {}, 200)
     p = (d or {}).get("promoted", 0)
     if p:
         broadcast({"type": "os_build", "kind": "collab", "who": "Sage Mira",
@@ -3546,7 +3546,7 @@ async def ambient_life():
             asyncio.create_task(_run_verification())
         # Mira promotes the best grounded findings into the vault via the quality gate (~20 min) —
         # the reliable research→vault funnel so the second-brain actually grows.
-        if loop_n % 1500 == 700:
+        if loop_n % 750 == 350:               # ~10 min: wider + more frequent funnel (more gems land)
             asyncio.create_task(_run_promotion())
         # Aldric harvests findings into next directions (~13 min) — work compounds toward them.
         if loop_n % 950 == 600:
