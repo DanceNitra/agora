@@ -17,7 +17,10 @@ Design rules that are not optional (each one cost us to learn):
     that is what stops the slow accuracy drift of LLM-rewritten memory.
   • Absolute timestamps at write time. Relative/derived times rot the moment they're consolidated.
   • Value-ranked, capacity-aware consolidation. The payoff from ranking *what to keep* scales
-    super-linearly as the budget shrinks (measured), so retention tracks value, not recency.
+    super-linearly as the budget shrinks (measured), so retention tracks value, not recency — and
+    NOT access-frequency: decaying on reads keeps *popular* memories, but popularity != value, so a
+    pure access-reset policy starves the rarely-read-but-load-bearing fact (measured: it retains
+    ~3x less total value than a value blend under a tight budget). Forgetting blends value + recency.
   • Report value at the COHORT level (tag / time-block), never per-memory: per-item value at n-of-1
     is statistical noise; cohorts are where the signal lives.
   • Contradictions are flagged for review, not auto-resolved. Silent rewrites destroy trust.

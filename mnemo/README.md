@@ -89,7 +89,12 @@ its memory is value-ranked and append-only, not a recency buffer.
 1. **Raw capture is immutable.** Consolidation adds links and markers; it never overwrites the
    source. This is what stops the slow accuracy drift of LLM-rewritten memory.
 2. **Absolute timestamps at write time.** Relative/derived times rot the moment they're consolidated.
-3. **Value-ranked, capacity-aware consolidation.** Retention tracks *value*, not recency.
+3. **Value-ranked, capacity-aware consolidation.** Retention tracks *value*, not recency — and
+   **not access-frequency either.** Resetting a memory's decay clock on every read (the common
+   half-life-with-access-reset trick) keeps *popular* memories, but popularity ≠ value: the
+   load-bearing-but-cold fact — the one queried once a month that prevents a destructive action —
+   gets starved while a frequently-but-trivially-read memory is immortal. Forgetting consumes a
+   value signal blended with recency, never access recency alone.
 4. **Value is reported at the cohort level** (tag / time-block), never per-memory.
 5. **Contradictions are flagged, never auto-resolved.** Silent rewrites destroy trust in the whole
    memory.
@@ -101,6 +106,14 @@ its memory is value-ranked and append-only, not a recency buffer.
 - **Value-ranked consolidation** — under a keep-budget, ranking *what to keep* by value beats
   FIFO/random, and the advantage **scales super-linearly as the budget shrinks** (≈1.8× at half
   budget → ≈4× at one-eighth), surviving heavy estimation noise.
+- **Retention must blend value with recency, not decay on access alone** — we simulated a
+  half-life-with-access-reset policy (a *popularity* signal) against a value-aware blend under a
+  shrinking budget, with value made deliberately anti-correlated with access-frequency for a
+  load-bearing-but-cold subset. At a 30% keep-budget the access-decay policy retained only **2.8%**
+  of the high-value/low-frequency memories and **20%** of total value, vs **100%** and **64%** for
+  the blend — about **3× more value kept** (the gap persists, ≈2.2× retained value, even at a 7%
+  budget). Pure access-frequency decay starves the rarely-queried-but-critical memories; forgetting
+  must consume an explicit value channel *separate from* access recency. (Agora Lab `19d802`.)
 - **Cohort-level value** — per-memory outcome attribution is **statistically underpowered at n-of-1**
   (the best proxy reached only ~0.36 power at realistic sample sizes); the cohort is where the
   signal lives. Hence rule 4.
