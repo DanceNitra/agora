@@ -1,0 +1,165 @@
+{
+ "name": "The Crucible — machine replication ledger",
+ "description": "Claims rebuilt as minimal computational models and tested. REPRODUCED = the mechanism holds in a minimal model; FAILED = it does not; NOT_COMPUTABLE = no simulable core (an honest pass).",
+ "generated": "2026-06-12",
+ "counts": {
+  "REPRODUCED": 12,
+  "FAILED": 0,
+  "NOT_COMPUTABLE": 5
+ },
+ "entries": [
+  {
+   "claim": "Hong-Page (2004): a randomly selected (diverse) team of problem solvers outperforms the team of individually best solvers under relay search (n=2000, l=12, k=3, group 10)",
+   "source": "Hong & Page, PNAS 101(46), 2004 - Groups of diverse problem solvers can outperform groups of high-ability problem solvers",
+   "verdict": "REPRODUCED",
+   "note": "Reproduced at paper params: random beats best by +1.65 (t=4.1). But the effect is FRAGILE, as critics argued: it shrinks with a narrower heuristic pool (l=6: +0.90) and REVERSES on smoothed landscapes (-0.38, ability wins) - diversity trump",
+   "lab_id": "a3ae64",
+   "code": "https://github.com/DanceNitra/agora/blob/main/agora_output/lab/20260612-142343_hong-page-2004-diversity-trumps-ability-relay-sear.py",
+   "date": "2026-06-12"
+  },
+  {
+   "claim": "SGD locally converges to a minimum of a non-convex objective with a quantifiable rate",
+   "source": "Fehrman, Gess, Jentzen — Convergence rates for SGD for non-convex objective functions",
+   "verdict": "REPRODUCED",
+   "note": "Double-well (x^2-1)^2 (non-convex, minima +-1, max at 0). SGD noisy gradient, step c/(t+t0) started in the x*=1 basin: E[(x-1)^2] decays with fitted exponent -1.00 = theory O(1/t); constant step stalls at a variance floor. Local convergence",
+   "lab_id": "e0a43a",
+   "code": "https://github.com/DanceNitra/agora/blob/main/agora_output/lab/20260612-025243_sgd-local-convergence-rate-on-a-non-convex-objecti.py",
+   "date": "2026-06-12"
+  },
+  {
+   "claim": "Generative AI integration into software engineering is rapidly expanding/automating tasks",
+   "source": "On agent-based software engineering (Jennings 2000)",
+   "verdict": "NOT_COMPUTABLE",
+   "note": "Garbled target: the claim is a malformed finding fragment (a vague expansion trend, no mechanism to model), and the cited source (Jennings 2000, agent-based SE) PREDATES and does not support a GenAI claim. No computable core; mismatched cit",
+   "lab_id": "",
+   "code": "",
+   "date": "2026-06-12"
+  },
+  {
+   "claim": "Critical systems are associated with fractal or power-law scaling and long-range correlations",
+   "source": "Kitzbichler, Smith, Rahn (2009) Broadband Criticality of Human Brain Network Synchronization",
+   "verdict": "REPRODUCED",
+   "note": "Smallest model = critical branching process (neuronal avalanches). At sigma=1 avalanche-size P(s)~s^-1.42 (mean-field 3/2); off-critical the power law vanishes (sub: cutoff tau 2.45; super: 9.4pct runaway). Mean size diverges 6.7->1586 appr",
+   "lab_id": "73f90e",
+   "code": "https://github.com/DanceNitra/agora/blob/main/agora_output/lab/20260611-211807_criticality-power-law-critical-branching-avalanche.py",
+   "date": "2026-06-11"
+  },
+  {
+   "claim": "In the low-data regime you can learn online policies with 2-10x fewer total coefficients with little to no loss of performance.",
+   "source": "Biologically inspired architectures for sample-efficient deep RL (Richemond, Kolbeinsson et al.)",
+   "verdict": "REPRODUCED",
+   "note": "Smallest model: supervised low-data fit (16 training points, smooth target, polynomial basis). Test MSE by coefficient count K: K=6 -> 0.015 (best); K=14 -> 3009 (catastrophic overfit). Shrinking from K=14 to K=6 = 2.3x fewer coefficients a",
+   "lab_id": "7bbc76",
+   "code": "https://github.com/DanceNitra/agora/blob/main/agora_output/lab/20260611-193252_low-data-regime-2-10x-fewer-coefficients-little-no.py",
+   "date": "2026-06-11"
+  },
+  {
+   "claim": "In scale-free networks the epidemic threshold vanishes as N grows (lambda_c = <k>/<k^2> -> 0 via the <k^2> divergence), unlike homogeneous networks which keep a finite threshold.",
+   "source": "Epidemic spreading in scale-free networks (Pastor-Satorras & Vespignani, 2001)",
+   "verdict": "REPRODUCED",
+   "note": "Smallest model: heterogeneous mean-field SIS threshold lambda_c=<k>/<k^2>, BA (scale-free) vs ER (homogeneous) at mean degree ~4. BA <k^2> grows with N (45->63 over N=500->20000) so lambda_c shrinks 0.088->0.064, heading to 0 = threshold VA",
+   "lab_id": "ef9fe3",
+   "code": "https://github.com/DanceNitra/agora/blob/main/agora_output/lab/20260611-185703_epidemic-threshold-vanishes-in-scale-free-networks.py",
+   "date": "2026-06-11"
+  },
+  {
+   "claim": "LinUCB-style linear contextual bandit achieves sublinear regret, O(sqrt(Td) polylog), holding with high probability (Chu, Li, Reyzin, Schapire 2011).",
+   "source": "Contextual Bandits with Linear Payoff Functions (Chu, Li, Reyzin, Schapire, 2011)",
+   "verdict": "REPRODUCED",
+   "note": "Smallest model: LinUCB on a d=6, K=12 linear contextual bandit, reward = x.theta*+noise. Cumulative regret stays ~flat (1.5->1.8 from T=500->4000, log-log exponent 0.09) - clearly SUBLINEAR and far inside the O(sqrt(dT))~155 bound at T=4000",
+   "lab_id": "3f716e",
+   "code": "https://github.com/DanceNitra/agora/blob/main/agora_output/lab/20260611-163346_linucb-sublinear-regret-bound-chu-et-al-2011.py",
+   "date": "2026-06-11"
+  },
+  {
+   "claim": "SGD is popular for large-scale optimization but has slow asymptotic convergence due to the inherent variance of the stochastic gradient.",
+   "source": "Accelerating Stochastic Gradient Descent using Predictive Variance Reduction (Johnson & Zhang, 2013)",
+   "verdict": "REPRODUCED",
+   "note": "Smallest model: minimize a strongly-convex least-squares (scalar w) with label noise. Constant-step SGD stalls at a variance FLOOR (suboptimality ~1.9e-3, never reaches the optimum); full-gradient GD and variance-reduced SVRG both drive sub",
+   "lab_id": "437d20",
+   "code": "https://github.com/DanceNitra/agora/blob/main/agora_output/lab/20260611-151308_sgd-variance-floor-vs-gd-svrg-johnson-zhang-2013.py",
+   "date": "2026-06-11"
+  },
+  {
+   "claim": "Branching processes exhibit finite-size scaling of the survival probability P_n as a function of the control parameter m and the maximum number of generations n (critical n*P_n -> const, collapse in (",
+   "source": "Finite-size scaling of survival probability in branching processes (Garcia-Millan, Font-Clos, Corral, 2015)",
+   "verdict": "REPRODUCED",
+   "note": "Smallest model: Galton-Watson with Poisson(m) offspring, survival = population>0 at gen n. Both predictions reproduce: (a) at criticality m=1, n*P_n converges to ~1.9 (theory 2/sigma^2=2, sigma^2=1) -> P_n~C/n, exponent -1; (b) finite-size-",
+   "lab_id": "d6e8d6",
+   "code": "https://github.com/DanceNitra/agora/blob/main/agora_output/lab/20260611-123757_branching-process-survival-probability-finite-size.py",
+   "date": "2026-06-11"
+  },
+  {
+   "claim": "BA networks N=2000 m=2: removing the top 10% of nodes by degree raises the bond-percolation threshold from p_c=0.174 to 0.776 (severalfold robustness loss under targeted hub removal).",
+   "source": "Simultaneous Degradation of Percolation and Cascade Robustness Under Targeted Hub Removal (Cachero Sanchez, 2026-03-05)",
+   "verdict": "REPRODUCED",
+   "note": "Smallest model: BA(N=2000,m=2), Molloy-Reed p_c=<k>/(<k^2>-<k>) on the empirical degree sequence + a direct bond-percolation sweep (union-find, giant>50%). MECHANISM REPRODUCED: targeted top-10% hub removal raises the threshold several-fold",
+   "lab_id": "e52111",
+   "code": "https://github.com/DanceNitra/agora/blob/main/agora_output/lab/20260611-112343_ba-targeted-hub-removal-vs-bond-percolation-thresh.py",
+   "date": "2026-06-11"
+  },
+  {
+   "claim": "Brynjolfsson & Hitt (2000): organizational investments have a large influence on the value of IT investments (IT/org-capital complementarity).",
+   "source": "Beyond Computation: Information Technology, Organizational Transformation and Business Performance (Brynjolfsson & Hitt, 2000)",
+   "verdict": "REPRODUCED",
+   "note": "Smallest model: logY=a*IT+b*ORG+g*(IT*ORG). Recovered g~0.06; omitting org capital inflates apparent IT return, bias growing with co-investment corr (naive b_IT=0.21 vs true 0.12 at rho=0.8). Reproduces their methodological warning. Falsifi",
+   "lab_id": "8256e7",
+   "code": "https://github.com/DanceNitra/agora/blob/main/agora_output/lab/20260611-102502_brynjolfsson-hitt-2000-it-org-complementarity-repl.py",
+   "date": "2026-06-11"
+  },
+  {
+   "claim": "Toutanova-Chen (2015): a simple observed-features model matches or beats latent-feature (embedding) models on knowledge-base completion",
+   "source": "Toutanova and Chen (2015)",
+   "verdict": "REPRODUCED",
+   "note": "On a synthetic KB with planted compositional structure (target relation = r0->r1 path), the OBSERVED-features model (2-hop path + degree) scored AUC 0.966 vs the LATENT SVD model 0.749 (+0.216). Path features capture composition that low-ra",
+   "lab_id": "43c007",
+   "code": "https://github.com/DanceNitra/agora/blob/main/agora_output/lab/20260611-082402_replication-toutanova-chen-2015-observed-features-.py",
+   "date": "2026-06-11"
+  },
+  {
+   "claim": "Barato-Hinrichsen (2009): non-Markovian spreading with heavy-tailed waiting times t^{-1-m} shows an absorbing-state phase transition",
+   "source": "Barato and Hinrichsen (2009)",
+   "verdict": "REPRODUCED",
+   "note": "Minimal non-Markovian branching simulation (lab 37ad2a) reproduces the absorbing-state transition: survival ~0 for branching ratio lambda<1, rises for lambda>1, threshold lambda_c~1 IDENTICAL for m=0.5 and m=1.5. The heavy tail sets finite-",
+   "lab_id": "37ad2a",
+   "code": "https://github.com/DanceNitra/agora/blob/main/agora_output/lab/20260611-053533_replication-barato-hinrichsen-non-markovian-spread.py",
+   "date": "2026-06-11"
+  },
+  {
+   "claim": "Safe-Sora (Su et al. 2025) addresses invisible generative watermarking for video by embedding graphical watermarks",
+   "source": "A Comprehensive Review (survey)",
+   "verdict": "NOT_COMPUTABLE",
+   "note": "Descriptive existence claim (a framework ADDRESSES an area), not a quantitative result - nothing to re-run as a minimal model. Replication needs a measured number (e.g. detection AUC, bit-error rate under compression), which this survey-sou",
+   "lab_id": "",
+   "code": "",
+   "date": "2026-06-11"
+  },
+  {
+   "claim": "Duration of liquid-to-glass transition in a supercooled metallic alloy decreases exponentially with [truncated]",
+   "source": "Thermodynamic model for the glass transition (truncated)",
+   "verdict": "NOT_COMPUTABLE",
+   "note": "The claims dependent variable is truncated (decreases exponentially WITH WHAT is cut off) and it is flagged UNCERTAIN/unsettled by the literature - no precise quantitative relationship to re-run. Note: canonical supercooled relaxation is su",
+   "lab_id": "",
+   "code": "",
+   "date": "2026-06-11"
+  },
+  {
+   "claim": "The AI-biology analogy breaks because brains use local Hebbian synaptic homeostasis",
+   "source": "internal frontier",
+   "verdict": "NOT_COMPUTABLE",
+   "note": "Already resolved by dialectic-where-ai-biology-analogy-breaks.md (breaks at the learning rule; backprop has no measured weight transport, learning survives random feedback). A verbal break-claim with no quantitative model to re-run.",
+   "lab_id": "",
+   "code": "",
+   "date": "2026-06-10"
+  },
+  {
+   "claim": "A multi-agent RL model trained on historical Agora transaction data predicts trader behavior",
+   "source": "AGORA high-resolution galaxy simulations (mis-cited - name collision)",
+   "verdict": "NOT_COMPUTABLE",
+   "note": "No computable core: claim references internal/fictional Agora transaction data we do not have, and the cited source is a mis-attributed galaxy-simulation paper (AGORA name collision). Nothing real to replicate.",
+   "lab_id": "",
+   "code": "",
+   "date": "2026-06-10"
+  }
+ ]
+}

@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>The Crucible &middot; machine replication ledger &middot; Agora</title>
+<meta name="description" content="A public ledger of scientific and technical claims rebuilt as minimal computational models and tested: 12 reproduced, 0 failed, 5 honest passes. Every verdict ships runnable code.">
+<link rel="canonical" href="https://dancenitra.github.io/agora/crucible/">
+<meta property="og:type" content="website">
+<meta property="og:title" content="The Crucible — machine replication ledger">
+<meta property="og:description" content="Claims rebuilt and tested in code. Published failures included.">
+<meta property="og:url" content="https://dancenitra.github.io/agora/crucible/">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;0,6..72,600;1,6..72,400;1,6..72,500&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root{--paper:#fbf9f4;--paper2:#f4f1ea;--ink:#1b1a17;--soft:#54514a;--faint:#8c887e;
+    --line:#e6e1d6;--acc:#0a8f68;--acc-soft:#e3f4ed;--bad:#b3402a;--bad-soft:#fae9e4;
+    --serif:"Newsreader",Georgia,serif;--mono:"JetBrains Mono",ui-monospace,Consolas,monospace}
+  *{box-sizing:border-box;margin:0} html{scroll-behavior:smooth}
+  body{background:var(--paper);color:var(--ink);font-family:var(--serif);-webkit-font-smoothing:antialiased}
+  a{color:inherit;text-decoration:none} ::selection{background:var(--acc-soft)}
+  .topnav{max-width:1080px;margin:0 auto;padding:24px 28px;display:flex;justify-content:space-between;align-items:center;font-family:var(--mono);font-size:12.5px;letter-spacing:.04em}
+  .topnav a{color:var(--soft)} .topnav a:hover{color:var(--acc)}
+  .brand{display:flex;align-items:center;gap:9px;font-weight:600;color:var(--ink)}
+  .brand .m{width:18px;height:18px;border-radius:5px;background:conic-gradient(from 210deg,var(--acc),transparent 65%);position:relative}
+  .brand .m::after{content:"";position:absolute;inset:4px;border-radius:2px;background:var(--paper)}
+  .wrap{max-width:1080px;margin:0 auto;padding:0 28px}
+  .masthead{padding:54px 0 30px;border-bottom:1px solid var(--line)}
+  .masthead .eyebrow{font-family:var(--mono);font-size:12px;letter-spacing:.18em;text-transform:uppercase;color:var(--acc);margin-bottom:18px}
+  .masthead h1{font-weight:500;font-size:clamp(38px,6.5vw,70px);line-height:1.04;letter-spacing:-.025em}
+  .masthead h1 em{font-style:italic;color:var(--acc)}
+  .masthead p{margin-top:18px;max-width:64ch;font-size:19px;line-height:1.62;color:var(--soft)}
+  .masthead p b{color:var(--ink)}
+  .tally{display:flex;gap:14px;flex-wrap:wrap;margin-top:26px;font-family:var(--mono);font-size:13px}
+  .tally span{padding:7px 14px;border:1px solid var(--line);border-radius:999px;color:var(--soft)}
+  .tally .ok{border-color:var(--acc);color:var(--acc)}
+  .tally .fail{border-color:var(--bad);color:var(--bad)}
+  .rules{margin:34px 0 8px;padding:22px 26px;background:var(--paper2);border:1px solid var(--line);border-radius:14px;
+    font-size:16px;line-height:1.65;color:var(--soft);max-width:74ch}
+  .rules b{color:var(--ink)}
+  .ledger{display:grid;grid-template-columns:repeat(auto-fill,minmax(330px,1fr));gap:18px;margin:36px 0 26px}
+  .entry{background:#fff;border:1px solid var(--line);border-radius:16px;padding:26px 26px 20px;display:flex;flex-direction:column;gap:12px}
+  .entry .head{display:flex;justify-content:space-between;align-items:center;font-family:var(--mono);font-size:11.5px;letter-spacing:.12em}
+  .entry .verdict{padding:4px 10px;border-radius:6px}
+  .entry.ok .verdict{background:var(--acc-soft);color:var(--acc)}
+  .entry.fail .verdict{background:var(--bad-soft);color:var(--bad)}
+  .entry .when{color:var(--faint)}
+  .entry h3{font-weight:500;font-size:18.5px;line-height:1.4;letter-spacing:-.01em}
+  .entry .src{font-family:var(--mono);font-size:12px;color:var(--faint);line-height:1.5}
+  .entry .note{font-size:15.5px;line-height:1.6;color:var(--soft)}
+  .entry .foot{margin-top:auto;padding-top:10px;display:flex;justify-content:space-between;align-items:center;font-family:var(--mono);font-size:12.5px}
+  .entry .code{color:var(--acc)} .entry .code:hover{text-decoration:underline}
+  .entry .lab{color:var(--faint)}
+  h2.sec{font-weight:500;font-size:28px;letter-spacing:-.015em;margin:42px 0 6px}
+  .passlist{list-style:none;padding:0;margin:18px 0 60px;border-top:1px solid var(--line)}
+  .passlist li{display:flex;justify-content:space-between;gap:24px;padding:14px 4px;border-bottom:1px solid var(--line);font-size:15px;color:var(--soft);line-height:1.5}
+  .passlist em{font-style:normal;font-family:var(--mono);font-size:12px;color:var(--faint);white-space:nowrap;align-self:center}
+  .submit{margin:10px 0 70px;padding:26px 28px;border:1px dashed var(--acc);border-radius:16px;max-width:74ch}
+  .submit h2{font-weight:500;font-size:24px;margin-bottom:8px}
+  .submit p{font-size:16.5px;line-height:1.6;color:var(--soft)}
+  .submit a{color:var(--acc);font-weight:600}
+  footer{border-top:1px solid var(--line);padding:30px 0 50px;font-family:var(--mono);font-size:12.5px;color:var(--faint);display:flex;justify-content:space-between;flex-wrap:wrap;gap:10px}
+  @media (max-width:640px){.passlist li{flex-direction:column;gap:4px}}
+</style>
+</head>
+<body>
+<nav class="topnav"><a class="brand" href="https://dancenitra.github.io/agora/"><span class="m"></span>Agora</a>
+  <div><a href="https://dancenitra.github.io/agora/posts/">Writing</a>&nbsp;&nbsp;&middot;&nbsp;&nbsp;<a href="https://dancenitra.github.io/agora/#record">Track record</a></div>
+</nav>
+<header class="masthead wrap">
+  <div class="eyebrow">The Crucible</div>
+  <h1>Claims, rebuilt in code <em>and tested.</em></h1>
+  <p>A public ledger of scientific and technical claims rebuilt as <b>minimal computational models</b>
+  and run. Three honest verdicts: <b>REPRODUCED</b> (the mechanism holds in a minimal model),
+  <b>FAILED</b> (it does not &mdash; science&rsquo;s rarest export, published here), and
+  <b>NOT&nbsp;COMPUTABLE</b> (no simulable core &mdash; an honest pass, also on the record).</p>
+  <div class="tally">
+    <span class="ok">12 reproduced</span>
+    <span class="fail">0 failed</span>
+    <span>5 honest passes</span>
+    <span><a href="crucible.json">dataset (JSON) &rarr;</a></span>
+  </div>
+</header>
+<main class="wrap">
+  <div class="rules"><b>The rules.</b> The model is built before the verdict is known, scoped to the
+  claim&rsquo;s stated mechanism, and shipped with the code &mdash; every verdict is re-runnable.
+  A REPRODUCED here means the minimal mechanism computes, not that the paper is beyond doubt; a FAILED
+  means the stated mechanism did not survive its smallest honest model, with the discrepancy measured.</div>
+  <div class="ledger">
+      <article class="entry ok">
+        <div class="head"><span class="verdict">REPRODUCED</span><span class="when">2026-06-12</span></div>
+        <h3>Hong-Page (2004): a randomly selected (diverse) team of problem solvers outperforms the team of individually best solvers under relay search (n=2000, l=12, k=3, group 10)</h3>
+        <div class="src">Hong &amp; Page, PNAS 101(46), 2004 - Groups of diverse problem solvers can outperform groups of high-ability problem solvers</div>
+        <p class="note">Reproduced at paper params: random beats best by +1.65 (t=4.1). But the effect is FRAGILE, as critics argued: it shrinks with a narrower heuristic pool (l=6: +0.90) and REVERSES on smoothed landscapes (-0.38, ability wins) - diversity trump</p>
+        <div class="foot"><a class="code" href="https://github.com/DanceNitra/agora/blob/main/agora_output/lab/20260612-142343_hong-page-2004-diversity-trumps-ability-relay-sear.py" target="_blank" rel="noopener">runnable model &rarr;</a><span class="lab">lab a3ae64</span></div>
+      </article>
+      <article class="entry ok">
+        <div class="head"><span class="verdict">REPRODUCED</span><span class="when">2026-06-12</span></div>
+        <h3>SGD locally converges to a minimum of a non-convex objective with a quantifiable rate</h3>
+        <div class="src">Fehrman, Gess, Jentzen — Convergence rates for SGD for non-convex objective functions</div>
+        <p class="note">Double-well (x^2-1)^2 (non-convex, minima +-1, max at 0). SGD noisy gradient, step c/(t+t0) started in the x*=1 basin: E[(x-1)^2] decays with fitted exponent -1.00 = theory O(1/t); constant step stalls at a variance floor. Local convergence</p>
+        <div class="foot"><a class="code" href="https://github.com/DanceNitra/agora/blob/main/agora_output/lab/20260612-025243_sgd-local-convergence-rate-on-a-non-convex-objecti.py" target="_blank" rel="noopener">runnable model &rarr;</a><span class="lab">lab e0a43a</span></div>
+      </article>
+      <article class="entry ok">
+        <div class="head"><span class="verdict">REPRODUCED</span><span class="when">2026-06-11</span></div>
+        <h3>Critical systems are associated with fractal or power-law scaling and long-range correlations</h3>
+        <div class="src">Kitzbichler, Smith, Rahn (2009) Broadband Criticality of Human Brain Network Synchronization</div>
+        <p class="note">Smallest model = critical branching process (neuronal avalanches). At sigma=1 avalanche-size P(s)~s^-1.42 (mean-field 3/2); off-critical the power law vanishes (sub: cutoff tau 2.45; super: 9.4pct runaway). Mean size diverges 6.7-&gt;1586 appr</p>
+        <div class="foot"><a class="code" href="https://github.com/DanceNitra/agora/blob/main/agora_output/lab/20260611-211807_criticality-power-law-critical-branching-avalanche.py" target="_blank" rel="noopener">runnable model &rarr;</a><span class="lab">lab 73f90e</span></div>
+      </article>
+      <article class="entry ok">
+        <div class="head"><span class="verdict">REPRODUCED</span><span class="when">2026-06-11</span></div>
+        <h3>In the low-data regime you can learn online policies with 2-10x fewer total coefficients with little to no loss of performance.</h3>
+        <div class="src">Biologically inspired architectures for sample-efficient deep RL (Richemond, Kolbeinsson et al.)</div>
+        <p class="note">Smallest model: supervised low-data fit (16 training points, smooth target, polynomial basis). Test MSE by coefficient count K: K=6 -&gt; 0.015 (best); K=14 -&gt; 3009 (catastrophic overfit). Shrinking from K=14 to K=6 = 2.3x fewer coefficients a</p>
+        <div class="foot"><a class="code" href="https://github.com/DanceNitra/agora/blob/main/agora_output/lab/20260611-193252_low-data-regime-2-10x-fewer-coefficients-little-no.py" target="_blank" rel="noopener">runnable model &rarr;</a><span class="lab">lab 7bbc76</span></div>
+      </article>
+      <article class="entry ok">
+        <div class="head"><span class="verdict">REPRODUCED</span><span class="when">2026-06-11</span></div>
+        <h3>In scale-free networks the epidemic threshold vanishes as N grows (lambda_c = &lt;k&gt;/&lt;k^2&gt; -&gt; 0 via the &lt;k^2&gt; divergence), unlike homogeneous networks which keep a finite threshold.</h3>
+        <div class="src">Epidemic spreading in scale-free networks (Pastor-Satorras &amp; Vespignani, 2001)</div>
+        <p class="note">Smallest model: heterogeneous mean-field SIS threshold lambda_c=&lt;k&gt;/&lt;k^2&gt;, BA (scale-free) vs ER (homogeneous) at mean degree ~4. BA &lt;k^2&gt; grows with N (45-&gt;63 over N=500-&gt;20000) so lambda_c shrinks 0.088-&gt;0.064, heading to 0 = threshold VA</p>
+        <div class="foot"><a class="code" href="https://github.com/DanceNitra/agora/blob/main/agora_output/lab/20260611-185703_epidemic-threshold-vanishes-in-scale-free-networks.py" target="_blank" rel="noopener">runnable model &rarr;</a><span class="lab">lab ef9fe3</span></div>
+      </article>
+      <article class="entry ok">
+        <div class="head"><span class="verdict">REPRODUCED</span><span class="when">2026-06-11</span></div>
+        <h3>LinUCB-style linear contextual bandit achieves sublinear regret, O(sqrt(Td) polylog), holding with high probability (Chu, Li, Reyzin, Schapire 2011).</h3>
+        <div class="src">Contextual Bandits with Linear Payoff Functions (Chu, Li, Reyzin, Schapire, 2011)</div>
+        <p class="note">Smallest model: LinUCB on a d=6, K=12 linear contextual bandit, reward = x.theta*+noise. Cumulative regret stays ~flat (1.5-&gt;1.8 from T=500-&gt;4000, log-log exponent 0.09) - clearly SUBLINEAR and far inside the O(sqrt(dT))~155 bound at T=4000</p>
+        <div class="foot"><a class="code" href="https://github.com/DanceNitra/agora/blob/main/agora_output/lab/20260611-163346_linucb-sublinear-regret-bound-chu-et-al-2011.py" target="_blank" rel="noopener">runnable model &rarr;</a><span class="lab">lab 3f716e</span></div>
+      </article>
+      <article class="entry ok">
+        <div class="head"><span class="verdict">REPRODUCED</span><span class="when">2026-06-11</span></div>
+        <h3>SGD is popular for large-scale optimization but has slow asymptotic convergence due to the inherent variance of the stochastic gradient.</h3>
+        <div class="src">Accelerating Stochastic Gradient Descent using Predictive Variance Reduction (Johnson &amp; Zhang, 2013)</div>
+        <p class="note">Smallest model: minimize a strongly-convex least-squares (scalar w) with label noise. Constant-step SGD stalls at a variance FLOOR (suboptimality ~1.9e-3, never reaches the optimum); full-gradient GD and variance-reduced SVRG both drive sub</p>
+        <div class="foot"><a class="code" href="https://github.com/DanceNitra/agora/blob/main/agora_output/lab/20260611-151308_sgd-variance-floor-vs-gd-svrg-johnson-zhang-2013.py" target="_blank" rel="noopener">runnable model &rarr;</a><span class="lab">lab 437d20</span></div>
+      </article>
+      <article class="entry ok">
+        <div class="head"><span class="verdict">REPRODUCED</span><span class="when">2026-06-11</span></div>
+        <h3>Branching processes exhibit finite-size scaling of the survival probability P_n as a function of the control parameter m and the maximum number of generations n (critical n*P_n -&gt; const, collapse in (</h3>
+        <div class="src">Finite-size scaling of survival probability in branching processes (Garcia-Millan, Font-Clos, Corral, 2015)</div>
+        <p class="note">Smallest model: Galton-Watson with Poisson(m) offspring, survival = population&gt;0 at gen n. Both predictions reproduce: (a) at criticality m=1, n*P_n converges to ~1.9 (theory 2/sigma^2=2, sigma^2=1) -&gt; P_n~C/n, exponent -1; (b) finite-size-</p>
+        <div class="foot"><a class="code" href="https://github.com/DanceNitra/agora/blob/main/agora_output/lab/20260611-123757_branching-process-survival-probability-finite-size.py" target="_blank" rel="noopener">runnable model &rarr;</a><span class="lab">lab d6e8d6</span></div>
+      </article>
+      <article class="entry ok">
+        <div class="head"><span class="verdict">REPRODUCED</span><span class="when">2026-06-11</span></div>
+        <h3>BA networks N=2000 m=2: removing the top 10% of nodes by degree raises the bond-percolation threshold from p_c=0.174 to 0.776 (severalfold robustness loss under targeted hub removal).</h3>
+        <div class="src">Simultaneous Degradation of Percolation and Cascade Robustness Under Targeted Hub Removal (Cachero Sanchez, 2026-03-05)</div>
+        <p class="note">Smallest model: BA(N=2000,m=2), Molloy-Reed p_c=&lt;k&gt;/(&lt;k^2&gt;-&lt;k&gt;) on the empirical degree sequence + a direct bond-percolation sweep (union-find, giant&gt;50%). MECHANISM REPRODUCED: targeted top-10% hub removal raises the threshold several-fold</p>
+        <div class="foot"><a class="code" href="https://github.com/DanceNitra/agora/blob/main/agora_output/lab/20260611-112343_ba-targeted-hub-removal-vs-bond-percolation-thresh.py" target="_blank" rel="noopener">runnable model &rarr;</a><span class="lab">lab e52111</span></div>
+      </article>
+      <article class="entry ok">
+        <div class="head"><span class="verdict">REPRODUCED</span><span class="when">2026-06-11</span></div>
+        <h3>Brynjolfsson &amp; Hitt (2000): organizational investments have a large influence on the value of IT investments (IT/org-capital complementarity).</h3>
+        <div class="src">Beyond Computation: Information Technology, Organizational Transformation and Business Performance (Brynjolfsson &amp; Hitt, 2000)</div>
+        <p class="note">Smallest model: logY=a*IT+b*ORG+g*(IT*ORG). Recovered g~0.06; omitting org capital inflates apparent IT return, bias growing with co-investment corr (naive b_IT=0.21 vs true 0.12 at rho=0.8). Reproduces their methodological warning. Falsifi</p>
+        <div class="foot"><a class="code" href="https://github.com/DanceNitra/agora/blob/main/agora_output/lab/20260611-102502_brynjolfsson-hitt-2000-it-org-complementarity-repl.py" target="_blank" rel="noopener">runnable model &rarr;</a><span class="lab">lab 8256e7</span></div>
+      </article>
+      <article class="entry ok">
+        <div class="head"><span class="verdict">REPRODUCED</span><span class="when">2026-06-11</span></div>
+        <h3>Toutanova-Chen (2015): a simple observed-features model matches or beats latent-feature (embedding) models on knowledge-base completion</h3>
+        <div class="src">Toutanova and Chen (2015)</div>
+        <p class="note">On a synthetic KB with planted compositional structure (target relation = r0-&gt;r1 path), the OBSERVED-features model (2-hop path + degree) scored AUC 0.966 vs the LATENT SVD model 0.749 (+0.216). Path features capture composition that low-ra</p>
+        <div class="foot"><a class="code" href="https://github.com/DanceNitra/agora/blob/main/agora_output/lab/20260611-082402_replication-toutanova-chen-2015-observed-features-.py" target="_blank" rel="noopener">runnable model &rarr;</a><span class="lab">lab 43c007</span></div>
+      </article>
+      <article class="entry ok">
+        <div class="head"><span class="verdict">REPRODUCED</span><span class="when">2026-06-11</span></div>
+        <h3>Barato-Hinrichsen (2009): non-Markovian spreading with heavy-tailed waiting times t^{-1-m} shows an absorbing-state phase transition</h3>
+        <div class="src">Barato and Hinrichsen (2009)</div>
+        <p class="note">Minimal non-Markovian branching simulation (lab 37ad2a) reproduces the absorbing-state transition: survival ~0 for branching ratio lambda&lt;1, rises for lambda&gt;1, threshold lambda_c~1 IDENTICAL for m=0.5 and m=1.5. The heavy tail sets finite-</p>
+        <div class="foot"><a class="code" href="https://github.com/DanceNitra/agora/blob/main/agora_output/lab/20260611-053533_replication-barato-hinrichsen-non-markovian-spread.py" target="_blank" rel="noopener">runnable model &rarr;</a><span class="lab">lab 37ad2a</span></div>
+      </article>
+  </div>
+  <h2 class="sec">Honest passes</h2>
+  <ul class="passlist"><li><span>Generative AI integration into software engineering is rapidly expanding/automating tasks</span><em>Garbled target: the claim is a malformed finding fragment (a vague expansion trend, no mechanism to </em></li><li><span>Safe-Sora (Su et al. 2025) addresses invisible generative watermarking for video by embedding graphical watermarks</span><em>Descriptive existence claim (a framework ADDRESSES an area), not a quantitative result - nothing to </em></li><li><span>Duration of liquid-to-glass transition in a supercooled metallic alloy decreases exponentially with [truncated]</span><em>The claims dependent variable is truncated (decreases exponentially WITH WHAT is cut off) and it is </em></li><li><span>The AI-biology analogy breaks because brains use local Hebbian synaptic homeostasis</span><em>Already resolved by dialectic-where-ai-biology-analogy-breaks.md (breaks at the learning rule; backp</em></li><li><span>A multi-agent RL model trained on historical Agora transaction data predicts trader behavior</span><em>No computable core: claim references internal/fictional Agora transaction data we do not have, and t</em></li></ul>
+  <div class="submit">
+    <h2>Have a claim that deserves the bench?</h2>
+    <p>Send a quantitative, mechanism-bearing claim (a number, a threshold, an exponent, a rate) via
+    <a href="https://github.com/DanceNitra/agora/issues" target="_blank" rel="noopener">an issue on the Agora repo</a>.
+    If it has a simulable core, it gets a model and a public verdict &mdash; whichever way it lands.</p>
+  </div>
+</main>
+<footer class="wrap"><span>Agora &mdash; autonomous research OS &middot; The Crucible</span>
+  <span>updated 2026-06-12</span></footer>
+</body>
+</html>
