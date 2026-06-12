@@ -540,6 +540,19 @@ class CorporationWorker:
         cto_score = cto_result.get("cto", {}).get("score", 50) if isinstance(cto_result.get("cto"), dict) else 50
         ceo_score = ceo_result.get("ceo", {}).get("score", 50) if isinstance(ceo_result.get("ceo"), dict) else 50
 
+        # PERSIST the verdict — without this the quest stayed status='review' / proposal='pending'
+        # and was re-evaluated every tick forever (never advancing). Now it reaches a terminal state:
+        # approved research → done (and the tick files a Ship-review to Claude); rejected → done/rejected.
+        if self.db and quest_id:
+            try:
+                await self.db.execute(
+                    "UPDATE quests SET status='done', proposal_status=?, completed_at=datetime('now') WHERE id=?",
+                    ("approved" if approved else "rejected", quest_id),
+                )
+                await self.db.commit()
+            except Exception as e:
+                print(f"[Eval] persist verdict error: {e}")
+
         return {
             "stage": "evaluation",
             "quest_id": quest_id,

@@ -170,6 +170,48 @@ def _score_relevance(finding: dict) -> int:
 # RESEARCHER — Deep Diver (3 variants)
 # ═══════════════════════════════════════════
 
+async def _topic_research(config: dict, quest: dict, researcher_type: str) -> dict:
+    """Research a TOPIC (no fetchable URL) — synthesize a grounded finding from the quest's
+    own question via the LLM. Unblocks frontier-seeded research questions that carry a question
+    rather than a source, so they can progress claimed → review instead of stalling forever."""
+    import asyncio
+    from agora.execution.llm_client import call_llm
+    title = (quest.get("title", "") or "").replace("Research question:", "").strip()
+    goal = quest.get("goal", "") or ""
+    sysmsg = (f"You are a rigorous {researcher_type} researcher. Investigate the question from "
+              f"established knowledge: be concrete and specific, name real results/authors only when "
+              f"confident, and flag uncertainty honestly. NEVER fabricate a citation.")
+    usr = (f"Research question: {title}\n\nContext: {goal[:600]}\n\n"
+           f'Respond with JSON: {{"summary":"a 2-3 sentence substantive finding",'
+           f'"key_points":["point","point","point"],"impact":"high|medium|low"}}')
+    try:
+        raw = await asyncio.to_thread(
+            call_llm, system_prompt=sysmsg, user_prompt=usr, tier="cheap",
+            temperature=0.4, max_tokens=500, response_format={"type": "json_object"})
+        syn = json.loads(raw)
+    except Exception as e:
+        return {"status": "error", "output": f"topic research failed: {e}"}
+    summary = (syn.get("summary") or "").strip()
+    key_points = syn.get("key_points") or []
+    if not summary:
+        return {"status": "skipped", "output": "no synthesis produced"}
+    qe = config.get("quest_engine")
+    quest_id = quest.get("id", "")
+    if qe and quest_id:
+        try:
+            await qe.db.execute(
+                """INSERT INTO research_findings (quest_id, researcher, source_url, summary, impact)
+                   VALUES (?, ?, ?, ?, ?)""",
+                (quest_id, researcher_type, "topic:" + title[:60], summary, syn.get("impact", "medium")))
+            await qe.db.commit()
+        except Exception as e:
+            print(f"[Researcher] topic store error: {e}")
+    return {"status": "ok",
+            "output": f"topic research ({researcher_type}): {len(key_points)} key points",
+            "synthesis": {"summary": summary, "key_points": key_points,
+                          "impact": syn.get("impact", "medium")}}
+
+
 async def action_deep_research(config: dict, quest: dict, params: dict) -> dict:
     """Read a URL and synthesize findings into structured knowledge.
 
@@ -178,13 +220,14 @@ async def action_deep_research(config: dict, quest: dict, params: dict) -> dict:
     """
     url = params.get("url") or quest.get("research_source") or ""
     researcher_type = params.get("researcher_type", "docs")
+    # A frontier-seeded quest carries a label ('frontier:...'), not a fetchable URL.
+    if url and not url.startswith(("http://", "https://")):
+        url = ""
 
     if not url:
-        return {
-            "status": "skipped",
-            "output": "No URL provided for research.",
-            "simulated": True,
-        }
+        # No fetchable source → research the TOPIC itself (the quest's question) via the LLM,
+        # so seeded research questions produce real findings instead of being skipped forever.
+        return await _topic_research(config, quest, researcher_type)
 
     # Fetch the URL content
     content = _fetch_url(url)
