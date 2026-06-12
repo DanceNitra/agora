@@ -1537,9 +1537,20 @@ async def tick_loop(app: FastAPI):
                             }
                             worker = CorporationWorker(qe, db, config)
                             app.state.agent_worker = worker
-                    if worker:
-                        corp_result = await worker.tick(tick_count=app.state.tick_count)
-                        print(f"[Corporation] Tick #{corp_result['tick']} done in {corp_result['duration_seconds']}s ({len(corp_result['results'])} steps)")
+                    # Run the corp tick in the BACKGROUND — its literature fetches + LLM research/
+                    # eval take minutes, and awaiting it here throttled the whole brain tick loop
+                    # (the rest of the OS crawled). A guard prevents overlapping corp ticks.
+                    if worker and not getattr(app.state, "_corp_running", False):
+                        app.state._corp_running = True
+                        async def _run_corp(_w, _tc):
+                            try:
+                                r = await _w.tick(tick_count=_tc)
+                                print(f"[Corporation] Tick #{r['tick']} done in {r['duration_seconds']}s ({len(r['results'])} steps)")
+                            except Exception as _e:
+                                print(f"[Corporation] Tick error: {_e}")
+                            finally:
+                                app.state._corp_running = False
+                        asyncio.create_task(_run_corp(worker, app.state.tick_count))
                 except Exception as e:
                     print(f"[Corporation] Tick error: {e}")
                     import traceback
