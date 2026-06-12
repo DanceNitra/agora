@@ -5,7 +5,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>The Crucible &middot; a machine that rebuilds claims in code &middot; Agora</title>
-<meta name="description" content="A public ledger of scientific and technical claims rebuilt as minimal computational models and tested in code: 12 reproduced, 1 failed, 4 honest passes. Every verdict ships runnable code and a measured number.">
+<meta name="description" content="A public ledger of scientific and technical claims rebuilt as minimal computational models and tested in code: 14 reproduced, 1 failed, 4 honest passes. Every verdict ships runnable code and a measured number.">
 <link rel="canonical" href="https://dancenitra.github.io/agora/public/crucible/">
 <meta property="og:type" content="website">
 <meta property="og:title" content="The Crucible — claims, rebuilt in code and tested">
@@ -170,7 +170,7 @@
   rarest export, published here), and <b>not computable</b> when there&rsquo;s no simulable core.
   Every verdict ships a measured number and the code that produced it.</p>
   <div class="tally">
-    <div class="t ok"><div class="num">12</div><div class="lbl">Reproduced</div></div>
+    <div class="t ok"><div class="num">14</div><div class="lbl">Reproduced</div></div>
     <div class="t fail"><div class="num">1</div><div class="lbl">Failed</div></div>
     <div class="t"><div class="num">4</div><div class="lbl">Honest passes</div></div>
   </div>
@@ -191,13 +191,33 @@
     </div>
   </section>
 <section class="ledger"><div class="wrap">
-  <div class="sechead"><h2>The ledger</h2><div class="sub">13 claims rebuilt &amp; tested &middot; newest first</div></div>
+  <div class="sechead"><h2>The ledger</h2><div class="sub">15 claims rebuilt &amp; tested &middot; newest first</div></div>
   <div class="filters">
     <button class="on" data-f="all">All</button>
     <button data-f="REPRODUCED">Reproduced</button>
     <button data-f="FAILED">Failed</button>
   </div>
   <div class="grid" id="grid">
+      <article class="card ok" data-v="REPRODUCED" data-reveal>
+        <div class="crail"></div>
+        <div class="cbody">
+          <div class="chead"><span class="cv">REPRODUCED</span>
+            <span class="cfield">Linguistics / statistics</span></div>
+          <h3>A monkey at a typewriter really does produce Zipf&#x27;s law</h3>
+          <p class="cresult">Random typing yields exponent −1.24; even a natural fine-structure discriminator fails at matched corpus size (1.8× &lt; 2× bar). The deflationary inference survives a severe test.</p>
+          <div class="cfoot"><span class="cyear">Miller · 1957</span><a class="code" href="https://github.com/DanceNitra/agora/blob/main/agora_output/lab/20260612-152425_miller-1957-random-typing-zipf-law-fine-structure-.py" target="_blank" rel="noopener">runnable model &rarr;</a></div>
+        </div>
+      </article>
+      <article class="card ok" data-v="REPRODUCED" data-reveal>
+        <div class="crail"></div>
+        <div class="cbody">
+          <div class="chead"><span class="cv">REPRODUCED</span>
+            <span class="cfield">Finance</span></div>
+          <h3>Thirty stocks diversify you — until the tails get heavy</h3>
+          <p class="cresult">N=30 captures ~96% of achievable risk reduction at realistic tails — but only 85% of tail-risk reduction near infinite-variance tails, where ~100 stocks are needed.</p>
+          <div class="cfoot"><span class="cyear">Evans &amp; Archer · 1968</span><a class="code" href="https://github.com/DanceNitra/agora/blob/main/agora_output/lab/20260612-152357_evans-archer-30-stocks-diversification-vol-vs-tail.py" target="_blank" rel="noopener">runnable model &rarr;</a></div>
+        </div>
+      </article>
       <article class="card ok" data-v="REPRODUCED" data-reveal>
         <div class="crail"></div>
         <div class="cbody">

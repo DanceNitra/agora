@@ -16,6 +16,18 @@
     "verdict": "On a no-hot-hand shooter the estimator does not read 0; it reads −7.9pp (t=−28 at n=100, growing to −17pp at streak length 4). This is the streak-selection bias of Miller & Sanjurjo (2018): selecting shots that follow a streak inside a finite sequence is a biased sample. A GVT measurement of ~0 therefore implies a real hot hand of roughly +8.5pp. The famous fallacy was the analysis, not the players.",
     "featured": true
   },
+  "7656de": {
+    "title": "Thirty stocks diversify you — until the tails get heavy",
+    "year": "Evans & Archer · 1968",
+    "field": "Finance",
+    "result": "N=30 captures ~96% of achievable risk reduction at realistic tails — but only 85% of tail-risk reduction near infinite-variance tails, where ~100 stocks are needed."
+  },
+  "4779c1": {
+    "title": "A monkey at a typewriter really does produce Zipf's law",
+    "year": "Miller · 1957",
+    "field": "Linguistics / statistics",
+    "result": "Random typing yields exponent −1.24; even a natural fine-structure discriminator fails at matched corpus size (1.8× < 2× bar). The deflationary inference survives a severe test."
+  },
   "a3ae64": {
     "title": "Diversity beats ability — but only on rugged ground",
     "year": "Hong & Page · 2004",

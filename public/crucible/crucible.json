@@ -3,11 +3,38 @@
  "description": "Scientific and technical claims rebuilt as minimal computational models and tested. REPRODUCED = the mechanism holds in a minimal model; FAILED = it does not; NOT_COMPUTABLE = no simulable core (an honest pass).",
  "generated": "2026-06-12",
  "counts": {
-  "REPRODUCED": 12,
+  "REPRODUCED": 14,
   "FAILED": 1,
-  "NOT_COMPUTABLE": 5
+  "NOT_COMPUTABLE": 6
  },
  "entries": [
+  {
+   "claim": "Miller (1957): random typing (letters + space) produces Zipf law, so Zipf law in language carries no linguistic significance",
+   "source": "Miller, American Journal of Psychology 70, 1957 - Some effects of intermittent silence",
+   "verdict": "REPRODUCED",
+   "note": "Random-typing corpus (443k words): rank-frequency exponent -1.24, an approximate power law - the math reproduces. Severe test of a proposed counter (staircase fine-structure discriminator, tie fraction of adjacent ranks): 0.89 vs 0.48 at ma",
+   "lab_id": "4779c1",
+   "code": "https://github.com/DanceNitra/agora/blob/main/agora_output/lab/20260612-152425_miller-1957-random-typing-zipf-law-fine-structure-.py",
+   "date": "2026-06-12"
+  },
+  {
+   "claim": "Evans & Archer (1968) / textbook canon: a portfolio of ~20-30 stocks achieves practically complete diversification - marginal benefit beyond 30 is negligible",
+   "source": "Evans & Archer, Journal of Finance 23(4), 1968 - Diversification and the reduction of dispersion",
+   "verdict": "REPRODUCED",
+   "note": "Holds at realistic tails: N=30 captures 95.6-96.9% of achievable vol AND ES99 reduction (normal and t2.5 idio + 1-factor). MEASURED BOUNDARY: near infinite-variance idio tails (t1.8) the canon breaks - only 85.4% of tail-risk reduction capt",
+   "lab_id": "7656de",
+   "code": "https://github.com/DanceNitra/agora/blob/main/agora_output/lab/20260612-152357_evans-archer-30-stocks-diversification-vol-vs-tail.py",
+   "date": "2026-06-12"
+  },
+  {
+   "claim": "Social media platforms enable rapid dissemination of information but also facilitate the spread of misinformation",
+   "source": "internal corp finding (descriptive)",
+   "verdict": "NOT_COMPUTABLE",
+   "note": "Descriptive trend claim with no stated mechanism or quantity; the simulable core (false-news cascades spread farther/faster, Vosoughi 2018) is a DIFFERENT, specific claim - queued as a future Crucible target rather than strawmanned here.",
+   "lab_id": "",
+   "code": "",
+   "date": "2026-06-12"
+  },
   {
    "claim": "Gilovich, Vallone & Tversky (1985): the basketball hot hand is a cognitive illusion - P(hit | streak of hits) is no higher than P(hit | streak of misses), so streak shooting does not exist",
    "source": "Gilovich, Vallone & Tversky, Cognitive Psychology 17, 1985 - The hot hand in basketball: On the misperception of random sequences",
