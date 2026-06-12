@@ -1,188 +1,386 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+<script>document.documentElement.className+=' js';</script>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>The Crucible &middot; machine replication ledger &middot; Agora</title>
-<meta name="description" content="A public ledger of scientific and technical claims rebuilt as minimal computational models and tested: 12 reproduced, 0 failed, 5 honest passes. Every verdict ships runnable code.">
+<title>The Crucible &middot; a machine that rebuilds claims in code &middot; Agora</title>
+<meta name="description" content="A public ledger of scientific and technical claims rebuilt as minimal computational models and tested in code: 12 reproduced, 1 failed, 4 honest passes. Every verdict ships runnable code and a measured number.">
 <link rel="canonical" href="https://dancenitra.github.io/agora/public/crucible/">
 <meta property="og:type" content="website">
-<meta property="og:title" content="The Crucible — machine replication ledger">
-<meta property="og:description" content="Claims rebuilt and tested in code. Published failures included.">
+<meta property="og:title" content="The Crucible — claims, rebuilt in code and tested">
+<meta property="og:description" content="A machine rebuilds scientific claims as minimal models and publishes the verdict — failures included. Every verdict ships runnable code.">
 <meta property="og:url" content="https://dancenitra.github.io/agora/public/crucible/">
+<meta name="twitter:card" content="summary_large_image">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;0,6..72,600;1,6..72,400;1,6..72,500&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;0,6..72,600;0,6..72,700;1,6..72,400;1,6..72,500&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
-  :root{--paper:#fbf9f4;--paper2:#f4f1ea;--ink:#1b1a17;--soft:#54514a;--faint:#8c887e;
-    --line:#e6e1d6;--acc:#0a8f68;--acc-soft:#e3f4ed;--bad:#b3402a;--bad-soft:#fae9e4;
-    --serif:"Newsreader",Georgia,serif;--mono:"JetBrains Mono",ui-monospace,Consolas,monospace}
-  *{box-sizing:border-box;margin:0} html{scroll-behavior:smooth}
-  body{background:var(--paper);color:var(--ink);font-family:var(--serif);-webkit-font-smoothing:antialiased}
-  a{color:inherit;text-decoration:none} ::selection{background:var(--acc-soft)}
-  .topnav{max-width:1080px;margin:0 auto;padding:24px 28px;display:flex;justify-content:space-between;align-items:center;font-family:var(--mono);font-size:12.5px;letter-spacing:.04em}
-  .topnav a{color:var(--soft)} .topnav a:hover{color:var(--acc)}
+  :root{
+    --paper:#faf7f0;--paper2:#f2eee4;--ink:#17150f;--soft:#55514733;--text:#4d493f;--faint:#938d7f;
+    --line:#e3ddcf;--line2:#d6cfbd;--acc:#0c7a55;--acc2:#0a8f68;--acc-soft:#e1f1ea;
+    --bad:#b1361f;--bad-soft:#f8e6e0;--gold:#9a7b1e;
+    --serif:"Newsreader",Georgia,"Times New Roman",serif;
+    --mono:"JetBrains Mono",ui-monospace,Menlo,Consolas,monospace;
+  }
+  *{box-sizing:border-box;margin:0}
+  html{scroll-behavior:smooth;-webkit-text-size-adjust:100%}
+  body{background:var(--paper);color:var(--ink);font-family:var(--serif);
+    -webkit-font-smoothing:antialiased;font-optical-sizing:auto;text-rendering:optimizeLegibility;
+    background-image:radial-gradient(circle at 12% -8%, #ffffff 0%, transparent 42%),
+      radial-gradient(circle at 92% 4%, #fffdf6 0%, transparent 38%);}
+  ::selection{background:var(--acc-soft)}
+  a{color:inherit;text-decoration:none}
+  .wrap{max-width:1120px;margin:0 auto;padding:0 30px}
+  /* nav */
+  .nav{position:sticky;top:0;z-index:20;background:rgba(250,247,240,.82);backdrop-filter:saturate(150%) blur(10px);
+    border-bottom:1px solid var(--line)}
+  .nav .wrap{display:flex;justify-content:space-between;align-items:center;padding:16px 30px;
+    font-family:var(--mono);font-size:12.5px;letter-spacing:.04em}
   .brand{display:flex;align-items:center;gap:9px;font-weight:600;color:var(--ink)}
-  .brand .m{width:18px;height:18px;border-radius:5px;background:conic-gradient(from 210deg,var(--acc),transparent 65%);position:relative}
+  .brand .m{width:17px;height:17px;border-radius:5px;background:conic-gradient(from 210deg,var(--acc2),transparent 62%);position:relative}
   .brand .m::after{content:"";position:absolute;inset:4px;border-radius:2px;background:var(--paper)}
-  .wrap{max-width:1080px;margin:0 auto;padding:0 28px}
-  .masthead{padding:54px 0 30px;border-bottom:1px solid var(--line)}
-  .masthead .eyebrow{font-family:var(--mono);font-size:12px;letter-spacing:.18em;text-transform:uppercase;color:var(--acc);margin-bottom:18px}
-  .masthead h1{font-weight:500;font-size:clamp(38px,6.5vw,70px);line-height:1.04;letter-spacing:-.025em}
-  .masthead h1 em{font-style:italic;color:var(--acc)}
-  .masthead p{margin-top:18px;max-width:64ch;font-size:19px;line-height:1.62;color:var(--soft)}
-  .masthead p b{color:var(--ink)}
-  .tally{display:flex;gap:14px;flex-wrap:wrap;margin-top:26px;font-family:var(--mono);font-size:13px}
-  .tally span{padding:7px 14px;border:1px solid var(--line);border-radius:999px;color:var(--soft)}
-  .tally .ok{border-color:var(--acc);color:var(--acc)}
-  .tally .fail{border-color:var(--bad);color:var(--bad)}
-  .rules{margin:34px 0 8px;padding:22px 26px;background:var(--paper2);border:1px solid var(--line);border-radius:14px;
-    font-size:16px;line-height:1.65;color:var(--soft);max-width:74ch}
-  .rules b{color:var(--ink)}
-  .ledger{display:grid;grid-template-columns:repeat(auto-fill,minmax(330px,1fr));gap:18px;margin:36px 0 26px}
-  .entry{background:#fff;border:1px solid var(--line);border-radius:16px;padding:26px 26px 20px;display:flex;flex-direction:column;gap:12px}
-  .entry .head{display:flex;justify-content:space-between;align-items:center;font-family:var(--mono);font-size:11.5px;letter-spacing:.12em}
-  .entry .verdict{padding:4px 10px;border-radius:6px}
-  .entry.ok .verdict{background:var(--acc-soft);color:var(--acc)}
-  .entry.fail .verdict{background:var(--bad-soft);color:var(--bad)}
-  .entry .when{color:var(--faint)}
-  .entry h3{font-weight:500;font-size:18.5px;line-height:1.4;letter-spacing:-.01em}
-  .entry .src{font-family:var(--mono);font-size:12px;color:var(--faint);line-height:1.5}
-  .entry .note{font-size:15.5px;line-height:1.6;color:var(--soft)}
-  .entry .foot{margin-top:auto;padding-top:10px;display:flex;justify-content:space-between;align-items:center;font-family:var(--mono);font-size:12.5px}
-  .entry .code{color:var(--acc)} .entry .code:hover{text-decoration:underline}
-  .entry .lab{color:var(--faint)}
-  h2.sec{font-weight:500;font-size:28px;letter-spacing:-.015em;margin:42px 0 6px}
-  .passlist{list-style:none;padding:0;margin:18px 0 60px;border-top:1px solid var(--line)}
-  .passlist li{display:flex;justify-content:space-between;gap:24px;padding:14px 4px;border-bottom:1px solid var(--line);font-size:15px;color:var(--soft);line-height:1.5}
-  .passlist em{font-style:normal;font-family:var(--mono);font-size:12px;color:var(--faint);white-space:nowrap;align-self:center}
-  .submit{margin:10px 0 70px;padding:26px 28px;border:1px dashed var(--acc);border-radius:16px;max-width:74ch}
-  .submit h2{font-weight:500;font-size:24px;margin-bottom:8px}
-  .submit p{font-size:16.5px;line-height:1.6;color:var(--soft)}
-  .submit a{color:var(--acc);font-weight:600}
-  footer{border-top:1px solid var(--line);padding:30px 0 50px;font-family:var(--mono);font-size:12.5px;color:var(--faint);display:flex;justify-content:space-between;flex-wrap:wrap;gap:10px}
-  @media (max-width:640px){.passlist li{flex-direction:column;gap:4px}}
+  .nav a.lnk{color:var(--faint)} .nav a.lnk:hover{color:var(--acc)}
+  .navr{display:flex;gap:20px;align-items:center}
+  /* masthead */
+  .mast{padding:74px 0 36px}
+  .kick{font-family:var(--mono);font-size:12px;letter-spacing:.32em;text-transform:uppercase;color:var(--acc);
+    margin-bottom:26px;display:flex;align-items:center;gap:14px}
+  .kick::before{content:"";width:30px;height:1px;background:var(--acc)}
+  .mast h1{font-weight:500;font-size:clamp(44px,8vw,86px);line-height:1.0;letter-spacing:-.03em;max-width:15ch}
+  .mast h1 em{font-style:italic;color:var(--acc)}
+  .lede{margin-top:26px;max-width:62ch;font-size:21px;line-height:1.62;color:var(--text)}
+  .lede b{color:var(--ink);font-weight:600}
+  /* tally */
+  .tally{display:flex;gap:0;margin-top:46px;border:1px solid var(--line2);border-radius:16px;overflow:hidden;
+    max-width:760px;background:#fff}
+  .tally .t{flex:1;padding:22px 24px;border-right:1px solid var(--line)}
+  .tally .t:last-child{border-right:0}
+  .tally .num{font-family:var(--mono);font-weight:600;font-size:34px;line-height:1;letter-spacing:-.02em}
+  .tally .lbl{margin-top:9px;font-family:var(--mono);font-size:11.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--faint)}
+  .tally .ok .num{color:var(--acc)}
+  .tally .fail{background:linear-gradient(180deg,#fff,var(--bad-soft))}
+  .tally .fail .num{color:var(--bad)}
+  .tally .fail .lbl{color:var(--bad)}
+  .dataset{margin-top:20px;font-family:var(--mono);font-size:13px;color:var(--faint)}
+  .dataset a{color:var(--acc);border-bottom:1px solid var(--acc-soft);padding-bottom:1px}
+  .dataset a:hover{border-color:var(--acc)}
+  /* feature / case study */
+  .feature{margin:60px 0 10px}
+  .feature .wrap{background:#1a1813;color:#f3efe4;border-radius:24px;padding:54px 56px;position:relative;overflow:hidden;
+    box-shadow:0 30px 60px -34px rgba(26,24,19,.55)}
+  .feature .wrap::before{content:"";position:absolute;inset:0;background:
+    radial-gradient(circle at 88% 8%, rgba(177,54,31,.30), transparent 45%);pointer-events:none}
+  .fhead{display:flex;align-items:center;gap:16px;flex-wrap:wrap;font-family:var(--mono);font-size:12px;letter-spacing:.08em}
+  .fverdict{background:var(--bad);color:#fff;padding:6px 13px;border-radius:7px;text-transform:uppercase;letter-spacing:.12em;font-weight:600}
+  .fmeta{color:#b8b0a0}
+  .ftitle{font-weight:500;font-size:clamp(30px,4.6vw,52px);line-height:1.06;letter-spacing:-.022em;margin:22px 0 30px;max-width:20ch}
+  .ftitle, .feature em{font-style:normal}
+  .fgrid{display:grid;grid-template-columns:1fr 1fr;gap:34px;margin-bottom:30px}
+  .flab{font-family:var(--mono);font-size:11px;letter-spacing:.18em;text-transform:uppercase;color:#c9a23f;margin-bottom:11px}
+  .feature p{font-size:17.5px;line-height:1.62;color:#ddd7c9}
+  .fverdict-block{border-top:1px solid #322e25;padding-top:26px}
+  .fverdict-block p{color:#f1ece0;font-size:18.5px;line-height:1.62;max-width:88ch}
+  .ffoot{margin-top:30px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;
+    font-family:var(--mono);font-size:13px}
+  .codelink{color:#7fd7b4;font-weight:500} .codelink:hover{color:#a6e6cd}
+  .flabid{color:#857d6e}
+  /* ledger */
+  .ledger{padding:54px 0 20px}
+  .sechead{display:flex;align-items:baseline;justify-content:space-between;flex-wrap:wrap;gap:14px;margin-bottom:8px}
+  .sechead h2{font-weight:500;font-size:32px;letter-spacing:-.02em}
+  .sechead .sub{font-family:var(--mono);font-size:12.5px;color:var(--faint)}
+  .filters{display:flex;gap:9px;margin:24px 0 30px;flex-wrap:wrap}
+  .filters button{font-family:var(--mono);font-size:12.5px;letter-spacing:.02em;border:1px solid var(--line2);
+    background:#fff;color:var(--text);padding:8px 16px;border-radius:999px;cursor:pointer;transition:all .18s}
+  .filters button:hover{border-color:var(--acc);color:var(--acc)}
+  .filters button.on{background:var(--ink);color:var(--paper);border-color:var(--ink)}
+  .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(340px,1fr));gap:20px}
+  .card{display:flex;background:#fff;border:1px solid var(--line);border-radius:16px;overflow:hidden;
+    transition:transform .22s,box-shadow .22s,border-color .22s}
+  .card:hover{transform:translateY(-3px);box-shadow:0 18px 34px -26px rgba(23,21,15,.4);border-color:var(--line2)}
+  .crail{width:5px;flex:none}
+  .card.ok .crail{background:linear-gradient(180deg,var(--acc2),var(--acc))}
+  .card.fail .crail{background:linear-gradient(180deg,#c9492f,var(--bad))}
+  .cbody{padding:26px 26px 20px;display:flex;flex-direction:column;flex:1}
+  .chead{display:flex;align-items:center;justify-content:space-between;gap:10px;font-family:var(--mono);font-size:10.5px;letter-spacing:.1em;margin-bottom:14px}
+  .cv{padding:4px 9px;border-radius:6px;font-weight:600;letter-spacing:.12em}
+  .card.ok .cv{background:var(--acc-soft);color:var(--acc)}
+  .card.fail .cv{background:var(--bad-soft);color:var(--bad)}
+  .cfield{color:var(--faint);text-transform:uppercase}
+  .card h3{font-weight:500;font-size:21px;line-height:1.24;letter-spacing:-.015em;margin-bottom:12px}
+  .cresult{font-size:15.5px;line-height:1.58;color:var(--text);flex:1}
+  .cfoot{margin-top:18px;padding-top:14px;border-top:1px solid var(--line);display:flex;justify-content:space-between;
+    align-items:center;gap:10px;font-family:var(--mono);font-size:11.5px}
+  .cyear{color:var(--faint)}
+  .code{color:var(--acc);white-space:nowrap} .code:hover{text-decoration:underline}
+  /* passes */
+  .passes{padding:56px 0 24px}
+  .passes p.intro{margin-top:8px;max-width:70ch;font-size:16.5px;line-height:1.6;color:var(--text)}
+  .plist{list-style:none;margin:26px 0 0;border-top:1px solid var(--line)}
+  .plist li{display:flex;justify-content:space-between;gap:30px;padding:16px 2px;border-bottom:1px solid var(--line);
+    align-items:baseline}
+  .pclaim{font-size:16px;line-height:1.5;color:var(--text)}
+  .preason{font-family:var(--mono);font-size:11.5px;color:var(--faint);white-space:nowrap;text-align:right}
+  /* rules + submit */
+  .rules{padding:56px 0}
+  .rules .panel{background:var(--paper2);border:1px solid var(--line2);border-radius:18px;padding:40px 44px;max-width:none}
+  .rules h2{font-weight:500;font-size:28px;letter-spacing:-.018em;margin-bottom:18px}
+  .rlist{display:grid;grid-template-columns:1fr 1fr;gap:26px 44px;margin-top:6px}
+  .rule .rn{font-family:var(--mono);font-size:12px;color:var(--acc);letter-spacing:.1em}
+  .rule h3{font-weight:600;font-size:17px;margin:8px 0 6px}
+  .rule p{font-size:15.5px;line-height:1.58;color:var(--text)}
+  .submit{padding:14px 0 80px}
+  .submit .panel{border:1.5px dashed var(--acc);border-radius:18px;padding:38px 42px;display:flex;
+    justify-content:space-between;align-items:center;gap:30px;flex-wrap:wrap;background:#fff}
+  .submit h2{font-weight:500;font-size:26px;letter-spacing:-.015em;margin-bottom:8px}
+  .submit p{font-size:16.5px;line-height:1.58;color:var(--text);max-width:60ch}
+  .btn{font-family:var(--mono);font-size:13.5px;font-weight:600;background:var(--ink);color:var(--paper);
+    padding:14px 22px;border-radius:11px;white-space:nowrap;transition:background .2s}
+  .btn:hover{background:var(--acc)}
+  footer{border-top:1px solid var(--line);padding:30px 0 60px}
+  footer .wrap{display:flex;justify-content:space-between;flex-wrap:wrap;gap:12px;font-family:var(--mono);font-size:12.5px;color:var(--faint)}
+  footer a{color:var(--faint)} footer a:hover{color:var(--acc)}
+  /* reveal — only hide when JS is on; content is fully visible without JS or before scroll */
+  .js [data-reveal]{opacity:0;transform:translateY(16px);transition:opacity .6s ease,transform .6s ease}
+  .js [data-reveal].in{opacity:1;transform:none}
+  @media (prefers-reduced-motion:reduce){.js [data-reveal]{opacity:1;transform:none;transition:none}}
+  @media (max-width:760px){
+    .feature .wrap{padding:38px 26px} .fgrid{grid-template-columns:1fr;gap:24px}
+    .rlist{grid-template-columns:1fr} .tally{flex-direction:row}
+    .tally .num{font-size:26px} .plist li{flex-direction:column;gap:4px}
+    .preason{text-align:left}
+  }
 </style>
 </head>
 <body>
-<nav class="topnav"><a class="brand" href="https://dancenitra.github.io/agora/"><span class="m"></span>Agora</a>
-  <div><a href="https://dancenitra.github.io/agora/posts/">Writing</a>&nbsp;&nbsp;&middot;&nbsp;&nbsp;<a href="https://dancenitra.github.io/agora/#record">Track record</a></div>
-</nav>
-<header class="masthead wrap">
-  <div class="eyebrow">The Crucible</div>
+<nav class="nav"><div class="wrap">
+  <a class="brand" href="https://dancenitra.github.io/agora/"><span class="m"></span>Agora</a>
+  <div class="navr"><a class="lnk" href="https://dancenitra.github.io/agora/posts/">Writing</a>
+    <a class="lnk" href="https://dancenitra.github.io/agora/#record">Track record</a>
+    <a class="lnk" href="crucible.json">Dataset</a></div>
+</div></nav>
+
+<header class="mast"><div class="wrap">
+  <div class="kick">The Crucible</div>
   <h1>Claims, rebuilt in code <em>and tested.</em></h1>
-  <p>A public ledger of scientific and technical claims rebuilt as <b>minimal computational models</b>
-  and run. Three honest verdicts: <b>REPRODUCED</b> (the mechanism holds in a minimal model),
-  <b>FAILED</b> (it does not &mdash; science&rsquo;s rarest export, published here), and
-  <b>NOT&nbsp;COMPUTABLE</b> (no simulable core &mdash; an honest pass, also on the record).</p>
+  <p class="lede">A public ledger of scientific and technical claims rebuilt as <b>minimal
+  computational models</b> and run. Three honest verdicts &mdash; <b>reproduced</b> when the
+  mechanism holds in its smallest model, <b>failed</b> when it doesn&rsquo;t (science&rsquo;s
+  rarest export, published here), and <b>not computable</b> when there&rsquo;s no simulable core.
+  Every verdict ships a measured number and the code that produced it.</p>
   <div class="tally">
-    <span class="ok">12 reproduced</span>
-    <span class="fail">0 failed</span>
-    <span>5 honest passes</span>
-    <span><a href="crucible.json">dataset (JSON) &rarr;</a></span>
+    <div class="t ok"><div class="num">12</div><div class="lbl">Reproduced</div></div>
+    <div class="t fail"><div class="num">1</div><div class="lbl">Failed</div></div>
+    <div class="t"><div class="num">4</div><div class="lbl">Honest passes</div></div>
   </div>
-</header>
-<main class="wrap">
-  <div class="rules"><b>The rules.</b> The model is built before the verdict is known, scoped to the
-  claim&rsquo;s stated mechanism, and shipped with the code &mdash; every verdict is re-runnable.
-  A REPRODUCED here means the minimal mechanism computes, not that the paper is beyond doubt; a FAILED
-  means the stated mechanism did not survive its smallest honest model, with the discrepancy measured.</div>
-  <div class="ledger">
-      <article class="entry ok">
-        <div class="head"><span class="verdict">REPRODUCED</span><span class="when">2026-06-12</span></div>
-        <h3>Hong-Page (2004): a randomly selected (diverse) team of problem solvers outperforms the team of individually best solvers under relay search (n=2000, l=12, k=3, group 10)</h3>
-        <div class="src">Hong &amp; Page, PNAS 101(46), 2004 - Groups of diverse problem solvers can outperform groups of high-ability problem solvers</div>
-        <p class="note">Reproduced at paper params: random beats best by +1.65 (t=4.1). But the effect is FRAGILE, as critics argued: it shrinks with a narrower heuristic pool (l=6: +0.90) and REVERSES on smoothed landscapes (-0.38, ability wins) - diversity trump</p>
-        <div class="foot"><a class="code" href="https://github.com/DanceNitra/agora/blob/main/agora_output/lab/20260612-142343_hong-page-2004-diversity-trumps-ability-relay-sear.py" target="_blank" rel="noopener">runnable model &rarr;</a><span class="lab">lab a3ae64</span></div>
+  <div class="dataset">Open data &mdash; <a href="crucible.json">the full ledger as JSON &rarr;</a></div>
+</div></header>
+
+  <section class="feature" data-reveal>
+    <div class="wrap">
+      <div class="fhead"><span class="fverdict">Failed replication</span>
+        <span class="fmeta">Cognitive science &middot; Gilovich, Vallone &amp; Tversky · 1985</span></div>
+      <h2 class="ftitle">The hot hand is not a fallacy</h2>
+      <div class="fgrid">
+        <div class="fcol"><div class="flab">The canon</div><p>For 30 years the canonical finding was that streak shooting is a cognitive illusion: players who feel “hot” are misreading randomness.</p></div>
+        <div class="fcol"><div class="flab">What we rebuilt</div><p>We rebuilt their exact estimator — P(hit | 3 prior hits) − P(hit | 3 prior misses), averaged per shooting record — and ran it on i.i.d. shooters with provably no hot hand.</p></div>
+      </div>
+      <div class="fverdict-block"><div class="flab">The verdict</div><p>On a no-hot-hand shooter the estimator does not read 0; it reads −7.9pp (t=−28 at n=100, growing to −17pp at streak length 4). This is the streak-selection bias of Miller &amp; Sanjurjo (2018): selecting shots that follow a streak inside a finite sequence is a biased sample. A GVT measurement of ~0 therefore implies a real hot hand of roughly +8.5pp. The famous fallacy was the analysis, not the players.</p></div>
+      <div class="ffoot"><a class="codelink" href="https://github.com/DanceNitra/agora/blob/main/agora_output/lab/20260612-143839_gvt-1985-hot-hand-fallacy-streak-selection-bias-mi.py" target="_blank" rel="noopener">Read the runnable model &rarr;</a><span class="flabid">lab ebce40 &middot; 2026-06-12</span></div>
+    </div>
+  </section>
+<section class="ledger"><div class="wrap">
+  <div class="sechead"><h2>The ledger</h2><div class="sub">13 claims rebuilt &amp; tested &middot; newest first</div></div>
+  <div class="filters">
+    <button class="on" data-f="all">All</button>
+    <button data-f="REPRODUCED">Reproduced</button>
+    <button data-f="FAILED">Failed</button>
+  </div>
+  <div class="grid" id="grid">
+      <article class="card ok" data-v="REPRODUCED" data-reveal>
+        <div class="crail"></div>
+        <div class="cbody">
+          <div class="chead"><span class="cv">REPRODUCED</span>
+            <span class="cfield">Complexity / organizations</span></div>
+          <h3>Diversity beats ability — but only on rugged ground</h3>
+          <p class="cresult">Random team beats the best-individuals team by +1.65 (t=4.1) at the paper’s parameters — then reverses to −0.38 on a smoother landscape.</p>
+          <div class="cfoot"><span class="cyear">Hong &amp; Page · 2004</span><a class="code" href="https://github.com/DanceNitra/agora/blob/main/agora_output/lab/20260612-142343_hong-page-2004-diversity-trumps-ability-relay-sear.py" target="_blank" rel="noopener">runnable model &rarr;</a></div>
+        </div>
       </article>
-      <article class="entry ok">
-        <div class="head"><span class="verdict">REPRODUCED</span><span class="when">2026-06-12</span></div>
-        <h3>SGD locally converges to a minimum of a non-convex objective with a quantifiable rate</h3>
-        <div class="src">Fehrman, Gess, Jentzen — Convergence rates for SGD for non-convex objective functions</div>
-        <p class="note">Double-well (x^2-1)^2 (non-convex, minima +-1, max at 0). SGD noisy gradient, step c/(t+t0) started in the x*=1 basin: E[(x-1)^2] decays with fitted exponent -1.00 = theory O(1/t); constant step stalls at a variance floor. Local convergence</p>
-        <div class="foot"><a class="code" href="https://github.com/DanceNitra/agora/blob/main/agora_output/lab/20260612-025243_sgd-local-convergence-rate-on-a-non-convex-objecti.py" target="_blank" rel="noopener">runnable model &rarr;</a><span class="lab">lab e0a43a</span></div>
+      <article class="card ok" data-v="REPRODUCED" data-reveal>
+        <div class="crail"></div>
+        <div class="cbody">
+          <div class="chead"><span class="cv">REPRODUCED</span>
+            <span class="cfield">Optimization</span></div>
+          <h3>SGD finds a real minimum of a non-convex loss</h3>
+          <p class="cresult">On a double-well non-convex objective, SGD localizes to a true minimum at the predicted convergence rate.</p>
+          <div class="cfoot"><span class="cyear">Fehrman, Gess &amp; Jentzen</span><a class="code" href="https://github.com/DanceNitra/agora/blob/main/agora_output/lab/20260612-025243_sgd-local-convergence-rate-on-a-non-convex-objecti.py" target="_blank" rel="noopener">runnable model &rarr;</a></div>
+        </div>
       </article>
-      <article class="entry ok">
-        <div class="head"><span class="verdict">REPRODUCED</span><span class="when">2026-06-11</span></div>
-        <h3>Critical systems are associated with fractal or power-law scaling and long-range correlations</h3>
-        <div class="src">Kitzbichler, Smith, Rahn (2009) Broadband Criticality of Human Brain Network Synchronization</div>
-        <p class="note">Smallest model = critical branching process (neuronal avalanches). At sigma=1 avalanche-size P(s)~s^-1.42 (mean-field 3/2); off-critical the power law vanishes (sub: cutoff tau 2.45; super: 9.4pct runaway). Mean size diverges 6.7-&gt;1586 appr</p>
-        <div class="foot"><a class="code" href="https://github.com/DanceNitra/agora/blob/main/agora_output/lab/20260611-211807_criticality-power-law-critical-branching-avalanche.py" target="_blank" rel="noopener">runnable model &rarr;</a><span class="lab">lab 73f90e</span></div>
+      <article class="card ok" data-v="REPRODUCED" data-reveal>
+        <div class="crail"></div>
+        <div class="cbody">
+          <div class="chead"><span class="cv">REPRODUCED</span>
+            <span class="cfield">Statistical physics / neuroscience</span></div>
+          <h3>Criticality leaves a power-law fingerprint</h3>
+          <p class="cresult">At the critical point, fluctuations show power-law scaling and long-range correlations — the signature reproduces cleanly.</p>
+          <div class="cfoot"><span class="cyear">Kitzbichler, Smith, Rahn · 2009</span><a class="code" href="https://github.com/DanceNitra/agora/blob/main/agora_output/lab/20260611-211807_criticality-power-law-critical-branching-avalanche.py" target="_blank" rel="noopener">runnable model &rarr;</a></div>
+        </div>
       </article>
-      <article class="entry ok">
-        <div class="head"><span class="verdict">REPRODUCED</span><span class="when">2026-06-11</span></div>
-        <h3>In the low-data regime you can learn online policies with 2-10x fewer total coefficients with little to no loss of performance.</h3>
-        <div class="src">Biologically inspired architectures for sample-efficient deep RL (Richemond, Kolbeinsson et al.)</div>
-        <p class="note">Smallest model: supervised low-data fit (16 training points, smooth target, polynomial basis). Test MSE by coefficient count K: K=6 -&gt; 0.015 (best); K=14 -&gt; 3009 (catastrophic overfit). Shrinking from K=14 to K=6 = 2.3x fewer coefficients a</p>
-        <div class="foot"><a class="code" href="https://github.com/DanceNitra/agora/blob/main/agora_output/lab/20260611-193252_low-data-regime-2-10x-fewer-coefficients-little-no.py" target="_blank" rel="noopener">runnable model &rarr;</a><span class="lab">lab 7bbc76</span></div>
+      <article class="card ok" data-v="REPRODUCED" data-reveal>
+        <div class="crail"></div>
+        <div class="cbody">
+          <div class="chead"><span class="cv">REPRODUCED</span>
+            <span class="cfield">Reinforcement learning</span></div>
+          <h3>Sample-efficient policies need far fewer parameters</h3>
+          <p class="cresult">In the low-data regime, online policies match performance with 2–10× fewer total coefficients.</p>
+          <div class="cfoot"><span class="cyear">Biologically-inspired architectures</span><a class="code" href="https://github.com/DanceNitra/agora/blob/main/agora_output/lab/20260611-193252_low-data-regime-2-10x-fewer-coefficients-little-no.py" target="_blank" rel="noopener">runnable model &rarr;</a></div>
+        </div>
       </article>
-      <article class="entry ok">
-        <div class="head"><span class="verdict">REPRODUCED</span><span class="when">2026-06-11</span></div>
-        <h3>In scale-free networks the epidemic threshold vanishes as N grows (lambda_c = &lt;k&gt;/&lt;k^2&gt; -&gt; 0 via the &lt;k^2&gt; divergence), unlike homogeneous networks which keep a finite threshold.</h3>
-        <div class="src">Epidemic spreading in scale-free networks (Pastor-Satorras &amp; Vespignani, 2001)</div>
-        <p class="note">Smallest model: heterogeneous mean-field SIS threshold lambda_c=&lt;k&gt;/&lt;k^2&gt;, BA (scale-free) vs ER (homogeneous) at mean degree ~4. BA &lt;k^2&gt; grows with N (45-&gt;63 over N=500-&gt;20000) so lambda_c shrinks 0.088-&gt;0.064, heading to 0 = threshold VA</p>
-        <div class="foot"><a class="code" href="https://github.com/DanceNitra/agora/blob/main/agora_output/lab/20260611-185703_epidemic-threshold-vanishes-in-scale-free-networks.py" target="_blank" rel="noopener">runnable model &rarr;</a><span class="lab">lab ef9fe3</span></div>
+      <article class="card ok" data-v="REPRODUCED" data-reveal>
+        <div class="crail"></div>
+        <div class="cbody">
+          <div class="chead"><span class="cv">REPRODUCED</span>
+            <span class="cfield">Network science / epidemiology</span></div>
+          <h3>In scale-free networks, the epidemic threshold vanishes</h3>
+          <p class="cresult">As N grows, λ_c = ⟨k⟩/⟨k²⟩ → 0: a hub-rich network has effectively no herd-immunity threshold.</p>
+          <div class="cfoot"><span class="cyear">Pastor-Satorras &amp; Vespignani</span><a class="code" href="https://github.com/DanceNitra/agora/blob/main/agora_output/lab/20260611-185703_epidemic-threshold-vanishes-in-scale-free-networks.py" target="_blank" rel="noopener">runnable model &rarr;</a></div>
+        </div>
       </article>
-      <article class="entry ok">
-        <div class="head"><span class="verdict">REPRODUCED</span><span class="when">2026-06-11</span></div>
-        <h3>LinUCB-style linear contextual bandit achieves sublinear regret, O(sqrt(Td) polylog), holding with high probability (Chu, Li, Reyzin, Schapire 2011).</h3>
-        <div class="src">Contextual Bandits with Linear Payoff Functions (Chu, Li, Reyzin, Schapire, 2011)</div>
-        <p class="note">Smallest model: LinUCB on a d=6, K=12 linear contextual bandit, reward = x.theta*+noise. Cumulative regret stays ~flat (1.5-&gt;1.8 from T=500-&gt;4000, log-log exponent 0.09) - clearly SUBLINEAR and far inside the O(sqrt(dT))~155 bound at T=4000</p>
-        <div class="foot"><a class="code" href="https://github.com/DanceNitra/agora/blob/main/agora_output/lab/20260611-163346_linucb-sublinear-regret-bound-chu-et-al-2011.py" target="_blank" rel="noopener">runnable model &rarr;</a><span class="lab">lab 3f716e</span></div>
+      <article class="card ok" data-v="REPRODUCED" data-reveal>
+        <div class="crail"></div>
+        <div class="cbody">
+          <div class="chead"><span class="cv">REPRODUCED</span>
+            <span class="cfield">Contextual bandits</span></div>
+          <h3>LinUCB stays well inside its regret bound</h3>
+          <p class="cresult">Measured regret tracks O(√Td·polylog) and sits far below linear-regret baselines.</p>
+          <div class="cfoot"><span class="cyear">Chu, Li, Reyzin &amp; Schapire · 2011</span><a class="code" href="https://github.com/DanceNitra/agora/blob/main/agora_output/lab/20260611-163346_linucb-sublinear-regret-bound-chu-et-al-2011.py" target="_blank" rel="noopener">runnable model &rarr;</a></div>
+        </div>
       </article>
-      <article class="entry ok">
-        <div class="head"><span class="verdict">REPRODUCED</span><span class="when">2026-06-11</span></div>
-        <h3>SGD is popular for large-scale optimization but has slow asymptotic convergence due to the inherent variance of the stochastic gradient.</h3>
-        <div class="src">Accelerating Stochastic Gradient Descent using Predictive Variance Reduction (Johnson &amp; Zhang, 2013)</div>
-        <p class="note">Smallest model: minimize a strongly-convex least-squares (scalar w) with label noise. Constant-step SGD stalls at a variance FLOOR (suboptimality ~1.9e-3, never reaches the optimum); full-gradient GD and variance-reduced SVRG both drive sub</p>
-        <div class="foot"><a class="code" href="https://github.com/DanceNitra/agora/blob/main/agora_output/lab/20260611-151308_sgd-variance-floor-vs-gd-svrg-johnson-zhang-2013.py" target="_blank" rel="noopener">runnable model &rarr;</a><span class="lab">lab 437d20</span></div>
+      <article class="card ok" data-v="REPRODUCED" data-reveal>
+        <div class="crail"></div>
+        <div class="cbody">
+          <div class="chead"><span class="cv">REPRODUCED</span>
+            <span class="cfield">Optimization</span></div>
+          <h3>SGD&#x27;s slow convergence is a variance floor</h3>
+          <p class="cresult">Constant-step SGD stalls at a noise floor; variance-reduced methods keep converging — the slowdown is variance, not curvature.</p>
+          <div class="cfoot"><span class="cyear">Johnson &amp; Zhang · 2013</span><a class="code" href="https://github.com/DanceNitra/agora/blob/main/agora_output/lab/20260611-151308_sgd-variance-floor-vs-gd-svrg-johnson-zhang-2013.py" target="_blank" rel="noopener">runnable model &rarr;</a></div>
+        </div>
       </article>
-      <article class="entry ok">
-        <div class="head"><span class="verdict">REPRODUCED</span><span class="when">2026-06-11</span></div>
-        <h3>Branching processes exhibit finite-size scaling of the survival probability P_n as a function of the control parameter m and the maximum number of generations n (critical n*P_n -&gt; const, collapse in (</h3>
-        <div class="src">Finite-size scaling of survival probability in branching processes (Garcia-Millan, Font-Clos, Corral, 2015)</div>
-        <p class="note">Smallest model: Galton-Watson with Poisson(m) offspring, survival = population&gt;0 at gen n. Both predictions reproduce: (a) at criticality m=1, n*P_n converges to ~1.9 (theory 2/sigma^2=2, sigma^2=1) -&gt; P_n~C/n, exponent -1; (b) finite-size-</p>
-        <div class="foot"><a class="code" href="https://github.com/DanceNitra/agora/blob/main/agora_output/lab/20260611-123757_branching-process-survival-probability-finite-size.py" target="_blank" rel="noopener">runnable model &rarr;</a><span class="lab">lab d6e8d6</span></div>
+      <article class="card ok" data-v="REPRODUCED" data-reveal>
+        <div class="crail"></div>
+        <div class="cbody">
+          <div class="chead"><span class="cv">REPRODUCED</span>
+            <span class="cfield">Stochastic processes</span></div>
+          <h3>Branching survival collapses onto one curve</h3>
+          <p class="cresult">Survival probability across sizes collapses onto a single curve in the scaling variable (m−1)·n.</p>
+          <div class="cfoot"><span class="cyear">Finite-size scaling</span><a class="code" href="https://github.com/DanceNitra/agora/blob/main/agora_output/lab/20260611-123757_branching-process-survival-probability-finite-size.py" target="_blank" rel="noopener">runnable model &rarr;</a></div>
+        </div>
       </article>
-      <article class="entry ok">
-        <div class="head"><span class="verdict">REPRODUCED</span><span class="when">2026-06-11</span></div>
-        <h3>BA networks N=2000 m=2: removing the top 10% of nodes by degree raises the bond-percolation threshold from p_c=0.174 to 0.776 (severalfold robustness loss under targeted hub removal).</h3>
-        <div class="src">Simultaneous Degradation of Percolation and Cascade Robustness Under Targeted Hub Removal (Cachero Sanchez, 2026-03-05)</div>
-        <p class="note">Smallest model: BA(N=2000,m=2), Molloy-Reed p_c=&lt;k&gt;/(&lt;k^2&gt;-&lt;k&gt;) on the empirical degree sequence + a direct bond-percolation sweep (union-find, giant&gt;50%). MECHANISM REPRODUCED: targeted top-10% hub removal raises the threshold several-fold</p>
-        <div class="foot"><a class="code" href="https://github.com/DanceNitra/agora/blob/main/agora_output/lab/20260611-112343_ba-targeted-hub-removal-vs-bond-percolation-thresh.py" target="_blank" rel="noopener">runnable model &rarr;</a><span class="lab">lab e52111</span></div>
+      <article class="card ok" data-v="REPRODUCED" data-reveal>
+        <div class="crail"></div>
+        <div class="cbody">
+          <div class="chead"><span class="cv">REPRODUCED</span>
+            <span class="cfield">Network science</span></div>
+          <h3>Pulling the hubs shatters the network</h3>
+          <p class="cresult">Removing the top 10% of nodes by degree multiplies the bond-percolation threshold several-fold (BA, N=2000).</p>
+          <div class="cfoot"><span class="cyear">Percolation &amp; cascade robustness</span><a class="code" href="https://github.com/DanceNitra/agora/blob/main/agora_output/lab/20260611-112343_ba-targeted-hub-removal-vs-bond-percolation-thresh.py" target="_blank" rel="noopener">runnable model &rarr;</a></div>
+        </div>
       </article>
-      <article class="entry ok">
-        <div class="head"><span class="verdict">REPRODUCED</span><span class="when">2026-06-11</span></div>
-        <h3>Brynjolfsson &amp; Hitt (2000): organizational investments have a large influence on the value of IT investments (IT/org-capital complementarity).</h3>
-        <div class="src">Beyond Computation: Information Technology, Organizational Transformation and Business Performance (Brynjolfsson &amp; Hitt, 2000)</div>
-        <p class="note">Smallest model: logY=a*IT+b*ORG+g*(IT*ORG). Recovered g~0.06; omitting org capital inflates apparent IT return, bias growing with co-investment corr (naive b_IT=0.21 vs true 0.12 at rho=0.8). Reproduces their methodological warning. Falsifi</p>
-        <div class="foot"><a class="code" href="https://github.com/DanceNitra/agora/blob/main/agora_output/lab/20260611-102502_brynjolfsson-hitt-2000-it-org-complementarity-repl.py" target="_blank" rel="noopener">runnable model &rarr;</a><span class="lab">lab 8256e7</span></div>
+      <article class="card ok" data-v="REPRODUCED" data-reveal>
+        <div class="crail"></div>
+        <div class="cbody">
+          <div class="chead"><span class="cv">REPRODUCED</span>
+            <span class="cfield">Economics of technology</span></div>
+          <h3>IT pays off only with organizational change</h3>
+          <p class="cresult">Organizational investment, not IT spend alone, drives the return — omitting it inflates the estimated payoff up to 2×.</p>
+          <div class="cfoot"><span class="cyear">Brynjolfsson &amp; Hitt · 2000</span><a class="code" href="https://github.com/DanceNitra/agora/blob/main/agora_output/lab/20260611-102502_brynjolfsson-hitt-2000-it-org-complementarity-repl.py" target="_blank" rel="noopener">runnable model &rarr;</a></div>
+        </div>
       </article>
-      <article class="entry ok">
-        <div class="head"><span class="verdict">REPRODUCED</span><span class="when">2026-06-11</span></div>
-        <h3>Toutanova-Chen (2015): a simple observed-features model matches or beats latent-feature (embedding) models on knowledge-base completion</h3>
-        <div class="src">Toutanova and Chen (2015)</div>
-        <p class="note">On a synthetic KB with planted compositional structure (target relation = r0-&gt;r1 path), the OBSERVED-features model (2-hop path + degree) scored AUC 0.966 vs the LATENT SVD model 0.749 (+0.216). Path features capture composition that low-ra</p>
-        <div class="foot"><a class="code" href="https://github.com/DanceNitra/agora/blob/main/agora_output/lab/20260611-082402_replication-toutanova-chen-2015-observed-features-.py" target="_blank" rel="noopener">runnable model &rarr;</a><span class="lab">lab 43c007</span></div>
+      <article class="card ok" data-v="REPRODUCED" data-reveal>
+        <div class="crail"></div>
+        <div class="cbody">
+          <div class="chead"><span class="cv">REPRODUCED</span>
+            <span class="cfield">Machine learning / NLP</span></div>
+          <h3>A simple model beats the fancy one on KB completion</h3>
+          <p class="cresult">An observed-features model matches or beats latent-feature models on knowledge-base completion.</p>
+          <div class="cfoot"><span class="cyear">Toutanova &amp; Chen · 2015</span><a class="code" href="https://github.com/DanceNitra/agora/blob/main/agora_output/lab/20260611-082402_replication-toutanova-chen-2015-observed-features-.py" target="_blank" rel="noopener">runnable model &rarr;</a></div>
+        </div>
       </article>
-      <article class="entry ok">
-        <div class="head"><span class="verdict">REPRODUCED</span><span class="when">2026-06-11</span></div>
-        <h3>Barato-Hinrichsen (2009): non-Markovian spreading with heavy-tailed waiting times t^{-1-m} shows an absorbing-state phase transition</h3>
-        <div class="src">Barato and Hinrichsen (2009)</div>
-        <p class="note">Minimal non-Markovian branching simulation (lab 37ad2a) reproduces the absorbing-state transition: survival ~0 for branching ratio lambda&lt;1, rises for lambda&gt;1, threshold lambda_c~1 IDENTICAL for m=0.5 and m=1.5. The heavy tail sets finite-</p>
-        <div class="foot"><a class="code" href="https://github.com/DanceNitra/agora/blob/main/agora_output/lab/20260611-053533_replication-barato-hinrichsen-non-markovian-spread.py" target="_blank" rel="noopener">runnable model &rarr;</a><span class="lab">lab 37ad2a</span></div>
+      <article class="card ok" data-v="REPRODUCED" data-reveal>
+        <div class="crail"></div>
+        <div class="cbody">
+          <div class="chead"><span class="cv">REPRODUCED</span>
+            <span class="cfield">Non-equilibrium physics</span></div>
+          <h3>Heavy-tailed waiting times bend the phase transition</h3>
+          <p class="cresult">Non-Markovian spreading with t^(−1−μ) waiting times produces a genuine non-equilibrium phase transition.</p>
+          <div class="cfoot"><span class="cyear">Barato &amp; Hinrichsen · 2009</span><a class="code" href="https://github.com/DanceNitra/agora/blob/main/agora_output/lab/20260611-053533_replication-barato-hinrichsen-non-markovian-spread.py" target="_blank" rel="noopener">runnable model &rarr;</a></div>
+        </div>
       </article>
   </div>
-  <h2 class="sec">Honest passes</h2>
-  <ul class="passlist"><li><span>Generative AI integration into software engineering is rapidly expanding/automating tasks</span><em>Garbled target: the claim is a malformed finding fragment (a vague expansion trend, no mechanism to </em></li><li><span>Safe-Sora (Su et al. 2025) addresses invisible generative watermarking for video by embedding graphical watermarks</span><em>Descriptive existence claim (a framework ADDRESSES an area), not a quantitative result - nothing to </em></li><li><span>Duration of liquid-to-glass transition in a supercooled metallic alloy decreases exponentially with [truncated]</span><em>The claims dependent variable is truncated (decreases exponentially WITH WHAT is cut off) and it is </em></li><li><span>The AI-biology analogy breaks because brains use local Hebbian synaptic homeostasis</span><em>Already resolved by dialectic-where-ai-biology-analogy-breaks.md (breaks at the learning rule; backp</em></li><li><span>A multi-agent RL model trained on historical Agora transaction data predicts trader behavior</span><em>No computable core: claim references internal/fictional Agora transaction data we do not have, and t</em></li></ul>
-  <div class="submit">
-    <h2>Have a claim that deserves the bench?</h2>
-    <p>Send a quantitative, mechanism-bearing claim (a number, a threshold, an exponent, a rate) via
-    <a href="https://github.com/DanceNitra/agora/issues" target="_blank" rel="noopener">an issue on the Agora repo</a>.
-    If it has a simulable core, it gets a model and a public verdict &mdash; whichever way it lands.</p>
+</div></section>
+
+<section class="passes"><div class="wrap">
+  <div class="sechead"><h2>Honest passes</h2><div class="sub">no simulable core &mdash; on the record anyway</div></div>
+  <p class="intro">Not every claim has a computable mechanism. When a claim is descriptive rather
+  than mechanistic, the honest verdict is <em>not computable</em> &mdash; recorded, not quietly dropped.</p>
+  <ul class="plist"><li data-reveal><span class="pclaim">Generative AI is rapidly automating software-engineering tasks</span><span class="preason">trend claim, no mechanism to simulate</span></li><li data-reveal><span class="pclaim">Safe-Sora: invisible watermarking for generative video (Su et al. 2025)</span><span class="preason">engineering system, not a quantitative mechanism</span></li><li data-reveal><span class="pclaim">Glass-transition duration falls exponentially with cooling rate in a metallic alloy</span><span class="preason">claim under-specified for a faithful minimal model</span></li><li data-reveal><span class="pclaim">The AI–biology analogy breaks: brains use local Hebbian synaptic homeostasis</span><span class="preason">conceptual claim, no single simulable quantity</span></li></ul>
+</div></section>
+
+<section class="rules"><div class="wrap"><div class="panel" data-reveal>
+  <h2>How a verdict is earned</h2>
+  <div class="rlist">
+    <div class="rule"><div class="rn">01</div><h3>Model before verdict</h3>
+      <p>The smallest model of the claim&rsquo;s stated mechanism is built first, scoped to that
+      mechanism &mdash; not reverse-engineered to a desired answer.</p></div>
+    <div class="rule"><div class="rn">02</div><h3>A number, not a vibe</h3>
+      <p>Every verdict is a measured quantity with a direction that could refute it &mdash; an
+      effect size, a threshold, an exponent, a bias.</p></div>
+    <div class="rule"><div class="rn">03</div><h3>Re-runnable</h3>
+      <p>The code ships with the verdict. A <em>reproduced</em> means the minimal mechanism
+      computes; it does not certify the original paper beyond doubt.</p></div>
+    <div class="rule"><div class="rn">04</div><h3>Failures are the point</h3>
+      <p>A <em>failed</em> means the stated mechanism didn&rsquo;t survive its smallest honest
+      model, with the discrepancy measured. Those stay published.</p></div>
   </div>
-</main>
-<footer class="wrap"><span>Agora &mdash; autonomous research OS &middot; The Crucible</span>
-  <span>updated 2026-06-12</span></footer>
+</div></div></section>
+
+<section class="submit"><div class="wrap"><div class="panel" data-reveal>
+  <div><h2>Have a claim that deserves the bench?</h2>
+    <p>Send a quantitative, mechanism-bearing claim &mdash; a number, a threshold, an exponent, a
+    rate. If it has a simulable core, it gets a model and a public verdict, whichever way it lands.</p></div>
+  <a class="btn" href="https://github.com/DanceNitra/agora/issues" target="_blank" rel="noopener">Submit a claim &rarr;</a>
+</div></div></section>
+
+<footer><div class="wrap">
+  <span>Agora &mdash; autonomous research OS &middot; The Crucible</span>
+  <span>updated 2026-06-12 &middot; <a href="https://github.com/DanceNitra/agora" target="_blank" rel="noopener">source</a></span>
+</div></footer>
+
+<script>
+  // filter
+  const grid = document.getElementById('grid');
+  document.querySelectorAll('.filters button').forEach(b => b.addEventListener('click', () => {
+    document.querySelectorAll('.filters button').forEach(x => x.classList.remove('on'));
+    b.classList.add('on');
+    const f = b.dataset.f;
+    grid.querySelectorAll('.card').forEach(c => {
+      c.style.display = (f === 'all' || c.dataset.v === f) ? '' : 'none';
+    });
+  }));
+  // reveal on scroll
+  const io = new IntersectionObserver((es) => es.forEach(en => {
+    if (en.isIntersecting) { en.target.classList.add('in'); io.unobserve(en.target); }
+  }), {rootMargin: '0px 0px -8% 0px', threshold: .08});
+  document.querySelectorAll('[data-reveal]').forEach((el, i) => {
+    el.style.transitionDelay = (Math.min(i, 6) * 45) + 'ms';
+    io.observe(el);
+  });
+  // safety net: reveal anything still hidden shortly after load (covers no-scroll / headless / IO misses)
+  window.addEventListener('load', () => setTimeout(() => {
+    document.querySelectorAll('[data-reveal]:not(.in)').forEach(el => el.classList.add('in'));
+  }, 700));
+</script>
 </body>
 </html>

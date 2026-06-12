@@ -1,13 +1,22 @@
 {
  "name": "The Crucible — machine replication ledger",
- "description": "Claims rebuilt as minimal computational models and tested. REPRODUCED = the mechanism holds in a minimal model; FAILED = it does not; NOT_COMPUTABLE = no simulable core (an honest pass).",
+ "description": "Scientific and technical claims rebuilt as minimal computational models and tested. REPRODUCED = the mechanism holds in a minimal model; FAILED = it does not; NOT_COMPUTABLE = no simulable core (an honest pass).",
  "generated": "2026-06-12",
  "counts": {
   "REPRODUCED": 12,
-  "FAILED": 0,
+  "FAILED": 1,
   "NOT_COMPUTABLE": 5
  },
  "entries": [
+  {
+   "claim": "Gilovich, Vallone & Tversky (1985): the basketball hot hand is a cognitive illusion - P(hit | streak of hits) is no higher than P(hit | streak of misses), so streak shooting does not exist",
+   "source": "Gilovich, Vallone & Tversky, Cognitive Psychology 17, 1985 - The hot hand in basketball: On the misperception of random sequences",
+   "verdict": "FAILED",
+   "note": "The canonical method manufactures its own conclusion. An iid shooter with NO hot hand shows P(hit|3H)-P(hit|3M) = -7.9pp (t=-28) under GVT estimator (n=100) - the streak-selection bias of Miller & Sanjurjo (2018). Bias grows to -17pp at k=4",
+   "lab_id": "ebce40",
+   "code": "https://github.com/DanceNitra/agora/blob/main/agora_output/lab/20260612-143839_gvt-1985-hot-hand-fallacy-streak-selection-bias-mi.py",
+   "date": "2026-06-12"
+  },
   {
    "claim": "Hong-Page (2004): a randomly selected (diverse) team of problem solvers outperforms the team of individually best solvers under relay search (n=2000, l=12, k=3, group 10)",
    "source": "Hong & Page, PNAS 101(46), 2004 - Groups of diverse problem solvers can outperform groups of high-ability problem solvers",

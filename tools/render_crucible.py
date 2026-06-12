@@ -2,9 +2,10 @@
 The Crucible — render the public replication ledger.
 
 Reads server/.replications.json (verdict ledger) + server/.lab.json (experiment scripts/output)
-and renders public/crucible/index.html (human ledger) + public/crucible/crucible.json
-(machine-readable dataset). Every entry: claim, source, verdict, method note, and — when the
-lab script is in the repo — a link to the runnable code. Run after any new replication:
+and a hand-curated display layer (tools/crucible_curation.json), then renders
+public/crucible/index.html (human ledger) + public/crucible/crucible.json (machine dataset).
+Curation overrides raw ledger text so the public page is 100% quality; the ledger stays the
+source of truth. Re-run after any new replication (commit lab scripts so code links resolve):
     python -X utf8 tools/render_crucible.py
 """
 from __future__ import annotations
@@ -17,209 +18,394 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 REPS = ROOT / "server" / ".replications.json"
 LAB = ROOT / "server" / ".lab.json"
+CURATION = ROOT / "tools" / "crucible_curation.json"
 OUT_DIR = ROOT / "public" / "crucible"
 SITE = "https://dancenitra.github.io/agora"
 REPO = "https://github.com/DanceNitra/agora"
 
-ICON = {"REPRODUCED": "REPRODUCED", "FAILED": "FAILED", "NOT_COMPUTABLE": "NOT COMPUTABLE"}
-KLASS = {"REPRODUCED": "ok", "FAILED": "fail", "NOT_COMPUTABLE": "pass"}
 
-
-def load(p: Path) -> list:
+def load(p: Path):
     try:
         return json.loads(p.read_text(encoding="utf-8"))
     except Exception:
-        return []
+        return [] if p in (REPS, LAB) else {}
 
 
-def lab_index(lab: list) -> dict:
-    out = {}
-    for e in lab:
-        if e.get("id"):
-            out[e["id"]] = e
-    return out
+def lab_index(lab):
+    return {e["id"]: e for e in lab if e.get("id")}
 
 
-def script_link(lab_rec: dict | None) -> str | None:
-    """GitHub link to the lab script if it lives under agora_output/lab (committed)."""
+def script_link(lab_rec):
     if not lab_rec:
         return None
     sp = (lab_rec.get("script") or "").replace("\\", "/")
     if "agora_output/lab/" not in sp:
         return None
     rel = "agora_output/lab/" + sp.split("agora_output/lab/")[-1]
-    if not (ROOT / rel).exists():
-        return None
-    return f"{REPO}/blob/main/{rel}"
+    return f"{REPO}/blob/main/{rel}" if (ROOT / rel).exists() else None
 
 
-def render() -> None:
+def e(s):
+    return html.escape(str(s or ""))
+
+
+def render():
     reps = load(REPS)
     labs = lab_index(load(LAB))
+    cur = load(CURATION)
     by = {o: sum(1 for r in reps if r.get("outcome") == o)
           for o in ("REPRODUCED", "FAILED", "NOT_COMPUTABLE")}
     tested = [r for r in reps if r.get("outcome") in ("REPRODUCED", "FAILED")][::-1]
     passed = [r for r in reps if r.get("outcome") == "NOT_COMPUTABLE"][::-1]
 
-    # ---------- machine-readable dataset ----------
+    # ---- machine-readable dataset ----
     dataset = {
         "name": "The Crucible — machine replication ledger",
-        "description": "Claims rebuilt as minimal computational models and tested. "
-                       "REPRODUCED = the mechanism holds in a minimal model; FAILED = it does not; "
-                       "NOT_COMPUTABLE = no simulable core (an honest pass).",
+        "description": "Scientific and technical claims rebuilt as minimal computational models and "
+                       "tested. REPRODUCED = the mechanism holds in a minimal model; FAILED = it does "
+                       "not; NOT_COMPUTABLE = no simulable core (an honest pass).",
         "generated": time.strftime("%Y-%m-%d"),
         "counts": by,
-        "entries": [
-            {
-                "claim": r.get("claim", ""),
-                "source": r.get("source", ""),
-                "verdict": r.get("outcome", ""),
-                "note": r.get("note", ""),
-                "lab_id": r.get("lab_id", ""),
-                "code": script_link(labs.get(r.get("lab_id"))) or "",
-                "date": time.strftime("%Y-%m-%d", time.localtime(r.get("ts", 0))) if r.get("ts") else "",
-            }
-            for r in reps[::-1]
-        ],
+        "entries": [{
+            "claim": r.get("claim", ""), "source": r.get("source", ""),
+            "verdict": r.get("outcome", ""), "note": r.get("note", ""),
+            "lab_id": r.get("lab_id", ""), "code": script_link(labs.get(r.get("lab_id"))) or "",
+            "date": time.strftime("%Y-%m-%d", time.localtime(r.get("ts", 0))) if r.get("ts") else "",
+        } for r in reps[::-1]],
     }
 
-    # ---------- entry cards ----------
+    def meta(r):
+        c = cur.get(r.get("lab_id", ""), {})
+        return c, script_link(labs.get(r.get("lab_id"))), \
+            (time.strftime("%Y-%m-%d", time.localtime(r.get("ts", 0))) if r.get("ts") else "")
+
+    # ---- featured failure (case study) ----
+    featured_html = ""
+    feat = next((r for r in tested if cur.get(r.get("lab_id", ""), {}).get("featured")), None)
+    if feat:
+        c, code, date = meta(feat)
+        codeline = (f'<a class="codelink" href="{code}" target="_blank" rel="noopener">Read the runnable model &rarr;</a>'
+                    if code else "")
+        featured_html = f"""
+  <section class="feature" data-reveal>
+    <div class="wrap">
+      <div class="fhead"><span class="fverdict">Failed replication</span>
+        <span class="fmeta">{e(c.get('field'))} &middot; {e(c.get('year'))}</span></div>
+      <h2 class="ftitle">{e(c.get('title'))}</h2>
+      <div class="fgrid">
+        <div class="fcol"><div class="flab">The canon</div><p>{e(c.get('canon'))}</p></div>
+        <div class="fcol"><div class="flab">What we rebuilt</div><p>{e(c.get('rebuilt'))}</p></div>
+      </div>
+      <div class="fverdict-block"><div class="flab">The verdict</div><p>{e(c.get('verdict'))}</p></div>
+      <div class="ffoot">{codeline}<span class="flabid">lab {e(feat.get('lab_id'))} &middot; {date}</span></div>
+    </div>
+  </section>"""
+
+    # ---- verdict cards (exclude the featured one from the grid) ----
     cards = []
-    for i, r in enumerate(tested, 1):
-        lab_rec = labs.get(r.get("lab_id"))
-        code = script_link(lab_rec)
+    for r in tested:
+        if feat is not None and r is feat:
+            continue
+        c, code, date = meta(r)
         outcome = r["outcome"]
-        date = time.strftime("%Y-%m-%d", time.localtime(r.get("ts", 0))) if r.get("ts") else ""
-        note = html.escape(r.get("note", ""))
-        src = html.escape(r.get("source", ""))
-        claim = html.escape(r.get("claim", ""))
+        klass = "ok" if outcome == "REPRODUCED" else "fail"
+        title = c.get("title") or r.get("claim", "")[:90]
+        result = c.get("result") or r.get("note", "")
+        field = c.get("field") or ""
+        year = c.get("year") or e(r.get("source", ""))[:46]
         codeline = (f'<a class="code" href="{code}" target="_blank" rel="noopener">runnable model &rarr;</a>'
                     if code else "")
         cards.append(f"""
-      <article class="entry {KLASS[outcome]}">
-        <div class="head"><span class="verdict">{ICON[outcome]}</span><span class="when">{date}</span></div>
-        <h3>{claim}</h3>
-        <div class="src">{src}</div>
-        {f'<p class="note">{note}</p>' if note else ''}
-        <div class="foot">{codeline}{f'<span class="lab">lab {r.get("lab_id")}</span>' if r.get("lab_id") else ''}</div>
+      <article class="card {klass}" data-v="{outcome}" data-reveal>
+        <div class="crail"></div>
+        <div class="cbody">
+          <div class="chead"><span class="cv">{'REPRODUCED' if outcome=='REPRODUCED' else 'FAILED'}</span>
+            <span class="cfield">{e(field)}</span></div>
+          <h3>{e(title)}</h3>
+          <p class="cresult">{e(result)}</p>
+          <div class="cfoot"><span class="cyear">{e(year)}</span>{codeline}</div>
+        </div>
       </article>""")
 
+    # honest passes: show ONLY curated entries (keeps the public page clean; the full raw
+    # NOT_COMPUTABLE set stays in crucible.json for transparency)
+    pass_curation = cur.get("_passes", [])
+    shown_passes = []
+    for pc in pass_curation:
+        match = pc.get("match", "")
+        if any((r.get("claim", "").startswith(match)) for r in passed):
+            shown_passes.append(pc)
     passes = "".join(
-        f'<li><span>{html.escape(r.get("claim", "")[:140])}</span>'
-        f'<em>{html.escape((r.get("note") or "no simulable core")[:100])}</em></li>'
-        for r in passed)
+        f'<li data-reveal><span class="pclaim">{e(pc.get("claim"))}</span>'
+        f'<span class="preason">{e(pc.get("reason"))}</span></li>'
+        for pc in shown_passes)
+    nc_shown = len(shown_passes)
 
-    page = f"""<!DOCTYPE html>
+    page = TEMPLATE.format(
+        site=SITE, repo=REPO, R=by["REPRODUCED"], F=by["FAILED"], NC=nc_shown,
+        tested=len(tested), updated=time.strftime("%Y-%m-%d"),
+        featured=featured_html, cards="".join(cards), passes=passes)
+
+    OUT_DIR.mkdir(parents=True, exist_ok=True)
+    (OUT_DIR / "index.html").write_text(page, encoding="utf-8")
+    (OUT_DIR / "crucible.json").write_text(json.dumps(dataset, ensure_ascii=False, indent=1), encoding="utf-8")
+    print(f"rendered {OUT_DIR/'index.html'} — {by['REPRODUCED']}R/{by['FAILED']}F/{by['NOT_COMPUTABLE']}NC, "
+          f"{len(tested)} tested cards, featured={'yes' if feat else 'no'}")
+
+
+TEMPLATE = r"""<!DOCTYPE html>
 <html lang="en">
 <head>
+<script>document.documentElement.className+=' js';</script>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>The Crucible &middot; machine replication ledger &middot; Agora</title>
-<meta name="description" content="A public ledger of scientific and technical claims rebuilt as minimal computational models and tested: {by['REPRODUCED']} reproduced, {by['FAILED']} failed, {by['NOT_COMPUTABLE']} honest passes. Every verdict ships runnable code.">
-<link rel="canonical" href="{SITE}/public/crucible/">
+<title>The Crucible &middot; a machine that rebuilds claims in code &middot; Agora</title>
+<meta name="description" content="A public ledger of scientific and technical claims rebuilt as minimal computational models and tested in code: {R} reproduced, {F} failed, {NC} honest passes. Every verdict ships runnable code and a measured number.">
+<link rel="canonical" href="{site}/public/crucible/">
 <meta property="og:type" content="website">
-<meta property="og:title" content="The Crucible — machine replication ledger">
-<meta property="og:description" content="Claims rebuilt and tested in code. Published failures included.">
-<meta property="og:url" content="{SITE}/public/crucible/">
+<meta property="og:title" content="The Crucible — claims, rebuilt in code and tested">
+<meta property="og:description" content="A machine rebuilds scientific claims as minimal models and publishes the verdict — failures included. Every verdict ships runnable code.">
+<meta property="og:url" content="{site}/public/crucible/">
+<meta name="twitter:card" content="summary_large_image">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;0,6..72,600;1,6..72,400;1,6..72,500&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;0,6..72,600;0,6..72,700;1,6..72,400;1,6..72,500&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
-  :root{{--paper:#fbf9f4;--paper2:#f4f1ea;--ink:#1b1a17;--soft:#54514a;--faint:#8c887e;
-    --line:#e6e1d6;--acc:#0a8f68;--acc-soft:#e3f4ed;--bad:#b3402a;--bad-soft:#fae9e4;
-    --serif:"Newsreader",Georgia,serif;--mono:"JetBrains Mono",ui-monospace,Consolas,monospace}}
-  *{{box-sizing:border-box;margin:0}} html{{scroll-behavior:smooth}}
-  body{{background:var(--paper);color:var(--ink);font-family:var(--serif);-webkit-font-smoothing:antialiased}}
-  a{{color:inherit;text-decoration:none}} ::selection{{background:var(--acc-soft)}}
-  .topnav{{max-width:1080px;margin:0 auto;padding:24px 28px;display:flex;justify-content:space-between;align-items:center;font-family:var(--mono);font-size:12.5px;letter-spacing:.04em}}
-  .topnav a{{color:var(--soft)}} .topnav a:hover{{color:var(--acc)}}
+  :root{{
+    --paper:#faf7f0;--paper2:#f2eee4;--ink:#17150f;--soft:#55514733;--text:#4d493f;--faint:#938d7f;
+    --line:#e3ddcf;--line2:#d6cfbd;--acc:#0c7a55;--acc2:#0a8f68;--acc-soft:#e1f1ea;
+    --bad:#b1361f;--bad-soft:#f8e6e0;--gold:#9a7b1e;
+    --serif:"Newsreader",Georgia,"Times New Roman",serif;
+    --mono:"JetBrains Mono",ui-monospace,Menlo,Consolas,monospace;
+  }}
+  *{{box-sizing:border-box;margin:0}}
+  html{{scroll-behavior:smooth;-webkit-text-size-adjust:100%}}
+  body{{background:var(--paper);color:var(--ink);font-family:var(--serif);
+    -webkit-font-smoothing:antialiased;font-optical-sizing:auto;text-rendering:optimizeLegibility;
+    background-image:radial-gradient(circle at 12% -8%, #ffffff 0%, transparent 42%),
+      radial-gradient(circle at 92% 4%, #fffdf6 0%, transparent 38%);}}
+  ::selection{{background:var(--acc-soft)}}
+  a{{color:inherit;text-decoration:none}}
+  .wrap{{max-width:1120px;margin:0 auto;padding:0 30px}}
+  /* nav */
+  .nav{{position:sticky;top:0;z-index:20;background:rgba(250,247,240,.82);backdrop-filter:saturate(150%) blur(10px);
+    border-bottom:1px solid var(--line)}}
+  .nav .wrap{{display:flex;justify-content:space-between;align-items:center;padding:16px 30px;
+    font-family:var(--mono);font-size:12.5px;letter-spacing:.04em}}
   .brand{{display:flex;align-items:center;gap:9px;font-weight:600;color:var(--ink)}}
-  .brand .m{{width:18px;height:18px;border-radius:5px;background:conic-gradient(from 210deg,var(--acc),transparent 65%);position:relative}}
+  .brand .m{{width:17px;height:17px;border-radius:5px;background:conic-gradient(from 210deg,var(--acc2),transparent 62%);position:relative}}
   .brand .m::after{{content:"";position:absolute;inset:4px;border-radius:2px;background:var(--paper)}}
-  .wrap{{max-width:1080px;margin:0 auto;padding:0 28px}}
-  .masthead{{padding:54px 0 30px;border-bottom:1px solid var(--line)}}
-  .masthead .eyebrow{{font-family:var(--mono);font-size:12px;letter-spacing:.18em;text-transform:uppercase;color:var(--acc);margin-bottom:18px}}
-  .masthead h1{{font-weight:500;font-size:clamp(38px,6.5vw,70px);line-height:1.04;letter-spacing:-.025em}}
-  .masthead h1 em{{font-style:italic;color:var(--acc)}}
-  .masthead p{{margin-top:18px;max-width:64ch;font-size:19px;line-height:1.62;color:var(--soft)}}
-  .masthead p b{{color:var(--ink)}}
-  .tally{{display:flex;gap:14px;flex-wrap:wrap;margin-top:26px;font-family:var(--mono);font-size:13px}}
-  .tally span{{padding:7px 14px;border:1px solid var(--line);border-radius:999px;color:var(--soft)}}
-  .tally .ok{{border-color:var(--acc);color:var(--acc)}}
-  .tally .fail{{border-color:var(--bad);color:var(--bad)}}
-  .rules{{margin:34px 0 8px;padding:22px 26px;background:var(--paper2);border:1px solid var(--line);border-radius:14px;
-    font-size:16px;line-height:1.65;color:var(--soft);max-width:74ch}}
-  .rules b{{color:var(--ink)}}
-  .ledger{{display:grid;grid-template-columns:repeat(auto-fill,minmax(330px,1fr));gap:18px;margin:36px 0 26px}}
-  .entry{{background:#fff;border:1px solid var(--line);border-radius:16px;padding:26px 26px 20px;display:flex;flex-direction:column;gap:12px}}
-  .entry .head{{display:flex;justify-content:space-between;align-items:center;font-family:var(--mono);font-size:11.5px;letter-spacing:.12em}}
-  .entry .verdict{{padding:4px 10px;border-radius:6px}}
-  .entry.ok .verdict{{background:var(--acc-soft);color:var(--acc)}}
-  .entry.fail .verdict{{background:var(--bad-soft);color:var(--bad)}}
-  .entry .when{{color:var(--faint)}}
-  .entry h3{{font-weight:500;font-size:18.5px;line-height:1.4;letter-spacing:-.01em}}
-  .entry .src{{font-family:var(--mono);font-size:12px;color:var(--faint);line-height:1.5}}
-  .entry .note{{font-size:15.5px;line-height:1.6;color:var(--soft)}}
-  .entry .foot{{margin-top:auto;padding-top:10px;display:flex;justify-content:space-between;align-items:center;font-family:var(--mono);font-size:12.5px}}
-  .entry .code{{color:var(--acc)}} .entry .code:hover{{text-decoration:underline}}
-  .entry .lab{{color:var(--faint)}}
-  h2.sec{{font-weight:500;font-size:28px;letter-spacing:-.015em;margin:42px 0 6px}}
-  .passlist{{list-style:none;padding:0;margin:18px 0 60px;border-top:1px solid var(--line)}}
-  .passlist li{{display:flex;justify-content:space-between;gap:24px;padding:14px 4px;border-bottom:1px solid var(--line);font-size:15px;color:var(--soft);line-height:1.5}}
-  .passlist em{{font-style:normal;font-family:var(--mono);font-size:12px;color:var(--faint);white-space:nowrap;align-self:center}}
-  .submit{{margin:10px 0 70px;padding:26px 28px;border:1px dashed var(--acc);border-radius:16px;max-width:74ch}}
-  .submit h2{{font-weight:500;font-size:24px;margin-bottom:8px}}
-  .submit p{{font-size:16.5px;line-height:1.6;color:var(--soft)}}
-  .submit a{{color:var(--acc);font-weight:600}}
-  footer{{border-top:1px solid var(--line);padding:30px 0 50px;font-family:var(--mono);font-size:12.5px;color:var(--faint);display:flex;justify-content:space-between;flex-wrap:wrap;gap:10px}}
-  @media (max-width:640px){{.passlist li{{flex-direction:column;gap:4px}}}}
+  .nav a.lnk{{color:var(--faint)}} .nav a.lnk:hover{{color:var(--acc)}}
+  .navr{{display:flex;gap:20px;align-items:center}}
+  /* masthead */
+  .mast{{padding:74px 0 36px}}
+  .kick{{font-family:var(--mono);font-size:12px;letter-spacing:.32em;text-transform:uppercase;color:var(--acc);
+    margin-bottom:26px;display:flex;align-items:center;gap:14px}}
+  .kick::before{{content:"";width:30px;height:1px;background:var(--acc)}}
+  .mast h1{{font-weight:500;font-size:clamp(44px,8vw,86px);line-height:1.0;letter-spacing:-.03em;max-width:15ch}}
+  .mast h1 em{{font-style:italic;color:var(--acc)}}
+  .lede{{margin-top:26px;max-width:62ch;font-size:21px;line-height:1.62;color:var(--text)}}
+  .lede b{{color:var(--ink);font-weight:600}}
+  /* tally */
+  .tally{{display:flex;gap:0;margin-top:46px;border:1px solid var(--line2);border-radius:16px;overflow:hidden;
+    max-width:760px;background:#fff}}
+  .tally .t{{flex:1;padding:22px 24px;border-right:1px solid var(--line)}}
+  .tally .t:last-child{{border-right:0}}
+  .tally .num{{font-family:var(--mono);font-weight:600;font-size:34px;line-height:1;letter-spacing:-.02em}}
+  .tally .lbl{{margin-top:9px;font-family:var(--mono);font-size:11.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--faint)}}
+  .tally .ok .num{{color:var(--acc)}}
+  .tally .fail{{background:linear-gradient(180deg,#fff,var(--bad-soft))}}
+  .tally .fail .num{{color:var(--bad)}}
+  .tally .fail .lbl{{color:var(--bad)}}
+  .dataset{{margin-top:20px;font-family:var(--mono);font-size:13px;color:var(--faint)}}
+  .dataset a{{color:var(--acc);border-bottom:1px solid var(--acc-soft);padding-bottom:1px}}
+  .dataset a:hover{{border-color:var(--acc)}}
+  /* feature / case study */
+  .feature{{margin:60px 0 10px}}
+  .feature .wrap{{background:#1a1813;color:#f3efe4;border-radius:24px;padding:54px 56px;position:relative;overflow:hidden;
+    box-shadow:0 30px 60px -34px rgba(26,24,19,.55)}}
+  .feature .wrap::before{{content:"";position:absolute;inset:0;background:
+    radial-gradient(circle at 88% 8%, rgba(177,54,31,.30), transparent 45%);pointer-events:none}}
+  .fhead{{display:flex;align-items:center;gap:16px;flex-wrap:wrap;font-family:var(--mono);font-size:12px;letter-spacing:.08em}}
+  .fverdict{{background:var(--bad);color:#fff;padding:6px 13px;border-radius:7px;text-transform:uppercase;letter-spacing:.12em;font-weight:600}}
+  .fmeta{{color:#b8b0a0}}
+  .ftitle{{font-weight:500;font-size:clamp(30px,4.6vw,52px);line-height:1.06;letter-spacing:-.022em;margin:22px 0 30px;max-width:20ch}}
+  .ftitle, .feature em{{font-style:normal}}
+  .fgrid{{display:grid;grid-template-columns:1fr 1fr;gap:34px;margin-bottom:30px}}
+  .flab{{font-family:var(--mono);font-size:11px;letter-spacing:.18em;text-transform:uppercase;color:#c9a23f;margin-bottom:11px}}
+  .feature p{{font-size:17.5px;line-height:1.62;color:#ddd7c9}}
+  .fverdict-block{{border-top:1px solid #322e25;padding-top:26px}}
+  .fverdict-block p{{color:#f1ece0;font-size:18.5px;line-height:1.62;max-width:88ch}}
+  .ffoot{{margin-top:30px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;
+    font-family:var(--mono);font-size:13px}}
+  .codelink{{color:#7fd7b4;font-weight:500}} .codelink:hover{{color:#a6e6cd}}
+  .flabid{{color:#857d6e}}
+  /* ledger */
+  .ledger{{padding:54px 0 20px}}
+  .sechead{{display:flex;align-items:baseline;justify-content:space-between;flex-wrap:wrap;gap:14px;margin-bottom:8px}}
+  .sechead h2{{font-weight:500;font-size:32px;letter-spacing:-.02em}}
+  .sechead .sub{{font-family:var(--mono);font-size:12.5px;color:var(--faint)}}
+  .filters{{display:flex;gap:9px;margin:24px 0 30px;flex-wrap:wrap}}
+  .filters button{{font-family:var(--mono);font-size:12.5px;letter-spacing:.02em;border:1px solid var(--line2);
+    background:#fff;color:var(--text);padding:8px 16px;border-radius:999px;cursor:pointer;transition:all .18s}}
+  .filters button:hover{{border-color:var(--acc);color:var(--acc)}}
+  .filters button.on{{background:var(--ink);color:var(--paper);border-color:var(--ink)}}
+  .grid{{display:grid;grid-template-columns:repeat(auto-fill,minmax(340px,1fr));gap:20px}}
+  .card{{display:flex;background:#fff;border:1px solid var(--line);border-radius:16px;overflow:hidden;
+    transition:transform .22s,box-shadow .22s,border-color .22s}}
+  .card:hover{{transform:translateY(-3px);box-shadow:0 18px 34px -26px rgba(23,21,15,.4);border-color:var(--line2)}}
+  .crail{{width:5px;flex:none}}
+  .card.ok .crail{{background:linear-gradient(180deg,var(--acc2),var(--acc))}}
+  .card.fail .crail{{background:linear-gradient(180deg,#c9492f,var(--bad))}}
+  .cbody{{padding:26px 26px 20px;display:flex;flex-direction:column;flex:1}}
+  .chead{{display:flex;align-items:center;justify-content:space-between;gap:10px;font-family:var(--mono);font-size:10.5px;letter-spacing:.1em;margin-bottom:14px}}
+  .cv{{padding:4px 9px;border-radius:6px;font-weight:600;letter-spacing:.12em}}
+  .card.ok .cv{{background:var(--acc-soft);color:var(--acc)}}
+  .card.fail .cv{{background:var(--bad-soft);color:var(--bad)}}
+  .cfield{{color:var(--faint);text-transform:uppercase}}
+  .card h3{{font-weight:500;font-size:21px;line-height:1.24;letter-spacing:-.015em;margin-bottom:12px}}
+  .cresult{{font-size:15.5px;line-height:1.58;color:var(--text);flex:1}}
+  .cfoot{{margin-top:18px;padding-top:14px;border-top:1px solid var(--line);display:flex;justify-content:space-between;
+    align-items:center;gap:10px;font-family:var(--mono);font-size:11.5px}}
+  .cyear{{color:var(--faint)}}
+  .code{{color:var(--acc);white-space:nowrap}} .code:hover{{text-decoration:underline}}
+  /* passes */
+  .passes{{padding:56px 0 24px}}
+  .passes p.intro{{margin-top:8px;max-width:70ch;font-size:16.5px;line-height:1.6;color:var(--text)}}
+  .plist{{list-style:none;margin:26px 0 0;border-top:1px solid var(--line)}}
+  .plist li{{display:flex;justify-content:space-between;gap:30px;padding:16px 2px;border-bottom:1px solid var(--line);
+    align-items:baseline}}
+  .pclaim{{font-size:16px;line-height:1.5;color:var(--text)}}
+  .preason{{font-family:var(--mono);font-size:11.5px;color:var(--faint);white-space:nowrap;text-align:right}}
+  /* rules + submit */
+  .rules{{padding:56px 0}}
+  .rules .panel{{background:var(--paper2);border:1px solid var(--line2);border-radius:18px;padding:40px 44px;max-width:none}}
+  .rules h2{{font-weight:500;font-size:28px;letter-spacing:-.018em;margin-bottom:18px}}
+  .rlist{{display:grid;grid-template-columns:1fr 1fr;gap:26px 44px;margin-top:6px}}
+  .rule .rn{{font-family:var(--mono);font-size:12px;color:var(--acc);letter-spacing:.1em}}
+  .rule h3{{font-weight:600;font-size:17px;margin:8px 0 6px}}
+  .rule p{{font-size:15.5px;line-height:1.58;color:var(--text)}}
+  .submit{{padding:14px 0 80px}}
+  .submit .panel{{border:1.5px dashed var(--acc);border-radius:18px;padding:38px 42px;display:flex;
+    justify-content:space-between;align-items:center;gap:30px;flex-wrap:wrap;background:#fff}}
+  .submit h2{{font-weight:500;font-size:26px;letter-spacing:-.015em;margin-bottom:8px}}
+  .submit p{{font-size:16.5px;line-height:1.58;color:var(--text);max-width:60ch}}
+  .btn{{font-family:var(--mono);font-size:13.5px;font-weight:600;background:var(--ink);color:var(--paper);
+    padding:14px 22px;border-radius:11px;white-space:nowrap;transition:background .2s}}
+  .btn:hover{{background:var(--acc)}}
+  footer{{border-top:1px solid var(--line);padding:30px 0 60px}}
+  footer .wrap{{display:flex;justify-content:space-between;flex-wrap:wrap;gap:12px;font-family:var(--mono);font-size:12.5px;color:var(--faint)}}
+  footer a{{color:var(--faint)}} footer a:hover{{color:var(--acc)}}
+  /* reveal — only hide when JS is on; content is fully visible without JS or before scroll */
+  .js [data-reveal]{{opacity:0;transform:translateY(16px);transition:opacity .6s ease,transform .6s ease}}
+  .js [data-reveal].in{{opacity:1;transform:none}}
+  @media (prefers-reduced-motion:reduce){{.js [data-reveal]{{opacity:1;transform:none;transition:none}}}}
+  @media (max-width:760px){{
+    .feature .wrap{{padding:38px 26px}} .fgrid{{grid-template-columns:1fr;gap:24px}}
+    .rlist{{grid-template-columns:1fr}} .tally{{flex-direction:row}}
+    .tally .num{{font-size:26px}} .plist li{{flex-direction:column;gap:4px}}
+    .preason{{text-align:left}}
+  }}
 </style>
 </head>
 <body>
-<nav class="topnav"><a class="brand" href="{SITE}/"><span class="m"></span>Agora</a>
-  <div><a href="{SITE}/posts/">Writing</a>&nbsp;&nbsp;&middot;&nbsp;&nbsp;<a href="{SITE}/#record">Track record</a></div>
-</nav>
-<header class="masthead wrap">
-  <div class="eyebrow">The Crucible</div>
+<nav class="nav"><div class="wrap">
+  <a class="brand" href="{site}/"><span class="m"></span>Agora</a>
+  <div class="navr"><a class="lnk" href="{site}/posts/">Writing</a>
+    <a class="lnk" href="{site}/#record">Track record</a>
+    <a class="lnk" href="crucible.json">Dataset</a></div>
+</div></nav>
+
+<header class="mast"><div class="wrap">
+  <div class="kick">The Crucible</div>
   <h1>Claims, rebuilt in code <em>and tested.</em></h1>
-  <p>A public ledger of scientific and technical claims rebuilt as <b>minimal computational models</b>
-  and run. Three honest verdicts: <b>REPRODUCED</b> (the mechanism holds in a minimal model),
-  <b>FAILED</b> (it does not &mdash; science&rsquo;s rarest export, published here), and
-  <b>NOT&nbsp;COMPUTABLE</b> (no simulable core &mdash; an honest pass, also on the record).</p>
+  <p class="lede">A public ledger of scientific and technical claims rebuilt as <b>minimal
+  computational models</b> and run. Three honest verdicts &mdash; <b>reproduced</b> when the
+  mechanism holds in its smallest model, <b>failed</b> when it doesn&rsquo;t (science&rsquo;s
+  rarest export, published here), and <b>not computable</b> when there&rsquo;s no simulable core.
+  Every verdict ships a measured number and the code that produced it.</p>
   <div class="tally">
-    <span class="ok">{by['REPRODUCED']} reproduced</span>
-    <span class="fail">{by['FAILED']} failed</span>
-    <span>{by['NOT_COMPUTABLE']} honest passes</span>
-    <span><a href="crucible.json">dataset (JSON) &rarr;</a></span>
+    <div class="t ok"><div class="num">{R}</div><div class="lbl">Reproduced</div></div>
+    <div class="t fail"><div class="num">{F}</div><div class="lbl">Failed</div></div>
+    <div class="t"><div class="num">{NC}</div><div class="lbl">Honest passes</div></div>
   </div>
-</header>
-<main class="wrap">
-  <div class="rules"><b>The rules.</b> The model is built before the verdict is known, scoped to the
-  claim&rsquo;s stated mechanism, and shipped with the code &mdash; every verdict is re-runnable.
-  A REPRODUCED here means the minimal mechanism computes, not that the paper is beyond doubt; a FAILED
-  means the stated mechanism did not survive its smallest honest model, with the discrepancy measured.</div>
-  <div class="ledger">{''.join(cards)}
+  <div class="dataset">Open data &mdash; <a href="crucible.json">the full ledger as JSON &rarr;</a></div>
+</div></header>
+{featured}
+<section class="ledger"><div class="wrap">
+  <div class="sechead"><h2>The ledger</h2><div class="sub">{tested} claims rebuilt &amp; tested &middot; newest first</div></div>
+  <div class="filters">
+    <button class="on" data-f="all">All</button>
+    <button data-f="REPRODUCED">Reproduced</button>
+    <button data-f="FAILED">Failed</button>
   </div>
-  <h2 class="sec">Honest passes</h2>
-  <ul class="passlist">{passes}</ul>
-  <div class="submit">
-    <h2>Have a claim that deserves the bench?</h2>
-    <p>Send a quantitative, mechanism-bearing claim (a number, a threshold, an exponent, a rate) via
-    <a href="{REPO}/issues" target="_blank" rel="noopener">an issue on the Agora repo</a>.
-    If it has a simulable core, it gets a model and a public verdict &mdash; whichever way it lands.</p>
+  <div class="grid" id="grid">{cards}
   </div>
-</main>
-<footer class="wrap"><span>Agora &mdash; autonomous research OS &middot; The Crucible</span>
-  <span>updated {time.strftime('%Y-%m-%d')}</span></footer>
+</div></section>
+
+<section class="passes"><div class="wrap">
+  <div class="sechead"><h2>Honest passes</h2><div class="sub">no simulable core &mdash; on the record anyway</div></div>
+  <p class="intro">Not every claim has a computable mechanism. When a claim is descriptive rather
+  than mechanistic, the honest verdict is <em>not computable</em> &mdash; recorded, not quietly dropped.</p>
+  <ul class="plist">{passes}</ul>
+</div></section>
+
+<section class="rules"><div class="wrap"><div class="panel" data-reveal>
+  <h2>How a verdict is earned</h2>
+  <div class="rlist">
+    <div class="rule"><div class="rn">01</div><h3>Model before verdict</h3>
+      <p>The smallest model of the claim&rsquo;s stated mechanism is built first, scoped to that
+      mechanism &mdash; not reverse-engineered to a desired answer.</p></div>
+    <div class="rule"><div class="rn">02</div><h3>A number, not a vibe</h3>
+      <p>Every verdict is a measured quantity with a direction that could refute it &mdash; an
+      effect size, a threshold, an exponent, a bias.</p></div>
+    <div class="rule"><div class="rn">03</div><h3>Re-runnable</h3>
+      <p>The code ships with the verdict. A <em>reproduced</em> means the minimal mechanism
+      computes; it does not certify the original paper beyond doubt.</p></div>
+    <div class="rule"><div class="rn">04</div><h3>Failures are the point</h3>
+      <p>A <em>failed</em> means the stated mechanism didn&rsquo;t survive its smallest honest
+      model, with the discrepancy measured. Those stay published.</p></div>
+  </div>
+</div></div></section>
+
+<section class="submit"><div class="wrap"><div class="panel" data-reveal>
+  <div><h2>Have a claim that deserves the bench?</h2>
+    <p>Send a quantitative, mechanism-bearing claim &mdash; a number, a threshold, an exponent, a
+    rate. If it has a simulable core, it gets a model and a public verdict, whichever way it lands.</p></div>
+  <a class="btn" href="{repo}/issues" target="_blank" rel="noopener">Submit a claim &rarr;</a>
+</div></div></section>
+
+<footer><div class="wrap">
+  <span>Agora &mdash; autonomous research OS &middot; The Crucible</span>
+  <span>updated {updated} &middot; <a href="{repo}" target="_blank" rel="noopener">source</a></span>
+</div></footer>
+
+<script>
+  // filter
+  const grid = document.getElementById('grid');
+  document.querySelectorAll('.filters button').forEach(b => b.addEventListener('click', () => {{
+    document.querySelectorAll('.filters button').forEach(x => x.classList.remove('on'));
+    b.classList.add('on');
+    const f = b.dataset.f;
+    grid.querySelectorAll('.card').forEach(c => {{
+      c.style.display = (f === 'all' || c.dataset.v === f) ? '' : 'none';
+    }});
+  }}));
+  // reveal on scroll
+  const io = new IntersectionObserver((es) => es.forEach(en => {{
+    if (en.isIntersecting) {{ en.target.classList.add('in'); io.unobserve(en.target); }}
+  }}), {{rootMargin: '0px 0px -8% 0px', threshold: .08}});
+  document.querySelectorAll('[data-reveal]').forEach((el, i) => {{
+    el.style.transitionDelay = (Math.min(i, 6) * 45) + 'ms';
+    io.observe(el);
+  }});
+  // safety net: reveal anything still hidden shortly after load (covers no-scroll / headless / IO misses)
+  window.addEventListener('load', () => setTimeout(() => {{
+    document.querySelectorAll('[data-reveal]:not(.in)').forEach(el => el.classList.add('in'));
+  }}, 700));
+</script>
 </body>
-</html>
-"""
-    OUT_DIR.mkdir(parents=True, exist_ok=True)
-    (OUT_DIR / "index.html").write_text(page, encoding="utf-8")
-    (OUT_DIR / "crucible.json").write_text(
-        json.dumps(dataset, ensure_ascii=False, indent=1), encoding="utf-8")
-    print(f"rendered {OUT_DIR / 'index.html'} — {by['REPRODUCED']}R/{by['FAILED']}F/{by['NOT_COMPUTABLE']}NC, "
-          f"{len(tested)} cards")
+</html>"""
 
 
 if __name__ == "__main__":

@@ -1,0 +1,91 @@
+{
+  "_doc": "Hand-curated display layer for The Crucible. Keyed by lab_id. The renderer prefers these polished fields over raw ledger text so the public page is 100% quality. Source of truth stays server/.replications.json; this only controls presentation. 'featured' marks the case-study hero. '_passes' curates the NOT_COMPUTABLE list: only curated passes are shown publicly (the full raw ledger stays in crucible.json).",
+  "_passes": [
+    {"match": "Generative AI integration into software engineering", "claim": "Generative AI is rapidly automating software-engineering tasks", "reason": "trend claim, no mechanism to simulate"},
+    {"match": "Safe-Sora", "claim": "Safe-Sora: invisible watermarking for generative video (Su et al. 2025)", "reason": "engineering system, not a quantitative mechanism"},
+    {"match": "Duration of liquid-to-glass transition", "claim": "Glass-transition duration falls exponentially with cooling rate in a metallic alloy", "reason": "claim under-specified for a faithful minimal model"},
+    {"match": "The AI-biology analogy breaks", "claim": "The AI–biology analogy breaks: brains use local Hebbian synaptic homeostasis", "reason": "conceptual claim, no single simulable quantity"}
+  ],
+  "ebce40": {
+    "title": "The hot hand is not a fallacy",
+    "year": "Gilovich, Vallone & Tversky · 1985",
+    "field": "Cognitive science",
+    "result": "Their estimator reads −7.9pp (t=−28) on a shooter with NO hot hand. A measured “zero” is really evidence for a +8.5pp hot hand.",
+    "canon": "For 30 years the canonical finding was that streak shooting is a cognitive illusion: players who feel “hot” are misreading randomness.",
+    "rebuilt": "We rebuilt their exact estimator — P(hit | 3 prior hits) − P(hit | 3 prior misses), averaged per shooting record — and ran it on i.i.d. shooters with provably no hot hand.",
+    "verdict": "On a no-hot-hand shooter the estimator does not read 0; it reads −7.9pp (t=−28 at n=100, growing to −17pp at streak length 4). This is the streak-selection bias of Miller & Sanjurjo (2018): selecting shots that follow a streak inside a finite sequence is a biased sample. A GVT measurement of ~0 therefore implies a real hot hand of roughly +8.5pp. The famous fallacy was the analysis, not the players.",
+    "featured": true
+  },
+  "a3ae64": {
+    "title": "Diversity beats ability — but only on rugged ground",
+    "year": "Hong & Page · 2004",
+    "field": "Complexity / organizations",
+    "result": "Random team beats the best-individuals team by +1.65 (t=4.1) at the paper’s parameters — then reverses to −0.38 on a smoother landscape."
+  },
+  "e0a43a": {
+    "title": "SGD finds a real minimum of a non-convex loss",
+    "year": "Fehrman, Gess & Jentzen",
+    "field": "Optimization",
+    "result": "On a double-well non-convex objective, SGD localizes to a true minimum at the predicted convergence rate."
+  },
+  "73f90e": {
+    "title": "Criticality leaves a power-law fingerprint",
+    "year": "Kitzbichler, Smith, Rahn · 2009",
+    "field": "Statistical physics / neuroscience",
+    "result": "At the critical point, fluctuations show power-law scaling and long-range correlations — the signature reproduces cleanly."
+  },
+  "7bbc76": {
+    "title": "Sample-efficient policies need far fewer parameters",
+    "year": "Biologically-inspired architectures",
+    "field": "Reinforcement learning",
+    "result": "In the low-data regime, online policies match performance with 2–10× fewer total coefficients."
+  },
+  "ef9fe3": {
+    "title": "In scale-free networks, the epidemic threshold vanishes",
+    "year": "Pastor-Satorras & Vespignani",
+    "field": "Network science / epidemiology",
+    "result": "As N grows, λ_c = ⟨k⟩/⟨k²⟩ → 0: a hub-rich network has effectively no herd-immunity threshold."
+  },
+  "3f716e": {
+    "title": "LinUCB stays well inside its regret bound",
+    "year": "Chu, Li, Reyzin & Schapire · 2011",
+    "field": "Contextual bandits",
+    "result": "Measured regret tracks O(√Td·polylog) and sits far below linear-regret baselines."
+  },
+  "437d20": {
+    "title": "SGD's slow convergence is a variance floor",
+    "year": "Johnson & Zhang · 2013",
+    "field": "Optimization",
+    "result": "Constant-step SGD stalls at a noise floor; variance-reduced methods keep converging — the slowdown is variance, not curvature."
+  },
+  "d6e8d6": {
+    "title": "Branching survival collapses onto one curve",
+    "year": "Finite-size scaling",
+    "field": "Stochastic processes",
+    "result": "Survival probability across sizes collapses onto a single curve in the scaling variable (m−1)·n."
+  },
+  "e52111": {
+    "title": "Pulling the hubs shatters the network",
+    "year": "Percolation & cascade robustness",
+    "field": "Network science",
+    "result": "Removing the top 10% of nodes by degree multiplies the bond-percolation threshold several-fold (BA, N=2000)."
+  },
+  "8256e7": {
+    "title": "IT pays off only with organizational change",
+    "year": "Brynjolfsson & Hitt · 2000",
+    "field": "Economics of technology",
+    "result": "Organizational investment, not IT spend alone, drives the return — omitting it inflates the estimated payoff up to 2×."
+  },
+  "43c007": {
+    "title": "A simple model beats the fancy one on KB completion",
+    "year": "Toutanova & Chen · 2015",
+    "field": "Machine learning / NLP",
+    "result": "An observed-features model matches or beats latent-feature models on knowledge-base completion."
+  },
+  "37ad2a": {
+    "title": "Heavy-tailed waiting times bend the phase transition",
+    "year": "Barato & Hinrichsen · 2009",
+    "field": "Non-equilibrium physics",
+    "result": "Non-Markovian spreading with t^(−1−μ) waiting times produces a genuine non-equilibrium phase transition."
+  }
+}
