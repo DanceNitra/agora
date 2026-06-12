@@ -178,11 +178,21 @@ async def _topic_research(config: dict, quest: dict, researcher_type: str) -> di
     from agora.execution.llm_client import call_llm
     title = (quest.get("title", "") or "").replace("Research question:", "").strip()
     goal = quest.get("goal", "") or ""
-    sysmsg = (f"You are a rigorous {researcher_type} researcher. Investigate the question from "
-              f"established knowledge: be concrete and specific, name real results/authors only when "
-              f"confident, and flag uncertainty honestly. NEVER fabricate a citation.")
-    usr = (f"Research question: {title}\n\nContext: {goal[:600]}\n\n"
-           f'Respond with JSON: {{"summary":"a 2-3 sentence substantive finding",'
+    # FIX A — ground the finding in REAL literature (OpenAlex + arXiv), not bare LLM recall.
+    sources = ""
+    try:
+        from agora.execution.research_tool import research, format_for_prompt
+        papers = await asyncio.to_thread(research, title[:120], 4)
+        sources = format_for_prompt(papers) if papers else ""
+    except Exception as e:
+        print(f"[Researcher] literature fetch failed: {e}")
+    sysmsg = (f"You are a rigorous {researcher_type} researcher. Investigate the question using the "
+              f"REAL sources provided: paraphrase their actual results and name them (Author Year). "
+              f"Be concrete and specific; flag uncertainty honestly. NEVER fabricate a citation — if "
+              f"the sources don't support a claim, say so.")
+    usr = (f"Research question: {title}\n\nContext: {goal[:400]}\n\n"
+           f"Real sources (ground your finding in these):\n{sources[:1800] or '(no sources found)'}\n\n"
+           f'Respond with JSON: {{"summary":"a 2-3 sentence substantive finding grounded in a named source",'
            f'"key_points":["point","point","point"],"impact":"high|medium|low"}}')
     try:
         raw = await asyncio.to_thread(

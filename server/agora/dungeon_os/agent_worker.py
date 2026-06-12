@@ -546,10 +546,14 @@ class CorporationWorker:
 
         cto_approved = cto_result.get("approved", False)
         ceo_approved = ceo_result.get("approved", False)
-        approved = cto_approved and ceo_approved
-
         cto_score = cto_result.get("cto", {}).get("score", 50) if isinstance(cto_result.get("cto"), dict) else 50
         ceo_score = ceo_result.get("ceo", {}).get("score", 50) if isinstance(ceo_result.get("ceo"), dict) else 50
+
+        # FIX B — softened gate. The corp's job is to surface promising LEADS; Claude is the real
+        # quality filter (a Ship-review tells Claude to develop the good ones and skip the thin).
+        # So pass if EITHER exec approves, or the better score clears a modest bar — instead of the
+        # old AND-of-both that rejected ~100% and choked the pipeline.
+        approved = cto_approved or ceo_approved or max(cto_score, ceo_score) >= 60
 
         # PERSIST the verdict — without this the quest stayed status='review' / proposal='pending'
         # and was re-evaluated every tick forever (never advancing). Now it reaches a terminal state:
