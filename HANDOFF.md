@@ -2,7 +2,75 @@
 
 > Resume doc for a fresh Claude Code session. Chat in **Slovak**; code + user-facing strings **English**.
 
-## ⚡⚡⚡ RESUME HERE (2026-06-12 — LATEST)
+## ⚡⚡⚡⚡ RESUME HERE (2026-06-12 LATE EVENING — FRESHEST)
+
+> Chat **Slovak**. Context was cleared here to save credits — this section is the full state.
+> Auto-memory loads: `agora-session-state`, `agora-local-llm`, `agora-roadmap-firm-os`,
+> `agora-methods-library`, `gated-approval-briefing`, `agora-architecture`, `agora-db-integrity-pattern`.
+
+**MODELS (final, split by job — see `agora-local-llm`):** dungeon + brain-CHEAP tier =
+`deepseek-v4-flash` (reliable, high volume); brain REASONING = `deepseek-v4-pro` (`AGORA_LLM_MODEL`).
+glm-4.7 was tried and REVERTED (49s tail-latency froze the dungeon). model_router pins cheap→v4-flash.
+
+**SYSTEM RUN STATE:** brain `uvicorn agora.main:app` :8000; dungeon now runs UNDER a **supervisor** —
+`cd agora-game-server && python -u dungeon_supervisor.py` (heartbeat watchdog auto-restarts a wedged
+life-loop). Both should be 200. Vault push: `DUNGEON_AUTOPUSH=1 python -X utf8 tools/safe_vault_push.py "msg"`.
+
+**THE BIG ARC THIS SESSION — Agora became a public credibility firm with a real product stack:**
+1. **THE CRUCIBLE** (`public/crucible/`, render `tools/render_crucible.py` from `.replications.json`
+   + curation `tools/crucible_curation.json`): public machine-replication ledger, **14 REPRODUCED /
+   2 FAILED / 6 passes**. The 2 FAILED are famous: **hot-hand (GVT 1985)** + **Dunning–Kruger** —
+   both shown to be statistical artifacts with measured numbers. Each verdict ships runnable code.
+2. **FLAGSHIP THESIS — "The Operating-Point Trap"** (vault note + `/brain/crucible-synthesis`): standard
+   methods break exactly at the operating point (small n / heavy tails / dependence / scarcity); error
+   is monotone in stress, not averageable. REFINED by its own falsifier (Lab 52c7a6): robustness =
+   decoupling error from stress (mean explodes 0.08→115 vs median flat). 8+ measured findings support it.
+3. **PUBLIC ESSAY + DEEP-DIVE (live):** `public/posts/the-operating-point-trap-…html` (flagship essay)
+   + `public/posts/deep-dive-hot-hand.html` (hand-crafted SVG charts from real sim data; render
+   `tools/render_hothand_deepdive.py`). Layered: essay → deep-dive → ledger.
+4. **NEW FLAGSHIP HOMEPAGE (just shipped, commit 08ce98a):** rebuilt `index.html` from a dark Three.js
+   SaaS page into an **editorial "newspaper A1"** — Fraunces+Newsreader+JetBrains Mono, paper grain,
+   the ledger IS the hero, hero hot-hand SVG chart, 2 FAILED "letterpress plates", a dark thesis panel
+   with the mean/median chart, writing index, Mnemosyne, protocol. Informed by a 5-agent design
+   workflow (Anthropic/Arc/Stripe Press/Ink&Switch/Asterisk/Observable). **Deploy QUEUED at push time
+   — VERIFY LIVE first thing next session:** `https://dancenitra.github.io/agora/` (Pages build_type=
+   workflow; if the Actions run is stuck queued, cancel it + re-dispatch `gh workflow run pages.yml`,
+   or use the `gh-pages` fallback branch + `tools/deploy_pages.sh`).
+5. **METHODS LIBRARY** (`server/agora/execution/methods.py`, mechanism #2): parameterized experiment
+   templates agents run autonomously (supply params, never code). Grow it: add a template after each
+   novel Lab experiment. See `agora-methods-library`.
+6. **SYNTHESIS ORGAN** (`server/agora/execution/synthesis.py`, mechanism #1): gathers the rigorous
+   corpus + files a grand-synthesis inbox task for Claude (Claude writes the thesis, not v4-pro).
+7. **CORP LAYER REDESIGNED** (owner: "dotiahnuť nech funguje ako má"): was exhausted/junk sources +
+   wrong eval rubric = 0 approved ever. Now Scout pulls REAL papers with measurable claims from
+   board-aligned topics (`pick_paper_target` + `_CORP_TOPICS` in `replication.py`), research on the
+   medium tier with regex parse, CTO/CEO judge with a TESTABILITY/portfolio rubric (empty-retry),
+   approved → "Crucible candidate" in Claude's inbox to replicate/refute. Honest ceiling: auto-search
+   won't surface famous classics (Claude hunts those); corp adds breadth + the occasional gem.
+8. **DUNGEON FIXES:** telepathic time-based quests (work decoupled from agent position — no more
+   traffic-jam freezes), supervisor watchdog + heartbeat, OS-module light cap, QuestBoard "RESEARCH
+   IDEAS" panel shows LIVE quests only (was padding with day-old DONE corp quests).
+9. **OUTREACH:** Envoy now files a "Correspondence reply by X" inbox task + Slovak briefing on every
+   reply (`main.py envoy_watch_loop`). Posted a measured reply to **bytedance/deer-flow#1898** (live).
+   New skill `.claude/skills/outreach-briefing/`. Mnemosyne README updated with the popularity-trap
+   retention finding.
+
+**PENDING / NEXT (priority):**
+- **VERIFY the new homepage is LIVE** (`https://dancenitra.github.io/agora/`) — deploy was queued at
+  context-clear; if stuck, re-dispatch the Pages workflow. Screenshot it; Telegram owner the link.
+- **Hunt a 3rd famous FAILED** before any HN launch (ego-depletion, power-posing, growth-mindset are
+  candidates — Lab-replicate where computable). HN timing = owner's call; content is essentially ready.
+- Methods Library: add templates for diversification / DK-artifact / replay / memory-retention.
+- Watch corp produce its first APPROVED Crucible candidate; develop it.
+- Gated awaiting owner: none open (flagship essay 20fa5b + deer-flow reply 3dc9c3 both approved+posted).
+
+**LOOP:** the autonomous `/loop` (HANDOFF_LOOP_PROMPT.txt) runs each cycle: inbox tasks → Lab-backed
+rigorous notes / replications, editorial skips, health check, ScheduleWakeup ~1500s. Always end a
+turn with ScheduleWakeup or the loop dies.
+
+---
+
+## ⚡⚡⚡ RESUME HERE (2026-06-12 — earlier)
 
 > Chat **Slovak**. Auto-memory loads: read `agora-session-state`, `agora-frontier-direction`,
 > `gated-approval-briefing`, `corporation-subsystem-decision`, `agora-db-integrity-pattern`.
