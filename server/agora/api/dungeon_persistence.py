@@ -123,8 +123,8 @@ async def define_quest(body: QuestDef, request: Request):
     rewards_json = json.dumps(body.rewards)
     
     await db.execute(
-        """INSERT INTO dungeon_quests (quest_id, title, description, quest_type, prerequisites, rewards, starting_npc)
-           VALUES (?, ?, ?, ?, ?, ?, ?)
+        """INSERT INTO dungeon_quests (id, quest_id, title, description, quest_type, prerequisites, rewards, starting_npc)
+           VALUES (lower(hex(randomblob(16))), ?, ?, ?, ?, ?, ?, ?)
            ON CONFLICT(quest_id) DO UPDATE SET
                title=excluded.title, description=excluded.description,
                quest_type=excluded.quest_type, prerequisites=excluded.prerequisites,
@@ -175,8 +175,8 @@ async def start_quest(quest_id: str, npc_id: str, request: Request):
     
     # Start quest
     await db.execute(
-        """INSERT INTO dungeon_quest_progress (npc_id, quest_id, status, progress, started_at)
-           VALUES (?, ?, 'active', '{}', datetime('now'))
+        """INSERT INTO dungeon_quest_progress (id, npc_id, quest_id, status, progress, started_at)
+           VALUES (lower(hex(randomblob(16))), ?, ?, 'active', '{}', datetime('now'))
            ON CONFLICT(npc_id, quest_id) DO UPDATE SET
                status='active', progress='{}', started_at=datetime('now'), completed_at=NULL""",
         (npc_id, quest_id),

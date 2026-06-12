@@ -65,8 +65,8 @@ class AgentLifecycle:
 
             # Store death event in DB
             await db.execute(
-                "INSERT INTO events (event_type, source_id, aggregate_type, aggregate_id, payload) "
-                "VALUES ('agent_died', ?, 'agent', ?, ?)",
+                "INSERT INTO events (id, event_type, source_id, aggregate_type, aggregate_id, payload) "
+                "VALUES (lower(hex(randomblob(16))), 'agent_died', ?, 'agent', ?, ?)",
                 (aid, aid, json.dumps({
                     "role": agent["role"],
                     "generation": agent["generation"],
@@ -123,8 +123,8 @@ class AgentLifecycle:
 
         # Log rebirth event
         await db.execute(
-            "INSERT INTO events (event_type, source_id, aggregate_type, aggregate_id, payload) "
-            "VALUES ('agent_reborn', ?, 'agent', ?, ?)",
+            "INSERT INTO events (id, event_type, source_id, aggregate_type, aggregate_id, payload) "
+            "VALUES (lower(hex(randomblob(16))), 'agent_reborn', ?, 'agent', ?, ?)",
             (agent_id, agent_id, json.dumps({
                 "new_generation": gen + 1,
                 "new_energy": starting_energy,

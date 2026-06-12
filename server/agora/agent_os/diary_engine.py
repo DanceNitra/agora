@@ -62,9 +62,9 @@ class DiaryEngine:
         title = f"{name}'s Journal — Day {tick // 20}"
 
         await self.db.execute(
-            "INSERT INTO agent_diaries (npc_id, entry_type, title, content, "
+            "INSERT INTO agent_diaries (id, npc_id, entry_type, title, content, "
             "mood_at_time, emotion_at_time, tick) "
-            "VALUES (?, 'diary', ?, ?, ?, ?, ?)",
+            "VALUES (lower(hex(randomblob(16))), ?, 'diary', ?, ?, ?, ?, ?)",
             (npc_id, title[:100], content[:1000], mood, emotion, tick),
         )
         await self.db.commit()
@@ -99,9 +99,9 @@ class DiaryEngine:
         content = reflections.get(milestone, f"A milestone reached: {milestone}. I pause to reflect.")
 
         await self.db.execute(
-            "INSERT INTO agent_diaries (npc_id, entry_type, title, content, "
+            "INSERT INTO agent_diaries (id, npc_id, entry_type, title, content, "
             "mood_at_time, emotion_at_time, tick) "
-            "VALUES (?, 'reflection', ?, ?, 0.6, 'grateful', ?)",
+            "VALUES (lower(hex(randomblob(16))), ?, 'reflection', ?, ?, 0.6, 'grateful', ?)",
             (npc_id, f"{name}'s Reflection: {milestone}", content[:500], tick),
         )
         await self.db.commit()
@@ -158,9 +158,9 @@ class DiaryEngine:
 
         # Store in DB
         await self.db.execute(
-            "INSERT INTO agent_diaries (npc_id, entry_type, title, content, "
+            "INSERT INTO agent_diaries (id, npc_id, entry_type, title, content, "
             "mood_at_time, emotion_at_time, tick) "
-            "VALUES (?, 'autobiography', ?, ?, 0.8, 'grateful', ?)",
+            "VALUES (lower(hex(randomblob(16))), ?, 'autobiography', ?, ?, 0.8, 'grateful', ?)",
             (npc_id, f"The Story of {name}", content[:5000], tick),
         )
         await self.db.commit()

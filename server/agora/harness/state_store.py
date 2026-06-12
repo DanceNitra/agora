@@ -290,8 +290,8 @@ class StateStore:
                                    requester_task: str = "") -> int:
         """Insert a new help request directly (must be in buffer? Or direct since it's INSERT)."""
         cursor = await self.db.execute(
-            "INSERT INTO agent_help_requests (requester_id, helper_id, problem_type, description, status, requester_task) "
-            "VALUES (?, ?, ?, ?, 'pending', ?)",
+            "INSERT INTO agent_help_requests (id, requester_id, helper_id, problem_type, description, status, requester_task) "
+            "VALUES (lower(hex(randomblob(16))), ?, ?, ?, ?, 'pending', ?)",
             (requester_id, helper_id, problem_type, description, requester_task),
         )
         await self.db.commit()

@@ -10,6 +10,7 @@ Implements Axelrod's Tit-for-Tat with four properties:
 """
 
 import json
+import uuid
 from dataclasses import dataclass, field
 from datetime import datetime, timezone
 from enum import Enum
@@ -294,10 +295,10 @@ class TrustEngine:
             )
         else:
             await self.db.execute(
-                """INSERT INTO trust_scores (source_id, target_id, score, interaction_count,
+                """INSERT INTO trust_scores (id, source_id, target_id, score, interaction_count,
                    consecutive_cooperations, consecutive_defections, sliding_window, last_updated)
-                   VALUES (?, ?, ?, ?, ?, ?, ?, datetime('now'))""",
-                (agent_id, target_id, trust["score"], trust["interactions"],
+                   VALUES (?, ?, ?, ?, ?, ?, ?, ?, datetime('now'))""",
+                (uuid.uuid4().hex, agent_id, target_id, trust["score"], trust["interactions"],
                  trust["consecutive_cooperations"], trust["consecutive_defections"],
                  sliding_window_json),
             )

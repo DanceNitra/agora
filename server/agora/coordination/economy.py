@@ -5,6 +5,8 @@ Market prices fluctuate based on supply and demand."""
 import json
 import math
 import random
+import sqlite3
+import uuid
 from datetime import datetime
 
 
@@ -20,8 +22,28 @@ class EconomyEngine:
         {"name": "scroll_fragment", "base_price": 4.0, "volatility": 0.3},
     ]
 
+    # Config (economy_config.py) refers to resources by a 1-based integer id,
+    # but the resources table stores UUID ids. This maps config-id N → name
+    # (same order as DEFAULT_RESOURCES) so we can resolve to the real UUID.
+    RESOURCE_ORDER = ["gold_ore", "herbs", "crystal_shards", "iron_ingot", "scroll_fragment"]
+
     def __init__(self, db):
         self.db = db
+        self._rid_by_name: dict | None = None
+
+    async def _resolve_rid(self, resource_id):
+        """Resolve a config integer resource id (1-based) to the real UUID.
+        Idempotent: an already-resolved UUID string is returned unchanged."""
+        if resource_id is None or isinstance(resource_id, str):
+            return resource_id
+        try:
+            name = self.RESOURCE_ORDER[int(resource_id) - 1]
+        except (ValueError, IndexError, TypeError):
+            return resource_id
+        if self._rid_by_name is None:
+            cur = await self.db.execute("SELECT id, name FROM resources")
+            self._rid_by_name = {r["name"]: r["id"] for r in await cur.fetchall()}
+        return self._rid_by_name.get(name, resource_id)
 
     async def init_resources(self):
         """Seed default resources if empty."""
@@ -70,31 +92,39 @@ class EconomyEngine:
         )
         return [dict(row) for row in await cursor.fetchall()]
 
-    async def add_to_inventory(self, agent_id: str, resource_id: int, quantity: float):
-        """Add resources to an agent's inventory."""
-        cursor = await self.db.execute(
-            "SELECT id, quantity FROM agent_inventory WHERE agent_id=? AND resource_id=?",
-            (agent_id, resource_id),
-        )
-        row = await cursor.fetchone()
-        if row:
-            await self.db.execute(
-                "UPDATE agent_inventory SET quantity=quantity+? WHERE id=?",
-                (quantity, row["id"]),
+    async def add_to_inventory(self, agent_id: str, resource_id: int, quantity: float) -> bool:
+        """Add resources to an agent's inventory. Best-effort: a missing FK
+        (e.g. a role-config resource_id not present in `resources`) is skipped
+        rather than aborting/spamming the economy tick. Returns False if skipped."""
+        resource_id = await self._resolve_rid(resource_id)
+        try:
+            cursor = await self.db.execute(
+                "SELECT id, quantity FROM agent_inventory WHERE agent_id=? AND resource_id=?",
+                (agent_id, resource_id),
             )
-        else:
+            row = await cursor.fetchone()
+            if row:
+                await self.db.execute(
+                    "UPDATE agent_inventory SET quantity=quantity+? WHERE id=?",
+                    (quantity, row["id"]),
+                )
+            else:
+                await self.db.execute(
+                    "INSERT INTO agent_inventory (id, agent_id, resource_id, quantity) VALUES (?, ?, ?, ?)",
+                    (uuid.uuid4().hex, agent_id, resource_id, quantity),
+                )
+            # Update total supply
             await self.db.execute(
-                "INSERT INTO agent_inventory (agent_id, resource_id, quantity) VALUES (?, ?, ?)",
-                (agent_id, resource_id, quantity),
+                "UPDATE resources SET total_supply=total_supply+?, updated_at=datetime('now') WHERE id=?",
+                (quantity, resource_id),
             )
-        # Update total supply
-        await self.db.execute(
-            "UPDATE resources SET total_supply=total_supply+?, updated_at=datetime('now') WHERE id=?",
-            (quantity, resource_id),
-        )
+            return True
+        except sqlite3.IntegrityError:
+            return False
 
     async def remove_from_inventory(self, agent_id: str, resource_id: int, quantity: float) -> bool:
         """Remove resources from inventory. Returns False if insufficient."""
+        resource_id = await self._resolve_rid(resource_id)
         cursor = await self.db.execute(
             "SELECT id, quantity FROM agent_inventory WHERE agent_id=? AND resource_id=?",
             (agent_id, resource_id),
@@ -115,6 +145,7 @@ class EconomyEngine:
     async def create_offer(self, agent_id: str, offer_type: str, resource_id: int,
                           quantity: float, price_per_unit: float) -> dict:
         """Create a buy or sell offer."""
+        resource_id = await self._resolve_rid(resource_id)
         if offer_type == "sell":
             # Check agent has the resources
             cursor = await self.db.execute(
@@ -125,19 +156,20 @@ class EconomyEngine:
             if not row or (row["q"] or 0) < quantity:
                 return {"status": "error", "message": "Insufficient resources"}
 
-        cursor = await self.db.execute(
-            "INSERT INTO trade_offers (agent_id, offer_type, resource_id, quantity, price_per_unit) "
-            "VALUES (?, ?, ?, ?, ?)",
-            (agent_id, offer_type, resource_id, quantity, price_per_unit),
+        offer_id = uuid.uuid4().hex
+        await self.db.execute(
+            "INSERT INTO trade_offers (id, agent_id, offer_type, resource_id, quantity, price_per_unit, status) "
+            "VALUES (?, ?, ?, ?, ?, ?, 'open')",
+            (offer_id, agent_id, offer_type, resource_id, quantity, price_per_unit),
         )
         await self.db.commit()
 
         # Try to match immediately
-        match = await self._match_offer(cursor.lastrowid)
+        match = await self._match_offer(offer_id)
         return match or {
             "status": "open",
-            "offer_id": cursor.lastrowid,
-            "message": f"Offer #{cursor.lastrowid} created (no immediate match)",
+            "offer_id": offer_id,
+            "message": f"Offer #{offer_id[:8]} created (no immediate match)",
         }
 
     async def _match_offer(self, offer_id: int) -> dict | None:
@@ -246,9 +278,9 @@ class EconomyEngine:
 
         # Record trade history
         await self.db.execute(
-            "INSERT INTO trade_history (buyer_id, seller_id, resource_id, quantity, price_per_unit, total_energy) "
-            "VALUES (?, ?, ?, ?, ?, ?)",
-            (buyer_id, seller_id, offer["resource_id"], trade_qty, trade_price, total_energy),
+            "INSERT INTO trade_history (id, buyer_id, seller_id, resource_id, quantity, price_per_unit, total_energy) "
+            "VALUES (?, ?, ?, ?, ?, ?, ?)",
+            (uuid.uuid4().hex, buyer_id, seller_id, offer["resource_id"], trade_qty, trade_price, total_energy),
         )
 
         await self.db.commit()
@@ -265,6 +297,7 @@ class EconomyEngine:
 
     async def get_market_price(self, resource_id: int) -> float:
         """Get current market price based on recent trades and supply."""
+        resource_id = await self._resolve_rid(resource_id)
         resource = await self.get_resource(resource_id)
         if not resource:
             return 1.0
@@ -290,6 +323,7 @@ class EconomyEngine:
 
     async def get_open_offers(self, resource_id: int | None = None) -> list[dict]:
         """Get open trade offers, optionally filtered by resource."""
+        resource_id = await self._resolve_rid(resource_id)
         if resource_id:
             cursor = await self.db.execute(
                 "SELECT * FROM trade_offers WHERE status='open' AND resource_id=? ORDER BY created_at",

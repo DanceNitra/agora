@@ -69,13 +69,13 @@ async def list_open_tasks(db=Depends(get_db)):
 @router.post("/", response_model=TaskResponse, status_code=201)
 async def post_task(body: TaskPost, db=Depends(get_db)):
     """Create a new task."""
+    task_id = uuid.uuid4().hex
     cursor = await db.execute(
-        "INSERT INTO tasks (title, description, priority, status, assignee_id, metadata) "
-        "VALUES (?, ?, ?, 'pending', ?, '{}')",
-        (body.title, body.description, body.priority, body.assigned_to),
+        "INSERT INTO tasks (id, title, description, priority, status, assignee_id, metadata) "
+        "VALUES (?, ?, ?, ?, 'pending', ?, '{}')",
+        (task_id, body.title, body.description, body.priority, body.assigned_to),
     )
     await db.commit()
-    task_id = cursor.lastrowid
     cursor2 = await db.execute(
         "SELECT id, title, description, priority, status, assignee_id, created_at, updated_at "
         "FROM tasks WHERE id=?",

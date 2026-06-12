@@ -76,7 +76,7 @@ class EpochEngine:
     async def _start_epoch(self, db, app):
         """Initialize a new epoch in the DB."""
         await db.execute(
-            "INSERT INTO epochs (epoch_number, status, summary) VALUES (?, 'active', ?)",
+            "INSERT INTO epochs (id, epoch_number, status, summary) VALUES (lower(hex(randomblob(16))), ?, 'active', ?)",
             (self._current_epoch, json.dumps({"phase": "fork", "start_tick": self._tick_in_epoch})),
         )
         await db.commit()

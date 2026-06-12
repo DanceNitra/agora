@@ -1150,8 +1150,8 @@ class AgentOS:
             )
         else:
             await self.db.execute(
-                "INSERT INTO agent_help_requests (requester_id, helper_id, problem_type, description, status, requester_task) "
-                "VALUES (?, ?, ?, ?, 'pending', ?)",
+                "INSERT INTO agent_help_requests (id, requester_id, helper_id, problem_type, description, status, requester_task) "
+                "VALUES (lower(hex(randomblob(16))), ?, ?, ?, ?, 'pending', ?)",
                 (npc_id, helper_id, problem_type, description, goal),
             )
 
@@ -1394,9 +1394,9 @@ class AgentOS:
             f"{helper_name} used their skill to assist. Interaction completed at {datetime.utcnow().isoformat()}."
         )
         await self.db.execute(
-            "INSERT INTO artifacts (agent_id, title, artifact_type, storage_path, content) "
-            "VALUES (?, ?, ?, ?, ?)",
-            (helper_id, f"Help: {requester_name} → {helper_name} ({problem_type})",
+            "INSERT INTO artifacts (id, agent_id, title, artifact_type, storage_path, content) "
+            "VALUES (?, ?, ?, ?, ?, ?)",
+            (uuid.uuid4().hex, helper_id, f"Help: {requester_name} → {helper_name} ({problem_type})",
              "interaction", f"help/{requester_id[:8]}-{req_id}", artifact_content),
         )
 

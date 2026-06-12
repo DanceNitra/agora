@@ -375,8 +375,8 @@ class LifecycleHooks:
         try:
             for v in violations:
                 await self.db.execute(
-                    "INSERT INTO events (event_type, source_id, aggregate_type, aggregate_id, payload) "
-                    "VALUES ('byzantine_violation', ?, 'npc', ?, ?)",
+                    "INSERT INTO events (id, event_type, source_id, aggregate_type, aggregate_id, payload) "
+                    "VALUES (lower(hex(randomblob(16))), 'byzantine_violation', ?, 'npc', ?, ?)",
                     (
                         v.get("npc_id", "unknown"),
                         v.get("npc_id", "unknown"),

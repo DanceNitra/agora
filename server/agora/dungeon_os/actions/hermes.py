@@ -117,13 +117,16 @@ async def action_send_message(config: dict, quest: dict, params: dict) -> dict:
     log_dir = config.get("log_dir", "/tmp/hermes-logs")
     os.makedirs(log_dir, exist_ok=True)
     log_file = f"{log_dir}/{quest.get('id', 'unknown')}.log"
-    with open(log_file, "w") as f:
+    with open(log_file, "w", encoding="utf-8") as f:
         f.write(full_message)
     outputs.append(f"Logged to {log_file}")
 
-    # Console fallback if Telegram failed
+    # Console fallback if Telegram failed (guard against cp1252 consoles on Windows)
     if not sent:
-        print(f"\n[📨 Hermes] {full_message}\n")
+        try:
+            print(f"\n[Hermes] {full_message}\n")
+        except UnicodeEncodeError:
+            print(f"\n[Hermes] {full_message.encode('ascii', 'replace').decode()}\n")
         outputs.append("Console output")
 
     return {

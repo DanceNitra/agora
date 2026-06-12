@@ -10,6 +10,7 @@ All NPC interactions require physical proximity:
 import asyncio
 import json
 import random
+import uuid
 from datetime import datetime
 from typing import Optional, Callable
 
@@ -211,9 +212,9 @@ class PhysicalWorld:
         # Record the query — use dynamic NPC ID lookup
         npc_id = await self._npc_id_by_name(npc_name) or "system"
         await self.db.execute(
-            "INSERT INTO artifacts (agent_id, title, artifact_type, storage_path, content) "
-            "VALUES (?, ?, ?, ?, ?)",
-            (npc_id, f"Library Query: {question[:50]}",
+            "INSERT INTO artifacts (id, agent_id, title, artifact_type, storage_path, content) "
+            "VALUES (?, ?, ?, ?, ?, ?)",
+            (uuid.uuid4().hex, npc_id, f"Library Query: {question[:50]}",
              "knowledge", f"library/query-{datetime.utcnow().isoformat()}", answer),
         )
         await self.db.commit()

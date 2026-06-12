@@ -66,8 +66,8 @@ class StigmergyPool:
         if self.db:
             try:
                 await self.db.execute(
-                    "INSERT INTO stigmergy_traces (agent_id, trace_type, payload, ttl_seconds, expires_at) "
-                    "VALUES (?, ?, ?, ?, datetime('now', '+' || ? || ' seconds'))",
+                    "INSERT INTO stigmergy_traces (id, agent_id, trace_type, payload, ttl_seconds, expires_at) "
+                    "VALUES (lower(hex(randomblob(16))), ?, ?, ?, ?, datetime('now', '+' || ? || ' seconds'))",
                     (agent_id, task_type, json.dumps(trace), self.ttl, self.ttl),
                 )
                 await self.db.commit()

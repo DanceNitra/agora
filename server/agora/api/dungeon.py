@@ -680,13 +680,13 @@ async def announce_task(body: TaskAnnouncement, request: Request):
         "task_type": body.task_type,
         "announced_by": body.announced_by,
     })
+    task_id = uuid.uuid4().hex
     cursor = await db.execute(
-        "INSERT INTO tasks (title, description, status, priority, metadata, assignee_id) "
-        "VALUES (?, ?, 'bidding', ?, ?, NULL)",
-        (body.title, body.description, body.difficulty, metadata),
+        "INSERT INTO tasks (id, title, description, status, priority, metadata, assignee_id) "
+        "VALUES (?, ?, ?, 'bidding', ?, ?, NULL)",
+        (task_id, body.title, body.description, body.difficulty, metadata),
     )
     await db.commit()
-    task_id = cursor.lastrowid
     _announced_tasks.append(task_id)
     return {
         "status": "task_announced",
@@ -723,8 +723,8 @@ async def submit_bid(body: BidSubmission, request: Request):
     # Upsert bid
     try:
         cursor = await db.execute(
-            "INSERT INTO task_bids (task_id, agent_id, bid_amount, bid_reason) "
-            "VALUES (?, ?, ?, ?) "
+            "INSERT INTO task_bids (id, task_id, agent_id, bid_amount, bid_reason, status) "
+            "VALUES (lower(hex(randomblob(16))), ?, ?, ?, ?, 'bidding') "
             "ON CONFLICT(task_id, agent_id) DO UPDATE SET "
             "bid_amount=excluded.bid_amount, bid_reason=excluded.bid_reason, status='pending'",
             (body.task_id, agent_id, max(0.0, min(1.0, body.bid_amount)), body.bid_reason),

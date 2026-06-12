@@ -296,8 +296,8 @@ async def auto_assign_quests(db) -> None:
                 continue
 
             await db.execute(
-                """INSERT INTO dungeon_quest_progress (npc_id, quest_id, status, progress, started_at)
-                   VALUES (?, ?, 'active', '{}', datetime('now'))
+                """INSERT INTO dungeon_quest_progress (id, npc_id, quest_id, status, progress, started_at)
+                   VALUES (lower(hex(randomblob(16))), ?, ?, 'active', '{}', datetime('now'))
                    ON CONFLICT(npc_id, quest_id) DO UPDATE SET status='active'""",
                 (npc_id, quest_id),
             )
@@ -570,8 +570,8 @@ async def check_quest_progress(
                 next_assignment = QUEST_ASSIGNMENTS.get(next_quest)
                 if next_assignment and next_assignment["agent"] == agent_name:
                     await db.execute(
-                        """INSERT INTO dungeon_quest_progress (npc_id, quest_id, status, progress, started_at)
-                           VALUES (?, ?, 'active', '{}', datetime('now'))
+                        """INSERT INTO dungeon_quest_progress (id, npc_id, quest_id, status, progress, started_at)
+                           VALUES (lower(hex(randomblob(16))), ?, ?, 'active', '{}', datetime('now'))
                            ON CONFLICT(npc_id, quest_id) DO UPDATE SET status='active'""",
                         (npc_id, next_quest),
                     )

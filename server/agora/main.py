@@ -15,6 +15,7 @@ for _stream in (_sys.stdout, _sys.stderr):
         pass
 
 # Load server/.env into os.environ so non-pydantic consumers (e.g. Telegram) see it too.
+import os
 import os as _os
 from pathlib import Path as _Path
 _envf = _Path(__file__).resolve().parent.parent / ".env"
@@ -828,7 +829,7 @@ async def _process_agent_thought(
     updated_trust = min(1.0, max(0.0, agent_trust + trust_change))
 
     # ── TFT-weighted trust blend: 30% TFT, 70% ESS ──
-    if tft and partner_id and tft._has_history(agent_id):
+    if tft and partner_id and await tft._has_history(agent_id):
         tft_eval = await tft.evaluate(agent_id)
         tft_score = tft_eval["tft_score"]
         blended_trust = round(0.7 * updated_trust + 0.3 * tft_score, 4)
@@ -851,9 +852,9 @@ async def _process_agent_thought(
 
     if tick_count % 5 == 0 and action != "error":
         await db.execute(
-            "INSERT INTO artifacts (agent_id, title, artifact_type, storage_path, metadata) "
-            "VALUES (?, ?, ?, ?, ?)",
-            (agent_id, f"{role} thought #{tick_count}", task_type,
+            "INSERT INTO artifacts (id, agent_id, title, artifact_type, storage_path, metadata) "
+            "VALUES (?, ?, ?, ?, ?, ?)",
+            (uuid.uuid4().hex, agent_id, f"{role} thought #{tick_count}", task_type,
              f"memory/tick-{tick_count}", json.dumps(thought)),
         )
 
@@ -1119,8 +1120,8 @@ async def _economy_tick(app: FastAPI):
             res_id = item["resource_id"]
             qty = item["quantity"]
 
-            # Is this a resource the role produces?
-            produces_ids = [p[0] for p in cfg.get("produces", [])]
+            # Is this a resource the role produces? (resolve config ids → UUIDs)
+            produces_ids = [await eco._resolve_rid(p[0]) for p in cfg.get("produces", [])]
             if res_id in produces_ids and qty > surplus:
                 # Sell surplus
                 sell_qty = qty - deficit
@@ -1341,6 +1342,7 @@ async def tick_loop(app: FastAPI):
                 all_npcs = await cursor_npcs.fetchall()
 
                 for npc in all_npcs:
+                    npc = dict(npc)  # sqlite3.Row has no .get()
                     npc_id = npc["npc_id"]
                     name = npc["npc_name"]
                     role = npc["role"]
@@ -1403,6 +1405,7 @@ async def tick_loop(app: FastAPI):
                 # Conflicts (every 3 ticks, 5% chance each)
                 if v3_tick > 0 and v3_tick % 3 == 0 and app.state.conflict_engine:
                     for npc in all_npcs:
+                        npc = dict(npc)  # sqlite3.Row has no .get()
                         nearby_ids_list = []
                         if app.state.agent_os:
                             try:

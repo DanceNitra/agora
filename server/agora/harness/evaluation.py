@@ -355,7 +355,7 @@ class EpochEvaluator:
                 )
             else:
                 await self.db.execute(
-                    "INSERT INTO epochs (epoch_number, status, summary) VALUES (?, 'completed', ?)",
+                    "INSERT INTO epochs (id, epoch_number, status, summary) VALUES (lower(hex(randomblob(16))), ?, 'completed', ?)",
                     (epoch_number, epoch_report),
                 )
             await self.db.commit()

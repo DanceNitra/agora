@@ -13,6 +13,7 @@ This is the bridge between the bidding API and actual task completion.
 import json
 import random
 import time
+import uuid
 from typing import Any, Optional
 
 # ── Task types the system auto-generates ──
@@ -150,14 +151,15 @@ class TaskExecutor:
             "auto": True,
         })
 
+        _tid = uuid.uuid4().hex
         cursor = await db.execute(
-            "INSERT INTO tasks (title, description, status, priority, metadata) "
-            "VALUES (?, ?, 'bidding', ?, ?)",
-            (tpl["title"], tpl["description"], difficulty, metadata),
+            "INSERT INTO tasks (id, title, description, status, priority, metadata) "
+            "VALUES (?, ?, ?, 'bidding', ?, ?)",
+            (_tid, tpl["title"], tpl["description"], difficulty, metadata),
         )
         await db.commit()
         return {
-            "id": cursor.lastrowid,
+            "id": _tid,
             "title": tpl["title"],
             "description": tpl["description"],
             "task_type": tpl["task_type"],
@@ -355,10 +357,11 @@ class TaskExecutor:
         content = self._generate_artifact_content(task["title"], task_type, task["title"],
                                                    agent_id, role, difficulty)
         await db.execute(
-            "INSERT INTO artifacts (agent_id, title, artifact_type, storage_path, "
+            "INSERT INTO artifacts (id, agent_id, title, artifact_type, storage_path, "
             "mime_type, size_bytes, content, metadata) "
-            "VALUES (?, ?, ?, ?, 'text/markdown', ?, ?, ?)",
+            "VALUES (?, ?, ?, ?, ?, 'text/markdown', ?, ?, ?)",
             (
+                uuid.uuid4().hex,
                 agent_id,
                 task["title"],
                 task_type,
@@ -380,8 +383,8 @@ class TaskExecutor:
         try:
             # Also log to events table for NPC context
             await db.execute(
-                "INSERT INTO events (event_type, source_id, aggregate_type, aggregate_id, payload) "
-                "VALUES ('task_completed', ?, 'task', ?, ?)",
+                "INSERT INTO events (id, event_type, source_id, aggregate_type, aggregate_id, payload) "
+                "VALUES (lower(hex(randomblob(16))), 'task_completed', ?, 'task', ?, ?)",
                 (agent_id, str(task_id), json.dumps({
                     "title": task["title"],
                     "task_type": task_type,

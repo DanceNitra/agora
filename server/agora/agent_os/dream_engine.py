@@ -52,8 +52,8 @@ class DreamEngine:
             ])
 
         await self.db.execute(
-            "INSERT INTO agent_dreams (npc_id, dream_type, content, emotion_felt, "
-            "impact_mood, impact_goal) VALUES (?, ?, ?, ?, ?, ?)",
+            "INSERT INTO agent_dreams (id, npc_id, dream_type, content, emotion_felt, "
+            "impact_mood, impact_goal) VALUES (lower(hex(randomblob(16))), ?, ?, ?, ?, ?, ?)",
             (npc_id, dream_type, dream_content[:500],
              random.choice(["curious", "fearful", "hopeful", "confused", "inspired"]),
              impact_mood, new_goal[:100] if new_goal else None),
@@ -111,8 +111,8 @@ class DreamEngine:
         )
 
         await self.db.execute(
-            "INSERT INTO agent_dreams (npc_id, dream_type, content, emotion_felt, "
-            "impact_mood) VALUES (?, 'inspiration', ?, 'inspired', 0.2)",
+            "INSERT INTO agent_dreams (id, npc_id, dream_type, content, emotion_felt, "
+            "impact_mood) VALUES (lower(hex(randomblob(16))), ?, 'inspiration', ?, 'inspired', 0.2)",
             (npc_id, content[:500]),
         )
         await self.db.commit()

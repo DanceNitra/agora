@@ -9,6 +9,7 @@ and trust violations. The system supports:
 """
 import json
 import random
+import uuid
 from datetime import datetime
 
 
@@ -38,16 +39,14 @@ class ConflictEngine:
         if row and row["c"] > 0:
             return None  # already in conflict
 
+        conflict_id = uuid.uuid4().hex
         await self.db.execute(
-            "INSERT INTO agent_conflicts (agent_a_id, agent_b_id, issue, "
-            "conflict_type, severity) VALUES (?, ?, ?, ?, ?)",
-            (agent_a_id, agent_b_id, issue[:200], conflict_type,
+            "INSERT INTO agent_conflicts (id, agent_a_id, agent_b_id, issue, "
+            "conflict_type, severity, status) VALUES (?, ?, ?, ?, ?, ?, 'active')",
+            (conflict_id, agent_a_id, agent_b_id, issue[:200], conflict_type,
              max(1, min(10, severity))),
         )
         await self.db.commit()
-        cursor = await self.db.execute("SELECT last_insert_rowid()")
-        row = await cursor.fetchone()
-        conflict_id = str(row[0]) if row else ""
 
         if broadcast_fn:
             await broadcast_fn("conflict_created", {
