@@ -241,9 +241,58 @@ class CorporationWorker:
     # ═══════════════════════════════════════════
 
     async def _run_scout(self) -> Optional[dict]:
-        """Run the Scout — scan GitHub for new opportunities."""
+        """Run the Scout — find an EXTERNAL research lead.
+
+        PRIMARY source (the corp redesign): a REAL paper with a quantitative, simulable claim
+        (pick_paper_target — arXiv/OpenAlex, already proven feeding Rooke's replications). This is
+        the corp's 'view from outside': it scans the literature while the rest of the OS scans
+        itself, and an approved lead becomes a Crucible candidate for Claude. The old GitHub
+        horizon scan (which had degraded into junk digest-repos) remains only as a fallback."""
         self._stats["scout_runs"] += 1
 
+        # ── PRIMARY: a real quantitative paper claim ──
+        try:
+            import asyncio as _aio
+            from agora.execution.replication import pick_paper_target
+            paper = await _aio.to_thread(pick_paper_target)
+        except Exception as e:
+            print(f"[Scout] paper target failed: {e}")
+            paper = None
+        if paper and paper.get("claim"):
+            # dedup: one lead per claim per 3 days
+            try:
+                cur = await self.db.execute(
+                    "SELECT COUNT(*) FROM quests WHERE goal LIKE ? AND created_at >= datetime('now','-3 day')",
+                    (f"%{paper['claim'][:80]}%",))
+                if (await cur.fetchone())[0] > 0:
+                    paper = None
+            except Exception:
+                pass
+        if paper and paper.get("claim"):
+            quest_id = f"lead-paper-{datetime.now().strftime('%Y%m%d_%H%M%S')}"
+            quest_title = f"Paper lead: {paper.get('title', paper['claim'])[:150]}"
+            quest_goal = (
+                f"CLAIM (verbatim, from a real paper): {paper['claim']}\n"
+                f"PAPER: {paper.get('source', '')}\n"
+                f"URL: {paper.get('url', '')}\n\n"
+                f"Research this claim: what does the paper actually show, is the claim quantitative "
+                f"and mechanistically testable in a minimal simulation, and is it interesting enough "
+                f"(famous, contested, or board-priority) to deserve the Crucible bench? An approved "
+                f"lead becomes a Crucible candidate for Claude to replicate or refute."
+            )
+            create_result = await self.qe.create_quest(
+                quest_id=quest_id, title=quest_title, goal=quest_goal, subsystem="knowledge",
+                success_criteria=["Ground the claim in the actual paper",
+                                  "Judge testability (simulable mechanism + a number)",
+                                  "Submit for CEO/CTO evaluation"],
+                reward=25, phase="head", research_source=paper.get("url", ""),
+            )
+            if "error" not in create_result:
+                await self.qe.assign_quest(quest_id, "scout")
+                return {"stage": "scout", "status": "new_quest", "quest_id": quest_id,
+                        "title": quest_title, "finding": paper}
+
+        # ── FALLBACK: the old GitHub horizon scan ──
         result = await self.registry.execute(
             npc_name="scout",
             skill_name="scan_horizon",
@@ -330,19 +379,19 @@ class CorporationWorker:
             for q in oq:
                 txt = q.get("question")
                 if txt:
-                    candidates.append(("flywheel", txt[:70],
+                    candidates.append(("flywheel", txt[:150],
                                        f"Close this OPEN question with a MEASURED answer: {txt}", None))
             oc = _contra.open_contradictions(2) or []
             for cc in oc:
                 a = _clean(cc.get("a_title") or cc.get("a") or "")
                 b = _clean(cc.get("b_title") or cc.get("b") or "")
                 if a and b:
-                    candidates.append(("contradiction", f"{a[:30]} vs {b[:30]}",
+                    candidates.append(("contradiction", f"{a[:70]} vs {b[:70]}",
                                        f"Two of our beliefs are in tension: '{a}' vs '{b}'. Investigate "
                                        f"which holds (or the distinction that reconciles them) with evidence.", None))
             ft = _frontier.frontier_target(vault)
             if ft:
-                candidates.append((ft.get("kind", "frontier"), (ft.get("target") or "")[:70],
+                candidates.append((ft.get("kind", "frontier"), (ft.get("target") or "")[:150],
                                    ft.get("prompt", ""), ft.get("target")))
             if not candidates:
                 return None
@@ -899,13 +948,14 @@ class CorporationWorker:
             src = quest.get("research_source") or quest.get("findings_path") or ""
             why = (ev.get("ceo_rationale") or ev.get("cto_rationale") or "")[:200]
             text = (
-                f"Ship-review: {title} || CORP-RESEARCHED, CEO/CTO approved "
+                f"Crucible candidate: {title} || CORP-RESEARCHED, CEO/CTO approved "
                 f"(CEO {ev.get('ceo_score', 0):.0f}/CTO {ev.get('cto_score', 0):.0f}). "
                 f"RESEARCH: {summary} WHY: {why} SOURCE: {src} "
-                f"|| Claude: judge HONESTLY whether this is a serious, ambitious research lead. "
-                f"If yes, DEVELOP it into rigorous scientifically-tested work (Lab measurement + "
-                f"falsifier, or a built tool) and SHIP it; say what you shipped. If it is thin or "
-                f"incremental, skip with reason — the bar is rigour and ambition, not volume."
+                f"|| Claude: judge HONESTLY whether this claim deserves the Crucible bench. If yes, "
+                f"REPLICATE it: build the smallest computational model of its mechanism via "
+                f"/brain/lab/run, record REPRODUCED|FAILED|NOT_COMPUTABLE via /brain/replication-record, "
+                f"add curation + re-render the Crucible. A potential FAILED of a famous claim is the "
+                f"highest-value outcome. If the claim is thin/unmeasurable, skip with reason."
             )
             tid = add_task(text)
             self._stats["ship_reviews_filed"] = self._stats.get("ship_reviews_filed", 0) + 1

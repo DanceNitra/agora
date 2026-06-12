@@ -195,10 +195,18 @@ async def _topic_research(config: dict, quest: dict, researcher_type: str) -> di
            f'Respond with JSON: {{"summary":"a 2-3 sentence substantive finding grounded in a named source",'
            f'"key_points":["point","point","point"],"impact":"high|medium|low"}}')
     try:
+        # MEDIUM tier + regex parse + temp .45: the cheap tier (v4-flash) returns EMPTY completions
+        # under the dungeon's concurrent load (the root of the '0 findings' dead-ends), and a
+        # sub-0.4-temp call would CACHE one bad reply for an identical prompt. Research calls are
+        # low-volume (3/quest), so the reasoning tier is affordable and far more reliable.
+        import re as _re
         raw = await asyncio.to_thread(
-            call_llm, system_prompt=sysmsg, user_prompt=usr, tier="cheap",
-            temperature=0.4, max_tokens=500, response_format={"type": "json_object"})
-        syn = json.loads(raw)
+            call_llm, system_prompt=sysmsg, user_prompt=usr, tier="medium",
+            temperature=0.45, max_tokens=900)
+        m = _re.search(r"\{.*\}", raw or "", _re.DOTALL)
+        syn = json.loads(m.group(0)) if m else {}
+        if not syn:
+            raise ValueError(f"no JSON in reply ({len(raw or '')} chars)")
     except Exception as e:
         return {"status": "error", "output": f"topic research failed: {e}"}
     summary = (syn.get("summary") or "").strip()
@@ -549,33 +557,42 @@ async def _cto_evaluate_llm(title: str, summary: str, subsystem: str, enriched_p
     from agora.execution.llm_client import call_llm
 
     prompt = enriched_prompt or get_role_prompt("cto")
+    # RUBRIC REWRITE: the corp evaluates RESEARCH LEADS (Crucible candidates), not software
+    # proposals — the old "architecture impact / integration complexity" rubric guaranteed
+    # rejections because the questions don't apply. The CTO now judges methodological testability.
     user_msg = (
-        f"## Research Proposal: {title}\n\n"
-        f"### Technical Summary\n{summary[:1000]}\n\n"
-        f"### Current Subsystem\n{subsystem}\n\n"
+        f"## Research Lead: {title}\n\n"
+        f"### Research Findings\n{summary[:1200]}\n\n"
         f"### Evaluation Required\n"
-        f"Assess this proposal on:\n"
-        f"1. Technical merit (is this sound?)\n"
-        f"2. Architecture impact (does it improve or complicate our system?)\n"
-        f"3. Integration complexity (how hard to implement?)\n"
-        f"4. Performance implications (faster, slower?)\n\n"
+        f"You are judging whether this lead deserves our research bench (the Crucible: we rebuild "
+        f"claims as minimal computational models and publish the verdict). Assess:\n"
+        f"1. TESTABILITY: does the claim have a simulable mechanism and a measurable quantity "
+        f"(a number, threshold, exponent, rate)?\n"
+        f"2. GROUNDING: are the findings tied to a real named source, not vague generalities?\n"
+        f"3. FALSIFIABILITY: could a minimal model genuinely come out either way?\n"
+        f"Approve leads a small simulation could decide; reject vague, purely descriptive, or "
+        f"unmeasurable ones.\n\n"
         f"Respond with JSON:\n"
         f'{{"approved": true/false, "rationale": "reason", "priority": "high/medium/low", "score": 0-100}}'
     )
 
     try:
-        # Run sync LLM call in thread to avoid blocking event loop
+        # MEDIUM tier + regex parse + temp .45 (cheap tier returns empties under dungeon load;
+        # sub-0.4 temp would cache one bad verdict for identical prompts). Low volume: 2 calls/eval.
         import asyncio
+        import re as _re
         raw = await asyncio.to_thread(
             call_llm,
             system_prompt=prompt,
             user_prompt=user_msg,
-            tier="cheap",
-            temperature=0.3,
-            max_tokens=400,
-            response_format={"type": "json_object"},
+            tier="medium",
+            temperature=0.45,
+            max_tokens=700,
         )
-        parsed = json.loads(raw)
+        m = _re.search(r"\{.*\}", raw or "", _re.DOTALL)
+        parsed = json.loads(m.group(0)) if m else {}
+        if not parsed:
+            raise ValueError(f"no JSON in reply ({len(raw or '')} chars)")
         return {
             "approved": parsed.get("approved", False),
             "rationale": parsed.get("rationale", "LLM evaluation unavailable"),
@@ -608,26 +625,36 @@ async def _ceo_evaluate_llm(title: str, summary: str, enriched_prompt: str = "")
     from agora.execution.llm_client import call_llm
 
     prompt = enriched_prompt or get_role_prompt("ceo")
+    # RUBRIC REWRITE: judge STRATEGIC FIT of a research lead for the firm's actual engine —
+    # the Crucible (public replications), the Operating-Point thesis, and the board priorities
+    # (science of better thinking / reasoning / AI; finance + longevity test-beds).
     user_msg = (
-        f"Proposal: {title}\n\n"
-        f"Summary: {summary[:600]}\n\n"
-        f"Assess strategic value, user impact, and opportunity cost. "
+        f"Research lead: {title}\n\n"
+        f"Findings: {summary[:800]}\n\n"
+        f"You run a research firm whose product is CREDIBILITY: a public ledger of claims rebuilt "
+        f"in code (famous/contested claims are the most valuable, especially potential FAILED "
+        f"verdicts), a 'methods break at the operating point' thesis, and board priorities in "
+        f"reasoning/AI/finance. Assess: would replicating this claim strengthen that portfolio? "
+        f"Is it interesting to a sophisticated audience? Approve strong fits; reject filler.\n"
         f"Respond with JSON:\n"
         f'{{"approved": true/false, "rationale": "reason", "score": 0-100}}'
     )
 
     try:
         import asyncio
+        import re as _re
         raw = await asyncio.to_thread(
             call_llm,
             system_prompt=prompt,
             user_prompt=user_msg,
-            tier="cheap",
-            temperature=0.3,
-            max_tokens=400,
-            response_format={"type": "json_object"},
+            tier="medium",
+            temperature=0.45,
+            max_tokens=700,
         )
-        parsed = json.loads(raw)
+        m = _re.search(r"\{.*\}", raw or "", _re.DOTALL)
+        parsed = json.loads(m.group(0)) if m else {}
+        if not parsed:
+            raise ValueError(f"no JSON in reply ({len(raw or '')} chars)")
         return {
             "approved": parsed.get("approved", False),
             "rationale": parsed.get("rationale", "LLM evaluation unavailable"),
