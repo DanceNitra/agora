@@ -2972,6 +2972,7 @@ async def ambient_life():
     memory: dict[str, list] = {}       # eid -> last things this agent did/saw
     next_decide: dict[str, float] = {} # eid -> monotonic time of next decision
     deciding: set[str] = set()         # decisions in flight (quest replenishment)
+    idle_bub: dict[str, float] = {}    # eid -> throttle for the "mulling…" idle bubble
     world_events: list[str] = []       # recent keep news (shared, for reactivity)
     locations: dict = dict(_LOCATIONS)  # navigable spots — GROWS as agents build modules
     os_modules: list[dict] = []        # real structures agents have built into the OS
@@ -3701,6 +3702,15 @@ async def ambient_life():
                     elif eid not in deciding:
                         deciding.add(eid)
                         asyncio.create_task(replenish_quests(eid, cx, cy))
+                elif now >= idle_bub.get(eid, 0.0):
+                    # Idle between quests → show what this agent is mulling (its REAL work),
+                    # not a blank or stale bubble: the next queued quest, else its recent work.
+                    idle_bub[eid] = now + 8.0
+                    nxt_q = quests.get(eid) or []
+                    focus = (nxt_q[0].get("intent") if nxt_q else None) \
+                        or (memory.get(eid) or [None])[-1] \
+                        or _ROLE_HINT.get(eid, "the next question")
+                    engine.set_entity_thought(eid, "⋯ " + str(focus)[:84])
                 continue
 
             # Arrived → act on the goal's KIND; create/upgrade/collaborate make real
