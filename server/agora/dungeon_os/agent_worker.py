@@ -209,7 +209,11 @@ class CorporationWorker:
         elapsed = (datetime.now() - tick_start).total_seconds()
 
         summary = self._build_summary(results)
-        await self._send_report(summary)
+        # Only ping Telegram when the tick actually SHIPPED something — a real
+        # commit, an approved deliverable, new findings, or a new quest. The
+        # per-tick "system healthy / QA flagged" report was pure noise to the owner.
+        if self._is_noteworthy(results):
+            await self._send_report(summary)
 
         return {
             "tick": self._stats["ticks"],
@@ -721,6 +725,27 @@ class CorporationWorker:
             "created_at": _safe_get("created_at"),
             "completed_at": _safe_get("completed_at"),
         }
+
+    def _is_noteworthy(self, results: list[dict]) -> bool:
+        """True only if this tick produced a material outcome worth a Telegram ping.
+        Routine 'system healthy', design-file churn, and QA-flagged retries are NOT."""
+        for r in results:
+            stage = r.get("stage", "")
+            if stage == "pata" and r.get("git_commit", {}).get("sha"):
+                return True
+            if stage == "evaluation" and r.get("approved"):
+                return True
+            if stage == "head" and r.get("findings_count", 0) > 0:
+                return True
+            if stage == "scout" and r.get("status") == "new_quest":
+                return True
+            if stage == "synthesis":  # knowledge actually stored to the vault
+                return True
+            if stage == "compound" and any(
+                d.get("memories_stored", 0) for d in r.get("details", [])
+            ):
+                return True
+        return False
 
     def _build_summary(self, results: list[dict]) -> str:
         """Build a Telegram summary of this tick."""
