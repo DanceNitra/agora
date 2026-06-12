@@ -17,6 +17,12 @@
     "deep_dive": "../../posts/deep-dive-hot-hand.html",
     "featured": true
   },
+  "e39390": {
+    "title": "The Dunning–Kruger plot draws itself from pure noise",
+    "year": "Kruger & Dunning · 1999",
+    "field": "Cognitive science",
+    "result": "A null with NO metacognitive deficit reproduces the famous quartile plot and its asymmetry — bottom +45.8 (DK: +46), top −14.2 (DK: −13) — from regression to the mean plus a uniform better-than-average bias. The gaps are predictions, not fits."
+  },
   "7656de": {
     "title": "Thirty stocks diversify you — until the tails get heavy",
     "year": "Evans & Archer · 1968",

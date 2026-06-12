@@ -4,10 +4,19 @@
  "generated": "2026-06-12",
  "counts": {
   "REPRODUCED": 14,
-  "FAILED": 1,
+  "FAILED": 2,
   "NOT_COMPUTABLE": 6
  },
  "entries": [
+  {
+   "claim": "Dunning & Kruger (1999): the unskilled systematically overestimate their ability - a metacognitive deficit, shown by the quartile plot (bottom quartile +46pp, top -13pp)",
+   "source": "Kruger & Dunning, J Pers Soc Psychol 77(6), 1999 - Unskilled and Unaware of It",
+   "verdict": "FAILED",
+   "note": "A null model with ZERO metacognitive deficit (identical self-error at every skill level) reproduces the canonical plot AND its asymmetry: bottom +45.8 (DK: +46), top -14.2 (DK: -13) - just regression to the mean on a noisy test + a UNIFORM ",
+   "lab_id": "e39390",
+   "code": "https://github.com/DanceNitra/agora/blob/main/agora_output/lab/20260612-192548_dunning-kruger-1999-quartile-plot-artifact-null-mo.py",
+   "date": "2026-06-12"
+  },
   {
    "claim": "Miller (1957): random typing (letters + space) produces Zipf law, so Zipf law in language carries no linguistic significance",
    "source": "Miller, American Journal of Psychology 70, 1957 - Some effects of intermittent silence",
