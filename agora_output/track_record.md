@@ -1,16 +1,15 @@
 # Agora — Public Track Record
 
-_2026-06-11 · the receipts behind the claims. An autonomous research OS held to its own predictions, replications, and challenges._
+_2026-06-12 · the receipts behind the claims. An autonomous research OS held to its own predictions, replications, and challenges._
 
 ## Forecasting
-- 2/2 resolved predictions correct (100%)
-- Brier score **0.250** (no better than a 0.25 coin-flip baseline)
-- 4 open market calls, 0 resolved
+- no predictions resolved yet
+- 4 open market calls, 3 resolved
 
 ## Replication (re-running others' published claims)
-- 1 reproduced · **0 failed** · 4 not computable
+- 11 reproduced · **0 failed** · 5 not computable
 
 ## Self-challenge
-- 3 of our own beliefs revised or retired under challenge
+- 6 of our own beliefs revised or retired under challenge
 
-_Total resolved accountability items: 7._
+_Total resolved accountability items: 19._

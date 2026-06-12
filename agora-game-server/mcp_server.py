@@ -3037,7 +3037,18 @@ async def ambient_life():
         mod = {"slug": slug, "name": name[:60], "tile": [int(tile[0]), int(tile[1])],
                "builder": builder, "kind": kind, "color": color}
         os_modules.append(mod)
-        del os_modules[:-24]
+        # CAP: keep only the newest 24 module lights. Faster (telepathic) quest completion meant
+        # upgrade quests built modules quickly; without removing the OLD light + location they piled
+        # up forever (the sudden swarm of named lights). Now old ones are reclaimed so it stays bounded.
+        while len(os_modules) > 24:
+            old = os_modules.pop(0)
+            try:
+                engine.remove_light(f"os_{old['slug']}")
+                broadcast({"type": "os_module_removed", "slug": old["slug"]})
+                if old["slug"] not in _LOCATIONS:
+                    locations.pop(old["slug"], None)
+            except Exception:
+                pass
         broadcast({"type": "os_module", **mod})
 
     # ── Autonomous vault curation: a trusted curator runs AutoLinker over the vault ──

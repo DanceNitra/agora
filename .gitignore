@@ -44,3 +44,11 @@ agora-game-server/.agent_memory/
 # dungeon supervisor runtime
 agora-game-server/.dungeon_heartbeat
 agora-game-server/_supervisor.log
+
+# transient tooling artifacts (CDP screenshots, browser profiles, stray logs)
+agora_output/_edgeprof*/
+agora_output/*.png
+**/_brain.out
+**/_dungeon.log
+**/_dungeon.err
+agora-game-server/_supervisor.log
