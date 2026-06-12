@@ -494,9 +494,9 @@ _LLM_THINK = os.environ.get("DUNGEON_LLM_THINK", "").strip().lower()  # "false" 
 # "fast" = lively banter. Override with DUNGEON_PACE.
 _PACE = os.environ.get("DUNGEON_PACE", "study").strip().lower()
 _STUDY = _PACE != "fast"
-_DECIDE_MIN, _DECIDE_MAX = (20.0, 45.0) if _STUDY else (3.0, 7.0)   # gap before PLANNING new goals
+_DECIDE_MIN, _DECIDE_MAX = (12.0, 24.0) if _STUDY else (3.0, 7.0)   # gap before PLANNING new goals
 _BACKLOG_MIN, _BACKLOG_MAX = (4.0, 9.0)                             # gap to pull the NEXT queued quest
-_CONV_COOLDOWN = 120.0 if _STUDY else 30.0                          # gap between an agent's talks
+_CONV_COOLDOWN = 45.0 if _STUDY else 20.0                           # gap between an agent's talks (livelier)
 
 _PERSONA = {
     "king":    "King Aldric — the keep's engineer-king who builds the tools and turns findings into doctrine. Commanding, decisive.",
@@ -746,7 +746,9 @@ async def _converse(a_id: str, b_id: str, hold: dict[str, int], memory: dict) ->
                                   f"Dialogue so far: {convo}\nReply to {oname} about the research.", fb)
             engine.set_entity_thought(sid, line)
             # one-shot knowledge packet, speaker → listener, so you SEE who talks to whom
-            broadcast({"type": "converse", "from": sid, "to": oid})
+            # (carry the actual line + names so the Event Log shows real Q&A, not just "grew closer")
+            broadcast({"type": "converse", "from": sid, "to": oid,
+                       "from_name": sname, "to_name": oname, "text": line})
             history.append(f"{sname}: {line}")
             await asyncio.sleep(2.4)
         await asyncio.sleep(1.0)
@@ -862,7 +864,8 @@ async def _collaborate(a_id, b_id, seed_kind, seed_title, seed_text, hold) -> No
             f"and exactly what you need from them.",
             f"{bn}, let's develop {seed_title} together.")
         engine.set_entity_thought(a_id, a_line)
-        broadcast({"type": "converse", "from": a_id, "to": b_id})
+        broadcast({"type": "converse", "from": a_id, "to": b_id,
+                   "from_name": an, "to_name": bn, "text": a_line})
         await asyncio.sleep(2.4)
         contrib = _ROLE_CONTRIB.get(b_id, "add your angle")
         b_line = await _llm_say(
@@ -871,7 +874,8 @@ async def _collaborate(a_id, b_id, seed_kind, seed_title, seed_text, hold) -> No
             f"In ONE line (max 20 words), give your concrete contribution.",
             f"Here is my angle on {seed_title}.")
         engine.set_entity_thought(b_id, b_line)
-        broadcast({"type": "converse", "from": b_id, "to": a_id})
+        broadcast({"type": "converse", "from": b_id, "to": a_id,
+                   "from_name": bn, "to_name": an, "text": b_line})
         await asyncio.sleep(2.4)
         # NO SOURCES, NO FINDING: with an empty literature block the joint-LLM (told NEVER to
         # invent sources) can only refuse — and those refusals were shipping as findings
