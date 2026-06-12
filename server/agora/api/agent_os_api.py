@@ -211,6 +211,20 @@ async def add_collective(request: Request):
         g = _garbage_finding(body["title"], body["content"])
         if g:
             return {"status": "rejected", "reason": g}
+        # NOVELTY GATE AT THE SOURCE: if this finding lexically near-duplicates a note the vault
+        # already has, don't store it — it would only clog the promotion funnel and be deduped later
+        # anyway (~71% of findings were such restatements). Uses the SAME calibrated containment as
+        # write-time dedup; measured: semantic similarity does NOT separate dup vs novel at finding
+        # granularity (both ~0.7), so the lexical containment is the right tool here.
+        _w = getattr(request.app.state, "vault_writer", None)
+        if _w is not None and len(body["content"]) >= 160:
+            try:
+                import asyncio as _a
+                if await _a.to_thread(_w._find_duplicate, body["title"], body["content"]):
+                    _PROMOTE_STATS["src_deduped"] = _PROMOTE_STATS.get("src_deduped", 0) + 1
+                    return {"status": "rejected", "reason": "vault already covers this (source dedup)"}
+            except Exception:
+                pass
     npc_id = DUNGEON_AGENT_IDS.get(body["npc"]) or body["npc"]
     os_engine = get_os(request)
     await os_engine._contribute_to_collective(
