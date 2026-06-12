@@ -1743,6 +1743,37 @@ async def brain_hypothesis_inputs(request: Request):
     return {"status": "ok", **await gather_hypothesis_inputs(request.app.state.db)}
 
 
+@router.get("/brain/ideation/inputs")
+async def brain_ideation_inputs(request: Request):
+    """THE IDEA FORGE — the brain's WHOLE rigorous cross-section (canon, beliefs, lessons,
+    reproduced+failed replications, analogies, theory, synthesis precursors, frontier, what the
+    Library read, freshest findings) as raw material for Claude to generate GROUNDBREAKING ideas
+    across four standing targets (OS, Agora, MCP memory, real-world product). Agora gathers."""
+    from agora.config import settings
+    from agora.execution.ideation import gather_ideation_inputs
+    vault = settings.vault_path or "C:/Users/Danculus/my-second-brain"
+    return {"status": "ok", **await gather_ideation_inputs(request.app.state.db, vault)}
+
+
+@router.post("/brain/ideation/record")
+async def brain_ideation_record(request: Request):
+    """Append one generated idea to the forge ledger (dedup substrate + public trail)."""
+    from agora.execution.ideation import record_idea
+    b = await request.json()
+    if not (b.get("title") and b.get("target")):
+        return {"status": "empty"}
+    return {"status": "ok", **record_idea(
+        b.get("title", ""), b.get("target", ""), b.get("mechanism", ""), b.get("test", ""),
+        b.get("first_step", ""), b.get("grounding", ""), b.get("note", ""))}
+
+
+@router.get("/brain/ideation")
+async def brain_ideation():
+    """The Idea Forge ledger — recent groundbreaking ideas the forge generated."""
+    from agora.execution.ideation import format_ideas, _load
+    return {"status": "ok", "report": format_ideas(12), "items": _load()[-15:]}
+
+
 @router.post("/brain/exchange/propose")
 async def brain_exchange_propose(request: Request):
     """RESEARCH EXCHANGE — compose the public digest (preview on disk) and propose publishing
