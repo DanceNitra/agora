@@ -187,6 +187,11 @@ class CorporationWorker:
                     )
                 self._stats["quality_records"] += 2
 
+            # Corp researched an idea and its CEO/CTO approved it → file it to Claude
+            # as a shippable proposal. Claude ships the ones with merit, skips the thin.
+            if eval_result and eval_result.get("approved"):
+                self._file_ship_review(quest, eval_result)
+
         # ── STEP 5: PATA execution ──
         pata_quests = await self._get_quests_by_phase("pata")
         for quest in pata_quests:
@@ -725,6 +730,32 @@ class CorporationWorker:
             "created_at": _safe_get("created_at"),
             "completed_at": _safe_get("completed_at"),
         }
+
+    def _file_ship_review(self, quest: dict, ev: dict) -> None:
+        """An idea the corp RESEARCHED and its CEO/CTO approved → file it to Claude's
+        inbox as a 'Ship-review' proposal. Claude develops the promising ones into
+        rigorous, scientifically-tested work and ships them; thin ones get skipped.
+        The corp does the legwork; Claude is the bar for rigour and ambition."""
+        try:
+            from agora.execution.claude_inbox import add_task
+            title = (quest.get("title") or "untitled idea")[:90]
+            summary = (quest.get("research_summary") or quest.get("goal") or "")[:600]
+            src = quest.get("research_source") or quest.get("findings_path") or ""
+            why = (ev.get("ceo_rationale") or ev.get("cto_rationale") or "")[:200]
+            text = (
+                f"Ship-review: {title} || CORP-RESEARCHED, CEO/CTO approved "
+                f"(CEO {ev.get('ceo_score', 0):.0f}/CTO {ev.get('cto_score', 0):.0f}). "
+                f"RESEARCH: {summary} WHY: {why} SOURCE: {src} "
+                f"|| Claude: judge HONESTLY whether this is a serious, ambitious research lead. "
+                f"If yes, DEVELOP it into rigorous scientifically-tested work (Lab measurement + "
+                f"falsifier, or a built tool) and SHIP it; say what you shipped. If it is thin or "
+                f"incremental, skip with reason — the bar is rigour and ambition, not volume."
+            )
+            tid = add_task(text)
+            self._stats["ship_reviews_filed"] = self._stats.get("ship_reviews_filed", 0) + 1
+            print(f"[Corp→Claude] filed ship-review {tid}: {title[:50]}")
+        except Exception as e:
+            print(f"[Corp→Claude] ship-review file error: {e}")
 
     def _is_noteworthy(self, results: list[dict]) -> bool:
         """True only if this tick produced a material outcome worth a Telegram ping.
