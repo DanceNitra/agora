@@ -44,6 +44,7 @@ logger = logging.getLogger("dungeon.mcp_server")
 
 HERE = Path(__file__).parent
 STATIC_DIR = HERE / "static"
+_HEARTBEAT_FILE = HERE / ".dungeon_heartbeat"   # life-loop liveness, watched by dungeon_supervisor.py
 
 
 def _load_dotenv() -> None:
@@ -3446,6 +3447,14 @@ async def ambient_life():
 
     while True:
         await asyncio.sleep(0.85)
+        # HEARTBEAT: stamp the loop counter + wall-clock to a file each iteration so an external
+        # supervisor (dungeon_supervisor.py) can detect a wedged loop (the failure mode that froze
+        # the QuestBoard) and restart us. Cheap, throttled to ~once/4s, never raises into the loop.
+        if loop_n % 5 == 0:
+            try:
+                _HEARTBEAT_FILE.write_text(f"{int(_time.time())} {loop_n}", encoding="utf-8")
+            except Exception:
+                pass
         ents = engine.state.entities
         occupied = {(int(round(e.x)), int(round(e.y))): eid for eid, e in ents.items()}
         now = _time.monotonic()

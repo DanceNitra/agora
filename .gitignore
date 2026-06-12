@@ -40,3 +40,7 @@ agora_output/audits/
 
 # Dungeon agents mnemo working memory (runtime state)
 agora-game-server/.agent_memory/
+
+# dungeon supervisor runtime
+agora-game-server/.dungeon_heartbeat
+agora-game-server/_supervisor.log
