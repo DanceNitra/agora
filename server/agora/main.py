@@ -651,6 +651,31 @@ async def frontier_harvest_loop(app: FastAPI):
         await _aio.sleep(7200)                               # every 2 hours
 
 
+async def idea_forge_loop(app: FastAPI):
+    """The Idea Forge cadence: ~twice a day, file a 'Forge ideas' inbox task so the main loop runs
+    the /idea-forge skill — read the whole brain (canon, beliefs, replications, the ~6000-note
+    vault) and generate GROUNDBREAKING ideas across the four targets (OS, Agora, MCP memory,
+    real-world product). Skips if a Forge task is already pending, so it never stacks."""
+    import asyncio as _aio
+    await _aio.sleep(300)                                     # let startup settle
+    while True:
+        try:
+            from agora.execution.claude_inbox import add_task, pending
+            if not any("Forge ideas" in (t.get("text", "") or "") for t in pending()):
+                add_task(
+                    "Forge ideas: run the /idea-forge skill — GET /brain/ideation/inputs (canon, "
+                    "beliefs, lessons, reproduced+failed replications, analogies, theory, synthesis "
+                    "precursors, frontier, the ~6000-note vault corpus by target), then generate 4-6 "
+                    "GROUNDBREAKING, non-obvious, buildable ideas spread across the four targets "
+                    "(os|agora|mcp_memory|realworld). Each: mechanism + falsifier + first step, "
+                    "grounded in specific vault knowledge, deduped against recent ideas. Push ONE "
+                    "vault note, POST /brain/ideation/record per idea, Telegram a short digest.")
+                print("[IdeaForge] queued a Forge ideas task")
+        except Exception as e:
+            print(f"[IdeaForge] loop error: {e}")
+        await _aio.sleep(12 * 3600)                           # ~twice a day
+
+
 async def lifespan(app: FastAPI):
     try:
         await init_db(app)
@@ -679,6 +704,10 @@ async def lifespan(app: FastAPI):
         loop.create_task(frontier_harvest_loop(app))  # keep the frontier reading list stocked
     except Exception as _e:
         print(f"[FrontierHarvest] not started: {_e}")
+    try:
+        loop.create_task(idea_forge_loop(app))     # ~2x/day: queue a Forge ideas task for the loop
+    except Exception as _e:
+        print(f"[IdeaForge] not started: {_e}")
     yield
     if hasattr(app.state, 'db') and app.state.db:
         await app.state.db.close()
