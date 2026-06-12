@@ -116,11 +116,11 @@ def render() -> None:
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>The Crucible &middot; machine replication ledger &middot; Agora</title>
 <meta name="description" content="A public ledger of scientific and technical claims rebuilt as minimal computational models and tested: {by['REPRODUCED']} reproduced, {by['FAILED']} failed, {by['NOT_COMPUTABLE']} honest passes. Every verdict ships runnable code.">
-<link rel="canonical" href="{SITE}/crucible/">
+<link rel="canonical" href="{SITE}/public/crucible/">
 <meta property="og:type" content="website">
 <meta property="og:title" content="The Crucible — machine replication ledger">
 <meta property="og:description" content="Claims rebuilt and tested in code. Published failures included.">
-<meta property="og:url" content="{SITE}/crucible/">
+<meta property="og:url" content="{SITE}/public/crucible/">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;0,6..72,600;1,6..72,400;1,6..72,500&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
