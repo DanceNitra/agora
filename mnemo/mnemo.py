@@ -75,6 +75,10 @@ class Mnemo:
         self.embed = embed
         self.items: list[dict] = []
         self._tok_cache: dict[str, set] = {}     # id -> token set, so recall doesn't re-tokenize
+        # recall auto-mode: below this many active memories lexical is as good and free; above it the
+        # embedder pays (measured crossover ~300-600 notes; semantic then wins 3.6-5x). Tunable.
+        self.semantic_threshold = 300
+        self._last_mode = "lexical"              # which mode the most recent recall() actually used
         if self.path and self.path.exists():
             try:
                 self.items = json.loads(self.path.read_text(encoding="utf-8"))
@@ -126,9 +130,15 @@ class Mnemo:
         return len(q & t) / min(len(q), len(t))     # overlap coefficient — forgiving without an embedder
 
     def recall(self, query: str, k: int = 6, include_superseded: bool = False,
-               include_hubs: bool = False) -> list[dict]:
+               include_hubs: bool = False, mode: str = "auto") -> list[dict]:
         """Top-k memories by RELEVANCE × VALUE — high-value memories outrank merely-similar ones.
-        Memories the dream pass flagged as hubs (universal matchers) are skipped unless include_hubs."""
+        Memories the dream pass flagged as hubs (universal matchers) are skipped unless include_hubs.
+
+        mode: 'auto' (default) uses LEXICAL token overlap while the store is small (< semantic_threshold
+        active memories) and SEMANTIC embedding recall once it grows past that — the measured crossover
+        where the embedder starts to pay (3.6-5x recall at scale). Force with 'lexical' / 'semantic'.
+        Semantic needs an embedder (set on the store); without one, or if embedding fails, recall
+        falls back to lexical automatically."""
         def _eligible(r: dict) -> bool:
             s = r["status"]
             if s == "active":
@@ -137,7 +147,10 @@ class Mnemo:
                 return include_hubs
             return include_superseded            # superseded / other non-active
         pool = [r for r in self.items if _eligible(r)]
-        qvec = self._qvec(query)                     # embed the query once, reuse across the pool
+        use_semantic = self.embed is not None and (
+            mode == "semantic" or (mode == "auto" and len(pool) >= self.semantic_threshold))
+        qvec = self._qvec(query) if use_semantic else None    # None -> lexical (also if embed fails)
+        self._last_mode = "semantic" if qvec is not None else "lexical"
         qtok = None if qvec is not None else _tokens(query)   # tokenize the query once, not per memory
         scored = []
         for r in pool:
