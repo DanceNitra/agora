@@ -340,8 +340,19 @@ class MetaScanner:
                 return None
 
             await self.qe.assign_quest(quest_id, "meta-scanner")
+            # A meta-quest is a self-DIAGNOSTIC ALERT (it surfaces in the owner's briefing), NOT a
+            # research topic — "optimize quest lifecycle" isn't something to run literature search on.
+            # Mark it terminal immediately so it never enters the HEAD research loop and re-researches
+            # itself forever (that produced 90+ findings on one quest, stuck at 'claimed', + the spam).
+            try:
+                await self.qe.db.execute(
+                    "UPDATE quests SET status='done', proposal_status='alert', completed_at=datetime('now') WHERE id=?",
+                    (quest_id,))
+                await self.qe.db.commit()
+            except Exception as _e:
+                print(f"[MetaScanner] alert-terminate error: {_e}")
             self._meta_quest_count += 1
-            print(f"[MetaScanner] Created meta-quest: {quest_id} — {title}")
+            print(f"[MetaScanner] Alert: {quest_id} — {title}")
 
             # Also store the trigger as a corporation lesson
             if self.memory:
