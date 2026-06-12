@@ -1014,6 +1014,35 @@ async def brain_lab():
     return {"status": "ok", "report": format_lab(), "experiments": recent()}
 
 
+@router.get("/brain/methods")
+async def brain_methods():
+    """THE METHODS LIBRARY — parameterized experiment templates + the autonomous-run ledger."""
+    from agora.execution.methods import catalog, format_methods, _load
+    return {"status": "ok", "report": format_methods(), "templates": catalog(),
+            "runs": _load()[-15:]}
+
+
+@router.post("/brain/methods/run")
+async def brain_methods_run(request: Request):
+    """Instantiate a vetted experiment template with validated params (params, never code)."""
+    import asyncio as _aio
+    from agora.execution.methods import run_method
+    b = await request.json()
+    return await _aio.to_thread(run_method, b.get("template") or "", b.get("params") or {},
+                                b.get("claim") or "", b.get("requester") or "api")
+
+
+@router.post("/brain/methods/match")
+async def brain_methods_match(request: Request):
+    """Map a free-text hypothesis theme to a template via the cheap LLM and run it."""
+    from agora.execution.methods import match_and_run
+    b = await request.json()
+    theme = (b.get("theme") or "").strip()
+    if len(theme) < 12:
+        return {"status": "empty"}
+    return await match_and_run(theme, b.get("requester") or "api")
+
+
 @router.post("/brain/night-shift")
 async def brain_night_shift(request: Request):
     """THE NIGHT SHIFT — nightly consolidation: re-embed the vault (fresh semantic memory by

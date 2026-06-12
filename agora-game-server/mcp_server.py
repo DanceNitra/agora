@@ -2326,11 +2326,24 @@ async def _queue_hypothesis_induction() -> None:
     covered += await _pending_task_themes("Hypothesize from findings:")
     if _theme_is_covered(theme, covered):
         return
+    # METHODS LIBRARY: try to pre-measure the baseline autonomously — the brain maps the theme
+    # onto a vetted experiment template (agents supply parameters, never code) and runs it.
+    # The hypothesis task then arrives WITH a measured number; Claude judges instead of building.
+    baseline = ""
+    md = await asyncio.to_thread(_brain_post_sync, "/api/v1/agent-os/brain/methods/match",
+                                 {"theme": theme[:300], "requester": "Artificer Rooke"}, 180)
+    if (md or {}).get("status") == "ok" and md.get("measured"):
+        baseline = (f" || AUTO-MEASURED BASELINE [{md.get('template')}/lab {md.get('lab_id')}]: "
+                    f"{md.get('measured')} {md.get('verdict', '')}")[:420]
+        broadcast({"type": "os_build", "kind": "collab", "who": "Artificer Rooke",
+                   "text": f"ran a Methods-Library experiment for the conjecture: "
+                           f"{md.get('measured', '')[:60]}"})
     await asyncio.to_thread(_brain_post_sync, "/api/v1/agent-os/brain/claude-inbox",
                             {"text": f"Hypothesize from findings: {theme[:90]} || SEVERE-TEST RULE: "
                                      f"the hypothesis must ship WITH a runnable Lab test - run the "
                                      f"baseline via /brain/lab/run in this same task and put the "
-                                     f"measured number in the note; no runnable test, no hypothesis"})
+                                     f"measured number in the note; no runnable test, no hypothesis"
+                                     + baseline})
     broadcast({"type": "os_build", "kind": "collab", "who": "High Priest Orin",
                "text": f"found a cross-agent finding cluster — queued a hypothesis: {theme[:34]}"})
     _mind_spark("#b89bff")        # violet — a conjecture forms
