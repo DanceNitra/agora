@@ -16,11 +16,14 @@ class TierConfig:
     description: str
 
 
-# Model comes from config (which reads server/.env). AGORA_LLM_MODEL overrides every
-# tier (e.g. deepseek-v4-flash via Ollama Cloud); otherwise per-tier defaults apply.
+# Model comes from config (which reads server/.env). AGORA_LLM_MODEL overrides the REASONING
+# tiers (medium/expert). The CHEAP tier is real-time NPC/brain dialogue: it always uses the
+# dedicated fast/reliable model (llm_model_cheap, default deepseek-v4-flash) so a slow/smart
+# override (e.g. glm-4.7, which has rare 45s+ latency spikes) can never stall dialogue and drop
+# agents to primitive templated fallbacks. Reliability > IQ for high-volume real-time chatter.
 from agora.config import settings as _settings
 _OVERRIDE = (_settings.llm_model or "").strip()
-_CHEAP = _OVERRIDE or _settings.llm_model_cheap or "nvidia/nemotron-3-nano-30b-a3b:free"
+_CHEAP = _settings.llm_model_cheap or "nvidia/nemotron-3-nano-30b-a3b:free"
 _BIG = _OVERRIDE or _settings.llm_model_medium or "nvidia/nemotron-3-ultra-550b-a55b:free"
 
 # ── Model tiers (override-aware) ──

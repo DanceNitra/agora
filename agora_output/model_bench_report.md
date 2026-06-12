@@ -42,3 +42,35 @@ token-thrifty, AND format-disciplined (no thinking-channel leakage).
 
 Optional: keep `deepseek-v4-pro` as a **manual "premium" override** for rare hard grand-synthesis runs,
 but default everything to glm-4.7 to stop the credit burn.
+
+---
+
+## UPDATE (2026-06-12, later) — reliability benchmark + the methodology fix
+
+**The first benchmark was wrong in method.** It measured mean latency from ~2 calls/model + output
+quality, but NOT tail latency / reliability under sustained load. That gap broke production: glm-4.7
+gives great quality but occasionally stalls ~49s, exceeding the dungeon's 45s per-call timeout →
+empty response → `LLM_quests=0` → agents freeze and drop to primitive templated fallbacks (the
+"primitive banter" + "stuck agents" the owner saw).
+
+**Reliability run (`tools/model_reliability.py`, 12 sequential calls/model, dungeon timeout 45s):**
+
+| model | p50 | p95 | max | timeouts | empties | badjson | verdict |
+|---|---|---|---|---|---|---|---|
+| **deepseek-v4-flash** | 2.4s | **7.3s** | 7.3s | 0 | 0 | 0 | **SUITABLE (dungeon)** |
+| glm-4.7 | 3.0s | 8.6s | 8.6s | 0 | 0 | 0 | suitable here, but a separate call spiked to **49s** — rare catastrophic tail |
+| gemini-3-flash-preview | 2.7s | 29.4s | 29.4s | 0 | 0 | 0 | RISKY (p95 near timeout) |
+| qwen3-next:80b | 3.6s | 7.9s | — | 0 | **12 empty** | 0 | unusable (reasoning model) |
+| gpt-oss:120b | 2.7s | 7.4s | 7.4s | 0 | 0 | 0 | suitable backup |
+
+**Final architecture (split by job, by reliability not just IQ):**
+- **Dungeon LLM** (`DUNGEON_LLM_MODEL`) = **deepseek-v4-flash** — high call volume, real-time, needs
+  consistent low latency + valid JSON. p95 7.3s, zero failures.
+- **Brain CHEAP tier** (real-time NPC/brain dialogue, `model_router._CHEAP`) = **deepseek-v4-flash** —
+  pinned regardless of the global override, so a slow/smart model can never stall dialogue into
+  primitive fallbacks (`model_router.py` change).
+- **Brain reasoning tiers** (medium/expert) = **glm-4.7** — deep research, slow cadence tolerates the
+  rare 49s spike; smartest of the suitable models.
+
+**Lesson:** benchmark RELIABILITY (p95/max/failure-rate under load), not just mean latency + quality.
+A model that's brilliant at p50 and stalls at p99 will look great in a demo and break the product.
