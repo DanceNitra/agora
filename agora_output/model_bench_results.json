@@ -1,0 +1,172 @@
+{
+ "deepseek-v4-flash": {
+  "R": {
+   "ok": true,
+   "s": 5.0,
+   "ctok": 320,
+   "ptok": 74,
+   "text": "Condition: Each reviewer’s individual accuracy is below 0.5 (worse than random). Mechanism: Condorcet jury theorem – majority vote accuracy approaches 0 as n increases when p < 0.5. Concrete falsifiable test: For a binary classification task, measure each reviewer’s accuracy p on a held-out set. If"
+  },
+  "J": {
+   "ok": true,
+   "s": 6.4,
+   "ctok": 181,
+   "ptok": 71,
+   "text": "{\"title\":\"Scout the Abandoned Data-Center\",\"steps\":[\"Survey the entrance hall\",\"Map the server corridors\",\"Document the backup power room\"],\"difficulty\":\"medium\",\"reward_xp\":45}",
+   "json_valid": true
+  }
+ },
+ "deepseek-v4-pro": {
+  "R": {
+   "ok": true,
+   "s": 11.1,
+   "ctok": 320,
+   "ptok": 74,
+   "text": ""
+  },
+  "J": {
+   "ok": true,
+   "s": 3.7,
+   "ctok": 168,
+   "ptok": 71,
+   "text": "{\"title\":\"Data-Center Recon\",\"steps\":[\"Infiltrate the perimeter and disable security systems\",\"Navigate through server rooms to map the layout\",\"Retrieve the core data logs and escape before backup power fails\"],\"difficulty\":\"medium\",\"reward_xp\":75}",
+   "json_valid": true
+  }
+ },
+ "deepseek-v3.2": {
+  "R": {
+   "ok": true,
+   "s": 33.0,
+   "ctok": 320,
+   "ptok": 74,
+   "text": ""
+  },
+  "J": {
+   "ok": true,
+   "s": 23.3,
+   "ctok": 220,
+   "ptok": 71,
+   "text": "",
+   "json_valid": false
+  }
+ },
+ "glm-4.6": {
+  "R": {
+   "ok": true,
+   "s": 19.4,
+   "ctok": 320,
+   "ptok": 74,
+   "text": ""
+  },
+  "J": {
+   "ok": true,
+   "s": 12.5,
+   "ctok": 220,
+   "ptok": 71,
+   "text": "",
+   "json_valid": false
+  }
+ },
+ "glm-4.7": {
+  "R": {
+   "ok": true,
+   "s": 4.0,
+   "ctok": 98,
+   "ptok": 74,
+   "text": "Condition: Reviewers share a systematic bias (correlated errors > 0).\nMechanism: Correlated error amplification, where additional votes reinforce the shared misconception rather than averaging out independent noise.\nTest: Measure the correlation coefficient ($\\rho$) of errors among $N$ reviewers. If $\\rho > 0$ and the group error rate increases as $N$ increases (specifically, if the probability of correct choice decreases with $N$), the claim is refuted."
+  },
+  "J": {
+   "ok": true,
+   "s": 3.0,
+   "ctok": 44,
+   "ptok": 71,
+   "text": "{\"title\":\"Data Center Mapping\",\"steps\":[\"Locate the main server room entrance\",\"Scan and map the cooling infrastructure layout\",\"Upload the completed schematics to the terminal\"],\"difficulty\":\"medium\",\"reward_xp\":50}",
+   "json_valid": true
+  }
+ },
+ "qwen3-next:80b": {
+  "R": {
+   "ok": true,
+   "s": 6.4,
+   "ctok": 856,
+   "ptok": 79,
+   "text": "Condition: Reviewers' errors are positively correlated due to shared bias (e.g., reliance on a faulty sensor). Mechanism: Correlated errors. Falsifiable test: In a binary classification task with known ground truth, measure error rate; if adding reviewers increases error rate (e.g., from 5% with 1 reviewer to 10% with 2 reviewers using the same biased sensor), claim fails."
+  },
+  "J": {
+   "ok": true,
+   "s": 9.2,
+   "ctok": 1417,
+   "ptok": 77,
+   "text": "{\"title\":\"Data Center Reconnaissance\",\"steps\":[\"Locate main entrance\",\"Map server configurations\",\"Secure data logs\"],\"difficulty\":\"medium\",\"reward_xp\":75}",
+   "json_valid": true
+  }
+ },
+ "gpt-oss:120b": {
+  "R": {
+   "ok": true,
+   "s": 7.3,
+   "ctok": 320,
+   "ptok": 138,
+   "text": "**Condition:** The claim fails when the reviewers’ binary errors are positively correlated above a critical level (ρ > 0.5).  \n\n**Mechanism:** *Error‑correlation amplification* – shared biases cause additional reviewers to add redundant, not independent, information, so the majority‑vote error probability rises with group size.  \n\n**Falsifiable test:**  \n\n1. Recruit a pool of independent‑task participants (N = 5, 10, 20).  \n2. For each N, have each participant answer the same set of M = 200 binary questions with known correct answers.  \n3. Compute (a) the ensemble accuracy (fraction correct by majority"
+  },
+  "J": {
+   "ok": true,
+   "s": 2.3,
+   "ctok": 220,
+   "ptok": 133,
+   "text": "",
+   "json_valid": false
+  }
+ },
+ "gemini-3-flash-preview": {
+  "R": {
+   "ok": true,
+   "s": 3.1,
+   "ctok": 316,
+   "ptok": 72,
+   "text": "The claim fails when individual reviewer accuracy ($"
+  },
+  "J": {
+   "ok": true,
+   "s": 1.8,
+   "ctok": 216,
+   "ptok": 71,
+   "text": "{\"title\":\"Data Center Reconnaissance\",\"steps",
+   "json_valid": false
+  }
+ },
+ "nemotron-3-super": {
+  "R": {
+   "ok": true,
+   "s": 86.4,
+   "ctok": 320,
+   "ptok": 90,
+   "text": "Condition: Reviewers’ errors are positively correlated (e.g., they share the same bias or information source). Mechanism: Correlated errors cause the ensemble’s variance to not decrease with N, and systematic bias can dominate, yielding no gain or a loss in accuracy. Test: For a fixed task, compute group accuracy A(N) as the proportion of correct decisions for N = 1,…,10 independent‑seeming reviewers; if A(N) does not strictly increase (i.e., ΔA = A(N+1)−A(N) ≤ 0 for any N ≥ 2), the claim is falsified. Expected refutation: observing ΔA ≤ 0 at N = 4"
+  },
+  "J": {
+   "ok": true,
+   "s": 8.2,
+   "ctok": 220,
+   "ptok": 88,
+   "text": "{\"title\":\"Scout",
+   "json_valid": false
+  }
+ },
+ "minimax-m2.5": {
+  "R": {
+   "ok": true,
+   "s": 6.8,
+   "ctok": 320,
+   "ptok": 107,
+   "text": ""
+  },
+  "J": {
+   "ok": true,
+   "s": 2.9,
+   "ctok": 220,
+   "ptok": 104,
+   "text": "",
+   "json_valid": false
+  }
+ }
+}
