@@ -498,6 +498,7 @@ _STUDY = _PACE != "fast"
 _DECIDE_MIN, _DECIDE_MAX = (12.0, 24.0) if _STUDY else (3.0, 7.0)   # gap before PLANNING new goals
 _BACKLOG_MIN, _BACKLOG_MAX = (4.0, 9.0)                             # gap to pull the NEXT queued quest
 _CONV_COOLDOWN = 45.0 if _STUDY else 20.0                           # gap between an agent's talks (livelier)
+_WORK_DUR = (8.0, 18.0) if _STUDY else (3.0, 7.0)                   # how long an active quest "works" before it completes (telepathic, time-based)
 
 _PERSONA = {
     "king":    "King Aldric — the keep's engineer-king who builds the tools and turns findings into doctrine. Commanding, decisive.",
@@ -2987,6 +2988,7 @@ async def ambient_life():
     next_decide: dict[str, float] = {} # eid -> monotonic time of next decision
     deciding: set[str] = set()         # decisions in flight (quest replenishment)
     idle_bub: dict[str, float] = {}    # eid -> throttle for the "mulling…" idle bubble
+    stuck: dict[str, int] = {}         # eid -> consecutive loops blocked from moving (anti-jam)
     world_events: list[str] = []       # recent keep news (shared, for reactivity)
     locations: dict = dict(_LOCATIONS)  # navigable spots — GROWS as agents build modules
     os_modules: list[dict] = []        # real structures agents have built into the OS
@@ -3263,13 +3265,13 @@ async def ambient_life():
             tag = f"{who} ✓{done}" if done else who
             g = goals.get(eid)
             if g:
-                # REAL progress: how far this agent is from its goal tile (fills as it walks,
-                # ~90% on arrival, then completes) — per-agent, not a synced fake animation.
-                ent = engine.state.entities.get(eid)
-                gt = g.get("tile")
-                if ent and gt:
-                    dist = abs(int(round(ent.x)) - gt[0]) + abs(int(round(ent.y)) - gt[1])
-                    prog = 92 if dist == 0 else max(12, min(85, 88 - dist * 7))
+                # REAL progress: how far through its WORK INTERVAL the quest is (time-based, since
+                # work is telepathic now — not tied to walking to a tile). Fills smoothly to 100%.
+                da = g.get("do_at")
+                if da:
+                    total = max(1.0, _WORK_DUR[1])
+                    remaining = max(0.0, da - _time.monotonic())
+                    prog = int(max(8, min(99, 100 * (1 - remaining / total))))
                 else:
                     prog = 30
                 # If this is a collaboration, surface the partner too so you SEE everyone on it.
@@ -3301,12 +3303,16 @@ async def ambient_life():
         return tile
 
     def activate_next_quest(eid):
-        """Pop the next quest from the backlog into the active slot and route to it."""
+        """Pop the next quest into the active slot. Work is TELEPATHIC + time-based: the quest
+        completes after a short work interval regardless of where the agent stands (no need to
+        walk to a tile or be near a partner). Movement is decoupled, purely ambient wandering —
+        so a traffic jam or unreachable tile can NEVER block real work again."""
         q = quests.get(eid)
         if not q:
             return False
         nxt = q.pop(0)
-        goals[eid] = {**nxt, "tile": _resolve_tile(eid, nxt.get("where", "wander"))}
+        goals[eid] = {**nxt, "tile": _resolve_tile(eid, nxt.get("where", "wander")),
+                      "do_at": _time.monotonic() + random.uniform(*_WORK_DUR)}
         paths.pop(eid, None)
         engine.set_entity_thought(eid, "» " + nxt["intent"][:90])
         engine.set_entity_state(eid, "walking")
@@ -3759,9 +3765,13 @@ async def ambient_life():
                     engine.set_entity_thought(eid, "⋯ " + str(focus)[:84])
                 continue
 
-            # Arrived → act on the goal's KIND; create/upgrade/collaborate make real
-            # artifacts in the shared brain. Everything is remembered.
-            if (cx, cy) == goal["tile"]:
+            # TELEPATHIC, TIME-BASED COMPLETION: the quest does its real work after a short work
+            # interval, WHEREVER the agent stands — no walking to a tile, no being near a partner.
+            # This removes the entire class of "agents jammed / can't reach the spot" stalls that
+            # froze the QuestBoard. Movement below is now purely ambient.
+            if "do_at" not in goal:
+                goal["do_at"] = now + random.uniform(*_WORK_DUR)
+            if now >= goal["do_at"]:
                 kind = goal.get("kind", "explore")
                 intent, action = goal["intent"], goal["action"]
                 who = _AGENT_NAMES.get(eid, eid)
@@ -3773,9 +3783,19 @@ async def ambient_life():
                                   "#ff6a6a" if kind == "challenge" else "#ffd27a", 0.9)
                 remember(eid, intent)
 
+                def _telepath_partner(prefer):
+                    """A partner by NAME (the LLM may name one in goal['with']) else a random living
+                    peer — telepathic, proximity no longer required."""
+                    others = [oid for oid in ents if oid != eid and dead.get(oid, 0) == 0]
+                    if prefer:
+                        pl = str(prefer).lower()
+                        for oid in others:
+                            nm = _AGENT_NAMES.get(oid, "")
+                            if nm and (nm.lower() in pl or nm.split()[-1].lower() in pl):
+                                return oid
+                    return random.choice(others) if others else None
+
                 if kind in ("hypothesize", "create"):
-                    # ATTENTION MARKET: a discovery slot costs an LLM+research spend —
-                    # standing decides who gets to spend (the productive compound).
                     won, p = _market_won(eid)
                     if not won:
                         engine.set_entity_thought(eid, "priced out this round — earn standing")
@@ -3794,8 +3814,7 @@ async def ambient_life():
                     note_event(f"{who} built: {intent}")
                     _os_build("upgrade", who, intent)
                 elif kind == "collaborate":
-                    pid = next((oid for oid, e2 in ents.items()
-                                if oid != eid and abs(e2.x - cx) + abs(e2.y - cy) <= 2), None)
+                    pid = _telepath_partner(goal.get("with"))
                     if pid:
                         await record_trust(eid, pid, "cooperate")
                         partner = _AGENT_NAMES.get(pid, pid)
@@ -3806,9 +3825,7 @@ async def ambient_life():
                     else:
                         note_event(f"{who}: {intent}")
                 elif kind == "challenge":
-                    # An intellectual dispute: contest a weak/contradictory finding → trust down.
-                    pid = next((oid for oid, e2 in ents.items()
-                                if oid != eid and abs(e2.x - cx) + abs(e2.y - cy) <= 2), None)
+                    pid = _telepath_partner(goal.get("with"))
                     if pid:
                         await record_trust(eid, pid, "defect")   # standing of both can shift
                         rival = _AGENT_NAMES.get(pid, pid)
@@ -3823,37 +3840,38 @@ async def ambient_life():
                 quest_log.setdefault(eid, []).append(intent)
                 del quest_log[eid][:-6]
                 quest_done[eid] = quest_done.get(eid, 0) + 1
-                # Real completion → the board announces "✓ Done" and the next quest takes over.
                 broadcast({"type": "quest_done", "agent": who, "title": intent[:90],
                            "kind": kind, "total": quest_done[eid]})
                 hold[eid] = 3
                 goals.pop(eid, None)
                 paths.pop(eid, None)
-                # Work through the backlog promptly; only pause for the study gap before planning anew.
                 next_decide[eid] = now + (random.uniform(_BACKLOG_MIN, _BACKLOG_MAX)
                                           if quests.get(eid) else random.uniform(_DECIDE_MIN, _DECIDE_MAX))
                 publish_goals()
                 continue
 
-            # Walk toward the goal (replan if blocked)
+            # AMBIENT WANDER (cosmetic only — never gates work): drift toward a random spot; on
+            # arrival or if boxed in, repick a fresh tile. A jam here can no longer stall anything.
+            wt = goal.get("tile")
+            if not wt or (cx, cy) == wt:
+                goal["tile"] = wt = random.choice(list(locations.values()))
+                paths.pop(eid, None)
             path = paths.get(eid) or []
             if not path:
-                p = _astar((cx, cy), goal["tile"])
-                if p is None:
-                    goals.pop(eid, None)        # unreachable → pick a new goal soon
-                    next_decide[eid] = now + 1.0
+                p = _astar((cx, cy), wt)
+                if not p or len(p) < 2:
+                    goal["tile"] = random.choice(list(locations.values()))   # repick, keep wandering
                     continue
                 paths[eid] = path = p[1:]
-            if not path:
-                goals.pop(eid, None)
-                continue
             nx, ny = path[0]
             if (nx, ny) in occupied and occupied[(nx, ny)] != eid:
-                p = _astar((cx, cy), goal["tile"])
-                if p is None:
-                    goals.pop(eid, None); paths.pop(eid, None)
-                    continue
-                paths[eid] = p[1:]
+                step = next(((cx + dx, cy + dy) for dx, dy in random.sample([(1, 0), (-1, 0), (0, 1), (0, -1)], 4)
+                             if _walkable(cx + dx, cy + dy)
+                             and ((cx + dx, cy + dy) not in occupied or occupied[(cx + dx, cy + dy)] == eid)), None)
+                if step:
+                    engine.set_entity_state(eid, "walking"); engine.move_entity(eid, *step)
+                    occupied.pop((cx, cy), None); occupied[step] = eid
+                paths.pop(eid, None)
                 continue
             engine.set_entity_state(eid, "walking")
             engine.move_entity(eid, nx, ny)
