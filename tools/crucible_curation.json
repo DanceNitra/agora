@@ -14,6 +14,7 @@
     "canon": "For 30 years the canonical finding was that streak shooting is a cognitive illusion: players who feel “hot” are misreading randomness.",
     "rebuilt": "We rebuilt their exact estimator — P(hit | 3 prior hits) − P(hit | 3 prior misses), averaged per shooting record — and ran it on i.i.d. shooters with provably no hot hand.",
     "verdict": "On a no-hot-hand shooter the estimator does not read 0; it reads −7.9pp (t=−28 at n=100, growing to −17pp at streak length 4). This is the streak-selection bias of Miller & Sanjurjo (2018): selecting shots that follow a streak inside a finite sequence is a biased sample. A GVT measurement of ~0 therefore implies a real hot hand of roughly +8.5pp. The famous fallacy was the analysis, not the players.",
+    "deep_dive": "../../posts/deep-dive-hot-hand.html",
     "featured": true
   },
   "7656de": {

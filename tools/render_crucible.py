@@ -86,6 +86,10 @@ def render():
         c, code, date = meta(feat)
         codeline = (f'<a class="codelink" href="{code}" target="_blank" rel="noopener">Read the runnable model &rarr;</a>'
                     if code else "")
+        dd = c.get("deep_dive")
+        if dd:
+            codeline = (f'<a class="codelink" href="{dd}">The deep dive, with charts &rarr;</a>  '
+                        + codeline)
         featured_html = f"""
   <section class="feature" data-reveal>
     <div class="wrap">
