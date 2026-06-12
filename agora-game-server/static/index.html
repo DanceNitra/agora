@@ -67,6 +67,7 @@
   #hud-task-lines { display: flex; flex-direction: column; gap: 5px; }
   .q-row { display: flex; gap: 6px; align-items: flex-start; }
   .q-row.queued { opacity: .5; }
+  .q-inits { display: flex; gap: 2px; flex: 0 0 auto; margin-top: 1px; }
   .q-init { flex: 0 0 auto; width: 15px; height: 15px; border-radius: 50%; font-size: 9px;
     line-height: 15px; text-align: center; font-weight: bold; color: #0a0712;
     background: #8f86c8; margin-top: 1px; }
@@ -1223,9 +1224,10 @@ if (!renderer.getContext()) {
       const working = t.status === 'in_progress';
       const done = t.status === 'done';
       const p = (typeof t.progress === 'number') ? Math.round(t.progress) : (done ? 100 : working ? 50 : 6);
-      const ini = Progress.initial(t.agent);
+      const names = (Array.isArray(t.agents) && t.agents.length) ? t.agents : [t.agent];
+      const badges = names.map(n => `<div class="q-init" title="${_esc(n||'')}">${_esc(Progress.initial(n))}</div>`).join('');
       const cls = done ? 'done' : working ? 'working' : 'queued';
-      return `<div class="q-row ${cls}"><div class="q-init" title="${_esc(t.agent||'')}">${_esc(ini)}</div>` +
+      return `<div class="q-row ${cls}"><div class="q-inits">${badges}</div>` +
              `<div class="q-body"><div class="q-title">${_esc(t.title||'')}</div>` +
              `<div class="q-meter"><i style="width:${p}%"></i></div></div>` +
              `<div class="q-pct">${p}%</div></div>`;

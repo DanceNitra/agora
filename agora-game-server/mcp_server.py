@@ -3258,8 +3258,13 @@ async def ambient_life():
                     prog = 92 if dist == 0 else max(12, min(85, 88 - dist * 7))
                 else:
                     prog = 30
+                # If this is a collaboration, surface the partner too so you SEE everyone on it.
+                partners = [who]
+                ally = (g.get("with") or "").strip()
+                if ally:
+                    partners.append(ally)
                 rows.append({"id": i, "key": f"{eid}:{g['intent'][:24]}", "title": g["intent"],
-                             "agent": tag, "status": "in_progress", "progress": prog})
+                             "agent": tag, "agents": partners, "status": "in_progress", "progress": prog})
                 i += 1
             for q in quests.get(eid, [])[:2]:        # show up to 2 upcoming quests
                 rows.append({"id": i, "key": f"{eid}:q:{q['intent'][:24]}", "title": q["intent"],
@@ -3334,7 +3339,9 @@ async def ambient_life():
             sysmsg = (
                 f"You are {_persona(eid)} {role_line} "
                 f"You work at the Vault Company, building a living 'Agentic OS' of GENUINE knowledge "
-                f"inside the vault. PLAN YOUR NEXT 3 RESEARCH MOVES as a quest list. Each must be a "
+                f"inside the vault. PLAN YOUR NEXT 3 RESEARCH MOVES as a quest list. Form YOUR OWN "
+                f"direction from your role + memory FIRST — your value is an INDEPENDENT angle, not "
+                f"echoing what the group is already doing. Each must be a "
                 f"SPECIFIC, substantive step that fits your role, draws on your memory + the library, "
                 f"builds on the OS so far, and does NOT repeat what you've already done. Vary the kinds. "
                 f"This is a RESEARCH keep, not a combat dungeon — NEVER invent traps, treasure, "
@@ -3358,8 +3365,11 @@ async def ambient_life():
                    f"The user's REAL knowledge GAPS — isolated notes worth developing (AIM HERE): {gap_txt}"
                    f"{grave_txt}\n"
                    f"Your recent work: {mem}\nAlready completed (do NOT repeat): {done}\n"
-                   + (f"What the keep already knows (colleagues' relevant findings — BUILD ON these, "
-                      f"don't re-derive; collaborate with that author if it fits): {colleague_mem}\n"
+                   + (f"What your COLLEAGUES are already covering — so DO NOT converge on the same "
+                      f"direction (a herd of agents chasing one topic is worth no more than one agent; "
+                      f"diversity beats herding). Pick a DIFFERENT angle, domain, or method where YOUR "
+                      f"role adds independent value; only collaborate if you bring a genuinely distinct "
+                      f"contribution, not an echo: {colleague_mem}\n"
                       if colleague_mem else "")
                    + f"Nearby now: {', '.join(nearby) or 'no one'}\nLatest in the keep: {news}\n"
                    f"Your quest log (3 next moves — prefer ones that DEVELOP a real gap above):")
