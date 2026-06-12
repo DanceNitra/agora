@@ -321,29 +321,51 @@ class CorporationWorker:
                 s = s.replace("_", " ").replace("-", " ").strip()
                 return _re.sub(r"\s+", " ", s)
 
-            lead = None  # (kind, short, prompt, seedkey)
-            pick = self._stats["ticks"] % 3
-            if pick == 0:
-                oq = _flywheel.open_questions(1)
-                if oq and (oq[0].get("question")):
-                    txt = oq[0]["question"]
-                    lead = ("flywheel", txt[:70], f"Close this OPEN question with a MEASURED answer: {txt}", None)
-            if lead is None and pick == 1:
-                oc = _contra.open_contradictions(1)
-                if oc:
-                    a = _clean(oc[0].get("a_title") or oc[0].get("a") or "")
-                    b = _clean(oc[0].get("b_title") or oc[0].get("b") or "")
-                    if a and b:
-                        lead = ("contradiction", f"{a[:30]} vs {b[:30]}",
-                                f"Two of our beliefs are in tension: '{a}' vs '{b}'. Investigate which "
-                                f"holds (or the distinction that reconciles them) with evidence.", None)
-            if lead is None:
-                ft = _frontier.frontier_target(vault)
-                if ft:
-                    lead = (ft.get("kind", "frontier"), (ft.get("target") or "")[:70],
-                            ft.get("prompt", ""), ft.get("target"))
-            if lead is None:
+            # Gather candidate leads from ALL sources, then pick the first FRESH one (not seeded in
+            # the last day). The flywheel/contradiction sources keep returning the same unresolved
+            # item until it's closed, so picking only one source churned the SAME research question
+            # for hours/days. Trying all sources guarantees variety while any source has fresh content.
+            candidates = []  # list of (kind, short, prompt, seedkey)
+            oq = _flywheel.open_questions(3) or []
+            for q in oq:
+                txt = q.get("question")
+                if txt:
+                    candidates.append(("flywheel", txt[:70],
+                                       f"Close this OPEN question with a MEASURED answer: {txt}", None))
+            oc = _contra.open_contradictions(2) or []
+            for cc in oc:
+                a = _clean(cc.get("a_title") or cc.get("a") or "")
+                b = _clean(cc.get("b_title") or cc.get("b") or "")
+                if a and b:
+                    candidates.append(("contradiction", f"{a[:30]} vs {b[:30]}",
+                                       f"Two of our beliefs are in tension: '{a}' vs '{b}'. Investigate "
+                                       f"which holds (or the distinction that reconciles them) with evidence.", None))
+            ft = _frontier.frontier_target(vault)
+            if ft:
+                candidates.append((ft.get("kind", "frontier"), (ft.get("target") or "")[:70],
+                                   ft.get("prompt", ""), ft.get("target")))
+            if not candidates:
                 return None
+            # rotate priority each tick so no single source dominates
+            r = self._stats["ticks"] % len(candidates)
+            candidates = candidates[r:] + candidates[:r]
+
+            async def _recently_seeded(title: str) -> bool:
+                try:
+                    cur = await self.db.execute(
+                        "SELECT COUNT(*) FROM quests WHERE title=? AND created_at >= datetime('now','-1 day')",
+                        (title,))
+                    return (await cur.fetchone())[0] > 0
+                except Exception:
+                    return False
+
+            lead = None
+            for c in candidates:
+                if not await _recently_seeded(f"Research question: {c[1]}"):
+                    lead = c
+                    break
+            if lead is None:
+                return None                       # everything fresh-worthy already on the board
             kind, short, prompt, seedkey = lead
 
             quest_id = f"frontier-{kind}-{datetime.now().strftime('%Y%m%d_%H%M%S')}"

@@ -1603,14 +1603,18 @@ if (!renderer.getContext()) {
         const data = await r.json();
         const seen = new Set();
         _quests = (data.quests || []).filter(q => {
-          if (!(q.phase === 'head' || /research|frontier/i.test((q.title || '') + (q.id || '')))) return false;
+          // LIVE research only — never show finished/terminal quests. Showing 'done' ones meant the
+          // panel was padded with day-old completed corp quests that just sat at 100% forever.
+          const st = q.status, ph = q.phase;
+          if (st === 'done' || st === 'completed' || ph === 'compound' || ph === 'pata') return false;
+          if (!(ph === 'head' || /research|frontier/i.test((q.title || '') + (q.id || '')))) return false;
           const k = (q.title || '').toLowerCase().trim();   // dedup repeated meta-quests by title
           if (seen.has(k)) return false;
           seen.add(k);
           return true;
-        }).sort((a, b) => {                                  // live work first, finished last
-          const dn = (q) => (q.status === 'done' || q.status === 'completed') ? 1 : 0;
-          return dn(a) - dn(b);
+        }).sort((a, b) => {                                  // most-progressed live work first
+          const ord = { review: 0, claimed: 1, in_progress: 1, open: 2 };
+          return (ord[a.status] ?? 3) - (ord[b.status] ?? 3);
         }).slice(0, 5);
         render();
       } catch (e) { /* brain may be restarting — keep last render */ }
