@@ -285,7 +285,11 @@ class CorporationWorker:
                 success_criteria=["Ground the claim in the actual paper",
                                   "Judge testability (simulable mechanism + a number)",
                                   "Submit for CEO/CTO evaluation"],
-                reward=25, phase="head", research_source=paper.get("url", ""),
+                # non-http label ON PURPOSE: an http research_source routes deep_research down the
+                # URL-FETCH path, which on an arXiv page yields 'Analyzed 1 lines' garbage and the
+                # board (correctly) rejects it. The label forces the _topic_research route, which
+                # researches the verbatim CLAIM in the goal with real OpenAlex/arXiv grounding.
+                reward=25, phase="head", research_source=f"paper:{paper.get('url', '')}",
             )
             if "error" not in create_result:
                 await self.qe.assign_quest(quest_id, "scout")

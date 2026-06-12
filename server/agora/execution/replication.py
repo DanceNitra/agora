@@ -68,25 +68,72 @@ def _best_claim(summ: str) -> tuple[str, int]:
     return best, score
 
 
-def pick_paper_target() -> dict | None:
-    """A REAL arXiv paper with a quantitative, simulable claim — the input Rooke needs to produce
-    a genuine REPRODUCED/FAILED (not NOT_COMPUTABLE on an internal/descriptive finding). Picks the
-    paper whose abstract carries the strongest measurable result, deduped against what's attempted."""
+# Board-aligned topics for the CORPORATION's lead hunt — tuned to our actual Crucible content
+# (the Operating-Point thesis: cognitive biases, statistical artifacts, finance, replication crisis),
+# not just the physics-heavy replication rotation. These are where FAMOUS, contested, FAILED-likely
+# claims live — the highest-value Crucible candidates.
+_CORP_TOPICS = [
+    "cognitive bias overconfidence calibration measured effect size",
+    "replication crisis effect size psychology meta-analysis",
+    "regression to the mean statistical artifact measurement",
+    "behavioral finance anomaly return predictability out-of-sample",
+    "heuristics and biases reasoning experiment quantitative",
+    "wisdom of crowds aggregation accuracy correlation",
+    "publication bias p-hacking effect size inflation",
+    "forecasting calibration expert prediction accuracy",
+    "nudge intervention effect size field experiment",
+    "growth mindset intervention effect size meta-analysis",
+    "power posing ego depletion replication effect",
+    "diversification tail risk portfolio number of stocks",
+]
+
+
+# methods-boilerplate that scores on a bare number but carries NO testable result
+_METHODS_NOISE = re.compile(
+    r"\b(participants?|we identif\w+|literature search|studies for inclusion|sample of|"
+    r"systematic review|inclusion criteria|we (?:perform|conduct|search))\b", re.IGNORECASE)
+# a genuine RESULT signal (effect size / direction), not just any digit
+_RESULT_STRONG = re.compile(
+    r"(\bd\s*=\s*[-\d.]|\br\s*=\s*[-\d.]|\beffect size\b|\bincreas\w+ by\b|\breduc\w+ by\b|"
+    r"\bcohen'?s d\b|\bodds ratio\b|\bcorrelat\w+ of\b|\d+(?:\.\d+)?\s*%|\bbeta\s*=|"
+    r"\bexponent\b|\bthreshold\b|\bscal\w+\b|\bvanish\w+\b|\bdiverg\w+\b)", re.IGNORECASE)
+
+
+def _scan_topic(topic: str, attempted: set) -> dict | None:
+    """Best fresh measurable-RESULT paper for one topic, or None. Prefers a real effect/exponent
+    over a methods sentence that merely contains a number (e.g. 'n = 28 participants')."""
     from agora.execution.research_tool import openalex_search, arxiv_search
-    attempted = {(r.get("claim") or "")[:60].lower() for r in _load()}
-    rot = int(time.time() // 3600) % len(_REPLICABLE_TOPICS)
-    topic = _REPLICABLE_TOPICS[rot]
     papers = [p for p in (arxiv_search(topic, 6) + openalex_search(topic, 4)) if not p.get("error")]
     best = None
     for p in papers:
         claim, score = _best_claim((p.get("summary") or "").strip())
-        if score < 2 or len(claim) < 40 or claim[:60].lower() in attempted:   # need a real result-signal
+        if score < 2 or len(claim) < 40 or claim[:60].lower() in attempted:
             continue
+        if _METHODS_NOISE.search(claim) and not _RESULT_STRONG.search(claim):
+            continue                                   # a methods sentence, not a testable result
+        if _RESULT_STRONG.search(claim):
+            score += 3                                 # prefer real effect/exponent claims
         if best is None or score > best["score"]:
             src = f"{p.get('title','')[:90]} ({p.get('authors','')[:50]}, {p.get('published','')[:10]})"
             best = {"claim": claim, "source": src[:160], "title": (p.get("title") or "")[:90],
                     "url": p.get("url", ""), "topic": topic, "score": score}
     return best
+
+
+def pick_paper_target() -> dict | None:
+    """A REAL arXiv paper with a quantitative, simulable claim — the input Rooke needs to produce
+    a genuine REPRODUCED/FAILED. Tries the hour's physics-replication topic first, then the
+    board-aligned corp topics in a rotated order, returning the first fresh measurable claim — so a
+    single exhausted topic can no longer starve the pipeline (the corp 'exhausted sources' bug)."""
+    attempted = {(r.get("claim") or "")[:60].lower() for r in _load()}
+    pool = [_REPLICABLE_TOPICS[int(time.time() // 3600) % len(_REPLICABLE_TOPICS)]]
+    r = int(time.time() // 1800) % len(_CORP_TOPICS)
+    pool += _CORP_TOPICS[r:] + _CORP_TOPICS[:r]
+    for topic in pool:
+        hit = _scan_topic(topic, attempted)
+        if hit:
+            return hit
+    return None
 
 
 async def pick_target(db) -> dict | None:

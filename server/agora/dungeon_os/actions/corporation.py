@@ -591,6 +591,11 @@ async def _cto_evaluate_llm(title: str, summary: str, subsystem: str, enriched_p
         )
         m = _re.search(r"\{.*\}", raw or "", _re.DOTALL)
         parsed = json.loads(m.group(0)) if m else {}
+        if not parsed:                                  # v4-pro occasionally returns empty — retry
+            raw = await asyncio.to_thread(call_llm, system_prompt=prompt, user_prompt=user_msg,
+                                          tier="cheap", temperature=0.45, max_tokens=500)
+            m = _re.search(r"\{.*\}", raw or "", _re.DOTALL)
+            parsed = json.loads(m.group(0)) if m else {}
         if not parsed:
             raise ValueError(f"no JSON in reply ({len(raw or '')} chars)")
         return {
@@ -653,6 +658,11 @@ async def _ceo_evaluate_llm(title: str, summary: str, enriched_prompt: str = "")
         )
         m = _re.search(r"\{.*\}", raw or "", _re.DOTALL)
         parsed = json.loads(m.group(0)) if m else {}
+        if not parsed:                                  # v4-pro occasionally returns empty — retry
+            raw = await asyncio.to_thread(call_llm, system_prompt=prompt, user_prompt=user_msg,
+                                          tier="cheap", temperature=0.45, max_tokens=500)
+            m = _re.search(r"\{.*\}", raw or "", _re.DOTALL)
+            parsed = json.loads(m.group(0)) if m else {}
         if not parsed:
             raise ValueError(f"no JSON in reply ({len(raw or '')} chars)")
         return {
