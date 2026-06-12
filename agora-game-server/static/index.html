@@ -62,8 +62,28 @@
     background: rgba(8,6,14,0.74); border: 1px solid #322c46; pointer-events: none;
     backdrop-filter: blur(2px);
   }
-  #hud-task-lines { display: flex; flex-direction: column; gap: 3px; }
-  #hud-research-lines { display: flex; flex-direction: column; gap: 4px; margin-bottom: 6px; }
+  #hud-task-lines { display: flex; flex-direction: column; gap: 5px; }
+  .q-row { display: flex; gap: 6px; align-items: flex-start; }
+  .q-row.queued { opacity: .5; }
+  .q-init { flex: 0 0 auto; width: 15px; height: 15px; border-radius: 50%; font-size: 9px;
+    line-height: 15px; text-align: center; font-weight: bold; color: #0a0712;
+    background: #8f86c8; margin-top: 1px; }
+  .q-body { flex: 1; min-width: 0; }
+  .q-title { color: #c4bedd; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .q-row.working .q-title { color: #e7e1ff; }
+  .q-meter { height: 4px; border-radius: 3px; background: rgba(255,255,255,0.09);
+    margin-top: 2px; overflow: hidden; position: relative; }
+  .q-meter > i { display: block; height: 100%; border-radius: 3px;
+    background: linear-gradient(90deg,#6f5fb0,#9affc0); width: 0; transition: width 1.1s linear; }
+  .q-row.working .q-meter > i { box-shadow: 0 0 6px rgba(154,255,192,0.5); }
+  .q-pct { font-size: 8px; opacity: .7; color: #9affc0; flex: 0 0 auto; }
+  .q-title .st { font-size: 8px; opacity: .55; text-transform: uppercase; }
+  .q-row.working .q-init { background: #9affc0; }
+  .q-row.done .q-init { background: #7fd99a; }
+  .q-row.done .q-meter > i { background: #7fd99a; }
+  #hud-research-lines { display: flex; flex-direction: column; gap: 5px; margin-bottom: 6px; }
+  .hud-research-sub { color: #ffd27a; font-size: 10px; opacity: .85; margin-bottom: 3px; }
+  .research-idea { color: #d9d2f2; line-height: 1.35; white-space: normal;
   .hud-research-sub { color: #ffd27a; font-size: 10px; opacity: .85; margin-bottom: 3px; }
   .research-idea { color: #d9d2f2; line-height: 1.35; white-space: normal;
     border-left: 2px solid #6f5fb0; padding-left: 6px; }
@@ -1171,6 +1191,47 @@ if (!renderer.getContext()) {
     while (el.children.length > 16) el.lastChild.remove();
   }
 
+  // Live progress animator — a working quest's meter creeps up over time (asymptotes to ~92%,
+  // never faking 100 until truly done), so you SEE work happening + who is on it. Queued = static.
+  const Progress = (() => {
+    const st = {};
+    const initial = (name) => { const w = (name || '').trim().split(/\s+/).pop(); return (w ? w[0] : '?').toUpperCase(); };
+    function mark(key, working, done) {
+      const s = st[key] || (st[key] = { start: performance.now(), working, done });
+      if (working && !s.working) s.start = performance.now();   // (re)entered work
+      s.working = working; s.done = done; s.seen = performance.now();
+    }
+    function pct(key) {
+      const s = st[key]; if (!s) return 8;
+      if (s.done) return 100;
+      if (!s.working) return 8;
+      const t = (performance.now() - s.start) / 1000;
+      return Math.min(92, 12 + 80 * (1 - Math.exp(-t / 45)));    // continuous, ever-slower climb
+    }
+    return { mark, pct, initial };
+  })();
+
+  // Render the dungeon quest list (who works on what + a live meter)
+  let _lastTasks = [];
+  function renderQuestRows() {
+    const el = document.getElementById('hud-task-lines');
+    if (!el) return;
+    el.innerHTML = (_lastTasks || []).map(t => {
+      const working = t.status === 'in_progress';
+      const done = t.status === 'done';
+      const key = 't:' + (t.id != null ? t.id : t.title);
+      Progress.mark(key, working, done);
+      const p = Math.round(Progress.pct(key));
+      const ini = Progress.initial(t.agent);
+      const cls = done ? 'done' : working ? 'working' : 'queued';
+      return `<div class="q-row ${cls}"><div class="q-init" title="${_esc(t.agent||'')}">${_esc(ini)}</div>` +
+             `<div class="q-body"><div class="q-title">${_esc(t.title||'')}</div>` +
+             `<div class="q-meter"><i style="width:${p}%"></i></div></div>` +
+             `<div class="q-pct">${p}%</div></div>`;
+    }).join('');
+  }
+  setInterval(renderQuestRows, 3000);   // animate the meters
+
   // Apply an incremental event broadcast by the server
   function applyEvent(ev) {
     HUD.onEvent(ev);
@@ -1367,14 +1428,8 @@ if (!renderer.getContext()) {
 
     const STATUS_ICON = { open: '○', in_progress: '◐', done: '✓' };
     function setTasks(tasks) {
-      taskEl.innerHTML = '';
-      for (const t of (tasks || [])) {
-        const div = document.createElement('div');
-        div.className = 'hud-task s-' + t.status;
-        const who = t.agent ? ` <span class="who">— ${t.agent}</span>` : '';
-        div.innerHTML = `${STATUS_ICON[t.status] || '○'} ${t.title}${who}`;
-        taskEl.appendChild(div);
-      }
+      _lastTasks = tasks || [];     // the animated renderer (renderQuestRows) draws these with live meters
+      renderQuestRows();
     }
 
     function addRow(id, e) {
@@ -1475,41 +1530,39 @@ if (!renderer.getContext()) {
   // === QUEST BOARD — RESEARCH IDEAS (corp HEAD research quests, fetched from the brain) ===
   const ResearchBoard = (() => {
     const BRAIN = `http://${location.hostname}:8000`;
-    const esc = (s) => (s || '').replace(/[<>&]/g, c => ({'<':'&lt;','>':'&gt;','&':'&amp;'}[c]));
-    async function refresh() {
+    let _quests = [];
+    function render() {
       const box = document.getElementById('hud-research-lines');
       if (!box) return;
+      if (!_quests.length) { box.innerHTML = '<div id="hud-research-empty">no research ideas yet…</div>'; return; }
+      box.innerHTML = _quests.slice(0, 6).map(q => {
+        const title = (q.title || 'untitled').replace(/^Research( question)?:\s*/i, '');
+        const st = q.status || 'open';
+        const working = ['claimed', 'in_progress', 'review'].includes(st);
+        const done = st === 'done' || st === 'completed' || q.phase === 'compound';
+        const key = 'q:' + (q.id || title);
+        Progress.mark(key, working, done);
+        const p = Math.round(Progress.pct(key));
+        const ini = Progress.initial(q.assignee || q.owner || 'scout');
+        const cls = done ? 'done' : working ? 'working' : 'queued';
+        return `<div class="q-row ${cls}"><div class="q-init" title="${_esc(q.owner||'')}">${_esc(ini)}</div>` +
+               `<div class="q-body"><div class="q-title">${_esc(title).slice(0,90)} <span class="st">${_esc(st)}</span></div>` +
+               `<div class="q-meter"><i style="width:${p}%"></i></div></div><div class="q-pct">${p}%</div></div>`;
+      }).join('');
+    }
+    async function refresh() {
       try {
         const r = await fetch(`${BRAIN}/api/v2/dungeon-os/quests`);
         if (!r.ok) return;
         const data = await r.json();
-        const quests = (data.quests || []).filter(q =>
+        _quests = (data.quests || []).filter(q =>
           q.phase === 'head' || /research|frontier/i.test((q.title || '') + (q.id || '')));
-        if (!quests.length) {
-          box.innerHTML = '<div id="hud-research-empty">no research ideas yet…</div>';
-          return;
-        }
-        const pct = (q) => {
-          const ph = q.phase, st = q.status;
-          if (st === 'done' || st === 'completed' || ph === 'compound') return 100;
-          if (ph === 'pata') return 85;
-          if (st === 'review') return 60;
-          if (st === 'claimed') return 35;
-          if (st === 'open') return 12;
-          return 22;
-        };
-        box.innerHTML = quests.slice(0, 6).map(q => {
-          const title = (q.title || 'untitled').replace(/^Research( question)?:\s*/i, '');
-          const st = q.status || 'open';
-          const p = pct(q);
-          return `<div class="research-idea st-${esc(st)}"><span class="q">${esc(title).slice(0,110)}</span>` +
-                 ` <span class="st">${esc(st)}</span> <span class="pct">${p}%</span>` +
-                 `<div class="pbar"><i style="width:${p}%"></i></div></div>`;
-        }).join('');
+        render();
       } catch (e) { /* brain may be restarting — keep last render */ }
     }
     refresh();
-    setInterval(refresh, 15000);
+    setInterval(refresh, 12000);   // re-fetch statuses
+    setInterval(render, 3000);     // animate the meters
     return { refresh };
   })();
 
