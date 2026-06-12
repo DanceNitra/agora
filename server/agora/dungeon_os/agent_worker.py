@@ -444,6 +444,29 @@ class CorporationWorker:
                 except Exception as e:
                     print(f"[Head] research_summary store error: {e}")
             await self.qe.submit_for_review(quest_id, "scout")
+        else:
+            # ZERO findings: this quest used to stay open in 'head' and get re-researched every
+            # tick FOREVER (oldest-first ordering meant dead topics clogged the 5-quest window —
+            # the "agents are stuck in HEAD" alert). Count the attempt via verification_runs;
+            # after the 2nd dry run, close it as a dead-end so the pipeline moves on.
+            try:
+                cur = await self.qe.db.execute(
+                    "SELECT COALESCE(verification_runs,0) FROM quests WHERE id=?", (quest_id,))
+                row = await cur.fetchone()
+                runs = (row[0] if row else 0) + 1
+                if runs >= 2:
+                    await self.qe.db.execute(
+                        "UPDATE quests SET status='done', proposal_status='rejected', "
+                        "denial_reason='dead-end: research returned 0 findings on 2 attempts', "
+                        "verification_runs=?, completed_at=datetime('now') WHERE id=?",
+                        (runs, quest_id))
+                    print(f"[Head] closed dead-end quest {quest_id} (0 findings x{runs})")
+                else:
+                    await self.qe.db.execute(
+                        "UPDATE quests SET verification_runs=? WHERE id=?", (runs, quest_id))
+                await self.qe.db.commit()
+            except Exception as e:
+                print(f"[Head] dead-end bookkeeping error: {e}")
 
         self._stats["head_completed"] += 1
 
@@ -888,55 +911,64 @@ class CorporationWorker:
         return False
 
     def _build_summary(self, results: list[dict]) -> str:
-        """Build a Telegram summary of this tick."""
-        parts = [f"🏢 **Corp Tick #{self._stats['ticks']}** (Phase 3)", ""]
-
+        """Owner-readable tick report: what happened, what it means, what (if anything)
+        needs attention — grouped, deduped, plain language. No internal codes."""
+        alerts, researched, verdicts, shipped, seeds = [], [], [], [], []
         for r in results:
             stage = r.get("stage", "")
-            if stage == "meta":
-                if "quest_id" in r:
-                    parts.append(f"🤖 Meta: `{r.get('quest_id', '')}` — {r.get('title', '')[:50]}")
-                else:
-                    parts.append(f"🤖 Meta: System healthy ✓")
-            elif stage == "scout":
-                status = r.get("status", "")
-                if status == "new_quest":
-                    parts.append(f"👁️ Scout: *{r.get('title', '')[:60]}*")
-                elif status == "nothing_new":
-                    parts.append(f"👁️ Scout: Nothing new")
+            if stage == "meta" and r.get("quest_id"):
+                alerts.append(r.get("title", "")[:80])
+            elif stage == "scout" and r.get("status") == "new_quest":
+                seeds.append(r.get("title", "").replace("Research question: ", "")[:70])
             elif stage == "head":
-                parts.append(f"🔬 HEAD: *{r.get('title', '')[:50]}* — {r.get('findings_count', 0)} findings")
-            elif stage == "synthesis":
-                parts.append(f"🧠 Brainmaster: Knowledge stored → vault")
+                n = r.get("findings_count", 0)
+                t = r.get("title", "").replace("Research question: ", "")[:60]
+                researched.append(
+                    f"“{t}” — {n} finding{'s' if n != 1 else ''}"
+                    + (" → to CEO/CTO review" if n else " → dead-end check"))
             elif stage == "evaluation":
-                verdict = "✅" if r.get("approved") else "❌"
-                parts.append(f"👔 CEO/CTO: {verdict} *{r.get('title', '')[:40]}* (CTO:{r.get('cto_score', 50):.0f}/CEO:{r.get('ceo_score', 50):.0f})")
-            elif stage == "pata":
-                summary = r.get("summary", "")
-                commit = r.get("git_commit", {}).get("sha", "")
-                if summary:
-                    line = f"🛠️ PATA: *{r.get('title', '')[:35]}* — {summary}"
-                    if commit:
-                        line += f" [`{commit}`]"
-                    parts.append(line)
+                t = r.get("title", "").replace("Research question: ", "")[:55]
+                cto, ceo = r.get("cto_score", 0), r.get("ceo_score", 0)
+                why = (r.get("cto_rationale") or r.get("ceo_rationale") or "")[:90]
+                if r.get("approved"):
+                    verdicts.append(f"✅ approved “{t}” (CTO {cto:.0f} · CEO {ceo:.0f}) → sent to Claude for ship-review")
                 else:
-                    parts.append(f"🛠️ PATA: *{r.get('title', '')[:40]}* — executed ✓")
-            elif stage == "compound":
-                n = r.get("quests_processed", 0)
-                mem = sum(d.get("memories_stored", 0) for d in r.get("details", []))
-                parts.append(f"📚 Compound: {n} quests → {mem} memories")
-            elif stage == "quality_trend":
-                data = r.get("data", {})
-                ar = data.get("approval_rate", {}).get("approval_rate", 0)
-                q = data.get("quality", {}).get("avg_quality", 0)
-                parts.append(f"📊 Quality: {ar:.0%} approval / {q:.0%} avg score")
+                    verdicts.append(f"❌ rejected “{t}” (CTO {cto:.0f} · CEO {ceo:.0f})"
+                                    + (f" — {why}" if why else ""))
+            elif stage == "pata":
+                commit = r.get("git_commit", {}).get("sha", "")
+                shipped.append(f"“{r.get('title', '')[:45]}”" + (f" [{commit}]" if commit else ""))
 
-        parts.extend([
+        parts = [f"🏢 Corporation — tick #{self._stats['ticks']}"]
+        if alerts:
+            parts.append("")
+            parts.append(f"⚠️ Health alerts ({len(alerts)}):")
+            parts += [f"  • {a}" for a in alerts]
+        if seeds:
+            parts.append("")
+            parts.append("🌱 New research quests:")
+            parts += [f"  • {s}" for s in seeds]
+        if researched:
+            parts.append("")
+            parts.append("🔬 Researched this tick:")
+            parts += [f"  • {x}" for x in researched]
+        if verdicts:
+            parts.append("")
+            parts.append("👔 Board verdicts:")
+            parts += [f"  • {v}" for v in verdicts]
+        if shipped:
+            parts.append("")
+            parts.append("🛠️ Shipped:")
+            parts += [f"  • {s}" for s in shipped]
+        if len(parts) == 1:
+            parts.append("Quiet tick — nothing noteworthy.")
+
+        s = self._stats
+        parts += [
             "",
-            f"📊 Stats: {self._stats['head_completed']} HEAD / {self._stats['pata_completed']} PATA / {self._stats['meta_quests_created']} meta / {self._stats['lessons_extracted']} lessons",
-            f"╰ {datetime.now().strftime('%H:%M:%S')}",
-        ])
-
+            f"Lifetime: {s['head_completed']} researched · {s['pata_completed']} shipped · "
+            f"{s.get('ship_reviews_filed', 0)} sent to Claude · {s['lessons_extracted']} lessons",
+        ]
         return "\n".join(parts)
 
     async def _send_report(self, message: str):

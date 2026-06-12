@@ -312,11 +312,13 @@ class MetaScanner:
         goal = template["goal"].format(**trigger)
 
         try:
-            # DEDUP: the trigger keeps firing while the condition persists, which used to
-            # create the same meta-quest every scan (the board showed it 3×). One live
-            # copy per title is enough.
+            # DEDUP: the trigger keeps firing while the condition persists. Alerts are marked
+            # terminal ('done') on creation, so a status-based dedup never matched and the SAME
+            # alert was re-created every scan (the owner saw it twice within an hour). One copy
+            # per title per 24h is enough — the condition either gets fixed or the daily repeat
+            # is itself the reminder.
             cur = await self.qe.db.execute(
-                "SELECT COUNT(*) FROM quests WHERE title=? AND status IN ('open','claimed','review')",
+                "SELECT COUNT(*) FROM quests WHERE title=? AND created_at >= datetime('now','-1 day')",
                 (title,),
             )
             row = await cur.fetchone()
