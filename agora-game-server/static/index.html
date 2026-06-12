@@ -55,12 +55,21 @@
   .hud-line { color: #b9b3cf; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
   .hud-line:nth-child(n+8) { opacity: .45; }
   #hud-tasks {
-    position: fixed; top: 12px; right: 12px; z-index: 12; width: 230px;
+    position: fixed; top: 12px; right: 12px; z-index: 12; width: 300px;
     padding: 7px 9px; border-radius: 6px; font-family: monospace; font-size: 11px;
     background: rgba(8,6,14,0.74); border: 1px solid #322c46; pointer-events: none;
     backdrop-filter: blur(2px);
   }
   #hud-task-lines { display: flex; flex-direction: column; gap: 3px; }
+  #hud-research-lines { display: flex; flex-direction: column; gap: 4px; margin-bottom: 6px; }
+  .hud-research-sub { color: #ffd27a; font-size: 10px; opacity: .85; margin-bottom: 3px; }
+  .research-idea { color: #d9d2f2; line-height: 1.35; white-space: normal;
+    border-left: 2px solid #6f5fb0; padding-left: 6px; }
+  .research-idea .q { color: #c9bdff; }
+  .research-idea .st { font-size: 9px; opacity: .7; text-transform: uppercase; }
+  .research-idea.st-review .st { color: #ffcf9a; }
+  .research-idea.st-claimed .st { color: #9affc0; }
+  #hud-research-empty { color: #6f6a86; font-style: italic; font-size: 10px; }
   .hud-task { color: #b9b3cf; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
   .hud-task .who { opacity: .7; font-size: 10px; }
   .hud-task.s-open { opacity: .55; }
@@ -133,7 +142,7 @@
 <div id="thought-bubble"></div>
 <div id="status">Dungeon OS — Connecting...</div>
 <div id="hud-roster"></div>
-<div id="hud-tasks"><div class="hud-log-title">📜 QUEST BOARD</div><div id="hud-task-lines"></div></div>
+<div id="hud-tasks"><div class="hud-log-title">📜 QUEST BOARD</div><div class="hud-research-sub">💡 RESEARCH IDEAS</div><div id="hud-research-lines"><div id="hud-research-empty">seeding research questions…</div></div><div id="hud-task-lines"></div></div>
 <div id="hud-log"><div class="hud-log-title">⚔ EVENT LOG</div><div id="hud-log-lines"></div></div>
 <div id="hud-trust"><div class="hud-log-title">🤝 RELATIONSHIPS · ESS TRUST</div><div id="hud-trust-lines"><div id="hud-trust-empty">building bonds…</div></div></div>
 <div id="hud-os"><div class="hud-log-title">⚙ AGENTIC OS — BUILD LOG</div><div id="hud-os-lines"><div id="hud-os-empty">agents are starting to build…</div></div></div>
@@ -1440,6 +1449,35 @@ if (!renderer.getContext()) {
     ws.onclose = () => { statusEl.textContent = 'Disconnected...'; setTimeout(connect, 2000); };
   }
   connect();
+
+  // === QUEST BOARD — RESEARCH IDEAS (corp HEAD research quests, fetched from the brain) ===
+  const ResearchBoard = (() => {
+    const BRAIN = `http://${location.hostname}:8000`;
+    const esc = (s) => (s || '').replace(/[<>&]/g, c => ({'<':'&lt;','>':'&gt;','&':'&amp;'}[c]));
+    async function refresh() {
+      const box = document.getElementById('hud-research-lines');
+      if (!box) return;
+      try {
+        const r = await fetch(`${BRAIN}/api/v2/dungeon-os/quests`);
+        if (!r.ok) return;
+        const data = await r.json();
+        const quests = (data.quests || []).filter(q =>
+          q.phase === 'head' || /research|frontier/i.test((q.title || '') + (q.id || '')));
+        if (!quests.length) {
+          box.innerHTML = '<div id="hud-research-empty">no research ideas yet…</div>';
+          return;
+        }
+        box.innerHTML = quests.slice(0, 6).map(q => {
+          const title = (q.title || 'untitled').replace(/^Research( question)?:\s*/i, '');
+          const st = q.status || 'open';
+          return `<div class="research-idea st-${esc(st)}"><span class="q">${esc(title).slice(0,120)}</span> <span class="st">${esc(st)}</span></div>`;
+        }).join('');
+      } catch (e) { /* brain may be restarting — keep last render */ }
+    }
+    refresh();
+    setInterval(refresh, 15000);
+    return { refresh };
+  })();
 
   // Animation clock
   const clock = new THREE.Clock();

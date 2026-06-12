@@ -143,6 +143,14 @@ class CorporationWorker:
         if scout_result:
             results.append(scout_result)
 
+        # ── STEP 1.5: RESEARCH-FRONTIER SEEDER ──
+        # Feed the board with hard, original research questions from real vault gaps
+        # (flywheel falsifiers / contradictions / structural holes) when it runs low.
+        if len(await self._get_quests_by_phase("head")) < 2:
+            seeded = await self._seed_research_frontier()
+            if seeded:
+                results.append(seeded)
+
         # ── STEP 2: HEAD research ──
         head_quests = await self._get_quests_by_phase("head")
         for quest in head_quests:
@@ -294,6 +302,76 @@ class CorporationWorker:
             "title": quest_title,
             "finding": top,
         }
+
+    async def _seed_research_frontier(self) -> Optional[dict]:
+        """Seed the QuestBoard with a HARD, ORIGINAL research question drawn from REAL
+        vault gaps — open flywheel falsifiers, belief contradictions, and structural
+        holes / thin domains — not scraped news. This is what makes the board surface
+        ideas worth dissecting, aligned to the owner's raised bar (rigorous original work)."""
+        try:
+            import re as _re
+            from agora.execution import frontier as _frontier
+            from agora.execution import flywheel as _flywheel
+            from agora.execution import contradictions as _contra
+            vault = self.config.get("vault_path") or "C:/Users/Danculus/my-second-brain"
+
+            def _clean(s: str) -> str:
+                # vault note ids look like 'ARI_2026-05-21_Why_AI_Systems_' — make them human
+                s = _re.sub(r"^ARI_\d{4}-\d{2}-\d{2}_", "", s or "")
+                s = s.replace("_", " ").replace("-", " ").strip()
+                return _re.sub(r"\s+", " ", s)
+
+            lead = None  # (kind, short, prompt, seedkey)
+            pick = self._stats["ticks"] % 3
+            if pick == 0:
+                oq = _flywheel.open_questions(1)
+                if oq and (oq[0].get("question")):
+                    txt = oq[0]["question"]
+                    lead = ("flywheel", txt[:70], f"Close this OPEN question with a MEASURED answer: {txt}", None)
+            if lead is None and pick == 1:
+                oc = _contra.open_contradictions(1)
+                if oc:
+                    a = _clean(oc[0].get("a_title") or oc[0].get("a") or "")
+                    b = _clean(oc[0].get("b_title") or oc[0].get("b") or "")
+                    if a and b:
+                        lead = ("contradiction", f"{a[:30]} vs {b[:30]}",
+                                f"Two of our beliefs are in tension: '{a}' vs '{b}'. Investigate which "
+                                f"holds (or the distinction that reconciles them) with evidence.", None)
+            if lead is None:
+                ft = _frontier.frontier_target(vault)
+                if ft:
+                    lead = (ft.get("kind", "frontier"), (ft.get("target") or "")[:70],
+                            ft.get("prompt", ""), ft.get("target"))
+            if lead is None:
+                return None
+            kind, short, prompt, seedkey = lead
+
+            quest_id = f"frontier-{kind}-{datetime.now().strftime('%Y%m%d_%H%M%S')}"
+            title = f"Research question: {short}"
+            goal = (
+                f"{prompt}\n\nBAR (owner): serious, RIGOROUS, ORIGINAL research — not a textbook "
+                f"restatement. Aim for a measured result with a falsifier (Lab simulation or real "
+                f"data; formal model where useful). If it has genuine merit, it becomes a Ship-review "
+                f"for Claude to develop into rigorous shipped work."
+            )
+            res = await self.qe.create_quest(
+                quest_id=quest_id, title=title, goal=goal, subsystem="knowledge",
+                success_criteria=["Frame a sharp, testable question",
+                                  "Produce a measured finding + falsifier",
+                                  "Submit for CEO/CTO evaluation"],
+                reward=25, phase="head", research_source=f"frontier:{kind}",
+            )
+            if "error" in res:
+                return None
+            await self.qe.assign_quest(quest_id, "scout")
+            if seedkey:
+                _frontier.record_seeded(seedkey, kind)
+            self._stats["frontier_seeded"] = self._stats.get("frontier_seeded", 0) + 1
+            print(f"[Frontier] seeded research question: {title[:60]}")
+            return {"stage": "scout", "status": "new_quest", "quest_id": quest_id, "title": title}
+        except Exception as e:
+            print(f"[Frontier] seed error: {e}")
+            return None
 
     # ═══════════════════════════════════════════
     # STEP 2: HEAD — Research phase
