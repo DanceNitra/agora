@@ -1014,6 +1014,32 @@ async def brain_lab():
     return {"status": "ok", "report": format_lab(), "experiments": recent()}
 
 
+@router.get("/brain/crucible-synthesis")
+async def brain_crucible_synthesis():
+    """THE SYNTHESIS ORGAN — the latest candidate unifying thesis across the rigorous corpus."""
+    from agora.execution.synthesis import format_synthesis, gather_findings, _load, _STORE
+    return {"status": "ok", "report": format_synthesis(),
+            "n_findings": len(gather_findings()), "proposals": _load(_STORE, [])[-5:]}
+
+
+@router.post("/brain/crucible-synthesis/run")
+async def brain_crucible_synthesis_run(request: Request):
+    """Queue a grand-synthesis task for Claude (the organ gathers the rigorous corpus; Claude
+    produces the unifying thesis — cross-finding synthesis is Claude's job, not a cheap LLM call)."""
+    import asyncio as _aio
+    from agora.execution.synthesis import queue_synthesis
+    return await _aio.to_thread(queue_synthesis)
+
+
+@router.post("/brain/crucible-synthesis/record")
+async def brain_crucible_synthesis_record(request: Request):
+    """Claude writes the synthesized thesis back to the organ's ledger."""
+    from agora.execution.synthesis import record_thesis
+    b = await request.json()
+    return record_thesis(b.get("thesis") or "", b.get("rests_on") or [], b.get("why") or "",
+                         b.get("falsifier") or "", b.get("honest", True), b.get("note_path") or "")
+
+
 @router.get("/brain/methods")
 async def brain_methods():
     """THE METHODS LIBRARY — parameterized experiment templates + the autonomous-run ledger."""
