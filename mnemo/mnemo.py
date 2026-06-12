@@ -46,6 +46,11 @@ import time
 import uuid
 from pathlib import Path
 
+try:                                  # OPTIONAL: numpy only ACCELERATES semantic recall at scale.
+    import numpy as _np               # mnemo still runs (pure-Python cosine) with no numpy installed.
+except Exception:
+    _np = None
+
 __version__ = "0.1.0"
 _WORD = re.compile(r"[a-z0-9][a-z0-9\-']{2,}")
 _STOP = frozenset("the a an of for to in on and or is are was were be been with this that it its as "
@@ -79,6 +84,9 @@ class Mnemo:
         # embedder pays (measured crossover ~300-600 notes; semantic then wins 3.6-5x). Tunable.
         self.semantic_threshold = 300
         self._last_mode = "lexical"              # which mode the most recent recall() actually used
+        self._mat = None                         # cached L2-normalized matrix of memory vectors (numpy)
+        self._vec_rowof: dict[str, int] = {}     # memory id -> its row in self._mat
+        self._mat_built_n = -1                   # item count when the matrix was built (rebuild on change)
         if self.path and self.path.exists():
             try:
                 self.items = json.loads(self.path.read_text(encoding="utf-8"))
@@ -111,6 +119,27 @@ class Mnemo:
             return self.embed(query)
         except Exception:
             return None
+
+    def _vec_matrix(self):
+        """Cached L2-normalized matrix (numpy) of every memory that carries a vec — so a semantic
+        recall is ONE matmul, not an O(N·d) pure-Python cosine loop. Rebuilt only when the item count
+        changes (remember / bulk load); status changes (consolidate) don't touch the vectors."""
+        if _np is None:
+            return None
+        if self._mat is None or self._mat_built_n != len(self.items):
+            rows, ids = [], []
+            for r in self.items:
+                if r.get("vec"):
+                    rows.append(r["vec"]); ids.append(r["id"])
+            if rows:
+                M = _np.asarray(rows, dtype=_np.float32)
+                M /= (_np.linalg.norm(M, axis=1, keepdims=True) + 1e-9)
+                self._mat = M
+                self._vec_rowof = {i: k for k, i in enumerate(ids)}
+            else:
+                self._mat, self._vec_rowof = None, {}
+            self._mat_built_n = len(self.items)
+        return self._mat
 
     def _rec_tokens(self, rec: dict) -> set:
         """Token set for a memory, cached by id — recall over N memories shouldn't re-tokenize."""
@@ -151,10 +180,20 @@ class Mnemo:
             mode == "semantic" or (mode == "auto" and len(pool) >= self.semantic_threshold))
         qvec = self._qvec(query) if use_semantic else None    # None -> lexical (also if embed fails)
         self._last_mode = "semantic" if qvec is not None else "lexical"
-        qtok = None if qvec is not None else _tokens(query)   # tokenize the query once, not per memory
+        qtok = _tokens(query)                                 # tokenize the query once (lexical + fallback)
+        # Vectorized semantic fast-path: one matmul gives the cosine to every vec-bearing memory.
+        sims_vec = None
+        if qvec is not None and _np is not None:
+            M = self._vec_matrix()
+            if M is not None:
+                qv = _np.asarray(qvec, dtype=_np.float32)
+                sims_vec = M @ (qv / (float(_np.linalg.norm(qv)) or 1.0))
         scored = []
         for r in pool:
-            sim = self._similarity(query, r, qvec, qtok)
+            if sims_vec is not None and r.get("vec") and r["id"] in self._vec_rowof:
+                sim = max(0.0, float(sims_vec[self._vec_rowof[r["id"]]]))
+            else:                                             # pure-Python cosine, or lexical fallback
+                sim = self._similarity(query, r, qvec, qtok)
             if sim <= 0:
                 continue
             score = sim * (1.0 + math.log1p(max(0.0, r["value"])))
