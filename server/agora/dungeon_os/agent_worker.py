@@ -432,6 +432,17 @@ class CorporationWorker:
                 })
 
         if all_findings:
+            # Populate research_summary with the ACTUAL findings so CEO/CTO evaluate the research,
+            # not an empty field/the bare question. (Empty summaries were why ~100% got rejected.)
+            summary_text = " | ".join(
+                f"[{f['researcher']}] {f['summary']}" for f in all_findings if f.get("summary"))[:1500]
+            if summary_text:
+                try:
+                    await self.qe.db.execute(
+                        "UPDATE quests SET research_summary=? WHERE id=?", (summary_text, quest_id))
+                    await self.qe.db.commit()
+                except Exception as e:
+                    print(f"[Head] research_summary store error: {e}")
             await self.qe.submit_for_review(quest_id, "scout")
 
         self._stats["head_completed"] += 1
@@ -854,23 +865,21 @@ class CorporationWorker:
             print(f"[Corp→Claude] ship-review file error: {e}")
 
     def _is_noteworthy(self, results: list[dict]) -> bool:
-        """True only if this tick produced a material outcome worth a Telegram ping.
-        Routine 'system healthy', design-file churn, and QA-flagged retries are NOT."""
+        """Fire the owner's briefing on REAL signals — he wants visibility into health and why agents
+        stall. That includes the MetaScanner's self-diagnostics (agents stuck, too many rejections),
+        completed research, approvals, and shipped commits. Repetition is held down upstream by the
+        MetaScanner's one-live-quest-per-title dedup, so the same alert no longer repeats every tick."""
         for r in results:
             stage = r.get("stage", "")
+            if stage == "meta" and r.get("quest_id"):        # a NEW health/diagnostic alert
+                return True
             if stage == "pata" and r.get("git_commit", {}).get("sha"):
                 return True
-            if stage == "evaluation" and r.get("approved"):
+            if stage == "evaluation":                        # approved OR rejected — both are signal
                 return True
             if stage == "head" and r.get("findings_count", 0) > 0:
                 return True
             if stage == "scout" and r.get("status") == "new_quest":
-                return True
-            if stage == "synthesis":  # knowledge actually stored to the vault
-                return True
-            if stage == "compound" and any(
-                d.get("memories_stored", 0) for d in r.get("details", [])
-            ):
                 return True
         return False
 

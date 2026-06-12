@@ -45,10 +45,11 @@
   .hud-agent .th { font-size: 10px; color: #ffcf9a; opacity: .85; min-height: 13px;
     white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
   #hud-log {
-    position: fixed; bottom: 30px; right: 12px; z-index: 12; width: 340px;
+    position: fixed; bottom: 30px; right: 12px; z-index: 11; width: 340px;
     padding: 7px 9px; border-radius: 6px; font-family: monospace; font-size: 11px;
     background: rgba(8,6,14,0.74); border: 1px solid #322c46; pointer-events: none;
     backdrop-filter: blur(2px);
+    max-height: 36vh; overflow: hidden;   /* stay clear of the quest board above */
   }
   .hud-log-title { color: #ffaa44; font-size: 9px; letter-spacing: 1.5px; margin-bottom: 5px; opacity: .9; }
   #hud-log-lines { display: flex; flex-direction: column; gap: 3px; }
@@ -63,6 +64,7 @@
     padding: 7px 9px; border-radius: 6px; font-family: monospace; font-size: 11px;
     background: rgba(8,6,14,0.74); border: 1px solid #322c46; pointer-events: none;
     backdrop-filter: blur(2px);
+    max-height: 54vh; overflow: hidden;   /* never grow under the event log */
   }
   #hud-task-lines { display: flex; flex-direction: column; gap: 5px; }
   .q-row { display: flex; gap: 6px; align-items: flex-start; }
@@ -85,6 +87,11 @@
   .q-row.done .q-init { background: #7fd99a; }
   .q-row.done .q-meter > i { background: #7fd99a; }
   #hud-research-lines { display: flex; flex-direction: column; gap: 5px; margin-bottom: 6px; }
+  #hud-pulse { color: #9affc0; font-size: 10px; margin: 2px 0 5px; opacity: .92; }
+  #hud-pulse b { color: #d6ffe6; font-weight: bold; }
+  #hud-pulse.beat { animation: pulsebeat .5s ease-out; }
+  @keyframes pulsebeat { from { color: #ffffff; } to { color: #9affc0; } }
+  #p-rate { opacity: .6; }
   .hud-research-sub { color: #ffd27a; font-size: 10px; opacity: .85; margin-bottom: 3px; }
   .research-idea { color: #d9d2f2; line-height: 1.35; white-space: normal;
   .hud-research-sub { color: #ffd27a; font-size: 10px; opacity: .85; margin-bottom: 3px; }
@@ -172,7 +179,7 @@
 <div id="thought-bubble"></div>
 <div id="status">Dungeon OS — Connecting...</div>
 <div id="hud-roster"></div>
-<div id="hud-tasks"><div class="hud-log-title">📜 QUEST BOARD</div><div class="hud-research-sub">💡 RESEARCH IDEAS</div><div id="hud-research-lines"><div id="hud-research-empty">seeding research questions…</div></div><div id="hud-task-lines"></div></div>
+<div id="hud-tasks"><div class="hud-log-title">📜 QUEST BOARD</div><div id="hud-pulse">⚡ this session — <b id="p-disc">0</b> findings · <b id="p-talk">0</b> exchanges · <b id="p-done">0</b> done<span id="p-rate"></span></div><div class="hud-research-sub">💡 RESEARCH IDEAS</div><div id="hud-research-lines"><div id="hud-research-empty">seeding research questions…</div></div><div id="hud-task-lines"></div></div>
 <div id="hud-log"><div class="hud-log-title">⚔ EVENT LOG</div><div id="hud-log-lines"></div></div>
 <div id="hud-trust"><div class="hud-log-title">🤝 RELATIONSHIPS · ESS TRUST</div><div id="hud-trust-lines"><div id="hud-trust-empty">building bonds…</div></div></div>
 <div id="hud-os"><div class="hud-log-title">⚙ AGENTIC OS — BUILD LOG</div><div id="hud-os-lines"><div id="hud-os-empty">agents are starting to build…</div></div></div>
@@ -1191,7 +1198,7 @@ if (!renderer.getContext()) {
     div.className = 'hud-line' + (cls ? ' ' + cls : '');
     div.innerHTML = html;
     el.prepend(div);
-    while (el.children.length > 16) el.lastChild.remove();
+    while (el.children.length > 9) el.lastChild.remove();
   }
 
   // Live progress animator — a working quest's meter creeps up over time (asymptotes to ~92%,
@@ -1220,7 +1227,15 @@ if (!renderer.getContext()) {
   function renderQuestRows() {
     const el = document.getElementById('hud-task-lines');
     if (!el) return;
-    el.innerHTML = (_lastTasks || []).map(t => {
+    // Working rows first (every active agent visible), then queued; dedup by title; cap to fit.
+    const seen = new Set();
+    const rows = (_lastTasks || []).filter(t => {
+      const k = (t.title || '').toLowerCase().trim();
+      if (seen.has(k)) return false;
+      seen.add(k);
+      return true;
+    }).sort((a, b) => (b.status === 'in_progress') - (a.status === 'in_progress')).slice(0, 9);
+    el.innerHTML = rows.map(t => {
       const working = t.status === 'in_progress';
       const done = t.status === 'done';
       const p = (typeof t.progress === 'number') ? Math.round(t.progress) : (done ? 100 : working ? 50 : 6);
@@ -1233,6 +1248,24 @@ if (!renderer.getContext()) {
              `<div class="q-pct">${p}%</div></div>`;
     }).join('');
   }
+
+  // PULSE — a zero-cost live progress metric: just counts the real events the server already
+  // broadcasts (findings, exchanges, completions). Always moves while the system works, no fetch.
+  const Pulse = (() => {
+    const c = { disc: 0, talk: 0, done: 0 };
+    const start = Date.now();
+    const el = { disc: 'p-disc', talk: 'p-talk', done: 'p-done' };
+    function bump(k) {
+      c[k]++;
+      const e = document.getElementById(el[k]); if (e) e.textContent = c[k];
+      const box = document.getElementById('hud-pulse');
+      if (box) { box.classList.remove('beat'); void box.offsetWidth; box.classList.add('beat'); }
+      const mins = (Date.now() - start) / 60000;
+      const rate = document.getElementById('p-rate');
+      if (rate && mins > 0.3) rate.textContent = `  ·  ${((c.disc + c.done) / mins).toFixed(1)}/min`;
+    }
+    return { bump };
+  })();
 
   // Apply an incremental event broadcast by the server
   function applyEvent(ev) {
@@ -1301,6 +1334,7 @@ if (!renderer.getContext()) {
         break;
       case 'os_build':
         OSHUD.build(ev);
+        if (ev.kind === 'discovery' || ev.kind === 'collab') Pulse.bump('disc');
         break;
       case 'os_snapshot':
         OSHUD.snapshot(ev.log);
@@ -1313,11 +1347,14 @@ if (!renderer.getContext()) {
         break;
       case 'converse':
         TrustGraph.spark(ev.from, ev.to);   // a real NPC↔NPC talk → one packet flies
-        if (ev.text)                        // show the actual exchange — who says what to whom
+        if (ev.text) {                      // show the actual exchange — who says what to whom
           logEvent(`💬 <b>${_esc(_shortNm(ev.from_name))}</b> → ${_esc(_shortNm(ev.to_name))}: ${_esc(ev.text)}`, 'conv');
+          Pulse.bump('talk');
+        }
         break;
       case 'quest_done':                    // a quest finished → announce it; the next takes its place
         logEvent(`✅ <b>${_esc(_shortNm(ev.agent))}</b> completed: ${_esc(ev.title)}`, 'done');
+        Pulse.bump('done');
         break;
       case 'os_modules_snapshot':
         (ev.modules || []).forEach(m => buildModule(m.name, m.tile[0], m.tile[1], m.color));
@@ -1381,14 +1418,10 @@ if (!renderer.getContext()) {
       },
       update(ev) {
         const p = ensure(ev.a, ev.b, ev.a_name, ev.b_name);
-        const before = p.score;
         paint(p, ev.score);
         p.row.classList.remove('flash'); void p.row.offsetWidth; p.row.classList.add('flash');
-        const an = short(ev.a_name), bn = short(ev.b_name);
-        if (ev.outcome === 'cooperate')
-          logLine(`🤝 ${an} & ${bn} grew closer (${ev.score.toFixed(2)})`);
-        else
-          logLine(`⚔ ${an} & ${bn} fell out (${ev.score.toFixed(2)})`);
+        // Trust deltas update the RELATIONSHIPS bar only — they no longer spam the Event Log
+        // (the owner wants the log reserved for real questions + completions, not "grew closer").
         reorder();
       },
     };
@@ -1568,8 +1601,17 @@ if (!renderer.getContext()) {
         const r = await fetch(`${BRAIN}/api/v2/dungeon-os/quests`);
         if (!r.ok) return;
         const data = await r.json();
-        _quests = (data.quests || []).filter(q =>
-          q.phase === 'head' || /research|frontier/i.test((q.title || '') + (q.id || '')));
+        const seen = new Set();
+        _quests = (data.quests || []).filter(q => {
+          if (!(q.phase === 'head' || /research|frontier/i.test((q.title || '') + (q.id || '')))) return false;
+          const k = (q.title || '').toLowerCase().trim();   // dedup repeated meta-quests by title
+          if (seen.has(k)) return false;
+          seen.add(k);
+          return true;
+        }).sort((a, b) => {                                  // live work first, finished last
+          const dn = (q) => (q.status === 'done' || q.status === 'completed') ? 1 : 0;
+          return dn(a) - dn(b);
+        }).slice(0, 5);
         render();
       } catch (e) { /* brain may be restarting — keep last render */ }
     }

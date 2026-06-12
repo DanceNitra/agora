@@ -312,6 +312,20 @@ class MetaScanner:
         goal = template["goal"].format(**trigger)
 
         try:
+            # DEDUP: the trigger keeps firing while the condition persists, which used to
+            # create the same meta-quest every scan (the board showed it 3×). One live
+            # copy per title is enough.
+            cur = await self.qe.db.execute(
+                "SELECT COUNT(*) FROM quests WHERE title=? AND status IN ('open','claimed','review')",
+                (title,),
+            )
+            row = await cur.fetchone()
+            if row and row[0] > 0:
+                return None
+        except Exception:
+            pass
+
+        try:
             result = await self.qe.create_quest(
                 quest_id=quest_id,
                 title=title,
