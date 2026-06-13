@@ -308,6 +308,110 @@ def seminar_stats() -> dict:
             "topics_synthesized": sum(1 for t in topics if t.get("status") == "synthesized")}
 
 
+_SEMLOG = _SERVER / ".seminar_log.json"
+_running = False        # in-flight guard: one group seminar at a time (a round is network+LLM heavy)
+
+
+def inject_topic(headline: str, prompt: str = "", source: str = "claude") -> dict:
+    """Push a topic into the seminar pool — used when Claude (or the owner) hands the team a
+    question to research. It jumps the queue as an open thread the agents will pick up."""
+    headline = (headline or "").strip()
+    if not headline:
+        return {"error": "empty"}
+    topics = _load(_TOPICS, [])
+    if any(t.get("headline", "").lower() == headline.lower() for t in topics):
+        return {"status": "exists", "headline": headline}
+    t = {"id": _id(headline), "topic": prompt or f"Investigate and stress-test: {headline}. "
+         f"Produce a falsifiable claim grounded in literature or the vault, and what would refute it.",
+         "headline": headline, "source": source, "status": "open", "n_contrib": 0,
+         "contribution_ids": [], "opened": time.time(), "last_advanced": 0.0}
+    topics.append(t)
+    _save(_TOPICS, topics)
+    return {"status": "ok", "headline": headline, "id": t["id"]}
+
+
+def log_round(topic: dict, contributors: list, passed: list, contribution: dict | None) -> None:
+    """Record one group-seminar round (who contributed, who passed and why) for the report."""
+    log = _load(_SEMLOG, [])
+    log.append({"ts": time.time(), "topic": topic.get("headline", "")[:80],
+                "contributors": contributors[:8], "passed": passed[:8],
+                "claim": (contribution or {}).get("claim", "")[:160] if contribution else ""})
+    _save(_SEMLOG, log[-200:])                       # rolling
+
+
+def run_group_seminar(npcs: list[dict], vault: str) -> dict:
+    """ALL agents work ONE topic together. Each agent brings the relevant KNOWLEDGE its memory
+    surfaces (MNEMO recall) — not decorative chatter — and only if it genuinely has something;
+    the rest pass (honestly logged). ONE rapporteur then synthesizes the team's combined knowledge
+    into a single grounded Contribution. One synthesis LLM call per round (fast on a shared GPU,
+    and 'work not chat'). Sync (network + LLM); call via to_thread. Returns a round summary."""
+    global _running
+    if _running:
+        return {"topic": "", "contributors": [], "passed": [], "contribution": None,
+                "skipped": "a round is already running"}
+    _running = True
+    try:
+        return _run_group_seminar_inner(npcs, vault)
+    finally:
+        _running = False
+
+
+def _run_group_seminar_inner(npcs: list[dict], vault: str) -> dict:
+    from agora.execution import mnemo_bridge
+
+    topic = pick_topic(vault)
+    contributors, passed, brought = [], [], []
+    for n in npcs[:8]:
+        name = n.get("npc_name") or n.get("npc_id", "agent")
+        role = n.get("role") or name
+        can, ctx = mnemo_bridge.agent_can_contribute(role, topic.get("headline", ""))
+        if can and ctx:
+            contributors.append({"id": n.get("npc_id"), "name": name})
+            brought.append(f"{name} brings: {ctx[:200]}")
+        else:
+            passed.append({"agent": name, "why": "no relevant memory"})
+    contribution = None
+    if contributors:
+        # the "exchange" is the team's pooled knowledge; the rapporteur synthesizes one claim
+        transcript = "\n".join(brought)
+        contribution = extract_contribution(topic, transcript, [c["name"] for c in contributors])
+        if contribution:
+            mnemo_bridge.remember_contribution(contribution["claim"], contribution.get("evidence", ""),
+                                               tags=[topic.get("headline", "")[:40]])
+    log_round(topic, [c["name"] for c in contributors], passed, contribution)
+    return {"topic": topic.get("headline", ""), "contributors": contributors,
+            "passed": passed, "contribution": contribution}
+
+
+def research_report(hours: int = 3) -> str:
+    """A Telegram-ready digest of what the team researched: topics advanced, contributions made,
+    what was skipped and WHY, and what is ripe for synthesis. For the owner while away."""
+    now = time.time()
+    cutoff = now - hours * 3600
+    contribs = [c for c in _load(_CONTRIB, []) if c.get("ts", 0) >= cutoff]
+    rounds = [r for r in _load(_SEMLOG, []) if r.get("ts", 0) >= cutoff]
+    topics = _load(_TOPICS, [])
+    ripe = [t["headline"] for t in topics if t.get("status") == "synthesized"]
+    passed_counts: dict = {}
+    for r in rounds:
+        for p in r.get("passed", []):
+            passed_counts[p.get("why", "?")] = passed_counts.get(p.get("why", "?"), 0) + 1
+    lines = [f"[RESEARCH REPORT] last {hours}h — team seminar"]
+    lines.append(f"Rounds: {len(rounds)} | Contributions: {len(contribs)} "
+                 f"(grounded {sum(1 for c in contribs if c.get('grounded'))})")
+    for c in contribs[-5:]:
+        who = "+".join(c.get("partners", [])[:3])
+        lines.append(f"+ [{c.get('topic','')[:32]}] {c['claim'][:90]}  ({who})")
+    if not contribs:
+        lines.append("(no new contributions — topics too thin or memory had nothing relevant)")
+    skipped = "; ".join(f"{v}x {k}" for k, v in sorted(passed_counts.items(), key=lambda x: -x[1]))
+    if skipped:
+        lines.append(f"Skipped turns: {skipped}")
+    if ripe:
+        lines.append(f"Ripe for synthesis: {', '.join(ripe[:4])}")
+    return "\n".join(lines)[:3900]
+
+
 def topic_threads(n: int = 8) -> list[dict]:
     topics = _load(_TOPICS, [])
     topics.sort(key=lambda t: -t.get("last_advanced", t.get("opened", 0)))

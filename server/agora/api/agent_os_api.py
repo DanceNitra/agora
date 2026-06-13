@@ -896,6 +896,23 @@ async def brain_funnel():
     return await _aio.to_thread(compute_funnel)
 
 
+@router.post("/brain/seminar/topic")
+async def brain_seminar_inject(request: Request):
+    """Hand the agent team a topic to research (Claude or owner). It becomes an open thread."""
+    from agora.execution.seminar import inject_topic
+    b = await request.json()
+    return inject_topic(b.get("headline") or b.get("topic") or "", b.get("prompt") or "",
+                        b.get("source") or "claude")
+
+
+@router.get("/brain/seminar/report")
+async def brain_seminar_report(hours: int = 3):
+    """The team's research report — topics advanced, contributions, what was skipped and why."""
+    from agora.execution.seminar import research_report, seminar_stats, topic_threads
+    return {"report": research_report(hours), "stats": seminar_stats(),
+            "threads": topic_threads(10)}
+
+
 @router.get("/brain/funnel/view")
 async def brain_funnel_view():
     """THE VALUE FUNNEL (HTML) — does the work produce value, and at what cost? One page."""

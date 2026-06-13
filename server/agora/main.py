@@ -676,6 +676,30 @@ async def idea_forge_loop(app: FastAPI):
         await _aio.sleep(12 * 3600)                           # ~twice a day
 
 
+async def seminar_report_loop(app: FastAPI):
+    """While the owner is away, push a Telegram research report every ~3h: what the team
+    researched, what was skipped and why, what got synthesized. Also seeds the shared MNEMO
+    store once at startup so the contribution gate isn't cold."""
+    import asyncio as _aio
+    await _aio.sleep(240)                                     # let startup settle
+    try:
+        from agora.execution.mnemo_bridge import seed_recent
+        n = await _aio.to_thread(seed_recent)
+        print(f"[Seminar] MNEMO seeded with {n} memories")
+    except Exception as e:
+        print(f"[Seminar] MNEMO seed error: {e}")
+    while True:
+        await _aio.sleep(3 * 3600)                            # every ~3h
+        try:
+            from agora.execution.seminar import research_report
+            from agora.execution.telegram_bot import send
+            report = research_report(hours=3)
+            await send(report)
+            print("[Seminar] research report sent")
+        except Exception as e:
+            print(f"[Seminar] report error: {e}")
+
+
 async def db_retention_loop(app: FastAPI):
     """Keep agora.db bounded: once a day, prune operational-log tables to a rolling window and
     drop stale byzantine-violation noise, then reclaim space. Knowledge tables are never touched.
@@ -729,6 +753,10 @@ async def lifespan(app: FastAPI):
         loop.create_task(db_retention_loop(app))   # daily: keep agora.db bounded (anti-lag)
     except Exception as _e:
         print(f"[Retention] not started: {_e}")
+    try:
+        loop.create_task(seminar_report_loop(app))  # ~3h: Telegram research report + seed MNEMO
+    except Exception as _e:
+        print(f"[Seminar] report loop not started: {_e}")
     yield
     if hasattr(app.state, 'db') and app.state.db:
         await app.state.db.close()
@@ -1086,41 +1114,34 @@ async def _brain_ecosystem_tick(app: FastAPI):
         except Exception:
             pass
 
-    # A 2-turn conversation between two agents, on a REAL open research question, that must
-    # terminate in a recorded Contribution (the Seminar — replaces the old dungeon-fiction chat
-    # that burned ~2.36M tokens for zero captured value). Throttled: it only fires when it has
-    # real work to do, not 60% of every tick.
-    if len(npcs) >= 2 and random.random() < 0.35:
-        async def _run_convo():
+    # GROUP SEMINAR — all agents work ONE topic together; each contributes only if MNEMO says it
+    # genuinely can, the rest pass (honestly logged). A rapporteur synthesizes one grounded
+    # Contribution from the multi-agent exchange. Replaces the old dungeon-fiction pairwise chat
+    # that burned ~2.36M tokens for zero captured value.
+    if len(npcs) >= 2 and random.random() < 0.5:
+        async def _run_seminar():
             try:
                 from agora.execution import seminar
                 from agora.config import settings
                 vault = settings.vault_path or "C:/Users/Danculus/my-second-brain"
-                a, b = random.sample(npcs, 2)
-                topic = seminar.pick_topic(vault)
-                sid = await agent_os._start_conversation(
-                    a["npc_id"], b["npc_id"], topic["topic"][:80],
-                    intent="research", broadcast_fn=_bcast)
-                cur = await db.execute(
-                    "SELECT speaker_name, message FROM agent_conversations "
-                    "WHERE session_id=? ORDER BY turn_number", (sid,))
-                rows = await cur.fetchall()
-                transcript = "\n".join(f"{r['speaker_name']}: {r['message']}" for r in rows)
-                partners = [a.get("npc_name") or a["npc_id"], b.get("npc_name") or b["npc_id"]]
-                c = await asyncio.to_thread(seminar.extract_contribution, topic, transcript, partners)
-                if c:
-                    # ECONOMY (Layer 4): a productive exchange pays both partners — standing is
-                    # earned by recorded contributions, not by chatter, so value-production
-                    # becomes the agents' incentive.
-                    for nid in (a["npc_id"], b["npc_id"]):
-                        await db.execute("UPDATE agent_identities SET energy_balance = "
-                                         "energy_balance + 3 WHERE agent_id=?", (nid,))
+                res = await asyncio.to_thread(seminar.run_group_seminar, npcs, vault)
+                c = res.get("contribution")
+                if c and res.get("contributors"):
+                    # ECONOMY (Layer 4): every agent whose angle fed a real contribution is paid;
+                    # passing (nothing relevant) pays nothing — value-production is the incentive.
+                    for cc in res["contributors"]:
+                        if cc.get("id"):
+                            await db.execute("UPDATE agent_identities SET energy_balance = "
+                                             "energy_balance + 3 WHERE agent_id=?", (cc["id"],))
                     await db.commit()
-                    print(f"[Seminar] contribution on '{topic.get('headline')}' "
-                          f"by {'+'.join(partners)} (+3 each): {c['claim'][:60]}")
+                    print(f"[Seminar] GROUP contribution on '{res['topic']}' by "
+                          f"{len(res['contributors'])} agents: {c['claim'][:60]}")
+                else:
+                    print(f"[Seminar] group round on '{res.get('topic')}' — "
+                          f"{len(res.get('contributors', []))} spoke, no contribution")
             except Exception as e:
-                print(f"[Seminar] conversation error: {e}")
-        asyncio.create_task(_run_convo())
+                print(f"[Seminar] group error: {e}")
+        asyncio.create_task(_run_seminar())
 
     # Group brainstorm — every 30 ticks (background so it never blocks the tick)
     if tick % 30 == 0 and len(npcs) >= 2:
