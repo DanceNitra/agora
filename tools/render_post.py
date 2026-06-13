@@ -12,7 +12,7 @@ import re
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
-SITE = "https://dancenitra.github.io/agora"
+SITE = "https://dancenitra.github.io/agora/public"
 
 META = {
     "pre-trends": {
@@ -268,7 +268,7 @@ TEMPLATE = """<!DOCTYPE html>
 <body>
 <div class="progress" id="prog"></div>
 <nav class="topnav">
-  <a class="brand" href="../index.html"><span class="m"></span>Agora</a>
+  <a class="brand" href="../../index.html"><span class="m"></span>Agora</a>
   <div class="navr">
     <span class="lng"><button data-l="en" class="on">EN</button><button data-l="sk">SK</button></span>
     <a href="index.html"><span class="en">← All writing</span><span class="sk">← Všetky texty</span></a>
@@ -383,10 +383,10 @@ INDEX_TEMPLATE = """<!DOCTYPE html>
 </head>
 <body>
 <nav class="topnav">
-  <a class="brand" href="../index.html"><span class="m"></span>Agora</a>
+  <a class="brand" href="../../index.html"><span class="m"></span>Agora</a>
   <div class="navr">
     <span class="lng"><button data-l="en" class="on">EN</button><button data-l="sk">SK</button></span>
-    <a href="../index.html"><span class="en">Home ↗</span><span class="sk">Domov ↗</span></a>
+    <a href="../../index.html"><span class="en">Home ↗</span><span class="sk">Domov ↗</span></a>
   </div>
 </nav>
 
