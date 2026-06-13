@@ -215,10 +215,15 @@ def call_llm(
                     pass
 
                 # deepseek-v4-flash intermittently returns an empty completion (finish=stop,
-                # no error) — retry a couple times before giving up on this call.
-                if not content.strip() and attempt < 2:
-                    time.sleep(0.4)
-                    continue
+                # no error) — and a usage cap can surface as empty too. Retry a couple times, then
+                # treat persistent empty as a failure so we FALL THROUGH to local qwen3-coder
+                # (never return an empty string — that silently broke seminar synthesis).
+                if not content.strip():
+                    if attempt < 2:
+                        time.sleep(0.4)
+                        continue
+                    errors.append(f"{tier_name}({model}): empty completion x3")
+                    break
 
                 # Log successful fallback (so we know when it happens)
                 if errors:
