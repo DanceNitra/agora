@@ -1086,19 +1086,33 @@ async def _brain_ecosystem_tick(app: FastAPI):
         except Exception:
             pass
 
-    # A 2-turn conversation between two agents (background; Layer 2)
-    if len(npcs) >= 2 and random.random() < 0.6:
+    # A 2-turn conversation between two agents, on a REAL open research question, that must
+    # terminate in a recorded Contribution (the Seminar — replaces the old dungeon-fiction chat
+    # that burned ~2.36M tokens for zero captured value). Throttled: it only fires when it has
+    # real work to do, not 60% of every tick.
+    if len(npcs) >= 2 and random.random() < 0.35:
         async def _run_convo():
             try:
+                from agora.execution import seminar
+                from agora.config import settings
+                vault = settings.vault_path or "C:/Users/Danculus/my-second-brain"
                 a, b = random.sample(npcs, 2)
-                topics = ["the dungeon's secrets", "a new discovery",
-                          "how to improve cooperation", "ancient artifacts",
-                          "a threat in the dungeon"]
-                await agent_os._start_conversation(
-                    a["npc_id"], b["npc_id"], random.choice(topics),
-                    intent="chat", broadcast_fn=_bcast)
+                topic = seminar.pick_topic(vault)
+                sid = await agent_os._start_conversation(
+                    a["npc_id"], b["npc_id"], topic["topic"][:80],
+                    intent="research", broadcast_fn=_bcast)
+                cur = await db.execute(
+                    "SELECT speaker_name, message FROM agent_conversations "
+                    "WHERE session_id=? ORDER BY turn_number", (sid,))
+                rows = await cur.fetchall()
+                transcript = "\n".join(f"{r['speaker_name']}: {r['message']}" for r in rows)
+                partners = [a.get("npc_name") or a["npc_id"], b.get("npc_name") or b["npc_id"]]
+                c = await asyncio.to_thread(seminar.extract_contribution, topic, transcript, partners)
+                if c:
+                    print(f"[Seminar] contribution on '{topic.get('headline')}' "
+                          f"by {'+'.join(partners)}: {c['claim'][:60]}")
             except Exception as e:
-                print(f"[BrainEcosystem] conversation error: {e}")
+                print(f"[Seminar] conversation error: {e}")
         asyncio.create_task(_run_convo())
 
     # Group brainstorm — every 30 ticks (background so it never blocks the tick)
@@ -1106,20 +1120,26 @@ async def _brain_ecosystem_tick(app: FastAPI):
         async def _run_brainstorm():
             try:
                 from agora.agent_os.brainstorm_engine import BrainstormEngine
-                topics = ["How can we make the dungeon safer?",
-                          "What new resources should we seek?",
-                          "How can agents help each other better?",
-                          "How can we improve our coordination?"]
+                from agora.execution import seminar
+                from agora.config import settings
+                vault = settings.vault_path or "C:/Users/Danculus/my-second-brain"
+                topic = seminar.pick_topic(vault)
                 bm = BrainstormEngine(db)
                 init = npcs[0]
-                sid = await bm.start_session(random.choice(topics), init["npc_name"], init["npc_id"])
+                sid = await bm.start_session(topic["topic"][:90], init["npc_name"], init["npc_id"])
                 ids = [n["npc_id"] for n in npcs]
                 ideas = await bm.generate_ideas(sid, ids, broadcast_fn=_bcast)
                 await bm.build_on_ideas(sid, ids, broadcast_fn=_bcast)
                 ranked = await bm.vote_on_ideas(sid, ids)
                 await bm.complete_session(sid)
+                # VALUE CONTRACT: distill the brainstorm into ONE grounded Contribution
+                top_txt = "\n".join(str(i.get("idea") or i.get("content") or i)
+                                    for i in (ideas or [])[:5])
+                partners = [n["npc_name"] for n in npcs[:4]]
+                c = await asyncio.to_thread(seminar.extract_contribution, topic, top_txt, partners)
                 top = ranked[0]["votes"] if ranked else 0
-                print(f"[BrainEcosystem] brainstorm {sid[:8]} — {len(ideas)} ideas, top votes {top}")
+                print(f"[Seminar] brainstorm {sid[:8]} — {len(ideas)} ideas, top votes {top}"
+                      f"{' → contribution: ' + c['claim'][:50] if c else ' (no contribution)'}")
             except Exception as e:
                 print(f"[BrainEcosystem] brainstorm error: {e}")
         asyncio.create_task(_run_brainstorm())

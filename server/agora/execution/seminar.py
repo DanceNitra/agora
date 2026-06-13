@@ -1,0 +1,316 @@
+"""
+The Seminar — agent conversation & brainstorm turned into topic-anchored research.
+
+The leak this closes: the tick loop ran a 2-turn agent conversation ~60% of EVERY tick and a
+group brainstorm every 30 ticks, both on HARDCODED dungeon-fiction topics ("ancient artifacts",
+"a threat in the dungeon", intent='chat'). They wrote conversation/brainstorm rows and burned
+~2.36M tokens (organ 'agent-dialogue') for ZERO recorded research value — agents literally
+chatting about dungeon secrets.
+
+The Seminar implements the owner's actual intent: agents collaborate on NAMED open research
+questions, and every exchange must terminate in a recorded CONTRIBUTION — a falsifiable claim
+grounded in real literature, with what would refute it and what it connects to. Talk is the
+means; the contribution is the product. Contributions accumulate into per-topic THREADS (a living
+dossier) and are valued, so the funnel's ROI for dialogue climbs off the floor.
+
+Four layers, one module:
+  1. Value contract — a cycle counts only if it yields a Contribution (else nothing is recorded).
+  2. Structured exchange — pick_topic + extract_contribution turn a transcript into a claim.
+  3. Topics as the unit of value — contributions append to a topic thread that advances.
+  4. Measurement — value_points()/seminar_stats() feed the Metabolism and the funnel.
+"""
+from __future__ import annotations
+
+import json
+import re
+import time
+from pathlib import Path
+
+_SERVER = Path(__file__).resolve().parents[2]
+_TOPICS = _SERVER / ".topics.json"
+_CONTRIB = _SERVER / ".contributions.json"
+
+_MAX_PER_TOPIC = 4          # contributions before a topic is ripe for synthesis/press
+# folder/structure artifacts that masquerade as "domains" — never a real research topic
+_JUNK = re.compile(r"\b(meta|root|unfiled|system|inbox|daily|templates?|fleeting|sessions?|"
+                   r"backups?|attachments?|untitled)\b", re.I)
+
+
+def _is_real_topic(headline: str) -> bool:
+    return bool(headline) and len(headline) > 3 and not _JUNK.search(headline)
+
+
+# Board-aligned open research questions — the priorities the seminar should advance (finance &
+# causal inference PREMIUM; Science of Better Thinking; Future of Work). These ground reliably in
+# real literature (unlike the thinnest vault gaps), so the dialogue reliably produces a
+# Contribution instead of stalling. Rotated deterministically; deepened across many sessions.
+_TOPIC_BANK = [
+    ("difference-in-differences parallel trends robustness",
+     "Under what realistic violations is a difference-in-differences estimate most biased, and "
+     "how powerful are the standard pre-trends and sensitivity checks at catching them?"),
+    ("instrumental variables weak instrument bias",
+     "When does a plausibly-valid instrument still give badly biased causal estimates, and what "
+     "diagnostic would reveal it before the estimate is trusted?"),
+    ("regression discontinuity bandwidth sensitivity",
+     "How sensitive are regression-discontinuity effect estimates to bandwidth and functional-form "
+     "choices, and what would falsify a claimed discontinuity?"),
+    ("volatility drag geometric vs arithmetic returns",
+     "How large is the gap between arithmetic and geometric (compounded) returns under realistic "
+     "volatility, and when does it dominate a strategy's expected growth?"),
+    ("factor investing out-of-sample decay",
+     "How much of a published equity factor's premium survives out of sample after costs, and what "
+     "evidence would mark a factor as data-mined rather than real?"),
+    ("Kelly criterion fractional betting drawdown",
+     "What fraction of full-Kelly best trades off long-run growth against drawdown risk, and what "
+     "observation would refute the chosen fraction?"),
+    ("spaced repetition forgetting curve optimal interval",
+     "What review schedule maximizes long-run retention per unit study time, and what result would "
+     "overturn the spacing effect's optimality?"),
+    ("calibration of expert probability forecasts",
+     "Do structured forecasting practices measurably improve calibration over base rates, and what "
+     "would show the improvement is illusory?"),
+    ("retrieval interference in large memory stores",
+     "How does retrieval precision degrade as a memory store grows, and does value-curation recover "
+     "it — i.e. is interference, not capacity, the binding constraint?"),
+    ("automation labor displacement task-level exposure",
+     "Which job tasks are most exposed to current AI, and what evidence distinguishes augmentation "
+     "from displacement in the data so far?"),
+    ("collective intelligence team size diminishing returns",
+     "At what point does adding members stop improving a group's problem-solving, and what would "
+     "falsify a claimed collective-intelligence factor?"),
+    ("survivorship bias in performance studies",
+     "How much does survivorship bias inflate measured performance in fund/startup studies, and "
+     "what correction would change the headline conclusion?"),
+]
+_REFUSAL = re.compile(
+    r"\b(i cannot|i can't|unable to|no (?:real |specific )?source|please provide|"
+    r"as an ai|i need a|does not (?:fit|apply)|no paper (?:fits|matches))\b", re.I)
+
+
+def _load(p: Path, default):
+    try:
+        return json.loads(p.read_text(encoding="utf-8"))
+    except Exception:
+        return default
+
+
+def _save(p: Path, data) -> None:
+    try:
+        p.write_text(json.dumps(data, ensure_ascii=False, indent=1), encoding="utf-8")
+    except Exception:
+        pass
+
+
+def _id(seed: str) -> str:
+    # stable-ish short id without random (deterministic on content+len of ledger)
+    base = f"{seed}{len(_load(_CONTRIB, []))}{int(time.time())}"
+    h = 0
+    for ch in base:
+        h = (h * 131 + ord(ch)) & 0xFFFFFFFF
+    return f"{h:08x}"
+
+
+# ── Layer 3: topics as the unit of value ────────────────────────────────────
+def pick_topic(vault: str) -> dict:
+    """A REAL open research question to collaborate on. Prefers deepening an existing open
+    thread (fewest contributions first) so topics actually advance; otherwise opens a fresh one
+    from the Frontier (a thin domain or an unbridged structural hole). Never returns dungeon
+    fiction."""
+    topics = _load(_TOPICS, [])
+    live = [t for t in topics if t.get("status") in ("open", "advancing")
+            and t.get("n_contrib", 0) < _MAX_PER_TOPIC and _is_real_topic(t.get("headline", ""))]
+    # 1) deepen the least-advanced live thread most of the time
+    if live and (len(live) >= 3 or (int(time.time()) % 3) != 0):
+        live.sort(key=lambda t: (t.get("n_contrib", 0), t.get("last_advanced", 0)))
+        return live[0]
+    # 2) open a fresh topic from the board-aligned bank (reliably groundable), rotating through
+    #    it before repeating. This is the primary fresh source — the priorities to advance.
+    seen = {t.get("headline", "").lower() for t in topics}
+    for headline, prompt in _TOPIC_BANK:
+        if headline.lower() not in seen:
+            t = {"id": _id(headline), "topic": prompt, "headline": headline,
+                 "source": "board", "status": "open", "n_contrib": 0, "contribution_ids": [],
+                 "opened": time.time(), "last_advanced": 0.0}
+            topics.append(t)
+            _save(_TOPICS, topics)
+            return t
+    # 3) a substantive vault gap, framed as a synthesis to connect/extend (secondary)
+    try:
+        from agora.execution.semantic_index import SemanticIndex
+        for g in SemanticIndex().rotated_gaps(10):
+            title = g.get("title", "")
+            if _is_real_topic(title) and title.lower() not in seen:
+                t = {"id": _id(title), "topic": f"Develop or stress-test the vault idea "
+                     f"'{title}' with a NEW finding — extend it, connect it to related work, "
+                     f"or state what evidence would refute it.", "headline": title,
+                     "source": "gap", "status": "open", "n_contrib": 0, "contribution_ids": [],
+                     "opened": time.time(), "last_advanced": 0.0}
+                topics.append(t)
+                _save(_TOPICS, topics)
+                return t
+    except Exception:
+        pass
+    # 4) frontier fallback (thin domain / structural hole), junk-filtered
+    try:
+        from agora.execution.frontier import frontier_target, record_seeded
+        ft = frontier_target(vault)
+        if ft and ft.get("prompt") and _is_real_topic(ft.get("target", "")):
+            t = {"id": _id(ft["target"]), "topic": ft["prompt"], "headline": ft["target"],
+                 "source": ft.get("kind", "frontier"), "status": "open",
+                 "n_contrib": 0, "contribution_ids": [],
+                 "opened": time.time(), "last_advanced": 0.0}
+            topics.append(t)
+            _save(_TOPICS, topics)
+            try:
+                record_seeded(ft["target"], ft.get("kind", ""))
+            except Exception:
+                pass
+            return t
+    except Exception:
+        pass
+    # 3) fallback: reuse any live thread, else a generic-but-real research prompt
+    if live:
+        return live[0]
+    tid = _id("open-inquiry")
+    t = {"id": tid, "topic": "Identify one unsupported assumption in the vault's strongest "
+         "current claim and state what evidence would test it.", "headline": "self-audit",
+         "source": "fallback", "status": "open", "n_contrib": 0, "contribution_ids": [],
+         "opened": time.time(), "last_advanced": 0.0}
+    topics.append(t)
+    _save(_TOPICS, topics)
+    return t
+
+
+def _advance_topic(topic_id: str, contrib_id: str) -> None:
+    topics = _load(_TOPICS, [])
+    for t in topics:
+        if t.get("id") == topic_id:
+            t.setdefault("contribution_ids", []).append(contrib_id)
+            t["n_contrib"] = t.get("n_contrib", 0) + 1
+            t["last_advanced"] = time.time()
+            t["status"] = "synthesized" if t["n_contrib"] >= _MAX_PER_TOPIC else "advancing"
+            break
+    _save(_TOPICS, topics)
+
+
+# ── Layer 1+2: the value contract + structured extraction ────────────────────
+def _parse_json(text: str) -> dict | None:
+    """Parse the rapporteur's JSON, tolerating truncation. The model often hits the token cap
+    mid-string, leaving the JSON unclosed — so on a strict-parse failure we salvage the completed
+    string fields by key (a finished claim is still usable even if evidence got cut off)."""
+    if not text:
+        return None
+    m = re.search(r"\{.*\}", text, re.S)
+    if m:
+        try:
+            return json.loads(m.group(0))
+        except Exception:
+            pass
+    out: dict = {}
+    for key in ("claim", "evidence", "falsifier"):
+        km = re.search(rf'"{key}"\s*:\s*"((?:[^"\\]|\\.)*)"', text, re.S)
+        if km:
+            out[key] = km.group(1).replace('\\"', '"').replace("\\n", " ").strip()
+    lm = re.search(r'"links"\s*:\s*\[([^\]]*)\]', text, re.S)
+    if lm:
+        out["links"] = [s.strip().strip('"') for s in lm.group(1).split(",") if s.strip().strip('"')]
+    return out or None
+
+
+def extract_contribution(topic: dict, transcript: str, partners: list[str]) -> dict | None:
+    """Turn a real exchange into a recorded Contribution grounded in literature, or return None.
+
+    The value contract: no grounded, falsifiable claim → no contribution → nothing recorded
+    (the cycle was activity, not knowledge). NEVER invents sources. Sync; call via to_thread.
+    """
+    from agora.execution import research_tool
+    from agora.execution.llm_client import call_llm
+
+    q = topic.get("headline") or topic.get("topic", "")[:80]
+    try:
+        papers = research_tool.research(research_tool.distill_query(q), n=4)
+        if not papers:                                # second angle: terms from the full prompt
+            papers = research_tool.research(research_tool.distill_query(topic.get("topic", q)), n=4)
+    except Exception:
+        papers = []
+    # Grounding is EITHER external literature OR the user's own vault notes (a synthesis that
+    # connects/extends real notes is valuable too). Require at least one real anchor.
+    vault_notes = []
+    try:
+        from agora.execution.semantic_index import SemanticIndex
+        vault_notes = [h for h in SemanticIndex().search(q, top_k=4) if h.get("score", 0) > 0.4]
+    except Exception:
+        vault_notes = []
+    if not papers and not vault_notes:
+        return None                                   # nothing real to stand on → honest skip
+    src_block = research_tool.format_for_prompt(papers) if papers else "(no external paper found)"
+    note_block = "; ".join(f"[[{n['title']}]]" for n in vault_notes[:4]) or "(no close vault note)"
+    has_paper = bool(papers)
+    sys = (
+        "You are a research seminar's rapporteur. From the colleagues' exchange, any RELEVANT "
+        "papers, and the user's own vault notes below, state ONE substantive, falsifiable finding "
+        "the discussion reached. Ground it by CONNECTING or EXTENDING the named vault notes into a "
+        "new claim; if a paper is directly on-topic, also paraphrase its result and name it "
+        "(Author Year) — but IGNORE any listed paper that is off-topic. Never invent sources or "
+        'over-generalize. Reply ONLY JSON: {"claim":"<one falsifiable sentence>","evidence":"<how '
+        'the vault notes combine, plus (Author Year) if a paper truly applies>","falsifier":"<what '
+        'observation would refute the claim>","links":["<vault concept it connects/contradicts>"]}')
+    usr = (f"Topic: {topic.get('topic','')}\n\nExchange:\n{transcript[:1000]}\n\n"
+           f"Possibly-relevant papers (use only if on-topic):\n{src_block[:1100]}\n\n"
+           f"User's related vault notes: {note_block}")
+    out = call_llm(sys, usr, tier="cheap", max_tokens=700, temperature=0.4)
+    if not (out or "").strip():                       # transient empty (GPU contention) → one retry
+        out = call_llm(sys, usr, tier="medium", max_tokens=700, temperature=0.4)
+    d = _parse_json(out)
+    if not d:
+        return None
+    claim = (d.get("claim") or "").strip()
+    if len(claim) < 25 or _REFUSAL.search(claim) or _REFUSAL.search(d.get("evidence", "")):
+        return None                                   # vacuous / refusal → not a contribution
+    return record_contribution(topic, partners, claim, d.get("evidence", ""),
+                               d.get("falsifier", ""), d.get("links") or [],
+                               basis="literature" if has_paper else "synthesis")
+
+
+def record_contribution(topic: dict, partners: list[str], claim: str, evidence: str,
+                        falsifier: str, links: list, basis: str = "literature") -> dict:
+    """Append a Contribution to the ledger and its topic thread; advance the topic."""
+    contribs = _load(_CONTRIB, [])
+    cid = _id(claim)
+    c = {"id": cid, "ts": time.time(), "topic_id": topic.get("id"),
+         "topic": topic.get("headline") or topic.get("topic", "")[:80],
+         "partners": partners[:4], "claim": claim[:400], "evidence": evidence[:300],
+         "falsifier": falsifier[:300], "links": [str(x)[:80] for x in links][:5],
+         "basis": basis,
+         "grounded": bool(evidence and not _REFUSAL.search(evidence)), "verified": False}
+    contribs.append(c)
+    _save(_CONTRIB, contribs)
+    if topic.get("id"):
+        _advance_topic(topic["id"], cid)
+    return c
+
+
+# ── Layer 4 support + measurement ────────────────────────────────────────────
+def value_points() -> float:
+    """Seminar value for the Metabolism: 1 per grounded contribution, +2 if later verified."""
+    contribs = _load(_CONTRIB, [])
+    return float(sum(1 for c in contribs if c.get("grounded"))
+                 + 2 * sum(1 for c in contribs if c.get("verified")))
+
+
+def seminar_stats() -> dict:
+    contribs = _load(_CONTRIB, [])
+    topics = _load(_TOPICS, [])
+    grounded = sum(1 for c in contribs if c.get("grounded"))
+    return {"contributions": len(contribs), "grounded": grounded,
+            "verified": sum(1 for c in contribs if c.get("verified")),
+            "topics_open": sum(1 for t in topics if t.get("status") in ("open", "advancing")),
+            "topics_synthesized": sum(1 for t in topics if t.get("status") == "synthesized")}
+
+
+def topic_threads(n: int = 8) -> list[dict]:
+    topics = _load(_TOPICS, [])
+    topics.sort(key=lambda t: -t.get("last_advanced", t.get("opened", 0)))
+    return [{"headline": t.get("headline", t.get("topic", "")[:60]),
+             "status": t.get("status"), "n_contrib": t.get("n_contrib", 0),
+             "source": t.get("source")} for t in topics[:n]]

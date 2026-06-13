@@ -135,6 +135,13 @@ def value_snapshot() -> dict:
     env_seen = j(".envoy.json", {}).get("seen", {})
     pts["envoy"] = sum(2.0 * v.get("replies", 0) + 1.0 * v.get("our_reactions", 0)
                        for v in env_seen.values())
+    # the Seminar — agent conversation/brainstorm now must terminate in a recorded, grounded
+    # Contribution; its value is read from that ledger so 'agent-dialogue' spend finally scores.
+    try:
+        from agora.execution.seminar import value_points as _seminar_value
+        pts["dialogue"] = _seminar_value()
+    except Exception:
+        pts["dialogue"] = 0.0
     return pts
 
 
@@ -155,6 +162,7 @@ _SPEND2VALUE = {
     "cartography-hole": "cartography",
     "scout-target": "scout",
     "press-target": "press",
+    "agent-dialogue": "dialogue",       # conversations + brainstorms → Seminar contributions
 }
 
 

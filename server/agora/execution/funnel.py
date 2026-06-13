@@ -191,6 +191,28 @@ def render_funnel_html() -> str:
         f"{e['roi'] if e['roi'] is not None else '—'}</td></tr>"
         for o, e in organs[:12])
 
+    # Seminar panel — topic threads + contributions (the redirected agent dialogue)
+    sem_html = ""
+    try:
+        from . import seminar
+        st = seminar.seminar_stats()
+        threads = seminar.topic_threads(6)
+        tr = "".join(
+            f"<tr><td>{t['headline'][:48]}</td>"
+            f"<td class='{'good' if t['status']=='synthesized' else 'mid'}'>{t['status']}</td>"
+            f"<td>{t['n_contrib']}</td><td class='dim'>{t.get('source','')}</td></tr>"
+            for t in threads) or "<tr><td class='dim' colspan=4>no topics yet — seeds on next tick</td></tr>"
+        sem_html = (
+            "<div class='panel'><h2>THE SEMINAR — dialogue redirected to topics</h2>"
+            f"<div class='kpi'><div><b>{st['contributions']}</b><span>contributions</span></div>"
+            f"<div><b>{st['grounded']}</b><span>grounded</span></div>"
+            f"<div><b>{st['topics_open']}</b><span>open topics</span></div>"
+            f"<div><b>{st['topics_synthesized']}</b><span>ripe for synthesis</span></div></div>"
+            f"<table><tr><th>topic thread</th><th>status</th><th>contribs</th><th>source</th></tr>"
+            f"{tr}</table></div>")
+    except Exception:
+        pass
+
     h = d["headline"]
     return f"""<!DOCTYPE html><html><head><meta charset="utf-8"><title>Agora — Value Funnel</title>
 <meta http-equiv="refresh" content="180"><style>
@@ -226,4 +248,5 @@ td,th{{text-align:left;padding:3px 8px 3px 0}} th{{color:#6a6488;font-weight:nor
 </div>
 <table><tr><th>organ</th><th>spend</th><th>value</th><th>ROI</th></tr>{orw}</table>
 </div>
+{sem_html}
 </body></html>"""
