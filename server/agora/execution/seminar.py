@@ -120,9 +120,12 @@ def pick_topic(vault: str) -> dict:
     from the Frontier (a thin domain or an unbridged structural hole). Never returns dungeon
     fiction."""
     topics = _load(_TOPICS, [])
+    # board/claude topics are curated research questions — trust them; only frontier/gap topics
+    # (raw folder/domain names) need the junk filter. (Without this, 'meta-prediction' etc. were
+    # wrongly dropped because the junk word 'meta' is a substring of a real topic.)
     live = [t for t in topics if t.get("status") in ("open", "advancing")
             and t.get("n_contrib", 0) < _MAX_PER_TOPIC and t.get("attempts", 0) < _MAX_ATTEMPTS
-            and _is_real_topic(t.get("headline", ""))]
+            and (t.get("source") in ("board", "claude") or _is_real_topic(t.get("headline", "")))]
     # 1) deepen the least-advanced live thread most of the time
     if live and (len(live) >= 3 or (int(time.time()) % 3) != 0):
         # fewest contributions first, then fewest attempts → rotate across live topics instead of
