@@ -31,6 +31,9 @@ _TOPICS = _SERVER / ".topics.json"
 _CONTRIB = _SERVER / ".contributions.json"
 
 _MAX_PER_TOPIC = 4          # contributions before a topic is ripe for synthesis/press
+_MAX_ATTEMPTS = 8           # rounds before a topic retires even if it never produced enough — stops
+#                            the seminar livelocking on a saturated topic (every new claim is a
+#                            near-duplicate the anti-repeat gate rejects, so n_contrib never advances)
 # folder/structure artifacts that masquerade as "domains" — never a real research topic
 _JUNK = re.compile(r"\b(meta|root|unfiled|system|inbox|daily|templates?|fleeting|sessions?|"
                    r"backups?|attachments?|untitled)\b", re.I)
@@ -118,10 +121,14 @@ def pick_topic(vault: str) -> dict:
     fiction."""
     topics = _load(_TOPICS, [])
     live = [t for t in topics if t.get("status") in ("open", "advancing")
-            and t.get("n_contrib", 0) < _MAX_PER_TOPIC and _is_real_topic(t.get("headline", ""))]
+            and t.get("n_contrib", 0) < _MAX_PER_TOPIC and t.get("attempts", 0) < _MAX_ATTEMPTS
+            and _is_real_topic(t.get("headline", ""))]
     # 1) deepen the least-advanced live thread most of the time
     if live and (len(live) >= 3 or (int(time.time()) % 3) != 0):
-        live.sort(key=lambda t: (t.get("n_contrib", 0), t.get("last_advanced", 0)))
+        # fewest contributions first, then fewest attempts → rotate across live topics instead of
+        # spinning on one (a rejected round doesn't bump last_advanced, so without attempts the same
+        # saturated topic would stay first forever).
+        live.sort(key=lambda t: (t.get("n_contrib", 0), t.get("attempts", 0), t.get("last_advanced", 0)))
         return live[0]
     # 2) open a fresh topic from the board-aligned bank (reliably groundable), rotating through
     #    it before repeating. This is the primary fresh source — the priorities to advance.
@@ -189,6 +196,22 @@ def _advance_topic(topic_id: str, contrib_id: str) -> None:
             t["n_contrib"] = t.get("n_contrib", 0) + 1
             t["last_advanced"] = time.time()
             t["status"] = "synthesized" if t["n_contrib"] >= _MAX_PER_TOPIC else "advancing"
+            break
+    _save(_TOPICS, topics)
+
+
+def _record_attempt(topic_id: str) -> None:
+    """Count every round on a topic (success or not) and retire it once it has had too many
+    tries — otherwise a saturated topic, whose every new claim the anti-repeat gate rejects,
+    would trap the seminar deepening it forever."""
+    if not topic_id:
+        return
+    topics = _load(_TOPICS, [])
+    for t in topics:
+        if t.get("id") == topic_id:
+            t["attempts"] = t.get("attempts", 0) + 1
+            if t["attempts"] >= _MAX_ATTEMPTS and t.get("status") in ("open", "advancing"):
+                t["status"] = "synthesized"      # exhausted — move the seminar on to fresh ground
             break
     _save(_TOPICS, topics)
 
@@ -413,6 +436,7 @@ def _run_group_seminar_inner(npcs: list[dict], vault: str) -> dict:
             mnemo_bridge.remember_contribution(contribution["claim"], contribution.get("evidence", ""),
                                                tags=[topic.get("headline", "")[:40]])
     log_round(topic, [c["name"] for c in contributors], passed, contribution)
+    _record_attempt(topic.get("id"))      # count the round so a saturated topic eventually retires
     return {"topic": topic.get("headline", ""), "contributors": contributors,
             "passed": passed, "contribution": contribution}
 
