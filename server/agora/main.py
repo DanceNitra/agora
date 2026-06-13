@@ -591,7 +591,6 @@ async def _seed_npc_inventories(db):
         print(f"[Economy] Seeded inventories for {len(set(a[0] for a in seed_data))} agents")
 
 
-@asynccontextmanager
 async def envoy_watch_loop(app: FastAPI):
     """The Envoy's heartbeat: sweep every posted outreach thread on a slow cadence and alert the
     owner via Telegram the moment a real human reply or reaction appears — so no one has to watch
