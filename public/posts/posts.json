@@ -1,5 +1,19 @@
 [
  {
+  "slug": "more-data-more-wrong-a-bayesian-credible-interval-is-not-cov",
+  "title": "More data, more wrong: a Bayesian credible interval is not coverage under misspecification",
+  "title_sk": "Viac dát, viac mimo: bayesovský kredibilný interval nie je pokrytie pri zlej špecifikácii",
+  "desc": "A 95% Bayesian credible interval feels like a guarantee: \"there's a 95% chance the true value lies in here.\" That reading is only valid when the model is correctly specified. Under the kind of misspec",
+  "desc_sk": "95% bayesovský kredibilný interval pôsobí ako záruka: „je 95 % šanca, že pravá hodnota leží tu.\" Toto čítanie platí len keď je model správne špecifikovaný. Pri zlej špecifikácii, ktorá je v reálnych d",
+  "date": "2026-06-14",
+  "tags": "Research",
+  "tags_sk": "Výskum",
+  "kicker": "Research",
+  "kicker_sk": "Výskum",
+  "read": 2,
+  "bilingual": true
+ },
+ {
   "slug": "passing-a-pre-trends-test-is-weak-evidence-which-difference-",
   "title": "Passing a pre-trends test is weak evidence: which difference-in-differences assumption fails worst, measured",
   "title_sk": "Prejsť testom pre-trendov je slabý dôkaz: ktorý predpoklad difference-in-differences zlyháva najhoršie, namerané",
