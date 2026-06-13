@@ -76,6 +76,43 @@ def _get_client(api_key: str, base_url: str) -> OpenAI:
     return OpenAI(**kwargs)
 
 
+# ── Local GPU fallback (qwen3-coder) ───────────────────────────────────────
+# The cloud provider (ollama.com) has usage limits; when it is exhausted (429/quota) OR returns
+# empty completions, we fall back to the LOCAL qwen3-coder:30b on the GPU — no usage limit, always
+# available. A 'sticky' window then routes straight to local for a while so we stop hammering the
+# rate-limited cloud. This is what keeps the whole agent system producing when the cloud is capped.
+import urllib.request as _urllib_request
+
+_LOCAL_OLLAMA = "http://localhost:11434/api/chat"
+_LOCAL_MODEL = "qwen3-coder:30b"
+_LOCAL_STICKY_SECONDS = 600.0
+_local_until = 0.0                  # while now < this, skip the capped cloud and use local directly
+
+
+def _is_usage_limit(err: str) -> bool:
+    e = (err or "").lower()
+    return any(k in e for k in ("429", "rate limit", "rate_limit", "quota", "usage limit",
+                                "exceeded", "too many requests", "insufficient"))
+
+
+def _local_qwen(system_prompt: str, user_prompt: str, temperature: float, max_tokens: int,
+                want_json: bool = False) -> str:
+    """Call local qwen3-coder:30b via Ollama's native API (GPU, no usage limit)."""
+    body = {
+        "model": _LOCAL_MODEL, "stream": False,
+        "messages": [{"role": "system", "content": system_prompt},
+                     {"role": "user", "content": user_prompt}],
+        "options": {"temperature": float(temperature), "num_predict": int(max_tokens)},
+    }
+    if want_json:
+        body["format"] = "json"
+    req = _urllib_request.Request(_LOCAL_OLLAMA, data=json.dumps(body).encode(),
+                                  headers={"Content-Type": "application/json"})
+    with _urllib_request.urlopen(req, timeout=240) as r:
+        d = json.loads(r.read().decode("utf-8", "replace"))
+    return (d.get("message", {}) or {}).get("content", "") or ""
+
+
 def call_llm(
     system_prompt: str,
     user_prompt: str,
@@ -101,6 +138,7 @@ def call_llm(
     Returns:
         Response text content, or error message if all tiers fail.
     """
+    global _local_until
     cfg = _get_settings()
     router = _get_router()
 
@@ -120,6 +158,25 @@ def call_llm(
         _LLM_CACHE_STATS["misses"] += 1
     else:
         _LLM_CACHE_STATS["skipped"] += 1
+
+    want_json = bool(response_format)
+
+    # STICKY LOCAL: if the cloud was recently usage-limited, skip it and use local qwen3-coder
+    # directly (no point hammering a capped provider). The window self-expires.
+    if time.time() < _local_until:
+        try:
+            content = _local_qwen(system_prompt, user_prompt, temperature, max_tokens, want_json)
+            if content.strip():
+                try:
+                    from agora.execution.metabolism import record_call as _meter
+                    _meter((len(system_prompt) + len(user_prompt)) // 4, len(content) // 4)
+                except Exception:
+                    pass
+                if cache_eligible:
+                    _LLM_CACHE[ckey] = (content, time.time())
+                return content
+        except Exception:
+            pass            # local unreachable → fall through to the normal cloud chain
 
     fallback_chain = router.get_fallback_chain(tier)
 
@@ -179,8 +236,12 @@ def call_llm(
                 error_str = str(e)
                 errors.append(f"{tier_name}({model}): {error_str[:100]}")
 
-                # Rate limit — retry with backoff
-                if "429" in error_str or "rate" in error_str.lower():
+                # Usage limit / rate limit — flip to local qwen3-coder for a sticky window so we
+                # stop hammering the capped cloud, then retry once with backoff.
+                if _is_usage_limit(error_str):
+                    _local_until = time.time() + _LOCAL_STICKY_SECONDS
+                    print(f"[LLM] usage limit on {model} → switching to local qwen3-coder for "
+                          f"{int(_LOCAL_STICKY_SECONDS)}s")
                     if attempt == 0:
                         time.sleep(2)
                         continue
@@ -190,7 +251,25 @@ def call_llm(
         # If we got here, this tier failed entirely
         print(f"[LLM] {tier_name}({model}) failed: {errors[-1][:80]}")
 
-    # All tiers failed
+    # LOCAL GPU FALLBACK: the cloud chain is exhausted (usage limit, provider errors, or persistent
+    # empty completions). Fall back to local qwen3-coder:30b on the GPU — no usage limit. This is the
+    # guarantee the agent team keeps producing even when ollama.com is capped.
+    try:
+        content = _local_qwen(system_prompt, user_prompt, temperature, max_tokens, want_json)
+        if content.strip():
+            print(f"[LLM] LOCAL fallback → qwen3-coder:30b OK ({len(content)} chars)")
+            try:
+                from agora.execution.metabolism import record_call as _meter
+                _meter((len(system_prompt) + len(user_prompt)) // 4, len(content) // 4)
+            except Exception:
+                pass
+            if cache_eligible:
+                _LLM_CACHE[ckey] = (content, time.time())
+            return content
+    except Exception as e:
+        errors.append(f"local-qwen: {str(e)[:80]}")
+
+    # All tiers + local failed
     error_summary = "; ".join(errors[-3:])
     return f"[LLM Error: all tiers failed — {error_summary[:200]}]"
 
