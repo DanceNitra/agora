@@ -676,6 +676,23 @@ async def idea_forge_loop(app: FastAPI):
         await _aio.sleep(12 * 3600)                           # ~twice a day
 
 
+async def db_retention_loop(app: FastAPI):
+    """Keep agora.db bounded: once a day, prune operational-log tables to a rolling window and
+    drop stale byzantine-violation noise, then reclaim space. Knowledge tables are never touched.
+    This is what stops the dungeon-lag regression (unbounded log growth) from recurring."""
+    import asyncio as _aio
+    await _aio.sleep(1800)                                    # let startup settle
+    while True:
+        try:
+            from agora.execution.db_retention import prune
+            res = await _aio.to_thread(prune, 14, 2, True)    # 14d logs, 2d byzantine, vacuum
+            print(f"[Retention] pruned {res.get('_total_deleted', 0)} log rows "
+                  f"(vacuum {res.get('_vacuum_seconds', '-')}s)")
+        except Exception as e:
+            print(f"[Retention] loop error: {e}")
+        await _aio.sleep(24 * 3600)                           # daily
+
+
 async def lifespan(app: FastAPI):
     try:
         await init_db(app)
@@ -708,6 +725,10 @@ async def lifespan(app: FastAPI):
         loop.create_task(idea_forge_loop(app))     # ~2x/day: queue a Forge ideas task for the loop
     except Exception as _e:
         print(f"[IdeaForge] not started: {_e}")
+    try:
+        loop.create_task(db_retention_loop(app))   # daily: keep agora.db bounded (anti-lag)
+    except Exception as _e:
+        print(f"[Retention] not started: {_e}")
     yield
     if hasattr(app.state, 'db') and app.state.db:
         await app.state.db.close()

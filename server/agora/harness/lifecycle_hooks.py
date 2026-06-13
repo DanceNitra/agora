@@ -47,6 +47,13 @@ class LifecycleHooks:
         self._stuck_counter: dict[str, int] = {}    # npc_id -> ticks without movement
         self._violations_log: list[dict] = []
         self._tick_count: int = 0
+        # (npc_id, type) -> tick when last persisted. A standing condition (e.g. an NPC stuck
+        # in 'panicked') breaches the same invariant EVERY tick; without this guard it wrote one
+        # DB row per tick and flooded `events` to 50k+ rows of identical 'stuck' violations
+        # (96% of the table). We keep the in-memory log every tick (full fidelity) but persist a
+        # given (npc, type) at most once per cooldown — periodic evidence, not a flood.
+        self._persist_cooldown: dict[tuple, int] = {}
+        self._PERSIST_EVERY_TICKS: int = 300
 
     # ═══════════════════════════════════════════
     # PRE-TICK — snapshot and invariant check
@@ -371,9 +378,21 @@ class LifecycleHooks:
     # ═══════════════════════════════════════════
 
     async def _persist_violations(self, violations: list[dict]):
-        """Store violations in DB for dashboard and historical analysis."""
+        """Store violations in DB for dashboard and historical analysis.
+
+        Persists each (npc_id, type) at most once per `_PERSIST_EVERY_TICKS` ticks so a standing
+        breach can't flood the events table (see _persist_cooldown). The in-memory log keeps every
+        tick; only the durable DB write is throttled.
+        """
         try:
+            persisted = 0
             for v in violations:
+                key = (v.get("npc_id", "unknown"), v.get("type", "?"))
+                last = self._persist_cooldown.get(key)
+                if last is not None and (self._tick_count - last) < self._PERSIST_EVERY_TICKS:
+                    continue                       # same standing breach — already logged recently
+                self._persist_cooldown[key] = self._tick_count
+                persisted += 1
                 await self.db.execute(
                     "INSERT INTO events (id, event_type, source_id, aggregate_type, aggregate_id, payload) "
                     "VALUES (lower(hex(randomblob(16))), 'byzantine_violation', ?, 'npc', ?, ?)",
