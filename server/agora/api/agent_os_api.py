@@ -888,6 +888,23 @@ async def brain_dashboard():
     return HTMLResponse(render_dashboard())
 
 
+@router.get("/brain/funnel")
+async def brain_funnel():
+    """THE VALUE FUNNEL (JSON) — activity → grounded → curated → shipped, with conversion + ROI."""
+    import asyncio as _aio
+    from agora.execution.funnel import compute_funnel
+    return await _aio.to_thread(compute_funnel)
+
+
+@router.get("/brain/funnel/view")
+async def brain_funnel_view():
+    """THE VALUE FUNNEL (HTML) — does the work produce value, and at what cost? One page."""
+    import asyncio as _aio
+    from fastapi.responses import HTMLResponse
+    from agora.execution.funnel import render_funnel_html
+    return HTMLResponse(await _aio.to_thread(render_funnel_html))
+
+
 @router.post("/brain/atlas/build")
 async def brain_atlas_build(request: Request):
     """THE ATLAS — (re)build the per-domain Maps of Content (idempotent direct writes)."""

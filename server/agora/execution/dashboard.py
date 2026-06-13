@@ -120,5 +120,5 @@ ul{{margin:0;padding-left:16px;font-size:.78rem;line-height:1.5}} table{{font-si
 td{{padding:2px 8px 2px 0}} .dim{{color:#6a6488;font-size:.72rem}}
 .big{{font-size:1.1rem;color:#d6cff0}} .up{{color:#9affc0}} .down{{color:#ff9a9a}} .flat{{color:#d6cff0}}
 </style></head><body>
-<h1>🧠 AGORA — GAUGES <span class="dim">{time.strftime('%Y-%m-%d %H:%M')} · auto-refresh 5 min</span></h1>
+<h1>🧠 AGORA — GAUGES <span class="dim">{time.strftime('%Y-%m-%d %H:%M')} · auto-refresh 5 min · <a href="brain/funnel/view" style="color:#9affc0">🔺 value funnel →</a></span></h1>
 <div class="grid">{''.join(cards)}</div></body></html>"""
