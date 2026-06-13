@@ -1109,8 +1109,15 @@ async def _brain_ecosystem_tick(app: FastAPI):
                 partners = [a.get("npc_name") or a["npc_id"], b.get("npc_name") or b["npc_id"]]
                 c = await asyncio.to_thread(seminar.extract_contribution, topic, transcript, partners)
                 if c:
+                    # ECONOMY (Layer 4): a productive exchange pays both partners — standing is
+                    # earned by recorded contributions, not by chatter, so value-production
+                    # becomes the agents' incentive.
+                    for nid in (a["npc_id"], b["npc_id"]):
+                        await db.execute("UPDATE agent_identities SET energy_balance = "
+                                         "energy_balance + 3 WHERE agent_id=?", (nid,))
+                    await db.commit()
                     print(f"[Seminar] contribution on '{topic.get('headline')}' "
-                          f"by {'+'.join(partners)}: {c['claim'][:60]}")
+                          f"by {'+'.join(partners)} (+3 each): {c['claim'][:60]}")
             except Exception as e:
                 print(f"[Seminar] conversation error: {e}")
         asyncio.create_task(_run_convo())
@@ -1137,6 +1144,11 @@ async def _brain_ecosystem_tick(app: FastAPI):
                                     for i in (ideas or [])[:5])
                 partners = [n["npc_name"] for n in npcs[:4]]
                 c = await asyncio.to_thread(seminar.extract_contribution, topic, top_txt, partners)
+                if c:  # ECONOMY (Layer 4): credit all brainstorm participants for a real result
+                    for n in npcs[:6]:
+                        await db.execute("UPDATE agent_identities SET energy_balance = "
+                                         "energy_balance + 2 WHERE agent_id=?", (n["npc_id"],))
+                    await db.commit()
                 top = ranked[0]["votes"] if ranked else 0
                 print(f"[Seminar] brainstorm {sid[:8]} — {len(ideas)} ideas, top votes {top}"
                       f"{' → contribution: ' + c['claim'][:50] if c else ' (no contribution)'}")
