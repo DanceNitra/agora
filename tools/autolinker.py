@@ -30,6 +30,10 @@ WIKILINK = re.compile(r"\[\[([^\]|#]+)")
 TOKEN = re.compile(r"[A-Za-z][A-Za-z'\-]{2,}")
 FM_TAGS = re.compile(r"tags:\s*\[(.*?)\]", re.S)
 DATE_TITLE = re.compile(r"^\d{4}[-_]\d{2}[-_]\d{2}")   # daily notes → noisy to cross-link
+# AutoLinker's OWN machine output (and other dated machine reports) is not knowledge — never scan,
+# suggest, or link it. These files dodge DATE_TITLE (their date is at the END of the name), which is
+# how they used to become 1000+-link mega-hubs that cross-referenced each other.
+MACHINE_REPORT = re.compile(r"^(autolinker_(report|pending)|quality_report)", re.I)
 MARK = "## Related (AutoLinker)"
 
 STOPWORDS = set("""
@@ -96,6 +100,8 @@ def main() -> None:
     for p in vault.rglob("*.md"):
         if any(part in skip_dirs for part in p.parts):
             continue
+        if MACHINE_REPORT.match(p.stem):
+            continue                    # skip AutoLinker's own reports / QA reports (machine spam)
         try:
             text = p.read_text(encoding="utf-8", errors="replace")
         except Exception:
@@ -204,13 +210,18 @@ def main() -> None:
         pend.append(f"## {title}")
         for s, other in cands:
             ot = notes[other]["title"]
-            rep.append(f"| [[{ot}]] | {s:.2f} |")
-            pend.append(f"- [ ] [[{ot}]]")
+            # NOTE: suggestions are emitted as `backticks`, NOT [[wikilinks]] — this file is a review
+            # artifact, not knowledge. Emitting live links here turned the report into a multi-thousand-
+            # link mega-hub that polluted the vault graph and semantic index. Apply happens in-memory.
+            rep.append(f"| `{ot}` | {s:.2f} |")
+            pend.append(f"- [ ] `{ot}`")
         rep.append("")
         pend.append("")
 
-    rep_path = out_dir / f"autolinker_report_{day}.md"
-    pend_path = out_dir / f"autolinker_pending_{day}.md"
+    # Single rolling files (overwritten each run) instead of dated daily files — the old
+    # autolinker_report_{day}.md pattern accumulated ~2 MB/day of regenerable machine output.
+    rep_path = out_dir / "autolinker_report.md"
+    pend_path = out_dir / "autolinker_pending.md"
     rep_path.write_text("\n".join(rep), encoding="utf-8")
     pend_path.write_text("\n".join(pend), encoding="utf-8")
 
@@ -255,9 +266,9 @@ def main() -> None:
         for g in groups:
             lines.append(f"### {notes[g[0]]['title']}  ({len(g)} copies)")
             for stem in g:
-                lines.append(f"- `{notes[stem]['path'].name}`  —  [[{notes[stem]['title']}]]")
+                lines.append(f"- `{notes[stem]['path'].name}`  —  `{notes[stem]['title']}`")
             lines.append("")
-        qpath = out_dir / f"quality_report_duplicates_{day}.md"
+        qpath = out_dir / "quality_report_duplicates.md"
         qpath.write_text("\n".join(lines), encoding="utf-8")
         print(f"[AutoLinker] FLAGGED {len(groups)} true-duplicate groups "
               f"({redundant} redundant copies) -> {qpath.name}")

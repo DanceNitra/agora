@@ -20,6 +20,10 @@ OLLAMA_EMBED = "http://localhost:11434/api/embed"
 MODEL = "nomic-embed-text"
 CACHE = Path(__file__).resolve().parents[2] / ".semantic_cache"   # server/.semantic_cache
 SKIP = (".git", ".obsidian", ".meta", "_vault_quarantine")
+# Machine-generated review artifacts (AutoLinker reports, QA duplicate reports) are not knowledge —
+# never embed them: they are huge low-specificity files that otherwise dominate retrieval as
+# universal-matcher hubs and distort semantic neighbourhoods.
+MACHINE_REPORT = re.compile(r"^(autolinker_(report|pending)|quality_report)", re.I)
 RETRIEVAL_LOG = Path(__file__).resolve().parents[2] / ".retrieval_log.json"
 
 
@@ -80,6 +84,8 @@ def build_index(vault: str, batch: int = 64) -> dict:
     for p in vroot.rglob("*.md"):
         if any(s in p.parts or s in str(p) for s in SKIP):
             continue
+        if MACHINE_REPORT.match(p.stem):
+            continue                    # AutoLinker / QA machine reports — not knowledge
         res = _note_text(p)
         if res:
             embed_txt, full_len = res
