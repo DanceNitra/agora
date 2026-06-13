@@ -217,11 +217,34 @@ def _parse_json(text: str) -> dict | None:
     return out or None
 
 
+_WORD = re.compile(r"[a-z0-9]+")
+
+
+def _prior_claims(topic_id: str) -> list[str]:
+    """Claims already recorded for this topic — so deepening ADVANCES instead of restating."""
+    if not topic_id:
+        return []
+    return [c.get("claim", "") for c in _load(_CONTRIB, []) if c.get("topic_id") == topic_id]
+
+
+def _too_similar(claim: str, priors: list[str], thr: float = 0.55) -> bool:
+    """True if the claim near-duplicates an existing one (token overlap-coefficient)."""
+    a = set(_WORD.findall((claim or "").lower()))
+    if len(a) < 4:
+        return False
+    for p in priors:
+        b = set(_WORD.findall((p or "").lower()))
+        if b and len(a & b) / min(len(a), len(b)) > thr:
+            return True
+    return False
+
+
 def extract_contribution(topic: dict, transcript: str, partners: list[str]) -> dict | None:
     """Turn a real exchange into a recorded Contribution grounded in literature, or return None.
 
     The value contract: no grounded, falsifiable claim → no contribution → nothing recorded
-    (the cycle was activity, not knowledge). NEVER invents sources. Sync; call via to_thread.
+    (the cycle was activity, not knowledge). Deepening a topic must ADD a distinct angle, not
+    restate prior contributions. NEVER invents sources. Sync; call via to_thread.
     """
     from agora.execution import research_tool
     from agora.execution.llm_client import call_llm
@@ -246,18 +269,27 @@ def extract_contribution(topic: dict, transcript: str, partners: list[str]) -> d
     src_block = research_tool.format_for_prompt(papers) if papers else "(no external paper found)"
     note_block = "; ".join(f"[[{n['title']}]]" for n in vault_notes[:4]) or "(no close vault note)"
     has_paper = bool(papers)
+    priors = _prior_claims(topic.get("id"))
+    prior_block = ""
+    if priors:
+        prior_block = ("\n\nALREADY ESTABLISHED for this topic (do NOT restate these — your finding "
+                       "must ADD a DISTINCT new angle: a different mechanism, a boundary condition, "
+                       "an edge case, a quantitative bound, or a counter-result):\n- "
+                       + "\n- ".join(c[:140] for c in priors[-6:]))
     sys = (
         "You are a research seminar's rapporteur. From the colleagues' exchange, any RELEVANT "
         "papers, and the user's own vault notes below, state ONE substantive, falsifiable finding "
         "the discussion reached. Ground it by CONNECTING or EXTENDING the named vault notes into a "
         "new claim; if a paper is directly on-topic, also paraphrase its result and name it "
-        "(Author Year) — but IGNORE any listed paper that is off-topic. Never invent sources or "
-        'over-generalize. Reply ONLY JSON: {"claim":"<one falsifiable sentence>","evidence":"<how '
-        'the vault notes combine, plus (Author Year) if a paper truly applies>","falsifier":"<what '
-        'observation would refute the claim>","links":["<vault concept it connects/contradicts>"]}')
+        "(Author Year) — but IGNORE any listed paper that is off-topic. If the topic already has "
+        "established claims (listed below), your finding MUST advance beyond them, not rephrase "
+        "them. Never invent sources or over-generalize. Reply ONLY JSON: "
+        '{"claim":"<one falsifiable sentence>","evidence":"<how the vault notes combine, plus '
+        '(Author Year) if a paper truly applies>","falsifier":"<what observation would refute the '
+        'claim>","links":["<vault concept it connects/contradicts>"]}')
     usr = (f"Topic: {topic.get('topic','')}\n\nExchange:\n{transcript[:1000]}\n\n"
            f"Possibly-relevant papers (use only if on-topic):\n{src_block[:1100]}\n\n"
-           f"User's related vault notes: {note_block}")
+           f"User's related vault notes: {note_block}{prior_block}")
     out = call_llm(sys, usr, tier="cheap", max_tokens=700, temperature=0.4)
     if not (out or "").strip():                       # transient empty (GPU contention) → one retry
         out = call_llm(sys, usr, tier="medium", max_tokens=700, temperature=0.4)
@@ -267,6 +299,8 @@ def extract_contribution(topic: dict, transcript: str, partners: list[str]) -> d
     claim = (d.get("claim") or "").strip()
     if len(claim) < 25 or _REFUSAL.search(claim) or _REFUSAL.search(d.get("evidence", "")):
         return None                                   # vacuous / refusal → not a contribution
+    if _too_similar(claim, priors):
+        return None                                   # near-duplicate of an existing contribution
     return record_contribution(topic, partners, claim, d.get("evidence", ""),
                                d.get("falsifier", ""), d.get("links") or [],
                                basis="literature" if has_paper else "synthesis")
