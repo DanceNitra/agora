@@ -2,7 +2,65 @@
 
 > Resume doc for a fresh Claude Code session. Chat in **Slovak**; code + user-facing strings **English**.
 
-## ⚡⚡⚡⚡ RESUME HERE (2026-06-12 LATE EVENING — FRESHEST)
+## ⚡⚡⚡⚡⚡ RESUME HERE (2026-06-14 — FRESHEST)
+
+> Chat **Slovak**. This section is the full state at session clear. Auto-memory loads include
+> `agora-session-state`, `agora-dungeon-value-fix` (today's headline), `agora-architecture`,
+> `agora-local-llm`, `agora-roadmap-firm-os`, `gated-approval-briefing`, `vault-push-ntfs-gotcha`.
+
+**TO RESUME (what the owner types in the fresh session):**
+```
+/loop C:\Users\Danculus\agora\HANDOFF_LOOP_PROMPT.txt
+```
+That re-enters the autonomous self-upgrade loop. First thing the fresh session should do: read THIS
+section + `agora-dungeon-value-fix` memory, health-check both servers, then drain the inbox.
+
+**RUN STATE:** brain `uvicorn agora.main:app` :8000 (ONE listener); dungeon = a **bare**
+`python -u mcp_server.py` :5174 kept alive by the brain's `watch_dungeon_forever` watchdog (NOT the
+supervisor this session — matches CLAUDE.md current default; verify exactly ONE mcp_server.py + ZERO
+supervisors). Both 200. Models = FULL LOCAL `qwen3-coder:30b` on the 3090 (see `agora-local-llm`);
+the `deepseek-v4-*` lines in the older section below are STALE. Vault push:
+`DUNGEON_AUTOPUSH=1 python -X utf8 tools/safe_vault_push.py "msg"`.
+
+**WHAT THIS SESSION DID — fixed the dungeon's valueless token spend at the ROOT, then purged the old agents:**
+The metabolism ledger showed ~7M tokens of near-zero-value agent cognition vs verify-findings (ROI 0.92,
+the real value engine). Three commits, all verified (brain 200 + ticking no-errors, dungeon 200):
+1. **`40528b9` Dungeon value fix:** DELETED the ungated group brainstorm in `_brain_ecosystem_tick`
+   (3 unconditional LLM rounds, ROI 0.04) — the MNEMO-gated **seminar** is now the sole group-cognition
+   path. Also disabled the ExecutionEngine duplicate think-loop (`llm_client=None`).
+2. **`9d03e2e` agent-think fix:** found the real `agent-think` source was the **tick_loop roleplay batch**
+   (NOT the ExecutionEngine — that was mistargeted). Added `roleplay_use_llm=False`. (Made moot by #3.)
+3. **`41bf30f` THE PURGE (owner-ordered):** deleted the 3 OLD ABSTRACT agents (researcher/writer/critic)
+   **forever** — `seed_agents()` + its empty-DB call site (the only respawn path), `SIMULATED_THOUGHTS`,
+   the tick_loop roleplay block, `AGENT_SYSTEM_PROMPTS` + `agent_think()` (execution/llm_client.py), 3
+   `ROLE_SKILLS` keys (lifecycle/genome_bridge.py), the whole `server/agora/agents/` dir, test_all.py
+   #9/#10, + a one-time DB sweep (0 rows). A 6-agent **read-only** Workflow (map + adversarial verify)
+   first confirmed they were pure dead scaffolding: **0 DB rows, no mnemo entries, no vault notes, no
+   dungeon refs.** Verify-pass mandatory fixes applied (removed a dangling `thinking_agents` heartbeat
+   key that would NameError every tick; removed the dead import).
+
+**RESULT (verified):** `agent-think` organ is DELETED → frozen at **7592 calls** forever (function gone).
+`agent-dialogue` (the 8 dungeon characters' REAL cognition via `AgentOS._think`) + `verify-findings`
+(ROI 0.92) keep growing — the agents think, the waste is dead. KEPT (look-alikes, do NOT touch):
+`dungeon_agent_think`, the vault `VaultWriter`, quality-gate critic, dungeon_os corporation/quest roles,
+`ROLE_SKILLS` analyst/explorer (owner scoped purge to the named trio).
+
+**PENDING / NEXT SESSION:**
+- **Drain the ~21 inbox research tasks** (deferred from the last cycle because that context was very long
+  after 4 brain restarts): Hypothesize×severe-test (Lab run in same cycle), the Second-brain briefing
+  (owner's product destination — read his real vault notes), Dialectics, an **Oracle call on "Will Claude
+  Fable 5 be restored for US customers by June 15?"** (market 2534927, ends 2026-06-16 — time-sensitive),
+  Replicate (branching-process finite-size scaling), Predict, Challenge belief, etc.
+- **DON'T re-add `seed_agents` or the roleplay block.** The 3 old agents are gone on purpose.
+- **Optional cleanup (low priority):** `_process_agent_thought` (main.py ~1025) is now harmless dead code;
+  `roleplay_use_llm`/`roleplay_think_pct` config settings are now inert. Remove only if convenient.
+- **Outreach:** all 4 tracked threads (hermes-agent#10771, zeroclaw#5849, deer-flow#1898, mem0#5330) have
+  US as last author — caught up. Keep running the backstop each cycle (verify last-author, never trust inbox).
+- Launch materials (OSS mnemo, EN+SK) remain GATED — owner posts when ready.
+
+---
+
+## ⚡⚡⚡⚡ RESUME HERE (2026-06-12 LATE EVENING — earlier history)
 
 > Chat **Slovak**. Context was cleared here to save credits — this section is the full state.
 > Auto-memory loads: `agora-session-state`, `agora-local-llm`, `agora-roadmap-firm-os`,
