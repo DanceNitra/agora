@@ -115,12 +115,16 @@ async def init_db(app: FastAPI):
     app.state.state_store = StateStore(db)
     app.state.lifecycle_hooks = LifecycleHooks(app.state.state_store, db)
     app.state.tool_registry = ToolRegistry(app.state.state_store, db)
-    # LLM client setup (for execution loop think)
-    from agora.execution.llm_client import agent_think
+    # ExecutionEngine LLM think DISABLED on purpose (llm_client=None). It ran a SECOND per-agent LLM
+    # decision loop (pick one tool) that DUPLICATED AgentOS._think — the agents' rich primary cognition
+    # that already decides AND executes visible actions with full memory/trust/skill context. Metered as
+    # 'agent-think': 1.7M tok over 7.5k calls for value 0 — a redundant decision loop, never the value
+    # path. With llm_client=None the engine uses its built-in rule-based action, so agents still act and
+    # the visible world stays alive; the duplicate model spend is gone. One rich cognition loop, not two.
+    # Structural dedup at the root, not a cadence throttle. Reversible: restore the agent_think lambda.
     app.state.execution_engine = ExecutionEngine(
         app.state.state_store, app.state.tool_registry, db,
-        llm_client=lambda prompt: agent_think("system", prompt).get("insight", prompt[:200])
-        if settings.llm_enabled else None,
+        llm_client=None,
     )
     app.state.context_manager = ContextManager(app.state.state_store, db)
     app.state.epoch_evaluator = EpochEvaluator(
@@ -1339,39 +1343,14 @@ async def _brain_ecosystem_tick(app: FastAPI):
                 print(f"[Seminar] group error: {e}")
         asyncio.create_task(_run_seminar())
 
-    # Group brainstorm — every 30 ticks (background so it never blocks the tick)
-    if tick % 30 == 0 and len(npcs) >= 2:
-        async def _run_brainstorm():
-            try:
-                from agora.agent_os.brainstorm_engine import BrainstormEngine
-                from agora.execution import seminar
-                from agora.config import settings
-                vault = settings.vault_path or "C:/Users/Danculus/my-second-brain"
-                topic = seminar.pick_topic(vault)
-                bm = BrainstormEngine(db)
-                init = npcs[0]
-                sid = await bm.start_session(topic["topic"][:90], init["npc_name"], init["npc_id"])
-                ids = [n["npc_id"] for n in npcs]
-                ideas = await bm.generate_ideas(sid, ids, broadcast_fn=_bcast)
-                await bm.build_on_ideas(sid, ids, broadcast_fn=_bcast)
-                ranked = await bm.vote_on_ideas(sid, ids)
-                await bm.complete_session(sid)
-                # VALUE CONTRACT: distill the brainstorm into ONE grounded Contribution
-                top_txt = "\n".join(str(i.get("idea") or i.get("content") or i)
-                                    for i in (ideas or [])[:5])
-                partners = [n["npc_name"] for n in npcs[:4]]
-                c = await asyncio.to_thread(seminar.extract_contribution, topic, top_txt, partners)
-                if c:  # ECONOMY (Layer 4): credit all brainstorm participants for a real result
-                    for n in npcs[:6]:
-                        await db.execute("UPDATE agent_identities SET energy_balance = "
-                                         "energy_balance + 2 WHERE agent_id=?", (n["npc_id"],))
-                    await db.commit()
-                top = ranked[0]["votes"] if ranked else 0
-                print(f"[Seminar] brainstorm {sid[:8]} — {len(ideas)} ideas, top votes {top}"
-                      f"{' → contribution: ' + c['claim'][:50] if c else ' (no contribution)'}")
-            except Exception as e:
-                print(f"[BrainEcosystem] brainstorm error: {e}")
-        asyncio.create_task(_run_brainstorm())
+    # Group brainstorm REMOVED (was every 30 ticks). It ran 3 UNCONDITIONAL LLM rounds across ALL
+    # agents — generate -> build -> vote (~3xN model calls) — then tried to salvage one contribution
+    # at the end. Metered at ROI 0.04 (5.2M tok / value ~220): the single biggest token sink, because
+    # most of those calls were ungrounded free-association. The MNEMO-gated GROUP SEMINAR above already
+    # produces the grounded group Contribution AND only spends the model on agents whose memory
+    # actually surfaces relevant knowledge (the rest pass for free). So the seminar is now the SOLE
+    # group-cognition path: no ungated free-association survives. This is a root-cause removal of the
+    # waste source, not a cadence throttle.
 
     # Self-improvement proposal — every 50 ticks (background)
     if tick % 50 == 0:
