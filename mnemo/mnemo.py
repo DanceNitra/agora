@@ -359,6 +359,12 @@ class Mnemo:
                             older["status"] = "superseded"
                             older["superseded_ts"] = time.time()
                             older.setdefault("meta", {})["superseded_by_toggle"] = newer["id"]
+                            # Accuracy loop, live consumer: being OVERTURNED by a later contradiction is
+                            # a was-wrong signal — debit the superseded claim, credit the one that
+                            # corrected the record. So the consolidation pass continuously feeds each
+                            # memory's reliability from real outcomes, not just external scoring.
+                            older["bad"] = float(older.get("bad", 0) or 0) + 1.0
+                            newer["good"] = float(newer.get("good", 0) or 0) + 1.0
                             toggled += 1
                             if older is a:
                                 break                # this anchor is gone; advance to the next
