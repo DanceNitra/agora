@@ -25,7 +25,12 @@ _TITLE_STOP = frozenset("the a an of and or for to in on with how what readme in
 
 def ingest(repo: str, name: str = "") -> Path:
     """Shallow-clone a public repo into agora_output/audits/<name>. Returns the path."""
+    # Validate the repo spec is a plain GitHub owner/name (no extra path, scheme, query, or '..')
+    # so the built clone URL can't be redirected and the derived name can't traverse the filesystem.
+    if not re.match(r"^[A-Za-z0-9_.-]+/[A-Za-z0-9_.-]+$", repo or ""):
+        raise ValueError(f"refusing to clone unsafe repo spec: {repo!r}")
     name = name or repo.rstrip("/").rsplit("/", 1)[-1]
+    name = re.sub(r"[^A-Za-z0-9_.-]", "_", name) or "repo"   # safe basename — no path traversal
     dst = AUDITS_DIR / name
     if not (dst / ".git").exists():
         AUDITS_DIR.mkdir(parents=True, exist_ok=True)

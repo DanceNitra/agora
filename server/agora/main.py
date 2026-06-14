@@ -3,6 +3,7 @@
 import asyncio
 import json
 import random
+import re as _re
 import sys as _sys
 import uuid
 
@@ -932,7 +933,32 @@ async def lifespan(app: FastAPI):
         await app.state.db.close()
 
 app = FastAPI(title="Agora", version="0.1.0", lifespan=lifespan)
-app.add_middleware(CORSMiddleware, allow_origins=["*"],
+
+# Defense-in-depth for a no-auth, RCE-capable (POST /brain/lab/run), loopback-only API. Binding to
+# 127.0.0.1 stops the network, but a malicious page in the owner's own browser could still POST to
+# 127.0.0.1:8000 (CSRF) or reach it via DNS-rebinding (a hostile domain resolving to 127.0.0.1).
+# Reject any request whose Host header isn't loopback (DNS-rebinding) or whose Origin is a foreign
+# site (browser CSRF). Server-side clients (the dungeon, local scripts) send a loopback Host and no
+# Origin, so they're unaffected; the local renderer on :5174 sends a loopback Origin and is allowed.
+_LOCAL_HOST_RE = _re.compile(r"^(127\.0\.0\.1|localhost|\[::1\]|::1)(:\d+)?$", _re.I)
+_LOCAL_ORIGIN_RE = _re.compile(r"^https?://(127\.0\.0\.1|localhost|\[::1\])(:\d+)?$", _re.I)
+
+
+@app.middleware("http")
+async def _local_only_guard(request, call_next):
+    from fastapi.responses import JSONResponse
+    host = (request.headers.get("host") or "").strip()
+    if host and not _LOCAL_HOST_RE.match(host):
+        return JSONResponse({"detail": "non-loopback Host rejected"}, status_code=403)
+    origin = (request.headers.get("origin") or "").strip()
+    if origin and not _LOCAL_ORIGIN_RE.match(origin):
+        return JSONResponse({"detail": "cross-site Origin rejected"}, status_code=403)
+    return await call_next(request)
+
+
+# CORS limited to loopback origins (the local renderer), not '*' — no foreign page may read responses.
+app.add_middleware(CORSMiddleware,
+                   allow_origin_regex=r"https?://(127\.0\.0\.1|localhost|\[::1\])(:\d+)?",
                    allow_methods=["*"], allow_headers=["*"])
 
 

@@ -130,13 +130,14 @@ class RealActionEngine:
                     "chat_id": chat_id,
                     "text": f"🏰 *{agent_name}*\n\n{message}\n\n_{datetime.now().strftime('%H:%M')}_",
                     "parse_mode": "Markdown",
-                })
-                subprocess.run(
-                    ["curl", "-s", "--max-time", "8", "-X", "POST",
-                     f"https://api.telegram.org/bot{bot_token}/sendMessage",
-                     "-H", "Content-Type: application/json", "-d", payload],
-                    capture_output=True, timeout=10,
-                )
+                }).encode()
+                # urllib, not a curl subprocess: keeps the bot token out of the process argument
+                # list (where `ps` / any local process could read it).
+                import urllib.request
+                req = urllib.request.Request(
+                    f"https://api.telegram.org/bot{bot_token}/sendMessage",
+                    data=payload, headers={"Content-Type": "application/json"})
+                urllib.request.urlopen(req, timeout=8).read()
         except Exception as e:
             print(f"[Telegram] Send failed: {e}")
 
