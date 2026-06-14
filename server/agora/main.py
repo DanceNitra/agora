@@ -712,6 +712,58 @@ async def idea_forge_loop(app: FastAPI):
         await _aio.sleep(90 * 60)                             # re-check every ~90 min
 
 
+async def second_brain_loop(app: FastAPI):
+    """The thinking-second-brain cadence: ~once a day, file a 'Second-brain briefing' inbox task so
+    the main loop runs the high-quality briefing on the OWNER'S OWN vault — read a real domain
+    cluster of his notes and GROUND claims vs literature, find GAPS, CHALLENGE beliefs, CONNECT
+    distant notes, and GENERATE ideas BY his own documented methods. This is the product (a second
+    brain that THINKS, not stores) dogfooded on the founder first. Skips if one is already pending.
+    RESTART-RESILIENT: anchored to a persisted last-fire time (server/.secondbrain_lastrun)."""
+    import asyncio as _aio
+    import time as _time
+    from pathlib import Path as _P
+    _marker = _P(__file__).resolve().parent.parent / ".secondbrain_lastrun"
+    _INTERVAL = 24 * 3600                                     # ~once a day
+
+    def _last() -> float:
+        try:
+            return float(_marker.read_text(encoding="utf-8").strip())
+        except Exception:
+            return 0.0
+
+    def _mark(now: float) -> None:
+        try:
+            _marker.write_text(str(now), encoding="utf-8")
+        except Exception as _e:
+            print(f"[SecondBrain] marker write error: {_e}")
+
+    await _aio.sleep(180)                                     # startup settle
+    while True:
+        try:
+            from agora.execution.claude_inbox import add_task, pending
+            now = _time.time()
+            if (now - _last()) > _INTERVAL and not any(
+                    "Second-brain briefing" in (t.get("text", "") or "") for t in pending()):
+                add_task(
+                    "Second-brain briefing: think about the OWNER'S OWN vault notes (not the abstract "
+                    "frontier). Pick a real domain cluster under my-second-brain '04 Resources' "
+                    "(rotate domains), read 6-10 of his real notes (skip Agora-Agents/autolinker/"
+                    "vault-digest artifacts), then do four moves tied to specific notes: (1) GROUND up "
+                    "to 3 claims vs real literature (SUPPORTED/CONTRADICTED/EXTENDED), (2) find up to 2 "
+                    "GAPS between his notes, (3) CHALLENGE up to 2 beliefs with disconfirming evidence, "
+                    "(4) make up to 2 non-obvious CONNECTIONS. Then GENERATE 2-3 ideas, each BY one of "
+                    "his documented methods (ARI hidden-connection bridge, missing-reciprocity, "
+                    "abstraction-ladder lift, gap-scan, link-density emergence). Quote real note "
+                    "titles, cite real sources, be honest in caveats. Push ONE briefing vault note + "
+                    "Telegram a short digest. Any claim with a one-Lab-run falsifier -> severe-test it "
+                    "the same cycle (no claim without a measured baseline).")
+                _mark(now)
+                print("[SecondBrain] queued a Second-brain briefing task")
+        except Exception as e:
+            print(f"[SecondBrain] loop error: {e}")
+        await _aio.sleep(120 * 60)                            # re-check every ~2h
+
+
 async def seminar_report_loop(app: FastAPI):
     """While the owner is away, push a Telegram research report every ~3h: what the team
     researched, what was skipped and why, what got synthesized. Also seeds the shared MNEMO
@@ -871,6 +923,10 @@ async def lifespan(app: FastAPI):
         loop.create_task(scout_digest_loop(app))   # ~8h: Telegram digest of what GitHub issues were scanned
     except Exception as _e:
         print(f"[ScoutDigest] loop not started: {_e}")
+    try:
+        loop.create_task(second_brain_loop(app))   # ~daily: queue a Second-brain briefing on the owner's notes
+    except Exception as _e:
+        print(f"[SecondBrain] loop not started: {_e}")
     yield
     if hasattr(app.state, 'db') and app.state.db:
         await app.state.db.close()
