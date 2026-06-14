@@ -106,6 +106,28 @@ _FORECASTERS = {
 }
 
 
+def _persona_reliability() -> dict:
+    """Each forecaster's track record from RESOLVED tournaments: a Beta-smoothed hit-rate (a call hits
+    if its direction matched the realized outcome). 0.5 with no history — so the tournament blends
+    calls by WAS-IT-RIGHT, not one-agent-one-vote (direction #7, the accuracy loop applied to the swarm)."""
+    good: dict = {}
+    bad: dict = {}
+    for p in _load():
+        if p.get("by") != "tournament" or "actual" not in p or p.get("status") not in ("correct", "incorrect"):
+            continue
+        actual = p["actual"]
+        for c in p.get("calls", []):
+            a = c.get("agent")
+            if not a:
+                continue
+            if c.get("direction") == actual:
+                good[a] = good.get(a, 0) + 1
+            else:
+                bad[a] = bad.get(a, 0) + 1
+    return {a: (good.get(a, 0) + 1) / (good.get(a, 0) + bad.get(a, 0) + 2)
+            for a in set(good) | set(bad)}
+
+
 async def run_tournament(theme: str, horizon_days: int = 14) -> dict:
     """Every agent makes its OWN call on the same theme (one labeled-text flash call for all six).
     Stored as a single ledger record with per-agent calls; resolve_due scores each agent, and the
@@ -132,14 +154,20 @@ async def run_tournament(theme: str, horizon_days: int = 14) -> dict:
     calls = [c for c in results if c]
     if len(calls) < 3:          # flash returned junk — don't store a hollow tournament
         return {"status": "skipped", "reason": "fewer than 3 parseable calls"}
-    dirs = [c["direction"] for c in calls]
-    majority = max(set(dirs), key=dirs.count)
+    # Calibration-weighted blend (not one-agent-one-vote): each call counts as reliability x confidence,
+    # so a forecaster with a better track record moves the verdict more — reputation follows truth.
+    rel = _persona_reliability()
+    wt: dict = {}
+    for c in calls:
+        c["weight"] = round(rel.get(c["agent"], 0.5) * c["confidence"], 3)
+        wt[c["direction"]] = wt.get(c["direction"], 0.0) + c["weight"]
+    chosen = max(wt, key=wt.get)
+    sel = [c for c in calls if c["direction"] == chosen]
     pred = {"id": uuid.uuid4().hex[:8], "theme": theme[:120], "metric": base["metric"],
             "metric_label": base["metric_label"], "baseline": int(base["baseline"]),
-            "all_baselines": base["all_baselines"], "direction": majority,
-            "confidence": round(sum(c["confidence"] for c in calls if c["direction"] == majority)
-                                / max(1, dirs.count(majority)), 2),
-            "why": "tournament majority", "by": "tournament", "calls": calls,
+            "all_baselines": base["all_baselines"], "direction": chosen,
+            "confidence": round(sum(c["confidence"] for c in sel) / max(1, len(sel)), 2),
+            "why": "tournament (calibration-weighted)", "by": "tournament", "calls": calls,
             "made_ts": time.time(), "resolve_ts": time.time() + horizon_days * 86400,
             "horizon_days": horizon_days, "status": "pending"}
     preds = _load()

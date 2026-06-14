@@ -90,12 +90,60 @@ def queue_synthesis(min_findings: int = 8) -> dict:
     return {"status": "queued", "task": tid, "n_findings": inp["n_findings"]}
 
 
+_AUDIT_STOP = set((
+    "the a an of to in on for and or is are was were be been being that this these those it its as by "
+    "at from with which who what when where why how not no than then so such into over under more most "
+    "less can could should would will may might because therefore thus hence also both each every any "
+    "we our they their system across between one two via using use makes make").split())
+
+
+def _atoks(s: str) -> set:
+    return {w for w in re.findall(r"[a-z][a-z\-]{3,}", (s or "").lower()) if w not in _AUDIT_STOP}
+
+
+def interpreter_audit(thesis: str, rests_on: list, threshold: float = 0.12) -> dict:
+    """Gazzaniga's interpreter check (Breaktruth #24 / direction #5). A synthesized thesis is a story
+    the 'interpreter' stitches over the findings — so audit that each ASSERTION actually traces to a
+    finding it rests_on, and flag the ones that don't as CONFABULATION. Lexical, no LLM: each
+    assertion's content-token overlap with the union of the rests_on text. Advisory — it flags, it
+    does not block (silent suppression would be its own confabulation)."""
+    support_text = []
+    for x in (rests_on or []):
+        if isinstance(x, dict):
+            support_text.append(str(x.get("text") or x.get("claim") or x.get("title")
+                                    or x.get("finding") or x.get("note") or ""))
+        else:
+            support_text.append(str(x))
+    support_toks: set = set().union(*[_atoks(t) for t in support_text]) if support_text else set()
+    assertions = []
+    for s in re.split(r"(?<=[.!?])\s+", (thesis or "")):
+        s = s.strip()
+        if len(s) < 25:
+            continue
+        at = _atoks(s)
+        if not at:
+            continue
+        overlap = len(at & support_toks) / len(at)
+        assertions.append({"assertion": s[:160], "support": round(overlap, 3),
+                           "grounded": overlap >= threshold})
+    n = len(assertions)
+    grounded = sum(1 for a in assertions if a["grounded"])
+    ratio = round(grounded / n, 3) if n else 1.0
+    verdict = ("grounded" if ratio >= 0.6 else
+               "partly_confabulated" if ratio >= 0.3 else "largely_confabulated")
+    return {"provenance_ratio": ratio, "n_assertions": n, "grounded": grounded,
+            "unsupported": [a["assertion"] for a in assertions if not a["grounded"]],
+            "verdict": verdict}
+
+
 def record_thesis(thesis: str, rests_on: list, why: str = "", falsifier: str = "",
                   honest: bool = True, note_path: str = "") -> dict:
     """Claude writes the synthesized thesis back to the organ's ledger."""
+    audit = interpreter_audit(thesis, rests_on or [])
     rec = {"ts": time.time(), "thesis": (thesis or "")[:600], "rests_on": rests_on or [],
            "why": (why or "")[:800], "falsifier": (falsifier or "")[:500],
-           "note_path": note_path[:300], "honest": bool(honest) and len((thesis or "").strip()) > 20}
+           "note_path": note_path[:300], "honest": bool(honest) and len((thesis or "").strip()) > 20,
+           "audit": audit}
     _store_proposal(rec)
     return {"status": "ok", **rec}
 
