@@ -14,19 +14,21 @@ if (-not $brainUp) {
         python -ArgumentList "-m", "uvicorn", "agora.main:app", "--host", "127.0.0.1", "--port", "8000"
 }
 
-# Dungeon runs UNDER the supervisor (dungeon_supervisor.py), which owns mcp_server.py's lifecycle
-# and restarts it on a wedged life-loop or a crash (heartbeat watchdog). Launch the SUPERVISOR, not
-# mcp_server directly. Re-running this script is safe: if the supervisor is already up, do nothing.
-# Because this script (re-run on logon, or on a periodic schtask) revives the supervisor itself, the
-# two layers cover each other: supervisor heals the dungeon, this script heals the supervisor.
-$supUp = $procs | Where-Object { $_.CommandLine -like '*dungeon_supervisor.py*' }
-if (-not $supUp) {
+# Dungeon: the CANONICAL manager is the brain's in-process watchdog (watch_dungeon_forever), which
+# HTTP-checks :5174 and relaunches a BARE mcp_server.py after a couple of misses. So the canonical
+# setup is brain-watchdog + exactly ONE bare mcp_server.py and ZERO supervisors. A dungeon_supervisor
+# here would FIGHT the brain watchdog — its kill_stray_dungeons() kills the watchdog's dungeon, and
+# each relaunches what the other kills => restart churn that starves the Scout scan. So this script
+# (a) always kills any stray supervisor, and (b) launches a bare mcp_server only if none is up.
+$procs | Where-Object { $_.CommandLine -like '*dungeon_supervisor.py*' } |
+    ForEach-Object { Stop-Process -Id $_.ProcessId -Force -ErrorAction SilentlyContinue }
+
+$dungeonUp = $procs | Where-Object { $_.CommandLine -like '*mcp_server.py*' -and $_.CommandLine -notlike '*-c*' }
+if (-not $dungeonUp) {
     Remove-Item Env:\DUNGEON_AUTOPUSH -ErrorAction SilentlyContinue
     $env:PYTHONUNBUFFERED = '1'
-    # clear any stray bare dungeon so the supervisor starts from a clean slate
-    Get-CimInstance Win32_Process -Filter "name like '%python%'" |
-        Where-Object { $_.CommandLine -like '*mcp_server.py*' -and $_.CommandLine -notlike '*-c*' } |
-        ForEach-Object { Stop-Process -Id $_.ProcessId -Force -ErrorAction SilentlyContinue }
     Start-Process -WindowStyle Hidden -WorkingDirectory "C:\Users\Danculus\agora\agora-game-server" `
-        python -ArgumentList "-u", "dungeon_supervisor.py"
+        -RedirectStandardOutput "C:\Users\Danculus\agora\agora-game-server\_dungeon.log" `
+        -RedirectStandardError "C:\Users\Danculus\agora\agora-game-server\_dungeon.err" `
+        python -ArgumentList "-u", "mcp_server.py"
 }
