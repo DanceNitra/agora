@@ -221,6 +221,14 @@ class Mnemo:
             rel = (sim / _top_sim) if _top_sim > 0 else 1.0
             r["value"] += 0.25 * rel
             r["last_access"] = _now                 # ...and resets the per-type decay clock
+            # Type GRADUATION: an episodic memory recalled into high accrued value has proven durable,
+            # so promote it to semantic — it stops fading on the fast 7-day episodic clock and decays
+            # on the slow semantic one instead. (Dakera's access-driven episodic->semantic promotion,
+            # gated on accrued VALUE rather than raw access count, so a popular-but-trivial memory
+            # doesn't graduate.)
+            if r.get("mtype") == "episodic" and r["value"] >= _GRADUATE_VALUE:
+                r["mtype"] = "semantic"
+                r.setdefault("meta", {})["graduated_from_episodic"] = True
             out.append({"id": r["id"], "text": r["text"], "tags": r["tags"], "iso": r["iso"],
                         "value": round(r["value"], 2), "relevance": round(sim, 3),
                         "score": round(score, 3), "links": r["links"]})
@@ -421,6 +429,9 @@ class Mnemo:
 # episodic = events (fade fast); semantic = durable facts (fade slow); procedural = rules/prefs
 # (barely fade). Access resets the decay clock (see Mnemo._effective_value). Tunable.
 _HALFLIFE_S = {"episodic": 7 * 86400, "semantic": 180 * 86400, "procedural": 3650 * 86400}
+# accrued value at which a repeatedly-recalled EPISODIC memory graduates to semantic (≈16 strong
+# recalls from the 1.0 floor); proven-durable, so it should decay on the slow clock, not the fast one.
+_GRADUATE_VALUE = 5.0
 _PROCEDURAL_RE = re.compile(r"\b(always|never|prefers?|rule|workflow|convention|policy|habit|"
                             r"setting|must|should|avoid|don't|do not)\b", re.I)
 _SEMANTIC_RE = re.compile(r"\b(means|defined|definition|theorem|law of|equals|consists? of|"
