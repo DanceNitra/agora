@@ -52,3 +52,4 @@ agora_output/*.png
 **/_dungeon.log
 **/_dungeon.err
 agora-game-server/_supervisor.log
+CLAUDE.md

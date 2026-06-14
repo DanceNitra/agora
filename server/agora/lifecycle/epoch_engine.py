@@ -10,6 +10,7 @@ Phases (within each epoch):
 Uses DB-backed epoch records from the schema.
 """
 import json
+import os
 import time
 from typing import Any, Optional
 
@@ -24,11 +25,24 @@ class EpochEngine:
         self.db = db
         self._current_epoch: int = 0
         self._tick_in_epoch: int = 0
+        self._synced: bool = False
 
     async def tick(self, app) -> list[dict]:
         """Run one epoch tick. Returns events to broadcast."""
         events = []
         db = self.db
+        if not self._synced:
+            # Resume the epoch counter across process restarts — it lives only in memory, so a fresh
+            # process would otherwise restart at 0 and re-INSERT epoch_number 0,1,2... that already
+            # exist (UNIQUE constraint failed: epochs.epoch_number, every tick). Continue from the max.
+            try:
+                cur = await db.execute("SELECT MAX(epoch_number) AS m FROM epochs")
+                row = await cur.fetchone()
+                if row and row["m"] is not None:
+                    self._current_epoch = int(row["m"])
+            except Exception:
+                pass
+            self._synced = True
         self._tick_in_epoch += 1
 
         # Check if we need to advance epoch
@@ -218,6 +232,11 @@ class EpochEngine:
     async def _fork_agents(self, db, app) -> list[dict]:
         """Spawn child agents if under capacity."""
         forked = []
+        # Forking the evolutionary clone-agents is OFF by default: the 8 named dungeon agents (+ the
+        # brain organs) do all the real research; the clone layer only added anonymous agents + noise.
+        # Re-enable with AGORA_EPOCH_FORK=1 if the evolutionary selection is ever wanted again.
+        if os.environ.get("AGORA_EPOCH_FORK", "0") != "1":
+            return forked
         # Only fork once per epoch
         if self._tick_in_epoch != 1:
             return forked
@@ -235,12 +254,13 @@ class EpochEngine:
 
         # Pick best parent (highest trust)
         cursor = await db.execute(
-            "SELECT agent_id, role, genome, trust_score FROM agent_identities "
+            "SELECT agent_id, role, genome, trust_score, generation FROM agent_identities "
             "WHERE status='active' ORDER BY trust_score DESC LIMIT 1"
         )
         parent = await cursor.fetchone()
         if not parent:
             return forked
+        parent = dict(parent)        # sqlite3.Row has no .get(); a dict does (and carries generation)
 
         import uuid
         parent_genome = json.loads(parent["genome"] or "{}")

@@ -67,12 +67,17 @@ mcp = FastMCP("mnemo")
 
 
 @mcp.tool()
-def remember(text: str, tags: list[str] | None = None, value: float = 1.0) -> dict:
+def remember(text: str, tags: list[str] | None = None, value: float = 1.0,
+             mtype: str | None = None) -> dict:
     """Store a memory (append-only; raw text is never edited afterward). `tags` group memories into
     cohorts; `value` (>=1) is its importance — higher-value memories outrank merely-similar ones at
-    recall, and recall itself nudges value up. Returns the new memory id."""
-    mid = _MEM.remember(text, tags=tags or [], value=value)
-    return {"id": mid, "stored": text[:120], "tags": tags or [], "value": value}
+    recall, and recall itself nudges value up. `mtype` ∈ {episodic, semantic, procedural} sets the
+    decay prior — episodic (events) fades fast, semantic (durable facts) slow, procedural (rules /
+    preferences) barely; pass it when you know the kind, else it's inferred. Returns the new id."""
+    mid = _MEM.remember(text, tags=tags or [], value=value, mtype=mtype)
+    rec = next((r for r in _MEM.items if r["id"] == mid), {})
+    return {"id": mid, "stored": text[:120], "tags": tags or [], "value": value,
+            "mtype": rec.get("mtype")}
 
 
 @mcp.tool()
@@ -84,10 +89,21 @@ def recall(query: str, k: int = 6) -> list[dict]:
 
 @mcp.tool()
 def consolidate(keep: int | None = None) -> dict:
-    """Run the consolidation 'dream' pass: link near-duplicate memories and, if `keep` is given,
-    mark the lowest-value surplus beyond that budget as superseded. ADDS a derived layer only — it
-    never edits or deletes raw memories. Returns a report (active / linked_pairs / staled / total)."""
+    """Run the consolidation 'dream' pass over ALL memories: flag universal-matcher 'hub' notes, link
+    near-duplicates, and (if `keep` is given) supersede the lowest-value surplus. Includes the
+    STATE-TOGGLE guard — a high-similarity pair that is a polarity clash (a preference flip) is
+    superseded, not merged, so recall returns the new state. ADDS a derived layer only; never edits
+    or deletes raw memories. Returns a report (active / hubs_flagged / linked_pairs / toggled / ...)."""
     return _MEM.consolidate(keep=keep)
+
+
+@mcp.tool()
+def consolidate_clusters(threshold: int = 15) -> dict:
+    """Cluster-TRIGGERED consolidation: consolidate a semantic cluster only once it has grown past
+    `threshold` members — not a global blanket. Avoids prematurely consolidating sparse topics (raw
+    episodes stay the best representation) and unbounded growth in dense ones. Cheap to call often
+    (a no-op until a cluster is ripe). Returns clusters_total / clusters_fired / linked_pairs / ..."""
+    return _MEM.consolidate_clusters(threshold=threshold)
 
 
 @mcp.tool()

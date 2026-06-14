@@ -225,6 +225,7 @@ async def ws_handler(reader: asyncio.StreamReader, writer: asyncio.StreamWriter)
     global ws_loop
     ws_loop = asyncio.get_event_loop()
 
+    queue = None        # bound only after a successful handshake; guard the finally cleanup
     try:
         # Read HTTP upgrade request
         data = await reader.readuntil(b"\r\n\r\n")
@@ -295,7 +296,8 @@ async def ws_handler(reader: asyncio.StreamReader, writer: asyncio.StreamWriter)
     except Exception as e:
         logger.debug(f"WebSocket error: {e}")
     finally:
-        ws_clients.discard(queue)
+        if queue is not None:
+            ws_clients.discard(queue)
         try:
             writer.close()
         except Exception:
@@ -533,6 +535,110 @@ except Exception:
 _AGENT_MEM_DIR = Path(__file__).resolve().parent / ".agent_memory"
 _agent_mem_stores: dict = {}
 
+# ── Semantic recall for the agents (dogfood mnemo's embedder path) ─────────────────────────────
+# On a single GPU shared with the 30B planner, a live embed costs ~2s (it queues behind qwen). So
+# embedding is kept OFF the hot path: writes stay fast (the vec is filled later by a throttled
+# background worker) and recall query-embeds are cached. AGENT_SEMANTIC=0 -> pure lexical (original).
+_SEMANTIC = os.environ.get("AGENT_SEMANTIC", "1") != "0"
+_EMB_URL = os.environ.get("AGENT_EMBED_URL", "http://localhost:11434/api/embeddings")
+_EMB_MODEL = os.environ.get("AGENT_EMBED_MODEL", "nomic-embed-text")
+_emb_cache: dict = {}                       # text[:512] -> vec; FIFO-capped (query + write reuse)
+_EMB_CACHE_MAX = 4000
+
+
+def _ollama_embed(text: str):
+    """text -> embedding via the local ollama embed model. Raises on failure (mnemo then falls back
+    to lexical, never crashes). keep_alive holds the embedder resident so it never cold-loads."""
+    body = json.dumps({"model": _EMB_MODEL, "prompt": (text or "")[:512],
+                       "keep_alive": "30m"}).encode()
+    req = _urlreq.Request(_EMB_URL, data=body, headers={"Content-Type": "application/json"})
+    with _urlreq.urlopen(req, timeout=8) as r:
+        return json.loads(r.read())["embedding"]
+
+
+def _cached_embed(text: str):
+    key = (text or "")[:512]
+    v = _emb_cache.get(key)
+    if v is not None:
+        return v
+    v = _ollama_embed(text)
+    if len(_emb_cache) >= _EMB_CACHE_MAX:
+        _emb_cache.pop(next(iter(_emb_cache)), None)
+    _emb_cache[key] = v
+    return v
+
+
+def _vec_backfill_worker():
+    """Background + throttled: give vec-less ACTIVE memories a vector (highest value / most recent
+    first) so semantic recall has a corpus to match — without blocking the game loop or starving the
+    planner's GPU. mnemo's atomic _save makes the shared-file writes corruption-safe."""
+    while True:
+        try:
+            did = 0
+            for eid in list(_AGENT_NAMES):
+                m = _agent_mnemo(eid)
+                if m is None:
+                    continue
+                cand = [r for r in list(m.items)
+                        if r.get("status") == "active" and not r.get("vec")]
+                if not cand:
+                    continue
+                cand.sort(key=lambda r: (-float(r.get("value", 1.0)), -float(r.get("ts", 0))))
+                for r in cand[:40]:                   # newest + highest-value first (what recall reaches for)
+                    try:
+                        r["vec"] = list(_cached_embed(r.get("text", "")))
+                        did += 1
+                    except Exception:
+                        pass
+                    time.sleep(0.4)                   # yield the GPU to qwen between embeds
+                m._mat = None                         # invalidate cached vec-matrix -> recall sees new vecs
+                try:
+                    m._save()
+                except Exception:
+                    pass
+            time.sleep(2.0 if did else 30.0)          # idle longer once everything is embedded
+        except Exception:
+            time.sleep(30.0)
+
+
+def _migrate_active_pool(target: int = 400):
+    """One-time alignment with the keep=400 policy. Past keep=150 consolidations over-superseded, so
+    each store sits below mnemo's semantic crossover (300 active). Revive the highest-value superseded
+    records up to `target` so recall actually runs the embedder. Idempotent (no-op once active>=target;
+    the genuinely low-value tail stays superseded). Runs at startup, single-writer-safe."""
+    if _Mnemo is None:
+        return
+    for eid in list(_AGENT_NAMES):
+        m = _agent_mnemo(eid)
+        if m is None:
+            continue
+        try:
+            active = [r for r in m.items if r.get("status") == "active"]
+            if len(active) >= target:
+                continue
+            cand = [r for r in m.items if r.get("status") == "superseded"]
+            cand.sort(key=lambda r: -float(r.get("value", 1.0)))
+            for r in cand[: target - len(active)]:
+                r["status"] = "active"
+            m._mat = None
+            m._save()
+            logger.info("active-pool migrate %s: %d -> %d active", eid, len(active),
+                        min(target, len(active) + len(cand)))
+        except Exception:
+            pass
+
+
+_vec_worker_started = False
+
+
+def _start_vec_worker():
+    global _vec_worker_started
+    if _SEMANTIC and _Mnemo is not None and not _vec_worker_started:
+        _vec_worker_started = True
+        _migrate_active_pool(400)        # cross the semantic crossover now, not in hours
+        threading.Thread(target=_vec_backfill_worker, daemon=True, name="mnemo-vec").start()
+        logger.info("mnemo semantic vec-backfill worker started (model=%s)", _EMB_MODEL)
+
 
 def _agent_mnemo(eid: str):
     if _Mnemo is None:
@@ -541,7 +647,10 @@ def _agent_mnemo(eid: str):
     if m is None:
         try:
             _AGENT_MEM_DIR.mkdir(exist_ok=True)
-            m = _Mnemo(str(_AGENT_MEM_DIR / f"{eid}.json"))
+            # embed= gives recall the semantic path (query-embedded, value-ranked over vec-bearing
+            # memories); vectors themselves are populated off the hot path by _vec_backfill_worker.
+            m = _Mnemo(str(_AGENT_MEM_DIR / f"{eid}.json"),
+                       embed=(_cached_embed if _SEMANTIC else None))
             _agent_mem_stores[eid] = m
         except Exception:
             return None
@@ -2841,14 +2950,16 @@ _REFUSAL_RE = re.compile(
     r"|^\s*as\s+an\s+ai\b"
     r"|\byour\s+request\s+asks\b"
     r"|\bthe\s+required\s+source\s+is\s+missing\b"
-    r"|\bno\s+(?:paper|source)\s+(?:fits|matches|was\s+provided)\b"
+    r"|\bno\s+(?:paper|source)s?\s+(?:fits|matches|(?:was|were)\s+provided)\b"
     r"|^\s*(?:none|neither)\s+of\s+the\s+provided\b"
     r"|^\s*neither\s+(?:paper|source)s?\b"
     r"|^\s*the\s+provided\s+(?:real\s+)?(?:paper|source|literature)s?[^.\n]{0,40}\b"
     r"(?:do(?:es)?\s+not|don't|doesn't|are\s+unrelated|is\s+unrelated)"
     r"|^\s*(?:i|we)\s+need\s+a\b[^.\n]{0,30}\bsource"
     r"|^\s*you\s+did\s+not\s+provide"
-    r"|\bno\s+(?:real\s+|specific\s+)?source[^.\n]{0,40}\b(?:is|was)\s+provided\b"
+    r"|\bno\s+(?:real\s+|specific\s+)?sources?[^.\n]{0,40}\b(?:is|was|were)\s+provided\b"
+    r"|\bto\s+distill\s+(?:a\s+)?final\s+finding\b"
+    r"|\bi\s+need\s+the\s+actual\s+(?:paper|source)"
     r"|\bplease\s+(?:provide|supply)\b[^.\n]{0,40}\bsource",
     re.IGNORECASE)
 
@@ -2995,15 +3106,32 @@ async def ambient_life():
     loop_n = 0
     await _init_trust()
     await _refresh_forecast_scores()        # tournament hit-rates feed the standing blend
+    _start_vec_worker()                     # background semantic-vec backfill (off the hot path)
     logger.info("LLM-driven life loop started")
 
-    def remember(eid, text):
+    def remember(eid, text, mtype=None, value=None):
         memory.setdefault(eid, []).append(text)
         memory[eid] = memory[eid][-8:]
         m = _agent_mnemo(eid)                       # dogfood: persist into the agent's mnemo store
         if m is not None:
             try:
-                m.remember(str(text)[:300], tags=[eid])
+                s = str(text)
+                # Findings/discoveries are durable knowledge -> semantic + higher value (long
+                # half-life so they persist); plain quest chatter stays episodic and fades fast.
+                # Engages mnemo's per-type decay + value-ranking on our own agents.
+                if value is None:
+                    value = 2.5 if re.search(r"Source:|Hypothesis|Finding|Falsifier|"
+                                             r"\([A-Z][a-z]+ \d{4}\)", s) else 1.0
+                if mtype is None and value >= 2.0:
+                    mtype = "semantic"
+                # Keep the write fast: don't inline-embed (a live embed is ~2s under GPU contention).
+                # The vec is filled off the hot path by _vec_backfill_worker; recall stays semantic.
+                _saved_embed = getattr(m, "embed", None)
+                m.embed = None
+                try:
+                    m.remember(s[:300], tags=[eid], value=value, mtype=mtype)
+                finally:
+                    m.embed = _saved_embed
             except Exception:
                 pass
 
@@ -3536,7 +3664,10 @@ async def ambient_life():
                     mm = _agent_mnemo(_eid)
                     if mm is not None:
                         try:
-                            mm.consolidate(keep=150)
+                            # keep>300 holds the active pool above mnemo's measured semantic
+                            # crossover, so recall runs the embedder (below it, lexical is as good).
+                            mm.consolidate(keep=400)              # hubs + dedup + state-toggle + keep
+                            mm.consolidate_clusters(threshold=15)  # cluster-triggered consolidation
                         except Exception:
                             pass
                 return _keep_memory_signal()

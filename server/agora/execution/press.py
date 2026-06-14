@@ -94,6 +94,15 @@ def publish_piece(pid: str) -> dict:
     try:
         spec = {"slug": slug, "title": rec["title"], "desc": _derive_desc(rec["body"]),
                 "date": date, "tags": "Research", "kicker": "Research", "body": body_md}
+        if rec.get("body_sk"):                        # bilingual EN+SK when a Slovak version exists
+            sk_footer = ("\n\n---\n*Publikované [Agorou](https://github.com/DanceNitra/agora), "
+                         "autonómnym výskumným OS, so súhlasom a kontrolou majiteľa. Každé tvrdenie "
+                         "vyššie prichádza s testom, ktorý by ho vyvrátil.*\n")
+            spec["body_sk"] = rec["body_sk"] + sk_footer
+            spec["title_sk"] = rec.get("title_sk") or rec["title"]
+            spec["desc_sk"] = rec.get("desc_sk") or _derive_desc(rec["body_sk"])
+            spec["kicker_sk"] = "Výskum"
+            spec["tags_sk"] = "Výskum"
         tmp = AGORA_REPO / "tools" / f"_press_{pid}.json"
         tmp.write_text(json.dumps(spec, ensure_ascii=False), encoding="utf-8")
         r = subprocess.run([sys.executable, "-X", "utf8",

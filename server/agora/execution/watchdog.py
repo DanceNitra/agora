@@ -23,7 +23,10 @@ CHECK_EVERY = int(os.environ.get("AGORA_WATCHDOG_INTERVAL", "300"))
 _state = {"misses": 0, "restarts": [], "muted_until": 0.0}
 
 
-def _dungeon_up(timeout: int = 10) -> bool:
+def _dungeon_up(timeout: int = 25) -> bool:
+    # 25s (was 10s): on a single shared GPU the dungeon's event loop can block for several seconds
+    # during a qwen generation, so a short timeout produced false "down" readings and needless
+    # restarts. Give a busy-but-alive dungeon time to answer.
     try:
         with urllib.request.urlopen(DUNGEON_URL, timeout=timeout) as r:
             return r.status == 200
@@ -89,8 +92,10 @@ async def watch_dungeon_forever() -> None:
             _state["misses"] = 0
             continue
         _state["misses"] += 1
-        if _state["misses"] < 2:
-            continue                              # one blip ≠ down (manual restarts happen)
+        if _state["misses"] < 3:
+            continue                              # need 3 misses (~15min): a busy GPU or a manual
+            #                                       restart is not "down". Only a sustained outage
+            #                                       (3 consecutive 25s-timeout failures) triggers a restart.
         now = time.time()
         if not should_restart(_state, now):
             if now > _state["muted_until"]:

@@ -20,6 +20,7 @@ MAP_WIDTH = 10000
 
 # Attempt real Redis; fall back to fakeredis
 _redis_client = None
+_redis_warned = False     # warn once, not 6000×, when no backend is available
 
 try:
     import fakeredis
@@ -47,8 +48,8 @@ def _score_to_pos(score: float) -> tuple[float, float]:
 
 
 def get_redis_client():
-    """Get Redis client (real async or fakeredis fallback)."""
-    global _redis_client
+    """Get Redis client (real async or fakeredis fallback), or None if neither is available."""
+    global _redis_client, _redis_warned
     if _redis_client is not None:
         return _redis_client
 
@@ -61,6 +62,11 @@ def get_redis_client():
             pass
 
     _redis_client = _fallback
+    if _redis_client is None and not _redis_warned:
+        # No redis lib AND no fakeredis: spatial tracking is a no-op. Say so once instead of
+        # letting every position update raise + log ('NoneType' has no attribute 'zadd', 6000×).
+        print("[RedisGeo] no redis/fakeredis backend available — NPC spatial tracking disabled (no-op)")
+        _redis_warned = True
     return _redis_client
 
 
@@ -84,6 +90,8 @@ def _room_set(room: str) -> str:
 async def update_npc_position(npc_name: str, x: float, y: float, room: str = ""):
     """Update NPC position in Redis."""
     r = get_redis_client()
+    if r is None:
+        return                          # no backend — silently skip (warned once at client init)
     try:
         score = _pos_to_score(x, y)
         await r.zadd(KEY_POSITIONS, {npc_name: score})

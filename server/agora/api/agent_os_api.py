@@ -1491,6 +1491,47 @@ async def brain_scout():
     return {"status": "ok", "report": format_scout(), "items": _load()[-12:]}
 
 
+@router.get("/brain/scout/status")
+async def brain_scout_status():
+    """VISIBILITY for the GitHub Opportunity Scout: what was scanned, the outcomes, when it last
+    scanned, and the live current candidate. The scan itself runs autonomously from the dungeon
+    supervisor (~2.4h); this is the read-only surface so the owner can SEE it without typing /scout."""
+    import asyncio as _aio
+    from datetime import datetime, timezone
+    from agora.execution.scout import _load, _STORE, find_opportunity, _THEMES
+    import time as _t
+    items = _load()
+    # last-scan time: newest recorded item ts, falling back to the ledger file's mtime (the file is
+    # rewritten on every recorded outcome, so mtime ~= last recorded scan even on a no-fit cycle).
+    last_ts = max((x.get("ts", 0) for x in items), default=0.0)
+    try:
+        file_mtime = _STORE.stat().st_mtime
+    except Exception:
+        file_mtime = 0.0
+    last_scan = max(last_ts, file_mtime)
+
+    def _iso(ts: float) -> str:
+        return datetime.fromtimestamp(ts, tz=timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ") if ts else ""
+
+    def _bucket(o: str) -> str:
+        return "no_fit" if "no real fit" in (o or "").lower() else "drafted"
+    outcomes = {"drafted": 0, "no_fit": 0}
+    for x in items:
+        outcomes[_bucket(x.get("outcome", ""))] += 1
+    recent = [{"repo": x.get("repo", ""), "issue": x.get("issue", 0),
+               "outcome": x.get("outcome", ""), "url": x.get("url", ""),
+               "ts": x.get("ts", 0), "iso": _iso(x.get("ts", 0))} for x in items[-12:][::-1]]
+    cur_theme = _THEMES[int(_t.time() // 3600) % len(_THEMES)]
+    try:
+        target = await _aio.to_thread(find_opportunity)
+    except Exception as e:
+        target = {"error": str(e)[:120]}
+    return {"status": "ok", "scanned_count": len(items),
+            "last_scan_unix": last_scan, "last_scan_iso": _iso(last_scan),
+            "outcomes": outcomes, "current_theme": cur_theme,
+            "current_target": target, "recent": recent}
+
+
 @router.get("/brain/agent-activity")
 async def brain_agent_activity(n: int = 8):
     """Recent agent-attributed work across all organ ledgers — for the dungeon build log so every
@@ -1775,6 +1816,17 @@ async def brain_hypothesis_inputs(request: Request):
     auto-registers, so the agents then test it)."""
     from agora.execution.hypothesis_induction import gather_hypothesis_inputs
     return {"status": "ok", **await gather_hypothesis_inputs(request.app.state.db)}
+
+
+@router.post("/brain/hypothesize/run")
+async def brain_hypothesize_run(request: Request):
+    """Fire the hypothesis trigger once on demand: bridge a ripe cross-domain finding cluster into a
+    tested, RECORDED hypothesis (knowledge_type='hypothesis') with its falsifier registered for the
+    agents to test. Same path the ~6h hypothesis_loop runs autonomously."""
+    from agora.config import settings
+    from agora.execution.hypothesis_induction import synthesize_and_record_hypothesis
+    return {"status": "ok", **await synthesize_and_record_hypothesis(request.app.state.db,
+                                                                     settings.vault_path)}
 
 
 @router.get("/brain/ideation/inputs")

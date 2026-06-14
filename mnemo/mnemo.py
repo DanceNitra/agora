@@ -41,6 +41,7 @@ from __future__ import annotations
 
 import json
 import math
+import os
 import re
 import time
 import uuid
@@ -94,11 +95,18 @@ class Mnemo:
                 self.items = []
 
     # ── capture ──────────────────────────────────────────────────────────────
-    def remember(self, text: str, tags=None, value: float = 1.0, meta: dict | None = None) -> str:
-        """Append-only raw capture. Stamped with an absolute UTC time; never edited afterward."""
+    def remember(self, text: str, tags=None, value: float = 1.0, meta: dict | None = None,
+                 mtype: str | None = None) -> str:
+        """Append-only raw capture. Stamped with an absolute UTC time; never edited afterward.
+        mtype in {episodic, semantic, procedural} sets the decay prior (episodic fades fast,
+        semantic slow, procedural barely); inferred from the text if not given. Pass it explicitly
+        when the caller knows the kind — inference defaults to episodic (the conservative, fast-decay
+        choice) and only promotes on clear markers."""
         mid = uuid.uuid4().hex[:10]
+        now = time.time()
         rec = {"id": mid, "text": text, "tags": list(tags or []), "value": float(value),
-               "ts": time.time(), "iso": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()),
+               "ts": now, "iso": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()),
+               "mtype": mtype or _infer_type(text), "last_access": now,
                "status": "active", "links": [], "meta": dict(meta or {})}
         if self.embed:
             try:
@@ -189,6 +197,7 @@ class Mnemo:
                 qv = _np.asarray(qvec, dtype=_np.float32)
                 sims_vec = M @ (qv / (float(_np.linalg.norm(qv)) or 1.0))
         scored = []
+        _now = time.time()                                # for per-type decay of the ranking value
         for r in pool:
             if sims_vec is not None and r.get("vec") and r["id"] in self._vec_rowof:
                 sim = max(0.0, float(sims_vec[self._vec_rowof[r["id"]]]))
@@ -196,18 +205,37 @@ class Mnemo:
                 sim = self._similarity(query, r, qvec, qtok)
             if sim <= 0:
                 continue
-            score = sim * (1.0 + math.log1p(max(0.0, r["value"])))
+            score = sim * (1.0 + math.log1p(max(0.0, self._effective_value(r, _now))))
             scored.append((score, sim, r))
         scored.sort(key=lambda x: -x[0])
         out = []
+        _top_sim = scored[0][1] if scored else 1.0   # normalize reinforcement by this query's best match
         for score, sim, r in scored[:k]:
-            r["value"] += 0.25                      # retrieval is a value signal (used memories matter)
+            # Relevance-weighted reinforcement: a strong, on-target hit reinforces value MORE than a
+            # marginal one that merely squeaked into the top-k. A flat +bump lets a memory that is a
+            # weak false-positive for many queries become 'immortal' — the popular-but-irrelevant
+            # failure mode. Weighting by this recall's relevance (normalized to the query's best hit)
+            # ties reinforcement to how well the memory actually answered. (Independently converged on
+            # in production by the Dakera and mem0 teams: weight access events by recall score, not raw
+            # count.)
+            rel = (sim / _top_sim) if _top_sim > 0 else 1.0
+            r["value"] += 0.25 * rel
+            r["last_access"] = _now                 # ...and resets the per-type decay clock
             out.append({"id": r["id"], "text": r["text"], "tags": r["tags"], "iso": r["iso"],
                         "value": round(r["value"], 2), "relevance": round(sim, 3),
                         "score": round(score, 3), "links": r["links"]})
         if out:
             self._save()
         return out
+
+    def _effective_value(self, r: dict, now: float) -> float:
+        """Recall weight = stored value decayed by time since last access, at the memory's TYPE
+        half-life (episodic fades fast, semantic slow, procedural barely). Access resets the clock,
+        so memories that keep being useful stay alive while stored-but-never-recalled ones fade.
+        Reversible: raw value/text are untouched; only the effective ranking weight decays."""
+        hl = _HALFLIFE_S.get(r.get("mtype", "episodic"), _HALFLIFE_S["episodic"])
+        age = max(0.0, now - r.get("last_access", r.get("ts", now)))
+        return r["value"] * (0.5 ** (age / hl))
 
     # ── consolidation (the "dream" pass) ──────────────────────────────────────
     def _common_vocab(self, active: list[dict], min_df_frac: float = 0.002):
@@ -232,7 +260,8 @@ class Mnemo:
            query and drowns the specific memory the user actually wanted (measured on a 6k-note
            vault: such hubs sat in the top-10 for ~47% of queries). We mark them `status:'hub'`
            (reversible; recall skips them unless include_hubs) — measured to lift recall@5 ~+22%.
-        2. near-duplicate LINKING to the higher-value memory (dedup without delete).
+        2. near-duplicate LINKING (dedup without delete) — EXCEPT a polarity clash, which is a
+           STATE TOGGLE (preference flip): supersede the OLDER, since a contradiction is not a dup.
         3. keep-budget: mark the lowest-value surplus `superseded`.
 
         hub_coverage: a memory covering ≥ this fraction of the common vocabulary is a hub (0 disables).
@@ -252,24 +281,98 @@ class Mnemo:
                     hubs += 1
             active = [r for r in active if r["status"] == "active"]
         active.sort(key=lambda r: -r["value"])
-        linked = 0
+        linked = toggled = 0
         if link_duplicates:
-            # link near-duplicates to the higher-value memory (so retrieval can dedup, not delete)
+            # Pairwise near-duplicate pass. A high-similarity pair is normally LINKED (dedup without
+            # delete) — UNLESS it's a polarity clash (one negates the other), which is a STATE TOGGLE
+            # (a preference flip / contradiction), not a duplicate. Then we supersede the OLDER memory
+            # so recall returns the NEW state, instead of letting high vector similarity silently
+            # merge a contradiction into one blob. (state-toggle guard.)
             for i, a in enumerate(active):
+                if a["status"] != "active":          # superseded by an earlier toggle this pass
+                    continue
                 avec = self._qvec(a["text"])         # embed each anchor once, not once per partner
                 for b in active[i + 1:]:
-                    if b["id"] in a["links"]:
+                    if b["status"] != "active" or b["id"] in a["links"]:
                         continue
                     if self._similarity(a["text"], b, avec) >= dup_threshold:
-                        a["links"].append(b["id"]); linked += 1
+                        if _negation_clash(a["text"], b["text"]):
+                            older, newer = (a, b) if a["ts"] <= b["ts"] else (b, a)
+                            older["status"] = "superseded"
+                            older["superseded_ts"] = time.time()
+                            older.setdefault("meta", {})["superseded_by_toggle"] = newer["id"]
+                            toggled += 1
+                            if older is a:
+                                break                # this anchor is gone; advance to the next
+                        else:
+                            a["links"].append(b["id"]); linked += 1
         staled = 0
         if keep is not None and len(active) > keep:
             for r in active[keep:]:
                 r["status"] = "superseded"; r["superseded_ts"] = time.time(); staled += 1
         self._save()
         return {"active": len([r for r in self.items if r["status"] == "active"]),
-                "hubs_flagged": hubs, "linked_pairs": linked, "staled": staled,
-                "kept": keep, "total": len(self.items)}
+                "hubs_flagged": hubs, "linked_pairs": linked, "toggled": toggled,
+                "staled": staled, "kept": keep, "total": len(self.items)}
+
+    # ── cluster-triggered consolidation ───────────────────────────────────────
+    def _cluster_active(self, sim_threshold: float = 0.5) -> list[list[dict]]:
+        """Cheap greedy single-pass clustering of ACTIVE memories by similarity (O(n·#clusters)).
+        Highest-value member is the cluster representative; each memory joins the most-similar
+        cluster above the threshold, else starts its own. Lexical or semantic per the store's mode."""
+        active = sorted([r for r in self.items if r["status"] == "active"], key=lambda r: -r["value"])
+        cents: list[dict] = []
+        for r in active:
+            rvec = self._qvec(r["text"])
+            best = None
+            for c in cents:
+                s = self._similarity(c["rec"]["text"], r, c["vec"])
+                if s >= sim_threshold and (best is None or s > best[1]):
+                    best = (c, s)
+            if best:
+                best[0]["members"].append(r)
+            else:
+                cents.append({"rec": r, "vec": rvec, "members": [r]})
+        return [c["members"] for c in cents]
+
+    def consolidate_clusters(self, threshold: int = 15, cluster_sim: float = 0.5,
+                             dup_threshold: float = 0.82, keep_per_cluster: int | None = None) -> dict:
+        """Cluster-TRIGGERED consolidation: consolidate a semantic cluster only once it has grown past
+        `threshold` members — not a global nightly blanket. Avoids (1) prematurely consolidating sparse
+        topics, where the raw episodes are still the best representation, and (2) unbounded growth in
+        dense ones. Cheap to call often (no-op until a cluster is ripe). Runs dedup + the state-toggle
+        guard (+ optional keep-budget) WITHIN each ripe cluster only."""
+        clusters = self._cluster_active(cluster_sim)
+        fired = linked = toggled = staled = 0
+        for members in clusters:
+            if len(members) < threshold:
+                continue                              # sparse — leave the raw episodes alone
+            fired += 1
+            members.sort(key=lambda r: -r["value"])
+            for i, a in enumerate(members):
+                if a["status"] != "active":
+                    continue
+                avec = self._qvec(a["text"])
+                for b in members[i + 1:]:
+                    if b["status"] != "active" or b["id"] in a["links"]:
+                        continue
+                    if self._similarity(a["text"], b, avec) >= dup_threshold:
+                        if _negation_clash(a["text"], b["text"]):
+                            older, newer = (a, b) if a["ts"] <= b["ts"] else (b, a)
+                            older["status"] = "superseded"; older["superseded_ts"] = time.time()
+                            older.setdefault("meta", {})["superseded_by_toggle"] = newer["id"]
+                            toggled += 1
+                            if older is a:
+                                break
+                        else:
+                            a["links"].append(b["id"]); linked += 1
+            if keep_per_cluster is not None:
+                act = sorted([r for r in members if r["status"] == "active"], key=lambda r: -r["value"])
+                for r in act[keep_per_cluster:]:
+                    r["status"] = "superseded"; r["superseded_ts"] = time.time(); staled += 1
+        self._save()
+        return {"clusters_total": len(clusters), "clusters_fired": fired, "threshold": threshold,
+                "linked_pairs": linked, "toggled": toggled, "staled": staled}
 
     # ── contradiction surfacing (flag, never auto-delete) ─────────────────────
     def contradictions(self, sim_threshold: float = 0.5, incompatible=None) -> list[dict]:
@@ -304,9 +407,35 @@ class Mnemo:
         if not self.path:
             return
         try:
-            self.path.write_text(json.dumps(self.items, ensure_ascii=False, indent=1), encoding="utf-8")
+            # Atomic write: a partial/interleaved write can't corrupt the store (crash- and
+            # concurrent-writer-safe — last writer wins, never a torn JSON file).
+            data = json.dumps(self.items, ensure_ascii=False, indent=1)
+            tmp = self.path.with_name(self.path.name + ".tmp")
+            tmp.write_text(data, encoding="utf-8")
+            os.replace(tmp, self.path)
         except Exception:
             pass
+
+
+# ── per-type decay priors (the half-life a memory's ranking value decays at, by kind) ──────────
+# episodic = events (fade fast); semantic = durable facts (fade slow); procedural = rules/prefs
+# (barely fade). Access resets the decay clock (see Mnemo._effective_value). Tunable.
+_HALFLIFE_S = {"episodic": 7 * 86400, "semantic": 180 * 86400, "procedural": 3650 * 86400}
+_PROCEDURAL_RE = re.compile(r"\b(always|never|prefers?|rule|workflow|convention|policy|habit|"
+                            r"setting|must|should|avoid|don't|do not)\b", re.I)
+_SEMANTIC_RE = re.compile(r"\b(means|defined|definition|theorem|law of|equals|consists? of|"
+                          r"is a |is an |is the |refers to)\b", re.I)
+
+
+def _infer_type(text: str) -> str:
+    """Conservative type inference: default EPISODIC (fast decay) and only promote on clear markers.
+    Callers that know the kind should pass mtype explicitly."""
+    t = text or ""
+    if _PROCEDURAL_RE.search(t):
+        return "procedural"
+    if _SEMANTIC_RE.search(t):
+        return "semantic"
+    return "episodic"
 
 
 def _negation_clash(a: str, b: str) -> bool:

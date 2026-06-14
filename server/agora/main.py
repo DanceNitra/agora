@@ -654,13 +654,49 @@ async def idea_forge_loop(app: FastAPI):
     """The Idea Forge cadence: ~twice a day, file a 'Forge ideas' inbox task so the main loop runs
     the /idea-forge skill — read the whole brain (canon, beliefs, replications, the ~6000-note
     vault) and generate GROUNDBREAKING ideas across the four targets (OS, Agora, MCP memory,
-    real-world product). Skips if a Forge task is already pending, so it never stacks."""
+    real-world product). Skips if a Forge task is already pending, so it never stacks.
+
+    RESTART-RESILIENT: the 12h cadence is anchored to a PERSISTED last-fire time (server/
+    .ideation_lastrun, falling back to the newest ts in server/.ideation.json), not to an
+    in-process timer. Previously the loop just slept 12h at the bottom of each iteration, so every
+    brain restart reset the clock to boot+12h — several restarts in a day starved the forge and it
+    never fired. Now it wakes often, computes wall-clock elapsed, and fires whenever >12h have
+    passed, so frequent restarts can no longer prevent a fire."""
     import asyncio as _aio
-    await _aio.sleep(300)                                     # let startup settle
+    import json as _json
+    import time as _time
+    from pathlib import Path as _P
+    _root = _P(__file__).resolve().parent.parent             # server/
+    _marker = _root / ".ideation_lastrun"
+    _ledger = _root / ".ideation.json"
+    _INTERVAL = 12 * 3600                                     # ~twice a day
+
+    def _last_fire() -> float:
+        # Prefer the explicit marker; fall back to the newest idea ts so a missing marker (first
+        # run after this upgrade, or a restart) does not trigger an immediate double-fire.
+        try:
+            return float(_marker.read_text(encoding="utf-8").strip())
+        except Exception:
+            pass
+        try:
+            items = _json.loads(_ledger.read_text(encoding="utf-8"))
+            return max((float(it.get("ts", 0) or 0) for it in items), default=0.0)
+        except Exception:
+            return 0.0
+
+    def _mark(now: float) -> None:
+        try:
+            _marker.write_text(str(now), encoding="utf-8")
+        except Exception as _e:
+            print(f"[IdeaForge] marker write error: {_e}")
+
+    await _aio.sleep(120)                                     # short startup settle; overdue fires fast
     while True:
         try:
             from agora.execution.claude_inbox import add_task, pending
-            if not any("Forge ideas" in (t.get("text", "") or "") for t in pending()):
+            now = _time.time()
+            overdue = (now - _last_fire()) > _INTERVAL
+            if overdue and not any("Forge ideas" in (t.get("text", "") or "") for t in pending()):
                 add_task(
                     "Forge ideas: run the /idea-forge skill — GET /brain/ideation/inputs (canon, "
                     "beliefs, lessons, reproduced+failed replications, analogies, theory, synthesis "
@@ -669,10 +705,11 @@ async def idea_forge_loop(app: FastAPI):
                     "(os|agora|mcp_memory|realworld). Each: mechanism + falsifier + first step, "
                     "grounded in specific vault knowledge, deduped against recent ideas. Push ONE "
                     "vault note, POST /brain/ideation/record per idea, Telegram a short digest.")
+                _mark(now)
                 print("[IdeaForge] queued a Forge ideas task")
         except Exception as e:
             print(f"[IdeaForge] loop error: {e}")
-        await _aio.sleep(12 * 3600)                           # ~twice a day
+        await _aio.sleep(90 * 60)                             # re-check every ~90 min
 
 
 async def seminar_report_loop(app: FastAPI):
@@ -716,6 +753,76 @@ async def db_retention_loop(app: FastAPI):
         await _aio.sleep(24 * 3600)                           # daily
 
 
+async def hypothesis_loop(app: FastAPI):
+    """Close the gap Agora's self-reflection flagged: thousands of findings, zero hypotheses. Every
+    ~6h, bridge a coherent cross-domain finding cluster into ONE hypothesis, TEST it against real
+    literature, RECORD it (knowledge_type='hypothesis'), and register its falsifier as an open
+    question so the agents go test it. Isolated facts become science only when something bridges
+    them — this is the trigger that existed in code but was never fired by any loop."""
+    import asyncio as _aio
+    await _aio.sleep(900)                                     # let startup + the finding stream settle
+    while True:
+        try:
+            from agora.execution.hypothesis_induction import synthesize_and_record_hypothesis
+            res = await synthesize_and_record_hypothesis(app.state.db, settings.vault_path)
+            if res.get("status") == "recorded":
+                print(f"[Hypothesis] recorded [{res.get('verdict')}]: {res.get('hypothesis','')[:70]}")
+                try:
+                    from agora.execution.telegram_bot import send
+                    from agora.execution.scientist import format_hypothesis
+                    await send("🧬 New hypothesis formed, tested + recorded:\n\n"
+                               + format_hypothesis(res.get("formatted", {})))
+                except Exception:
+                    pass
+            else:
+                print(f"[Hypothesis] skip: {res.get('reason','?')}")
+        except Exception as e:
+            print(f"[Hypothesis] loop error: {e}")
+        await _aio.sleep(6 * 3600)                            # every ~6h
+
+
+async def scout_digest_loop(app: FastAPI):
+    """VISIBILITY for the GitHub Opportunity Scout. The scan itself runs autonomously from the
+    dungeon supervisor (~2.4h) and writes server/.scout.json, but nothing ever pushed the owner a
+    digest — so GitHub scanning was invisible unless they manually typed /scout. Every ~8h this
+    reads the scout ledger and Telegrams what issues were scanned + the outcome split, and flags a
+    STALLED scan (e.g. dungeon down) when nothing new was engaged. Read-only; reuses the existing
+    ledger + _send_telegram. Does NOT scan itself (that would double-queue and burn rate limit)."""
+    import asyncio as _aio
+    import time as _t
+    await _aio.sleep(600)                                     # let startup settle
+    window = 8 * 3600
+    while True:
+        try:
+            from agora.execution.scout import _load, find_opportunity
+            from agora.api.agent_os_api import _send_telegram
+            items = _load()
+            cutoff = _t.time() - window
+            fresh = [x for x in items if x.get("ts", 0) >= cutoff]
+            if fresh:
+                drafted = sum(1 for x in fresh if "no real fit" not in (x.get("outcome", "") or "").lower())
+                nofit = len(fresh) - drafted
+                lines = [f"\U0001F52D *Scout digest* — {len(fresh)} GitHub issues scanned in ~8h "
+                         f"({drafted} drafted, {nofit} no-fit)"]
+                for x in fresh[-6:][::-1]:
+                    lines.append(f"• [{x.get('outcome','?')[:40]}] {x.get('repo','')}#{x.get('issue','')}")
+            else:
+                lines = ["\U0001F52D *Scout digest* — no new GitHub issues engaged in ~8h "
+                         "(scan may be idle — check the dungeon supervisor is running)."]
+            try:
+                tgt = await _aio.to_thread(find_opportunity)
+                if tgt and tgt.get("url"):
+                    lines.append(f"_Now eyeing:_ {tgt.get('repo','')}#{tgt.get('issue_number','')} "
+                                 f"(fit {tgt.get('score','?')})")
+            except Exception:
+                pass
+            await _send_telegram("\n".join(lines))
+            print(f"[ScoutDigest] sent ({len(fresh)} fresh of {len(items)})")
+        except Exception as e:
+            print(f"[ScoutDigest] loop error: {e}")
+        await _aio.sleep(window)                              # every ~8h
+
+
 async def lifespan(app: FastAPI):
     try:
         await init_db(app)
@@ -756,6 +863,14 @@ async def lifespan(app: FastAPI):
         loop.create_task(seminar_report_loop(app))  # ~3h: Telegram research report + seed MNEMO
     except Exception as _e:
         print(f"[Seminar] report loop not started: {_e}")
+    try:
+        loop.create_task(hypothesis_loop(app))     # ~6h: findings -> a tested, recorded hypothesis
+    except Exception as _e:
+        print(f"[Hypothesis] loop not started: {_e}")
+    try:
+        loop.create_task(scout_digest_loop(app))   # ~8h: Telegram digest of what GitHub issues were scanned
+    except Exception as _e:
+        print(f"[ScoutDigest] loop not started: {_e}")
     yield
     if hasattr(app.state, 'db') and app.state.db:
         await app.state.db.close()
