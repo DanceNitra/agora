@@ -1879,6 +1879,35 @@ async def brain_ideation():
     return {"status": "ok", "report": format_ideas(12), "items": _load()[-15:]}
 
 
+@router.get("/brain/exaptation/supply")
+async def brain_exaptation_supply():
+    """THE EXAPTATION SCANNER (outward turn) — the SUPPLY side: our proven mechanisms abstracted
+    to their structural invariant + ready-made world-search queries. Claude takes these OUT to the
+    live world (forums/Reddit/HN/YouTube) to harvest matching real unmet need."""
+    from agora.execution.exaptation import supply_registry
+    return {"status": "ok", **supply_registry()}
+
+
+@router.post("/brain/exaptation/record")
+async def brain_exaptation_record(request: Request):
+    """Record one discovered DEMAND->SUPPLY match (discovery only — NOT outreach; any outreach
+    still goes through the gated correspondent/draft flow)."""
+    from agora.execution.exaptation import record_match
+    b = await request.json()
+    if not b.get("mechanism_id") or not b.get("pain_title"):
+        return {"status": "empty"}
+    return {"status": "ok", **record_match(
+        b.get("mechanism_id", ""), b.get("pain_title", ""), b.get("url", ""),
+        b.get("community", ""), b.get("score", 0), b.get("note", ""))}
+
+
+@router.get("/brain/exaptation")
+async def brain_exaptation():
+    """The Exaptation Scanner ledger — real-world pain matched to our proven mechanisms."""
+    from agora.execution.exaptation import format_pipeline, _load
+    return {"status": "ok", "report": format_pipeline(15), "items": _load()[-20:]}
+
+
 @router.post("/brain/exchange/propose")
 async def brain_exchange_propose(request: Request):
     """RESEARCH EXCHANGE — compose the public digest (preview on disk) and propose publishing
