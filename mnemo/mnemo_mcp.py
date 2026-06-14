@@ -120,6 +120,16 @@ def value_by_cohort() -> dict:
     return _MEM.value_by_cohort()
 
 
+@mcp.tool()
+def credit(ids: list[str], outcome: str, weight: float = 1.0) -> dict:
+    """Close the accuracy loop: when the work some recalled memories fed gets a real verdict — a forecast
+    resolves, a claim is ruled correct/wrong, a plan succeeds/fails — call credit(those ids, outcome) so
+    each memory's track record updates. Future `recall` then ranks by WAS-IT-RIGHT (a Beta good/bad
+    posterior), not merely by being-recalled. `outcome`: 'good'/'right'/'correct' vs 'bad'/'wrong'/'failed'
+    (or pass a bool / a signed number). Counts only grow; raw text is never edited. Returns what updated."""
+    return _MEM.credit(ids, outcome, weight=weight)
+
+
 def main():
     mcp.run()
 

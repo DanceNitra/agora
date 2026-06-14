@@ -214,7 +214,12 @@ class Mnemo:
                 (_by_id.get(lid, {}).get("meta") or {}).get("superseded_by_toggle") for lid in r["links"])
             prov = 0.5 if stale else 1.0
             r["_stale_derived"] = stale                   # surfaced in the returned record
-            score = sim * (1.0 + math.log1p(max(0.0, self._effective_value(r, _now)))) * prov
+            # Calibration: WAS-IT-RIGHT. A per-memory Beta(good,bad) posterior (fed by credit() when work
+            # this memory was recalled into later RESOLVES) nudges the score by track record, not just by
+            # being-recalled. Neutral (x1.0) until a memory has any outcome; bounded to [0.5, 1.5] so one
+            # bad outcome can't erase a memory but a consistent liar fades and a consistent winner rises.
+            cal = 0.5 + self._reliability(r)
+            score = sim * (1.0 + math.log1p(max(0.0, self._effective_value(r, _now)))) * prov * cal
             scored.append((score, sim, r))
         scored.sort(key=lambda x: -x[0])
         out = []
@@ -241,10 +246,45 @@ class Mnemo:
             out.append({"id": r["id"], "text": r["text"], "tags": r["tags"], "iso": r["iso"],
                         "value": round(r["value"], 2), "relevance": round(sim, 3),
                         "score": round(score, 3), "links": r["links"],
+                        "reliability": round(self._reliability(r), 3),
                         "stale_derived": bool(r.get("_stale_derived"))})
         if out:
             self._save()
         return out
+
+    @staticmethod
+    def _reliability(r: dict) -> float:
+        """Per-memory track record as a Beta(1+good, 1+bad) posterior MEAN: 0.5 with no outcomes yet,
+        ->1 if recalls into it kept resolving WELL, ->0 if they kept resolving badly. Counts only grow."""
+        g = float(r.get("good", 0) or 0)
+        b = float(r.get("bad", 0) or 0)
+        return (g + 1.0) / (g + b + 2.0)
+
+    def credit(self, ids, outcome, weight: float = 1.0) -> dict:
+        """Close the accuracy loop onto the substrate. When the work a set of memories was recalled into
+        gets a real verdict (a forecast resolves, a replication is ruled REPRODUCED/FAILED, a hypothesis is
+        severe-tested), call credit(recalled_ids, outcome): each memory's Beta(good,bad) track record is
+        nudged so future recall ranks by WAS-IT-RIGHT, not merely was-it-recalled. Append-only to the
+        counts; never edits raw text. `outcome` may be a bool, a sign (>0 good), or a verdict string
+        (good/right/correct/reproduced/hit vs bad/wrong/failed/miss)."""
+        if isinstance(outcome, bool):
+            good = outcome
+        elif isinstance(outcome, (int, float)):
+            good = outcome > 0
+        else:
+            s = str(outcome).strip().lower()
+            good = s in ("good", "right", "correct", "reproduced", "hit", "true", "win", "+")
+        by_id = {x["id"]: x for x in self.items}
+        key, updated = ("good" if good else "bad"), []
+        for i in (ids or []):
+            rec = by_id.get(i)
+            if rec is None:
+                continue
+            rec[key] = float(rec.get(key, 0) or 0) + float(weight)
+            updated.append(i)
+        if updated:
+            self._save()
+        return {"updated": updated, "outcome": key, "weight": weight}
 
     def _effective_value(self, r: dict, now: float) -> float:
         """Recall weight = stored value decayed by time since last access, at the memory's TYPE
