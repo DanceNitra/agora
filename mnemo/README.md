@@ -2,7 +2,7 @@
 
 # Mnemosyne · `mnemo`
 
-**A memory layer for AI agents — the one that already runs an autonomous research OS over ~5,800 notes.**
+**A memory layer for AI agents — the one that already runs an autonomous research OS over ~6,000 notes.**
 
 *Memory is the mother of the Muses. An agent with no memory has no ideas.*
 
@@ -15,7 +15,7 @@ autonomous research system — distilled into **a single file with no required d
 the four things agent memory actually needs, the way that held up running in production for weeks.
 
 Most "agent memory" libraries are demos. This one is extracted from a system that has used it daily
-to curate a 5,800-note knowledge base, and whose consolidation behaviour we have **measured**, not
+to curate a 6,000-note knowledge base, and whose consolidation behaviour we have **measured**, not
 assumed (see *Provenance* below).
 
 ## Install
@@ -107,10 +107,12 @@ its memory is value-ranked and append-only, not a recency buffer.
 
 `mnemo`'s design isn't taste; it's what Agora's lab *measured*:
 
-- **Semantic recall beats keyword recall, and the gap widens with scale** — on the ~6,000-note
-  vault, embedding-based `recall@5` was **0.94 vs 0.63** lexical in our latest known-item benchmark
-  (and ≈3.8× on the harder full-corpus probe). The embedder is the real lever at scale; the lexical
-  overlap match is the zero-dependency *floor* that still runs anywhere. (Honest footnote: pruning
+- **Semantic recall beats keyword recall, and the gap widens with scale** — as the store grows to
+  the ~6,000-note full corpus, lexical `recall@5` decays from **0.94** (small store) to **0.25**,
+  while semantic **holds at ~0.65** — ≈**2.6×** at full scale (Agora Lab `b4c260`); on paraphrase
+  queries semantic `recall@5` is **0.86 vs 0.20** lexical (`3501f1`). The embedder is the real lever
+  at scale; the lexical overlap match is the zero-dependency *floor* that still runs anywhere on a
+  small store. (Honest footnote: pruning
   universal-matcher *hub* notes lifts **lexical** recall ~20% only when a store is link-spammed, and
   does **not** move semantic recall — it's a lexical/hybrid optimisation, not a headline.)
 - **Value-ranked consolidation** — under a keep-budget, ranking *what to keep* by value beats
@@ -127,15 +129,72 @@ its memory is value-ranked and append-only, not a recency buffer.
 - **Cohort-level value** — per-memory outcome attribution is **statistically underpowered at n-of-1**
   (the best proxy reached only ~0.36 power at realistic sample sizes); the cohort is where the
   signal lives. Hence rule 4.
-- **Contradiction detection** runs in production over the 5,800-note vault; the lesson that it must
+- **Contradiction detection** runs in production over the 6,000-note vault; the lesson that it must
   *flag, not auto-edit* (rule 5) is why silent rewrites are forbidden.
 
 (Methods + numbers live in the Agora track record: <https://dancenitra.github.io/agora/>.)
 
+## The `second_brain` thinking layer
+
+`mnemo_mcp` gives an agent **memory**. `second_brain_mcp` gives it a **second brain to think over** —
+point it at any folder of Markdown notes (an Obsidian vault, a Zettelkasten, a `docs/` tree) and an
+MCP client (Claude Desktop, Claude Code, Cursor, your own agent) gets the substrate to *reason
+against* those notes: pull what's relevant, find where the network is blind, surface non-obvious
+bridges, isolate the claims worth checking, and generate ideas by named methods.
+
+**The split that keeps it honest.** The server returns **retrieval + structure**; the calling LLM does
+the **reasoning**. The tool is the memory and the map; the agent is the mind. There is no LLM call
+inside this server — it scores, links, and slices your notes, then hands the material back. So the
+claims below are about what an *agent* did with the tools, not about the tool "thinking" on its own.
+No autonomous oracle.
+
+**Runs today, zero config.** It indexes your notes into an in-process `mnemo` store at startup; with
+no embedder it uses the lexical-overlap fallback. An embedder (`MNEMO_EMBED_URL/MODEL/KEY`) is optional
+and matters **at scale**: on a ~6,000-note vault, lexical recall@5 decays from 0.94 (small store) to
+**0.25** at full corpus while semantic **holds ~0.65** — ≈2.6× (Agora Lab `b4c260`); on paraphrase
+queries semantic recall@5 is **0.86 vs 0.20** lexical (`3501f1`).
+
+```
+NOTES_DIR=/path/to/your/vault python second_brain_mcp.py      # run after a flat download of both files
+```
+
+Register it with an MCP client (point `args` at the file's absolute path so `mnemo.py`, which sits
+beside it, is found):
+
+```json
+{
+  "mcpServers": {
+    "second_brain": {
+      "command": "python",
+      "args": ["/abs/path/to/second_brain_mcp.py"],
+      "env": {
+        "NOTES_DIR": "/abs/path/to/your/vault",
+        "SECOND_BRAIN_INDEX": "/abs/path/to/second_brain_index.json"
+      }
+    }
+  }
+}
+```
+
+| tool | returns |
+|---|---|
+| `index_status` | notes indexed, folder spread, resolved `NOTES_DIR` (call first; `0` ⇒ fix `NOTES_DIR`) |
+| `relevant_notes` | the `k` most relevant notes by relevance × accrued value (value accrues with use; a cold index is effectively relevance-ranked), with excerpts |
+| `find_gaps` | isolated/under-linked notes + thin folders — where the network is blind (noisy on a tiny vault; earns its keep at scale) |
+| `bridge_candidates` | distant notes (different folder, no link) that are semantically close = candidate connections; the agent writes or rejects the mapping |
+| `extract_claims` | claim-like sentences from a note so the agent can ground or challenge them |
+| `idea_methods` | a toolkit of named idea-generation recipes, so generation is principled, not a vibe |
+
+Dogfood result, stated honestly: pointed at the maintainer's own ~6,000-note vault, an agent using
+these tools caught a number in his *own* forecasting note inflated ~7× ("60-78%" vs the real ~6-11%),
+surfaced two silently-contradicting notes, and proposed ideas via `idea_methods` — two of which were
+then severe-tested **in Agora's separate research lab** (not inside this server) and held. The LLM did
+the reasoning; the corrections still warrant a source-check before public citation.
+
 ## Status
 
-`v0.1` — the core, honest and runnable, **now with an MCP server** so any Claude/agent client can use
-`mnemo` as its memory (above). Roadmap: pluggable vector stores, a hosted tier. Open-core; the core
-stays free.
+`v0.1` — the core, honest and runnable, **now with two MCP servers**: `mnemo_mcp` (memory) and
+`second_brain_mcp` (the thinking layer over your notes). Roadmap: pluggable vector stores, a hosted
+tier. Open-core; the core stays free.
 
 MIT-licensed · part of [Agora](https://github.com/DanceNitra/agora).
