@@ -2971,10 +2971,31 @@ def _is_refusal(text: str) -> bool:
     return bool(_REFUSAL_RE.search((text or "")[:300]))
 
 
+# Quest-INTENT guard: the agents were logging quest PLANS as "discoveries" — "Extend King Aldric's
+# result — Explore X", "Collaborate with Y on Z", "build on Mira's finding: ..." — which inflated the
+# count with chatter (~74% of discovery rows carried no finding). A plan is not knowledge. We drop a
+# contribution whose text is a bare quest-intent UNLESS it actually carries grounding (a source /
+# citation / measured result), in which case it's a real finding that merely mentions prior work.
+_INTENT_RE = re.compile(
+    r"^\s*(extend\s+\w+|collaborate with\b|co-develop\b|review and validate\b|let'?s\s+(explore|build)"
+    r"|build on\s+\w+'?s?\s+(finding|result|work)|pipeline:\s*(build on|collaborate|explore)"
+    r"|test agora'?s\s+claim\b|explore\s+\w+|investigate\s+\w+)", re.I)
+_GROUNDED_RE = re.compile(r"Source:|et al|\([A-Z][a-z]+,?\s+\d{4}\)|arXiv|\bdoi\b|measured|p_c|"
+                          r"=\s*-?\d|\d+%|coverage|reproduced", re.I)
+
+
+def _is_intent(text: str) -> bool:
+    return bool(_INTENT_RE.search((text or "")[:120]))
+
+
 async def _brain_contribute(eid: str, title: str, content: str) -> bool:
     if _is_refusal(content) or _is_refusal(title):
         broadcast({"type": "os_build", "kind": "collab", "who": _AGENT_NAMES.get(eid, eid),
                    "text": "discarded a non-finding (refusal/no-fit) — the slot yielded nothing"})
+        return False
+    if (_is_intent(content) or _is_intent(title)) and not _GROUNDED_RE.search(content or ""):
+        broadcast({"type": "os_build", "kind": "collab", "who": _AGENT_NAMES.get(eid, eid),
+                   "text": "discarded a quest-INTENT (a plan, not a finding) — only grounded results count"})
         return False
     r = await asyncio.to_thread(
         _brain_post_sync, "/api/v1/agent-os/brain/collective",
