@@ -13,9 +13,7 @@ class GenomeBridge:
 
     # Map DB role → GenesisForge skills
     ROLE_SKILLS = {
-        "researcher": ["web_search", "data_analyse", "summarise", "read_file"],
-        "writer": ["file_write", "format", "cite", "summarise"],
-        "critic": ["review", "validate", "score", "data_analyse"],
+        # (researcher/writer/critic removed: skill profiles for the purged old abstract agents.)
         "analyst": ["data_analyse", "web_search", "summarise", "validate"],
         "explorer": ["web_search", "read_file", "code_execute"],
         "adventurer": ["move", "talk", "interact", "explore"],

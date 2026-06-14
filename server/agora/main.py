@@ -512,43 +512,11 @@ async def init_db(app: FastAPI):
     app.include_router(vault_company_router)
     print(f"[VaultCompany] Engine + API initialized (6 agents, night cycle at 02:00 UTC)")
 
-    # Seed agents if empty
-    cursor = await db.execute("SELECT COUNT(*) as cnt FROM agent_identities")
-    row = await cursor.fetchone()
-    if row and row["cnt"] == 0:
-        await seed_agents(db)
+    # (Removed: the old abstract researcher/writer/critic agents are purged. The dungeon characters'
+    # identities are created via the dungeon/agent_os path, never seeded here — so an empty
+    # agent_identities table no longer respawns the old trio.)
 
     print(f"[Agora] DB initialized ({settings.database_url[:50]}...)")
-
-
-async def seed_agents(db):
-    seed_roles = [
-        {"role": "researcher", "tools": ["web_search", "read_file", "summarize"]},
-        {"role": "writer", "tools": ["write_file", "format", "cite"]},
-        {"role": "critic", "tools": ["review", "validate", "score"]},
-    ]
-    from agora.coordination.ess_protocol import ESSMessage
-    for s in seed_roles:
-        aid = str(uuid.uuid4())
-        genome = json.dumps({
-            "role": s["role"], "tools": s["tools"],
-            "model_tier": "cheap", "temperature": 0.7,
-            "personality_traits": {"curiosity": 0.8, "thoroughness": 0.7,
-                                   "cooperativeness": 0.85}
-        })
-        # Real Ed25519 identity for ESS message signing (task 1.5).
-        priv_key, pub_key = ESSMessage.generate_keypair()
-        pub_key_hex = ESSMessage.public_key_to_hex(pub_key)
-        priv_key_hex = ESSMessage.private_key_to_hex(priv_key)
-        await db.execute(
-            """INSERT INTO agent_identities (agent_id, public_key, generation, genome,
-               trust_score, energy_balance, role, status)
-               VALUES (?, ?, 0, ?, 0.5, 100, ?, 'active')""",
-            (aid, pub_key_hex, genome, s["role"])
-        )
-        # Dev only: private keys belong in a secrets manager in production.
-        print(f"  [Seed] {s['role']}-{aid[:8]} pub={pub_key_hex[:16]}... priv={priv_key_hex[:16]}...")
-    await db.commit()
 
 
 async def _seed_npc_inventories(db):
@@ -1444,28 +1412,7 @@ async def _economy_tick(app: FastAPI):
 
 async def tick_loop(app: FastAPI):
     """Main loop: agent interactions every N seconds (simulated thoughts when LLM disabled)."""
-    from agora.execution.llm_client import agent_think
     task_types = ["research", "writing", "review", "analysis", "exploration"]
-    use_llm = settings.llm_enabled
-
-    # Simulated responses per role (no API calls, no token cost)
-    SIMULATED_THOUGHTS = {
-        "researcher": [
-            {"action": "research", "topic": "pattern analysis", "insight": "Analyzing recent trace patterns for emergent behavior.", "confidence": 0.75},
-            {"action": "propose", "topic": "coordination strategy", "insight": "Proposing improved agent coordination based on trust signals.", "confidence": 0.7},
-            {"action": "respond", "topic": "data synthesis", "insight": "Synthesizing findings from multi-agent traces.", "confidence": 0.8},
-        ],
-        "writer": [
-            {"action": "write", "title": "system report", "content_preview": "Drafting system status report from agent outputs.", "confidence": 0.75},
-            {"action": "edit", "title": "trace log", "content_preview": "Editing trace log for clarity and structure.", "confidence": 0.7},
-            {"action": "format", "title": "insight summary", "content_preview": "Formatting collected insights into readable summary.", "confidence": 0.8},
-        ],
-        "critic": [
-            {"action": "review", "target": "agent outputs", "feedback": "Outputs show adequate quality, improvement area in novelty.", "score": 0.65},
-            {"action": "validate", "target": "trust model", "feedback": "Trust distribution appears healthy, no anomalies detected.", "score": 0.8},
-            {"action": "score", "target": "system health", "feedback": "System operating within normal parameters.", "score": 0.75},
-        ],
-    }
 
     while True:
         await asyncio.sleep(settings.tick_interval)
@@ -1560,69 +1507,12 @@ async def tick_loop(app: FastAPI):
             except Exception as e:
                 print(f"[LifecycleHooks] Post-tick error: {e}")
 
-            # THROTTLE: roleplay cognition is a 0-direct-value cost centre (see Metabolism). Cap
-            # how often and how many agents think per tick; the freed flash rate-limit headroom
-            # flows to the value-producing organs that share the same API budget.
-            if random.random() < settings.roleplay_think_pct:
-                n_think = max(1, min(settings.roleplay_agents_per_tick, len(agents)))
-                thinking_agents = random.sample(agents, n_think)
-            else:
-                thinking_agents = []
-            # ── 4. PROCESS THOUGHTS (global — LLM inferences batch) ──
-            # Prepare contexts and parameters for all thinking agents
-            thinking_params = []
-            for agent in thinking_agents:
-                agent_id = agent["agent_id"]
-                role = agent["role"]
-                agent_trust = agent["trust_score"]
-                agent_energy = agent["energy_balance"]
-
-                if agent_energy < 5:
-                    continue
-
-                partner = random.choice([a for a in agents if a["agent_id"] != agent_id])
-                partner_id = partner["agent_id"] if partner else None
-
-                tier = "expert" if agent_trust >= 0.7 else "medium" if agent_trust >= 0.4 else "cheap"
-
-                recent_traces = await stigmergy.recent_alerts(limit=3)
-                context_parts = [f"I am a {role} agent. Current trust: {agent_trust:.2f}."]
-                for t in recent_traces:
-                    context_parts.append(f"Recent: {t.get('result_preview', '')[:100]}")
-                context = " | ".join(context_parts)
-
-                thinking_params.append((agent, partner_id, tier, role, context))
-
-            # Gather LLM thoughts in parallel. roleplay_use_llm=False routes to the free
-            # SIMULATED_THOUGHTS branch below: agents still think (trust/ESS preserved) at zero token
-            # cost. This is the live source of the metered 'agent-think' sink (1.7M tok / value 0).
-            if use_llm and settings.roleplay_use_llm and thinking_params:
-                llm_coros = [asyncio.to_thread(agent_think, p[3], p[4], p[2]) for p in thinking_params]
-                llm_results = await asyncio.gather(*llm_coros, return_exceptions=True)
-
-                thoughts_with_params = []
-                for idx, (params, result) in enumerate(zip(thinking_params, llm_results)):
-                    agent, partner_id, tier, role, context = params
-                    if isinstance(result, Exception):
-                        print(f"[Tick] LLM exception for {role}: {result}")
-                        role_thoughts = SIMULATED_THOUGHTS.get(role, SIMULATED_THOUGHTS["researcher"])
-                        thought = random.choice(role_thoughts)
-                    elif result.get("action") == "error" and not str(result.get("insight", "")).strip():
-                        print(f"[Tick] LLM empty for {role}, falling back to simulated")
-                        role_thoughts = SIMULATED_THOUGHTS.get(role, SIMULATED_THOUGHTS["researcher"])
-                        thought = random.choice(role_thoughts)
-                    else:
-                        thought = result
-                    thoughts_with_params.append((agent, partner_id, tier, thought))
-
-                for agent, partner_id, tier, thought in thoughts_with_params:
-                    await _process_agent_thought(app, db, trust_engine, stigmergy, agent, partner_id, tier, thought, app.state.tick_count)
-            elif thinking_params:
-                for agent, partner_id, tier, role, context in thinking_params:
-                    role_thoughts = SIMULATED_THOUGHTS.get(role, SIMULATED_THOUGHTS["researcher"])
-                    thought = random.choice(role_thoughts)
-                    await _process_agent_thought(app, db, trust_engine, stigmergy, agent, partner_id, tier, thought, app.state.tick_count)
-
+            # ── 4. PROCESS THOUGHTS — REMOVED. This block was the old abstract researcher/writer/critic
+            # agents' roleplay cognition: it sampled agent_identities, called agent_think() (the value-0
+            # 'agent-think' organ) or canned SIMULATED_THOUGHTS, and fed _process_agent_thought. The old
+            # agents are purged; the dungeon characters' real cognition (AgentOS._think) and the gated
+            # seminar are the cognition paths now. Nothing here is replaced — the tick still runs
+            # lifecycle/controller/byzantine hooks above and the v3 emotion/dream/diary layer below.
             await db.commit()
 
             # ── Agentic OS v3 — emócie, vzťahy, sny, denníky, kultúra, konflikty ──
@@ -1893,7 +1783,6 @@ async def tick_loop(app: FastAPI):
             await broadcast(app, "heartbeat", {
                 "tick": app.state.tick_count, "agents": len(agents),
                 "total_energy": total_energy,
-                "thinking_agents": len(thinking_agents),
             })
         except Exception as e:
             print(f"[Tick] Error at tick {app.state.tick_count}: {e}")

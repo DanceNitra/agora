@@ -111,28 +111,7 @@ al.replay_events(lambda e: events_replayed.append(e))
 assert len(events_replayed) == 2
 print("[OK] audit.py")
 
-# 9. agents/base
-from agora.agents.base import BaseAgent
-import abc
-assert abc.ABCMeta in type(BaseAgent).__mro__
-print("[OK] base.py (abstract)")
+# (Sections #9 agents/base and #10 agents/researcher removed: the old abstract researcher/writer/critic
+#  agent scaffolding was purged. Their modules no longer exist.)
 
-# 10. agents/researcher
-from agora.agents.researcher import ResearcherAgent
-ra = ResearcherAgent("researcher-1", domain="biology")
-assert ra.agent_id == "researcher-1"
-assert ra.trust_score == 0.5
-assert ra.energy == 100.0
-plan = ra.think({"query": "What is RLHF?", "depth": "moderate"})
-assert plan["type"] == "research"
-assert len(plan["sub_queries"]) == 3
-outcome = ra.act(plan)
-assert len(outcome["results"]) == 3
-reflection = ra.reflect(outcome)
-assert "completeness" in reflection
-assert ra.energy < 100.0
-log = ra.get_research_log()
-assert len(log) == 3
-print("[OK] researcher.py")
-
-print("\n=== ALL 10 MODULES PASSED ===")
+print("\n=== ALL 8 MODULES PASSED ===")
