@@ -292,6 +292,19 @@ async def promote_findings(request: Request, n: int = 16):
         "ORDER BY created_at DESC LIMIT 150")
     rows = await cur.fetchall()
     import re as _re
+    # A vault note must carry a real finding — not a quest PLAN, not a NEGATIVE admission, not a
+    # placeholder. The audit (2026-06-14) found ~48% of curated notes were thin: intent stubs
+    # ("Collaborate with X", "Explore Y"), negatives ("neither cited paper supports the link"), and
+    # citation-mismatches that the Source:/year gate alone let through. Reject them before the judge.
+    _INTENT_PROMO = _re.compile(
+        r"^\s*(extend\s+\w+|(colla?borat|cooperat)(e|ion)\s+with\b|co-?develop\b|review and validate\b|connect\s+\w+"
+        r"|build on\s+\w+'?s?\s+(finding|result|work)|explore\s+\w+|investigate\s+\w+|develop\s+(a|an|the)\b"
+        r"|jointly\s+\w+|pipeline:\s*(build on|colla?borat|explore|connect))", _re.I)
+    _NEGATIVE_PROMO = _re.compile(
+        r"(neither|none|no)\s+(of\s+the\s+)?(cited\s+|provided\s+|real\s+)?(paper|source|abstract|study|studie)s?"
+        r"[^.\n]{0,40}\b(support|provide|relate|address|mention|match)|does not support|are unrelated|is unrelated"
+        r"|no papers? (were|was) provided|could not find any|unable to (find|locate)|total mismatch|not supported by",
+        _re.I)
     # 1) gather the window's eligible candidates (cheap filters; don't consume _PROMOTED yet)
     cands = []
     for r in rows:
@@ -301,6 +314,8 @@ async def promote_findings(request: Request, n: int = 16):
         if (title in _PROMOTED or len(content) < 160 or "Source:" not in content
                 or tl.count("hypothesize on:") >= 2 or tl.count("pursue direction:") >= 2):
             continue
+        if _INTENT_PROMO.match(title) or _INTENT_PROMO.match(content) or _NEGATIVE_PROMO.search(content):
+            continue                                       # a plan / negative / placeholder, not a finding
         _body, _, _src = content.partition("Source:")     # citation-year-mismatch rigor
         _by = _re.search(r"\b(?:19|20)\d{2}\b", _body)
         _sy = _re.search(r"\b(?:19|20)\d{2}\b", _src)
