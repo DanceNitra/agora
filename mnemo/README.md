@@ -158,6 +158,32 @@ queries semantic recall@5 is **0.86 vs 0.20** lexical (`3501f1`).
 NOTES_DIR=/path/to/your/vault python second_brain_mcp.py      # run after a flat download of both files
 ```
 
+### See it run (no setup)
+
+`python examples/demo.py` runs every tool against a tiny bundled sample vault — no MCP client, no
+key, no embedder. ([`examples/demo.tape`](../examples/demo.tape) renders it to a GIF with
+[`vhs`](https://github.com/charmbracelet/vhs): `vhs examples/demo.tape`.) A trimmed session:
+
+```text
+▸ relevant_notes("how does feedback speed up learning", k=3)
+  → Deliberate Practice (Learning)   relevance 0.60
+  → Expected Value     (Decisions)   relevance 0.20
+
+▸ find_gaps()              → isolated: ["Sourdough Starter"]   (the one note with no [[links]])
+
+▸ bridge_candidates("Deliberate Practice")
+  → Habit Loops (Habits, DISTANT domain)   — both turn on "feedback latency", and nothing links them
+
+▸ extract_claims("Deliberate Practice")
+  → "Feedback latency is the hidden variable: the longer the gap between an action
+     and its feedback, the slower the learning."   (line 3 — go ground or challenge it)
+
+▸ idea_methods()           → 10 recipes (Hidden-Connection Bridge, Missing-Reciprocity, …)
+```
+
+That `bridge_candidates` hit is the point: a connection across two folders that *you never linked* —
+the agent now writes the mapping (or rejects it). The tool found the material; the agent does the thinking.
+
 Register it with an MCP client (point `args` at the file's absolute path so `mnemo.py`, which sits
 beside it, is found):
 
