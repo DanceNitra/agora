@@ -1,13 +1,94 @@
 {
  "name": "The Crucible — machine replication ledger",
  "description": "Scientific and technical claims rebuilt as minimal computational models and tested. REPRODUCED = the mechanism holds in a minimal model; FAILED = it does not; NOT_COMPUTABLE = no simulable core (an honest pass).",
- "generated": "2026-06-12",
+ "generated": "2026-06-14",
  "counts": {
-  "REPRODUCED": 14,
+  "REPRODUCED": 22,
   "FAILED": 2,
-  "NOT_COMPUTABLE": 6
+  "NOT_COMPUTABLE": 7
  },
  "entries": [
+  {
+   "claim": "In DiD with FEW treated units and spatially/serially-correlated errors, standard DiD inference under-covers (invalid CIs) while synthetic control is materially better when parallel trends ~holds",
+   "source": "Alvarez & Ferman (2020)",
+   "verdict": "REPRODUCED",
+   "note": "N=30,T=12,1 treated,rho=0.7,true effect=0,800 reps: DiD 95% CI coverage=0.305 (severe under-coverage vs nominal 0.95); SC coverage=0.891; SC RMSE=1.017 < DiD RMSE=1.267. DiD inference invalid, SC materially better.",
+   "lab_id": "606f02",
+   "code": "https://github.com/DanceNitra/agora/blob/main/agora_output/lab/20260614-105855_af2020-did-vs-sc.py",
+   "date": "2026-06-14"
+  },
+  {
+   "claim": "p-hacking inflates Type I error in the error-statistical (Neyman-Pearson) approach but not in formal/likelihood inference that accounts for the selection",
+   "source": "Rubin (2026)",
+   "verdict": "REPRODUCED",
+   "note": "Under a true null (N=5000, n=30, K=5 forks): NP p-hacking (report min p) inflates Type I error 0.051->0.227 (+17.6pp, 4.45x, matches 1-.95^5=0.226). Formal/likelihood: a selection-ACCOUNTED likelihood (correct best-of-K sampling distributio",
+   "lab_id": "f4136f",
+   "code": "https://github.com/DanceNitra/agora/blob/main/agora_output/lab/20260614-104551_phack-np-vs-likelihood.py",
+   "date": "2026-06-14"
+  },
+  {
+   "claim": "Context-aware AI augmentation (adaptive type/timing/scale) preserves cognitive flow (difficulty-skill match); poorly-timed/scaled interventions disrupt flow and hurt reasoning performance",
+   "source": "Dissanayake & Nanayakkara (2025)",
+   "verdict": "NOT_COMPUTABLE",
+   "note": "Design/HCI framework, not a falsifiable empirical claim: a minimal flow model (flow=difficulty-skill match) confirms a gap-closing intervention by construction, so the directional result is near-tautological — no genuine FAILED was possible. Downgraded from a constructed-model REPRODUCED to keep the ledger honest.",
+   "lab_id": "1b4d0a",
+   "code": "https://github.com/DanceNitra/agora/blob/main/agora_output/lab/20260614-104519_replication-flow-aware-ai-augmentation.py",
+   "date": "2026-06-14"
+  },
+  {
+   "claim": "Removing top-10% degree nodes from a BA network (N=2000,m=2) raises the bond-percolation threshold p_c 0.174->0.776",
+   "source": "Simultaneous Degradation of Percolation and Cascade",
+   "verdict": "REPRODUCED",
+   "note": "Mechanism+direction reproduced: hub removal collapses <k^2> 50.8->3.8, p_c jumps ~8x (0.085->0.687 via Cohen mean-field). After-value within 12% of claim; before differs 2x (mean-field vs direct simulation). Robust-yet-fragile confirmed.",
+   "lab_id": "9bd205",
+   "code": "https://github.com/DanceNitra/agora/blob/main/agora_output/lab/20260613-144542_replicate-ba-hub-removal-percolation.py",
+   "date": "2026-06-13"
+  },
+  {
+   "claim": "Derenyi-Palla-Vicsek (2005): k-clique percolation in ER graphs at p_c(k)=[(k-1)N]^(-1/(k-1)); for k=3, p_c ~ 1/sqrt(2N)",
+   "source": "Clique Percolation in Random Networks (Derenyi, Palla, Vicsek, 2005)",
+   "verdict": "REPRODUCED",
+   "note": "k=3 scaling exponent confirmed: empirical p_c*sqrt(2N) constant across N=400/800/1600 (1.26,1.26,1.19). N^(-1/2) scaling reproduced; prefactor ~1.2x asymptotic formula due to finite-size + 50%-coverage operational threshold.",
+   "lab_id": "d02e5c",
+   "code": "https://github.com/DanceNitra/agora/blob/main/agora_output/lab/20260613-054612_clique-percolation-dpv.py",
+   "date": "2026-06-13"
+  },
+  {
+   "claim": "Berger (2003): conditional-frequentist testing reconciles Fisher/Neyman/Jeffreys - the conditional error probability equals the Bayesian posterior; the naive p-value overstates evidence against H0",
+   "source": "Berger (2003), Could Fisher, Jeffreys and Neyman Have Agreed on Testing?",
+   "verdict": "REPRODUCED",
+   "note": "Calibration exact: empirical freq(H0 true | evidence) = Bayesian P(H0|x) across all bins. Berger-Sellke: p=0.05 -> P(H0|x)=0.216, p=0.005 -> 0.041 (p-value overstates evidence ~4x at 0.05).",
+   "lab_id": "6e4ffc",
+   "code": "https://github.com/DanceNitra/agora/blob/main/agora_output/lab/20260613-035707_berger-conditional-frequentist-reconciliation.py",
+   "date": "2026-06-13"
+  },
+  {
+   "claim": "Systems in the same universality class share the same critical exponents (Lubeck 2004)",
+   "source": "Universal Scaling Behavior of Non-Equilibrium Phase Transitions (Sven Lubeck, 2004)",
+   "verdict": "REPRODUCED",
+   "note": "Three structurally different Z2 mean-field models (tanh self-consistency, phi^4 free energy, arctan self-consistency) all give order-parameter exponent beta=0.500; a different-class absorbing-state model gives beta=1.000. Same class -> same",
+   "lab_id": "d3e71e",
+   "code": "https://github.com/DanceNitra/agora/blob/main/agora_output/lab/20260612-235202_universality-critical-exponents.py",
+   "date": "2026-06-12"
+  },
+  {
+   "claim": "LinUCB (Chu et al 2011): linear contextual bandit achieves O(sqrt(Td log^3)) i.e. sublinear ~sqrt(T) regret w.p. 1-delta",
+   "source": "Contextual Bandits with Linear Payoff Functions (Chu, Li, Reyzin, Schapire, 2011)",
+   "verdict": "REPRODUCED",
+   "note": "Empirical regret growth exponent 0.03-0.11 (sub-sqrt(T), well inside the O(sqrt(T)) upper bound); cum regret 3-8 vs linear non-learning regret 1400-2700; d-scaling ~sqrt(d) to d. Computable core holds.",
+   "lab_id": "032cdd",
+   "code": "https://github.com/DanceNitra/agora/blob/main/agora_output/lab/20260612-230455_linucb-regret-replication.py",
+   "date": "2026-06-12"
+  },
+  {
+   "claim": "BA(N=2000,m=2): removing top-10% nodes by degree raises bond-percolation threshold p_c 0.174 -> 0.776 (~4.5x)",
+   "source": "Simultaneous Degradation of Percolation and Cascade Robustness Under Targeted Hub Removal (Cachero Sanchez, 2026-03-05)",
+   "verdict": "REPRODUCED",
+   "note": "MC before/after = 0.150/0.680 (ratio 4.53x) vs claimed ratio 4.46x; absolute values within finite-size tolerance. Cascade claim at phi=0.22 out of scope.",
+   "lab_id": "a33457",
+   "code": "https://github.com/DanceNitra/agora/blob/main/agora_output/lab/20260612-214132_percolation-hub-removal-replication.py",
+   "date": "2026-06-12"
+  },
   {
    "claim": "Dunning & Kruger (1999): the unskilled systematically overestimate their ability - a metacognitive deficit, shown by the quartile plot (bottom quartile +46pp, top -13pp)",
    "source": "Kruger & Dunning, J Pers Soc Psychol 77(6), 1999 - Unskilled and Unaware of It",
