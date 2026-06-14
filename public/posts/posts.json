@@ -14,6 +14,20 @@
   "bilingual": true
  },
  {
+  "slug": "a-95-confidence-interval-that-covers-31-of-the-time-differen",
+  "title": "A 95% confidence interval that covers 31% of the time: difference-in-differences with one treated unit",
+  "title_sk": "A 95% confidence interval that covers 31% of the time: difference-in-differences with one treated unit",
+  "desc": "The claim. When you run difference-in-differences (DiD) with a single treated unit and errors that are correlated over time, the \"95%\" confidence interval it reports is badly overconfident. In a clean",
+  "desc_sk": "The claim. When you run difference-in-differences (DiD) with a single treated unit and errors that are correlated over time, the \"95%\" confidence interval it reports is badly overconfident. In a clean",
+  "date": "2026-06-14",
+  "tags": "Research",
+  "tags_sk": "Research",
+  "kicker": "Research",
+  "kicker_sk": "Research",
+  "read": 2,
+  "bilingual": false
+ },
+ {
   "slug": "passing-a-pre-trends-test-is-weak-evidence-which-difference-",
   "title": "Passing a pre-trends test is weak evidence: which difference-in-differences assumption fails worst, measured",
   "title_sk": "Prejsť testom pre-trendov je slabý dôkaz: ktorý predpoklad difference-in-differences zlyháva najhoršie, namerané",
