@@ -15,6 +15,13 @@ class Settings(BaseSettings):
     # frees flash budget for research/replication/prediction. 1.0 + 2 reproduces the old behaviour.
     roleplay_think_pct: float = 0.5
     roleplay_agents_per_tick: int = 1
+    # When False, the tick-loop roleplay uses FREE canned SIMULATED_THOUGHTS instead of a per-agent
+    # LLM call. The agents still "think" every tick (trust/ESS/stigmergy updates via
+    # _process_agent_thought are preserved), but the metered 'agent-think' organ (1.7M tok / value 0 —
+    # generic flavor like "Analyzing trace patterns") stops growing. The dungeon characters' REAL
+    # cognition (AgentOS._think = agent-dialogue) and all research organs are untouched. Set True to
+    # restore LLM-generated roleplay flavor.
+    roleplay_use_llm: bool = False
     debug: bool = True
     api_key: str = ""
     api_base_url: str = "https://api.deepseek.com/v1"

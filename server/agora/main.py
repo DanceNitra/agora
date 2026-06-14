@@ -115,13 +115,12 @@ async def init_db(app: FastAPI):
     app.state.state_store = StateStore(db)
     app.state.lifecycle_hooks = LifecycleHooks(app.state.state_store, db)
     app.state.tool_registry = ToolRegistry(app.state.state_store, db)
-    # ExecutionEngine LLM think DISABLED on purpose (llm_client=None). It ran a SECOND per-agent LLM
-    # decision loop (pick one tool) that DUPLICATED AgentOS._think — the agents' rich primary cognition
-    # that already decides AND executes visible actions with full memory/trust/skill context. Metered as
-    # 'agent-think': 1.7M tok over 7.5k calls for value 0 — a redundant decision loop, never the value
-    # path. With llm_client=None the engine uses its built-in rule-based action, so agents still act and
-    # the visible world stays alive; the duplicate model spend is gone. One rich cognition loop, not two.
-    # Structural dedup at the root, not a cadence throttle. Reversible: restore the agent_think lambda.
+    # ExecutionEngine LLM think DISABLED (llm_client=None): it was a SECOND per-agent decision loop
+    # (pick one tool) that duplicated AgentOS._think — the agents' rich primary cognition that already
+    # decides AND executes visible actions. One cognition loop is enough; the engine falls back to its
+    # built-in rule-based action, so agents still act. NOTE: the metered 'agent-think' 1.7M-tok / value-0
+    # sink is NOT this loop — it is the tick_loop roleplay batch near line 1600 (see roleplay_use_llm,
+    # which is the real lever). Reversible: restore the agent_think lambda.
     app.state.execution_engine = ExecutionEngine(
         app.state.state_store, app.state.tool_registry, db,
         llm_client=None,
@@ -1594,8 +1593,10 @@ async def tick_loop(app: FastAPI):
 
                 thinking_params.append((agent, partner_id, tier, role, context))
 
-            # Gather LLM thoughts in parallel
-            if use_llm and thinking_params:
+            # Gather LLM thoughts in parallel. roleplay_use_llm=False routes to the free
+            # SIMULATED_THOUGHTS branch below: agents still think (trust/ESS preserved) at zero token
+            # cost. This is the live source of the metered 'agent-think' sink (1.7M tok / value 0).
+            if use_llm and settings.roleplay_use_llm and thinking_params:
                 llm_coros = [asyncio.to_thread(agent_think, p[3], p[4], p[2]) for p in thinking_params]
                 llm_results = await asyncio.gather(*llm_coros, return_exceptions=True)
 
