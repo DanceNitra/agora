@@ -72,6 +72,24 @@ def remember_contribution(claim: str, evidence: str = "", tags=None) -> None:
         pass
 
 
+def credit_outcome(subject: str, good: bool, k: int = 5, min_rel: float = 0.30) -> dict:
+    """Stage 3 of the accuracy loop (the one big bet): when an EXTERNAL verdict lands — a forecast
+    resolves correct/wrong, a replication is ruled REPRODUCED/FAILED — credit the brain-memories most
+    relevant to that subject by the outcome, so the substrate re-ranks by WAS-IT-RIGHT (knowledge tied
+    to verified results rises; knowledge tied to debunked claims fades). Recall-at-resolution with a
+    STRONG relevance floor (0.30, above the contribution gate) so only clearly-on-subject memories take
+    the signal — a defensible proxy for the exact grounding without creation-time recall-set stamping."""
+    try:
+        m = _mnemo()
+        hits = m.recall(subject or "", k=k)
+        ids = [h["id"] for h in hits if h.get("relevance", 0) >= min_rel]
+        if not ids:
+            return {"updated": [], "reason": "no strongly-relevant memory"}
+        return m.credit(ids, "good" if good else "bad")
+    except Exception as e:
+        return {"error": str(e)[:100]}
+
+
 def agent_can_contribute(role_hint: str, topic: str, min_rel: float = 0.22) -> tuple[bool, str]:
     """Can this agent genuinely add to the topic? True only if its memory (shared MNEMO, or the
     vault as a bootstrap backstop) surfaces relevant knowledge. Returns (can, context_snippets)."""

@@ -170,6 +170,15 @@ def record(claim: str, source: str, outcome: str, lab_id: str = "", note: str = 
     items = _load()
     items.append(rec)
     _save(items[-120:])
+    # Stage 3 (accuracy loop): a hard external verdict credits the brain-memories about this claim —
+    # REPRODUCED rewards knowledge consistent with verified results, FAILED debits knowledge tied to a
+    # debunked claim. NOT_COMPUTABLE carries no signal (skip).
+    if o in ("REPRODUCED", "FAILED"):
+        try:
+            from agora.execution.mnemo_bridge import credit_outcome
+            credit_outcome(claim, good=(o == "REPRODUCED"))
+        except Exception:
+            pass
     return rec
 
 

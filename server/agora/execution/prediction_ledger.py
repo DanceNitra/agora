@@ -256,6 +256,13 @@ async def resolve_due(force: bool = False) -> list:
         # 0.25 = a coin-flip 50% call. This is what makes the record CALIBRATION, not just hit-rate.
         p["brier"] = round((p.get("confidence", 0.5) - (1.0 if correct else 0.0)) ** 2, 4)
         p["resolved_ts"] = now
+        # Stage 3 (accuracy loop closed onto the substrate): the external verdict credits the
+        # brain-memories most relevant to this theme by whether the call was RIGHT.
+        try:
+            from agora.execution.mnemo_bridge import credit_outcome
+            credit_outcome(f"{p.get('theme', '')} {p.get('metric_label', '')}".strip(), good=correct)
+        except Exception:
+            pass
         resolved.append(p)
     if resolved:
         _save(preds)
