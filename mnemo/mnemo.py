@@ -198,6 +198,7 @@ class Mnemo:
                 sims_vec = M @ (qv / (float(_np.linalg.norm(qv)) or 1.0))
         scored = []
         _now = time.time()                                # for per-type decay of the ranking value
+        _by_id = {x["id"]: x for x in self.items}         # for provenance lookups (source-episode status)
         for r in pool:
             if sims_vec is not None and r.get("vec") and r["id"] in self._vec_rowof:
                 sim = max(0.0, float(sims_vec[self._vec_rowof[r["id"]]]))
@@ -205,7 +206,15 @@ class Mnemo:
                 sim = self._similarity(query, r, qvec, qtok)
             if sim <= 0:
                 continue
-            score = sim * (1.0 + math.log1p(max(0.0, self._effective_value(r, _now))))
+            # Provenance gate: a memory that absorbed near-duplicates (links) is STALE-DERIVED if any of
+            # those sources was later CONTRADICTED (state-toggle supersession) — the merged summary
+            # outlived a fact it summarized. Demote it (don't drop — flag for re-consolidation), so a
+            # consolidated claim can't quietly outrank the fresh memory that overturned its source.
+            stale = bool(r.get("links")) and any(
+                (_by_id.get(lid, {}).get("meta") or {}).get("superseded_by_toggle") for lid in r["links"])
+            prov = 0.5 if stale else 1.0
+            r["_stale_derived"] = stale                   # surfaced in the returned record
+            score = sim * (1.0 + math.log1p(max(0.0, self._effective_value(r, _now)))) * prov
             scored.append((score, sim, r))
         scored.sort(key=lambda x: -x[0])
         out = []
@@ -231,7 +240,8 @@ class Mnemo:
                 r.setdefault("meta", {})["graduated_from_episodic"] = True
             out.append({"id": r["id"], "text": r["text"], "tags": r["tags"], "iso": r["iso"],
                         "value": round(r["value"], 2), "relevance": round(sim, 3),
-                        "score": round(score, 3), "links": r["links"]})
+                        "score": round(score, 3), "links": r["links"],
+                        "stale_derived": bool(r.get("_stale_derived"))})
         if out:
             self._save()
         return out
