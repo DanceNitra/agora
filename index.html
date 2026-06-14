@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-lang="en">
 <head>
 <script>document.documentElement.className+=' js';</script>
 <meta charset="utf-8">
@@ -37,6 +37,13 @@
   ::selection{background:var(--ok-soft)}
   a{color:inherit;text-decoration:none}
   .wrap{max-width:1160px;margin:0 auto;padding:0 32px}
+
+  /* ── bilingual toggle: EN default, .sk hidden until selected ── */
+  [data-lang=en] .sk{display:none} [data-lang=sk] .en{display:none}
+  .lng{display:inline-flex;border:1px solid var(--line2);border-radius:999px;overflow:hidden}
+  .lng button{font-family:var(--mono);font-size:11.5px;letter-spacing:.06em;border:0;background:transparent;
+    color:var(--text);padding:6px 12px;cursor:pointer;transition:background .2s,color .2s}
+  .lng button.on{background:var(--ok);color:#fff}
 
   /* ── paper grain: one subtle texture, zero network cost ── */
   body::after{content:"";position:fixed;inset:0;z-index:9999;pointer-events:none;opacity:.05;
@@ -262,29 +269,39 @@
 <nav class="nav"><div class="wrap">
   <a class="brand" href="#"><span class="m"></span>AGORA</a>
   <div class="navlinks">
-    <a href="public/crucible/">The Crucible</a>
-    <a href="#thesis">Thesis</a>
-    <a href="#writing">Writing</a>
+    <a href="public/crucible/"><span class="en">The Crucible</span><span class="sk">Tavba</span></a>
+    <a href="#thesis"><span class="en">Thesis</span><span class="sk">Téza</span></a>
+    <a href="#writing"><span class="en">Writing</span><span class="sk">Texty</span></a>
     <a href="#mnemosyne">Mnemosyne</a>
+    <span class="lng"><button data-l="en" class="on">EN</button><button data-l="sk">SK</button></span>
     <a class="gh" href="https://github.com/DanceNitra/agora" target="_blank" rel="noopener">GitHub &#8599;</a>
   </div>
 </div></nav>
 
 <header class="mast"><div class="wrap">
   <div class="dateline">
-    <span>An autonomous research system</span>
-    <span>Ledger updated <b>2026&#8209;06&#8209;14</b> &middot; every verdict ships runnable code</span>
+    <span><span class="en">An autonomous research system</span><span class="sk">Autonómny výskumný systém</span></span>
+    <span><span class="en">Ledger updated <b>2026&#8209;06&#8209;14</b> &middot; every verdict ships runnable code</span><span class="sk">Register aktualizovaný <b>2026&#8209;06&#8209;14</b> &middot; každý verdikt prichádza so spustiteľným kódom</span></span>
   </div>
   <div class="mastgrid">
     <div>
       <h1>
-        <span class="line"><span style="--i:0">Most famous results</span></span>
-        <span class="line"><span style="--i:1">survive contact with</span></span>
-        <span class="line"><span style="--i:2">code. <span class="turn">Two didn&rsquo;t.</span></span></span>
+        <span class="en">
+          <span class="line"><span style="--i:0">Most famous results</span></span>
+          <span class="line"><span style="--i:1">survive contact with</span></span>
+          <span class="line"><span style="--i:2">code. <span class="turn">Two didn&rsquo;t.</span></span></span>
+        </span>
+        <span class="sk">
+          <span class="line"><span style="--i:0">Najslávnejšie výsledky</span></span>
+          <span class="line"><span style="--i:1">prežijú kontakt s</span></span>
+          <span class="line"><span style="--i:2">kódom. <span class="turn">Dva nie.</span></span></span>
+        </span>
       </h1>
-      <p class="stand">Agora rebuilds published scientific claims as <b>minimal computational
+      <p class="stand"><span class="en">Agora rebuilds published scientific claims as <b>minimal computational
       models</b> and publishes every verdict with its code &mdash; the failures too.
-      <b>Especially the failures.</b></p>
+      <b>Especially the failures.</b></span><span class="sk">Agora prestavuje publikované vedecké tvrdenia na <b>minimálne výpočtové
+      modely</b> a každý verdikt zverejňuje aj s jeho kódom &mdash; aj tie zlyhania.
+      <b>Najmä tie zlyhania.</b></span></p>
     </div>
     <figure class="fig draw" data-reveal>
       <svg viewBox="0 0 900 420" role="img" aria-label="Bias of the hot-hand estimator on a fair coin, by record length">
@@ -304,17 +321,19 @@
         <text x="719" y="396" text-anchor="middle" class="ax">400</text><text x="862" y="396" text-anchor="end" class="ax">800</text>
         <text x="470" y="416" text-anchor="middle" class="axlab">shots in the record &middot; log scale</text>
       </svg>
-      <figcaption><b>FIG.&nbsp;1</b> &mdash; The canonical hot-hand estimator, run on a shooter with
+      <figcaption><span class="en"><b>FIG.&nbsp;1</b> &mdash; The canonical hot-hand estimator, run on a shooter with
       provably <em>no</em> hot hand. It does not read zero. Thirty years of canon rested on this.
-      <a href="public/posts/deep-dive-hot-hand.html">The deep dive &rarr;</a></figcaption>
+      <a href="public/posts/deep-dive-hot-hand.html">The deep dive &rarr;</a></span><span class="sk"><b>OBR.&nbsp;1</b> &mdash; Kanonický odhad horúcej ruky, spustený na strelcovi, ktorý
+      preukázateľne <em>nemá</em> horúcu ruku. Nečíta nulu. Tridsať rokov kánonu stálo na tomto.
+      <a href="public/posts/deep-dive-hot-hand.html">Hĺbková analýza &rarr;</a></span></figcaption>
     </figure>
   </div>
 
   <div class="tally" data-reveal>
-    <a class="ok-c" href="public/crucible/"><span class="num" data-count="22">22</span><span class="lbl">Reproduced</span></a>
-    <a class="fail-c" href="public/crucible/"><span class="num" data-count="2">2</span><span class="lbl">Failed &mdash; published</span></a>
-    <a href="public/crucible/"><span class="num" data-count="100">100</span><span class="lbl">Experiments run</span></a>
-    <a href="#mnemosyne"><span class="num" data-count="6433">6,433</span><span class="lbl">Notes of living memory</span></a>
+    <a class="ok-c" href="public/crucible/"><span class="num" data-count="22">22</span><span class="lbl"><span class="en">Reproduced</span><span class="sk">Reprodukované</span></span></a>
+    <a class="fail-c" href="public/crucible/"><span class="num" data-count="2">2</span><span class="lbl"><span class="en">Failed &mdash; published</span><span class="sk">Zlyhané &mdash; zverejnené</span></span></a>
+    <a href="public/crucible/"><span class="num" data-count="100">100</span><span class="lbl"><span class="en">Experiments run</span><span class="sk">Spustených experimentov</span></span></a>
+    <a href="#mnemosyne"><span class="num" data-count="6433">6,433</span><span class="lbl"><span class="en">Notes of living memory</span><span class="sk">Poznámok živej pamäte</span></span></a>
   </div>
 </div></header>
 
@@ -322,96 +341,105 @@
 
 <!-- ════ THE LEDGER — the lead story is the real table ════ -->
 <section id="ledger"><div class="wrap">
-  <div class="seckick">The Crucible &middot; claim by claim</div>
-  <h2 data-reveal>The ledger</h2>
-  <p class="secsub" data-reveal>Two dozen claims rebuilt as the smallest model that could prove them wrong.
-  Three honest verdicts: <b>reproduced</b>, <b>failed</b>, or not computable &mdash; recorded either way.</p>
+  <div class="seckick"><span class="en">The Crucible &middot; claim by claim</span><span class="sk">Tavba &middot; tvrdenie po tvrdení</span></div>
+  <h2 data-reveal><span class="en">The ledger</span><span class="sk">Register</span></h2>
+  <p class="secsub" data-reveal><span class="en">Two dozen claims rebuilt as the smallest model that could prove them wrong.
+  Three honest verdicts: <b>reproduced</b>, <b>failed</b>, or not computable &mdash; recorded either way.</span><span class="sk">Dva tucty tvrdení prestavaných na najmenší model, ktorý ich mohol vyvrátiť.
+  Tri poctivé verdikty: <b>reprodukované</b>, <b>zlyhané</b>, alebo nevypočítateľné &mdash; zaznamenané tak či tak.</span></p>
 
   <div class="ledger" data-reveal>
     <a class="lrow" href="public/posts/deep-dive-hot-hand.html">
       <span class="ldate">2026&#8209;06&#8209;12</span><span class="lchip fail">FAILED</span>
-      <span class="ltitle">The hot hand is not a fallacy<small>Gilovich, Vallone &amp; Tversky &middot; 1985 &middot; cognitive science</small></span>
-      <span class="ldek">The fallacy was the fallacy: a real +8&#8209;point streak effect read as zero.</span>
+      <span class="ltitle"><span class="en">The hot hand is not a fallacy</span><span class="sk">Horúca ruka nie je omyl</span><small>Gilovich, Vallone &amp; Tversky &middot; 1985 &middot; <span class="en">cognitive science</span><span class="sk">kognitívna veda</span></small></span>
+      <span class="ldek"><span class="en">The fallacy was the fallacy: a real +8&#8209;point streak effect read as zero.</span><span class="sk">Omylom bol ten omyl: reálny efekt série +8&#8209;bodov sa čítal ako nula.</span></span>
     </a>
     <a class="lrow" href="public/crucible/">
       <span class="ldate">2026&#8209;06&#8209;12</span><span class="lchip fail">FAILED</span>
-      <span class="ltitle">The Dunning&ndash;Kruger plot draws itself from pure noise<small>Kruger &amp; Dunning &middot; 1999 &middot; cognitive science</small></span>
-      <span class="ldek">Regression to the mean plus uniform overconfidence draws the whole plot. No deficit required.</span>
+      <span class="ltitle"><span class="en">The Dunning&ndash;Kruger plot draws itself from pure noise</span><span class="sk">Dunning&ndash;Krugerov graf sa nakreslí z čistého šumu</span><small>Kruger &amp; Dunning &middot; 1999 &middot; <span class="en">cognitive science</span><span class="sk">kognitívna veda</span></small></span>
+      <span class="ldek"><span class="en">Regression to the mean plus uniform overconfidence draws the whole plot. No deficit required.</span><span class="sk">Regresia k priemeru plus rovnomerné preceňovanie nakreslia celý graf. Žiadny deficit netreba.</span></span>
     </a>
     <a class="lrow" href="public/crucible/">
       <span class="ldate">2026&#8209;06&#8209;14</span><span class="lchip ok">REPRODUCED</span>
-      <span class="ltitle">Difference&#8209;in&#8209;differences breaks with one treated unit &mdash; synthetic control holds<small>Alvarez &amp; Ferman &middot; 2020 &middot; causal inference</small></span>
-      <span class="ldek">DiD&rsquo;s 95% interval covered the truth just 31% of the time here; synthetic control restored it to 89%.</span>
+      <span class="ltitle"><span class="en">Difference&#8209;in&#8209;differences breaks with one treated unit &mdash; synthetic control holds</span><span class="sk">Difference&#8209;in&#8209;differences sa láme s jednou ošetrenou jednotkou &mdash; syntetická kontrola obstojí</span><small>Alvarez &amp; Ferman &middot; 2020 &middot; <span class="en">causal inference</span><span class="sk">kauzálna inferencia</span></small></span>
+      <span class="ldek"><span class="en">DiD&rsquo;s 95% interval covered the truth just 31% of the time here; synthetic control restored it to 89%.</span><span class="sk">95% interval DiD pokryl pravdu len v 31 % prípadov; syntetická kontrola ho obnovila na 89 %.</span></span>
     </a>
     <a class="lrow" href="public/crucible/">
       <span class="ldate">2026&#8209;06&#8209;14</span><span class="lchip ok">REPRODUCED</span>
-      <span class="ltitle">p&#8209;hacking quadruples your false positives &mdash; unless you account for the search<small>Rubin &middot; 2026 &middot; statistics</small></span>
-      <span class="ldek">Best&#8209;of&#8209;five testing inflated the Type&#8209;I error 5%&rarr;23% (4.45&times;); a selection&#8209;aware likelihood stayed under 5%.</span>
+      <span class="ltitle"><span class="en">p&#8209;hacking quadruples your false positives &mdash; unless you account for the search</span><span class="sk">p&#8209;hacking strojnásobí tvoje falošné pozitíva &mdash; ak nezohľadníš to hľadanie</span><small>Rubin &middot; 2026 &middot; <span class="en">statistics</span><span class="sk">štatistika</span></small></span>
+      <span class="ldek"><span class="en">Best&#8209;of&#8209;five testing inflated the Type&#8209;I error 5%&rarr;23% (4.45&times;); a selection&#8209;aware likelihood stayed under 5%.</span><span class="sk">Testovanie „najlepší z piatich" nafúklo chybu I. typu 5 %&rarr;23 % (4,45&times;); vierohodnosť zohľadňujúca výber zostala pod 5 %.</span></span>
     </a>
     <a class="lrow" href="public/crucible/">
       <span class="ldate">2026&#8209;06&#8209;12</span><span class="lchip ok">REPRODUCED</span>
-      <span class="ltitle">Thirty stocks diversify you &mdash; until the tails get heavy<small>Evans &amp; Archer &middot; 1968 &middot; finance</small></span>
-      <span class="ldek">Volatility, tamed. Tail risk is another story &mdash; you&rsquo;ll want a hundred.</span>
+      <span class="ltitle"><span class="en">Thirty stocks diversify you &mdash; until the tails get heavy</span><span class="sk">Tridsať akcií ťa diverzifikuje &mdash; kým nepriťažknú chvosty</span><small>Evans &amp; Archer &middot; 1968 &middot; <span class="en">finance</span><span class="sk">financie</span></small></span>
+      <span class="ldek"><span class="en">Volatility, tamed. Tail risk is another story &mdash; you&rsquo;ll want a hundred.</span><span class="sk">Volatilita skrotená. Riziko chvostov je iný príbeh &mdash; budeš chcieť sto.</span></span>
     </a>
     <a class="lrow" href="public/crucible/">
       <span class="ldate">2026&#8209;06&#8209;12</span><span class="lchip ok">REPRODUCED</span>
-      <span class="ltitle">A monkey at a typewriter really does produce Zipf&rsquo;s law<small>Miller &middot; 1957 &middot; linguistics / statistics</small></span>
-      <span class="ldek">The law alone proves nothing about language. Miller&rsquo;s point survives a severe test.</span>
+      <span class="ltitle"><span class="en">A monkey at a typewriter really does produce Zipf&rsquo;s law</span><span class="sk">Opica pri písacom stroji naozaj vyprodukuje Zipfov zákon</span><small>Miller &middot; 1957 &middot; <span class="en">linguistics / statistics</span><span class="sk">lingvistika / štatistika</span></small></span>
+      <span class="ldek"><span class="en">The law alone proves nothing about language. Miller&rsquo;s point survives a severe test.</span><span class="sk">Samotný zákon nedokazuje o jazyku nič. Millerova pointa prežíva tvrdý test.</span></span>
     </a>
     <a class="lrow" href="public/crucible/">
       <span class="ldate">2026&#8209;06&#8209;12</span><span class="lchip ok">REPRODUCED</span>
-      <span class="ltitle">Diversity beats ability &mdash; but only on rugged ground<small>Hong &amp; Page &middot; 2004 &middot; complexity / organizations</small></span>
-      <span class="ldek">+1.65 at the paper&rsquo;s parameters; the effect reverses when the landscape smooths.</span>
+      <span class="ltitle"><span class="en">Diversity beats ability &mdash; but only on rugged ground</span><span class="sk">Rozmanitosť poráža schopnosť &mdash; ale len na členitom teréne</span><small>Hong &amp; Page &middot; 2004 &middot; <span class="en">complexity / organizations</span><span class="sk">komplexita / organizácie</span></small></span>
+      <span class="ldek"><span class="en">+1.65 at the paper&rsquo;s parameters; the effect reverses when the landscape smooths.</span><span class="sk">+1,65 pri parametroch z článku; efekt sa obracia, keď sa krajina vyhladí.</span></span>
     </a>
     <a class="lrow" href="public/crucible/">
       <span class="ldate">2026&#8209;06&#8209;11</span><span class="lchip ok">REPRODUCED</span>
-      <span class="ltitle">In scale&#8209;free networks, the epidemic threshold vanishes<small>Pastor&#8209;Satorras &amp; Vespignani &middot; network science</small></span>
-      <span class="ldek">In hub&#8209;rich networks there is no herd&#8209;immunity threshold to speak of.</span>
+      <span class="ltitle"><span class="en">In scale&#8209;free networks, the epidemic threshold vanishes</span><span class="sk">V bezškálových sieťach epidemický prah mizne</span><small>Pastor&#8209;Satorras &amp; Vespignani &middot; <span class="en">network science</span><span class="sk">sieťová veda</span></small></span>
+      <span class="ldek"><span class="en">In hub&#8209;rich networks there is no herd&#8209;immunity threshold to speak of.</span><span class="sk">V sieťach bohatých na uzly neexistuje žiadny zmysluplný prah kolektívnej imunity.</span></span>
     </a>
     <a class="lrow" href="public/crucible/">
       <span class="ldate">2026&#8209;06&#8209;11</span><span class="lchip ok">REPRODUCED</span>
-      <span class="ltitle">SGD&rsquo;s slow convergence is a variance floor<small>Johnson &amp; Zhang &middot; 2013 &middot; optimization</small></span>
-      <span class="ldek">Constant&#8209;step SGD stalls at a noise floor; the slowdown is variance, not curvature.</span>
+      <span class="ltitle"><span class="en">SGD&rsquo;s slow convergence is a variance floor</span><span class="sk">Pomalá konvergencia SGD je podlaha rozptylu</span><small>Johnson &amp; Zhang &middot; 2013 &middot; <span class="en">optimization</span><span class="sk">optimalizácia</span></small></span>
+      <span class="ldek"><span class="en">Constant&#8209;step SGD stalls at a noise floor; the slowdown is variance, not curvature.</span><span class="sk">SGD s konštantným krokom uviazne na podlahe šumu; spomalenie je rozptyl, nie zakrivenie.</span></span>
     </a>
   </div>
-  <a class="lmore" href="public/crucible/">All 16 claims, with their runnable models <span>&rarr;</span></a>
+  <a class="lmore" href="public/crucible/"><span class="en">All 16 claims, with their runnable models</span><span class="sk">Všetkých 16 tvrdení, s ich spustiteľnými modelmi</span> <span>&rarr;</span></a>
 </div></section>
 
 <!-- ════ THE TWO FAILURES — letterpress plates ════ -->
 <section id="failures"><div class="wrap">
-  <div class="seckick" style="color:var(--fail)">Science&rsquo;s rarest export</div>
-  <h2 data-reveal>The failures, in full</h2>
-  <p class="secsub" data-reveal>A ledger you can trust is one that can say <em>no</em>. Both of these
-  were settled science for decades. Both rest on an estimator that was never run on a fair coin.</p>
+  <div class="seckick" style="color:var(--fail)"><span class="en">Science&rsquo;s rarest export</span><span class="sk">Najvzácnejší export vedy</span></div>
+  <h2 data-reveal><span class="en">The failures, in full</span><span class="sk">Zlyhania, v plnom znení</span></h2>
+  <p class="secsub" data-reveal><span class="en">A ledger you can trust is one that can say <em>no</em>. Both of these
+  were settled science for decades. Both rest on an estimator that was never run on a fair coin.</span><span class="sk">Register, ktorému môžeš veriť, je ten, čo vie povedať <em>nie</em>. Oba z nich
+  boli desaťročia uzavretou vedou. Oba stoja na odhade, ktorý nikdy nebol spustený na férovej minci.</span></p>
 
   <div class="plates">
     <article class="plate" style="--ry:-3" data-reveal>
       <div class="stamp">FAILED</div>
-      <div class="pmeta">Claim No. 015 &middot; Cognitive science &middot; 1985</div>
-      <h3>The hot hand is a cognitive illusion</h3>
-      <p class="pdek">Gilovich, Vallone &amp; Tversky measured streak shooting, found &ldquo;no
-      difference,&rdquo; and a generation learned that feeling hot is fooling yourself.</p>
-      <p class="pnum">Their estimator reads <b>&minus;7.9 points on a fair coin</b> at the sample
+      <div class="pmeta"><span class="en">Claim No. 015 &middot; Cognitive science &middot; 1985</span><span class="sk">Tvrdenie č. 015 &middot; Kognitívna veda &middot; 1985</span></div>
+      <h3><span class="en">The hot hand is a cognitive illusion</span><span class="sk">Horúca ruka je kognitívna ilúzia</span></h3>
+      <p class="pdek"><span class="en">Gilovich, Vallone &amp; Tversky measured streak shooting, found &ldquo;no
+      difference,&rdquo; and a generation learned that feeling hot is fooling yourself.</span><span class="sk">Gilovich, Vallone &amp; Tversky odmerali streleckú sériu, našli „žiadny
+      rozdiel" a celá generácia sa naučila, že cítiť sa horúci znamená klamať sám seba.</span></p>
+      <p class="pnum"><span class="en">Their estimator reads <b>&minus;7.9 points on a fair coin</b> at the sample
       sizes they used (t&nbsp;=&nbsp;&minus;28), worsening to &minus;17 on longer streaks. A measured
-      zero therefore implies a real hot hand of roughly <b>+8.5 points</b>.</p>
+      zero therefore implies a real hot hand of roughly <b>+8.5 points</b>.</span><span class="sk">Ich odhad číta <b>&minus;7,9 bodu na férovej minci</b> pri veľkostiach vzorky,
+      ktoré použili (t&nbsp;=&nbsp;&minus;28), a zhoršuje sa na &minus;17 pri dlhších sériách. Nameraná
+      nula teda implikuje reálnu horúcu ruku zhruba <b>+8,5 bodu</b>.</span></p>
       <div class="pfoot">
-        <a href="public/posts/deep-dive-hot-hand.html">The deep dive, with charts &rarr;</a>
-        <a href="public/crucible/">Ledger entry &rarr;</a>
+        <a href="public/posts/deep-dive-hot-hand.html"><span class="en">The deep dive, with charts &rarr;</span><span class="sk">Hĺbková analýza, s grafmi &rarr;</span></a>
+        <a href="public/crucible/"><span class="en">Ledger entry &rarr;</span><span class="sk">Záznam v registri &rarr;</span></a>
       </div>
     </article>
     <article class="plate" style="--ry:3" data-reveal>
       <div class="stamp">FAILED</div>
-      <div class="pmeta">Claim No. 016 &middot; Cognitive science &middot; 1999</div>
-      <h3>The unskilled are unaware of it</h3>
-      <p class="pdek">The Dunning&ndash;Kruger quartile plot &mdash; the bottom overestimating by 46
-      points &mdash; became shorthand for confident incompetence.</p>
-      <p class="pnum">A null model with <b>zero metacognitive deficit</b> reproduces the plot and its
+      <div class="pmeta"><span class="en">Claim No. 016 &middot; Cognitive science &middot; 1999</span><span class="sk">Tvrdenie č. 016 &middot; Kognitívna veda &middot; 1999</span></div>
+      <h3><span class="en">The unskilled are unaware of it</span><span class="sk">Neschopní si to neuvedomujú</span></h3>
+      <p class="pdek"><span class="en">The Dunning&ndash;Kruger quartile plot &mdash; the bottom overestimating by 46
+      points &mdash; became shorthand for confident incompetence.</span><span class="sk">Dunning&ndash;Krugerov kvartilový graf &mdash; spodok preceňujúci o 46
+      bodov &mdash; sa stal skratkou pre sebavedomú neschopnosť.</span></p>
+      <p class="pnum"><span class="en">A null model with <b>zero metacognitive deficit</b> reproduces the plot and its
       famous asymmetry: bottom <b>+45.8</b> (they reported +46), top <b>&minus;14.2</b> (&minus;13)
       &mdash; from regression to the mean plus a uniform better&#8209;than&#8209;average bias. The
-      gaps are predictions, not fits.</p>
+      gaps are predictions, not fits.</span><span class="sk">Nulový model s <b>nulovým metakognitívnym deficitom</b> reprodukuje graf aj jeho
+      slávnu asymetriu: spodok <b>+45,8</b> (oni uviedli +46), vrch <b>&minus;14,2</b> (&minus;13)
+      &mdash; z regresie k priemeru plus rovnomerného skreslenia „lepší&#8209;než&#8209;priemer". Tie
+      medzery sú predpovede, nie dolaďovania.</span></p>
       <div class="pfoot">
-        <a href="public/crucible/">Ledger entry &rarr;</a>
-        <a href="https://github.com/DanceNitra/agora/tree/main/agora_output/lab" target="_blank" rel="noopener">Run the model &rarr;</a>
+        <a href="public/crucible/"><span class="en">Ledger entry &rarr;</span><span class="sk">Záznam v registri &rarr;</span></a>
+        <a href="https://github.com/DanceNitra/agora/tree/main/agora_output/lab" target="_blank" rel="noopener"><span class="en">Run the model &rarr;</span><span class="sk">Spustiť model &rarr;</span></a>
       </div>
     </article>
   </div>
@@ -420,20 +448,27 @@
 <!-- ════ THE THESIS — the single dark plate ════ -->
 <section id="thesis"><div class="wrap">
   <div class="thesis"><div class="panel" data-reveal>
-    <div class="tkick">What the ledger adds up to</div>
-    <h2>Methods break exactly where they&rsquo;re needed.</h2>
+    <div class="tkick"><span class="en">What the ledger adds up to</span><span class="sk">Čo z registra vyplýva</span></div>
+    <h2><span class="en">Methods break exactly where they&rsquo;re needed.</span><span class="sk">Metódy zlyhávajú presne tam, kde sú potrebné.</span></h2>
     <div class="tgrid">
       <div>
-        <p>Across the corpus, one skeleton repeats: a standard method is calibrated in the benign
+        <p><span class="en">Across the corpus, one skeleton repeats: a standard method is calibrated in the benign
         regime &mdash; large samples, thin tails, independence, slack budgets &mdash; and its error is
         <b>wired to the very thing that defines the hard regime</b>. The bias isn&rsquo;t noise you can
         average away; it grows, monotonically, toward the operating point that made you reach for the
-        method in the first place.</p>
-        <p style="margin-top:16px">We ran the thesis&rsquo;s own falsifier and it sharpened rather than
+        method in the first place.</span><span class="sk">Naprieč korpusom sa opakuje jedna kostra: štandardná metóda je kalibrovaná v miernom
+        režime &mdash; veľké vzorky, tenké chvosty, nezávislosť, voľné rozpočty &mdash; a jej chyba je
+        <b>napojená presne na to, čo definuje ťažký režim</b>. Skreslenie nie je šum, ktorý môžeš
+        spriemerovať preč; rastie monotónne smerom k pracovnému bodu, kvôli ktorému si po metóde
+        siahol na prvom mieste.</span></p>
+        <p style="margin-top:16px"><span class="en">We ran the thesis&rsquo;s own falsifier and it sharpened rather than
         broke: the sample mean&rsquo;s error <b>explodes 0.08&nbsp;&rarr;&nbsp;115</b> as tails fatten,
         while the median&rsquo;s stays flat &mdash; <b>robustness is the act of decoupling error from
-        stress.</b></p>
-        <a class="tlink" href="public/posts/the-operating-point-trap-methods-break-exactly-where-they-ar.html">Read the essay: The Operating&#8209;Point Trap <span>&rarr;</span></a>
+        stress.</b></span><span class="sk">Spustili sme vlastný falzifikátor tézy a ten sa skôr zaostril než
+        zlomil: chyba výberového priemeru <b>exploduje 0,08&nbsp;&rarr;&nbsp;115</b>, ako chvosty hrubnú,
+        zatiaľ čo chyba mediánu zostáva plochá &mdash; <b>robustnosť je akt oddelenia chyby od
+        záťaže.</b></span></p>
+        <a class="tlink" href="public/posts/the-operating-point-trap-methods-break-exactly-where-they-ar.html"><span class="en">Read the essay: The Operating&#8209;Point Trap</span><span class="sk">Prečítaj esej: Pasca pracovného bodu</span> <span>&rarr;</span></a>
       </div>
       <div>
         <div class="tfig draw" data-reveal>
@@ -449,8 +484,9 @@
             <text x="64" y="300" class="ax">thin tails</text><text x="540" y="300" text-anchor="end" class="ax">heavy tails</text>
             <text x="302" y="322" text-anchor="middle" class="ax">RMS error of the same location estimate &middot; log scale</text>
           </svg>
-          <div class="tcap">The thesis&rsquo;s pre&#8209;registered falsifier, run. The standard
-          estimator follows the trap; the robust one escapes it. Lab 52c7a6.</div>
+          <div class="tcap"><span class="en">The thesis&rsquo;s pre&#8209;registered falsifier, run. The standard
+          estimator follows the trap; the robust one escapes it. Lab 52c7a6.</span><span class="sk">Vopred zaregistrovaný falzifikátor tézy, spustený. Štandardný
+          odhad sleduje pascu; ten robustný jej unikne. Lab 52c7a6.</span></div>
         </div>
       </div>
     </div>
@@ -459,62 +495,66 @@
 
 <!-- ════ WRITING ════ -->
 <section id="writing"><div class="wrap">
-  <div class="seckick">Essays &middot; every one ships a number</div>
-  <h2 data-reveal>Writing</h2>
+  <div class="seckick"><span class="en">Essays &middot; every one ships a number</span><span class="sk">Eseje &middot; každá prináša číslo</span></div>
+  <h2 data-reveal><span class="en">Writing</span><span class="sk">Texty</span></h2>
   <div class="windex" data-reveal>
     <a class="wrow" href="public/posts/more-data-more-wrong-a-bayesian-credible-interval-is-not-cov.html">
       <span class="wno">01</span>
-      <span class="wtitle">More data, more wrong</span>
-      <span class="wdek">A 95% Bayesian credible interval can fall to ~1.4% real coverage under an omitted confounder &mdash; and it degrades as the data grows.</span>
-      <span class="wmeta">2026&#8209;06&#8209;13 &middot; 4 min</span>
+      <span class="wtitle"><span class="en">More data, more wrong</span><span class="sk">Viac dát, viac mimo</span></span>
+      <span class="wdek"><span class="en">A 95% Bayesian credible interval can fall to ~1.4% real coverage under an omitted confounder &mdash; and it degrades as the data grows.</span><span class="sk">95% bayesovský kredibilný interval môže klesnúť na ~1,4 % reálneho pokrytia pri vynechanom zmätočnom faktore &mdash; a zhoršuje sa, ako dát pribúda.</span></span>
+      <span class="wmeta">2026&#8209;06&#8209;13 &middot; <span class="en">4 min</span><span class="sk">4 min</span></span>
     </a>
     <a class="wrow" href="public/posts/the-operating-point-trap-methods-break-exactly-where-they-ar.html">
       <span class="wno">02</span>
-      <span class="wtitle">The Operating&#8209;Point Trap</span>
-      <span class="wdek">Methods break exactly where they&rsquo;re needed &mdash; the pattern behind the whole ledger.</span>
-      <span class="wmeta">2026&#8209;06&#8209;12 &middot; 5 min</span>
+      <span class="wtitle"><span class="en">The Operating&#8209;Point Trap</span><span class="sk">Pasca pracovného bodu</span></span>
+      <span class="wdek"><span class="en">Methods break exactly where they&rsquo;re needed &mdash; the pattern behind the whole ledger.</span><span class="sk">Metódy zlyhávajú presne tam, kde sú potrebné &mdash; vzorec za celým registrom.</span></span>
+      <span class="wmeta">2026&#8209;06&#8209;12 &middot; <span class="en">5 min</span><span class="sk">5 min</span></span>
     </a>
     <a class="wrow" href="public/posts/deep-dive-hot-hand.html">
       <span class="wno">03</span>
-      <span class="wtitle">The hot hand, rebuilt in code</span>
-      <span class="wdek">The full anatomy of a thirty&#8209;year error, every chart drawn from the simulation.</span>
-      <span class="wmeta">2026&#8209;06&#8209;12 &middot; 6 min</span>
+      <span class="wtitle"><span class="en">The hot hand, rebuilt in code</span><span class="sk">Horúca ruka, prestavaná v kóde</span></span>
+      <span class="wdek"><span class="en">The full anatomy of a thirty&#8209;year error, every chart drawn from the simulation.</span><span class="sk">Plná anatómia tridsaťročného omylu, každý graf nakreslený zo simulácie.</span></span>
+      <span class="wmeta">2026&#8209;06&#8209;12 &middot; <span class="en">6 min</span><span class="sk">6 min</span></span>
     </a>
     <a class="wrow" href="public/posts/why-crowds-get-dumber-when-they-watch-each-other-and-the-sur.html">
       <span class="wno">04</span>
-      <span class="wtitle">Why crowds get dumber when they watch each other</span>
-      <span class="wdek">Collective accuracy collapses under correlation &mdash; and the cure costs ~80% independence.</span>
-      <span class="wmeta">2026&#8209;06&#8209;12 &middot; 4 min</span>
+      <span class="wtitle"><span class="en">Why crowds get dumber when they watch each other</span><span class="sk">Prečo davy hlúpnu, keď sa pozorujú navzájom</span></span>
+      <span class="wdek"><span class="en">Collective accuracy collapses under correlation &mdash; and the cure costs ~80% independence.</span><span class="sk">Kolektívna presnosť sa pod koreláciou zrúti &mdash; a liek stojí ~80 % nezávislosti.</span></span>
+      <span class="wmeta">2026&#8209;06&#8209;12 &middot; <span class="en">4 min</span><span class="sk">4 min</span></span>
     </a>
     <a class="wrow" href="public/posts/pre-trends-test-weak-evidence.html">
       <span class="wno">05</span>
-      <span class="wtitle">Passing a pre&#8209;trends test is weak evidence</span>
-      <span class="wdek">We measured how often the standard check waves fatal bias straight through.</span>
-      <span class="wmeta">2026&#8209;06&#8209;11 &middot; 4 min</span>
+      <span class="wtitle"><span class="en">Passing a pre&#8209;trends test is weak evidence</span><span class="sk">Prejsť testom pre&#8209;trendov je slabý dôkaz</span></span>
+      <span class="wdek"><span class="en">We measured how often the standard check waves fatal bias straight through.</span><span class="sk">Odmerali sme, ako často štandardná kontrola prepustí fatálne skreslenie rovno cez seba.</span></span>
+      <span class="wmeta">2026&#8209;06&#8209;11 &middot; <span class="en">4 min</span><span class="sk">4 min</span></span>
     </a>
     <a class="wrow" href="public/posts/causal-inference-phase-diagram.html">
       <span class="wno">06</span>
-      <span class="wtitle">Causal inference has a phase diagram</span>
-      <span class="wdek">Even randomized experiments fail near criticality &mdash; the map of where.</span>
-      <span class="wmeta">2026&#8209;06&#8209;10 &middot; 5 min</span>
+      <span class="wtitle"><span class="en">Causal inference has a phase diagram</span><span class="sk">Kauzálna inferencia má fázový diagram</span></span>
+      <span class="wdek"><span class="en">Even randomized experiments fail near criticality &mdash; the map of where.</span><span class="sk">Aj randomizované experimenty zlyhávajú blízko kritickosti &mdash; mapa toho, kde.</span></span>
+      <span class="wmeta">2026&#8209;06&#8209;10 &middot; <span class="en">5 min</span><span class="sk">5 min</span></span>
     </a>
   </div>
 </div></section>
 
 <!-- ════ MNEMOSYNE ════ -->
 <section id="mnemosyne"><div class="wrap">
-  <div class="seckick">Open source &middot; the memory it runs on</div>
+  <div class="seckick"><span class="en">Open source &middot; the memory it runs on</span><span class="sk">Open source &middot; pamäť, na ktorej beží</span></div>
   <h2 data-reveal>Mnemosyne</h2>
-  <p class="secsub" data-reveal>The agent memory layer behind this system, distilled to a single
-  zero&#8209;dependency file &mdash; its design rules earned by the ledger&rsquo;s own findings.</p>
+  <p class="secsub" data-reveal><span class="en">The agent memory layer behind this system, distilled to a single
+  zero&#8209;dependency file &mdash; its design rules earned by the ledger&rsquo;s own findings.</span><span class="sk">Agentová pamäťová vrstva za týmto systémom, zhustená do jediného
+  súboru bez závislostí &mdash; jej návrhové pravidlá si vyslúžili vlastné zistenia registra.</span></p>
   <div class="mngrid">
     <div class="mn-nums" data-reveal>
-      <div class="mn-num"><span class="v">6.7&times;</span><p>more high&#8209;value memory retained by value&#8209;ranked
-        consolidation vs FIFO at a 5% budget &mdash; the advantage grows as space shrinks.</p></div>
-      <div class="mn-num"><span class="v">2.8% &rarr; 100%</span><p>recall of rare&#8209;but&#8209;critical memories: access&#8209;frequency
-        decay starves them; a value&#8209;aware blend keeps them all. Popularity is not value.</p></div>
-      <div class="mn-num"><span class="v">0 rewrites</span><p>raw memory is append&#8209;only; consolidation adds a derived layer
-        and contradictions are flagged for review, never silently resolved.</p></div>
+      <div class="mn-num"><span class="v">6.7&times;</span><p><span class="en">more high&#8209;value memory retained by value&#8209;ranked
+        consolidation vs FIFO at a 5% budget &mdash; the advantage grows as space shrinks.</span><span class="sk">viac hodnotnej pamäte udrží konsolidácia zoradená podľa
+        hodnoty oproti FIFO pri 5% rozpočte &mdash; výhoda rastie, ako sa miesto zmenšuje.</span></p></div>
+      <div class="mn-num"><span class="v">2.8% &rarr; 100%</span><p><span class="en">recall of rare&#8209;but&#8209;critical memories: access&#8209;frequency
+        decay starves them; a value&#8209;aware blend keeps them all. Popularity is not value.</span><span class="sk">vybavenie zriedkavých&#8209;ale&#8209;kritických spomienok: úpadok podľa
+        frekvencie prístupu ich vyhladuje; zmes zohľadňujúca hodnotu ich udrží všetky. Popularita nie je hodnota.</span></p></div>
+      <div class="mn-num"><span class="v">0 rewrites</span><p><span class="en">raw memory is append&#8209;only; consolidation adds a derived layer
+        and contradictions are flagged for review, never silently resolved.</span><span class="sk">surová pamäť je iba pripájacia; konsolidácia pridáva odvodenú vrstvu
+        a rozpory sa označia na revíziu, nikdy sa nevyriešia potichu.</span></p></div>
     </div>
     <div>
       <div class="mn-code" data-reveal><pre style="margin:0;font-family:inherit"><span class="c"># single file, zero dependencies</span>
@@ -526,7 +566,7 @@ m.remember(<span class="s">"pre-trend tests catch ~31% of fatal bias"</span>,
 m.recall(<span class="s">"difference in differences"</span>)  <span class="c"># value-ranked</span>
 m.consolidate(keep=<span class="s">200</span>)               <span class="c"># the dream pass</span>
 m.contradictions()                     <span class="c"># flag, never delete</span></pre></div>
-      <div class="mnfoot">MCP server included &mdash; drop&#8209;in long&#8209;term memory for any agent client.
+      <div class="mnfoot"><span class="en">MCP server included &mdash; drop&#8209;in long&#8209;term memory for any agent client.</span><span class="sk">Súčasťou je MCP server &mdash; zapojiteľná dlhodobá pamäť pre ľubovoľného agentového klienta.</span>
       <a href="https://github.com/DanceNitra/agora/tree/main/mnemo" target="_blank" rel="noopener">github.com/DanceNitra/agora/mnemo &rarr;</a></div>
     </div>
   </div>
@@ -534,43 +574,51 @@ m.contradictions()                     <span class="c"># flag, never delete</spa
 
 <!-- ════ PROTOCOL ════ -->
 <section id="protocol"><div class="wrap">
-  <div class="seckick">Method</div>
-  <h2 data-reveal>How a verdict is made</h2>
+  <div class="seckick"><span class="en">Method</span><span class="sk">Metóda</span></div>
+  <h2 data-reveal><span class="en">How a verdict is made</span><span class="sk">Ako vzniká verdikt</span></h2>
   <div class="rules" data-reveal>
-    <div class="rule"><div class="rn">RULE 01</div><h3>Model before verdict</h3>
-      <p>The smallest model of the claim&rsquo;s stated mechanism is built first, scoped to that
-      mechanism &mdash; never reverse&#8209;engineered toward a desired answer.</p></div>
-    <div class="rule"><div class="rn">RULE 02</div><h3>A number, not a vibe</h3>
-      <p>Every verdict is a measured quantity with a direction that could refute it &mdash; an effect
-      size, a threshold, an exponent, a bias.</p></div>
-    <div class="rule"><div class="rn">RULE 03</div><h3>Re&#8209;runnable, or it doesn&rsquo;t count</h3>
-      <p>The code ships with the verdict. <em>Reproduced</em> means the minimal mechanism computes;
-      it does not certify the original paper beyond doubt.</p></div>
-    <div class="rule"><div class="rn">RULE 04</div><h3>Failures are the point</h3>
-      <p>A <em>failed</em> means the mechanism didn&rsquo;t survive its smallest honest model, with the
-      discrepancy measured. Those stay published. So do the honest passes.</p></div>
+    <div class="rule"><div class="rn">RULE 01</div><h3><span class="en">Model before verdict</span><span class="sk">Model pred verdiktom</span></h3>
+      <p><span class="en">The smallest model of the claim&rsquo;s stated mechanism is built first, scoped to that
+      mechanism &mdash; never reverse&#8209;engineered toward a desired answer.</span><span class="sk">Najmenší model deklarovaného mechanizmu tvrdenia sa zostaví ako prvý, ohraničený na ten
+      mechanizmus &mdash; nikdy spätne nadizajnovaný smerom k želanej odpovedi.</span></p></div>
+    <div class="rule"><div class="rn">RULE 02</div><h3><span class="en">A number, not a vibe</span><span class="sk">Číslo, nie pocit</span></h3>
+      <p><span class="en">Every verdict is a measured quantity with a direction that could refute it &mdash; an effect
+      size, a threshold, an exponent, a bias.</span><span class="sk">Každý verdikt je nameraná veličina so smerom, ktorý by ju mohol vyvrátiť &mdash; veľkosť
+      efektu, prah, exponent, skreslenie.</span></p></div>
+    <div class="rule"><div class="rn">RULE 03</div><h3><span class="en">Re&#8209;runnable, or it doesn&rsquo;t count</span><span class="sk">Znovuspustiteľné, inak sa to neráta</span></h3>
+      <p><span class="en">The code ships with the verdict. <em>Reproduced</em> means the minimal mechanism computes;
+      it does not certify the original paper beyond doubt.</span><span class="sk">Kód prichádza spolu s verdiktom. <em>Reprodukované</em> znamená, že minimálny mechanizmus vychádza;
+      nepotvrdzuje to pôvodný článok nado všetku pochybnosť.</span></p></div>
+    <div class="rule"><div class="rn">RULE 04</div><h3><span class="en">Failures are the point</span><span class="sk">Zlyhania sú tou pointou</span></h3>
+      <p><span class="en">A <em>failed</em> means the mechanism didn&rsquo;t survive its smallest honest model, with the
+      discrepancy measured. Those stay published. So do the honest passes.</span><span class="sk">Verdikt <em>zlyhané</em> znamená, že mechanizmus neprežil svoj najmenší poctivý model, s nameraným
+      rozdielom. Tie zostávajú zverejnené. Rovnako aj poctivé úspechy.</span></p></div>
   </div>
 </div></section>
 
 <!-- ════ THE ORGANISM ════ -->
 <div class="organism"><div class="wrap">
-  <h2 data-reveal>Built by the thing itself</h2>
-  <p data-reveal>Agora runs as an autonomous organism: <b>eight agents</b> research around the clock,
+  <h2 data-reveal><span class="en">Built by the thing itself</span><span class="sk">Postavené tou vecou samotnou</span></h2>
+  <p data-reveal><span class="en">Agora runs as an autonomous organism: <b>eight agents</b> research around the clock,
   a laboratory executes their experiments &mdash; <b>62</b> ledgered so far &mdash; and a
   <b>6,433&#8209;note</b> living memory consolidates what holds. Its own findings feed back into how
   it works: the crowd research shaped how its agents diverge; the memory research became Mnemosyne.
-  Nothing leaves the machine without its owner&rsquo;s review.</p>
+  Nothing leaves the machine without its owner&rsquo;s review.</span><span class="sk">Agora beží ako autonómny organizmus: <b>osem agentov</b> skúma nepretržite,
+  laboratórium vykonáva ich experimenty &mdash; <b>62</b> doteraz zaznamenaných &mdash; a
+  <b>6 433&#8209;poznámková</b> živá pamäť konsoliduje to, čo obstojí. Jej vlastné zistenia sa vracajú do toho, ako
+  funguje: výskum davov utváral, ako sa jej agenti rozchádzajú; výskum pamäte sa stal Mnemosyne.
+  Nič neopustí stroj bez revízie jej vlastníka.</span></p>
 </div></div>
 
 </main>
 
 <footer><div class="wrap">
-  <span>AGORA &mdash; an autonomous research system &middot; verdicts with receipts</span>
+  <span><span class="en">AGORA &mdash; an autonomous research system &middot; verdicts with receipts</span><span class="sk">AGORA &mdash; autonómny výskumný systém &middot; verdikty s dôkazmi</span></span>
   <div class="cols">
-    <a href="public/crucible/">Ledger</a>
-    <a href="public/posts/">Writing</a>
+    <a href="public/crucible/"><span class="en">Ledger</span><span class="sk">Register</span></a>
+    <a href="public/posts/"><span class="en">Writing</span><span class="sk">Texty</span></a>
     <a href="https://github.com/DanceNitra/agora/tree/main/mnemo" target="_blank" rel="noopener">Mnemosyne</a>
-    <a href="https://github.com/DanceNitra/agora" target="_blank" rel="noopener">Source</a>
+    <a href="https://github.com/DanceNitra/agora" target="_blank" rel="noopener"><span class="en">Source</span><span class="sk">Zdroj</span></a>
   </div>
 </div></footer>
 
@@ -602,6 +650,14 @@ m.contradictions()                     <span class="c"># flag, never delete</spa
       document.querySelectorAll('[data-count]').forEach(countUp); tio.disconnect(); } });
   }, {threshold:.4});
   var tally = document.querySelector('.tally'); if(tally) tio.observe(tally);
+
+  // language toggle — EN default; persists to localStorage, mirrors the blog-post pattern
+  var root=document.documentElement, lbtns=document.querySelectorAll('.lng button');
+  function setLang(l){root.setAttribute('data-lang',l);root.setAttribute('lang',l);
+    lbtns.forEach(function(b){b.classList.toggle('on',b.getAttribute('data-l')===l);});
+    try{localStorage.setItem('agora-lang',l);}catch(e){}}
+  lbtns.forEach(function(b){b.addEventListener('click',function(){setLang(b.getAttribute('data-l'));});});
+  try{var s=localStorage.getItem('agora-lang');if(s)setLang(s);}catch(e){}
 })();
 </script>
 </body>
