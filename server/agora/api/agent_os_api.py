@@ -1585,7 +1585,11 @@ async def brain_press_draft(request: Request):
         return {"status": "too_short"}
     if any(x.get("kind") == "press" for x in pending_approvals()):
         return {"status": "already_pending"}
-    rec = save_piece(title, body, b.get("source") or "")
+    rec = save_piece(title, body, b.get("source") or "",
+                     body_sk=(b.get("body_sk") or "").strip(),
+                     desc=(b.get("desc") or "").strip(),
+                     desc_sk=(b.get("desc_sk") or "").strip(),
+                     title_sk=(b.get("title_sk") or "").strip())
     act = propose_action("press", f"Publish press piece: {title[:60]}",
                          body[:300], {"press_id": rec["id"]})
     await _send_telegram(f"📰 Press proposal `{act['id']}`: standalone public post\n"

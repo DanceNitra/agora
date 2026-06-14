@@ -55,10 +55,21 @@ def _derive_desc(body: str) -> str:
     return (body or "").strip()[:200]
 
 
-def save_piece(title: str, body: str, source_note: str = "") -> dict:
-    """Store Claude's polished piece; the caller proposes the gated 'press' action around it."""
+def save_piece(title: str, body: str, source_note: str = "", *, body_sk: str = "",
+               desc: str = "", desc_sk: str = "", title_sk: str = "") -> dict:
+    """Store Claude's polished piece; the caller proposes the gated 'press' action around it.
+    Bilingual EN+SK: pass body_sk (and optionally desc/desc_sk/title_sk) so publish_piece renders
+    the SK version too — the site's standing requirement is that public posts are EN+SK."""
     rec = {"id": uuid.uuid4().hex[:6], "title": (title or "")[:160], "body": (body or "")[:12000],
            "source": (source_note or "")[:160], "status": "draft", "ts": time.time()}
+    if body_sk:
+        rec["body_sk"] = body_sk[:12000]
+    if desc:
+        rec["desc"] = desc[:300]
+    if desc_sk:
+        rec["desc_sk"] = desc_sk[:300]
+    if title_sk:
+        rec["title_sk"] = title_sk[:160]
     items = _load()
     items.append(rec)
     _save(items[-60:])
