@@ -2991,19 +2991,39 @@ def _is_intent(text: str) -> bool:
     return bool(_INTENT_RE.search((text or "")[:120]))
 
 
+def _credit_agent_mem(eid: str, subject: str, good: bool, k: int = 4, min_rel: float = 0.30) -> None:
+    """Agent-side accuracy loop (stage 3, dungeon edition). When an agent's contribution LANDS
+    (grounded) or is REJECTED (refusal / quest-intent), credit/debit the agent's OWN memories most
+    relevant to the subject it was contributing on — so each agent's recall sharpens by WAS-IT-RIGHT,
+    not just by use. Strong-relevance only; gentle (bounded Beta), so one miss can't erase a memory."""
+    try:
+        m = _agent_mnemo(eid)
+        if m is None or not hasattr(m, "credit"):
+            return
+        ids = [h["id"] for h in m.recall(subject or "", k=k) if h.get("relevance", 0) >= min_rel]
+        if ids:
+            m.credit(ids, "good" if good else "bad")
+    except Exception:
+        pass
+
+
 async def _brain_contribute(eid: str, title: str, content: str) -> bool:
+    _subject = f"{title or ''} {content or ''}".strip()
     if _is_refusal(content) or _is_refusal(title):
         broadcast({"type": "os_build", "kind": "collab", "who": _AGENT_NAMES.get(eid, eid),
                    "text": "discarded a non-finding (refusal/no-fit) — the slot yielded nothing"})
+        _credit_agent_mem(eid, _subject, False)   # the memory it leaned on didn't ground a finding
         return False
     if (_is_intent(content) or _is_intent(title)) and not _GROUNDED_RE.search(content or ""):
         broadcast({"type": "os_build", "kind": "collab", "who": _AGENT_NAMES.get(eid, eid),
                    "text": "discarded a quest-INTENT (a plan, not a finding) — only grounded results count"})
+        _credit_agent_mem(eid, _subject, False)
         return False
     r = await asyncio.to_thread(
         _brain_post_sync, "/api/v1/agent-os/brain/collective",
         {"npc": _AGENT_NAMES.get(eid, eid), "title": title[:90],
          "content": content[:600], "knowledge_type": "discovery"})
+    _credit_agent_mem(eid, _subject, bool(r))      # a grounded contribution rewards its grounding
     return bool(r)
 
 
