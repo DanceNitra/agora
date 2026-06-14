@@ -502,7 +502,7 @@ _PACE = os.environ.get("DUNGEON_PACE", "study").strip().lower()
 _STUDY = _PACE != "fast"
 _DECIDE_MIN, _DECIDE_MAX = (12.0, 24.0) if _STUDY else (3.0, 7.0)   # gap before PLANNING new goals
 _BACKLOG_MIN, _BACKLOG_MAX = (4.0, 9.0)                             # gap to pull the NEXT queued quest
-_CONV_COOLDOWN = 45.0 if _STUDY else 20.0                           # gap between an agent's talks (livelier)
+_CONV_COOLDOWN = 240.0 if _STUDY else 150.0                        # long gap between talks — chatter (agent-dialogue) was the #1 token sink at ROI 0.04; grounded collaboration is the default now
 _WORK_DUR = (8.0, 18.0) if _STUDY else (3.0, 7.0)                   # how long an active quest "works" before it completes (telepathic, time-based)
 
 _PERSONA = {
@@ -814,7 +814,7 @@ def _schedule_thought(eid: str, situation: str, fallback: str) -> None:
     now = _time.monotonic()
     if now < _speech_cd.get(eid, 0.0):
         return
-    _speech_cd[eid] = now + 14.0
+    _speech_cd[eid] = now + 900.0           # flavor 'thought' LLM lines were agent-think: 1.7M tok / 0 research value. Keep them RARE — the instant fallback line still shows, so the world stays alive without the spend.
 
     async def _run():
         sysmsg = (f"You are {_persona(eid)} You are in a torch-lit medieval dungeon keep. "
@@ -898,7 +898,7 @@ def _maybe_start_conversation(ents, dead: dict[str, int], hold: dict[str, int], 
 _collab_cd: dict = {}        # eid -> next monotonic time it may collaborate
 _collab_recent: list = []    # recent "a|b" pairs, to vary partners
 _collab_rot = {"i": 0}
-_COLLAB_COOLDOWN = 80
+_COLLAB_COOLDOWN = 40        # grounded co-production is the dominant activity now (it feeds verify-findings, ROI 0.92), so its per-agent gap is short
 
 # what each role best CONTRIBUTES when joining another agent's work
 _ROLE_CONTRIB = {
@@ -3631,13 +3631,16 @@ async def ambient_life():
             hold[eid] = max(0, hold.get(eid, 0) - 1)
             cooldown[eid] = max(0, cooldown.get(eid, 0) - 1)
 
-        # Agents that wander near each other talk shop about their research.
-        _maybe_start_conversation(ents, dead, hold, memory)
+        # Agents that wander near each other occasionally talk shop — now RARE (chatter was the #1
+        # token sink at ROI 0.04). Grounded collaboration below is the dominant activity instead.
+        if loop_n % 25 == 13:
+            _maybe_start_conversation(ents, dead, hold, memory)
 
         loop_n += 1
-        # Meaningful collaboration: a varied pair co-produces a real grounded finding from a
-        # rotating seed (recent finding / gap / bridge) — the OS actually doing work.
-        if loop_n % 45 == 20:
+        # Meaningful collaboration: a varied pair co-produces a real grounded finding from a rotating
+        # seed (recent finding / gap / bridge) — the OS actually doing research. Fired often now (it
+        # feeds verify-findings, the one organ at ROI 0.92), so grounded output is the default, not chatter.
+        if loop_n % 18 == 7:
             asyncio.create_task(_maybe_collaborate(hold))
         # Orchestrated pipeline: advance one stage of Aldric's assembly line (one role at a time).
         if loop_n % 9 == 4:
