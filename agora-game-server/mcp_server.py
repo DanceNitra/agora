@@ -3568,22 +3568,13 @@ async def ambient_life():
                     "action": (q.get("action") or "...").strip(),
                     "with": (q.get("with") or "").strip()})
                 added += 1
-            # Leverage collective recall DETERMINISTICALLY: when a colleague's value-ranked memory is
-            # strongly relevant and the agent isn't already collaborating, seed a collaborate quest on
-            # that finding. Makes agents build on each other even when the flaky planner LLM returns
-            # nothing — the product's recall, not the LLM, drives the cross-pollination.
-            _top = _collective_top(_q, exclude=eid, min_score=1.0)
-            if _top and random.random() < 0.6 and not any(
-                    (qq.get("kind") == "collaborate") for qq in quests.get(eid, [])):
-                _pid, _ptext, _sc = _top
-                _pname = _AGENT_NAMES.get(_pid, _pid)
-                _sur = _pname.split()[-1]
-                quests.setdefault(eid, []).insert(0, {
-                    "intent": f"build on {_sur}'s finding: {_ptext[:48]}"[:90],
-                    "kind": "collaborate", "where": _sur.lower(),
-                    "action": f"Extend {_pname}'s result — {_ptext[:90]}", "with": _pname})
-                logger.info(f"[collective] {_AGENT_NAMES.get(eid, eid)} -> collaborate with {_pname} "
-                            f"(score {_sc:.2f}) on: {_ptext[:60]}")
+            # REMOVED (2026-06-14): the deterministic "build on X's finding / Extend X's result —"
+            # collaborate-seed. It pasted a colleague's recalled memory text into a templated quest,
+            # the collaborate handler then logged that PLAN as a "discovery", and the plan fed back
+            # into memory — a self-amplifying chatter loop that produced ~74% of discovery rows with
+            # ZERO findings and burned tokens. Real cross-agent cooperation now lives ONLY in the
+            # Seminar (brain-side run_group_seminar -> a grounded Contribution: claim + evidence +
+            # falsifier). Trust/cooperation between agents still accrues from genuine quests below.
             # Planning-quality signal: how many quests the LLM itself produced (0 = it failed and we
             # fell back to deterministic gaps). Lets us compare models live (flash ~0 vs deepseek-v4-pro).
             logger.info(f"[plan] {_AGENT_NAMES.get(eid, eid)}: LLM_quests={added}")
@@ -3979,10 +3970,11 @@ async def ambient_life():
                 elif kind == "collaborate":
                     pid = _telepath_partner(goal.get("with"))
                     if pid:
-                        await record_trust(eid, pid, "cooperate")
+                        await record_trust(eid, pid, "cooperate")   # genuine social signal (ESS trust)
                         partner = _AGENT_NAMES.get(pid, pid)
-                        asyncio.create_task(
-                            _brain_contribute(eid, f"{intent} (with {partner})", action))
+                        # NO _brain_contribute: a collaborate quest is a social/trust act, not a finding.
+                        # Logging the plan text ("Extend X's result — …") as a 'discovery' was the chatter
+                        # source. Real joint knowledge comes from the Seminar (a grounded Contribution).
                         note_event(f"{who} & {partner}: {intent}")
                         _os_build("collab", f"{who} + {partner}", intent)
                     else:
