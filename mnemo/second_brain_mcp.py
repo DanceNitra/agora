@@ -51,6 +51,22 @@ _SENT = re.compile(r"(?<=[.!?])\s+")
 # claim-like: declarative, has a verb-ish copula or quantity, not a question/heading/list
 _CLAIM_HINT = re.compile(r"\b(is|are|was|were|causes?|leads? to|implies|beats?|reduces?|increases?|"
                          r"means|equals?|driven by|because|therefore|%|\d)\b", re.I)
+_STOP = set(("the a an of to in on for and or is are was were be been being do does did how what when "
+             "where why which who whom with that this these those it its as by at from into over under "
+             "can could should would will may might more most less than then so such not no your you "
+             "our we i they them their about between across vs versus using use make made get gets").split())
+
+
+def _salient_terms(question: str, limit: int = 8) -> list[str]:
+    """Content words from a question (LLM-free): the sub-terms whose coverage we check."""
+    words = re.findall(r"[A-Za-z][A-Za-z\-]{3,}", (question or "").lower())
+    seen, terms = set(), []
+    for w in words:
+        if w in _STOP or w in seen:
+            continue
+        seen.add(w)
+        terms.append(w)
+    return terms[:limit]
 
 
 def _embed_url_ok(url: str) -> bool:
@@ -169,6 +185,33 @@ def relevant_notes(query: str, k: int = 6) -> list[dict]:
                     "relevance": round(h.get("relevance", h.get("score", 0)) or 0, 3),
                     "excerpt": (note["text"][:500] if note else h.get("text", "")[:500])})
     return out
+
+
+@mcp.tool()
+def coverage_gap(question: str, k: int = 6, threshold: float = 0.22) -> dict:
+    """Surface the NEGATIVE SPACE of a question — what your notes do NOT cover. Alongside the top-k
+    relevant notes it returns a measured completeness score and the explicit list of the question's
+    sub-terms that have NO strongly-relevant note. This is a WYSIATI guard: a tidy retrieved context
+    feels complete and breeds overconfidence precisely when it is incomplete, so an agent should read
+    `missing` and the `outside_view_first` slot BEFORE answering, and flag the gap rather than answer
+    a tidy-but-incomplete context with full confidence. Pure retrieval (no LLM call)."""
+    terms = _salient_terms(question)
+    covered, missing = [], []
+    for t in terms:
+        hits = _MEM.recall(t, k=2)
+        top = max((h.get("relevance", h.get("score", 0)) or 0 for h in hits), default=0.0)
+        (covered if top >= threshold else missing).append({"term": t, "top_relevance": round(top, 3)})
+    completeness = round(len(covered) / len(terms), 3) if terms else 0.0
+    return {
+        "outside_view_first": (f"Before any case detail: what is the base-rate / reference-class answer "
+                               f"to \"{(question or '')[:90]}\"? State the prior, then adjust inward."),
+        "completeness": completeness,
+        "covered": covered,
+        "missing": missing,
+        "top_notes": relevant_notes(question, k=k),
+        "guidance": ("A non-empty `missing` (or low completeness) means the context is tidy but INCOMPLETE "
+                     "— do NOT answer with full confidence; name the gap or go find/ground the missing terms."),
+    }
 
 
 @mcp.tool()

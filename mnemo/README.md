@@ -209,6 +209,7 @@ beside it, is found):
 |---|---|
 | `index_status` | notes indexed, folder spread, resolved `NOTES_DIR` (call first; `0` ⇒ fix `NOTES_DIR`) |
 | `relevant_notes` | the `k` most relevant notes by relevance × accrued value (value accrues with use; a cold index is effectively relevance-ranked), with excerpts |
+| `coverage_gap` | the **negative space** of a question: top notes + a measured completeness score + the explicit sub-terms with **no** supporting note — a WYSIATI guard so the agent sees what's *missing* and doesn't answer a tidy-but-incomplete context with false confidence |
 | `find_gaps` | isolated/under-linked notes + thin folders — where the network is blind (noisy on a tiny vault; earns its keep at scale) |
 | `bridge_candidates` | distant notes (different folder, no link) that are semantically close = candidate connections; the agent writes or rejects the mapping |
 | `extract_claims` | claim-like sentences from a note so the agent can ground or challenge them |
