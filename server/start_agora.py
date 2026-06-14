@@ -4,7 +4,8 @@ import subprocess, sys, time, urllib.request
 # Start uvicorn from venv
 proc = subprocess.Popen(
     [sys.executable, "-m", "uvicorn", "agora.main:app",
-     "--host", "0.0.0.0", "--port", "8000"],
+     # Loopback only — the brain is no-auth + CORS '*' + has an RCE-by-design lab endpoint.
+     "--host", "127.0.0.1", "--port", "8000"],
     cwd="/home/vboxuser/agora/server",
     stdout=subprocess.PIPE, stderr=subprocess.PIPE
 )

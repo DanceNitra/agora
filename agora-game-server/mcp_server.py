@@ -63,6 +63,9 @@ def _load_dotenv() -> None:
 _load_dotenv()
 HTTP_PORT = int(os.environ.get("DUNGEON_HTTP_PORT", "5174"))
 WS_PORT = int(os.environ.get("DUNGEON_WS_PORT", "5175"))
+# Loopback by default (the renderer/HUD is viewed locally). Set DUNGEON_HOST=0.0.0.0 only on a
+# TRUSTED LAN — these servers have no auth.
+BIND_HOST = os.environ.get("DUNGEON_HOST", "127.0.0.1")
 
 # ── Game Engine (shared state) ──────────────────────────────
 
@@ -324,8 +327,8 @@ def _make_ws_frame(payload: str, opcode: int = 0x1) -> bytes:
 
 async def run_ws_server():
     """Start WebSocket server on WS_PORT."""
-    server = await asyncio.start_server(ws_handler, "0.0.0.0", WS_PORT)
-    logger.info(f"WebSocket server on ws://0.0.0.0:{WS_PORT}")
+    server = await asyncio.start_server(ws_handler, BIND_HOST, WS_PORT)
+    logger.info(f"WebSocket server on ws://{BIND_HOST}:{WS_PORT}")
     async with server:
         await server.serve_forever()
 
@@ -400,8 +403,8 @@ async def http_handler(reader: asyncio.StreamReader, writer: asyncio.StreamWrite
 
 async def run_http_server():
     """Start HTTP server on HTTP_PORT."""
-    server = await asyncio.start_server(http_handler, "0.0.0.0", HTTP_PORT)
-    logger.info(f"HTTP server on http://0.0.0.0:{HTTP_PORT}")
+    server = await asyncio.start_server(http_handler, BIND_HOST, HTTP_PORT)
+    logger.info(f"HTTP server on http://{BIND_HOST}:{HTTP_PORT}")
     async with server:
         await server.serve_forever()
 

@@ -220,6 +220,17 @@ surfaced two silently-contradicting notes, and proposed ideas via `idea_methods`
 then severe-tested **in Agora's separate research lab** (not inside this server) and held. The LLM did
 the reasoning; the corrections still warrant a source-check before public citation.
 
+### Trust & safety
+- **Read-only over your notes.** The server reads `NOTES_DIR` recursively; it does no `eval`, no shell,
+  no subprocess, and writes only its own index file. Symlinks/junctions that point *outside*
+  `NOTES_DIR` are deliberately **not** followed (so a planted link in a shared/cloned vault can't leak
+  files from elsewhere on disk).
+- **The embedder is a trust boundary.** If you set `MNEMO_EMBED_URL`, the **full text of every note**
+  is POSTed there. It's validated at startup — `https` anywhere, plain `http` only to loopback (local
+  Ollama, etc.), and cloud-metadata/link-local targets are refused. Point it only at an endpoint you trust.
+- **Notes over ~2 MB are skipped** (configurable via `SECOND_BRAIN_MAX_BYTES`) so a single huge file
+  can't exhaust memory.
+
 ## Status
 
 `v0.1` — the core, honest and runnable, **now with two MCP servers**: `mnemo_mcp` (memory) and

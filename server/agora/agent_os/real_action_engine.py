@@ -15,7 +15,9 @@ Actions are routed through existing subsystems:
 """
 import json
 import os
+import shlex
 import subprocess
+import sys
 import tempfile
 from datetime import datetime
 from typing import Optional
@@ -205,21 +207,35 @@ class RealActionEngine:
                 "filepath": fpath, "line_count": line_count,
             }
 
+    # Read-only command allowlist. An LLM (sometimes fed untrusted external text) picks the command,
+    # so a denylist + shell=True is unsafe (trivially bypassed: `rm -rf ~`, `curl x|sh`, `git add -A`).
+    _SAFE_CMDS = {"ls", "dir", "cat", "head", "tail", "grep", "rg", "wc", "find", "pwd", "date",
+                  "whoami", "tree", "stat", "du", "df", "uname", "hostname", "echo", "git"}
+    _SAFE_GIT = {"status", "log", "diff", "show", "ls-files", "branch", "remote", "config"}
+
     async def _run_script(self, params: dict, agent_name: str) -> dict:
-        """Execute a safe shell command."""
+        """Execute a READ-ONLY command. Allowlist + argv (no shell), no chaining/redirection —
+        because the command is LLM-chosen and the LLM can be influenced by untrusted content."""
         command = params.get("command", "").strip()
         if not command:
             return {"status": "skipped", "output": "No command provided"}
 
-        # Safety filter
-        dangerous = ["rm -rf /", "mkfs", "dd if=", "> /dev/", ":(){"]
-        for d in dangerous:
-            if d in command.lower():
-                return {"status": "blocked", "output": f"Dangerous pattern blocked: {d}"}
+        # No shell metacharacters: no chaining, redirection, substitution, or newlines.
+        if any(ch in command for ch in ["|", ";", "&", ">", "<", "`", "$(", "\n", "\\"]):
+            return {"status": "blocked", "output": "Shell metacharacters not allowed (single read-only command only)"}
+        try:
+            argv = shlex.split(command)
+        except ValueError:
+            return {"status": "blocked", "output": "Unparseable command"}
+        if not argv or argv[0] not in self._SAFE_CMDS:
+            return {"status": "blocked",
+                    "output": f"Only read-only commands allowed: {sorted(self._SAFE_CMDS)}"}
+        if argv[0] == "git" and (len(argv) < 2 or argv[1] not in self._SAFE_GIT):
+            return {"status": "blocked", "output": f"git limited to read-only subcommands: {sorted(self._SAFE_GIT)}"}
 
         try:
             result = subprocess.run(
-                command, shell=True, capture_output=True, text=True, timeout=30,
+                argv, shell=False, capture_output=True, text=True, timeout=30,
             )
             stdout = result.stdout[-500:] if result.stdout else ""
             stderr = result.stderr[-200:] if result.stderr else ""
@@ -245,26 +261,24 @@ class RealActionEngine:
 
         try:
             message = params.get("message", f"[Dungeon Agent] {agent_name}: automated update")
+            # SAFETY: never `git add -A` on this vault. It holds ~380 NTFS-illegal ':' filenames that a
+            # bulk add stages as DELETIONS — this once deleted 376 real notes. Route through the
+            # add-only safe pusher, which rebuilds the commit tree from origin via plumbing and
+            # ABORTS on any deletion. This action is LLM-reachable, so the guarantee must be in code.
+            from pathlib import Path as _P
+            pusher = _P(__file__).resolve().parents[3] / "tools" / "safe_vault_push.py"
+            if not pusher.exists():
+                return {"status": "skipped", "output": "safe_vault_push.py not found — refusing bare git add"}
             env = os.environ.copy()
-            ssh_key = getattr(self.vault_writer, "git_ssh_key", "")
-            if ssh_key and os.path.exists(ssh_key):
-                env["GIT_SSH_COMMAND"] = f"ssh -i {ssh_key} -o StrictHostKeyChecking=no"
-
-            subprocess.run(["git", "-C", vault_path, "pull", "--rebase"],
-                          env=env, capture_output=True, timeout=30)
-            subprocess.run(["git", "-C", vault_path, "add", "-A"],
-                          env=env, capture_output=True, timeout=30)
+            env["DUNGEON_AUTOPUSH"] = "1"
             result = subprocess.run(
-                ["git", "-C", vault_path, "commit", "-m", message],
-                env=env, capture_output=True, timeout=30,
+                [sys.executable, "-X", "utf8", str(pusher), message],
+                env=env, capture_output=True, text=True, timeout=120,
             )
-            stdout = result.stdout.decode() if result.stdout else ""
-            subprocess.run(["git", "-C", vault_path, "push"],
-                          env=env, capture_output=True, timeout=60)
-            return {
-                "status": "ok",
-                "output": stdout[:200] or "Commit pushed",
-            }
+            out = (result.stdout or "")[-300:]
+            ok = result.returncode == 0 and "ABORT" not in out
+            return {"status": "ok" if ok else "error",
+                    "output": out or "safe vault push complete"}
         except Exception as e:
             return {"status": "error", "output": f"Git failed: {e}"}
 

@@ -45,6 +45,7 @@ except Exception:
 
 _NOTES_DIR = Path(os.environ.get("NOTES_DIR", "./notes")).expanduser()
 _CAP = int(os.environ.get("SECOND_BRAIN_CAP", "4000"))
+_MAX_BYTES = int(os.environ.get("SECOND_BRAIN_MAX_BYTES", str(2 * 1024 * 1024)))  # skip notes > 2 MB
 _WIKILINK = re.compile(r"\[\[([^\]|#]+)")
 _SENT = re.compile(r"(?<=[.!?])\s+")
 # claim-like: declarative, has a verb-ish copula or quantity, not a question/heading/list
@@ -52,9 +53,36 @@ _CLAIM_HINT = re.compile(r"\b(is|are|was|were|causes?|leads? to|implies|beats?|r
                          r"means|equals?|driven by|because|therefore|%|\d)\b", re.I)
 
 
+def _embed_url_ok(url: str) -> bool:
+    """The embedder receives the FULL TEXT of every note. Refuse cleartext-to-the-internet and the
+    cloud-metadata SSRF target; allow https anywhere and http only to loopback (local Ollama, etc.)."""
+    import ipaddress
+    from urllib.parse import urlparse
+    try:
+        u = urlparse(url)
+    except Exception:
+        return False
+    if u.scheme not in ("http", "https"):
+        sys.stderr.write("second_brain: MNEMO_EMBED_URL must be http(s) — embedder disabled.\n")
+        return False
+    host = (u.hostname or "").lower()
+    try:
+        ip = ipaddress.ip_address(host)
+        if ip.is_link_local or str(ip) == "169.254.169.254":      # cloud-metadata / link-local
+            sys.stderr.write("second_brain: refusing link-local/metadata MNEMO_EMBED_URL — embedder disabled.\n")
+            return False
+        loopback = ip.is_loopback
+    except ValueError:
+        loopback = host in ("localhost",) or host.endswith(".localhost")
+    if u.scheme == "http" and not loopback:
+        sys.stderr.write("second_brain: refusing non-loopback http MNEMO_EMBED_URL (cleartext) — use https.\n")
+        return False
+    return True
+
+
 def _make_embedder():
     url = os.environ.get("MNEMO_EMBED_URL", "").strip()
-    if not url:
+    if not url or not _embed_url_ok(url):
         return None
     model = os.environ.get("MNEMO_EMBED_MODEL", "text-embedding-3-small").strip()
     key = os.environ.get("MNEMO_EMBED_KEY", "").strip()
@@ -75,7 +103,20 @@ def _read_notes() -> list[dict]:
     notes = []
     if not _NOTES_DIR.exists():
         return notes
+    base = _NOTES_DIR.resolve()
     for p in _NOTES_DIR.rglob("*.md"):
+        # Containment: rglob follows directory symlinks (Linux/macOS) AND Windows junctions (which
+        # report is_symlink()==False), so a planted link inside a shared/cloned vault could escape
+        # NOTES_DIR and leak arbitrary .md files. Resolve the real path and require it under base.
+        # Use resolve()+parents (NOT is_symlink) precisely because junctions defeat is_symlink.
+        try:
+            rp = p.resolve()
+            if rp != base and base not in rp.parents:
+                continue
+            if p.stat().st_size > _MAX_BYTES:        # bound memory: don't read a giant planted file
+                continue
+        except OSError:
+            continue
         name = p.stem
         low = name.lower()
         if any(s in low for s in ("autolinker", "vault-digest", "_pending", "_report")):

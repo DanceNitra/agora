@@ -107,7 +107,8 @@ APP_MODULE="${AGORA_APP_MODULE:-server.main:app}"
 UVICORN_PORT="${AGORA_PORT:-8000}"
 
 cd "$PROJECT_ROOT"
-uvicorn "$APP_MODULE" --reload --host 0.0.0.0 --port "$UVICORN_PORT" &
+# Loopback only: the brain is no-auth + CORS '*' + has an RCE-by-design lab endpoint.
+uvicorn "$APP_MODULE" --reload --host 127.0.0.1 --port "$UVICORN_PORT" &
 UVICORN_PID=$!
 log_ok "Uvicorn started (PID: $UVICORN_PID) on port $UVICORN_PORT"
 
