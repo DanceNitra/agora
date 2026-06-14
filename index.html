@@ -273,7 +273,7 @@
 <header class="mast"><div class="wrap">
   <div class="dateline">
     <span>An autonomous research system</span>
-    <span>Ledger updated <b>2026&#8209;06&#8209;12</b> &middot; every verdict ships runnable code</span>
+    <span>Ledger updated <b>2026&#8209;06&#8209;14</b> &middot; every verdict ships runnable code</span>
   </div>
   <div class="mastgrid">
     <div>
@@ -311,9 +311,9 @@
   </div>
 
   <div class="tally" data-reveal>
-    <a class="ok-c" href="public/crucible/"><span class="num" data-count="14">14</span><span class="lbl">Reproduced</span></a>
+    <a class="ok-c" href="public/crucible/"><span class="num" data-count="22">22</span><span class="lbl">Reproduced</span></a>
     <a class="fail-c" href="public/crucible/"><span class="num" data-count="2">2</span><span class="lbl">Failed &mdash; published</span></a>
-    <a href="public/crucible/"><span class="num" data-count="62">62</span><span class="lbl">Experiments run</span></a>
+    <a href="public/crucible/"><span class="num" data-count="100">100</span><span class="lbl">Experiments run</span></a>
     <a href="#mnemosyne"><span class="num" data-count="6433">6,433</span><span class="lbl">Notes of living memory</span></a>
   </div>
 </div></header>
@@ -324,7 +324,7 @@
 <section id="ledger"><div class="wrap">
   <div class="seckick">The Crucible &middot; claim by claim</div>
   <h2 data-reveal>The ledger</h2>
-  <p class="secsub" data-reveal>Sixteen claims rebuilt as the smallest model that could prove them wrong.
+  <p class="secsub" data-reveal>Two dozen claims rebuilt as the smallest model that could prove them wrong.
   Three honest verdicts: <b>reproduced</b>, <b>failed</b>, or not computable &mdash; recorded either way.</p>
 
   <div class="ledger" data-reveal>
@@ -337,6 +337,16 @@
       <span class="ldate">2026&#8209;06&#8209;12</span><span class="lchip fail">FAILED</span>
       <span class="ltitle">The Dunning&ndash;Kruger plot draws itself from pure noise<small>Kruger &amp; Dunning &middot; 1999 &middot; cognitive science</small></span>
       <span class="ldek">Regression to the mean plus uniform overconfidence draws the whole plot. No deficit required.</span>
+    </a>
+    <a class="lrow" href="public/crucible/">
+      <span class="ldate">2026&#8209;06&#8209;14</span><span class="lchip ok">REPRODUCED</span>
+      <span class="ltitle">Difference&#8209;in&#8209;differences breaks with one treated unit &mdash; synthetic control holds<small>Alvarez &amp; Ferman &middot; 2020 &middot; causal inference</small></span>
+      <span class="ldek">DiD&rsquo;s 95% interval covered the truth just 31% of the time here; synthetic control restored it to 89%.</span>
+    </a>
+    <a class="lrow" href="public/crucible/">
+      <span class="ldate">2026&#8209;06&#8209;14</span><span class="lchip ok">REPRODUCED</span>
+      <span class="ltitle">p&#8209;hacking quadruples your false positives &mdash; unless you account for the search<small>Rubin &middot; 2026 &middot; statistics</small></span>
+      <span class="ldek">Best&#8209;of&#8209;five testing inflated the Type&#8209;I error 5%&rarr;23% (4.45&times;); a selection&#8209;aware likelihood stayed under 5%.</span>
     </a>
     <a class="lrow" href="public/crucible/">
       <span class="ldate">2026&#8209;06&#8209;12</span><span class="lchip ok">REPRODUCED</span>
