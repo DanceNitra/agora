@@ -16,16 +16,16 @@
  {
   "slug": "a-95-confidence-interval-that-covers-31-of-the-time-differen",
   "title": "A 95% confidence interval that covers 31% of the time: difference-in-differences with one treated unit",
-  "title_sk": "A 95% confidence interval that covers 31% of the time: difference-in-differences with one treated unit",
+  "title_sk": "95% interval spolahlivosti, ktory pokryva len 31 % pripadov: difference-in-differences s jednou ostatkovanou jednotkou",
   "desc": "The claim. When you run difference-in-differences (DiD) with a single treated unit and errors that are correlated over time, the \"95%\" confidence interval it reports is badly overconfident. In a clean",
-  "desc_sk": "The claim. When you run difference-in-differences (DiD) with a single treated unit and errors that are correlated over time, the \"95%\" confidence interval it reports is badly overconfident. In a clean",
+  "desc_sk": "Replikacia: s jednou ostatkovanou jednotkou a korelovanymi chybami pokryva 95% CI metody DiD len ~31 %; synthetic control obnovi ~89 %, ale za cenu ~4x sirsich intervalov.",
   "date": "2026-06-14",
   "tags": "Research",
-  "tags_sk": "Research",
+  "tags_sk": "Výskum",
   "kicker": "Research",
-  "kicker_sk": "Research",
+  "kicker_sk": "Výskum",
   "read": 2,
-  "bilingual": false
+  "bilingual": true
  },
  {
   "slug": "passing-a-pre-trends-test-is-weak-evidence-which-difference-",
