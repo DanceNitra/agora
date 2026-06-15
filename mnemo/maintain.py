@@ -135,6 +135,40 @@ def suggest_links(notes: list[dict], orphans: list[str], *, k: int = 3, max_orph
     return out
 
 
+_REL_BLOCK = re.compile(r"\n*<!-- maintain:related:start -->.*?<!-- maintain:related:end -->\n*", re.S)
+
+
+def apply_suggestions(notes: list[dict], link_suggestions: dict, *, dry_run: bool = True) -> dict:
+    """ACT on the link suggestions — append a clearly-marked '## Related (auto-suggested)' block of
+    [[links]] to each orphan note, reconnecting it to the graph. STRICTLY SAFE:
+      • additive only — it never edits, reorders, or deletes the note's existing content;
+      • idempotent — re-running REPLACES its own marked block, never stacking duplicates;
+      • re-reads the FULL file before writing (so a capped scan can't truncate a note);
+      • dry_run=True by default — returns the planned changes without touching a single file.
+    For a git-synced vault with fragile filenames, run dry_run first, then apply + push via your
+    safe vault path. Returns {dry_run, changed, notes}."""
+    by_title = {n["title"]: n for n in notes}
+    changed = []
+    for orphan, sugs in link_suggestions.items():
+        n = by_title.get(orphan)
+        if not n or not sugs:
+            continue
+        block = ("\n\n<!-- maintain:related:start -->\n## Related (auto-suggested)\n"
+                 + "\n".join(f"- [[{s['link_to']}]]" for s in sugs)
+                 + "\n<!-- maintain:related:end -->\n")
+        p = Path(n["path"])
+        try:
+            cur = p.read_text(encoding="utf-8", errors="ignore")     # FULL file, not the capped scan text
+        except Exception:
+            continue
+        new = _REL_BLOCK.sub("\n", cur).rstrip() + block             # drop any prior block, append fresh
+        if new != cur:
+            changed.append(orphan)
+            if not dry_run:
+                p.write_text(new, encoding="utf-8")
+    return {"dry_run": dry_run, "changed": len(changed), "notes": changed[:20]}
+
+
 def maintain(notes: list[dict], *, now: float | None = None, stale_days: float = 120.0,
              dup_threshold: float = 0.6, dup_max_n: int = 2000, suggest: bool = True,
              link_k: int = 3, max_orphans: int = 300, embed=None) -> dict:
@@ -282,5 +316,17 @@ if __name__ == "__main__":
     assert any(set(c) == {"dup1", "dup2"} for c in rep["duplicate_clusters"])
     assert "lost_kalman" in rep["link_suggestions"] and rep["link_suggestions"]["lost_kalman"][0]["link_to"] == "core2"
     assert "stale_old" in rep["archive_candidates"]
-    print("\nOK — found dead links, orphans, stale, duplicates; SUGGESTED linking lost_kalman -> core2; "
-          "flagged stale_old to archive. Health scored.")
+
+    # apply mode — safe/additive/idempotent
+    lk = Path(d) / "lost_kalman.md"
+    before = lk.read_text(encoding="utf-8")
+    sug = {"lost_kalman": rep["link_suggestions"]["lost_kalman"]}
+    dry = apply_suggestions(scan_vault(d), sug, dry_run=True)
+    assert dry["changed"] == 1 and lk.read_text(encoding="utf-8") == before, "dry-run must not write"
+    apply_suggestions(scan_vault(d), sug, dry_run=False)
+    after = lk.read_text(encoding="utf-8")
+    assert before.rstrip() in after and "## Related (auto-suggested)" in after and "[[core2]]" in after
+    apply_suggestions(scan_vault(d), sug, dry_run=False)                       # re-run
+    assert after == lk.read_text(encoding="utf-8") and lk.read_text(encoding="utf-8").count("related:start") == 1
+    print("\nOK — found dead links, orphans, stale, duplicates; SUGGESTED lost_kalman -> core2; "
+          "flagged stale_old to archive; APPLIED the link (additive, content preserved, idempotent). Health scored.")

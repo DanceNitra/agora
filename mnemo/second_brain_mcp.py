@@ -324,6 +324,22 @@ def maintenance_report(stale_days: float = 120.0) -> dict:
     return m.maintain(m.scan_vault(str(_NOTES_DIR)), stale_days=stale_days)
 
 
+@mcp.tool()
+def apply_links(dry_run: bool = True, stale_days: float = 120.0) -> dict:
+    """ACT on the maintenance plan: append a marked '## Related (auto-suggested)' block of [[links]]
+    to each orphan note, reconnecting it to the graph. SAFE: additive only (never edits existing
+    content), idempotent (re-running replaces its own block), and DRY-RUN BY DEFAULT — call with
+    dry_run=False to actually write. Returns {dry_run, changed, notes}. Review a dry run first."""
+    import importlib.util as _i
+    from pathlib import Path as _P
+    spec = _i.spec_from_file_location("sb_maintain", str(_P(__file__).resolve().parent / "maintain.py"))
+    m = _i.module_from_spec(spec)
+    spec.loader.exec_module(m)
+    notes = m.scan_vault(str(_NOTES_DIR))
+    rep = m.maintain(notes, stale_days=stale_days)
+    return m.apply_suggestions(notes, rep["link_suggestions"], dry_run=dry_run)
+
+
 def main():
     mcp.run()
 

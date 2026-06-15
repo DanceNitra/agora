@@ -250,5 +250,8 @@ note to link it to** (re-connecting it to the graph), and flags **archive candid
 isolated). It resolves links by filename *or* frontmatter alias, and dates notes by frontmatter
 (not git-reset mtime) — both learned from dogfooding it on a real ~7,700-note vault (it rescued ~300
 falsely-flagged orphans). Advisory + safe: it returns a plan and an action list; it never edits,
-moves, or deletes a note. `python maintain.py` runs a verified round-trip on a synthetic vault; the
-`maintenance_report` tool in `second_brain_mcp.py` exposes it to any MCP agent.
+moves, or deletes a note. And it can **apply** the fix when you ask: `apply_suggestions` appends a
+marked `## Related (auto-suggested)` block of `[[links]]` to each orphan — additive only, idempotent
+(re-running replaces its own block), **dry-run by default**. `python maintain.py` runs a verified
+round-trip on a synthetic vault (diagnose → suggest → apply); `maintenance_report` and `apply_links`
+in `second_brain_mcp.py` expose it to any MCP agent.
