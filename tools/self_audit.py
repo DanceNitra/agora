@@ -52,6 +52,7 @@ def audit_mnemo(rep):
     active = sum(1 for m in mem if isinstance(m, dict) and m.get("status", "active") == "active")
     linked = sum(1 for m in mem if isinstance(m, dict) and m.get("links"))
     rep["mnemo"] = {
+        "status": "ok",
         "source": ".mnemo_brain.json (the brain's live memory)",
         "memories": len(mem), "active": active,
         "mean_value": round(statistics.fmean(vals), 3) if vals else None,
@@ -76,6 +77,7 @@ def audit_ragfresh(rep):
     for _vid, (action, _why) in plan["decisions"].items():
         counts[action] = counts.get(action, 0) + 1
     rep["ragfresh"] = {
+        "status": "ok",
         "source": ".mnemo_brain.json (our own memory, real timestamps)",
         "items": len(items), "decisions": counts,
         "finding": f"of {len(items)} live memories: " +
@@ -95,7 +97,7 @@ def audit_nullcheck(rep):
         rep["nullcheck"] = {
             "source": ".contributions.json (verify-rate signal)",
             "contributions": n, "grounded": grounded, "verified": verified,
-            "verdict": "NO SIGNAL TO TEST",
+            "status": "gap", "verdict": "NO SIGNAL TO TEST",
             "finding": f"GAP FOUND: {grounded}/{n} contributions are grounded but {verified} are marked "
                        f"verified — Voss's QA/verification tier isn't writing outcomes back, so there is "
                        f"no verify-rate to A/B. (Fix: have the verify pass set `verified`.) "
@@ -109,7 +111,7 @@ def audit_nullcheck(rep):
         "source": ".contributions.json (grounded vs ungrounded verify-rates)",
         "verify_rate_grounded": round(statistics.fmean(g), 3) if g else None,
         "verify_rate_ungrounded": round(statistics.fmean(u), 3) if u else None,
-        "p_empirical": res.get("p_empirical"), "verdict": res.get("verdict"),
+        "status": "ok", "p_empirical": res.get("p_empirical"), "verdict": res.get("verdict"),
         "finding": f"grounded verify {statistics.fmean(g):.0%} vs ungrounded {statistics.fmean(u):.0%} — {res.get('verdict')}" if g and u else "insufficient data",
     }
 
@@ -123,6 +125,7 @@ def audit_selfref(rep):
     external_fraction = sum(1 for c in contribs if c.get("grounded")) / len(contribs)
     a = selfref.audit(external_fraction=external_fraction, self_trust_p=1.0)
     rep["selfref"] = {
+        "status": "ok" if a["overall_verdict"].startswith("SAFE") else "gap",
         "source": ".contributions.json (grounded = externally-anchored fraction)",
         "external_fraction": round(external_fraction, 3),
         "collapse_verdict": a["collapse"]["verdict"].split("—")[0].strip(),
@@ -147,6 +150,7 @@ def audit_quitkit(rep):
         yields.append(sum(1 for c in win if c.get("grounded")) / len(win))
     q = quitkit.should_quit(yields, window=max(3, len(yields) // 3))
     rep["quitkit"] = {
+        "status": "gap" if q.get("quit") else "ok",
         "source": ".contributions.json (grounded-yield trend over time)",
         "windows": len(yields), "recent_yield": q.get("recent_rate"), "peak_yield": q.get("peak_rate"),
         "drawdown": q.get("drawdown"), "quit": q.get("quit"),
@@ -175,6 +179,7 @@ def audit_goodhart(rep):
     gameability = max(0.0, (1.0 - corr) * 4)
     a = goodhart.audit(gameability, n_metrics=1)
     rep["goodhart"] = {
+        "status": "ok" if corr >= 0.5 else "gap",
         "source": "agent_standing.json (proxy) x grounded contributions (true value)",
         "proxy_value_corr": round(corr, 3), "implied_gameability": round(gameability, 2),
         "verdict": a["verdict"].split("—")[0].strip(),
@@ -200,6 +205,7 @@ def audit_herdcheck(rep):
     # contrast: our 8-agent system audited at its observed config (agents do read each other -> peers~2)
     a = herdcheck.audit(peers_seen=2, own_weight=1.0)
     rep["herdcheck"] = {
+        "status": "gap" if hhi >= 0.15 else "ok",
         "source": ".contributions.json (topic concentration) + herdcheck model",
         "distinct_topics": len(topics), "herfindahl": round(hhi, 3),
         "effective_independent_topics": effective_topics,
@@ -215,6 +221,7 @@ def audit_idcheck(rep):
     """idcheck <- the mechanism we rely on for claim-diligence; proof on our own terms."""
     cb = idcheck.collider_bias(0.5)
     rep["idcheck"] = {
+        "status": "ok",
         "source": "idcheck collider proof (the engine behind our claim-diligence)",
         "true_beta": cb["true_beta"], "naive": cb["naive_Y_on_X"],
         "controlled_for_collider": cb["adjusted_for_collider"],
@@ -239,7 +246,7 @@ def main():
         except Exception as e:
             rep[fn.__name__.replace("audit_", "")] = {"error": str(e)[:160]}
     out = ROOT / "agora_output" / "self_audit.json"
-    out.write_text(json.dumps(rep, indent=2, ensure_ascii=False))
+    out.write_text(json.dumps(rep, indent=2, ensure_ascii=False), encoding="utf-8")
     print("=== AGORA SELF-AUDIT — the toolkit run on our own systems (real data) ===\n")
     for tool in ("mnemo", "ragfresh", "nullcheck", "selfref", "quitkit", "goodhart", "herdcheck", "idcheck"):
         sec = rep.get(tool, {})
