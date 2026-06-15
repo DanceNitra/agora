@@ -308,6 +308,22 @@ def idea_methods() -> list[dict]:
     ]
 
 
+@mcp.tool()
+def maintenance_report(stale_days: float = 120.0) -> dict:
+    """Run the SELF-MAINTAINING pass over the notes folder — the chore people stop doing. Finds dead
+    [[wikilinks]], orphan notes (nothing links to them and they link to nothing), stale notes
+    (old + weakly connected), near-duplicate clusters, and a vault HEALTH score: self_legibility =
+    fraction of notes in the link graph's giant component (knowledge debt is a percolation collapse,
+    so this warns BEFORE the cliff) plus orphan/dead-link/stale fractions and a prioritised action
+    list. ADVISORY ONLY — returns a plan; it never edits, moves, or deletes a note."""
+    import importlib.util as _i
+    from pathlib import Path as _P
+    spec = _i.spec_from_file_location("sb_maintain", str(_P(__file__).resolve().parent / "maintain.py"))
+    m = _i.module_from_spec(spec)
+    spec.loader.exec_module(m)
+    return m.maintain(m.scan_vault(str(_NOTES_DIR)), stale_days=stale_days)
+
+
 def main():
     mcp.run()
 

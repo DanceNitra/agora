@@ -239,3 +239,12 @@ the reasoning; the corrections still warrant a source-check before public citati
 tier. Open-core; the core stays free.
 
 MIT-licensed · part of [Agora](https://github.com/DanceNitra/agora).
+
+## Self-maintaining (maintain.py)
+The #1 second-brain frustration is **maintenance**, not capture. `maintain.py` runs the chore people
+stop doing — over a folder of Markdown notes it finds **dead `[[wikilinks]]`, orphan notes, stale
+notes, near-duplicate clusters**, and a **vault health score** (`self_legibility` = % of notes in the
+link graph's giant component — knowledge debt is a *percolation* collapse, so it warns *before* the
+cliff). Advisory + safe: it returns a plan and an action list; it never edits, moves, or deletes a
+note. `python maintain.py` runs a verified round-trip on a synthetic vault; the
+`maintenance_report` tool in `second_brain_mcp.py` exposes it to any MCP agent.
