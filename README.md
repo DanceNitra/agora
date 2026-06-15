@@ -15,10 +15,11 @@ not assumed*. **→ Full overview: [TOOLKIT.md](TOOLKIT.md)**
 | **[quitkit](quitkit/)** | **when to quit a depleting effort** — a measured drawdown-exit threshold (θ≈0.6) | `python quitkit/quitkit.py` |
 | **[idcheck](idcheck/)** | **is your causal/attribution number identified, or biased?** — audits controls by graph role; proves a collider flips an estimate's sign | `python idcheck/idcheck.py` |
 | **[goodhart](goodhart/)** | **how gameable is your proxy/metric?** — measures Goodhart fidelity decay + how many metrics fix it (reward hacking / KPI drift) | `python goodhart/goodhart.py` |
+| **[herdcheck](herdcheck/)** | **will your multi-agent system herd?** — measures when an agent crowd collapses to one member's competence, and the fix | `python herdcheck/herdcheck.py` |
 
 ```bash
-pip install "git+https://github.com/DanceNitra/agora.git"   # the seven cores, dependency-free
-python examples/toolkit_demo.py                              # run all seven end-to-end
+pip install "git+https://github.com/DanceNitra/agora.git"   # the eight cores, dependency-free
+python examples/toolkit_demo.py                              # run all eight end-to-end
 ```
 
 Open-core: the cores stay free. The tools are the public, *proven* output of the research engine below.

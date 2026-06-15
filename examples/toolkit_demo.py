@@ -6,7 +6,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT))
 
-import mnemo, ragfresh, nullcheck, selfref, quitkit, idcheck, goodhart   # noqa: E402
+import mnemo, ragfresh, nullcheck, selfref, quitkit, idcheck, goodhart, herdcheck   # noqa: E402
 
 print("=" * 70)
 print("1) mnemo — agent memory: remember, then value-ranked recall")
@@ -48,5 +48,9 @@ print("\n7) goodhart — how gameable is your proxy/metric?")
 print("   clean proxy   (gameability 0):", f"{goodhart.fidelity(0.0)['precision']:.0%} precision")
 print("   gamed proxy   (gameability 2):", goodhart.audit(2.0, 1)["verdict"].split("—")[0].strip())
 
+print("\n8) herdcheck — will your multi-agent crowd herd?")
+print("   each agent sees 0 peers (independent):", f"{herdcheck.ensemble_accuracy(0,1.0):.0%}")
+print("   each agent sees 2 peers (equal weight):", herdcheck.audit(2,1.0)["verdict"].split("—")[0].strip())
+
 print("\n" + "=" * 70)
-print("All seven ran. Each has its own `python <tool>/<tool>.py` for the full measured benchmark.")
+print("All eight ran. Each has its own `python <tool>/<tool>.py` for the full measured benchmark.")

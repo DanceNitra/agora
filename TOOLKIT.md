@@ -13,6 +13,7 @@ because the rule here is *measured, not assumed*.
 | **[quitkit](quitkit/)** | **when to quit a depleting effort** — a measured drawdown-exit threshold (θ≈0.6, an interior optimum), beats mining-to-depletion +239% | `python quitkit/quitkit.py` |
 | **[idcheck](idcheck/)** | **is your causal/attribution number identified, or biased?** — audits each control by its graph role; proves a collider flips a correct estimate's sign | `python idcheck/idcheck.py` |
 | **[goodhart](goodhart/)** | **how gameable is your proxy/metric?** — measures Goodhart fidelity decay (80%→20%) and how many independent metrics fix it (reward hacking / KPI drift) | `python goodhart/goodhart.py` |
+| **[herdcheck](herdcheck/)** | **will your multi-agent system herd?** — measures when a crowd of agents collapses to one member's competence (popularity trap) and the fix | `python herdcheck/herdcheck.py` |
 
 They share one idea: **keep / trust what survives contact with a null or with reality.** mnemo keeps
 the memory that proves valuable; ragfresh keeps the chunk that's still fresh and worth its cost;
@@ -20,7 +21,8 @@ nullcheck keeps only the effect a no-effect null can't reproduce; selfref keeps 
 the outside world so its own output can't quietly take it over; quitkit keeps your effort on a vein only
 while it's still paying, then cuts; idcheck keeps only the controls that actually identify the effect,
 and drops the ones injecting bias; goodhart keeps a metric honest only while optimizing it still tracks
-the goal, and tells you when it doesn't.
+the goal, and tells you when it doesn't; herdcheck keeps a crowd of agents wiser than its best member by
+catching the moment they start copying each other.
 
 ## Install
 ```bash
@@ -37,6 +39,7 @@ risk = selfref.audit(external_fraction=0.0, self_trust_p=2.0)  # collapse / lock
 cut = quitkit.should_quit(recent_yields)       # drawdown stop — keep or quit?
 id_ = idcheck.audit({"age": "confounder", "saw_ad": "collider"})  # identified or biased?
 gh = goodhart.audit(gameability=2.0, n_metrics=1)   # is the metric gamed?
+hc = herdcheck.audit(peers_seen=2, own_weight=1.0)  # will the agent crowd herd?
 ```
 
 ## MCP (use them from Claude / Cursor / any agent)
@@ -48,6 +51,7 @@ selfref-mcp          # is this agent/model training on itself? (collapse + lock)
 quitkit-mcp          # when to quit a depleting effort (drawdown-exit threshold)
 idcheck-mcp          # is this causal/attribution number identified, or biased?
 goodhart-mcp         # how gameable is this proxy/metric? (reward hacking / KPI drift)
+herdcheck-mcp        # will this multi-agent system / ensemble herd?
 ```
 
 ## Try everything at once
