@@ -1,0 +1,26 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "agora-memory-toolkit"
+version = "0.1.0"
+description = "Zero-dependency memory & data-hygiene tools distilled from an autonomous research OS: mnemo (agent memory + self-maintaining second brain), ragfresh (RAG freshness/decay), nullcheck (is-this-number-real)."
+readme = "TOOLKIT.md"
+requires-python = ">=3.10"
+authors = [{ name = "Agora" }]
+keywords = ["llm", "agent-memory", "rag", "vector-store", "second-brain", "ab-testing", "mcp"]
+
+# The cores are dependency-free. Extras only enable the optional surfaces:
+[project.optional-dependencies]
+mcp = ["mcp[cli]"]              # the MCP servers (mnemo-mcp, second-brain-mcp, ragfresh-mcp)
+pgvector = ["psycopg[binary]"] # ragfresh PgVectorAdapter
+pinecone = ["pinecone"]        # ragfresh PineconeAdapter
+
+[project.scripts]
+mnemo-mcp = "mnemo.mnemo_mcp:main"
+second-brain-mcp = "mnemo.second_brain_mcp:main"
+ragfresh-mcp = "ragfresh.ragfresh_mcp:main"
+
+[tool.setuptools]
+packages = ["mnemo", "ragfresh", "nullcheck"]
