@@ -6,7 +6,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT))
 
-import mnemo, ragfresh, nullcheck, selfref   # noqa: E402
+import mnemo, ragfresh, nullcheck, selfref, quitkit   # noqa: E402
 
 print("=" * 70)
 print("1) mnemo — agent memory: remember, then value-ranked recall")
@@ -35,5 +35,9 @@ print("\n4) selfref — is your AI training on itself? (collapse + lock)")
 print("   pure self-training + p=2 :", selfref.audit(external_fraction=0.0, self_trust_p=2.0)["overall_verdict"])
 print("   20% real data    + p=1   :", selfref.audit(external_fraction=0.20, self_trust_p=1.0)["overall_verdict"])
 
+print("\n5) quitkit — when to quit a depleting effort (drawdown stop)")
+print("   healthy yield stream:", "QUIT" if quitkit.should_quit([1,1,1,0,1,1,0,1]*4)["quit"] else "KEEP")
+print("   faded yield stream  :", "QUIT" if quitkit.should_quit([1,1,1,0,1,1,0,1]*4 + [0,0,1,0,0,0,0,0]*3)["quit"] else "KEEP")
+
 print("\n" + "=" * 70)
-print("All four ran. Each has its own `python <tool>/<tool>.py` for the full measured benchmark.")
+print("All five ran. Each has its own `python <tool>/<tool>.py` for the full measured benchmark.")
