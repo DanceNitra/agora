@@ -13,10 +13,11 @@ not assumed*. **→ Full overview: [TOOLKIT.md](TOOLKIT.md)**
 | **[nullcheck](nullcheck/)** | **is this number real, or noise?** — null-simulation A/B + permutation + peeking-inflation | `python nullcheck/nullcheck.py` |
 | **[selfref](selfref/)** | **is your AI training on itself?** — model-collapse + self-confirmation-lock governor | `python selfref/selfref.py` |
 | **[quitkit](quitkit/)** | **when to quit a depleting effort** — a measured drawdown-exit threshold (θ≈0.6) | `python quitkit/quitkit.py` |
+| **[idcheck](idcheck/)** | **is your causal/attribution number identified, or biased?** — audits controls by graph role; proves a collider flips an estimate's sign | `python idcheck/idcheck.py` |
 
 ```bash
-pip install "git+https://github.com/DanceNitra/agora.git"   # the five cores, dependency-free
-python examples/toolkit_demo.py                              # run all five end-to-end
+pip install "git+https://github.com/DanceNitra/agora.git"   # the six cores, dependency-free
+python examples/toolkit_demo.py                              # run all six end-to-end
 ```
 
 Open-core: the cores stay free. The tools are the public, *proven* output of the research engine below.

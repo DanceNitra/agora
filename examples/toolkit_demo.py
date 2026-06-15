@@ -6,7 +6,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT))
 
-import mnemo, ragfresh, nullcheck, selfref, quitkit   # noqa: E402
+import mnemo, ragfresh, nullcheck, selfref, quitkit, idcheck   # noqa: E402
 
 print("=" * 70)
 print("1) mnemo — agent memory: remember, then value-ranked recall")
@@ -39,5 +39,10 @@ print("\n5) quitkit — when to quit a depleting effort (drawdown stop)")
 print("   healthy yield stream:", "QUIT" if quitkit.should_quit([1,1,1,0,1,1,0,1]*4)["quit"] else "KEEP")
 print("   faded yield stream  :", "QUIT" if quitkit.should_quit([1,1,1,0,1,1,0,1]*4 + [0,0,1,0,0,0,0,0]*3)["quit"] else "KEEP")
 
+print("\n6) idcheck — is the causal number identified, or did controls inject bias?")
+_cb = idcheck.collider_bias(0.5)
+print(f"   true +0.5 -> naive {_cb['naive_Y_on_X']}, but 'controlling for' a collider -> {_cb['adjusted_for_collider']}")
+print("   audit verdict:", idcheck.audit({"age":"confounder","saw_ad":"collider"})["verdict"].split("—")[0].strip())
+
 print("\n" + "=" * 70)
-print("All five ran. Each has its own `python <tool>/<tool>.py` for the full measured benchmark.")
+print("All six ran. Each has its own `python <tool>/<tool>.py` for the full measured benchmark.")
