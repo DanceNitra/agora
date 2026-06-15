@@ -1,5 +1,19 @@
 [
  {
+  "slug": "the-hot-hand-fallacy-was-the-fallacy-a-famous-null-is-a-meas",
+  "title": "The hot-hand \"fallacy\" was the fallacy: a famous null is a measurement artifact",
+  "title_sk": "The hot-hand \"fallacy\" was the fallacy: a famous null is a measurement artifact",
+  "desc": "The claim. In 1985, Gilovich, Vallone & Tversky concluded that the basketball \"hot hand\" is a cognitive illusion: conditioning on a streak of made shots does not raise the probability of the next make",
+  "desc_sk": "The claim. In 1985, Gilovich, Vallone & Tversky concluded that the basketball \"hot hand\" is a cognitive illusion: conditioning on a streak of made shots does not raise the probability of the next make",
+  "date": "2026-06-15",
+  "tags": "Research",
+  "tags_sk": "Research",
+  "kicker": "Research",
+  "kicker_sk": "Research",
+  "read": 2,
+  "bilingual": false
+ },
+ {
   "slug": "more-data-more-wrong-a-bayesian-credible-interval-is-not-cov",
   "title": "More data, more wrong: a Bayesian credible interval is not coverage under misspecification",
   "title_sk": "Viac dát, viac mimo: bayesovský kredibilný interval nie je pokrytie pri zlej špecifikácii",
