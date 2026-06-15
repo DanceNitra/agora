@@ -28,18 +28,48 @@ from pathlib import Path
 
 _WIKILINK = re.compile(r"\[\[([^\]|#]+)")
 _WORD = re.compile(r"[a-z0-9]{3,}")
+_FM_DATE = re.compile(r"^\s*(updated|date|created)\s*:\s*(\d{4})-(\d{2})-(\d{2})", re.M)
 
 
-def scan_vault(folder: str, cap: int = 4000) -> list[dict]:
-    """Read a folder of .md notes into {title, path, text, mtime, links_out}."""
+def _frontmatter(text: str) -> tuple[set, float | None]:
+    """Parse a note's YAML frontmatter (best-effort, zero-dep) for aliases and the freshest date.
+    Returns (aliases set, epoch-ts or None). Vaults sync over git, which resets file mtime — so the
+    real 'last touched' lives in frontmatter (updated/date/created), not on disk."""
+    if not text.startswith("---"):
+        return set(), None
+    end = text.find("\n---", 3)
+    fm = text[3:end] if end != -1 else ""
+    aliases = set()
+    m = re.search(r"^\s*aliases\s*:\s*\[([^\]]*)\]", fm, re.M)            # inline: aliases: [a, b]
+    if m:
+        aliases |= {a.strip().strip("\"'") for a in m.group(1).split(",") if a.strip()}
+    bl = re.search(r"^\s*aliases\s*:\s*\n((?:\s*-\s*.+\n?)+)", fm, re.M)  # block list under aliases:
+    if bl:
+        aliases |= {ln.split("-", 1)[1].strip().strip("\"'")
+                    for ln in bl.group(1).splitlines() if "-" in ln}
+    ts = None
+    for _, y, mo, d in _FM_DATE.findall(fm):                              # freshest of updated/date/created
+        try:
+            import datetime as _dt
+            cand = _dt.datetime(int(y), int(mo), int(d)).timestamp()
+            ts = cand if ts is None else max(ts, cand)
+        except Exception:
+            pass
+    return {a for a in aliases if a}, ts
+
+
+def scan_vault(folder: str, cap: int = 8000) -> list[dict]:
+    """Read a folder of .md notes into {title, aliases, path, ts, links_out}. `ts` is the frontmatter
+    date if present (mtime is unreliable across a git sync), else file mtime."""
     notes = []
     for p in Path(folder).rglob("*.md"):
         try:
-            text = p.read_text(encoding="utf-8", errors="ignore")[:cap]
+            text = p.read_text(encoding="utf-8", errors="ignore")
         except Exception:
             continue
-        notes.append({"title": p.stem, "path": str(p), "text": text,
-                      "mtime": p.stat().st_mtime,
+        aliases, fm_ts = _frontmatter(text[:cap])
+        notes.append({"title": p.stem, "aliases": aliases, "path": str(p),
+                      "text": text[:cap], "ts": fm_ts if fm_ts else p.stat().st_mtime,
                       "links_out": {m.strip() for m in _WIKILINK.findall(text)}})
     return notes
 
@@ -69,35 +99,46 @@ def _giant_component_frac(titles: set, edges: dict) -> float:
 
 
 def maintain(notes: list[dict], *, now: float | None = None, stale_days: float = 120.0,
-             dup_threshold: float = 0.6, embed=None) -> dict:
-    """Compute the maintenance plan + health for a scanned vault. Pure: returns findings, edits nothing."""
+             dup_threshold: float = 0.6, dup_max_n: int = 2000, embed=None) -> dict:
+    """Compute the maintenance plan + health for a scanned vault. Pure: returns findings, edits nothing.
+    Duplicate detection is O(n^2) lexical; it auto-skips above `dup_max_n` notes (use an embedder +
+    LSH for big vaults). All other findings are O(n)/O(edges) and always run."""
     now = time.time() if now is None else float(now)
     titles = {n["title"] for n in notes}
     by_title = {n["title"]: n for n in notes}
+    # a wikilink resolves to a canonical note by filename OR by a frontmatter alias (Obsidian does
+    # both) — resolving aliases is what stops alias-links being miscounted as dead.
+    resolve = {t: t for t in titles}
+    for n in notes:
+        for a in n.get("aliases", ()):  # title wins on a collision
+            resolve.setdefault(a, n["title"])
 
-    # link graph (only edges to notes that exist)
     edges: dict[str, set] = {t: set() for t in titles}
-    in_links: dict[str, int] = {t: 0 for t in titles}
+    in_links = {t: 0 for t in titles}
+    out_valid = {t: 0 for t in titles}
     dead_links = []
     for n in notes:
         for tgt in n["links_out"]:
-            if tgt in titles:
-                edges[n["title"]].add(tgt); edges[tgt].add(n["title"]); in_links[tgt] += 1
+            canon = resolve.get(tgt)
+            if canon in by_title:
+                edges[n["title"]].add(canon); edges[canon].add(n["title"])
+                in_links[canon] += 1; out_valid[n["title"]] += 1
             else:
                 dead_links.append({"note": n["title"], "broken_link": tgt})
 
     orphans, stale = [], []
     for n in notes:
-        out_valid = len(n["links_out"] & titles)
-        if in_links[n["title"]] == 0 and out_valid == 0:
-            orphans.append(n["title"])
-        age = (now - n["mtime"]) / 86400.0
-        if age > stale_days and (in_links[n["title"]] + out_valid) <= 1:
-            stale.append({"note": n["title"], "age_days": round(age)})
+        t = n["title"]
+        if in_links[t] == 0 and out_valid[t] == 0:
+            orphans.append(t)
+        age = (now - n["ts"]) / 86400.0                       # frontmatter date, not git-reset mtime
+        if age > stale_days and (in_links[t] + out_valid[t]) <= 1:
+            stale.append({"note": t, "age_days": round(age)})
 
     # near-duplicate clusters (token Jaccard, or embedder cosine if provided)
     dup_clusters = []
-    if embed is None:
+    dup_scanned = len(notes) <= dup_max_n
+    if embed is None and dup_scanned:
         toks = {n["title"]: _tokens(n["text"]) for n in notes}
         items = list(titles)
         used = set()
@@ -125,7 +166,7 @@ def maintain(notes: list[dict], *, now: float | None = None, stale_days: float =
         "dead_link_frac": round(len(dead_links) / n, 3),
         "stale_frac": round(len(stale) / n, 3),
         "avg_links": round(sum(len(e) for e in edges.values()) / n, 2),
-        "duplicate_clusters": len(dup_clusters),
+        "duplicate_clusters": (len(dup_clusters) if dup_scanned else "skipped (vault > dup_max_n; use an embedder)"),
     }
     # one-line verdict: percolation framing — warn as the giant component thins
     if gc >= 0.85:
