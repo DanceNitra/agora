@@ -777,6 +777,33 @@ async def db_retention_loop(app: FastAPI):
         await _aio.sleep(24 * 3600)                           # daily
 
 
+async def prediction_resolve_loop(app: FastAPI):
+    """Close the RESOLUTION bottleneck. Predictions were recorded but NOTHING ever called
+    resolve_due(), so the ledger stayed 0-resolved and the Brier was unmeasurable forever — the
+    credibility track record (the moat) could never become real. Once a day, resolve every matured
+    prediction and any due oracle market so calibration actually accumulates. Purely additive: it
+    only scores forecasts whose horizon has elapsed (the >=1-day age guard still binds)."""
+    import asyncio as _aio
+    await _aio.sleep(1200)                                    # let startup settle
+    while True:
+        try:
+            from agora.execution.prediction_ledger import resolve_due, calibration
+            resolved = await resolve_due()
+            cal = calibration()
+            print(f"[Predict-Resolve] resolved {len(resolved)} due; track record "
+                  f"{cal.get('correct')}/{cal.get('resolved')} (Brier {cal.get('brier')})")
+        except Exception as e:
+            print(f"[Predict-Resolve] ledger error: {e}")
+        try:
+            from agora.execution.oracle import resolve_open
+            o = await _aio.to_thread(resolve_open)
+            if o:
+                print(f"[Predict-Resolve] oracle resolved {len(o)} markets")
+        except Exception as e:
+            print(f"[Predict-Resolve] oracle error: {e}")
+        await _aio.sleep(24 * 3600)                           # daily
+
+
 async def hypothesis_loop(app: FastAPI):
     """Close the gap Agora's self-reflection flagged: thousands of findings, zero hypotheses. Every
     ~6h, bridge a coherent cross-domain finding cluster into ONE hypothesis, TEST it against real
@@ -883,6 +910,10 @@ async def lifespan(app: FastAPI):
         loop.create_task(db_retention_loop(app))   # daily: keep agora.db bounded (anti-lag)
     except Exception as _e:
         print(f"[Retention] not started: {_e}")
+    try:
+        loop.create_task(prediction_resolve_loop(app))  # daily: resolve matured forecasts -> real Brier track record
+    except Exception as _e:
+        print(f"[Predict-Resolve] not started: {_e}")
     try:
         loop.create_task(seminar_report_loop(app))  # ~3h: Telegram research report + seed MNEMO
     except Exception as _e:
