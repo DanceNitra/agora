@@ -90,6 +90,17 @@ def credit_outcome(subject: str, good: bool, k: int = 5, min_rel: float = 0.30) 
         return {"error": str(e)[:100]}
 
 
+def consolidate_brain_memory() -> dict:
+    """The dream pass on the shared brain store: link near-duplicate memories + state-toggle
+    contradictions. Raw text is immutable and nothing is dropped (keep=None) — it only ADDS links /
+    supersede markers. The dungeon agents already run this on their stores; this brings the brain's
+    store the same hygiene so links compound as it grows. Returns the consolidation stats."""
+    try:
+        return _mnemo().consolidate()      # keep=None -> never drops; links + state-toggles only
+    except Exception as e:
+        return {"error": str(e)[:120]}
+
+
 def agent_can_contribute(role_hint: str, topic: str, min_rel: float = 0.22) -> tuple[bool, str]:
     """Can this agent genuinely add to the topic? True only if its memory (shared MNEMO, or the
     vault as a bootstrap backstop) surfaces relevant knowledge. Returns (can, context_snippets)."""

@@ -351,6 +351,34 @@ def record_contribution(topic: dict, partners: list[str], claim: str, evidence: 
 
 
 # ── Layer 4 support + measurement ────────────────────────────────────────────
+_SOURCE_RE = re.compile(r"\[\[.+?\]\]|\(\s*[A-Z][A-Za-z\-]+.{0,40}\d{4}\s*\)|doi:|https?://|arXiv|et al\.", re.I)
+
+
+def verify_contributions(limit: int = 500) -> dict:
+    """Promote grounded contributions to VERIFIED when they meet the full evidence bar: a falsifier
+    AND a checkable source — a cited paper ('(Author, 2024)'/arXiv/doi/url) or a [[vault note]].
+    Here 'verified' means *independently checkable + falsifiable* (a stricter tier than 'grounded',
+    which only requires some evidence text) — the higher-trust QA layer that value_points() already
+    rewards (+2) but that nothing ever wrote back. Deterministic, idempotent; never un-verifies."""
+    contribs = _load(_CONTRIB, [])
+    changed = checked = 0
+    for c in contribs:
+        if c.get("verified") or not c.get("grounded"):
+            continue
+        checked += 1
+        if checked > limit:
+            break
+        has_fals = bool((c.get("falsifier") or "").strip())
+        has_src = bool(_SOURCE_RE.search((c.get("evidence") or "") + " " + (c.get("claim") or "")))
+        if has_fals and has_src:
+            c["verified"] = True
+            changed += 1
+    if changed:
+        _save(_CONTRIB, contribs)
+    return {"checked": checked, "newly_verified": changed,
+            "total_verified": sum(1 for c in contribs if c.get("verified")), "total": len(contribs)}
+
+
 def value_points() -> float:
     """Seminar value for the Metabolism: 1 per grounded contribution, +2 if later verified."""
     contribs = _load(_CONTRIB, [])

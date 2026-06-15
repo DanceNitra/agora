@@ -929,6 +929,43 @@ async def scout_digest_loop(app: FastAPI):
         await _aio.sleep(window)                              # every ~8h
 
 
+async def self_audit_loop(app: FastAPI):
+    """THE SELF-AUDIT — Agora keeps its own house in order with its own tools, and tracks its health
+    over time. Every ~12h: (1) consolidate the brain's mnemo store (link near-duplicates, drop
+    nothing), (2) promote grounded+sourced+falsifiable contributions to VERIFIED (the higher-trust
+    tier value_points already rewards but nothing wrote back), (3) append a health snapshot so trends
+    are visible (server/.self_audit_history.json). The full 8-tool audit is tools/self_audit.py;
+    this is the live hygiene + trend recorder. Purely additive and idempotent."""
+    import asyncio as _aio, json as _json, time as _t
+    from pathlib import Path as _P
+    _hist = _P(__file__).resolve().parent.parent / ".self_audit_history.json"
+    await _aio.sleep(1500)                                    # let startup settle
+    while True:
+        try:
+            from agora.execution.mnemo_bridge import consolidate_brain_memory
+            from agora.execution.seminar import verify_contributions, seminar_stats
+            cons = await _aio.to_thread(consolidate_brain_memory)
+            ver = await _aio.to_thread(verify_contributions)
+            stats = seminar_stats()
+            snap = {"ts": _t.time(), "memories": cons.get("total"),
+                    "linked_pairs": cons.get("linked_pairs"), "newly_verified": ver.get("newly_verified"),
+                    "contributions": stats.get("contributions"), "grounded": stats.get("grounded"),
+                    "verified": stats.get("verified")}
+            hist = []
+            if _hist.exists():
+                try:
+                    hist = _json.loads(_hist.read_text())
+                except Exception:
+                    hist = []
+            hist.append(snap)
+            _hist.write_text(_json.dumps(hist[-200:], indent=2))
+            print(f"[Self-Audit] verified {stats.get('verified')}/{stats.get('contributions')} contributions, "
+                  f"mem {cons.get('total')} (+{cons.get('linked_pairs')} links); snapshot #{len(hist)}")
+        except Exception as e:
+            print(f"[Self-Audit] loop error: {e}")
+        await _aio.sleep(12 * 3600)                           # ~2x/day
+
+
 async def lifespan(app: FastAPI):
     try:
         await init_db(app)
@@ -989,6 +1026,10 @@ async def lifespan(app: FastAPI):
         loop.create_task(second_brain_loop(app))   # ~daily: queue a Second-brain briefing on the owner's notes
     except Exception as _e:
         print(f"[SecondBrain] loop not started: {_e}")
+    try:
+        loop.create_task(self_audit_loop(app))     # ~12h: run our own tools on ourselves (consolidate + verify + health snapshot)
+    except Exception as _e:
+        print(f"[Self-Audit] loop not started: {_e}")
     yield
     if hasattr(app.state, 'db') and app.state.db:
         await app.state.db.close()
