@@ -28,6 +28,20 @@
   "bilingual": true
  },
  {
+  "slug": "your-rag-store-is-rotting-freshness-beats-retrieval-and-we-m",
+  "title": "Your RAG store is rotting: freshness beats retrieval, and we measured it",
+  "title_sk": "Tvoj RAG store hnije: čerstvosť poráža vyhľadávanie, a odmerali sme to",
+  "desc": "The claim. Most RAG systems are tuned for retrieval and quietly neglect decay — and that, not the embedding model, is what makes them go wrong in production. A vector store that keeps every chunk fore",
+  "desc_sk": "Väčšina RAG systémov zanedbáva rozpad, nie embeddingy. Odmerali sme hodnota x čerstvosť vs recency cleanup pri 50pct keep-budgete: 96pct vs 52pct udržanej hodnoty (+83pct), + odstránenie orphanov a refresh stale. Zabalené ako ragfresh, open nástroj bez závislostí.",
+  "date": "2026-06-15",
+  "tags": "Research",
+  "tags_sk": "Výskum",
+  "kicker": "Research",
+  "kicker_sk": "Výskum",
+  "read": 2,
+  "bilingual": true
+ },
+ {
   "slug": "more-data-more-wrong-a-bayesian-credible-interval-is-not-cov",
   "title": "More data, more wrong: a Bayesian credible interval is not coverage under misspecification",
   "title_sk": "Viac dát, viac mimo: bayesovský kredibilný interval nie je pokrytie pri zlej špecifikácii",
