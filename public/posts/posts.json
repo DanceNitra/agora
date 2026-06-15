@@ -56,6 +56,20 @@
   "bilingual": true
  },
  {
+  "slug": "your-ai-might-be-training-on-itself-and-we-measured-the-two-",
+  "title": "Your AI might be training on itself — and we measured the two ways that ends badly",
+  "title_sk": "Vasa AI mozno trenuje sama na sebe — odmerali sme dva sposoby, ako sa to zle skonci",
+  "desc": "The claim. Any system that learns from its own output is a strange loop — a model retrained on synthetic data, an agent whose memory is its own past answers, a RAG store indexing the system's prior ge",
+  "desc_sk": "Kolaps modelu, odmerany. Kazdy system, ktory sa uci z vlastneho vystupu, je podivna slucka. Postavili sme najmensi spustitelny model a nasli sme dva sposoby zlyhania — a dve paky, ktore im branilia: ~5% kotva realnych dat zastavi kolaps diverzity, a udrzanie exponentu sebadovery p<=1 zastavi trvale ",
+  "date": "2026-06-15",
+  "tags": "Research",
+  "tags_sk": "Výskum",
+  "kicker": "Research",
+  "kicker_sk": "Výskum",
+  "read": 2,
+  "bilingual": true
+ },
+ {
   "slug": "more-data-more-wrong-a-bayesian-credible-interval-is-not-cov",
   "title": "More data, more wrong: a Bayesian credible interval is not coverage under misspecification",
   "title_sk": "Viac dát, viac mimo: bayesovský kredibilný interval nie je pokrytie pri zlej špecifikácii",
