@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="en" data-lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>AI Audit — one reliability report for your AI system · Agora</title>
+<meta name="description" content="Run a free reliability audit on your AI/agent system in the browser: catch reward-hacking, model-collapse, agent-herding, fake A/B lifts, RAG rot and biased causal claims — with the fix for each. No install, no signup.">
+<link rel="canonical" href="https://dancenitra.github.io/agora/public/aiaudit/">
+<meta property="og:title" content="AI Audit — one reliability report for your AI system">
+<meta property="og:description" content="Run a free reliability audit on your AI system in the browser. Reward-hacking, model-collapse, agent-herding, fake metrics, RAG rot — with fixes.">
+<meta property="og:url" content="https://dancenitra.github.io/agora/public/aiaudit/">
+<meta name="twitter:card" content="summary_large_image">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400..700;1,9..144,400&family=Newsreader:ital,opsz,wght@0,6..72,400..600;1,6..72,400&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+ :root{--paper:#faf7f0;--paper2:#f2eee4;--ink:#1b1a17;--text:#4d493f;--faint:#938d7f;--line:#e3ddcf;--line2:#d6cfbd;
+   --ok:#0c7a55;--ok-soft:#e1f1ea;--warn:#9a7b1e;--warn-soft:#f7eecd;--fail:#b3361f;--fail-soft:#f8e6e0;
+   --plate:#1a1813;--plate-text:#f3efe4;--plate-soft:#ddd7c9;
+   --display:"Fraunces",Georgia,serif;--serif:"Newsreader",Georgia,serif;--mono:"JetBrains Mono",ui-monospace,Consolas,monospace;}
+ *{box-sizing:border-box;margin:0} html{scroll-behavior:smooth;-webkit-text-size-adjust:100%}
+ body{background:var(--paper);color:var(--ink);font-family:var(--serif);font-size:18px;line-height:1.65;-webkit-font-smoothing:antialiased}
+ [data-lang=en] .sk{display:none} [data-lang=sk] .en{display:none}
+ a{color:inherit;text-decoration:none}
+ .wrap{max-width:1080px;margin:0 auto;padding:0 28px}
+ .nav{position:sticky;top:0;z-index:30;background:rgba(250,247,240,.85);backdrop-filter:blur(10px);border-bottom:1px solid var(--line)}
+ .nav .wrap{display:flex;justify-content:space-between;align-items:center;padding:14px 28px;font-family:var(--mono);font-size:12.5px}
+ .brand{display:flex;align-items:center;gap:9px;font-weight:600;color:var(--ink)}
+ .brand .m{width:17px;height:17px;border-radius:5px;background:conic-gradient(from 210deg,var(--ok),transparent 62%);position:relative}
+ .brand .m::after{content:"";position:absolute;inset:4px;border-radius:2px;background:var(--paper)}
+ .navr{display:flex;gap:18px;align-items:center} .navr a{color:var(--faint)} .navr a:hover{color:var(--ok)}
+ .lng button{font-family:var(--mono);font-size:11.5px;background:none;border:1px solid var(--line2);border-radius:6px;padding:3px 8px;cursor:pointer;color:var(--faint);margin-left:4px} .lng button.on{color:var(--ok);border-color:var(--ok)}
+ .hero{padding:64px 0 18px}
+ .kick{font-family:var(--mono);font-size:12px;letter-spacing:.28em;text-transform:uppercase;color:var(--ok);margin-bottom:20px}
+ h1{font-family:var(--display);font-weight:560;font-size:clamp(40px,6vw,72px);line-height:1.03;letter-spacing:-.02em;max-width:16ch}
+ h1 em{font-style:italic;color:var(--ok)}
+ .lede{margin-top:22px;max-width:60ch;font-size:21px;line-height:1.55;color:var(--text)}
+ .lede b{color:var(--ink)}
+ .cta{margin-top:28px;display:flex;gap:14px;flex-wrap:wrap;align-items:center}
+ .btn{font-family:var(--mono);font-size:13px;padding:12px 20px;border-radius:10px;cursor:pointer;border:1px solid var(--line2);background:#fff;color:var(--ink)}
+ .btn.primary{background:var(--ok);color:#fff;border-color:var(--ok)}
+ .btn:hover{border-color:var(--ok)}
+ section{padding:54px 0 0}
+ h2{font-family:var(--display);font-weight:540;font-size:clamp(28px,3vw,40px);line-height:1.1;letter-spacing:-.01em}
+ .sub{margin-top:10px;max-width:62ch;color:var(--text)}
+ /* audit tool */
+ .tool{margin-top:30px;display:grid;grid-template-columns:minmax(0,420px) minmax(0,1fr);gap:26px;align-items:start}
+ @media(max-width:880px){.tool{grid-template-columns:1fr}}
+ .panel{background:#fff;border:1px solid var(--line2);border-radius:16px;padding:22px}
+ .fg{margin-bottom:16px;padding-bottom:14px;border-bottom:1px solid var(--line)}
+ .fg:last-child{border-bottom:0;margin-bottom:0;padding-bottom:0}
+ .fg h4{font-family:var(--mono);font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:var(--faint);margin-bottom:9px}
+ .row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+ label{font-family:var(--mono);font-size:12px;color:var(--text);display:flex;flex-direction:column;gap:4px}
+ input,select{font-family:var(--mono);font-size:13px;padding:7px 9px;border:1px solid var(--line2);border-radius:8px;background:var(--paper);color:var(--ink);width:92px}
+ select{width:auto}
+ .report{background:var(--plate);color:var(--plate-text);border-radius:16px;padding:22px;font-family:var(--mono);font-size:13px;line-height:1.6;min-height:200px}
+ .rhead{font-size:15px;margin-bottom:14px;padding-bottom:12px;border-bottom:1px solid #ffffff22}
+ .dim{padding:10px 0;border-bottom:1px solid #ffffff14}
+ .dim:last-child{border-bottom:0}
+ .tag{display:inline-block;font-weight:600;border-radius:5px;padding:1px 7px;margin-right:8px;font-size:11px}
+ .tag.ok{background:#143;color:#7fd1a8} .tag.warn{background:#443012;color:#e7c46b} .tag.fail{background:#451a12;color:#e88f78}
+ .fix{color:var(--plate-soft);margin-top:4px;padding-left:6px;border-left:2px solid #ffffff22}
+ .score{font-family:var(--mono);font-weight:600;font-size:34px}
+ .checks{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:12px;margin-top:24px}
+ .chk{border:1px solid var(--line);border-radius:12px;padding:16px;background:#fff}
+ .chk b{font-family:var(--mono);font-size:14px}
+ .chk p{font-size:15px;color:var(--text);margin-top:5px}
+ .price{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:24px}
+ @media(max-width:720px){.price{grid-template-columns:1fr}}
+ .tier{border:1px solid var(--line2);border-radius:16px;padding:24px;background:#fff}
+ .tier.hl{border-color:var(--ok);background:linear-gradient(180deg,#fff,var(--ok-soft))}
+ .tier h3{font-family:var(--display);font-size:24px} .tier .p{font-family:var(--mono);font-size:13px;color:var(--faint);margin:6px 0 14px}
+ .tier ul{list-style:none;padding:0;font-size:16px} .tier li{padding:5px 0 5px 22px;position:relative}
+ .tier li::before{content:"✓";position:absolute;left:0;color:var(--ok)}
+ footer{margin-top:64px;border-top:1px solid var(--line);padding:28px 0;font-family:var(--mono);font-size:12px;color:var(--faint)}
+ code{font-family:var(--mono);font-size:.92em;background:var(--paper2);padding:2px 6px;border-radius:5px}
+</style>
+</head>
+<body>
+<nav class="nav"><div class="wrap">
+  <a class="brand" href="../../"><span class="m"></span>Agora</a>
+  <div class="navr">
+    <a href="#run"><span class="en">Run it</span><span class="sk">Spusti</span></a>
+    <a href="#checks"><span class="en">Checks</span><span class="sk">Kontroly</span></a>
+    <a href="#pricing"><span class="en">Pricing</span><span class="sk">Cena</span></a>
+    <a href="https://github.com/DanceNitra/agora/tree/main/aiaudit" target="_blank" rel="noopener">GitHub &#8599;</a>
+    <span class="lng"><button data-l="en" class="on">EN</button><button data-l="sk">SK</button></span>
+  </div>
+</div></nav>
+
+<header class="hero"><div class="wrap">
+  <div class="kick"><span class="en">Agora · AI Audit</span><span class="sk">Agora · AI Audit</span></div>
+  <h1><span class="en">One reliability report for your <em>AI system</em>.</span><span class="sk">Jeden reliability report pre tvoj <em>AI systém</em>.</span></h1>
+  <p class="lede"><span class="en">Describe your AI/agent system and get one prioritized <b>PASS / WARN / FAIL</b> report &mdash; reward-hacking, model-collapse, agent-herding, fake A/B lifts, RAG rot, biased causal claims &mdash; each with the fix. Every check is <b>measured, not assumed</b>. <b>Run it free below, in your browser.</b></span><span class="sk">Opíš svoj AI/agentový systém a dostaneš jeden prioritizovaný <b>PASS / WARN / FAIL</b> report &mdash; reward-hacking, kolaps modelu, stádovanie agentov, falošné A/B nárasty, hnitie RAG, skreslené kauzálne tvrdenia &mdash; každé s opravou. Každá kontrola je <b>odmeraná, nie predpokladaná</b>. <b>Spusti to zadarmo nižšie, v prehliadači.</b></span></p>
+  <div class="cta">
+    <a class="btn primary" href="#run"><span class="en">Run the audit &#8595;</span><span class="sk">Spusti audit &#8595;</span></a>
+    <a class="btn" href="https://github.com/DanceNitra/agora/tree/main/aiaudit" target="_blank" rel="noopener">pip install / CLI / MCP</a>
+  </div>
+</div></header>
+
+<section id="run"><div class="wrap">
+  <h2><span class="en">Run it now</span><span class="sk">Spusti to teraz</span></h2>
+  <p class="sub"><span class="en">Fill in whatever parts of your system you have (pre-filled with a failing example). It runs entirely in your browser &mdash; nothing is sent anywhere.</span><span class="sk">Vyplň tie časti systému, ktoré máš (predvyplnené zlyhávajúcim príkladom). Beží celé v prehliadači &mdash; nič sa nikam neposiela.</span></p>
+  <div class="tool">
+    <div class="panel">
+      <div class="fg"><h4><span class="en">A/B result &mdash; is the lift real?</span><span class="sk">A/B výsledok &mdash; je nárast reálny?</span></h4>
+        <div class="row">
+          <label>conv A<input id="ca" type="number" value="100"></label>
+          <label>n A<input id="na" type="number" value="1000"></label>
+          <label>conv B<input id="cb" type="number" value="115"></label>
+          <label>n B<input id="nb" type="number" value="1000"></label>
+        </div></div>
+      <div class="fg"><h4><span class="en">Self-training &mdash; model collapse?</span><span class="sk">Self-training &mdash; kolaps modelu?</span></h4>
+        <div class="row">
+          <label><span class="en">external data %</span><span class="sk">externé dáta %</span><input id="ext" type="number" step="0.01" value="0"></label>
+          <label><span class="en">self-trust p</span><span class="sk">sebadôvera p</span><input id="stp" type="number" step="0.1" value="2"></label>
+        </div></div>
+      <div class="fg"><h4><span class="en">Multi-agent &mdash; herding?</span><span class="sk">Multi-agent &mdash; stádovanie?</span></h4>
+        <div class="row">
+          <label><span class="en">peers seen</span><span class="sk">videní peers</span><input id="peers" type="number" value="2"></label>
+          <label><span class="en">own weight</span><span class="sk">vlastná váha</span><input id="ow" type="number" step="0.1" value="1"></label>
+          <label><span class="en">peer discount</span><span class="sk">zľava peer</span><input id="disc" type="number" step="0.1" value="1"></label>
+        </div></div>
+      <div class="fg"><h4><span class="en">Metric / reward &mdash; gamed?</span><span class="sk">Metrika / odmena &mdash; gameovaná?</span></h4>
+        <div class="row">
+          <label><span class="en">gameability</span><span class="sk">gameovateľnosť</span><input id="game" type="number" step="0.1" value="2"></label>
+          <label><span class="en"># metrics</span><span class="sk"># metrík</span><input id="nm" type="number" value="1"></label>
+        </div></div>
+      <div class="fg"><h4><span class="en">Causal control &mdash; identified?</span><span class="sk">Kauzálna kontrola &mdash; identifikované?</span></h4>
+        <div class="row">
+          <select id="role">
+            <option value="confounder">confounder (good)</option>
+            <option value="outcome_predictor">outcome predictor (good)</option>
+            <option value="collider" selected>collider (bad)</option>
+            <option value="mediator">mediator (bad)</option>
+            <option value="instrument">instrument (bad)</option>
+          </select>
+          <span style="font-family:var(--mono);font-size:11px;color:var(--faint)"><span class="en">role of a control you adjust for</span><span class="sk">rola kontroly, na ktorú adjustuješ</span></span>
+        </div></div>
+      <button class="btn primary" style="width:100%;margin-top:16px" onclick="runAudit()"><span class="en">Run audit</span><span class="sk">Spusti audit</span></button>
+    </div>
+    <div class="report" id="report"></div>
+  </div>
+</div></section>
+
+<section id="checks"><div class="wrap">
+  <h2><span class="en">What it checks</span><span class="sk">Čo kontroluje</span></h2>
+  <p class="sub"><span class="en">Each is a proven, measured tool &mdash; and we run all of them on ourselves, publicly. <a href="../self-audit/" style="color:var(--ok)">See our own self-audit &rarr;</a></span><span class="sk">Každá je dokázaný, odmeraný nástroj &mdash; a všetky spúšťame na sebe, verejne. <a href="../self-audit/" style="color:var(--ok)">Pozri náš seba-audit &rarr;</a></span></p>
+  <div class="checks">
+    <div class="chk"><b>nullcheck</b><p><span class="en">Is a reported lift real, or noise?</span><span class="sk">Je nárast reálny, či šum?</span></p></div>
+    <div class="chk"><b>selfref</b><p><span class="en">Is the model collapsing on itself?</span><span class="sk">Kolabuje model sám na seba?</span></p></div>
+    <div class="chk"><b>herdcheck</b><p><span class="en">Will your agents herd?</span><span class="sk">Budú agenti stádovať?</span></p></div>
+    <div class="chk"><b>goodhart</b><p><span class="en">Is the metric/reward gamed?</span><span class="sk">Je metrika gameovaná?</span></p></div>
+    <div class="chk"><b>idcheck</b><p><span class="en">Is the causal number identified?</span><span class="sk">Je kauzálne číslo identifikované?</span></p></div>
+    <div class="chk"><b>ragfresh</b><p><span class="en">Is your RAG store rotting?</span><span class="sk">Hnije tvoj RAG sklad?</span></p></div>
+    <div class="chk"><b>mnemo</b><p><span class="en">Agent-memory health.</span><span class="sk">Zdravie pamäte agentov.</span></p></div>
+    <div class="chk"><b>quitkit</b><p><span class="en">When to quit a depleting effort.</span><span class="sk">Kedy vzdať slabnúce úsilie.</span></p></div>
+  </div>
+</div></section>
+
+<section id="pricing"><div class="wrap">
+  <h2><span class="en">Pricing</span><span class="sk">Cena</span></h2>
+  <div class="price">
+    <div class="tier"><h3><span class="en">Open core</span><span class="sk">Open core</span></h3><div class="p"><span class="en">free, forever</span><span class="sk">zadarmo, navždy</span></div>
+      <ul>
+        <li><span class="en">All 8 checks + the audit, one <code>pip install</code></span><span class="sk">Všetkých 8 kontrol + audit, jeden <code>pip install</code></span></li>
+        <li><span class="en">CLI &amp; MCP server (CI-gateable)</span><span class="sk">CLI a MCP server (do CI)</span></li>
+        <li><span class="en">Run in-browser, like above</span><span class="sk">Spustenie v prehliadači, ako vyššie</span></li>
+      </ul>
+      <a class="btn" style="margin-top:14px;display:inline-block" href="https://github.com/DanceNitra/agora/tree/main/aiaudit" target="_blank" rel="noopener">GitHub &#8599;</a>
+    </div>
+    <div class="tier hl"><h3><span class="en">Hosted</span><span class="sk">Hostované</span></h3><div class="p"><span class="en">coming soon</span><span class="sk">čoskoro</span></div>
+      <ul>
+        <li><span class="en">Audit API + dashboard, history over time</span><span class="sk">Audit API + dashboard, história v čase</span></li>
+        <li><span class="en">Plug into your CI/CD &amp; agent runtime</span><span class="sk">Napojenie na CI/CD a agent runtime</span></li>
+        <li><span class="en">Continuous monitoring &amp; alerts</span><span class="sk">Kontinuálny monitoring a alerty</span></li>
+      </ul>
+      <a class="btn primary" style="margin-top:14px;display:inline-block" href="mailto:rastislav.drahos@gmail.com?subject=AI%20Audit%20hosted%20%E2%80%94%20interested"><span class="en">Get notified</span><span class="sk">Daj vedieť</span></a>
+    </div>
+  </div>
+</div></section>
+
+<footer><div class="wrap"><span class="en">Agora &middot; AI Audit runs entirely client-side here &middot; every check is measured &amp; open-source</span><span class="sk">Agora &middot; AI Audit tu beží celé na strane klienta &middot; každá kontrola je odmeraná a open-source</span></div></footer>
+
+<script>
+ var root=document.documentElement;
+ function setLang(l){root.setAttribute('data-lang',l);root.setAttribute('lang',l);
+   document.querySelectorAll('.lng button').forEach(function(b){b.classList.toggle('on',b.getAttribute('data-l')===l);});
+   try{localStorage.setItem('agora-lang',l);}catch(e){}}
+ document.querySelectorAll('.lng button').forEach(function(b){b.addEventListener('click',function(){setLang(b.getAttribute('data-l'));});});
+ try{var s=localStorage.getItem('agora-lang');if(s)setLang(s);}catch(e){}
+
+ // ── the audit engine, client-side (faithful to the measured Python tools) ──
+ function erfc(x){var z=Math.abs(x),t=1/(1+z/2),r=t*Math.exp(-z*z-1.26551223+t*(1.00002368+t*(0.37409196+t*(0.09678418+t*(-0.18628806+t*(0.27886807+t*(-1.13520398+t*(1.48851587+t*(-0.82215223+t*0.17087277)))))))));return x>=0?r:2-r;}
+ var num=function(id){var v=parseFloat(document.getElementById(id).value);return isNaN(v)?null:v;};
+ function abTest(ca,na,cb,nb){var ra=ca/na,rb=cb/nb,p0=(ca+cb)/(na+nb);var se=Math.sqrt(Math.max(1e-12,p0*(1-p0)*(1/na+1/nb)));var z=Math.abs(rb-ra)/se;var p=erfc(z/Math.SQRT2);var v=p<0.01?'REAL':p<0.05?'LIKELY REAL':p<0.15?'SUSPECT':'NOISE';var sev=(p<0.05)?'ok':(p<0.15?'warn':'fail');return {sev:sev,find:'lift '+((rb-ra>=0?'+':''))+(rb-ra).toFixed(3)+', p&#8776;'+p.toFixed(3)+' &mdash; '+v,fix:sev==='ok'?null:'collect more data; a no-effect null reproduces this routinely'};}
+ function lockFraction(p){var prod=1;for(var n=1;n<8000;n++){prod*=(1-1/Math.pow(n+1,p));if(prod<1e-9)return 0;}return prod;}
+ function selfref(ext,p){var collapse=ext<0.02?'fail':ext<0.05?'warn':'ok';var lf=lockFraction(p);var lock=lf<0.01?'ok':lf<0.2?'warn':'fail';var order={ok:0,warn:1,fail:2};var sev=order[collapse]>=order[lock]?collapse:lock;var msg=[];if(collapse!=='ok')msg.push('collapse risk ('+(ext*100).toFixed(0)+'% external data)');if(lock!=='ok')msg.push('bias lock '+(lf*100).toFixed(0)+'% at p='+p);return {sev:sev,find:sev==='ok'?'SAFE &mdash; '+(ext*100).toFixed(0)+'% external, p='+p:msg.join('; ').toUpperCase(),fix:sev==='ok'?null:'keep &ge;5% real/external data; cap self-trust so p&le;1'};}
+ function herd(peers,w,disc){var eff=peers*disc;var kc=Math.floor(w)+1;var sev;if(eff>=w+1)sev='fail';else if(eff>w)sev='warn';else sev='ok';return {sev:sev,find:sev==='ok'?'INDEPENDENT &mdash; below k_c=w+1='+(Math.floor(w)+1):(sev==='fail'?'HERDED &mdash; '+peers+' peers &ge; k_c='+kc+'; crowd no wiser than one agent':'DEGRADED &mdash; peer copying eroding the edge'),fix:sev==='ok'?null:'weight own evidence &ge; peers, discount peer signals (<1), or share evidence not verdicts'};}
+ function goodhart(g,m){var eff=g/Math.sqrt(Math.max(1,m));var pts=[[0,0.80],[0.5,0.63],[1,0.45],[2,0.29],[4,0.19]];var prec;if(eff<=0)prec=0.80;else if(eff>=4)prec=0.19;else{for(var i=1;i<pts.length;i++){if(eff<=pts[i][0]){var a=pts[i-1],b=pts[i];prec=a[1]+(b[1]-a[1])*(eff-a[0])/(b[0]-a[0]);break;}}}var sev=prec>=0.7?'ok':prec>=0.4?'warn':'fail';return {sev:sev,find:(sev==='fail'?'GAMED':sev==='warn'?'DEGRADED':'SAFE')+' &mdash; selection precision '+(prec*100).toFixed(0)+'%',fix:sev==='ok'?null:'combine more independent metrics, or change what you measure'};}
+ function idcheck(role){var bad={collider:1,mediator:1,instrument:1};var sev=bad[role]?'fail':'ok';return {sev:sev,find:sev==='ok'?'ADMISSIBLE &mdash; '+role+' is a good control':'BIASED &mdash; conditioning on a '+role+' injects bias',fix:sev==='ok'?null:'drop the '+role+' from your controls (more controls is not safer)'};}
+
+ function runAudit(){
+   var dims=[];
+   var ca=num('ca'),na=num('na'),cb=num('cb'),nb=num('nb');
+   if(ca!==null&&na>0&&cb!==null&&nb>0)dims.push(['A/B result (nullcheck)',abTest(ca,na,cb,nb)]);
+   var ext=num('ext'),stp=num('stp');
+   if(ext!==null&&stp!==null)dims.push(['Self-training (selfref)',selfref(ext>1?ext/100:ext,stp)]);
+   var peers=num('peers'),ow=num('ow'),disc=num('disc');
+   if(peers!==null&&ow!==null)dims.push(['Multi-agent (herdcheck)',herd(peers,ow,disc===null?1:disc)]);
+   var game=num('game'),nm=num('nm');
+   if(game!==null)dims.push(['Metric / reward (goodhart)',goodhart(game,nm===null?1:nm)]);
+   var role=document.getElementById('role').value;
+   if(role)dims.push(['Causal control (idcheck)',idcheck(role)]);
+   var order={ok:0,warn:1,fail:2},icon={ok:'PASS',warn:'WARN',fail:'FAIL'};
+   var nf=dims.filter(function(d){return d[1].sev==='fail';}).length;
+   var nw=dims.filter(function(d){return d[1].sev==='warn';}).length;
+   var no=dims.length-nf-nw;
+   var overall=nf?'FAIL':nw?'WARN':'PASS';
+   var score=dims.length?Math.round(100*(no+0.5*nw)/dims.length):0;
+   dims.sort(function(a,b){return order[b[1].sev]-order[a[1].sev];});
+   var lang=root.getAttribute('data-lang');
+   var h='<div class="rhead">=== AI Audit === <b style="color:'+(overall==='FAIL'?'#e88f78':overall==='WARN'?'#e7c46b':'#7fd1a8')+'">'+overall+'</b> &middot; <span class="score">'+score+'</span>/100 &middot; '+no+' pass / '+nw+' warn / '+nf+' fail</div>';
+   dims.forEach(function(d){h+='<div class="dim"><span class="tag '+d[1].sev+'">'+icon[d[1].sev]+'</span>'+d[0]+': '+d[1].find+(d[1].fix?'<div class="fix">fix: '+d[1].fix+'</div>':'')+'</div>';});
+   document.getElementById('report').innerHTML=h;
+ }
+ runAudit();
+</script>
+</body>
+</html>
