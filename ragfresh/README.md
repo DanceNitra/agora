@@ -63,5 +63,16 @@ score = cosine(q, v) * retrieval_weight(item, now=time.time())
 ```
 Works with any store (Pinecone, pgvector, Weaviate, Qdrant, …) — `ragfresh` only decides; you apply.
 
+## MCP server
+`ragfresh_mcp.py` exposes the engine to any MCP client (Claude Code/Desktop, Cursor, a maintenance cron):
+- `triage(items, …)` → the full per-item plan + savings report
+- `prune_ids(items, …)` → just `{prune: [...], refresh: [...]}` for a job to act on
+- `retrieval_weight(item, …)` → the query-time staleness multiplier
+
+```
+python -m ragfresh.ragfresh_mcp      # stdio; needs:  pip install "mcp[cli]"
+```
+ragfresh is **stateless** — pass your store's item metadata in, get a plan back; your code applies it.
+
 ## Status
-v0: the core decision engine + the measured benchmark. Next: an MCP server (like `mnemo_mcp.py`) and thin store adapters. Open-core — the core stays free.
+v0: core decision engine + measured benchmark + MCP server. Next: thin store adapters (Pinecone/pgvector). Open-core — the core stays free.
