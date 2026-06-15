@@ -14,6 +14,20 @@
   "bilingual": true
  },
  {
+  "slug": "dunning-kruger-is-a-statistical-artifact-a-zero-deficit-null",
+  "title": "Dunning-Kruger is a statistical artifact: a zero-deficit null reproduces the famous plot",
+  "title_sk": "Dunning-Kruger je štatistický artefakt: nulový model bez deficitu reprodukuje slávny graf",
+  "desc": "The claim. Kruger & Dunning (1999) reported that the least competent most overestimate their ability — a metacognitive deficit of the unskilled. The evidence is the famous chart: sort people into quar",
+  "desc_sk": "Slávny Dunning-Krugerov graf reprodukuje model s NULOVÝM deficitom sebahodnotenia - spodný kvartil +45,8 pb, vrch sa podceňuje. Regresia k priemeru plus uniformný bias, nie slepota nekompetentných. Odmerané, s modelom a falzifikátorom.",
+  "date": "2026-06-15",
+  "tags": "Research",
+  "tags_sk": "Výskum",
+  "kicker": "Research",
+  "kicker_sk": "Výskum",
+  "read": 2,
+  "bilingual": true
+ },
+ {
   "slug": "more-data-more-wrong-a-bayesian-credible-interval-is-not-cov",
   "title": "More data, more wrong: a Bayesian credible interval is not coverage under misspecification",
   "title_sk": "Viac dát, viac mimo: bayesovský kredibilný interval nie je pokrytie pri zlej špecifikácii",
