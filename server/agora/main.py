@@ -7,6 +7,22 @@ import re as _re
 import sys as _sys
 import uuid
 
+# ── No flashing console windows ── the brain runs WITHOUT a console (launched hidden), so every
+# subprocess that runs a console program (git, gh, …) makes Windows pop a NEW console window. Default
+# all children to CREATE_NO_WINDOW so they stay invisible (run/call/check_output go through Popen;
+# explicit creationflags are left untouched).
+if _sys.platform == "win32":
+    import subprocess as _sp
+    _CREATE_NO_WINDOW = 0x08000000
+    _orig_popen_init = _sp.Popen.__init__
+
+    def _popen_no_window(self, *a, **kw):
+        if not kw.get("creationflags"):
+            kw["creationflags"] = _CREATE_NO_WINDOW
+        return _orig_popen_init(self, *a, **kw)
+
+    _sp.Popen.__init__ = _popen_no_window
+
 # Make stdout/stderr UTF-8 so emoji/Slovak prints don't crash on a non-UTF-8 console
 # (Windows cp1250) — otherwise any print() inside a request handler 500s the request.
 for _stream in (_sys.stdout, _sys.stderr):

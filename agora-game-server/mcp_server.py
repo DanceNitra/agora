@@ -28,6 +28,22 @@ import time
 from pathlib import Path
 from typing import Any
 
+# ── No flashing console windows ── this process runs WITHOUT a console (launched hidden/detached), so
+# every subprocess that runs a console program (git, gh, …) makes Windows pop a NEW console window —
+# the recurring popup. Default all children to CREATE_NO_WINDOW so they stay invisible. (run/call/
+# check_output all go through Popen, so patching Popen.__init__ covers them; explicit creationflags,
+# e.g. the watchdog's DETACHED|CREATE_NO_WINDOW, are left untouched.)
+if sys.platform == "win32":
+    _CREATE_NO_WINDOW = 0x08000000
+    _orig_popen_init = subprocess.Popen.__init__
+
+    def _popen_no_window(self, *a, **kw):
+        if not kw.get("creationflags"):
+            kw["creationflags"] = _CREATE_NO_WINDOW
+        return _orig_popen_init(self, *a, **kw)
+
+    subprocess.Popen.__init__ = _popen_no_window
+
 from mcp.server.fastmcp import FastMCP
 
 # Add parent dir to path for imports
