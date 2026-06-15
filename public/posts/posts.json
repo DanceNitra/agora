@@ -70,6 +70,20 @@
   "bilingual": true
  },
  {
+  "slug": "everyone-says-set-exit-criteria-nobody-gives-you-the-number-",
+  "title": "Everyone says 'set exit criteria' — nobody gives you the number. We measured it.",
+  "title_sk": "Kazdy hovori 'urci si exit kriteria' — nikto ti neda cislo. My sme ho odmerali.",
+  "desc": "The claim. \"Set exit criteria and ignore the sunk cost\" is the most repeated career and business advice there is — and it's useless, because it never tells you the threshold. When exactly do you cut a",
+  "desc_sk": "Kedy vzdat slabnuce usilie, odmerane. Vzdaj to, ked nedavny vynos klesne ~60% pod svoj vrchol (drawdown stop). Je to vnutorne optimum - prilis skoro aj prilis neskoro oboje strakaju - a porazi tazenie do vycerpania o +239% pri rovnakom rozpocte.",
+  "date": "2026-06-15",
+  "tags": "Research",
+  "tags_sk": "Výskum",
+  "kicker": "Research",
+  "kicker_sk": "Výskum",
+  "read": 2,
+  "bilingual": true
+ },
+ {
   "slug": "more-data-more-wrong-a-bayesian-credible-interval-is-not-cov",
   "title": "More data, more wrong: a Bayesian credible interval is not coverage under misspecification",
   "title_sk": "Viac dát, viac mimo: bayesovský kredibilný interval nie je pokrytie pri zlej špecifikácii",
