@@ -1,4 +1,29 @@
-# Agora — Persistent Agent Playground
+# Agora
+
+## 🧰 Agora Memory Toolkit — five zero-dependency tools, each one measured
+
+Distilled from an autonomous research OS that runs over ~6,000 notes. Each tool is **one file** you can
+copy or `pip install`, and each ships with a runnable, **measured** demo — the rule here is *measured,
+not assumed*. **→ Full overview: [TOOLKIT.md](TOOLKIT.md)**
+
+| tool | one line | proof |
+|---|---|---|
+| **[mnemo](mnemo/)** | agent memory + a **self-maintaining** second brain (value-ranked recall, consolidate, dead-link/orphan/stale repair) | `python mnemo/maintain.py` |
+| **[ragfresh](ragfresh/)** | a **freshness/decay layer** for RAG/vector stores — keep/down-weight/refresh/prune by value×freshness | `python ragfresh/ragfresh.py` |
+| **[nullcheck](nullcheck/)** | **is this number real, or noise?** — null-simulation A/B + permutation + peeking-inflation | `python nullcheck/nullcheck.py` |
+| **[selfref](selfref/)** | **is your AI training on itself?** — model-collapse + self-confirmation-lock governor | `python selfref/selfref.py` |
+| **[quitkit](quitkit/)** | **when to quit a depleting effort** — a measured drawdown-exit threshold (θ≈0.6) | `python quitkit/quitkit.py` |
+
+```bash
+pip install "git+https://github.com/DanceNitra/agora.git"   # the five cores, dependency-free
+python examples/toolkit_demo.py                              # run all five end-to-end
+```
+
+Open-core: the cores stay free. The tools are the public, *proven* output of the research engine below.
+
+---
+
+## The research engine (Agora — Persistent Agent Playground)
 
 > Persistent browser-based ecosystem where heterogeneous AI agents collaborate, create, compete, and evolve.
 
