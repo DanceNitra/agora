@@ -684,6 +684,61 @@ async def idea_forge_loop(app: FastAPI):
         await _aio.sleep(90 * 60)                             # re-check every ~90 min
 
 
+async def exaptation_scan_loop(app: FastAPI):
+    """The OUTWARD scanner cadence: ~once a day, file an 'Exaptation scan' inbox task so the main
+    loop turns Agora outward — GET /brain/exaptation/supply (our proven mechanisms + ready-made
+    world-search queries), WebSearch the live world for fresh real-world pain, match each to the
+    mechanism that solves it, record the demand->supply matches, and Telegram a digest of 'new
+    problems the world has + what we can do about it'. This is what makes the scanner autonomous
+    instead of only-when-Claude-runs-it. RESTART-RESILIENT: anchored to a persisted last-fire time
+    (server/.exaptation_lastrun, fallback newest ts in server/.exaptation.json), not an in-process
+    timer, so frequent brain restarts can't starve it."""
+    import asyncio as _aio
+    import json as _json
+    import time as _time
+    from pathlib import Path as _P
+    _root = _P(__file__).resolve().parent.parent             # server/
+    _marker = _root / ".exaptation_lastrun"
+    _ledger = _root / ".exaptation.json"
+    _INTERVAL = 24 * 3600                                     # ~once a day
+
+    def _last_fire() -> float:
+        try:
+            return float(_marker.read_text(encoding="utf-8").strip())
+        except Exception:
+            pass
+        try:
+            items = _json.loads(_ledger.read_text(encoding="utf-8"))
+            return max((float(it.get("ts", 0) or 0) for it in items), default=0.0)
+        except Exception:
+            return 0.0
+
+    await _aio.sleep(300)                                     # startup settle
+    while True:
+        try:
+            from agora.execution.claude_inbox import add_task, pending
+            now = _time.time()
+            overdue = (now - _last_fire()) > _INTERVAL
+            if overdue and not any("Exaptation scan" in (t.get("text", "") or "") for t in pending()):
+                add_task(
+                    "Exaptation scan: turn Agora OUTWARD. GET /brain/exaptation/supply (our proven "
+                    "mechanisms + ready-made world-search queries), then WebSearch the live world "
+                    "(forums/Reddit/HN/news) for FRESH real-world pain in those areas. For each strong "
+                    "fit, POST /brain/exaptation/record {mechanism_id,pain_title,url,community,score} "
+                    "(dedup vs existing ledger urls; score 0-100 by demand strength x match cleanliness). "
+                    "Then Telegram a short digest: the new problems + which of our mechanisms solves each. "
+                    "Any match scoring >=88 with a real first-customer: flag it for a gated outreach draft "
+                    "or a one-page product spec.")
+                try:
+                    _marker.write_text(str(now), encoding="utf-8")
+                except Exception:
+                    pass
+                print("[Exaptation] queued an outward scan task")
+        except Exception as e:
+            print(f"[Exaptation] loop error: {e}")
+        await _aio.sleep(3 * 3600)                            # re-check every ~3h
+
+
 async def second_brain_loop(app: FastAPI):
     """The thinking-second-brain cadence: ~once a day, file a 'Second-brain briefing' inbox task so
     the main loop runs the high-quality briefing on the OWNER'S OWN vault — read a real domain
@@ -906,6 +961,10 @@ async def lifespan(app: FastAPI):
         loop.create_task(idea_forge_loop(app))     # ~2x/day: queue a Forge ideas task for the loop
     except Exception as _e:
         print(f"[IdeaForge] not started: {_e}")
+    try:
+        loop.create_task(exaptation_scan_loop(app))  # ~daily: queue an outward real-world scan task
+    except Exception as _e:
+        print(f"[Exaptation] scan loop not started: {_e}")
     try:
         loop.create_task(db_retention_loop(app))   # daily: keep agora.db bounded (anti-lag)
     except Exception as _e:
