@@ -6,7 +6,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT))
 
-import mnemo, ragfresh, nullcheck, selfref, quitkit, idcheck   # noqa: E402
+import mnemo, ragfresh, nullcheck, selfref, quitkit, idcheck, goodhart   # noqa: E402
 
 print("=" * 70)
 print("1) mnemo — agent memory: remember, then value-ranked recall")
@@ -44,5 +44,9 @@ _cb = idcheck.collider_bias(0.5)
 print(f"   true +0.5 -> naive {_cb['naive_Y_on_X']}, but 'controlling for' a collider -> {_cb['adjusted_for_collider']}")
 print("   audit verdict:", idcheck.audit({"age":"confounder","saw_ad":"collider"})["verdict"].split("—")[0].strip())
 
+print("\n7) goodhart — how gameable is your proxy/metric?")
+print("   clean proxy   (gameability 0):", f"{goodhart.fidelity(0.0)['precision']:.0%} precision")
+print("   gamed proxy   (gameability 2):", goodhart.audit(2.0, 1)["verdict"].split("—")[0].strip())
+
 print("\n" + "=" * 70)
-print("All six ran. Each has its own `python <tool>/<tool>.py` for the full measured benchmark.")
+print("All seven ran. Each has its own `python <tool>/<tool>.py` for the full measured benchmark.")
