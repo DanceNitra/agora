@@ -245,6 +245,10 @@ The #1 second-brain frustration is **maintenance**, not capture. `maintain.py` r
 stop doing — over a folder of Markdown notes it finds **dead `[[wikilinks]]`, orphan notes, stale
 notes, near-duplicate clusters**, and a **vault health score** (`self_legibility` = % of notes in the
 link graph's giant component — knowledge debt is a *percolation* collapse, so it warns *before* the
-cliff). Advisory + safe: it returns a plan and an action list; it never edits, moves, or deletes a
-note. `python maintain.py` runs a verified round-trip on a synthetic vault; the
+cliff). Crucially it turns findings into **actions**: for each orphan it **suggests which existing
+note to link it to** (re-connecting it to the graph), and flags **archive candidates** (old +
+isolated). It resolves links by filename *or* frontmatter alias, and dates notes by frontmatter
+(not git-reset mtime) — both learned from dogfooding it on a real ~7,700-note vault (it rescued ~300
+falsely-flagged orphans). Advisory + safe: it returns a plan and an action list; it never edits,
+moves, or deletes a note. `python maintain.py` runs a verified round-trip on a synthetic vault; the
 `maintenance_report` tool in `second_brain_mcp.py` exposes it to any MCP agent.

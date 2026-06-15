@@ -74,8 +74,17 @@ def scan_vault(folder: str, cap: int = 8000) -> list[dict]:
     return notes
 
 
+_STOP = set((
+    "the a an and or but of to in is it for on with that this as are be by at from into over "
+    "not no can will would should could than then so if you your we our they their there here "
+    "note notes see also more most some any all one two via use used using etc"
+).split())
+
+
 def _tokens(text: str) -> set:
-    return set(_WORD.findall(text.lower()))
+    """Content tokens for similarity — common stopwords removed so matches need real topical
+    overlap, not shared filler like 'note'/'about'/'the' (which produced spurious suggestions)."""
+    return {w for w in _WORD.findall(text.lower()) if w not in _STOP}
 
 
 def _giant_component_frac(titles: set, edges: dict) -> float:
@@ -98,8 +107,37 @@ def _giant_component_frac(titles: set, edges: dict) -> float:
     return best / len(titles)
 
 
+def suggest_links(notes: list[dict], orphans: list[str], *, k: int = 3, max_orphans: int = 300,
+                  min_sim: float = 0.12, embed=None) -> dict:
+    """For each orphan, suggest the top-k most-similar CONNECTED notes to link it to — turning
+    'you have N orphans' into 'link this orphan to these'. Lexical Jaccard by default (capped at
+    max_orphans for scale); an embedder makes it sharper. Suggests nothing when no decent match
+    exists (no noise). Advisory only."""
+    by_title = {n["title"]: n for n in notes}
+    orphan_set = set(orphans)
+    pool = [n for n in notes if n["title"] not in orphan_set]
+    pool_tok = {n["title"]: _tokens(n["text"]) for n in pool}
+    out = {}
+    for ot in orphans[:max_orphans]:
+        ta = _tokens(by_title[ot]["text"])
+        if not ta:
+            continue
+        scored = []
+        for n in pool:
+            tb = pool_tok[n["title"]]
+            if tb:
+                j = len(ta & tb) / len(ta | tb)
+                if j >= min_sim:
+                    scored.append((round(j, 3), n["title"]))
+        scored.sort(reverse=True)
+        if scored:
+            out[ot] = [{"link_to": t, "sim": j} for j, t in scored[:k]]
+    return out
+
+
 def maintain(notes: list[dict], *, now: float | None = None, stale_days: float = 120.0,
-             dup_threshold: float = 0.6, dup_max_n: int = 2000, embed=None) -> dict:
+             dup_threshold: float = 0.6, dup_max_n: int = 2000, suggest: bool = True,
+             link_k: int = 3, max_orphans: int = 300, embed=None) -> dict:
     """Compute the maintenance plan + health for a scanned vault. Pure: returns findings, edits nothing.
     Duplicate detection is O(n^2) lexical; it auto-skips above `dup_max_n` notes (use an embedder +
     LSH for big vaults). All other findings are O(n)/O(edges) and always run."""
@@ -134,6 +172,12 @@ def maintain(notes: list[dict], *, now: float | None = None, stale_days: float =
         age = (now - n["ts"]) / 86400.0                       # frontmatter date, not git-reset mtime
         if age > stale_days and (in_links[t] + out_valid[t]) <= 1:
             stale.append({"note": t, "age_days": round(age)})
+
+    # turn orphans into actions: link the connectable ones, archive the old-isolated ones
+    link_suggestions = suggest_links(notes, orphans, k=link_k, max_orphans=max_orphans,
+                                     embed=embed) if suggest else {}
+    archive_candidates = [o for o in orphans if o not in link_suggestions
+                          and (now - by_title[o]["ts"]) / 86400.0 > stale_days]
 
     # near-duplicate clusters (token Jaccard, or embedder cosine if provided)
     dup_clusters = []
@@ -178,15 +222,18 @@ def maintain(notes: list[dict], *, now: float | None = None, stale_days: float =
 
     actions = []
     if dead_links:
-        actions.append(f"fix {len(dead_links)} dead links")
-    if orphans:
-        actions.append(f"link or archive {len(orphans)} orphan notes")
+        actions.append(f"fix {len(dead_links)} dead links ({len({x['broken_link'] for x in dead_links})} distinct targets)")
+    if link_suggestions:
+        actions.append(f"link {len(link_suggestions)} orphans to suggested neighbors")
+    if archive_candidates:
+        actions.append(f"archive {len(archive_candidates)} old isolated notes")
     if stale:
         actions.append(f"review/refresh {len(stale)} stale notes")
-    if dup_clusters:
+    if isinstance(dup_clusters, list) and dup_clusters:
         actions.append(f"merge {len(dup_clusters)} duplicate clusters")
     return {"health": health, "actions": actions, "dead_links": dead_links,
-            "orphans": orphans, "stale": stale, "duplicate_clusters": dup_clusters}
+            "orphans": orphans, "stale": stale, "duplicate_clusters": dup_clusters,
+            "link_suggestions": link_suggestions, "archive_candidates": archive_candidates}
 
 
 if __name__ == "__main__":
@@ -217,6 +264,8 @@ if __name__ == "__main__":
     w("stale_old", "Old weakly-linked note about delta.", age_days=400)             # stale (old + weak)
     w("dup1", "Quarterly pricing: enterprise tier is $499 per seat per month billed annually.")
     w("dup2", "Quarterly pricing: enterprise tier is $499 per seat per month billed annually!!")  # near-dup
+    # an orphan that SHOULD get a link suggestion (matches core2's topic but links nowhere)
+    w("lost_kalman", "Stray notes on kalman filtering robotics state estimation — specifics about kalman filtering robotics.")
 
     rep = maintain(scan_vault(d), now=now, stale_days=120)
     print("health :", rep["health"])
@@ -225,8 +274,13 @@ if __name__ == "__main__":
     print("orphans:", rep["orphans"])
     print("stale  :", rep["stale"])
     print("dup clusters:", rep["duplicate_clusters"])
+    print("link suggestions:", rep["link_suggestions"])
+    print("archive candidates:", rep["archive_candidates"])
     assert rep["health"]["dead_link_frac"] > 0 and len(rep["dead_links"]) == 2
     assert "orphan_a" in rep["orphans"] and "orphan_b" in rep["orphans"]
     assert any("stale_old" == s["note"] for s in rep["stale"])
     assert any(set(c) == {"dup1", "dup2"} for c in rep["duplicate_clusters"])
-    print("\nOK — maintainer found dead links, orphans, stale, and the duplicate cluster, and scored health.")
+    assert "lost_kalman" in rep["link_suggestions"] and rep["link_suggestions"]["lost_kalman"][0]["link_to"] == "core2"
+    assert "stale_old" in rep["archive_candidates"]
+    print("\nOK — found dead links, orphans, stale, duplicates; SUGGESTED linking lost_kalman -> core2; "
+          "flagged stale_old to archive. Health scored.")
