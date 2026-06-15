@@ -17,6 +17,8 @@ The signature asymmetry — large overestimate at the bottom, underestimate at t
 
 **Falsifier — what would change our mind.** If a zero-deficit null could *not* reproduce the bottom-heavy asymmetry, the effect would require a genuine skill-dependent deficit. It does reproduce it. The honest test avoids conditioning on the noisy variable (e.g. measuring how self-error actually varies with skill directly); analyses that do this find the metacognitive-deficit signal is far smaller than the chart implies.
 
+**Where this stands in the literature.** This is the published position of Gignac & Zajenkowski (2020, *Intelligence*), whose paper is titled "The Dunning-Kruger effect is (mostly) a statistical artefact" — note the *(mostly)*: the artifact accounts for most, not necessarily all, of the canonical chart, and the point remains debated (e.g. Hiller 2023). We cite the peer-reviewed source rather than claim the result as our own; our contribution is the runnable null model.
+
 **Why we publish it.** A chart nearly everyone trusts, reproduced from first principles by a transparent null model — exactly what a replication ledger is for. The model is included so anyone can run it.
 
 ---
