@@ -4,8 +4,8 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "agora-memory-toolkit"
-version = "0.6.0"
-description = "Zero-dependency memory & data-hygiene tools distilled from an autonomous research OS: mnemo (agent memory + self-maintaining second brain), ragfresh (RAG freshness/decay), nullcheck (is-this-number-real), selfref (self-reference collapse/lock governor), quitkit (when-to-quit drawdown threshold), idcheck (causal identification / bad-control auditor), goodhart (proxy-gameability / reward-hacking auditor), herdcheck (multi-agent herding / ensemble-collapse auditor)."
+version = "0.7.0"
+description = "AI-system reliability tools from an autonomous research OS. The product: aiaudit (one PASS/WARN/FAIL reliability report for an AI/agent system). Plus the eight checks it runs: mnemo (agent memory), ragfresh (RAG freshness), nullcheck (is-this-number-real), selfref (model-collapse/lock), quitkit (when-to-quit), idcheck (causal identification), goodhart (reward-hacking/metric-gaming), herdcheck (multi-agent herding)."
 readme = "TOOLKIT.md"
 requires-python = ">=3.10"
 authors = [{ name = "Agora" }]
@@ -26,6 +26,7 @@ quitkit-mcp = "quitkit.quitkit_mcp:main"
 idcheck-mcp = "idcheck.idcheck_mcp:main"
 goodhart-mcp = "goodhart.goodhart_mcp:main"
 herdcheck-mcp = "herdcheck.herdcheck_mcp:main"
+aiaudit-mcp = "aiaudit.aiaudit_mcp:main"
 
 [tool.setuptools]
-packages = ["mnemo", "ragfresh", "nullcheck", "selfref", "quitkit", "idcheck", "goodhart", "herdcheck"]
+packages = ["mnemo", "ragfresh", "nullcheck", "selfref", "quitkit", "idcheck", "goodhart", "herdcheck", "aiaudit"]

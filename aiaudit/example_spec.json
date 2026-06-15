@@ -1,0 +1,7 @@
+{
+  "ab_test":      {"conv_a": 100, "n_a": 1000, "conv_b": 115, "n_b": 1000},
+  "metric":       {"gameability": 2.0, "n_metrics": 1},
+  "training_mix": {"external_fraction": 0.0, "self_trust_p": 2.0},
+  "multi_agent":  {"peers_seen": 2, "own_weight": 1.0},
+  "causal":       {"controls": {"age": "confounder", "saw_competitor_ad": "collider", "clicked_email": "mediator"}}
+}
