@@ -74,5 +74,14 @@ python -m ragfresh.ragfresh_mcp      # stdio; needs:  pip install "mcp[cli]"
 ```
 ragfresh is **stateless** — pass your store's item metadata in, get a plan back; your code applies it.
 
+## Store adapters
+`adapters.py` is the thin bridge from a real store to the engine — `run(adapter, now=...)` does
+**scan → triage → apply** (pass `apply=False` for a dry run):
+- **`PgVectorAdapter`** (Postgres + pgvector; `pip install "psycopg[binary]"`) — DELETE prunes, UPDATE flags refresh
+- **`PineconeAdapter`** (`pip install pinecone`) — `index.delete` prunes, metadata flags refresh/down-weight
+- **`MemoryAdapter`** (zero deps) — the runnable reference; `python adapters.py` verifies the full round-trip
+
+Your store just keeps the freshness signals in metadata (`updated_ts`, `last_access_ts`, `hits`, `value`, `source_exists`); field names are configurable. The engine decides; the adapter applies — nothing is deleted that triage didn't mark.
+
 ## Status
-v0: core decision engine + measured benchmark + MCP server. Next: thin store adapters (Pinecone/pgvector). Open-core — the core stays free.
+v0: core decision engine + measured benchmark + MCP server + pgvector/Pinecone adapters. Open-core — the core stays free.
