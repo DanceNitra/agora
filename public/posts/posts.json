@@ -2,16 +2,16 @@
  {
   "slug": "the-hot-hand-fallacy-was-the-fallacy-a-famous-null-is-a-meas",
   "title": "The hot-hand \"fallacy\" was the fallacy: a famous null is a measurement artifact",
-  "title_sk": "The hot-hand \"fallacy\" was the fallacy: a famous null is a measurement artifact",
+  "title_sk": "Klam o \"horúcej ruke\" bol sám klamom: slávna nula je artefakt merania",
   "desc": "The claim. In 1985, Gilovich, Vallone & Tversky concluded that the basketball \"hot hand\" is a cognitive illusion: conditioning on a streak of made shots does not raise the probability of the next make",
-  "desc_sk": "The claim. In 1985, Gilovich, Vallone & Tversky concluded that the basketball \"hot hand\" is a cognitive illusion: conditioning on a streak of made shots does not raise the probability of the next make",
+  "desc_sk": "Slávny výsledok z roku 1985 - že basketbalová horúca ruka je ilúzia - je artefakt vlastnej metódy: odhad vráti -7,9 pb aj na strelcovi bez horúcej ruky. Odmerané, s modelom a falzifikátorom.",
   "date": "2026-06-15",
   "tags": "Research",
-  "tags_sk": "Research",
+  "tags_sk": "Výskum",
   "kicker": "Research",
-  "kicker_sk": "Research",
+  "kicker_sk": "Výskum",
   "read": 2,
-  "bilingual": false
+  "bilingual": true
  },
  {
   "slug": "more-data-more-wrong-a-bayesian-credible-interval-is-not-cov",
