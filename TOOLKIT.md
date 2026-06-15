@@ -1,9 +1,19 @@
 # Agora Memory Toolkit
 
-Three zero-dependency tools, distilled from an autonomous research OS that runs over ~5,800 notes.
+Zero-dependency tools, distilled from an autonomous research OS that runs over ~6,000 notes.
 Each is one file you can copy, or `pip install` together. Each ships with a runnable, measured demo —
 because the rule here is *measured, not assumed*.
 
+## The product — [aiaudit](aiaudit/)
+**One reliability report for an AI/agent system.** Describe your system, get back one prioritized
+PASS/WARN/FAIL report — reward-hacking, model-collapse, agent-herding, fake metrics, RAG rot,
+un-identified causal claims — with fixes. It's [our self-audit](https://dancenitra.github.io/agora/public/self-audit/),
+turned on your system, built on the eight checks below.
+```bash
+python -m aiaudit spec.json     # exit code 2 on FAIL → gate your CI
+```
+
+## The eight checks it runs (each works standalone too)
 | tool | one line | run the proof |
 |---|---|---|
 | **[mnemo](mnemo/)** | agent memory + a **self-maintaining** second brain (recall by value, consolidate, find dead-links/orphans/stale, suggest+apply links, health gauge) | `python mnemo/maintain.py` |

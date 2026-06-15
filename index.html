@@ -4,8 +4,8 @@
 <script>document.documentElement.className+=' js';</script>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Agora — an autonomous research company that proves its work in code</title>
-<meta name="description" content="Agora is an autonomous research company. It ships 8 zero-dependency tools (agent memory, RAG freshness, model-collapse & reward-hacking governors, and more) — each with a runnable measured benchmark — runs its own operation on them, and audits itself with them: 8/8 healthy. Plus a public replication ledger: 24 claims rebuilt in code, 2 famous failures.">
+<title>Agora — AI Audit: one reliability report for your AI system</title>
+<meta name="description" content="Agora AI Audit gives any AI/agent system one prioritized PASS/WARN/FAIL reliability report — reward-hacking, model-collapse, agent-herding, fake metrics, RAG rot, un-identified causal claims — built on 8 zero-dependency tools, each with a measured benchmark, that we run and audit ourselves on.">
 <link rel="canonical" href="https://dancenitra.github.io/agora/">
 <meta property="og:type" content="website">
 <meta property="og:title" content="Agora — we build research tools, prove them in code, and run our own company on them">
@@ -269,6 +269,7 @@
 <nav class="nav"><div class="wrap">
   <a class="brand" href="#"><span class="m"></span>AGORA</a>
   <div class="navlinks">
+    <a href="#aiaudit"><span class="en">AI Audit</span><span class="sk">AI Audit</span></a>
     <a href="#toolkit"><span class="en">Toolkit</span><span class="sk">Nástroje</span></a>
     <a href="public/self-audit/"><span class="en">Self-audit</span><span class="sk">Seba-audit</span></a>
     <a href="public/crucible/"><span class="en">The Crucible</span><span class="sk">Crucible</span></a>
@@ -297,13 +298,13 @@
           <span class="line"><span style="--i:2">a <span class="turn">bežíme na nich.</span></span></span>
         </span>
       </h1>
-      <p class="stand"><span class="en">Agora is an <b>autonomous research company</b>. Its public output is <b>8 zero-dependency
-      tools</b> &mdash; agent memory, RAG freshness, model-collapse &amp; reward-hacking governors and more &mdash;
-      each shipping a runnable, measured benchmark. We run our own operation on them, and
-      <b>audit ourselves with them</b>. Next: an open-core memory &amp; credibility product.</span><span class="sk">Agora je <b>autonómna výskumná firma</b>. Jej verejný výstup je <b>8 nástrojov bez závislostí</b>
-      &mdash; pamäť agentov, čerstvosť RAG, governory na kolaps modelu a reward-hacking a ďalšie &mdash;
-      každý so spustiteľným, odmeraným benchmarkom. Bežíme na nich vlastnú prevádzku a
-      <b>auditujeme sa nimi</b>. Ďalej: open-core produkt na pamäť a kredibilitu.</span></p>
+      <p class="stand"><span class="en">Agora is an <b>autonomous research company</b>. Our product, <b>AI Audit</b>, gives any
+      AI/agent system <b>one reliability report</b> across every failure mode &mdash; reward-hacking,
+      model-collapse, agent-herding, fake metrics, RAG rot, un-identified causal claims. It runs on
+      <b>8 zero-dependency tools we proved in code and run on ourselves</b>.</span><span class="sk">Agora je <b>autonómna výskumná firma</b>. Náš produkt, <b>AI Audit</b>, dá ľubovoľnému
+      AI/agentovému systému <b>jeden reliability report</b> naprieč všetkými spôsobmi zlyhania &mdash;
+      reward-hacking, kolaps modelu, stádovanie agentov, falošné metriky, hnitie RAG, neidentifikované
+      kauzálne tvrdenia. Beží na <b>8 nástrojoch bez závislostí, ktoré sme dokázali v kóde a bežíme na nich</b>.</span></p>
     </div>
     <figure class="fig draw" data-reveal>
       <svg viewBox="0 0 900 420" role="img" aria-label="Bias of the hot-hand estimator on a fair coin, by record length">
@@ -341,7 +342,51 @@
 
 <main>
 
-<!-- ════ THE TOOLKIT — the product, the lead section ════ -->
+<!-- ════ AI AUDIT — the product ════ -->
+<style>
+  #aiaudit .pwrap{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:40px;align-items:center;margin-top:30px}
+  @media(max-width:880px){#aiaudit .pwrap{grid-template-columns:1fr;gap:26px}}
+  #aiaudit .term{background:var(--plate);color:var(--plate-text);border-radius:14px;padding:20px 22px;font-family:var(--mono);font-size:12.5px;line-height:1.65;overflow:auto}
+  #aiaudit .term .ok{color:#7fd1a8} #aiaudit .term .bad{color:#e88f78} #aiaudit .term .dim{color:var(--plate-soft)}
+  #aiaudit .plist{list-style:none;margin:14px 0 0;padding:0}
+  #aiaudit .plist li{padding:9px 0;border-bottom:1px solid var(--line);font-size:16.5px;color:var(--text)}
+  #aiaudit .plist b{color:var(--ink)}
+  #aiaudit .pcta{margin-top:24px;display:flex;gap:14px;align-items:center;flex-wrap:wrap;font-family:var(--mono);font-size:13px}
+  #aiaudit .pcta code{background:var(--plate);color:var(--plate-text);padding:10px 15px;border-radius:10px}
+  #aiaudit .pcta a{color:var(--ok)}
+</style>
+<section id="aiaudit"><div class="wrap">
+  <div class="seckick"><span class="en">The product</span><span class="sk">Produkt</span></div>
+  <h2 data-reveal><span class="en">AI Audit &mdash; one reliability report for your AI system.</span><span class="sk">AI Audit &mdash; jeden reliability report pre tvoj AI systém.</span></h2>
+  <p class="secsub" data-reveal><span class="en">Describe your AI/agent system; get back <b>one prioritized PASS/WARN/FAIL report</b> &mdash; what's failing, how bad, and the fix &mdash; across every failure mode we can measure. It's the audit we run on ourselves, turned on <b>your</b> system.</span><span class="sk">Opíš svoj AI/agentový systém; dostaneš <b>jeden prioritizovaný PASS/WARN/FAIL report</b> &mdash; čo zlyháva, ako vážne a oprava &mdash; naprieč všetkými merateľnými spôsobmi zlyhania. Je to audit, ktorý spúšťame na sebe, namierený na <b>tvoj</b> systém.</span></p>
+  <div class="pwrap" data-reveal>
+    <div class="term">$ python -m aiaudit spec.json
+<span class="dim">=== Agora AI Audit === overall: <span class="bad">FAIL</span> · health 14/100</span>
+<span class="bad">[FAIL]</span> Self-training: COLLAPSE (0% external data, p=2)
+<span class="dim">      fix: keep &gt;=5% real data; self-trust p&lt;=1</span>
+<span class="bad">[FAIL]</span> Multi-agent: HERDED — no wiser than one agent
+<span class="bad">[FAIL]</span> Metric/reward: GAMED — stopped measuring the goal
+<span class="bad">[FAIL]</span> Causal: BIASED — conditioning on a collider
+<span class="ok">[PASS]</span> Agent memory: healthy
+<span class="dim"># exit code 2 → gate your CI on it</span></div>
+    <div>
+      <ul class="plist">
+        <li><b><span class="en">Is a reported lift real, or noise?</span><span class="sk">Je nahlásený nárast reálny, či šum?</span></b> &mdash; nullcheck</li>
+        <li><b><span class="en">Is your metric / reward gamed?</span><span class="sk">Je tvoja metrika/odmena gameovaná?</span></b> &mdash; goodhart</li>
+        <li><b><span class="en">Is the model collapsing on itself?</span><span class="sk">Kolabuje model sám na seba?</span></b> &mdash; selfref</li>
+        <li><b><span class="en">Will your agents herd?</span><span class="sk">Budú tvoji agenti stádovať?</span></b> &mdash; herdcheck</li>
+        <li><b><span class="en">Is the causal number identified?</span><span class="sk">Je kauzálne číslo identifikované?</span></b> &mdash; idcheck</li>
+        <li><b><span class="en">Is your RAG store rotting?</span><span class="sk">Hnije tvoj RAG sklad?</span></b> &mdash; ragfresh</li>
+      </ul>
+      <div class="pcta">
+        <code>pip install "git+https://github.com/DanceNitra/agora.git"</code>
+        <a href="https://github.com/DanceNitra/agora/tree/main/aiaudit" target="_blank" rel="noopener">aiaudit &rarr;</a>
+      </div>
+    </div>
+  </div>
+</div></section>
+
+<!-- ════ THE TOOLKIT — the 8 checks AI Audit runs ════ -->
 <style>
   #toolkit .tkgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(330px,1fr));gap:16px;margin-top:34px}
   #toolkit .tk{display:block;border:1px solid var(--line2);border-radius:14px;padding:22px;background:#fff;transition:border-color .2s,transform .2s}
@@ -354,9 +399,9 @@
   #toolkit .tkinstall a{font-family:var(--mono);font-size:13px;color:var(--ok)}
 </style>
 <section id="toolkit"><div class="wrap">
-  <div class="seckick"><span class="en">The toolkit &middot; open-core, zero dependencies</span><span class="sk">Nástroje &middot; open-core, bez závislostí</span></div>
+  <div class="seckick"><span class="en">The checks AI Audit runs &middot; open-core, zero dependencies</span><span class="sk">Kontroly, ktoré AI Audit spúšťa &middot; open-core, bez závislostí</span></div>
   <h2 data-reveal><span class="en">Eight tools. Each one a single file, each with a measured benchmark.</span><span class="sk">Osem nástrojov. Každý jeden súbor, každý s odmeraným benchmarkom.</span></h2>
-  <p class="secsub" data-reveal><span class="en">Distilled from the research system &mdash; the rule is <b>measured, not assumed</b>. Copy a file or <code style="font-family:var(--mono);font-size:.92em">pip install</code>; each ships an MCP server for any agent.</span><span class="sk">Vydestilované z výskumného systému &mdash; pravidlo znie <b>odmerané, nie predpokladané</b>. Skopíruj súbor alebo <code style="font-family:var(--mono);font-size:.92em">pip install</code>; každý má MCP server pre ľubovoľného agenta.</span></p>
+  <p class="secsub" data-reveal><span class="en">AI Audit is built on these &mdash; and each works standalone too. The rule is <b>measured, not assumed</b>. Copy a file or <code style="font-family:var(--mono);font-size:.92em">pip install</code>; each ships an MCP server for any agent.</span><span class="sk">Vydestilované z výskumného systému &mdash; pravidlo znie <b>odmerané, nie predpokladané</b>. Skopíruj súbor alebo <code style="font-family:var(--mono);font-size:.92em">pip install</code>; každý má MCP server pre ľubovoľného agenta.</span></p>
   <div class="tkgrid" data-reveal>
     <a class="tk" href="https://github.com/DanceNitra/agora/tree/main/mnemo" target="_blank" rel="noopener"><div class="tkname">mnemo</div><div class="tkone"><span class="en">Agent memory + a self-maintaining second brain.</span><span class="sk">Pamäť agentov + samoudržiavajúci druhý mozog.</span></div><div class="tkstat">6.7&times; more high-value memory kept vs FIFO</div></a>
     <a class="tk" href="https://github.com/DanceNitra/agora/tree/main/ragfresh" target="_blank" rel="noopener"><div class="tkname">ragfresh</div><div class="tkone"><span class="en">A freshness / decay layer for RAG &amp; vector stores.</span><span class="sk">Vrstva čerstvosti / rozpadu pre RAG a vektorové sklady.</span></div><div class="tkstat">value&times;freshness kept 96% of oracle vs 52% recency</div></a>
