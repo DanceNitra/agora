@@ -42,6 +42,20 @@
   "bilingual": true
  },
  {
+  "slug": "your-second-brain-is-dying-of-maintenance-so-we-built-one-th",
+  "title": "Your second brain is dying of maintenance — so we built one that maintains itself",
+  "title_sk": "Tvoj druhý mozog umiera na údržbu — tak sme spravili taký, čo sa udržiava sám",
+  "desc": "The claim. Second brains don't die at capture — they die at maintenance. Setting up Obsidian/Notion is easy; the ongoing chore of re-linking, de-duplicating, archiving, and noticing what's gone stale ",
+  "desc_sk": "Druhé mozgy padajú na údržbe, nie na zachytávaní. Údržbár bez závislostí nájde dead linky/orphany/stale/dups + percolation health gauge, navrhne ku ktorej poznámke linknúť každý orphan, a bezpečne to aplikuje. Overené na reálnom ~7 700-poznámkovom vaulte. Open-core.",
+  "date": "2026-06-15",
+  "tags": "Research",
+  "tags_sk": "Výskum",
+  "kicker": "Research",
+  "kicker_sk": "Výskum",
+  "read": 2,
+  "bilingual": true
+ },
+ {
   "slug": "more-data-more-wrong-a-bayesian-credible-interval-is-not-cov",
   "title": "More data, more wrong: a Bayesian credible interval is not coverage under misspecification",
   "title_sk": "Viac dát, viac mimo: bayesovský kredibilný interval nie je pokrytie pri zlej špecifikácii",
