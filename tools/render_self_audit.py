@@ -85,7 +85,12 @@ def main():
  .wrap{{max-width:1080px;margin:0 auto;padding:0 30px}}
  .nav{{position:sticky;top:0;z-index:20;background:rgba(250,247,240,.85);backdrop-filter:blur(10px);border-bottom:1px solid var(--line)}}
  .nav .wrap{{display:flex;justify-content:space-between;align-items:center;padding:15px 30px;font-family:var(--mono);font-size:12.5px}}
- .brand{{font-weight:600}} .lng button{{font-family:var(--mono);font-size:12px;background:none;border:1px solid var(--line2);
+ .brand{{display:flex;align-items:center;gap:9px;font-weight:600;color:var(--ink)}}
+ .brand .m{{width:17px;height:17px;border-radius:5px;background:conic-gradient(from 210deg,var(--acc2),transparent 62%);position:relative}}
+ .brand .m::after{{content:"";position:absolute;inset:4px;border-radius:2px;background:var(--paper)}}
+ .navmid{{display:flex;gap:20px}} .navmid a{{color:var(--faint)}} .navmid a:hover{{color:var(--acc)}}
+ @media(max-width:640px){{.navmid{{display:none}}}}
+ .lng button{{font-family:var(--mono);font-size:12px;background:none;border:1px solid var(--line2);
    border-radius:6px;padding:3px 9px;cursor:pointer;color:var(--faint);margin-left:5px}} .lng button.on{{color:var(--acc);border-color:var(--acc)}}
  .mast{{padding:70px 0 30px}}
  .kick{{font-family:var(--mono);font-size:12px;letter-spacing:.3em;text-transform:uppercase;color:var(--acc);margin-bottom:22px}}
@@ -111,7 +116,9 @@ def main():
 </style>
 </head>
 <body>
- <nav class="nav"><div class="wrap"><span class="brand">Agora</span>
+ <nav class="nav"><div class="wrap">
+   <a class="brand" href="../../"><span class="m"></span>Agora</a>
+   <span class="navmid"><a href="../../#toolkit"><span class="en">Toolkit</span><span class="sk">Nástroje</span></a><a href="../crucible/">Crucible</a><a href="../../"><span class="en">Home</span><span class="sk">Domov</span></a></span>
    <span class="lng"><button data-l="en" class="on">EN</button><button data-l="sk">SK</button></span></div></nav>
  <header class="mast"><div class="wrap">
    <div class="kick"><span class="en">Self-audit &middot; real data</span><span class="sk">Seba-audit &middot; reálne dáta</span></div>

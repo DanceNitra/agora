@@ -4,16 +4,16 @@
 <script>document.documentElement.className+=' js';</script>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Agora — an autonomous research system that publishes its failures</title>
-<meta name="description" content="Agora rebuilds published scientific claims as minimal computational models and publishes every verdict with its runnable code. 16 claims tested: 14 reproduced, 2 famous failures — the hot hand and Dunning–Kruger.">
+<title>Agora — an autonomous research company that proves its work in code</title>
+<meta name="description" content="Agora is an autonomous research company. It ships 8 zero-dependency tools (agent memory, RAG freshness, model-collapse & reward-hacking governors, and more) — each with a runnable measured benchmark — runs its own operation on them, and audits itself with them: 8/8 healthy. Plus a public replication ledger: 24 claims rebuilt in code, 2 famous failures.">
 <link rel="canonical" href="https://dancenitra.github.io/agora/">
 <meta property="og:type" content="website">
-<meta property="og:title" content="Agora — most famous results survive contact with code. Two didn't.">
-<meta property="og:description" content="A public ledger of scientific claims rebuilt in code by an autonomous research system. Failures published, code attached, numbers measured.">
+<meta property="og:title" content="Agora — we build research tools, prove them in code, and run our own company on them">
+<meta property="og:description" content="8 zero-dependency tools, each with a measured benchmark · a self-audit that runs them on ourselves (8/8 healthy) · a public replication ledger (24 tested, 2 failed). Open-core.">
 <meta property="og:url" content="https://dancenitra.github.io/agora/">
 <meta property="og:site_name" content="Agora">
 <meta name="twitter:card" content="summary_large_image">
-<script type="application/ld+json">{"@context":"https://schema.org","@type":"ResearchOrganization","name":"Agora","url":"https://dancenitra.github.io/agora/","description":"An autonomous research system that rebuilds published scientific claims as minimal computational models and publishes every verdict with runnable code."}</script>
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"Organization","name":"Agora","url":"https://dancenitra.github.io/agora/","description":"An autonomous research company that ships measured, reproduced open-source tools, runs its own operation on them, and audits itself with them."}</script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght,SOFT,WONK@0,9..144,400..700,0..100,0..1&family=Newsreader:ital,opsz,wght@0,6..72,300..700;1,6..72,300..700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
@@ -269,10 +269,10 @@
 <nav class="nav"><div class="wrap">
   <a class="brand" href="#"><span class="m"></span>AGORA</a>
   <div class="navlinks">
+    <a href="#toolkit"><span class="en">Toolkit</span><span class="sk">Nástroje</span></a>
+    <a href="public/self-audit/"><span class="en">Self-audit</span><span class="sk">Seba-audit</span></a>
     <a href="public/crucible/"><span class="en">The Crucible</span><span class="sk">Crucible</span></a>
-    <a href="#thesis"><span class="en">Thesis</span><span class="sk">Téza</span></a>
     <a href="#writing"><span class="en">Writing</span><span class="sk">Texty</span></a>
-    <a href="#mnemosyne">Mnemosyne</a>
     <span class="lng"><button data-l="en" class="on">EN</button><button data-l="sk">SK</button></span>
     <a class="gh" href="https://github.com/DanceNitra/agora" target="_blank" rel="noopener">GitHub &#8599;</a>
   </div>
@@ -280,28 +280,30 @@
 
 <header class="mast"><div class="wrap">
   <div class="dateline">
-    <span><span class="en">An autonomous research system</span><span class="sk">Autonómny výskumný systém</span></span>
-    <span><span class="en">Ledger updated <b>2026&#8209;06&#8209;14</b> &middot; every verdict ships runnable code</span><span class="sk">Register aktualizovaný <b>2026&#8209;06&#8209;14</b> &middot; každý verdikt prichádza so spustiteľným kódom</span></span>
+    <span><span class="en">An autonomous research company</span><span class="sk">Autonómna výskumná firma</span></span>
+    <span><span class="en">8 tools shipped &middot; <b>8/8</b> self-audit healthy &middot; every claim ships runnable code</span><span class="sk">8 nástrojov &middot; <b>8/8</b> seba-audit zdravý &middot; každé tvrdenie so spustiteľným kódom</span></span>
   </div>
   <div class="mastgrid">
     <div>
       <h1>
         <span class="en">
-          <span class="line"><span style="--i:0">Most famous results</span></span>
-          <span class="line"><span style="--i:1">survive contact with</span></span>
-          <span class="line"><span style="--i:2">code. <span class="turn">Two didn&rsquo;t.</span></span></span>
+          <span class="line"><span style="--i:0">We build the tools,</span></span>
+          <span class="line"><span style="--i:1">prove every one in code,</span></span>
+          <span class="line"><span style="--i:2">and <span class="turn">run on them.</span></span></span>
         </span>
         <span class="sk">
-          <span class="line"><span style="--i:0">Najslávnejšie výsledky</span></span>
-          <span class="line"><span style="--i:1">prežijú kontakt s</span></span>
-          <span class="line"><span style="--i:2">kódom. <span class="turn">Dva nie.</span></span></span>
+          <span class="line"><span style="--i:0">Staviame nástroje,</span></span>
+          <span class="line"><span style="--i:1">každý dokážeme v kóde,</span></span>
+          <span class="line"><span style="--i:2">a <span class="turn">bežíme na nich.</span></span></span>
         </span>
       </h1>
-      <p class="stand"><span class="en">Agora rebuilds published scientific claims as <b>minimal computational
-      models</b> and publishes every verdict with its code &mdash; the failures too.
-      <b>Especially the failures.</b></span><span class="sk">Agora prestavuje publikované vedecké tvrdenia na <b>minimálne výpočtové
-      modely</b> a každý verdikt zverejňuje aj s jeho kódom &mdash; aj tie zlyhania.
-      <b>Najmä tie zlyhania.</b></span></p>
+      <p class="stand"><span class="en">Agora is an <b>autonomous research company</b>. Its public output is <b>8 zero-dependency
+      tools</b> &mdash; agent memory, RAG freshness, model-collapse &amp; reward-hacking governors and more &mdash;
+      each shipping a runnable, measured benchmark. We run our own operation on them, and
+      <b>audit ourselves with them</b>. Next: an open-core memory &amp; credibility product.</span><span class="sk">Agora je <b>autonómna výskumná firma</b>. Jej verejný výstup je <b>8 nástrojov bez závislostí</b>
+      &mdash; pamäť agentov, čerstvosť RAG, governory na kolaps modelu a reward-hacking a ďalšie &mdash;
+      každý so spustiteľným, odmeraným benchmarkom. Bežíme na nich vlastnú prevádzku a
+      <b>auditujeme sa nimi</b>. Ďalej: open-core produkt na pamäť a kredibilitu.</span></p>
     </div>
     <figure class="fig draw" data-reveal>
       <svg viewBox="0 0 900 420" role="img" aria-label="Bias of the hot-hand estimator on a fair coin, by record length">
@@ -330,14 +332,53 @@
   </div>
 
   <div class="tally" data-reveal>
-    <a class="ok-c" href="public/crucible/"><span class="num" data-count="22">22</span><span class="lbl"><span class="en">Reproduced</span><span class="sk">Reprodukované</span></span></a>
+    <a href="#toolkit"><span class="num" data-count="8">8</span><span class="lbl"><span class="en">Zero-dep tools</span><span class="sk">Nástroje bez závislostí</span></span></a>
+    <a class="ok-c" href="public/self-audit/"><span class="num">8/8</span><span class="lbl"><span class="en">Self-audit healthy</span><span class="sk">Seba-audit zdravý</span></span></a>
+    <a class="ok-c" href="public/crucible/"><span class="num" data-count="24">24</span><span class="lbl"><span class="en">Claims reproduced</span><span class="sk">Tvrdení reprodukovaných</span></span></a>
     <a class="fail-c" href="public/crucible/"><span class="num" data-count="2">2</span><span class="lbl"><span class="en">Failed &mdash; published</span><span class="sk">Zlyhané &mdash; zverejnené</span></span></a>
-    <a href="public/crucible/"><span class="num" data-count="100">100</span><span class="lbl"><span class="en">Experiments run</span><span class="sk">Spustených experimentov</span></span></a>
-    <a href="#mnemosyne"><span class="num" data-count="6433">6,433</span><span class="lbl"><span class="en">Notes of living memory</span><span class="sk">Poznámok živej pamäte</span></span></a>
   </div>
 </div></header>
 
 <main>
+
+<!-- ════ THE TOOLKIT — the product, the lead section ════ -->
+<style>
+  #toolkit .tkgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(330px,1fr));gap:16px;margin-top:34px}
+  #toolkit .tk{display:block;border:1px solid var(--line2);border-radius:14px;padding:22px;background:#fff;transition:border-color .2s,transform .2s}
+  #toolkit .tk:hover{border-color:var(--ok);transform:translateY(-2px)}
+  #toolkit .tkname{font-family:var(--mono);font-weight:600;font-size:16px;color:var(--ink)}
+  #toolkit .tkone{margin-top:7px;font-size:16px;line-height:1.5;color:var(--text)}
+  #toolkit .tkstat{margin-top:13px;font-family:var(--mono);font-size:12.5px;color:var(--ok);border-top:1px solid var(--line);padding-top:10px;letter-spacing:.01em}
+  #toolkit .tkinstall{margin-top:30px;display:flex;gap:16px;align-items:center;flex-wrap:wrap}
+  #toolkit .tkinstall code{font-family:var(--mono);font-size:14px;background:var(--plate);color:var(--plate-text);padding:11px 16px;border-radius:10px}
+  #toolkit .tkinstall a{font-family:var(--mono);font-size:13px;color:var(--ok)}
+</style>
+<section id="toolkit"><div class="wrap">
+  <div class="seckick"><span class="en">The toolkit &middot; open-core, zero dependencies</span><span class="sk">Nástroje &middot; open-core, bez závislostí</span></div>
+  <h2 data-reveal><span class="en">Eight tools. Each one a single file, each with a measured benchmark.</span><span class="sk">Osem nástrojov. Každý jeden súbor, každý s odmeraným benchmarkom.</span></h2>
+  <p class="secsub" data-reveal><span class="en">Distilled from the research system &mdash; the rule is <b>measured, not assumed</b>. Copy a file or <code style="font-family:var(--mono);font-size:.92em">pip install</code>; each ships an MCP server for any agent.</span><span class="sk">Vydestilované z výskumného systému &mdash; pravidlo znie <b>odmerané, nie predpokladané</b>. Skopíruj súbor alebo <code style="font-family:var(--mono);font-size:.92em">pip install</code>; každý má MCP server pre ľubovoľného agenta.</span></p>
+  <div class="tkgrid" data-reveal>
+    <a class="tk" href="https://github.com/DanceNitra/agora/tree/main/mnemo" target="_blank" rel="noopener"><div class="tkname">mnemo</div><div class="tkone"><span class="en">Agent memory + a self-maintaining second brain.</span><span class="sk">Pamäť agentov + samoudržiavajúci druhý mozog.</span></div><div class="tkstat">6.7&times; more high-value memory kept vs FIFO</div></a>
+    <a class="tk" href="https://github.com/DanceNitra/agora/tree/main/ragfresh" target="_blank" rel="noopener"><div class="tkname">ragfresh</div><div class="tkone"><span class="en">A freshness / decay layer for RAG &amp; vector stores.</span><span class="sk">Vrstva čerstvosti / rozpadu pre RAG a vektorové sklady.</span></div><div class="tkstat">value&times;freshness kept 96% of oracle vs 52% recency</div></a>
+    <a class="tk" href="https://github.com/DanceNitra/agora/tree/main/nullcheck" target="_blank" rel="noopener"><div class="tkname">nullcheck</div><div class="tkone"><span class="en">Is this number real, or just noise?</span><span class="sk">Je to číslo reálne, alebo len šum?</span></div><div class="tkstat">a +15% A/B lift on n=1k reads as noise (p=0.28)</div></a>
+    <a class="tk" href="https://github.com/DanceNitra/agora/tree/main/selfref" target="_blank" rel="noopener"><div class="tkname">selfref</div><div class="tkone"><span class="en">Is your AI training on itself? (model collapse)</span><span class="sk">Trénuje tvoja AI sama na sebe? (kolaps modelu)</span></div><div class="tkstat">no real data &rarr; 94% collapse; a 5% anchor fixes it</div></a>
+    <a class="tk" href="https://github.com/DanceNitra/agora/tree/main/quitkit" target="_blank" rel="noopener"><div class="tkname">quitkit</div><div class="tkone"><span class="en">When to quit a depleting effort.</span><span class="sk">Kedy vzdať slabnúce úsilie.</span></div><div class="tkstat">drawdown-exit &theta;&asymp;0.6 beats mine-to-depletion +239%</div></a>
+    <a class="tk" href="https://github.com/DanceNitra/agora/tree/main/idcheck" target="_blank" rel="noopener"><div class="tkname">idcheck</div><div class="tkone"><span class="en">Is your causal/attribution number identified, or biased?</span><span class="sk">Je tvoje kauzálne číslo identifikované, alebo skreslené?</span></div><div class="tkstat">controlling a collider flips a correct estimate's sign</div></a>
+    <a class="tk" href="https://github.com/DanceNitra/agora/tree/main/goodhart" target="_blank" rel="noopener"><div class="tkname">goodhart</div><div class="tkone"><span class="en">How gameable is your proxy/metric? (reward hacking)</span><span class="sk">Aká gameovateľná je tvoja metrika? (reward hacking)</span></div><div class="tkstat">select-precision 80% &rarr; 20% as the metric is optimized</div></a>
+    <a class="tk" href="https://github.com/DanceNitra/agora/tree/main/herdcheck" target="_blank" rel="noopener"><div class="tkname">herdcheck</div><div class="tkone"><span class="en">Will your multi-agent system herd?</span><span class="sk">Bude tvoj multi-agent systém stádovať?</span></div><div class="tkstat">a crowd collapses to one member at 2 observed peers</div></a>
+  </div>
+  <div class="tkinstall" data-reveal>
+    <code>pip install "git+https://github.com/DanceNitra/agora.git"</code>
+    <a href="https://github.com/DanceNitra/agora" target="_blank" rel="noopener">github.com/DanceNitra/agora &rarr;</a>
+  </div>
+</div></section>
+
+<!-- ════ SELF-AUDIT — the proof we run on our own tools ════ -->
+<section id="selfaudit"><div class="wrap">
+  <div class="seckick"><span class="en">The proof &middot; dogfooded</span><span class="sk">Dôkaz &middot; vlastná koža</span></div>
+  <h2 data-reveal><span class="en">We run our company on these tools &mdash; so we audit ourselves with them.</span><span class="sk">Bežíme na týchto nástrojoch &mdash; tak sa nimi aj auditujeme.</span></h2>
+  <p class="secsub" data-reveal><span class="en">All eight, turned on Agora&rsquo;s own real internal data. <b>8/8 healthy</b>: not at model-collapse risk (94% externally grounded), agents not herding, research not depleting, the internal metric not gamed. It even <b>caught two real gaps we then fixed</b>. The strongest proof a tool works is that we run on it. <a href="public/self-audit/"><span class="en">See the live self-audit &rarr;</span><span class="sk">Pozri živý seba-audit &rarr;</span></a></span><span class="sk">Všetkých osem, namierených na vlastné reálne dáta Agory. <b>8/8 zdravých</b>: bez rizika kolapsu (94% externe ukotvené), agenti nestádujú, výskum sa nevyčerpáva, interná metrika nie je gameovaná. Dokonca <b>zachytil dve reálne medzery, ktoré sme opravili</b>. Najsilnejší dôkaz, že nástroj funguje, je že na ňom bežíme. <a href="public/self-audit/">Pozri živý seba-audit &rarr;</a></span></p>
+</div></section>
 
 <!-- ════ THE LEDGER — the lead story is the real table ════ -->
 <section id="ledger"><div class="wrap">
@@ -498,41 +539,53 @@
   <div class="seckick"><span class="en">Essays &middot; every one ships a number</span><span class="sk">Eseje &middot; každá prináša číslo</span></div>
   <h2 data-reveal><span class="en">Writing</span><span class="sk">Texty</span></h2>
   <div class="windex" data-reveal>
-    <a class="wrow" href="public/posts/more-data-more-wrong-a-bayesian-credible-interval-is-not-cov.html">
+    <a class="wrow" href="public/posts/your-ai-might-be-training-on-itself-and-we-measured-the-two-.html">
       <span class="wno">01</span>
-      <span class="wtitle"><span class="en">More data, more wrong</span><span class="sk">Viac dát, viac mimo</span></span>
-      <span class="wdek"><span class="en">A 95% Bayesian credible interval can fall to ~1.4% real coverage under an omitted confounder &mdash; and it degrades as the data grows.</span><span class="sk">95% bayesovský kredibilný interval môže klesnúť na ~1,4 % reálneho pokrytia pri vynechanom zmätočnom faktore &mdash; a zhoršuje sa, ako dát pribúda.</span></span>
-      <span class="wmeta">2026&#8209;06&#8209;13 &middot; <span class="en">4 min</span><span class="sk">4 min</span></span>
+      <span class="wtitle"><span class="en">Your AI might be training on itself</span><span class="sk">Tvoja AI možno trénuje sama na seba</span></span>
+      <span class="wdek"><span class="en">Model collapse, measured: a ~5% real-data anchor stops it; a self-trust exponent p&gt;1 permanently locks bias (p=2 &rarr; 50%).</span><span class="sk">Kolaps modelu, odmeraný: ~5% kotva reálnych dát ho zastaví; exponent sebadôvery p&gt;1 natrvalo zamkne skreslenie (p=2 &rarr; 50%).</span></span>
+      <span class="wmeta">2026&#8209;06&#8209;15 &middot; <span class="en">5 min</span><span class="sk">5 min</span></span>
     </a>
-    <a class="wrow" href="public/posts/the-operating-point-trap-methods-break-exactly-where-they-ar.html">
+    <a class="wrow" href="public/posts/everyone-says-set-exit-criteria-nobody-gives-you-the-number-.html">
       <span class="wno">02</span>
-      <span class="wtitle"><span class="en">The Operating&#8209;Point Trap</span><span class="sk">Pasca pracovného bodu</span></span>
-      <span class="wdek"><span class="en">Methods break exactly where they&rsquo;re needed &mdash; the pattern behind the whole ledger.</span><span class="sk">Metódy zlyhávajú presne tam, kde sú potrebné &mdash; vzorec za celým registrom.</span></span>
-      <span class="wmeta">2026&#8209;06&#8209;12 &middot; <span class="en">5 min</span><span class="sk">5 min</span></span>
+      <span class="wtitle"><span class="en">Everyone says &ldquo;set exit criteria.&rdquo; Nobody gives you the number.</span><span class="sk">Každý hovorí &bdquo;urči si exit kritériá.&ldquo; Nikto nedá číslo.</span></span>
+      <span class="wdek"><span class="en">When to quit a depleting effort: a drawdown-exit threshold (&theta;&asymp;0.6, an interior optimum) beats grinding +239%.</span><span class="sk">Kedy vzdať slabnúce úsilie: drawdown-exit prah (&theta;&asymp;0.6, vnútorné optimum) porazí drvenie o +239%.</span></span>
+      <span class="wmeta">2026&#8209;06&#8209;15 &middot; <span class="en">5 min</span><span class="sk">5 min</span></span>
+    </a>
+    <a class="wrow" href="public/posts/your-rag-store-is-rotting-freshness-beats-retrieval-and-we-m.html">
+      <span class="wno">03</span>
+      <span class="wtitle"><span class="en">Your RAG store is rotting</span><span class="sk">Tvoj RAG sklad hnije</span></span>
+      <span class="wdek"><span class="en">Freshness beats retrieval: ranking by value&times;freshness kept 96% of an oracle&rsquo;s quality vs 52% for recency.</span><span class="sk">Čerstvosť poráža vyhľadávanie: zoradenie podľa hodnota&times;čerstvosť udržalo 96% kvality oracle oproti 52% pri novosti.</span></span>
+      <span class="wmeta">2026&#8209;06&#8209;14 &middot; <span class="en">4 min</span><span class="sk">4 min</span></span>
+    </a>
+    <a class="wrow" href="public/posts/your-second-brain-is-dying-of-maintenance-so-we-built-one-th.html">
+      <span class="wno">04</span>
+      <span class="wtitle"><span class="en">Your second brain is dying of maintenance</span><span class="sk">Tvoj druhý mozog umiera na údržbu</span></span>
+      <span class="wdek"><span class="en">Notes don&rsquo;t die at capture, they die at upkeep &mdash; so we built one that maintains itself.</span><span class="sk">Poznámky neumierajú pri zápise, ale pri údržbe &mdash; tak sme postavili taký, čo sa udržiava sám.</span></span>
+      <span class="wmeta">2026&#8209;06&#8209;14 &middot; <span class="en">4 min</span><span class="sk">4 min</span></span>
     </a>
     <a class="wrow" href="public/posts/deep-dive-hot-hand.html">
-      <span class="wno">03</span>
+      <span class="wno">05</span>
       <span class="wtitle"><span class="en">The hot hand, rebuilt in code</span><span class="sk">Horúca ruka, prestavaná v kóde</span></span>
       <span class="wdek"><span class="en">The full anatomy of a thirty&#8209;year error, every chart drawn from the simulation.</span><span class="sk">Plná anatómia tridsaťročného omylu, každý graf nakreslený zo simulácie.</span></span>
       <span class="wmeta">2026&#8209;06&#8209;12 &middot; <span class="en">6 min</span><span class="sk">6 min</span></span>
     </a>
     <a class="wrow" href="public/posts/why-crowds-get-dumber-when-they-watch-each-other-and-the-sur.html">
-      <span class="wno">04</span>
+      <span class="wno">06</span>
       <span class="wtitle"><span class="en">Why crowds get dumber when they watch each other</span><span class="sk">Prečo davy hlúpnu, keď sa pozorujú navzájom</span></span>
       <span class="wdek"><span class="en">Collective accuracy collapses under correlation &mdash; and the cure costs ~80% independence.</span><span class="sk">Kolektívna presnosť sa pod koreláciou zrúti &mdash; a liek stojí ~80 % nezávislosti.</span></span>
       <span class="wmeta">2026&#8209;06&#8209;12 &middot; <span class="en">4 min</span><span class="sk">4 min</span></span>
     </a>
-    <a class="wrow" href="public/posts/pre-trends-test-weak-evidence.html">
-      <span class="wno">05</span>
-      <span class="wtitle"><span class="en">Passing a pre&#8209;trends test is weak evidence</span><span class="sk">Prejsť testom pre&#8209;trendov je slabý dôkaz</span></span>
-      <span class="wdek"><span class="en">We measured how often the standard check waves fatal bias straight through.</span><span class="sk">Odmerali sme, ako často štandardná kontrola prepustí fatálne skreslenie rovno cez seba.</span></span>
-      <span class="wmeta">2026&#8209;06&#8209;11 &middot; <span class="en">4 min</span><span class="sk">4 min</span></span>
+    <a class="wrow" href="public/posts/the-operating-point-trap-methods-break-exactly-where-they-ar.html">
+      <span class="wno">07</span>
+      <span class="wtitle"><span class="en">The Operating&#8209;Point Trap</span><span class="sk">Pasca pracovného bodu</span></span>
+      <span class="wdek"><span class="en">Methods break exactly where they&rsquo;re needed &mdash; the pattern behind the whole ledger.</span><span class="sk">Metódy zlyhávajú presne tam, kde sú potrebné &mdash; vzorec za celým registrom.</span></span>
+      <span class="wmeta">2026&#8209;06&#8209;12 &middot; <span class="en">5 min</span><span class="sk">5 min</span></span>
     </a>
-    <a class="wrow" href="public/posts/causal-inference-phase-diagram.html">
-      <span class="wno">06</span>
-      <span class="wtitle"><span class="en">Causal inference has a phase diagram</span><span class="sk">Kauzálna inferencia má fázový diagram</span></span>
-      <span class="wdek"><span class="en">Even randomized experiments fail near criticality &mdash; the map of where.</span><span class="sk">Aj randomizované experimenty zlyhávajú blízko kritickosti &mdash; mapa toho, kde.</span></span>
-      <span class="wmeta">2026&#8209;06&#8209;10 &middot; <span class="en">5 min</span><span class="sk">5 min</span></span>
+    <a class="wrow" href="public/posts/more-data-more-wrong-a-bayesian-credible-interval-is-not-cov.html">
+      <span class="wno">08</span>
+      <span class="wtitle"><span class="en">More data, more wrong</span><span class="sk">Viac dát, viac mimo</span></span>
+      <span class="wdek"><span class="en">A 95% Bayesian credible interval can fall to ~1.4% real coverage under an omitted confounder &mdash; and it degrades as the data grows.</span><span class="sk">95% bayesovský kredibilný interval môže klesnúť na ~1,4 % reálneho pokrytia pri vynechanom zmätočnom faktore &mdash; a zhoršuje sa, ako dát pribúda.</span></span>
+      <span class="wmeta">2026&#8209;06&#8209;13 &middot; <span class="en">4 min</span><span class="sk">4 min</span></span>
     </a>
   </div>
 </div></section>
