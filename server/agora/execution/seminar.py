@@ -133,9 +133,25 @@ def pick_topic(vault: str) -> dict:
         # saturated topic would stay first forever).
         live.sort(key=lambda t: (t.get("n_contrib", 0), t.get("attempts", 0), t.get("last_advanced", 0)))
         return live[0]
-    # 2) open a fresh topic from the board-aligned bank (reliably groundable), rotating through
-    #    it before repeating. This is the primary fresh source — the priorities to advance.
     seen = {t.get("headline", "").lower() for t in topics}
+    # 2) NETWORK-FILTERED CROSS-DOMAIN bridge — the validated mechanism (network filtering surfaces
+    #    +67.5% more cross-domain concepts than keyword search on the real vault). Interleaved with the
+    #    board bank (~half of fresh opens) so the agents regularly research real cross-domain links.
+    if int(time.time()) % 2 == 0:
+        try:
+            from agora.execution.cross_domain import cross_domain_topic
+            cd = cross_domain_topic()
+            if cd and cd["headline"].lower() not in seen:
+                t = {"id": _id(cd["headline"]), "topic": cd["prompt"], "headline": cd["headline"],
+                     "source": "cross-domain", "status": "open", "n_contrib": 0,
+                     "contribution_ids": [], "opened": time.time(), "last_advanced": 0.0}
+                topics.append(t)
+                _save(_TOPICS, topics)
+                return t
+        except Exception:
+            pass
+    # 3) open a fresh topic from the board-aligned bank (reliably groundable), rotating through
+    #    it before repeating. This is the primary fresh source — the priorities to advance.
     for headline, prompt in _TOPIC_BANK:
         if headline.lower() not in seen:
             t = {"id": _id(headline), "topic": prompt, "headline": headline,
