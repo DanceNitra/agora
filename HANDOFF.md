@@ -41,10 +41,16 @@ self-audit page + cross-domain network-filter wired into the seminar + churn mon
 
 **TO RESUME (what the owner types in the fresh session):**
 ```
-Pokracujem. Precitaj C:\Users\Danculus\agora\HANDOFF.md (horna sekcia) + memory owner-goal-ai-services a market-truth-no-saas. Realny ciel: prijem z domu cez AI sluzby + detske interaktivne knizky v C:\Users\Danculus\rozpravky. Pokracuj odtial. Po slovensky.
+/loop C:\Users\Danculus\agora\HANDOFF_LOOP_PROMPT.txt
 ```
-(Use that, NOT `/loop` — the autonomous Agora self-upgrade loop is no longer the priority. `/loop
-C:\Users\Danculus\agora\HANDOFF_LOOP_PROMPT.txt` still works if you only want Agora maintenance.)
+The owner WANTS the loop running — it drains the dungeon-fed Claude inbox (don't stop it) + keeps both
+servers healthy. **BUT the loop must honor this session's pivot:** first read memories
+`owner-goal-ai-services` + `market-truth-no-saas` + this handoff section. The real priority is income
+from home — freelance AI services (`services/`) + the kids storybook project
+(`C:\Users\Danculus\rozpravky`) — NOT building Agora as a product. So each loop cycle = (1) triage the
+inbox with the raised-bar editorial discipline (skip off-frontier/textbook/duplicate noise, handle
+genuine value, severe-test rule), (2) keep Agora healthy + run `tools/churn_check.py`, (3) when the
+owner is active, advance the income work (kids-book / services), not Agora product features.
 
 ---
 
