@@ -1,4 +1,5 @@
 """Agent OS API — soul, brain, body, abilities, skills, help requests."""
+import re
 from pathlib import Path
 
 from fastapi import APIRouter, Request, HTTPException
@@ -180,9 +181,34 @@ async def query_collective(request: Request, q: str = "", limit: int = 20):
     return {"knowledge": [dict(r) for r in await cursor.fetchall()]}
 
 
+# Finding Novelty & Significance Gate (owner-requested build #2): two write-time checks that
+# complement the existing structural filter + vault-novelty dedup. They keep NON-FINDINGS and
+# TRIVIAL textbook facts out of the raw discovery pool (which feeds hypotheses/ideation/seminar),
+# not just out of the vault at promotion time.
+# (a) refusal / no-support: the same negative-claim family already filtered at PROMOTION, applied
+#     here at the source so "No paper directly supports ..." never enters the pool.
+_REFUSAL_AT_SOURCE = re.compile(
+    r"\bno (?:paper|papers|source|sources|study|studies|abstract|abstracts|evidence)\b[^.\n]{0,40}"
+    r"\b(?:support|provide|relate|address|mention|match|fit|confirm)\w*"
+    r"|\bdoes not (?:support|fit|apply)|\b(?:are|is) unrelated|\bcould not find|\bunable to (?:find|locate)"
+    r"|\bno (?:relevant|direct(?:ly)?)\b[^.\n]{0,30}\b(?:paper|source|support|evidence|match)\w*"
+    r"|\bthe closest (?:are|is)\b|\bnot supported by|\btotal mismatch|\bas an ai\b"
+    r"|\bi (?:cannot|can't|could not|am unable)\b", re.I)
+# (b) low significance: a SHORT, copula-led, bare assertion that carries no quantitative or
+#     comparative claim (e.g. "linear regression has a Chow test"). Deliberately conservative —
+#     it fires only when all three hold (short + definitional shape + no measured/relational signal),
+#     so substantive short findings (with a number, %, effect or comparison) always pass.
+_SIG_MARK = re.compile(
+    r"\d|%|\b(increas|decreas|reduc|improv|impair|enhanc|disrupt|lower|higher|faster|slower|"
+    r"more|less|than|correlat|caus|effect|predict|mediat|regulat|drive|outperform|versus|vs|"
+    r"compared|ratio|signific|fold|percent|times)\w*", re.I)
+_TRIVIAL_COPULA = re.compile(
+    r"^[^.\n]{0,55}\b(is|are|was|were|has|have|uses?|consists? of|refers? to|means?)\b", re.I)
+
+
 def _garbage_finding(title: str, content: str):
     """Conservative quality filter — reject only CLEARLY broken findings (self-upgrade: completion
-    filter). Returns a reason string if garbage, else None."""
+    filter + novelty/significance gate). Returns a reason string if garbage, else None."""
     t, c = (title or "").strip(), (content or "").strip()
     cl, tl = c.lower(), t.lower()
     _PREFIXES = ("hypothesize on:", "pursue direction:", "develop the gap:", "deepen:",
@@ -196,6 +222,10 @@ def _garbage_finding(title: str, content: str):
         return "too short"
     if body.strip(". ") == tl.strip(". "):               # content merely restates the title
         return "content restates title (no real finding)"
+    if _REFUSAL_AT_SOURCE.search(c):
+        return "refusal / non-finding (no source supports the claim)"
+    if len(body) < 80 and _TRIVIAL_COPULA.match(body) and not _SIG_MARK.search(body):
+        return "low significance (bare definitional fact, no measured/comparative claim)"
     return None
 
 
@@ -210,6 +240,10 @@ async def add_collective(request: Request):
     if body.get("knowledge_type", "observation") == "discovery":
         g = _garbage_finding(body["title"], body["content"])
         if g:
+            if g.startswith("refusal"):
+                _PROMOTE_STATS["src_refusal"] = _PROMOTE_STATS.get("src_refusal", 0) + 1
+            elif g.startswith("low significance"):
+                _PROMOTE_STATS["src_trivial"] = _PROMOTE_STATS.get("src_trivial", 0) + 1
             return {"status": "rejected", "reason": g}
         # NOVELTY GATE AT THE SOURCE: if this finding lexically near-duplicates a note the vault
         # already has, don't store it — it would only clog the promotion funnel and be deduped later
