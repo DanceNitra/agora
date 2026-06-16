@@ -54,3 +54,5 @@ agora_output/*.png
 agora-game-server/_supervisor.log
 CLAUDE.md
 services/support_agent/run_log.jsonl
+services/support_agent/*_runs.jsonl
+services/support_agent/_tmp_test.jsonl

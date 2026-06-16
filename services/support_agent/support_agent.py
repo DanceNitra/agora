@@ -23,14 +23,18 @@ from datetime import datetime
 from pathlib import Path
 
 OLLAMA = "http://localhost:11434/api/chat"
-MODEL = "qwen2.5:7b"                       # local + fast; swap to gpt/claude for a client
+MODEL = os.environ.get("SUPPORT_AGENT_MODEL", "qwen3-coder:30b")  # capable model REQUIRED: the 7B
+# invented opening hours + a phone number on real content (breaks the no-hallucination guarantee).
+# 30b runs locally and grounds reliably; for production swap ask_llm to Claude/GPT.
 HERE = Path(__file__).resolve().parent
 # Run telemetry -> consumed by services/reliability_receipt/receipt.py to bill the SLA.
 RUN_LOG = Path(os.environ.get("SUPPORT_AGENT_LOG", HERE / "run_log.jsonl"))
 VALUE_PER_RESOLVED = 6.0                    # $ of staff time saved per ticket the agent deflects
 # A handoff = the agent safely escalated to a human (correct behaviour, but a human was needed).
-_HANDOFF = re.compile(r"not sure|connect you|reach out|contact (us|our|the|them)|"
-                      r"can'?t find|don'?t have that|speak to|a human|our team|call us|email us", re.I)
+_HANDOFF = re.compile(r"not sure|connect you|reach out|contact (?:us|our|the|them)|please contact|"
+                      r"can'?t find|don'?t have|i don'?t see|not among|not listed|isn'?t listed|"
+                      r"no (?:specific )?information|speak to|a human|our team|call us|email us|"
+                      r"confirm (?:this|whether)", re.I)
 _WORD = re.compile(r"[a-z0-9]{2,}")
 _STOP = set("the a an of to in and or is are do you your we our for on at it with can i my me what "
             "when where how why does has have any".split())
@@ -56,10 +60,16 @@ def retrieve(question, chunks, k=3):
 
 def ask_llm(question, context, business="the business"):
     """Answer using ONLY the context. Returns {text, ok, error, latency_s}; ok=False on LLM failure."""
-    system = (f"You are the friendly customer-support assistant for {business}. Answer the customer's "
-              "question using ONLY the CONTEXT below. Be concise and warm. If the answer is not in the "
-              "context, say you're not sure and offer to connect them with a human (email/phone if "
-              "present) — do NOT invent facts, prices, or hours.")
+    system = (f"You are the friendly customer-support assistant for {business}. Answer ONLY from the "
+              "CONTEXT below. CRITICAL: the CONTEXT is often INCOMPLETE (it may have no opening hours, no "
+              "availability, or missing prices). If the answer is not EXPLICITLY written in the CONTEXT, "
+              "you MUST NOT guess or state ANY specific value — never state hours, days, dates, prices, or "
+              "any fact that is not literally in the CONTEXT. In that case say you don't have that detail "
+              "on hand and give the phone/email (if present) so they can confirm. Do not invent anything. "
+              "When asked whether you offer/have a specific service, treatment, or feature, answer YES only "
+              "if it is EXPLICITLY listed in the CONTEXT; if it is not listed, do NOT assume you offer it - "
+              "say it is not among the services listed and offer to confirm by phone/email. "
+              "Be concise and warm.")
     payload = {"model": MODEL, "stream": False,
                "messages": [{"role": "system", "content": system},
                             {"role": "user", "content": f"CONTEXT:\n{context}\n\nCUSTOMER: {question}"}]}
