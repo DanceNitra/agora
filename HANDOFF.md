@@ -2,6 +2,52 @@
 
 > Resume doc for a fresh Claude Code session. Chat in **Slovak**; code + user-facing strings **English**.
 
+## 🟢🟢🟢 RESUME HERE (2026-06-16 — FRESHEST · BIG PIVOT) 🟢🟢🟢
+
+> Read this first. Auto-memory now also loads **`owner-goal-ai-services`** and **`market-truth-no-saas`**
+> — read both. Chat **Slovak**.
+
+**THE PIVOT (most important):** Agora-as-a-product is NOT the plan. Honest reckoning this session: the
+markets our 8 tools touch are taken (eval = Arize $70M/Braintrust; memory = mem0 $24M/AWS), and the real
+wall is **distribution from zero reputation** (proved it: the owner's first HN post was auto-killed —
+new account + self-link = [dead]). A new product doesn't help unless it solves distribution.
+
+**THE OWNER'S REAL GOAL:** no network/capital/audience, learning, **needs income from home**, enjoys
+AI + programming, open to **services**. Two live tracks (both chosen WITH him):
+
+1. **Freelance AI-agent SERVICES** (fastest realistic income; marketplace demand = no audience needed).
+   Kit in repo-root **`services/`**:
+   - `services/support_agent/` — WORKING grounded AI support agent (answers only from a business's
+     content, refuses to hallucinate). CLI + **web chat widget** (`python server.py` → localhost:8800). Verified.
+   - `services/GIGS.md` (3 gigs), `services/PROFILES.md` (Upwork/Fiverr copy), `services/PROPOSALS.md` (templates).
+   - Next: owner records a 60-sec demo, sets up Upwork/Fiverr, applies; I tailor proposals + build client work.
+
+2. **🌟 Kids interactive storybooks — `C:\Users\Danculus\rozpravky` (SEPARATE project, NOT in agora repo).**
+   Most promising — passes BOTH filters: real gap (no SK/CZ digital interactive storybook: audio +
+   tap-interaction + in-story mini-games) AND a reachable/fundable audience (parents + **schools + EU/SK
+   edtech grants** = institutional, bypasses the distribution wall). Built: a **scalable engine**
+   (`index.html`, data-driven: one book = one `books/<name>.js`) + first complete book (Perníková
+   chalúpka — Slovak Web-Speech narration, tappable objects, find + quiz mini-games, reward). Content =
+   public-domain tales + AI. Full strategy + honest risks + grant list + MVP roadmap in
+   **`C:\Users\Danculus\rozpravky\PLAN.md`**. Next decision (owner's): more books / real ElevenLabs SK
+   voice / AI illustrations / grant outline / a šlabikár (education) demo. Do NOT drift back to Agora-as-product.
+
+**AGORA SYSTEM STATE:** brain (:8000) + dungeon (:5174, 200) both confirmed ALIVE. The dungeon is kept
+alive by the brain's `watch_dungeon_forever` watchdog — **independent of the chat /loop**, so closing the
+chat does NOT kill it. Agora keeps producing research (the credibility asset) but is NOT the income plan.
+Also shipped+committed this session: 8-tool `agora-memory-toolkit` + `aiaudit` product + public
+self-audit page + cross-domain network-filter wired into the seminar + churn monitor (`tools/churn_check.py`)
++ recurring-popup fix (CREATE_NO_WINDOW in brain+dungeon).
+
+**TO RESUME (what the owner types in the fresh session):**
+```
+Pokracujem. Precitaj C:\Users\Danculus\agora\HANDOFF.md (horna sekcia) + memory owner-goal-ai-services a market-truth-no-saas. Realny ciel: prijem z domu cez AI sluzby + detske interaktivne knizky v C:\Users\Danculus\rozpravky. Pokracuj odtial. Po slovensky.
+```
+(Use that, NOT `/loop` — the autonomous Agora self-upgrade loop is no longer the priority. `/loop
+C:\Users\Danculus\agora\HANDOFF_LOOP_PROMPT.txt` still works if you only want Agora maintenance.)
+
+---
+
 ## ⚡⚡⚡⚡⚡ RESUME HERE (2026-06-14 — FRESHEST)
 
 > Chat **Slovak**. This section is the full state at session clear. Auto-memory loads include
