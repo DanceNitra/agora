@@ -1,5 +1,19 @@
 [
  {
+  "slug": "a-pre-trend-too-gentle-to-see-can-bias-a-difference-in-diffe",
+  "title": "A pre-trend too gentle to see can bias a difference-in-differences estimate by ~77% — and the standard test usually misses it",
+  "title_sk": "A pre-trend too gentle to see can bias a difference-in-differences estimate by ~77% — and the standard test usually misses it",
+  "desc": "Difference-in-differences (DiD) is one of the most-used causal designs in economics, policy, and product analytics. Its credibility rests on one assumption: parallel trends — that, absent treatment, t",
+  "desc_sk": "Difference-in-differences (DiD) is one of the most-used causal designs in economics, policy, and product analytics. Its credibility rests on one assumption: parallel trends — that, absent treatment, t",
+  "date": "2026-06-16",
+  "tags": "Research",
+  "tags_sk": "Research",
+  "kicker": "Research",
+  "kicker_sk": "Research",
+  "read": 2,
+  "bilingual": false
+ },
+ {
   "slug": "the-hot-hand-fallacy-was-the-fallacy-a-famous-null-is-a-meas",
   "title": "The hot-hand \"fallacy\" was the fallacy: a famous null is a measurement artifact",
   "title_sk": "Klam o \"horúcej ruke\" bol sám klamom: slávna nula je artefakt merania",
