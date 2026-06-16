@@ -53,3 +53,4 @@ agora_output/*.png
 **/_dungeon.err
 agora-game-server/_supervisor.log
 CLAUDE.md
+services/support_agent/run_log.jsonl

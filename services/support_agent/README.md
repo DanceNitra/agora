@@ -27,4 +27,13 @@ or run `python support_agent.py` for interactive mode.
 - Wrap in a chat widget (web), or wire to WhatsApp / email / their CRM.
 - The grounded + refusal behavior is the selling point — demo both in the sales call.
 
+## Reliability receipt (the SLA that sells the retainer)
+Every call logs one line to `run_log.jsonl` (uptime, human handoffs, value delivered, latency). Turn that
+into a one-page monthly SLA receipt the client renews against:
+```
+python ../reliability_receipt/receipt.py run_log.jsonl --client "Brew & Bloom" --automation "Website support agent" --rate 500
+```
+First real deployment (this agent, 16 live queries): see `reliability_receipt_2026-06-16.md` -
+100% uptime, 6 safe human handoffs, 2.5s typical response. This is the artifact you show on the sales call.
+
 Built as a portfolio piece for AI-agent service work. Tool-agnostic; the value is a reliable agent, not the framework.
