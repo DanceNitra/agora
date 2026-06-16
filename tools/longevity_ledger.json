@@ -1,0 +1,31 @@
+{
+  "title": "Longevity Translation Ledger",
+  "subtitle": "Flagship anti-aging interventions: mouse evidence vs proven human hard-endpoint benefit. A living calibrated prior - updated as trials report.",
+  "updated": "2026-06-16",
+  "method": "Population = flagship interventions (NIA ITP positives + the most-hyped non-ITP). 'Proven human' requires a hard clinical endpoint (lifespan/healthspan) in a controlled human trial, not a biomarker/surrogate. Sources in each row.",
+  "status_legend": {
+    "proven": "Proven human benefit on a hard clinical endpoint",
+    "failed": "Tested in humans and did NOT translate",
+    "null_or_safety": "Human trial reported - safety/biomarker/null only, no hard-endpoint win",
+    "pending": "Human trial designed or in progress, no hard-endpoint result yet",
+    "no_human_outcome": "No meaningful human outcome data (mouse/cell-only or observational-only)"
+  },
+  "interventions": [
+    {"name": "Rapamycin", "itp": true, "mouse": "Robust lifespan, both sexes (female-skewed)", "human": "PEARL RCT = safety only; gerotherapeutic efficacy unproven", "status": "null_or_safety"},
+    {"name": "Acarbose", "itp": true, "mouse": "+~22% male / ~5% female median", "human": "Approved diabetes drug; observational only, no longevity RCT", "status": "no_human_outcome"},
+    {"name": "17-alpha-estradiol", "itp": true, "mouse": "Lifespan extension in males only", "human": "No human longevity data", "status": "no_human_outcome"},
+    {"name": "Canagliflozin", "itp": true, "mouse": "Lifespan extension in males only", "human": "Approved diabetes drug; no longevity RCT", "status": "no_human_outcome"},
+    {"name": "NDGA", "itp": true, "mouse": "Lifespan extension, males (early)", "human": "No human longevity data", "status": "no_human_outcome"},
+    {"name": "Glycine", "itp": true, "mouse": "Modest lifespan extension", "human": "No human longevity outcome", "status": "no_human_outcome"},
+    {"name": "Captopril", "itp": true, "mouse": "+4-5% female; male signal confounded by one site", "human": "BP drug; no longevity RCT", "status": "no_human_outcome"},
+    {"name": "Aspirin", "itp": true, "mouse": "Lifespan extension in males (early cohort)", "human": "ASPREE RCT: NO healthy-lifespan benefit in elderly, slight mortality increase", "status": "failed"},
+    {"name": "Metformin", "itp": false, "mouse": "NULL for lifespan in the ITP; healthspan signals elsewhere", "human": "TAME trial designed, unreported; observational mixed", "status": "pending"},
+    {"name": "Caloric restriction", "itp": false, "mouse": "Robust in rodents; primates SPLIT (UW yes / NIA no)", "human": "CALERIE 2yr: biomarker gains, NO lifespan endpoint", "status": "null_or_safety"},
+    {"name": "Senolytics (D+Q, fisetin)", "itp": false, "mouse": "Healthspan/function gains in mice", "human": "Phase-1 pilots null (5-pt Alzheimer's 'no effectiveness'; STAMINA null)", "status": "null_or_safety"},
+    {"name": "NMN / NAD+ precursors", "itp": false, "mouse": "Mouse metabolic improvements", "human": "RCT meta-analyses NULL (muscle, metabolism); blood NAD+ doesn't track age", "status": "null_or_safety"},
+    {"name": "Resveratrol", "itp": true, "mouse": "ITP: NEGATIVE (failed to extend lifespan)", "human": "Human trials null on the longevity claims", "status": "null_or_safety"},
+    {"name": "Partial reprogramming (OSK)", "itp": false, "mouse": "Mouse in-vivo (e.g. optic nerve)", "human": "Human CELLS in vitro only; no human in-vivo outcome", "status": "no_human_outcome"},
+    {"name": "Young plasma / GDF11 / parabiosis", "itp": false, "mouse": "Robust mouse parabiosis; GDF11 contested even in mice", "human": "Early Phase-1 (GDF11/stroke); small plasma RCTs; no longevity endpoint", "status": "pending"},
+    {"name": "FTL1 knockdown", "itp": false, "mouse": "Mouse, male, hippocampus only (2025)", "human": "None (mouse-stage)", "status": "no_human_outcome"}
+  ]
+}
