@@ -7,21 +7,28 @@ then raise. Gig 1 already has a working demo (services/support_agent/).
 
 ---
 
-## GIG 1 — AI customer-support agent  ★ (start here; demo built)
-**Title:** I will build a custom AI customer-support agent for your website that never makes things up
+## GIG 1 — AI customer-support agent  ★ (start here; demo built + receipt deployed)
+**Title:** I will build an AI customer-support agent that never makes things up — with a monthly reliability report
 **Search tags:** ai agent, ai chatbot, customer support automation, ai integration
+
+> Full paste-ready listing + Upwork proposal + the proof artifact: **`services/gig_support_agent_with_receipt.md`**.
 
 **Description:**
 > Most support bots invent answers — wrong prices, wrong hours — and that's why businesses don't trust
 > them. I build an AI support agent grounded ONLY in your real content: it answers accurately from your
 > FAQ/site/docs, and when it doesn't know, it says so and hands off to a human. Safe to put live.
-> I've built and run full autonomous multi-agent systems, so this is the easy part — done right.
+> And every month you get a **Reliability Receipt** — uptime, issues caught, value delivered, drift
+> alerts — so you can see it's working. I've built and run full autonomous multi-agent systems.
 
 | Tier | Price | What you get | Delivery |
 |---|---|---|---|
-| Basic | €40 | Agent trained on your FAQ/content (up to 5 pages), accurate + safe "I don't know" handling, demo video | 3 days |
-| Standard | €110 | + scrape your whole site/docs, email/human escalation, embeddable web chat widget | 5 days |
-| Premium | €250 | + integrate with WhatsApp / email / your CRM, custom tone, simple analytics, 2 weeks support | 8 days |
+| Basic | €45 | Agent trained on your FAQ/content (up to 5 pages), accurate + safe "I don't know" handling, demo video | 3 days |
+| Standard | €120 | + scrape your whole site/docs, email/human escalation, embeddable web chat widget, **first Reliability Receipt** | 5 days |
+| Premium | €270 | + WhatsApp / email / CRM integration, custom tone, **reliability logging wired in + 1 month of receipts** | 8 days |
+
+**★ Care Plan — €90/month (the recurring offer, pitch on every delivery):** I keep the agent accurate as
+your content changes and email a monthly Reliability Receipt. The build wins the client; the receipt +
+care plan is the actual income (recurring beats one-off). Proof: `services/support_agent/reliability_receipt_2026-06-16.md`.
 
 ---
 
@@ -67,7 +74,9 @@ then raise. Gig 1 already has a working demo (services/support_agent/).
 
 ## First-week checklist
 - [ ] Record a 60-sec screen demo of services/support_agent (the grounded answer + the safe refusal).
-- [ ] Create Fiverr account + post Gig 1 (then 2, 3). Upwork account → aim Rising Talent.
-- [ ] Add Agora + the support-agent demo as portfolio items.
-- [ ] Upwork: apply to 5 AI-agent/automation jobs/day with tailored proposals (I draft them).
+- [ ] Screenshot the real Reliability Receipt (services/support_agent/reliability_receipt_2026-06-16.md) → gig image + proposals.
+- [ ] Post Gig 1 from `services/gig_support_agent_with_receipt.md` (paste-ready) on Fiverr (then 2, 3). Upwork → aim Rising Talent.
+- [ ] Add Agora + the support-agent demo + the receipt as portfolio items.
+- [ ] Upwork: apply to 5 AI-agent/support jobs/day with the proposal template (receipt attached as proof).
+- [ ] On every delivery, pitch the €90/mo care plan — recurring income is the goal, not the one-off build.
 - [ ] Goal: ~40 conversations / 20 proposals → first paid gig in ~2 weeks (realistic per 2026 data).
