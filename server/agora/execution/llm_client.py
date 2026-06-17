@@ -95,6 +95,12 @@ _local_until = 0.0                  # while now < this, skip the capped cloud an
 import os as _os
 _LOCAL_FALLBACK_ENABLED = _os.getenv("AGORA_LOCAL_FALLBACK", "0") == "1"
 
+# Cloud reasoning models (deepseek-v4-flash, glm-4.7) spend the output budget THINKING before they
+# emit the answer, so a small max_tokens truncates them to an EMPTY completion (the source of the
+# "[LLM Error]" pollution). Floor every call's budget so they have room to reason AND answer.
+# Owner directive 2026-06-17: allow up to 3000. Overridable via AGORA_MAX_TOKENS_FLOOR.
+_MIN_MAX_TOKENS = int(_os.getenv("AGORA_MAX_TOKENS_FLOOR", "3000"))
+
 
 def _is_usage_limit(err: str) -> bool:
     e = (err or "").lower()
@@ -148,6 +154,9 @@ def call_llm(
     global _local_until
     cfg = _get_settings()
     router = _get_router()
+
+    # Floor the output budget so reasoning models can emit (never lowers a caller's higher request).
+    max_tokens = max(int(max_tokens or 0), _MIN_MAX_TOKENS)
 
     api_key = cfg.llm_api_key
     base_url = cfg.api_base_url
