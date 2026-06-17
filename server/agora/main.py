@@ -829,6 +829,13 @@ async def seminar_report_loop(app: FastAPI):
             print("[Seminar] research report sent")
         except Exception as e:
             print(f"[Seminar] report error: {e}")
+        # ~3h autonomous yield snapshot so the self-improving-scientist trend accumulates on its own
+        try:
+            from agora.execution.self_scientist import snapshot as _ys
+            s = await _aio.to_thread(_ys)
+            print(f"[Self-Scientist] yield snapshot {s.get('yield_score')}")
+        except Exception as e:
+            print(f"[Self-Scientist] snapshot error: {e}")
 
 
 async def db_retention_loop(app: FastAPI):

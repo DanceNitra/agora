@@ -63,8 +63,15 @@ def apply_policy() -> dict:
 # weights reward VALIDATED, severe-tested, externally-grounded outputs; FAILED replications count
 # (shareable, per the Crucible thesis); churn (strained / no-mapping) counts little.
 W = {"law": 10.0, "theory_corroborated": 3.0, "theory_strained": 0.5, "reproduced": 2.0,
-     "failed": 3.0, "analogy_viable": 2.0, "bridge": 2.0, "investigation": 3.0,
-     "hypothesis_grounded": 1.0}
+     "failed": 3.0, "analogy_viable": 2.0, "bridge": 1.5, "investigation": 3.0,
+     "hypothesis_grounded": 1.0,
+     # near-term, continuous research output so the trend is responsive (not just rare laws):
+     "contribution_grounded": 0.05, "contribution_verified": 0.25}
+_CONTRIB = Path(__file__).resolve().parents[2] / ".contributions.json"
+
+
+def _truthy(x) -> bool:
+    return str(x).lower() == "true"
 
 
 def _ledger(modpath: str) -> list:
@@ -92,6 +99,16 @@ def validated_yield(hours: float = 48.0) -> dict:
     comp["failed"] = sum(1 for r in rep if r.get("outcome") == "FAILED")
     comp["analogy_viable"] = sum(1 for a in _recent(_ledger("agora.execution.analogy"), hours)
                                  if a.get("outcome") == "viable")
+    comp["bridge"] = sum(1 for b in _recent(_ledger("agora.execution.cartography"), hours)
+                         if b.get("outcome") and "no honest bridge" not in str(b.get("outcome")).lower())
+    # the seminar's continuous validated output (windowed) — makes near-term research move the score
+    try:
+        contribs = json.loads(_CONTRIB.read_text(encoding="utf-8"))
+        rc = _recent(contribs, hours)
+        comp["contribution_grounded"] = sum(1 for c in rc if _truthy(c.get("grounded")))
+        comp["contribution_verified"] = sum(1 for c in rc if _truthy(c.get("verified")))
+    except Exception:
+        comp["contribution_grounded"] = comp["contribution_verified"] = 0
     try:
         from agora.execution import investigation as _inv
         comp["investigation"] = sum(1 for i in _recent(_inv._load(), hours)
