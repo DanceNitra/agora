@@ -1,5 +1,19 @@
 [
  {
+  "slug": "the-most-confident-systems-are-the-least-grounded",
+  "title": "The most confident systems are the least grounded",
+  "title_sk": "Najistejšie systémy sú najmenej ukotvené",
+  "desc": "Three failures look unrelated. An AI model trained on its own output degrades into nonsense (\"model collapse\"). Seventy expert teams handed the same brain-imaging dataset reach different conclusions; ",
+  "desc_sk": "Jeden zákon za model collapse, replikačnou krízou aj trhovým lock-inom: istota postavená z vnútornej konzistencie sa odpája od pravdy, keď klesá externé ukotvenie. Odmerané v simulácii a porovnané s many-analysts štúdiami.",
+  "date": "2026-06-17",
+  "tags": "Research",
+  "tags_sk": "Výskum",
+  "kicker": "Research",
+  "kicker_sk": "Výskum",
+  "read": 3,
+  "bilingual": true
+ },
+ {
   "slug": "a-pre-trend-too-gentle-to-see-can-bias-a-difference-in-diffe",
   "title": "A pre-trend too gentle to see can bias a difference-in-differences estimate by ~77% — and the standard test usually misses it",
   "title_sk": "A pre-trend too gentle to see can bias a difference-in-differences estimate by ~77% — and the standard test usually misses it",
