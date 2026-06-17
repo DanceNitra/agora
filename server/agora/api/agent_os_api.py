@@ -540,30 +540,12 @@ async def brain_believe(q: str, k: int = 8):
     return {"status": "ok", **await believe(q, settings.vault_path, k)}
 
 
-# Cooldown for the ad-hoc /brain/hypothesize HTTP path: the dungeon agents hammer it from their
-# quest loop (kind="hypothesize"), which metered at ~4.3k calls / 4.7M tokens for ~0 value (ROI 0.01)
-# — pure low-value churn. Throttle the HTTP entrypoint so each real (2-LLM-call) test fires at most
-# once per gap. The brain's own grounded hypothesis_loop is UNAFFECTED (it calls hypothesize_and_test
-# directly, not via HTTP). Reversible: drop _HYP_MIN_GAP to 0 to restore the old behaviour.
-import time as _time
-_HYP_COOLDOWN = {"last": 0.0}
-_HYP_MIN_GAP = 600.0
-
-
 @router.get("/brain/hypothesize")
 async def brain_hypothesize(q: str):
     """AGORA 2.0 / Pillar 2 — agents as scientists: take what the vault believes, form a NEW
-    testable hypothesis, test it against real literature, return verdict + evidence + falsifier.
-    Rate-limited (cost control): the expensive literature test runs at most once per _HYP_MIN_GAP;
-    within the window it returns a cheap skip so callers degrade gracefully (no tokens burned)."""
+    testable hypothesis, test it against real literature, return verdict + evidence + falsifier."""
     from agora.config import settings
     from agora.execution.scientist import hypothesize_and_test
-    now = _time.time()
-    if now - _HYP_COOLDOWN["last"] < _HYP_MIN_GAP:
-        return {"status": "throttled", "hypothesis": "", "verdict": "SKIP",
-                "evidence": "", "falsifier": "", "confidence": 0.0,
-                "note": "hypothesize endpoint on cooldown (cost control)"}
-    _HYP_COOLDOWN["last"] = now
     return {"status": "ok", **await hypothesize_and_test(q, settings.vault_path)}
 
 
