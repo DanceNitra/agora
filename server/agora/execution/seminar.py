@@ -281,6 +281,14 @@ def _too_similar(claim: str, priors: list[str], thr: float = 0.55) -> bool:
     return False
 
 
+def _recent_claims(limit: int = 80) -> list[str]:
+    """The most recent contribution claims ACROSS ALL TOPICS — so the dedup gate also catches
+    cross-topic repetition (e.g. two near-identical 'CVaR risk metric' or 'Bridge: X' claims on
+    different threads), not just restatements within one topic thread."""
+    items = sorted(_load(_CONTRIB, []), key=lambda c: c.get("ts", 0), reverse=True)
+    return [c.get("claim", "") for c in items[:limit]]
+
+
 def extract_contribution(topic: dict, transcript: str, partners: list[str]) -> dict | None:
     """Turn a real exchange into a recorded Contribution grounded in literature, or return None.
 
@@ -342,7 +350,11 @@ def extract_contribution(topic: dict, transcript: str, partners: list[str]) -> d
     if len(claim) < 25 or _REFUSAL.search(claim) or _REFUSAL.search(d.get("evidence", "")):
         return None                                   # vacuous / refusal → not a contribution
     if _too_similar(claim, priors):
-        return None                                   # near-duplicate of an existing contribution
+        return None                                   # near-duplicate within this topic thread
+    # cross-topic global gate: a slightly higher bar so genuinely distinct claims that share
+    # jargon survive, but near-identical claims on OTHER threads are rejected before storage.
+    if _too_similar(claim, _recent_claims(), thr=0.62):
+        return None                                   # near-duplicate of a recent contribution
     return record_contribution(topic, partners, claim, d.get("evidence", ""),
                                d.get("falsifier", ""), d.get("links") or [],
                                basis="literature" if has_paper else "synthesis")
