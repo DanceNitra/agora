@@ -88,6 +88,13 @@ _LOCAL_MODEL = "qwen3-coder:30b"
 _LOCAL_STICKY_SECONDS = 600.0
 _local_until = 0.0                  # while now < this, skip the capped cloud and use local directly
 
+# Owner policy (2026-06): ALL-CLOUD except embeddings. The local qwen3-coder fallback is OFF by
+# default — when it engaged it kept a 21.7 GB qwen3-coder:30b resident on the 3090, starving the
+# local embedder and slowing the dungeon to HTTP timeouts. Re-enable only by setting
+# AGORA_LOCAL_FALLBACK=1 (e.g. if the cloud quota is genuinely exhausted and you accept the GPU cost).
+import os as _os
+_LOCAL_FALLBACK_ENABLED = _os.getenv("AGORA_LOCAL_FALLBACK", "0") == "1"
+
 
 def _is_usage_limit(err: str) -> bool:
     e = (err or "").lower()
@@ -163,7 +170,7 @@ def call_llm(
 
     # STICKY LOCAL: if the cloud was recently usage-limited, skip it and use local qwen3-coder
     # directly (no point hammering a capped provider). The window self-expires.
-    if time.time() < _local_until:
+    if _LOCAL_FALLBACK_ENABLED and time.time() < _local_until:
         try:
             content = _local_qwen(system_prompt, user_prompt, temperature, max_tokens, want_json)
             if content.strip():
@@ -244,9 +251,10 @@ def call_llm(
                 # Usage limit / rate limit — flip to local qwen3-coder for a sticky window so we
                 # stop hammering the capped cloud, then retry once with backoff.
                 if _is_usage_limit(error_str):
-                    _local_until = time.time() + _LOCAL_STICKY_SECONDS
-                    print(f"[LLM] usage limit on {model} → switching to local qwen3-coder for "
-                          f"{int(_LOCAL_STICKY_SECONDS)}s")
+                    if _LOCAL_FALLBACK_ENABLED:
+                        _local_until = time.time() + _LOCAL_STICKY_SECONDS
+                        print(f"[LLM] usage limit on {model} → switching to local qwen3-coder for "
+                              f"{int(_LOCAL_STICKY_SECONDS)}s")
                     if attempt == 0:
                         time.sleep(2)
                         continue
@@ -256,23 +264,24 @@ def call_llm(
         # If we got here, this tier failed entirely
         print(f"[LLM] {tier_name}({model}) failed: {errors[-1][:80]}")
 
-    # LOCAL GPU FALLBACK: the cloud chain is exhausted (usage limit, provider errors, or persistent
-    # empty completions). Fall back to local qwen3-coder:30b on the GPU — no usage limit. This is the
-    # guarantee the agent team keeps producing even when ollama.com is capped.
-    try:
-        content = _local_qwen(system_prompt, user_prompt, temperature, max_tokens, want_json)
-        if content.strip():
-            print(f"[LLM] LOCAL fallback → qwen3-coder:30b OK ({len(content)} chars)")
-            try:
-                from agora.execution.metabolism import record_call as _meter
-                _meter((len(system_prompt) + len(user_prompt)) // 4, len(content) // 4)
-            except Exception:
-                pass
-            if cache_eligible:
-                _LLM_CACHE[ckey] = (content, time.time())
-            return content
-    except Exception as e:
-        errors.append(f"local-qwen: {str(e)[:80]}")
+    # LOCAL GPU FALLBACK (OFF by default — owner policy is all-cloud; see _LOCAL_FALLBACK_ENABLED).
+    # Only engages when AGORA_LOCAL_FALLBACK=1, e.g. if the cloud quota is exhausted and the GPU cost
+    # is acceptable. Otherwise we stay all-cloud and surface the error so callers degrade gracefully.
+    if _LOCAL_FALLBACK_ENABLED:
+        try:
+            content = _local_qwen(system_prompt, user_prompt, temperature, max_tokens, want_json)
+            if content.strip():
+                print(f"[LLM] LOCAL fallback → qwen3-coder:30b OK ({len(content)} chars)")
+                try:
+                    from agora.execution.metabolism import record_call as _meter
+                    _meter((len(system_prompt) + len(user_prompt)) // 4, len(content) // 4)
+                except Exception:
+                    pass
+                if cache_eligible:
+                    _LLM_CACHE[ckey] = (content, time.time())
+                return content
+        except Exception as e:
+            errors.append(f"local-qwen: {str(e)[:80]}")
 
     # All tiers + local failed
     error_summary = "; ".join(errors[-3:])
