@@ -973,10 +973,25 @@ async def self_audit_loop(app: FastAPI):
                     hist = _json.loads(_hist.read_text())
                 except Exception:
                     hist = []
+            # Self-governance: apply our own Anchor Law to ourselves — track external-grounding φ and
+            # ALARM autonomously if it drifts toward the self-confirming lock-in threshold. The loop
+            # closing on itself (the system governed by the law it discovered).
+            try:
+                from agora.execution.self_improvement import govern
+                g = await _aio.to_thread(govern)
+                snap["grounding_phi"] = g.get("phi")
+                if g.get("alarm"):
+                    from agora.api.agent_os_api import _send_telegram
+                    await _send_telegram(
+                        f"⚠️ Self-governance ALARM (Anchor Law): external grounding phi={g['phi']:.2f} "
+                        f"near the lock-in threshold — predicts self-confirming drift. Raise paper/vault grounding.")
+            except Exception as _e:
+                print(f"[Self-Govern] {_e}")
             hist.append(snap)
             _hist.write_text(_json.dumps(hist[-200:], indent=2))
             print(f"[Self-Audit] verified {stats.get('verified')}/{stats.get('contributions')} contributions, "
-                  f"mem {cons.get('total')} (+{cons.get('linked_pairs')} links); snapshot #{len(hist)}")
+                  f"mem {cons.get('total')} (+{cons.get('linked_pairs')} links), phi={snap.get('grounding_phi')}; "
+                  f"snapshot #{len(hist)}")
         except Exception as e:
             print(f"[Self-Audit] loop error: {e}")
         await _aio.sleep(12 * 3600)                           # ~2x/day

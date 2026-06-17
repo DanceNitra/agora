@@ -100,6 +100,17 @@ def recommend(m: dict) -> dict:
     return {"recommendations": recs}
 
 
+def govern() -> dict:
+    """ACT, don't just measure: the system applies its own Anchor Law to itself. Returns the current
+    operating point + whether external grounding φ has drifted toward the self-confirming lock-in
+    threshold (an autonomous early-warning the self_audit_loop fires on). The loop closing on itself."""
+    m = measure_self()
+    r = recommend(m)
+    phi = m.get("grounding_phi")
+    return {"phi": phi, "alarm": (phi is not None and phi < PHI_C_ALARM),
+            "recommendations": r.get("recommendations", []), "measure": m}
+
+
 def format_self_improvement(m: dict, r: dict) -> str:
     lines = ["🔁 *Recursive self-improvement* — Agora measured on its own law:"]
     if m.get("grounding_phi") is not None:
