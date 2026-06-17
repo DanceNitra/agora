@@ -899,6 +899,18 @@ async def brain_investigation_action(action: str, request: Request):
     return handle(action, await request.json())
 
 
+@router.get("/brain/self-improvement")
+async def brain_self_improvement():
+    """RECURSIVE SELF-IMPROVEMENT — Agora measures itself on its own external-anchor law + per-organ
+    validated-yield, and emits a law-aware feedback recommendation."""
+    import asyncio as _aio
+    from agora.config import settings
+    from agora.execution.self_improvement import measure_self, recommend, format_self_improvement
+    m = await _aio.to_thread(measure_self, settings.vault_path or "")
+    r = recommend(m)
+    return {"status": "ok", "report": format_self_improvement(m, r), "measure": m, **r}
+
+
 @router.get("/brain/counterfactual")
 async def brain_counterfactual():
     """THE COUNTERFACTUAL SELF — the system's history replayed under alternative policies."""
