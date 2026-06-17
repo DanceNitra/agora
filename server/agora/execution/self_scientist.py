@@ -19,7 +19,46 @@ import time
 from pathlib import Path
 
 _HIST = Path(__file__).resolve().parents[2] / ".self_scientist.json"
+_POLICY = Path(__file__).resolve().parents[2] / ".scientist_policy.json"
 _DB = Path(__file__).resolve().parents[2] / "agora.db"
+
+# v2: the controller writes a bounded, reversible POLICY that real organs (the seminar) read and obey.
+# Defaults match prior behaviour, so a missing/corrupt file is safe. Values are clamped on write.
+_DEFAULT_POLICY = {"grounding_floor": 0.40, "dedup_threshold": 0.62, "allocate": "law-discovery"}
+
+
+def get_policy() -> dict:
+    """Read the active self-tuning policy (organs call this). Safe defaults if absent."""
+    try:
+        p = json.loads(_POLICY.read_text(encoding="utf-8"))
+        return {**_DEFAULT_POLICY, **{k: p[k] for k in _DEFAULT_POLICY if k in p}}
+    except Exception:
+        return dict(_DEFAULT_POLICY)
+
+
+def apply_policy() -> dict:
+    """v2 — the controller ACTS: derive bounded organ parameters from our own laws + operating point
+    and write them where the organs read. Reversible (delete the file -> defaults)."""
+    try:
+        from agora.execution.self_improvement import measure_self
+        phi = measure_self().get("grounding_phi")
+    except Exception:
+        phi = None
+    # Grounding-Coupling lever: raise the seminar's grounding floor as phi falls; a modest push when
+    # healthy. Clamped to [0.40, 0.55] so it can never starve the seminar.
+    gf = 0.45
+    if phi is not None and phi < 0.40:
+        gf = 0.55
+    elif phi is not None and phi < 0.55:
+        gf = 0.50
+    gf = max(0.40, min(0.55, gf))
+    pol = {"grounding_floor": round(gf, 2), "dedup_threshold": 0.62, "allocate": "law-discovery",
+           "phi": phi, "ts": time.time()}
+    try:
+        _POLICY.write_text(json.dumps(pol, ensure_ascii=False, indent=1), encoding="utf-8")
+    except Exception:
+        pass
+    return pol
 
 # weights reward VALIDATED, severe-tested, externally-grounded outputs; FAILED replications count
 # (shareable, per the Crucible thesis); churn (strained / no-mapping) counts little.

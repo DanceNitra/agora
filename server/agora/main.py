@@ -990,9 +990,11 @@ async def self_audit_loop(app: FastAPI):
             # The self-improving scientist: track validated-discovery yield over time so the
             # capstone question — does applying our own laws raise our yield? — is measurable.
             try:
-                from agora.execution.self_scientist import snapshot as _yield_snap
+                from agora.execution.self_scientist import snapshot as _yield_snap, apply_policy as _apply_pol
                 ys = await _aio.to_thread(_yield_snap)
                 snap["validated_yield"] = ys.get("yield_score")
+                pol = await _aio.to_thread(_apply_pol)   # v2: the controller ACTS — tune organs by our own laws
+                snap["policy"] = {"grounding_floor": pol.get("grounding_floor"), "dedup": pol.get("dedup_threshold")}
             except Exception as _e:
                 print(f"[Self-Scientist] {_e}")
             hist.append(snap)

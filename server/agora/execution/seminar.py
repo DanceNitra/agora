@@ -281,6 +281,19 @@ def _too_similar(claim: str, priors: list[str], thr: float = 0.55) -> bool:
     return False
 
 
+def _policy(key: str, default):
+    """Read the self-improving scientist's active policy (it tunes these knobs by Agora's own laws).
+    File-based + safe default so there is no import coupling and a missing file changes nothing."""
+    try:
+        import json as _json
+        from pathlib import Path as _P
+        p = _json.loads((_P(__file__).resolve().parents[2] / ".scientist_policy.json").read_text(encoding="utf-8"))
+        v = p.get(key, default)
+        return v if isinstance(v, (int, float)) else default
+    except Exception:
+        return default
+
+
 def _recent_claims(limit: int = 80) -> list[str]:
     """The most recent contribution claims ACROSS ALL TOPICS — so the dedup gate also catches
     cross-topic repetition (e.g. two near-identical 'CVaR risk metric' or 'Bridge: X' claims on
@@ -311,7 +324,8 @@ def extract_contribution(topic: dict, transcript: str, partners: list[str]) -> d
     vault_notes = []
     try:
         from agora.execution.semantic_index import SemanticIndex
-        vault_notes = [h for h in SemanticIndex().search(q, top_k=4) if h.get("score", 0) > 0.4]
+        vault_notes = [h for h in SemanticIndex().search(q, top_k=4)
+                       if h.get("score", 0) > _policy("grounding_floor", 0.4)]
     except Exception:
         vault_notes = []
     if not papers and not vault_notes:
@@ -353,7 +367,7 @@ def extract_contribution(topic: dict, transcript: str, partners: list[str]) -> d
         return None                                   # near-duplicate within this topic thread
     # cross-topic global gate: a slightly higher bar so genuinely distinct claims that share
     # jargon survive, but near-identical claims on OTHER threads are rejected before storage.
-    if _too_similar(claim, _recent_claims(), thr=0.62):
+    if _too_similar(claim, _recent_claims(), thr=_policy("dedup_threshold", 0.62)):
         return None                                   # near-duplicate of a recent contribution
     return record_contribution(topic, partners, claim, d.get("evidence", ""),
                                d.get("falsifier", ""), d.get("links") or [],
