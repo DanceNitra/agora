@@ -58,6 +58,15 @@ def apply_policy() -> dict:
         _POLICY.write_text(json.dumps(pol, ensure_ascii=False, indent=1), encoding="utf-8")
     except Exception:
         pass
+    # Make the loop FALSIFIABLE: ensure the controlled self-experiment is running (idempotent). The
+    # experiment alternates intervention/control regimes on-read so the controller's causal effect on
+    # autonomous yield can be identified, not merely asserted.
+    try:
+        from agora.execution import self_experiment as _se
+        st = _se.start()
+        pol["experiment_regime"] = _se.regime_at(time.time(), st)
+    except Exception:
+        pass
     return pol
 
 # weights reward VALIDATED, severe-tested, externally-grounded outputs; FAILED replications count

@@ -923,6 +923,17 @@ async def brain_self_scientist():
             "yield": y, "controller": controller(), "trend": trend()}
 
 
+@router.get("/brain/self-experiment")
+async def brain_self_experiment():
+    """THE SELF-EXPERIMENT — is the self-improvement loop real? A controlled A/B over policy regimes,
+    measured on the AUTONOMOUS channel only (so the controller's causal effect is identified, not
+    confounded by Claude's manual work). Returns an effect size + an honest verdict."""
+    import asyncio as _aio
+    from agora.execution.self_experiment import readout, format_self_experiment
+    r = await _aio.to_thread(readout)
+    return {"status": "ok", "report": format_self_experiment(), **r}
+
+
 @router.get("/brain/counterfactual")
 async def brain_counterfactual():
     """THE COUNTERFACTUAL SELF — the system's history replayed under alternative policies."""

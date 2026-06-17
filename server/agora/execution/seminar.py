@@ -283,7 +283,16 @@ def _too_similar(claim: str, priors: list[str], thr: float = 0.55) -> bool:
 
 def _policy(key: str, default):
     """Read the self-improving scientist's active policy (it tunes these knobs by Agora's own laws).
-    File-based + safe default so there is no import coupling and a missing file changes nothing."""
+    File-based + safe default so there is no import coupling and a missing file changes nothing.
+    During a self-experiment the live regime (deterministic from time) OVERRIDES the static policy for
+    the experimental knobs, so the controller's effect can be measured against a control baseline."""
+    try:
+        from agora.execution import self_experiment as _se
+        ap = _se.active_policy()
+        if ap and key in ap and isinstance(ap[key], (int, float)):
+            return ap[key]
+    except Exception:
+        pass
     try:
         import json as _json
         from pathlib import Path as _P
