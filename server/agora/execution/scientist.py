@@ -55,20 +55,32 @@ async def hypothesize_and_test(topic: str, vault_path: str) -> dict:
         "named mechanism, with author/year — not a vague 'this paper is related'. If no abstract "
         "states such a specific supporting result, the verdict is UNCERTAIN. "
         "Reply ONLY JSON: {\"verdict\":\"SUPPORTED|REFUTED|UNCERTAIN\",\"evidence\":\"<one sentence "
-        "with the specific result + author/year>\",\"confidence\":0.0,\"falsifier\":\"<what "
+        "with the specific result + author/year>\",\"confidence\":<your calibrated 0..1 probability "
+        "the hypothesis is TRUE given the evidence>,\"falsifier\":\"<what "
         "observation would prove it wrong>\"}.",
         f"HYPOTHESIS: {hyp}\n\nREAL ABSTRACTS:\n{sources}", "cheap", 0.1, 360)
     d = _json(raw)
     verdict = str(d.get("verdict", "UNCERTAIN")).upper()
     if verdict not in ("SUPPORTED", "REFUTED", "UNCERTAIN"):
         verdict = "UNCERTAIN"
+    # Calibrated confidence = P(hypothesis is true). The old test prompt templated "confidence":0.0,
+    # so the cheap model echoed 0.0 back on UNCERTAIN verdicts — reporting hypotheses it had NOT
+    # refuted as "conf 0%" (self-contradictory, and 0% reads as 'certainly false'). Fall back to a
+    # verdict-anchored prior when the returned value is missing or the echoed ~0 placeholder.
+    # UNCERTAIN = the literature is SILENT, a genuine ~50% prior, not disconfirmation.
+    rc = d.get("confidence")
+    rc = float(rc) if isinstance(rc, (int, float)) and 0.0 <= float(rc) <= 1.0 else None
+    prior = {"SUPPORTED": 0.7, "REFUTED": 0.15, "UNCERTAIN": 0.5}[verdict]
+    conf = prior if (rc is None or rc < 0.05) else rc
+    if verdict == "UNCERTAIN":
+        conf = min(max(conf, 0.35), 0.6)          # keep "we don't know" away from the extremes
     top = sources.splitlines()[0].lstrip("- ").strip()[:140] if sources and "(no external" not in sources else ""
     return {
         "topic": topic,
         "hypothesis": hyp,
         "verdict": verdict,
         "evidence": str(d.get("evidence", ""))[:300],
-        "confidence": float(d.get("confidence", 0.5)) if isinstance(d.get("confidence", 0.5), (int, float)) else 0.5,
+        "confidence": conf,
         "falsifier": str(d.get("falsifier", ""))[:200],
         "source": top,
         "known_claims": len(b.get("claims", [])),
