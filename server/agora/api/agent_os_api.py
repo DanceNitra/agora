@@ -885,6 +885,20 @@ async def brain_unification_record(request: Request):
                               b.get("note") or "")
 
 
+@router.get("/brain/investigation")
+async def brain_investigation():
+    """THE INVESTIGATION ENGINE — multi-step Lab chains (depth, not one-shot)."""
+    from agora.execution.investigation import format_investigations, _load
+    return {"status": "ok", "report": format_investigations(), "investigations": _load()[-15:]}
+
+
+@router.post("/brain/investigation/{action}")
+async def brain_investigation_action(action: str, request: Request):
+    """Lifecycle of a multi-step investigation: start | step | conclude."""
+    from agora.execution.investigation import handle
+    return handle(action, await request.json())
+
+
 @router.get("/brain/counterfactual")
 async def brain_counterfactual():
     """THE COUNTERFACTUAL SELF — the system's history replayed under alternative policies."""
