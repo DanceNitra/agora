@@ -994,6 +994,22 @@ async def self_audit_loop(app: FastAPI):
                         f"near the lock-in threshold — predicts self-confirming drift. Raise paper/vault grounding.")
             except Exception as _e:
                 print(f"[Self-Govern] {_e}")
+            # Consensus lock-in guard: apply Agora's own minority-tipping / Grounding-Coupling law to
+            # its OWN consensus stream — alarm if one theme crosses the critical mass without the
+            # external grounding + domain diversity the law requires (automated retrospective check).
+            try:
+                from agora.execution.self_tipping import assess as _tip_assess
+                ta = await _aio.to_thread(_tip_assess)
+                if ta.get("status") == "ok":
+                    snap["consensus_top_theme"] = ta.get("top_theme")
+                    snap["consensus_top_share"] = ta.get("top_share")
+                    snap["consensus_lock_in_risk"] = ta.get("lock_in_risk")
+                    if ta.get("lock_in_risk"):
+                        from agora.api.agent_os_api import _send_telegram
+                        await _send_telegram(
+                            f"⚠️ Consensus lock-in guard (minority-tipping law): {ta.get('verdict')}")
+            except Exception as _e:
+                print(f"[Lock-in Guard] {_e}")
             # The self-improving scientist: track validated-discovery yield over time so the
             # capstone question — does applying our own laws raise our yield? — is measurable.
             try:

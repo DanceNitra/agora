@@ -934,6 +934,18 @@ async def brain_self_experiment():
     return {"status": "ok", "report": format_self_experiment(), **r}
 
 
+@router.get("/brain/self-tipping")
+async def brain_self_tipping():
+    """CONSENSUS LOCK-IN GUARD — Agora checked by its own minority-tipping / Grounding-Coupling law:
+    is one theme crossing the critical mass without the external grounding + domain diversity the law
+    says is needed to keep a dominant cluster truth-tracking? Automates the criticality retrospective's
+    bias-check."""
+    import asyncio as _aio
+    from agora.execution.self_tipping import assess, format_self_tipping
+    a = await _aio.to_thread(assess)
+    return {"status": "ok", "report": format_self_tipping(), **a}
+
+
 @router.get("/brain/counterfactual")
 async def brain_counterfactual():
     """THE COUNTERFACTUAL SELF — the system's history replayed under alternative policies."""
