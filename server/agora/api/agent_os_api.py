@@ -864,6 +864,27 @@ async def brain_theory():
     return {"status": "ok", "report": format_theory(), "runs": _load()[-15:]}
 
 
+@router.get("/brain/unification")
+async def brain_unification():
+    """THE UNIFICATION ENGINE — strongest validated results + candidate unifying laws."""
+    from agora.config import settings
+    from agora.execution.unification import gather_inputs, format_unification, _load
+    vault = settings.vault_path or "C:/Users/Danculus/my-second-brain"
+    return {"status": "ok", "report": format_unification(),
+            "inputs": gather_inputs(vault), "laws": _load()[-15:]}
+
+
+@router.post("/brain/unification/record")
+async def brain_unification_record(request: Request):
+    """Ledger a candidate unifying law (must name a NOVEL prediction + falsifier + Lab id)."""
+    from agora.execution.unification import record_unification
+    b = await request.json()
+    return record_unification(b.get("name") or "", b.get("principle") or "", b.get("subsumes") or [],
+                              b.get("lab_id") or "", b.get("novel_prediction") or "",
+                              b.get("falsifier") or "", b.get("status") or "candidate",
+                              b.get("note") or "")
+
+
 @router.get("/brain/counterfactual")
 async def brain_counterfactual():
     """THE COUNTERFACTUAL SELF — the system's history replayed under alternative policies."""
