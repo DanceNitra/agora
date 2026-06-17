@@ -117,8 +117,8 @@ async def synthesize_and_record_hypothesis(db, vault_path: str) -> dict:
 
     h = await hypothesize_and_test(theme, vault_path)         # generate + TEST against real literature
     hyp = (h.get("hypothesis") or "").strip()
-    if not hyp:
-        return {"status": "skip", "reason": "no hypothesis generated", "theme": theme}
+    if not hyp or hyp.startswith("[LLM Error") or "[LLM Error" in hyp:
+        return {"status": "skip", "reason": "no hypothesis generated (LLM unavailable)", "theme": theme}
 
     contributors = sorted({m.get("by", "?") for m in members})
     conf = float(h.get("confidence") or 0.5)

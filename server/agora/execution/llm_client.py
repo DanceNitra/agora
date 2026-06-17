@@ -283,9 +283,13 @@ def call_llm(
         except Exception as e:
             errors.append(f"local-qwen: {str(e)[:80]}")
 
-    # All tiers + local failed
+    # All tiers failed. Return EMPTY (not an error string) so callers' existing empty-checks skip
+    # the round gracefully instead of RECORDING the error text as content — a "[LLM Error: ...]"
+    # string leaked into the vault as a hypothesis/finding once local fallback was turned off. Log
+    # it so the failure stays visible.
     error_summary = "; ".join(errors[-3:])
-    return f"[LLM Error: all tiers failed — {error_summary[:200]}]"
+    print(f"[LLM] all tiers failed — {error_summary[:200]}")
+    return ""
 
 
 # ── Cost tracking ──────────────────────────────────────
