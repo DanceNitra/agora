@@ -911,6 +911,18 @@ async def brain_self_improvement():
     return {"status": "ok", "report": format_self_improvement(m, r), "measure": m, **r}
 
 
+@router.get("/brain/self-scientist")
+async def brain_self_scientist():
+    """THE SELF-IMPROVING SCIENTIST — Agora's validated-discovery yield over time + a self-tuning
+    directive derived from its own laws (the apex of the self-referential bet, measured)."""
+    import asyncio as _aio
+    from agora.execution.self_scientist import (validated_yield, controller, trend,
+                                                format_self_scientist)
+    y = await _aio.to_thread(validated_yield)
+    return {"status": "ok", "report": format_self_scientist(),
+            "yield": y, "controller": controller(), "trend": trend()}
+
+
 @router.get("/brain/counterfactual")
 async def brain_counterfactual():
     """THE COUNTERFACTUAL SELF — the system's history replayed under alternative policies."""

@@ -987,6 +987,14 @@ async def self_audit_loop(app: FastAPI):
                         f"near the lock-in threshold — predicts self-confirming drift. Raise paper/vault grounding.")
             except Exception as _e:
                 print(f"[Self-Govern] {_e}")
+            # The self-improving scientist: track validated-discovery yield over time so the
+            # capstone question — does applying our own laws raise our yield? — is measurable.
+            try:
+                from agora.execution.self_scientist import snapshot as _yield_snap
+                ys = await _aio.to_thread(_yield_snap)
+                snap["validated_yield"] = ys.get("yield_score")
+            except Exception as _e:
+                print(f"[Self-Scientist] {_e}")
             hist.append(snap)
             _hist.write_text(_json.dumps(hist[-200:], indent=2))
             print(f"[Self-Audit] verified {stats.get('verified')}/{stats.get('contributions')} contributions, "
