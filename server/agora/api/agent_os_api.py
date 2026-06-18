@@ -934,6 +934,17 @@ async def brain_self_experiment():
     return {"status": "ok", "report": format_self_experiment(), **r}
 
 
+@router.get("/brain/self-improver")
+async def brain_self_improver():
+    """SELF-IMPROVING SCIENTIST v3 (recursive, advisory) — reads the live self-experiment and recommends
+    the next falsifiable self-modification, with an adoption bar scaled to the change's cost/
+    irreversibility (Lab 39baec). Read-only: proposes, the loop/owner disposes."""
+    import asyncio as _aio
+    from agora.execution.self_improver import recommend, format_self_improver
+    a = await _aio.to_thread(recommend)
+    return {"status": "ok", "report": format_self_improver(), **a}
+
+
 @router.post("/brain/ews")
 async def brain_ews(request: Request):
     """CRITICAL-TRANSITION EARLY-WARNING ENGINE (capstone) — score a supplied time series for an
