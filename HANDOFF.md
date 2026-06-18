@@ -2,7 +2,91 @@
 
 > Resume doc for a fresh Claude Code session. Chat in **Slovak**; code + user-facing strings **English**.
 
-## 🟢🟢🟢 RESUME HERE (2026-06-16 — FRESHEST · BIG PIVOT) 🟢🟢🟢
+## 🔵🔵🔵 RESUME HERE (2026-06-18 — FRESHEST · the CALIBRATION session) 🔵🔵🔵
+
+> Chat **Slovak**. Read this first, then the 2026-06-16 BIG-PIVOT section below (the income-from-home
+> strategy still stands — it was not retired, the owner just spent this session steering deep Agora
+> research). Auto-memory loads the usual set + `deep-research-workflow-cost`.
+
+**TO RESUME (what the owner types in the fresh session):**
+```
+/loop C:\Users\Danculus\agora\HANDOFF_LOOP_PROMPT.txt
+```
+
+**SYSTEM RUN-STATE (verified clean at handoff):** brain `uvicorn agora.main:app` :8000 = ONE listener
+(health ok, ticking); dungeon = ONE bare `mcp_server.py` :5174 = 200, kept alive by the brain's
+`watch_dungeon_forever` watchdog; **ZERO supervisors** (correct). Closing the chat does NOT stop either
+process. Models = all-cloud (ollama.com glm-4.7 brain + deepseek-v4-flash dungeon), embeddings local
+(nomic-embed-text) — see `agora-local-llm`. Vault push: `DUNGEON_AUTOPUSH=1 python -X utf8 tools/safe_vault_push.py "msg"`.
+
+**THE ARC OF THIS SESSION — one coherent idea emerged and got published: CALIBRATION, not capability, is
+the scarce resource.** It was not planned; it crystallized from ~5 independent results and then we turned
+it on ourselves and reformed our own practice. Everything below is committed + pushed to `agora` main.
+
+1. **Three capstones built (all advisory/read-only, py_compile + `from agora.main import app` verified
+   BEFORE restart — the lesson from the EWS crash):**
+   - **Critical-transition early-warning engine** — `server/agora/execution/ews.py`, `POST /brain/ews`
+     (uses `await request.json()`, NOT `Body(...)` — Body caused a startup crash; fixed). Kendall-tau of
+     rolling variance + lag-1 autocorrelation → warning_score + regime + trust HIGH/LOW. Its real
+     contribution = knowing when NOT to trust itself (AUC 0.90 on folds, ~0.50 on noise). Commit d78afd4.
+   - **Consensus lock-in guard** — `server/agora/execution/self_tipping.py`, `GET /brain/self-tipping`;
+     `self_audit_loop` alarms on lock_in_risk. Agora governed by its own minority-tipping law. Commit dcd2f2c.
+   - **Self-improving-scientist v3** — `server/agora/execution/self_improver.py`, `GET /brain/self-improver`.
+     CANDIDATE_LEVERS registry + **cost-aware threshold** (reversible→lenient t>1.0, irreversible→strict
+     t>2.5; crossover ~harm_scale 8). Reads the live self-experiment. Advisory only. Commit 0a61987.
+   - (Supporting it: **self-experiment** `self_experiment.py` / `GET /brain/self-experiment`, commit 7157828
+     — a falsifiable A/B over policy regimes, intervention grounding_floor=0.50/dedup=0.62 vs control
+     0.40/0.95, 6h epochs. **LIVE & RESOLVING ~7h out** — heading to a NULL (intervention ≈ control), so v3
+     will reject the grounding_floor lever and queue `verifier_strictness` next. Check it next session.)
+
+2. **THE BREAKTRUTH — "calibration is the scarce resource"** (canon, vault note
+   `breaktruth-calibration-is-the-scarce-resource-of-intelligence`, Lab 837d5e). Subsumes 5 session
+   results (SC coverage 0.31→0.89, inner-crowd, thinking-protocol, EWS, Crucible). The novel TESTED piece =
+   the **capability–calibration scissors**: on correlated evidence (ρ=0.4) as capability K rises 2→100,
+   accuracy plateaus at the shared-error floor (RMSE 0.84→0.64) but naive 95%-CI coverage COLLAPSES
+   (0.58→0.18) — *more capable = more confidently wrong*. Counting effective-independent evidence
+   `N_eff=K/(1+(K−1)ρ)` severs it (coverage holds ~0.87). Honest caveat in the note: 0.87 < 0.95.
+
+3. **Turned the Breaktruth INWARD (self-audit) → then FIXED our own organ.**
+   - Self-audit found our prediction ledger fails its own law: 17/20 forecasts were "PubMed papers UP" —
+     near-monotonic counters (zero information) at bunched 0.65 confidence (zero resolution). Calibration
+     theater. (Vault: `self-audit-our-prediction-ledger-fails-its-own-calibration-breaktruth`.)
+   - **Rebuilt the Predict organ** (`prediction_ledger.py` + `data_tool.py`, commit 3afcd41): forecasts now
+     a trailing-WINDOW count (a RATE / acceleration), genuinely ~50/50, not a cumulative counter. New
+     windowed fetchers (PubMed `reldate`, HN `created_at_i>`, GitHub `created:>`); predictions tagged
+     `mode="rate"`; `resolve_due` branches on it so the 20 in-flight cumulative preds still resolve (no
+     corruption). Verified live (emits ~0.5 confidence honest forecasts). **First meaningful self-Brier
+     resolves in ~14 days** — the first real test of whether we practice what we published.
+
+4. **PUBLIC (all verify-before-citing gated, owner-approved, deploys confirmed):**
+   - **Crucible refresh published** (commit 6528168) — 4 verified replications incl. 2 famous FAILEDs
+     reconciled (Hong-Page: REPRODUCED only at exact params / FAILED as a general law; Metcalfe FAILED).
+   - **2 press posts LIVE** — `robustness-checks-arent-ritual...` (corroboration as a measurable filter,
+     commit 300894a) + `why-a-more-capable-ai-can-be-more-confidently-wrong.html` (the scissors, commit
+     74e0030). The public storefront now tells ONE coherent calibration/independence story: corroboration
+     filter + scissors + Crucible-as-literature-calibration.
+
+**GATED QUEUE: EMPTY** (both press pieces approved + published this session). Nothing waits on the owner.
+
+**PENDING / NEXT SESSION:**
+- **Self-experiment verdict ~7h out** (`GET /brain/self-experiment`) → when it lands null, v3 rejects
+  grounding_floor + should queue `verifier_strictness` as the next falsifiable lever.
+- **Predict rate-forecasts resolve ~14d** → first real self-Brier; watch resolution emerge (or not).
+- **Two real inbox tasks were open at compaction** (NOT yet handled — handle via the loop's normal triage):
+  (a) **`afd11c`** — mem0 correspondence: maintainer `kartik-mem0` CLOSED mem0ai/mem0#5330 but **invited a
+  focused minimal upstream-hook feature request** (an `on_search_hit` callback or `cleanup()` API). That is
+  a concrete path to a real upstream contribution (credibility/distribution) — brief the owner in Slovak,
+  draft GATED. (b) **`3ae957`** — Forge ideas (use `/open-world-forge`, anchor on the 36 books, not our canon).
+- **Strategic reminder (do NOT lose):** the 2026-06-16 BIG PIVOT still holds — the owner's real goal is
+  **income from home** (freelance AI services in `services/` + the kids storybooks at
+  `C:\Users\Danculus\rozpravky`). This session was deep Agora research because the owner was actively
+  steering it; when he is active again, advance the income work, don't drift into more Agora product theater.
+- **Cost note (`deep-research-workflow-cost`):** the prior restart was a /deep-research Workflow blowing the
+  session limit. One per session max; capture output to disk immediately.
+
+---
+
+## 🟢🟢🟢 RESUME HERE (2026-06-16 — BIG PIVOT) 🟢🟢🟢
 
 > Read this first. Auto-memory now also loads **`owner-goal-ai-services`** and **`market-truth-no-saas`**
 > — read both. Chat **Slovak**.
