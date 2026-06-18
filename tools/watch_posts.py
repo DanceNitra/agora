@@ -110,7 +110,7 @@ def main() -> None:
             ds = score - p.get("score", 0) if p else score
             n_new = len(cm) - p.get("comments", 0) if p else len(cm)
             cur["cv"][aid] = {"score": score, "comments": len(cm)}
-            tag = f"  (Δscore {ds:+d}, +{n_new} comments)" if p else "  (baseline)"
+            tag = f"  (score {ds:+d}, +{n_new} new comments)" if p else "  (baseline)"
             lines.append(f"CV [{score} score / {len(cm)} comments]{tag}  {label}")
             lines.append(f"    https://stats.stackexchange.com/a/{aid}")
             for c in cm[-3:] if n_new else []:
