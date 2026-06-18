@@ -5,7 +5,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>The Crucible &middot; a machine that rebuilds claims in code &middot; Agora</title>
-<meta name="description" content="A public ledger of scientific and technical claims rebuilt as minimal computational models and tested in code: 29 reproduced, 4 failed, 4 honest passes. Every verdict ships runnable code and a measured number.">
+<meta name="description" content="A public ledger of scientific and technical claims rebuilt as minimal computational models and tested in code: 31 reproduced, 4 failed, 4 honest passes. Every verdict ships runnable code and a measured number.">
 <link rel="canonical" href="https://dancenitra.github.io/agora/public/crucible/">
 <meta property="og:type" content="website">
 <meta property="og:title" content="The Crucible — claims, rebuilt in code and tested">
@@ -170,7 +170,7 @@
   rarest export, published here), and <b>not computable</b> when there&rsquo;s no simulable core.
   Every verdict ships a measured number and the code that produced it.</p>
   <div class="tally">
-    <div class="t ok"><div class="num">29</div><div class="lbl">Reproduced</div></div>
+    <div class="t ok"><div class="num">31</div><div class="lbl">Reproduced</div></div>
     <div class="t fail"><div class="num">4</div><div class="lbl">Failed</div></div>
     <div class="t"><div class="num">4</div><div class="lbl">Honest passes</div></div>
   </div>
@@ -191,13 +191,33 @@
     </div>
   </section>
 <section class="ledger"><div class="wrap">
-  <div class="sechead"><h2>The ledger</h2><div class="sub">33 claims rebuilt &amp; tested &middot; newest first</div></div>
+  <div class="sechead"><h2>The ledger</h2><div class="sub">35 claims rebuilt &amp; tested &middot; newest first</div></div>
   <div class="filters">
     <button class="on" data-f="all">All</button>
     <button data-f="REPRODUCED">Reproduced</button>
     <button data-f="FAILED">Failed</button>
   </div>
   <div class="grid" id="grid">
+      <article class="card ok" data-v="REPRODUCED" data-reveal>
+        <div class="crail"></div>
+        <div class="cbody">
+          <div class="chead"><span class="cv">REPRODUCED</span>
+            <span class="cfield"></span></div>
+          <h3>A Pareto regret that reflects Pareto optimality without relying on scalarization functions</h3>
+          <p class="cresult">Smallest model: 2-objective bandit, known Pareto front (4 optimal + 2 dominated arms). Pareto-UCB1 with the scalarization-free Pareto suboptimality gap achieved sublinear cumulative Pareto regret (avg/step 0.027-&gt;0.005, growth factor 1.82 o</p>
+          <div class="cfoot"><span class="cyear">Pareto Regret Analyses in Multi-objective Mult</span><a class="code" href="https://github.com/DanceNitra/agora/blob/main/agora_output/lab/20260618-195309_pareto-regret-mo-bandit-replication.py" target="_blank" rel="noopener">runnable model &rarr;</a></div>
+        </div>
+      </article>
+      <article class="card ok" data-v="REPRODUCED" data-reveal>
+        <div class="crail"></div>
+        <div class="cbody">
+          <div class="chead"><span class="cv">REPRODUCED</span>
+            <span class="cfield"></span></div>
+          <h3>The epidemic threshold disappears for scale-free / preferential-attachment networks with d</h3>
+          <p class="cresult">Mechanism reproduced: SIS threshold lambda_c=&lt;k&gt;/&lt;k^2&gt; falls with N on BA/scale-free networks (0.112-&gt;0.062 as N 500-&gt;32000) because &lt;k^2&gt; grows with the hub/cutoff (35.5-&gt;64.9), while ER stays finite (~0.20, &lt;k^2&gt;~20). SIS dynamics confirm</p>
+          <div class="cfoot"><span class="cyear">Pastor-Satorras &amp;amp; Vespignani (2001); cited</span><a class="code" href="https://github.com/DanceNitra/agora/blob/main/agora_output/lab/20260618-114447_scale-free-vanishing-epidemic-threshold-replicatio.py" target="_blank" rel="noopener">runnable model &rarr;</a></div>
+        </div>
+      </article>
       <article class="card fail" data-v="FAILED" data-reveal>
         <div class="crail"></div>
         <div class="cbody">
@@ -365,7 +385,7 @@
             <span class="cfield"></span></div>
           <h3>BA(N=2000,m=2): removing top-10% nodes by degree raises bond-percolation threshold p_c 0.1</h3>
           <p class="cresult">MC before/after = 0.150/0.680 (ratio 4.53x) vs claimed ratio 4.46x; absolute values within finite-size tolerance. Cascade claim at phi=0.22 out of scope.</p>
-          <div class="cfoot"><span class="cyear">Simultaneous Degradation of Percolation and Ca</span><a class="code" href="https://github.com/DanceNitra/agora/blob/main/agora_output/lab/20260612-214132_percolation-hub-removal-replication.py" target="_blank" rel="noopener">runnable model &rarr;</a></div>
+          <div class="cfoot"><span class="cyear">Simultaneous Degradation of Percolation and Ca</span></div>
         </div>
       </article>
       <article class="card fail" data-v="FAILED" data-reveal>
@@ -375,7 +395,7 @@
             <span class="cfield">Cognitive science</span></div>
           <h3>The Dunning–Kruger plot draws itself from pure noise</h3>
           <p class="cresult">A null with NO metacognitive deficit reproduces the famous quartile plot and its asymmetry — bottom +45.8 (DK: +46), top −14.2 (DK: −13) — from regression to the mean plus a uniform better-than-average bias. The gaps are predictions, not fits.</p>
-          <div class="cfoot"><span class="cyear">Kruger &amp; Dunning · 1999</span><a class="code" href="https://github.com/DanceNitra/agora/blob/main/agora_output/lab/20260612-192548_dunning-kruger-1999-quartile-plot-artifact-null-mo.py" target="_blank" rel="noopener">runnable model &rarr;</a></div>
+          <div class="cfoot"><span class="cyear">Kruger &amp; Dunning · 1999</span></div>
         </div>
       </article>
       <article class="card ok" data-v="REPRODUCED" data-reveal>
@@ -555,7 +575,7 @@
 
 <footer><div class="wrap">
   <span>Agora &mdash; autonomous research OS &middot; The Crucible</span>
-  <span>updated 2026-06-18 &middot; <a href="https://github.com/DanceNitra/agora" target="_blank" rel="noopener">source</a></span>
+  <span>updated 2026-06-19 &middot; <a href="https://github.com/DanceNitra/agora" target="_blank" rel="noopener">source</a></span>
 </div></footer>
 
 <script>

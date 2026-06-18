@@ -1,13 +1,40 @@
 {
  "name": "The Crucible — machine replication ledger",
  "description": "Scientific and technical claims rebuilt as minimal computational models and tested. REPRODUCED = the mechanism holds in a minimal model; FAILED = it does not; NOT_COMPUTABLE = no simulable core (an honest pass).",
- "generated": "2026-06-18",
+ "generated": "2026-06-19",
  "counts": {
-  "REPRODUCED": 29,
+  "REPRODUCED": 31,
   "FAILED": 4,
-  "NOT_COMPUTABLE": 13
+  "NOT_COMPUTABLE": 14
  },
  "entries": [
+  {
+   "claim": "Degree distribution of competition-induced preferential attachment graphs is a power law up to a finite threshold and decays exponentially above it",
+   "source": "Degree Distribution of Competition-Induced Preferential Attachment Graphs (Berger, Borgs, Chayes, DSouza, 2005)",
+   "verdict": "NOT_COMPUTABLE",
+   "note": "The smallest faithful model of the stated mechanism (1D positions; new vertex connects to earlier vertex minimizing |dx| + alpha*depth) DEGENERATES across alpha to a near-star (max-degree 849->4059 growing with alpha, mean-degree 2, poor po",
+   "lab_id": "4cf927",
+   "code": "https://github.com/DanceNitra/agora/blob/main/agora_output/lab/20260618-210611_cipa-degree-distribution-replication.py",
+   "date": "2026-06-18"
+  },
+  {
+   "claim": "A Pareto regret that reflects Pareto optimality without relying on scalarization functions can be defined and minimized in multi-objective bandits",
+   "source": "Pareto Regret Analyses in Multi-objective Multi-armed Bandit (Xu & Klabjan, 2022)",
+   "verdict": "REPRODUCED",
+   "note": "Smallest model: 2-objective bandit, known Pareto front (4 optimal + 2 dominated arms). Pareto-UCB1 with the scalarization-free Pareto suboptimality gap achieved sublinear cumulative Pareto regret (avg/step 0.027->0.005, growth factor 1.82 o",
+   "lab_id": "ac7232",
+   "code": "https://github.com/DanceNitra/agora/blob/main/agora_output/lab/20260618-195309_pareto-regret-mo-bandit-replication.py",
+   "date": "2026-06-18"
+  },
+  {
+   "claim": "The epidemic threshold disappears for scale-free / preferential-attachment networks with degree exponent gamma in (2,3]",
+   "source": "Pastor-Satorras & Vespignani (2001); cited by Jones & Handcock (2003), preferential attachment in human sexual networks",
+   "verdict": "REPRODUCED",
+   "note": "Mechanism reproduced: SIS threshold lambda_c=<k>/<k^2> falls with N on BA/scale-free networks (0.112->0.062 as N 500->32000) because <k^2> grows with the hub/cutoff (35.5->64.9), while ER stays finite (~0.20, <k^2>~20). SIS dynamics confirm",
+   "lab_id": "f637bb",
+   "code": "https://github.com/DanceNitra/agora/blob/main/agora_output/lab/20260618-114447_scale-free-vanishing-epidemic-threshold-replicatio.py",
+   "date": "2026-06-18"
+  },
   {
    "claim": "Metcalfe's Law: the value of a communications network scales as n^2 (the number of possible pairwise connections)",
    "source": "Metcalfe's Law (folklore/Gilder 1993); contested by Briscoe, Odlyzko & Tilly (2006), 'Metcalfe's Law is Wrong' (IEEE Spectrum), and Metcalfe (2013) Facebook dat",
@@ -221,7 +248,7 @@
    "verdict": "REPRODUCED",
    "note": "MC before/after = 0.150/0.680 (ratio 4.53x) vs claimed ratio 4.46x; absolute values within finite-size tolerance. Cascade claim at phi=0.22 out of scope.",
    "lab_id": "a33457",
-   "code": "https://github.com/DanceNitra/agora/blob/main/agora_output/lab/20260612-214132_percolation-hub-removal-replication.py",
+   "code": "",
    "date": "2026-06-12"
   },
   {
@@ -230,7 +257,7 @@
    "verdict": "FAILED",
    "note": "A null model with ZERO metacognitive deficit (identical self-error at every skill level) reproduces the canonical plot AND its asymmetry: bottom +45.8 (DK: +46), top -14.2 (DK: -13) - just regression to the mean on a noisy test + a UNIFORM ",
    "lab_id": "e39390",
-   "code": "https://github.com/DanceNitra/agora/blob/main/agora_output/lab/20260612-192548_dunning-kruger-1999-quartile-plot-artifact-null-mo.py",
+   "code": "",
    "date": "2026-06-12"
   },
   {
