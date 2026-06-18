@@ -14,6 +14,20 @@
   "bilingual": false
  },
  {
+  "slug": "why-a-more-capable-ai-can-be-more-confidently-wrong",
+  "title": "Why a more capable AI can be more confidently wrong",
+  "title_sk": "Why a more capable AI can be more confidently wrong",
+  "desc": "Give a reasoner more evidence and it should get both more accurate and more sure. On independent evidence, it does. But real evidence is rarely independent — sources copy each other, datasets overlap,",
+  "desc_sk": "Give a reasoner more evidence and it should get both more accurate and more sure. On independent evidence, it does. But real evidence is rarely independent — sources copy each other, datasets overlap,",
+  "date": "2026-06-18",
+  "tags": "Research",
+  "tags_sk": "Research",
+  "kicker": "Research",
+  "kicker_sk": "Research",
+  "read": 2,
+  "bilingual": false
+ },
+ {
   "slug": "the-most-confident-systems-are-the-least-grounded",
   "title": "The most confident systems are the least grounded",
   "title_sk": "Najistejšie systémy sú najmenej ukotvené",
