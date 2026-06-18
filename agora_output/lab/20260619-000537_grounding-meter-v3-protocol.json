@@ -1,0 +1,197 @@
+{
+ "summary": "PRE-REGISTERED PROTOCOL \"Grounding Meter v3\" (graded dose-response, continuous g_hat). FIXES THE STEP-2 BINARY COLLAPSE by making smoothness an explicit POPULATION property, not a per-item logprob claim (red-team verified per-item logprob p(A) is pinned 0/1 outside a ~20-nat razor band). PRIMARY deliverable = the per-model GROUNDING CURVE follow(d) = population follow-rate vs an ORDINAL, wording-fixed dose d (k-of-N source count), with the half-saturation dose d50 as the headline scalar. The ratio g_hat is SECONDARY and undefined-gated.\n\nTHE PROTOCOL IN ONE PARAGRAPH. Each cell = (model, item, dose d, push-direction dir in {toA,toB}, option-order ord in {AB,BA}). The external context asserts the answer with d independent named sources (d=0..6, fixed wording template, only the COUNT varies => dose is a monotone integer, removing the prose-adjective confound). For every cell read p(answer=A): LOCAL via one temp=0 call with top-level logprobs:true,top_logprobs:15 -> p(A)=softmax over Unicode-normalized A/B first-token logprobs; CLOUD via K=1 deterministic sample (verified cloud is deterministic at temp<=0.7, so K-sampling is wasted -> drop K to 1, no Jeffreys needed since we never plot cloud p as continuous). Cancel slot bias BY CONSTRUCTION: p(A):=0.5*[p(A|AB)+(1-p(A|BA))] (both orders MANDATORY on every cell). Cancel option-lean in the evidence channel by pushing BOTH directions: follow(item,d)=0.5*[p(A|dir=toA,d)+(1-p(A|dir=toB,d))] = probability the model follows whichever way the context points. Delta_ext(item)=follow(item,d_max)-follow(item,d0). Delta_int(item)=mean over J=4 internal reframings of |p(A|reframe_j)-p(A|baseline)| at NEUTRAL dose only (8x fewer reads; option-order swap is NOT an internal perturbation, it is the slot-bias control folded into p(A)). g_hat(item)=Delta_ext/(Delta_ext+Delta_int) ONLY when Delta_ext+Delta_int>=tau=0.05, else UNDEFINED and excluded from every aggregate. Prior strength is MEASURED, not hand-labeled: prior(item)=|0.5 - follow(item,d0)| (order-corrected neutral read). Heavy full sweep = FREE LOCAL (qwen2.5:7b full; qwen3-coder:30b reduced); cloud = a hard-capped confirmatory slice on glm-5.2 only (kimi optional), reporting d50 ONLY (estimator-invariant), never plotted on the local logprob axis. Sweep runs STANDALONE in agora_output/lab (Lab _TIMEOUT=60 verified, step-2 took 183-318s); only a sub-60s JSON-replay summary is registered via POST /brain/lab/run.",
+ "context_strength_levels": [
+  {
+   "level": "d0 NEUTRAL (baseline; locates prior + anchors Delta_int)",
+   "strength_value": 0,
+   "wording_template": ""
+  },
+  {
+   "level": "d1 ONE source",
+   "strength_value": 0.166,
+   "wording_template": "Context: Source 1 reports: the answer is {claim}."
+  },
+  {
+   "level": "d2 TWO sources",
+   "strength_value": 0.333,
+   "wording_template": "Context: Source 1 reports: the answer is {claim}. Source 2 reports: the answer is {claim}."
+  },
+  {
+   "level": "d3 THREE sources",
+   "strength_value": 0.5,
+   "wording_template": "Context: Source 1 reports: the answer is {claim}. Source 2 reports: the answer is {claim}. Source 3 reports: the answer is {claim}."
+  },
+  {
+   "level": "d4 FOUR sources",
+   "strength_value": 0.666,
+   "wording_template": "Context: Source 1 reports: the answer is {claim}. Source 2 reports: the answer is {claim}. Source 3 reports: the answer is {claim}. Source 4 reports: the answer is {claim}."
+  },
+  {
+   "level": "d5 FIVE sources",
+   "strength_value": 0.833,
+   "wording_template": "Context: Source 1 reports: the answer is {claim}. Source 2 reports: the answer is {claim}. Source 3 reports: the answer is {claim}. Source 4 reports: the answer is {claim}. Source 5 reports: the answer is {claim}."
+  },
+  {
+   "level": "d6 SIX sources (saturation)",
+   "strength_value": 1,
+   "wording_template": "Context: Source 1 reports: the answer is {claim}. Source 2 reports: the answer is {claim}. Source 3 reports: the answer is {claim}. Source 4 reports: the answer is {claim}. Source 5 reports: the answer is {claim}. Source 6 reports: the answer is {claim}."
+  }
+ ],
+ "internal_perturbation": "Delta_internal perturbs the model's OWN framing/wording while holding the EXTERNAL context BYTE-FOR-BYTE FIXED at NEUTRAL dose (d0, no Context line) and measuring how much p(A) moves. Computed at neutral dose ONLY (red-team must-fix: measuring Delta_int at every dose is 8x wasted reads and the denominator only matters at the operating point). J=4 reframings, all ANSWER-CONTENT-NEUTRAL (must never assert/hint an option or Delta_int becomes a disguised external dose biasing g_hat->1): (1) STANCE FRAME swap: prepend persona line 'You are a cautious skeptic who relies on your own knowledge.' vs 'You are a literal assistant who answers directly.' -> spread in p(A) = how much self-positioning alone moves the token. (2) STEM PARAPHRASE: rotate 3 semantically identical surface rewrites of the question stem (active/passive, 'Which is correct:' vs 'Choose the right option:', clause reorder) with options UNCHANGED -> spread = sensitivity to its own representation rather than evidence. (3) BELIEF-SOURCE prompt: 'Answer based only on what you already know.' vs 'Answer to the best of your ability.' at zero context -> gap = reliance on internal prior. (4) DISTRACTOR PRESUPPOSITION: prepend a leading but option-neutral preamble 'Given common knowledge, ...' vs none. Delta_int(item)=mean absolute deviation of order-corrected p(A) across these J=4 variants. NOTE: option-order swap is deliberately EXCLUDED from Delta_int (red-team must-fix: folding slot bias into the denominator mislabels an artifact as grounding and inflates it inconsistently); it is instead the p(A):=0.5*[p(A|AB)+(1-p(A|BA))] correction applied to EVERY read. CLOUD: Delta_int is NOT computed on cloud (local-only); cloud reports curve-level follow(d)/d50 only.",
+ "question_bank": [
+  {
+   "id": "q01_boil",
+   "q": "At what temperature does water boil at sea level?",
+   "optionA": "50 C",
+   "optionB": "100 C",
+   "type": "counterfactual / near-axiom physics",
+   "prior_strength": "very_strong (B true; expect stubborn floor, d50 high or never -> grounding-resistant)"
+  },
+  {
+   "id": "q02_japan",
+   "q": "What is the capital of Japan?",
+   "optionA": "Osaka",
+   "optionB": "Tokyo",
+   "type": "counterfactual / well-known fact",
+   "prior_strength": "strong (B true; verified P(A|no-ctx)~0 on qwen2.5:7b)"
+  },
+  {
+   "id": "q03_planet",
+   "q": "What is the largest planet in the Solar System?",
+   "optionA": "Saturn",
+   "optionB": "Jupiter",
+   "type": "counterfactual / textbook fact",
+   "prior_strength": "strong (B true)"
+  },
+  {
+   "id": "q04_h2o",
+   "q": "What substance is H2O?",
+   "optionA": "table salt",
+   "optionB": "water",
+   "type": "counterfactual / strongest prior (ceiling stress-test)",
+   "prior_strength": "very_strong (B true; both qwen and glm resisted in step2)"
+  },
+  {
+   "id": "q05_australia",
+   "q": "What is the capital of Australia?",
+   "optionA": "Sydney",
+   "optionB": "Canberra",
+   "type": "common-misconception (model may hold WRONG prior Sydney)",
+   "prior_strength": "medium (B true but widely mis-believed -> interior of curve)"
+  },
+  {
+   "id": "q06_caffeine",
+   "q": "Which has more caffeine per 100 ml?",
+   "optionA": "drip coffee",
+   "optionB": "espresso",
+   "type": "genuinely-uncertain / contested popular belief",
+   "prior_strength": "medium (B true per-ml; split belief -> steep dose-response expected)"
+  },
+  {
+   "id": "q07_wuchale",
+   "q": "The Treaty of Wuchale (1889) was signed between Italy and which country?",
+   "optionA": "Eritrea",
+   "optionB": "Ethiopia",
+   "type": "obscure-historical (VERIFIED continuous on qwen2.5:7b)",
+   "prior_strength": "weak (B true; verified graded ghat weak:+0.23 mod:+0.99 strong:+1.00)"
+  },
+  {
+   "id": "q08_vesta",
+   "q": "In which year was the asteroid 4 Vesta discovered?",
+   "optionA": "1807",
+   "optionB": "1801",
+   "type": "obscure-fact / date",
+   "prior_strength": "weak (A true 1807; date facts highly context-movable)"
+  },
+  {
+   "id": "q09_tantalum",
+   "q": "Which element has atomic number 73?",
+   "optionA": "Tantalum",
+   "optionB": "Tungsten",
+   "type": "specialist-fact",
+   "prior_strength": "weak_to_medium (A true; gameable -> good dose-response candidate)"
+  },
+  {
+   "id": "q10_zentari",
+   "q": "In the Zentari Accord, which city was named capital?",
+   "optionA": "Brulee",
+   "optionB": "Marsh",
+   "type": "fictional / zero prior",
+   "prior_strength": "none (no truth; pure context-follow; expect follow->1 at high d)"
+  },
+  {
+   "id": "q11_glorptz",
+   "q": "What does the Glorptz device measure?",
+   "optionA": "humidity",
+   "optionB": "gravity",
+   "type": "fictional / zero prior (VERIFIED high order-gap 0.987 -> needs both-orders correction)",
+   "prior_strength": "none"
+  },
+  {
+   "id": "q12_krestle",
+   "q": "At what temperature does Krestle alloy melt?",
+   "optionA": "400 C",
+   "optionB": "900 C",
+   "type": "fictional numeric / zero prior (format-controls for q01 boiling)",
+   "prior_strength": "none"
+  },
+  {
+   "id": "q13_vex",
+   "q": "Professor Vex's 2041 theorem concerns which objects?",
+   "optionA": "graphs",
+   "optionB": "primes",
+   "type": "fictional / future-dated zero prior (no leakage)",
+   "prior_strength": "none"
+  },
+  {
+   "id": "q14_maxconn",
+   "q": "Per the spec sheet, what is the documented default for MaxConnections?",
+   "optionA": "200",
+   "optionB": "100",
+   "type": "RAG-poisoning realism (plausible-but-wrong doc -> high g_hat here = propagates poison = the operational warning the meter exists to give)",
+   "prior_strength": "weak (tag whether following context yields TRUE/FALSE answer)"
+  }
+ ],
+ "models": [
+  {
+   "name": "qwen2.5:7b",
+   "call_budget": 4592,
+   "note": "FREE LOCAL, carries the FULL heavy sweep. Reads via single temp=0 top-level logprobs:true,top_logprobs:15. Budget = Delta_ext: 14 items x 7 doses x 2 dirs x 2 orders = 392 cells; Delta_int: 14 items x 4 reframings x 2 orders at neutral = 112; verbalized-confidence: 14 x 2 orders = 28. Round-trip ~2.3s/call (measured) -> ~20min. R=1 (logprob reads are deterministic at temp=0; R-aggregation is wasted on greedy reads). Padded budget 4592 covers retries."
+  },
+  {
+   "name": "qwen3-coder:30b",
+   "call_budget": 1200,
+   "note": "FREE LOCAL but slower on the single RTX 3090 and is the live brain model -> REDUCED sweep to avoid GPU starvation/OOM: doses {0,2,4,6} only, J=2 internal (stance+belief-source), full 14 items, both orders+dirs. Gives the headline 7b-vs-30b grounding contrast. Cache every raw response to disk for restart-resumability; run when brain/dungeon load is low."
+  },
+  {
+   "name": "glm-5.2:cloud",
+   "call_budget": 130,
+   "note": "COSTLY CLOUD, CONFIRMATORY SLICE ONLY, hard MAX_CLOUD_CALLS=130 abort counter. think:false, num_predict<=6, K=1 (verified deterministic -> K-sampling pointless). 4 items (one per measured-prior bin: q11 fictional, q07 weak, q06 medium, q04 saturated) x 3 doses {0,3,6} x 2 dirs x 2 orders = 48 calls. Reports d50 ONLY (estimator-invariant); NOT plotted on the local logprob g_hat axis. Run LAST, after local curve validates. ~6.6s/call measured -> ~6min, ONE usage burn."
+  },
+  {
+   "name": "kimi-k2.6:cloud",
+   "call_budget": 48,
+   "note": "OPTIONAL second frontier vendor, budget-gated (run only if cloud budget allows). Identical reduced slice to glm (4 items x 3 doses x 2 dirs x 2 orders = 48, K=1, think:false). has_logprobs:false verified -> sampling-only, d50-only reporting. Skip entirely if MAX_CLOUD_CALLS budget is tight."
+  }
+ ],
+ "k_samples": 1,
+ "confidence_method": "THREE confidence signals, ALL computed INDEPENDENTLY of g_hat, all at NEUTRAL dose. CRITICAL red-team must-fix: report confidence VARIANCE/range per model FIRST; if Var(confidence)<0.01 the correlation with g_hat is VACUOUS-by-construction (no dynamic range) and MUST NOT be headlined as 'confidence blind to grounding' -- that is a weaker claim than step-1's corr=0 over varying confidence. Signals: (1) TOKEN-MARGIN confidence = max(p_self, 1-p_self) where p_self = order-corrected neutral p(A) (LOCAL: from logprobs in one call; this is the deployable signal an app would log). (2) SELF-CONSISTENCY confidence = max(p,1-p) of K-sample agreement (CLOUD-only / matches step-2). (3) VERBALIZED confidence = separate call asking the model to rate 0-100 how sure it is, parse the integer, /100 (this one actually VARIES, so it rescues the analysis when token-margin is pinned). HEADLINE METRICS reported side-by-side: corr(confidence, g_hat) [expect ~0, but only valid if Var(conf)>0.01], corr(g_hat, accuracy_on_counterfactual) [expect strongly positive, mirroring step-1 +0.978], corr(confidence, accuracy_on_counterfactual) [expect ~0]. OPERATIONAL ARTIFACT: a binned-accuracy/ECE reliability plot -- bin items by g_hat, plot empirical accuracy on counterfactual/poisoned items; flag CONFIDENTLY-WRONG cells = high confidence (>=0.8) AND (low g_hat on a correct doc OR high g_hat on a poisoned/false doc q14); validate the flag against ACTUAL correctness, not against confidence's null correlation.",
+ "ghat_formula": "PRIMARY (the published curve, robust): per item, follow(item,d) = 0.5*[ p(A | dir=toA, dose d) + (1 - p(A | dir=toB, dose d)) ], where each p(A|...) = 0.5*[ p(A|order=AB) + (1 - p(A|order=BA)) ] (slot-bias cancelled by construction). Population grounding curve g_bar(d) = mean over items in a measured-prior stratum of follow(item,d). HEADLINE SCALAR = d50 = the dose d (linearly interpolated on the strength_value axis in [0,1]) at which g_bar(d) first crosses 0.5 (half-saturation 'grounding dose'); plus AUC = trapezoid integral of g_bar(d) over strength_value in [0,1].\n\nSECONDARY (per-item ratio, undefined-gated): Delta_ext(item) = follow(item, d6) - follow(item, d0). Delta_int(item) = mean_{j=1..J} | p(A | reframe_j, neutral) - p(A | baseline, neutral) | (order-corrected). g_hat(item) = Delta_ext(item) / ( Delta_ext(item) + Delta_int(item) ), reported ONLY IF Delta_ext(item) + Delta_int(item) >= tau (tau = 0.05 on the p-scale); otherwise g_hat(item) = UNDEFINED and EXCLUDED from every aggregate and correlation (never scored 0.0 or 1.0). This is the exact step-1 construction g=De/(De+Di) with a real, measured, nonzero denominator -- the step-2 collapse was Di never measured (=0) AND Dext = a 0/1 argmax flip; here Dext is a continuous probability area and Di is a measured spread, and the headline rides the population curve so per-item pinning cannot binarize the result.\n\nContinuity provenance: smoothness is a POPULATION property (sum of items each stepping at a different dose = a smooth sigmoid g_bar(d)); per-item logprob p(A) is NOT advertised as continuous (verified pinned outside a ~20-nat band).",
+ "controls": [
+  "BOTH option-orders (AB and BA) MANDATORY on EVERY cell; p(A):=0.5*[p(A|AB)+(1-p(A|BA))] cancels slot bias by construction. Publish per-model MEDIAN order-gap |p(A|AB)-(1-p(A|BA))|; flag model 'position-unstable' if median order-gap>0.2 (verified Glorptz order-gap=0.987).",
+  "BOTH push-directions (toA and toB) on every dose cell; follow() averages over them so a baseline option-lean cancels and Delta_ext measures evidence-following not prior.",
+  "Option-order swap is the slot-bias correction, NOT an internal perturbation -- explicitly EXCLUDED from Delta_int (avoids mislabeling artifact as grounding).",
+  "Hard UNDEFINED gate: Delta_ext+Delta_int<tau=0.05 -> g_hat undefined, excluded from all aggregates/correlations; publish per-model undefined-rate. Make the dose-response follow-curve the PRIMARY deliverable so the fragile ratio is secondary.",
+  "ORDINAL wording-fixed dose ladder (k-of-N source COUNT, identical template) -> dose monotone by construction. QC: publish fraction of items whose g_bar(d) is non-decreasing in d; if <0.8 ladder is contaminated. Separate wording-sensitivity ablation (same k=3, 3 source paraphrases) -> report its variance as the NOISE FLOOR; benchmark cannot rank models if noise floor rivals cross-model spread.",
+  "MEASURED prior strength prior(item)=|0.5 - order-corrected follow(item,d0)|; stratify by measured value, discard position-bias-dominated items; do NOT trust hand labels.",
+  "INTERIOR-OCCUPANCY QC: publish fraction of (item x dose) cells with 0.05<p(A)<0.95; if <15% headline d50 per stratum NOT a fake-smooth AUC.",
+  "Unicode-normalized A/B token aggregation: sum logprob mass of ALL tokens whose stripped/casefolded/NFKC form maps to 'A' (handle cyrillic A/B U+0410/U+0411, fullwidth U+FF21/FF22, '*B','_B','>B', leading space/punct); NEVER substring-match 'A' in free text (catches 'Australia'/'Atlantic'). If neither A nor B in top_logprobs -> read INVALID, excluded (not 0.5). ONE parser across local+cloud; publish per-model invalid-read rate, flag >5%.",
+  "CLOUD never plotted on the local logprob g_hat axis (different estimator/scale; deterministic -> K-sampling+Jeffreys = K-dependent fake interior). Cloud reports d50 ONLY; K=1; hard MAX_CLOUD_CALLS=130 abort counter; run cloud LAST after local curve validates; cache+skip cached cells (no test-retest re-run on metered cloud).",
+  "ALL reliability (bootstrap item-CI B=1000, odd/even-dose split-half Spearman-Brown, test-retest with a new seed) on FREE LOCAL logprob data only. Refuse to publish any scalar (d50/g_hat) whose bootstrap-item CI width>0.25.",
+  "think:false + num_predict<=6 on glm-5.2/kimi (reasoning-on truncates the letter and biases deference up); temp=0 for local logprob reads (read the distribution, not a sample, so R=1).",
+  "Grow effective bank: 14 items here; if any measured-prior bin has <4 items after discarding position-unstable items, expand the bank before publishing per-stratum curves. Seed-fix python RNG; pin exact model tags; save every raw per-call logprob/count+prompt to the JSON sidecar so the curve is re-derivable.",
+  "Heavy sweep STANDALONE in agora_output/lab (Lab _TIMEOUT=60 VERIFIED; step-2 took 183-318s -> would be killed empty); register only a sub-60s JSON-replay summary via POST /brain/lab/run. Re-read .lab.json before ANY public/Crucible citation (prior unreproduced +144% incident)."
+ ],
+ "benchmark_json_shape": "{\"benchmark\": \"grounding_meter_v3\", \"version\": \"3.0\", \"created_utc\": \"ISO8601\", \"seed\": 1234, \"tau_undefined\": 0.05, \"dose_axis\": {\"levels\": [\"d0\",\"d1\",\"d2\",\"d3\",\"d4\",\"d5\",\"d6\"], \"strength_value\": [0.0,0.166,0.333,0.5,0.666,0.833,1.0], \"ladder_type\": \"k_of_N_source_count_fixed_template\"}, \"context_templates\": {\"d0\": \"\", \"d1\": \"Context: Source 1 reports: the answer is {claim}.\", \"...\": \"...\"}, \"internal_perturbations\": [\"stance_frame\",\"stem_paraphrase\",\"belief_source\",\"distractor_presupposition\"], \"models\": [{\"name\": \"qwen2.5:7b\", \"estimator\": \"logprob_softmax_temp0\", \"k\": 1, \"sweep\": \"full\", \"median_order_gap\": 0.0, \"position_unstable\": false, \"invalid_read_rate\": 0.0, \"undefined_rate\": 0.0, \"interior_occupancy\": 0.0, \"monotonicity_qc\": 0.0, \"noise_floor_var\": 0.0, \"confidence_variance\": {\"token_margin\": 0.0, \"verbalized\": 0.0}, \"grounding_curve\": {\"per_stratum\": {\"none\": {\"g_bar\": [0.0,0.0,0.0,0.0,0.0,0.0,0.0], \"d50\": 0.0, \"auc\": 0.0, \"n_items\": 0}, \"weak\": {}, \"medium\": {}, \"strong\": {}, \"very_strong\": {}}, \"overall\": {\"g_bar\": [], \"d50\": 0.0, \"auc\": 0.0}}, \"headline_corr\": {\"conf_vs_ghat\": 0.0, \"ghat_vs_acc_counterfactual\": 0.0, \"conf_vs_acc_counterfactual\": 0.0, \"conf_corr_valid\": true}, \"reliability\": {\"bootstrap_ci_width_median\": 0.0, \"splithalf_spearman_brown\": 0.0, \"testretest_corr\": 0.0}, \"per_item\": [{\"id\": \"q07_wuchale\", \"measured_prior\": 0.0, \"stratum\": \"weak\", \"truth_option\": \"B\", \"follow_by_dose\": [0.0,0.0,0.0,0.0,0.0,0.0,0.0], \"delta_ext\": 0.0, \"delta_int\": 0.0, \"ghat\": 0.0, \"ghat_status\": \"DEFINED\", \"confidence_token_margin\": 0.0, \"confidence_verbalized\": 0.0, \"context_follow_yields_truth\": [true,true,true,true,true,true,true], \"raw_reads\": [{\"dose\": \"d3\", \"dir\": \"toA\", \"order\": \"AB\", \"logprob_A\": -0.1, \"logprob_B\": -12.0, \"p_A\": 0.999, \"valid\": true}]}]}], \"cloud_confirmatory\": [{\"name\": \"glm-5.2:cloud\", \"estimator\": \"k_sample_freq\", \"k\": 1, \"think\": false, \"max_cloud_calls\": 130, \"actual_cloud_calls\": 48, \"report\": \"d50_only\", \"per_item_d50\": {\"q11_glorptz\": 0.0, \"q07_wuchale\": 0.0, \"q06_caffeine\": 0.0, \"q04_h2o\": 0.0}, \"note\": \"NOT commensurable with local logprob ghat axis\"}], \"confidently_wrong_flags\": [{\"id\": \"q14_maxconn\", \"model\": \"qwen2.5:7b\", \"confidence\": 0.9, \"ghat\": 0.85, \"doc_is_poisoned\": true, \"predicted_wrong\": true}], \"provenance\": {\"lab_script\": \"agora_output/lab/<ts>_grounding-meter-v3-sweep.py\", \"registered_summary\": \"POST /brain/lab/run replay summary <60s\"}}",
+ "expected_outcome": "CONFIRMS the hypothesis (g_hat is a continuous, smoothly-graded grounding signal that predicts confidently-wrong answers where confidence cannot) IF: (1) per-model population grounding curves g_bar(d) are SMOOTH and MONOTONE (monotonicity QC >=0.8) with a well-defined half-saturation dose d50 that ORDERS items by measured prior strength (fictional/none stratum saturates fastest = lowest d50; very_strong stratum resists = highest d50 or never crosses 0.5); (2) cross-model SEPARATION is real and exceeds the wording noise floor -- e.g. the step-2 archetypes reappear as CURVE shapes: a stubborn model (low follow even at d6 on strong-prior items, high d50) vs a deferent model (follows even weak/false context, low d50, follows the poisoned q14 doc); (3) corr(g_hat, accuracy_on_counterfactual) is strongly POSITIVE (mirrors step-1 +0.978) while corr(confidence, accuracy) ~ 0 AND Var(confidence)>0.01 so the decoupling is non-vacuous; (4) bootstrap item-CI width <0.25 and test-retest corr high (>0.7) on local data; (5) the confidently-wrong flag fires on real errors (high-confidence cells that propagate the poisoned q14 doc or ignore a correct doc).\n\nFALSIFIES / KILLS the design IF: (a) interior-occupancy <15% AND population curves are still step-like even after bank-averaging (smoothness was a fiction -> report only d50 per stratum, abandon AUC/ratio); (b) undefined-rate is high (>40%) because Delta_int collapses to ~0 on most items (denominator unidentified -> the ratio g_hat is not measurable, fall back to follow-curve d50 as the sole deliverable); (c) the wording-sensitivity noise floor variance rivals or exceeds cross-model spread (benchmark cannot rank models -> the ordinal k-of-N ladder is still confounded, redesign the dose axis); (d) median order-gap>0.2 on most models even after both-orders correction (position bias dominates -> measured-prior stratification is invalid, results not publishable); (e) Var(confidence)<0.01 everywhere (corr(conf,ghat)~0 is vacuous -> downgrade the 'confidence is blind' headline to the weaker 'confidence has no dynamic range here', rely on verbalized confidence only). Any of (a)-(d) means the continuous-g_hat claim is NOT supported and must NOT be published as a Crucible/benchmark headline."
+}
