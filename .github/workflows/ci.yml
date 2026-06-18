@@ -1,15 +1,33 @@
 name: CI
 
+# Only run on real code changes — not on the constant docs/posts/vault pushes to main (those were
+# triggering full server+game+shell CI every time and piling up stuck, hours-long runs).
 on:
   push:
     branches: [main]
+    paths:
+      - 'server/**'
+      - 'game/**'
+      - 'shell/**'
+      - '.github/workflows/ci.yml'
   pull_request:
     branches: [main]
+    paths:
+      - 'server/**'
+      - 'game/**'
+      - 'shell/**'
+      - '.github/workflows/ci.yml'
+
+# A newer push cancels an in-flight run instead of accumulating stuck runs.
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
 
 jobs:
   server-tests:
     name: Server tests (Python 3.11)
     runs-on: ubuntu-latest
+    timeout-minutes: 20          # heavy deps install; fail fast instead of hanging for hours
     defaults:
       run:
         working-directory: server
@@ -26,6 +44,7 @@ jobs:
   game-lint:
     name: Game TypeScript check
     runs-on: ubuntu-latest
+    timeout-minutes: 15
     defaults:
       run:
         working-directory: game
@@ -42,6 +61,7 @@ jobs:
   shell-lint:
     name: Shell TypeScript check (non-blocking — WIP frontend)
     runs-on: ubuntu-latest
+    timeout-minutes: 15
     # The shell is a work-in-progress frontend with ~34 pre-existing d3/TS type errors; don't block
     # CI on it (server + game are the gating jobs). Remove this once the shell types are cleaned up.
     continue-on-error: true
