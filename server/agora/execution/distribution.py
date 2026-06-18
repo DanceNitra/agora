@@ -28,10 +28,11 @@ PACKET_DIR = ROOT / "agora_output" / "distribution"
 VENUES: dict[str, dict] = {
     "hn":               {"name": "Hacker News",     "kind": "hn"},
     "x":                {"name": "X / Twitter",     "kind": "x"},
-    "r/statistics":     {"name": "r/statistics",     "kind": "reddit", "sub": "statistics"},
+    # some subs auto-remove posts whose title lacks a category flair tag -> prepend one
+    "r/statistics":     {"name": "r/statistics",     "kind": "reddit", "sub": "statistics", "flair": "[D]"},
     "r/econometrics":   {"name": "r/econometrics",   "kind": "reddit", "sub": "econometrics"},
     "r/datascience":    {"name": "r/datascience",    "kind": "reddit", "sub": "datascience"},
-    "r/MachineLearning": {"name": "r/MachineLearning", "kind": "reddit", "sub": "MachineLearning"},
+    "r/MachineLearning": {"name": "r/MachineLearning", "kind": "reddit", "sub": "MachineLearning", "flair": "[D]"},
     "r/LocalLLaMA":     {"name": "r/LocalLLaMA",     "kind": "reddit", "sub": "LocalLLaMA"},
     "r/slatestarcodex": {"name": "r/slatestarcodex", "kind": "reddit", "sub": "slatestarcodex"},
     "r/longevity":      {"name": "r/longevity",      "kind": "reddit", "sub": "longevity"},
@@ -91,8 +92,10 @@ def submit_url(venue_key: str, url: str, title: str, blurb: str = "") -> str:
     if kind == "hn":
         return f"https://news.ycombinator.com/submitlink?u={_q(url)}&t={_q(title)}"
     if kind == "reddit":
+        flair = v.get("flair", "")
+        t = f"{flair} {title}".strip() if flair else title
         return (f"https://www.reddit.com/r/{v.get('sub','')}/submit"
-                f"?url={_q(url)}&title={_q(title)}")
+                f"?url={_q(url)}&title={_q(t)}")
     if kind == "x":
         text = (blurb or title)[:240]
         return f"https://twitter.com/intent/tweet?text={_q(text)}&url={_q(url)}"
