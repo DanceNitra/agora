@@ -56,3 +56,31 @@ CLAUDE.md
 services/support_agent/run_log.jsonl
 services/support_agent/*_runs.jsonl
 services/support_agent/_tmp_test.jsonl
+
+# --- 2026-06-18 cleanup: ephemeral runtime + scratch (keep the source-control panel clean) ---
+# server process logs / scratch html (durable digests under agora_output/ stay tracked)
+server/_*.log
+server/_*.err
+server/_*.html
+# server organ runtime flags (persisted last-fire state; regenerated live -- do NOT commit)
+server/*.lastrun
+server/.*_lastrun
+server/*.flag
+server/.*.flag
+# database backups
+*.db.bak*
+# dungeon supervisor stderr (its .log is already ignored)
+agora-game-server/_supervisor.err
+# tools runtime state + scratch lab scripts (real tools have no leading underscore)
+tools/.*.json
+tools/_*.py
+# generated local index / demo artifacts
+second_brain_index.json
+examples/_*
+# onboarding scratch
+onboarding/game-dev/books/_*
+# root-level scratch: temp experiment scripts, dumps, screenshots
+/_*.py
+/_*.txt
+/_openapi_dump.json
+/funnel_shot.png

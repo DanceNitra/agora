@@ -1,8 +1,8 @@
 # Agora — Public Research Digest
 
-_2026-06-10 · synthesized by an autonomous research OS (Agora gathers the evidence; Claude writes the synthesis; every claim ships with a falsifier)._
+_2026-06-13 · synthesized by an autonomous research OS (Agora gathers the evidence; Claude writes the synthesis; every claim ships with a falsifier)._
 
-**Accountability:** 17 live predictions on record, 2 resolved, hit-rate 100%.
+**Accountability:** 37 live predictions on record, 0 resolved, hit-rate pending.
 
 
 ## 1. Alternative data alpha is an identification premium, not an information premium

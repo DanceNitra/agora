@@ -102,41 +102,53 @@
   <p class="sub"><span class="en">Fill in whatever parts of your system you have (pre-filled with a failing example). It runs entirely in your browser &mdash; nothing is sent anywhere.</span><span class="sk">Vyplň tie časti systému, ktoré máš (predvyplnené zlyhávajúcim príkladom). Beží celé v prehliadači &mdash; nič sa nikam neposiela.</span></p>
   <div class="tool">
     <div class="panel">
-      <div class="fg"><h4><span class="en">A/B result &mdash; is the lift real?</span><span class="sk">A/B výsledok &mdash; je nárast reálny?</span></h4>
+      <p style="font-size:14px;color:var(--faint);margin:-4px 0 16px"><span class="en">Answer the ones you can &mdash; skip the rest. The defaults are a deliberately broken example so you see a full report. Hover units for help.</span><span class="sk">Odpovedz na tie, ktoré vieš &mdash; ostatné preskoč. Predvolené hodnoty sú zámerne pokazený príklad, aby si videl plný report.</span></p>
+
+      <div class="fg"><h4><span class="en">1 · Did a change actually help?</span><span class="sk">1 · Pomohla zmena naozaj?</span></h4>
+        <p class="hlp"><span class="en">Your A/B test &mdash; conversions out of users, per variant.</span><span class="sk">Tvoj A/B test &mdash; konverzie z používateľov, na variant.</span></p>
         <div class="row">
-          <label>conv A<input id="ca" type="number" value="100"></label>
-          <label>n A<input id="na" type="number" value="1000"></label>
-          <label>conv B<input id="cb" type="number" value="115"></label>
-          <label>n B<input id="nb" type="number" value="1000"></label>
+          <label>A: <span class="en">conversions</span><span class="sk">konverzie</span><input id="ca" type="number" value="100"></label>
+          <label>A: <span class="en">users</span><span class="sk">používatelia</span><input id="na" type="number" value="1000"></label>
+          <label>B: <span class="en">conversions</span><span class="sk">konverzie</span><input id="cb" type="number" value="115"></label>
+          <label>B: <span class="en">users</span><span class="sk">používatelia</span><input id="nb" type="number" value="1000"></label>
         </div></div>
-      <div class="fg"><h4><span class="en">Self-training &mdash; model collapse?</span><span class="sk">Self-training &mdash; kolaps modelu?</span></h4>
+
+      <div class="fg"><h4><span class="en">2 · Is your model training on its own output?</span><span class="sk">2 · Trénuje model na vlastnom výstupe?</span></h4>
+        <p class="hlp"><span class="en">Model-collapse risk from synthetic / self-generated data.</span><span class="sk">Riziko kolapsu z umelých / samo-generovaných dát.</span></p>
         <div class="row">
-          <label><span class="en">external data %</span><span class="sk">externé dáta %</span><input id="ext" type="number" step="0.01" value="0"></label>
-          <label><span class="en">self-trust p</span><span class="sk">sebadôvera p</span><input id="stp" type="number" step="0.1" value="2"></label>
+          <label><span class="en">% of training data that is REAL / human</span><span class="sk">% trénovacích dát, čo je REÁLNE / ľudské</span><input id="realpct" type="number" value="0" min="0" max="100"></label>
+          <label><span class="en">does it over-trust its own past answers?</span><span class="sk">prehnane verí vlastným minulým odpovediam?</span>
+            <select id="overtrust"><option value="1">no / balanced</option><option value="1.5">somewhat</option><option value="2" selected>heavily</option></select></label>
         </div></div>
-      <div class="fg"><h4><span class="en">Multi-agent &mdash; herding?</span><span class="sk">Multi-agent &mdash; stádovanie?</span></h4>
+
+      <div class="fg"><h4><span class="en">3 · Do your agents copy each other?</span><span class="sk">3 · Kopírujú sa agenti navzájom?</span></h4>
+        <p class="hlp"><span class="en">Multi-agent / ensemble herding (skip if single-agent).</span><span class="sk">Stádovanie multi-agentov / ensemble (preskoč ak 1 agent).</span></p>
         <div class="row">
-          <label><span class="en">peers seen</span><span class="sk">videní peers</span><input id="peers" type="number" value="2"></label>
-          <label><span class="en">own weight</span><span class="sk">vlastná váha</span><input id="ow" type="number" step="0.1" value="1"></label>
-          <label><span class="en">peer discount</span><span class="sk">zľava peer</span><input id="disc" type="number" step="0.1" value="1"></label>
+          <label><span class="en">how many peers' answers each agent sees</span><span class="sk">koľko odpovedí peers vidí každý agent</span><input id="peers" type="number" value="2"></label>
+          <label><span class="en">how much it weights its OWN evidence (1 = same as a peer)</span><span class="sk">ako váži VLASTNÝ dôkaz (1 = ako peer)</span><input id="ow" type="number" step="0.1" value="1"></label>
         </div></div>
-      <div class="fg"><h4><span class="en">Metric / reward &mdash; gamed?</span><span class="sk">Metrika / odmena &mdash; gameovaná?</span></h4>
+
+      <div class="fg"><h4><span class="en">4 · Is your KPI / reward easy to game?</span><span class="sk">4 · Dá sa tvoja KPI / odmena ľahko gameovať?</span></h4>
+        <p class="hlp"><span class="en">Reward-hacking / Goodhart &mdash; when a metric becomes a target.</span><span class="sk">Reward-hacking / Goodhart &mdash; keď sa miera stane cieľom.</span></p>
         <div class="row">
-          <label><span class="en">gameability</span><span class="sk">gameovateľnosť</span><input id="game" type="number" step="0.1" value="2"></label>
-          <label><span class="en"># metrics</span><span class="sk"># metrík</span><input id="nm" type="number" value="1"></label>
+          <label><span class="en">how gameable is the metric?</span><span class="sk">aká gameovateľná je metrika?</span>
+            <select id="gamesel"><option value="0.5">hard to game</option><option value="1">somewhat</option><option value="2" selected>easy</option><option value="4">trivial</option></select></label>
+          <label><span class="en">how many independent metrics combined?</span><span class="sk">koľko nezávislých metrík spolu?</span><input id="nm" type="number" value="1"></label>
         </div></div>
-      <div class="fg"><h4><span class="en">Causal control &mdash; identified?</span><span class="sk">Kauzálna kontrola &mdash; identifikované?</span></h4>
+
+      <div class="fg"><h4><span class="en">5 · Are you controlling for the right things?</span><span class="sk">5 · Kontroluješ správne veci?</span></h4>
+        <p class="hlp"><span class="en">Causal/attribution &mdash; one variable you "control for". Adjusting for the wrong kind injects bias.</span><span class="sk">Kauzálne/atribúcia &mdash; jedna premenná, na ktorú "kontroluješ". Nesprávny druh vnáša skreslenie.</span></p>
         <div class="row">
-          <select id="role">
-            <option value="confounder">confounder (good)</option>
-            <option value="outcome_predictor">outcome predictor (good)</option>
-            <option value="collider" selected>collider (bad)</option>
-            <option value="mediator">mediator (bad)</option>
-            <option value="instrument">instrument (bad)</option>
+          <select id="role" style="width:100%">
+            <option value="confounder">a common cause of both (e.g. age) — good to control</option>
+            <option value="outcome_predictor">predicts the outcome only — good to control</option>
+            <option value="collider" selected>something BOTH affect (e.g. "saw the ad") — BAD</option>
+            <option value="mediator">a step on the path (e.g. "clicked") — BAD</option>
+            <option value="instrument">affects the cause only — BAD to control</option>
           </select>
-          <span style="font-family:var(--mono);font-size:11px;color:var(--faint)"><span class="en">role of a control you adjust for</span><span class="sk">rola kontroly, na ktorú adjustuješ</span></span>
         </div></div>
-      <button class="btn primary" style="width:100%;margin-top:16px" onclick="runAudit()"><span class="en">Run audit</span><span class="sk">Spusti audit</span></button>
+
+      <button class="btn primary" style="width:100%;margin-top:18px;font-size:14px;padding:14px" onclick="runAudit()"><span class="en">▶ Run my audit</span><span class="sk">▶ Spusti môj audit</span></button>
     </div>
     <div class="report" id="report"></div>
   </div>
