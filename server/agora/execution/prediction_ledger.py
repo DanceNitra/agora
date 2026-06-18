@@ -56,27 +56,57 @@ _METRIC_LABEL = {"hackernews_stories": "Hacker News stories", "github_repos": "G
                  "pubmed_papers": "PubMed papers"}
 
 
+def _window_count(metric: str, theme: str, days: int) -> int:
+    """Items created/published for `theme` in the trailing `days` window (a RATE, not a total)."""
+    from agora.execution.data_tool import (hackernews_window_count, github_window_count,
+                                           pubmed_window_count)
+    try:
+        if metric == "hackernews_stories":
+            return hackernews_window_count(theme, days)
+        if metric == "github_repos":
+            return github_window_count(theme, days)
+        if metric == "pubmed_papers":
+            return pubmed_window_count(theme, days)
+    except Exception:
+        pass
+    return 0
+
+
+def _windowed_baselines(theme: str, days: int) -> dict:
+    """Trailing-window counts so the forecast 'will the NEXT window beat the LAST' is genuinely ~50/50
+    (rate-of-attention / acceleration), not 'will a cumulative counter go up' (always yes). The chosen
+    metric is the most ACTIVE rate (so the forecast is non-degenerate)."""
+    from agora.execution.data_tool import (hackernews_window_count, github_window_count,
+                                           pubmed_window_count)
+    bl = {}
+    for m, fn in (("pubmed_papers", pubmed_window_count), ("github_repos", github_window_count),
+                  ("hackernews_stories", hackernews_window_count)):
+        try:
+            bl[m] = int(fn(theme, days) or 0)
+        except Exception:
+            bl[m] = 0
+    metric = max(bl, key=lambda k: bl[k]) if any(bl.values()) else "pubmed_papers"
+    return {"theme": theme, "metric": metric, "metric_label": f"{_METRIC_LABEL[metric]} ({days}d)",
+            "baseline": bl[metric], "all_baselines": bl, "mode": "rate", "window_days": days}
+
+
 async def make_prediction(theme: str, horizon_days: int = 14) -> dict:
-    """Record a falsifiable prediction: the current metric + a forecast of its direction."""
-    from agora.execution.data_tool import fetch_hackernews, fetch_github, fetch_pubmed
+    """Record a falsifiable RATE forecast: will the NEXT window's activity beat the LAST window's
+    (acceleration) — a genuinely ~50/50 question, not 'will a cumulative counter go up'."""
     from agora.execution.llm_client import call_llm
 
-    hn, gh, pm = (await asyncio.to_thread(fetch_hackernews, theme),
-                  await asyncio.to_thread(fetch_github, theme),
-                  await asyncio.to_thread(fetch_pubmed, theme))
-    baselines = {"hackernews_stories": int(hn.get("total_stories_ever", 0) or 0),
-                 "github_repos": int(gh.get("total_repos", 0) or 0),
-                 "pubmed_papers": int(pm.get("paper_count", 0) or 0)}
-    metric = max(baselines, key=lambda k: baselines[k])           # the strongest real-world signal
-    baseline = baselines[metric]
+    base = await asyncio.to_thread(_windowed_baselines, theme, horizon_days)
+    metric, baseline = base["metric"], base["baseline"]
 
     raw = await asyncio.to_thread(
         call_llm,
-        "You are a calibrated forecaster. Given a theme and its CURRENT real-world metric, predict how "
-        f"that metric will move over the next {horizon_days} days. Reply in EXACTLY this form:\n"
+        "You are a calibrated forecaster. A topic's RECENT ACTIVITY RATE is given. Predict whether the "
+        f"NEXT {horizon_days} days will have MORE (UP = accelerating) or FEWER (DOWN = decelerating) "
+        "than the last window — this is genuinely uncertain, so SPREAD your confidence (be near 50 when "
+        "unsure, high only when you have a real reason). Reply EXACTLY:\n"
         "DIRECTION: UP or DOWN or FLAT\nCONFIDENCE: <integer 0-100>\nWHY: <one sentence>",
-        f"THEME: {theme}\nMETRIC: {_METRIC_LABEL[metric]} = {baseline} now\n"
-        f"(other signals: {baselines})", "cheap", 0.3, 200) or ""
+        f"THEME: {theme}\nRATE: {base['metric_label']} = {baseline} in the last {horizon_days} days\n"
+        f"(other rates: {base['all_baselines']})", "cheap", 0.3, 200) or ""
     dm = re.search(r"DIRECTION:\s*(UP|DOWN|FLAT)", raw, re.I)
     cm = re.search(r"CONFIDENCE:\s*(\d+)", raw)
     wm = re.search(r"WHY:\s*(.+)", raw, re.DOTALL | re.I)
@@ -85,7 +115,8 @@ async def make_prediction(theme: str, horizon_days: int = 14) -> dict:
     why = (wm.group(1).strip()[:200] if wm else "")
 
     pred = {"id": uuid.uuid4().hex[:8], "theme": theme[:120], "metric": metric,
-            "metric_label": _METRIC_LABEL[metric], "baseline": baseline, "all_baselines": baselines,
+            "metric_label": base["metric_label"], "baseline": baseline,
+            "all_baselines": base["all_baselines"], "mode": "rate", "window_days": horizon_days,
             "direction": direction, "confidence": confidence, "why": why,
             "made_ts": time.time(), "resolve_ts": time.time() + horizon_days * 86400,
             "horizon_days": horizon_days, "status": "pending"}
@@ -133,15 +164,16 @@ async def run_tournament(theme: str, horizon_days: int = 14) -> dict:
     Stored as a single ledger record with per-agent calls; resolve_due scores each agent, and the
     dungeon blends each agent's hit-rate into its standing — reputation follows truth."""
     from agora.execution.llm_client import call_llm
-    base = await gather_prediction_baseline(theme)
+    base = await gather_prediction_baseline(theme, horizon_days)
 
     def _one_call(name: str, persona: str) -> dict | None:
         # one tiny labeled-text call per agent — flash returns EMPTY on anything bigger
         raw = call_llm(
-            f"You are {persona} Forecast the metric's move over {horizon_days} days. "
-            "Reply EXACTLY one line: DIRECTION CONFIDENCE  (e.g. 'UP 70'). "
-            "DIRECTION is UP, DOWN or FLAT. Nothing else.",
-            f"THEME: {theme}\nMETRIC: {base['metric_label']} = {base['baseline']} now",
+            f"You are {persona} A topic's activity in the LAST {horizon_days} days is given. Will the "
+            f"NEXT {horizon_days} days be HIGHER (UP=accelerating) or LOWER (DOWN=decelerating)? This is "
+            "genuinely uncertain — spread your confidence. Reply EXACTLY one line: DIRECTION CONFIDENCE "
+            "(e.g. 'UP 60'). DIRECTION is UP, DOWN or FLAT. Nothing else.",
+            f"THEME: {theme}\nRATE: {base['metric_label']} = {base['baseline']} in the last {horizon_days}d",
             "cheap", 0.6, 150) or ""        # >=120: flash spends tokens reasoning before output
         m = re.search(r"\b(UP|DOWN|FLAT)\b\s*(\d+)?", raw, re.I)
         if not m:
@@ -165,7 +197,8 @@ async def run_tournament(theme: str, horizon_days: int = 14) -> dict:
     sel = [c for c in calls if c["direction"] == chosen]
     pred = {"id": uuid.uuid4().hex[:8], "theme": theme[:120], "metric": base["metric"],
             "metric_label": base["metric_label"], "baseline": int(base["baseline"]),
-            "all_baselines": base["all_baselines"], "direction": chosen,
+            "all_baselines": base["all_baselines"], "mode": "rate", "window_days": horizon_days,
+            "direction": chosen,
             "confidence": round(sum(c["confidence"] for c in sel) / max(1, len(sel)), 2),
             "why": "tournament (calibration-weighted)", "by": "tournament", "calls": calls,
             "made_ts": time.time(), "resolve_ts": time.time() + horizon_days * 86400,
@@ -193,26 +226,10 @@ def agent_scores() -> dict:
     return out
 
 
-async def gather_prediction_baseline(theme: str) -> dict:
-    """The current real-world metrics for a theme WITHOUT the (weak) flash forecast — so Claude Opus
-    makes the reasoned prediction itself, for quality."""
-    from agora.execution.data_tool import fetch_hackernews, fetch_github, fetch_pubmed
-
-    def _safe(fetch):
-        # any single source may be transiently down (PubMed 500s happen) — degrade, don't fail
-        try:
-            return fetch(theme)
-        except Exception:
-            return {}
-    hn, gh, pm = (await asyncio.to_thread(_safe, fetch_hackernews),
-                  await asyncio.to_thread(_safe, fetch_github),
-                  await asyncio.to_thread(_safe, fetch_pubmed))
-    baselines = {"hackernews_stories": int(hn.get("total_stories_ever", 0) or 0),
-                 "github_repos": int(gh.get("total_repos", 0) or 0),
-                 "pubmed_papers": int(pm.get("paper_count", 0) or 0)}
-    metric = max(baselines, key=lambda k: baselines[k])
-    return {"theme": theme, "metric": metric, "metric_label": _METRIC_LABEL[metric],
-            "baseline": baselines[metric], "all_baselines": baselines}
+async def gather_prediction_baseline(theme: str, horizon_days: int = 14) -> dict:
+    """Trailing-window RATE baselines for a theme (so the forecast is acceleration — a ~50/50 question —
+    not the direction of a monotonic cumulative counter). Degrades gracefully per source."""
+    return await asyncio.to_thread(_windowed_baselines, theme, horizon_days)
 
 
 def record_prediction(theme: str, metric: str, baseline: int, direction: str,
@@ -244,7 +261,10 @@ async def resolve_due(force: bool = False) -> list:
             continue
         if not force and now < p.get("resolve_ts", 0):
             continue
-        new = await asyncio.to_thread(_metric_value, p["metric"], p["theme"])
+        if p.get("mode") == "rate":      # next-window rate vs the last-window baseline (acceleration)
+            new = await asyncio.to_thread(_window_count, p["metric"], p["theme"], p.get("horizon_days", 14))
+        else:                            # legacy cumulative-total predictions resolve unchanged
+            new = await asyncio.to_thread(_metric_value, p["metric"], p["theme"])
         base = p.get("baseline", 0)
         thresh = max(1, base * 0.05)
         actual = "UP" if new > base + thresh else ("DOWN" if new < base - thresh else "FLAT")

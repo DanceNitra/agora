@@ -116,6 +116,40 @@ def fetch_pubmed(query: str, **_) -> dict:
             "sample_pmids": er.get("idlist", [])[:3]}
 
 
+# ── Windowed RATE counts: items created/published in a trailing window (not the cumulative total). ──
+# These power rate-of-attention forecasts: "will the next N days beat the last N days" is a genuinely
+# two-sided (~50/50) question, unlike "will a cumulative counter go up" (always yes).
+def hackernews_window_count(query: str, days: int = 14, **_) -> int:
+    import time as _t
+    cut = int(_t.time()) - days * 86400
+    url = (f"https://hn.algolia.com/api/v1/search?query={urllib.parse.quote(query)}"
+           f"&tags=story&hitsPerPage=0&numericFilters=created_at_i>{cut}")
+    try:
+        return int(_get_json(url).get("nbHits", 0) or 0)
+    except Exception:
+        return 0
+
+
+def github_window_count(query: str, days: int = 14, **_) -> int:
+    import datetime as _dt
+    since = (_dt.date.today() - _dt.timedelta(days=days)).strftime("%Y-%m-%d")
+    url = (f"https://api.github.com/search/repositories?q={urllib.parse.quote(query)}"
+           f"+created:>{since}&per_page=1")
+    try:
+        return int(_get_json(url).get("total_count", 0) or 0)
+    except Exception:
+        return 0
+
+
+def pubmed_window_count(query: str, days: int = 14, **_) -> int:
+    url = (f"https://eutils.ncbi.nlm.nih.gov/entrez/eutils/esearch.fcgi?db=pubmed"
+           f"&term={urllib.parse.quote(query)}&retmode=json&retmax=0&datetype=pdat&reldate={days}")
+    try:
+        return int(_get_json(url).get("esearchresult", {}).get("count", 0) or 0)
+    except Exception:
+        return 0
+
+
 def fetch_restcountries(query: str, **_) -> dict:
     """Demographic/geographic facts about a country (population, region, area)."""
     try:
