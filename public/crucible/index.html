@@ -5,7 +5,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>The Crucible &middot; a machine that rebuilds claims in code &middot; Agora</title>
-<meta name="description" content="A public ledger of scientific and technical claims rebuilt as minimal computational models and tested in code: 22 reproduced, 2 failed, 4 honest passes. Every verdict ships runnable code and a measured number.">
+<meta name="description" content="A public ledger of scientific and technical claims rebuilt as minimal computational models and tested in code: 29 reproduced, 4 failed, 4 honest passes. Every verdict ships runnable code and a measured number.">
 <link rel="canonical" href="https://dancenitra.github.io/agora/public/crucible/">
 <meta property="og:type" content="website">
 <meta property="og:title" content="The Crucible — claims, rebuilt in code and tested">
@@ -170,8 +170,8 @@
   rarest export, published here), and <b>not computable</b> when there&rsquo;s no simulable core.
   Every verdict ships a measured number and the code that produced it.</p>
   <div class="tally">
-    <div class="t ok"><div class="num">22</div><div class="lbl">Reproduced</div></div>
-    <div class="t fail"><div class="num">2</div><div class="lbl">Failed</div></div>
+    <div class="t ok"><div class="num">29</div><div class="lbl">Reproduced</div></div>
+    <div class="t fail"><div class="num">4</div><div class="lbl">Failed</div></div>
     <div class="t"><div class="num">4</div><div class="lbl">Honest passes</div></div>
   </div>
   <div class="dataset">Open data &mdash; <a href="crucible.json">the full ledger as JSON &rarr;</a></div>
@@ -187,17 +187,107 @@
         <div class="fcol"><div class="flab">What we rebuilt</div><p>We rebuilt their exact estimator — P(hit | 3 prior hits) − P(hit | 3 prior misses), averaged per shooting record — and ran it on i.i.d. shooters with provably no hot hand.</p></div>
       </div>
       <div class="fverdict-block"><div class="flab">The verdict</div><p>On a no-hot-hand shooter the estimator does not read 0; it reads −7.9pp (t=−28 at n=100, growing to −17pp at streak length 4). This is the streak-selection bias of Miller &amp; Sanjurjo (2018): selecting shots that follow a streak inside a finite sequence is a biased sample. A GVT measurement of ~0 therefore implies a real hot hand of roughly +8.5pp. The famous fallacy was the analysis, not the players.</p></div>
-      <div class="ffoot"><a class="codelink" href="../../posts/deep-dive-hot-hand.html">The deep dive, with charts &rarr;</a>  <a class="codelink" href="https://github.com/DanceNitra/agora/blob/main/agora_output/lab/20260612-143839_gvt-1985-hot-hand-fallacy-streak-selection-bias-mi.py" target="_blank" rel="noopener">Read the runnable model &rarr;</a><span class="flabid">lab ebce40 &middot; 2026-06-12</span></div>
+      <div class="ffoot"><a class="codelink" href="../../posts/deep-dive-hot-hand.html">The deep dive, with charts &rarr;</a>  <span class="flabid">lab ebce40 &middot; 2026-06-12</span></div>
     </div>
   </section>
 <section class="ledger"><div class="wrap">
-  <div class="sechead"><h2>The ledger</h2><div class="sub">24 claims rebuilt &amp; tested &middot; newest first</div></div>
+  <div class="sechead"><h2>The ledger</h2><div class="sub">33 claims rebuilt &amp; tested &middot; newest first</div></div>
   <div class="filters">
     <button class="on" data-f="all">All</button>
     <button data-f="REPRODUCED">Reproduced</button>
     <button data-f="FAILED">Failed</button>
   </div>
   <div class="grid" id="grid">
+      <article class="card fail" data-v="FAILED" data-reveal>
+        <div class="crail"></div>
+        <div class="cbody">
+          <div class="chead"><span class="cv">FAILED</span>
+            <span class="cfield">Network economics</span></div>
+          <h3>Metcalfe&#x27;s Law (network value ∝ n²) is an equal-value artifact</h3>
+          <p class="cresult">The n² scaling holds only if every pairwise connection has equal value. Under realistic rank-declining connection value the network&#x27;s value scales as ~n·log n (fitted exponent 1.12, vs 2.00 for equal value; 1.33 for slow decay) — the famous quadratic over-states large-network value, matching Briscoe-Odlyzko-Tilly (2006) and Metcalfe&#x27;s own 2013 data-fit. A mechanism derivation, not a fit to proprietary network data.</p>
+          <div class="cfoot"><span class="cyear">Metcalfe&#x27;s Law · contested (Briscoe–Odlyzko–Tilly 2006)</span><a class="code" href="https://github.com/DanceNitra/agora/blob/main/agora_output/lab/20260618-022251_metcalfe-law-n2-vs-nlogn-replication.py" target="_blank" rel="noopener">runnable model &rarr;</a></div>
+        </div>
+      </article>
+      <article class="card fail" data-v="FAILED" data-reveal>
+        <div class="crail"></div>
+        <div class="cbody">
+          <div class="chead"><span class="cv">FAILED</span>
+            <span class="cfield">Collective intelligence</span></div>
+          <h3>…but &quot;diversity trumps ability&quot; is not a general law</h3>
+          <p class="cresult">Stress-test of the same claim in a DIFFERENT, faithful problem model (NK landscapes; paired and statistically powered): the best-ability group matches or slightly beats the random/diverse group at every difficulty level. So the Hong-Page advantage is real at the original parameters (companion card) but does NOT generalize — condition-specific, not a universal law, consistent with Thompson (2014). The effect is small; this refutes the universal claim, not the value of diversity in specific regimes.</p>
+          <div class="cfoot"><span class="cyear">Hong &amp; Page · 2004 (contested, Thompson 2014)</span><a class="code" href="https://github.com/DanceNitra/agora/blob/main/agora_output/lab/20260617-234958_hong-page-diversity-trumps-ability-replication.py" target="_blank" rel="noopener">runnable model &rarr;</a></div>
+        </div>
+      </article>
+      <article class="card ok" data-v="REPRODUCED" data-reveal>
+        <div class="crail"></div>
+        <div class="cbody">
+          <div class="chead"><span class="cv">REPRODUCED</span>
+            <span class="cfield"></span></div>
+          <h3>The survival probability of a branching process obeys finite-size scaling in the control p</h3>
+          <p class="cresult">Smallest Galton-Watson model (Poisson offspring), vectorized over 40k realizations. Critical eps=0: n*P_n -&gt; ~2 (Kolmogorov 2/sigma^2, sigma^2=1). Scaling collapse confirmed: n*P_n is a function of x=eps*n alone - within-x spread 0.116 vs a</p>
+          <div class="cfoot"><span class="cyear">Garcia-Millan, Font-Clos et al. 2015, &amp;quot;Fi</span><a class="code" href="https://github.com/DanceNitra/agora/blob/main/agora_output/lab/20260617-193907_branching-survival-finite-size-scaling.py" target="_blank" rel="noopener">runnable model &rarr;</a></div>
+        </div>
+      </article>
+      <article class="card ok" data-v="REPRODUCED" data-reveal>
+        <div class="crail"></div>
+        <div class="cbody">
+          <div class="chead"><span class="cv">REPRODUCED</span>
+            <span class="cfield"></span></div>
+          <h3>In the Erdos-Renyi graph G(N,p), the k-clique percolation transition occurs at p_c(k) = 1/</h3>
+          <p class="cresult">Smallest CPM model: enumerate k-cliques in G(N,p), union any sharing a (k-1)-clique, track largest community fraction R(p)=vertices_in_largest/N; empirical transition = p where R crosses half its max. Measured/formula ratio is near-CONSTANT</p>
+          <div class="cfoot"><span class="cyear">Derenyi, Palla &amp;amp; Vicsek 2005, &amp;#x27;Clique</span><a class="code" href="https://github.com/DanceNitra/agora/blob/main/agora_output/lab/20260617-102601_clique-percolation-threshold-dpv.py" target="_blank" rel="noopener">runnable model &rarr;</a></div>
+        </div>
+      </article>
+      <article class="card ok" data-v="REPRODUCED" data-reveal>
+        <div class="crail"></div>
+        <div class="cbody">
+          <div class="chead"><span class="cv">REPRODUCED</span>
+            <span class="cfield"></span></div>
+          <h3>The epidemic threshold of a network disappears (goes to 0 as N-&gt;infinity) when the degree-</h3>
+          <p class="cresult">Smallest model: HMF threshold lambda_c=&lt;k&gt;/&lt;k^2&gt; from sampled power-law degree sequences vs N. Measured lambda_c at N=1e3..1e6: gamma=2.3 shrinks x28.7, gamma=2.7 x3.6 (power-law vanishing); gamma=3.0 is MARGINAL - vanishes only logarithmic</p>
+          <div class="cfoot"><span class="cyear">Jones &amp;amp; Handcock 2003, &amp;#x27;An assessment</span><a class="code" href="https://github.com/DanceNitra/agora/blob/main/agora_output/lab/20260617-090921_scalefree-epidemic-threshold-vanishes-2to3.py" target="_blank" rel="noopener">runnable model &rarr;</a></div>
+        </div>
+      </article>
+      <article class="card ok" data-v="REPRODUCED" data-reveal>
+        <div class="crail"></div>
+        <div class="cbody">
+          <div class="chead"><span class="cv">REPRODUCED</span>
+            <span class="cfield"></span></div>
+          <h3>Whether a mouse geroprotector is recorded as extending lifespan can depend on the survival</h3>
+          <p class="cresult">Self-contained sim (weighted log-rank family, n=50/arm, 4000 trials). Age-localized true effect: log-rank power 32.5% vs Gehan 72.3%; the two tests give DISCORDANT verdicts on 39.9% of identical datasets. Under the null, best-of-3 tests inf</p>
+          <div class="cfoot"><span class="cyear">deep-research 2026-06-16 + Jiang et al., GeroS</span></div>
+        </div>
+      </article>
+      <article class="card ok" data-v="REPRODUCED" data-reveal>
+        <div class="crail"></div>
+        <div class="cbody">
+          <div class="chead"><span class="cv">REPRODUCED</span>
+            <span class="cfield"></span></div>
+          <h3>For BA networks (N=2,000, m=2), removing the top 10% of nodes by degree raises the bond-pe</h3>
+          <p class="cresult">Finite-size susceptibility-peak MC on the actual BA network reproduces it: intact p_c 0.170 (claimed 0.174), hub-removed 0.740 (claimed 0.776), both within ~5% over 6 replicas. Methodology lesson: the Molloy-Reed configuration-model estimat</p>
+          <div class="cfoot"><span class="cyear">Cachero Sanchez (2026), Simultaneous Degradati</span></div>
+        </div>
+      </article>
+      <article class="card ok" data-v="REPRODUCED" data-reveal>
+        <div class="crail"></div>
+        <div class="cbody">
+          <div class="chead"><span class="cv">REPRODUCED</span>
+            <span class="cfield"></span></div>
+          <h3>Recursively synthesized, self-referential systems improve performance (e.g. Promptbreeder,</h3>
+          <p class="cresult">Smallest model (lab a08981): a population recursively synthesizes candidates FROM ITSELF each generation; the pivotal variable is the SELECTION signal. With an EXTERNAL fitness anchor (as Promptbreeder has: real task accuracy), recursive sy</p>
+          <div class="cfoot"><span class="cyear">Promptbreeder (Fernando, Banarse, Michalewski,</span><a class="code" href="https://github.com/DanceNitra/agora/blob/main/agora_output/lab/20260615-033219_recursive-synthesis-external-anchor-boundary.py" target="_blank" rel="noopener">runnable model &rarr;</a></div>
+        </div>
+      </article>
+      <article class="card ok" data-v="REPRODUCED" data-reveal>
+        <div class="crail"></div>
+        <div class="cbody">
+          <div class="chead"><span class="cv">REPRODUCED</span>
+            <span class="cfield"></span></div>
+          <h3>Finite-size scaling exists for the survival probability of a branching process as a functi</h3>
+          <p class="cresult">Smallest model: exact survival curve of a Poisson(m) Galton-Watson process via PGF iteration q_n=exp(m(q_{n-1}-1)), S_n=1-q_n (zero Monte-Carlo noise). Three FSS signatures all confirmed: (1) exact critical amplitude n*S_n -&gt; 2 = 2/sigma^2 </p>
+          <div class="cfoot"><span class="cyear">Garcia-Millan, Font-Clos &amp;amp; Corral (2015), </span><a class="code" href="https://github.com/DanceNitra/agora/blob/main/agora_output/lab/20260614-215240_branching-process-finite-size-scaling.py" target="_blank" rel="noopener">runnable model &rarr;</a></div>
+        </div>
+      </article>
       <article class="card ok" data-v="REPRODUCED" data-reveal>
         <div class="crail"></div>
         <div class="cbody">
@@ -295,7 +385,7 @@
             <span class="cfield">Linguistics / statistics</span></div>
           <h3>A monkey at a typewriter really does produce Zipf&#x27;s law</h3>
           <p class="cresult">Random typing yields exponent −1.24; even a natural fine-structure discriminator fails at matched corpus size (1.8× &lt; 2× bar). The deflationary inference survives a severe test.</p>
-          <div class="cfoot"><span class="cyear">Miller · 1957</span><a class="code" href="https://github.com/DanceNitra/agora/blob/main/agora_output/lab/20260612-152425_miller-1957-random-typing-zipf-law-fine-structure-.py" target="_blank" rel="noopener">runnable model &rarr;</a></div>
+          <div class="cfoot"><span class="cyear">Miller · 1957</span></div>
         </div>
       </article>
       <article class="card ok" data-v="REPRODUCED" data-reveal>
@@ -305,17 +395,17 @@
             <span class="cfield">Finance</span></div>
           <h3>Thirty stocks diversify you — until the tails get heavy</h3>
           <p class="cresult">N=30 captures ~96% of achievable risk reduction at realistic tails — but only 85% of tail-risk reduction near infinite-variance tails, where ~100 stocks are needed.</p>
-          <div class="cfoot"><span class="cyear">Evans &amp; Archer · 1968</span><a class="code" href="https://github.com/DanceNitra/agora/blob/main/agora_output/lab/20260612-152357_evans-archer-30-stocks-diversification-vol-vs-tail.py" target="_blank" rel="noopener">runnable model &rarr;</a></div>
+          <div class="cfoot"><span class="cyear">Evans &amp; Archer · 1968</span></div>
         </div>
       </article>
       <article class="card ok" data-v="REPRODUCED" data-reveal>
         <div class="crail"></div>
         <div class="cbody">
           <div class="chead"><span class="cv">REPRODUCED</span>
-            <span class="cfield">Complexity / organizations</span></div>
-          <h3>Diversity beats ability — but only on rugged ground</h3>
-          <p class="cresult">Random team beats the best-individuals team by +1.65 (t=4.1) at the paper’s parameters — then reverses to −0.38 on a smoother landscape.</p>
-          <div class="cfoot"><span class="cyear">Hong &amp; Page · 2004</span><a class="code" href="https://github.com/DanceNitra/agora/blob/main/agora_output/lab/20260612-142343_hong-page-2004-diversity-trumps-ability-relay-sear.py" target="_blank" rel="noopener">runnable model &rarr;</a></div>
+            <span class="cfield">Collective intelligence</span></div>
+          <h3>Diversity beats ability — but only at Hong &amp; Page&#x27;s exact parameters</h3>
+          <p class="cresult">Reproduced in the authors&#x27; own relay model: a random team beats the best-individuals team by +1.65 (t=4.1) at the paper&#x27;s parameters — but the edge is fragile, reversing to −0.38 on a smoother landscape. See the companion FAILED card: the advantage does not survive a different, powered problem model.</p>
+          <div class="cfoot"><span class="cyear">Hong &amp; Page · 2004</span></div>
         </div>
       </article>
       <article class="card ok" data-v="REPRODUCED" data-reveal>
@@ -325,7 +415,7 @@
             <span class="cfield">Optimization</span></div>
           <h3>SGD finds a real minimum of a non-convex loss</h3>
           <p class="cresult">On a double-well non-convex objective, SGD localizes to a true minimum at the predicted convergence rate.</p>
-          <div class="cfoot"><span class="cyear">Fehrman, Gess &amp; Jentzen</span><a class="code" href="https://github.com/DanceNitra/agora/blob/main/agora_output/lab/20260612-025243_sgd-local-convergence-rate-on-a-non-convex-objecti.py" target="_blank" rel="noopener">runnable model &rarr;</a></div>
+          <div class="cfoot"><span class="cyear">Fehrman, Gess &amp; Jentzen</span></div>
         </div>
       </article>
       <article class="card ok" data-v="REPRODUCED" data-reveal>
@@ -335,7 +425,7 @@
             <span class="cfield">Statistical physics / neuroscience</span></div>
           <h3>Criticality leaves a power-law fingerprint</h3>
           <p class="cresult">At the critical point, fluctuations show power-law scaling and long-range correlations — the signature reproduces cleanly.</p>
-          <div class="cfoot"><span class="cyear">Kitzbichler, Smith, Rahn · 2009</span><a class="code" href="https://github.com/DanceNitra/agora/blob/main/agora_output/lab/20260611-211807_criticality-power-law-critical-branching-avalanche.py" target="_blank" rel="noopener">runnable model &rarr;</a></div>
+          <div class="cfoot"><span class="cyear">Kitzbichler, Smith, Rahn · 2009</span></div>
         </div>
       </article>
       <article class="card ok" data-v="REPRODUCED" data-reveal>
@@ -345,7 +435,7 @@
             <span class="cfield">Reinforcement learning</span></div>
           <h3>Sample-efficient policies need far fewer parameters</h3>
           <p class="cresult">In the low-data regime, online policies match performance with 2–10× fewer total coefficients.</p>
-          <div class="cfoot"><span class="cyear">Biologically-inspired architectures</span><a class="code" href="https://github.com/DanceNitra/agora/blob/main/agora_output/lab/20260611-193252_low-data-regime-2-10x-fewer-coefficients-little-no.py" target="_blank" rel="noopener">runnable model &rarr;</a></div>
+          <div class="cfoot"><span class="cyear">Biologically-inspired architectures</span></div>
         </div>
       </article>
       <article class="card ok" data-v="REPRODUCED" data-reveal>
@@ -355,7 +445,7 @@
             <span class="cfield">Network science / epidemiology</span></div>
           <h3>In scale-free networks, the epidemic threshold vanishes</h3>
           <p class="cresult">As N grows, λ_c = ⟨k⟩/⟨k²⟩ → 0: a hub-rich network has effectively no herd-immunity threshold.</p>
-          <div class="cfoot"><span class="cyear">Pastor-Satorras &amp; Vespignani</span><a class="code" href="https://github.com/DanceNitra/agora/blob/main/agora_output/lab/20260611-185703_epidemic-threshold-vanishes-in-scale-free-networks.py" target="_blank" rel="noopener">runnable model &rarr;</a></div>
+          <div class="cfoot"><span class="cyear">Pastor-Satorras &amp; Vespignani</span></div>
         </div>
       </article>
       <article class="card ok" data-v="REPRODUCED" data-reveal>
@@ -365,7 +455,7 @@
             <span class="cfield">Contextual bandits</span></div>
           <h3>LinUCB stays well inside its regret bound</h3>
           <p class="cresult">Measured regret tracks O(√Td·polylog) and sits far below linear-regret baselines.</p>
-          <div class="cfoot"><span class="cyear">Chu, Li, Reyzin &amp; Schapire · 2011</span><a class="code" href="https://github.com/DanceNitra/agora/blob/main/agora_output/lab/20260611-163346_linucb-sublinear-regret-bound-chu-et-al-2011.py" target="_blank" rel="noopener">runnable model &rarr;</a></div>
+          <div class="cfoot"><span class="cyear">Chu, Li, Reyzin &amp; Schapire · 2011</span></div>
         </div>
       </article>
       <article class="card ok" data-v="REPRODUCED" data-reveal>
@@ -375,7 +465,7 @@
             <span class="cfield">Optimization</span></div>
           <h3>SGD&#x27;s slow convergence is a variance floor</h3>
           <p class="cresult">Constant-step SGD stalls at a noise floor; variance-reduced methods keep converging — the slowdown is variance, not curvature.</p>
-          <div class="cfoot"><span class="cyear">Johnson &amp; Zhang · 2013</span><a class="code" href="https://github.com/DanceNitra/agora/blob/main/agora_output/lab/20260611-151308_sgd-variance-floor-vs-gd-svrg-johnson-zhang-2013.py" target="_blank" rel="noopener">runnable model &rarr;</a></div>
+          <div class="cfoot"><span class="cyear">Johnson &amp; Zhang · 2013</span></div>
         </div>
       </article>
       <article class="card ok" data-v="REPRODUCED" data-reveal>
@@ -385,7 +475,7 @@
             <span class="cfield">Stochastic processes</span></div>
           <h3>Branching survival collapses onto one curve</h3>
           <p class="cresult">Survival probability across sizes collapses onto a single curve in the scaling variable (m−1)·n.</p>
-          <div class="cfoot"><span class="cyear">Finite-size scaling</span><a class="code" href="https://github.com/DanceNitra/agora/blob/main/agora_output/lab/20260611-123757_branching-process-survival-probability-finite-size.py" target="_blank" rel="noopener">runnable model &rarr;</a></div>
+          <div class="cfoot"><span class="cyear">Finite-size scaling</span></div>
         </div>
       </article>
       <article class="card ok" data-v="REPRODUCED" data-reveal>
@@ -395,7 +485,7 @@
             <span class="cfield">Network science</span></div>
           <h3>Pulling the hubs shatters the network</h3>
           <p class="cresult">Removing the top 10% of nodes by degree multiplies the bond-percolation threshold several-fold (BA, N=2000).</p>
-          <div class="cfoot"><span class="cyear">Percolation &amp; cascade robustness</span><a class="code" href="https://github.com/DanceNitra/agora/blob/main/agora_output/lab/20260611-112343_ba-targeted-hub-removal-vs-bond-percolation-thresh.py" target="_blank" rel="noopener">runnable model &rarr;</a></div>
+          <div class="cfoot"><span class="cyear">Percolation &amp; cascade robustness</span></div>
         </div>
       </article>
       <article class="card ok" data-v="REPRODUCED" data-reveal>
@@ -405,7 +495,7 @@
             <span class="cfield">Economics of technology</span></div>
           <h3>IT pays off only with organizational change</h3>
           <p class="cresult">Organizational investment, not IT spend alone, drives the return — omitting it inflates the estimated payoff up to 2×.</p>
-          <div class="cfoot"><span class="cyear">Brynjolfsson &amp; Hitt · 2000</span><a class="code" href="https://github.com/DanceNitra/agora/blob/main/agora_output/lab/20260611-102502_brynjolfsson-hitt-2000-it-org-complementarity-repl.py" target="_blank" rel="noopener">runnable model &rarr;</a></div>
+          <div class="cfoot"><span class="cyear">Brynjolfsson &amp; Hitt · 2000</span></div>
         </div>
       </article>
       <article class="card ok" data-v="REPRODUCED" data-reveal>
@@ -415,7 +505,7 @@
             <span class="cfield">Machine learning / NLP</span></div>
           <h3>A simple model beats the fancy one on KB completion</h3>
           <p class="cresult">An observed-features model matches or beats latent-feature models on knowledge-base completion.</p>
-          <div class="cfoot"><span class="cyear">Toutanova &amp; Chen · 2015</span><a class="code" href="https://github.com/DanceNitra/agora/blob/main/agora_output/lab/20260611-082402_replication-toutanova-chen-2015-observed-features-.py" target="_blank" rel="noopener">runnable model &rarr;</a></div>
+          <div class="cfoot"><span class="cyear">Toutanova &amp; Chen · 2015</span></div>
         </div>
       </article>
       <article class="card ok" data-v="REPRODUCED" data-reveal>
@@ -425,7 +515,7 @@
             <span class="cfield">Non-equilibrium physics</span></div>
           <h3>Heavy-tailed waiting times bend the phase transition</h3>
           <p class="cresult">Non-Markovian spreading with t^(−1−μ) waiting times produces a genuine non-equilibrium phase transition.</p>
-          <div class="cfoot"><span class="cyear">Barato &amp; Hinrichsen · 2009</span><a class="code" href="https://github.com/DanceNitra/agora/blob/main/agora_output/lab/20260611-053533_replication-barato-hinrichsen-non-markovian-spread.py" target="_blank" rel="noopener">runnable model &rarr;</a></div>
+          <div class="cfoot"><span class="cyear">Barato &amp; Hinrichsen · 2009</span></div>
         </div>
       </article>
   </div>
@@ -465,7 +555,7 @@
 
 <footer><div class="wrap">
   <span>Agora &mdash; autonomous research OS &middot; The Crucible</span>
-  <span>updated 2026-06-14 &middot; <a href="https://github.com/DanceNitra/agora" target="_blank" rel="noopener">source</a></span>
+  <span>updated 2026-06-18 &middot; <a href="https://github.com/DanceNitra/agora" target="_blank" rel="noopener">source</a></span>
 </div></footer>
 
 <script>

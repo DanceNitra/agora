@@ -1,13 +1,148 @@
 {
  "name": "The Crucible — machine replication ledger",
  "description": "Scientific and technical claims rebuilt as minimal computational models and tested. REPRODUCED = the mechanism holds in a minimal model; FAILED = it does not; NOT_COMPUTABLE = no simulable core (an honest pass).",
- "generated": "2026-06-14",
+ "generated": "2026-06-18",
  "counts": {
-  "REPRODUCED": 22,
-  "FAILED": 2,
-  "NOT_COMPUTABLE": 7
+  "REPRODUCED": 29,
+  "FAILED": 4,
+  "NOT_COMPUTABLE": 13
  },
  "entries": [
+  {
+   "claim": "Metcalfe's Law: the value of a communications network scales as n^2 (the number of possible pairwise connections)",
+   "source": "Metcalfe's Law (folklore/Gilder 1993); contested by Briscoe, Odlyzko & Tilly (2006), 'Metcalfe's Law is Wrong' (IEEE Spectrum), and Metcalfe (2013) Facebook dat",
+   "verdict": "FAILED",
+   "note": "Strong n^2 claim FAILS. Fitting alpha in V ~ n^alpha: the n^2 holds ONLY under the (unrealistic) assumption that every pairwise connection has EQUAL value (alpha=2.00). Under realistic rank-declining connection value (Zipf 1/k, the Briscoe-",
+   "lab_id": "b790af",
+   "code": "https://github.com/DanceNitra/agora/blob/main/agora_output/lab/20260618-022251_metcalfe-law-n2-vs-nlogn-replication.py",
+   "date": "2026-06-18"
+  },
+  {
+   "claim": "Diversity trumps ability: a random/diverse group of problem solvers outperforms (>=) a group of the best individual solvers (Hong & Page 2004 PNAS)",
+   "source": "Hong & Page (2004), Groups of diverse problem solvers can outperform groups of high-ability problem solvers, PNAS 101(46)",
+   "verdict": "FAILED",
+   "note": "STRONG claim (random>=best) NOT reproduced in a faithful, paired, statistically-powered minimal model (n=800 ring, pool=120, group=10, random group averaged over 5 draws, 25 landscapes). Random-minus-best is consistently NEGATIVE across heu",
+   "lab_id": "b56ae0",
+   "code": "https://github.com/DanceNitra/agora/blob/main/agora_output/lab/20260617-234958_hong-page-diversity-trumps-ability-replication.py",
+   "date": "2026-06-17"
+  },
+  {
+   "claim": "Compactness and geometric stability conjectures for scalar curvature and convergence (Sormani et al., IAS 2018 workshop)",
+   "source": "Conjectures on Convergence and Scalar Curvature (Sormani et al., 2021)",
+   "verdict": "NOT_COMPUTABLE",
+   "note": "Open conjectures in geometric analysis (intrinsic-flat / Gromov-Hausdorff convergence under scalar-curvature bounds). No finite computational mechanism to reduce to a smallest model - these are deep manifold-convergence conjectures, not a s",
+   "lab_id": "",
+   "code": "",
+   "date": "2026-06-17"
+  },
+  {
+   "claim": "The survival probability of a branching process obeys finite-size scaling in the control parameter (offspring mean m=1+eps) and the max generations n: P_n(eps) ~ (1/n)*F(eps*n).",
+   "source": "Garcia-Millan, Font-Clos et al. 2015, \"Finite-size scaling of survival probability in branching processes\"",
+   "verdict": "REPRODUCED",
+   "note": "Smallest Galton-Watson model (Poisson offspring), vectorized over 40k realizations. Critical eps=0: n*P_n -> ~2 (Kolmogorov 2/sigma^2, sigma^2=1). Scaling collapse confirmed: n*P_n is a function of x=eps*n alone - within-x spread 0.116 vs a",
+   "lab_id": "32d07b",
+   "code": "https://github.com/DanceNitra/agora/blob/main/agora_output/lab/20260617-193907_branching-survival-finite-size-scaling.py",
+   "date": "2026-06-17"
+  },
+  {
+   "claim": "In the Erdos-Renyi graph G(N,p), the k-clique percolation transition occurs at p_c(k) = 1/[(k-1)N]^(1/(k-1)).",
+   "source": "Derenyi, Palla & Vicsek 2005, 'Clique Percolation in Random Networks' (PRL 94, 160202)",
+   "verdict": "REPRODUCED",
+   "note": "Smallest CPM model: enumerate k-cliques in G(N,p), union any sharing a (k-1)-clique, track largest community fraction R(p)=vertices_in_largest/N; empirical transition = p where R crosses half its max. Measured/formula ratio is near-CONSTANT",
+   "lab_id": "aa120e",
+   "code": "https://github.com/DanceNitra/agora/blob/main/agora_output/lab/20260617-102601_clique-percolation-threshold-dpv.py",
+   "date": "2026-06-17"
+  },
+  {
+   "claim": "The epidemic threshold of a network disappears (goes to 0 as N->infinity) when the degree-distribution scaling exponent rho is in 2 < rho <= 3.",
+   "source": "Jones & Handcock 2003, 'An assessment of preferential attachment as a mechanism for human sexual network formation' (after Pastor-Satorras & Vespignani 2001)",
+   "verdict": "REPRODUCED",
+   "note": "Smallest model: HMF threshold lambda_c=<k>/<k^2> from sampled power-law degree sequences vs N. Measured lambda_c at N=1e3..1e6: gamma=2.3 shrinks x28.7, gamma=2.7 x3.6 (power-law vanishing); gamma=3.0 is MARGINAL - vanishes only logarithmic",
+   "lab_id": "1f04d5",
+   "code": "https://github.com/DanceNitra/agora/blob/main/agora_output/lab/20260617-090921_scalefree-epidemic-threshold-vanishes-2to3.py",
+   "date": "2026-06-17"
+  },
+  {
+   "claim": "Whether a mouse geroprotector is recorded as extending lifespan can depend on the survival statistic chosen (log-rank vs Gehan-Wilcoxon); and reporting the best of several survival tests inflates the ",
+   "source": "deep-research 2026-06-16 + Jiang et al., GeroScience 2024 (Gehan reanalysis of NIA ITP data)",
+   "verdict": "REPRODUCED",
+   "note": "Self-contained sim (weighted log-rank family, n=50/arm, 4000 trials). Age-localized true effect: log-rank power 32.5% vs Gehan 72.3%; the two tests give DISCORDANT verdicts on 39.9% of identical datasets. Under the null, best-of-3 tests inf",
+   "lab_id": "20260616-ger",
+   "code": "",
+   "date": "2026-06-16"
+  },
+  {
+   "claim": "Specimens were loaded with low-amplitude cyclic torque to analyze deformation in the small strain range (0.001-0.01%).",
+   "source": "Optical Flow Method for Measuring Deformation of Soil Specimen Subjected to Torsional Shear (Srokosz, Bujko, Bochenska)",
+   "verdict": "NOT_COMPUTABLE",
+   "note": "Not a falsifiable claim with a result - it is a methods sentence describing a physical geotechnical experiment (optical-flow measurement of a soil specimen under cyclic torsional shear). Off-domain (soil mechanics, not our frontier), no res",
+   "lab_id": "",
+   "code": "",
+   "date": "2026-06-16"
+  },
+  {
+   "claim": "For BA networks (N=2,000, m=2), removing the top 10% of nodes by degree raises the bond-percolation threshold from p_c=0.174 to 0.776.",
+   "source": "Cachero Sanchez (2026), Simultaneous Degradation of Percolation and Cascade Robustness Under Targeted Hub Removal",
+   "verdict": "REPRODUCED",
+   "note": "Finite-size susceptibility-peak MC on the actual BA network reproduces it: intact p_c 0.170 (claimed 0.174), hub-removed 0.740 (claimed 0.776), both within ~5% over 6 replicas. Methodology lesson: the Molloy-Reed configuration-model estimat",
+   "lab_id": "20260616-per",
+   "code": "",
+   "date": "2026-06-16"
+  },
+  {
+   "claim": "Cohen's benchmarks (r=.10/.30/.50, d=.20/.50/.80) are used to interpret observed effect sizes; in gerontology observed effects fall below them, so the benchmarks are miscalibrated (Brydges 2019).",
+   "source": "Effect Size Guidelines, Sample Size Calculations, and Statistical Power in Gerontology (Brydges, 2019)",
+   "verdict": "NOT_COMPUTABLE",
+   "note": "Cohen's cutoffs are conventions, not empirical predictions, so they cannot be reproduced. Brydges' substantive claim (observed gerontology effect sizes fall below the benchmarks) is an empirical distributional claim requiring his meta-analy",
+   "lab_id": "",
+   "code": "",
+   "date": "2026-06-16"
+  },
+  {
+   "claim": "Deep networks have enabled RL to scale to more complex domains, but these methods typically require large quantities of training data.",
+   "source": "Sample-Efficient RL with Maximum Entropy Mellowmax Episodic Control (Sarrico, Arulkumaran, Agostinelli et al.)",
+   "verdict": "NOT_COMPUTABLE",
+   "note": "Extracted sentence is a qualitative background premise (deep model-free RL is sample-inefficient) = a textbook fact, no crisp falsifiable mechanism; modelling it would re-derive known sample-inefficiency. The papers real contribution (Mello",
+   "lab_id": "",
+   "code": "",
+   "date": "2026-06-15"
+  },
+  {
+   "claim": "In general, critical systems are associated with fractal / power-law behaviour",
+   "source": "(general statistical-physics statement)",
+   "verdict": "NOT_COMPUTABLE",
+   "note": "Too general to replicate: no single specific quantitative claim with a computable mechanism, and criticality<->scale-invariance/power-laws is foundational textbook physics where FAILED is NOT a live possibility - reproducing a known critica",
+   "lab_id": "",
+   "code": "",
+   "date": "2026-06-15"
+  },
+  {
+   "claim": "Recursively synthesized, self-referential systems improve performance (e.g. Promptbreeder, Fernando et al. 2023: ~15pct few-shot gain via self-referential prompt evolution).",
+   "source": "Promptbreeder (Fernando, Banarse, Michalewski, Osindero, Rocktaschel, 2023, arXiv:2309.16797)",
+   "verdict": "REPRODUCED",
+   "note": "Smallest model (lab a08981): a population recursively synthesizes candidates FROM ITSELF each generation; the pivotal variable is the SELECTION signal. With an EXTERNAL fitness anchor (as Promptbreeder has: real task accuracy), recursive sy",
+   "lab_id": "a08981",
+   "code": "https://github.com/DanceNitra/agora/blob/main/agora_output/lab/20260615-033219_recursive-synthesis-external-anchor-boundary.py",
+   "date": "2026-06-15"
+  },
+  {
+   "claim": "Compactness and geometric stability conjectures for scalar curvature convergence (intrinsic flat / GH convergence of Riemannian manifolds)",
+   "source": "Sormani et al., Conjectures on Convergence and Scalar Curvature (2021, arXiv:2103.10093)",
+   "verdict": "NOT_COMPUTABLE",
+   "note": "A survey of OPEN conjectures in geometric analysis (convergence of Riemannian manifolds under scalar-curvature bounds, intrinsic flat distance). No single claim with a finite computable mechanism to model; the content is conjectural/abstrac",
+   "lab_id": "",
+   "code": "",
+   "date": "2026-06-14"
+  },
+  {
+   "claim": "Finite-size scaling exists for the survival probability of a branching process as a function of the control parameter (m-1) and the maximum number of generations n: S_n ~ n^-1 G((m-1)*n).",
+   "source": "Garcia-Millan, Font-Clos & Corral (2015), Finite-size scaling of survival probability in branching processes (arXiv:1508.01515 / Phys. Rev. E 91, 042122).",
+   "verdict": "REPRODUCED",
+   "note": "Smallest model: exact survival curve of a Poisson(m) Galton-Watson process via PGF iteration q_n=exp(m(q_{n-1}-1)), S_n=1-q_n (zero Monte-Carlo noise). Three FSS signatures all confirmed: (1) exact critical amplitude n*S_n -> 2 = 2/sigma^2 ",
+   "lab_id": "816fdd",
+   "code": "https://github.com/DanceNitra/agora/blob/main/agora_output/lab/20260614-215240_branching-process-finite-size-scaling.py",
+   "date": "2026-06-14"
+  },
   {
    "claim": "In DiD with FEW treated units and spatially/serially-correlated errors, standard DiD inference under-covers (invalid CIs) while synthetic control is materially better when parallel trends ~holds",
    "source": "Alvarez & Ferman (2020)",
@@ -104,7 +239,7 @@
    "verdict": "REPRODUCED",
    "note": "Random-typing corpus (443k words): rank-frequency exponent -1.24, an approximate power law - the math reproduces. Severe test of a proposed counter (staircase fine-structure discriminator, tie fraction of adjacent ranks): 0.89 vs 0.48 at ma",
    "lab_id": "4779c1",
-   "code": "https://github.com/DanceNitra/agora/blob/main/agora_output/lab/20260612-152425_miller-1957-random-typing-zipf-law-fine-structure-.py",
+   "code": "",
    "date": "2026-06-12"
   },
   {
@@ -113,7 +248,7 @@
    "verdict": "REPRODUCED",
    "note": "Holds at realistic tails: N=30 captures 95.6-96.9% of achievable vol AND ES99 reduction (normal and t2.5 idio + 1-factor). MEASURED BOUNDARY: near infinite-variance idio tails (t1.8) the canon breaks - only 85.4% of tail-risk reduction capt",
    "lab_id": "7656de",
-   "code": "https://github.com/DanceNitra/agora/blob/main/agora_output/lab/20260612-152357_evans-archer-30-stocks-diversification-vol-vs-tail.py",
+   "code": "",
    "date": "2026-06-12"
   },
   {
@@ -131,7 +266,7 @@
    "verdict": "FAILED",
    "note": "The canonical method manufactures its own conclusion. An iid shooter with NO hot hand shows P(hit|3H)-P(hit|3M) = -7.9pp (t=-28) under GVT estimator (n=100) - the streak-selection bias of Miller & Sanjurjo (2018). Bias grows to -17pp at k=4",
    "lab_id": "ebce40",
-   "code": "https://github.com/DanceNitra/agora/blob/main/agora_output/lab/20260612-143839_gvt-1985-hot-hand-fallacy-streak-selection-bias-mi.py",
+   "code": "",
    "date": "2026-06-12"
   },
   {
@@ -140,7 +275,7 @@
    "verdict": "REPRODUCED",
    "note": "Reproduced at paper params: random beats best by +1.65 (t=4.1). But the effect is FRAGILE, as critics argued: it shrinks with a narrower heuristic pool (l=6: +0.90) and REVERSES on smoothed landscapes (-0.38, ability wins) - diversity trump",
    "lab_id": "a3ae64",
-   "code": "https://github.com/DanceNitra/agora/blob/main/agora_output/lab/20260612-142343_hong-page-2004-diversity-trumps-ability-relay-sear.py",
+   "code": "",
    "date": "2026-06-12"
   },
   {
@@ -149,7 +284,7 @@
    "verdict": "REPRODUCED",
    "note": "Double-well (x^2-1)^2 (non-convex, minima +-1, max at 0). SGD noisy gradient, step c/(t+t0) started in the x*=1 basin: E[(x-1)^2] decays with fitted exponent -1.00 = theory O(1/t); constant step stalls at a variance floor. Local convergence",
    "lab_id": "e0a43a",
-   "code": "https://github.com/DanceNitra/agora/blob/main/agora_output/lab/20260612-025243_sgd-local-convergence-rate-on-a-non-convex-objecti.py",
+   "code": "",
    "date": "2026-06-12"
   },
   {
@@ -167,7 +302,7 @@
    "verdict": "REPRODUCED",
    "note": "Smallest model = critical branching process (neuronal avalanches). At sigma=1 avalanche-size P(s)~s^-1.42 (mean-field 3/2); off-critical the power law vanishes (sub: cutoff tau 2.45; super: 9.4pct runaway). Mean size diverges 6.7->1586 appr",
    "lab_id": "73f90e",
-   "code": "https://github.com/DanceNitra/agora/blob/main/agora_output/lab/20260611-211807_criticality-power-law-critical-branching-avalanche.py",
+   "code": "",
    "date": "2026-06-11"
   },
   {
@@ -176,7 +311,7 @@
    "verdict": "REPRODUCED",
    "note": "Smallest model: supervised low-data fit (16 training points, smooth target, polynomial basis). Test MSE by coefficient count K: K=6 -> 0.015 (best); K=14 -> 3009 (catastrophic overfit). Shrinking from K=14 to K=6 = 2.3x fewer coefficients a",
    "lab_id": "7bbc76",
-   "code": "https://github.com/DanceNitra/agora/blob/main/agora_output/lab/20260611-193252_low-data-regime-2-10x-fewer-coefficients-little-no.py",
+   "code": "",
    "date": "2026-06-11"
   },
   {
@@ -185,7 +320,7 @@
    "verdict": "REPRODUCED",
    "note": "Smallest model: heterogeneous mean-field SIS threshold lambda_c=<k>/<k^2>, BA (scale-free) vs ER (homogeneous) at mean degree ~4. BA <k^2> grows with N (45->63 over N=500->20000) so lambda_c shrinks 0.088->0.064, heading to 0 = threshold VA",
    "lab_id": "ef9fe3",
-   "code": "https://github.com/DanceNitra/agora/blob/main/agora_output/lab/20260611-185703_epidemic-threshold-vanishes-in-scale-free-networks.py",
+   "code": "",
    "date": "2026-06-11"
   },
   {
@@ -194,7 +329,7 @@
    "verdict": "REPRODUCED",
    "note": "Smallest model: LinUCB on a d=6, K=12 linear contextual bandit, reward = x.theta*+noise. Cumulative regret stays ~flat (1.5->1.8 from T=500->4000, log-log exponent 0.09) - clearly SUBLINEAR and far inside the O(sqrt(dT))~155 bound at T=4000",
    "lab_id": "3f716e",
-   "code": "https://github.com/DanceNitra/agora/blob/main/agora_output/lab/20260611-163346_linucb-sublinear-regret-bound-chu-et-al-2011.py",
+   "code": "",
    "date": "2026-06-11"
   },
   {
@@ -203,7 +338,7 @@
    "verdict": "REPRODUCED",
    "note": "Smallest model: minimize a strongly-convex least-squares (scalar w) with label noise. Constant-step SGD stalls at a variance FLOOR (suboptimality ~1.9e-3, never reaches the optimum); full-gradient GD and variance-reduced SVRG both drive sub",
    "lab_id": "437d20",
-   "code": "https://github.com/DanceNitra/agora/blob/main/agora_output/lab/20260611-151308_sgd-variance-floor-vs-gd-svrg-johnson-zhang-2013.py",
+   "code": "",
    "date": "2026-06-11"
   },
   {
@@ -212,7 +347,7 @@
    "verdict": "REPRODUCED",
    "note": "Smallest model: Galton-Watson with Poisson(m) offspring, survival = population>0 at gen n. Both predictions reproduce: (a) at criticality m=1, n*P_n converges to ~1.9 (theory 2/sigma^2=2, sigma^2=1) -> P_n~C/n, exponent -1; (b) finite-size-",
    "lab_id": "d6e8d6",
-   "code": "https://github.com/DanceNitra/agora/blob/main/agora_output/lab/20260611-123757_branching-process-survival-probability-finite-size.py",
+   "code": "",
    "date": "2026-06-11"
   },
   {
@@ -221,7 +356,7 @@
    "verdict": "REPRODUCED",
    "note": "Smallest model: BA(N=2000,m=2), Molloy-Reed p_c=<k>/(<k^2>-<k>) on the empirical degree sequence + a direct bond-percolation sweep (union-find, giant>50%). MECHANISM REPRODUCED: targeted top-10% hub removal raises the threshold several-fold",
    "lab_id": "e52111",
-   "code": "https://github.com/DanceNitra/agora/blob/main/agora_output/lab/20260611-112343_ba-targeted-hub-removal-vs-bond-percolation-thresh.py",
+   "code": "",
    "date": "2026-06-11"
   },
   {
@@ -230,7 +365,7 @@
    "verdict": "REPRODUCED",
    "note": "Smallest model: logY=a*IT+b*ORG+g*(IT*ORG). Recovered g~0.06; omitting org capital inflates apparent IT return, bias growing with co-investment corr (naive b_IT=0.21 vs true 0.12 at rho=0.8). Reproduces their methodological warning. Falsifi",
    "lab_id": "8256e7",
-   "code": "https://github.com/DanceNitra/agora/blob/main/agora_output/lab/20260611-102502_brynjolfsson-hitt-2000-it-org-complementarity-repl.py",
+   "code": "",
    "date": "2026-06-11"
   },
   {
@@ -239,7 +374,7 @@
    "verdict": "REPRODUCED",
    "note": "On a synthetic KB with planted compositional structure (target relation = r0->r1 path), the OBSERVED-features model (2-hop path + degree) scored AUC 0.966 vs the LATENT SVD model 0.749 (+0.216). Path features capture composition that low-ra",
    "lab_id": "43c007",
-   "code": "https://github.com/DanceNitra/agora/blob/main/agora_output/lab/20260611-082402_replication-toutanova-chen-2015-observed-features-.py",
+   "code": "",
    "date": "2026-06-11"
   },
   {
@@ -248,7 +383,7 @@
    "verdict": "REPRODUCED",
    "note": "Minimal non-Markovian branching simulation (lab 37ad2a) reproduces the absorbing-state transition: survival ~0 for branching ratio lambda<1, rises for lambda>1, threshold lambda_c~1 IDENTICAL for m=0.5 and m=1.5. The heavy tail sets finite-",
    "lab_id": "37ad2a",
-   "code": "https://github.com/DanceNitra/agora/blob/main/agora_output/lab/20260611-053533_replication-barato-hinrichsen-non-markovian-spread.py",
+   "code": "",
    "date": "2026-06-11"
   },
   {
