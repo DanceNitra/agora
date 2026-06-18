@@ -934,6 +934,24 @@ async def brain_self_experiment():
     return {"status": "ok", "report": format_self_experiment(), **r}
 
 
+@router.post("/brain/ews")
+async def brain_ews(request: Request):
+    """CRITICAL-TRANSITION EARLY-WARNING ENGINE (capstone) — score a supplied time series for an
+    approaching fold/bifurcation (critical slowing down) AND report the engine's own trustworthiness
+    (fold-like = in-scope/trust; rising-variance-without-slowing = volatility/noise regime = out of
+    scope). Body: {series: [float, ...], win?: int}."""
+    import asyncio as _aio
+    from agora.execution.ews import assess, format_ews
+    try:
+        body = await request.json()
+    except Exception:
+        body = {}
+    series = body.get("series") or []
+    win = int(body.get("win") or 0)
+    a = await _aio.to_thread(assess, series, win)
+    return {"status": "ok", "report": format_ews(a), **a}
+
+
 @router.get("/brain/self-tipping")
 async def brain_self_tipping():
     """CONSENSUS LOCK-IN GUARD — Agora checked by its own minority-tipping / Grounding-Coupling law:
