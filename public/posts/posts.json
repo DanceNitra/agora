@@ -1,5 +1,19 @@
 [
  {
+  "slug": "robustness-checks-arent-ritual---theyre-a-measurable-filter-",
+  "title": "Robustness checks aren't ritual - they're a measurable filter (if the tests are independent)",
+  "title_sk": "Robustness checks aren't ritual - they're a measurable filter (if the tests are independent)",
+  "desc": "In causal inference you can never prove an effect is real. You can only subject it to severe tests - placebo-in-time, placebo-in-space, leave-one-out, pre-trend checks - and trust an estimate a little",
+  "desc_sk": "In causal inference you can never prove an effect is real. You can only subject it to severe tests - placebo-in-time, placebo-in-space, leave-one-out, pre-trend checks - and trust an estimate a little",
+  "date": "2026-06-18",
+  "tags": "Research",
+  "tags_sk": "Research",
+  "kicker": "Research",
+  "kicker_sk": "Research",
+  "read": 2,
+  "bilingual": false
+ },
+ {
   "slug": "the-most-confident-systems-are-the-least-grounded",
   "title": "The most confident systems are the least grounded",
   "title_sk": "Najistejšie systémy sú najmenej ukotvené",
