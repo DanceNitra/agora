@@ -1759,6 +1759,37 @@ async def brain_press():
     return {"status": "ok", "report": format_press(), "items": _load()[-10:]}
 
 
+@router.get("/brain/distribution/inputs")
+async def brain_distribution_inputs(n: int = 6):
+    """THE DISTRIBUTION DESK — our strongest public posts matched to venues where the
+    audience already gathers. Raw material for Claude to draft a venue-tailored share."""
+    import asyncio as _aio
+    from agora.execution.distribution import distribution_inputs
+    return await _aio.to_thread(distribution_inputs, n)
+
+
+@router.post("/brain/distribution/draft")
+async def brain_distribution_draft(request: Request):
+    """Store Claude's venue-tailored share and propose the GATED post. Nothing leaves the
+    machine: on approval the owner gets a prefilled submit URL for the final one click."""
+    from agora.execution.distribution import draft_distribution
+    b = await request.json()
+    slug = (b.get("slug") or "").strip()
+    venue = (b.get("venue") or "").strip()
+    title = (b.get("title") or "").strip()
+    pitch = (b.get("pitch") or "").strip()
+    if not slug or not venue or len(pitch) < 20:
+        return {"status": "too_short"}
+    rec = draft_distribution(slug, venue, title, pitch,
+                             url=(b.get("url") or "").strip(), body=(b.get("body") or "").strip())
+    if rec.get("error"):
+        return {"status": "error", "error": rec["error"]}
+    await _send_telegram(f"📣 Distribution proposal `{rec['id']}`: share to *{rec['payload']['venue_name']}*\n"
+                         f"*{title[:80]}*\n_{pitch[:160]}…_\n"
+                         f"Reply `approve {rec['id']}` or `reject {rec['id']}`.")
+    return {"status": "proposed", "action": rec}
+
+
 @router.get("/brain/roadmap-inputs")
 async def brain_roadmap_inputs():
     """THE ROADMAP — Aldric's organ instrument panel for a data-backed next-move synthesis."""
