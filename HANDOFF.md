@@ -72,11 +72,17 @@ it on ourselves and reformed our own practice. Everything below is committed + p
 - **Self-experiment verdict ~7h out** (`GET /brain/self-experiment`) → when it lands null, v3 rejects
   grounding_floor + should queue `verifier_strictness` as the next falsifiable lever.
 - **Predict rate-forecasts resolve ~14d** → first real self-Brier; watch resolution emerge (or not).
-- **Two real inbox tasks were open at compaction** (NOT yet handled — handle via the loop's normal triage):
-  (a) **`afd11c`** — mem0 correspondence: maintainer `kartik-mem0` CLOSED mem0ai/mem0#5330 but **invited a
-  focused minimal upstream-hook feature request** (an `on_search_hit` callback or `cleanup()` API). That is
-  a concrete path to a real upstream contribution (credibility/distribution) — brief the owner in Slovak,
-  draft GATED. (b) **`3ae957`** — Forge ideas (use `/open-world-forge`, anchor on the 36 books, not our canon).
+- **🔥 LIVE UPSTREAM-CONTRIBUTION THREAD — mem0ai/mem0#5611 (the real distribution/credibility wedge).**
+  We opened the focused minimal-hook feature request that maintainer `kartik-mem0` invited on #5330. He
+  replied 2026-06-18 with the crux design question (how to persist access metadata for long-running
+  deployments + pin `policy="lru"` semantics). **We answered + POSTED** (2026-06-18 12:13 UTC, owner-approved,
+  gated action 4c18ee): a pluggable `AccessStore` decoupled from the 30+ vector backends AND the process
+  lifetime (in-mem default + SQLite sidecar + Redis), with a VERIFIED Lab number (`56efae`: SQLite sidecar
+  ~6.4 µs/hit, ~2 MB/100k memories, survives restart, <0.1% of a vector query), pinned lru/lfu semantics,
+  and an **offer to write a focused PR**. NOW WAITING ON KARTIK. **If he says "yes, draft the PR" → that is
+  the next real step** (write the `AccessStore` interface + in-mem + SQLite impls + the benchmark as a test
+  in the mem0 repo). The Envoy + outreach backstop watch the thread; each loop cycle re-checks last-author.
+  (The old `/open-world-forge` task `3ae957` is no longer in the inbox — inbox is empty.)
 - **Strategic reminder (do NOT lose):** the 2026-06-16 BIG PIVOT still holds — the owner's real goal is
   **income from home** (freelance AI services in `services/` + the kids storybooks at
   `C:\Users\Danculus\rozpravky`). This session was deep Agora research because the owner was actively
