@@ -90,7 +90,12 @@ def submit_url(venue_key: str, url: str, title: str, blurb: str = "") -> str:
     v = VENUES.get(venue_key, {})
     kind = v.get("kind", "hn")
     if kind == "hn":
-        return f"https://news.ycombinator.com/submitlink?u={_q(url)}&t={_q(title)}"
+        # HN enforces an 80-char title limit; truncate word-safe so the prefill is accepted.
+        t = title.strip()
+        if len(t) > 80:
+            cut = t[:80].rsplit(" ", 1)[0]
+            t = (cut if len(cut) >= 60 else t[:80]).rstrip(" ,;:-")
+        return f"https://news.ycombinator.com/submitlink?u={_q(url)}&t={_q(t)}"
     if kind == "reddit":
         flair = v.get("flair", "")
         t = f"{flair} {title}".strip() if flair else title
