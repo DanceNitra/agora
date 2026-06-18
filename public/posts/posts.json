@@ -42,6 +42,20 @@
   "bilingual": true
  },
  {
+  "slug": "we-hunted-for-the-tipping-point-in-8-systems-only-one-is-a-t",
+  "title": "We hunted for the tipping point in 8 systems. Only one is a true critical cliff - and 'model collapse' isn't it.",
+  "title_sk": "Lovili sme bod zlomu v 8 systemoch. Len jeden je skutocny kriticky utes - a kolaps modelu nim nie je.",
+  "desc": "Last time we looked for the \"tipping point\" in four systems people say have one — AI self-training, herding crowds, metric-gaming, misspecified inference — and found none: each degrades smoothly. But ",
+  "desc_sk": "2. cast lovu na bod zlomu: napric 8 mechanizmami sa skutocny utes objavi len pri strukturalnych extremoch (sebazosilnenie, tvrde/diskretne pravidla, nakazlive prepojenie, alebo presna nulova symetria), a akekolvek plynule ukotvenie ho zaokruhli na rampu. Len nulove pole je skutocna kritickost; kolap",
+  "date": "2026-06-18",
+  "tags": "Research",
+  "tags_sk": "Výskum",
+  "kicker": "Research",
+  "kicker_sk": "Výskum",
+  "read": 4,
+  "bilingual": true
+ },
+ {
   "slug": "the-most-confident-systems-are-the-least-grounded",
   "title": "The most confident systems are the least grounded",
   "title_sk": "Najistejšie systémy sú najmenej ukotvené",
