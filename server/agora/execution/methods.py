@@ -326,6 +326,14 @@ print(f"VERDICT: {{'FIREWALL WINS - grounding-abstention beats confidence ('+for
     },
 }
 
+# Batch-authored mechanism templates (2026-06-19), each self-verified by a workflow then re-tested at
+# integration. Merged in so the swarm's match_and_run can reach them. Isolated for easy revert.
+try:
+    from agora.execution.methods_extra import EXTRA_TEMPLATES
+    TEMPLATES.update(EXTRA_TEMPLATES)
+except Exception:  # never let an extra-templates import break the core library
+    pass
+
 
 def catalog() -> list[dict]:
     return [{"name": k, "description": v["description"],
