@@ -20,6 +20,14 @@
    "date": "2026-06-19"
   },
   {
+   "claim": "Retrieval-augmented frontier models weigh a retrieved document against their own knowledge - they won't blindly adopt a doc that contradicts what they correctly know.",
+   "source": "RAG-robustness folklore; measured on real models via the Grounding Firewall poison protocol (Agora). The Poison-Deference Index.",
+   "verdict": "FAILED",
+   "note": "Poison-Deference Index: 12 factual questions each model answered CORRECTLY without context, then given a context asserting the WRONG answer (real LLMs, k=3 order-corrected, thinking-robust reader). deepseek-v4-flash: PDR=92% (flips to the false answer on 11/12 questions it knew), CPR=83% (confidently wrong). glm-5.2: PDR=92%, CPR=92%. BOTH frontier models abandon their correct knowledge for a planted-false doc ~92% of the time, almost always confidently - retrieval OVERRIDES rather than augments. (Strong-assertion poison; 2 models so far - a live index across more models is the next step. Mitigation already exists: the Grounding Firewall's abstain-on-high-sensitivity gate catches exactly these.)",
+   "lab": "agora_output/aiclaims/20260619_poison_deference_index.py (+ poison_deference_index.json)",
+   "date": "2026-06-19"
+  },
+  {
    "claim": "AI agent success decays with a CONSTANT hazard (an exponential 'half-life') as the task gets longer.",
    "source": "arXiv 2505.05115 'Is there a half-life for the success rates of AI agents?'; tested on METR time-horizon data (metr.org/blog/2025-03-19; epoch.ai/benchmarks/metr-time-horizons).",
    "verdict": "REPRODUCED",

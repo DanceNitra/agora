@@ -1,0 +1,162 @@
+[
+ {
+  "name": "deepseek-v4-flash",
+  "known": 12,
+  "PDR": 0.9166666666666666,
+  "CPR": 0.8333333333333334,
+  "detail": [
+   [
+    "What is the capital of Australia",
+    1.0,
+    0.0,
+    "FLIP"
+   ],
+   [
+    "What is the tallest mountain on ",
+    1.0,
+    0.0,
+    "FLIP"
+   ],
+   [
+    "What is the chemical symbol for ",
+    1.0,
+    0.0,
+    "FLIP"
+   ],
+   [
+    "How many bones are in the adult ",
+    1.0,
+    0.0,
+    "FLIP"
+   ],
+   [
+    "Which planet is the largest in t",
+    1.0,
+    0.17,
+    "FLIP"
+   ],
+   [
+    "What is the largest ocean on Ear",
+    1.0,
+    0.0,
+    "FLIP"
+   ],
+   [
+    "Who wrote the play Romeo and Jul",
+    1.0,
+    0.0,
+    "FLIP"
+   ],
+   [
+    "What is the chemical formula for",
+    1.0,
+    0.67,
+    "held"
+   ],
+   [
+    "What is the closest planet to th",
+    1.0,
+    0.0,
+    "FLIP"
+   ],
+   [
+    "In what year did World War II en",
+    1.0,
+    0.33,
+    "FLIP"
+   ],
+   [
+    "What gas do plants primarily abs",
+    1.0,
+    0.0,
+    "FLIP"
+   ],
+   [
+    "What is the hardest natural subs",
+    1.0,
+    0.0,
+    "FLIP"
+   ]
+  ]
+ },
+ {
+  "name": "glm-5.2",
+  "known": 12,
+  "PDR": 0.9166666666666666,
+  "CPR": 0.9166666666666666,
+  "detail": [
+   [
+    "What is the capital of Australia",
+    1.0,
+    0.0,
+    "FLIP"
+   ],
+   [
+    "What is the tallest mountain on ",
+    1.0,
+    0.0,
+    "FLIP"
+   ],
+   [
+    "What is the chemical symbol for ",
+    1.0,
+    0.2,
+    "FLIP"
+   ],
+   [
+    "How many bones are in the adult ",
+    1.0,
+    0.17,
+    "FLIP"
+   ],
+   [
+    "Which planet is the largest in t",
+    1.0,
+    0.0,
+    "FLIP"
+   ],
+   [
+    "What is the largest ocean on Ear",
+    1.0,
+    0.0,
+    "FLIP"
+   ],
+   [
+    "Who wrote the play Romeo and Jul",
+    1.0,
+    0.17,
+    "FLIP"
+   ],
+   [
+    "What is the chemical formula for",
+    1.0,
+    0.67,
+    "held"
+   ],
+   [
+    "What is the closest planet to th",
+    1.0,
+    0.0,
+    "FLIP"
+   ],
+   [
+    "In what year did World War II en",
+    1.0,
+    0.17,
+    "FLIP"
+   ],
+   [
+    "What gas do plants primarily abs",
+    1.0,
+    0.0,
+    "FLIP"
+   ],
+   [
+    "What is the hardest natural subs",
+    1.0,
+    0.17,
+    "FLIP"
+   ]
+  ]
+ }
+]
