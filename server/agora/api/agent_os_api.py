@@ -582,6 +582,19 @@ async def brain_frontier(q: str, k: int = 8):
 
 _DIRECTIONS: dict = {"themes": [], "insight": "", "directions": [], "ts": 0}
 
+# Durable, template-backed FRONTIER research directions (the workflow-authored frontier questions, each
+# mapping 1:1 to a Methods Library template). Merged into current_directions so the swarm quests on
+# FRONTIER-tier questions, not just the textbook-tier directions auto-harvested from recent findings.
+_FRONTIER_DIR_FILE = Path(__file__).resolve().parents[3] / ".frontier_directions.json"  # repo root
+
+
+def _load_frontier_directions() -> list:
+    import json
+    try:
+        return list(json.loads(_FRONTIER_DIR_FILE.read_text(encoding="utf-8")))
+    except Exception:
+        return []
+
 
 @router.get("/brain/directions")
 async def brain_directions(request: Request, n: int = 14):
@@ -603,8 +616,12 @@ async def brain_directions(request: Request, n: int = 14):
 
 @router.get("/brain/directions/current")
 async def current_directions():
-    """The latest harvested directions — agents pull these to pursue them (closing the loop)."""
-    return {"directions": _DIRECTIONS.get("directions", []), "themes": _DIRECTIONS.get("themes", [])}
+    """The latest harvested directions — agents pull these to pursue them (closing the loop). Durable
+    FRONTIER directions are merged FIRST so the swarm reliably quests on the template-backed frontier
+    questions (the swarm's _renewable_quests interleaves + dedups these, so it rotates through them)."""
+    frontier = _load_frontier_directions()
+    return {"directions": frontier + _DIRECTIONS.get("directions", []),
+            "themes": _DIRECTIONS.get("themes", [])}
 
 
 _LAST_UPGRADES: list = []   # the last self-upgrade proposals (numbered) — pick one by replying its number
