@@ -3265,7 +3265,18 @@ async def ambient_life():
     world_events: list[str] = []       # recent keep news (shared, for reactivity)
     locations: dict = dict(_LOCATIONS)  # navigable spots — GROWS as agents build modules
     os_modules: list[dict] = []        # real structures agents have built into the OS
+    # PERSIST the loop counter across restarts. The inbox task-generators fire on loop_n % N == offset
+    # schedules (dialectic@400, insight@1100, deepening@1500, ...); with loop_n=0 on every restart, the
+    # watchdog's restart churn kept resetting the countdown so the dungeon rarely ran the ~400-1500
+    # uninterrupted loops needed to queue a task -> the Claude inbox starved (empty for hours). Loading
+    # the last loop_n from the heartbeat makes the schedule accumulate across restarts. 2026-06-19.
     loop_n = 0
+    try:
+        _hb = _HEARTBEAT_FILE.read_text(encoding="utf-8").split()
+        if len(_hb) >= 2 and _hb[1].isdigit():
+            loop_n = int(_hb[1])
+    except Exception:
+        loop_n = 0
     await _init_trust()
     await _refresh_forecast_scores()        # tournament hit-rates feed the standing blend
     _start_vec_worker()                     # background semantic-vec backfill (off the hot path)
