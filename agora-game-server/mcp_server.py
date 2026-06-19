@@ -524,6 +524,13 @@ _LLM_SEM = threading.Semaphore(_LLM_CONCURRENCY)
 # go through "na preskacku" (3 at a time, everyone in turn), not just the same fast few. A burst of 8
 # drains in ~15s at 3-concurrency, so 30s almost never skips; the cap only ever holds 3 cloud calls.
 _LLM_SEM_WAIT = float(os.environ.get("DUNGEON_LLM_SEM_WAIT", "30"))
+# Per-agent LLM quest PLANNER (default OFF, 2026-06-19): each agent used to make its own cloud LLM
+# call every planning tick to invent 3 free-form quests (kinds create/upgrade/explore). In practice
+# that produced the self-referential "build a knowledge module" / "explore X" / "pipeline X" filler
+# (the "gaming party"), AND it was 8 concurrent cloud calls/cycle = the dominant 429 cause. The
+# grounded `_renewable_quests` pool already GUARANTEES real research, so the planner is pure filler +
+# quota burn. OFF by default → agents draw all work from the grounded pool. Re-enable with =1.
+_LLM_PLANNER_ON = os.environ.get("DUNGEON_LLM_PLANNER", "0").strip() == "1"
 
 # Pace: "study" = slow & deliberate (default; real research, light on the quota),
 # "fast" = lively banter. Override with DUNGEON_PACE.
@@ -3618,7 +3625,7 @@ async def ambient_life():
                       if colleague_mem else "")
                    + f"Nearby now: {', '.join(nearby) or 'no one'}\nLatest in the keep: {news}\n"
                    f"Your quest log (3 next moves — prefer ones that DEVELOP a real gap above):")
-            data = await asyncio.to_thread(_llm_json_sync, sysmsg, usr) or {}
+            data = (await asyncio.to_thread(_llm_json_sync, sysmsg, usr) or {}) if _LLM_PLANNER_ON else {}
             added = 0
             for q in (data.get("quests") or [])[:4]:
                 intent = (q.get("intent") or "").strip()
@@ -3642,7 +3649,8 @@ async def ambient_life():
             # falsifier). Trust/cooperation between agents still accrues from genuine quests below.
             # Planning-quality signal: how many quests the LLM itself produced (0 = it failed and we
             # fell back to deterministic gaps). Lets us compare models live (flash ~0 vs deepseek-v4-pro).
-            logger.info(f"[plan] {_AGENT_NAMES.get(eid, eid)}: LLM_quests={added}")
+            logger.info(f"[plan] {_AGENT_NAMES.get(eid, eid)}: LLM_quests={added}"
+                        + ("" if _LLM_PLANNER_ON else " (planner OFF — grounded pool only)"))
             # GUARANTEE work: if the (flaky) LLM planner came up short, draw REAL quests from the
             # vault's inexhaustible surface — gaps, bridges, findings. Agents never run dry.
             if len(quests.get(eid, [])) < 2:
