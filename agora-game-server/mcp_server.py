@@ -3913,17 +3913,18 @@ async def ambient_life():
         # Reality Bridge — Orin empirically tests a recent finding vs real-world data (~12 min).
         if loop_n % 850 == 350:
             asyncio.create_task(_run_reality_check())
-        # Insight Engine — Agora queues a rich theme for Claude to synthesize (~95 min, premium).
-        if loop_n % 3400 == 1100:
+        # Insight Engine — Agora queues a rich theme for Claude to synthesize (BOOSTED 2026-06-19, ~34 min).
+        if loop_n % 2400 == 1100:
             asyncio.create_task(_queue_insight_theme())
-        # Flywheel — queue an insight's falsifier for Claude to re-test + deepen (~80 min).
-        if loop_n % 2800 == 1500:
+        # Flywheel — queue an insight's falsifier for Claude to re-test + deepen (BOOSTED 2026-06-19, ~31 min).
+        if loop_n % 2200 == 1500:
             asyncio.create_task(_queue_deepening())
         # Prediction Ledger — resolve due predictions + queue a new one for Claude (~90 min).
         if loop_n % 6300 == 1500:
             asyncio.create_task(_run_predictions())
-        # Dialectic — queue a contentious claim for Claude to stress-test (~80 min, offset).
-        if loop_n % 2800 == 400:
+        # Dialectic — DOWN-WEIGHTED 2026-06-19 (was %2800): it dominated the inbox (22/100 tasks) at low
+        # value; the high-value organs (Replicate/Synthesize/Hypothesize/Deepen) are boosted instead (~155 min).
+        if loop_n % 11000 == 400:
             asyncio.create_task(_queue_dialectic())
         # The Agora Mind — metacognitive reflection: synthesize the worldview + self-direct (~daily).
         if loop_n % 64000 == 33000:
@@ -3946,8 +3947,8 @@ async def ambient_life():
         # RESEARCH EXCHANGE — compose + propose the public digest (GATED, ~weekly offset).
         if loop_n % 448000 == 120000:
             asyncio.create_task(_run_research_exchange())
-        # HYPOTHESIS INDUCTION — bridge a finding cluster into a testable conjecture (~95 min).
-        if loop_n % 6700 == 2000:
+        # HYPOTHESIS INDUCTION — bridge a finding cluster into a testable conjecture (BOOSTED 2026-06-19, ~57 min).
+        if loop_n % 4000 == 2000:
             asyncio.create_task(_queue_hypothesis_induction())
         # THE OBSERVATORY — one vital-signs reading of the whole organism (~weekly offset).
         if loop_n % 448000 == 350000:
@@ -3993,7 +3994,7 @@ async def ambient_life():
             asyncio.create_task(_queue_belief_challenge())
         if loop_n % 5500 == 2100:                      # The Court — structured debate  (~78 min)
             asyncio.create_task(_run_debate())
-        if loop_n % 2800 == 600:                       # Replication Unit (Rooke)  (~40 min)
+        if loop_n % 2000 == 600:                       # Replication Unit (Rooke) - BOOSTED 2026-06-19 (Crucible=moat, ~28 min)
             asyncio.create_task(_queue_replication())
         if loop_n % 3000 == 1700:                      # Cartographer (Wren)  (~43 min)
             asyncio.create_task(_queue_cartography())
