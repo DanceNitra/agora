@@ -245,6 +245,29 @@ async def add_collective(request: Request):
             elif g.startswith("low significance"):
                 _PROMOTE_STATS["src_trivial"] = _PROMOTE_STATS.get("src_trivial", 0) + 1
             return {"status": "rejected", "reason": g}
+        # LAB-FIRST gate (2026-06-19, flag AGORA_REQUIRE_LAB): a 'discovery' must be backed by a REAL
+        # Lab experiment (a reproducible measured result), not a paraphrase. Require a lab_id that
+        # exists in the Lab/Methods ledger with ok==True. Closes the paraphrase paths (collab/pipeline/
+        # literature) at the write chokepoint. Reversible: unset the flag.
+        import os as _os
+        if _os.environ.get("AGORA_REQUIRE_LAB", "0") == "1":
+            import re as _re, json as _json
+            from pathlib import Path as _Pth
+            _mlab = _re.search(r"[Ll]ab[ _]?(?:id[ =:]*)?([0-9a-f]{6})\b", body["content"] or "")
+            _ok_lab = False
+            if _mlab:
+                _lid = _mlab.group(1)
+                for _ledger in (".lab.json", ".methods.json"):
+                    try:
+                        _items = _json.load(open(_Pth(__file__).resolve().parents[2] / _ledger, encoding="utf-8"))
+                        if any((e.get("id") == _lid or e.get("lab_id") == _lid) and e.get("ok") for e in _items):
+                            _ok_lab = True
+                            break
+                    except Exception:
+                        pass
+            if not _ok_lab:
+                _PROMOTE_STATS["src_no_lab"] = _PROMOTE_STATS.get("src_no_lab", 0) + 1
+                return {"status": "rejected", "reason": "LAB-FIRST: discovery has no reproducible Lab result (lab_id)"}
         # NOVELTY GATE AT THE SOURCE: if this finding lexically near-duplicates a note the vault
         # already has, don't store it — it would only clog the promotion funnel and be deduped later
         # anyway (~71% of findings were such restatements). Uses the SAME calibrated containment as
