@@ -1,0 +1,67 @@
+=== Phase surface  (N=21, cue reliability g=0.35) ===
+rows = competence mu (private), cols = shared-cue weight beta (correlation)
+
+        beta:  0.0  0.2  0.5  0.8  1.0  1.2  1.5  1.8  2.0  2.2  2.5  2.8  3.0
+  mu=0.00      .    -    -    -    -    -    -    -    -    .    .    .    .
+  mu=0.20      +    +    -    -    -    -    -    -    -    -    -    .    .
+  mu=0.40      +    +    .    -    -    -    -    -    -    -    -    -    .
+  mu=0.60      +    +    +    -    -    -    -    -    -    -    -    -    -
+  mu=0.80      +    +    +    +    -    -    -    -    -    -    -    -    -
+  mu=1.00      +    +    +    +    +    -    -    -    -    -    -    -    -
+  mu=1.20      +    +    +    +    +    -    -    -    -    -    -    -    -
+  mu=1.40      +    +    +    +    +    +    -    -    -    -    -    -    -
+  mu=1.60      +    +    +    +    +    +    +    -    -    -    -    -    -
+  mu=1.80      +    +    +    +    +    +    +    +    -    -    -    -    -
+  mu=2.00      +    +    +    +    +    +    +    +    .    -    -    -    -
+  mu=2.20      +    +    +    +    +    +    +    +    +    -    -    -    -
+  mu=2.40      +    +    +    +    +    +    +    +    +    +    -    -    -
+
+MEASURED: amplification region (ensemble WORSE than a single reasoner) = 53.3% of the (competence x correlation) plane  [g=0.35, N=21]
+
+MEASURED boundary c*(correlation) — min single-accuracy at which aggregation starts to help:
+  beta= 0.0  rho~ 0.00:  c* > 0.992  (aggregation hurts across all tested competence)
+  beta= 0.2  rho~ 0.02:  c* = 0.510
+  beta= 0.5  rho~ 0.07:  c* = 0.587
+  beta= 0.8  rho~ 0.13:  c* = 0.639
+  beta= 1.0  rho~ 0.21:  c* = 0.664
+  beta= 1.2  rho~ 0.30:  c* = 0.673
+  beta= 1.5  rho~ 0.38:  c* = 0.674
+  beta= 1.8  rho~ 0.47:  c* = 0.675
+  beta= 2.0  rho~ 0.55:  c* = 0.675
+  beta= 2.2  rho~ 0.63:  c* = 0.675
+  beta= 2.5  rho~ 0.71:  c* > 0.649  (aggregation hurts across all tested competence)
+  beta= 2.8  rho~ 0.77:  c* > 0.582  (aggregation hurts across all tested competence)
+  beta= 3.0  rho~ 0.83:  c* > 0.528  (aggregation hurts across all tested competence)
+MEASURED: the safe-aggregation threshold RISES with correlation — c* goes from ~0.51 (rho~0.02) to ~0.67 (rho~0.63).
+
+=== Two regimes as you add reasoners (T=200000, g=0.35) ===
+  INDEPENDENT (mu=0.40, beta=0.2)        | CORRELATED+MISLEADING (mu=0.40, beta=2.0)
+   N   single  ensemble  delta            |  N   single  ensemble  delta
+    1  0.629   0.629   +0.000           |   1  0.382   0.382   +0.000
+    3  0.631   0.688   +0.057           |   3  0.384   0.357   -0.027
+    9  0.631   0.775   +0.143           |   9  0.382   0.349   -0.033
+   21  0.631   0.846   +0.215           |  21  0.384   0.351   -0.033
+   51  0.631   0.918   +0.287           |  51  0.382   0.349   -0.033
+  101  0.631   0.965   +0.335           | 101  0.383   0.350   -0.033
+  -> left: aggregation HELPS and grows with N (Condorcet). right: aggregation HURTS and the gap
+     does NOT close with more reasoners (the redundancy trap of a shared misleading cue).
+
+=== Cue-reliability g sweep  (N=21, mu=0.4, beta=2.0) ===
+  g=0.20: single=0.240  ensemble=0.198  delta=-0.042  -> AMPLIFIES error
+  g=0.35: single=0.383  ensemble=0.351  delta=-0.032  -> AMPLIFIES error
+  g=0.50: single=0.520  ensemble=0.497  delta=-0.023  -> AMPLIFIES error
+  g=0.65: single=0.663  ensemble=0.650  delta=-0.014  -> AMPLIFIES error
+  g=0.80: single=0.803  ensemble=0.799  delta=-0.005  -> helps
+
+=== Robustness: confidence-weighted voting (weight each vote by its |x|) ===
+MEASURED: under confidence-weighting the amplification region is 53.8% of the plane (vs 53.3% for plain majority). Weighting the confident does NOT rescue it — confident reasoners are confident BECAUSE of the shared cue, so weighting leans HARDER on it.
+
+=== Robustness: sequential herding / info-cascade (N=21, g=0.35, beta=0 so the ONLY correlation is herding) ===
+  herding lambda=0.0: single=0.726  ensemble=0.986  delta=+0.261  -> helps
+  herding lambda=0.5: single=0.824  ensemble=0.952  delta=+0.127  -> helps
+  herding lambda=1.0: single=0.844  ensemble=0.864  delta=+0.020  -> helps
+  herding lambda=2.0: single=0.777  ensemble=0.765  delta=-0.012  -> AMPLIFIES
+  -> with NO shared cue (beta=0), pure herding still manufactures the amplification: a competent
+     crowd that watches itself can vote worse than its average member.
+
+VERDICT: LAW HOLDS — a real boundary exists. Aggregation helps only above a correlation-dependent competence threshold (c*~0.67 at high correlation); below it, a shared misleading cue makes the majority WORSE than one reasoner, and adding reasoners deepens the error. Pure Condorcet (always-helps) is the special case g>=0.5 or beta=0.

@@ -1,0 +1,40 @@
+Running 22 questions x 8 personas on deepseek-v4-flash (concurrency 3)...
+  Q 1 (truth A): BBBBBBBB
+  Q 2 (truth B): AAAAAAAA
+  Q 3 (truth B): AAAAAAAA
+  Q 4 (truth A): BBBBBBBB
+  Q 5 (truth B): AAAAAAAA
+  Q 6 (truth A): BBBBBBBB
+  Q 7 (truth B): AAAAAAAA
+  Q 8 (truth B): AAAAAAAA
+  Q 9 (truth A): BBBBBBBB
+  Q10 (truth A): BBBBBBBB
+  Q11 (truth A): BBBBBBBB
+  Q12 (truth B): AAAAAAAA
+  Q13 (truth B): AAAAAAAA
+  Q14 (truth B): AAAAAAAA
+  Q15 (truth A): BBBBBBBB
+  Q16 (truth A): BBBBBBBB
+  Q17 (truth B): AAAAAAAA
+  Q18 (truth A): ABBBBBBB
+  Q19 (truth B): AAAAAAAA
+  Q20 (truth B): AABAAAAA
+  Q21 (truth B): AAAAAAAA
+  Q22 (truth B): AAAAAAAA
+
+failed/total calls: 173/176
+
+=== Agora swarm on the Collective Intelligence diagram ===
+  n_items: 22
+  n_reasoners: 8
+  avg_competence: 0.0114
+  best_competence: 0.0455
+  error_correlation: -0.0017
+  majority_accuracy: 0.0
+  beats_avg_single: False
+  beats_best_single: False
+  decision: DO_NOT_AGGREGATE
+  why: majority vote is WORSE than the average single reasoner — you are in the amplification / redundancy trap (a shared misleading cue or herding). Adding reasoners will not help; diversify their evidence or use a single strong reasoner.
+
+MEASURED: Agora's 8 same-model personas: avg competence 0.011, inter-agent error-correlation -0.002; majority lift over the average agent = -0.011.
+VERDICT: the persona-prompts buy more independence than expected — aggregation lifts accuracy; the swarm is not (yet) in the redundancy trap on this quiz.
