@@ -28,6 +28,20 @@
   "bilingual": true
  },
  {
+  "slug": "we-built-a-firewall-for-ai-confidently-wrong-answers---and-i",
+  "title": "We built a firewall for AI confidently-wrong answers - and it catches what confidence cannot",
+  "title_sk": "Postavili sme firewall na sebaisto-nespravne odpovede AI - a chyta to, co confidence nevidi",
+  "desc": "The problem. A model is most confident exactly when it is wrong for the right-looking reason. When a retrieved document states a plausible-but-false answer - a poisoned context: stale data, an injecte",
+  "desc_sk": "Model je najsebaistejsi presne vtedy, ked ho otraveny dokument privedie k chybe. Grounding Firewall sa zdrzi pri odpovediach, ktore visia na nacitanom dokumente - chyta chyby z otraveneho kontextu, na ktore je confidence slepy (AUC 0.028 vs 0.095).",
+  "date": "2026-06-19",
+  "tags": "Research",
+  "tags_sk": "Výskum",
+  "kicker": "Research",
+  "kicker_sk": "Výskum",
+  "read": 2,
+  "bilingual": true
+ },
+ {
   "slug": "robustness-checks-arent-ritual---theyre-a-measurable-filter-",
   "title": "Robustness checks aren't ritual - they're a measurable filter (if the tests are independent)",
   "title_sk": "Robustness checks aren't ritual - they're a measurable filter (if the tests are independent)",
