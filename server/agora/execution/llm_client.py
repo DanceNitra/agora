@@ -201,6 +201,16 @@ def call_llm(
         tier_name = tier_cfg.name
         model = tier_cfg.model
 
+        # Reasoning-tier override: send ONLY the low-volume medium/expert calls to a separate
+        # endpoint + model (e.g. glm-5.2 via the local Ollama cloud-route). The high-volume cheap
+        # tier is untouched (stays on base_url + deepseek-v4-flash). No-op unless configured.
+        tier_base_url, tier_api_key = base_url, api_key
+        if tier_name in ("medium", "expert") and cfg.reasoning_base_url:
+            tier_base_url = cfg.reasoning_base_url
+            tier_api_key = cfg.reasoning_key or "local"
+            if cfg.reasoning_model:
+                model = cfg.reasoning_model
+
         # Build kwargs
         kwargs: dict[str, Any] = {
             "model": model,
@@ -217,7 +227,7 @@ def call_llm(
         # Retry loop per model (rate-limit backoff + intermittent empty-completion retry)
         for attempt in range(3):
             try:
-                client = _get_client(api_key, base_url)
+                client = _get_client(tier_api_key, tier_base_url)
                 resp = client.chat.completions.create(**kwargs)
                 content = resp.choices[0].message.content or ""
 

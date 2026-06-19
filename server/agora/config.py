@@ -29,6 +29,12 @@ class Settings(BaseSettings):
     llm_model_medium: str = "deepseek-v4-flash"
     llm_model_expert: str = "deepseek-v4-flash"
     llm_model: str = ""   # single override for ALL tiers (AGORA_LLM_MODEL)
+    # Reasoning-tier (medium/expert) override: route ONLY the low-volume reasoning calls to a
+    # separate endpoint+model (e.g. glm-5.2 via the local Ollama cloud-route), while the high-volume
+    # cheap tier stays on api_base_url. Set AGORA_REASONING_BASE_URL + AGORA_REASONING_MODEL to enable.
+    reasoning_base_url: str = ""
+    reasoning_model: str = ""
+    reasoning_key: str = "local"
     llm_enabled: bool = True
     # OpenRouter-specific
     openrouter_key: str = ""
