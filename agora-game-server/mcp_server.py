@@ -3084,6 +3084,33 @@ async def _brain_contribute(eid: str, title: str, content: str) -> bool:
 _NOVELTY_GATE = float(os.environ.get("DUNGEON_NOVELTY_GATE", "0.88"))   # 2026-06-19: vault grew to ~6000 notes, so even FRESH papers score 0.76-0.85; 0.72 blocked everything. 0.88 blocks only near-dups (write-time dedup backstops).
 
 
+# LAB-FIRST research (2026-06-19): make a MEASURED Lab result the only output. Routes a claim through
+# the Methods Library (cheap agent supplies only the THEME; a Claude-vetted TEMPLATE runs in the Lab and
+# returns MEASURED:/VERDICT: lines). Writes a finding ONLY if it carries a same-cycle lab_id + real
+# measured number — no paraphrase, no "UNCERTAIN" markers. Flag-gated for a clean A/B + revert.
+_LAB_FIRST = os.environ.get("DUNGEON_LAB_FIRST", "0").strip() == "1"
+
+
+async def _experiment_discovery(eid: str, intent: str) -> None:
+    """Reduce the claim to a runnable experiment via /brain/methods/match and record the MEASURED result."""
+    who = _AGENT_NAMES.get(eid, eid)
+    theme = _strip_quest_prefix(intent)
+    res = await asyncio.to_thread(
+        _brain_post_sync, "/api/v1/agent-os/brain/methods/match",
+        {"theme": theme[:300], "requester": who}, 120)            # 120s: the match + Lab run is slow
+    if res and res.get("status") == "ok" and res.get("ok") and (res.get("measured") or "").strip():
+        tpl = res.get("template", ""); lab_id = res.get("lab_id", "")
+        measured = (res.get("measured") or "").strip(); verdict = (res.get("verdict") or "").strip()
+        content = f"{measured}\n{verdict}\nExperiment: {tpl} (Lab {lab_id}); params {res.get('params', {})}."
+        broadcast({"type": "os_build", "kind": "collab", "who": who,
+                   "text": f"ran experiment {tpl}: {measured[:56]}"})
+        await _brain_contribute(eid, f"Measured: {theme[:66]}", content[:560])
+    else:
+        # No template fits -> KILL (never paraphrase). The compounding fix is a NEW template (authored by Claude).
+        broadcast({"type": "os_build", "kind": "collab", "who": who,
+                   "text": f"no experiment fits '{theme[:32]}' — killed (no paraphrase); needs a new Lab template"})
+
+
 async def _grounded_discovery(eid: str, intent: str) -> None:
     """Turn a 'create' goal into a REAL finding grounded in arXiv AND connected to the user's
     own notes (or flagging a real gap) — a concrete claim, not a vague plan."""
@@ -4035,6 +4062,11 @@ async def ambient_life():
                     if not won:
                         engine.set_entity_thought(eid, "priced out this round — earn standing")
                         note_event(f"{who} was priced out of the discovery market (p={p:.2f})")
+                    elif _LAB_FIRST:
+                        # LAB-FIRST: both research intents must end in a MEASURED Lab result, not a paraphrase.
+                        asyncio.create_task(_experiment_discovery(eid, intent))
+                        note_event(f"{who} runs an experiment: {intent}")
+                        _os_build("discovery", who, intent)
                     elif kind == "hypothesize":
                         asyncio.create_task(_hypothesis_discovery(eid, intent))
                         note_event(f"{who} forms a hypothesis: {intent}")
