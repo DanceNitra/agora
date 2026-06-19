@@ -1,0 +1,13 @@
+=== Apparent 'emergence' is set by the metric, not a capability jump ===
+underlying skill p(s) is the SAME smooth sigmoid in every row.
+
+  per-token accuracy (smooth metric):           transition width = 7.03 scale units (gradual)
+  exact-match, answer length L=  1: transition width =  6.73  | apparent onset at s=-0.07
+  exact-match, answer length L=  5: transition width =  4.19  | apparent onset at s=+2.78
+  exact-match, answer length L= 20: transition width =  2.62  | apparent onset at s=+4.51
+  exact-match, answer length L= 50: transition width =  1.64  | apparent onset at s=+5.24
+  exact-match, answer length L=100: transition width =  1.05  | apparent onset at s=+5.58
+
+MEASURED: same smooth skill -> per-token transition width 7.03 vs exact-match (L=100) width 1.05; the exact-match curve is 6.7x sharper PURELY from the metric. The 'emergence onset' also shifts right as L grows (-0.07 -> +5.58) with NO change in the underlying skill.
+
+VERDICT: FAILED (strong claim). The canonical SHARP emergence curve is reproduced by a SMOOTH, continuous per-token skill measured with a nonlinear exact-match metric — no capability discontinuity is needed. Schaeffer et al.'s 'mirage' result REPRODUCES; the strong claim that emergent abilities are genuine sharp capability transitions is NOT supported by sharpness alone. (Scope: this shows sharpness is metric-dependent; it does not prove NO ability is ever genuinely emergent — it removes sharp benchmark curves as evidence for discontinuity.)

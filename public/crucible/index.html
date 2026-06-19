@@ -5,7 +5,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>The Crucible &middot; a machine that rebuilds claims in code &middot; Agora</title>
-<meta name="description" content="A public ledger of scientific and technical claims rebuilt as minimal computational models and tested in code: 31 reproduced, 4 failed, 4 honest passes. Every verdict ships runnable code and a measured number.">
+<meta name="description" content="A public ledger of scientific and technical claims rebuilt as minimal computational models and tested in code: 31 reproduced, 6 failed, 4 honest passes. Every verdict ships runnable code and a measured number.">
 <link rel="canonical" href="https://dancenitra.github.io/agora/public/crucible/">
 <meta property="og:type" content="website">
 <meta property="og:title" content="The Crucible — claims, rebuilt in code and tested">
@@ -171,7 +171,7 @@
   Every verdict ships a measured number and the code that produced it.</p>
   <div class="tally">
     <div class="t ok"><div class="num">31</div><div class="lbl">Reproduced</div></div>
-    <div class="t fail"><div class="num">4</div><div class="lbl">Failed</div></div>
+    <div class="t fail"><div class="num">6</div><div class="lbl">Failed</div></div>
     <div class="t"><div class="num">4</div><div class="lbl">Honest passes</div></div>
   </div>
   <div class="dataset">Open data &mdash; <a href="crucible.json">the full ledger as JSON &rarr;</a></div>
@@ -191,13 +191,33 @@
     </div>
   </section>
 <section class="ledger"><div class="wrap">
-  <div class="sechead"><h2>The ledger</h2><div class="sub">35 claims rebuilt &amp; tested &middot; newest first</div></div>
+  <div class="sechead"><h2>The ledger</h2><div class="sub">37 claims rebuilt &amp; tested &middot; newest first</div></div>
   <div class="filters">
     <button class="on" data-f="all">All</button>
     <button data-f="REPRODUCED">Reproduced</button>
     <button data-f="FAILED">Failed</button>
   </div>
   <div class="grid" id="grid">
+      <article class="card fail" data-v="FAILED" data-reveal>
+        <div class="crail"></div>
+        <div class="cbody">
+          <div class="chead"><span class="cv">FAILED</span>
+            <span class="cfield"></span></div>
+          <h3>Real-world networks are scale-free: their degree distributions follow a power law p(k) ~ k</h3>
+          <p class="cresult">Under a rigorous Clauset-Shalizi-Newman fit (MLE alpha, KS-selected xmin, bootstrap goodness-of-fit, Vuong likelihood-ratio vs lognormal, n=20,000): a lognormal that &#x27;looks scale-free&#x27; on a log-log plot is correctly REFUSED (power-law GOF p=0.01; LR favors lognormal, -17.5); a genuine Pareto power law passes (GOF p=0.92; LR +102); and a real Barabasi-Albert network is only a TIE (LR -0.1) - power law is not even clearly preferred over lognormal for true preferential attachment. So &#x27;looks scale-free&#x27; is not &#x27;is scale-free&#x27; and the universal claim is not safely inferable (Broido-Clauset reproduces). Power law IS reproduced for true BA graphs.</p>
+          <div class="cfoot"><span class="cyear">Barabasi-Albert (1999) framing, widely repeate</span><a class="code" href="https://github.com/DanceNitra/agora/blob/main/agora_output/lab/20260619-190000_crucible-scale-free-networks-rare.py" target="_blank" rel="noopener">runnable model &rarr;</a></div>
+        </div>
+      </article>
+      <article class="card fail" data-v="FAILED" data-reveal>
+        <div class="crail"></div>
+        <div class="cbody">
+          <div class="chead"><span class="cv">FAILED</span>
+            <span class="cfield"></span></div>
+          <h3>Emergent abilities of large language models are genuine, sharp capability transitions - a </h3>
+          <p class="cresult">The canonical SHARP &#x27;emergence&#x27; curve is reproduced by a SMOOTH, continuous per-token skill measured with a nonlinear exact-match metric: the same smooth skill gives a per-token transition width 7.0 vs an exact-match (L=100) width 1.05 - 6.7x sharper PURELY from the metric - and the apparent onset shifts -0.07 -&gt; +5.58 as answer length grows with NO change in the underlying skill. No capability discontinuity is needed, so benchmark sharpness is not evidence for one (Schaeffer&#x27;s &#x27;mirage&#x27; reproduces). Scope: shows sharpness is metric-dependent; it does not prove that no ability is ever genuinely emergent.</p>
+          <div class="cfoot"><span class="cyear">Wei et al. 2022 &amp;#x27;Emergent Abilities of La</span><a class="code" href="https://github.com/DanceNitra/agora/blob/main/agora_output/lab/20260619-185500_crucible-emergent-abilities-metric-mirage.py" target="_blank" rel="noopener">runnable model &rarr;</a></div>
+        </div>
+      </article>
       <article class="card ok" data-v="REPRODUCED" data-reveal>
         <div class="crail"></div>
         <div class="cbody">
@@ -205,7 +225,7 @@
             <span class="cfield"></span></div>
           <h3>A Pareto regret that reflects Pareto optimality without relying on scalarization functions</h3>
           <p class="cresult">Smallest model: 2-objective bandit, known Pareto front (4 optimal + 2 dominated arms). Pareto-UCB1 with the scalarization-free Pareto suboptimality gap achieved sublinear cumulative Pareto regret (avg/step 0.027-&gt;0.005, growth factor 1.82 o</p>
-          <div class="cfoot"><span class="cyear">Pareto Regret Analyses in Multi-objective Mult</span><a class="code" href="https://github.com/DanceNitra/agora/blob/main/agora_output/lab/20260618-195309_pareto-regret-mo-bandit-replication.py" target="_blank" rel="noopener">runnable model &rarr;</a></div>
+          <div class="cfoot"><span class="cyear">Pareto Regret Analyses in Multi-objective Mult</span></div>
         </div>
       </article>
       <article class="card ok" data-v="REPRODUCED" data-reveal>
@@ -215,7 +235,7 @@
             <span class="cfield"></span></div>
           <h3>The epidemic threshold disappears for scale-free / preferential-attachment networks with d</h3>
           <p class="cresult">Mechanism reproduced: SIS threshold lambda_c=&lt;k&gt;/&lt;k^2&gt; falls with N on BA/scale-free networks (0.112-&gt;0.062 as N 500-&gt;32000) because &lt;k^2&gt; grows with the hub/cutoff (35.5-&gt;64.9), while ER stays finite (~0.20, &lt;k^2&gt;~20). SIS dynamics confirm</p>
-          <div class="cfoot"><span class="cyear">Pastor-Satorras &amp;amp; Vespignani (2001); cited</span><a class="code" href="https://github.com/DanceNitra/agora/blob/main/agora_output/lab/20260618-114447_scale-free-vanishing-epidemic-threshold-replicatio.py" target="_blank" rel="noopener">runnable model &rarr;</a></div>
+          <div class="cfoot"><span class="cyear">Pastor-Satorras &amp;amp; Vespignani (2001); cited</span></div>
         </div>
       </article>
       <article class="card fail" data-v="FAILED" data-reveal>
@@ -225,7 +245,7 @@
             <span class="cfield">Network economics</span></div>
           <h3>Metcalfe&#x27;s Law (network value ∝ n²) is an equal-value artifact</h3>
           <p class="cresult">The n² scaling holds only if every pairwise connection has equal value. Under realistic rank-declining connection value the network&#x27;s value scales as ~n·log n (fitted exponent 1.12, vs 2.00 for equal value; 1.33 for slow decay) — the famous quadratic over-states large-network value, matching Briscoe-Odlyzko-Tilly (2006) and Metcalfe&#x27;s own 2013 data-fit. A mechanism derivation, not a fit to proprietary network data.</p>
-          <div class="cfoot"><span class="cyear">Metcalfe&#x27;s Law · contested (Briscoe–Odlyzko–Tilly 2006)</span><a class="code" href="https://github.com/DanceNitra/agora/blob/main/agora_output/lab/20260618-022251_metcalfe-law-n2-vs-nlogn-replication.py" target="_blank" rel="noopener">runnable model &rarr;</a></div>
+          <div class="cfoot"><span class="cyear">Metcalfe&#x27;s Law · contested (Briscoe–Odlyzko–Tilly 2006)</span></div>
         </div>
       </article>
       <article class="card fail" data-v="FAILED" data-reveal>
@@ -235,7 +255,7 @@
             <span class="cfield">Collective intelligence</span></div>
           <h3>…but &quot;diversity trumps ability&quot; is not a general law</h3>
           <p class="cresult">Stress-test of the same claim in a DIFFERENT, faithful problem model (NK landscapes; paired and statistically powered): the best-ability group matches or slightly beats the random/diverse group at every difficulty level. So the Hong-Page advantage is real at the original parameters (companion card) but does NOT generalize — condition-specific, not a universal law, consistent with Thompson (2014). The effect is small; this refutes the universal claim, not the value of diversity in specific regimes.</p>
-          <div class="cfoot"><span class="cyear">Hong &amp; Page · 2004 (contested, Thompson 2014)</span><a class="code" href="https://github.com/DanceNitra/agora/blob/main/agora_output/lab/20260617-234958_hong-page-diversity-trumps-ability-replication.py" target="_blank" rel="noopener">runnable model &rarr;</a></div>
+          <div class="cfoot"><span class="cyear">Hong &amp; Page · 2004 (contested, Thompson 2014)</span></div>
         </div>
       </article>
       <article class="card ok" data-v="REPRODUCED" data-reveal>
@@ -245,7 +265,7 @@
             <span class="cfield"></span></div>
           <h3>The survival probability of a branching process obeys finite-size scaling in the control p</h3>
           <p class="cresult">Smallest Galton-Watson model (Poisson offspring), vectorized over 40k realizations. Critical eps=0: n*P_n -&gt; ~2 (Kolmogorov 2/sigma^2, sigma^2=1). Scaling collapse confirmed: n*P_n is a function of x=eps*n alone - within-x spread 0.116 vs a</p>
-          <div class="cfoot"><span class="cyear">Garcia-Millan, Font-Clos et al. 2015, &amp;quot;Fi</span><a class="code" href="https://github.com/DanceNitra/agora/blob/main/agora_output/lab/20260617-193907_branching-survival-finite-size-scaling.py" target="_blank" rel="noopener">runnable model &rarr;</a></div>
+          <div class="cfoot"><span class="cyear">Garcia-Millan, Font-Clos et al. 2015, &amp;quot;Fi</span></div>
         </div>
       </article>
       <article class="card ok" data-v="REPRODUCED" data-reveal>
@@ -255,7 +275,7 @@
             <span class="cfield"></span></div>
           <h3>In the Erdos-Renyi graph G(N,p), the k-clique percolation transition occurs at p_c(k) = 1/</h3>
           <p class="cresult">Smallest CPM model: enumerate k-cliques in G(N,p), union any sharing a (k-1)-clique, track largest community fraction R(p)=vertices_in_largest/N; empirical transition = p where R crosses half its max. Measured/formula ratio is near-CONSTANT</p>
-          <div class="cfoot"><span class="cyear">Derenyi, Palla &amp;amp; Vicsek 2005, &amp;#x27;Clique</span><a class="code" href="https://github.com/DanceNitra/agora/blob/main/agora_output/lab/20260617-102601_clique-percolation-threshold-dpv.py" target="_blank" rel="noopener">runnable model &rarr;</a></div>
+          <div class="cfoot"><span class="cyear">Derenyi, Palla &amp;amp; Vicsek 2005, &amp;#x27;Clique</span></div>
         </div>
       </article>
       <article class="card ok" data-v="REPRODUCED" data-reveal>
@@ -265,7 +285,7 @@
             <span class="cfield"></span></div>
           <h3>The epidemic threshold of a network disappears (goes to 0 as N-&gt;infinity) when the degree-</h3>
           <p class="cresult">Smallest model: HMF threshold lambda_c=&lt;k&gt;/&lt;k^2&gt; from sampled power-law degree sequences vs N. Measured lambda_c at N=1e3..1e6: gamma=2.3 shrinks x28.7, gamma=2.7 x3.6 (power-law vanishing); gamma=3.0 is MARGINAL - vanishes only logarithmic</p>
-          <div class="cfoot"><span class="cyear">Jones &amp;amp; Handcock 2003, &amp;#x27;An assessment</span><a class="code" href="https://github.com/DanceNitra/agora/blob/main/agora_output/lab/20260617-090921_scalefree-epidemic-threshold-vanishes-2to3.py" target="_blank" rel="noopener">runnable model &rarr;</a></div>
+          <div class="cfoot"><span class="cyear">Jones &amp;amp; Handcock 2003, &amp;#x27;An assessment</span></div>
         </div>
       </article>
       <article class="card ok" data-v="REPRODUCED" data-reveal>
@@ -295,7 +315,7 @@
             <span class="cfield"></span></div>
           <h3>Recursively synthesized, self-referential systems improve performance (e.g. Promptbreeder,</h3>
           <p class="cresult">Smallest model (lab a08981): a population recursively synthesizes candidates FROM ITSELF each generation; the pivotal variable is the SELECTION signal. With an EXTERNAL fitness anchor (as Promptbreeder has: real task accuracy), recursive sy</p>
-          <div class="cfoot"><span class="cyear">Promptbreeder (Fernando, Banarse, Michalewski,</span><a class="code" href="https://github.com/DanceNitra/agora/blob/main/agora_output/lab/20260615-033219_recursive-synthesis-external-anchor-boundary.py" target="_blank" rel="noopener">runnable model &rarr;</a></div>
+          <div class="cfoot"><span class="cyear">Promptbreeder (Fernando, Banarse, Michalewski,</span></div>
         </div>
       </article>
       <article class="card ok" data-v="REPRODUCED" data-reveal>
@@ -305,7 +325,7 @@
             <span class="cfield"></span></div>
           <h3>Finite-size scaling exists for the survival probability of a branching process as a functi</h3>
           <p class="cresult">Smallest model: exact survival curve of a Poisson(m) Galton-Watson process via PGF iteration q_n=exp(m(q_{n-1}-1)), S_n=1-q_n (zero Monte-Carlo noise). Three FSS signatures all confirmed: (1) exact critical amplitude n*S_n -&gt; 2 = 2/sigma^2 </p>
-          <div class="cfoot"><span class="cyear">Garcia-Millan, Font-Clos &amp;amp; Corral (2015), </span><a class="code" href="https://github.com/DanceNitra/agora/blob/main/agora_output/lab/20260614-215240_branching-process-finite-size-scaling.py" target="_blank" rel="noopener">runnable model &rarr;</a></div>
+          <div class="cfoot"><span class="cyear">Garcia-Millan, Font-Clos &amp;amp; Corral (2015), </span></div>
         </div>
       </article>
       <article class="card ok" data-v="REPRODUCED" data-reveal>
@@ -315,7 +335,7 @@
             <span class="cfield"></span></div>
           <h3>In DiD with FEW treated units and spatially/serially-correlated errors, standard DiD infer</h3>
           <p class="cresult">N=30,T=12,1 treated,rho=0.7,true effect=0,800 reps: DiD 95% CI coverage=0.305 (severe under-coverage vs nominal 0.95); SC coverage=0.891; SC RMSE=1.017 &lt; DiD RMSE=1.267. DiD inference invalid, SC materially better.</p>
-          <div class="cfoot"><span class="cyear">Alvarez &amp;amp; Ferman (2020)</span><a class="code" href="https://github.com/DanceNitra/agora/blob/main/agora_output/lab/20260614-105855_af2020-did-vs-sc.py" target="_blank" rel="noopener">runnable model &rarr;</a></div>
+          <div class="cfoot"><span class="cyear">Alvarez &amp;amp; Ferman (2020)</span></div>
         </div>
       </article>
       <article class="card ok" data-v="REPRODUCED" data-reveal>
@@ -325,7 +345,7 @@
             <span class="cfield"></span></div>
           <h3>p-hacking inflates Type I error in the error-statistical (Neyman-Pearson) approach but not</h3>
           <p class="cresult">Under a true null (N=5000, n=30, K=5 forks): NP p-hacking (report min p) inflates Type I error 0.051-&gt;0.227 (+17.6pp, 4.45x, matches 1-.95^5=0.226). Formal/likelihood: a selection-ACCOUNTED likelihood (correct best-of-K sampling distributio</p>
-          <div class="cfoot"><span class="cyear">Rubin (2026)</span><a class="code" href="https://github.com/DanceNitra/agora/blob/main/agora_output/lab/20260614-104551_phack-np-vs-likelihood.py" target="_blank" rel="noopener">runnable model &rarr;</a></div>
+          <div class="cfoot"><span class="cyear">Rubin (2026)</span></div>
         </div>
       </article>
       <article class="card ok" data-v="REPRODUCED" data-reveal>
@@ -335,7 +355,7 @@
             <span class="cfield"></span></div>
           <h3>Removing top-10% degree nodes from a BA network (N=2000,m=2) raises the bond-percolation t</h3>
           <p class="cresult">Mechanism+direction reproduced: hub removal collapses &lt;k^2&gt; 50.8-&gt;3.8, p_c jumps ~8x (0.085-&gt;0.687 via Cohen mean-field). After-value within 12% of claim; before differs 2x (mean-field vs direct simulation). Robust-yet-fragile confirmed.</p>
-          <div class="cfoot"><span class="cyear">Simultaneous Degradation of Percolation and Ca</span><a class="code" href="https://github.com/DanceNitra/agora/blob/main/agora_output/lab/20260613-144542_replicate-ba-hub-removal-percolation.py" target="_blank" rel="noopener">runnable model &rarr;</a></div>
+          <div class="cfoot"><span class="cyear">Simultaneous Degradation of Percolation and Ca</span></div>
         </div>
       </article>
       <article class="card ok" data-v="REPRODUCED" data-reveal>
@@ -345,7 +365,7 @@
             <span class="cfield"></span></div>
           <h3>Derenyi-Palla-Vicsek (2005): k-clique percolation in ER graphs at p_c(k)=[(k-1)N]^(-1/(k-1</h3>
           <p class="cresult">k=3 scaling exponent confirmed: empirical p_c*sqrt(2N) constant across N=400/800/1600 (1.26,1.26,1.19). N^(-1/2) scaling reproduced; prefactor ~1.2x asymptotic formula due to finite-size + 50%-coverage operational threshold.</p>
-          <div class="cfoot"><span class="cyear">Clique Percolation in Random Networks (Derenyi</span><a class="code" href="https://github.com/DanceNitra/agora/blob/main/agora_output/lab/20260613-054612_clique-percolation-dpv.py" target="_blank" rel="noopener">runnable model &rarr;</a></div>
+          <div class="cfoot"><span class="cyear">Clique Percolation in Random Networks (Derenyi</span></div>
         </div>
       </article>
       <article class="card ok" data-v="REPRODUCED" data-reveal>
@@ -355,7 +375,7 @@
             <span class="cfield"></span></div>
           <h3>Berger (2003): conditional-frequentist testing reconciles Fisher/Neyman/Jeffreys - the con</h3>
           <p class="cresult">Calibration exact: empirical freq(H0 true | evidence) = Bayesian P(H0|x) across all bins. Berger-Sellke: p=0.05 -&gt; P(H0|x)=0.216, p=0.005 -&gt; 0.041 (p-value overstates evidence ~4x at 0.05).</p>
-          <div class="cfoot"><span class="cyear">Berger (2003), Could Fisher, Jeffreys and Neym</span><a class="code" href="https://github.com/DanceNitra/agora/blob/main/agora_output/lab/20260613-035707_berger-conditional-frequentist-reconciliation.py" target="_blank" rel="noopener">runnable model &rarr;</a></div>
+          <div class="cfoot"><span class="cyear">Berger (2003), Could Fisher, Jeffreys and Neym</span></div>
         </div>
       </article>
       <article class="card ok" data-v="REPRODUCED" data-reveal>
@@ -365,7 +385,7 @@
             <span class="cfield"></span></div>
           <h3>Systems in the same universality class share the same critical exponents (Lubeck 2004)</h3>
           <p class="cresult">Three structurally different Z2 mean-field models (tanh self-consistency, phi^4 free energy, arctan self-consistency) all give order-parameter exponent beta=0.500; a different-class absorbing-state model gives beta=1.000. Same class -&gt; same</p>
-          <div class="cfoot"><span class="cyear">Universal Scaling Behavior of Non-Equilibrium </span><a class="code" href="https://github.com/DanceNitra/agora/blob/main/agora_output/lab/20260612-235202_universality-critical-exponents.py" target="_blank" rel="noopener">runnable model &rarr;</a></div>
+          <div class="cfoot"><span class="cyear">Universal Scaling Behavior of Non-Equilibrium </span></div>
         </div>
       </article>
       <article class="card ok" data-v="REPRODUCED" data-reveal>
@@ -375,7 +395,7 @@
             <span class="cfield"></span></div>
           <h3>LinUCB (Chu et al 2011): linear contextual bandit achieves O(sqrt(Td log^3)) i.e. sublinea</h3>
           <p class="cresult">Empirical regret growth exponent 0.03-0.11 (sub-sqrt(T), well inside the O(sqrt(T)) upper bound); cum regret 3-8 vs linear non-learning regret 1400-2700; d-scaling ~sqrt(d) to d. Computable core holds.</p>
-          <div class="cfoot"><span class="cyear">Contextual Bandits with Linear Payoff Function</span><a class="code" href="https://github.com/DanceNitra/agora/blob/main/agora_output/lab/20260612-230455_linucb-regret-replication.py" target="_blank" rel="noopener">runnable model &rarr;</a></div>
+          <div class="cfoot"><span class="cyear">Contextual Bandits with Linear Payoff Function</span></div>
         </div>
       </article>
       <article class="card ok" data-v="REPRODUCED" data-reveal>
