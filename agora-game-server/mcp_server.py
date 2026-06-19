@@ -512,6 +512,19 @@ _LLM_ON = bool(_LLM_KEY)
 _LLM_MAX_TOKENS = int(os.environ.get("DUNGEON_LLM_MAX_TOKENS", "350"))
 _LLM_THINK = os.environ.get("DUNGEON_LLM_THINK", "").strip().lower()  # "false" disables thinking
 
+# Cloud concurrency throttle (2026-06-19): the ollama.com plan caps CONCURRENT requests and was
+# returning HTTP 429 "too many concurrent requests" when the 8 agents + their per-tick activities
+# fired cloud LLM calls all at once -> LLM_quests=0, agents starved. Gate every cloud call through a
+# small semaphore so we stay under the cap (and leave headroom for the brain on the same account).
+# Timeout-acquire (never blocks a worker thread > the timeout, never deadlocks): a waiter that can't
+# get a slot returns None and the agent falls back to its renewable-quest pool. Env-tunable.
+_LLM_CONCURRENCY = max(1, int(os.environ.get("DUNGEON_LLM_CONCURRENCY", "3")))   # ollama.com cap = 3
+_LLM_SEM = threading.Semaphore(_LLM_CONCURRENCY)
+# Wait long enough that waiters QUEUE and get served (FIFO-fair) rather than skip — so all 8 agents
+# go through "na preskacku" (3 at a time, everyone in turn), not just the same fast few. A burst of 8
+# drains in ~15s at 3-concurrency, so 30s almost never skips; the cap only ever holds 3 cloud calls.
+_LLM_SEM_WAIT = float(os.environ.get("DUNGEON_LLM_SEM_WAIT", "30"))
+
 # Pace: "study" = slow & deliberate (default; real research, light on the quota),
 # "fast" = lively banter. Override with DUNGEON_PACE.
 _PACE = os.environ.get("DUNGEON_PACE", "study").strip().lower()
@@ -784,6 +797,9 @@ def _llm_content_sync(system: str, user: str) -> str | None:
         "HTTP-Referer": "https://github.com/DanceNitra/agora",
         "X-Title": "Dungeon OS",
     })
+    if not _LLM_SEM.acquire(timeout=_LLM_SEM_WAIT):
+        logger.debug("LLM call skipped: cloud concurrency gate busy (avoiding 429)")
+        return None
     try:
         with _urlreq.urlopen(req, timeout=45) as r:
             data = json.loads(r.read())
@@ -791,6 +807,8 @@ def _llm_content_sync(system: str, user: str) -> str | None:
     except Exception as e:
         logger.debug(f"LLM call failed: {e}")
         return None
+    finally:
+        _LLM_SEM.release()
 
 
 def _llm_say_sync(system: str, user: str) -> str | None:
@@ -930,41 +948,44 @@ _ROLE_CONTRIB = {
 
 
 async def _pick_collab_seed():
-    """Rotate the seed across the real research surface. The FRONTIER (under-explored thin
-    domains + structural holes) gets 2 of every 4 slots so research is pushed to the EDGE, not
-    the dense centre the agents churn on; findings/gaps/bridges fill the other two."""
+    """Rotate the collab/pipeline seed across REAL RESEARCH only: fresh papers to ground, Agora's own
+    claims to test, under-explored thin frontier domains, and recent findings to deepen. Combinatorial
+    'bridge' (A <-> B) and 'gap' seeds were removed 2026-06-19 — they produced the low-substance
+    'AgentA + AgentB: X <-> Y' filler the owner called a 'gaming party'. No source = skip, never a bridge."""
     i = _collab_rot["i"] % 4
     _collab_rot["i"] += 1
     try:
-        if i in (0, 2):                                   # FRONTIER — priority, novelty by default
+        if i == 0:                                        # FRESH PAPER — grounded, novel frontier literature
+            d = await asyncio.to_thread(_brain_get_sync, "/api/v1/agent-os/brain/library", 60)
+            ps = [p for p in (d or {}).get("papers", []) if (p.get("title") or "").strip()]
+            if ps:
+                p = random.choice(ps)
+                return ("paper", p["title"][:80],
+                        f"Ground ONE finding this paper directly supports, naming it (Author Year): {p['title']}")
+        if i == 1:                                        # TEST AGORA'S OWN CLAIM (flywheel falsifiers)
+            d = await asyncio.to_thread(_brain_get_sync, "/api/v1/agent-os/brain/flywheel/questions?n=4", 60)
+            qs = (d or {}).get("open", [])
+            if qs:
+                q = random.choice(qs)
+                return ("claim", q["question"][:80], f"Find real evidence on whether this holds: {q['question']}")
+        if i == 2:                                        # FRONTIER — under-explored THIN domains (not combinatorial holes)
             d = await asyncio.to_thread(_brain_get_sync, "/api/v1/agent-os/brain/frontier-seed", 75)
             t = (d or {}).get("target") or {}
-            if t.get("target"):
-                kind = "frontier-hole" if t.get("kind") == "hole" else "frontier-thin"
-                return (kind, t["target"][:80], t.get("prompt", "")[:300])
-            # frontier exhausted (everything bridged/developed) → fall through to a finding
-        if i == 1:
-            d = await asyncio.to_thread(_brain_get_sync, "/api/v1/agent-os/brain/gaps?n=8")
-            gs = (d or {}).get("gaps", [])
-            if gs:
-                g = random.choice(gs)
-                return ("gap", g["title"][:80], f"The vault is thin on: {g['title']}")
-        if i == 3:
-            d = await asyncio.to_thread(_brain_get_sync, "/api/v1/agent-os/brain/collective?limit=8")
-            ks = [k for k in (d or {}).get("knowledge", []) if (k.get("content") or "")]
-            if ks:
-                k = random.choice(ks)
-                title = (k.get("title") or "a recent finding").replace("Pipeline: ", "").strip()
-                return ("finding", title[:80], (k.get("content") or "")[:240])
-        # any slot can fall back to a bridge seed if its own source came up empty
-        if True:
-            d = await asyncio.to_thread(
-                _brain_get_sync, "/api/v1/agent-os/brain/bridges?n=4&rationale=false")
-            bs = (d or {}).get("bridges", [])
-            if bs:
-                b = random.choice(bs)
-                return ("bridge", f"{b['a']} ↔ {b['b']}"[:80],
-                        f"Two related but unlinked ideas to fuse: {b['a']} and {b['b']}")
+            if t.get("target") and t.get("kind") != "hole":
+                return ("frontier-thin", t["target"][:80], t.get("prompt", "")[:300])
+        # i == 3, or any slot whose own source was empty → deepen a recent REAL finding
+        d = await asyncio.to_thread(_brain_get_sync, "/api/v1/agent-os/brain/collective?limit=8")
+        ks = [k for k in (d or {}).get("knowledge", []) if (k.get("content") or "")]
+        if ks:
+            k = random.choice(ks)
+            title = (k.get("title") or "a recent finding").replace("Pipeline: ", "").strip()
+            return ("finding", title[:80], (k.get("content") or "")[:240])
+        # final fallback → a fresh paper (NEVER a bridge)
+        d = await asyncio.to_thread(_brain_get_sync, "/api/v1/agent-os/brain/library", 60)
+        ps = [p for p in (d or {}).get("papers", []) if (p.get("title") or "").strip()]
+        if ps:
+            p = random.choice(ps)
+            return ("paper", p["title"][:80], f"Ground ONE finding this paper supports: {p['title']}")
     except Exception:
         pass
     return None
@@ -1469,9 +1490,10 @@ def _strip_quest_prefix(title: str) -> str:
 
 
 async def _renewable_quests(eid: str, want: int = 3) -> list:
-    """A GUARANTEED, inexhaustible supply of real work drawn from the vault's surface — gaps to
-    develop, bridges to connect, findings to deepen. The vault always has these, so agents NEVER
-    run out of meaningful tasks (the flaky LLM planner becomes just a bonus, not a dependency)."""
+    """A GUARANTEED supply of REAL RESEARCH (no combinatorial filler): test Agora's own claims
+    (flywheel), pursue harvested frontier directions, ground findings from FRESH papers, and form+test
+    hypotheses that deepen existing findings. Bridges/gaps (combinatorial recombination of the
+    saturated vault) were removed 2026-06-19 — they produced the low-substance 'gaming party' notes."""
     pool, priority = [], []
     try:
         # COMPOUNDING FLYWHEEL first — the agents test the FALSIFIERS of Agora's own insights (its
@@ -1486,15 +1508,19 @@ async def _renewable_quests(eid: str, want: int = 3) -> list:
             if d.get("kind") == "research":          # upgrade-directions go to the user, not agents
                 priority.append((f"Pursue direction: {d['title']}",
                                  f"Advance this with real evidence — {d.get('why', '')}"))
-        gaps = await _brain_gaps()
-        for g in random.sample(gaps, min(3, len(gaps))):
-            pool.append((f"Develop the gap: {g['title']}",
-                         f"Find real evidence to develop '{g['title']}'"))
-        bd = await asyncio.to_thread(
-            _brain_get_sync, "/api/v1/agent-os/brain/bridges?n=5&rationale=false")
-        for b in (bd or {}).get("bridges", [])[:3]:
-            pool.append((f"Connect {b['a']} <-> {b['b']}",
-                         f"Ground how {b['a']} relates to {b['b']}, citing a real paper"))
+        # FRESH PAPERS (priority) — real, novel, frontier literature the vault does NOT yet cover, so
+        # agents do GROUNDED research on new science instead of recombining the saturated vault. This
+        # replaces the old "Connect A<->B" bridges and vague "Develop the gap" quests, which were
+        # combinatorial filler (the "gaming party"): they recombined existing notes and produced
+        # low-substance notes. Real research = grounded in a real paper, on the frontier.
+        lib = await asyncio.to_thread(_brain_get_sync, "/api/v1/agent-os/brain/library")
+        for p in (lib or {}).get("papers", [])[:6]:
+            ttl = (p.get("title") or "").strip()
+            if ttl:
+                priority.append((f"Ground a finding from: {ttl[:60]}",
+                                 f"State ONE research finding this paper directly supports, "
+                                 f"paraphrasing its actual result and naming it (Author Year): {ttl}",
+                                 "create"))
         fd = await asyncio.to_thread(_brain_get_sync, "/api/v1/agent-os/brain/collective?limit=8")
         finds = [k for k in (fd or {}).get("knowledge", []) if (k.get("content") or "")]
         for k in random.sample(finds, min(3, len(finds))):
@@ -3048,7 +3074,7 @@ async def _brain_contribute(eid: str, title: str, content: str) -> bool:
 # well-covered topics score ~0.74-0.80 on vault-search, genuinely novel ones ~0.50-0.58 — 0.72 splits
 # them cleanly. Above it, skip the discovery (the vault already knows this) and free the slot for new
 # ground. The write-time dedup stays as the backstop.
-_NOVELTY_GATE = float(os.environ.get("DUNGEON_NOVELTY_GATE", "0.72"))
+_NOVELTY_GATE = float(os.environ.get("DUNGEON_NOVELTY_GATE", "0.88"))   # 2026-06-19: vault grew to ~6000 notes, so even FRESH papers score 0.76-0.85; 0.72 blocked everything. 0.88 blocks only near-dups (write-time dedup backstops).
 
 
 async def _grounded_discovery(eid: str, intent: str) -> None:
