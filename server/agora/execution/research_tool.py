@@ -95,14 +95,19 @@ def _get_json(url: str, headers: dict, retries: int = 2):
     raise RuntimeError("unreachable")
 
 
-def arxiv_search(query: str, max_results: int = 5) -> list[dict]:
-    """Search arXiv for real papers. Returns [{title, authors, summary, url, published}]."""
-    q = urllib.parse.urlencode({
+def arxiv_search(query: str, max_results: int = 5, sort: str = "relevance") -> list[dict]:
+    """Search arXiv for real papers. Returns [{title, authors, summary, url, published}].
+    sort='relevance' (default) for best-match; sort='submittedDate' for newest-first (used by the
+    frontier harvester so it pulls FRESH papers instead of re-finding the same already-read top hits)."""
+    params = {
         "search_query": f"all:{query}",
         "start": 0,
         "max_results": max_results,
-        "sortBy": "relevance",
-    })
+        "sortBy": sort,
+    }
+    if sort == "submittedDate":
+        params["sortOrder"] = "descending"
+    q = urllib.parse.urlencode(params)
     req = urllib.request.Request(f"{_ARXIV}?{q}",
                                  headers={"User-Agent": "agora-research/1.0"})
     try:

@@ -46,7 +46,10 @@ def harvest(per_topic: int = 5) -> dict:
     rot = int(time.time() // 3600) % len(_FRONTIER_QUERIES)   # rotate hourly through the topics
     topic = _FRONTIER_QUERIES[rot]
     try:
-        papers = arxiv_search(topic, per_topic)
+        # newest-first so each harvest pulls FRESH submissions; relevance-sort re-found the same
+        # already-read top hits every cycle (0 added) and let the reading list starve to ~2 papers,
+        # which collapsed the swarm onto the flywheel's few questions (monoculture). 2026-06-19.
+        papers = arxiv_search(topic, per_topic, sort="submittedDate")
     except Exception as e:
         return {"topic": topic, "error": str(e)[:120], "queued": 0}
     ids = _ids_from(papers)
