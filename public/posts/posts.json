@@ -14,6 +14,20 @@
   "bilingual": true
  },
  {
+  "slug": "we-built-a-meter-for-when-an-ai-is-confidently-wrong---and-c",
+  "title": "We built a meter for when an AI is confidently wrong - and confidence can't see it",
+  "title_sk": "Postavili sme meradlo na to, kedy sa AI sebaisto myli - a confidence to nevidi",
+  "desc": "The problem. A confidence score cannot distinguish two failures that look identical from the outside: a model that ignores a correct document, and a model that confidently swallows a wrong or poisoned",
+  "desc_sk": "Confidence skore nerozlisi, ci model ignoruje spravny dokument alebo sebaisto prehlta nespravny. Grounding Meter to meria priamo - a predpoveda sebaiste-nespravne odpovede (r=-0.93) tam, kde confidence sotva (0.15-0.36).",
+  "date": "2026-06-19",
+  "tags": "Research",
+  "tags_sk": "Výskum",
+  "kicker": "Research",
+  "kicker_sk": "Výskum",
+  "read": 2,
+  "bilingual": true
+ },
+ {
   "slug": "robustness-checks-arent-ritual---theyre-a-measurable-filter-",
   "title": "Robustness checks aren't ritual - they're a measurable filter (if the tests are independent)",
   "title_sk": "Robustness checks aren't ritual - they're a measurable filter (if the tests are independent)",
