@@ -3095,7 +3095,12 @@ async def _grounded_discovery(eid: str, intent: str) -> None:
         return
     related = await _brain_vault_search(intent)
     top_sim = (related[0].get("score", 0.0) if related else 0.0)
-    if top_sim >= _NOVELTY_GATE:     # the vault already covers this — generating would just dup it
+    # FRESH-PAPER EXEMPTION (2026-06-19): a quest to ground a specific NEW paper is novel by
+    # definition — its finding isn't in the vault even if the TOPIC is vault-heavy. The topic-
+    # similarity gate wrongly blocked these (e.g. "Ground a finding from: Lee & Spekkens" scored
+    # 0.88 because causal inference is well-covered), starving the grounded-paper engine. Exempt them.
+    _fresh_paper = intent.startswith("Ground a finding from:")
+    if top_sim >= _NOVELTY_GATE and not _fresh_paper:  # the vault already covers this — would just dup it
         logger.info(f"[novelty-gate] {_AGENT_NAMES.get(eid, eid)} skipped '{intent[:40]}' "
                     f"(vault sim {top_sim:.2f} >= {_NOVELTY_GATE}) — steering to novel ground")
         broadcast({"type": "os_build", "kind": "collab", "who": _AGENT_NAMES.get(eid, eid),
