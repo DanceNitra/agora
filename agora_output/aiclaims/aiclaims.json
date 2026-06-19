@@ -1,0 +1,23 @@
+{
+ "name": "The AI-Claim Crucible",
+ "description": "A standing, machine-readable ledger that rebuilds widely-repeated AI / agent engineering claims as the smallest runnable test and rules REPRODUCED / FAILED / NOT_COMPUTABLE. Honest receipts for the field's folklore.",
+ "generated": "2026-06-19",
+ "entries": [
+  {
+   "claim": "Multi-agent systems (an orchestrator delegating to sub-agents) outperform a single agent on complex tasks.",
+   "source": "2026 agent-engineering folklore (contested: Cognition 'Don't Build Multi-Agents' vs Anthropic's multi-agent research system); Gartner: ~40% of agentic projects scrapped.",
+   "verdict": "NOT_COMPUTABLE",
+   "note": "Tested at FIXED token cost on decomposable ground-truth tasks (one base model, only the scaffold differs; single self-consistency vs an orchestrator+workers+aggregator scaffold). Run 3x: the SAME config swings 0.15-0.20 in accuracy run-to-run on IDENTICAL tasks (multi@wmax1400: 0.75/0.75/0.92; single k=5: 0.96/0.75) at n=24, temp 0.7. The comparison is dominated by LLM-stochasticity noise at realistic eval scale -> the claim cannot be cleanly settled, AND the loud folklore (in both directions) rests on under-powered, non-reproducible comparisons. A stable verdict would need large-n multi-seed evals, which the folklore/blog benchmarks do not run. Honest scope: our own eval is also too small for a positive claim; the finding is the NON-REPRODUCIBILITY itself.",
+   "lab": "agora_output/aiclaims/20260619_multi_vs_single_agent_eval.py (+ PREREGISTRATION_multi-vs-single-agent.md)",
+   "date": "2026-06-19"
+  },
+  {
+   "claim": "When you evaluate N models/configs on a benchmark and report the top scorer's number, that score is a reliable estimate of its true performance and the winner is the truly-best model.",
+   "source": "Universal AI benchmarking / leaderboard practice (SOTA reporting, hyperparameter + model selection on a held-out benchmark).",
+   "verdict": "FAILED",
+   "note": "Winner's curse (selection-on-the-max), clean DETERMINISTIC model (no LLM noise - the lesson from entry #1): N models with true accuracies clustered within sigma_true=0.04, each measured with eval noise (finite test set + run-to-run variance). At N=50 models and eval-noise SE 0.06 (~ a 50-200 item benchmark): the reported winner's score is inflated by +0.112 (the SOTA bar is overstated), the observed winner is the truly-best model only 17% of the time, and trusting it costs 0.040 true accuracy vs the real best. Both effects GROW with the number of candidates and the eval noise (P(true best): N=5 -> 62%, N=100 -> 13%). So 'the leaderboard winner's score is reliable' FAILS: more candidates + noisier evals = more inflated, less trustworthy. (Ties to entry #1: the same eval noise that makes multi-vs-single non-reproducible is what drives this inflation.)",
+   "lab": "agora_output/aiclaims/20260619_benchmark_winners_curse.py",
+   "date": "2026-06-19"
+  }
+ ]
+}

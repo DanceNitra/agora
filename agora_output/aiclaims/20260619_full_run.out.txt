@@ -1,0 +1,7 @@
+=== FULL: multi-vs-single agent at fixed cost (n=20, K=8 steps=10) ===
+  single(k=1)      acc=0.450 (SE 0.111)  avg_tokens=2120
+  single(k=3)      acc=0.850 (SE 0.080)  avg_tokens=6322
+  multi(wmax=600)  acc=0.700 (SE 0.102)  avg_tokens=3145
+  multi(wmax=1400) acc=0.750 (SE 0.097)  avg_tokens=3262
+
+VERDICT: REPRODUCED (multi dominates at fixed cost)

@@ -1,0 +1,15 @@
+=== RESOLVE (n=24, K=8 steps=10, same tasks) — clean equal-cost Pareto ===
+  single(k=1)      acc=0.458 (SE 0.102)  avg_tokens=2120
+  single(k=3)      acc=0.750 (SE 0.088)  avg_tokens=6309
+  single(k=5)      acc=0.958 (SE 0.041)  avg_tokens=10213
+  multi(wmax=200)  acc=0.000 (SE 0.000)  avg_tokens=2481
+  multi(wmax=1400) acc=0.750 (SE 0.088)  avg_tokens=3271
+
+Pareto frontier (cost-ascending):
+  single(k=1)      0.458 @ 2120 tok
+  multi(wmax=1400) 0.750 @ 3271 tok
+  single(k=5)      0.958 @ 10213 tok
+
+multi on frontier: 1 | single on frontier: 2 | highest-accuracy arm: single
+
+Equal-cost (~2300 tok): multi 0.00 vs single 0.46 -> delta -0.46 (-4.5 SE)
