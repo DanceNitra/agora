@@ -69,9 +69,14 @@ def _iso_to_ts(iso: str) -> float:
         return 0.0
 
 
+MIN_STARS = 3   # a real-community bar: drop solo/0-star repos (keyword match != engagement target)
+
+
 def find_opportunity() -> dict | None:
     """Search GitHub open issues across a rotating strength-theme; return the best-fit candidate
-    not already contacted, with a fit score and its text for Claude to judge."""
+    not already contacted, with a fit score and its text for Claude to judge. Quality-gated: skip
+    self-authored 'issues-as-notebook' entries and require a real-community repo (stars/forks), so a
+    mere keyword match on a solo personal project is not surfaced as an outreach target."""
     from agora.execution.correspondent import _api
     seen = {x.get("url") for x in _load()}
     rot = int(time.time() // 3600) % len(_THEMES)
@@ -82,8 +87,8 @@ def find_opportunity() -> dict | None:
         res = _api("GET", f"/search/issues?q={q}&sort=updated&order=desc&per_page=15")
     except Exception as e:
         return {"error": str(e)[:120], "theme": theme}
-    best = None
     now = time.time()
+    cands = []
     for it in res.get("items", []):
         url = it.get("html_url", "")
         if not url or url in seen or it.get("pull_request"):
@@ -96,24 +101,44 @@ def find_opportunity() -> dict | None:
         if repo.lower().startswith("dancenitra/"):
             continue
         title, body = it.get("title", ""), (it.get("body") or "")[:1200]
-        # fit = how much the issue overlaps our strength theme + is it actually a question
-        overlap = len(theme_words & _words(title + " " + body))
-        asks = 1 if ("?" in title or "?" in body[:400]
-                     or re.search(r"\bhow\b|\bwhy\b|\bbest way\b", (title + body[:200]).lower())) else 0
         reactions = (it.get("reactions") or {}).get("total_count", 0)
-        # FRESHNESS — a reply only lands if the participants are still present. Reward recently
-        # active threads and skip cold ones (we revived a month-dead thread once; no one answered).
+        comments = it.get("comments", 0)
+        author = (it.get("user") or {}).get("login", "").lower()
+        owner = repo.split("/")[0].lower()
+        # SKIP solo 'issues-as-notebook': the repo owner filing their own issue with NO community
+        # response (0 comments + 0 reactions) is a private planning note, not a question to engage.
+        if author == owner and comments == 0 and reactions == 0:
+            continue
+        # FRESHNESS — a reply only lands if the participants are still present. Skip cold threads.
         upd = it.get("updated_at") or ""
         age_d = (now - _iso_to_ts(upd)) / 86400 if upd else 999
         if age_d > 45:                      # cold thread — engaging it is shouting into a void
             continue
+        # fit = how much the issue overlaps our strength theme + is it actually a question
+        overlap = len(theme_words & _words(title + " " + body))
+        asks = 1 if ("?" in title or "?" in body[:400]
+                     or re.search(r"\bhow\b|\bwhy\b|\bbest way\b", (title + body[:200]).lower())) else 0
         fresh = 3 if age_d <= 7 else 2 if age_d <= 21 else 0
-        score = overlap * 2 + asks * 3 + min(reactions, 5) + fresh
-        if score >= 5 and (best is None or score > best["score"]):
-            best = {"url": url, "repo": repo, "issue_number": int(m.group(2)),
-                    "title": title[:160], "body": body[:900], "theme": theme,
-                    "score": score, "reactions": reactions, "age_days": round(age_d, 1)}
-    return best
+        score = overlap * 2 + asks * 3 + min(reactions, 5) + min(comments, 5) + fresh
+        if score >= 5:
+            cands.append({"url": url, "repo": repo, "issue_number": int(m.group(2)),
+                          "title": title[:160], "body": body[:900], "theme": theme,
+                          "score": score, "reactions": reactions, "comments": comments,
+                          "age_days": round(age_d, 1)})
+    # COMMUNITY GATE: check the top-scoring candidates' repos (bounded API calls) and return the first
+    # that clears the real-community bar (stars/forks). Drops 0-star/0-fork solo projects entirely.
+    for c in sorted(cands, key=lambda z: -z["score"])[:6]:
+        try:
+            rp = _api("GET", f"/repos/{c['repo']}")
+            stars = int(rp.get("stargazers_count", 0) or 0)
+            forks = int(rp.get("forks_count", 0) or 0)
+        except Exception:
+            continue
+        if stars >= MIN_STARS or forks >= 1:
+            c["stars"] = stars
+            c["forks"] = forks
+            return c
+    return None
 
 
 def record_contacted(url: str, repo: str, issue: int, outcome: str = "drafted") -> dict | None:
