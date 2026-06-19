@@ -18,6 +18,22 @@
    "note": "Winner's curse (selection-on-the-max), clean DETERMINISTIC model (no LLM noise - the lesson from entry #1): N models with true accuracies clustered within sigma_true=0.04, each measured with eval noise (finite test set + run-to-run variance). At N=50 models and eval-noise SE 0.06 (~ a 50-200 item benchmark): the reported winner's score is inflated by +0.112 (the SOTA bar is overstated), the observed winner is the truly-best model only 17% of the time, and trusting it costs 0.040 true accuracy vs the real best. Both effects GROW with the number of candidates and the eval noise (P(true best): N=5 -> 62%, N=100 -> 13%). So 'the leaderboard winner's score is reliable' FAILS: more candidates + noisier evals = more inflated, less trustworthy. (Ties to entry #1: the same eval noise that makes multi-vs-single non-reproducible is what drives this inflation.)",
    "lab": "agora_output/aiclaims/20260619_benchmark_winners_curse.py",
    "date": "2026-06-19"
+  },
+  {
+   "claim": "AI agent success decays with a CONSTANT hazard (an exponential 'half-life') as the task gets longer.",
+   "source": "arXiv 2505.05115 'Is there a half-life for the success rates of AI agents?'; tested on METR time-horizon data (metr.org/blog/2025-03-19; epoch.ai/benchmarks/metr-time-horizons).",
+   "verdict": "REPRODUCED",
+   "note": "Fit on METR's real public anchors (success vs human-task-length: ~99% @ 4min, ~80% @ 15min, 50% @ 60min [Claude 3.7], <10% @ 240min). A constant-hazard exponential (P = 0.5^(t/60min)) fits well: predicts 0.95/0.84/0.50/0.06 vs observed 0.99/0.80/0.50/0.08, SSE 0.0032 - actually BETTER than the logistic-in-log-time (SSE 0.0075, which overshoots the tail). The half-life claim holds. Minor tension: the t80/t50 ratio is slightly steeper than exponential (0.250 vs 0.322), hinting at mild extra steepening, but 4 anchor points can't resolve it. HONEST SCOPE: public anchors only (Claude 3.7 + aggregate); METR's raw per-task data would sharpen the per-model hazard.",
+   "lab": "agora_output/aiclaims/20260619_metr_horizon_survival_multiverse.py",
+   "date": "2026-06-19"
+  },
+  {
+   "claim": "The 'AI time horizon' is a robust headline number (supporting 'AI will automate month-long tasks within ~5 years').",
+   "source": "METR time-horizon headline + 7-month-doubling extrapolation (metr.org/blog/2025-03-19); multiverse / specification-curve method (One Model Many Scores, arXiv 2308.16681).",
+   "verdict": "FAILED",
+   "note": "Multiverse over ONE analytic fork METR itself exposes - the success-threshold choice. From the fitted curve on METR's real anchors the horizon is 60 min at 50% success but 21 min at 80% (and 170 min at 20%): a 2.8x swing from an arbitrary threshold. At doubling-every-7-months that 2.8x is ~11 months of apparent 'progress' - so the famous 'month-long tasks in ~5 years' timeline slips ~11 months if you (reasonably) demand 80% reliability instead of 50%. The headline is NOT a robust single number; it rides on an unstated analytic choice. (A full specification curve over more forks needs METR's raw per-task data.)",
+   "lab": "agora_output/aiclaims/20260619_metr_horizon_survival_multiverse.py",
+   "date": "2026-06-19"
   }
  ]
 }
