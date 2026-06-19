@@ -33,6 +33,9 @@ server/.research_cache/
 agora-game-server/_dungeon.log
 agora-game-server/_dungeon.err
 
+# dungeon runtime state (persisted across restarts, not source)
+agora-game-server/.recent_intents.json
+
 # NOTE: agora_output/ (lab scripts + public digests) is intentionally TRACKED —
 # those are durable research artifacts, committed as a record, not ignored.
 # EXCEPT audit clones: foreign repos we measure are not ours to commit.
