@@ -1500,7 +1500,8 @@ def _save_recent_intents() -> None:
         pass
 
 _QUEST_PREFIX_RE = re.compile(
-    r"^(?:Hypothesize on|Pursue direction|Deepen|Develop the gap|Connect|Frontier|Hypothesis|Pipeline)"
+    r"^(?:Hypothesize on|Pursue direction|Deepen|Develop the gap|Connect|Frontier|Hypothesis|Pipeline"
+    r"|Measured|Ground a finding from|Test Agora'?s claim|Hypothesize from findings|Replicate claim)"
     r"\s*:?\s*", re.I)
 
 
@@ -3132,6 +3133,20 @@ async def _experiment_discovery(eid: str, intent: str) -> None:
     """Reduce the claim to a runnable experiment via /brain/methods/match and record the MEASURED result."""
     who = _AGENT_NAMES.get(eid, eid)
     theme = _strip_quest_prefix(intent)
+    # DEDUP: skip if this exact theme was already measured recently. The frontier directions are a fixed
+    # list quested by several agents + findings get re-fed as seeds, so without this the SAME result gets
+    # re-run and re-recorded 4-5x (real research that looks like churn). Checking first also saves the
+    # expensive match+Lab run. (Prefix-normalized via _strip_quest_prefix, which now also peels 'Measured:'.)
+    try:
+        recent = await asyncio.to_thread(_brain_get_sync, "/api/v1/agent-os/brain/collective?limit=30")
+        norm = theme.lower()[:50]
+        if norm and any(_strip_quest_prefix(k.get("title") or "").lower()[:50] == norm
+                        for k in (recent or {}).get("knowledge", [])):
+            broadcast({"type": "os_build", "kind": "collab", "who": who,
+                       "text": f"'{theme[:32]}' already measured - skipping duplicate"})
+            return
+    except Exception:
+        pass
     res = await asyncio.to_thread(
         _brain_post_sync, "/api/v1/agent-os/brain/methods/match",
         {"theme": theme[:300], "requester": who}, 120)            # 120s: the match + Lab run is slow
