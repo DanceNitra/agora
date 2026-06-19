@@ -290,6 +290,40 @@ print(f"MEASURED: true value captured (z) - oracle {{oracle:.2f}}, honest-proxy 
 print(f"VERDICT: {{'GOODHART - gaming the proxy cuts captured true value by '+format(drop,'.0f')+'%' if honest > 1e-6 and gamed < honest - 0.05 else 'PROXY HOLDS - optimizing it still tracks the true objective here'}}")
 ''',
     },
+    "grounding-firewall-sim": {
+        "description": ("Simulates whether a GROUNDING-SENSITIVITY abstention gate beats a CONFIDENCE "
+                        "gate at catching poisoned-context wrong answers (selective prediction under RAG "
+                        "poisoning). Sweeps poison rate, model deference to a bad doc, and how well each "
+                        "signal tracks correctness; reports the risk-coverage AUC of each gate. Use for "
+                        "claims that grounding/sensitivity-based abstention improves RAG safety, catches "
+                        "hallucinations or poisoned-context errors that confidence misses, or that "
+                        "confidence is a poor abstention signal. Backs the Grounding Firewall capstone."),
+        "params": {"n": ("int", 500, 50000, 4000), "poison_rate": ("float", 0.0, 1.0, 0.3),
+                   "deference": ("float", 0.0, 1.0, 0.6), "conf_signal": ("float", 0.0, 1.0, 0.37),
+                   "sens_signal": ("float", 0.0, 1.0, 0.68)},
+        "code": r'''
+import numpy as np
+rng = np.random.default_rng(7)
+n, poison_rate, deference, conf_signal, sens_signal = {n}, {poison_rate}, {deference}, {conf_signal}, {sens_signal}
+poisoned = rng.random(n) < poison_rate
+wrong = (poisoned & (rng.random(n) < deference)) | ((~poisoned) & (rng.random(n) < 0.05))  # followed poison, or rare clean error
+correct = ~wrong
+doc_driven = wrong | ((~poisoned) & (rng.random(n) < 0.5))   # poison-wrong are doc-driven; some clean answers use the doc too
+def sig(flag, strength):                      # point-biserial signal: corr with the flag ~= strength
+    return strength*(2.0*flag.astype(float)-1.0) + rng.normal(0, 1.0, n)
+confidence = sig(correct, conf_signal)        # confidence: a (weak) signal of correctness
+sensitivity = sig(doc_driven, sens_signal)    # sensitivity: a signal of doc-dependence (firewall abstains when high)
+def auc(trust):                               # mean cumulative risk over coverage; lower is better
+    w = wrong[np.argsort(-trust)]
+    return float((np.cumsum(w)/np.arange(1, n+1)).mean())
+def corr(a, b):
+    a = a-a.mean(); b = b-b.mean(); d = (np.sum(a*a)*np.sum(b*b))**0.5
+    return float(np.sum(a*b)/d) if d else 0.0
+a_conf, a_fw = auc(confidence), auc(-sensitivity)
+print(f"MEASURED: risk-coverage AUC confidence={{a_conf:.3f}} vs firewall={{a_fw:.3f}} (lower=better) ; corr(conf,correct)={{corr(confidence,correct.astype(float)):+.2f}} corr(-sens,correct)={{corr(-sensitivity,correct.astype(float)):+.2f}} ; poison={{poison_rate}} wrong={{wrong.mean():.2f}}")
+print(f"VERDICT: {{'FIREWALL WINS - grounding-abstention beats confidence ('+format(a_fw,'.3f')+' < '+format(a_conf,'.3f')+')' if a_fw < a_conf-0.01 else ('CONFIDENCE WINS' if a_conf < a_fw-0.01 else 'TIE - no separation at these params')}}")
+''',
+    },
 }
 
 
