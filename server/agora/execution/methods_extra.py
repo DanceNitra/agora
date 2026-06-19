@@ -1,5 +1,5 @@
-"""Batch-authored experiment templates (2026-06-19), merged into the Methods Library.
-Authored + self-verified by a 12-agent workflow, then re-tested at integration."""
+"""Batch-authored experiment templates, merged into the Methods Library.
+Authored + self-verified by workflows (2026-06-19), then re-tested at integration."""
 EXTRA_TEMPLATES = {
     'did-parallel-trends': {
         "description": 'Tests Difference-in-Differences / event-study identification when parallel trends is violated by a differential pre-trend that persists into the post period. Shows the DiD estimate is biased away from the true treatment effect, and that the bias tracks the pre-trend slope (so a "significant" DiD coefficient can be pure trend, not the intervention). Use for any claim that a DiD or event-study identifies a causal effect, policy/natural-experiment evaluations, two-period or staggered before/after designs, "treatment vs control after a shock", or any "the intervention caused X" comparison where treated and control units could be on diverging baseline trajectories.',
@@ -529,6 +529,852 @@ se = gb.std(ddof=1)
 
 print(f"MEASURED: outcome Gini = {{gini:.3f}} (SE {{se:.3f}}); top-1% share = {{top1:.1f}}% from ZERO skill differences (accel={{accel}})")
 print(f"VERDICT: {{'RICH-GET-RICHER - extreme inequality (Gini '+format(gini,'.2f')+') with identical agents; unequal outcomes do NOT imply skill' if gini > 0.30 else 'EGALITARIAN - neutral process did not concentrate; inequality here would need a skill explanation'}}")
+''',
+    },
+    'interdependent-cascade-cliff': {
+        "description": 'Buldyrev-style mutual percolation of an AI-inference layer coupled to a human-verification layer: measures the excess discontinuous jump in the mutual giant component (vs a single-layer control) to test whether realistic partial coupling q produces a first-order catastrophic collapse rather than graceful second-order degradation.',
+        "params": {'N': ('int', 400, 4000, 2000), 'q': ('float', 0.0, 1.0, 0.6), 'deg': ('float', 2.0, 8.0, 4.0), 'reps': ('int', 2, 12, 6)},
+        "code": r'''
+import numpy as np
+rng = np.random.default_rng(0)
+N = {N}
+q = {q}
+deg = {deg}
+reps = {reps}
+
+def giant_mask(ea, eb, alive, N):
+    parent = np.arange(N)
+    def find(x):
+        root = x
+        while parent[root] != root:
+            root = parent[root]
+        while parent[x] != root:
+            parent[x], x = root, parent[x]
+        return root
+    m = alive[ea] & alive[eb]
+    for a, b in zip(ea[m].tolist(), eb[m].tolist()):
+        ra, rb = find(a), find(b)
+        if ra != rb:
+            parent[ra] = rb
+    if not alive.any():
+        return np.zeros(N, dtype=bool)
+    roots = np.array([find(i) if alive[i] else -1 for i in range(N)])
+    valid = roots[roots >= 0]
+    counts = np.bincount(valid, minlength=N)
+    return (roots == counts.argmax()) & alive
+
+p_edge = deg / (N - 1)
+iu = np.triu_indices(N, k=1)
+def er():
+    keep = rng.random(iu[0].shape[0]) < p_edge
+    return iu[0][keep], iu[1][keep]
+A0, A1 = er()
+B0, B1 = er()
+perm = rng.permutation(N)
+inv = np.empty(N, dtype=int)
+inv[perm] = np.arange(N)
+ps = np.linspace(0.0, 0.95, 40)
+
+def max_jump(qval, seed):
+    rl = np.random.default_rng(seed)
+    coupled = rl.random(N) < qval
+    def mg(p):
+        aA = rl.random(N) >= p
+        aB = rl.random(N) >= p
+        for _ in range(300):
+            gA = giant_mask(A0, A1, aA, N)
+            gB = giant_mask(B0, B1, aB, N)
+            nA = gA.copy()
+            nB = gB.copy()
+            nA[coupled & ~gB[perm]] = False
+            nB[coupled[inv] & ~gA[inv]] = False
+            if np.array_equal(nA, aA) and np.array_equal(nB, aB):
+                aA, aB = nA, nB
+                break
+            aA, aB = nA, nB
+        return float(giant_mask(A0, A1, aA, N).sum()) / N
+    G = np.array([mg(p) for p in ps])
+    d = G[:-1] - G[1:]
+    k = int(d.argmax())
+    return d[k], float((ps[k] + ps[k + 1]) / 2)
+
+jc = np.array([max_jump(q, 100 + r)[0] for r in range(reps)])
+j0 = np.array([max_jump(0.0, 100 + r)[0] for r in range(reps)])
+pcs = np.array([max_jump(q, 100 + r)[1] for r in range(reps)])
+excess = jc - j0
+mean = float(excess.mean())
+se = float(excess.std(ddof=1) / np.sqrt(reps)) if reps > 1 else float("nan")
+t = mean / se if se > 0 else float("nan")
+print(f"MEASURED: excess discontinuity deltaG(q={{q}})-deltaG(0) = {{mean:.3f}} N (SE {{se:.3f}}, t={{t:.1f}}); p_c~{{pcs.mean():.2f}}")
+print(f"VERDICT: {{'FIRST-ORDER cliff: partial coupling creates a catastrophic mutual collapse' if (t > 2 and mean > 0.05) else 'GRACEFUL: coupling adds no discontinuity beyond the single-layer breakdown -- claim falsified'}}")
+''',
+    },
+    'csd-control-leverage': {
+        "description": "Tests whether critical slowing down makes a late 'strike when critical' push cheaper than constant/front-loaded forcing for flipping a bistable collective — by measuring min time-integrated effort to reliably flip a double-well normal form under three forcing schedules.",
+        "params": {'T': ('float', 2.0, 20.0, 8.0), 'sigma': ('float', 0.05, 0.6, 0.2), 'n_seeds': ('int', 20, 200, 60)},
+        "code": r'''
+import numpy as np
+
+# ---- params (the ONLY single-brace assignments in this template) ----
+T = {T}
+sigma = {sigma}
+n_seeds = {n_seeds}
+
+# Bistable normal form (saddle-node / double well):
+#   dx = (x - x^3 + u(t)) dt + sigma dW
+# Stable wells at x=-1 (start) and x=+1 (target); unstable saddle at x=0.
+# Near the saddle the restoring force (1 - 3x^2) vanishes -> critical slowing down (CSD).
+# A nonnegative control u(t) pushes toward +1. We compare three SHAPES of u(t)
+# over [0,T], each normalized to the same time-integrated effort budget B = INT u dt,
+# then bisect on B to find the MINIMUM budget each schedule needs for a reliable flip
+# (>=90% of noise seeds end in the +1 well). Headline = critical/constant effort ratio.
+rng = np.random.default_rng(0)
+dt = 0.01
+nt = int(round(T / dt))
+t = np.linspace(0.0, T, nt, endpoint=False)
+
+def shape(kind):
+    # unit-mean nonnegative weight: INT w dt = T, so (B/T)*w integrates to exactly B
+    if kind == "constant":
+        w = np.ones(nt)
+    elif kind == "front":
+        w = np.exp(-3.0 * t / T)      # front-loaded: hard early, decays
+    else:  # "critical"
+        w = np.exp(3.0 * t / T)       # back-loaded: ramps up, peaks late (strike-when-critical)
+    return w / w.mean()
+
+def flip_fraction(kind, B, seeds):
+    w = shape(kind)
+    u = (B / T) * w
+    sq = np.sqrt(dt)
+    flips = 0
+    for s in seeds:
+        r = np.random.default_rng(int(s) + 1000)
+        x = -1.0
+        noise = r.standard_normal(nt)
+        for k in range(nt):
+            x += (x - x**3 + u[k]) * dt + sigma * sq * noise[k]
+        if x > 0.0:
+            flips += 1
+    return flips / len(seeds)
+
+def min_budget(kind, seeds, lo=0.0, hi=6.0, target=0.90, iters=20):
+    if flip_fraction(kind, hi, seeds) < target:
+        return hi  # cannot reach target within range
+    for _ in range(iters):
+        mid = 0.5 * (lo + hi)
+        if flip_fraction(kind, mid, seeds) >= target:
+            hi = mid
+        else:
+            lo = mid
+    return hi
+
+seeds = np.arange(n_seeds)
+B_const = min_budget("constant", seeds)
+B_front = min_budget("front", seeds)
+B_crit = min_budget("critical", seeds)
+
+# bootstrap SE on the critical/constant ratio by resampling noise seeds
+ratios = []
+nb = 12
+for b in range(nb):
+    rb = np.random.default_rng(5000 + b)
+    samp = rb.integers(0, n_seeds, size=n_seeds)
+    bc = min_budget("constant", samp, iters=15)
+    bk = min_budget("critical", samp, iters=15)
+    if bc > 0:
+        ratios.append(bk / bc)
+ratios = np.array(ratios)
+ratio = float(B_crit / B_const) if B_const > 0 else float("nan")
+se = float(ratios.std(ddof=1) / np.sqrt(len(ratios))) if len(ratios) > 1 else float("nan")
+front_ratio = float(B_front / B_const) if B_const > 0 else float("nan")
+
+print(f"MEASURED: min-effort ratio critical/constant = {{ratio:.3f}} (bootstrap SE {{se:.3f}}); B_const={{B_const:.3f}}, B_front={{B_front:.3f}}, B_crit={{B_crit:.3f}}, front/const={{front_ratio:.3f}}")
+
+eps = 2 * se + 0.02
+if abs(ratio - 1.0) <= eps and abs(front_ratio - 1.0) <= eps:
+    verdict = "timing IRRELEVANT - only total integrated push matters; 'strike when critical' FALSE (CSD confers no cost asymmetry)"
+elif (ratio < 1.0 - eps) and (ratio < front_ratio - eps):
+    verdict = f"late critical-moment push STRICTLY cheapest ({{(1-ratio)*100:.0f}}% saving vs constant, beats front-loaded) - leverage hypothesis SUPPORTED"
+elif (front_ratio < 1.0 - eps) and (front_ratio < ratio - eps):
+    verdict = "front-loaded cheapest - criticality makes LATE effort wasted; leverage hypothesis FALSIFIED (opposite sign)"
+elif (ratio < 1.0 - eps) and abs(ratio - front_ratio) <= eps:
+    verdict = f"non-constant beats constant ({{(1-ratio)*100:.0f}}% saving) but front~critical TIED - shaping helps, critical-timing NOT uniquely better; only partial leverage"
+else:
+    verdict = "no clean schedule advantage detected"
+print(f"VERDICT: {{verdict}} - falsifier: equal min-effort across schedules, or front-loaded cheapest, kills the 'strike when critical' claim")
+''',
+    },
+    'algo-pricing-collusion-threshold': {
+        "description": 'Do independent tabular Q-learning pricing agents spontaneously collude, and is there a sharp discount-factor threshold? Sweep delta, measure the Nash-to-monopoly collusion index and its steepening.',
+        "params": {'steps': ('int', 10000, 120000, 50000), 'grid': ('int', 4, 9, 6), 'alpha': ('float', 0.02, 0.4, 0.125), 'target': ('float', 0.1, 0.5, 0.25)},
+        "code": r'''
+import numpy as np
+
+steps = {steps}
+grid = {grid}
+alpha = {alpha}
+target = {target}
+
+# Spontaneous algorithmic collusion: two INDEPENDENT tabular Q-learners (epsilon-greedy,
+# no communication) price in a repeated differentiated-Bertrand duopoly with linear demand.
+# State = last price-index of BOTH firms (memory-1). We sweep the discount factor delta
+# (memory of the future) and measure the collusion index over the last 2000 steps:
+# index = 0 at Bertrand-Nash, 1 at joint-monopoly. Is the rise a SHARP threshold or a ramp?
+
+c = 1.0
+a = 2.0
+def profit(pi, pj):
+    qi = max(0.0, (a - 2.0*pi + pj) / 3.0)
+    return (pi - c) * qi
+
+fine = np.linspace(c, c + 2.0, 2001)
+def best_response(pj):
+    pr = np.array([profit(p, pj) for p in fine])
+    return fine[int(np.argmax(pr))]
+p = c + 0.5
+for _ in range(200):
+    p = best_response(p)
+p_nash = p
+joint = np.array([2.0*profit(pp, pp) for pp in fine])
+p_mono = fine[int(np.argmax(joint))]
+price_grid = np.linspace(p_nash, p_mono, grid)
+
+deltas = np.array([0.0, 0.5, 0.9, 0.95, 0.99])
+
+def collusion_index(delta, seed):
+    r = np.random.default_rng(seed)
+    nA = grid
+    Q0 = np.zeros((nA, nA, nA))
+    Q1 = np.zeros((nA, nA, nA))
+    s0, s1 = nA//2, nA//2
+    beta = 6.0/steps
+    last = []
+    for t in range(steps):
+        eps = max(0.02, np.exp(-beta*t))
+        a0 = r.integers(nA) if r.random() < eps else int(np.argmax(Q0[s0, s1]))
+        a1 = r.integers(nA) if r.random() < eps else int(np.argmax(Q1[s0, s1]))
+        p0 = price_grid[a0]; p1 = price_grid[a1]
+        r0 = profit(p0, p1); r1 = profit(p1, p0)
+        Q0[s0, s1, a0] += alpha*(r0 + delta*np.max(Q0[a0, a1]) - Q0[s0, s1, a0])
+        Q1[s0, s1, a1] += alpha*(r1 + delta*np.max(Q1[a0, a1]) - Q1[s0, s1, a1])
+        s0, s1 = a0, a1
+        if t >= steps - 2000:
+            last.append(0.5*(p0 + p1))
+    return (float(np.mean(last)) - p_nash) / (p_mono - p_nash)
+
+reps = 4
+curve = []; se = []
+for d in deltas:
+    vals = [collusion_index(d, 7 + 31*int(d*100) + k) for k in range(reps)]
+    curve.append(float(np.mean(vals)))
+    se.append(float(np.std(vals, ddof=1)/np.sqrt(reps)))
+curve = np.array(curve); se = np.array(se)
+
+def crossover(x, y, thr):
+    for i in range(len(x)-1):
+        if (y[i]-thr)*(y[i+1]-thr) <= 0 and y[i+1] != y[i]:
+            frac = (thr - y[i])/(y[i+1]-y[i])
+            return x[i] + frac*(x[i+1]-x[i]), (y[i+1]-y[i])/(x[i+1]-x[i])
+    return float("nan"), float("nan")
+
+xc, xslope = crossover(deltas, curve, target)
+local = np.diff(curve)/np.diff(deltas)
+mean_slope = (curve[-1]-curve[0])/(deltas[-1]-deltas[0])
+steepening = float(np.nanmax(local)/mean_slope) if mean_slope > 0 else float("nan")
+rise = float(curve[-1] - curve[0])
+
+print(f"curve(index vs delta): {{[round(float(v),3) for v in curve]}}; SE {{[round(float(v),3) for v in se]}}")
+print(f"MEASURED: collusion index {{curve[0]:.2f}}->{{curve[-1]:.2f}} (rise={{rise:.2f}}, top-SE {{se[-1]:.2f}}); crosses {{target}} at delta={{xc:.2f}}, local steepening={{steepening:.1f}}x mean")
+if curve.max() <= 0.1:
+    v = "FALSIFIED: index never exceeds ~0.1 (Nash) at any delta -- no spontaneous collusion"
+elif curve.min() < -0.1:
+    v = "FALSIFIED: agents converge BELOW Nash for some delta -- sign flip kills the claim"
+elif np.isnan(xc):
+    v = f"index rises with delta but never reaches the {{target}} switch-on level -- weak/no collusion"
+elif steepening >= 1.5:
+    v = f"spontaneous collusion CONFIRMED with a SHARP threshold near delta={{xc:.2f}} (rise is {{steepening:.1f}}x steeper than linear)"
+else:
+    v = "graded collusion but a SMOOTH ramp, not a sharp threshold"
+print(f"VERDICT: {{v}}")
+''',
+    },
+    'griffiths-phase-contagion': {
+        "description": "Tests whether quenched topological disorder (rare dense sub-domains) converts a network contagion's sharp epidemic threshold into an extended Griffiths band of power-law (critical-like) spreading, by measuring the WIDTH in lambda of the power-law-decay region versus a clean control.",
+        "params": {'N': ('int', 400, 4000, 1500), 'D': ('float', 0.0, 1.5, 0.9), 'p_rec': ('float', 0.1, 0.8, 0.4), 'n_real': ('int', 3, 30, 10)},
+        "code": r'''
+import numpy as np, time
+rng = np.random.default_rng(0)
+# --- params (the ONLY single-brace fields, injected at the top) ---
+N = {N}
+D = {D}
+p_rec = {p_rec}
+n_real = {n_real}
+# Disordered contact process (SIS) on a heterogeneous substrate: a sparse ring
+# backbone plus rare DENSE regions. Disorder D = log-normal spread of per-region
+# internal coupling (a few rare strongly-interlinked sub-domains in a sparse matrix
+# -- exactly the "rare region" setup that produces Griffiths effects). We sweep the
+# spreading rate lambda and, for the realization-averaged decay rho(t) of the active
+# fraction, ask whether it is better fit by a POWER LAW (log rho vs log t) than by an
+# EXPONENTIAL (log rho vs t). Headline = WIDTH (in lambda) of the power-law band; we
+# compare disorder D vs the clean D=0 control. Clean -> one knife-edge cell; a finite
+# band under disorder = an extended Griffiths phase.
+T = 160
+lam_steps = 24
+n_regions = 60
+n_net = 4  # network replicates per condition (for the SE)
+
+def region_weights(Ds):
+    het = np.exp(Ds * rng.normal(0, 1.0, n_regions))
+    return het / het.mean()  # fix MEAN coupling; only the SPREAD (disorder) changes
+
+def build(Ds):
+    region = rng.integers(0, n_regions, N)
+    w = region_weights(Ds)
+    nbrs = [set() for _ in range(N)]
+    for i in range(N):
+        nbrs[i].add((i+1) % N); nbrs[(i+1) % N].add(i)  # sparse backbone
+    by = [np.where(region == r)[0] for r in range(n_regions)]
+    for r in range(n_regions):
+        mem = by[r]
+        if len(mem) < 2:
+            continue
+        p = min(0.9, 0.05 * w[r])  # strong regions are dense -> rare regions
+        for ii in range(len(mem)):
+            for jj in range(ii+1, len(mem)):
+                if rng.random() < p:
+                    a, b = int(mem[ii]), int(mem[jj])
+                    nbrs[a].add(b); nbrs[b].add(a)
+    md = max(len(s) for s in nbrs)
+    adj = np.full((N, md), -1, np.int64)
+    for i in range(N):
+        l = list(nbrs[i]); adj[i, :len(l)] = l
+    return adj
+
+def mean_curve(adj, lam):
+    v = adj >= 0; s2 = adj.clip(min=0); acc = np.zeros(T)
+    for _ in range(n_real):
+        st = np.ones(N, bool); rho = np.empty(T)
+        for t in range(T):
+            rho[t] = st.mean()
+            if not st.any():
+                rho[t:] = 0.0; break
+            rec = st & (rng.random(N) < p_rec)
+            k = np.where(v, st[s2], False).sum(1)
+            new = (~st) & (rng.random(N) < 1.0 - (1.0 - lam) ** k)
+            st = (st & ~rec) | new
+        acc += rho
+    return acc / n_real
+
+def is_powerlaw(rho):
+    if rho[-1] > 0.03:           # survives -> active/supercritical phase
+        return False
+    t = np.arange(1, len(rho)+1, dtype=float)
+    m = rho > 1e-3; m[:3] = False
+    if m.sum() < 14:            # dies fast -> off-critical exponential
+        return False
+    tt = t[m]; Y = np.log(rho[m]); sst = float(((Y - Y.mean())**2).sum())
+    if sst <= 0:
+        return False
+    A1 = np.vstack([np.log(tt), np.ones_like(tt)]).T
+    c1, *_ = np.linalg.lstsq(A1, Y, rcond=None)
+    r2_pow = 1.0 - float(((Y - A1 @ c1)**2).sum()) / sst
+    A2 = np.vstack([tt, np.ones_like(tt)]).T
+    c2, *_ = np.linalg.lstsq(A2, Y, rcond=None)
+    r2_exp = 1.0 - float(((Y - A2 @ c2)**2).sum()) / sst
+    return (r2_pow > r2_exp + 0.02) and (r2_pow > 0.90)
+
+def band_width(Ds):
+    adj = build(Ds)
+    lams = np.linspace(0.03, 0.30, lam_steps)
+    flags = np.array([is_powerlaw(mean_curve(adj, float(l))) for l in lams])
+    return flags.sum() * (lams[1] - lams[0])
+
+t0 = time.time()
+w_clean = np.array([band_width(0.0) for _ in range(n_net)])
+w_dis = np.array([band_width(D) for _ in range(n_net)])
+broadening = float(w_dis.mean() - w_clean.mean())
+se = float(np.sqrt(w_dis.var(ddof=1)/n_net + w_clean.var(ddof=1)/n_net))
+tstat = broadening / se if se > 0 else float("nan")
+print(f"MEASURED: power-law band width = {{w_dis.mean():.3f}} (D={{D}}) vs {{w_clean.mean():.3f}} (clean); broadening = {{broadening:+.3f}} lambda-units (SE {{se:.3f}}, t={{tstat:.1f}}); {{time.time()-t0:.0f}}s")
+opened = (broadening > 2*se) and (broadening > 0.01)
+print(f"VERDICT: {{'extended GRIFFITHS band opened by disorder' if opened else 'no broadening -- sharp threshold, Griffiths phase falsified'}} -- falsifier: band width stays ~0/unchanged for all D (clean gives a single knife-edge lambda)")
+''',
+    },
+    'ecological-leak-mis-diagnosis': {
+        "description": "Tests whether a drift-optimal evidence-leak (forgetting) updater that maximizes accuracy in a non-stationary world is mis-read as 'conservatism' by a stationary calibration audit, while a leak-free updater is audit-perfect.",
+        "params": {'n_steps': ('int', 5000, 200000, 60000), 'audit_blocks': ('int', 200, 8000, 1500), 'flip_p': ('float', 0.001, 0.2, 0.02), 'acc': ('float', 0.55, 0.95, 0.75)},
+        "code": r'''
+import numpy as np
+rng = np.random.default_rng(0)
+n_steps = {n_steps}
+audit_blocks = {audit_blocks}
+flip_p = {flip_p}
+acc = {acc}
+block_len = 40
+
+lams = [1.0, 0.97, 0.93, 0.88, 0.8]
+llr_mag = float(np.log(acc / (1.0 - acc)))
+
+# ---- Drift world: hidden state random-walks; leaky log-odds updater b <- lam*b + signed_llr ----
+flips = rng.random(n_steps) < flip_p
+state = np.empty(n_steps, dtype=np.int8)
+s = 1
+for t in range(n_steps):
+    if flips[t]:
+        s = -s
+    state[t] = s
+obs = np.where(rng.random(n_steps) < acc, state, -state)
+signed_llr = obs * llr_mag
+
+drift_acc = {{}}
+for lam in lams:
+    b = 0.0
+    hits = 0
+    for t in range(n_steps):
+        if (1 if b >= 0 else -1) == state[t]:
+            hits += 1
+        b = lam * b + signed_llr[t]
+    drift_acc[lam] = hits / n_steps
+
+lam_star = max(lams, key=lambda L: drift_acc[L])
+gain = drift_acc[lam_star] - drift_acc[1.0]
+
+# ---- Stationary audit: state fixed within a block; measure confidence-accuracy gap ----
+def audit_gap(lam):
+    n_obs = 0
+    sum_conf = 0.0
+    sum_corr = 0.0
+    for _ in range(audit_blocks):
+        true_s = 1 if rng.random() < 0.5 else -1
+        b = 0.0
+        for _ in range(block_len):
+            o = true_s if (rng.random() < acc) else -true_s
+            b = lam * b + o * llr_mag
+            sum_conf += 1.0 / (1.0 + np.exp(-abs(b)))
+            sum_corr += 1.0 if (1 if b >= 0 else -1) == true_s else 0.0
+            n_obs += 1
+    return (sum_conf / n_obs) - (sum_corr / n_obs), n_obs
+
+gap_leakfree, _ = audit_gap(1.0)
+gap_star, nobs = audit_gap(lam_star)
+se_gap = float(np.sqrt(0.25 / nobs))
+mis = (gap_star < gap_leakfree - 3 * se_gap) and (gain > 0.05)
+
+print(f"MEASURED: audit conf-acc gap at lambda*={{lam_star}} = {{gap_star:+.3f}} (SE {{se_gap:.3f}}); leak-free gap = {{gap_leakfree:+.3f}}; drift-world accuracy gain of lambda* over leak-free = {{gain:+.3f}} ({{drift_acc[1.0]:.3f}}->{{drift_acc[lam_star]:.3f}})")
+print(f"VERDICT: {{'stationary audit MIS-DIAGNOSES ecological adaptation as conservatism - drift-optimal leak looks underconfident AND buys real drift accuracy' if mis else 'claim collapses - either no audit mis-diagnosis or negligible drift gain'}}; falsifier: ~0 audit gap at lambda* OR negligible drift gain")
+''',
+    },
+    'meta-uncertainty-conservatism': {
+        "description": "Tests whether conservatism (under-updating vs Bayes) is the normatively correct response to a Beta belief over one's own cue validity: integrated vs plug-in two-cue log-odds gap, swept over validity-belief variance.",
+        "params": {'qbar': ('float', 0.51, 0.95, 0.6), 'a_tight': ('float', 5.0, 60.0, 20.0), 'a_diffuse': ('float', 0.5, 4.0, 1.2), 'steps': ('int', 4, 40, 9)},
+        "code": r'''
+import numpy as np
+rng = np.random.default_rng(0)
+qbar = {qbar}
+a_tight = {a_tight}
+a_diffuse = {a_diffuse}
+steps = {steps}
+
+def moments(a, qbar):
+    # Beta(a,b) with mean qbar => b = a*(1-qbar)/qbar
+    b = a*(1.0-qbar)/qbar
+    Eq = a/(a+b)
+    Eq2 = a*(a+1.0)/((a+b)*(a+b+1.0))
+    Em2 = 1.0 - 2.0*Eq + Eq2            # E[(1-q)^2]
+    var = a*b/((a+b)**2*(a+b+1.0))
+    return Eq, Eq2, Em2, var
+
+a_grid = np.linspace(a_tight, a_diffuse, steps)
+gaps, varis = [], []
+for a in a_grid:
+    Eq, Eq2, Em2, var = moments(a, qbar)
+    plug = 2.0*np.log(Eq/(1.0-Eq))     # plug-in mean q, cues treated independent
+    integ = np.log(Eq2/Em2)            # exact integrated 2-cue log-odds
+    gaps.append(integ - plug)
+    varis.append(var)
+gaps = np.array(gaps); varis = np.array(varis)
+
+# slope of conservatism gap vs the variance of the validity belief
+coef = np.polyfit(varis, gaps, 1)
+slope = float(coef[0])
+resid = gaps - np.polyval(coef, varis)
+n = len(gaps)
+sxx = float(np.sum((varis - varis.mean())**2))
+se = float(np.sqrt(float(np.sum(resid**2))/(n-2)/sxx)) if sxx > 0 else float("nan")
+t = slope/se if se > 0 else float("nan")
+g_tight, g_diff = float(gaps[0]), float(gaps[-1])
+allneg = bool(np.all(gaps <= 1e-9))
+mono = slope < 0 and t < -2 and allneg
+print(f"MEASURED: conservatism-gap slope vs validity-variance = {{slope:.3f}} (SE {{se:.3f}}, t={{t:.1f}}); gap {{g_tight:.3f}} (tight) -> {{g_diff:.3f}} (diffuse)")
+print(f"VERDICT: {{'meta-uncertainty over cue validity NORMATIVELY produces conservatism (gap<0 and grows with belief variance)' if mono else 'mechanism FALSE: gap>=0 or not monotone in validity-variance'}} - falsifier: integrated update >= plug-in (gap>=0) for all Beta beliefs, or no growth with variance")
+''',
+    },
+    'self-consistency-amplification': {
+        "description": 'Tests whether majority-vote self-consistency amplifies a coherent LLM misconception (accuracy falls as k rises) while agreement-rate stays high and flat, and finds the per-sample correct-probability crossover p*.',
+        "params": {'trials': ('int', 1000, 100000, 20000), 'n_distract': ('int', 2, 20, 6), 'wrong_share': ('float', 0.0, 0.95, 0.6), 'p_lo': ('float', 0.05, 0.45, 0.2), 'p_hi': ('float', 0.2, 0.6, 0.45), 'k_big': ('int', 3, 51, 11)},
+        "code": r'''
+import numpy as np
+rng = np.random.default_rng(0)
+trials = {trials}
+n_distract = {n_distract}
+wrong_share = {wrong_share}
+p_lo = {p_lo}
+p_hi = {p_hi}
+k_big = {k_big}
+
+ps = np.round(np.arange(p_lo, p_hi + 1e-9, 0.05), 3)
+
+def build_probs(p):
+    # answer 0 = correct (prob p); answer 1 = dominant coherent-misconception mode
+    # (takes wrong_share of remaining mass); rest spread over n_distract distractors.
+    rest = 1.0 - p
+    wrong = wrong_share * rest
+    tail = (rest - wrong) / n_distract
+    probs = np.empty(2 + n_distract)
+    probs[0] = p
+    probs[1] = wrong
+    probs[2:] = tail
+    return probs
+
+def run(p, k):
+    probs = build_probs(p)
+    n_ans = probs.shape[0]
+    draws = rng.choice(n_ans, size=(trials, k), p=probs)
+    counts = np.zeros((trials, n_ans), dtype=np.int32)
+    for a in range(n_ans):
+        counts[:, a] = (draws == a).sum(axis=1)
+    maj = counts.argmax(axis=1)              # ties -> lowest index (favors correct, conservative)
+    acc = float((maj == 0).mean())
+    agree = float((counts.max(axis=1) / k).mean())  # deployed self-consistency confidence
+    return acc, agree
+
+acc1 = {{}}
+acc11 = {{}}
+agree11 = {{}}
+for p in ps:
+    a1, _ = run(p, 1)
+    a11, ag11 = run(p, k_big)
+    acc1[p] = a1
+    acc11[p] = a11
+    agree11[p] = ag11
+
+pstar = None
+for p in ps:
+    if acc11[p] >= acc1[p]:
+        pstar = p
+        break
+
+p0 = ps[0]
+acc_gap = acc1[p0] - acc11[p0]
+conf_gap = agree11[p0] - acc11[p0]
+se = float(np.sqrt(acc11[p0] * (1 - acc11[p0]) / trials + acc1[p0] * (1 - acc1[p0]) / trials))
+
+all_help = all(acc11[p] >= acc1[p] for p in ps)
+agree_lo = agree11[ps[0]]
+agree_hi = agree11[ps[-1]]
+agree_flat = abs(agree_hi - agree_lo) < 0.15
+
+pstar_str = f"{{pstar:.2f}}" if pstar is not None else f">{{p_hi:.2f}}"
+print(f"MEASURED: crossover p*={{pstar_str}}; at p={{p0:.2f}} k={{k_big}} cuts acc {{acc1[p0]:.3f}}->{{acc11[p0]:.3f}} (drop {{acc_gap:.3f}}, SE {{se:.3f}}) while agreement stays {{agree11[p0]:.3f}} (conf-acc gap {{conf_gap:.3f}})")
+print(f"VERDICT: {{'amplification confirmed' if (not all_help and acc_gap > 2*se) else 'self-consistency never hurts - claim FALSE'}}; agreement {{'DECOUPLED (flat ~%.2f-%.2f, ignores acc)' % (agree_lo, agree_hi) if agree_flat else 'tracks accuracy - decoupling FALSE'}} -- falsifier: dies if k={{k_big}} acc>=k=1 acc for all p OR agreement tracks accuracy")
+''',
+    },
+    'soc-retrieval-cascades': {
+        "description": 'Tests whether a demand-driven knowledge store self-organizes to the critical edge: does the BTW retrieval-cascade exponent tau converge near ~1.5 independent of initial conditions (the SOC-attractor signature)?',
+        "params": {'n_nodes': ('int', 300, 4000, 1500), 'k_deg': ('int', 2, 12, 4), 'n_steps': ('int', 1500, 20000, 6000)},
+        "code": r'''
+import numpy as np
+rng = np.random.default_rng(0)
+n_nodes = {n_nodes}
+k_deg = {k_deg}
+n_steps = {n_steps}
+
+def run_to_steady_state(init):
+    # fixed capacity budget (= n_nodes*k_deg) distributed under different initial conditions
+    cap = np.zeros(n_nodes, dtype=np.int64)
+    total_cap_budget = n_nodes * k_deg
+    if init == "sparse":
+        cap[:] = 1
+        leftover = total_cap_budget - cap.sum()
+        idx = rng.integers(0, n_nodes, size=leftover)
+        np.add.at(cap, idx, 1)
+    elif init == "dense":
+        cap[:] = 1
+        leftover = total_cap_budget - cap.sum()
+        hubs = rng.choice(n_nodes, size=20, replace=False)
+        np.add.at(cap, rng.choice(hubs, size=leftover), 1)
+    else:  # uniform/random
+        cap[:] = k_deg
+    load = np.zeros(n_nodes, dtype=np.int64)
+    topple_count = np.zeros(n_nodes, dtype=np.int64)
+    avalanche_sizes = []
+    record_after = n_steps // 3  # discard transient before measuring steady state
+    cap_sum_target = int(cap.sum())
+    for step in range(n_steps):
+        # a query lands preferentially on high-capacity (high-demand) nodes
+        w = cap.astype(np.float64) + 0.1
+        q = int(rng.choice(n_nodes, p=w / w.sum()))
+        load[q] += 1
+        # queue-based BTW toppling: node forwards load to 2 ring neighbors when load > capacity
+        s = 0
+        stack = []
+        if load[q] > cap[q]:
+            stack.append(q)
+        while stack:
+            u = stack.pop()
+            if load[u] <= cap[u]:
+                continue
+            excess = load[u]
+            load[u] = 0
+            s += 1
+            topple_count[u] += 1
+            left = (u - 1) % n_nodes
+            right = (u + 1) % n_nodes
+            give = excess - 1  # one unit dissipates (drain) -> dissipative driving
+            load[left] += give // 2
+            load[right] += give - give // 2
+            if load[left] > cap[left]:
+                stack.append(left)
+            if load[right] > cap[right]:
+                stack.append(right)
+        if s > 0 and step >= record_after:
+            avalanche_sizes.append(s)
+        # FEEDBACK: shift 1 capacity unit from the idlest spare node to the busiest node (budget fixed)
+        if step % 5 == 0 and step > 0:
+            busy = int(np.argmax(topple_count))
+            spare = np.where(cap > 1)[0]
+            if len(spare) > 0:
+                idle = int(spare[np.argmin(topple_count[spare])])
+                if idle != busy:
+                    cap[idle] -= 1
+                    cap[busy] += 1
+            topple_count = (topple_count * 9) // 10  # decay demand memory (track recent demand)
+    assert abs(int(cap.sum()) - cap_sum_target) <= 2  # budget conservation
+    return np.array(avalanche_sizes, dtype=np.float64)
+
+def fit_tau(sizes):
+    # Clauset MLE for discrete power-law exponent, xmin=1
+    sizes = sizes[sizes >= 1]
+    if len(sizes) < 30:
+        return float("nan"), float("nan"), 0
+    xmin = 1.0
+    tau = 1.0 + len(sizes) / np.sum(np.log(sizes / (xmin - 0.5)))
+    se = (tau - 1.0) / np.sqrt(len(sizes))
+    return float(tau), float(se), len(sizes)
+
+taus = {{}}
+for init in ["sparse", "dense", "random"]:
+    sizes = run_to_steady_state(init)
+    tau, se, m = fit_tau(sizes)
+    taus[init] = (tau, se, m)
+
+vals = np.array([taus[k][0] for k in taus])
+spread = float(np.nanmax(vals) - np.nanmin(vals))
+mean_tau = float(np.nanmean(vals))
+mean_se = float(np.nanmean([taus[k][1] for k in taus]))
+near_soc = abs(mean_tau - 1.5) < 0.5
+universal = spread < 0.3
+
+print(f"MEASURED: tau = {{mean_tau:.3f}} (mean SE {{mean_se:.3f}}); across-init spread = {{spread:.3f}}; per-init " +
+      ", ".join(f"{{k}}={{taus[k][0]:.2f}}" for k in taus))
+print(f"VERDICT: {{'SOC attractor CONFIRMED (power-law, init-independent, near 1.5)' if (near_soc and universal) else 'SOC claim FAILS (not power-law-1.5 or init-dependent)'}} -- falsifier: tau!=~1.5 or spread>0.3")
+''',
+    },
+    'oring-automation-flip': {
+        "description": "CES O-ring model: finds the critical skill-atrophy a*(rho) at which automating co-tasks flips a human task from wage-raising complement to wage-lowering redundancy, testing whether the flip's sign depends on production substitutability rho.",
+        "params": {'n_co': ('int', 1, 12, 3), 'q_human': ('float', 0.3, 0.99, 0.85), 'q_co_base': ('float', 0.3, 0.99, 0.8)},
+        "code": r'''
+import numpy as np
+rng = np.random.default_rng(0)
+n_co = {n_co}
+q_human = {q_human}
+q_co_base = {q_co_base}
+
+rho_steps = 41
+a_steps = 41
+q_auto = 0.999
+
+def ces(qs, rho):
+    qs = np.asarray(qs, dtype=float)
+    if abs(rho) < 1e-9:
+        return float(np.exp(np.mean(np.log(np.clip(qs, 1e-12, None)))))
+    return float((np.mean(qs ** rho)) ** (1.0 / rho))
+
+def human_value(rho, a, automated):
+    co = np.full(n_co, q_auto if automated else q_co_base)
+    qh = q_human * (1.0 - a) if automated else q_human
+    base = np.concatenate(([qh], co))
+    eps = 1e-4
+    bump = base.copy()
+    bump[0] = min(qh + eps, 1.0 - 1e-9)
+    mp = (ces(bump, rho) - ces(base, rho)) / (bump[0] - base[0])
+    return mp * qh
+
+rhos = np.linspace(0.001, 1.0, rho_steps)
+ats = np.linspace(0.0, 0.5, a_steps)
+
+a_star = {{}}
+signs_seen = set()
+for rho in rhos:
+    flip_a = np.nan
+    prev_sign = None
+    for a in ats:
+        before = human_value(rho, a, automated=False)
+        after = human_value(rho, a, automated=True)
+        d = after - before
+        s = 1 if d > 0 else (-1 if d < 0 else 0)
+        signs_seen.add(s)
+        if prev_sign is not None and s != prev_sign and np.isnan(flip_a):
+            flip_a = a
+        prev_sign = s
+    a_star[round(float(rho), 4)] = flip_a
+
+flipped = [r for r, av in a_star.items() if not np.isnan(av)]
+finite_vals = np.array([av for av in a_star.values() if not np.isnan(av)])
+best07 = min(a_star.keys(), key=lambda r: abs(r - 0.7))
+a07 = a_star[best07]
+
+has_boundary = len(flipped) > 0
+rho_dependent = finite_vals.size >= 2 and (finite_vals.max() - finite_vals.min()) > 1e-3
+both_signs = (1 in signs_seen) and (-1 in signs_seen)
+rng_span = float(finite_vals.max() - finite_vals.min()) if finite_vals.size else 0.0
+se = float(np.std(finite_vals, ddof=1) / np.sqrt(finite_vals.size)) if finite_vals.size >= 2 else float("nan")
+
+a07s = f"{{a07:.3f}}" if not np.isnan(a07) else "none"
+print(f"MEASURED: a*(rho~{{best07:.2f}}) = {{a07s}}; sign flips on {{len(flipped)}}/{{rho_steps}} rho-slices, a* spans {{rng_span:.3f}} across rho (SE {{se:.3f}})")
+
+if has_boundary and rho_dependent and both_signs:
+    verdict = "phase boundary EXISTS and varies with rho - production substitutability x deskilling jointly set the sign of human-task value (claim survives)"
+elif has_boundary and both_signs and not rho_dependent:
+    verdict = "flip exists but is rho-INDEPENDENT - atrophy alone decides, O-ring structure irrelevant (claim killed)"
+else:
+    verdict = "NO sign flip anywhere on the grid - no phase boundary, structure-x-deskilling claim dead (always {{}})".format("complement" if (1 in signs_seen) else "redundant")
+print(f"VERDICT: {{verdict}}")
+''',
+    },
+    'basket-goodhart-interior-k': {
+        "description": 'Tests whether a 1/K-weighted multi-proxy basket has an INTERIOR optimal size K* (more proxies first help, then backfire) under an effort-budgeted adversary who exploits the cheapest-to-game proxy, by sweeping K over a correlation x cost-dispersion grid.',
+        "params": {'n_draws': ('int', 100, 5000, 800), 'Kmax': ('int', 5, 60, 30), 'sigma_lo': ('float', 0.3, 2.0, 1.0), 'sigma_hi': ('float', 0.5, 3.5, 2.0)},
+        "code": r'''
+import numpy as np
+rng = np.random.default_rng(0)
+n_draws = {n_draws}
+Kmax = {Kmax}
+sigma_lo = {sigma_lo}
+sigma_hi = {sigma_hi}
+
+# Adversary vs a 1/K-weighted basket of K proxies. Agent has effort budget B=1 and maximizes
+# the basket score S = (1/K) sum_i (loadings_i * t + g_i), where t = honest effort on the TRUE
+# goal (linear cost 1; raises EVERY proxy via positive loadings_i) and g_i = direct gaming of
+# proxy i (linear cost gc_i). Gaming costs gc_i are lognormal (dispersion sigma); loadings are
+# correlated through a shared factor (correlation rho). The LP optimum puts the whole budget in
+# the single highest score-per-budget channel:
+#   honest rate = (1/K) * sum(loadings) = mean loading
+#   gaming rate = (1/K) / min_i(gc_i)   (exploit the cheapest-to-game, yet basket-weighted, proxy)
+# Realized TRUE-goal value = honest effort actually spent (B if honest wins, else 0). We sweep
+# K=1..Kmax over a grid of (rho, sigma) and ask whether argmax_K is INTERIOR (1<K*<Kmax) and
+# whether the realized-value curve has a backfire hump (helps then hurts).
+
+rhos = np.array([0.2, 0.4, 0.6, 0.8])
+sigmas = np.linspace(sigma_lo, sigma_hi, 5)
+Ks = np.arange(1, Kmax + 1)
+
+kstars = []
+interior_flags = []
+curve_grid = []
+for rho in rhos:
+    for sigma in sigmas:
+        realized = np.zeros(len(Ks))
+        for ki, K in enumerate(Ks):
+            common = rng.uniform(0.4, 1.0, n_draws)
+            base = rng.uniform(0.2, 1.0, (n_draws, K))
+            loadings = (1 - rho) * base + rho * common[:, None]
+            gc = np.exp(rng.normal(0.0, sigma, (n_draws, K)))
+            honest_rate = loadings.mean(axis=1)
+            gaming_rate = (1.0 / K) / gc.min(axis=1)
+            realized[ki] = np.mean(np.where(honest_rate >= gaming_rate, 1.0, 0.0))
+        ks = int(Ks[np.argmax(realized)])
+        kstars.append(ks)
+        interior_flags.append(1 < ks < Kmax)
+        curve_grid.append(realized)
+
+kstars = np.array(kstars)
+interior_frac = float(np.mean(interior_flags))
+backfire = 0
+for c in curve_grid:
+    imax = int(np.argmax(c))
+    if 0 < imax < len(c) - 1 and c[imax] > c[0] + 1e-6 and c[imax] > c[-1] + 1e-6:
+        backfire += 1
+backfire_frac = backfire / len(curve_grid)
+
+mean_kstar = float(kstars.mean())
+se_kstar = float(kstars.std(ddof=1) / np.sqrt(len(kstars)))
+frac_corner1 = float(np.mean(kstars == 1))
+frac_cornerMax = float(np.mean(kstars == Kmax))
+
+print(f"MEASURED: mean K* = {{mean_kstar:.1f}} (SE {{se_kstar:.1f}}); interior-optimum cells {{interior_frac*100:.0f}}%, backfire hump {{backfire_frac*100:.0f}}%, K*=1 {{frac_corner1*100:.0f}}%, K*=Kmax {{frac_cornerMax*100:.0f}}%; grid={{len(curve_grid)}} cells, Kmax={{Kmax}}")
+if backfire_frac >= 0.20:
+    v = "interior optimum CONFIRMED -- more proxies first help then HURT in a substantial share of the cost/correlation grid"
+elif frac_corner1 >= 0.5:
+    v = "basket cure uniformly counterproductive -- K*=1 dominates (interior framing dies)"
+else:
+    v = "FALSIFIED -- realized true value essentially monotone in K (K* at a boundary); no interior backfire"
+print(f"VERDICT: {{v}}")
+''',
+    },
+    'citation-bandwagon-lockin': {
+        "description": "Tests whether a bandwagon parameter (citing-instead-of-replicating, suppressed by how 'established' a claim already is) makes false claims survive at a higher rate than the rate true claims are abandoned, vs a no-suppression control.",
+        "params": {'n_claims': ('int', 200, 40000, 4000), 'n_studies': ('int', 20, 1000, 200), 'bandwagon': ('float', 0.0, 10.0, 3.0), 'mu': ('float', 0.05, 1.0, 0.3), 'base_rep': ('float', 0.05, 1.0, 0.5)},
+        "code": r'''
+import numpy as np
+rng = np.random.default_rng(0)
+n_claims = {n_claims}
+n_studies = {n_studies}
+bandwagon = {bandwagon}
+mu = {mu}
+base_rep = {base_rep}
+
+# Each claim is true (effect=1) or false (effect=0); equal initial evidence.
+# Realistic adoption: a claim ENTERS the literature already adopted (prior log-odds +0.5, P~0.62).
+half = n_claims // 2
+truth = np.concatenate([np.ones(half), np.zeros(n_claims - half)]).astype(float)
+
+def simulate(bw, seed):
+    r = np.random.default_rng(seed)
+    lo = np.full(n_claims, 0.5)  # adopted-on-entry prior
+    for _ in range(n_studies):
+        belief = 1.0 / (1.0 + np.exp(-lo))
+        # the more 'established' (believed-true) a claim is, the less it is independently RE-TESTED;
+        # bandwagon=0 -> every study replicates at base_rep (cite==test); bandwagon>0 -> citing replaces testing.
+        p_rep = base_rep / (1.0 + bw * np.clip(belief, 0.0, 1.0))
+        do_rep = r.random(n_claims) < p_rep
+        z = r.normal(np.where(truth > 0.5, mu, -mu), 1.0)   # noisy replication z-signal
+        llr = 2.0 * mu * z                                   # Gaussian log-likelihood-ratio (sd=1)
+        lo = lo + np.where(do_rep, llr, 0.0)                 # cites/extends -> no update
+    return 1.0 / (1.0 + np.exp(-lo))
+
+fb = simulate(bandwagon, 0)
+fbc = simulate(0.0, 1)
+fm = truth < 0.5
+tm = truth > 0.5
+nf = int(fm.sum())
+
+p_false_surv = float(np.mean(fb[fm] > 0.5))
+p_true_aband = float(np.mean(fb[tm] < 0.5))
+p_false_ctrl = float(np.mean(fbc[fm] > 0.5))
+
+se_f = float(np.sqrt(p_false_surv * (1 - p_false_surv) / nf))
+se_c = float(np.sqrt(p_false_ctrl * (1 - p_false_ctrl) / nf))
+lift = p_false_surv / p_false_ctrl if p_false_ctrl > 0 else float("inf")
+asym = p_false_surv / p_true_aband if p_true_aband > 0 else float("inf")
+diff = p_false_surv - p_false_ctrl
+se_d = float(np.sqrt(se_f ** 2 + se_c ** 2))
+z_d = diff / se_d if se_d > 0 else float("nan")
+
+print(f"MEASURED: P(false survives)={{p_false_surv:.3f}}+/-{{se_f:.3f}} vs bandwagon=0 control {{p_false_ctrl:.3f}}+/-{{se_c:.3f}} (lift {{lift:.1f}}x, z_diff={{z_d:.1f}}); P(true abandoned)={{p_true_aband:.3f}}, false/true asymmetry {{asym:.1f}}x; n={{n_claims}}")
+ok = (z_d > 2) and (p_false_surv > p_true_aband) and (lift > 1.5)
+print(f"VERDICT: {{'lock-in confirmed' if ok else 'no lock-in'}} - bandwagon suppression makes false claims survive above the no-suppression control AND above the rate true claims are abandoned; falsifier: dead if survival==abandonment or lift~1")
 ''',
     },
 }
