@@ -1,0 +1,14 @@
+=== Challenge: does SC's edge REALLY need many pre-periods, or just clean pre-fit? ===
+   T_pre  sigma  DiD |bias|  SC |bias|   winner
+       3    0.1       0.398      0.353       SC
+       4    0.1       0.478      0.375       SC
+       6    0.1       0.543      0.381       SC
+      24    0.1       1.068      0.600       SC
+       3    0.6       0.502      0.601      DiD
+       4    0.6       0.538      0.593      DiD
+       6    0.6       0.599      0.649      DiD
+      24    0.6       1.085      0.749       SC
+
+MEASURED (decisive cell — T_pre=3, sigma=0.1, systematic pre-trend gap): DiD |bias|=0.451 vs SC |bias|=0.366  -> SC is BETTER with only 3 CLEAN pre-periods.
+
+VERDICT: belief REFINED (challenge partially succeeds). SC dominates DiD even with only 3 pre-periods WHEN the donors are clean and well-matching — so the gating condition is pre-fit SIGNAL-TO-NOISE, not the pre-period COUNT per se. The original 'needs enough pre-periods' collapses to a special case of low signal-to-noise; with few but clean periods SC still wins. Core claim (SC beats DiD under a systematic, matchable pre-trend gap) HOLDS; the 'short-pre-period collapse' is really a noise effect.
