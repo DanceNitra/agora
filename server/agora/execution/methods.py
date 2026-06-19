@@ -196,6 +196,100 @@ print(f"MEASURED: random-team minus best-team = {{d:+.2f}} (SE {{se:.2f}}) at l=
 print(f"VERDICT: {{'DIVERSITY WINS' if d > 2*se else ('ABILITY WINS' if d < -2*se else 'TIE')}}")
 ''',
     },
+    "selection-fdr": {
+        "description": ("Tests whether a 'significant' or 'best' result is REAL or just the winner of "
+                        "many tries (multiple testing / selection bias / p-hacking / factor zoo / "
+                        "backtest overfitting). Simulates m candidate tests, a fraction with a true "
+                        "effect, and compares NAIVE 'report the best raw p<alpha' against Benjamini-"
+                        "Hochberg FDR control. Use for ANY claim that a discovered/selected effect (the "
+                        "best strategy, the winning factor, a significant A/B winner, a screened hit) "
+                        "is genuine rather than a selection artifact."),
+        "params": {"m": ("int", 10, 4000, 200), "frac_real": ("float", 0.0, 0.5, 0.1),
+                   "effect": ("float", 0.0, 5.0, 2.5), "alpha": ("float", 0.005, 0.1, 0.05),
+                   "reps": ("int", 200, 4000, 1500)},
+        "code": r'''
+import numpy as np
+from scipy import stats
+rng = np.random.default_rng(7)
+m, frac_real, effect, alpha, reps = {m}, {frac_real}, {effect}, {alpha}, {reps}
+n_real = int(round(m*frac_real))
+naive_sig = naive_false = bh_total = bh_false = 0
+for _ in range(reps):
+    theta = np.zeros(m)
+    if n_real > 0:
+        theta[rng.choice(m, n_real, replace=False)] = effect
+    real = theta > 0
+    z = rng.standard_normal(m) + theta
+    p = stats.norm.sf(z)                      # one-sided p-values
+    j = int(np.argmin(p))                     # naive: the single best candidate
+    if p[j] < alpha:
+        naive_sig += 1
+        naive_false += int(not real[j])
+    order = np.argsort(p); ranked = p[order]  # Benjamini-Hochberg
+    below = np.where(ranked <= alpha*np.arange(1, m+1)/m)[0]
+    if len(below):
+        rej = order[:below[-1]+1]
+        bh_total += len(rej); bh_false += int((~real[rej]).sum())
+naive_fdr = naive_false/naive_sig if naive_sig else 0.0
+bh_fdr = bh_false/bh_total if bh_total else 0.0
+print(f"MEASURED: naive best-of-{{m}} false-discovery rate = {{naive_fdr:.2f}} ; BH-controlled FDR = {{bh_fdr:.3f}} (target alpha={{alpha}}, {{int(frac_real*100)}}% truly real)")
+print(f"VERDICT: {{'SELECTION-BIASED - the best-of-many result is false '+format(naive_fdr*100,'.0f')+'% of the time; report BH-adjusted, not raw' if naive_fdr > 2*alpha else 'OK - selection bias is mild at these settings'}}")
+''',
+    },
+    "minority-tipping": {
+        "description": ("Measures the committed-minority fraction f* that flips a coupled population's "
+                        "consensus, and whether capture is irreversible (hysteresis). Mean-field Glauber: "
+                        "coupling J, a field h favoring the status quo, a committed minority pinned to the "
+                        "opposite view. Use for claims that a small committed faction tips consensus / "
+                        "social tipping points / activist or shareholder capture / norm change / opinion "
+                        "cascades."),
+        "params": {"J": ("float", 0.5, 6.0, 2.0), "h": ("float", 0.0, 1.0, 0.15),
+                   "beta": ("float", 0.5, 6.0, 2.0)},
+        "code": r'''
+import numpy as np
+J, h, beta = {J}, {h}, {beta}
+def settle(f, m0):
+    m = m0
+    for _ in range(5000):
+        mn = (1-f)*np.tanh(beta*(J*m + h)) + f*(-1.0)
+        if abs(mn - m) < 1e-10: break
+        m = mn
+    return m
+grid = np.linspace(0, 0.5, 251)
+f_up = next((f for f in grid if settle(f, +1.0) < 0), None)              # status-quo -> flipped
+f_down = next((f for f in grid[::-1] if settle(f, -1.0) > 0), None)      # captured -> recovered
+fu = f_up if f_up is not None else 1.0
+fd = f_down if f_down is not None else 0.0
+print(f"MEASURED: tipping fraction f_up = {{fu*100:.1f}}% ; recovery edge f_down = {{fd*100:.1f}}% ; hysteresis width = {{(fu-fd)*100:.1f}}% (J={{J}}, h={{h}})")
+print(f"VERDICT: {{'TIPPABLE - a committed '+format(fu*100,'.0f')+'% minority flips consensus'+(' and capture is IRREVERSIBLE (hysteresis)' if fu-fd>0.05 else '') if fu <= 0.30 else 'ROBUST - needs a large faction ('+format(fu*100,'.0f')+'%)'}}")
+''',
+    },
+    "goodhart-proxy": {
+        "description": ("Tests Goodhart's law / the legibility transition: when you SELECT or optimize "
+                        "hard on a PROXY metric correlated with a true objective, does the true objective "
+                        "improve or degrade? Models true value T and proxy P=rho*T+noise, with 'gaming' = "
+                        "effort that lifts the proxy but not T; selects the top fraction by the gamed proxy "
+                        "and measures the true value captured. Use for claims about metric-gaming, "
+                        "teaching-to-the-test, KPI/OKR optimization, reward hacking, proxy reward, "
+                        "alignment, or 'when a measure becomes a target it ceases to be a good measure'."),
+        "params": {"rho": ("float", 0.0, 0.99, 0.6), "topfrac": ("float", 0.001, 0.5, 0.02),
+                   "gaming": ("float", 0.0, 4.0, 1.0), "n": ("int", 2000, 300000, 60000)},
+        "code": r'''
+import numpy as np
+rng = np.random.default_rng(7)
+rho, topfrac, gaming, n = {rho}, {topfrac}, {gaming}, {n}
+T = rng.standard_normal(n)
+P = rho*T + np.sqrt(1-rho*rho)*rng.standard_normal(n)        # honest proxy
+Pg = P + gaming*rng.standard_normal(n)                       # proxy under gaming (effort that lifts P, not T)
+k = max(1, int(n*topfrac))
+def topmean(score):
+    return T[np.argpartition(score, -k)[-k:]].mean()
+oracle = topmean(T); honest = topmean(P); gamed = topmean(Pg)
+drop = (honest - gamed)/honest*100 if honest > 1e-6 else 0.0
+print(f"MEASURED: true value captured (z) - oracle {{oracle:.2f}}, honest-proxy {{honest:.2f}}, gamed-proxy {{gamed:.2f}} (rho={{rho}}, gaming={{gaming}}, top {{topfrac*100:.1f}}%)")
+print(f"VERDICT: {{'GOODHART - gaming the proxy cuts captured true value by '+format(drop,'.0f')+'%' if honest > 1e-6 and gamed < honest - 0.05 else 'PROXY HOLDS - optimizing it still tracks the true objective here'}}")
+''',
+    },
 }
 
 
