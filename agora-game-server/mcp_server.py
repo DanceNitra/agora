@@ -1477,7 +1477,27 @@ async def _brain_gaps() -> list:
     return _GAP_CACHE["gaps"]
 
 
-_recent_intents: list = []   # recently-issued quest intents, to avoid repetition (self-upgrade #1)
+_RECENT_INTENTS_FILE = Path(__file__).resolve().parent / ".recent_intents.json"
+
+
+def _load_recent_intents() -> list:
+    try:
+        return list(json.loads(_RECENT_INTENTS_FILE.read_text(encoding="utf-8")))[-50:]
+    except Exception:
+        return []
+
+
+# recently-issued quest intents, to avoid repetition (self-upgrade #1). PERSISTED to disk so the dedup
+# SURVIVES dungeon restarts — the watchdog's restart churn used to clear this every ~hour, so the swarm
+# re-picked the same flywheel questions (the 8x-duplicate "Test Agora's claim" output monoculture, 2026-06-19).
+_recent_intents: list = _load_recent_intents()
+
+
+def _save_recent_intents() -> None:
+    try:
+        _RECENT_INTENTS_FILE.write_text(json.dumps(_recent_intents[-50:]), encoding="utf-8")
+    except Exception:
+        pass
 
 _QUEST_PREFIX_RE = re.compile(
     r"^(?:Hypothesize on|Pursue direction|Deepen|Develop the gap|Connect|Frontier|Hypothesis|Pipeline)"
@@ -1501,20 +1521,23 @@ async def _renewable_quests(eid: str, want: int = 3) -> list:
     (flywheel), pursue harvested frontier directions, ground findings from FRESH papers, and form+test
     hypotheses that deepen existing findings. Bridges/gaps (combinatorial recombination of the
     saturated vault) were removed 2026-06-19 — they produced the low-substance 'gaming party' notes."""
-    pool, priority = [], []
+    # One bucket per source. We INTERLEAVE them (round-robin) instead of concatenating flywheel-first,
+    # so no single source can monopolize the top `want` slots — the flywheel's same ~3 questions used to
+    # fill every slot, collapsing the swarm's output to one repeated theme (monoculture fix, 2026-06-19).
+    b_fly, b_dir, b_paper, b_find = [], [], [], []
     try:
-        # COMPOUNDING FLYWHEEL first — the agents test the FALSIFIERS of Agora's own insights (its
-        # claims' weak points), so the system's outputs become its next research + knowledge deepens.
+        # COMPOUNDING FLYWHEEL — the agents test the FALSIFIERS of Agora's own insights (its claims'
+        # weak points), so the system's outputs become its next research + knowledge deepens.
         fw = await asyncio.to_thread(_brain_get_sync, "/api/v1/agent-os/brain/flywheel/questions?n=3")
         for q in (fw or {}).get("open", []):
-            priority.append((f"Test Agora's claim: {q['question'][:55]}",
-                             f"Find real evidence on whether this holds: {q['question']}", "hypothesize"))
-        # HARVESTED DIRECTIONS next (priority) — so research follows the synthesis and COMPOUNDS.
+            b_fly.append((f"Test Agora's claim: {q['question'][:55]}",
+                          f"Find real evidence on whether this holds: {q['question']}", "hypothesize"))
+        # HARVESTED DIRECTIONS — so research follows the synthesis and COMPOUNDS.
         dd = await asyncio.to_thread(_brain_get_sync, "/api/v1/agent-os/brain/directions/current")
         for d in (dd or {}).get("directions", []):
             if d.get("kind") == "research":          # upgrade-directions go to the user, not agents
-                priority.append((f"Pursue direction: {d['title']}",
-                                 f"Advance this with real evidence — {d.get('why', '')}"))
+                b_dir.append((f"Pursue direction: {d['title']}",
+                              f"Advance this with real evidence — {d.get('why', '')}"))
         # FRESH PAPERS (priority) — real, novel, frontier literature the vault does NOT yet cover, so
         # agents do GROUNDED research on new science instead of recombining the saturated vault. This
         # replaces the old "Connect A<->B" bridges and vague "Develop the gap" quests, which were
@@ -1524,10 +1547,10 @@ async def _renewable_quests(eid: str, want: int = 3) -> list:
         for p in (lib or {}).get("papers", [])[:6]:
             ttl = (p.get("title") or "").strip()
             if ttl:
-                priority.append((f"Ground a finding from: {ttl[:60]}",
-                                 f"State ONE research finding this paper directly supports, "
-                                 f"paraphrasing its actual result and naming it (Author Year): {ttl}",
-                                 "create"))
+                b_paper.append((f"Ground a finding from: {ttl[:60]}",
+                                f"State ONE research finding this paper directly supports, "
+                                f"paraphrasing its actual result and naming it (Author Year): {ttl}",
+                                "create"))
         fd = await asyncio.to_thread(_brain_get_sync, "/api/v1/agent-os/brain/collective?limit=8")
         finds = [k for k in (fd or {}).get("knowledge", []) if (k.get("content") or "")]
         for k in random.sample(finds, min(3, len(finds))):
@@ -1536,18 +1559,32 @@ async def _renewable_quests(eid: str, want: int = 3) -> list:
             topic = _strip_quest_prefix(k.get("title") or "")[:55]
             if not topic:
                 continue
-            pool.append((f"Hypothesize on: {topic}",
-                         "Form + test a new hypothesis that deepens this finding", "hypothesize"))
+            b_find.append((f"Hypothesize on: {topic}",
+                           "Form + test a new hypothesis that deepens this finding", "hypothesize"))
     except Exception as e:
         logger.debug(f"renewable_quests {eid}: {e}")
-    random.shuffle(pool)
-    combined = priority + pool                        # directions first, then the renewable surface
+    # INTERLEAVE the four sources round-robin, with a shuffled bucket order so the lead source varies
+    # each cycle — this is the diversity fix: the top `want` picks now span sources instead of being
+    # three flywheel questions every time.
+    buckets = [b_paper, b_find, b_fly, b_dir]
+    for b in buckets:
+        random.shuffle(b)
+    random.shuffle(buckets)
+    interleaved, i = [], 0
+    while any(len(b) > i for b in buckets):
+        for b in buckets:
+            if len(b) > i:
+                interleaved.append(b[i])
+        i += 1
     # SELF-UPGRADE #1: don't re-pursue a topic done recently — avoid the repetition the OS fell into.
-    fresh = [x for x in combined if x[0] not in _recent_intents]
-    chosen = (fresh or combined)[:want]
+    # _recent_intents is PERSISTED, so this dedup now survives dungeon restarts (kills the cross-restart dups).
+    fresh = [x for x in interleaved if x[0] not in _recent_intents]
+    chosen = (fresh or interleaved)[:want]
     for x in chosen:
         _recent_intents.append(x[0])
         del _recent_intents[:-50]
+    if chosen:
+        _save_recent_intents()
     return [{"intent": x[0][:90], "kind": (x[2] if len(x) > 2 else "create"),
              "where": "wander", "action": x[1], "with": ""}
             for x in chosen]
