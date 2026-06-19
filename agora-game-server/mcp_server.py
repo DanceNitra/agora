@@ -4228,21 +4228,34 @@ def main():
         # Run MCP stdio transport
         mcp.run(transport="stdio")
     else:
-        # Standalone mode: run all three in asyncio
-        async def run_all():
-            await asyncio.gather(
-                run_ws_server(),
-                run_http_server(),
-                ambient_life(),
-            )
+        # Standalone mode. SERIOUS FIX (2026-06-19): the watchdog-checked HTTP server (:5174) used to run
+        # on the SAME event loop as ambient_life(), so whenever the loop blocked (its LLM/heavy work
+        # starving the event loop) the health endpoint couldn't answer -> the brain watchdog logged
+        # "dungeon was down" and restarted it. That false-restart churn reset loop_n every time, which
+        # starved the Claude inbox + the GitHub scout. http_handler is a PURE STATIC-FILE server (no
+        # shared mutable state), so we now run it in its OWN thread+loop -> the health endpoint stays
+        # responsive no matter what ambient_life is doing. WS (:5175, live state) stays on the main loop
+        # (it already coexisted with ambient there; only the watchdog-checked HTTP needed decoupling).
+        def _run_async(loop_fn):
+            loop = asyncio.new_event_loop()
+            asyncio.set_event_loop(loop)
+            loop.run_until_complete(loop_fn)
+
+        http_thread = threading.Thread(target=_run_async, args=(run_http_server(),),
+                                       daemon=True, name="dungeon-http")
+        http_thread.start()
 
         engine.create_default_dungeon()
         print(f"Dungeon Game Server starting...")
-        print(f"  HTTP:     http://localhost:{HTTP_PORT}")
+        print(f"  HTTP:     http://localhost:{HTTP_PORT}  (own thread - watchdog-safe)")
         print(f"  WebSocket: ws://localhost:{WS_PORT}")
         print(f"  Open http://localhost:{HTTP_PORT} in your browser")
         print()
-        asyncio.run(run_all())
+
+        async def run_main():
+            await asyncio.gather(run_ws_server(), ambient_life())
+
+        asyncio.run(run_main())
 
 
 if __name__ == "__main__":
