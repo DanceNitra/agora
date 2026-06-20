@@ -25,7 +25,7 @@ configs:
 
 A standing, machine-readable benchmark of widely-repeated AI / data-science claims, each rebuilt as the smallest runnable test and ruled REPRODUCED / FAILED / NOT_COMPUTABLE. Honest, citable receipts for the field's folklore.
 
-**v0.1.0** - 58 claims
-(32 REPRODUCED / 11 FAILED / 15 NOT_COMPUTABLE).
+**v0.1.0** - 59 claims
+(32 REPRODUCED / 12 FAILED / 15 NOT_COMPUTABLE).
 Each row has a permanent `key` (FI-NNNN) for stable citation. Load: `datasets.load_dataset("<user>/folklore-index")`.
 Fields: key, domain, claim, source, verdict, note, lab_file, code_url, code_resolves, date. Source repo: https://github.com/DanceNitra/agora. Data CC-BY-4.0, code MIT.

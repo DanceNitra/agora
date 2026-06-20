@@ -18,17 +18,17 @@
   "date": "YYYY-MM-DD"
  },
  "counts": {
-  "total": 58,
+  "total": 59,
   "by_verdict": {
-   "FAILED": 11,
+   "FAILED": 12,
    "NOT_COMPUTABLE": 15,
    "REPRODUCED": 32
   },
   "by_domain": {
    "replication": 51,
-   "ai-claim": 7
+   "ai-claim": 8
   },
-  "runnable_code_present": 9
+  "runnable_code_present": 10
  },
  "entries": [
   {
@@ -726,6 +726,18 @@
    "code_resolves": true,
    "date": "2026-06-20",
    "key": "FI-0058"
+  },
+  {
+   "domain": "ai-claim",
+   "claim": "Adding a reranker (cross-encoder) on top of first-stage retrieval reliably improves end-to-end RAG accuracy, or at worst never hurts it ('drop in a reranker for a free boost').",
+   "source": "Cohere / Pinecone / LangChain / LlamaIndex RAG tutorials and 'production RAG checklist' blogs; repeated as received wisdom by practitioners.",
+   "verdict": "FAILED",
+   "note": "Deterministic numpy model (seed 0, n=200k queries): gold doc + 3 hard negatives (lexically similar) + 27 soft distractors; NO-RERANK uses a noisy first-stage scorer, RERANK uses a CLEANER scorer but inflates the 3 hard negatives by `infl` (a cross-encoder fooled by lexical overlap); end-to-end correctness depends on the gold doc's rank in a position-biased top-5. Measured delta (rerank - no-rerank): infl=0.0 -> +0.139, 1.4 -> +0.013, 2.2 -> -0.074, 3.0 -> -0.131. The reranker HELPS when it is merely cleaner (control infl=0: +0.139) but crosses to a NET LOSS at infl* ~ 1.52 and reaches -0.131 - so 'a reranker never hurts / free boost' is FAILED: a second scorer with a different error profile can demote the gold doc out of a position-biased top-k. Anti-rig: the control (infl=0) shows the harness CAN produce a gain (not baked to fail); the verdict is read off the printed curve. HONEST SCOPE: a stylized simulation, not real corpora/models - it shows the loss is mechanically in-range and the condition for it (non-trivial hard-negative susceptibility), not that any specific production reranker degrades a specific stack; the realistic magnitude of `infl` for real cross-encoders is the open empirical question. The defensible takeaway: 'always helps' is not a safe default.",
+   "lab_file": "agora_output/aiclaims/20260620_reranker_not_free_boost.py",
+   "code_url": "https://github.com/DanceNitra/agora/blob/main/agora_output/aiclaims/20260620_reranker_not_free_boost.py",
+   "code_resolves": true,
+   "date": "2026-06-20",
+   "key": "FI-0059"
   }
  ]
 }

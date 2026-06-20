@@ -2,9 +2,9 @@
 
 A standing, machine-readable benchmark of widely-repeated AI / data-science claims, each rebuilt as the smallest runnable test and ruled REPRODUCED / FAILED / NOT_COMPUTABLE. Honest, citable receipts for the field's folklore.
 
-**Version 0.1.0** - 58 claims
-(32 REPRODUCED, 11 FAILED, 15 NOT_COMPUTABLE) -
-9 with a runnable test in the repo.
+**Version 0.1.0** - 59 claims
+(32 REPRODUCED, 12 FAILED, 15 NOT_COMPUTABLE) -
+10 with a runnable test in the repo.
 
 Every claim has a permanent citation key (`FI-NNNN`) that never renumbers, so a cited claim stays valid as
 the index grows.
@@ -34,7 +34,7 @@ Each entry in `folklore_index.json`:
 
 ## Verdict mix
 - REPRODUCED: 32
-- FAILED: 11
+- FAILED: 12
 - NOT_COMPUTABLE: 15
 
 ## Provenance
