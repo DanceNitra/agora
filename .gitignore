@@ -96,3 +96,6 @@ onboarding/game-dev/books/_*
 /_*.err
 # runtime watcher/state json (regenerated live; underscore-prefixed = scratch per repo convention)
 agora_output/**/_*.json
+
+# methods-library runtime stores (gap log + run ledger)
+/.methods_gaps.json

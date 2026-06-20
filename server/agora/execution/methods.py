@@ -24,6 +24,7 @@ import time
 from pathlib import Path
 
 _STORE = Path(__file__).resolve().parents[2] / ".methods.json"
+_GAPS = Path(__file__).resolve().parents[2] / ".methods_gaps.json"
 
 # ── Template registry ───────────────────────────────────────────────────────
 # Each: description (for the matcher LLM), params schema {name: (type, min, max, default)}
@@ -365,6 +366,17 @@ def _validate(template: str, params: dict) -> dict:
     return out
 
 
+def _log_gap(theme: str) -> None:
+    """Record a hypothesis theme that matched NO template -> the data-driven backlog of templates to add
+    (the compounding 'when no template fits, write one' loop starts from this list)."""
+    try:
+        g = json.loads(_GAPS.read_text(encoding="utf-8")) if _GAPS.exists() else []
+        g.append({"theme": theme[:200], "ts": time.time()})
+        _GAPS.write_text(json.dumps(g[-300:], ensure_ascii=False, indent=1), encoding="utf-8")
+    except Exception:
+        pass
+
+
 def _load() -> list:
     try:
         return json.loads(_STORE.read_text(encoding="utf-8"))
@@ -407,9 +419,14 @@ async def match_and_run(theme: str, requester: str = "") -> dict:
     from agora.execution.llm_client import call_llm
     cat = "\n".join(f"- {c['name']}: {c['description'][:180]} | params: "
                     f"{', '.join(c['params'])}" for c in catalog())
-    sysmsg = ("You match research hypotheses to experiment templates. Reply ONLY JSON: "
-              '{"template":"<name or none>","params":{...},"why":"<8 words>"} . '
-              "Pick 'none' unless the hypothesis GENUINELY fits a template's mechanism.")
+    sysmsg = ("You map a research hypothesis to the experiment template that could TEST it. Each template "
+              "description says 'Use for ANY claim of the form ...' - match by the underlying MECHANISM / "
+              "claim-shape (e.g. streak->next-outcome, common-effect/collider, scale-free or heavy-tail "
+              "distribution, tipping/cascade, selection/multiple-testing, crowd-vs-individual, "
+              "critical-slowing-down, regression-to-mean), NOT the surface topic/domain. Pick the closest "
+              "template whose mechanism would produce a measurement bearing on the hypothesis; reply 'none' "
+              "ONLY if genuinely no template's mechanism applies. "
+              'Reply ONLY JSON: {"template":"<name or none>","params":{...},"why":"<8 words>"}.')
     usr = f"Hypothesis theme: {theme[:300]}\n\nTemplates:\n{cat}"
     # MEDIUM tier (reasoning model): the matcher is a LOW-frequency judgment call (fires only
     # when a finding cluster forms), and the cheap tier (v4-flash) returns empty completions
@@ -427,6 +444,7 @@ async def match_and_run(theme: str, requester: str = "") -> dict:
         return {"status": "no_match"}
     tpl = (d.get("template") or "").strip()
     if tpl not in TEMPLATES:
+        _log_gap(theme)
         return {"status": "no_match", "why": d.get("why", "")}
     res = await _aio.to_thread(run_method, tpl, d.get("params") or {}, theme, requester)
     res["why"] = d.get("why", "")
