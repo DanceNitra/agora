@@ -37,8 +37,12 @@ formatted churn. One agent per cycle, flag-gated + reversible (CLAUDE.md rules).
   replication process, which is gated + verified by Claude).
 - [ ] **Mira** (Curator) — write a GRADE evidence card only AFTER a Lab receipt exists; null/FAILED curated
   as first-class. Note volume stops being a credit metric.
-- [ ] **Orin** (Idea Alchemist) — Platt strong-inference: ≥2 mutually-exclusive hypotheses with a crucial
-  differentiating observable, not a list of co-existing ideas.
+- [x] **Orin** (Idea Alchemist) — DONE 2026-06-20: hypothesis generation now names a concrete MECHANISM +
+  predicted direction a minimal model can measure (favours simulation-settleable shapes). OBSERVED: 3/4
+  generated hypotheses match a Lab template (vs proof's 2/5) → severe-test conversion ~40%→~75%. (Single
+  testable hypothesis; full multi-hypothesis Platt trees deferred - the matchability win was the lever.)
+  Also: **agent_activity_monitor.py** launched - watches if agents work + what they produce (loop/grounded/
+  lab-runs/shipped deltas; ~3h Telegram summary; alerts on frozen OR busy-but-idle).
 - [ ] **Kael** (Scout) — claim-gap retrieval (one best-grounded finding per side of a hole) + mandatory
   effect-size/credibility audit (flag N<50 / no-prereg as low-credibility).
 - [ ] **Wren** (Cartographer) — ranked structural-hole list that feeds Orin's bridges + forced-collision.
