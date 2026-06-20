@@ -1,15 +1,15 @@
 {
  "name": "The AI-Claim Crucible",
  "description": "A standing, machine-readable ledger that rebuilds widely-repeated AI / agent engineering claims as the smallest runnable test and rules REPRODUCED / FAILED / NOT_COMPUTABLE. Honest receipts for the field's folklore.",
- "generated": "2026-06-19",
+ "generated": "2026-06-20",
  "entries": [
   {
    "claim": "Multi-agent systems (an orchestrator delegating to sub-agents) outperform a single agent on complex tasks.",
-   "source": "2026 agent-engineering folklore (contested: Cognition 'Don't Build Multi-Agents' vs Anthropic's multi-agent research system); Gartner: ~40% of agentic projects scrapped.",
-   "verdict": "NOT_COMPUTABLE",
-   "note": "Tested at FIXED token cost on decomposable ground-truth tasks (one base model, only the scaffold differs; single self-consistency vs an orchestrator+workers+aggregator scaffold). Run 3x: the SAME config swings 0.15-0.20 in accuracy run-to-run on IDENTICAL tasks (multi@wmax1400: 0.75/0.75/0.92; single k=5: 0.96/0.75) at n=24, temp 0.7. The comparison is dominated by LLM-stochasticity noise at realistic eval scale -> the claim cannot be cleanly settled, AND the loud folklore (in both directions) rests on under-powered, non-reproducible comparisons. A stable verdict would need large-n multi-seed evals, which the folklore/blog benchmarks do not run. Honest scope: our own eval is also too small for a positive claim; the finding is the NON-REPRODUCIBILITY itself.",
-   "lab": "agora_output/aiclaims/20260619_multi_vs_single_agent_eval.py (+ PREREGISTRATION_multi-vs-single-agent.md)",
-   "date": "2026-06-19"
+   "source": "2026 agent-engineering folklore (contested: Cognition 'Don't Build Multi-Agents' vs Anthropic's multi-agent research system; Gartner ~40% of agentic projects scrapped). Direct claim: Tran & Kiela, arXiv 2604.02460 - single-agent >= multi-agent at equal thinking-token budget.",
+   "verdict": "FAILED",
+   "note": "Replicated on MuSiQue multi-hop QA (n=48 hop-diverse: 16 each of 2/3/4-hop, 20 paragraphs with distractors), single chain-of-thought vs a standard decompose-solve-aggregate multi-agent, generous per-call caps so neither side is truncated (an earlier forced budget-split truncated multi answers and was fixed). Single-agent SIGNIFICANTLY beats multi on BOTH frontier models AND uses ~3x fewer tokens: glm-5.2 single 96% vs multi 69% (gap +27pp, 95% CI [12.5,43.8]); deepseek-v4-flash single 94% vs multi 79% (gap +15pp, 95% CI [4.2,27.1]); both CIs exclude 0. Multi-agent does NOT outperform - the opposite, at lower cost. Honest nuance: the multi-agent closes/reverses the gap only at the hardest 4-hop tier (explicit decomposition pays off when depth is high). Supersedes the earlier NOT_COMPUTABLE verdict, which came from a noisy small toy eval; the real benchmark gives a stable signal.",
+   "lab": "agora_output/lab/20260620-174500_single-vs-multi-agent-musique.py (result single_vs_multi_musique.json)",
+   "date": "2026-06-20"
   },
   {
    "claim": "When you evaluate N models/configs on a benchmark and report the top scorer's number, that score is a reliable estimate of its true performance and the winner is the truly-best model.",
@@ -71,8 +71,8 @@
    "claim": "You can trust an LLM's CONFIDENCE to tell you when a retrieved document has corrupted its answer (high-confidence RAG answers are safe).",
    "source": "RAG-deployment folklore (confidence/self-consistency gating as a hallucination guard); tested on frontier models glm-5.2 and deepseek-v4-flash.",
    "verdict": "FAILED",
-   "note": "Two measured settings (12 factual questions each model knows unaided; thinking-robust reader, k=2, order-corrected). (1) ALL-POISON: given a doc asserting the FALSE answer, frontier models ADOPT the poison at FULL confidence - glm-5.2 16/16 (100%), deepseek-v4-flash 15/16 (94%); confidence is ~1.0 while the answer is wrong. (2) REALISTIC MIXED retrieval (each question once with a clean doc, once with a poisoned doc, 50/50): confidence is BLIND - corr(confidence, correct) = -0.07 (glm) / +0.21 (deepseek), shipping ~46-50% wrong at every coverage, because poisoned and clean answers are BOTH high-confidence. The discriminating signal is NOT confidence but answer-drop SENSITIVITY (how much the answer moves when the doc is removed): corr(-sensitivity, correct) = +0.97 (glm) / +1.00 (deepseek), giving 0% wrong at 50% coverage (keep every clean-doc answer, abstain on every poisoned one) - risk-coverage AUC ~2x better than confidence (0.216 vs 0.427; 0.261 vs 0.489). So 'trust the confidence' FAILS; a drop-sensitivity gate (the Grounding Firewall) recovers safety. HONEST SCOPE: strong direct-assertion poison, 2-option factual questions; kept-coverage tracks the clean-doc fraction (50% here by construction). The earlier qwen2.5:7b '0% wrong at 70% coverage' headline was a weak-model artifact - these are the frontier-grade numbers.",
-   "lab": "agora_output/lab/20260620-110000_grounding-firewall-validate-glm52.py (all-poison) + agora_output/lab/20260620-114500_grounding-firewall-mixed-retrieval-glm52.py (mixed)",
+   "note": "Two layers. (1) ALL-POISON: given a doc asserting the FALSE answer, frontier models ADOPT the poison at FULL confidence (glm-5.2 ~100%, deepseek ~94%) - confidence ~1.0 while wrong. (2) HARDENED 2026-06-20 to n=101 factual questions (was n=16), clean/poison 50/50, strong poison, K=3, thinking-robust reader: the grounding-DROP firewall (abstain when the answer depends on the retrieved doc) ships 0% wrong @ 50% coverage on BOTH models (0/101 kept; Wilson 95% upper bound 3.7%) where CONFIDENCE-gating ships 18.8% (glm-5.2) / 35.6% (deepseek) wrong; drop-sensitivity correlates -0.93/-0.95 with correctness vs confidence only +0.30/+0.23. Confidence is blind exactly when the model is confidently wrong; the cheap context-drop test is not.",
+   "lab": "agora_output/lab/20260620-171500_firewall-n100-fast.py (n=101, result firewall_n100_hardening.json) + earlier all-poison/mixed labs",
    "date": "2026-06-20"
   }
  ]
