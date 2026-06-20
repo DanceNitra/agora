@@ -44,8 +44,10 @@ formatted churn. One agent per cycle, flag-gated + reversible (CLAUDE.md rules).
   testable hypothesis; full multi-hypothesis Platt trees deferred - the matchability win was the lever.)
   Also: **agent_activity_monitor.py** launched - watches if agents work + what they produce (loop/grounded/
   lab-runs/shipped deltas; ~3h Telegram summary; alerts on frozen OR busy-but-idle).
-- [ ] **Kael** (Scout) — claim-gap retrieval (one best-grounded finding per side of a hole) + mandatory
-  effect-size/credibility audit (flag N<50 / no-prereg as low-credibility).
+- [x] **Kael** (Scout) — DONE 2026-06-20: effect-size/credibility audit on every promoted finding - a
+  single underpowered/preliminary study (not lab-measured/meta-analytic/replicated/pre-registered) is
+  flagged `low-credibility`, gets a caveat, and a HIGH grade is capped to MODERATE. Calibration verified.
+  (claim-gap retrieval part deferred - depends on Wren's structural holes.)
 - [ ] **Wren** (Cartographer) — ranked structural-hole list that feeds Orin's bridges + forced-collision.
 
 ## Overnight run (2026-06-20, owner: "dorobme to vsetko a nechame to pracovat cez noc")
