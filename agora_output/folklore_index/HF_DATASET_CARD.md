@@ -27,5 +27,5 @@ A standing, machine-readable benchmark of widely-repeated AI / data-science clai
 
 **v0.1.0** - 59 claims
 (32 REPRODUCED / 12 FAILED / 15 NOT_COMPUTABLE).
-Each row has a permanent `key` (FI-NNNN) for stable citation. Load: `datasets.load_dataset("<user>/folklore-index")`.
+Each row has a permanent `key` (FI-NNNN) for stable citation. Load: `datasets.load_dataset("Danchi17/folklore-index")`.
 Fields: key, domain, claim, source, verdict, note, lab_file, code_url, code_resolves, date. Source repo: https://github.com/DanceNitra/agora. Data CC-BY-4.0, code MIT.

@@ -245,7 +245,7 @@ configs:
 
 **v{ds['version']}** - {ds['counts']['total']} claims
 ({by_v.get('REPRODUCED',0)} REPRODUCED / {by_v.get('FAILED',0)} FAILED / {by_v.get('NOT_COMPUTABLE',0)} NOT_COMPUTABLE).
-Each row has a permanent `key` (FI-NNNN) for stable citation. Load: `datasets.load_dataset("<user>/folklore-index")`.
+Each row has a permanent `key` (FI-NNNN) for stable citation. Load: `datasets.load_dataset("Danchi17/folklore-index")`.
 Fields: {", ".join(ds['schema'].keys())}. Source repo: {REPO}. Data CC-BY-4.0, code MIT.
 """
     with open(os.path.join(OUT_DIR, "HF_DATASET_CARD.md"), "w", encoding="utf-8") as f:
