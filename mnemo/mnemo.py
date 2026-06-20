@@ -488,9 +488,15 @@ class Mnemo:
             self._dirty = True
             return
         try:
+            # Persist text/metadata only; the `vec` embedding arrays are a re-derivable in-memory CACHE
+            # and are STRIPPED here. json.dumps of N x 768-dim float vectors is huge, slow, and holds the
+            # GIL for many seconds - which froze the whole event loop even from a worker thread (the
+            # frozen-world bug, 2026-06-20). Vectors stay in self.items (RAM) so recall is unaffected this
+            # session; on reload they are re-embedded lazily. Keeps the store file small + the save fast.
+            slim = [{k: v for k, v in r.items() if k != "vec"} for r in self.items]
             # Atomic write: a partial/interleaved write can't corrupt the store (crash- and
             # concurrent-writer-safe — last writer wins, never a torn JSON file).
-            data = json.dumps(self.items, ensure_ascii=False, indent=1)
+            data = json.dumps(slim, ensure_ascii=False, indent=1)
             tmp = self.path.with_name(self.path.name + ".tmp")
             tmp.write_text(data, encoding="utf-8")
             os.replace(tmp, self.path)
