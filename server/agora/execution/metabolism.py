@@ -108,8 +108,13 @@ def value_snapshot() -> dict:
     pts["bounty"] = 3.0 * sum(1 for x in bounty if x.get("kill")) \
         + 0.75 * sum(1 for x in bounty if not x.get("kill"))
     reps = j(".replications.json", [])
-    pts["replication"] = (4.0 * sum(1 for r in reps if r.get("outcome") == "FAILED")     # publishable
-                          + 2.0 * sum(1 for r in reps if r.get("outcome") == "REPRODUCED")
+    # Anti-manufactured-FAILED guard (Crucible integrity): FAILED and REPRODUCED are valued EQUALLY.
+    # Paying more for FAILED (was 4.0 vs 2.0) created a perverse incentive to MANUFACTURE failures (rig a
+    # weak baseline / underpowered run) and poison the Crucible, whose entire value is that its FAILEDs are
+    # honest. The reward is now verdict-neutral - replicate honestly and let the evidence decide. FAILED's
+    # higher DISTRIBUTION value is handled separately (the falsified digest + owner approval), not by the
+    # agent reward. NOT_COMPUTABLE stays lower (inconclusive).
+    pts["replication"] = (2.5 * sum(1 for r in reps if r.get("outcome") in ("FAILED", "REPRODUCED"))
                           + 0.5 * sum(1 for r in reps if r.get("outcome") == "NOT_COMPUTABLE"))
     ana = j(".analogies.json", [])
     pts["analogy"] = 4.0 * sum(1 for a in ana if "survived" in (a.get("outcome") or "").lower()) \
