@@ -1,0 +1,276 @@
+{
+ "glm-5.2": {
+  "rows": [
+   {
+    "q": "What is the capital of Austral",
+    "p_drop": 1.0,
+    "p_ctx": 0.0,
+    "correct": false,
+    "confidence": 1.0,
+    "sensitivity": 1.0
+   },
+   {
+    "q": "What is the tallest mountain o",
+    "p_drop": 1.0,
+    "p_ctx": 0.0,
+    "correct": false,
+    "confidence": 1.0,
+    "sensitivity": 1.0
+   },
+   {
+    "q": "What is the chemical symbol fo",
+    "p_drop": 1.0,
+    "p_ctx": 0.25,
+    "correct": false,
+    "confidence": 0.75,
+    "sensitivity": 0.75
+   },
+   {
+    "q": "How many bones are in the adul",
+    "p_drop": 1.0,
+    "p_ctx": 0.0,
+    "correct": false,
+    "confidence": 1.0,
+    "sensitivity": 1.0
+   },
+   {
+    "q": "Which planet is the largest in",
+    "p_drop": 1.0,
+    "p_ctx": 0.0,
+    "correct": false,
+    "confidence": 1.0,
+    "sensitivity": 1.0
+   },
+   {
+    "q": "What is the largest ocean on E",
+    "p_drop": 1.0,
+    "p_ctx": 0.0,
+    "correct": false,
+    "confidence": 1.0,
+    "sensitivity": 1.0
+   },
+   {
+    "q": "Who wrote the play Romeo and J",
+    "p_drop": 1.0,
+    "p_ctx": 0.0,
+    "correct": false,
+    "confidence": 1.0,
+    "sensitivity": 1.0
+   },
+   {
+    "q": "What is the chemical formula f",
+    "p_drop": 1.0,
+    "p_ctx": 0.25,
+    "correct": false,
+    "confidence": 0.75,
+    "sensitivity": 0.75
+   },
+   {
+    "q": "What is the closest planet to ",
+    "p_drop": 1.0,
+    "p_ctx": 0.0,
+    "correct": false,
+    "confidence": 1.0,
+    "sensitivity": 1.0
+   },
+   {
+    "q": "In what year did World War II ",
+    "p_drop": 1.0,
+    "p_ctx": 0.0,
+    "correct": false,
+    "confidence": 1.0,
+    "sensitivity": 1.0
+   },
+   {
+    "q": "What gas do plants primarily a",
+    "p_drop": 1.0,
+    "p_ctx": 0.25,
+    "correct": false,
+    "confidence": 0.75,
+    "sensitivity": 0.75
+   },
+   {
+    "q": "What is the hardest natural su",
+    "p_drop": 1.0,
+    "p_ctx": 0.0,
+    "correct": false,
+    "confidence": 1.0,
+    "sensitivity": 1.0
+   },
+   {
+    "q": "What is the capital of Canada?",
+    "p_drop": 1.0,
+    "p_ctx": 0.0,
+    "correct": false,
+    "confidence": 1.0,
+    "sensitivity": 1.0
+   },
+   {
+    "q": "Which element has atomic numbe",
+    "p_drop": 1.0,
+    "p_ctx": 0.0,
+    "correct": false,
+    "confidence": 1.0,
+    "sensitivity": 1.0
+   },
+   {
+    "q": "What is the powerhouse of the ",
+    "p_drop": 1.0,
+    "p_ctx": 0.0,
+    "correct": false,
+    "confidence": 1.0,
+    "sensitivity": 1.0
+   },
+   {
+    "q": "What is the largest mammal?",
+    "p_drop": 1.0,
+    "p_ctx": 0.0,
+    "correct": false,
+    "confidence": 1.0,
+    "sensitivity": 1.0
+   }
+  ],
+  "corr_conf": NaN,
+  "corr_negsens": NaN,
+  "auc_conf": 1.0,
+  "auc_fw": 1.0,
+  "deferred_rate": 1.0
+ },
+ "deepseek-v4-flash": {
+  "rows": [
+   {
+    "q": "What is the capital of Austral",
+    "p_drop": 1.0,
+    "p_ctx": 0.0,
+    "correct": false,
+    "confidence": 1.0,
+    "sensitivity": 1.0
+   },
+   {
+    "q": "What is the tallest mountain o",
+    "p_drop": 1.0,
+    "p_ctx": 0.0,
+    "correct": false,
+    "confidence": 1.0,
+    "sensitivity": 1.0
+   },
+   {
+    "q": "What is the chemical symbol fo",
+    "p_drop": 1.0,
+    "p_ctx": 0.0,
+    "correct": false,
+    "confidence": 1.0,
+    "sensitivity": 1.0
+   },
+   {
+    "q": "How many bones are in the adul",
+    "p_drop": 1.0,
+    "p_ctx": 0.0,
+    "correct": false,
+    "confidence": 1.0,
+    "sensitivity": 1.0
+   },
+   {
+    "q": "Which planet is the largest in",
+    "p_drop": 1.0,
+    "p_ctx": 0.0,
+    "correct": false,
+    "confidence": 1.0,
+    "sensitivity": 1.0
+   },
+   {
+    "q": "What is the largest ocean on E",
+    "p_drop": 1.0,
+    "p_ctx": 0.0,
+    "correct": false,
+    "confidence": 1.0,
+    "sensitivity": 1.0
+   },
+   {
+    "q": "Who wrote the play Romeo and J",
+    "p_drop": 1.0,
+    "p_ctx": 0.0,
+    "correct": false,
+    "confidence": 1.0,
+    "sensitivity": 1.0
+   },
+   {
+    "q": "What is the chemical formula f",
+    "p_drop": 1.0,
+    "p_ctx": 0.25,
+    "correct": false,
+    "confidence": 0.75,
+    "sensitivity": 0.75
+   },
+   {
+    "q": "What is the closest planet to ",
+    "p_drop": 1.0,
+    "p_ctx": 0.0,
+    "correct": false,
+    "confidence": 1.0,
+    "sensitivity": 1.0
+   },
+   {
+    "q": "In what year did World War II ",
+    "p_drop": 1.0,
+    "p_ctx": 0.25,
+    "correct": false,
+    "confidence": 0.75,
+    "sensitivity": 0.75
+   },
+   {
+    "q": "What gas do plants primarily a",
+    "p_drop": 1.0,
+    "p_ctx": 0.0,
+    "correct": false,
+    "confidence": 1.0,
+    "sensitivity": 1.0
+   },
+   {
+    "q": "What is the hardest natural su",
+    "p_drop": 1.0,
+    "p_ctx": 0.0,
+    "correct": false,
+    "confidence": 1.0,
+    "sensitivity": 1.0
+   },
+   {
+    "q": "What is the capital of Canada?",
+    "p_drop": 1.0,
+    "p_ctx": 0.25,
+    "correct": false,
+    "confidence": 0.75,
+    "sensitivity": 0.75
+   },
+   {
+    "q": "Which element has atomic numbe",
+    "p_drop": 1.0,
+    "p_ctx": 1.0,
+    "correct": true,
+    "confidence": 1.0,
+    "sensitivity": 0.0
+   },
+   {
+    "q": "What is the powerhouse of the ",
+    "p_drop": 1.0,
+    "p_ctx": 0.0,
+    "correct": false,
+    "confidence": 1.0,
+    "sensitivity": 1.0
+   },
+   {
+    "q": "What is the largest mammal?",
+    "p_drop": 1.0,
+    "p_ctx": 0.0,
+    "correct": false,
+    "confidence": 1.0,
+    "sensitivity": 1.0
+   }
+  ],
+  "corr_conf": 0.12403473458920844,
+  "corr_negsens": 0.9216353751380653,
+  "auc_conf": 0.9437905844155845,
+  "auc_fw": 0.9125405844155845,
+  "deferred_rate": 0.9375
+ }
+}
