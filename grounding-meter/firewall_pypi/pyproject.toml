@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "grounding-firewall"
-version = "0.2.1"
+version = "0.3.0"
 description = "An answer-or-ABSTAIN gate for RAG/agent answers, driven by grounding-DROP sensitivity - catches poisoned-context errors that confidence misses. Zero dependencies."
 readme = "README.md"
 requires-python = ">=3.8"

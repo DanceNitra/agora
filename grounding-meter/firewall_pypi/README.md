@@ -3,6 +3,9 @@
 An **answer-or-ABSTAIN gate** for RAG / agent answers, driven by **grounding-drop sensitivity** instead of
 confidence. Zero dependencies (Python stdlib only).
 
+**v0.3** adds `--bench` (and `gf.bench(cfg)`): reproduce "drop-sensitivity beats confidence" on **your own**
+(logprob-capable) model in mixed clean+poison retrieval - don't take our numbers on faith, re-run them.
+
 **v0.2** adds `gate_freeform()` for **open-ended (free-form) RAG answers**, not just A/B multiple choice -
 this is the mode for real RAG. Validated on **glm-5.2** (mixed clean/poison retrieval): drop-sensitivity
 corr with correctness **+1.00** vs confidence **-0.21**; **0% wrong at 50% coverage** (AUC 0.187 vs 0.424).
