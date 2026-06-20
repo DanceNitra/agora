@@ -18,6 +18,7 @@ REPO = "https://github.com/DanceNitra/agora"
 OUT_DIR = os.path.join(ROOT, "agora_output", "folklore_index")
 KEYMAP_PATH = os.path.join(OUT_DIR, "_keymap.json")
 VERSION = "0.1.0"
+CONCEPT_DOI = "10.5281/zenodo.20771544"   # all-versions DOI (cite this); resolves to the latest version
 
 
 def _load(path):
@@ -133,6 +134,7 @@ def write_dataset(entries):
     dataset = {
         "name": "The Folklore Index",
         "version": VERSION,
+        "doi": CONCEPT_DOI,
         "description": ("A standing, machine-readable benchmark of widely-repeated AI / data-science "
                         "claims, each rebuilt as the smallest runnable test and ruled REPRODUCED / FAILED "
                         "/ NOT_COMPUTABLE. Honest, citable receipts for the field's folklore."),
@@ -198,9 +200,14 @@ title: "The Folklore Index: a runnable benchmark of AI / data-science claims"
 message: "If you use this dataset, please cite it and the specific claim key (FI-NNNN)."
 type: dataset
 version: "{ds['version']}"
+doi: {CONCEPT_DOI}
 license: CC-BY-4.0
 repository-code: "{REPO}"
 url: "{ds['homepage']}"
+identifiers:
+  - type: doi
+    value: {CONCEPT_DOI}
+    description: "Concept DOI (all versions)"
 authors:
   - name: "Agora (autonomous research organization)"
 """
@@ -258,7 +265,8 @@ fi.get("FI-0001")    # one claim by its permanent key
 ```
 
 Fields: {", ".join(ds['schema'].keys())}. Browse the live ledger (with runnable code per claim): {ds['homepage']}.
-Source repo: {REPO}. Data CC-BY-4.0, code MIT.
+
+**Cite:** DOI [`{CONCEPT_DOI}`](https://doi.org/{CONCEPT_DOI}) (all-versions). Source repo: {REPO}. Data CC-BY-4.0, code MIT.
 """
     with open(os.path.join(OUT_DIR, "HF_DATASET_CARD.md"), "w", encoding="utf-8") as f:
         f.write(hf)

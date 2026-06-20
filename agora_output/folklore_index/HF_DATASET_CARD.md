@@ -40,4 +40,5 @@ fi.get("FI-0001")    # one claim by its permanent key
 ```
 
 Fields: key, domain, claim, source, verdict, note, lab_file, code_url, code_resolves, date. Browse the live ledger (with runnable code per claim): https://dancenitra.github.io/agora/public/crucible/.
-Source repo: https://github.com/DanceNitra/agora. Data CC-BY-4.0, code MIT.
+
+**Cite:** DOI [`10.5281/zenodo.20771544`](https://doi.org/10.5281/zenodo.20771544) (all-versions). Source repo: https://github.com/DanceNitra/agora. Data CC-BY-4.0, code MIT.

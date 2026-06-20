@@ -1,6 +1,7 @@
 {
  "name": "The Folklore Index",
  "version": "0.1.0",
+ "doi": "10.5281/zenodo.20771544",
  "description": "A standing, machine-readable benchmark of widely-repeated AI / data-science claims, each rebuilt as the smallest runnable test and ruled REPRODUCED / FAILED / NOT_COMPUTABLE. Honest, citable receipts for the field's folklore.",
  "homepage": "https://dancenitra.github.io/agora/public/crucible/",
  "repo": "https://github.com/DanceNitra/agora",
