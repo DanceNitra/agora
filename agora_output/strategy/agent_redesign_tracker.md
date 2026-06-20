@@ -25,9 +25,10 @@ formatted churn. One agent per cycle, flag-gated + reversible (CLAUDE.md rules).
   deferred (32 templates is already broad; the matcher was the real lever).
 
 ## Next (priority order)
-- [ ] **Funnel metric honesty** — `execution/funnel.py` `_GROUNDED` regex matches the *words*
-  Hypothesis/Falsifier/Source → replace with a count of discoveries carrying a verified `lab_run_id`; make
-  FAILED/NULL value 1.0 (metabolism already does for replications). Small, high-value truth fix.
+- [x] **Funnel metric honesty** — `execution/funnel.py` `_GROUNDED` now requires a real citation OR a
+  measured result/lab receipt (not the words Hypothesis/Falsifier/Source:). Effect: grounded 7369 (48%) ->
+  honest 2145 (14%). Read-side only, verified live. (metabolism value-weights already reward replication/
+  press; the FAILED/NULL=1.0 extension folds into the Rooke fair-baseline work below.)
 - [ ] **Anti-gaming guard (Rooke)** — a FAILED verdict must show the baseline was FAIR (reproduce a known
   control in the same harness) before it can go public, so FAILEDs can't be manufactured (Crucible integrity).
 - [ ] **Mira** (Curator) — write a GRADE evidence card only AFTER a Lab receipt exists; null/FAILED curated
