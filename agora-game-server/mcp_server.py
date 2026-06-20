@@ -1978,6 +1978,8 @@ async def _task_already_pending(prefix: str) -> bool:
 
 
 async def _queue_insight_theme() -> None:
+    if os.getenv("AGORA_QUIET_GENERATORS") == "1":
+        return  # quieted: low-value 'synthesize insight' inbox churn (agent redesign; flag-reversible)
     """Insight Engine workflow: Agora GATHERS + QUEUES a rich theme; Claude Opus SYNTHESIZES it when
     active (the flash model is too weak for the synthesis). Picks a theme from the user's harvest
     directions / real gaps and drops it in the Claude inbox as 'Synthesize insight: <theme>'."""
@@ -2010,6 +2012,8 @@ async def _queue_insight_theme() -> None:
 
 
 async def _queue_deepening() -> None:
+    if os.getenv("AGORA_QUIET_GENERATORS") == "1":
+        return  # quieted: low-value 'deepen insight' inbox churn (agent redesign; flag-reversible)
     """Compounding Flywheel (second half): queue an insight's falsifier for Claude to RE-TEST against
     the fresh evidence and DEEPEN the insight — outputs come back as sharper outputs, knowledge deepens."""
     if not await _attn_ok("deepen_queue"):
@@ -2123,6 +2127,8 @@ async def _run_predictions() -> None:
 
 
 async def _queue_dialectic() -> None:
+    if os.getenv("AGORA_QUIET_GENERATORS") == "1":
+        return  # quieted: low-value 'dialectic' inbox churn (agent redesign; flag-reversible)
     """Queue a contentious claim for CLAUDE to run the dialectic on (quality thesis/antithesis/
     synthesis — the flash version is weak). Picks a flywheel falsifier or a harvest direction."""
     if not await _attn_ok("dialectic_queue"):
