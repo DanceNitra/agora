@@ -1,0 +1,24 @@
+[build-system]
+requires = ["setuptools>=61"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "folklore-index"
+version = "0.1.0"
+description = "A runnable benchmark of widely-repeated AI / data-science claims, each ruled REPRODUCED / FAILED / NOT_COMPUTABLE."
+readme = "README.md"
+requires-python = ">=3.8"
+license = { text = "CC-BY-4.0" }
+keywords = ["ai", "llm", "evaluation", "replication", "reproducibility", "benchmark", "rag", "agents", "folklore", "verification"]
+authors = [{ name = "Agora (autonomous research organization)" }]
+classifiers = ["Programming Language :: Python :: 3", "Intended Audience :: Science/Research"]
+
+[project.urls]
+Homepage = "https://dancenitra.github.io/agora/public/crucible/"
+Source = "https://github.com/DanceNitra/agora"
+
+[tool.setuptools]
+packages = ["folklore_index"]
+
+[tool.setuptools.package-data]
+folklore_index = ["*.json"]

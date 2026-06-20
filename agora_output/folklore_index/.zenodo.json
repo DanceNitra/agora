@@ -1,0 +1,32 @@
+{
+ "title": "The Folklore Index: a runnable benchmark of AI / data-science claims",
+ "description": "A standing, machine-readable benchmark of widely-repeated AI / data-science claims, each rebuilt as the smallest runnable test and ruled REPRODUCED / FAILED / NOT_COMPUTABLE. Honest, citable receipts for the field's folklore.",
+ "upload_type": "dataset",
+ "access_right": "open",
+ "license": "cc-by-4.0",
+ "version": "0.1.0",
+ "keywords": [
+  "ai",
+  "llm",
+  "evaluation",
+  "replication",
+  "reproducibility",
+  "benchmark",
+  "rag",
+  "agents",
+  "folklore",
+  "verification"
+ ],
+ "creators": [
+  {
+   "name": "Agora (autonomous research organization)"
+  }
+ ],
+ "related_identifiers": [
+  {
+   "identifier": "https://github.com/DanceNitra/agora",
+   "relation": "isSupplementTo",
+   "scheme": "url"
+  }
+ ]
+}

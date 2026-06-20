@@ -208,11 +208,171 @@ authors:
         f.write(cff)
 
 
+KEYWORDS = ["ai", "llm", "evaluation", "replication", "reproducibility", "benchmark", "rag",
+            "agents", "folklore", "verification"]
+
+
+def write_publishing(ds):
+    """Emit everything needed to publish externally (owner does the final account step, gated):
+    a JSONL mirror, a Hugging Face dataset card, Zenodo DOI metadata, a pip-installable package, and
+    a PUBLISHING.md with the exact commands."""
+    entries = ds["entries"]
+
+    # 1) JSONL mirror (Hugging Face datasets loads line-delimited JSON cleanly)
+    with open(os.path.join(OUT_DIR, "folklore_index.jsonl"), "w", encoding="utf-8") as f:
+        for e in entries:
+            f.write(json.dumps(e, ensure_ascii=False) + "\n")
+
+    # 2) Hugging Face dataset card (YAML front-matter + body)
+    by_v = ds["counts"]["by_verdict"]
+    hf = f"""---
+license: cc-by-4.0
+language:
+  - en
+pretty_name: The Folklore Index
+size_categories:
+  - n<1K
+tags:
+{chr(10).join("  - " + k for k in KEYWORDS)}
+configs:
+  - config_name: default
+    data_files: folklore_index.jsonl
+---
+
+# The Folklore Index
+
+{ds['description']}
+
+**v{ds['version']}** - {ds['counts']['total']} claims
+({by_v.get('REPRODUCED',0)} REPRODUCED / {by_v.get('FAILED',0)} FAILED / {by_v.get('NOT_COMPUTABLE',0)} NOT_COMPUTABLE).
+Each row has a permanent `key` (FI-NNNN) for stable citation. Load: `datasets.load_dataset("<user>/folklore-index")`.
+Fields: {", ".join(ds['schema'].keys())}. Source repo: {REPO}. Data CC-BY-4.0, code MIT.
+"""
+    with open(os.path.join(OUT_DIR, "HF_DATASET_CARD.md"), "w", encoding="utf-8") as f:
+        f.write(hf)
+
+    # 3) Zenodo DOI metadata
+    zenodo = {
+        "title": "The Folklore Index: a runnable benchmark of AI / data-science claims",
+        "description": ds["description"], "upload_type": "dataset", "access_right": "open",
+        "license": "cc-by-4.0", "version": ds["version"], "keywords": KEYWORDS,
+        "creators": [{"name": "Agora (autonomous research organization)"}],
+        "related_identifiers": [{"identifier": REPO, "relation": "isSupplementTo", "scheme": "url"}],
+    }
+    with open(os.path.join(OUT_DIR, ".zenodo.json"), "w", encoding="utf-8") as f:
+        json.dump(zenodo, f, indent=1)
+
+    # 4) pip-installable package (flat layout): folklore_index with a tiny load() API + bundled data
+    pkg = os.path.join(OUT_DIR, "pypi", "folklore_index")
+    os.makedirs(pkg, exist_ok=True)
+    with open(os.path.join(pkg, "folklore_index.json"), "w", encoding="utf-8") as f:
+        json.dump(ds, f, indent=1, ensure_ascii=False)   # bundle the dataset inside the package
+    init_py = '''"""The Folklore Index - a runnable benchmark of AI / data-science claims.
+
+>>> import folklore_index as fi
+>>> fi.verdicts()            # {'REPRODUCED': .., 'FAILED': .., 'NOT_COMPUTABLE': ..}
+>>> fi.get("FI-0001")        # one claim by its permanent citation key
+"""
+import json, os
+
+_DATA = os.path.join(os.path.dirname(__file__), "folklore_index.json")
+
+
+def load():
+    """Return the full dataset (metadata + entries)."""
+    with open(_DATA, encoding="utf-8") as f:
+        return json.load(f)
+
+
+def claims():
+    """Return the list of claim entries."""
+    return load()["entries"]
+
+
+def get(key):
+    """Return one claim by its permanent FI-NNNN key, or None."""
+    return next((e for e in claims() if e.get("key") == key), None)
+
+
+def verdicts():
+    """Return the verdict counts."""
+    return load()["counts"]["by_verdict"]
+
+
+__version__ = load().get("version", "0")
+'''
+    with open(os.path.join(pkg, "__init__.py"), "w", encoding="utf-8") as f:
+        f.write(init_py)
+    pyproject = f'''[build-system]
+requires = ["setuptools>=61"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "folklore-index"
+version = "{ds['version']}"
+description = "A runnable benchmark of widely-repeated AI / data-science claims, each ruled REPRODUCED / FAILED / NOT_COMPUTABLE."
+readme = "README.md"
+requires-python = ">=3.8"
+license = {{ text = "CC-BY-4.0" }}
+keywords = {json.dumps(KEYWORDS)}
+authors = [{{ name = "Agora (autonomous research organization)" }}]
+classifiers = ["Programming Language :: Python :: 3", "Intended Audience :: Science/Research"]
+
+[project.urls]
+Homepage = "{ds['homepage']}"
+Source = "{REPO}"
+
+[tool.setuptools]
+packages = ["folklore_index"]
+
+[tool.setuptools.package-data]
+folklore_index = ["*.json"]
+'''
+    with open(os.path.join(OUT_DIR, "pypi", "pyproject.toml"), "w", encoding="utf-8") as f:
+        f.write(pyproject)
+    with open(os.path.join(OUT_DIR, "pypi", "README.md"), "w", encoding="utf-8") as f:
+        f.write("# folklore-index\n\n" + ds["description"] +
+                "\n\n```python\nimport folklore_index as fi\nfi.verdicts()\nfi.get('FI-0001')\n```\n")
+
+    # 5) PUBLISHING.md - the exact gated steps for the owner (his accounts/tokens)
+    pub = f"""# Publishing the Folklore Index (GATED - owner's accounts)
+
+Everything below is prepared by `tools/build_folklore_index.py`. Each publish step needs YOUR account/token;
+nothing here runs automatically. Re-run the build first so all artifacts are current:
+
+    python tools/build_folklore_index.py
+
+## A. PyPI  (`pip install folklore-index`)
+    cd agora_output/folklore_index/pypi
+    python -m pip install --upgrade build twine
+    python -m build                      # makes dist/*.whl + *.tar.gz
+    python -m twine upload dist/*         # needs your PyPI API token
+
+## B. Hugging Face dataset
+    pip install -U huggingface_hub
+    huggingface-cli login                 # your HF token
+    # create a dataset repo named e.g. <you>/folklore-index, then:
+    huggingface-cli upload <you>/folklore-index agora_output/folklore_index/folklore_index.jsonl folklore_index.jsonl --repo-type dataset
+    huggingface-cli upload <you>/folklore-index agora_output/folklore_index/HF_DATASET_CARD.md README.md --repo-type dataset
+
+## C. Zenodo DOI
+    Easiest: enable the GitHub<->Zenodo integration for the agora repo, then cut a GitHub Release -
+    Zenodo mints a DOI automatically using `.zenodo.json`. (Or upload the jsonl on zenodo.org and paste
+    the .zenodo.json fields.)
+
+After A/B/C: link the PyPI / HF / DOI from the Crucible page and from each post. The dataset then does the
+distribution - researchers cite the DOI and pull the package; no manual social trawling required.
+"""
+    with open(os.path.join(OUT_DIR, "PUBLISHING.md"), "w", encoding="utf-8") as f:
+        f.write(pub)
+
+
 def main():
     entries = assign_keys(gather())
     ds = write_dataset(entries)
     write_card(ds)
     write_citation(ds)
+    write_publishing(ds)
     by_v, by_d = ds["counts"]["by_verdict"], ds["counts"]["by_domain"]
     print("=" * 64)
     print("THE FOLKLORE INDEX v%s" % VERSION)
@@ -226,7 +386,9 @@ def main():
     if missing:
         print("WARNING: %d entries reference a lab file that is NOT in the repo (code link blank): %s"
               % (len(missing), ", ".join(missing[:8])))
-    print("wrote: agora_output/folklore_index/{folklore_index.json, README.md, CITATION.cff, _keymap.json}")
+    print("wrote: folklore_index.json, README.md, CITATION.cff, _keymap.json")
+    print("publishing artifacts: folklore_index.jsonl, HF_DATASET_CARD.md, .zenodo.json, "
+          "pypi/ (pip package), PUBLISHING.md")
 
 
 if __name__ == "__main__":
