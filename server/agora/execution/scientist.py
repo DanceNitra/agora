@@ -10,6 +10,7 @@ from __future__ import annotations
 
 import asyncio
 import json
+import os
 import re
 
 
@@ -44,6 +45,12 @@ async def hypothesize_and_test(topic: str, vault_path: str) -> dict:
         hyp = (await asyncio.to_thread(call_llm, sysmsg, usr, "cheap", 0.7, 200) or "").strip().strip('"')
     if not hyp:
         return {"topic": topic, "hypothesis": "", "verdict": "NONE", "known": b.get("claims", [])}
+
+    # SEVERE-TEST PATH (AGORA_SCIENTIST_LAB=1): a REAL Lab run via the Methods Library + a pre-commitment,
+    # instead of the LLM-vibe-check below. No measured number -> verdict NONE, NOT recorded. (proof step;
+    # flag off = old behavior, instant revert.)
+    if os.getenv("AGORA_SCIENTIST_LAB") == "1":
+        return await _severe_test(topic, hyp, b)
 
     # 2) test it against real literature
     papers = await asyncio.to_thread(research, hyp[:100], 5)
@@ -83,6 +90,60 @@ async def hypothesize_and_test(topic: str, vault_path: str) -> dict:
         "confidence": conf,
         "falsifier": str(d.get("falsifier", ""))[:200],
         "source": top,
+        "known_claims": len(b.get("claims", [])),
+    }
+
+
+async def _precommit(hyp: str) -> dict:
+    """Pre-registration BEFORE any run (no HARKing): the predicted measured direction + a decision rule."""
+    from agora.execution.llm_client import call_llm
+    raw = (await asyncio.to_thread(
+        call_llm,
+        "For the hypothesis, state a PRE-COMMITMENT to be written BEFORE any experiment runs: the expected "
+        "measured direction/sign and a one-line decision rule for SUPPORTED vs REFUTED. Reply ONLY JSON: "
+        '{"direction":"<expected sign/direction of the measured effect>",'
+        '"decision_rule":"<SUPPORTED if ...; REFUTED if ...>"}.',
+        f"HYPOTHESIS: {hyp}", "cheap", 0.2, 220) or "")
+    return _json(raw)
+
+
+async def _severe_test(topic: str, hyp: str, b: dict) -> dict:
+    """Severe-test path: run a REAL minimal model via the Methods Library, compare the MEASURED number to a
+    pre-commitment. No template fit OR no measured number -> verdict NONE (not a test, not recorded)."""
+    from agora.execution.methods import match_and_run
+    from agora.execution.llm_client import call_llm
+    precommit = await _precommit(hyp)
+    res = await match_and_run(hyp, requester="scientist")
+    measured = (res.get("measured") or "").replace("MEASURED:", "").strip()
+    if res.get("status") != "ok" or not res.get("ok") or not measured:
+        return {"topic": topic, "hypothesis": hyp, "verdict": "NONE",
+                "reason": ("no_lab_template_match" if res.get("status") != "ok" else "no_measured_number"),
+                "precommit": precommit, "lab_backed": True, "known_claims": len(b.get("claims", []))}
+    tpl_verdict = (res.get("verdict") or "").replace("VERDICT:", "").strip()
+    # compare MEASURED vs pre-commitment AND flag whether the measured quantity actually bears on the claim
+    raw = (await asyncio.to_thread(
+        call_llm,
+        "A hypothesis was severely tested by running a computational model. Compare the MEASURED result to "
+        "the PRE-COMMITMENT. Reply ONLY JSON: {\"verdict\":\"SUPPORTED|REFUTED|UNCERTAIN\","
+        "\"relevant\":<true if the measured quantity actually bears on the hypothesis, else false>,"
+        "\"confidence\":<0..1 probability the hypothesis is true given the measurement>}.",
+        f"HYPOTHESIS: {hyp}\nPRE-COMMITMENT: {json.dumps(precommit)[:300]}\n"
+        f"MEASURED: {measured[:200]}\nMODEL VERDICT: {tpl_verdict[:120]}", "cheap", 0.1, 220) or "")
+    d = _json(raw)
+    verdict = str(d.get("verdict", "UNCERTAIN")).upper()
+    if verdict not in ("SUPPORTED", "REFUTED", "UNCERTAIN"):
+        verdict = "UNCERTAIN"
+    rc = d.get("confidence")
+    conf = float(rc) if isinstance(rc, (int, float)) and 0.0 <= float(rc) <= 1.0 else \
+        {"SUPPORTED": 0.7, "REFUTED": 0.2, "UNCERTAIN": 0.5}[verdict]
+    return {
+        "topic": topic, "hypothesis": hyp, "verdict": verdict,
+        "evidence": f"Lab[{res.get('template', '')}] {measured}"[:300],
+        "confidence": conf,
+        "falsifier": (precommit.get("decision_rule") or tpl_verdict)[:200],
+        "source": f"lab:{res.get('lab_id', '')} ({res.get('template', '')})",
+        "lab_id": res.get("lab_id", ""), "measured": measured[:200],
+        "lab_relevant": bool(d.get("relevant", False)), "lab_backed": True,
         "known_claims": len(b.get("claims", [])),
     }
 

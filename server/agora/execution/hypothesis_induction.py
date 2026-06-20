@@ -169,7 +169,9 @@ async def _record_one(db, theme: str, members: list, vault_path: str) -> dict | 
     from agora.execution import flywheel
     h = await hypothesize_and_test(theme, vault_path)         # generate + TEST against real literature
     hyp = (h.get("hypothesis") or "").strip()
-    if not hyp or "[LLM Error" in hyp:
+    # severe-test rule: a hypothesis with no real verdict (e.g. no Lab template fit / no measured number
+    # under AGORA_SCIENTIST_LAB) is NOT a claim -> do not record it.
+    if not hyp or "[LLM Error" in hyp or str(h.get("verdict")) == "NONE":
         return None
     contributors = sorted({m.get("by", "?") for m in members})
     conf = float(h.get("confidence") or 0.5)
