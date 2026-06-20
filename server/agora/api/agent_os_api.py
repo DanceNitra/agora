@@ -351,6 +351,31 @@ def _evidence_grade(content: str):
     return "LOW", "grounded but no measured result or external citation"
 
 
+_CRED_WEAK = _grade_re.compile(
+    r"\b(?:a|one|a single|a recent|a pilot|a preliminary|an exploratory)\s+stud(?:y|ies)\b|\bpilot\b|"
+    r"\bpreliminary\b|\bexploratory\b|\bsmall sample\b|\bunderpowered\b|\bcase (?:study|report)\b|\banecdot",
+    _grade_re.I)
+_CRED_SMALLN = _grade_re.compile(r"\bn\s*=\s*([1-9]\d?)\b", _grade_re.I)
+_CRED_STRONG = _grade_re.compile(
+    r"meta-?analysis|systematic review|replicat|pre-?regist|large (?:sample|cohort|n)|\bRCT\b|"
+    r"randomi[sz]ed|MEASURED:|VERDICT:", _grade_re.I)
+
+
+def _credibility_audit(content: str):
+    """Shadow Kael's effect-size/credibility audit: a finding that leans on a single underpowered /
+    preliminary study (and is NOT Lab-measured, meta-analytic, replicated, or pre-registered) is
+    low-credibility — replicate before relying. Returns (is_low, caveat)."""
+    c = content or ""
+    if _CRED_STRONG.search(c):
+        return False, ""
+    if _CRED_WEAK.search(c):
+        return True, "rests on a single / preliminary study - replicate before relying"
+    m = _CRED_SMALLN.search(c)
+    if m and int(m.group(1)) < 50:
+        return True, f"small sample (n={m.group(1)}) - underpowered, replicate before relying"
+    return False, ""
+
+
 @router.post("/brain/promote-findings")
 async def promote_findings(request: Request, n: int = 16):
     """Promote the best recent findings into the vault through the (reliable) quality gate — the
@@ -463,10 +488,15 @@ async def promote_findings(request: Request, n: int = 16):
             continue
         try:
             _g, _gwhy = _evidence_grade(content)
+            _lowcred, _caveat = _credibility_audit(content)   # Shadow Kael: cap underpowered single-studies
+            if _lowcred and _g == "HIGH":
+                _g, _gwhy = "MODERATE", "capped: " + _caveat
+            _tags = ["agora", "research", f"grade-{_g.lower()}"] + (["low-credibility"] if _lowcred else [])
             graded = (f"> **Evidence grade: {_g}** — {_gwhy}. (Grades the strength of the evidence, "
-                      f"not the claim's importance.)\n\n" + content)
+                      f"not the claim's importance.)\n\n"
+                      + (f"> ⚠ Credibility: {_caveat}\n\n" if _lowcred else "") + content)
             await writer.write_note(title=title[:70], content=graded,
-                                    tags=["agora", "research", f"grade-{_g.lower()}"], agent_name="Sage Mira")
+                                    tags=_tags, agent_name="Sage Mira")
             promoted.append(title[:50])
         except Exception:
             pass
