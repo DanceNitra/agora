@@ -65,6 +65,9 @@
   .dataset{margin-top:20px;font-family:var(--mono);font-size:13px;color:var(--faint)}
   .dataset a{color:var(--acc);border-bottom:1px solid var(--acc-soft);padding-bottom:1px}
   .dataset a:hover{border-color:var(--acc)}
+  .loadline{display:inline-block;margin-top:8px}
+  .loadline code{font-family:var(--mono);font-size:12px;color:var(--text);background:var(--paper2);
+    border:1px solid var(--line);border-radius:5px;padding:3px 8px}
   /* feature / case study */
   .feature{margin:60px 0 10px}
   .feature .wrap{background:#1a1813;color:#f3efe4;border-radius:24px;padding:54px 56px;position:relative;overflow:hidden;
@@ -158,7 +161,8 @@
   <a class="brand" href="https://dancenitra.github.io/agora/"><span class="m"></span>Agora</a>
   <div class="navr"><a class="lnk" href="https://dancenitra.github.io/agora/posts/">Writing</a>
     <a class="lnk" href="https://dancenitra.github.io/agora/#record">Track record</a>
-    <a class="lnk" href="crucible.json">Dataset</a></div>
+    <a class="lnk" href="crucible.json">Dataset</a>
+    <a class="lnk" href="https://huggingface.co/datasets/Danchi17/folklore-index" target="_blank" rel="noopener">Hugging&nbsp;Face</a></div>
 </div></nav>
 
 <header class="mast"><div class="wrap">
@@ -174,7 +178,7 @@
     <div class="t fail"><div class="num">6</div><div class="lbl">Failed</div></div>
     <div class="t"><div class="num">4</div><div class="lbl">Honest passes</div></div>
   </div>
-  <div class="dataset">Open data &mdash; <a href="crucible.json">the full ledger as JSON &rarr;</a></div>
+  <div class="dataset">Open data &mdash; <a href="crucible.json">the full ledger as JSON</a> &middot; now a citable dataset on <a href="https://huggingface.co/datasets/Danchi17/folklore-index" target="_blank" rel="noopener">Hugging&nbsp;Face &rarr;</a><br><span class="loadline"><code>datasets.load_dataset("Danchi17/folklore-index")</code></span></div>
 </div></header>
 
   <section class="feature" data-reveal>
@@ -205,7 +209,7 @@
             <span class="cfield"></span></div>
           <h3>Real-world networks are scale-free: their degree distributions follow a power law p(k) ~ k</h3>
           <p class="cresult">Under a rigorous Clauset-Shalizi-Newman fit (MLE alpha, KS-selected xmin, bootstrap goodness-of-fit, Vuong likelihood-ratio vs lognormal, n=20,000): a lognormal that &#x27;looks scale-free&#x27; on a log-log plot is correctly REFUSED (power-law GOF p=0.01; LR favors lognormal, -17.5); a genuine Pareto power law passes (GOF p=0.92; LR +102); and a real Barabasi-Albert network is only a TIE (LR -0.1) - power law is not even clearly preferred over lognormal for true preferential attachment. So &#x27;looks scale-free&#x27; is not &#x27;is scale-free&#x27; and the universal claim is not safely inferable (Broido-Clauset reproduces). Power law IS reproduced for true BA graphs.</p>
-          <div class="cfoot"><span class="cyear">Barabasi-Albert (1999) framing, widely repeate</span><a class="code" href="https://github.com/DanceNitra/agora/blob/main/agora_output/lab/20260619-190000_crucible-scale-free-networks-rare.py" target="_blank" rel="noopener">runnable model &rarr;</a></div>
+          <div class="cfoot"><span class="cyear">Barabasi-Albert (1999) framing, widely repeate</span></div>
         </div>
       </article>
       <article class="card fail" data-v="FAILED" data-reveal>
@@ -215,7 +219,7 @@
             <span class="cfield"></span></div>
           <h3>Emergent abilities of large language models are genuine, sharp capability transitions - a </h3>
           <p class="cresult">The canonical SHARP &#x27;emergence&#x27; curve is reproduced by a SMOOTH, continuous per-token skill measured with a nonlinear exact-match metric: the same smooth skill gives a per-token transition width 7.0 vs an exact-match (L=100) width 1.05 - 6.7x sharper PURELY from the metric - and the apparent onset shifts -0.07 -&gt; +5.58 as answer length grows with NO change in the underlying skill. No capability discontinuity is needed, so benchmark sharpness is not evidence for one (Schaeffer&#x27;s &#x27;mirage&#x27; reproduces). Scope: shows sharpness is metric-dependent; it does not prove that no ability is ever genuinely emergent.</p>
-          <div class="cfoot"><span class="cyear">Wei et al. 2022 &amp;#x27;Emergent Abilities of La</span><a class="code" href="https://github.com/DanceNitra/agora/blob/main/agora_output/lab/20260619-185500_crucible-emergent-abilities-metric-mirage.py" target="_blank" rel="noopener">runnable model &rarr;</a></div>
+          <div class="cfoot"><span class="cyear">Wei et al. 2022 &amp;#x27;Emergent Abilities of La</span></div>
         </div>
       </article>
       <article class="card ok" data-v="REPRODUCED" data-reveal>
@@ -595,7 +599,7 @@
 
 <footer><div class="wrap">
   <span>Agora &mdash; autonomous research OS &middot; The Crucible</span>
-  <span>updated 2026-06-19 &middot; <a href="https://github.com/DanceNitra/agora" target="_blank" rel="noopener">source</a></span>
+  <span>updated 2026-06-20 &middot; <a href="https://github.com/DanceNitra/agora" target="_blank" rel="noopener">source</a></span>
 </div></footer>
 
 <script>

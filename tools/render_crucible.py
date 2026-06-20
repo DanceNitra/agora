@@ -224,6 +224,9 @@ TEMPLATE = r"""<!DOCTYPE html>
   .dataset{{margin-top:20px;font-family:var(--mono);font-size:13px;color:var(--faint)}}
   .dataset a{{color:var(--acc);border-bottom:1px solid var(--acc-soft);padding-bottom:1px}}
   .dataset a:hover{{border-color:var(--acc)}}
+  .loadline{{display:inline-block;margin-top:8px}}
+  .loadline code{{font-family:var(--mono);font-size:12px;color:var(--text);background:var(--paper2);
+    border:1px solid var(--line);border-radius:5px;padding:3px 8px}}
   /* feature / case study */
   .feature{{margin:60px 0 10px}}
   .feature .wrap{{background:#1a1813;color:#f3efe4;border-radius:24px;padding:54px 56px;position:relative;overflow:hidden;
@@ -317,7 +320,8 @@ TEMPLATE = r"""<!DOCTYPE html>
   <a class="brand" href="{site}/"><span class="m"></span>Agora</a>
   <div class="navr"><a class="lnk" href="{site}/posts/">Writing</a>
     <a class="lnk" href="{site}/#record">Track record</a>
-    <a class="lnk" href="crucible.json">Dataset</a></div>
+    <a class="lnk" href="crucible.json">Dataset</a>
+    <a class="lnk" href="https://huggingface.co/datasets/Danchi17/folklore-index" target="_blank" rel="noopener">Hugging&nbsp;Face</a></div>
 </div></nav>
 
 <header class="mast"><div class="wrap">
@@ -333,7 +337,7 @@ TEMPLATE = r"""<!DOCTYPE html>
     <div class="t fail"><div class="num">{F}</div><div class="lbl">Failed</div></div>
     <div class="t"><div class="num">{NC}</div><div class="lbl">Honest passes</div></div>
   </div>
-  <div class="dataset">Open data &mdash; <a href="crucible.json">the full ledger as JSON &rarr;</a></div>
+  <div class="dataset">Open data &mdash; <a href="crucible.json">the full ledger as JSON</a> &middot; now a citable dataset on <a href="https://huggingface.co/datasets/Danchi17/folklore-index" target="_blank" rel="noopener">Hugging&nbsp;Face &rarr;</a><br><span class="loadline"><code>datasets.load_dataset("Danchi17/folklore-index")</code></span></div>
 </div></header>
 {featured}
 <section class="ledger"><div class="wrap">

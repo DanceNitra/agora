@@ -1,7 +1,7 @@
 {
  "name": "The Crucible — machine replication ledger",
  "description": "Scientific and technical claims rebuilt as minimal computational models and tested. REPRODUCED = the mechanism holds in a minimal model; FAILED = it does not; NOT_COMPUTABLE = no simulable core (an honest pass).",
- "generated": "2026-06-19",
+ "generated": "2026-06-20",
  "counts": {
   "REPRODUCED": 31,
   "FAILED": 6,
@@ -14,7 +14,7 @@
    "verdict": "FAILED",
    "note": "Under a rigorous Clauset-Shalizi-Newman fit (MLE alpha, KS-selected xmin, bootstrap goodness-of-fit, Vuong likelihood-ratio vs lognormal, n=20,000): a lognormal that 'looks scale-free' on a log-log plot is correctly REFUSED (power-law GOF p=0.01; LR favors lognormal, -17.5); a genuine Pareto power law passes (GOF p=0.92; LR +102); and a real Barabasi-Albert network is only a TIE (LR -0.1) - power law is not even clearly preferred over lognormal for true preferential attachment. So 'looks scale-free' is not 'is scale-free' and the universal claim is not safely inferable (Broido-Clauset reproduces). Power law IS reproduced for true BA graphs.",
    "lab_id": "e88ca9",
-   "code": "https://github.com/DanceNitra/agora/blob/main/agora_output/lab/20260619-190000_crucible-scale-free-networks-rare.py",
+   "code": "",
    "date": "2026-06-19"
   },
   {
@@ -23,7 +23,7 @@
    "verdict": "FAILED",
    "note": "The canonical SHARP 'emergence' curve is reproduced by a SMOOTH, continuous per-token skill measured with a nonlinear exact-match metric: the same smooth skill gives a per-token transition width 7.0 vs an exact-match (L=100) width 1.05 - 6.7x sharper PURELY from the metric - and the apparent onset shifts -0.07 -> +5.58 as answer length grows with NO change in the underlying skill. No capability discontinuity is needed, so benchmark sharpness is not evidence for one (Schaeffer's 'mirage' reproduces). Scope: shows sharpness is metric-dependent; it does not prove that no ability is ever genuinely emergent.",
    "lab_id": "af4a24",
-   "code": "https://github.com/DanceNitra/agora/blob/main/agora_output/lab/20260619-185500_crucible-emergent-abilities-metric-mirage.py",
+   "code": "",
    "date": "2026-06-19"
   },
   {
