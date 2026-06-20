@@ -99,3 +99,7 @@ agora_output/**/_*.json
 
 # methods-library runtime stores (gap log + run ledger)
 /.methods_gaps.json
+
+/tools/.agent_activity_state.json
+/_agent_activity.log
+/_agent_activity.err

@@ -34,11 +34,18 @@ async def hypothesize_and_test(topic: str, vault_path: str) -> dict:
         or "(the vault is thin here)"
 
     # 1) generate ONE new, specific, testable hypothesis that goes beyond what's already claimed
+    # Orin rebuild: a hypothesis must name a concrete MECHANISM + a predicted DIRECTION/quantity a minimal
+    # computational model could measure — so it is genuinely severe-testable AND maps to a Methods template
+    # (raises Rooke's match + the quality of what gets tested), not a vague sentence.
     sysmsg = (
-        "Propose ONE NEW, specific, TESTABLE hypothesis about the topic — a single declarative "
-        "sentence a real paper could support or refute. If prior claims are given, extend or "
-        "challenge them (don't restate). If little is known, propose a sharp first hypothesis from "
-        "the topic itself. Reply ONLY the hypothesis sentence, nothing else.")
+        "Propose ONE NEW, specific, TESTABLE hypothesis about the topic — a single declarative sentence "
+        "that names a concrete MECHANISM and a PREDICTED DIRECTION or quantity a minimal computational "
+        "model could measure (e.g. 'X raises Y', 'the effect vanishes when Z', 'the distribution is "
+        "power-law, not lognormal', 'a committed minority above fraction f flips consensus'). Favour "
+        "claim-shapes a simulation can settle: streaks/runs, tipping/cascades, selection or "
+        "multiple-testing bias, scale-free/heavy-tail, regression-to-mean, ensemble-vs-individual, "
+        "critical-slowing-down. If prior claims are given, extend or challenge them (don't restate). "
+        "Reply ONLY the hypothesis sentence, nothing else.")
     usr = f"Topic: {topic}\nAlready claimed:\n{known}"
     hyp = (await asyncio.to_thread(call_llm, sysmsg, usr, "cheap", 0.5, 160) or "").strip().strip('"')
     if not hyp:                                         # the LLM occasionally returns empty — retry once
@@ -130,6 +137,12 @@ async def _severe_test(topic: str, hyp: str, b: dict) -> dict:
         f"HYPOTHESIS: {hyp}\nPRE-COMMITMENT: {json.dumps(precommit)[:300]}\n"
         f"MEASURED: {measured[:200]}\nMODEL VERDICT: {tpl_verdict[:120]}", "cheap", 0.1, 220) or "")
     d = _json(raw)
+    # RELEVANCE GATE: a template can match loosely and measure the wrong thing (the test-relevance seam).
+    # If the measured quantity does not bear on the hypothesis, it is NOT a test of it -> do not record.
+    if not bool(d.get("relevant", False)):
+        return {"topic": topic, "hypothesis": hyp, "verdict": "NONE", "reason": "lab_result_irrelevant",
+                "lab_id": res.get("lab_id", ""), "measured": measured[:200], "lab_backed": True,
+                "known_claims": len(b.get("claims", []))}
     verdict = str(d.get("verdict", "UNCERTAIN")).upper()
     if verdict not in ("SUPPORTED", "REFUTED", "UNCERTAIN"):
         verdict = "UNCERTAIN"
