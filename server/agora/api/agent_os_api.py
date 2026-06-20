@@ -331,6 +331,26 @@ _PROMOTED: set = set()   # finding titles already promoted to the vault (avoid d
 _PROMOTE_STATS = {"promoted": 0, "checked": 0}   # cumulative funnel stats for the research-ROI metric
 
 
+import re as _grade_re
+_G_MEASURED = _grade_re.compile(
+    r"MEASURED:|VERDICT:|\blab[:_ ]?[0-9a-f]{6}\b|\bn\s*=\s*\d|\d+(?:\.\d+)?\s*%|\bCI\b|p\s*[<=]\s*0?\.\d", _grade_re.I)
+_G_CITE = _grade_re.compile(r"10\.\d{4,9}/|arxiv[:\s]*\d{4}\.\d|\([A-Z][a-zA-Z]+(?: et al\.?)?,? \d{4}\)", _grade_re.I)
+_G_FALS = _grade_re.compile(r"falsif|would (?:refute|disprove|be wrong)|refuted if", _grade_re.I)
+
+
+def _evidence_grade(content: str):
+    """Sage Mira's GRADE: rate the strength of the underlying EVIDENCE (not the claim's importance), so the
+    vault is honest about confidence per note. HIGH = a measured result + (citation or falsifier);
+    MODERATE = one of those; LOW = grounded but no measured result or external citation."""
+    c = content or ""
+    meas, cite, fals = bool(_G_MEASURED.search(c)), bool(_G_CITE.search(c)), bool(_G_FALS.search(c))
+    if meas and (cite or fals):
+        return "HIGH", "measured result with a citation/falsifier"
+    if meas or cite:
+        return "MODERATE", "a measured result or a real external citation"
+    return "LOW", "grounded but no measured result or external citation"
+
+
 @router.post("/brain/promote-findings")
 async def promote_findings(request: Request, n: int = 16):
     """Promote the best recent findings into the vault through the (reliable) quality gate — the
@@ -442,8 +462,11 @@ async def promote_findings(request: Request, n: int = 16):
         if not q["pass"]:
             continue
         try:
-            await writer.write_note(title=title[:70], content=content,
-                                    tags=["agora", "research"], agent_name="Sage Mira")
+            _g, _gwhy = _evidence_grade(content)
+            graded = (f"> **Evidence grade: {_g}** — {_gwhy}. (Grades the strength of the evidence, "
+                      f"not the claim's importance.)\n\n" + content)
+            await writer.write_note(title=title[:70], content=graded,
+                                    tags=["agora", "research", f"grade-{_g.lower()}"], agent_name="Sage Mira")
             promoted.append(title[:50])
         except Exception:
             pass
