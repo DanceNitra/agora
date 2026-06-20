@@ -16,10 +16,15 @@ formatted churn. One agent per cycle, flag-gated + reversible (CLAUDE.md rules).
   number — never the literal word "Source:" (which an empty note faked). Calibrated: real lab + literature
   findings pass; "Source:"-only / stub / buzzword-soup reject.
 
+- [x] **Aldric** (Compute CFO / Methods Library) — **corrected diagnosis**: the library already has **32
+  templates** (not 8 — earlier undercount), so the proof's 40% match rate was the **MATCHER under-matching
+  (none-bias), not missing coverage**. Fixed the matcher to map by underlying MECHANISM/claim-shape →
+  verified the proof's 3 previous misses now match 3/3 (power-law→preferential-attachment,
+  criticality→csd-earlywarning, multi-agent→diversity-vs-ability). Added gap-logging (`.methods_gaps.json`).
+  Dropped a duplicate + a buggy power-law template (didn't ship bad science). Auto-template-writing loop
+  deferred (32 templates is already broad; the matcher was the real lever).
+
 ## Next (priority order)
-- [ ] **Aldric** (Compute CFO / Methods Library) — THE match-rate lever: expand the Methods Library
-  templates + add the "when no template matches, an agent WRITES a new vetted template" loop. Without this,
-  Rooke's severe-test only covers ~40% of hypotheses. Highest ROI next.
 - [ ] **Funnel metric honesty** — `execution/funnel.py` `_GROUNDED` regex matches the *words*
   Hypothesis/Falsifier/Source → replace with a count of discoveries carrying a verified `lab_run_id`; make
   FAILED/NULL value 1.0 (metabolism already does for replications). Small, high-value truth fix.
