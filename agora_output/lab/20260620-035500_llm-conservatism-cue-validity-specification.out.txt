@@ -1,0 +1,31 @@
+=== deepseek-v4-flash ===
+    n  nR  bayes   cond  reported  cons_gap  k
+    6   5  0.967   told     0.967    -0.000  2
+    6   5  0.967  infer     0.967    -0.000  1
+    8   6  0.967   told     0.967    -0.000  2
+    8   6  0.967  infer   none      none  0
+   10   7  0.967   told   none      none  0
+   10   7  0.967  infer   none      none  0
+   10   8  0.994   told     0.994    +0.000  3
+   10   8  0.994  infer   none      none  0
+   12   9  0.994   told     0.998    -0.004  3
+   12   9  0.994  infer   none      none  0
+  -> mean conservatism gap: TOLD=-0.001 (n=4)  INFER=+0.000 (n=1)  extra-conservatism(INFER-TOLD)=+0.001
+
+=== glm-5.2 ===
+    n  nR  bayes   cond  reported  cons_gap  k
+    6   5  0.967   told     0.967    -0.000  3
+    6   5  0.967  infer   none      none  0
+    8   6  0.967   told     0.967    -0.000  3
+    8   6  0.967  infer   none      none  0
+   10   7  0.967   told     0.967    -0.000  3
+   10   7  0.967  infer   none      none  0
+   10   8  0.994   told     0.994    +0.000  3
+   10   8  0.994  infer   none      none  0
+   12   9  0.994   told     0.994    +0.000  3
+   12   9  0.994  infer   none      none  0
+  -> mean conservatism gap: TOLD=+0.000 (n=5)  INFER=+nan (n=0)  extra-conservatism(INFER-TOLD)=+nan
+
+=== SUMMARY: does SPECIFYING (vs inferring) cue validity reduce the conservatism gap? ===
+  deepseek-v4-flash  TOLD gap=-0.001  INFER gap=+0.000  -> NO - specifying cue validity does NOT reduce the gap (falsifier)
+  glm-5.2            INSUFFICIENT DATA (told n=5, infer n=0)

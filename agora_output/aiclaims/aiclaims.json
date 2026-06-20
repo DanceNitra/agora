@@ -42,6 +42,14 @@
    "note": "Multiverse over ONE analytic fork METR itself exposes - the success-threshold choice. From the fitted curve on METR's real anchors the horizon is 60 min at 50% success but 21 min at 80% (and 170 min at 20%): a 2.8x swing from an arbitrary threshold. At doubling-every-7-months that 2.8x is ~11 months of apparent 'progress' - so the famous 'month-long tasks in ~5 years' timeline slips ~11 months if you (reasonably) demand 80% reliability instead of 50%. The headline is NOT a robust single number; it rides on an unstated analytic choice. (A full specification curve over more forks needs METR's raw per-task data.)",
    "lab": "agora_output/aiclaims/20260619_metr_horizon_survival_multiverse.py",
    "date": "2026-06-19"
+  },
+  {
+   "claim": "LLMs inherit human cognitive biases - e.g. conservatism in Bayesian belief updating (people under-revise relative to Bayes; Edwards 1968).",
+   "source": "Folklore that LLMs reproduce human judgment-and-decision biases; tested on the canonical bookbag-and-poker-chip conservatism task with real models.",
+   "verdict": "FAILED",
+   "note": "On the exact task where humans are reliably conservative (two equally-likely sources, symmetric cue validity q=0.70, an R/B signal sequence; Bayesian posterior ~0.97), both frontier models return the EXACT Bayesian posterior when the likelihoods are specified: deepseek-v4-flash mean conservatism gap = -0.001 (4/5 items parsed), glm-5.2 = +0.000 (5/5). Humans on the same task report ~0.70 (a large conservative gap); the LLMs show ~0.000. The bias does NOT transfer - handed the diagnosticity as numbers, the model just computes the likelihood ratio. HONEST SCOPE: only the SPECIFIED-likelihood case is settled. The human-analogue INFER case (model must ESTIMATE cue validity from a training sample, as humans do) is NOT cleanly measurable here - the harder estimate-then-update task exhausts the thinking models' token budget before a parseable answer (1/10 parsed), and forcing answer-first would suppress the reasoning the task needs. So: conservatism does not appear when cue validity is told; whether it appears when cue validity must be learned is open.",
+   "lab": "agora_output/lab/20260620-035500_llm-conservatism-cue-validity-specification.py (+ llm_conservatism_cue_validity.json)",
+   "date": "2026-06-20"
   }
  ]
 }
