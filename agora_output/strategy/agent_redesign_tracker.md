@@ -1,0 +1,45 @@
+# Agent redesign — per-agent rebuild tracker
+
+Rebuild each agent's ORGAN (the code that embodies its function) so it produces measured value, not
+formatted churn. One agent per cycle, flag-gated + reversible (CLAUDE.md rules). Priority = the critique's
+"build the load-bearing two first (Rooke, Voss), defer the over-engineered meta-structure." Full design:
+`20260620_agent-redesign.md`.
+
+## Done
+- [x] **Rooke** (Confirmation Scientist — the Lab linchpin) → `execution/scientist.py` severe-test path,
+  flag `AGORA_SCIENTIST_LAB=1` (live). A hypothesis now runs a REAL minimal model via the Methods Library
+  with a pre-commitment (no HARKing); no template fit / no measured number → verdict NONE → **not recorded**;
+  a relevance gate drops results that don't bear on the claim. Proof: ~1/5 hypotheses get a real, relevant
+  measured test → **the bottleneck is Lab template COVERAGE**, not orchestration.
+- [x] **Voss** (Adversarial gate) → `execution/quality_gate.py` science gate, flag `AGORA_SCIENCE_GATE=1`
+  (live). Vault entry now needs REAL grounding — a citation shape (DOI/arXiv/Author-year) OR a measured
+  number — never the literal word "Source:" (which an empty note faked). Calibrated: real lab + literature
+  findings pass; "Source:"-only / stub / buzzword-soup reject.
+
+## Next (priority order)
+- [ ] **Aldric** (Compute CFO / Methods Library) — THE match-rate lever: expand the Methods Library
+  templates + add the "when no template matches, an agent WRITES a new vetted template" loop. Without this,
+  Rooke's severe-test only covers ~40% of hypotheses. Highest ROI next.
+- [ ] **Funnel metric honesty** — `execution/funnel.py` `_GROUNDED` regex matches the *words*
+  Hypothesis/Falsifier/Source → replace with a count of discoveries carrying a verified `lab_run_id`; make
+  FAILED/NULL value 1.0 (metabolism already does for replications). Small, high-value truth fix.
+- [ ] **Anti-gaming guard (Rooke)** — a FAILED verdict must show the baseline was FAIR (reproduce a known
+  control in the same harness) before it can go public, so FAILEDs can't be manufactured (Crucible integrity).
+- [ ] **Mira** (Curator) — write a GRADE evidence card only AFTER a Lab receipt exists; null/FAILED curated
+  as first-class. Note volume stops being a credit metric.
+- [ ] **Orin** (Idea Alchemist) — Platt strong-inference: ≥2 mutually-exclusive hypotheses with a crucial
+  differentiating observable, not a list of co-existing ideas.
+- [ ] **Kael** (Scout) — claim-gap retrieval (one best-grounded finding per side of a hole) + mandatory
+  effect-size/credibility audit (flag N<50 / no-prereg as low-credibility).
+- [ ] **Wren** (Cartographer) — ranked structural-hole list that feeds Orin's bridges + forced-collision.
+
+## Deferred (critique: unproven meta-structure / weakest)
+- **Elara** — redesign is pure bookkeeping (can't earn value under the new gate); keep for the 3D world only
+  until there's measured evidence it reduces FAILED rate.
+- **Squads / Elo tournaments / credibility ledgers / 90-day clocks** — build only after the core loop proves
+  it produces measured value at acceptable cost.
+
+## Standing guards
+- Big-Five persona strings stay OUT of scientific-task prompts (cost up to -0.65 on retrieval); souls are for
+  the 3D world + trust only.
+- One agent per cycle, flag-gated, py_compile + verify both servers 200 + one :8000 listener, revert on breakage.
