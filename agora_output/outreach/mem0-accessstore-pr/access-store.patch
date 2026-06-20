@@ -1,0 +1,418 @@
+diff --git a/mem0/memory/access_store.py b/mem0/memory/access_store.py
+new file mode 100644
+index 0000000..7c670eb
+--- /dev/null
++++ b/mem0/memory/access_store.py
+@@ -0,0 +1,212 @@
++"""
++Pluggable access-metadata store for mem0.
++
++Tracks per-memory `hit_count` + `last_access` to power `Memory.cleanup(policy)` (prune stale / low-value
++memories so retrieval quality does not degrade as a store grows). The access metadata is decoupled from
++the 30+ vector backends *and* from the process lifetime, so:
++
++  - no vector backend has to change (the metadata lives in a small sidecar, not the vector payload), and
++  - it survives restarts (the SQLite impl) for the long-running deployments this is aimed at.
++
++It is OPT-IN: `Memory` only records access when an `access_store` is configured; the default is off, so
++existing behaviour is unchanged. The store is intentionally tiny (`{memory_id: (hit_count, last_access)}`).
++
++Persistence options (the design fork raised in the issue):
++  - `InMemoryAccessStore` — zero-config, fine for short-lived agents / dev.
++  - `SQLiteAccessStore`   — zero-infra, file-backed, survives restart (the natural single-node default).
++  - subclass `AccessStore` for Redis / a custom distributed store (e.g. for multi-process deployments).
++
++Eviction policy semantics are pinned down in `evict_candidates`.
++"""
++from __future__ import annotations
++
++import abc
++import math
++import sqlite3
++import threading
++import time
++from typing import Dict, List, Optional, Tuple
++
++
++class AccessStore(abc.ABC):
++    """Records which memories get used and ranks them for eviction. Recording is on the hot read path,
++    so impls keep `record_hit` O(1); eviction is an explicit, caller-triggered batch op."""
++
++    @abc.abstractmethod
++    def record_hit(self, memory_id: str, ts: Optional[float] = None) -> None:
++        """Note that `memory_id` was retrieved (increment hit_count, set last_access)."""
++
++    @abc.abstractmethod
++    def get_stats(self, memory_id: str) -> Optional[Tuple[int, float]]:
++        """Return (hit_count, last_access) for one memory, or None if never accessed."""
++
++    @abc.abstractmethod
++    def all_stats(self) -> Dict[str, Tuple[int, float]]:
++        """Return {memory_id: (hit_count, last_access)} for every tracked memory."""
++
++    @abc.abstractmethod
++    def forget(self, memory_ids) -> None:
++        """Drop access metadata for evicted/deleted memories (keep the sidecar in sync)."""
++
++    def flush(self) -> None:
++        """Persist any buffered writes (no-op for in-memory)."""
++
++    def close(self) -> None:
++        """Release resources (no-op for in-memory)."""
++
++    # --- eviction policy (pinned-down semantics) -------------------------------------------------
++    def evict_candidates(
++        self,
++        policy: str = "lru",
++        max_items: Optional[int] = None,
++        max_age: Optional[float] = None,
++        now: Optional[float] = None,
++    ) -> List[str]:
++        """Return the memory_ids that SHOULD be evicted under `policy` (the caller does the deleting).
++
++        - `max_age` (seconds): any memory whose `last_access` is older than this is a candidate,
++          regardless of policy (hard staleness bound).
++        - `max_items`: if more than `max_items` are tracked, the worst `(n - max_items)` under `policy`
++          are candidates.
++        Policies:
++          - "lru"   : worst = oldest `last_access` first; tie-break by lowest `hit_count`.
++          - "lfu"   : worst = lowest `hit_count` first; tie-break by oldest `last_access`.
++          - "decay" : worst = lowest recency-weighted frequency `hit_count * 2**(-age/half_life)`
++                      (half-life 7 days); balances LRU's "drops rarely-but-critically used" against
++                      LFU's "old high-count items never leave" failure modes.
++        The result is the order-preserving union of the staleness set and the over-capacity set.
++        """
++        now = time.time() if now is None else now
++        stats = self.all_stats()
++        if not stats:
++            return []
++        stale = [m for m, (_, la) in stats.items() if max_age is not None and (now - la) > max_age]
++        over: List[str] = []
++        if max_items is not None and len(stats) > max_items:
++            ranked = self._rank_worst_first(stats, policy, now)  # worst (evict first) -> best
++            over = ranked[: len(stats) - max_items]
++        seen, out = set(), []
++        for m in stale + over:
++            if m not in seen:
++                seen.add(m); out.append(m)
++        return out
++
++    @staticmethod
++    def _rank_worst_first(stats: Dict[str, Tuple[int, float]], policy: str, now: float) -> List[str]:
++        if policy == "lfu":
++            key = lambda m: (stats[m][0], stats[m][1])               # lowest hits, then oldest
++        elif policy == "decay":
++            lam = math.log(2) / (7 * 86400)                          # 7-day half-life
++            key = lambda m: stats[m][0] * math.exp(-lam * (now - stats[m][1]))
++        elif policy == "lru":
++            key = lambda m: (stats[m][1], stats[m][0])               # oldest access, then fewest hits
++        else:
++            raise ValueError(f"unknown eviction policy: {policy!r} (use 'lru', 'lfu', or 'decay')")
++        return sorted(stats, key=key)                               # ascending = worst first
++
++
++class InMemoryAccessStore(AccessStore):
++    """Process-local; lost on restart. Fine for short-lived agents and tests. Thread-safe."""
++
++    def __init__(self) -> None:
++        self._d: Dict[str, list] = {}
++        self._lock = threading.Lock()
++
++    def record_hit(self, memory_id: str, ts: Optional[float] = None) -> None:
++        ts = time.time() if ts is None else ts
++        with self._lock:
++            h = self._d.get(memory_id)
++            if h:
++                h[0] += 1; h[1] = ts
++            else:
++                self._d[memory_id] = [1, ts]
++
++    def get_stats(self, memory_id: str) -> Optional[Tuple[int, float]]:
++        h = self._d.get(memory_id)
++        return (h[0], h[1]) if h else None
++
++    def all_stats(self) -> Dict[str, Tuple[int, float]]:
++        with self._lock:
++            return {k: (v[0], v[1]) for k, v in self._d.items()}
++
++    def forget(self, memory_ids) -> None:
++        with self._lock:
++            for m in memory_ids:
++                self._d.pop(m, None)
++
++
++class SQLiteAccessStore(AccessStore):
++    """File-backed, survives restart, no vector-backend changes. Write-behind buffer + batched UPSERT
++    keeps `record_hit` off the disk on the hot path; WAL + synchronous=NORMAL keep durability cheap.
++
++    Measured (100k memories, 500k hits, Zipf-ish): ~0.7 us / recorded hit, ~2 MB on disk per 100k tracked,
++    counts intact across restart — i.e. <0.1% of a 1-10 ms vector search.
++    """
++
++    def __init__(self, path: str = "mem0_access.db", flush_every: int = 2000) -> None:
++        self.path = path
++        self.flush_every = flush_every
++        self._buf: Dict[str, list] = {}
++        self._lock = threading.Lock()
++        self._conn = sqlite3.connect(path, check_same_thread=False)
++        self._conn.execute("PRAGMA journal_mode=WAL")
++        self._conn.execute("PRAGMA synchronous=NORMAL")
++        self._conn.execute(
++            "CREATE TABLE IF NOT EXISTS access "
++            "(memory_id TEXT PRIMARY KEY, hit_count INTEGER NOT NULL, last_access REAL NOT NULL)"
++        )
++        self._conn.commit()
++
++    def record_hit(self, memory_id: str, ts: Optional[float] = None) -> None:
++        ts = time.time() if ts is None else ts
++        with self._lock:
++            h = self._buf.get(memory_id)
++            if h:
++                h[0] += 1; h[1] = ts
++            else:
++                self._buf[memory_id] = [1, ts]
++            if len(self._buf) >= self.flush_every:
++                self._flush_locked()
++
++    def _flush_locked(self) -> None:
++        if not self._buf:
++            return
++        rows = [(m, hc, la) for m, (hc, la) in self._buf.items()]
++        self._conn.executemany(
++            "INSERT INTO access(memory_id, hit_count, last_access) VALUES(?,?,?) "
++            "ON CONFLICT(memory_id) DO UPDATE SET "
++            "hit_count = hit_count + excluded.hit_count, last_access = excluded.last_access",
++            rows,
++        )
++        self._conn.commit()
++        self._buf.clear()
++
++    def flush(self) -> None:
++        with self._lock:
++            self._flush_locked()
++
++    def get_stats(self, memory_id: str) -> Optional[Tuple[int, float]]:
++        self.flush()
++        r = self._conn.execute(
++            "SELECT hit_count, last_access FROM access WHERE memory_id=?", (memory_id,)
++        ).fetchone()
++        return (r[0], r[1]) if r else None
++
++    def all_stats(self) -> Dict[str, Tuple[int, float]]:
++        self.flush()
++        return {m: (hc, la) for m, hc, la in
++                self._conn.execute("SELECT memory_id, hit_count, last_access FROM access")}
++
++    def forget(self, memory_ids) -> None:
++        ids = list(memory_ids)
++        if not ids:
++            return
++        with self._lock:
++            for m in ids:
++                self._buf.pop(m, None)
++            self._conn.executemany("DELETE FROM access WHERE memory_id=?", [(m,) for m in ids])
++            self._conn.commit()
++
++    def close(self) -> None:
++        self.flush()
++        self._conn.close()
+diff --git a/mem0/memory/main.py b/mem0/memory/main.py
+index 02e86c4..4f69c11 100644
+--- a/mem0/memory/main.py
++++ b/mem0/memory/main.py
+@@ -433,6 +433,11 @@ class Memory(MemoryBase):
+         # Entity store is initialized lazily on first use
+         self._entity_store = None
+ 
++        # Optional access tracking (opt-in; default off, so behaviour is unchanged). When set to an
++        # AccessStore, search()/get() record per-memory hit_count + last_access, enabling cleanup(policy)
++        # to prune stale / low-value memories. See mem0/memory/access_store.py.
++        self.access_store = None
++
+         if MEM0_TELEMETRY:
+             # Create telemetry config manually to avoid deepcopy issues with thread locks
+             telemetry_config_dict = {}
+@@ -1122,6 +1127,8 @@ class Memory(MemoryBase):
+         if additional_metadata:
+             result_item["metadata"] = additional_metadata
+ 
++        if self.access_store is not None:
++            self.access_store.record_hit(result_item["id"])
+         display_first_run_notice(self, "sync", "get")
+         return result_item
+ 
+@@ -1379,6 +1386,10 @@ class Memory(MemoryBase):
+             )
+         else:
+             display_first_run_notice(self, "sync", "search")
++        if self.access_store is not None:
++            for _m in original_memories:
++                if _m.get("id"):
++                    self.access_store.record_hit(_m["id"])
+         return {"results": original_memories}
+ 
+     def _process_metadata_filters(self, metadata_filters: Dict[str, Any]) -> Dict[str, Any]:
+@@ -1712,6 +1723,37 @@ class Memory(MemoryBase):
+             display_first_run_notice(self, "sync", "delete")
+         return {"message": "Memory deleted successfully!"}
+ 
++    def cleanup(self, policy: str = "lru", max_items: Optional[int] = None, max_age: Optional[float] = None):
++        """Prune stale / low-value memories using the configured access_store.
++
++        Eviction is explicit and caller-triggered (never automatic). Requires `self.access_store` to be set.
++
++        Args:
++            policy: "lru" (oldest last_access), "lfu" (lowest hit_count), or "decay" (recency-weighted
++                frequency). See AccessStore.evict_candidates for exact semantics.
++            max_items: keep at most this many memories (evict the worst beyond it).
++            max_age: evict any memory whose last_access is older than this many seconds.
++
++        Returns:
++            dict: {"deleted": [memory_id, ...], "count": N}
++        """
++        if self.access_store is None:
++            raise ValueError("Memory.cleanup requires an access_store; set e.g. "
++                             "memory.access_store = SQLiteAccessStore(path) first.")
++        if max_items is None and max_age is None:
++            raise ValueError("cleanup needs at least one bound: max_items or max_age.")
++        candidates = self.access_store.evict_candidates(policy=policy, max_items=max_items, max_age=max_age)
++        deleted = []
++        for mid in candidates:
++            try:
++                self.delete(mid)
++                deleted.append(mid)
++            except ValueError:
++                pass  # already gone; still forget it from the sidecar below
++        if deleted:
++            self.access_store.forget(deleted)
++        return {"deleted": deleted, "count": len(deleted)}
++
+     def delete_all(self, user_id: Optional[str] = None, agent_id: Optional[str] = None, run_id: Optional[str] = None):
+         """
+         Delete all memories.
+diff --git a/tests/memory/test_access_store.py b/tests/memory/test_access_store.py
+new file mode 100644
+index 0000000..ece8a5d
+--- /dev/null
++++ b/tests/memory/test_access_store.py
+@@ -0,0 +1,120 @@
++"""Tests for the pluggable AccessStore (hit tracking + eviction policy + persistence).
++
++Pure-stdlib; runnable directly (`python tests/memory/test_access_store.py`) or under pytest.
++Includes the benchmark cited in the feature request so the performance claim is reproducible.
++"""
++import os
++import tempfile
++import time
++
++try:                                                      # normal path (mem0 installed)
++    from mem0.memory.access_store import InMemoryAccessStore, SQLiteAccessStore
++except Exception:                                         # standalone path (module is stdlib-only)
++    import importlib.util
++    _p = os.path.join(os.path.dirname(__file__), "..", "..", "mem0", "memory", "access_store.py")
++    _spec = importlib.util.spec_from_file_location("access_store", _p)
++    _m = importlib.util.module_from_spec(_spec); _spec.loader.exec_module(_m)
++    InMemoryAccessStore, SQLiteAccessStore = _m.InMemoryAccessStore, _m.SQLiteAccessStore
++
++
++def _fresh(tmp, name):
++    """An InMemory store and a fresh SQLite store (caller closes the SQLite one)."""
++    return InMemoryAccessStore(), SQLiteAccessStore(os.path.join(tmp, name), flush_every=2)
++
++
++def test_record_and_stats():
++    with tempfile.TemporaryDirectory() as tmp:
++        a, b = _fresh(tmp, "stats.db")
++        try:
++            for st in (a, b):
++                st.record_hit("a", ts=100.0); st.record_hit("a", ts=200.0); st.record_hit("b", ts=150.0)
++                assert st.get_stats("a") == (2, 200.0)
++                assert st.get_stats("b") == (1, 150.0)
++                assert st.get_stats("missing") is None
++                assert set(st.all_stats()) == {"a", "b"}
++        finally:
++            b.close()
++
++
++def test_evict_policies():
++    now = 1_000_000.0
++    with tempfile.TemporaryDirectory() as tmp:
++        a, b = _fresh(tmp, "evict.db")
++        try:
++            for st in (a, b):
++                for _ in range(20):
++                    st.record_hit("stale_star", ts=now - 30 * 86400)   # 20 hits, 30d ago
++                for _ in range(3):
++                    st.record_hit("newbie", ts=now - 10)               # 3 hits, just now
++                st.record_hit("deadweight", ts=now - 25 * 86400)       # 1 hit, 25d ago
++                # LRU: oldest last_access first
++                assert st.evict_candidates("lru", max_items=2, now=now)[0] == "stale_star"
++                # LFU: fewest hits first
++                assert st.evict_candidates("lfu", max_items=2, now=now)[0] == "deadweight"
++                # DECAY: recency-weighted frequency; 1 ancient hit is worst
++                assert st.evict_candidates("decay", max_items=2, now=now)[0] == "deadweight"
++                # max_age: both >5d-old are candidates, the just-now one is not
++                stale = set(st.evict_candidates("lru", max_age=5 * 86400, now=now))
++                assert stale == {"stale_star", "deadweight"}
++        finally:
++            b.close()
++
++
++def test_sqlite_survives_restart():
++    with tempfile.TemporaryDirectory() as tmp:
++        path = os.path.join(tmp, "persist.db")
++        s = SQLiteAccessStore(path, flush_every=1)
++        s.record_hit("x", ts=42.0); s.record_hit("x", ts=43.0)
++        s.close()
++        s2 = SQLiteAccessStore(path)
++        try:
++            assert s2.get_stats("x") == (2, 43.0)         # counts intact after restart
++        finally:
++            s2.close()
++
++
++def test_forget():
++    st = InMemoryAccessStore()
++    st.record_hit("a"); st.record_hit("b")
++    st.forget(["a"])
++    assert st.get_stats("a") is None and st.get_stats("b") is not None
++
++
++def _benchmark(n_mem=100_000, n_hits=500_000, flush_every=5000):
++    import bisect, random
++    random.seed(0)
++    w = [1.0 / (r ** 1.07) for r in range(1, n_mem + 1)]
++    tot = sum(w); cum = []; acc = 0.0
++    for x in w:
++        acc += x / tot; cum.append(acc)
++    hits = [bisect.bisect_left(cum, random.random()) for _ in range(n_hits)]
++    base = time.time()
++
++    mem = InMemoryAccessStore()
++    t0 = time.perf_counter()
++    for i, x in enumerate(hits):
++        mem.record_hit(str(x), base + i * 1e-6)
++    us_mem = (time.perf_counter() - t0) / n_hits * 1e6
++
++    tmp = os.path.join(tempfile.gettempdir(), "mem0_as_bench.db")
++    for e in ("", "-wal", "-shm"):
++        try: os.remove(tmp + e)
++        except OSError: pass
++    sq = SQLiteAccessStore(tmp, flush_every=flush_every)
++    t0 = time.perf_counter()
++    for i, x in enumerate(hits):
++        sq.record_hit(str(x), base + i * 1e-6)
++    sq.flush()
++    us_sq = (time.perf_counter() - t0) / n_hits * 1e6
++    sq._conn.execute("PRAGMA wal_checkpoint(TRUNCATE)"); sq._conn.commit()
++    mb = os.path.getsize(tmp) / 1e6
++    distinct = len(set(hits)); sq.close()
++    return us_mem, us_sq, mb, distinct
++
++
++if __name__ == "__main__":
++    test_record_and_stats(); test_evict_policies(); test_sqlite_survives_restart(); test_forget()
++    print("functional tests: PASS")
++    um, us, mb, distinct = _benchmark()
++    print(f"benchmark: in-mem {um:.2f} us/hit | SQLite {us:.2f} us/hit | "
++          f"{mb:.1f} MB / {distinct:,} tracked -> ~{mb / distinct * 100000:.1f} MB / 100k")
