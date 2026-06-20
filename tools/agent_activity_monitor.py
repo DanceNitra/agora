@@ -19,7 +19,7 @@ import os, sys, time, json, re, urllib.request
 BASE = os.path.dirname(os.path.abspath(__file__))
 ROOT = os.path.dirname(BASE)
 HEARTBEAT = os.path.join(ROOT, "agora-game-server", ".dungeon_heartbeat")
-METHODS = os.path.join(ROOT, ".methods.json")
+METHODS = os.path.join(ROOT, "server", ".methods.json")   # the Methods ledger lives under server/
 ENV = os.path.join(ROOT, "server", ".env")
 STATE = os.path.join(BASE, ".agent_activity_state.json")
 API = "http://127.0.0.1:8000/api/v1/agent-os/brain"
