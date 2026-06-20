@@ -27,5 +27,17 @@ A standing, machine-readable benchmark of widely-repeated AI / data-science clai
 
 **v0.1.0** - 59 claims
 (32 REPRODUCED / 12 FAILED / 15 NOT_COMPUTABLE).
-Each row has a permanent `key` (FI-NNNN) for stable citation. Load: `datasets.load_dataset("Danchi17/folklore-index")`.
-Fields: key, domain, claim, source, verdict, note, lab_file, code_url, code_resolves, date. Source repo: https://github.com/DanceNitra/agora. Data CC-BY-4.0, code MIT.
+Each row has a permanent `key` (FI-NNNN) for stable citation.
+
+```python
+from datasets import load_dataset
+ds = load_dataset("Danchi17/folklore-index")          # this dataset
+# or the Python package, with a tiny API:
+# pip install folklore-index
+import folklore_index as fi
+fi.verdicts()        # verdict counts
+fi.get("FI-0001")    # one claim by its permanent key
+```
+
+Fields: key, domain, claim, source, verdict, note, lab_file, code_url, code_resolves, date. Browse the live ledger (with runnable code per claim): https://dancenitra.github.io/agora/public/crucible/.
+Source repo: https://github.com/DanceNitra/agora. Data CC-BY-4.0, code MIT.

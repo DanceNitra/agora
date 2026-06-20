@@ -28,7 +28,7 @@
    "replication": 51,
    "ai-claim": 8
   },
-  "runnable_code_present": 10
+  "runnable_code_present": 8
  },
  "entries": [
   {
@@ -37,9 +37,9 @@
    "source": "Barabasi-Albert (1999) framing, widely repeated; rigorous tests: Clauset, Shalizi & Newman 2009; Broido & Clauset 2019 'Scale-Free Networks Are Rare'.",
    "verdict": "FAILED",
    "note": "Under a rigorous Clauset-Shalizi-Newman fit (MLE alpha, KS-selected xmin, bootstrap goodness-of-fit, Vuong likelihood-ratio vs lognormal, n=20,000): a lognormal that 'looks scale-free' on a log-log plot is correctly REFUSED (power-law GOF p=0.01; LR favors lognormal, -17.5); a genuine Pareto power law passes (GOF p=0.92; LR +102); and a real Barabasi-Albert network is only a TIE (LR -0.1) - power law is not even clearly preferred over lognormal for true preferential attachment. So 'looks scale-free' is not 'is scale-free' and the universal claim is not safely inferable (Broido-Clauset reproduces). Power law IS reproduced for true BA graphs.",
-   "lab_file": "agora_output/lab/20260619-190000_crucible-scale-free-networks-rare.py",
-   "code_url": "https://github.com/DanceNitra/agora/blob/main/agora_output/lab/20260619-190000_crucible-scale-free-networks-rare.py",
-   "code_resolves": true,
+   "lab_file": "",
+   "code_url": "",
+   "code_resolves": false,
    "date": "2026-06-19",
    "key": "FI-0001"
   },
@@ -49,9 +49,9 @@
    "source": "Wei et al. 2022 'Emergent Abilities of Large Language Models' (claim); counter: Schaeffer, Miranda & Koyejo 2023 'Are Emergent Abilities a Mirage?' (NeurIPS).",
    "verdict": "FAILED",
    "note": "The canonical SHARP 'emergence' curve is reproduced by a SMOOTH, continuous per-token skill measured with a nonlinear exact-match metric: the same smooth skill gives a per-token transition width 7.0 vs an exact-match (L=100) width 1.05 - 6.7x sharper PURELY from the metric - and the apparent onset shifts -0.07 -> +5.58 as answer length grows with NO change in the underlying skill. No capability discontinuity is needed, so benchmark sharpness is not evidence for one (Schaeffer's 'mirage' reproduces). Scope: shows sharpness is metric-dependent; it does not prove that no ability is ever genuinely emergent.",
-   "lab_file": "agora_output/lab/20260619-185500_crucible-emergent-abilities-metric-mirage.py",
-   "code_url": "https://github.com/DanceNitra/agora/blob/main/agora_output/lab/20260619-185500_crucible-emergent-abilities-metric-mirage.py",
-   "code_resolves": true,
+   "lab_file": "",
+   "code_url": "",
+   "code_resolves": false,
    "date": "2026-06-19",
    "key": "FI-0002"
   },

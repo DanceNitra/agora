@@ -4,7 +4,7 @@ A standing, machine-readable benchmark of widely-repeated AI / data-science clai
 
 **Version 0.1.0** - 59 claims
 (32 REPRODUCED, 12 FAILED, 15 NOT_COMPUTABLE) -
-10 with a runnable test in the repo.
+8 with a runnable test in the repo.
 
 Every claim has a permanent citation key (`FI-NNNN`) that never renumbers, so a cited claim stays valid as
 the index grows.
@@ -29,7 +29,7 @@ Each entry in `folklore_index.json`:
 - `date` - YYYY-MM-DD
 
 ## How to cite one claim
-> Agora Folklore Index, FI-0001 (FAILED): "Real-world networks are scale-free: their degree distributions follow a power law p(k) ~ k..."
+> Agora Folklore Index, FI-0053 (FAILED): "When you evaluate N models/configs on a benchmark and report the top scorer's number, that..."
 > https://dancenitra.github.io/agora/public/crucible/ (v0.1.0).
 
 ## Verdict mix

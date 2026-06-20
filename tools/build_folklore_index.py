@@ -245,8 +245,20 @@ configs:
 
 **v{ds['version']}** - {ds['counts']['total']} claims
 ({by_v.get('REPRODUCED',0)} REPRODUCED / {by_v.get('FAILED',0)} FAILED / {by_v.get('NOT_COMPUTABLE',0)} NOT_COMPUTABLE).
-Each row has a permanent `key` (FI-NNNN) for stable citation. Load: `datasets.load_dataset("Danchi17/folklore-index")`.
-Fields: {", ".join(ds['schema'].keys())}. Source repo: {REPO}. Data CC-BY-4.0, code MIT.
+Each row has a permanent `key` (FI-NNNN) for stable citation.
+
+```python
+from datasets import load_dataset
+ds = load_dataset("Danchi17/folklore-index")          # this dataset
+# or the Python package, with a tiny API:
+# pip install folklore-index
+import folklore_index as fi
+fi.verdicts()        # verdict counts
+fi.get("FI-0001")    # one claim by its permanent key
+```
+
+Fields: {", ".join(ds['schema'].keys())}. Browse the live ledger (with runnable code per claim): {ds['homepage']}.
+Source repo: {REPO}. Data CC-BY-4.0, code MIT.
 """
     with open(os.path.join(OUT_DIR, "HF_DATASET_CARD.md"), "w", encoding="utf-8") as f:
         f.write(hf)
