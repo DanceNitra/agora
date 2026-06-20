@@ -29,8 +29,12 @@ formatted churn. One agent per cycle, flag-gated + reversible (CLAUDE.md rules).
   measured result/lab receipt (not the words Hypothesis/Falsifier/Source:). Effect: grounded 7369 (48%) ->
   honest 2145 (14%). Read-side only, verified live. (metabolism value-weights already reward replication/
   press; the FAILED/NULL=1.0 extension folds into the Rooke fair-baseline work below.)
-- [ ] **Anti-gaming guard (Rooke)** — a FAILED verdict must show the baseline was FAIR (reproduce a known
-  control in the same harness) before it can go public, so FAILEDs can't be manufactured (Crucible integrity).
+- [x] **Anti-gaming guard (Rooke)** — metabolism now values FAILED == REPRODUCED (both 2.5; was 4.0 vs 2.0),
+  killing the incentive to manufacture failures. **Process rule** (for recording Crucible replications):
+  before logging a FAILED, confirm a known-true control REPRODUCES in the same harness (so a FAILED is a
+  real refutation, not a broken harness). The full in-code control-run is deferred (Methods templates are
+  self-controlled - they test vs a null - so the live severe-test path is low-risk; the gap is the manual
+  replication process, which is gated + verified by Claude).
 - [ ] **Mira** (Curator) — write a GRADE evidence card only AFTER a Lab receipt exists; null/FAILED curated
   as first-class. Note volume stops being a credit metric.
 - [ ] **Orin** (Idea Alchemist) — Platt strong-inference: ≥2 mutually-exclusive hypotheses with a crucial
