@@ -35,8 +35,9 @@ formatted churn. One agent per cycle, flag-gated + reversible (CLAUDE.md rules).
   real refutation, not a broken harness). The full in-code control-run is deferred (Methods templates are
   self-controlled - they test vs a null - so the live severe-test path is low-risk; the gap is the manual
   replication process, which is gated + verified by Claude).
-- [ ] **Mira** (Curator) — write a GRADE evidence card only AFTER a Lab receipt exists; null/FAILED curated
-  as first-class. Note volume stops being a credit metric.
+- [x] **Mira** (Curator) — DONE 2026-06-20: promote-findings now attaches an honest **Evidence grade**
+  (HIGH = measured + citation/falsifier; MODERATE = one; LOW = grounded-thin) + a `grade-<level>` tag to
+  every curated note, so the vault is honest about confidence per note. Calibration verified.
 - [x] **Orin** (Idea Alchemist) — DONE 2026-06-20: hypothesis generation now names a concrete MECHANISM +
   predicted direction a minimal model can measure (favours simulation-settleable shapes). OBSERVED: 3/4
   generated hypotheses match a Lab template (vs proof's 2/5) → severe-test conversion ~40%→~75%. (Single
