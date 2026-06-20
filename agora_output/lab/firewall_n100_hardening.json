@@ -1,0 +1,28 @@
+{
+ "glm-5.2": {
+  "questions_used": 101,
+  "n_items": 202,
+  "base_wrong": 0.2871287128712871,
+  "fw_risk50": 0.0,
+  "conf_risk50": 0.18811881188118812,
+  "fw_kept": 101,
+  "fw_wrong_in_kept": 0,
+  "fw_risk50_wilson_upper": 0.03664194365595336,
+  "corr_sens_correct": -0.9315866040124374,
+  "corr_conf_correct": 0.30205856657317237,
+  "seconds": 1329.0
+ },
+ "deepseek-v4-flash": {
+  "questions_used": 101,
+  "n_items": 202,
+  "base_wrong": 0.39603960396039606,
+  "fw_risk50": 0.0,
+  "conf_risk50": 0.3564356435643564,
+  "fw_kept": 101,
+  "fw_wrong_in_kept": 0,
+  "fw_risk50_wilson_upper": 0.03664194365595336,
+  "corr_sens_correct": -0.9509943898266983,
+  "corr_conf_correct": 0.234788423204967,
+  "seconds": 452.0
+ }
+}

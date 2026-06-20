@@ -1,0 +1,17 @@
+compile OK
+
+=== glm-5.2 (n>=100, strong poison) ===
+  questions_used=101 n_items=202 base_wrong=29%
+  FIREWALL wrong@50%cov = 0.0% (0/101 kept; Wilson95 upper 3.7%)
+  CONFIDENCE wrong@50%cov = 18.8%
+  corr(drop,correct)=-0.93  corr(conf,correct)=+0.30  [1329s]
+
+=== deepseek-v4-flash (n>=100, strong poison) ===
+  questions_used=101 n_items=202 base_wrong=40%
+  FIREWALL wrong@50%cov = 0.0% (0/101 kept; Wilson95 upper 3.7%)
+  CONFIDENCE wrong@50%cov = 35.6%
+  corr(drop,correct)=-0.95  corr(conf,correct)=+0.23  [452s]
+
+=== VERDICT ===
+  glm-5.2: firewall BEATS confidence @ n=101 (fw 0.0% [<= 3.7%] vs conf 18.8%); base_wrong 29%
+  deepseek-v4-flash: firewall BEATS confidence @ n=101 (fw 0.0% [<= 3.7%] vs conf 35.6%); base_wrong 40%
