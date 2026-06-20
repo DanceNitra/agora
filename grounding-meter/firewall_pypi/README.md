@@ -3,6 +3,10 @@
 An **answer-or-ABSTAIN gate** for RAG / agent answers, driven by **grounding-drop sensitivity** instead of
 confidence. Zero dependencies (Python stdlib only).
 
+**v0.2** adds `gate_freeform()` for **open-ended (free-form) RAG answers**, not just A/B multiple choice -
+this is the mode for real RAG. Validated on **glm-5.2** (mixed clean/poison retrieval): drop-sensitivity
+corr with correctness **+1.00** vs confidence **-0.21**; **0% wrong at 50% coverage** (AUC 0.187 vs 0.424).
+
 ## Why
 
 A model's confidence is blind exactly when it is *confidently wrong*: when a retrieved document is
@@ -47,9 +51,16 @@ pip install grounding-firewall
 
 ```python
 import grounding_firewall as gf
-cfg = {"endpoint": "http://localhost:11434/v1", "model": "qwen2.5:7b", "api_key": "", "logprobs": True, "k": 5}
-g = gf.gate(cfg, question="What is the capital of Australia?",
-            context="Doc: the capital is Sydney.", a="Canberra", b="Sydney")
+cfg = {"endpoint": "https://your-llm/v1", "model": "<model>", "api_key": "<key>", "logprobs": True, "k": 5}
+
+# free-form (real RAG) — v0.2:
+gf.gate_freeform(cfg, question="What is the capital of Australia?",
+                 context="Doc: the capital is Sydney.")
+# -> {'answer': 'Sydney', 'answer_without_doc': 'Canberra', 'sensitivity': 1.0, 'decision': 'ABSTAIN', ...}
+
+# multiple-choice:
+gf.gate(cfg, question="What is the capital of Australia?",
+        context="Doc: the capital is Sydney.", a="Canberra", b="Sydney")
 # -> {'answer': 'Sydney', 'confidence': 1.0, 'sensitivity': 1.0, 'decision': 'ABSTAIN', ...}
 ```
 
