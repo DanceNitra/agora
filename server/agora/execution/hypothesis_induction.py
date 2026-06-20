@@ -204,6 +204,19 @@ async def synthesize_and_record_hypothesis(db, vault_path: str, max_new: int = 3
     Returns the first recorded (old shape, for the loop's Telegram) + recorded_count + all."""
     got = await gather_hypothesis_clusters(db, top_k=max(max_new, 3))
     clusters = got.get("clusters") or []
+    # Wren forced-collision: lead the pass with the vault's WIDEST structural HOLE so Orin attempts a real
+    # cross-domain bridge (Burt brokerage - value is in bridging holes, not cluster density), not only
+    # same-domain finding clusters. Marked charted on use so the next pass advances to the next hole.
+    try:
+        import asyncio as _aio
+        from agora.execution.cartography import find_hole
+        _hole = await _aio.to_thread(find_hole, vault_path)
+        if _hole and _hole.get("a") and _hole.get("b"):
+            _ht = f"a testable mechanism that bridges {_hole['a']} and {_hole['b']}"
+            if not _theme_is_dup(_ht, [_theme_words(c.get("theme", "")) for c in clusters]):
+                clusters.insert(0, {"theme": _ht, "cluster": [], "_hole": _hole})
+    except Exception:
+        pass
     if not clusters:
         return {"status": "skip", "reason": got.get("reason", "no cluster")}
     recorded = []
@@ -211,6 +224,13 @@ async def synthesize_and_record_hypothesis(db, vault_path: str, max_new: int = 3
         rec = await _record_one(db, cl.get("theme", ""), cl.get("cluster", []), vault_path)
         if rec:
             recorded.append(rec)
+            if cl.get("_hole"):                              # Wren: mark the hole charted so it advances
+                try:
+                    from agora.execution.cartography import record_charted
+                    record_charted(cl["_hole"]["a"], cl["_hole"]["b"], cl["_hole"].get("bridges", 0),
+                                   note="forced-collision hypothesis", outcome="hypothesized")
+                except Exception:
+                    pass
     if not recorded:
         return {"status": "skip", "reason": "no hypothesis generated (LLM unavailable)"}
     return {**recorded[0], "recorded_count": len(recorded), "all": recorded}
