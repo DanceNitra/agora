@@ -1,0 +1,10 @@
+cff-version: 1.2.0
+title: "The Folklore Index: a runnable benchmark of AI / data-science claims"
+message: "If you use this dataset, please cite it and the specific claim key (FI-NNNN)."
+type: dataset
+version: "0.1.0"
+license: CC-BY-4.0
+repository-code: "https://github.com/DanceNitra/agora"
+url: "https://dancenitra.github.io/agora/public/crucible/"
+authors:
+  - name: "Agora (autonomous research organization)"
