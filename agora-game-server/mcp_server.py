@@ -623,19 +623,20 @@ def _vec_backfill_worker():
                 if not cand:
                     continue
                 cand.sort(key=lambda r: (-float(r.get("value", 1.0)), -float(r.get("ts", 0))))
-                for r in cand[:40]:                   # newest + highest-value first (what recall reaches for)
+                for r in cand[:8]:                    # small batch: this is BACKGROUND, must yield the GPU
                     try:
                         r["vec"] = list(_cached_embed(r.get("text", "")))
                         did += 1
                     except Exception:
                         pass
-                    time.sleep(0.4)                   # yield the GPU to qwen between embeds
+                    time.sleep(1.5)                   # GENTLE: the live agents' vault-search shares this one
+                    # GPU embedder; a hot backfill starves them and freezes the visible world (2026-06-20).
                 m._mat = None                         # invalidate cached vec-matrix -> recall sees new vecs
                 try:
                     m._save()
                 except Exception:
                     pass
-            time.sleep(2.0 if did else 30.0)          # idle longer once everything is embedded
+            time.sleep(8.0 if did else 30.0)          # rest between batches so the embedder serves live work
         except Exception:
             time.sleep(30.0)
 
@@ -3812,26 +3813,38 @@ async def ambient_life():
         # Orchestrated pipeline: advance one stage of Aldric's assembly line (one role at a time).
         if loop_n % 9 == 4:
             asyncio.create_task(_pipeline_tick(hold))
+        # These trust/DB/cross-agent-learning awaits can touch a slow brain/embedder; bound them so a
+        # contended call caps the loop stall at a few seconds instead of FREEZING the visible world
+        # (2026-06-20). The loop's progression must never hinge on a slow downstream call.
         if loop_n % 10 == 1:
-            _m = await _trust_matrix()
-            if _m:
-                broadcast({"type": "trust_snapshot", "matrix": _m, "names": _AGENT_NAMES})
-            await _broadcast_trust_graph()          # ESS trust + cross-agent learning
-            broadcast({"type": "os_snapshot", "log": os_log[-12:]})
-            if os_modules:
-                broadcast({"type": "os_modules_snapshot", "modules": os_modules})
+            try:
+                _m = await asyncio.wait_for(_trust_matrix(), timeout=3)
+                if _m:
+                    broadcast({"type": "trust_snapshot", "matrix": _m, "names": _AGENT_NAMES})
+                await asyncio.wait_for(_broadcast_trust_graph(), timeout=3)   # ESS + cross-agent learning
+                broadcast({"type": "os_snapshot", "log": os_log[-12:]})
+                if os_modules:
+                    broadcast({"type": "os_modules_snapshot", "modules": os_modules})
+            except Exception:
+                pass
 
         # Reputation decay: nudge all trust toward baseline so standing stays DYNAMIC —
         # bonds you don't reinforce fade, so curation authority genuinely shifts over time.
         if loop_n % 40 == 20 and _trust_engine:
-            await _trust_engine.apply_decay(0.02)
+            try:
+                await asyncio.wait_for(_trust_engine.apply_decay(0.02), timeout=3)
+            except Exception:
+                pass
 
         # Autonomous curation: Dame Elara (Bridge Builder) tends the vault's links and
         # Sage Mira (Curator) consolidates live discoveries into vault notes — each gated
         # by their OWN standing, on offset cadences.
         if (loop_n % 850 == 7 or loop_n % 110 == 50 or loop_n % 1200 == 90
                 or loop_n % 17000 == 300):
-            _stm = _compute_standing(await _trust_matrix())
+            try:
+                _stm = _compute_standing(await asyncio.wait_for(_trust_matrix(), timeout=3))
+            except Exception:
+                _stm = {}
             if loop_n % 850 == 7 and not curation["running"]:       # Elara: connect links (~12 min)
                 asyncio.create_task(_run_curation("guard_r", _stm.get("guard_r", 0.5)))
             if loop_n % 1200 == 90 and not curation["running"]:     # Voss: QA flag duplicates (~17 min)
@@ -4149,7 +4162,7 @@ async def ambient_life():
                 elif kind == "collaborate":
                     pid = _telepath_partner(goal.get("with"))
                     if pid:
-                        await record_trust(eid, pid, "cooperate")   # genuine social signal (ESS trust)
+                        asyncio.create_task(record_trust(eid, pid, "cooperate"))   # ESS trust, fire-and-forget (never block the loop)
                         partner = _AGENT_NAMES.get(pid, pid)
                         # NO _brain_contribute: a collaborate quest is a social/trust act, not a finding.
                         # Logging the plan text ("Extend X's result — …") as a 'discovery' was the chatter
@@ -4161,7 +4174,7 @@ async def ambient_life():
                 elif kind == "challenge":
                     pid = _telepath_partner(goal.get("with"))
                     if pid:
-                        await record_trust(eid, pid, "defect")   # standing of both can shift
+                        asyncio.create_task(record_trust(eid, pid, "defect"))   # standing shifts; fire-and-forget
                         rival = _AGENT_NAMES.get(pid, pid)
                         note_event(f"{who} challenged {rival}: {intent}")
                         _os_build("challenge", f"{who} ⟂ {rival}", intent)
