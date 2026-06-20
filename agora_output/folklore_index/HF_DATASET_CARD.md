@@ -25,8 +25,8 @@ configs:
 
 A standing, machine-readable benchmark of widely-repeated AI / data-science claims, each rebuilt as the smallest runnable test and ruled REPRODUCED / FAILED / NOT_COMPUTABLE. Honest, citable receipts for the field's folklore.
 
-**v0.1.0** - 60 claims
-(32 REPRODUCED / 13 FAILED / 15 NOT_COMPUTABLE).
+**v0.1.1** - 60 claims
+(32 REPRODUCED / 14 FAILED / 14 NOT_COMPUTABLE).
 Each row has a permanent `key` (FI-NNNN) for stable citation.
 
 ```python

@@ -17,7 +17,7 @@ ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 REPO = "https://github.com/DanceNitra/agora"
 OUT_DIR = os.path.join(ROOT, "agora_output", "folklore_index")
 KEYMAP_PATH = os.path.join(OUT_DIR, "_keymap.json")
-VERSION = "0.1.0"
+VERSION = "0.1.1"
 CONCEPT_DOI = "10.5281/zenodo.20771544"   # all-versions DOI (cite this); resolves to the latest version
 
 
