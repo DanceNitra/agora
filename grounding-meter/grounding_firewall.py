@@ -12,14 +12,18 @@ WHY
     if that doc is wrong, the answer is wrong, and confidence won't tell you. The firewall ABSTAINS on
     high-sensitivity answers.
 
-MEASURED (M3, 24 real factual questions each given a POISONED context, qwen2.5:7b, truth known
-independently — agora_output/lab/20260619-141039_grounding-firewall-m3*):
-    corr(grounding-signal, correct) = +0.68   vs   corr(confidence, correct) = +0.37
-    risk-coverage AUC: firewall 0.028 vs confidence 0.095 (~3.4x lower risk)
-    at 70% coverage the firewall ships 0% wrong answers; confidence-gating still ships 12%.
-    It catches the confidently-wrong case (model followed the poison at confidence 0.99).
-    Honest scope: N=24, one open model, simple injected poison; a larger corpus + adaptive poisoner
-    is the next hardening. A second query (context-dropped) is the real deploy cost.
+MEASURED on FRONTIER models (glm-5.2, deepseek-v4-flash), realistic MIXED retrieval — each factual
+question once with a clean doc, once with a poisoned doc (agora_output/lab/20260620-114500*):
+    confidence is BLIND: corr(confidence, correct) = -0.07 (glm) / +0.21 (deepseek), ~46-50% wrong at
+        every coverage — poisoned and clean answers are BOTH high-confidence.
+    the firewall's drop-sensitivity is not: corr(-sensitivity, correct) = +0.97 / +1.00, giving
+        0% wrong at 50% coverage (keep every clean-doc answer, abstain on every poisoned one);
+        risk-coverage AUC ~2x better than confidence (0.216 vs 0.427; 0.261 vs 0.489).
+    Under ALL-POISON (no clean docs) frontier models defer ~94-100% at full confidence, so the firewall
+        correctly abstains on ~everything (safe but degenerate).
+    Honest scope: strong direct-assertion poison, 2-option factual questions; kept coverage tracks the
+        clean-doc fraction. A second query (context-dropped) is the real deploy cost. (An earlier
+        qwen2.5:7b "0% at 70% coverage" figure was a weak-model artifact — these are the frontier numbers.)
 
 USAGE
     # self-test (reproduces the poisoning benchmark on your own model):
