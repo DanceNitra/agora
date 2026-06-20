@@ -26,10 +26,14 @@ from pathlib import Path
 _SERVER = Path(__file__).resolve().parents[2]
 _DB = _SERVER / "agora.db"
 
-# A discovery "lands" as knowledge when it carries real grounding: a source, a citation, a
-# tested hypothesis, or a documented frontier — not a one-line activity note. Same spirit as
-# the dungeon's novelty/refusal gates, measured after the fact.
-_GROUNDED = re.compile(r"Source:|Hypothesis|Falsifier|Open frontier|\([A-Z][a-z]+ \d{4}\)|et al")
+# A discovery "lands" as knowledge only with REAL grounding: a real citation (DOI / arXiv / Author-year)
+# OR a measured result / lab receipt (MEASURED:/VERDICT:/lab id / a number+%/CI/n=). NOT the mere WORDS
+# "Hypothesis/Falsifier/Source:" that any activity note can contain — that was Goodhart (the funnel counted
+# text-that-says-Hypothesis as grounded). Aligns with the Voss science gate's _real_grounding.
+_GROUNDED = re.compile(
+    r"10\.\d{4,9}/|arxiv[:\s]*\d{4}\.\d|\([A-Z][a-z]+(?: et al\.?)?,? \d{4}\)|"
+    r"MEASURED:|VERDICT:|\blab[:_ ]?[0-9a-f]{6}\b|\bn\s*=\s*\d|\d+(?:\.\d+)?\s*%|\b95%|\bCI\b|p\s*[<=]\s*0?\.\d",
+    re.I)
 
 
 def _j(name, default):
