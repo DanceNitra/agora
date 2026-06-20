@@ -88,6 +88,13 @@ class Mnemo:
         self._mat = None                         # cached L2-normalized matrix of memory vectors (numpy)
         self._vec_rowof: dict[str, int] = {}     # memory id -> its row in self._mat
         self._mat_built_n = -1                   # item count when the matrix was built (rebuild on change)
+        # _save() THROTTLE: serializing the whole store (json.dumps of every item) is O(store size); doing
+        # it on EVERY recall/remember froze callers once the store grew (recall mutates access value, so it
+        # used to re-serialize everything each call). Coalesce disk writes to at most once / _save_min_s;
+        # at most _save_min_s of access-metadata is lost on a hard crash (working memory — acceptable).
+        self._save_min_s = 5.0
+        self._last_save = 0.0
+        self._dirty = False
         if self.path and self.path.exists():
             try:
                 self.items = json.loads(self.path.read_text(encoding="utf-8"))
@@ -114,7 +121,7 @@ class Mnemo:
             except Exception:
                 rec["vec"] = None
         self.items.append(rec)
-        self._save()
+        self._save(force=True)        # a new memory is real content - persist immediately, not throttled
         return mid
 
     # ── retrieval (value-ranked) ──────────────────────────────────────────────
@@ -467,8 +474,14 @@ class Mnemo:
         return {k: {"count": v["count"], "value": round(v["value"], 2),
                     "avg": round(v["value"] / v["count"], 2)} for k, v in out.items()}
 
-    def _save(self):
+    def _save(self, force: bool = False):
         if not self.path:
+            return
+        # Throttle: coalesce frequent writes (e.g. one per recall) so a large store isn't re-serialized
+        # on the hot path. force=True (or flush()) bypasses it for shutdown/critical persistence.
+        now = time.time()
+        if not force and (now - self._last_save) < self._save_min_s:
+            self._dirty = True
             return
         try:
             # Atomic write: a partial/interleaved write can't corrupt the store (crash- and
@@ -477,8 +490,15 @@ class Mnemo:
             tmp = self.path.with_name(self.path.name + ".tmp")
             tmp.write_text(data, encoding="utf-8")
             os.replace(tmp, self.path)
+            self._last_save = now
+            self._dirty = False
         except Exception:
             pass
+
+    def flush(self):
+        """Force-persist any pending throttled changes (call on clean shutdown)."""
+        if self._dirty:
+            self._save(force=True)
 
 
 # ── per-type decay priors (the half-life a memory's ranking value decays at, by kind) ──────────

@@ -3667,9 +3667,11 @@ async def ambient_life():
             # Value-ranked recall from the agent's mnemo store (relevant past work), with the plain
             # recency list as a fallback when mnemo is empty/unavailable.
             _q = f"{_ROLE_HINT.get(eid, '')} {(memory.get(eid) or ['research'])[-1]}"
-            mem = _recall_mem(eid, _q) or " | ".join(memory.get(eid, [])[-4:]) or "(nothing yet)"
+            # mnemo recall can serialize the store (json.dumps) — run it OFF the event loop so it can
+            # never freeze the ambient loop (the frozen-world bug, 2026-06-20). See mnemo _save throttle.
+            mem = (await asyncio.to_thread(_recall_mem, eid, _q)) or " | ".join(memory.get(eid, [])[-4:]) or "(nothing yet)"
             # Collective recall — what colleagues already found that's relevant to this agent's focus.
-            colleague_mem = _collective_recall(_q, exclude=eid)
+            colleague_mem = await asyncio.to_thread(_collective_recall, _q, exclude=eid)
             done = " | ".join(quest_log.get(eid, [])[-6:]) or "(none yet)"
             news = " | ".join(world_events[-4:]) or "(quiet)"
             # Pull the agent's real mind (memory/emotion/vault) from server/agora.
@@ -4269,6 +4271,17 @@ def main():
         print()
 
         async def run_main():
+            import concurrent.futures
+            # FREEZE FIX (2026-06-20): the ambient loop fires many background LLM/brain calls via
+            # asyncio.to_thread (collaborate, pipeline, curation, per-agent decisions). The DEFAULT
+            # thread pool is only ~min(32, cpu+4); under cloud contention each call holds a thread for up
+            # to 45s, so the pool EXHAUSTS and the loop's OWN to_thread awaits (trust matrix, decisions)
+            # queue behind it -> the loop crawls to ~20s/tick and the world looks frozen (esp. when an
+            # agent publishes -> an LLM burst). These calls are I/O-bound (threads just wait on network),
+            # so a large pool is cheap and keeps the loop responsive even when the LLM is slow.
+            loop = asyncio.get_running_loop()
+            loop.set_default_executor(
+                concurrent.futures.ThreadPoolExecutor(max_workers=64, thread_name_prefix="dungeon-io"))
             await asyncio.gather(run_ws_server(), ambient_life())
 
         asyncio.run(run_main())
