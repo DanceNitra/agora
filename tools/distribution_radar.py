@@ -21,6 +21,11 @@ ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 OUT_DIR = os.path.join(ROOT, "agora_output", "distribution_radar")
 WINDOW_DAYS = 30
 CRUCIBLE = "https://dancenitra.github.io/agora/public/crucible/"
+# actionability gates (a weak/old/closed thread is not worth a comment)
+HN_MAX_AGE_DAYS = 5      # HN threads die within days; commenting later = nobody sees it
+HN_MIN_POINTS = 15       # real audience
+GH_MIN_COMMENTS = 1      # a genuine discussion, not a solo dump
+JUNK_REPO_RE = re.compile(r"(intern|bootcamp|camp|playbook|test-|-test|demo|tutorial|course|assignment|homework|study|sandbox|practice|example)", re.I)
 
 # our real, defensible assets mapped to the conversations they speak to
 TOPICS = [
@@ -71,6 +76,8 @@ def hn_search(topic, since_ts):
         age = (time.time() - h.get("created_at_i", time.time())) / 86400.0
         points = h.get("points", 0) or 0
         ncom = h.get("num_comments", 0) or 0
+        if age > HN_MAX_AGE_DAYS or points < HN_MIN_POINTS:   # stale or no audience -> not actionable
+            continue
         score = (points + 2 * ncom) * _recency_weight(age)
         out.append({"src": "HN", "title": title[:140],
                     "url": "https://news.ycombinator.com/item?id=%s" % h.get("objectID"),
@@ -84,8 +91,8 @@ def gh_search(topic, since_date):
     out = []
     try:
         q = '%s in:title,body state:open created:>%s' % (topic["q"], since_date)
-        p = subprocess.run(["gh", "search", "issues", q, "--limit", "8",
-                            "--json", "title,url,repository,createdAt,commentsCount"],
+        p = subprocess.run(["gh", "search", "issues", q, "--limit", "12",
+                            "--json", "title,url,repository,createdAt,commentsCount,state,isPullRequest"],
                            capture_output=True, text=True, encoding="utf-8", errors="replace", timeout=40)
         hits = json.loads(p.stdout) if p.stdout.strip() else []
     except Exception as e:
@@ -95,14 +102,18 @@ def gh_search(topic, since_date):
         text = title.lower()
         if not any(k in text for k in topic["kw"]):
             continue
+        if (h.get("state") or "open").lower() != "open" or h.get("isPullRequest"):  # re-verify open, no PRs
+            continue
+        ncom = h.get("commentsCount", 0) or 0
+        repo = (h.get("repository") or {}).get("nameWithOwner", "")
+        if ncom < GH_MIN_COMMENTS or JUNK_REPO_RE.search(repo):   # solo dump or personal/learning repo
+            continue
         try:
             created = time.mktime(time.strptime(h.get("createdAt", "")[:10], "%Y-%m-%d"))
             age = (time.time() - created) / 86400.0
         except Exception:
             age = WINDOW_DAYS
-        ncom = h.get("commentsCount", 0) or 0
         score = (3 + 2 * ncom) * _recency_weight(age)
-        repo = (h.get("repository") or {}).get("nameWithOwner", "")
         out.append({"src": "GitHub", "title": ("%s: %s" % (repo, title))[:140],
                     "url": h.get("url"), "engagement": "%d comments" % ncom,
                     "age_days": round(age, 1), "score": round(score, 1)})

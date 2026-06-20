@@ -5,192 +5,42 @@
  "errors": [],
  "opportunities": [
   {
-   "src": "HN",
-   "title": "Show HN: Open Envelope – an open schema for defining AI agent teams",
-   "url": "https://news.ycombinator.com/item?id=48315016",
-   "engagement": "52 pts / 13 comments",
-   "age_days": 22.5,
-   "score": 19.6,
-   "asset": "Folklore Index: multi-agent > single at fixed cost = NOT_COMPUTABLE",
-   "draft_angle": "at fixed token cost the comparison is dominated by run-to-run noise (same config swings 0.15-0.20 on identical tasks); the loud folklore rests on under-powered evals"
-  },
-  {
    "src": "GitHub",
-   "title": "youfoundron/llmonomicon: Research: Benchmark (LLM evaluation)",
-   "url": "https://github.com/youfoundron/llmonomicon/issues/82",
-   "engagement": "9 comments",
-   "age_days": 2.4,
-   "score": 19.3,
-   "asset": "Folklore Index: leaderboard winner's score is reliable = FAILED (winner's curse)",
-   "draft_angle": "selection-on-the-max inflates the reported top score and the winner is the truly-best model only ~17% of the time at N=50 noisy evals"
-  },
-  {
-   "src": "GitHub",
-   "title": "beyond-sw-camp/be25-fin-WIP-Workipedia-ai: [FEAT] RAG 하이퍼파라미터 평가 및 최적값 선정",
-   "url": "https://github.com/beyond-sw-camp/be25-fin-WIP-Workipedia-ai/issues/28",
-   "engagement": "2 comments",
+   "title": "chf3198/megingjord-harness: Guardrail against human-calendar cadence in agentic governance timers",
+   "url": "https://github.com/chf3198/megingjord-harness/issues/2983",
+   "engagement": "3 comments",
    "age_days": 7.4,
-   "score": 5.3,
-   "asset": "Folklore Index: 'smaller chunks are better for RAG' = FAILED",
-   "draft_angle": "we ran it - under a fixed top-k budget the SMALLEST chunk is the worst (recovery 0.75 vs 1.0); optimum sits at/above the span scale"
-  },
-  {
-   "src": "GitHub",
-   "title": "namtran310/firedesk-intern-test-namtran310-20260608: SPIKE: Evaluating LLM-as-a-Judge Evaluation Metrics",
-   "url": "https://github.com/namtran310/firedesk-intern-test-namtran310-20260608/issues/8",
-   "engagement": "0 comments",
-   "age_days": 1.4,
-   "score": 2.9,
-   "asset": "Crucible / Eval-Eval angle",
-   "draft_angle": "the judge layer everyone evaluates ON is rarely audited itself (test-retest, position/verbosity bias) - we publish runnable receipts"
-  },
-  {
-   "src": "GitHub",
-   "title": "demobdev/open-grove: AI Agent: Multi-tool chaining for autonomous workflows",
-   "url": "https://github.com/demobdev/open-grove/issues/12",
-   "engagement": "0 comments",
-   "age_days": 1.4,
-   "score": 2.9,
-   "asset": "Folklore Index: multi-agent > single at fixed cost = NOT_COMPUTABLE",
-   "draft_angle": "at fixed token cost the comparison is dominated by run-to-run noise (same config swings 0.15-0.20 on identical tasks); the loud folklore rests on under-powered evals"
-  },
-  {
-   "src": "GitHub",
-   "title": "ChangWeiHong/technical-playbook: [Research] RAG chunking strategy and retrieval quality",
-   "url": "https://github.com/ChangWeiHong/technical-playbook/issues/1",
-   "engagement": "0 comments",
-   "age_days": 3.4,
-   "score": 2.7,
-   "asset": "Folklore Index: 'smaller chunks are better for RAG' = FAILED",
-   "draft_angle": "we ran it - under a fixed top-k budget the SMALLEST chunk is the worst (recovery 0.75 vs 1.0); optimum sits at/above the span scale"
-  },
-  {
-   "src": "GitHub",
-   "title": "onlywmo/RAG-LLM: Validate chunk settings before splitting documents",
-   "url": "https://github.com/onlywmo/RAG-LLM/issues/5",
-   "engagement": "0 comments",
-   "age_days": 3.4,
-   "score": 2.7,
-   "asset": "Folklore Index: 'smaller chunks are better for RAG' = FAILED",
-   "draft_angle": "we ran it - under a fixed top-k budget the SMALLEST chunk is the worst (recovery 0.75 vs 1.0); optimum sits at/above the span scale"
-  },
-  {
-   "src": "GitHub",
-   "title": "OWASP/www-project-ai-testing-guide: Contribution offer: Test Oracle Frameworks for AI Systems — LLM-as-a-Judge & Inter-Rater Reliability",
-   "url": "https://github.com/OWASP/www-project-ai-testing-guide/issues/80",
-   "engagement": "0 comments",
-   "age_days": 3.4,
-   "score": 2.7,
-   "asset": "Crucible / Eval-Eval angle",
-   "draft_angle": "the judge layer everyone evaluates ON is rarely audited itself (test-retest, position/verbosity bias) - we publish runnable receipts"
-  },
-  {
-   "src": "GitHub",
-   "title": "PhDLeToanThang/ai-ml-dl: Thiết Kế Công Cụ AI Agent: Mô Hình Nào Hiệu Quả, Mô Hình Nào Không & Tích Hợp Database Doanh Nghiệp",
-   "url": "https://github.com/PhDLeToanThang/ai-ml-dl/issues/103",
-   "engagement": "0 comments",
-   "age_days": 4.4,
-   "score": 2.6,
+   "score": 6.8,
    "asset": "Folklore Index: agent-success half-life REPRODUCED; time-horizon headline FAILED",
    "draft_angle": "a constant-hazard half-life fits METR's anchors, but the headline horizon swings 2.8x just from the 50%-vs-80% success threshold"
   },
   {
    "src": "GitHub",
-   "title": "Dontalion/Agentic_rag: Fix Critical RAG bugs and Architectural Issues (chunk size, retrieval truncation, and dead code)",
-   "url": "https://github.com/Dontalion/Agentic_rag/issues/1",
-   "engagement": "0 comments",
-   "age_days": 5.4,
-   "score": 2.5,
-   "asset": "Folklore Index: 'smaller chunks are better for RAG' = FAILED",
-   "draft_angle": "we ran it - under a fixed top-k budget the SMALLEST chunk is the worst (recovery 0.75 vs 1.0); optimum sits at/above the span scale"
-  },
-  {
-   "src": "GitHub",
-   "title": "Emposes/ai-encyclopedia: Proposal: LLM Evaluation & Benchmark Methodology (chapters/17)",
-   "url": "https://github.com/Emposes/ai-encyclopedia/issues/16",
-   "engagement": "0 comments",
-   "age_days": 5.4,
-   "score": 2.5,
-   "asset": "Folklore Index: leaderboard winner's score is reliable = FAILED (winner's curse)",
-   "draft_angle": "selection-on-the-max inflates the reported top score and the winner is the truly-best model only ~17% of the time at N=50 noisy evals"
-  },
-  {
-   "src": "GitHub",
-   "title": "RANDCorporation/judge-reliability-harness: Perturbation generator defaults to the same model family as a judge under test: add an optional c",
-   "url": "https://github.com/RANDCorporation/judge-reliability-harness/issues/2",
-   "engagement": "0 comments",
-   "age_days": 7.4,
-   "score": 2.3,
-   "asset": "Crucible / Eval-Eval angle",
-   "draft_angle": "the judge layer everyone evaluates ON is rarely audited itself (test-retest, position/verbosity bias) - we publish runnable receipts"
-  },
-  {
-   "src": "GitHub",
-   "title": "KestrelSovereignAI/kestrel-sovereign: Epic: Multi-agent voice — the mixing board (per-agent composer + voice sessions)",
-   "url": "https://github.com/KestrelSovereignAI/kestrel-sovereign/issues/1767",
-   "engagement": "0 comments",
-   "age_days": 7.4,
-   "score": 2.3,
+   "title": "hleserg/atman: [COMP] Multi-scope memory partitioning — user_id / agent_id / org_id isolation",
+   "url": "https://github.com/hleserg/atman/issues/1183",
+   "engagement": "1 comments",
+   "age_days": 9.4,
+   "score": 3.4,
    "asset": "Folklore Index: multi-agent > single at fixed cost = NOT_COMPUTABLE",
    "draft_angle": "at fixed token cost the comparison is dominated by run-to-run noise (same config swings 0.15-0.20 on identical tasks); the loud folklore rests on under-powered evals"
   },
   {
    "src": "GitHub",
-   "title": "sudotty/rag-reliability-lab: Epic: Build document ingestion and chunk preview",
-   "url": "https://github.com/sudotty/rag-reliability-lab/issues/1",
-   "engagement": "0 comments",
-   "age_days": 8.4,
-   "score": 2.2,
+   "title": "FireFistisDead/pdf-qa-bot: improve: optimize vector retrieval and embedding pipeline",
+   "url": "https://github.com/FireFistisDead/pdf-qa-bot/issues/6",
+   "engagement": "8 comments",
+   "age_days": 36.4,
+   "score": 1.9,
    "asset": "Folklore Index: 'smaller chunks are better for RAG' = FAILED",
    "draft_angle": "we ran it - under a fixed top-k budget the SMALLEST chunk is the worst (recovery 0.75 vs 1.0); optimum sits at/above the span scale"
   },
   {
    "src": "GitHub",
-   "title": "GioiaZheng/msmarco-genqa: [Research] Add semantic and parent-child chunking experiments",
-   "url": "https://github.com/GioiaZheng/msmarco-genqa/issues/58",
-   "engagement": "0 comments",
-   "age_days": 9.4,
-   "score": 2.1,
-   "asset": "Folklore Index: 'smaller chunks are better for RAG' = FAILED",
-   "draft_angle": "we ran it - under a fixed top-k budget the SMALLEST chunk is the worst (recovery 0.75 vs 1.0); optimum sits at/above the span scale"
-  },
-  {
-   "src": "GitHub",
-   "title": "String-sg/tw-context-intelligence: [1.3] Knowledge base ingestion pipeline (GCS → chunking + embedding → Vertex AI Vector Search)",
-   "url": "https://github.com/String-sg/tw-context-intelligence/issues/64",
-   "engagement": "0 comments",
-   "age_days": 9.4,
-   "score": 2.1,
-   "asset": "Folklore Index: 'smaller chunks are better for RAG' = FAILED",
-   "draft_angle": "we ran it - under a fixed top-k budget the SMALLEST chunk is the worst (recovery 0.75 vs 1.0); optimum sits at/above the span scale"
-  },
-  {
-   "src": "GitHub",
-   "title": "fworks-tech/agenthood: feat(rag): implement HierarchicalChunkStrategy with parent-child chunks and parent metadata attachment",
-   "url": "https://github.com/fworks-tech/agenthood/issues/109",
-   "engagement": "0 comments",
-   "age_days": 12.4,
-   "score": 1.8,
-   "asset": "Folklore Index: 'smaller chunks are better for RAG' = FAILED",
-   "draft_angle": "we ran it - under a fixed top-k budget the SMALLEST chunk is the worst (recovery 0.75 vs 1.0); optimum sits at/above the span scale"
-  },
-  {
-   "src": "GitHub",
-   "title": "anote-ai/Research-AgenticRAG: Draft research paper: AgenticRAG-Bench — evaluating retrieval gating, multi-hop attribution, and RL reward des",
-   "url": "https://github.com/anote-ai/Research-AgenticRAG/issues/7",
-   "engagement": "0 comments",
-   "age_days": 14.4,
-   "score": 1.6,
-   "asset": "Folklore Index: multi-agent > single at fixed cost = NOT_COMPUTABLE",
-   "draft_angle": "at fixed token cost the comparison is dominated by run-to-run noise (same config swings 0.15-0.20 on identical tasks); the loud folklore rests on under-powered evals"
-  },
-  {
-   "src": "GitHub",
-   "title": "narmaku/eval-studio: Add LLM-as-judge transparency and meta-evaluation",
-   "url": "https://github.com/narmaku/eval-studio/issues/38",
-   "engagement": "0 comments",
-   "age_days": 18.4,
-   "score": 1.2,
+   "title": "varsity-tech-product/benchmark: Improve eval reliability using OpenAI Evals best practices for LLM-as-judge scoring",
+   "url": "https://github.com/varsity-tech-product/benchmark/issues/105",
+   "engagement": "2 comments",
+   "age_days": 51.4,
+   "score": 0.7,
    "asset": "Crucible / Eval-Eval angle",
    "draft_angle": "the judge layer everyone evaluates ON is rarely audited itself (test-retest, position/verbosity bias) - we publish runnable receipts"
   },
@@ -213,56 +63,6 @@
    "score": 0.5,
    "asset": "Folklore Index: multi-agent > single at fixed cost = NOT_COMPUTABLE",
    "draft_angle": "at fixed token cost the comparison is dominated by run-to-run noise (same config swings 0.15-0.20 on identical tasks); the loud folklore rests on under-powered evals"
-  },
-  {
-   "src": "GitHub",
-   "title": "langwatch/langwatch: LLM Judge Quality Analysis: Measure the Reliability of Your LLM Evaluators",
-   "url": "https://github.com/langwatch/langwatch/issues/3945",
-   "engagement": "0 comments",
-   "age_days": 40.4,
-   "score": 0.3,
-   "asset": "Crucible / Eval-Eval angle",
-   "draft_angle": "the judge layer everyone evaluates ON is rarely audited itself (test-retest, position/verbosity bias) - we publish runnable receipts"
-  },
-  {
-   "src": "GitHub",
-   "title": "cerai-iitm/AIEvaluationTool: Hallucination evaluation uses the same model to generate ground truth and judge against it",
-   "url": "https://github.com/cerai-iitm/AIEvaluationTool/issues/155",
-   "engagement": "0 comments",
-   "age_days": 41.4,
-   "score": 0.3,
-   "asset": "Crucible / Eval-Eval angle",
-   "draft_angle": "the judge layer everyone evaluates ON is rarely audited itself (test-retest, position/verbosity bias) - we publish runnable receipts"
-  },
-  {
-   "src": "GitHub",
-   "title": "deepwatrcreatur/agent-roundtable: Q37 — Vaglio Evaluation Framework: Multi-Agent vs. Single-Model (2026-04-30)",
-   "url": "https://github.com/deepwatrcreatur/agent-roundtable/issues/67",
-   "engagement": "0 comments",
-   "age_days": 50.4,
-   "score": 0.3,
-   "asset": "Folklore Index: multi-agent > single at fixed cost = NOT_COMPUTABLE",
-   "draft_angle": "at fixed token cost the comparison is dominated by run-to-run noise (same config swings 0.15-0.20 on identical tasks); the loud folklore rests on under-powered evals"
-  },
-  {
-   "src": "GitHub",
-   "title": "deepwatrcreatur/agent-roundtable: Q37 — Vaglio Evaluation Framework: Multi-Agent vs. Single-Model (2026-04-30)",
-   "url": "https://github.com/deepwatrcreatur/agent-roundtable/issues/41",
-   "engagement": "0 comments",
-   "age_days": 50.4,
-   "score": 0.3,
-   "asset": "Folklore Index: multi-agent > single at fixed cost = NOT_COMPUTABLE",
-   "draft_angle": "at fixed token cost the comparison is dominated by run-to-run noise (same config swings 0.15-0.20 on identical tasks); the loud folklore rests on under-powered evals"
-  },
-  {
-   "src": "GitHub",
-   "title": "hammer/labs: Chinese model benchmarking landscape: SuperCLUE, OpenCompass, FlagEval",
-   "url": "https://github.com/hammer/labs/issues/31",
-   "engagement": "0 comments",
-   "age_days": 50.4,
-   "score": 0.3,
-   "asset": "Folklore Index: leaderboard winner's score is reliable = FAILED (winner's curse)",
-   "draft_angle": "selection-on-the-max inflates the reported top score and the winner is the truly-best model only ~17% of the time at N=50 noisy evals"
   }
  ]
 }
