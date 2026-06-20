@@ -36,8 +36,12 @@ agora-game-server/_dungeon.err
 # dungeon runtime state (persisted across restarts, not source)
 agora-game-server/.recent_intents.json
 
-# NOTE: agora_output/ (lab scripts + public digests) is intentionally TRACKED —
-# those are durable research artifacts, committed as a record, not ignored.
+# NOTE (updated 2026-06-20): public digests under agora_output/ stay TRACKED, but agora_output/lab/ is now
+# treated as SCRATCH and ignored. Rationale: the brain's Lab organ writes experiments there continuously and
+# they piled up as ~780 uncommitted files (source-control noise). Provenance is preserved without them:
+# meaningful labs are embedded in the Crucible ledger (public/crucible/crucible.json 'code' field), ~219 labs
+# are already committed in history, and the files remain on disk. Commit a deliberately-kept lab with `git add -f`.
+agora_output/lab/
 # EXCEPT audit clones: foreign repos we measure are not ours to commit.
 agora_output/audits/
 
@@ -87,3 +91,8 @@ onboarding/game-dev/books/_*
 /_*.txt
 /_openapi_dump.json
 /funnel_shot.png
+# root-level runtime logs (brain / dungeon / canary stdout+stderr)
+/_*.log
+/_*.err
+# runtime watcher/state json (regenerated live; underscore-prefixed = scratch per repo convention)
+agora_output/**/_*.json
