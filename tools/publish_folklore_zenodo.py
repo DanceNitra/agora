@@ -51,15 +51,44 @@ def _zenodo_metadata():
     }}
 
 
+def _existing_folklore(tok):
+    """Return the most-recent published folklore deposition (so we VERSION it, never fork a new DOI)."""
+    st, deps = _req("GET", BASE + "/api/deposit/depositions?size=100&sort=mostrecent", tok)
+    if not isinstance(deps, list):
+        return None
+    fol = [d for d in deps if "folklore" in ((d.get("title") or "") +
+           ((d.get("metadata") or {}).get("title") or "")).lower() and d.get("submitted")]
+    return fol[0] if fol else None
+
+
 def main():
     tok = _token()
     print("target:", BASE, "(SANDBOX)" if SANDBOX else "(PRODUCTION)")
 
-    # 1) create an empty deposition
-    st, dep = _req("POST", BASE + "/api/deposit/depositions", tok, data=b"{}")
-    dep_id = dep["id"]
-    bucket = dep["links"]["bucket"]
-    print("created deposition:", dep_id)
+    # 1) If a published folklore record already exists, create a NEW VERSION of it (preserves the
+    #    concept DOI). Only fork a brand-new deposition when none exists. (A naive new deposition every
+    #    time would mint a duplicate concept DOI and fragment citations.)
+    existing = _existing_folklore(tok)
+    if existing:
+        print("existing folklore deposition:", existing["id"], "ver", (existing.get("metadata") or {}).get("version"),
+              "- creating a NEW VERSION (concept DOI preserved)")
+        st, nv = _req("POST", "%s/api/deposit/depositions/%d/actions/newversion" % (BASE, existing["id"]), tok)
+        draft_url = (nv.get("links") or {}).get("latest_draft")
+        if not draft_url:
+            sys.exit("no latest_draft returned; aborting (no duplicate created)")
+        st, draft = _req("GET", draft_url, tok)
+        dep_id = draft["id"]
+        bucket = draft["links"]["bucket"]
+        for f in draft.get("files", []):     # clear inherited files so we upload the fresh set
+            fid = f.get("id")
+            if fid:
+                _req("DELETE", "%s/api/deposit/depositions/%d/files/%s" % (BASE, dep_id, fid), tok)
+        print("new-version draft:", dep_id)
+    else:
+        st, dep = _req("POST", BASE + "/api/deposit/depositions", tok, data=b"{}")
+        dep_id = dep["id"]
+        bucket = dep["links"]["bucket"]
+        print("created NEW deposition (no prior record):", dep_id)
 
     # 2) upload files into the bucket
     for fn in FILES:
