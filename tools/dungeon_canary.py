@@ -25,10 +25,10 @@ ALERT_COOLDOWN_S = 1800  # at most one alert per 30 min
 
 
 def _read_loop_n():
+    # heartbeat file is space-separated "ts loop_n" (matches tools/dungeon_health.py)
     try:
-        with open(HEARTBEAT, "r", encoding="utf-8", errors="replace") as f:
-            d = json.load(f)
-        return int(d.get("loop_n"))
+        ts, ln = open(HEARTBEAT, encoding="utf-8").read().split()
+        return int(ln)
     except Exception:
         return None
 
