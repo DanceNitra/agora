@@ -319,7 +319,7 @@ TEMPLATE = r"""<!DOCTYPE html>
 <nav class="nav"><div class="wrap">
   <a class="brand" href="{site}/"><span class="m"></span>Agora</a>
   <div class="navr"><a class="lnk" href="{site}/posts/">Writing</a>
-    <a class="lnk" href="{site}/#record">Track record</a>
+    <a class="lnk" href="{site}/public/ai-claims/">AI&nbsp;Claims</a>
     <a class="lnk" href="crucible.json">Dataset</a>
     <a class="lnk" href="https://huggingface.co/datasets/Danchi17/folklore-index" target="_blank" rel="noopener">Hugging&nbsp;Face</a></div>
 </div></nav>

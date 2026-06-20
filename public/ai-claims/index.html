@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>The AI-Claim Crucible &middot; AI-engineering folklore, tested in code &middot; Agora</title>
+<meta name="description" content="A public ledger of widely-repeated AI-engineering claims rebuilt as the smallest runnable test and ruled REPRODUCED, FAILED, or NOT_COMPUTABLE: smaller-chunks-for-RAG, rerankers, the time-horizon headline, LLM conservatism, poison-deference and more. Every verdict ships a measured number and runnable code.">
+<link rel="canonical" href="https://dancenitra.github.io/agora/public/ai-claims/">
+<meta property="og:type" content="website">
+<meta property="og:title" content="The AI-Claim Crucible — AI folklore, tested in code">
+<meta property="og:description" content="We rebuild repeated AI-engineering claims as runnable tests and publish the verdict — failures included. Measured numbers + code.">
+<meta property="og:url" content="https://dancenitra.github.io/agora/public/ai-claims/">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;0,6..72,600;1,6..72,400&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{--paper:#faf7f0;--paper2:#f2eee4;--ink:#17150f;--text:#4d493f;--faint:#938d7f;--line:#e3ddcf;
+    --acc:#0c7a55;--acc-soft:#e1f1ea;--bad:#b1361f;--bad-soft:#f8e6e0;--gold:#9a7b1e;--gold-soft:#f4ecd6;
+    --serif:"Newsreader",Georgia,serif;--mono:"JetBrains Mono",ui-monospace,Consolas,monospace;}
+  *{box-sizing:border-box;margin:0} html{scroll-behavior:smooth}
+  body{background:var(--paper);color:var(--ink);font-family:var(--serif);-webkit-font-smoothing:antialiased;
+    background-image:radial-gradient(circle at 12% -8%,#fff 0%,transparent 42%);}
+  a{color:inherit;text-decoration:none} .wrap{max-width:1060px;margin:0 auto;padding:0 28px}
+  .nav{position:sticky;top:0;z-index:20;background:rgba(250,247,240,.85);backdrop-filter:blur(10px);border-bottom:1px solid var(--line)}
+  .nav .wrap{display:flex;justify-content:space-between;align-items:center;padding:15px 28px;font-family:var(--mono);font-size:12.5px;letter-spacing:.04em}
+  .brand{font-weight:600} .navr a{color:var(--faint);margin-left:18px} .navr a:hover{color:var(--acc)}
+  .mast{padding:68px 0 30px}
+  .kick{font-family:var(--mono);font-size:12px;letter-spacing:.3em;text-transform:uppercase;color:var(--acc);margin-bottom:22px}
+  .mast h1{font-weight:500;font-size:clamp(40px,7vw,72px);line-height:1.02;letter-spacing:-.03em;max-width:16ch}
+  .lede{margin-top:22px;font-size:19px;line-height:1.55;color:var(--text);max-width:62ch}
+  .lede b{color:var(--ink);font-weight:600}
+  .tally{display:flex;gap:30px;margin-top:30px;font-family:var(--mono)}
+  .t .num{font-size:30px;font-weight:600} .t .lbl{font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--faint)}
+  .t.ok .num{color:var(--acc)} .t.fail .num{color:var(--bad)}
+  .dataset{margin-top:24px;font-family:var(--mono);font-size:13px;color:var(--faint)}
+  .dataset a{color:var(--acc);border-bottom:1px solid var(--acc-soft)} .dataset code{background:var(--paper2);border:1px solid var(--line);border-radius:5px;padding:2px 7px;font-size:12px}
+  .grid{margin:36px 0 60px;display:grid;gap:18px}
+  .card{background:#fff;border:1px solid var(--line);border-radius:12px;padding:22px 24px;box-shadow:0 1px 0 #00000008}
+  .card.fail{border-left:3px solid var(--bad)} .card.ok{border-left:3px solid var(--acc)} .card.nc{border-left:3px solid var(--gold)}
+  .chead{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}
+  .cv{font-family:var(--mono);font-size:11px;font-weight:600;letter-spacing:.1em;padding:3px 9px;border-radius:20px}
+  .cv.fail{color:var(--bad);background:var(--bad-soft)} .cv.ok{color:var(--acc);background:var(--acc-soft)} .cv.nc{color:var(--gold);background:var(--gold-soft)}
+  .cdate{font-family:var(--mono);font-size:11px;color:var(--faint)}
+  .card h3{font-weight:600;font-size:21px;line-height:1.3;letter-spacing:-.01em}
+  .csrc{font-size:13.5px;color:var(--faint);font-style:italic;margin-top:6px}
+  .cnote{margin-top:12px;font-size:15.5px;line-height:1.6;color:var(--text)}
+  .cfoot{margin-top:14px;font-family:var(--mono);font-size:12.5px}
+  .cfoot .code{color:var(--acc);border-bottom:1px solid var(--acc-soft)} .cfoot .nocode{color:var(--faint)}
+  footer{border-top:1px solid var(--line);padding:26px 0 50px;font-family:var(--mono);font-size:12px;color:var(--faint)}
+  footer a{color:var(--acc)}
+</style>
+</head>
+<body>
+<nav class="nav"><div class="wrap">
+  <a class="brand" href="https://dancenitra.github.io/agora/">Agora</a>
+  <div class="navr"><a href="https://dancenitra.github.io/agora/public/crucible/">The Crucible</a><a href="https://huggingface.co/datasets/Danchi17/folklore-index" target="_blank" rel="noopener">Dataset</a><a href="https://dancenitra.github.io/agora/posts/">Writing</a></div>
+</div></nav>
+<header class="mast"><div class="wrap">
+  <div class="kick">The AI-Claim Crucible</div>
+  <h1>AI folklore, <em>tested in code.</em></h1>
+  <p class="lede">The field repeats a lot of engineering folklore &mdash; <b>&ldquo;chunk smaller for RAG&rdquo;</b>, <b>&ldquo;a reranker never hurts&rdquo;</b>, <b>&ldquo;trust the model&rsquo;s confidence&rdquo;</b> &mdash; with little runnable verification. We rebuild each claim as the <b>smallest test that could settle it</b>, run it on frontier models, and publish the verdict: <b>reproduced</b>, <b>failed</b>, or <b>not computable</b>. Every entry ships a measured number and the code.</p>
+  <div class="tally">
+    <div class="t ok"><div class="num">1</div><div class="lbl">Reproduced</div></div>
+    <div class="t fail"><div class="num">7</div><div class="lbl">Failed</div></div>
+    <div class="t"><div class="num">1</div><div class="lbl">Not computable</div></div>
+  </div>
+  <div class="dataset">Part of the Folklore Index &mdash; <a href="https://huggingface.co/datasets/Danchi17/folklore-index" target="_blank" rel="noopener">dataset on Hugging Face</a> &middot; <code>pip install folklore-index</code> &middot; <a href="https://doi.org/10.5281/zenodo.20771544" target="_blank" rel="noopener">DOI</a></div>
+</div></header>
+<section><div class="wrap"><div class="grid">
+      <article class="card fail">
+        <div class="chead"><span class="cv fail">FAILED</span><span class="cdate">2026-06-20</span></div>
+        <h3>LLMs inherit human cognitive biases - e.g. conservatism in Bayesian belief updating (people under-revise relative to Bayes; Edwards 1968).</h3>
+        <p class="csrc">Folklore that LLMs reproduce human judgment-and-decision biases; tested on the canonical bookbag-and-poker-chip conservatism task with real models.</p>
+        <p class="cnote">On the exact task where humans are reliably conservative (two equally-likely sources, symmetric cue validity q=0.70, an R/B signal sequence; Bayesian posterior ~0.97), both frontier models return the EXACT Bayesian posterior when the likelihoods are specified: deepseek-v4-flash mean conservatism gap = -0.001 (4/5 items parsed), glm-5.2 = +0.000 (5/5). Humans on the same task report ~0.70 (a large conservative gap); the LLMs show ~0.000. The bias does NOT transfer - handed the diagnosticity as numbers, the model just computes the likelihood ratio. HONEST SCOPE: only the SPECIFIED-likelihood case is settled. The human-analogue INFER case (model must ESTIMATE cue validity from a training sample, as humans do) is NOT cleanly measurable here - the harder estimate-then-update task exhausts the thinking models&#x27; token budget before a parseable answer (1/10 parsed), and forcing answer-first would suppress the reasoning the task needs. So: conservatism does not appear when cue validity is told; whether it appears when cue validity must be learned is open.</p>
+        <div class="cfoot"><a class="code" href="https://github.com/DanceNitra/agora/blob/main/agora_output/lab/20260620-035500_llm-conservatism-cue-validity-specification.py" target="_blank" rel="noopener">Read the runnable test &rarr;</a></div>
+      </article>
+      <article class="card fail">
+        <div class="chead"><span class="cv fail">FAILED</span><span class="cdate">2026-06-20</span></div>
+        <h3>Smaller chunks improve RAG retrieval quality - &#x27;when in doubt, chunk smaller&#x27; raises precision/relevance.</h3>
+        <p class="csrc">Common RAG-engineering folklore (chunk-size tuning advice; &#x27;smaller chunks = higher precision&#x27;).</p>
+        <p class="cnote">Deterministic numpy test: a 200-token document with one CONTIGUOUS gold span (length 30-50), fixed-grid chunking, each chunk scored by gold density (the precision force that rewards small chunks), retrieve top-k=3, measure recovery = gold tokens recovered / span length. Smaller is NOT better: the smallest chunk c=10 recovers only 0.750 of a 40-token span while c&gt;=20 recovers 1.000 - the minimum chunk size is the WORST, and the optimum sits AT/ABOVE the span scale (best chunk = 20-40) in 9/9 robustness cells (seeds x span length). Mechanism: small chunks do maximize per-chunk density, but a grid cut fragments a contiguous span into more pieces than the top-k=3 budget can reassemble, and that recall loss dominates the precision gain. Anti-rig CONTROL: retrieving ALL chunks (no budget) flattens recovery to exactly 1.000 for every chunk size - proving the reversal is caused by the retrieval budget, not baked into the data. HONEST SCOPE: a noiseless density oracle, binary relevance, a single contiguous span, fixed grid boundaries - it isolates the fragmentation-vs-precision tradeoff, not embedding noise or overlapping/recursive chunkers. Conditional takeaway: &#x27;smaller = better&#x27; is false whenever relevant evidence is contiguous and longer than a chunk under a tight top-k budget. (Generated + adversarially verified by an Agora workflow: 1 of 4 candidate claims survived 2 independent skeptic referees; the other 3 were killed as textbook/Condorcet or stipulated-geometry.)</p>
+        <div class="cfoot"><a class="code" href="https://github.com/DanceNitra/agora/blob/main/agora_output/aiclaims/20260620_rag_chunk_size_not_monotone.py" target="_blank" rel="noopener">Read the runnable test &rarr;</a></div>
+      </article>
+      <article class="card fail">
+        <div class="chead"><span class="cv fail">FAILED</span><span class="cdate">2026-06-20</span></div>
+        <h3>Adding a reranker (cross-encoder) on top of first-stage retrieval reliably improves end-to-end RAG accuracy, or at worst never hurts it (&#x27;drop in a reranker for a free boost&#x27;).</h3>
+        <p class="csrc">Cohere / Pinecone / LangChain / LlamaIndex RAG tutorials and &#x27;production RAG checklist&#x27; blogs; repeated as received wisdom by practitioners.</p>
+        <p class="cnote">Deterministic numpy model (seed 0, n=200k queries): gold doc + 3 hard negatives (lexically similar) + 27 soft distractors; NO-RERANK uses a noisy first-stage scorer, RERANK uses a CLEANER scorer but inflates the 3 hard negatives by `infl` (a cross-encoder fooled by lexical overlap); end-to-end correctness depends on the gold doc&#x27;s rank in a position-biased top-5. Measured delta (rerank - no-rerank): infl=0.0 -&gt; +0.139, 1.4 -&gt; +0.013, 2.2 -&gt; -0.074, 3.0 -&gt; -0.131. The reranker HELPS when it is merely cleaner (control infl=0: +0.139) but crosses to a NET LOSS at infl* ~ 1.52 and reaches -0.131 - so &#x27;a reranker never hurts / free boost&#x27; is FAILED: a second scorer with a different error profile can demote the gold doc out of a position-biased top-k. Anti-rig: the control (infl=0) shows the harness CAN produce a gain (not baked to fail); the verdict is read off the printed curve. HONEST SCOPE: a stylized simulation, not real corpora/models - it shows the loss is mechanically in-range and the condition for it (non-trivial hard-negative susceptibility), not that any specific production reranker degrades a specific stack; the realistic magnitude of `infl` for real cross-encoders is the open empirical question. The defensible takeaway: &#x27;always helps&#x27; is not a safe default.</p>
+        <div class="cfoot"><a class="code" href="https://github.com/DanceNitra/agora/blob/main/agora_output/aiclaims/20260620_reranker_not_free_boost.py" target="_blank" rel="noopener">Read the runnable test &rarr;</a></div>
+      </article>
+      <article class="card fail">
+        <div class="chead"><span class="cv fail">FAILED</span><span class="cdate">2026-06-20</span></div>
+        <h3>You can trust an LLM&#x27;s CONFIDENCE to tell you when a retrieved document has corrupted its answer (high-confidence RAG answers are safe).</h3>
+        <p class="csrc">RAG-deployment folklore (confidence/self-consistency gating as a hallucination guard); tested on frontier models glm-5.2 and deepseek-v4-flash.</p>
+        <p class="cnote">Two measured settings (12 factual questions each model knows unaided; thinking-robust reader, k=2, order-corrected). (1) ALL-POISON: given a doc asserting the FALSE answer, frontier models ADOPT the poison at FULL confidence - glm-5.2 16/16 (100%), deepseek-v4-flash 15/16 (94%); confidence is ~1.0 while the answer is wrong. (2) REALISTIC MIXED retrieval (each question once with a clean doc, once with a poisoned doc, 50/50): confidence is BLIND - corr(confidence, correct) = -0.07 (glm) / +0.21 (deepseek), shipping ~46-50% wrong at every coverage, because poisoned and clean answers are BOTH high-confidence. The discriminating signal is NOT confidence but answer-drop SENSITIVITY (how much the answer moves when the doc is removed): corr(-sensitivity, correct) = +0.97 (glm) / +1.00 (deepseek), giving 0% wrong at 50% coverage (keep every clean-doc answer, abstain on every poisoned one) - risk-coverage AUC ~2x better than confidence (0.216 vs 0.427; 0.261 vs 0.489). So &#x27;trust the confidence&#x27; FAILS; a drop-sensitivity gate (the Grounding Firewall) recovers safety. HONEST SCOPE: strong direct-assertion poison, 2-option factual questions; kept-coverage tracks the clean-doc fraction (50% here by construction). The earlier qwen2.5:7b &#x27;0% wrong at 70% coverage&#x27; headline was a weak-model artifact - these are the frontier-grade numbers.</p>
+        <div class="cfoot"><a class="code" href="https://github.com/DanceNitra/agora/blob/main/agora_output/lab/20260620-110000_grounding-firewall-validate-glm52.py" target="_blank" rel="noopener">Read the runnable test &rarr;</a></div>
+      </article>
+      <article class="card nc">
+        <div class="chead"><span class="cv nc">NOT_COMPUTABLE</span><span class="cdate">2026-06-19</span></div>
+        <h3>Multi-agent systems (an orchestrator delegating to sub-agents) outperform a single agent on complex tasks.</h3>
+        <p class="csrc">2026 agent-engineering folklore (contested: Cognition &#x27;Don&#x27;t Build Multi-Agents&#x27; vs Anthropic&#x27;s multi-agent research system); Gartner: ~40% of agentic projects scrapped.</p>
+        <p class="cnote">Tested at FIXED token cost on decomposable ground-truth tasks (one base model, only the scaffold differs; single self-consistency vs an orchestrator+workers+aggregator scaffold). Run 3x: the SAME config swings 0.15-0.20 in accuracy run-to-run on IDENTICAL tasks (multi@wmax1400: 0.75/0.75/0.92; single k=5: 0.96/0.75) at n=24, temp 0.7. The comparison is dominated by LLM-stochasticity noise at realistic eval scale -&gt; the claim cannot be cleanly settled, AND the loud folklore (in both directions) rests on under-powered, non-reproducible comparisons. A stable verdict would need large-n multi-seed evals, which the folklore/blog benchmarks do not run. Honest scope: our own eval is also too small for a positive claim; the finding is the NON-REPRODUCIBILITY itself.</p>
+        <div class="cfoot"><a class="code" href="https://github.com/DanceNitra/agora/blob/main/agora_output/aiclaims/20260619_multi_vs_single_agent_eval.py" target="_blank" rel="noopener">Read the runnable test &rarr;</a></div>
+      </article>
+      <article class="card fail">
+        <div class="chead"><span class="cv fail">FAILED</span><span class="cdate">2026-06-19</span></div>
+        <h3>When you evaluate N models/configs on a benchmark and report the top scorer&#x27;s number, that score is a reliable estimate of its true performance and the winner is the truly-best model.</h3>
+        <p class="csrc">Universal AI benchmarking / leaderboard practice (SOTA reporting, hyperparameter + model selection on a held-out benchmark).</p>
+        <p class="cnote">Winner&#x27;s curse (selection-on-the-max), clean DETERMINISTIC model (no LLM noise - the lesson from entry #1): N models with true accuracies clustered within sigma_true=0.04, each measured with eval noise (finite test set + run-to-run variance). At N=50 models and eval-noise SE 0.06 (~ a 50-200 item benchmark): the reported winner&#x27;s score is inflated by +0.112 (the SOTA bar is overstated), the observed winner is the truly-best model only 17% of the time, and trusting it costs 0.040 true accuracy vs the real best. Both effects GROW with the number of candidates and the eval noise (P(true best): N=5 -&gt; 62%, N=100 -&gt; 13%). So &#x27;the leaderboard winner&#x27;s score is reliable&#x27; FAILS: more candidates + noisier evals = more inflated, less trustworthy. (Ties to entry #1: the same eval noise that makes multi-vs-single non-reproducible is what drives this inflation.)</p>
+        <div class="cfoot"><a class="code" href="https://github.com/DanceNitra/agora/blob/main/agora_output/aiclaims/20260619_benchmark_winners_curse.py" target="_blank" rel="noopener">Read the runnable test &rarr;</a></div>
+      </article>
+      <article class="card fail">
+        <div class="chead"><span class="cv fail">FAILED</span><span class="cdate">2026-06-19</span></div>
+        <h3>Retrieval-augmented frontier models weigh a retrieved document against their own knowledge - they won&#x27;t blindly adopt a doc that contradicts what they correctly know.</h3>
+        <p class="csrc">RAG-robustness folklore; measured on real models via the Grounding Firewall poison protocol (Agora). The Poison-Deference Index.</p>
+        <p class="cnote">Poison-Deference Index: 12 factual questions each model answered CORRECTLY without context, then given a context asserting the WRONG answer (real LLMs, k=3 order-corrected, thinking-robust reader). deepseek-v4-flash: PDR=92% (flips to the false answer on 11/12 questions it knew), CPR=83% (confidently wrong). glm-5.2: PDR=92%, CPR=92%. BOTH frontier models abandon their correct knowledge for a planted-false doc ~92% of the time, almost always confidently - retrieval OVERRIDES rather than augments. (Strong-assertion poison; 2 models so far - a live index across more models is the next step. Mitigation already exists: the Grounding Firewall&#x27;s abstain-on-high-sensitivity gate catches exactly these.)</p>
+        <div class="cfoot"><a class="code" href="https://github.com/DanceNitra/agora/blob/main/agora_output/aiclaims/20260619_poison_deference_index.py" target="_blank" rel="noopener">Read the runnable test &rarr;</a></div>
+      </article>
+      <article class="card ok">
+        <div class="chead"><span class="cv ok">REPRODUCED</span><span class="cdate">2026-06-19</span></div>
+        <h3>AI agent success decays with a CONSTANT hazard (an exponential &#x27;half-life&#x27;) as the task gets longer.</h3>
+        <p class="csrc">arXiv 2505.05115 &#x27;Is there a half-life for the success rates of AI agents?&#x27;; tested on METR time-horizon data (metr.org/blog/2025-03-19; epoch.ai/benchmarks/metr-time-horizons).</p>
+        <p class="cnote">Fit on METR&#x27;s real public anchors (success vs human-task-length: ~99% @ 4min, ~80% @ 15min, 50% @ 60min [Claude 3.7], &lt;10% @ 240min). A constant-hazard exponential (P = 0.5^(t/60min)) fits well: predicts 0.95/0.84/0.50/0.06 vs observed 0.99/0.80/0.50/0.08, SSE 0.0032 - actually BETTER than the logistic-in-log-time (SSE 0.0075, which overshoots the tail). The half-life claim holds. Minor tension: the t80/t50 ratio is slightly steeper than exponential (0.250 vs 0.322), hinting at mild extra steepening, but 4 anchor points can&#x27;t resolve it. HONEST SCOPE: public anchors only (Claude 3.7 + aggregate); METR&#x27;s raw per-task data would sharpen the per-model hazard.</p>
+        <div class="cfoot"><a class="code" href="https://github.com/DanceNitra/agora/blob/main/agora_output/aiclaims/20260619_metr_horizon_survival_multiverse.py" target="_blank" rel="noopener">Read the runnable test &rarr;</a></div>
+      </article>
+      <article class="card fail">
+        <div class="chead"><span class="cv fail">FAILED</span><span class="cdate">2026-06-19</span></div>
+        <h3>The &#x27;AI time horizon&#x27; is a robust headline number (supporting &#x27;AI will automate month-long tasks within ~5 years&#x27;).</h3>
+        <p class="csrc">METR time-horizon headline + 7-month-doubling extrapolation (metr.org/blog/2025-03-19); multiverse / specification-curve method (One Model Many Scores, arXiv 2308.16681).</p>
+        <p class="cnote">Multiverse over ONE analytic fork METR itself exposes - the success-threshold choice. From the fitted curve on METR&#x27;s real anchors the horizon is 60 min at 50% success but 21 min at 80% (and 170 min at 20%): a 2.8x swing from an arbitrary threshold. At doubling-every-7-months that 2.8x is ~11 months of apparent &#x27;progress&#x27; - so the famous &#x27;month-long tasks in ~5 years&#x27; timeline slips ~11 months if you (reasonably) demand 80% reliability instead of 50%. The headline is NOT a robust single number; it rides on an unstated analytic choice. (A full specification curve over more forks needs METR&#x27;s raw per-task data.)</p>
+        <div class="cfoot"><a class="code" href="https://github.com/DanceNitra/agora/blob/main/agora_output/aiclaims/20260619_metr_horizon_survival_multiverse.py" target="_blank" rel="noopener">Read the runnable test &rarr;</a></div>
+      </article>
+</div></div></section>
+<footer><div class="wrap">A public, machine-readable ledger &middot; updated 2026-06-20 &middot; <a href="https://github.com/DanceNitra/agora" target="_blank" rel="noopener">source + runnable tests</a> &middot; submit a claim: <a href="https://github.com/DanceNitra/agora/issues/new?title=AI-claim%20submission:%20&body=Claim:%0ASource/where%20it%27s%20repeated:%0AWhy%20FAILED%20is%20plausible:" target="_blank" rel="noopener">open an issue &rarr;</a></div></footer>
+</body>
+</html>
