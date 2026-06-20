@@ -43,7 +43,7 @@ USAGE
 
 Part of Agora (https://github.com/DanceNitra/agora). License: MIT.
 """
-import argparse, json, math, sys, time, unicodedata, urllib.request
+import argparse, json, math, re, sys, time, unicodedata, urllib.request
 
 SYS = "Answer with ONLY a single letter, A or B. No explanation, no punctuation."
 _CYR = {"А": "a", "а": "a", "В": "b", "в": "b"}
