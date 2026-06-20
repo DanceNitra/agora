@@ -1,0 +1,62 @@
+{
+ "glm-5.2": {
+  "n": 48,
+  "single_acc": 0.958,
+  "multi_acc": 0.688,
+  "gap_single_minus_multi": 0.271,
+  "gap_ci95": [
+   0.125,
+   0.438
+  ],
+  "single_tok_mean": 547.1,
+  "multi_tok_mean": 1853.3,
+  "by_hop": {
+   "2": {
+    "n": 16,
+    "single": 1.0,
+    "multi": 0.688
+   },
+   "3": {
+    "n": 16,
+    "single": 1.0,
+    "multi": 0.438
+   },
+   "4": {
+    "n": 16,
+    "single": 0.875,
+    "multi": 0.938
+   }
+  },
+  "seconds": 819.0
+ },
+ "deepseek-v4-flash": {
+  "n": 48,
+  "single_acc": 0.938,
+  "multi_acc": 0.792,
+  "gap_single_minus_multi": 0.146,
+  "gap_ci95": [
+   0.042,
+   0.271
+  ],
+  "single_tok_mean": 702.6,
+  "multi_tok_mean": 1898.6,
+  "by_hop": {
+   "2": {
+    "n": 16,
+    "single": 0.938,
+    "multi": 0.688
+   },
+   "3": {
+    "n": 16,
+    "single": 0.875,
+    "multi": 0.75
+   },
+   "4": {
+    "n": 16,
+    "single": 1.0,
+    "multi": 0.938
+   }
+  },
+  "seconds": 279.0
+ }
+}

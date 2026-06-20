@@ -1,0 +1,15 @@
+compile OK
+
+=== glm-5.2: single vs multi-agent (MuSiQue n=48, 2/3/4-hop) ===
+  single_acc=95.8%  multi_acc=68.8%  gap(single-multi)=+27.1% CI95[0.125, 0.438]
+  tokens/q: single=547  multi=1853  (multi/single=3.4x)
+  by hop: {2: {'n': 16, 'single': 1.0, 'multi': 0.688}, 3: {'n': 16, 'single': 1.0, 'multi': 0.438}, 4: {'n': 16, 'single': 0.875, 'multi': 0.938}}  [819s]
+
+=== deepseek-v4-flash: single vs multi-agent (MuSiQue n=48, 2/3/4-hop) ===
+  single_acc=93.8%  multi_acc=79.2%  gap(single-multi)=+14.6% CI95[0.042, 0.271]
+  tokens/q: single=703  multi=1899  (multi/single=2.7x)
+  by hop: {2: {'n': 16, 'single': 0.938, 'multi': 0.688}, 3: {'n': 16, 'single': 0.875, 'multi': 0.75}, 4: {'n': 16, 'single': 1.0, 'multi': 0.938}}  [279s]
+
+=== VERDICT ===
+  glm-5.2: single-agent >= multi AND uses 0.3x fewer tokens -> paper REPRODUCED (single on the efficiency frontier); single 96% vs multi 69% @ 547/1853 tok
+  deepseek-v4-flash: single-agent >= multi AND uses 0.4x fewer tokens -> paper REPRODUCED (single on the efficiency frontier); single 94% vs multi 79% @ 703/1899 tok
