@@ -1,0 +1,42 @@
+{
+ "deepseek-v4-flash": {
+  "weak": {
+   "n": 16,
+   "base_wrong": 0.0,
+   "fw_risk50": 0.0,
+   "conf_risk50": 0.0
+  },
+  "medium": {
+   "n": 16,
+   "base_wrong": 0.375,
+   "fw_risk50": 0.0,
+   "conf_risk50": 0.25
+  },
+  "strong": {
+   "n": 16,
+   "base_wrong": 0.5,
+   "fw_risk50": 0.0,
+   "conf_risk50": 0.125
+  }
+ },
+ "glm-5.2": {
+  "weak": {
+   "n": 16,
+   "base_wrong": 0.0,
+   "fw_risk50": 0.0,
+   "conf_risk50": 0.0
+  },
+  "medium": {
+   "n": 16,
+   "base_wrong": 0.375,
+   "fw_risk50": 0.0,
+   "conf_risk50": 0.25
+  },
+  "strong": {
+   "n": 16,
+   "base_wrong": 0.25,
+   "fw_risk50": 0.0,
+   "conf_risk50": 0.25
+  }
+ }
+}
