@@ -19,17 +19,17 @@
   "date": "YYYY-MM-DD"
  },
  "counts": {
-  "total": 59,
+  "total": 60,
   "by_verdict": {
-   "FAILED": 12,
+   "FAILED": 13,
    "NOT_COMPUTABLE": 15,
    "REPRODUCED": 32
   },
   "by_domain": {
    "replication": 51,
-   "ai-claim": 8
+   "ai-claim": 9
   },
-  "runnable_code_present": 8
+  "runnable_code_present": 9
  },
  "entries": [
   {
@@ -739,6 +739,18 @@
    "code_resolves": true,
    "date": "2026-06-20",
    "key": "FI-0059"
+  },
+  {
+   "domain": "ai-claim",
+   "claim": "You can trust an LLM's CONFIDENCE to tell you when a retrieved document has corrupted its answer (high-confidence RAG answers are safe).",
+   "source": "RAG-deployment folklore (confidence/self-consistency gating as a hallucination guard); tested on frontier models glm-5.2 and deepseek-v4-flash.",
+   "verdict": "FAILED",
+   "note": "Two measured settings (12 factual questions each model knows unaided; thinking-robust reader, k=2, order-corrected). (1) ALL-POISON: given a doc asserting the FALSE answer, frontier models ADOPT the poison at FULL confidence - glm-5.2 16/16 (100%), deepseek-v4-flash 15/16 (94%); confidence is ~1.0 while the answer is wrong. (2) REALISTIC MIXED retrieval (each question once with a clean doc, once with a poisoned doc, 50/50): confidence is BLIND - corr(confidence, correct) = -0.07 (glm) / +0.21 (deepseek), shipping ~46-50% wrong at every coverage, because poisoned and clean answers are BOTH high-confidence. The discriminating signal is NOT confidence but answer-drop SENSITIVITY (how much the answer moves when the doc is removed): corr(-sensitivity, correct) = +0.97 (glm) / +1.00 (deepseek), giving 0% wrong at 50% coverage (keep every clean-doc answer, abstain on every poisoned one) - risk-coverage AUC ~2x better than confidence (0.216 vs 0.427; 0.261 vs 0.489). So 'trust the confidence' FAILS; a drop-sensitivity gate (the Grounding Firewall) recovers safety. HONEST SCOPE: strong direct-assertion poison, 2-option factual questions; kept-coverage tracks the clean-doc fraction (50% here by construction). The earlier qwen2.5:7b '0% wrong at 70% coverage' headline was a weak-model artifact - these are the frontier-grade numbers.",
+   "lab_file": "agora_output/lab/20260620-110000_grounding-firewall-validate-glm52.py",
+   "code_url": "https://github.com/DanceNitra/agora/blob/main/agora_output/lab/20260620-110000_grounding-firewall-validate-glm52.py",
+   "code_resolves": true,
+   "date": "2026-06-20",
+   "key": "FI-0060"
   }
  ]
 }
