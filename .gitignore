@@ -103,3 +103,7 @@ agora_output/**/_*.json
 /tools/.agent_activity_state.json
 /_agent_activity.log
 /_agent_activity.err
+
+/tools/.self_improvement_state.json
+/_self_improvement.log
+/_self_improvement.err
