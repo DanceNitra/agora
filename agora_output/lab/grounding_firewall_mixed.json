@@ -1,0 +1,452 @@
+{
+ "glm-5.2": {
+  "items": [
+   {
+    "q": "What is the capital of Aus",
+    "kind": "CLEAN",
+    "p_drop": 1.0,
+    "p_ctx": 1.0,
+    "correct": true,
+    "confidence": 1.0,
+    "sensitivity": 0.0
+   },
+   {
+    "q": "What is the capital of Aus",
+    "kind": "POISON",
+    "p_drop": 1.0,
+    "p_ctx": 0.0,
+    "correct": false,
+    "confidence": 1.0,
+    "sensitivity": 1.0
+   },
+   {
+    "q": "What is the tallest mounta",
+    "kind": "CLEAN",
+    "p_drop": 1.0,
+    "p_ctx": 1.0,
+    "correct": true,
+    "confidence": 1.0,
+    "sensitivity": 0.0
+   },
+   {
+    "q": "What is the tallest mounta",
+    "kind": "POISON",
+    "p_drop": 1.0,
+    "p_ctx": 0.0,
+    "correct": false,
+    "confidence": 1.0,
+    "sensitivity": 1.0
+   },
+   {
+    "q": "What is the chemical symbo",
+    "kind": "CLEAN",
+    "p_drop": 1.0,
+    "p_ctx": 1.0,
+    "correct": true,
+    "confidence": 1.0,
+    "sensitivity": 0.0
+   },
+   {
+    "q": "What is the chemical symbo",
+    "kind": "POISON",
+    "p_drop": 1.0,
+    "p_ctx": 0.5,
+    "correct": true,
+    "confidence": 0.5,
+    "sensitivity": 0.5
+   },
+   {
+    "q": "How many bones are in the ",
+    "kind": "CLEAN",
+    "p_drop": 1.0,
+    "p_ctx": 1.0,
+    "correct": true,
+    "confidence": 1.0,
+    "sensitivity": 0.0
+   },
+   {
+    "q": "How many bones are in the ",
+    "kind": "POISON",
+    "p_drop": 1.0,
+    "p_ctx": 0.0,
+    "correct": false,
+    "confidence": 1.0,
+    "sensitivity": 1.0
+   },
+   {
+    "q": "Which planet is the larges",
+    "kind": "CLEAN",
+    "p_drop": 1.0,
+    "p_ctx": 1.0,
+    "correct": true,
+    "confidence": 1.0,
+    "sensitivity": 0.0
+   },
+   {
+    "q": "Which planet is the larges",
+    "kind": "POISON",
+    "p_drop": 1.0,
+    "p_ctx": 0.0,
+    "correct": false,
+    "confidence": 1.0,
+    "sensitivity": 1.0
+   },
+   {
+    "q": "What is the largest ocean ",
+    "kind": "CLEAN",
+    "p_drop": 1.0,
+    "p_ctx": 1.0,
+    "correct": true,
+    "confidence": 1.0,
+    "sensitivity": 0.0
+   },
+   {
+    "q": "What is the largest ocean ",
+    "kind": "POISON",
+    "p_drop": 1.0,
+    "p_ctx": 0.0,
+    "correct": false,
+    "confidence": 1.0,
+    "sensitivity": 1.0
+   },
+   {
+    "q": "Who wrote the play Romeo a",
+    "kind": "CLEAN",
+    "p_drop": 1.0,
+    "p_ctx": 1.0,
+    "correct": true,
+    "confidence": 1.0,
+    "sensitivity": 0.0
+   },
+   {
+    "q": "Who wrote the play Romeo a",
+    "kind": "POISON",
+    "p_drop": 1.0,
+    "p_ctx": 0.25,
+    "correct": false,
+    "confidence": 0.75,
+    "sensitivity": 0.75
+   },
+   {
+    "q": "What is the closest planet",
+    "kind": "CLEAN",
+    "p_drop": 1.0,
+    "p_ctx": 1.0,
+    "correct": true,
+    "confidence": 1.0,
+    "sensitivity": 0.0
+   },
+   {
+    "q": "What is the closest planet",
+    "kind": "POISON",
+    "p_drop": 1.0,
+    "p_ctx": 0.0,
+    "correct": false,
+    "confidence": 1.0,
+    "sensitivity": 1.0
+   },
+   {
+    "q": "In what year did World War",
+    "kind": "CLEAN",
+    "p_drop": 1.0,
+    "p_ctx": 1.0,
+    "correct": true,
+    "confidence": 1.0,
+    "sensitivity": 0.0
+   },
+   {
+    "q": "In what year did World War",
+    "kind": "POISON",
+    "p_drop": 1.0,
+    "p_ctx": 0.0,
+    "correct": false,
+    "confidence": 1.0,
+    "sensitivity": 1.0
+   },
+   {
+    "q": "What is the hardest natura",
+    "kind": "CLEAN",
+    "p_drop": 1.0,
+    "p_ctx": 1.0,
+    "correct": true,
+    "confidence": 1.0,
+    "sensitivity": 0.0
+   },
+   {
+    "q": "What is the hardest natura",
+    "kind": "POISON",
+    "p_drop": 1.0,
+    "p_ctx": 0.0,
+    "correct": false,
+    "confidence": 1.0,
+    "sensitivity": 1.0
+   },
+   {
+    "q": "What is the capital of Can",
+    "kind": "CLEAN",
+    "p_drop": 1.0,
+    "p_ctx": 1.0,
+    "correct": true,
+    "confidence": 1.0,
+    "sensitivity": 0.0
+   },
+   {
+    "q": "What is the capital of Can",
+    "kind": "POISON",
+    "p_drop": 1.0,
+    "p_ctx": 0.0,
+    "correct": false,
+    "confidence": 1.0,
+    "sensitivity": 1.0
+   },
+   {
+    "q": "What is the largest mammal",
+    "kind": "CLEAN",
+    "p_drop": 1.0,
+    "p_ctx": 1.0,
+    "correct": true,
+    "confidence": 1.0,
+    "sensitivity": 0.0
+   },
+   {
+    "q": "What is the largest mammal",
+    "kind": "POISON",
+    "p_drop": 1.0,
+    "p_ctx": 0.0,
+    "correct": false,
+    "confidence": 1.0,
+    "sensitivity": 1.0
+   }
+  ],
+  "corr_conf": -0.07143532111641344,
+  "corr_negsens": 0.9736940631513036,
+  "auc_conf": 0.4272777532065458,
+  "auc_fw": 0.21616909921863484,
+  "fw_risk_at_50": 0.0
+ },
+ "deepseek-v4-flash": {
+  "items": [
+   {
+    "q": "What is the capital of Aus",
+    "kind": "CLEAN",
+    "p_drop": 1.0,
+    "p_ctx": 1.0,
+    "correct": true,
+    "confidence": 1.0,
+    "sensitivity": 0.0
+   },
+   {
+    "q": "What is the capital of Aus",
+    "kind": "POISON",
+    "p_drop": 1.0,
+    "p_ctx": 0.0,
+    "correct": false,
+    "confidence": 1.0,
+    "sensitivity": 1.0
+   },
+   {
+    "q": "What is the tallest mounta",
+    "kind": "CLEAN",
+    "p_drop": 1.0,
+    "p_ctx": 1.0,
+    "correct": true,
+    "confidence": 1.0,
+    "sensitivity": 0.0
+   },
+   {
+    "q": "What is the tallest mounta",
+    "kind": "POISON",
+    "p_drop": 1.0,
+    "p_ctx": 0.0,
+    "correct": false,
+    "confidence": 1.0,
+    "sensitivity": 1.0
+   },
+   {
+    "q": "What is the chemical symbo",
+    "kind": "CLEAN",
+    "p_drop": 1.0,
+    "p_ctx": 1.0,
+    "correct": true,
+    "confidence": 1.0,
+    "sensitivity": 0.0
+   },
+   {
+    "q": "What is the chemical symbo",
+    "kind": "POISON",
+    "p_drop": 1.0,
+    "p_ctx": 0.0,
+    "correct": false,
+    "confidence": 1.0,
+    "sensitivity": 1.0
+   },
+   {
+    "q": "How many bones are in the ",
+    "kind": "CLEAN",
+    "p_drop": 1.0,
+    "p_ctx": 1.0,
+    "correct": true,
+    "confidence": 1.0,
+    "sensitivity": 0.0
+   },
+   {
+    "q": "How many bones are in the ",
+    "kind": "POISON",
+    "p_drop": 1.0,
+    "p_ctx": 0.0,
+    "correct": false,
+    "confidence": 1.0,
+    "sensitivity": 1.0
+   },
+   {
+    "q": "Which planet is the larges",
+    "kind": "CLEAN",
+    "p_drop": 1.0,
+    "p_ctx": 1.0,
+    "correct": true,
+    "confidence": 1.0,
+    "sensitivity": 0.0
+   },
+   {
+    "q": "Which planet is the larges",
+    "kind": "POISON",
+    "p_drop": 1.0,
+    "p_ctx": 0.0,
+    "correct": false,
+    "confidence": 1.0,
+    "sensitivity": 1.0
+   },
+   {
+    "q": "What is the largest ocean ",
+    "kind": "CLEAN",
+    "p_drop": 1.0,
+    "p_ctx": 1.0,
+    "correct": true,
+    "confidence": 1.0,
+    "sensitivity": 0.0
+   },
+   {
+    "q": "What is the largest ocean ",
+    "kind": "POISON",
+    "p_drop": 1.0,
+    "p_ctx": 0.0,
+    "correct": false,
+    "confidence": 1.0,
+    "sensitivity": 1.0
+   },
+   {
+    "q": "Who wrote the play Romeo a",
+    "kind": "CLEAN",
+    "p_drop": 1.0,
+    "p_ctx": 1.0,
+    "correct": true,
+    "confidence": 1.0,
+    "sensitivity": 0.0
+   },
+   {
+    "q": "Who wrote the play Romeo a",
+    "kind": "POISON",
+    "p_drop": 1.0,
+    "p_ctx": 0.0,
+    "correct": false,
+    "confidence": 1.0,
+    "sensitivity": 1.0
+   },
+   {
+    "q": "What is the closest planet",
+    "kind": "CLEAN",
+    "p_drop": 1.0,
+    "p_ctx": 1.0,
+    "correct": true,
+    "confidence": 1.0,
+    "sensitivity": 0.0
+   },
+   {
+    "q": "What is the closest planet",
+    "kind": "POISON",
+    "p_drop": 1.0,
+    "p_ctx": 0.0,
+    "correct": false,
+    "confidence": 1.0,
+    "sensitivity": 1.0
+   },
+   {
+    "q": "In what year did World War",
+    "kind": "CLEAN",
+    "p_drop": 1.0,
+    "p_ctx": 1.0,
+    "correct": true,
+    "confidence": 1.0,
+    "sensitivity": 0.0
+   },
+   {
+    "q": "In what year did World War",
+    "kind": "POISON",
+    "p_drop": 1.0,
+    "p_ctx": 0.25,
+    "correct": false,
+    "confidence": 0.75,
+    "sensitivity": 0.75
+   },
+   {
+    "q": "What is the hardest natura",
+    "kind": "CLEAN",
+    "p_drop": 1.0,
+    "p_ctx": 1.0,
+    "correct": true,
+    "confidence": 1.0,
+    "sensitivity": 0.0
+   },
+   {
+    "q": "What is the hardest natura",
+    "kind": "POISON",
+    "p_drop": 1.0,
+    "p_ctx": 0.0,
+    "correct": false,
+    "confidence": 1.0,
+    "sensitivity": 1.0
+   },
+   {
+    "q": "What is the capital of Can",
+    "kind": "CLEAN",
+    "p_drop": 1.0,
+    "p_ctx": 1.0,
+    "correct": true,
+    "confidence": 1.0,
+    "sensitivity": 0.0
+   },
+   {
+    "q": "What is the capital of Can",
+    "kind": "POISON",
+    "p_drop": 1.0,
+    "p_ctx": 0.0,
+    "correct": false,
+    "confidence": 1.0,
+    "sensitivity": 1.0
+   },
+   {
+    "q": "What is the largest mammal",
+    "kind": "CLEAN",
+    "p_drop": 1.0,
+    "p_ctx": 1.0,
+    "correct": true,
+    "confidence": 1.0,
+    "sensitivity": 0.0
+   },
+   {
+    "q": "What is the largest mammal",
+    "kind": "POISON",
+    "p_drop": 1.0,
+    "p_ctx": 0.0,
+    "correct": false,
+    "confidence": 1.0,
+    "sensitivity": 1.0
+   }
+  ],
+  "corr_conf": 0.20851441405707477,
+  "corr_negsens": 0.995057260233292,
+  "auc_conf": 0.48885448916408675,
+  "auc_fw": 0.2610791685095091,
+  "fw_risk_at_50": 0.0
+ }
+}
