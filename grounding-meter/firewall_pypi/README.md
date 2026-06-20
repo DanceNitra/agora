@@ -7,8 +7,8 @@ confidence. Zero dependencies (Python stdlib only).
 (logprob-capable) model in mixed clean+poison retrieval - don't take our numbers on faith, re-run them.
 
 **v0.2** adds `gate_freeform()` for **open-ended (free-form) RAG answers**, not just A/B multiple choice -
-this is the mode for real RAG. Validated on **glm-5.2** (mixed clean/poison retrieval): drop-sensitivity
-corr with correctness **+1.00** vs confidence **-0.21**; **0% wrong at 50% coverage** (AUC 0.187 vs 0.424).
+this is the mode for real RAG. (Free-form was validated on glm-5.2 in a smaller pilot; the hardened
+headline numbers below are the **n=101** multiple-choice measurement.)
 
 ## Why
 
@@ -24,25 +24,27 @@ An answer that **flips when you remove its evidence** is grounded in the doc, no
 so if the doc is wrong, the answer is wrong, and confidence won't warn you. The firewall **abstains** on
 high-sensitivity answers.
 
-## Measured (frontier models, realistic mixed retrieval)
+## Measured (frontier models, n = 101 factual questions)
 
-Each factual question given once a **clean** doc and once a **poisoned** doc (50/50), on **glm-5.2** and
-**deepseek-v4-flash**:
+**101** factual questions, each given once a **clean** doc and once a **poisoned** doc (50/50, strong
+direct-assertion poison), 3 samples each, on **glm-5.2** and **deepseek-v4-flash** (202 items per model):
 
 | signal | glm-5.2 | deepseek-v4-flash |
 |---|---|---|
-| confidence corr with correctness | **-0.07** (blind) | **+0.21** (blind) |
-| **drop-sensitivity** corr with correctness | **+0.97** | **+1.00** |
-| confidence: wrong-rate @ 50% coverage | ~42% | ~50% |
-| **firewall: wrong-rate @ 50% coverage** | **0%** | **0%** |
-| risk-coverage AUC (lower better) | 0.216 vs 0.427 | 0.261 vs 0.489 |
+| model fooled by poison (base wrong-rate) | 29% | 40% |
+| confidence corr with correctness | **+0.30** (weak) | **+0.23** (weak) |
+| **drop-sensitivity** corr with correctness | **-0.93** | **-0.95** |
+| confidence: wrong-rate @ 50% coverage | 18.8% | 35.6% |
+| **firewall: wrong-rate @ 50% coverage** | **0.0%** (0/101, 95% CI ≤ 3.7%) | **0.0%** (0/101, ≤ 3.7%) |
 
-The firewall keeps every clean-doc answer and abstains on every poisoned one, where confidence ships ~half
-wrong (poisoned and clean answers are both high-confidence). Under **all-poison** retrieval, frontier models
-defer ~94-100% at full confidence and the firewall correctly abstains on ~everything.
+Drop-sensitivity correlates **negatively** with correctness - the more an answer depends on the retrieved
+doc, the more likely it's wrong - while confidence barely correlates at all. Ranking by lowest
+drop-sensitivity, the firewall keeps the half of answers grounded in the model's own knowledge and ships
+**0 wrong of 101** on both models (Wilson 95% upper bound 3.7%), where confidence-gating ships 19-36% wrong.
 
 **Honest scope:** strong direct-assertion poison, 2-option factual questions; the coverage you keep tracks
 the fraction of clean docs in your retrieval. The real deploy cost is one extra (context-dropped) query.
+(This n=101 measurement supersedes an earlier n=16 pilot.)
 
 ## Install
 
