@@ -255,8 +255,12 @@ class Mnemo:
                         "score": round(score, 3), "links": r["links"],
                         "reliability": round(self._reliability(r), 3),
                         "stale_derived": bool(r.get("_stale_derived"))})
+        # NOTE: recall is a READ. It nudges in-memory access value / graduation, but must NOT persist the
+        # whole store here — serializing (json.dumps) on every recall, across many agents' stores,
+        # saturated the thread pool and FROZE the world. The in-memory nudges are persisted on the next
+        # remember()/consolidate()/flush(); losing recent access metadata on a hard crash is harmless.
         if out:
-            self._save()
+            self._dirty = True   # mark for the next throttled/forced save; do NOT serialize on the read path
         return out
 
     @staticmethod
