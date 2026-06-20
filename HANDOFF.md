@@ -1,3 +1,107 @@
+# Agora — Session Handoff (2026-06-20, late)
+
+## ⏩ PASTE THIS AFTER SESSION RESTART (re-arms the 25-min dungeon/agent recheck loop)
+
+```
+/loop Resume Agora ops. FIRST read C:\Users\Danculus\agora\HANDOFF.md fully. Then RECHECK the whole system and fix anything broken: (1) verify the 5 processes are alive — brain (agora.main, exactly one :8000 listener), dungeon (mcp_server.py), tools/dungeon_canary.py, tools/agent_activity_monitor.py, tools/self_improvement_controller.py — and RELAUNCH any that died using the commands in HANDOFF.md §Relaunch; (2) confirm the dungeon is genuinely advancing with `python tools/dungeon_health.py 20 3` (loop_n must advance — do NOT trust HTTP 200, it lies); (3) confirm flags active: AGORA_SCIENTIST_LAB + AGORA_SCIENCE_GATE in server/.env, AGORA_QUIET_GENERATORS in agora-game-server/.env; (4) check production: funnel grounded/shipped, server/.methods.json Lab-run count growing, inbox NOT refilling with synthesize/deepen/dialectic churn; (5) handle any self-improvement-controller tasks in the inbox (AUTO-REBUILD / OPPORTUNITY SCAN / SELF-RESEARCH) ONE at a time, each verified before the next; (6) Telegram ONE Slovak status line only on a change/breakage. Revert on breakage. If all healthy and nothing queued, DO NOTHING extra. Re-check every 25 minutes.
+```
+
+It's a dynamic `/loop` — I self-pace at ~1500s (25 min). Telegram token is in `server/.env`; never echo it on a command line. Chat with the owner in **Slovak**; code + output **English**.
+
+---
+
+## TL;DR — where things stand
+The 8-agent organism was rebuilt today so it produces **measured value, not churn**, and a **closed
+self-improvement loop** now keeps it that way. Everything is running and watched (5 processes). Overnight it
+should produce real Lab-backed findings; the remaining bottleneck is **distribution (shipped ~1%)**, which
+needs the owner's sales step, not more agent work. **Discipline going forward: change → observe its effect →
+next. One agent/change at a time, never batch.**
+
+## Architecture (2 servers + 3 watchers = 5 processes)
+- **brain** `:8000` — FastAPI `agora.main:app`, `server/agora/`. Owns memory/trust/economy, the research organs, Telegram, the inbox.
+- **dungeon** `:5174` HTTP / `:5175` WS — `agora-game-server/mcp_server.py`, the 8 persona agents' `ambient_life` loop. Run exactly ONE; ZERO supervisors (the brain's `watch_dungeon_forever` watchdog keeps it alive).
+- **tools/dungeon_canary.py** — liveness watcher (loop_n advancing; alerts on a real freeze).
+- **tools/agent_activity_monitor.py** — production watcher (loop/grounded/lab-runs/shipped deltas every 30 min; ~3h Telegram summary; alerts frozen OR busy-but-idle).
+- **tools/self_improvement_controller.py** — the closed loop (hourly): reads `/brain/metabolism` per-organ ROI → a churning organ (>60k tok / <1 value point since last check) → queues an AUTO-REBUILD task (24h/organ cooldown); scout-freshness; 12h OPPORTUNITY SCAN (repos+forums+where-we-fit); 24h OS SELF-AUDIT. It DETECTS + queues; Claude does the rebuild in the /loop.
+- LLM: brain reasoning = `glm-5.2:cloud` via `localhost:11434/v1`; dungeon = `deepseek-v4-flash` @ ollama.com; embeddings local `nomic-embed-text`. **Validate serious work on glm-5.2, never qwen-7b.** glm-5.2 cloud route caps concurrency ~3.
+
+## Process IDs at handoff (will change on relaunch — match by CommandLine, not PID)
+brain `agora.main` 27876 · `mcp_server.py` 71716 · `dungeon_canary.py` 74452 · `agent_activity_monitor.py` 63592 · `self_improvement_controller.py` 47820.
+
+## What was done today (all live, each verified ONE-AT-A-TIME)
+**9-step agent redesign** (full tracker: `agora_output/strategy/agent_redesign_tracker.md`):
+1. **Rooke** — `execution/scientist.py`: a hypothesis runs a REAL minimal Lab model (severe-test, pre-committed, relevance-gated) or it isn't recorded (verdict NONE). Flag `AGORA_SCIENTIST_LAB=1`.
+2. **Voss** — `execution/quality_gate.py`: vault entry needs REAL grounding (citation shape OR measured number), never the literal word "Source:". Flag `AGORA_SCIENCE_GATE=1`.
+3. **Aldric** — `execution/methods.py`: fixed the matcher to map by MECHANISM/claim-shape (library already had 32 templates; the matcher's none-bias, not coverage, was the bottleneck); added gap-logging; dropped a buggy + a duplicate template.
+4. **funnel honesty** — `execution/funnel.py`: "grounded" now requires a real citation OR measured result (not the words Hypothesis/Falsifier/Source:). 7369 → ~2150.
+5. **anti-FAILED** — `execution/metabolism.py`: FAILED == REPRODUCED (both 2.5; was 4.0 vs 2.0) → no incentive to manufacture failures.
+6. **Orin** — `execution/scientist.py`: hypotheses must name a concrete MECHANISM + predicted direction a minimal model can measure (3/4 now match a template vs 2/5).
+7. **Mira** — `api/agent_os_api.py` promote-findings: attaches an honest **Evidence grade** (HIGH/MODERATE/LOW) + `grade-<level>` tag to each curated note.
+8. **Kael** — `api/agent_os_api.py`: credibility audit flags single/underpowered/preliminary studies as `low-credibility`, caps a HIGH grade to MODERATE.
+9. **Wren** — `execution/hypothesis_induction.py`: each hypothesis pass leads with the vault's widest structural hole (Burt brokerage) as a cross-domain theme for Orin (forced collision), charted on use. Surfaced Business↔Health (0 bridges).
+**+ noise quieted** (`AGORA_QUIET_GENERATORS=1` in `agora-game-server/.env`): the 3 churn generators (synthesize/deepen/dialectic) skip; the value path stays live.
+**+ self-improvement controller** built + running (the closed loop above).
+
+**Verified working (30-min check):** noise stopped (inbox churn 27→12); +11 grounded; the severe-test path
+produces Lab-backed cross-domain findings — e.g. "MDD cytokines power-law" → `Lab[heavy-tail-mean] CLT-slowness 2.29`;
+Wren's Business+Health hole → "corporate wellness tipping point" SUPPORTED.
+
+### ⚠️ Gotchas that cost time today
+- **Methods ledger is `server/.methods.json`** (~15 runs), NOT repo-root `agora/.methods.json` (empty). A "methods runs = 0" scare was reading the wrong path. The monitors were fixed to `server/.methods.json` (commit 16326f4).
+- **`tools/dungeon_health.py` needs a ≥18–20s window.** An 8s window gives a false "not progressing" because LLM quests cause transient stalls. Use `python tools/dungeon_health.py 20 3`; the canary multi-samples and is authoritative. **Never trust HTTP 200** — it stays 200 on its own thread even when the agent loop is frozen.
+
+## §Relaunch (if a process is dead — start detached + hidden, from `C:\Users\Danculus\agora`)
+```powershell
+# brain:
+$wd="C:\Users\Danculus\agora\server"; $env:PYTHONPATH="."; Start-Process python -ArgumentList "-m","uvicorn","agora.main:app","--host","127.0.0.1","--port","8000" -WorkingDirectory $wd -WindowStyle Hidden -RedirectStandardOutput "$wd\_brain.log" -RedirectStandardError "$wd\_brain.err"
+# dungeon (run exactly ONE; the brain watchdog also relaunches it):
+$wd="C:\Users\Danculus\agora\agora-game-server"; Start-Process python -ArgumentList "-u","mcp_server.py" -WorkingDirectory $wd -WindowStyle Hidden -RedirectStandardOutput "$wd\_dungeon.log" -RedirectStandardError "$wd\_dungeon.err"
+# each watcher — replace <NAME>:  dungeon_canary | agent_activity_monitor | self_improvement_controller
+$wd="C:\Users\Danculus\agora"; Start-Process python -ArgumentList "-u","tools\<NAME>.py" -WorkingDirectory $wd -WindowStyle Hidden -RedirectStandardOutput "$wd\_<NAME>.log" -RedirectStandardError "$wd\_<NAME>.err"
+```
+After any brain/dungeon relaunch: verify health 200 + exactly ONE `:8000` listener + ONE `mcp_server.py` + ZERO supervisors:
+```powershell
+(Get-NetTCPConnection -LocalPort 8000 -State Listen).OwningProcess | Select-Object -Unique
+Get-CimInstance Win32_Process -Filter "name like '%python%'" | Where-Object { $_.CommandLine -match 'mcp_server|dungeon_canary|agent_activity_monitor|self_improvement_controller|agora.main' } | Select-Object ProcessId, CommandLine
+```
+
+## Health-check one-liners
+```
+curl -s http://127.0.0.1:8000/api/v1/health
+curl -s http://127.0.0.1:5174/ -o NUL -w "%{http_code}\n"
+python tools/dungeon_health.py 20 3
+```
+Owner-facing surfaces: `GET .../brain/telegram-feed?n=8` · `.../brain/funnel` · `.../brain/metabolism` · `.../brain/claude-inbox` · `.../brain/scout/status`.
+
+## Pending / next (one at a time, change→observe→next)
+- **`match` organ** = the top live ROI-0 churner (~7M tok, value 0 — the matcher calls medium-tier glm-5.2 every attempt). Fix = cheap-first / cache + credit its value. **Do carefully — the matcher works now (3/4); don't break it.** The controller will also flag it.
+- **Distribution** (curated→shipped ~1%) is THE bottleneck — needs the owner-as-salesperson step. Bets: mem0 AccessStore PR (built + GATED in `agora_output/outreach/mem0-accessstore-pr/`, open only when mem0 #147 merges + owner says go); grounding-firewall n=101 published; folklore-index live (HF Danchi17 + PyPI + Zenodo).
+- TrustLens Wilson-bound helper — prepare when mem0 #147 merges.
+- Handle controller-queued inbox tasks (AUTO-REBUILD / OPPORTUNITY SCAN / SELF-RESEARCH) as they appear.
+
+## Hard rules (do not forget)
+- **Vault is private + fragile**: NEVER `git add -A` / `git add <folder>` / `git reset` in `C:/Users/Danculus/my-second-brain` (~380 notes have NTFS-illegal `:` names → staged as deletions). Push ONLY via `tools/safe_vault_push.py`. Public output goes to the `agora` repo `public/` or gated GitHub posts — never the vault.
+- **Outreach / press / PRs are GATED**: nothing goes out without the owner's approval, and a **Slovak briefing first** (context, their question, our answer, how we use it).
+- **Verify measured numbers vs the source lab** (`.lab.json` / re-run) before ANY public citation.
+- **Code + public output in English; Slovak only in chat.**
+- **Secrets in gitignored `.env`**; never echo the Telegram token on a command line.
+- **Small reversible commits**; one self-upgrade per cycle; `py_compile` + verify both servers 200 before commit; **revert on breakage**.
+- **Severe-test rule**: a hypothesis/replication ships only WITH a runnable Lab baseline measured in the same cycle.
+- **Serious models** (glm-5.2 / deepseek), never weak local qwen-7b. HF account = **Danchi17** (not the dancenitra GitHub handle).
+- **change → observe → measure → next.** One agent/change at a time; do NOT batch (owner pushback this session).
+
+## Baseline (compare overnight)
+`agora_output/strategy/overnight_baseline_20260620.md` — ~21:15: inbox churn ~12–15, methods runs (`server/.methods.json`) ~15, funnel grounded ~2150 / shipped 33. Overnight target: methods-runs and grounded climb, shipped flat (distribution is the owner's step), inbox does NOT refill with synthesize/deepen churn.
+```
+
+
+---
+---
+
+# 📚 FULL PRIOR HISTORY (everything before 2026-06-20 — preserved, do not delete)
+
+> The section above is the freshest state. Everything below is the accumulated handoff history from all prior sessions, kept verbatim.
+
 # AGORA — SESSION HANDOFF
 
 > Resume doc for a fresh Claude Code session. Chat in **Slovak**; code + user-facing strings **English**.
