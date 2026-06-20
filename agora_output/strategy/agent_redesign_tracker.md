@@ -48,7 +48,18 @@ formatted churn. One agent per cycle, flag-gated + reversible (CLAUDE.md rules).
   single underpowered/preliminary study (not lab-measured/meta-analytic/replicated/pre-registered) is
   flagged `low-credibility`, gets a caveat, and a HIGH grade is capped to MODERATE. Calibration verified.
   (claim-gap retrieval part deferred - depends on Wren's structural holes.)
-- [ ] **Wren** (Cartographer) — ranked structural-hole list that feeds Orin's bridges + forced-collision.
+- [x] **Wren** (Cartographer) — DONE 2026-06-20 (LAST): structural-hole analysis (Burt brokerage, already
+  existed) now WIRED into the hypothesis loop - each pass leads with the vault's widest hole as a
+  cross-domain theme for Orin (forced-collision), charted on use so it advances. OBSERVED: surfaced
+  Business<->Health&Medicine (0 bridges).
+
+## ✅ AGENT REDESIGN COMPLETE (9/9) — 2026-06-20
+Rooke, Voss, Aldric, funnel, anti-FAILED, Orin, Mira, Kael, Wren — all live, each verified one-at-a-time
+(change→observe→commit). The severe-test rule is in executing code; the gate enforces real grounding; the
+matcher finds the right experiment; the metric is honest; FAILED can't be manufactured; hypotheses are
+mechanism-explicit; curated notes carry an evidence GRADE + credibility flag; structural holes feed
+cross-domain hypotheses. Noise generators quieted. **Next: measure the overnight output (the value test),
+THEN any remaining polish.**
 
 ## Overnight run (2026-06-20, owner: "dorobme to vsetko a nechame to pracovat cez noc")
 The 4 generator agents' NOISE is quieted at the source (flag `AGORA_QUIET_GENERATORS=1`): the 3 dominant
