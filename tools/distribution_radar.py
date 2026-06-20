@@ -5,8 +5,9 @@ Distribution Desk (which submits OUR posts to venues): the Radar PULLS live thre
 fit x recency x engagement, and drafts an angle + which of our assets to bring. The owner reviews and
 posts (GATED - this never posts anything).
 
-Sources in v0.1: Hacker News (free Algolia API, no auth) + GitHub issues (via gh, already authed here).
-Reddit/X are deferred (Reddit 403s our env; X has no free API) - flagged honestly in the output.
+Sources: Hacker News (free Algolia API, no auth) + GitHub issues (via gh, already authed here) +
+Reddit (app-only OAuth read, free tier, creds in server/.env). X deferred (no free search API).
+Reddit is READ-ONLY discovery; we never post (the owner posts manually) - ToS-compliant.
 
 Usage:  python tools/distribution_radar.py            # last 30 days, top opportunities
 """
@@ -26,6 +27,10 @@ HN_MAX_AGE_DAYS = 5      # HN threads die within days; commenting later = nobody
 HN_MIN_POINTS = 15       # real audience
 GH_MIN_COMMENTS = 1      # a genuine discussion, not a solo dump
 JUNK_REPO_RE = re.compile(r"(intern|bootcamp|camp|playbook|test-|-test|demo|tutorial|course|assignment|homework|study|sandbox|practice|example)", re.I)
+REDDIT_MAX_AGE_DAYS = 14   # subreddit threads stay active longer than HN (days, not hours)
+REDDIT_MIN_UPS = 5         # a real thread, not a 1-upvote drop
+REDDIT_MIN_COMMENTS = 3    # OR this many comments = a live discussion
+ENV_PATH = os.path.join(ROOT, "server", ".env")
 
 # our real, defensible assets mapped to the conversations they speak to
 TOPICS = [
@@ -120,12 +125,90 @@ def gh_search(topic, since_date):
     return out, None
 
 
+_REDDIT_TOKEN = None
+
+
+def _load_reddit_creds():
+    cid = os.environ.get("AGORA_REDDIT_CLIENT_ID")
+    csec = os.environ.get("AGORA_REDDIT_CLIENT_SECRET")
+    if cid and csec:
+        return cid, csec
+    try:                                          # read from gitignored server/.env (append-safe, no echo)
+        with open(ENV_PATH, "r", encoding="utf-8") as f:
+            for line in f:
+                line = line.strip()
+                if line.startswith("AGORA_REDDIT_CLIENT_ID="):
+                    cid = line.split("=", 1)[1].strip()
+                elif line.startswith("AGORA_REDDIT_CLIENT_SECRET="):
+                    csec = line.split("=", 1)[1].strip()
+    except Exception:
+        pass
+    return cid, csec
+
+
+def _reddit_token():
+    """App-only OAuth (client_credentials) for a confidential 'script' app -> read-only bearer token."""
+    global _REDDIT_TOKEN
+    if _REDDIT_TOKEN:
+        return _REDDIT_TOKEN
+    cid, csec = _load_reddit_creds()
+    if not (cid and csec):
+        return None
+    import base64
+    auth = base64.b64encode(("%s:%s" % (cid, csec)).encode()).decode()
+    data = urllib.parse.urlencode({"grant_type": "client_credentials"}).encode()
+    req = urllib.request.Request("https://www.reddit.com/api/v1/access_token", data=data,
+                                 headers={"Authorization": "Basic %s" % auth, "User-Agent": UA["User-Agent"]})
+    try:
+        res = json.loads(urllib.request.urlopen(req, timeout=20).read())
+        _REDDIT_TOKEN = res.get("access_token")
+    except Exception:
+        _REDDIT_TOKEN = None
+    return _REDDIT_TOKEN
+
+
+def reddit_search(topic, since_ts):
+    """Reddit via app-only OAuth (read-only): recent posts matching the query, gated by engagement+recency.
+    Read-only discovery only - we NEVER post here (the owner posts manually); ToS-compliant per the
+    Responsible Builder Policy (low-volume, non-commercial, no automated posting/voting)."""
+    out = []
+    tok = _reddit_token()
+    if not tok:
+        return out, "reddit: no token (set AGORA_REDDIT_CLIENT_ID/SECRET in server/.env)"
+    url = ("https://oauth.reddit.com/search?" + urllib.parse.urlencode({
+        "q": topic["q"], "sort": "relevance", "t": "month", "limit": 12, "type": "link"}))
+    hdr = {"Authorization": "bearer %s" % tok, "User-Agent": UA["User-Agent"]}
+    try:
+        r = json.loads(urllib.request.urlopen(urllib.request.Request(url, headers=hdr), timeout=20).read())
+    except Exception as e:
+        return out, "reddit error: %s" % e
+    for c in r.get("data", {}).get("children", []):
+        d = c.get("data", {})
+        title = d.get("title") or ""
+        if not title:
+            continue
+        text = (title + " " + (d.get("selftext") or "")).lower()
+        if not any(k in text for k in topic["kw"]):
+            continue
+        age = (time.time() - d.get("created_utc", time.time())) / 86400.0
+        ups = d.get("ups", 0) or 0
+        ncom = d.get("num_comments", 0) or 0
+        if age > REDDIT_MAX_AGE_DAYS or (ups < REDDIT_MIN_UPS and ncom < REDDIT_MIN_COMMENTS):
+            continue                              # stale or no audience -> not actionable
+        score = (ups + 2 * ncom) * _recency_weight(age)
+        out.append({"src": "Reddit", "title": ("r/%s: %s" % (d.get("subreddit"), title))[:140],
+                    "url": "https://www.reddit.com" + (d.get("permalink") or ""),
+                    "engagement": "%d ups / %d comments" % (ups, ncom),
+                    "age_days": round(age, 1), "score": round(score, 1)})
+    return out, None
+
+
 def main():
     since_ts = int(time.time() - WINDOW_DAYS * 86400)
     since_date = time.strftime("%Y-%m-%d", time.localtime(since_ts))
     opportunities, errors = [], []
     for topic in TOPICS:
-        for fn, arg in ((hn_search, since_ts), (gh_search, since_date)):
+        for fn, arg in ((hn_search, since_ts), (gh_search, since_date), (reddit_search, since_ts)):
             hits, err = fn(topic, arg)
             if err:
                 errors.append(err)
@@ -144,14 +227,14 @@ def main():
     os.makedirs(OUT_DIR, exist_ok=True)
     payload = {"generated_window_days": WINDOW_DAYS, "crucible": CRUCIBLE,
                "note": "GATED - draft angles for the owner to review and post; this tool never posts. "
-                       "Reddit/X deferred (Reddit 403s our env; X has no free API).",
+                       "Sources: HN + GitHub + Reddit (app-only OAuth, read-only). X deferred (no free API).",
                "errors": errors, "opportunities": ranked}
     with open(os.path.join(OUT_DIR, "radar_opportunities.json"), "w", encoding="utf-8") as f:
         json.dump(payload, f, indent=1, ensure_ascii=False)
 
     print("=" * 70)
     print("DISTRIBUTION RADAR - live conversations to join (last %d days)" % WINDOW_DAYS)
-    print("GATED: draft angles only; the owner posts. Reddit/X deferred (auth).")
+    print("GATED: draft angles only; the owner posts. Sources: HN + GitHub + Reddit.")
     print("=" * 70)
     if not ranked:
         print("No fitting live threads found in the window (try widening WINDOW_DAYS or topics).")
