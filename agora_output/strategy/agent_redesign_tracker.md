@@ -43,6 +43,17 @@ formatted churn. One agent per cycle, flag-gated + reversible (CLAUDE.md rules).
   effect-size/credibility audit (flag N<50 / no-prereg as low-credibility).
 - [ ] **Wren** (Cartographer) — ranked structural-hole list that feeds Orin's bridges + forced-collision.
 
+## Overnight run (2026-06-20, owner: "dorobme to vsetko a nechame to pracovat cez noc")
+The 4 generator agents' NOISE is quieted at the source (flag `AGORA_QUIET_GENERATORS=1`): the 3 dominant
+inbox-churn generators (`_queue_insight_theme`=synthesize, `_queue_deepening`=deepen, `_queue_dialectic`)
+skip. The VALUE path stays live: hypothesize→severe-test (Rooke), replication, scout outreach, belief
+challenge. Combined with the 5 brain-side rebuilds (severe-test, science gate, fixed matcher, honest funnel,
+anti-manufactured-FAILED), the system should produce MEASURED findings overnight, not churn. Verified: dungeon
+1.1s/loop advancing, brain healthy, canary watching. **Per-agent QUALITY polish (Mira GRADE cards, Orin
+competing-hypotheses, Kael effect-size audit, Wren structural-holes) is the listed-but-unchecked work below —
+deliberately deferred: shipping unverified deep rewrites to run unattended overnight is the wrong risk.
+Measure the overnight output FIRST, then polish.**
+
 ## Deferred (critique: unproven meta-structure / weakest)
 - **Elara** — redesign is pure bookkeeping (can't earn value under the new gate); keep for the 3D world only
   until there's measured evidence it reduces FAILED rate.
