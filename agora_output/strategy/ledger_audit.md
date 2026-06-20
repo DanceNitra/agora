@@ -20,12 +20,16 @@ holds) | DOWNGRADE (verdict not supported -> honestly revise) | EMBED (computati
 - [ ] **Reranker on top of first-stage retrieval helps** — re-verify. PRIORITY: med.
 
 ## Crucible ledger (public/crucible/crucible.json)
-- [ ] **Emergent abilities are genuine sharp transitions** — HIGH PROFILE (Schaeffer-style mirage claim). Re-verify the metric-discontinuity model is robust; embarrassing if thin. PRIORITY: HIGH (first target).
+- [x] **Emergent abilities are genuine sharp transitions** — CONFIRMED FAILED (audited 2026-06-20). Original reproduces (6.7x sharper from the exact-match metric alone, onset drifts -0.07->+5.58 with no skill change); parameter sweep: metric-induced sharpening holds in 9/9 combos (always >1x, >2x in the majority), magnitude scales with answer length + skill smoothness -> robust, not cherry-picked. Verdict unchanged, nothing to republish. (lab 20260619-185500)
 - [ ] **Real-world networks are scale-free** — note says n=20,000 CSN fit; likely solid, confirm. PRIORITY: low.
 - [ ] **Metcalfe's Law n^2** — computational; confirm model. PRIORITY: low.
 - [ ] **Diversity trumps ability (Hong-Page)** — computational; confirm. PRIORITY: low.
 - [ ] **Dunning-Kruger is an artifact** — confirm the autocorrelation/noise model. PRIORITY: med.
 - [ ] **Hot-hand fallacy (Gilovich) reversed (Miller-Sanjurjo)** — computational; confirm. PRIORITY: low.
 
-**Next target:** Emergent-abilities mirage (HIGH profile, FAILED) — re-verify the discontinuity-from-metric
-model on a clean setup before it ever anchors a public claim.
+**Next target:** the remaining COMPUTATIONAL FAILED entries (Dunning-Kruger artifact, best-of-many FDR,
+Metcalfe, scale-free, hot-hand, diversity) — no LLM, so zero dungeon contention; audit these first. DEFER
+the LLM-needing RAG ones (chunk-size, reranker, doc-weighing) to paced slots when the dungeon is idle, so
+they don't starve the agents' model.
+
+**Audit log:** 2026-06-20 emergent-abilities -> CONFIRMED FAILED (robust under param sweep).
