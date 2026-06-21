@@ -10,6 +10,44 @@ It's a dynamic `/loop` — I self-pace at ~1500s (25 min) and actively produce e
 
 ---
 
+## 🌙 OVERNIGHT 2026-06-21 — what the loop produced (newest; read this first)
+
+System healthy all night (5/5 processes, brain ticking, dungeon loop_n advancing, inbox stayed empty —
+no controller AUTO-REBUILD/SCAN tasks fired). Telegram throttled to **breakthroughs only** (owner rule).
+
+**🔌 DISTRIBUTION — the night's headline (owner steered this):**
+- **Reddit is now wired into `tools/distribution_radar.py`** (`reddit_search()`, commit **f1516d6**):
+  app-only OAuth (`client_credentials`, a **script** app), read-only discovery. Creds in gitignored
+  `server/.env` (`AGORA_REDDIT_CLIENT_ID` / `AGORA_REDDIT_CLIENT_SECRET`). Decision: **owner posts MANUALLY**
+  (copy-paste), we NEVER auto-post (ToS + ban risk). Reddit is by far the best surface (live r/Rag,
+  r/LangChain, r/LLMDevs threads vs stale HN/GitHub).
+- Fixed a **stale radar hook** (commit **15a8c43**): the multi-agent topic still served the old
+  NOT_COMPUTABLE verdict; updated to the current FI-0052 MuSiQue result.
+- **2 GATED paste-ready Reddit comments waiting for owner approval** in `agora_output/distribution/`:
+  (1) `20260621_rRag-chunking-failure-modes_paste-ready.md` (chunk-size "smaller is better" = FAILED),
+  (2) `20260621_rLangChain-single-vs-multi-agent_paste-ready.md` (single-agent beats multi at ~3x lower
+  cost, FI-0052). Both numbers verified vs source. **Owner: review, then paste manually if good.**
+- Note: the **grounding-firewall is already hardened to n=101** (FI entry, 2026-06-20: 0% wrong @ 50%
+  coverage, Wilson 95% upper bound 3.7%) — citable now WITH that caveat. The old "n=16" warning is moot.
+
+**🔬 SEVERE-TESTED FINDINGS (each = real Methods-Lab run + pre-committed falsifier; vault notes pushed):**
+1. `6a4d8f` — O-ring automation flip: ~9% skill atrophy flips a human from wage complement to substitute; two-parameter (deskilling × substitutability) phase boundary.
+2. `af3c04` 📱 — **Self-consistency (majority-vote) AMPLIFIES a coherent misconception**: accuracy ↓ with k while agreement stays high+flat (84% agree / 4% correct); cause = error *concentration* (control: spread errors → Condorcet helps).
+3. `d67a36`/`037c3f` — Algorithmic pricing collusion is a **sharp δ-threshold** (~0.8, rise 10× steeper than linear); replicates Calvano 2020 as a minimal model.
+4. `133313` 📱 — **AI↔human-verification coupling → catastrophic-collapse threshold**: graceful below q~0.3, first-order cliff above (excess 0.08→0.24, collapses at lower stress); Buldyrev applied to AI oversight.
+5. `56e5de` — Optimal forgetting mis-read as miscalibration: perfect-memory Bayes is ~chance in a drift world; λ*<1 buys +23–44%, yet a stationary audit flags it "conservative". Extends the calibration thesis.
+6. `35a748`/`cbc52d` — Demand-driven memory store self-organizes to a scale-free critical attractor, but at τ≈1.70 (NOT canonical BTW 1.5); honest split verdict; mnemo hypothesis.
+7. `6e3832` — Inequality ≠ merit: identical agents → top-1% owns 64% from super-linear cumulative advantage (control accel=0 → Gini 0.11).
+8. `48c213` 📱 — **Multi-proxy basket helps only if gaming costs are uniform**: low dispersion → optimal ~15 proxies; high dispersion → K*=1 (one hard-to-game metric beats the basket). Goodhart/alignment.
+9. `7a4558` — NULL (clean FAILED): quenched disorder did NOT open a Griffiths band in a minimal contagion (no broadening even at max disorder/N=1500; control validated). Threshold-smearing is not automatic.
+
+**⏳ STILL PENDING (deferred all night ON PURPOSE — needs owner + a brain restart):**
+- The **`match`-organ ROI fix** (top HANDOFF item): ~7M tok at value 0 (matcher hits glm-5.2 every call).
+  I did NOT touch it overnight — it needs a brain restart + an observe-the-effect cycle the owner should
+  watch (it "works now 3/4"; don't break it autonomously at night). **Do this with the owner.**
+
+---
+
 ## TL;DR — where things stand
 The 8-agent organism was rebuilt today so it produces **measured value, not churn**, and a **closed
 self-improvement loop** now keeps it that way. Everything is running and watched (5 processes). Overnight it
