@@ -19,12 +19,15 @@ CSD early-warning run-up, targeted-percolation, diversity-vs-ability search).
 from __future__ import annotations
 
 import json
+import os
 import re
 import time
 from pathlib import Path
 
 _STORE = Path(__file__).resolve().parents[2] / ".methods.json"
 _GAPS = Path(__file__).resolve().parents[2] / ".methods_gaps.json"
+_MATCH_CACHE = Path(__file__).resolve().parents[2] / ".methods_cache.json"
+_MATCH_TTL_S = 6 * 3600   # AGORA_MATCH_CACHE: skip the ~2k-token catalog LLM call when a theme (or a 'no template' decision) recurs within this window
 
 # ── Template registry ───────────────────────────────────────────────────────
 # Each: description (for the matcher LLM), params schema {name: (type, min, max, default)}
@@ -412,11 +415,55 @@ def run_method(template: str, params: dict, claim: str = "", requester: str = ""
     return {"status": "ok", **entry}
 
 
+def _norm_theme(t: str) -> str:
+    return " ".join((t or "").lower().split())[:200]
+
+
+def _match_cache_get(key: str):
+    """Return a fresh cached match decision for this normalized theme, or None."""
+    try:
+        cache = json.loads(_MATCH_CACHE.read_text(encoding="utf-8"))
+    except Exception:
+        return None
+    e = cache.get(key)
+    if e and (time.time() - e.get("ts", 0)) < _MATCH_TTL_S:
+        return e.get("res")
+    return None
+
+
+def _match_cache_put(key: str, res: dict):
+    """Persist a GENUINE matcher decision (a real template match, or a real 'no template') so the
+    same theme doesn't re-pay the ~2k-token catalog LLM call within the TTL. Transient LLM/parse
+    failures are NOT cached (caller only calls this on a genuine decision)."""
+    try:
+        cache = json.loads(_MATCH_CACHE.read_text(encoding="utf-8"))
+    except Exception:
+        cache = {}
+    cache[key] = {"ts": time.time(), "res": res}
+    now = time.time()
+    cache = {k: v for k, v in cache.items() if now - v.get("ts", 0) < _MATCH_TTL_S}   # prune stale
+    if len(cache) > 2000:
+        cache = dict(sorted(cache.items(), key=lambda kv: kv[1].get("ts", 0))[-2000:])
+    try:
+        _MATCH_CACHE.write_text(json.dumps(cache), encoding="utf-8")
+    except Exception:
+        pass
+
+
 async def match_and_run(theme: str, requester: str = "") -> dict:
     """Map a free-text hypothesis theme onto a template + params via the cheap LLM, then run it.
-    Agents supply only the THEME; the LLM supplies only PARAMETERS — never code."""
+    Agents supply only the THEME; the LLM supplies only PARAMETERS — never code.
+    AGORA_MATCH_CACHE (default ON; set =0 to disable): a recurring theme — or a recurring genuine
+    'no template' decision — short-circuits the (static-catalog) LLM call, the dominant cost of this
+    organ; matching LOGIC is unchanged (the LLM still decides on every cache MISS)."""
     import asyncio as _aio
     from agora.execution.llm_client import call_llm
+    use_cache = os.getenv("AGORA_MATCH_CACHE", "1") != "0"
+    ckey = _norm_theme(theme)
+    if use_cache:
+        cached = _match_cache_get(ckey)
+        if cached is not None:
+            return {**cached, "cached": True}
     cat = "\n".join(f"- {c['name']}: {c['description'][:180]} | params: "
                     f"{', '.join(c['params'])}" for c in catalog())
     sysmsg = ("You map a research hypothesis to the experiment template that could TEST it. Each template "
@@ -437,17 +484,22 @@ async def match_and_run(theme: str, requester: str = "") -> dict:
     raw = (await _aio.to_thread(call_llm, sysmsg, usr, "medium", 0.45, 700)) or ""
     m = re.search(r"\{.*\}", raw, re.DOTALL)
     if not m:
-        return {"status": "no_match", "raw": raw[:160]}
+        return {"status": "no_match", "raw": raw[:160]}   # transient empty completion -> do NOT cache
     try:
         d = json.loads(m.group(0))
     except Exception:
-        return {"status": "no_match"}
+        return {"status": "no_match"}                     # parse failure -> do NOT cache
     tpl = (d.get("template") or "").strip()
     if tpl not in TEMPLATES:
         _log_gap(theme)
-        return {"status": "no_match", "why": d.get("why", "")}
+        out = {"status": "no_match", "why": d.get("why", "")}
+        if use_cache:
+            _match_cache_put(ckey, out)                   # genuine 'no template' decision -> cache
+        return out
     res = await _aio.to_thread(run_method, tpl, d.get("params") or {}, theme, requester)
     res["why"] = d.get("why", "")
+    if use_cache:
+        _match_cache_put(ckey, res)                       # genuine match -> cache
     return res
 
 
