@@ -15,6 +15,7 @@ turning the dormant 8489-finding corpus into a hypothesis engine.
 """
 from __future__ import annotations
 
+import os
 import re
 
 import numpy as np
@@ -123,8 +124,26 @@ async def gather_hypothesis_clusters(db, sample: int = 1200, top_k: int = 6) -> 
     sims = v @ v.T
     np.fill_diagonal(sims, -1.0)
 
+    # NOVELTY FILTER (AGORA_NOVELTY_FILTER, default ON; =0 disables): collapse near-identical findings
+    # (re-measurements of the SAME phenomenon, cos>0.93) to ONE representative so the long tail of DISTINCT
+    # findings can seed clusters instead of being drowned by thousands of duplicates — the root cause of the
+    # "8705 findings -> only 3 hypotheses" funnel. The 0.93 threshold is high enough to leave the
+    # 0.50<cos<0.88 cluster NEIGHBOURS intact (it removes only near-exact duplicates), so it cannot starve
+    # cluster formation. It is a decorrelation of the discovery pool -> higher effective diversity.
+    absorbed: set[int] = set()
+    if os.getenv("AGORA_NOVELTY_FILTER", "1") != "0":
+        for i in sorted(range(len(finds)), key=lambda k: len(finds[k]["content"]), reverse=True):
+            if i in absorbed:                                  # i is itself a duplicate of an earlier-kept rep
+                continue
+            for j in np.where(sims[i] > 0.93)[0].tolist():     # near-exact re-measurements of representative i
+                if j != i and j not in absorbed:
+                    absorbed.add(j)
+        if absorbed:
+            print(f"[novelty-filter] collapsed {len(absorbed)} near-duplicate findings; "
+                  f"{len(finds) - len(absorbed)} distinct kept of {len(finds)}", flush=True)
+
     existing = await _existing_hypothesis_wordsets(db)
-    used: set[int] = set()
+    used: set[int] = set(absorbed)                             # near-duplicate re-measurements excluded from seeds AND neighbours
     clusters = []
     for _ in range(top_k * 3):                              # extra rounds: dup/used clusters are skipped
         if len(clusters) >= top_k:
