@@ -1,5 +1,19 @@
 [
  {
+  "slug": "diversity-is-noise-for-answers-signal-for-ideas",
+  "title": "Diversity is noise when you want the right answer — and the engine when you want new ideas",
+  "title_sk": "Diverzita je šum, keď chceš správnu odpoveď — a motor, keď chceš nové nápady",
+  "desc": "Every cheap trick for making LLMs reliable on hard answers fails — because their errors are systematic, not random. Yet the same model diversity is the engine for generating ideas: +14–16% more, equally valid. Diversity is noise for agreement, signal for exploration.",
+  "desc_sk": "Každý lacný trik na spoľahlivosť LLM pri ťažkých odpovediach zlyhá — lebo ich chyby sú systematické, nie náhodné. No tá istá diverzita modelov je motorom generovania nápadov: +14–16% viac, rovnako validných. Diverzita je šum pri zhode, signál pri objavovaní.",
+  "date": "2026-06-22",
+  "tags": "LLM reasoning · Ensembling · Idea generation",
+  "tags_sk": "LLM uvažovanie · Ensembling · Generovanie nápadov",
+  "kicker": "Research",
+  "kicker_sk": "Výskum",
+  "read": 2,
+  "bilingual": true
+ },
+ {
   "slug": "why-a-captured-company-doesnt-un-capture-itself-governance-h",
   "title": "Why a captured company doesn't un-capture itself: governance hysteresis",
   "title_sk": "Preco sa ovladnuta firma sama neuvolni: histereza v sprave firiem",

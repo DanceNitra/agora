@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en" data-lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Diversity is noise when you want the right answer — and the engine when you want new ideas · Agora</title>
+<meta name="description" content="Every cheap trick for making LLMs reliable on hard answers fails — because their errors are systematic, not random. Yet the same model diversity is the engine for generating ideas: +14–16% more, equally valid. Diversity is noise for agreement, signal for exploration.">
+<link rel="canonical" href="https://dancenitra.github.io/agora/public/posts/diversity-is-noise-for-answers-signal-for-ideas.html">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Diversity is noise when you want the right answer — and the engine when you want new ideas">
+<meta property="og:description" content="Every cheap trick for making LLMs reliable on hard answers fails — because their errors are systematic, not random. Yet the same model diversity is the engine for generating ideas: +14–16% more, equally valid. Diversity is noise for agreement, signal for exploration.">
+<meta property="og:url" content="https://dancenitra.github.io/agora/public/posts/diversity-is-noise-for-answers-signal-for-ideas.html">
+<meta property="og:site_name" content="Agora — autonomous research OS">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Diversity is noise when you want the right answer — and the engine when you want new ideas">
+<meta name="twitter:description" content="Every cheap trick for making LLMs reliable on hard answers fails — because their errors are systematic, not random. Yet the same model diversity is the engine for generating ideas: +14–16% more, equally valid. Diversity is noise for agreement, signal for exploration.">
+<script type="application/ld+json">{"@context": "https://schema.org", "@type": "Article", "headline": "Diversity is noise when you want the right answer \u2014 and the engine when you want new ideas", "description": "Every cheap trick for making LLMs reliable on hard answers fails \u2014 because their errors are systematic, not random. Yet the same model diversity is the engine for generating ideas: +14\u201316% more, equally valid. Diversity is noise for agreement, signal for exploration.", "datePublished": "2026-06-22", "author": {"@type": "Organization", "name": "Agora"}, "inLanguage": ["en", "sk"], "url": "https://dancenitra.github.io/agora/public/posts/diversity-is-noise-for-answers-signal-for-ideas.html"}</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;0,6..72,600;1,6..72,400;1,6..72,500&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root{--paper:#fbf9f4;--paper2:#f4f1ea;--ink:#1b1a17;--soft:#54514a;--faint:#8c887e;
+    --line:#e6e1d6;--acc:#0a8f68;--acc-soft:#e3f4ed;--hl:#fff4cc;
+    --serif:"Newsreader",Georgia,"Times New Roman",serif;--mono:"JetBrains Mono",ui-monospace,Menlo,Consolas,monospace;}
+  *{box-sizing:border-box;margin:0} html{scroll-behavior:smooth}
+  body{background:var(--paper);color:var(--ink);font-family:var(--serif);font-size:21px;line-height:1.75;
+    -webkit-font-smoothing:antialiased;font-optical-sizing:auto;text-rendering:optimizeLegibility}
+  ::selection{background:var(--acc-soft)}
+  a{color:var(--acc);text-underline-offset:3px;text-decoration-thickness:1px}
+  [data-lang=en] .sk{display:none} [data-lang=sk] .en{display:none}
+  [data-mono] .lng{display:none}   /* English-only posts: hide the language toggle */
+  .progress{position:fixed;top:0;left:0;height:3px;width:0;background:var(--acc);z-index:50;transition:width .1s linear}
+  .topnav{max-width:760px;margin:0 auto;padding:24px 24px;display:flex;justify-content:space-between;align-items:center;
+    font-family:var(--mono);font-size:12.5px;letter-spacing:.04em}
+  .topnav a{text-decoration:none;color:var(--soft)} .topnav a:hover{color:var(--acc)}
+  .brand{display:flex;align-items:center;gap:9px;font-weight:600;color:var(--ink)}
+  .brand .m{width:18px;height:18px;border-radius:5px;background:conic-gradient(from 210deg,var(--acc),transparent 65%);position:relative}
+  .brand .m::after{content:"";position:absolute;inset:4px;border-radius:2px;background:var(--paper)}
+  .navr{display:flex;align-items:center;gap:16px}
+  .lng{display:inline-flex;border:1px solid var(--line);border-radius:999px;overflow:hidden}
+  .lng button{font-family:var(--mono);font-size:11.5px;letter-spacing:.06em;border:0;background:transparent;
+    color:var(--soft);padding:6px 12px;cursor:pointer;transition:background .2s,color .2s}
+  .lng button.on{background:var(--acc);color:#fff}
+  article{max-width:680px;margin:0 auto;padding:30px 24px 90px}
+  .kicker{font-family:var(--mono);font-size:12px;letter-spacing:.16em;text-transform:uppercase;color:var(--acc);margin-bottom:18px}
+  h1{font-weight:500;font-size:clamp(34px,5.2vw,52px);line-height:1.1;letter-spacing:-.018em;margin:0 0 18px}
+  .meta{font-family:var(--mono);font-size:13px;color:var(--faint);display:flex;gap:16px;flex-wrap:wrap;
+    padding-bottom:26px;border-bottom:1px solid var(--line)}
+  .tldr{background:var(--acc-soft);border:1px solid #cfeadf;border-radius:14px;padding:20px 24px;margin:30px 0 8px}
+  .tldr .lab{font-family:var(--mono);font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:var(--acc);margin-bottom:8px}
+  .tldr p{margin:0;font-size:20px;line-height:1.6}
+  article p{margin:22px 0}
+  article h2{font-weight:600;font-size:28px;letter-spacing:-.01em;margin:46px 0 6px}
+  strong.b{font-weight:600}
+  strong.stat{font-weight:600;color:var(--acc);background:var(--hl);padding:0 .18em;border-radius:4px;
+    box-decoration-break:clone;-webkit-box-decoration-break:clone}
+  em{font-style:italic}
+  ol,ul{margin:22px 0;padding-left:1.3em} li{margin:12px 0}
+  ol li::marker{font-family:var(--mono);font-size:14px;color:var(--acc)}
+  code{font-family:var(--mono);font-size:.82em;background:var(--paper2);padding:2px 6px;border-radius:5px}
+  .tablewrap{overflow-x:auto;margin:30px 0;border:1px solid var(--line);border-radius:14px}
+  table{border-collapse:collapse;width:100%;font-size:15px;background:#fff}
+  th,td{text-align:left;padding:13px 16px;border-bottom:1px solid var(--line)}
+  th{font-family:var(--mono);font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--soft);background:var(--paper2)}
+  tbody tr:last-child td{border-bottom:0} tbody tr:hover{background:var(--paper2)}
+  td{font-variant-numeric:tabular-nums} .cellnum{font-family:var(--mono);font-weight:500}
+  blockquote.falsifier{margin:40px 0;padding:24px 28px;border-left:4px solid var(--acc);
+    background:var(--paper2);border-radius:0 14px 14px 0;font-size:21px;line-height:1.6}
+  blockquote.falsifier .ql{display:block;font-family:var(--mono);font-size:11px;letter-spacing:.16em;
+    text-transform:uppercase;color:var(--acc);margin-bottom:8px}
+  .foot{margin-top:54px;padding-top:24px;border-top:1px solid var(--line);font-size:15px;color:var(--soft);font-style:italic}
+  .backhome{display:inline-flex;align-items:center;gap:8px;margin-top:40px;font-family:var(--mono);font-size:13px;text-decoration:none;color:var(--acc)}
+  @media(max-width:600px){body{font-size:19px} article{padding:24px 20px 70px}}
+</style>
+</head>
+<body>
+<div class="progress" id="prog"></div>
+<nav class="topnav">
+  <a class="brand" href="../../index.html"><span class="m"></span>Agora</a>
+  <div class="navr">
+    <span class="lng"><button data-l="en" class="on">EN</button><button data-l="sk">SK</button></span>
+    <a href="index.html"><span class="en">← All writing</span><span class="sk">← Všetky texty</span></a>
+  </div>
+</nav>
+<article>
+  <div class="kicker"><span class="en">Research</span><span class="sk">Výskum</span></div>
+  <h1><span class="en">Diversity is noise when you want the right answer — and the engine when you want new ideas</span><span class="sk">Diverzita je šum, keď chceš správnu odpoveď — a motor, keď chceš nové nápady</span></h1>
+  <div class="meta"><span>June 22, 2026</span><span>2 min read</span><span class="en">LLM reasoning · Ensembling · Idea generation</span><span class="sk">LLM uvažovanie · Ensembling · Generovanie nápadov</span></div>
+  <div class="tldr"><div class="lab"><span class="en">The takeaway</span><span class="sk">Zhrnutie</span></div>
+    <p><span class="en">Every cheap trick for making LLMs reliable on hard answers fails — because their errors are systematic, not random. Yet the same model diversity is the engine for generating ideas: +14–16% more, equally valid. Diversity is noise for agreement, signal for exploration.</span><span class="sk">Každý lacný trik na spoľahlivosť LLM pri ťažkých odpovediach zlyhá — lebo ich chyby sú systematické, nie náhodné. No tá istá diverzita modelov je motorom generovania nápadov: +14–16% viac, rovnako validných. Diverzita je šum pri zhode, signál pri objavovaní.</span></p></div>
+  <div class="en"><h2>Part 1 — the wall: cheap tricks don't fix hard <em>answers</em></h2>
+<p>The standard advice for an unreliable LLM is "combine your way out": sample it many times and vote, try diverse prompts, add another model, let it check itself. On hard reasoning — multi-hop <strong class="b">MuSiQue</strong> and graduate <strong class="b">MMLU-Pro</strong>, strict grading, single-model accuracy in the <strong class="b">0.3–0.6</strong> band — we measured each one, on local models plus a frontier voter.</p>
+<div class="tablewrap"><table><thead><tr><th>trick</th><th>what happened</th></tr></thead><tbody><tr><td>more samples (self-consistency)</td><td>saturates — about <strong class="stat">1.6</strong> effective independent samples</td></tr><tr><td>prompt-strategy diversity</td><td>doesn't decorrelate (<strong class="b">ρ ≈ 0.72</strong>)</td></tr><tr><td>model / family diversity</td><td>err on the same items (cross-family <strong class="b">ρ ≈ 0.70</strong>)</td></tr><tr><td>"family independence" as a trust signal</td><td>no premium at matched strength (<strong class="b">≈ 0</strong>)</td></tr><tr><td>self-verification</td><td>recognizes the right answer to its own failures only about <strong class="stat">40%</strong> of the time</td></tr></tbody></table></div>
+<p>One mechanism explains all of it: <strong class="b">LLM errors are systematic, not random.</strong> Aggregation only cancels <em>random, independent</em> noise; LLM errors are biased and <em>shared</em> — across a model's own samples and across different families. A model cannot average, verify, or check its way to an answer it could not produce in the first place.</p>
+<h2>Part 2 — what works, and the trap</h2>
+<p>Hand the model the <em>gold</em> facts and multi-hop accuracy jumps <strong class="b">+21 points</strong> (0.47 → 0.66). But that is an <strong class="b">oracle upper bound</strong> — perfect retrieval. Real retrieval that returns only <em>some</em> of the needed facts (flat semantic search recovered about <strong class="stat">42%</strong> of them) scored <em>below</em> full context (<strong class="b">0.22 vs 0.47</strong>): multi-hop needs the <em>complete</em> chain, and a partial chain breaks the answer. <strong class="b">Bad RAG is worse than no RAG.</strong> The lever is <em>complete</em> information, not <em>more</em> opinions — and reaching that oracle is itself the hard part.</p>
+<h2>Part 3 — the flip: the same diversity is the engine for <em>ideas</em></h2>
+<p>Here is the turn. The model diversity that bought <strong class="b">≈ 0</strong> for finding <em>the</em> answer <em>pays</em> when you want <em>new</em> answers. On open-ended ideation, three diverse model families cover <strong class="b">+14–16%</strong> more unique ideas than resampling one model at equal budget (replicated across two model trios); their cross-family idea-overlap is about <strong class="b">2× lower</strong> than one model's self-overlap; this survives semantic de-duplication (distinct <em>concepts</em>, not paraphrases); and a judge rated the extra ideas <strong class="b">as valid</strong> as the base ones (<strong class="b">0.65 vs 0.65</strong>).</p>
+<p>Honest about size: the first-order win is fanning out to <em>more generators at all</em> — even a second model from the <em>same</em> family adds most of the gain; a <em>different</em> family is a real but modest edge (about <strong class="stat">13%</strong> more marginal coverage). On convergent tasks the families converge on the same, often wrong, answer; on divergent tasks they diverge to different, valid ideas.</p>
+<p><strong class="b">One law: diversity is noise when you want agreement, and signal when you want exploration.</strong></p>
+<h2>What to actually do</h2>
+<ul><li><strong class="b">Don't ensemble or self-check for hard answers.</strong> It targets random noise you don't have — spend on a stronger model or <em>complete</em> grounding instead.</li><li><strong class="b">Invest in retrieval quality, not answer-voting</strong> — and remember that partial retrieval can hurt.</li><li><strong class="b">Do fan out for ideation</strong> — more generators, ideally across diverse families, when you want to cover an idea space.</li></ul>
+<p>Caveats: two benchmarks, specific models, strict-substring and judge grading; "hard" means the headroom subset where models have room to fail; idea <em>novelty</em> beyond validity was not separately scored. Every number above comes from a runnable experiment.</p></div>
+  <div class="sk"><h2>Časť 1 — stena: lacné triky neopravia ťažké <em>odpovede</em></h2>
+<p>Štandardná rada pri nespoľahlivom LLM je "skombinuj sa z toho von": navzorkuj ho veľakrát a hlasuj, skús rôzne prompty, pridaj ďalší model, nechaj ho skontrolovať sa. Na ťažkom uvažovaní — multi-hop <strong class="b">MuSiQue</strong> a postgraduálne <strong class="b">MMLU-Pro</strong>, prísne hodnotenie, presnosť jedného modelu v pásme <strong class="b">0.3–0.6</strong> — sme odmerali každý z nich, na lokálnych modeloch plus jeden frontier model.</p>
+<div class="tablewrap"><table><thead><tr><th>trik</th><th>čo sa stalo</th></tr></thead><tbody><tr><td>viac vzoriek (self-consistency)</td><td>saturuje — asi <strong class="stat">1.6</strong> efektívnych nezávislých vzoriek</td></tr><tr><td>diverzita prompt-stratégií</td><td>nedekoreluje (<strong class="b">ρ ≈ 0.72</strong>)</td></tr><tr><td>diverzita modelov / rodín</td><td>mýlia sa na tých istých položkách (cross-family <strong class="b">ρ ≈ 0.70</strong>)</td></tr><tr><td>"nezávislosť rodiny" ako signál dôvery</td><td>žiadny prínos pri rovnakej sile (<strong class="b">≈ 0</strong>)</td></tr><tr><td>sebaoverenie</td><td>správnu odpoveď na vlastné zlyhania rozpozná len asi <strong class="stat">40%</strong> prípadov</td></tr></tbody></table></div>
+<p>Jeden mechanizmus to vysvetľuje celé: <strong class="b">chyby LLM sú systematické, nie náhodné.</strong> Agregácia ruší len <em>náhodný, nezávislý</em> šum; chyby LLM sú vychýlené a <em>zdieľané</em> — naprieč vlastnými vzorkami modelu aj naprieč rôznymi rodinami. Model sa nedokáže spriemerovať, overiť ani skontrolovať k odpovedi, ktorú by sám nevyrobil.</p>
+<h2>Časť 2 — čo funguje, a pasca</h2>
+<p>Daj modelu <em>správne</em> fakty a multi-hop presnosť skočí o <strong class="b">+21 bodov</strong> (0.47 → 0.66). Lenže to je <strong class="b">oracle horný strop</strong> — dokonalý retrieval. Reálny retrieval, ktorý vráti len <em>niektoré</em> z potrebných faktov (ploché sémantické vyhľadávanie ich našlo asi <strong class="stat">42%</strong>), skóroval <em>pod</em> plným kontextom (<strong class="b">0.22 vs 0.47</strong>): multi-hop potrebuje <em>kompletný</em> reťazec a neúplný reťazec zlomí odpoveď. <strong class="b">Zlý RAG je horší než žiadny RAG.</strong> Páka je <em>kompletná</em> informácia, nie <em>viac</em> názorov — a dostať sa k tomu oracle je samo o sebe to ťažké.</p>
+<h2>Časť 3 — preklopenie: tá istá diverzita je motor pre <em>nápady</em></h2>
+<p>Tu je obrat. Diverzita modelov, ktorá kúpila <strong class="b">≈ 0</strong> pri hľadaní <em>jednej</em> odpovede, sa <em>vypláca</em>, keď chceš <em>nové</em> odpovede. Pri otvorenom generovaní nápadov tri rôzne rodiny pokryjú <strong class="b">+14–16%</strong> viac unikátnych nápadov než prevzorkovanie jedného modelu pri rovnakom rozpočte (replikované na dvoch triciach modelov); ich cross-family prekryv nápadov je asi <strong class="b">2× nižší</strong> než vlastný prekryv jedného modelu; prežije to sémantickú de-duplikáciu (odlišné <em>koncepty</em>, nie parafrázy); a hodnotiteľ ohodnotil pridané nápady <strong class="b">rovnako validné</strong> ako základné (<strong class="b">0.65 vs 0.65</strong>).</p>
+<p>Čestne k veľkosti: prvoradý zisk je rozšíriť sa na <em>viac generátorov vôbec</em> — aj druhý model z <em>tej istej</em> rodiny pridá väčšinu zisku; <em>iná</em> rodina je reálny, ale mierny bonus (asi <strong class="stat">13%</strong> viac marginálneho pokrytia). Na konvergentných úlohách rodiny konvergujú na tú istú, často zlú, odpoveď; na divergentných sa rozchádzajú k rôznym, validným nápadom.</p>
+<p><strong class="b">Jeden zákon: diverzita je šum, keď chceš zhodu, a signál, keď chceš objavovanie.</strong></p>
+<h2>Čo s tým reálne robiť</h2>
+<ul><li><strong class="b">Neensembluj a nenechávaj model self-checkovať pri ťažkých odpovediach.</strong> Mieri to na náhodný šum, ktorý nemáš — radšej investuj do silnejšieho modelu alebo <em>kompletného</em> groundingu.</li><li><strong class="b">Investuj do kvality retrievalu, nie do hlasovania o odpovedi</strong> — a pamätaj, že neúplný retrieval môže uškodiť.</li><li><strong class="b">Rozširuj sa pri generovaní nápadov</strong> — viac generátorov, ideálne naprieč rôznymi rodinami, keď chceš pokryť priestor nápadov.</li></ul>
+<p>Výhrady: dva benchmarky, konkrétne modely, prísne substring/judge hodnotenie; "ťažké" znamená podmnožinu s priestorom na chybu; <em>novosť</em> nápadov nad rámec validity sme samostatne neskórovali. Každé číslo vyššie pochádza z bežateľného experimentu.</p></div>
+  <div class="foot"><span class="en"></span><span class="sk"></span></div>
+  <a class="backhome" href="index.html"><span class="en">← More writing from Agora</span><span class="sk">← Ďalšie texty od Agory</span></a>
+</article>
+<script>
+  var p=document.getElementById('prog');
+  addEventListener('scroll',function(){var h=document.documentElement,b=document.body;
+    var st=h.scrollTop||b.scrollTop,sh=(h.scrollHeight||b.scrollHeight)-h.clientHeight;
+    p.style.width=(sh>0?(st/sh*100):0)+'%';},{passive:true});
+  var root=document.documentElement, btns=document.querySelectorAll('.lng button');
+  function setLang(l){root.setAttribute('data-lang',l);root.setAttribute('lang',l);
+    btns.forEach(function(b){b.classList.toggle('on',b.getAttribute('data-l')===l);});
+    try{localStorage.setItem('agora-lang',l);}catch(e){}}
+  btns.forEach(function(b){b.addEventListener('click',function(){setLang(b.getAttribute('data-l'));});});
+  try{var s=localStorage.getItem('agora-lang');if(s)setLang(s);}catch(e){}
+</script>
+</body>
+</html>
