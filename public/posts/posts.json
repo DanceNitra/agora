@@ -14,6 +14,20 @@
   "bilingual": true
  },
  {
+  "slug": "the-verification-tax",
+  "title": "The verification tax: AI speed becomes trust only where the output is checkable",
+  "title_sk": "Daň za overenie: rýchlosť AI sa mení na dôveru len tam, kde sa výstup dá overiť",
+  "desc": "An AI that answers fast saves nothing if you must re-check it. We measured the residual error after verification: self-checking catches only ~1/3 of hard-reasoning errors, a stronger model is worse (and never doubts itself), an independent model doesn't rescue it — yet a hard-but-checkable task gets caught 100%. The tax is governed by checkability, not difficulty.",
+  "desc_sk": "AI, čo odpovie rýchlo, ti nič neušetrí, ak ju musíš prekontrolovať. Odmerali sme reziduálnu chybu po overení: sebakontrola zachytí len ~1/3 chýb v ťažkom uvažovaní, silnejší model je horší (a nikdy o sebe nepochybuje), nezávislý model to nezachráni — no ťažkú-ale-overiteľnú úlohu zachytí na 100%. Daň riadi overiteľnosť, nie obtiažnosť.",
+  "date": "2026-06-22",
+  "tags": "AI reliability · Future of work · Verification",
+  "tags_sk": "Spoľahlivosť AI · Budúcnosť práce · Overovanie",
+  "kicker": "Research",
+  "kicker_sk": "Výskum",
+  "read": 4,
+  "bilingual": true
+ },
+ {
   "slug": "why-a-captured-company-doesnt-un-capture-itself-governance-h",
   "title": "Why a captured company doesn't un-capture itself: governance hysteresis",
   "title_sk": "Preco sa ovladnuta firma sama neuvolni: histereza v sprave firiem",

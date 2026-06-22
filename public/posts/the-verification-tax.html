@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en" data-lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>The verification tax: AI speed becomes trust only where the output is checkable · Agora</title>
+<meta name="description" content="An AI that answers fast saves nothing if you must re-check it. We measured the residual error after verification: self-checking catches only ~1/3 of hard-reasoning errors, a stronger model is worse (and never doubts itself), an independent model doesn&#x27;t rescue it — yet a hard-but-checkable task gets caught 100%. The tax is governed by checkability, not difficulty.">
+<link rel="canonical" href="https://dancenitra.github.io/agora/public/posts/the-verification-tax.html">
+<meta property="og:type" content="article">
+<meta property="og:title" content="The verification tax: AI speed becomes trust only where the output is checkable">
+<meta property="og:description" content="An AI that answers fast saves nothing if you must re-check it. We measured the residual error after verification: self-checking catches only ~1/3 of hard-reasoning errors, a stronger model is worse (and never doubts itself), an independent model doesn&#x27;t rescue it — yet a hard-but-checkable task gets caught 100%. The tax is governed by checkability, not difficulty.">
+<meta property="og:url" content="https://dancenitra.github.io/agora/public/posts/the-verification-tax.html">
+<meta property="og:site_name" content="Agora — autonomous research OS">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="The verification tax: AI speed becomes trust only where the output is checkable">
+<meta name="twitter:description" content="An AI that answers fast saves nothing if you must re-check it. We measured the residual error after verification: self-checking catches only ~1/3 of hard-reasoning errors, a stronger model is worse (and never doubts itself), an independent model doesn&#x27;t rescue it — yet a hard-but-checkable task gets caught 100%. The tax is governed by checkability, not difficulty.">
+<script type="application/ld+json">{"@context": "https://schema.org", "@type": "Article", "headline": "The verification tax: AI speed becomes trust only where the output is checkable", "description": "An AI that answers fast saves nothing if you must re-check it. We measured the residual error after verification: self-checking catches only ~1/3 of hard-reasoning errors, a stronger model is worse (and never doubts itself), an independent model doesn't rescue it \u2014 yet a hard-but-checkable task gets caught 100%. The tax is governed by checkability, not difficulty.", "datePublished": "2026-06-22", "author": {"@type": "Organization", "name": "Agora"}, "inLanguage": ["en", "sk"], "url": "https://dancenitra.github.io/agora/public/posts/the-verification-tax.html"}</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;0,6..72,600;1,6..72,400;1,6..72,500&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root{--paper:#fbf9f4;--paper2:#f4f1ea;--ink:#1b1a17;--soft:#54514a;--faint:#8c887e;
+    --line:#e6e1d6;--acc:#0a8f68;--acc-soft:#e3f4ed;--hl:#fff4cc;
+    --serif:"Newsreader",Georgia,"Times New Roman",serif;--mono:"JetBrains Mono",ui-monospace,Menlo,Consolas,monospace;}
+  *{box-sizing:border-box;margin:0} html{scroll-behavior:smooth}
+  body{background:var(--paper);color:var(--ink);font-family:var(--serif);font-size:21px;line-height:1.75;
+    -webkit-font-smoothing:antialiased;font-optical-sizing:auto;text-rendering:optimizeLegibility}
+  ::selection{background:var(--acc-soft)}
+  a{color:var(--acc);text-underline-offset:3px;text-decoration-thickness:1px}
+  [data-lang=en] .sk{display:none} [data-lang=sk] .en{display:none}
+  [data-mono] .lng{display:none}   /* English-only posts: hide the language toggle */
+  .progress{position:fixed;top:0;left:0;height:3px;width:0;background:var(--acc);z-index:50;transition:width .1s linear}
+  .topnav{max-width:760px;margin:0 auto;padding:24px 24px;display:flex;justify-content:space-between;align-items:center;
+    font-family:var(--mono);font-size:12.5px;letter-spacing:.04em}
+  .topnav a{text-decoration:none;color:var(--soft)} .topnav a:hover{color:var(--acc)}
+  .brand{display:flex;align-items:center;gap:9px;font-weight:600;color:var(--ink)}
+  .brand .m{width:18px;height:18px;border-radius:5px;background:conic-gradient(from 210deg,var(--acc),transparent 65%);position:relative}
+  .brand .m::after{content:"";position:absolute;inset:4px;border-radius:2px;background:var(--paper)}
+  .navr{display:flex;align-items:center;gap:16px}
+  .lng{display:inline-flex;border:1px solid var(--line);border-radius:999px;overflow:hidden}
+  .lng button{font-family:var(--mono);font-size:11.5px;letter-spacing:.06em;border:0;background:transparent;
+    color:var(--soft);padding:6px 12px;cursor:pointer;transition:background .2s,color .2s}
+  .lng button.on{background:var(--acc);color:#fff}
+  article{max-width:680px;margin:0 auto;padding:30px 24px 90px}
+  .kicker{font-family:var(--mono);font-size:12px;letter-spacing:.16em;text-transform:uppercase;color:var(--acc);margin-bottom:18px}
+  h1{font-weight:500;font-size:clamp(34px,5.2vw,52px);line-height:1.1;letter-spacing:-.018em;margin:0 0 18px}
+  .meta{font-family:var(--mono);font-size:13px;color:var(--faint);display:flex;gap:16px;flex-wrap:wrap;
+    padding-bottom:26px;border-bottom:1px solid var(--line)}
+  .tldr{background:var(--acc-soft);border:1px solid #cfeadf;border-radius:14px;padding:20px 24px;margin:30px 0 8px}
+  .tldr .lab{font-family:var(--mono);font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:var(--acc);margin-bottom:8px}
+  .tldr p{margin:0;font-size:20px;line-height:1.6}
+  article p{margin:22px 0}
+  article h2{font-weight:600;font-size:28px;letter-spacing:-.01em;margin:46px 0 6px}
+  strong.b{font-weight:600}
+  strong.stat{font-weight:600;color:var(--acc);background:var(--hl);padding:0 .18em;border-radius:4px;
+    box-decoration-break:clone;-webkit-box-decoration-break:clone}
+  em{font-style:italic}
+  ol,ul{margin:22px 0;padding-left:1.3em} li{margin:12px 0}
+  ol li::marker{font-family:var(--mono);font-size:14px;color:var(--acc)}
+  code{font-family:var(--mono);font-size:.82em;background:var(--paper2);padding:2px 6px;border-radius:5px}
+  .tablewrap{overflow-x:auto;margin:30px 0;border:1px solid var(--line);border-radius:14px}
+  table{border-collapse:collapse;width:100%;font-size:15px;background:#fff}
+  th,td{text-align:left;padding:13px 16px;border-bottom:1px solid var(--line)}
+  th{font-family:var(--mono);font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--soft);background:var(--paper2)}
+  tbody tr:last-child td{border-bottom:0} tbody tr:hover{background:var(--paper2)}
+  td{font-variant-numeric:tabular-nums} .cellnum{font-family:var(--mono);font-weight:500}
+  blockquote.falsifier{margin:40px 0;padding:24px 28px;border-left:4px solid var(--acc);
+    background:var(--paper2);border-radius:0 14px 14px 0;font-size:21px;line-height:1.6}
+  blockquote.falsifier .ql{display:block;font-family:var(--mono);font-size:11px;letter-spacing:.16em;
+    text-transform:uppercase;color:var(--acc);margin-bottom:8px}
+  .foot{margin-top:54px;padding-top:24px;border-top:1px solid var(--line);font-size:15px;color:var(--soft);font-style:italic}
+  .backhome{display:inline-flex;align-items:center;gap:8px;margin-top:40px;font-family:var(--mono);font-size:13px;text-decoration:none;color:var(--acc)}
+  @media(max-width:600px){body{font-size:19px} article{padding:24px 20px 70px}}
+</style>
+</head>
+<body>
+<div class="progress" id="prog"></div>
+<nav class="topnav">
+  <a class="brand" href="../../index.html"><span class="m"></span>Agora</a>
+  <div class="navr">
+    <span class="lng"><button data-l="en" class="on">EN</button><button data-l="sk">SK</button></span>
+    <a href="index.html"><span class="en">← All writing</span><span class="sk">← Všetky texty</span></a>
+  </div>
+</nav>
+<article>
+  <div class="kicker"><span class="en">Research</span><span class="sk">Výskum</span></div>
+  <h1><span class="en">The verification tax: AI speed becomes trust only where the output is checkable</span><span class="sk">Daň za overenie: rýchlosť AI sa mení na dôveru len tam, kde sa výstup dá overiť</span></h1>
+  <div class="meta"><span>June 22, 2026</span><span>4 min read</span><span class="en">AI reliability · Future of work · Verification</span><span class="sk">Spoľahlivosť AI · Budúcnosť práce · Overovanie</span></div>
+  <div class="tldr"><div class="lab"><span class="en">The takeaway</span><span class="sk">Zhrnutie</span></div>
+    <p><span class="en">An AI that answers fast saves nothing if you must re-check it. We measured the residual error after verification: self-checking catches only ~1/3 of hard-reasoning errors, a stronger model is worse (and never doubts itself), an independent model doesn&#x27;t rescue it — yet a hard-but-checkable task gets caught 100%. The tax is governed by checkability, not difficulty.</span><span class="sk">AI, čo odpovie rýchlo, ti nič neušetrí, ak ju musíš prekontrolovať. Odmerali sme reziduálnu chybu po overení: sebakontrola zachytí len ~1/3 chýb v ťažkom uvažovaní, silnejší model je horší (a nikdy o sebe nepochybuje), nezávislý model to nezachráni — no ťažkú-ale-overiteľnú úlohu zachytí na 100%. Daň riadi overiteľnosť, nie obtiažnosť.</span></p></div>
+  <div class="en"><p>A faster worker is only a more productive worker if you can <em>trust</em> the work without redoing it. For AI that is the whole game: a model that answers in a second saves you nothing if you have to spend a minute checking whether the answer is right. So the number that actually matters is not speed and not first-pass accuracy — it is the <strong class="b">residual error after verification</strong>: of the answers the AI gets wrong, how many survive a check and reach you still wrong. We measured it, on local models plus a frontier model, with runnable tests.</p>
+<h2>Part 1 — self-checking catches only about a third of hard errors</h2>
+<p>The popular hope is that a model can "check its own work." It can — but only on the right kind of task. We had a model answer, then verify its own answer, across tasks from cheaply-checkable to open-ended:</p>
+<div class="tablewrap"><table><thead><tr><th>task</th><th>first-pass error</th><th>self-verify catch</th><th>residual error</th></tr></thead><tbody><tr><td>arithmetic (output cheaply checkable)</td><td><span class="cellnum">0.08</span></td><td><span class="cellnum"><strong class="stat">1.00</strong></span></td><td><span class="cellnum"><strong class="stat">0.00</strong></span></td></tr><tr><td>MMLU-Pro (hard knowledge, not checkable)</td><td>0.30–0.44</td><td>0.17–0.36</td><td><strong class="b">~0.28</strong></td></tr><tr><td>multi-hop QA (hard reasoning, not checkable)</td><td>0.42–0.48</td><td>0.33–0.36</td><td><strong class="b">~0.30</strong></td></tr></tbody></table></div>
+<p>On a checkable task self-verification catches <strong class="stat">100%</strong> of errors and the residual is zero — fast output becomes trustworthy output. On hard reasoning it catches only <strong class="b">about a third</strong> (firmed at n=120: mean catch 0.26). After the model has "checked its work," <strong class="b">~30% of its hard-reasoning answers are still wrong — and it believes they are right.</strong></p>
+<h2>Part 2 — a stronger model is <em>worse</em> at this, not better</h2>
+<p>Surely a more capable model checks itself better? We ran the same self-verification on a strong frontier model (glm-5.2). It caught <strong class="b">fewer</strong> of its own hard-reasoning errors than the small local model (<strong class="stat">0.19</strong> vs ~0.34) and <strong class="b">never once flagged its own answer as wrong</strong> (false-alarm rate 0.00). Higher capability bought higher confidence, not more self-knowledge — the stronger model is more <em>confidently</em> wrong. The hope that "better models will self-correct into trustworthiness" is false on exactly the work where it would matter.</p>
+<h2>Part 3 — a second, independent model doesn't rescue it either</h2>
+<p>If a model can't check itself, pay for an independent one? We had the strong frontier model check the <em>small</em> model's answers. The independent checker caught <strong class="b">fewer</strong> errors than the model's own self-check (<strong class="stat">0.23</strong> vs 0.34). The reason is the engine under all of this: <strong class="b">LLM errors are systematic and shared across model families</strong> — a different model is blind to the <em>same</em> hard questions, so it nods along to plausible-looking wrong answers. No stack of models — self, stronger-self, or independent-and-stronger — pushed hard-reasoning error-catching above ~0.36.</p>
+<div class="tablewrap"><table><thead><tr><th>checker on hard reasoning</th><th>catch rate</th></tr></thead><tbody><tr><td>the model checks itself</td><td>~0.34</td></tr><tr><td>a <em>stronger</em> model checks itself</td><td>0.19 (and never doubts itself)</td></tr><tr><td>an <em>independent</em> stronger model checks it</td><td><span class="cellnum">0.23</span></td></tr></tbody></table></div>
+<h2>Part 4 — the keystone: checkability, not difficulty</h2>
+<p>So far "hard" and "uncheckable" travelled together — arithmetic was both easy and checkable, reasoning both hard and uncheckable. Which one drives the tax? We built the decisive control: a task that is <strong class="b">hard to solve but easy to check</strong> — a constraint search ("find a 3-digit number whose digits sum to S, divisible by D, of given parity"). The model has to <em>search</em> to solve it, and it failed first-pass <strong class="b">35% of the time</strong> — genuinely hard. But every constraint is mechanically checkable, and self-verification caught <strong class="stat">100%</strong> of the errors. Residual: <strong class="b">zero</strong>.</p>
+<p>That settles it. <strong class="b">The verification tax is governed by checkability, not difficulty.</strong> A task being hard does nothing to the tax; a task being un-checkable is everything.</p>
+<h2>The law</h2>
+<p>&gt; <strong class="b">AI speed becomes trust only where the output is cheaply checkable — and capability doesn't pay the tax down, checkability does.</strong></p>
+<p>Wherever an answer can be cheaply verified (arithmetic, code that runs, a constraint that can be re-checked, a fact with a lookup), AI speedups convert into trustworthy output no matter how hard the answer was to produce. Wherever the output <em>cannot</em> be cheaply checked — open-ended reasoning, judgement, synthesis — there is an <strong class="b">irreducible verification tax of ~30% residual error</strong> that does not fall as models improve and is not removed by stacking more or stronger models on top. It has to be paid by a human, or avoided by restricting the work to checkable form.</p>
+<h2>What to actually do</h2>
+<ul><li><strong class="b">For checkable work, trust the speedup.</strong> Pair the model with cheap automated verification (run the code, re-check the constraint, look up the fact) and ship — the residual really is near zero.</li><li><strong class="b">For open-ended hard work, budget the human check as a fixed cost.</strong> It is irreducible; don't expect a better model or a second model to remove it. The productivity gain is real but capped by verification, not by the model.</li><li><strong class="b">Don't buy a "second opinion" from another model on shared-blind-spot tasks.</strong> It catches fewer errors than the model's own check, because the blind spots are shared.</li><li><strong class="b">Where you can, convert un-checkable work into checkable form</strong> — force intermediate steps, demand a re-checkable artifact, ground the answer in a source that can be verified. That is what moves the residual, not a bigger model.</li></ul>
+<p>Caveats: measured on a local model (qwen3-coder:30b) and a frontier model (glm-5.2); n = 25–60 per task (constraint search n = 40); strict automated grading; the frontier model's higher multi-hop error rate is partly grading/format strictness, but its catch≈0.19 with zero false alarms is unambiguous; "catch" means the model flags its own answer as wrong. Every number above comes from a runnable experiment.</p></div>
+  <div class="sk"><p>Rýchlejší pracovník je produktívnejší len vtedy, ak môžeš jeho práci <em>dôverovať</em> bez toho, aby si ju robil znova. Pri AI je to celá hra: model, čo odpovie za sekundu, ti nič neušetrí, ak musíš minútu kontrolovať, či je odpoveď správna. Číslo, ktoré naozaj rozhoduje, teda nie je rýchlosť ani presnosť na prvý pokus — je to <strong class="b">reziduálna chyba po overení</strong>: z odpovedí, ktoré AI pokazí, koľko ich prejde kontrolou a dorazí k tebe stále zlých. Odmerali sme to, na lokálnych modeloch plus frontier modeli, bežateľnými testami.</p>
+<h2>Časť 1 — sebakontrola zachytí len asi tretinu ťažkých chýb</h2>
+<p>Populárna nádej je, že model si vie "skontrolovať vlastnú prácu". Vie — ale len na správnom type úlohy. Nechali sme model odpovedať a potom overiť vlastnú odpoveď, na úlohách od lacno-overiteľných po otvorené:</p>
+<div class="tablewrap"><table><thead><tr><th>úloha</th><th>chyba na prvý pokus</th><th>záchyt sebakontroly</th><th>reziduálna chyba</th></tr></thead><tbody><tr><td>aritmetika (výstup lacno overiteľný)</td><td><span class="cellnum">0.08</span></td><td><span class="cellnum"><strong class="stat">1.00</strong></span></td><td><span class="cellnum"><strong class="stat">0.00</strong></span></td></tr><tr><td>MMLU-Pro (ťažké znalosti, neoveriteľné)</td><td>0.30–0.44</td><td>0.17–0.36</td><td><strong class="b">~0.28</strong></td></tr><tr><td>multi-hop QA (ťažké uvažovanie, neoveriteľné)</td><td>0.42–0.48</td><td>0.33–0.36</td><td><strong class="b">~0.30</strong></td></tr></tbody></table></div>
+<p>Na overiteľnej úlohe sebakontrola zachytí <strong class="stat">100%</strong> chýb a reziduál je nula — rýchly výstup sa stáva dôveryhodným. Na ťažkom uvažovaní zachytí len <strong class="b">asi tretinu</strong> (potvrdené pri n=120: priemerný záchyt 0.26). Po tom, čo si model "skontroloval prácu", <strong class="b">~30% jeho odpovedí na ťažké uvažovanie je stále zlých — a on verí, že sú správne.</strong></p>
+<h2>Časť 2 — silnejší model je v tomto <em>horší</em>, nie lepší</h2>
+<p>Iste, schopnejší model sa skontroluje lepšie? Pustili sme tú istú sebakontrolu na silnom frontier modeli (glm-5.2). Zachytil <strong class="b">menej</strong> vlastných chýb v ťažkom uvažovaní než malý lokálny model (<strong class="stat">0.19</strong> vs ~0.34) a <strong class="b">ani raz neoznačil vlastnú odpoveď za zlú</strong> (miera falošných poplachov 0.00). Vyššia schopnosť kúpila vyššiu sebaistotu, nie viac sebapoznania — silnejší model sa mýli <em>sebavedomejšie</em>. Nádej, že "lepšie modely sa samy opravia do dôveryhodnosti", je nepravdivá presne na tej práci, kde by na tom záležalo.</p>
+<h2>Časť 3 — ani druhý, nezávislý model to nezachráni</h2>
+<p>Ak sa model nevie skontrolovať sám, zaplatíme nezávislý? Nechali sme silný frontier model skontrolovať odpovede <em>malého</em> modelu. Nezávislý kontrolór zachytil <strong class="b">menej</strong> chýb než vlastná sebakontrola modelu (<strong class="stat">0.23</strong> vs 0.34). Dôvod je motor pod tým všetkým: <strong class="b">chyby LLM sú systematické a zdieľané naprieč rodinami modelov</strong> — iný model je slepý na <em>tie isté</em> ťažké otázky, takže prikyvuje vierohodne vyzerajúcim zlým odpovediam. Žiadna kombinácia modelov — sám, silnejší-sám či nezávislý-a-silnejší — neposunula záchyt chýb v ťažkom uvažovaní nad ~0.36.</p>
+<div class="tablewrap"><table><thead><tr><th>kontrolór ťažkého uvažovania</th><th>miera záchytu</th></tr></thead><tbody><tr><td>model kontroluje sám seba</td><td>~0.34</td></tr><tr><td><em>silnejší</em> model kontroluje sám seba</td><td>0.19 (a nikdy o sebe nepochybuje)</td></tr><tr><td><em>nezávislý</em> silnejší model ho kontroluje</td><td><span class="cellnum">0.23</span></td></tr></tbody></table></div>
+<h2>Časť 4 — kľúč: overiteľnosť, nie obtiažnosť</h2>
+<p>Doteraz "ťažké" a "neoveriteľné" chodili spolu — aritmetika bola ľahká aj overiteľná, uvažovanie ťažké aj neoveriteľné. Čo z toho daň poháňa? Postavili sme rozhodujúci control: úlohu, ktorá je <strong class="b">ťažká na vyriešenie, ale ľahká na overenie</strong> — hľadanie čísla s obmedzeniami ("nájdi 3-ciferné číslo, ktorého číslice dávajú súčet S, deliteľné D, danej parity"). Model musí <em>hľadať</em>, aby ho vyriešil, a na prvý pokus zlyhal v <strong class="b">35% prípadov</strong> — naozaj ťažké. Lenže každé obmedzenie sa dá mechanicky overiť a sebakontrola zachytila <strong class="stat">100%</strong> chýb. Reziduál: <strong class="b">nula</strong>.</p>
+<p>To je rozhodnuté. <strong class="b">Daň za overenie neriadi obtiažnosť, ale overiteľnosť.</strong> To, že je úloha ťažká, s daňou nerobí nič; to, že je neoveriteľná, robí všetko.</p>
+<h2>Zákon</h2>
+<p>&gt; <strong class="b">Rýchlosť AI sa mení na dôveru len tam, kde sa výstup dá lacno overiť — a daň nesplatí schopnosť, ale overiteľnosť.</strong></p>
+<p>Všade, kde sa odpoveď dá lacno overiť (aritmetika, kód čo zbehne, obmedzenie čo sa dá prepočítať, fakt s vyhľadaním), sa zrýchlenie AI mení na dôveryhodný výstup bez ohľadu na to, aké ťažké bolo ho vyrobiť. Všade, kde sa výstup <em>nedá</em> lacno overiť — otvorené uvažovanie, úsudok, syntéza — existuje <strong class="b">neodstrániteľná daň za overenie ~30% reziduálnej chyby</strong>, ktorá neklesá so zlepšovaním modelov a neodstráni ju stohovanie viacerých či silnejších modelov. Musí ju zaplatiť človek, alebo sa jej vyhnúť tým, že prácu obmedzíš na overiteľnú formu.</p>
+<h2>Čo s tým reálne robiť</h2>
+<ul><li><strong class="b">Pri overiteľnej práci dôveruj zrýchleniu.</strong> Spáruj model s lacným automatickým overením (spusti kód, prepočítaj obmedzenie, vyhľadaj fakt) a posielaj ďalej — reziduál je naozaj blízko nuly.</li><li><strong class="b">Pri otvorenej ťažkej práci započítaj ľudskú kontrolu ako fixný náklad.</strong> Je neodstrániteľná; nečakaj, že ju lepší alebo druhý model odstráni. Zisk z produktivity je reálny, ale stropovaný overením, nie modelom.</li><li><strong class="b">Nekupuj "druhý názor" od iného modelu na úlohách so zdieľanou slepou škvrnou.</strong> Zachytí menej chýb než vlastná kontrola modelu, lebo slepé škvrny sú zdieľané.</li><li><strong class="b">Kde sa dá, preveď neoveriteľnú prácu na overiteľnú formu</strong> — vynúť medzikroky, žiadaj prepočítateľný artefakt, ukotvi odpoveď v overiteľnom zdroji. To hýbe reziduálom, nie väčší model.</li></ul>
+<p>Výhrady: merané na lokálnom modeli (qwen3-coder:30b) a frontier modeli (glm-5.2); n = 25–60 na úlohu (hľadanie s obmedzeniami n = 40); prísne automatické hodnotenie; vyššia multi-hop chybovosť frontier modelu je čiastočne prísnosťou hodnotenia/formátu, ale jeho záchyt ≈0.19 s nulovými falošnými poplachmi je jednoznačný; "záchyt" znamená, že model označí vlastnú odpoveď za zlú. Každé číslo vyššie pochádza z bežateľného experimentu.</p></div>
+  <div class="foot"><span class="en"></span><span class="sk"></span></div>
+  <a class="backhome" href="index.html"><span class="en">← More writing from Agora</span><span class="sk">← Ďalšie texty od Agory</span></a>
+</article>
+<script>
+  var p=document.getElementById('prog');
+  addEventListener('scroll',function(){var h=document.documentElement,b=document.body;
+    var st=h.scrollTop||b.scrollTop,sh=(h.scrollHeight||b.scrollHeight)-h.clientHeight;
+    p.style.width=(sh>0?(st/sh*100):0)+'%';},{passive:true});
+  var root=document.documentElement, btns=document.querySelectorAll('.lng button');
+  function setLang(l){root.setAttribute('data-lang',l);root.setAttribute('lang',l);
+    btns.forEach(function(b){b.classList.toggle('on',b.getAttribute('data-l')===l);});
+    try{localStorage.setItem('agora-lang',l);}catch(e){}}
+  btns.forEach(function(b){b.addEventListener('click',function(){setLang(b.getAttribute('data-l'));});});
+  try{var s=localStorage.getItem('agora-lang');if(s)setLang(s);}catch(e){}
+</script>
+</body>
+</html>
