@@ -203,7 +203,7 @@ class Mnemo:
             if M is not None:
                 qv = _np.asarray(qvec, dtype=_np.float32)
                 sims_vec = M @ (qv / (float(_np.linalg.norm(qv)) or 1.0))
-        scored = []
+        cands = []                                        # (sim, prov, eff_value, r) for sim>0 candidates
         _now = time.time()                                # for per-type decay of the ranking value
         _by_id = {x["id"]: x for x in self.items}         # for provenance lookups (source-episode status)
         for r in pool:
@@ -221,12 +221,34 @@ class Mnemo:
                 (_by_id.get(lid, {}).get("meta") or {}).get("superseded_by_toggle") for lid in r["links"])
             prov = 0.5 if stale else 1.0
             r["_stale_derived"] = stale                   # surfaced in the returned record
-            # Calibration: WAS-IT-RIGHT. A per-memory Beta(good,bad) posterior (fed by credit() when work
-            # this memory was recalled into later RESOLVES) nudges the score by track record, not just by
-            # being-recalled. Neutral (x1.0) until a memory has any outcome; bounded to [0.5, 1.5] so one
-            # bad outcome can't erase a memory but a consistent liar fades and a consistent winner rises.
-            cal = 0.5 + self._reliability(r)
-            score = sim * (1.0 + math.log1p(max(0.0, self._effective_value(r, _now)))) * prov * cal
+            cands.append((sim, prov, self._effective_value(r, _now), r))
+        # Calibration WAS-IT-RIGHT: a per-memory Beta(good,bad) posterior nudges the score by track record.
+        # cal_mode controls how the outcome-credit channel is allowed to act (our measured signal-reliability
+        # law: a selection signal only beats relevance once reliability p > the no-signal floor 1/(1+D)):
+        #   'full'  (default) — cal in [0.5, 1.5] (legacy: can promote AND demote).
+        #   'boost' — cal in [1.0, 1.5]: outcome-credit can PROMOTE a proven memory but never DEMOTE one below
+        #             its relevance, so a wrong/random credit cannot suppress a correct memory (kills backfire).
+        #   'gated' — disable cal (->1.0) for this recall when the pooled signal looks weaker than 1/(1+D).
+        mode = getattr(self, "cal_mode", "full")
+        gate_off = False
+        if mode == "gated" and cands:
+            top = max(c[0] for c in cands)
+            near = [c for c in cands if c[0] >= top * 0.95]      # candidates relevance can't separate
+            D = len(near)
+            if D >= 2:
+                g = sum(float(c[3].get("good", 0) or 0) for c in near)
+                b = sum(float(c[3].get("bad", 0) or 0) for c in near)
+                if (g + 1.0) / (g + b + 2.0) <= 1.0 / (1.0 + D):
+                    gate_off = True
+        scored = []
+        for sim, prov, evalue, r in cands:
+            if gate_off:
+                cal = 1.0
+            else:
+                cal = 0.5 + self._reliability(r)
+                if mode == "boost" and cal < 1.0:
+                    cal = 1.0
+            score = sim * (1.0 + math.log1p(max(0.0, evalue))) * prov * cal
             scored.append((score, sim, r))
         scored.sort(key=lambda x: -x[0])
         out = []
