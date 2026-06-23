@@ -341,8 +341,15 @@ class Mnemo:
             toks, common = self._common_vocab(active)
             nv = len(common) or 1
             for r, tk in zip(active, toks):
-                cov = len(tk & common) / nv
-                if cov >= hub_coverage:
+                shared = len(tk & common)
+                cov = shared / nv
+                # A genuine 'universal matcher' overlaps MANY of the corpus's common words. Requiring an absolute
+                # floor (>= 3 shared common words) on top of the coverage fraction prevents the low-diversity /
+                # templated-store failure: when the common vocabulary is tiny (e.g. a handful of repeated attribute
+                # words), a legitimate memory trivially covers >= hub_coverage of it with just ONE common word, which
+                # would wrongly flag every memory a hub and SILENTLY EMPTY recall. (Measured: 3-5 shared attrs -> 100%
+                # hub-flagged, 0% recall, before this floor.)
+                if shared >= 3 and cov >= hub_coverage:
                     r["status"] = "hub"
                     r.setdefault("meta", {})["hub"] = True
                     r["meta"]["hub_coverage"] = round(cov, 3)
