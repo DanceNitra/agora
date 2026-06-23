@@ -174,7 +174,8 @@ class Mnemo:
         return len(q & t) / min(len(q), len(t))     # overlap coefficient — forgiving without an embedder
 
     def recall(self, query: str, k: int = 6, include_superseded: bool = False,
-               include_hubs: bool = False, mode: str = "auto", min_relevance: float = 0.0) -> list[dict]:
+               include_hubs: bool = False, mode: str = "auto", min_relevance: float = 0.0,
+               scope: str | None = None) -> list[dict]:
         """Top-k memories by RELEVANCE × VALUE — high-value memories outrank merely-similar ones.
         Memories the dream pass flagged as hubs (universal matchers) are skipped unless include_hubs.
 
@@ -191,6 +192,11 @@ class Mnemo:
                 return include_hubs
             return include_superseded            # superseded / other non-active
         pool = [r for r in self.items if _eligible(r)]
+        # Scope/namespace isolation: when a scope is requested, recall ONLY sees memories tagged with that scope
+        # (meta['scope']) BEFORE ranking — a shared store (e.g. many agents / tenants in one Mnemo) cannot bleed
+        # one scope's memories into another's recall. scope=None (default) sees everything (legacy behavior).
+        if scope is not None:
+            pool = [r for r in pool if (r.get("meta") or {}).get("scope") == scope]
         use_semantic = self.embed is not None and (
             mode == "semantic" or (mode == "auto" and len(pool) >= self.semantic_threshold))
         qvec = self._qvec(query) if use_semantic else None    # None -> lexical (also if embed fails)
