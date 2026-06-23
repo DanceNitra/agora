@@ -174,7 +174,7 @@ class Mnemo:
         return len(q & t) / min(len(q), len(t))     # overlap coefficient — forgiving without an embedder
 
     def recall(self, query: str, k: int = 6, include_superseded: bool = False,
-               include_hubs: bool = False, mode: str = "auto") -> list[dict]:
+               include_hubs: bool = False, mode: str = "auto", min_relevance: float = 0.0) -> list[dict]:
         """Top-k memories by RELEVANCE × VALUE — high-value memories outrank merely-similar ones.
         Memories the dream pass flagged as hubs (universal matchers) are skipped unless include_hubs.
 
@@ -211,7 +211,10 @@ class Mnemo:
                 sim = max(0.0, float(sims_vec[self._vec_rowof[r["id"]]]))
             else:                                             # pure-Python cosine, or lexical fallback
                 sim = self._similarity(query, r, qvec, qtok)
-            if sim <= 0:
+            # Relevance-floor ABSTENTION: drop candidates below an absolute similarity floor; if the WHOLE
+            # top-k falls below it, recall() returns [] ("not in memory") instead of padding context with a weak
+            # false match. min_relevance=0.0 (default) keeps legacy behavior (only sim<=0 is dropped).
+            if sim <= 0 or sim < min_relevance:
                 continue
             # Provenance gate: a memory that absorbed near-duplicates (links) is STALE-DERIVED if any of
             # those sources was later CONTRADICTED (state-toggle supersession) — the merged summary
