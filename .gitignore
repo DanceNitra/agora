@@ -107,3 +107,10 @@ agora_output/**/_*.json
 /tools/.self_improvement_state.json
 /_self_improvement.log
 /_self_improvement.err
+
+# internal strategy / gated drafts — never publish to the public repo
+agora_output/benchmark/PUBLICATION_READINESS.md
+agora_output/benchmark/DESIGN.md
+agora_output/*draft*.md
+agora_output/*_comment*.md
+agora_output/*_reply*.md

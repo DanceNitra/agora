@@ -1,0 +1,31 @@
+{
+  "name": "RAMR",
+  "version": "0.1.0",
+  "description": "Retrieval-Augmented Memory Reliability -- contamination-resistant synthetic benchmark.",
+  "generator_seed": 20260623,
+  "hops": 3,
+  "files": {
+    "ramr_chains_v0.1.0.jsonl": {
+      "n": 300,
+      "sha256": "00f15876806726908d41f6770fe9ea401ec9a99a8245bd1d3545a983d5ca68d0"
+    }
+  },
+  "schema": {
+    "id": "str",
+    "question": "str",
+    "gold_facts": "list[str] (complete chain)",
+    "answer": "str",
+    "drop_index": "int (hop dropped for PARTIAL)",
+    "distractor_pool": "list[str] (len 60, take first k for DISTRACTION)"
+  },
+  "metrics": [
+    "CONVERSION (gold acc)",
+    "CHAIN-FRAGILITY (gold-partial)",
+    "DISTRACTION (gold-noisy)"
+  ],
+  "contamination_note": "entities are random synthetic tokens -> closed-book accuracy ~0 (uncontaminated).",
+  "memory_families_external": {
+    "FACT-RETENTION": "ramr_factret.py (deterministic gen_facts seeds)",
+    "OUTCOME-RANKED-RECALL": "ramr_outcome_ranked.py (embed-once fixed pool, seed 99)"
+  }
+}

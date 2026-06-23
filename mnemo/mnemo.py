@@ -365,7 +365,7 @@ class Mnemo:
                     if b["status"] != "active" or b["id"] in a["links"]:
                         continue
                     if self._similarity(a["text"], b, avec) >= dup_threshold:
-                        if _negation_clash(a["text"], b["text"]):
+                        if _negation_clash(a["text"], b["text"]) or _value_clash(a["text"], b["text"]):
                             older, newer = (a, b) if a["ts"] <= b["ts"] else (b, a)
                             older["status"] = "superseded"
                             older["superseded_ts"] = time.time()
@@ -432,7 +432,7 @@ class Mnemo:
                     if b["status"] != "active" or b["id"] in a["links"]:
                         continue
                     if self._similarity(a["text"], b, avec) >= dup_threshold:
-                        if _negation_clash(a["text"], b["text"]):
+                        if _negation_clash(a["text"], b["text"]) or _value_clash(a["text"], b["text"]):
                             older, newer = (a, b) if a["ts"] <= b["ts"] else (b, a)
                             older["status"] = "superseded"; older["superseded_ts"] = time.time()
                             older.setdefault("meta", {})["superseded_by_toggle"] = newer["id"]
@@ -540,6 +540,20 @@ def _negation_clash(a: str, b: str) -> bool:
     LLM judge for production — but gate it behind similarity first to keep it O(neighbourhood)."""
     neg = re.compile(r"\b(not|no|never|cannot|can't|doesn't|isn't|won't|fails?|false)\b", re.I)
     return bool(neg.search(a)) != bool(neg.search(b))
+
+
+_NUM = re.compile(r"-?\d+(?:\.\d+)?")
+
+
+def _value_clash(a: str, b: str) -> bool:
+    """A VALUE UPDATE: two already-near-duplicate statements that are identical EXCEPT for a differing
+    numeric value ('retry limit is 5' -> '... is 12'). This is a state toggle (the fact's value changed),
+    NOT a duplicate — so the older should be superseded, not merged. Gated behind the caller's similarity
+    check; the tight 'non-numeric remainder is identical' condition keeps genuinely-distinct facts safe."""
+    na, nb = set(_NUM.findall(a)), set(_NUM.findall(b))
+    if (not na and not nb) or na == nb:
+        return False                                      # no numbers, or same numbers -> not a value change
+    return _tokens(_NUM.sub("", a)) == _tokens(_NUM.sub("", b))   # identical apart from the value(s)
 
 
 if __name__ == "__main__":

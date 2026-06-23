@@ -4,12 +4,12 @@
 <script>document.documentElement.className+=' js';</script>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Agora — AI Audit: one reliability report for your AI system</title>
-<meta name="description" content="Agora AI Audit gives any AI/agent system one prioritized PASS/WARN/FAIL reliability report — reward-hacking, model-collapse, agent-herding, fake metrics, RAG rot, un-identified causal claims — built on 8 zero-dependency tools, each with a measured benchmark, that we run and audit ourselves on.">
+<title>Agora — an autonomous research organization that ships receipts</title>
+<meta name="description" content="Agora is an autonomous research organization. Every published claim ships as the smallest model that could prove it wrong — a measured number and runnable code. A public replication ledger (51 claims tested, 31 reproduced, 6 failed), an open agentic-memory benchmark (RAMR), and open-source tools we run on ourselves.">
 <link rel="canonical" href="https://dancenitra.github.io/agora/">
 <meta property="og:type" content="website">
-<meta property="og:title" content="Agora — we build research tools, prove them in code, and run our own company on them">
-<meta property="og:description" content="8 zero-dependency tools, each with a measured benchmark · a self-audit that runs them on ourselves (8/8 healthy) · a public replication ledger (24 tested, 2 failed). Open-core.">
+<meta property="og:title" content="Agora — an autonomous research organization that ships receipts">
+<meta property="og:description" content="Every published claim ships as the smallest model that could prove it wrong. Public replication ledger: 51 claims tested, 31 reproduced, 6 failed. Plus RAMR (an open agentic-memory benchmark) and open-source tools. Open-core.">
 <meta property="og:url" content="https://dancenitra.github.io/agora/">
 <meta property="og:site_name" content="Agora">
 <meta name="twitter:card" content="summary_large_image">
@@ -269,11 +269,11 @@
 <nav class="nav"><div class="wrap">
   <a class="brand" href="#"><span class="m"></span>AGORA</a>
   <div class="navlinks">
-    <a href="public/aiaudit/"><span class="en">AI Audit</span><span class="sk">AI Audit</span></a>
-    <a href="#toolkit"><span class="en">Toolkit</span><span class="sk">Nástroje</span></a>
-    <a href="public/self-audit/"><span class="en">Self-audit</span><span class="sk">Seba-audit</span></a>
+    <a href="#shipped"><span class="en">Shipped</span><span class="sk">Dodané</span></a>
+    <a href="#ramr">RAMR</a>
     <a href="public/crucible/"><span class="en">The Crucible</span><span class="sk">Crucible</span></a>
     <a href="#writing"><span class="en">Writing</span><span class="sk">Texty</span></a>
+    <a href="public/aiaudit/"><span class="en">AI Audit</span><span class="sk">AI Audit</span></a>
     <span class="lng"><button data-l="en" class="on">EN</button><button data-l="sk">SK</button></span>
     <a class="gh" href="https://github.com/DanceNitra/agora" target="_blank" rel="noopener">GitHub &#8599;</a>
   </div>
@@ -281,30 +281,30 @@
 
 <header class="mast"><div class="wrap">
   <div class="dateline">
-    <span><span class="en">An autonomous research company</span><span class="sk">Autonómna výskumná firma</span></span>
-    <span><span class="en">8 tools shipped &middot; <b>8/8</b> self-audit healthy &middot; every claim ships runnable code</span><span class="sk">8 nástrojov &middot; <b>8/8</b> seba-audit zdravý &middot; každé tvrdenie so spustiteľným kódom</span></span>
+    <span><span class="en">An autonomous research organization</span><span class="sk">Autonómna výskumná organizácia</span></span>
+    <span><span class="en"><b>51</b> claims tested &middot; <b>6</b> failed &amp; published &middot; <b>27</b> essays &middot; open-core</span><span class="sk"><b>51</b> tvrdení testovaných &middot; <b>6</b> zlyhaných &amp; zverejnených &middot; <b>27</b> esejí &middot; open-core</span></span>
   </div>
   <div class="mastgrid">
     <div>
       <h1>
         <span class="en">
-          <span class="line"><span style="--i:0">We build the tools,</span></span>
-          <span class="line"><span style="--i:1">prove every one in code,</span></span>
-          <span class="line"><span style="--i:2">and <span class="turn">run on them.</span></span></span>
+          <span class="line"><span style="--i:0">An autonomous</span></span>
+          <span class="line"><span style="--i:1">research organization</span></span>
+          <span class="line"><span style="--i:2">that <span class="turn">ships receipts.</span></span></span>
         </span>
         <span class="sk">
-          <span class="line"><span style="--i:0">Staviame nástroje,</span></span>
-          <span class="line"><span style="--i:1">každý dokážeme v kóde,</span></span>
-          <span class="line"><span style="--i:2">a <span class="turn">bežíme na nich.</span></span></span>
+          <span class="line"><span style="--i:0">Autonómna</span></span>
+          <span class="line"><span style="--i:1">výskumná organizácia,</span></span>
+          <span class="line"><span style="--i:2">ktorá <span class="turn">prináša dôkazy.</span></span></span>
         </span>
       </h1>
-      <p class="stand"><span class="en">Agora is an <b>autonomous research company</b>. Our product, <b>AI Audit</b>, gives any
-      AI/agent system <b>one reliability report</b> across every failure mode &mdash; reward-hacking,
-      model-collapse, agent-herding, fake metrics, RAG rot, un-identified causal claims. It runs on
-      <b>8 zero-dependency tools we proved in code and run on ourselves</b>.</span><span class="sk">Agora je <b>autonómna výskumná firma</b>. Náš produkt, <b>AI Audit</b>, dá ľubovoľnému
-      AI/agentovému systému <b>jeden reliability report</b> naprieč všetkými spôsobmi zlyhania &mdash;
-      reward-hacking, kolaps modelu, stádovanie agentov, falošné metriky, hnitie RAG, neidentifikované
-      kauzálne tvrdenia. Beží na <b>8 nástrojoch bez závislostí, ktoré sme dokázali v kóde a bežíme na nich</b>.</span></p>
+      <p class="stand"><span class="en">Agora is an <b>autonomous research organization</b>. Eight AI agents research around
+      the clock; every claim we publish ships as <b>the smallest model that could prove it wrong</b> &mdash; a
+      measured number and runnable code. We replicate the field&rsquo;s folklore, publish the failures, and run the
+      whole operation on our own open-source tools.</span><span class="sk">Agora je <b>autonómna výskumná organizácia</b>. Osem AI agentov skúma
+      nepretržite; každé tvrdenie, ktoré zverejníme, prichádza ako <b>najmenší model, ktorý by ho mohol vyvrátiť</b>
+      &mdash; nameraným číslom a spustiteľným kódom. Replikujeme folklór odboru, zverejňujeme zlyhania a celú
+      prevádzku poháňame vlastnými open-source nástrojmi.</span></p>
     </div>
     <figure class="fig draw" data-reveal>
       <svg viewBox="0 0 900 420" role="img" aria-label="Bias of the hot-hand estimator on a fair coin, by record length">
@@ -335,12 +335,86 @@
   <div class="tally" data-reveal>
     <a href="#toolkit"><span class="num" data-count="8">8</span><span class="lbl"><span class="en">Zero-dep tools</span><span class="sk">Nástroje bez závislostí</span></span></a>
     <a class="ok-c" href="public/self-audit/"><span class="num">8/8</span><span class="lbl"><span class="en">Self-audit healthy</span><span class="sk">Seba-audit zdravý</span></span></a>
-    <a class="ok-c" href="public/crucible/"><span class="num" data-count="24">24</span><span class="lbl"><span class="en">Claims reproduced</span><span class="sk">Tvrdení reprodukovaných</span></span></a>
-    <a class="fail-c" href="public/crucible/"><span class="num" data-count="2">2</span><span class="lbl"><span class="en">Failed &mdash; published</span><span class="sk">Zlyhané &mdash; zverejnené</span></span></a>
+    <a class="ok-c" href="public/crucible/"><span class="num" data-count="31">31</span><span class="lbl"><span class="en">Claims reproduced</span><span class="sk">Tvrdení reprodukovaných</span></span></a>
+    <a class="fail-c" href="public/crucible/"><span class="num" data-count="6">6</span><span class="lbl"><span class="en">Failed &mdash; published</span><span class="sk">Zlyhané &mdash; zverejnené</span></span></a>
   </div>
 </div></header>
 
 <main>
+
+<!-- ════ WHAT WE'VE SHIPPED — live artifacts ════ -->
+<style>
+  #shipped .shipgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(330px,1fr));gap:16px;margin-top:34px}
+  #shipped .ship{display:flex;flex-direction:column;border:1px solid var(--line2);border-radius:14px;padding:22px 22px 18px;background:#fff}
+  #shipped .shipname{font-family:var(--mono);font-size:13.5px;font-weight:600;letter-spacing:.02em;color:var(--ink)}
+  #shipped .shipone{margin-top:9px;font-size:15.5px;line-height:1.5;color:var(--text);flex:1}
+  #shipped .shipstat{margin-top:14px;padding-top:12px;border-top:1px solid var(--line);font-family:var(--mono);
+    font-size:12.5px;color:var(--ok);font-variant-numeric:tabular-nums}
+  .badges{display:flex;flex-wrap:wrap;gap:7px;margin-top:14px}
+  .badges a{font-family:var(--mono);font-size:11px;letter-spacing:.02em;color:var(--ok);
+    border:1px solid var(--line2);border-radius:999px;padding:4px 10px;transition:border-color .2s,background .2s}
+  .badges a:hover{border-color:var(--ok);background:var(--ok-soft)}
+  #ramr .rlead{margin-top:30px;background:var(--plate);color:var(--plate-text);border-radius:16px;
+    padding:clamp(26px,3vw,40px);box-shadow:0 28px 56px -40px rgb(26 24 19 / .55)}
+  #ramr .rlead .rk{font-family:var(--mono);font-size:11.5px;letter-spacing:.22em;text-transform:uppercase;color:var(--gold)}
+  #ramr .rlead .rstat{font-family:var(--mono);font-weight:600;font-size:clamp(26px,3vw,40px);line-height:1.1;
+    margin-top:14px;letter-spacing:-.01em}
+  #ramr .rlead .rstat .g{color:#7fd7b4}
+  #ramr .rlead p{margin-top:14px;font-size:16px;line-height:1.6;color:var(--plate-soft);max-width:60ch}
+  #ramr .mlist{list-style:none;margin:26px 0 0;padding:0;border-top:2px solid var(--ink)}
+  #ramr .mlist li{display:grid;grid-template-columns:215px 1fr;gap:20px;padding:14px 4px;
+    border-bottom:1px solid var(--line);align-items:baseline}
+  #ramr .mlist .mk{font-family:var(--mono);font-size:12.5px;font-weight:600;letter-spacing:.04em;color:var(--ink)}
+  #ramr .mlist p{font-size:15.5px;line-height:1.5;color:var(--text)}
+  @media(max-width:880px){#ramr .mlist li{grid-template-columns:1fr;gap:4px}}
+</style>
+<section id="shipped"><div class="wrap">
+  <div class="seckick"><span class="en">What we&rsquo;ve shipped &middot; with receipts</span><span class="sk">Čo sme dodali &middot; s dôkazmi</span></div>
+  <h2 data-reveal><span class="en">Five artifacts &mdash; every one public, runnable, and third-party archived.</span><span class="sk">Päť artefaktov &mdash; každý verejný, spustiteľný a archivovaný treťou stranou.</span></h2>
+  <div class="shipgrid" data-reveal>
+    <div class="ship"><div class="shipname">The Crucible &middot; Folklore Index</div>
+      <div class="shipone"><span class="en">A public replication ledger: each claim rebuilt as the smallest model that could refute it.</span><span class="sk">Verejný replikačný register: každé tvrdenie prestavané na najmenší model, ktorý by ho vyvrátil.</span></div>
+      <div class="shipstat">51 tested &middot; 31 reproduced &middot; 6 failed &middot; 14 not&#8209;computable</div>
+      <div class="badges"><a href="public/crucible/"><span class="en">The ledger</span><span class="sk">Register</span></a><a href="https://huggingface.co/datasets/Danchi17/folklore-index" target="_blank" rel="noopener">Hugging Face</a><a href="https://doi.org/10.5281/zenodo.20771544" target="_blank" rel="noopener">DOI</a></div></div>
+    <div class="ship"><div class="shipname">RAMR</div>
+      <div class="shipone"><span class="en">A contamination-resistant benchmark for agentic-RAG / memory systems &mdash; six metrics, pre-registered falsifiers, sha256-pinned data.</span><span class="sk">Benchmark odolný voči kontaminácii pre agentic-RAG / pamäťové systémy &mdash; šesť metrík, predregistrované falzifikátory, sha256 dáta.</span></div>
+      <div class="shipstat">chain&#8209;fragility +1.000 (CI [1.000, 1.000], n=200)</div>
+      <div class="badges"><a href="https://github.com/DanceNitra/ramr" target="_blank" rel="noopener"><span class="en">Code</span><span class="sk">Kód</span></a><a href="https://huggingface.co/datasets/Danchi17/ramr" target="_blank" rel="noopener">Hugging Face</a><a href="https://doi.org/10.5281/zenodo.20818291" target="_blank" rel="noopener">DOI</a><a href="#ramr"><span class="en">Details</span><span class="sk">Detaily</span></a></div></div>
+    <div class="ship"><div class="shipname">mnemo &middot; Mnemosyne</div>
+      <div class="shipone"><span class="en">Agent memory + a self-maintaining second brain, distilled to one zero-dependency file. MCP server included.</span><span class="sk">Pamäť agentov + samoudržiavajúci druhý mozog v jednom súbore bez závislostí. MCP server v balíku.</span></div>
+      <div class="shipstat"><span class="en">~3&times; more value kept vs FIFO under a tight budget</span><span class="sk">~3&times; viac hodnoty udržané oproti FIFO pri tesnom rozpočte</span></div>
+      <div class="badges"><a href="https://github.com/DanceNitra/agora/tree/main/mnemo" target="_blank" rel="noopener"><span class="en">Source</span><span class="sk">Zdroj</span></a><a href="#mnemosyne"><span class="en">How it works</span><span class="sk">Ako to funguje</span></a></div></div>
+    <div class="ship"><div class="shipname">AI Audit</div>
+      <div class="shipone"><span class="en">One prioritized PASS/WARN/FAIL reliability report for any AI/agent system, built on 8 zero-dependency checks.</span><span class="sk">Jeden prioritizovaný PASS/WARN/FAIL report pre ľubovoľný AI/agentový systém, na 8 kontrolách bez závislostí.</span></div>
+      <div class="shipstat">8/8 self&#8209;audit healthy &middot; 94% externally grounded</div>
+      <div class="badges"><a href="public/aiaudit/"><span class="en">Run it free</span><span class="sk">Spusti zadarmo</span></a><a href="#toolkit"><span class="en">The 8 tools</span><span class="sk">8 nástrojov</span></a></div></div>
+    <div class="ship"><div class="shipname"><span class="en">Writing</span><span class="sk">Texty</span></div>
+      <div class="shipone"><span class="en">Essays, each one shipping a measured number, not an opinion.</span><span class="sk">Eseje, každá s nameraným číslom, nie názorom.</span></div>
+      <div class="shipstat">27 <span class="en">published</span><span class="sk">zverejnených</span></div>
+      <div class="badges"><a href="public/posts/"><span class="en">All essays</span><span class="sk">Všetky eseje</span></a></div></div>
+  </div>
+</div></section>
+
+<!-- ════ RAMR — the memory benchmark ════ -->
+<section id="ramr"><div class="wrap">
+  <div class="seckick"><span class="en">Memory benchmark &middot; RAMR</span><span class="sk">Pamäťový benchmark &middot; RAMR</span></div>
+  <h2 data-reveal><span class="en">RAMR &mdash; a contamination-resistant benchmark for agentic-RAG and memory systems.</span><span class="sk">RAMR &mdash; benchmark odolný voči kontaminácii pre agentic-RAG a pamäťové systémy.</span></h2>
+  <p class="secsub" data-reveal><span class="en">Items are random synthetic tokens, so no model can have memorized the answers &mdash; it isolates the retrieval/memory <b>mechanism</b>. Six metrics, runnable, MIT. A findings + method release, not a leaderboard: treat small-n magnitudes as directional, the orderings as the signal.</span><span class="sk">Položky sú náhodné syntetické tokeny, takže žiadny model si odpovede nemohol zapamätať &mdash; izoluje <b>mechanizmus</b> vyhľadávania/pamäte. Šesť metrík, spustiteľné, MIT. Vydanie zistení + metódy, nie rebríček: malé vzorky ber ako smerové, poradie je signál.</span></p>
+  <div class="rlead" data-reveal>
+    <div class="rk"><span class="en">Lead finding &middot; across the models we tested</span><span class="sk">Hlavné zistenie &middot; naprieč testovanými modelmi</span></div>
+    <div class="rstat"><span class="en">One missing hop collapses 3-hop retrieval &mdash; <span class="g">chain-fragility +1.000</span> (CI [1.000, 1.000]), n=200.</span><span class="sk">Jeden chýbajúci krok zrúti 3-krokové vyhľadávanie &mdash; <span class="g">chain-fragility +1.000</span> (CI [1.000, 1.000]), n=200.</span></div>
+    <p><span class="en">Identical on a 30B local model and a frontier model. A recall miss on a single linked fact is near-total, not graceful &mdash; completeness of the chain matters far more than how clean the context looks.</span><span class="sk">Identické na 30B lokálnom aj frontier modeli. Výpadok jediného prepojeného faktu je takmer úplný, nie postupný &mdash; úplnosť reťazca je dôležitejšia než to, ako čistý kontext vyzerá.</span></p>
+  </div>
+  <ul class="mlist" data-reveal>
+    <li><span class="mk">CONVERSION</span><p><span class="en">complete retrieval converts to a correct multi-hop answer (gold accuracy 1.000, n=40).</span><span class="sk">úplné vyhľadanie sa premení na správnu viac-krokovú odpoveď (gold presnosť 1.000, n=40).</span></p></li>
+    <li><span class="mk">CHAIN-FRAGILITY</span><p><span class="en">one missing hop &rarr; near-total collapse (+1.000, CI [1.000,1.000], n=200).</span><span class="sk">jeden chýbajúci krok &rarr; takmer úplný kolaps (+1.000, CI [1.000,1.000], n=200).</span></p></li>
+    <li><span class="mk">DISTRACTION</span><p><span class="en">cost of noisy context is model-specific (+0.15 to +0.60 across models).</span><span class="sk">cena zašumeného kontextu je špecifická pre model (+0.15 až +0.60).</span></p></li>
+    <li><span class="mk">FACT-RETENTION</span><p><span class="en">compaction is lossy under a fixed budget (+0.70 loss at a 400-char budget).</span><span class="sk">kompakcia je stratová pri pevnom rozpočte (+0.70 strata pri 400-znakovom rozpočte).</span></p></li>
+    <li><span class="mk">OUTCOME-RANKED-RECALL</span><p><span class="en">ranking recall by was-it-right beats was-it-recalled (+0.345 to +0.500; CIs exclude 0).</span><span class="sk">radenie pamäte podľa &bdquo;bolo to správne&ldquo; bije &bdquo;bolo to nájdené&ldquo; (+0.345 až +0.500; CI nad nulou).</span></p></li>
+    <li><span class="mk">FORGET-PRECISION</span><p><span class="en">after a fact is updated, does recall return the current value &mdash; this caught and fixed a value-update gap in our own mnemo.</span><span class="sk">po aktualizácii faktu &mdash; vráti recall aktuálnu hodnotu? Toto odhalilo a opravilo medzeru pri zmene hodnoty v našom mnemo.</span></p></li>
+  </ul>
+  <div class="badges" data-reveal style="margin-top:22px"><a href="https://github.com/DanceNitra/ramr" target="_blank" rel="noopener">github.com/DanceNitra/ramr</a><a href="https://doi.org/10.5281/zenodo.20818291" target="_blank" rel="noopener">DOI 10.5281/zenodo.20818291</a><a href="https://huggingface.co/datasets/Danchi17/ramr" target="_blank" rel="noopener">Hugging Face</a></div>
+</div></section>
 
 <!-- ════ AI AUDIT — the product ════ -->
 <style>
@@ -403,7 +477,7 @@
   <h2 data-reveal><span class="en">Eight tools. Each one a single file, each with a measured benchmark.</span><span class="sk">Osem nástrojov. Každý jeden súbor, každý s odmeraným benchmarkom.</span></h2>
   <p class="secsub" data-reveal><span class="en">AI Audit is built on these &mdash; and each works standalone too. The rule is <b>measured, not assumed</b>. Copy a file or <code style="font-family:var(--mono);font-size:.92em">pip install</code>; each ships an MCP server for any agent.</span><span class="sk">Vydestilované z výskumného systému &mdash; pravidlo znie <b>odmerané, nie predpokladané</b>. Skopíruj súbor alebo <code style="font-family:var(--mono);font-size:.92em">pip install</code>; každý má MCP server pre ľubovoľného agenta.</span></p>
   <div class="tkgrid" data-reveal>
-    <a class="tk" href="https://github.com/DanceNitra/agora/tree/main/mnemo" target="_blank" rel="noopener"><div class="tkname">mnemo</div><div class="tkone"><span class="en">Agent memory + a self-maintaining second brain.</span><span class="sk">Pamäť agentov + samoudržiavajúci druhý mozog.</span></div><div class="tkstat">6.7&times; more high-value memory kept vs FIFO</div></a>
+    <a class="tk" href="https://github.com/DanceNitra/agora/tree/main/mnemo" target="_blank" rel="noopener"><div class="tkname">mnemo</div><div class="tkone"><span class="en">Agent memory + a self-maintaining second brain.</span><span class="sk">Pamäť agentov + samoudržiavajúci druhý mozog.</span></div><div class="tkstat">~3&times; more value kept vs FIFO under a tight budget</div></a>
     <a class="tk" href="https://github.com/DanceNitra/agora/tree/main/ragfresh" target="_blank" rel="noopener"><div class="tkname">ragfresh</div><div class="tkone"><span class="en">A freshness / decay layer for RAG &amp; vector stores.</span><span class="sk">Vrstva čerstvosti / rozpadu pre RAG a vektorové sklady.</span></div><div class="tkstat">value&times;freshness kept 96% of oracle vs 52% recency</div></a>
     <a class="tk" href="https://github.com/DanceNitra/agora/tree/main/nullcheck" target="_blank" rel="noopener"><div class="tkname">nullcheck</div><div class="tkone"><span class="en">Is this number real, or just noise?</span><span class="sk">Je to číslo reálne, alebo len šum?</span></div><div class="tkstat">a +15% A/B lift on n=1k reads as noise (p=0.28)</div></a>
     <a class="tk" href="https://github.com/DanceNitra/agora/tree/main/selfref" target="_blank" rel="noopener"><div class="tkname">selfref</div><div class="tkone"><span class="en">Is your AI training on itself? (model collapse)</span><span class="sk">Trénuje tvoja AI sama na sebe? (kolaps modelu)</span></div><div class="tkstat">no real data &rarr; 94% collapse; a 5% anchor fixes it</div></a>
@@ -480,7 +554,7 @@
       <span class="ldek"><span class="en">Constant&#8209;step SGD stalls at a noise floor; the slowdown is variance, not curvature.</span><span class="sk">SGD s konštantným krokom uviazne na podlahe šumu; spomalenie je rozptyl, nie zakrivenie.</span></span>
     </a>
   </div>
-  <a class="lmore" href="public/crucible/"><span class="en">All 16 claims, with their runnable models</span><span class="sk">Všetkých 16 tvrdení, s ich spustiteľnými modelmi</span> <span>&rarr;</span></a>
+  <a class="lmore" href="public/crucible/"><span class="en">All 51 claims, with their runnable models &mdash; plus 14 recorded as not-computable</span><span class="sk">Všetkých 51 tvrdení, s ich spustiteľnými modelmi &mdash; plus 14 zaznamenaných ako nevypočítateľné</span> <span>&rarr;</span></a>
 </div></section>
 
 <!-- ════ THE TWO FAILURES — letterpress plates ════ -->
@@ -650,9 +724,9 @@
   súboru bez závislostí &mdash; jej návrhové pravidlá si vyslúžili vlastné zistenia registra.</span></p>
   <div class="mngrid">
     <div class="mn-nums" data-reveal>
-      <div class="mn-num"><span class="v">6.7&times;</span><p><span class="en">more high&#8209;value memory retained by value&#8209;ranked
-        consolidation vs FIFO at a 5% budget &mdash; the advantage grows as space shrinks.</span><span class="sk">viac hodnotnej pamäte udrží konsolidácia zoradená podľa
-        hodnoty oproti FIFO pri 5% rozpočte &mdash; výhoda rastie, ako sa miesto zmenšuje.</span></p></div>
+      <div class="mn-num"><span class="v">~3&times;</span><p><span class="en">more total value retained by value&#8209;ranked
+        consolidation vs FIFO under a tight budget (100% vs 64% of value) &mdash; the advantage grows as space shrinks.</span><span class="sk">viac celkovej hodnoty udrží konsolidácia zoradená podľa
+        hodnoty oproti FIFO pri tesnom rozpočte (100% vs 64% hodnoty) &mdash; výhoda rastie, ako sa miesto zmenšuje.</span></p></div>
       <div class="mn-num"><span class="v">2.8% &rarr; 100%</span><p><span class="en">recall of rare&#8209;but&#8209;critical memories: access&#8209;frequency
         decay starves them; a value&#8209;aware blend keeps them all. Popularity is not value.</span><span class="sk">vybavenie zriedkavých&#8209;ale&#8209;kritických spomienok: úpadok podľa
         frekvencie prístupu ich vyhladuje; zmes zohľadňujúca hodnotu ich udrží všetky. Popularita nie je hodnota.</span></p></div>
@@ -670,7 +744,7 @@ m.remember(<span class="s">"pre-trend tests catch ~31% of fatal bias"</span>,
 m.recall(<span class="s">"difference in differences"</span>)  <span class="c"># value-ranked</span>
 m.consolidate(keep=<span class="s">200</span>)               <span class="c"># the dream pass</span>
 m.contradictions()                     <span class="c"># flag, never delete</span></pre></div>
-      <div class="mnfoot"><span class="en">MCP server included &mdash; drop&#8209;in long&#8209;term memory for any agent client.</span><span class="sk">Súčasťou je MCP server &mdash; zapojiteľná dlhodobá pamäť pre ľubovoľného agentového klienta.</span>
+      <div class="mnfoot"><span class="en">MCP server included &mdash; drop&#8209;in long&#8209;term memory for any agent client. Our own RAMR FORGET&#8209;PRECISION check caught a value&#8209;update gap in mnemo &mdash; when a fact is superseded, recall now returns the current value, not the stale one. We fixed it and shipped it.</span><span class="sk">Súčasťou je MCP server &mdash; zapojiteľná dlhodobá pamäť pre ľubovoľného agentového klienta. Náš vlastný RAMR FORGET&#8209;PRECISION test odhalil v mnemo medzeru pri zmene hodnoty &mdash; keď je fakt nahradený, recall teraz vráti aktuálnu hodnotu, nie zastaranú. Opravili sme to a nasadili.</span>
       <a href="https://github.com/DanceNitra/agora/tree/main/mnemo" target="_blank" rel="noopener">github.com/DanceNitra/agora/mnemo &rarr;</a></div>
     </div>
   </div>
@@ -704,26 +778,48 @@ m.contradictions()                     <span class="c"># flag, never delete</spa
 <div class="organism"><div class="wrap">
   <h2 data-reveal><span class="en">Built by the thing itself</span><span class="sk">Postavené tou vecou samotnou</span></h2>
   <p data-reveal><span class="en">Agora runs as an autonomous organism: <b>eight agents</b> research around the clock,
-  a laboratory executes their experiments &mdash; <b>62</b> ledgered so far &mdash; and a
-  <b>6,433&#8209;note</b> living memory consolidates what holds. Its own findings feed back into how
+  a laboratory executes their experiments &mdash; <b>60+</b> ledgered so far &mdash; and a living memory of
+  <b>thousands of curated notes</b> consolidates what holds. Its own findings feed back into how
   it works: the crowd research shaped how its agents diverge; the memory research became Mnemosyne.
   Nothing leaves the machine without its owner&rsquo;s review.</span><span class="sk">Agora beží ako autonómny organizmus: <b>osem agentov</b> skúma nepretržite,
-  laboratórium vykonáva ich experimenty &mdash; <b>62</b> doteraz zaznamenaných &mdash; a
-  <b>6 433&#8209;poznámková</b> živá pamäť konsoliduje to, čo obstojí. Jej vlastné zistenia sa vracajú do toho, ako
+  laboratórium vykonáva ich experimenty &mdash; <b>60+</b> doteraz zaznamenaných &mdash; a živá pamäť
+  <b>tisícok kurátorovaných poznámok</b> konsoliduje to, čo obstojí. Jej vlastné zistenia sa vracajú do toho, ako
   funguje: výskum davov utváral, ako sa jej agenti rozchádzajú; výskum pamäte sa stal Mnemosyne.
   Nič neopustí stroj bez revízie jej vlastníka.</span></p>
 </div></div>
 
+<!-- ════ ABOUT + FOUNDER ════ -->
+<section id="about"><div class="wrap">
+  <div class="seckick"><span class="en">About</span><span class="sk">O nás</span></div>
+  <p class="secsub" data-reveal style="max-width:68ch"><span class="en">Agora is an autonomous research organization founded and directed by <b>Rastislav Drahoš</b> (<b>DanceNitra</b>). Eight AI agents do the round-the-clock research; nothing is published without human review.</span><span class="sk">Agora je autonómna výskumná organizácia založená a vedená <b>Rastislavom Drahošom</b> (<b>DanceNitra</b>). Osem AI agentov robí nepretržitý výskum; nič sa nezverejní bez ľudskej kontroly.</span></p>
+</div></section>
+
 </main>
 
 <footer><div class="wrap">
-  <span><span class="en">AGORA &mdash; an autonomous research system &middot; verdicts with receipts</span><span class="sk">AGORA &mdash; autonómny výskumný systém &middot; verdikty s dôkazmi</span></span>
   <div class="cols">
-    <a href="public/crucible/"><span class="en">Ledger</span><span class="sk">Register</span></a>
-    <a href="public/posts/"><span class="en">Writing</span><span class="sk">Texty</span></a>
-    <a href="https://github.com/DanceNitra/agora/tree/main/mnemo" target="_blank" rel="noopener">Mnemosyne</a>
-    <a href="https://github.com/DanceNitra/agora" target="_blank" rel="noopener"><span class="en">Source</span><span class="sk">Zdroj</span></a>
+    <div>
+      <span class="lbl" style="display:block;font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--faint);margin-bottom:8px"><span class="en">Artifacts</span><span class="sk">Artefakty</span></span>
+      <a href="public/crucible/" style="display:block;padding:3px 0"><span class="en">The Crucible</span><span class="sk">Crucible</span></a>
+      <a href="https://github.com/DanceNitra/ramr" target="_blank" rel="noopener" style="display:block;padding:3px 0">RAMR</a>
+      <a href="https://github.com/DanceNitra/agora/tree/main/mnemo" target="_blank" rel="noopener" style="display:block;padding:3px 0">mnemo</a>
+      <a href="public/aiaudit/" style="display:block;padding:3px 0">AI Audit</a>
+    </div>
+    <div>
+      <span class="lbl" style="display:block;font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--faint);margin-bottom:8px"><span class="en">Data</span><span class="sk">Dáta</span></span>
+      <a href="https://huggingface.co/datasets/Danchi17/folklore-index" target="_blank" rel="noopener" style="display:block;padding:3px 0">Folklore Index &middot; HF</a>
+      <a href="https://huggingface.co/datasets/Danchi17/ramr" target="_blank" rel="noopener" style="display:block;padding:3px 0">RAMR &middot; HF</a>
+      <a href="https://doi.org/10.5281/zenodo.20818291" target="_blank" rel="noopener" style="display:block;padding:3px 0">RAMR &middot; DOI</a>
+      <a href="public/crucible/crucible.json" style="display:block;padding:3px 0"><span class="en">Ledger JSON</span><span class="sk">Register JSON</span></a>
+    </div>
+    <div>
+      <span class="lbl" style="display:block;font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--faint);margin-bottom:8px"><span class="en">Read</span><span class="sk">Čítaj</span></span>
+      <a href="public/posts/" style="display:block;padding:3px 0"><span class="en">Writing</span><span class="sk">Texty</span></a>
+      <a href="public/self-audit/" style="display:block;padding:3px 0"><span class="en">Self-audit</span><span class="sk">Seba-audit</span></a>
+      <a href="https://github.com/DanceNitra/agora" target="_blank" rel="noopener" style="display:block;padding:3px 0"><span class="en">Source</span><span class="sk">Zdroj</span></a>
+    </div>
   </div>
+  <span style="width:100%;border-top:1px solid var(--line);padding-top:18px;margin-top:8px"><span class="en">AGORA &mdash; an autonomous research organization &middot; verdicts with receipts &middot; founded by Rastislav Drahoš &middot; &copy; 2026</span><span class="sk">AGORA &mdash; autonómna výskumná organizácia &middot; verdikty s dôkazmi &middot; založil Rastislav Drahoš &middot; &copy; 2026</span></span>
 </div></footer>
 
 <script>

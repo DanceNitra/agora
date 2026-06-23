@@ -1,0 +1,23 @@
+{
+  "version": "0.1.0",
+  "dataset": "ramr_chains_v0.1.0.jsonl",
+  "model": "qwen3-coder:30b",
+  "n": 3,
+  "dist": 10,
+  "conversion": 1.0,
+  "chain_fragility": {
+    "v": 1.0,
+    "ci": [
+      1.0,
+      1.0
+    ]
+  },
+  "distraction": {
+    "v": 0.0,
+    "ci": [
+      0.0,
+      0.0
+    ]
+  },
+  "closed_book": 0.0
+}

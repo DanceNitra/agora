@@ -1,0 +1,728 @@
+{
+"0": [
+{
+"e_attr": "concurrency cap of the geo lookup",
+"val": "240",
+"text": "The concurrency cap of the geo lookup is 240."
+},
+{
+"e_attr": "timeout seconds of the chat gateway",
+"val": "200",
+"text": "The timeout seconds of the chat gateway is 200."
+},
+{
+"e_attr": "retry limit of the login flow",
+"val": "293",
+"text": "The retry limit of the login flow is 293."
+},
+{
+"e_attr": "timeout seconds of the data lake",
+"val": "103",
+"text": "The timeout seconds of the data lake is 103."
+},
+{
+"e_attr": "concurrency cap of the search index",
+"val": "129",
+"text": "The concurrency cap of the search index is 129."
+},
+{
+"e_attr": "concurrency cap of the data lake",
+"val": "301",
+"text": "The concurrency cap of the data lake is 301."
+},
+{
+"e_attr": "retry limit of the schema migrator",
+"val": "52",
+"text": "The retry limit of the schema migrator is 52."
+},
+{
+"e_attr": "concurrency cap of the trace collector",
+"val": "136",
+"text": "The concurrency cap of the trace collector is 136."
+},
+{
+"e_attr": "retry limit of the fraud check",
+"val": "60",
+"text": "The retry limit of the fraud check is 60."
+},
+{
+"e_attr": "cache TTL minutes of the rate limiter",
+"val": "246",
+"text": "The cache TTL minutes of the rate limiter is 246."
+},
+{
+"e_attr": "concurrency cap of the webhook relay",
+"val": "130",
+"text": "The concurrency cap of the webhook relay is 130."
+},
+{
+"e_attr": "max batch size of the payment API",
+"val": "174",
+"text": "The max batch size of the payment API is 174."
+},
+{
+"e_attr": "retry limit of the geo lookup",
+"val": "306",
+"text": "The retry limit of the geo lookup is 306."
+},
+{
+"e_attr": "cache TTL minutes of the schema migrator",
+"val": "284",
+"text": "The cache TTL minutes of the schema migrator is 284."
+},
+{
+"e_attr": "cache TTL minutes of the notification bus",
+"val": "259",
+"text": "The cache TTL minutes of the notification bus is 259."
+},
+{
+"e_attr": "timeout seconds of the schema migrator",
+"val": "124",
+"text": "The timeout seconds of the schema migrator is 124."
+},
+{
+"e_attr": "concurrency cap of the token vault",
+"val": "283",
+"text": "The concurrency cap of the token vault is 283."
+},
+{
+"e_attr": "timeout seconds of the payment API",
+"val": "76",
+"text": "The timeout seconds of the payment API is 76."
+},
+{
+"e_attr": "concurrency cap of the backup task",
+"val": "80",
+"text": "The concurrency cap of the backup task is 80."
+},
+{
+"e_attr": "cache TTL minutes of the data lake",
+"val": "209",
+"text": "The cache TTL minutes of the data lake is 209."
+},
+{
+"e_attr": "max batch size of the recommend svc",
+"val": "233",
+"text": "The max batch size of the recommend svc is 233."
+},
+{
+"e_attr": "retry limit of the notification bus",
+"val": "155",
+"text": "The retry limit of the notification bus is 155."
+},
+{
+"e_attr": "concurrency cap of the cache layer",
+"val": "46",
+"text": "The concurrency cap of the cache layer is 46."
+},
+{
+"e_attr": "max batch size of the image CDN",
+"val": "35",
+"text": "The max batch size of the image CDN is 35."
+},
+{
+"e_attr": "cache TTL minutes of the search index",
+"val": "197",
+"text": "The cache TTL minutes of the search index is 197."
+},
+{
+"e_attr": "timeout seconds of the upload queue",
+"val": "183",
+"text": "The timeout seconds of the upload queue is 183."
+},
+{
+"e_attr": "concurrency cap of the shard router",
+"val": "179",
+"text": "The concurrency cap of the shard router is 179."
+},
+{
+"e_attr": "concurrency cap of the auth service",
+"val": "166",
+"text": "The concurrency cap of the auth service is 166."
+},
+{
+"e_attr": "retry limit of the metrics sink",
+"val": "116",
+"text": "The retry limit of the metrics sink is 116."
+},
+{
+"e_attr": "max batch size of the export tool",
+"val": "287",
+"text": "The max batch size of the export tool is 287."
+},
+{
+"e_attr": "timeout seconds of the audit log",
+"val": "18",
+"text": "The timeout seconds of the audit log is 18."
+},
+{
+"e_attr": "concurrency cap of the payment API",
+"val": "189",
+"text": "The concurrency cap of the payment API is 189."
+},
+{
+"e_attr": "concurrency cap of the billing job",
+"val": "105",
+"text": "The concurrency cap of the billing job is 105."
+},
+{
+"e_attr": "timeout seconds of the token vault",
+"val": "244",
+"text": "The timeout seconds of the token vault is 244."
+},
+{
+"e_attr": "concurrency cap of the notification bus",
+"val": "71",
+"text": "The concurrency cap of the notification bus is 71."
+},
+{
+"e_attr": "concurrency cap of the rate limiter",
+"val": "39",
+"text": "The concurrency cap of the rate limiter is 39."
+},
+{
+"e_attr": "timeout seconds of the metrics sink",
+"val": "257",
+"text": "The timeout seconds of the metrics sink is 257."
+},
+{
+"e_attr": "max batch size of the auth service",
+"val": "252",
+"text": "The max batch size of the auth service is 252."
+},
+{
+"e_attr": "cache TTL minutes of the shard router",
+"val": "208",
+"text": "The cache TTL minutes of the shard router is 208."
+},
+{
+"e_attr": "timeout seconds of the search index",
+"val": "19",
+"text": "The timeout seconds of the search index is 19."
+},
+{
+"e_attr": "timeout seconds of the geo lookup",
+"val": "110",
+"text": "The timeout seconds of the geo lookup is 110."
+},
+{
+"e_attr": "concurrency cap of the email worker",
+"val": "290",
+"text": "The concurrency cap of the email worker is 290."
+},
+{
+"e_attr": "timeout seconds of the trace collector",
+"val": "117",
+"text": "The timeout seconds of the trace collector is 117."
+},
+{
+"e_attr": "cache TTL minutes of the fraud check",
+"val": "98",
+"text": "The cache TTL minutes of the fraud check is 98."
+},
+{
+"e_attr": "max batch size of the backup task",
+"val": "128",
+"text": "The max batch size of the backup task is 128."
+},
+{
+"e_attr": "retry limit of the report engine",
+"val": "169",
+"text": "The retry limit of the report engine is 169."
+},
+{
+"e_attr": "timeout seconds of the recommend svc",
+"val": "268",
+"text": "The timeout seconds of the recommend svc is 268."
+},
+{
+"e_attr": "timeout seconds of the login flow",
+"val": "149",
+"text": "The timeout seconds of the login flow is 149."
+}
+],
+"1": [
+{
+"e_attr": "concurrency cap of the auth service",
+"val": "109",
+"text": "The concurrency cap of the auth service is 109."
+},
+{
+"e_attr": "cache TTL minutes of the schema migrator",
+"val": "66",
+"text": "The cache TTL minutes of the schema migrator is 66."
+},
+{
+"e_attr": "cache TTL minutes of the metrics sink",
+"val": "144",
+"text": "The cache TTL minutes of the metrics sink is 144."
+},
+{
+"e_attr": "cache TTL minutes of the login flow",
+"val": "231",
+"text": "The cache TTL minutes of the login flow is 231."
+},
+{
+"e_attr": "cache TTL minutes of the upload queue",
+"val": "299",
+"text": "The cache TTL minutes of the upload queue is 299."
+},
+{
+"e_attr": "concurrency cap of the data lake",
+"val": "124",
+"text": "The concurrency cap of the data lake is 124."
+},
+{
+"e_attr": "retry limit of the cache layer",
+"val": "271",
+"text": "The retry limit of the cache layer is 271."
+},
+{
+"e_attr": "max batch size of the session store",
+"val": "133",
+"text": "The max batch size of the session store is 133."
+},
+{
+"e_attr": "max batch size of the export tool",
+"val": "116",
+"text": "The max batch size of the export tool is 116."
+},
+{
+"e_attr": "retry limit of the export tool",
+"val": "115",
+"text": "The retry limit of the export tool is 115."
+},
+{
+"e_attr": "max batch size of the login flow",
+"val": "77",
+"text": "The max batch size of the login flow is 77."
+},
+{
+"e_attr": "concurrency cap of the upload queue",
+"val": "75",
+"text": "The concurrency cap of the upload queue is 75."
+},
+{
+"e_attr": "max batch size of the trace collector",
+"val": "87",
+"text": "The max batch size of the trace collector is 87."
+},
+{
+"e_attr": "cache TTL minutes of the chat gateway",
+"val": "249",
+"text": "The cache TTL minutes of the chat gateway is 249."
+},
+{
+"e_attr": "concurrency cap of the fraud check",
+"val": "308",
+"text": "The concurrency cap of the fraud check is 308."
+},
+{
+"e_attr": "retry limit of the token vault",
+"val": "150",
+"text": "The retry limit of the token vault is 150."
+},
+{
+"e_attr": "retry limit of the config loader",
+"val": "239",
+"text": "The retry limit of the config loader is 239."
+},
+{
+"e_attr": "max batch size of the pdf renderer",
+"val": "269",
+"text": "The max batch size of the pdf renderer is 269."
+},
+{
+"e_attr": "timeout seconds of the pdf renderer",
+"val": "85",
+"text": "The timeout seconds of the pdf renderer is 85."
+},
+{
+"e_attr": "retry limit of the webhook relay",
+"val": "125",
+"text": "The retry limit of the webhook relay is 125."
+},
+{
+"e_attr": "concurrency cap of the pdf renderer",
+"val": "84",
+"text": "The concurrency cap of the pdf renderer is 84."
+},
+{
+"e_attr": "concurrency cap of the audit log",
+"val": "262",
+"text": "The concurrency cap of the audit log is 262."
+},
+{
+"e_attr": "concurrency cap of the geo lookup",
+"val": "53",
+"text": "The concurrency cap of the geo lookup is 53."
+},
+{
+"e_attr": "retry limit of the payment API",
+"val": "162",
+"text": "The retry limit of the payment API is 162."
+},
+{
+"e_attr": "timeout seconds of the recommend svc",
+"val": "160",
+"text": "The timeout seconds of the recommend svc is 160."
+},
+{
+"e_attr": "cache TTL minutes of the shard router",
+"val": "280",
+"text": "The cache TTL minutes of the shard router is 280."
+},
+{
+"e_attr": "concurrency cap of the payment API",
+"val": "177",
+"text": "The concurrency cap of the payment API is 177."
+},
+{
+"e_attr": "concurrency cap of the session store",
+"val": "56",
+"text": "The concurrency cap of the session store is 56."
+},
+{
+"e_attr": "retry limit of the email worker",
+"val": "228",
+"text": "The retry limit of the email worker is 228."
+},
+{
+"e_attr": "concurrency cap of the notification bus",
+"val": "76",
+"text": "The concurrency cap of the notification bus is 76."
+},
+{
+"e_attr": "timeout seconds of the data lake",
+"val": "236",
+"text": "The timeout seconds of the data lake is 236."
+},
+{
+"e_attr": "timeout seconds of the metrics sink",
+"val": "248",
+"text": "The timeout seconds of the metrics sink is 248."
+},
+{
+"e_attr": "timeout seconds of the search index",
+"val": "224",
+"text": "The timeout seconds of the search index is 224."
+},
+{
+"e_attr": "concurrency cap of the backup task",
+"val": "247",
+"text": "The concurrency cap of the backup task is 247."
+},
+{
+"e_attr": "retry limit of the search index",
+"val": "63",
+"text": "The retry limit of the search index is 63."
+},
+{
+"e_attr": "retry limit of the geo lookup",
+"val": "46",
+"text": "The retry limit of the geo lookup is 46."
+},
+{
+"e_attr": "cache TTL minutes of the data lake",
+"val": "12",
+"text": "The cache TTL minutes of the data lake is 12."
+},
+{
+"e_attr": "cache TTL minutes of the backup task",
+"val": "33",
+"text": "The cache TTL minutes of the backup task is 33."
+},
+{
+"e_attr": "cache TTL minutes of the rate limiter",
+"val": "68",
+"text": "The cache TTL minutes of the rate limiter is 68."
+},
+{
+"e_attr": "timeout seconds of the report engine",
+"val": "49",
+"text": "The timeout seconds of the report engine is 49."
+},
+{
+"e_attr": "timeout seconds of the geo lookup",
+"val": "189",
+"text": "The timeout seconds of the geo lookup is 189."
+},
+{
+"e_attr": "max batch size of the notification bus",
+"val": "192",
+"text": "The max batch size of the notification bus is 192."
+},
+{
+"e_attr": "concurrency cap of the search index",
+"val": "48",
+"text": "The concurrency cap of the search index is 48."
+},
+{
+"e_attr": "concurrency cap of the webhook relay",
+"val": "213",
+"text": "The concurrency cap of the webhook relay is 213."
+},
+{
+"e_attr": "timeout seconds of the payment API",
+"val": "258",
+"text": "The timeout seconds of the payment API is 258."
+},
+{
+"e_attr": "max batch size of the auth service",
+"val": "69",
+"text": "The max batch size of the auth service is 69."
+},
+{
+"e_attr": "cache TTL minutes of the payment API",
+"val": "253",
+"text": "The cache TTL minutes of the payment API is 253."
+},
+{
+"e_attr": "timeout seconds of the auth service",
+"val": "264",
+"text": "The timeout seconds of the auth service is 264."
+}
+],
+"2": [
+{
+"e_attr": "cache TTL minutes of the geo lookup",
+"val": "41",
+"text": "The cache TTL minutes of the geo lookup is 41."
+},
+{
+"e_attr": "retry limit of the config loader",
+"val": "48",
+"text": "The retry limit of the config loader is 48."
+},
+{
+"e_attr": "concurrency cap of the billing job",
+"val": "101",
+"text": "The concurrency cap of the billing job is 101."
+},
+{
+"e_attr": "cache TTL minutes of the backup task",
+"val": "56",
+"text": "The cache TTL minutes of the backup task is 56."
+},
+{
+"e_attr": "cache TTL minutes of the notification bus",
+"val": "250",
+"text": "The cache TTL minutes of the notification bus is 250."
+},
+{
+"e_attr": "concurrency cap of the audit log",
+"val": "126",
+"text": "The concurrency cap of the audit log is 126."
+},
+{
+"e_attr": "cache TTL minutes of the fraud check",
+"val": "175",
+"text": "The cache TTL minutes of the fraud check is 175."
+},
+{
+"e_attr": "concurrency cap of the webhook relay",
+"val": "166",
+"text": "The concurrency cap of the webhook relay is 166."
+},
+{
+"e_attr": "cache TTL minutes of the config loader",
+"val": "118",
+"text": "The cache TTL minutes of the config loader is 118."
+},
+{
+"e_attr": "max batch size of the upload queue",
+"val": "40",
+"text": "The max batch size of the upload queue is 40."
+},
+{
+"e_attr": "timeout seconds of the search index",
+"val": "72",
+"text": "The timeout seconds of the search index is 72."
+},
+{
+"e_attr": "concurrency cap of the notification bus",
+"val": "274",
+"text": "The concurrency cap of the notification bus is 274."
+},
+{
+"e_attr": "cache TTL minutes of the email worker",
+"val": "176",
+"text": "The cache TTL minutes of the email worker is 176."
+},
+{
+"e_attr": "max batch size of the auth service",
+"val": "204",
+"text": "The max batch size of the auth service is 204."
+},
+{
+"e_attr": "timeout seconds of the backup task",
+"val": "93",
+"text": "The timeout seconds of the backup task is 93."
+},
+{
+"e_attr": "concurrency cap of the search index",
+"val": "76",
+"text": "The concurrency cap of the search index is 76."
+},
+{
+"e_attr": "max batch size of the chat gateway",
+"val": "156",
+"text": "The max batch size of the chat gateway is 156."
+},
+{
+"e_attr": "max batch size of the login flow",
+"val": "198",
+"text": "The max batch size of the login flow is 198."
+},
+{
+"e_attr": "concurrency cap of the login flow",
+"val": "143",
+"text": "The concurrency cap of the login flow is 143."
+},
+{
+"e_attr": "cache TTL minutes of the cache layer",
+"val": "47",
+"text": "The cache TTL minutes of the cache layer is 47."
+},
+{
+"e_attr": "concurrency cap of the pdf renderer",
+"val": "195",
+"text": "The concurrency cap of the pdf renderer is 195."
+},
+{
+"e_attr": "retry limit of the data lake",
+"val": "31",
+"text": "The retry limit of the data lake is 31."
+},
+{
+"e_attr": "timeout seconds of the report engine",
+"val": "161",
+"text": "The timeout seconds of the report engine is 161."
+},
+{
+"e_attr": "cache TTL minutes of the payment API",
+"val": "121",
+"text": "The cache TTL minutes of the payment API is 121."
+},
+{
+"e_attr": "max batch size of the pdf renderer",
+"val": "192",
+"text": "The max batch size of the pdf renderer is 192."
+},
+{
+"e_attr": "concurrency cap of the config loader",
+"val": "133",
+"text": "The concurrency cap of the config loader is 133."
+},
+{
+"e_attr": "cache TTL minutes of the search index",
+"val": "74",
+"text": "The cache TTL minutes of the search index is 74."
+},
+{
+"e_attr": "retry limit of the trace collector",
+"val": "52",
+"text": "The retry limit of the trace collector is 52."
+},
+{
+"e_attr": "timeout seconds of the feature flag svc",
+"val": "197",
+"text": "The timeout seconds of the feature flag svc is 197."
+},
+{
+"e_attr": "max batch size of the report engine",
+"val": "67",
+"text": "The max batch size of the report engine is 67."
+},
+{
+"e_attr": "max batch size of the recommend svc",
+"val": "13",
+"text": "The max batch size of the recommend svc is 13."
+},
+{
+"e_attr": "cache TTL minutes of the image CDN",
+"val": "34",
+"text": "The cache TTL minutes of the image CDN is 34."
+},
+{
+"e_attr": "concurrency cap of the recommend svc",
+"val": "77",
+"text": "The concurrency cap of the recommend svc is 77."
+},
+{
+"e_attr": "max batch size of the feature flag svc",
+"val": "244",
+"text": "The max batch size of the feature flag svc is 244."
+},
+{
+"e_attr": "concurrency cap of the shard router",
+"val": "23",
+"text": "The concurrency cap of the shard router is 23."
+},
+{
+"e_attr": "max batch size of the token vault",
+"val": "73",
+"text": "The max batch size of the token vault is 73."
+},
+{
+"e_attr": "timeout seconds of the notification bus",
+"val": "90",
+"text": "The timeout seconds of the notification bus is 90."
+},
+{
+"e_attr": "cache TTL minutes of the session store",
+"val": "120",
+"text": "The cache TTL minutes of the session store is 120."
+},
+{
+"e_attr": "timeout seconds of the shard router",
+"val": "123",
+"text": "The timeout seconds of the shard router is 123."
+},
+{
+"e_attr": "timeout seconds of the rate limiter",
+"val": "84",
+"text": "The timeout seconds of the rate limiter is 84."
+},
+{
+"e_attr": "timeout seconds of the audit log",
+"val": "303",
+"text": "The timeout seconds of the audit log is 303."
+},
+{
+"e_attr": "retry limit of the billing job",
+"val": "178",
+"text": "The retry limit of the billing job is 178."
+},
+{
+"e_attr": "retry limit of the pdf renderer",
+"val": "207",
+"text": "The retry limit of the pdf renderer is 207."
+},
+{
+"e_attr": "concurrency cap of the metrics sink",
+"val": "91",
+"text": "The concurrency cap of the metrics sink is 91."
+},
+{
+"e_attr": "max batch size of the export tool",
+"val": "122",
+"text": "The max batch size of the export tool is 122."
+},
+{
+"e_attr": "timeout seconds of the auth service",
+"val": "236",
+"text": "The timeout seconds of the auth service is 236."
+},
+{
+"e_attr": "max batch size of the metrics sink",
+"val": "159",
+"text": "The max batch size of the metrics sink is 159."
+},
+{
+"e_attr": "timeout seconds of the trace collector",
+"val": "253",
+"text": "The timeout seconds of the trace collector is 253."
+}
+]
+}

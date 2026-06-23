@@ -408,7 +408,9 @@ async def promote_findings(request: Request, n: int = 16):
         r"|no papers? (were|was) provided|could not find any|unable to (find|locate)|total mismatch|not supported by",
         _re.I)
     # 1) gather the window's eligible candidates (cheap filters; don't consume _PROMOTED yet)
+    from agora.execution.finding_diversity import _tokens, _containment  # novelty gate (reuse churn detector)
     cands = []
+    _acc_toks = []  # token sets of accepted candidates — used to drop near-duplicates within this run
     for r in rows:
         title = (r["title"] or "").strip()
         content = (r["content"] or "").strip()
@@ -423,6 +425,10 @@ async def promote_findings(request: Request, n: int = 16):
         _sy = _re.search(r"\b(?:19|20)\d{2}\b", _src)
         if _by and _sy and _by.group(0) != _sy.group(0):
             continue
+        _ct = _tokens(title + " " + content[:600])        # NOVELTY GATE (Fix 1): ration the write-budget to
+        if any(_containment(_ct, pt) >= 0.6 for pt in _acc_toks):  # NEW findings — drop near-duplicates of ones
+            continue                                       # already accepted this run (containment >= 0.6)
+        _acc_toks.append(_ct)
         cands.append((title, content))
         if len(cands) >= 40:                              # wider funnel — more gems reach the vault
             break
