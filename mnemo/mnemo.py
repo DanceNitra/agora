@@ -124,6 +124,22 @@ class Mnemo:
         self._save(force=True)        # a new memory is real content - persist immediately, not throttled
         return mid
 
+    def remember_dedup(self, text: str, tags=None, value: float = 1.0, meta: dict | None = None,
+                       mtype: str | None = None, dup_threshold: float = 0.95) -> str:
+        """OPT-IN write that skips redundant appends. If an active memory is near-identical (similarity >=
+        dup_threshold) AND carries the SAME value(s) (no numeric clash), this returns that memory's id WITHOUT
+        appending a duplicate raw row -- cutting raw-store bloat from repeated identical writes. A near-identical
+        text with a DIFFERENT number (a value UPDATE) is NOT a duplicate: it appends, so the consolidation pass can
+        supersede the stale value. Default `remember()` stays strictly append-only (the 'zero rewrites' contract);
+        this is a separate opt-in path for high-duplicate ingest."""
+        hits = self.recall(text, k=1)
+        if hits:
+            h = hits[0]
+            s = self._similarity(text, h, self._qvec(text) if self.embed else None)
+            if s >= dup_threshold and not _value_clash(text, h["text"]):
+                return h["id"]            # NO-OP: near-identical, same value -> skip the redundant append
+        return self.remember(text, tags=tags, value=value, meta=meta, mtype=mtype)
+
     # ── retrieval (value-ranked) ──────────────────────────────────────────────
     def _qvec(self, query: str):
         """Embed a query ONCE per scan, or None (no embedder / failure). Callers pass the result
