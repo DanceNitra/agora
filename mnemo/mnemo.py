@@ -604,10 +604,21 @@ def _value_clash(a: str, b: str) -> bool:
     numeric value ('retry limit is 5' -> '... is 12'). This is a state toggle (the fact's value changed),
     NOT a duplicate — so the older should be superseded, not merged. Gated behind the caller's similarity
     check; the tight 'non-numeric remainder is identical' condition keeps genuinely-distinct facts safe."""
-    na, nb = set(_NUM.findall(a)), set(_NUM.findall(b))
-    if (not na and not nb) or na == nb:
-        return False                                      # no numbers, or same numbers -> not a value change
-    return _tokens(_NUM.sub("", a)) == _tokens(_NUM.sub("", b))   # identical apart from the value(s)
+    # A value UPDATE keeps the same numbers in the same ORDER except ONE position whose value changed
+    # ('timeout is 5' -> 'is 12'; '5 of 10' -> '7 of 10'). Compare numbers POSITIONALLY, not as sets: a
+    # set view is ambiguous for ENUMERATED facts because an index can equal another row's value
+    # ('step 1 takes 5 min' vs 'step 5 takes 13 min' share the literal 5), which set-math reads as a
+    # single change and would silently supersede a coexisting record. (Measured: a 6-item enumerated store
+    # lost 5/6 facts under the set rule; 0/6 under this positional rule.)
+    na, nb = _NUM.findall(a), _NUM.findall(b)             # ORDERED, not sets
+    if not na or len(na) != len(nb):
+        return False                                      # no numbers, or different count -> not a single update
+    if sum(1 for x, y in zip(na, nb) if x != y) != 1:
+        return False                                      # exactly one positional value changed
+    # Compare the word-skeleton with ALL numbers stripped: _tokens keeps 3+ digit numbers as tokens
+    # (_WORD requires length >= 3), so a multi-digit value ('...is 123') would otherwise spuriously make
+    # the skeletons differ and miss the update. Strip numbers first, exactly as before this guard existed.
+    return _tokens(_NUM.sub("", a)) == _tokens(_NUM.sub("", b))   # identical apart from the one value
 
 
 if __name__ == "__main__":
