@@ -306,7 +306,13 @@ class Mnemo:
             # on the slow semantic one instead. (Dakera's access-driven episodic->semantic promotion,
             # gated on accrued VALUE rather than raw access count, so a popular-but-trivial memory
             # doesn't graduate.)
-            if r.get("mtype") == "episodic" and r["value"] >= _GRADUATE_VALUE:
+            # POISON guard: durability must be EARNED by corroboration, not mere recall-frequency. The value bump
+            # above is correctness-blind, so a confabulation recalled enough would otherwise graduate to the durable
+            # (slow-decay) tier and entrench itself. Require a corroboration signal — a re-checkable origin
+            # (provenance), a positive OUTCOME (good>0), or an independent corroborating duplicate (links) — before
+            # promoting. An uncorroborated popular memory stays episodic and fades on the fast clock unless earned.
+            corroborated = bool(r.get("source")) or float(r.get("good", 0) or 0) > 0 or bool(r.get("links"))
+            if r.get("mtype") == "episodic" and r["value"] >= _GRADUATE_VALUE and corroborated:
                 r["mtype"] = "semantic"
                 r.setdefault("meta", {})["graduated_from_episodic"] = True
             out.append({"id": r["id"], "text": r["text"], "tags": r["tags"], "iso": r["iso"],
