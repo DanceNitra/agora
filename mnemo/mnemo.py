@@ -103,7 +103,8 @@ class Mnemo:
 
     # ── capture ──────────────────────────────────────────────────────────────
     def remember(self, text: str, tags=None, value: float = 1.0, meta: dict | None = None,
-                 mtype: str | None = None, valid_from: float | None = None) -> str:
+                 mtype: str | None = None, valid_from: float | None = None,
+                 source: dict | None = None) -> str:
         """Append-only raw capture. Stamped with an absolute UTC time; never edited afterward.
         mtype in {episodic, semantic, procedural} sets the decay prior (episodic fades fast,
         semantic slow, procedural barely); inferred from the text if not given. Pass it explicitly
@@ -114,6 +115,7 @@ class Mnemo:
         rec = {"id": mid, "text": text, "tags": list(tags or []), "value": float(value),
                "ts": now, "iso": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()),
                "valid_from": float(valid_from) if valid_from is not None else now,  # event-time (bi-temporal); defaults to ingest-time
+               "source": dict(source) if source else None,   # re-checkable origin (e.g. {"doc": id, "span": [start, end]}) so a recalled fact can be traced back, not trusted blind
                "mtype": mtype or _infer_type(text), "last_access": now,
                "status": "active", "links": [], "meta": dict(meta or {})}
         if self.embed:
@@ -311,6 +313,7 @@ class Mnemo:
                         "value": round(r["value"], 2), "relevance": round(sim, 3),
                         "score": round(score, 3), "links": r["links"],
                         "reliability": round(self._reliability(r), 3),
+                        "source": r.get("source"),    # re-checkable origin (provenance), surfaced so a recalled fact can be traced back
                         "stale_derived": bool(r.get("_stale_derived"))})
         # NOTE: recall is a READ. It nudges in-memory access value / graduation, but must NOT persist the
         # whole store here — serializing (json.dumps) on every recall, across many agents' stores,
