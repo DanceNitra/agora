@@ -103,7 +103,7 @@ class Mnemo:
 
     # ── capture ──────────────────────────────────────────────────────────────
     def remember(self, text: str, tags=None, value: float = 1.0, meta: dict | None = None,
-                 mtype: str | None = None) -> str:
+                 mtype: str | None = None, valid_from: float | None = None) -> str:
         """Append-only raw capture. Stamped with an absolute UTC time; never edited afterward.
         mtype in {episodic, semantic, procedural} sets the decay prior (episodic fades fast,
         semantic slow, procedural barely); inferred from the text if not given. Pass it explicitly
@@ -113,6 +113,7 @@ class Mnemo:
         now = time.time()
         rec = {"id": mid, "text": text, "tags": list(tags or []), "value": float(value),
                "ts": now, "iso": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()),
+               "valid_from": float(valid_from) if valid_from is not None else now,  # event-time (bi-temporal); defaults to ingest-time
                "mtype": mtype or _infer_type(text), "last_access": now,
                "status": "active", "links": [], "meta": dict(meta or {})}
         if self.embed:
@@ -191,7 +192,7 @@ class Mnemo:
 
     def recall(self, query: str, k: int = 6, include_superseded: bool = False,
                include_hubs: bool = False, mode: str = "auto", min_relevance: float = 0.0,
-               scope: str | None = None) -> list[dict]:
+               scope: str | None = None, as_of: float | None = None) -> list[dict]:
         """Top-k memories by RELEVANCE × VALUE — high-value memories outrank merely-similar ones.
         Memories the dream pass flagged as hubs (universal matchers) are skipped unless include_hubs.
 
@@ -202,6 +203,15 @@ class Mnemo:
         falls back to lexical automatically."""
         def _eligible(r: dict) -> bool:
             s = r["status"]
+            if as_of is not None:
+                # Bi-temporal "as of T": a memory counts if it was VALID at time T — valid_from <= T and not yet
+                # invalidated by T — INCLUDING records now superseded (they were current back then). Records
+                # superseded by the pre-bitemporal pass carry no invalidated_at; treat them as still-valid here.
+                vf = r.get("valid_from", r["ts"])
+                inv = r.get("invalidated_at")
+                if vf > as_of or (inv is not None and inv <= as_of):
+                    return False
+                return include_hubs if s == "hub" else True
             if s == "active":
                 return True
             if s == "hub":
@@ -420,9 +430,16 @@ class Mnemo:
                         continue
                     if self._similarity(a["text"], b, avec) >= dup_threshold:
                         if _negation_clash(a["text"], b["text"]) or _value_clash(a["text"], b["text"]):
-                            older, newer = (a, b) if a["ts"] <= b["ts"] else (b, a)
+                            # Resolve by VALIDITY time (valid_from = when the fact is TRUE), not ingest order
+                            # (ts = when it was stored). A fact learned LATE about an EARLIER state (e.g. a
+                            # back-filled record) must NOT overwrite the genuinely-current one just because it
+                            # arrived later. valid_from defaults to ts, so ingest-ordered streams are unchanged;
+                            # only out-of-order arrivals (the bi-temporal case) flip vs the old ts rule.
+                            _vf = lambda r: r.get("valid_from", r["ts"])
+                            older, newer = (a, b) if _vf(a) <= _vf(b) else (b, a)
                             older["status"] = "superseded"
                             older["superseded_ts"] = time.time()
+                            older["invalidated_at"] = _vf(newer)   # bi-temporal: when this record stopped being current
                             older.setdefault("meta", {})["superseded_by_toggle"] = newer["id"]
                             # Accuracy loop, live consumer: being OVERTURNED by a later contradiction is
                             # a was-wrong signal — debit the superseded claim, credit the one that
