@@ -43,11 +43,17 @@ _THEMES = {
     "complexity/emergence": ["emergence", "complexity", "self-organ", "nonlinear", "feedback", "attractor"],
 }
 
-# Thresholds derived from this session's measurements + the retrospective precedent:
-#  - critical-mass band ~20-25% (Lab 6e363b); we treat a single coarse theme above CONCENTRATION_HI as
-#    "dominant". The retrospective showed 51% is SAFE when grounded + multi-domain, so dominance alone
-#    is NOT the alarm — it must coincide with low grounding OR low diversity (the law's resistance lever).
-CONCENTRATION_HI = 0.40
+# Thresholds derived from measurement + the retrospective precedent:
+#  - critical-mass band: Lab 6e6e85 (2026-06-24) re-measured the committed-minority tipping fraction across
+#    stochastic noise and found it is NOT a fixed tiny number — it ranges from ~0% at the symmetric critical
+#    point (zero field) to ~25-26% in the realistic strong-consensus regime, RECOVERING Centola's empirical
+#    ~25% threshold. (The earlier "0.2%" finding was a zero-field critical-point artifact, not a tipping law.)
+#    So CONCENTRATION_HI is set at that validated ~25% critical mass: a coarse theme above it is "dominant".
+#  - The law: f_c RISES with grounding (grounding = the noise/resistance lever), so dominance alone is NOT the
+#    alarm. The retrospective showed 51% is SAFE when grounded + multi-domain; dominance is a LOCK-IN RISK only
+#    when it coincides with low grounding OR low diversity. Lowering 0.40 -> 0.25 catches ungrounded lock-in
+#    earlier — a low-grounding theme at 25-40% (already past the validated critical mass) was previously missed.
+CONCENTRATION_HI = 0.25     # validated critical mass (Lab 6e6e85, ~= Centola ~25%); was 0.40
 GROUNDING_SAFE = 0.60
 DIVERSITY_SAFE = 4          # number of coarse themes carrying >=5% of consensus
 
