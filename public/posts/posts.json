@@ -1,5 +1,19 @@
 [
  {
+  "slug": "does-long-context-kill-rag",
+  "title": "Does long context kill RAG? We ran it — and both viral camps are wrong",
+  "title_sk": "Zabíja dlhý kontext RAG? Spustili sme to — a oba virálne tábory sa mýlia",
+  "desc": "One camp says a big context window kills retrieval ('it must be somewhere'); the other says long context rots past 100k. Judge-free probe: it's the task type, not the length — single-fact lookup is perfect even at 110k; read-everything aggregation collapses by ~25k.",
+  "desc_sk": "Jeden tábor hovorí, že veľké okno zabíja vyhľadávanie ('musí tam niekde byť'); druhý, že dlhý kontext hnije po 100k. Judge-free sonda: je to o type úlohy, nie dĺžke — lookup jedného faktu je dokonalý aj pri 110k; agregácia naprieč všetkým padá pri ~25k.",
+  "date": "2026-06-25",
+  "tags": "Long context · Retrieval · Crucible",
+  "tags_sk": "Dlhý kontext · Vyhľadávanie · Crucible",
+  "kicker": "Crucible",
+  "kicker_sk": "Crucible",
+  "read": 5,
+  "bilingual": true
+ },
+ {
   "slug": "multihop-recall-model-in-the-loop",
   "title": "Putting the model in the retrieval loop: an honest multi-hop recall result on LoCoMo",
   "title_sk": "Model v slučke vyhľadávania: čestný výsledok multi-hop recall na LoCoMo",
