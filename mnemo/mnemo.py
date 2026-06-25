@@ -306,12 +306,16 @@ class Mnemo:
             # on the slow semantic one instead. (Dakera's access-driven episodic->semantic promotion,
             # gated on accrued VALUE rather than raw access count, so a popular-but-trivial memory
             # doesn't graduate.)
-            # POISON guard: durability must be EARNED by corroboration, not mere recall-frequency. The value bump
-            # above is correctness-blind, so a confabulation recalled enough would otherwise graduate to the durable
-            # (slow-decay) tier and entrench itself. Require a corroboration signal — a re-checkable origin
-            # (provenance), a positive OUTCOME (good>0), or an independent corroborating duplicate (links) — before
-            # promoting. An uncorroborated popular memory stays episodic and fades on the fast clock unless earned.
-            corroborated = bool(r.get("source")) or float(r.get("good", 0) or 0) > 0 or bool(r.get("links"))
+            # POISON guard (HARDENED 2026-06-25): durability must be EARNED by INDEPENDENT corroboration, not
+            # mere recall-frequency. The value bump above is correctness-blind, so a confabulation recalled
+            # enough would otherwise graduate to the durable (slow-decay) tier and entrench itself. A
+            # self-assertable `source` string or a SINGLE `links` edge is attacker-settable (AgentPoison /
+            # MINJA / OWASP-ASI06), so neither alone may confer durability. Require either an EARNED net-positive
+            # outcome (good>0 and good>=bad — set only by credit() resolving real work, not self-assertable), OR
+            # >=2 DISTINCT corroborating links (no single self-created edge suffices). An uncorroborated popular
+            # memory stays episodic and fades on the fast clock unless earned.
+            _good = float(r.get("good", 0) or 0); _bad = float(r.get("bad", 0) or 0)
+            corroborated = (_good > 0 and _good >= _bad) or len(r.get("links") or []) >= 2
             if r.get("mtype") == "episodic" and r["value"] >= _GRADUATE_VALUE and corroborated:
                 r["mtype"] = "semantic"
                 r.setdefault("meta", {})["graduated_from_episodic"] = True
