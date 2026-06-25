@@ -143,6 +143,49 @@ class Mnemo:
                 return h["id"]            # NO-OP: near-identical, same value -> skip the redundant append
         return self.remember(text, tags=tags, value=value, meta=meta, mtype=mtype)
 
+    def forget(self, ids=None, where=None, redact_links: bool = True) -> dict:
+        """HARD-DELETE memories — the one operation that genuinely REMOVES content. mnemo is otherwise
+        append-only: supersession / invalidation only DEMOTE a record (it still exists, recallable with
+        include_superseded). forget() is for the cases where demotion is not enough: a right-to-be-forgotten
+        / erasure request, a poisoned or libellous memory, or a hard correction.
+
+        Select by `ids` (a single id or an iterable) and/or `where` (a predicate fn(record)->bool; e.g.
+        lambda r: 'secret' in r['text']). VERIFIED FORGETTING: the matched records are deleted AND their ids
+        are scrubbed from every surviving record's `links` and toggle-supersession pointers, and the cached
+        vec matrix + token caches are dropped — so a forgotten memory cannot resurface via recall, via a
+        consolidation link, or via a stale derived-summary pointer. This is complete because consolidation
+        never copies raw text into other records (it only links ids and toggles status) — there is no merged
+        blob left holding the forgotten content. Returns {forgotten, ids, scrubbed_links}."""
+        target = set()
+        if ids is not None:
+            target |= ({ids} if isinstance(ids, str) else set(ids))
+        if where is not None:
+            for r in self.items:
+                try:
+                    if where(r):
+                        target.add(r["id"])
+                except Exception:
+                    pass
+        target &= {r["id"] for r in self.items}          # ignore ids not actually present
+        if not target:
+            return {"forgotten": 0, "ids": [], "scrubbed_links": 0}
+        self.items = [r for r in self.items if r["id"] not in target]
+        scrubbed = 0
+        if redact_links:
+            for r in self.items:
+                if r.get("links"):
+                    before = len(r["links"])
+                    r["links"] = [l for l in r["links"] if l not in target]
+                    scrubbed += before - len(r["links"])
+                meta = r.get("meta")
+                if meta and meta.get("superseded_by_toggle") in target:
+                    meta.pop("superseded_by_toggle", None)   # drop dangling toggle pointer (no ghost stale-derived)
+        for tid in target:
+            self._tok_cache.pop(tid, None)
+        self._mat = None; self._mat_built_n = -1             # force vec-matrix rebuild (drops forgotten rows)
+        self._save(force=True)                               # a deletion is real content change — persist now
+        return {"forgotten": len(target), "ids": sorted(target), "scrubbed_links": scrubbed}
+
     # ── retrieval (value-ranked) ──────────────────────────────────────────────
     def _qvec(self, query: str):
         """Embed a query ONCE per scan, or None (no embedder / failure). Callers pass the result

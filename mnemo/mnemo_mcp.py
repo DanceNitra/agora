@@ -130,6 +130,21 @@ def credit(ids: list[str], outcome: str, weight: float = 1.0) -> dict:
     return _MEM.credit(ids, outcome, weight=weight)
 
 
+@mcp.tool()
+def forget(ids: list[str] | None = None, where_contains: str | None = None) -> dict:
+    """TRULY DELETE memories — the one op that removes content (everything else is append-only: supersession
+    only demotes). Use for an erasure / right-to-be-forgotten request, a poisoned or false memory, or a hard
+    correction. Pass `ids` (memory ids to drop) and/or `where_contains` (delete every memory whose text
+    contains this substring, case-insensitive). Verified forgetting: the records are deleted AND their ids are
+    scrubbed from every survivor's links + supersession pointers + the caches, so a forgotten memory cannot
+    resurface via recall or a later consolidation pass. Returns {forgotten, ids, scrubbed_links}."""
+    where = None
+    if where_contains:
+        needle = where_contains.lower()
+        where = lambda r: needle in (r.get("text") or "").lower()
+    return _MEM.forget(ids=ids, where=where)
+
+
 def main():
     mcp.run()
 

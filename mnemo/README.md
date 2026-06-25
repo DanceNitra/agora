@@ -47,7 +47,8 @@ forgiving lexical match so it **runs anywhere, today**.
 
 `mnemo` ships an [MCP](https://modelcontextprotocol.io) stdio server so any MCP-compatible agent can
 use it as long-term memory — `remember` (with a per-type decay prior), value-ranked `recall`,
-`consolidate`, `consolidate_clusters`, `contradictions`, `value_by_cohort`. `mnemo.py` stays
+`consolidate`, `consolidate_clusters`, `contradictions`, `value_by_cohort`, `forget` (verified erasure).
+`mnemo.py` stays
 zero-dependency; only the server needs the SDK:
 
 ```bash
@@ -86,6 +87,7 @@ its memory is value-ranked and append-only, not a recency buffer.
 | `consolidate(keep)` | the **dream pass**: flag universal-matcher *hubs*, link near-duplicates, apply the **state-toggle guard** (a polarity clash supersedes, doesn't merge), supersede the low-value surplus — only *adds* a derived layer |
 | `consolidate_clusters(threshold)` | **cluster-triggered** consolidation: consolidate a semantic cluster only once it's grown past `threshold` — sparse topics keep their raw episodes, dense ones don't grow unbounded |
 | `contradictions()` | flag mutually-incompatible **related** memories (similarity-gated) for human review |
+| `forget(ids, where)` | the one op that **truly deletes** (the rest is append-only): hard-removes the matched records *and* scrubs their ids from every survivor's links + toggle pointers + the vec/token caches, so a forgotten memory can't resurface via recall, a consolidation link, or the dream pass. For erasure / right-to-be-forgotten, poison removal, or a hard correction — measured 15/15 on a verified-forgetting severe-test |
 
 ## Five rules it won't break (each one cost us to learn)
 
