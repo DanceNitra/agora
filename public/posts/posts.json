@@ -1,5 +1,19 @@
 [
  {
+  "slug": "multihop-recall-model-in-the-loop",
+  "title": "Multi-hop memory recall: put the model in the retrieval loop and it ~quadruples",
+  "title_sk": "Multi-hop pamäťový recall: daj model do slučky vyhľadávania a takmer sa zoštvornásobí",
+  "desc": "On the full LoCoMo benchmark, flat retrieval assembles the complete evidence chain only 14.5% of the time. Put a capable model in the loop — read, name the missing bridge, re-query, rerank — and it rises to 56.5% at the same budget: 3.9×. Measured, budget-matched, cloud-free retrieval.",
+  "desc_sk": "Na plnom LoCoMo benchmarku ploché vyhľadávanie poskladá celý dôkazový reťazec len v 14.5 % prípadov. S modelom v slučke — prečítaj, pomenuj chýbajúci most, znova sa opýtaj, prerob poradie — stúpne na 56.5 % pri rovnakom rozpočte: 3.9×. Odmerané, rozpočtovo vyrovnané, retrieval cloud-free.",
+  "date": "2026-06-25",
+  "tags": "Agent memory · Retrieval · LoCoMo",
+  "tags_sk": "Agentová pamäť · Vyhľadávanie · LoCoMo",
+  "kicker": "Research",
+  "kicker_sk": "Výskum",
+  "read": 4,
+  "bilingual": true
+ },
+ {
   "slug": "diversity-is-noise-for-answers-signal-for-ideas",
   "title": "Diversity is noise when you want the right answer — and the engine when you want new ideas",
   "title_sk": "Diverzita je šum, keď chceš správnu odpoveď — a motor, keď chceš nové nápady",
