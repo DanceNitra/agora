@@ -1,5 +1,19 @@
 [
  {
+  "slug": "memory-poison-resistance-measured",
+  "title": "Memory that won't let an uncorroborated fact become permanent — measured",
+  "title_sk": "Pamäť, ktorá nedovolí, aby sa nepodložený fakt stal trvalým — odmerané",
+  "desc": "Memory poisoning is a named threat no public benchmark scores. Measured on our open-source engine: gating durability on EARNED corroboration makes a recall-pumped false memory fade in ~3 weeks instead of corrupting answers for months — once the attack stops. Honest limits included.",
+  "desc_sk": "Memory poisoning je pomenovaná hrozba, ktorú žiadny benchmark nemeria. Odmerané na našom open-source engine: podmienenie trvácnosti ZASLÚŽENOU korroboráciou spraví recall-pumpnutý falošný fakt prechodným (vybledne za ~3 týždne namiesto mesiacov) — keď útok prestane. Čestné limity vrátane.",
+  "date": "2026-06-25",
+  "tags": "Agent memory · Security · mnemo",
+  "tags_sk": "Agentová pamäť · Bezpečnosť · mnemo",
+  "kicker": "Research",
+  "kicker_sk": "Výskum",
+  "read": 5,
+  "bilingual": true
+ },
+ {
   "slug": "does-long-context-kill-rag",
   "title": "Does long context kill RAG? We ran it — and both viral camps are wrong",
   "title_sk": "Zabíja dlhý kontext RAG? Spustili sme to — a oba virálne tábory sa mýlia",
