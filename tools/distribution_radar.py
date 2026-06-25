@@ -52,6 +52,16 @@ TOPICS = [
     {"q": "AI agent reliability long tasks time horizon", "kw": ["agent", "reliab", "time horizon", "metr"],
      "asset": "Folklore Index: agent-success half-life REPRODUCED; time-horizon headline FAILED",
      "hook": "a constant-hazard half-life fits METR's anchors, but the headline horizon swings 2.8x just from the 50%-vs-80% success threshold"},
+    # --- the 3 freshly-verified posts (2026-06-25) ---
+    {"q": "long context window replace RAG", "kw": ["long context", "context window", "rag", "context rot", "cag"],
+     "asset": "Crucible: 'does long context kill RAG?' https://dancenitra.github.io/agora/public/posts/does-long-context-kill-rag.html",
+     "hook": "we measured it judge-free: single-fact LOOKUP stays 1.00 even at ~110k tokens, but exhaustive AGGREGATION (count/filter across all records) collapses 0.75->~0.3 by ~25k - so 'just dump everything into the context' works for find-one, fails for combine-everything; both viral camps conflate task types"},
+    {"q": "agent memory poisoning long-term", "kw": ["memory", "poison", "agent", "long-term", "rag"],
+     "asset": "Crucible: memory poison-resistance measured https://dancenitra.github.io/agora/public/posts/memory-poison-resistance-measured.html",
+     "hook": "we A/B'd a corroboration-gated graduation rule: a single planted poison the old rule entrenched for months fades below the truth in ~2 weeks under the new gate - but a CONTINUOUS attacker (re-pumping >=weekly) still wins, so honest framing is 'denies unearned durability', not 'poison-proof'"},
+    {"q": "multi-hop RAG retrieval agent memory recall", "kw": ["multi-hop", "multihop", "recall", "retriev", "memory", "locomo"],
+     "asset": "Crucible: model-in-the-loop multi-hop recall https://dancenitra.github.io/agora/public/posts/multihop-recall-model-in-the-loop.html",
+     "hook": "on full LoCoMo (n=276) letting the model emit follow-up bridge queries in the loop ~doubled multi-hop recall at equal budget (0.145->0.297); it's mainstream iterative retrieval (IRCoT/PRISM family) measured cleanly vs a naive flat baseline - not a new method"},
 ]
 
 UA = {"User-Agent": "agora-distribution-radar/0.1"}
