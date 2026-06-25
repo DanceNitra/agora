@@ -114,3 +114,28 @@ agora_output/benchmark/DESIGN.md
 agora_output/*draft*.md
 agora_output/*_comment*.md
 agora_output/*_reply*.md
+
+# --- session scratch / scan output (2026-06-25): keep the repo SCM clean ---
+agora_output/scan2/
+agora_output/scan3/
+agora_output/scan_transcripts/
+agora_output/scan3_transcripts/
+agora_output/scan3_src/
+agora_output/agent_memory_transcripts/
+agora_output/strategy/
+agora_output/ragdead/
+agora_output/self_research/
+agora_output/*_workflow.js
+agora_output/*_chunk.js
+agora_output/*.js
+q*_tmp.txt
+agora_output/benchmark/
+agora_output/distribution/
+agora_output/ramr_ls_fixtures/
+agora_output/flagship3_architecture.md
+agora_output/scan_backlog_*.md
+
+# distribution watch runtime — keep our reply-targets/drafts out of the public repo
+agora_output/distribution_radar/reddit_reply_snapshot.json
+agora_output/distribution_radar/reddit_reply_watch.py
+agora_output/distribution_radar/ready_drafts_*.md
