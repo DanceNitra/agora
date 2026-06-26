@@ -112,6 +112,20 @@ class Mnemo:
         # the cost of lagging an uncorroborated single legitimate change. Leave OFF for trusted-source
         # stores; turn ON for adversarial / multi-tenant ingestion.
         self.supersede_requires_corroboration = False
+        # Persistence supersession (OPT-IN, default OFF; set to an int >= 2 to enable). A standing fact is
+        # superseded only when the contradicting NEW state is asserted by >= this many INDEPENDENT records —
+        # i.e. the change must PERSIST/accumulate, not arrive once. This is the sequential-change-detection
+        # (CUSUM) escape applied to memory: an isolated single-shot poison flip never crosses the threshold
+        # and is rejected, while a genuinely sustained value change is adopted once `supersede_persistence`
+        # corroborating records exist. The integer IS the Adaptation-Corruption law's detection-latency floor
+        # d* made explicit — set it to your stream's corruption-vs-change ratio. Unlike
+        # supersede_requires_corroboration this needs NO external credit(): it adopts a genuine change purely
+        # from repeated independent assertions, where the corroboration guard would lag one forever. MEASURED
+        # (lab fea933, mnemo's real consolidate() path): isolated-poison false-supersede 1 -> 0 while a
+        # 3-record sustained change is still adopted; it Pareto-dominates both the naive (poison-fooled) and
+        # corroboration-only (change-lagging) rules — see the Adaptation-Corruption Separation Law (lab f490d8).
+        # Reversible: 0 or 1 -> legacy fast supersession.
+        self.supersede_persistence = 0
         # _save() THROTTLE: serializing the whole store (json.dumps of every item) is O(store size); doing
         # it on EVERY recall/remember froze callers once the store grew (recall mutates access value, so it
         # used to re-serialize everything each call). Coalesce disk writes to at most once / _save_min_s;
@@ -554,6 +568,21 @@ class Mnemo:
                             if self.supersede_requires_corroboration:
                                 _ng = float(newer.get("good", 0) or 0); _nb = float(newer.get("bad", 0) or 0)
                                 if not ((_ng > 0 and _ng >= _nb) or len(newer.get("links") or []) >= 2):
+                                    a["links"].append(b["id"]); linked += 1
+                                    continue
+                            # Persistence (CUSUM) guard: supersede only once the NEW state is asserted by
+                            # >= supersede_persistence independent records (the change has persisted). Count
+                            # active records that (i) match newer's value/polarity and (ii) contradict older —
+                            # an isolated poison flip stays below the threshold and is merely linked.
+                            if self.supersede_persistence > 1:
+                                nvec = self._qvec(newer["text"])
+                                support = sum(
+                                    1 for r in active if r["status"] == "active"
+                                    and self._similarity(newer["text"], r, nvec) >= dup_threshold
+                                    and not _value_clash(newer["text"], r["text"])
+                                    and not _negation_clash(newer["text"], r["text"])
+                                    and (_value_clash(older["text"], r["text"]) or _negation_clash(older["text"], r["text"])))
+                                if support < self.supersede_persistence:
                                     a["links"].append(b["id"]); linked += 1
                                     continue
                             older["status"] = "superseded"
