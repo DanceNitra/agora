@@ -102,6 +102,16 @@ class Mnemo:
         # neutral on rare-critical + poison-flood. Reversible: two_tier_keep=False -> legacy top-N-by-raw.
         self.two_tier_keep = True
         self.protect_frac = 0.30
+        # Fast-novelty channel guard (OPT-IN, default OFF). mnemo's state-toggle supersedes a standing
+        # fact the moment a single similar+contradicting memory arrives — correct + fast for a TRUSTED
+        # single source (configs/preferences: latest assertion wins), but a single-shot poison flip
+        # (AgentPoison / MINJA) can then override a true fact. With this ON, a contradiction supersedes
+        # only when CORROBORATED (earned credit, or >=2 corroborating links) — the same bar as graduation;
+        # an uncorroborated single contradiction is recorded as a link but does NOT supersede. This is the
+        # two-channel capstone's latency-floor tradeoff made explicit: robustness to single-shot poison at
+        # the cost of lagging an uncorroborated single legitimate change. Leave OFF for trusted-source
+        # stores; turn ON for adversarial / multi-tenant ingestion.
+        self.supersede_requires_corroboration = False
         # _save() THROTTLE: serializing the whole store (json.dumps of every item) is O(store size); doing
         # it on EVERY recall/remember froze callers once the store grew (recall mutates access value, so it
         # used to re-serialize everything each call). Coalesce disk writes to at most once / _save_min_s;
@@ -537,6 +547,15 @@ class Mnemo:
                             # only out-of-order arrivals (the bi-temporal case) flip vs the old ts rule.
                             _vf = lambda r: r.get("valid_from", r["ts"])
                             older, newer = (a, b) if _vf(a) <= _vf(b) else (b, a)
+                            # Fast-novelty guard (opt-in): supersede only on a CORROBORATED contradiction
+                            # (earned credit, or >=2 links — same bar as graduation). An uncorroborated
+                            # single contradiction is recorded as a link but does NOT override a standing
+                            # fact (resists single-shot poison flips). Default OFF -> legacy fast behavior.
+                            if self.supersede_requires_corroboration:
+                                _ng = float(newer.get("good", 0) or 0); _nb = float(newer.get("bad", 0) or 0)
+                                if not ((_ng > 0 and _ng >= _nb) or len(newer.get("links") or []) >= 2):
+                                    a["links"].append(b["id"]); linked += 1
+                                    continue
                             older["status"] = "superseded"
                             older["superseded_ts"] = time.time()
                             older["invalidated_at"] = _vf(newer)   # bi-temporal: when this record stopped being current
