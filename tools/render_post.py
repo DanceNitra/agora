@@ -76,6 +76,20 @@ def md_to_html(md: str):
         words += len(ln.split())
         if ln.startswith("# "):
             title = ln[2:].strip(); i += 1; continue
+        st = ln.strip()
+        if st.startswith("<figure") or st.startswith("<svg"):   # raw-HTML figure passthrough (no escaping/wrapping)
+            close = "</figure>" if st.startswith("<figure") else "</svg>"
+            raw = [ln]
+            while close not in lines[i] and i + 1 < len(lines):
+                i += 1; raw.append(lines[i])
+            i += 1
+            out.append("\n".join(raw)); continue
+        if st.startswith(">"):                                  # blockquote callout (one or more > lines)
+            buf = []
+            while i < len(lines) and lines[i].strip().startswith(">"):
+                buf.append(re.sub(r"^\s*>\s?", "", lines[i])); i += 1
+            inner = _inline(" ".join(x for x in buf if x.strip()))
+            out.append(f'<blockquote class="callout">{inner}</blockquote>'); continue
         if ln.startswith("## "):
             out.append(f"<h2>{_inline(ln[3:].strip())}</h2>"); i += 1; continue
         if ln.strip().startswith("|") and i + 1 < len(lines) and set(lines[i+1].replace("|", "").strip()) <= set("-: "):
@@ -260,6 +274,10 @@ TEMPLATE = """<!DOCTYPE html>
     background:var(--paper2);border-radius:0 14px 14px 0;font-size:21px;line-height:1.6}}
   blockquote.falsifier .ql{{display:block;font-family:var(--mono);font-size:11px;letter-spacing:.16em;
     text-transform:uppercase;color:var(--acc);margin-bottom:8px}}
+  blockquote.callout{{margin:32px 0;padding:20px 26px;border-left:4px solid var(--acc);background:var(--paper2);
+    border-radius:0 14px 14px 0;font-size:20px;line-height:1.55}}
+  .fig{{margin:34px 0;text-align:center}} .fig svg{{max-width:100%;height:auto;color:var(--ink)}}
+  .fig figcaption{{margin-top:12px;font-size:14px;line-height:1.55;color:var(--soft);text-align:left}}
   .foot{{margin-top:54px;padding-top:24px;border-top:1px solid var(--line);font-size:15px;color:var(--soft);font-style:italic}}
   .backhome{{display:inline-flex;align-items:center;gap:8px;margin-top:40px;font-family:var(--mono);font-size:13px;text-decoration:none;color:var(--acc)}}
   @media(max-width:600px){{body{{font-size:19px}} article{{padding:24px 20px 70px}}}}
