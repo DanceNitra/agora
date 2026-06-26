@@ -14,6 +14,20 @@
   "bilingual": true
  },
  {
+  "slug": "best-of-n-exploitability",
+  "title": "More samples, worse answers: when scaling best-of-N backfires",
+  "title_sk": "Viac vzoriek, horšie odpovede: kedy škálovanie best-of-N škodí",
+  "desc": "Verifier-based selection (best-of-N) scales safely under a noisy verifier but collapses under an exploitable one - the danger is exploitability, not imperfection. Measured, with the falsifier.",
+  "desc_sk": "Výber verifikátorom (best-of-N) sa škáluje bezpečne pri zašumenom verifikátore, ale kolabuje pri zneužiteľnom - nebezpečná je zneužiteľnosť, nie nedokonalosť. Odmerané, s falzifikátorom.",
+  "date": "2026-06-26",
+  "tags": "AI reasoning - Test-time compute - Reward overoptimization",
+  "tags_sk": "Uvažovanie AI - Výpočet v čase testu - Overoptimalizácia odmeny",
+  "kicker": "AI reasoning",
+  "kicker_sk": "Uvažovanie AI",
+  "read": 2,
+  "bilingual": true
+ },
+ {
   "slug": "memory-poison-resistance-measured",
   "title": "Memory that won't let an uncorroborated fact become permanent — measured",
   "title_sk": "Pamäť, ktorá nedovolí, aby sa nepodložený fakt stal trvalým — odmerané",
