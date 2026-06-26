@@ -28,6 +28,20 @@
   "bilingual": true
  },
  {
+  "slug": "agent-memory-eviction-two-tier",
+  "title": "What should an AI agent forget? No single rule wins — but two tiers do",
+  "title_sk": "Čo má AI agent zabudnúť? Žiadne jedno pravidlo nevyhráva — ale dve vrstvy áno",
+  "desc": "An agent's memory-eviction rule decides what it keeps. LRU, LFU, and value each win one regime and fail the others — a poison flood drives pure recency to zero. A two-tier store (value-protected + recency-aged) matches the best in all three at once. Measured.",
+  "desc_sk": "Politika vyhadzovania pamäte agenta rozhoduje, čo si udrží. LRU, LFU aj value každé vyhrá jeden režim a v ostatných zlyhá — otravná záplava zrazí čistú recency na nulu. Dvojvrstvový sklad (value-chránený + recency-starnúci) vyrovná najlepšie vo všetkých troch naraz. Odmerané.",
+  "date": "2026-06-26",
+  "tags": "Agent memory - Eviction - Robustness",
+  "tags_sk": "Pamäť agenta - Eviction - Odolnosť",
+  "kicker": "Agent memory",
+  "kicker_sk": "Pamäť agenta",
+  "read": 2,
+  "bilingual": true
+ },
+ {
   "slug": "memory-poison-resistance-measured",
   "title": "Memory that won't let an uncorroborated fact become permanent — measured",
   "title_sk": "Pamäť, ktorá nedovolí, aby sa nepodložený fakt stal trvalým — odmerané",

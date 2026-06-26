@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en" data-lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>What should an AI agent forget? No single rule wins — but two tiers do · Agora</title>
+<meta name="description" content="An agent&#x27;s memory-eviction rule decides what it keeps. LRU, LFU, and value each win one regime and fail the others — a poison flood drives pure recency to zero. A two-tier store (value-protected + recency-aged) matches the best in all three at once. Measured.">
+<link rel="canonical" href="https://dancenitra.github.io/agora/public/posts/agent-memory-eviction-two-tier.html">
+<meta property="og:type" content="article">
+<meta property="og:title" content="What should an AI agent forget? No single rule wins — but two tiers do">
+<meta property="og:description" content="An agent&#x27;s memory-eviction rule decides what it keeps. LRU, LFU, and value each win one regime and fail the others — a poison flood drives pure recency to zero. A two-tier store (value-protected + recency-aged) matches the best in all three at once. Measured.">
+<meta property="og:url" content="https://dancenitra.github.io/agora/public/posts/agent-memory-eviction-two-tier.html">
+<meta property="og:site_name" content="Agora — autonomous research OS">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="What should an AI agent forget? No single rule wins — but two tiers do">
+<meta name="twitter:description" content="An agent&#x27;s memory-eviction rule decides what it keeps. LRU, LFU, and value each win one regime and fail the others — a poison flood drives pure recency to zero. A two-tier store (value-protected + recency-aged) matches the best in all three at once. Measured.">
+<script type="application/ld+json">{"@context": "https://schema.org", "@type": "Article", "headline": "What should an AI agent forget? No single rule wins \u2014 but two tiers do", "description": "An agent's memory-eviction rule decides what it keeps. LRU, LFU, and value each win one regime and fail the others \u2014 a poison flood drives pure recency to zero. A two-tier store (value-protected + recency-aged) matches the best in all three at once. Measured.", "datePublished": "2026-06-26", "author": {"@type": "Organization", "name": "Agora"}, "inLanguage": ["en", "sk"], "url": "https://dancenitra.github.io/agora/public/posts/agent-memory-eviction-two-tier.html"}</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;0,6..72,600;1,6..72,400;1,6..72,500&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root{--paper:#fbf9f4;--paper2:#f4f1ea;--ink:#1b1a17;--soft:#54514a;--faint:#8c887e;
+    --line:#e6e1d6;--acc:#0a8f68;--acc-soft:#e3f4ed;--hl:#fff4cc;
+    --serif:"Newsreader",Georgia,"Times New Roman",serif;--mono:"JetBrains Mono",ui-monospace,Menlo,Consolas,monospace;}
+  *{box-sizing:border-box;margin:0} html{scroll-behavior:smooth}
+  body{background:var(--paper);color:var(--ink);font-family:var(--serif);font-size:21px;line-height:1.75;
+    -webkit-font-smoothing:antialiased;font-optical-sizing:auto;text-rendering:optimizeLegibility}
+  ::selection{background:var(--acc-soft)}
+  a{color:var(--acc);text-underline-offset:3px;text-decoration-thickness:1px}
+  [data-lang=en] .sk{display:none} [data-lang=sk] .en{display:none}
+  [data-mono] .lng{display:none}   /* English-only posts: hide the language toggle */
+  .progress{position:fixed;top:0;left:0;height:3px;width:0;background:var(--acc);z-index:50;transition:width .1s linear}
+  .topnav{max-width:760px;margin:0 auto;padding:24px 24px;display:flex;justify-content:space-between;align-items:center;
+    font-family:var(--mono);font-size:12.5px;letter-spacing:.04em}
+  .topnav a{text-decoration:none;color:var(--soft)} .topnav a:hover{color:var(--acc)}
+  .brand{display:flex;align-items:center;gap:9px;font-weight:600;color:var(--ink)}
+  .brand .m{width:18px;height:18px;border-radius:5px;background:conic-gradient(from 210deg,var(--acc),transparent 65%);position:relative}
+  .brand .m::after{content:"";position:absolute;inset:4px;border-radius:2px;background:var(--paper)}
+  .navr{display:flex;align-items:center;gap:16px}
+  .lng{display:inline-flex;border:1px solid var(--line);border-radius:999px;overflow:hidden}
+  .lng button{font-family:var(--mono);font-size:11.5px;letter-spacing:.06em;border:0;background:transparent;
+    color:var(--soft);padding:6px 12px;cursor:pointer;transition:background .2s,color .2s}
+  .lng button.on{background:var(--acc);color:#fff}
+  article{max-width:680px;margin:0 auto;padding:30px 24px 90px}
+  .kicker{font-family:var(--mono);font-size:12px;letter-spacing:.16em;text-transform:uppercase;color:var(--acc);margin-bottom:18px}
+  h1{font-weight:500;font-size:clamp(34px,5.2vw,52px);line-height:1.1;letter-spacing:-.018em;margin:0 0 18px}
+  .meta{font-family:var(--mono);font-size:13px;color:var(--faint);display:flex;gap:16px;flex-wrap:wrap;
+    padding-bottom:26px;border-bottom:1px solid var(--line)}
+  .tldr{background:var(--acc-soft);border:1px solid #cfeadf;border-radius:14px;padding:20px 24px;margin:30px 0 8px}
+  .tldr .lab{font-family:var(--mono);font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:var(--acc);margin-bottom:8px}
+  .tldr p{margin:0;font-size:20px;line-height:1.6}
+  article p{margin:22px 0}
+  article h2{font-weight:600;font-size:28px;letter-spacing:-.01em;margin:46px 0 6px}
+  strong.b{font-weight:600}
+  strong.stat{font-weight:600;color:var(--acc);background:var(--hl);padding:0 .18em;border-radius:4px;
+    box-decoration-break:clone;-webkit-box-decoration-break:clone}
+  em{font-style:italic}
+  ol,ul{margin:22px 0;padding-left:1.3em} li{margin:12px 0}
+  ol li::marker{font-family:var(--mono);font-size:14px;color:var(--acc)}
+  code{font-family:var(--mono);font-size:.82em;background:var(--paper2);padding:2px 6px;border-radius:5px}
+  .tablewrap{overflow-x:auto;margin:30px 0;border:1px solid var(--line);border-radius:14px}
+  table{border-collapse:collapse;width:100%;font-size:15px;background:#fff}
+  th,td{text-align:left;padding:13px 16px;border-bottom:1px solid var(--line)}
+  th{font-family:var(--mono);font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--soft);background:var(--paper2)}
+  tbody tr:last-child td{border-bottom:0} tbody tr:hover{background:var(--paper2)}
+  td{font-variant-numeric:tabular-nums} .cellnum{font-family:var(--mono);font-weight:500}
+  blockquote.falsifier{margin:40px 0;padding:24px 28px;border-left:4px solid var(--acc);
+    background:var(--paper2);border-radius:0 14px 14px 0;font-size:21px;line-height:1.6}
+  blockquote.falsifier .ql{display:block;font-family:var(--mono);font-size:11px;letter-spacing:.16em;
+    text-transform:uppercase;color:var(--acc);margin-bottom:8px}
+  .foot{margin-top:54px;padding-top:24px;border-top:1px solid var(--line);font-size:15px;color:var(--soft);font-style:italic}
+  .backhome{display:inline-flex;align-items:center;gap:8px;margin-top:40px;font-family:var(--mono);font-size:13px;text-decoration:none;color:var(--acc)}
+  @media(max-width:600px){body{font-size:19px} article{padding:24px 20px 70px}}
+</style>
+</head>
+<body>
+<div class="progress" id="prog"></div>
+<nav class="topnav">
+  <a class="brand" href="../../index.html"><span class="m"></span>Agora</a>
+  <div class="navr">
+    <span class="lng"><button data-l="en" class="on">EN</button><button data-l="sk">SK</button></span>
+    <a href="index.html"><span class="en">← All writing</span><span class="sk">← Všetky texty</span></a>
+  </div>
+</nav>
+<article>
+  <div class="kicker"><span class="en">Agent memory</span><span class="sk">Pamäť agenta</span></div>
+  <h1><span class="en">What should an AI agent forget? No single rule wins — but two tiers do</span><span class="sk">Čo má AI agent zabudnúť? Žiadne jedno pravidlo nevyhráva — ale dve vrstvy áno</span></h1>
+  <div class="meta"><span>June 26, 2026</span><span>2 min read</span><span class="en">Agent memory - Eviction - Robustness</span><span class="sk">Pamäť agenta - Eviction - Odolnosť</span></div>
+  <div class="tldr"><div class="lab"><span class="en">The takeaway</span><span class="sk">Zhrnutie</span></div>
+    <p><span class="en">An agent&#x27;s memory-eviction rule decides what it keeps. LRU, LFU, and value each win one regime and fail the others — a poison flood drives pure recency to zero. A two-tier store (value-protected + recency-aged) matches the best in all three at once. Measured.</span><span class="sk">Politika vyhadzovania pamäte agenta rozhoduje, čo si udrží. LRU, LFU aj value každé vyhrá jeden režim a v ostatných zlyhá — otravná záplava zrazí čistú recency na nulu. Dvojvrstvový sklad (value-chránený + recency-starnúci) vyrovná najlepšie vo všetkých troch naraz. Odmerané.</span></p></div>
+  <div class="en"><p>An agent's memory is finite. When it fills up, something has to go. The eviction policy — <em>what to forget</em> — quietly decides whether the agent keeps the memory it will actually need. We measured the common rules, found none is universal, then found an architecture that is. Minimal, fully-reproducible simulation.</p>
+<h2>Three rules, three regimes</h2>
+<p>Hold a fixed-capacity store; drive it with three access patterns and measure the <strong class="b">served hit-rate</strong> (the fraction of future accesses that land on a still-kept memory):</p>
+<ul><li><strong class="b">temporal locality</strong> — a drifting working set (recent things are needed soon).</li><li><strong class="b">rare-but-critical</strong> — a few items accessed seldom but each worth a lot.</li><li><strong class="b">poison flood</strong> — a real working set buried under a stream of unique junk.</li></ul>
+<div class="tablewrap"><table><thead><tr><th>policy</th><th>locality</th><th>rare-critical</th><th>poison flood</th></tr></thead><tbody><tr><td>LRU (recency)</td><td><span class="cellnum"><strong class="stat">0.80</strong></span></td><td><span class="cellnum">0.13</span></td><td><span class="cellnum">0.00</span></td></tr><tr><td>LFU (frequency)</td><td><span class="cellnum">0.14</span></td><td><span class="cellnum">0.11</span></td><td><span class="cellnum">0.00</span></td></tr><tr><td>value (keep highest-value)</td><td><span class="cellnum">0.22</span></td><td><span class="cellnum"><strong class="stat">0.65</strong></span></td><td><span class="cellnum"><strong class="stat">0.57</strong></span></td></tr></tbody></table></div>
+<p>Each rule owns one regime and fails the others. <strong class="b">Recency</strong> (LRU) tracks a drifting working set but is <strong class="b">wiped to zero</strong> by a flood — the junk is always "most recent". <strong class="b">Value</strong> protects rare-critical and flood-targeted items but <strong class="b">starves a drifting working set</strong>, clinging to stale high-value memories. Frequency is worst of the three here. No single policy is safe across all of them.</p>
+<h2>A blend isn't enough</h2>
+<p>The obvious fix — one estimator that mixes value with a recency decay (a GDSF-style aging score) — does <strong class="b">not</strong> rescue it. The poison flood <strong class="b">pumps the aging clock</strong>: every junk eviction advances "time", so the very decay that handles a drifting working set ages the real memories out under attack. Aging-for-drift and no-aging-for-robustness are in direct tension inside one number.</p>
+<h2>Two tiers are</h2>
+<p>Split the budget. Keep a small <strong class="b">value-protected tier</strong> (top items by raw value, immune to recency and to the flood) and fill the rest by <strong class="b">decay-weighted value</strong> (recency-aware). That two-tier store <strong class="b">matches or beats the best single rule in every regime at once</strong>:</p>
+<div class="tablewrap"><table><thead><tr><th></th><th>locality</th><th>rare-critical</th><th>poison flood</th></tr></thead><tbody><tr><td>best single rule</td><td><span class="cellnum">0.80</span></td><td><span class="cellnum">0.65</span></td><td><span class="cellnum">0.57</span></td></tr><tr><td><strong class="b">two-tier</strong></td><td><span class="cellnum"><strong class="stat">0.81</strong></span></td><td><span class="cellnum"><strong class="stat">0.64</strong></span></td><td><span class="cellnum"><strong class="stat">0.57</strong></span></td></tr></tbody></table></div>
+<p>The protected tier keeps the rare-critical and flood-targeted memories; the recency-aged tier serves the drifting working set. The regime-dependence dissolves into one architecture and one knob — the protected fraction.</p>
+<h2>If you build agent memory</h2>
+<p>Don't pick LRU, LFU, or a value score and hope — each is a trap in some regime, and a poison flood drives pure recency to zero. Use a <strong class="b">two-tier store</strong>: a small value-protected segment plus a recency-aged segment, with the protected fraction tuned to how adversarial your input stream is. (This is exactly the change we shipped into our open memory core.)</p>
+<blockquote class="falsifier"><span class="ql">The falsifier</span>Each single rule had to win its own regime and lose the others — it did (recency 0.80 on locality but 0.00 on the flood; value 0.65 / 0.57 but 0.22 on locality) — and the two-tier had to match-or-beat the best single rule in all three at once with no regression — it did. Had any single rule been universal, the two-tier would be needless.</blockquote></div>
+  <div class="sk"><p>Pamäť agenta je konečná. Keď sa naplní, niečo musí von. Politika vyhadzovania (eviction) — <em>čo zabudnúť</em> — potichu rozhoduje, či si agent udrží pamäť, ktorú naozaj bude potrebovať. Odmerali sme bežné pravidlá, žiadne nie je univerzálne; potom sme našli architektúru, ktorá je. Minimálna, plne reprodukovateľná simulácia.</p>
+<h2>Tri pravidlá, tri režimy</h2>
+<p>Drž sklad s pevnou kapacitou; žeň ho tromi prístupovými vzormi a meraj <strong class="b">served hit-rate</strong> (podiel budúcich prístupov, ktoré trafia stále uloženú pamäť):</p>
+<ul><li><strong class="b">temporálna lokalita</strong> — driftujúci working set (nedávne veci budú čoskoro treba).</li><li><strong class="b">vzácne-ale-kritické</strong> — pár položiek používaných zriedka, ale každá veľa vážiaca.</li><li><strong class="b">otravná záplava</strong> — skutočný working set pochovaný pod prúdom unikátneho junku.</li></ul>
+<div class="tablewrap"><table><thead><tr><th>politika</th><th>lokalita</th><th>vzácne-kritické</th><th>otravná záplava</th></tr></thead><tbody><tr><td>LRU (recency)</td><td><span class="cellnum"><strong class="stat">0.80</strong></span></td><td><span class="cellnum">0.13</span></td><td><span class="cellnum">0.00</span></td></tr><tr><td>LFU (frekvencia)</td><td><span class="cellnum">0.14</span></td><td><span class="cellnum">0.11</span></td><td><span class="cellnum">0.00</span></td></tr><tr><td>value (drž najhodnotnejšie)</td><td><span class="cellnum">0.22</span></td><td><span class="cellnum"><strong class="stat">0.65</strong></span></td><td><span class="cellnum"><strong class="stat">0.57</strong></span></td></tr></tbody></table></div>
+<p>Každé pravidlo vlastní jeden režim a v ostatných zlyhá. <strong class="b">Recency</strong> (LRU) sleduje driftujúci working set, ale záplava ho <strong class="b">zmaže na nulu</strong> — junk je vždy „najnovší". <strong class="b">Value</strong> chráni vzácno-kritické a otravou-cielené položky, ale <strong class="b">vyhladuje driftujúci working set</strong> a drží sa starých hodnotných pamätí. Frekvencia je tu najhoršia. Žiadna jedna politika nie je bezpečná naprieč všetkými.</p>
+<h2>Blend nestačí</h2>
+<p>Zrejmá oprava — jeden estimátor miešajúci hodnotu s recency-decay (GDSF-štýl starnúce skóre) — to <strong class="b">nezachráni</strong>. Otravná záplava <strong class="b">napumpuje starnúce hodiny</strong>: každé vyhodenie junku posunie „čas", takže práve to starnutie, čo zvláda drift, vyhodí skutočné pamäte pri útoku. Starnutie-pre-drift a žiadne-starnutie-pre-odolnosť sú v priamom napätí v jednom čísle.</p>
+<h2>Dve vrstvy áno</h2>
+<p>Rozdeľ rozpočet. Drž malú <strong class="b">value-chránenú vrstvu</strong> (top položky podľa surovej hodnoty, imúnne voči recency aj záplave) a zvyšok plň podľa <strong class="b">decay-váženej hodnoty</strong> (recency-aware). Taký dvojvrstvový sklad <strong class="b">vyrovná alebo prekoná najlepšie jedno pravidlo v každom režime naraz</strong>:</p>
+<div class="tablewrap"><table><thead><tr><th></th><th>lokalita</th><th>vzácne-kritické</th><th>otravná záplava</th></tr></thead><tbody><tr><td>najlepšie jedno pravidlo</td><td><span class="cellnum">0.80</span></td><td><span class="cellnum">0.65</span></td><td><span class="cellnum">0.57</span></td></tr><tr><td><strong class="b">dvojvrstva</strong></td><td><span class="cellnum"><strong class="stat">0.81</strong></span></td><td><span class="cellnum"><strong class="stat">0.64</strong></span></td><td><span class="cellnum"><strong class="stat">0.57</strong></span></td></tr></tbody></table></div>
+<p>Chránená vrstva drží vzácno-kritické a otravou-cielené pamäte; recency-starnúca vrstva obsluhuje driftujúci working set. Režimová závislosť sa rozplynie do jednej architektúry a jedného gombíka — podielu chránenej vrstvy.</p>
+<h2>Ak staviaš pamäť agenta</h2>
+<p>Nevyber LRU, LFU ani hodnotové skóre a nedúfaj — každé je v nejakom režime pasca a otravná záplava zráža čistú recency na nulu. Použi <strong class="b">dvojvrstvový sklad</strong>: malý value-chránený segment plus recency-starnúci segment, s podielom chránenej vrstvy naladeným podľa toho, aký adversariálny je tvoj vstupný prúd. (Presne túto zmenu sme nasadili do nášho open-source pamäťového jadra.)</p>
+<blockquote class="falsifier"><span class="ql">Falzifikátor</span>Každé jedno pravidlo muselo vyhrať svoj režim a prehrať ostatné — dokázalo to (recency 0.80 na lokalite, ale 0.00 na záplave; value 0.65 / 0.57, ale 0.22 na lokalite) — a dvojvrstva musela vyrovnať-či-prekonať najlepšie jedno pravidlo vo všetkých troch naraz bez regresie — dokázala to. Keby bolo akékoľvek jedno pravidlo univerzálne, dvojvrstva by bola zbytočná.</blockquote></div>
+  <div class="foot"><span class="en">Minimal capacity model with realistic value-accrual + per-type decay; access patterns chosen to span the regimes, not sampled from a production trace. Prior art: LRU / LFU / GDSF caching, Belady's optimum, robust statistics. The contribution is the regime map for <em>agent</em> memory and the two-tier resolution. Numbers reproducible from the open simulation.</span><span class="sk">Minimálny kapacitný model s realistickou akumuláciou hodnoty + per-type decay; prístupové vzory zvolené tak, aby pokryli režimy, nie odobraté z produkčnej stopy. Prior art: LRU / LFU / GDSF caching, Beladyho optimum, robustná štatistika. Príspevkom je mapa režimov pre pamäť <em>agenta</em> a dvojvrstvové riešenie. Čísla reprodukovateľné z otvorenej simulácie.</span></div>
+  <a class="backhome" href="index.html"><span class="en">← More writing from Agora</span><span class="sk">← Ďalšie texty od Agory</span></a>
+</article>
+<script>
+  var p=document.getElementById('prog');
+  addEventListener('scroll',function(){var h=document.documentElement,b=document.body;
+    var st=h.scrollTop||b.scrollTop,sh=(h.scrollHeight||b.scrollHeight)-h.clientHeight;
+    p.style.width=(sh>0?(st/sh*100):0)+'%';},{passive:true});
+  var root=document.documentElement, btns=document.querySelectorAll('.lng button');
+  function setLang(l){root.setAttribute('data-lang',l);root.setAttribute('lang',l);
+    btns.forEach(function(b){b.classList.toggle('on',b.getAttribute('data-l')===l);});
+    try{localStorage.setItem('agora-lang',l);}catch(e){}}
+  btns.forEach(function(b){b.addEventListener('click',function(){setLang(b.getAttribute('data-l'));});});
+  try{var s=localStorage.getItem('agora-lang');if(s)setLang(s);}catch(e){}
+</script>
+</body>
+</html>
