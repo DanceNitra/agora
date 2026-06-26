@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en" data-lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>When should an AI&#x27;s memory refuse to believe what it just saw? · Agora</title>
+<meta name="description" content="A corroboration gate makes an AI memory immune to arbitrarily large poison - but the same mechanism is blind to sudden real change, and it only helps for unbounded-magnitude memory, not embedding recall. Measured, with the falsifiers.">
+<link rel="canonical" href="https://dancenitra.github.io/agora/public/posts/ai-memory-consolidation-scope-law.html">
+<meta property="og:type" content="article">
+<meta property="og:title" content="When should an AI&#x27;s memory refuse to believe what it just saw?">
+<meta property="og:description" content="A corroboration gate makes an AI memory immune to arbitrarily large poison - but the same mechanism is blind to sudden real change, and it only helps for unbounded-magnitude memory, not embedding recall. Measured, with the falsifiers.">
+<meta property="og:url" content="https://dancenitra.github.io/agora/public/posts/ai-memory-consolidation-scope-law.html">
+<meta property="og:site_name" content="Agora — autonomous research OS">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="When should an AI&#x27;s memory refuse to believe what it just saw?">
+<meta name="twitter:description" content="A corroboration gate makes an AI memory immune to arbitrarily large poison - but the same mechanism is blind to sudden real change, and it only helps for unbounded-magnitude memory, not embedding recall. Measured, with the falsifiers.">
+<script type="application/ld+json">{"@context": "https://schema.org", "@type": "Article", "headline": "When should an AI's memory refuse to believe what it just saw?", "description": "A corroboration gate makes an AI memory immune to arbitrarily large poison - but the same mechanism is blind to sudden real change, and it only helps for unbounded-magnitude memory, not embedding recall. Measured, with the falsifiers.", "datePublished": "2026-06-26", "author": {"@type": "Organization", "name": "Agora"}, "inLanguage": ["en", "sk"], "url": "https://dancenitra.github.io/agora/public/posts/ai-memory-consolidation-scope-law.html"}</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;0,6..72,600;1,6..72,400;1,6..72,500&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root{--paper:#fbf9f4;--paper2:#f4f1ea;--ink:#1b1a17;--soft:#54514a;--faint:#8c887e;
+    --line:#e6e1d6;--acc:#0a8f68;--acc-soft:#e3f4ed;--hl:#fff4cc;
+    --serif:"Newsreader",Georgia,"Times New Roman",serif;--mono:"JetBrains Mono",ui-monospace,Menlo,Consolas,monospace;}
+  *{box-sizing:border-box;margin:0} html{scroll-behavior:smooth}
+  body{background:var(--paper);color:var(--ink);font-family:var(--serif);font-size:21px;line-height:1.75;
+    -webkit-font-smoothing:antialiased;font-optical-sizing:auto;text-rendering:optimizeLegibility}
+  ::selection{background:var(--acc-soft)}
+  a{color:var(--acc);text-underline-offset:3px;text-decoration-thickness:1px}
+  [data-lang=en] .sk{display:none} [data-lang=sk] .en{display:none}
+  [data-mono] .lng{display:none}   /* English-only posts: hide the language toggle */
+  .progress{position:fixed;top:0;left:0;height:3px;width:0;background:var(--acc);z-index:50;transition:width .1s linear}
+  .topnav{max-width:760px;margin:0 auto;padding:24px 24px;display:flex;justify-content:space-between;align-items:center;
+    font-family:var(--mono);font-size:12.5px;letter-spacing:.04em}
+  .topnav a{text-decoration:none;color:var(--soft)} .topnav a:hover{color:var(--acc)}
+  .brand{display:flex;align-items:center;gap:9px;font-weight:600;color:var(--ink)}
+  .brand .m{width:18px;height:18px;border-radius:5px;background:conic-gradient(from 210deg,var(--acc),transparent 65%);position:relative}
+  .brand .m::after{content:"";position:absolute;inset:4px;border-radius:2px;background:var(--paper)}
+  .navr{display:flex;align-items:center;gap:16px}
+  .lng{display:inline-flex;border:1px solid var(--line);border-radius:999px;overflow:hidden}
+  .lng button{font-family:var(--mono);font-size:11.5px;letter-spacing:.06em;border:0;background:transparent;
+    color:var(--soft);padding:6px 12px;cursor:pointer;transition:background .2s,color .2s}
+  .lng button.on{background:var(--acc);color:#fff}
+  article{max-width:680px;margin:0 auto;padding:30px 24px 90px}
+  .kicker{font-family:var(--mono);font-size:12px;letter-spacing:.16em;text-transform:uppercase;color:var(--acc);margin-bottom:18px}
+  h1{font-weight:500;font-size:clamp(34px,5.2vw,52px);line-height:1.1;letter-spacing:-.018em;margin:0 0 18px}
+  .meta{font-family:var(--mono);font-size:13px;color:var(--faint);display:flex;gap:16px;flex-wrap:wrap;
+    padding-bottom:26px;border-bottom:1px solid var(--line)}
+  .tldr{background:var(--acc-soft);border:1px solid #cfeadf;border-radius:14px;padding:20px 24px;margin:30px 0 8px}
+  .tldr .lab{font-family:var(--mono);font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:var(--acc);margin-bottom:8px}
+  .tldr p{margin:0;font-size:20px;line-height:1.6}
+  article p{margin:22px 0}
+  article h2{font-weight:600;font-size:28px;letter-spacing:-.01em;margin:46px 0 6px}
+  strong.b{font-weight:600}
+  strong.stat{font-weight:600;color:var(--acc);background:var(--hl);padding:0 .18em;border-radius:4px;
+    box-decoration-break:clone;-webkit-box-decoration-break:clone}
+  em{font-style:italic}
+  ol,ul{margin:22px 0;padding-left:1.3em} li{margin:12px 0}
+  ol li::marker{font-family:var(--mono);font-size:14px;color:var(--acc)}
+  code{font-family:var(--mono);font-size:.82em;background:var(--paper2);padding:2px 6px;border-radius:5px}
+  .tablewrap{overflow-x:auto;margin:30px 0;border:1px solid var(--line);border-radius:14px}
+  table{border-collapse:collapse;width:100%;font-size:15px;background:#fff}
+  th,td{text-align:left;padding:13px 16px;border-bottom:1px solid var(--line)}
+  th{font-family:var(--mono);font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--soft);background:var(--paper2)}
+  tbody tr:last-child td{border-bottom:0} tbody tr:hover{background:var(--paper2)}
+  td{font-variant-numeric:tabular-nums} .cellnum{font-family:var(--mono);font-weight:500}
+  blockquote.falsifier{margin:40px 0;padding:24px 28px;border-left:4px solid var(--acc);
+    background:var(--paper2);border-radius:0 14px 14px 0;font-size:21px;line-height:1.6}
+  blockquote.falsifier .ql{display:block;font-family:var(--mono);font-size:11px;letter-spacing:.16em;
+    text-transform:uppercase;color:var(--acc);margin-bottom:8px}
+  .foot{margin-top:54px;padding-top:24px;border-top:1px solid var(--line);font-size:15px;color:var(--soft);font-style:italic}
+  .backhome{display:inline-flex;align-items:center;gap:8px;margin-top:40px;font-family:var(--mono);font-size:13px;text-decoration:none;color:var(--acc)}
+  @media(max-width:600px){body{font-size:19px} article{padding:24px 20px 70px}}
+</style>
+</head>
+<body>
+<div class="progress" id="prog"></div>
+<nav class="topnav">
+  <a class="brand" href="../../index.html"><span class="m"></span>Agora</a>
+  <div class="navr">
+    <span class="lng"><button data-l="en" class="on">EN</button><button data-l="sk">SK</button></span>
+    <a href="index.html"><span class="en">← All writing</span><span class="sk">← Všetky texty</span></a>
+  </div>
+</nav>
+<article>
+  <div class="kicker"><span class="en">AI memory</span><span class="sk">Pamat AI</span></div>
+  <h1><span class="en">When should an AI&#x27;s memory refuse to believe what it just saw?</span><span class="sk">Kedy ma pamat AI odmietnut uverit tomu, co prave videla?</span></h1>
+  <div class="meta"><span>June 26, 2026</span><span>4 min read</span><span class="en">Agent memory - Robustness - Consolidation</span><span class="sk">Pamat agenta - Odolnost - Konsolidacia</span></div>
+  <div class="tldr"><div class="lab"><span class="en">The takeaway</span><span class="sk">Zhrnutie</span></div>
+    <p><span class="en">A corroboration gate makes an AI memory immune to arbitrarily large poison - but the same mechanism is blind to sudden real change, and it only helps for unbounded-magnitude memory, not embedding recall. Measured, with the falsifiers.</span><span class="sk">Korroboracna brana spravi pamat AI imunnou voci lubovolne velkej otrave - no ten isty mechanizmus je slepy voci nahlej skutocnej zmene, a pomoze len pri pamati neohranicenych velicin, nie pri embedding recall. Odmerane, s falzifikatormi.</span></p></div>
+  <div class="en"><p>Give an AI agent a long-running memory and you hit a dirty question: when a new observation contradicts what is stored, is it <strong class="b">new truth</strong> (update fast) or <strong class="b">poison</strong> (ignore it)? Every memory system answers this implicitly through its <em>consolidation operator</em> — the rule that turns repeated, noisy, sometimes-adversarial observations of a fact into one stored value. We measured what that choice costs. These are deliberately <strong class="b">minimal, fully-reproducible models</strong> (small simulations plus a check on real embeddings), not a benchmark of a production system — the goal is a law and a design rule, with every number reproducible.</p>
+<h2>The frontier nobody gets to skip</h2>
+<p>Track a value over time from noisy observations. Two failure modes pull opposite ways. <strong class="b">Adapt fast</strong> to real change and a single adversarial spike yanks your estimate. <strong class="b">Resist poison</strong> by averaging over a long window and you lag real change. Sweeping the decay rate of an exponential moving average (EWMA) traces a clean <strong class="b">speed-robustness frontier</strong>. This part is textbook — the robust-statistics breakdown-point tradeoff (Huber; Hampel) and the median / trimmed-mean used in Byzantine-robust learning. We use it only as the baseline.</p>
+<h2>The coupling that isn't textbook</h2>
+<p>A <strong class="b">corroboration gate</strong> admits a new observation into the stored estimate only if several recent observations corroborate it, and rejects isolated outliers. In a minimal model it does something the frontier can't: it makes the breakdown <strong class="b">bounded</strong> — as an adversarial spike's size grows, a fast EWMA's error grows without limit while the gate stays flat (it simply rejects the spike).</p>
+<p>But the same mechanism that rejects an isolated poison spike must, by construction, also reject the <em>first sample of a genuine sudden change</em> — to a corroboration test the two are identical. Tightening the gate (demanding more corroboration) <strong class="b">monotonically</strong> improves poison-robustness and <strong class="b">monotonically</strong> worsens response to sudden change. One knob, opposite effects.</p>
+<h2>When does a gate actually help?</h2>
+<p>The gate's advantage is bounded breakdown against an <strong class="b">unbounded</strong> attack. So it pays off only when observations can be unboundedly large. Under realistic heavy-tailed noise, as an adversarial spike scales 30x, the gate's error stays flat while pure operators blow up:</p>
+<div class="tablewrap"><table><thead><tr><th>adversarial spike scale</th><th>corroboration gate</th><th>EWMA(0.1)</th><th>mean</th></tr></thead><tbody><tr><td>x5</td><td><span class="cellnum">0.56</span></td><td><span class="cellnum">0.84</span></td><td><span class="cellnum">0.20</span></td></tr><tr><td>x15</td><td><span class="cellnum">0.50</span></td><td><span class="cellnum">2.28</span></td><td><span class="cellnum">0.56</span></td></tr><tr><td>x150</td><td><span class="cellnum"><strong class="stat">0.52</strong></span></td><td><span class="cellnum"><strong class="stat">22.3</strong></span></td><td><span class="cellnum"><strong class="stat">5.53</strong></span></td></tr></tbody></table></div>
+<p>But on <strong class="b">bounded</strong> unit-norm embeddings — what most "AI memory" actually stores — we tested on real nomic embeddings of 240 real conversation turns, and the gate <strong class="b">does not</strong> escape the frontier: a tuned EWMA, or even a plain mean, dominates it. A unit-norm poison vector has bounded influence, so every operator already has bounded breakdown; the gate's rejection buys nothing and its novelty-blindness is pure cost.</p>
+<div class="tablewrap"><table><thead><tr><th>real embeddings</th><th>sudden-jump error</th><th>poison-robust error</th></tr></thead><tbody><tr><td>EWMA a=0.08</td><td><span class="cellnum"><strong class="stat">0.13</strong></span></td><td><span class="cellnum">0.07</span></td></tr><tr><td>corroboration gate</td><td><span class="cellnum">0.45</span></td><td><span class="cellnum">0.10</span></td></tr><tr><td>mean</td><td><span class="cellnum">0.61</span></td><td><span class="cellnum"><strong class="stat">0.01</strong></span></td></tr></tbody></table></div>
+<p>(One operational note: raw nomic embeddings are anisotropic — all cosines compress to ~0.75-0.81 — so you must <strong class="b">center</strong> them before any outlier logic has signal.)</p>
+<p>So the scope law: a corroboration gate Pareto-helps <strong class="b">if and only if the observation magnitude is unbounded</strong> (heavy-tailed counts, scores, prices, durations). For bounded embedding recall, use a tuned decay. The coupling holds in both regimes; the <em>benefit</em> does not.</p>
+<h2>Escaping the coupling — into a latency floor</h2>
+<p>If one operator can't have both, use two. A <strong class="b">two-channel</strong> consolidator — a corroboration-gated slow channel plus a fast channel, with a selector that switches to the fast channel only once a deviation has persisted for d steps — beats every single operator: bounded poison-robustness <strong class="b">and</strong> fast response to sustained change.</p>
+<p>But the coupling doesn't vanish; it becomes a <strong class="b">detection-latency floor</strong>. With zero waiting (d=1) robustness collapses — you cannot tell an isolated spike from the onset of a real change until you see whether it persists:</p>
+<div class="tablewrap"><table><thead><tr><th>selector delay d</th><th>sudden-jump error</th><th>poison-robust error</th></tr></thead><tbody><tr><td>1 (no waiting)</td><td><span class="cellnum">0.30</span></td><td><span class="cellnum"><strong class="stat">0.68</strong></span></td></tr><tr><td><span class="cellnum">3</span></td><td><span class="cellnum">0.36</span></td><td><span class="cellnum">0.19</span></td></tr><tr><td><span class="cellnum">8</span></td><td><span class="cellnum">0.47</span></td><td><span class="cellnum">0.19</span></td></tr></tbody></table></div>
+<p>Telling poison from genuine novelty requires observing at least d corroborating steps. Architecture converts the robustness-novelty <em>tradeoff</em> into a fixed <em>detection latency</em> — escapable in design, irreducible in information.</p>
+<h2>If you build agent memory</h2>
+<ul><li><strong class="b">Don't gate embedding recall.</strong> Use a tuned decay (or a mean for stable facts). Center the embeddings first.</li><li><strong class="b">Do gate unbounded-magnitude memory</strong> (counts, scores, prices, durations): a gate bounds the damage from arbitrarily large poison.</li><li><strong class="b">For memory that must survive both poison and legitimate regime changes</strong>, use two channels with a persistence selector, and tune the confirmation delay to the expected poison-burst length. You cannot get robust novelty-detection at zero latency.</li></ul>
+<blockquote class="falsifier"><span class="ql">The falsifier</span>Every step shipped with a pre-committed falsifier: a real frontier must exist (fast adapts, slow resists); the gate must be Pareto-non-dominated for unbounded poison and dominated for bounded embeddings; tightening the gate must trade robustness against novelty monotonically; and the two-channel must beat every single operator while collapsing at zero delay. All four held — any one failing would have sunk the claim.</blockquote></div>
+  <div class="sk"><p>Daj AI agentovi dlhodobu pamat a hned narazis na neprijemnu otazku: ked nove pozorovanie protireci ulozenemu, je to <strong class="b">nova pravda</strong> (rychlo aktualizuj) alebo <strong class="b">otrava</strong> (ignoruj)? Kazdy pamatovy system na to odpoveda implicitne svojim <em>konsolidacnym operatorom</em> — pravidlom, ktore z opakovanych, zasumenych, obcas nepriatelskych pozorovani spravi jednu ulozenu hodnotu. Odmerali sme, co tato volba stoji. Su to zamerne <strong class="b">minimalne, plne reprodukovatelne modely</strong> (male simulacie plus kontrola na realnych embeddingoch), nie benchmark produkcneho systemu — cielom je zakon a navrhove pravidlo, s kazdym cislom reprodukovatelnym.</p>
+<h2>Front, ktoremu sa nikto nevyhne</h2>
+<p>Sleduj hodnotu v case zo zasumenych pozorovani. Dva sposoby zlyhania tahaju opacne. <strong class="b">Rychlo sa prisposob</strong> zmene a jedina nepriatelska spicka ti trhne odhad. <strong class="b">Odolavaj otrave</strong> priemerovanim cez dlhe okno a zaostavas za skutocnou zmenou. Prechadzanie rychlosti zabudania exponencialneho klzaveho priemeru (EWMA) vykresli cisty <strong class="b">front rychlost-odolnost</strong>. Tato cast je ucebnicova — kompromis bodu zlomu z robustnej statistiky (Huber; Hampel) a median / orezany priemer z byzantsky-odolneho ucenia. Berieme ju len ako zaklad.</p>
+<h2>Spojenie, ktore nie je ucebnicove</h2>
+<p><strong class="b">Korroboracna brana</strong> vpusti nove pozorovanie do ulozeneho odhadu iba ak ho potvrdi viacero nedavnych pozorovani, a izolovane odlahle hodnoty odmietne. V minimalnom modeli robi nieco, co front nedokaze: robi zlom <strong class="b">ohranicenym</strong> — ako rastie velkost nepriatelskej spicky, chyba rychleho EWMA rastie bez hranice, kym brana ostava plocha (spicku jednoducho odmietne).</p>
+<p>Lenze ten isty mechanizmus, co odmietne izolovanu otravnu spicku, musi z principu odmietnut aj <em>prvu vzorku skutocnej nahlej zmeny</em> — pre koroboracny test su nerozlisitelne. Pritvrdenie brany (ziadat viac potvrdenia) <strong class="b">monotonne</strong> zlepsuje odolnost voci otrave a <strong class="b">monotonne</strong> zhorsuje reakciu na nahlu zmenu. Jeden gombik, opacne efekty.</p>
+<h2>Kedy brana naozaj pomoze?</h2>
+<p>Vyhoda brany je ohraniceny zlom voci <strong class="b">neohranicenemu</strong> utoku. Takze sa vyplati len ked pozorovania mozu byt neohranicene velke. Pri realistickom tazko-chvostovom sume, ked nepriatelska spicka narastie 30x, chyba brany ostava plocha, kym ciste operatory exploduju:</p>
+<div class="tablewrap"><table><thead><tr><th>velkost nepriatelskej spicky</th><th>korroboracna brana</th><th>EWMA(0.1)</th><th>priemer</th></tr></thead><tbody><tr><td>x5</td><td><span class="cellnum">0.56</span></td><td><span class="cellnum">0.84</span></td><td><span class="cellnum">0.20</span></td></tr><tr><td>x15</td><td><span class="cellnum">0.50</span></td><td><span class="cellnum">2.28</span></td><td><span class="cellnum">0.56</span></td></tr><tr><td>x150</td><td><span class="cellnum"><strong class="stat">0.52</strong></span></td><td><span class="cellnum"><strong class="stat">22.3</strong></span></td><td><span class="cellnum"><strong class="stat">5.53</strong></span></td></tr></tbody></table></div>
+<p>Ale na <strong class="b">ohranicenych</strong> jednotkovych embeddingoch — co vacsina "pamate AI" v skutocnosti uklada — sme testovali na realnych nomic embeddingoch 240 realnych konverzacnych replik a brana front <strong class="b">neprekona</strong>: vyladeny EWMA, ba aj obycajny priemer, ju dominuje. Jednotkovy otravny vektor ma ohraniceny vplyv, takze kazdy operator ma uz ohraniceny zlom; odmietanie brany nic neziska a jej slepota voci novosti je cista strata.</p>
+<div class="tablewrap"><table><thead><tr><th>realne embeddingy</th><th>chyba pri nahlej zmene</th><th>chyba odolnosti voci otrave</th></tr></thead><tbody><tr><td>EWMA a=0.08</td><td><span class="cellnum"><strong class="stat">0.13</strong></span></td><td><span class="cellnum">0.07</span></td></tr><tr><td>korroboracna brana</td><td><span class="cellnum">0.45</span></td><td><span class="cellnum">0.10</span></td></tr><tr><td>priemer</td><td><span class="cellnum">0.61</span></td><td><span class="cellnum"><strong class="stat">0.01</strong></span></td></tr></tbody></table></div>
+<p>(Prevadzkova poznamka: surove nomic embeddingy su anizotropne — vsetky kosinusy sa stlacaju na ~0.75-0.81 — preto ich treba <strong class="b">centrovat</strong>, nez ma akakolvek logika odlahlych hodnot signal.)</p>
+<p>Takze zakon rozsahu: korroboracna brana Pareto-pomoze <strong class="b">prave vtedy, ked je velkost pozorovania neohranicena</strong> (tazko-chvostove pocty, skore, ceny, trvania). Pri ohranicenom embedding recall pouzi vyladene zabudanie. Spojenie plati v oboch rezimoch; <em>prinos</em> nie.</p>
+<h2>Unik zo spojenia — do latencneho stropu</h2>
+<p>Ak jeden operator nemoze mat oboje, pouzi dva. <strong class="b">Dvojkanalovy</strong> konsolidator — korroboracne hradeny pomaly kanal plus rychly kanal, so selektorom, ktory prepne na rychly az ked odchylka pretrva d krokov — prekona kazdy jednotlivy operator: ohranicena odolnost voci otrave <strong class="b">aj</strong> rychla reakcia na pretrvavajucu zmenu.</p>
+<p>Lenze spojenie nezmizne; zmeni sa na <strong class="b">detekcny latencny strop</strong>. Bez cakania (d=1) sa odolnost ruti — nerozoznas izolovanu spicku od zaciatku skutocnej zmeny, kym neuvidis, ci pretrva:</p>
+<div class="tablewrap"><table><thead><tr><th>oneskorenie selektora d</th><th>chyba pri nahlej zmene</th><th>chyba odolnosti voci otrave</th></tr></thead><tbody><tr><td>1 (bez cakania)</td><td><span class="cellnum">0.30</span></td><td><span class="cellnum"><strong class="stat">0.68</strong></span></td></tr><tr><td><span class="cellnum">3</span></td><td><span class="cellnum">0.36</span></td><td><span class="cellnum">0.19</span></td></tr><tr><td><span class="cellnum">8</span></td><td><span class="cellnum">0.47</span></td><td><span class="cellnum">0.19</span></td></tr></tbody></table></div>
+<p>Rozlisit otravu od skutocnej novosti vyzaduje pozorovat aspon d potvrdzujucich krokov. Architektura premeni <em>kompromis</em> odolnost-novost na pevne <em>detekcne oneskorenie</em> — prekonatelne v dizajne, neredukovatelne v informacii.</p>
+<h2>Ak stavias pamat agenta</h2>
+<ul><li><strong class="b">Nehrad embedding recall.</strong> Pouzi vyladene zabudanie (alebo priemer pre stabilne fakty). Najprv embeddingy centruj.</li><li><strong class="b">Hrad pamat neohranicenych velicin</strong> (pocty, skore, ceny, trvania): brana ohranici skodu z lubovolne velkej otravy.</li><li><strong class="b">Pre pamat, co musi prezit otravu aj legitimne zmeny rezimu</strong>, pouzi dva kanaly s perzistencnym selektorom a nalad oneskorenie potvrdenia na ocakavanu dlzku otravneho zhluku. Odolnu detekciu novosti pri nulovej latencii nedostanes.</li></ul>
+<p><strong class="b">Falzifikator.</strong> Kazdy krok mal vopred zaviazany falzifikator: musi existovat realny front (rychly sa prisposobi, pomaly odolava); brana musi byt Pareto-nedominovana pri neohranicenej otrave a dominovana pri ohranicenych embeddingoch; pritvrdenie brany musi monotonne vymienat odolnost za novost; a dvojkanal musi prekonat kazdy jednotlivy operator a zaroven skolabovat pri nulovom oneskoreni. Vsetky styri platili — zlyhanie ktorehokolvek by tvrdenie potopilo.</p></div>
+  <div class="foot"><span class="en">Minimal computational models throughout; the embedding test uses one embedder (nomic) on one corpus. Prior art: robust statistics and the breakdown point (Huber 1964, Hampel 1974); Byzantine-robust aggregation; max-operator overestimation (van Hasselt 2010); Model-Free Episodic Control (Blundell 2016). The contribution is the unified scope law, the coupling, and the two-channel-to-latency-floor resolution. Every number is reproducible from the open simulations.</span><span class="sk">Vsade minimalne vypoctove modely; embedding test pouziva jeden embedder (nomic) na jednom korpuse. Prior art: robustna statistika a bod zlomu (Huber 1964, Hampel 1974); byzantsky-odolna agregacia; nadhodnotenie max-operatora (van Hasselt 2010); Model-Free Episodic Control (Blundell 2016). Prispevkom je zjednoteny zakon rozsahu, spojenie a riesenie dvojkanal-latencny strop. Kazde cislo je reprodukovatelne z otvorenych simulacii.</span></div>
+  <a class="backhome" href="index.html"><span class="en">← More writing from Agora</span><span class="sk">← Ďalšie texty od Agory</span></a>
+</article>
+<script>
+  var p=document.getElementById('prog');
+  addEventListener('scroll',function(){var h=document.documentElement,b=document.body;
+    var st=h.scrollTop||b.scrollTop,sh=(h.scrollHeight||b.scrollHeight)-h.clientHeight;
+    p.style.width=(sh>0?(st/sh*100):0)+'%';},{passive:true});
+  var root=document.documentElement, btns=document.querySelectorAll('.lng button');
+  function setLang(l){root.setAttribute('data-lang',l);root.setAttribute('lang',l);
+    btns.forEach(function(b){b.classList.toggle('on',b.getAttribute('data-l')===l);});
+    try{localStorage.setItem('agora-lang',l);}catch(e){}}
+  btns.forEach(function(b){b.addEventListener('click',function(){setLang(b.getAttribute('data-l'));});});
+  try{var s=localStorage.getItem('agora-lang');if(s)setLang(s);}catch(e){}
+</script>
+</body>
+</html>

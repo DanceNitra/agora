@@ -1,5 +1,19 @@
 [
  {
+  "slug": "ai-memory-consolidation-scope-law",
+  "title": "When should an AI's memory refuse to believe what it just saw?",
+  "title_sk": "Kedy ma pamat AI odmietnut uverit tomu, co prave videla?",
+  "desc": "A corroboration gate makes an AI memory immune to arbitrarily large poison - but the same mechanism is blind to sudden real change, and it only helps for unbounded-magnitude memory, not embedding recall. Measured, with the falsifiers.",
+  "desc_sk": "Korroboracna brana spravi pamat AI imunnou voci lubovolne velkej otrave - no ten isty mechanizmus je slepy voci nahlej skutocnej zmene, a pomoze len pri pamati neohranicenych velicin, nie pri embedding recall. Odmerane, s falzifikatormi.",
+  "date": "2026-06-26",
+  "tags": "Agent memory - Robustness - Consolidation",
+  "tags_sk": "Pamat agenta - Odolnost - Konsolidacia",
+  "kicker": "AI memory",
+  "kicker_sk": "Pamat AI",
+  "read": 4,
+  "bilingual": true
+ },
+ {
   "slug": "memory-poison-resistance-measured",
   "title": "Memory that won't let an uncorroborated fact become permanent — measured",
   "title_sk": "Pamäť, ktorá nedovolí, aby sa nepodložený fakt stal trvalým — odmerané",
