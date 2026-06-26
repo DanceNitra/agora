@@ -88,6 +88,12 @@ class Mnemo:
         self._mat = None                         # cached L2-normalized matrix of memory vectors (numpy)
         self._vec_rowof: dict[str, int] = {}     # memory id -> its row in self._mat
         self._mat_built_n = -1                   # item count when the matrix was built (rebuild on change)
+        self._vec_mean = None                    # corpus mean vector (for anisotropy centering of semantic recall)
+        # Anisotropy centering: subtract the corpus mean before cosine. Many embedders (e.g. nomic) are
+        # anisotropic — all cosines compress into a narrow band — so semantic recall under-separates.
+        # MEASURED on real LoCoMo (419 turns): centering lifts single-hop full-evidence recall@k by
+        # +0.04..+0.07 (k=5/10/20) and is neutral on multi-hop. Reversible: set center_embeddings=False.
+        self.center_embeddings = True
         # _save() THROTTLE: serializing the whole store (json.dumps of every item) is O(store size); doing
         # it on EVERY recall/remember froze callers once the store grew (recall mutates access value, so it
         # used to re-serialize everything each call). Coalesce disk writes to at most once / _save_min_s;
@@ -210,11 +216,14 @@ class Mnemo:
                     rows.append(r["vec"]); ids.append(r["id"])
             if rows:
                 M = _np.asarray(rows, dtype=_np.float32)
+                self._vec_mean = M.mean(axis=0)               # corpus mean (computed regardless; used to center)
+                if self.center_embeddings:
+                    M = M - self._vec_mean                    # de-anisotropise: remove the common component
                 M /= (_np.linalg.norm(M, axis=1, keepdims=True) + 1e-9)
                 self._mat = M
                 self._vec_rowof = {i: k for k, i in enumerate(ids)}
             else:
-                self._mat, self._vec_rowof = None, {}
+                self._mat, self._vec_rowof, self._vec_mean = None, {}, None
             self._mat_built_n = len(self.items)
         return self._mat
 
@@ -279,6 +288,8 @@ class Mnemo:
             M = self._vec_matrix()
             if M is not None:
                 qv = _np.asarray(qvec, dtype=_np.float32)
+                if self.center_embeddings and self._vec_mean is not None:
+                    qv = qv - self._vec_mean              # center the query the SAME way as the matrix
                 sims_vec = M @ (qv / (float(_np.linalg.norm(qv)) or 1.0))
         cands = []                                        # (sim, prov, eff_value, r) for sim>0 candidates
         _now = time.time()                                # for per-type decay of the ranking value
