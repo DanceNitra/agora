@@ -94,6 +94,14 @@ class Mnemo:
         # MEASURED on real LoCoMo (419 turns): centering lifts single-hop full-evidence recall@k by
         # +0.04..+0.07 (k=5/10/20) and is neutral on multi-hop. Reversible: set center_embeddings=False.
         self.center_embeddings = True
+        # Two-tier keep-budget: when consolidate(keep) must drop surplus, PROTECT the top protect_frac
+        # of the budget by RAW value (recency-immune) and fill the REST by EFFECTIVE (decay-weighted)
+        # value — so a freshly-useful memory isn't evicted by a stale high-value one. A pure top-N-by-raw
+        # prune keeps old high-value items forever and starves a drifting working set. MEASURED on a
+        # simulation of mnemo's own value-accrual + per-type decay: locality served-hit 0.22 -> 0.78,
+        # neutral on rare-critical + poison-flood. Reversible: two_tier_keep=False -> legacy top-N-by-raw.
+        self.two_tier_keep = True
+        self.protect_frac = 0.30
         # _save() THROTTLE: serializing the whole store (json.dumps of every item) is O(store size); doing
         # it on EVERY recall/remember froze callers once the store grew (recall mutates access value, so it
         # used to re-serialize everything each call). Coalesce disk writes to at most once / _save_min_s;
@@ -546,7 +554,20 @@ class Mnemo:
                             a["links"].append(b["id"]); linked += 1
         staled = 0
         if keep is not None and len(active) > keep:
-            for r in active[keep:]:
+            # active is sorted by -raw value (above). Legacy = keep the top-`keep` by raw value. Two-tier =
+            # protect the top kprot by raw value (recency-immune), then fill the remaining budget from the
+            # REST by EFFECTIVE (decay-weighted) value, so a stale high-raw-value memory can't crowd out a
+            # freshly-useful one. (kprot=0 for tiny budgets -> pure recency-aware fill.)
+            if self.two_tier_keep:
+                now = time.time()
+                kprot = int(self.protect_frac * keep)
+                protected, rest = active[:kprot], active[kprot:]
+                rest_keep = set(id(r) for r in
+                                sorted(rest, key=lambda r: -self._effective_value(r, now))[:keep - kprot])
+                drop = [r for r in rest if id(r) not in rest_keep]
+            else:
+                drop = active[keep:]
+            for r in drop:
                 r["status"] = "superseded"; r["superseded_ts"] = time.time(); staled += 1
         self._save()
         return {"active": len([r for r in self.items if r["status"] == "active"]),
