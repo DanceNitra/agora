@@ -199,6 +199,15 @@ class CorporationWorker:
             # as a shippable proposal. Claude ships the ones with merit, skips the thin.
             if eval_result and eval_result.get("approved"):
                 self._file_ship_review(quest, eval_result)
+            # REPOINT (owner 2026-06-26): a board NEAR-MISS (not ship-approved but with a decent
+            # score and real research) still carries lead value — surface it to Claude as a research
+            # DOSSIER instead of letting it die in HEAD. The score is a priority hint, not a kill
+            # switch; Claude develops the ambitious ones and archives the rest (RAISED BAR).
+            elif eval_result and not eval_result.get("approved"):
+                _score = max(eval_result.get("cto_score", 0) or 0, eval_result.get("ceo_score", 0) or 0)
+                _has_research = bool(quest.get("research_summary") or quest.get("findings_path"))
+                if _score >= 55 and _has_research:
+                    self._file_research_dossier(quest, eval_result)
 
         # ── STEP 5: PATA execution ──
         pata_quests = await self._get_quests_by_phase("pata")
@@ -966,6 +975,32 @@ class CorporationWorker:
             print(f"[Corp→Claude] filed ship-review {tid}: {title[:50]}")
         except Exception as e:
             print(f"[Corp→Claude] ship-review file error: {e}")
+
+    def _file_research_dossier(self, quest: dict, ev: dict) -> None:
+        """REPOINT (owner 2026-06-26): a near-miss the corp RESEARCHED but the board did not
+        ship-approve still carries real research value. Rather than let it die in HEAD, file it to
+        Claude's inbox as a RESEARCH DOSSIER — packaged findings for Claude to DEVELOP into rigorous,
+        Lab-tested work OR honestly ARCHIVE. The board score is a priority hint, not a kill switch;
+        Claude is the bar for rigour/ambition (RAISED BAR: develop the ambitious ones, archive thin)."""
+        try:
+            from agora.execution.claude_inbox import add_task
+            title = (quest.get("title") or "untitled idea")[:90]
+            summary = (quest.get("research_summary") or quest.get("goal") or "")[:600]
+            src = quest.get("research_source") or quest.get("findings_path") or ""
+            why = (ev.get("cto_rationale") or ev.get("ceo_rationale") or "")[:200]
+            text = (
+                f"Research dossier: {title} || CORP-RESEARCHED, board near-miss "
+                f"(CEO {ev.get('ceo_score', 0):.0f}/CTO {ev.get('cto_score', 0):.0f} — not ship-approved, "
+                f"surfaced as a lead). RESEARCH: {summary} BOARD NOTE: {why} SOURCE: {src} "
+                f"|| Claude: judge HONESTLY against the RAISED BAR. If it is a hard, original, testable "
+                f"question, DEVELOP it into rigorous work (Lab + falsifier, real data where possible); "
+                f"otherwise ARCHIVE with a one-line reason. Do NOT manufacture a small note from a thin lead."
+            )
+            tid = add_task(text)
+            self._stats["ship_reviews_filed"] = self._stats.get("ship_reviews_filed", 0) + 1
+            print(f"[Corp→Claude] filed research dossier {tid}: {title[:50]}")
+        except Exception as e:
+            print(f"[Corp→Claude] dossier file error: {e}")
 
     def _is_noteworthy(self, results: list[dict]) -> bool:
         """Fire the owner's briefing on REAL signals — he wants visibility into health and why agents
