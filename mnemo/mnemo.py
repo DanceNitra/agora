@@ -52,7 +52,7 @@ try:                                  # OPTIONAL: numpy only ACCELERATES semanti
 except Exception:
     _np = None
 
-__version__ = "0.2.0"
+__version__ = "0.2.1"
 _WORD = re.compile(r"[a-z0-9][a-z0-9\-']{2,}")
 _STOP = frozenset("the a an of for to in on and or is are was were be been with this that it its as "
                   "by at from into our we us you your he she they them his her their not no".split())
@@ -441,8 +441,13 @@ class Mnemo:
             # outcome (good>0 and good>=bad — set only by credit() resolving real work, not self-assertable), OR
             # >=2 DISTINCT corroborating links (no single self-created edge suffices). An uncorroborated popular
             # memory stays episodic and fades on the fast clock unless earned.
+            # SYBIL HARDENING (entity resolution): count DISTINCT CANONICAL sources among the corroborating
+            # links, not the raw link count. A naive "≥2 links" lets an attacker mint independence by naming
+            # one origin many ways ("Wikipedia" / "wikipedia.org" / a full URL → 3 links, 1 real source).
+            # Canonicalizing source identifiers before counting collapses those to one; a link whose record
+            # has no source counts as its own id, so genuinely source-less corroboration is unchanged.
             _good = float(r.get("good", 0) or 0); _bad = float(r.get("bad", 0) or 0)
-            corroborated = (_good > 0 and _good >= _bad) or len(r.get("links") or []) >= 2
+            corroborated = (_good > 0 and _good >= _bad) or self._distinct_sources(r.get("links"), _by_id) >= 2
             if r.get("mtype") == "episodic" and r["value"] >= _GRADUATE_VALUE and corroborated:
                 r["mtype"] = "semantic"
                 r.setdefault("meta", {})["graduated_from_episodic"] = True
@@ -459,6 +464,33 @@ class Mnemo:
         if out:
             self._dirty = True   # mark for the next throttled/forced save; do NOT serialize on the read path
         return out
+
+    @staticmethod
+    def _canon_source(doc) -> str:
+        """Entity-resolution canonicalization of a source identifier, so sybil variants of one origin
+        ('Wikipedia', 'wikipedia.org', 'https://www.wikipedia.org/wiki/X') collapse to a single key."""
+        s = str(doc or "").strip().lower()
+        s = re.sub(r"^[a-z]+://", "", s)                 # strip scheme
+        s = re.sub(r"^www\.", "", s)                     # strip www.
+        s = s.split("/")[0].split("?")[0]                # host / first path segment only
+        s = re.sub(r"\.(org|com|net|io|gov|edu|co|ai|dev|info|news)$", "", s)  # strip a common TLD
+        s = re.sub(r"[^a-z0-9]+", "", s)                 # collapse remaining punctuation
+        return s
+
+    @staticmethod
+    def _distinct_sources(links, by_id) -> int:
+        """Count DISTINCT canonical sources among corroborating links — entity resolution BEFORE counting,
+        so 'three names for one source' sybil variants count as one. A link whose record carries no source
+        counts as its own id, so genuinely source-less corroboration is not penalised (no regression)."""
+        keys = set()
+        for lid in (links or []):
+            lr = by_id.get(lid)
+            if lr is None:
+                continue
+            src = lr.get("source")
+            doc = src.get("doc") if isinstance(src, dict) else (src if isinstance(src, str) else None)
+            keys.add(Mnemo._canon_source(doc) if doc else "id:" + lid)
+        return len(keys)
 
     @staticmethod
     def _reliability(r: dict) -> float:
