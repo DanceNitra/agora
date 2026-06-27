@@ -5,7 +5,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>The Crucible &middot; a machine that rebuilds claims in code &middot; Agora</title>
-<meta name="description" content="A public ledger of scientific and technical claims rebuilt as minimal computational models and tested in code: 31 reproduced, 6 failed, 4 honest passes. Every verdict ships runnable code and a measured number.">
+<meta name="description" content="A public ledger of scientific and technical claims rebuilt as minimal computational models and tested in code: 42 reproduced, 7 failed, 4 honest passes. Every verdict ships runnable code and a measured number.">
 <link rel="canonical" href="https://dancenitra.github.io/agora/public/crucible/">
 <meta property="og:type" content="website">
 <meta property="og:title" content="The Crucible — claims, rebuilt in code and tested">
@@ -174,8 +174,8 @@
   rarest export, published here), and <b>not computable</b> when there&rsquo;s no simulable core.
   Every verdict ships a measured number and the code that produced it.</p>
   <div class="tally">
-    <div class="t ok"><div class="num">31</div><div class="lbl">Reproduced</div></div>
-    <div class="t fail"><div class="num">6</div><div class="lbl">Failed</div></div>
+    <div class="t ok"><div class="num">42</div><div class="lbl">Reproduced</div></div>
+    <div class="t fail"><div class="num">7</div><div class="lbl">Failed</div></div>
     <div class="t"><div class="num">4</div><div class="lbl">Honest passes</div></div>
   </div>
   <div class="dataset">Open data &mdash; <a href="crucible.json">the full ledger as JSON</a> &middot; now a citable dataset on <a href="https://huggingface.co/datasets/Danchi17/folklore-index" target="_blank" rel="noopener">Hugging&nbsp;Face &rarr;</a><br><span class="loadline"><code>datasets.load_dataset("Danchi17/folklore-index")</code></span></div>
@@ -195,13 +195,133 @@
     </div>
   </section>
 <section class="ledger"><div class="wrap">
-  <div class="sechead"><h2>The ledger</h2><div class="sub">37 claims rebuilt &amp; tested &middot; newest first</div></div>
+  <div class="sechead"><h2>The ledger</h2><div class="sub">49 claims rebuilt &amp; tested &middot; newest first</div></div>
   <div class="filters">
     <button class="on" data-f="all">All</button>
     <button data-f="REPRODUCED">Reproduced</button>
     <button data-f="FAILED">Failed</button>
   </div>
   <div class="grid" id="grid">
+      <article class="card ok" data-v="REPRODUCED" data-reveal>
+        <div class="crail"></div>
+        <div class="cbody">
+          <div class="chead"><span class="cv">REPRODUCED</span>
+            <span class="cfield"></span></div>
+          <h3>Cosine similarity cannot distinguish a superseded fact from its replacement (the &#x27;superses</h3>
+          <p class="cresult">Replicated on local nomic (24 subject-relation-object facts, mean-centered): the cosine &#x27;is-this-a-supersession&#x27; classifier scores AUROC 0.613 (chance 0.5; Yadav ~0.59) -- a contradiction is often MORE embedding-similar to the original than a genuine rephrase (10/24 cases). A pure-cosine top-1 store served the stale value 41.7% of the time; a deterministic (subject,relation,object) supersession key drove that to 0% (shipped in mnemo v0.2.0). Falsifier: if the key did not cut stale below cosine it would be useless -- it did. Honest scope: synthetic, 24 facts, characterizes the mechanism, not a product benchmark.</p>
+          <div class="cfoot"><span class="cyear">Temporal Validity in Retrieval Memory: Elimina</span></div>
+        </div>
+      </article>
+      <article class="card ok" data-v="REPRODUCED" data-reveal>
+        <div class="crail"></div>
+        <div class="cbody">
+          <div class="chead"><span class="cv">REPRODUCED</span>
+            <span class="cfield"></span></div>
+          <h3>Episodic memory (Model-Free Episodic Control: store the MAX observed discounted return per</h3>
+          <p class="cresult">Smallest model of the mechanism; exploration HELD IDENTICAL (both learners fed the same uniform-random trajectories off-policy, so the only difference is credit assignment). Exp A (deterministic chain + step cost): EC reaches a goal-reachin</p>
+          <div class="cfoot"><span class="cyear">Sarrico, Arulkumaran, Agostinelli et al. - Sam</span></div>
+        </div>
+      </article>
+      <article class="card ok" data-v="REPRODUCED" data-reveal>
+        <div class="crail"></div>
+        <div class="cbody">
+          <div class="chead"><span class="cv">REPRODUCED</span>
+            <span class="cfield"></span></div>
+          <h3>The SIS epidemic threshold disappears for a power-law degree distribution with exponent 2 </h3>
+          <p class="cresult">HMF threshold lambda_c=&lt;k&gt;/&lt;k^2&gt; over growing N with structural cutoff k_max~N^(1/(rho-1)). 2&lt;rho&lt;=3: lambda_c-&gt;0 (rho=2.3/2.5 final 0.0000/0.0008; rho=3.0 marginal/log-slow 0.106-&gt;0.042). rho&gt;3 bounded (3.5/4.0 -&gt; 0.134/0.196). Determinist</p>
+          <div class="cfoot"><span class="cyear">Jones &amp;amp; Handcock 2003 (mechanism: Pastor-S</span></div>
+        </div>
+      </article>
+      <article class="card ok" data-v="REPRODUCED" data-reveal>
+        <div class="crail"></div>
+        <div class="cbody">
+          <div class="chead"><span class="cv">REPRODUCED</span>
+            <span class="cfield"></span></div>
+          <h3>Stochastic gradient descent has slow asymptotic convergence due to the inherent variance o</h3>
+          <p class="cresult">Row-normalized L2-logistic, kappa 1.7-67, same eta=0.5. Const-step SGD plateaus at ~2.5e-2 variance floor; SVRG -&gt; machine precision (3/3). Caveat: needs inner-loop m &gt;~ kappa (advantage gone at kappa~6e4 &gt;&gt; m=n).</p>
+          <div class="cfoot"><span class="cyear">Accelerating SGD using Predictive Variance Red</span></div>
+        </div>
+      </article>
+      <article class="card fail" data-v="FAILED" data-reveal>
+        <div class="crail"></div>
+        <div class="cbody">
+          <div class="chead"><span class="cv">FAILED</span>
+            <span class="cfield"></span></div>
+          <h3>MemGPT-style paging memory keeps QA accuracy FLAT as the corpus/context scales (0-&gt;700 doc</h3>
+          <p class="cresult">Smallest model (exp_memgpt_flatcurve.py, cloud-free, local nomic-embed-text retriever; reader factor = OUR measured oracle accuracy single 0.95 / 3-hop 0.91). Pages top-B=8 from a synthetic corpus scaling N=10..250. SINGLE-hop QA flat at 0.</p>
+          <div class="cfoot"><span class="cyear">MemGPT (Packer et al.) flat-accuracy-vs-corpus</span></div>
+        </div>
+      </article>
+      <article class="card ok" data-v="REPRODUCED" data-reveal>
+        <div class="crail"></div>
+        <div class="cbody">
+          <div class="chead"><span class="cv">REPRODUCED</span>
+            <span class="cfield"></span></div>
+          <h3>BA(N=2000,m=2): removing top 10% nodes by degree raises bond-percolation threshold from p_</h3>
+          <p class="cresult">Minimal model: networkx BA(N=2000,m=2), Molloy-Reed p_c=&lt;k&gt;/(&lt;k2&gt;-&lt;k&gt;) + direct bond-percolation simulation (peak-of-2nd-largest-component locator), 8 graph realizations. MECHANISM REPRODUCED robustly: removing top 10% nodes by degree sharp</p>
+          <div class="cfoot"><span class="cyear">Simultaneous Degradation of Percolation and Ca</span></div>
+        </div>
+      </article>
+      <article class="card ok" data-v="REPRODUCED" data-reveal>
+        <div class="crail"></div>
+        <div class="cbody">
+          <div class="chead"><span class="cv">REPRODUCED</span>
+            <span class="cfield"></span></div>
+          <h3>LinUCB O(sqrt(Td ln^3(KT/delta))) regret bound</h3>
+          <p class="cresult">bound holds (not violated): regret/sqrt(T) decreasing 0.32-&gt;0.065, ~log in benign stochastic regime; weak log-K confirmed (K-exp 0.32); tightness untested (needs adversarial contexts)</p>
+          <div class="cfoot"><span class="cyear">Chu, Li, Reyzin, Schapire 2011 - Contextual ba</span></div>
+        </div>
+      </article>
+      <article class="card ok" data-v="REPRODUCED" data-reveal>
+        <div class="crail"></div>
+        <div class="cbody">
+          <div class="chead"><span class="cv">REPRODUCED</span>
+            <span class="cfield"></span></div>
+          <h3>k-clique percolation in ER(N) graphs transitions at edge prob p_c(k)=1/[(k-1)N]^(1/(k-1));</h3>
+          <p class="cresult">REPRODUCED (severe-tested, lab: agora_output/lab/replicate_clique_percolation.py). ER(N=300), k=3 clique percolation: built triangles, linked those sharing an edge, tracked largest clique-cluster node-coverage vs p. Coverage takes off sharp</p>
+          <div class="cfoot"><span class="cyear">Derenyi, Palla, Vicsek - Clique Percolation in</span></div>
+        </div>
+      </article>
+      <article class="card ok" data-v="REPRODUCED" data-reveal>
+        <div class="crail"></div>
+        <div class="cbody">
+          <div class="chead"><span class="cv">REPRODUCED</span>
+            <span class="cfield"></span></div>
+          <h3>All systems in a given universality class share the same critical exponents (microscopic d</h3>
+          <p class="cresult">REPRODUCED (severe-tested, lab: agora_output/lab/replicate_universality_branching.py). Universality demonstrated on critical Galton-Watson branching: survival exponent q_n ~ n^-1 is the SAME across three distinct offspring distributions (Po</p>
+          <div class="cfoot"><span class="cyear">universality (statistical physics) - tested on</span></div>
+        </div>
+      </article>
+      <article class="card ok" data-v="REPRODUCED" data-reveal>
+        <div class="crail"></div>
+        <div class="cbody">
+          <div class="chead"><span class="cv">REPRODUCED</span>
+            <span class="cfield"></span></div>
+          <h3>Finite-size scaling of survival probability in critical branching processes: q_n*n is a un</h3>
+          <p class="cresult">REPRODUCED (severe-tested, lab: agora_output/lab/replicate_branching_fss.py). Galton-Watson Poisson(m) Monte Carlo (T=200k). (a) criticality m=1: q_n*n -&gt; 1.97 at n=200 (analytic 2.0 for sigma^2=1). (b) finite-size scaling DATA COLLAPSE con</p>
+          <div class="cfoot"><span class="cyear">Garcia-Millan, Font-Clos, Corral 2015</span></div>
+        </div>
+      </article>
+      <article class="card ok" data-v="REPRODUCED" data-reveal>
+        <div class="crail"></div>
+        <div class="cbody">
+          <div class="chead"><span class="cv">REPRODUCED</span>
+            <span class="cfield"></span></div>
+          <h3>BA(N=2000,m=2): removing top 10% nodes by degree raises bond-percolation threshold p_c fro</h3>
+          <p class="cresult">Minimal analytic model (Cohen/Molloy-Reed p_c=&lt;k&gt;/(&lt;k^2&gt;-&lt;k&gt;), 25 BA realizations) REPRODUCES the mechanism+direction: targeted top-10pct hub removal raises p_c several-fold (0.093-&gt;0.647, 6.95x). Exact published thresholds NOT matched (0.1</p>
+          <div class="cfoot"><span class="cyear">Cachero Sanchez 2026 - Simultaneous Degradatio</span></div>
+        </div>
+      </article>
+      <article class="card ok" data-v="REPRODUCED" data-reveal>
+        <div class="crail"></div>
+        <div class="cbody">
+          <div class="chead"><span class="cv">REPRODUCED</span>
+            <span class="cfield"></span></div>
+          <h3>k-clique percolation in Erdos-Renyi graphs sets in at p_c = 1/[(k-1)N]^(1/(k-1)) (k=3: 1/s</h3>
+          <p class="cresult">Smallest model: ER graph N=400, k=3 triangles, union-find on triangles sharing an edge; order parameter Phi (giant triangle-community / all triangles) jumps 0.09-&gt;0.43-&gt;0.92-&gt;1.0 across p/pc 1.0-&gt;1.2-&gt;1.5-&gt;2.0; measured onset (Phi&gt;0.5) at p</p>
+          <div class="cfoot"><span class="cyear">Derenyi, Palla, Vicsek - Clique Percolation in</span></div>
+        </div>
+      </article>
       <article class="card fail" data-v="FAILED" data-reveal>
         <div class="crail"></div>
         <div class="cbody">
@@ -599,7 +719,7 @@
 
 <footer><div class="wrap">
   <span>Agora &mdash; autonomous research OS &middot; The Crucible</span>
-  <span>updated 2026-06-20 &middot; <a href="https://github.com/DanceNitra/agora" target="_blank" rel="noopener">source</a></span>
+  <span>updated 2026-06-28 &middot; <a href="https://github.com/DanceNitra/agora" target="_blank" rel="noopener">source</a></span>
 </div></footer>
 
 <script>
