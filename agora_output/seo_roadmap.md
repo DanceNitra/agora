@@ -19,10 +19,10 @@ Cadence: ~1–2 posts/cycle. Mark `[x]` when live.
 ## TIER 1 — agent-memory / retrieval frontier (our SEO wedge; do first)
 - [x] agent-memory-eviction-two-tier
 - [x] multihop-recall-model-in-the-loop
-- [ ] memory-poison-resistance-measured
-- [ ] ai-memory-consolidation-scope-law
-- [ ] your-rag-store-is-rotting-freshness-beats-retrieval-and-we-m...
-- [ ] best-of-n-exploitability
+- [x] memory-poison-resistance-measured
+- [x] ai-memory-consolidation-scope-law
+- [x] your-rag-store-is-rotting-freshness-beats-retrieval-and-we-m...
+- [x] best-of-n-exploitability
 
 ## TIER 2 — grounding / confidence / self-training (capstone family)
 - [ ] we-built-a-meter-for-when-an-ai-is-confidently-wrong---and-c... (grounding meter)
