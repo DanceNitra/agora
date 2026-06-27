@@ -737,6 +737,7 @@
       <div class="mn-num"><span class="v">0 rewrites</span><p><span class="en">raw memory is append&#8209;only; consolidation adds a derived layer
         and contradictions are flagged for review, never silently resolved.</span><span class="sk">surová pamäť je iba pripájacia; konsolidácia pridáva odvodenú vrstvu
         a rozpory sa označia na revíziu, nikdy sa nevyriešia potichu.</span></p></div>
+      <div class="mn-num"><span class="v">42% &rarr; 0%</span><p><span class="en">stale&#8209;fact recall, eliminated &mdash; a deterministic (subject, relation, object) supersession key retires an updated fact, where cosine similarity is near&#8209;chance at telling current from superseded (a reproduced blind spot).</span><span class="sk">vybavenie zastaraných faktov, odstránené &mdash; deterministický (subjekt, relácia, objekt) supersession kľúč stiahne aktualizovaný fakt, tam kde je cosine podobnosť takmer náhodná pri rozlíšení aktuálneho od nahradeného (reprodukovaný slepý bod).</span></p></div>
     </div>
     <div>
       <div class="mn-code" data-reveal><pre style="margin:0;font-family:inherit"><span class="c"># single file, zero dependencies</span>
@@ -748,7 +749,7 @@ m.remember(<span class="s">"pre-trend tests catch ~31% of fatal bias"</span>,
 m.recall(<span class="s">"difference in differences"</span>)  <span class="c"># value-ranked</span>
 m.consolidate(keep=<span class="s">200</span>)               <span class="c"># the dream pass</span>
 m.contradictions()                     <span class="c"># flag, never delete</span></pre></div>
-      <div class="mnfoot"><span class="en">MCP server included &mdash; drop&#8209;in long&#8209;term memory for any agent client. Our own RAMR FORGET&#8209;PRECISION check caught a value&#8209;update gap in mnemo &mdash; when a fact is superseded, recall now returns the current value, not the stale one. We fixed it and shipped it.</span><span class="sk">Súčasťou je MCP server &mdash; zapojiteľná dlhodobá pamäť pre ľubovoľného agentového klienta. Náš vlastný RAMR FORGET&#8209;PRECISION test odhalil v mnemo medzeru pri zmene hodnoty &mdash; keď je fakt nahradený, recall teraz vráti aktuálnu hodnotu, nie zastaranú. Opravili sme to a nasadili.</span>
+      <div class="mnfoot"><span class="en">MCP server included &mdash; drop&#8209;in long&#8209;term memory for any agent client. <b>v0.2</b> adds a deterministic (subject, relation, object) supersession key (stale facts retired, no similarity threshold), an entity&#8209;resolution corroboration gate that resists sybil sources, and <code>forget()</code> &mdash; verified erasure. <a href="public/posts/rag-supersession-blind-spot.html">Why RAG serves stale facts &rarr;</a></span><span class="sk">Súčasťou je MCP server &mdash; zapojiteľná dlhodobá pamäť pre ľubovoľného agentového klienta. <b>v0.2</b> pridáva deterministický (subjekt, relácia, objekt) supersession kľúč (zastarané fakty stiahnuté, bez prahu podobnosti), entity&#8209;resolution corroboration gate odolný voči sybil zdrojom a <code>forget()</code> &mdash; overené vymazanie. <a href="public/posts/rag-supersession-blind-spot.html">Prečo RAG podáva zastarané fakty &rarr;</a></span>
       <a href="https://github.com/DanceNitra/agora/tree/main/mnemo" target="_blank" rel="noopener">github.com/DanceNitra/agora/mnemo &rarr;</a></div>
     </div>
   </div>
