@@ -52,7 +52,7 @@ try:                                  # OPTIONAL: numpy only ACCELERATES semanti
 except Exception:
     _np = None
 
-__version__ = "0.1.0"
+__version__ = "0.2.0"
 _WORD = re.compile(r"[a-z0-9][a-z0-9\-']{2,}")
 _STOP = frozenset("the a an of for to in on and or is are was were be been with this that it its as "
                   "by at from into our we us you your he she they them his her their not no".split())
@@ -142,12 +142,22 @@ class Mnemo:
     # ── capture ──────────────────────────────────────────────────────────────
     def remember(self, text: str, tags=None, value: float = 1.0, meta: dict | None = None,
                  mtype: str | None = None, valid_from: float | None = None,
-                 source: dict | None = None) -> str:
+                 source: dict | None = None, key: str | None = None) -> str:
         """Append-only raw capture. Stamped with an absolute UTC time; never edited afterward.
         mtype in {episodic, semantic, procedural} sets the decay prior (episodic fades fast,
         semantic slow, procedural barely); inferred from the text if not given. Pass it explicitly
         when the caller knows the kind — inference defaults to episodic (the conservative, fast-decay
-        choice) and only promotes on clear markers."""
+        choice) and only promotes on clear markers.
+
+        `key` (OPT-IN) is a deterministic supersession key — typically a (subject, relation) identifier,
+        e.g. "billing-api::auth-method". When set, remembering a new value RETIRES every active record
+        sharing the same key (status -> superseded), with NO similarity threshold and NO LLM call. This
+        closes the 'supersession blind spot': cosine similarity cannot tell a contradicted fact from its
+        replacement (we measured AUROC ~0.61, near chance — a contradiction is often MORE embedding-similar
+        to the original than a rephrase is), so a similarity-based store silently serves the stale value
+        (~42% of the time in our test). A deterministic (subject, relation, object) ledger drives that to
+        ~0%. Bi-temporal: a back-filled record (earlier valid_from) does NOT overwrite a genuinely newer
+        same-key value — the stale-on-arrival record is the one retired."""
         mid = uuid.uuid4().hex[:10]
         now = time.time()
         rec = {"id": mid, "text": text, "tags": list(tags or []), "value": float(value),
@@ -156,14 +166,45 @@ class Mnemo:
                "source": dict(source) if source else None,   # re-checkable origin (e.g. {"doc": id, "span": [start, end]}) so a recalled fact can be traced back, not trusted blind
                "mtype": mtype or _infer_type(text), "last_access": now,
                "status": "active", "links": [], "meta": dict(meta or {})}
+        if key is not None:
+            rec["key"] = str(key)
         if self.embed:
             try:
                 rec["vec"] = list(self.embed(text))
             except Exception:
                 rec["vec"] = None
         self.items.append(rec)
+        if key is not None:
+            self._supersede_by_key(rec)   # deterministic SRO supersession (no embedding, no threshold)
         self._save(force=True)        # a new memory is real content - persist immediately, not throttled
         return mid
+
+    def _supersede_by_key(self, rec: dict) -> None:
+        """Deterministic (subject, relation, object) supersession: retire active records that share
+        rec['key']. No similarity threshold, no LLM call — the fix our Crucible replication validated
+        (stale-fact recall 41.7% -> 0.0%, where cosine-based detection is near chance at AUROC ~0.61).
+        Bi-temporal: only same-key records with valid_from <= rec's are retired; if an active same-key
+        record is genuinely newer (later valid_from), the INCOMING rec is the stale one and is retired
+        instead — a back-filled value never overwrites the current one. recall() hides superseded records
+        by default, so a keyed store never surfaces a stale fact."""
+        k = rec.get("key")
+        if not k:
+            return
+        vf_new = rec.get("valid_from", rec["ts"])
+        for r in self.items:
+            if r is rec or r.get("status") != "active" or r.get("key") != k:
+                continue
+            vf_r = r.get("valid_from", r["ts"])
+            if vf_r <= vf_new:                 # r is the older value -> retire it
+                r["status"] = "superseded"
+                r["superseded_ts"] = time.time()
+                r["invalidated_at"] = vf_new
+                r.setdefault("meta", {})["superseded_by_toggle"] = rec["id"]
+            else:                              # an active same-key value is newer -> incoming is stale-on-arrival
+                rec["status"] = "superseded"
+                rec["superseded_ts"] = time.time()
+                rec["invalidated_at"] = vf_r
+                rec.setdefault("meta", {})["superseded_by_toggle"] = r["id"]
 
     def remember_dedup(self, text: str, tags=None, value: float = 1.0, meta: dict | None = None,
                        mtype: str | None = None, dup_threshold: float = 0.95) -> str:

@@ -82,7 +82,7 @@ its memory is value-ranked and append-only, not a recency buffer.
 
 | op | what it does |
 |---|---|
-| `remember(text, tags, value, mtype)` | **append-only** raw capture, absolute UTC time, never edited; `mtype` ∈ {episodic, semantic, procedural} sets the **decay prior** (events fade fast, durable facts slow, rules barely) |
+| `remember(text, tags, value, mtype, key)` | **append-only** raw capture, absolute UTC time, never edited; `mtype` ∈ {episodic, semantic, procedural} sets the **decay prior** (events fade fast, durable facts slow, rules barely). Optional `key` = a **deterministic (subject, relation) supersession key**: a new value retires every active record with the same key — *no similarity threshold, no LLM* — so recall never serves the stale value (bi-temporal: a back-filled earlier value can't overwrite the current one) |
 | `recall(query, k)` | **value-ranked** retrieval: relevance × value, **decayed by the memory's per-type half-life** (access resets the clock), so important durable memories beat both merely-similar and stale ones. Reinforcement is **relevance-weighted** (a bullseye hit reinforces value more than one that squeaked into top-k, so a weak-but-frequent false positive can't go immortal); a repeatedly-recalled episodic memory **graduates** to semantic; and a memory whose source was later contradicted is **provenance-demoted** + flagged `stale_derived` |
 | `consolidate(keep)` | the **dream pass**: flag universal-matcher *hubs*, link near-duplicates, apply the **state-toggle guard** (a polarity clash supersedes, doesn't merge), supersede the low-value surplus — only *adds* a derived layer |
 | `consolidate_clusters(threshold)` | **cluster-triggered** consolidation: consolidate a semantic cluster only once it's grown past `threshold` — sparse topics keep their raw episodes, dense ones don't grow unbounded |
@@ -128,6 +128,14 @@ its memory is value-ranked and append-only, not a recency buffer.
   the blend — about **3× more value kept** (the gap persists, ≈2.2× retained value, even at a 7%
   budget). Pure access-frequency decay starves the rarely-queried-but-critical memories; forgetting
   must consume an explicit value channel *separate from* access recency. (Agora Lab `19d802`.)
+- **Supersession needs a deterministic key, not embedding similarity** — replicating an external
+  result (MemStrata / Yadav, arXiv 2606.26511) on our own local `nomic` stack: a cosine-similarity
+  classifier separating a *contradicted* fact from a *rephrased duplicate* scores **AUROC ~0.61**
+  (near chance) — a contradiction is often *more* embedding-similar to the original than a true
+  rephrase is. A similarity-based store therefore serves the **stale value ~42% of the time**; the
+  deterministic `(subject, relation, object)` supersession key (`remember(..., key=...)`) drives that
+  to **0%** (Agora Lab `exp_supersession_replication`, severe-test 8/8). This is *why* supersession is
+  a key, not a threshold.
 - **Cohort-level value** — per-memory outcome attribution is **statistically underpowered at n-of-1**
   (the best proxy reached only ~0.36 power at realistic sample sizes); the cohort is where the
   signal lives. Hence rule 4.
@@ -236,9 +244,10 @@ the reasoning; the corrections still warrant a source-check before public citati
 
 ## Status
 
-`v0.1` — the core, honest and runnable, **now with two MCP servers**: `mnemo_mcp` (memory) and
-`second_brain_mcp` (the thinking layer over your notes). Roadmap: pluggable vector stores, a hosted
-tier. Open-core; the core stays free.
+`v0.2` — the core, honest and runnable, **now with two MCP servers** (`mnemo_mcp` for memory,
+`second_brain_mcp` for the thinking layer over your notes) **and a deterministic supersession key**
+(`remember(..., key=...)`) that closes the embedding *supersession blind spot*. Roadmap: pluggable
+vector stores, a hosted tier. Open-core; the core stays free.
 
 MIT-licensed · part of [Agora](https://github.com/DanceNitra/agora).
 

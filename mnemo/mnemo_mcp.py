@@ -68,13 +68,17 @@ mcp = FastMCP("mnemo")
 
 @mcp.tool()
 def remember(text: str, tags: list[str] | None = None, value: float = 1.0,
-             mtype: str | None = None) -> dict:
+             mtype: str | None = None, key: str | None = None) -> dict:
     """Store a memory (append-only; raw text is never edited afterward). `tags` group memories into
     cohorts; `value` (>=1) is its importance — higher-value memories outrank merely-similar ones at
     recall, and recall itself nudges value up. `mtype` ∈ {episodic, semantic, procedural} sets the
     decay prior — episodic (events) fades fast, semantic (durable facts) slow, procedural (rules /
-    preferences) barely; pass it when you know the kind, else it's inferred. Returns the new id."""
-    mid = _MEM.remember(text, tags=tags or [], value=value, mtype=mtype)
+    preferences) barely; pass it when you know the kind, else it's inferred. Optional `key` is a
+    deterministic (subject, relation) supersession key (e.g. "billing-api::auth-method"): storing a new
+    value with the same key retires the old one so recall never returns the stale value — no similarity
+    threshold, no extra LLM call. Use it for facts that get updated (config, prices, versions, status).
+    Returns the new id."""
+    mid = _MEM.remember(text, tags=tags or [], value=value, mtype=mtype, key=key)
     rec = next((r for r in _MEM.items if r["id"] == mid), {})
     return {"id": mid, "stored": text[:120], "tags": tags or [], "value": value,
             "mtype": rec.get("mtype")}
