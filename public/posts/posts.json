@@ -71,8 +71,8 @@
  },
  {
   "slug": "memory-poison-resistance-measured",
-  "title": "Memory that won't let an uncorroborated fact become permanent — measured",
-  "title_sk": "Pamäť, ktorá nedovolí, aby sa nepodložený fakt stal trvalým — odmerané",
+  "title": "When should AI memory trust a new fact? Corroboration, measured",
+  "title_sk": "Kedy má AI pamäť dôverovať novému faktu? Corroboration, odmerané",
   "desc": "Memory poisoning is a named threat no public benchmark scores. Measured on our open-source engine: gating durability on EARNED corroboration makes a recall-pumped false memory fade in ~3 weeks instead of corrupting answers for months — once the attack stops. Honest limits included.",
   "desc_sk": "Memory poisoning je pomenovaná hrozba, ktorú žiadny benchmark nemeria. Odmerané na našom open-source engine: podmienenie trvácnosti ZASLÚŽENOU korroboráciou spraví recall-pumpnutý falošný fakt prechodným (vybledne za ~3 týždne namiesto mesiacov) — keď útok prestane. Čestné limity vrátane.",
   "date": "2026-06-25",
@@ -99,8 +99,8 @@
  },
  {
   "slug": "multihop-recall-model-in-the-loop",
-  "title": "Putting the model in the retrieval loop: an honest multi-hop recall result on LoCoMo",
-  "title_sk": "Model v slučke vyhľadávania: čestný výsledok multi-hop recall na LoCoMo",
+  "title": "Multi-hop recall on LoCoMo: put the model in the retrieval loop",
+  "title_sk": "Multi-hop recall na LoCoMo: daj model do vyhľadávacej slučky",
   "desc": "A KNOWN agentic-retrieval recipe (IRCoT/Self-RAG/PRISM family) applied to a memory benchmark, with an under-reported metric and a deliberately naive baseline. Flat dense gets the full evidence chain 14.5% of the time on LoCoMo multi-hop; a model-in-the-loop pipeline gets 56.5% at equal budget. The 3.9x is over a NAIVE baseline — not a SOTA method claim.",
   "desc_sk": "ZNÁMY recept agentického vyhľadávania (rodina IRCoT/Self-RAG/PRISM) na pamäťovom benchmarku, s málo-reportovanou metrikou a zámerne naivným baselinom. Ploché husté poskladá celý dôkazový reťazec v 14.5 % na LoCoMo multi-hop; pipeline s modelom v slučke dosiahne 56.5 % pri rovnakom rozpočte. To 3.9× je nad NAIVNÝM baselinom — nie SOTA tvrdenie.",
   "date": "2026-06-25",
