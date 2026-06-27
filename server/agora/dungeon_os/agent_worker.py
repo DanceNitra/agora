@@ -903,7 +903,7 @@ class CorporationWorker:
             return []
         try:
             cursor = await self.db.execute(
-                "SELECT * FROM quests WHERE phase='head' AND status='review' AND (findings_path IS NULL OR findings_path = '') ORDER BY created_at ASC LIMIT 3",
+                "SELECT * FROM quests WHERE phase='head' AND status='review' AND (research_summary IS NULL OR research_summary = '') ORDER BY created_at ASC LIMIT 3",
             )
             rows = await cursor.fetchall()
             return [self._quest_to_dict(r) for r in rows]
@@ -915,7 +915,7 @@ class CorporationWorker:
             return []
         try:
             cursor = await self.db.execute(
-                "SELECT * FROM quests WHERE phase='head' AND findings_path IS NOT NULL AND findings_path != '' AND proposal_status='pending' ORDER BY created_at ASC LIMIT 3",
+                "SELECT * FROM quests WHERE phase='head' AND research_summary IS NOT NULL AND research_summary != '' AND proposal_status='pending' ORDER BY created_at ASC LIMIT 3",
             )
             rows = await cursor.fetchall()
             return [self._quest_to_dict(r) for r in rows]
