@@ -1,5 +1,19 @@
 [
  {
+  "slug": "agent-memory-poisoning-corroboration-gate",
+  "title": "Can corroboration stop AI-agent memory poisoning? Measured",
+  "title_sk": "Zastaví corroboration otravu pamäte AI agentov? Odmerané",
+  "desc": "Memory-injection attacks (MINJA, Agent Security Bench) poison naive AI-agent memory 70–95% of the time. We replicated the attack against mnemo's corroboration gate: single-source poison drops to 0% — for both entrenchment and overwrite — but a sybil forging ≥2 sources bypasses it. Strong baseline, honest limits, runnable.",
+  "desc_sk": "Memory-injection útoky (MINJA, Agent Security Bench) otrávia naivnú pamäť AI agenta 70–95% prípadov. Replikovali sme útok proti corroboration gate v mnemo: single-source poison padá na 0% — aj zakorenenie, aj prepis — ale sybil, čo sfalšuje ≥2 zdroje, ho obíde. Silný baseline, poctivé limity, spustiteľné.",
+  "date": "2026-06-27",
+  "tags": "agent memory · memory poisoning · LLM security · MINJA · replication · mnemo",
+  "tags_sk": "pamäť agentov · otrava pamäte · bezpečnosť LLM · MINJA · replikácia · mnemo",
+  "kicker": "Crucible",
+  "kicker_sk": "Crucible",
+  "read": 3,
+  "bilingual": true
+ },
+ {
   "slug": "ai-memory-consolidation-scope-law",
   "title": "When should an AI's memory refuse to believe what it just saw?",
   "title_sk": "Kedy ma pamat AI odmietnut uverit tomu, co prave videla?",

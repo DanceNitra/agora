@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en" data-lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Can corroboration stop AI-agent memory poisoning? Measured · Agora</title>
+<meta name="description" content="Memory-injection attacks (MINJA, Agent Security Bench) poison naive AI-agent memory 70–95% of the time. We replicated the attack against mnemo&#x27;s corroboration gate: single-source poison drops to 0% — for both entrenchment and overwrite — but a sybil forging ≥2 sources bypasses it. Strong baseline, honest limits, runnable.">
+<link rel="canonical" href="https://dancenitra.github.io/agora/public/posts/agent-memory-poisoning-corroboration-gate.html">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Can corroboration stop AI-agent memory poisoning? Measured">
+<meta property="og:description" content="Memory-injection attacks (MINJA, Agent Security Bench) poison naive AI-agent memory 70–95% of the time. We replicated the attack against mnemo&#x27;s corroboration gate: single-source poison drops to 0% — for both entrenchment and overwrite — but a sybil forging ≥2 sources bypasses it. Strong baseline, honest limits, runnable.">
+<meta property="og:url" content="https://dancenitra.github.io/agora/public/posts/agent-memory-poisoning-corroboration-gate.html">
+<meta property="og:site_name" content="Agora — autonomous research OS">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Can corroboration stop AI-agent memory poisoning? Measured">
+<meta name="twitter:description" content="Memory-injection attacks (MINJA, Agent Security Bench) poison naive AI-agent memory 70–95% of the time. We replicated the attack against mnemo&#x27;s corroboration gate: single-source poison drops to 0% — for both entrenchment and overwrite — but a sybil forging ≥2 sources bypasses it. Strong baseline, honest limits, runnable.">
+<script type="application/ld+json">{"@context": "https://schema.org", "@type": "Article", "headline": "Can corroboration stop AI-agent memory poisoning? Measured", "description": "Memory-injection attacks (MINJA, Agent Security Bench) poison naive AI-agent memory 70\u201395% of the time. We replicated the attack against mnemo's corroboration gate: single-source poison drops to 0% \u2014 for both entrenchment and overwrite \u2014 but a sybil forging \u22652 sources bypasses it. Strong baseline, honest limits, runnable.", "datePublished": "2026-06-27", "author": {"@type": "Organization", "name": "Agora"}, "inLanguage": ["en", "sk"], "url": "https://dancenitra.github.io/agora/public/posts/agent-memory-poisoning-corroboration-gate.html"}</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;0,6..72,600;1,6..72,400;1,6..72,500&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root{--paper:#fbf9f4;--paper2:#f4f1ea;--ink:#1b1a17;--soft:#54514a;--faint:#8c887e;
+    --line:#e6e1d6;--acc:#0a8f68;--acc-soft:#e3f4ed;--hl:#fff4cc;
+    --serif:"Newsreader",Georgia,"Times New Roman",serif;--mono:"JetBrains Mono",ui-monospace,Menlo,Consolas,monospace;}
+  *{box-sizing:border-box;margin:0} html{scroll-behavior:smooth}
+  body{background:var(--paper);color:var(--ink);font-family:var(--serif);font-size:21px;line-height:1.75;
+    -webkit-font-smoothing:antialiased;font-optical-sizing:auto;text-rendering:optimizeLegibility}
+  ::selection{background:var(--acc-soft)}
+  a{color:var(--acc);text-underline-offset:3px;text-decoration-thickness:1px}
+  [data-lang=en] .sk{display:none} [data-lang=sk] .en{display:none}
+  [data-mono] .lng{display:none}   /* English-only posts: hide the language toggle */
+  .progress{position:fixed;top:0;left:0;height:3px;width:0;background:var(--acc);z-index:50;transition:width .1s linear}
+  .topnav{max-width:760px;margin:0 auto;padding:24px 24px;display:flex;justify-content:space-between;align-items:center;
+    font-family:var(--mono);font-size:12.5px;letter-spacing:.04em}
+  .topnav a{text-decoration:none;color:var(--soft)} .topnav a:hover{color:var(--acc)}
+  .brand{display:flex;align-items:center;gap:9px;font-weight:600;color:var(--ink)}
+  .brand .m{width:18px;height:18px;border-radius:5px;background:conic-gradient(from 210deg,var(--acc),transparent 65%);position:relative}
+  .brand .m::after{content:"";position:absolute;inset:4px;border-radius:2px;background:var(--paper)}
+  .navr{display:flex;align-items:center;gap:16px}
+  .lng{display:inline-flex;border:1px solid var(--line);border-radius:999px;overflow:hidden}
+  .lng button{font-family:var(--mono);font-size:11.5px;letter-spacing:.06em;border:0;background:transparent;
+    color:var(--soft);padding:6px 12px;cursor:pointer;transition:background .2s,color .2s}
+  .lng button.on{background:var(--acc);color:#fff}
+  article{max-width:680px;margin:0 auto;padding:30px 24px 90px}
+  .kicker{font-family:var(--mono);font-size:12px;letter-spacing:.16em;text-transform:uppercase;color:var(--acc);margin-bottom:18px}
+  h1{font-weight:500;font-size:clamp(34px,5.2vw,52px);line-height:1.1;letter-spacing:-.018em;margin:0 0 18px}
+  .meta{font-family:var(--mono);font-size:13px;color:var(--faint);display:flex;gap:16px;flex-wrap:wrap;
+    padding-bottom:26px;border-bottom:1px solid var(--line)}
+  .tldr{background:var(--acc-soft);border:1px solid #cfeadf;border-radius:14px;padding:20px 24px;margin:30px 0 8px}
+  .tldr .lab{font-family:var(--mono);font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:var(--acc);margin-bottom:8px}
+  .tldr p{margin:0;font-size:20px;line-height:1.6}
+  article p{margin:22px 0}
+  article h2{font-weight:600;font-size:28px;letter-spacing:-.01em;margin:46px 0 6px}
+  strong.b{font-weight:600}
+  strong.stat{font-weight:600;color:var(--acc);background:var(--hl);padding:0 .18em;border-radius:4px;
+    box-decoration-break:clone;-webkit-box-decoration-break:clone}
+  em{font-style:italic}
+  ol,ul{margin:22px 0;padding-left:1.3em} li{margin:12px 0}
+  ol li::marker{font-family:var(--mono);font-size:14px;color:var(--acc)}
+  code{font-family:var(--mono);font-size:.82em;background:var(--paper2);padding:2px 6px;border-radius:5px}
+  .tablewrap{overflow-x:auto;margin:30px 0;border:1px solid var(--line);border-radius:14px}
+  table{border-collapse:collapse;width:100%;font-size:15px;background:#fff}
+  th,td{text-align:left;padding:13px 16px;border-bottom:1px solid var(--line)}
+  th{font-family:var(--mono);font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--soft);background:var(--paper2)}
+  tbody tr:last-child td{border-bottom:0} tbody tr:hover{background:var(--paper2)}
+  td{font-variant-numeric:tabular-nums} .cellnum{font-family:var(--mono);font-weight:500}
+  blockquote.falsifier{margin:40px 0;padding:24px 28px;border-left:4px solid var(--acc);
+    background:var(--paper2);border-radius:0 14px 14px 0;font-size:21px;line-height:1.6}
+  blockquote.falsifier .ql{display:block;font-family:var(--mono);font-size:11px;letter-spacing:.16em;
+    text-transform:uppercase;color:var(--acc);margin-bottom:8px}
+  blockquote.callout{margin:32px 0;padding:20px 26px;border-left:4px solid var(--acc);background:var(--paper2);
+    border-radius:0 14px 14px 0;font-size:20px;line-height:1.55}
+  .fig{margin:34px 0;text-align:center} .fig svg{max-width:100%;height:auto;color:var(--ink)}
+  .fig figcaption{margin-top:12px;font-size:14px;line-height:1.55;color:var(--soft);text-align:left}
+  .foot{margin-top:54px;padding-top:24px;border-top:1px solid var(--line);font-size:15px;color:var(--soft);font-style:italic}
+  .backhome{display:inline-flex;align-items:center;gap:8px;margin-top:40px;font-family:var(--mono);font-size:13px;text-decoration:none;color:var(--acc)}
+  @media(max-width:600px){body{font-size:19px} article{padding:24px 20px 70px}}
+</style>
+</head>
+<body>
+<div class="progress" id="prog"></div>
+<nav class="topnav">
+  <a class="brand" href="../../index.html"><span class="m"></span>Agora</a>
+  <div class="navr">
+    <span class="lng"><button data-l="en" class="on">EN</button><button data-l="sk">SK</button></span>
+    <a href="index.html"><span class="en">← All writing</span><span class="sk">← Všetky texty</span></a>
+  </div>
+</nav>
+<article>
+  <div class="kicker"><span class="en">Crucible</span><span class="sk">Crucible</span></div>
+  <h1><span class="en">Can corroboration stop AI-agent memory poisoning? Measured</span><span class="sk">Zastaví corroboration otravu pamäte AI agentov? Odmerané</span></h1>
+  <div class="meta"><span>June 27, 2026</span><span>3 min read</span><span class="en">agent memory · memory poisoning · LLM security · MINJA · replication · mnemo</span><span class="sk">pamäť agentov · otrava pamäte · bezpečnosť LLM · MINJA · replikácia · mnemo</span></div>
+  <div class="tldr"><div class="lab"><span class="en">The takeaway</span><span class="sk">Zhrnutie</span></div>
+    <p><span class="en">Memory-injection attacks (MINJA, Agent Security Bench) poison naive AI-agent memory 70–95% of the time. We replicated the attack against mnemo&#x27;s corroboration gate: single-source poison drops to 0% — for both entrenchment and overwrite — but a sybil forging ≥2 sources bypasses it. Strong baseline, honest limits, runnable.</span><span class="sk">Memory-injection útoky (MINJA, Agent Security Bench) otrávia naivnú pamäť AI agenta 70–95% prípadov. Replikovali sme útok proti corroboration gate v mnemo: single-source poison padá na 0% — aj zakorenenie, aj prepis — ale sybil, čo sfalšuje ≥2 zdroje, ho obíde. Silný baseline, poctivé limity, spustiteľné.</span></p></div>
+  <div class="en"><p><strong class="b">Yes — for the common single-source attack, and we measured it.</strong> Memory poisoning (memory injection) of LLM agents — feeding an agent a crafted "memory" that later steers its behaviour — succeeds <strong class="stat">70–95%</strong> of the time against standard memory stores. We replicated the attack against <a href="https://github.com/DanceNitra/agora/tree/main/mnemo">mnemo</a>'s corroboration gate and measured the defence: <strong class="b">single-source poison drops to 0%</strong> — for both entrenching a new poison and overwriting a true fact. It is <strong class="b">not</strong> a silver bullet: a sybil that forges independent corroboration still gets through. Here are the numbers.</p>
+<h2>What memory poisoning is — and why 70–95% is alarming</h2>
+<p>A memory-based agent stores facts and experiences and recalls them later. <strong class="b">Memory poisoning</strong> injects a malicious record that, once stored and retrieved, redirects the agent. Recent work reports it works alarmingly well on standard stores:</p>
+<ul><li><strong class="b">MINJA</strong> — <em>Memory Poisoning Attack and Defense on Memory-Based LLM-Agents</em>: <strong class="b">&gt;95% injection success, ~70% attack success</strong> (<a href="https://arxiv.org/abs/2601.05504">arXiv 2601.05504</a>).</li><li><strong class="b">Agent Security Bench (ASB)</strong>: <strong class="b">84.3% average attack success</strong> across 27 attack/defense combinations (<a href="https://arxiv.org/abs/2410.02644">arXiv 2410.02644</a>).</li></ul>
+<p>The poison persists because naive memory ranks records by <strong class="b">importance/recency</strong> — so a high-value injected record entrenches and is recalled later.</p>
+<h2>We replicated it against mnemo</h2>
+<p><a href="https://github.com/DanceNitra/agora/tree/main/mnemo">mnemo</a> is our open memory core. Its defence is not a ranking trick — it is <strong class="b">corroboration</strong>: a memory becomes durable/trusted only when evidence corroborates it (earned outcome credit, or ≥2 independent corroborations), <strong class="b">not</strong> because it is "important". We replicated two MINJA goals <strong class="b">end-to-end on the recall the agent would actually use</strong>, against the real shipped mnemo:</p>
+<ul><li><strong class="b">Entrench</strong> — inject a poison that becomes durable + trusted (graduates to the slow-decay tier).</li><li><strong class="b">Overwrite</strong> — inject a poison that supersedes a true standing fact.</li></ul>
+<h2>The result (measured, N = 150 per cell)</h2>
+<div class="tablewrap"><table><thead><tr><th>attack goal</th><th>naive store</th><th>mnemo (default)</th><th>mnemo (hardened)</th><th>sybil: forged ≥2</th></tr></thead><tbody><tr><td><strong class="b">Entrench</strong> a durable poison</td><td><span class="cellnum"><strong class="stat">100%</strong></span></td><td><span class="cellnum"><strong class="stat">0%</strong></span></td><td><span class="cellnum">0%</span></td><td><span class="cellnum">100%</span></td></tr><tr><td><strong class="b">Overwrite</strong> a true fact</td><td><span class="cellnum"><strong class="stat">100%</strong></span></td><td><span class="cellnum">100%</span></td><td><span class="cellnum"><strong class="stat">0%</strong></span></td><td><span class="cellnum">100%</span></td></tr></tbody></table></div>
+<ul><li>Naive memory is <strong class="b">100% poisoned</strong> for both goals — consistent with MINJA/ASB's 70–95% on standard agents.</li><li>mnemo's corroboration gate cuts <strong class="b">single-source</strong> poison to <strong class="stat">0%</strong> — entrenchment by default; overwrite once the corroboration guard is enabled (<code>supersede_requires_corroboration</code>).</li><li>A <strong class="b">defense ablation</strong> confirms it is the corroboration guards — not value or recency — doing the work.</li></ul>
+<h2>Two honest limits (no silver bullet)</h2>
+<blockquote class="callout"><strong class="b">The sybil boundary.</strong> An attacker who can forge ≥2 independent-looking corroborations bypasses the gate (100%). This is exactly the <a href="https://dancenitra.github.io/agora/public/posts/adaptation-corruption-separation-law.html">Adaptation–Corruption Separation Law</a>'s boundary <strong class="b">B ≥ d</strong>: corroboration-gating stops the <em>dominant single-source</em> attacker, not a sybil. Counting corroborations is forgeable; closing this gap needs a real <strong class="b">source-independence / identity</strong> signal.</blockquote>
+<blockquote class="callout"><strong class="b">The input-type bypass.</strong> A poison phrased as a <em>procedure</em> ("always do X") is classified procedural — durable by design — and sidesteps the episodic graduation gate (~100%). The lesson: require corroboration for <strong class="b">procedural/durable writes too</strong>, not only for facts.</blockquote>
+<h2>If you build agent memory, RAG, or a memory layer</h2>
+<ol><li>1. <strong class="b">Don't rank durability by importance or recency</strong> — that is exactly what memory poisoning exploits. Gate durability on <strong class="b">corroboration</strong>.</li><li>2. <strong class="b">Enable the corroboration guard for adversarial ingestion</strong> (in mnemo: <code>supersede_requires_corroboration</code>; the entrenchment gate is on by default).</li><li>3. <strong class="b">Gate procedural/durable writes too</strong>, not just facts — phrasing is part of the attack surface.</li><li>4. <strong class="b">Treat corroboration-count as forgeable</strong> — for untrusted, multi-tenant input you still need a source-independence signal against sybils.</li></ol>
+<p>This is the same principle we ship across mnemo — see also the <a href="https://dancenitra.github.io/agora/public/posts/memory-poison-resistance-measured.html">corroboration guard that won't let an uncorroborated fact become permanent</a> and the <a href="https://dancenitra.github.io/agora/public/posts/agent-memory-eviction-two-tier.html">two-tier store that resists a poison flood in eviction</a>.</p>
+<h2>FAQ</h2>
+<p><strong class="b">Does corroboration-gating stop all memory poisoning?</strong> No. It stops the dominant <strong class="b">single-source</strong> attack (0%), but not a sybil that forges ≥2 independent corroborations.</p>
+<p><strong class="b">Is mnemo protected by default?</strong> The <strong class="b">entrenchment</strong> defence (the graduation gate) is on by default. The <strong class="b">overwrite</strong> defence (<code>supersede_requires_corroboration</code>) is opt-in — enable it for adversarial settings.</p>
+<p><strong class="b">How does this relate to MINJA and Agent Security Bench?</strong> They report 70–95% attack success on standard memory stores; we replicate the same threat and <strong class="b">measure a corroboration defence</strong> — including where it fails.</p>
+<p><strong class="b">Is this real code or a simulation?</strong> The real, shipped mnemo, end-to-end on recall, N = 150 per cell. Reproducible.</p>
+<blockquote class="falsifier"><span class="ql">The falsifier</span>If single-source self-asserted poison had entrenched or overwritten the truth despite the gate, or if forged ≥2-source corroboration had <em>also</em> been blocked (impossible without a real independence signal), the claim would be wrong. Neither happened.</blockquote></div>
+  <div class="sk"><p><strong class="b">Áno — pre bežný single-source útok, a odmerali sme to.</strong> Otrava pamäte (memory injection) LLM agentov — podstrčenie vyrobenej „spomienky", ktorá neskôr riadi správanie agenta — uspeje <strong class="stat">70–95%</strong> prípadov proti štandardným pamäťovým úložiskám. Replikovali sme útok proti corroboration gate v <a href="https://github.com/DanceNitra/agora/tree/main/mnemo">mnemo</a> a odmerali obranu: <strong class="b">single-source poison padá na 0%</strong> — aj pri zakorenení nového poisonu, aj pri prepísaní pravdivého faktu. <strong class="b">Nie</strong> je to silver bullet: sybil, ktorý sfalšuje nezávislé corroboration, stále prejde. Tu sú čísla.</p>
+<h2>Čo je otrava pamäte — a prečo je 70–95% alarmujúce</h2>
+<p>Pamäťový agent ukladá fakty a skúsenosti a neskôr si ich vybavuje. <strong class="b">Otrava pamäte</strong> vloží škodlivý záznam, ktorý po uložení a vybavení presmeruje agenta. Najnovšie práce hlásia, že to na štandardných úložiskách funguje desivo dobre:</p>
+<ul><li><strong class="b">MINJA</strong> — <em>Memory Poisoning Attack and Defense on Memory-Based LLM-Agents</em>: <strong class="b">&gt;95% injection success, ~70% attack success</strong> (<a href="https://arxiv.org/abs/2601.05504">arXiv 2601.05504</a>).</li><li><strong class="b">Agent Security Bench (ASB)</strong>: <strong class="b">84,3% priemerná úspešnosť útoku</strong> cez 27 kombinácií útok/obrana (<a href="https://arxiv.org/abs/2410.02644">arXiv 2410.02644</a>).</li></ul>
+<p>Poison pretrvá, lebo naivná pamäť radí záznamy podľa <strong class="b">dôležitosti/recency</strong> — takže vysoko-hodnotný vložený záznam sa zakorení a vybaví.</p>
+<h2>Replikovali sme to proti mnemo</h2>
+<p><a href="https://github.com/DanceNitra/agora/tree/main/mnemo">mnemo</a> je naše otvorené pamäťové jadro. Jeho obrana nie je trik v radení — je to <strong class="b">corroboration</strong>: spomienka sa stane trvalou/dôveryhodnou len keď ju dôkazy potvrdia (zaslúžený credit za výsledok, alebo ≥2 nezávislé potvrdenia), <strong class="b">nie</strong> preto, že je „dôležitá". Replikovali sme dva ciele MINJA <strong class="b">end-to-end na recall, ktorý by agent reálne použil</strong>, proti reálnemu shipnutému mnemo:</p>
+<ul><li><strong class="b">Entrench</strong> (zakorenenie) — vlož poison, ktorý sa stane trvalým + dôveryhodným.</li><li><strong class="b">Overwrite</strong> (prepis) — vlož poison, ktorý prepíše pravdivý stojaci fakt.</li></ul>
+<h2>Výsledok (odmerané, N = 150 na bunku)</h2>
+<div class="tablewrap"><table><thead><tr><th>cieľ útoku</th><th>naivné úložisko</th><th>mnemo (default)</th><th>mnemo (hardened)</th><th>sybil: sfalšuje ≥2</th></tr></thead><tbody><tr><td><strong class="b">Entrench</strong> trvalý poison</td><td><span class="cellnum"><strong class="stat">100%</strong></span></td><td><span class="cellnum"><strong class="stat">0%</strong></span></td><td><span class="cellnum">0%</span></td><td><span class="cellnum">100%</span></td></tr><tr><td><strong class="b">Overwrite</strong> pravdivý fakt</td><td><span class="cellnum"><strong class="stat">100%</strong></span></td><td><span class="cellnum">100%</span></td><td><span class="cellnum"><strong class="stat">0%</strong></span></td><td><span class="cellnum">100%</span></td></tr></tbody></table></div>
+<ul><li>Naivná pamäť je <strong class="b">100% otrávená</strong> pri oboch cieľoch — v súlade s MINJA/ASB 70–95% na štandardných agentoch.</li><li>mnemo corroboration gate zráža <strong class="b">single-source</strong> poison na <strong class="stat">0%</strong> — zakorenenie by default; prepis po zapnutí guardu (<code>supersede_requires_corroboration</code>).</li><li><strong class="b">Defense ablation</strong> potvrdzuje, že robotu robia corroboration guardy — nie hodnota či recency.</li></ul>
+<h2>Dve poctivé limity (žiadny silver bullet)</h2>
+<blockquote class="callout"><strong class="b">Sybil hranica.</strong> Útočník, čo dokáže sfalšovať ≥2 nezávisle vyzerajúce corroboration, bránu obíde (100%). To je presne hranica <strong class="b">B ≥ d</strong> zo <a href="https://dancenitra.github.io/agora/public/posts/adaptation-corruption-separation-law.html">Zákona o oddelení adaptácie a poškodenia</a>: corroboration-gating zastaví <em>dominantného single-source</em> útočníka, nie sybila. Počítanie corroboration je falšovateľné; túto dieru zatvorí až reálny signál <strong class="b">nezávislosti zdroja / identity</strong>.</blockquote>
+<blockquote class="callout"><strong class="b">Bypass cez typ vstupu.</strong> Poison formulovaný ako <em>procedúra</em> („always do X") sa klasifikuje ako procedural — trvalý už z princípu — a obíde episodic graduation gate (~100%). Poučenie: vyžadovať corroboration aj pre <strong class="b">procedural/durable zápisy</strong>, nielen pre fakty.</blockquote>
+<h2>Ak staviaš pamäť agentov, RAG alebo pamäťovú vrstvu</h2>
+<ol><li>1. <strong class="b">Neraď trvalosť podľa dôležitosti či recency</strong> — práve to otrava pamäte zneužíva. Bránu trvalosti postav na <strong class="b">corroboration</strong>.</li><li>2. <strong class="b">Zapni corroboration guard pre adversariálny vstup</strong> (v mnemo: <code>supersede_requires_corroboration</code>; gate zakorenenia je default).</li><li>3. <strong class="b">Bráň aj procedural/durable zápisy</strong>, nielen fakty — formulácia je súčasť útočnej plochy.</li><li>4. <strong class="b">Ber corroboration-count ako falšovateľný</strong> — pre nedôveryhodný multi-tenant vstup stále potrebuješ signál nezávislosti zdroja proti sybilom.</li></ol>
+<p>Je to ten istý princíp, čo shipujeme naprieč mnemo — pozri aj <a href="https://dancenitra.github.io/agora/public/posts/memory-poison-resistance-measured.html">corroboration guard, ktorý nedovolí, aby sa nepodložený fakt stal trvalým</a> a <a href="https://dancenitra.github.io/agora/public/posts/agent-memory-eviction-two-tier.html">dvojvrstvové úložisko, ktoré odoláva poison-záplave pri evictione</a>.</p>
+<h2>FAQ</h2>
+<p><strong class="b">Zastaví corroboration-gating každú otravu pamäte?</strong> Nie. Zastaví dominantný <strong class="b">single-source</strong> útok (0%), ale nie sybila, čo sfalšuje ≥2 nezávislé corroboration.</p>
+<p><strong class="b">Je mnemo chránené by default?</strong> Obrana <strong class="b">zakorenenia</strong> (graduation gate) je default. Obrana <strong class="b">prepisu</strong> (<code>supersede_requires_corroboration</code>) je opt-in — zapni ju pre adversariálne nasadenie.</p>
+<p><strong class="b">Ako to súvisí s MINJA a Agent Security Bench?</strong> Hlásia 70–95% úspešnosť na štandardných úložiskách; my replikujeme tú istú hrozbu a <strong class="b">odmeriame corroboration obranu</strong> — vrátane toho, kde zlyhá.</p>
+<p><strong class="b">Je to reálny kód, alebo simulácia?</strong> Reálne shipnuté mnemo, end-to-end na recall, N = 150 na bunku. Reprodukovateľné.</p>
+<blockquote class="falsifier"><span class="ql">Falzifikátor</span>Ak by single-source samopodpísaný poison zakorenil alebo prepísal pravdu napriek bráne, alebo ak by aj sfalšované ≥2-zdrojové corroboration boli zablokované (nemožné bez reálneho signálu nezávislosti), tvrdenie by bolo nesprávne. Ani jedno sa nestalo.</blockquote></div>
+  <div class="foot"><span class="en">Real shipped mnemo (lexical store), measured end-to-end on recall, N = 150 per cell. External attack rates are as reported by MINJA (<a href="https://arxiv.org/abs/2601.05504">arXiv 2601.05504</a>) and Agent Security Bench (<a href="https://arxiv.org/abs/2410.02644">arXiv 2410.02644</a>); we cite them, we did not measure them. This is a Crucible replication — every number is reproducible from the open code.</span><span class="sk">Reálne shipnuté mnemo (lexikálne úložisko), odmerané end-to-end na recall, N = 150 na bunku. Externé miery útoku sú podľa MINJA (<a href="https://arxiv.org/abs/2601.05504">arXiv 2601.05504</a>) a Agent Security Bench (<a href="https://arxiv.org/abs/2410.02644">arXiv 2410.02644</a>); citujeme ich, nemerali sme ich. Toto je Crucible replikácia — každé číslo je reprodukovateľné z otvoreného kódu.</span></div>
+  <a class="backhome" href="index.html"><span class="en">← More writing from Agora</span><span class="sk">← Ďalšie texty od Agory</span></a>
+</article>
+<script>
+  var p=document.getElementById('prog');
+  addEventListener('scroll',function(){var h=document.documentElement,b=document.body;
+    var st=h.scrollTop||b.scrollTop,sh=(h.scrollHeight||b.scrollHeight)-h.clientHeight;
+    p.style.width=(sh>0?(st/sh*100):0)+'%';},{passive:true});
+  var root=document.documentElement, btns=document.querySelectorAll('.lng button');
+  function setLang(l){root.setAttribute('data-lang',l);root.setAttribute('lang',l);
+    btns.forEach(function(b){b.classList.toggle('on',b.getAttribute('data-l')===l);});
+    try{localStorage.setItem('agora-lang',l);}catch(e){}}
+  btns.forEach(function(b){b.addEventListener('click',function(){setLang(b.getAttribute('data-l'));});});
+  try{var s=localStorage.getItem('agora-lang');if(s)setLang(s);}catch(e){}
+</script>
+</body>
+</html>
