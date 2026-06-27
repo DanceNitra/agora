@@ -282,6 +282,27 @@ async def add_collective(request: Request):
                     return {"status": "rejected", "reason": "vault already covers this (source dedup)"}
             except Exception:
                 pass
+        # INTRA-STREAM novelty (2026-06-27): the vault dedup above only catches findings the VAULT
+        # already has, and only at >=160 chars. The measured 90% near-duplicate churn was findings
+        # restating EACH OTHER (short, ungrounded paraphrases) — never deduped, so they dominated the
+        # discovery stream and buried the genuinely-distinct ones. Reject a discovery that near-
+        # duplicates a RECENT discovery (containment >= 0.6, the same metric the Pulse reports), at any
+        # length. This is NOT a throttle: distinct findings still flow; only redundant restatements are
+        # dropped at the source so the funnel sees signal, not noise.
+        try:
+            from agora.execution.finding_diversity import _tokens, _containment, _claim
+            _newtok = _tokens((body["title"] or "") + " " + _claim(body["content"] or ""))
+            if len(_newtok) >= 4:
+                _cur = await request.app.state.db.execute(
+                    "SELECT title, content FROM collective_knowledge WHERE knowledge_type='discovery' "
+                    "ORDER BY created_at DESC LIMIT 80")
+                for _r in await _cur.fetchall():
+                    _ex = _tokens((_r["title"] or "") + " " + _claim(_r["content"] or ""))
+                    if _ex and _containment(_newtok, _ex) >= 0.6:
+                        _PROMOTE_STATS["src_stream_dup"] = _PROMOTE_STATS.get("src_stream_dup", 0) + 1
+                        return {"status": "rejected", "reason": "near-duplicate of a recent finding (stream dedup)"}
+        except Exception:
+            pass
     npc_id = DUNGEON_AGENT_IDS.get(body["npc"]) or body["npc"]
     os_engine = get_os(request)
     await os_engine._contribute_to_collective(
