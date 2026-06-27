@@ -568,6 +568,21 @@ async def promote_findings(request: Request, n: int = 16):
             "deduped": deduped, "titles": promoted}
 
 
+@router.get("/brain/web-scout")
+async def web_scout(request: Request, q: str, n: int = 6):
+    """Widest-reach FREE multi-source web search (owner 2026-06-27): HuggingFace papers, Hacker News,
+    Crossref, Wikipedia, Semantic Scholar, DuckDuckGo (no-key) + Tavily/Brave/Reddit (key-gated, free
+    monthly quota). Fresh external signal to bridge into the vault + feed the Crucible with testable
+    claims. Read-only aggregator, fail-soft per source."""
+    import asyncio
+    try:
+        from agora.execution.web_search import web_search
+        out = await asyncio.to_thread(web_search, q, n)
+        return out
+    except Exception as e:
+        return {"status": "error", "error": str(e)[:200], "results": []}
+
+
 _VERIFIED: set = set()   # finding titles already fact-checked (so we work through the backlog)
 
 
