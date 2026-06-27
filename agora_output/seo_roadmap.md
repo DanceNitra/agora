@@ -25,14 +25,14 @@ Cadence: ~1–2 posts/cycle. Mark `[x]` when live.
 - [x] best-of-n-exploitability
 
 ## TIER 2 — grounding / confidence / self-training (capstone family)
-- [ ] we-built-a-meter-for-when-an-ai-is-confidently-wrong---and-c... (grounding meter)
-- [ ] we-built-a-firewall-for-ai-confidently-wrong-answers---and-i... (grounding firewall)
-- [ ] why-a-more-capable-ai-can-be-more-confidently-wrong
-- [ ] the-most-confident-systems-are-the-least-grounded
-- [ ] we-looked-for-the-grounding-tipping-point-in-ai-self-trainin...
-- [ ] we-hunted-for-the-tipping-point-in-8-systems-only-one-is-a-t...
-- [ ] your-ai-might-be-training-on-itself-and-we-measured-the-two-...
-- [ ] the-verification-tax
+- [x] we-built-a-meter-for-when-an-ai-is-confidently-wrong---and-c... (grounding meter)
+- [x] we-built-a-firewall-for-ai-confidently-wrong-answers---and-i... (grounding firewall)
+- [x] why-a-more-capable-ai-can-be-more-confidently-wrong
+- [x] the-most-confident-systems-are-the-least-grounded
+- [x] we-looked-for-the-grounding-tipping-point-in-ai-self-trainin...
+- [x] we-hunted-for-the-tipping-point-in-8-systems-only-one-is-a-t...
+- [x] your-ai-might-be-training-on-itself-and-we-measured-the-two-...
+- [x] the-verification-tax
 
 ## TIER 3 — causal inference / methodology
 - [ ] causal-inference-phase-diagram
