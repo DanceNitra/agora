@@ -146,6 +146,25 @@ def _upsert_manifest(entry: dict) -> None:
     _MANIFEST.write_text(json.dumps(items, ensure_ascii=False, indent=1), encoding="utf-8")
 
 
+def _extract_faq(md: str):
+    """Pull (question, answer) pairs from a post's '## FAQ' section for FAQPage JSON-LD. Format:
+    each Q&A is a paragraph `**Question?** Answer text.`; non-question bold paragraphs (e.g.
+    **The falsifier.**) are skipped. Returns [] if no FAQ."""
+    mt = re.search(r"\n##\s*FAQ\s*\n(.+?)(?:\n##\s|\n---\n|\Z)", md, re.S)
+    if not mt:
+        return []
+    out = []
+    for para in re.split(r"\n\s*\n", mt.group(1)):
+        pm = re.match(r"\*\*(.+?)\*\*\s*(.*)", para.strip(), re.S)
+        if pm and pm.group(1).rstrip().endswith("?"):
+            q = re.sub(r"\s+", " ", pm.group(1)).strip()
+            a = re.sub(r"\[([^\]]+)\]\([^)]+\)", r"\1", pm.group(2))   # strip md links -> text
+            a = re.sub(r"\s+", " ", re.sub(r"[*`]", "", a)).strip()
+            if a:
+                out.append((q, a))
+    return out
+
+
 def _emit_html(m: dict, body_en, foot_en, body_sk, foot_sk, read: int, bilingual: bool) -> None:
     """Write {slug}.html from the editorial template and record the post in the manifest.
     Mono-lingual (bilingual=False) hides the language toggle and shows EN only."""
@@ -155,11 +174,28 @@ def _emit_html(m: dict, body_en, foot_en, body_sk, foot_sk, read: int, bilingual
     desc_sk = m.get("desc_sk") or m["desc"]
     tags_sk = m.get("tags_sk") or m["tags"]
     kicker_sk = m.get("kicker_sk") or m["kicker"]
-    jsonld = json.dumps({"@context": "https://schema.org", "@type": "Article",
-                         "headline": m["title"], "description": m["desc"], "datePublished": m["date"],
-                         "author": {"@type": "Organization", "name": "Agora"},
-                         "inLanguage": ["en", "sk"] if bilingual else ["en"],
-                         "url": f"{SITE}/posts/{m['slug']}.html"})
+    # SEO/AEO (Mode-B): emit Article + Organization (+ FAQPage when the post has an FAQ) as a JSON-LD
+    # array, so Google/LLMs can parse who we are, the freshness, and lift the Q&A into AI answers.
+    _graph = [
+        {"@context": "https://schema.org", "@type": "Article",
+         "headline": m["title"], "description": m["desc"],
+         "datePublished": m["date"], "dateModified": m.get("modified") or m["date"],
+         "author": {"@type": "Organization", "name": "Agora"},
+         "publisher": {"@type": "Organization", "name": "Agora"},
+         "inLanguage": ["en", "sk"] if bilingual else ["en"],
+         "url": f"{SITE}/posts/{m['slug']}.html"},
+        {"@context": "https://schema.org", "@type": "Organization", "name": "Agora",
+         "url": "https://dancenitra.github.io/agora/",
+         "sameAs": ["https://github.com/DanceNitra/agora",
+                    "https://huggingface.co/Danchi17",
+                    "https://github.com/DanceNitra/ramr"]},
+    ]
+    if m.get("faq"):
+        _graph.append({"@context": "https://schema.org", "@type": "FAQPage",
+                       "mainEntity": [{"@type": "Question", "name": q,
+                                       "acceptedAnswer": {"@type": "Answer", "text": a}}
+                                      for q, a in m["faq"]]})
+    jsonld = json.dumps(_graph, ensure_ascii=False)
     out = TEMPLATE.format(
         mono="" if bilingual else " data-mono",
         title=html.escape(m["title"]), title_sk=html.escape(title_sk),
@@ -177,9 +213,11 @@ def _emit_html(m: dict, body_en, foot_en, body_sk, foot_sk, read: int, bilingual
 
 def render(key: str):
     """Render a hand-curated bilingual post from public/posts/src/{key}.{en,sk}.md + META[key]."""
-    m = META[key]
+    m = dict(META[key])
     src = ROOT / "public" / "posts" / "src"
-    _, body_en, foot_en, words = md_to_html((src / f"{key}.en.md").read_text(encoding="utf-8"))
+    _en_md = (src / f"{key}.en.md").read_text(encoding="utf-8")
+    m["faq"] = _extract_faq(_en_md)
+    _, body_en, foot_en, words = md_to_html(_en_md)
     _, body_sk, foot_sk, _ = md_to_html((src / f"{key}.sk.md").read_text(encoding="utf-8"))
     read = max(1, round(words / 200))
     _emit_html(m, body_en, foot_en, body_sk, foot_sk, read, bilingual=True)
@@ -199,7 +237,8 @@ def render_piece(d: dict):
     m = {"slug": d["slug"], "title": d["title"], "title_sk": d.get("title_sk"),
          "desc": d["desc"], "desc_sk": d.get("desc_sk"), "date": d["date"],
          "tags": d.get("tags", ""), "tags_sk": d.get("tags_sk"),
-         "kicker": d.get("kicker", "Research"), "kicker_sk": d.get("kicker_sk")}
+         "kicker": d.get("kicker", "Research"), "kicker_sk": d.get("kicker_sk"),
+         "modified": d.get("modified"), "faq": _extract_faq(d.get("body", ""))}
     _emit_html(m, body_en, foot_en, body_sk, foot_sk, read, bilingual)
     return d["slug"], read
 
@@ -212,6 +251,9 @@ TEMPLATE = """<!DOCTYPE html>
 <title>{title} · Agora</title>
 <meta name="description" content="{desc}">
 <link rel="canonical" href="{site}/posts/{slug}.html">
+<link rel="alternate" hreflang="en" href="{site}/posts/{slug}.html">
+<link rel="alternate" hreflang="sk" href="{site}/posts/{slug}.html">
+<link rel="alternate" hreflang="x-default" href="{site}/posts/{slug}.html">
 <meta property="og:type" content="article">
 <meta property="og:title" content="{title}">
 <meta property="og:description" content="{desc}">
