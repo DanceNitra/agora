@@ -363,9 +363,13 @@ def extract_contribution(topic: dict, transcript: str, partners: list[str]) -> d
     usr = (f"Topic: {topic.get('topic','')}\n\nExchange:\n{transcript[:1000]}\n\n"
            f"Possibly-relevant papers (use only if on-topic):\n{src_block[:1100]}\n\n"
            f"User's related vault notes: {note_block}{prior_block}")
-    out = call_llm(sys, usr, tier="cheap", max_tokens=700, temperature=0.4)
-    if not (out or "").strip():                       # transient empty (GPU contention) → one retry
-        out = call_llm(sys, usr, tier="medium", max_tokens=700, temperature=0.4)
+    # QUALITY (#1, owner 2026-06-27): the CREATIVE step — turning the exchange + sources into a
+    # falsifiable claim — is the highest-leverage point for research quality, so route it to the
+    # strong REASONING tier (glm-5.2) instead of the cheap model. Low volume (~tens of contributions
+    # per period), so the cost is small; the claim quality is what compounds into hypotheses + synthesis.
+    out = call_llm(sys, usr, tier="medium", max_tokens=700, temperature=0.4)
+    if not (out or "").strip():                       # transient empty (GPU/cloud contention) → escalate
+        out = call_llm(sys, usr, tier="expert", max_tokens=700, temperature=0.4)
     d = _parse_json(out)
     if not d:
         return None
