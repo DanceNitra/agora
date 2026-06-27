@@ -397,6 +397,34 @@ def _credibility_audit(content: str):
     return False, ""
 
 
+def _adversarial_review(title: str, content: str) -> tuple:
+    """RESEARCH-QUALITY #4 (owner 2026-06-27): a STRONG-model red-team gate before a finding is
+    promoted into the curated vault. Rejects the failure modes that made past notes thin —
+    textbook/known prior-art, weak-baseline artifacts, vague/over-general/unfalsifiable claims, and
+    cited-source mismatches. Uses the reasoning tier (glm-5.2). FAIL-OPEN: on empty/parse-error the
+    finding is NOT blocked (return True) so a model outage can never freeze the research->vault funnel.
+    Returns (survives: bool, reason: str)."""
+    try:
+        from agora.execution.llm_client import call_llm
+        import json as _j, re as _re2
+        sysp = (
+            "You are a brutal senior peer reviewer guarding a curated research vault. A finding is up "
+            "for promotion. REJECT if ANY holds: (a) it restates a textbook / well-known result (prior "
+            "art exists); (b) the 'result' is likely a weak-baseline artifact or measurement quirk, not "
+            "a real effect; (c) it is vague, over-general, or not falsifiable; (d) the cited source does "
+            "not actually support the claim. ACCEPT only a specific, grounded, falsifiable, non-obvious "
+            'finding. Reply ONLY JSON: {"survive": true|false, "reason": "<=15 words"}')
+        out = call_llm(sysp, f"TITLE: {title}\n\nFINDING:\n{content[:1200]}",
+                       tier="medium", max_tokens=120, temperature=0.1) or ""
+        m = _re2.search(r"\{.*\}", out, _re2.S)
+        if not m:
+            return (True, "adv: unparseable -> not blocked")
+        d = _j.loads(m.group(0))
+        return (bool(d.get("survive", True)), str(d.get("reason", ""))[:80])
+    except Exception as e:
+        return (True, f"adv: error -> not blocked ({type(e).__name__})")
+
+
 @router.post("/brain/promote-findings")
 async def promote_findings(request: Request, n: int = 16):
     """Promote the best recent findings into the vault through the (reliable) quality gate — the
@@ -512,6 +540,13 @@ async def promote_findings(request: Request, n: int = 16):
             pass
         q = await assess_quality(title, content)
         if not q["pass"]:
+            continue
+        # RESEARCH-QUALITY #4: strong-model adversarial red-team before the vault (prior-art /
+        # weak-baseline / vagueness / source-mismatch). Only genuinely novel, grounded, falsifiable
+        # findings survive; fail-open so a model outage can't freeze the funnel.
+        _adv_ok, _adv_why = await _asyncio.to_thread(_adversarial_review, title, content)
+        if not _adv_ok:
+            _PROMOTE_STATS["src_adv_reject"] = _PROMOTE_STATS.get("src_adv_reject", 0) + 1
             continue
         try:
             _g, _gwhy = _evidence_grade(content)
