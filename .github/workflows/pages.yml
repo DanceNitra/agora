@@ -11,6 +11,8 @@ on:
     paths:
       - 'index.html'
       - 'public/**'
+      - 'sitemap.xml'
+      - 'robots.txt'
       - '.github/workflows/pages.yml'
   workflow_dispatch:
 
@@ -37,6 +39,8 @@ jobs:
           cp index.html _site/index.html
           touch _site/.nojekyll
           cp -r public _site/public
+          [ -f sitemap.xml ] && cp sitemap.xml _site/sitemap.xml || true
+          [ -f robots.txt ] && cp robots.txt _site/robots.txt || true
       - uses: actions/configure-pages@v5
       - uses: actions/upload-pages-artifact@v3
         with:
