@@ -10,7 +10,12 @@ Spec JSON: [{"slug": "...", "links": [["en anchor phrase", "sk anchor phrase", "
 """
 import json
 import re
+import unicodedata
 from pathlib import Path
+
+
+def _nfc(x):
+    return unicodedata.normalize("NFC", x)
 
 ROOT = Path(__file__).resolve().parent.parent
 POSTS = ROOT / "public" / "posts"
@@ -22,11 +27,11 @@ def apply(spec) -> str:
     f = POSTS / f"{slug}.html"
     if not f.exists():
         return f"{slug}: FILE MISSING"
-    s = f.read_text(encoding="utf-8")
+    s = _nfc(f.read_text(encoding="utf-8"))
     notes = []
     for en_a, sk_a, target in spec["links"]:
         url = f"{SITE}/{target}.html"
-        for lang, anchor in (("en", en_a), ("sk", sk_a)):
+        for lang, anchor in (("en", _nfc(en_a)), ("sk", _nfc(sk_a))):
             if f">{anchor}</a>" in s:
                 notes.append(f"{lang}:already-linked"); continue
             n = s.count(anchor)
