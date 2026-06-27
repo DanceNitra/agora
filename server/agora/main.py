@@ -635,6 +635,16 @@ async def frontier_harvest_loop(app: FastAPI):
             print(f"[FrontierHarvest] {r.get('topic')}: +{r.get('queued', 0)} papers queued")
         except Exception as e:
             print(f"[FrontierHarvest] error: {e}")
+        # WEB-SCOUT (#6, owner 2026-06-27): widest-reach free external search → file a couple of fresh,
+        # high-signal leads to the Claude inbox as Crucible/frontier candidates (deduped vs seen; NOT
+        # into the raw discovery stream). Read-only data fetch; fail-soft.
+        try:
+            from agora.execution.web_search import web_scout_pass
+            from agora.execution.claude_inbox import add_task
+            ws = await _aio.to_thread(web_scout_pass, add_task, 2, 2)
+            print(f"[WebScout] filed {ws.get('filed')} fresh external leads ({ws.get('pooled')} pooled): {ws.get('leads')}")
+        except Exception as e:
+            print(f"[WebScout] error: {e}")
         await _aio.sleep(7200)                               # every 2 hours
 
 

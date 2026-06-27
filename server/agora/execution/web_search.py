@@ -208,6 +208,89 @@ def web_search(query: str, n_per: int = 6) -> dict:
             "errors": errors, "results": results}
 
 
+# ── autonomous pass: query frontier themes -> file fresh external leads to Claude ─────────────
+_SEEN = _SERVER / ".web_scout_seen.json"
+_THEMES = [
+    "LLM agent memory benchmark",
+    "memory poisoning attack LLM agents",
+    "retrieval augmented generation long context failure",
+    "memory consolidation forgetting LLM agents",
+    "knowledge graph agent memory retrieval",
+    "multi-hop retrieval reasoning benchmark LLM",
+    "reward model overoptimization best-of-n",
+    "online change-point detection concept drift",
+]
+# rank: papers + paid-tier general web first, low-signal sources last
+_PREF = {"hf": 0, "crossref": 1, "s2": 2, "tavily": 3, "brave": 4, "hn": 5, "reddit": 6,
+         "wikipedia": 9, "ddg": 9}
+
+
+def _load_seen():
+    try:
+        return set(json.loads(_SEEN.read_text(encoding="utf-8")))
+    except Exception:
+        return set()
+
+
+def _save_seen(s):
+    try:
+        _SEEN.write_text(json.dumps(sorted(s)[-3000:]), encoding="utf-8")   # cap the file
+    except Exception:
+        pass
+
+
+def _board_query():
+    try:
+        d = json.loads((_SERVER / ".board.json").read_text(encoding="utf-8"))
+        return (d.get("directives") or "")[:120].strip() or None
+    except Exception:
+        return None
+
+
+def web_scout_pass(add_task, n_themes: int = 2, n_leads: int = 2) -> dict:
+    """One autonomous web-scout pass (called from a periodic loop): query a couple of ROTATING
+    frontier themes (+ the Board directive), dedup vs previously-seen URLs, and file the top fresh,
+    high-signal leads to the Claude inbox as Crucible/frontier candidates (develop-or-skip). Low
+    volume on purpose (RAISED BAR — leads for Claude to triage, NOT notes; NOT into the raw discovery
+    stream). `add_task` is injected so it's testable. Returns a summary."""
+    seen = _load_seen()
+    idx = int(time.time() // 7200) % len(_THEMES)              # rotate by 2h bucket
+    queries = [_THEMES[(idx + i) % len(_THEMES)] for i in range(max(1, n_themes))]
+    bq = _board_query()
+    if bq:
+        queries.append(bq)
+    pooled = []
+    for q in queries:
+        try:
+            for r in web_search(q, 6).get("results", []):
+                u = (r.get("url") or "").rstrip("/")
+                if u and u not in seen:
+                    pooled.append((q, r))
+        except Exception:
+            pass
+    pooled.sort(key=lambda x: _PREF.get(x[1].get("source"), 9))
+    filed = []
+    for q, r in pooled:
+        if len(filed) >= n_leads:
+            break
+        u = (r.get("url") or "").rstrip("/")
+        if u in seen:
+            continue
+        seen.add(u)
+        text = (f"External lead (web-scout/{r.get('source')}): {(r.get('title') or '')[:110]} || "
+                f"QUERY: {q} | URL: {u} | {(r.get('snippet') or '')[:200]} || Claude: judge for the "
+                f"Crucible/frontier — if it is a testable, novel claim on our agenda "
+                f"(agent-memory / RAG / reasoning), DEVELOP it (Lab + falsifier) or REPLICATE it; "
+                f"otherwise SKIP with a one-line reason. Do NOT make a small note from a thin lead.")
+        try:
+            add_task(text)
+            filed.append(f"{r.get('source')}:{(r.get('title') or '')[:50]}")
+        except Exception:
+            pass
+    _save_seen(seen)
+    return {"queries": queries, "pooled": len(pooled), "filed": len(filed), "leads": filed}
+
+
 if __name__ == "__main__":
     import sys
     out = web_search(sys.argv[1] if len(sys.argv) > 1 else "agent memory benchmark", 5)
