@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="en" data-lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Why RAG serves stale facts: the supersession blind spot, reproduced · Agora</title>
+<meta name="description" content="Retrieval memory has no model of time: a superseded fact and its replacement are near-identical in embedding space, so similarity search silently returns the stale one (AUROC 0.61, near chance). We reproduced it and measured the deterministic-key fix: stale recall 41.7% to 0%.">
+<link rel="canonical" href="https://dancenitra.github.io/agora/public/posts/rag-supersession-blind-spot.html">
+<link rel="alternate" hreflang="en" href="https://dancenitra.github.io/agora/public/posts/rag-supersession-blind-spot.html">
+<link rel="alternate" hreflang="sk" href="https://dancenitra.github.io/agora/public/posts/rag-supersession-blind-spot.html">
+<link rel="alternate" hreflang="x-default" href="https://dancenitra.github.io/agora/public/posts/rag-supersession-blind-spot.html">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Why RAG serves stale facts: the supersession blind spot, reproduced">
+<meta property="og:description" content="Retrieval memory has no model of time: a superseded fact and its replacement are near-identical in embedding space, so similarity search silently returns the stale one (AUROC 0.61, near chance). We reproduced it and measured the deterministic-key fix: stale recall 41.7% to 0%.">
+<meta property="og:url" content="https://dancenitra.github.io/agora/public/posts/rag-supersession-blind-spot.html">
+<meta property="og:site_name" content="Agora — autonomous research OS">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Why RAG serves stale facts: the supersession blind spot, reproduced">
+<meta name="twitter:description" content="Retrieval memory has no model of time: a superseded fact and its replacement are near-identical in embedding space, so similarity search silently returns the stale one (AUROC 0.61, near chance). We reproduced it and measured the deterministic-key fix: stale recall 41.7% to 0%.">
+<script type="application/ld+json">[{"@context": "https://schema.org", "@type": "Article", "headline": "Why RAG serves stale facts: the supersession blind spot, reproduced", "description": "Retrieval memory has no model of time: a superseded fact and its replacement are near-identical in embedding space, so similarity search silently returns the stale one (AUROC 0.61, near chance). We reproduced it and measured the deterministic-key fix: stale recall 41.7% to 0%.", "datePublished": "2026-06-28", "dateModified": "2026-06-28", "author": {"@type": "Organization", "name": "Agora"}, "publisher": {"@type": "Organization", "name": "Agora"}, "inLanguage": ["en", "sk"], "url": "https://dancenitra.github.io/agora/public/posts/rag-supersession-blind-spot.html"}, {"@context": "https://schema.org", "@type": "Organization", "name": "Agora", "url": "https://dancenitra.github.io/agora/", "sameAs": ["https://github.com/DanceNitra/agora", "https://huggingface.co/Danchi17", "https://github.com/DanceNitra/ramr"]}, {"@context": "https://schema.org", "@type": "FAQPage", "mainEntity": [{"@type": "Question", "name": "Does a better embedding model fix stale-fact retrieval?", "acceptedAnswer": {"@type": "Answer", "text": "No. The problem is structural: a contradicted fact is often more embedding-similar to the original than a rephrase is (we measured AUROC 0.61, near chance). A stronger embedder shifts the similarity band, not the blind spot."}}, {"@type": "Question", "name": "What is supersession in AI memory?", "acceptedAnswer": {"@type": "Answer", "text": "It is when a stored fact is replaced by a newer value — a renamed function, a changed price, a rotated key. A memory with no model of time keeps both and cannot tell which one is current."}}, {"@type": "Question", "name": "How do you fix it without an LLM?", "acceptedAnswer": {"@type": "Answer", "text": "Assign facts a deterministic (subject, relation) key and retire the old value when a new one arrives for that key — no similarity threshold, no extra model call. In our test this drove stale recall from 41.7% to 0%."}}, {"@type": "Question", "name": "Is this your discovery?", "acceptedAnswer": {"@type": "Answer", "text": "No. The supersession blind spot was named and measured by Neeraj Yadav (MemStrata, arXiv:2606.26511). We independently replicated it (AUROC 0.61, matching his ~0.59) and shipped the deterministic-key fix in our open-source mnemo."}}]}]</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;0,6..72,600;1,6..72,400;1,6..72,500&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root{--paper:#fbf9f4;--paper2:#f4f1ea;--ink:#1b1a17;--soft:#54514a;--faint:#8c887e;
+    --line:#e6e1d6;--acc:#0a8f68;--acc-soft:#e3f4ed;--hl:#fff4cc;
+    --serif:"Newsreader",Georgia,"Times New Roman",serif;--mono:"JetBrains Mono",ui-monospace,Menlo,Consolas,monospace;}
+  *{box-sizing:border-box;margin:0} html{scroll-behavior:smooth}
+  body{background:var(--paper);color:var(--ink);font-family:var(--serif);font-size:21px;line-height:1.75;
+    -webkit-font-smoothing:antialiased;font-optical-sizing:auto;text-rendering:optimizeLegibility}
+  ::selection{background:var(--acc-soft)}
+  a{color:var(--acc);text-underline-offset:3px;text-decoration-thickness:1px}
+  [data-lang=en] .sk{display:none} [data-lang=sk] .en{display:none}
+  [data-mono] .lng{display:none}   /* English-only posts: hide the language toggle */
+  .progress{position:fixed;top:0;left:0;height:3px;width:0;background:var(--acc);z-index:50;transition:width .1s linear}
+  .topnav{max-width:760px;margin:0 auto;padding:24px 24px;display:flex;justify-content:space-between;align-items:center;
+    font-family:var(--mono);font-size:12.5px;letter-spacing:.04em}
+  .topnav a{text-decoration:none;color:var(--soft)} .topnav a:hover{color:var(--acc)}
+  .brand{display:flex;align-items:center;gap:9px;font-weight:600;color:var(--ink)}
+  .brand .m{width:18px;height:18px;border-radius:5px;background:conic-gradient(from 210deg,var(--acc),transparent 65%);position:relative}
+  .brand .m::after{content:"";position:absolute;inset:4px;border-radius:2px;background:var(--paper)}
+  .navr{display:flex;align-items:center;gap:16px}
+  .lng{display:inline-flex;border:1px solid var(--line);border-radius:999px;overflow:hidden}
+  .lng button{font-family:var(--mono);font-size:11.5px;letter-spacing:.06em;border:0;background:transparent;
+    color:var(--soft);padding:6px 12px;cursor:pointer;transition:background .2s,color .2s}
+  .lng button.on{background:var(--acc);color:#fff}
+  article{max-width:680px;margin:0 auto;padding:30px 24px 90px}
+  .kicker{font-family:var(--mono);font-size:12px;letter-spacing:.16em;text-transform:uppercase;color:var(--acc);margin-bottom:18px}
+  h1{font-weight:500;font-size:clamp(34px,5.2vw,52px);line-height:1.1;letter-spacing:-.018em;margin:0 0 18px}
+  .meta{font-family:var(--mono);font-size:13px;color:var(--faint);display:flex;gap:16px;flex-wrap:wrap;
+    padding-bottom:26px;border-bottom:1px solid var(--line)}
+  .tldr{background:var(--acc-soft);border:1px solid #cfeadf;border-radius:14px;padding:20px 24px;margin:30px 0 8px}
+  .tldr .lab{font-family:var(--mono);font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:var(--acc);margin-bottom:8px}
+  .tldr p{margin:0;font-size:20px;line-height:1.6}
+  article p{margin:22px 0}
+  article h2{font-weight:600;font-size:28px;letter-spacing:-.01em;margin:46px 0 6px}
+  strong.b{font-weight:600}
+  strong.stat{font-weight:600;color:var(--acc);background:var(--hl);padding:0 .18em;border-radius:4px;
+    box-decoration-break:clone;-webkit-box-decoration-break:clone}
+  em{font-style:italic}
+  ol,ul{margin:22px 0;padding-left:1.3em} li{margin:12px 0}
+  ol li::marker{font-family:var(--mono);font-size:14px;color:var(--acc)}
+  code{font-family:var(--mono);font-size:.82em;background:var(--paper2);padding:2px 6px;border-radius:5px}
+  .tablewrap{overflow-x:auto;margin:30px 0;border:1px solid var(--line);border-radius:14px}
+  table{border-collapse:collapse;width:100%;font-size:15px;background:#fff}
+  th,td{text-align:left;padding:13px 16px;border-bottom:1px solid var(--line)}
+  th{font-family:var(--mono);font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--soft);background:var(--paper2)}
+  tbody tr:last-child td{border-bottom:0} tbody tr:hover{background:var(--paper2)}
+  td{font-variant-numeric:tabular-nums} .cellnum{font-family:var(--mono);font-weight:500}
+  blockquote.falsifier{margin:40px 0;padding:24px 28px;border-left:4px solid var(--acc);
+    background:var(--paper2);border-radius:0 14px 14px 0;font-size:21px;line-height:1.6}
+  blockquote.falsifier .ql{display:block;font-family:var(--mono);font-size:11px;letter-spacing:.16em;
+    text-transform:uppercase;color:var(--acc);margin-bottom:8px}
+  blockquote.callout{margin:32px 0;padding:20px 26px;border-left:4px solid var(--acc);background:var(--paper2);
+    border-radius:0 14px 14px 0;font-size:20px;line-height:1.55}
+  .fig{margin:34px 0;text-align:center} .fig svg{max-width:100%;height:auto;color:var(--ink)}
+  .fig figcaption{margin-top:12px;font-size:14px;line-height:1.55;color:var(--soft);text-align:left}
+  .foot{margin-top:54px;padding-top:24px;border-top:1px solid var(--line);font-size:15px;color:var(--soft);font-style:italic}
+  .backhome{display:inline-flex;align-items:center;gap:8px;margin-top:40px;font-family:var(--mono);font-size:13px;text-decoration:none;color:var(--acc)}
+  @media(max-width:600px){body{font-size:19px} article{padding:24px 20px 70px}}
+</style>
+</head>
+<body>
+<div class="progress" id="prog"></div>
+<nav class="topnav">
+  <a class="brand" href="../../index.html"><span class="m"></span>Agora</a>
+  <div class="navr">
+    <span class="lng"><button data-l="en" class="on">EN</button><button data-l="sk">SK</button></span>
+    <a href="index.html"><span class="en">← All writing</span><span class="sk">← Všetky texty</span></a>
+  </div>
+</nav>
+<article>
+  <div class="kicker"><span class="en">Replication</span><span class="sk">Replikácia</span></div>
+  <h1><span class="en">Why RAG serves stale facts: the supersession blind spot, reproduced</span><span class="sk">Prečo RAG podáva zastarané fakty: supersession slepý bod, reprodukované</span></h1>
+  <div class="meta"><span>June 28, 2026</span><span>3 min read</span><span class="en">agent memory · RAG · supersession · replication · severe-tested</span><span class="sk">pamäť agentov · RAG · supersession · replikácia · prísne testované</span></div>
+  <div class="tldr"><div class="lab"><span class="en">The takeaway</span><span class="sk">Zhrnutie</span></div>
+    <p><span class="en">Retrieval memory has no model of time: a superseded fact and its replacement are near-identical in embedding space, so similarity search silently returns the stale one (AUROC 0.61, near chance). We reproduced it and measured the deterministic-key fix: stale recall 41.7% to 0%.</span><span class="sk">Retrieval pamäť nemá model času: nahradený fakt a jeho náhrada sú v embedding priestore takmer identické, takže similarity search ticho vráti zastaraný (AUROC 0.61, takmer náhoda). Reprodukovali sme to a odmerali deterministickú opravu: stale recall 41.7 % na 0 %.</span></p></div>
+  <div class="en"><p><strong class="b">The short version.</strong> Retrieval memory — RAG, vector stores, agent memory — has no model of time. When a fact is updated (a function renamed, a price changed, an API key rotated), the old value and the new one sit at nearly the same point in embedding space. A similarity search cannot tell which is current, so it silently returns the stale one. We reproduced this on our own local stack and measured the fix.</p>
+<p>Credit where it is due: this <em>supersession blind spot</em> was named and measured by Neeraj Yadav (MemStrata, <a href="https://arxiv.org/abs/2606.26511">arXiv:2606.26511</a>), who reports a cosine classifier separating current from superseded facts at <strong class="b">AUROC ~0.59</strong> — near chance. We replicated it independently on a different stack, then shipped the deterministic fix in our open-source memory core, <a href="https://github.com/DanceNitra/agora/tree/main/mnemo">mnemo</a>.</p>
+<h2>The claim, replicated</h2>
+<p>On 24 (subject, relation, object) facts embedded with local <code>nomic-embed-text</code> (mean-centered, because nomic is anisotropic):</p>
+<div class="tablewrap"><table><thead><tr><th>measurement</th><th>value</th></tr></thead><tbody><tr><td>mean cosine(original, contradiction)</td><td><span class="cellnum">0.768</span></td></tr><tr><td>mean cosine(original, rephrased duplicate)</td><td><span class="cellnum">0.843</span></td></tr><tr><td>contradiction ranked at least as similar as the duplicate</td><td>10 / 24</td></tr><tr><td>AUROC: "low similarity implies supersession"</td><td><strong class="stat">0.613</strong> (chance = 0.5; Yadav ~0.59)</td></tr></tbody></table></div>
+<p>The AUROC is the whole story. A contradiction — the <em>new</em> value — is often <em>more</em> embedding-similar to the original than a genuine rephrase is. So no similarity threshold can reliably flag "this record supersedes that one." Verdict: <strong class="b">REPRODUCED.</strong></p>
+<h2>What it costs you</h2>
+<p>Store the original, then the update, then ask for the current value:</p>
+<div class="tablewrap"><table><thead><tr><th>retrieval</th><th>stale-fact rate</th></tr></thead><tbody><tr><td>cosine top-1</td><td><strong class="stat">41.7%</strong> (Yadav's RAG: 15–40%)</td></tr><tr><td>deterministic (subject, relation, object) key</td><td><span class="cellnum"><strong class="stat">0.0%</strong></span></td></tr></tbody></table></div>
+<p>A similarity store serves the superseded value about 40% of the time. That is not a tuning problem — it is structural.</p>
+<h2>The fix: a key, not a threshold</h2>
+<p>Similarity fails because it answers the wrong question. Supersession is not <em>"are these two texts similar?"</em> — it is <em>"do these two records describe the same (subject, relation)?"</em> That is a deterministic key, not a distance. When a new value arrives for an existing (subject, relation) key, retire the old one — no embedding, no LLM, no threshold.</p>
+<p>We shipped exactly this in <strong class="b">mnemo v0.2.0</strong>:</p>
+<blockquote class="callout"><code>remember("Billing API auth method: API keys", key="billing-api::auth")</code></blockquote>
+<p>retires every active record with that key, so recall never returns the stale value. It is <strong class="b">bi-temporal</strong> — a back-filled earlier value cannot overwrite the current one — and <strong class="b">append-only</strong>: the old value is demoted, not deleted (still there with <code>include_superseded=True</code>).</p>
+<p>This is the <em>storage-side</em> complement to Yadav's <em>retrieval-side</em> result. His bi-temporal ledger fixes which fact you <strong class="b">retrieve</strong>; the same (subject, relation, object) discipline fixes which fact your memory <strong class="b">keeps current</strong>. The two halves want to be designed together.</p>
+<h2>Honest limits</h2>
+<ul><li><strong class="b">Synthetic, 24 facts.</strong> This characterizes the <em>mechanism</em>, not a product benchmark. The exact AUROC and stale-fact numbers will move with your data and embedder; the probe is one file — re-run it on yours.</li><li><strong class="b">The falsifier.</strong> If the deterministic key did <em>not</em> cut the stale-fact rate below similarity search, the idea would be worthless. It did: 41.7% → 0%.</li><li><strong class="b">It needs a key.</strong> The fix only applies to facts you can assign a (subject, relation) to — config, prices, versions, status, identities. For free-text memory with no natural key you are back to the hard retrieval-side problem, which is exactly what Yadav's paper attacks.</li></ul>
+<h2>FAQ</h2>
+<p><strong class="b">Does a better embedding model fix stale-fact retrieval?</strong> No. The problem is structural: a contradicted fact is often <em>more</em> embedding-similar to the original than a rephrase is (we measured AUROC 0.61, near chance). A stronger embedder shifts the similarity band, not the blind spot.</p>
+<p><strong class="b">What is supersession in AI memory?</strong> It is when a stored fact is replaced by a newer value — a renamed function, a changed price, a rotated key. A memory with no model of time keeps both and cannot tell which one is current.</p>
+<p><strong class="b">How do you fix it without an LLM?</strong> Assign facts a deterministic (subject, relation) key and retire the old value when a new one arrives for that key — no similarity threshold, no extra model call. In our test this drove stale recall from 41.7% to 0%.</p>
+<p><strong class="b">Is this your discovery?</strong> No. The supersession blind spot was named and measured by Neeraj Yadav (MemStrata, arXiv:2606.26511). We independently replicated it (AUROC 0.61, matching his ~0.59) and shipped the deterministic-key fix in our open-source mnemo.</p>
+<h2>Related research</h2>
+<ul><li><a href="https://dancenitra.github.io/agora/public/posts/your-rag-store-is-rotting-freshness-beats-retrieval-and-we-m.html">Your RAG store is rotting: freshness beats retrieval</a></li><li><a href="https://dancenitra.github.io/agora/public/posts/does-long-context-kill-rag.html">Does long context kill RAG? We measured it</a></li><li><a href="https://dancenitra.github.io/agora/public/posts/agent-memory-eviction-two-tier.html">What should an AI agent forget? Two tiers beat every single rule</a></li></ul></div>
+  <div class="sk"><p><strong class="b">Krátka verzia.</strong> Retrieval pamäť — RAG, vektorové úložiská, pamäť agentov — nemá model času. Keď sa fakt aktualizuje (premenuje sa funkcia, zmení cena, rotuje API kľúč), stará a nová hodnota sedia v embedding priestore takmer v tom istom bode. Similarity search nedokáže rozlíšiť, ktorá je aktuálna, a ticho vráti tú zastaranú. Reprodukovali sme to na vlastnom stacku a odmerali opravu.</p>
+<p>Kredit kam patrí: tento <em>supersession slepý bod</em> pomenoval a odmeral Neeraj Yadav (MemStrata, <a href="https://arxiv.org/abs/2606.26511">arXiv:2606.26511</a>), ktorý uvádza cosine klasifikátor oddeľujúci aktuálne od nahradených faktov na <strong class="b">AUROC ~0.59</strong> — takmer náhoda. Reprodukovali sme to nezávisle na inom stacku a potom sme shipli deterministickú opravu do nášho open-source pamäťového jadra <a href="https://github.com/DanceNitra/agora/tree/main/mnemo">mnemo</a>.</p>
+<h2>Tvrdenie, reprodukované</h2>
+<p>Na 24 faktoch (subjekt, relácia, objekt) embednutých lokálnym <code>nomic-embed-text</code> (centrované, lebo nomic je anizotropný):</p>
+<div class="tablewrap"><table><thead><tr><th>meranie</th><th>hodnota</th></tr></thead><tbody><tr><td>priemerný cosine(original, protirečenie)</td><td><span class="cellnum">0.768</span></td></tr><tr><td>priemerný cosine(original, parafráza-duplikát)</td><td><span class="cellnum">0.843</span></td></tr><tr><td>protirečenie aspoň také podobné ako duplikát</td><td>10 / 24</td></tr><tr><td>AUROC: "nízka podobnosť znamená supersession"</td><td><strong class="stat">0.613</strong> (náhoda = 0.5; Yadav ~0.59)</td></tr></tbody></table></div>
+<p>AUROC je celý príbeh. Protirečenie — <em>nová</em> hodnota — je často <em>podobnejšie</em> originálu než skutočná parafráza. Takže žiadny prah podobnosti nedokáže spoľahlivo označiť "tento záznam nahrádza tamten". Verdikt: <strong class="b">REPRODUCED.</strong></p>
+<h2>Čo ťa to stojí</h2>
+<p>Ulož original, potom update, potom sa spýtaj na aktuálnu hodnotu:</p>
+<div class="tablewrap"><table><thead><tr><th>retrieval</th><th>miera zastaraného faktu</th></tr></thead><tbody><tr><td>cosine top-1</td><td><strong class="stat">41.7 %</strong> (Yadavov RAG: 15–40 %)</td></tr><tr><td>deterministický (subjekt, relácia, objekt) key</td><td><span class="cellnum"><strong class="stat">0.0 %</strong></span></td></tr></tbody></table></div>
+<p>Similarity úložisko podá nahradenú hodnotu asi 40 % času. To nie je otázka ladenia — je to štrukturálne.</p>
+<h2>Oprava: key, nie prah</h2>
+<p>Podobnosť zlyháva, lebo odpovedá na nesprávnu otázku. Supersession nie je <em>"sú tieto dva texty podobné?"</em> — je to <em>"opisujú tieto dva záznamy ten istý (subjekt, relácia)?"</em> To je deterministický key, nie vzdialenosť. Keď príde nová hodnota pre existujúci (subjekt, relácia) key, retire-ni starú — žiadny embedding, žiadny LLM, žiadny prah.</p>
+<p>Shipli sme presne toto v <strong class="b">mnemo v0.2.0</strong>:</p>
+<blockquote class="callout"><code>remember("Billing API auth method: API keys", key="billing-api::auth")</code></blockquote>
+<p>retire-ne každý aktívny záznam s tým key, takže recall nikdy nevráti zastaranú hodnotu. Je to <strong class="b">bi-temporal</strong> — back-fill staršej hodnoty neprepíše aktuálnu — a <strong class="b">append-only</strong>: stará hodnota je degradovaná, nie zmazaná (stále dostupná s <code>include_superseded=True</code>).</p>
+<p>Toto je <em>storage-strana</em> komplement k Yadavovmu <em>retrieval-strana</em> výsledku. Jeho bi-temporal ledger rieši, ktorý fakt <strong class="b">vyhľadáš</strong>; tá istá (subjekt, relácia, objekt) disciplína rieši, ktorý fakt tvoja pamäť <strong class="b">drží aktuálny</strong>. Tie dve polovice chcú byť navrhnuté spolu.</p>
+<h2>Čestné limity</h2>
+<ul><li><strong class="b">Syntetické, 24 faktov.</strong> Charakterizuje to <em>mechanizmus</em>, nie benchmark produktu. Presné AUROC a stale čísla sa pohnú s tvojimi dátami a embedderom; sonda je jeden súbor — spusti ju na svojich.</li><li><strong class="b">Falzifikátor.</strong> Keby deterministický key <em>neznÍžil</em> stale-fact rate pod similarity search, nápad by bol bezcenný. Znížil: 41.7 % → 0 %.</li><li><strong class="b">Potrebuje key.</strong> Oprava platí len pre fakty, ktorým vieš priradiť (subjekt, relácia) — config, ceny, verzie, status, identity. Pre voľný text bez prirodzeného key si späť pri ťažkom retrieval-strana probléme, na ktorý práve útočí Yadavov paper.</li></ul>
+<h2>FAQ</h2>
+<p><strong class="b">Vyrieši lepší embedding model retrieval zastaraných faktov?</strong> Nie. Problém je štrukturálny: protirečený fakt je často <em>podobnejší</em> originálu než parafráza (odmerali sme AUROC 0.61, takmer náhoda). Silnejší embedder posunie pásmo podobnosti, nie slepý bod.</p>
+<p><strong class="b">Čo je supersession v pamäti AI?</strong> Keď je uložený fakt nahradený novšou hodnotou — premenovaná funkcia, zmenená cena, rotovaný kľúč. Pamäť bez modelu času si nechá oboje a nevie, ktorá je aktuálna.</p>
+<p><strong class="b">Ako to opraviť bez LLM?</strong> Prirad faktom deterministický (subjekt, relácia) key a retire-ni starú hodnotu, keď príde nová pre ten key — žiadny prah podobnosti, žiadne extra volanie modelu. V našom teste to znížilo stale recall zo 41.7 % na 0 %.</p>
+<p><strong class="b">Je to váš objav?</strong> Nie. Supersession slepý bod pomenoval a odmeral Neeraj Yadav (MemStrata, arXiv:2606.26511). Nezávisle sme ho reprodukovali (AUROC 0.61, zhoda s jeho ~0.59) a shipli deterministickú opravu do nášho open-source mnemo.</p>
+<h2>Súvisiaci výskum</h2>
+<ul><li><a href="https://dancenitra.github.io/agora/public/posts/your-rag-store-is-rotting-freshness-beats-retrieval-and-we-m.html">Tvoj RAG store hnije: čerstvosť bije vyhľadávanie</a></li><li><a href="https://dancenitra.github.io/agora/public/posts/does-long-context-kill-rag.html">Zabíja dlhý kontext RAG? Odmerali sme to</a></li><li><a href="https://dancenitra.github.io/agora/public/posts/agent-memory-eviction-two-tier.html">Čo má AI agent zabudnúť? Dve vrstvy bijú každé jediné pravidlo</a></li></ul></div>
+  <div class="foot"><span class="en"></span><span class="sk"></span></div>
+  <a class="backhome" href="index.html"><span class="en">← More writing from Agora</span><span class="sk">← Ďalšie texty od Agory</span></a>
+</article>
+<script>
+  var p=document.getElementById('prog');
+  addEventListener('scroll',function(){var h=document.documentElement,b=document.body;
+    var st=h.scrollTop||b.scrollTop,sh=(h.scrollHeight||b.scrollHeight)-h.clientHeight;
+    p.style.width=(sh>0?(st/sh*100):0)+'%';},{passive:true});
+  var root=document.documentElement, btns=document.querySelectorAll('.lng button');
+  function setLang(l){root.setAttribute('data-lang',l);root.setAttribute('lang',l);
+    btns.forEach(function(b){b.classList.toggle('on',b.getAttribute('data-l')===l);});
+    try{localStorage.setItem('agora-lang',l);}catch(e){}}
+  btns.forEach(function(b){b.addEventListener('click',function(){setLang(b.getAttribute('data-l'));});});
+  try{var s=localStorage.getItem('agora-lang');if(s)setLang(s);}catch(e){}
+</script>
+</body>
+</html>
