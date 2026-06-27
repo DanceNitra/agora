@@ -63,12 +63,15 @@ mangles some SK chars like ľ). Anchors must be tag-free body phrases NOT duplic
 Pillars: memory→adaptation-corruption-separation-law; grounding→the-most-confident-systems-are-the-least-grounded; causal→causal-inference-phase-diagram.
 
 - [x] MEMORY cluster (8): law(3), eviction(3), poison-resistance(3), consolidation(3), MINJA(3), rag-rot(2), multihop(2), RAG-dead(1) — audited 0 issues
-- [ ] GROUNDING cluster (8): meter, firewall, more-capable, most-confident(pillar), looked-tipping, hunted-tipping, training-on-itself, verification-tax
-- [ ] CAUSAL cluster (9): phase-diagram(pillar), pre-trends x3, 95-CI, more-data, operating-point, robustness, exit-criteria
+- [x] GROUNDING cluster (8) DONE: meter, firewall, more-capable, most-confident(pillar), looked-tipping, hunted-tipping, training-on-itself, verification-tax
+- [x] CAUSAL cluster (9) DONE: phase-diagram(pillar), pre-trends x3, 95-CI, more-data, operating-point, robustness, exit-criteria
 - [ ] OTHER (7): hot-hand, dunning-kruger, calibrated-prior, i-scored-16, why-crowds, captured-company, second-brain
 - [ ] best-of-n, diversity — link where natural
 
 ---
+
+## SK-BODY FIX (2026-06-27)
+Found + fixed 5 posts published EN-body-only (no Slovak body): more-capable, a-pre-trend, robustness, calibrated-prior, i-scored. Full SK translations + h1/tldr SK spans added. Audit: 0 posts missing SK body. (First audit had off-by-one bug; thorough re-audit = prose-length check before FAQ.)
 
 ## Notes / watch for
 - **Possible near-duplicate pairs** (SEO cannibalization risk — flag, don't merge here):
