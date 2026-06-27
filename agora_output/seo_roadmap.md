@@ -65,8 +65,8 @@ Pillars: memory→adaptation-corruption-separation-law; grounding→the-most-con
 - [x] MEMORY cluster (8): law(3), eviction(3), poison-resistance(3), consolidation(3), MINJA(3), rag-rot(2), multihop(2), RAG-dead(1) — audited 0 issues
 - [x] GROUNDING cluster (8) DONE: meter, firewall, more-capable, most-confident(pillar), looked-tipping, hunted-tipping, training-on-itself, verification-tax
 - [x] CAUSAL cluster (9) DONE: phase-diagram(pillar), pre-trends x3, 95-CI, more-data, operating-point, robustness, exit-criteria
-- [ ] OTHER (7): hot-hand, dunning-kruger, calibrated-prior, i-scored-16, why-crowds, captured-company, second-brain
-- [ ] best-of-n, diversity — link where natural
+- [x] OTHER (7) DONE: hot-hand, dunning-kruger, calibrated-prior, i-scored-16, why-crowds, captured-company, second-brain
+- [x] best-of-n, diversity DONE. Phase-2 COMPLETE 32/34 (skip: passing-* canonicalized dup; deep-dive-hot-hand legacy page)
 
 ---
 
