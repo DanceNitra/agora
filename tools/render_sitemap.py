@@ -8,6 +8,12 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parent.parent
 SITE = "https://dancenitra.github.io/agora"
 
+# Slugs that canonicalize to another post (near-duplicates) — omit from the sitemap so only the
+# canonical URL is listed. The page still exists; its <link rel="canonical"> points to the survivor.
+CANONICALIZED = {
+    "passing-a-pre-trends-test-is-weak-evidence-which-difference-",  # -> pre-trends-test-weak-evidence
+}
+
 
 def build():
     urls = [(f"{SITE}/", None)]
@@ -21,7 +27,7 @@ def build():
         posts = []
     for p in posts:
         slug = p.get("slug")
-        if slug:
+        if slug and slug not in CANONICALIZED:
             urls.append((f"{SITE}/public/posts/{slug}.html", p.get("date")))
     out = ['<?xml version="1.0" encoding="UTF-8"?>',
            '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">']
