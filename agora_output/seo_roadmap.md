@@ -56,6 +56,20 @@ Cadence: ~1–2 posts/cycle. Mark `[x]` when live.
 
 ---
 
+## Phase 2 — in-content contextual links (2–3 per post, pillar-funneled, EN+SK)
+Owner-approved: quality over quota; link toward cluster pillars; keep the Related lists too.
+Tool: `tools/seo_add_inline_links.py` (NFC-robust; feed Write-tool JSON, NOT bash heredoc — heredoc
+mangles some SK chars like ľ). Anchors must be tag-free body phrases NOT duplicated in meta/JSON-LD.
+Pillars: memory→adaptation-corruption-separation-law; grounding→the-most-confident-systems-are-the-least-grounded; causal→causal-inference-phase-diagram.
+
+- [x] MEMORY cluster (8): law(3), eviction(3), poison-resistance(3), consolidation(3), MINJA(3), rag-rot(2), multihop(2), RAG-dead(1) — audited 0 issues
+- [ ] GROUNDING cluster (8): meter, firewall, more-capable, most-confident(pillar), looked-tipping, hunted-tipping, training-on-itself, verification-tax
+- [ ] CAUSAL cluster (9): phase-diagram(pillar), pre-trends x3, 95-CI, more-data, operating-point, robustness, exit-criteria
+- [ ] OTHER (7): hot-hand, dunning-kruger, calibrated-prior, i-scored-16, why-crowds, captured-company, second-brain
+- [ ] best-of-n, diversity — link where natural
+
+---
+
 ## Notes / watch for
 - **Possible near-duplicate pairs** (SEO cannibalization risk — flag, don't merge here):
   - `passing-a-pre-trends-test-is-weak-evidence-which-difference-...` vs `pre-trends-test-weak-evidence`
