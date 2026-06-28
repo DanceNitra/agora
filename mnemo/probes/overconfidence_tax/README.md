@@ -37,6 +37,21 @@ it assigned ~2% confidence to most of its wrong answers and ~77% to its right on
 frontier-true**. The value of an external verification / grounding gate is therefore inversely proportional
 to model capability — essential for small/local agents, marginal for frontier ones.
 
+### Risk–coverage (the operational view)
+
+AUROC summarizes whether confidence *ranks* correctness; risk–coverage shows what that buys you — accuracy if
+you answer only the most-confident fraction (i.e. gate/abstain on confidence):
+
+| model | answer all | most-confident ½ | most-confident ¼ | answerable @ ≥90% acc |
+|---|---|---|---|---|
+| qwen2.5:7b (weak) | 28% | 28% | 28% | ~1% |
+| qwen3-coder:30b (mid) | 15% | 15% | 15% | ~0% |
+| glm-5.2 (frontier) | 80% | 93% | 100% | 63% |
+| claude-sonnet-4-6 (frontier) | 52% | 79% | 92% | 44% |
+
+Below the frontier, gating on confidence buys nothing (28%→28%); at the frontier it lifts accuracy sharply
+and lets you answer ~half the questions at ≥90% accuracy. (Computed from the same result JSONs' raw rows.)
+
 ## Follow-up (v2): verbalized vs multi-sample confidence
 
 Prompted by a sharp r/LLMDevs comment (multi-sample / Monte-Carlo temperature-sweep confidence is more
