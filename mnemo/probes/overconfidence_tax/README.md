@@ -37,6 +37,25 @@ it assigned ~2% confidence to most of its wrong answers and ~77% to its right on
 frontier-true**. The value of an external verification / grounding gate is therefore inversely proportional
 to model capability — essential for small/local agents, marginal for frontier ones.
 
+## Follow-up (v2): verbalized vs multi-sample confidence
+
+Prompted by a sharp r/LLMDevs comment (multi-sample / Monte-Carlo temperature-sweep confidence is more
+predictive, even on small models — arXiv:2502.18389), we measured both signals on the **same** task with
+`multisample_confidence.py`: VERBALIZED = ask once for a confidence; SAMPLED = sample N=5 times at
+temperature, use answer-agreement (fraction matching the modal answer) as the confidence.
+
+| model | verbalized AUROC | **multi-sample AUROC** |
+|---|---|---|
+| qwen2.5:7b (weak) | 0.50 | **0.97** |
+| qwen3-coder:30b (mid) | 0.53 | **0.98** |
+
+So small models **do** carry a usable correctness signal — it just lives in their **answer-consistency
+across samples**, not in their verbalized self-report. This sharpens the headline rather than contradicting
+it: the finding is scoped to *verbalized single-shot* confidence (the cheap signal an agent gate reads); if
+you can afford N samples, consistency recovers discrimination. (Caveat: accuracy on these hard items is low,
+so the AUROC rests on few correct cases — directional, consistent across both models. Result JSONs include
+raw rows.)
+
 ## Run it
 
 ```bash
