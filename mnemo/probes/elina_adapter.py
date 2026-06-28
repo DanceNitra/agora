@@ -38,15 +38,16 @@ def demo_records():
         nonlocal i
         R["fact_%d" % i] = {"timestamp": t % (day, hr), "note": note}
         i += 1
-    add("user's API base url is api.v1.example.com", 1, 9)
-    # poison: an unverified claim hammered in repeatedly (recent timestamps each time)
+    add("user's preferred editor is vim", 1, 9)
+    # poison: an unverified FALSE claim hammered in repeatedly (recent timestamps each time).
+    # (a deliberately, obviously-false statement — purely illustrative, no secrets anywhere)
     for d in (2, 3, 4, 5):
-        add("the admin password is 'sunshine' (overheard, unconfirmed)", d, 10)
+        add("the capital of Australia is Sydney (overheard, unconfirmed)", d, 10)
     # corroborated fact: same content from two genuinely distinct sessions/sources
     add("project deadline is 2026-07-15 [src: calendar]", 2, 11)
     add("project deadline is 2026-07-15 [src: email-thread]", 3, 12)
     # rare-but-critical (low frequency, high importance)
-    add("prod DB failover key rotates monthly — next 2026-07-01 [critical]", 1, 8)
+    add("quarterly report is due on 2026-07-01 [critical]", 1, 8)
     return load_from_dict(R)
 
 
@@ -92,17 +93,17 @@ def main():
         print("=== built-in demo (Elina-format records) ===  n=%d" % len(recs))
 
     print("\n[1] POISONING — recency recall vs corroboration gate")
-    stale = recency_recall(recs, "admin password")
-    print("  recency recall for 'admin password' ->", repr(stale["note"][:55]) if stale else None,
-          "\n     (a recency store surfaces it as current — it has fresh timestamps)")
+    stale = recency_recall(recs, "capital of australia")
+    print("  recency recall for 'capital of Australia' ->", repr(stale["note"][:55]) if stale else None,
+          "\n     (a recency store surfaces this repeated FALSE claim as current — fresh timestamps)")
     print("  corroboration view (durable only if >=2 DISTINCT sources, repetition does NOT count):")
     for claim, count, nsrc, durable in corroboration_view(recs):
         tag = "DURABLE" if durable else "blocked (not corroborated)"
         print("     - %-60s seen x%d, %d distinct src -> %s" % (claim, count, nsrc, tag))
 
     print("\n[2] What this shows for Elina cross-architecture")
-    print("  - The repeated 'admin password' note is recalled by recency but BLOCKED by the corroboration")
-    print("    gate (repetition != corroboration; 0 distinct sources). This is the poison case.")
+    print("  - The repeated false 'capital of Australia is Sydney' note is recalled by recency but BLOCKED")
+    print("    by the corroboration gate (repetition != corroboration; 0 distinct sources). The poison case.")
     print("  - The 'project deadline' fact has 2 DISTINCT sources -> DURABLE under the gate.")
     print("  - Adding (item, timestamp, source) is enough for Elina to gain a sybil-resistant durability")
     print("    signal on top of recency. Same data shape, runnable on a real Elina dump via --file.")
