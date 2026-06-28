@@ -464,7 +464,13 @@ async def promote_findings(request: Request, n: int = 16):
         title = (r["title"] or "").strip()
         content = (r["content"] or "").strip()
         tl = title.lower()
-        if (title in _PROMOTED or len(content) < 160 or "Source:" not in content
+        # GROUNDED = a real citation ("Source:") OR a Lab-measured result (MEASURED:/VERDICT:) — the
+        # latter is grounded by its own measurement, not a paper, and was previously rejected outright
+        # (the bug that blocked ALL Lab findings from the vault: 0 notes/day). The LLM judge + novelty
+        # gate downstream still ration quality.
+        _cu = content.upper()
+        _grounded = ("Source:" in content) or ("MEASURED:" in _cu and "VERDICT:" in _cu)
+        if (title in _PROMOTED or len(content) < 160 or not _grounded
                 or tl.count("hypothesize on:") >= 2 or tl.count("pursue direction:") >= 2):
             continue
         if _INTENT_PROMO.match(title) or _INTENT_PROMO.match(content) or _NEGATIVE_PROMO.search(content):
