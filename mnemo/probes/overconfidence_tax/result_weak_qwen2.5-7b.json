@@ -1,0 +1,850 @@
+[
+  {
+    "model": "qwen2.5:7b",
+    "n": 80,
+    "n_clean": 71,
+    "n_parse_fail": 1,
+    "n_answered_no_conf": 8,
+    "accuracy_answered": 0.253,
+    "accuracy_clean": 0.282,
+    "mean_conf_clean": 1.0,
+    "overconfidence_clean": 0.718,
+    "conf_AUROC_clean": 0.5,
+    "n_wrong_clean": 51,
+    "by_penalty": {
+      "c=1.0": {
+        "tau_star": 0.5,
+        "util_at_tau_on_conf": -31.0,
+        "best_thresh": 1.0,
+        "best_util": 0.0,
+        "abstain_all_is_best": true,
+        "overconfidence_tax": 31.0,
+        "oracle_util": 20.0,
+        "confidence_gap_vs_oracle": 20.0
+      },
+      "c=2.0": {
+        "tau_star": 0.667,
+        "util_at_tau_on_conf": -82.0,
+        "best_thresh": 1.0,
+        "best_util": 0.0,
+        "abstain_all_is_best": true,
+        "overconfidence_tax": 82.0,
+        "oracle_util": 20.0,
+        "confidence_gap_vs_oracle": 20.0
+      },
+      "c=4.0": {
+        "tau_star": 0.8,
+        "util_at_tau_on_conf": -184.0,
+        "best_thresh": 1.0,
+        "best_util": 0.0,
+        "abstain_all_is_best": true,
+        "overconfidence_tax": 184.0,
+        "oracle_util": 20.0,
+        "confidence_gap_vs_oracle": 20.0
+      }
+    },
+    "secs": 36.0,
+    "rows": [
+      {
+        "level": 1,
+        "correct": 1,
+        "conf": 1.0,
+        "ans_ok": true,
+        "conf_ok": true,
+        "_ans": 3,
+        "_gold": 3,
+        "_expr": "7 - 4"
+      },
+      {
+        "level": 2,
+        "correct": 0,
+        "conf": 1.0,
+        "ans_ok": true,
+        "conf_ok": true,
+        "_ans": 721,
+        "_gold": 691,
+        "_expr": "85 * 8 + 11"
+      },
+      {
+        "level": 4,
+        "correct": 0,
+        "conf": 1.0,
+        "ans_ok": true,
+        "conf_ok": true,
+        "_ans": 52005259,
+        "_gold": 48701627,
+        "_expr": "1410 + 7106 * 6853 - 1146 + 3945"
+      },
+      {
+        "level": 3,
+        "correct": 0,
+        "conf": 1.0,
+        "ans_ok": true,
+        "conf_ok": true,
+        "_ans": 100,
+        "_gold": 225842,
+        "_expr": "376 * 598 + 61 + 933"
+      },
+      {
+        "level": 2,
+        "correct": 0,
+        "conf": null,
+        "ans_ok": true,
+        "conf_ok": false,
+        "_ans": 2144,
+        "_gold": 2164,
+        "_expr": "19 + 39 * 55"
+      },
+      {
+        "level": 3,
+        "correct": 0,
+        "conf": 1.0,
+        "ans_ok": true,
+        "conf_ok": true,
+        "_ans": 71549,
+        "_gold": 72384,
+        "_expr": "122 * 586 + 317 + 575"
+      },
+      {
+        "level": 1,
+        "correct": 1,
+        "conf": 1.0,
+        "ans_ok": true,
+        "conf_ok": true,
+        "_ans": 10,
+        "_gold": 10,
+        "_expr": "5 * 2"
+      },
+      {
+        "level": 5,
+        "correct": 0,
+        "conf": 1.0,
+        "ans_ok": true,
+        "conf_ok": true,
+        "_ans": 30957555455,
+        "_gold": 39251761622317,
+        "_expr": "74117 + 16228 * 29262 * 82659 - 82240 + 76416"
+      },
+      {
+        "level": 4,
+        "correct": 0,
+        "conf": 1.0,
+        "ans_ok": true,
+        "conf_ok": true,
+        "_ans": 27947548000,
+        "_gold": 274748216594,
+        "_expr": "9530 * 9360 * 3080 + 6103 * 1598"
+      },
+      {
+        "level": 5,
+        "correct": 0,
+        "conf": 1.0,
+        "ans_ok": true,
+        "conf_ok": true,
+        "_ans": -565445564,
+        "_gold": -5803129458,
+        "_expr": "7814 - 81136 - 26997 - 65068 * 89183 - 69695"
+      },
+      {
+        "level": 1,
+        "correct": 1,
+        "conf": 1.0,
+        "ans_ok": true,
+        "conf_ok": true,
+        "_ans": 13,
+        "_gold": 13,
+        "_expr": "7 + 6"
+      },
+      {
+        "level": 2,
+        "correct": 0,
+        "conf": 1.0,
+        "ans_ok": true,
+        "conf_ok": true,
+        "_ans": 3082,
+        "_gold": 3028,
+        "_expr": "25 + 91 * 33"
+      },
+      {
+        "level": 3,
+        "correct": 0,
+        "conf": 1.0,
+        "ans_ok": true,
+        "conf_ok": true,
+        "_ans": -275201,
+        "_gold": -274401,
+        "_expr": "309 - 539 * 508 - 898"
+      },
+      {
+        "level": 4,
+        "correct": 0,
+        "conf": null,
+        "ans_ok": true,
+        "conf_ok": false,
+        "_ans": 100,
+        "_gold": 2394,
+        "_expr": "4719 - 9979 + 1201 - 1936 + 8389"
+      },
+      {
+        "level": 5,
+        "correct": 0,
+        "conf": 1.0,
+        "ans_ok": true,
+        "conf_ok": true,
+        "_ans": 264390279,
+        "_gold": 2651300094,
+        "_expr": "64091 * 55274 - 5140 - 87586 * 10175 - 73150"
+      },
+      {
+        "level": 1,
+        "correct": 1,
+        "conf": 1.0,
+        "ans_ok": true,
+        "conf_ok": true,
+        "_ans": 18,
+        "_gold": 18,
+        "_expr": "9 + 9"
+      },
+      {
+        "level": 2,
+        "correct": 0,
+        "conf": null,
+        "ans_ok": true,
+        "conf_ok": false,
+        "_ans": 16848,
+        "_gold": 29016,
+        "_expr": "13 * 36 * 62"
+      },
+      {
+        "level": 3,
+        "correct": 0,
+        "conf": 1.0,
+        "ans_ok": true,
+        "conf_ok": true,
+        "_ans": -311992,
+        "_gold": -34559932,
+        "_expr": "68 - 64 * 750 * 720"
+      },
+      {
+        "level": 4,
+        "correct": 0,
+        "conf": 1.0,
+        "ans_ok": true,
+        "conf_ok": true,
+        "_ans": 9356620,
+        "_gold": 2106194,
+        "_expr": "7303 - 4664 - 6322 + 5687 * 371"
+      },
+      {
+        "level": 5,
+        "correct": 0,
+        "conf": 1.0,
+        "ans_ok": true,
+        "conf_ok": true,
+        "_ans": 999771636,
+        "_gold": 993173636,
+        "_expr": "15349 * 64711 + 7729 - 28602 - 37676 - 16954"
+      },
+      {
+        "level": 1,
+        "correct": 1,
+        "conf": 1.0,
+        "ans_ok": true,
+        "conf_ok": true,
+        "_ans": -1,
+        "_gold": -1,
+        "_expr": "3 - 4"
+      },
+      {
+        "level": 2,
+        "correct": 0,
+        "conf": null,
+        "ans_ok": false,
+        "conf_ok": false,
+        "_ans": null,
+        "_gold": 88,
+        "_expr": "53 + 72 - 37"
+      },
+      {
+        "level": 3,
+        "correct": 0,
+        "conf": 1.0,
+        "ans_ok": true,
+        "conf_ok": true,
+        "_ans": -207189,
+        "_gold": -207754,
+        "_expr": "886 - 565 - 287 * 725"
+      },
+      {
+        "level": 4,
+        "correct": 0,
+        "conf": 1.0,
+        "ans_ok": true,
+        "conf_ok": true,
+        "_ans": 3803552,
+        "_gold": 3380020,
+        "_expr": "6235 + 3782 + 2474 * 1361 + 2889"
+      },
+      {
+        "level": 5,
+        "correct": 0,
+        "conf": 1.0,
+        "ans_ok": true,
+        "conf_ok": true,
+        "_ans": -855772345,
+        "_gold": -823079466,
+        "_expr": "1583 + 63567 + 77219 - 23902 * 34440 - 36955"
+      },
+      {
+        "level": 1,
+        "correct": 1,
+        "conf": 1.0,
+        "ans_ok": true,
+        "conf_ok": true,
+        "_ans": 28,
+        "_gold": 28,
+        "_expr": "7 * 4"
+      },
+      {
+        "level": 2,
+        "correct": 0,
+        "conf": 1.0,
+        "ans_ok": true,
+        "conf_ok": true,
+        "_ans": 100,
+        "_gold": 461295,
+        "_expr": "67 * 81 * 85"
+      },
+      {
+        "level": 3,
+        "correct": 0,
+        "conf": null,
+        "ans_ok": true,
+        "conf_ok": false,
+        "_ans": 22371875,
+        "_gold": 24673666,
+        "_expr": "57 * 469 * 923 - 893"
+      },
+      {
+        "level": 4,
+        "correct": 0,
+        "conf": 1.0,
+        "ans_ok": true,
+        "conf_ok": true,
+        "_ans": 4230000,
+        "_gold": 42650504,
+        "_expr": "6523 * 6538 - 6459 + 1698 + 7891"
+      },
+      {
+        "level": 5,
+        "correct": 0,
+        "conf": 1.0,
+        "ans_ok": true,
+        "conf_ok": true,
+        "_ans": 649000000,
+        "_gold": 883981545,
+        "_expr": "8829 * 27365 + 57755 + 21275 + 14410 * 44573"
+      },
+      {
+        "level": 1,
+        "correct": 1,
+        "conf": 1.0,
+        "ans_ok": true,
+        "conf_ok": true,
+        "_ans": 14,
+        "_gold": 14,
+        "_expr": "4 + 10"
+      },
+      {
+        "level": 2,
+        "correct": 1,
+        "conf": 1.0,
+        "ans_ok": true,
+        "conf_ok": true,
+        "_ans": 133,
+        "_gold": 133,
+        "_expr": "48 + 80 + 5"
+      },
+      {
+        "level": 3,
+        "correct": 0,
+        "conf": 1.0,
+        "ans_ok": true,
+        "conf_ok": true,
+        "_ans": -99451,
+        "_gold": -100011,
+        "_expr": "630 - 387 - 154 * 651"
+      },
+      {
+        "level": 4,
+        "correct": 0,
+        "conf": 1.0,
+        "ans_ok": true,
+        "conf_ok": true,
+        "_ans": -12831,
+        "_gold": -13705,
+        "_expr": "5968 - 7770 - 2014 - 1891 - 7998"
+      },
+      {
+        "level": 5,
+        "correct": 0,
+        "conf": 1.0,
+        "ans_ok": true,
+        "conf_ok": true,
+        "_ans": 2936845275,
+        "_gold": 3041967834,
+        "_expr": "11259 - 18891 - 13395 * 98263 + 44911 * 97041"
+      },
+      {
+        "level": 1,
+        "correct": 1,
+        "conf": 1.0,
+        "ans_ok": true,
+        "conf_ok": true,
+        "_ans": 10,
+        "_gold": 10,
+        "_expr": "2 * 5"
+      },
+      {
+        "level": 2,
+        "correct": 1,
+        "conf": 1.0,
+        "ans_ok": true,
+        "conf_ok": true,
+        "_ans": 1050,
+        "_gold": 1050,
+        "_expr": "48 * 20 + 90"
+      },
+      {
+        "level": 3,
+        "correct": 0,
+        "conf": 1.0,
+        "ans_ok": true,
+        "conf_ok": true,
+        "_ans": 169001,
+        "_gold": 166512,
+        "_expr": "778 + 542 * 307 - 660"
+      },
+      {
+        "level": 4,
+        "correct": 0,
+        "conf": 1.0,
+        "ans_ok": true,
+        "conf_ok": true,
+        "_ans": 54757034758,
+        "_gold": 814826893116248,
+        "_expr": "8495 * 6010 * 2738 * 5829 - 3652"
+      },
+      {
+        "level": 5,
+        "correct": 0,
+        "conf": 1.0,
+        "ans_ok": true,
+        "conf_ok": true,
+        "_ans": -1549106327,
+        "_gold": -1547102807,
+        "_expr": "83421 - 29236 * 80379 + 99396 + 25580 * 31379"
+      },
+      {
+        "level": 1,
+        "correct": 0,
+        "conf": null,
+        "ans_ok": true,
+        "conf_ok": false,
+        "_ans": 100,
+        "_gold": 63,
+        "_expr": "9 * 7"
+      },
+      {
+        "level": 2,
+        "correct": 0,
+        "conf": 1.0,
+        "ans_ok": true,
+        "conf_ok": true,
+        "_ans": -42,
+        "_gold": -37,
+        "_expr": "5 - 5 - 37"
+      },
+      {
+        "level": 3,
+        "correct": 0,
+        "conf": 1.0,
+        "ans_ok": true,
+        "conf_ok": true,
+        "_ans": -609212,
+        "_gold": -609712,
+        "_expr": "200 - 711 - 621 * 981"
+      },
+      {
+        "level": 4,
+        "correct": 0,
+        "conf": 1.0,
+        "ans_ok": true,
+        "conf_ok": true,
+        "_ans": 9434,
+        "_gold": 12322,
+        "_expr": "5728 + 5976 - 1321 + 3614 - 1675"
+      },
+      {
+        "level": 5,
+        "correct": 0,
+        "conf": 1.0,
+        "ans_ok": true,
+        "conf_ok": true,
+        "_ans": 100,
+        "_gold": -4832485270,
+        "_expr": "26789 * 63264 - 81799 * 79990 + 252 * 62847"
+      },
+      {
+        "level": 1,
+        "correct": 1,
+        "conf": 1.0,
+        "ans_ok": true,
+        "conf_ok": true,
+        "_ans": 24,
+        "_gold": 24,
+        "_expr": "3 * 8"
+      },
+      {
+        "level": 2,
+        "correct": 0,
+        "conf": null,
+        "ans_ok": true,
+        "conf_ok": false,
+        "_ans": 162,
+        "_gold": 62,
+        "_expr": "98 + 27 - 63"
+      },
+      {
+        "level": 3,
+        "correct": 0,
+        "conf": 1.0,
+        "ans_ok": true,
+        "conf_ok": true,
+        "_ans": 523725,
+        "_gold": 528498,
+        "_expr": "810 * 653 - 342 - 90"
+      },
+      {
+        "level": 4,
+        "correct": 0,
+        "conf": 1.0,
+        "ans_ok": true,
+        "conf_ok": true,
+        "_ans": 7359554,
+        "_gold": 7263236,
+        "_expr": "6578 + 1393 + 2604 * 2787 - 2083"
+      },
+      {
+        "level": 5,
+        "correct": 0,
+        "conf": 1.0,
+        "ans_ok": true,
+        "conf_ok": true,
+        "_ans": 40577755725775,
+        "_gold": 389277263797692,
+        "_expr": "85966 - 19161 + 80162 * 78103 * 62176 + 86151"
+      },
+      {
+        "level": 1,
+        "correct": 1,
+        "conf": 1.0,
+        "ans_ok": true,
+        "conf_ok": true,
+        "_ans": 4,
+        "_gold": 4,
+        "_expr": "2 * 2"
+      },
+      {
+        "level": 2,
+        "correct": 1,
+        "conf": 1.0,
+        "ans_ok": true,
+        "conf_ok": true,
+        "_ans": 1344,
+        "_gold": 1344,
+        "_expr": "85 * 15 + 69"
+      },
+      {
+        "level": 3,
+        "correct": 0,
+        "conf": 1.0,
+        "ans_ok": true,
+        "conf_ok": true,
+        "_ans": 614,
+        "_gold": 694,
+        "_expr": "446 + 894 + 201 - 847"
+      },
+      {
+        "level": 4,
+        "correct": 0,
+        "conf": 1.0,
+        "ans_ok": true,
+        "conf_ok": true,
+        "_ans": -35712325,
+        "_gold": -32386569,
+        "_expr": "3488 - 4801 - 8213 * 3942 - 9610"
+      },
+      {
+        "level": 5,
+        "correct": 0,
+        "conf": null,
+        "ans_ok": true,
+        "conf_ok": false,
+        "_ans": 13757756343,
+        "_gold": 13301723022371,
+        "_expr": "17182 * 7984 * 96985 - 46373 * 60054 + 86833"
+      },
+      {
+        "level": 1,
+        "correct": 1,
+        "conf": 1.0,
+        "ans_ok": true,
+        "conf_ok": true,
+        "_ans": 40,
+        "_gold": 40,
+        "_expr": "10 * 4"
+      },
+      {
+        "level": 2,
+        "correct": 0,
+        "conf": 1.0,
+        "ans_ok": true,
+        "conf_ok": true,
+        "_ans": 327,
+        "_gold": 299,
+        "_expr": "67 + 4 * 58"
+      },
+      {
+        "level": 3,
+        "correct": 0,
+        "conf": 1.0,
+        "ans_ok": true,
+        "conf_ok": true,
+        "_ans": 1403,
+        "_gold": 1467,
+        "_expr": "6 + 796 + 820 - 155"
+      },
+      {
+        "level": 4,
+        "correct": 0,
+        "conf": 1.0,
+        "ans_ok": true,
+        "conf_ok": true,
+        "_ans": 100,
+        "_gold": 18225683383,
+        "_expr": "1973 * 9119 * 1013 - 5342 + 8494"
+      },
+      {
+        "level": 5,
+        "correct": 0,
+        "conf": 1.0,
+        "ans_ok": true,
+        "conf_ok": true,
+        "_ans": -669625768,
+        "_gold": -667500846,
+        "_expr": "73441 + 7449 * 32572 - 25076 * 36298 + 5533"
+      },
+      {
+        "level": 1,
+        "correct": 1,
+        "conf": 1.0,
+        "ans_ok": true,
+        "conf_ok": true,
+        "_ans": -6,
+        "_gold": -6,
+        "_expr": "3 - 9"
+      },
+      {
+        "level": 2,
+        "correct": 0,
+        "conf": null,
+        "ans_ok": true,
+        "conf_ok": false,
+        "_ans": 100,
+        "_gold": 5359,
+        "_expr": "80 * 66 + 79"
+      },
+      {
+        "level": 3,
+        "correct": 0,
+        "conf": 1.0,
+        "ans_ok": true,
+        "conf_ok": true,
+        "_ans": 19935,
+        "_gold": -40095,
+        "_expr": "711 * 285 - 465 * 522"
+      },
+      {
+        "level": 4,
+        "correct": 0,
+        "conf": 1.0,
+        "ans_ok": true,
+        "conf_ok": true,
+        "_ans": -10002,
+        "_gold": -6108,
+        "_expr": "4059 - 8574 + 4255 - 9169 + 3321"
+      },
+      {
+        "level": 5,
+        "correct": 0,
+        "conf": 1.0,
+        "ans_ok": true,
+        "conf_ok": true,
+        "_ans": 3670571840,
+        "_gold": 836607563,
+        "_expr": "51429 - 57951 + 41418 + 9510 * 87971 - 31543"
+      },
+      {
+        "level": 1,
+        "correct": 1,
+        "conf": 1.0,
+        "ans_ok": true,
+        "conf_ok": true,
+        "_ans": 12,
+        "_gold": 12,
+        "_expr": "3 * 4"
+      },
+      {
+        "level": 2,
+        "correct": 1,
+        "conf": 1.0,
+        "ans_ok": true,
+        "conf_ok": true,
+        "_ans": 122,
+        "_gold": 122,
+        "_expr": "84 + 86 - 48"
+      },
+      {
+        "level": 3,
+        "correct": 0,
+        "conf": 1.0,
+        "ans_ok": true,
+        "conf_ok": true,
+        "_ans": 141970,
+        "_gold": 142250,
+        "_expr": "906 + 142 * 992 + 480"
+      },
+      {
+        "level": 4,
+        "correct": 0,
+        "conf": 1.0,
+        "ans_ok": true,
+        "conf_ok": true,
+        "_ans": 100,
+        "_gold": 42328225,
+        "_expr": "6527 * 7985 - 2669 * 3667 - 2647"
+      },
+      {
+        "level": 5,
+        "correct": 0,
+        "conf": 1.0,
+        "ans_ok": true,
+        "conf_ok": true,
+        "_ans": 1949622850,
+        "_gold": 1949903050,
+        "_expr": "44450 * 55219 - 25658 + 46744 - 41751 * 12086"
+      },
+      {
+        "level": 1,
+        "correct": 1,
+        "conf": 1.0,
+        "ans_ok": true,
+        "conf_ok": true,
+        "_ans": 81,
+        "_gold": 81,
+        "_expr": "9 * 9"
+      },
+      {
+        "level": 2,
+        "correct": 0,
+        "conf": 1.0,
+        "ans_ok": true,
+        "conf_ok": true,
+        "_ans": 8712,
+        "_gold": 8976,
+        "_expr": "4 * 51 * 44"
+      },
+      {
+        "level": 3,
+        "correct": 0,
+        "conf": 1.0,
+        "ans_ok": true,
+        "conf_ok": true,
+        "_ans": 1892,
+        "_gold": 1882,
+        "_expr": "304 + 526 + 985 + 67"
+      },
+      {
+        "level": 4,
+        "correct": 0,
+        "conf": 1.0,
+        "ans_ok": true,
+        "conf_ok": true,
+        "_ans": -12348435,
+        "_gold": -1932917,
+        "_expr": "1379 - 4353 + 4457 - 650 * 2976"
+      },
+      {
+        "level": 5,
+        "correct": 0,
+        "conf": 1.0,
+        "ans_ok": true,
+        "conf_ok": true,
+        "_ans": -1099918553,
+        "_gold": -1041842343,
+        "_expr": "33898 - 53210 * 19579 - 70335 + 67475 - 74791"
+      },
+      {
+        "level": 1,
+        "correct": 1,
+        "conf": 1.0,
+        "ans_ok": true,
+        "conf_ok": true,
+        "_ans": -2,
+        "_gold": -2,
+        "_expr": "2 - 4"
+      },
+      {
+        "level": 2,
+        "correct": 1,
+        "conf": 1.0,
+        "ans_ok": true,
+        "conf_ok": true,
+        "_ans": 400,
+        "_gold": 400,
+        "_expr": "11 * 36 + 4"
+      },
+      {
+        "level": 3,
+        "correct": 0,
+        "conf": 1.0,
+        "ans_ok": true,
+        "conf_ok": true,
+        "_ans": 333,
+        "_gold": 553,
+        "_expr": "822 + 268 + 87 - 624"
+      },
+      {
+        "level": 4,
+        "correct": 0,
+        "conf": 1.0,
+        "ans_ok": true,
+        "conf_ok": true,
+        "_ans": -10428458,
+        "_gold": -1057956,
+        "_expr": "1995 - 7436 - 191 * 5558 + 9063"
+      },
+      {
+        "level": 5,
+        "correct": 0,
+        "conf": 1.0,
+        "ans_ok": true,
+        "conf_ok": true,
+        "_ans": 73863,
+        "_gold": 54041,
+        "_expr": "5665 - 69065 + 93002 + 31254 + 14348 - 21163"
+      }
+    ]
+  }
+]
