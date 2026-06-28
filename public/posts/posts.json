@@ -14,6 +14,20 @@
   "bilingual": true
  },
  {
+  "slug": "can-an-llm-trust-its-own-confidence",
+  "title": "When can an AI trust its own confidence? Only frontier",
+  "title_sk": "Kedy môže AI veriť vlastnej istote? Len na frontieri",
+  "desc": "Should an agent use its own confidence to decide when to answer vs abstain? We measured it on a contamination-free task. Whether confidence predicts correctness (AUROC) is a coin-flip (0.50) for weak and mid models but 0.73-0.90 for frontier models. Self-confidence-based abstention is weak-model-false, frontier-true. Runnable probe + raw data included.",
+  "desc_sk": "Má agent použiť vlastnú istotu na rozhodnutie kedy odpovedať vs zdržať sa? Odmerali sme to na úlohe odolnej voči kontaminácii. Či istota predpovedá správnosť (AUROC) je hod mincou (0,50) pri slabých a stredných modeloch, ale 0,73-0,90 pri frontier modeloch. Abstinencia podľa vlastnej istoty je pre slabé modely nepravda, pre frontier pravda. Spustiteľný probe + surové dáta priložené.",
+  "date": "2026-06-28",
+  "tags": "agent reasoning · calibration · selective prediction · abstention · LLM confidence · severe-tested",
+  "tags_sk": "uvažovanie agentov · kalibrácia · selektívna predikcia · abstinencia · istota LLM · prísne testované",
+  "kicker": "Measured folklore",
+  "kicker_sk": "Meraný folklór",
+  "read": 6,
+  "bilingual": true
+ },
+ {
   "slug": "agent-memory-poisoning-corroboration-gate",
   "title": "Can corroboration stop AI-agent memory poisoning? Measured",
   "title_sk": "Zastaví corroboration otravu pamäte AI agentov? Odmerané",
