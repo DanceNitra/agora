@@ -10,7 +10,7 @@ import os, re, sys, json, urllib.request
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 REPO = os.environ.get("RAMR_REPO_DIR", "C:/Users/Danculus/ramr-pub")
-ZIP = os.path.join(REPO, "ramr-v0.1.1.zip")
+ZIP = os.path.join(REPO, "ramr-v0.4.1.zip")
 SANDBOX = "--sandbox" in sys.argv
 BASE = "https://sandbox.zenodo.org" if SANDBOX else "https://zenodo.org"
 FILES = [ZIP, os.path.join(REPO, "README.md"), os.path.join(REPO, "CITATION.cff")]
@@ -19,15 +19,20 @@ META = {"metadata": {
     "title": "RAMR — Retrieval-Augmented Memory Reliability",
     "upload_type": "software",
     "description": ("RAMR is a contamination-resistant synthetic benchmark for agentic-RAG / memory systems. "
-                    "It isolates six failure modes with pre-registered falsifiers and bootstrap confidence "
+                    "It isolates nine failure modes with pre-registered falsifiers and bootstrap confidence "
                     "intervals: CONVERSION (does complete retrieval convert to a correct multi-hop answer), "
                     "CHAIN-FRAGILITY (cost of one missing hop), DISTRACTION (cost of irrelevant/look-alike facts), "
                     "FACT-RETENTION (does a compiled/summarized memory tier drop facts under a fixed budget), "
-                    "OUTCOME-RANKED-RECALL (does ranking recall by was-it-right beat was-it-recalled), and "
+                    "OUTCOME-RANKED-RECALL (does ranking recall by was-it-right beat was-it-recalled), "
                     "FORGET-PRECISION (after a fact is updated, does recall return the current value or the stale "
-                    "one). Ships a "
+                    "one), COMPRESSION-vs-RAW (does a compiled summary beat the raw noisy context, or only lose to "
+                    "it), OPERATIONAL-CONTINUITY (on resume after compaction, is an already-completed action "
+                    "re-executed), and TEMPORAL-AS-OF (out-of-order ingest: supersession resolves by validity-time, "
+                    "not arrival order). Also ships a reusable Folklore Meter probe (scores any AI-engineering "
+                    "folklore claim against a runnable test) and a shared sha256-pinned RAMR-LS evidence-fixture "
+                    "set. Includes a "
                     "frozen sha256-pinned dataset, a single runner, independent baselines (scikit-learn cosine; "
-                    "SQLite FTS5/BM25 and dense-vector retrieval), and a number-verification ledger. v0.1 is a "
+                    "SQLite FTS5/BM25 and dense-vector retrieval), and a number-verification ledger. A "
                     "findings+method release; numbers are synthetic and directional. Code: "
                     "https://github.com/DanceNitra/ramr"),
     "creators": [{"name": "Agora"}],
@@ -35,7 +40,7 @@ META = {"metadata": {
                  "vector-search", "consolidation"],
     "license": "MIT",
     "access_right": "open",
-    "version": "0.1.1",
+    "version": "0.4.1",
     "related_identifiers": [
         {"relation": "isSupplementTo", "identifier": "https://github.com/DanceNitra/ramr", "scheme": "url"}],
 }}

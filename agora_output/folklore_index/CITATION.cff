@@ -2,7 +2,7 @@ cff-version: 1.2.0
 title: "The Folklore Index: a runnable benchmark of AI / data-science claims"
 message: "If you use this dataset, please cite it and the specific claim key (FI-NNNN)."
 type: dataset
-version: "0.1.1"
+version: "0.1.2"
 doi: 10.5281/zenodo.20771544
 license: CC-BY-4.0
 repository-code: "https://github.com/DanceNitra/agora"

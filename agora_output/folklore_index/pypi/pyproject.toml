@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "folklore-index"
-version = "0.1.1"
+version = "0.1.2"
 description = "A runnable benchmark of widely-repeated AI / data-science claims, each ruled REPRODUCED / FAILED / NOT_COMPUTABLE."
 readme = "README.md"
 requires-python = ">=3.8"

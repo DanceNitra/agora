@@ -1,6 +1,6 @@
 {
  "name": "The Folklore Index",
- "version": "0.1.1",
+ "version": "0.1.2",
  "doi": "10.5281/zenodo.20771544",
  "description": "A standing, machine-readable benchmark of widely-repeated AI / data-science claims, each rebuilt as the smallest runnable test and ruled REPRODUCED / FAILED / NOT_COMPUTABLE. Honest, citable receipts for the field's folklore.",
  "homepage": "https://dancenitra.github.io/agora/public/crucible/",
@@ -19,14 +19,14 @@
   "date": "YYYY-MM-DD"
  },
  "counts": {
-  "total": 60,
+  "total": 73,
   "by_verdict": {
-   "FAILED": 14,
-   "NOT_COMPUTABLE": 14,
-   "REPRODUCED": 32
+   "FAILED": 15,
+   "NOT_COMPUTABLE": 15,
+   "REPRODUCED": 43
   },
   "by_domain": {
-   "replication": 51,
+   "replication": 64,
    "ai-claim": 9
   },
   "runnable_code_present": 9
@@ -751,6 +751,162 @@
    "code_resolves": true,
    "date": "2026-06-20",
    "key": "FI-0060"
+  },
+  {
+   "domain": "replication",
+   "claim": "Cosine similarity cannot distinguish a superseded fact from its replacement (the 'supersession blind spot'); a deterministic (subject, relation, object) ledger removes stale-fact recall.",
+   "source": "Temporal Validity in Retrieval Memory: Eliminating Stale-Fact Errors (Yadav, MemStrata, arXiv:2606.26511)",
+   "verdict": "REPRODUCED",
+   "note": "Replicated on local nomic (24 subject-relation-object facts, mean-centered): the cosine 'is-this-a-supersession' classifier scores AUROC 0.613 (chance 0.5; Yadav ~0.59) -- a contradiction is often MORE embedding-similar to the original than a genuine rephrase (10/24 cases). A pure-cosine top-1 store served the stale value 41.7% of the time; a deterministic (subject,relation,object) supersession key drove that to 0% (shipped in mnemo v0.2.0). Falsifier: if the key did not cut stale below cosine it would be useless -- it did. Honest scope: synthetic, 24 facts, characterizes the mechanism, not a product benchmark.",
+   "lab_file": "",
+   "code_url": "",
+   "code_resolves": false,
+   "date": "2026-06-28",
+   "key": "FI-0061"
+  },
+  {
+   "domain": "replication",
+   "claim": "Episodic memory (Model-Free Episodic Control: store the MAX observed discounted return per state-action) gives sample-efficient RL vs incremental parametric value learning.",
+   "source": "Sarrico, Arulkumaran, Agostinelli et al. - Sample-Efficient Reinforcement Learning with Maximum Entropy Mellowmax Episodic Control",
+   "verdict": "REPRODUCED",
+   "note": "Smallest model of the mechanism; exploration HELD IDENTICAL (both learners fed the same uniform-random trajectories off-policy, so the only difference is credit assignment). Exp A (deterministic chain + step cost): EC reaches a goal-reachin",
+   "lab_file": "",
+   "code_url": "",
+   "code_resolves": false,
+   "date": "2026-06-26",
+   "key": "FI-0062"
+  },
+  {
+   "domain": "replication",
+   "claim": "The SIS epidemic threshold disappears for a power-law degree distribution with exponent 2 < rho <= 3.",
+   "source": "Jones & Handcock 2003 (mechanism: Pastor-Satorras & Vespignani 2001)",
+   "verdict": "REPRODUCED",
+   "note": "HMF threshold lambda_c=<k>/<k^2> over growing N with structural cutoff k_max~N^(1/(rho-1)). 2<rho<=3: lambda_c->0 (rho=2.3/2.5 final 0.0000/0.0008; rho=3.0 marginal/log-slow 0.106->0.042). rho>3 bounded (3.5/4.0 -> 0.134/0.196). Determinist",
+   "lab_file": "",
+   "code_url": "",
+   "code_resolves": false,
+   "date": "2026-06-25",
+   "key": "FI-0063"
+  },
+  {
+   "domain": "replication",
+   "claim": "Stochastic gradient descent has slow asymptotic convergence due to the inherent variance of the stochastic gradient; SVRG's control variate removes it -> linear convergence.",
+   "source": "Accelerating SGD using Predictive Variance Reduction (Johnson & Zhang, 2013)",
+   "verdict": "REPRODUCED",
+   "note": "Row-normalized L2-logistic, kappa 1.7-67, same eta=0.5. Const-step SGD plateaus at ~2.5e-2 variance floor; SVRG -> machine precision (3/3). Caveat: needs inner-loop m >~ kappa (advantage gone at kappa~6e4 >> m=n).",
+   "lab_file": "",
+   "code_url": "",
+   "code_resolves": false,
+   "date": "2026-06-24",
+   "key": "FI-0064"
+  },
+  {
+   "domain": "replication",
+   "claim": "MemGPT-style paging memory keeps QA accuracy FLAT as the corpus/context scales (0->700 docs)",
+   "source": "MemGPT (Packer et al.) flat-accuracy-vs-corpus claim, via the agent-memory transcript scan",
+   "verdict": "FAILED",
+   "note": "Smallest model (exp_memgpt_flatcurve.py, cloud-free, local nomic-embed-text retriever; reader factor = OUR measured oracle accuracy single 0.95 / 3-hop 0.91). Pages top-B=8 from a synthetic corpus scaling N=10..250. SINGLE-hop QA flat at 0.",
+   "lab_file": "",
+   "code_url": "",
+   "code_resolves": false,
+   "date": "2026-06-24",
+   "key": "FI-0065"
+  },
+  {
+   "domain": "replication",
+   "claim": "BA(N=2000,m=2): removing top 10% nodes by degree raises bond-percolation threshold from p_c=0.174 to 0.776 (simultaneous percolation+cascade robustness degradation)",
+   "source": "Simultaneous Degradation of Percolation and Cascade Robustness Under Targeted Hub Removal (Cachero Sanchez, 2026-03-05)",
+   "verdict": "REPRODUCED",
+   "note": "Minimal model: networkx BA(N=2000,m=2), Molloy-Reed p_c=<k>/(<k2>-<k>) + direct bond-percolation simulation (peak-of-2nd-largest-component locator), 8 graph realizations. MECHANISM REPRODUCED robustly: removing top 10% nodes by degree sharp",
+   "lab_file": "",
+   "code_url": "",
+   "code_resolves": false,
+   "date": "2026-06-24",
+   "key": "FI-0066"
+  },
+  {
+   "domain": "replication",
+   "claim": "LinUCB O(sqrt(Td ln^3(KT/delta))) regret bound",
+   "source": "Chu, Li, Reyzin, Schapire 2011 - Contextual bandits with linear payoff functions",
+   "verdict": "REPRODUCED",
+   "note": "bound holds (not violated): regret/sqrt(T) decreasing 0.32->0.065, ~log in benign stochastic regime; weak log-K confirmed (K-exp 0.32); tightness untested (needs adversarial contexts)",
+   "lab_file": "",
+   "code_url": "",
+   "code_resolves": false,
+   "date": "2026-06-23",
+   "key": "FI-0067"
+  },
+  {
+   "domain": "replication",
+   "claim": "k-clique percolation in ER(N) graphs transitions at edge prob p_c(k)=1/[(k-1)N]^(1/(k-1)); for k=3, p_c=1/sqrt(2N)",
+   "source": "Derenyi, Palla, Vicsek - Clique Percolation in Random Networks, PRL 2005",
+   "verdict": "REPRODUCED",
+   "note": "REPRODUCED (severe-tested, lab: agora_output/lab/replicate_clique_percolation.py). ER(N=300), k=3 clique percolation: built triangles, linked those sharing an edge, tracked largest clique-cluster node-coverage vs p. Coverage takes off sharp",
+   "lab_file": "",
+   "code_url": "",
+   "code_resolves": false,
+   "date": "2026-06-22",
+   "key": "FI-0068"
+  },
+  {
+   "domain": "replication",
+   "claim": "All systems in a given universality class share the same critical exponents (microscopic details set only non-universal amplitudes)",
+   "source": "universality (statistical physics) - tested on critical branching processes",
+   "verdict": "REPRODUCED",
+   "note": "REPRODUCED (severe-tested, lab: agora_output/lab/replicate_universality_branching.py). Universality demonstrated on critical Galton-Watson branching: survival exponent q_n ~ n^-1 is the SAME across three distinct offspring distributions (Po",
+   "lab_file": "",
+   "code_url": "",
+   "code_resolves": false,
+   "date": "2026-06-22",
+   "key": "FI-0069"
+  },
+  {
+   "domain": "replication",
+   "claim": "A brief growth-mindset intervention improves adolescent achievement at population scale (heterogeneous effects)",
+   "source": "Yeager et al. 2019 Nature - national growth mindset experiment",
+   "verdict": "NOT_COMPUTABLE",
+   "note": "Empirical population RCT (effect ~0.03-0.1 GPA SD, concentrated in lower-achievers / supportive norms). No closed computational MECHANISM to reproduce as a minimal model - it is a measured social-science effect, not a derivable dynamic. Rec",
+   "lab_file": "",
+   "code_url": "",
+   "code_resolves": false,
+   "date": "2026-06-22",
+   "key": "FI-0070"
+  },
+  {
+   "domain": "replication",
+   "claim": "Finite-size scaling of survival probability in critical branching processes: q_n*n is a universal function of (m-1)*n; at criticality q_n~2/(sigma^2 n)",
+   "source": "Garcia-Millan, Font-Clos, Corral 2015",
+   "verdict": "REPRODUCED",
+   "note": "REPRODUCED (severe-tested, lab: agora_output/lab/replicate_branching_fss.py). Galton-Watson Poisson(m) Monte Carlo (T=200k). (a) criticality m=1: q_n*n -> 1.97 at n=200 (analytic 2.0 for sigma^2=1). (b) finite-size scaling DATA COLLAPSE con",
+   "lab_file": "",
+   "code_url": "",
+   "code_resolves": false,
+   "date": "2026-06-22",
+   "key": "FI-0071"
+  },
+  {
+   "domain": "replication",
+   "claim": "BA(N=2000,m=2): removing top 10% nodes by degree raises bond-percolation threshold p_c from 0.174 to 0.776",
+   "source": "Cachero Sanchez 2026 - Simultaneous Degradation of Percolation and Cascade Robustness Under Targeted Hub Removal",
+   "verdict": "REPRODUCED",
+   "note": "Minimal analytic model (Cohen/Molloy-Reed p_c=<k>/(<k^2>-<k>), 25 BA realizations) REPRODUCES the mechanism+direction: targeted top-10pct hub removal raises p_c several-fold (0.093->0.647, 6.95x). Exact published thresholds NOT matched (0.1",
+   "lab_file": "",
+   "code_url": "",
+   "code_resolves": false,
+   "date": "2026-06-21",
+   "key": "FI-0072"
+  },
+  {
+   "domain": "replication",
+   "claim": "k-clique percolation in Erdos-Renyi graphs sets in at p_c = 1/[(k-1)N]^(1/(k-1)) (k=3: 1/sqrt(2N))",
+   "source": "Derenyi, Palla, Vicsek - Clique Percolation in Random Networks (2005)",
+   "verdict": "REPRODUCED",
+   "note": "Smallest model: ER graph N=400, k=3 triangles, union-find on triangles sharing an edge; order parameter Phi (giant triangle-community / all triangles) jumps 0.09->0.43->0.92->1.0 across p/pc 1.0->1.2->1.5->2.0; measured onset (Phi>0.5) at p",
+   "lab_file": "",
+   "code_url": "",
+   "code_resolves": false,
+   "date": "2026-06-21",
+   "key": "FI-0073"
   }
  ]
 }

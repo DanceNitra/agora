@@ -45,12 +45,23 @@ real-corpus accuracy. Treat small-n magnitudes as directional; the orderings are
 | `drop_index` | which hop to drop for the PARTIAL condition (CHAIN-FRAGILITY) |
 | `distractor_pool` | fixed irrelevant facts; take first *k* for DISTRACTION |
 
-## The six metrics (measured in the code repo)
+## The nine metrics (measured in the code repo)
 
 CONVERSION (does complete retrieval convert to a correct answer), **CHAIN-FRAGILITY** (cost of one missing hop —
 near-total collapse across 7 models / 6 families), DISTRACTION (cost of noisy context — model-specific),
 FACT-RETENTION (compaction lossy under a fixed budget), OUTCOME-RANKED-RECALL (was-it-right vs was-it-recalled),
-and FORGET-PRECISION (after a fact is updated, does recall return the current value or the stale one).
+FORGET-PRECISION (after a fact is updated, does recall return the current or the stale value),
+COMPRESSION-vs-RAW (does a compiled summary beat the raw noisy context, or only lose to it),
+OPERATIONAL-CONTINUITY (on resume after compaction, is an already-completed action re-executed),
+and TEMPORAL-AS-OF (out-of-order ingest: supersession resolves by validity-time, not arrival order).
+Plus auxiliary metrics in the repo (ABSTENTION / false-recall, CROSS-SCOPE-LEAKAGE).
+
+## Tooling + interoperability (v0.4)
+
+- **Folklore Meter** (`ramr_folklore_meter.py`) — a reusable probe that scores any AI-engineering folklore claim
+  against a runnable test, returning a REAL / WEAK-MODEL-ARTIFACT / REGIME-SPECIFIC verdict.
+- **RAMR↔LS interoperability** — a shared, sha256-pinned evidence-fixture set (`ramr-ls-evidence-v0.1`) spanning
+  the four continuation verdicts, developed in collaboration with the [LS](https://github.com/safal207/LS) project.
 
 ## Cite
 
