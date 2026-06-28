@@ -20,7 +20,13 @@ artifact.
 |---|---|---|---|---|---|
 | qwen2.5:7b | weak | 51 | +0.72 | **0.50** | 1 |
 | qwen3-coder:30b | mid | 66 | +0.84 | **0.54** | 0 |
+| glm-5.2 | frontier | 16 | +0.19 | **0.73** | 41 ⚠ |
 | claude-sonnet-4-6 | frontier | 23 | **+0.02** | **0.903** | 0 |
+
+⚠ glm-5.2 failed to emit a parseable confidence on 41/120 items (34%), so its AUROC is on a selected
+subset and is less reliable. claude-sonnet-4-6 emitted a real confidence on every item (the clean anchor).
+Both frontier models clear the weak/mid coin-flip line, which is the finding; the exact frontier magnitude
+(0.73–0.90) is anchor-dependent.
 
 Weak and mid models emit **maxed-out confidence on almost everything** (including wrong answers), so their
 confidence cannot separate right from wrong (AUROC ≈ 0.5). The frontier model is **near-perfectly
