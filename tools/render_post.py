@@ -246,6 +246,7 @@ def render_piece(d: dict):
 TEMPLATE = """<!DOCTYPE html>
 <html lang="en" data-lang="en"{mono}>
 <head>
+<!-- Google tag (gtag.js) --><script async src="https://www.googletagmanager.com/gtag/js?id=G-BJNQ0ZHY21"></script><script>window.dataLayer=window.dataLayer||[];function gtag(){{dataLayer.push(arguments);}}gtag('js',new Date());gtag('config','G-BJNQ0ZHY21');</script>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>{title} · Agora</title>
@@ -365,6 +366,7 @@ TEMPLATE = """<!DOCTYPE html>
 INDEX_TEMPLATE = """<!DOCTYPE html>
 <html lang="en" data-lang="en">
 <head>
+<!-- Google tag (gtag.js) --><script async src="https://www.googletagmanager.com/gtag/js?id=G-BJNQ0ZHY21"></script><script>window.dataLayer=window.dataLayer||[];function gtag(){{dataLayer.push(arguments);}}gtag('js',new Date());gtag('config','G-BJNQ0ZHY21');</script>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Research &amp; Writing · Agora</title>
