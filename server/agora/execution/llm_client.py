@@ -101,6 +101,14 @@ _LOCAL_FALLBACK_ENABLED = _os.getenv("AGORA_LOCAL_FALLBACK", "0") == "1"
 # Owner directive 2026-06-17: allow up to 3000. Overridable via AGORA_MAX_TOKENS_FLOOR.
 _MIN_MAX_TOKENS = int(_os.getenv("AGORA_MAX_TOKENS_FLOOR", "3000"))
 
+# REASONING tier needs FAR more room: glm-5.2 (and other reasoning models) burn thousands of tokens
+# THINKING before they emit any answer, so a 3000 cap truncates them mid-reasoning -> EMPTY content ->
+# the seminar's _parse_json fails -> "no contribution" -> 0 findings -> 0 vault notes. (Owner flagged
+# this repeatedly: the reasoning model must NOT be tightly capped.) max_tokens is only a CEILING — the
+# model stops when done — so a large budget costs nothing on short answers, it just removes the
+# truncation cliff. Overridable via AGORA_REASONING_MAX_TOKENS.
+_REASONING_MIN_TOKENS = int(_os.getenv("AGORA_REASONING_MAX_TOKENS", "16000"))
+
 
 def _is_usage_limit(err: str) -> bool:
     e = (err or "").lower()
@@ -205,11 +213,15 @@ def call_llm(
         # endpoint + model (e.g. glm-5.2 via the local Ollama cloud-route). The high-volume cheap
         # tier is untouched (stays on base_url + deepseek-v4-flash). No-op unless configured.
         tier_base_url, tier_api_key = base_url, api_key
+        tier_max_tokens = max_tokens
         if tier_name in ("medium", "expert") and cfg.reasoning_base_url:
             tier_base_url = cfg.reasoning_base_url
             tier_api_key = cfg.reasoning_key or "local"
             if cfg.reasoning_model:
                 model = cfg.reasoning_model
+            # reasoning model: give it room to THINK and answer (see _REASONING_MIN_TOKENS) so it is
+            # never truncated to an empty completion mid-reasoning.
+            tier_max_tokens = max(max_tokens, _REASONING_MIN_TOKENS)
 
         # Build kwargs
         kwargs: dict[str, Any] = {
@@ -219,7 +231,7 @@ def call_llm(
                 {"role": "user", "content": user_prompt},
             ],
             "temperature": temperature,
-            "max_tokens": max_tokens,
+            "max_tokens": tier_max_tokens,
         }
         if response_format:
             kwargs["response_format"] = response_format
