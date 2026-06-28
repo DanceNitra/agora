@@ -131,6 +131,24 @@ def _auroc(pairs):
     return wins / (len(pos) * len(neg))
 
 
+def _risk_coverage(pairs):
+    """The operational view: accuracy if you answer only the most-confident fraction (gate/abstain on
+    confidence), + the largest coverage answerable at >=90% accuracy. AUROC ranks; this shows what it buys."""
+    ps = sorted(pairs, key=lambda x: -x[0]); n = len(ps)
+    if not n:
+        return None
+    def acc_at(cov):
+        k = max(1, round(cov * n)); return round(sum(1 for _, c in ps[:k] if c) / k, 3)
+    def cov_at(t):
+        best = 0.0
+        for k in range(1, n + 1):
+            if sum(1 for _, c in ps[:k] if c) / k >= t:
+                best = round(k / n, 3)
+        return best
+    return {"answer_all": acc_at(1.0), "top_half": acc_at(0.5), "top_quarter": acc_at(0.25),
+            "coverage_at_90acc": cov_at(0.9)}
+
+
 def analyze(model, rows):
     n = len(rows)
     # CLEAN set: only items with a REAL confidence AND a usable answer — no defaulting, the credible base.
@@ -155,6 +173,7 @@ def analyze(model, rows):
            "mean_conf_clean": round(mc, 3) if mc is not None else None,
            "overconfidence_clean": round(mc - acc_clean, 3) if (mc is not None and acc_clean is not None) else None,
            "conf_AUROC_clean": round(auroc_clean, 3) if auroc_clean is not None else None,
+           "risk_coverage": _risk_coverage([(r["conf"], bool(r["correct"])) for r in clean]),
            "n_wrong_clean": sum(1 for r in clean if not r["correct"]),
            "by_penalty": {}}
     if nclean:
