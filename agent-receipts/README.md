@@ -17,6 +17,7 @@ python agent_receipts.py     # core: hash-chain + Ed25519 signatures + tamper/fo
 python mcp_wrapper.py         # wrap any MCP/agent tool so every call emits a receipt
 python mediator.py           # external-mediator mode: catch an agent hiding/faking its own actions
 python verify_cli.py receipts.json --pubkey <hex>   # independently verify a receipts file (no code)
+python mnemo_receipts.py     # tamper-evident memory: detect an out-of-band edit to an mnemo store
 ```
 
 ## What it does — two layers
@@ -106,6 +107,27 @@ broken step. Exit code 0/1 drops cleanly into CI or a pre-commit hook. Measured 
 honest file verifies; tampering one output prints `seq 0: content tampered` (exit 1); the wrong `--pubkey`
 prints `signed by an unexpected key` (exit 1).
 
+## Tamper-evident memory: the `mnemo` integration (`mnemo_receipts.py`)
+
+[mnemo](https://github.com/DanceNitra/agora/tree/main/mnemo) (our open-source memory core) is already
+append-only with deterministic supersession, so it never silently edits a fact in normal use. But the
+store is a file — anyone who can touch it can rewrite a stored memory after the fact, and any store
+would then serve the altered text as the original. Receipts close that: every `remember()` emits a
+signed receipt committing to the memory's content hash, so the *write history* is independently
+verifiable.
+
+```python
+from mnemo_receipts import ReceiptedMnemo, audit_memory
+rm = ReceiptedMnemo(Mnemo(path="mem.json"), private_key_hex=sk, public_key_hex=pk)
+rm.remember("The prod database host is db-prod-01.", key="prod-db::host", mtype="semantic")
+ok, problems = audit_memory(rm.m, rm.chain, expected_pubkey=pk)
+```
+
+`audit_memory()` re-hashes the current store against the write receipts. Measured: an honest store
+audits clean; an **out-of-band edit** (`db-prod-01 → db-attacker-07`, made straight in the store, which
+mnemo itself can't see) is caught — `memory <id>: stored content no longer matches the write receipt`.
+This is a thin wrapper; it does **not** modify mnemo's zero-dependency core.
+
 ## Honest scope (what this is NOT)
 
 - The *self-signed* core proves a receipt **chain is internally consistent and authentically signed**.
@@ -149,9 +171,9 @@ Honest map of the space:
 
 ## Roadmap (if this proves useful)
 
-~~External-mediator mode~~ (done — `mediator.py`) · ~~verifier CLI~~ (done — `verify_cli.py`) · an
-`mnemo` integration so memory writes are tamper-evident by default · publish-and-anchor the chain head ·
-selective disclosure of a single committed field.
+~~External-mediator mode~~ (done — `mediator.py`) · ~~verifier CLI~~ (done — `verify_cli.py`) ·
+~~`mnemo` integration~~ (done — `mnemo_receipts.py`) · publish-and-anchor the chain head · selective
+disclosure of a single committed field · packaged spin-out (PyPI).
 
 MIT. Part of the [Agora](https://github.com/DanceNitra/agora) project — an autonomous research OS that
 ships every claim with a runnable receipt. Feedback and adversarial testing welcome.
