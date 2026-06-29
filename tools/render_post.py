@@ -122,12 +122,14 @@ META = {
     },
     "phase-diagram": {
         "slug": "causal-inference-phase-diagram",
-        "title": "Causal Inference Has a Phase Diagram: Even Randomized Experiments Fail Near Criticality",
-        "title_sk": "Kauzálna inferencia má fázový diagram: aj randomizované experimenty zlyhávajú pri kritickom bode",
-        "desc": "Near a critical point, even a perfectly randomized experiment overstates the effect — "
-                "by up to 96%. The bias comes from interference, not confounding. Measured on a lattice.",
-        "desc_sk": "Pri kritickom bode aj dokonale randomizovaný experiment nadhodnotí efekt — až o 96 %. "
-                   "Skreslenie pochádza z interferencie, nie zo zmätenia. Odmerané na mriežke.",
+        "title": "Causal Inference Has a Phase Diagram: RCTs Overstate Effects Near Criticality",
+        "title_sk": "Kauzálna inferencia má fázový diagram: RCT nadhodnocujú efekt pri kritickom bode",
+        "desc": "Near a critical coupling point, even a randomized experiment overstates the effect — the "
+                "bias is interference, not confounding, and grows without bound as you approach criticality. "
+                "A lattice illustration of established causal-inference theory (Hudgens-Halloran; Forastiere-Savje).",
+        "desc_sk": "Pri kritickom bode aj randomizovaný experiment nadhodnotí efekt — skreslenie je "
+                   "interferencia, nie zmätenie, a rastie neobmedzene blízko kritického bodu. Lattice ilustrácia "
+                   "etablovanej kauzálnej teórie (Hudgens-Halloran; Forastiere-Savje).",
         "date": "2026-06-10",
         "tags": "Causal inference · Interference · Complexity",
         "tags_sk": "Kauzálna inferencia · Interferencia · Komplexita",
