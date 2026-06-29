@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<!--
+  STORM RESEARCH — report template.
+  Clone this file and FILL the slots marked <!-- FILL:* -->. Do NOT rebuild the CSS.
+  Replace example text; keep structure, classes, and styling verbatim.
+  Status tag classes for references + findings: .ok (CONFIRMED) .partial (PARTIALLY CONFIRMED/CORRECTED)
+  .unver (UNVERIFIED) .false (FALSE/fabricated) .demoted (preprint/contested -> Contested signal).
+-->
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title><!-- FILL:title -->Storm Research Briefing</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&family=Roboto+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ink:#0f172a; --body:#334155; --muted:#64748b; --line:#e2e8f0; --bg:#ffffff;
+    --soft:#f8fafc; --accent:#2563eb; --accent-soft:#eff6ff;
+    --ok:#16a34a; --ok-soft:#f0fdf4; --warn:#d97706; --warn-soft:#fffbeb;
+    --bad:#dc2626; --bad-soft:#fef2f2; --demote:#7c3aed; --demote-soft:#f5f3ff;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--soft);color:var(--body);
+    font-family:"Montserrat",system-ui,-apple-system,sans-serif;line-height:1.62;font-size:16px}
+  .wrap{max-width:860px;margin:0 auto;padding:48px 24px 96px}
+  .card{background:var(--bg);border:1px solid var(--line);border-radius:14px;padding:28px 32px;margin:20px 0;
+    box-shadow:0 1px 2px rgba(15,23,42,.04)}
+  h1{font-size:34px;line-height:1.18;font-weight:800;color:var(--ink);margin:0 0 10px}
+  h2{font-size:13px;font-weight:700;letter-spacing:.09em;text-transform:uppercase;color:var(--accent);margin:0 0 16px}
+  h3{font-size:19px;font-weight:700;color:var(--ink);margin:0 0 6px}
+  p{margin:0 0 14px}
+  a{color:var(--accent);text-decoration:none;border-bottom:1px solid #bfdbfe}
+  a:hover{border-color:var(--accent)}
+  code,.mono{font-family:"Roboto Mono",monospace}
+  .topic{font-family:"Roboto Mono",monospace;font-size:13px;color:var(--muted)}
+  .meta{font-size:13px;color:var(--muted);margin-top:8px}
+  .disclosure{font-size:12.5px;color:var(--muted);background:var(--soft);border:1px dashed var(--line);
+    border-radius:10px;padding:12px 16px;margin-top:18px}
+  /* verification banner */
+  .verify{display:flex;flex-wrap:wrap;gap:10px;align-items:center;background:var(--accent-soft);
+    border:1px solid #bfdbfe;border-radius:12px;padding:14px 18px;margin:20px 0;font-size:14px}
+  .verify b{color:var(--ink)}
+  .pill{font-family:"Roboto Mono",monospace;font-size:12px;font-weight:600;padding:3px 10px;border-radius:999px;
+    border:1px solid var(--line);background:#fff;color:var(--body)}
+  .pill.g{color:var(--ok);border-color:#bbf7d0;background:var(--ok-soft)}
+  .pill.y{color:var(--warn);border-color:#fde68a;background:var(--warn-soft)}
+  .pill.r{color:var(--bad);border-color:#fecaca;background:var(--bad-soft)}
+  .pill.v{color:var(--demote);border-color:#ddd6fe;background:var(--demote-soft)}
+  /* findings */
+  .finding{border-top:1px solid var(--line);padding:20px 0}
+  .finding:first-of-type{border-top:0;padding-top:4px}
+  .frow{display:flex;align-items:baseline;gap:14px}
+  .rank{font-family:"Roboto Mono",monospace;font-weight:600;color:var(--muted);font-size:14px;min-width:26px}
+  .conf{margin-left:auto;font-family:"Roboto Mono",monospace;font-size:12px;font-weight:600;
+    color:var(--accent);background:var(--accent-soft);border:1px solid #bfdbfe;border-radius:999px;padding:3px 11px;white-space:nowrap}
+  .chips{display:flex;flex-wrap:wrap;gap:7px;margin:10px 0 0 40px}
+  .chip{font-size:12px;padding:3px 10px;border-radius:6px;border:1px solid var(--line);background:var(--soft);color:var(--muted)}
+  .chip.sup{color:var(--ok);border-color:#bbf7d0;background:var(--ok-soft)}
+  .chip.chg{color:var(--bad);border-color:#fecaca;background:var(--bad-soft)}
+  .finding p{margin:8px 0 0 40px}
+  /* safety guide */
+  .guide{display:grid;grid-template-columns:1fr;gap:14px}
+  @media(min-width:640px){.guide{grid-template-columns:1fr 1fr 1fr}}
+  .gcol{border:1px solid var(--line);border-radius:10px;padding:16px}
+  .gcol h4{margin:0 0 10px;font-size:13px;letter-spacing:.05em;text-transform:uppercase}
+  .gcol.assert{background:var(--ok-soft);border-color:#bbf7d0}.gcol.assert h4{color:var(--ok)}
+  .gcol.caveat{background:var(--warn-soft);border-color:#fde68a}.gcol.caveat h4{color:var(--warn)}
+  .gcol.avoid{background:var(--bad-soft);border-color:#fecaca}.gcol.avoid h4{color:var(--bad)}
+  .gcol ul{margin:0;padding-left:18px;font-size:14px}.gcol li{margin:6px 0}
+  ul.moves{padding-left:20px}ul.moves li{margin:9px 0}
+  .sidebar{background:var(--demote-soft);border:1px solid #ddd6fe;border-radius:12px;padding:18px 22px;margin:20px 0}
+  .sidebar h2{color:var(--demote)}
+  .frontier{background:var(--ink);color:#e2e8f0;border-radius:14px;padding:30px 32px;margin:24px 0}
+  .frontier h2{color:#93c5fd}.frontier .q{font-size:22px;font-weight:700;color:#fff;line-height:1.4}
+  .refs{font-size:13.5px}
+  .ref{padding:11px 0;border-top:1px solid var(--line);display:flex;gap:12px;align-items:flex-start}
+  .ref:first-of-type{border-top:0}
+  .tag{font-family:"Roboto Mono",monospace;font-size:10.5px;font-weight:600;letter-spacing:.04em;
+    padding:2px 8px;border-radius:5px;white-space:nowrap;margin-top:2px}
+  .tag.ok{color:var(--ok);background:var(--ok-soft);border:1px solid #bbf7d0}
+  .tag.partial{color:var(--warn);background:var(--warn-soft);border:1px solid #fde68a}
+  .tag.unver{color:var(--muted);background:var(--soft);border:1px solid var(--line)}
+  .tag.false{color:var(--bad);background:var(--bad-soft);border:1px solid #fecaca}
+  .tag.demoted{color:var(--demote);background:var(--demote-soft);border:1px solid #ddd6fe}
+  .grade{font-family:"Roboto Mono",monospace;font-weight:600;color:var(--ink)}
+  footer{text-align:center;color:var(--muted);font-size:12px;margin-top:40px}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <!-- ============ HEADER ============ -->
+  <header>
+    <h1><!-- FILL:title -->Briefing title — the settled fact, not a headline</h1>
+    <div class="topic"><!-- FILL:topic-slug --> topic: {topic} · for {reader-role}</div>
+    <div class="meta"><!-- FILL:date -->{Month DD, YYYY} · Storm Research · 5-lens, citation-verified</div>
+    <div class="disclosure">
+      <!-- FILL:disclosure (keep this honest) -->
+      The five expert lenses below are an <b>author-built panel</b> (simulated Practitioner, Academic,
+      Skeptic, Economist, Historian), not independent field experts. Agreement across lenses is a strong
+      hypothesis, not consensus of the field. Every cited figure was verified against its primary source
+      (see status tags).
+    </div>
+  </header>
+
+  <!-- ============ VERIFICATION BANNER (fill after Phase 4) ============ -->
+  <div class="verify">
+    <b>Verification:</b>
+    <span class="pill g"><!-- FILL -->N/N citations checked</span>
+    <span class="pill r"><!-- FILL -->X fabricated</span>
+    <span class="pill y"><!-- FILL -->Y corrected</span>
+    <span class="pill v"><!-- FILL -->Z demoted</span>
+    <span class="grade" style="margin-left:auto"><!-- FILL -->Overall grade: B+</span>
+  </div>
+
+  <!-- ============ 60-SECOND SUMMARY ============ -->
+  <section class="card">
+    <h2>The 60-second summary</h2>
+    <!-- FILL: decision-maker grade. Lead with the settled fact, then the contested interpretation. -->
+    <p>{2-4 sentences. Settled fact first; then where interpretations diverge.}</p>
+  </section>
+
+  <!-- ============ KEY FINDINGS (ranked by reliability) ============ -->
+  <section class="card">
+    <h2>Key findings — ranked by reliability</h2>
+    <!-- FILL: repeat .finding x5, highest reliability first. conf = 1-10 from Phase 4. -->
+    <div class="finding">
+      <div class="frow"><span class="rank">01</span><h3>{Finding statement}</h3>
+        <span class="conf">confidence 9/10</span></div>
+      <div class="chips">
+        <span class="chip sup">Supported by: Academic, Practitioner</span>
+        <span class="chip chg">Challenged by: Skeptic</span>
+      </div>
+      <p>{One-paragraph elaboration with the key number + primary source.}</p>
+    </div>
+    <div class="finding">
+      <div class="frow"><span class="rank">02</span><h3>{Finding statement}</h3>
+        <span class="conf">confidence 7/10</span></div>
+      <div class="chips"><span class="chip sup">Supported by: Economist</span>
+        <span class="chip chg">Challenged by: Historian</span></div>
+      <p>{Elaboration.}</p>
+    </div>
+    <!-- findings 03, 04, 05 ... -->
+  </section>
+
+  <!-- ============ HIDDEN CONNECTION ============ -->
+  <section class="card">
+    <h2>The hidden connection</h2>
+    <!-- FILL: the non-obvious link visible only across all five lenses. -->
+    <p>{The cross-lens insight no single perspective surfaced.}</p>
+  </section>
+
+  <!-- ============ MISSING 6TH LENS ============ -->
+  <section class="card">
+    <h2>Key assumption · the missing 6th lens</h2>
+    <!-- FILL: the blind spot none of the five addressed, framed as the lens that could flip the conclusion. -->
+    <p>{What no lens addressed, and how it could change everything.}</p>
+  </section>
+
+  <!-- ============ ACTIONABLE INSIGHT ============ -->
+  <section class="card">
+    <h2>What to do — for {reader-role}</h2>
+    <!-- FILL: 3-6 specific moves for the Phase 0 reader role. Concrete, not abstract. -->
+    <ul class="moves">
+      <li>{Specific move 1.}</li>
+      <li>{Specific move 2.}</li>
+      <li>{Specific move 3.}</li>
+    </ul>
+  </section>
+
+  <!-- ============ CLAIM SAFETY GUIDE (fill from Phase 4 verdicts) ============ -->
+  <section class="card">
+    <h2>Claim safety guide</h2>
+    <div class="guide">
+      <div class="gcol assert"><h4>Safe to assert</h4><ul>
+        <li>{Verified, high-reliability claim.}</li></ul></div>
+      <div class="gcol caveat"><h4>Assert with caveat</h4><ul>
+        <li>{Partially confirmed / context-dependent claim.}</li></ul></div>
+      <div class="gcol avoid"><h4>Avoid / don't repeat</h4><ul>
+        <li>{Unverified, demoted, or false claim.}</li></ul></div>
+    </div>
+  </section>
+
+  <!-- ============ CONTESTED SIGNAL (demoted preprints/contested claims) ============ -->
+  <aside class="sidebar">
+    <h2>Contested signal</h2>
+    <!-- FILL: claims demoted in Phase 4 (preprint, single survey, contradicted). Keep but flag. -->
+    <p>{Claims that didn't survive verification at full strength, with why.}</p>
+  </aside>
+
+  <!-- ============ FRONTIER QUESTION ============ -->
+  <section class="frontier">
+    <h2>The frontier question</h2>
+    <!-- FILL: the single empirical question that would change the conclusion. -->
+    <p class="q">{The one question that would settle it.}</p>
+  </section>
+
+  <!-- ============ REFERENCES (per-citation verification status) ============ -->
+  <section class="card refs">
+    <h2>References — verified against primary sources</h2>
+    <!-- FILL: every citation. tag class = ok / partial / unver / false / demoted -->
+    <div class="ref"><span class="tag ok">CONFIRMED</span>
+      <span>{Author(s), "Title", Venue, Year. Real finding/effect size.} <a href="{URL}">primary source</a></span></div>
+    <div class="ref"><span class="tag partial">CORRECTED</span>
+      <span>{Corrected citation + what was wrong.} <a href="{URL}">primary source</a></span></div>
+    <div class="ref"><span class="tag demoted">DEMOTED</span>
+      <span>{Preprint / single survey — kept but downgraded.} <a href="{URL}">source</a></span></div>
+  </section>
+
+  <footer><!-- FILL:date -->Generated by the Storm Research pipeline · 5 lenses → contradiction map → synthesis → adversarial verification</footer>
+
+</div>
+</body>
+</html>
