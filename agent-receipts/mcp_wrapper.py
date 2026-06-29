@@ -44,8 +44,8 @@ def _demo() -> None:
     def web_search(query: str) -> dict:
         return {"hits": 3, "top": "example.com/" + query.replace(" ", "-")}
 
-    def calculator(expr: str) -> dict:
-        return {"value": eval(expr, {"__builtins__": {}})}  # demo only; never eval untrusted input
+    def calculator(a: int, b: int) -> dict:
+        return {"value": a * b}
 
     kw = {}
     if _HAVE_CRYPTO:
@@ -57,7 +57,7 @@ def _demo() -> None:
 
     bus = ReceiptedDispatcher(chain, {"web_search": web_search, "calculator": calculator})
     bus.dispatch("web_search", query="verifiable agent receipts")
-    bus.dispatch("calculator", expr="6*7")
+    bus.dispatch("calculator", a=6, b=7)
 
     print("=== mcp_wrapper: self-demo ===")
     print(chain.to_json())

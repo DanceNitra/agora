@@ -10,8 +10,11 @@ This single file gives the smallest honest version of that, in two layers:
 
   1. HASH CHAIN (integrity, zero extra deps).  Each receipt commits to the previous one
      (prev = hash of the last receipt), so the whole sequence is a Merkle-style chain. Edit ANY
-     past receipt and every hash after it breaks -> tampering is detectable, and you can name the
-     exact step that was altered. This alone makes the audit trail append-only-or-caught.
+     past receipt and every hash after it breaks -> a *partial* edit is detectable, and you can
+     name the exact step that was altered. IMPORTANT, honest limit: the hash chain ALONE does not
+     stop a thorough tamperer who recomputes the whole chain end-to-end (no link breaks then) -- so
+     integrity-only is enough only if the chain head is published/anchored somewhere the attacker
+     can't also rewrite. The SIGNATURE (layer 2) is what protects a self-held chain.
 
   2. ED25519 SIGNATURES (authenticity, needs `cryptography`).  Each receipt's hash is signed with
      the actor's private key. A third party verifies with the PUBLIC key only -> it proves *who*
@@ -206,11 +209,12 @@ def _demo() -> None:
         print("    -> the signature (made by the real key over the ORIGINAL hash) exposes the forgery,")
         print("       and #2's broken chain link points downstream. Integrity + authenticity together.")
     else:
-        print("    -> the broken chain link still flags it; with Ed25519 signing the forgery is also")
-        print("       provable to a third party who only holds the public key.")
+        print("    -> this lazy edit broke a chain link, so it's caught. But WITHOUT signatures a")
+        print("       thorough tamperer would recompute the WHOLE chain (no link breaks) and it would")
+        print("       pass -- integrity-only needs an anchored/published head. Ed25519 signing closes this.")
 
-    print("\nMEASURED: an honest receipt chain verifies; a single edited past receipt is detected at the")
-    print("exact step, and a re-hashed forgery is still caught by the signature. Logs can't do this.")
+    print("\nMEASURED: an honest receipt chain verifies; a partial edit is detected at the exact step;")
+    print("a re-hashed forgery is caught by the SIGNATURE (a full recompute defeats the hash chain alone).")
 
 
 if __name__ == "__main__":

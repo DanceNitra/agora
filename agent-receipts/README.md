@@ -13,7 +13,7 @@ command. It is a reference proof-of-concept, not a hardened product — the scop
 honest about what it does and does not give you.
 
 > **Naming note / prior art.** There is already an established **"Agent Receipts" protocol** with a
-> public spec and a Python SDK by Otto Jongerius ([github.com/agent-receipts](https://github.com/agent-receipts/spec)).
+> public spec and a Python SDK by Otto Jongerius ([github.com/agent-receipts](https://github.com/agent-receipts/ar)).
 > This project is an **independent, minimal reference** for understanding the idea — it is *not* that
 > protocol's SDK, and on PyPI it is `agora-agent-receipts` to avoid any confusion. If you want the
 > protocol and a maintained SDK, use his; if you want a 200-line file to learn from or vendor, use this.
@@ -30,8 +30,11 @@ python mnemo_receipts.py     # tamper-evident memory: detect an out-of-band edit
 
 1. **Hash chain (integrity, zero extra deps).** Each receipt commits to the previous one
    (`prev = hash of the last receipt`), forming a Merkle-style chain. Edit *any* past receipt and
-   every hash after it breaks — so tampering is **detectable**, and `verify()` names the exact step
-   that was altered. The trail is append-only-or-caught.
+   every hash after it breaks — so a *partial* edit is **detectable**, and `verify()` names the exact
+   step that was altered. **Honest limit:** the hash chain *alone* does not stop a thorough tamperer
+   who recomputes the whole chain end-to-end (then no link breaks). Integrity-only is sufficient only
+   if the chain head is published/anchored where the attacker can't also rewrite it — otherwise the
+   signature (layer 2) is what actually protects a self-held chain.
 2. **Ed25519 signatures (authenticity, needs `cryptography`).** Each receipt's hash is signed with
    the actor's private key; a third party verifies with the **public key only**. This proves *who*
    produced the receipt and that the content wasn't forged — no shared secret. (If `cryptography`
@@ -92,11 +95,15 @@ chain is ground truth:
 
 ```
 agent reported 2 actions but the mediator brokered 3 -> agent OMITTED 1 call(s)
+action 1: agent calls it 'read_secret', mediator saw 'mcp.transfer_funds'
+action 1 (mcp.transfer_funds): input hash mismatch (agent misreported its arguments)
 action 1 (mcp.transfer_funds): output hash mismatch (agent misreported the result)
 action 2 (mcp.read_secret): no agent record at all (hidden call)
 ```
 
-Now the agent cannot withhold a receipt, forge one (it lacks the mediator's key), or lie about I/O (the
+(This is the real demo output — `reconcile()` aligns positionally, so omitting a middle call also shifts
+the indices after it; the point is that the omission and the misreport are both surfaced.) Now the agent
+cannot withhold a receipt, forge one (it lacks the mediator's key), or lie about I/O (the
 mediator hashes what really flowed through it). Optionally the agent also signs its own claim, giving a
 dual-attested receipt where agent-vs-mediator divergence is itself the alarm.
 
@@ -157,7 +164,7 @@ idea*, and that toolkit as the grown-up version.
 Honest map of the space:
 
 - **A named protocol + SDK:** the **"Agent Receipts" protocol** by Otto Jongerius — a public spec
-  ([github.com/agent-receipts/spec](https://github.com/agent-receipts/spec)) plus a maintained Python
+  ([github.com/agent-receipts/ar](https://github.com/agent-receipts/ar)) plus a maintained Python
   SDK (`pip install agent-receipts`). The most directly-related effort to this one; if you need an
   interoperable standard rather than a teaching reference, start there.
 - **Production OSS (corporate):** Microsoft `agent-governance-toolkit` — Tutorial 33 = the same

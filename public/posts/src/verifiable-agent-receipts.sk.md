@@ -1,6 +1,6 @@
 # Overiteľné účtenky pre AI agentov: vaše logy nie sú dôkaz
 
-**Krátka verzia.** Logy AI agenta sú *self-reported tvrdenia* — agent ich vie prepísať dodatočne, alebo zalogovať volanie nástroja, ktoré sa nikdy nestalo. **Overiteľná účtenka (receipt)** je opak: nezávislý kryptografický dôkaz o tom, čo akcia spotrebovala a vyprodukovala, ktorý si vie hocikto skontrolovať **bez dôvery v agenta**. Postavili sme najmenšiu spustiteľnú verziu, ktorá presne ukazuje ako to funguje, odmerali jej odolnosť voči manipulácii a zmapovali, kto to stavia reálne.
+**Krátka verzia.** Logy AI agenta sú *self-reported tvrdenia* — agent ich vie prepísať dodatočne, alebo zalogovať volanie nástroja, ktoré sa nikdy nestalo. **Overiteľná účtenka (receipt)** je opak: nezávislý kryptografický dôkaz o tom, čo akcia spotrebovala a vyprodukovala, ktorý si vie hocikto skontrolovať **bez dôvery v agenta**. Postavili sme najmenšiu spustiteľnú verziu a potom ju vzali tam, kde nám dáva najväčší zmysel — do **pamäte agenta**: účtenky robia históriu zápisov do pamäte *tamper-evident*, takže out-of-band úprava toho, čo si agent „pamätá", sa odhalí. Nižšie: ako to funguje, kde je to podľa nás najužitočnejšie, čestné limity, a kto to stavia reálne.
 
 ## Prečo log agenta nie je dôkaz
 
@@ -15,7 +15,7 @@ Keď AI agent volá nástroj cez [MCP](https://modelcontextprotocol.io/) — dat
 
 ## Dve vrstvy: hash-reťazec, potom podpis
 
-1. **Hash-reťazec — integrita.** Pole `prev` každej účtenky je hash tej predošlej, čím vzniká reťazec. Uprav *hocijakú* minulú účtenku a každý hash po nej sa zlomí, takže manipulácia je odhaliteľná a vieš pomenovať presný krok, ktorý sa zmenil. Toto nepotrebuje žiadnu kryptografickú knižnicu.
+1. **Hash-reťazec — integrita.** Pole `prev` každej účtenky je hash tej predošlej, čím vzniká reťazec. Uprav *hocijakú* minulú účtenku a hashe po nej sa zlomia, takže *čiastočná* úprava je odhaliteľná a vieš pomenovať krok, ktorý sa zmenil — bez kryptografickej knižnice. (Čestný limit: samotný reťazec nezastaví dôkladného útočníka, ktorý prepočíta celý reťazec end-to-end; na to je podpis — alebo ukotvenie hlavy externe.)
 2. **Ed25519 podpis — pravosť.** Hash každej účtenky je podpísaný súkromným kľúčom aktéra; overovatelia ho skontrolujú verejným kľúčom. To dokazuje *kto* účtenku vytvoril a že nič nebolo sfalšované. Plné zero-knowledge dôkazy (ZK-SNARK) idú ďalej — dokážu, že výpočet bol správny bez odhalenia čohokoľvek — a sú ťažký koniec toho istého priestoru.
 
 ## Postavili sme najmenšiu spustiteľnú verziu — a odmerali ju
@@ -32,6 +32,12 @@ Self-reported log zlyhá vo všetkých troch ticho: upravený od začiatku do ko
 
 Pre MCP konkrétne nemeníš nástroje: obalíš dispatch. `ReceiptedDispatcher` zaznamená jednu podpísanú účtenku na každé volanie nástroja, takže potom hocikto potvrdí presne ktoré nástroje bežali, s akými hashmi argumentov a výsledkov, v akom poradí.
 
+## Náš uhol: tamper-evident pamäť
+
+Účtenky sú najzaujímavejšie tam, kde už pracujeme — v **pamäti agenta**. Naše open-source pamäťové jadro [mnemo](https://github.com/DanceNitra/agora/tree/main/mnemo) je už append-only, ale úložisko je stále súbor: ktokoľvek sa k nemu dostane, vie uloženú pamäť dodatočne prepísať — a agent by potom recalloval zmenený text ako pôvodný. Zapojenie účteniek to mení — každý `remember()` emituje podpísanú účtenku zaviazanú k hashu obsahu pamäte, takže *história zápisov* je nezávisle overiteľná.
+
+Odmerané: čestné úložisko prejde auditom čisto; out-of-band úprava (`db-prod-01 → db-attacker-07`, spravená priamo v úložisku) je chytená a pomenovaná podľa memory id. To je **tamper-evident pamäť** — vlastnosť, ktorú širší landscape väčšinou aplikuje na volania nástrojov, nie na samotnú pamäťovú vrstvu. To je tá časť, ktorú chceme ďalej stavať.
+
 ## Čestné limity
 
 Toto je referenčný proof-of-concept a čestný rozsah je dôležitejší než demo:
@@ -42,7 +48,7 @@ Toto je referenčný proof-of-concept a čestný rozsah je dôležitejší než 
 
 ## Krajina — kto to stavia
 
-- **Protokol „Agent Receipts"** od Otta Jongeriusa — verejný spec ([github.com/agent-receipts/spec](https://github.com/agent-receipts/spec)) a udržiavané Python SDK (`pip install agent-receipts`). Najpriamejšie príbuzný projekt; ak chceš interoperabilný štandard a nie minimálnu referenciu, začni tam. (Naše ide na PyPI ako `agora-agent-receipts`, aby nedošlo ku kolízii mien.)
+- **Protokol „Agent Receipts"** od Otta Jongeriusa — verejný spec ([github.com/agent-receipts/ar](https://github.com/agent-receipts/ar)) a udržiavané Python SDK (`pip install agent-receipts`). Najpriamejšie príbuzný projekt; ak chceš interoperabilný štandard a nie minimálnu referenciu, začni tam. (Naše ide na PyPI ako `agora-agent-receipts`, aby nedošlo ku kolízii mien.)
 - **Microsoft `agent-governance-toolkit`** — production open source; offline-overiteľné Ed25519 + kanonické + hash-chained účtenky s politikou a identitou okolo nich.
 - **[`pipelock`](https://github.com/luckyPipewrench/pipelock)** — open-source MCP/egress firewall, ktorý emituje *mediátorom-podpísané* účtenky zvonku agenta (zatvára medzeru so zatajením).
 - **[Zero Proof AI](https://zeroproofai.com)** — komerčná „certificate authority for AI agents", on-chain-ukotvené účtenky (pred spustením).

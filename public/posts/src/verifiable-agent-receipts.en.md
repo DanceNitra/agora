@@ -1,6 +1,6 @@
 # Verifiable receipts for AI agents: your logs aren't proof
 
-**The short version.** An AI agent's logs are *self-reported claims* — it can rewrite them after the fact, or log a tool call that never happened. A **verifiable receipt** is the opposite: independent, cryptographic evidence of what an action consumed and produced, that anyone can check **without trusting the agent**. We built the smallest runnable version to show exactly how it works, measured it tampering-resistant, and mapped who is building this for real.
+**The short version.** An AI agent's logs are *self-reported claims* — it can rewrite them after the fact, or log a tool call that never happened. A **verifiable receipt** is the opposite: independent, cryptographic evidence of what an action consumed and produced, that anyone can check **without trusting the agent**. We built the smallest runnable version, then took it where it matters most for us — **agent memory**: receipts make a memory store's write-history *tamper-evident*, so an out-of-band edit to what your agent "remembers" is caught. Below: how it works, where we think it's most useful, the honest limits, and who's building this for real.
 
 ## Why an agent's log isn't evidence
 
@@ -15,7 +15,7 @@ A receipt commits, at the moment of the action, to **the SHA-256 hash of the inp
 
 ## Two layers: a hash chain, then a signature
 
-1. **Hash chain — integrity.** Each receipt's `prev` field is the hash of the one before it, forming a chain. Edit *any* past receipt and every hash after it breaks, so tampering is detectable and you can name the exact step that changed. This needs no cryptography library at all.
+1. **Hash chain — integrity.** Each receipt's `prev` field is the hash of the one before it, forming a chain. Edit *any* past receipt and the hashes after it break, so a *partial* edit is detectable and you can name the step that changed — no cryptography library needed. (Honest limit: the chain *alone* doesn't stop a thorough tamperer who recomputes it end-to-end; that's what the signature — or anchoring the head externally — is for.)
 2. **Ed25519 signature — authenticity.** Each receipt's hash is signed with the actor's private key; verifiers check it with the public key. This proves *who* produced the receipt and that nothing was forged. Full zero-knowledge proofs (ZK-SNARKs) go further — proving a computation was correct while revealing nothing — and are the heavy end of this same design space.
 
 ## We built the smallest runnable version — and measured it
@@ -32,6 +32,12 @@ A self-reported log fails all three silently: edited end-to-end, it looks identi
 
 For MCP specifically, you don't change your tools: you wrap the dispatch. A `ReceiptedDispatcher` records one signed receipt per tool call, so afterwards anyone can confirm exactly which tools ran, with which argument and result hashes, in which order.
 
+## Our angle: tamper-evident memory
+
+Receipts get most interesting where we already work — **agent memory**. Our open-source memory core, [mnemo](https://github.com/DanceNitra/agora/tree/main/mnemo), is already append-only, but the store is still a file: anyone who can touch it can rewrite a stored memory after the fact, and the agent would then recall the altered text as if it were the original. Wiring receipts in changes that — every `remember()` emits a signed receipt committing to the memory's content hash, so the *write history* becomes independently verifiable.
+
+Measured: an honest store audits clean; an out-of-band edit (`db-prod-01 → db-attacker-07`, made straight in the store) is caught and named by memory id. That is **tamper-evident memory** — a property the broader landscape mostly applies to tool calls, not to the memory layer itself. It is the part of this we intend to keep building.
+
 ## The honest limits
 
 This is a reference proof-of-concept, and the honest scope matters more than the demo:
@@ -42,7 +48,7 @@ This is a reference proof-of-concept, and the honest scope matters more than the
 
 ## The landscape — who's building this
 
-- **The "Agent Receipts" protocol** by Otto Jongerius — a public spec ([github.com/agent-receipts/spec](https://github.com/agent-receipts/spec)) and a maintained Python SDK (`pip install agent-receipts`). The most directly-related effort; if you want an interoperable standard rather than a minimal reference, start there. (Ours ships on PyPI as `agora-agent-receipts` to avoid any name clash.)
+- **The "Agent Receipts" protocol** by Otto Jongerius — a public spec ([github.com/agent-receipts/ar](https://github.com/agent-receipts/ar)) and a maintained Python SDK (`pip install agent-receipts`). The most directly-related effort; if you want an interoperable standard rather than a minimal reference, start there. (Ours ships on PyPI as `agora-agent-receipts` to avoid any name clash.)
 - **Microsoft `agent-governance-toolkit`** — production open source; offline-verifiable Ed25519 + canonical + hash-chained receipts with policy and identity around them.
 - **[`pipelock`](https://github.com/luckyPipewrench/pipelock)** — an open-source MCP/egress firewall that emits *mediator-signed* receipts from outside the agent (closing the withholding gap).
 - **[Zero Proof AI](https://zeroproofai.com)** — a commercial "certificate authority for AI agents," on-chain-anchored receipts (pre-launch).
