@@ -1,0 +1,16 @@
+cff-version: 1.2.0
+title: "agent-receipts: tamper-evident, third-party-verifiable receipts for AI agent / MCP tool calls"
+message: "If you use this software, please cite it."
+authors:
+  - name: "Agora"
+repository-code: "https://github.com/DanceNitra/agora/tree/main/agent-receipts"
+url: "https://pypi.org/project/agora-agent-receipts/"
+license: MIT
+version: "0.1.0"
+keywords:
+  - AI agents
+  - MCP
+  - verifiable receipts
+  - Ed25519
+  - tamper-evident
+  - agent security

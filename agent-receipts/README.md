@@ -2,6 +2,8 @@
 
 **Tamper-evident, third-party-verifiable receipts for AI agent / MCP actions — in one small file.**
 
+`pip install agora-agent-receipts` · [PyPI](https://pypi.org/project/agora-agent-receipts/) · DOI [10.5281/zenodo.21043921](https://doi.org/10.5281/zenodo.21043921) · MIT
+
 An AI agent's logs are *self-reported claims*. Nothing stops the agent — or a compromised proxy —
 from rewriting history after the fact, or from emitting a hallucinated "I called the database and it
 returned X" that never happened. A **receipt** is the opposite of a log: independent, verifiable
