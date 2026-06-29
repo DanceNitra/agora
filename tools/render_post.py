@@ -5,6 +5,8 @@ Reads {name}.en.md and {name}.sk.md from public/posts/src/, renders both into on
 EN/SK toggle (persisted), an editorial template (warm paper, Newsreader serif, big readable type,
 highlighted measured numbers, takeaway box, pull-quoted falsifier, reading progress, COMPUTED
 read-time), and full SEO/Open-Graph/JSON-LD. Writes a clean-slug .html.
+
+PUBLISH GATE: run /stress-claim (argument) + /verify-claims (facts) on the source BEFORE rendering.
 """
 import html
 import json

@@ -1,4 +1,5 @@
 """
+    PUBLISH GATE: run /stress-claim (argument) + /verify-claims (facts) on the source BEFORE rendering.
 The Crucible — render the public replication ledger.
 
 Reads server/.replications.json (verdict ledger) + server/.lab.json (experiment scripts/output)
