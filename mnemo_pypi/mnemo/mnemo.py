@@ -39,6 +39,7 @@ MIT-licensed. Part of Agora (https://github.com/DanceNitra/agora).
 """
 from __future__ import annotations
 
+import hashlib
 import json
 import math
 import os
@@ -52,7 +53,34 @@ try:                                  # OPTIONAL: numpy only ACCELERATES semanti
 except Exception:
     _np = None
 
-__version__ = "0.1.0"
+try:                                  # OPTIONAL: only needed to SIGN write receipts (see receipts=...).
+    from cryptography.hazmat.primitives.asymmetric.ed25519 import (
+        Ed25519PrivateKey as _Ed25519SK, Ed25519PublicKey as _Ed25519PK)
+    from cryptography.hazmat.primitives import serialization as _ser
+    _HAVE_ED = True
+except Exception:
+    _HAVE_ED = False
+
+_GENESIS = "0" * 64
+
+
+def _canon(obj) -> bytes:
+    return json.dumps(obj, sort_keys=True, separators=(",", ":"), ensure_ascii=False).encode("utf-8")
+
+
+def _sha256_hex(b: bytes) -> str:
+    return hashlib.sha256(b).hexdigest()
+
+
+def new_receipt_keypair():
+    """Return (private_key_hex, public_key_hex) for signing mnemo write receipts. Needs `cryptography`."""
+    if not _HAVE_ED:
+        raise RuntimeError("signing write receipts needs the `cryptography` package (pip install cryptography)")
+    sk = _Ed25519SK.generate()
+    return (sk.private_bytes(_ser.Encoding.Raw, _ser.PrivateFormat.Raw, _ser.NoEncryption()).hex(),
+            sk.public_key().public_bytes(_ser.Encoding.Raw, _ser.PublicFormat.Raw).hex())
+
+__version__ = "0.2.2"
 _WORD = re.compile(r"[a-z0-9][a-z0-9\-']{2,}")
 _STOP = frozenset("the a an of for to in on and or is are was were be been with this that it its as "
                   "by at from into our we us you your he she they them his her their not no".split())
@@ -74,9 +102,19 @@ def _cosine(a, b) -> float:
 
 
 class Mnemo:
-    def __init__(self, path: str | None = None, embed=None):
+    def __init__(self, path: str | None = None, embed=None, receipts: bool = False,
+                 receipt_key: str | None = None, receipt_pubkey: str | None = None):
         """path: optional JSON file to persist to. embed: optional fn(str)->list[float] for semantic
-        recall; if omitted, recall uses lexical token overlap (zero dependencies)."""
+        recall; if omitted, recall uses lexical token overlap (zero dependencies).
+
+        receipts/receipt_key (OPT-IN, default OFF -> identical legacy behavior): when enabled, every
+        remember() appends a tamper-evident, hash-chained WRITE RECEIPT committing to the memory's
+        content hash, persisted to a sidecar "<path>.receipts.json" (the main store format is unchanged).
+        verify_writes() then proves the write history wasn't altered out-of-band — something an
+        append-only store alone can't, because anyone who can edit the store file can rewrite a stored
+        memory and the store would serve the altered text as original. The hash chain is zero-dependency;
+        pass receipt_key (+ receipt_pubkey) from new_receipt_keypair() to also Ed25519-SIGN each receipt
+        so a third party can verify it with the public key only. (Standalone version: agora-agent-receipts.)"""
         self.path = Path(path) if path else None
         self.embed = embed
         self.items: list[dict] = []
@@ -88,6 +126,44 @@ class Mnemo:
         self._mat = None                         # cached L2-normalized matrix of memory vectors (numpy)
         self._vec_rowof: dict[str, int] = {}     # memory id -> its row in self._mat
         self._mat_built_n = -1                   # item count when the matrix was built (rebuild on change)
+        self._vec_mean = None                    # corpus mean vector (for anisotropy centering of semantic recall)
+        # Anisotropy centering: subtract the corpus mean before cosine. Many embedders (e.g. nomic) are
+        # anisotropic — all cosines compress into a narrow band — so semantic recall under-separates.
+        # MEASURED on real LoCoMo (419 turns): centering lifts single-hop full-evidence recall@k by
+        # +0.04..+0.07 (k=5/10/20) and is neutral on multi-hop. Reversible: set center_embeddings=False.
+        self.center_embeddings = True
+        # Two-tier keep-budget: when consolidate(keep) must drop surplus, PROTECT the top protect_frac
+        # of the budget by RAW value (recency-immune) and fill the REST by EFFECTIVE (decay-weighted)
+        # value — so a freshly-useful memory isn't evicted by a stale high-value one. A pure top-N-by-raw
+        # prune keeps old high-value items forever and starves a drifting working set. MEASURED on a
+        # simulation of mnemo's own value-accrual + per-type decay: locality served-hit 0.22 -> 0.78,
+        # neutral on rare-critical + poison-flood. Reversible: two_tier_keep=False -> legacy top-N-by-raw.
+        self.two_tier_keep = True
+        self.protect_frac = 0.30
+        # Fast-novelty channel guard (OPT-IN, default OFF). mnemo's state-toggle supersedes a standing
+        # fact the moment a single similar+contradicting memory arrives — correct + fast for a TRUSTED
+        # single source (configs/preferences: latest assertion wins), but a single-shot poison flip
+        # (AgentPoison / MINJA) can then override a true fact. With this ON, a contradiction supersedes
+        # only when CORROBORATED (earned credit, or >=2 corroborating links) — the same bar as graduation;
+        # an uncorroborated single contradiction is recorded as a link but does NOT supersede. This is the
+        # two-channel capstone's latency-floor tradeoff made explicit: robustness to single-shot poison at
+        # the cost of lagging an uncorroborated single legitimate change. Leave OFF for trusted-source
+        # stores; turn ON for adversarial / multi-tenant ingestion.
+        self.supersede_requires_corroboration = False
+        # Persistence supersession (OPT-IN, default OFF; set to an int >= 2 to enable). A standing fact is
+        # superseded only when the contradicting NEW state is asserted by >= this many INDEPENDENT records —
+        # i.e. the change must PERSIST/accumulate, not arrive once. This is the sequential-change-detection
+        # (CUSUM) escape applied to memory: an isolated single-shot poison flip never crosses the threshold
+        # and is rejected, while a genuinely sustained value change is adopted once `supersede_persistence`
+        # corroborating records exist. The integer IS the Adaptation-Corruption law's detection-latency floor
+        # d* made explicit — set it to your stream's corruption-vs-change ratio. Unlike
+        # supersede_requires_corroboration this needs NO external credit(): it adopts a genuine change purely
+        # from repeated independent assertions, where the corroboration guard would lag one forever. MEASURED
+        # (lab fea933, mnemo's real consolidate() path): isolated-poison false-supersede 1 -> 0 while a
+        # 3-record sustained change is still adopted; it Pareto-dominates both the naive (poison-fooled) and
+        # corroboration-only (change-lagging) rules — see the Adaptation-Corruption Separation Law (lab f490d8).
+        # Reversible: 0 or 1 -> legacy fast supersession.
+        self.supersede_persistence = 0
         # _save() THROTTLE: serializing the whole store (json.dumps of every item) is O(store size); doing
         # it on EVERY recall/remember froze callers once the store grew (recall mutates access value, so it
         # used to re-serialize everything each call). Coalesce disk writes to at most once / _save_min_s;
@@ -100,29 +176,201 @@ class Mnemo:
                 self.items = json.loads(self.path.read_text(encoding="utf-8"))
             except Exception:
                 self.items = []
+        # OPT-IN write receipts (default OFF -> zero behavior change; no sidecar created)
+        self.receipts_enabled = bool(receipts or receipt_key)
+        self._receipt_sk = receipt_key
+        self.receipt_pubkey = receipt_pubkey
+        self._receipts: list[dict] = []
+        self._receipts_path = (self.path.parent / (self.path.name + ".receipts.json")) if self.path else None
+        if self.receipts_enabled and self._receipts_path and self._receipts_path.exists():
+            try:
+                self._receipts = json.loads(self._receipts_path.read_text(encoding="utf-8"))
+            except Exception:
+                self._receipts = []
 
     # ── capture ──────────────────────────────────────────────────────────────
     def remember(self, text: str, tags=None, value: float = 1.0, meta: dict | None = None,
-                 mtype: str | None = None) -> str:
+                 mtype: str | None = None, valid_from: float | None = None,
+                 source: dict | None = None, key: str | None = None) -> str:
         """Append-only raw capture. Stamped with an absolute UTC time; never edited afterward.
         mtype in {episodic, semantic, procedural} sets the decay prior (episodic fades fast,
         semantic slow, procedural barely); inferred from the text if not given. Pass it explicitly
         when the caller knows the kind — inference defaults to episodic (the conservative, fast-decay
-        choice) and only promotes on clear markers."""
+        choice) and only promotes on clear markers.
+
+        `key` (OPT-IN) is a deterministic supersession key — typically a (subject, relation) identifier,
+        e.g. "billing-api::auth-method". When set, remembering a new value RETIRES every active record
+        sharing the same key (status -> superseded), with NO similarity threshold and NO LLM call. This
+        closes the 'supersession blind spot': cosine similarity cannot tell a contradicted fact from its
+        replacement (we measured AUROC ~0.61, near chance — a contradiction is often MORE embedding-similar
+        to the original than a rephrase is), so a similarity-based store silently serves the stale value
+        (~42% of the time in our test). A deterministic (subject, relation, object) ledger drives that to
+        ~0%. Bi-temporal: a back-filled record (earlier valid_from) does NOT overwrite a genuinely newer
+        same-key value — the stale-on-arrival record is the one retired."""
         mid = uuid.uuid4().hex[:10]
         now = time.time()
         rec = {"id": mid, "text": text, "tags": list(tags or []), "value": float(value),
                "ts": now, "iso": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()),
+               "valid_from": float(valid_from) if valid_from is not None else now,  # event-time (bi-temporal); defaults to ingest-time
+               "source": dict(source) if source else None,   # re-checkable origin (e.g. {"doc": id, "span": [start, end]}) so a recalled fact can be traced back, not trusted blind
                "mtype": mtype or _infer_type(text), "last_access": now,
                "status": "active", "links": [], "meta": dict(meta or {})}
+        if key is not None:
+            rec["key"] = str(key)
         if self.embed:
             try:
                 rec["vec"] = list(self.embed(text))
             except Exception:
                 rec["vec"] = None
         self.items.append(rec)
+        if key is not None:
+            self._supersede_by_key(rec)   # deterministic SRO supersession (no embedding, no threshold)
         self._save(force=True)        # a new memory is real content - persist immediately, not throttled
+        if self.receipts_enabled:
+            self._emit_write_receipt(rec)
         return mid
+
+    # ── write receipts (OPT-IN: tamper-evident write history) ─────────────────
+    def _write_commit(self, rec: dict) -> dict:
+        """What a receipt commits to for a stored memory: its id + a hash of its content-bearing fields."""
+        return {"id": rec["id"],
+                "content_sha256": _sha256_hex(_canon({"text": rec.get("text"), "key": rec.get("key"),
+                                                      "mtype": rec.get("mtype")}))}
+
+    def _emit_write_receipt(self, rec: dict) -> dict:
+        prev = self._receipts[-1]["hash"] if self._receipts else _GENESIS
+        r = {"seq": len(self._receipts), "ts": rec.get("ts"), "memory_id": rec["id"],
+             "commit": self._write_commit(rec), "prev": prev}
+        r["hash"] = _sha256_hex(_canon({k: r[k] for k in ("seq", "ts", "memory_id", "commit", "prev")}))
+        if self._receipt_sk and _HAVE_ED:
+            sk = _Ed25519SK.from_private_bytes(bytes.fromhex(self._receipt_sk))
+            r["pubkey"] = self.receipt_pubkey
+            r["sig"] = sk.sign(bytes.fromhex(r["hash"])).hex()
+        self._receipts.append(r)
+        if self._receipts_path:
+            try:
+                self._receipts_path.write_text(json.dumps(self._receipts, indent=2, ensure_ascii=False),
+                                               encoding="utf-8")
+            except Exception:
+                pass
+        return r
+
+    def verify_writes(self, expected_pubkey: str | None = None) -> tuple[bool, list[str]]:
+        """Verify the write-receipt chain AND that each stored memory still matches its write receipt.
+        Returns (ok, problems). Catches out-of-band edits to the store the normal flow can't see.
+        Requires receipts to have been enabled at write time."""
+        problems: list[str] = []
+        prev = _GENESIS
+        by_id = {it["id"]: it for it in self.items}
+        for i, r in enumerate(self._receipts):
+            core = {k: r.get(k) for k in ("seq", "ts", "memory_id", "commit", "prev")}
+            if r.get("prev") != prev:
+                problems.append(f"receipt {i}: broken chain link (a prior receipt was altered/removed)")
+            if _sha256_hex(_canon(core)) != r.get("hash"):
+                problems.append(f"receipt {i}: receipt tampered (hash mismatch)")
+            if "sig" in r and _HAVE_ED:
+                try:
+                    _Ed25519PK.from_public_bytes(bytes.fromhex(r["pubkey"])).verify(
+                        bytes.fromhex(r["sig"]), bytes.fromhex(r["hash"]))
+                    if expected_pubkey and r.get("pubkey") != expected_pubkey:
+                        problems.append(f"receipt {i}: signed by an unexpected key")
+                except Exception:
+                    problems.append(f"receipt {i}: invalid signature")
+            elif expected_pubkey:
+                problems.append(f"receipt {i}: unsigned, but a signature was required")
+            cur = by_id.get(r["memory_id"])
+            if cur is None:
+                problems.append(f"memory {r['memory_id']}: written but missing from the store (deleted out-of-band)")
+            elif self._write_commit(cur) != r["commit"]:
+                problems.append(f"memory {r['memory_id']}: stored content no longer matches its write receipt (edited after write)")
+            prev = r.get("hash")
+        return (len(problems) == 0, problems)
+
+    def _supersede_by_key(self, rec: dict) -> None:
+        """Deterministic (subject, relation, object) supersession: retire active records that share
+        rec['key']. No similarity threshold, no LLM call — the fix our Crucible replication validated
+        (stale-fact recall 41.7% -> 0.0%, where cosine-based detection is near chance at AUROC ~0.61).
+        Bi-temporal: only same-key records with valid_from <= rec's are retired; if an active same-key
+        record is genuinely newer (later valid_from), the INCOMING rec is the stale one and is retired
+        instead — a back-filled value never overwrites the current one. recall() hides superseded records
+        by default, so a keyed store never surfaces a stale fact."""
+        k = rec.get("key")
+        if not k:
+            return
+        vf_new = rec.get("valid_from", rec["ts"])
+        for r in self.items:
+            if r is rec or r.get("status") != "active" or r.get("key") != k:
+                continue
+            vf_r = r.get("valid_from", r["ts"])
+            if vf_r <= vf_new:                 # r is the older value -> retire it
+                r["status"] = "superseded"
+                r["superseded_ts"] = time.time()
+                r["invalidated_at"] = vf_new
+                r.setdefault("meta", {})["superseded_by_toggle"] = rec["id"]
+            else:                              # an active same-key value is newer -> incoming is stale-on-arrival
+                rec["status"] = "superseded"
+                rec["superseded_ts"] = time.time()
+                rec["invalidated_at"] = vf_r
+                rec.setdefault("meta", {})["superseded_by_toggle"] = r["id"]
+
+    def remember_dedup(self, text: str, tags=None, value: float = 1.0, meta: dict | None = None,
+                       mtype: str | None = None, dup_threshold: float = 0.95) -> str:
+        """OPT-IN write that skips redundant appends. If an active memory is near-identical (similarity >=
+        dup_threshold) AND carries the SAME value(s) (no numeric clash), this returns that memory's id WITHOUT
+        appending a duplicate raw row -- cutting raw-store bloat from repeated identical writes. A near-identical
+        text with a DIFFERENT number (a value UPDATE) is NOT a duplicate: it appends, so the consolidation pass can
+        supersede the stale value. Default `remember()` stays strictly append-only (the 'zero rewrites' contract);
+        this is a separate opt-in path for high-duplicate ingest."""
+        hits = self.recall(text, k=1)
+        if hits:
+            h = hits[0]
+            s = self._similarity(text, h, self._qvec(text) if self.embed else None)
+            if s >= dup_threshold and not _value_clash(text, h["text"]):
+                return h["id"]            # NO-OP: near-identical, same value -> skip the redundant append
+        return self.remember(text, tags=tags, value=value, meta=meta, mtype=mtype)
+
+    def forget(self, ids=None, where=None, redact_links: bool = True) -> dict:
+        """HARD-DELETE memories — the one operation that genuinely REMOVES content. mnemo is otherwise
+        append-only: supersession / invalidation only DEMOTE a record (it still exists, recallable with
+        include_superseded). forget() is for the cases where demotion is not enough: a right-to-be-forgotten
+        / erasure request, a poisoned or libellous memory, or a hard correction.
+
+        Select by `ids` (a single id or an iterable) and/or `where` (a predicate fn(record)->bool; e.g.
+        lambda r: 'secret' in r['text']). VERIFIED FORGETTING: the matched records are deleted AND their ids
+        are scrubbed from every surviving record's `links` and toggle-supersession pointers, and the cached
+        vec matrix + token caches are dropped — so a forgotten memory cannot resurface via recall, via a
+        consolidation link, or via a stale derived-summary pointer. This is complete because consolidation
+        never copies raw text into other records (it only links ids and toggles status) — there is no merged
+        blob left holding the forgotten content. Returns {forgotten, ids, scrubbed_links}."""
+        target = set()
+        if ids is not None:
+            target |= ({ids} if isinstance(ids, str) else set(ids))
+        if where is not None:
+            for r in self.items:
+                try:
+                    if where(r):
+                        target.add(r["id"])
+                except Exception:
+                    pass
+        target &= {r["id"] for r in self.items}          # ignore ids not actually present
+        if not target:
+            return {"forgotten": 0, "ids": [], "scrubbed_links": 0}
+        self.items = [r for r in self.items if r["id"] not in target]
+        scrubbed = 0
+        if redact_links:
+            for r in self.items:
+                if r.get("links"):
+                    before = len(r["links"])
+                    r["links"] = [l for l in r["links"] if l not in target]
+                    scrubbed += before - len(r["links"])
+                meta = r.get("meta")
+                if meta and meta.get("superseded_by_toggle") in target:
+                    meta.pop("superseded_by_toggle", None)   # drop dangling toggle pointer (no ghost stale-derived)
+        for tid in target:
+            self._tok_cache.pop(tid, None)
+        self._mat = None; self._mat_built_n = -1             # force vec-matrix rebuild (drops forgotten rows)
+        self._save(force=True)                               # a deletion is real content change — persist now
+        return {"forgotten": len(target), "ids": sorted(target), "scrubbed_links": scrubbed}
 
     # ── retrieval (value-ranked) ──────────────────────────────────────────────
     def _qvec(self, query: str):
@@ -148,11 +396,14 @@ class Mnemo:
                     rows.append(r["vec"]); ids.append(r["id"])
             if rows:
                 M = _np.asarray(rows, dtype=_np.float32)
+                self._vec_mean = M.mean(axis=0)               # corpus mean (computed regardless; used to center)
+                if self.center_embeddings:
+                    M = M - self._vec_mean                    # de-anisotropise: remove the common component
                 M /= (_np.linalg.norm(M, axis=1, keepdims=True) + 1e-9)
                 self._mat = M
                 self._vec_rowof = {i: k for k, i in enumerate(ids)}
             else:
-                self._mat, self._vec_rowof = None, {}
+                self._mat, self._vec_rowof, self._vec_mean = None, {}, None
             self._mat_built_n = len(self.items)
         return self._mat
 
@@ -174,7 +425,8 @@ class Mnemo:
         return len(q & t) / min(len(q), len(t))     # overlap coefficient — forgiving without an embedder
 
     def recall(self, query: str, k: int = 6, include_superseded: bool = False,
-               include_hubs: bool = False, mode: str = "auto") -> list[dict]:
+               include_hubs: bool = False, mode: str = "auto", min_relevance: float = 0.0,
+               scope: str | None = None, as_of: float | None = None) -> list[dict]:
         """Top-k memories by RELEVANCE × VALUE — high-value memories outrank merely-similar ones.
         Memories the dream pass flagged as hubs (universal matchers) are skipped unless include_hubs.
 
@@ -185,12 +437,26 @@ class Mnemo:
         falls back to lexical automatically."""
         def _eligible(r: dict) -> bool:
             s = r["status"]
+            if as_of is not None:
+                # Bi-temporal "as of T": a memory counts if it was VALID at time T — valid_from <= T and not yet
+                # invalidated by T — INCLUDING records now superseded (they were current back then). Records
+                # superseded by the pre-bitemporal pass carry no invalidated_at; treat them as still-valid here.
+                vf = r.get("valid_from", r["ts"])
+                inv = r.get("invalidated_at")
+                if vf > as_of or (inv is not None and inv <= as_of):
+                    return False
+                return include_hubs if s == "hub" else True
             if s == "active":
                 return True
             if s == "hub":
                 return include_hubs
             return include_superseded            # superseded / other non-active
         pool = [r for r in self.items if _eligible(r)]
+        # Scope/namespace isolation: when a scope is requested, recall ONLY sees memories tagged with that scope
+        # (meta['scope']) BEFORE ranking — a shared store (e.g. many agents / tenants in one Mnemo) cannot bleed
+        # one scope's memories into another's recall. scope=None (default) sees everything (legacy behavior).
+        if scope is not None:
+            pool = [r for r in pool if (r.get("meta") or {}).get("scope") == scope]
         use_semantic = self.embed is not None and (
             mode == "semantic" or (mode == "auto" and len(pool) >= self.semantic_threshold))
         qvec = self._qvec(query) if use_semantic else None    # None -> lexical (also if embed fails)
@@ -202,8 +468,10 @@ class Mnemo:
             M = self._vec_matrix()
             if M is not None:
                 qv = _np.asarray(qvec, dtype=_np.float32)
+                if self.center_embeddings and self._vec_mean is not None:
+                    qv = qv - self._vec_mean              # center the query the SAME way as the matrix
                 sims_vec = M @ (qv / (float(_np.linalg.norm(qv)) or 1.0))
-        scored = []
+        cands = []                                        # (sim, prov, eff_value, r) for sim>0 candidates
         _now = time.time()                                # for per-type decay of the ranking value
         _by_id = {x["id"]: x for x in self.items}         # for provenance lookups (source-episode status)
         for r in pool:
@@ -211,7 +479,10 @@ class Mnemo:
                 sim = max(0.0, float(sims_vec[self._vec_rowof[r["id"]]]))
             else:                                             # pure-Python cosine, or lexical fallback
                 sim = self._similarity(query, r, qvec, qtok)
-            if sim <= 0:
+            # Relevance-floor ABSTENTION: drop candidates below an absolute similarity floor; if the WHOLE
+            # top-k falls below it, recall() returns [] ("not in memory") instead of padding context with a weak
+            # false match. min_relevance=0.0 (default) keeps legacy behavior (only sim<=0 is dropped).
+            if sim <= 0 or sim < min_relevance:
                 continue
             # Provenance gate: a memory that absorbed near-duplicates (links) is STALE-DERIVED if any of
             # those sources was later CONTRADICTED (state-toggle supersession) — the merged summary
@@ -221,12 +492,34 @@ class Mnemo:
                 (_by_id.get(lid, {}).get("meta") or {}).get("superseded_by_toggle") for lid in r["links"])
             prov = 0.5 if stale else 1.0
             r["_stale_derived"] = stale                   # surfaced in the returned record
-            # Calibration: WAS-IT-RIGHT. A per-memory Beta(good,bad) posterior (fed by credit() when work
-            # this memory was recalled into later RESOLVES) nudges the score by track record, not just by
-            # being-recalled. Neutral (x1.0) until a memory has any outcome; bounded to [0.5, 1.5] so one
-            # bad outcome can't erase a memory but a consistent liar fades and a consistent winner rises.
-            cal = 0.5 + self._reliability(r)
-            score = sim * (1.0 + math.log1p(max(0.0, self._effective_value(r, _now)))) * prov * cal
+            cands.append((sim, prov, self._effective_value(r, _now), r))
+        # Calibration WAS-IT-RIGHT: a per-memory Beta(good,bad) posterior nudges the score by track record.
+        # cal_mode controls how the outcome-credit channel is allowed to act (our measured signal-reliability
+        # law: a selection signal only beats relevance once reliability p > the no-signal floor 1/(1+D)):
+        #   'full'  (default) — cal in [0.5, 1.5] (legacy: can promote AND demote).
+        #   'boost' — cal in [1.0, 1.5]: outcome-credit can PROMOTE a proven memory but never DEMOTE one below
+        #             its relevance, so a wrong/random credit cannot suppress a correct memory (kills backfire).
+        #   'gated' — disable cal (->1.0) for this recall when the pooled signal looks weaker than 1/(1+D).
+        mode = getattr(self, "cal_mode", "full")
+        gate_off = False
+        if mode == "gated" and cands:
+            top = max(c[0] for c in cands)
+            near = [c for c in cands if c[0] >= top * 0.95]      # candidates relevance can't separate
+            D = len(near)
+            if D >= 2:
+                g = sum(float(c[3].get("good", 0) or 0) for c in near)
+                b = sum(float(c[3].get("bad", 0) or 0) for c in near)
+                if (g + 1.0) / (g + b + 2.0) <= 1.0 / (1.0 + D):
+                    gate_off = True
+        scored = []
+        for sim, prov, evalue, r in cands:
+            if gate_off:
+                cal = 1.0
+            else:
+                cal = 0.5 + self._reliability(r)
+                if mode == "boost" and cal < 1.0:
+                    cal = 1.0
+            score = sim * (1.0 + math.log1p(max(0.0, evalue))) * prov * cal
             scored.append((score, sim, r))
         scored.sort(key=lambda x: -x[0])
         out = []
@@ -247,13 +540,29 @@ class Mnemo:
             # on the slow semantic one instead. (Dakera's access-driven episodic->semantic promotion,
             # gated on accrued VALUE rather than raw access count, so a popular-but-trivial memory
             # doesn't graduate.)
-            if r.get("mtype") == "episodic" and r["value"] >= _GRADUATE_VALUE:
+            # POISON guard (HARDENED 2026-06-25): durability must be EARNED by INDEPENDENT corroboration, not
+            # mere recall-frequency. The value bump above is correctness-blind, so a confabulation recalled
+            # enough would otherwise graduate to the durable (slow-decay) tier and entrench itself. A
+            # self-assertable `source` string or a SINGLE `links` edge is attacker-settable (AgentPoison /
+            # MINJA / OWASP-ASI06), so neither alone may confer durability. Require either an EARNED net-positive
+            # outcome (good>0 and good>=bad — set only by credit() resolving real work, not self-assertable), OR
+            # >=2 DISTINCT corroborating links (no single self-created edge suffices). An uncorroborated popular
+            # memory stays episodic and fades on the fast clock unless earned.
+            # SYBIL HARDENING (entity resolution): count DISTINCT CANONICAL sources among the corroborating
+            # links, not the raw link count. A naive "≥2 links" lets an attacker mint independence by naming
+            # one origin many ways ("Wikipedia" / "wikipedia.org" / a full URL → 3 links, 1 real source).
+            # Canonicalizing source identifiers before counting collapses those to one; a link whose record
+            # has no source counts as its own id, so genuinely source-less corroboration is unchanged.
+            _good = float(r.get("good", 0) or 0); _bad = float(r.get("bad", 0) or 0)
+            corroborated = (_good > 0 and _good >= _bad) or self._distinct_sources(r.get("links"), _by_id) >= 2
+            if r.get("mtype") == "episodic" and r["value"] >= _GRADUATE_VALUE and corroborated:
                 r["mtype"] = "semantic"
                 r.setdefault("meta", {})["graduated_from_episodic"] = True
             out.append({"id": r["id"], "text": r["text"], "tags": r["tags"], "iso": r["iso"],
                         "value": round(r["value"], 2), "relevance": round(sim, 3),
                         "score": round(score, 3), "links": r["links"],
                         "reliability": round(self._reliability(r), 3),
+                        "source": r.get("source"),    # re-checkable origin (provenance), surfaced so a recalled fact can be traced back
                         "stale_derived": bool(r.get("_stale_derived"))})
         # NOTE: recall is a READ. It nudges in-memory access value / graduation, but must NOT persist the
         # whole store here — serializing (json.dumps) on every recall, across many agents' stores,
@@ -262,6 +571,33 @@ class Mnemo:
         if out:
             self._dirty = True   # mark for the next throttled/forced save; do NOT serialize on the read path
         return out
+
+    @staticmethod
+    def _canon_source(doc) -> str:
+        """Entity-resolution canonicalization of a source identifier, so sybil variants of one origin
+        ('Wikipedia', 'wikipedia.org', 'https://www.wikipedia.org/wiki/X') collapse to a single key."""
+        s = str(doc or "").strip().lower()
+        s = re.sub(r"^[a-z]+://", "", s)                 # strip scheme
+        s = re.sub(r"^www\.", "", s)                     # strip www.
+        s = s.split("/")[0].split("?")[0]                # host / first path segment only
+        s = re.sub(r"\.(org|com|net|io|gov|edu|co|ai|dev|info|news)$", "", s)  # strip a common TLD
+        s = re.sub(r"[^a-z0-9]+", "", s)                 # collapse remaining punctuation
+        return s
+
+    @staticmethod
+    def _distinct_sources(links, by_id) -> int:
+        """Count DISTINCT canonical sources among corroborating links — entity resolution BEFORE counting,
+        so 'three names for one source' sybil variants count as one. A link whose record carries no source
+        counts as its own id, so genuinely source-less corroboration is not penalised (no regression)."""
+        keys = set()
+        for lid in (links or []):
+            lr = by_id.get(lid)
+            if lr is None:
+                continue
+            src = lr.get("source")
+            doc = src.get("doc") if isinstance(src, dict) else (src if isinstance(src, str) else None)
+            keys.add(Mnemo._canon_source(doc) if doc else "id:" + lid)
+        return len(keys)
 
     @staticmethod
     def _reliability(r: dict) -> float:
@@ -319,6 +655,31 @@ class Mnemo:
         common = {w for w, c in df.items() if c >= min_df}
         return toks, common
 
+    def recall_iterative(self, query: str, ask_followup, k: int = 6, rounds: int = 1,
+                         **recall_kw) -> list[dict]:
+        """Multi-hop recall. One-shot top-k misses evidence reachable only via a BRIDGE entity (a fact whose
+        detail lives in a memory NOT similar to the query). This does: retrieve -> let a capable model read the
+        results and name what's missing, emitting follow-up queries -> retrieve again -> merge (dedup by id).
+        `ask_followup(query, current_results) -> list[str]` is caller-supplied, so mnemo stays model-agnostic
+        (inject any model/LLM). MEASURED ~3.3x multi-hop full-evidence recall vs one-shot top-k on LoCoMo
+        (0.057 -> 0.186, n=70 across 3 conversations) — the one mechanism that moved the multi-hop bottleneck
+        where static retrieval tricks (dense-neighbor, lexical bridges) did not. More expensive (a model call
+        in the loop), so it's an explicit mode, not the default."""
+        seen: dict = {}
+        for r in self.recall(query, k=k, **recall_kw):
+            seen[r["id"]] = r
+        for _ in range(max(0, int(rounds))):
+            try:
+                followups = ask_followup(query, list(seen.values())) or []
+            except Exception:
+                followups = []
+            for fq in followups:
+                if not isinstance(fq, str) or not fq.strip():
+                    continue
+                for r in self.recall(fq, k=k, **recall_kw):
+                    seen.setdefault(r["id"], r)
+        return list(seen.values())
+
     def consolidate(self, keep: int | None = None, dup_threshold: float = 0.82,
                     hub_coverage: float = 0.12, link_duplicates: bool = True) -> dict:
         """The dream pass. ADDS a derived layer (status + links); never edits raw text. Three steps:
@@ -341,8 +702,15 @@ class Mnemo:
             toks, common = self._common_vocab(active)
             nv = len(common) or 1
             for r, tk in zip(active, toks):
-                cov = len(tk & common) / nv
-                if cov >= hub_coverage:
+                shared = len(tk & common)
+                cov = shared / nv
+                # A genuine 'universal matcher' overlaps MANY of the corpus's common words. Requiring an absolute
+                # floor (>= 3 shared common words) on top of the coverage fraction prevents the low-diversity /
+                # templated-store failure: when the common vocabulary is tiny (e.g. a handful of repeated attribute
+                # words), a legitimate memory trivially covers >= hub_coverage of it with just ONE common word, which
+                # would wrongly flag every memory a hub and SILENTLY EMPTY recall. (Measured: 3-5 shared attrs -> 100%
+                # hub-flagged, 0% recall, before this floor.)
+                if shared >= 3 and cov >= hub_coverage:
                     r["status"] = "hub"
                     r.setdefault("meta", {})["hub"] = True
                     r["meta"]["hub_coverage"] = round(cov, 3)
@@ -365,10 +733,41 @@ class Mnemo:
                     if b["status"] != "active" or b["id"] in a["links"]:
                         continue
                     if self._similarity(a["text"], b, avec) >= dup_threshold:
-                        if _negation_clash(a["text"], b["text"]):
-                            older, newer = (a, b) if a["ts"] <= b["ts"] else (b, a)
+                        if _negation_clash(a["text"], b["text"]) or _value_clash(a["text"], b["text"]):
+                            # Resolve by VALIDITY time (valid_from = when the fact is TRUE), not ingest order
+                            # (ts = when it was stored). A fact learned LATE about an EARLIER state (e.g. a
+                            # back-filled record) must NOT overwrite the genuinely-current one just because it
+                            # arrived later. valid_from defaults to ts, so ingest-ordered streams are unchanged;
+                            # only out-of-order arrivals (the bi-temporal case) flip vs the old ts rule.
+                            _vf = lambda r: r.get("valid_from", r["ts"])
+                            older, newer = (a, b) if _vf(a) <= _vf(b) else (b, a)
+                            # Fast-novelty guard (opt-in): supersede only on a CORROBORATED contradiction
+                            # (earned credit, or >=2 links — same bar as graduation). An uncorroborated
+                            # single contradiction is recorded as a link but does NOT override a standing
+                            # fact (resists single-shot poison flips). Default OFF -> legacy fast behavior.
+                            if self.supersede_requires_corroboration:
+                                _ng = float(newer.get("good", 0) or 0); _nb = float(newer.get("bad", 0) or 0)
+                                if not ((_ng > 0 and _ng >= _nb) or len(newer.get("links") or []) >= 2):
+                                    a["links"].append(b["id"]); linked += 1
+                                    continue
+                            # Persistence (CUSUM) guard: supersede only once the NEW state is asserted by
+                            # >= supersede_persistence independent records (the change has persisted). Count
+                            # active records that (i) match newer's value/polarity and (ii) contradict older —
+                            # an isolated poison flip stays below the threshold and is merely linked.
+                            if self.supersede_persistence > 1:
+                                nvec = self._qvec(newer["text"])
+                                support = sum(
+                                    1 for r in active if r["status"] == "active"
+                                    and self._similarity(newer["text"], r, nvec) >= dup_threshold
+                                    and not _value_clash(newer["text"], r["text"])
+                                    and not _negation_clash(newer["text"], r["text"])
+                                    and (_value_clash(older["text"], r["text"]) or _negation_clash(older["text"], r["text"])))
+                                if support < self.supersede_persistence:
+                                    a["links"].append(b["id"]); linked += 1
+                                    continue
                             older["status"] = "superseded"
                             older["superseded_ts"] = time.time()
+                            older["invalidated_at"] = _vf(newer)   # bi-temporal: when this record stopped being current
                             older.setdefault("meta", {})["superseded_by_toggle"] = newer["id"]
                             # Accuracy loop, live consumer: being OVERTURNED by a later contradiction is
                             # a was-wrong signal — debit the superseded claim, credit the one that
@@ -383,7 +782,20 @@ class Mnemo:
                             a["links"].append(b["id"]); linked += 1
         staled = 0
         if keep is not None and len(active) > keep:
-            for r in active[keep:]:
+            # active is sorted by -raw value (above). Legacy = keep the top-`keep` by raw value. Two-tier =
+            # protect the top kprot by raw value (recency-immune), then fill the remaining budget from the
+            # REST by EFFECTIVE (decay-weighted) value, so a stale high-raw-value memory can't crowd out a
+            # freshly-useful one. (kprot=0 for tiny budgets -> pure recency-aware fill.)
+            if self.two_tier_keep:
+                now = time.time()
+                kprot = int(self.protect_frac * keep)
+                protected, rest = active[:kprot], active[kprot:]
+                rest_keep = set(id(r) for r in
+                                sorted(rest, key=lambda r: -self._effective_value(r, now))[:keep - kprot])
+                drop = [r for r in rest if id(r) not in rest_keep]
+            else:
+                drop = active[keep:]
+            for r in drop:
                 r["status"] = "superseded"; r["superseded_ts"] = time.time(); staled += 1
         self._save()
         return {"active": len([r for r in self.items if r["status"] == "active"]),
@@ -432,7 +844,7 @@ class Mnemo:
                     if b["status"] != "active" or b["id"] in a["links"]:
                         continue
                     if self._similarity(a["text"], b, avec) >= dup_threshold:
-                        if _negation_clash(a["text"], b["text"]):
+                        if _negation_clash(a["text"], b["text"]) or _value_clash(a["text"], b["text"]):
                             older, newer = (a, b) if a["ts"] <= b["ts"] else (b, a)
                             older["status"] = "superseded"; older["superseded_ts"] = time.time()
                             older.setdefault("meta", {})["superseded_by_toggle"] = newer["id"]
@@ -540,6 +952,31 @@ def _negation_clash(a: str, b: str) -> bool:
     LLM judge for production — but gate it behind similarity first to keep it O(neighbourhood)."""
     neg = re.compile(r"\b(not|no|never|cannot|can't|doesn't|isn't|won't|fails?|false)\b", re.I)
     return bool(neg.search(a)) != bool(neg.search(b))
+
+
+_NUM = re.compile(r"-?\d+(?:\.\d+)?")
+
+
+def _value_clash(a: str, b: str) -> bool:
+    """A VALUE UPDATE: two already-near-duplicate statements that are identical EXCEPT for a differing
+    numeric value ('retry limit is 5' -> '... is 12'). This is a state toggle (the fact's value changed),
+    NOT a duplicate — so the older should be superseded, not merged. Gated behind the caller's similarity
+    check; the tight 'non-numeric remainder is identical' condition keeps genuinely-distinct facts safe."""
+    # A value UPDATE keeps the same numbers in the same ORDER except ONE position whose value changed
+    # ('timeout is 5' -> 'is 12'; '5 of 10' -> '7 of 10'). Compare numbers POSITIONALLY, not as sets: a
+    # set view is ambiguous for ENUMERATED facts because an index can equal another row's value
+    # ('step 1 takes 5 min' vs 'step 5 takes 13 min' share the literal 5), which set-math reads as a
+    # single change and would silently supersede a coexisting record. (Measured: a 6-item enumerated store
+    # lost 5/6 facts under the set rule; 0/6 under this positional rule.)
+    na, nb = _NUM.findall(a), _NUM.findall(b)             # ORDERED, not sets
+    if not na or len(na) != len(nb):
+        return False                                      # no numbers, or different count -> not a single update
+    if sum(1 for x, y in zip(na, nb) if x != y) != 1:
+        return False                                      # exactly one positional value changed
+    # Compare the word-skeleton with ALL numbers stripped: _tokens keeps 3+ digit numbers as tokens
+    # (_WORD requires length >= 3), so a multi-digit value ('...is 123') would otherwise spuriously make
+    # the skeletons differ and miss the update. Strip numbers first, exactly as before this guard existed.
+    return _tokens(_NUM.sub("", a)) == _tokens(_NUM.sub("", b))   # identical apart from the one value
 
 
 if __name__ == "__main__":

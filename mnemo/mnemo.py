@@ -39,6 +39,7 @@ MIT-licensed. Part of Agora (https://github.com/DanceNitra/agora).
 """
 from __future__ import annotations
 
+import hashlib
 import json
 import math
 import os
@@ -52,7 +53,34 @@ try:                                  # OPTIONAL: numpy only ACCELERATES semanti
 except Exception:
     _np = None
 
-__version__ = "0.2.1"
+try:                                  # OPTIONAL: only needed to SIGN write receipts (see receipts=...).
+    from cryptography.hazmat.primitives.asymmetric.ed25519 import (
+        Ed25519PrivateKey as _Ed25519SK, Ed25519PublicKey as _Ed25519PK)
+    from cryptography.hazmat.primitives import serialization as _ser
+    _HAVE_ED = True
+except Exception:
+    _HAVE_ED = False
+
+_GENESIS = "0" * 64
+
+
+def _canon(obj) -> bytes:
+    return json.dumps(obj, sort_keys=True, separators=(",", ":"), ensure_ascii=False).encode("utf-8")
+
+
+def _sha256_hex(b: bytes) -> str:
+    return hashlib.sha256(b).hexdigest()
+
+
+def new_receipt_keypair():
+    """Return (private_key_hex, public_key_hex) for signing mnemo write receipts. Needs `cryptography`."""
+    if not _HAVE_ED:
+        raise RuntimeError("signing write receipts needs the `cryptography` package (pip install cryptography)")
+    sk = _Ed25519SK.generate()
+    return (sk.private_bytes(_ser.Encoding.Raw, _ser.PrivateFormat.Raw, _ser.NoEncryption()).hex(),
+            sk.public_key().public_bytes(_ser.Encoding.Raw, _ser.PublicFormat.Raw).hex())
+
+__version__ = "0.2.2"
 _WORD = re.compile(r"[a-z0-9][a-z0-9\-']{2,}")
 _STOP = frozenset("the a an of for to in on and or is are was were be been with this that it its as "
                   "by at from into our we us you your he she they them his her their not no".split())
@@ -74,9 +102,19 @@ def _cosine(a, b) -> float:
 
 
 class Mnemo:
-    def __init__(self, path: str | None = None, embed=None):
+    def __init__(self, path: str | None = None, embed=None, receipts: bool = False,
+                 receipt_key: str | None = None, receipt_pubkey: str | None = None):
         """path: optional JSON file to persist to. embed: optional fn(str)->list[float] for semantic
-        recall; if omitted, recall uses lexical token overlap (zero dependencies)."""
+        recall; if omitted, recall uses lexical token overlap (zero dependencies).
+
+        receipts/receipt_key (OPT-IN, default OFF -> identical legacy behavior): when enabled, every
+        remember() appends a tamper-evident, hash-chained WRITE RECEIPT committing to the memory's
+        content hash, persisted to a sidecar "<path>.receipts.json" (the main store format is unchanged).
+        verify_writes() then proves the write history wasn't altered out-of-band — something an
+        append-only store alone can't, because anyone who can edit the store file can rewrite a stored
+        memory and the store would serve the altered text as original. The hash chain is zero-dependency;
+        pass receipt_key (+ receipt_pubkey) from new_receipt_keypair() to also Ed25519-SIGN each receipt
+        so a third party can verify it with the public key only. (Standalone version: agora-agent-receipts.)"""
         self.path = Path(path) if path else None
         self.embed = embed
         self.items: list[dict] = []
@@ -138,6 +176,17 @@ class Mnemo:
                 self.items = json.loads(self.path.read_text(encoding="utf-8"))
             except Exception:
                 self.items = []
+        # OPT-IN write receipts (default OFF -> zero behavior change; no sidecar created)
+        self.receipts_enabled = bool(receipts or receipt_key)
+        self._receipt_sk = receipt_key
+        self.receipt_pubkey = receipt_pubkey
+        self._receipts: list[dict] = []
+        self._receipts_path = (self.path.parent / (self.path.name + ".receipts.json")) if self.path else None
+        if self.receipts_enabled and self._receipts_path and self._receipts_path.exists():
+            try:
+                self._receipts = json.loads(self._receipts_path.read_text(encoding="utf-8"))
+            except Exception:
+                self._receipts = []
 
     # ── capture ──────────────────────────────────────────────────────────────
     def remember(self, text: str, tags=None, value: float = 1.0, meta: dict | None = None,
@@ -177,7 +226,65 @@ class Mnemo:
         if key is not None:
             self._supersede_by_key(rec)   # deterministic SRO supersession (no embedding, no threshold)
         self._save(force=True)        # a new memory is real content - persist immediately, not throttled
+        if self.receipts_enabled:
+            self._emit_write_receipt(rec)
         return mid
+
+    # ── write receipts (OPT-IN: tamper-evident write history) ─────────────────
+    def _write_commit(self, rec: dict) -> dict:
+        """What a receipt commits to for a stored memory: its id + a hash of its content-bearing fields."""
+        return {"id": rec["id"],
+                "content_sha256": _sha256_hex(_canon({"text": rec.get("text"), "key": rec.get("key"),
+                                                      "mtype": rec.get("mtype")}))}
+
+    def _emit_write_receipt(self, rec: dict) -> dict:
+        prev = self._receipts[-1]["hash"] if self._receipts else _GENESIS
+        r = {"seq": len(self._receipts), "ts": rec.get("ts"), "memory_id": rec["id"],
+             "commit": self._write_commit(rec), "prev": prev}
+        r["hash"] = _sha256_hex(_canon({k: r[k] for k in ("seq", "ts", "memory_id", "commit", "prev")}))
+        if self._receipt_sk and _HAVE_ED:
+            sk = _Ed25519SK.from_private_bytes(bytes.fromhex(self._receipt_sk))
+            r["pubkey"] = self.receipt_pubkey
+            r["sig"] = sk.sign(bytes.fromhex(r["hash"])).hex()
+        self._receipts.append(r)
+        if self._receipts_path:
+            try:
+                self._receipts_path.write_text(json.dumps(self._receipts, indent=2, ensure_ascii=False),
+                                               encoding="utf-8")
+            except Exception:
+                pass
+        return r
+
+    def verify_writes(self, expected_pubkey: str | None = None) -> tuple[bool, list[str]]:
+        """Verify the write-receipt chain AND that each stored memory still matches its write receipt.
+        Returns (ok, problems). Catches out-of-band edits to the store the normal flow can't see.
+        Requires receipts to have been enabled at write time."""
+        problems: list[str] = []
+        prev = _GENESIS
+        by_id = {it["id"]: it for it in self.items}
+        for i, r in enumerate(self._receipts):
+            core = {k: r.get(k) for k in ("seq", "ts", "memory_id", "commit", "prev")}
+            if r.get("prev") != prev:
+                problems.append(f"receipt {i}: broken chain link (a prior receipt was altered/removed)")
+            if _sha256_hex(_canon(core)) != r.get("hash"):
+                problems.append(f"receipt {i}: receipt tampered (hash mismatch)")
+            if "sig" in r and _HAVE_ED:
+                try:
+                    _Ed25519PK.from_public_bytes(bytes.fromhex(r["pubkey"])).verify(
+                        bytes.fromhex(r["sig"]), bytes.fromhex(r["hash"]))
+                    if expected_pubkey and r.get("pubkey") != expected_pubkey:
+                        problems.append(f"receipt {i}: signed by an unexpected key")
+                except Exception:
+                    problems.append(f"receipt {i}: invalid signature")
+            elif expected_pubkey:
+                problems.append(f"receipt {i}: unsigned, but a signature was required")
+            cur = by_id.get(r["memory_id"])
+            if cur is None:
+                problems.append(f"memory {r['memory_id']}: written but missing from the store (deleted out-of-band)")
+            elif self._write_commit(cur) != r["commit"]:
+                problems.append(f"memory {r['memory_id']}: stored content no longer matches its write receipt (edited after write)")
+            prev = r.get("hash")
+        return (len(problems) == 0, problems)
 
     def _supersede_by_key(self, rec: dict) -> None:
         """Deterministic (subject, relation, object) supersession: retire active records that share

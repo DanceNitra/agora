@@ -68,13 +68,17 @@ mcp = FastMCP("mnemo")
 
 @mcp.tool()
 def remember(text: str, tags: list[str] | None = None, value: float = 1.0,
-             mtype: str | None = None) -> dict:
+             mtype: str | None = None, key: str | None = None) -> dict:
     """Store a memory (append-only; raw text is never edited afterward). `tags` group memories into
     cohorts; `value` (>=1) is its importance — higher-value memories outrank merely-similar ones at
     recall, and recall itself nudges value up. `mtype` ∈ {episodic, semantic, procedural} sets the
     decay prior — episodic (events) fades fast, semantic (durable facts) slow, procedural (rules /
-    preferences) barely; pass it when you know the kind, else it's inferred. Returns the new id."""
-    mid = _MEM.remember(text, tags=tags or [], value=value, mtype=mtype)
+    preferences) barely; pass it when you know the kind, else it's inferred. Optional `key` is a
+    deterministic (subject, relation) supersession key (e.g. "billing-api::auth-method"): storing a new
+    value with the same key retires the old one so recall never returns the stale value — no similarity
+    threshold, no extra LLM call. Use it for facts that get updated (config, prices, versions, status).
+    Returns the new id."""
+    mid = _MEM.remember(text, tags=tags or [], value=value, mtype=mtype, key=key)
     rec = next((r for r in _MEM.items if r["id"] == mid), {})
     return {"id": mid, "stored": text[:120], "tags": tags or [], "value": value,
             "mtype": rec.get("mtype")}
@@ -128,6 +132,21 @@ def credit(ids: list[str], outcome: str, weight: float = 1.0) -> dict:
     posterior), not merely by being-recalled. `outcome`: 'good'/'right'/'correct' vs 'bad'/'wrong'/'failed'
     (or pass a bool / a signed number). Counts only grow; raw text is never edited. Returns what updated."""
     return _MEM.credit(ids, outcome, weight=weight)
+
+
+@mcp.tool()
+def forget(ids: list[str] | None = None, where_contains: str | None = None) -> dict:
+    """TRULY DELETE memories — the one op that removes content (everything else is append-only: supersession
+    only demotes). Use for an erasure / right-to-be-forgotten request, a poisoned or false memory, or a hard
+    correction. Pass `ids` (memory ids to drop) and/or `where_contains` (delete every memory whose text
+    contains this substring, case-insensitive). Verified forgetting: the records are deleted AND their ids are
+    scrubbed from every survivor's links + supersession pointers + the caches, so a forgotten memory cannot
+    resurface via recall or a later consolidation pass. Returns {forgotten, ids, scrubbed_links}."""
+    where = None
+    if where_contains:
+        needle = where_contains.lower()
+        where = lambda r: needle in (r.get("text") or "").lower()
+    return _MEM.forget(ids=ids, where=where)
 
 
 def main():

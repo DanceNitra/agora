@@ -239,9 +239,29 @@ the reasoning; the corrections still warrant a source-check before public citati
 - **Notes over ~2 MB are skipped** (configurable via `SECOND_BRAIN_MAX_BYTES`) so a single huge file
   can't exhaust memory.
 
+## Tamper-evident write receipts (opt-in)
+
+mnemo is append-only, so it never silently edits a fact in normal use — but the store is a file, and
+anyone who can touch it can rewrite a stored memory after the fact. Turn on **write receipts** and every
+`remember()` appends a hash-chained (optionally Ed25519-signed) receipt committing to the memory's
+content hash, to a sidecar `<path>.receipts.json`. `verify_writes()` then proves the write history
+wasn't altered out-of-band — something an append-only store alone can't. Default OFF (zero behavior
+change); the hash chain is zero-dependency, signing needs `cryptography`.
+
+```python
+from mnemo import Mnemo, new_receipt_keypair
+sk, pk = new_receipt_keypair()
+m = Mnemo("mem.json", receipts=True, receipt_key=sk, receipt_pubkey=pk)
+m.remember("prod db host is db-prod-01", key="db::host", mtype="semantic")
+ok, problems = m.verify_writes(expected_pubkey=pk)   # True on an honest store
+# an out-of-band edit to a stored memory -> ok=False, names the exact memory id
+```
+
+(The same mechanism, standalone and for any agent/MCP tool call, is `agora-agent-receipts`.)
+
 ## Status
 
-`v0.1` — the core, honest and runnable, **now with two MCP servers**: `mnemo_mcp` (memory) and
+`v0.2` — the core, honest and runnable, **now with two MCP servers**: `mnemo_mcp` (memory) and
 `second_brain_mcp` (the thinking layer over your notes). Roadmap: pluggable vector stores, a hosted
 tier. Open-core; the core stays free.
 
