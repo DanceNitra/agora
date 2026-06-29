@@ -35,6 +35,7 @@ CHURN_EXEMPT = {"seminar", "vault-note", "promote-findings", "directions", "matc
 SCOUT_STALE_S = 12 * 3600      # repo scan considered stale after 12h
 OPP_EVERY_S = 12 * 3600        # opportunity (repos+forums+where-we-fit) sweep cadence
 AUDIT_EVERY_S = 24 * 3600      # OS self-audit cadence
+CRUCIBLE_EVERY_S = 3 * 24 * 3600  # Crucible-candidate hunt cadence (storm/artifact-debunk -> ledger)
 
 
 def _get(path):
@@ -138,6 +139,16 @@ def _periodic(st, now):
                "ROI-0 leak or the weakest stage of activity->grounded->curated->shipped), with the concrete "
                "change. One data-backed recommendation.")
         print("[selfimp] queued OS self-audit", flush=True)
+    if now - st.get("last_crucible", 0) > CRUCIBLE_EVERY_S:
+        st["last_crucible"] = now
+        _queue("CRUCIBLE-CANDIDATE HUNT (feed the ledger): run a fresh hunt for famous, quantitative, "
+               "falsifiable claims where a runnable null/strong-baseline could give a FAILED — prefer the "
+               "AI/LLM-engineering folklore lane (dev-actionable + public data). Use the ai-folklore-batch / "
+               "artifact-debunk-pipeline workflow to surface + prior-art-vet candidates, then RED-TEAM the "
+               "top pick with the stress-claim skill and VERIFY any cited numbers with verify-claims BEFORE "
+               "recording. Severe-test the strongest computable one (Lab baseline same cycle); record to the "
+               "Crucible only if it passes both gates. Gated publish stays owner-approved.")
+        print("[selfimp] queued Crucible-candidate hunt", flush=True)
 
 
 def main():
