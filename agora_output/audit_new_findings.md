@@ -42,3 +42,13 @@ discloses (2)+(3). This is the [[audit-publish-full-procedure-never-shorten]] pa
 ## Next: feed the strongest to the flywheel
 The #9-curation and #10-retrieval questions are the most testable + on-frontier. Candidate to POST to the
 brain Board / hypothesis loop as open questions the agents re-test, or to run as the next Crucible probes.
+
+## #1 (causal-inference-phase-diagram) — full /audit-post, verdict heavy REFRAME (estimand error)
+Core error caught (all 5 lenses + code read): τ=2.0 is the DIRECT effect; difference-in-means consistently
+estimates the TOTAL effect via M=(I−ρW)⁻¹, so the "96% bias" was a total-vs-direct ESTIMAND MISMATCH, not
+RCT bias; the 1/(1−ρ) divergence is the Manski linear-in-means reduced form (multiplier label = Glaeser-
+Sacerdote-Scheinkman 2003), baked in; "phase diagram" was a 1-D curve; "design matters less" was untested
+and likely INVERTED. Rewritten honestly (estimand shift; design/estimand matters MORE), re-audited CLEAN.
+**Frontier question:** on a scale-free network as ρ→ρ_crit, does a cluster-randomized estimator of the
+TOTAL effect stay unbiased with finite variance, or does critical slowing-down make it unidentifiable? That
+single test separates "design fixes it" from "near criticality nothing is estimable."

@@ -137,17 +137,17 @@ META = {
     },
     "phase-diagram": {
         "slug": "causal-inference-phase-diagram",
-        "title": "Causal Inference Has a Phase Diagram: RCTs Overstate Effects Near Criticality",
-        "title_sk": "Kauzálna inferencia má fázový diagram: RCT nadhodnocujú efekt pri kritickom bode",
-        "desc": "Near a critical coupling point, even a randomized experiment overstates the effect — the "
-                "bias is interference, not confounding, and grows without bound as you approach criticality. "
-                "A lattice illustration of established causal-inference theory (Hudgens-Halloran; Forastiere-Savje).",
-        "desc_sk": "Pri kritickom bode aj randomizovaný experiment nadhodnotí efekt — skreslenie je "
-                   "interferencia, nie zmätenie, a rastie neobmedzene blízko kritického bodu. Lattice ilustrácia "
-                   "etablovanej kauzálnej teórie (Hudgens-Halloran; Forastiere-Savje).",
-        "date": "2026-06-10",
-        "tags": "Causal inference · Interference · Complexity",
-        "tags_sk": "Kauzálna inferencia · Interferencia · Komplexita",
+        "title": "Spillovers Don't Bias Your Experiment — They Change the Estimand",
+        "title_sk": "Spillovery nezaujatkujú experiment — menia estimand",
+        "desc": "When units interfere, a randomized difference-in-means doesn't break — it consistently "
+                "estimates the TOTAL effect, not the direct one, and the gap grows with coupling (to ~96% of "
+                "the direct effect near criticality). The fix: choose your estimand and a design that targets it. Corrected re-publication.",
+        "desc_sk": "Keď jednotky interferujú, randomizovaný difference-in-means sa nerozbije — konzistentne "
+                   "meria TOTAL efekt, nie priamy, a rozdiel rastie s previazanosťou (~96% priameho efektu pri "
+                   "kriticite). Oprava: vyber estimand a dizajn, ktorý naň mieri. Opravená re-publikácia.",
+        "date": "2026-06-10", "modified": "2026-06-29",
+        "tags": "Causal inference · Interference · Estimand · Spillovers",
+        "tags_sk": "Kauzálna inferencia · Interferencia · Estimand · Spillovery",
         "kicker": "Causal inference", "kicker_sk": "Kauzálna inferencia",
     },
 }
