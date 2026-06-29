@@ -1,5 +1,19 @@
 [
  {
+  "slug": "llm-as-judge-length-confound",
+  "title": "LLM-as-Judge's 80% Human Match Is Half Just Length",
+  "title_sk": "80% zhoda LLM-sudcu s ľuďmi je spolovice len dĺžka",
+  "desc": "The famous LLM-as-judge result says GPT-4 agrees with humans ~80%. On the same data, a zero-understanding 'pick the longer answer' null hits 68% — reproducing half the judge's above-chance agreement. Measured on the original votes, with the falsifier.",
+  "desc_sk": "Slávny výsledok LLM-as-judge tvrdí, že GPT-4 sa zhoduje s ľuďmi ~80%. Na tých istých dátach „vyber dlhšiu odpoveď“ null dosiahne 68% — polovicu nad-náhodnej zhody sudcu. Odmerané na originálnych hlasoch, s falzifikátorom.",
+  "date": "2026-06-29",
+  "tags": "AI evaluation · LLM-as-judge · Verbosity bias · Replication",
+  "tags_sk": "AI hodnotenie · LLM-as-judge · Verbosity bias · Replikácia",
+  "kicker": "The Crucible",
+  "kicker_sk": "Crucible",
+  "read": 4,
+  "bilingual": true
+ },
+ {
   "slug": "good-to-great-zero-skill-null",
   "title": "‘Good to Great’: a zero-skill null reproduces the leap",
   "title_sk": "„Good to Great“: ten skok zvládne aj nulová schopnosť",

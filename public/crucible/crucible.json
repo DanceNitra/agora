@@ -4,10 +4,19 @@
  "generated": "2026-06-29",
  "counts": {
   "REPRODUCED": 42,
-  "FAILED": 9,
+  "FAILED": 10,
   "NOT_COMPUTABLE": 15
  },
  "entries": [
+  {
+   "claim": "LLM-as-judge (GPT-4) agrees with human preferences ~80% — on par with human-human agreement — so it is a valid stand-in for human quality evaluation (MT-Bench).",
+   "source": "Zheng et al. 2023, Judging LLM-as-a-Judge with MT-Bench and Chatbot Arena, arXiv:2306.05685",
+   "verdict": "FAILED",
+   "note": "Length-confound null on the ORIGINAL released data (lmsys/mt_bench_human_judgments: 3355 human + 2400 GPT-4 pairwise votes). NULL judge with zero understanding = pick the LONGER response. Measured (ties excluded): length-only vs human = 0.6",
+   "lab_id": "bf7bb9",
+   "code": "https://github.com/DanceNitra/agora/blob/main/agora_output/lab/20260629-143109_llm-judge-length-confound.py",
+   "date": "2026-06-29"
+  },
   {
    "claim": "The 11 'Good to Great' companies (Collins 2001) achieved sustained greatness via a discoverable shared set of traits (Level 5 leadership, Hedgehog Concept, right-people-on-the-bus, the Flywheel).",
    "source": "Jim Collins, Good to Great (HarperBusiness 2001)",

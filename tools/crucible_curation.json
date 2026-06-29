@@ -156,5 +156,16 @@
   "verdict": "FAILED. The selection cohort is fully reproducible from luck alone (3x->30 firms, 5x->9, vs Collins 11), each spectacular in the selection window (3.8-5.6x the market) BY CONSTRUCTION, after which forward excess collapses to ~0 (3x: +0.015, CI (-1.12,1.64); 5x: -0.008) and only ~47% beat the market going forward. All-firms forward excess = 0.00000 (sanity). This regression-to-the-mean collapse is exactly what happened to Collins' real picks after 2001 (Circuit City bankrupt, Fannie Mae bailed out). Honest scope: the evidence cannot separate skill from luck+selection - NOT that management skill is literally zero. Prior art: Rosenzweig 'The Halo Effect' (2007), Levitt; our contribution is the runnable zero-skill null + forward-collapse receipt.",
   "featured": false,
   "deep_dive": "../../posts/good-to-great-zero-skill-null.html"
+ },
+ "bf7bb9": {
+  "title": "LLM-as-judge agrees with humans ~80%, so it is a valid quality judge",
+  "year": "Zheng et al. - 2023 (MT-Bench)",
+  "field": "AI evaluation",
+  "result": "A zero-understanding null judge that simply picks the LONGER answer already agrees with human preferences 68.1% of the time (vs 50% chance), reproducing ~half of the GPT-4 judges celebrated above-chance agreement; the GPT-4 judge itself agrees with pick-the-longer 73.5% of the time.",
+  "canon": "The foundational LLM-as-judge paper reported GPT-4 agrees with human preference judgments ~80% of the time, on par with human-human agreement, and concluded a strong LLM is a valid scalable stand-in for human quality evaluation. LLM-as-judge is now ubiquitous in AI eval.",
+  "rebuilt": "On the ORIGINAL released data (lmsys/mt_bench_human_judgments: 3355 human + 2400 GPT-4 pairwise votes), build a NULL judge with zero understanding -> pick the response with more characters. Measure its agreement with human votes and with the GPT-4 judge (ties excluded).",
+  "verdict": "FAILED. Length-only vs human = 0.681 (n=2562; robust to word-count, 0.664). GPT-4 judge vs human majority = ~0.84 (n=825) — reproduces the celebrated ~80%, validating the pipeline. Length-only vs GPT-4 = 0.735 (n=1792): the famous judge agrees with the dumb length rule nearly 3/4 of the time. So a rule with NO understanding reproduces ~52-54% of the judges above-chance agreement — the ~80% human-parity is substantially a verbosity/length confound, not proof of semantic judging. Honest scope: length explains about half, not all (residual semantic signal exists); what FAILS is the inference that 80% agreement validates LLM-judges as semantic stand-ins. Prior art: Zheng et al. flag verbosity bias themselves; Dubois et al. 2024 (length-controlled AlpacaEval). Our contribution: the runnable length-only-null receipt on the exact original data.",
+  "deep_dive": "../../posts/llm-as-judge-length-confound.html",
+  "featured": false
  }
 }
