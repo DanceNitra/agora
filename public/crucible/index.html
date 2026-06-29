@@ -5,7 +5,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>The Crucible &middot; a machine that rebuilds claims in code &middot; Agora</title>
-<meta name="description" content="A public ledger of scientific and technical claims rebuilt as minimal computational models and tested in code: 42 reproduced, 11 failed, 4 honest passes. Every verdict ships runnable code and a measured number.">
+<meta name="description" content="A public ledger of scientific and technical claims rebuilt as minimal computational models and tested in code: 42 reproduced, 12 failed, 4 honest passes. Every verdict ships runnable code and a measured number.">
 <link rel="canonical" href="https://dancenitra.github.io/agora/public/crucible/">
 <meta property="og:type" content="website">
 <meta property="og:title" content="The Crucible — claims, rebuilt in code and tested">
@@ -175,7 +175,7 @@
   Every verdict ships a measured number and the code that produced it.</p>
   <div class="tally">
     <div class="t ok"><div class="num">42</div><div class="lbl">Reproduced</div></div>
-    <div class="t fail"><div class="num">11</div><div class="lbl">Failed</div></div>
+    <div class="t fail"><div class="num">12</div><div class="lbl">Failed</div></div>
     <div class="t"><div class="num">4</div><div class="lbl">Honest passes</div></div>
   </div>
   <div class="dataset">Open data &mdash; <a href="crucible.json">the full ledger as JSON</a> &middot; now a citable dataset on <a href="https://huggingface.co/datasets/Danchi17/folklore-index" target="_blank" rel="noopener">Hugging&nbsp;Face &rarr;</a><br><span class="loadline"><code>datasets.load_dataset("Danchi17/folklore-index")</code></span></div>
@@ -195,13 +195,23 @@
     </div>
   </section>
 <section class="ledger"><div class="wrap">
-  <div class="sechead"><h2>The ledger</h2><div class="sub">53 claims rebuilt &amp; tested &middot; newest first</div></div>
+  <div class="sechead"><h2>The ledger</h2><div class="sub">54 claims rebuilt &amp; tested &middot; newest first</div></div>
   <div class="filters">
     <button class="on" data-f="all">All</button>
     <button data-f="REPRODUCED">Reproduced</button>
     <button data-f="FAILED">Failed</button>
   </div>
   <div class="grid" id="grid">
+      <article class="card fail" data-v="FAILED" data-reveal>
+        <div class="crail"></div>
+        <div class="cbody">
+          <div class="chead"><span class="cv">FAILED</span>
+            <span class="cfield">AI evaluation</span></div>
+          <h3>Chatbot Arena Elo ranks LLMs by genuine quality (cite Arena rank to pick a model)</h3>
+          <p class="cresult">A classifier that sees ONLY answer style (length, markdown headers, bold, lists) and NO model identity predicts the human winner 61.5% of the time, and its per-model ranking correlates rho=0.74 with the real win-rate ranking across 48 models — it reproduces the leaderboard ORDER without knowing which model wrote anything.</p>
+          <div class="cfoot"><span class="cyear">Chiang et al. - 2024 (LMArena)</span><a class="code" href="https://github.com/DanceNitra/agora/blob/main/agora_output/lab/20260629-151508_arena-style-only-leaderboard.py" target="_blank" rel="noopener">runnable model &rarr;</a></div>
+        </div>
+      </article>
       <article class="card fail" data-v="FAILED" data-reveal>
         <div class="crail"></div>
         <div class="cbody">

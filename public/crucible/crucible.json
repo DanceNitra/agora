@@ -4,10 +4,19 @@
  "generated": "2026-06-29",
  "counts": {
   "REPRODUCED": 42,
-  "FAILED": 11,
+  "FAILED": 12,
   "NOT_COMPUTABLE": 15
  },
  "entries": [
+  {
+   "claim": "Chatbot Arena (LMArena) Elo ranks LLMs by genuine answer quality, so Arena rank is a valid model-selection signal.",
+   "source": "Chiang et al. 2024, Chatbot Arena, arXiv:2403.04132",
+   "verdict": "FAILED",
+   "note": "Style-only null on real public votes (lmarena-ai/arena-human-preference-140k, 2 shards = 28,084 decided battles). Features = STYLE ONLY as side-A-minus-B differences (response length/tokens, markdown header count, list count, bold count) wi",
+   "lab_id": "14c41f",
+   "code": "https://github.com/DanceNitra/agora/blob/main/agora_output/lab/20260629-151508_arena-style-only-leaderboard.py",
+   "date": "2026-06-29"
+  },
   {
    "claim": "Founder-led firms returned ~3.1x more than other firms (1990-2014); the founders mentality drives superior long-run performance.",
    "source": "Zook & Allen (Bain), The Founders Mentality (HBR Press 2016)",

@@ -178,5 +178,16 @@
   "verdict": "FAILED (with honest scope). A zero-skill survivorship null reproduces a 2.60x MEAN gap (76% of 3.1x), rising monotonically with the volatility ratio (1.4x vol->1.55x; 2.2x->4.77x). Crucially the MEDIAN gap is only 1.58x — the advantage lives in the extreme upper tail, exactly where survivorship operates, and a mean/aggregate 3.1x is the tail-sensitive metric this inflates. So index construction (survivorship + look-ahead inclusion) of a higher-variance cohort manufactures most of the headline with no skill at all. Scope: NOT proof founder firms have zero real edge; assumptions (vol ratio, ruin, index bar) stated and swept. Survivorship bias is textbook; the contribution is the runnable null tied to this specific claim + the mean-vs-median tail diagnosis.",
   "deep_dive": "../../posts/founder-led-survivorship-null.html",
   "featured": false
+ },
+ "14c41f": {
+  "title": "Chatbot Arena Elo ranks LLMs by genuine quality (cite Arena rank to pick a model)",
+  "year": "Chiang et al. - 2024 (LMArena)",
+  "field": "AI evaluation",
+  "result": "A classifier that sees ONLY answer style (length, markdown headers, bold, lists) and NO model identity predicts the human winner 61.5% of the time, and its per-model ranking correlates rho=0.74 with the real win-rate ranking across 48 models — it reproduces the leaderboard ORDER without knowing which model wrote anything.",
+  "canon": "Chatbot Arena / LMArena Elo, from millions of human pairwise votes, is the de-facto authority developers cite to choose models, taken to rank LLMs by genuine answer quality.",
+  "rebuilt": "Real public votes (lmarena-ai/arena-human-preference-140k, 28,084 decided battles). Build style-ONLY features as side-A-minus-B differences (assistant tokens, markdown header/list/bold counts), NO model identity, NO content. Logistic classifier predicts the winner; then rank models by style-only win-propensity and correlate with the actual win-rate ranking.",
+  "verdict": "FAILED. Style-only held-out accuracy 61.5% (AUC 0.655; chance 50.8%); length alone 61.5% (markdown adds ~nothing beyond length here). The fresh receipt: style-only per-model ranking vs actual win-rate ranking gives Spearman rho=0.74, robust across thresholds (0.748/0.743/0.732 at >=100/200/500 battles; 51/48/44 models). A model blind to which LLM produced each answer reproduces the leaderboard ORDER from stylistic form. Falsifier met (acc>=0.60 AND rho>=0.70). Honest scope: Arena rank is heavily explained by style/length, NOT that the models are equal in quality. Prior art: Zheng 2023 (verbosity), LMSYS style-control blog 2024 (no no-identity ranking reproduction shipped), Singh & Hooker Leaderboard Illusion 2025, and our LLM-as-judge length post. Sequel: length fakes the JUDGE -> style fakes the LEADERBOARD.",
+  "deep_dive": "../../posts/chatbot-arena-style-not-skill.html",
+  "featured": false
  }
 }

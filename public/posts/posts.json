@@ -1,5 +1,19 @@
 [
  {
+  "slug": "chatbot-arena-style-not-skill",
+  "title": "Chatbot Arena Ranks LLMs by Style as Much as Skill",
+  "title_sk": "Chatbot Arena radí modely podľa štýlu rovnako ako kvality",
+  "desc": "On real Arena votes, a judge that sees only answer style (length, markdown) and no model identity predicts the winner 61.5% and reproduces the leaderboard order at ρ=0.74 across 48 models. The rank you cite to pick a model is largely formatting. Measured, with the falsifier.",
+  "desc_sk": "Na reálnych Arena hlasoch sudca, čo vidí len štýl odpovede (dĺžka, markdown) a žiadnu identitu modelu, predpovedá víťaza 61,5% a reprodukuje poradie leaderboardu pri ρ=0,74 cez 48 modelov. Poradie, čo citujeme, je z veľkej časti formátovanie. Odmerané, s falzifikátorom.",
+  "date": "2026-06-29",
+  "tags": "AI evaluation · Chatbot Arena · Verbosity bias · Replication",
+  "tags_sk": "AI hodnotenie · Chatbot Arena · Verbosity bias · Replikácia",
+  "kicker": "The Crucible",
+  "kicker_sk": "Crucible",
+  "read": 4,
+  "bilingual": true
+ },
+ {
   "slug": "founder-led-survivorship-null",
   "title": "Founder-Led Firms' 3.1× Edge: Mostly Survivorship",
   "title_sk": "Náskok 3,1× founder firiem: hlavne survivorship",
