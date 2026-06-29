@@ -4,10 +4,19 @@
  "generated": "2026-06-29",
  "counts": {
   "REPRODUCED": 42,
-  "FAILED": 10,
+  "FAILED": 11,
   "NOT_COMPUTABLE": 15
  },
  "entries": [
+  {
+   "claim": "Founder-led firms returned ~3.1x more than other firms (1990-2014); the founders mentality drives superior long-run performance.",
+   "source": "Zook & Allen (Bain), The Founders Mentality (HBR Press 2016)",
+   "verdict": "FAILED",
+   "note": "Zero-skill survivorship null (Lab 12b630). Two cohorts with IDENTICAL expected returns; founder-led differs ONLY by higher volatility (~1.8x) + more delisting; apply the same look-ahead index filter (survive to end AND be large enough). MEA",
+   "lab_id": "12b630",
+   "code": "https://github.com/DanceNitra/agora/blob/main/agora_output/lab/20260629-144725_founder-led-survivorship-artifact.py",
+   "date": "2026-06-29"
+  },
   {
    "claim": "LLM-as-judge (GPT-4) agrees with human preferences ~80% — on par with human-human agreement — so it is a valid stand-in for human quality evaluation (MT-Bench).",
    "source": "Zheng et al. 2023, Judging LLM-as-a-Judge with MT-Bench and Chatbot Arena, arXiv:2306.05685",

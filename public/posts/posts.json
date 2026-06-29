@@ -1,5 +1,19 @@
 [
  {
+  "slug": "founder-led-survivorship-null",
+  "title": "Founder-Led Firms' 3.1× Edge: Mostly Survivorship",
+  "title_sk": "Náskok 3,1× founder firiem: hlavne survivorship",
+  "desc": "Bain says founder-led firms returned 3.1× more. A zero-skill cohort that's merely more volatile, run through the same survivorship filter, reproduces 2.6× of it (76%) — and the edge is tail-driven (median 1.58×). Measured, with the falsifier.",
+  "desc_sk": "Bain tvrdí, že founder firmy vyniesli 3,1× viac. Zero-skill kohorta, len volatilnejšia, cez ten istý survivorship filter reprodukuje 2,6× (76%) — a náskok je tail-driven (medián 1,58×). Odmerané, s falzifikátorom.",
+  "date": "2026-06-29",
+  "tags": "Management · Survivorship bias · Look-ahead bias · Replication",
+  "tags_sk": "Manažment · Survivorship bias · Look-ahead bias · Replikácia",
+  "kicker": "The Crucible",
+  "kicker_sk": "Crucible",
+  "read": 4,
+  "bilingual": true
+ },
+ {
   "slug": "llm-as-judge-length-confound",
   "title": "LLM-as-Judge's 80% Human Match Is Half Just Length",
   "title_sk": "80% zhoda LLM-sudcu s ľuďmi je spolovice len dĺžka",

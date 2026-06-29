@@ -167,5 +167,16 @@
   "verdict": "FAILED. Length-only vs human = 0.681 (n=2562; robust to word-count, 0.664). GPT-4 judge vs human majority = ~0.84 (n=825) — reproduces the celebrated ~80%, validating the pipeline. Length-only vs GPT-4 = 0.735 (n=1792): the famous judge agrees with the dumb length rule nearly 3/4 of the time. So a rule with NO understanding reproduces ~52-54% of the judges above-chance agreement — the ~80% human-parity is substantially a verbosity/length confound, not proof of semantic judging. Honest scope: length explains about half, not all (residual semantic signal exists); what FAILS is the inference that 80% agreement validates LLM-judges as semantic stand-ins. Prior art: Zheng et al. flag verbosity bias themselves; Dubois et al. 2024 (length-controlled AlpacaEval). Our contribution: the runnable length-only-null receipt on the exact original data.",
   "deep_dive": "../../posts/llm-as-judge-length-confound.html",
   "featured": false
+ },
+ "12b630": {
+  "title": "Founder-led firms returned 3.1x more — the founders mentality drives performance",
+  "year": "Zook & Allen (Bain) - 2016",
+  "field": "Management / Future of Work",
+  "result": "With IDENTICAL expected returns, a founder-led cohort that is merely ~1.8x as volatile, run through the same survive-and-be-large index filter, shows an apparent 2.60x mean return gap — 76% of Bains 3.1x — from ZERO skill. The advantage is tail-driven: the MEDIAN gap is only 1.58x.",
+  "canon": "Bains widely-cited stat: founder-led firms returned about 3.1x more than the rest (1990-2014), presented as evidence that a founders mentality causes superior long-run performance.",
+  "rebuilt": "Two cohorts with the SAME expected return; founder-led differs only mechanically — higher volatility (~1.8x) and more delisting. Apply the same look-ahead index rule the stat uses (count only firms that survived to the end and are large enough). Measure the apparent return gap. Pure numpy, no external data.",
+  "verdict": "FAILED (with honest scope). A zero-skill survivorship null reproduces a 2.60x MEAN gap (76% of 3.1x), rising monotonically with the volatility ratio (1.4x vol->1.55x; 2.2x->4.77x). Crucially the MEDIAN gap is only 1.58x — the advantage lives in the extreme upper tail, exactly where survivorship operates, and a mean/aggregate 3.1x is the tail-sensitive metric this inflates. So index construction (survivorship + look-ahead inclusion) of a higher-variance cohort manufactures most of the headline with no skill at all. Scope: NOT proof founder firms have zero real edge; assumptions (vol ratio, ruin, index bar) stated and swept. Survivorship bias is textbook; the contribution is the runnable null tied to this specific claim + the mean-vs-median tail diagnosis.",
+  "deep_dive": "../../posts/founder-led-survivorship-null.html",
+  "featured": false
  }
 }
