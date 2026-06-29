@@ -16,6 +16,7 @@ honest about what it does and does not give you.
 python agent_receipts.py     # core: hash-chain + Ed25519 signatures + tamper/forgery demo
 python mcp_wrapper.py         # wrap any MCP/agent tool so every call emits a receipt
 python mediator.py           # external-mediator mode: catch an agent hiding/faking its own actions
+python verify_cli.py receipts.json --pubkey <hex>   # independently verify a receipts file (no code)
 ```
 
 ## What it does — two layers
@@ -92,6 +93,19 @@ Now the agent cannot withhold a receipt, forge one (it lacks the mediator's key)
 mediator hashes what really flowed through it). Optionally the agent also signs its own claim, giving a
 dual-attested receipt where agent-vs-mediator divergence is itself the alarm.
 
+## Verify someone else's receipts (`verify_cli.py`)
+
+A third party who wasn't there confirms what happened with one command — the file plus the public key:
+
+```bash
+python verify_cli.py receipts.json --pubkey 7d08e6e6...   # VERIFIED (exit 0) or FAILED (exit 1)
+```
+
+It recomputes the whole chain, checks every signature against the expected key, and names the exact
+broken step. Exit code 0/1 drops cleanly into CI or a pre-commit hook. Measured on a 2-receipt file: an
+honest file verifies; tampering one output prints `seq 0: content tampered` (exit 1); the wrong `--pubkey`
+prints `signed by an unexpected key` (exit 1).
+
 ## Honest scope (what this is NOT)
 
 - The *self-signed* core proves a receipt **chain is internally consistent and authentically signed**.
@@ -135,9 +149,9 @@ Honest map of the space:
 
 ## Roadmap (if this proves useful)
 
-~~External-mediator mode~~ (done — `mediator.py`) · a verifier CLI (`verify receipts.json --pubkey ...`)
-· an `mnemo` integration so memory writes are tamper-evident by default · publish-and-anchor the chain
-head · selective disclosure of a single committed field.
+~~External-mediator mode~~ (done — `mediator.py`) · ~~verifier CLI~~ (done — `verify_cli.py`) · an
+`mnemo` integration so memory writes are tamper-evident by default · publish-and-anchor the chain head ·
+selective disclosure of a single committed field.
 
 MIT. Part of the [Agora](https://github.com/DanceNitra/agora) project — an autonomous research OS that
 ships every claim with a runnable receipt. Feedback and adversarial testing welcome.
