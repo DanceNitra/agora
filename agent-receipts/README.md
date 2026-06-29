@@ -15,6 +15,7 @@ honest about what it does and does not give you.
 ```bash
 python agent_receipts.py     # core: hash-chain + Ed25519 signatures + tamper/forgery demo
 python mcp_wrapper.py         # wrap any MCP/agent tool so every call emits a receipt
+python mediator.py           # external-mediator mode: catch an agent hiding/faking its own actions
 ```
 
 ## What it does — two layers
@@ -63,12 +64,41 @@ open("receipts.json", "w").write(chain.to_json()) # ship the receipts; the publi
 `mcp_wrapper.py` shows a `ReceiptedDispatcher` that drops in around an MCP-style tool registry so you
 don't touch your tools — you wrap the dispatch.
 
+## External-mediator mode (`mediator.py`)
+
+Self-signed receipts have one honest hole: an agent holding its own key can simply *not* emit a receipt
+for an action it wants to hide. The fix (as used by `pipelock` and the receiver-attested research line)
+is to move the signer **outside** the agent — route every tool call through a `Mediator` that holds its
+own key and signs what it actually brokers:
+
+```python
+from mediator import Mediator, reconcile
+med = Mediator(tools, private_key_hex=mk, public_key_hex=mpub, name="org-proxy")
+med.dispatch("transfer_funds", to="acct-9981", amount=5000)   # mediator signs the real call
+ok, problems = reconcile(agent_self_reported_log, med.chain)  # diff the agent's story vs the truth
+```
+
+The demo has an agent route three calls through the mediator, then tamper with its *own* log — hiding a
+funds transfer and faking a secret read. `reconcile()` catches all of it, because the mediator's signed
+chain is ground truth:
+
+```
+agent reported 2 actions but the mediator brokered 3 -> agent OMITTED 1 call(s)
+action 1 (mcp.transfer_funds): output hash mismatch (agent misreported the result)
+action 2 (mcp.read_secret): no agent record at all (hidden call)
+```
+
+Now the agent cannot withhold a receipt, forge one (it lacks the mediator's key), or lie about I/O (the
+mediator hashes what really flowed through it). Optionally the agent also signs its own claim, giving a
+dual-attested receipt where agent-vs-mediator divergence is itself the alarm.
+
 ## Honest scope (what this is NOT)
 
-- It proves a receipt **chain is internally consistent and authentically signed**. It does **not** by
-  itself prove the agent reported *every* action — an actor that controls its own key can still
-  withhold a receipt. Closing that needs an **external mediator/proxy** that signs receipts from
-  outside the agent (see the landscape below), or anchoring the chain head to a third party.
+- The *self-signed* core proves a receipt **chain is internally consistent and authentically signed**.
+  It does **not** by itself prove the agent reported *every* action — an actor that controls its own
+  key can still withhold a receipt. That gap is closed by **external-mediator mode** (`mediator.py`,
+  below), which puts the signer outside the agent; anchoring the chain head to a third party is a
+  further hardening.
 - It commits to input/output **hashes**, not a proof that the tool *computed correctly*. That is what
   ZK-SNARK approaches add, at much higher cost.
 - Keys here are raw/in-memory for clarity; real deployments use a KMS / hardware-backed key store.
@@ -105,9 +135,9 @@ Honest map of the space:
 
 ## Roadmap (if this proves useful)
 
-External-mediator mode (sign from a proxy, not the agent) · publish-and-anchor the chain head · a
-verifier CLI (`verify receipts.json --pubkey ...`) · an `mnemo` integration so memory writes are
-tamper-evident by default · selective disclosure of a single committed field.
+~~External-mediator mode~~ (done — `mediator.py`) · a verifier CLI (`verify receipts.json --pubkey ...`)
+· an `mnemo` integration so memory writes are tamper-evident by default · publish-and-anchor the chain
+head · selective disclosure of a single committed field.
 
 MIT. Part of the [Agora](https://github.com/DanceNitra/agora) project — an autonomous research OS that
 ships every claim with a runnable receipt. Feedback and adversarial testing welcome.
