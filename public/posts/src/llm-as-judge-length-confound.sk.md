@@ -19,6 +19,19 @@ Použili sme originálne dáta `lmsys/mt_bench_human_judgments` — **3 355 ľud
 
 Vypadnú dve veci. Po prvé, náš pipeline reprodukuje oslavované číslo (GPT-4 ≈ 84% vs ľudia), takže porovnanie je férové. Po druhé, pravidlo s **nulovým porozumením** už dosiahne 68% — to je **~52-54% celej nad-náhodnej marže sudcu** získanej počítaním znakov. A GPT-4 sudca sa zhoduje s pravidlom dĺžky takmer **tri zo štyroch** krát, takže slávny sudca sám silno sleduje dĺžku.
 
+## Update — nie je to jeden starý model
+
+Férová námietka: tých 73,5% vyššie sú uvoľnené GPT-4 hlasy z 2023 — možno novší sudcovia sú iní. Tak sme pustili troch **súčasných** frontier sudcov z troch rôznych rodín na tie isté MT-Bench páry (poradie A/B randomizované na neutralizáciu position biasu) a odmerali, ako často každý vyberie dlhšiu odpoveď:
+
+| Sudca (rodina) | Zhoda s človekom | **Vyberie dlhšiu odpoveď** |
+|---|---|---|
+| GPT-4 (uvoľnené hlasy 2023) | ~84% | 73,5% |
+| Claude Opus 4.8 (Anthropic) | 72% | **72,7%** |
+| DeepSeek-V4-Pro (DeepSeek) | 79% | **72,4%** |
+| GLM-5.2 (Z.AI) | 77% | **71,1%** |
+
+Štyria sudcovia naprieč štyrmi rodinami a tromi generáciami modelov vyberú dlhšiu odpoveď **~72-74%** prípadov, pričom každý nezávisle reprodukuje slávne ~80% human agreement. Na 56 z 96 zdieľaných párov vyberú dlhšiu všetci traja súčasní sudcovia (a navzájom sa na voľbe dlhšia-či-nie zhodnú ~82-86%). Ťah k dĺžke **nie je vrtoch jedného starého modelu — je to stabilná vlastnosť LLM sudcov v 2026.**
+
 ## Prečo zhoda nie je validita
 
 „Zhoduje sa s ľuďmi v 80%" znie ako „hodnotí kvalitu ako človek". Ale zhoda je lacná, keď je confound zdieľaný. Dĺžka je presne taký confound: koreluje s ľudskou preferenciou a LLM sudca — trénovaný na dátach ľudských preferencií — dedí tú istú zaujatosť. Takže veľká časť z 80% nie je sudca *rozpoznávajúci* lepšiu odpoveď; sú to dva systémy aplikujúce tú istú heuristiku dĺžky. To je opakovaná lekcia Crucible: titulkové číslo, ktoré je vlastnosťou *zdieľanej zaujatosti*, nie veci, ktorú tvrdí merať — ten istý tvar ako [nudging 2,5× artefakt](food-nudges-publication-bias.html) a [„skok" Good to Great](good-to-great-zero-skill-null.html).
