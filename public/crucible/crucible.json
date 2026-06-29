@@ -1,13 +1,22 @@
 {
  "name": "The Crucible — machine replication ledger",
  "description": "Scientific and technical claims rebuilt as minimal computational models and tested. REPRODUCED = the mechanism holds in a minimal model; FAILED = it does not; NOT_COMPUTABLE = no simulable core (an honest pass).",
- "generated": "2026-06-28",
+ "generated": "2026-06-29",
  "counts": {
   "REPRODUCED": 42,
-  "FAILED": 7,
+  "FAILED": 8,
   "NOT_COMPUTABLE": 15
  },
  "entries": [
+  {
+   "claim": "Food-choice nudges are ~2.5x more responsive to choice-architecture interventions than other behavioral domains (between-domain effect-size ratio as evidence of intrinsic domain responsiveness).",
+   "source": "Mertens, Herberz, Hahnel & Brosch (2021), PNAS, doi:10.1073/pnas.2107346118",
+   "verdict": "FAILED",
+   "note": "Mechanism replication (we lack their raw per-study data). Smallest model: K domains with IDENTICAL true effect (d=0.20); food studies small-n (per-group ~30, point-of-choice field/lab), other domains large-n (~300); publish iff p<.05 in-dir",
+   "lab_id": "39737a",
+   "code": "https://github.com/DanceNitra/agora/blob/main/agora_output/lab/20260629-123411_nudge-food-domain-pubbias-artifact.py",
+   "date": "2026-06-29"
+  },
   {
    "claim": "Cosine similarity cannot distinguish a superseded fact from its replacement (the 'supersession blind spot'); a deterministic (subject, relation, object) ledger removes stale-fact recall.",
    "source": "Temporal Validity in Retrieval Memory: Eliminating Stale-Fact Errors (Yadav, MemStrata, arXiv:2606.26511)",

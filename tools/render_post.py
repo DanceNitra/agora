@@ -28,6 +28,21 @@ META = {
         "tags_sk": "Kauzálna inferencia · Difference-in-differences · Paralelné trendy",
         "kicker": "Causal inference", "kicker_sk": "Kauzálna inferencia",
     },
+    "food-nudges-publication-bias": {
+        "slug": "food-nudges-publication-bias",
+        "title": "Food Nudges Aren't 2.5× Better — It's Publication Bias",
+        "title_sk": "Food nudge nie je 2,5× účinnejší — je to publikačný bias",
+        "desc": "A famous PNAS meta-analysis says food-choice nudges are 2.5× more responsive than "
+                "other domains. We reproduced that exact 2.5× from zero true difference — it's a "
+                "publication-bias artifact. Measured, with the simulation and the falsifier.",
+        "desc_sk": "Slávna meta-analýza v PNAS tvrdí, že food nudge sú 2,5× citlivejšie než iné "
+                   "domény. Reprodukovali sme presne ten 2,5× z nulového skutočného rozdielu — je to "
+                   "artefakt publikačného biasu. Odmerané, so simuláciou aj falzifikátorom.",
+        "date": "2026-06-29",
+        "tags": "Behavioral economics · Nudging · Publication bias · Replication",
+        "tags_sk": "Behaviorálna ekonómia · Nudging · Publikačný bias · Replikácia",
+        "kicker": "The Crucible", "kicker_sk": "Crucible",
+    },
     "phase-diagram": {
         "slug": "causal-inference-phase-diagram",
         "title": "Causal Inference Has a Phase Diagram: Even Randomized Experiments Fail Near Criticality",

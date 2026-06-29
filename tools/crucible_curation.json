@@ -134,5 +134,16 @@
   "year": "Metcalfe's Law · contested (Briscoe–Odlyzko–Tilly 2006)",
   "field": "Network economics",
   "result": "The n² scaling holds only if every pairwise connection has equal value. Under realistic rank-declining connection value the network's value scales as ~n·log n (fitted exponent 1.12, vs 2.00 for equal value; 1.33 for slow decay) — the famous quadratic over-states large-network value, matching Briscoe-Odlyzko-Tilly (2006) and Metcalfe's own 2013 data-fit. A mechanism derivation, not a fit to proprietary network data."
+ },
+ "39737a": {
+  "title": "Food nudges are 2.5x more responsive than other domains",
+  "year": "Mertens, Herberz, Hahnel & Brosch · 2021",
+  "field": "Behavioral economics",
+  "result": "From an IDENTICAL true effect in every domain, differential publication bias alone reproduces a 2.63x food/other ratio (control with equal sample sizes = 1.00). The famous 2.5x is a small-study mirage.",
+  "canon": "Mertens et al.s widely-cited PNAS meta-analysis reported food-choice nudges are up to 2.5x more responsive to choice architecture than nudges in other domains read as an intrinsic difference in how nudgeable each domain is.",
+  "rebuilt": "Smallest model: K domains with an IDENTICAL true effect (Cohen d = 0.20); food studies small-n (per-group ~30, typical point-of-choice field/lab designs), other domains large-n (~300); a study is published iff p < .05 in the expected direction. Then measure the observed food/other inverse-variance-pooled effect ratio.",
+  "verdict": "From a true ratio of 1.00, publication bias plus the food-vs-other study-size gap produces an observed ratio of 2.63x. An equal-n control returns 1.00 (the inflation is the sample-size asymmetry, not a sim artifact), and the ratio rises monotonically with that gap (food_n 300->1.01, 100->1.52, 60->1.91, 30->2.64, 20->3.18) the claimed ~2.5x appears precisely at the realistic ~10x asymmetry between small food studies and large other-domain studies. The between-domain RATIO is therefore not robust evidence of intrinsic domain responsiveness. This is a mechanism replication (we lack their raw per-study data) and corroborates the real-data critique of this exact meta-analysis by Maier, Bartos, Stanley, Shanks, Harris & Wagenmakers (2022, PNAS). It does not claim nudges have zero effect only that the domain ranking is fragile to a known confound.",
+  "deep_dive": "../../posts/food-nudges-publication-bias.html",
+  "featured": false
  }
 }
