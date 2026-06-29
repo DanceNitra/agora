@@ -189,5 +189,16 @@
   "verdict": "FAILED. Style-only held-out accuracy 61.5% (AUC 0.655; chance 50.8%); length alone 61.5% (markdown adds ~nothing beyond length here). The fresh receipt: style-only per-model ranking vs actual win-rate ranking gives Spearman rho=0.74, robust across thresholds (0.748/0.743/0.732 at >=100/200/500 battles; 51/48/44 models). A model blind to which LLM produced each answer reproduces the leaderboard ORDER from stylistic form. Falsifier met (acc>=0.60 AND rho>=0.70). Honest scope: Arena rank is heavily explained by style/length, NOT that the models are equal in quality. Prior art: Zheng 2023 (verbosity), LMSYS style-control blog 2024 (no no-identity ranking reproduction shipped), Singh & Hooker Leaderboard Illusion 2025, and our LLM-as-judge length post. Sequel: length fakes the JUDGE -> style fakes the LEADERBOARD.",
   "deep_dive": "../../posts/chatbot-arena-style-not-skill.html",
   "featured": false
+ },
+ "fc5c22": {
+  "title": "AI coding assistants make developers ~55% faster",
+  "year": "Peng/GitHub 2023 vs METR 2025 vs Cui/Demirer 2025",
+  "field": "AI / Future of Work",
+  "result": "The universal claim fails. A storm-research audit (8 verified sources) shows the famous 55.8% is a vendor preprint on ONE greenfield task; the only independent RCT on experienced devs in mature repos found -19% (time), while a peer-reviewed 3-RCT study found +26% (task-count, juniors). A minimal write-vs-review model reproduces the junior-gain / expert-loss SIGN-FLIP (crossover k*=0.62), robust in 79% of param sets -- so the split is one operating-point curve, not a contradiction.",
+  "canon": "The widely-cited number, originally from a GitHub/Microsoft study, is read as a universal productivity boost: AI coding assistants make developers roughly 55% faster.",
+  "rebuilt": "Two halves. (1) Evidence audit (storm-research, 5 lenses + 6 independent verifiers): the 55.8% is a vendor preprint on a single JS HTTP-server task (~95 recruited/~70 completers, CI 21-89%); METR RCT = -19% time for experienced devs in mature repos (n=16, 2025 snapshot, +20% perceived); Cui/Demirer (Management Science, peer-reviewed) = +26% task-count over 4867 devs, larger for juniors. (2) A minimal write-vs-review time model: net speedup = 1 - (read+review)/(self-write); experts write faster + AI adds fixed read/review overhead.",
+  "verdict": "FAILED for the UNIVERSAL '~55% faster' reading. The model (Lab fc5c22) yields a robust junior-gain / expert-loss SIGN-FLIP with a crossover at context k*=0.62, and it flips even with NO context-dependent review tax -- purely because experts write faster and AI adds a fixed read/prompt overhead; robust in 79% of plausible parameter sets (review-tax drawn 0..3, not assumed). So the +26% (count) and -19% (time) RCTs are two OPERATING POINTS of one curve, not a contradiction; the error is reporting a single operating point as 'the' effect. Honest scope: an illustrative model (magnitudes not fit; the RCTs use different metrics) that shows the studies are CONSISTENT, not a new measurement; which driver dominates (less-to-gain vs review-tax) is underdetermined. The robust cross-cutting fact, verified, is the perception-reality gap: self-reported speedup is a biased estimator of measured output.",
+  "featured": false,
+  "deep_dive": "../../posts/ai-coding-productivity-operating-point.html"
  }
 }

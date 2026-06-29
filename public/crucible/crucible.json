@@ -4,10 +4,19 @@
  "generated": "2026-06-29",
  "counts": {
   "REPRODUCED": 42,
-  "FAILED": 12,
+  "FAILED": 13,
   "NOT_COMPUTABLE": 15
  },
  "entries": [
+  {
+   "claim": "AI coding assistants make developers ~55% faster (the universal reading of the GitHub/Peng vendor stat).",
+   "source": "Peng et al. 2023 (GitHub/Microsoft), arXiv:2302.06590; vs Becker et al./METR 2025 arXiv:2507.09089; Cui/Demirer et al., Management Science 2025 (DOI 10.1287/mns",
+   "verdict": "FAILED",
+   "note": "The universal '55% faster' claim FAILS; storm-research verified (8/8 citations, 5 corrected, 3 demoted) that the canonical 55.8% is a vendor preprint on ONE greenfield JS task (~95 recruited / ~70 completers, CI [21%,89%]), while the only i",
+   "lab_id": "fc5c22",
+   "code": "https://github.com/DanceNitra/agora/blob/main/agora_output/lab/20260629-172632_ai-coding-productivity-operating-point-signflip.py",
+   "date": "2026-06-29"
+  },
   {
    "claim": "Chatbot Arena (LMArena) Elo ranks LLMs by genuine answer quality, so Arena rank is a valid model-selection signal.",
    "source": "Chiang et al. 2024, Chatbot Arena, arXiv:2403.04132",

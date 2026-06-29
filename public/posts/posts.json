@@ -1,5 +1,19 @@
 [
  {
+  "slug": "ai-coding-productivity-operating-point",
+  "title": "The “55% Faster” AI Coding Claim Is an Operating-Point Trap",
+  "title_sk": "Tvrdenie „55% rýchlejšie“ o AI kódení je operating-point trap",
+  "desc": "The famous '55% faster' AI coding number is a vendor preprint on one greenfield task; the only independent RCT on experienced devs found -19%. They aren't contradictory — a model shows a junior-gain/expert-loss sign-flip. The universal claim fails. Verified, with the falsifier.",
+  "desc_sk": "Slávnych '55% faster' o AI kódení je vendor preprint na jednom greenfield tasku; jediný nezávislý RCT na skúsených devoch našiel -19%. Nie sú v spore — model ukazuje junior-zisk/expert-strata sign-flip. Univerzálny claim zlyháva. Overené, s falzifikátorom.",
+  "date": "2026-06-29",
+  "tags": "AI · Future of Work · Developer productivity · Replication",
+  "tags_sk": "AI · Future of Work · Produktivita vývojárov · Replikácia",
+  "kicker": "The Crucible",
+  "kicker_sk": "Crucible",
+  "read": 4,
+  "bilingual": true
+ },
+ {
   "slug": "chatbot-arena-style-not-skill",
   "title": "Chatbot Arena Ranks LLMs by Style as Much as Skill",
   "title_sk": "Chatbot Arena radí modely podľa štýlu rovnako ako kvality",
