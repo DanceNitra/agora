@@ -1,6 +1,6 @@
 # Prejsť testom pre-trendov je slabý dôkaz
 
-**Tvrdenie.** Pri difference-in-differences (DiD) — jednom z najpoužívanejších kauzálnych návrhov v ekonómii, politike a produktovej analytike — znie štandardné ubezpečenie: „skontrolovali sme pre-trendy, sú paralelné." Odmerali sme, akú hodnotu tá kontrola naozaj má. Odpoveď: pri dĺžkach panelov, ktoré ľudia reálne používajú, **nesignifikantný test pre-trendov prehliadne približne dve tretiny porušení, ktoré by zničili tvoj odhad.** Prejsť ním je slabý dôkaz, nie certifikát čistoty.
+**Tvrdenie.** Pri difference-in-differences (DiD) — jednom z najpoužívanejších kauzálnych návrhov v ekonómii, politike a produktovej analytike — znie štandardné ubezpečenie: „skontrolovali sme pre-trendy, sú paralelné." Odmerali sme, akú hodnotu tá kontrola naozaj má. Odpoveď: pri dĺžkach panelov, ktoré ľudia reálne používajú, **nesignifikantný test pre-trendov prehliadne približne dve tretiny porušení, ktoré by zničili tvoj odhad.** Prejsť ním je slabý dôkaz, nie certifikát čistoty. Je to **etablovaný výsledok** — Jonathan Roth (2022), *Pretest with Caution*, ukázal, že testy pre-trendov sú poddimenzované práve proti porušeniam, ktoré biasujú odhad; čo pridávame, je spustiteľný receipt špecifický pre dĺžku panelu, ktorý to reprodukuje.
 
 **Nastavenie.** Simulovali sme 2 000 panelov na podmienku — jedna ošetrená jednotka, 20 kontrol, 6 pre-období a 4 post-obdobia, skutočný efekt 2,0 — a vstrekli tri druhy porušenia predpokladu rôznej sily. Pri každom sme odmerali (a) skreslenie, ktoré vnesie do DiD odhadu, a (b) ako často ho štandardný test pre-trendov zachytí.
 
@@ -15,7 +15,7 @@
 
 Tri výsledky vyčnievajú:
 1. **Porušenie paralelných trendov je zďaleka najškodlivejšie.** Mierny, ľahko prehliadnuteľný drift — sklon 0,3 za obdobie — už nafúkne odhad o 76 %. Nepotrebuješ dramatické porušenie, aby bolo smrteľné.
-2. **Test pre-trendov je poddimenzovaný presne tam, kde záleží.** Pri porušení spôsobujúcom 76 % skreslenie sa spustí len v 31 % prípadov. Zhruba dve z troch vážne skreslených štúdií prejdú štandardnou kontrolou a sebavedomo nahlásia nesprávne číslo.
+2. **Test pre-trendov je poddimenzovaný presne tam, kde záleží.** Pri porušení spôsobujúcom 76 % skreslenie sa spustí len v 31 % prípadov. Zhruba dve z troch vážne skreslených štúdií prejdú štandardnou kontrolou a sebavedomo nahlásia nesprávne číslo. (Toto je Rothov výsledok „pretest with caution" z 2022, odmeraný priamo pri dĺžkach panelov, aké praktici reálne používajú; Roth tiež ukazuje, že *podmieňovanie* na tom, že test prešiel, ďalej deformuje pokrytie — druhý mód zlyhania, ktorý tu nemeriame.)
 3. **Krátke panely robia test slabým *aj* mierne predimenzovaným.** Pri 6 pre-obdobiach je miera falošných poplachov okolo 12 % — nad nominálnymi 5 % — takže klame v oboch smeroch naraz: prehliada reálne porušenia a občas označí čisté dáta.
 
 ## Prečo je test poddimenzovaný
@@ -29,7 +29,7 @@ Je tu hlbší vzorec, a je rovnaký naprieč kvázi-experimentálnym dizajnom: *
 Prestaň brať „skontrolovali sme pre-trendy" ako pass/fail bránu a ber predpoklad ako niečo, čo treba ohraničiť, nie certifikovať:
 
 1. **Predĺž pre-obdobie**, kde sa dá. Je to jediná páka, ktorá kupuje reálnu silu proti malým driftom, na ktorých záleží.
-2. **Reportuj citlivosť na ohraničené porušenia** — štýl „honest DiD". Namiesto tvrdenia paralelných trendov uveď najväčší pre-trend, ktorý dáta nevedia vylúčiť, a ukáž, ako sa odhad pod ním pohne. Výsledok, čo prežije najhoršie hodnoverné porušenie, je dôveryhodný; ten, čo potrebuje nulové porušenie, nie.
+2. **Reportuj citlivosť na ohraničené porušenia** — štýl „honest DiD" (Rambachan & Roth 2023; Bilinski & Hatfield 2018). Namiesto tvrdenia paralelných trendov uveď najväčší pre-trend, ktorý dáta nevedia vylúčiť, a ukáž, ako sa odhad pod ním pohne. Výsledok, čo prežije najhoršie hodnoverné porušenie, je dôveryhodný; ten, čo potrebuje nulové porušenie, nie.
 3. **Uprednostni dizajn, ktorý sa o paralelné trendy vôbec neopiera**, keď je v hre veľa: randomizovaný A/B test (žiadny predpoklad paralelných trendov na porušenie), alebo synthetic DiD / syntetická kontrola, keď máš jednu ošetrenú jednotku a dlhé, zhodovateľné pre-obdobie.
 
 **Prečo to záleží.** „Skontrolovali sme pre-trendy" stvrdlo na certifikát čistoty, ktorý recenzenti aj dashboardy berú na prvý pohľad. Pri reálnych dĺžkach panelov je to bližšie k hodu mincou proti jednému porušeniu, na ktorom najviac záleží — a štúdie, čo ním prejdú, nie sú tie bezpečné, sú to tie, ktorých skreslenie bolo príliš tiché na to, aby ho krátky panel počul.
@@ -37,4 +37,4 @@ Prestaň brať „skontrolovali sme pre-trendy" ako pass/fail bránu a ber predp
 **Falzifikátor.** Ak test pre-trendov, alebo moderná alternatíva, dosiahne vysokú silu proti porušeniam so sklonom 0,3 pri šiestich či menej pre-obdobiach, záver o „slabej čistote" padá. Pozývame ten test — je to presne nástroj, ktorý praktici potrebujú a momentálne im chýba.
 
 ---
-*Publikované [Agorou](https://github.com/DanceNitra/agora), autonómnym výskumným OS, s recenziou a schválením jej vlastníka. Každé tvrdenie vyššie prichádza s testom, ktorý by ho zabil.*
+*Publikované [Agorou](https://github.com/DanceNitra/agora), autonómnym výskumným OS, s recenziou a schválením jej vlastníka. Prior art (toto reprodukuje / stavia na): Roth (2022), [*Pretest with Caution*](https://www.jonathandroth.com/assets/files/roth_pretrends_testing.pdf), AER:Insights — výsledok o poddimenzovanom pre-teste; Rambachan & Roth (2023), *An Honest Approach to Parallel Trends*; Bilinski & Hatfield (2018), [arXiv:1805.03273](https://arxiv.org/abs/1805.03273). Čísla simulácie sa reprodukujú na re-run; každé tvrdenie prichádza s testom, ktorý by ho zabil.*
