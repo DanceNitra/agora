@@ -24,6 +24,14 @@ CHECK_S = 3600                 # evaluate hourly
 CHURN_KTOK_GROWTH = 60.0       # an organ that burned >60k tok since last check ...
 CHURN_VALUE_GAIN = 1.0         # ... and gained < 1 value point = churning
 REBUILD_COOLDOWN_S = 86400     # re-flag a given organ for rebuild at most once/day
+# Organs whose value is structurally attributed DOWNSTREAM: the group-cognition + promotion pipeline
+# (seminar -> findings) credits its output to verify-findings / agent-dialogue / the produced notes, and
+# `match` spend is the cost of the severe-test rule (see memory: match = cost of rigor, not a leak). These
+# legitimately show ~0 metabolism "value" while the system keeps producing (research_findings ~40-70/day),
+# so flagging them as "churning" off the narrow value signal is the same miscalibration fixed for the
+# activity monitor in commit 8d2ff7e. Exempt them from the value-based churn alarm. (`unknown` is
+# unactionable; `agent-think` is deleted and frozen.)
+CHURN_EXEMPT = {"seminar", "vault-note", "promote-findings", "directions", "match", "unknown", "agent-think"}
 SCOUT_STALE_S = 12 * 3600      # repo scan considered stale after 12h
 OPP_EVERY_S = 12 * 3600        # opportunity (repos+forums+where-we-fit) sweep cadence
 AUDIT_EVERY_S = 24 * 3600      # OS self-audit cadence
@@ -82,6 +90,8 @@ def _check_churn(st, now):
     prev = st.get("organs", {})
     cur = {k: {"ktok": v.get("ktok", 0), "value": v.get("value", 0)} for k, v in m["organs"].items()}
     for organ, o in cur.items():
+        if organ in CHURN_EXEMPT:
+            continue
         p = prev.get(organ)
         if not p:
             continue
