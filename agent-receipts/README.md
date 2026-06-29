@@ -12,6 +12,12 @@ This is the smallest honest version of that idea, built to be read in one sittin
 command. It is a reference proof-of-concept, not a hardened product — the scope below is deliberately
 honest about what it does and does not give you.
 
+> **Naming note / prior art.** There is already an established **"Agent Receipts" protocol** with a
+> public spec and a Python SDK by Otto Jongerius ([github.com/agent-receipts](https://github.com/agent-receipts/spec)).
+> This project is an **independent, minimal reference** for understanding the idea — it is *not* that
+> protocol's SDK, and on PyPI it is `agora-agent-receipts` to avoid any confusion. If you want the
+> protocol and a maintained SDK, use his; if you want a 200-line file to learn from or vendor, use this.
+
 ```bash
 python agent_receipts.py     # core: hash-chain + Ed25519 signatures + tamper/forgery demo
 python mcp_wrapper.py         # wrap any MCP/agent tool so every call emits a receipt
@@ -150,6 +156,10 @@ idea*, and that toolkit as the grown-up version.
 
 Honest map of the space:
 
+- **A named protocol + SDK:** the **"Agent Receipts" protocol** by Otto Jongerius — a public spec
+  ([github.com/agent-receipts/spec](https://github.com/agent-receipts/spec)) plus a maintained Python
+  SDK (`pip install agent-receipts`). The most directly-related effort to this one; if you need an
+  interoperable standard rather than a teaching reference, start there.
 - **Production OSS (corporate):** Microsoft `agent-governance-toolkit` — Tutorial 33 = the same
   Ed25519 + canonical + hash-chain receipts, with policy/identity/sandboxing around it.
 - **External-mediator receipts:** [`pipelock`](https://github.com/luckyPipewrench/pipelock) — an

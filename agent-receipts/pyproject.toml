@@ -3,7 +3,7 @@ requires = ["setuptools>=61"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "agent-receipts"
+name = "agora-agent-receipts"
 version = "0.1.0"
 description = "Tamper-evident, third-party-verifiable receipts for AI agent / MCP tool calls"
 readme = "README.md"

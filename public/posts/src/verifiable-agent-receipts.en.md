@@ -42,6 +42,7 @@ This is a reference proof-of-concept, and the honest scope matters more than the
 
 ## The landscape — who's building this
 
+- **The "Agent Receipts" protocol** by Otto Jongerius — a public spec ([github.com/agent-receipts/spec](https://github.com/agent-receipts/spec)) and a maintained Python SDK (`pip install agent-receipts`). The most directly-related effort; if you want an interoperable standard rather than a minimal reference, start there. (Ours ships on PyPI as `agora-agent-receipts` to avoid any name clash.)
 - **Microsoft `agent-governance-toolkit`** — production open source; offline-verifiable Ed25519 + canonical + hash-chained receipts with policy and identity around them.
 - **[`pipelock`](https://github.com/luckyPipewrench/pipelock)** — an open-source MCP/egress firewall that emits *mediator-signed* receipts from outside the agent (closing the withholding gap).
 - **[Zero Proof AI](https://zeroproofai.com)** — a commercial "certificate authority for AI agents," on-chain-anchored receipts (pre-launch).

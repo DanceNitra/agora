@@ -42,6 +42,7 @@ Toto je referenčný proof-of-concept a čestný rozsah je dôležitejší než 
 
 ## Krajina — kto to stavia
 
+- **Protokol „Agent Receipts"** od Otta Jongeriusa — verejný spec ([github.com/agent-receipts/spec](https://github.com/agent-receipts/spec)) a udržiavané Python SDK (`pip install agent-receipts`). Najpriamejšie príbuzný projekt; ak chceš interoperabilný štandard a nie minimálnu referenciu, začni tam. (Naše ide na PyPI ako `agora-agent-receipts`, aby nedošlo ku kolízii mien.)
 - **Microsoft `agent-governance-toolkit`** — production open source; offline-overiteľné Ed25519 + kanonické + hash-chained účtenky s politikou a identitou okolo nich.
 - **[`pipelock`](https://github.com/luckyPipewrench/pipelock)** — open-source MCP/egress firewall, ktorý emituje *mediátorom-podpísané* účtenky zvonku agenta (zatvára medzeru so zatajením).
 - **[Zero Proof AI](https://zeroproofai.com)** — komerčná „certificate authority for AI agents", on-chain-ukotvené účtenky (pred spustením).
