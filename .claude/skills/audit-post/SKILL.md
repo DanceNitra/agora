@@ -1,0 +1,70 @@
+# Audit-Post — the ONE correct, unskippable procedure for auditing a published post
+
+## What this is
+
+The end-to-end procedure for auditing one already-published post to a scientific-organization standard.
+It chains the adversarial skills and — critically — **re-runs the auditor on the CORRECTED post to confirm
+it now passes clean** before committing. We are a scientific organization; we do not ship missteps. Run
+EVERY step, in order, for EVERY post. No light/inline version. Fewer posts done FULLY > more done shallow.
+
+Defined 2026-06-29 after the owner caught two failures: (1) shortening the audit to a single citation
+verifier + inline reasoning (missed a "Bayesian" mislabel, a strawman baseline, a wrong-estimand, and a
+"textbook dressed as our law" overclaim across posts #7–#10); (2) dropping the re-audit-after-fix step — I
+fixed and committed WITHOUT re-running the auditor on the corrected post to confirm the fix is clean.
+
+## The procedure (9 steps, none optional)
+
+### 0. Select + read
+Open `agora_output/publish_audit_tracker.md`, take the next post. Read the FULL post — EN and SK bodies,
+`<title>`/meta/OG/Twitter, the JSON-LD (Article + FAQPage), the footer. Note render type (src `.md` →
+edit src + re-render; render_piece → edit HTML directly, and remember the FAQ exists TWICE: visible + schema).
+
+### 1. State the load-bearing claim(s) + evidence
+Write each claim as one falsifiable sentence + its support (Lab id / measured numbers / cited prior art).
+
+### 2. Re-run OUR Lab numbers from source
+Find and RUN the lab/probe script behind every measured number. A number in the post or vault is NOT
+verified. Confirm each published figure matches the re-run. If a script is missing, that itself is a finding.
+
+### 3. /stress-claim — full 5-lens adversarial panel (parallel, one message)
+PRIOR-ART HUNTER · STEELMAN SKEPTIC · METHOD/CONFOUND AUDITOR · OVERCLAIM/FRAMING CHECK · BLIND-SPOT 6TH LENS.
+Adjudicate → verdict PUBLISH / REFRAME / KILL. Actually fan out the agents; never an inline "I considered prior art".
+
+### 4. /verify-claims — every external citation vs its PRIMARY source
+Extract every checkable claim (numbers, papers, IDs, quotes, priority claims). Fan out independent
+verifiers vs primary sources (not blog summaries). Produce the banner (N/N checked · X FALSE · Y corrected ·
+Z demoted). Fix/demote anything FALSE or UNVERIFIED.
+
+### 5. Apply ALL fixes — BILINGUAL + SEO, at parity
+Apply every correction in BOTH EN and SK (body, FAQ visible AND the JSON-LD FAQPage copy, footer prior-art).
+Never EN-only. Run the /seo Mode-A check (keyword in title near front + leads with result; meta description;
+≥1 list + ≥1 table; answer-first; FAQ + valid FAQPage schema; ≥3 internal links; Article/Org/FAQPage JSON-LD;
+bump `dateModified`). If severe-test applies and a claim was only asserted, RUN the experiment to substantiate
+or kill it (don't just hedge).
+
+### 6. RE-AUDIT THE CORRECTED POST → CONFIRM CLEAN  ← the step that gets skipped; never skip it
+After the fixes, run the auditor AGAIN on the corrected version: re-run /verify-claims on every number/citation
+you touched, AND a focused adversarial confirmation (spawn ≥2 skeptics: "attack this CORRECTED post — does it
+still overclaim, miss prior art, or state a number it can't back? did the edits introduce any NEW error or an
+EN/SK mismatch?"). If anything survives → back to step 5 and repeat. The audit is NOT done until the corrected
+post passes the auditor clean.
+
+### 7. Capture NEW findings
+The panel produces real research leads (6th-lens frontier questions + measured side-results). Append them to
+`agora_output/audit_new_findings.md` so they feed the flywheel — the audit is generative, not only defensive.
+
+### 8. Verify HTML valid (balanced tags), leak-scan the diff, anon commit
+(`agora-builder@users.noreply.github.com`), push; re-render if src-based. Update the tracker row (status,
+verdict, commit). Force-add any new lab script (lab/ is gitignored) so "we measured it" links to runnable code.
+
+### 9. Report the verdict
+Banner + verdict (PUBLISH/REFRAME/KILL) + the single most damaging finding + what was fixed + the captured
+frontier question + commit hash.
+
+## Hard rules
+- Public posts are GATED outward content, but FIXING our own already-public post to be MORE honest is
+  product maintenance the audit authorizes (no new outward claim). A brand-new public CLAIM still needs the
+  Slovak briefing + owner approval.
+- KILL is a success, not a loss. A textbook re-derivation with a rigged baseline and no fresh receipt is a KILL.
+- Enforces: [[audit-publish-full-procedure-never-shorten]] · no-overclaim-cite-prior-art-strong-baseline ·
+  flagship-publish-credibility-audit · bilingual-en-sk-everything · seo-program-setup.
