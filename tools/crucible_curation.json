@@ -145,5 +145,16 @@
   "verdict": "From a true ratio of 1.00, publication bias plus the food-vs-other study-size gap produces an observed ratio of 2.63x. An equal-n control returns 1.00 (the inflation is the sample-size asymmetry, not a sim artifact), and the ratio rises monotonically with that gap (food_n 300->1.01, 100->1.52, 60->1.91, 30->2.64, 20->3.18) the claimed ~2.5x appears precisely at the realistic ~10x asymmetry between small food studies and large other-domain studies. The between-domain RATIO is therefore not robust evidence of intrinsic domain responsiveness. This is a mechanism replication (we lack their raw per-study data) and corroborates the real-data critique of this exact meta-analysis by Maier, Bartos, Stanley, Shanks, Harris & Wagenmakers (2022, PNAS). It does not claim nudges have zero effect only that the domain ranking is fragile to a known confound.",
   "deep_dive": "../../posts/food-nudges-publication-bias.html",
   "featured": false
+ },
+ "502d6c": {
+  "title": "Good to Great: 11 companies, discoverable shared traits = sustained greatness",
+  "year": "Jim Collins, Good to Great - 2001",
+  "field": "Management / Future of Work",
+  "result": "A zero-skill null reproduces the whole pattern: select firms for a 15-year 3.8x-the-market leap from a population where NO firm is more skilled than any other, and their next 15 years revert to the market (forward excess +0.015, 95% CI spanning 0; ~47% beat the market = a coin flip).",
+  "canon": "Collins studied 11 firms that leapt from good to great and stayed there, and distilled shared traits (Level 5 leadership, the Hedgehog Concept, getting the right people on the bus, the Flywheel) presented as the discoverable causes of sustained greatness. ~4M copies sold.",
+  "rebuilt": "Smallest null with skill switched OFF: 1400 firms as geometric random walks with IDENTICAL drift and volatility. Apply Collins-style selection on the dependent variable (mediocre for 15 years, then >= N x the market for the next 15), then measure the NEXT 15 years.",
+  "verdict": "FAILED. The selection cohort is fully reproducible from luck alone (3x->30 firms, 5x->9, vs Collins 11), each spectacular in the selection window (3.8-5.6x the market) BY CONSTRUCTION, after which forward excess collapses to ~0 (3x: +0.015, CI (-1.12,1.64); 5x: -0.008) and only ~47% beat the market going forward. All-firms forward excess = 0.00000 (sanity). This regression-to-the-mean collapse is exactly what happened to Collins' real picks after 2001 (Circuit City bankrupt, Fannie Mae bailed out). Honest scope: the evidence cannot separate skill from luck+selection - NOT that management skill is literally zero. Prior art: Rosenzweig 'The Halo Effect' (2007), Levitt; our contribution is the runnable zero-skill null + forward-collapse receipt.",
+  "featured": false,
+  "deep_dive": "../../posts/good-to-great-zero-skill-null.html"
  }
 }

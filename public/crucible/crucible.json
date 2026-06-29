@@ -4,10 +4,19 @@
  "generated": "2026-06-29",
  "counts": {
   "REPRODUCED": 42,
-  "FAILED": 8,
+  "FAILED": 9,
   "NOT_COMPUTABLE": 15
  },
  "entries": [
+  {
+   "claim": "The 11 'Good to Great' companies (Collins 2001) achieved sustained greatness via a discoverable shared set of traits (Level 5 leadership, Hedgehog Concept, right-people-on-the-bus, the Flywheel).",
+   "source": "Jim Collins, Good to Great (HarperBusiness 2001)",
+   "verdict": "FAILED",
+   "note": "Zero-skill null (Lab 502d6c): N=1400 firms as geometric random walks with IDENTICAL drift+vol (no firm more skilled than any other); apply Collins selection-on-the-dependent-variable (mediocre 15y, then >=Nx the market 15y). Robust across t",
+   "lab_id": "502d6c",
+   "code": "https://github.com/DanceNitra/agora/blob/main/agora_output/lab/20260629-141149_good-to-great-zeroskill-null-artifact.py",
+   "date": "2026-06-29"
+  },
   {
    "claim": "Food-choice nudges are ~2.5x more responsive to choice-architecture interventions than other behavioral domains (between-domain effect-size ratio as evidence of intrinsic domain responsiveness).",
    "source": "Mertens, Herberz, Hahnel & Brosch (2021), PNAS, doi:10.1073/pnas.2107346118",

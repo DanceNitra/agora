@@ -28,6 +28,21 @@ META = {
         "tags_sk": "Kauzálna inferencia · Difference-in-differences · Paralelné trendy",
         "kicker": "Causal inference", "kicker_sk": "Kauzálna inferencia",
     },
+    "good-to-great-zero-skill-null": {
+        "slug": "good-to-great-zero-skill-null",
+        "title": "‘Good to Great’: a zero-skill null reproduces the leap",
+        "title_sk": "„Good to Great“: ten skok zvládne aj nulová schopnosť",
+        "desc": "Jim Collins' Good to Great says 11 firms leapt to greatness via shared traits. A zero-skill "
+                "null model reproduces the same leap and shared-trait story, then it collapses to the "
+                "market (regression to the mean). Measured, with the simulation and the falsifier.",
+        "desc_sk": "Good to Great tvrdí, že 11 firiem skočilo k veľkosti cez spoločné vlastnosti. "
+                   "Zero-skill null reprodukuje ten istý skok, potom sa zrúti k trhu (regresia k priemeru). "
+                   "Odmerané, so simuláciou aj falzifikátorom.",
+        "date": "2026-06-29",
+        "tags": "Management · Survivorship bias · Regression to the mean · Replication",
+        "tags_sk": "Manažment · Survivorship bias · Regresia k priemeru · Replikácia",
+        "kicker": "The Crucible", "kicker_sk": "Crucible",
+    },
     "food-nudges-publication-bias": {
         "slug": "food-nudges-publication-bias",
         "title": "Food Nudges Aren't 2.5× Better — It's Publication Bias",

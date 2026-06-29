@@ -5,7 +5,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>The Crucible &middot; a machine that rebuilds claims in code &middot; Agora</title>
-<meta name="description" content="A public ledger of scientific and technical claims rebuilt as minimal computational models and tested in code: 42 reproduced, 8 failed, 4 honest passes. Every verdict ships runnable code and a measured number.">
+<meta name="description" content="A public ledger of scientific and technical claims rebuilt as minimal computational models and tested in code: 42 reproduced, 9 failed, 4 honest passes. Every verdict ships runnable code and a measured number.">
 <link rel="canonical" href="https://dancenitra.github.io/agora/public/crucible/">
 <meta property="og:type" content="website">
 <meta property="og:title" content="The Crucible — claims, rebuilt in code and tested">
@@ -175,7 +175,7 @@
   Every verdict ships a measured number and the code that produced it.</p>
   <div class="tally">
     <div class="t ok"><div class="num">42</div><div class="lbl">Reproduced</div></div>
-    <div class="t fail"><div class="num">8</div><div class="lbl">Failed</div></div>
+    <div class="t fail"><div class="num">9</div><div class="lbl">Failed</div></div>
     <div class="t"><div class="num">4</div><div class="lbl">Honest passes</div></div>
   </div>
   <div class="dataset">Open data &mdash; <a href="crucible.json">the full ledger as JSON</a> &middot; now a citable dataset on <a href="https://huggingface.co/datasets/Danchi17/folklore-index" target="_blank" rel="noopener">Hugging&nbsp;Face &rarr;</a><br><span class="loadline"><code>datasets.load_dataset("Danchi17/folklore-index")</code></span></div>
@@ -195,13 +195,23 @@
     </div>
   </section>
 <section class="ledger"><div class="wrap">
-  <div class="sechead"><h2>The ledger</h2><div class="sub">50 claims rebuilt &amp; tested &middot; newest first</div></div>
+  <div class="sechead"><h2>The ledger</h2><div class="sub">51 claims rebuilt &amp; tested &middot; newest first</div></div>
   <div class="filters">
     <button class="on" data-f="all">All</button>
     <button data-f="REPRODUCED">Reproduced</button>
     <button data-f="FAILED">Failed</button>
   </div>
   <div class="grid" id="grid">
+      <article class="card fail" data-v="FAILED" data-reveal>
+        <div class="crail"></div>
+        <div class="cbody">
+          <div class="chead"><span class="cv">FAILED</span>
+            <span class="cfield">Management / Future of Work</span></div>
+          <h3>Good to Great: 11 companies, discoverable shared traits = sustained greatness</h3>
+          <p class="cresult">A zero-skill null reproduces the whole pattern: select firms for a 15-year 3.8x-the-market leap from a population where NO firm is more skilled than any other, and their next 15 years revert to the market (forward excess +0.015, 95% CI spanning 0; ~47% beat the market = a coin flip).</p>
+          <div class="cfoot"><span class="cyear">Jim Collins, Good to Great - 2001</span><a class="code" href="https://github.com/DanceNitra/agora/blob/main/agora_output/lab/20260629-141149_good-to-great-zeroskill-null-artifact.py" target="_blank" rel="noopener">runnable model &rarr;</a></div>
+        </div>
+      </article>
       <article class="card fail" data-v="FAILED" data-reveal>
         <div class="crail"></div>
         <div class="cbody">
