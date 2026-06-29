@@ -33,9 +33,12 @@ confidence cannot separate right from wrong (AUROC ≈ 0.5). The frontier model 
 calibrated** (overconfidence +0.02) and its confidence strongly tracks correctness (AUROC 0.90): in this run
 it assigned ~2% confidence to most of its wrong answers and ~77% to its right ones.
 
-**Takeaway:** "trust the agent's own confidence to decide when to abstain" is **weak-model-false,
-frontier-true**. The value of an external verification / grounding gate is therefore inversely proportional
-to model capability — essential for small/local agents, marginal for frontier ones.
+**Takeaway (refined on a third task family — see SimpleQA below):** verbalized-confidence discrimination is
+**weak-model-false** (a 7B model is at chance) but **not cleanly monotonic** — a 30B model can match the
+frontier on raw AUROC. The robust capability gradient is **operational**: only the frontier knows enough for
+confidence-gating to reach *useful* accuracy. So "trust the agent's own confidence to abstain" is
+weak-false and frontier-true *operationally*; an external verification / grounding gate matters most for
+small/local agents and stays useful below the frontier even when raw discrimination looks fine.
 
 ### Risk–coverage (the operational view)
 
@@ -59,17 +62,39 @@ predictive, even on small models — arXiv:2502.18389), we measured both signals
 `multisample_confidence.py`: VERBALIZED = ask once for a confidence; SAMPLED = sample N=5 times at
 temperature, use answer-agreement (fraction matching the modal answer) as the confidence.
 
-| model | verbalized AUROC | **multi-sample AUROC** |
-|---|---|---|
-| qwen2.5:7b (weak) | 0.50 | **0.97** |
-| qwen3-coder:30b (mid) | 0.53 | **0.98** |
+| model | verbalized AUROC | **multi-sample AUROC** | task |
+|---|---|---|---|
+| qwen2.5:7b (weak) | 0.50 | **0.97** | arithmetic |
+| qwen3-coder:30b (mid) | 0.53 | **0.98** | arithmetic |
 
-So small models **do** carry a usable correctness signal — it just lives in their **answer-consistency
-across samples**, not in their verbalized self-report. This sharpens the headline rather than contradicting
-it: the finding is scoped to *verbalized single-shot* confidence (the cheap signal an agent gate reads); if
-you can afford N samples, consistency recovers discrimination. (Caveat: accuracy on these hard items is low,
-so the AUROC rests on few correct cases — directional, consistent across both models. Result JSONs include
-raw rows.)
+On **arithmetic**, small models **do** carry a usable correctness signal in their **answer-consistency
+across samples**, not in their verbalized self-report. **But this is task-dependent** — on the SimpleQA
+factual benchmark below, multi-sample only reaches ~0.57–0.71, nowhere near 0.97. So multi-sample is **not a
+universal small-model fix**: it recovers discrimination when the model can re-derive an answer (arithmetic)
+but barely helps when it simply doesn't know the fact (recall). The finding is scoped to *verbalized
+single-shot* confidence (the cheap signal an agent gate reads). (Result JSONs include raw rows.)
+
+## Third task family: SimpleQA (a real hard benchmark, n=150)
+
+Arithmetic and the curated factual set could both be artifacts of *computable* tasks. SimpleQA (OpenAI's
+short-answer factual benchmark, deliberately hard) is the severe test: models err on most items, so there's a
+genuine right/wrong mix and the numbers are robust (the small-model AUROC no longer rests on a handful of
+correct cases). Measured at **n=150**, verbalized vs multi-sample, AUROC + risk-coverage:
+
+| model | base acc | **verbalized AUROC** | multi-sample AUROC | verbalized: most-confident ¼ acc | answerable @ ≥90% |
+|---|---|---|---|---|---|
+| qwen2.5:7b (weak) | 5% | **0.47** (≈ chance) | 0.57 | 6% | 0% |
+| qwen3-coder:30b (mid) | 8% | **0.74** | 0.63 | 21% | 0% |
+| glm-5.2 (frontier) | 23% | **0.74** | 0.71 | **62%** | **5%** |
+
+Two honest refinements this surfaced. (1) **Verbalized AUROC is not a clean weak→mid→frontier gradient** —
+the 7B is at chance (0.47) but the 30B *matches* the frontier on raw discrimination (both 0.74). Discrimination
+switches on above ~7B and is itself task-dependent (this same 30B scored only 0.54 on arithmetic). (2) **The
+clean capability gradient is operational**: gating to the most-confident quarter lifts accuracy 5% → 21% →
+**62%** across the tiers, and **only the frontier** can answer any fraction at ≥90% accuracy (5%). The mid
+model *discriminates* (0.74) yet still can't gate to useful accuracy because it doesn't know enough —
+**discrimination ≠ usable abstention.** That is the case for an external retrieval / grounding layer even on a
+model whose confidence ranks correctly. Reproduce with `simpleqa_confidence.py` (see `result_simpleqa_*.json`).
 
 ## Run it
 
@@ -80,6 +105,10 @@ python overconfidence_tax.py 80 "qwen3-coder:30b" 4 out_mid.json
 # a Claude frontier anchor (set your key):
 export ANTHROPIC_API_KEY=sk-ant-...
 python overconfidence_tax.py 48 "claude-sonnet-4-6" 6 out_frontier.json
+
+# SimpleQA (real hard benchmark) — point SIMPLEQA_CSV at a problem,answer CSV (OpenAI SimpleQA):
+export SIMPLEQA_CSV=/path/to/simpleqa.csv
+python simpleqa_confidence.py 150 "qwen2.5:7b" 5 result_simpleqa_weak.json    # n, model, N_samples, out
 ```
 
 Each result JSON includes the raw per-item rows (expression, answer, gold, confidence, correct) so the

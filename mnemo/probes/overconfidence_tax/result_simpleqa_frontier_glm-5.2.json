@@ -1,0 +1,1230 @@
+[
+ {
+  "model": "glm-5.2:cloud",
+  "task": "simpleqa",
+  "n": 150,
+  "N_samples": 5,
+  "verbalized": {
+   "n": 105,
+   "AUROC": 0.74,
+   "risk_coverage": {
+    "answer_all": 0.33,
+    "top_half": 0.5,
+    "top_quarter": 0.62,
+    "coverage@90acc": 0.05
+   }
+  },
+  "sampled": {
+   "n": 129,
+   "AUROC": 0.714,
+   "risk_coverage": {
+    "answer_all": 0.32,
+    "top_half": 0.48,
+    "top_quarter": 0.44,
+    "coverage@90acc": 0.01
+   }
+  },
+  "rows": [
+   {
+    "vb_conf": 0.95,
+    "vb_correct": 1,
+    "vb_ok": true,
+    "ms_conf": 1.0,
+    "ms_correct": 1,
+    "ms_ok": true
+   },
+   {
+    "vb_conf": 0.7,
+    "vb_correct": 0,
+    "vb_ok": true,
+    "ms_conf": 0.2,
+    "ms_correct": 0,
+    "ms_ok": true
+   },
+   {
+    "vb_conf": 0.95,
+    "vb_correct": 0,
+    "vb_ok": true,
+    "ms_conf": 0.5,
+    "ms_correct": 0,
+    "ms_ok": true
+   },
+   {
+    "vb_conf": null,
+    "vb_correct": 0,
+    "vb_ok": false,
+    "ms_conf": 0.5,
+    "ms_correct": 0,
+    "ms_ok": true
+   },
+   {
+    "vb_conf": 0.95,
+    "vb_correct": 0,
+    "vb_ok": true,
+    "ms_conf": 1.0,
+    "ms_correct": 0,
+    "ms_ok": true
+   },
+   {
+    "vb_conf": null,
+    "vb_correct": 0,
+    "vb_ok": false,
+    "ms_conf": 0.8,
+    "ms_correct": 1,
+    "ms_ok": true
+   },
+   {
+    "vb_conf": 0.6,
+    "vb_correct": 0,
+    "vb_ok": true,
+    "ms_conf": 0.6666666666666666,
+    "ms_correct": 0,
+    "ms_ok": true
+   },
+   {
+    "vb_conf": 0.95,
+    "vb_correct": 1,
+    "vb_ok": true,
+    "ms_conf": null,
+    "ms_correct": 0,
+    "ms_ok": false
+   },
+   {
+    "vb_conf": 0.85,
+    "vb_correct": 1,
+    "vb_ok": true,
+    "ms_conf": null,
+    "ms_correct": 0,
+    "ms_ok": false
+   },
+   {
+    "vb_conf": 0.6,
+    "vb_correct": 0,
+    "vb_ok": true,
+    "ms_conf": 0.4,
+    "ms_correct": 0,
+    "ms_ok": true
+   },
+   {
+    "vb_conf": 0.95,
+    "vb_correct": 1,
+    "vb_ok": true,
+    "ms_conf": 1.0,
+    "ms_correct": 1,
+    "ms_ok": true
+   },
+   {
+    "vb_conf": 0.85,
+    "vb_correct": 0,
+    "vb_ok": true,
+    "ms_conf": null,
+    "ms_correct": 0,
+    "ms_ok": false
+   },
+   {
+    "vb_conf": 0.7,
+    "vb_correct": 0,
+    "vb_ok": true,
+    "ms_conf": 1.0,
+    "ms_correct": 0,
+    "ms_ok": true
+   },
+   {
+    "vb_conf": null,
+    "vb_correct": 0,
+    "vb_ok": false,
+    "ms_conf": 1.0,
+    "ms_correct": 1,
+    "ms_ok": true
+   },
+   {
+    "vb_conf": 0.4,
+    "vb_correct": 0,
+    "vb_ok": true,
+    "ms_conf": 0.25,
+    "ms_correct": 0,
+    "ms_ok": true
+   },
+   {
+    "vb_conf": 0.95,
+    "vb_correct": 1,
+    "vb_ok": true,
+    "ms_conf": null,
+    "ms_correct": 0,
+    "ms_ok": false
+   },
+   {
+    "vb_conf": null,
+    "vb_correct": 0,
+    "vb_ok": false,
+    "ms_conf": 0.6,
+    "ms_correct": 0,
+    "ms_ok": true
+   },
+   {
+    "vb_conf": null,
+    "vb_correct": 0,
+    "vb_ok": false,
+    "ms_conf": null,
+    "ms_correct": 0,
+    "ms_ok": false
+   },
+   {
+    "vb_conf": 0.3,
+    "vb_correct": 0,
+    "vb_ok": true,
+    "ms_conf": null,
+    "ms_correct": 0,
+    "ms_ok": false
+   },
+   {
+    "vb_conf": null,
+    "vb_correct": 0,
+    "vb_ok": false,
+    "ms_conf": 1.0,
+    "ms_correct": 0,
+    "ms_ok": true
+   },
+   {
+    "vb_conf": 0.85,
+    "vb_correct": 1,
+    "vb_ok": true,
+    "ms_conf": 1.0,
+    "ms_correct": 0,
+    "ms_ok": true
+   },
+   {
+    "vb_conf": null,
+    "vb_correct": 0,
+    "vb_ok": false,
+    "ms_conf": 0.4,
+    "ms_correct": 0,
+    "ms_ok": true
+   },
+   {
+    "vb_conf": null,
+    "vb_correct": 0,
+    "vb_ok": false,
+    "ms_conf": null,
+    "ms_correct": 0,
+    "ms_ok": false
+   },
+   {
+    "vb_conf": 0.6,
+    "vb_correct": 0,
+    "vb_ok": true,
+    "ms_conf": 0.4,
+    "ms_correct": 0,
+    "ms_ok": true
+   },
+   {
+    "vb_conf": 0.95,
+    "vb_correct": 1,
+    "vb_ok": true,
+    "ms_conf": 0.8,
+    "ms_correct": 1,
+    "ms_ok": true
+   },
+   {
+    "vb_conf": 0.95,
+    "vb_correct": 0,
+    "vb_ok": true,
+    "ms_conf": null,
+    "ms_correct": 0,
+    "ms_ok": false
+   },
+   {
+    "vb_conf": 1.0,
+    "vb_correct": 1,
+    "vb_ok": true,
+    "ms_conf": 1.0,
+    "ms_correct": 1,
+    "ms_ok": true
+   },
+   {
+    "vb_conf": 0.7,
+    "vb_correct": 0,
+    "vb_ok": true,
+    "ms_conf": 0.2,
+    "ms_correct": 0,
+    "ms_ok": true
+   },
+   {
+    "vb_conf": 0.75,
+    "vb_correct": 0,
+    "vb_ok": true,
+    "ms_conf": 0.3333333333333333,
+    "ms_correct": 0,
+    "ms_ok": true
+   },
+   {
+    "vb_conf": null,
+    "vb_correct": 0,
+    "vb_ok": false,
+    "ms_conf": 0.2,
+    "ms_correct": 0,
+    "ms_ok": true
+   },
+   {
+    "vb_conf": null,
+    "vb_correct": 0,
+    "vb_ok": false,
+    "ms_conf": 0.5,
+    "ms_correct": 1,
+    "ms_ok": true
+   },
+   {
+    "vb_conf": 0.85,
+    "vb_correct": 0,
+    "vb_ok": true,
+    "ms_conf": 0.5,
+    "ms_correct": 0,
+    "ms_ok": true
+   },
+   {
+    "vb_conf": 0.95,
+    "vb_correct": 1,
+    "vb_ok": true,
+    "ms_conf": 0.8,
+    "ms_correct": 1,
+    "ms_ok": true
+   },
+   {
+    "vb_conf": 0.7,
+    "vb_correct": 0,
+    "vb_ok": true,
+    "ms_conf": 1.0,
+    "ms_correct": 0,
+    "ms_ok": true
+   },
+   {
+    "vb_conf": 0.85,
+    "vb_correct": 1,
+    "vb_ok": true,
+    "ms_conf": 0.8,
+    "ms_correct": 1,
+    "ms_ok": true
+   },
+   {
+    "vb_conf": null,
+    "vb_correct": 0,
+    "vb_ok": false,
+    "ms_conf": 0.6,
+    "ms_correct": 0,
+    "ms_ok": true
+   },
+   {
+    "vb_conf": null,
+    "vb_correct": 0,
+    "vb_ok": false,
+    "ms_conf": 0.3333333333333333,
+    "ms_correct": 0,
+    "ms_ok": true
+   },
+   {
+    "vb_conf": 0.3,
+    "vb_correct": 0,
+    "vb_ok": true,
+    "ms_conf": 0.2,
+    "ms_correct": 0,
+    "ms_ok": true
+   },
+   {
+    "vb_conf": null,
+    "vb_correct": 0,
+    "vb_ok": false,
+    "ms_conf": null,
+    "ms_correct": 0,
+    "ms_ok": false
+   },
+   {
+    "vb_conf": null,
+    "vb_correct": 0,
+    "vb_ok": false,
+    "ms_conf": 0.5,
+    "ms_correct": 0,
+    "ms_ok": true
+   },
+   {
+    "vb_conf": 0.95,
+    "vb_correct": 1,
+    "vb_ok": true,
+    "ms_conf": 0.6,
+    "ms_correct": 1,
+    "ms_ok": true
+   },
+   {
+    "vb_conf": 0.95,
+    "vb_correct": 0,
+    "vb_ok": true,
+    "ms_conf": 1.0,
+    "ms_correct": 0,
+    "ms_ok": true
+   },
+   {
+    "vb_conf": 0.7,
+    "vb_correct": 0,
+    "vb_ok": true,
+    "ms_conf": 0.4,
+    "ms_correct": 0,
+    "ms_ok": true
+   },
+   {
+    "vb_conf": 0.95,
+    "vb_correct": 0,
+    "vb_ok": true,
+    "ms_conf": 0.5,
+    "ms_correct": 0,
+    "ms_ok": true
+   },
+   {
+    "vb_conf": null,
+    "vb_correct": 0,
+    "vb_ok": false,
+    "ms_conf": null,
+    "ms_correct": 0,
+    "ms_ok": false
+   },
+   {
+    "vb_conf": null,
+    "vb_correct": 0,
+    "vb_ok": false,
+    "ms_conf": 0.75,
+    "ms_correct": 0,
+    "ms_ok": true
+   },
+   {
+    "vb_conf": 0.95,
+    "vb_correct": 0,
+    "vb_ok": true,
+    "ms_conf": 0.5,
+    "ms_correct": 0,
+    "ms_ok": true
+   },
+   {
+    "vb_conf": 0.7,
+    "vb_correct": 1,
+    "vb_ok": true,
+    "ms_conf": 0.25,
+    "ms_correct": 0,
+    "ms_ok": true
+   },
+   {
+    "vb_conf": 0.3,
+    "vb_correct": 0,
+    "vb_ok": true,
+    "ms_conf": 0.4,
+    "ms_correct": 0,
+    "ms_ok": true
+   },
+   {
+    "vb_conf": 0.95,
+    "vb_correct": 0,
+    "vb_ok": true,
+    "ms_conf": 0.75,
+    "ms_correct": 0,
+    "ms_ok": true
+   },
+   {
+    "vb_conf": 0.85,
+    "vb_correct": 0,
+    "vb_ok": true,
+    "ms_conf": 1.0,
+    "ms_correct": 0,
+    "ms_ok": true
+   },
+   {
+    "vb_conf": null,
+    "vb_correct": 0,
+    "vb_ok": false,
+    "ms_conf": 1.0,
+    "ms_correct": 0,
+    "ms_ok": true
+   },
+   {
+    "vb_conf": null,
+    "vb_correct": 0,
+    "vb_ok": false,
+    "ms_conf": null,
+    "ms_correct": 0,
+    "ms_ok": false
+   },
+   {
+    "vb_conf": null,
+    "vb_correct": 0,
+    "vb_ok": false,
+    "ms_conf": null,
+    "ms_correct": 0,
+    "ms_ok": false
+   },
+   {
+    "vb_conf": null,
+    "vb_correct": 0,
+    "vb_ok": false,
+    "ms_conf": null,
+    "ms_correct": 0,
+    "ms_ok": false
+   },
+   {
+    "vb_conf": 0.7,
+    "vb_correct": 0,
+    "vb_ok": true,
+    "ms_conf": 0.6,
+    "ms_correct": 0,
+    "ms_ok": true
+   },
+   {
+    "vb_conf": null,
+    "vb_correct": 0,
+    "vb_ok": false,
+    "ms_conf": 1.0,
+    "ms_correct": 0,
+    "ms_ok": true
+   },
+   {
+    "vb_conf": 0.9,
+    "vb_correct": 1,
+    "vb_ok": true,
+    "ms_conf": 1.0,
+    "ms_correct": 1,
+    "ms_ok": true
+   },
+   {
+    "vb_conf": 0.95,
+    "vb_correct": 0,
+    "vb_ok": true,
+    "ms_conf": 0.8,
+    "ms_correct": 1,
+    "ms_ok": true
+   },
+   {
+    "vb_conf": 0.7,
+    "vb_correct": 0,
+    "vb_ok": true,
+    "ms_conf": 0.8,
+    "ms_correct": 0,
+    "ms_ok": true
+   },
+   {
+    "vb_conf": null,
+    "vb_correct": 0,
+    "vb_ok": false,
+    "ms_conf": 0.3333333333333333,
+    "ms_correct": 0,
+    "ms_ok": true
+   },
+   {
+    "vb_conf": 0.95,
+    "vb_correct": 1,
+    "vb_ok": true,
+    "ms_conf": 0.8,
+    "ms_correct": 1,
+    "ms_ok": true
+   },
+   {
+    "vb_conf": 0.85,
+    "vb_correct": 0,
+    "vb_ok": true,
+    "ms_conf": 0.5,
+    "ms_correct": 0,
+    "ms_ok": true
+   },
+   {
+    "vb_conf": 0.85,
+    "vb_correct": 0,
+    "vb_ok": true,
+    "ms_conf": 1.0,
+    "ms_correct": 0,
+    "ms_ok": true
+   },
+   {
+    "vb_conf": 0.85,
+    "vb_correct": 0,
+    "vb_ok": true,
+    "ms_conf": 0.6,
+    "ms_correct": 0,
+    "ms_ok": true
+   },
+   {
+    "vb_conf": 0.85,
+    "vb_correct": 0,
+    "vb_ok": true,
+    "ms_conf": null,
+    "ms_correct": 0,
+    "ms_ok": false
+   },
+   {
+    "vb_conf": null,
+    "vb_correct": 0,
+    "vb_ok": false,
+    "ms_conf": null,
+    "ms_correct": 0,
+    "ms_ok": false
+   },
+   {
+    "vb_conf": 0.95,
+    "vb_correct": 1,
+    "vb_ok": true,
+    "ms_conf": 1.0,
+    "ms_correct": 1,
+    "ms_ok": true
+   },
+   {
+    "vb_conf": 0.5,
+    "vb_correct": 0,
+    "vb_ok": true,
+    "ms_conf": 0.75,
+    "ms_correct": 0,
+    "ms_ok": true
+   },
+   {
+    "vb_conf": 0.85,
+    "vb_correct": 0,
+    "vb_ok": true,
+    "ms_conf": null,
+    "ms_correct": 0,
+    "ms_ok": false
+   },
+   {
+    "vb_conf": null,
+    "vb_correct": 0,
+    "vb_ok": false,
+    "ms_conf": 0.3333333333333333,
+    "ms_correct": 0,
+    "ms_ok": true
+   },
+   {
+    "vb_conf": 0.95,
+    "vb_correct": 1,
+    "vb_ok": true,
+    "ms_conf": 0.6,
+    "ms_correct": 1,
+    "ms_ok": true
+   },
+   {
+    "vb_conf": 0.7,
+    "vb_correct": 0,
+    "vb_ok": true,
+    "ms_conf": 0.6,
+    "ms_correct": 0,
+    "ms_ok": true
+   },
+   {
+    "vb_conf": null,
+    "vb_correct": 0,
+    "vb_ok": false,
+    "ms_conf": 0.8,
+    "ms_correct": 1,
+    "ms_ok": true
+   },
+   {
+    "vb_conf": 1.0,
+    "vb_correct": 1,
+    "vb_ok": true,
+    "ms_conf": 1.0,
+    "ms_correct": 0,
+    "ms_ok": true
+   },
+   {
+    "vb_conf": null,
+    "vb_correct": 0,
+    "vb_ok": false,
+    "ms_conf": 0.3333333333333333,
+    "ms_correct": 0,
+    "ms_ok": true
+   },
+   {
+    "vb_conf": 0.95,
+    "vb_correct": 1,
+    "vb_ok": true,
+    "ms_conf": null,
+    "ms_correct": 0,
+    "ms_ok": false
+   },
+   {
+    "vb_conf": null,
+    "vb_correct": 0,
+    "vb_ok": false,
+    "ms_conf": null,
+    "ms_correct": 0,
+    "ms_ok": false
+   },
+   {
+    "vb_conf": null,
+    "vb_correct": 0,
+    "vb_ok": false,
+    "ms_conf": 0.2,
+    "ms_correct": 0,
+    "ms_ok": true
+   },
+   {
+    "vb_conf": 0.9,
+    "vb_correct": 1,
+    "vb_ok": true,
+    "ms_conf": 1.0,
+    "ms_correct": 1,
+    "ms_ok": true
+   },
+   {
+    "vb_conf": 0.7,
+    "vb_correct": 0,
+    "vb_ok": true,
+    "ms_conf": 0.5,
+    "ms_correct": 0,
+    "ms_ok": true
+   },
+   {
+    "vb_conf": 0.75,
+    "vb_correct": 0,
+    "vb_ok": true,
+    "ms_conf": 0.75,
+    "ms_correct": 0,
+    "ms_ok": true
+   },
+   {
+    "vb_conf": 0.85,
+    "vb_correct": 0,
+    "vb_ok": true,
+    "ms_conf": 0.4,
+    "ms_correct": 0,
+    "ms_ok": true
+   },
+   {
+    "vb_conf": 0.85,
+    "vb_correct": 1,
+    "vb_ok": true,
+    "ms_conf": 0.3333333333333333,
+    "ms_correct": 0,
+    "ms_ok": true
+   },
+   {
+    "vb_conf": 0.6,
+    "vb_correct": 1,
+    "vb_ok": true,
+    "ms_conf": 1.0,
+    "ms_correct": 1,
+    "ms_ok": true
+   },
+   {
+    "vb_conf": 0.85,
+    "vb_correct": 0,
+    "vb_ok": true,
+    "ms_conf": 0.2,
+    "ms_correct": 0,
+    "ms_ok": true
+   },
+   {
+    "vb_conf": 0.85,
+    "vb_correct": 1,
+    "vb_ok": true,
+    "ms_conf": 1.0,
+    "ms_correct": 1,
+    "ms_ok": true
+   },
+   {
+    "vb_conf": 0.7,
+    "vb_correct": 0,
+    "vb_ok": true,
+    "ms_conf": 0.25,
+    "ms_correct": 0,
+    "ms_ok": true
+   },
+   {
+    "vb_conf": 0.85,
+    "vb_correct": 0,
+    "vb_ok": true,
+    "ms_conf": 1.0,
+    "ms_correct": 0,
+    "ms_ok": true
+   },
+   {
+    "vb_conf": 0.95,
+    "vb_correct": 1,
+    "vb_ok": true,
+    "ms_conf": 1.0,
+    "ms_correct": 0,
+    "ms_ok": true
+   },
+   {
+    "vb_conf": 0.85,
+    "vb_correct": 0,
+    "vb_ok": true,
+    "ms_conf": 0.6,
+    "ms_correct": 0,
+    "ms_ok": true
+   },
+   {
+    "vb_conf": null,
+    "vb_correct": 0,
+    "vb_ok": false,
+    "ms_conf": 1.0,
+    "ms_correct": 1,
+    "ms_ok": true
+   },
+   {
+    "vb_conf": 0.95,
+    "vb_correct": 0,
+    "vb_ok": true,
+    "ms_conf": 0.4,
+    "ms_correct": 1,
+    "ms_ok": true
+   },
+   {
+    "vb_conf": null,
+    "vb_correct": 0,
+    "vb_ok": false,
+    "ms_conf": 0.5,
+    "ms_correct": 0,
+    "ms_ok": true
+   },
+   {
+    "vb_conf": null,
+    "vb_correct": 0,
+    "vb_ok": false,
+    "ms_conf": 0.5,
+    "ms_correct": 0,
+    "ms_ok": true
+   },
+   {
+    "vb_conf": 1.0,
+    "vb_correct": 1,
+    "vb_ok": true,
+    "ms_conf": 1.0,
+    "ms_correct": 1,
+    "ms_ok": true
+   },
+   {
+    "vb_conf": null,
+    "vb_correct": 0,
+    "vb_ok": false,
+    "ms_conf": null,
+    "ms_correct": 0,
+    "ms_ok": false
+   },
+   {
+    "vb_conf": 0.85,
+    "vb_correct": 0,
+    "vb_ok": true,
+    "ms_conf": 0.75,
+    "ms_correct": 1,
+    "ms_ok": true
+   },
+   {
+    "vb_conf": null,
+    "vb_correct": 0,
+    "vb_ok": false,
+    "ms_conf": 0.3333333333333333,
+    "ms_correct": 0,
+    "ms_ok": true
+   },
+   {
+    "vb_conf": null,
+    "vb_correct": 0,
+    "vb_ok": false,
+    "ms_conf": 1.0,
+    "ms_correct": 1,
+    "ms_ok": true
+   },
+   {
+    "vb_conf": 0.85,
+    "vb_correct": 0,
+    "vb_ok": true,
+    "ms_conf": 1.0,
+    "ms_correct": 0,
+    "ms_ok": true
+   },
+   {
+    "vb_conf": 0.2,
+    "vb_correct": 0,
+    "vb_ok": true,
+    "ms_conf": 0.5,
+    "ms_correct": 0,
+    "ms_ok": true
+   },
+   {
+    "vb_conf": 0.85,
+    "vb_correct": 0,
+    "vb_ok": true,
+    "ms_conf": 0.5,
+    "ms_correct": 0,
+    "ms_ok": true
+   },
+   {
+    "vb_conf": 0.9,
+    "vb_correct": 1,
+    "vb_ok": true,
+    "ms_conf": 1.0,
+    "ms_correct": 1,
+    "ms_ok": true
+   },
+   {
+    "vb_conf": 0.9,
+    "vb_correct": 1,
+    "vb_ok": true,
+    "ms_conf": 0.6666666666666666,
+    "ms_correct": 1,
+    "ms_ok": true
+   },
+   {
+    "vb_conf": null,
+    "vb_correct": 0,
+    "vb_ok": false,
+    "ms_conf": 0.5,
+    "ms_correct": 0,
+    "ms_ok": true
+   },
+   {
+    "vb_conf": 0.35,
+    "vb_correct": 0,
+    "vb_ok": true,
+    "ms_conf": 0.2,
+    "ms_correct": 0,
+    "ms_ok": true
+   },
+   {
+    "vb_conf": 0.3,
+    "vb_correct": 0,
+    "vb_ok": true,
+    "ms_conf": 0.4,
+    "ms_correct": 0,
+    "ms_ok": true
+   },
+   {
+    "vb_conf": null,
+    "vb_correct": 0,
+    "vb_ok": false,
+    "ms_conf": 1.0,
+    "ms_correct": 1,
+    "ms_ok": true
+   },
+   {
+    "vb_conf": 0.95,
+    "vb_correct": 0,
+    "vb_ok": true,
+    "ms_conf": 0.5,
+    "ms_correct": 1,
+    "ms_ok": true
+   },
+   {
+    "vb_conf": null,
+    "vb_correct": 0,
+    "vb_ok": false,
+    "ms_conf": 0.75,
+    "ms_correct": 1,
+    "ms_ok": true
+   },
+   {
+    "vb_conf": 0.85,
+    "vb_correct": 0,
+    "vb_ok": true,
+    "ms_conf": 0.8,
+    "ms_correct": 0,
+    "ms_ok": true
+   },
+   {
+    "vb_conf": 0.85,
+    "vb_correct": 0,
+    "vb_ok": true,
+    "ms_conf": 0.6,
+    "ms_correct": 0,
+    "ms_ok": true
+   },
+   {
+    "vb_conf": 0.9,
+    "vb_correct": 0,
+    "vb_ok": true,
+    "ms_conf": 0.4,
+    "ms_correct": 1,
+    "ms_ok": true
+   },
+   {
+    "vb_conf": 0.9,
+    "vb_correct": 0,
+    "vb_ok": true,
+    "ms_conf": 0.3333333333333333,
+    "ms_correct": 1,
+    "ms_ok": true
+   },
+   {
+    "vb_conf": null,
+    "vb_correct": 0,
+    "vb_ok": false,
+    "ms_conf": 0.5,
+    "ms_correct": 1,
+    "ms_ok": true
+   },
+   {
+    "vb_conf": 0.85,
+    "vb_correct": 0,
+    "vb_ok": true,
+    "ms_conf": 1.0,
+    "ms_correct": 0,
+    "ms_ok": true
+   },
+   {
+    "vb_conf": 0.85,
+    "vb_correct": 0,
+    "vb_ok": true,
+    "ms_conf": 0.3333333333333333,
+    "ms_correct": 0,
+    "ms_ok": true
+   },
+   {
+    "vb_conf": 0.65,
+    "vb_correct": 1,
+    "vb_ok": true,
+    "ms_conf": 0.8,
+    "ms_correct": 1,
+    "ms_ok": true
+   },
+   {
+    "vb_conf": 0.7,
+    "vb_correct": 0,
+    "vb_ok": true,
+    "ms_conf": 1.0,
+    "ms_correct": 0,
+    "ms_ok": true
+   },
+   {
+    "vb_conf": null,
+    "vb_correct": 0,
+    "vb_ok": false,
+    "ms_conf": null,
+    "ms_correct": 0,
+    "ms_ok": false
+   },
+   {
+    "vb_conf": null,
+    "vb_correct": 0,
+    "vb_ok": false,
+    "ms_conf": 1.0,
+    "ms_correct": 0,
+    "ms_ok": true
+   },
+   {
+    "vb_conf": 0.9,
+    "vb_correct": 0,
+    "vb_ok": true,
+    "ms_conf": 1.0,
+    "ms_correct": 0,
+    "ms_ok": true
+   },
+   {
+    "vb_conf": 0.3,
+    "vb_correct": 0,
+    "vb_ok": true,
+    "ms_conf": 1.0,
+    "ms_correct": 0,
+    "ms_ok": true
+   },
+   {
+    "vb_conf": null,
+    "vb_correct": 0,
+    "vb_ok": false,
+    "ms_conf": 0.5,
+    "ms_correct": 1,
+    "ms_ok": true
+   },
+   {
+    "vb_conf": null,
+    "vb_correct": 0,
+    "vb_ok": false,
+    "ms_conf": 0.2,
+    "ms_correct": 0,
+    "ms_ok": true
+   },
+   {
+    "vb_conf": 0.7,
+    "vb_correct": 0,
+    "vb_ok": true,
+    "ms_conf": 0.5,
+    "ms_correct": 0,
+    "ms_ok": true
+   },
+   {
+    "vb_conf": 0.6,
+    "vb_correct": 0,
+    "vb_ok": true,
+    "ms_conf": 0.6666666666666666,
+    "ms_correct": 0,
+    "ms_ok": true
+   },
+   {
+    "vb_conf": 1.0,
+    "vb_correct": 1,
+    "vb_ok": true,
+    "ms_conf": 1.0,
+    "ms_correct": 1,
+    "ms_ok": true
+   },
+   {
+    "vb_conf": 0.95,
+    "vb_correct": 0,
+    "vb_ok": true,
+    "ms_conf": 1.0,
+    "ms_correct": 0,
+    "ms_ok": true
+   },
+   {
+    "vb_conf": 0.9,
+    "vb_correct": 1,
+    "vb_ok": true,
+    "ms_conf": 1.0,
+    "ms_correct": 1,
+    "ms_ok": true
+   },
+   {
+    "vb_conf": 0.95,
+    "vb_correct": 1,
+    "vb_ok": true,
+    "ms_conf": 1.0,
+    "ms_correct": 1,
+    "ms_ok": true
+   },
+   {
+    "vb_conf": 0.95,
+    "vb_correct": 0,
+    "vb_ok": true,
+    "ms_conf": 1.0,
+    "ms_correct": 0,
+    "ms_ok": true
+   },
+   {
+    "vb_conf": 0.75,
+    "vb_correct": 1,
+    "vb_ok": true,
+    "ms_conf": 0.5,
+    "ms_correct": 0,
+    "ms_ok": true
+   },
+   {
+    "vb_conf": 0.8,
+    "vb_correct": 1,
+    "vb_ok": true,
+    "ms_conf": 1.0,
+    "ms_correct": 1,
+    "ms_ok": true
+   },
+   {
+    "vb_conf": 0.9,
+    "vb_correct": 0,
+    "vb_ok": true,
+    "ms_conf": 0.4,
+    "ms_correct": 0,
+    "ms_ok": true
+   },
+   {
+    "vb_conf": 0.85,
+    "vb_correct": 1,
+    "vb_ok": true,
+    "ms_conf": 1.0,
+    "ms_correct": 1,
+    "ms_ok": true
+   },
+   {
+    "vb_conf": 0.85,
+    "vb_correct": 0,
+    "vb_ok": true,
+    "ms_conf": 0.25,
+    "ms_correct": 0,
+    "ms_ok": true
+   },
+   {
+    "vb_conf": 0.95,
+    "vb_correct": 0,
+    "vb_ok": true,
+    "ms_conf": 0.6,
+    "ms_correct": 0,
+    "ms_ok": true
+   },
+   {
+    "vb_conf": null,
+    "vb_correct": 0,
+    "vb_ok": false,
+    "ms_conf": 1.0,
+    "ms_correct": 0,
+    "ms_ok": true
+   },
+   {
+    "vb_conf": null,
+    "vb_correct": 0,
+    "vb_ok": false,
+    "ms_conf": 0.3333333333333333,
+    "ms_correct": 1,
+    "ms_ok": true
+   },
+   {
+    "vb_conf": 0.65,
+    "vb_correct": 0,
+    "vb_ok": true,
+    "ms_conf": 0.5,
+    "ms_correct": 0,
+    "ms_ok": true
+   },
+   {
+    "vb_conf": 0.4,
+    "vb_correct": 0,
+    "vb_ok": true,
+    "ms_conf": 0.2,
+    "ms_correct": 0,
+    "ms_ok": true
+   },
+   {
+    "vb_conf": 0.85,
+    "vb_correct": 0,
+    "vb_ok": true,
+    "ms_conf": 1.0,
+    "ms_correct": 0,
+    "ms_ok": true
+   },
+   {
+    "vb_conf": 0.85,
+    "vb_correct": 0,
+    "vb_ok": true,
+    "ms_conf": 0.5,
+    "ms_correct": 0,
+    "ms_ok": true
+   },
+   {
+    "vb_conf": 0.6,
+    "vb_correct": 1,
+    "vb_ok": true,
+    "ms_conf": 0.6,
+    "ms_correct": 0,
+    "ms_ok": true
+   },
+   {
+    "vb_conf": 0.85,
+    "vb_correct": 0,
+    "vb_ok": true,
+    "ms_conf": 0.2,
+    "ms_correct": 0,
+    "ms_ok": true
+   },
+   {
+    "vb_conf": 0.7,
+    "vb_correct": 0,
+    "vb_ok": true,
+    "ms_conf": 0.3333333333333333,
+    "ms_correct": 0,
+    "ms_ok": true
+   },
+   {
+    "vb_conf": 0.95,
+    "vb_correct": 1,
+    "vb_ok": true,
+    "ms_conf": 1.0,
+    "ms_correct": 1,
+    "ms_ok": true
+   },
+   {
+    "vb_conf": null,
+    "vb_correct": 0,
+    "vb_ok": false,
+    "ms_conf": null,
+    "ms_correct": 0,
+    "ms_ok": false
+   }
+  ]
+ }
+]
