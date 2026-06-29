@@ -60,6 +60,21 @@ META = {
         "tags_sk": "AI hodnotenie · Chatbot Arena · Verbosity bias · Replikácia",
         "kicker": "The Crucible", "kicker_sk": "Crucible",
     },
+    "verifiable-agent-receipts": {
+        "slug": "verifiable-agent-receipts",
+        "title": "Verifiable Receipts for AI Agents: Logs Aren't Proof",
+        "title_sk": "Overiteľné účtenky pre AI agentov: logy nie sú dôkaz",
+        "desc": "An AI agent's logs are self-reported claims. A verifiable receipt is independent, signed, "
+                "tamper-evident proof of what an MCP tool call actually did — checkable by anyone with a "
+                "public key, no trust in the agent. We built the smallest runnable version and mapped the field.",
+        "desc_sk": "Logy AI agenta sú self-reported tvrdenia. Overiteľná účtenka je nezávislý, podpísaný, "
+                   "tamper-evident dôkaz toho, čo MCP volanie nástroja naozaj urobilo — overiteľný hocikým s "
+                   "verejným kľúčom, bez dôvery v agenta. Postavili sme najmenšiu spustiteľnú verziu a zmapovali pole.",
+        "date": "2026-06-29",
+        "tags": "AI agents · MCP · verifiable receipts · cryptography · agent security",
+        "tags_sk": "AI agenti · MCP · overiteľné účtenky · kryptografia · bezpečnosť agentov",
+        "kicker": "Build", "kicker_sk": "Build",
+    },
     "founder-led-survivorship-null": {
         "slug": "founder-led-survivorship-null",
         "title": "Founder-Led Firms' 3.1× Edge: Mostly Survivorship",

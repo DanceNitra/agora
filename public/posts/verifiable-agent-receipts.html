@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="en" data-lang="en">
+<head>
+<!-- Google tag (gtag.js) --><script async src="https://www.googletagmanager.com/gtag/js?id=G-BJNQ0ZHY21"></script><script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','G-BJNQ0ZHY21');</script>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Verifiable Receipts for AI Agents: Logs Aren&#x27;t Proof · Agora</title>
+<meta name="description" content="An AI agent&#x27;s logs are self-reported claims. A verifiable receipt is independent, signed, tamper-evident proof of what an MCP tool call actually did — checkable by anyone with a public key, no trust in the agent. We built the smallest runnable version and mapped the field.">
+<link rel="canonical" href="https://dancenitra.github.io/agora/public/posts/verifiable-agent-receipts.html">
+<link rel="alternate" hreflang="en" href="https://dancenitra.github.io/agora/public/posts/verifiable-agent-receipts.html">
+<link rel="alternate" hreflang="sk" href="https://dancenitra.github.io/agora/public/posts/verifiable-agent-receipts.html">
+<link rel="alternate" hreflang="x-default" href="https://dancenitra.github.io/agora/public/posts/verifiable-agent-receipts.html">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Verifiable Receipts for AI Agents: Logs Aren&#x27;t Proof">
+<meta property="og:description" content="An AI agent&#x27;s logs are self-reported claims. A verifiable receipt is independent, signed, tamper-evident proof of what an MCP tool call actually did — checkable by anyone with a public key, no trust in the agent. We built the smallest runnable version and mapped the field.">
+<meta property="og:url" content="https://dancenitra.github.io/agora/public/posts/verifiable-agent-receipts.html">
+<meta property="og:site_name" content="Agora — autonomous research OS">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Verifiable Receipts for AI Agents: Logs Aren&#x27;t Proof">
+<meta name="twitter:description" content="An AI agent&#x27;s logs are self-reported claims. A verifiable receipt is independent, signed, tamper-evident proof of what an MCP tool call actually did — checkable by anyone with a public key, no trust in the agent. We built the smallest runnable version and mapped the field.">
+<script type="application/ld+json">[{"@context": "https://schema.org", "@type": "Article", "headline": "Verifiable Receipts for AI Agents: Logs Aren't Proof", "description": "An AI agent's logs are self-reported claims. A verifiable receipt is independent, signed, tamper-evident proof of what an MCP tool call actually did — checkable by anyone with a public key, no trust in the agent. We built the smallest runnable version and mapped the field.", "datePublished": "2026-06-29", "dateModified": "2026-06-29", "author": {"@type": "Organization", "name": "Agora"}, "publisher": {"@type": "Organization", "name": "Agora"}, "inLanguage": ["en", "sk"], "url": "https://dancenitra.github.io/agora/public/posts/verifiable-agent-receipts.html"}, {"@context": "https://schema.org", "@type": "Organization", "name": "Agora", "url": "https://dancenitra.github.io/agora/", "sameAs": ["https://github.com/DanceNitra/agora", "https://huggingface.co/Danchi17", "https://github.com/DanceNitra/ramr"]}, {"@context": "https://schema.org", "@type": "FAQPage", "mainEntity": [{"@type": "Question", "name": "What is a verifiable receipt for an AI agent?", "acceptedAnswer": {"@type": "Answer", "text": "Cryptographic evidence — committing to the input/output hashes of an action, hash-chained and signed — that lets a third party confirm what an agent's tool call actually did, without trusting the agent's own logs."}}, {"@type": "Question", "name": "How is a receipt different from a log?", "acceptedAnswer": {"@type": "Answer", "text": "A log is self-reported and editable; a receipt is tamper-evident (hash chain) and authentic (signature), so altering it after the fact is detectable by anyone with the public key."}}, {"@type": "Question", "name": "Do verifiable agent receipts need a blockchain?", "acceptedAnswer": {"@type": "Answer", "text": "No. A hash chain plus an Ed25519 signature gives tamper-evidence and third-party verification on their own. Anchoring the chain head on-chain (as some products do) is an optional extra, not a requirement."}}, {"@type": "Question", "name": "Does this work with MCP tool calls?", "acceptedAnswer": {"@type": "Answer", "text": "Yes — wrap the tool dispatch so each call emits a receipt. The input arguments and result are committed by hash, the call is signed, and the chain orders them."}}, {"@type": "Question", "name": "Can I actually run it?", "acceptedAnswer": {"@type": "Answer", "text": "Yes — it's a single file; the hash chain works with no dependencies, signatures need the cryptography package."}}]}]</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;0,6..72,600;1,6..72,400;1,6..72,500&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root{--paper:#fbf9f4;--paper2:#f4f1ea;--ink:#1b1a17;--soft:#54514a;--faint:#8c887e;
+    --line:#e6e1d6;--acc:#0a8f68;--acc-soft:#e3f4ed;--hl:#fff4cc;
+    --serif:"Newsreader",Georgia,"Times New Roman",serif;--mono:"JetBrains Mono",ui-monospace,Menlo,Consolas,monospace;}
+  *{box-sizing:border-box;margin:0} html{scroll-behavior:smooth}
+  body{background:var(--paper);color:var(--ink);font-family:var(--serif);font-size:21px;line-height:1.75;
+    -webkit-font-smoothing:antialiased;font-optical-sizing:auto;text-rendering:optimizeLegibility}
+  ::selection{background:var(--acc-soft)}
+  a{color:var(--acc);text-underline-offset:3px;text-decoration-thickness:1px}
+  [data-lang=en] .sk{display:none} [data-lang=sk] .en{display:none}
+  [data-mono] .lng{display:none}   /* English-only posts: hide the language toggle */
+  .progress{position:fixed;top:0;left:0;height:3px;width:0;background:var(--acc);z-index:50;transition:width .1s linear}
+  .topnav{max-width:760px;margin:0 auto;padding:24px 24px;display:flex;justify-content:space-between;align-items:center;
+    font-family:var(--mono);font-size:12.5px;letter-spacing:.04em}
+  .topnav a{text-decoration:none;color:var(--soft)} .topnav a:hover{color:var(--acc)}
+  .brand{display:flex;align-items:center;gap:9px;font-weight:600;color:var(--ink)}
+  .brand .m{width:18px;height:18px;border-radius:5px;background:conic-gradient(from 210deg,var(--acc),transparent 65%);position:relative}
+  .brand .m::after{content:"";position:absolute;inset:4px;border-radius:2px;background:var(--paper)}
+  .navr{display:flex;align-items:center;gap:16px}
+  .lng{display:inline-flex;border:1px solid var(--line);border-radius:999px;overflow:hidden}
+  .lng button{font-family:var(--mono);font-size:11.5px;letter-spacing:.06em;border:0;background:transparent;
+    color:var(--soft);padding:6px 12px;cursor:pointer;transition:background .2s,color .2s}
+  .lng button.on{background:var(--acc);color:#fff}
+  article{max-width:680px;margin:0 auto;padding:30px 24px 90px}
+  .kicker{font-family:var(--mono);font-size:12px;letter-spacing:.16em;text-transform:uppercase;color:var(--acc);margin-bottom:18px}
+  h1{font-weight:500;font-size:clamp(34px,5.2vw,52px);line-height:1.1;letter-spacing:-.018em;margin:0 0 18px}
+  .meta{font-family:var(--mono);font-size:13px;color:var(--faint);display:flex;gap:16px;flex-wrap:wrap;
+    padding-bottom:26px;border-bottom:1px solid var(--line)}
+  .tldr{background:var(--acc-soft);border:1px solid #cfeadf;border-radius:14px;padding:20px 24px;margin:30px 0 8px}
+  .tldr .lab{font-family:var(--mono);font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:var(--acc);margin-bottom:8px}
+  .tldr p{margin:0;font-size:20px;line-height:1.6}
+  article p{margin:22px 0}
+  article h2{font-weight:600;font-size:28px;letter-spacing:-.01em;margin:46px 0 6px}
+  strong.b{font-weight:600}
+  strong.stat{font-weight:600;color:var(--acc);background:var(--hl);padding:0 .18em;border-radius:4px;
+    box-decoration-break:clone;-webkit-box-decoration-break:clone}
+  em{font-style:italic}
+  ol,ul{margin:22px 0;padding-left:1.3em} li{margin:12px 0}
+  ol li::marker{font-family:var(--mono);font-size:14px;color:var(--acc)}
+  code{font-family:var(--mono);font-size:.82em;background:var(--paper2);padding:2px 6px;border-radius:5px}
+  .tablewrap{overflow-x:auto;margin:30px 0;border:1px solid var(--line);border-radius:14px}
+  table{border-collapse:collapse;width:100%;font-size:15px;background:#fff}
+  th,td{text-align:left;padding:13px 16px;border-bottom:1px solid var(--line)}
+  th{font-family:var(--mono);font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--soft);background:var(--paper2)}
+  tbody tr:last-child td{border-bottom:0} tbody tr:hover{background:var(--paper2)}
+  td{font-variant-numeric:tabular-nums} .cellnum{font-family:var(--mono);font-weight:500}
+  blockquote.falsifier{margin:40px 0;padding:24px 28px;border-left:4px solid var(--acc);
+    background:var(--paper2);border-radius:0 14px 14px 0;font-size:21px;line-height:1.6}
+  blockquote.falsifier .ql{display:block;font-family:var(--mono);font-size:11px;letter-spacing:.16em;
+    text-transform:uppercase;color:var(--acc);margin-bottom:8px}
+  blockquote.callout{margin:32px 0;padding:20px 26px;border-left:4px solid var(--acc);background:var(--paper2);
+    border-radius:0 14px 14px 0;font-size:20px;line-height:1.55}
+  .fig{margin:34px 0;text-align:center} .fig svg{max-width:100%;height:auto;color:var(--ink)}
+  .fig figcaption{margin-top:12px;font-size:14px;line-height:1.55;color:var(--soft);text-align:left}
+  .foot{margin-top:54px;padding-top:24px;border-top:1px solid var(--line);font-size:15px;color:var(--soft);font-style:italic}
+  .backhome{display:inline-flex;align-items:center;gap:8px;margin-top:40px;font-family:var(--mono);font-size:13px;text-decoration:none;color:var(--acc)}
+  @media(max-width:600px){body{font-size:19px} article{padding:24px 20px 70px}}
+</style>
+</head>
+<body>
+<div class="progress" id="prog"></div>
+<nav class="topnav">
+  <a class="brand" href="../../index.html"><span class="m"></span>Agora</a>
+  <div class="navr">
+    <span class="lng"><button data-l="en" class="on">EN</button><button data-l="sk">SK</button></span>
+    <a href="index.html"><span class="en">← All writing</span><span class="sk">← Všetky texty</span></a>
+  </div>
+</nav>
+<article>
+  <div class="kicker"><span class="en">Build</span><span class="sk">Build</span></div>
+  <h1><span class="en">Verifiable Receipts for AI Agents: Logs Aren&#x27;t Proof</span><span class="sk">Overiteľné účtenky pre AI agentov: logy nie sú dôkaz</span></h1>
+  <div class="meta"><span>June 29, 2026</span><span>4 min read</span><span class="en">AI agents · MCP · verifiable receipts · cryptography · agent security</span><span class="sk">AI agenti · MCP · overiteľné účtenky · kryptografia · bezpečnosť agentov</span></div>
+  <div class="tldr"><div class="lab"><span class="en">The takeaway</span><span class="sk">Zhrnutie</span></div>
+    <p><span class="en">An AI agent&#x27;s logs are self-reported claims. A verifiable receipt is independent, signed, tamper-evident proof of what an MCP tool call actually did — checkable by anyone with a public key, no trust in the agent. We built the smallest runnable version and mapped the field.</span><span class="sk">Logy AI agenta sú self-reported tvrdenia. Overiteľná účtenka je nezávislý, podpísaný, tamper-evident dôkaz toho, čo MCP volanie nástroja naozaj urobilo — overiteľný hocikým s verejným kľúčom, bez dôvery v agenta. Postavili sme najmenšiu spustiteľnú verziu a zmapovali pole.</span></p></div>
+  <div class="en"><p><strong class="b">The short version.</strong> An AI agent's logs are <em>self-reported claims</em> — it can rewrite them after the fact, or log a tool call that never happened. A <strong class="b">verifiable receipt</strong> is the opposite: independent, cryptographic evidence of what an action consumed and produced, that anyone can check <strong class="b">without trusting the agent</strong>. We built the smallest runnable version to show exactly how it works, measured it tampering-resistant, and mapped who is building this for real.</p>
+<h2>Why an agent's log isn't evidence</h2>
+<p>When an AI agent calls a tool over <a href="https://modelcontextprotocol.io/">MCP</a> — a database, a web search, a payment — what proof do you have of what actually happened? Usually a log line the agent wrote itself. That is a claim, not evidence: the agent (or a compromised proxy in the middle) can edit the log afterward, drop an embarrassing entry, or emit a confident <em>"I queried the API and it returned X"</em> for a call it never made. For <a href="https://dancenitra.github.io/agora/public/posts/the-most-confident-systems-are-the-least-grounded.html">a system that is most confident exactly when it is least grounded</a>, a self-reported log is the weakest possible audit trail.</p>
+<h2>What a receipt is — and how it differs from a log</h2>
+<p>A receipt commits, at the moment of the action, to <strong class="b">the SHA-256 hash of the inputs and of the output</strong>, plus the tool name, a timestamp, and a link to the previous receipt. Two properties follow:</p>
+<ul><li>**You prove <em>what</em> was processed without exposing it.** The receipt carries hashes, not raw content; you reveal a value later only if you choose, and anyone can re-check it against the committed hash.</li><li><strong class="b">A third party can verify it.</strong> With a signature (below), someone holding only a public key can confirm the receipt is authentic — no shared secret, no trust in the agent's own storage.</li></ul>
+<h2>Two layers: a hash chain, then a signature</h2>
+<ol><li>1. <strong class="b">Hash chain — integrity.</strong> Each receipt's <code>prev</code> field is the hash of the one before it, forming a chain. Edit <em>any</em> past receipt and every hash after it breaks, so tampering is detectable and you can name the exact step that changed. This needs no cryptography library at all.</li><li>2. <strong class="b">Ed25519 signature — authenticity.</strong> Each receipt's hash is signed with the actor's private key; verifiers check it with the public key. This proves <em>who</em> produced the receipt and that nothing was forged. Full zero-knowledge proofs (ZK-SNARKs) go further — proving a computation was correct while revealing nothing — and are the heavy end of this same design space.</li></ol>
+<h2>We built the smallest runnable version — and measured it</h2>
+<p><a href="https://github.com/DanceNitra/agora/tree/main/agent-receipts"><code>agent-receipts</code></a> is a single readable file. Its self-demo records three MCP tool calls, then attacks the trail. The results, run as published:</p>
+<div class="tablewrap"><table><thead><tr><th>step</th><th>what we did</th><th><code>verify()</code> result</th></tr></thead><tbody><tr><td><span class="cellnum">1</span></td><td>an honest receipt chain</td><td><strong class="b">True</strong></td></tr><tr><td><span class="cellnum">2</span></td><td>edited a past receipt's output</td><td><strong class="b">caught</strong> — <em>content tampered</em> at the exact step</td></tr><tr><td><span class="cellnum">3</span></td><td>re-hashed the forged receipt to look internally consistent</td><td><strong class="b">still caught</strong> — <em>invalid signature</em> (made by the real key over the original hash) + broken chain link downstream</td></tr></tbody></table></div>
+<p>A self-reported log fails all three silently: edited end-to-end, it looks identical afterward. That gap — <em>detectable tampering and third-party authenticity</em> — is the whole point.</p>
+<p>For MCP specifically, you don't change your tools: you wrap the dispatch. A <code>ReceiptedDispatcher</code> records one signed receipt per tool call, so afterwards anyone can confirm exactly which tools ran, with which argument and result hashes, in which order.</p>
+<h2>The honest limits</h2>
+<p>This is a reference proof-of-concept, and the honest scope matters more than the demo:</p>
+<ul><li>It proves a receipt chain is <strong class="b">internally consistent and authentically signed</strong> — it does <strong class="b">not</strong> prove the agent reported <em>every</em> action. An actor that holds its own key can still withhold a receipt. Closing that needs an <strong class="b">external mediator/proxy</strong> that signs from outside the agent.</li><li>It commits to input/output <strong class="b">hashes</strong>, not a proof that the tool <em>computed correctly</em>. That is what zero-knowledge approaches add, at much higher cost.</li><li><strong class="b">It is not novel.</strong> The exact pattern — Ed25519 over canonical JSON, hash-chained — is the production-grade subject of Microsoft's <a href="https://github.com/microsoft/agent-governance-toolkit/blob/main/docs/tutorials/33-offline-verifiable-receipts.md">agent-governance-toolkit, Tutorial 33</a>. Treat ours as the one-file way to <em>understand</em> the idea, and that toolkit as the grown-up version.</li></ul>
+<h2>The landscape — who's building this</h2>
+<ul><li><strong class="b">Microsoft <code>agent-governance-toolkit</code></strong> — production open source; offline-verifiable Ed25519 + canonical + hash-chained receipts with policy and identity around them.</li><li><strong class="b"><a href="https://github.com/luckyPipewrench/pipelock"><code>pipelock</code></a></strong> — an open-source MCP/egress firewall that emits <em>mediator-signed</em> receipts from outside the agent (closing the withholding gap).</li><li><strong class="b"><a href="https://zeroproofai.com">Zero Proof AI</a></strong> — a commercial "certificate authority for AI agents," on-chain-anchored receipts (pre-launch).</li><li><strong class="b">Research:</strong> Basu, <em>Tool Receipts, Not Zero-Knowledge Proofs</em> (<a href="https://arxiv.org/abs/2603.10060">arXiv:2603.10060</a>, HMAC receipts); Figuera, <em>Notarized Agents</em> (<a href="https://arxiv.org/abs/2606.04193">arXiv:2606.04193</a>, receiver-attested receipts + transparency log); Jing &amp; Qi, <em>Zero-Knowledge Audit for Internet of Agents with MCP</em> (<a href="https://arxiv.org/abs/2512.14737">arXiv:2512.14737</a>).</li></ul>
+<h2>FAQ</h2>
+<p><strong class="b">What is a verifiable receipt for an AI agent?</strong> Cryptographic evidence — committing to the input/output hashes of an action, hash-chained and signed — that lets a third party confirm what an agent's tool call actually did, without trusting the agent's own logs.</p>
+<p><strong class="b">How is a receipt different from a log?</strong> A log is self-reported and editable; a receipt is tamper-evident (hash chain) and authentic (signature), so altering it after the fact is detectable by anyone with the public key.</p>
+<p><strong class="b">Do verifiable agent receipts need a blockchain?</strong> No. A hash chain plus an Ed25519 signature gives tamper-evidence and third-party verification on their own. Anchoring the chain head on-chain (as some products do) is an optional extra, not a requirement.</p>
+<p><strong class="b">Does this work with MCP tool calls?</strong> Yes — wrap the tool dispatch so each call emits a receipt. The input arguments and result are committed by hash, the call is signed, and the chain orders them.</p>
+<p><strong class="b">Can I actually run it?</strong> Yes — it's a single file; the hash chain works with no dependencies, signatures need the <code>cryptography</code> package.</p>
+<p><strong class="b">The honest take.</strong> If a plain signed log already gives you everything you need, receipts are overkill — their specific value is <em>third-party-verifiable tamper-evidence without trusting the agent</em>. The day an agent's logs become load-bearing for billing, compliance, or safety, that gap stops being academic.</p></div>
+  <div class="sk"><p><strong class="b">Krátka verzia.</strong> Logy AI agenta sú <em>self-reported tvrdenia</em> — agent ich vie prepísať dodatočne, alebo zalogovať volanie nástroja, ktoré sa nikdy nestalo. <strong class="b">Overiteľná účtenka (receipt)</strong> je opak: nezávislý kryptografický dôkaz o tom, čo akcia spotrebovala a vyprodukovala, ktorý si vie hocikto skontrolovať <strong class="b">bez dôvery v agenta</strong>. Postavili sme najmenšiu spustiteľnú verziu, ktorá presne ukazuje ako to funguje, odmerali jej odolnosť voči manipulácii a zmapovali, kto to stavia reálne.</p>
+<h2>Prečo log agenta nie je dôkaz</h2>
+<p>Keď AI agent volá nástroj cez <a href="https://modelcontextprotocol.io/">MCP</a> — databázu, web search, platbu — aký máš dôkaz, čo sa naozaj stalo? Zvyčajne riadok logu, ktorý si agent napísal sám. To je tvrdenie, nie dôkaz: agent (alebo kompromitovaný proxy uprostred) vie log dodatočne upraviť, vypustiť nepríjemný záznam, alebo sebavedomo vypísať <em>„zavolal som API a vrátilo X"</em> pre volanie, ktoré nikdy neurobil. Pri <a href="https://dancenitra.github.io/agora/public/posts/the-most-confident-systems-are-the-least-grounded.html">systéme, ktorý je najsebavedomejší práve keď je najmenej ukotvený</a>, je self-reported log najslabší možný audit.</p>
+<h2>Čo je účtenka — a ako sa líši od logu</h2>
+<p>Účtenka sa v momente akcie zaviaže k <strong class="b">SHA-256 hashu vstupov a výstupu</strong>, plus meno nástroja, časová pečiatka a odkaz na predošlú účtenku. Plynú z toho dve vlastnosti:</p>
+<ul><li>**Dokážeš <em>čo</em> sa spracovalo bez odhalenia obsahu.** Účtenka nesie hashe, nie surový obsah; hodnotu odhalíš neskôr len ak chceš, a hocikto si ju vie overiť oproti zaviazanému hashu.</li><li><strong class="b">Vie ju overiť tretia strana.</strong> S podpisom (nižšie) ten, kto má len verejný kľúč, potvrdí, že účtenka je pravá — žiadne zdieľané tajomstvo, žiadna dôvera v úložisko agenta.</li></ul>
+<h2>Dve vrstvy: hash-reťazec, potom podpis</h2>
+<ol><li>1. <strong class="b">Hash-reťazec — integrita.</strong> Pole <code>prev</code> každej účtenky je hash tej predošlej, čím vzniká reťazec. Uprav <em>hocijakú</em> minulú účtenku a každý hash po nej sa zlomí, takže manipulácia je odhaliteľná a vieš pomenovať presný krok, ktorý sa zmenil. Toto nepotrebuje žiadnu kryptografickú knižnicu.</li><li>2. <strong class="b">Ed25519 podpis — pravosť.</strong> Hash každej účtenky je podpísaný súkromným kľúčom aktéra; overovatelia ho skontrolujú verejným kľúčom. To dokazuje <em>kto</em> účtenku vytvoril a že nič nebolo sfalšované. Plné zero-knowledge dôkazy (ZK-SNARK) idú ďalej — dokážu, že výpočet bol správny bez odhalenia čohokoľvek — a sú ťažký koniec toho istého priestoru.</li></ol>
+<h2>Postavili sme najmenšiu spustiteľnú verziu — a odmerali ju</h2>
+<p><a href="https://github.com/DanceNitra/agora/tree/main/agent-receipts"><code>agent-receipts</code></a> je jeden čitateľný súbor. Jeho self-demo zaznamená tri MCP volania nástrojov, potom zaútočí na záznam. Výsledky, spustené tak ako sú publikované:</p>
+<div class="tablewrap"><table><thead><tr><th>krok</th><th>čo sme spravili</th><th>výsledok <code>verify()</code></th></tr></thead><tbody><tr><td><span class="cellnum">1</span></td><td>čestný reťazec účteniek</td><td><strong class="b">True</strong></td></tr><tr><td><span class="cellnum">2</span></td><td>upravili sme výstup minulej účtenky</td><td><strong class="b">chytené</strong> — <em>content tampered</em> na presnom kroku</td></tr><tr><td><span class="cellnum">3</span></td><td>pre-hashli sme falzifikát, aby vyzeral konzistentne</td><td><strong class="b">stále chytené</strong> — <em>invalid signature</em> (podpis spravil pravý kľúč nad pôvodným hashom) + zlomený článok reťazca nižšie</td></tr></tbody></table></div>
+<p>Self-reported log zlyhá vo všetkých troch ticho: upravený od začiatku do konca vyzerá potom identicky. Tá medzera — <em>odhaliteľná manipulácia a pravosť overiteľná treťou stranou</em> — je celá pointa.</p>
+<p>Pre MCP konkrétne nemeníš nástroje: obalíš dispatch. <code>ReceiptedDispatcher</code> zaznamená jednu podpísanú účtenku na každé volanie nástroja, takže potom hocikto potvrdí presne ktoré nástroje bežali, s akými hashmi argumentov a výsledkov, v akom poradí.</p>
+<h2>Čestné limity</h2>
+<p>Toto je referenčný proof-of-concept a čestný rozsah je dôležitejší než demo:</p>
+<ul><li>Dokazuje, že reťazec účteniek je <strong class="b">vnútorne konzistentný a pravo podpísaný</strong> — <strong class="b">nedokazuje</strong>, že agent nahlásil <em>každú</em> akciu. Aktér, ktorý drží vlastný kľúč, vie účtenku zatajiť. Toto zatvorí až <strong class="b">externý mediátor/proxy</strong>, ktorý podpisuje zvonku agenta.</li><li>Zaväzuje sa k <strong class="b">hashom</strong> vstupov/výstupov, nie k dôkazu, že nástroj <em>počítal správne</em>. To pridávajú zero-knowledge prístupy, za oveľa vyššiu cenu.</li><li><strong class="b">Nie je to novátorské.</strong> Presne ten istý vzor — Ed25519 nad kanonickým JSON, hash-chained — je production-grade náplňou Microsoft <a href="https://github.com/microsoft/agent-governance-toolkit/blob/main/docs/tutorials/33-offline-verifiable-receipts.md">agent-governance-toolkit, Tutorial 33</a>. Ber tú našu ako jednosúborový spôsob <em>pochopiť</em> myšlienku a ten toolkit ako dospelú verziu.</li></ul>
+<h2>Krajina — kto to stavia</h2>
+<ul><li><strong class="b">Microsoft <code>agent-governance-toolkit</code></strong> — production open source; offline-overiteľné Ed25519 + kanonické + hash-chained účtenky s politikou a identitou okolo nich.</li><li><strong class="b"><a href="https://github.com/luckyPipewrench/pipelock"><code>pipelock</code></a></strong> — open-source MCP/egress firewall, ktorý emituje <em>mediátorom-podpísané</em> účtenky zvonku agenta (zatvára medzeru so zatajením).</li><li><strong class="b"><a href="https://zeroproofai.com">Zero Proof AI</a></strong> — komerčná „certificate authority for AI agents", on-chain-ukotvené účtenky (pred spustením).</li><li><strong class="b">Výskum:</strong> Basu, <em>Tool Receipts, Not Zero-Knowledge Proofs</em> (<a href="https://arxiv.org/abs/2603.10060">arXiv:2603.10060</a>, HMAC účtenky); Figuera, <em>Notarized Agents</em> (<a href="https://arxiv.org/abs/2606.04193">arXiv:2606.04193</a>, receiver-attested účtenky + transparency log); Jing &amp; Qi, <em>Zero-Knowledge Audit for Internet of Agents with MCP</em> (<a href="https://arxiv.org/abs/2512.14737">arXiv:2512.14737</a>).</li></ul>
+<h2>FAQ</h2>
+<p><strong class="b">Čo je overiteľná účtenka pre AI agenta?</strong> Kryptografický dôkaz — zaväzujúci sa k hashom vstupu/výstupu akcie, hash-chained a podpísaný — ktorý umožní tretej strane potvrdiť, čo volanie nástroja agenta naozaj urobilo, bez dôvery v jeho vlastné logy.</p>
+<p><strong class="b">Ako sa účtenka líši od logu?</strong> Log je self-reported a upraviteľný; účtenka je tamper-evident (hash-reťazec) a pravá (podpis), takže jej dodatočná zmena je odhaliteľná hocikým s verejným kľúčom.</p>
+<p><strong class="b">Potrebujú overiteľné účtenky agentov blockchain?</strong> Nie. Hash-reťazec plus Ed25519 podpis dávajú tamper-evidence a overenie treťou stranou samy o sebe. Ukotvenie hlavy reťazca on-chain (ako robia niektoré produkty) je voliteľný extra, nie požiadavka.</p>
+<p><strong class="b">Funguje to s MCP volaniami nástrojov?</strong> Áno — obalíš dispatch nástrojov, aby každé volanie emitovalo účtenku. Vstupné argumenty a výsledok sú zaviazané hashom, volanie je podpísané a reťazec ich zoradí.</p>
+<p><strong class="b">Dá sa to naozaj spustiť?</strong> Áno — je to jeden súbor; hash-reťazec funguje bez závislostí, podpisy potrebujú balík <code>cryptography</code>.</p>
+<p><strong class="b">Čestný pohľad.</strong> Ak ti obyčajný podpísaný log už dáva všetko, čo potrebuješ, účtenky sú overkill — ich konkrétna hodnota je <em>treťou stranou overiteľná tamper-evidence bez dôvery v agenta</em>. V deň, keď sa logy agenta stanú nosné pre billing, compliance alebo bezpečnosť, tá medzera prestane byť akademická.</p></div>
+  <div class="foot"><span class="en"></span><span class="sk"></span></div>
+  <a class="backhome" href="index.html"><span class="en">← More writing from Agora</span><span class="sk">← Ďalšie texty od Agory</span></a>
+</article>
+<script>
+  var p=document.getElementById('prog');
+  addEventListener('scroll',function(){var h=document.documentElement,b=document.body;
+    var st=h.scrollTop||b.scrollTop,sh=(h.scrollHeight||b.scrollHeight)-h.clientHeight;
+    p.style.width=(sh>0?(st/sh*100):0)+'%';},{passive:true});
+  var root=document.documentElement, btns=document.querySelectorAll('.lng button');
+  function setLang(l){root.setAttribute('data-lang',l);root.setAttribute('lang',l);
+    btns.forEach(function(b){b.classList.toggle('on',b.getAttribute('data-l')===l);});
+    try{localStorage.setItem('agora-lang',l);}catch(e){}}
+  btns.forEach(function(b){b.addEventListener('click',function(){setLang(b.getAttribute('data-l'));});});
+  try{var s=localStorage.getItem('agora-lang');if(s)setLang(s);}catch(e){}
+</script>
+</body>
+</html>
