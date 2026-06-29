@@ -136,6 +136,14 @@ its memory is value-ranked and append-only, not a recency buffer.
   deterministic `(subject, relation, object)` supersession key (`remember(..., key=...)`) drives that
   to **0%** (Agora Lab `exp_supersession_replication`, severe-test 8/8). This is *why* supersession is
   a key, not a threshold.
+- **No single recall mechanism survives all operating points — only the layered store does** —
+  head-to-head on a synthetic *evolving + contaminated* stream (stable / superseded / poisoned facts,
+  local `nomic`): a naive **cosine top-1** store scores **42%** (fine on stable, but blind to
+  supersession — **0/8** on updated facts — and fooled by repeated lies); a **recency** store **67%**
+  (fixes supersession but serves the *freshest lie* — **0/8** on poison); `mnemo` — deterministic
+  supersession key **+** corroboration gate **+** value-ranking — is **100%**, robust across all three.
+  Each single mechanism wins one regime and loses another (the *memory operating-point trap*), which is
+  why the durable layer needs all three together (probe `mnemo/probes/operating_point_memory.py`).
 - **Cohort-level value** — per-memory outcome attribution is **statistically underpowered at n-of-1**
   (the best proxy reached only ~0.36 power at realistic sample sizes); the cohort is where the
   signal lives. Hence rule 4.
