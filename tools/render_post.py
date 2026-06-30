@@ -17,6 +17,21 @@ ROOT = Path(__file__).resolve().parents[1]
 SITE = "https://dancenitra.github.io/agora/public"
 
 META = {
+    "agent-memory-retrieval": {
+        "slug": "agent-memory-retrieval-bm25-vector-hybrid",
+        "title": "Agent-memory retrieval, measured: recency 0.024, a vector DB ties BM25, the cheap hybrid wins",
+        "title_sk": "Retrieval pre agent memory, odmerané: recency 0,024, vector DB len remizuje s BM25, lacný hybrid vyhráva",
+        "desc": "We benchmarked 6 self-hostable retrievers for AI agent memory on LoCoMo. Recency (the "
+                "'last-N' default) scored 0.024 recall@20; a vector DB didn't beat zero-dependency BM25 (a tie); "
+                "the cheap BM25+embedder hybrid won.",
+        "desc_sk": "Odmerali sme 6 self-hostovateľných retrieverov pre pamäť AI agentov na LoCoMo. Recency "
+                   "(default 'posledných N') dosiahol 0,024 recall@20; samotný vektorový index neporazil "
+                   "zero-dependency BM25 (remíza); lacný BM25+embedder hybrid vyhral.",
+        "date": "2026-06-30", "modified": "2026-06-30",
+        "tags": "AI agents · Memory · Retrieval · BM25 vs vector · Hybrid",
+        "tags_sk": "AI agenti · Pamäť · Retrieval · BM25 vs vektory · Hybrid",
+        "kicker": "AI agent memory", "kicker_sk": "Pamäť AI agentov",
+    },
     "pre-trends": {
         "slug": "pre-trends-test-weak-evidence",
         "title": "Passing a Pre-Trends Test Is Weak Evidence — We Measured It",
