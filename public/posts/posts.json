@@ -492,9 +492,9 @@
  {
   "slug": "everyone-says-set-exit-criteria-nobody-gives-you-the-number-",
   "title": "Everyone says 'set exit criteria' — nobody gives you the number. We measured it.",
-  "title_sk": "Kazdy hovori 'urci si exit kriteria' — nikto ti neda cislo. My sme ho odmerali.",
-  "desc": "The claim. \"Set exit criteria and ignore the sunk cost\" is the most repeated career and business advice there is — and it's useless, because it never tells you the threshold. When exactly do you cut a",
-  "desc_sk": "Kedy vzdat slabnuce usilie, odmerane. Vzdaj to, ked nedavny vynos klesne ~60% pod svoj vrchol (drawdown stop). Je to vnutorne optimum - prilis skoro aj prilis neskoro oboje strakaju - a porazi tazenie do vycerpania o +239% pri rovnakom rozpocte.",
+  "title_sk": "Každý hovorí ‚urči si exit kritériá' — nikto ti nedá číslo. My sme ho odmerali.",
+  "desc": "When to quit a fading effort, measured. Quit when recent yield falls ~60% below its peak (a drawdown stop) — an interior optimum (too early and too late both lose) that beat mining to depletion by +239% on the same budget in our reference model. θ≈0.6 is illustrative, not a universal constant.",
+  "desc_sk": "Kedy vzdať slabnúce úsilie, odmerané. Vzdaj to, keď nedávny výnos klesne ~60 % pod svoj vrchol (drawdown stop). Je to vnútorné optimum — príliš skoro aj príliš neskoro oboje strácajú — a porazí ťaženie do vyčerpania o +239 % pri rovnakom rozpočte. θ≈0,6 je ilustračné, nie univerzálna konštanta.",
   "date": "2026-06-15",
   "tags": "Research",
   "tags_sk": "Výskum",
