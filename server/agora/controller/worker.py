@@ -92,19 +92,19 @@ class WorkerResult:
 
 
 def _compute_body_update(npc: dict) -> dict:
-    """Čisto matematický výpočet body zmien — žiadne I/O."""
-    stamina = max(0.0, npc.get("stamina", 100) - random.uniform(0.5, 2.0))
-    hunger = min(100.0, npc.get("hunger", 0) + random.uniform(0.2, 0.8))
-    fatigue = min(100.0, npc.get("fatigue", 0) + random.uniform(0.3, 1.0))
-    health = npc.get("health", 100)
+    """Čisto matematický výpočet body zmien — žiadne I/O.
 
-    # Health penalties
-    if hunger > 80:
-        health = max(0, health - 0.5)
-    if fatigue > 80:
-        health = max(0, health - 0.3)
-    if stamina < 10:
-        health = max(0, health - 0.2)
+    COSMETIC ONLY: body stats are flavor for the 3D HUD bars and MUST NEVER gate
+    research (owner's standing rule — survival mechanics may not degrade output).
+    The original pure-decay version here was a death-spiral twin of
+    agent_os._evolve_body: every agent reached health=0/fatigue=100 and stuck in
+    'panicked', stalling all research. So stats now drift in a SAFE BAND that can
+    never trip a gate (panic<20, heal<25, confused<50, rest fatigue>70/stamina<20,
+    hunger>80). Keep in sync with agent_os._evolve_body."""
+    stamina = min(95.0, max(60.0, npc.get("stamina", 100) + random.uniform(-2.0, 2.0)))
+    fatigue = min(50.0, max(5.0, npc.get("fatigue", 0) + random.uniform(-2.0, 2.0)))
+    hunger = min(55.0, max(0.0, npc.get("hunger", 0) + random.uniform(-1.5, 1.5)))
+    health = min(100.0, max(85.0, npc.get("health", 100) + random.uniform(-1.0, 2.0)))
 
     return {
         "stamina": round(stamina, 1),

@@ -413,35 +413,25 @@ class AgentOS:
 
         await self.db.commit()
 
-    # States in which the agent is recovering at the keep (rest / eat / heal)
-    # rather than exerting itself. Outside these, body stats decay with activity.
-    _RECOVERY_STATES = ("resting", "panicked", "confused", "blocked")
-
     def _evolve_body(self, state_of_mind, stamina, hunger, fatigue, health):
-        """Pure homeostasis step. Recovering states RESTORE the body; productive
-        states decay it. Health regenerates when the body is well-supplied and
-        only bleeds at the extremes.
+        """Body stats are COSMETIC ONLY — flavor for the 3D HUD's health/stamina/
+        fatigue bars. They MUST NEVER gate research (owner's standing rule: survival
+        mechanics may not degrade output).
 
-        Without the recovery branch this was a one-way death spiral: stamina only
-        fell, hunger/fatigue only rose, so every agent inevitably reached
-        stamina=0/fatigue=100/health=0 and stuck permanently in 'panicked'
-        (health<20 always beats the resting check), halting all research. The
-        recovery branch closes the loop into a sustainable work<->rest cycle.
-        Returns (stamina, hunger, fatigue, health), all clamped to [0, 100]."""
-        if state_of_mind in self._RECOVERY_STATES:
-            stamina = min(100.0, stamina + random.uniform(2.0, 5.0))
-            fatigue = max(0.0, fatigue - random.uniform(2.0, 5.0))
-            hunger = max(0.0, hunger - random.uniform(1.0, 3.0))
-        else:
-            stamina = min(100.0, max(0.0, stamina - random.uniform(0.5, 2.0)))
-            hunger = min(100.0, hunger + random.uniform(0.2, 0.8))
-            fatigue = min(100.0, fatigue + random.uniform(0.3, 1.0))
-        if hunger < 70 and fatigue < 70 and stamina > 20:
-            health = min(100.0, health + random.uniform(0.5, 1.0))   # regen when well-supplied
-        else:
-            if hunger > 80: health = max(0.0, health - 0.5)
-            if fatigue > 80: health = max(0.0, health - 0.3)
-            if stamina < 10: health = max(0.0, health - 0.2)
+        The original pure-decay version (stamina only fell, hunger/fatigue only rose,
+        health bled with no recovery) drove every agent to health=0/fatigue=100, stuck
+        permanently in 'panicked', halting ALL research for hours after each restart.
+        So the stats now just drift gently inside a SAFE BAND that can never cross any
+        gate threshold anywhere in the system: panic (health<20), seek-healing
+        (health<25), confused (health<50), forced-rest (fatigue>70/>75 or stamina<15/<20),
+        hunger penalty (>80). The bars still move (watchable world) but the agent stays
+        'focused'/'planning' forever -> always researches. Twin path:
+        worker._compute_body_changes (Controller ProcessPoolExecutor) — keep them in sync.
+        `state_of_mind` is unused now (cosmetic drift is state-independent)."""
+        stamina = min(95.0, max(60.0, stamina + random.uniform(-2.0, 2.0)))
+        fatigue = min(50.0, max(5.0, fatigue + random.uniform(-2.0, 2.0)))
+        hunger = min(55.0, max(0.0, hunger + random.uniform(-1.5, 1.5)))
+        health = min(100.0, max(85.0, health + random.uniform(-1.0, 2.0)))
         return stamina, hunger, fatigue, health
 
     async def _update_body(self, npc_id: str):
