@@ -80,7 +80,7 @@ def new_receipt_keypair():
     return (sk.private_bytes(_ser.Encoding.Raw, _ser.PrivateFormat.Raw, _ser.NoEncryption()).hex(),
             sk.public_key().public_bytes(_ser.Encoding.Raw, _ser.PublicFormat.Raw).hex())
 
-__version__ = "0.2.2"
+__version__ = "0.3.0"
 _WORD = re.compile(r"[a-z0-9][a-z0-9\-']{2,}")
 _STOP = frozenset("the a an of for to in on and or is are was were be been with this that it its as "
                   "by at from into our we us you your he she they them his her their not no".split())
@@ -92,6 +92,18 @@ def _stem(w: str) -> str:
 
 def _tokens(text: str) -> set:
     return {_stem(w) for w in _WORD.findall((text or "").lower()) if w not in _STOP}
+
+
+def _token_counts(text: str) -> dict:
+    """Term-frequency map with the SAME tokenization as _tokens (stem + stopword filter). BM25 needs TF;
+    _tokens loses it by returning a set."""
+    d: dict = {}
+    for w in _WORD.findall((text or "").lower()):
+        if w in _STOP:
+            continue
+        s = _stem(w)
+        d[s] = d.get(s, 0) + 1
+    return d
 
 
 def _cosine(a, b) -> float:
@@ -119,8 +131,9 @@ class Mnemo:
         self.embed = embed
         self.items: list[dict] = []
         self._tok_cache: dict[str, set] = {}     # id -> token set, so recall doesn't re-tokenize
+        self._tc_cache: dict[str, dict] = {}     # id -> term-frequency map, for the BM25 hybrid channel
         # recall auto-mode: below this many active memories lexical is as good and free; above it the
-        # embedder pays (measured crossover ~300-600 notes; semantic then wins 3.6-5x). Tunable.
+        # lexical+semantic HYBRID (RRF) pays — measured to beat either channel alone on agent memory. Tunable.
         self.semantic_threshold = 300
         self._last_mode = "lexical"              # which mode the most recent recall() actually used
         self._mat = None                         # cached L2-normalized matrix of memory vectors (numpy)
@@ -415,6 +428,40 @@ class Mnemo:
             t = _tokens(rec["text"]); self._tok_cache[rid] = t
         return t
 
+    def _rec_tokcount(self, rec: dict) -> dict:
+        """Term-frequency map for a memory, cached by id (for the BM25 hybrid channel)."""
+        rid = rec.get("id") or id(rec)
+        c = self._tc_cache.get(rid)
+        if c is None:
+            c = _token_counts(rec["text"]); self._tc_cache[rid] = c
+        return c
+
+    def _bm25_scores(self, qtok: set, pool: list, k1: float = 1.5, b: float = 0.75) -> list:
+        """Okapi BM25 score of `query` (token set) against every record in `pool` — the strong lexical
+        channel for the hybrid. df/avgdl are computed over the pool (the live corpus). Returns a list of
+        scores aligned to `pool`. Pure-Python, zero-dependency. We MEASURED BM25 (not token-overlap) as the
+        lexical channel that makes the hybrid beat either alone (mnemo/probes/locomo_retrieval_map.py)."""
+        N = len(pool)
+        if N == 0:
+            return []
+        counts = [self._rec_tokcount(r) for r in pool]
+        dl = [sum(c.values()) for c in counts]
+        avgdl = (sum(dl) / N) or 1.0
+        df: dict = {}
+        for c in counts:
+            for t in c:
+                df[t] = df.get(t, 0) + 1
+        idf = {t: math.log(1 + (N - n + 0.5) / (n + 0.5)) for t, n in df.items()}
+        out = []
+        for c, L in zip(counts, dl):
+            s = 0.0
+            for t in qtok:
+                f = c.get(t, 0)
+                if f:
+                    s += idf.get(t, 0.0) * (f * (k1 + 1)) / (f + k1 * (1 - b + b * L / avgdl))
+            out.append(s)
+        return out
+
     def _similarity(self, query: str, rec: dict, qvec=None, qtok: set | None = None) -> float:
         if qvec is not None and rec.get("vec"):
             return max(0.0, _cosine(qvec, rec["vec"]))
@@ -431,10 +478,11 @@ class Mnemo:
         Memories the dream pass flagged as hubs (universal matchers) are skipped unless include_hubs.
 
         mode: 'auto' (default) uses LEXICAL token overlap while the store is small (< semantic_threshold
-        active memories) and SEMANTIC embedding recall once it grows past that — the measured crossover
-        where the embedder starts to pay (3.6-5x recall at scale). Force with 'lexical' / 'semantic'.
-        Semantic needs an embedder (set on the store); without one, or if embedding fails, recall
-        falls back to lexical automatically."""
+        active memories) and a LEXICAL+SEMANTIC HYBRID (Reciprocal Rank Fusion) once it grows past that —
+        the hybrid robustly beat either channel alone in our agent-memory benchmark (details in the recall
+        body / mnemo/probes/locomo_retrieval_map.py). Force a single channel with mode='lexical' /
+        'semantic', or the fusion explicitly with mode='hybrid'. Semantic/hybrid need an embedder (set on
+        the store); without one, or if embedding fails, recall falls back to lexical automatically."""
         def _eligible(r: dict) -> bool:
             s = r["status"]
             if as_of is not None:
@@ -457,10 +505,23 @@ class Mnemo:
         # one scope's memories into another's recall. scope=None (default) sees everything (legacy behavior).
         if scope is not None:
             pool = [r for r in pool if (r.get("meta") or {}).get("scope") == scope]
-        use_semantic = self.embed is not None and (
-            mode == "semantic" or (mode == "auto" and len(pool) >= self.semantic_threshold))
-        qvec = self._qvec(query) if use_semantic else None    # None -> lexical (also if embed fails)
-        self._last_mode = "semantic" if qvec is not None else "lexical"
+        # Mode selection. 'hybrid' = lexical (token overlap) + semantic (embedding) fused with Reciprocal
+        # Rank Fusion. We MEASURED hybrid robustly beating EITHER channel alone for agent memory on LoCoMo
+        # (recall@20 0.61 hybrid vs 0.55 lexical vs 0.53 semantic; +0.057 over the best single channel,
+        # 9/10 conversations, conversation-level bootstrap CI excludes 0). So 'auto' now fuses (was: switch
+        # lexical->semantic at the threshold). Receipt: mnemo/probes/locomo_retrieval_map.py. RRF needs no
+        # tuning and no extra dependency. Force a single channel with mode='lexical'/'semantic'.
+        has_embed = self.embed is not None
+        if mode == "lexical" or not has_embed:
+            sel = "lexical"
+        elif mode in ("semantic", "hybrid"):
+            sel = mode
+        else:                                                 # 'auto': fuse once the store is worth it
+            sel = "hybrid" if len(pool) >= self.semantic_threshold else "lexical"
+        qvec = self._qvec(query) if sel in ("semantic", "hybrid") else None
+        if qvec is None and sel != "lexical":
+            sel = "lexical"                                   # embedder absent or failed -> graceful fallback
+        self._last_mode = sel
         qtok = _tokens(query)                                 # tokenize the query once (lexical + fallback)
         # Vectorized semantic fast-path: one matmul gives the cosine to every vec-bearing memory.
         sims_vec = None
@@ -471,28 +532,52 @@ class Mnemo:
                 if self.center_embeddings and self._vec_mean is not None:
                     qv = qv - self._vec_mean              # center the query the SAME way as the matrix
                 sims_vec = M @ (qv / (float(_np.linalg.norm(qv)) or 1.0))
-        cands = []                                        # (sim, prov, eff_value, r) for sim>0 candidates
         _now = time.time()                                # for per-type decay of the ranking value
         _by_id = {x["id"]: x for x in self.items}         # for provenance lookups (source-episode status)
-        for r in pool:
+        def _semsim(r) -> float:
             if sims_vec is not None and r.get("vec") and r["id"] in self._vec_rowof:
-                sim = max(0.0, float(sims_vec[self._vec_rowof[r["id"]]]))
-            else:                                             # pure-Python cosine, or lexical fallback
-                sim = self._similarity(query, r, qvec, qtok)
-            # Relevance-floor ABSTENTION: drop candidates below an absolute similarity floor; if the WHOLE
-            # top-k falls below it, recall() returns [] ("not in memory") instead of padding context with a weak
-            # false match. min_relevance=0.0 (default) keeps legacy behavior (only sim<=0 is dropped).
-            if sim <= 0 or sim < min_relevance:
-                continue
+                return max(0.0, float(sims_vec[self._vec_rowof[r["id"]]]))
+            return max(0.0, _cosine(qvec, r["vec"])) if (qvec is not None and r.get("vec")) else 0.0
+        def _lexsim(r) -> float:
+            t = self._rec_tokens(r)
+            return (len(qtok & t) / min(len(qtok), len(t))) if (qtok and t) else 0.0
+        def _candrec(r, sim):                             # provenance gate + value, shared by all modes
             # Provenance gate: a memory that absorbed near-duplicates (links) is STALE-DERIVED if any of
             # those sources was later CONTRADICTED (state-toggle supersession) — the merged summary
             # outlived a fact it summarized. Demote it (don't drop — flag for re-consolidation), so a
             # consolidated claim can't quietly outrank the fresh memory that overturned its source.
             stale = bool(r.get("links")) and any(
                 (_by_id.get(lid, {}).get("meta") or {}).get("superseded_by_toggle") for lid in r["links"])
-            prov = 0.5 if stale else 1.0
             r["_stale_derived"] = stale                   # surfaced in the returned record
-            cands.append((sim, prov, self._effective_value(r, _now), r))
+            return (sim, 0.5 if stale else 1.0, self._effective_value(r, _now), r)
+        cands = []                                        # (sim, prov, eff_value, r), sim in [0,1]
+        # Relevance-floor ABSTENTION: drop candidates below an absolute similarity floor; if the WHOLE top-k
+        # falls below it, recall() returns [] ("not in memory") instead of padding context with a weak false
+        # match. min_relevance=0.0 (default) keeps legacy behavior (only sim<=0 dropped). In hybrid the floor
+        # is applied to the stronger of the two raw channels, then the FUSED rank score becomes the relevance.
+        if sel == "hybrid":
+            bm = self._bm25_scores(qtok, pool)            # strong BM25 lexical channel over the live corpus
+            scn = []                                      # (r, sem, bm25) candidates above the floor
+            for r, bx in zip(pool, bm):
+                sem = _semsim(r)
+                if (sem <= 0 or sem < min_relevance) and bx <= 0:
+                    continue                              # abstain only when BOTH channels are empty/below floor
+                scn.append((r, sem, bx))
+            if scn:
+                order_sem = sorted(range(len(scn)), key=lambda i: -scn[i][1])
+                order_bm = sorted(range(len(scn)), key=lambda i: -scn[i][2])
+                rrf = [0.0] * len(scn)
+                for rank, i in enumerate(order_sem): rrf[i] += 1.0 / (60 + rank)
+                for rank, i in enumerate(order_bm):  rrf[i] += 1.0 / (60 + rank)
+                mx = max(rrf) or 1.0
+                for i, (r, sem, bx) in enumerate(scn):
+                    cands.append(_candrec(r, rrf[i] / mx))    # normalize the fused rank score to a [0,1] relevance
+        else:
+            for r in pool:
+                sim = _semsim(r) if sel == "semantic" else _lexsim(r)
+                if sim <= 0 or sim < min_relevance:
+                    continue
+                cands.append(_candrec(r, sim))
         # Calibration WAS-IT-RIGHT: a per-memory Beta(good,bad) posterior nudges the score by track record.
         # cal_mode controls how the outcome-credit channel is allowed to act (our measured signal-reliability
         # law: a selection signal only beats relevance once reliability p > the no-signal floor 1/(1+D)):

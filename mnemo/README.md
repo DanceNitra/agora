@@ -41,7 +41,13 @@ m.value_by_cohort()                            # value reported per tag/time-blo
 ```
 
 Bring any text→vector function as `embed=` for semantic recall; with none, `mnemo` falls back to a
-forgiving lexical match so it **runs anywhere, today**.
+forgiving lexical match so it **runs anywhere, today**. Once the store grows past the threshold, recall
+**fuses lexical (BM25) + semantic with Reciprocal Rank Fusion**. On high-lexical-overlap agent memory
+(e.g. LoCoMo) the fused hybrid *measurably* beats either channel alone (recall@20 **+0.06** over the best
+single channel, 9/10 conversations, conversation-level bootstrap CI excludes 0; receipt:
+[`probes/locomo_retrieval_map.py`](probes/locomo_retrieval_map.py)); where the embedder already dominates
+(paraphrase-heavy corpora, see benchmarks) fusion adds little. `mode='auto'` fuses; `mode='lexical'` /
+`'semantic'` force a single channel.
 
 ## Use it as an MCP server (any Claude / Cursor / agent client)
 
