@@ -313,3 +313,46 @@ f=0 -> 92% collapse, knee at f=0.05 -> 6%, f=0.20 -> 1%; lock p=1.5=0.177, p=2=0
   moves with d / nu. Two sub-questions fall out: (a) is the 5% anchor robust or a 1-D Gaussian artifact
   (test t-distributed generators, d>1)? (b) below what q does filtering AMPLIFY collapse (a bad
   verifier selects on noise)? This is Crucible-grade: it tests the one claim the post hand-waves.
+
+---
+
+## Audit #11 — your-rag-store-is-rotting (ragfresh) — 2026-06-30 — HEAVY REFRAME (the most serious find of the run)
+
+**The defect the FULL panel caught (a 2-skeptic re-audit would have missed it):** the post's headline
+benchmark was RIGGED. The original A/B handed the value+freshness strategy the ORACLE true value while
+the recency baseline got only `updated_ts`, AND the synthetic made content-age INDEPENDENT of value, so
+"recency" was structurally ~random. That manufactured the hero number (+83% "value × freshness beats
+recency"). Two framing errors compounded it: (a) "freshness beats retrieval" is a CATEGORY ERROR — no
+retrieval/recall/embedding arm exists in the benchmark, it only compares keep/eviction policies; (b)
+"access-frequency is the wrong signal" was asserted as fact and is FALSE in the model.
+
+**The honest rebuild (6 arms x 2 age-regimes x 20 seeds, % of keep-best-by-true-value oracle):**
+- realistic (age~value): value-only 100, value+freshness 95, hits-only 92, hits-proxy 91, recency 62, random 56
+- worst (age independent of value): value-only 100, value+freshness 96, hits 91, hits-proxy 90, recency 56=random 56
+Lessons the data forced into the post: (1) VALUE is the lever, not freshness — value-only (100) >=
+value+freshness (95), so the freshness term is a small TAX on the keep-ranking, not a benefit; its real
+job is the query-time staleness multiplier + orphan/stale lifecycle. (2) a decayed HIT-COUNT proxy is a
+STRONG signal (~91%, the realistic observable arm with no labels), refuting "popular != valuable" — this
+is just LFU-with-aging / LFUDA. (3) recency-only ~= random when age does not track value.
+
+**Prior art the post had ZERO of (its biggest exposure):** the whole method IS cost-aware caching —
+GreedyDual-Size (Cao & Irani 1997), GDSF (Cherkasova 1998), GreedyDual (Young 2002), LFU-DA (Arlitt et
+al. 2000); freshness layer = temporal-RAG / FreshQA (Vu et al. 2023). Repositioned ragfresh as a
+*packaged application*, not a discovery.
+
+**Re-audit caught 3 more (all fixed):** (1) "1.5-1.8x MORE" -> "as much" (x-more = +180%, ~2x inflation);
+(2) crossover 0.09 in post vs 0.07 in tool docstring — the REAL lab gives F* = edge/Δevents =
+130.2/(1900-76) = 0.071, so 0.07 is canonical and the post's 0.09 was wrong (verified by re-running
+20260615-070150_autophagy...); (3) TLDR/meta "~90%" undersold the value-aware arm (95-100%).
+
+**Frontier question (runnable, Crucible-grade):** what is the value-vs-frequency CORRELATION threshold
+above which a label-free hit-count proxy beats a value-aware policy that uses NOISY labels? Sweep
+(label-noise sigma) x (popularity-value correlation rho) x (keep-budget): there is a crossover surface
+where, below some label quality, you are better off NOT scoring value and just aging hit-counts. That
+surface is the actual deployment decision ragfresh users face and nobody has mapped it.
+
+**Meta-lesson (reinforces [[audit-publish-full-procedure-never-shorten]]):** the rigging was invisible to
+re-running the OLD benchmark (it ran fine and printed +83%) — only REBUILDING the benchmark with the
+obvious missing arms (give every strategy the same information; make age sometimes track value) exposed
+it. An audit that only re-runs the author's own harness cannot catch a rigged harness. Rebuild the
+measurement from the estimand, don't re-execute the artifact.
