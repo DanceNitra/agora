@@ -385,3 +385,28 @@ the Grounding-Meter / Overconfidence-Tax line. This is the "could it stand as se
 **Meta-lesson:** the lab's OWN header cited Nuhfer 2016 -- the prior art that guts the novelty claim was in our
 source file and dropped from the public post. Audit check: diff the lab/source-file citations against the post's
 citations; anything the author knew but omitted is a red flag.
+
+---
+
+## Audit #13 — the-hot-hand-fallacy-was-the-fallacy — 2026-06-30 — REFRAME (attribution + framing + truncation)
+
+**Verdict: science is SOLID (lab verified 1:1: D=-0.0794 t=-27.7 @k3/p.5/n100; -0.033 k2; -0.170 k4; -0.082 @p.46; consistent with Miller-Sanjurjo 2018 -- difference estimator doubles the ~-4pp single-conditional to ~-8pp at p=0.5; GVT really used 100 shots/shooter). Citations all TRUE (GVT 1985 Cognitive Psychology 17:295-314; MS 2018 Econometrica 86:2019-2047). But REFRAME on attribution + framing + a P0 truncation.**
+
+**Defects the full panel caught:**
+1. (P0) EN truncation on 5 surfaces (meta/og/twitter/JSON-LD Article desc/EN TLDR): all read only "The claim. In 1985... does not raise the probability of the next make" -- truncated mid-thought, no result, no period -- while SK TLDR is complete. Replaced with a result-first EN takeaway.
+2. (P1 CRITICAL) The post took credit for Miller-Sanjurjo's REVERSAL. "the hot-hand fallacy was the fallacy / the famous debunking debunked nothing" IS MS's published Econometrica conclusion, but the post credited MS only for the "selection effect" mechanism, never the reversal -- reads as if WE overturned GVT. Added explicit "the reversal is MS's (2018); our contribution is only the runnable null" early + in body.
+3. (P1) "debunked nothing" over-generalized: GVT ran multiple analyses (serial corr, runs tests, betting study); the MS bias hits the conditional-probability streak estimator specifically. And GVT's broader PERCEPTION thesis (people overestimate streakiness) is a separate claim the bias doesn't overturn. Scoped.
+4. (P2, all lenses) "Re-analyses generally find a SMALL but real hot hand" is wrong AND undercuts the post's own thesis: MS's correction of GVT's OWN controlled data recovered ~+11-13pp (substantial, "moderate-to-large") -- larger than the ~8pp artifact the post dramatizes. Fixed to "substantial ~11-13pp in controlled shooting; in-game smaller and still debated."
+5. (P2) "~8-point headwind" is n=100/k=3-specific; the bias shrinks with record length (-3pp at n=248, measured in the lab but hidden). Scoped.
+6. (P2) The giant t-values (t=-28 etc.) are SIMULATION precision across ~6000 records, not a per-player statistic; risked a lay misread. Caveated.
+7. (P2) SK FAQ (lines 121-124) was never localized: dot decimals, English quote glyphs, anglicisms (estimator/null/bias/hot hand/streak) -- fixed to SK register. Added formal GVT + MS references with links (the post had none).
+
+**Frontier question (Crucible-grade, ON our frontier -- the genuinely novel angle, not the known basketball reversal):**
+The transferable structure is "CONDITION ON A STREAK / EXTREME, then evaluate on the SAME finite sample -> manufacture a sign-flipped null/optimistic estimate." This finite-sample selection bias is PERVASIVE and UN-bias-corrected in ML evaluation, where it's treated as folklore:
+  - best-checkpoint / early-stopping selection (report the val-max checkpoint -> optimistic; the next step regresses -- hot-hand-in-reverse / winner's curse);
+  - best-of-K seeds / hyperparameter "our best run" (max over seeds is upward-biased);
+  - post-hoc "where the model is confident" subgroup slices (condition on a high-confidence streak -> biased accuracy-after-streak);
+  - streaming/agentic eval: "LLM/agent accuracy AFTER a run of K successes/agreements" (self-consistency, RL reward streaks) is the EXACT Miller-Sanjurjo estimand on a finite trajectory -- and nobody bias-corrects it.
+Runnable Crucible probe: take a real eval pipeline (checkpoint selection OR self-consistency-after-K), construct a ground-truth null, measure the manufactured effect in pp -- same recipe as this post, applied where FAILED is a live novel result. Ties to [[overconfidence-tax]] / calibration line. THIS is the original contribution worth leading future work with, vs re-running a famous Econometrica reversal.
+
+**Meta-lesson:** when a post re-implements a FAMOUS published result (MS 2018 got NYT coverage), the attribution bar is higher, not lower -- the headline must credit the original authors for the HEADLINE CLAIM, not just the mechanism, or it reads as claiming their result. Same shape as #12 (Nuhfer). Audit check: is the post's HEADLINE someone else's published conclusion? If yes, credit them in the headline vicinity.
