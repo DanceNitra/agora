@@ -168,6 +168,29 @@ renderer so future posts don't regress — a separate small build task. #3/#4 (o
 did NOT have this (their TLDR/desc were hand-written complete); it hits the posts whose desc was
 auto-derived from the body's first chars.
 
+## #7 (more-data-more-wrong) — FULL PANEL (after owner flagged the #7-#10 re-audits were shortened)
+The 2-skeptic re-audit had only fixed truncation + SK quality. The owner correctly insisted on the FULL
+5-lens + verify-claims panel. It caught a REAL content over-generalization the skeptics missed: the post
+asserted "the estimator is consistent for the BLP coef (≈1.6), SO the interval is correctly calibrated for
+that pseudo-true value" — the "so" is a non-sequitur in general and CONTRADICTS the post's own cited Müller
+2013 (under generic misspecification even the pseudo-true value needs a sandwich correction). The method agent
+MEASURED it: coverage of 1.6 = 95.2/94.2/95.5/95.5% at n=50/200/1k/20k — TRUE here, but only by a Gaussian/
+homoskedastic accident (marginal residual conditionally homoskedastic → marginal model correctly specified →
+model variance = sandwich). Fixed: substantiated (measured ~95% of 1.6) + scoped to the Gaussian structure +
+noted generic misspecification needs the sandwich (Müller); added White (1982) as the QMLE/pseudo-true/sandwich
+foundation; tightened the FAQ slogan "more data, more wrong" → "more confidently wrong" (snippet-safety).
+**Lesson: the 2-skeptic-only re-audit is NOT equivalent to the full panel — the panel's prior-art/method
+lenses catch technical over-claims a confirmation skeptic doesn't. Run the full panel.**
+- **Frontier Q (the strong one, from the blind-spot lens): is confounder-induced overconfidence DETECTABLE
+  in-sample?** On the same y=x+z+noise (ρ=0.6, omit z) setup, at each n run (a) a posterior-predictive check,
+  (b) a misspecification/spec test (RESET, residual normality, heteroskedasticity), (c) held-out predictive
+  log-likelihood vs the correct model (without access to z). Conjecture: because z is absorbed into the error
+  and only shifts x's coefficient, the omitted-confounder model is observationally indistinguishable in-sample
+  (PPCs pass, spec tests fire at ≈ nominal α, flat in n) → the overconfidence is UNDETECTABLE from the data you
+  have. If it holds, THAT is the non-tautological, publishable result ("the failure is silent — no in-sample
+  diagnostic flags it, which is exactly why more data is dangerous"). If some diagnostic's power grows with n →
+  the actionable rule "run test X". Either way a sharper post than the coverage-collapse receipt.
+
 ## #6 (a-95-confidence-interval-covers-31 / DiD 1-treated-unit) — full panel, verdict REFRAME
 Numbers reproduce within MC noise (DiD coverage 0.305→re-run 0.301; SC 0.891→0.898; widths/RMSE all match;
 kept 800 reps — swapping to 2000 would force "31%"→"30%" + a title/slug change for a 1pp wobble). Real
