@@ -1135,6 +1135,19 @@ class AgentOS:
         if not problem_type:
             return
 
+        # COOLDOWN: an unresolved goal (e.g. "find a quest") makes the agent re-seek help EVERY tick — the
+        # prior request completes (without resolving the goal), so the pending-guard below doesn't catch it,
+        # and the same request re-fires 2-3x/min. That burns ticks/LLM/DB + spams Telegram (123k rows seen),
+        # while research actually comes from the seminar loop, not these requests. So: at most ONE help
+        # request per (npc, problem_type) per cooldown window; otherwise let the agent do other work this tick.
+        cd = await self.db.execute(
+            "SELECT 1 FROM agent_help_requests WHERE requester_id=? AND problem_type=? "
+            "AND created_at > datetime('now','-300 seconds') LIMIT 1",
+            (npc_id, problem_type),
+        )
+        if await cd.fetchone():
+            return
+
         # Find best helper
         helper = await self._find_best_helper(problem_type, npc_id)
         if not helper:

@@ -19,11 +19,12 @@ from pathlib import Path
 
 _DB = Path(__file__).resolve().parents[2] / "agora.db"
 
-# Operational-log tables pruned to a rolling window: (table, time_column, extra_where).
-# Knowledge tables are deliberately absent — they are never pruned.
+# Operational-log tables pruned to a rolling window: (table, time_column, extra_where[, days_override]).
+# Knowledge tables are deliberately absent — they are never pruned. A 4th element overrides the default
+# window for high-velocity tables (agent_help_requests can fire 1000s/day even with the seek-help cooldown).
 _PRUNE = [
     ("event_store", "occurred_at", ""),
-    ("agent_help_requests", "created_at", ""),
+    ("agent_help_requests", "created_at", "", 2),   # tight window: pure operational churn, very high volume
     ("trade_history", "created_at", ""),
     ("trade_offers", "created_at", ""),
     ("stigmergy_traces", "created_at", ""),
@@ -65,8 +66,12 @@ def prune(days: int = 14, byzantine_days: int = 2, vacuum: bool = False) -> dict
 
         delete("byzantine_violation",
                "event_type='byzantine_violation' AND occurred_at < ?", bcut)
-        for t, col, extra in _PRUNE:
-            delete(t, f"{col} < ?{extra}", cutoff)
+        for row in _PRUNE:
+            t, col, extra = row[0], row[1], row[2]
+            days_override = row[3] if len(row) > 3 else None
+            cut = ((datetime.utcnow() - timedelta(days=days_override)).strftime("%Y-%m-%d")
+                   if days_override is not None else cutoff)
+            delete(t, f"{col} < ?{extra}", cut)
         con.commit()
         c.execute("PRAGMA wal_checkpoint(TRUNCATE)")
         con.commit()
