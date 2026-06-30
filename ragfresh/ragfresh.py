@@ -20,13 +20,16 @@ Two API surfaces:
     retrieval_weight(item, ...)   -> a 0..1 multiplier to fold into your similarity score at query time
 
 Design rules (each one measured, not assumed — same provenance as mnemo):
-  • Value-ranked, capacity-aware — NOT recency-only and NOT access-frequency. Pruning by what's
-    most VALUABLE (a value+freshness blend) beats pruning by recency, and the gap widens super-
-    linearly as the keep-budget tightens. Access-frequency alone starves the rarely-read-but-load-
-    bearing chunk. (mnemo retention benchmark.)
-  • Run it as a PERIODIC BATCH, not a per-write hook. Continuous cleanup keeps the store ~8% leaner
-    but pays ~25x more pruning events; once a pruning event has any real overhead the periodic pass
-    wins on net (Agora Lab 619055, crossover ~0.07 overhead/event). So: schedule it, don't hook it.
+  • Value-ranked, capacity-aware — rank what to KEEP by value, not by recency (recency-only retains
+    ~62% of the value-only optimum, ~56% when content-age is independent of value -> ~random). With no
+    value labels a DECAYED hit-count is a strong proxy (~91%): don't discard frequency, AGE it
+    (LFU-with-aging) so a once-popular dead chunk decays out. This is the cost-aware GreedyDual-Size-
+    Frequency eviction family. (benchmark in __main__ below; 20 seeds.)
+  • Run it as a PERIODIC BATCH, not a per-write hook. Continuous cleanup buys only a ~8% retrieval-
+    quality (signal-vs-clutter) edge but pays ~25x more pruning events; once a pruning event has any
+    real overhead the periodic pass wins on net (a separate runnable lab,
+    20260615-070150_autophagy-vs-continuous-pruning-overhead-crossover, analytic crossover ~0.07
+    overhead/event). So: schedule it, don't hook it.
   • Orphans are deleted on a source-existence signal, never guessed. Stale-but-valuable is REFRESHED,
     not dropped — losing a load-bearing chunk is worse than re-embedding it.
   • Decisions are advisory + reversible: triage RETURNS a plan; the caller applies it. No silent deletes.
@@ -137,41 +140,65 @@ def triage(items, *, now: float, stale_days: float = 90.0, half_life_days: float
 # Runnable proof: ragfresh's value+freshness triage vs the naive recency-only cleanup everyone writes,
 # on a synthetic store with a KNOWN true business value. "Measured, not assumed."
 if __name__ == "__main__":
-    import random
-    random.seed(7)
+    # Honest multi-arm benchmark (rewritten 2026-06-30 after an adversarial audit found the original
+    # A/B was rigged: it handed the value+freshness strategy the oracle true value while the recency
+    # baseline got none, and the synthetic made content-age INDEPENDENT of value so recency was ~random).
+    # We now report ALL the obvious arms, an observable-only (no-oracle-labels) scenario, two age regimes,
+    # and 20 seeds, so the reader sees the real picture: value is the lever, freshness adds little, a
+    # hit-count proxy is a STRONG signal (not "wrong"), and recency is a fair baseline only when age
+    # actually tracks value.  This is cost-aware eviction (GreedyDual-Size-Frequency family).
+    import random, statistics
+
     DAY = 86400.0
     now = 1_000_000_000.0
-    N = 1000
-    store = []
-    true_value = {}
-    for i in range(N):
-        # true business value (what we actually want to retain) — skewed: a few chunks carry most value
-        tv = random.random() ** 3
-        age = random.expovariate(1 / 60.0)                  # content age in days, mean ~60
-        # access correlates with value but noisily; valuable old chunks exist (the load-bearing ones)
-        hits = int(max(0, random.gauss(tv * 40, 8)))
-        orphan = random.random() < 0.06                     # 6% have a deleted source
-        it = Item(id=f"c{i}", updated_ts=now - age * DAY,
-                  last_access_ts=now - random.expovariate(1 / 30.0) * DAY,
-                  hits=hits, value=tv, source_exists=not orphan, bytes=4096)
-        store.append(it); true_value[it.id] = tv if not orphan else 0.0
+    N, BUDGET, SEEDS = 1000, 500, range(20)
 
-    budget = N // 2                                          # keep half (tight budget)
+    def make_store(seed, age_tracks_value):
+        rng = random.Random(seed)
+        store, tv = [], {}
+        for i in range(N):
+            v = rng.random() ** 3                                       # skewed true value
+            if age_tracks_value:                                        # realistic: fresher = more valuable
+                age = (1 - v) * rng.expovariate(1 / 40.0) + rng.expovariate(1 / 90.0)
+            else:                                                       # worst case: age independent of value
+                age = rng.expovariate(1 / 60.0)
+            hits = int(max(0, rng.gauss(v * 40, 8)))                    # hits correlate (noisily) with value
+            orphan = rng.random() < 0.06
+            it = Item(id=f"c{i}", updated_ts=now - age * DAY,
+                      last_access_ts=now - rng.expovariate(1 / 30.0) * DAY,
+                      hits=hits, value=v, source_exists=not orphan, bytes=4096)
+            store.append(it); tv[it.id] = v if not orphan else 0.0
+        return store, tv
 
-    # (1) operational triage output (advisory KEEP/DOWNWEIGHT/REFRESH/PRUNE + savings)
-    res = triage(store, now=now, stale_days=90, keep_budget=budget)
-    print("ragfresh triage (keep ~half, stale>90d):", res["report"])
+    def obs_score(it):                                                  # NO oracle value -> hit-count proxy
+        shadow = Item(it.id, it.updated_ts, it.last_access_ts, it.hits, None, it.source_exists, it.bytes)
+        return _retention_score(shadow, now, 120.0)
 
-    # (2) FAIR head-to-head: at the SAME hard keep-count, does value+freshness ranking beat recency?
-    #     Both keep exactly `budget` items (prune the rest). Orphans (true value 0) are excluded first.
-    live = [it for it in store if it.source_exists]
-    ragfresh_keep = sorted(live, key=lambda it: _retention_score(it, now, 120.0), reverse=True)[:budget]
-    recency_keep = sorted(live, key=lambda it: it.updated_ts, reverse=True)[:budget]
-    rf = sum(true_value[it.id] for it in ragfresh_keep)
-    rc = sum(true_value[it.id] for it in recency_keep)
-    oracle = sum(sorted(true_value.values(), reverse=True)[:budget])    # best possible at this budget
-    print(f"\nFAIR A/B — true business value retained, both keep exactly {budget} of {N} (higher=better):")
-    print(f"  ragfresh (value+freshness): {rf:7.1f}  ({rf/oracle:.0%} of oracle)")
-    print(f"  recency-only (naive)      : {rc:7.1f}  ({rc/oracle:.0%} of oracle)")
-    print(f"  uplift over naive         : {rf/rc - 1:+.0%}")
-    print(f"  + orphans auto-deleted: {res['report']['orphans_removed']}, stale flagged for refresh: {res['report']['stale_refreshed']}")
+    def evaluate(store, tv, seed):
+        live = [it for it in store if it.source_exists]
+        oracle = sum(sorted(tv.values(), reverse=True)[:BUDGET]) or 1.0
+        keep = lambda key: sorted(live, key=key, reverse=True)[:BUDGET]
+        ret = lambda k: sum(tv[it.id] for it in k) / oracle
+        return {
+            "value-only (oracle labels)":       ret(keep(lambda it: it.value)),
+            "value×freshness (oracle labels)":  ret(keep(lambda it: _retention_score(it, now, 120.0))),
+            "hits-proxy×freshness (no labels)": ret(keep(obs_score)),
+            "hits-only":                        ret(keep(lambda it: it.hits)),
+            "recency-only":                     ret(keep(lambda it: it.updated_ts)),
+            "random":                           ret(random.Random(seed).sample(live, BUDGET)),
+        }
+
+    s0, _ = make_store(7, False)                                        # triage demo (orphan + stale)
+    print("ragfresh triage (keep ~half, stale>90d):", triage(s0, now=now, stale_days=90, keep_budget=BUDGET)["report"])
+
+    for age_tracks_value, label in [(False, "age INDEPENDENT of value (worst case for a recency baseline)"),
+                                    (True,  "age ~ value (realistic: fresher content is more valuable)")]:
+        agg = {}
+        for seed in SEEDS:
+            store, tv = make_store(seed, age_tracks_value)
+            for k, v in evaluate(store, tv, seed).items():
+                agg.setdefault(k, []).append(v)
+        print(f"\n=== {N} chunks, keep {BUDGET}, {len(list(SEEDS))} seeds | {label} ===")
+        print("  (% of the keep-best-by-true-value oracle; mean over seeds, higher=better)")
+        for k, vals in agg.items():
+            print(f"  {k:36s} {statistics.mean(vals):5.0%}  (sd {statistics.pstdev(vals):.0%})")

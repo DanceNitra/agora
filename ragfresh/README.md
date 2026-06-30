@@ -1,7 +1,8 @@
 # ragfresh — a freshness & decay layer for RAG / vector stores
 
 > Your vector store rots. `ragfresh` decides what to **keep, down-weight, refresh, or prune** —
-> ranked by *value × freshness*, not recency — so answers stay current and the bill stops climbing.
+> ranked by **value**, not recency — so answers stay current and the bill stops climbing.
+> (Value-aware eviction is the [GreedyDual-Size-Frequency](https://www.usenix.org/legacy/publications/library/proceedings/usits97/full_papers/cao/cao.pdf) cache-eviction family applied to vector stores; freshness is the query-time + lifecycle layer on top.)
 > One file, zero dependencies. A sibling of [mnemo](../mnemo).
 
 ## The problem (measured in the wild, 2026)
@@ -25,23 +26,34 @@ For a batch of vector-store entries, `triage()` returns a per-item plan:
 And `retrieval_weight(item, now)` gives a `0..1` multiplier to fold into your similarity score at query time — so fresh chunks rank above stale ones **without deleting anything** (orphans get `0`).
 
 ## Measured, not assumed
-`python ragfresh.py` runs a head-to-head on a 1,000-chunk synthetic store with a known true value:
+`python ragfresh.py` runs every obvious keep-policy head-to-head on a 1,000-chunk synthetic store with a known true value (keep 500 of 1000, 20 seeds, % of the keep-best-by-true-value oracle):
 
 ```
-FAIR A/B — true business value retained, both keep exactly 500 of 1000:
-  ragfresh (value+freshness): 214.5  (96% of oracle)
-  recency-only (naive)      : 117.2  (52% of oracle)
-  uplift over naive         : +83%
-  + orphans auto-deleted: 65, stale flagged for refresh: 85
+age ~ value (realistic: fresher content is more valuable)
+  value-only (oracle labels)        100%
+  value+freshness blend (oracle)     95%
+  hits-proxy + freshness (no labels) 91%   <- what you actually get without value labels
+  hits-only                          92%
+  recency-only                       62%
+  random                             56%
+  + orphans auto-deleted: ~65, stale flagged for refresh: ~85
 ```
 
-Ranking what to keep by **value × freshness** retains **96% of the maximum achievable value** at a 50% prune budget — **+83% more** than the recency-only cleanup most teams hand-roll — while removing orphans and flagging stale chunks for refresh.
+The honest picture: **value-awareness is the lever** — ranking what to keep by value retains ~100% of the achievable value, vs **62% for a recency-only cleanup** (which falls to ~56% ≈ random when content-age doesn't track value). So a value-aware keep-policy retains roughly **1.5–1.8× as much of the value that matters** as recency-only cleanup (~50–80% more). Two honest caveats the benchmark makes explicit:
+- **You usually don't have value labels.** The realistic, observable arm is `hits-proxy` — a decayed hit-count — which still retains **~91%**. So *access-frequency is a strong proxy, not "the wrong signal"* (this is LFU-with-aging / [LFUDA](https://en.wikipedia.org/wiki/Cache_replacement_policies#LFU_with_dynamic_aging)). It tracks value only when popularity correlates with value — usually true, not always.
+- **Freshness adds little to *what to keep*** (value-only 100% ≥ value+freshness 95%). Freshness's real job is the **query-time staleness multiplier** (`retrieval_weight`) and flagging **orphans + stale-but-valuable** chunks — not winning the keep-ranking.
 
 ## Design rules (each one measured)
-- **Value-ranked + capacity-aware — not recency, not access-frequency.** The payoff from ranking *what to keep* grows super-linearly as the budget tightens; access-frequency alone starves the rarely-read-but-load-bearing chunk. (mnemo retention benchmark.)
-- **Run it as a PERIODIC BATCH, not a per-write hook.** Continuous cleanup keeps a store ~8% leaner but pays ~25× more pruning events; once a pruning event has any real overhead, the periodic pass wins on net (Agora Lab `619055`, crossover ≈ 0.07 overhead/event). Schedule it; don't hook it.
+- **Value-ranked + capacity-aware — not recency.** Ranking *what to keep* by value retains ~1.5–1.8× more value than a recency-only cleanup; with no value labels a **decayed hit-count is a strong stand-in (~91%)**, so don't discard frequency — age it (LFU-with-aging) so a once-popular dead chunk decays out. (Benchmark above.)
+- **Run it as a PERIODIC BATCH, not a per-write hook.** Continuous cleanup buys a small (~8%) retrieval-quality (signal/clutter) edge but pays ~25× more pruning events; once a pruning event has any real overhead, the periodic pass wins on net (a separate runnable lab, `20260615-070150_autophagy-vs-continuous-pruning-overhead-crossover`, analytic crossover ≈ 0.07 overhead/event). Schedule it; don't hook it. (`python ragfresh.py` reproduces the keep-ranking arms above, not this A/B.)
 - **Orphans on a signal, never a guess.** Stale-but-valuable is **refreshed**, not dropped.
 - **Advisory + reversible.** `triage()` returns a plan; your code applies it. No silent deletes.
+
+## Prior art (this is packaging, not a discovery)
+The individual ideas are established; ragfresh's contribution is the integrated zero-dependency tool + the measured comparison.
+- **Cost-aware / value-aware eviction:** GreedyDual-Size (Cao & Irani, USENIX 1997); GreedyDual-Size-Frequency (Cherkasova, HP Labs 1998); GreedyDual (Young 2002). ragfresh's value+freshness keep-score is this family applied to vector stores.
+- **Frequency without aging pollutes the cache:** the classic LFU cache-pollution problem; the fix is **LFU-Aging / LFUDA** — which is exactly why our hit-count proxy decays.
+- **Freshness / staleness for retrieval:** FreshLLMs / FreshQA (Vu et al., 2023, [arXiv:2310.03214](https://arxiv.org/abs/2310.03214)) and the temporal-RAG line — the motivation for `retrieval_weight` and the REFRESH action.
 
 ## Use it
 ```python
