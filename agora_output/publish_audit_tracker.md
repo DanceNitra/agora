@@ -7,7 +7,7 @@ Verdicts: CLEAR / MINOR / REFRAME / KILL.
 |---|-----|------|------|------|--------|---------|--------|
 | 1 | 41 | 06-10 | causal-inference-phase-diagram | src | DONE (FULL /audit-post + re-audit CLEAN) | heavy REFRAME — fixed CORE estimand error (total-vs-direct mislabeled as RCT bias; retitled off "phase diagram"); prior REFRAME dfcdbbb was insufficient | 4eee700 |
 | 2 | 40 | 06-11 | pre-trends-test-weak-evidence | src | DONE (FULL /audit-post + re-audit CLEAN) | REFRAME — fixed REAL stats bug (z-vs-t on 4df: 31%→16%, removed spurious 12% FP); prior 22a7cae was insufficient | 6ee8239 |
-| 3 | 38 | 06-12 | the-operating-point-trap | piece | DONE | REFRAME | 2341c3e |
+| 3 | 38 | 06-12 | the-operating-point-trap | piece | DONE (FULL /audit-post + 2-round re-audit CLEAN) | REFRAME — prior 2341c3e deferred number-verify + skipped re-audit; full panel re-ran all 5 sims (all reproduce) and caught: garbled hot-hand FAQ (=diversification "96%" text, live in EN+SK+JSON-LD), memory bullet quoting access-reset "3%/kept-all" while linking the two-tier post (0.13/0.65) + committing its own thesis-sin (30%-row as "tight budget"), James-Stein self-contradiction in the honest part, "monotonically" overclaim, 3-mechanism conflation; +Longin&Solnik 2001. Re-audit r2 caught ν≈1.8≠"real markets", double-numbered list, thesis over-strength, SK term drift | 6c24348 |
 | 4 | 39 | 06-12 | why-crowds-get-dumber | piece | DONE | REFRAME | 70859a0 |
 | 5 | 37 | 06-13 | passing-a-pre-trends-test-weak-evidence-which-diff | piece | DONE | REFRAME | a641c69 |
 | 6 | 36 | 06-14 | a-95-confidence-interval-that-covers-31 | piece | DONE | REFRAME (nums re-run 100%) | 3564a60 |

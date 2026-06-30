@@ -1,3 +1,32 @@
+# New findings + frontier questions surfaced BY the full-panel audits (#3, #7–#10)
+
+## Audit #3 — the-operating-point-trap (full panel, 2026-06-30)
+- **Frontier Q1 (the strong one): is the operating-point gap FORECASTABLE from benign-regime data?**
+  For each rebuilt claim, fit error(stress) and test whether the LOCAL slope dError/dStress at LOW stress
+  predicts the high-stress gap. Two publishable outcomes: (a) it extrapolates → a cheap "stress-sensitivity
+  probe" you can run WITHOUT going to the dangerous operating point (operationalizes the post's own habit #2);
+  (b) it does NOT (failures are threshold/phase-transition, flat-then-cliff) → a scarier finding: the trap is
+  unforecastable from benign data, so "check if the bias grows in the stress variable" is unmeasurable exactly
+  where it matters. Directly stress-tests the post's prescription. Runnable now on the existing probes.
+- **Frontier Q2 — "conservation of fragility" test.** For each robust escape (median, value-aware eviction),
+  identify its OWN stress variable and show the trap reappears: median → construct a skew/asymmetry regime,
+  measure whether its error grows there; value-aware policy → inject value-estimation noise / distribution
+  shift, measure re-coupling. If every robust estimator re-traps on a different axis, upgrade the insight from
+  "use robust estimators" (a false free lunch) to a quantified **"fragility is conserved; minimize
+  ∫error·P(stress) over YOUR deployment's stress distribution."** A more defensible, more original claim than
+  the current post. (This conservation caveat was added to the post's "honest part" in this audit.)
+- **Prior-art the diversification example should have named: Longin & Solnik 2001** (extreme/crash correlation
+  → diversification fails when needed) — the single most famous on-the-nose version of the post's own headline;
+  now credited. Also robust-statistics breakdown point (Huber 1964 / Hampel 1971) as the formal cousin.
+- **Lesson:** in a SYNTHESIS post that quotes numbers from other posts, the citation LINK and the quoted
+  NUMBER must come from the SAME experiment. The memory bullet quoted the access-reset-decay lab's dramatic
+  "3%/kept-all/3×" while linking to the two-tier post (which reports 0.13/0.65) — a reader who clicks to verify
+  lands on different numbers. Fixed by aligning the bullet to the linked post's own figures (13% vs 65%). Also
+  the panel caught the post committing its OWN thesis sin twice (quoting a 30%-budget row as "tight budget"
+  where the value policy "kept all", when at the genuinely tight 7% budget it too collapses to ~2.4%; and
+  quoting a single t(1.8)/ES99 figure as "real markets"). Decisive bug: a garbled FAQ answering the hot-hand
+  question with diversification text ("96% risk reduction"), live in EN + SK + the JSON-LD FAQPage schema.
+
 # New findings + frontier questions surfaced BY the full-panel audits (#7–#10)
 
 The full /stress-claim panels don't only catch overclaims — the 6th-lens (blind-spot) and the
