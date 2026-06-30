@@ -283,3 +283,33 @@ fully credited: Charnov MVT + Krebs/McNair/Green/Brown giving-up family, "nothin
   high replenishment -> quitting a recovering vein). The noise run above (edge +231%->+62%) is axis 1 of
   this grid and already shows the proxy's edge is SNR-graded; replenishment + switch-cost are the untested
   axes. This is a genuine Crucible-grade probe, not a textbook re-derivation.
+
+---
+
+## AUDIT — "Your AI might be training on itself..." (selfref / collapse+lock), 2026-06-30
+OVERCLAIM/FRAMING + BLIND-SPOT (6th lens). Both halves reproduce locally (selfref.py):
+f=0 -> 92% collapse, knee at f=0.05 -> 6%, f=0.20 -> 1%; lock p=1.5=0.177, p=2=0.500, p=3=0.809.
+
+- **Overclaim (the one real fix) — FAQ answers drop the toy-scoping the body keeps.** Body says
+  "In our minimal simulation ... ~92-94% of runs collapsed". FAQ (EN+SK+JSON-LD) says flatly
+  "Yes, cheaply. A ~5% real ... anchor pulls the collapse rate from ~94% to under ~10%, and 20%
+  makes it clean." — stated as a universal fact, no "in our toy". This is the only place stronger
+  than the hedged body. Fix: prepend "In our minimal model," to the collapse-number FAQ answer in
+  all three surfaces. Low effort, removes the lone overclaim.
+- **Blind-spot — std-collapse is a PARTIAL proxy for model collapse.** The toy fits mean+std of a
+  Gaussian and calls collapse = final std < 0.5*true_std. That captures Shumailov's *late-stage*
+  variance collapse but a Gaussian has no tails/modes to lose, so it cannot exhibit the *early-stage*
+  tail/rare-event/mode disappearance that is the actual production worry. The post says "diversity
+  drains away" which reads as faithful, but "diversity = std" silently narrows it. Worth a one-clause
+  disclosure (std = variance proxy, not tail-loss).
+- **Frontier Q (runnable, the real science) — does verifier-FILTERED self-training reverse collapse,
+  and at what filter precision does selection substitute for the real-data anchor?** The post already
+  concedes (caveat 1) that selecting synthetic outputs (best-of-N / reward-model / AlphaZero regime)
+  injects outside signal and is NOT modeled by the single external_fraction knob. Make it measurable:
+  add a `filter_precision q` to collapse_risk (keep a synthetic sample only if it passes a verifier
+  that is correct with prob q), then sweep a 2-axis grid q x external_fraction x {dimensionality d,
+  tail-heaviness via Student-t nu}. Map the trade curve: how much filter precision q buys one point of
+  real-data anchor f (the "selection-substitutes-for-data" exchange rate), and whether the ~5% knee
+  moves with d / nu. Two sub-questions fall out: (a) is the 5% anchor robust or a 1-D Gaussian artifact
+  (test t-distributed generators, d>1)? (b) below what q does filtering AMPLIFY collapse (a bad
+  verifier selects on noise)? This is Crucible-grade: it tests the one claim the post hand-waves.
