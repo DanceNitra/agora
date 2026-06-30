@@ -52,3 +52,16 @@ and likely INVERTED. Rewritten honestly (estimand shift; design/estimand matters
 **Frontier question:** on a scale-free network as ρ→ρ_crit, does a cluster-randomized estimator of the
 TOTAL effect stay unbiased with finite variance, or does critical slowing-down make it unidentifiable? That
 single test separates "design fixes it" from "near criticality nothing is estimable."
+
+## #2 (pre-trends-test-weak-evidence) — full /audit-post, verdict REFRAME (real stats bug)
+Method auditor + our own verify script caught a measurement bug the light pass missed: the pre-trends test
+used a NORMAL (z=1.96) critical value on a t-statistic with only 4 pre-period df. Correct Student-t cutoff:
+detection at slope 0.3 = 16% (not 31%), at 0.6 = 45% (not 70%); false-positive rate = nominal 5% (not 12%).
+=> the published "short panels make the test oversized / ~12% false positives / misleads both directions"
+claim was an ARTIFACT and is removed; the honest story is one-directional (pure low power), and stronger
+("misses ~5 of 6", not 2/3). Fixed EN+SK+table+tldr+meta/og/twitter/JSON-LD; foregrounded the fix
+(Rambachan-Roth HonestDiD + Roth's pretrends power package). Re-audit: 2 skeptics caught a leftover
+"one-third" in the desc/tldr/meta -> fixed -> clean. Numbers = our sim reproducing Roth 2022, not his.
+**Frontier question:** in a single-treated-unit design, what min pre-period length / effect size makes
+honest-DiD sensitivity bounds informative rather than vacuous? **Lesson:** always use the correct t (not z)
+cutoff on small-df test statistics — a z-on-4df error manufactured a whole false sub-claim.
