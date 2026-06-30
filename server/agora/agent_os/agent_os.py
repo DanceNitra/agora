@@ -413,52 +413,80 @@ class AgentOS:
 
         await self.db.commit()
 
+    # States in which the agent is recovering at the keep (rest / eat / heal)
+    # rather than exerting itself. Outside these, body stats decay with activity.
+    _RECOVERY_STATES = ("resting", "panicked", "confused", "blocked")
+
+    def _evolve_body(self, state_of_mind, stamina, hunger, fatigue, health):
+        """Pure homeostasis step. Recovering states RESTORE the body; productive
+        states decay it. Health regenerates when the body is well-supplied and
+        only bleeds at the extremes.
+
+        Without the recovery branch this was a one-way death spiral: stamina only
+        fell, hunger/fatigue only rose, so every agent inevitably reached
+        stamina=0/fatigue=100/health=0 and stuck permanently in 'panicked'
+        (health<20 always beats the resting check), halting all research. The
+        recovery branch closes the loop into a sustainable work<->rest cycle.
+        Returns (stamina, hunger, fatigue, health), all clamped to [0, 100]."""
+        if state_of_mind in self._RECOVERY_STATES:
+            stamina = min(100.0, stamina + random.uniform(2.0, 5.0))
+            fatigue = max(0.0, fatigue - random.uniform(2.0, 5.0))
+            hunger = max(0.0, hunger - random.uniform(1.0, 3.0))
+        else:
+            stamina = min(100.0, max(0.0, stamina - random.uniform(0.5, 2.0)))
+            hunger = min(100.0, hunger + random.uniform(0.2, 0.8))
+            fatigue = min(100.0, fatigue + random.uniform(0.3, 1.0))
+        if hunger < 70 and fatigue < 70 and stamina > 20:
+            health = min(100.0, health + random.uniform(0.5, 1.0))   # regen when well-supplied
+        else:
+            if hunger > 80: health = max(0.0, health - 0.5)
+            if fatigue > 80: health = max(0.0, health - 0.3)
+            if stamina < 10: health = max(0.0, health - 0.2)
+        return stamina, hunger, fatigue, health
+
     async def _update_body(self, npc_id: str):
-        """Update body stats: stamina decreases, hunger/fatigue increase."""
+        """Update body stats with homeostasis: decay while working, recover while
+        resting/panicked (see _evolve_body — the missing recovery branch is what
+        drove every agent to health=0 and stalled research)."""
         if self.state_store:
             body = await self.state_store.get_body(npc_id)
             if not body:
                 return
-            new_stamina = min(100.0, max(0.0, body["stamina"] - random.uniform(0.5, 2.0)))
-            new_hunger = min(100.0, body["hunger"] + random.uniform(0.2, 0.8))
-            new_fatigue = min(100.0, body["fatigue"] + random.uniform(0.3, 1.0))
-            await self.state_store.update_body(npc_id, {
-                "stamina": new_stamina, "hunger": new_hunger, "fatigue": new_fatigue,
-            })
+            brain = await self.state_store.get_brain(npc_id)
             npc = await self.state_store.get_npc(npc_id)
-            if npc:
-                new_health = npc["health"]
-                if new_hunger > 80: new_health = max(0, new_health - 0.5)
-                if new_fatigue > 80: new_health = max(0, new_health - 0.3)
-                if new_stamina < 10: new_health = max(0, new_health - 0.2)
-                if new_health != npc["health"]:
-                    await self.state_store.update_npc(npc_id, {"health": new_health})
+            state = (brain or {}).get("state_of_mind") or "focused"
+            health0 = npc["health"] if npc else 100.0
+            ns, nh, nf, nhealth = self._evolve_body(
+                state, body["stamina"], body["hunger"], body["fatigue"], health0)
+            await self.state_store.update_body(npc_id, {
+                "stamina": ns, "hunger": nh, "fatigue": nf,
+            })
+            if npc and nhealth != health0:
+                await self.state_store.update_npc(npc_id, {"health": nhealth})
         else:
             # Fallback: direct DB (pre-state-store compatibility)
             cursor = await self.db.execute(
-                "SELECT stamina, hunger, fatigue FROM agent_body WHERE npc_id=?", (npc_id,)
+                "SELECT b.stamina, b.hunger, b.fatigue, br.state_of_mind, d.health "
+                "FROM agent_body b "
+                "JOIN agent_brain br ON br.npc_id = b.npc_id "
+                "JOIN dungeon_npcs d ON d.npc_id = b.npc_id "
+                "WHERE b.npc_id=?",
+                (npc_id,),
             )
             row = await cursor.fetchone()
             if not row:
                 return
-            new_stamina = min(100.0, max(0.0, row["stamina"] - random.uniform(0.5, 2.0)))
-            new_hunger = min(100.0, row["hunger"] + random.uniform(0.2, 0.8))
-            new_fatigue = min(100.0, row["fatigue"] + random.uniform(0.3, 1.0))
+            state = row["state_of_mind"] or "focused"
+            health0 = row["health"]
+            ns, nh, nf, nhealth = self._evolve_body(
+                state, row["stamina"], row["hunger"], row["fatigue"], health0)
             await self.db.execute(
                 "UPDATE agent_body SET stamina=?, hunger=?, fatigue=? WHERE npc_id=?",
-                (new_stamina, new_hunger, new_fatigue, npc_id),
+                (ns, nh, nf, npc_id),
             )
-            health_cursor = await self.db.execute(
-                "SELECT health FROM dungeon_npcs WHERE npc_id=?", (npc_id,)
-            )
-            health_row = await health_cursor.fetchone()
-            if health_row:
-                new_health = health_row["health"]
-                if new_hunger > 80: new_health = max(0, new_health - 0.5)
-                if new_fatigue > 80: new_health = max(0, new_health - 0.3)
-                if new_stamina < 10: new_health = max(0, new_health - 0.2)
+            if nhealth != health0:
                 await self.db.execute(
-                    "UPDATE dungeon_npcs SET health=? WHERE npc_id=?", (new_health, npc_id)
+                    "UPDATE dungeon_npcs SET health=? WHERE npc_id=?", (nhealth, npc_id)
                 )
 
     async def _think(self, npc_id: str, name: str) -> str:
