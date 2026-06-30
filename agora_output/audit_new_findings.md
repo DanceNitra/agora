@@ -251,3 +251,35 @@ claim was an ARTIFACT and is removed; the honest story is one-directional (pure 
 **Frontier question:** in a single-treated-unit design, what min pre-period length / effect size makes
 honest-DiD sensitivity bounds informative rather than vacuous? **Lesson:** always use the correct t (not z)
 cutoff on small-df test statistics — a z-on-4df error manufactured a whole false sub-claim.
+
+## exit-criteria / quitkit (drawdown-stop, theta~0.6) — overclaim+blind-spot pass, verdict PUBLISH (minor fix)
+Numbers reproduce EXACTLY off the numpy lab (757 baseline; 2010/2113/2569/2366/2053 sweep; +239.4%). Post is
+already heavily hedged (interior-optimum honest, +239% explicitly called the worst-baseline gain, prior art
+fully credited: Charnov MVT + Krebs/McNair/Green/Brown giving-up family, "nothing here is new theory").
+- **Consistency fix (minor):** the SHIPPED public tool `quitkit/quitkit.py` (linked as "the proof") uses
+  Python's `random.Random(3)` not numpy's PCG64, so it prints baseline=811, best=2535, **+212.6%** — NOT the
+  headline +239%. A reader who runs the linked artifact gets a different number. Either align the tool's RNG
+  to the numpy lab, or report the lift as a range ("~+210-240% depending on RNG"). The foot's "figures
+  reproduce on re-run" is true for the lab but not for the public tool.
+- **Seed robustness (measured, NEW):** over 40 numpy seeds, lift vs deplete = mean 223% / median 216% /
+  range 162-311%; argmax theta = 0.6 in **37/40** seeds. => the qualitative claims (interior optimum at
+  ~0.6, large positive lift) are ROBUST; the exact +239% is a slightly-high single seed (seed 3 > median).
+  This strengthens the "theta~0.6 illustrative" framing rather than weakening it.
+- **Blind-spot (the strong one) — the noise/SNR regime is the headline's blind corner:** the post mentions
+  in WORDS that a drawdown stop "can quit a good vein on a temporary dip," but never measures it. Measured
+  (lognormal multiplicative noise sigma on per-dig success prob, 20 seeds): lift collapses
+  +231% (sigma=0) -> +198% (0.5) -> +119% (1.0) -> **+62% (1.5)**. The cheap proxy still WINS in this
+  no-replenish model but gives back ~3/4 of its edge as SNR drops. The +239% headline lives at the
+  zero-transient-noise corner; real efforts (ad campaigns, research lines) are noisy.
+- **Blind-spot #2 — no-replenish / no-return over-generalization:** the model has finite veins, no
+  replenishment, no switch cost, and quits PERMANENTLY. The post discloses this, but the headline domains
+  it invokes (a field reopens, a method matures, a sales channel recovers) are exactly the replenishing /
+  returnable case the model cannot speak to. The interior optimum here is driven purely by finite veins
+  (post says this) — add a per-switch cost or replenishment and the optimal theta moves.
+- **Frontier Q (runnable, the real science):** sweep drawdown-theta vs MVT-exact (marginal rate = habitat
+  average) vs Gittins-index vs never-quit across a 3-axis grid: observation-noise sigma x replenishment-rate
+  rho x per-switch-cost c. Map the region where the cheap model-free drawdown proxy is within X% of the
+  MVT/Gittins optimum ("when is the free proxy good enough?") vs where it is actively dangerous (high noise,
+  high replenishment -> quitting a recovering vein). The noise run above (edge +231%->+62%) is axis 1 of
+  this grid and already shows the proxy's edge is SNR-graded; replenishment + switch-cost are the untested
+  axes. This is a genuine Crucible-grade probe, not a textbook re-derivation.
