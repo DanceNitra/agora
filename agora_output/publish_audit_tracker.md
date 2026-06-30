@@ -5,8 +5,8 @@ Verdicts: CLEAR / MINOR / REFRAME / KILL.
 
 | # | idx | date | slug | type | status | verdict | commit |
 |---|-----|------|------|------|--------|---------|--------|
-| 1 | 41 | 06-10 | causal-inference-phase-diagram | src | DONE | REFRAME | dfcdbbb |
-| 2 | 40 | 06-11 | pre-trends-test-weak-evidence | src | DONE | REFRAME | 22a7cae |
+| 1 | 41 | 06-10 | causal-inference-phase-diagram | src | DONE (FULL /audit-post + re-audit CLEAN) | heavy REFRAME — fixed CORE estimand error (total-vs-direct mislabeled as RCT bias; retitled off "phase diagram"); prior REFRAME dfcdbbb was insufficient | 4eee700 |
+| 2 | 40 | 06-11 | pre-trends-test-weak-evidence | src | DONE (FULL /audit-post + re-audit CLEAN) | REFRAME — fixed REAL stats bug (z-vs-t on 4df: 31%→16%, removed spurious 12% FP); prior 22a7cae was insufficient | 6ee8239 |
 | 3 | 38 | 06-12 | the-operating-point-trap | piece | DONE | REFRAME | 2341c3e |
 | 4 | 39 | 06-12 | why-crowds-get-dumber | piece | DONE | REFRAME | 70859a0 |
 | 5 | 37 | 06-13 | passing-a-pre-trends-test-weak-evidence-which-diff | piece | DONE | REFRAME | a641c69 |
