@@ -31,6 +31,19 @@ Three results stand out:
 2. **A vector DB does not beat BM25 here — it ties.** With the strong embedder, mxbai (0.526) versus BM25 (0.552) is **not a significant difference** (paired Wilcoxon p = 0.36; conversation-level 95% bootstrap CI on the gap **includes zero**). "You need a vector database for agent memory" is not supported as a *standalone* claim on this benchmark. Where embeddings *do* look worth their cost is **multi-hop** questions (mxbai 0.313 vs BM25 0.241 — a directional per-category gain we did not separately significance-test) — the semantic-matching regime — while lexical wins on entity/temporal recall.
 3. **The cheap hybrid wins, robustly.** BM25 + mxbai (0.609) beats BM25 alone by **+0.057**, with a conversation-level bootstrap CI of **[+0.039, +0.076]** (excludes zero) and a win in **9 of 10 conversations**. Fusing a lexical and a semantic channel recovers what each misses. Notably this needs only a *small local* embedder, not a bigger one: hybrid_nomic (0.604) ≈ hybrid_mxbai (0.609).
 
+## At the budget you actually have (k=3–5)
+
+recall@20 is a fair retrieval ceiling, but an agent rarely spends 20 chunks of context per turn — in practice the budget is k≈3–5. So we report the smaller cutoffs too, and the picture sharpens:
+
+| retriever | recall@5 | recall@10 | recall@20 |
+|---|---|---|---|
+| recency | 0.002 | 0.010 | 0.024 |
+| BM25 | 0.411 | 0.479 | 0.552 |
+| mxbai (vector) | 0.305 | 0.410 | 0.526 |
+| **BM25 + mxbai (hybrid)** | **0.423** | **0.519** | **0.609** |
+
+The hybrid's edge moves in *opposite* directions against the two baselines as k shrinks. **Against the single vector index it widens** (+0.083 → +0.109 → **+0.118** at k=5 — missing the one exact-token hit hurts most when you can only keep five chunks). **Against BM25 alone it shrinks** (+0.057 → +0.040 → **+0.012** at k=5): at the realistic budget, BM25 by itself is essentially the hybrid. So shrinking k makes the conclusion *more* BM25-first, not less — the embedder's marginal value drops as the budget tightens. Recency stays ~0 throughout (0.002 at k=5).
+
 ## Why the lexical channel is so strong here
 
 LoCoMo is conversational self-narrative: people reuse the same names, dates, and event words across sessions, so a question and its gold-evidence turn usually **share surface vocabulary**. That is the best case for lexical search and a demanding test for pure semantics — which is precisely why BM25 is hard to beat and why the hybrid's gain comes from the minority of questions (multi-hop, paraphrase) where lexical overlap breaks down. It also reconciles a result we previously measured — that naive RRF does *not* help when one channel already dominates with a good embedder: fusion pays off **only when the two channels are complementary and comparably strong**, which is the regime LoCoMo sits in and a single-embedder web-RAG corpus often is not.

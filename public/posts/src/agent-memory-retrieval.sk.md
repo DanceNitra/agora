@@ -31,6 +31,19 @@ Tri výsledky vyčnievajú:
 2. **Vektorová DB tu neprekoná BM25 — remizuje.** So silným embedderom je mxbai (0,526) oproti BM25 (0,552) **nie významný rozdiel** (párový Wilcoxon p = 0,36; 95 % bootstrap CI na medzere na úrovni konverzácií **obsahuje nulu**). „Pre pamäť agenta potrebuješ vektorovú databázu" nie je ako *samostatné* tvrdenie na tomto benchmarku podložené. Tam, kde embeddingy *vyzerajú* hodné svojej ceny, sú **multi-hop** otázky (mxbai 0,313 vs BM25 0,241 — smerový zisk po kategórii, ktorý sme samostatne signifikančne netestovali) — režim sémantického párovania — kým lexikálne vyhráva na entitnom/temporal recalle.
 3. **Lacný hybrid vyhráva, robustne.** BM25 + mxbai (0,609) prekoná samotné BM25 o **+0,057**, s bootstrap CI na úrovni konverzácií **[+0,039, +0,076]** (vylučuje nulu) a výhrou v **9 z 10 konverzácií**. Fúzia lexikálneho a sémantického kanála získa späť to, čo každý z nich míňa. Pozoruhodne na to stačí len *malý lokálny* embedder, nie väčší: hybrid_nomic (0,604) ≈ hybrid_mxbai (0,609).
 
+## Pri rozpočte, ktorý reálne máš (k=3–5)
+
+recall@20 je férový strop pre vyhľadávanie, ale agent málokedy minie 20 chunkov kontextu na ťah — v praxi je rozpočet k≈3–5. Preto reportujeme aj menšie cutoffy a obraz sa zaostrí:
+
+| retriever | recall@5 | recall@10 | recall@20 |
+|---|---|---|---|
+| recency | 0.002 | 0.010 | 0.024 |
+| BM25 | 0.411 | 0.479 | 0.552 |
+| mxbai (vector) | 0.305 | 0.410 | 0.526 |
+| **BM25 + mxbai (hybrid)** | **0.423** | **0.519** | **0.609** |
+
+Edge hybridu sa pri zmenšovaní k pohybuje *opačne* voči dvom baseline-om. **Voči samotnému vektorovému indexu sa zväčšuje** (+0,083 → +0,109 → **+0,118** pri k=5 — minúť ten jeden exact-token zásah bolí najviac, keď si môžeš nechať len päť chunkov). **Voči samotnému BM25 sa zmenšuje** (+0,057 → +0,040 → **+0,012** pri k=5): pri reálnom rozpočte je samotné BM25 v podstate hybrid. Takže zmenšovanie k robí záver *ešte viac* BM25-first, nie menej — marginálna hodnota embeddera klesá, ako sa rozpočet uťahuje. Recency ostáva ~0 po celý čas (0,002 pri k=5).
+
 ## Prečo je lexikálny kanál tu taký silný
 
 LoCoMo je konverzačné sebarozprávanie: ľudia opätovne používajú tie isté mená, dátumy a slová o udalostiach naprieč sessions, takže otázka a jej zlatý evidence-ťah zvyčajne **zdieľajú povrchovú slovnú zásobu**. To je najlepší prípad pre lexikálne vyhľadávanie a náročný test pre čistú sémantiku — čo je presne dôvod, prečo je BM25 ťažké prekonať a prečo zisk hybridu pochádza z menšiny otázok (multi-hop, parafráza), kde sa lexikálne prekrytie láme. Zmieruje to aj výsledok, ktorý sme predtým namerali — že naivné RRF *nepomáha*, keď jeden kanál už dominuje s dobrým embedderom: fúzia sa vypláca **iba vtedy, keď sú oba kanály komplementárne a porovnateľne silné**, čo je režim, v ktorom LoCoMo sedí a jednoembedderový web-RAG korpus často nie.
