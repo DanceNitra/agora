@@ -28,6 +28,36 @@ python verify_cli.py receipts.json --pubkey <hex>   # independently verify a rec
 python mnemo_receipts.py     # tamper-evident memory: detect an out-of-band edit to an mnemo store
 ```
 
+## Quickstart — verifiable receipts for your MCP server
+
+You already have a `{tool_name: function}` registry. Wrap it once; every tool call now emits a signed,
+third-party-verifiable receipt — you don't touch the tools themselves:
+
+```python
+from agent_receipts import ReceiptChain, generate_keypair
+from mcp_wrapper import ReceiptedDispatcher
+
+sk, pk = generate_keypair()                                   # the server's identity (publish pk)
+chain  = ReceiptChain(actor="my-mcp-server", private_key_hex=sk, public_key_hex=pk)
+disp   = ReceiptedDispatcher(chain, tools=my_tools)           # <-- the one line you add
+
+disp.dispatch("web_search", query="...")                      # call tools through it, as usual
+disp.dispatch("db.read", table="orders", id=42)
+
+chain.verify(expected_pubkey=pk)        # anyone with the public key can confirm the whole trail
+open("receipts.json", "w").write(chain.to_json())             # ship the receipts; pk verifies them
+```
+
+Anyone — a user, an auditor, CI — then checks that file with no code and no trust in your server:
+
+```bash
+python verify_cli.py receipts.json --pubkey <pk>     # VERIFIED (exit 0) or names the tampered step (exit 1)
+```
+
+That's the whole idea: **the agent's logs are its word; a receipt is proof.** Everything below is the
+honest detail — how the chain + signature work, where self-signing isn't enough (and the
+external-mediator fix), and how it sits next to the rest of the field.
+
 ## What it does — two layers
 
 1. **Hash chain (integrity, zero extra deps).** Each receipt commits to the previous one
