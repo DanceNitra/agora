@@ -20,7 +20,7 @@ Verdicts: CLEAR / MINOR / REFRAME / KILL.
 | 10 | 32 | 06-15 | your-second-brain-is-dying-of-maintenance | piece | DONE (FULL panel + 2-round re-audit CLEAN) | REFRAME — percolation claim substantiated+scoped (ran sweep), prior-art (Molloy-Reed + Obsidian plugins), coverage caveat | 519d10c |
 > Audit now ALSO captures NEW findings/frontier questions -> agora_output/audit_new_findings.md (per owner 2026-06-29).
 | 11 | 31 | 06-15 | your-rag-store-is-rotting-freshness-beats-retrieval | piece | DONE (FULL panel + benchmark rebuild + 2-skeptic re-audit CLEAN) | heavy REFRAME: rigged benchmark rebuilt (6 arms x 2 regimes x 20 seeds), honest thesis (value is the lever; freshness ~neutral on keep-ranking; hits-proxy ~91% strong, refutes "freq is wrong"); dropped "freshness beats retrieval" (category error); added GDSF/LFUDA/FreshQA prior-art; fixed 1.5-1.8x-more->as-much, crossover 0.09->0.07, oracle disclosure | 0eeef31 |
-| 12 | 30 | 06-15 | dunning-kruger-is-a-statistical-artifact | piece | TODO | | |
+| 12 | 30 | 06-15 | dunning-kruger-is-a-statistical-artifact | piece | DONE (FULL panel + 2-skeptic re-audit CLEAN) | REFRAME: +Krueger-Mueller 2002 + Nuhfer 2016/17 + autocorrelation (Jarry/Fix) prior-art, demoted novelty claim; fixed FALSE "no skill-dependent self-insight" framing (model has corr 0.59) + "not psychology" overreach; table top splice ~77->~73; surfaced reliability-dependence; FAQ softened; meta 180->152; linked runnable model | 0c5c9aa |
 | 13 | 29 | 06-15 | the-hot-hand-fallacy-was-the-fallacy | piece | TODO | | |
 | 14 | 28 | 06-16 | i-scored-the-16-most-hyped-anti-aging | piece | TODO | | |
 | 15 | 27 | 06-16 | the-calibrated-prior-for-we-reversed-aging-in-mice | piece | TODO | | |

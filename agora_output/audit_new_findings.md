@@ -356,3 +356,32 @@ re-running the OLD benchmark (it ran fine and printed +83%) — only REBUILDING 
 obvious missing arms (give every strategy the same information; make age sometimes track value) exposed
 it. An audit that only re-runs the author's own harness cannot catch a rigged harness. Rebuild the
 measurement from the estimand, don't re-execute the artifact.
+
+---
+
+## Audit #12 — dunning-kruger-is-a-statistical-artifact — 2026-06-30 — REFRAME (prior-art + framing)
+
+**Verdict: methodologically sound, citations clean (verify-claims 8/8: 0 FALSE, K&D 1999 / Gignac-Zajenkowski 2020 / Hiller 2023 all real+accurate; "+46" = DK Study-1 humor gap, conservative end), but a REFRAME on prior-art + two framing defects.**
+
+**Defects the full panel caught:**
+1. (HIGH) Table TOP cell "~77" was a row-splice (the reliability-0.85 run) while the other three cells are reliability-0.60 — at 0.60 the top self-estimate is 73.3 (gap -14.2). Fixed -> ~73.
+2. (HIGH) Framing "every person has the SAME self-assessment error / no skill-dependent self-insight anywhere" is FALSE for a SHRINK=0.35 model: corr(self,skill)=0.59, mean-error skill-slope -0.66; what is actually flat is the self-knowledge NOISE (sd~14 in every decile). Reworded to "no skill-SPECIFIC deficit; self still partly tracks skill via regression; only the competence-specific blindness term is zero."
+3. (MED-HIGH) "Two well-understood statistical effects, NOT psychology" — better-than-average IS a psychological bias (and per the lab it is the OFFSET, not regression, that creates the famous asymmetry). Reframed to "neither a skill-dependent deficit."
+4. (REFRAME) Prior-art gap: the post credited Gignac-Zajenkowski 2020 as the artifact position's source, but Krueger & Mueller (2002, JPSP) ORIGINATED the regression+BTA account (DK replied same issue), and Nuhfer et al. (2016/2017, Numeracy) already published a RANDOM-NUMBER SIMULATION of this exact chart -- i.e. the "runnable null model" the post claimed as its contribution. Nuhfer is even cited in our own lab header (line 9) but was dropped from the post. Novelty demoted to "clean prediction-not-fit re-implementation"; added the autocorrelation account (Jarry 2020 / Fix 2022) as a distinct artifact family.
+
+**Robustness (method/confound re-ran):** +45.8 is near-deterministic (20 seeds sd 0.047); OFFSET sweep (grand-mean 60->72th) keeps bottom large-+ / top negative; reliability sweep 0.45-0.85 keeps the monotone shape; binning correct; clip(1,99) immaterial (<0.4pp). The reliability-dependence (artifact grows as reliability falls, +47.8@0.45 -> +42.5@0.85) was the post's OWN most-original sliver, computed in the lab but omitted -- now surfaced.
+
+**Frontier question (Crucible-grade, ON our frontier -- the genuinely novel science the debunk steps over):**
+Does the SAME conditioning/regression artifact contaminate how WE measure LLM overconfidence & calibration?
+When we bin model responses by correctness and plot stated confidence per bin (the standard reliability-
+diagram / ECE workflow), are we partly MANUFACTURING the "models are overconfident on what they get wrong"
+pattern the same way the DK quartile plot manufactures human overconfidence? Runnable probe: take a calibrated-
+by-construction synthetic model (confidence = P(correct) + noise, NO miscalibration), bin by correctness,
+and see whether the canonical "overconfident-when-wrong / underconfident-when-right" reliability curve appears
+from regression-to-the-mean alone. If it does, a chunk of published LLM-overconfidence evidence (incl. our own
+Overconfidence-Tax framing) needs the same null. Ties directly to [[flagship-publish-credibility-audit]] and
+the Grounding-Meter / Overconfidence-Tax line. This is the "could it stand as serious science" version.
+
+**Meta-lesson:** the lab's OWN header cited Nuhfer 2016 -- the prior art that guts the novelty claim was in our
+source file and dropped from the public post. Audit check: diff the lab/source-file citations against the post's
+citations; anything the author knew but omitted is a red flag.
