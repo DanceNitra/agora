@@ -152,6 +152,22 @@ SK; "~3 minds" given its weak-clue regime label; "almost nothing at 50%" → mea
 expensive-cure headline reconciled (contrarian-quota is the expensive one that barely works; structural cure
 is cheap). All 5 sims reproduce; 6/6 citations TRUE. FQ-A/B/C remain the live flywheel leads.
 
+## ⚠️ SYSTEMIC BUG (found during #6/#7): truncated meta descriptions across 16 published posts
+A scan of `public/posts/posts.json` found **24 truncated `desc`/`desc_sk` fields across 16 posts** — the
+description was cut off mid-word/mid-sentence (e.g. "…Under the kind of misspec", "…found none: each
+degrades smoothly. But", "…the 16 fla"). This desc feeds the meta description + og + twitter + JSON-LD
+Article description + the visible TLDR + the homepage card excerpt — so Google/social/LLM all show a
+truncated snippet for these 16 posts. Affected slugs (from the scan): why-a-captured-company, we-built-a-
+meter, we-built-a-firewall, robustness-checks-arent-ritual, why-a-more-capable-ai, we-looked-for-the-
+grounding-tipping-point, we-hunted-for-the-tipping-point, the-most-confident-systems, a-pre-trend-too-
+gentle, the-calibrated-prior-for-we-reversed-aging, i-scored-the-16-most-hyped-anti-aging, the-hot-hand-
+fallacy, your-rag-store-is-rotting, your-second-brain-is-dying, your-ai-might-be-training, everyone-says-
+set-exit-criteria. **Each is fixed as part of its own audit** (the audit queue covers most of these). The
+root render cause (descriptions truncated at ~200 chars at generation time) should also be fixed in the
+renderer so future posts don't regress — a separate small build task. #3/#4 (operating-point, why-crowds)
+did NOT have this (their TLDR/desc were hand-written complete); it hits the posts whose desc was
+auto-derived from the body's first chars.
+
 ## #6 (a-95-confidence-interval-covers-31 / DiD 1-treated-unit) — full panel, verdict REFRAME
 Numbers reproduce within MC noise (DiD coverage 0.305→re-run 0.301; SC 0.891→0.898; widths/RMSE all match;
 kept 800 reps — swapping to 2000 would force "31%"→"30%" + a title/slug change for a 1pp wobble). Real
