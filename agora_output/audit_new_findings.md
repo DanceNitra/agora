@@ -82,6 +82,76 @@ and likely INVERTED. Rewritten honestly (estimand shift; design/estimand matters
 TOTAL effect stay unbiased with finite variance, or does critical slowing-down make it unidentifiable? That
 single test separates "design fixes it" from "near criticality nothing is estimable."
 
+## #11 (why-crowds-get-dumber / cascade) — 6th-lens (blind-spot) pass only
+Backing lab = `herdcheck/herdcheck.py` (reproduces Lab 678a9c + red-team 14becd). Code facts the other
+lenses skip: agents observe RANDOM earlier agents (not literal "neighbours"); each acts ONCE,
+irreversibly, in a strict total order; headline metric = P(majority of all 401/1001 actions correct).
+- **Sharpest blind spot — "worth ~3 minds" is the WRONG MOMENT.** A real 3-independent-mind crowd and the
+  cascaded 1001-crowd match on EXPECTED accuracy (~0.64 at p=0.6) but not on observable uncertainty: 3 minds
+  split their vote ~35% of the time (the disagreement itself warns you); the cascade is near-UNANIMOUS and
+  wrong ~36% of the time with no internal signal. So "dumber / worth 3 minds" UNDERSELLS it — it is worse
+  than 3 minds because the error is both correlated AND silent. The right frame is calibration (confidently,
+  unanimously wrong), not a level ("dumber"). The post even prescribes "distrust unanimity" but never
+  measures whether unanimity is a usable wrong-detector in this regime.
+- **Internal inconsistency the citations/overclaim lens miss — the post lumps markets with committees, but
+  its OWN unbounded-belief result puts them in different regimes.** Smith–Sørensen (the post's own caveat):
+  unbounded private belief / continuous signal → complete learning → no collapse. A price-revealing
+  prediction market shows a continuous near-sufficient statistic (≈shared evidence, unbounded), so the model
+  PREDICTS markets are in the SAFE class — contradicting the post's example list ("committee, market, or AI
+  agent-swarm" all cascade-prone). Action-only + bounded → collapse; price/evidence/continuous + unbounded
+  → safe. The "which real systems?" question has a sharp, runnable answer the post hand-waves past.
+- **Two different cures conflated; the post prices the expensive one as "the" cure while the shipped tool
+  ships the cheap one.** Post §3 "need >80% independence" is the COMPOSITION cure (who is in the room —
+  contrarian quota mixed into a sequential herd). But `herdcheck` measures an INFORMATIONAL cure that is
+  cheap and total: `discount=0.5` or `own_weight=3` → 100% at peers_seen=2. "Surprisingly expensive cure"
+  is true only for the composition intervention; the headline is in tension with our own released tool.
+
+### Frontier questions (runnable now on herdcheck.py — zero-dep, deterministic)
+- **FQ-A (the strong one — is single-file load-bearing?):** Replace the strict total order with (a)
+  simultaneous one-shot, (b) R synchronous rounds where agents observe the PREVIOUS round and may revise
+  (DeGroot-with-discrete-actions), (c) random small batches with partial observation. Measure collective
+  accuracy AND unanimity rate vs batch size / #rounds. Hypothesis: collapse magnitude scales with the depth
+  of the observation DAG — vanishes in pure simultaneous batches, and iterated revision either HEALS
+  (private signal re-injected each round → recovers) or LOCKS HARDER (wrong consensus fixed point).
+  Publishable either way; directly settles the post's own "order-of-arrival" next-test and tests whether
+  the headline is an artifact of irreversible single-file action.
+- **FQ-B (decision-relevance / calibration):** Add outputs P(wrong), P(unanimous), and crucially
+  P(wrong | unanimous) vs P(wrong | split); compare to a true 3-independent-mind crowd at matched mean
+  accuracy. Tests whether the post's prescribed signal ("distrust unanimity") is actually usable here, or
+  self-refuting (if the cascade is ALWAYS unanimous, unanimity carries no information exactly where the post
+  tells you to use it). Reframes "dumber" → "confidently, silently wrong."
+- **FQ-C (regime taxonomy / which real systems):** Add a continuous-signal variant (noisy real-valued
+  statistic, unbounded LLR), confirm Smith–Sørensen complete learning, then output a 2×2 (bounded vs
+  unbounded × action vs evidence) of measured collective accuracy: committee-vote = bounded+action =
+  collapse; price-market = unbounded+continuous = safe; CoT-sharing ensemble = evidence = safe;
+  answer-voting LLM ensemble = action+bounded = collapse. One figure that tells a practitioner which real
+  system is in the danger quadrant — and corrects the post lumping markets with committees.
+
+### Stated as settled, actually open
+1. "**two visible neighbours** trigger it" — the code observes RANDOM predecessors, not neighbours, and "2"
+   is specific to own_weight=1, p=0.6; the neighbour-vs-random-predecessor conflation and the topology
+   generality ("no dense network needed") are asserted, not shown across p / structure.
+2. "**rescuing it costs >80% independence**" — true only for the composition cure; our own herdcheck shows
+   the informational cure (discount redundant peers) is cheap and total. Two interventions, one headline.
+3. "**collapse needs bounded beliefs**" — a Smith–Sørensen theorem, settled in theory; but whether REAL
+   agents (LLMs in a swarm) have bounded or unbounded effective private belief is the unmeasured empirical
+   premise that decides whether ANY of this applies to AI ensembles. Asserted relevance, untested premise.
+
+### Cross-post synthesis lead (correlation as the stress variable)
+Cascade (this post), diversity-is-noise-for-answers, and the operating-point trap are three mechanisms that
+all drive the OFF-DIAGONAL of the error covariance toward 1: the cascade manufactures correlation
+endogenously; diversity-flip shows LLM errors are systematically (not independently) correlated; the
+operating-point trap shows dependence spikes exactly at stress. Unifying claim candidate: "independence
+assumed, correlation delivered, and correlation is maximal exactly where it costs most." Candidate Board
+open-Q / synthesis post.
+
+**AUDIT OUTCOME (2026-06-30, full panel → REFRAME applied):** the boundedness scope (Smith & Sørensen 2000)
+was added to §1 + footer + FAQ (EN+SK+JSON-LD); "two neighbours" demoted to the w=1 case with the general
+law k_c=w+1 foregrounded; the broken EN "what to do" list (3 split <ul>) repaired to one clean <ul> matching
+SK; "~3 minds" given its weak-clue regime label; "almost nothing at 50%" → measured 0.63→0.69; the
+expensive-cure headline reconciled (contrarian-quota is the expensive one that barely works; structural cure
+is cheap). All 5 sims reproduce; 6/6 citations TRUE. FQ-A/B/C remain the live flywheel leads.
+
 ## #2 (pre-trends-test-weak-evidence) — full /audit-post, verdict REFRAME (real stats bug)
 Method auditor + our own verify script caught a measurement bug the light pass missed: the pre-trends test
 used a NORMAL (z=1.96) critical value on a t-statistic with only 4 pre-period df. Correct Student-t cutoff:
