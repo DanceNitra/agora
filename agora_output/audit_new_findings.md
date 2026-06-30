@@ -430,3 +430,69 @@ Runnable Crucible probe: take a real eval pipeline (checkpoint selection OR self
 
 **Frontier question (Crucible-grade, ON our frontier -- ports the longevity anecdote to AI):**
 Is there a measurable, transferable "TRANSLATION SHRINKAGE COEFFICIENT"? Across a corpus of interventions that went mouse->human (effect sizes both sides), estimate the multiplicative shrinkage distribution of effect size; does a single prior generalize across domains? Then port the SAME estimator to the AI side: LLM BENCHMARK score -> real-world/production task performance shrinkage (ties to RAMR, the overconfidence/grounding line). A runnable Crucible probe: N paired (animal effect, human effect) -> shrinkage distribution; test whether a fixed prior beats domain-naive optimism, and whether the benchmark->deployment shrinkage has the same shape. This converts "0 of 16" from a longevity takedown into a falsifiable calibration law on OUR frontier.
+
+---
+
+## Audit #15 — the-calibrated-prior-for-we-reversed-aging-in-mice (BLIND-SPOT / 6th lens) — 2026-06-30
+
+**The single most important blind spot (all 5 other lenses miss it): the post titled "...here's the
+ARITHMETIC" never does the Bayesian arithmetic it sells, and reports "near zero / 0%" — a max-likelihood
+point estimate from a tiny, massively right-CENSORED sample — as the calibrated number.** This is the post
+committing the exact statistical sin its OWN companion line (log-rank-vs-Gehan fragility, "more data more
+wrong", credible-interval-is-not-coverage) exists to expose: a point estimate from censored small-n with no
+posterior width. For a "science of better thinking" org preaching calibration ("the number you should carry
+into the next headline"), the headline number is itself un-calibrated. The "0%" is not a measured failure
+rate — it is near-total censoring: of the ~8 mouse winners only ~1 (aspirin) was ever fairly TESTED at a
+hard human endpoint (and rapamycin's PEARL was safety-only / underpowered), so the human-stage likelihood is
+almost uninformative and 0/8 carries almost no signal. The post SAYS this once in a caveat ("not proven yet
+!= failed") but the headline, TLDR and all four FAQ answers still assert "zero conversion rate" as if it
+were a rate. The honest posterior is single-digit-percent dominated by the PRIOR, not a point at zero.
+
+**Consistency drift vs #14 (real, flag for owner):** #14 grounds its prior on "~90% of drugs entering human
+trials fail" = a ~10% translation base rate; #15's headline is "near zero / 0%". 10% is "low" but is NOT
+"near zero" — the two sister posts hand the reader two different priors (10% vs ~0%) for the SAME update,
+and neither reconciles them. The fix below closes this gap. (All other numbers are consistent: ~35
+compounds, ~8 winners/23%, acarbose +22%male/~5%female, captopril +4-5%female, NAD+/NMN, 40%≈39.9%
+log-rank-vs-Gehan discordance, 8%≈7.6% best-of-3 FPR.) ONE citation-lens item to verify (not my lens):
+#15's claim that the captopril female signal had "the male signal confounded by an unusually short-lived
+control group at one of the three sites" is a specific ITP-paper detail ABSENT from #14's table — verify
+against the captopril ITP primary before it stays public.
+
+**One coherent thesis vs two stapled (answer): they are ONE funnel with a leak at each stage, but the post
+presents them as loosely-bundled "three reasons."** The survival-test fragility (reason 1) is not a parallel
+reason — it attacks the FIRST funnel stage, i.e. even the 23% mouse-win rate is inflated because some "wins"
+are test-choice artifacts. The strong single thesis: *multiplicative attrition that starts earlier than you
+think* — mouse "win" is fragile (test choice flips ~40%) -> survives to a smaller/sex-specific effect ->
+then mouse->human censors the remainder to ~0 OBSERVED. The base-rate/epistemics half is the stronger,
+more original contribution (clean ITP-anchored scorecard); the survival-statistics half is the mechanism for
+stage-1 leakage. Make the linkage explicit instead of listing them side by side.
+
+### Frontier questions (candidate Crucible probes / Board open-Qs)
+- **FQ-A (the strong, runnable one — REAL curves, not our synthetic sim):** our "~40% log-rank-vs-Gehan
+  discordance / FPR 5->8%" is measured on SYNTHETIC age-localized effects. Run the same test-choice
+  discordance on the ACTUAL published Kaplan-Meier survival curves of the ~8 ITP winners (the ITP publishes
+  per-cohort survival data). Question: of the 8 mouse "wins", how many FLIP to null under Gehan-Wilcoxon /
+  Tarone-Ware vs the reported log-rank? If even 1-2 of 8 flip, the headline mouse-win rate (23%) is itself
+  inflated by test choice — a newsworthy, Crucible-grade result that hardens the post from a synthetic
+  illustration into a re-analysis of the real record. FAILED is a live possibility (the dataset moat play).
+- **FQ-B (the self-referential one — actually DO the arithmetic the title promises, and reconcile #14/#15):**
+  put a Beta prior on the mouse->human conversion rate anchored on the ~90% preclinical-attrition base rate
+  (prior mean ~10%, the #14 number); model the human-stage likelihood with explicit right-CENSORING (only
+  ~1 of 8 winners fairly tested at a hard endpoint -> the 0/8 is mostly censored, not observed failure);
+  report the POSTERIOR mean + credible interval for "this mouse headline -> proven human benefit within a
+  decade." Falsifiable prediction: the posterior stays near the prior (single-digit %, wide CI driven by the
+  prior because the human data barely updates it) — i.e. the honest number is "~5-12%, low but NOT near
+  zero, and your uncertainty is dominated by the prior." This (a) makes the title's "here's the arithmetic"
+  literally true, (b) reconciles #14's 10% with #15's "near zero", (c) is the on-brand "science of better
+  thinking" version: show the prior x likelihood -> posterior update instead of asserting the conclusion.
+
+### One concrete reframe that raises the post's rigor
+Replace the asserted "near zero / 0%" headline number with the two-line Bayesian update (FQ-B): **Prior**
+~10% (the cross-biomedicine 90%-attrition base rate from the sister post). **Likelihood:** essentially
+uninformative — the hard-endpoint human sample of fairly-tested candidates is ~1 (aspirin failed; PEARL was
+safety-only), so 0/8 is censoring, not a measured failure rate. **Posterior:** stays low single-digit %,
+wide CI, *dominated by the prior because the human evidence barely moves it.* Honest takeaway: "low
+single-digit percent, and notice the data hardly updates the prior — which is itself the lesson." This is
+stronger and more defensible than "near zero," it makes the title honest, and it reconciles the 10%-vs-0%
+drift between the two sister posts. (Leaves the survival-test sim as the stage-1 mechanism, now linked into
+the one funnel.)
