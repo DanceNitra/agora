@@ -152,6 +152,30 @@ SK; "~3 minds" given its weak-clue regime label; "almost nothing at 50%" → mea
 expensive-cure headline reconciled (contrarian-quota is the expensive one that barely works; structural cure
 is cheap). All 5 sims reproduce; 6/6 citations TRUE. FQ-A/B/C remain the live flywheel leads.
 
+## #6 (a-95-confidence-interval-covers-31 / DiD 1-treated-unit) — full panel, verdict REFRAME
+Numbers reproduce within MC noise (DiD coverage 0.305→re-run 0.301; SC 0.891→0.898; widths/RMSE all match;
+kept 800 reps — swapping to 2000 would force "31%"→"30%" + a title/slug change for a 1pp wobble). Real
+defects the prior "nums re-run" pass missed: (1) EN TLDR + meta/og/twitter/JSON-LD + homepage card +
+posts.json `desc` were all TRUNCATED mid-sentence at "…In a clean"; (2) SK body+h1+TLDR+footer were
+diacritic-stripped and used the non-word "ostatkovaná jednotka" (vs the correct "ošetrená" in the SK FAQ);
+(3) **estimator-vs-inference conflation** — the table compares DiD-with-analytic-SE vs SC-with-placebo-
+inference, changing BOTH at once, so "SC fixes coverage" is under-identified; SC's coverage comes mainly from
+its placebo/permutation inference (Abadie-Diamond-Hainmueller 2010, was UNCITED), and valid inference
+(Conley-Taber/permutation/wild-cluster bootstrap) on the DiD estimate also restores coverage — the real fix is
+the inference, not abandoning DiD; (4) AF2020 MISCREDIT — Alvarez-Ferman 2020 is about *spatial* correlation
+(across units) and is an arXiv working paper, but the post replicates AR(1) *serial* correlation over time =
+the BDM-2004 / Conley-Taber design; recredited; (5) "mean abs(bias)" mislabel (estimator is unbiased under
+true=0) → "mean abs error".
+- **Frontier Q (the strong one): disentangle estimator-failure from inference-failure + map the coverage
+  surface.** On the same AF-style panels run the 2×2 {estimator: DiD, SC} × {inference: analytic-SE,
+  permutation/placebo} + a 3rd arm Conley-Taber-on-DiD, reporting coverage AND power AND width at true effects
+  τ∈{0,0.5,1,2}. Prediction: DiD+permutation restores coverage ~0.95 AT the DiD estimator (proves "switch to
+  SC" is a false dichotomy); SC's 4× width costs real power. Then map coverage-vs-(ρ, n_treated, T_pre): sweep
+  ρ∈{0,.2,.4,.6,.7,.9}, n_treated∈{1,2,5,10}, T_pre∈{4,8,20} → the boundary where naive DiD inference becomes
+  trustworthy (coverage≥0.93). A phase-diagram that ties into the "causal inference has a phase diagram" post.
+- Missing prior art added: Abadie-Diamond-Hainmueller 2010 (JASA, the SC method + placebo inference) +
+  Ferman-Pinto 2019 (REStat, few treated groups). Real-data ρ≈0.8, so the post's ρ=0.7 is conservative.
+
 ## #5 (passing-a-pre-trends-test / twin of #2) — full panel, verdict REFRAME (SAME z-vs-t bug, unfixed)
 The render_piece twin of #2 still carried the EXACT z-vs-t bug #2's full audit fixed (det 31%→16%, 70%→45%,
 removed the spurious 12% "oversized/misleads-both-directions" FP — real size nominal 5%; "2/3"→"5/6";
