@@ -478,9 +478,9 @@
  {
   "slug": "your-ai-might-be-training-on-itself-and-we-measured-the-two-",
   "title": "Your AI might be training on itself — and we measured the two ways that ends badly",
-  "title_sk": "Vasa AI mozno trenuje sama na sebe — odmerali sme dva sposoby, ako sa to zle skonci",
-  "desc": "The claim. Any system that learns from its own output is a strange loop — a model retrained on synthetic data, an agent whose memory is its own past answers, a RAG store indexing the system's prior ge",
-  "desc_sk": "Kolaps modelu, odmerany. Kazdy system, ktory sa uci z vlastneho vystupu, je podivna slucka. Postavili sme najmensi spustitelny model a nasli sme dva sposoby zlyhania — a dve paky, ktore im branilia: ~5% kotva realnych dat zastavi kolaps diverzity, a udrzanie exponentu sebadovery p<=1 zastavi trvale ",
+  "title_sk": "Vaša AI možno trénuje sama na sebe — odmerali sme dva spôsoby, ako sa to zle skončí",
+  "desc": "Model collapse, measured. Any system that learns from its own output is a strange loop. We built the smallest runnable model and found two failure modes — and two knobs that prevent each: a ~5% real-data anchor pulls the collapse rate from ~94% to under ~10%, and keeping the self-trust exponent p≤1 prevents permanent lock-in. Both halves are established results (Shumailov 2024; Arthur 1989) — we add the runnable packaging.",
+  "desc_sk": "Kolaps modelu, odmeraný. Každý systém, ktorý sa učí z vlastného výstupu, je podivná slučka. Postavili sme najmenší spustiteľný model a našli sme dva spôsoby zlyhania — a dve páky, ktoré im bránia: ~5% kotva reálnych dát stiahne mieru kolapsu z ~94% pod ~10%, a udržanie exponentu sebadôvery p≤1 zabráni trvalému zamknutiu. Obe polovice sú etablované výsledky (Shumailov 2024; Arthur 1989) — pridávame spustiteľné zabalenie.",
   "date": "2026-06-15",
   "tags": "Research",
   "tags_sk": "Výskum",
