@@ -152,6 +152,30 @@ SK; "~3 minds" given its weak-clue regime label; "almost nothing at 50%" → mea
 expensive-cure headline reconciled (contrarian-quota is the expensive one that barely works; structural cure
 is cheap). All 5 sims reproduce; 6/6 citations TRUE. FQ-A/B/C remain the live flywheel leads.
 
+## #5 (passing-a-pre-trends-test / twin of #2) — full panel, verdict REFRAME (SAME z-vs-t bug, unfixed)
+The render_piece twin of #2 still carried the EXACT z-vs-t bug #2's full audit fixed (det 31%→16%, 70%→45%,
+removed the spurious 12% "oversized/misleads-both-directions" FP — real size nominal 5%; "2/3"→"5/6";
+"one-third"→"one in six"). Prior pass a641c69 added only Roth-2022 credit. Lesson: **when a post is the
+twin of an already-fixed one, the fix does NOT propagate — re-audit the twin to the same standard.** Also
+caught: Rambachan&Roth title was the working-paper "An Honest Approach" → published "A More Credible Approach
+to Parallel Trends" (ReStud 2023); added Roth's `pretrends` package (already computes the headline) + "What's
+Trending in DiD" survey; reframed the "which assumption fails worst" ranking (parametrization artifact — a
+per-period slope compounds over post-periods, a one-time composition/anticipation shift does not) →
+"a slow compounding pre-trend is most biasing AND hardest to see".
+- **Structural finding for the owner:** #5 is a near-duplicate of #2 (same title; canonical already → #2; #2
+  is richer + already corrected). Numbers now synced, but the panel recommends COLLAPSING #5 into #2 (redirect
+  + de-list from sitemap/index) rather than maintaining two same-title posts. Flagged for owner (outward/SEO).
+- **Frontier Q (blind-spot, the strong ones):** (F1) sweep J treated-units × T_pre pre-periods at slope 0.3,
+  find the power≥0.80 contour → "you need ≥X treated units and ≥Y pre-periods before a passed pre-trends test
+  carries real information" (bounds the scope instead of overgeneralizing from J=1). (F2) gating vs honest-DiD
+  head-to-head on the SAME panels — measure effective coverage of the true effect + interval width (validates
+  the post's own prescription, currently asserted-not-measured). (F3) conditional-on-passing bias: measure
+  E[bias | pre-test PASSED] — pre-testing is a selection procedure that can leave survivors MORE biased; this
+  is the mechanism Roth actually warns about and is absent from the post. All runnable on the existing DGP.
+- **Scope caveat added:** the n=1-treated-unit / few-pre-period design is the worst corner AND a known-
+  degenerate inference case (Conley–Taber 2011); serious single-treated-unit practice uses placebo/permutation
+  or Conley–Taber, not a 4-df t-test. Result scoped accordingly.
+
 ## #2 (pre-trends-test-weak-evidence) — full /audit-post, verdict REFRAME (real stats bug)
 Method auditor + our own verify script caught a measurement bug the light pass missed: the pre-trends test
 used a NORMAL (z=1.96) critical value on a t-statistic with only 4 pre-period df. Correct Student-t cutoff:
