@@ -496,3 +496,33 @@ single-digit percent, and notice the data hardly updates the prior — which is 
 stronger and more defensible than "near zero," it makes the title honest, and it reconciles the 10%-vs-0%
 drift between the two sister posts. (Leaves the survival-test sim as the stage-1 mechanism, now linked into
 the one funnel.)
+
+## Audit #16 — a-pre-trend-too-gentle-to-see (full panel, 2026-07-01)
+- **Frontier Q (from the blind-spot lens): panel-shape dependence of pre-trends test power.** The whole
+  result (77% bias, 16% detection) is one point in (T_pre, N_control, slope) space; T_pre=6 is close to the
+  worst case a linear-slope t-test can face (only 4 residual df). Sweep T_pre ∈ {6,10,15,20,30} at the same
+  slope=0.3 and N_control=20, and separately sweep the pre-trend TEST design itself (single linear-slope
+  t-test vs a joint F-test over multiple lead dummies on the full panel, the way applied econometricians
+  actually run event studies per the steelman-skeptic lens). Two publishable outcomes: (a) power scales
+  favorably enough with T_pre that the honest actionable rule is "check YOUR panel's power via `pretrends`,
+  don't blanket-distrust" (would sharpen both #2 and #16's practical-rule sections with an actual power
+  curve instead of a qualitative caveat); (b) the joint-F-test on the full panel has a *meaningfully*
+  different power profile than the collapsed single-slope test — which would mean "the standard pre-trends
+  test usually misses it" is version-dependent, not a property of pre-trends testing per se. Runnable now
+  (extend `agora_output/lab/20260616-did-pretrend-verify.py` with a T_pre sweep + an event-study F-test arm).
+- **Mechanism-vs-power conflation, generalized:** the method-auditor lens found that the "trend" violation
+  (drift continuing into the post-period) makes part of the measured "bias" a STRUCTURAL DiD-estimator
+  limitation (no test, however powerful, recovers the true effect — you need a different estimator/design),
+  not a pure test-power failure the way "anticipation"/"composition" (pre-period-localized, genuinely
+  fixable if caught) are. This same conflation is latent in sibling post #2 (pre-trends-test-weak-evidence),
+  which uses the identical simulated "trend" violation and doesn't disentangle the two failure modes either
+  — worth a light follow-up pass on #2 specifically for this framing point (not just the citation-title fix
+  already applied in this cycle).
+- **Prior-art gap that was a near-miss on both #2 and #16:** this is literally Jonathan Roth (2022, AER:
+  Insights, "Pretest with Caution") and Rambachan & Roth (2023, ReStud, "A More Credible Approach to
+  Parallel Trends") re-derived by simulation. #16 originally cited NEITHER. Now fixed (both posts cite Roth
+  2022 + Rambachan-Roth 2023 + the `pretrends` R package). Housekeeping applied to #2 in the same cycle:
+  corrected "An Honest Approach to Parallel Trends" (the pre-publication working-paper title) to the
+  published ReStud title "A More Credible Approach to Parallel Trends", and gave Bilinski & Hatfield (2018)
+  its real title ("Nothing to See Here? Non-inferiority Approaches to Parallel Trends and Other Model
+  Assumptions") instead of a bare arXiv id.

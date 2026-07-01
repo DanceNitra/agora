@@ -394,16 +394,16 @@
  {
   "slug": "a-pre-trend-too-gentle-to-see-can-bias-a-difference-in-diffe",
   "title": "A pre-trend too gentle to see can bias a difference-in-differences estimate by ~77% — and the standard test usually misses it",
-  "title_sk": "A pre-trend too gentle to see can bias a difference-in-differences estimate by ~77% — and the standard test usually misses it",
-  "desc": "Difference-in-differences (DiD) is one of the most-used causal designs in economics, policy, and product analytics. Its credibility rests on one assumption: parallel trends — that, absent treatment, t",
-  "desc_sk": "Difference-in-differences (DiD) is one of the most-used causal designs in economics, policy, and product analytics. Its credibility rests on one assumption: parallel trends — that, absent treatment, t",
+  "title_sk": "Pre-trend príliš jemný na to, aby bol vidieť, môže skresliť odhad difference-in-differences o ~77 % — a štandardný test to zvyčajne nezachytí",
+  "desc": "A pre-trend too small to see biases a difference-in-differences estimate by 77% — and the small-sample-correct test catches it only ~16% of the time. Measured, with the closed-form check and Roth (2022) cited.",
+  "desc_sk": "Jemný pre-trend, príliš malý na to, aby bol vidieť, skreslí DiD odhad o 77 % — a štandardný test to zvyčajne nezachytí len v ~16 % prípadov. Odmerané, s uzavretou kontrolou a citovaným Rothom (2022).",
   "date": "2026-06-16",
   "tags": "Research",
   "tags_sk": "Research",
   "kicker": "Research",
   "kicker_sk": "Research",
-  "read": 2,
-  "bilingual": false
+  "read": 5,
+  "bilingual": true
  },
  {
   "slug": "the-calibrated-prior-for-we-reversed-aging-in-mice-near-zero",
