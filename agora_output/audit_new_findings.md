@@ -526,3 +526,35 @@ the one funnel.)
   published ReStud title "A More Credible Approach to Parallel Trends", and gave Bilinski & Hatfield (2018)
   its real title ("Nothing to See Here? Non-inferiority Approaches to Parallel Trends and Other Model
   Assumptions") instead of a bare arXiv id.
+
+## Audit #17 — the-most-confident-systems-are-the-least-grounded (full 5-lens panel, 2026-07-01)
+- **Frontier Q (from the blind-spot lens, the sharpest one): adversarial/strategic gaming of the
+  grounding signal itself.** All three toy models assume passive dynamics — nothing in them models an
+  agent that KNOWS it's being scored on "external grounding" and optimizes to look grounded (cite
+  sources selectively, pass a robustness checklist, grounding-wash) without becoming more accurate.
+  This is a qualitatively different problem (adversarial ML / mechanism design) than the passive
+  bistable dynamics in the current models — closer to Goodhart's law applied recursively to the
+  grounding metric itself. Directly relevant to Agora's own "grounding meter" companion project:
+  pressure-test it against an agent that knows it's being scored and optimizes against the meter, not
+  just against passive drift. Runnable now: add a 4th "adversarial" agent type to the opinion-formation
+  model that observes tau and injects a costless confidence boost when tau is being measured.
+- **Method finding (from re-running the structural realization at multiple N, N=50 to N=20,000):** the
+  "confidence stays flat/insensitive to grounding while accuracy alone collapses" signature is NOT an
+  N-artifact that a different sample size would fix — it holds at every N tested. This means the
+  identification-vs-precision mechanism has a robust, sample-size-invariant signature distinct from the
+  self-reference mechanism's rising-confidence signature. Worth its own short follow-up: is this
+  "confidence orthogonal to grounding" signature (rather than "confidence rises as grounding falls")
+  the MORE common real-world failure mode in practice (e.g. does a mis-specified regression's reported
+  SE/CI actually stay roughly constant as omitted-variable bias grows in real applied work)? If so, it
+  may be the more actionable/alarming half of the post's story, since nothing in the confidence score
+  itself would tip off a practitioner.
+- **Prior-art debt this audit paid down (not a frontier Q, a fix record):** the post originally claimed
+  "one law" / "one knob" spanning three mechanisms with ZERO citations. Five separate established
+  literatures now credited: Brian Arthur (1989) increasing-returns lock-in; Charles Manski's partial-
+  identification program (identification vs precision); Guo et al. (2017, arXiv:1706.04599) on modern
+  neural-net miscalibration/overconfidence; Marten Scheffer et al. (2009, Nature, DOI 10.1038/nature08227)
+  critical-transitions/hysteresis; opinion-dynamics (Deffuant, Hegselmann-Krause) and echo-chamber /
+  epistemic-bubble theory. The genuinely novel contribution, once scoped honestly, is narrower than "a
+  law": ONE shared model (not three) that puts model collapse and winner-take-all lock-in on a single
+  measured critical curve phi_c(alpha) plus a quantified hysteresis gap, and a SEPARATE illustration
+  making the (already-known) identification-vs-precision point concrete with a reproducible signature.
