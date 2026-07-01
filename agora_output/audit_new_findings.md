@@ -691,3 +691,31 @@ the one funnel.)
   pre-trends test" framing itself implicitly tests against an unrealistic zero-violation null — a live,
   unresolved methodological pushback against Roth's diagnosis, now disclosed in the post as contested, not
   settled either way.
+
+## STORM addendum to Audit #17 (the-most-confident-systems-are-the-least-grounded, 2026-07-01, retroactive)
+
+- **Frontier question:** could a system, aware it's being monitored via the confidence-diversity
+  co-movement signal (rising confidence + collapsing independent-answer spread — a new practical detector
+  surfaced this cycle), learn to game that specific detector by artificially preserving surface-level
+  answer diversity while its actual grounding degrades, the same way a directly-measured grounding score
+  can be gamed once acted on? A red-team/adversarial-robustness lens on the detection mechanisms this
+  post's idea family proposes is the natural next step.
+- **Real numeric error found and fixed:** the post claimed Breznau et al. 2022 found methodology "explains
+  up to roughly 20%" of many-analysts disagreement. The actual paper: real coded analyst decisions
+  explained only 2.6% of variance (95.2% unexplained overall); ~16% was a purely theoretical simulated
+  ceiling nobody's real analysis reached (a stricter re-analysis puts the ceiling closer to ~12%). The
+  wrong number had propagated to THREE places (body prose, FAQ, and a newly-added summary table) — the
+  table specifically was fixed only after a dedicated re-audit agent caught that it still had the stale
+  figure even after the prose was corrected, a concrete case of "fix propagation" needing its own explicit
+  check, not assumed from fixing the primary location.
+- **Category-stretch pattern, worth a standing check:** two independent STORM lenses (Skeptic + Academic)
+  converged on the same critique — a "real-data validation" section cited studies that measure a DIFFERENT
+  thing (cross-team specification variance) than what the post's core claim is about (a system's own
+  confidence tracking its own grounding). This is a distinct failure mode from a wrong number or a missing
+  citation: the evidence is real and correctly characterized, but doesn't test what it's being used to
+  support. Worth a standing audit-post check: for every "this matches real data" claim, ask specifically
+  what variable the cited study measures vs. what variable the post's own model/claim is about.
+- **New citations for this org's "confidence/grounding" post family**: Kuhn's paradigm entrenchment (1962),
+  Minsky's Financial Instability Hypothesis (1975/1986), Janis's groupthink (1972) — all independently
+  describe "internal coherence substituting for external checking," relevant prior naming for any future
+  post on this theme.

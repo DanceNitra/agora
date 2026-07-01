@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Is there a real pattern where confidence decouples from grounding? — Storm Research Briefing</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&family=Roboto+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ink:#0f172a; --body:#334155; --muted:#64748b; --line:#e2e8f0; --bg:#ffffff;
+    --soft:#f8fafc; --accent:#2563eb; --accent-soft:#eff6ff;
+    --ok:#16a34a; --ok-soft:#f0fdf4; --warn:#d97706; --warn-soft:#fffbeb;
+    --bad:#dc2626; --bad-soft:#fef2f2; --demote:#7c3aed; --demote-soft:#f5f3ff;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--soft);color:var(--body);
+    font-family:"Montserrat",system-ui,-apple-system,sans-serif;line-height:1.62;font-size:16px}
+  .wrap{max-width:860px;margin:0 auto;padding:48px 24px 96px}
+  .card{background:var(--bg);border:1px solid var(--line);border-radius:14px;padding:28px 32px;margin:20px 0;
+    box-shadow:0 1px 2px rgba(15,23,42,.04)}
+  h1{font-size:34px;line-height:1.18;font-weight:800;color:var(--ink);margin:0 0 10px}
+  h2{font-size:13px;font-weight:700;letter-spacing:.09em;text-transform:uppercase;color:var(--accent);margin:0 0 16px}
+  h3{font-size:19px;font-weight:700;color:var(--ink);margin:0 0 6px}
+  p{margin:0 0 14px}
+  a{color:var(--accent);text-decoration:none;border-bottom:1px solid #bfdbfe}
+  a:hover{border-color:var(--accent)}
+  code,.mono{font-family:"Roboto Mono",monospace}
+  .topic{font-family:"Roboto Mono",monospace;font-size:13px;color:var(--muted)}
+  .meta{font-size:13px;color:var(--muted);margin-top:8px}
+  .disclosure{font-size:12.5px;color:var(--muted);background:var(--soft);border:1px dashed var(--line);
+    border-radius:10px;padding:12px 16px;margin-top:18px}
+  .verify{display:flex;flex-wrap:wrap;gap:10px;align-items:center;background:var(--accent-soft);
+    border:1px solid #bfdbfe;border-radius:12px;padding:14px 18px;margin:20px 0;font-size:14px}
+  .verify b{color:var(--ink)}
+  .pill{font-family:"Roboto Mono",monospace;font-size:12px;font-weight:600;padding:3px 10px;border-radius:999px;
+    border:1px solid var(--line);background:#fff;color:var(--body)}
+  .pill.g{color:var(--ok);border-color:#bbf7d0;background:var(--ok-soft)}
+  .pill.y{color:var(--warn);border-color:#fde68a;background:var(--warn-soft)}
+  .pill.r{color:var(--bad);border-color:#fecaca;background:var(--bad-soft)}
+  .pill.v{color:var(--demote);border-color:#ddd6fe;background:var(--demote-soft)}
+  .finding{border-top:1px solid var(--line);padding:20px 0}
+  .finding:first-of-type{border-top:0;padding-top:4px}
+  .frow{display:flex;align-items:baseline;gap:14px}
+  .rank{font-family:"Roboto Mono",monospace;font-weight:600;color:var(--muted);font-size:14px;min-width:26px}
+  .conf{margin-left:auto;font-family:"Roboto Mono",monospace;font-size:12px;font-weight:600;
+    color:var(--accent);background:var(--accent-soft);border:1px solid #bfdbfe;border-radius:999px;padding:3px 11px;white-space:nowrap}
+  .chips{display:flex;flex-wrap:wrap;gap:7px;margin:10px 0 0 40px}
+  .chip{font-size:12px;padding:3px 10px;border-radius:6px;border:1px solid var(--line);background:var(--soft);color:var(--muted)}
+  .chip.sup{color:var(--ok);border-color:#bbf7d0;background:var(--ok-soft)}
+  .chip.chg{color:var(--bad);border-color:#fecaca;background:var(--bad-soft)}
+  .finding p{margin:8px 0 0 40px}
+  .guide{display:grid;grid-template-columns:1fr;gap:14px}
+  @media(min-width:640px){.guide{grid-template-columns:1fr 1fr 1fr}}
+  .gcol{border:1px solid var(--line);border-radius:10px;padding:16px}
+  .gcol h4{margin:0 0 10px;font-size:13px;letter-spacing:.05em;text-transform:uppercase}
+  .gcol.assert{background:var(--ok-soft);border-color:#bbf7d0}.gcol.assert h4{color:var(--ok)}
+  .gcol.caveat{background:var(--warn-soft);border-color:#fde68a}.gcol.caveat h4{color:var(--warn)}
+  .gcol.avoid{background:var(--bad-soft);border-color:#fecaca}.gcol.avoid h4{color:var(--bad)}
+  .gcol ul{margin:0;padding-left:18px;font-size:14px}.gcol li{margin:6px 0}
+  ul.moves{padding-left:20px}ul.moves li{margin:9px 0}
+  .sidebar{background:var(--demote-soft);border:1px solid #ddd6fe;border-radius:12px;padding:18px 22px;margin:20px 0}
+  .sidebar h2{color:var(--demote)}
+  .frontier{background:var(--ink);color:#e2e8f0;border-radius:14px;padding:30px 32px;margin:24px 0}
+  .frontier h2{color:#93c5fd}.frontier .q{font-size:22px;font-weight:700;color:#fff;line-height:1.4}
+  .refs{font-size:13.5px}
+  .ref{padding:11px 0;border-top:1px solid var(--line);display:flex;gap:12px;align-items:flex-start}
+  .ref:first-of-type{border-top:0}
+  .tag{font-family:"Roboto Mono",monospace;font-size:10.5px;font-weight:600;letter-spacing:.04em;
+    padding:2px 8px;border-radius:5px;white-space:nowrap;margin-top:2px}
+  .tag.ok{color:var(--ok);background:var(--ok-soft);border:1px solid #bbf7d0}
+  .tag.partial{color:var(--warn);background:var(--warn-soft);border:1px solid #fde68a}
+  .tag.unver{color:var(--muted);background:var(--soft);border:1px solid var(--line)}
+  .tag.false{color:var(--bad);background:var(--bad-soft);border:1px solid #fecaca}
+  .tag.demoted{color:var(--demote);background:var(--demote-soft);border:1px solid #ddd6fe}
+  .grade{font-family:"Roboto Mono",monospace;font-weight:600;color:var(--ink)}
+  footer{text-align:center;color:var(--muted);font-size:12px;margin-top:40px}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header>
+    <h1>Confidence decoupling from grounding: a real, named-elsewhere pattern — but one number was wrong and the real-data check proves less than claimed</h1>
+    <div class="topic">topic: is there a shared pattern where a system's confidence (built from internal consistency) decouples from its correctness as external grounding falls, across AI model collapse, market lock-in, and scientific replication-crisis disagreement? · for researchers, ML practitioners, and forecasters</div>
+    <div class="meta">July 1, 2026 · Storm Research · 5-lens, citation-verified</div>
+    <div class="disclosure">
+      The five expert lenses below are an <b>author-built panel</b>, not independent field experts.
+      Agreement across lenses is a strong hypothesis, not consensus of the field. Every cited figure was
+      verified against its primary source. Commissioned as the missing STORM step of an audit-post
+      correction cycle for post #17 — retroactively run after the owner caught it was skipped originally.
+    </div>
+  </header>
+
+  <div class="verify">
+    <b>Verification:</b>
+    <span class="pill g">5/5 new citations checked</span>
+    <span class="pill r">0 fabricated</span>
+    <span class="pill y">1 corrected (a load-bearing number)</span>
+    <span class="pill v">0 demoted</span>
+    <span class="grade" style="margin-left:auto">Overall grade: B</span>
+  </div>
+
+  <section class="card">
+    <h2>The 60-second summary</h2>
+    <p>The post's core move — bridging Arthur's lock-in economics, Manski's partial-identification
+    econometrics, ML calibration/overconfidence, and Scheffer's critical-transitions hysteresis under one
+    "confidence decouples from external grounding" frame — is a genuine, narrow synthesis: the Academic lens
+    confirmed no existing paper welds these specific literatures together this way, even though each piece
+    is individually well-established. Where the panel found real problems: (1) a load-bearing statistic was
+    wrong — the post claimed Breznau et al. 2022 found methodology "explains up to roughly 20%" of
+    cross-team disagreement; the actual paper found real coded decisions explain only 2.6% of variance, with
+    ~16% being a purely theoretical ceiling nobody hit. Fixed. (2) The Skeptic and Academic lenses
+    independently converged on a sharper problem: the post's "many-analysts" real-data validation measures
+    cross-team SPECIFICATION variance, not literally the toy models' own confidence dynamics — using it as
+    direct confirmation was a category stretch, now disclosed as a real-world parallel instead. (3) The
+    Historian lens found the general pattern already has names in older literatures (Kuhn's paradigm
+    entrenchment, Minsky's Financial Instability Hypothesis, Janis's groupthink) that the post hadn't
+    credited — now added. (4) The Skeptic raised a genuine falsifiability concern (if grounding-loss can
+    produce EITHER rising OR flat confidence, is "decoupling" testable?) — the post's existing "what would
+    change our mind" section already states a real falsification criterion (a system that stays well-calibrated
+    as grounding falls), which survives the challenge but deserves emphasis. The Practitioner lens contributed
+    a genuinely useful new operational idea: confidence rising while answer-diversity collapses is a
+    detectable early-warning signal, addable without ground truth.</p>
+  </section>
+
+  <section class="card">
+    <h2>Key findings — ranked by reliability</h2>
+
+    <div class="finding">
+      <div class="frow"><span class="rank">01</span><h3>The five-way cross-domain bridge is a genuine, narrow synthesis, not a rediscovery of an existing unified theory</h3>
+        <span class="conf">confidence 8/10</span></div>
+      <div class="chips"><span class="chip sup">Supported by: Academic</span></div>
+      <p>Each individual piece (Arthur, Manski, Guo et al., Scheffer, Deffuant/Hegselmann-Krause) is
+      independently well-established and correctly characterized; no existing paper explicitly welds all
+      five into one frame. The Academic lens flags the Manski-calibration pairing specifically as the
+      unusual, distinctive move.</p>
+    </div>
+
+    <div class="finding">
+      <div class="frow"><span class="rank">02</span><h3>A load-bearing statistic was wrong — Breznau et al. 2022's real explanatory power is 2.6%, not "up to ~20%"</h3>
+        <span class="conf">confidence 9/10</span></div>
+      <div class="chips"><span class="chip sup">Supported by: Academic, dedicated verifier</span></div>
+      <p>The original "~20%" conflated a purely theoretical simulated ceiling (~16%, itself contested down
+      to ~12% in a stricter re-analysis) with what real coded analyst decisions actually explained: 2.6% of
+      variance, 95.2% remaining unexplained overall. Fixed across body, FAQ, JSON-LD, and the summary table
+      (three separate places the error had propagated to).</p>
+    </div>
+
+    <div class="finding">
+      <div class="frow"><span class="rank">03</span><h3>The "many-analysts" real-data check measures specification variance, not the toy models' specific confidence dynamics — a category stretch, now disclosed</h3>
+        <span class="conf">confidence 7/10</span></div>
+      <div class="chips">
+        <span class="chip sup">Supported by: Skeptic, Academic (independent convergence)</span>
+      </div>
+      <p>Silberzahn/Breznau/Botvinik-Nezer measure how much answers vary across independent analytic teams,
+      not a system's own self-reported confidence as grounding is progressively removed. Using them as direct
+      confirmation overstated the real-data support; now framed as a real-world parallel to the precision-≠-
+      truth mechanism specifically, not a test of the broader "confidence decouples" claim.</p>
+    </div>
+
+    <div class="finding">
+      <div class="frow"><span class="rank">04</span><h3>The general pattern already has names in older, unrelated literatures the post hadn't credited</h3>
+        <span class="conf">confidence 7/10</span></div>
+      <div class="chips"><span class="chip sup">Supported by: Historian</span></div>
+      <p>Kuhn's paradigm entrenchment (1962), Minsky's Financial Instability Hypothesis (1975/1986), and
+      Janis's groupthink (1972) each independently describe "internal coherence substituting for external
+      checking." None formalize a shared mechanism the way Arthur/Manski/Scheffer do — cited as convergent
+      naming, not rigorous parallel, avoiding overclaim.</p>
+    </div>
+
+    <div class="finding">
+      <div class="frow"><span class="rank">05</span><h3>A new, genuinely useful operational signal: confidence rising while answer-diversity collapses, detectable without ground truth</h3>
+        <span class="conf">confidence 6/10</span></div>
+      <div class="chips"><span class="chip sup">Supported by: Practitioner</span></div>
+      <p>Not part of the original toy models or measured in this post — a suggested, untested extension.
+      Added to the practical-rule section explicitly flagged as such, not presented as a finding.</p>
+    </div>
+  </section>
+
+  <section class="card">
+    <h2>The hidden connection</h2>
+    <p>The Skeptic's falsifiability challenge and the Academic's "category stretch" finding point at the same
+    underlying tension: a pattern broad enough to cover both a RISING-confidence signature (opinion-formation
+    model) and a FLAT-confidence signature (identification model) is harder to falsify than a single-mechanism
+    claim, and the real-data check that's supposed to anchor it doesn't test either signature directly — it
+    tests a third, related-but-different thing (cross-team variance). The post's honesty about being a
+    "pattern, not a law" is the right posture; this audit sharpens exactly WHERE the evidentiary gap is,
+    rather than papering over it.</p>
+  </section>
+
+  <section class="card">
+    <h2>Key assumption · the missing 6th lens</h2>
+    <p>None of the five lenses examined the ADVERSARIAL-GAMING failure mode in depth: the post's own final
+    caveat notes a grounding score becomes a target once acted on, but doesn't explore what a system
+    optimizing against BOTH the confidence-building mechanism AND a grounding detector would actually do —
+    e.g., could a system learn to make the confidence-diversity co-movement signal (the Practitioner's
+    suggested detector) itself look benign while still ungrounded? A red-team/adversarial-robustness lens on
+    the detection mechanisms this post's family of ideas proposes would be the natural next audit.</p>
+  </section>
+
+  <section class="card">
+    <h2>What to do — for researchers, ML practitioners, and forecasters</h2>
+    <ul class="moves">
+      <li>Don't cite Breznau et al. 2022 as showing methodology "explains up to 20%" of many-analysts
+      disagreement — the real figure is 2.6%; ~16% was a theoretical ceiling nobody's analysis reached.</li>
+      <li>Treat many-analysts studies as evidence that specification choice dominates sampling noise in
+      under-identified questions — not as a direct measurement of any specific confidence-vs-grounding
+      mechanism.</li>
+      <li>If monitoring an ensemble or team output for grounding failure, track confidence AND diversity
+      together — rising confidence with collapsing independent-answer spread is a real-time, ground-truth-free
+      early warning.</li>
+      <li>When citing this "pattern," credit the five formal literatures (Arthur/Manski/Guo/Scheffer/opinion-
+      dynamics) for the mechanism and Kuhn/Minsky/Janis for the convergent historical naming — don't present
+      either as a discovery.</li>
+    </ul>
+  </section>
+
+  <section class="card">
+    <h2>Claim safety guide</h2>
+    <div class="guide">
+      <div class="gcol assert"><h4>Safe to assert</h4><ul>
+        <li>The five-literature cross-domain synthesis (Arthur/Manski/Guo/Scheffer/opinion-dynamics) is a
+        genuine, narrow contribution — no prior paper welds these together this way.</li>
+        <li>Breznau et al. 2022: real coded decisions explain 2.6% of variance; a theoretical ceiling was
+        ~16%.</li>
+      </ul></div>
+      <div class="gcol caveat"><h4>Assert with caveat</h4><ul>
+        <li>The many-analysts studies support the pattern as a real-world PARALLEL, not a direct measurement
+        of the toy models' specific confidence dynamics.</li>
+        <li>Kuhn/Minsky/Janis are convergent historical NAMING of the general shape, not formal parallels to
+        the toy models' mechanisms.</li>
+      </ul></div>
+      <div class="gcol avoid"><h4>Avoid / don't repeat</h4><ul>
+        <li>Do not repeat "methodology explains up to ~20%" for Breznau et al. — this figure conflates a
+        theoretical ceiling with the actual (much smaller, 2.6%) real-world result.</li>
+      </ul></div>
+    </div>
+  </section>
+
+  <aside class="sidebar">
+    <h2>Contested signal</h2>
+    <p><b>Falsifiability of "confidence decouples from grounding."</b> The Skeptic lens raised a real concern:
+    a pattern that predicts EITHER rising confidence OR flat confidence as grounding falls is broader, and
+    harder to falsify, than a single-signature claim. The post's stated falsification criterion (a system
+    that stays well-calibrated as grounding falls) survives this challenge, but readers should weigh the
+    pattern's breadth accordingly — it is closer to "confidence does not reliably track grounding" than to a
+    single precise, narrow mechanism.</p>
+  </aside>
+
+  <section class="frontier">
+    <h2>The frontier question</h2>
+    <p class="q">Could a system, aware it's being monitored via the confidence-diversity co-movement signal
+    (rising confidence + collapsing independent-answer spread), learn to game that specific detector — e.g.
+    by artificially preserving surface-level answer diversity while its actual grounding degrades — the same
+    way a directly-measured grounding score can be gamed once acted on?</p>
+  </section>
+
+  <section class="card refs">
+    <h2>References — verified against primary sources</h2>
+    <div class="ref"><span class="tag partial">CORRECTED</span>
+      <span>Breznau, N. et al. (2022). "Observing Many Researchers Using the Same Data and Hypothesis Reveals a Hidden Universe of Uncertainty." <i>PNAS</i> 119(44), e2203150119. Real coded decisions explain 2.6% of variance (95.2% unexplained overall); a simulated theoretical ceiling was ~16% (later re-analysis: ~12%). <a href="https://www.pnas.org/doi/10.1073/pnas.2203150119">PNAS</a></span></div>
+    <div class="ref"><span class="tag ok">CONFIRMED</span>
+      <span>Aczel, B. et al. (2026). "Investigating the analytical robustness of the social and behavioural sciences." <i>Nature</i> 652, 135–142. 100 studies, ≥5 reanalysts each: 34% matched within tight tolerance. <a href="https://www.nature.com/articles/s41586-025-09844-9">Nature</a></span></div>
+    <div class="ref"><span class="tag ok">CONFIRMED</span>
+      <span>Kuhn, T. (1962). <i>The Structure of Scientific Revolutions</i>. University of Chicago Press. Paradigm entrenchment: confidence persists while anomalies accumulate until crisis forces revision.</span></div>
+    <div class="ref"><span class="tag ok">CONFIRMED</span>
+      <span>Minsky, H. (1975). <i>John Maynard Keynes</i>; (1986) <i>Stabilizing an Unstable Economy</i>. Financial Instability Hypothesis: stability breeds instability, largely ignored until the 2008 "Minsky moment." <a href="https://www.levyinstitute.org/pubs/wp74.pdf">Levy Institute (WP74 restatement)</a></span></div>
+    <div class="ref"><span class="tag ok">CONFIRMED</span>
+      <span>Janis, I. (1972). <i>Victims of Groupthink: A Psychological Study of Foreign-Policy Decisions and Fiascoes</i>. Cohesive, insulated groups manufacture consensus-confidence while losing contact with disconfirming evidence; Bay of Pigs (1961) a founding case study.</span></div>
+  </section>
+
+  <footer>Generated by the Storm Research pipeline · 5 lenses → contradiction map → synthesis → adversarial verification · July 1, 2026</footer>
+
+</div>
+</body>
+</html>

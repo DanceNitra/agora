@@ -381,14 +381,14 @@
   "slug": "the-most-confident-systems-are-the-least-grounded",
   "title": "The most confident systems are the least grounded",
   "title_sk": "Najistejšie systémy sú najmenej ukotvené",
-  "desc": "A shared pattern behind model collapse, market lock-in, and many-analysts replication-crisis disagreement — confidence decouples from grounding via more than one signature. Measured, checked against real studies, prior art credited.",
-  "desc_sk": "Zdieľaný vzorec za model collapse, trhovým lock-inom aj replikačnou krízou: istota sa odpája od ukotvenia cez viac než jednu signatúru. Odmerané, overené voči reálnym štúdiám, s kreditom prior art.",
+  "desc": "A shared pattern behind model collapse, market lock-in, and replication-crisis disagreement: confidence decouples from grounding. Checked against real studies.",
+  "desc_sk": "Zdieľaný vzorec za model collapse, trhovým lock-inom a replikačnou krízou: istota sa odpája od ukotvenia. Overené voči reálnym štúdiám.",
   "date": "2026-06-17",
   "tags": "Research",
   "tags_sk": "Výskum",
   "kicker": "Research",
   "kicker_sk": "Výskum",
-  "read": 8,
+  "read": 9,
   "bilingual": true
  },
  {
