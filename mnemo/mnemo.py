@@ -473,7 +473,8 @@ class Mnemo:
 
     def recall(self, query: str, k: int = 6, include_superseded: bool = False,
                include_hubs: bool = False, mode: str = "auto", min_relevance: float = 0.0,
-               scope: str | None = None, as_of: float | None = None) -> list[dict]:
+               scope: str | None = None, as_of: float | None = None,
+               where: dict | None = None) -> list[dict]:
         """Top-k memories by RELEVANCE × VALUE — high-value memories outrank merely-similar ones.
         Memories the dream pass flagged as hubs (universal matchers) are skipped unless include_hubs.
 
@@ -482,7 +483,19 @@ class Mnemo:
         the hybrid robustly beat either channel alone in our agent-memory benchmark (details in the recall
         body / mnemo/probes/locomo_retrieval_map.py). Force a single channel with mode='lexical' /
         'semantic', or the fusion explicitly with mode='hybrid'. Semantic/hybrid need an embedder (set on
-        the store); without one, or if embedding fails, recall falls back to lexical automatically."""
+        the store); without one, or if embedding fails, recall falls back to lexical automatically.
+
+        where: an OPT-IN metadata pre-filter applied to the candidate pool BEFORE ranking — the cheap
+        'filter before you rank' lever (measured on LoCoMo: a metadata pre-filter can beat retriever choice;
+        mnemo/probes/locomo_metadata_prefilter.py). A dict of field -> condition; a record must match ALL
+        fields (AND). Each field is matched against the record's top-level attributes first, then its meta
+        dict, so both `valid_from`/`mtype`/`key` and any `meta` key work. A condition is either a scalar
+        (equality), a list/tuple/set (membership), or a dict of operators:
+        {"$gte","$lte","$gt","$lt","$in","$nin","$ne","$contains"} — e.g. a time range
+        where={"valid_from": {"$gte": t0, "$lte": t1}} (hard-filter the SOLVED half), or a closed-set
+        entity where={"speaker": {"$in": ["Caroline","Mel"]}}. NOTE: this is a HARD filter — a record that
+        doesn't match is removed, so on lossy/predicted extraction prefer a broad/loose filter (or rerank)
+        over an aggressive one, since a wrong filter hard-deletes the answer (measured harm mode)."""
         def _eligible(r: dict) -> bool:
             s = r["status"]
             if as_of is not None:
@@ -505,6 +518,41 @@ class Mnemo:
         # one scope's memories into another's recall. scope=None (default) sees everything (legacy behavior).
         if scope is not None:
             pool = [r for r in pool if (r.get("meta") or {}).get("scope") == scope]
+        # Metadata pre-filter (the 'filter before you rank' lever): keep only records matching ALL `where`
+        # conditions, matched against top-level fields then meta. Deterministic, no embedder, O(pool).
+        if where:
+            def _match(r: dict) -> bool:
+                meta = r.get("meta") or {}
+                for field, cond in where.items():
+                    val = r[field] if field in r else meta.get(field)
+                    if isinstance(cond, dict):
+                        for op, cv in cond.items():
+                            if op in ("$eq", "eq"):
+                                if val != cv: return False
+                            elif op in ("$ne", "ne"):
+                                if val == cv: return False
+                            elif op in ("$in", "in"):
+                                if val not in cv: return False
+                            elif op in ("$nin", "nin"):
+                                if val in cv: return False
+                            elif op in ("$gte", "gte"):
+                                if val is None or val < cv: return False
+                            elif op in ("$lte", "lte"):
+                                if val is None or val > cv: return False
+                            elif op in ("$gt", "gt"):
+                                if val is None or val <= cv: return False
+                            elif op in ("$lt", "lt"):
+                                if val is None or val >= cv: return False
+                            elif op in ("$contains", "contains"):
+                                if val is None or cv not in val: return False
+                            else:
+                                raise ValueError(f"recall(where=): unknown operator {op!r}")
+                    elif isinstance(cond, (list, tuple, set)):
+                        if val not in cond: return False
+                    else:
+                        if val != cond: return False
+                return True
+            pool = [r for r in pool if _match(r)]
         # Mode selection. 'hybrid' = lexical (token overlap) + semantic (embedding) fused with Reciprocal
         # Rank Fusion. We MEASURED hybrid robustly beating EITHER channel alone for agent memory on LoCoMo
         # (recall@20 0.61 hybrid vs 0.55 lexical vs 0.53 semantic; +0.057 over the best single channel,
