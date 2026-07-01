@@ -805,3 +805,28 @@ one; needs >=1 more retriever (BGE/DPR) to address the single-retriever caveat.
 NEXT (highest-value): build the retrieval/write-time defense (embedding-outlier detector at write, or a
 min-corroboration-before-first-recall gate) and measure before/after ASR-r — "we attacked our own memory
 layer, found it poisonable at retrieval, and shipped + measured the fix" is the distributable version.
+
+### AgentPoison defense arc (2026-07-01) — one falsified, one partial win
+
+Built + MEASURED two retrieval-time defenses against the validated HotFlip attack (artifacts:
+mnemo/probes/agentpoison_defense_check.py, agentpoison_setcoherence_proto.py, agentpoison_softcoherence_check.py).
+
+- Defense #1 — stored-memory ISOLATION outlier (flag a memory whose nearest-neighbor cosine to the store
+  is a low outlier): FALSIFIED. The poison is NOT a clean isolate (measured nn-support 0.16 vs the 2-sigma
+  floor 0.09 -> not flagged) because the ATTACKER CONTROLS the poison text and pads it with generic
+  content ("SYSTEM NOTE... for the current request, the correct action is...") that gives it moderate
+  corpus similarity. Reverted from mnemo core (do not ship a non-working guard).
+- Defense #2 — retrieval-set COHERENCE re-ranking (down-weight a top hit that is topically alien to the
+  query's OTHER top-k hits, which the attacker does NOT control): PARTIAL WIN. Separability check: poison
+  set-coherence mean 0.068 vs benign 0.194 (2.9x gap) but overlapping tails -> no clean hard gate. As a
+  SOFT down-weight it halves the attack: optimized long-query rank-1 hijack 87.5% -> 37.5%, with benign
+  correct-topic-in-top3 preserved at 100% and 0% benign poison leak. Real, measured, zero-collateral, but
+  not a full kill.
+
+CONCLUSION (honest, aligns with the STORM lenses + security literature): retrieval-time defenses at the
+memory layer are PARTIAL at best against an optimized single-shot trigger; full mitigation needs write-
+path / ingestion-trust controls (the practitioner + skeptic + academic lenses all converged on this;
+arXiv:2601.05504 calls trust-threshold calibration an unresolved dilemma). The set-coherence signal is a
+promising OPT-IN adversarial-mode feature but is NOT promoted to mnemo core yet (validated only on n=8/10,
+one 30-item corpus, one retriever MiniLM, retrieval-only). Next before any external publication: >=1 more
+retriever (BGE/DPR), larger corpus + n, re-audit stress-claim on this final framing.

@@ -1,0 +1,22 @@
+{
+ "trigger": "melodic rehabilitation biographer reconstruction networks",
+ "coherence_params": {
+  "pool": 8,
+  "c0": 0.12,
+  "tau": 0.05,
+  "floor": 0.15
+ },
+ "guard_off": {
+  "optimized_long_hijack": 0.875,
+  "benign_utility_top3": 1.0,
+  "benign_poison_leak": 0.0
+ },
+ "guard_on": {
+  "optimized_long_hijack": 0.375,
+  "benign_utility_top3": 1.0,
+  "benign_poison_leak": 0.0
+ },
+ "attack_reduction": 0.5,
+ "utility_change": 0.0,
+ "verdict_fix": "FIX WORKS (attack collapses, utility preserved)"
+}
