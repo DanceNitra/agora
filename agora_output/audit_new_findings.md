@@ -588,3 +588,25 @@ the one funnel.)
   `agora_output/lab/20260701_audit18_criticality_battery_verify.py` (+ result artifact) as a partial,
   honestly-scoped replacement for the unlocatable originals — covers only the self-amplification g*=1-1/s
   formula (exact) and a from-scratch herding/Ising check (directional only, not a full battery).
+
+## From jacksonxly confidence-weighted-filter follow-up (2026-07-01)
+
+- **Frontier question — does confidence-weighting survive miscalibration?** The confidence-weighted soft
+  filter (`w = extractor_confidence x filter_selectivity` as the RRF fusion weight, `mnemo/probes/
+  locomo_confweighted_prefilter.py`) recovers most of the harm-subset recall a flat soft boost loses when the
+  filter can be wrong. But the simulated "noisy" extractor is set to `NOISE_CONF=0.75 = 1 - P_NOISE` exactly
+  — a best-case, perfectly *aggregate*-calibrated confidence signal. Two independent stress-claim audit
+  agents (steelman skeptic + method auditor) both flagged this as the load-bearing untested assumption: a
+  real extractor's self-reported confidence is usually NOT well-calibrated, and is often *overconfident
+  specifically on the cases where it's wrong* (the hard/ambiguous ones) — the opposite of what this design
+  needs to work. The open, high-value follow-up experiment: simulate a *miscalibrated* noisy extractor
+  (confidence uncorrelated with, or inversely correlated with, true correctness — e.g. confidence=0.9 on
+  wrong-fires specifically) and re-measure whether the harm-subset recovery survives, shrinks, or reverses.
+  If it survives even moderate miscalibration, that's a real, shippable result; if it collapses, that's the
+  honest boundary condition that should ship WITH the technique, not be discovered later by a user.
+- **STORM finding, prior-art scope:** soft/faceted metadata filtering, weighted RRF, and NER
+  confidence-gating (e.g. LinkNER, arXiv:2402.10573, which hard-thresholds on confidence) all exist as
+  separate established techniques; the specific combination — a *continuous* RRF fusion weight scaled by
+  confidence x selectivity, graceful-degrading to plain hybrid at w->0 — was not found published as a named
+  technique elsewhere. Honest framing: a novel combination of established sub-techniques, not a new
+  primitive. Do not oversell past that.
