@@ -83,12 +83,22 @@ def _save_state(s):
         pass
 
 
+CHURN_PERSIST_HOURS = 2         # require N CONSECUTIVE churning hours before flagging (kill single-hour noise)
+
+
 def _check_churn(st, now):
-    """Flag organs that grew in spend but not in value since last check -> queue a rebuild (cooldowned)."""
+    """Flag organs that grew in spend but not in value for CHURN_PERSIST_HOURS consecutive checks in a
+    row -> queue a rebuild (cooldowned). A single noisy hour is not enough: 2026-07-01 diagnosis found
+    'agent-dialogue' (the biggest spender, 19.8M tok) flagged off ONE quiet hour despite a decent
+    cumulative ROI (0.24, second only to verify-findings 0.78) -- the same one-window-noise pattern as
+    the earlier busy-but-idle false alarm (commit 8d2ff7e) and the match-organ false alarm. Persistence
+    turns a noisy single sample into a real signal without hiding genuine churn (which keeps re-triggering
+    hour after hour by definition)."""
     m = _get("/metabolism")
     if not m or "organs" not in m:
         return
     prev = st.get("organs", {})
+    streak = st.setdefault("churn_streak", {})
     cur = {k: {"ktok": v.get("ktok", 0), "value": v.get("value", 0)} for k, v in m["organs"].items()}
     for organ, o in cur.items():
         if organ in CHURN_EXEMPT:
@@ -99,15 +109,22 @@ def _check_churn(st, now):
         dktok = o["ktok"] - p["ktok"]
         dval = o["value"] - p["value"]
         if dktok >= CHURN_KTOK_GROWTH and dval < CHURN_VALUE_GAIN:
+            streak[organ] = streak.get(organ, 0) + 1
+        else:
+            streak[organ] = 0
+        if streak.get(organ, 0) >= CHURN_PERSIST_HOURS:
             last = st["rebuild_flagged"].get(organ, 0)
             if now - last > REBUILD_COOLDOWN_S:
                 st["rebuild_flagged"][organ] = now
                 _queue(f"AUTO-REBUILD (self-improvement controller): organ '{organ}' is CHURNING — burned "
-                       f"~{dktok:.0f}k tokens in the last hour for <{CHURN_VALUE_GAIN} value points (ROI ~0). "
+                       f"~{dktok:.0f}k tokens in the last hour for <{CHURN_VALUE_GAIN} value points (ROI ~0), "
+                       f"{streak[organ]} consecutive hours running. "
                        f"Diagnose it and rebuild it toward a measured, value-producing form (severe-test / "
                        f"real receipt), or throttle/quiet it if it can't earn its keep. One change, verify, commit.")
-                _telegram(f"Self-improvement: '{organ}' churning (+{dktok:.0f}k tok, ~0 value) -> queued a rebuild task.")
-                print(f"[selfimp] churn flagged: {organ} +{dktok:.0f}k tok / +{dval:.1f} value", flush=True)
+                _telegram(f"Self-improvement: '{organ}' churning (+{dktok:.0f}k tok, ~0 value, "
+                          f"{streak[organ]}h streak) -> queued a rebuild task.")
+                print(f"[selfimp] churn flagged: {organ} +{dktok:.0f}k tok / +{dval:.1f} value "
+                      f"({streak[organ]}h streak)", flush=True)
     st["organs"] = cur
 
 
