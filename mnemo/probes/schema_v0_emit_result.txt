@@ -1,0 +1,31 @@
+=== schema_v0 emitter: a real mnemo record -> the interchange payload ===
+
+{
+  "version": "schema_v0",
+  "fact_record": {
+    "id": "de254ecd29",
+    "valid_from": 1782893022.3804295,
+    "recorded_at": 1782893022.3804295,
+    "key": "billing-api::auth-method",
+    "subject": "billing-api",
+    "relation": "auth-method",
+    "object": null,
+    "text": "The billing API authenticates with API keys.",
+    "sources": [
+      {
+        "channel": "doc",
+        "principal": "runbook#auth"
+      },
+      {
+        "channel": "tool",
+        "principal": "kms:rotate-job"
+      }
+    ],
+    "corroboration_count": 2,
+    "effective_value": 1.0,
+    "mtype": "semantic",
+    "status": "active"
+  }
+}
+
+[validate] payload conforms to mnemo/schema_v0.json
