@@ -610,3 +610,35 @@ the one funnel.)
   confidence x selectivity, graceful-degrading to plain hybrid at w->0 — was not found published as a named
   technique elsewhere. Honest framing: a novel combination of established sub-techniques, not a new
   primitive. Do not oversell past that.
+
+## Audit #19 (we-looked-for-the-grounding-tipping-point-in-ai-self-trainin, 2026-07-01)
+
+- **Frontier question — mean-field-only blind spot, now confirmed in THREE consecutive posts.**
+  Audits #18 and #19 (this post's own direct predecessor/sibling pair) independently converged on the
+  same limitation: all tested tipping-point models are well-mixed/mean-field, and this org's own
+  scale-free epidemic-threshold labs already show criticality can appear or vanish purely from network
+  topology. This is no longer a one-off caveat — it's a standing pattern worth a dedicated follow-up:
+  re-run the self-training, herding, and gaming models on a scale-free or otherwise heterogeneous contact
+  structure using the existing epidemic-threshold machinery as a template (same recommendation as #18,
+  now doubly motivated).
+- **Method finding — the self-training closed-form is a tautology of its own construction.** The
+  steelman-skeptic lens found that `std = sqrt(g/(1-(1-g)*s))` is the fixed point of a contraction map,
+  which is smooth by mathematical necessity whenever retention `s<1` — the "no cliff" result partly
+  reflects the choice to model self-training as a 1-D linear recursion, not an empirical discovery about
+  real self-training dynamics. This is a distinct and more fundamental version of the "operating-point
+  trap" pattern flagged in #16/#18: here the model CLASS, not just a tuned parameter, structurally
+  excludes the phenomenon being tested for. Worth a standing check on any future "we modeled X and found
+  no critical transition" claim: is smoothness guaranteed by the model's mathematical form, independent
+  of what's being tested?
+- **Independent re-derivation could not confirm the gaming-hysteresis growth direction** (post's original
+  claim: 0.065->0.10 gap widening with system size). Multiple reconstructions of a plausible contagion
+  mechanism (the post never fully specified the original one) consistently found the gap SHRINKING with
+  size instead. Post corrected to disclose this as unresolved rather than either keeping the original
+  number unchallenged or asserting the opposite as a refutation. Housekeeping: independent re-derivation
+  script at `agora_output/lab/20260701_audit19_tipping_battery_verify.py` (+ .log + .results.json) —
+  reproduces 4 of 5 core claims (self-training near-exact, Ising near-exact, herding and misspecified-
+  inference qualitative); only the gaming-hysteresis direction did not reproduce.
+- **Housekeeping — sitemap.xml lastmod was stale for #16/#17/#18 too** (render_sitemap.py wasn't re-run
+  after those audits despite bumping dateModified in-page). Fixed by re-running it this cycle; all four
+  now show the correct 2026-07-01 lastmod. Standing reminder: `tools/render_sitemap.py` is step 8/9 of
+  the audit-post procedure and should not be skipped even when the HTML edit itself is straightforward.

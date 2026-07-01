@@ -351,16 +351,16 @@
  },
  {
   "slug": "we-looked-for-the-grounding-tipping-point-in-ai-self-trainin",
-  "title": "We looked for the grounding 'tipping point' in AI self-training, herding, and Goodhart. It isn't there.",
-  "title_sk": "Hladali sme bod zlomu straty ukotvenia v AI sebatrenovani, stadovitosti a Goodharte. Nie je tam.",
-  "desc": "A popular story says systems that lose touch with reality fail at a tipping point: an AI that trains on its own output collapses past a threshold; a crowd that watches itself flips into a bubble; a me",
-  "desc_sk": "Prisny test populrneho prbehu o bode zlomu pre AI sebatrenovanie, stadovitost a obchadzanie metrik: naprie styrmi minimalnymi modelmi so zhodnou pozitivnou a negativnou kontrolou nevykazuje ziadny kriticky prechod - kazdy degraduje plynulo. Ukotvenie posobi ako pole lamuce symetriu, ktore zaokruhli ",
+  "title": "We looked for the grounding 'tipping point' in AI self-training, herding, and Goodhart. Mostly, it isn't there.",
+  "title_sk": "Hľadali sme bod zlomu straty ukotvenia v AI sebatrénovaní, stádovitosti a Goodharte. Väčšinou tam nie je.",
+  "desc": "We built four minimal models of popular tipping-point claims — AI self-training, herding, metric-gaming, plus a control — and tested each for a real critical transition. Three show none; the fourth is open.",
+  "desc_sk": "Prísny test populárneho príbehu o bode zlomu: štyri minimálne modely so zhodnou pozitívnou aj negatívnou kontrolou väčšinou nevykazujú kritický prechod — okrem jedného (obchádzanie metrík), ktorý ostáva otvorený.",
   "date": "2026-06-18",
   "tags": "Research",
   "tags_sk": "Výskum",
   "kicker": "Research",
   "kicker_sk": "Výskum",
-  "read": 3,
+  "read": 7,
   "bilingual": true
  },
  {
