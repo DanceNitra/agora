@@ -753,3 +753,22 @@ the one funnel.)
   precursor signals. But even confirmed critical systems (e.g. financial markets, per Guttal et al.) often
   don't show clean critical-slowing-down precursors in practice — so "it's critical, therefore build an
   early-warning dashboard" is itself not a safe inference without checking the specific mechanism.
+
+## Frontier candidate from inbox triage (2026-07-01): mnemo poison-guard vs. AgentPoison-style attack
+
+- **Frontier question:** does mnemo's corroboration-gate (episodic->semantic promotion requiring earned
+  trust, [[mnemo-poison-guard-hole]]) hold up against an AgentPoison-style OPTIMIZED trigger attack — not
+  just naive repeated-poisoning (already tested), but an adversarially-optimized embedding-space trigger
+  designed to be retrieved with high probability for a target query while evading simple corroboration
+  checks? AgentPoison (Chen et al. 2024, NeurIPS, doi:10.52202/079017-4136) is a real, citable red-teaming
+  technique for exactly this attack surface (poisoning an LLM agent's RAG memory/knowledge base).
+- **Why deferred, not built now:** a proper test requires (a) implementing or approximating the
+  AgentPoison optimization procedure, (b) a real severe-test falsifier (does the gate's detection rate
+  degrade specifically against optimized vs. naive triggers), (c) the full VALIDATE->STORM->AUDIT->VERIFY
+  gate since this is a security claim about our own shipped product (mnemo). This is a full audit-post-
+  scale undertaking, not a quick Lab script — flagged here rather than rubber-stamped as a thin note.
+- **Related leads bundled into this one frontier flag** (not separately noted, per the "no small notes
+  from thin leads" rule): "Prompt Persistence Attacks: Long-Term Memory Poisoning in LLM-Based Systems",
+  "SpAIware" (persistent-memory attack vector), "Thinking Like a NERD: Entity-Centered Memory for LLM
+  Agents", and an "LLM Memory Poisoning Attack" database entry — all describe the same attack surface
+  (persistent/RAG memory poisoning), useful as a citation cluster when this frontier item is picked up.
