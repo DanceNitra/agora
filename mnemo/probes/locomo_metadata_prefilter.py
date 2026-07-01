@@ -122,7 +122,10 @@ for D0 in D:
             _all.append(q["question"])
 warmup(_all)
 
-METHODS = ("hybrid", "hybrid+speaker", "hybrid+session_oracle")
+METHODS = ("hybrid", "hybrid+speaker", "hybrid+speaker_soft", "hybrid+session_oracle")
+# harm subset = questions where the speaker heuristic FIRES but the gold turn is the OTHER speaker's
+# (a wrong hard-filter deletes the answer). Tracks baseline / hard / soft recall there globally.
+harm = {"hybrid": [], "hybrid+speaker": [], "hybrid+speaker_soft": []}
 per_conv = {m: [] for m in METHODS}          # per-conversation mean recall@20
 fire = correct = fired_gold_kept = 0
 n_q = 0
@@ -145,15 +148,29 @@ for ci, D0 in enumerate(D):
         conv_acc["hybrid"].append(len(g & set(rk[:K])) / ng)
         # speaker heuristic
         qn = q["question"].lower(); na = sa.lower() in qn; nb = sb.lower() in qn
+        gold_all_named = None
         if na ^ nb:                                   # exactly one speaker named -> filter
             fire += 1; named = sa if na else sb
             cand = [i for i in order if spk[i] == named]
-            if all(spk[gi] == named for gi in g): correct += 1
+            gold_all_named = all(spk[gi] == named for gi in g)
+            if gold_all_named: correct += 1
             if g.issubset(set(cand)): fired_gold_kept += 1
+            # HARD: restrict the pool to the named speaker (a wrong filter hard-deletes the answer)
             rk_s = hybrid_over(cand, oidx, bm, tvec, qv, q["question"]) if cand else []
+            # SOFT (jacksonxly): don't delete - BOOST matching-speaker via RRF with a speaker prior,
+            # keep every turn as fallback (matching first, then the rest, both in hybrid order)
+            prior = [i for i in rk if spk[i] == named] + [i for i in rk if spk[i] != named]
+            rk_soft = rrf(rk, prior, order)
         else:
             rk_s = rk                                 # no confident filter -> fall back to full hybrid
+            rk_soft = rk
         conv_acc["hybrid+speaker"].append(len(g & set(rk_s[:K])) / ng)
+        conv_acc["hybrid+speaker_soft"].append(len(g & set(rk_soft[:K])) / ng)
+        # harm subset: heuristic fired but gold is (partly) the OTHER speaker -> hard filter should hurt
+        if gold_all_named is False:
+            harm["hybrid"].append(len(g & set(rk[:K])) / ng)
+            harm["hybrid+speaker"].append(len(g & set(rk_s[:K])) / ng)
+            harm["hybrid+speaker_soft"].append(len(g & set(rk_soft[:K])) / ng)
         # session oracle (ceiling): restrict to sessions of the gold turns
         gsess = {session_of(gi) for gi in g}
         cand_sess = [i for i in order if session_of(i) in gsess]
@@ -185,7 +202,14 @@ for m in METHODS:
     else:
         lo, hi = boot_ci(dlt); sig = "" if (lo <= 0 <= hi) else "  (excludes 0)"
         print(f"{m:<24}{r:>10.3f}{mean(dlt):>+18.3f}{f'{wins}/10':>15}{f'[{lo:+.3f}, {hi:+.3f}]{sig}':>24}")
-print("\nReading: hybrid+speaker is the CHEAP, shippable filter (exact-match 2 names, no LLM);")
+nh = len(harm["hybrid"])
+print(f"\nHARM SUBSET (heuristic fired but gold is the OTHER speaker's turn), n={nh}:")
+print(f"  {'hybrid (no filter)':<24}{mean(harm['hybrid']):>8.3f}")
+print(f"  {'hard filter':<24}{mean(harm['hybrid+speaker']):>8.3f}  <- a wrong hard-filter deletes the answer")
+print(f"  {'soft filter (boost+fallback)':<24}{mean(harm['hybrid+speaker_soft']):>8.3f}  <- keeps the fallback")
+print("\nReading: hybrid+speaker (HARD) is the cheap filter (exact-match 2 names, no LLM); it wins overall")
+print("but ZEROES the harm subset. hybrid+speaker_soft (jacksonxly: boost, don't delete) keeps ~the overall")
+print("gain AND rescues the harm subset - the safer default when extraction is lossy.")
 print("hybrid+session_oracle is the CEILING of a perfect time/session filter (uses gold -> not shippable).")
 print("If speaker's CI excludes 0 positive, cheap metadata filtering beats retriever choice here;")
 print("if it includes 0 while the oracle ceiling is large, the lever is real but needs better filter extraction.")
@@ -193,6 +217,9 @@ print("if it includes 0 while the oracle ceiling is large, the lever is real but
 result = {"k": K, "n_q": n_q, "n_conv": len(base),
           "recall@20": {m: round(mean(per_conv[m]), 4) for m in METHODS},
           "delta_vs_hybrid": {m: round(mean([per_conv[m][i]-base[i] for i in range(len(base))]), 4) for m in METHODS if m != "hybrid"},
-          "speaker_fire_rate": round(fire/n_q, 3), "speaker_correct_rate": round(correct/max(fire, 1), 3)}
+          "speaker_fire_rate": round(fire/n_q, 3), "speaker_correct_rate": round(correct/max(fire, 1), 3),
+          "harm_subset": {"n": nh, "hybrid": round(mean(harm["hybrid"]), 4),
+                          "hard": round(mean(harm["hybrid+speaker"]), 4),
+                          "soft": round(mean(harm["hybrid+speaker_soft"]), 4)}}
 json.dump(result, open("locomo_metadata_prefilter_result.json", "w"), indent=1)
 print("\nsaved: locomo_metadata_prefilter_result.json")

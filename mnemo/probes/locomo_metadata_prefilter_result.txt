@@ -1,0 +1,34 @@
+warmup: all cached
+  conv 0: 419 turns, 149 Q (t+10s)
+  conv 1: 369 turns, 81 Q (t+14s)
+  conv 2: 663 turns, 152 Q (t+30s)
+  conv 3: 629 turns, 199 Q (t+48s)
+  conv 4: 680 turns, 178 Q (t+67s)
+  conv 5: 675 turns, 123 Q (t+81s)
+  conv 6: 689 turns, 150 Q (t+98s)
+  conv 7: 681 turns, 191 Q (t+120s)
+  conv 8: 509 turns, 153 Q (t+133s)
+  conv 9: 568 turns, 155 Q (t+148s)
+
+=== LoCoMo metadata pre-filter (recall@20, n_q=1531, 10 conversations) ===
+speaker heuristic fired on 1366/1531 Q (89%); named-speaker owns ALL gold 1292/1366 (94%); gold fully kept after filter 1292/1366 (94%)
+
+method                   recall@20   delta vs hybrid  conv win-rate      95% CI (conv boot)
+hybrid                       0.583                --             --                      --
+hybrid+speaker               0.729            +0.146          10/10[+0.124, +0.173]  (excludes 0)
+hybrid+speaker_soft          0.711            +0.129          10/10[+0.116, +0.144]  (excludes 0)
+hybrid+session_oracle        0.927            +0.345          10/10[+0.319, +0.375]  (excludes 0)
+
+HARM SUBSET (heuristic fired but gold is the OTHER speaker's turn), n=74:
+  hybrid (no filter)         0.558
+  hard filter                0.152  <- a wrong hard-filter deletes the answer
+  soft filter (boost+fallback)   0.271  <- keeps the fallback
+
+Reading: hybrid+speaker (HARD) is the cheap filter (exact-match 2 names, no LLM); it wins overall
+but ZEROES the harm subset. hybrid+speaker_soft (jacksonxly: boost, don't delete) keeps ~the overall
+gain AND rescues the harm subset - the safer default when extraction is lossy.
+hybrid+session_oracle is the CEILING of a perfect time/session filter (uses gold -> not shippable).
+If speaker's CI excludes 0 positive, cheap metadata filtering beats retriever choice here;
+if it includes 0 while the oracle ceiling is large, the lever is real but needs better filter extraction.
+
+saved: locomo_metadata_prefilter_result.json
