@@ -811,15 +811,36 @@ class AgentOS:
                 pass
 
         # ── Real action execution ──
-        real_action = decision.get("real_action")
+        # Ambient ticks may ONLY perform knowledge/vault actions. Agents must talk to EACH OTHER
+        # (seek_help/cooperate/share target other agents) and fill the vault — they must NEVER DM the
+        # owner (send_telegram), run shell (run_script), or push git (git_commit) from an ambient tick.
+        # The owner's Telegram surface is the brain's report loops + the Vault-Company OS, not per-agent
+        # pings. This whitelist holds even if the LLM hallucinates a real_action that is not advertised.
+        _AMBIENT_REAL_ACTIONS = ("write_note", "write_article", "ask_question")
+        real_action = _sfield(decision, "real_action", "")
         real_params = decision.get("real_params", {})
+        if real_action and real_action not in _AMBIENT_REAL_ACTIONS:
+            # Redirect the impulse inward instead of pinging the owner: record it as a thought so the
+            # agent surfaces it to the swarm next tick, and drop the owner-facing action silently.
+            if real_action == "send_telegram":
+                try:
+                    msg = (real_params.get("message") if isinstance(real_params, dict) else "") or ""
+                    await self.db.execute(
+                        "INSERT INTO agent_thoughts (npc_id, thought_type, content, context, importance) "
+                        "VALUES (?, 'blocked_owner_ping', ?, 'redirected to swarm', 0.4)",
+                        (npc_id, ("Wanted to ask the owner: " + str(msg))[:240]))
+                    await self.db.commit()
+                except Exception:
+                    pass
+            real_action = None
         if real_action and self._real_action_engine:
             try:
                 result = await self._real_action_engine.execute(
                     action_type=real_action,
                     params=real_params,
                     agent_name=name,
-                    broadcast_fn=lambda t, p: None,
+                    broadcast_fn=None,   # no-op broadcast for internal real-actions; a sync lambda here
+                                         # returns None and `execute` does `await broadcast_fn(...)` -> crash
                 )
                 if result.get("status") in ("ok", "written", "sent"):
                     print(f"[RealAction] {name}: {real_action} → {result.get('output', '')[:80]}")

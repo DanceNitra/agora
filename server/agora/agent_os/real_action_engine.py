@@ -73,13 +73,18 @@ class RealActionEngine:
 
     async def get_action_context(self, agent_name: str, role: str) -> str:
         """Return formatted string for LLM prompt injection."""
+        # Ambient agents get KNOWLEDGE actions only. They must never DM the owner (send_telegram),
+        # run shell (run_script), or push git (git_commit) from an ambient tick — those pinged the
+        # owner's Telegram with "give me a task / which to prioritize" spam. Agent-to-agent coordination
+        # happens via the decision `action` field (seek_help/cooperate/share); the owner's report surface
+        # is the brain's report loops + the Vault-Company OS. (agent_os enforces the same whitelist.)
         role_actions = {
-            "adventurer": ["write_note", "send_telegram"],
-            "scout": ["write_note", "send_telegram"],
-            "sage": ["write_note", "write_article", "ask_question", "send_telegram"],
-            "blacksmith": ["run_script", "git_commit", "write_note", "send_telegram"],
-            "alchemist": ["write_note", "write_article", "send_telegram"],
-            "guard": ["write_note", "send_telegram"],
+            "adventurer": ["write_note"],
+            "scout": ["write_note", "ask_question"],
+            "sage": ["write_note", "write_article", "ask_question"],
+            "blacksmith": ["write_note", "ask_question"],
+            "alchemist": ["write_note", "write_article"],
+            "guard": ["write_note"],
         }
         actions = role_actions.get(role, ["write_note"])
 
