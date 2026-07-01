@@ -642,3 +642,29 @@ the one funnel.)
   after those audits despite bumping dateModified in-page). Fixed by re-running it this cycle; all four
   now show the correct 2026-07-01 lastmod. Standing reminder: `tools/render_sitemap.py` is step 8/9 of
   the audit-post procedure and should not be skipped even when the HTML edit itself is straightforward.
+
+## STORM addendum to Audit #19 (retroactive, 2026-07-01 — the missed step, run after the owner caught it)
+
+- **Frontier question, sharpened by STORM's Historian + Skeptic lenses:** does the same four-model
+  finite-size-scaling battery flip its verdict on a realistic (scale-free/heterogeneous) network topology
+  instead of well-mixed mean-field? This isn't hypothetical either direction — physics has DOCUMENTED
+  cases of structure erasing a mean-field-predicted transition (Pastor-Satorras & Vespignani 2001, epidemic
+  threshold vanishes on scale-free networks) AND cases of structure creating one the mean-field limit missed
+  (explosive percolation, Achlioptas et al. 2009 / Riordan & Warnke 2011). A well-mixed null genuinely does
+  not settle which way real self-training/herding/gaming systems would go. Directly actionable: re-run
+  claim2_herding and claim3_gaming from `20260701_audit19_tipping_battery_verify.py` on a scale-free contact
+  structure using the org's existing epidemic-threshold machinery as a template (now recommended by THREE
+  independent findings: #18's blind-spot lens, #19's own blind-spot lens, and this STORM briefing).
+- **The gaming/Goodhart question is contested in the peer-reviewed literature itself**, not just in this
+  org's inconclusive reconstruction: Pan, Bhatia & Steinhardt (ICLR 2022, arXiv:2201.03544) found genuine
+  discontinuous capability-threshold reward-hacking in some RL environments; Gao, Schulman & Hilton (ICML
+  2023, arXiv:2210.10760) found smooth scaling curves in others. Neither paper is reconciled with the other.
+  Worth a dedicated follow-up: what distinguishes the RL environments where Pan et al. found a real cliff
+  from the RM-overoptimization setting where Gao et al. found smoothness — is it the same mean-field/
+  structure distinction, or something else entirely (e.g. discrete vs continuous action spaces)?
+- **Process finding, not a research finding:** running STORM AFTER stress-claim+verify-claims (instead of
+  skipping it) surfaced a real error already live on the published post — a citation URL
+  (arxiv.org/abs/cond-mat/0107493, meant for Pastor-Satorras & Vespignani 2001) that actually resolved to an
+  unrelated granular-physics paper. This would not have been caught by stress-claim's narrower prior-art
+  lens, which doesn't independently verify citations the way STORM's Phase 4 (and a dedicated verify-claims
+  pass) does. Concrete evidence for why the gate mandates storm as a SEPARATE, non-substitutable step.
