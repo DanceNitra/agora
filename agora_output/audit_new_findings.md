@@ -668,3 +668,26 @@ the one funnel.)
   unrelated granular-physics paper. This would not have been caught by stress-claim's narrower prior-art
   lens, which doesn't independently verify citations the way STORM's Phase 4 (and a dedicated verify-claims
   pass) does. Concrete evidence for why the gate mandates storm as a SEPARATE, non-substitutable step.
+
+## STORM addendum to Audit #16 (a-pre-trend-too-gentle-to-see, 2026-07-01, retroactive)
+
+- **Frontier question:** does pre-trends test power against realistic drifts vary substantially by
+  VIOLATION SHAPE (linear vs. regime-shift vs. mean-reverting), not just magnitude and panel length? Both
+  this post and Roth (2022) test linear drift; applied panels rarely know in advance which shape their own
+  violation would take. A shape-robustness sweep would sharpen how general the specific "16% detection"
+  number really is.
+- **Real precision gap found and fixed:** the post's headline 77%/16% numbers were the org's own
+  single-treated-unit simulation output, not figures Roth (2022) himself reported (his calibration used a
+  survey of real published multi-unit designs). Fixed with an explicit disclosure in 3 places (intro, FAQ,
+  FAQ JSON-LD) plus a Conley & Taber (2011) caveat that single-treated-unit inference requires an extra
+  homoskedasticity assumption the simulation imposes by construction, not one a real study gets for free.
+- **A citation from the Economist STORM lens turned out to be FALSE on verification**: "NBER w31666 finds
+  design-based methods in 72.6%/60.7% of empirical economics/political-science articles" — this figure does
+  not appear anywhere in that paper (which is actually about false-rejection rates in t-statistic
+  distributions). Excluded from the post and the STORM report, flagged explicitly as a caught fabrication —
+  concrete evidence for why Phase-4 verification catches things a lens's own citation list can't be trusted
+  on face value, even when the lens cites a real, existing, correctly-titled paper.
+- **Contested signal surfaced:** Mikhaeil & Harshaw (2025, arXiv:2510.26470) argue the "underpowered
+  pre-trends test" framing itself implicitly tests against an unrealistic zero-violation null — a live,
+  unresolved methodological pushback against Roth's diagnosis, now disclosed in the post as contested, not
+  settled either way.

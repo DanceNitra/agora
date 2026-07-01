@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Does a gentle pre-trend evade the standard DiD pre-trends test? — Storm Research Briefing</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&family=Roboto+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ink:#0f172a; --body:#334155; --muted:#64748b; --line:#e2e8f0; --bg:#ffffff;
+    --soft:#f8fafc; --accent:#2563eb; --accent-soft:#eff6ff;
+    --ok:#16a34a; --ok-soft:#f0fdf4; --warn:#d97706; --warn-soft:#fffbeb;
+    --bad:#dc2626; --bad-soft:#fef2f2; --demote:#7c3aed; --demote-soft:#f5f3ff;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--soft);color:var(--body);
+    font-family:"Montserrat",system-ui,-apple-system,sans-serif;line-height:1.62;font-size:16px}
+  .wrap{max-width:860px;margin:0 auto;padding:48px 24px 96px}
+  .card{background:var(--bg);border:1px solid var(--line);border-radius:14px;padding:28px 32px;margin:20px 0;
+    box-shadow:0 1px 2px rgba(15,23,42,.04)}
+  h1{font-size:34px;line-height:1.18;font-weight:800;color:var(--ink);margin:0 0 10px}
+  h2{font-size:13px;font-weight:700;letter-spacing:.09em;text-transform:uppercase;color:var(--accent);margin:0 0 16px}
+  h3{font-size:19px;font-weight:700;color:var(--ink);margin:0 0 6px}
+  p{margin:0 0 14px}
+  a{color:var(--accent);text-decoration:none;border-bottom:1px solid #bfdbfe}
+  a:hover{border-color:var(--accent)}
+  code,.mono{font-family:"Roboto Mono",monospace}
+  .topic{font-family:"Roboto Mono",monospace;font-size:13px;color:var(--muted)}
+  .meta{font-size:13px;color:var(--muted);margin-top:8px}
+  .disclosure{font-size:12.5px;color:var(--muted);background:var(--soft);border:1px dashed var(--line);
+    border-radius:10px;padding:12px 16px;margin-top:18px}
+  .verify{display:flex;flex-wrap:wrap;gap:10px;align-items:center;background:var(--accent-soft);
+    border:1px solid #bfdbfe;border-radius:12px;padding:14px 18px;margin:20px 0;font-size:14px}
+  .verify b{color:var(--ink)}
+  .pill{font-family:"Roboto Mono",monospace;font-size:12px;font-weight:600;padding:3px 10px;border-radius:999px;
+    border:1px solid var(--line);background:#fff;color:var(--body)}
+  .pill.g{color:var(--ok);border-color:#bbf7d0;background:var(--ok-soft)}
+  .pill.y{color:var(--warn);border-color:#fde68a;background:var(--warn-soft)}
+  .pill.r{color:var(--bad);border-color:#fecaca;background:var(--bad-soft)}
+  .pill.v{color:var(--demote);border-color:#ddd6fe;background:var(--demote-soft)}
+  .finding{border-top:1px solid var(--line);padding:20px 0}
+  .finding:first-of-type{border-top:0;padding-top:4px}
+  .frow{display:flex;align-items:baseline;gap:14px}
+  .rank{font-family:"Roboto Mono",monospace;font-weight:600;color:var(--muted);font-size:14px;min-width:26px}
+  .conf{margin-left:auto;font-family:"Roboto Mono",monospace;font-size:12px;font-weight:600;
+    color:var(--accent);background:var(--accent-soft);border:1px solid #bfdbfe;border-radius:999px;padding:3px 11px;white-space:nowrap}
+  .chips{display:flex;flex-wrap:wrap;gap:7px;margin:10px 0 0 40px}
+  .chip{font-size:12px;padding:3px 10px;border-radius:6px;border:1px solid var(--line);background:var(--soft);color:var(--muted)}
+  .chip.sup{color:var(--ok);border-color:#bbf7d0;background:var(--ok-soft)}
+  .chip.chg{color:var(--bad);border-color:#fecaca;background:var(--bad-soft)}
+  .finding p{margin:8px 0 0 40px}
+  .guide{display:grid;grid-template-columns:1fr;gap:14px}
+  @media(min-width:640px){.guide{grid-template-columns:1fr 1fr 1fr}}
+  .gcol{border:1px solid var(--line);border-radius:10px;padding:16px}
+  .gcol h4{margin:0 0 10px;font-size:13px;letter-spacing:.05em;text-transform:uppercase}
+  .gcol.assert{background:var(--ok-soft);border-color:#bbf7d0}.gcol.assert h4{color:var(--ok)}
+  .gcol.caveat{background:var(--warn-soft);border-color:#fde68a}.gcol.caveat h4{color:var(--warn)}
+  .gcol.avoid{background:var(--bad-soft);border-color:#fecaca}.gcol.avoid h4{color:var(--bad)}
+  .gcol ul{margin:0;padding-left:18px;font-size:14px}.gcol li{margin:6px 0}
+  ul.moves{padding-left:20px}ul.moves li{margin:9px 0}
+  .sidebar{background:var(--demote-soft);border:1px solid #ddd6fe;border-radius:12px;padding:18px 22px;margin:20px 0}
+  .sidebar h2{color:var(--demote)}
+  .frontier{background:var(--ink);color:#e2e8f0;border-radius:14px;padding:30px 32px;margin:24px 0}
+  .frontier h2{color:#93c5fd}.frontier .q{font-size:22px;font-weight:700;color:#fff;line-height:1.4}
+  .refs{font-size:13.5px}
+  .ref{padding:11px 0;border-top:1px solid var(--line);display:flex;gap:12px;align-items:flex-start}
+  .ref:first-of-type{border-top:0}
+  .tag{font-family:"Roboto Mono",monospace;font-size:10.5px;font-weight:600;letter-spacing:.04em;
+    padding:2px 8px;border-radius:5px;white-space:nowrap;margin-top:2px}
+  .tag.ok{color:var(--ok);background:var(--ok-soft);border:1px solid #bbf7d0}
+  .tag.partial{color:var(--warn);background:var(--warn-soft);border:1px solid #fde68a}
+  .tag.unver{color:var(--muted);background:var(--soft);border:1px solid var(--line)}
+  .tag.false{color:var(--bad);background:var(--bad-soft);border:1px solid #fecaca}
+  .tag.demoted{color:var(--demote);background:var(--demote-soft);border:1px solid #ddd6fe}
+  .grade{font-family:"Roboto Mono",monospace;font-weight:600;color:var(--ink)}
+  footer{text-align:center;color:var(--muted);font-size:12px;margin-top:40px}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header>
+    <h1>A gentle pre-trend evades the standard DiD test — real, established, but our specific 77%/16% numbers are ours, not Roth's</h1>
+    <div class="topic">topic: does a gentle/small pre-trend violation meaningfully bias a difference-in-differences estimate while evading the standard pre-trends test at realistic panel lengths? · for applied economists, policy analysts, and industry causal-inference practitioners running DiD</div>
+    <div class="meta">July 1, 2026 · Storm Research · 5-lens, citation-verified</div>
+    <div class="disclosure">
+      The five expert lenses below are an <b>author-built panel</b> (simulated Practitioner, Academic,
+      Skeptic, Economist, Historian), not independent field experts. Agreement across lenses is a strong
+      hypothesis, not consensus of the field. Every cited figure was verified against its primary source
+      (see status tags). Commissioned as the missing STORM step of an audit-post correction cycle for post
+      #16 in this org's audit series — retroactively run after the owner caught it was skipped originally.
+    </div>
+  </header>
+
+  <div class="verify">
+    <b>Verification:</b>
+    <span class="pill g">5/5 new citations checked</span>
+    <span class="pill r">1 false (excluded, not published)</span>
+    <span class="pill y">0 corrected</span>
+    <span class="pill v">0 demoted</span>
+    <span class="grade" style="margin-left:auto">Overall grade: B+</span>
+  </div>
+
+  <section class="card">
+    <h2>The 60-second summary</h2>
+    <p>Roth (2022, AER: Insights, published) is real and correctly characterized: standard pre-trends tests
+    have low power against realistic violations, and conditioning inference on passing the test makes things
+    worse, not better. That part of the post is solid. Where the panel pushed back hard, converging from two
+    independent directions (Skeptic and Academic): the post's specific headline numbers — a gentle drift
+    biases the estimate by 77%, detected only 16% of the time — are the org's OWN simulation output from one
+    stylized single-treated-unit design, not figures Roth himself reported (his calibration used a survey of
+    real published multi-unit designs). This is a real, fixable precision issue, not a fatal flaw — the
+    qualitative mechanism reproduces faithfully; the specific numbers just needed to stop reading as if
+    quoted from Roth. A second, genuine methodological wrinkle: a single-treated-unit DiD design requires an
+    extra assumption (homoskedastic errors across units, Conley &amp; Taber 2011) for valid inference, which
+    this post's simulation imposes by construction rather than earning empirically — worth disclosing. The
+    practical stakes are real: the field's most widely used applied DiD toolkit doesn't even cite Roth or
+    mention test power, and historically (per the Historian lens), proof that a diagnostic is broken rarely
+    changes field-wide practice on its own.</p>
+  </section>
+
+  <section class="card">
+    <h2>Key findings — ranked by reliability</h2>
+
+    <div class="finding">
+      <div class="frow"><span class="rank">01</span><h3>Roth (2022)'s core finding — pre-trends tests are underpowered, and conditioning on passing one worsens bias — is real, published, and correctly cited</h3>
+        <span class="conf">confidence 9/10</span></div>
+      <div class="chips">
+        <span class="chip sup">Supported by: Academic, Practitioner</span>
+      </div>
+      <p>AER: Insights 4(3), 2022, DOI 10.1257/aeri.20210236. Two distinct results: low power against realistic
+      violations, and a separate pretest-conditioning bias that undercuts confidence-interval coverage. Both
+      accurately represented in the post.</p>
+    </div>
+
+    <div class="finding">
+      <div class="frow"><span class="rank">02</span><h3>The post's 77%/16% figures are its own simulation's output, not Roth's reported numbers — a real precision gap, now fixed</h3>
+        <span class="conf">confidence 9/10</span></div>
+      <div class="chips">
+        <span class="chip sup">Supported by: Skeptic, Academic</span>
+      </div>
+      <p>Roth's own power calibration used a heterogeneous survey of real published DiD designs. This org
+      built one specific, extreme design (a single treated unit vs. 20 controls) to make the mechanism
+      concrete and runnable — a legitimate contribution, but the post needed an explicit statement that these
+      exact numbers are the org's own, illustrating (not quoting) Roth's mechanism. Fixed in this cycle.</p>
+    </div>
+
+    <div class="finding">
+      <div class="frow"><span class="rank">03</span><h3>Single-treated-unit DiD inference requires an extra homoskedasticity assumption the simulation imposes by construction</h3>
+        <span class="conf">confidence 8/10</span></div>
+      <div class="chips">
+        <span class="chip sup">Supported by: Skeptic (Conley &amp; Taber 2011)</span>
+      </div>
+      <p>With n=1 treated unit, standard asymptotic inference generally requires assuming errors are
+      distributed identically across treated and control units — the simulation's uniform noise SD across all
+      units satisfies this by design, which is honest for a toy model but not something a real single-unit
+      applied study gets for free. Now disclosed in the post.</p>
+    </div>
+
+    <div class="finding">
+      <div class="frow"><span class="rank">04</span><h3>The applied gap is real: the most widely used DiD toolkit doesn't mention pre-trends test power at all</h3>
+        <span class="conf">confidence 7/10</span></div>
+      <div class="chips">
+        <span class="chip sup">Supported by: Practitioner</span>
+      </div>
+      <p>Callaway's <code>did</code> R package documentation walks through pre-testing mechanics without
+      citing Roth (2022) or discussing power — evidence the underpowered-pretest problem is not yet
+      operationally addressed in the field's standard applied tooling, strengthening the post's practical
+      relevance.</p>
+    </div>
+
+    <div class="finding">
+      <div class="frow"><span class="rank">05</span><h3>Historically, proof that a diagnostic test is underpowered rarely changes field-wide practice on its own</h3>
+        <span class="conf">confidence 6/10</span></div>
+      <div class="chips">
+        <span class="chip sup">Supported by: Historian</span>
+        <span class="chip chg">Challenged by: the DiD-credibility-revolution DID eventually shift some practice (Goodman-Bacon, de Chaisemartin-D'Haultfœuille)</span>
+      </div>
+      <p>Cohen (1962) showed psychology studies were underpowered; Sedlmeier &amp; Gigerenzer (1989) found
+      power hadn't meaningfully improved 27 years later despite Cohen's warning being well cited. A sobering,
+      not certain, precedent for how much the Roth 2022 warning will actually change applied DiD practice.</p>
+    </div>
+  </section>
+
+  <section class="card">
+    <h2>The hidden connection</h2>
+    <p>The Skeptic/Academic precision issue and the Practitioner's applied-gap finding are two sides of the
+    same coin: the reason a single-treated-unit toy simulation is tempting to build (and to publish numbers
+    from) is exactly the reason practitioners don't run power checks in real applied work — the honest
+    power-calibration Roth actually did (a survey of real heterogeneous designs) is expensive and doesn't
+    reduce to one quotable number, while a stylized simulation does. The org fell into a milder version of the
+    same trap the field's applied tooling falls into: a clean, quotable number is more attractive than an
+    honestly-scoped, harder-to-summarize truth.</p>
+  </section>
+
+  <section class="card">
+    <h2>Key assumption · the missing 6th lens</h2>
+    <p>None of the five lenses examined how test power scales with the SPECIFIC violation shape assumed.
+    The post (and Roth) test linear drift; a regime-shift, mean-reverting wobble, or discrete jump might be
+    substantially easier or harder for a pre-trends test to catch, and applied panels rarely know in advance
+    which shape their own violation (if any) would take. A "shape-robustness" lens — sweeping violation
+    functional forms, not just magnitude — would sharpen exactly how general the "16% detection" number is.</p>
+  </section>
+
+  <section class="card">
+    <h2>What to do — for applied economists and causal-inference practitioners</h2>
+    <ul class="moves">
+      <li>Don't treat "passed the pre-trends test" as clearance, especially with 6 or fewer pre-periods —
+      run Roth's <code>pretrends</code> package (<code>slope_for_power()</code>) against a plausible violation
+      size for YOUR specific design before trusting a pass.</li>
+      <li>If your DiD design has one or very few treated units, check whether you're implicitly assuming
+      homoskedastic errors across units (Conley &amp; Taber 2011) — if that assumption is shaky, standard
+      inference may not be valid regardless of what the pre-trends test says.</li>
+      <li>Report sensitivity bounds (Rambachan &amp; Roth's "honest DiD") for the plausible range of
+      violations your power analysis can't rule out, rather than a single pass/fail p-value.</li>
+      <li>Treat "the correct test detects 16% of realistic violations" as this org's own simulation-specific
+      number, not a citable fact from Roth (2022) — cite Roth for the mechanism, this org's Lab for the
+      illustrative number.</li>
+    </ul>
+  </section>
+
+  <section class="card">
+    <h2>Claim safety guide</h2>
+    <div class="guide">
+      <div class="gcol assert"><h4>Safe to assert</h4><ul>
+        <li>Roth (2022) established pre-trends tests are underpowered against realistic violations, and that
+        conditioning on passing worsens subsequent bias/coverage.</li>
+        <li>Callaway's widely-used <code>did</code> package documentation doesn't cite Roth 2022 or discuss
+        test power — a real, checkable applied-tooling gap.</li>
+      </ul></div>
+      <div class="gcol caveat"><h4>Assert with caveat</h4><ul>
+        <li>"77% bias / 16% detection" — assert only as this org's own simulation output for one specific
+        single-treated-unit design, not as Roth's reported figures.</li>
+        <li>Mikhaeil &amp; Harshaw (2025) contest the "underpowered" framing itself — real, but an unpublished
+        preprint with a genuinely unresolved counter-argument, not a settled rebuttal.</li>
+      </ul></div>
+      <div class="gcol avoid"><h4>Avoid / don't repeat</h4><ul>
+        <li>Do NOT cite "NBER w31666 finds design-based methods in 72.6% of empirical economics articles" —
+        this specific figure could not be located anywhere in that paper and appears fabricated or
+        citation-swapped. The paper is about false-rejection rates in t-statistic distributions, unrelated to
+        method-adoption shares.</li>
+      </ul></div>
+    </div>
+  </section>
+
+  <aside class="sidebar">
+    <h2>Contested signal</h2>
+    <p><b>Mikhaeil &amp; Harshaw, "In Defense of the Pre-Test"</b> (arXiv:2510.26470, Oct 2025) — real preprint,
+    correct argument (the "underpowered" framing implicitly tests against a zero-violation null nobody
+    actually believes; they propose a conditional-extrapolation threshold instead). Not yet peer-reviewed;
+    presents a genuinely live, unresolved methodological disagreement with Roth's framing, not a refutation.</p>
+  </aside>
+
+  <section class="frontier">
+    <h2>The frontier question</h2>
+    <p class="q">Does pre-trends test power against realistic drifts vary substantially by VIOLATION SHAPE
+    (linear vs. regime-shift vs. mean-reverting), not just magnitude and panel length — and if so, which
+    shape is most representative of real applied violations, so power calculations stop defaulting to the
+    mathematically convenient linear case?</p>
+  </section>
+
+  <section class="card refs">
+    <h2>References — verified against primary sources</h2>
+    <div class="ref"><span class="tag ok">CONFIRMED</span>
+      <span>Roth, J. (2022). "Pretest with Caution: Event-Study Estimates after Testing for Parallel Trends." <i>AER: Insights</i> 4(3), 305–322. DOI 10.1257/aeri.20210236. Calibrated to a survey of real published designs, not one canonical DGP. <a href="https://www.aeaweb.org/articles?id=10.1257%2Faeri.20210236">AEA</a></span></div>
+    <div class="ref"><span class="tag ok">CONFIRMED</span>
+      <span>Rambachan, A. &amp; Roth, J. (2023). "A More Credible Approach to Parallel Trends." <i>Review of Economic Studies</i> 90(5), 2555–2591. The "honest DiD" sensitivity-bounds approach. <a href="https://academic.oup.com/restud/article-abstract/90/5/2555/7039335">OUP</a></span></div>
+    <div class="ref"><span class="tag ok">CONFIRMED</span>
+      <span>Conley, T.G. &amp; Taber, C.R. (2011). "Inference with 'Difference in Differences' with a Small Number of Policy Changes." <i>Review of Economics and Statistics</i> 93(1), 113–125. Single/few-treated-unit inference requires homoskedasticity across units. <a href="https://direct.mit.edu/rest/article/93/1/113/57888">MIT Press</a></span></div>
+    <div class="ref"><span class="tag ok">CONFIRMED</span>
+      <span>Mikhaeil, J.M. &amp; Harshaw, C. (2025). "In Defense of the Pre-Test." arXiv:2510.26470. Preprint, contests the "underpowered" framing as implicitly testing a zero-violation null. <a href="https://arxiv.org/abs/2510.26470">arXiv</a></span></div>
+    <div class="ref"><span class="tag ok">CONFIRMED</span>
+      <span>Cohen, J. (1962). "The Statistical Power of Abnormal-Social Psychological Research: A Review." <i>J. Abnormal and Social Psychology</i> 65(3), 145–153; Sedlmeier, P. &amp; Gigerenzer, G. (1989). "Do Studies of Statistical Power Have an Effect on the Power of Studies?" <i>Psychological Bulletin</i> 105(2), 309–316. Power unchanged 1960–1984 despite Cohen's warning. <a href="https://replicationindex.com/wp-content/uploads/2025/09/Cohen.1962.The_statistical_power_of_abnor.pdf">primary source</a></span></div>
+    <div class="ref"><span class="tag false">FALSE — EXCLUDED</span>
+      <span>NBER w31666, "How Credible Is the Credibility Revolution?" (Kevin Lang, 2023) — the claimed "72.6%/60.7% of articles use design-based methods" figure does NOT appear anywhere in this paper (which is actually about false-rejection rates in t-statistic distributions). Not used in the post. <a href="https://www.nber.org/papers/w31666">NBER</a></span></div>
+  </section>
+
+  <footer>Generated by the Storm Research pipeline · 5 lenses → contradiction map → synthesis → adversarial verification · July 1, 2026</footer>
+
+</div>
+</body>
+</html>
