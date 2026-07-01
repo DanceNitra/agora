@@ -558,3 +558,33 @@ the one funnel.)
   law": ONE shared model (not three) that puts model collapse and winner-take-all lock-in on a single
   measured critical curve phi_c(alpha) plus a quantified hysteresis gap, and a SEPARATE illustration
   making the (already-known) identification-vs-precision point concrete with a reproducible signature.
+
+## Audit #18 — we-hunted-for-the-tipping-point-in-8-systems (full 5-lens panel, 2026-07-01)
+- **Source-availability finding (systemic, not just this post):** the original lab scripts behind at
+  least 4 of the 8 claimed mechanisms could not be located in the repository this cycle (susceptibility-
+  vs-system-size for self-amplification, the exact herding fluctuation-collapse numbers, the hard-decision
+  first-order jump, the contagious-metric-gaming bistability). This is the SAME "rotated out of the
+  operational ledger" issue first flagged in audit #16 (lab id 2b7e05) — worth considering whether
+  load-bearing Lab results for flagship/synthesis posts should be force-committed to a permanent location
+  (not just the rotating .lab.json) at publish time, so future audits don't have to re-derive from scratch.
+- **Frontier Q (from the blind-spot lens, directly runnable with existing assets): does the mean-field-only
+  "grounding rounds the cliff" and "model collapse is locatable, not critical" story survive on hub-dominated
+  (scale-free) network topology?** The org already has the exact tooling to test this —
+  `20260617-090921_scalefree-epidemic-threshold-vanishes-2to3.py` and
+  `20260618-114447_scale-free-vanishing-epidemic-threshold-replicatio.py` show a mean-field-finite epidemic
+  threshold VANISHING on scale-free networks. Both of this post's "reassuring" headline claims were tested
+  only in the well-mixed limit; if real AI training pipelines / social platforms are hub-dominated (a small
+  number of reused datasets, base models, or influential accounts), both claims could behave differently.
+  This is the single most actionable follow-up: re-run the herding and self-amplification models on a
+  scale-free contact structure using the existing epidemic-threshold machinery as a template.
+- **Method finding from our own re-derivation attempt:** the herding-crowd criticality signal at q=0.5 only
+  appeared once the coupling parameter K was tuned to its exact theoretical critical value (K=1); an
+  untuned choice (K=1.5) showed no distinctive signal at all. This "operating-point trap" pattern (same
+  bug class the audit series first caught on post #3) is worth a standing check for any future criticality
+  claim: disclose whether the reported effect requires hand-tuning a free parameter to a theoretically
+  special value, or whether it is a property of the mechanism class more broadly (a proper finite-size-
+  scaling fit across a K-sweep would settle this, not just a point measurement at K=K_c).
+- **Housekeeping note:** independent re-derivation script preserved at
+  `agora_output/lab/20260701_audit18_criticality_battery_verify.py` (+ result artifact) as a partial,
+  honestly-scoped replacement for the unlocatable originals — covers only the self-amplification g*=1-1/s
+  formula (exact) and a from-scratch herding/Ising check (directional only, not a full battery).
