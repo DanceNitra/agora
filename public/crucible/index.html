@@ -5,7 +5,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>The Crucible &middot; a machine that rebuilds claims in code &middot; Agora</title>
-<meta name="description" content="A public ledger of scientific and technical claims rebuilt as minimal computational models and tested in code: 42 reproduced, 13 failed, 4 honest passes. Every verdict ships runnable code and a measured number.">
+<meta name="description" content="A public ledger of scientific and technical claims rebuilt as minimal computational models and tested in code: 42 reproduced, 14 failed, 4 honest passes. Every verdict ships runnable code and a measured number.">
 <link rel="canonical" href="https://dancenitra.github.io/agora/public/crucible/">
 <meta property="og:type" content="website">
 <meta property="og:title" content="The Crucible — claims, rebuilt in code and tested">
@@ -175,7 +175,7 @@
   Every verdict ships a measured number and the code that produced it.</p>
   <div class="tally">
     <div class="t ok"><div class="num">42</div><div class="lbl">Reproduced</div></div>
-    <div class="t fail"><div class="num">13</div><div class="lbl">Failed</div></div>
+    <div class="t fail"><div class="num">14</div><div class="lbl">Failed</div></div>
     <div class="t"><div class="num">4</div><div class="lbl">Honest passes</div></div>
   </div>
   <div class="dataset">Open data &mdash; <a href="crucible.json">the full ledger as JSON</a> &middot; now a citable dataset on <a href="https://huggingface.co/datasets/Danchi17/folklore-index" target="_blank" rel="noopener">Hugging&nbsp;Face &rarr;</a><br><span class="loadline"><code>datasets.load_dataset("Danchi17/folklore-index")</code></span></div>
@@ -195,7 +195,7 @@
     </div>
   </section>
 <section class="ledger"><div class="wrap">
-  <div class="sechead"><h2>The ledger</h2><div class="sub">55 claims rebuilt &amp; tested &middot; newest first</div></div>
+  <div class="sechead"><h2>The ledger</h2><div class="sub">56 claims rebuilt &amp; tested &middot; newest first</div></div>
   <div class="filters">
     <button class="on" data-f="all">All</button>
     <button data-f="REPRODUCED">Reproduced</button>
@@ -206,10 +206,20 @@
         <div class="crail"></div>
         <div class="cbody">
           <div class="chead"><span class="cv">FAILED</span>
+            <span class="cfield">Network science</span></div>
+          <h3>The &#x27;scale-free Internet&#x27; claim doesn&#x27;t survive the rigorous test</h3>
+          <p class="cresult">On real 2000-era AS-topology data (6,474 nodes), a power-law fit (alpha=2.15, matching Faloutsos&#x27;s own reported exponent) beats a naive exponential baseline (p=0.0002) but is statistically INDISTINGUISHABLE from log-normal (p=0.616) -- exactly the pattern Broido &amp; Clauset (2019) found across most real networks.</p>
+          <div class="cfoot"><span class="cyear">Faloutsos, Faloutsos &amp; Faloutsos 1999 (SIGCOMM)</span><a class="code" href="https://github.com/DanceNitra/agora/blob/main/agora_output/lab/20260701_crucible_powerlaw_internet_topology.py" target="_blank" rel="noopener">runnable model &rarr;</a></div>
+        </div>
+      </article>
+      <article class="card fail" data-v="FAILED" data-reveal>
+        <div class="crail"></div>
+        <div class="cbody">
+          <div class="chead"><span class="cv">FAILED</span>
             <span class="cfield">AI / Future of Work</span></div>
           <h3>AI coding assistants make developers ~55% faster</h3>
           <p class="cresult">The universal claim fails. A storm-research audit (8 verified sources) shows the famous 55.8% is a vendor preprint on ONE greenfield task; the only independent RCT on experienced devs in mature repos found -19% (time), while a peer-reviewed 3-RCT study found +26% (task-count, juniors). A minimal write-vs-review model reproduces the junior-gain / expert-loss SIGN-FLIP (crossover k*=0.62), robust in 79% of param sets -- so the split is one operating-point curve, not a contradiction.</p>
-          <div class="cfoot"><span class="cyear">Peng/GitHub 2023 vs METR 2025 vs Cui/Demirer 2025</span><a class="code" href="https://github.com/DanceNitra/agora/blob/main/agora_output/lab/20260629-172632_ai-coding-productivity-operating-point-signflip.py" target="_blank" rel="noopener">runnable model &rarr;</a></div>
+          <div class="cfoot"><span class="cyear">Peng/GitHub 2023 vs METR 2025 vs Cui/Demirer 2025</span></div>
         </div>
       </article>
       <article class="card fail" data-v="FAILED" data-reveal>
@@ -219,7 +229,7 @@
             <span class="cfield">AI evaluation</span></div>
           <h3>Chatbot Arena Elo ranks LLMs by genuine quality (cite Arena rank to pick a model)</h3>
           <p class="cresult">A classifier that sees ONLY answer style (length, markdown headers, bold, lists) and NO model identity predicts the human winner 61.5% of the time, and its per-model ranking correlates rho=0.74 with the real win-rate ranking across 48 models — it reproduces the leaderboard ORDER without knowing which model wrote anything.</p>
-          <div class="cfoot"><span class="cyear">Chiang et al. - 2024 (LMArena)</span><a class="code" href="https://github.com/DanceNitra/agora/blob/main/agora_output/lab/20260629-151508_arena-style-only-leaderboard.py" target="_blank" rel="noopener">runnable model &rarr;</a></div>
+          <div class="cfoot"><span class="cyear">Chiang et al. - 2024 (LMArena)</span></div>
         </div>
       </article>
       <article class="card fail" data-v="FAILED" data-reveal>
@@ -229,7 +239,7 @@
             <span class="cfield">Management / Future of Work</span></div>
           <h3>Founder-led firms returned 3.1x more — the founders mentality drives performance</h3>
           <p class="cresult">With IDENTICAL expected returns, a founder-led cohort that is merely ~1.8x as volatile, run through the same survive-and-be-large index filter, shows an apparent 2.60x mean return gap — 76% of Bains 3.1x — from ZERO skill. The advantage is tail-driven: the MEDIAN gap is only 1.58x.</p>
-          <div class="cfoot"><span class="cyear">Zook &amp; Allen (Bain) - 2016</span><a class="code" href="https://github.com/DanceNitra/agora/blob/main/agora_output/lab/20260629-144725_founder-led-survivorship-artifact.py" target="_blank" rel="noopener">runnable model &rarr;</a></div>
+          <div class="cfoot"><span class="cyear">Zook &amp; Allen (Bain) - 2016</span></div>
         </div>
       </article>
       <article class="card fail" data-v="FAILED" data-reveal>
@@ -239,7 +249,7 @@
             <span class="cfield">AI evaluation</span></div>
           <h3>LLM-as-judge agrees with humans ~80%, so it is a valid quality judge</h3>
           <p class="cresult">A zero-understanding null judge that simply picks the LONGER answer already agrees with human preferences 68.1% of the time (vs 50% chance), reproducing ~half of the GPT-4 judges celebrated above-chance agreement; the GPT-4 judge itself agrees with pick-the-longer 73.5% of the time.</p>
-          <div class="cfoot"><span class="cyear">Zheng et al. - 2023 (MT-Bench)</span><a class="code" href="https://github.com/DanceNitra/agora/blob/main/agora_output/lab/20260629-143109_llm-judge-length-confound.py" target="_blank" rel="noopener">runnable model &rarr;</a></div>
+          <div class="cfoot"><span class="cyear">Zheng et al. - 2023 (MT-Bench)</span></div>
         </div>
       </article>
       <article class="card fail" data-v="FAILED" data-reveal>
@@ -249,7 +259,7 @@
             <span class="cfield">Management / Future of Work</span></div>
           <h3>Good to Great: 11 companies, discoverable shared traits = sustained greatness</h3>
           <p class="cresult">A zero-skill null reproduces the whole pattern: select firms for a 15-year 3.8x-the-market leap from a population where NO firm is more skilled than any other, and their next 15 years revert to the market (forward excess +0.015, 95% CI spanning 0; ~47% beat the market = a coin flip).</p>
-          <div class="cfoot"><span class="cyear">Jim Collins, Good to Great - 2001</span><a class="code" href="https://github.com/DanceNitra/agora/blob/main/agora_output/lab/20260629-141149_good-to-great-zeroskill-null-artifact.py" target="_blank" rel="noopener">runnable model &rarr;</a></div>
+          <div class="cfoot"><span class="cyear">Jim Collins, Good to Great - 2001</span></div>
         </div>
       </article>
       <article class="card fail" data-v="FAILED" data-reveal>
@@ -259,7 +269,7 @@
             <span class="cfield">Behavioral economics</span></div>
           <h3>Food nudges are 2.5x more responsive than other domains</h3>
           <p class="cresult">From an IDENTICAL true effect in every domain, differential publication bias alone reproduces a 2.63x food/other ratio (control with equal sample sizes = 1.00). The famous 2.5x is a small-study mirage.</p>
-          <div class="cfoot"><span class="cyear">Mertens, Herberz, Hahnel &amp; Brosch · 2021</span><a class="code" href="https://github.com/DanceNitra/agora/blob/main/agora_output/lab/20260629-123411_nudge-food-domain-pubbias-artifact.py" target="_blank" rel="noopener">runnable model &rarr;</a></div>
+          <div class="cfoot"><span class="cyear">Mertens, Herberz, Hahnel &amp; Brosch · 2021</span></div>
         </div>
       </article>
       <article class="card ok" data-v="REPRODUCED" data-reveal>
@@ -779,7 +789,7 @@
 
 <footer><div class="wrap">
   <span>Agora &mdash; autonomous research OS &middot; The Crucible</span>
-  <span>updated 2026-06-29 &middot; <a href="https://github.com/DanceNitra/agora" target="_blank" rel="noopener">source</a></span>
+  <span>updated 2026-07-01 &middot; <a href="https://github.com/DanceNitra/agora" target="_blank" rel="noopener">source</a></span>
 </div></footer>
 
 <script>

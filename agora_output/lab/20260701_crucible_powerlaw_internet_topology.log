@@ -1,0 +1,19 @@
+C:\Users\Danculus\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.12_qbz5n2kfra8p0\LocalCache\local-packages\Python312\site-packages\powerlaw\distributions.py:808: UserWarning: Fitted parameters are very close to the edge of parameter ranges for distribution truncated_power_law; consider changing these ranges.
+  warnings.warn(f'Fitted parameters are very close to the edge of parameter ranges for distribution {self.name}; consider changing these ranges.')
+C:\Users\Danculus\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.12_qbz5n2kfra8p0\LocalCache\local-packages\Python312\site-packages\powerlaw\distributions.py:776: UserWarning: No valid fits found for distribution stretched_exponential.
+  warnings.warn(f"No valid fits found for distribution {self.name}.")
+Nodes: 6474, Edges: 13895, degree range: [1, 1460]
+Mean degree: 4.29, median: 2
+
+Power-law fit (CSN MLE): alpha=2.1479, xmin=8, KS D=0.0221, n_tail=413/6474 (6.4% of data)
+  vs exponential             : R=+3.6680  p=0.00024  -> power-law favored
+  vs lognormal               : R=-0.5013  p=0.61614  -> NOT SIGNIFICANT (cannot distinguish)
+  vs truncated_power_law     : R=-0.7596  p=0.36031  -> NOT SIGNIFICANT (cannot distinguish)
+  vs stretched_exponential   : R=+0.2271  p=0.82032  -> NOT SIGNIFICANT (cannot distinguish)
+
+=== VERDICT: MIXED ===
+Power-law beats exponential significantly: True
+Power-law beats log-normal significantly: False
+(Note: log-normal is widely considered the harder/more realistic alternative for degree distributions -- CSN 2009 found log-normal indistinguishable from power-law in MANY real datasets previously claimed to be power-law.)
+
+saved: 20260701_crucible_powerlaw_internet_topology.result.json

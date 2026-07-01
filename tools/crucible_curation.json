@@ -190,6 +190,16 @@
   "deep_dive": "../../posts/chatbot-arena-style-not-skill.html",
   "featured": false
  },
+ "4399e9": {
+  "title": "The 'scale-free Internet' claim doesn't survive the rigorous test",
+  "year": "Faloutsos, Faloutsos & Faloutsos 1999 (SIGCOMM)",
+  "field": "Network science",
+  "result": "On real 2000-era AS-topology data (6,474 nodes), a power-law fit (alpha=2.15, matching Faloutsos's own reported exponent) beats a naive exponential baseline (p=0.0002) but is statistically INDISTINGUISHABLE from log-normal (p=0.616) -- exactly the pattern Broido & Clauset (2019) found across most real networks.",
+  "canon": "One of the most-cited papers in networking (10,000+ citations) reported the Internet's AS-level degree distribution follows a power law, launching the 'scale-free Internet' framing that underpins two decades of network-robustness and preferential-attachment models.",
+  "rebuilt": "The Clauset-Shalizi-Newman (2009) rigorous test: MLE fit + automatic xmin selection + a likelihood-ratio significance test against alternative distributions, run on a real public AS-topology snapshot (SNAP as20000102.txt, Oregon RouteViews, Jan 2000) via the `powerlaw` package -- not a log-log-plot eyeball, which is what the original 1999 claim relied on.",
+  "verdict": "FAILED to clear the CSN bar for 'genuinely power-law.' The fit beats a weak strawman (exponential) but ties the harder, more appropriate alternative (log-normal, p=0.616 -- not significant). This is not a fresh debunking: Clauset-Shalizi-Newman's own 2009 dataset table already includes an AS-topology entry (alpha=2.12+/-0.09, 2006 data -- remarkably close to our result), and Broido & Clauset (2019, Nature Communications) tested hundreds of CAIDA AS-level snapshots directly, finding strongly scale-free structure in only ~4% of ~1,000 real networks overall (log-normal at least as good a fit in 88% of cases). Honest limits: a single, small, 26-year-old snapshot; BGP-derived AS-topology data is independently known to undersample true peering links (a data-quality caveat, not just a statistical one); exponential is a weak alternative, so beating it alone is weak evidence FOR power-law specifically. Prior art credited in full -- this replication confirms, on new data, what the field's own rigorous statisticians already established.",
+  "featured": false
+ },
  "fc5c22": {
   "title": "AI coding assistants make developers ~55% faster",
   "year": "Peng/GitHub 2023 vs METR 2025 vs Cui/Demirer 2025",

@@ -1,20 +1,29 @@
 {
  "name": "The Crucible — machine replication ledger",
  "description": "Scientific and technical claims rebuilt as minimal computational models and tested. REPRODUCED = the mechanism holds in a minimal model; FAILED = it does not; NOT_COMPUTABLE = no simulable core (an honest pass).",
- "generated": "2026-06-29",
+ "generated": "2026-07-01",
  "counts": {
   "REPRODUCED": 42,
-  "FAILED": 13,
+  "FAILED": 14,
   "NOT_COMPUTABLE": 15
  },
  "entries": [
+  {
+   "claim": "Internet AS-level topology follows a power-law degree distribution",
+   "source": "Faloutsos et al. 1999 SIGCOMM; tested vs exponential/log-normal via Clauset-Shalizi-Newman 2009 SIAM Rev., cf. Broido & Clauset 2019 Nat Commun 10:1017",
+   "verdict": "FAILED",
+   "note": "Real 2000 AS data (SNAP, 6474 nodes), CSN MLE: power-law (alpha=2.15, matches Faloutsos exponent) beats exponential (p=0.0002) but ties log-normal (p=0.616, NS). Confirms Broido-Clauset: <5% of networks are truly scale-free.",
+   "lab_id": "4399e9",
+   "code": "https://github.com/DanceNitra/agora/blob/main/agora_output/lab/20260701_crucible_powerlaw_internet_topology.py",
+   "date": "2026-07-01"
+  },
   {
    "claim": "AI coding assistants make developers ~55% faster (the universal reading of the GitHub/Peng vendor stat).",
    "source": "Peng et al. 2023 (GitHub/Microsoft), arXiv:2302.06590; vs Becker et al./METR 2025 arXiv:2507.09089; Cui/Demirer et al., Management Science 2025 (DOI 10.1287/mns",
    "verdict": "FAILED",
    "note": "The universal '55% faster' claim FAILS; storm-research verified (8/8 citations, 5 corrected, 3 demoted) that the canonical 55.8% is a vendor preprint on ONE greenfield JS task (~95 recruited / ~70 completers, CI [21%,89%]), while the only i",
    "lab_id": "fc5c22",
-   "code": "https://github.com/DanceNitra/agora/blob/main/agora_output/lab/20260629-172632_ai-coding-productivity-operating-point-signflip.py",
+   "code": "",
    "date": "2026-06-29"
   },
   {
@@ -23,7 +32,7 @@
    "verdict": "FAILED",
    "note": "Style-only null on real public votes (lmarena-ai/arena-human-preference-140k, 2 shards = 28,084 decided battles). Features = STYLE ONLY as side-A-minus-B differences (response length/tokens, markdown header count, list count, bold count) wi",
    "lab_id": "14c41f",
-   "code": "https://github.com/DanceNitra/agora/blob/main/agora_output/lab/20260629-151508_arena-style-only-leaderboard.py",
+   "code": "",
    "date": "2026-06-29"
   },
   {
@@ -32,7 +41,7 @@
    "verdict": "FAILED",
    "note": "Zero-skill survivorship null (Lab 12b630). Two cohorts with IDENTICAL expected returns; founder-led differs ONLY by higher volatility (~1.8x) + more delisting; apply the same look-ahead index filter (survive to end AND be large enough). MEA",
    "lab_id": "12b630",
-   "code": "https://github.com/DanceNitra/agora/blob/main/agora_output/lab/20260629-144725_founder-led-survivorship-artifact.py",
+   "code": "",
    "date": "2026-06-29"
   },
   {
@@ -41,7 +50,7 @@
    "verdict": "FAILED",
    "note": "Length-confound null on the ORIGINAL released data (lmsys/mt_bench_human_judgments: 3355 human + 2400 GPT-4 pairwise votes). NULL judge with zero understanding = pick the LONGER response. Measured (ties excluded): length-only vs human = 0.6",
    "lab_id": "bf7bb9",
-   "code": "https://github.com/DanceNitra/agora/blob/main/agora_output/lab/20260629-143109_llm-judge-length-confound.py",
+   "code": "",
    "date": "2026-06-29"
   },
   {
@@ -50,7 +59,7 @@
    "verdict": "FAILED",
    "note": "Zero-skill null (Lab 502d6c): N=1400 firms as geometric random walks with IDENTICAL drift+vol (no firm more skilled than any other); apply Collins selection-on-the-dependent-variable (mediocre 15y, then >=Nx the market 15y). Robust across t",
    "lab_id": "502d6c",
-   "code": "https://github.com/DanceNitra/agora/blob/main/agora_output/lab/20260629-141149_good-to-great-zeroskill-null-artifact.py",
+   "code": "",
    "date": "2026-06-29"
   },
   {
@@ -59,7 +68,7 @@
    "verdict": "FAILED",
    "note": "Mechanism replication (we lack their raw per-study data). Smallest model: K domains with IDENTICAL true effect (d=0.20); food studies small-n (per-group ~30, point-of-choice field/lab), other domains large-n (~300); publish iff p<.05 in-dir",
    "lab_id": "39737a",
-   "code": "https://github.com/DanceNitra/agora/blob/main/agora_output/lab/20260629-123411_nudge-food-domain-pubbias-artifact.py",
+   "code": "",
    "date": "2026-06-29"
   },
   {
