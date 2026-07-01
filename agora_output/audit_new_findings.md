@@ -719,3 +719,37 @@ the one funnel.)
   Minsky's Financial Instability Hypothesis (1975/1986), Janis's groupthink (1972) — all independently
   describe "internal coherence substituting for external checking," relevant prior naming for any future
   post on this theme.
+
+## STORM addendum to Audit #18 (we-hunted-for-the-tipping-point-in-8-systems, 2026-07-01, retroactive)
+
+- **Frontier question:** is there any principled reason real herding/opinion-dynamics systems (AI-adjacent
+  or human) would be driven toward the exact critical coupling K≈K_c the post's positive finding required
+  tuning to — the way some physical systems have proposed self-organizing mechanisms toward criticality —
+  or is K_c simply this model's own mathematical convenience with no bridge to real, untuned dynamics? This
+  is THE open question the operating-point-trap finding creates.
+- **Major finding — the post's own "one confirmed critical cliff" is an operating-point trap.** Skeptic and
+  Historian STORM lenses independently converged: the herding model only shows critical behavior after
+  tuning its coupling to the exact theoretical critical value — the same class of problem that has
+  repeatedly undermined self-organized-criticality claims for 40 years, including SOC's own founding
+  rice-pile experiment (Frette et al. 1996 — only worked for elongated grains) and a claimed sharp QCD phase
+  transition later shown by exact computation to be a smooth crossover (Aoki et al. 2006). Fixed with an
+  explicit, forceful self-aware disclosure in the post itself: "read this caveat literally and zero of
+  eight mechanisms are confirmed critical cliffs, not one... don't read 'only one is a true critical cliff'
+  as 'one is confirmed.'" The title was kept (the exercise of finding no mechanism survives scrutiny
+  undiminished is itself the finding) but the tension is now explicitly owned, not left implicit — a
+  re-audit skeptic specifically flagged that a post arguing against its own headline without saying so reads
+  as sloppy, not honest; the fix makes it honest.
+- **Three real citation-attribution errors found and fixed**, all following the same pattern (crediting a
+  broad/foundational source for a narrower/later specific result): Zeeman 1977 alone credited for a
+  classification theorem that's Thom's (1972); Castellano-Fortunato-Loreto 2009 credited for a majority-
+  vote-with-inertia result actually published 8 years later (Chen et al. 2017, an anachronistic citation);
+  Kirman 1993 credited with a kinetic-Ising mapping actually worked out later by Hisakado & Mori (2015) as a
+  limiting case. Worth a standing audit-post check: when a citation for a SPECIFIC mechanism/result names
+  only a broad review or a foundational paper, verify the specific result actually appears there and wasn't
+  established by later, narrower work.
+- **Practical distinction, worth carrying into future posts on this theme:** a deterministic threshold
+  (model collapse) has zero early-warning lead time by construction — you're fine right up to g*, then
+  you're not, no canary will fire early — while a genuine critical transition could in principle show
+  precursor signals. But even confirmed critical systems (e.g. financial markets, per Guttal et al.) often
+  don't show clean critical-slowing-down precursors in practice — so "it's critical, therefore build an
+  early-warning dashboard" is itself not a safe inference without checking the specific mechanism.

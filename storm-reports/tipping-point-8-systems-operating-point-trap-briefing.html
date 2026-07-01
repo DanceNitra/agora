@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Does the "one confirmed critical cliff" survive scrutiny? — Storm Research Briefing</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&family=Roboto+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ink:#0f172a; --body:#334155; --muted:#64748b; --line:#e2e8f0; --bg:#ffffff;
+    --soft:#f8fafc; --accent:#2563eb; --accent-soft:#eff6ff;
+    --ok:#16a34a; --ok-soft:#f0fdf4; --warn:#d97706; --warn-soft:#fffbeb;
+    --bad:#dc2626; --bad-soft:#fef2f2; --demote:#7c3aed; --demote-soft:#f5f3ff;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--soft);color:var(--body);
+    font-family:"Montserrat",system-ui,-apple-system,sans-serif;line-height:1.62;font-size:16px}
+  .wrap{max-width:860px;margin:0 auto;padding:48px 24px 96px}
+  .card{background:var(--bg);border:1px solid var(--line);border-radius:14px;padding:28px 32px;margin:20px 0;
+    box-shadow:0 1px 2px rgba(15,23,42,.04)}
+  h1{font-size:34px;line-height:1.18;font-weight:800;color:var(--ink);margin:0 0 10px}
+  h2{font-size:13px;font-weight:700;letter-spacing:.09em;text-transform:uppercase;color:var(--accent);margin:0 0 16px}
+  h3{font-size:19px;font-weight:700;color:var(--ink);margin:0 0 6px}
+  p{margin:0 0 14px}
+  a{color:var(--accent);text-decoration:none;border-bottom:1px solid #bfdbfe}
+  a:hover{border-color:var(--accent)}
+  code,.mono{font-family:"Roboto Mono",monospace}
+  .topic{font-family:"Roboto Mono",monospace;font-size:13px;color:var(--muted)}
+  .meta{font-size:13px;color:var(--muted);margin-top:8px}
+  .disclosure{font-size:12.5px;color:var(--muted);background:var(--soft);border:1px dashed var(--line);
+    border-radius:10px;padding:12px 16px;margin-top:18px}
+  .verify{display:flex;flex-wrap:wrap;gap:10px;align-items:center;background:var(--accent-soft);
+    border:1px solid #bfdbfe;border-radius:12px;padding:14px 18px;margin:20px 0;font-size:14px}
+  .verify b{color:var(--ink)}
+  .pill{font-family:"Roboto Mono",monospace;font-size:12px;font-weight:600;padding:3px 10px;border-radius:999px;
+    border:1px solid var(--line);background:#fff;color:var(--body)}
+  .pill.g{color:var(--ok);border-color:#bbf7d0;background:var(--ok-soft)}
+  .pill.y{color:var(--warn);border-color:#fde68a;background:var(--warn-soft)}
+  .pill.r{color:var(--bad);border-color:#fecaca;background:var(--bad-soft)}
+  .pill.v{color:var(--demote);border-color:#ddd6fe;background:var(--demote-soft)}
+  .finding{border-top:1px solid var(--line);padding:20px 0}
+  .finding:first-of-type{border-top:0;padding-top:4px}
+  .frow{display:flex;align-items:baseline;gap:14px}
+  .rank{font-family:"Roboto Mono",monospace;font-weight:600;color:var(--muted);font-size:14px;min-width:26px}
+  .conf{margin-left:auto;font-family:"Roboto Mono",monospace;font-size:12px;font-weight:600;
+    color:var(--accent);background:var(--accent-soft);border:1px solid #bfdbfe;border-radius:999px;padding:3px 11px;white-space:nowrap}
+  .chips{display:flex;flex-wrap:wrap;gap:7px;margin:10px 0 0 40px}
+  .chip{font-size:12px;padding:3px 10px;border-radius:6px;border:1px solid var(--line);background:var(--soft);color:var(--muted)}
+  .chip.sup{color:var(--ok);border-color:#bbf7d0;background:var(--ok-soft)}
+  .chip.chg{color:var(--bad);border-color:#fecaca;background:var(--bad-soft)}
+  .finding p{margin:8px 0 0 40px}
+  .guide{display:grid;grid-template-columns:1fr;gap:14px}
+  @media(min-width:640px){.guide{grid-template-columns:1fr 1fr 1fr}}
+  .gcol{border:1px solid var(--line);border-radius:10px;padding:16px}
+  .gcol h4{margin:0 0 10px;font-size:13px;letter-spacing:.05em;text-transform:uppercase}
+  .gcol.assert{background:var(--ok-soft);border-color:#bbf7d0}.gcol.assert h4{color:var(--ok)}
+  .gcol.caveat{background:var(--warn-soft);border-color:#fde68a}.gcol.caveat h4{color:var(--warn)}
+  .gcol.avoid{background:var(--bad-soft);border-color:#fecaca}.gcol.avoid h4{color:var(--bad)}
+  .gcol ul{margin:0;padding-left:18px;font-size:14px}.gcol li{margin:6px 0}
+  ul.moves{padding-left:20px}ul.moves li{margin:9px 0}
+  .sidebar{background:var(--demote-soft);border:1px solid #ddd6fe;border-radius:12px;padding:18px 22px;margin:20px 0}
+  .sidebar h2{color:var(--demote)}
+  .frontier{background:var(--ink);color:#e2e8f0;border-radius:14px;padding:30px 32px;margin:24px 0}
+  .frontier h2{color:#93c5fd}.frontier .q{font-size:22px;font-weight:700;color:#fff;line-height:1.4}
+  .refs{font-size:13.5px}
+  .ref{padding:11px 0;border-top:1px solid var(--line);display:flex;gap:12px;align-items:flex-start}
+  .ref:first-of-type{border-top:0}
+  .tag{font-family:"Roboto Mono",monospace;font-size:10.5px;font-weight:600;letter-spacing:.04em;
+    padding:2px 8px;border-radius:5px;white-space:nowrap;margin-top:2px}
+  .tag.ok{color:var(--ok);background:var(--ok-soft);border:1px solid #bbf7d0}
+  .tag.partial{color:var(--warn);background:var(--warn-soft);border:1px solid #fde68a}
+  .tag.unver{color:var(--muted);background:var(--soft);border:1px solid var(--line)}
+  .tag.false{color:var(--bad);background:var(--bad-soft);border:1px solid #fecaca}
+  .tag.demoted{color:var(--demote);background:var(--demote-soft);border:1px solid #ddd6fe}
+  .grade{font-family:"Roboto Mono",monospace;font-weight:600;color:var(--ink)}
+  footer{text-align:center;color:var(--muted);font-size:12px;margin-top:40px}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header>
+    <h1>The one "confirmed critical cliff" is an operating-point trap — the same class of problem that has dogged self-organized criticality for 40 years</h1>
+    <div class="topic">topic: across 8 candidate AI/social "tipping point" mechanisms tested with real finite-size-scaling tools, does the ONE claimed positive finding (herding, at the exact theoretical critical coupling) actually survive scrutiny as a genuine discovery? · for AI safety researchers and complex-systems practitioners</div>
+    <div class="meta">July 1, 2026 · Storm Research · 5-lens, citation-verified</div>
+    <div class="disclosure">
+      The five expert lenses below are an <b>author-built panel</b>, not independent field experts.
+      Agreement across lenses is a strong hypothesis, not consensus of the field. Every cited figure was
+      verified against its primary source. Commissioned as the missing STORM step of an audit-post
+      correction cycle for post #18 — retroactively run after the owner caught it was skipped originally.
+    </div>
+  </header>
+
+  <div class="verify">
+    <b>Verification:</b>
+    <span class="pill g">8/8 citations checked</span>
+    <span class="pill r">0 fabricated</span>
+    <span class="pill y">3 corrected (attribution precision)</span>
+    <span class="pill v">0 demoted</span>
+    <span class="grade" style="margin-left:auto">Overall grade: B+</span>
+  </div>
+
+  <section class="card">
+    <h2>The 60-second summary</h2>
+    <p>The post's careful verification-tier disclosure (already unusually honest before this audit — explicitly
+    flagging which of 8 mechanisms were solidly re-derived vs. directionally re-derived vs. not re-verified at
+    all) held up well under scrutiny; three citation-attribution errors were found and fixed (Zeeman 1977
+    credited alone for a classification theorem that's actually Thom's 1972; Castellano-Fortunato-Loreto 2009
+    credited for a majority-vote-with-inertia result actually published 8 years later by Chen et al. 2017;
+    Kirman's 1993 paper credited with a kinetic-Ising mapping actually worked out later by Hisakado &amp; Mori
+    2015). The load-bearing finding of this audit: the Skeptic and Historian lenses independently converged on
+    a serious problem with the post's ONE positive result. The herding model only shows critical behavior after
+    tuning its coupling parameter to the exact theoretical critical value — and this is precisely the same
+    "operating-point trap" that has repeatedly undermined claims of self-organized criticality, including SOC's
+    own founding rice-pile experiment (which only worked for elongated grains, not round ones) and a claimed
+    sharp QCD phase transition later shown by exact computation to be a smooth crossover. Read strictly, this
+    means the post's own headline ("only one is a true critical cliff") overclaims — the honest reading is
+    closer to zero-of-eight confirmed, with one candidate that requires further, un-tuned evidence. The post
+    now says this explicitly rather than leaving the tension implicit.</p>
+  </section>
+
+  <section class="card">
+    <h2>Key findings — ranked by reliability</h2>
+
+    <div class="finding">
+      <div class="frow"><span class="rank">01</span><h3>The post's ONE positive finding (herding criticality) is an operating-point trap, the same failure mode that has dogged self-organized-criticality claims for 40 years</h3>
+        <span class="conf">confidence 9/10</span></div>
+      <div class="chips"><span class="chip sup">Supported by: Skeptic, Historian (independent convergence)</span></div>
+      <p>Tuning a coupling parameter to its exact theoretical critical value to observe critical behavior is
+      close to circular — it doesn't demonstrate the system naturally sits there. SOC's own founding
+      experiment (Frette et al. 1996) required specific grain geometry to reach criticality; a claimed sharp
+      QCD phase transition (Aoki et al. 2006) was shown by exact lattice computation to be a smooth crossover.
+      Both are documented historical cases of "criticality" dissolving under closer scrutiny — directly
+      analogous to this post's herding result.</p>
+    </div>
+
+    <div class="finding">
+      <div class="frow"><span class="rank">02</span><h3>Three citation-attribution errors found and fixed</h3>
+        <span class="conf">confidence 9/10</span></div>
+      <div class="chips"><span class="chip sup">Supported by: Academic, dedicated verifier</span></div>
+      <p>Zeeman (1977) alone credited for the catastrophe-theory classification theorem, which is Thom's
+      (1972) — Zeeman's book applies it. Castellano-Fortunato-Loreto (2009) credited for a majority-vote-
+      with-inertia hysteresis result that was actually published later (Chen et al. 2017, anachronistic
+      citation). Kirman (1993) credited with a kinetic-Ising equivalence actually worked out by Hisakado &amp;
+      Mori (2015) as a limiting case, not by Kirman himself.</p>
+    </div>
+
+    <div class="finding">
+      <div class="frow"><span class="rank">03</span><h3>A deterministic threshold (model collapse) has zero early-warning lead time; a genuine critical transition would have precursor signals — a real practical distinction</h3>
+        <span class="conf">confidence 7/10</span></div>
+      <div class="chips">
+        <span class="chip sup">Supported by: Practitioner</span>
+        <span class="chip chg">Challenged by: financial-crash literature shows even genuine critical transitions often lack clean precursor signals in practice</span>
+      </div>
+      <p>Industry already implicitly treats model collapse as locatable (capping synthetic-data ratios rather
+      than building early-warning dashboards) — the correct response to a deterministic threshold. But
+      applying that same "just cap it" playbook to a genuinely critical mechanism would be a category error.
+      Caveat: even confirmed critical transitions (e.g., financial crashes) often don't show clean
+      critical-slowing-down precursors in practice, per Guttal et al.</p>
+    </div>
+
+    <div class="finding">
+      <div class="frow"><span class="rank">04</span><h3>The "unpredictable collapse cliff" vs. "manageable locatable threshold" framings are both actively monetized by opposing commercial interests</h3>
+        <span class="conf">confidence 5/10</span></div>
+      <div class="chips"><span class="chip sup">Supported by: Economist</span></div>
+      <p>AI existential-risk funding (~$780M+ from Open Philanthropy alone) has a structural interest in
+      collapse staying legible as unpredictable/catastrophic; synthetic-data vendors (Nvidia's $320M+
+      acquisition of Gretel) and the labs consuming synthetic data at scale have the opposite interest. Useful
+      context for why the narrative persists regardless of evidence; not evidence about which framing is
+      physically correct.</p>
+    </div>
+  </section>
+
+  <section class="card">
+    <h2>The hidden connection</h2>
+    <p>The citation-attribution errors (Zeeman/Thom, CFL/Chen, Kirman/Hisakado-Mori) and the operating-point-trap
+    finding share a root cause: crediting a general/foundational source for a specific/derived result. The post
+    credited broad reviews and founding papers for precise findings actually established by later, narrower
+    work — and made the analogous mistake at the level of the CENTRAL CLAIM, crediting "tuning to the critical
+    point" with demonstrating criticality exists, when the specific/narrower claim (untuned dynamics land near
+    that point) is what's actually needed and wasn't established.</p>
+  </section>
+
+  <section class="card">
+    <h2>Key assumption · the missing 6th lens</h2>
+    <p>None of the five lenses tested whether the herding model's critical coupling K_c=1 has any principled
+    reason to be the value REAL herding systems would actually converge to (as opposed to an arbitrary
+    mathematical convenience of this particular model's parameterization). A lens asking "is there any
+    mechanism that would drive real social/AI herding dynamics toward K≈K_c specifically, the way avalanche
+    dynamics or the many self-organized-criticality claims propose a driving mechanism" is the natural next
+    step — without it, even resolving the operating-point-trap concern wouldn't establish real-world relevance.</p>
+  </section>
+
+  <section class="card">
+    <h2>What to do — for AI safety researchers and complex-systems practitioners</h2>
+    <ul class="moves">
+      <li>Don't cite this post's herding finding as "a confirmed critical transition in an AI-adjacent
+      mechanism" — the honest framing is "critical behavior appears only at the exact theoretical tuning
+      point, an open question whether real dynamics land there."</li>
+      <li>When citing catastrophe theory, credit Thom (1972) for the classification theorem specifically,
+      not Zeeman (1977) alone.</li>
+      <li>For model-collapse risk management, the deterministic-threshold framing (cap the real:synthetic
+      ratio above g*) is the evidence-backed response — don't build early-warning-signal infrastructure for
+      a mechanism that has no precursor by construction.</li>
+      <li>Be skeptical of any "we tuned a parameter to its theoretical critical value and found criticality"
+      result in this literature — ask explicitly whether real/untuned dynamics have ever been shown to land
+      near that point, the same question that dogs self-organized-criticality claims generally.</li>
+    </ul>
+  </section>
+
+  <section class="card">
+    <h2>Claim safety guide</h2>
+    <div class="guide">
+      <div class="gcol assert"><h4>Safe to assert</h4><ul>
+        <li>Self-amplification / model collapse is a deterministic, locatable threshold (g*=1-1/s),
+        independently re-derived exactly.</li>
+        <li>The Ising positive control confirms the finite-size-scaling method genuinely detects real
+        transitions when present (β=0.500 exact).</li>
+      </ul></div>
+      <div class="gcol caveat"><h4>Assert with caveat</h4><ul>
+        <li>The herding "critical transition" is real only at the exact tuned critical coupling — an
+        operating-point-trap result analogous to SOC's own founding-experiment problems, not yet shown to
+        reflect untuned/real dynamics.</li>
+        <li>2 of the original 8 mechanisms (hard-decision jump, contagious metric-gaming) were not
+        independently re-verified this cycle at all.</li>
+      </ul></div>
+      <div class="gcol avoid"><h4>Avoid / don't repeat</h4><ul>
+        <li>Do not cite "only one of eight mechanisms is a confirmed critical cliff" without the operating-
+        point-trap caveat — read strictly, the honest count is zero confirmed, one open candidate.</li>
+      </ul></div>
+    </div>
+  </section>
+
+  <aside class="sidebar">
+    <h2>Contested signal</h2>
+    <p><b>Financial-market critical-slowing-down precursors.</b> Guttal et al. found a lack of critical
+    slowing down before many financial meltdowns, suggesting they may not be classic critical transitions —
+    or that precursor signals are harder to detect in practice than the physics idealization suggests. Relevant
+    caveat to the practical distinction (deterministic = no precursor vs. critical = has precursor) this
+    audit's Practitioner lens proposed: even confirmed critical systems don't always show clean warning
+    signs.</p>
+  </aside>
+
+  <section class="frontier">
+    <h2>The frontier question</h2>
+    <p class="q">Is there any principled reason real herding/opinion-dynamics systems (AI-adjacent or human)
+    would be driven toward the exact critical coupling K≈K_c, the way some physical systems have proposed
+    self-organizing mechanisms toward criticality — or is K_c simply this model's own mathematical
+    convenience, with no bridge to real, untuned dynamics?</p>
+  </section>
+
+  <section class="card refs">
+    <h2>References — verified against primary sources</h2>
+    <div class="ref"><span class="tag partial">CORRECTED</span>
+      <span>Thom, R. (1972). <i>Stabilité structurelle et morphogénèse.</i> W.A. Benjamin. Correct primary source for the catastrophe classification theorem (Zeeman 1977 applies it, doesn't originate it).</span></div>
+    <div class="ref"><span class="tag partial">CORRECTED</span>
+      <span>Chen, H., Shen, C., Zhang, H., Li, G., Hou, Z. &amp; Kurths, J. (2017). "First-order phase transition in a majority-vote model with inertia." <i>Phys. Rev. E</i> 95, 042304. <a href="https://journals.aps.org/pre/abstract/10.1103/PhysRevE.95.042304">APS</a></span></div>
+    <div class="ref"><span class="tag partial">CORRECTED</span>
+      <span>Hisakado, M. &amp; Mori, S. (2015). "Information cascade, Kirman's ant colony model, and kinetic Ising model." <i>Physica A</i> 417, 63. Kirman's model and kinetic Ising emerge as limiting cases of a shared framework; not Kirman's own 1993 result. <a href="https://arxiv.org/abs/1401.4258">arXiv</a></span></div>
+    <div class="ref"><span class="tag ok">CONFIRMED</span>
+      <span>Frette, V. et al. (1996). "Avalanche dynamics in a pile of rice." <i>Nature</i> 379, 49–52. Elongated-grain rice self-organized to criticality; round-grain rice did not. <a href="https://www.nature.com/articles/379049a0">Nature</a></span></div>
+    <div class="ref"><span class="tag ok">CONFIRMED</span>
+      <span>Aoki, Y. et al. (2006). "The order of the QCD transition predicted by the standard model of particle physics." <i>Nature</i> 443, 675–678. Lattice-exact computation showed the claimed sharp transition is an analytic crossover. <a href="https://arxiv.org/abs/hep-lat/0611014">arXiv</a></span></div>
+    <div class="ref"><span class="tag ok">CONFIRMED</span>
+      <span>Kirman, A. (1993). "Ants, Rationality, and Recruitment." <i>QJE</i> 108(1), 137–156. Ant-recruitment master-equation source model (no kinetic-Ising derivation in the original paper).</span></div>
+    <div class="ref"><span class="tag ok">CONFIRMED</span>
+      <span>Castellano, C., Fortunato, S. &amp; Loreto, V. (2009). "Statistical physics of social dynamics." <i>Rev. Mod. Phys.</i> 81, 591. Broad review, correctly cited for the general discreteness-creates-hysteresis classification, not the specific 2017 result. <a href="https://arxiv.org/abs/0710.3256">arXiv</a></span></div>
+    <div class="ref"><span class="tag ok">CONFIRMED</span>
+      <span>Guttal, V. et al. "Lack of Critical Slowing Down Suggests Financial Meltdowns Are Not Critical Transitions." Contested-signal reference for the practical distinction between deterministic and critical failure modes. <a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC4711996/">PMC</a></span></div>
+  </section>
+
+  <footer>Generated by the Storm Research pipeline · 5 lenses → contradiction map → synthesis → adversarial verification · July 1, 2026</footer>
+
+</div>
+</body>
+</html>
