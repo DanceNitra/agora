@@ -1,0 +1,52 @@
+=== B-001 Preference Application - CROSSOVER substrate instrument (v2, post-audit) ===
+    (not a framework test; the always-inject-vs-retrieve split is MemGPT/Letta prior art -
+     we measure WHERE the channels cross over, across 3 independent similarity mechanisms)
+
+[M1] OVERLAP CROSSOVER - pref_recall@5 vs how topically close the query is to a preference
+     (query classes: off = unrelated topic (the true B-001 case), mid, on = about answer style)
+
+  nomic-embed-text   off: recall=0.29 (nearest-cos=0.42)  mid: recall=0.67 (nearest-cos=0.46)  on: recall=1.00 (nearest-cos=0.70)
+  mxbai-embed-large  off: recall=0.17 (nearest-cos=0.42)  mid: recall=0.67 (nearest-cos=0.51)  on: recall=1.00 (nearest-cos=0.74)
+  tfidf-lexical      off: recall=0.04 (nearest-cos=0.01)  mid: recall=0.00 (nearest-cos=0.03)  on: recall=0.58 (nearest-cos=0.23)
+
+  orthogonality on off-topic (B-001) queries: cos(query, nearest pref) vs cos(query, best on-topic memory):
+    nomic-embed-text   pref=0.42  on-topic-memory=0.75
+    mxbai-embed-large  pref=0.42  on-topic-memory=0.79
+    tfidf-lexical      pref=0.01  on-topic-memory=0.37
+
+  reading: every channel recovers the preference when the query is ABOUT answer style (on),
+  and collapses when the query is an unrelated topic (off) - the B-001 scenario. The crossover
+  is the query-overlap axis itself, not the embedder (holds for nomic, mxbai AND pure lexical).
+
+[M2] SCALE CROSSOVER - recall of the 3 turn-relevant prefs vs set size N (inject budget B=12)
+     N    inject-all   recency-cap   random-B    note
+      3     1.00        1.00         1.00      all fit budget
+     10     1.00        1.00         1.00      all fit budget
+     30      --         0.40         0.38      N>B: must SELECT (need a ranker)
+    100      --         0.14         0.14      N>B: must SELECT (need a ranker)
+    300      --         0.03         0.05      N>B: must SELECT (need a ranker)
+  reading: typed_profile=1.0 is a small-N artifact (N<=B). Past the inject budget, a generic
+  selector keeps only ~B/N of the relevant prefs; you need a RELEVANCE ranker - and ranking
+  preferences by similarity to the query is exactly the M1 orthogonality failure again.
+
+[M3] SUPERSESSION FUSION (B-001 needs B-003) - a preference changes concise->detailed
+     naive append (no supersession): stale 'concise' still ACTIVE/injectable = 1  (current 'detailed' active = 1) -> both live, stale can be served
+     keyed supersession:             stale 'concise' active = 0 (retired), current 'detailed' active = 1 -> only the current value is injectable
+  reading: maintaining a bounded, CURRENT profile is a retrieval + supersession problem -
+  the same keyed machinery as B-003. B-001-at-scale and B-003 are one story, not two.
+
+raw_format (csv; M1 overlap crossover, primary embedder):
+scenario_id,pressure_type,similarity_channel,query_class,nearest_pref_cosine,on_topic_memory_cosine,pref_recall_at5,substrate
+B-001,B_low_causal_density_under_load,nomic-embed-text,off,0.422,0.752,0.292,similarity_only
+B-001,B_low_causal_density_under_load,nomic-embed-text,mid,0.456,0.514,0.667,similarity_only
+B-001,B_low_causal_density_under_load,nomic-embed-text,on,0.700,0.454,1.000,similarity_only
+B-001,B_low_causal_density_under_load,mxbai-embed-large,off,0.416,0.794,0.167,similarity_only
+B-001,B_low_causal_density_under_load,mxbai-embed-large,mid,0.508,0.564,0.667,similarity_only
+B-001,B_low_causal_density_under_load,mxbai-embed-large,on,0.740,0.464,1.000,similarity_only
+B-001,B_low_causal_density_under_load,tfidf-lexical,off,0.011,0.366,0.042,similarity_only
+B-001,B_low_causal_density_under_load,tfidf-lexical,mid,0.029,0.142,0.000,similarity_only
+B-001,B_low_causal_density_under_load,tfidf-lexical,on,0.227,0.045,0.583,similarity_only
+
+Scope: substrate only (retrieval = necessary precondition for preference application, not proof
+the model then applied it). Prior art: MemGPT working-context / Letta core-memory (arXiv:2310.08560);
+mem0 is user-scoped but still similarity-retrieved. We measure the crossovers, we do not claim the design.
