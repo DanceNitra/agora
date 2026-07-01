@@ -165,6 +165,14 @@ HELP_MATRIX = {
 }
 
 
+def _sfield(decision, key, default=""):
+    """LLM decision fields sometimes come back as dicts/lists instead of strings (malformed model output);
+    coerce to a string so downstream .strip()/.lower() never crash the agent's execute path and halt research
+    production. Empty/missing -> default (preserves the old `or default` behavior)."""
+    v = decision.get(key) if isinstance(decision, dict) else None
+    return v if (isinstance(v, str) and v) else default
+
+
 class AgentOS:
     """Operating System for dungeon NPCs — duša, mozog, telo, zručnosti a help-seeking."""
 
@@ -675,7 +683,7 @@ class AgentOS:
                 return oid
         # A nearby name (case-insensitive)?
         for oid, oname in nearby:
-            if oname and target.strip().lower() == oname.strip().lower():
+            if oname and isinstance(target, str) and target.strip().lower() == oname.strip().lower():
                 return oid
         # Fall back to a global name lookup.
         try:
@@ -689,7 +697,7 @@ class AgentOS:
         Best-effort: every sub-action is guarded so a malformed LLM response can
         never break the tick. `nearby` is a list of (npc_id, name) tuples.
         """
-        action = (decision.get("action") or "explore").strip().lower()
+        action = _sfield(decision, "action", "explore").strip().lower()
         insight = decision.get("insight", "") or ""
         skill_to_use = decision.get("skill_to_use")
         new_state = decision.get("state_of_mind", "focused")
@@ -958,8 +966,8 @@ class AgentOS:
             from agora.execution.llm_client import dungeon_agent_think
             decision = await asyncio.to_thread(
                 dungeon_agent_think, name, "brainstorm", prompt, "cheap")
-            title = (decision.get("title") or "").strip()
-            desc = (decision.get("description") or "").strip()
+            title = _sfield(decision, "title", "").strip()
+            desc = _sfield(decision, "description", "").strip()
             if title and desc:
                 await self.db.execute(
                     "INSERT INTO system_upgrade_proposals (proposer_id, proposer_name, title, "
