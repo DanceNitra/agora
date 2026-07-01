@@ -1,0 +1,37 @@
+<figure class="fig"><svg viewBox="0 0 620 300" role="img" aria-label="Detection-delay vs false-distrust: a persistence detector pulls the whole frontier toward the origin" font-family="ui-sans-serif,system-ui,sans-serif" font-size="12">
+<line x1="64" y1="18" x2="64" y2="236" stroke="currentColor" stroke-opacity=".35"/>
+<line x1="64" y1="236" x2="556" y2="236" stroke="currentColor" stroke-opacity=".35"/>
+<line x1="64" y1="225.1" x2="556" y2="225.1" stroke="currentColor" stroke-opacity=".3" stroke-dasharray="4 4"/>
+<text x="556" y="220.1" text-anchor="end" fill="currentColor" fill-opacity=".6">false-distrust = 5% (a fair operating point)</text>
+<polyline points="67.8,18.0 100.7,101.5 162.4,220.1 294.1,236.0 553.0,236.0" fill="none" stroke="#e5484d" stroke-width="2.2"/>
+<circle cx="67.8" cy="18.0" r="2.6" fill="#e5484d"/>
+<circle cx="100.7" cy="101.5" r="2.6" fill="#e5484d"/>
+<circle cx="162.4" cy="220.1" r="2.6" fill="#e5484d"/>
+<circle cx="294.1" cy="236.0" r="2.6" fill="#e5484d"/>
+<circle cx="553.0" cy="236.0" r="2.6" fill="#e5484d"/>
+<polyline points="68.2,18.0 109.4,152.5 159.0,226.2 261.6,236.0 339.9,236.0" fill="none" stroke="#0091ff" stroke-width="2.2"/>
+<circle cx="68.2" cy="18.0" r="2.6" fill="#0091ff"/>
+<circle cx="109.4" cy="152.5" r="2.6" fill="#0091ff"/>
+<circle cx="159.0" cy="226.2" r="2.6" fill="#0091ff"/>
+<circle cx="261.6" cy="236.0" r="2.6" fill="#0091ff"/>
+<circle cx="339.9" cy="236.0" r="2.6" fill="#0091ff"/>
+<polyline points="109.0,149.9 155.6,225.1 203.7,235.3 251.0,236.0 344.8,236.0" fill="none" stroke="#30a46c" stroke-width="2.2"/>
+<circle cx="109.0" cy="149.9" r="2.6" fill="#30a46c"/>
+<circle cx="155.6" cy="225.1" r="2.6" fill="#30a46c"/>
+<circle cx="203.7" cy="235.3" r="2.6" fill="#30a46c"/>
+<circle cx="251.0" cy="236.0" r="2.6" fill="#30a46c"/>
+<circle cx="344.8" cy="236.0" r="2.6" fill="#30a46c"/>
+<circle cx="294.1" cy="225.1" r="4.5" fill="none" stroke="#e5484d" stroke-width="2"/>
+<circle cx="159.0" cy="225.1" r="4.5" fill="none" stroke="#0091ff" stroke-width="2"/>
+<circle cx="155.6" cy="225.1" r="4.5" fill="none" stroke="#30a46c" stroke-width="2"/>
+<text x="294.1" y="243.1" text-anchor="middle" fill="#e5484d">delay 6.1</text>
+<text x="157.1" y="215.1" text-anchor="middle" fill="#0091ff">2.5 / 2.4</text>
+<text x="310" y="296" text-anchor="middle" fill="currentColor" fill-opacity=".75">detection delay (turns) — faster &#8594;</text>
+<text x="14" y="127" text-anchor="middle" fill="currentColor" fill-opacity=".75" transform="rotate(-90 14 127)">false-distrust &#8593;</text>
+<line x1="72" y1="24" x2="90" y2="24" stroke="#e5484d" stroke-width="2.6"/>
+<text x="95" y="28" fill="currentColor" fill-opacity=".85">naive decay (EWMA) — what memory ships</text>
+<line x1="72" y1="40" x2="90" y2="40" stroke="#0091ff" stroke-width="2.6"/>
+<text x="95" y="44" fill="currentColor" fill-opacity=".85">two-channel store</text>
+<line x1="72" y1="56" x2="90" y2="56" stroke="#30a46c" stroke-width="2.6"/>
+<text x="95" y="60" fill="currentColor" fill-opacity=".85">CUSUM (provably optimal)</text>
+</svg></figure>

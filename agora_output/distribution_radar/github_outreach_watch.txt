@@ -1,0 +1,13 @@
+# GitHub outreach threads we commented on (DanceNitra) — check for replies each cycle via:
+#   gh issue view <num> --repo <repo> --comments | tail -40
+# On a real reply -> GATED Slovak briefing to owner; never auto-reply.
+openclaw/openclaw#35203  | 2026-06-27 | multi-agent: layered memory + best-of-N tail + blackboard herding | comment 4821672492
+deepseek-ai/DeepSeek-V3#1121 | 2026-06-27 | on-device memory: two-tier eviction + identity-binding as anti-sybil provenance | comment 4821677849
+DanceNitra/agora#discussions/2 | 2026-06-28 | Neeraj/MemStrata collab thread (write-side+read-side memory) | watch for replies (gh api graphql)
+r/LLMDevs 1uhajcp | Neeraj reply POSTED 2026-06-28 (supersession replication + mnemo + discussion link) | watch for his next reply
+deepseek-launch-community/Elina-seed#47 | 2026-06-30 | Supersession spec drop-in ACCEPTED + we are in their README "Community Collaborations"; thanked him + offered live side-by-side probe run | comment 4845293732 | last=us, ball on him (offer to run probes once spec lands)
+deepseek-ai/DeepSeek-V3#1447 | 2026-06-30 | qingkong cross-framework calibration status (July 3 deadline, calib doc this week); broad, not @us | last=qingkong66 15:51Z | OPEN invite, no direct Q to us
+deepseek-ai/DeepSeek-V3#1462 | 2026-06-30 | qingkong "Identity Pressure Eval" B-001..B-003 OPEN INVITATION to run our framework + share what our instrument sees; "not a competition" | last=qingkong66 15:39Z | DECISION: join with mnemo probes (rigor) or just watch?
+deepseek-launch-community/Elina-seed#47 | 2026-06-30 LATE | confirmed adapter runs on their elina_memory_sample.json; full poison+eviction side-by-side READY, waiting on B-series/real fixtures (current sample has no repeated/contradicted facts) | comment 4846778060 | last=us, ball on him (he pings when fixtures stable -> then a2: run measured side-by-side + full audit)
+r/Rag 1ujwwu6 | 2026-06-30 | "single vector ties BM25, hybrid wins" post (owner-posted) | donk8r replied (positive, asked recall@3/5) -> we added @5/@10 to post + replied (BM25-first widens at small k) | last=us, ball on community | WALK nested t1 tree each check
+deepseek-ai/DeepSeek-V3#1462 | 2026-06-30 LATE | CONTRIBUTED B-003 substrate instrument (mnemo keyed supersession vs last-value vs append-log; provenance/supersession_explicit + spec csv); 3-lens red-team audited; framed complementary-not-superior, tagged qingkong only | comment 4847062453 | last=us, watch for qingkong/framework-author reactions

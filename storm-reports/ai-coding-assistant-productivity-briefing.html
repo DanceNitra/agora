@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Do AI coding assistants make developers more productive? · Storm Research</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&family=Roboto+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ink:#0f172a; --body:#334155; --muted:#64748b; --line:#e2e8f0; --bg:#ffffff;
+    --soft:#f8fafc; --accent:#2563eb; --accent-soft:#eff6ff;
+    --ok:#16a34a; --ok-soft:#f0fdf4; --warn:#d97706; --warn-soft:#fffbeb;
+    --bad:#dc2626; --bad-soft:#fef2f2; --demote:#7c3aed; --demote-soft:#f5f3ff;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--soft);color:var(--body);
+    font-family:"Montserrat",system-ui,-apple-system,sans-serif;line-height:1.62;font-size:16px}
+  .wrap{max-width:860px;margin:0 auto;padding:48px 24px 96px}
+  .card{background:var(--bg);border:1px solid var(--line);border-radius:14px;padding:28px 32px;margin:20px 0;
+    box-shadow:0 1px 2px rgba(15,23,42,.04)}
+  h1{font-size:34px;line-height:1.18;font-weight:800;color:var(--ink);margin:0 0 10px}
+  h2{font-size:13px;font-weight:700;letter-spacing:.09em;text-transform:uppercase;color:var(--accent);margin:0 0 16px}
+  h3{font-size:19px;font-weight:700;color:var(--ink);margin:0 0 6px}
+  p{margin:0 0 14px}
+  a{color:var(--accent);text-decoration:none;border-bottom:1px solid #bfdbfe}
+  a:hover{border-color:var(--accent)}
+  code,.mono{font-family:"Roboto Mono",monospace}
+  .topic{font-family:"Roboto Mono",monospace;font-size:13px;color:var(--muted)}
+  .meta{font-size:13px;color:var(--muted);margin-top:8px}
+  .disclosure{font-size:12.5px;color:var(--muted);background:var(--soft);border:1px dashed var(--line);
+    border-radius:10px;padding:12px 16px;margin-top:18px}
+  .verify{display:flex;flex-wrap:wrap;gap:10px;align-items:center;background:var(--accent-soft);
+    border:1px solid #bfdbfe;border-radius:12px;padding:14px 18px;margin:20px 0;font-size:14px}
+  .verify b{color:var(--ink)}
+  .pill{font-family:"Roboto Mono",monospace;font-size:12px;font-weight:600;padding:3px 10px;border-radius:999px;
+    border:1px solid var(--line);background:#fff;color:var(--body)}
+  .pill.g{color:var(--ok);border-color:#bbf7d0;background:var(--ok-soft)}
+  .pill.y{color:var(--warn);border-color:#fde68a;background:var(--warn-soft)}
+  .pill.r{color:var(--bad);border-color:#fecaca;background:var(--bad-soft)}
+  .pill.v{color:var(--demote);border-color:#ddd6fe;background:var(--demote-soft)}
+  .finding{border-top:1px solid var(--line);padding:20px 0}
+  .finding:first-of-type{border-top:0;padding-top:4px}
+  .frow{display:flex;align-items:baseline;gap:14px}
+  .rank{font-family:"Roboto Mono",monospace;font-weight:600;color:var(--muted);font-size:14px;min-width:26px}
+  .conf{margin-left:auto;font-family:"Roboto Mono",monospace;font-size:12px;font-weight:600;
+    color:var(--accent);background:var(--accent-soft);border:1px solid #bfdbfe;border-radius:999px;padding:3px 11px;white-space:nowrap}
+  .chips{display:flex;flex-wrap:wrap;gap:7px;margin:10px 0 0 40px}
+  .chip{font-size:12px;padding:3px 10px;border-radius:6px;border:1px solid var(--line);background:var(--soft);color:var(--muted)}
+  .chip.sup{color:var(--ok);border-color:#bbf7d0;background:var(--ok-soft)}
+  .chip.chg{color:var(--bad);border-color:#fecaca;background:var(--bad-soft)}
+  .finding p{margin:8px 0 0 40px}
+  .guide{display:grid;grid-template-columns:1fr;gap:14px}
+  @media(min-width:640px){.guide{grid-template-columns:1fr 1fr 1fr}}
+  .gcol{border:1px solid var(--line);border-radius:10px;padding:16px}
+  .gcol h4{margin:0 0 10px;font-size:13px;letter-spacing:.05em;text-transform:uppercase}
+  .gcol.assert{background:var(--ok-soft);border-color:#bbf7d0}.gcol.assert h4{color:var(--ok)}
+  .gcol.caveat{background:var(--warn-soft);border-color:#fde68a}.gcol.caveat h4{color:var(--warn)}
+  .gcol.avoid{background:var(--bad-soft);border-color:#fecaca}.gcol.avoid h4{color:var(--bad)}
+  .gcol ul{margin:0;padding-left:18px;font-size:14px}.gcol li{margin:6px 0}
+  ul.moves{padding-left:20px}ul.moves li{margin:9px 0}
+  .sidebar{background:var(--demote-soft);border:1px solid #ddd6fe;border-radius:12px;padding:18px 22px;margin:20px 0}
+  .sidebar h2{color:var(--demote)}
+  .frontier{background:var(--ink);color:#e2e8f0;border-radius:14px;padding:30px 32px;margin:24px 0}
+  .frontier h2{color:#93c5fd}.frontier .q{font-size:22px;font-weight:700;color:#fff;line-height:1.4}
+  .refs{font-size:13.5px}
+  .ref{padding:11px 0;border-top:1px solid var(--line);display:flex;gap:12px;align-items:flex-start}
+  .ref:first-of-type{border-top:0}
+  .tag{font-family:"Roboto Mono",monospace;font-size:10.5px;font-weight:600;letter-spacing:.04em;
+    padding:2px 8px;border-radius:5px;white-space:nowrap;margin-top:2px}
+  .tag.ok{color:var(--ok);background:var(--ok-soft);border:1px solid #bbf7d0}
+  .tag.partial{color:var(--warn);background:var(--warn-soft);border:1px solid #fde68a}
+  .tag.unver{color:var(--muted);background:var(--soft);border:1px solid var(--line)}
+  .tag.false{color:var(--bad);background:var(--bad-soft);border:1px solid #fecaca}
+  .tag.demoted{color:var(--demote);background:var(--demote-soft);border:1px solid #ddd6fe}
+  .grade{font-family:"Roboto Mono",monospace;font-weight:600;color:var(--ink)}
+  footer{text-align:center;color:var(--muted);font-size:12px;margin-top:40px}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header>
+    <h1>Do AI coding assistants actually make developers more productive?</h1>
+    <div class="topic">storm-research · for an AI-research org curating a public replication ledger (the Crucible)</div>
+    <div class="meta">June 29, 2026 · Storm Research · 5-lens, citation-verified</div>
+    <div class="disclosure">
+      The five expert lenses below (Practitioner, Academic, Skeptic, Economist, Historian) are an
+      <b>author-built panel</b>, not independent field experts. Agreement across lenses is a strong
+      hypothesis, not consensus of the field. Every cited figure was independently verified against its
+      primary source (see status tags); corrections and demotions are disclosed in the banner.
+    </div>
+  </header>
+
+  <div class="verify">
+    <b>Verification:</b>
+    <span class="pill g">8/8 citations checked</span>
+    <span class="pill r">0 fabricated</span>
+    <span class="pill y">5 corrected</span>
+    <span class="pill v">3 demoted</span>
+    <span class="grade" style="margin-left:auto">Overall grade: A−</span>
+  </div>
+
+  <section class="card">
+    <h2>The 60-second summary</h2>
+    <p><b>Settled:</b> AI coding assistants produce real, measured output gains in specific contexts — scoped/greenfield tasks and less-experienced developers. The strongest evidence is a peer-reviewed set of three field RCTs (4,867 developers) showing GitHub Copilot raised completed tasks ~26%, with larger gains for juniors.</p>
+    <p><b>Contested:</b> whether they help <i>experienced</i> developers in <i>large, mature</i> codebases. The only randomized trial on that population (METR, 16 devs, a 2025 snapshot) found a <b>19% slowdown</b> — while those same developers <i>believed</i> they were ~20% faster. The robust, cross-cutting finding is therefore not a speed number at all: it is the <b>perception–reality gap</b> — self-reported productivity is a biased estimator of actual output, so any org "measuring" AI ROI via developer surveys is measuring belief, not work.</p>
+  </section>
+
+  <section class="card">
+    <h2>Key findings — ranked by reliability</h2>
+
+    <div class="finding">
+      <div class="frow"><span class="rank">01</span><h3>For typical/junior devs on scoped tasks, AI raises task throughput ~26%</h3>
+        <span class="conf">confidence 8/10</span></div>
+      <div class="chips"><span class="chip sup">Supported by: Academic, Practitioner, Economist</span>
+        <span class="chip chg">Challenged by: Skeptic (counts completion, not quality)</span></div>
+      <p>Three field RCTs, 4,867 developers (Microsoft/Accenture/Fortune-100), peer-reviewed in <i>Management Science</i>: +26.1% completed tasks (SE ~10pp), larger for less-experienced devs. Measures <b>task-completion count</b>, not code quality, correctness, or maintainability — the known blind spot.</p>
+    </div>
+
+    <div class="finding">
+      <div class="frow"><span class="rank">02</span><h3>Developers' felt speedup is decoupled from their measured output (the perception gap)</h3>
+        <span class="conf">confidence 8/10</span></div>
+      <div class="chips"><span class="chip sup">Supported by: all five lenses</span>
+        <span class="chip chg">Challenged by: — (direction robust; magnitude is time-specific)</span></div>
+      <p>METR's RCT: experienced devs were 19% <i>slower</i> with AI yet forecast +24% and reported +20% after the fact — a ~39-point gap, inside one randomized study. The direction (belief ≠ output) is the single most replicated, load-bearing result here. <b>Caveat:</b> small-n preprint and a 2025 snapshot — METR's Feb-2026 follow-up found late-2025 tools improved to a positive effect, so the −19% is a moment-in-time number, not an evergreen verdict.</p>
+    </div>
+
+    <div class="finding">
+      <div class="frow"><span class="rank">03</span><h3>The gains are context-split: greenfield/novel/junior win; experienced devs in mature repos go flat-to-negative</h3>
+        <span class="conf">confidence 7/10</span></div>
+      <div class="chips"><span class="chip sup">Supported by: Practitioner, Academic, Historian</span>
+        <span class="chip chg">Challenged by: vendor single-number claims</span></div>
+      <p>The apparent +26% vs −19% conflict dissolves once you condition on developer expertise and codebase familiarity. AI supplies context the novice lacks; it cannot supply the tacit context an expert already holds — so it helps most exactly where the hype is weakest and helps least exactly where the hype is loudest.</p>
+    </div>
+
+    <div class="finding">
+      <div class="frow"><span class="rank">04</span><h3>Individual time-savings don't propagate to org-level delivery</h3>
+        <span class="conf">confidence 6/10</span></div>
+      <div class="chips"><span class="chip sup">Supported by: Practitioner, Skeptic, Economist</span>
+        <span class="chip chg">Challenged by: vendor adoption stats</span></div>
+      <p>Google's DORA 2024 estimated that +25% AI adoption was associated with −1.5% delivery throughput and −7.2% stability (2025: throughput turned positive, stability still negative). Observational survey, not causal — DORA frames it as AI <i>amplifying</i> existing team strengths/weaknesses, with the bottleneck shifting to review/QA.</p>
+    </div>
+
+    <div class="finding">
+      <div class="frow"><span class="rank">05</span><h3>"Saved" coding time relocates to review, debugging, and maintenance — and quality/security can decay</h3>
+        <span class="conf">confidence 6/10</span></div>
+      <div class="chips"><span class="chip sup">Supported by: Skeptic, Practitioner</span>
+        <span class="chip chg">Challenged by: completion-only metrics</span></div>
+      <p>NYU/IEEE S&amp;P (peer-reviewed): ~40% of Copilot completions across 1,689 programs contained a security weakness. GitClear (commercial, 211M lines): copy-pasted code rose 8.3%→12.3% and overtook refactored code for the first time. The mechanism the speed-numbers ignore: effort moves from typing to <i>reviewing plausible-but-subtly-wrong code</i>, which is slower and more draining when you already know the codebase.</p>
+    </div>
+  </section>
+
+  <section class="card">
+    <h2>The hidden connection</h2>
+    <p>The <b>pricing model explains the measurement gap.</b> AI coding tools are sold per seat, so vendor revenue scales with <i>adoption and retention</i> — and the cheapest driver of both is the <i>feeling</i> of speed, which the evidence shows is decoupled from real output. That is why every billion-dollar incumbent's "productivity" proof is internally produced on trivial greenfield tasks (where AI genuinely wins), while the one study engineered to be unsellable — independent funding, real repos, experienced devs — is the one that found a loss. The perception gap isn't just a psychology curiosity; it is the business model's load-bearing asset.</p>
+  </section>
+
+  <section class="card">
+    <h2>Key assumption · the missing 6th lens</h2>
+    <p><b>The long-term maintainer / code archaeologist.</b> Every metric here is short-horizon: task time, completion count, first-draft volume. None measures the multi-year cost — maintainability debt as AI-written code accumulates, the review burden compounding, and skill atrophy in juniors who ship working code without ever learning the hard parts. The 6th lens asks the question that would change the conclusion: <i>what is the 3-year total cost of ownership of AI-accelerated code?</i> No study here answers it.</p>
+  </section>
+
+  <section class="card">
+    <h2>What to do — for an org curating the Crucible (+ mnemo / RAMR)</h2>
+    <ul class="moves">
+      <li><b>Crucible candidate (high value):</b> the canonical "GitHub Copilot makes devs 55.8% faster" stat is a <i>vendor preprint</i> on a <i>single greenfield JS HTTP-server task</i>, ~95 recruited / ~70 completers — fragile as a universal claim. Pair it against the independent METR −19% (experienced/mature repos) as a <b>"vendor benchmark vs independent RCT — context flips the sign"</b> ledger entry. The FAILED reading is the <i>universal</i> "X% faster" claim, not AI coding itself.</li>
+      <li><b>External anchor for our overconfidence / calibration line (cite, don't re-run):</b> the METR perception gap (−19% measured, +20% felt) is a real-world <i>human</i> instance of the exact theme our overconfidence-tax and LLM-judge probes measure in models — <b>self-report is a biased estimator of true performance.</b> Strong, verified corroboration for that canon.</li>
+      <li><b>Methods receipt (eval-folklore Crucible):</b> the +26% vs −19% "contradiction" is the same shape as our LLM-judge / Arena work — <i>the metric isn't measuring what it claims.</i> Completion-count ≠ time-to-done ≠ downstream defect cost; the sign depends on which you pick and on whom. A clean "measure-what-matters" receipt.</li>
+      <li><b>mnemo / RAMR hook:</b> experienced devs lose in <i>mature</i> repos precisely because the AI lacks the deep context they hold — the binding constraint is <b>context/memory quality, not raw model capability.</b> That is the argument for a good agent-memory layer (mnemo = supply the context the model lacks) and a contamination-resistant memory benchmark (RAMR). And "individual gain doesn't reach the org because the bottleneck shifts to verification" is the verification-bottleneck theme in the wild.</li>
+      <li><b>Discipline:</b> never publish a single number as "the" productivity effect. The honest claim is conditional: <i>population × task type × time horizon.</i></li>
+    </ul>
+  </section>
+
+  <section class="card">
+    <h2>Claim safety guide</h2>
+    <div class="guide">
+      <div class="gcol assert"><h4>Safe to assert</h4><ul>
+        <li>Gains are real but context-dependent (juniors/greenfield up; experts/mature repos flat-to-negative).</li>
+        <li>The perception–reality gap is real and replicated in direction (METR).</li>
+        <li>Peer-reviewed RCT: +26% task completion for typical devs (Cui/Demirer, <i>Management Science</i>).</li>
+        <li>~40% of Copilot completions had a security weakness (NYU, peer-reviewed).</li>
+      </ul></div>
+      <div class="gcol caveat"><h4>Assert with caveat</h4><ul>
+        <li>METR −19%: small-n preprint <i>and</i> a 2025 snapshot — pair with the Feb-2026 uplift revision.</li>
+        <li>+26% is completion-<i>count</i>, not quality/maintainability.</li>
+        <li>DORA −7.2% stability: observational survey, not causal.</li>
+        <li>Cursor ~$50B / Copilot ~$1B ARR: reported/analyst-estimated, not all company-disclosed.</li>
+      </ul></div>
+      <div class="gcol avoid"><h4>Avoid / don't repeat</h4><ul>
+        <li>"AI makes developers X% more productive" as a <i>universal</i> claim.</li>
+        <li>The vendor "55.8% faster" as representative of real work.</li>
+        <li>GitClear churn "doubled" — it was <i>projected</i> to; commercial, not peer-reviewed.</li>
+        <li>Citing developer-survey self-reports as evidence of actual output.</li>
+      </ul></div>
+    </div>
+  </section>
+
+  <aside class="sidebar">
+    <h2>Contested signal (demoted in verification)</h2>
+    <p><b>METR −19%</b> — striking and confirmed, but n=16 preprint and a 2025-snapshot; the Feb-2026 follow-up shows the gap narrowed with newer tools. Use for the <i>direction</i> (perception gap), not the evergreen magnitude. <b>Peng "55.8% faster"</b> — real number, but a GitHub/Microsoft preprint on one toy task with an attrition-reduced sample; not representative. <b>GitClear code-quality decay</b> — commercial report (not peer-reviewed); copy-paste rise is measured, but "churn doubled" was a projection.</p>
+  </aside>
+
+  <section class="frontier">
+    <h2>The frontier question</h2>
+    <p class="q">Does AI help or hurt experienced developers in mature codebases — measured by time-to-merged plus downstream defect and maintenance cost over 6–12 months — in a large, pre-registered, peer-reviewed RCT? No such study exists; METR (n=16, preprint) is the only randomized evidence on that population.</p>
+  </section>
+
+  <section class="card refs">
+    <h2>References — verified against primary sources</h2>
+    <div class="ref"><span class="tag partial">CORRECTED</span>
+      <span>Cui, Demirer, Jaffe, Musolff, Peng &amp; Salz (2025), "The Effects of Generative AI on High-Skilled Work," <i>Management Science</i>, DOI 10.1287/mnsc.2025.00535 — +26.1% completed tasks, 4,867 devs, peer-reviewed. <a href="https://pubsonline.informs.org/doi/10.1287/mnsc.2025.00535">source</a> (corrected: lens mis-cited arXiv 2302.06590, which is the Peng study below)</span></div>
+    <div class="ref"><span class="tag demoted">CONFIRMED · 2025 snapshot</span>
+      <span>Becker et al. / METR (2025), "Measuring the Impact of Early-2025 AI on Experienced OS Developer Productivity," arXiv:2507.09089 — 19% slower, 16 devs, 246 tasks; +20% perceived. Preprint. <a href="https://arxiv.org/abs/2507.09089">source</a> · <a href="https://metr.org/blog/2026-02-24-uplift-update/">Feb-2026 revision</a></span></div>
+    <div class="ref"><span class="tag demoted">PARTIALLY CONFIRMED</span>
+      <span>Peng, Kalliamvakou, Cihon &amp; Demirer (2023), "The Impact of AI on Developer Productivity: Evidence from GitHub Copilot," arXiv:2302.06590 — 55.8% faster on one JS HTTP-server task; ~95 recruited / ~70 completers; GitHub/Microsoft preprint (vendor). <a href="https://arxiv.org/abs/2302.06590">source</a></span></div>
+    <div class="ref"><span class="tag ok">CONFIRMED</span>
+      <span>Google DORA 2024 &amp; 2025 Accelerate State of DevOps — +25% AI adoption ↔ −1.5% throughput, −7.2% stability (2024); throughput positive, stability still negative (2025). Observational. <a href="https://dora.dev/research/2024/dora-report/">2024</a> · <a href="https://cloud.google.com/blog/products/ai-machine-learning/announcing-the-2025-dora-report">2025</a></span></div>
+    <div class="ref"><span class="tag partial">CORRECTED</span>
+      <span>Pearce, Ahmad, Tan, Dolan-Gavitt &amp; Karri (2022), "Asleep at the Keyboard? Assessing the Security of GitHub Copilot," IEEE S&amp;P — ~40% of 1,689 programs (89 scenarios) vulnerable. Peer-reviewed. <a href="https://arxiv.org/abs/2108.09293">source</a> (corrected: 1,689 not 1,692)</span></div>
+    <div class="ref"><span class="tag demoted">PARTIALLY CONFIRMED</span>
+      <span>GitClear (2025), "AI Copilot Code Quality" — copy-paste 8.3%→12.3% (overtook refactored code); "moved" code 25%→&lt;10%; churn <i>projected</i> to double. Commercial report, not peer-reviewed. <a href="https://www.gitclear.com/ai_assistant_code_quality_2025_research">source</a></span></div>
+    <div class="ref"><span class="tag partial">CORRECTED</span>
+      <span>Market/revenue: Cursor/Anysphere $2.3B Series D at $29.3B, ~$1B ARR (company-disclosed Nov 2025); ~$50B reported "in talks" Apr 2026. Copilot 4.7M paid subs (Microsoft-disclosed); ~$1B ARR is analyst estimate. AI code-tools market ~$5–7B (2023–25) → ~$26–30B by 2030–31 (analyst). <a href="https://cursor.com/blog/series-d">Cursor</a> · <a href="https://www.grandviewresearch.com/industry-analysis/ai-code-tools-market-report">Grand View</a></span></div>
+  </section>
+
+  <footer>Generated by the Storm Research pipeline · 5 lenses → contradiction map → synthesis → adversarial verification (6 independent verifiers, 8 citations)</footer>
+
+</div>
+</body>
+</html>

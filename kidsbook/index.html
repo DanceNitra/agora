@@ -1,0 +1,202 @@
+so <!DOCTYPE html>
+<html lang="sk">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<title>Rozprávky — interaktívne čítanie pre deti</title>
+<style>
+  *{box-sizing:border-box;margin:0;-webkit-tap-highlight-color:transparent;font-family:"Comic Sans MS",Verdana,sans-serif}
+  html,body{height:100%}
+  body{background:#fff4e6;color:#3a2f25;overflow:hidden;user-select:none}
+  #app{height:100vh;display:flex;flex-direction:column}
+
+  /* library */
+  .lib{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:24px;padding:24px;text-align:center}
+  .lib h1{font-size:clamp(28px,5vw,46px);color:#c2410c}
+  .lib p{font-size:18px;color:#7c6f63;max-width:30ch}
+  .shelf{display:flex;gap:20px;flex-wrap:wrap;justify-content:center}
+  .cover{width:180px;background:#fff;border:3px solid #f0c896;border-radius:20px;padding:22px 18px;cursor:pointer;
+    box-shadow:0 8px 22px rgba(0,0,0,.10);transition:transform .15s}
+  .cover:hover{transform:translateY(-4px)}
+  .cover .pic{font-size:72px} .cover .t{margin-top:10px;font-size:19px;font-weight:bold;color:#9a3412}
+  .cover .go{margin-top:12px;background:#16a34a;color:#fff;border-radius:999px;padding:8px 18px;font-size:15px;display:inline-block}
+
+  /* reader */
+  .reader{flex:1;display:none;flex-direction:column}
+  .reader.on{display:flex}
+  .topbar{display:flex;align-items:center;justify-content:space-between;padding:10px 14px}
+  .iconbtn{background:#fff;border:2px solid #f0c896;border-radius:14px;width:46px;height:46px;font-size:22px;cursor:pointer}
+  .dots{display:flex;gap:7px} .dot{width:11px;height:11px;border-radius:50%;background:#e7d3b4} .dot.on{background:#16a34a}
+  .scene{position:relative;flex:1;margin:0 14px;border-radius:24px;overflow:hidden;border:3px solid #fff;box-shadow:inset 0 0 0 2px #f0c896}
+  .obj{position:absolute;transform:translate(-50%,-50%);font-size:clamp(40px,9vw,72px);background:none;border:0;cursor:pointer;line-height:1;transition:transform .12s}
+  .obj:active{transform:translate(-50%,-50%) scale(.8)}
+  .obj.bounce{animation:bnc .5s}
+  @keyframes bnc{0%,100%{transform:translate(-50%,-50%) scale(1)}30%{transform:translate(-50%,-60%) scale(1.25)}}
+  .obj.done{opacity:.35;filter:grayscale(1)}
+  .gamebar{position:absolute;top:12px;left:50%;transform:translateX(-50%);background:rgba(255,255,255,.92);
+    border-radius:14px;padding:8px 16px;font-size:17px;font-weight:bold;color:#9a3412;white-space:nowrap}
+  /* quiz */
+  .quiz{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:18px;padding:20px;background:rgba(255,255,255,.4)}
+  .quiz .opt{display:flex;align-items:center;gap:12px;background:#fff;border:3px solid #f0c896;border-radius:18px;
+    padding:14px 22px;font-size:20px;cursor:pointer;min-width:240px}
+  .quiz .opt .e{font-size:34px}
+  /* reward */
+  .reward{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;text-align:center;padding:24px}
+  .reward .stars{font-size:64px;animation:pop .8s} @keyframes pop{0%{transform:scale(0)}70%{transform:scale(1.3)}100%{transform:scale(1)}}
+  .reward h2{font-size:30px;color:#16a34a}
+  /* narration bubble + controls */
+  .bottom{padding:12px 16px 18px;display:flex;gap:12px;align-items:flex-start}
+  .play{background:#16a34a;color:#fff;border:0;border-radius:50%;width:58px;height:58px;font-size:26px;cursor:pointer;flex:none;box-shadow:0 5px 14px rgba(22,163,74,.4)}
+  .bubble{flex:1;background:#fff;border:2px solid #f0c896;border-radius:18px;padding:12px 16px;font-size:clamp(16px,2.4vw,20px);line-height:1.45;min-height:58px;display:flex;align-items:center}
+  .next{background:#f59e0b;color:#fff;border:0;border-radius:16px;padding:0 18px;font-size:30px;cursor:pointer;flex:none}
+  .next:disabled{opacity:.3;cursor:not-allowed}
+</style>
+</head>
+<body>
+<div id="app">
+  <!-- LIBRARY -->
+  <div class="lib" id="lib">
+    <h1>📚 Rozprávky</h1>
+    <p>Interaktívne rozprávky pre deti — počúvaj, klikaj a hraj sa.</p>
+    <div class="shelf" id="shelf"></div>
+    <p style="font-size:13px;color:#b3a392">prototyp · hlas: Web Speech (SK) · ilustrácie a profi hlas pribudnú</p>
+  </div>
+
+  <!-- READER -->
+  <div class="reader" id="reader">
+    <div class="topbar">
+      <button class="iconbtn" onclick="goLibrary()">🏠</button>
+      <div class="dots" id="dots"></div>
+      <button class="iconbtn" id="replayNarr" onclick="playNarration()">🔊</button>
+    </div>
+    <div class="scene" id="scene"></div>
+    <div class="bottom">
+      <button class="play" id="play" onclick="playNarration()">▶</button>
+      <div class="bubble" id="bubble"></div>
+      <button class="next" id="next" onclick="nextPage()">▶</button>
+    </div>
+  </div>
+</div>
+
+<script>
+  var book=null, pageIdx=0, gameSolved=false, found=0, synth=window.speechSynthesis, skVoice=null;
+
+  function pickVoice(){
+    var vs=synth?synth.getVoices():[];
+    skVoice=vs.find(function(v){return /sk|slov/i.test(v.lang)||/sloven/i.test(v.name)})
+      || vs.find(function(v){return /cs|czech/i.test(v.lang)}) || vs[0] || null;
+  }
+  if(synth){ synth.onvoiceschanged=pickVoice; pickVoice(); }
+  function speak(t){
+    if(!synth||!t)return;
+    synth.cancel();
+    var u=new SpeechSynthesisUtterance(t);
+    if(skVoice)u.voice=skVoice; u.lang="sk-SK"; u.rate=.95; u.pitch=1.05;
+    synth.speak(u);
+  }
+
+  // LIBRARY
+  function renderLibrary(){
+    var shelf=document.getElementById('shelf'); shelf.innerHTML='';
+    Object.values(window.BOOKS||{}).forEach(function(b){
+      var c=document.createElement('div'); c.className='cover';
+      c.innerHTML='<div class="pic">'+b.cover+'</div><div class="t">'+b.title+'</div><div class="go">Čítať ▶</div>';
+      c.onclick=function(){openBook(b);};
+      shelf.appendChild(c);
+    });
+  }
+  function goLibrary(){ if(synth)synth.cancel(); document.getElementById('reader').classList.remove('on'); document.getElementById('lib').style.display='flex'; }
+
+  function openBook(b){
+    book=b; pageIdx=0;
+    document.getElementById('lib').style.display='none';
+    document.getElementById('reader').classList.add('on');
+    var dots=document.getElementById('dots'); dots.innerHTML='';
+    b.pages.forEach(function(_,i){var d=document.createElement('div');d.className='dot';dots.appendChild(d);});
+    renderPage();
+  }
+
+  function renderPage(){
+    var p=book.pages[pageIdx], scene=document.getElementById('scene');
+    gameSolved=!p.game; found=0;
+    scene.style.background=p.bg||'#eef';
+    scene.innerHTML='';
+    document.getElementById('bubble').textContent=p.narration||'';
+    // progress dots
+    document.querySelectorAll('.dot').forEach(function(d,i){d.classList.toggle('on',i===pageIdx);});
+    // next arrow gating
+    var nb=document.getElementById('next'); nb.disabled=!gameSolved; nb.textContent = pageIdx>=book.pages.length-1?'🏠':'▶';
+
+    if(p.reward){ renderReward(scene); }
+    else if(p.game && p.game.type==='find'){ renderFind(scene,p.game); }
+    else if(p.game && p.game.type==='quiz'){ renderQuiz(scene,p.game); }
+    else { (p.objects||[]).forEach(function(o){ scene.appendChild(makeObj(o)); }); }
+
+    setTimeout(playNarration,400);
+  }
+
+  function makeObj(o){
+    var b=document.createElement('button'); b.className='obj'; b.textContent=o.emoji;
+    b.style.left=o.x+'%'; b.style.top=o.y+'%';
+    b.onclick=function(){ document.getElementById('bubble').textContent=o.say; speak(o.say);
+      b.classList.remove('bounce'); void b.offsetWidth; b.classList.add('bounce'); };
+    return b;
+  }
+
+  function renderFind(scene,g){
+    var bar=document.createElement('div'); bar.className='gamebar'; bar.id='gbar'; bar.textContent=g.prompt; scene.appendChild(bar);
+    var spots=[[20,40],[50,38],[80,42],[30,72],[55,72],[78,72]];
+    var items=g.items.slice();
+    items.forEach(function(it,i){
+      var b=document.createElement('button'); b.className='obj'; b.textContent=it.emoji;
+      b.style.left=spots[i%spots.length][0]+'%'; b.style.top=spots[i%spots.length][1]+'%';
+      b.onclick=function(){
+        if(b.classList.contains('done'))return;
+        document.getElementById('bubble').textContent=it.say; speak(it.say);
+        if(it.correct){ b.classList.add('done'); found++;
+          if(found>=g.items.filter(function(x){return x.correct}).length){ winGame(g); } }
+        else { b.classList.remove('bounce'); void b.offsetWidth; b.classList.add('bounce'); }
+      };
+      scene.appendChild(b);
+    });
+  }
+
+  function renderQuiz(scene,g){
+    var box=document.createElement('div'); box.className='quiz';
+    var q=document.createElement('div'); q.className='gamebar'; q.style.position='static'; q.style.transform='none'; q.textContent=g.prompt; box.appendChild(q);
+    g.options.forEach(function(op){
+      var b=document.createElement('button'); b.className='opt';
+      b.innerHTML='<span class="e">'+op.emoji+'</span><span>'+op.label+'</span>';
+      b.onclick=function(){ if(op.correct){ speak(g.win); winGame(g); } else { speak('Skús ešte raz!'); document.getElementById('bubble').textContent='Skús ešte raz! 🙂'; b.style.borderColor='#ef4444'; } };
+      box.appendChild(b);
+    });
+    scene.appendChild(box);
+  }
+
+  function winGame(g){
+    gameSolved=true;
+    document.getElementById('bubble').textContent=g.win; speak(g.win);
+    document.getElementById('next').disabled=false;
+    var bar=document.getElementById('gbar'); if(bar)bar.textContent='✅ '+(g.win.length>40?'Hotovo!':g.win);
+  }
+
+  function renderReward(scene){
+    var r=document.createElement('div'); r.className='reward';
+    r.innerHTML='<div class="stars">⭐⭐⭐</div><h2>Výborne!</h2><div style="font-size:20px;max-width:26ch">'+(book.pages[pageIdx].narration||'')+'</div>'+
+      '<button class="cover" style="border:0;background:#16a34a;color:#fff;cursor:pointer;width:auto" onclick="openBook(book)">Čítať znova 🔁</button>';
+    scene.appendChild(r);
+  }
+
+  function playNarration(){ var p=book.pages[pageIdx]; if(p&&p.narration)speak(p.narration); }
+  function nextPage(){
+    if(!gameSolved)return;
+    if(pageIdx>=book.pages.length-1){ goLibrary(); return; }
+    pageIdx++; renderPage();
+  }
+
+  renderLibrary();
+</script>
+<script src="books/pernikova-chalupka.js"></script>
+<script>renderLibrary();</script>
+</body>
+</html>
