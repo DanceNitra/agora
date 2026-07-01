@@ -1,0 +1,33 @@
+{
+ "short": {
+  "none": [
+   0.125,
+   0.0
+  ],
+  "random": [
+   1.0,
+   1.0
+  ],
+  "optimized": [
+   1.0,
+   1.0
+  ]
+ },
+ "long": {
+  "none": [
+   0.125,
+   0.0
+  ],
+  "random": [
+   1.0,
+   0.25
+  ],
+  "optimized": [
+   1.0,
+   1.0
+  ]
+ },
+ "margin_short_top5": 0.0,
+ "margin_long_top5": 0.0,
+ "reading": "If long/random collapses while long/optimized stays high, optimization matters and the hotflip probe's margin=0 was a short-query artifact. If both long conditions stay high, the vulnerability is robust to dilution and optimization genuinely adds no retrieval margin. If both long collapse, the whole attack is a short-query/mean-pool artifact."
+}

@@ -772,3 +772,36 @@ the one funnel.)
   "SpAIware" (persistent-memory attack vector), "Thinking Like a NERD: Entity-Centered Memory for LLM
   Agents", and an "LLM Memory Poisoning Attack" database entry — all describe the same attack surface
   (persistent/RAG memory poisoning), useful as a citation cluster when this frontier item is picked up.
+
+## AgentPoison vs mnemo — TESTED (2026-07-01), supersedes the earlier "deferred frontier flag"
+
+Ran a REAL gradient-guided (HotFlip) AgentPoison-style attack (arXiv:2407.12784) against mnemo's
+semantic-retrieval channel, using a differentiable dense retriever (all-MiniLM-L6-v2) as mnemo's
+embedder so attack and defense share one embedding space. Artifacts (runnable receipts):
+mnemo/probes/agentpoison_hotflip_probe.py (+_result.json), agentpoison_dilution_check.py,
+agentpoison_multirandom_check.py. The first (gradient-free) probe agentpoison_trigger_probe.py is kept
+as a documented negative example: its 100% ASR-r was a BM25 exact-string artifact (0% on the isolated
+embedding channel) — caught by the 5-lens stress-claim panel.
+
+VALIDATED FINDING (with controls):
+- Single-instance trigger poisoning gets the poison into semantic top-5 TRIVIALLY: any random rare
+  5-word phrase prepended to a query -> 100% top-5 ASR-r. Not a BM25 artifact (pure semantic mode).
+  This part is textbook (prior art: MINJA arXiv:2601.05504; unfiltered similarity retrieval is
+  poisonable — RAG-security 101).
+- The NON-obvious part — the payoff of AgentPoison's gradient optimization — shows up only on the
+  STRICT rank-1 hijack metric under REALISTIC dilution (trigger a small fraction of a long query):
+  optimized trigger holds 100% rank-1 hijack (8/8), while 8 independent random triggers average 59%
+  (range 0-88%, wildly unstable). Optimized beats ALL 8 random draws. Margin +40pp. So optimization
+  buys RELIABILITY / rank dominance, not mere presence — which is exactly why the paper bothers with it.
+- mnemo's existing poison-guard (episodic->semantic graduation, corroboration-gated) is IRRELEVANT to
+  all of this: it gates long-term durability, not retrieval. The poison stayed episodic/ungraduated yet
+  retrieved at 100%. Confirmed. The real fix must live at write/retrieval time (embedding-outlier gate).
+
+CAVEATS (before any external publication — gate NOT yet fully cleared): n=8 carriers, single 30-item
+corpus, single retriever (MiniLM mean-pooling); retrieval-only (no downstream agent-action loop, no
+coherence/target loss); stress-claim panel ran on an EARLIER framing and should be re-run on this final
+one; needs >=1 more retriever (BGE/DPR) to address the single-retriever caveat.
+
+NEXT (highest-value): build the retrieval/write-time defense (embedding-outlier detector at write, or a
+min-corroboration-before-first-recall gate) and measure before/after ASR-r — "we attacked our own memory
+layer, found it poisonable at retrieval, and shipped + measured the fix" is the distributable version.
