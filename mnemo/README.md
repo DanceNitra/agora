@@ -49,6 +49,25 @@ single channel, 9/10 conversations, conversation-level bootstrap CI excludes 0; 
 (paraphrase-heavy corpora, see benchmarks) fusion adds little. `mode='auto'` fuses; `mode='lexical'` /
 `'semantic'` force a single channel.
 
+### Poison-resistant recall: `recall(..., influence_only=True)` (0.4.0)
+
+Retrieval-time / embedding-geometry defenses do **not** stop memory poisoning in general. We red-teamed
+`mnemo` with a real AgentPoison-style single-instance attack (Chen et al., NeurIPS 2024; PoisonedRAG, Zou
+et al., USENIX Security 2025): a **plain-English trigger sentence** in one poisoned memory hijacks raw
+top-1 retrieval **88–100%**, it is **scale-invariant** (60→10 000 memories), it **evades a perplexity
+filter** (natural triggers have natural perplexity), and coherence/outlier retrieval defenses **don't
+generalize across encoders**. The layer that *does* generalize is **influence-gating by corroboration**:
+`recall(..., influence_only=True)` returns only memories that earned the same bar as episodic→semantic
+graduation (a credited good outcome, or ≥2 distinct-source links). Retrieve freely for context; gate what
+drives an *action*. Measured: single-instance poison rank-1 hijack → **0%** on MiniLM/BGE/Contriever and
+at every scale, because an injected poison never earns corroboration while real memories earn it through
+use — and it generalizes precisely because it lives in **provenance metadata, not embedding geometry**.
+Honest cost (a calibration tradeoff): a rare-but-true memory that hasn't earned corroboration is filtered
+too (recall 1.00 corroborated vs 0.08 uncorroborated), so this is for **adversarial / untrusted-ingestion**
+use. It raises attacker cost (defeating it needs ≥3 coordinated records with ≥2 forged independent
+provenances), it does not make poisoning impossible. Receipts: [`probes/agentpoison_influence_gate.py`](probes/agentpoison_influence_gate.py),
+[`probes/agentpoison_influence_gate_validation.py`](probes/agentpoison_influence_gate_validation.py).
+
 ## Use it as an MCP server (any Claude / Cursor / agent client)
 
 `mnemo` ships an [MCP](https://modelcontextprotocol.io) stdio server so any MCP-compatible agent can

@@ -80,7 +80,7 @@ def new_receipt_keypair():
     return (sk.private_bytes(_ser.Encoding.Raw, _ser.PrivateFormat.Raw, _ser.NoEncryption()).hex(),
             sk.public_key().public_bytes(_ser.Encoding.Raw, _ser.PublicFormat.Raw).hex())
 
-__version__ = "0.3.0"
+__version__ = "0.4.0"
 _WORD = re.compile(r"[a-z0-9][a-z0-9\-']{2,}")
 _STOP = frozenset("the a an of for to in on and or is are was were be been with this that it its as "
                   "by at from into our we us you your he she they them his her their not no".split())
@@ -474,7 +474,7 @@ class Mnemo:
     def recall(self, query: str, k: int = 6, include_superseded: bool = False,
                include_hubs: bool = False, mode: str = "auto", min_relevance: float = 0.0,
                scope: str | None = None, as_of: float | None = None,
-               where: dict | None = None) -> list[dict]:
+               where: dict | None = None, influence_only: bool = False) -> list[dict]:
         """Top-k memories by RELEVANCE × VALUE — high-value memories outrank merely-similar ones.
         Memories the dream pass flagged as hubs (universal matchers) are skipped unless include_hubs.
 
@@ -495,7 +495,27 @@ class Mnemo:
         where={"valid_from": {"$gte": t0, "$lte": t1}} (hard-filter the SOLVED half), or a closed-set
         entity where={"speaker": {"$in": ["Caroline","Mel"]}}. NOTE: this is a HARD filter — a record that
         doesn't match is removed, so on lossy/predicted extraction prefer a broad/loose filter (or rerank)
-        over an aggressive one, since a wrong filter hard-deletes the answer (measured harm mode)."""
+        over an aggressive one, since a wrong filter hard-deletes the answer (measured harm mode).
+
+        influence_only (OPT-IN, default False -> zero behavior change): restrict the result to CORROBORATED
+        memories — those that meet the same bar mnemo uses for episodic->semantic GRADUATION (an EARNED
+        net-positive outcome via credit() [good>0 and good>=bad], OR already-graduated 'semantic' type, OR
+        >=2 DISTINCT-canonical-source corroborating links). This is the retrieve-then-INFLUENCE split: recall
+        freely for context, but call with influence_only=True for the set that is allowed to DRIVE an action.
+        MEASURED (mnemo/probes/agentpoison_influence_gate*.py) against a real AgentPoison-style single-
+        instance retrieval-poisoning attack (Chen et al., NeurIPS 2024, arXiv:2407.12784; PoisonedRAG, Zou
+        et al., arXiv:2402.07867): a natural-sentence trigger hijacks RAW top-1 retrieval 88-100% and is
+        scale-invariant (60->10k memories), and retrieval-time / embedding-geometry defenses do NOT
+        generalize across encoders — but influence_only drops the single-instance poison's rank-1 hijack to
+        0% on all three tested retrievers (MiniLM/BGE/Contriever) and all scales, because an injected poison
+        never earns corroboration while legitimate memories earn it through use. It GENERALIZES precisely
+        because it lives in provenance metadata, not embedding geometry. HONEST COST (calibration tradeoff):
+        a rare-but-true memory that has not yet earned corroboration is filtered too (measured recall 1.00
+        corroborated vs 0.08 uncorroborated) — so this is for adversarial / untrusted-ingestion use, where a
+        recalled-but-uncorroborated memory should inform but not unilaterally drive an action. It RAISES
+        attacker cost (a single free injection is filtered; defeating it needs >=3 coordinated records with
+        >=2 independent forged provenances) rather than making poisoning impossible. Reversible: default
+        False = legacy recall."""
         def _eligible(r: dict) -> bool:
             s = r["status"]
             if as_of is not None:
@@ -553,6 +573,12 @@ class Mnemo:
                         if val != cond: return False
                 return True
             pool = [r for r in pool if _match(r)]
+        # Influence gate (retrieve-then-influence split): keep only CORROBORATED memories in the set that is
+        # allowed to drive an action. Same bar as episodic->semantic graduation; embedder-independent, so it
+        # generalizes across retrievers where geometry-based poison defenses do not (see the docstring).
+        if influence_only:
+            _byid = {x["id"]: x for x in self.items}
+            pool = [r for r in pool if self._is_corroborated(r, _byid)]
         # Mode selection. 'hybrid' = lexical (token overlap) + semantic (embedding) fused with Reciprocal
         # Rank Fusion. We MEASURED hybrid robustly beating EITHER channel alone for agent memory on LoCoMo
         # (recall@20 0.61 hybrid vs 0.55 lexical vs 0.53 semantic; +0.057 over the best single channel,
@@ -731,6 +757,21 @@ class Mnemo:
             doc = src.get("doc") if isinstance(src, dict) else (src if isinstance(src, str) else None)
             keys.add(Mnemo._canon_source(doc) if doc else "id:" + lid)
         return len(keys)
+
+    @staticmethod
+    def _is_corroborated(rec: dict, by_id: dict) -> bool:
+        """The corroboration bar shared by episodic->semantic graduation and the recall influence gate:
+        an EARNED net-positive outcome (good>0 and good>=bad — set by credit() on real work, not
+        self-assertable), OR an already-graduated 'semantic' memory, OR >=2 DISTINCT-canonical-source
+        corroborating links (sybil variants of one source collapse to one). A single fresh self-asserted
+        memory (the AgentPoison single-instance poison) meets none of these."""
+        good = float(rec.get("good", 0) or 0)
+        bad = float(rec.get("bad", 0) or 0)
+        if good > 0 and good >= bad:
+            return True
+        if rec.get("mtype") == "semantic":
+            return True
+        return Mnemo._distinct_sources(rec.get("links"), by_id) >= 2
 
     @staticmethod
     def _reliability(r: dict) -> float:
