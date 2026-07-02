@@ -31,3 +31,9 @@ Runnable receipts (zero-dependency, MIT — re-run or break them): `mnemo/probes
 - influence_only → 0% on 3 retrievers + all scales; utility ~90–100% — agentpoison_influence_gate_result.json + validation
 - rare cost 1.00 vs 0.08; attacker ladder (1 free filtered / 3 records + 2 forged sources passes) — validation
 - citations: AgentPoison = Chen et al. NeurIPS 2024 arXiv:2407.12784; PoisonedRAG = Zou et al. USENIX Sec 2025 arXiv:2402.07867 (both verified this session)
+
+
+## POSTED 2026-07-02 (owner-approved)
+- #1462 -> https://github.com/deepseek-ai/DeepSeek-V3/issues/1462#issuecomment-4865632130
+- #1466 -> https://github.com/deepseek-ai/DeepSeek-V3/issues/1466#issuecomment-4865634138
+OPEN PROMISE: if 万象渊鉴 V2 dialogue/identity-drift (身份漂移) has extractable cross-session contradiction pairs, run the substrate instrument on the shared set + post rows. WATCH both threads for replies.
