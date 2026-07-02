@@ -41,10 +41,18 @@ edit src + re-render; render_piece → edit HTML directly, and remember the FAQ 
 ### 1. State the load-bearing claim(s) + evidence
 Write each claim as one falsifiable sentence + its support (Lab id / measured numbers / cited prior art).
 
-### 2. VALIDATE — re-run OUR Lab numbers from source
+### 2. VALIDATE — re-run OUR Lab numbers from source, and make the artifact PUBLIC + LINKED
 Find and RUN the lab/probe script behind every measured number. A number in the post or vault is NOT
 verified. Confirm each published figure matches the re-run. If a script is missing, that itself is a
 finding — build an independent from-scratch re-derivation and disclose it as such (see #16/#18/#19).
+**A private re-derivation is NOT enough (standing-gate requirement, added audit #20):** every published
+headline number must resolve to a runnable artifact a reader can OPEN. `agora_output/lab/` is gitignored,
+so a script there cannot be linked — **promote the re-derivation to a PUBLIC tracked path (`mnemo/probes/`),
+make it self-contained (no local paths / secrets / PII), have it print every number the post cites, and add
+an `<a href>` from the post body (EN + SK) to the file in the public repo** (`github.com/DanceNitra/agora/blob/main/mnemo/probes/<name>.py`).
+A post that carries a headline figure with no linked runnable probe is a NEEDS-FIX, not a PUBLISH — this
+is exactly the gap the re-audit skeptic caught on #20. Consolidate one probe that reproduces the whole
+number set (naive result + every correction + the sensitivity sweep), not a scatter of throwaway scripts.
 
 ### 3. STORM — /storm-research on the post's core claim  ← MANDATORY, run this before stress-claim
 Run the full `storm-research` skill (5 expert lenses + contradiction map + its own Phase-4 verification)
