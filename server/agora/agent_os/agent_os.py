@@ -852,6 +852,21 @@ class AgentOS:
                         await mem.store_memory(mem_text, "episodic", 0.7, "satisfied", "action")
                     except Exception:
                         pass
+                elif result.get("status") == "rejected":
+                    # CHATTER-GATE feedback (owner 2026-07-02): teach the agent, don't just block.
+                    # A strong episodic memory of the rejection surfaces on recall, so the agent
+                    # stops re-submitting the same ungrounded stub and coordinates in conversation.
+                    print(f"[RealAction] {name}: {real_action} REJECTED → {result.get('output', '')[:80]}")
+                    mem_text = (f"Your {real_action} was REJECTED by the vault gate — it was "
+                                "coordination/ungrounded text, not a finding. Lesson: the vault only "
+                                "stores grounded results (a measured number or a real citation); "
+                                "talk to colleagues in conversation instead of writing notes at them.")
+                    try:
+                        from agora.agent_os.memory_agent import MemoryAgent
+                        mem = MemoryAgent(self.db, npc_id)
+                        await mem.store_memory(mem_text, "episodic", 0.8, "reflective", "action")
+                    except Exception:
+                        pass
             except Exception as e:
                 print(f"[RealAction] {name} error: {e}")
 

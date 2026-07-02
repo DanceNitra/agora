@@ -94,8 +94,8 @@ class RealActionEngine:
         ]
         action_descriptions = {
             "send_telegram": "Send a message to Rasto via Telegram. Use to share discoveries, insights, or ask questions. Params: message (str)",
-            "write_note": "Write a short .md note to the knowledge vault. Use to record discoveries, observations, errors. Params: title (str), content (str), tags (list)",
-            "write_article": "Write a detailed article (600-900 lines) to the knowledge vault. Use for deep analysis, book insights, tutorials. Params: title (str), content (str, 600+ lines), tags (list)",
+            "write_note": "Record ONE grounded finding in the knowledge vault. A real citation or a measured number is REQUIRED — ungrounded notes are rejected. NOT for coordination: quest requests, proposals, status updates and questions to colleagues belong in conversation (your `action` field), never the vault. Params: title (str), content (str), tags (list)",
+            "write_article": "Write a deep, grounded analysis to the knowledge vault (same bar: real citations or measured numbers; ungrounded plans/proposals are rejected). Params: title (str), content (str), tags (list)",
             "run_script": "Execute a shell command. Use for automation, data processing, file operations. Params: command (str). SAFETY: read-only commands only.",
             "git_commit": "Commit and push changes to the vault repo. Use after writing notes. No params needed.",
             "ask_question": "Search the vault for knowledge on a topic. Params: query (str)",
@@ -153,10 +153,30 @@ class RealActionEngine:
         }
 
     async def _write_note(self, params: dict, agent_name: str) -> dict:
-        """Write a note to the vault."""
+        """Write a note to the vault — ONLY a grounded finding survives (quality-gated)."""
         title = params.get("title", f"{agent_name}'s Note")
         content = params.get("content", "No content")
         tags = params.get("tags", ["dungeon", "agent-generated"])
+
+        # CHATTER GATE (owner 2026-07-02): this ambient path wrote straight to the vault with NO
+        # gate, so coordination chatter — quest requests, near-identical "proposal" stubs, status
+        # updates, spec requests (~37/day) — polluted the second-brain while real research had to
+        # fight through the promote gates. The vault stores GROUNDED KNOWLEDGE only; coordination
+        # belongs in agent conversation. Same judge as /brain/vault-note (science gate: a real
+        # citation or a measured number, substantive body). Fail-open on gate outage so a model
+        # hiccup can't block a genuine finding.
+        try:
+            from agora.execution.quality_gate import assess_quality
+            q = await assess_quality(title, content)
+            if not q["pass"]:
+                return {"status": "rejected",
+                        "output": (f"NOT written -- the vault only stores grounded findings "
+                                   f"({q['reason']}). Coordination -- quest requests, proposals, "
+                                   "status updates, questions to colleagues -- belongs in "
+                                   "conversation, not the vault. Write a note only when you have "
+                                   "a real result: a measured number or a real citation.")}
+        except Exception:
+            pass
 
         if self.vault_writer:
             try:
@@ -180,10 +200,23 @@ class RealActionEngine:
             return {"status": "ok", "output": f"Written to {fpath}", "filepath": fpath}
 
     async def _write_article(self, params: dict, agent_name: str) -> dict:
-        """Write a long-form article to the vault."""
+        """Write a long-form article to the vault — same grounding bar as _write_note."""
         title = params.get("title", f"{agent_name}'s Article")
         content = params.get("content", "No content")
         tags = params.get("tags", ["dungeon", "article", "deep-analysis"])
+
+        # CHATTER GATE (owner 2026-07-02): same as _write_note — an ungrounded "article" (plan,
+        # proposal, restated intent) is chatter with a longer word count, not knowledge.
+        try:
+            from agora.execution.quality_gate import assess_quality
+            q = await assess_quality(title, content)
+            if not q["pass"]:
+                return {"status": "rejected",
+                        "output": (f"NOT written -- the vault only stores grounded work "
+                                   f"({q['reason']}). An article needs real citations or measured "
+                                   "numbers; plans and proposals belong in conversation.")}
+        except Exception:
+            pass
 
         # Count lines for SEO requirement
         lines = content.split("\n")
