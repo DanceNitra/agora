@@ -533,25 +533,33 @@ async def promote_findings(request: Request, n: int = 16):
     for _v, title, content in ranked:
         if len(promoted) >= n:
             break
-        _PROMOTED.add(title)
         checked += 1
+        # ONE-SHOT-BURN FIX (2026-07-02): _PROMOTED used to be set BEFORE the outcome, so a single
+        # TRANSIENT failure (LLM flake in the judge/red-team, a write exception swallowed below)
+        # permanently discarded a genuine finding — the funnel silently starved (0 notes/day while
+        # candidates verified clean offline). Burn the title only on a DEFINITIVE outcome (dedup,
+        # judge/red-team rejection, successful write); on a transient write error leave it un-burned
+        # so the next 20-min run retries it.
         # DEDUP-AWARE: don't burn the slot on a near-duplicate of an existing vault note — the
         # write would be silently skipped anyway, leaving "promoted" inflated and 0 notes landed.
         # Skip it and try the next-best NOVEL candidate (reuses the writer's own dedup metric).
         try:
             if await _asyncio.to_thread(writer._find_duplicate, title, content):
+                _PROMOTED.add(title)                  # definitive: vault already covers it
                 deduped += 1
                 continue
         except Exception:
             pass
         q = await assess_quality(title, content)
         if not q["pass"]:
+            _PROMOTED.add(title)                      # definitive: judged not vault-worthy
             continue
         # RESEARCH-QUALITY #4: strong-model adversarial red-team before the vault (prior-art /
         # weak-baseline / vagueness / source-mismatch). Only genuinely novel, grounded, falsifiable
         # findings survive; fail-open so a model outage can't freeze the funnel.
         _adv_ok, _adv_why = await _asyncio.to_thread(_adversarial_review, title, content)
         if not _adv_ok:
+            _PROMOTED.add(title)                      # definitive: red-team rejection (prior art etc.)
             _PROMOTE_STATS["src_adv_reject"] = _PROMOTE_STATS.get("src_adv_reject", 0) + 1
             continue
         try:
@@ -565,9 +573,12 @@ async def promote_findings(request: Request, n: int = 16):
                       + (f"> ⚠ Credibility: {_caveat}\n\n" if _lowcred else "") + content)
             await writer.write_note(title=title[:70], content=graded,
                                     tags=_tags, agent_name="Sage Mira")
+            _PROMOTED.add(title)                      # definitive: landed in the vault
             promoted.append(title[:50])
-        except Exception:
-            pass
+        except Exception as _we:
+            # transient (do NOT burn the title — retry next run), and SAY so instead of hiding it
+            print(f"[promote] write_note failed for '{title[:60]}': {type(_we).__name__}: {_we}")
+            _PROMOTE_STATS["src_write_err"] = _PROMOTE_STATS.get("src_write_err", 0) + 1
     _PROMOTE_STATS["promoted"] += len(promoted)
     _PROMOTE_STATS["checked"] += checked
     return {"status": "ok", "promoted": len(promoted), "checked": checked,
