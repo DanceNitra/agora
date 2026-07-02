@@ -1,6 +1,6 @@
 """
 Crucible candidate: does mnemo's existing poison-guard defend against an AgentPoison-style
-(Zhang et al., "AgentPoison: Red-teaming LLM Agents via Poisoning Memory or Knowledge Bases",
+(Chen et al., "AgentPoison: Red-teaming LLM Agents via Poisoning Memory or Knowledge Bases",
 NeurIPS 2024, arXiv:2407.12784) memory-poisoning attack?
 
 THREAT MODEL (from the primary source, verified via arXiv HTML + PDF):
@@ -10,9 +10,10 @@ THREAT MODEL (from the primary source, verified via arXiv HTML + PDF):
     tight cluster with each other; (c) COHERENCE -- keep the trigger text low-perplexity (fluent,
     natural-looking) via a surrogate LM, so it evades perplexity-filter defenses; (d) TARGET -- the
     poisoned memory text elicits the attacker's chosen behavior once retrieved.
-  - Measured headline numbers (verified against the paper): >=80% attack-success-rate at retrieval
-    (ASR-r) with <0.1% poison rate; 62.0% average ASR-r with just ONE poisoned instance and a
-    single-token trigger; <1% impact on benign-query accuracy; existing input-side defenses
+  - Measured headline numbers (verified against the paper, verify-claims 2026-07-02): 81.2% average
+    attack-success-rate at retrieval (ASR-r) with <0.1% poison rate; single-instance poisoning also works
+    (their Fig. 4); the 62.6% figure is the end-to-end ASR-t (target impact), NOT single-instance ASR-r;
+    <1% impact on benign-query accuracy; existing input-side defenses
     (perplexity filtering, query rephrasing) only cut ASR-target to 47.2%/50.0% (vs near-total kill
     on cruder attacks like GCG), because the coherence loss specifically makes the trigger
     indistinguishable from real text under those filters.
@@ -308,7 +309,7 @@ result = {
     "claim": "AgentPoison-inspired single-instance adversarial-cluster trigger achieves high-confidence "
              "retrieval in mnemo's EMBEDDING channel, and the existing episodic->semantic poison-guard "
              "provides no real-time barrier (it gates long-term durability, not retrieval)",
-    "source": "Zhang et al. 2024, AgentPoison, NeurIPS 2024, arXiv:2407.12784",
+    "source": "Chen et al. 2024 (Zhaorun Chen, Zhen Xiang, Chaowei Xiao, Dawn Song, Bo Li), AgentPoison, NeurIPS 2024, arXiv:2407.12784",
     "simplification": "gradient-guided beam search over a differentiable embedder substituted with a "
                        "discrete local search over natural-phrase candidates, scored by the same "
                        "uniqueness+compactness objective (coherence/target losses out of scope: mnemo "

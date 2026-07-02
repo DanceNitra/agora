@@ -1,8 +1,11 @@
 """
 THE NOVEL CONTRIBUTION (blindspot-lens hook): retrieval-time defense is the wrong layer. We red-team a
 memory layer that has a TRUST/GRADUATION guard (mnemo) and measure the boundary of a two-stage
-retrieve-then-influence architecture that prior RAG-poisoning work (PoisonedRAG arXiv:2402.07867,
-anisotropy paper arXiv:2606.19692) does not test.
+retrieve-then-influence architecture that prior RAG-poisoning work (e.g. PoisonedRAG, Zou et al. 2024,
+arXiv:2402.07867) does not test -- it attacks/defends RETRIEVAL, not a corroboration-gated influence step.
+(verify-claims 2026-07-02: do NOT cite arXiv:2606.19692 here -- it argues anisotropy ENABLES a global
+admission gate, the opposite of a "defense fails on anisotropic encoders" claim; our anisotropy remark is
+our own empirical observation grounded in the general anisotropy of these encoders, Ethayarajh 2019.)
 
 THESIS: a single-instance AgentPoison-style trigger hijacks RETRIEVAL ~100% (reproduced, known). But if
 only CORROBORATED memory is allowed to INFLUENCE the agent's action, the poison -- a single injected

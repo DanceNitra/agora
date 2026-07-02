@@ -891,9 +891,11 @@ triggers, same mechanism).
 
 ### THE NOVEL CONTRIBUTION (2026-07-02): corroboration-gated INFLUENCE — validated, RAISED-BAR
 
-The blindspot lens found the one thing prior art (PoisonedRAG 2402.07867, anisotropy 2606.19692) doesn't
+The blindspot lens found the one thing prior art (PoisonedRAG, Zou et al. 2024, arXiv:2402.07867) doesn't
 cover: red-teaming a memory layer with a TRUST/GRADUATION guard. Built + validated the defense at the
-retrieve->ACT boundary. Artifacts: mnemo/probes/agentpoison_influence_gate.py (+_result.json),
+retrieve->ACT boundary. (verify-claims 2026-07-02: dropped the arXiv:2606.19692 citation -- it argues the
+OPPOSITE, that anisotropy ENABLES a global admission gate; our anisotropy observation is our own
+empirical result grounded in Ethayarajh 2019's general anisotropy finding, not that paper.) Artifacts: mnemo/probes/agentpoison_influence_gate.py (+_result.json),
 agentpoison_influence_gate_validation.py (+_result.json).
 
 THESIS (design lesson): retrieval-time poison defense is the WRONG layer (embedder-dependent, fails on

@@ -1,6 +1,6 @@
 {
  "claim": "AgentPoison-inspired single-instance adversarial-cluster trigger achieves high-confidence retrieval in mnemo's EMBEDDING channel, and the existing episodic->semantic poison-guard provides no real-time barrier (it gates long-term durability, not retrieval)",
- "source": "Zhang et al. 2024, AgentPoison, NeurIPS 2024, arXiv:2407.12784",
+ "source": "Chen et al. 2024 (Zhaorun Chen, Zhen Xiang, Chaowei Xiao, Dawn Song, Bo Li), AgentPoison, NeurIPS 2024, arXiv:2407.12784",
  "simplification": "gradient-guided beam search over a differentiable embedder substituted with a discrete local search over natural-phrase candidates, scored by the same uniqueness+compactness objective (coherence/target losses out of scope: mnemo has no perplexity/content filter to evade, and no downstream agent-action loop was run -- this tests RETRIEVAL only, not end-to-end attack success)",
  "trigger": "along the disused canal towpath",
  "trigger_search_detail": {

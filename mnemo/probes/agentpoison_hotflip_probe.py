@@ -8,11 +8,13 @@ was a BM25 exact-string artifact (the trigger appeared verbatim in both the pois
 queries; on the isolated EMBEDDING channel the same trigger scored 0%). So that probe did NOT test the
 actual AgentPoison mechanism (fooling a DENSE retriever without literal keyword overlap). This probe does.
 
-Primary source: Zhang et al. 2024, "AgentPoison", NeurIPS 2024, arXiv:2407.12784. The paper optimizes a
+Primary source: Chen et al. 2024, "AgentPoison", NeurIPS 2024, arXiv:2407.12784. The paper optimizes a
 trigger via a constrained discrete search combining a UNIQUENESS loss (push trigger-bearing query
 embeddings away from the benign-query cluster) and a COMPACTNESS loss (pull them into a tight cluster),
 using gradient-guided beam search (HotFlip) against a differentiable retriever (they attack DPR/ANCE/
-BGE). Headline: >=80% ASR-r at <0.1% poison rate; 62% ASR-r with ONE poisoned instance.
+BGE). Headline: 81.2% avg ASR-r at <0.1% poison rate; single-instance poisoning also works (their Fig. 4).
+NOTE (verify-claims 2026-07-02): the 62.6% figure is the paper's end-to-end ASR-t (target impact), NOT a
+single-instance ASR-r; do not cite it as such. Authors: Chen, Xiang, Xiao, Song, Li.
 
 WHAT THIS DOES FAITHFULLY:
   - Uses a REAL differentiable dense retriever (sentence-transformers/all-MiniLM-L6-v2, loaded via
@@ -323,7 +325,7 @@ result = {
     "claim": "A REAL gradient-guided (HotFlip) AgentPoison-style trigger, optimized on the "
              "uniqueness+compactness objective against a differentiable dense retriever, achieves "
              "high-confidence retrieval of a single poisoned memory in mnemo's SEMANTIC channel",
-    "source": "Zhang et al. 2024, AgentPoison, NeurIPS 2024, arXiv:2407.12784",
+    "source": "Chen et al. 2024 (Zhaorun Chen, Zhen Xiang, Chaowei Xiao, Dawn Song, Bo Li), AgentPoison, NeurIPS 2024, arXiv:2407.12784",
     "retriever": MODEL, "device": DEVICE, "trigger_len": TRIGGER_LEN,
     "hotflip_rounds": HOTFLIP_ROUNDS, "cands_per_pos": CANDS_PER_POS,
     "optimized_trigger": opt_trigger, "optimized_loss": round(opt_loss, 4),

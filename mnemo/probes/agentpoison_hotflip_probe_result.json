@@ -1,6 +1,6 @@
 {
  "claim": "A REAL gradient-guided (HotFlip) AgentPoison-style trigger, optimized on the uniqueness+compactness objective against a differentiable dense retriever, achieves high-confidence retrieval of a single poisoned memory in mnemo's SEMANTIC channel",
- "source": "Zhang et al. 2024, AgentPoison, NeurIPS 2024, arXiv:2407.12784",
+ "source": "Chen et al. 2024 (Zhaorun Chen, Zhen Xiang, Chaowei Xiao, Dawn Song, Bo Li), AgentPoison, NeurIPS 2024, arXiv:2407.12784",
  "retriever": "sentence-transformers/all-MiniLM-L6-v2",
  "device": "cuda",
  "trigger_len": 5,
