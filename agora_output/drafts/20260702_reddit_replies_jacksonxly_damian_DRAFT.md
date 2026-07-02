@@ -94,3 +94,17 @@ Honest caveat: part of that harm-subset recovery is structural (alias=0 ⇒ no f
 
 ### → damian-delmas (~95 words; READ his repo + arXiv:2603.22587 first)
 Read the flexvec paper — PEM (exposing the score array + embedding matrix as SQL-composable surfaces) is a clean way to put fusion/centrality/decay in the query itself, and 3 modulations in 82ms on 1M chunks on CPU with no ANN index is a genuinely surprising number. SOMA (content-addressed identity surviving renames) is the part I'd have underestimated — it's the join key everything else leans on. And your mean-centered embeddings caught my eye: centering to kill anisotropy is exactly what moved the needle in a retrieval thing I was just testing. Nice work.
+
+---
+
+## FOLLOW-UP → jacksonxly: the TIME arm (2026-07-02, gate-cleared: validate/verify/method-audit)
+Numbers verified vs mnemo/probes/locomo_temporal_parser_weight_result.json. Method-audit corrected the
+explanation (collinearity, not "uniform reliability") + flat/parser = a TIE, not flat-best.
+
+Also ran your time arm — and it splits from the entity one in a way I didn't expect.
+
+On the 250 LoCoMo questions that actually contain a temporal expression, a rule parser (SUTime-lite regex → month/year window) is a strong filter cue: soft-preferring the resolved window is the best arm, recall@20 0.751 vs 0.497 no-filter (+0.254), and it crushes the hard filter on the failure case — when an event is dated in one session but discussed in another, the hard filter deletes the answer (0.02) while soft keeps it (0.45). So "use a rule parser for time, don't hard-delete" holds strongly.
+
+But weighting by the parser's confidence was a wash vs just always applying it (0.747 vs 0.751, n=250). And the reason isn't "the parser is uniformly reliable" — it's collinearity: a vague expression resolves to no window at all, so there's nothing to filter on; you only ever have a confidence to gate on once you've already resolved a clean window. Window-presence is the gate.
+
+Contrast the entity arm, where reliability genuinely varied (exact name vs guessed) and weighting by alias-match strength did pay (+0.084, best, and it protected the wrong-extraction subset). So: both your signals confirm soft>hard + use-an-a-priori-signal; the confidence weight only earns its keep where extraction reliability actually varies. Receipt: https://github.com/DanceNitra/agora/blob/main/mnemo/probes/locomo_temporal_parser_weight.py
