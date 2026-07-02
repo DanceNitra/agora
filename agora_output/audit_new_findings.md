@@ -1057,3 +1057,54 @@ sensitivity can only add information beyond confidence when the model is genuine
 reporting/clean arm and measure sensitivity vs a signed-margin baseline on a mixed clean+poison
 corpus, in the uncertain-prior cell. The deployable defense is provenance/corroboration + NLI
 consistency (logprob-free), NOT a logprob firewall.
+
+================================================================================
+AUDIT #23 -- "we-built-a-meter-for-when-an-ai-is-confidently-wrong" (2026-07-02)
+Verdict: REFRAME -> PUBLISH (lighter than #22; the post was careful and has a real KEEPER).
+
+VALIDATED (deterministic, reproduced from the v3 cache, NO LLM calls): the post's numbers are
+exact -- corr_follow6_vs_resistfalse=-0.928 (post -0.93), confidence corrs 0.146-0.355 (0.15-0.36),
+per-stratum half-saturation d50 0.083 (fictional) vs 0.261 (strong). Public probe:
+mnemo/probes/grounding_meter_v3_analyze.py (+_gm_v3_sweep.py + _gm_v3_raw.json).
+
+TWO PROBLEMS (STORM 5-lens + 5 verified citations converge):
+1. THE -0.93 IS NEAR-TAUTOLOGICAL. It is corr(follow_at_max_dose, resist_false) and
+   resist_false = 1 - follow_to_false, so it correlates a variable with (one minus) itself.
+   Comparing that identity to a real confidence-vs-error correlation (0.15-0.36) is a category
+   error. DROPPED in the reframe; replaced with the honest, narrower point (confidence doesn't
+   encode whether an answer rides on the context -- Lichtenstein-Fischhoff 1977; Guo 2017).
+2. THE "GLM-5.2 RESISTS ON FACTS IT KNOWS" CLAIM WAS CHERRY-PICKED. It rested on a k=1-SAMPLE,
+   4-item slice the lab ITSELF flagged estimator='k_sample_freq_k1_thinkfalse', report=
+   'd50_only_not_commensurable'; a K=3 run showed glm-5.2 FOLLOWING boil/capital/planet; #22's
+   24-item both-orders test found it follows common-fact poisons 22/24.
+
+STRONG-MODEL RE-MEASUREMENT (owner + skeptic demanded it; GPU-free sampling, K=5, both orders,
+6 sources asserting the FALSE option): mnemo/probes/grounding_meter_strong_models.py --
+  follow_false@6 by stratum:   glm-5.2: fictional 1.00, common 0.80, axiom 0.55
+                               deepseek-v4-pro: fictional 1.00, common 0.42, axiom 0.25
+  Two results at once: (a) the dose-response ORDERING BY PRIOR STRENGTH REPLICATES on both frontier
+  models (fictional>common>axiom) -- this validates the KEEPER; (b) glm-5.2 does NOT broadly resist
+  -- it follows the 6-source false context on boil(0.70, an axiom!)/planet(0.90)/japan(1.00)/
+  everest(1.00), resisting only the most canonical (H2O); it is MORE poison-susceptible than
+  deepseek-v4-pro. So the specific cross-model claim inverts.
+
+THE KEEPER (Academic lens): the INSTRUMENT is a real methodological contribution -- a fixed-wording,
+order/direction bias-cancelled dose-response curve with a per-fact half-saturation dose (an EC50 for
+evidence), and the half-saturation-dose-vs-prior-strength scaling. Historian framing: "an Asch
+conformity curve (1951-56) fitted with A.V. Hill's 1910 dose-response equation" -- drug=evidence,
+receptor=prior. POSITIVE vs #22: the meter has a SAMPLING variant (no logprobs) so it runs on strong
+models, unlike the #22 firewall.
+
+PRIOR ART (phenomenon is textbook; verified): Xie et al. ICLR 2024 (2305.13300, adoption depends on
+evidence strength + prior confidence); ClashEval Wu et al. NeurIPS 2024 (2404.10198, override correct
+prior >60%, scales inversely with confidence); Sharma et al. sycophancy (2310.13548); ContextCite
+(2409.00729); Longpre 2021; Guo 2017; Kadavath 2022; Asch 1951-56; Hill 1910; Edwards 1968;
+Lichtenstein-Fischhoff 1977.
+
+FRONTIER QUESTION: the ladder is one fixed wording with no ablation -- is it measuring GROUNDING or
+SUGGESTIBILITY to a prompt template (sycophancy)? The owed experiment (post concedes it): vary the
+wording, confirm the dose-response is monotone in perceived evidential strength (not token count), and
+contrast authoritative-source framings vs social-pressure framings on the same facts.
+
+METHOD LESSON (reinforces #22): a k=1-sample cross-model claim is noise; the owner was right to
+demand strong-model validation -- it both confirmed the real result and killed the cherry-picked one.
