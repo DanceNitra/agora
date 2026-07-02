@@ -1006,3 +1006,54 @@ Next probe: add a reporting-fraction f (share of run checks shown), map false-po
 (rho, f), and test whether PRE-REGISTERING the check set -- not diversifying it -- is what
 restores the multiplicative filter. (Also: a content-blind estimator of the effective number of
 independent checks, Nyholt/Cheverud Meff applied to a robustness table's outcome pattern.)
+
+================================================================================
+AUDIT #22 -- "we-built-a-firewall-for-ai-confidently-wrong-answers" (2026-07-02)
+Verdict: heavy REFRAME -> PUBLISH as an honest NEGATIVE RESULT (the original headline
+"we built a firewall ... it catches what confidence cannot" was mostly an artifact).
+The most severe audit finding so far. Owner explicitly demanded strong-model validation.
+
+THE ORIGINAL CLAIM: a "grounding firewall" -- abstain when an answer's token-probability is
+sensitive to deleting the retrieved document (sensitivity = |p(ans|ctx) - p(ans|no-ctx)|) --
+catches poisoned-wrong answers that confidence misses (N=24, qwen2.5-7B, risk-coverage AUC
+0.028 vs 0.095). Reproduced exactly this cycle (deterministic).
+
+WHY IT FAILS (5-lens STORM + 5-lens stress + 17 verified citations, all converge):
+1. TEXTBOOK/PRIOR ART: ContextCite (NeurIPS 2024) ablates context + detects poisoning;
+   ReDeEP/SEReDeEP (ECS/PKS external-vs-parametric reliance); Chow 1970 (reject option);
+   Cook 1977 (leave-one-out influence); SelfCheckGPT (logprob-free black-box). Not novel.
+2. SATURATED-PRIOR ARTIFACT: the model knew every fact (p_prior=1.00 on all 24; every model
+   tested had 0 errors with no context). When prior=1, sensitivity = 1 - p(ans|ctx), which is
+   co-monotone with the "followed poison" label [p(ans|ctx)<0.5] -- the firewall "beats
+   confidence" by algebra. n=24, 5 wrong, 1 confidently-wrong.
+3. FLAGS GROUNDING NOT LYING: high sensitivity = "answer depends on context" = good RAG. Looks
+   like a firewall only because every context is poison; on a mixed corpus it abstains on
+   grounded-CORRECT answers.
+4. RIGGED COMPARISON: confidence=max(p,1-p) folds direction; the honest signal is the signed
+   margin toward the poison -- ONE model call, no context-removal call.
+5. UNRUNNABLE ON STRONG MODELS: the method needs token logprobs; glm-5.2/kimi (Ollama Cloud)
+   and Anthropic do not expose them. So "works on closed APIs where you only see inputs and
+   outputs" was FALSE. Firewall runs only on the weak open model, where it is an artifact.
+
+NEW MEASURED RESULT (the owner's demand, GPU-free, strong cloud models, plain answer -- the
+weak model UNDERSTATED the problem): with NO context every model answers all 24 correctly (0
+prior errors); given a document asserting the FALSE answer (both answer-orders), poison-follow:
+   glm-5.2 = 22/24, deepseek-v4-pro = 20/24, qwen2.5-7B = 5/24, kimi-k2.7-code = 4/24.
+So frontier reasoners are FAR more poison-susceptible than the weak 7B -- following a
+trusted-looking retrieved doc is intended context-faithfulness (the PoisonedRAG threat,
+~90% ASR w/ 5 texts), not stupidity; susceptibility tracks context-faithfulness of the model
+family, NOT raw capability (kimi, a code model, resisted). Probes (public, linked from post):
+mnemo/probes/grounding_firewall_cloud_poison.py (strong-model table),
+mnemo/probes/grounding_firewall_hardened.py (saturated-prior confound + signed-margin baseline
++ clean/poison arms).
+
+METHOD LESSON (banked): do NOT validate a security/robustness claim on a single weak local
+model. The 7B here made the problem look SMALL (5/24) and made the firewall look GOOD (saturated
+prior). The strong cloud models both (a) reveal the problem is worse (20-22/24) and (b) cannot
+even run the proposed method (no logprobs). [[use-serious-models-not-weak-local]] [[local-gpu-too-slow-cloud-only]]
+
+FRONTIER QUESTION: the only defensible angle (Academic lens) is a PRIOR-ENTROPY-STRATIFIED test:
+sensitivity can only add information beyond confidence when the model is genuinely UNSURE. Add a
+reporting/clean arm and measure sensitivity vs a signed-margin baseline on a mixed clean+poison
+corpus, in the uncertain-prior cell. The deployable defense is provenance/corroboration + NLI
+consistency (logprob-free), NOT a logprob firewall.
