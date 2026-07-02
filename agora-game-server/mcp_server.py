@@ -3154,6 +3154,22 @@ async def _experiment_discovery(eid: str, intent: str) -> None:
             return
     except Exception:
         pass
+    # VAULT-SATURATION GATE (2026-07-02): the check above only looks at the last 30 discoveries by exact
+    # title prefix, so an experiment whose result the VAULT already holds (from an earlier week) still ran
+    # the expensive match+Lab, then got dropped downstream as a vault duplicate (src_deduped). Measured
+    # waste: ~95 of ~100 daily lab runs re-measured covered ground while ~5 genuinely-new results landed.
+    # Mirror the vault-novelty gate _grounded_discovery already uses: if the theme is already densely covered
+    # in the vault, SKIP before the costly run and steer the agent to new ground (fresh papers / uncovered
+    # themes) instead of burning the slot. Reversible: raise/lower via DUNGEON_NOVELTY_GATE.
+    try:
+        related = await _brain_vault_search(theme)
+        top_sim = (related[0].get("score", 0.0) if related else 0.0)
+        if top_sim >= _NOVELTY_GATE:
+            broadcast({"type": "os_build", "kind": "collab", "who": who,
+                       "text": f"'{theme[:30]}' already covered in the vault (sim {top_sim:.2f}) - seeking new ground"})
+            return
+    except Exception:
+        pass
     res = await asyncio.to_thread(
         _brain_post_sync, "/api/v1/agent-os/brain/methods/match",
         {"theme": theme[:300], "requester": who}, 120)            # 120s: the match + Lab run is slow
