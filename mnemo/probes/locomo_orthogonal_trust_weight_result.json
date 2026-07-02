@@ -1,0 +1,34 @@
+{
+ "k": 20,
+ "n_q": 1531,
+ "fire": 1366,
+ "flips": 331,
+ "p_noise": 0.25,
+ "overconf": 0.9,
+ "d2_topm": 10,
+ "harm_n": 383,
+ "d2_disagree_on_harm": {
+  "caught": 73,
+  "total": 383,
+  "rate": 0.1906
+ },
+ "recall@20": {
+  "hybrid": 0.5828,
+  "soft_selfconf": 0.5692,
+  "soft_orthogonal": 0.5121
+ },
+ "harm_subset": {
+  "hybrid": {
+   "mean": 0.5894,
+   "n": 383
+  },
+  "soft_selfconf": {
+   "mean": 0.2867,
+   "n": 383
+  },
+  "soft_orthogonal": {
+   "mean": 0.3034,
+   "n": 383
+  }
+ }
+}
