@@ -830,3 +830,33 @@ arXiv:2601.05504 calls trust-threshold calibration an unresolved dilemma). The s
 promising OPT-IN adversarial-mode feature but is NOT promoted to mnemo core yet (validated only on n=8/10,
 one 30-item corpus, one retriever MiniLM, retrieval-only). Next before any external publication: >=1 more
 retriever (BGE/DPR), larger corpus + n, re-audit stress-claim on this final framing.
+
+### AgentPoison STEP 1 — cross-retriever evidence broadening (2026-07-02): defense does NOT generalize
+
+Re-ran attack + defense across THREE dense retrievers (all-MiniLM-L6-v2 mean-pool, BGE-small-en-v1.5
+CLS-pool, Contriever mean-pool) on a larger corpus (60 mem / 10 topics, 16 long trigger carriers, 16
+benign). Artifacts: mnemo/probes/agentpoison_multiretriever_check.py (+_result.json),
+agentpoison_coherence_diag.py, agentpoison_centering_diag_result.json.
+
+ATTACK generalizes STRONGLY (the solid, publishable part): all 3 retrievers -> optimized single-instance
+trigger = 100% long-query rank-1 hijack; even RANDOM triggers 65% (MiniLM) / 86% (BGE) / 90% (Contriever)
+mean. mnemo's dense-retrieval memory is broadly poisonable, robust to dilution, across embedder families.
+
+DEFENSE (set-coherence soft re-rank) does NOT generalize -- KILLS the "ship a universal fix" plan:
+- MiniLM: works (hijack 100%->19%, utility 100%). Separable (poison coherence 0.009 vs benign 0.251).
+- Contriever: SEPARABLE (poison 0.249 vs benign 0.384, benign_min 0.333 > poison_max 0.267) but the
+  fixed C0=0.12 threshold (tuned to MiniLM's scale) was too low -> defense did nothing as-run. Would need
+  PER-MODEL calibration. This IS the "calibration dilemma" (arXiv:2601.05504) shown concretely.
+- BGE: NOT separable (poison coherence 0.462 vs benign 0.549, overlap -0.037). BGE is strongly
+  anisotropic (everything ~0.5 cosine) so the poison's cross-topic incoherence is invisible. No threshold
+  works, at any calibration.
+- mnemo's anisotropy CENTERING does NOT rescue it -- it DESTROYS the separation on ALL three (MiniLM
+  0.046->-0.046, BGE -0.037->-0.087, Contriever 0.066->-0.045). The defense lives only on raw embeddings.
+
+CONCLUSION: there is NO cheap, retriever-agnostic retrieval-time defense against this attack class. The
+fix must be upstream (ingestion trust), matching the STORM lenses + literature. => Track A ("ship a
+universal mnemo defense") is honestly KILLED. Honest product contributions instead: (a) a mnemo README
+threat-model note (the poison-guard defends DURABILITY, not RETRIEVAL -- measured), (b) ship the
+cross-retriever red-team harness so users test their OWN embedder. Track B (article: "cheap memory-layer
+defenses don't generalize -- here's the cross-retriever evidence") is the real, honest, distributable
+result and does NOT need a working fix.
