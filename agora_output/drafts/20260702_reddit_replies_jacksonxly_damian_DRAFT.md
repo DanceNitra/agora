@@ -81,14 +81,16 @@ DRAFT (short, genuine, one real technical touch-point):
 
 ## SHORTENED, Reddit-friendly (2026-07-02) — use these
 
-### → jacksonxly (~180 words)
-Ran it — your core point holds, but the orthogonal fix needs the second signal to be genuinely independent, and mine wasn't.
+### → jacksonxly (~190 words) — FINAL (positive; tests his ACTUAL signal, not a proxy)
+Ran your actual entity signal — alias-match strength as the trust weight — and it works; it's the best of the three.
 
-Same LoCoMo hybrid + speaker filter, extractor flipped wrong 25% of the time and made overconfident-on-wrong (self-reports 0.9 even on the flips). Weighting by that self-confidence craters the wrong-fire subset to 0.287 (vs 0.589 no-filter) — exactly what you said.
+Same LoCoMo hybrid + speaker filter. Exact-name questions → reliable extraction (5% wrong); no-name/ambiguous ones → the extractor has to guess (63% wrong), so errors concentrate exactly where you'd expect. Weighting the filter's contribution:
+- flat self-confidence (0.9): +0.077 recall@20 overall, but it craters the wrong-fire subset to 0.371 (vs 0.448 no-filter) — it fires on the ambiguous guesses too.
+- alias-strength (0.9 × alias, ≈0 on no-name): +0.084 overall (best) and the wrong-fire subset back to 0.436 ≈ no-filter. It keeps the filter's benefit on exact matches and backs off exactly where extraction is unreliable — because alias-strength is knowable a priori, independent of the model's own belief. Your point, confirmed.
 
-But my "orthogonal" signal was a proxy, not yours: majority speaker of the top-10 retrieved turns. It disagreed with the wrong extractor on only 19% of harm cases (it shares the retriever's error), so it barely helped (0.303) and hurt overall (−0.071). That's just co-training — agreement only pays when the two views fail independently.
+Honest caveat: part of that harm-subset recovery is structural (alias=0 ⇒ no filter on the ambiguous set), so the headline is the overall number — you get the filter's upside without its downside. Receipt: https://github.com/DanceNitra/agora/blob/main/mnemo/probes/locomo_alias_strength_weight.py
 
-So it doesn't actually test your idea: SUTime-vs-model, or alias-match strength, are extraction-side signals independent of the flip — which mine wasn't. That's the arm worth running. Got a dataset with a real exact/fuzzy split? Receipt: https://github.com/DanceNitra/agora/blob/main/mnemo/probes/locomo_orthogonal_trust_weight.py
+(The earlier retrieval-derived "second opinion" proxy failed — 19% error-coverage, too correlated; that was the wrong signal, not the wrong idea.)
 
 ### → damian-delmas (~95 words; READ his repo + arXiv:2603.22587 first)
 Read the flexvec paper — PEM (exposing the score array + embedding matrix as SQL-composable surfaces) is a clean way to put fusion/centrality/decay in the query itself, and 3 modulations in 82ms on 1M chunks on CPU with no ANN index is a genuinely surprising number. SOMA (content-addressed identity surviving renames) is the part I'd have underestimated — it's the join key everything else leans on. And your mean-centered embeddings caught my eye: centering to kill anisotropy is exactly what moved the needle in a retrieval thing I was just testing. Nice work.
