@@ -47,3 +47,10 @@ jobs:
           path: _site
       - id: deployment
         uses: actions/deploy-pages@v4
+        with:
+          # GitHub Pages' deploy backend intermittently returns transient status-poll
+          # errors ("Deployment failed, try again later") after a clean build. Raise the
+          # tolerance so a flaky poll doesn't fail an otherwise-good deploy (build always
+          # succeeds; reruns always work). error_count default is 10, timeout 600000ms.
+          error_count: 30
+          timeout: 900000
