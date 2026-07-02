@@ -6,7 +6,7 @@
 
 *Memory is the mother of the Muses. An agent with no memory has no ideas.*
 
-`pip install agora-mnemo` · [PyPI](https://pypi.org/project/agora-mnemo/) · [Hugging Face](https://huggingface.co/Danchi17/mnemo) · [DOI 10.5281/zenodo.21128549](https://doi.org/10.5281/zenodo.21128549) · MIT · v0.4.1
+`pip install agora-mnemo` · [PyPI](https://pypi.org/project/agora-mnemo/) · [Hugging Face](https://huggingface.co/Danchi17/mnemo) · [DOI 10.5281/zenodo.21128549](https://doi.org/10.5281/zenodo.21128549) · MIT · v0.4.2
 
 </div>
 
@@ -86,6 +86,23 @@ wrong), alias-strength-weighted `prefer` scores **recall@20 0.718 (+0.144 over n
 10/10 conversations)** and — on the subset where the extractor picked the wrong speaker — recovers to
 **0.315 vs the hard filter's 0.110** (which craters by deleting the right answer). Soft `prefer` gives the
 filter's upside without the hard filter's downside. Reversible: `prefer=None` = legacy recall.
+
+### Compose several soft cues: multi-dimension `prefer` (0.4.2)
+
+Pass `prefer` as a **list** of `(cond, trust)` tuples (or `{"cond":…, "trust":…}` dicts) to weight more
+than one cue at once — e.g. a resolved time window *and* a named speaker:
+`recall(q, prefer=[({"year": 2023}, 0.9), ({"speaker": x}, 0.7)])`. Matching cues **compose as a product**
+of neutral-at-1.0 factors, so a memory matching both is boosted more than one matching a single cue, and a
+non-matching cue is inert. Cap the total with `prefer_max_boost` (a ceiling on the product, like
+Elasticsearch `function_score`'s `max_boost`). A single `dict` + scalar `prefer_trust` is the one-dimension
+case, unchanged. MEASURED (receipt: [`probes/locomo_composed_soft_filters.py`](probes/locomo_composed_soft_filters.py),
+self-check 0/1568 vs the shipped path): on LoCoMo questions carrying two independent cues (n=183), the
+product composition scores **recall@20 0.865 vs 0.755 for the best single cue (+0.110, bootstrap CI excludes
+0)**, while a summed boost *capped at one dimension's trust* crowds out (−0.053 — the cap flattens the joint
+evidence, the classic "combine outside the saturating form" failure, BM25F/Robertson et al. CIKM 2004). So:
+compose as a **product**, and if you cap, cap the product — the same choice production search settled on
+(Elasticsearch defaults `score_mode=multiply`). Honest scope: one benchmark, one embedder, near-orthogonal
+cues; correlated cues could double-count. Reversible: a single dict / `None` behaves exactly as before.
 
 ## Use it as an MCP server (any Claude / Cursor / agent client)
 

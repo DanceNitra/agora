@@ -80,7 +80,7 @@ def new_receipt_keypair():
     return (sk.private_bytes(_ser.Encoding.Raw, _ser.PrivateFormat.Raw, _ser.NoEncryption()).hex(),
             sk.public_key().public_bytes(_ser.Encoding.Raw, _ser.PublicFormat.Raw).hex())
 
-__version__ = "0.4.1"
+__version__ = "0.4.2"
 _WORD = re.compile(r"[a-z0-9][a-z0-9\-']{2,}")
 _STOP = frozenset("the a an of for to in on and or is are was were be been with this that it its as "
                   "by at from into our we us you your he she they them his her their not no".split())
@@ -475,7 +475,8 @@ class Mnemo:
                include_hubs: bool = False, mode: str = "auto", min_relevance: float = 0.0,
                scope: str | None = None, as_of: float | None = None,
                where: dict | None = None, influence_only: bool = False,
-               prefer: dict | None = None, prefer_trust: float = 1.0) -> list[dict]:
+               prefer=None, prefer_trust: float = 1.0,
+               prefer_max_boost: float | None = None) -> list[dict]:
         """Top-k memories by RELEVANCE × VALUE — high-value memories outrank merely-similar ones.
         Memories the dream pass flagged as hubs (universal matchers) are skipped unless include_hubs.
 
@@ -530,7 +531,43 @@ class Mnemo:
         case). MEASURED (mnemo/probes/locomo_soft_prefer_filter.py) on LoCoMo: soft prefer weighted by
         alias-strength gives the filter's benefit on reliable (exact-name) queries while backing off on
         ambiguous ones where extraction fails -- beating both no filter and a hard `where` filter under
-        imperfect extraction. Reversible: prefer=None = legacy recall."""
+        imperfect extraction. Reversible: prefer=None = legacy recall.
+
+        MULTI-DIMENSION prefer (compose several soft cues at once): pass `prefer` as a LIST of specs, each
+        either {"cond": <dict>, "trust": <0..1>} or a (cond, trust) tuple. Matching dimensions compose as a
+        PRODUCT of neutral-at-1.0 factors — pref = Π (1 + trust_i * gain) over the dims a record matches — so
+        a record matching two cues is boosted more than one matching a single cue, and non-matching dims are
+        inert (factor 1.0). A single dict + scalar prefer_trust is the one-dimension case (unchanged). Cap the
+        TOTAL boost with `prefer_max_boost` (a ceiling on the product, like Elasticsearch function_score's
+        max_boost); default None = uncapped. MEASURED (mnemo/probes/locomo_composed_soft_filters.py) on LoCoMo:
+        on questions carrying two independent cues (a resolved time window AND a named speaker), the product
+        composition reached recall@20 0.865 vs 0.755 for the best single cue (+0.110, bootstrap CI excludes 0);
+        a naive summed boost CAPPED at one dimension's trust crowded out (-0.053, the cap flattened the joint
+        evidence — the classic 'combine outside the saturating form' failure, BM25F, Robertson et al. CIKM
+        2004). So: compose as a PRODUCT, and if you cap, cap the product, not the summed trusts. This mirrors
+        production search (Elasticsearch function_score defaults score_mode=multiply). Reversible: a single
+        dict / None behaves exactly as before."""
+        # Normalize `prefer` into a list of (cond_dict, clamped_trust) specs. Back-compat: a plain dict uses
+        # the scalar prefer_trust (the legacy one-dimension path, byte-identical scoring); a list composes.
+        _prefer_specs: list = []
+        if prefer:
+            if isinstance(prefer, dict):
+                _t0 = max(0.0, min(1.0, float(prefer_trust)))
+                if _t0 > 0.0:
+                    _prefer_specs = [(prefer, _t0)]
+            elif isinstance(prefer, (list, tuple)):
+                for _spec in prefer:
+                    if isinstance(_spec, dict) and "cond" in _spec:
+                        _c, _t = _spec["cond"], float(_spec.get("trust", prefer_trust))
+                    elif isinstance(_spec, (list, tuple)) and len(_spec) == 2:
+                        _c, _t = _spec[0], float(_spec[1])
+                    else:
+                        raise ValueError("prefer list items must be {'cond':..,'trust':..} or (cond, trust)")
+                    _t = max(0.0, min(1.0, _t))
+                    if _t > 0.0 and _c:
+                        _prefer_specs.append((_c, _t))
+            else:
+                raise ValueError("prefer must be a dict (one dimension) or a list of (cond, trust) specs")
         def _eligible(r: dict) -> bool:
             s = r["status"]
             if as_of is not None:
@@ -654,11 +691,11 @@ class Mnemo:
                 b = sum(float(c[3].get("bad", 0) or 0) for c in near)
                 if (g + 1.0) / (g + b + 2.0) <= 1.0 / (1.0 + D):
                     gate_off = True
-        # Soft `prefer` filter: multiplicatively boost records matching the prefer condition by
-        # (1 + prefer_trust * _PREFER_GAIN). Non-matching records are left rankable (unlike hard `where`),
-        # so a wrong/weak filter degrades gracefully instead of hard-deleting the answer. prefer_trust=0
-        # (or prefer=None) -> no boost (identity). Clamp trust to [0, 1].
-        _pt = max(0.0, min(1.0, float(prefer_trust))) if prefer else 0.0
+        # Soft `prefer` filter: multiplicatively boost records matching each prefer condition. Non-matching
+        # records are left rankable (unlike hard `where`), so a wrong/weak cue degrades gracefully instead of
+        # hard-deleting the answer. Multiple cues COMPOSE as a product of neutral-at-1.0 factors
+        # (pref = Π (1 + trust_i * _PREFER_GAIN) over matched dims); one dim reproduces the legacy scalar path.
+        # Optionally cap the product at prefer_max_boost (measured: cap the PRODUCT, never the summed trusts).
         scored = []
         for sim, prov, evalue, r in cands:
             if gate_off:
@@ -667,7 +704,12 @@ class Mnemo:
                 cal = 0.5 + self._reliability(r)
                 if mode == "boost" and cal < 1.0:
                     cal = 1.0
-            pref = (1.0 + _pt * _PREFER_GAIN) if (_pt > 0.0 and self._cond_match(r, prefer)) else 1.0
+            pref = 1.0
+            for _cond, _tr in _prefer_specs:
+                if self._cond_match(r, _cond):
+                    pref *= (1.0 + _tr * _PREFER_GAIN)
+            if prefer_max_boost is not None and pref > prefer_max_boost:
+                pref = prefer_max_boost
             score = sim * (1.0 + math.log1p(max(0.0, evalue))) * prov * cal * pref
             scored.append((score, sim, r))
         scored.sort(key=lambda x: -x[0])
