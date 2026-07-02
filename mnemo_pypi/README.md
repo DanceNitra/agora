@@ -25,13 +25,6 @@ assumed (see *Provenance* below).
 curl -O https://raw.githubusercontent.com/DanceNitra/agora/main/mnemo/mnemo.py
 ```
 
-## Install
-
-```bash
-pip install agora-mnemo            # the zero-dep core (import name stays `mnemo`)
-pip install "agora-mnemo[mcp]"     # + the MCP server, so any Claude/Cursor agent uses it as memory
-```
-
 ## Use
 
 ```python
@@ -51,14 +44,36 @@ Bring any text→vector function as `embed=` for semantic recall; with none, `mn
 forgiving lexical match so it **runs anywhere, today**. Once the store grows past the threshold, recall
 **fuses lexical (BM25) + semantic with Reciprocal Rank Fusion**. On high-lexical-overlap agent memory
 (e.g. LoCoMo) the fused hybrid *measurably* beats either channel alone (recall@20 **+0.06** over the best
-single channel, 9/10 conversations); where the embedder already dominates (paraphrase-heavy corpora, see
-benchmarks below) fusion adds little. `mode='auto'` fuses; `mode='lexical'` / `'semantic'` force a channel.
+single channel, 9/10 conversations, conversation-level bootstrap CI excludes 0; receipt:
+[`probes/locomo_retrieval_map.py`](probes/locomo_retrieval_map.py)); where the embedder already dominates
+(paraphrase-heavy corpora, see benchmarks) fusion adds little. `mode='auto'` fuses; `mode='lexical'` /
+`'semantic'` force a single channel.
+
+### Poison-resistant recall: `recall(..., influence_only=True)` (0.4.0)
+
+Retrieval-time / embedding-geometry defenses do **not** stop memory poisoning in general. We red-teamed
+`mnemo` with a real AgentPoison-style single-instance attack (Chen et al., NeurIPS 2024; PoisonedRAG, Zou
+et al., USENIX Security 2025): a **plain-English trigger sentence** in one poisoned memory hijacks raw
+top-1 retrieval **88–100%**, it is **scale-invariant** (60→10 000 memories), it **evades a perplexity
+filter** (natural triggers have natural perplexity), and coherence/outlier retrieval defenses **don't
+generalize across encoders**. The layer that *does* generalize is **influence-gating by corroboration**:
+`recall(..., influence_only=True)` returns only memories that earned the same bar as episodic→semantic
+graduation (a credited good outcome, or ≥2 distinct-source links). Retrieve freely for context; gate what
+drives an *action*. Measured: single-instance poison rank-1 hijack → **0%** on MiniLM/BGE/Contriever and
+at every scale, because an injected poison never earns corroboration while real memories earn it through
+use — and it generalizes precisely because it lives in **provenance metadata, not embedding geometry**.
+Honest cost (a calibration tradeoff): a rare-but-true memory that hasn't earned corroboration is filtered
+too (recall 1.00 corroborated vs 0.08 uncorroborated), so this is for **adversarial / untrusted-ingestion**
+use. It raises attacker cost (defeating it needs ≥3 coordinated records with ≥2 forged independent
+provenances), it does not make poisoning impossible. Receipts: [`probes/agentpoison_influence_gate.py`](probes/agentpoison_influence_gate.py),
+[`probes/agentpoison_influence_gate_validation.py`](probes/agentpoison_influence_gate_validation.py).
 
 ## Use it as an MCP server (any Claude / Cursor / agent client)
 
 `mnemo` ships an [MCP](https://modelcontextprotocol.io) stdio server so any MCP-compatible agent can
 use it as long-term memory — `remember` (with a per-type decay prior), value-ranked `recall`,
-`consolidate`, `consolidate_clusters`, `contradictions`, `value_by_cohort`. `mnemo.py` stays
+`consolidate`, `consolidate_clusters`, `contradictions`, `value_by_cohort`, `forget` (verified erasure).
+`mnemo.py` stays
 zero-dependency; only the server needs the SDK:
 
 ```bash
@@ -92,11 +107,12 @@ its memory is value-ranked and append-only, not a recency buffer.
 
 | op | what it does |
 |---|---|
-| `remember(text, tags, value, mtype)` | **append-only** raw capture, absolute UTC time, never edited; `mtype` ∈ {episodic, semantic, procedural} sets the **decay prior** (events fade fast, durable facts slow, rules barely) |
-| `recall(query, k)` | **value-ranked** retrieval: relevance × value, **decayed by the memory's per-type half-life** (access resets the clock), so important durable memories beat both merely-similar and stale ones. Reinforcement is **relevance-weighted** (a bullseye hit reinforces value more than one that squeaked into top-k, so a weak-but-frequent false positive can't go immortal); a repeatedly-recalled episodic memory **graduates** to semantic; and a memory whose source was later contradicted is **provenance-demoted** + flagged `stale_derived` |
+| `remember(text, tags, value, mtype, key)` | **append-only** raw capture, absolute UTC time, never edited; `mtype` ∈ {episodic, semantic, procedural} sets the **decay prior** (events fade fast, durable facts slow, rules barely). Optional `key` = a **deterministic (subject, relation) supersession key**: a new value retires every active record with the same key — *no similarity threshold, no LLM* — so recall never serves the stale value (bi-temporal: a back-filled earlier value can't overwrite the current one) |
+| `recall(query, k, where=…)` | **value-ranked** retrieval: relevance × value, **decayed by the memory's per-type half-life** (access resets the clock), so important durable memories beat both merely-similar and stale ones. Optional `where` = a **metadata pre-filter** (the cheap *filter-before-you-rank* lever): field → scalar / list / operator (`$gte $lte $gt $lt $in $nin $ne $contains`), matched top-level then `meta`, ALL fields AND-ed — e.g. a hard time-range `where={"valid_from":{"$gte":t0,"$lte":t1}}` or a closed-set entity `where={"speaker":{"$in":[…]}}`. Measured to beat retriever choice on LoCoMo (`probes/locomo_metadata_prefilter.py`); it's a HARD filter, so on lossy/predicted extraction keep it loose (a wrong filter hard-deletes the answer). Reinforcement is **relevance-weighted** (a bullseye hit reinforces value more than one that squeaked into top-k, so a weak-but-frequent false positive can't go immortal); a repeatedly-recalled episodic memory **graduates** to semantic **only when corroborated** — by an earned outcome, or by **≥2 distinct *canonical* sources** (entity-resolved before counting, so sybil variants of one origin — `Wikipedia` / `wikipedia.org` / a full URL — collapse to one and can't mint durability); and a memory whose source was later contradicted is **provenance-demoted** + flagged `stale_derived` |
 | `consolidate(keep)` | the **dream pass**: flag universal-matcher *hubs*, link near-duplicates, apply the **state-toggle guard** (a polarity clash supersedes, doesn't merge), supersede the low-value surplus — only *adds* a derived layer |
 | `consolidate_clusters(threshold)` | **cluster-triggered** consolidation: consolidate a semantic cluster only once it's grown past `threshold` — sparse topics keep their raw episodes, dense ones don't grow unbounded |
 | `contradictions()` | flag mutually-incompatible **related** memories (similarity-gated) for human review |
+| `forget(ids, where)` | the one op that **truly deletes** (the rest is append-only): hard-removes the matched records *and* scrubs their ids from every survivor's links + toggle pointers + the vec/token caches, so a forgotten memory can't resurface via recall, a consolidation link, or the dream pass. For erasure / right-to-be-forgotten, poison removal, or a hard correction — measured 15/15 on a verified-forgetting severe-test |
 
 ## Five rules it won't break (each one cost us to learn)
 
@@ -137,6 +153,22 @@ its memory is value-ranked and append-only, not a recency buffer.
   the blend — about **3× more value kept** (the gap persists, ≈2.2× retained value, even at a 7%
   budget). Pure access-frequency decay starves the rarely-queried-but-critical memories; forgetting
   must consume an explicit value channel *separate from* access recency. (Agora Lab `19d802`.)
+- **Supersession needs a deterministic key, not embedding similarity** — replicating an external
+  result (MemStrata / Yadav, arXiv 2606.26511) on our own local `nomic` stack: a cosine-similarity
+  classifier separating a *contradicted* fact from a *rephrased duplicate* scores **AUROC ~0.61**
+  (near chance) — a contradiction is often *more* embedding-similar to the original than a true
+  rephrase is. A similarity-based store therefore serves the **stale value ~42% of the time**; the
+  deterministic `(subject, relation, object)` supersession key (`remember(..., key=...)`) drives that
+  to **0%** (Agora Lab `exp_supersession_replication`, severe-test 8/8). This is *why* supersession is
+  a key, not a threshold.
+- **No single recall mechanism survives all operating points — only the layered store does** —
+  head-to-head on a synthetic *evolving + contaminated* stream (stable / superseded / poisoned facts,
+  local `nomic`): a naive **cosine top-1** store scores **42%** (fine on stable, but blind to
+  supersession — **0/8** on updated facts — and fooled by repeated lies); a **recency** store **67%**
+  (fixes supersession but serves the *freshest lie* — **0/8** on poison); `mnemo` — deterministic
+  supersession key **+** corroboration gate **+** value-ranking — is **100%**, robust across all three.
+  Each single mechanism wins one regime and loses another (the *memory operating-point trap*), which is
+  why the durable layer needs all three together (probe `mnemo/probes/operating_point_memory.py`).
 - **Cohort-level value** — per-memory outcome attribution is **statistically underpowered at n-of-1**
   (the best proxy reached only ~0.36 power at realistic sample sizes); the cohort is where the
   signal lives. Hence rule 4.
@@ -243,31 +275,12 @@ the reasoning; the corrections still warrant a source-check before public citati
 - **Notes over ~2 MB are skipped** (configurable via `SECOND_BRAIN_MAX_BYTES`) so a single huge file
   can't exhaust memory.
 
-## Tamper-evident write receipts (opt-in)
-
-mnemo is append-only, so it never silently edits a fact in normal use — but the store is a file, and
-anyone who can touch it can rewrite a stored memory after the fact. Turn on **write receipts** and every
-`remember()` appends a hash-chained (optionally Ed25519-signed) receipt committing to the memory's
-content hash, to a sidecar `<path>.receipts.json`. `verify_writes()` then proves the write history
-wasn't altered out-of-band — something an append-only store alone can't. Default OFF (zero behavior
-change); the hash chain is zero-dependency, signing needs `cryptography`.
-
-```python
-from mnemo import Mnemo, new_receipt_keypair
-sk, pk = new_receipt_keypair()
-m = Mnemo("mem.json", receipts=True, receipt_key=sk, receipt_pubkey=pk)
-m.remember("prod db host is db-prod-01", key="db::host", mtype="semantic")
-ok, problems = m.verify_writes(expected_pubkey=pk)   # True on an honest store
-# an out-of-band edit to a stored memory -> ok=False, names the exact memory id
-```
-
-(The same mechanism, standalone and for any agent/MCP tool call, is `agora-agent-receipts`.)
-
 ## Status
 
-`v0.2` — the core, honest and runnable, **now with two MCP servers**: `mnemo_mcp` (memory) and
-`second_brain_mcp` (the thinking layer over your notes). Roadmap: pluggable vector stores, a hosted
-tier. Open-core; the core stays free.
+`v0.2` — the core, honest and runnable, **now with two MCP servers** (`mnemo_mcp` for memory,
+`second_brain_mcp` for the thinking layer over your notes) **and a deterministic supersession key**
+(`remember(..., key=...)`) that closes the embedding *supersession blind spot*. Roadmap: pluggable
+vector stores, a hosted tier. Open-core; the core stays free.
 
 MIT-licensed · part of [Agora](https://github.com/DanceNitra/agora).
 
