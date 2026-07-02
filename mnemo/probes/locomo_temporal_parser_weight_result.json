@@ -1,0 +1,35 @@
+{
+ "k": 20,
+ "n_temporal_q": 250,
+ "harm_n": 22,
+ "parser_conf_dist": {
+  "0.2": 48,
+  "0.6": 8,
+  "0.7": 14,
+  "1.0": 180
+ },
+ "recall@20": {
+  "no_filter": 0.4973,
+  "hard_where": 0.7133,
+  "soft_flat": 0.7513,
+  "soft_parser": 0.7473
+ },
+ "harm_subset": {
+  "no_filter": {
+   "mean": 0.5227,
+   "n": 22
+  },
+  "hard_where": {
+   "mean": 0.0227,
+   "n": 22
+  },
+  "soft_flat": {
+   "mean": 0.4545,
+   "n": 22
+  },
+  "soft_parser": {
+   "mean": 0.4091,
+   "n": 22
+  }
+ }
+}
