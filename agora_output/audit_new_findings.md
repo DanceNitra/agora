@@ -923,3 +923,42 @@ STATUS: this is a genuine, honest, novel contribution (influence-gate on a trust
 art) that clears the RAISED BAR. REVIVES Track A: the influence-gate is a shippable, generalizing mnemo
 opt-in feature (unlike set-coherence which failed to generalize). Next: promote to mnemo core (opt-in,
 reversible, measured provenance in README), verify-claims on citations, write the post, owner gate.
+
+================================================================================
+AUDIT #20 -- "why-a-more-capable-ai-can-be-more-confidently-wrong" (2026-07-02)
+Verdict: PUBLISH (heavy REFRAME applied). The post was corrected from a false
+"~87% is a fundamental calibration ceiling" claim to the true two-stage picture.
+
+DEFECT FIXED (the single most damaging finding, caught by the method/re-derivation
+pass): the post's residual "correction holds calibration steady at ~87% at any
+capability" was DOUBLY wrong -- (1) not steady (real naive coverage RISES 63->84->87
+under the self-calibrated correction), and (2) the ~87% is NOT a deep limit, it is a
+BIASED-SAMPLE-SD artifact: an equicorrelated sample's own spread understates the true
+marginal spread by sqrt(1-rho), so a correction that self-calibrates SD from the
+correlated data can only reach ~87%. Supply the true marginal SD / rho from OUTSIDE
+the pool and coverage returns to 95% at EVERY K. Post rewritten to say exactly this.
+
+ARTIFACT (now public + linked from the post): mnemo/probes/correlated_sources_calibration.py
+Reproduces every number: naive 95%-CI coverage 0.578/0.499/0.185 (=58/50/18% at
+K=2/10/100, rho=0.4); RMS error 0.84/0.68/0.64, floor sqrt(rho)=0.632; self-calibrated
+design-effect correction -> 0.63/0.84/0.87 (the ~87% partial recovery); external-SD
+correction -> 0.951/0.950/0.950 (95% at every K); rho-sensitivity at K=100 ->
+0.184/0.426/0.562 (=18/43/57% at rho=0.4/0.1/0.05). Skeptic A's NEEDS-FIX ("headline
+18% with no linked runnable probe" under the standing gate) is closed by this link.
+
+PRIOR ART (credited in-post, verified vs primary sources): survey design effect
+(Kish 1965), N_eff = K/(1+(K-1)rho); Meng 2018 big-data paradox (2.3M-person survey
+-> ~400 effective, Ann. Appl. Stat. 12(2):685-726); Ladha 1992 Condorcet-with-dependence
+(AJPS 36(3):617-634); Hurlbert 1984 pseudoreplication; AI bridge Kim et al. arXiv:2506.07962
+(correlated LLM errors across providers), Tian et al. arXiv:2305.14975 (verbalized
+confidence). Core is TEXTBOOK; the contribution is making it concrete + runnable for
+AI evidence-aggregation, honestly labeled ("we didn't discover the effect").
+
+FRONTIER QUESTION (blind-spot / 6th lens): you cannot read rho off the correlated
+data alone (the whole point). So: is there a CONTENT-BLIND estimator of effective
+independence -- e.g. from source provenance/lineage, base-model identity, or an
+engineered-decorrelation probe -- that recovers usable rho WITHOUT a clean external
+anchor? That estimator would turn "engineer independence" from a qualitative rule
+(different base models, disjoint sources, dedup) into a measurable dial. Candidate
+next probe: inject known-rho synthetic sources, test whether a lineage-graph estimator
+recovers N_eff within tolerance.

@@ -352,16 +352,16 @@
  {
   "slug": "why-a-more-capable-ai-can-be-more-confidently-wrong",
   "title": "Why a more capable AI can be more confidently wrong",
-  "title_sk": "Why a more capable AI can be more confidently wrong",
-  "desc": "Give a reasoner more evidence and it should get both more accurate and more sure. On independent evidence, it does. But real evidence is rarely independent — sources copy each other, datasets overlap,",
-  "desc_sk": "Give a reasoner more evidence and it should get both more accurate and more sure. On independent evidence, it does. But real evidence is rarely independent — sources copy each other, datasets overlap,",
+  "title_sk": "Preco schopnejsia AI moze byt sebavedomejsie nespravna",
+  "desc": "Pool more correlated evidence and an AI grows more confident, not more right - its 95% interval coverage collapses 58% to 18%. The classic survey design effect (Kish 1965), applied to AI scaling.",
+  "desc_sk": "Zbieraj viac korelovanych dokazov a AI je istejsia, nie spravnejsia - 95% pokrytie kolabuje 58% na 18%. Klasicky design effect (Kish 1965), aplikovany na skalovanie AI.",
   "date": "2026-06-18",
   "tags": "Research",
   "tags_sk": "Research",
   "kicker": "Research",
   "kicker_sk": "Research",
   "read": 2,
-  "bilingual": false
+  "bilingual": true
  },
  {
   "slug": "we-looked-for-the-grounding-tipping-point-in-ai-self-trainin",
