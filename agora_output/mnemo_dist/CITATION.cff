@@ -6,7 +6,7 @@ authors:
 repository-code: "https://github.com/DanceNitra/agora/tree/main/mnemo"
 url: "https://pypi.org/project/agora-mnemo/"
 license: MIT
-version: "0.4.0"
+version: "0.4.1"
 keywords:
   - LLM
   - agent memory
@@ -16,4 +16,4 @@ keywords:
   - MCP
   - memory poisoning
   - agent security
-doi: "10.5281/zenodo.21128550"
+doi: "10.5281/zenodo.21128549"
