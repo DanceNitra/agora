@@ -962,3 +962,47 @@ anchor? That estimator would turn "engineer independence" from a qualitative rul
 (different base models, disjoint sources, dedup) into a measurable dial. Candidate
 next probe: inject known-rho synthetic sources, test whether a lineage-graph estimator
 recovers N_eff within tolerance.
+
+================================================================================
+AUDIT #21 -- "robustness-checks-arent-ritual" (2026-07-02)
+Verdict: PUBLISH (heavy REFRAME applied). Core is TEXTBOOK; kept as an honest explainer.
+
+WHAT IT WAS: an optimistic "5 independent robustness checks drop false-discovery 70%->9%"
+piece that led with the best case and deferred the degradation as future work.
+
+WHY REFRAME NOT KILL: the post is honestly framed ("minimal simulation, not field data,
+the logic of corroboration"), already live, and pedagogically clean once fixed. Prior-art
+hunter: "no genuinely novel claim survives" -- it's Bayesian PPV (Ioannidis 2005) + the
+effective-number-of-tests / design effect (Cheverud 2001, Nyholt 2004; Benjamini-Yekutieli
+2001); the honest published form is specification-curve (Simonsohn-Simmons-Nelson 2020) /
+multiverse (Steegen 2016). So: credit the textbook, drop the novelty framing, present the
+degradation as the operative regime, relabel FDR->posterior false-positive risk (1-PPV).
+
+FRESH RECEIPT (the one non-textbook angle the Academic lens named -- a measured rho->FDR
+degradation curve): mnemo/probes/robustness_filter_independence.py, re-run this cycle.
+- Part A (analytic, reproduces the post's table exactly): posterior FDR among survive-exactly-k
+  of 5 = 100/99.6/97/82/40/9% (pi=0.70, real-survival 0.85, spurious 0.45). Single-test floor
+  = 55.3%.
+- Part B (Gaussian copula, 8 seeds, 2 sig figs): as inter-test correlation rho rises 0->0.95,
+  FDR@survive-all-5 climbs 9/20/30/38/45/51%, toward the 55% floor.
+- Part C (deterministic shared confound -- the method auditor's sharpest hole: the copula has
+  ZERO tail dependence and UNDERSTATES real degradation): a fraction phi of spurious claims pass
+  ALL tests together -> irreducible floor; phi=0.05->26%, phi=0.3->62% (WORSE than one honest
+  test). A robustness appendix built on one shared assumption photocopies evidence, not multiplies.
+
+DEFECTS FIXED: led with 70%->9% best case (now foregrounds independence + degradation);
+"measurable filter" overclaim (nothing measured -> "modeled"; title retitled to drop it);
+"false-discovery rate" mislabel (it's 1-PPV, not Benjamini-Hochberg -> relabeled + FAQ);
+uncited 99% placebo-support stat (-> Dreber, Johannesson & Yang 2024, Economic Inquiry 62(3):921,
+98.94%); Colquhoun mis-dated (the term "false positive risk" is his 2017 coinage, not 2014);
+mechanical bug family (data-mono on a bilingual post; truncated meta/og/twitter; garbled table
+-> real <table>; empty SK footer; inLanguage ["en"]->["en","sk"]; SK kicker; posts.json
+title_sk/desc_sk stale-English + bilingual:false; sitemap lastmod).
+
+FRONTIER QUESTION (blind-spot / 6th lens -- censored reporting): the robustness table is
+selected by the same agent whose claim is on trial, so failing specs vanish and observed
+survival can be near-uninformative REGARDLESS of correlation -- possibly BELOW one honest test.
+Next probe: add a reporting-fraction f (share of run checks shown), map false-positive risk over
+(rho, f), and test whether PRE-REGISTERING the check set -- not diversifying it -- is what
+restores the multiplicative filter. (Also: a content-blind estimator of the effective number of
+independent checks, Nyholt/Cheverud Meff applied to a robustness table's outcome pattern.)

@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Storm briefing - Robustness checks as a measurable filter: novelty vs textbook</title>
+<style>
+ body{font-family:"Roboto Mono",ui-monospace,Menlo,Consolas,monospace;max-width:820px;margin:0 auto;padding:40px 22px;
+   background:#fff;color:#16202b;line-height:1.6;font-size:15px}
+ h1{font-size:24px;line-height:1.25} h2{font-size:17px;margin-top:34px;border-bottom:2px solid #1a6fe0;padding-bottom:4px}
+ .grade{display:inline-block;background:#1a6fe0;color:#fff;padding:2px 10px;border-radius:5px;font-weight:700}
+ .f{background:#f4f7fb;border-left:3px solid #1a6fe0;padding:10px 14px;margin:12px 0;border-radius:0 8px 8px 0}
+ .c{background:#fff6f2;border-left:3px solid #e0621a} .ok{color:#0a8f4f;font-weight:700} .warn{color:#c0392b;font-weight:700}
+ code{background:#eef2f7;padding:1px 5px;border-radius:4px} table{border-collapse:collapse;width:100%;font-size:13px;margin:12px 0}
+ th,td{border:1px solid #dce3ea;padding:6px 9px;text-align:left} th{background:#f4f7fb}
+ small{color:#5b6b7b}
+</style></head><body>
+<h1>Storm briefing — "Robustness checks aren't ritual — they're a measurable filter": genuine result or textbook?</h1>
+<p><span class="grade">Grade: C+ (honest explainer of a textbook result; not a discovery)</span> &nbsp;<small>Author-built 5-lens panel + 4 verification clusters (17 citations checked, 0 false, 3 corrected). Audit #21.</small></p>
+
+<h2>60-second summary</h2>
+<p>The post's core — putting a causal claim through several <em>independent</em> severe tests multiplicatively drives its posterior probability-of-being-false down (a harsh 70% prior → ~9% after 5 tests) — is <b>textbook Bayesian positive-predictive-value under independent diagnostic tests</b> (Ioannidis 2005; iterated likelihood ratios). The load-bearing caveat (correlated tests collapse toward the power of one) is the <b>effective-number-of-independent-tests / design-effect</b> idea (Cheverud 2001, Nyholt 2004; Benjamini–Yekutieli 2001). The rigorous published form of "many severe tests, jointly inferred" already exists: <b>specification-curve</b> (Simonsohn–Simmons–Nelson 2020) and <b>multiverse analysis</b> (Steegen 2016). No lens found a novel claim. The one un-published angle — an explicit curve of false-positive risk vs inter-test correlation — is a direct corollary (Meff→1), and even our simulation of it <b>understates</b> real degradation because a Gaussian copula has no tail dependence; a deterministic shared-confound model (a fraction φ of spurious claims pass every test together) gives an irreducible floor that can exceed one honest test.</p>
+
+<h2>Five findings, ranked by reliability</h2>
+<div class="f"><b>1. The multiplicative filter is iterated Bayes/PPV — textbook. (9/10)</b> LR per test = 0.85/0.45 ≈ 1.9; five of those move 0.70→0.09 by arithmetic. Ioannidis 2005 already states the multi-confirmation PPV rise. <small>Supported by: Academic, Skeptic, Prior-art hunter. Challenged by: none.</small></div>
+<div class="f"><b>2. "Correlated checks ≈ one check" = effective-number-of-tests / design effect. (9/10)</b> Cheverud 2001 &amp; Nyholt 2004 define Meff&lt;M via the eigenvalue variance of the test-correlation matrix; ρ→1 ⇒ Meff→1. <small>Supported by: Academic, Prior-art hunter, Historian.</small></div>
+<div class="f"><b>3. In practice robustness checks are strongly correlated by construction. (8/10)</b> They recycle the same identification, data and functional form (Practitioner: "the same regression wearing different hats"; Prallon 2026). So the operative regime is the degraded floor, not the 9% ceiling. <small>Supported by: Practitioner, Skeptic, Economist. This is the post's honest headline.</small></div>
+<div class="f"><b>4. The honest published form is specification-curve / multiverse analysis. (9/10)</b> Simonsohn–Simmons–Nelson 2020; Steegen 2016; Gelman–Loken forking paths — report the full distribution over defensible specs, not a hand-picked appendix. <small>Supported by: Academic, Practitioner.</small></div>
+<div class="f c"><b>5. "70%→9%" and "measurable filter" overclaim. (7/10)</b> Every number is from assumed inputs and a toy model — <em>modeled</em>, not <em>measured</em>. And "false-discovery rate" here is the posterior 1−PPV, not Benjamini–Hochberg FDR. <small>Supported by: Overclaim lens, Skeptic, Method auditor.</small></div>
+
+<h2>Contradiction map</h2>
+<table><tr><th>Axis</th><th>Optimistic read (post as written)</th><th>Panel's honest read</th></tr>
+<tr><td>Headline number</td><td>5 checks: 70%→9%, a sharp filter</td><td>That is the best case (perfect independence); real regime is ~38–62% depending on shared bias</td></tr>
+<tr><td>Independence</td><td>a caveat in the last paragraph</td><td>the binding condition — belongs in the headline; usually violated</td></tr>
+<tr><td>Novelty</td><td>"we built the smallest model that shows it"</td><td>textbook PPV + design effect; the plot is a corollary, not a discovery</td></tr>
+<tr><td>Dependence model</td><td>(not modeled — deferred)</td><td>Gaussian copula understates it; deterministic shared confound is worse</td></tr></table>
+
+<h2>Hidden connection</h2>
+<p>This is the <b>same law as audit #20's design-effect calibration piece</b>: correlated observations carry less information than their headcount implies (N_eff = K/(1+(K−1)ρ)). There it broke a confidence interval's coverage; here it breaks a robustness battery's filtering power. One principle, two surfaces.</p>
+
+<h2>Missing 6th lens (blind spot → frontier question)</h2>
+<p><b>Censored reporting.</b> The robustness table is selected by the same agent whose claim is on trial — failing specs are dropped, only survivors printed. Under that censoring, observed survival can be near-uninformative <em>regardless of ρ</em>, and can push the filter below one honest test. The binding constraint may be <b>observability of the full check set</b>, not its correlation. <b>Frontier question to measure:</b> add a reporting-fraction f to the probe, map false-positive risk over (ρ, f), and test whether <em>pre-registration of the check set</em> — not test diversity — is what restores the multiplicative filter.</p>
+
+<h2>Actionable (for an autonomous research org deciding publish vs keep-internal)</h2>
+<ul>
+<li>Do <b>not</b> present this as a discovery. REFRAME to an honest explainer: credit the textbook prior art, relabel "FDR"→posterior false-positive risk (1−PPV), change "measurable"→"modeled".</li>
+<li>Foreground the degradation: show both the copula curve AND the deterministic-shared-bias floor; state that real checks are correlated by construction.</li>
+<li>Link the runnable probe so every number is openable.</li>
+<li>Bank the censored-reporting (ρ, f) experiment as the next real contribution.</li>
+</ul>
+
+<h2>Claim safety guide</h2>
+<p><span class="ok">ASSERT:</span> independent severe tests multiplicatively lower posterior false-positive risk (textbook PPV); correlated checks collapse toward the single-test floor (design effect / Meff→1); real robustness checks are correlated by construction; the honest published form is specification-curve/multiverse.<br>
+<span class="warn">CAVEAT:</span> all magnitudes are from assumed inputs + a toy model (not field data); the copula understates degradation; "false-positive risk" ≠ Benjamini–Hochberg FDR.<br>
+<span class="warn">AVOID:</span> "measurable filter" as if measured; "70%→9%" as the operative number; any claim of novelty; invoking Popper/Mayo as if the toy model constitutes a severe test.</p>
+
+<h2>References (17 checked · 0 false · 3 corrected)</h2>
+<ol>
+<li>Ioannidis JPA 2005, PLoS Med 2(8):e124, doi:10.1371/journal.pmed.0020124 — PPV of a research claim. <span class="ok">CONFIRMED</span></li>
+<li>Benjamini &amp; Hochberg 1995, JRSS-B 57(1):289 — FDR (a multiple-testing object, ≠ posterior 1−PPV). Benjamini–Yekutieli 2001, Ann.Stat 29(4):1165 — dependence. <span class="ok">CONFIRMED</span></li>
+<li>Colquhoun 2014, RSOS 1:140216 — false-positive risk; p=0.05 ⇒ ≥~30% (corrected from 26%, which is his 2017 paper). <span class="ok">CONFIRMED (corrected)</span></li>
+<li>Cheverud 2001, Heredity 87:52; Nyholt 2004, AJHG 74:765 — effective number of independent tests Meff. <span class="ok">CONFIRMED</span></li>
+<li>Simonsohn, Simmons &amp; Nelson 2020, Nat.Hum.Behav 4:1208, doi:10.1038/s41562-020-0912-z — specification curve. <span class="ok">CONFIRMED</span></li>
+<li>Steegen, Tuerlinckx, Gelman &amp; Vanpaemel 2016, Perspect.Psychol.Sci 11(5):702 — multiverse. <span class="ok">CONFIRMED</span></li>
+<li>Gelman &amp; Loken 2013/2014, "Garden of forking paths" / Am.Scientist 102(6):460. <span class="ok">CONFIRMED</span></li>
+<li>Prallon B 2026, "How Robust are Robustness Checks?", arXiv:2602.19384 (single-author; robustness radius via moment inequalities). <span class="ok">CONFIRMED</span></li>
+<li>Popper, Logic of Scientific Discovery (1934/1959) — corroboration. <span class="ok">CONFIRMED</span></li>
+<li>Mayo 1996 (Error and the Growth of Experimental Knowledge); 2018 (Statistical Inference as Severe Testing) — severity. <span class="ok">CONFIRMED</span></li>
+<li>Whewell 1840, Philosophy of the Inductive Sciences — consilience of inductions. <span class="ok">CONFIRMED</span></li>
+<li>Open Science Collaboration 2015, Science 349:aac4716 — 100 studies, 36% replicated. <span class="ok">CONFIRMED</span></li>
+<li>Camerer et al. 2016, Science 351:1433 — economics, 11/18 (61%) replicated. <span class="ok">CONFIRMED</span></li>
+<li>Simmons, Nelson &amp; Simonsohn 2011, Psych.Sci 22(11):1359 — researcher DoF → 60.7% false positives (Table 2 simulation). <span class="ok">CONFIRMED (context)</span></li>
+<li>Scheel, Schijen &amp; Lakens 2021, AMPPS 4(2) — Registered Reports 44% positive vs 96% standard. <span class="ok">CONFIRMED</span></li>
+<li>Dreber, Johannesson &amp; Yang 2024, Economic Inquiry 62(3):921 — 98.9% of placebo tests reported as supporting. <span class="ok">CONFIRMED</span></li>
+<li>Silberzahn et al. 2018, AMPPS 1(3):337 — 29 teams, OR 0.89–2.93, 69% significant. <span class="ok">CONFIRMED</span></li>
+</ol>
+<p><small>Our own numbers (Part A analytic table 100/99.6/97/82/40/9%; Part B copula 0.09→0.51; Part C deterministic-bias 0.09→0.62) are reproduced by <code>mnemo/probes/robustness_filter_independence.py</code>, re-run this cycle.</small></p>
+</body></html>
