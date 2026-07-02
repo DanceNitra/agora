@@ -888,3 +888,36 @@ ingestion trust/provenance/cost, matching OWASP ASI06 + 25y of spam/SEO/adversar
 economist). Remaining honest caveats: n=16, 60-item corpus, retrieval-only (no end-to-end agent action),
 benign false-positive rate for the fluent trigger not separately re-measured (was low 0-20% for prior
 triggers, same mechanism).
+
+### THE NOVEL CONTRIBUTION (2026-07-02): corroboration-gated INFLUENCE — validated, RAISED-BAR
+
+The blindspot lens found the one thing prior art (PoisonedRAG 2402.07867, anisotropy 2606.19692) doesn't
+cover: red-teaming a memory layer with a TRUST/GRADUATION guard. Built + validated the defense at the
+retrieve->ACT boundary. Artifacts: mnemo/probes/agentpoison_influence_gate.py (+_result.json),
+agentpoison_influence_gate_validation.py (+_result.json).
+
+THESIS (design lesson): retrieval-time poison defense is the WRONG layer (embedder-dependent, fails on
+anisotropic encoders). The layer that GENERALIZES is influence-gating by corroboration: reuse mnemo's
+durability graduation criterion (earned good>0 & good>=bad, OR >=2 distinct-source links) as an INFLUENCE
+gate -- an un-corroborated memory can be RETRIEVED but not allowed to drive the agent's action.
+
+MEASURED (all runnable):
+- Attack (faithful threat model: attacker injects the trigger into the query, per AgentPoison): a natural-
+  sentence trigger (ppl 441, evades perplexity filter), single instance, hijacks RAW retrieval 88-94% and
+  is SCALE-INVARIANT (94/88/94/94% at corpus size 60/500/2000/10000) -- refutes the stress-claim skeptic's
+  "collapses at scale" prediction.
+- Influence-gate DEFENSE: influence-hijack -> 0% on ALL 3 retrievers (MiniLM/BGE/Contriever) AND at ALL
+  scales (60->10k). GENERALIZES where the geometry-based set-coherence defense failed on BGE -- because it
+  lives in provenance metadata, not embedding geometry (the key insight).
+- HONEST COST (calibration dilemma at the influence layer): corroborated-memory recall 100% but
+  rare/uncorroborated true-memory recall drops to 8.3% -- the gate taxes rare-but-true memories until they
+  earn corroboration. Not a free lunch.
+- ATTACKER COST LADDER: 1 free injection -> filtered; 2 same-source copies -> filtered (sybil
+  canonicalization); 2 records/1 link -> filtered; 3 records + 2 forged INDEPENDENT provenances -> PASSES.
+  The gate RAISES cost (coordinate >=3 records + forge >=2 independent sources), does not eliminate the
+  attack. The good-credit path is not attacker-settable (credit() is issued by the app on real outcomes).
+
+STATUS: this is a genuine, honest, novel contribution (influence-gate on a trust-gated store; not in prior
+art) that clears the RAISED BAR. REVIVES Track A: the influence-gate is a shippable, generalizing mnemo
+opt-in feature (unlike set-coherence which failed to generalize). Next: promote to mnemo core (opt-in,
+reversible, measured provenance in README), verify-claims on citations, write the post, owner gate.
