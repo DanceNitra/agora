@@ -860,3 +860,31 @@ threat-model note (the poison-guard defends DURABILITY, not RETRIEVAL -- measure
 cross-retriever red-team harness so users test their OWN embedder. Track B (article: "cheap memory-layer
 defenses don't generalize -- here's the cross-retriever evidence") is the real, honest, distributable
 result and does NOT need a working fix.
+
+### AgentPoison STORM skeptic blind-spot CLOSED (2026-07-02): perplexity filter defeated, claim strengthened
+
+The STORM skeptic lens correctly caught that our HotFlip triggers were GIBBERISH (gpt2 perplexity
+22k-59k vs ~50-250 for natural text), so a trivial write-time perplexity filter would catch them and our
+"no cheap defense" claim was untested against that specific defense. Closed it with
+mnemo/probes/agentpoison_coherence_attack.py (gpt2 as coherence surrogate; ppl gate = 1000).
+
+DECISIVE RESULT (all 3 retrievers, MiniLM/BGE/Contriever):
+- gibberish-optimized trigger: hijacks 100% but ppl 4.5k-31k -> CAUGHT by the perplexity filter.
+- fluent RANDOM natural sentence (UNoptimized, e.g. "the old lighthouse still guides ships along the
+  rocky coast" ppl 441; "she poured a cup of coffee and watched the morning rain" ppl 47): EVADES the
+  filter AND hijacks 69-100%.
+- fluent coherence-constrained HotFlip (ppl 722-972, under the gate): EVADES AND hijacks 100%.
+=> 6/9 trigger-conditions evade a ppl<1000 filter AND hijack >=50%. The perplexity/gibberish filter (the
+obvious cheap write-time defense) is DEFEATED: it only catches gibberish, which the attack does not need
+-- a plain English sentence hijacks just as well. You don't even need AgentPoison's gradient/coherence
+machinery on these small single-vector retrievers; the attack is near-trivial.
+
+STRENGTHENED CLAIM (skeptic-tested): single-instance memory poisoning hijacks retrieval across 3
+retrievers with EITHER gibberish OR natural low-perplexity triggers; the two cheap content-based defenses
+both fail -- perplexity filtering (natural triggers sail through) and retrieval-time outlier/coherence
+detection (doesn't generalize across embedders, bounded by encoder anisotropy). Durable fix = upstream
+ingestion trust/provenance/cost, matching OWASP ASI06 + 25y of spam/SEO/adversarial-ML arms-race history
+(STORM historian) + production practice (STORM practitioner) + the non-vendor-credibility angle (STORM
+economist). Remaining honest caveats: n=16, 60-item corpus, retrieval-only (no end-to-end agent action),
+benign false-positive rate for the fluent trigger not separately re-measured (was low 0-20% for prior
+triggers, same mechanism).
