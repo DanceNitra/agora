@@ -14,25 +14,43 @@ the model's slot; entity = alias-match strength (exact vs fuzzy vs embedding-onl
 aggregate miscalibration, not adversarial overconfidence. His bet: raw-confidence-weighted craters on the
 skewed set; parser-agreement + alias-strength pulls the 0.42 back.
 
-DRAFT (short, agrees, credits, connects to our new result honestly):
+DRAFT (RAN IT — full gate cleared: validate/storm/audit/verify; numbers verified vs the probe JSON;
+receipt pushed at mnemo/probes/locomo_orthogonal_trust_weight.py):
 
-> You're right, and it's the cleanest statement of it I've seen: the extractor's own softmax is the one
-> signal guaranteed to be corrupted in exactly the failure mode you care about, so weighting by it just
-> rebuilds the hard filter on the worst cases. Orthogonal signals — parser-agreement, alias-strength — are
-> the fix.
+> Ran it — your core point holds, and I also hit the harder half: the orthogonal signal only pays if it's
+> genuinely independent, and mine wasn't.
 >
-> Funny timing: I just posted a memory-poisoning result that lands on the same principle from the other
-> side. Self-*asserted* trust is what breaks; gating on *earned* corroboration (an outcome, or independent
-> agreement — not the model's own claim) is what holds, and it generalizes across embedders precisely
-> because it's not the model grading itself. Different setting, same lesson.
+> Setup: same LoCoMo hybrid retriever + speaker filter, predicted extractor flipped wrong 25% of the time,
+> and I made it overconfident-on-wrong (self-reported 0.9 *even on the flips* — the case you flagged). Two
+> weights on the filter's RRF contribution:
+> - self-confidence (w = 0.9 × selectivity): overall −0.014, but on the wrong-fire subset it craters to
+>   **0.287 vs 0.589 no-filter**. Exactly your point — weighting by the model's own belief up-weights the
+>   filter on the fires you most wanted to suppress.
+> - orthogonal agreement (w = 0.9 if an independent second opinion agrees, else 0): wrong-fire subset
+>   **0.303** — barely above self-conf, and **−0.071 overall** (worse).
 >
-> I haven't run the parser-agreement-as-weight arm yet — that's the one I want to run next, and I'll report
-> the number. My guess matches yours: raw-confidence craters on the skewed set.
+> Why it barely moved: my "independent" signal wasn't yours. I couldn't cleanly simulate alias-strength /
+> parser-agreement on LoCoMo's exact-name speaker detection, so I used the nearest proxy — the majority
+> speaker of the top-10 retrieved turns. It disagreed with the wrong extractor on only **19%** of the harm
+> cases (too correlated — it shares the retriever's error) and falsely distrusted enough right cases to
+> cost more than it saved. That's just co-training/Condorcet: agreement only helps when the two views fail
+> *independently*, and a retrieval-derived opinion doesn't.
+>
+> So this doesn't test your actual proposal — SUTime-vs-model for time, or alias-match strength for entity,
+> are extraction-quality signals plausibly independent of the flip, which is the property mine lacked. That's
+> the arm worth running; I just need a setup with a real exact/fuzzy split. (Full disclosure: an audit of my
+> first cut caught that I'd scaled the orthogonal arm 1.0 vs self-conf's 0.9 — unfair — so these are the
+> corrected equal-base numbers.)
+>
+> Receipt: https://github.com/DanceNitra/agora/blob/main/mnemo/probes/locomo_orthogonal_trust_weight.py — if
+> you know a dataset where the alias/parser signal is real, I'll run your exact version.
 
-OPTIONAL (stronger): I can actually RUN jacksonxly's suggested arm — swap raw-confidence for
-parser-agreement + alias-strength as the weight on the 25%-wrong-extractor set — and give him a measured
-number instead of a guess. That's a great collaboration follow-up if you want it (say the word and I'll
-build+measure it before you reply).
+VERIFIED NUMBERS (mnemo/probes/locomo_orthogonal_trust_weight_result.json): overall hybrid 0.583 /
+self-conf 0.569 (−0.014) / orthogonal 0.512 (−0.071); harm subset hybrid 0.589 / self-conf 0.287 /
+orthogonal 0.303; D2 disagreed on 73/383 = 19.06% of harm cases. Gate: STORM (principle = Condorcet /
+co-training, NOT novel — frame as "measured an instance"); stress-claim/method-audit caught the scale bug
+(fixed) + that the retrieval-D2 is a proxy, not jacksonxly's signal (disclosed in the reply); verify-claims
+= numbers match the JSON.
 
 ---
 
