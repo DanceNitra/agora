@@ -6,7 +6,7 @@ authors:
 repository-code: "https://github.com/DanceNitra/agora/tree/main/mnemo"
 url: "https://pypi.org/project/agora-mnemo/"
 license: MIT
-version: "0.4.1"
+version: 0.4.2
 keywords:
   - LLM
   - agent memory
