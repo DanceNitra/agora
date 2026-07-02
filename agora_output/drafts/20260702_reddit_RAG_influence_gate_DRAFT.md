@@ -9,8 +9,13 @@
 
 ---
 
-## TITLE
-We tried to poison our own RAG memory store. Retrieval-time defenses didn't generalize across embedders — what worked was gating what a retrieved chunk is allowed to *act on*, not the retrieval.
+## TITLE (recommended, ~83 chars — fits the feed)
+We tried to poison our own RAG store — the retrieval-time defenses didn't generalize
+
+## TITLE alternates
+- One plain sentence poisons RAG retrieval 88–100% — the fix wasn't a better retriever
+- Retrieval-time defenses against RAG poisoning didn't generalize across embedders
+- RAG poisoning: gating what a chunk can *act on* beat every retrieval-time defense I tried
 
 ## BODY
 
