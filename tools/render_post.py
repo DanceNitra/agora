@@ -17,6 +17,19 @@ ROOT = Path(__file__).resolve().parents[1]
 SITE = "https://dancenitra.github.io/agora/public"
 
 META = {
+    "agent-memory-poisoning-influence-gate": {
+        "slug": "agent-memory-poisoning-influence-gate",
+        "title": "One Plain Sentence Hijacks AI-Agent Memory Retrieval — and the Fix Isn't a Better Retriever",
+        "title_sk": "Jedna obyčajná veta unesie retrieval pamäte AI agenta — a riešením nie je lepší retriever",
+        "desc": "One poisoned memory with a plain-English trigger hijacks AI-agent retrieval 88–100%, even "
+                "at 10k. Gating influence by corroboration drops it to 0%.",
+        "desc_sk": "Jedna otrávená spomienka s triggerom z obyčajnej vety unesie retrieval AI agenta na "
+                   "88–100% aj pri 10k. Gejtovanie vplyvu korroboráciou ho zrazí na 0%.",
+        "date": "2026-07-02", "modified": "2026-07-02",
+        "tags": "AI agents · Memory · Security · Poisoning · mnemo",
+        "tags_sk": "AI agenti · Pamäť · Bezpečnosť · Poisoning · mnemo",
+        "kicker": "Agent memory security", "kicker_sk": "Bezpečnosť pamäte agentov",
+    },
     "agent-memory-retrieval": {
         "slug": "agent-memory-retrieval-bm25-vector-hybrid",
         "title": "Agent-memory retrieval, measured: recency 0.024, a vector DB ties BM25, the cheap hybrid wins",
