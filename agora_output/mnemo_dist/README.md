@@ -102,7 +102,17 @@ product composition scores **recall@20 0.865 vs 0.755 for the best single cue (+
 evidence, the classic "combine outside the saturating form" failure, BM25F/Robertson et al. CIKM 2004). So:
 compose as a **product**, and if you cap, cap the product — the same choice production search settled on
 (Elasticsearch defaults `score_mode=multiply`). Honest scope: one benchmark, one embedder, near-orthogonal
-cues; correlated cues could double-count. Reversible: a single dict / `None` behaves exactly as before.
+cues. Reversible: a single dict / `None` behaves exactly as before.
+
+**Compose only cues you trust** (receipt: [`probes/locomo_correlated_cue_composition.py`](probes/locomo_correlated_cue_composition.py)).
+A product inherits the product-of-experts *veto* (Hinton 2002): a near-zero factor vetoes, so a target that
+misses *either* cue collapses far below an additive sum or the trusted cue alone — measured, on the subset
+where the second cue is wrong-for-the-query, product recall@20 **0.10 vs sum 0.52 vs one-cue 0.70**. So an
+unreliable second cue hurts a *product* more than a *sum* (and can do worse than not composing at all). The
+fix is the per-cue `trust` you already pass: down-weighting an untrusted cue restores the product toward the
+sum. Interestingly this is **not** a correlation effect — the gap is largest when the cues are *orthogonal*
+and *shrinks* as they correlate (a redundant copy just can't miss when the real cue hits). Rule of thumb:
+compose a second cue **only when it is independently reliable for the query**, and weight it by that reliability.
 
 ## Use it as an MCP server (any Claude / Cursor / agent client)
 
