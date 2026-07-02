@@ -6,7 +6,7 @@
 
 *Memory is the mother of the Muses. An agent with no memory has no ideas.*
 
-`pip install agora-mnemo` · [PyPI](https://pypi.org/project/agora-mnemo/) · [Hugging Face](https://huggingface.co/Danchi17/mnemo) · [DOI 10.5281/zenodo.21128550](https://doi.org/10.5281/zenodo.21128550) · MIT · v0.4.0
+`pip install agora-mnemo` · [PyPI](https://pypi.org/project/agora-mnemo/) · [Hugging Face](https://huggingface.co/Danchi17/mnemo) · [DOI 10.5281/zenodo.21128550](https://doi.org/10.5281/zenodo.21128550) · MIT · v0.4.1
 
 </div>
 
@@ -69,6 +69,23 @@ too (recall 1.00 corroborated vs 0.08 uncorroborated), so this is for **adversar
 use. It raises attacker cost (defeating it needs ≥3 coordinated records with ≥2 forged independent
 provenances), it does not make poisoning impossible. Receipts: [`probes/agentpoison_influence_gate.py`](probes/agentpoison_influence_gate.py),
 [`probes/agentpoison_influence_gate_validation.py`](probes/agentpoison_influence_gate_validation.py).
+
+### Soft metadata filter: `recall(prefer=..., prefer_trust=...)` (0.4.1)
+
+A hard metadata filter (`where={"speaker": x}`) deletes non-matching memories — great when the filter is
+right, but when your extractor guesses the wrong value it **hard-deletes the answer**. The soft version
+only *boosts* matching memories, weighted by how much you trust the cue this call, and leaves everything
+else rankable: `recall(q, prefer={"speaker": x}, prefer_trust=t)`, `t∈[0,1]` (0 = no filter, 1 = strong
+preference). Pass a **low** `prefer_trust` when the match is weak/ambiguous so the filter backs off toward
+plain recall. The point is to weight by the **a-priori reliability of the extraction** (e.g. alias-match
+strength: exact-name hit → ~1.0, no-name/ambiguous guess → ~0.0), *not* by the extractor model's own
+self-reported confidence (which is corrupted exactly when it's wrong). MEASURED end-to-end through
+`recall()` on LoCoMo (receipt: [`probes/locomo_soft_prefer_filter.py`](probes/locomo_soft_prefer_filter.py)):
+with an extractor that is reliable on exact-name questions (5% wrong) but guesses on ambiguous ones (67%
+wrong), alias-strength-weighted `prefer` scores **recall@20 0.718 (+0.144 over no filter, best of all,
+10/10 conversations)** and — on the subset where the extractor picked the wrong speaker — recovers to
+**0.315 vs the hard filter's 0.110** (which craters by deleting the right answer). Soft `prefer` gives the
+filter's upside without the hard filter's downside. Reversible: `prefer=None` = legacy recall.
 
 ## Use it as an MCP server (any Claude / Cursor / agent client)
 

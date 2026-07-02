@@ -80,7 +80,7 @@ def new_receipt_keypair():
     return (sk.private_bytes(_ser.Encoding.Raw, _ser.PrivateFormat.Raw, _ser.NoEncryption()).hex(),
             sk.public_key().public_bytes(_ser.Encoding.Raw, _ser.PublicFormat.Raw).hex())
 
-__version__ = "0.4.0"
+__version__ = "0.4.1"
 _WORD = re.compile(r"[a-z0-9][a-z0-9\-']{2,}")
 _STOP = frozenset("the a an of for to in on and or is are was were be been with this that it its as "
                   "by at from into our we us you your he she they them his her their not no".split())
@@ -474,7 +474,8 @@ class Mnemo:
     def recall(self, query: str, k: int = 6, include_superseded: bool = False,
                include_hubs: bool = False, mode: str = "auto", min_relevance: float = 0.0,
                scope: str | None = None, as_of: float | None = None,
-               where: dict | None = None, influence_only: bool = False) -> list[dict]:
+               where: dict | None = None, influence_only: bool = False,
+               prefer: dict | None = None, prefer_trust: float = 1.0) -> list[dict]:
         """Top-k memories by RELEVANCE × VALUE — high-value memories outrank merely-similar ones.
         Memories the dream pass flagged as hubs (universal matchers) are skipped unless include_hubs.
 
@@ -515,7 +516,21 @@ class Mnemo:
         recalled-but-uncorroborated memory should inform but not unilaterally drive an action. It RAISES
         attacker cost (a single free injection is filtered; defeating it needs >=3 coordinated records with
         >=2 independent forged provenances) rather than making poisoning impossible. Reversible: default
-        False = legacy recall."""
+        False = legacy recall.
+
+        prefer / prefer_trust (OPT-IN, default None -> zero behavior change): a SOFT, trust-weighted metadata
+        filter. Unlike `where` (a HARD filter that DELETES non-matching records — so a wrong filter hard-
+        deletes the answer), `prefer` takes the same condition dict but only BOOSTS matching records'
+        score by (1 + prefer_trust * gain), leaving non-matching records rankable. prefer_trust in [0,1] is
+        HOW MUCH to trust the filter cue this call: pass a low value when your metadata extractor is unsure
+        (weak/ambiguous match) so the filter gracefully backs off toward plain recall; prefer_trust=0 == no
+        filter. This is the a-priori-trust lever: weight the filter by the RELIABILITY of the extraction
+        (e.g. alias-match strength: exact-name hit -> ~1.0, no-name/ambiguous guess -> ~0.0), NOT by the
+        extractor model's own self-reported confidence (which is corrupted in the overconfident-on-wrong
+        case). MEASURED (mnemo/probes/locomo_soft_prefer_filter.py) on LoCoMo: soft prefer weighted by
+        alias-strength gives the filter's benefit on reliable (exact-name) queries while backing off on
+        ambiguous ones where extraction fails -- beating both no filter and a hard `where` filter under
+        imperfect extraction. Reversible: prefer=None = legacy recall."""
         def _eligible(r: dict) -> bool:
             s = r["status"]
             if as_of is not None:
@@ -541,38 +556,7 @@ class Mnemo:
         # Metadata pre-filter (the 'filter before you rank' lever): keep only records matching ALL `where`
         # conditions, matched against top-level fields then meta. Deterministic, no embedder, O(pool).
         if where:
-            def _match(r: dict) -> bool:
-                meta = r.get("meta") or {}
-                for field, cond in where.items():
-                    val = r[field] if field in r else meta.get(field)
-                    if isinstance(cond, dict):
-                        for op, cv in cond.items():
-                            if op in ("$eq", "eq"):
-                                if val != cv: return False
-                            elif op in ("$ne", "ne"):
-                                if val == cv: return False
-                            elif op in ("$in", "in"):
-                                if val not in cv: return False
-                            elif op in ("$nin", "nin"):
-                                if val in cv: return False
-                            elif op in ("$gte", "gte"):
-                                if val is None or val < cv: return False
-                            elif op in ("$lte", "lte"):
-                                if val is None or val > cv: return False
-                            elif op in ("$gt", "gt"):
-                                if val is None or val <= cv: return False
-                            elif op in ("$lt", "lt"):
-                                if val is None or val >= cv: return False
-                            elif op in ("$contains", "contains"):
-                                if val is None or cv not in val: return False
-                            else:
-                                raise ValueError(f"recall(where=): unknown operator {op!r}")
-                    elif isinstance(cond, (list, tuple, set)):
-                        if val not in cond: return False
-                    else:
-                        if val != cond: return False
-                return True
-            pool = [r for r in pool if _match(r)]
+            pool = [r for r in pool if self._cond_match(r, where)]
         # Influence gate (retrieve-then-influence split): keep only CORROBORATED memories in the set that is
         # allowed to drive an action. Same bar as episodic->semantic graduation; embedder-independent, so it
         # generalizes across retrievers where geometry-based poison defenses do not (see the docstring).
@@ -670,6 +654,11 @@ class Mnemo:
                 b = sum(float(c[3].get("bad", 0) or 0) for c in near)
                 if (g + 1.0) / (g + b + 2.0) <= 1.0 / (1.0 + D):
                     gate_off = True
+        # Soft `prefer` filter: multiplicatively boost records matching the prefer condition by
+        # (1 + prefer_trust * _PREFER_GAIN). Non-matching records are left rankable (unlike hard `where`),
+        # so a wrong/weak filter degrades gracefully instead of hard-deleting the answer. prefer_trust=0
+        # (or prefer=None) -> no boost (identity). Clamp trust to [0, 1].
+        _pt = max(0.0, min(1.0, float(prefer_trust))) if prefer else 0.0
         scored = []
         for sim, prov, evalue, r in cands:
             if gate_off:
@@ -678,7 +667,8 @@ class Mnemo:
                 cal = 0.5 + self._reliability(r)
                 if mode == "boost" and cal < 1.0:
                     cal = 1.0
-            score = sim * (1.0 + math.log1p(max(0.0, evalue))) * prov * cal
+            pref = (1.0 + _pt * _PREFER_GAIN) if (_pt > 0.0 and self._cond_match(r, prefer)) else 1.0
+            score = sim * (1.0 + math.log1p(max(0.0, evalue))) * prov * cal * pref
             scored.append((score, sim, r))
         scored.sort(key=lambda x: -x[0])
         out = []
@@ -772,6 +762,43 @@ class Mnemo:
         if rec.get("mtype") == "semantic":
             return True
         return Mnemo._distinct_sources(rec.get("links"), by_id) >= 2
+
+    @staticmethod
+    def _cond_match(r: dict, conds: dict) -> bool:
+        """Does record r satisfy ALL of `conds` (a where/prefer dict)? Each field is matched against the
+        record's top-level attributes first, then its meta dict. A condition is a scalar (equality), a
+        list/tuple/set (membership), or a dict of operators ($eq/$ne/$in/$nin/$gte/$lte/$gt/$lt/$contains).
+        Shared by the hard `where` pre-filter and the soft `prefer` trust-weighted boost."""
+        meta = r.get("meta") or {}
+        for field, cond in conds.items():
+            val = r[field] if field in r else meta.get(field)
+            if isinstance(cond, dict):
+                for op, cv in cond.items():
+                    if op in ("$eq", "eq"):
+                        if val != cv: return False
+                    elif op in ("$ne", "ne"):
+                        if val == cv: return False
+                    elif op in ("$in", "in"):
+                        if val not in cv: return False
+                    elif op in ("$nin", "nin"):
+                        if val in cv: return False
+                    elif op in ("$gte", "gte"):
+                        if val is None or val < cv: return False
+                    elif op in ("$lte", "lte"):
+                        if val is None or val > cv: return False
+                    elif op in ("$gt", "gt"):
+                        if val is None or val <= cv: return False
+                    elif op in ("$lt", "lt"):
+                        if val is None or val >= cv: return False
+                    elif op in ("$contains", "contains"):
+                        if val is None or cv not in val: return False
+                    else:
+                        raise ValueError(f"recall condition: unknown operator {op!r}")
+            elif isinstance(cond, (list, tuple, set)):
+                if val not in cond: return False
+            else:
+                if val != cond: return False
+        return True
 
     @staticmethod
     def _reliability(r: dict) -> float:
@@ -1104,6 +1131,11 @@ _HALFLIFE_S = {"episodic": 7 * 86400, "semantic": 180 * 86400, "procedural": 365
 # accrued value at which a repeatedly-recalled EPISODIC memory graduates to semantic (≈16 strong
 # recalls from the 1.0 floor); proven-durable, so it should decay on the slow clock, not the fast one.
 _GRADUATE_VALUE = 5.0
+# Max multiplicative boost for a fully-trusted soft `prefer` filter match (prefer_trust=1 -> x4). At
+# prefer_trust=1 this strongly prefers matches (approaching a hard filter) but never DELETES non-matches,
+# so a highly-relevant non-match can still surface; prefer_trust=0 -> no boost. Fixed a priori (not tuned
+# on the eval) so the measured win isn't an overfit.
+_PREFER_GAIN = 3.0
 _PROCEDURAL_RE = re.compile(r"\b(always|never|prefers?|rule|workflow|convention|policy|habit|"
                             r"setting|must|should|avoid|don't|do not)\b", re.I)
 _SEMANTIC_RE = re.compile(r"\b(means|defined|definition|theorem|law of|equals|consists? of|"

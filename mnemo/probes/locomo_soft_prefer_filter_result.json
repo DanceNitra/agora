@@ -1,0 +1,28 @@
+{
+ "k": 20,
+ "n_q": 1531,
+ "fire_exact": 1366,
+ "wrong_exact": 74,
+ "fire_ambiguous": 165,
+ "wrong_ambiguous": 111,
+ "harm_n": 185,
+ "recall@20": {
+  "no_filter": 0.5738,
+  "hard_where": 0.7102,
+  "soft_prefer": 0.718
+ },
+ "harm_subset": {
+  "no_filter": {
+   "mean": 0.4871,
+   "n": 185
+  },
+  "hard_where": {
+   "mean": 0.1101,
+   "n": 185
+  },
+  "soft_prefer": {
+   "mean": 0.3149,
+   "n": 185
+  }
+ }
+}
