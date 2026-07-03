@@ -116,18 +116,18 @@ assert floor > 0.10, "Sybil floor: forged corroboration keeps executing while be
 
 print(f"\nMEASURED — the frontier is ~DIAGONAL: mean |poison_closed − true_recall_lost| = {diag_gap:.3f} over the "
       f"usable band. Integrity does not detect poison; it trades security for utility 1:1.")
-print(f"MEASURED — at ~{b['poison_closed']:.0%} single-poison closure (tau={b['tau']}): strict rule loses "
-      f"{b['true_recall_lost']:.2f} of true-recall; the earned-standing declassifier recovers "
-      f"{recovered:.2f} of it at the SAME closure (poison stays blocked — it has no standing).")
-print(f"MEASURED — cold-start bound: only {aged:.0%} of rare-true have earned standing; the rest (fresh, g=0) "
+print(f"ILLUSTRATIVE (dials we set, NOT empirical rates): at ~{b['poison_closed']:.0%} poison closure the "
+      f"strict rule loses {b['true_recall_lost']:.2f} true-recall; endorsing earned-standing members refunds "
+      f"~{recovered:.2f} — but this equals the standing-prevalence we set (P_AGED), it is not a measured recovery rate.")
+print(f"STRUCTURAL BOUND — cold-start: only {aged:.0%} of rare-true have earned standing; the rest (fresh, g=0) "
       f"are indistinguishable from fresh poison and cannot be refunded. SLEEPER: a poison that farms g>="
       f"{G_MIN:.0f} then defects is endorsed (standing is intent-blind).")
-print(f"MEASURED — Sybil FLOOR: forged-corroboration poison executes at {floor:.2f} while benign utility "
+print(f"STRUCTURAL — Sybil FLOOR: forged-corroboration poison executes at {floor:.2f} while benign utility "
       f"survives — integrity-identical to real corroboration, so closure is capped until identity has a mint cost.")
 verdict = (f"The security question is NOT the low-water-mark. Because poison and rare-true share one integrity "
            f"distribution, the graded low-water-mark frontier is ~diagonal (gap {diag_gap:.2f}): it trades "
            f"security for utility ~1:1 and does not detect poison. The lever is the ORTHOGONAL earned-standing "
-           f"declassifier: at matched ~{b['poison_closed']:.0%} poison closure it refunds {recovered:.2f} of the "
+           f"declassifier: it refunds ONLY the true items that already hold standing (in the toy, the {recovered:.2f}≈P_AGED we set) of the "
            f"lost true-recall (poison has no standing), but is bounded by COLD START (only ~{aged:.0%} of "
            f"rare-true have standing; the rest = the irreducible tail Sybil-resistance can't refund) and "
            f"defeated by SLEEPERS (standing is intent-blind), and it sits above a Sybil FLOOR (~{floor:.2f} "
