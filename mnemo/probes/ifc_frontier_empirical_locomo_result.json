@@ -1,0 +1,152 @@
+{
+ "scenario": "ifc_frontier_EMPIRICAL_locomo",
+ "self_check": "passed",
+ "conversations": 10,
+ "n_rare_true": 1791,
+ "n_poison_single": 362,
+ "n_poison_sybil": 66,
+ "auroc_integrity_separates_poison": 0.683,
+ "frontier_diagonal_gap": 0.269,
+ "cold_start_fraction": 0.601,
+ "operating_tau": 0.85,
+ "poison_closed_at_op": 0.884,
+ "true_recall_recovered_by_declassify": 0.382,
+ "sybil_floor_at_op": 0.0,
+ "frontier": [
+  {
+   "tau": 0.05,
+   "poison_closed": 0.649,
+   "true_lost": 0.304,
+   "true_lost_declassify": 0.183,
+   "sybil_passes": 1.0
+  },
+  {
+   "tau": 0.1,
+   "poison_closed": 0.649,
+   "true_lost": 0.304,
+   "true_lost_declassify": 0.183,
+   "sybil_passes": 1.0
+  },
+  {
+   "tau": 0.15,
+   "poison_closed": 0.649,
+   "true_lost": 0.304,
+   "true_lost_declassify": 0.183,
+   "sybil_passes": 1.0
+  },
+  {
+   "tau": 0.2,
+   "poison_closed": 0.649,
+   "true_lost": 0.304,
+   "true_lost_declassify": 0.183,
+   "sybil_passes": 1.0
+  },
+  {
+   "tau": 0.25,
+   "poison_closed": 0.649,
+   "true_lost": 0.304,
+   "true_lost_declassify": 0.183,
+   "sybil_passes": 1.0
+  },
+  {
+   "tau": 0.3,
+   "poison_closed": 0.649,
+   "true_lost": 0.304,
+   "true_lost_declassify": 0.183,
+   "sybil_passes": 1.0
+  },
+  {
+   "tau": 0.35,
+   "poison_closed": 0.649,
+   "true_lost": 0.304,
+   "true_lost_declassify": 0.183,
+   "sybil_passes": 1.0
+  },
+  {
+   "tau": 0.4,
+   "poison_closed": 0.649,
+   "true_lost": 0.304,
+   "true_lost_declassify": 0.183,
+   "sybil_passes": 1.0
+  },
+  {
+   "tau": 0.45,
+   "poison_closed": 0.793,
+   "true_lost": 0.517,
+   "true_lost_declassify": 0.286,
+   "sybil_passes": 1.0
+  },
+  {
+   "tau": 0.5,
+   "poison_closed": 0.793,
+   "true_lost": 0.517,
+   "true_lost_declassify": 0.286,
+   "sybil_passes": 1.0
+  },
+  {
+   "tau": 0.55,
+   "poison_closed": 0.793,
+   "true_lost": 0.517,
+   "true_lost_declassify": 0.286,
+   "sybil_passes": 1.0
+  },
+  {
+   "tau": 0.6,
+   "poison_closed": 0.793,
+   "true_lost": 0.517,
+   "true_lost_declassify": 0.286,
+   "sybil_passes": 1.0
+  },
+  {
+   "tau": 0.65,
+   "poison_closed": 0.793,
+   "true_lost": 0.517,
+   "true_lost_declassify": 0.286,
+   "sybil_passes": 1.0
+  },
+  {
+   "tau": 0.7,
+   "poison_closed": 0.848,
+   "true_lost": 0.651,
+   "true_lost_declassify": 0.335,
+   "sybil_passes": 0.0
+  },
+  {
+   "tau": 0.75,
+   "poison_closed": 0.848,
+   "true_lost": 0.651,
+   "true_lost_declassify": 0.335,
+   "sybil_passes": 0.0
+  },
+  {
+   "tau": 0.8,
+   "poison_closed": 0.848,
+   "true_lost": 0.651,
+   "true_lost_declassify": 0.335,
+   "sybil_passes": 0.0
+  },
+  {
+   "tau": 0.85,
+   "poison_closed": 0.884,
+   "true_lost": 0.74,
+   "true_lost_declassify": 0.358,
+   "sybil_passes": 0.0
+  },
+  {
+   "tau": 0.9,
+   "poison_closed": 0.884,
+   "true_lost": 0.74,
+   "true_lost_declassify": 0.358,
+   "sybil_passes": 0.0
+  },
+  {
+   "tau": 0.95,
+   "poison_closed": 0.925,
+   "true_lost": 0.841,
+   "true_lost_declassify": 0.374,
+   "sybil_passes": 0.0
+  }
+ ],
+ "idea_credit": "jacksonxly (framing + staked standing); roots Biba 1977, Myers&Liskov DLM, CaMeL 2503.18813, Douceur 2002",
+ "verdict": "EMPIRICAL on real LoCoMo (corrects the toy): corroboration-integrity is a WEAK poison signal, not none (AUROC 0.68 vs a naive transplant poison) and not a strong one — an adaptive poison that blends into the conversation would erode it toward chance. So the low-water-mark frontier is FAVORABLE but lossy (gap 0.27): at ~88% poison closure you still lose 74% of true-recall. Earned standing (orthogonal, from real earlier-session recurrence) refunds 0.38 of that, but 60% of real rare-true carry no standing (the irreducible cold-start tail). And the Sybil floor is a TRADEOFF: a 2-forgery poison (integrity ~0.70) passes at any tau below ~0.7 (100% at moderate closure) and is only blocked by a tau so high it destroys benign utility. RBAC gates the actor, IFC gates the data, membership-cost gates the identity — and cold start is the empirical price of the last one without a registrar."
+}
