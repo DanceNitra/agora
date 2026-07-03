@@ -1,0 +1,43 @@
+{
+ "metric": "recall@10",
+ "queries": 1531,
+ "corr_norm_len": -0.711,
+ "dev_recall": {
+  "-1.0": 0.3627,
+  "-0.75": 0.3624,
+  "-0.5": 0.3471,
+  "-0.25": 0.3338,
+  "0.0": 0.323,
+  "0.25": 0.3129,
+  "0.5": 0.2887,
+  "0.75": 0.2726,
+  "1.0": 0.2574
+ },
+ "dev_len": {
+  "-1.0": 0.004,
+  "-0.75": 0.0053,
+  "-0.5": 0.0103,
+  "-0.25": 0.0588,
+  "0.0": 0.323,
+  "0.25": 0.3248,
+  "0.5": 0.2319,
+  "0.75": 0.1879,
+  "1.0": 0.1642
+ },
+ "best_beta": -1.0,
+ "best_len_beta": 0.25,
+ "test_cosine": 0.3735,
+ "test_norm": 0.416,
+ "test_length": 0.4161,
+ "test_norm_vs_cos": [
+  0.0425,
+  0.025,
+  0.0606
+ ],
+ "test_norm_vs_length": [
+  -0.0001,
+  -0.0264,
+  0.0264
+ ],
+ "verdict": "REFRAME (length-equivalent) - norm beats cosine (+0.0425) but is statistically INDISTINGUISHABLE from a pure length prior (norm-length -0.0001, CI crosses 0; corr(|d|,len)=-0.71). The 'norm re-ranker' IS a length prior on this data; no evidence of a specificity signal beyond length. A length re-rank is the honest, simpler feature."
+}
