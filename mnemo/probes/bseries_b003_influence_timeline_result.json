@@ -54,9 +54,9 @@
   {
    "scenario_id": "B-003",
    "step": 3,
-   "phase": "revised belief acts",
+   "phase": "revised belief passes gate",
    "framework": "mnemo-substrate",
-   "memory_op": "act",
+   "memory_op": "recall",
    "corroboration_state": "corroborated",
    "corroboration_path": "2 distinct-source corroborating links",
    "gate_decision": "allow",
@@ -65,7 +65,7 @@
    "provenance_retained": true,
    "position": "",
    "coherence": "",
-   "note": "the corroborated new value now passes the influence gate and drives the answer; prior retained"
+   "note": "the corroborated new value now surfaces through the recall(influence_only) boundary (gate=allow); prior retained. Substrate only -- whether the agent then acts on it is the cognitive layer's, not ours"
   },
   {
    "scenario_id": "B-003",
