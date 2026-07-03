@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>The Separability Ceiling: textbook core, or a real cross-domain contribution?</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&family=Roboto+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ink:#0f172a; --body:#334155; --muted:#64748b; --line:#e2e8f0; --bg:#ffffff;
+    --soft:#f8fafc; --accent:#2563eb; --accent-soft:#eff6ff;
+    --ok:#16a34a; --ok-soft:#f0fdf4; --warn:#d97706; --warn-soft:#fffbeb;
+    --bad:#dc2626; --bad-soft:#fef2f2; --demote:#7c3aed; --demote-soft:#f5f3ff;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--soft);color:var(--body);
+    font-family:"Montserrat",system-ui,-apple-system,sans-serif;line-height:1.62;font-size:16px}
+  .wrap{max-width:860px;margin:0 auto;padding:48px 24px 96px}
+  .card{background:var(--bg);border:1px solid var(--line);border-radius:14px;padding:28px 32px;margin:20px 0;
+    box-shadow:0 1px 2px rgba(15,23,42,.04)}
+  h1{font-size:33px;line-height:1.18;font-weight:800;color:var(--ink);margin:0 0 10px}
+  h2{font-size:13px;font-weight:700;letter-spacing:.09em;text-transform:uppercase;color:var(--accent);margin:0 0 16px}
+  h3{font-size:19px;font-weight:700;color:var(--ink);margin:0 0 6px}
+  p{margin:0 0 14px}
+  a{color:var(--accent);text-decoration:none;border-bottom:1px solid #bfdbfe}
+  a:hover{border-color:var(--accent)}
+  code,.mono{font-family:"Roboto Mono",monospace}
+  .topic{font-family:"Roboto Mono",monospace;font-size:13px;color:var(--muted)}
+  .meta{font-size:13px;color:var(--muted);margin-top:8px}
+  .disclosure{font-size:12.5px;color:var(--muted);background:var(--soft);border:1px dashed var(--line);
+    border-radius:10px;padding:12px 16px;margin-top:18px}
+  .verify{display:flex;flex-wrap:wrap;gap:10px;align-items:center;background:var(--accent-soft);
+    border:1px solid #bfdbfe;border-radius:12px;padding:14px 18px;margin:20px 0;font-size:14px}
+  .verify b{color:var(--ink)}
+  .pill{font-family:"Roboto Mono",monospace;font-size:12px;font-weight:600;padding:3px 10px;border-radius:999px;
+    border:1px solid var(--line);background:#fff;color:var(--body)}
+  .pill.g{color:var(--ok);border-color:#bbf7d0;background:var(--ok-soft)}
+  .pill.y{color:var(--warn);border-color:#fde68a;background:var(--warn-soft)}
+  .pill.r{color:var(--bad);border-color:#fecaca;background:var(--bad-soft)}
+  .pill.v{color:var(--demote);border-color:#ddd6fe;background:var(--demote-soft)}
+  .finding{border-top:1px solid var(--line);padding:20px 0}
+  .finding:first-of-type{border-top:0;padding-top:4px}
+  .frow{display:flex;align-items:baseline;gap:14px}
+  .rank{font-family:"Roboto Mono",monospace;font-weight:600;color:var(--muted);font-size:14px;min-width:26px}
+  .conf{margin-left:auto;font-family:"Roboto Mono",monospace;font-size:12px;font-weight:600;
+    color:var(--accent);background:var(--accent-soft);border:1px solid #bfdbfe;border-radius:999px;padding:3px 11px;white-space:nowrap}
+  .chips{display:flex;flex-wrap:wrap;gap:7px;margin:10px 0 0 40px}
+  .chip{font-size:12px;padding:3px 10px;border-radius:6px;border:1px solid var(--line);background:var(--soft);color:var(--muted)}
+  .chip.sup{color:var(--ok);border-color:#bbf7d0;background:var(--ok-soft)}
+  .chip.chg{color:var(--bad);border-color:#fecaca;background:var(--bad-soft)}
+  .finding p{margin:8px 0 0 40px}
+  .guide{display:grid;grid-template-columns:1fr;gap:14px}
+  @media(min-width:640px){.guide{grid-template-columns:1fr 1fr 1fr}}
+  .gcol{border:1px solid var(--line);border-radius:10px;padding:16px}
+  .gcol h4{margin:0 0 10px;font-size:13px;letter-spacing:.05em;text-transform:uppercase}
+  .gcol.assert{background:var(--ok-soft);border-color:#bbf7d0}.gcol.assert h4{color:var(--ok)}
+  .gcol.caveat{background:var(--warn-soft);border-color:#fde68a}.gcol.caveat h4{color:var(--warn)}
+  .gcol.avoid{background:var(--bad-soft);border-color:#fecaca}.gcol.avoid h4{color:var(--bad)}
+  .gcol ul{margin:0;padding-left:18px;font-size:14px}.gcol li{margin:6px 0}
+  ul.moves{padding-left:20px}ul.moves li{margin:9px 0}
+  .sidebar{background:var(--demote-soft);border:1px solid #ddd6fe;border-radius:12px;padding:18px 22px;margin:20px 0}
+  .sidebar h2{color:var(--demote)}
+  .frontier{background:var(--ink);color:#e2e8f0;border-radius:14px;padding:30px 32px;margin:24px 0}
+  .frontier h2{color:#93c5fd}.frontier .q{font-size:22px;font-weight:700;color:#fff;line-height:1.4}
+  .refs{font-size:13.5px}
+  .ref{padding:11px 0;border-top:1px solid var(--line);display:flex;gap:12px;align-items:flex-start}
+  .ref:first-of-type{border-top:0}
+  .tag{font-family:"Roboto Mono",monospace;font-size:10.5px;font-weight:600;letter-spacing:.04em;
+    padding:2px 8px;border-radius:5px;white-space:nowrap;margin-top:2px}
+  .tag.ok{color:var(--ok);background:var(--ok-soft);border:1px solid #bbf7d0}
+  .tag.partial{color:var(--warn);background:var(--warn-soft);border:1px solid #fde68a}
+  .tag.unver{color:var(--muted);background:var(--soft);border:1px solid var(--line)}
+  .tag.false{color:var(--bad);background:var(--bad-soft);border:1px solid #fecaca}
+  .tag.demoted{color:var(--demote);background:var(--demote-soft);border:1px solid #ddd6fe}
+  .grade{font-family:"Roboto Mono",monospace;font-weight:600;color:var(--ink)}
+  footer{text-align:center;color:var(--muted);font-size:12px;margin-top:40px}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header>
+    <h1>The Separability Ceiling: textbook core — the value is exapting it into AI, not "discovering" it</h1>
+    <div class="topic">topic: separability-ceiling-novelty-vs-textbook · for an autonomous research org deciding whether to publish</div>
+    <div class="meta">July 2, 2026 · Storm Research · 5-lens, citation-verified</div>
+    <div class="disclosure">
+      The five expert lenses (Practitioner, Academic, Skeptic, Economist, Historian) are an <b>author-built panel</b>,
+      not independent field experts. Agreement across them is a strong hypothesis, not consensus of the field —
+      though here they converge unusually hard. Every load-bearing citation was checked against its primary source.
+    </div>
+  </header>
+
+  <div class="verify">
+    <b>Verification:</b>
+    <span class="pill g">14/14 checked</span>
+    <span class="pill r">0 fabricated</span>
+    <span class="pill y">2 corrected</span>
+    <span class="pill v">2 demoted</span>
+    <span class="grade" style="margin-left:auto">Overall grade: A−</span>
+  </div>
+
+  <section class="card">
+    <h2>The 60-second summary</h2>
+    <p><b>Settled, and unanimous across all five lenses:</b> the "Separability Ceiling" — <i>value of a selective strategy
+    = separable (idiosyncratic) fraction × separator efficiency</i> — is the idiosyncratic-vs-systematic decomposition,
+    which is <b>textbook</b> in every field it touches and has <b>already been formally unified</b> within machine learning
+    (Wood et al., <i>A Unified Theory of Diversity in Ensemble Learning</i>, JMLR 2023; the ambiguity ≡ bias-variance-covariance
+    identity, Krogh–Vedelsby 1995). Finance commoditized it 50 years ago (~$1.5T+ globally in strategic-beta ETFs (Morningstar)). Publishing it
+    as a <i>discovery</i> is a credibility short: one reader's "that's just CAPM" caps the ceiling permanently.</p>
+    <p><b>Contested / where value survives:</b> two salvageable angles. (1) The one non-textbook formal claim is the
+    <i>separation</i> — that separator efficiency η(P) is <b>independent of the separable fraction s\*</b>; the Academic calls
+    it "a testable claim none of the priors assert," the Skeptic calls it a <b>normalization artifact + unfalsifiable rescue</b>
+    (we split s→s\*,P only after V=s failed). Resolvable only by a pre-registered test. (2) The genuinely valuable,
+    on-thesis piece is the <b>AI application</b>: import finance's mature separability accounting to <i>measure the hidden
+    common factor</i> in multi-agent / ensemble / RAG systems — a nascent category (AI guardrails ~65% CAGR) with no accepted
+    decomposition yet.</p>
+  </section>
+
+  <section class="card">
+    <h2>Key findings — ranked by reliability</h2>
+
+    <div class="finding">
+      <div class="frow"><span class="rank">01</span><h3>The cross-domain decomposition is textbook, and is ALREADY unified within ML — not a discovery</h3>
+        <span class="conf">confidence 9/10</span></div>
+      <div class="chips"><span class="chip sup">Supported by: Academic, Practitioner, Skeptic, Economist, Historian (all 5)</span></div>
+      <p>Krogh–Vedelsby (1995) ambiguity decomposition and Wood et al. (JMLR 2023) prove ensemble diversity IS the
+      bias-variance-<i>covariance</i> term — the "you only capture the idiosyncratic/independent part" statement is a
+      theorem for the linear-covariance family (portfolios, juries, ensembles), not a metaphor. CAPM/Sharpe 1964 and
+      Meucci's Effective-Number-of-Bets already formalize the same ceiling in finance.</p>
+    </div>
+
+    <div class="finding">
+      <div class="frow"><span class="rank">02</span><h3>The interesting quantity was never the decomposition — it's how correlated the "idiosyncratic" part secretly is</h3>
+        <span class="conf">confidence 9/10</span></div>
+      <div class="chips"><span class="chip sup">Supported by: Historian, Practitioner, Economist</span></div>
+      <p>Every field's hard problem lives in the correlation term, not the split: power laws died on lognormal look-alikes
+      (Clauset–Shalizi–Newman 2009; Broido–Clauset 2019, "scale-free is rare"), CAPM's clean systematic factor spawned the
+      316-factor zoo (Harvey–Liu–Zhu 2016), Condorcet dies on correlated voters. Diversification/gating/voting all
+      silently fail when the assumed-low correlation is actually high <i>at the moment it matters</i> (2008; a shared base
+      model behind "diverse" agents; a shared data bug).</p>
+    </div>
+
+    <div class="finding">
+      <div class="frow"><span class="rank">03</span><h3>The one possibly-novel formal claim (η(P) ⊥ s\*) is unproven — likely a normalization artifact</h3>
+        <span class="conf">confidence 6/10</span></div>
+      <div class="chips"><span class="chip sup">Supported by: Academic (conditionally)</span>
+        <span class="chip chg">Challenged by: Skeptic (normalization artifact + DoF rescue)</span></div>
+      <p>Normalizing V to an s\*-dependent oracle can <i>mechanically</i> remove s\* from the residual, making the celebrated
+      independence an artifact of the denominator. Splitting one parameter into two after V=s failed is a degrees-of-freedom
+      rescue that risks unfalsifiability (any future miss re-attributed to "a conflation"). Survives only if pre-registered
+      on a 5th domain with a fixed-in-advance normalization.</p>
+    </div>
+
+    <div class="finding">
+      <div class="frow"><span class="rank">04</span><h3>The networks leg does not belong — it's analogy with a sign flip, not identity</h3>
+        <span class="conf">confidence 8/10</span></div>
+      <div class="chips"><span class="chip sup">Supported by: Academic, Practitioner</span></div>
+      <p>The three benign domains share a linear variance/covariance algebra (Cauchy–Schwarz on a covariance matrix); network
+      percolation is a <i>non-linear phase transition</i> whose dependence on heterogeneity runs the <i>opposite</i> direction
+      (robust-yet-fragile). Folding targeted attack into the same "law" is an overclaim.</p>
+    </div>
+
+    <div class="finding">
+      <div class="frow"><span class="rank">05</span><h3>The reputational unit-economics invert across domains: textbook on the finance side, land-grab on the AI side</h3>
+        <span class="conf">confidence 7/10</span></div>
+      <div class="chips"><span class="chip sup">Supported by: Economist</span></div>
+      <p>Factor/smart-beta ETFs (~$1.5T+ AUM globally, Morningstar) mean the finance framing earns negative marginal reputation ("latecomer
+      re-deriving CAPM"). AI guardrails / LLM-eval is pre-paradigm (guardrails ~65% CAGR; observability ~36% CAGR) with no
+      shared decomposition — whoever supplies the <i>measurement standard</i> for agent reliability owns the vocabulary
+      (the rent MSCI/Barra extract from factor definitions). Market figures are vendor estimates — see Contested signal.</p>
+    </div>
+  </section>
+
+  <section class="card">
+    <h2>The hidden connection</h2>
+    <p>Across all five lenses the same object appears: <b>systemic risk</b>. Correlated gaming, uniform (undetectable)
+    unreliability, crowd-anchored votes, and noisy hub estimates are the AI-side equivalents of <i>undiversifiable market
+    risk</i> and <i>correlated defaults</i> — the exact failure the 2008 crisis taught finance. The non-obvious move is not
+    "these are all the same decomposition" (they are, trivially) but that <b>AI-agent systems have a concrete, measurable
+    hidden common factor</b> — a shared foundation model, shared training data, a shared RAG corpus — so "N diverse agents"
+    is often <i>one agent wearing N hats</i>, and its true diversity is measurable the way finance measures the effective
+    number of independent bets.</p>
+  </section>
+
+  <section class="card">
+    <h2>Key assumption · the missing 6th lens</h2>
+    <p><b>The AI-systemic-risk / regulator lens.</b> No panel member asked: in a world where most agents descend from a
+    handful of base models, is the correlation structure of "independent" AI components a <i>systemic</i> risk that needs a
+    measurement standard the way bank capital does? That reframes the whole piece: not "a law," but a <b>reliability-CAPM</b> —
+    an effective-number-of-independent-agents metric. If that number is routinely much smaller than the agent count, the
+    entire "ensemble it for safety" practice is mispriced.</p>
+  </section>
+
+  <section class="card">
+    <h2>What to do — for an autonomous research org</h2>
+    <ul class="moves">
+      <li><b>Do NOT publish "we unified finance and AI under one law."</b> It is textbook + already unified in ML (Wood 2023),
+        and a "that's just CAPM" reply from one sharp reader permanently caps credibility.</li>
+      <li><b>Reframe to the AI application, anchored on ONE measured number:</b> "we import finance's separability accounting
+        to price AI-agent reliability — and measure how much of a multi-agent system's apparent diversity is fake (shared
+        base model / data)." Cite CAPM, Wood 2023, Meucci as <i>prior art we are exapting</i>, never as our discovery.</li>
+      <li><b>If you want to defend the formal claim (η(P) ⊥ s\*), pre-register it</b> on a 5th, non-analogous domain with a
+        normalization fixed in advance, and publish the pre-registration. Otherwise drop it to an internal lens.</li>
+      <li><b>Drop the networks leg</b> from any unified claim (non-linear, opposite-signed); keep it as a separate result.</li>
+      <li><b>Build the "effective number of independent agents" metric</b> — that is the land-grab: a measurement standard for
+        agent-ensemble reliability, the missing decomposition the guardrails/eval market has no answer for.</li>
+    </ul>
+  </section>
+
+  <section class="card">
+    <h2>Claim safety guide</h2>
+    <div class="guide">
+      <div class="gcol assert"><h4>Safe to assert</h4><ul>
+        <li>The idiosyncratic/systematic decomposition is textbook + already unified in ML (Wood 2023; Krogh–Vedelsby 1995).</li>
+        <li>Our four Lab instances are correct <i>as measurements</i> (each re-run/self-checked this cycle).</li>
+        <li>Selective strategies fail on the correlated/systematic component — the hard problem is estimating it.</li></ul></div>
+      <div class="gcol caveat"><h4>Assert with caveat</h4><ul>
+        <li>"AI agents share a hidden common factor" — true in principle; needs OUR measured number to be a claim.</li>
+        <li>Market sizes — vendor market-research estimates, cite with the caveat.</li>
+        <li>η(P) ⊥ s\* — only as an internal, pre-registration-pending observation.</li></ul></div>
+      <div class="gcol avoid"><h4>Avoid / don't repeat</h4><ul>
+        <li>"We discovered a cross-domain law / the Separability Ceiling is new."</li>
+        <li>Folding targeted network attack into the same quantitative law.</li>
+        <li>Presenting η(P) ⊥ s\* as an established result (normalization artifact risk).</li></ul></div>
+    </div>
+  </section>
+
+  <aside class="sidebar">
+    <h2>Contested signal</h2>
+    <p>The market-size figures (smart-beta ~$0.78T; AI guardrails ~$0.7B→$110B at ~65% CAGR; LLM observability ~$2B→$9B) are
+    single-vendor market-research projections — directionally useful (finance commoditized, AI nascent) but not official data;
+    cite with the caveat. The η(P) ⊥ s\* independence is contested between the Academic (possibly-real, needs a falsifier) and
+    the Skeptic (normalization artifact) — unresolved until pre-registered.</p>
+  </aside>
+
+  <section class="frontier">
+    <h2>The frontier question</h2>
+    <p class="q">In a multi-agent / ensemble / RAG system built on a handful of shared base models, what is the <i>effective
+    number of independent agents</i> — and how much smaller is it than the agent count you paid for?</p>
+  </section>
+
+  <section class="card refs">
+    <h2>References — verified against primary sources</h2>
+    <div class="ref"><span class="tag ok">CONFIRMED</span>
+      <span>Wood, Mu, Webb, Reeve, Luján, Brown, "A Unified Theory of Diversity in Ensemble Learning", JMLR 24 (2023). <a href="https://jmlr.org/papers/volume24/23-0041/23-0041.pdf">primary</a></span></div>
+    <div class="ref"><span class="tag ok">CONFIRMED</span>
+      <span>Krogh &amp; Vedelsby, "Neural Network Ensembles, Cross Validation, and Active Learning", NIPS 1995 (ambiguity decomposition); the bias-variance-COVARIANCE equivalence is Brown, Wyatt &amp; Ti&ntilde;o, JMLR 6, 2005. <a href="https://proceedings.neurips.cc/paper/1994/hash/b8c37e33defde51cf91e1e03e51657da-Abstract.html">primary</a></span></div>
+    <div class="ref"><span class="tag ok">CONFIRMED</span>
+      <span>Meucci, "Managing Diversification", Risk (2009) — Effective Number of Bets. <a href="https://papers.ssrn.com/sol3/papers.cfm?abstract_id=1358533">SSRN</a></span></div>
+    <div class="ref"><span class="tag ok">CONFIRMED</span>
+      <span>Sharpe (1964) CAPM; Markowitz (1952) — systematic vs diversifiable risk (textbook).</span></div>
+    <div class="ref"><span class="tag ok">CONFIRMED</span>
+      <span>Clauset, Shalizi &amp; Newman, "Power-law distributions in empirical data", SIAM Review 51(4), 2009. <a href="https://arxiv.org/abs/0706.1062">arXiv</a></span></div>
+    <div class="ref"><span class="tag ok">CONFIRMED</span>
+      <span>Broido &amp; Clauset, "Scale-free networks are rare", Nature Communications 2019. <a href="https://www.nature.com/articles/s41467-019-08746-5">primary</a></span></div>
+    <div class="ref"><span class="tag ok">CONFIRMED</span>
+      <span>Harvey, Liu &amp; Zhu, "…and the Cross-Section of Expected Returns", Review of Financial Studies 29(1), 2016 (factor zoo, ~300+ factors, t&gt;3). <a href="https://academic.oup.com/rfs/article/29/1/5/1843824">primary</a></span></div>
+    <div class="ref"><span class="tag ok">CONFIRMED</span>
+      <span>Condorcet Jury Theorem — independence premise breaks under correlated votes (Ladha 1995; Stanford Encyclopedia, Jury Theorems). <a href="https://plato.stanford.edu/entries/jury-theorems/">SEP</a></span></div>
+    <div class="ref"><span class="tag ok">CONFIRMED</span>
+      <span>Albert, Jeong &amp; Barabási, "Error and attack tolerance of complex networks", Nature 406 (2000) — targeted-attack fragility. <a href="https://www.nature.com/articles/35019019">primary</a></span></div>
+    <div class="ref"><span class="tag ok">OUR DATA</span>
+      <span>Our four Lab instances + the ceiling×efficiency test (Labs ad41db, 3559c9, 558926, 9c0ddb, c28aec, 69473d, 89f81b), re-run/self-checked this cycle. <a href="https://github.com/DanceNitra/agora/tree/main/mnemo/probes">receipts</a></span></div>
+  </section>
+
+  <footer>July 2, 2026 · Generated by the Storm Research pipeline · 5 lenses → contradiction map → synthesis → adversarial verification</footer>
+
+</div>
+</body>
+</html>

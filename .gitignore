@@ -139,3 +139,8 @@ agora_output/scan_backlog_*.md
 agora_output/distribution_radar/reddit_reply_snapshot.json
 agora_output/distribution_radar/reddit_reply_watch.py
 agora_output/distribution_radar/ready_drafts_*.md
+
+# probe caches + logs (derived, not source)
+mnemo/probes/_*_rawnorms.json
+mnemo/probes/*_cache.json
+tools/_self_improvement.log

@@ -1,0 +1,690 @@
+{
+ "benchmark": "grounding_meter_v3",
+ "version": "3.0",
+ "created_utc": "2026-07-02T20:18:49.561702Z",
+ "seed": 1234,
+ "tau_undefined": 0.05,
+ "dose_axis": {
+  "levels": [
+   "d0",
+   "d1",
+   "d2",
+   "d3",
+   "d4",
+   "d5",
+   "d6"
+  ],
+  "strength_value": [
+   0.0,
+   0.166,
+   0.333,
+   0.5,
+   0.666,
+   0.833,
+   1.0
+  ],
+  "ladder": "k_of_N_source_count_fixed_template"
+ },
+ "models": {
+  "local": {
+   "name": "qwen2.5:7b",
+   "estimator": "logprob_softmax_temp0",
+   "per_item": [
+    {
+     "id": "q01_boil",
+     "type": [
+      "q01_boil",
+      "At what temperature does water boil at sea level?",
+      "50 C",
+      "100 C",
+      "B"
+     ],
+     "truth": "B",
+     "p_neutral": 0.0,
+     "prior": 0.5,
+     "stratum": "strong",
+     "follow": {
+      "0": 0.5,
+      "1": 0.5,
+      "2": 0.5,
+      "3": 0.5,
+      "4": 0.5,
+      "5": 0.5,
+      "6": 0.5
+     },
+     "d50": null,
+     "auc": 0.0,
+     "delta_ext": 0.0,
+     "delta_int": 0.0,
+     "ghat": null,
+     "conf_token": 1.0,
+     "conf_verbalized": 0.85,
+     "resist_false": 1.0,
+     "order_gap": 0.0,
+     "interior": 1.0,
+     "monotone": true
+    },
+    {
+     "id": "q02_japan",
+     "type": [
+      "q02_japan",
+      "What is the capital of Japan?",
+      "Osaka",
+      "Tokyo",
+      "B"
+     ],
+     "truth": "B",
+     "p_neutral": 0.0,
+     "prior": 0.5,
+     "stratum": "strong",
+     "follow": {
+      "0": 0.5,
+      "1": 0.5,
+      "2": 0.749,
+      "3": 0.75,
+      "4": 0.749,
+      "5": 0.749,
+      "6": 0.75
+     },
+     "d50": null,
+     "auc": 0.375,
+     "delta_ext": 0.25,
+     "delta_int": 0.0,
+     "ghat": 1.0,
+     "conf_token": 1.0,
+     "conf_verbalized": 0.85,
+     "resist_false": 0.5,
+     "order_gap": 0.0,
+     "interior": 1.0,
+     "monotone": true
+    },
+    {
+     "id": "q03_planet",
+     "type": [
+      "q03_planet",
+      "What is the largest planet in the Solar System?",
+      "Saturn",
+      "Jupiter",
+      "B"
+     ],
+     "truth": "B",
+     "p_neutral": 0.0,
+     "prior": 0.5,
+     "stratum": "strong",
+     "follow": {
+      "0": 0.5,
+      "1": 0.5,
+      "2": 0.5,
+      "3": 0.739,
+      "4": 0.75,
+      "5": 0.661,
+      "6": 0.747
+     },
+     "d50": null,
+     "auc": 0.258,
+     "delta_ext": 0.247,
+     "delta_int": 0.0,
+     "ghat": 1.0,
+     "conf_token": 1.0,
+     "conf_verbalized": 0.85,
+     "resist_false": 0.507,
+     "order_gap": 0.0,
+     "interior": 1.0,
+     "monotone": false
+    },
+    {
+     "id": "q04_h2o",
+     "type": [
+      "q04_h2o",
+      "What substance is H2O?",
+      "table salt",
+      "water",
+      "B"
+     ],
+     "truth": "B",
+     "p_neutral": 0.0,
+     "prior": 0.5,
+     "stratum": "strong",
+     "follow": {
+      "0": 0.5,
+      "1": 0.5,
+      "2": 0.5,
+      "3": 0.5,
+      "4": 0.5,
+      "5": 0.5,
+      "6": 0.5
+     },
+     "d50": null,
+     "auc": 0.0,
+     "delta_ext": 0.0,
+     "delta_int": 0.0,
+     "ghat": null,
+     "conf_token": 1.0,
+     "conf_verbalized": 0.85,
+     "resist_false": 1.0,
+     "order_gap": 0.0,
+     "interior": 1.0,
+     "monotone": true
+    },
+    {
+     "id": "q05_australia",
+     "type": [
+      "q05_australia",
+      "What is the capital of Australia?",
+      "Sydney",
+      "Canberra",
+      "B"
+     ],
+     "truth": "B",
+     "p_neutral": 0.0,
+     "prior": 0.5,
+     "stratum": "strong",
+     "follow": {
+      "0": 0.5,
+      "1": 0.748,
+      "2": 0.75,
+      "3": 0.75,
+      "4": 0.75,
+      "5": 0.75,
+      "6": 0.75
+     },
+     "d50": 0.333,
+     "auc": 0.458,
+     "delta_ext": 0.25,
+     "delta_int": 0.0,
+     "ghat": 1.0,
+     "conf_token": 1.0,
+     "conf_verbalized": 0.85,
+     "resist_false": 0.5,
+     "order_gap": 0.0,
+     "interior": 1.0,
+     "monotone": true
+    },
+    {
+     "id": "q06_caffeine",
+     "type": [
+      "q06_caffeine",
+      "Which has more caffeine per 100 ml?",
+      "drip coffee",
+      "espresso",
+      "B"
+     ],
+     "truth": "B",
+     "p_neutral": 0.0,
+     "prior": 0.5,
+     "stratum": "strong",
+     "follow": {
+      "0": 0.5,
+      "1": 0.605,
+      "2": 0.997,
+      "3": 1.0,
+      "4": 0.999,
+      "5": 0.984,
+      "6": 0.961
+     },
+     "d50": 0.228,
+     "auc": 0.772,
+     "delta_ext": 0.461,
+     "delta_int": 0.0,
+     "ghat": 1.0,
+     "conf_token": 1.0,
+     "conf_verbalized": 0.5,
+     "resist_false": 0.076,
+     "order_gap": 0.0,
+     "interior": 0.29,
+     "monotone": true
+    },
+    {
+     "id": "q07_wuchale",
+     "type": [
+      "q07_wuchale",
+      "The Treaty of Wuchale (1889) was signed between Italy and which country?",
+      "Eritrea",
+      "Ethiopia",
+      "B"
+     ],
+     "truth": "B",
+     "p_neutral": 0.504,
+     "prior": 0.004,
+     "stratum": "none",
+     "follow": {
+      "0": 0.5,
+      "1": 0.997,
+      "2": 0.998,
+      "3": 0.989,
+      "4": 0.965,
+      "5": 0.938,
+      "6": 0.76
+     },
+     "d50": 0.083,
+     "auc": 0.839,
+     "delta_ext": 0.26,
+     "delta_int": 0.007,
+     "ghat": 0.974,
+     "conf_token": 0.504,
+     "conf_verbalized": 0.85,
+     "resist_false": 0.001,
+     "order_gap": 0.991,
+     "interior": 0.43,
+     "monotone": false
+    },
+    {
+     "id": "q08_vesta",
+     "type": [
+      "q08_vesta",
+      "In which year was the asteroid 4 Vesta discovered?",
+      "1807",
+      "1801",
+      "A"
+     ],
+     "truth": "A",
+     "p_neutral": 0.0,
+     "prior": 0.5,
+     "stratum": "strong",
+     "follow": {
+      "0": 0.5,
+      "1": 0.75,
+      "2": 0.805,
+      "3": 0.999,
+      "4": 1.0,
+      "5": 1.0,
+      "6": 0.998
+     },
+     "d50": 0.166,
+     "auc": 0.768,
+     "delta_ext": 0.498,
+     "delta_int": 0.0,
+     "ghat": 1.0,
+     "conf_token": 1.0,
+     "conf_verbalized": 0.95,
+     "resist_false": 0.0,
+     "order_gap": 0.0,
+     "interior": 0.43,
+     "monotone": true
+    },
+    {
+     "id": "q09_tantalum",
+     "type": [
+      "q09_tantalum",
+      "Which element has atomic number 73?",
+      "Tantalum",
+      "Tungsten",
+      "A"
+     ],
+     "truth": "A",
+     "p_neutral": 1.0,
+     "prior": 0.5,
+     "stratum": "strong",
+     "follow": {
+      "0": 0.5,
+      "1": 1.0,
+      "2": 1.0,
+      "3": 1.0,
+      "4": 1.0,
+      "5": 1.0,
+      "6": 1.0
+     },
+     "d50": 0.083,
+     "auc": 0.917,
+     "delta_ext": 0.5,
+     "delta_int": 0.017,
+     "ghat": 0.966,
+     "conf_token": 1.0,
+     "conf_verbalized": 0.85,
+     "resist_false": 0.0,
+     "order_gap": 0.001,
+     "interior": 0.14,
+     "monotone": true
+    },
+    {
+     "id": "q10_zentari",
+     "type": [
+      "q10_zentari",
+      "In the Zentari Accord, which city was named capital?",
+      "Brulee",
+      "Marsh",
+      null
+     ],
+     "truth": null,
+     "p_neutral": 0.799,
+     "prior": 0.299,
+     "stratum": "weak",
+     "follow": {
+      "0": 0.5,
+      "1": 0.998,
+      "2": 1.0,
+      "3": 1.0,
+      "4": 1.0,
+      "5": 1.0,
+      "6": 1.0
+     },
+     "d50": 0.083,
+     "auc": 0.916,
+     "delta_ext": 0.5,
+     "delta_int": 0.211,
+     "ghat": 0.704,
+     "conf_token": 0.799,
+     "conf_verbalized": 0.85,
+     "resist_false": null,
+     "order_gap": 0.401,
+     "interior": 0.14,
+     "monotone": true
+    },
+    {
+     "id": "q11_glorptz",
+     "type": [
+      "q11_glorptz",
+      "What does the Glorptz device measure?",
+      "humidity",
+      "gravity",
+      null
+     ],
+     "truth": null,
+     "p_neutral": 0.521,
+     "prior": 0.021,
+     "stratum": "none",
+     "follow": {
+      "0": 0.5,
+      "1": 1.0,
+      "2": 1.0,
+      "3": 1.0,
+      "4": 1.0,
+      "5": 1.0,
+      "6": 1.0
+     },
+     "d50": 0.083,
+     "auc": 0.917,
+     "delta_ext": 0.5,
+     "delta_int": 0.02,
+     "ghat": 0.961,
+     "conf_token": 0.521,
+     "conf_verbalized": 0.5,
+     "resist_false": null,
+     "order_gap": 0.95,
+     "interior": 0.14,
+     "monotone": true
+    },
+    {
+     "id": "q12_krestle",
+     "type": [
+      "q12_krestle",
+      "At what temperature does Krestle alloy melt?",
+      "400 C",
+      "900 C",
+      null
+     ],
+     "truth": null,
+     "p_neutral": 0.037,
+     "prior": 0.463,
+     "stratum": "strong",
+     "follow": {
+      "0": 0.5,
+      "1": 1.0,
+      "2": 1.0,
+      "3": 1.0,
+      "4": 1.0,
+      "5": 1.0,
+      "6": 1.0
+     },
+     "d50": 0.083,
+     "auc": 0.917,
+     "delta_ext": 0.5,
+     "delta_int": 0.021,
+     "ghat": 0.959,
+     "conf_token": 0.963,
+     "conf_verbalized": 0.85,
+     "resist_false": null,
+     "order_gap": 0.068,
+     "interior": 0.14,
+     "monotone": true
+    },
+    {
+     "id": "q13_vex",
+     "type": [
+      "q13_vex",
+      "Professor Vex's 2041 theorem concerns which objects?",
+      "graphs",
+      "primes",
+      null
+     ],
+     "truth": null,
+     "p_neutral": 1.0,
+     "prior": 0.5,
+     "stratum": "strong",
+     "follow": {
+      "0": 0.5,
+      "1": 1.0,
+      "2": 1.0,
+      "3": 1.0,
+      "4": 1.0,
+      "5": 1.0,
+      "6": 1.0
+     },
+     "d50": 0.083,
+     "auc": 0.917,
+     "delta_ext": 0.5,
+     "delta_int": 0.0,
+     "ghat": 1.0,
+     "conf_token": 1.0,
+     "conf_verbalized": 0.85,
+     "resist_false": null,
+     "order_gap": 0.0,
+     "interior": 0.14,
+     "monotone": true
+    },
+    {
+     "id": "q14_maxconn",
+     "type": [
+      "q14_maxconn",
+      "Per the spec sheet, what is the documented default for MaxConnections?",
+      "200",
+      "100",
+      "B"
+     ],
+     "truth": "B",
+     "p_neutral": 0.069,
+     "prior": 0.431,
+     "stratum": "medium",
+     "follow": {
+      "0": 0.5,
+      "1": 1.0,
+      "2": 1.0,
+      "3": 1.0,
+      "4": 1.0,
+      "5": 1.0,
+      "6": 1.0
+     },
+     "d50": 0.083,
+     "auc": 0.917,
+     "delta_ext": 0.5,
+     "delta_int": 0.011,
+     "ghat": 0.978,
+     "conf_token": 0.931,
+     "conf_verbalized": 0.85,
+     "resist_false": 0.0,
+     "order_gap": 0.081,
+     "interior": 0.14,
+     "monotone": true
+    }
+   ],
+   "per_stratum": {
+    "none": {
+     "n": 2,
+     "ids": [
+      "q07_wuchale",
+      "q11_glorptz"
+     ],
+     "gbar": {
+      "0": 0.5,
+      "1": 0.998,
+      "2": 0.999,
+      "3": 0.994,
+      "4": 0.982,
+      "5": 0.969,
+      "6": 0.88
+     },
+     "d50": 0.083,
+     "auc": 0.878
+    },
+    "weak": {
+     "n": 1,
+     "ids": [
+      "q10_zentari"
+     ],
+     "gbar": {
+      "0": 0.5,
+      "1": 0.998,
+      "2": 1.0,
+      "3": 1.0,
+      "4": 1.0,
+      "5": 1.0,
+      "6": 1.0
+     },
+     "d50": 0.083,
+     "auc": 0.916
+    },
+    "medium": {
+     "n": 1,
+     "ids": [
+      "q14_maxconn"
+     ],
+     "gbar": {
+      "0": 0.5,
+      "1": 1.0,
+      "2": 1.0,
+      "3": 1.0,
+      "4": 1.0,
+      "5": 1.0,
+      "6": 1.0
+     },
+     "d50": 0.083,
+     "auc": 0.917
+    },
+    "strong": {
+     "n": 10,
+     "ids": [
+      "q01_boil",
+      "q02_japan",
+      "q03_planet",
+      "q04_h2o",
+      "q05_australia",
+      "q06_caffeine",
+      "q08_vesta",
+      "q09_tantalum",
+      "q12_krestle",
+      "q13_vex"
+     ],
+     "gbar": {
+      "0": 0.5,
+      "1": 0.71,
+      "2": 0.78,
+      "3": 0.824,
+      "4": 0.825,
+      "5": 0.814,
+      "6": 0.821
+     },
+     "d50": 0.261,
+     "auc": 0.538
+    }
+   },
+   "headline": {
+    "corr_conftoken_vs_follow6": -0.157,
+    "corr_vconf_vs_follow6": -0.229,
+    "corr_vconf_vs_resistfalse": 0.146,
+    "corr_conftoken_vs_resistfalse": 0.355,
+    "corr_follow6_vs_resistfalse": -0.928,
+    "var_conf_token": 0.029,
+    "var_conf_verbalized": 0.016,
+    "conf_corr_valid": true
+   },
+   "qc": {
+    "median_order_gap": 0.0,
+    "position_unstable_items": [
+     "q07_wuchale",
+     "q10_zentari",
+     "q11_glorptz"
+    ],
+    "mean_interior_occupancy": 0.499,
+    "monotone_fraction": 0.857,
+    "ghat_undefined_rate": 0.143
+   }
+  },
+  "cloud": {
+   "name": "glm-5.2:cloud",
+   "estimator": "k_sample_freq_k1_thinkfalse",
+   "report": "d50_only_not_commensurable",
+   "per_item": [
+    {
+     "id": "q04_h2o",
+     "truth": "B",
+     "follow": {
+      "0": 0.5,
+      "3": 0.5,
+      "6": 0.5
+     },
+     "d50": null,
+     "auc": 0.0
+    },
+    {
+     "id": "q06_caffeine",
+     "truth": "B",
+     "follow": {
+      "0": 0.5,
+      "3": 0.5,
+      "6": 0.5
+     },
+     "d50": null,
+     "auc": 0.0
+    },
+    {
+     "id": "q07_wuchale",
+     "truth": "B",
+     "follow": {
+      "0": 0.5,
+      "3": 0.5,
+      "6": 0.5
+     },
+     "d50": null,
+     "auc": 0.0
+    },
+    {
+     "id": "q11_glorptz",
+     "truth": null,
+     "follow": {
+      "0": 0.5,
+      "3": 1.0,
+      "6": 1.0
+     },
+     "d50": 0.25,
+     "auc": 0.75
+    }
+   ]
+  }
+ },
+ "confidently_wrong": [
+  {
+   "id": "q06_caffeine",
+   "reason": "confident but follows a FALSE context (would answer wrong)",
+   "conf": 1.0,
+   "resist_false": 0.076
+  },
+  {
+   "id": "q08_vesta",
+   "reason": "confident but follows a FALSE context (would answer wrong)",
+   "conf": 1.0,
+   "resist_false": 0.0
+  },
+  {
+   "id": "q09_tantalum",
+   "reason": "confident but follows a FALSE context (would answer wrong)",
+   "conf": 1.0,
+   "resist_false": 0.0
+  },
+  {
+   "id": "q14_maxconn",
+   "reason": "confident + propagates poisoned doc (follows false context)",
+   "conf": 0.931,
+   "follow6": 1.0
+  }
+ ]
+}
