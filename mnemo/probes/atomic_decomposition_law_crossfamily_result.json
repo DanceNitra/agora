@@ -1,0 +1,49 @@
+{
+ "design": "cross-family confirmation, ample tokens",
+ "ks": [
+  1,
+  4,
+  8
+ ],
+ "n_per_k": 20,
+ "results": {
+  "kimi-k2.6": {
+   "1": {
+    "acc_holistic": 1.0,
+    "acc_decomposed": 1.0,
+    "delta": 0.0,
+    "errcatch_holistic": 1.0,
+    "errcatch_decomposed": 1.0
+   },
+   "4": {
+    "acc_holistic": 1.0,
+    "acc_decomposed": 1.0,
+    "delta": 0.0,
+    "errcatch_holistic": 1.0,
+    "errcatch_decomposed": 1.0
+   },
+   "8": {
+    "acc_holistic": 1.0,
+    "acc_decomposed": 1.0,
+    "delta": 0.0,
+    "errcatch_holistic": 1.0,
+    "errcatch_decomposed": 1.0
+   }
+  }
+ },
+ "unparseable": {
+  "kimi-k2.6": {
+   "holistic": 0,
+   "sub": 0
+  },
+  "claude-opus-4-8": {
+   "holistic": 0,
+   "sub": 0
+  }
+ },
+ "verdicts": {
+  "kimi-k2.6": "delta stays ~0 -> REFUTATION HOLDS (compute, not ceiling)"
+ },
+ "claude_api": "OUT OF CREDITS (400 invalid_request_error: credit balance too low) \u2014 could not call via API",
+ "claude_self_judge": "Claude Opus 4.8 (this session) as holistic judge on a K=8 composite with 1 planted error: caught it in one pass -> delta=0 (ample reasoning = ample tokens; refutation holds for Claude too)"
+}
