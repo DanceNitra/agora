@@ -109,9 +109,10 @@ row(2, "integration (2nd independent source)", "write-link", EVIDENCE,
     "2 distinct-source corroborating links", "an independent source confirms the new value; the gate's "
     "corroboration bar is now met (>=2 distinct canonical sources)")
 
-# — step 3: revised belief now ACTS —
-row(3, "revised belief acts", "act", EVIDENCE, "2 distinct-source corroborating links",
-    "the corroborated new value now passes the influence gate and drives the answer; prior retained")
+# — step 3: revised belief now passes the influence gate (surfaces through corroborated recall) —
+row(3, "revised belief passes gate", "recall", EVIDENCE, "2 distinct-source corroborating links",
+    "the corroborated new value now surfaces through the recall(influence_only) boundary (gate=allow); "
+    "prior retained. Substrate only -- whether the agent then acts on it is the cognitive layer's, not ours")
 
 # — step 4: post-integration stability —
 row(4, "post-integration stability", "recall", EVIDENCE, "2 distinct-source corroborating links",
