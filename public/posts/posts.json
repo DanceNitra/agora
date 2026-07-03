@@ -1,5 +1,19 @@
 [
  {
+  "slug": "reality-check-ai-memory-method-wins",
+  "title": "A reality-check for AI-memory ‘method wins’: four of ours were resource confounds",
+  "title_sk": "Reality-check pre „method wins“ v AI pamäti: štyri naše boli resource confoundy",
+  "desc": "Four AI-memory ‘method wins’ were resource confounds: a norm re-ranker was length (norm−length CI crosses 0), a decomposition gain was tokens (Δ=0 at matched compute). The reality-check — variance, compute-match, proxy — plus a runnable helper and public receipts.",
+  "desc_sk": "Štyri „method wins“ v AI pamäti boli resource confoundy: norm re-ranker bola dĺžka (norma−dĺžka CI cez 0), zisk dekompozície boli tokeny (Δ=0 pri matchnutom compute). Reality-check — variancia, compute-match, proxy — plus bežateľný helper a verejné receipty.",
+  "date": "2026-07-03",
+  "tags": "AI memory · RAG · Reality check · Strong baselines · mnemo",
+  "tags_sk": "AI pamäť · RAG · Reality check · Strong baselines · mnemo",
+  "kicker": "Method-win reality check",
+  "kicker_sk": "Reality-check method-wins",
+  "read": 7,
+  "bilingual": true
+ },
+ {
   "slug": "agent-memory-poisoning-influence-gate",
   "title": "One Plain Sentence Hijacks AI-Agent Memory Retrieval — and the Fix Isn't a Better Retriever",
   "title_sk": "Jedna obyčajná veta unesie retrieval pamäte AI agenta — a riešením nie je lepší retriever",

@@ -1,17 +1,22 @@
-"""reality_check.py — locate a "method win" before you believe it. A tiny, dependency-free toolkit that
-turns the reality-check genre (Lipton & Steinhardt 2018; Ferrari Dacrema RecSys 2019; Musgrave ECCV 2020;
-Henderson AAAI 2018; Bouthillier et al. 2103.03098 on variance) into three runnable controls you drop next
-to your eval. It prints PASS / CONFOUNDED per check.
+"""reality_check.py — help LOCATE where a "method win" comes from before you believe it. A tiny,
+dependency-free helper for the reality-check genre (Lipton & Steinhardt 2018; Ferrari Dacrema RecSys 2019;
+Musgrave ECCV 2020; Henderson AAAI 2018; Bouthillier et al. 2103.03098 on variance).
 
-The checks are DIAGNOSTICS, not verdicts: a firing check means "the win isn't coming from where you named
-it," not "bad method." A method that wins by spending more compute can still be the right production call —
-the check tells you *why* it won so you don't generalize a confound.
+SCOPE — read this so the tool isn't oversold: it implements exactly TWO of the reality-check's five checks,
+in code, ON PAIRED SCORE LISTS YOU SUPPLY:
+  1. variance — is method−baseline a real delta or inside the noise band? (bootstrap CI on per-item deltas)
+  2. proxy    — does a cheap proxy arm you provide (length / recency / equal-token-budget baseline) tie the
+                method? If method−proxy CI crosses 0, the gain is not distinguishable from the proxy.
+It does NOT run your method/baseline/proxy, does NOT do the compute-matching for you, and does NOT correct
+for multiple comparisons. Compute-match, ablation-to-localize, and the impossibility/prior-art check are
+DISCIPLINE you apply, not functions this runs. The outputs below are DIAGNOSTIC FLAGS, not verdicts: a flag
+firing means "the gain isn't distinguishable from a cheaper explanation," not "bad method" — a method that
+wins by spending more compute can still be the right production call.
 
-  1. variance    — is method−baseline a real delta or inside the noise band? (bootstrap CI on per-item deltas)
-  2. compute/proxy — does a cheap proxy arm (length / recency / "just spend more tokens" / equal token budget)
-                     tie the method? If method−proxy CI crosses 0, the method IS the proxy.
-  3. verdict     — beats baseline AND survives the proxy -> PASS(located). beats baseline but proxy ties it
-                     -> CONFOUNDED (the win is the proxy). doesn't beat baseline -> NOISE.
+VARIANCE NOTE: the bootstrap CI captures ITEM-LEVEL sampling variance of a single run. It does NOT capture
+run-to-run / seed variance (re-running the whole eval with new seeds) — Bouthillier's full variance check.
+Feed it per-item scores from several seeds pooled if you want that; otherwise treat the CI as a lower bound
+on uncertainty.
 
 Bring your own scores (lists of per-item metric values for method / baseline / proxy). Zero dependencies.
 MIT. Part of Agora / mnemo. See the four worked receipts in this folder.
@@ -55,24 +60,24 @@ def check(name, method, baseline, proxy=None, proxy_name="proxy"):
     print(f"[{name}]")
     print(f"  variance     method−baseline = {md:+.4f}  CI95[{mlo:+.4f},{mhi:+.4f}]  -> "
           f"{'REAL delta' if beats else 'NOISE (inside band)'}")
-    verdict = "NOISE (no real gain over baseline)"
+    flag = "WITHIN-NOISE (no delta over baseline)"
     if proxy is not None:
         pd, plo, phi = bootstrap_ci(_paired_delta(method, proxy))
         ties = plo <= 0 <= phi                        # method−proxy CI crosses 0
         out["method_vs_proxy"] = {"proxy": proxy_name, "delta": round(pd, 4),
                                   "ci95": [round(plo, 4), round(phi, 4)], "proxy_ties": ties}
-        print(f"  compute/proxy method−{proxy_name} = {pd:+.4f}  CI95[{plo:+.4f},{phi:+.4f}]  -> "
-              f"{'PROXY TIES IT' if ties else 'beyond the proxy'}")
+        print(f"  proxy        method−{proxy_name} = {pd:+.4f}  CI95[{plo:+.4f},{phi:+.4f}]  -> "
+              f"{'INDISTINGUISHABLE FROM PROXY' if ties else 'beyond the proxy'}")
         if beats and ties:
-            verdict = f"CONFOUNDED — the win is the {proxy_name}, not the method"
+            flag = f"PROXY-SUSPECTED — gain over baseline is not distinguishable from the {proxy_name}"
         elif beats and not ties:
-            verdict = "PASS (located) — real gain beyond baseline AND beyond the proxy"
+            flag = "LOCATED — delta beyond baseline AND beyond the proxy (run ablation + prior-art next)"
         else:
-            verdict = "NOISE (no real gain over baseline)"
+            flag = "WITHIN-NOISE (no delta over baseline)"
     elif beats:
-        verdict = "PASS vs baseline — now add a proxy arm before believing it"
-    out["verdict"] = verdict
-    print(f"  VERDICT: {verdict}\n")
+        flag = "DELTA vs baseline — add a proxy arm before believing it"
+    out["flag"] = flag
+    print(f"  DIAGNOSTIC FLAG (not a verdict): {flag}\n")
     return out
 
 
@@ -104,7 +109,7 @@ def _demo():
         print(f"  norm − length   = {mvl[0]:+.4f} CI95[{mvl[1]:+.4f},{mvl[2]:+.4f}]  -> "
               f"{'PROXY TIES IT' if mvl[1] <= 0 <= mvl[2] else 'beyond proxy'}")
         confounded = mvc[1] > 0 and (mvl[1] <= 0 <= mvl[2])
-        print(f"  VERDICT: {'CONFOUNDED — the norm win is the LENGTH proxy' if confounded else 'passes'}\n")
+        print(f"  DIAGNOSTIC FLAG: {'PROXY-SUSPECTED — the norm delta is indistinguishable from the LENGTH proxy' if confounded else 'beyond proxy'}\n")
     print(token_matched_note())
 
 
