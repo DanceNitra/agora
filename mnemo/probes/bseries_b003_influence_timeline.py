@@ -148,3 +148,16 @@ out = {"scenario": "B-003_belief_update_without_overwrite", "instrument": "mnemo
 json.dump(out, open(os.path.join(os.path.dirname(__file__), "bseries_b003_influence_timeline_result.json"),
                     "w"), ensure_ascii=False, indent=1)
 print("saved: mnemo/probes/bseries_b003_influence_timeline_result.json")
+
+# also emit the FOCUSED CSV (exactly the columns sent to the #1466 cross-framework matrix; position &
+# coherence present but empty by design -- those are the cognitive layer's, not the storage substrate's).
+fcols = ["scenario_id", "step", "phase", "memory_op", "corroboration_state", "gate_decision",
+         "position", "coherence", "provenance_retained"]
+csv_path = os.path.join(os.path.dirname(__file__), "bseries_b003_influence_timeline.csv")
+with open(csv_path, "w", newline="", encoding="utf-8") as fh:
+    fw = csv.DictWriter(fh, fieldnames=fcols, extrasaction="ignore")
+    fw.writeheader()
+    for r in rows:
+        fw.writerow({k: ("true" if (k == "provenance_retained" and r[k]) else
+                         ("false" if k == "provenance_retained" else r.get(k, ""))) for k in fcols})
+print("saved: mnemo/probes/bseries_b003_influence_timeline.csv")
