@@ -411,7 +411,9 @@ def run_method(template: str, params: dict, claim: str = "", requester: str = ""
              "ts": time.time()}
     items = _load()
     items.append(entry)
-    _save(items[-200:])
+    # Cap 1000 (was 200): same rotation-race as .lab.json — the LAB-FIRST gate checks lab_id against
+    # this ledger too, and a 200-entry window rotated out within ~a day at current run rates.
+    _save(items[-1000:])
     return {"status": "ok", **entry}
 
 

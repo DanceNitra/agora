@@ -59,7 +59,10 @@ def run_experiment(name: str, code: str) -> dict:
            "output": output.strip()[:_OUT_CAP], "source": "simulation", "ts": time.time()}
     items = _load()
     items.append(rec)
-    _save(items[-100:])
+    # Ledger cap 1000 (was 100): at ~100 runs/day the old cap rotated a lab_id out within ~12h, so the
+    # LAB-FIRST gate falsely rejected discoveries citing a REAL-but-older experiment (src_no_lab), and
+    # audits couldn't find source scripts. 1000 keeps ~1-2 weeks of receipts; file stays ~1 MB.
+    _save(items[-1000:])
     return rec
 
 
