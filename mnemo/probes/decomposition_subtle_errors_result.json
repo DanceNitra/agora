@@ -1,0 +1,29 @@
+{
+ "design": "chained propositional args, planted affirming-the-consequent, holistic vs decomposed vs scaffolded, ample tokens",
+ "steps": 4,
+ "n": 24,
+ "results": {
+  "deepseek-v4-flash": {
+   "acc_holistic": 1.0,
+   "acc_scaffold": 1.0,
+   "acc_decomposed": 1.0,
+   "fallacy_catch_holistic": 1.0,
+   "fallacy_catch_scaffold": 1.0,
+   "fallacy_catch_decomposed": 1.0
+  },
+  "kimi-k2.6": {
+   "acc_holistic": 1.0,
+   "acc_scaffold": 0.958,
+   "acc_decomposed": 1.0,
+   "fallacy_catch_holistic": 1.0,
+   "fallacy_catch_scaffold": 0.917,
+   "fallacy_catch_decomposed": 1.0
+  }
+ },
+ "verdicts": {
+  "deepseek-v4-flash": "NO DECOMPOSITION ADVANTAGE even on subtle errors (dec-hol=+0.00)",
+  "kimi-k2.6": "NO DECOMPOSITION ADVANTAGE even on subtle errors (dec-hol=+0.00)"
+ },
+ "claude_self_anchor": "Claude Opus 4.8 (in-session), hint-free, caught the planted AC in a 4-step chained argument with distractors by per-step scrutiny in a holistic read -> consistent with delta=0 (holistic catches it).",
+ "outcome": "REFUTED even on subtle chained affirming-the-consequent fallacies: holistic ample-token judging catches every planted fallacy (hint-free, with distractors) on deepseek-v4-flash and kimi-k2.6; scaffold ~= holistic ~= decomposed. Combined with the arithmetic result, the atomic-decomposition advantage is a token-budget confound on clean facts and NONEXISTENT on chained formal fallacies. The Theoria hidden-premise effect, if real, must live in a harder-to-ground informal-NL regime not captured here."
+}
