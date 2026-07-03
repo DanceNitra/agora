@@ -1,0 +1,58 @@
+{
+ "scenario": "membership_cost_frontier",
+ "self_check": "passed",
+ "part1_sybil_passthrough": {
+  "open": {
+   "sybil_passes": true,
+   "attacker_cost_per_identity": "free (any string) — the Sybil hole"
+  },
+  "registrar": {
+   "sybil_passes": false,
+   "honest_passes": true,
+   "attacker_cost_per_identity": "impossible without a registrar entry (real-world registration; trust relocated to the authority)"
+  },
+  "attestation": {
+   "sybil_passes": false,
+   "honest_passes": true,
+   "passes_if_issuer_key_stolen": true,
+   "attacker_cost_per_identity": "impossible without the issuer key (residual: compromise the issuer -> unlimited; require >=2 issuers)"
+  },
+  "pow": {
+   "bits": 16,
+   "sybil_passes": true,
+   "attacker_hashes_for_2_identities": 54981,
+   "honest_hashes_for_2_identities": 54981,
+   "attacker_cost_per_identity": "~2**16 hashes per identity (SYMMETRIC: honest writers pay it too; resourced attacker pays K x)"
+  },
+  "stake": {
+   "min_stake": 10.0,
+   "sybil_passes_before_detection": true,
+   "sybil_passes_after_slash": false,
+   "stake_forfeited_on_detection": 20.0,
+   "attacker_cost_per_identity": "lock >= 10.0 stake per identity, forfeited on detection (ASYMMETRIC: honest keeps it, detected attacker loses it)"
+  }
+ },
+ "part3_earned_credit_reframe": {
+  "blended_sybil_source_count_gate": true,
+  "blended_sybil_earned_gate": false,
+  "genuine_earned_gate": true,
+  "detection_latency_bad_outcomes": 2
+ },
+ "operating_tau": 0.45,
+ "true_recall_lost_at_op": 0.517,
+ "p_detect_offtopic": 0.793,
+ "p_detect_ontopic": 0.0,
+ "breakeven_stake_offtopic": 1.261,
+ "breakeven_stake_ontopic": Infinity,
+ "sleeper_standing_ceiling_multiple": 50.0,
+ "sleeper_farm_steps_at_90pct_ceiling": 114,
+ "idea_credit": "jacksonxly (framing + staked/decaying standing); roots Douceur 2002 (Sybil), a16z cryptoeconomics-of-slashing + STAKESURE 2401.05797 (S*=damage/p), PoisonedRAG USENIX Security 2025 / arXiv 2402.07867 (on-topic/retrievable poison hijacks RAG, ~90% ASR@5; does NOT test corroboration defenses), Myers&Liskov DLM 1997, Biba 1977, CaMeL 2503.18813",
+ "prior_art_verdict": "textbook re-derivation at the mechanism level; only the LoCoMo instantiation is ours (a demonstration)",
+ "audit_caveats": [
+  "Part 1 is by-construction, not empirical",
+  "HMAC is a symmetric attestation stand-in",
+  "S* unbounded is a p->0 consequence not a measured infinity",
+  "single-owner store: Sybil is the wrong threat model; influence-over-time is the real lever"
+ ],
+ "verdict": "DEMONSTRATION, NOT A DISCOVERY (KILL as a research finding or product upgrade; keep only as a runnable receipt). Built a prototype of all four membership-cost backends on mnemo's corroboration gate and characterized each. Every mechanism-level claim is TEXTBOOK, verified against primary sources: registrar/attestation defeating the 2-domain forgery is Douceur 2002 (the Sybil impossibility — a certifying authority is the one full prevention); PoW being a SYMMETRIC tax a resourced attacker pays is Douceur's resource-parity caveat; break-even stake S*=damage/detection_prob is the standard crypto-economic cost-of-corruption/slashing inequality (a16z; STAKESURE 2401.05797); and the premise that poison must be ON-TOPIC/retrievable to hijack output is PoisonedRAG's explicit retrieval condition (USENIX Security 2025, arXiv 2402.07867; ~90% ASR with 5 texts) — note PoisonedRAG does NOT itself test corroboration defenses, so the 'blended poison defeats corroboration' step is OUR reasoning, not their result. The ONLY original content is the empirical instantiation on one LoCoMo run (one embedder, detector AUROC 0.683, a 2-mate sybil): PoW ~55k hashes for 2 identities (symmetric); stake break-even 1/p ~= 1.26x damage for off-topic poison the detector sees, UNBOUNDED for on-topic poison it is blind to at every utility-preserving tau; decay caps slashable standing at u/(1-d). CAVEATS (from audit): Part 1 is by-construction, not measured; HMAC is a SYMMETRIC stand-in, not real asymmetric attestation; 'S* unbounded' is a p->0 consequence, not a measured infinity. HONEST NET: for a SINGLE-OWNER memory store the Sybil/membership frame is the wrong problem — the owner IS the trust root, and the realistic threat is single-source injection (which an influence-gate already catches), not many colluding identities. The valuable lever we already own is INFLUENCE-OVER-TIME / taint-tracking, not source-counting. This probe's job is to make that case measurable and to keep an honest reply credible; it is not itself an upgrade."
+}
