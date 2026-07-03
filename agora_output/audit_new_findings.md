@@ -1108,3 +1108,49 @@ contrast authoritative-source framings vs social-pressure framings on the same f
 
 METHOD LESSON (reinforces #22): a k=1-sample cross-model claim is noise; the owner was right to
 demand strong-model validation -- it both confirmed the real result and killed the cherry-picked one.
+
+================================================================================
+AUDIT #24 -- "why-a-captured-company-doesnt-un-capture-itself: governance hysteresis" (2026-07-03)
+Verdict: KILL-level novelty -> owner chose honest REFRAME -> PUBLISH as expository.
+
+VALIDATED: the lab reproduces the table exactly (f_up/f_down = 14/14, 22/0, 28/0, 32/0 at
+J=1.2/2.0/3.0/4.0). Public probe promoted: mnemo/probes/governance_hysteresis_ising.py.
+
+THREE problems (STORM 5-lens + 9 verified citations converge):
+1. TEXTBOOK PHYSICS. Mean-field Glauber/Ising in a field -> first-order transition, metastable
+   region, hysteresis above the critical coupling (Curie-Weiss/spinodal). Ewing coined "hysteresis"
+   in 1885. Nothing about the loop existing is new.
+2. THE INCREMENT IS ALREADY PUBLISHED. Xie et al., PLoS ONE 2012 (competing committed groups):
+   bistable region bounded by two fold-bifurcation (spinodal) lines meeting at a cusp = the FULL
+   f_up/f_down loop with distinct forward/backward thresholds. Our "measure f_down too + it widens
+   with J" is a relabeling. (f_up itself is the committed-minority tipping result: Xie 2011 ~10%,
+   Centola 2018 ~25%.)
+3. THE NUMBERS ARE A PARAMETER ARTIFACT + THE MECHANISM IS WRONG FOR THE DOMAIN. f_down->0 is just
+   spontaneous magnetization (weak field vs strong coupling); our probe Part B shows the loop CLOSES
+   as the field strengthens (h=1.0 -> f_up=f_down at J=2.0). And -- the deepest hit (Practitioner
+   lens) -- real corporate control is legal vote-counting + charter architecture, NOT opinion tipping:
+   Airgas 2010-11 (Air Products won 3 board seats + the shareholder argument, still could NOT take the
+   staggered board; the poison pill was upheld, In re Airgas 16 A.3d 48; no suitor has ever taken a
+   staggered board by vote -- needs 2 annual cycles). The one-way door is charter defenses set BEFORE
+   the contest, not a belief tipping point.
+
+THE HONEST STANDING: institutional lock-in is the SAME bistable/hysteresis math across magnets (Ewing
+1885), technologies (David QWERTY 1985), economies (Blanchard-Summers unemployment hysteresis 1986),
+and opinions (Xie/Centola). Real governance stickiness is documented -- path dependence (Bebchuk-Roe
+1999), entrenchment (E-index, 1200+ studies), the Big Three (~5%->~20%, ~40% projected; Bebchuk-Hirst
+2019), Stigler capture (1971) -- but that literature measures persistence + asymmetric switching
+costs, and the recovery threshold has never been measured in real firms. So the hysteresis is MODELED,
+not measured.
+
+REFRAME: retitled to "an old physics idea, and the real (charter-based) reason"; credited the textbook
++ Xie 2012 + the governance literature; flagged the numbers as parameter readouts (probe Part B);
+CORRECTED the mechanism to charter/legal (Airgas); kept the honest "modeled not measured" concession.
+
+FRONTIER QUESTION (Academic lens): the toy adds nothing unless it has a governance-specific ingredient
+physics lacks -- an ENDOGENOUS field h(m) (firm performance feeds back on the entrenchment incentive)
+that breaks Curie-Weiss universality, OR a model built on the actual legal control STATE (charter +
+vote thresholds) rather than opinion tipping. Neither done yet.
+
+METHOD LESSON: a mean-field opinion model is the wrong OBJECT for corporate control -- check the domain
+mechanism before mapping a physics analogy onto it. Textbook + pre-empted + wrong-mechanism = the RAISED
+BAR's KILL criterion; kept only as an honest expository correction, not a finding.
