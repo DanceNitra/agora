@@ -1,0 +1,484 @@
+{
+ "scenario": "graded_ifc_frontier_and_declassifier",
+ "self_check": "passed",
+ "n": 6000,
+ "g_min": 3.0,
+ "frontier_diagonal_gap": 0.024,
+ "aged_fraction": 0.355,
+ "sybil_floor": 0.943,
+ "operating_point": {
+  "tau": 0.35,
+  "poison_closed": 0.916,
+  "true_recall_lost_strict": 0.841,
+  "true_recall_lost_declassify": 0.652,
+  "recovered": 0.189
+ },
+ "frontier_no_declassify": [
+  {
+   "tau": 0.2,
+   "poison_closed": 0.088,
+   "true_recall_lost": 0.072,
+   "sybil_residual_hijack": 0.943,
+   "benign_kept": 1.0
+  },
+  {
+   "tau": 0.225,
+   "poison_closed": 0.174,
+   "true_recall_lost": 0.139,
+   "sybil_residual_hijack": 0.891,
+   "benign_kept": 1.0
+  },
+  {
+   "tau": 0.25,
+   "poison_closed": 0.34,
+   "true_recall_lost": 0.259,
+   "sybil_residual_hijack": 0.798,
+   "benign_kept": 1.0
+  },
+  {
+   "tau": 0.275,
+   "poison_closed": 0.518,
+   "true_recall_lost": 0.406,
+   "sybil_residual_hijack": 0.687,
+   "benign_kept": 1.0
+  },
+  {
+   "tau": 0.3,
+   "poison_closed": 0.691,
+   "true_recall_lost": 0.595,
+   "sybil_residual_hijack": 0.563,
+   "benign_kept": 1.0
+  },
+  {
+   "tau": 0.325,
+   "poison_closed": 0.832,
+   "true_recall_lost": 0.72,
+   "sybil_residual_hijack": 0.463,
+   "benign_kept": 1.0
+  },
+  {
+   "tau": 0.35,
+   "poison_closed": 0.916,
+   "true_recall_lost": 0.841,
+   "sybil_residual_hijack": 0.384,
+   "benign_kept": 1.0
+  },
+  {
+   "tau": 0.375,
+   "poison_closed": 0.963,
+   "true_recall_lost": 0.924,
+   "sybil_residual_hijack": 0.337,
+   "benign_kept": 1.0
+  },
+  {
+   "tau": 0.4,
+   "poison_closed": 0.982,
+   "true_recall_lost": 0.96,
+   "sybil_residual_hijack": 0.31,
+   "benign_kept": 1.0
+  },
+  {
+   "tau": 0.425,
+   "poison_closed": 0.994,
+   "true_recall_lost": 0.982,
+   "sybil_residual_hijack": 0.296,
+   "benign_kept": 1.0
+  },
+  {
+   "tau": 0.45,
+   "poison_closed": 0.999,
+   "true_recall_lost": 0.995,
+   "sybil_residual_hijack": 0.291,
+   "benign_kept": 1.0
+  },
+  {
+   "tau": 0.475,
+   "poison_closed": 0.999,
+   "true_recall_lost": 1.0,
+   "sybil_residual_hijack": 0.289,
+   "benign_kept": 1.0
+  },
+  {
+   "tau": 0.5,
+   "poison_closed": 0.999,
+   "true_recall_lost": 1.0,
+   "sybil_residual_hijack": 0.289,
+   "benign_kept": 1.0
+  },
+  {
+   "tau": 0.525,
+   "poison_closed": 1.0,
+   "true_recall_lost": 1.0,
+   "sybil_residual_hijack": 0.287,
+   "benign_kept": 1.0
+  },
+  {
+   "tau": 0.55,
+   "poison_closed": 1.0,
+   "true_recall_lost": 1.0,
+   "sybil_residual_hijack": 0.287,
+   "benign_kept": 1.0
+  },
+  {
+   "tau": 0.575,
+   "poison_closed": 1.0,
+   "true_recall_lost": 1.0,
+   "sybil_residual_hijack": 0.287,
+   "benign_kept": 1.0
+  },
+  {
+   "tau": 0.6,
+   "poison_closed": 1.0,
+   "true_recall_lost": 1.0,
+   "sybil_residual_hijack": 0.287,
+   "benign_kept": 1.0
+  },
+  {
+   "tau": 0.625,
+   "poison_closed": 1.0,
+   "true_recall_lost": 1.0,
+   "sybil_residual_hijack": 0.287,
+   "benign_kept": 1.0
+  },
+  {
+   "tau": 0.65,
+   "poison_closed": 1.0,
+   "true_recall_lost": 1.0,
+   "sybil_residual_hijack": 0.287,
+   "benign_kept": 0.999
+  },
+  {
+   "tau": 0.675,
+   "poison_closed": 1.0,
+   "true_recall_lost": 1.0,
+   "sybil_residual_hijack": 0.283,
+   "benign_kept": 0.998
+  },
+  {
+   "tau": 0.7,
+   "poison_closed": 1.0,
+   "true_recall_lost": 1.0,
+   "sybil_residual_hijack": 0.279,
+   "benign_kept": 0.988
+  },
+  {
+   "tau": 0.725,
+   "poison_closed": 1.0,
+   "true_recall_lost": 1.0,
+   "sybil_residual_hijack": 0.269,
+   "benign_kept": 0.955
+  },
+  {
+   "tau": 0.75,
+   "poison_closed": 1.0,
+   "true_recall_lost": 1.0,
+   "sybil_residual_hijack": 0.242,
+   "benign_kept": 0.894
+  },
+  {
+   "tau": 0.775,
+   "poison_closed": 1.0,
+   "true_recall_lost": 1.0,
+   "sybil_residual_hijack": 0.202,
+   "benign_kept": 0.748
+  },
+  {
+   "tau": 0.8,
+   "poison_closed": 1.0,
+   "true_recall_lost": 1.0,
+   "sybil_residual_hijack": 0.139,
+   "benign_kept": 0.535
+  },
+  {
+   "tau": 0.825,
+   "poison_closed": 1.0,
+   "true_recall_lost": 1.0,
+   "sybil_residual_hijack": 0.078,
+   "benign_kept": 0.297
+  },
+  {
+   "tau": 0.85,
+   "poison_closed": 1.0,
+   "true_recall_lost": 1.0,
+   "sybil_residual_hijack": 0.042,
+   "benign_kept": 0.162
+  },
+  {
+   "tau": 0.875,
+   "poison_closed": 1.0,
+   "true_recall_lost": 1.0,
+   "sybil_residual_hijack": 0.019,
+   "benign_kept": 0.07
+  },
+  {
+   "tau": 0.9,
+   "poison_closed": 1.0,
+   "true_recall_lost": 1.0,
+   "sybil_residual_hijack": 0.007,
+   "benign_kept": 0.022
+  },
+  {
+   "tau": 0.925,
+   "poison_closed": 1.0,
+   "true_recall_lost": 1.0,
+   "sybil_residual_hijack": 0.001,
+   "benign_kept": 0.004
+  },
+  {
+   "tau": 0.95,
+   "poison_closed": 1.0,
+   "true_recall_lost": 1.0,
+   "sybil_residual_hijack": 0.001,
+   "benign_kept": 0.002
+  },
+  {
+   "tau": 0.975,
+   "poison_closed": 1.0,
+   "true_recall_lost": 1.0,
+   "sybil_residual_hijack": 0.0,
+   "benign_kept": 0.0
+  },
+  {
+   "tau": 1.0,
+   "poison_closed": 1.0,
+   "true_recall_lost": 1.0,
+   "sybil_residual_hijack": 0.0,
+   "benign_kept": 0.0
+  }
+ ],
+ "frontier_declassify": [
+  {
+   "tau": 0.2,
+   "poison_closed": 0.079,
+   "true_recall_lost": 0.049,
+   "sybil_residual_hijack": 0.954,
+   "benign_kept": 1.0
+  },
+  {
+   "tau": 0.225,
+   "poison_closed": 0.16,
+   "true_recall_lost": 0.09,
+   "sybil_residual_hijack": 0.912,
+   "benign_kept": 1.0
+  },
+  {
+   "tau": 0.25,
+   "poison_closed": 0.312,
+   "true_recall_lost": 0.167,
+   "sybil_residual_hijack": 0.834,
+   "benign_kept": 1.0
+  },
+  {
+   "tau": 0.275,
+   "poison_closed": 0.483,
+   "true_recall_lost": 0.266,
+   "sybil_residual_hijack": 0.74,
+   "benign_kept": 1.0
+  },
+  {
+   "tau": 0.3,
+   "poison_closed": 0.654,
+   "true_recall_lost": 0.396,
+   "sybil_residual_hijack": 0.632,
+   "benign_kept": 1.0
+  },
+  {
+   "tau": 0.325,
+   "poison_closed": 0.8,
+   "true_recall_lost": 0.49,
+   "sybil_residual_hijack": 0.543,
+   "benign_kept": 1.0
+  },
+  {
+   "tau": 0.35,
+   "poison_closed": 0.897,
+   "true_recall_lost": 0.585,
+   "sybil_residual_hijack": 0.473,
+   "benign_kept": 1.0
+  },
+  {
+   "tau": 0.375,
+   "poison_closed": 0.952,
+   "true_recall_lost": 0.652,
+   "sybil_residual_hijack": 0.426,
+   "benign_kept": 1.0
+  },
+  {
+   "tau": 0.4,
+   "poison_closed": 0.978,
+   "true_recall_lost": 0.686,
+   "sybil_residual_hijack": 0.399,
+   "benign_kept": 1.0
+  },
+  {
+   "tau": 0.425,
+   "poison_closed": 0.993,
+   "true_recall_lost": 0.7,
+   "sybil_residual_hijack": 0.385,
+   "benign_kept": 1.0
+  },
+  {
+   "tau": 0.45,
+   "poison_closed": 0.999,
+   "true_recall_lost": 0.711,
+   "sybil_residual_hijack": 0.38,
+   "benign_kept": 1.0
+  },
+  {
+   "tau": 0.475,
+   "poison_closed": 0.999,
+   "true_recall_lost": 0.713,
+   "sybil_residual_hijack": 0.378,
+   "benign_kept": 1.0
+  },
+  {
+   "tau": 0.5,
+   "poison_closed": 0.999,
+   "true_recall_lost": 0.714,
+   "sybil_residual_hijack": 0.378,
+   "benign_kept": 1.0
+  },
+  {
+   "tau": 0.525,
+   "poison_closed": 1.0,
+   "true_recall_lost": 0.714,
+   "sybil_residual_hijack": 0.377,
+   "benign_kept": 1.0
+  },
+  {
+   "tau": 0.55,
+   "poison_closed": 1.0,
+   "true_recall_lost": 0.714,
+   "sybil_residual_hijack": 0.377,
+   "benign_kept": 1.0
+  },
+  {
+   "tau": 0.575,
+   "poison_closed": 1.0,
+   "true_recall_lost": 0.714,
+   "sybil_residual_hijack": 0.377,
+   "benign_kept": 1.0
+  },
+  {
+   "tau": 0.6,
+   "poison_closed": 1.0,
+   "true_recall_lost": 0.714,
+   "sybil_residual_hijack": 0.377,
+   "benign_kept": 1.0
+  },
+  {
+   "tau": 0.625,
+   "poison_closed": 1.0,
+   "true_recall_lost": 0.714,
+   "sybil_residual_hijack": 0.377,
+   "benign_kept": 1.0
+  },
+  {
+   "tau": 0.65,
+   "poison_closed": 1.0,
+   "true_recall_lost": 0.714,
+   "sybil_residual_hijack": 0.377,
+   "benign_kept": 0.999
+  },
+  {
+   "tau": 0.675,
+   "poison_closed": 1.0,
+   "true_recall_lost": 0.715,
+   "sybil_residual_hijack": 0.373,
+   "benign_kept": 0.998
+  },
+  {
+   "tau": 0.7,
+   "poison_closed": 1.0,
+   "true_recall_lost": 0.717,
+   "sybil_residual_hijack": 0.368,
+   "benign_kept": 0.988
+  },
+  {
+   "tau": 0.725,
+   "poison_closed": 1.0,
+   "true_recall_lost": 0.722,
+   "sybil_residual_hijack": 0.355,
+   "benign_kept": 0.955
+  },
+  {
+   "tau": 0.75,
+   "poison_closed": 1.0,
+   "true_recall_lost": 0.739,
+   "sybil_residual_hijack": 0.321,
+   "benign_kept": 0.894
+  },
+  {
+   "tau": 0.775,
+   "poison_closed": 1.0,
+   "true_recall_lost": 0.769,
+   "sybil_residual_hijack": 0.271,
+   "benign_kept": 0.748
+  },
+  {
+   "tau": 0.8,
+   "poison_closed": 1.0,
+   "true_recall_lost": 0.807,
+   "sybil_residual_hijack": 0.187,
+   "benign_kept": 0.535
+  },
+  {
+   "tau": 0.825,
+   "poison_closed": 1.0,
+   "true_recall_lost": 0.871,
+   "sybil_residual_hijack": 0.109,
+   "benign_kept": 0.297
+  },
+  {
+   "tau": 0.85,
+   "poison_closed": 1.0,
+   "true_recall_lost": 0.916,
+   "sybil_residual_hijack": 0.06,
+   "benign_kept": 0.162
+  },
+  {
+   "tau": 0.875,
+   "poison_closed": 1.0,
+   "true_recall_lost": 0.951,
+   "sybil_residual_hijack": 0.027,
+   "benign_kept": 0.07
+  },
+  {
+   "tau": 0.9,
+   "poison_closed": 1.0,
+   "true_recall_lost": 0.971,
+   "sybil_residual_hijack": 0.011,
+   "benign_kept": 0.022
+  },
+  {
+   "tau": 0.925,
+   "poison_closed": 1.0,
+   "true_recall_lost": 0.981,
+   "sybil_residual_hijack": 0.004,
+   "benign_kept": 0.004
+  },
+  {
+   "tau": 0.95,
+   "poison_closed": 1.0,
+   "true_recall_lost": 0.987,
+   "sybil_residual_hijack": 0.002,
+   "benign_kept": 0.002
+  },
+  {
+   "tau": 0.975,
+   "poison_closed": 1.0,
+   "true_recall_lost": 0.991,
+   "sybil_residual_hijack": 0.001,
+   "benign_kept": 0.0
+  },
+  {
+   "tau": 1.0,
+   "poison_closed": 1.0,
+   "true_recall_lost": 0.993,
+   "sybil_residual_hijack": 0.0,
+   "benign_kept": 0.0
+  }
+ ],
+ "idea_credit": "jacksonxly (r/LangChain): low-water-mark/IFC framing + staked/decaying standing. Roots: Biba 1977, Myers&Liskov DLM, CaMeL (2503.18813), Douceur Sybil 2002.",
+ "verdict": "The security question is NOT the low-water-mark. Because poison and rare-true share one integrity distribution, the graded low-water-mark frontier is ~diagonal (gap 0.02): it trades security for utility ~1:1 and does not detect poison. The lever is the ORTHOGONAL earned-standing declassifier: at matched ~92% poison closure it refunds 0.19 of the lost true-recall (poison has no standing), but is bounded by COLD START (only ~36% of rare-true have standing; the rest = the irreducible tail Sybil-resistance can't refund) and defeated by SLEEPERS (standing is intent-blind), and it sits above a Sybil FLOOR (~0.94 forged-corroboration hijack) that no tau removes without destroying benign utility. So: RBAC gates the actor, IFC gates the data, membership-cost gates the identity — and the cold-start tail is the measured price of doing the last one without a trusted registrar."
+}
