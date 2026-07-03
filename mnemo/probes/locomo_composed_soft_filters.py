@@ -212,7 +212,7 @@ for sub in SUBSETS:
         r = mean(per_q[sub][a]); row[a] = round(r, 4)
         print(f"  {a:<12}{r:.3f}")
     out["subsets"][sub] = {"n": n, "recall@20": row}
-    if sub == "both" and n:
+    if sub == "both" and n:  # keep the conjunction-subset deltas as before
         for comp in ("comp_capped", "comp_sum", "comp_mult"):
             for single in ("time_soft", "alias_soft", "hybrid"):
                 dl = [per_q[sub][comp][i] - per_q[sub][single][i] for i in range(n)]
@@ -220,5 +220,53 @@ for sub in SUBSETS:
                 out["subsets"][sub][f"{comp}_vs_{single}"] = {
                     "delta": round(mean(dl), 4), "ci95": [round(lo, 4), round(hi, 4)]}
                 print(f"  {comp} vs {single}: {mean(dl):+.3f}  CI[{lo:+.3f},{hi:+.3f}]")
+
+# FULL COMPOSABLE SET (jacksonxly's "deployment number"): every question where AT LEAST one cue fires,
+# with the missing dimension seeded at 1.0 (multiplicatively neutral — a lone strong cue is never
+# vetoed). This is the exact query-weighted distribution: concatenate the per-query recall values across
+# both + time_only + alias_only (NOT a weighted average of the subset means — same result, but exact and
+# bootstrappable). Contrast with the BOTH-subset (conjunction) number; they answer different questions.
+full = {a: per_q["both"][a] + per_q["time_only"][a] + per_q["alias_only"][a] for a in ARMS}
+nfull = len(full["hybrid"])
+print(f"\n--- FULL COMPOSABLE SET (n={nfull}: both {len(per_q['both']['hybrid'])} + "
+      f"time_only {len(per_q['time_only']['hybrid'])} + alias_only {len(per_q['alias_only']['hybrid'])}) ---")
+full_row = {}
+for a in ARMS:
+    full_row[a] = round(mean(full[a]), 4)
+    print(f"  {a:<12}{mean(full[a]):.3f}")
+full_out = {"n": nfull, "recall@20": full_row, "missing_dim_seed": 1.0}
+for comp in ("comp_mult", "comp_capped", "comp_sum"):
+    dl = [full[comp][i] - full["hybrid"][i] for i in range(nfull)]
+    lo, hi = boot(dl)
+    full_out[f"{comp}_vs_hybrid"] = {"delta": round(mean(dl), 4), "ci95": [round(lo, 4), round(hi, 4)]}
+    print(f"  {comp} vs hybrid: {mean(dl):+.3f}  CI[{lo:+.3f},{hi:+.3f}]")
+out["full_composable_set"] = full_out
+
+# SINGLE-CUE-ONLY REGIME (the seed's regime — jacksonxly: "there the whole game is what a missing
+# dimension multiplies by"). Questions where EXACTLY ONE cue fires (time_only + alias_only, n=1202). Here
+# the non-firing dimension is seeded at 1.0, so comp_mult == the lone firing cue EXACTLY (no sub-1.0 veto);
+# the delta vs hybrid is the value the lone cue keeps precisely because the seed is graceful. This is the
+# clean demonstration that seed=1.0 preserves a lone strong cue, vs a sub-1.0 seed which would drag it down.
+sc = {a: per_q["time_only"][a] + per_q["alias_only"][a] for a in ARMS}
+nsc = len(sc["hybrid"])
+print(f"\n--- SINGLE-CUE-ONLY (seed's regime, n={nsc}: time_only {len(per_q['time_only']['hybrid'])} + "
+      f"alias_only {len(per_q['alias_only']['hybrid'])}) ---")
+sc_row = {a: round(mean(sc[a]), 4) for a in ARMS}
+for a in ARMS: print(f"  {a:<12}{mean(sc[a]):.3f}")
+# sanity: on a single-cue subset all three composed arms reduce to the SAME single-term formula
+# (1 + T*G), so comp_mult == comp_sum == comp_capped per query. If this fails, the seed logic is wrong.
+sc_invariant = all(abs(sc["comp_mult"][i] - sc["comp_sum"][i]) < 1e-12 and
+                   abs(sc["comp_mult"][i] - sc["comp_capped"][i]) < 1e-12 for i in range(nsc))
+print(f"  single-cue invariant (comp_mult==comp_sum==comp_capped): {sc_invariant}")
+if not sc_invariant:
+    print("!! SINGLE-CUE INVARIANT FAILED — seed/composition logic is wrong, do not report"); sys.exit(3)
+dl = [sc["comp_mult"][i] - sc["hybrid"][i] for i in range(nsc)]
+lo, hi = boot(dl)
+sc_out = {"n": nsc, "recall@20": sc_row, "missing_dim_seed": 1.0,
+          "comp_mult_vs_hybrid": {"delta": round(mean(dl), 4), "ci95": [round(lo, 4), round(hi, 4)]},
+          "note": "comp_mult == the lone firing cue by construction (missing dim x 1.0, no veto)"}
+print(f"  comp_mult vs hybrid: {mean(dl):+.3f}  CI[{lo:+.3f},{hi:+.3f}]  "
+      f"(comp_mult == lone cue: seed=1.0 preserves it, no veto)")
+out["single_cue_only"] = sc_out
 json.dump(out, open("mnemo/probes/locomo_composed_soft_filters_result.json", "w"), indent=1)
 print("\nsaved: mnemo/probes/locomo_composed_soft_filters_result.json")
