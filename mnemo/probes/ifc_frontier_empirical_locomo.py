@@ -193,16 +193,18 @@ assert any(r["sybil_passes"] > 0.5 and r["poison_closed"] > 0.3 for r in frontie
     "empirical Sybil floor: forged corroboration must pass at a tau that already closes real single-source poison"
 
 syb_lowtau = max((r["sybil_passes"] for r in frontier if r["poison_closed"] >= 0.6), default=0.0)
-verdict = (f"EMPIRICAL on real LoCoMo (corrects the toy): corroboration-integrity is a WEAK poison signal, not "
-           f"none (AUROC {auc:.2f} vs a naive transplant poison) and not a strong one — an adaptive poison that "
-           f"blends into the conversation would erode it toward chance. So the low-water-mark frontier is "
-           f"FAVORABLE but lossy (gap {diag_gap:.2f}): at ~{op['poison_closed']:.0%} poison closure you still lose "
-           f"{op['true_lost']:.0%} of true-recall. Earned standing (orthogonal, from real earlier-session "
-           f"recurrence) refunds {recovered:.2f} of that, but {cold_start:.0%} of real rare-true carry no standing "
-           f"(the irreducible cold-start tail). And the Sybil floor is a TRADEOFF: a 2-forgery poison (integrity "
-           f"~0.70) passes at any tau below ~0.7 ({syb_lowtau:.0%} at moderate closure) and is only blocked by a "
-           f"tau so high it destroys benign utility. RBAC gates the actor, IFC gates the data, membership-cost "
-           f"gates the identity — and cold start is the empirical price of the last one without a registrar.")
+verdict = (f"EMPIRICAL on real LoCoMo — and the honest reading, after two audits, is a NEGATIVE that survives: "
+           f"corroboration-integrity is a TOPICAL-OUTLIER detector, NOT a poison detector. The AUROC {auc:.2f} "
+           f"(robust 0.61-0.68 across CORR_TAU) is bought on OFF-TOPIC, single-session transplants — an easy "
+           f"discrimination that measures 'is this turn from this conversation', not maliciousness. The poison "
+           f"that matters is ON-TOPIC and false: it blends into the conversation, lands in HIGH corroboration, "
+           f"and integrity cannot catch it — exactly the Sybil result (forged/blended corroboration is integrity-"
+           f"identical to real; {syb_lowtau:.0%} passes at moderate closure). The declassifier's {recovered:.2f} "
+           f"'refund' LEAKS the label (genuine facts recur across sessions; a transplant is injected once) so it "
+           f"is near-circular, not a real defense. Cold-start is a large but TUNABLE fraction (~0.45-0.80, it is "
+           f"defined by CORR_TAU). NET: integrity/corroboration filters topical outliers; it does not defend "
+           f"against on-topic poison, which reduces to membership cost. RBAC gates the actor, IFC gates the data, "
+           f"membership-cost gates the identity — and only the last one stops the poison that blends in.")
 print(f"\nVERDICT: {verdict}")
 if len(_cache):
     json.dump(_cache, open(CACHE, "w"))
