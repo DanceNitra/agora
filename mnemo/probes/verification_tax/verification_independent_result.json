@@ -1,0 +1,24 @@
+[
+ {
+  "task": "MMLU-Pro (hard)",
+  "n": 25,
+  "error_rate": 0.32,
+  "self_catch": 0.375,
+  "indep_catch": 0.25,
+  "self_FA": 0.176,
+  "indep_FA": 0.0,
+  "residual_self": 0.2,
+  "residual_indep": 0.24
+ },
+ {
+  "task": "multi-hop QA (hard)",
+  "n": 25,
+  "error_rate": 0.4,
+  "self_catch": 0.3,
+  "indep_catch": 0.2,
+  "self_FA": 0.467,
+  "indep_FA": 0.333,
+  "residual_self": 0.28,
+  "residual_indep": 0.32
+ }
+]
