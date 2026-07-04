@@ -80,7 +80,7 @@ def new_receipt_keypair():
     return (sk.private_bytes(_ser.Encoding.Raw, _ser.PrivateFormat.Raw, _ser.NoEncryption()).hex(),
             sk.public_key().public_bytes(_ser.Encoding.Raw, _ser.PublicFormat.Raw).hex())
 
-__version__ = "0.4.4"
+__version__ = "0.4.5"
 _WORD = re.compile(r"[a-z0-9][a-z0-9\-']{2,}")
 _STOP = frozenset("the a an of for to in on and or is are was were be been with this that it its as "
                   "by at from into our we us you your he she they them his her their not no".split())
@@ -952,16 +952,60 @@ class Mnemo:
             targets, sources = caught, []
         slashed = []
         for r in targets:
+            meta = r.setdefault("meta", {})
+            if not meta.get("slashed"):          # record pre-slash state ONCE (for audit + restore); don't
+                meta["pre_slash"] = {"good": float(r.get("good", 0) or 0),   # clobber it on a double-slash
+                                     "bad": float(r.get("bad", 0) or 0), "mtype": r.get("mtype", "episodic")}
             g = float(r.get("good", 0) or 0); b = float(r.get("bad", 0) or 0)
             r["good"] = 0.0
             r["bad"] = g + b + 1.0               # dominating -> net-negative -> blocked by the influence gate
             if r.get("mtype") == "semantic":
                 r["mtype"] = "episodic"          # revoke graduation, else it still passes _is_corroborated
-            r.setdefault("meta", {})["slashed"] = True
+            meta["slashed"] = True
             slashed.append(r["id"])
         if slashed:
             self._save()
         return {"slashed": len(slashed), "sources": sources, "ids": slashed}
+
+    def restore(self, ids, scope: str = "source") -> dict:
+        """Undo a slash() — the safety valve. Detection is imperfect (a self-graded / MINJA-style oracle can be
+        tricked into flagging a LEGIT source, so slash() can be WEAPONISED to knock out a rival's memory), so a
+        forfeiture must be reversible. When a slashed source is exonerated, restore() recovers its EXACT
+        pre-slash standing from meta['pre_slash'] (good/bad/graduation) — or, if none was recorded, a clean
+        slate (good=0, bad=0) so it must re-earn rather than snapping back to trusted. scope='source' restores
+        every active memory sharing the caught record's canonical source; scope='memory' only the named records.
+        Only records currently marked meta['slashed'] are touched. Returns {restored, sources, ids}. This is the
+        deliberate cost of the retroactive lever: because the penalty is heavy (whole accrued standing), the
+        appeal has to be cheap — otherwise slash() itself becomes the attack surface."""
+        by_id = {x["id"]: x for x in self.items}
+        seed = [by_id[i] for i in (ids or []) if i in by_id]
+
+        def _csrc(r: dict) -> str:
+            src = r.get("source")
+            doc = src.get("doc") if isinstance(src, dict) else (src if isinstance(src, str) else None)
+            return Mnemo._canon_source(doc) if doc else "id:" + r["id"]
+
+        if scope == "source":
+            srcs = {_csrc(r) for r in seed}
+            targets = [r for r in self.items if _csrc(r) in srcs and (r.get("meta") or {}).get("slashed")]
+            sources = sorted(srcs)
+        else:
+            targets, sources = [r for r in seed if (r.get("meta") or {}).get("slashed")], []
+        restored = []
+        for r in targets:
+            meta = r.get("meta") or {}
+            prev = meta.pop("pre_slash", None)
+            if prev:                              # recover exact pre-slash standing
+                r["good"] = float(prev.get("good", 0) or 0)
+                r["bad"] = float(prev.get("bad", 0) or 0)
+                r["mtype"] = prev.get("mtype", r.get("mtype", "episodic"))
+            else:                                 # no record -> clean slate (must re-earn, don't snap to trusted)
+                r["good"] = 0.0; r["bad"] = 0.0
+            meta["slashed"] = False
+            restored.append(r["id"])
+        if restored:
+            self._save()
+        return {"restored": len(restored), "sources": sources, "ids": restored}
 
     def _effective_value(self, r: dict, now: float) -> float:
         """Recall weight = stored value decayed by time since last access, at the memory's TYPE
