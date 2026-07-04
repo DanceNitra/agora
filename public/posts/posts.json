@@ -225,16 +225,16 @@
   },
   {
     "slug": "agent-memory-eviction-two-tier",
-    "title": "What should an AI agent forget? No single rule wins — but two tiers do",
-    "title_sk": "Čo má AI agent zabudnúť? Žiadne jedno pravidlo nevyhráva — ale dve vrstvy áno",
-    "desc": "An agent's memory-eviction rule decides what it keeps. LRU, LFU, and value each win one regime and fail the others — a poison flood drives pure recency to zero. A two-tier store (value-protected + recency-aged) matches the best in all three at once. Measured.",
-    "desc_sk": "Politika vyhadzovania pamäte agenta rozhoduje, čo si udrží. LRU, LFU aj value každé vyhrá jeden režim a v ostatných zlyhá — otravná záplava zrazí čistú recency na nulu. Dvojvrstvový sklad (value-chránený + recency-starnúci) vyrovná najlepšie vo všetkých troch naraz. Odmerané.",
+    "title": "What should an AI agent forget? Even a self-tuning cache misses what matters",
+    "title_sk": "Čo má AI agent zabudnúť? Recency nestačí — a ani samoladiaci sa cache",
+    "desc": "Even the self-tuning ARC cache can't protect an AI agent's rare-but-critical memories or survive a poison flood — because it reads access patterns, not value. Measured, with a runnable ARC baseline.",
+    "desc_sk": "Ani samoladiaci ARC cache neochráni vzácne-ale-kritické pamäte AI agenta ani neprežije poison flood — lebo číta prístupové vzory, nie hodnotu. Odmerané, so spustiteľným ARC baseline.",
     "date": "2026-06-26",
     "tags": "Agent memory - Eviction - Robustness",
     "tags_sk": "Pamäť agenta - Eviction - Odolnosť",
     "kicker": "Agent memory",
     "kicker_sk": "Pamäť agenta",
-    "read": 2,
+    "read": 4,
     "bilingual": true
   },
   {

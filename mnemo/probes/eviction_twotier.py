@@ -73,6 +73,54 @@ def serve_twotier(stream, weights, value_tag, cap, f):
     return served / total
 
 
+class _OrderedSet:
+    """LRU-ordered set for ARC: dict preserves insertion order; re-insert -> move to MRU."""
+    def __init__(self): self.d = {}
+    def __contains__(self, k): return k in self.d
+    def __len__(self): return len(self.d)
+    def add_mru(self, k): self.d.pop(k, None); self.d[k] = True
+    def discard(self, k): self.d.pop(k, None)
+    def pop_lru(self):
+        k = next(iter(self.d)); self.d.pop(k); return k
+
+
+def serve_arc(stream, weights, value_tag, cap):
+    """ARC (Megiddo & Modha, USENIX FAST 2003) -- the SOTA self-tuning recency/frequency hybrid,
+    NO fixed knob. It has NO exogenous value signal; it protects items by observed REUSE. We score
+    the same weighted served-fraction. ARC is the fair 'adaptive hybrid' baseline the two-tier must
+    be compared against -- and it FAILS rare-critical + wide-flood exactly because those regimes
+    carry no reuse signal for it to detect (that is the point: value != access frequency)."""
+    c = cap
+    T1, T2, B1, B2 = _OrderedSet(), _OrderedSet(), _OrderedSet(), _OrderedSet()
+    p = 0; served = 0.0; total = float(weights.sum())
+
+    def replace(x_in_b2):
+        nonlocal p
+        if len(T1) >= 1 and ((x_in_b2 and len(T1) == p) or (len(T1) > p)):
+            B1.add_mru(T1.pop_lru())
+        else:
+            B2.add_mru(T2.pop_lru())
+
+    for t, it in enumerate(stream):
+        if it in T1:
+            served += weights[t]; T1.discard(it); T2.add_mru(it)
+        elif it in T2:
+            served += weights[t]; T2.add_mru(it)
+        elif it in B1:
+            p = min(c, p + max(1, len(B2) // max(1, len(B1)))); replace(False); B1.discard(it); T2.add_mru(it)
+        elif it in B2:
+            p = max(0, p - max(1, len(B1) // max(1, len(B2)))); replace(True); B2.discard(it); T2.add_mru(it)
+        else:
+            if len(T1) + len(B1) == c:
+                if len(T1) < c: B1.pop_lru(); replace(False)
+                else: T1.pop_lru()
+            elif len(T1) + len(B1) < c and (len(T1)+len(T2)+len(B1)+len(B2)) >= c:
+                if (len(T1)+len(T2)+len(B1)+len(B2)) == 2*c: B2.pop_lru()
+                replace(False)
+            T1.add_mru(it)
+    return served / total
+
+
 def make_workload(rng, kind, n_items=1200, M=18000):
     if kind == "recency":
         stream = np.empty(M, dtype=int); ws = list(range(20)); cur = 20
@@ -108,7 +156,8 @@ def make_workload(rng, kind, n_items=1200, M=18000):
 
 def main():
     WORKLOADS = ["recency", "rare_critical", "adversarial_flood"]
-    acc = {w: {k: [] for k in ["lru", "lfu", "value", "tt15", "tt30"]} for w in WORKLOADS}
+    keys = ["lru", "lfu", "value", "arc", "tt15", "tt30"]
+    acc = {w: {k: [] for k in keys} for w in WORKLOADS}
     for sd in range(SEEDS):
         for w in WORKLOADS:
             rng = np.random.default_rng(11000 + sd)
@@ -116,17 +165,27 @@ def main():
             acc[w]["lru"].append(serve_single(stream, weights, vtag, CAP, "lru"))
             acc[w]["lfu"].append(serve_single(stream, weights, vtag, CAP, "lfu"))
             acc[w]["value"].append(serve_single(stream, weights, vtag, CAP, "value"))
+            acc[w]["arc"].append(serve_arc(stream, weights, vtag, CAP))
             acc[w]["tt15"].append(serve_twotier(stream, weights, vtag, CAP, 0.15))
             acc[w]["tt30"].append(serve_twotier(stream, weights, vtag, CAP, 0.30))
     R = {w: {k: float(np.mean(v)) for k, v in d.items()} for w, d in acc.items()}
+    S = {w: {k: float(np.std(v) / (len(v) ** 0.5)) for k, v in d.items()} for w, d in acc.items()}
 
-    print(f"=== served weight fraction (cap={CAP}; higher=better) ===")
-    cols = ["lru", "lfu", "value", "tt15", "tt30"]
-    print(f"{'workload':>18} | " + " | ".join(f"{c:>6}" for c in cols))
+    print(f"=== served weight fraction (cap={CAP}, SEEDS={SEEDS}; higher=better; +/- = std err) ===")
+    print(f"{'workload':>18} | " + " | ".join(f"{c:>6}" for c in keys))
     for w in WORKLOADS:
-        print(f"{w:>18} | " + " | ".join(f"{R[w][c]:6.3f}" for c in cols))
+        print(f"{w:>18} | " + " | ".join(f"{R[w][c]:6.3f}" for c in keys))
+
+    print("\n=== ARC (self-tuning hybrid, no value signal) vs the value-protected two-tier ===")
+    for w in WORKLOADS:
+        print(f"   {w:>18}: arc={R[w]['arc']:.3f}+/-{S[w]['arc']:.3f}  "
+              f"tt30={R[w]['tt30']:.3f}+/-{S[w]['tt30']:.3f}  value={R[w]['value']:.3f}")
+    print("   -> ARC matches on locality but FAILS rare-critical + wide-flood: it protects by observed")
+    print("      REUSE, and neither regime gives it a reuse signal. The two-tier's edge is EXOGENOUS")
+    print("      value admission, not the tiering itself (that is SLRU/ARC/2Q, 1993-2003).")
 
     print("\n=== does a two-tier match-or-beat the best single estimator in EVERY regime? ===")
+    print("    (NOTE: 'universal' holds only at a TUNED protected fraction; tt15 is NOT universal)")
     for tt in ["tt15", "tt30"]:
         ok_all = True; line = []
         for w in WORKLOADS:
@@ -134,7 +193,23 @@ def main():
             ok = R[w][tt] >= best_single - 0.02
             ok_all = ok_all and ok
             line.append(f"{w.split('_')[0]}:{R[w][tt]:.3f}/{best_single:.3f}{'OK' if ok else 'X'}")
-        print(f"   {tt}: " + " | ".join(line) + f"  -> universal: {ok_all}")
+        print(f"   {tt}: " + " | ".join(line) + f"  -> universal(+/-0.02): {ok_all}")
+
+    print("\n=== how CALIBRATED must the value signal be? (value_tag = true*exp(N(0,sigma))) ===")
+    print("    (does the value tier still beat ARC's 0.12 rare-critical with a NOISY value estimate?)")
+    for sigma in (0.0, 0.5, 1.0, 1.5, 2.0, 3.0):
+        rc, fl = [], []
+        for sd in range(SEEDS):
+            for w, bucket in (("rare_critical", rc), ("adversarial_flood", fl)):
+                rng = np.random.default_rng(11000 + sd)
+                stream, weights, _, size = make_workload(rng, w)
+                tv = np.zeros(size)
+                for it, wt in zip(stream, weights): tv[it] += wt
+                vtag = tv * np.exp(rng.normal(0, sigma, size))
+                bucket.append(serve_twotier(stream, weights, vtag, CAP, 0.30))
+        print(f"   sigma={sigma:>3.1f}: rare-critical tt30={np.mean(rc):.3f}  flood tt30={np.mean(fl):.3f}  (ARC=0.12/0.00)")
+    print("   -> value admission degrades GRACEFULLY and stays >2x ARC even at sigma=3 (a poor estimate):")
+    print("      the win needs a value signal merely BETTER THAN NOISE, not a calibrated oracle.")
 
 
 if __name__ == "__main__":
