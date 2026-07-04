@@ -1,0 +1,7 @@
+{
+ "mean_single": 29.7,
+ "mean_intra_model_union_3samples": 63.6,
+ "mean_inter_model_union_3models": 72.7,
+ "within_model_overlap_jaccard": 0.275,
+ "cross_model_overlap_jaccard": 0.141
+}
