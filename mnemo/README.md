@@ -6,7 +6,7 @@
 
 *Memory is the mother of the Muses. An agent with no memory has no ideas.*
 
-`pip install agora-mnemo` · [PyPI](https://pypi.org/project/agora-mnemo/) · [Hugging Face](https://huggingface.co/Danchi17/mnemo) · [DOI 10.5281/zenodo.21128549](https://doi.org/10.5281/zenodo.21128549) · MIT · v0.4.6
+`pip install agora-mnemo` · [PyPI](https://pypi.org/project/agora-mnemo/) · [Hugging Face](https://huggingface.co/Danchi17/mnemo) · [DOI 10.5281/zenodo.21128549](https://doi.org/10.5281/zenodo.21128549) · MIT · v0.4.7
 
 </div>
 
@@ -116,6 +116,21 @@ matches on *own source OR inherited taint*, so forfeiting a source also burns ev
 honest boundary: the app has to *declare* the derivation at the transformation step — `mnemo` can carry the taint
 through, but it can't recover provenance an opaque summary threw away. This is the substrate everything else is
 deterrence math on top of. Receipt: [`probes/triad_attacker_split.py`](probes/triad_attacker_split.py).
+
+**One control, not two — the cumulative detector IS the slash trigger: `monitor()` (0.4.7).** Retroactive
+`slash()` *cannot* fire per-slice against a slow salami attacker: per-slice `P(detected) ≈ 0`, and the
+deterrence bond scales with `1/P(detected)`, so the required penalty blows up on exactly the attack you're
+worried about. So the slash has to be triggered by a **cumulative** detector. `monitor(ids, outcome)` is a
+drop-in for `credit()` that also runs a one-sided **CUSUM** on each attributed source's bad-rate above a benign
+reference `k`; when a source's statistic breaches `h`, the **budget-breach is the detection event and the slash
+trigger at once** — it auto-forfeits that source's accrued standing and resets. Attribution rides the
+`derived_from` taint, so slices that were later summarized still accumulate against their origin. `h` sets the
+false-alarm rate and the detection delay `~ h/(rate−k)` — the irreducible Lorden/CUSUM floor no gate shrinks.
+State persists to a side file so a patient attacker can't reset the detector by spanning sessions; a false alarm
+is undone with `restore()`. This is the whole layered story collapsed to its load-bearing pair: **provenance
+that survives transformation, read out at the accountability layer.** Receipts:
+[`probes/triad_attacker_split.py`](probes/triad_attacker_split.py),
+[`probes/reversibility_gate_frontier.py`](probes/reversibility_gate_frontier.py).
 
 ### Soft metadata filter: `recall(prefer=..., prefer_trust=...)` (0.4.1)
 
