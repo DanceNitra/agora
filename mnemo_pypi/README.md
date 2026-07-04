@@ -6,7 +6,7 @@
 
 *Memory is the mother of the Muses. An agent with no memory has no ideas.*
 
-`pip install agora-mnemo` · [PyPI](https://pypi.org/project/agora-mnemo/) · [Hugging Face](https://huggingface.co/Danchi17/mnemo) · [DOI 10.5281/zenodo.21128549](https://doi.org/10.5281/zenodo.21128549) · MIT · v0.4.3
+`pip install agora-mnemo` · [PyPI](https://pypi.org/project/agora-mnemo/) · [Hugging Face](https://huggingface.co/Danchi17/mnemo) · [DOI 10.5281/zenodo.21128549](https://doi.org/10.5281/zenodo.21128549) · MIT · v0.4.4
 
 </div>
 
@@ -83,6 +83,21 @@ poison from a newcomer and filters most legit recalls (the classic *cheap-pseudo
 & Resnick 2001). **(2) The gate rides entirely on an un-self-gradable oracle** — a MINJA-style self-graded outcome
 (arXiv:2503.03704) collapses it at *every* density, even inverting it (blocking legit more than poison), so never
 let recalled content drive its own `credit()`; issue outcomes from the application, on real resolved work.
+
+### Retroactive standing forfeiture: `slash(ids)` (0.4.4)
+
+`credit()` is append-only, so a **patient "sleeper"** that banks good outcomes across many benign memories under
+one source survives a single bad one (good=50, bad=1 stays trusted) — the residual attack against
+outcome-standing is a slow, in-domain accumulator, not a one-shot. `slash(ids, scope='source')` is the
+accountability lever: when a memory is **caught** driving a bad outcome, it forfeits the **entire accrued
+standing of that source** — every active memory sharing its canonical source goes net-negative and loses any
+episodic→semantic graduation, so the source immediately fails the influence gate. The accrued reputation *is* the
+bond; one catch turns the attacker's patience into its largest exposed stake. Unlike `forget()` it deletes
+nothing (records stay recallable for context and audit via `meta['slashed']`); unlike `credit(bad)` it can't be
+out-banked. This makes cost-of-corruption scale with accrued-standing × detectability (the classic
+expected-penalty result — penalty must beat gain / P(caught)), the lever that bites a time-rich attacker a
+per-action cap only lets him amortize. Receipts: [`probes/triad_attacker_split.py`](probes/triad_attacker_split.py),
+[`probes/reversibility_gate_frontier.py`](probes/reversibility_gate_frontier.py).
 
 ### Soft metadata filter: `recall(prefer=..., prefer_trust=...)` (0.4.1)
 

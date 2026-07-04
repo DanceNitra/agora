@@ -80,7 +80,7 @@ def new_receipt_keypair():
     return (sk.private_bytes(_ser.Encoding.Raw, _ser.PrivateFormat.Raw, _ser.NoEncryption()).hex(),
             sk.public_key().public_bytes(_ser.Encoding.Raw, _ser.PublicFormat.Raw).hex())
 
-__version__ = "0.4.3"
+__version__ = "0.4.4"
 _WORD = re.compile(r"[a-z0-9][a-z0-9\-']{2,}")
 _STOP = frozenset("the a an of for to in on and or is are was were be been with this that it its as "
                   "by at from into our we us you your he she they them his her their not no".split())
@@ -916,6 +916,52 @@ class Mnemo:
         if updated:
             self._save()
         return {"updated": updated, "outcome": key, "weight": weight}
+
+    def slash(self, ids, scope: str = "source") -> dict:
+        """Retroactive standing forfeiture — the accountability lever for a CAUGHT poison. When a memory is
+        caught driving a bad outcome (the application detects/attributes it), slash() FORFEITS the entire
+        accrued outcome-standing of its SOURCE (scope='source', default — every active memory sharing that
+        canonical source) or just the named memories (scope='memory'). A patient 'sleeper' that banked good
+        credit over many benign memories under one identity loses ALL of it on one catch, so its accrued
+        reputation IS the bond and its patience becomes its largest exposed stake.
+        WHY this and not credit(bad): credit() is append-only, so a net-positive sleeper survives one bad
+        (good=50, bad=1 stays trusted). slash() zeroes `good`, books a dominating `bad`, AND revokes any
+        episodic->semantic graduation, so the source goes net-negative and immediately FAILS the corroboration
+        / influence gate (recall(influence_only=True) and episodic->semantic graduation). WHY not forget():
+        forget() deletes; slash() KEEPS the records for audit and only strips their standing — they can still be
+        recalled for context, just not trusted to drive an action. This makes cost-of-corruption scale with the
+        accrued standing + detection (Becker expected-penalty: the penalty must beat gain / P(caught)), which is
+        the lever that bites a time-rich patient attacker a per-action cap only lets him amortize. MEASURED
+        motivation: mnemo/probes/triad_attacker_split.py + reversibility_gate_frontier.py (the residual against a
+        patient sleeper is a slow-cumulative in-domain attack; retroactive forfeiture, not a throughput cap, is
+        the dominant control). Returns {slashed, sources, ids}. Records + raw text untouched; only good/bad/mtype
+        change, auditable via meta['slashed']. Reversible: nothing is deleted."""
+        by_id = {x["id"]: x for x in self.items}
+        caught = [by_id[i] for i in (ids or []) if i in by_id]
+
+        def _csrc(r: dict) -> str:
+            src = r.get("source")
+            doc = src.get("doc") if isinstance(src, dict) else (src if isinstance(src, str) else None)
+            return Mnemo._canon_source(doc) if doc else "id:" + r["id"]
+
+        if scope == "source":
+            bad_sources = {_csrc(r) for r in caught}
+            targets = [r for r in self.items if r.get("status") == "active" and _csrc(r) in bad_sources]
+            sources = sorted(bad_sources)
+        else:                                    # scope='memory' — only the named records
+            targets, sources = caught, []
+        slashed = []
+        for r in targets:
+            g = float(r.get("good", 0) or 0); b = float(r.get("bad", 0) or 0)
+            r["good"] = 0.0
+            r["bad"] = g + b + 1.0               # dominating -> net-negative -> blocked by the influence gate
+            if r.get("mtype") == "semantic":
+                r["mtype"] = "episodic"          # revoke graduation, else it still passes _is_corroborated
+            r.setdefault("meta", {})["slashed"] = True
+            slashed.append(r["id"])
+        if slashed:
+            self._save()
+        return {"slashed": len(slashed), "sources": sources, "ids": slashed}
 
     def _effective_value(self, r: dict, now: float) -> float:
         """Recall weight = stored value decayed by time since last access, at the memory's TYPE
