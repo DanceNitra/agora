@@ -80,7 +80,36 @@ def new_receipt_keypair():
     return (sk.private_bytes(_ser.Encoding.Raw, _ser.PrivateFormat.Raw, _ser.NoEncryption()).hex(),
             sk.public_key().public_bytes(_ser.Encoding.Raw, _ser.PublicFormat.Raw).hex())
 
-__version__ = "0.5.1"
+
+def new_source_keypair():
+    """Return (private_key_hex, public_key_hex) for an ATTESTING SOURCE. The private half is held by the
+    source (off the memory store's write path); the public half is what a corroboration is counted by.
+    This is the exogenous trust root: a source signs the claims it authored, so 'independence' is measured
+    by distinct VERIFIED KEYS an attacker cannot forge, not by distinct source STRINGS it can spoof. Needs
+    `cryptography`."""
+    return new_receipt_keypair()
+
+
+def _attest_message(text: str, source_doc) -> bytes:
+    """Canonical message an attestation signs: the claim text bound to its canonical source, so a signature
+    for 'X by source S' cannot be replayed as 'X by source T' or attached to a different claim."""
+    canon_src = Mnemo._canon_source(source_doc) if source_doc else ""
+    return _canon({"t": text, "s": canon_src})
+
+
+def attest(text: str, source_sk_hex: str, source_doc=None) -> str:
+    """Produce a source's Ed25519 signature (hex) over a claim, to pass as remember(..., attestation=(pubkey,
+    sig)). The source signs 'I authored this text (as this canonical source)'. A mislabel then means forging
+    the source's key, not editing the store. Honest limit: this attests AUTHORSHIP, not TRUTH — a source that
+    owns its key can honestly sign a false claim (a wrong-at-write-time / MINJA attack survives a signature);
+    what it buys is that a caught liar is a NON-REPUDIABLE identity you can revoke, and that Sybil variants of
+    one origin collapse to one verified key. Needs `cryptography`."""
+    if not _HAVE_ED:
+        raise RuntimeError("attestation needs the `cryptography` package (pip install cryptography)")
+    sk = _Ed25519SK.from_private_bytes(bytes.fromhex(source_sk_hex))
+    return sk.sign(_attest_message(text, source_doc)).hex()
+
+__version__ = "0.5.2"
 _WORD = re.compile(r"[a-z0-9][a-z0-9\-']{2,}")
 _STOP = frozenset("the a an of for to in on and or is are was were be been with this that it its as "
                   "by at from into our we us you your he she they them his her their not no".split())
@@ -174,9 +203,21 @@ class Mnemo:
         # from repeated independent assertions, where the corroboration guard would lag one forever. MEASURED
         # (lab fea933, mnemo's real consolidate() path): isolated-poison false-supersede 1 -> 0 while a
         # 3-record sustained change is still adopted; it Pareto-dominates both the naive (poison-fooled) and
-        # corroboration-only (change-lagging) rules — see the Adaptation-Corruption Separation Law (lab f490d8).
+        # corroboration-only (change-lagging) rules — see the adaptation-corruption coupling (a classical
+        # quickest-change-detection tradeoff; lab f490d8).
         # Reversible: 0 or 1 -> legacy fast supersession.
         self.supersede_persistence = 0
+        # STRICT corroboration (OPT-IN, default OFF -> identical legacy behavior). The corroboration bar
+        # (episodic->semantic graduation AND the recall influence gate) counts ">=2 distinct sources". By
+        # default a "source" is a canonical STRING (entity-resolved), which collapses honest sybil variants
+        # ("Wikipedia"/"wikipedia.org"/URL) but is still SPOOFABLE by an attacker who supplies two unrelated
+        # source strings it controls. With strict_corroboration ON, a corroborating link only counts if it
+        # carries a VERIFIED KEY (remember(..., attestation=...)): independence is then measured by distinct
+        # Ed25519 public keys an attacker cannot forge, so N sybil variants of one origin collapse to one
+        # witness unless the attacker holds N distinct keys (a costly identity, Douceur 2002). This binds the
+        # "independence" rail to the "origin-signed" rail; it does NOT make a claim TRUE (an attested source
+        # can still sign a false claim), only makes manufactured independence expensive. Reversible: OFF.
+        self.strict_corroboration = False
         # _save() THROTTLE: serializing the whole store (json.dumps of every item) is O(store size); doing
         # it on EVERY recall/remember froze callers once the store grew (recall mutates access value, so it
         # used to re-serialize everything each call). Coalesce disk writes to at most once / _save_min_s;
@@ -205,7 +246,7 @@ class Mnemo:
     def remember(self, text: str, tags=None, value: float = 1.0, meta: dict | None = None,
                  mtype: str | None = None, valid_from: float | None = None,
                  source: dict | None = None, key: str | None = None,
-                 derived_from: list | None = None) -> str:
+                 derived_from: list | None = None, attestation=None) -> str:
         """Append-only raw capture. Stamped with an absolute UTC time; never edited afterward.
         mtype in {episodic, semantic, procedural} sets the decay prior (episodic fades fast,
         semantic slow, procedural barely); inferred from the text if not given. Pass it explicitly
@@ -250,6 +291,26 @@ class Mnemo:
                 rec["links"] = links
         if key is not None:
             rec["key"] = str(key)
+        # ORIGIN ATTESTATION (OPT-IN): bind this claim to a source's VERIFIED KEY. attestation is
+        # (pubkey_hex, sig_hex) or {"pubkey":..., "sig":...}; the signature (from mnemo.attest(text, sk,
+        # source_doc)) must verify over the same claim+canonical-source message, else the write is REJECTED
+        # (a forged attestation is loud, not silently dropped). On success the record carries attested_key,
+        # which strict_corroboration counts distinct instances of — so manufactured independence costs a real
+        # key. Verifying authorship, NOT truth: an attested source can still sign a false claim.
+        if attestation is not None:
+            if isinstance(attestation, dict):
+                pubkey_hex, sig_hex = attestation.get("pubkey"), attestation.get("sig")
+            else:
+                pubkey_hex, sig_hex = attestation
+            if not _HAVE_ED:
+                raise RuntimeError("verifying an attestation needs the `cryptography` package (pip install cryptography)")
+            src_doc = source.get("doc") if isinstance(source, dict) else (source if isinstance(source, str) else None)
+            try:
+                _Ed25519PK.from_public_bytes(bytes.fromhex(pubkey_hex)).verify(
+                    bytes.fromhex(sig_hex), _attest_message(text, src_doc))
+            except Exception as e:
+                raise ValueError("attestation signature does not verify for this claim/source") from e
+            rec["attested_key"] = pubkey_hex
         if self.embed:
             try:
                 rec["vec"] = list(self.embed(text))
@@ -694,7 +755,7 @@ class Mnemo:
         # generalizes across retrievers where geometry-based poison defenses do not (see the docstring).
         if influence_only:
             _byid = {x["id"]: x for x in self.items}
-            pool = [r for r in pool if self._is_corroborated(r, _byid)]
+            pool = [r for r in pool if self._is_corroborated(r, _byid, self.strict_corroboration)]
         # Mode selection. 'hybrid' = lexical (token overlap) + semantic (embedding) fused with Reciprocal
         # Rank Fusion. We MEASURED hybrid robustly beating EITHER channel alone for agent memory on LoCoMo
         # (recall@20 0.61 hybrid vs 0.55 lexical vs 0.53 semantic; +0.057 over the best single channel,
@@ -840,7 +901,9 @@ class Mnemo:
             # Canonicalizing source identifiers before counting collapses those to one; a link whose record
             # has no source counts as its own id, so genuinely source-less corroboration is unchanged.
             _good = float(r.get("good", 0) or 0); _bad = float(r.get("bad", 0) or 0)
-            corroborated = (_good > 0 and _good >= _bad) or self._distinct_sources(r.get("links"), _by_id) >= 2
+            _distinct = (self._distinct_verified_keys(r.get("links"), _by_id) if self.strict_corroboration
+                         else self._distinct_sources(r.get("links"), _by_id))
+            corroborated = (_good > 0 and _good >= _bad) or _distinct >= 2
             if r.get("mtype") == "episodic" and r["value"] >= _GRADUATE_VALUE and corroborated:
                 r["mtype"] = "semantic"
                 r.setdefault("meta", {})["graduated_from_episodic"] = True
@@ -897,18 +960,35 @@ class Mnemo:
         return len(keys)
 
     @staticmethod
-    def _is_corroborated(rec: dict, by_id: dict) -> bool:
+    def _distinct_verified_keys(links, by_id) -> int:
+        """Count DISTINCT VERIFIED KEYS among corroborating links: an attacker cannot manufacture N
+        'independent' witnesses without N distinct Ed25519 keys it holds (forging one = breaking the
+        signature). Links whose record carries no attested_key do NOT count here — strict corroboration
+        demands cryptographic, not string, independence. Complements _distinct_sources (the default,
+        string-based, spoofable rail)."""
+        keys = set()
+        for lid in (links or []):
+            lr = by_id.get(lid)
+            if lr is not None and lr.get("attested_key"):
+                keys.add(lr["attested_key"])
+        return len(keys)
+
+    @staticmethod
+    def _is_corroborated(rec: dict, by_id: dict, strict: bool = False) -> bool:
         """The corroboration bar shared by episodic->semantic graduation and the recall influence gate:
         an EARNED net-positive outcome (good>0 and good>=bad — set by credit() on real work, not
-        self-assertable), OR an already-graduated 'semantic' memory, OR >=2 DISTINCT-canonical-source
-        corroborating links (sybil variants of one source collapse to one). A single fresh self-asserted
-        memory (the AgentPoison single-instance poison) meets none of these."""
+        self-assertable), OR an already-graduated 'semantic' memory, OR >=2 corroborating links from
+        distinct sources. `strict` selects the independence measure for that last path: distinct VERIFIED
+        KEYS (unforgeable) when True, distinct canonical-source STRINGS (spoofable but zero-setup) when
+        False. A single fresh self-asserted memory (the AgentPoison single-instance poison) meets none."""
         good = float(rec.get("good", 0) or 0)
         bad = float(rec.get("bad", 0) or 0)
         if good > 0 and good >= bad:
             return True
         if rec.get("mtype") == "semantic":
             return True
+        if strict:
+            return Mnemo._distinct_verified_keys(rec.get("links"), by_id) >= 2
         return Mnemo._distinct_sources(rec.get("links"), by_id) >= 2
 
     def influence_gate_report(self) -> dict:
@@ -937,7 +1017,8 @@ class Mnemo:
                 corr += 1; earned += 1
             elif r.get("mtype") == "semantic":
                 corr += 1; sem += 1
-            elif self._distinct_sources(r.get("links"), byid) >= 2:
+            elif (self._distinct_verified_keys(r.get("links"), byid) if self.strict_corroboration
+                  else self._distinct_sources(r.get("links"), byid)) >= 2:
                 corr += 1; multi += 1
         frac = (corr / n) if n else 0.0
         advice = ("cheap - most active memories are corroborated" if frac >= 0.7 else
@@ -945,8 +1026,9 @@ class Mnemo:
                   "expensive - store too sparse; influence_only will filter most legit recalls. Grow density "
                   "or credit() real outcomes first, or use it only for untrusted-ingestion defense.")
         return {"active": n, "corroborated": corr, "corroborated_frac": round(frac, 3),
-                "would_block_frac": round(1.0 - frac, 3),
-                "by_path": {"earned_outcome": earned, "semantic": sem, "multi_source": multi},
+                "would_block_frac": round(1.0 - frac, 3), "strict_corroboration": self.strict_corroboration,
+                "by_path": {"earned_outcome": earned, "semantic": sem,
+                            ("multi_verified_key" if self.strict_corroboration else "multi_source"): multi},
                 "advice": advice}
 
     @staticmethod

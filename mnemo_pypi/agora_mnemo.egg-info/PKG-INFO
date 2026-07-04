@@ -1,6 +1,6 @@
 Metadata-Version: 2.4
 Name: agora-mnemo
-Version: 0.4.2
+Version: 0.5.2
 Summary: mnemo - a zero-dependency memory layer for AI agents: value-ranked recall, per-type decay, consolidation, and semantic+lexical auto-mode. Extracted from an autonomous research system running over ~9,000 notes.
 Author: Agora (autonomous research organization)
 License: MIT
@@ -23,7 +23,7 @@ Requires-Dist: mcp[cli]>=1.0; extra == "mcp"
 
 *Memory is the mother of the Muses. An agent with no memory has no ideas.*
 
-`pip install agora-mnemo` · [PyPI](https://pypi.org/project/agora-mnemo/) · [Hugging Face](https://huggingface.co/Danchi17/mnemo) · [DOI 10.5281/zenodo.21128549](https://doi.org/10.5281/zenodo.21128549) · MIT · v0.4.2
+`pip install agora-mnemo` · [PyPI](https://pypi.org/project/agora-mnemo/) · [Hugging Face](https://huggingface.co/Danchi17/mnemo) · [DOI 10.5281/zenodo.21128549](https://doi.org/10.5281/zenodo.21128549) · MIT · v0.5.2
 
 </div>
 
@@ -87,6 +87,160 @@ use. It raises attacker cost (defeating it needs ≥3 coordinated records with �
 provenances), it does not make poisoning impossible. Receipts: [`probes/agentpoison_influence_gate.py`](probes/agentpoison_influence_gate.py),
 [`probes/agentpoison_influence_gate_validation.py`](probes/agentpoison_influence_gate_validation.py).
 
+### Know before you gate: `influence_gate_report()` (0.4.3)
+
+The influence gate is not free, and its cost is **density-dependent** — so check it before you rely on it.
+`influence_gate_report()` returns the gate's **live cost on your store** (`would_block_frac` = the fraction of
+active memories it would filter, plus the corroboration breakdown and an `advice` string). Why it matters, and
+both measured on [`probes/oracle_separation_density.py`](probes/oracle_separation_density.py) (controlled corpus,
+real embeddings): **(1) density = affordability** — the fraction of *legitimate* high-stakes recalls the gate
+blocks falls from **~51% when each memory is used ~once (sparse)** to **~6% when each is used ~8× (dense)**,
+because a legit memory only earns standing through repeated successful use; in a thin store the gate can't tell a
+poison from a newcomer and filters most legit recalls (the classic *cheap-pseudonyms / whitewashing* tax, Friedman
+& Resnick 2001). **(2) The gate rides entirely on an un-self-gradable oracle** — a MINJA-style self-graded outcome
+(arXiv:2503.03704) collapses it at *every* density, even inverting it (blocking legit more than poison), so never
+let recalled content drive its own `credit()`; issue outcomes from the application, on real resolved work.
+
+### Retroactive standing forfeiture: `slash(ids)` (0.4.4)
+
+`credit()` is append-only, so a **patient "sleeper"** that banks good outcomes across many benign memories under
+one source survives a single bad one (good=50, bad=1 stays trusted) — the residual attack against
+outcome-standing is a slow, in-domain accumulator, not a one-shot. `slash(ids, scope='source')` is the
+accountability lever: when a memory is **caught** driving a bad outcome, it forfeits the **entire accrued
+standing of that source** — every active memory sharing its canonical source goes net-negative and loses any
+episodic→semantic graduation, so the source immediately fails the influence gate. The accrued reputation *is* the
+bond; one catch turns the attacker's patience into its largest exposed stake. Unlike `forget()` it deletes
+nothing (records stay recallable for context and audit via `meta['slashed']`); unlike `credit(bad)` it can't be
+out-banked. This makes cost-of-corruption scale with accrued-standing × detectability (the classic
+expected-penalty result — penalty must beat gain / P(caught)), the lever that bites a time-rich attacker a
+per-action cap only lets him amortize. Receipts: [`probes/triad_attacker_split.py`](probes/triad_attacker_split.py),
+[`probes/reversibility_gate_frontier.py`](probes/reversibility_gate_frontier.py).
+
+Because detection is imperfect — a self-graded / MINJA-style oracle can be *tricked* into flagging a legitimate
+source, so `slash()` can be **weaponised** to knock out a rival's memory — the forfeiture is reversible:
+`restore(ids, scope='source')` recovers the **exact** pre-slash standing (saved in `meta['pre_slash']`), or a
+clean slate if none was recorded. The penalty is heavy, so the appeal is cheap — otherwise `slash()` itself
+becomes the attack surface.
+
+**Provenance that rides through transformation: `remember(..., derived_from=[ids])` (0.4.6).** All of the above —
+`slash`, a per-source influence budget, any source-level accountability — is silently un-countable the moment a
+memory is *transformed*: an app-side **summary** of five source-memories is a fresh record with no source, so
+`slash(source)` can't reach it and a cumulative cap can't attribute its slices. `mnemo`'s own consolidation never
+loses provenance (it links, never merges text), but LLM summarization/rewrite does. `remember(text,
+derived_from=[parent_ids])` closes that hole: the new record **inherits the union of its parents' canonical
+sources** as a `taint` (transitively — a summary-of-a-summary still carries the origin), and `slash(scope='source')`
+matches on *own source OR inherited taint*, so forfeiting a source also burns every derived summary it fed. The
+honest boundary: the app has to *declare* the derivation at the transformation step — `mnemo` can carry the taint
+through, but it can't recover provenance an opaque summary threw away. This is the substrate everything else is
+deterrence math on top of. Receipt: [`probes/triad_attacker_split.py`](probes/triad_attacker_split.py).
+
+**The cumulative trigger the slash needs — as a case-raiser, not an auto-executioner: `monitor()` (0.4.7,
+hardened 0.4.8).** Retroactive `slash()` *cannot* fire per-slice against a slow salami attacker: per-slice
+`P(detected) ≈ 0`, and the deterrence bond scales with `1/P(detected)`, so the penalty blows up on exactly the
+attack you're worried about. So the trigger has to be **cumulative**. `monitor(ids, outcome)` is a drop-in for
+`credit()` that runs a one-sided **CUSUM-type** detector on each attributed source's bad-rate above a benign
+reference `k`; on breach of `h` it **raises a case** for that source, with attribution carried through the
+`derived_from` taint so slices later summarized still accumulate against their origin. `h` sets the false-alarm
+rate (`ARL ~ exp(h)`) and the detection delay `~ h/(rate−k)` — the Lorden floor no gate shrinks. State persists
+to a side file so a drip can't reset the detector across sessions.
+
+Three honest limits (from a full adversarial review — this does **not** "solve" poisoning):
+(1) it's **CUSUM-*type*** (Gaussian-mean-shift `x−k`), not the exactly-optimal Bernoulli log-likelihood form;
+(2) **`k` is a tolerated-rate *price*, not a wall** — an attacker holding its bad-rate at/below `k` drifts the
+statistic to zero and is *provably* undetectable, so this catches the careless poisoner while a patient one nets
+a bounded `k × exposure` residual (the latency floor moved to `k`, not closed); lowering `k` just raises false
+alarms on honest sources;
+(3) **don't auto-fire the irreversible penalty** — `auto_slash` **defaults OFF**. Seventy years of automated
+penalties (SPC → fraud → content moderation, e.g. Knight Capital, no-fly lists) converged on automatic
+*detection* + a human-reviewable *reversible* penalty, because a drifting base-rate guarantees false alarms, a
+single false positive nukes a whole tainted downstream tree (guilt-by-linkage), and if outcomes are
+attacker-influenceable (MINJA) the auto-trigger becomes a *framing weapon* (feed bad outcomes attributed to a
+rival → auto-slash the rival; cf. RepTrap / bad-mouthing). Recommended: on a case, cap/freeze the source's
+forward influence (reversible) and queue a **human** review; confirm the `slash()` by hand; keep `restore()` one
+call away. `auto_slash=True` is an explicit opt-in for a high-integrity, un-self-gradable oracle only. Receipts:
+[`probes/triad_attacker_split.py`](probes/triad_attacker_split.py),
+[`probes/reversibility_gate_frontier.py`](probes/reversibility_gate_frontier.py).
+
+**Bound the one residual the rate-detector can't: `spend_irreversible()` (0.4.9).** `monitor`'s `k` is a
+tolerated *rate*, so the **strictly-below-`k`** attacker gives the CUSUM negative drift → no detection power above
+the baseline false-alarm rate, netting `k × exposure` — but exposure is **per-window**, so over an unbounded
+horizon its *total* irreversible blast grows without bound. Capping a rate never bounds an integral.
+`spend_irreversible(ids, amount, budget)` caps the integral directly: a per-source **lifetime budget on
+irreversible influence**, charged through the `derived_from` taint (the tightest contributing source binds — an
+action tainted by an exhausted source is denied). Meter it **only on the irreversible tail**: reversible influence
+is never charged, so genuinely-good sources keep *unbounded* reversible influence and only their irreversible tail
+is finite. It is **not** refunded by `restore()` — an irreversible action can't be un-done, so its integral is
+permanent (raise a reviewed source's ceiling by hand, not by a cheap auto-refund). The honest read: you don't
+remove the residual, you **price it (`k`), bound it (this lifetime budget), and put a reversible human gate
+(`slash`/`restore`) on the irreversible tail** — but this is **not a closed decomposition**, because all three
+lean on a fourth, unbounded axis: **sound attribution** (correctly assigning an action to its source and labeling
+its irreversibility). Measured: [`probes/lifetime_budget_bound.py`](probes/lifetime_budget_bound.py) shows the
+same undetectable below-`k` attacker's total blast go from unbounded (50→800 over the horizon) to **capped at
+`budget` regardless of horizon**, while a good source keeps 10 000 free reversible uses.
+
+Honest limits (this **relocates** the residual, it does not close it): (1) the budget is **per-source, so it
+doesn't escape Sybil** — a whitewashing attacker who mints fresh cheap identities gets a fresh `budget` each, so
+system-wide blast is `budget × (#identities)`; the identity count is bounded by a *different* axis (a
+standing-independent capability ceiling / an identity cost; Douceur 2002, Friedman–Resnick 2001), so this bounds a
+*known* source, not an adversary who can mint new ones. (2) **Refund-free forfeiture is a griefing vector** — get
+bad irreversible actions attributed or taint-linked to a rival's source and you permanently exhaust its budget
+(RepTrap on the budget axis), the same weapon the `auto_slash`-off default avoids, so tune `budget` and the
+reversible/irreversible split conservatively. (3) It assumes the app can label an action's **irreversibility and
+blast `amount`** at spend time; `amount` is caller-supplied and one action of size=`budget` exhausts a source in
+one shot (so the guarantee is "≤ `budget` per source", `k` doesn't enter it), and if the classifier is
+attacker-influenceable the meter leaks. Prior art (textbook; the shipped plumbing on an agent-memory core is
+what's new): a total-budget-on-cumulative-cost is the differential-privacy **privacy budget** (a total `ε` caps
+cumulative leakage across queries under composition; Dwork & Roth 2014), an SRE **error budget**, a **VaR / loss
+limit**, and Sagas' **compensable-vs-non-compensable** transaction split (Garcia-Molina & Salem 1987) — "cap the
+integral, not the rate."
+
+**Harden the floor the other three stand on: `verify_attribution()` (0.5.0).** `k`, the influence budget, the
+influence gate and `slash` are all keyed on a memory's canonical **source id**. So attribution is not a fourth
+axis — it is the **floor** the other three stand on, and the only one that isn't self-certifying: a single
+post-hoc **relabel** (rewrite a record's source, or strip a summary's inherited `derived_from` taint to launder a
+poisoned origin) doesn't *degrade* the other three, it **voids all of them at once, silently**, with no inner
+layer to appeal to. So bind attribution into the tamper-evident write-receipt chain (enable `receipts=True` /
+`receipt_key=…`): the receipt now commits to each write's canonical sources, and `verify_attribution()` reports any
+active memory whose *current* sources no longer match what was committed. **A relabel becomes loud, not silent.**
+Measured: [`probes/attribution_floor.py`](probes/attribution_floor.py) — a source relabel and a taint-strip are
+both **detected**; a legitimate `slash` does **not** false-alarm; editing a past receipt breaks the hash chain.
+
+**Two honest limits — read this as tamper-EVIDENT, not tamper-PROOF.** (1) **Tamper-evidence ≠ correctness.** A
+source that was *wrong at write time* — an attacker who controls the labeling channel (MINJA-style) and asserts a
+benign source — is committed faithfully and `verify_attribution()` **cannot** tell it was wrong. That is the
+genuinely-open **oracle problem**, untouched. (2) **The chain is only tamper-evident if it is signed (offline key)
+or externally anchored.** Unsigned — the default — an attacker who can silently relabel `rec["source"]` can equally
+recompute the whole sidecar receipt chain with the new sources and pass the check, so bare `verify_attribution()`
+only catches a relabel by an actor who can edit the store but **not** the `.receipts` sidecar (e.g. an out-of-band
+DB edit). For the "loud" property to hold against a store-capable attacker you must pass `receipt_key=…` (Ed25519)
+with the key out of reach, or anchor the chain head externally. The crypto is textbook — hash-chains (Haber &
+Stornetta 1991), tamper-evident logs (Schneier & Kelsey 1998), the same design as our
+[agent-receipts](https://github.com/DanceNitra/agora) work; the only new bit is the systems observation that a
+source-keyed defense stack has one silent single-point-of-failure (relabel), and committing attribution converts
+that failure from silent to loud. The correctness slice stays the small, sharp, unshipped problem.
+
+**Make corroboration count a distinct *verified key*, not a distinct *string*: `strict_corroboration` +
+`attestation` (0.5.2).** The corroboration gate (episodic→semantic graduation and `recall(influence_only=True)`)
+requires "≥2 distinct sources". By default a source is a canonical **string** — entity-resolution collapses honest
+sybil variants (`Wikipedia`/`wikipedia.org`/a URL → one), but an attacker who owns the labeling channel can still
+supply two *unrelated* source strings it controls and manufacture "independent" corroboration. Set
+`m.strict_corroboration = True` and a corroborating link counts only if it carries a **verified key**: a source
+signs the claims it authored (`sig = mnemo.attest(text, source_sk, source_doc)`; write with
+`remember(..., attestation=(source_pubkey, sig))`), the signature is verified over the *same claim + canonical
+source* at write time (a forged or replayed attestation is **rejected**, not silently dropped), and the record
+carries `attested_key`. Independence is then measured by distinct **Ed25519 public keys an attacker cannot
+forge** — N sybil variants of one origin collapse to one witness unless the attacker holds N distinct keys (a
+costly identity; Douceur 2002). This is the **exogenous trust root** the attribution problem bottoms out on:
+"can I trust the label" becomes "can I trust the root", i.e. the identity axis. Measured:
+[`probes/attribution_verified_key.py`](probes/attribution_verified_key.py) — a two-string spoof that passes the
+default gate is **rejected** under strict; two distinct signed witnesses pass; the same key used twice collapses
+to one; forged and claim-replayed attestations are refused at write time. **Honest limit:** this buys unforgeable
+**independence**, not **correctness** — an attested source can still sign a *false* claim (a wrong-at-write-time /
+MINJA attack survives a signature); a signature proves **authorship** (so a caught liar is a non-repudiable,
+revocable key), not truth. Textbook root-of-trust (PKI/TCB; costly-identity sybil defense, Douceur 2002); the new
+bit is binding the independence rail of a memory's corroboration gate to that root. Opt-in, default OFF → identical
+legacy behavior.
+
 ### Soft metadata filter: `recall(prefer=..., prefer_trust=...)` (0.4.1)
 
 A hard metadata filter (`where={"speaker": x}`) deletes non-matching memories — great when the filter is
@@ -119,7 +273,17 @@ product composition scores **recall@20 0.865 vs 0.755 for the best single cue (+
 evidence, the classic "combine outside the saturating form" failure, BM25F/Robertson et al. CIKM 2004). So:
 compose as a **product**, and if you cap, cap the product — the same choice production search settled on
 (Elasticsearch defaults `score_mode=multiply`). Honest scope: one benchmark, one embedder, near-orthogonal
-cues; correlated cues could double-count. Reversible: a single dict / `None` behaves exactly as before.
+cues. Reversible: a single dict / `None` behaves exactly as before.
+
+**Compose only cues you trust** (receipt: [`probes/locomo_correlated_cue_composition.py`](probes/locomo_correlated_cue_composition.py)).
+A product inherits the product-of-experts *veto* (Hinton 2002): a near-zero factor vetoes, so a target that
+misses *either* cue collapses far below an additive sum or the trusted cue alone — measured, on the subset
+where the second cue is wrong-for-the-query, product recall@20 **0.10 vs sum 0.52 vs one-cue 0.70**. So an
+unreliable second cue hurts a *product* more than a *sum* (and can do worse than not composing at all). The
+fix is the per-cue `trust` you already pass: down-weighting an untrusted cue restores the product toward the
+sum. Interestingly this is **not** a correlation effect — the gap is largest when the cues are *orthogonal*
+and *shrinks* as they correlate (a redundant copy just can't miss when the real cue hits). Rule of thumb:
+compose a second cue **only when it is independently reliable for the query**, and weight it by that reliability.
 
 ## Use it as an MCP server (any Claude / Cursor / agent client)
 

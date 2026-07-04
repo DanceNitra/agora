@@ -6,7 +6,7 @@
 
 *Memory is the mother of the Muses. An agent with no memory has no ideas.*
 
-`pip install agora-mnemo` · [PyPI](https://pypi.org/project/agora-mnemo/) · [Hugging Face](https://huggingface.co/Danchi17/mnemo) · [DOI 10.5281/zenodo.21128549](https://doi.org/10.5281/zenodo.21128549) · MIT · v0.5.1
+`pip install agora-mnemo` · [PyPI](https://pypi.org/project/agora-mnemo/) · [Hugging Face](https://huggingface.co/Danchi17/mnemo) · [DOI 10.5281/zenodo.21128549](https://doi.org/10.5281/zenodo.21128549) · MIT · v0.5.2
 
 </div>
 
@@ -201,6 +201,28 @@ Stornetta 1991), tamper-evident logs (Schneier & Kelsey 1998), the same design a
 [agent-receipts](https://github.com/DanceNitra/agora) work; the only new bit is the systems observation that a
 source-keyed defense stack has one silent single-point-of-failure (relabel), and committing attribution converts
 that failure from silent to loud. The correctness slice stays the small, sharp, unshipped problem.
+
+**Make corroboration count a distinct *verified key*, not a distinct *string*: `strict_corroboration` +
+`attestation` (0.5.2).** The corroboration gate (episodic→semantic graduation and `recall(influence_only=True)`)
+requires "≥2 distinct sources". By default a source is a canonical **string** — entity-resolution collapses honest
+sybil variants (`Wikipedia`/`wikipedia.org`/a URL → one), but an attacker who owns the labeling channel can still
+supply two *unrelated* source strings it controls and manufacture "independent" corroboration. Set
+`m.strict_corroboration = True` and a corroborating link counts only if it carries a **verified key**: a source
+signs the claims it authored (`sig = mnemo.attest(text, source_sk, source_doc)`; write with
+`remember(..., attestation=(source_pubkey, sig))`), the signature is verified over the *same claim + canonical
+source* at write time (a forged or replayed attestation is **rejected**, not silently dropped), and the record
+carries `attested_key`. Independence is then measured by distinct **Ed25519 public keys an attacker cannot
+forge** — N sybil variants of one origin collapse to one witness unless the attacker holds N distinct keys (a
+costly identity; Douceur 2002). This is the **exogenous trust root** the attribution problem bottoms out on:
+"can I trust the label" becomes "can I trust the root", i.e. the identity axis. Measured:
+[`probes/attribution_verified_key.py`](probes/attribution_verified_key.py) — a two-string spoof that passes the
+default gate is **rejected** under strict; two distinct signed witnesses pass; the same key used twice collapses
+to one; forged and claim-replayed attestations are refused at write time. **Honest limit:** this buys unforgeable
+**independence**, not **correctness** — an attested source can still sign a *false* claim (a wrong-at-write-time /
+MINJA attack survives a signature); a signature proves **authorship** (so a caught liar is a non-repudiable,
+revocable key), not truth. Textbook root-of-trust (PKI/TCB; costly-identity sybil defense, Douceur 2002); the new
+bit is binding the independence rail of a memory's corroboration gate to that root. Opt-in, default OFF → identical
+legacy behavior.
 
 ### Soft metadata filter: `recall(prefer=..., prefer_trust=...)` (0.4.1)
 
