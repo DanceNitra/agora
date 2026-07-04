@@ -6,7 +6,7 @@
 
 *Memory is the mother of the Muses. An agent with no memory has no ideas.*
 
-`pip install agora-mnemo` · [PyPI](https://pypi.org/project/agora-mnemo/) · [Hugging Face](https://huggingface.co/Danchi17/mnemo) · [DOI 10.5281/zenodo.21128549](https://doi.org/10.5281/zenodo.21128549) · MIT · v0.4.4
+`pip install agora-mnemo` · [PyPI](https://pypi.org/project/agora-mnemo/) · [Hugging Face](https://huggingface.co/Danchi17/mnemo) · [DOI 10.5281/zenodo.21128549](https://doi.org/10.5281/zenodo.21128549) · MIT · v0.4.5
 
 </div>
 
@@ -98,6 +98,12 @@ out-banked. This makes cost-of-corruption scale with accrued-standing × detecta
 expected-penalty result — penalty must beat gain / P(caught)), the lever that bites a time-rich attacker a
 per-action cap only lets him amortize. Receipts: [`probes/triad_attacker_split.py`](probes/triad_attacker_split.py),
 [`probes/reversibility_gate_frontier.py`](probes/reversibility_gate_frontier.py).
+
+Because detection is imperfect — a self-graded / MINJA-style oracle can be *tricked* into flagging a legitimate
+source, so `slash()` can be **weaponised** to knock out a rival's memory — the forfeiture is reversible:
+`restore(ids, scope='source')` recovers the **exact** pre-slash standing (saved in `meta['pre_slash']`), or a
+clean slate if none was recorded. The penalty is heavy, so the appeal is cheap — otherwise `slash()` itself
+becomes the attack surface.
 
 ### Soft metadata filter: `recall(prefer=..., prefer_trust=...)` (0.4.1)
 
