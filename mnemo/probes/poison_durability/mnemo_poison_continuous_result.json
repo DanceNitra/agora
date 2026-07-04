@@ -1,0 +1,37 @@
+{
+ "n_scenarios": 15,
+ "sampled_days": [
+  0,
+  3,
+  7,
+  10,
+  14,
+  21,
+  30,
+  45,
+  60,
+  75,
+  90
+ ],
+ "metric": "fraction of 90-day window the poison out-ranks the truth",
+ "stop(single)": {
+  "OLD_guard_corrupt_fraction": 1.0,
+  "NEW_guard_corrupt_fraction": 0.394
+ },
+ "every_30d": {
+  "OLD_guard_corrupt_fraction": 1.0,
+  "NEW_guard_corrupt_fraction": 0.715
+ },
+ "every_14d": {
+  "OLD_guard_corrupt_fraction": 1.0,
+  "NEW_guard_corrupt_fraction": 0.994
+ },
+ "every_7d": {
+  "OLD_guard_corrupt_fraction": 1.0,
+  "NEW_guard_corrupt_fraction": 1.0
+ },
+ "continuous": {
+  "OLD_guard_corrupt_fraction": 1.0,
+  "NEW_guard_corrupt_fraction": 1.0
+ }
+}

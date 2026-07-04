@@ -1,0 +1,83 @@
+{
+ "N_total": 40,
+ "semantic": {
+  "mode": "semantic",
+  "n_scenarios_counted": 40,
+  "ages_days": [
+   0,
+   3,
+   7,
+   14,
+   21,
+   30,
+   45,
+   60,
+   90
+  ],
+  "OLD_guard_corruption_rate": {
+   "0": 1.0,
+   "3": 1.0,
+   "7": 1.0,
+   "14": 1.0,
+   "21": 1.0,
+   "30": 1.0,
+   "45": 1.0,
+   "60": 1.0,
+   "90": 1.0
+  },
+  "NEW_guard_corruption_rate": {
+   "0": 1.0,
+   "3": 1.0,
+   "7": 1.0,
+   "14": 0.525,
+   "21": 0.0,
+   "30": 0.0,
+   "45": 0.0,
+   "60": 0.0,
+   "90": 0.0
+  },
+  "NEW_fade_day_median": 21,
+  "NEW_fade_day_mean": 17.7,
+  "OLD_still_corrupting_at_90d_rate": 1.0
+ },
+ "lexical": {
+  "mode": "lexical",
+  "n_scenarios_counted": 40,
+  "ages_days": [
+   0,
+   3,
+   7,
+   14,
+   21,
+   30,
+   45,
+   60,
+   90
+  ],
+  "OLD_guard_corruption_rate": {
+   "0": 1.0,
+   "3": 1.0,
+   "7": 1.0,
+   "14": 1.0,
+   "21": 1.0,
+   "30": 1.0,
+   "45": 1.0,
+   "60": 1.0,
+   "90": 1.0
+  },
+  "NEW_guard_corruption_rate": {
+   "0": 1.0,
+   "3": 1.0,
+   "7": 1.0,
+   "14": 0.525,
+   "21": 0.0,
+   "30": 0.0,
+   "45": 0.0,
+   "60": 0.0,
+   "90": 0.0
+  },
+  "NEW_fade_day_median": 21,
+  "NEW_fade_day_mean": 17.7,
+  "OLD_still_corrupting_at_90d_rate": 1.0
+ }
+}
