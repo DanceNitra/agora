@@ -80,7 +80,7 @@ def new_receipt_keypair():
     return (sk.private_bytes(_ser.Encoding.Raw, _ser.PrivateFormat.Raw, _ser.NoEncryption()).hex(),
             sk.public_key().public_bytes(_ser.Encoding.Raw, _ser.PublicFormat.Raw).hex())
 
-__version__ = "0.4.5"
+__version__ = "0.4.6"
 _WORD = re.compile(r"[a-z0-9][a-z0-9\-']{2,}")
 _STOP = frozenset("the a an of for to in on and or is are was were be been with this that it its as "
                   "by at from into our we us you your he she they them his her their not no".split())
@@ -204,7 +204,8 @@ class Mnemo:
     # ── capture ──────────────────────────────────────────────────────────────
     def remember(self, text: str, tags=None, value: float = 1.0, meta: dict | None = None,
                  mtype: str | None = None, valid_from: float | None = None,
-                 source: dict | None = None, key: str | None = None) -> str:
+                 source: dict | None = None, key: str | None = None,
+                 derived_from: list | None = None) -> str:
         """Append-only raw capture. Stamped with an absolute UTC time; never edited afterward.
         mtype in {episodic, semantic, procedural} sets the decay prior (episodic fades fast,
         semantic slow, procedural barely); inferred from the text if not given. Pass it explicitly
@@ -228,6 +229,25 @@ class Mnemo:
                "source": dict(source) if source else None,   # re-checkable origin (e.g. {"doc": id, "span": [start, end]}) so a recalled fact can be traced back, not trusted blind
                "mtype": mtype or _infer_type(text), "last_access": now,
                "status": "active", "links": [], "meta": dict(meta or {})}
+        # TAINT INHERITANCE (provenance that rides through transformation): when this memory is DERIVED from
+        # others (a summary, a consolidation, an LLM rewrite), it inherits the union of its parents' canonical
+        # sources — transitively, since a parent's own inherited taint is included. Without this, an app-side
+        # summary is a fresh record with no source, so slash()/per-source attribution can't reach it: the
+        # cumulative influence cap and the retroactive slash both need provenance to survive summarization to be
+        # countable at all. `derived_from` is the substrate everything else (cap, slash) is deterrence math on.
+        if derived_from:
+            _by = {x["id"]: x for x in self.items}
+            taint, links = set(), []
+            for pid in derived_from:
+                p = _by.get(pid)
+                if p is None:
+                    continue
+                links.append(pid)
+                taint |= Mnemo._rec_sources(p)     # parent's own source + its inherited taint (transitive)
+            if taint:
+                rec["taint"] = sorted(taint)
+            if links:
+                rec["links"] = links
         if key is not None:
             rec["key"] = str(key)
         if self.embed:
@@ -779,6 +799,17 @@ class Mnemo:
         return s
 
     @staticmethod
+    def _rec_sources(rec: dict) -> set:
+        """The canonical sources a record is attributable to: its OWN source (entity-resolved) PLUS any taint
+        inherited from parents via derived_from (so provenance rides through summarization/consolidation). A
+        source-less record is attributable to its own id, so nothing is silently un-attributable. Used by
+        slash()/restore() so forfeiting a source also reaches every derived record it fed."""
+        src = rec.get("source")
+        doc = src.get("doc") if isinstance(src, dict) else (src if isinstance(src, str) else None)
+        own = Mnemo._canon_source(doc) if doc else "id:" + rec["id"]
+        return {own} | set(rec.get("taint") or [])
+
+    @staticmethod
     def _distinct_sources(links, by_id) -> int:
         """Count DISTINCT canonical sources among corroborating links — entity resolution BEFORE counting,
         so 'three names for one source' sybil variants count as one. A link whose record carries no source
@@ -938,15 +969,12 @@ class Mnemo:
         change, auditable via meta['slashed']. Reversible: nothing is deleted."""
         by_id = {x["id"]: x for x in self.items}
         caught = [by_id[i] for i in (ids or []) if i in by_id]
-
-        def _csrc(r: dict) -> str:
-            src = r.get("source")
-            doc = src.get("doc") if isinstance(src, dict) else (src if isinstance(src, str) else None)
-            return Mnemo._canon_source(doc) if doc else "id:" + r["id"]
-
         if scope == "source":
-            bad_sources = {_csrc(r) for r in caught}
-            targets = [r for r in self.items if r.get("status") == "active" and _csrc(r) in bad_sources]
+            bad_sources = set().union(*(Mnemo._rec_sources(r) for r in caught)) if caught else set()
+            # a record is caught if its own source OR any inherited taint intersects the slashed sources ->
+            # forfeiting a source also burns every derived summary/consolidation it fed (provenance-carried).
+            targets = [r for r in self.items if r.get("status") == "active"
+                       and (Mnemo._rec_sources(r) & bad_sources)]
             sources = sorted(bad_sources)
         else:                                    # scope='memory' — only the named records
             targets, sources = caught, []
@@ -979,15 +1007,9 @@ class Mnemo:
         appeal has to be cheap — otherwise slash() itself becomes the attack surface."""
         by_id = {x["id"]: x for x in self.items}
         seed = [by_id[i] for i in (ids or []) if i in by_id]
-
-        def _csrc(r: dict) -> str:
-            src = r.get("source")
-            doc = src.get("doc") if isinstance(src, dict) else (src if isinstance(src, str) else None)
-            return Mnemo._canon_source(doc) if doc else "id:" + r["id"]
-
         if scope == "source":
-            srcs = {_csrc(r) for r in seed}
-            targets = [r for r in self.items if _csrc(r) in srcs and (r.get("meta") or {}).get("slashed")]
+            srcs = set().union(*(Mnemo._rec_sources(r) for r in seed)) if seed else set()
+            targets = [r for r in self.items if (Mnemo._rec_sources(r) & srcs) and (r.get("meta") or {}).get("slashed")]
             sources = sorted(srcs)
         else:
             targets, sources = [r for r in seed if (r.get("meta") or {}).get("slashed")], []

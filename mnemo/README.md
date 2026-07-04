@@ -6,7 +6,7 @@
 
 *Memory is the mother of the Muses. An agent with no memory has no ideas.*
 
-`pip install agora-mnemo` · [PyPI](https://pypi.org/project/agora-mnemo/) · [Hugging Face](https://huggingface.co/Danchi17/mnemo) · [DOI 10.5281/zenodo.21128549](https://doi.org/10.5281/zenodo.21128549) · MIT · v0.4.5
+`pip install agora-mnemo` · [PyPI](https://pypi.org/project/agora-mnemo/) · [Hugging Face](https://huggingface.co/Danchi17/mnemo) · [DOI 10.5281/zenodo.21128549](https://doi.org/10.5281/zenodo.21128549) · MIT · v0.4.6
 
 </div>
 
@@ -104,6 +104,18 @@ source, so `slash()` can be **weaponised** to knock out a rival's memory — the
 `restore(ids, scope='source')` recovers the **exact** pre-slash standing (saved in `meta['pre_slash']`), or a
 clean slate if none was recorded. The penalty is heavy, so the appeal is cheap — otherwise `slash()` itself
 becomes the attack surface.
+
+**Provenance that rides through transformation: `remember(..., derived_from=[ids])` (0.4.6).** All of the above —
+`slash`, a per-source influence budget, any source-level accountability — is silently un-countable the moment a
+memory is *transformed*: an app-side **summary** of five source-memories is a fresh record with no source, so
+`slash(source)` can't reach it and a cumulative cap can't attribute its slices. `mnemo`'s own consolidation never
+loses provenance (it links, never merges text), but LLM summarization/rewrite does. `remember(text,
+derived_from=[parent_ids])` closes that hole: the new record **inherits the union of its parents' canonical
+sources** as a `taint` (transitively — a summary-of-a-summary still carries the origin), and `slash(scope='source')`
+matches on *own source OR inherited taint*, so forfeiting a source also burns every derived summary it fed. The
+honest boundary: the app has to *declare* the derivation at the transformation step — `mnemo` can carry the taint
+through, but it can't recover provenance an opaque summary threw away. This is the substrate everything else is
+deterrence math on top of. Receipt: [`probes/triad_attacker_split.py`](probes/triad_attacker_split.py).
 
 ### Soft metadata filter: `recall(prefer=..., prefer_trust=...)` (0.4.1)
 
