@@ -1,0 +1,9 @@
+{
+ "n": 276,
+ "flat": 0.145,
+ "rrf_fonly@50": 0.326,
+ "prev_rerank_top100@50": 0.482,
+ "merged_pool_ceiling@150": 0.656,
+ "RERANK2_merged150_recall@50": 0.565,
+ "questions_missing_output": 0
+}

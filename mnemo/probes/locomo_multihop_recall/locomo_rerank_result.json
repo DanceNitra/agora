@@ -1,0 +1,9 @@
+{
+ "n": 276,
+ "flat": 0.145,
+ "rrf_fonly_top50 (pool@50)": 0.326,
+ "pool_ceiling@100": 0.514,
+ "RERANKED_recall@50": 0.482,
+ "questions_rerank_recovered": 43,
+ "questions_missing_rerank_output": 1
+}
