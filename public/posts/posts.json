@@ -1,5 +1,19 @@
 [
  {
+  "slug": "agent-memory-poisoning-layered-defense-residual",
+  "title": "A reality-check on agent-memory poisoning defenses: you price the residual, you don't close it",
+  "title_sk": "Reality-check pre obrany proti otrave pamäte agentov: rezíduum oceníš, nezavrieš",
+  "desc": "Layered defenses against agent-memory poisoning don't multiply into a wall. Four composition claims verified against the dependability, Sybil and change-point literature — all correct and all textbook — leave a priced, appealable residual on top of provenance that survives transformation. Plus five shipped mnemo primitives, each limit in the code.",
+  "desc_sk": "Vrstvené obrany proti otrave pamäte agentov sa nevynásobia do steny. Štyri kompozičné tvrdenia overené proti literatúre spoľahlivosti, Sybil a change-point — všetky správne a učebnicové — nechávajú oceniteľné, odvolateľné rezíduum nad provenance, čo prežije transformáciu. Plus päť shipnutých mnemo primitív, každý limit v kóde.",
+  "date": "2026-07-04",
+  "tags": "Agent memory · Memory poisoning · Security · Sybil · mnemo",
+  "tags_sk": "Pamäť agentov · Otrava pamäte · Bezpečnosť · Sybil · mnemo",
+  "kicker": "Agent memory security",
+  "kicker_sk": "Bezpečnosť pamäte agentov",
+  "read": 11,
+  "bilingual": true
+ },
+ {
   "slug": "reality-check-ai-memory-method-wins",
   "title": "A reality-check for AI-memory ‘method wins’: four of ours were resource confounds",
   "title_sk": "Reality-check pre „method wins“ v AI pamäti: štyri naše boli resource confoundy",

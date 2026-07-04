@@ -193,6 +193,23 @@ META = {
         "tags_sk": "AI pamäť · RAG · Reality check · Strong baselines · mnemo",
         "kicker": "Method-win reality check", "kicker_sk": "Reality-check method-wins",
     },
+    "agent-memory-poisoning-layered-defense-residual": {
+        "slug": "agent-memory-poisoning-layered-defense-residual",
+        "title": "A reality-check on agent-memory poisoning defenses: you price the residual, you don't close it",
+        "title_sk": "Reality-check pre obrany proti otrave pamäte agentov: rezíduum oceníš, nezavrieš",
+        "desc": "Layered defenses against agent-memory poisoning don't multiply into a wall. Four composition "
+                "claims verified against the dependability, Sybil and change-point literature — all correct and "
+                "all textbook — leave a priced, appealable residual on top of provenance that survives "
+                "transformation. Plus five shipped mnemo primitives, each limit in the code.",
+        "desc_sk": "Vrstvené obrany proti otrave pamäte agentov sa nevynásobia do steny. Štyri kompozičné "
+                   "tvrdenia overené proti literatúre spoľahlivosti, Sybil a change-point — všetky správne a "
+                   "učebnicové — nechávajú oceniteľné, odvolateľné rezíduum nad provenance, čo prežije "
+                   "transformáciu. Plus päť shipnutých mnemo primitív, každý limit v kóde.",
+        "date": "2026-07-04", "modified": "2026-07-04",
+        "tags": "Agent memory · Memory poisoning · Security · Sybil · mnemo",
+        "tags_sk": "Pamäť agentov · Otrava pamäte · Bezpečnosť · Sybil · mnemo",
+        "kicker": "Agent memory security", "kicker_sk": "Bezpečnosť pamäte agentov",
+    },
 }
 
 _STAT = re.compile(r"^[+\-−]?[\d.,\s]+(?:%|×|x|SD|σ)?$|^\d+[\s,]*(?:[–-]\s*\d+)?\s*%$")
