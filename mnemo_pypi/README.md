@@ -6,7 +6,7 @@
 
 *Memory is the mother of the Muses. An agent with no memory has no ideas.*
 
-`pip install agora-mnemo` · [PyPI](https://pypi.org/project/agora-mnemo/) · [Hugging Face](https://huggingface.co/Danchi17/mnemo) · [DOI 10.5281/zenodo.21128549](https://doi.org/10.5281/zenodo.21128549) · MIT · v0.4.2
+`pip install agora-mnemo` · [PyPI](https://pypi.org/project/agora-mnemo/) · [Hugging Face](https://huggingface.co/Danchi17/mnemo) · [DOI 10.5281/zenodo.21128549](https://doi.org/10.5281/zenodo.21128549) · MIT · v0.4.3
 
 </div>
 
@@ -69,6 +69,20 @@ too (recall 1.00 corroborated vs 0.08 uncorroborated), so this is for **adversar
 use. It raises attacker cost (defeating it needs ≥3 coordinated records with ≥2 forged independent
 provenances), it does not make poisoning impossible. Receipts: [`probes/agentpoison_influence_gate.py`](probes/agentpoison_influence_gate.py),
 [`probes/agentpoison_influence_gate_validation.py`](probes/agentpoison_influence_gate_validation.py).
+
+### Know before you gate: `influence_gate_report()` (0.4.3)
+
+The influence gate is not free, and its cost is **density-dependent** — so check it before you rely on it.
+`influence_gate_report()` returns the gate's **live cost on your store** (`would_block_frac` = the fraction of
+active memories it would filter, plus the corroboration breakdown and an `advice` string). Why it matters, and
+both measured on [`probes/oracle_separation_density.py`](probes/oracle_separation_density.py) (controlled corpus,
+real embeddings): **(1) density = affordability** — the fraction of *legitimate* high-stakes recalls the gate
+blocks falls from **~51% when each memory is used ~once (sparse)** to **~6% when each is used ~8× (dense)**,
+because a legit memory only earns standing through repeated successful use; in a thin store the gate can't tell a
+poison from a newcomer and filters most legit recalls (the classic *cheap-pseudonyms / whitewashing* tax, Friedman
+& Resnick 2001). **(2) The gate rides entirely on an un-self-gradable oracle** — a MINJA-style self-graded outcome
+(arXiv:2503.03704) collapses it at *every* density, even inverting it (blocking legit more than poison), so never
+let recalled content drive its own `credit()`; issue outcomes from the application, on real resolved work.
 
 ### Soft metadata filter: `recall(prefer=..., prefer_trust=...)` (0.4.1)
 

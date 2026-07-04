@@ -80,7 +80,7 @@ def new_receipt_keypair():
     return (sk.private_bytes(_ser.Encoding.Raw, _ser.PrivateFormat.Raw, _ser.NoEncryption()).hex(),
             sk.public_key().public_bytes(_ser.Encoding.Raw, _ser.PublicFormat.Raw).hex())
 
-__version__ = "0.4.2"
+__version__ = "0.4.3"
 _WORD = re.compile(r"[a-z0-9][a-z0-9\-']{2,}")
 _STOP = frozenset("the a an of for to in on and or is are was were be been with this that it its as "
                   "by at from into our we us you your he she they them his her their not no".split())
@@ -517,7 +517,10 @@ class Mnemo:
         recalled-but-uncorroborated memory should inform but not unilaterally drive an action. It RAISES
         attacker cost (a single free injection is filtered; defeating it needs >=3 coordinated records with
         >=2 independent forged provenances) rather than making poisoning impossible. Reversible: default
-        False = legacy recall.
+        False = legacy recall. Call `influence_gate_report()` first to see this gate's LIVE cost on your store
+        (it is density-dependent: ~51% of legit recalls filtered when memories are used ~once, ~6% when dense
+        — mnemo/probes/oracle_separation_density.py) and the load-bearing caveat that it rides on an
+        un-self-gradable credit() oracle.
 
         prefer / prefer_trust (OPT-IN, default None -> zero behavior change): a SOFT, trust-weighted metadata
         filter. Unlike `where` (a HARD filter that DELETES non-matching records — so a wrong filter hard-
@@ -804,6 +807,44 @@ class Mnemo:
         if rec.get("mtype") == "semantic":
             return True
         return Mnemo._distinct_sources(rec.get("links"), by_id) >= 2
+
+    def influence_gate_report(self) -> dict:
+        """Report the LIVE COST of the influence gate (recall(influence_only=True)) on THIS store, so you can
+        judge whether it is affordable before enabling it. The gate keeps only CORROBORATED memories
+        (_is_corroborated); its cost is that not-yet-earned LEGITIMATE memories are filtered too, and that cost
+        is DENSITY-DEPENDENT. MEASURED on a controlled corpus with real embeddings
+        (mnemo/probes/oracle_separation_density.py): the fraction of legitimate high-stakes recalls the gate
+        blocks falls from ~51% when each memory is used ~once (sparse) to ~6% when each is used ~8x (dense),
+        because a legit memory only earns standing through repeated successful use — so in a SPARSE store the
+        gate is expensive (it filters most legit recalls); grow density, or credit() real outcomes, before
+        relying on influence_only for anything but adversarial/untrusted ingestion.
+        A SECOND, load-bearing caveat the same probe measured: the gate rides ENTIRELY on credit() being an
+        outcome oracle the attacker CANNOT SELF-GRADE. A MINJA-style self-graded outcome (arXiv:2503.03704)
+        collapses the gate at every density — it can even block legit MORE than poison. Never let recalled
+        memory content drive its own credit(); issue outcomes from the application, on real resolved work.
+        Returns {active, corroborated, corroborated_frac, would_block_frac, by_path{earned_outcome, semantic,
+        multi_source}, advice}. Read-only; no side effects."""
+        byid = {x["id"]: x for x in self.items}
+        active = [r for r in self.items if r.get("status") == "active"]
+        n = len(active)
+        earned = sem = multi = corr = 0
+        for r in active:
+            g = float(r.get("good", 0) or 0); b = float(r.get("bad", 0) or 0)
+            if g > 0 and g >= b:
+                corr += 1; earned += 1
+            elif r.get("mtype") == "semantic":
+                corr += 1; sem += 1
+            elif self._distinct_sources(r.get("links"), byid) >= 2:
+                corr += 1; multi += 1
+        frac = (corr / n) if n else 0.0
+        advice = ("cheap - most active memories are corroborated" if frac >= 0.7 else
+                  "affordable" if frac >= 0.4 else
+                  "expensive - store too sparse; influence_only will filter most legit recalls. Grow density "
+                  "or credit() real outcomes first, or use it only for untrusted-ingestion defense.")
+        return {"active": n, "corroborated": corr, "corroborated_frac": round(frac, 3),
+                "would_block_frac": round(1.0 - frac, 3),
+                "by_path": {"earned_outcome": earned, "semantic": sem, "multi_source": multi},
+                "advice": advice}
 
     @staticmethod
     def _cond_match(r: dict, conds: dict) -> bool:
