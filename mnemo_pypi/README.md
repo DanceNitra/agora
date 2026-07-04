@@ -6,7 +6,7 @@
 
 *Memory is the mother of the Muses. An agent with no memory has no ideas.*
 
-`pip install agora-mnemo` · [PyPI](https://pypi.org/project/agora-mnemo/) · [Hugging Face](https://huggingface.co/Danchi17/mnemo) · [DOI 10.5281/zenodo.21128549](https://doi.org/10.5281/zenodo.21128549) · MIT · v0.4.8
+`pip install agora-mnemo` · [PyPI](https://pypi.org/project/agora-mnemo/) · [Hugging Face](https://huggingface.co/Danchi17/mnemo) · [DOI 10.5281/zenodo.21128549](https://doi.org/10.5281/zenodo.21128549) · MIT · v0.4.9
 
 </div>
 
@@ -143,6 +143,39 @@ forward influence (reversible) and queue a **human** review; confirm the `slash(
 call away. `auto_slash=True` is an explicit opt-in for a high-integrity, un-self-gradable oracle only. Receipts:
 [`probes/triad_attacker_split.py`](probes/triad_attacker_split.py),
 [`probes/reversibility_gate_frontier.py`](probes/reversibility_gate_frontier.py).
+
+**Bound the one residual the rate-detector can't: `spend_irreversible()` (0.4.9).** `monitor`'s `k` is a
+tolerated *rate*, so the **strictly-below-`k`** attacker gives the CUSUM negative drift → no detection power above
+the baseline false-alarm rate, netting `k × exposure` — but exposure is **per-window**, so over an unbounded
+horizon its *total* irreversible blast grows without bound. Capping a rate never bounds an integral.
+`spend_irreversible(ids, amount, budget)` caps the integral directly: a per-source **lifetime budget on
+irreversible influence**, charged through the `derived_from` taint (the tightest contributing source binds — an
+action tainted by an exhausted source is denied). Meter it **only on the irreversible tail**: reversible influence
+is never charged, so genuinely-good sources keep *unbounded* reversible influence and only their irreversible tail
+is finite. It is **not** refunded by `restore()` — an irreversible action can't be un-done, so its integral is
+permanent (raise a reviewed source's ceiling by hand, not by a cheap auto-refund). The honest read: you don't
+remove the residual, you **price it (`k`), bound it (this lifetime budget), and put a reversible human gate
+(`slash`/`restore`) on the irreversible tail** — but this is **not a closed decomposition**, because all three
+lean on a fourth, unbounded axis: **sound attribution** (correctly assigning an action to its source and labeling
+its irreversibility). Measured: [`probes/lifetime_budget_bound.py`](probes/lifetime_budget_bound.py) shows the
+same undetectable below-`k` attacker's total blast go from unbounded (50→800 over the horizon) to **capped at
+`budget` regardless of horizon**, while a good source keeps 10 000 free reversible uses.
+
+Honest limits (this **relocates** the residual, it does not close it): (1) the budget is **per-source, so it
+doesn't escape Sybil** — a whitewashing attacker who mints fresh cheap identities gets a fresh `budget` each, so
+system-wide blast is `budget × (#identities)`; the identity count is bounded by a *different* axis (a
+standing-independent capability ceiling / an identity cost; Douceur 2002, Friedman–Resnick 2001), so this bounds a
+*known* source, not an adversary who can mint new ones. (2) **Refund-free forfeiture is a griefing vector** — get
+bad irreversible actions attributed or taint-linked to a rival's source and you permanently exhaust its budget
+(RepTrap on the budget axis), the same weapon the `auto_slash`-off default avoids, so tune `budget` and the
+reversible/irreversible split conservatively. (3) It assumes the app can label an action's **irreversibility and
+blast `amount`** at spend time; `amount` is caller-supplied and one action of size=`budget` exhausts a source in
+one shot (so the guarantee is "≤ `budget` per source", `k` doesn't enter it), and if the classifier is
+attacker-influenceable the meter leaks. Prior art (textbook; the shipped plumbing on an agent-memory core is
+what's new): a total-budget-on-cumulative-cost is the differential-privacy **privacy budget** (a total `ε` caps
+cumulative leakage across queries under composition; Dwork & Roth 2014), an SRE **error budget**, a **VaR / loss
+limit**, and Sagas' **compensable-vs-non-compensable** transaction split (Garcia-Molina & Salem 1987) — "cap the
+integral, not the rate."
 
 ### Soft metadata filter: `recall(prefer=..., prefer_trust=...)` (0.4.1)
 

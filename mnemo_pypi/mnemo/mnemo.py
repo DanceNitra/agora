@@ -80,7 +80,7 @@ def new_receipt_keypair():
     return (sk.private_bytes(_ser.Encoding.Raw, _ser.PrivateFormat.Raw, _ser.NoEncryption()).hex(),
             sk.public_key().public_bytes(_ser.Encoding.Raw, _ser.PublicFormat.Raw).hex())
 
-__version__ = "0.4.8"
+__version__ = "0.4.9"
 _WORD = re.compile(r"[a-z0-9][a-z0-9\-']{2,}")
 _STOP = frozenset("the a an of for to in on and or is are was were be been with this that it its as "
                   "by at from into our we us you your he she they them his her their not no".split())
@@ -1108,6 +1108,89 @@ class Mnemo:
                 S[s] = 0.0                                    # reset the breached statistic after firing
         self._save_cusum()
         return {"alarms": alarms, "slashed": slashed, "cusum": {k2: round(v, 3) for k2, v in S.items()}}
+
+    def _budget_state(self) -> dict:
+        """Per-source CUMULATIVE irreversible-influence spend, lazily loaded from a side file (like the CUSUM
+        state) so the lifetime budget survives restarts — a patient attacker must not reset its spent budget by
+        spanning sessions. In-memory-only when the store has no path."""
+        if getattr(self, "_irrev", None) is None:
+            self._irrev = {}
+            if self.path:
+                try:
+                    self._irrev = json.loads((self.path.with_name(self.path.name + ".irrev.json"))
+                                             .read_text(encoding="utf-8"))
+                except Exception:
+                    self._irrev = {}
+        return self._irrev
+
+    def _save_budget(self):
+        if self.path:
+            try:
+                (self.path.with_name(self.path.name + ".irrev.json")).write_text(
+                    json.dumps(self._irrev, ensure_ascii=False), encoding="utf-8")
+            except Exception:
+                pass
+
+    def spend_irreversible(self, ids, amount: float = 1.0, budget: float = 1.0) -> dict:
+        """Per-source LIFETIME budget on IRREVERSIBLE influence — the integral cap that bounds the one residual
+        the rate-detector (monitor) provably CANNOT: the strictly-below-k patient attacker. monitor()'s k is a
+        tolerated RATE, so an attacker holding bad-rate BELOW k gives the CUSUM negative drift -> no detection
+        power above the baseline false-alarm rate, netting k x exposure — and exposure is PER-WINDOW, so over an
+        unbounded horizon its TOTAL irreversible blast grows without bound. Capping a rate never bounds the
+        integral. This caps the integral directly: each irreversible (hard-to-undo) action an application is about
+        to take is metered against the LIFETIME budget of every source that influenced it (own source OR inherited
+        derived_from taint). Once a source has spent its budget, further irreversible actions carrying its influence
+        are DENIED — so THAT source's total irreversible damage is bounded by the budget, a finite number YOU
+        choose, not a rate you tolerate forever. This bounds a KNOWN source only: a Sybil/whitewashing attacker
+        gets a fresh budget per identity, so the identity count (bounded by a DIFFERENT axis — a capability ceiling
+        or identity cost; Douceur, Friedman-Resnick) is what caps the total, not this — the budget relocates the
+        residual to the identity axis, it does not close it.
+
+        Call it as the gate on the IRREVERSIBLE TAIL ONLY: spend_irreversible(recalled_ids, amount=blast) returns
+        {'allowed': bool}; iff allowed, the caller performs the irreversible action and the spend is booked
+        (monotonic). REVERSIBLE influence is never metered — genuinely-good sources keep UNBOUNDED reversible
+        influence and only their irreversible tail is finite (the everyone-pays shape of a hard capability ceiling,
+        but charged only where the action is actually irreversible). The tightest contributing source binds: an
+        action tainted by an exhausted source is blocked, exactly as slash() burns every derived summary a caught
+        source fed.
+
+        Orthogonal to standing: NOT refunded by restore() (an irreversible action cannot be un-done, so its
+        integral is permanent) and does NOT read good/bad. It composes with the other axes as price(k, monitor) +
+        BOUND(this lifetime budget) + a reversible human gate(slash/restore) on the irreversible tail — but this is
+        NOT a closed decomposition: all three lean on a fourth, unbounded axis, SOUND ATTRIBUTION — the budget, the
+        rate detector, and the gate all assume the app can correctly assign an action to its source and correctly
+        label its irreversibility + blast `amount`; a misattributed or mislabeled action (or an attacker-influenced
+        classifier) escapes all of them. Two more honest limits: refund-free forfeiture is itself a griefing vector
+        (get bad irreversible actions attributed/taint-linked to a rival's source and you permanently exhaust its
+        budget — RepTrap on the budget axis), and `amount` is caller-supplied so one action of size=budget exhausts
+        a source in a single shot (k never enters the guarantee; the bound is the budget, per source). Prior art
+        (textbook; the shipped plumbing is what's new): a total-budget-on-cumulative-cost is the differential-
+        privacy privacy budget (a total epsilon caps cumulative leakage across queries under composition; Dwork &
+        Roth 2014), an SRE error budget, a VaR / loss limit, and Sagas' compensable-vs-non-compensable split
+        (Garcia-Molina & Salem 1987) — 'cap the integral, not the rate'. Persists to a side file (cross-session).
+        Returns {allowed, exhausted, sources, spent}. Deliberately no cheap programmatic refund — raise a reviewed
+        source's ceiling by calling with a higher budget or editing the side file by hand."""
+        by_id = {x["id"]: x for x in self.items}
+        recs = [by_id[i] for i in (ids or []) if i in by_id]
+        srcs = sorted(set().union(*(Mnemo._rec_sources(r) for r in recs)) if recs else set())
+        B = self._budget_state()
+        # the tightest contributing source binds: deny if ANY contributing source would exceed its lifetime budget
+        exhausted = [s for s in srcs if float(B.get(s, 0.0)) + float(amount) > float(budget)]
+        allowed = not exhausted
+        if allowed:
+            for s in srcs:
+                B[s] = float(B.get(s, 0.0)) + float(amount)   # monotonic; never decremented
+            self._save_budget()
+        return {"allowed": allowed, "exhausted": exhausted, "sources": srcs,
+                "spent": {s: round(float(B.get(s, 0.0)), 4) for s in srcs}}
+
+    def irreversible_budget_report(self, budget: float = 1.0) -> dict:
+        """Audit view of the per-source lifetime irreversible-influence budget (spend_irreversible): for every
+        source that has spent anything, its cumulative spent / remaining / whether it is exhausted. Read-only."""
+        B = self._budget_state()
+        return {s: {"spent": round(float(v), 4), "remaining": round(max(0.0, float(budget) - float(v)), 4),
+                    "exhausted": float(v) >= float(budget)}
+                for s, v in sorted(B.items())}
 
     def _effective_value(self, r: dict, now: float) -> float:
         """Recall weight = stored value decayed by time since last access, at the memory's TYPE
