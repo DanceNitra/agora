@@ -1,0 +1,28 @@
+{
+ "per_length": {
+  "5k": {
+   "needle_acc": 1.0,
+   "synth_acc": 0.75,
+   "tokens": 4877
+  },
+  "25k": {
+   "needle_acc": 1.0,
+   "synth_acc": 0.375,
+   "tokens": 25050
+  },
+  "60k": {
+   "needle_acc": 1.0,
+   "synth_acc": 0.25,
+   "tokens": 61874
+  },
+  "110k": {
+   "needle_acc": 1.0,
+   "synth_acc": 0.375,
+   "tokens": 114865
+  }
+ },
+ "synth_drop_short_to_long": 0.375,
+ "needle_at_longest": 1.0,
+ "synth_at_longest": 0.375,
+ "verdict": "FAILED for CAG's 'it must be somewhere => correct answer' ON SYNTHESIS \u2014 needle (single lookup) holds while read-everything aggregation collapses with length. Long context does NOT replace retrieval for aggregation/synthesis. Context-rot REPRODUCED."
+}

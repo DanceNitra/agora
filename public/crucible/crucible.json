@@ -1,20 +1,38 @@
 {
  "name": "The Crucible — machine replication ledger",
  "description": "Scientific and technical claims rebuilt as minimal computational models and tested. REPRODUCED = the mechanism holds in a minimal model; FAILED = it does not; NOT_COMPUTABLE = no simulable core (an honest pass).",
- "generated": "2026-07-01",
+ "generated": "2026-07-04",
  "counts": {
-  "REPRODUCED": 42,
-  "FAILED": 14,
+  "REPRODUCED": 43,
+  "FAILED": 15,
   "NOT_COMPUTABLE": 15
  },
  "entries": [
+  {
+   "claim": "A big-enough context window replaces retrieval (CAG / \"RAG is dead\"): preload the whole corpus into long context and \"it must be somewhere\" => the model answers correctly.",
+   "source": "CAG / \"long context kills RAG\" viral discourse; CAG paper = Chan et al. 2024 (arXiv:2412.15605), which itself scopes replacement to small constrained knowledge bases.",
+   "verdict": "FAILED",
+   "note": "Judge-free probe on one synthetic structured log at 5k/25k/60k/110k tokens, two task families. NEEDLE (single-fact lookup) = 1.00 at every length incl. 110k; SYNTH (read-everything count/filter aggregation) collapses 0.75->~0.25-0.375 by ~25k and stays there. Verdict FAILED for CAG *on synthesis*; needle lookup survives long context fine, so blanket \"context rot kills recall\" is also too strong. It is the task type, not the length. Replicates lost-in-the-middle (Liu 2023/TACL 2024), RULER (Hsieh/NVIDIA 2024), NoLiMa (2502.05167), Chroma context-rot (2025, non-peer-reviewed). HONEST LIMITS: n=8 synth Qs/length (the 0.75->0.3 drop is Fisher p~0.13, credible mainly by matching the replicated literature); one frontier model (exact model not logged); even at 5k synth is 0.75 so part of the failure is exhaustive arithmetic the model cannot do at any length -> the real fix for count/filter is a TOOL, not retrieval. Probe: mnemo/probes/ragdead (generator + independent gold-re-derivation scorer). Post: public/posts/does-long-context-kill-rag.html.",
+   "lab_id": "ragdead",
+   "code": "",
+   "date": "2026-06-17"
+  },
+  {
+   "claim": "k-clique percolation threshold in Erdos-Renyi graphs is p_c(k)=1/[(k-1)N]^(1/(k-1))",
+   "source": "Derenyi, Palla, Vicsek 2005 - Clique Percolation in Random Networks",
+   "verdict": "REPRODUCED",
+   "note": "k=3 (triangle percolation, p_c=1/sqrt(2N)): largest 3-clique community 0.018 below p_c, 0.999 by 1.8x p_c, onset at the predicted threshold (N=350). Scoped to k=3; k=4 not run (clique-community compute exceeded the 60s Lab budget).",
+   "lab_id": "9298e0",
+   "code": "",
+   "date": "2026-07-02"
+  },
   {
    "claim": "Internet AS-level topology follows a power-law degree distribution",
    "source": "Faloutsos et al. 1999 SIGCOMM; tested vs exponential/log-normal via Clauset-Shalizi-Newman 2009 SIAM Rev., cf. Broido & Clauset 2019 Nat Commun 10:1017",
    "verdict": "FAILED",
    "note": "Real 2000 AS data (SNAP, 6474 nodes), CSN MLE: power-law (alpha=2.15, matches Faloutsos exponent) beats exponential (p=0.0002) but ties log-normal (p=0.616, NS). Confirms Broido-Clauset: <5% of networks are truly scale-free.",
    "lab_id": "4399e9",
-   "code": "https://github.com/DanceNitra/agora/blob/main/agora_output/lab/20260701_crucible_powerlaw_internet_topology.py",
+   "code": "",
    "date": "2026-07-01"
   },
   {

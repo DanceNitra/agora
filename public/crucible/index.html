@@ -5,7 +5,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>The Crucible &middot; a machine that rebuilds claims in code &middot; Agora</title>
-<meta name="description" content="A public ledger of scientific and technical claims rebuilt as minimal computational models and tested in code: 42 reproduced, 14 failed, 4 honest passes. Every verdict ships runnable code and a measured number.">
+<meta name="description" content="A public ledger of scientific and technical claims rebuilt as minimal computational models and tested in code: 43 reproduced, 15 failed, 4 honest passes. Every verdict ships runnable code and a measured number.">
 <link rel="canonical" href="https://dancenitra.github.io/agora/public/crucible/">
 <meta property="og:type" content="website">
 <meta property="og:title" content="The Crucible — claims, rebuilt in code and tested">
@@ -174,8 +174,8 @@
   rarest export, published here), and <b>not computable</b> when there&rsquo;s no simulable core.
   Every verdict ships a measured number and the code that produced it.</p>
   <div class="tally">
-    <div class="t ok"><div class="num">42</div><div class="lbl">Reproduced</div></div>
-    <div class="t fail"><div class="num">14</div><div class="lbl">Failed</div></div>
+    <div class="t ok"><div class="num">43</div><div class="lbl">Reproduced</div></div>
+    <div class="t fail"><div class="num">15</div><div class="lbl">Failed</div></div>
     <div class="t"><div class="num">4</div><div class="lbl">Honest passes</div></div>
   </div>
   <div class="dataset">Open data &mdash; <a href="crucible.json">the full ledger as JSON</a> &middot; now a citable dataset on <a href="https://huggingface.co/datasets/Danchi17/folklore-index" target="_blank" rel="noopener">Hugging&nbsp;Face &rarr;</a><br><span class="loadline"><code>datasets.load_dataset("Danchi17/folklore-index")</code></span></div>
@@ -195,7 +195,7 @@
     </div>
   </section>
 <section class="ledger"><div class="wrap">
-  <div class="sechead"><h2>The ledger</h2><div class="sub">56 claims rebuilt &amp; tested &middot; newest first</div></div>
+  <div class="sechead"><h2>The ledger</h2><div class="sub">58 claims rebuilt &amp; tested &middot; newest first</div></div>
   <div class="filters">
     <button class="on" data-f="all">All</button>
     <button data-f="REPRODUCED">Reproduced</button>
@@ -206,10 +206,30 @@
         <div class="crail"></div>
         <div class="cbody">
           <div class="chead"><span class="cv">FAILED</span>
+            <span class="cfield"></span></div>
+          <h3>A big-enough context window replaces retrieval (CAG / &quot;RAG is dead&quot;): preload the whole co</h3>
+          <p class="cresult">Judge-free probe on one synthetic structured log at 5k/25k/60k/110k tokens, two task families. NEEDLE (single-fact lookup) = 1.00 at every length incl. 110k; SYNTH (read-everything count/filter aggregation) collapses 0.75-&gt;~0.25-0.375 by ~25k and stays there. Verdict FAILED for CAG *on synthesis*; needle lookup survives long context fine, so blanket &quot;context rot kills recall&quot; is also too strong. It is the task type, not the length. Replicates lost-in-the-middle (Liu 2023/TACL 2024), RULER (Hsieh/NVIDIA 2024), NoLiMa (2502.05167), Chroma context-rot (2025, non-peer-reviewed). HONEST LIMITS: n=8 synth Qs/length (the 0.75-&gt;0.3 drop is Fisher p~0.13, credible mainly by matching the replicated literature); one frontier model (exact model not logged); even at 5k synth is 0.75 so part of the failure is exhaustive arithmetic the model cannot do at any length -&gt; the real fix for count/filter is a TOOL, not retrieval. Probe: mnemo/probes/ragdead (generator + independent gold-re-derivation scorer). Post: public/posts/does-long-context-kill-rag.html.</p>
+          <div class="cfoot"><span class="cyear">CAG / &amp;quot;long context kills RAG&amp;quot; viral</span></div>
+        </div>
+      </article>
+      <article class="card ok" data-v="REPRODUCED" data-reveal>
+        <div class="crail"></div>
+        <div class="cbody">
+          <div class="chead"><span class="cv">REPRODUCED</span>
+            <span class="cfield"></span></div>
+          <h3>k-clique percolation threshold in Erdos-Renyi graphs is p_c(k)=1/[(k-1)N]^(1/(k-1))</h3>
+          <p class="cresult">k=3 (triangle percolation, p_c=1/sqrt(2N)): largest 3-clique community 0.018 below p_c, 0.999 by 1.8x p_c, onset at the predicted threshold (N=350). Scoped to k=3; k=4 not run (clique-community compute exceeded the 60s Lab budget).</p>
+          <div class="cfoot"><span class="cyear">Derenyi, Palla, Vicsek 2005 - Clique Percolati</span></div>
+        </div>
+      </article>
+      <article class="card fail" data-v="FAILED" data-reveal>
+        <div class="crail"></div>
+        <div class="cbody">
+          <div class="chead"><span class="cv">FAILED</span>
             <span class="cfield">Network science</span></div>
           <h3>The &#x27;scale-free Internet&#x27; claim doesn&#x27;t survive the rigorous test</h3>
           <p class="cresult">On real 2000-era AS-topology data (6,474 nodes), a power-law fit (alpha=2.15, matching Faloutsos&#x27;s own reported exponent) beats a naive exponential baseline (p=0.0002) but is statistically INDISTINGUISHABLE from log-normal (p=0.616) -- exactly the pattern Broido &amp; Clauset (2019) found across most real networks.</p>
-          <div class="cfoot"><span class="cyear">Faloutsos, Faloutsos &amp; Faloutsos 1999 (SIGCOMM)</span><a class="code" href="https://github.com/DanceNitra/agora/blob/main/agora_output/lab/20260701_crucible_powerlaw_internet_topology.py" target="_blank" rel="noopener">runnable model &rarr;</a></div>
+          <div class="cfoot"><span class="cyear">Faloutsos, Faloutsos &amp; Faloutsos 1999 (SIGCOMM)</span></div>
         </div>
       </article>
       <article class="card fail" data-v="FAILED" data-reveal>
@@ -789,7 +809,7 @@
 
 <footer><div class="wrap">
   <span>Agora &mdash; autonomous research OS &middot; The Crucible</span>
-  <span>updated 2026-07-01 &middot; <a href="https://github.com/DanceNitra/agora" target="_blank" rel="noopener">source</a></span>
+  <span>updated 2026-07-04 &middot; <a href="https://github.com/DanceNitra/agora" target="_blank" rel="noopener">source</a></span>
 </div></footer>
 
 <script>
