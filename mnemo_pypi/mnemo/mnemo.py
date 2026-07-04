@@ -80,7 +80,7 @@ def new_receipt_keypair():
     return (sk.private_bytes(_ser.Encoding.Raw, _ser.PrivateFormat.Raw, _ser.NoEncryption()).hex(),
             sk.public_key().public_bytes(_ser.Encoding.Raw, _ser.PublicFormat.Raw).hex())
 
-__version__ = "0.4.6"
+__version__ = "0.4.7"
 _WORD = re.compile(r"[a-z0-9][a-z0-9\-']{2,}")
 _STOP = frozenset("the a an of for to in on and or is are was were be been with this that it its as "
                   "by at from into our we us you your he she they them his her their not no".split())
@@ -922,6 +922,15 @@ class Mnemo:
         b = float(r.get("bad", 0) or 0)
         return (g + 1.0) / (g + b + 2.0)
 
+    @staticmethod
+    def _outcome_good(outcome) -> bool:
+        """Parse a credit/monitor outcome: bool, a sign (>0 good), or a verdict string."""
+        if isinstance(outcome, bool):
+            return outcome
+        if isinstance(outcome, (int, float)):
+            return outcome > 0
+        return str(outcome).strip().lower() in ("good", "right", "correct", "reproduced", "hit", "true", "win", "+")
+
     def credit(self, ids, outcome, weight: float = 1.0) -> dict:
         """Close the accuracy loop onto the substrate. When the work a set of memories was recalled into
         gets a real verdict (a forecast resolves, a replication is ruled REPRODUCED/FAILED, a hypothesis is
@@ -929,13 +938,7 @@ class Mnemo:
         nudged so future recall ranks by WAS-IT-RIGHT, not merely was-it-recalled. Append-only to the
         counts; never edits raw text. `outcome` may be a bool, a sign (>0 good), or a verdict string
         (good/right/correct/reproduced/hit vs bad/wrong/failed/miss)."""
-        if isinstance(outcome, bool):
-            good = outcome
-        elif isinstance(outcome, (int, float)):
-            good = outcome > 0
-        else:
-            s = str(outcome).strip().lower()
-            good = s in ("good", "right", "correct", "reproduced", "hit", "true", "win", "+")
+        good = Mnemo._outcome_good(outcome)
         by_id = {x["id"]: x for x in self.items}
         key, updated = ("good" if good else "bad"), []
         for i in (ids or []):
@@ -1028,6 +1031,67 @@ class Mnemo:
         if restored:
             self._save()
         return {"restored": len(restored), "sources": sources, "ids": restored}
+
+    def _cusum_state(self) -> dict:
+        """Per-source CUSUM statistics, lazily loaded from a side file (like write receipts) so a patient
+        attacker can't reset the detector by spanning sessions. In-memory-only when the store has no path."""
+        if getattr(self, "_cusum", None) is None:
+            self._cusum = {}
+            if self.path:
+                try:
+                    self._cusum = json.loads((self.path.with_name(self.path.name + ".cusum.json"))
+                                             .read_text(encoding="utf-8"))
+                except Exception:
+                    self._cusum = {}
+        return self._cusum
+
+    def _save_cusum(self):
+        if self.path:
+            try:
+                (self.path.with_name(self.path.name + ".cusum.json")).write_text(
+                    json.dumps(self._cusum, ensure_ascii=False), encoding="utf-8")
+            except Exception:
+                pass
+
+    def monitor(self, ids, outcome, k: float = 0.3, h: float = 3.0,
+                auto_slash: bool = True, weight: float = 1.0) -> dict:
+        """Per-SOURCE cumulative (CUSUM) poison detector whose breach FIRES slash() — the unified control
+        (jacksonxly). Retroactive slashing cannot fire per-slice: per-slice P(detected)~=0 and the deterrence
+        bond scales with 1/P(detected), so the required penalty blows up on exactly the slow salami attack. So
+        the slash is triggered by a CUMULATIVE detector: a one-sided CUSUM on each source's bad-rate above a
+        benign reference k. When a source's statistic breaches h, that budget-breach IS the detection event and
+        the slash trigger AT ONCE — one mechanism, not two. Attribution rides the derived_from taint: a bad
+        outcome on a summary charges ALL its inherited sources, so slices that were later summarized still
+        accumulate against their origin — the per-source cap and the slash are the same plumbing on the
+        provenance substrate.
+        Drop-in for credit() (it also records the per-memory good/bad standing): monitor(recalled_ids, outcome).
+        CUSUM per attributed source: S = max(0, S + weight*(bad - k)); alarm at S >= h; on alarm (auto_slash)
+        forfeit that source's accrued standing via slash(scope='source') and reset S. Tuning: `k` in (0,1) is
+        the benign bad-rate you tolerate (drift reference); `h` sets the false-alarm rate (larger h -> longer
+        average run length between false alarms) and the detection delay ~ h/(true_rate - k) — the irreducible
+        Lorden/CUSUM floor (no gate shrinks it). State persists to a side file. Returns
+        {alarms, slashed, cusum}. Undo a false alarm with restore()."""
+        self.credit(ids, outcome, weight)                    # standing accrues normally...
+        bad = 0.0 if Mnemo._outcome_good(outcome) else 1.0
+        by_id = {x["id"]: x for x in self.items}
+        recs = [by_id[i] for i in (ids or []) if i in by_id]
+        srcs = set().union(*(Mnemo._rec_sources(r) for r in recs)) if recs else set()
+        S = self._cusum_state()
+        alarms = []
+        for s in srcs:
+            S[s] = max(0.0, float(S.get(s, 0.0)) + float(weight) * (bad - k))
+            if S[s] >= h:
+                alarms.append(s)
+        slashed = {}
+        if auto_slash and alarms:
+            for s in alarms:
+                rep = next((r["id"] for r in self.items
+                            if r.get("status") == "active" and s in Mnemo._rec_sources(r)), None)
+                if rep:
+                    slashed[s] = self.slash([rep], scope="source")["slashed"]
+                S[s] = 0.0                                    # reset the breached statistic after firing
+        self._save_cusum()
+        return {"alarms": alarms, "slashed": slashed, "cusum": {k2: round(v, 3) for k2, v in S.items()}}
 
     def _effective_value(self, r: dict, now: float) -> float:
         """Recall weight = stored value decayed by time since last access, at the memory's TYPE
