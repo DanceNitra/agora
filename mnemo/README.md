@@ -6,7 +6,7 @@
 
 *Memory is the mother of the Muses. An agent with no memory has no ideas.*
 
-`pip install agora-mnemo` · [PyPI](https://pypi.org/project/agora-mnemo/) · [Hugging Face](https://huggingface.co/Danchi17/mnemo) · [DOI 10.5281/zenodo.21128549](https://doi.org/10.5281/zenodo.21128549) · MIT · v0.5.0
+`pip install agora-mnemo` · [PyPI](https://pypi.org/project/agora-mnemo/) · [Hugging Face](https://huggingface.co/Danchi17/mnemo) · [DOI 10.5281/zenodo.21128549](https://doi.org/10.5281/zenodo.21128549) · MIT · v0.5.1
 
 </div>
 
@@ -188,14 +188,19 @@ active memory whose *current* sources no longer match what was committed. **A re
 Measured: [`probes/attribution_floor.py`](probes/attribution_floor.py) — a source relabel and a taint-strip are
 both **detected**; a legitimate `slash` does **not** false-alarm; editing a past receipt breaks the hash chain.
 
-**The honest limit (this is the whole point of the thread's end): tamper-evidence ≠ correctness.** A source that
-was *wrong at write time* — an attacker who controls the labeling channel (MINJA-style) and asserts a benign
-source — is committed faithfully and `verify_attribution()` **cannot** tell it was wrong. That is the genuinely-open
-**oracle problem**, untouched. What ships here is the tamper-evident *slice* of the floor (a relabel can't be
-silent); the correctness slice is the small, sharp, unshipped problem. Prior art: tamper-evident hash-chains
-(Haber & Stornetta 1991) + signed provenance — the same design as our
-[agent-receipts](https://github.com/DanceNitra/agora) work; `receipt_key=…` adds Ed25519 so an attacker who can
-recompute the whole chain tail still can't forge a clean history.
+**Two honest limits — read this as tamper-EVIDENT, not tamper-PROOF.** (1) **Tamper-evidence ≠ correctness.** A
+source that was *wrong at write time* — an attacker who controls the labeling channel (MINJA-style) and asserts a
+benign source — is committed faithfully and `verify_attribution()` **cannot** tell it was wrong. That is the
+genuinely-open **oracle problem**, untouched. (2) **The chain is only tamper-evident if it is signed (offline key)
+or externally anchored.** Unsigned — the default — an attacker who can silently relabel `rec["source"]` can equally
+recompute the whole sidecar receipt chain with the new sources and pass the check, so bare `verify_attribution()`
+only catches a relabel by an actor who can edit the store but **not** the `.receipts` sidecar (e.g. an out-of-band
+DB edit). For the "loud" property to hold against a store-capable attacker you must pass `receipt_key=…` (Ed25519)
+with the key out of reach, or anchor the chain head externally. The crypto is textbook — hash-chains (Haber &
+Stornetta 1991), tamper-evident logs (Schneier & Kelsey 1998), the same design as our
+[agent-receipts](https://github.com/DanceNitra/agora) work; the only new bit is the systems observation that a
+source-keyed defense stack has one silent single-point-of-failure (relabel), and committing attribution converts
+that failure from silent to loud. The correctness slice stays the small, sharp, unshipped problem.
 
 ### Soft metadata filter: `recall(prefer=..., prefer_trust=...)` (0.4.1)
 

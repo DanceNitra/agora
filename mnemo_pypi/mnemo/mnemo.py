@@ -80,7 +80,7 @@ def new_receipt_keypair():
     return (sk.private_bytes(_ser.Encoding.Raw, _ser.PrivateFormat.Raw, _ser.NoEncryption()).hex(),
             sk.public_key().public_bytes(_ser.Encoding.Raw, _ser.PublicFormat.Raw).hex())
 
-__version__ = "0.5.0"
+__version__ = "0.5.1"
 _WORD = re.compile(r"[a-z0-9][a-z0-9\-']{2,}")
 _STOP = frozenset("the a an of for to in on and or is are was were be been with this that it its as "
                   "by at from into our we us you your he she they them his her their not no".split())
@@ -345,10 +345,19 @@ class Mnemo:
           - uncommitted: active ids with no attribution in their receipt (written before this was added, or the
             memory was never receipted) — cannot be checked, so not trusted;
           - missing: ids in the receipt chain no longer in the store.
-        HONEST LIMIT: tamper-evidence != correctness. A source that was WRONG at write time (an attacker who
-        controls the labeling channel, e.g. MINJA) is committed faithfully and this cannot tell it was wrong — the
-        genuinely-open oracle problem. Pass receipt_key=... (Ed25519) to also stop an attacker who can recompute
-        the whole chain tail from forging a clean history. Requires receipts enabled at write time."""
+        TWO honest limits (do NOT read this as tamper-PROOF):
+        1. tamper-evidence != CORRECTNESS. A source that was WRONG at write time (an attacker who controls the
+           labeling channel, e.g. MINJA) is committed faithfully and this cannot tell it was wrong — the
+           genuinely-open oracle problem, untouched.
+        2. the chain is only tamper-EVIDENT if it is SIGNED with a receipt_key held OFF the write path (or its head
+           is externally anchored). UNSIGNED (the default), an attacker who can silently relabel rec['source'] can
+           equally recompute the whole sidecar receipt chain with the new sources and pass this check — so bare
+           verify_attribution() only catches a relabel by an actor who can edit the store but NOT the .receipts
+           sidecar (e.g. an out-of-band DB edit). For the 'loud' property to hold against a store-capable attacker
+           you MUST pass receipt_key=... (Ed25519) with the key out of reach, or anchor the chain head externally.
+        Requires receipts enabled at write time. The crypto is textbook (Haber-Stornetta 1991 hash-chains,
+        Schneier-Kelsey 1998 tamper-evident logs); the only new bit is committing attribution so a source-keyed
+        defense set's single silent failure (relabel) becomes detectable."""
         # chain integrity = the receipt log's OWN hashes link and aren't tampered/mis-signed. Kept independent of
         # whether stored content was later LEGITIMATELY mutated (e.g. slash changes mtype) — that is the relabeled
         # question below, not a log-integrity failure.
