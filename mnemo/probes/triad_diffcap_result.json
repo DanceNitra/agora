@@ -1,0 +1,49 @@
+{
+ "scenario": "triad_diffcap",
+ "valid": false,
+ "episodes": 4000,
+ "params": {
+  "N_I": 8,
+  "K_CORR": 2,
+  "W_WARM": 6,
+  "DECAY": 0.15,
+  "D_STEPS": 4,
+  "DSTAR": 3,
+  "THETA_S": 2.0
+ },
+ "reversible_open": {
+  "residual": {
+   "": 1.0,
+   "S": 0.0,
+   "C": 1.0,
+   "I": 1.0,
+   "SC": 0.0,
+   "SI": 0.0,
+   "CI": 1.0,
+   "SCI": 0.0
+  },
+  "logsynergy_ci": [
+   0.0,
+   0.0
+  ]
+ },
+ "reversible_closed": {
+  "residual": {
+   "": 1.0,
+   "S": 0.0,
+   "C": 0.349,
+   "I": 1.0,
+   "SC": 0.0,
+   "SI": 0.0,
+   "CI": 0.34325,
+   "SCI": 0.0
+  },
+  "logsynergy_ci": [
+   0.0,
+   0.0
+  ],
+  "SI_jaccard": 0.0
+ },
+ "SI_one_axis": false,
+ "verdict": "INVALID ATTEMPT — do NOT cite these numbers (self-audited). This first cut is BY-CONSTRUCTION DEGENERATE: at these params S alone gives residual 0 (a perfect wall) and I alone gives residual 1 (a no-op), so no leg is a partial independently-failing defense at matched utility (exactly auditor #1's warning); and S-block / I-block are drawn from INDEPENDENT rng, so their 'independence' (Jaccard 0) is HARD-CODED, not emergent — which voids the one thing worth measuring (does the shared pay-ahead currency make S and I fail TOGETHER?). A valid model must fund S (warm-up standing) and I (usable corroborators) from ONE shared per-identity investment and let the correlation EMERGE at matched legit-utility. WHAT ACTUALLY HOLDS (from the rigorous 3-lens PRE-AUDIT, not this sim): the superadditive-triad question is textbook DEFENSE-IN-DEPTH — its entire content is the independence-of-failures assumption; prior art USPTO 11,829,484 (diffcap), arXiv 2510.11235 ('Independent Safety Mechanisms or Shared Failures?'), Saltzer & Schroeder (separation of privilege). The honest, non-textbook finding would be the failure-CORRELATION structure: S (earned standing) and I (corroboration count) plausibly share the pay-ahead currency and fail together (2 axes, not 3), and C (capability ceiling) is load-bearing ONLY if the reversible set is closed / rate-limited under the d* floor (Lorden) — which our own reversibility_gate_frontier ARM D already suggested it is NOT. NET: bod-2 is a textbook re-derivation with a likely-negative correlation result; not worth a clean measured build under the RAISED BAR. Kept as an honest receipt of a degenerate attempt + the pre-audit."
+}
