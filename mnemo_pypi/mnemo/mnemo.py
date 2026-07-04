@@ -80,7 +80,7 @@ def new_receipt_keypair():
     return (sk.private_bytes(_ser.Encoding.Raw, _ser.PrivateFormat.Raw, _ser.NoEncryption()).hex(),
             sk.public_key().public_bytes(_ser.Encoding.Raw, _ser.PublicFormat.Raw).hex())
 
-__version__ = "0.4.9"
+__version__ = "0.5.0"
 _WORD = re.compile(r"[a-z0-9][a-z0-9\-']{2,}")
 _STOP = frozenset("the a an of for to in on and or is are was were be been with this that it its as "
                   "by at from into our we us you your he she they them his her their not no".split())
@@ -265,10 +265,19 @@ class Mnemo:
 
     # ── write receipts (OPT-IN: tamper-evident write history) ─────────────────
     def _write_commit(self, rec: dict) -> dict:
-        """What a receipt commits to for a stored memory: its id + a hash of its content-bearing fields."""
+        """What a receipt commits to for a stored memory: its id, a hash of its content-bearing fields, AND a hash
+        of its ATTRIBUTION (canonical sources = own source + inherited derived_from taint). Binding attribution into
+        the receipt is what makes a later RELABEL detectable: k, the influence budget, the influence gate and slash
+        are all keyed on the source id, so a silent relabel (rewriting a record's source, or stripping its taint)
+        voids all of them at once with no inner layer to appeal to — attribution is not a fourth axis, it is the
+        floor the others stand on. With the sources committed, a relabel no longer matches the receipt, so
+        verify_attribution() flags it. Honest limit: this makes a relabel tamper-EVIDENT, not attribution CORRECT —
+        a wrong source asserted at write time (an attacker who controls the labeling channel, e.g. MINJA) is
+        committed faithfully and uselessly; that oracle problem is untouched."""
         return {"id": rec["id"],
                 "content_sha256": _sha256_hex(_canon({"text": rec.get("text"), "key": rec.get("key"),
-                                                      "mtype": rec.get("mtype")}))}
+                                                      "mtype": rec.get("mtype")})),
+                "attrib_sha256": _sha256_hex(_canon(sorted(Mnemo._rec_sources(rec))))}
 
     def _emit_write_receipt(self, rec: dict) -> dict:
         prev = self._receipts[-1]["hash"] if self._receipts else _GENESIS
@@ -314,10 +323,64 @@ class Mnemo:
             cur = by_id.get(r["memory_id"])
             if cur is None:
                 problems.append(f"memory {r['memory_id']}: written but missing from the store (deleted out-of-band)")
-            elif self._write_commit(cur) != r["commit"]:
-                problems.append(f"memory {r['memory_id']}: stored content no longer matches its write receipt (edited after write)")
+            else:
+                # compare only the fields THIS receipt committed to (a receipt written before attribution was
+                # committed has no attrib_sha256 — don't fault it for a field it never promised)
+                cc = self._write_commit(cur)
+                if any(cc.get(k) != v for k, v in (r.get("commit") or {}).items()):
+                    problems.append(f"memory {r['memory_id']}: stored content no longer matches its write receipt (edited after write)")
             prev = r.get("hash")
         return (len(problems) == 0, problems)
+
+    def verify_attribution(self) -> dict:
+        """Tamper-evidence for the ATTRIBUTION FLOOR. k, the influence budget, the influence gate and slash are all
+        keyed on a memory's canonical source id; a post-hoc RELABEL (rewriting a record's source, or stripping its
+        inherited derived_from taint) therefore voids all of them at once, silently, with no inner layer to appeal
+        to — attribution is not a fourth axis, it is the floor the others stand on. This binds each write's
+        attribution into the tamper-evident receipt chain (see _write_commit) and reports, per memory, whether its
+        CURRENT canonical sources still match what was committed at write time. A relabel is thus LOUD, not silent.
+
+        Returns {ok, chain_ok, relabeled, uncommitted, missing}:
+          - relabeled: active memory ids whose current sources differ from their receipt (the attack this catches);
+          - uncommitted: active ids with no attribution in their receipt (written before this was added, or the
+            memory was never receipted) — cannot be checked, so not trusted;
+          - missing: ids in the receipt chain no longer in the store.
+        HONEST LIMIT: tamper-evidence != correctness. A source that was WRONG at write time (an attacker who
+        controls the labeling channel, e.g. MINJA) is committed faithfully and this cannot tell it was wrong — the
+        genuinely-open oracle problem. Pass receipt_key=... (Ed25519) to also stop an attacker who can recompute
+        the whole chain tail from forging a clean history. Requires receipts enabled at write time."""
+        # chain integrity = the receipt log's OWN hashes link and aren't tampered/mis-signed. Kept independent of
+        # whether stored content was later LEGITIMATELY mutated (e.g. slash changes mtype) — that is the relabeled
+        # question below, not a log-integrity failure.
+        chain_ok, prev = True, _GENESIS
+        for r in self._receipts:
+            core = {k: r.get(k) for k in ("seq", "ts", "memory_id", "commit", "prev")}
+            if r.get("prev") != prev or _sha256_hex(_canon(core)) != r.get("hash"):
+                chain_ok = False
+            if "sig" in r and _HAVE_ED:
+                try:
+                    _Ed25519PK.from_public_bytes(bytes.fromhex(r["pubkey"])).verify(
+                        bytes.fromhex(r["sig"]), bytes.fromhex(r["hash"]))
+                except Exception:
+                    chain_ok = False
+            prev = r.get("hash")
+        by_id = {it["id"]: it for it in self.items}
+        committed = {}                         # latest committed attribution hash per memory id (None if pre-attrib)
+        for r in self._receipts:
+            committed[r["memory_id"]] = (r.get("commit") or {}).get("attrib_sha256")
+        relabeled, uncommitted, missing = [], [], []
+        for mid, a in committed.items():
+            cur = by_id.get(mid)
+            if cur is None:
+                missing.append(mid)
+            elif cur.get("status") != "active":
+                continue
+            elif a is None:
+                uncommitted.append(mid)
+            elif _sha256_hex(_canon(sorted(Mnemo._rec_sources(cur)))) != a:
+                relabeled.append(mid)
+        return {"ok": chain_ok and not relabeled, "chain_ok": chain_ok,
+                "relabeled": relabeled, "uncommitted": uncommitted, "missing": missing}
 
     def _supersede_by_key(self, rec: dict) -> None:
         """Deterministic (subject, relation, object) supersession: retire active records that share

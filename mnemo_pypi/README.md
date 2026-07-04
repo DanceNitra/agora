@@ -6,7 +6,7 @@
 
 *Memory is the mother of the Muses. An agent with no memory has no ideas.*
 
-`pip install agora-mnemo` · [PyPI](https://pypi.org/project/agora-mnemo/) · [Hugging Face](https://huggingface.co/Danchi17/mnemo) · [DOI 10.5281/zenodo.21128549](https://doi.org/10.5281/zenodo.21128549) · MIT · v0.4.9
+`pip install agora-mnemo` · [PyPI](https://pypi.org/project/agora-mnemo/) · [Hugging Face](https://huggingface.co/Danchi17/mnemo) · [DOI 10.5281/zenodo.21128549](https://doi.org/10.5281/zenodo.21128549) · MIT · v0.5.0
 
 </div>
 
@@ -176,6 +176,26 @@ what's new): a total-budget-on-cumulative-cost is the differential-privacy **pri
 cumulative leakage across queries under composition; Dwork & Roth 2014), an SRE **error budget**, a **VaR / loss
 limit**, and Sagas' **compensable-vs-non-compensable** transaction split (Garcia-Molina & Salem 1987) — "cap the
 integral, not the rate."
+
+**Harden the floor the other three stand on: `verify_attribution()` (0.5.0).** `k`, the influence budget, the
+influence gate and `slash` are all keyed on a memory's canonical **source id**. So attribution is not a fourth
+axis — it is the **floor** the other three stand on, and the only one that isn't self-certifying: a single
+post-hoc **relabel** (rewrite a record's source, or strip a summary's inherited `derived_from` taint to launder a
+poisoned origin) doesn't *degrade* the other three, it **voids all of them at once, silently**, with no inner
+layer to appeal to. So bind attribution into the tamper-evident write-receipt chain (enable `receipts=True` /
+`receipt_key=…`): the receipt now commits to each write's canonical sources, and `verify_attribution()` reports any
+active memory whose *current* sources no longer match what was committed. **A relabel becomes loud, not silent.**
+Measured: [`probes/attribution_floor.py`](probes/attribution_floor.py) — a source relabel and a taint-strip are
+both **detected**; a legitimate `slash` does **not** false-alarm; editing a past receipt breaks the hash chain.
+
+**The honest limit (this is the whole point of the thread's end): tamper-evidence ≠ correctness.** A source that
+was *wrong at write time* — an attacker who controls the labeling channel (MINJA-style) and asserts a benign
+source — is committed faithfully and `verify_attribution()` **cannot** tell it was wrong. That is the genuinely-open
+**oracle problem**, untouched. What ships here is the tamper-evident *slice* of the floor (a relabel can't be
+silent); the correctness slice is the small, sharp, unshipped problem. Prior art: tamper-evident hash-chains
+(Haber & Stornetta 1991) + signed provenance — the same design as our
+[agent-receipts](https://github.com/DanceNitra/agora) work; `receipt_key=…` adds Ed25519 so an attacker who can
+recompute the whole chain tail still can't forge a clean history.
 
 ### Soft metadata filter: `recall(prefer=..., prefer_trust=...)` (0.4.1)
 
