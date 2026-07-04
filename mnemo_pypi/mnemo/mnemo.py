@@ -80,7 +80,7 @@ def new_receipt_keypair():
     return (sk.private_bytes(_ser.Encoding.Raw, _ser.PrivateFormat.Raw, _ser.NoEncryption()).hex(),
             sk.public_key().public_bytes(_ser.Encoding.Raw, _ser.PublicFormat.Raw).hex())
 
-__version__ = "0.4.7"
+__version__ = "0.4.8"
 _WORD = re.compile(r"[a-z0-9][a-z0-9\-']{2,}")
 _STOP = frozenset("the a an of for to in on and or is are was were be been with this that it its as "
                   "by at from into our we us you your he she they them his her their not no".split())
@@ -1054,23 +1054,39 @@ class Mnemo:
                 pass
 
     def monitor(self, ids, outcome, k: float = 0.3, h: float = 3.0,
-                auto_slash: bool = True, weight: float = 1.0) -> dict:
-        """Per-SOURCE cumulative (CUSUM) poison detector whose breach FIRES slash() — the unified control
-        (jacksonxly). Retroactive slashing cannot fire per-slice: per-slice P(detected)~=0 and the deterrence
-        bond scales with 1/P(detected), so the required penalty blows up on exactly the slow salami attack. So
-        the slash is triggered by a CUMULATIVE detector: a one-sided CUSUM on each source's bad-rate above a
-        benign reference k. When a source's statistic breaches h, that budget-breach IS the detection event and
-        the slash trigger AT ONCE — one mechanism, not two. Attribution rides the derived_from taint: a bad
-        outcome on a summary charges ALL its inherited sources, so slices that were later summarized still
-        accumulate against their origin — the per-source cap and the slash are the same plumbing on the
-        provenance substrate.
-        Drop-in for credit() (it also records the per-memory good/bad standing): monitor(recalled_ids, outcome).
-        CUSUM per attributed source: S = max(0, S + weight*(bad - k)); alarm at S >= h; on alarm (auto_slash)
-        forfeit that source's accrued standing via slash(scope='source') and reset S. Tuning: `k` in (0,1) is
-        the benign bad-rate you tolerate (drift reference); `h` sets the false-alarm rate (larger h -> longer
-        average run length between false alarms) and the detection delay ~ h/(true_rate - k) — the irreducible
-        Lorden/CUSUM floor (no gate shrinks it). State persists to a side file. Returns
-        {alarms, slashed, cusum}. Undo a false alarm with restore()."""
+                auto_slash: bool = False, weight: float = 1.0) -> dict:
+        """Per-SOURCE cumulative (CUSUM-type) poison DETECTOR — raises a case on a source whose cumulative
+        bad-rate breaches a budget; you (or a human) then decide whether to slash(). This is the cumulative
+        trigger the retroactive slash needs: slash can't fire per-slice (per-slice P(detected)~=0, and the
+        deterrence bond scales with 1/P(detected), so the penalty blows up on the slow salami attack), so the
+        signal has to be cumulative. On each attributed outcome, a one-sided CUSUM: S = max(0, S + weight*(bad -
+        k)); alarm at S >= h. Attribution rides the derived_from taint (a bad outcome on a summary charges ALL
+        its inherited sources), so slices later summarized still accumulate against their origin — the per-source
+        budget and the slash are the same plumbing on the provenance substrate.
+        Drop-in for credit() (also records the per-memory good/bad standing): monitor(recalled_ids, outcome).
+
+        THREE honest limits (from a full adversarial review — do not overclaim this 'solves' poisoning):
+        1. NOT exact-optimal: (x - k) is the Gaussian-mean-shift CUSUM; the exactly-optimal statistic for a
+           Bernoulli bad-indicator increments by the log-likelihood ratio. This is a CUSUM-TYPE detector.
+        2. k IS A TOLERATED-RATE PRICE, NOT A WALL: an attacker who holds its per-source bad-rate at/below k
+           produces non-positive drift -> S -> 0 -> PROVABLY undetectable (the ARL<->detectability duality). So
+           this catches the careless/impatient poisoner; a patient one nets a bounded k x exposure residual —
+           the detection-latency floor moved to k, not closed. Lowering k to chase it just raises false alarms
+           on honest sources.
+        3. DO NOT AUTO-FIRE THE IRREVERSIBLE PENALTY. auto_slash DEFAULTS OFF for a reason: 70 years of
+           auto-penalty systems (SPC -> fraud -> content moderation) converged on automatic DETECTION + a
+           human-reviewable, REVERSIBLE penalty, never auto-fired forfeiture — because a drifting base-rate
+           guarantees false alarms, and with taint a single false positive nukes a whole downstream tree
+           (guilt-by-linkage), and if outcomes are attacker-influenceable (MINJA) the trigger becomes a framing
+           weapon (feed bad outcomes attributed to a rival -> auto-slash the rival; cf. RepTrap / bad-mouthing).
+           Recommended: on alarm, cap/freeze the source's forward influence (reversible) and queue a HUMAN
+           review; confirm the slash by hand; keep restore() one call away.
+
+        Tuning: `k` in (0,1) is the bad-rate you contractually tolerate (drift reference); `h` sets the
+        false-alarm rate (ARL ~ exp(h)) and the detection delay ~ h/(true_rate - k) — the Lorden floor.
+        `auto_slash=True` is an explicit opt-in for a high-integrity, un-self-gradable oracle only. State
+        persists to a side file (cross-session). Returns {alarms, slashed, cusum}. Undo a false alarm with
+        restore()."""
         self.credit(ids, outcome, weight)                    # standing accrues normally...
         bad = 0.0 if Mnemo._outcome_good(outcome) else 1.0
         by_id = {x["id"]: x for x in self.items}
