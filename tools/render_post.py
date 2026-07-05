@@ -17,6 +17,21 @@ ROOT = Path(__file__).resolve().parents[1]
 SITE = "https://dancenitra.github.io/agora/public"
 
 META = {
+    "self-audit-32": {
+        "slug": "labels-failed-more-than-measurements",
+        "title": "Labels failed more than measurements: severe-testing our AI's 32 confident findings",
+        "title_sk": "Labely zlyhali viac než merania: prísny test 32 sebavedomých zistení našej AI",
+        "desc": "Our autonomous AI pipeline published 32 findings as confident 'discoveries.' Under a full "
+                "adversarial audit the labels failed (53% textbook-relabeled) more than the measurements "
+                "(34% wrong); 13% were already honest. Reproducible, with a positive control.",
+        "desc_sk": "Náš autonómny AI pipeline publikoval 32 zistení ako sebavedomé „objavy“. Pod plným "
+                   "adversariálnym auditom labely zlyhali (53 % učebnicový relabel) viac než merania "
+                   "(34 % zlé); 13 % bolo už čestných. Reprodukovateľné, s pozitívnou kontrolou.",
+        "date": "2026-07-05", "modified": "2026-07-05",
+        "tags": "AI research · Self-audit · Meta-science · Autonomous agents · Reproducibility",
+        "tags_sk": "AI výskum · Sebaaudit · Meta-veda · Autonómni agenti · Reprodukovateľnosť",
+        "kicker": "Meta · self-audit", "kicker_sk": "Meta · sebaaudit",
+    },
     "agent-memory-poisoning-influence-gate": {
         "slug": "agent-memory-poisoning-influence-gate",
         "title": "One Plain Sentence Hijacks AI-Agent Memory Retrieval — and the Fix Isn't a Better Retriever",
