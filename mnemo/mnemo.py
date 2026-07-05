@@ -227,6 +227,10 @@ class Mnemo:
         # FAKE source string still passes here -> pair with strict_corroboration/attestation, which demands a
         # VERIFIED key, to price that too.) Biba-style default-deny at the store boundary. Reversible: OFF.
         self.strict_provenance = False
+        # AUTO-STAMP LINEAGE substrate: the ids of the most recent recall(), so a derived write (a summary written
+        # right after) can inherit them as parents -- the lineage EDGE carried by the STORE from the recall->write
+        # flow, not supplied by the untrusted LLM. Transient (not persisted); see remember(derived=True).
+        self._last_recall: list[str] = []
         # _save() THROTTLE: serializing the whole store (json.dumps of every item) is O(store size); doing
         # it on EVERY recall/remember froze callers once the store grew (recall mutates access value, so it
         # used to re-serialize everything each call). Coalesce disk writes to at most once / _save_min_s;
@@ -271,6 +275,16 @@ class Mnemo:
         (~42% of the time in our test). A deterministic (subject, relation, object) ledger drives that to
         ~0%. Bi-temporal: a back-filled record (earlier valid_from) does NOT overwrite a genuinely newer
         same-key value — the stale-on-arrival record is the one retired."""
+        # AUTO-STAMP LINEAGE (jacksonxly / MemLineage arXiv:2605.14421): a derived write (a summary / consolidation)
+        # that names no explicit parent inherits the store's most recent recall as its parents. The lineage EDGE is
+        # carried by the STORE from the recall->write flow -- the untrusted LLM only supplies the summary text and
+        # never holds the switch -- so a summary written right after a recall automatically carries its ancestors'
+        # taint (a retraction reaches it; it is not an orphan) WITHOUT the caller threading derived_from through the
+        # rewrite. If no recent recall exists, an explicit derived=True falls through to the orphan rule (fail-closed).
+        # This is the store-side inference the storm/verify pass found to be the ONLY form with measured defense
+        # value (signature-only 6/6 attacks -> 0/6 once lineage propagates); a caller-supplied source string is not.
+        if derived and derived_from is None:
+            derived_from = list(getattr(self, "_last_recall", []) or [])
         mid = uuid.uuid4().hex[:10]
         now = time.time()
         rec = {"id": mid, "text": text, "tags": list(tags or []), "value": float(value),
@@ -954,6 +968,9 @@ class Mnemo:
                 if cr.get("low_source_diversity"):
                     _o["low_source_diversity"] = True
             out.append(_o)
+        # AUTO-STAMP LINEAGE: remember what this recall surfaced, so a derived write built from it (a summary
+        # written next) can inherit these as parents. Store-carried lineage from the recall->write flow.
+        self._last_recall = [o["id"] for o in out]
         # NOTE: recall is a READ. It nudges in-memory access value / graduation, but must NOT persist the
         # whole store here — serializing (json.dumps) on every recall, across many agents' stores,
         # saturated the thread pool and FROZE the world. The in-memory nudges are persisted on the next
