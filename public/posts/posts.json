@@ -169,16 +169,16 @@
  },
  {
   "slug": "food-nudges-publication-bias",
-  "title": "Food Nudges Aren't 2.5× Better — It's Publication Bias",
-  "title_sk": "Food nudge nie je 2,5× účinnejší — je to publikačný bias",
-  "desc": "A famous PNAS meta-analysis says food-choice nudges are 2.5× more responsive than other domains. We reproduced that exact 2.5× from zero true difference — it's a publication-bias artifact. Measured, with the simulation and the falsifier.",
-  "desc_sk": "Slávna meta-analýza v PNAS tvrdí, že food nudge sú 2,5× citlivejšie než iné domény. Reprodukovali sme presne ten 2,5× z nulového skutočného rozdielu — je to artefakt publikačného biasu. Odmerané, so simuláciou aj falzifikátorom.",
+  "title": "Food Nudges Aren't 2.5× Better — Food Is the Small-Study Domain",
+  "title_sk": "Food nudge nie je 2,5× účinnejší — jedlo je len doména malých štúdií",
+  "desc": "A famous PNAS meta-analysis ranked food the most nudgeable domain (~2.7× the lowest). In the authors' own data food is by far the smallest-study domain (~113 vs ~861+ participants) — a size gap that reproduces the whole ratio from zero true difference. The honest twist: small-study fragility, not proven publication bias. Runnable.",
+  "desc_sk": "Slávna PNAS meta-analýza označila jedlo za najnudge-ovateľnejšiu doménu (~2,7× nad najnižšou). V dátach autorov je jedlo zďaleka doména najmenších štúdií (~113 vs ~861+ účastníkov) — asymetria, ktorá reprodukuje celý pomer z nulového rozdielu. Poctivý zvrat: small-study krehkosť, nie preukázaný publikačný bias. Spustiteľné.",
   "date": "2026-06-29",
   "tags": "Behavioral economics · Nudging · Publication bias · Replication",
   "tags_sk": "Behaviorálna ekonómia · Nudging · Publikačný bias · Replikácia",
   "kicker": "The Crucible",
   "kicker_sk": "Crucible",
-  "read": 5,
+  "read": 7,
   "bilingual": true
  },
  {
