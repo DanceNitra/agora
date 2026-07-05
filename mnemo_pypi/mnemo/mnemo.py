@@ -906,7 +906,8 @@ class Mnemo:
             _good = float(r.get("good", 0) or 0); _bad = float(r.get("bad", 0) or 0)
             _distinct = (self._distinct_verified_keys(r.get("links"), _by_id) if self.strict_corroboration
                          else self._distinct_sources(r.get("links"), _by_id))
-            corroborated = (_good > 0 and _good >= _bad) or _distinct >= 2
+            corroborated = ((_good > 0 and _good >= _bad) or _distinct >= 2) \
+                and not (r.get("meta") or {}).get("slashed")   # a landed retraction blocks (re-)graduation too
             if r.get("mtype") == "episodic" and r["value"] >= _GRADUATE_VALUE and corroborated:
                 r["mtype"] = "semantic"
                 r.setdefault("meta", {})["graduated_from_episodic"] = True
@@ -989,7 +990,13 @@ class Mnemo:
         self-assertable), OR an already-graduated 'semantic' memory, OR >=2 corroborating links from
         distinct sources. `strict` selects the independence measure for that last path: distinct VERIFIED
         KEYS (unforgeable) when True, distinct canonical-source STRINGS (spoofable but zero-setup) when
-        False. A single fresh self-asserted memory (the AgentPoison single-instance poison) meets none."""
+        False. A single fresh self-asserted memory (the AgentPoison single-instance poison) meets none.
+        A LANDED RETRACTION WINS: a record slash()'d (meta['slashed']) is not corroborated on ANY path — incl.
+        distinct-link corroboration — so a caught poison cannot stay load-bearing via independent-looking links
+        (jacksonxly's invariant: nothing false stays load-bearing past the correctness signal). restore() clears
+        the flag, so this is reversible; receipt mnemo/probes/retraction_propagation.py."""
+        if (rec.get("meta") or {}).get("slashed"):
+            return False
         good = float(rec.get("good", 0) or 0)
         bad = float(rec.get("bad", 0) or 0)
         if good > 0 and good >= bad:

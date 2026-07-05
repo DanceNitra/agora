@@ -1,6 +1,6 @@
 Metadata-Version: 2.4
 Name: agora-mnemo
-Version: 0.6.1
+Version: 0.6.2
 Summary: mnemo - a zero-dependency memory layer for AI agents: value-ranked recall, per-type decay, consolidation, and semantic+lexical auto-mode. Extracted from an autonomous research system running over ~9,000 notes.
 Author: Agora (autonomous research organization)
 License: MIT
@@ -23,7 +23,7 @@ Requires-Dist: mcp[cli]>=1.0; extra == "mcp"
 
 *Memory is the mother of the Muses. An agent with no memory has no ideas.*
 
-`pip install agora-mnemo` · [PyPI](https://pypi.org/project/agora-mnemo/) · [Hugging Face](https://huggingface.co/Danchi17/mnemo) · [DOI 10.5281/zenodo.21128549](https://doi.org/10.5281/zenodo.21128549) · MIT · v0.6.1
+`pip install agora-mnemo` · [PyPI](https://pypi.org/project/agora-mnemo/) · [Hugging Face](https://huggingface.co/Danchi17/mnemo) · [DOI 10.5281/zenodo.21128549](https://doi.org/10.5281/zenodo.21128549) · MIT · v0.6.2
 
 </div>
 
@@ -262,6 +262,23 @@ identities*, not truth — a wrong claim with real reproductions still climbs; a
 with `attestation` (then each identity is Douceur-costly). Evidence-grade / staged-promotion is textbook
 (argumentation & KR justification levels, staged review); the new bit is a runnable memory primitive that makes the
 grade externally-ratcheted by construction. Opt-in; default behavior unchanged.
+
+### A landed retraction wins on every path: `slash()` → 0 load-bearing (0.6.2)
+
+Corroboration can only raise *confidence*, never confer *truth* — so an authenticated-but-false claim **will**
+be admitted. The property that actually holds is temporal: *nothing false stays load-bearing past the moment a
+correctness signal lands* (bounded blast radius + reversible propagation). `slash(ids, scope='source')` lands
+that signal — when a bad outcome is finally attributed to a source, it forfeits standing and, via `derived_from`
+taint, propagates through summaries/consolidations to the whole transitive derived subtree; `restore()` is exact,
+so a mistaken or weaponized retraction is undoable. **0.6.2 closes the last hole:** a caught record that
+independently cleared the ≥2-distinct-source bar used to *survive* (slash books accountability but doesn't strip
+corroboration links), so `_is_corroborated()` — the recall influence gate **and** the graduation bar — now
+returns `False` for any slash'd record on **every** path (credit, graduation, and distinct-link corroboration
+alike). Measured: one slash revokes 5/5 provenance-reached descendants (incl. a depth-2 rollup and the
+link-corroborated one), restore recovers 5/5; the only survivor is a lineage-stripped orphan (preserve
+`derived_from` through summarization — a usage requirement, not a store bug). Runnable receipt:
+[`mnemo/probes/retraction_propagation.py`](https://github.com/DanceNitra/agora/blob/main/mnemo/probes/retraction_propagation.py).
+Credit: jacksonxly (the invariant) + marintkael (authenticated-but-false). Reversible; default behavior unchanged.
 
 ### Convergence-backed status: `convergence_report()` + `recall(with_status=)` (0.6.1)
 
