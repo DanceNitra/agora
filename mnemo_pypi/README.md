@@ -6,7 +6,7 @@
 
 *Memory is the mother of the Muses. An agent with no memory has no ideas.*
 
-`pip install agora-mnemo` · [PyPI](https://pypi.org/project/agora-mnemo/) · [Hugging Face](https://huggingface.co/Danchi17/mnemo) · [DOI 10.5281/zenodo.21128549](https://doi.org/10.5281/zenodo.21128549) · MIT · v0.5.2
+`pip install agora-mnemo` · [PyPI](https://pypi.org/project/agora-mnemo/) · [Hugging Face](https://huggingface.co/Danchi17/mnemo) · [DOI 10.5281/zenodo.21128549](https://doi.org/10.5281/zenodo.21128549) · MIT · v0.6.0
 
 </div>
 
@@ -223,6 +223,28 @@ MINJA attack survives a signature); a signature proves **authorship** (so a caug
 revocable key), not truth. Textbook root-of-trust (PKI/TCB; costly-identity sybil defense, Douceur 2002); the new
 bit is binding the independence rail of a memory's corroboration gate to that root. Opt-in, default OFF → identical
 legacy behavior.
+
+### Evidence-grade ratchet: `grade()` + `ratify()` (0.6.0)
+
+**A claim's status is something it *earns*, not a label the writer self-assigns.** Two axes ride on the existing
+substrate and can only move UP on an event from a party *other than the writer*: a **confidence grade**
+(`claimed → corroborated → verified → settled`) and a separate **novelty** flag (`novel` only when an external
+prior-art search comes back **empty**). `remember()` cannot set either; `grade(id)` is a pure function of
+ratifications + corroboration + `credit()` outcomes, so there is nothing to spoof. `ratify(id, kind, by_key, lens=)`
+records an external event (`independent_witness` / `reproduction` / `prior_art_empty` / `audit`); a ratifier whose
+`by_key` is the claim's own author is **rejected**, and a duplicate `(by_key, kind, lens)` does not stack, so a
+correlated or repeat auditor adds nothing. The top grade requires a reproduction **plus two distinct lenses** — the
+correlated-auditor guard. Receipt: [`probes/evidence_grade_ratchet.py`](probes/evidence_grade_ratchet.py) shows (1)
+the ratchet holds (a generator upgrading its own claim does nothing), (2) forge-cost — one identity is stuck at
+`claimed`, every rung up needs another distinct key (Douceur; pair with `attestation` to make those keys
+unforgeable), and (3) a replay of our own 32 adversarially-audited posts through the ratchet reproduces the audit's
+headline **for free**: **0/32 reach `novel`** (none had an empty prior-art search) and the 11 substantive-wrong ones
+stay at `claimed` while the 21 reproduced ones reach `verified`. Over-labeling isn't caught after the fact — it
+becomes structurally un-assertable. **Honest limit:** this bounds *who* may upgrade a label to *distinct
+identities*, not truth — a wrong claim with real reproductions still climbs; and `by_key` is spoofable unless paired
+with `attestation` (then each identity is Douceur-costly). Evidence-grade / staged-promotion is textbook
+(argumentation & KR justification levels, staged review); the new bit is a runnable memory primitive that makes the
+grade externally-ratcheted by construction. Opt-in; default behavior unchanged.
 
 ### Soft metadata filter: `recall(prefer=..., prefer_trust=...)` (0.4.1)
 

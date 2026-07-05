@@ -109,7 +109,7 @@ def attest(text: str, source_sk_hex: str, source_doc=None) -> str:
     sk = _Ed25519SK.from_private_bytes(bytes.fromhex(source_sk_hex))
     return sk.sign(_attest_message(text, source_doc)).hex()
 
-__version__ = "0.5.2"
+__version__ = "0.6.0"
 _WORD = re.compile(r"[a-z0-9][a-z0-9\-']{2,}")
 _STOP = frozenset("the a an of for to in on and or is are was were be been with this that it its as "
                   "by at from into our we us you your he she they them his her their not no".split())
@@ -1104,6 +1104,80 @@ class Mnemo:
         if updated:
             self._save()
         return {"updated": updated, "outcome": key, "weight": weight}
+
+    # ── evidence-grade RATCHET (OPT-IN) ───────────────────────────────────────
+    # Two axes a claim can NEVER self-assign at write time; each moves UP only on an EXTERNAL event:
+    #   confidence: claimed -> corroborated -> verified -> settled
+    #   novelty:    known   -> novel   (only if an external prior-art search came back EMPTY)
+    # This operationalizes the finding that autonomous pipelines OVER-LABEL: the generator sets the cheap
+    # default (claimed / known) for free; every upgrade has a defined price paid by a party OTHER than the
+    # writer -- an independent witness, a reproduction, a distinct verified key, an empty prior-art search.
+    # The generator cannot move its own claim up; grade() is a pure function of ratifications + the existing
+    # corroboration/credit substrate, so there is nothing to spoof. Honest limit: distinct `by_key` is an
+    # IDENTITY count (Douceur cost), spoofable unless paired with attestation (verified keys) exactly as
+    # strict_corroboration is; and a ratifier can be WRONG -- this bounds who may upgrade a label, not truth.
+    _GRADES = ("claimed", "corroborated", "verified", "settled")
+    _RATIFY_KINDS = ("independent_witness", "reproduction", "prior_art_empty", "audit")
+
+    def ratify(self, id: str, kind: str, by_key: str, lens: str | None = None, note: str | None = None) -> dict:
+        """Record an EXTERNAL ratification of a claim. `kind` in _RATIFY_KINDS; `by_key` is the ratifier's
+        identity (a source id or, better, a verified pubkey) and MUST differ from the claim's own attested
+        key/source -- self-ratification is rejected (the whole point of the ratchet). Duplicate (by_key, kind,
+        lens) does not stack, so a correlated/repeat auditor adds nothing. Returns {ok, grade, novel, reason}."""
+        if kind not in Mnemo._RATIFY_KINDS:
+            raise ValueError(f"kind must be one of {Mnemo._RATIFY_KINDS}")
+        by_id = {x["id"]: x for x in self.items}
+        rec = by_id.get(id)
+        if rec is None:
+            return {"ok": False, "reason": "no such id"}
+        author = {rec.get("attested_key")}
+        src = rec.get("source") or {}
+        author.add(src.get("doc") if isinstance(src, dict) else src)
+        if by_key in author:
+            return {"ok": False, "reason": "self-ratification rejected (by_key is the claim's own author)"}
+        rats = rec.setdefault("ratifications", [])
+        if any(r.get("by_key") == by_key and r.get("kind") == kind and r.get("lens") == lens for r in rats):
+            g = self.grade(rec)
+            return {"ok": False, "reason": "duplicate (by_key, kind, lens) -- does not stack",
+                    "grade": g["grade"], "novel": g["novel"]}
+        rats.append({"kind": kind, "by_key": by_key, "lens": lens, "note": note, "ts": time.time()})
+        self._save(force=True)
+        g = self.grade(rec)
+        return {"ok": True, "grade": g["grade"], "novel": g["novel"], "reason": f"{kind} recorded"}
+
+    def grade(self, target, strict: bool | None = None) -> dict:
+        """Compute a claim's CURRENT evidence grade + novelty from external ratifications and the existing
+        corroboration/credit substrate. Pure/read-only; nothing here is settable by the writer. Returns
+        {grade, novel, evidence}. `strict` (defaults to self.strict_corroboration) selects distinct verified
+        keys vs distinct source strings for the multi-source corroboration path."""
+        rec = target if isinstance(target, dict) else {x["id"]: x for x in self.items}.get(target)
+        if rec is None:
+            return {"grade": None, "novel": None, "evidence": {"reason": "no such id"}}
+        strict = self.strict_corroboration if strict is None else strict
+        by_id = {x["id"]: x for x in self.items}
+        good = float(rec.get("good", 0) or 0); bad = float(rec.get("bad", 0) or 0)
+        rats = rec.get("ratifications", []) or []
+        # distinct EXTERNAL ratifiers per kind, and distinct lenses (correlated-auditor guard)
+        def keys(kind):
+            return {r.get("by_key") for r in rats if r.get("kind") == kind}
+        repro = keys("reproduction"); witness = keys("independent_witness")
+        prior_empty = keys("prior_art_empty")
+        lenses = {r.get("lens") for r in rats if r.get("kind") in ("reproduction", "audit") and r.get("lens")}
+        multi = (Mnemo._distinct_verified_keys(rec.get("links"), by_id) >= 2) if strict \
+            else (Mnemo._distinct_sources(rec.get("links"), by_id) >= 2)
+        earned = good > 0 and good >= bad
+        attested = bool(rec.get("attested_key"))
+        corroborated = multi or bool(witness) or bool(repro) or earned
+        verified = bool(repro) or (attested and corroborated)
+        settled = verified and earned and len(repro) >= 1 and len(lenses) >= 2   # diverse, reproduced, track record
+        g = "settled" if settled else ("verified" if verified else ("corroborated" if corroborated else "claimed"))
+        # novelty is a SEPARATE axis, and can ONLY be earned by an external empty prior-art search
+        # (never self-assertable); a discredited claim (bad>good) forfeits novel standing.
+        novel = bool(prior_empty) and good >= bad
+        return {"grade": g, "novel": novel, "evidence": {
+            "multi_source": multi, "attested": attested, "earned_outcome": earned,
+            "reproductions": len(repro), "witnesses": len(witness),
+            "prior_art_empty": bool(prior_empty), "distinct_lenses": len(lenses)}}
 
     def slash(self, ids, scope: str = "source") -> dict:
         """Retroactive standing forfeiture — the accountability lever for a CAUGHT poison. When a memory is
