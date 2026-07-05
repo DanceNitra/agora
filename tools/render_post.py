@@ -32,6 +32,19 @@ META = {
         "tags_sk": "AI výskum · Sebaaudit · Meta-veda · Autonómni agenti · Reprodukovateľnosť",
         "kicker": "Meta · self-audit", "kicker_sk": "Meta · sebaaudit",
     },
+    "memory-defense-veracity-gap": {
+        "slug": "agent-memory-defense-provenance-not-truth",
+        "title": "Agent memory poisoning: provenance can't buy truth",
+        "title_sk": "Otrava pamäte agenta: proveniencia nekúpi pravdu",
+        "desc": "An adaptive attacker beats four AI-agent memory defenses: every content-only signal falls, "
+                "and provenance authenticates the source, not the truth.",
+        "desc_sk": "Adaptívny útočník porazí štyri obrany pamäte AI agenta: každý iba-obsahový signál padne "
+                   "a proveniencia overuje zdroj, nie pravdu.",
+        "date": "2026-07-05", "modified": "2026-07-05",
+        "tags": "AI agents · Memory · Security · Poisoning · mnemo · Provenance",
+        "tags_sk": "AI agenti · Pamäť · Bezpečnosť · Poisoning · mnemo · Proveniencia",
+        "kicker": "Agent memory security", "kicker_sk": "Bezpečnosť pamäte agentov",
+    },
     "agent-memory-poisoning-influence-gate": {
         "slug": "agent-memory-poisoning-influence-gate",
         "title": "One Plain Sentence Hijacks AI-Agent Memory Retrieval — and the Fix Isn't a Better Retriever",

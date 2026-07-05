@@ -14,6 +14,20 @@
   "bilingual": true
  },
  {
+  "slug": "agent-memory-defense-provenance-not-truth",
+  "title": "Agent memory poisoning: provenance can't buy truth",
+  "title_sk": "Otrava pamäte agenta: proveniencia nekúpi pravdu",
+  "desc": "An adaptive attacker beats four AI-agent memory defenses: every content-only signal falls, and provenance authenticates the source, not the truth.",
+  "desc_sk": "Adaptívny útočník porazí štyri obrany pamäte AI agenta: každý iba-obsahový signál padne a proveniencia overuje zdroj, nie pravdu.",
+  "date": "2026-07-05",
+  "tags": "AI agents · Memory · Security · Poisoning · mnemo · Provenance",
+  "tags_sk": "AI agenti · Pamäť · Bezpečnosť · Poisoning · mnemo · Proveniencia",
+  "kicker": "Agent memory security",
+  "kicker_sk": "Bezpečnosť pamäte agentov",
+  "read": 8,
+  "bilingual": true
+ },
+ {
   "slug": "agent-memory-poisoning-layered-defense-residual",
   "title": "A reality-check on agent-memory poisoning defenses: you price the residual, you don't close it",
   "title_sk": "Reality-check pre obrany proti otrave pamäte agentov: rezíduum oceníš, nezavrieš",
