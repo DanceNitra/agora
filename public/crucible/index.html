@@ -5,7 +5,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>The Crucible &middot; a machine that rebuilds claims in code &middot; Agora</title>
-<meta name="description" content="A public ledger of scientific and technical claims rebuilt as minimal computational models and tested in code: 27 reproduced, 12 failed, 4 honest passes. Every verdict ships runnable code and a measured number.">
+<meta name="description" content="A public ledger of scientific and technical claims rebuilt as minimal computational models and tested in code: 24 reproduced, 12 failed, 4 honest passes. Every verdict ships runnable code and a measured number.">
 <link rel="canonical" href="https://dancenitra.github.io/agora/public/crucible/">
 <meta property="og:type" content="website">
 <meta property="og:title" content="The Crucible — claims, rebuilt in code and tested">
@@ -174,7 +174,7 @@
   rarest export, published here), and <b>not computable</b> when there&rsquo;s no simulable core.
   Every verdict ships a measured number and the code that produced it.</p>
   <div class="tally">
-    <div class="t ok"><div class="num">27</div><div class="lbl">Reproduced</div></div>
+    <div class="t ok"><div class="num">24</div><div class="lbl">Reproduced</div></div>
     <div class="t fail"><div class="num">12</div><div class="lbl">Failed</div></div>
     <div class="t"><div class="num">4</div><div class="lbl">Honest passes</div></div>
   </div>
@@ -195,7 +195,7 @@
     </div>
   </section>
 <section class="ledger"><div class="wrap">
-  <div class="sechead"><h2>The ledger</h2><div class="sub">39 claims rebuilt &amp; tested &middot; newest first</div></div>
+  <div class="sechead"><h2>The ledger</h2><div class="sub">36 claims rebuilt &amp; tested &middot; newest first</div></div>
   <div class="filters">
     <button class="on" data-f="all">All</button>
     <button data-f="REPRODUCED">Reproduced</button>
@@ -302,16 +302,6 @@
           <div class="cfoot"><span class="cyear">Sarrico, Arulkumaran, Agostinelli et al. - Sam</span></div>
         </div>
       </article>
-      <article class="card ok" data-v="REPRODUCED" data-reveal>
-        <div class="crail"></div>
-        <div class="cbody">
-          <div class="chead"><span class="cv">REPRODUCED</span>
-            <span class="cfield"></span></div>
-          <h3>Stochastic gradient descent has slow asymptotic convergence due to the inherent variance o</h3>
-          <p class="cresult">Row-normalized L2-logistic, kappa 1.7-67, same eta=0.5. Const-step SGD plateaus at ~2.5e-2 variance floor; SVRG -&gt; machine precision (3/3). Caveat: needs inner-loop m &gt;~ kappa (advantage gone at kappa~6e4 &gt;&gt; m=n).</p>
-          <div class="cfoot"><span class="cyear">Accelerating SGD using Predictive Variance Red</span></div>
-        </div>
-      </article>
       <article class="card fail" data-v="FAILED" data-reveal>
         <div class="crail"></div>
         <div class="cbody">
@@ -387,8 +377,8 @@
         <div class="cbody">
           <div class="chead"><span class="cv">REPRODUCED</span>
             <span class="cfield"></span></div>
-          <h3>Recursively synthesized, self-referential systems improve performance (e.g. Promptbreeder,</h3>
-          <p class="cresult">Smallest model (lab a08981): a population recursively synthesizes candidates FROM ITSELF each generation; the pivotal variable is the SELECTION signal. With an EXTERNAL fitness anchor (as Promptbreeder has: real task accuracy), recursive sy</p>
+          <h3>Recursive prompt/self synthesis improves performance ONLY when scored by an EXTERNAL fitne</h3>
+          <p class="cresult">Smallest model (lab a08981): a population recursively synthesizes candidates FROM ITSELF each generation; the pivotal variable is the SELECTION signal. With an EXTERNAL fitness anchor (as Promptbreeder has: real task accuracy) recursive synthesis improves; with self-scoring only it does NOT -- so the gain is attributable to external selection, not to self-reference. Claim RESCOPED + unverified &#x27;~15%&#x27; figure dropped (Crucible audit 2026-07-05): the headline previously mis-credited self-reference.</p>
           <div class="cfoot"><span class="cyear">Promptbreeder (Fernando, Banarse, Michalewski,</span></div>
         </div>
       </article>
@@ -550,26 +540,6 @@
           <h3>Pulling the hubs shatters the network</h3>
           <p class="cresult">Removing the top 10% of nodes by degree multiplies the bond-percolation threshold several-fold (BA, N=2000).</p>
           <div class="cfoot"><span class="cyear">Percolation &amp; cascade robustness</span></div>
-        </div>
-      </article>
-      <article class="card ok" data-v="REPRODUCED" data-reveal>
-        <div class="crail"></div>
-        <div class="cbody">
-          <div class="chead"><span class="cv">REPRODUCED</span>
-            <span class="cfield">Economics of technology</span></div>
-          <h3>IT pays off only with organizational change</h3>
-          <p class="cresult">Organizational investment, not IT spend alone, drives the return — omitting it inflates the estimated payoff up to 2×.</p>
-          <div class="cfoot"><span class="cyear">Brynjolfsson &amp; Hitt · 2000</span></div>
-        </div>
-      </article>
-      <article class="card ok" data-v="REPRODUCED" data-reveal>
-        <div class="crail"></div>
-        <div class="cbody">
-          <div class="chead"><span class="cv">REPRODUCED</span>
-            <span class="cfield">Machine learning / NLP</span></div>
-          <h3>A simple model beats the fancy one on KB completion</h3>
-          <p class="cresult">An observed-features model matches or beats latent-feature models on knowledge-base completion.</p>
-          <div class="cfoot"><span class="cyear">Toutanova &amp; Chen · 2015</span></div>
         </div>
       </article>
       <article class="card ok" data-v="REPRODUCED" data-reveal>

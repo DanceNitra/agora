@@ -3,9 +3,9 @@
  "description": "Scientific and technical claims rebuilt as minimal computational models and tested. REPRODUCED = the mechanism holds in a minimal model; FAILED = it does not; NOT_COMPUTABLE = no simulable core (an honest pass).",
  "generated": "2026-07-05",
  "counts": {
-  "REPRODUCED": 27,
+  "REPRODUCED": 24,
   "FAILED": 12,
-  "NOT_COMPUTABLE": 15
+  "NOT_COMPUTABLE": 17
  },
  "entries": [
   {
@@ -97,15 +97,6 @@
    "lab_id": "84b6b7",
    "code": "",
    "date": "2026-06-26"
-  },
-  {
-   "claim": "Stochastic gradient descent has slow asymptotic convergence due to the inherent variance of the stochastic gradient; SVRG's control variate removes it -> linear convergence.",
-   "source": "Accelerating SGD using Predictive Variance Reduction (Johnson & Zhang, 2013)",
-   "verdict": "REPRODUCED",
-   "note": "Row-normalized L2-logistic, kappa 1.7-67, same eta=0.5. Const-step SGD plateaus at ~2.5e-2 variance floor; SVRG -> machine precision (3/3). Caveat: needs inner-loop m >~ kappa (advantage gone at kappa~6e4 >> m=n).",
-   "lab_id": "0d255b",
-   "code": "",
-   "date": "2026-06-24"
   },
   {
    "claim": "MemGPT-style paging memory keeps QA accuracy FLAT as the corpus/context scales (0->700 docs)",
@@ -234,10 +225,10 @@
    "date": "2026-06-15"
   },
   {
-   "claim": "Recursively synthesized, self-referential systems improve performance (e.g. Promptbreeder, Fernando et al. 2023: ~15pct few-shot gain via self-referential prompt evolution).",
+   "claim": "Recursive prompt/self synthesis improves performance ONLY when scored by an EXTERNAL fitness signal (real task accuracy, as in Promptbreeder, Fernando et al. 2023); self-reference without an external anchor does not.",
    "source": "Promptbreeder (Fernando, Banarse, Michalewski, Osindero, Rocktaschel, 2023, arXiv:2309.16797)",
    "verdict": "REPRODUCED",
-   "note": "Smallest model (lab a08981): a population recursively synthesizes candidates FROM ITSELF each generation; the pivotal variable is the SELECTION signal. With an EXTERNAL fitness anchor (as Promptbreeder has: real task accuracy), recursive sy",
+   "note": "Smallest model (lab a08981): a population recursively synthesizes candidates FROM ITSELF each generation; the pivotal variable is the SELECTION signal. With an EXTERNAL fitness anchor (as Promptbreeder has: real task accuracy) recursive synthesis improves; with self-scoring only it does NOT -- so the gain is attributable to external selection, not to self-reference. Claim RESCOPED + unverified '~15%' figure dropped (Crucible audit 2026-07-05): the headline previously mis-credited self-reference.",
    "lab_id": "a08981",
    "code": "",
    "date": "2026-06-15"
@@ -363,7 +354,7 @@
    "claim": "Hong-Page (2004): a randomly selected (diverse) team of problem solvers outperforms the team of individually best solvers under relay search (n=2000, l=12, k=3, group 10)",
    "source": "Hong & Page, PNAS 101(46), 2004 - Groups of diverse problem solvers can outperform groups of high-ability problem solvers",
    "verdict": "REPRODUCED",
-   "note": "Reproduced at paper params: random beats best by +1.65 (t=4.1). But the effect is FRAGILE, as critics argued: it shrinks with a narrower heuristic pool (l=6: +0.90) and REVERSES on smoothed landscapes (-0.38, ability wins) - diversity trump",
+   "note": "Reproduced at paper params: random beats best by +1.65 (t=4.1). But the effect is FRAGILE, as critics argued: it shrinks with a narrower heuristic pool (l=6: +0.90) and REVERSES on smoothed landscapes (-0.38, ability wins) - diversity trump Cross-ref: the paired STRONG-claim entry (lab b56ae0) rules the general 'random>=best' FAILED in a faithful powered paired model; this REPRODUCED holds only at the paper's specific params and reverses on smoothed landscapes -- the two are consistent, not contradictory.",
    "lab_id": "a3ae64",
    "code": "",
    "date": "2026-06-12"
@@ -434,8 +425,8 @@
   {
    "claim": "Brynjolfsson & Hitt (2000): organizational investments have a large influence on the value of IT investments (IT/org-capital complementarity).",
    "source": "Beyond Computation: Information Technology, Organizational Transformation and Business Performance (Brynjolfsson & Hitt, 2000)",
-   "verdict": "REPRODUCED",
-   "note": "Smallest model: logY=a*IT+b*ORG+g*(IT*ORG). Recovered g~0.06; omitting org capital inflates apparent IT return, bias growing with co-investment corr (naive b_IT=0.21 vs true 0.12 at rho=0.8). Reproduces their methodological warning. Falsifi",
+   "verdict": "NOT_COMPUTABLE",
+   "note": "The cited result (Brynjolfsson-Hitt 2000, JEP 14(4): IT/organizational-capital complementarity) is an EMPIRICAL estimate on real firm data. Our model fit logY=a*IT+b*ORG+g*(IT*ORG) with a PLANTED g~0.06 and correlated regressors, then recovered that omitting ORG inflates the IT coefficient (0.21 vs 0.12) -- but that is the textbook omitted-variable-bias identity, guaranteed once you build the interaction term and correlate the inputs. It ILLUSTRATES the mechanism behind their warning; it does NOT replicate their measured complementarity from data. Reclassified REPRODUCED->NOT_COMPUTABLE (Crucible audit 2026-07-05): tautological simulation of our own assumptions.",
    "lab_id": "8256e7",
    "code": "",
    "date": "2026-06-11"
@@ -443,8 +434,8 @@
   {
    "claim": "Toutanova-Chen (2015): a simple observed-features model matches or beats latent-feature (embedding) models on knowledge-base completion",
    "source": "Toutanova and Chen (2015)",
-   "verdict": "REPRODUCED",
-   "note": "On a synthetic KB with planted compositional structure (target relation = r0->r1 path), the OBSERVED-features model (2-hop path + degree) scored AUC 0.966 vs the LATENT SVD model 0.749 (+0.216). Path features capture composition that low-ra",
+   "verdict": "NOT_COMPUTABLE",
+   "note": "The cited result (Toutanova-Chen 2015, W15-4007: observed/path features match or beat latent embeddings on KB completion) is EMPIRICAL on REAL KBs (FB15k, WN18). Our synthetic reproduction PLANTED the r0->r1 compositional structure that path-features are built to detect, so the observed-beats-latent gap (AUC 0.966 vs 0.749) is guaranteed BY CONSTRUCTION -- it illustrates the mechanism (path features read compositional paths low-rank SVD misses) but is NOT an independent replication of the paper's real-data result. Reclassified REPRODUCED->NOT_COMPUTABLE (Crucible audit 2026-07-05). Faithful next step: Node+LinkFeat vs an embedding model on FB15k-237.",
    "lab_id": "43c007",
    "code": "",
    "date": "2026-06-11"
