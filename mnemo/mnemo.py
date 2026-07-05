@@ -289,6 +289,9 @@ class Mnemo:
                 rec["taint"] = sorted(taint)
             if links:
                 rec["links"] = links
+                rec["derived_from"] = list(links)   # explicit lineage (distinct from corroboration links) so
+                #                                     a derived memory's evidence grade can be capped at its
+                #                                     weakest parent's -- trust taint propagates, not just source taint
         if key is not None:
             rec["key"] = str(key)
         # ORIGIN ATTESTATION (OPT-IN): bind this claim to a source's VERIFIED KEY. attestation is
@@ -1228,8 +1231,20 @@ class Mnemo:
                          "correlated-origin agreement; raise suspicion, do not read as stronger corroboration")
         if adjudicated:
             notes.append("adjudicated: confirmed by an out-of-band check with a different failure mode")
-        return {"status": status, "grade": g["grade"], "distinct_sources": n_src,
-                "distinct_verified_keys": n_keys, "corroborating_links": len(links),
+        # lineage cap: a DERIVED memory (a summary/consolidation) is only as adjudicated as its WEAKEST parent
+        # -- a chain is as independent as its least-independent link, so trust taint propagates, not just source
+        # taint. grade() is non-recursive, so grading parents here cannot loop. One level (immediate parents).
+        parents = [p for p in (rec.get("derived_from") or []) if p in by_id]
+        lineage_grade = g["grade"]
+        if parents:
+            rank = {gr: i for i, gr in enumerate(Mnemo._GRADES)}
+            par_grades = [self.grade(by_id[p], _by_id=by_id)["grade"] for p in parents]
+            lineage_grade = min([g["grade"]] + par_grades, key=lambda gr: rank.get(gr, 0))
+            if rank.get(lineage_grade, 0) < rank.get(g["grade"], 0):
+                notes.append("lineage-capped: derived from a weaker input (grade '%s') -- a derived memory is "
+                             "only as adjudicated as its least-adjudicated parent" % lineage_grade)
+        return {"status": status, "grade": g["grade"], "lineage_grade": lineage_grade,
+                "distinct_sources": n_src, "distinct_verified_keys": n_keys, "corroborating_links": len(links),
                 "low_source_diversity": low_diversity, "adjudicated": adjudicated,
                 "notes": notes or ["no corroboration yet (claimed)"]}
 
