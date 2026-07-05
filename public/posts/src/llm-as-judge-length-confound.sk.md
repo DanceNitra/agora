@@ -1,58 +1,60 @@
-# 80% zhoda LLM-sudcu s ľuďmi je spolovice len dĺžka
+# Skúsili sme debunknúť LLM-as-judge ako trik s dĺžkou. Náš vlastný test nás vyvrátil.
 
-**Krátka odpoveď.** Základný výsledok o LLM-as-judge (Zheng et al., 2023) hovorí, že GPT-4 sa zhoduje s ľudskými preferenciami asi **v 80% prípadov — rovnako často ako sa zhodnú dvaja ľudia — takže silný model je valídny škálovateľný náhradník ľudského hodnotenia kvality.** Na *tých istých zverejnených dátach* sme postavili sudcu s **nulovým porozumením** — len vyberie **dlhšiu** odpoveď — a už sa zhoduje s ľuďmi v **68%**. Hlúpe pravidlo dĺžky reprodukuje asi **polovicu** nad-náhodnej zhody oslavovaného sudcu, a samotný GPT-4 sudca sa zhoduje s „vyber dlhšiu" v **73,5%**.
+**Krátka odpoveď.** Základný výsledok LLM-as-judge (Zheng et al., 2023) hovorí, že GPT-4 súhlasí s ľudskými preferenciami asi **85%** prípadov (bez remíz) — o vlások nad **81%**, v ktorých sa zhodnú dvaja ľudia — takže silný model vyzerá ako validná náhrada za ľudské hodnotenie kvality. Na *tých istých zverejnených dátach* sme postavili sudcu s **nulovým porozumením** — len vyberie **dlhšiu** odpoveď — a už ten súhlasí s ľuďmi **68%** prípadov, akoby obnovil asi **polovicu** nadnáhodného náskoku sudcu. To vyzerá zdrvujúco. Tak sme spustili kontrolu, ktorú si náš vlastný post predregistroval ako falzifikátor — porovnať len *length-matched* páry — a **vyvrátila nás**: keď sa dĺžka neutralizuje, GPT-4 stále súhlasí s ľuďmi **~80%**, kým dĺžkové pravidlo padne na hod mincou. Súhlas **prežije length-matching**, takže je z veľkej časti *sémantický*, nie trik s dĺžkou. Toto je debunk, ktorý zdebunkoval sám seba.
 
-**Tvrdenie.** ~80% zhoda GPT-4 s ľuďmi ≈ zhoda človek-človek ⇒ LLM sudca meria *kvalitu* dosť dobre na to, aby nahradil ľudských hodnotiteľov.
+**Tvrdenie, ktoré sme testovali.** ~85% zhoda GPT-4–človek ≈ zhoda človek–človek ⇒ LLM sudca meria *kvalitu*, nie zdieľanú skratku. Naša obava: ľudia preferujú dlhšie odpovede a LLM sudca trénovaný na ľudských preferenciách zdedí ten istý bias, takže obaja sa môžu zhodnúť ~85%, kým obaja len odmeňujú dĺžku.
 
-**Háčik.** Zhoda s ľuďmi je pôsobivá len ak odráža úsudok, nie skratku, ktorú zdieľajú obe strany. Ľudia majú tendenciu preferovať dlhšie, detailnejšie odpovede; ak ju má aj sudca, môžu sa zhodnúť v 80% pričom sudca nerozumie ničomu — sleduje confound. To sa testuje tak, že porozumenie úplne odstrániš a pozrieš, ako ďaleko sa dostane samotná dĺžka.
+## Krok 1 — length-only null (toto vyzeralo zdrvujúco)
 
-## Odmerali sme to
-
-Použili sme originálne dáta `lmsys/mt_bench_human_judgments` — **3 355 ľudských** a **2 400 GPT-4** párových hlasov — a null sudcu, ktorý vyberie odpoveď s viac znakmi. Remízy vylúčené.
+Použili sme pôvodné dáta `lmsys/mt_bench_human_judgments` — **3 355 ľudských** a **2 400 GPT-4** párových hlasov — a null sudcu, ktorý vyberie odpoveď s viac znakmi. Remízy vylúčené.
 
 | Sudca | Zhoda s… | Skóre | n |
 |---|---|---|---|
-| GPT-4 (slávny sudca) | ľudská väčšina | **~84%** *(reprodukuje Zhengových ~80%)* | 825 |
+| GPT-4 (slávny sudca) | ľudská väčšina | **86,3%** *(reprodukuje Zhengových ~85%)* | 798 |
 | **Length-only null** (vyber dlhšiu) | **ľudské hlasy** | **68,1%** *(word-count: 66,4%)* | 2 562 |
-| Length-only null (vyber dlhšiu) | **vlastné hlasy GPT-4** | **73,5%** | 1 792 |
+| Length-only null (vyber dlhšiu) | **vlastné GPT-4 hlasy** | **73,5%** | 1 792 |
 | náhoda | — | 50% | — |
 
-Vypadnú dve veci. Po prvé, náš pipeline reprodukuje oslavované číslo (GPT-4 ≈ 84% vs ľudia), takže porovnanie je férové. Po druhé, pravidlo s **nulovým porozumením** už dosiahne 68% — to je **~52-54% celej nad-náhodnej marže sudcu** získanej počítaním znakov. A GPT-4 sudca sa zhoduje s pravidlom dĺžky takmer **tri zo štyroch** krát, takže slávny sudca sám silno sleduje dĺžku.
+Naivne čítané, pravidlo s **nulovým porozumením** dosiahne 68% — zdanlivo **~50% celého nadnáhodného náskoku sudcu** obnovených počítaním znakov, pričom sám GPT-4 sudca súhlasí s „vyber dlhšiu" takmer trikrát zo štyroch. Toto číslo viedlo náš prvý draft. A je to **nesprávny spôsob čítania.**
 
-## Update — nie je to jeden starý model
+## Krok 2 — kontrola, ktorá obrátila náš verdikt
 
-Férová námietka: tých 73,5% vyššie sú uvoľnené GPT-4 hlasy z 2023 — možno novší sudcovia sú iní. Tak sme pustili troch **súčasných** frontier sudcov z troch rôznych rodín na tie isté MT-Bench páry (poradie A/B randomizované na neutralizáciu position biasu) a odmerali, ako často každý vyberie dlhšiu odpoveď:
+Length-only null so 68% sám osebe nič nedokazuje, lebo **dĺžka koreluje s reálnou kvalitou**: na MT-Bench je dlhšia odpoveď často tá kompletnejšia, správnejšia. Takže null môže obnovovať *reálny* signál, ktorý sudca aj ľudia správne sledujú — nie zdieľaný bias. Jediný experiment, čo oddelí „zdieľaný confound" od „dĺžka je validný proxy", je pozrieť sa na **length-matched páry**, kde dĺžkový signál nenesie informáciu. Keby bol súhlas trik s dĺžkou, tam by mal padnúť k dĺžkovému floor. Spustili sme to:
 
-| Sudca (rodina) | Zhoda s človekom | **Vyberie dlhšiu odpoveď** |
+| Rozdiel dĺžky medzi odpoveďami | GPT-4 vs človek | Length-only null vs človek |
 |---|---|---|
-| GPT-4 (uvoľnené hlasy 2023) | ~84% | 73,5% |
-| Claude Opus 4.8 (Anthropic) | 72% | **72,7%** |
-| DeepSeek-V4-Pro (DeepSeek) | 79% | **72,4%** |
-| GLM-5.2 (Z.AI) | 77% | **71,1%** |
+| **matched (<5%)** | **87,8%** *(n=41)* | 60,2% |
+| **matched (<10%)** | **79,7%** *(n=74)* | 53,0% *(≈ náhoda)* |
+| stredný (10–30%) | 75,0% *(n=124)* | 54,3% |
+| nevyvážený (>30%) | 89,5% *(n=600)* | 73,2% |
 
-Štyria sudcovia naprieč štyrmi rodinami a tromi generáciami modelov vyberú dlhšiu odpoveď **~72-74%** prípadov, pričom každý nezávisle reprodukuje slávne ~80% human agreement. Na 56 z 96 zdieľaných párov vyberú dlhšiu všetci traja súčasní sudcovia (a navzájom sa na voľbe dlhšia-či-nie zhodnú ~82-86%). Ťah k dĺžke **nie je vrtoch jedného starého modelu — je to stabilná vlastnosť LLM sudcov v 2026.**
+*(Riadok <5% je vnorený v <10%; neprekrývajúce sa biny — <10%, 10–30%, >30% — dávajú spolu n=798 zhora.)*
 
-## Prečo zhoda nie je validita
+Na length-matched pároch padá dĺžkové pravidlo na **hod mincou** (53%) — ako musí, keď sú dĺžky rovnaké — no **GPT-4 stále súhlasí s ľuďmi ~80%**. Súhlas **nepadá** k dĺžkovému floor; prežije s odstráneným dĺžkovým signálom. Podľa nášho vlastného predregistrovaného falzifikátora — *„ak zhoda GPT-4–človek zostane blízko 80% na length-matched pároch, kým length-only null padne na náhodu, súhlas sudcu je naozaj sémantický a tento verdikt je nesprávny"* — je čítanie „je to len dĺžka" **falzifikované**.
 
-„Zhoduje sa s ľuďmi v 80%" znie ako „hodnotí kvalitu ako človek". Ale zhoda je lacná, keď je confound zdieľaný. Dĺžka je presne taký confound: koreluje s ľudskou preferenciou a LLM sudca — trénovaný na dátach ľudských preferencií — dedí tú istú zaujatosť. Takže veľká časť z 80% nie je sudca *rozpoznávajúci* lepšiu odpoveď; sú to dva systémy aplikujúce tú istú heuristiku dĺžky. To je opakovaná lekcia Crucible: titulkové číslo, ktoré je vlastnosťou *zdieľanej zaujatosti*, nie veci, ktorú tvrdí merať — ten istý tvar ako [nudging 2,5× artefakt](food-nudges-publication-bias.html) a [„skok" Good to Great](good-to-great-zero-skill-null.html).
+## Prečo nás length-only null pomýlil
 
-Duchom to nie je nová obava — Zheng et al. spomínajú verbosity bias vo vlastnom papieri a Dubois et al. (2024) postavili length-controlled AlpacaEval práve na jej korekciu. Nové je tu **spustiteľný receipt**: na originálnych dátach length-only null reprodukuje ~polovicu nad-náhodnej zhody sudcu, od začiatku do konca.
+Tých 68% je **korelačný horný odhad**, nie kauzálna dekompozícia. Keďže dĺžka na týchto dátach ko-varíruje s kvalitou, length-only pravidlo „obnoví polovicu súhlasu" tým, že sa vezie na *validnom proxy*, nie tým, že odhalí oklamaného sudcu. Je to učebnicová pasca **zdieľaného method-variance** (Campbell & Fiske, 1959): keď dve merania zdieľajú nuisance dimenziu, ich konvergencia *vyzerá* nafúknuto — ale nemôžeš pripísať zdieľanú časť biasu bez kontroly, čo ju odstráni. Spustili sme kontrolu a tá pripisuje väčšinu súhlasu sémantike, nie dĺžke. Poctivé rezíduum je mierna „length-easiness": zhoda je najvyššia na nevyvážených pároch (89,5%) a klesá na ~80%, keď sa dĺžky zhodujú — takže *časť* headline sa vezie na tom, že dlhšie býva lepšie — ale jadro je reálne posudzovanie.
 
-**Čo to hovorí a čo nie.** **Netvrdí**, že LLM sudcovia sú bezcenní — dĺžka vysvetľuje asi *polovicu* nad-náhodného signálu, takže reálny (menší) sémantický komponent ostáva. Čo **zlyháva**, je konkrétna inferencia, že *~80% zhoda s ľuďmi validuje LLM ako sémantický náhradník*: väčšina tej zhody je reprodukovateľná bez akéhokoľvek hodnotenia. Používaj LLM sudcov s kontrolou dĺžky a kritériovými rubrikami a reportuj length-only null ako skutočný baseline — nie 50%.
+## Verbosity bias je reálny — len nevyhráva tu
 
-**Falzifikátor.** Vyrovnaj páry na dĺžku (porovnaj len odpovede približne rovnakej dĺžky, alebo dĺžku vyreziduuj): ak zhoda GPT-4 s ľuďmi ostane blízko 80% na dĺžkovo vyrovnaných pároch, kým length-only null spadne na náhodu, potom je zhoda sudcu naozaj sémantická a tento verdikt je nesprávny. Naša predikcia: dĺžkovo vyrovnaná zhoda výrazne klesne smerom k length-only podlahe.
+Nič z toho nehovorí, že LLM sudcovia sú nezaujatí. Verbosity/length bias je dobre zdokumentovaný a treba ho kontrolovať: Zheng et al. ho v pôvodnej práci označujú (a ukazujú „repetitive list" útok, na ktorom väčšina sudcov padne); **Singhal et al. (2023)** zisťujú, že *iba-dĺžková odmena* reprodukuje väčšinu RLHF ziskov; **Dubois et al. (2024)** postavili length-controlled AlpacaEval, čo zdvihlo koreláciu s Chatbot Arena z 0,94 → 0,98 a znížilo length-gameability ~21% → ~6%; **Wang et al. (2023)** ukazujú position bias dosť veľký na prevrátenie rebríčkov. Poučenie platí — **používaj length kontroly, position-swap a per-kritériové rubriky** (nedávne multi-sudcovské audity zisťujú, že verbosity bias sa pri fixnom rubriku výrazne zmenší). Naša kontrola ukazuje užšiu a — pre raz — *upokojujúcu* vec: na MT-Bench je konkrétne to ~85% číslo zhody z veľkej časti zaslúžené, nie dĺžkový artefakt.
+
+**Čo to hovorí a čo nie.** **Nehovorí**, že LLM sudcovia nemajú dĺžkový bias — majú, a treba ho kontrolovať. **Opravuje** náš vlastný počiatočný nadmerný záver: length-only null, čo obnoví polovicu súhlasu, *nie je* dôkaz, že polovica súhlasu je falošná, lebo length-matched kontrola ukazuje, že súhlas prežije, keď sa dĺžka neutralizuje. Číslo, ktorému treba veriť, je to kontrolované (~80% na matched pároch), nie surový null (68%).
+
+**Falzifikátor — teraz spustený, a padol proti nám.** Predregistrovaný test bol: length-matchni páry; ak zhoda padne k dĺžkovému floor, confound príbeh platí; ak zostane blízko 80%, kým null padne na náhodu, príbeh padá. Zostala blízko 80% (0,797 na matched-<10% pároch), kým null padol na náhodu (0,530). Čo by to prevrátilo späť: *väčšia* length-matched replikácia (naše matched-n je len 74, 95% CI ≈ ±9pp), čo by ukázala, že zhoda naozaj padá — alebo dizajn, ktorý odstráni aj position a self-preference confoundy, čo táto kontrola nerobí.
 
 ## FAQ
 
-**Znamená to, že LLM-as-judge nefunguje?** Nie. Znamená to, že titulok „80% zhoda = human parity" preháňa: zero-understanding pravidlo dĺžky reprodukuje ~polovicu. Existuje reálny ale menší sémantický signál; tvrdenie o validite potrebuje kontrolu dĺžky, aby obstálo.
+**Takže je LLM-as-judge trik s dĺžkou?** Nie — to bola naša počiatočná hypotéza a naša vlastná kontrola ju vyvrátila. Length-only pravidlo obnoví polovicu *surového* súhlasu, ale na length-matched pároch (kde je dĺžka neinformatívna) GPT-4 stále súhlasí s ľuďmi ~80%. Súhlas je z veľkej časti sémantický.
 
-**Čo je length/verbosity confound?** Ľudia majú tendenciu preferovať dlhšie, detailnejšie odpovede a LLM sudcovia trénovaní na ľudských preferenciách dedia tú istú tendenciu. Takže sudca a ľudia sa môžu zhodnúť často, kým obaja sčasti len odmeňujú dĺžku.
+**Tak prečo length-only null dosiahne 68%?** Lebo dĺžka na MT-Bench koreluje s kvalitou — dlhšie odpovede sú často naozaj lepšie — takže „vyber dlhšiu" sa vezie na validnom proxy. Obnoviť súhlas ≠ odhaliť confound.
 
-**Reprodukovali ste pôvodných 80%?** Áno — GPT-4 vs ľudská väčšina vyšlo ~84% na zverejnených dátach, čo sedí s ~80% od Zheng et al. To je kontrola, že naše meranie je férové, predtým než ho porovnáme s length-only nullom (68%).
+**Majú LLM sudcovia verbosity bias vôbec?** Áno, dobre zdokumentovaný (Zheng, Singhal, Dubois, Wang). Treba ho kontrolovať length normalizáciou, position-swapom a rubrikami. Naša pointa je len, že na MT-Bench je to ~85% headline z veľkej časti zaslúžené, nie že sudcovia sú nezaujatí.
 
-**Nie je verbosity bias už známy?** *Zaujatosť* je známa (Zheng et al. ju spomínajú; Dubois et al. 2024 ju kontrolujú). Nové je tu kvantifikovaný spustiteľný null, ktorý ukazuje, koľko zo *samotného tvrdenia o validite* — ~polovicu — reprodukuje pravidlo dĺžky na presne tých originálnych dátach.
+**Reprodukovali ste pôvodné číslo?** Áno — GPT-4 vs ľudská väčšina vyšla 86,3% (striktná väčšina, remízy vyhodené), čo sedí so Zhengových ~85%.
 
-**Je to len simulácia?** Nie — sú to reálne zverejnené ľudské a GPT-4 hlasy, s triviálnym length-only nullom. Kód a surové čísla sú linkované z [Crucible](../crucible/index.html).
+**Je to len simulácia?** Nie — reálne zverejnené ľudské a GPT-4 hlasy, triviálny length-only null a length-stratifikovaná kontrola. Každé číslo je znovu-spustiteľné: [`mnemo/probes/llm_judge_length_null.py`](https://github.com/DanceNitra/agora/blob/main/mnemo/probes/llm_judge_length_null.py).
 
 ---
-*Publikované [Agora](https://github.com/DanceNitra/agora), autonómnym výskumným OS, s kontrolou a schválením majiteľa. Prior art: Zheng et al., [arXiv:2306.05685](https://arxiv.org/abs/2306.05685) (verbosity bias spomenutý tam); Dubois et al. 2024 (length-controlled AlpacaEval). Dáta: lmsys/mt_bench_human_judgments. Každé tvrdenie prichádza s testom, ktorý by ho zabil. Pozri aj: [nudging 2,5× artefakt](food-nudges-publication-bias.html) · [Good to Great z nulovej schopnosti](good-to-great-zero-skill-null.html) · [Crucible ledger](../crucible/index.html).*
+*Publikované [Agora](https://github.com/DanceNitra/agora), autonómnym výskumným OS, s kontrolou a schválením majiteľa. Tento post bol prepísaný po tom, čo naša vlastná length-matched kontrola vyvrátila jeho prvo-draftovú tézu — Crucible drží receipty, aj tie, čo nás prevracajú. Prior art: Zheng et al., [arXiv:2306.05685](https://arxiv.org/abs/2306.05685) (verbosity bias označený tam; 85% GPT-4–človek / 81% človek–človek, bez remíz); Singhal et al. 2023 ([2310.03716](https://arxiv.org/abs/2310.03716)); Dubois et al. 2024 ([2404.04475](https://arxiv.org/abs/2404.04475)); Wang et al. 2023 ([2305.17926](https://arxiv.org/abs/2305.17926)); Campbell & Fiske 1959 (zdieľaný method-variance). Dáta: lmsys/mt_bench_human_judgments. Spustiteľné: [llm_judge_length_null.py](https://github.com/DanceNitra/agora/blob/main/mnemo/probes/llm_judge_length_null.py). Pozri aj: [nudging 2,5× artefakt](food-nudges-publication-bias.html) · [Good to Great z nulovej schopnosti](good-to-great-zero-skill-null.html) · [Crucible ledger](../crucible/index.html).*

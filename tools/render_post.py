@@ -148,17 +148,19 @@ META = {
     },
     "llm-as-judge-length-confound": {
         "slug": "llm-as-judge-length-confound",
-        "title": "LLM-as-Judge's 80% Human Match Is Half Just Length",
-        "title_sk": "80% zhoda LLM-sudcu s ľuďmi je spolovice len dĺžka",
-        "desc": "The famous LLM-as-judge result says GPT-4 agrees with humans ~80%. On the same data, a "
-                "zero-understanding 'pick the longer answer' null hits 68% — reproducing half the judge's "
-                "above-chance agreement. Measured on the original votes, with the falsifier.",
-        "desc_sk": "Slávny výsledok LLM-as-judge tvrdí, že GPT-4 sa zhoduje s ľuďmi ~80%. Na tých istých "
-                   "dátach „vyber dlhšiu odpoveď“ null dosiahne 68% — polovicu nad-náhodnej zhody sudcu. "
-                   "Odmerané na originálnych hlasoch, s falzifikátorom.",
+        "title": "We Tried to Debunk LLM-as-Judge as a Length Trick. Our Own Control Refuted It.",
+        "title_sk": "Skúsili sme debunknúť LLM-as-judge ako trik s dĺžkou. Náš vlastný test nás vyvrátil.",
+        "desc": "A length-only null recovers half of GPT-4's above-chance agreement with humans on MT-Bench "
+                "(68% vs 86%), which looks like a verbosity confound. But our pre-registered control — "
+                "length-matched pairs — refuted it: with length neutralized, GPT-4 still agrees ~80% while "
+                "the null drops to chance. The agreement is largely semantic. A debunk that debunked itself.",
+        "desc_sk": "Length-only null obnoví polovicu nadnáhodného súhlasu GPT-4 s ľuďmi na MT-Bench (68% vs "
+                   "86%), čo vyzerá ako verbosity confound. Ale naša predregistrovaná kontrola — length-matched "
+                   "páry — to vyvrátila: pri neutralizovanej dĺžke GPT-4 stále súhlasí ~80%, kým null padne na "
+                   "náhodu. Súhlas je z veľkej časti sémantický. Debunk, čo zdebunkoval sám seba.",
         "date": "2026-06-29",
-        "tags": "AI evaluation · LLM-as-judge · Verbosity bias · Replication",
-        "tags_sk": "AI hodnotenie · LLM-as-judge · Verbosity bias · Replikácia",
+        "tags": "AI evaluation · LLM-as-judge · Verbosity bias · Self-correction · Replication",
+        "tags_sk": "AI hodnotenie · LLM-as-judge · Verbosity bias · Sebaoprava · Replikácia",
         "kicker": "The Crucible", "kicker_sk": "Crucible",
     },
     "good-to-great-zero-skill-null": {
