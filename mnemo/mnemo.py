@@ -1179,6 +1179,52 @@ class Mnemo:
             "reproductions": len(repro), "witnesses": len(witness),
             "prior_art_empty": bool(prior_empty), "distinct_lenses": len(lenses)}}
 
+    def convergence_report(self, target) -> dict:
+        """Read-only: distinguish CONVERGENCE-BACKED (independent sources agree) from ADJUDICATED (an out-of-band
+        check with a DIFFERENT failure mode confirmed it). Corroboration measures independence of ORIGIN, never
+        correctness -- so genuinely independent sources can converge on a FALSE claim ("authenticated-but-false")
+        and nothing in the record content catches it. This surfaces the honest status so a consumer never reads
+        convergence as truth, and flags LOW SOURCE DIVERSITY (uniform agreement from few distinct origins should
+        RAISE suspicion, not confidence -- errors are correlated when checks share a substrate). Adjudication
+        belongs above this layer, through an ORTHOGONAL check: ratify(kind='reproduction'|'audit') from an
+        identity that is NOT the claim's own author -- only that lifts corroborated -> verified. Redundancy
+        recovers a wrong consensus only to the degree the checks' failure modes are independent (a known result:
+        Knight & Leveson 1986 on N-version programming; Condorcet/Ladha 1992 on correlated votes; Campbell &
+        Fiske 1959 on shared-method variance). Returns {status, grade, distinct_sources, corroborating_links,
+        low_source_diversity, adjudicated, notes}. Nothing here is settable by the writer."""
+        rec = target if isinstance(target, dict) else {x["id"]: x for x in self.items}.get(target)
+        if rec is None:
+            return {"status": None, "reason": "no such id"}
+        by_id = {x["id"]: x for x in self.items}
+        g = self.grade(rec)
+        ev = g["evidence"]
+        links = [l for l in (rec.get("links") or []) if l in by_id]
+        n_src = Mnemo._distinct_sources(rec.get("links"), by_id)
+        n_keys = Mnemo._distinct_verified_keys(rec.get("links"), by_id)
+        adjudicated = ev["reproductions"] > 0 or (ev["attested"] and (ev["multi_source"] or ev["witnesses"] > 0))
+        convergence_only = (ev["multi_source"] or ev["witnesses"] > 0) and not adjudicated
+        low_diversity = len(links) >= 2 and n_src <= 1
+        if g["grade"] in ("verified", "settled"):
+            status = "adjudicated"          # an out-of-band check (different failure mode) confirmed it
+        elif convergence_only:
+            status = "convergence-backed"   # sources agree; NOT established true -- do not promote to true
+        else:
+            status = g["grade"]             # claimed, or corroborated via an earned outcome only
+        notes = []
+        if convergence_only:
+            notes.append("convergence-backed: independent sources agree, but this is NOT adjudicated true; "
+                         "route to an ORTHOGONAL out-of-band check (ratify kind='reproduction'/'audit') before "
+                         "relying on it -- corroboration cannot see an authenticated-but-false claim")
+        if low_diversity:
+            notes.append("low source diversity: >=2 corroborating links resolve to <=1 distinct origin -- "
+                         "correlated-origin agreement; raise suspicion, do not read as stronger corroboration")
+        if adjudicated:
+            notes.append("adjudicated: confirmed by an out-of-band check with a different failure mode")
+        return {"status": status, "grade": g["grade"], "distinct_sources": n_src,
+                "distinct_verified_keys": n_keys, "corroborating_links": len(links),
+                "low_source_diversity": low_diversity, "adjudicated": adjudicated,
+                "notes": notes or ["no corroboration yet (claimed)"]}
+
     def slash(self, ids, scope: str = "source") -> dict:
         """Retroactive standing forfeiture — the accountability lever for a CAUGHT poison. When a memory is
         caught driving a bad outcome (the application detects/attributes it), slash() FORFEITS the entire
