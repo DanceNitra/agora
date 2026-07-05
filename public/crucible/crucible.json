@@ -3,9 +3,9 @@
  "description": "Scientific and technical claims rebuilt as minimal computational models and tested. REPRODUCED = the mechanism holds in a minimal model; FAILED = it does not; NOT_COMPUTABLE = no simulable core (an honest pass).",
  "generated": "2026-07-05",
  "counts": {
-  "REPRODUCED": 24,
-  "FAILED": 12,
-  "NOT_COMPUTABLE": 17
+  "REPRODUCED": 21,
+  "FAILED": 10,
+  "NOT_COMPUTABLE": 22
  },
  "entries": [
   {
@@ -20,8 +20,8 @@
   {
    "claim": "Internet AS-level topology follows a power-law degree distribution",
    "source": "Faloutsos et al. 1999 SIGCOMM; tested vs exponential/log-normal via Clauset-Shalizi-Newman 2009 SIAM Rev., cf. Broido & Clauset 2019 Nat Commun 10:1017",
-   "verdict": "FAILED",
-   "note": "Real 2000 AS data (SNAP, 6474 nodes), CSN MLE: power-law (alpha=2.15, matches Faloutsos exponent) beats exponential (p=0.0002) but ties log-normal (p=0.616, NS). Confirms Broido-Clauset: <5% of networks are truly scale-free.",
+   "verdict": "NOT_COMPUTABLE",
+   "note": "Real 2000 AS data (SNAP, 6474 nodes), CSN MLE: power-law alpha=2.15 BEATS exponential (p=0.0002) but TIES lognormal (Vuong p=0.616, NS). A tie means the data CANNOT distinguish power-law from lognormal -- the power law is not rejected, just not uniquely best (CSN 'inconclusive'). Reclassified FAILED->NOT_COMPUTABLE (Crucible audit 2026-07-05): the Faloutsos claim is neither confirmed nor refuted here, so a clean FAILED overclaimed.",
    "lab_id": "4399e9",
    "code": "",
    "date": "2026-07-01"
@@ -81,10 +81,10 @@
    "date": "2026-06-29"
   },
   {
-   "claim": "Cosine similarity cannot distinguish a superseded fact from its replacement (the 'supersession blind spot'); a deterministic (subject, relation, object) ledger removes stale-fact recall.",
+   "claim": "Cosine similarity BARELY distinguishes a superseded fact from its replacement (AUROC ~0.61, near chance) so a pure-cosine store serves the stale value ~42% of the time; a deterministic (subject, relation, object) key fixes it.",
    "source": "Temporal Validity in Retrieval Memory: Eliminating Stale-Fact Errors (Yadav, MemStrata, arXiv:2606.26511)",
    "verdict": "REPRODUCED",
-   "note": "Replicated on local nomic (24 subject-relation-object facts, mean-centered): the cosine 'is-this-a-supersession' classifier scores AUROC 0.613 (chance 0.5; Yadav ~0.59) -- a contradiction is often MORE embedding-similar to the original than a genuine rephrase (10/24 cases). A pure-cosine top-1 store served the stale value 41.7% of the time; a deterministic (subject,relation,object) supersession key drove that to 0% (shipped in mnemo v0.2.0). Falsifier: if the key did not cut stale below cosine it would be useless -- it did. Honest scope: synthetic, 24 facts, characterizes the mechanism, not a product benchmark.",
+   "note": "Replicated on local nomic (24 subject-relation-object facts, mean-centered): the cosine 'is-this-a-supersession' classifier scores AUROC 0.613 (chance 0.5; Yadav ~0.59) -- a contradiction is often MORE embedding-similar to the original than a genuine rephrase (10/24 cases). A pure-cosine top-1 store served the stale value 41.7% of the time; a deterministic (subject,relation,object) supersession key drove that to 0% (shipped in mnemo v0.2.0). Falsifier: if the key did not cut stale below cosine it would be useless -- it did. Honest scope: synthetic, 24 facts, characterizes the mechanism, not a product benchmark. SCOPED (Crucible audit 2026-07-05): AUROC 0.613 is barely ABOVE chance (0.5), not zero -- the honest statement is 'near-useless in practice', carried by the harm number (pure-cosine top-1 served the STALE value 41.7% of the time), not by 'cannot'. n=24 = small-n replication consistent with Yadav 0.59 (arXiv:2606.26511), not a large-n certification.",
    "lab_id": "exp_supersession_replication",
    "code": "https://github.com/DanceNitra/agora/blob/main/mnemo/probes/supersession_replication.py",
    "date": "2026-06-28"
@@ -93,7 +93,7 @@
    "claim": "Episodic memory (Model-Free Episodic Control: store the MAX observed discounted return per state-action) gives sample-efficient RL vs incremental parametric value learning.",
    "source": "Sarrico, Arulkumaran, Agostinelli et al. - Sample-Efficient Reinforcement Learning with Maximum Entropy Mellowmax Episodic Control",
    "verdict": "REPRODUCED",
-   "note": "Smallest model of the mechanism; exploration HELD IDENTICAL (both learners fed the same uniform-random trajectories off-policy, so the only difference is credit assignment). Exp A (deterministic chain + step cost): EC reaches a goal-reachin",
+   "note": "Smallest model of the mechanism; exploration HELD IDENTICAL (both learners fed the same uniform-random trajectories off-policy, so the only difference is credit assignment). Exp A (deterministic chain + step cost): EC reaches a goal-reachin SCOPED (Crucible audit 2026-07-05): the max-return store is unbiased only in a NOISELESS deterministic env (max=mean); EC beating parametric learning on a tiny deterministic chain is close to textbook (tabular memorization beats function approximation when no generalization is needed). Do not generalize to broad sample-efficiency.",
    "lab_id": "84b6b7",
    "code": "",
    "date": "2026-06-26"
@@ -101,8 +101,8 @@
   {
    "claim": "MemGPT-style paging memory keeps QA accuracy FLAT as the corpus/context scales (0->700 docs)",
    "source": "MemGPT (Packer et al.) flat-accuracy-vs-corpus claim, via the agent-memory transcript scan",
-   "verdict": "FAILED",
-   "note": "Smallest model (exp_memgpt_flatcurve.py, cloud-free, local nomic-embed-text retriever; reader factor = OUR measured oracle accuracy single 0.95 / 3-hop 0.91). Pages top-B=8 from a synthetic corpus scaling N=10..250. SINGLE-hop QA flat at 0.",
+   "verdict": "NOT_COMPUTABLE",
+   "note": "Not a fair adjudication of MemGPT (Packer et al. 2023, arXiv:2310.08560): (1) synthetic corpus + OUR OWN measured reader-accuracy factor (0.95/0.91) is baked in, so the reader ceiling drives the curve; (2) tested only to N=250, but the claim is 0->700 docs; (3) SINGLE-hop QA stayed FLAT -- which CONFIRMS MemGPT's actual paper claim -- and only MULTI-hop synthesis degraded, which the paper never claimed stays flat. Reclassified FAILED->NOT_COMPUTABLE (Crucible audit 2026-07-05): failing a claim the paper did not make. (The multi-hop synthesis collapse is real and lives in the RAG-is-dead marquee.)",
    "lab_id": "f4e22f",
    "code": "",
    "date": "2026-06-24"
@@ -120,7 +120,7 @@
    "claim": "Real-world networks are scale-free: their degree distributions follow a power law p(k) ~ k^-alpha.",
    "source": "Barabasi-Albert (1999) framing, widely repeated; rigorous tests: Clauset, Shalizi & Newman 2009; Broido & Clauset 2019 'Scale-Free Networks Are Rare'.",
    "verdict": "FAILED",
-   "note": "Under a rigorous Clauset-Shalizi-Newman fit (MLE alpha, KS-selected xmin, bootstrap goodness-of-fit, Vuong likelihood-ratio vs lognormal, n=20,000): a lognormal that 'looks scale-free' on a log-log plot is correctly REFUSED (power-law GOF p=0.01; LR favors lognormal, -17.5); a genuine Pareto power law passes (GOF p=0.92; LR +102); and a real Barabasi-Albert network is only a TIE (LR -0.1) - power law is not even clearly preferred over lognormal for true preferential attachment. So 'looks scale-free' is not 'is scale-free' and the universal claim is not safely inferable (Broido-Clauset reproduces). Power law IS reproduced for true BA graphs.",
+   "note": "Under a rigorous Clauset-Shalizi-Newman fit (MLE alpha, KS-selected xmin, bootstrap goodness-of-fit, Vuong likelihood-ratio vs lognormal, n=20,000): a lognormal that 'looks scale-free' on a log-log plot is correctly REFUSED (power-law GOF p=0.01; LR favors lognormal, -17.5); a genuine Pareto power law passes (GOF p=0.92; LR +102); and a real Barabasi-Albert network is only a TIE (LR -0.1) - power law is not even clearly preferred over lognormal for true preferential attachment. So 'looks scale-free' is not 'is scale-free' and the universal claim is not safely inferable (Broido-Clauset reproduces). Power law IS reproduced for true BA graphs. CONTESTED (Crucible audit 2026-07-05): FAILED holds only under the STRICT CSN pure-power-law criterion; under regularly-varying / generalized-power-law definitions many networks pass (Voitalov et al. 2019; Serafino et al. 2021 PNAS: finite-size effects hide true power laws). Open debate, not a closed debunk.",
    "lab_id": "e88ca9",
    "code": "",
    "date": "2026-06-19"
@@ -254,8 +254,8 @@
   {
    "claim": "p-hacking inflates Type I error in the error-statistical (Neyman-Pearson) approach but not in formal/likelihood inference that accounts for the selection",
    "source": "Rubin (2026)",
-   "verdict": "REPRODUCED",
-   "note": "Under a true null (N=5000, n=30, K=5 forks): NP p-hacking (report min p) inflates Type I error 0.051->0.227 (+17.6pp, 4.45x, matches 1-.95^5=0.226). Formal/likelihood: a selection-ACCOUNTED likelihood (correct best-of-K sampling distributio",
+   "verdict": "NOT_COMPUTABLE",
+   "note": "First half SOUND (report-min-p over K=5 forks inflates Type I 0.051->0.227 = Sidak 1-.95^5=0.226). But 'a selection-ACCOUNTED likelihood does not inflate' is TAUTOLOGICAL: feed in the correct best-of-K selection distribution and calibration is guaranteed -- FAILED was never possible. Reclassified REPRODUCED->NOT_COMPUTABLE (Crucible audit 2026-07-05): illustrates Rubin's (2026, arXiv:2602.21792) definitional point, does not TEST it. Prior art: Sidak/Bonferroni multiple comparisons.",
    "lab_id": "f4136f",
    "code": "",
    "date": "2026-06-14"
@@ -281,8 +281,8 @@
   {
    "claim": "Berger (2003): conditional-frequentist testing reconciles Fisher/Neyman/Jeffreys - the conditional error probability equals the Bayesian posterior; the naive p-value overstates evidence against H0",
    "source": "Berger (2003), Could Fisher, Jeffreys and Neyman Have Agreed on Testing?",
-   "verdict": "REPRODUCED",
-   "note": "Calibration exact: empirical freq(H0 true | evidence) = Bayesian P(H0|x) across all bins. Berger-Sellke: p=0.05 -> P(H0|x)=0.216, p=0.005 -> 0.041 (p-value overstates evidence ~4x at 0.05).",
+   "verdict": "NOT_COMPUTABLE",
+   "note": "Berger (2003, Stat. Sci. 18(1)) is faithfully cited, but 'conditional error probability = Bayesian posterior' is Berger's THEOREM -- an algebraic identity of the conditional test. Re-verifying it on data drawn from the same prior just re-derives Bayes' rule; FAILED impossible -> by construction. Also the cited 0.216/0.041 do not match the canonical Berger-Sellke bound (~0.29 at p=.05). Reclassified REPRODUCED->NOT_COMPUTABLE (Crucible audit 2026-07-05).",
    "lab_id": "6e4ffc",
    "code": "",
    "date": "2026-06-13"
@@ -315,10 +315,10 @@
    "date": "2026-06-12"
   },
   {
-   "claim": "Miller (1957): random typing (letters + space) produces Zipf law, so Zipf law in language carries no linguistic significance",
+   "claim": "Miller (1957): random typing (letters + space) reproduces the POWER-LAW FORM of Zipf, but random-typing Zipf is statistically DISTINCT from real language (Ferrer-i-Cancho 2010; Piantadosi 2014) -- so 'Zipf proves nothing linguistic' overclaims.",
    "source": "Miller, American Journal of Psychology 70, 1957 - Some effects of intermittent silence",
    "verdict": "REPRODUCED",
-   "note": "Random-typing corpus (443k words): rank-frequency exponent -1.24, an approximate power law - the math reproduces. Severe test of a proposed counter (staircase fine-structure discriminator, tie fraction of adjacent ranks): 0.89 vs 0.48 at ma",
+   "note": "Random-typing corpus (443k words): rank-frequency exponent -1.24, an approximate power law - the math reproduces. Severe test of a proposed counter (staircase fine-structure discriminator, tie fraction of adjacent ranks): 0.89 vs 0.48 at ma CORRECTED (Crucible audit 2026-07-05): the prior headline 'Zipf carries no linguistic significance' is refuted by Ferrer-i-Cancho & Elvevag 2010 (random texts do NOT exhibit real Zipf) and Piantadosi 2014; our own staircase discriminator (0.89 vs 0.48) SEPARATES real from random, contradicting that headline. The power-law FORM reproduces; the linguistic-insignificance conclusion does not.",
    "lab_id": "4779c1",
    "code": "",
    "date": "2026-06-12"
@@ -327,7 +327,7 @@
    "claim": "Evans & Archer (1968) / textbook canon: a portfolio of ~20-30 stocks achieves practically complete diversification - marginal benefit beyond 30 is negligible",
    "source": "Evans & Archer, Journal of Finance 23(4), 1968 - Diversification and the reduction of dispersion",
    "verdict": "REPRODUCED",
-   "note": "Holds at realistic tails: N=30 captures 95.6-96.9% of achievable vol AND ES99 reduction (normal and t2.5 idio + 1-factor). MEASURED BOUNDARY: near infinite-variance idio tails (t1.8) the canon breaks - only 85.4% of tail-risk reduction capt",
+   "note": "Holds at realistic tails: N=30 captures 95.6-96.9% of achievable vol AND ES99 reduction (normal and t2.5 idio + 1-factor). MEASURED BOUNDARY: near infinite-variance idio tails (t1.8) the canon breaks - only 85.4% of tail-risk reduction capt ATTRIBUTION (Crucible audit 2026-07-05): Evans & Archer's own result was ~10-16 stocks; the '~20-30' is post-Statman (1987) textbook canon.",
    "lab_id": "7656de",
    "code": "",
    "date": "2026-06-12"
@@ -389,8 +389,8 @@
   {
    "claim": "In the low-data regime you can learn online policies with 2-10x fewer total coefficients with little to no loss of performance.",
    "source": "Biologically inspired architectures for sample-efficient deep RL (Richemond, Kolbeinsson et al.)",
-   "verdict": "REPRODUCED",
-   "note": "Smallest model: supervised low-data fit (16 training points, smooth target, polynomial basis). Test MSE by coefficient count K: K=6 -> 0.015 (best); K=14 -> 3009 (catastrophic overfit). Shrinking from K=14 to K=6 = 2.3x fewer coefficients a",
+   "verdict": "NOT_COMPUTABLE",
+   "note": "The cited paper (Richemond-Kolbeinsson-Guo, arXiv:1911.11285) tensor-factorizes ONLINE RL policies for 2-10x fewer coefficients. Our reproduction tests none of that: a supervised polynomial fit on 16 points showing K=14 overfits and K=6 is best -- textbook bias-variance, and '2.3x' is engineered by picking an overfitting K (any ratio is manufacturable). Reclassified REPRODUCED->NOT_COMPUTABLE (Crucible audit 2026-07-05): a textbook overfit demo, not a replication of the paper's mechanism.",
    "lab_id": "7bbc76",
    "code": "",
    "date": "2026-06-11"

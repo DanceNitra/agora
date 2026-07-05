@@ -5,7 +5,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>The Crucible &middot; a machine that rebuilds claims in code &middot; Agora</title>
-<meta name="description" content="A public ledger of scientific and technical claims rebuilt as minimal computational models and tested in code: 24 reproduced, 12 failed, 4 honest passes. Every verdict ships runnable code and a measured number.">
+<meta name="description" content="A public ledger of scientific and technical claims rebuilt as minimal computational models and tested in code: 21 reproduced, 10 failed, 4 honest passes. Every verdict ships runnable code and a measured number.">
 <link rel="canonical" href="https://dancenitra.github.io/agora/public/crucible/">
 <meta property="og:type" content="website">
 <meta property="og:title" content="The Crucible — claims, rebuilt in code and tested">
@@ -174,8 +174,8 @@
   rarest export, published here), and <b>not computable</b> when there&rsquo;s no simulable core.
   Every verdict ships a measured number and the code that produced it.</p>
   <div class="tally">
-    <div class="t ok"><div class="num">24</div><div class="lbl">Reproduced</div></div>
-    <div class="t fail"><div class="num">12</div><div class="lbl">Failed</div></div>
+    <div class="t ok"><div class="num">21</div><div class="lbl">Reproduced</div></div>
+    <div class="t fail"><div class="num">10</div><div class="lbl">Failed</div></div>
     <div class="t"><div class="num">4</div><div class="lbl">Honest passes</div></div>
   </div>
   <div class="dataset">Open data &mdash; <a href="crucible.json">the full ledger as JSON</a> &middot; now a citable dataset on <a href="https://huggingface.co/datasets/Danchi17/folklore-index" target="_blank" rel="noopener">Hugging&nbsp;Face &rarr;</a><br><span class="loadline"><code>datasets.load_dataset("Danchi17/folklore-index")</code></span></div>
@@ -195,7 +195,7 @@
     </div>
   </section>
 <section class="ledger"><div class="wrap">
-  <div class="sechead"><h2>The ledger</h2><div class="sub">36 claims rebuilt &amp; tested &middot; newest first</div></div>
+  <div class="sechead"><h2>The ledger</h2><div class="sub">31 claims rebuilt &amp; tested &middot; newest first</div></div>
   <div class="filters">
     <button class="on" data-f="all">All</button>
     <button data-f="REPRODUCED">Reproduced</button>
@@ -210,16 +210,6 @@
           <h3>A big-enough context window replaces retrieval (CAG / &quot;RAG is dead&quot;): preload the whole co</h3>
           <p class="cresult">Judge-free probe on one synthetic structured log at 5k/25k/60k/110k tokens, two task families. NEEDLE (single-fact lookup) = 1.00 at every length incl. 110k; SYNTH (read-everything count/filter aggregation) collapses 0.75-&gt;~0.25-0.375 by ~25k and stays there. Verdict FAILED for CAG *on synthesis*; needle lookup survives long context fine, so blanket &quot;context rot kills recall&quot; is also too strong. It is the task type, not the length. Replicates lost-in-the-middle (Liu 2023/TACL 2024), RULER (Hsieh/NVIDIA 2024), NoLiMa (2502.05167), Chroma context-rot (2025, non-peer-reviewed). HONEST LIMITS: n=8 synth Qs/length (the 0.75-&gt;0.3 drop is Fisher p~0.13, credible mainly by matching the replicated literature); one frontier model (exact model not logged); even at 5k synth is 0.75 so part of the failure is exhaustive arithmetic the model cannot do at any length -&gt; the real fix for count/filter is a TOOL, not retrieval. Probe: mnemo/probes/ragdead (generator + independent gold-re-derivation scorer). Post: public/posts/does-long-context-kill-rag.html.</p>
           <div class="cfoot"><span class="cyear">CAG / &amp;quot;long context kills RAG&amp;quot; viral</span><a class="code" href="https://github.com/DanceNitra/agora/blob/main/mnemo/probes/ragdead/exp_ragdead_A.py" target="_blank" rel="noopener">runnable model &rarr;</a></div>
-        </div>
-      </article>
-      <article class="card fail" data-v="FAILED" data-reveal>
-        <div class="crail"></div>
-        <div class="cbody">
-          <div class="chead"><span class="cv">FAILED</span>
-            <span class="cfield">Network science</span></div>
-          <h3>The &#x27;scale-free Internet&#x27; claim doesn&#x27;t survive the rigorous test</h3>
-          <p class="cresult">On real 2000-era AS-topology data (6,474 nodes), a power-law fit (alpha=2.15, matching Faloutsos&#x27;s own reported exponent) beats a naive exponential baseline (p=0.0002) but is statistically INDISTINGUISHABLE from log-normal (p=0.616) -- exactly the pattern Broido &amp; Clauset (2019) found across most real networks.</p>
-          <div class="cfoot"><span class="cyear">Faloutsos, Faloutsos &amp; Faloutsos 1999 (SIGCOMM)</span></div>
         </div>
       </article>
       <article class="card fail" data-v="FAILED" data-reveal>
@@ -287,8 +277,8 @@
         <div class="cbody">
           <div class="chead"><span class="cv">REPRODUCED</span>
             <span class="cfield"></span></div>
-          <h3>Cosine similarity cannot distinguish a superseded fact from its replacement (the &#x27;superses</h3>
-          <p class="cresult">Replicated on local nomic (24 subject-relation-object facts, mean-centered): the cosine &#x27;is-this-a-supersession&#x27; classifier scores AUROC 0.613 (chance 0.5; Yadav ~0.59) -- a contradiction is often MORE embedding-similar to the original than a genuine rephrase (10/24 cases). A pure-cosine top-1 store served the stale value 41.7% of the time; a deterministic (subject,relation,object) supersession key drove that to 0% (shipped in mnemo v0.2.0). Falsifier: if the key did not cut stale below cosine it would be useless -- it did. Honest scope: synthetic, 24 facts, characterizes the mechanism, not a product benchmark.</p>
+          <h3>Cosine similarity BARELY distinguishes a superseded fact from its replacement (AUROC ~0.61</h3>
+          <p class="cresult">Replicated on local nomic (24 subject-relation-object facts, mean-centered): the cosine &#x27;is-this-a-supersession&#x27; classifier scores AUROC 0.613 (chance 0.5; Yadav ~0.59) -- a contradiction is often MORE embedding-similar to the original than a genuine rephrase (10/24 cases). A pure-cosine top-1 store served the stale value 41.7% of the time; a deterministic (subject,relation,object) supersession key drove that to 0% (shipped in mnemo v0.2.0). Falsifier: if the key did not cut stale below cosine it would be useless -- it did. Honest scope: synthetic, 24 facts, characterizes the mechanism, not a product benchmark. SCOPED (Crucible audit 2026-07-05): AUROC 0.613 is barely ABOVE chance (0.5), not zero -- the honest statement is &#x27;near-useless in practice&#x27;, carried by the harm number (pure-cosine top-1 served the STALE value 41.7% of the time), not by &#x27;cannot&#x27;. n=24 = small-n replication consistent with Yadav 0.59 (arXiv:2606.26511), not a large-n certification.</p>
           <div class="cfoot"><span class="cyear">Temporal Validity in Retrieval Memory: Elimina</span><a class="code" href="https://github.com/DanceNitra/agora/blob/main/mnemo/probes/supersession_replication.py" target="_blank" rel="noopener">runnable model &rarr;</a></div>
         </div>
       </article>
@@ -298,7 +288,7 @@
           <div class="chead"><span class="cv">REPRODUCED</span>
             <span class="cfield"></span></div>
           <h3>Episodic memory (Model-Free Episodic Control: store the MAX observed discounted return per</h3>
-          <p class="cresult">Smallest model of the mechanism; exploration HELD IDENTICAL (both learners fed the same uniform-random trajectories off-policy, so the only difference is credit assignment). Exp A (deterministic chain + step cost): EC reaches a goal-reachin</p>
+          <p class="cresult">Smallest model of the mechanism; exploration HELD IDENTICAL (both learners fed the same uniform-random trajectories off-policy, so the only difference is credit assignment). Exp A (deterministic chain + step cost): EC reaches a goal-reachin SCOPED (Crucible audit 2026-07-05): the max-return store is unbiased only in a NOISELESS deterministic env (max=mean); EC beating parametric learning on a tiny deterministic chain is close to textbook (tabular memorization beats function approximation when no generalization is needed). Do not generalize to broad sample-efficiency.</p>
           <div class="cfoot"><span class="cyear">Sarrico, Arulkumaran, Agostinelli et al. - Sam</span></div>
         </div>
       </article>
@@ -307,18 +297,8 @@
         <div class="cbody">
           <div class="chead"><span class="cv">FAILED</span>
             <span class="cfield"></span></div>
-          <h3>MemGPT-style paging memory keeps QA accuracy FLAT as the corpus/context scales (0-&gt;700 doc</h3>
-          <p class="cresult">Smallest model (exp_memgpt_flatcurve.py, cloud-free, local nomic-embed-text retriever; reader factor = OUR measured oracle accuracy single 0.95 / 3-hop 0.91). Pages top-B=8 from a synthetic corpus scaling N=10..250. SINGLE-hop QA flat at 0.</p>
-          <div class="cfoot"><span class="cyear">MemGPT (Packer et al.) flat-accuracy-vs-corpus</span></div>
-        </div>
-      </article>
-      <article class="card fail" data-v="FAILED" data-reveal>
-        <div class="crail"></div>
-        <div class="cbody">
-          <div class="chead"><span class="cv">FAILED</span>
-            <span class="cfield"></span></div>
           <h3>Real-world networks are scale-free: their degree distributions follow a power law p(k) ~ k</h3>
-          <p class="cresult">Under a rigorous Clauset-Shalizi-Newman fit (MLE alpha, KS-selected xmin, bootstrap goodness-of-fit, Vuong likelihood-ratio vs lognormal, n=20,000): a lognormal that &#x27;looks scale-free&#x27; on a log-log plot is correctly REFUSED (power-law GOF p=0.01; LR favors lognormal, -17.5); a genuine Pareto power law passes (GOF p=0.92; LR +102); and a real Barabasi-Albert network is only a TIE (LR -0.1) - power law is not even clearly preferred over lognormal for true preferential attachment. So &#x27;looks scale-free&#x27; is not &#x27;is scale-free&#x27; and the universal claim is not safely inferable (Broido-Clauset reproduces). Power law IS reproduced for true BA graphs.</p>
+          <p class="cresult">Under a rigorous Clauset-Shalizi-Newman fit (MLE alpha, KS-selected xmin, bootstrap goodness-of-fit, Vuong likelihood-ratio vs lognormal, n=20,000): a lognormal that &#x27;looks scale-free&#x27; on a log-log plot is correctly REFUSED (power-law GOF p=0.01; LR favors lognormal, -17.5); a genuine Pareto power law passes (GOF p=0.92; LR +102); and a real Barabasi-Albert network is only a TIE (LR -0.1) - power law is not even clearly preferred over lognormal for true preferential attachment. So &#x27;looks scale-free&#x27; is not &#x27;is scale-free&#x27; and the universal claim is not safely inferable (Broido-Clauset reproduces). Power law IS reproduced for true BA graphs. CONTESTED (Crucible audit 2026-07-05): FAILED holds only under the STRICT CSN pure-power-law criterion; under regularly-varying / generalized-power-law definitions many networks pass (Voitalov et al. 2019; Serafino et al. 2021 PNAS: finite-size effects hide true power laws). Open debate, not a closed debunk.</p>
           <div class="cfoot"><span class="cyear">Barabasi-Albert (1999) framing, widely repeate</span></div>
         </div>
       </article>
@@ -397,29 +377,9 @@
         <div class="cbody">
           <div class="chead"><span class="cv">REPRODUCED</span>
             <span class="cfield"></span></div>
-          <h3>p-hacking inflates Type I error in the error-statistical (Neyman-Pearson) approach but not</h3>
-          <p class="cresult">Under a true null (N=5000, n=30, K=5 forks): NP p-hacking (report min p) inflates Type I error 0.051-&gt;0.227 (+17.6pp, 4.45x, matches 1-.95^5=0.226). Formal/likelihood: a selection-ACCOUNTED likelihood (correct best-of-K sampling distributio</p>
-          <div class="cfoot"><span class="cyear">Rubin (2026)</span></div>
-        </div>
-      </article>
-      <article class="card ok" data-v="REPRODUCED" data-reveal>
-        <div class="crail"></div>
-        <div class="cbody">
-          <div class="chead"><span class="cv">REPRODUCED</span>
-            <span class="cfield"></span></div>
           <h3>Derenyi-Palla-Vicsek (2005): k-clique percolation in ER graphs at p_c(k)=[(k-1)N]^(-1/(k-1</h3>
           <p class="cresult">k=3 scaling exponent confirmed: empirical p_c*sqrt(2N) constant across N=400/800/1600 (1.26,1.26,1.19). N^(-1/2) scaling reproduced; prefactor ~1.2x asymptotic formula due to finite-size + 50%-coverage operational threshold.</p>
           <div class="cfoot"><span class="cyear">Clique Percolation in Random Networks (Derenyi</span></div>
-        </div>
-      </article>
-      <article class="card ok" data-v="REPRODUCED" data-reveal>
-        <div class="crail"></div>
-        <div class="cbody">
-          <div class="chead"><span class="cv">REPRODUCED</span>
-            <span class="cfield"></span></div>
-          <h3>Berger (2003): conditional-frequentist testing reconciles Fisher/Neyman/Jeffreys - the con</h3>
-          <p class="cresult">Calibration exact: empirical freq(H0 true | evidence) = Bayesian P(H0|x) across all bins. Berger-Sellke: p=0.05 -&gt; P(H0|x)=0.216, p=0.005 -&gt; 0.041 (p-value overstates evidence ~4x at 0.05).</p>
-          <div class="cfoot"><span class="cyear">Berger (2003), Could Fisher, Jeffreys and Neym</span></div>
         </div>
       </article>
       <article class="card ok" data-v="REPRODUCED" data-reveal>
@@ -500,16 +460,6 @@
           <h3>Criticality leaves a power-law fingerprint</h3>
           <p class="cresult">At the critical point, fluctuations show power-law scaling and long-range correlations — the signature reproduces cleanly.</p>
           <div class="cfoot"><span class="cyear">Kitzbichler, Smith, Rahn · 2009</span></div>
-        </div>
-      </article>
-      <article class="card ok" data-v="REPRODUCED" data-reveal>
-        <div class="crail"></div>
-        <div class="cbody">
-          <div class="chead"><span class="cv">REPRODUCED</span>
-            <span class="cfield">Reinforcement learning</span></div>
-          <h3>Sample-efficient policies need far fewer parameters</h3>
-          <p class="cresult">In the low-data regime, online policies match performance with 2–10× fewer total coefficients.</p>
-          <div class="cfoot"><span class="cyear">Biologically-inspired architectures</span></div>
         </div>
       </article>
       <article class="card ok" data-v="REPRODUCED" data-reveal>
