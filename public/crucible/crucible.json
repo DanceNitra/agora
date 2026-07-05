@@ -3,9 +3,9 @@
  "description": "Scientific and technical claims rebuilt as minimal computational models and tested. REPRODUCED = the mechanism holds in a minimal model; FAILED = it does not; NOT_COMPUTABLE = no simulable core (an honest pass).",
  "generated": "2026-07-05",
  "counts": {
-  "REPRODUCED": 29,
+  "REPRODUCED": 27,
   "FAILED": 12,
-  "NOT_COMPUTABLE": 16
+  "NOT_COMPUTABLE": 15
  },
  "entries": [
   {
@@ -180,15 +180,6 @@
    "date": "2026-06-17"
   },
   {
-   "claim": "Compactness and geometric stability conjectures for scalar curvature and convergence (Sormani et al., IAS 2018 workshop)",
-   "source": "Conjectures on Convergence and Scalar Curvature (Sormani et al., 2021)",
-   "verdict": "NOT_COMPUTABLE",
-   "note": "Open conjectures in geometric analysis (intrinsic-flat / Gromov-Hausdorff convergence under scalar-curvature bounds). No finite computational mechanism to reduce to a smallest model - these are deep manifold-convergence conjectures, not a s",
-   "lab_id": "",
-   "code": "",
-   "date": "2026-06-17"
-  },
-  {
    "claim": "The survival probability of a branching process obeys finite-size scaling in the control parameter (offspring mean m=1+eps) and the max generations n: P_n(eps) ~ (1/n)*F(eps*n).",
    "source": "Garcia-Millan, Font-Clos et al. 2015, \"Finite-size scaling of survival probability in branching processes\"",
    "verdict": "REPRODUCED",
@@ -212,15 +203,6 @@
    "verdict": "NOT_COMPUTABLE",
    "note": "Not a falsifiable claim with a result - it is a methods sentence describing a physical geotechnical experiment (optical-flow measurement of a soil specimen under cyclic torsional shear). Off-domain (soil mechanics, not our frontier), no res",
    "lab_id": "",
-   "code": "",
-   "date": "2026-06-16"
-  },
-  {
-   "claim": "For BA networks (N=2,000, m=2), removing the top 10% of nodes by degree raises the bond-percolation threshold from p_c=0.174 to 0.776.",
-   "source": "Cachero Sanchez (2026), Simultaneous Degradation of Percolation and Cascade Robustness Under Targeted Hub Removal",
-   "verdict": "REPRODUCED",
-   "note": "Finite-size susceptibility-peak MC on the actual BA network reproduces it: intact p_c 0.170 (claimed 0.174), hub-removed 0.740 (claimed 0.776), both within ~5% over 6 replicas. Methodology lesson: the Molloy-Reed configuration-model estimat",
-   "lab_id": "20260616-per",
    "code": "",
    "date": "2026-06-16"
   },
@@ -329,15 +311,6 @@
    "verdict": "REPRODUCED",
    "note": "Empirical regret growth exponent 0.03-0.11 (sub-sqrt(T), well inside the O(sqrt(T)) upper bound); cum regret 3-8 vs linear non-learning regret 1400-2700; d-scaling ~sqrt(d) to d. Computable core holds.",
    "lab_id": "032cdd",
-   "code": "",
-   "date": "2026-06-12"
-  },
-  {
-   "claim": "BA(N=2000,m=2): removing top-10% nodes by degree raises bond-percolation threshold p_c 0.174 -> 0.776 (~4.5x)",
-   "source": "Simultaneous Degradation of Percolation and Cascade Robustness Under Targeted Hub Removal (Cachero Sanchez, 2026-03-05)",
-   "verdict": "REPRODUCED",
-   "note": "MC before/after = 0.150/0.680 (ratio 4.53x) vs claimed ratio 4.46x; absolute values within finite-size tolerance. Cascade claim at phi=0.22 out of scope.",
-   "lab_id": "a33457",
    "code": "",
    "date": "2026-06-12"
   },

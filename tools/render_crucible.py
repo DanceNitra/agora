@@ -13,6 +13,7 @@ from __future__ import annotations
 
 import html
 import json
+import re
 import time
 from pathlib import Path
 
@@ -75,8 +76,65 @@ def e(s):
     return html.escape(str(s or ""))
 
 
+# --- ledger de-duplication guard (anti-inflation) ---------------------------------------------------
+# The pipeline re-runs the same textbook claim over time (k-clique percolation, epidemic-threshold,
+# LinUCB regret, ...), which silently inflates the public REPRODUCED count. This guard collapses
+# near-duplicate entries (same verdict + high content-word overlap) to ONE canonical entry for the
+# PUBLIC render only -- the source ledger (.replications.json) keeps every run, so nothing is lost and
+# the dedup is fully reversible. The threshold is deliberately conservative (a wrongly-dropped real
+# replication is worse than a surviving duplicate): 0.50 sits well above the point where genuinely
+# distinct claims start merging (the two distinct SGD results merge only below ~0.45).
+_DEDUP_THR = 0.50
+_DD_STOP = set("the a an of in on to for and or is are be as at by with from into that this it its "
+               "which whose than then so not no does do".split())
+# textbook families to WARN about (same verdict, >=3 survivors) so paraphrases the fingerprint misses
+# still get a human's eye rather than quietly padding the count.
+_DD_FAMILIES = ["k-clique", "clique percolation", "epidemic threshold", "finite-size", "branching",
+                "linucb", "regret bound", "percolation threshold", "universality class",
+                "power law", "power-law", "scale-free", "preferential attach"]
+
+
+def _dd_tokens(claim):
+    s = re.sub(r"\([^)]*\)", " ", (claim or "").lower())   # drop parentheticals (citations/years)
+    s = re.sub(r"[^a-z\s]", " ", s)                        # drop digits/punctuation/formula symbols
+    return {t for t in s.split() if len(t) > 2 and t not in _DD_STOP}
+
+
+def _dedup_ledger(reps):
+    """Collapse same-verdict near-duplicate entries to one canonical (prefer a real hex lab-hash, then
+    the longest note). Returns the deduped list; prints what it collapsed + family warnings."""
+    def canon_score(r):
+        lab = r.get("lab_id", "") or ""
+        return (bool(re.fullmatch(r"[0-9a-f]{6,}", lab)), len(r.get("note", "") or ""))
+
+    kept, sigs, clusters = [], [], []
+    for r in reps:
+        oc, tk = r.get("outcome", ""), _dd_tokens(r.get("claim", ""))
+        hit = next((i for i, (koc, ktk) in enumerate(sigs)
+                    if koc == oc and tk and ktk
+                    and len(tk & ktk) / len(tk | ktk) >= _DEDUP_THR), None)
+        if hit is None:
+            kept.append(r); sigs.append((oc, tk)); clusters.append([r])
+        else:
+            clusters[hit].append(r)
+            if canon_score(r) > canon_score(kept[hit]):
+                kept[hit] = r; sigs[hit] = (oc, tk)
+
+    for c in (c for c in clusters if len(c) > 1):
+        print(f"  [dedup] collapsed x{len(c)} [{c[0].get('outcome')}]: {c[0].get('claim','')[:64]}")
+    # warn on textbook families the fingerprint may have under-merged (paraphrased re-runs)
+    for fam in _DD_FAMILIES:
+        for oc in ("REPRODUCED", "FAILED", "NOT_COMPUTABLE"):
+            n = sum(1 for r in kept if fam in (r.get("claim", "").lower()) and r.get("outcome") == oc)
+            if n >= 3:
+                print(f"  [dedup][WARN] {n}x '{fam}' survive as {oc} -- likely paraphrased re-runs, review by hand")
+    if len(kept) < len(reps):
+        print(f"  [dedup] {len(reps)} ledger entries -> {len(kept)} after de-duplication")
+    return kept
+
+
 def render():
-    reps = load(REPS)
+    reps = _dedup_ledger(load(REPS))
     labs = lab_index(load(LAB))
     cur = load(CURATION)
     by = {o: sum(1 for r in reps if r.get("outcome") == o)
