@@ -46,11 +46,26 @@ def script_link(lab_rec):
     return f"{REPO}/blob/main/{rel}" if (ROOT / rel).exists() else None
 
 
+# Durable lab_id -> PUBLIC probe map (tracked here, not in gitignored .replications.json, so the receipt links
+# survive re-renders regardless of the ledger file). Only add a mapping you are confident about -- a wrong
+# receipt is worse than none. Extend as more probes are confirmed (agentpoison, eviction, separation-law, ...).
+_PROBE_BY_LAB = {
+    "39737a": "mnemo/probes/nudge_pubbias_artifact.py",              # food-nudges 2.5x
+    "502d6c": "mnemo/probes/good_to_great_null.py",                  # good-to-great
+    "bf7bb9": "mnemo/probes/llm_judge_length_null.py",               # llm-as-judge length
+    "12b630": "mnemo/probes/founder_survivorship_null.py",           # founder-led 3.1x
+    "14c41f": "mnemo/probes/arena_style_only.py",                    # chatbot arena style
+    "ragdead": "mnemo/probes/ragdead/exp_ragdead_A.py",             # RAG-is-dead / CAG
+    "exp_supersession_replication": "mnemo/probes/supersession_replication.py",  # cosine supersession
+}
+
+
 def entry_code(r, labs):
-    """Prefer an explicit repo-relative `code` path on the entry (a linked PUBLIC probe under mnemo/probes/);
-    fall back to the lab-script link. lab scripts live in gitignored agora_output/lab/, so most entries only get
-    a resolvable receipt once a public probe is wired here -- return a URL only if the file exists in the repo."""
-    p = (r.get("code") or "").strip().replace("\\", "/")
+    """Resolve a runnable-receipt URL for a ledger entry: an explicit repo-relative `code` on the entry, else
+    the tracked lab_id->probe map, else the lab-script link. lab scripts live in gitignored agora_output/lab/,
+    so most entries only get a resolvable receipt once a public probe is wired -- return a URL only if the file
+    exists in the repo."""
+    p = (r.get("code") or _PROBE_BY_LAB.get(r.get("lab_id", ""), "") or "").strip().replace("\\", "/")
     if p and (ROOT / p).exists():
         return f"{REPO}/blob/main/{p}"
     return script_link(labs.get(r.get("lab_id")))
