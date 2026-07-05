@@ -1,0 +1,51 @@
+Resume Agora from HANDOFF_2026-07-05_v2.md (read it + agora_output/publish_audit_tracker.md + the /audit-post skill first).
+
+HEALTH-CHECK FIRST:
+- git: origin/main == HEAD (should be 9c41721 or later), tree clean-ish (pycache + untracked supersession_deepdive.py are expected).
+- brain :8000: curl /api/v1/health -> {"status":"ok"} + exactly ONE :8000 LISTEN.
+- dungeon :5174 -> HTTP 200; verify exactly ONE mcp_server.py + ZERO stray supervisors.
+- mnemo: local import 0.6.0; PyPI agora-mnemo == 0.6.0 (already released).
+
+THEN: continue the published-post AUDIT PROGRAM.
+
+== FINISH AUDIT #34 first (agent-memory-poisoning-corroboration-gate, piece) ==
+VALIDATE is DONE and both defects are already investigated (see the #34 RESUME note in the tracker):
+- DEFECT 1 (fix): MINJA citation is conflated. Post cites "MINJA ... arXiv 2601.05504" -> real MINJA =
+  arXiv:2503.03704 (NeurIPS 2025, 98.2% injection / 76.8% ASR). 2601.05504 is a DIFFERENT paper. Fix the
+  cite + numbers everywhere (EN+SK+meta+JSON-LD). ASB (2410.02644) OK but "84.3% across 27 combinations"
+  -> "highest average ASR 84.30%".
+- DEFECT 2 (RESOLVED - the post is CORRECT): the "entrench sybil = 100%" is right for a REALISTIC sybil
+  (2 real distinct-source records); the v2 lab's en_forged=0.00 was a fake-link-string artifact (fake
+  strings don't resolve on the hardened current mnemo). BONUS: strict_corroboration BOUNDS not CLOSES
+  (2 attested records = 2 verified keys still clear a 2-witness gate, same as Veracity-Gap D2) - add this
+  honest update + cross-link the Veracity-Gap post (agent-memory-defense-provenance-not-truth).
+REMAINING #34 steps (FULL /audit-post from STORM on, do NOT shorten):
+  1. Build a clean PUBLIC probe (mnemo/probes/) with the REALISTIC sybil (real distinct-source records,
+     NOT fake link strings) AND the correct OVERWRITE mechanics (mnemo supersession = STATE-TOGGLE +
+     supersede_requires_corroboration, NOT the key= path - my quick attempt got hardened-single overwrite
+     wrong at 100% instead of 0%). Reproduce the post's table + the strict-bounds result. Link it EN+SK.
+  2. STORM (dominant) + 5-lens stress-claim + verify-claims (MINJA 2503.03704, ASB 2410.02644, credit
+     Douceur 2002 Sybil explicitly for the forgeable-count boundary; note the result is largely
+     BY-CONSTRUCTION so don't overclaim "measured" for a definitional cell).
+  3. Check Crucible-ledger membership (kicker="Crucible" - is it in server/.replications.json / crucible.json?
+     #28 found a Crucible post missing from the ledger).
+  4. Bilingual EN+SK fixes (SK already has diacritics, unlike #33) + fix the double-numbered list
+     (EN ~line 113 / SK ~136: <ol> + literal "1." "2." "3." "4.").
+  5. SEO Mode-A + 2-skeptic + summary-self-test re-audit CLEAN + findings -> audit_new_findings.md +
+     anon commit + tracker row -> DONE + gated deploy (product-maintenance fix; owner says "pushni").
+
+== THEN continue the audit program at #35 (can-an-llm-trust-its-own-confidence, piece) ==
+Full 11-step /audit-post, never shorten. (After #35: #36 rag-supersession-blind-spot is already DONE;
+#37-#41 are the src null-result posts.)
+
+WATCH (no action unless owner asks):
+- Reddit: Veracity-Gap on r/RAG (check for replies manually - reply-watcher is read-only). Optional gated
+  reply to Wright_Starforge on r/AI_Agents re the shipped 0.6.0 ratchet (his idea) - OWNER posts.
+- GitHub DeepSeek-V3 #1462/#1466: the 7/6 joint report - verify our Layer-0 section stays accurate and is
+  NOT co-branded onto the "0.3 universal boundary" overclaim. #1447 = not ours, watch-only.
+
+RULES: standing gate #0 (validate->storm->audit->verify) before ANY outward; anon identity on public commits;
+one :8000 / one dungeon / one supervisor; audit-post = FULL 11 steps NEVER shortened; reports in Slovak in
+chat (not Telegram); NOTHING new+outward (a brand-new claim, a Reddit post, a PyPI release) without a Slovak
+briefing + my OK first. Fixing an already-public post to be more honest is authorized product maintenance
+("pushni" deploys it).
