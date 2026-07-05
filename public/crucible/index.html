@@ -5,7 +5,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>The Crucible &middot; a machine that rebuilds claims in code &middot; Agora</title>
-<meta name="description" content="A public ledger of scientific and technical claims rebuilt as minimal computational models and tested in code: 43 reproduced, 15 failed, 4 honest passes. Every verdict ships runnable code and a measured number.">
+<meta name="description" content="A public ledger of scientific and technical claims rebuilt as minimal computational models and tested in code: 29 reproduced, 12 failed, 4 honest passes. Every verdict ships runnable code and a measured number.">
 <link rel="canonical" href="https://dancenitra.github.io/agora/public/crucible/">
 <meta property="og:type" content="website">
 <meta property="og:title" content="The Crucible — claims, rebuilt in code and tested">
@@ -174,8 +174,8 @@
   rarest export, published here), and <b>not computable</b> when there&rsquo;s no simulable core.
   Every verdict ships a measured number and the code that produced it.</p>
   <div class="tally">
-    <div class="t ok"><div class="num">43</div><div class="lbl">Reproduced</div></div>
-    <div class="t fail"><div class="num">15</div><div class="lbl">Failed</div></div>
+    <div class="t ok"><div class="num">29</div><div class="lbl">Reproduced</div></div>
+    <div class="t fail"><div class="num">12</div><div class="lbl">Failed</div></div>
     <div class="t"><div class="num">4</div><div class="lbl">Honest passes</div></div>
   </div>
   <div class="dataset">Open data &mdash; <a href="crucible.json">the full ledger as JSON</a> &middot; now a citable dataset on <a href="https://huggingface.co/datasets/Danchi17/folklore-index" target="_blank" rel="noopener">Hugging&nbsp;Face &rarr;</a><br><span class="loadline"><code>datasets.load_dataset("Danchi17/folklore-index")</code></span></div>
@@ -195,7 +195,7 @@
     </div>
   </section>
 <section class="ledger"><div class="wrap">
-  <div class="sechead"><h2>The ledger</h2><div class="sub">58 claims rebuilt &amp; tested &middot; newest first</div></div>
+  <div class="sechead"><h2>The ledger</h2><div class="sub">41 claims rebuilt &amp; tested &middot; newest first</div></div>
   <div class="filters">
     <button class="on" data-f="all">All</button>
     <button data-f="REPRODUCED">Reproduced</button>
@@ -210,16 +210,6 @@
           <h3>A big-enough context window replaces retrieval (CAG / &quot;RAG is dead&quot;): preload the whole co</h3>
           <p class="cresult">Judge-free probe on one synthetic structured log at 5k/25k/60k/110k tokens, two task families. NEEDLE (single-fact lookup) = 1.00 at every length incl. 110k; SYNTH (read-everything count/filter aggregation) collapses 0.75-&gt;~0.25-0.375 by ~25k and stays there. Verdict FAILED for CAG *on synthesis*; needle lookup survives long context fine, so blanket &quot;context rot kills recall&quot; is also too strong. It is the task type, not the length. Replicates lost-in-the-middle (Liu 2023/TACL 2024), RULER (Hsieh/NVIDIA 2024), NoLiMa (2502.05167), Chroma context-rot (2025, non-peer-reviewed). HONEST LIMITS: n=8 synth Qs/length (the 0.75-&gt;0.3 drop is Fisher p~0.13, credible mainly by matching the replicated literature); one frontier model (exact model not logged); even at 5k synth is 0.75 so part of the failure is exhaustive arithmetic the model cannot do at any length -&gt; the real fix for count/filter is a TOOL, not retrieval. Probe: mnemo/probes/ragdead (generator + independent gold-re-derivation scorer). Post: public/posts/does-long-context-kill-rag.html.</p>
           <div class="cfoot"><span class="cyear">CAG / &amp;quot;long context kills RAG&amp;quot; viral</span><a class="code" href="https://github.com/DanceNitra/agora/blob/main/mnemo/probes/ragdead/exp_ragdead_A.py" target="_blank" rel="noopener">runnable model &rarr;</a></div>
-        </div>
-      </article>
-      <article class="card ok" data-v="REPRODUCED" data-reveal>
-        <div class="crail"></div>
-        <div class="cbody">
-          <div class="chead"><span class="cv">REPRODUCED</span>
-            <span class="cfield"></span></div>
-          <h3>k-clique percolation threshold in Erdos-Renyi graphs is p_c(k)=1/[(k-1)N]^(1/(k-1))</h3>
-          <p class="cresult">k=3 (triangle percolation, p_c=1/sqrt(2N)): largest 3-clique community 0.018 below p_c, 0.999 by 1.8x p_c, onset at the predicted threshold (N=350). Scoped to k=3; k=4 not run (clique-community compute exceeded the 60s Lab budget).</p>
-          <div class="cfoot"><span class="cyear">Derenyi, Palla, Vicsek 2005 - Clique Percolati</span></div>
         </div>
       </article>
       <article class="card fail" data-v="FAILED" data-reveal>
@@ -242,10 +232,10 @@
           <div class="cfoot"><span class="cyear">Peng/GitHub 2023 vs METR 2025 vs Cui/Demirer 2025</span></div>
         </div>
       </article>
-      <article class="card fail" data-v="FAILED" data-reveal>
+      <article class="card ok" data-v="REPRODUCED" data-reveal>
         <div class="crail"></div>
         <div class="cbody">
-          <div class="chead"><span class="cv">FAILED</span>
+          <div class="chead"><span class="cv">REPRODUCED</span>
             <span class="cfield">AI evaluation</span></div>
           <h3>Chatbot Arena Elo ranks LLMs by genuine quality (cite Arena rank to pick a model)</h3>
           <p class="cresult">A classifier that sees ONLY answer style (length, markdown headers, bold, lists) and NO model identity predicts the human winner 61.5% of the time, and its per-model ranking correlates rho=0.74 with the real win-rate ranking across 48 models — it reproduces the leaderboard ORDER without knowing which model wrote anything.</p>
@@ -262,10 +252,10 @@
           <div class="cfoot"><span class="cyear">Zook &amp; Allen (Bain) - 2016</span><a class="code" href="https://github.com/DanceNitra/agora/blob/main/mnemo/probes/founder_survivorship_null.py" target="_blank" rel="noopener">runnable model &rarr;</a></div>
         </div>
       </article>
-      <article class="card fail" data-v="FAILED" data-reveal>
+      <article class="card ok" data-v="REPRODUCED" data-reveal>
         <div class="crail"></div>
         <div class="cbody">
-          <div class="chead"><span class="cv">FAILED</span>
+          <div class="chead"><span class="cv">REPRODUCED</span>
             <span class="cfield">AI evaluation</span></div>
           <h3>LLM-as-judge agrees with humans ~80%, so it is a valid quality judge</h3>
           <p class="cresult">A zero-understanding null judge that simply picks the LONGER answer already agrees with human preferences 68.1% of the time (vs 50% chance), reproducing ~half of the GPT-4 judges celebrated above-chance agreement; the GPT-4 judge itself agrees with pick-the-longer 73.5% of the time.</p>
@@ -317,16 +307,6 @@
         <div class="cbody">
           <div class="chead"><span class="cv">REPRODUCED</span>
             <span class="cfield"></span></div>
-          <h3>The SIS epidemic threshold disappears for a power-law degree distribution with exponent 2 </h3>
-          <p class="cresult">HMF threshold lambda_c=&lt;k&gt;/&lt;k^2&gt; over growing N with structural cutoff k_max~N^(1/(rho-1)). 2&lt;rho&lt;=3: lambda_c-&gt;0 (rho=2.3/2.5 final 0.0000/0.0008; rho=3.0 marginal/log-slow 0.106-&gt;0.042). rho&gt;3 bounded (3.5/4.0 -&gt; 0.134/0.196). Determinist</p>
-          <div class="cfoot"><span class="cyear">Jones &amp;amp; Handcock 2003 (mechanism: Pastor-S</span></div>
-        </div>
-      </article>
-      <article class="card ok" data-v="REPRODUCED" data-reveal>
-        <div class="crail"></div>
-        <div class="cbody">
-          <div class="chead"><span class="cv">REPRODUCED</span>
-            <span class="cfield"></span></div>
           <h3>Stochastic gradient descent has slow asymptotic convergence due to the inherent variance o</h3>
           <p class="cresult">Row-normalized L2-logistic, kappa 1.7-67, same eta=0.5. Const-step SGD plateaus at ~2.5e-2 variance floor; SVRG -&gt; machine precision (3/3). Caveat: needs inner-loop m &gt;~ kappa (advantage gone at kappa~6e4 &gt;&gt; m=n).</p>
           <div class="cfoot"><span class="cyear">Accelerating SGD using Predictive Variance Red</span></div>
@@ -340,76 +320,6 @@
           <h3>MemGPT-style paging memory keeps QA accuracy FLAT as the corpus/context scales (0-&gt;700 doc</h3>
           <p class="cresult">Smallest model (exp_memgpt_flatcurve.py, cloud-free, local nomic-embed-text retriever; reader factor = OUR measured oracle accuracy single 0.95 / 3-hop 0.91). Pages top-B=8 from a synthetic corpus scaling N=10..250. SINGLE-hop QA flat at 0.</p>
           <div class="cfoot"><span class="cyear">MemGPT (Packer et al.) flat-accuracy-vs-corpus</span></div>
-        </div>
-      </article>
-      <article class="card ok" data-v="REPRODUCED" data-reveal>
-        <div class="crail"></div>
-        <div class="cbody">
-          <div class="chead"><span class="cv">REPRODUCED</span>
-            <span class="cfield"></span></div>
-          <h3>BA(N=2000,m=2): removing top 10% nodes by degree raises bond-percolation threshold from p_</h3>
-          <p class="cresult">Minimal model: networkx BA(N=2000,m=2), Molloy-Reed p_c=&lt;k&gt;/(&lt;k2&gt;-&lt;k&gt;) + direct bond-percolation simulation (peak-of-2nd-largest-component locator), 8 graph realizations. MECHANISM REPRODUCED robustly: removing top 10% nodes by degree sharp</p>
-          <div class="cfoot"><span class="cyear">Simultaneous Degradation of Percolation and Ca</span></div>
-        </div>
-      </article>
-      <article class="card ok" data-v="REPRODUCED" data-reveal>
-        <div class="crail"></div>
-        <div class="cbody">
-          <div class="chead"><span class="cv">REPRODUCED</span>
-            <span class="cfield"></span></div>
-          <h3>LinUCB O(sqrt(Td ln^3(KT/delta))) regret bound</h3>
-          <p class="cresult">bound holds (not violated): regret/sqrt(T) decreasing 0.32-&gt;0.065, ~log in benign stochastic regime; weak log-K confirmed (K-exp 0.32); tightness untested (needs adversarial contexts)</p>
-          <div class="cfoot"><span class="cyear">Chu, Li, Reyzin, Schapire 2011 - Contextual ba</span></div>
-        </div>
-      </article>
-      <article class="card ok" data-v="REPRODUCED" data-reveal>
-        <div class="crail"></div>
-        <div class="cbody">
-          <div class="chead"><span class="cv">REPRODUCED</span>
-            <span class="cfield"></span></div>
-          <h3>k-clique percolation in ER(N) graphs transitions at edge prob p_c(k)=1/[(k-1)N]^(1/(k-1));</h3>
-          <p class="cresult">REPRODUCED (severe-tested, lab: agora_output/lab/replicate_clique_percolation.py). ER(N=300), k=3 clique percolation: built triangles, linked those sharing an edge, tracked largest clique-cluster node-coverage vs p. Coverage takes off sharp</p>
-          <div class="cfoot"><span class="cyear">Derenyi, Palla, Vicsek - Clique Percolation in</span></div>
-        </div>
-      </article>
-      <article class="card ok" data-v="REPRODUCED" data-reveal>
-        <div class="crail"></div>
-        <div class="cbody">
-          <div class="chead"><span class="cv">REPRODUCED</span>
-            <span class="cfield"></span></div>
-          <h3>All systems in a given universality class share the same critical exponents (microscopic d</h3>
-          <p class="cresult">REPRODUCED (severe-tested, lab: agora_output/lab/replicate_universality_branching.py). Universality demonstrated on critical Galton-Watson branching: survival exponent q_n ~ n^-1 is the SAME across three distinct offspring distributions (Po</p>
-          <div class="cfoot"><span class="cyear">universality (statistical physics) - tested on</span></div>
-        </div>
-      </article>
-      <article class="card ok" data-v="REPRODUCED" data-reveal>
-        <div class="crail"></div>
-        <div class="cbody">
-          <div class="chead"><span class="cv">REPRODUCED</span>
-            <span class="cfield"></span></div>
-          <h3>Finite-size scaling of survival probability in critical branching processes: q_n*n is a un</h3>
-          <p class="cresult">REPRODUCED (severe-tested, lab: agora_output/lab/replicate_branching_fss.py). Galton-Watson Poisson(m) Monte Carlo (T=200k). (a) criticality m=1: q_n*n -&gt; 1.97 at n=200 (analytic 2.0 for sigma^2=1). (b) finite-size scaling DATA COLLAPSE con</p>
-          <div class="cfoot"><span class="cyear">Garcia-Millan, Font-Clos, Corral 2015</span></div>
-        </div>
-      </article>
-      <article class="card ok" data-v="REPRODUCED" data-reveal>
-        <div class="crail"></div>
-        <div class="cbody">
-          <div class="chead"><span class="cv">REPRODUCED</span>
-            <span class="cfield"></span></div>
-          <h3>BA(N=2000,m=2): removing top 10% nodes by degree raises bond-percolation threshold p_c fro</h3>
-          <p class="cresult">Minimal analytic model (Cohen/Molloy-Reed p_c=&lt;k&gt;/(&lt;k^2&gt;-&lt;k&gt;), 25 BA realizations) REPRODUCES the mechanism+direction: targeted top-10pct hub removal raises p_c several-fold (0.093-&gt;0.647, 6.95x). Exact published thresholds NOT matched (0.1</p>
-          <div class="cfoot"><span class="cyear">Cachero Sanchez 2026 - Simultaneous Degradatio</span></div>
-        </div>
-      </article>
-      <article class="card ok" data-v="REPRODUCED" data-reveal>
-        <div class="crail"></div>
-        <div class="cbody">
-          <div class="chead"><span class="cv">REPRODUCED</span>
-            <span class="cfield"></span></div>
-          <h3>k-clique percolation in Erdos-Renyi graphs sets in at p_c = 1/[(k-1)N]^(1/(k-1)) (k=3: 1/s</h3>
-          <p class="cresult">Smallest model: ER graph N=400, k=3 triangles, union-find on triangles sharing an edge; order parameter Phi (giant triangle-community / all triangles) jumps 0.09-&gt;0.43-&gt;0.92-&gt;1.0 across p/pc 1.0-&gt;1.2-&gt;1.5-&gt;2.0; measured onset (Phi&gt;0.5) at p</p>
-          <div class="cfoot"><span class="cyear">Derenyi, Palla, Vicsek - Clique Percolation in</span></div>
         </div>
       </article>
       <article class="card fail" data-v="FAILED" data-reveal>
@@ -428,7 +338,7 @@
           <div class="chead"><span class="cv">FAILED</span>
             <span class="cfield"></span></div>
           <h3>Emergent abilities of large language models are genuine, sharp capability transitions - a </h3>
-          <p class="cresult">The canonical SHARP &#x27;emergence&#x27; curve is reproduced by a SMOOTH, continuous per-token skill measured with a nonlinear exact-match metric: the same smooth skill gives a per-token transition width 7.0 vs an exact-match (L=100) width 1.05 - 6.7x sharper PURELY from the metric - and the apparent onset shifts -0.07 -&gt; +5.58 as answer length grows with NO change in the underlying skill. No capability discontinuity is needed, so benchmark sharpness is not evidence for one (Schaeffer&#x27;s &#x27;mirage&#x27; reproduces). Scope: shows sharpness is metric-dependent; it does not prove that no ability is ever genuinely emergent.</p>
+          <p class="cresult">The canonical SHARP &#x27;emergence&#x27; curve is reproduced by a SMOOTH, continuous per-token skill measured with a nonlinear exact-match metric: the same smooth skill gives a per-token transition width 7.0 vs an exact-match (L=100) width 1.05 -- 6.7x sharper PURELY from the metric -- and the apparent onset shifts -0.07 -&gt; +5.58 as answer length grows with NO change in underlying skill. No capability discontinuity is needed, so benchmark sharpness is not evidence for one (Schaeffer et al. 2023 &#x27;mirage&#x27;, NeurIPS Outstanding Paper, reproduces). CONTESTED / scope: shows the metric mechanism is SUFFICIENT to fake sharpness here; it does NOT prove no ability is ever genuinely emergent -- Du et al. 2024 argue downstream abilities track a genuine pretraining-loss threshold. What FAILS is &#x27;benchmark sharpness proves a discontinuity&#x27;, not all emergence.</p>
           <div class="cfoot"><span class="cyear">Wei et al. 2022 &amp;#x27;Emergent Abilities of La</span></div>
         </div>
       </article>
@@ -440,26 +350,6 @@
           <h3>A Pareto regret that reflects Pareto optimality without relying on scalarization functions</h3>
           <p class="cresult">Smallest model: 2-objective bandit, known Pareto front (4 optimal + 2 dominated arms). Pareto-UCB1 with the scalarization-free Pareto suboptimality gap achieved sublinear cumulative Pareto regret (avg/step 0.027-&gt;0.005, growth factor 1.82 o</p>
           <div class="cfoot"><span class="cyear">Pareto Regret Analyses in Multi-objective Mult</span></div>
-        </div>
-      </article>
-      <article class="card ok" data-v="REPRODUCED" data-reveal>
-        <div class="crail"></div>
-        <div class="cbody">
-          <div class="chead"><span class="cv">REPRODUCED</span>
-            <span class="cfield"></span></div>
-          <h3>The epidemic threshold disappears for scale-free / preferential-attachment networks with d</h3>
-          <p class="cresult">Mechanism reproduced: SIS threshold lambda_c=&lt;k&gt;/&lt;k^2&gt; falls with N on BA/scale-free networks (0.112-&gt;0.062 as N 500-&gt;32000) because &lt;k^2&gt; grows with the hub/cutoff (35.5-&gt;64.9), while ER stays finite (~0.20, &lt;k^2&gt;~20). SIS dynamics confirm</p>
-          <div class="cfoot"><span class="cyear">Pastor-Satorras &amp;amp; Vespignani (2001); cited</span></div>
-        </div>
-      </article>
-      <article class="card fail" data-v="FAILED" data-reveal>
-        <div class="crail"></div>
-        <div class="cbody">
-          <div class="chead"><span class="cv">FAILED</span>
-            <span class="cfield">Network economics</span></div>
-          <h3>Metcalfe&#x27;s Law (network value ∝ n²) is an equal-value artifact</h3>
-          <p class="cresult">The n² scaling holds only if every pairwise connection has equal value. Under realistic rank-declining connection value the network&#x27;s value scales as ~n·log n (fitted exponent 1.12, vs 2.00 for equal value; 1.33 for slow decay) — the famous quadratic over-states large-network value, matching Briscoe-Odlyzko-Tilly (2006) and Metcalfe&#x27;s own 2013 data-fit. A mechanism derivation, not a fit to proprietary network data.</p>
-          <div class="cfoot"><span class="cyear">Metcalfe&#x27;s Law · contested (Briscoe–Odlyzko–Tilly 2006)</span></div>
         </div>
       </article>
       <article class="card fail" data-v="FAILED" data-reveal>
@@ -480,26 +370,6 @@
           <h3>The survival probability of a branching process obeys finite-size scaling in the control p</h3>
           <p class="cresult">Smallest Galton-Watson model (Poisson offspring), vectorized over 40k realizations. Critical eps=0: n*P_n -&gt; ~2 (Kolmogorov 2/sigma^2, sigma^2=1). Scaling collapse confirmed: n*P_n is a function of x=eps*n alone - within-x spread 0.116 vs a</p>
           <div class="cfoot"><span class="cyear">Garcia-Millan, Font-Clos et al. 2015, &amp;quot;Fi</span></div>
-        </div>
-      </article>
-      <article class="card ok" data-v="REPRODUCED" data-reveal>
-        <div class="crail"></div>
-        <div class="cbody">
-          <div class="chead"><span class="cv">REPRODUCED</span>
-            <span class="cfield"></span></div>
-          <h3>In the Erdos-Renyi graph G(N,p), the k-clique percolation transition occurs at p_c(k) = 1/</h3>
-          <p class="cresult">Smallest CPM model: enumerate k-cliques in G(N,p), union any sharing a (k-1)-clique, track largest community fraction R(p)=vertices_in_largest/N; empirical transition = p where R crosses half its max. Measured/formula ratio is near-CONSTANT</p>
-          <div class="cfoot"><span class="cyear">Derenyi, Palla &amp;amp; Vicsek 2005, &amp;#x27;Clique</span></div>
-        </div>
-      </article>
-      <article class="card ok" data-v="REPRODUCED" data-reveal>
-        <div class="crail"></div>
-        <div class="cbody">
-          <div class="chead"><span class="cv">REPRODUCED</span>
-            <span class="cfield"></span></div>
-          <h3>The epidemic threshold of a network disappears (goes to 0 as N-&gt;infinity) when the degree-</h3>
-          <p class="cresult">Smallest model: HMF threshold lambda_c=&lt;k&gt;/&lt;k^2&gt; from sampled power-law degree sequences vs N. Measured lambda_c at N=1e3..1e6: gamma=2.3 shrinks x28.7, gamma=2.7 x3.6 (power-law vanishing); gamma=3.0 is MARGINAL - vanishes only logarithmic</p>
-          <div class="cfoot"><span class="cyear">Jones &amp;amp; Handcock 2003, &amp;#x27;An assessment</span></div>
         </div>
       </article>
       <article class="card ok" data-v="REPRODUCED" data-reveal>
@@ -537,16 +407,6 @@
         <div class="cbody">
           <div class="chead"><span class="cv">REPRODUCED</span>
             <span class="cfield"></span></div>
-          <h3>Finite-size scaling exists for the survival probability of a branching process as a functi</h3>
-          <p class="cresult">Smallest model: exact survival curve of a Poisson(m) Galton-Watson process via PGF iteration q_n=exp(m(q_{n-1}-1)), S_n=1-q_n (zero Monte-Carlo noise). Three FSS signatures all confirmed: (1) exact critical amplitude n*S_n -&gt; 2 = 2/sigma^2 </p>
-          <div class="cfoot"><span class="cyear">Garcia-Millan, Font-Clos &amp;amp; Corral (2015), </span></div>
-        </div>
-      </article>
-      <article class="card ok" data-v="REPRODUCED" data-reveal>
-        <div class="crail"></div>
-        <div class="cbody">
-          <div class="chead"><span class="cv">REPRODUCED</span>
-            <span class="cfield"></span></div>
           <h3>In DiD with FEW treated units and spatially/serially-correlated errors, standard DiD infer</h3>
           <p class="cresult">N=30,T=12,1 treated,rho=0.7,true effect=0,800 reps: DiD 95% CI coverage=0.305 (severe under-coverage vs nominal 0.95); SC coverage=0.891; SC RMSE=1.017 &lt; DiD RMSE=1.267. DiD inference invalid, SC materially better.</p>
           <div class="cfoot"><span class="cyear">Alvarez &amp;amp; Ferman (2020)</span></div>
@@ -560,16 +420,6 @@
           <h3>p-hacking inflates Type I error in the error-statistical (Neyman-Pearson) approach but not</h3>
           <p class="cresult">Under a true null (N=5000, n=30, K=5 forks): NP p-hacking (report min p) inflates Type I error 0.051-&gt;0.227 (+17.6pp, 4.45x, matches 1-.95^5=0.226). Formal/likelihood: a selection-ACCOUNTED likelihood (correct best-of-K sampling distributio</p>
           <div class="cfoot"><span class="cyear">Rubin (2026)</span></div>
-        </div>
-      </article>
-      <article class="card ok" data-v="REPRODUCED" data-reveal>
-        <div class="crail"></div>
-        <div class="cbody">
-          <div class="chead"><span class="cv">REPRODUCED</span>
-            <span class="cfield"></span></div>
-          <h3>Removing top-10% degree nodes from a BA network (N=2000,m=2) raises the bond-percolation t</h3>
-          <p class="cresult">Mechanism+direction reproduced: hub removal collapses &lt;k^2&gt; 50.8-&gt;3.8, p_c jumps ~8x (0.085-&gt;0.687 via Cohen mean-field). After-value within 12% of claim; before differs 2x (mean-field vs direct simulation). Robust-yet-fragile confirmed.</p>
-          <div class="cfoot"><span class="cyear">Simultaneous Degradation of Percolation and Ca</span></div>
         </div>
       </article>
       <article class="card ok" data-v="REPRODUCED" data-reveal>
@@ -706,30 +556,10 @@
         <div class="crail"></div>
         <div class="cbody">
           <div class="chead"><span class="cv">REPRODUCED</span>
-            <span class="cfield">Contextual bandits</span></div>
-          <h3>LinUCB stays well inside its regret bound</h3>
-          <p class="cresult">Measured regret tracks O(√Td·polylog) and sits far below linear-regret baselines.</p>
-          <div class="cfoot"><span class="cyear">Chu, Li, Reyzin &amp; Schapire · 2011</span></div>
-        </div>
-      </article>
-      <article class="card ok" data-v="REPRODUCED" data-reveal>
-        <div class="crail"></div>
-        <div class="cbody">
-          <div class="chead"><span class="cv">REPRODUCED</span>
             <span class="cfield">Optimization</span></div>
           <h3>SGD&#x27;s slow convergence is a variance floor</h3>
           <p class="cresult">Constant-step SGD stalls at a noise floor; variance-reduced methods keep converging — the slowdown is variance, not curvature.</p>
           <div class="cfoot"><span class="cyear">Johnson &amp; Zhang · 2013</span></div>
-        </div>
-      </article>
-      <article class="card ok" data-v="REPRODUCED" data-reveal>
-        <div class="crail"></div>
-        <div class="cbody">
-          <div class="chead"><span class="cv">REPRODUCED</span>
-            <span class="cfield">Stochastic processes</span></div>
-          <h3>Branching survival collapses onto one curve</h3>
-          <p class="cresult">Survival probability across sizes collapses onto a single curve in the scaling variable (m−1)·n.</p>
-          <div class="cfoot"><span class="cyear">Finite-size scaling</span></div>
         </div>
       </article>
       <article class="card ok" data-v="REPRODUCED" data-reveal>

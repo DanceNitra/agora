@@ -3,9 +3,9 @@
  "description": "Scientific and technical claims rebuilt as minimal computational models and tested. REPRODUCED = the mechanism holds in a minimal model; FAILED = it does not; NOT_COMPUTABLE = no simulable core (an honest pass).",
  "generated": "2026-07-05",
  "counts": {
-  "REPRODUCED": 43,
-  "FAILED": 15,
-  "NOT_COMPUTABLE": 15
+  "REPRODUCED": 29,
+  "FAILED": 12,
+  "NOT_COMPUTABLE": 16
  },
  "entries": [
   {
@@ -16,15 +16,6 @@
    "lab_id": "ragdead",
    "code": "https://github.com/DanceNitra/agora/blob/main/mnemo/probes/ragdead/exp_ragdead_A.py",
    "date": "2026-06-17"
-  },
-  {
-   "claim": "k-clique percolation threshold in Erdos-Renyi graphs is p_c(k)=1/[(k-1)N]^(1/(k-1))",
-   "source": "Derenyi, Palla, Vicsek 2005 - Clique Percolation in Random Networks",
-   "verdict": "REPRODUCED",
-   "note": "k=3 (triangle percolation, p_c=1/sqrt(2N)): largest 3-clique community 0.018 below p_c, 0.999 by 1.8x p_c, onset at the predicted threshold (N=350). Scoped to k=3; k=4 not run (clique-community compute exceeded the 60s Lab budget).",
-   "lab_id": "9298e0",
-   "code": "",
-   "date": "2026-07-02"
   },
   {
    "claim": "Internet AS-level topology follows a power-law degree distribution",
@@ -47,8 +38,8 @@
   {
    "claim": "Chatbot Arena (LMArena) Elo ranks LLMs by genuine answer quality, so Arena rank is a valid model-selection signal.",
    "source": "Chiang et al. 2024, Chatbot Arena, arXiv:2403.04132",
-   "verdict": "FAILED",
-   "note": "Style-only null on real public votes (lmarena-ai/arena-human-preference-140k, 2 shards = 28,084 decided battles). Features = STYLE ONLY as side-A-minus-B differences (response length/tokens, markdown header count, list count, bold count) wi",
+   "verdict": "REPRODUCED",
+   "note": "Style-only null on real public votes (lmarena-ai/arena-human-preference-140k, 28,084 decided battles). Two opposing findings. VOTES: a style-only judge (length+markdown, no model identity/content) predicts the human winner 61.5%, and the longer answer wins ~62% even between the SAME two models (>=50 battles/pair: 63.3%) -- a genuine per-vote length bias. ORDER: style-only rank reproduces Spearman rho=0.74 of the leaderboard, but that is a correlational CEILING (style co-moves with quality) and LMSYS's style-CONTROLLED Elo reorders only modestly -> the leaderboard ORDER is mostly skill. VERDICT REVISED FAILED->REPRODUCED (Crucible audit 2026-07-05): the model-selection use (rank) mostly holds; the style bias is in individual votes, not (mostly) the order. Public probe mnemo/probes/arena_style_only.py.",
    "lab_id": "14c41f",
    "code": "https://github.com/DanceNitra/agora/blob/main/mnemo/probes/arena_style_only.py",
    "date": "2026-06-29"
@@ -65,8 +56,8 @@
   {
    "claim": "LLM-as-judge (GPT-4) agrees with human preferences ~80% — on par with human-human agreement — so it is a valid stand-in for human quality evaluation (MT-Bench).",
    "source": "Zheng et al. 2023, Judging LLM-as-a-Judge with MT-Bench and Chatbot Arena, arXiv:2306.05685",
-   "verdict": "FAILED",
-   "note": "Length-confound null on the ORIGINAL released data (lmsys/mt_bench_human_judgments: 3355 human + 2400 GPT-4 pairwise votes). NULL judge with zero understanding = pick the LONGER response. Measured (ties excluded): length-only vs human = 0.6",
+   "verdict": "REPRODUCED",
+   "note": "Length-confound null on the original released data (lmsys/mt_bench_human_judgments: 3355 human + 2400 GPT-4 pairwise votes). A length-only null (pick the longer answer) agrees with humans 68.1% (words 66.4%), APPARENTLY recovering ~half the judge's above-chance margin (judge=86.3% vs chance 50%). But the pre-registered control -- length-MATCHED pairs (<10% gap) -- REFUTES the 'it's just length' read: GPT-4 still agrees with humans ~80% (79.7%, n=74) while the length-null falls to chance (53.0%). The agreement SURVIVES length-matching, so it is largely semantic (Campbell-Fiske shared-method-variance; 68% is a correlational upper bound, length as a valid PROXY). VERDICT REVISED FAILED->REPRODUCED (Crucible audit 2026-07-05): the folklore holds; length is a real but minority confound, not the driver. Public probe mnemo/probes/llm_judge_length_null.py.",
    "lab_id": "bf7bb9",
    "code": "https://github.com/DanceNitra/agora/blob/main/mnemo/probes/llm_judge_length_null.py",
    "date": "2026-06-29"
@@ -108,15 +99,6 @@
    "date": "2026-06-26"
   },
   {
-   "claim": "The SIS epidemic threshold disappears for a power-law degree distribution with exponent 2 < rho <= 3.",
-   "source": "Jones & Handcock 2003 (mechanism: Pastor-Satorras & Vespignani 2001)",
-   "verdict": "REPRODUCED",
-   "note": "HMF threshold lambda_c=<k>/<k^2> over growing N with structural cutoff k_max~N^(1/(rho-1)). 2<rho<=3: lambda_c->0 (rho=2.3/2.5 final 0.0000/0.0008; rho=3.0 marginal/log-slow 0.106->0.042). rho>3 bounded (3.5/4.0 -> 0.134/0.196). Determinist",
-   "lab_id": "1b11ef",
-   "code": "",
-   "date": "2026-06-25"
-  },
-  {
    "claim": "Stochastic gradient descent has slow asymptotic convergence due to the inherent variance of the stochastic gradient; SVRG's control variate removes it -> linear convergence.",
    "source": "Accelerating SGD using Predictive Variance Reduction (Johnson & Zhang, 2013)",
    "verdict": "REPRODUCED",
@@ -135,42 +117,6 @@
    "date": "2026-06-24"
   },
   {
-   "claim": "BA(N=2000,m=2): removing top 10% nodes by degree raises bond-percolation threshold from p_c=0.174 to 0.776 (simultaneous percolation+cascade robustness degradation)",
-   "source": "Simultaneous Degradation of Percolation and Cascade Robustness Under Targeted Hub Removal (Cachero Sanchez, 2026-03-05)",
-   "verdict": "REPRODUCED",
-   "note": "Minimal model: networkx BA(N=2000,m=2), Molloy-Reed p_c=<k>/(<k2>-<k>) + direct bond-percolation simulation (peak-of-2nd-largest-component locator), 8 graph realizations. MECHANISM REPRODUCED robustly: removing top 10% nodes by degree sharp",
-   "lab_id": "fbb1cd",
-   "code": "",
-   "date": "2026-06-24"
-  },
-  {
-   "claim": "LinUCB O(sqrt(Td ln^3(KT/delta))) regret bound",
-   "source": "Chu, Li, Reyzin, Schapire 2011 - Contextual bandits with linear payoff functions",
-   "verdict": "REPRODUCED",
-   "note": "bound holds (not violated): regret/sqrt(T) decreasing 0.32->0.065, ~log in benign stochastic regime; weak log-K confirmed (K-exp 0.32); tightness untested (needs adversarial contexts)",
-   "lab_id": "linucb-regre",
-   "code": "",
-   "date": "2026-06-23"
-  },
-  {
-   "claim": "k-clique percolation in ER(N) graphs transitions at edge prob p_c(k)=1/[(k-1)N]^(1/(k-1)); for k=3, p_c=1/sqrt(2N)",
-   "source": "Derenyi, Palla, Vicsek - Clique Percolation in Random Networks, PRL 2005",
-   "verdict": "REPRODUCED",
-   "note": "REPRODUCED (severe-tested, lab: agora_output/lab/replicate_clique_percolation.py). ER(N=300), k=3 clique percolation: built triangles, linked those sharing an edge, tracked largest clique-cluster node-coverage vs p. Coverage takes off sharp",
-   "lab_id": "agora_output",
-   "code": "",
-   "date": "2026-06-22"
-  },
-  {
-   "claim": "All systems in a given universality class share the same critical exponents (microscopic details set only non-universal amplitudes)",
-   "source": "universality (statistical physics) - tested on critical branching processes",
-   "verdict": "REPRODUCED",
-   "note": "REPRODUCED (severe-tested, lab: agora_output/lab/replicate_universality_branching.py). Universality demonstrated on critical Galton-Watson branching: survival exponent q_n ~ n^-1 is the SAME across three distinct offspring distributions (Po",
-   "lab_id": "agora_output",
-   "code": "",
-   "date": "2026-06-22"
-  },
-  {
    "claim": "A brief growth-mindset intervention improves adolescent achievement at population scale (heterogeneous effects)",
    "source": "Yeager et al. 2019 Nature - national growth mindset experiment",
    "verdict": "NOT_COMPUTABLE",
@@ -178,33 +124,6 @@
    "lab_id": "n/a",
    "code": "",
    "date": "2026-06-22"
-  },
-  {
-   "claim": "Finite-size scaling of survival probability in critical branching processes: q_n*n is a universal function of (m-1)*n; at criticality q_n~2/(sigma^2 n)",
-   "source": "Garcia-Millan, Font-Clos, Corral 2015",
-   "verdict": "REPRODUCED",
-   "note": "REPRODUCED (severe-tested, lab: agora_output/lab/replicate_branching_fss.py). Galton-Watson Poisson(m) Monte Carlo (T=200k). (a) criticality m=1: q_n*n -> 1.97 at n=200 (analytic 2.0 for sigma^2=1). (b) finite-size scaling DATA COLLAPSE con",
-   "lab_id": "agora_output",
-   "code": "",
-   "date": "2026-06-22"
-  },
-  {
-   "claim": "BA(N=2000,m=2): removing top 10% nodes by degree raises bond-percolation threshold p_c from 0.174 to 0.776",
-   "source": "Cachero Sanchez 2026 - Simultaneous Degradation of Percolation and Cascade Robustness Under Targeted Hub Removal",
-   "verdict": "REPRODUCED",
-   "note": "Minimal analytic model (Cohen/Molloy-Reed p_c=<k>/(<k^2>-<k>), 25 BA realizations) REPRODUCES the mechanism+direction: targeted top-10pct hub removal raises p_c several-fold (0.093->0.647, 6.95x). Exact published thresholds NOT matched (0.1",
-   "lab_id": "agora_output",
-   "code": "",
-   "date": "2026-06-21"
-  },
-  {
-   "claim": "k-clique percolation in Erdos-Renyi graphs sets in at p_c = 1/[(k-1)N]^(1/(k-1)) (k=3: 1/sqrt(2N))",
-   "source": "Derenyi, Palla, Vicsek - Clique Percolation in Random Networks (2005)",
-   "verdict": "REPRODUCED",
-   "note": "Smallest model: ER graph N=400, k=3 triangles, union-find on triangles sharing an edge; order parameter Phi (giant triangle-community / all triangles) jumps 0.09->0.43->0.92->1.0 across p/pc 1.0->1.2->1.5->2.0; measured onset (Phi>0.5) at p",
-   "lab_id": "ebbca2",
-   "code": "",
-   "date": "2026-06-21"
   },
   {
    "claim": "Real-world networks are scale-free: their degree distributions follow a power law p(k) ~ k^-alpha.",
@@ -219,7 +138,7 @@
    "claim": "Emergent abilities of large language models are genuine, sharp capability transitions - a discontinuous jump in skill above a scale threshold.",
    "source": "Wei et al. 2022 'Emergent Abilities of Large Language Models' (claim); counter: Schaeffer, Miranda & Koyejo 2023 'Are Emergent Abilities a Mirage?' (NeurIPS).",
    "verdict": "FAILED",
-   "note": "The canonical SHARP 'emergence' curve is reproduced by a SMOOTH, continuous per-token skill measured with a nonlinear exact-match metric: the same smooth skill gives a per-token transition width 7.0 vs an exact-match (L=100) width 1.05 - 6.7x sharper PURELY from the metric - and the apparent onset shifts -0.07 -> +5.58 as answer length grows with NO change in the underlying skill. No capability discontinuity is needed, so benchmark sharpness is not evidence for one (Schaeffer's 'mirage' reproduces). Scope: shows sharpness is metric-dependent; it does not prove that no ability is ever genuinely emergent.",
+   "note": "The canonical SHARP 'emergence' curve is reproduced by a SMOOTH, continuous per-token skill measured with a nonlinear exact-match metric: the same smooth skill gives a per-token transition width 7.0 vs an exact-match (L=100) width 1.05 -- 6.7x sharper PURELY from the metric -- and the apparent onset shifts -0.07 -> +5.58 as answer length grows with NO change in underlying skill. No capability discontinuity is needed, so benchmark sharpness is not evidence for one (Schaeffer et al. 2023 'mirage', NeurIPS Outstanding Paper, reproduces). CONTESTED / scope: shows the metric mechanism is SUFFICIENT to fake sharpness here; it does NOT prove no ability is ever genuinely emergent -- Du et al. 2024 argue downstream abilities track a genuine pretraining-loss threshold. What FAILS is 'benchmark sharpness proves a discontinuity', not all emergence.",
    "lab_id": "af4a24",
    "code": "",
    "date": "2026-06-19"
@@ -243,19 +162,10 @@
    "date": "2026-06-18"
   },
   {
-   "claim": "The epidemic threshold disappears for scale-free / preferential-attachment networks with degree exponent gamma in (2,3]",
-   "source": "Pastor-Satorras & Vespignani (2001); cited by Jones & Handcock (2003), preferential attachment in human sexual networks",
-   "verdict": "REPRODUCED",
-   "note": "Mechanism reproduced: SIS threshold lambda_c=<k>/<k^2> falls with N on BA/scale-free networks (0.112->0.062 as N 500->32000) because <k^2> grows with the hub/cutoff (35.5->64.9), while ER stays finite (~0.20, <k^2>~20). SIS dynamics confirm",
-   "lab_id": "f637bb",
-   "code": "",
-   "date": "2026-06-18"
-  },
-  {
    "claim": "Metcalfe's Law: the value of a communications network scales as n^2 (the number of possible pairwise connections)",
    "source": "Metcalfe's Law (folklore/Gilder 1993); contested by Briscoe, Odlyzko & Tilly (2006), 'Metcalfe's Law is Wrong' (IEEE Spectrum), and Metcalfe (2013) Facebook dat",
-   "verdict": "FAILED",
-   "note": "Strong n^2 claim FAILS. Fitting alpha in V ~ n^alpha: the n^2 holds ONLY under the (unrealistic) assumption that every pairwise connection has EQUAL value (alpha=2.00). Under realistic rank-declining connection value (Zipf 1/k, the Briscoe-",
+   "verdict": "NOT_COMPUTABLE",
+   "note": "Fitting V ~ n^alpha: the strong n^2 law holds only under the (unrealistic) assumption that every pairwise connection has EQUAL value (alpha=2.00); under realistic rank-declining value (Zipf 1/k) the theoretical prediction is ~n*log(n) (Briscoe-Odlyzko-Tilly 2006). BUT the exponent is empirically UNSETTLED: real user/revenue data from Facebook & Tencent fit n^2 better than n*log(n) (Zhang, Liu & Xu 2015; Van Hove 2016 upholds), and later work even fits a cube law. VERDICT NOT_COMPUTABLE (revised from FAILED, Crucible audit 2026-07-05): our lab shows n^2 is not FORCED by first principles once connection value declines, but n^2 does not fail EMPIRICALLY -- the headline data go the other way, so no clean REPRODUCED/FAILED is warranted.",
    "lab_id": "b790af",
    "code": "",
    "date": "2026-06-18"
@@ -284,24 +194,6 @@
    "verdict": "REPRODUCED",
    "note": "Smallest Galton-Watson model (Poisson offspring), vectorized over 40k realizations. Critical eps=0: n*P_n -> ~2 (Kolmogorov 2/sigma^2, sigma^2=1). Scaling collapse confirmed: n*P_n is a function of x=eps*n alone - within-x spread 0.116 vs a",
    "lab_id": "32d07b",
-   "code": "",
-   "date": "2026-06-17"
-  },
-  {
-   "claim": "In the Erdos-Renyi graph G(N,p), the k-clique percolation transition occurs at p_c(k) = 1/[(k-1)N]^(1/(k-1)).",
-   "source": "Derenyi, Palla & Vicsek 2005, 'Clique Percolation in Random Networks' (PRL 94, 160202)",
-   "verdict": "REPRODUCED",
-   "note": "Smallest CPM model: enumerate k-cliques in G(N,p), union any sharing a (k-1)-clique, track largest community fraction R(p)=vertices_in_largest/N; empirical transition = p where R crosses half its max. Measured/formula ratio is near-CONSTANT",
-   "lab_id": "aa120e",
-   "code": "",
-   "date": "2026-06-17"
-  },
-  {
-   "claim": "The epidemic threshold of a network disappears (goes to 0 as N->infinity) when the degree-distribution scaling exponent rho is in 2 < rho <= 3.",
-   "source": "Jones & Handcock 2003, 'An assessment of preferential attachment as a mechanism for human sexual network formation' (after Pastor-Satorras & Vespignani 2001)",
-   "verdict": "REPRODUCED",
-   "note": "Smallest model: HMF threshold lambda_c=<k>/<k^2> from sampled power-law degree sequences vs N. Measured lambda_c at N=1e3..1e6: gamma=2.3 shrinks x28.7, gamma=2.7 x3.6 (power-law vanishing); gamma=3.0 is MARGINAL - vanishes only logarithmic",
-   "lab_id": "1f04d5",
    "code": "",
    "date": "2026-06-17"
   },
@@ -378,15 +270,6 @@
    "date": "2026-06-14"
   },
   {
-   "claim": "Finite-size scaling exists for the survival probability of a branching process as a function of the control parameter (m-1) and the maximum number of generations n: S_n ~ n^-1 G((m-1)*n).",
-   "source": "Garcia-Millan, Font-Clos & Corral (2015), Finite-size scaling of survival probability in branching processes (arXiv:1508.01515 / Phys. Rev. E 91, 042122).",
-   "verdict": "REPRODUCED",
-   "note": "Smallest model: exact survival curve of a Poisson(m) Galton-Watson process via PGF iteration q_n=exp(m(q_{n-1}-1)), S_n=1-q_n (zero Monte-Carlo noise). Three FSS signatures all confirmed: (1) exact critical amplitude n*S_n -> 2 = 2/sigma^2 ",
-   "lab_id": "816fdd",
-   "code": "",
-   "date": "2026-06-14"
-  },
-  {
    "claim": "In DiD with FEW treated units and spatially/serially-correlated errors, standard DiD inference under-covers (invalid CIs) while synthetic control is materially better when parallel trends ~holds",
    "source": "Alvarez & Ferman (2020)",
    "verdict": "REPRODUCED",
@@ -412,15 +295,6 @@
    "lab_id": "1b4d0a",
    "code": "",
    "date": "2026-06-14"
-  },
-  {
-   "claim": "Removing top-10% degree nodes from a BA network (N=2000,m=2) raises the bond-percolation threshold p_c 0.174->0.776",
-   "source": "Simultaneous Degradation of Percolation and Cascade",
-   "verdict": "REPRODUCED",
-   "note": "Mechanism+direction reproduced: hub removal collapses <k^2> 50.8->3.8, p_c jumps ~8x (0.085->0.687 via Cohen mean-field). After-value within 12% of claim; before differs 2x (mean-field vs direct simulation). Robust-yet-fragile confirmed.",
-   "lab_id": "9bd205",
-   "code": "",
-   "date": "2026-06-13"
   },
   {
    "claim": "Derenyi-Palla-Vicsek (2005): k-clique percolation in ER graphs at p_c(k)=[(k-1)N]^(-1/(k-1)); for k=3, p_c ~ 1/sqrt(2N)",
@@ -471,7 +345,7 @@
    "claim": "Dunning & Kruger (1999): the unskilled systematically overestimate their ability - a metacognitive deficit, shown by the quartile plot (bottom quartile +46pp, top -13pp)",
    "source": "Kruger & Dunning, J Pers Soc Psychol 77(6), 1999 - Unskilled and Unaware of It",
    "verdict": "FAILED",
-   "note": "A null model with ZERO metacognitive deficit (identical self-error at every skill level) reproduces the canonical plot AND its asymmetry: bottom +45.8 (DK: +46), top -14.2 (DK: -13) - just regression to the mean on a noisy test + a UNIFORM ",
+   "note": "A null model with ZERO metacognitive deficit (identical self-error at every skill level) reproduces the canonical quartile plot AND its asymmetry: bottom quartile +45.8 (DK: +46), top -14.2 (DK: -13) -- pure regression to the mean on a noisy test plus a UNIFORM better-than-average offset. So the quartile plot does NOT by itself demonstrate a metacognitive deficit (Gignac & Zajenkowski 2020; Nuhfer et al. 2017; Fix 2022 autocorrelation critique). Scope: 'people self-assess imperfectly' broadly survives, and whether a residual metacognitive signal remains after the artifact is separately contested (Comment, Intelligence 2023) -- what FAILS is that the dramatic quartile graph PROVES the deficit.",
    "lab_id": "e39390",
    "code": "",
    "date": "2026-06-12"
@@ -567,29 +441,11 @@
    "date": "2026-06-11"
   },
   {
-   "claim": "LinUCB-style linear contextual bandit achieves sublinear regret, O(sqrt(Td) polylog), holding with high probability (Chu, Li, Reyzin, Schapire 2011).",
-   "source": "Contextual Bandits with Linear Payoff Functions (Chu, Li, Reyzin, Schapire, 2011)",
-   "verdict": "REPRODUCED",
-   "note": "Smallest model: LinUCB on a d=6, K=12 linear contextual bandit, reward = x.theta*+noise. Cumulative regret stays ~flat (1.5->1.8 from T=500->4000, log-log exponent 0.09) - clearly SUBLINEAR and far inside the O(sqrt(dT))~155 bound at T=4000",
-   "lab_id": "3f716e",
-   "code": "",
-   "date": "2026-06-11"
-  },
-  {
    "claim": "SGD is popular for large-scale optimization but has slow asymptotic convergence due to the inherent variance of the stochastic gradient.",
    "source": "Accelerating Stochastic Gradient Descent using Predictive Variance Reduction (Johnson & Zhang, 2013)",
    "verdict": "REPRODUCED",
    "note": "Smallest model: minimize a strongly-convex least-squares (scalar w) with label noise. Constant-step SGD stalls at a variance FLOOR (suboptimality ~1.9e-3, never reaches the optimum); full-gradient GD and variance-reduced SVRG both drive sub",
    "lab_id": "437d20",
-   "code": "",
-   "date": "2026-06-11"
-  },
-  {
-   "claim": "Branching processes exhibit finite-size scaling of the survival probability P_n as a function of the control parameter m and the maximum number of generations n (critical n*P_n -> const, collapse in (",
-   "source": "Finite-size scaling of survival probability in branching processes (Garcia-Millan, Font-Clos, Corral, 2015)",
-   "verdict": "REPRODUCED",
-   "note": "Smallest model: Galton-Watson with Poisson(m) offspring, survival = population>0 at gen n. Both predictions reproduce: (a) at criticality m=1, n*P_n converges to ~1.9 (theory 2/sigma^2=2, sigma^2=1) -> P_n~C/n, exponent -1; (b) finite-size-",
-   "lab_id": "d6e8d6",
    "code": "",
    "date": "2026-06-11"
   },
