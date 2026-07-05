@@ -3,9 +3,9 @@
  "description": "Scientific and technical claims rebuilt as minimal computational models and tested. REPRODUCED = the mechanism holds in a minimal model; FAILED = it does not; NOT_COMPUTABLE = no simulable core (an honest pass).",
  "generated": "2026-07-05",
  "counts": {
-  "REPRODUCED": 21,
+  "REPRODUCED": 20,
   "FAILED": 10,
-  "NOT_COMPUTABLE": 22
+  "NOT_COMPUTABLE": 20
  },
  "entries": [
   {
@@ -189,15 +189,6 @@
    "date": "2026-06-16"
   },
   {
-   "claim": "Specimens were loaded with low-amplitude cyclic torque to analyze deformation in the small strain range (0.001-0.01%).",
-   "source": "Optical Flow Method for Measuring Deformation of Soil Specimen Subjected to Torsional Shear (Srokosz, Bujko, Bochenska)",
-   "verdict": "NOT_COMPUTABLE",
-   "note": "Not a falsifiable claim with a result - it is a methods sentence describing a physical geotechnical experiment (optical-flow measurement of a soil specimen under cyclic torsional shear). Off-domain (soil mechanics, not our frontier), no res",
-   "lab_id": "",
-   "code": "",
-   "date": "2026-06-16"
-  },
-  {
    "claim": "Cohen's benchmarks (r=.10/.30/.50, d=.20/.50/.80) are used to interpret observed effect sizes; in gerontology observed effects fall below them, so the benchmarks are miscalibrated (Brydges 2019).",
    "source": "Effect Size Guidelines, Sample Size Calculations, and Statistical Power in Gerontology (Brydges, 2019)",
    "verdict": "NOT_COMPUTABLE",
@@ -211,15 +202,6 @@
    "source": "Sample-Efficient RL with Maximum Entropy Mellowmax Episodic Control (Sarrico, Arulkumaran, Agostinelli et al.)",
    "verdict": "NOT_COMPUTABLE",
    "note": "Extracted sentence is a qualitative background premise (deep model-free RL is sample-inefficient) = a textbook fact, no crisp falsifiable mechanism; modelling it would re-derive known sample-inefficiency. The papers real contribution (Mello",
-   "lab_id": "",
-   "code": "",
-   "date": "2026-06-15"
-  },
-  {
-   "claim": "In general, critical systems are associated with fractal / power-law behaviour",
-   "source": "(general statistical-physics statement)",
-   "verdict": "NOT_COMPUTABLE",
-   "note": "Too general to replicate: no single specific quantitative claim with a computable mechanism, and criticality<->scale-invariance/power-laws is foundational textbook physics where FAILED is NOT a live possibility - reproducing a known critica",
    "lab_id": "",
    "code": "",
    "date": "2026-06-15"
@@ -354,7 +336,7 @@
    "claim": "Hong-Page (2004): a randomly selected (diverse) team of problem solvers outperforms the team of individually best solvers under relay search (n=2000, l=12, k=3, group 10)",
    "source": "Hong & Page, PNAS 101(46), 2004 - Groups of diverse problem solvers can outperform groups of high-ability problem solvers",
    "verdict": "REPRODUCED",
-   "note": "Reproduced at paper params: random beats best by +1.65 (t=4.1). But the effect is FRAGILE, as critics argued: it shrinks with a narrower heuristic pool (l=6: +0.90) and REVERSES on smoothed landscapes (-0.38, ability wins) - diversity trump Cross-ref: the paired STRONG-claim entry (lab b56ae0) rules the general 'random>=best' FAILED in a faithful powered paired model; this REPRODUCED holds only at the paper's specific params and reverses on smoothed landscapes -- the two are consistent, not contradictory.",
+   "note": "Reproduced at paper params: random beats best by +1.65 (t=4.1). But the effect is FRAGILE, as critics argued: it shrinks with a narrower heuristic pool (l=6: +0.90) and REVERSES on smoothed landscapes (-0.38, ability wins) -- diversity trumps ability only in the papers specific regime. Cross-ref: the paired STRONG-claim entry (lab b56ae0) rules the general 'random>=best' FAILED in a faithful powered paired model; this REPRODUCED holds only at the paper's specific params and reverses on smoothed landscapes -- the two are consistent, not contradictory.",
    "lab_id": "a3ae64",
    "code": "",
    "date": "2026-06-12"
@@ -441,10 +423,10 @@
    "date": "2026-06-11"
   },
   {
-   "claim": "Barato-Hinrichsen (2009): non-Markovian spreading with heavy-tailed waiting times t^{-1-m} shows an absorbing-state phase transition",
+   "claim": "Barato et al. (2009): non-Markovian spreading with heavy-tailed waiting times t^{-1-m} shows anomalous critical exponents (a distinct universality class) at the absorbing transition.",
    "source": "Barato and Hinrichsen (2009)",
-   "verdict": "REPRODUCED",
-   "note": "Minimal non-Markovian branching simulation (lab 37ad2a) reproduces the absorbing-state transition: survival ~0 for branching ratio lambda<1, rises for lambda>1, threshold lambda_c~1 IDENTICAL for m=0.5 and m=1.5. The heavy tail sets finite-",
+   "verdict": "NOT_COMPUTABLE",
+   "note": "Threshold at branching-ratio=1 (survival ~0 for lambda<1, rising for lambda>1, identical for m=0.5 and m=1.5) is textbook Galton-Watson: ultimate survival depends only on the offspring MEAN, not on inter-event timing, so tail-independence of the threshold is BY CONSTRUCTION. The papers non-trivial result -- heavy-tailed non-Markovian return times P(tau)~tau^{-3/2} produce ANOMALOUS critical exponents (a distinct universality class) -- was NOT tested. Reclassified REPRODUCED->NOT_COMPUTABLE (Crucible audit 2026-07-05). Citation corrected: Barato, Bonachela, Fiore, Hinrichsen & Munoz (2009), Phys. Rev. E 79, 041130 (arXiv:0901.0451).",
    "lab_id": "37ad2a",
    "code": "",
    "date": "2026-06-11"
@@ -472,15 +454,6 @@
    "source": "internal frontier",
    "verdict": "NOT_COMPUTABLE",
    "note": "Already resolved by dialectic-where-ai-biology-analogy-breaks.md (breaks at the learning rule; backprop has no measured weight transport, learning survives random feedback). A verbal break-claim with no quantitative model to re-run.",
-   "lab_id": "",
-   "code": "",
-   "date": "2026-06-10"
-  },
-  {
-   "claim": "A multi-agent RL model trained on historical Agora transaction data predicts trader behavior",
-   "source": "AGORA high-resolution galaxy simulations (mis-cited - name collision)",
-   "verdict": "NOT_COMPUTABLE",
-   "note": "No computable core: claim references internal/fictional Agora transaction data we do not have, and the cited source is a mis-attributed galaxy-simulation paper (AGORA name collision). Nothing real to replicate.",
    "lab_id": "",
    "code": "",
    "date": "2026-06-10"
