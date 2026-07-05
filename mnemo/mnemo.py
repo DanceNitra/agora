@@ -246,7 +246,7 @@ class Mnemo:
     def remember(self, text: str, tags=None, value: float = 1.0, meta: dict | None = None,
                  mtype: str | None = None, valid_from: float | None = None,
                  source: dict | None = None, key: str | None = None,
-                 derived_from: list | None = None, attestation=None) -> str:
+                 derived_from: list | None = None, attestation=None, derived: bool = False) -> str:
         """Append-only raw capture. Stamped with an absolute UTC time; never edited afterward.
         mtype in {episodic, semantic, procedural} sets the decay prior (episodic fades fast,
         semantic slow, procedural barely); inferred from the text if not given. Pass it explicitly
@@ -292,6 +292,21 @@ class Mnemo:
                 rec["derived_from"] = list(links)   # explicit lineage (distinct from corroboration links) so
                 #                                     a derived memory's evidence grade can be capped at its
                 #                                     weakest parent's -- trust taint propagates, not just source taint
+        # INTEGRITY-FLOOR FOR SELF-DECLARED TRANSFORMATION OUTPUTS (prompted by jacksonxly). A write the caller
+        # DECLARES a transformation output (derived=True -- a summary / consolidation / LLM rewrite) that could
+        # not name/resolve ANY parent is an ORPHAN: missing lineage is treated as unverified, so it earns NO
+        # corroboration standing (fails the influence gate + graduation + distinct-source bar), defaulting to
+        # scope-local context, and cannot quietly survive a retraction it should have inherited. Reversible:
+        # re-remember with a resolvable derived_from. Primary observations (derived=False, default) are
+        # unaffected. This is Biba-style integrity (1977: low-integrity input cannot raise an object's integrity)
+        # / taint-tracking default-deny applied to the graduation+recall gate -- an APPLICATION, not a new idea.
+        # HONEST LIMIT (do NOT call this "fail-closed against an adversary"): `derived` is CALLER-SET, so a
+        # hostile or careless caller that OMITS it is treated as a primary observation and can still earn
+        # standing -- it fails OPEN. It closes the orphaned-summary hole only for COOPERATIVE callers that
+        # correctly self-declare derivation but lose lineage in an untrusted transform. A truly adversary-resistant
+        # version would INFER derivation from the summarize/consolidate call site rather than trust the flag.
+        if derived and not rec.get("derived_from"):
+            rec["orphan"] = True
         if key is not None:
             rec["key"] = str(key)
         # ORIGIN ATTESTATION (OPT-IN): bind this claim to a source's VERIFIED KEY. attestation is
@@ -907,7 +922,8 @@ class Mnemo:
             _distinct = (self._distinct_verified_keys(r.get("links"), _by_id) if self.strict_corroboration
                          else self._distinct_sources(r.get("links"), _by_id))
             corroborated = ((_good > 0 and _good >= _bad) or _distinct >= 2) \
-                and not (r.get("meta") or {}).get("slashed")   # a landed retraction blocks (re-)graduation too
+                and not (r.get("meta") or {}).get("slashed") \
+                and not r.get("orphan")   # landed retraction OR orphan (no lineage) blocks (re-)graduation too
             if r.get("mtype") == "episodic" and r["value"] >= _GRADUATE_VALUE and corroborated:
                 r["mtype"] = "semantic"
                 r.setdefault("meta", {})["graduated_from_episodic"] = True
@@ -994,8 +1010,11 @@ class Mnemo:
         A LANDED RETRACTION WINS: a record slash()'d (meta['slashed']) is not corroborated on ANY path — incl.
         distinct-link corroboration — so a caught poison cannot stay load-bearing via independent-looking links
         (jacksonxly's invariant: nothing false stays load-bearing past the correctness signal). restore() clears
-        the flag, so this is reversible; receipt mnemo/probes/retraction_propagation.py."""
-        if (rec.get("meta") or {}).get("slashed"):
+        the flag, so this is reversible; receipt mnemo/probes/retraction_propagation.py.
+        FAIL-CLOSED PROVENANCE: an ORPHAN (a declared transformation output that named no parent, meta-flag
+        rec['orphan']) is likewise not corroborated on any path -- missing lineage is treated as unverified, so
+        an app-side summary that dropped its derived_from cannot quietly earn standing or survive a retraction."""
+        if (rec.get("meta") or {}).get("slashed") or rec.get("orphan"):
             return False
         good = float(rec.get("good", 0) or 0)
         bad = float(rec.get("bad", 0) or 0)

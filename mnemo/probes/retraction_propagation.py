@@ -36,9 +36,14 @@ FINDINGS (self-check asserts the core):
      so a mistaken/ weaponized retraction is undoable (slash cannot be used to permanently knock out a rival).
   3. CONFIDENCE-NOT-TRUTH: at its peak P grades 'corroborated' / convergence-backed, never 'verified' -- the
      substrate never granted it truth, exactly as the invariant requires.
-  BOUNDARY (precondition, measured): the ORPHAN summary -- same content, lineage stripped -- is NOT reached.
-     Preserve derived_from through app-side summarization, or the retraction has nothing to propagate along.
-     This is a usage requirement, not a store bug: if the app throws away provenance, no store can find the child.
+  ORPHAN BOUNDARY -> INTEGRITY FLOOR (Biba-style, measured): a self-declared derived write (derived=True) that
+     resolves no parent earns NO standing (O2 below is load-bearing=False from t0 even WITH credit), so a summary
+     that lost its lineage cannot quietly earn influence or survive a retraction; a genuine primary write (O) is
+     unaffected. HONEST LIMIT (this is NOT adversary-proof): `derived` is caller-set, so a hostile/careless caller
+     that OMITS it is treated as a primary observation and can still earn standing -- it fails OPEN. Prior art:
+     Biba integrity (1977), taint-tracking / default-deny; this is an application to the graduation+recall gate,
+     not a new idea. A truly adversary-resistant version would INFER derivation from the summarize/consolidate
+     call site rather than trust the flag.
   FIXED THIS CYCLE (the link-corroboration hole): a descendant that independently cleared the >=2-distinct-source
      gate used to SURVIVE the retraction, because slash() books accountability (zeroes good, dominates bad,
      revokes graduation) but does not invalidate corroboration LINKS, so the distinct-source path stayed lit.
@@ -94,9 +99,16 @@ def main():
     B1 = m.remember("Runbook (rolled up from the config summary): keep retries off.", source=None, derived_from=[A1])
     m.credit([B1], "good", weight=2.0)            # DEPTH-2 descendant (derived from A1, not P) -- transitivity test
 
-    # --- control O: same content as A1 but LINEAGE STRIPPED (app-side summary with no derived_from) ---
-    O = m.remember("Prod config summary: retries disabled by default.", source=None)  # no derived_from
+    # --- O: a PRIMARY write with no parents (NOT declared derived) -- a fresh observation legitimately has no
+    #     lineage and still earns standing. This is the case the fail-closed rule must NOT punish. ---
+    O = m.remember("Prod config summary: retries disabled by default.", source=None)  # no derived_from, derived=False
     m.credit([O], "good", weight=3.0)
+
+    # --- O2: an app-side summary DECLARED a transformation output (derived=True) that named NO parent --
+    #     the untrusted LLM-summarize step dropped the lineage. Fail-closed provenance (jacksonxly) -> ORPHAN ->
+    #     NO corroboration standing from the start, even WITH earned credit -> nothing to survive a retraction. ---
+    O2 = m.remember("Ops summary (LLM-written, lineage lost): retries stay disabled.", source=None, derived=True)
+    m.credit([O2], "good", weight=3.0)
 
     # --- C: a descendant of P that is ALSO independently link-corroborated (>=2 distinct sources) ---
     corr1 = m.remember("Blog: many teams run api.retry=0.", source=SRC_X)
@@ -108,7 +120,7 @@ def main():
     m._save()
 
     ids = {"P (root)": P, "A1 (summary)": A1, "A2 (graduated)": A2, "B1 (depth-2)": B1,
-           "O (orphan)": O, "C (link-corrob.)": C}
+           "O (primary,no-lin)": O, "O2 (derived orphan)": O2, "C (link-corrob.)": C}
     # every provenance-reached descendant should fall (incl. C, the link-corroborated one, after the fix);
     # O is the only survivor -- it kept no lineage, so the retraction has no edge to travel along.
     prov_reached = ["P (root)", "A1 (summary)", "A2 (graduated)", "B1 (depth-2)", "C (link-corrob.)"]
@@ -122,7 +134,10 @@ def main():
     for k in ids:
         print(f"      {k:20s} load-bearing={t0[k]}")
     print(f"    P evidence grade at peak: '{grade0.get('status')}' "
-          f"(lineage_grade='{grade0.get('lineage_grade')}') -- confidence, never 'verified'.\n")
+          f"(lineage_grade='{grade0.get('lineage_grade')}') -- confidence, never 'verified'.")
+    print(f"    FAIL-CLOSED: O2 (declared derived=True, named no parent) load-bearing={t0['O2 (derived orphan)']} "
+          f"even WITH credit -- an orphan earns NO standing; O (primary, not declared derived) "
+          f"load-bearing={t0['O (primary,no-lin)']}, legitimately unaffected.\n")
 
     # --- ONE correctness signal lands on the root ---
     res = m.slash([P], scope="source")
@@ -135,8 +150,8 @@ def main():
     revoked = [k for k in prov_reached if t0[k] and not t1[k]]
     print(f"\n    PROPAGATION: {len(revoked)}/{len(prov_reached)} provenance-reached descendants revoked "
           f"transitively (incl. depth-2 B1 AND link-corroborated C).")
-    print(f"    BOUNDARY (precondition): orphan O still load-bearing={t1['O (orphan)']} "
-          f"(lineage stripped -> no edge to travel; preserve derived_from through summarization).")
+    print(f"    ORPHAN BOUNDARY (integrity-floor, Biba-style): a SELF-DECLARED derived summary that lost its "
+          f"lineage (O2) earns no standing, so nothing to survive; a primary write (O) is untouched.")
 
     # --- reversibility: the retraction is undoable ---
     m.restore([P], scope="source")
@@ -147,16 +162,20 @@ def main():
         print(f"      {k:20s} load-bearing={t2[k]}")
 
     # --- self-check (the falsifier) ---
-    assert all(t0[k] for k in ids), "setup: every node must start load-bearing"
+    non_orphan = [k for k in ids if k != "O2 (derived orphan)"]
+    assert all(t0[k] for k in non_orphan), "setup: every non-orphan node must start load-bearing"
+    assert t0["O2 (derived orphan)"] is False, "FAIL-CLOSED broke: a declared-derived orphan must earn NO standing"
     assert all(not t1[k] for k in prov_reached), "PROPAGATION incomplete: a provenance descendant survived slash"
-    assert t1["O (orphan)"] is True, "control broke: orphan should be UNREACHED by source-scoped slash"
+    assert t1["O (primary,no-lin)"] is True, "control broke: a PRIMARY no-lineage write must keep standing (not an orphan)"
     assert all(t2[k] for k in prov_reached), "REVERSIBILITY failed: restore did not recover standing"
     assert grade0.get("status") != "verified", "confidence-not-truth: P must never grade 'verified' from corroboration"
 
     print("\nVERDICT: the invariant HOLDS -- one slash reaches the full transitive provenance subtree (credit,")
-    print("graduation, AND link-corroboration paths all fall), load-bearing -> 0, and restore is exact. The one")
-    print("boundary left is a usage precondition (preserve provenance; orphaned summaries escape), not a store")
-    print("bug. Bounded blast radius + reversible retraction propagation is real on shipped mnemo.")
+    print("graduation, AND link-corroboration all fall), load-bearing -> 0, restore exact. The orphan boundary")
+    print("gets a Biba-style INTEGRITY FLOOR: a self-declared derived write that lost its lineage earns NO")
+    print("standing, so it cannot quietly survive a retraction; a primary write is unaffected. HONEST LIMIT: this")
+    print("is NOT adversary-proof -- `derived` is caller-set, so a caller that OMITS it fails OPEN (treated as")
+    print("primary). It closes the hole for COOPERATIVE callers; store-inferred derivation would be the real fix.")
 
 
 if __name__ == "__main__":
