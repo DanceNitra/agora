@@ -6,7 +6,7 @@
 
 *Memory is the mother of the Muses. An agent with no memory has no ideas.*
 
-`pip install agora-mnemo` · [PyPI](https://pypi.org/project/agora-mnemo/) · [Hugging Face](https://huggingface.co/Danchi17/mnemo) · [DOI 10.5281/zenodo.21128549](https://doi.org/10.5281/zenodo.21128549) · MIT · v0.6.0
+`pip install agora-mnemo` · [PyPI](https://pypi.org/project/agora-mnemo/) · [Hugging Face](https://huggingface.co/Danchi17/mnemo) · [DOI 10.5281/zenodo.21128549](https://doi.org/10.5281/zenodo.21128549) · MIT · v0.6.1
 
 </div>
 
@@ -245,6 +245,21 @@ identities*, not truth — a wrong claim with real reproductions still climbs; a
 with `attestation` (then each identity is Douceur-costly). Evidence-grade / staged-promotion is textbook
 (argumentation & KR justification levels, staged review); the new bit is a runnable memory primitive that makes the
 grade externally-ratcheted by construction. Opt-in; default behavior unchanged.
+
+### Convergence-backed status: `convergence_report()` + `recall(with_status=)` (0.6.1)
+
+**Corroboration measures independence of *origin*, never *correctness*** — so genuinely independent sources can
+converge on a *false* claim ("authenticated-but-false") and nothing in the record content catches it. This upgrade
+(prompted by a sharp r/RAG exchange) makes the memory layer carry that honestly instead of promoting convergence to
+"true". `convergence_report(id)` returns a **`convergence-backed`** status (sources agree, *not* adjudicated true)
+vs **`adjudicated`** (an out-of-band check ratified it via `ratify(kind='reproduction'/'audit')` from a *different*
+identity — a different failure mode); it flags **`low_source_diversity`** (≥2 corroborating links resolving to ≤1
+distinct origin — uniform agreement from few origins should *raise* suspicion, since errors correlate when sources
+share a substrate); and it reports a **`lineage_grade`** capping a derived memory at its weakest parent (trust taint
+propagates, not just source taint). `recall(with_status=True)` carries the status at the point of use. The mechanism
+is textbook — redundancy recovers a wrong consensus only to the degree failure modes are independent (Knight &
+Leveson 1986; Condorcet/Ladha 1992; Campbell & Fiske 1959); the new bit is a runnable memory primitive that names
+it. Opt-in; default behavior unchanged.
 
 ### Soft metadata filter: `recall(prefer=..., prefer_trust=...)` (0.4.1)
 

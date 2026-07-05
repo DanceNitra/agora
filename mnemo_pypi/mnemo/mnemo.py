@@ -289,6 +289,9 @@ class Mnemo:
                 rec["taint"] = sorted(taint)
             if links:
                 rec["links"] = links
+                rec["derived_from"] = list(links)   # explicit lineage (distinct from corroboration links) so
+                #                                     a derived memory's evidence grade can be capped at its
+                #                                     weakest parent's -- trust taint propagates, not just source taint
         if key is not None:
             rec["key"] = str(key)
         # ORIGIN ATTESTATION (OPT-IN): bind this claim to a source's VERIFIED KEY. attestation is
@@ -629,7 +632,7 @@ class Mnemo:
                scope: str | None = None, as_of: float | None = None,
                where: dict | None = None, influence_only: bool = False,
                prefer=None, prefer_trust: float = 1.0,
-               prefer_max_boost: float | None = None) -> list[dict]:
+               prefer_max_boost: float | None = None, with_status: bool = False) -> list[dict]:
         """Top-k memories by RELEVANCE × VALUE — high-value memories outrank merely-similar ones.
         Memories the dream pass flagged as hubs (universal matchers) are skipped unless include_hubs.
 
@@ -907,12 +910,18 @@ class Mnemo:
             if r.get("mtype") == "episodic" and r["value"] >= _GRADUATE_VALUE and corroborated:
                 r["mtype"] = "semantic"
                 r.setdefault("meta", {})["graduated_from_episodic"] = True
-            out.append({"id": r["id"], "text": r["text"], "tags": r["tags"], "iso": r["iso"],
-                        "value": round(r["value"], 2), "relevance": round(sim, 3),
-                        "score": round(score, 3), "links": r["links"],
-                        "reliability": round(self._reliability(r), 3),
-                        "source": r.get("source"),    # re-checkable origin (provenance), surfaced so a recalled fact can be traced back
-                        "stale_derived": bool(r.get("_stale_derived"))})
+            _o = {"id": r["id"], "text": r["text"], "tags": r["tags"], "iso": r["iso"],
+                  "value": round(r["value"], 2), "relevance": round(sim, 3),
+                  "score": round(score, 3), "links": r["links"],
+                  "reliability": round(self._reliability(r), 3),
+                  "source": r.get("source"),    # re-checkable origin (provenance), surfaced so a recalled fact can be traced back
+                  "stale_derived": bool(r.get("_stale_derived"))}
+            if with_status:     # OPT-IN: carry the honest truth-status at the point of use (convergence-backed
+                cr = self.convergence_report(r, _by_id=_by_id)   # vs adjudicated), never let convergence read as truth
+                _o["convergence"] = cr["status"]
+                if cr.get("low_source_diversity"):
+                    _o["low_source_diversity"] = True
+            out.append(_o)
         # NOTE: recall is a READ. It nudges in-memory access value / graduation, but must NOT persist the
         # whole store here — serializing (json.dumps) on every recall, across many agents' stores,
         # saturated the thread pool and FROZE the world. The in-memory nudges are persisted on the next
@@ -1145,16 +1154,17 @@ class Mnemo:
         g = self.grade(rec)
         return {"ok": True, "grade": g["grade"], "novel": g["novel"], "reason": f"{kind} recorded"}
 
-    def grade(self, target, strict: bool | None = None) -> dict:
+    def grade(self, target, strict: bool | None = None, _by_id: dict | None = None) -> dict:
         """Compute a claim's CURRENT evidence grade + novelty from external ratifications and the existing
         corroboration/credit substrate. Pure/read-only; nothing here is settable by the writer. Returns
         {grade, novel, evidence}. `strict` (defaults to self.strict_corroboration) selects distinct verified
-        keys vs distinct source strings for the multi-source corroboration path."""
-        rec = target if isinstance(target, dict) else {x["id"]: x for x in self.items}.get(target)
+        keys vs distinct source strings for the multi-source corroboration path. `_by_id` is an optional cached
+        id->record map (a caller grading many records can pass it to skip the per-call rebuild)."""
+        by_id = _by_id if _by_id is not None else {x["id"]: x for x in self.items}
+        rec = target if isinstance(target, dict) else by_id.get(target)
         if rec is None:
             return {"grade": None, "novel": None, "evidence": {"reason": "no such id"}}
         strict = self.strict_corroboration if strict is None else strict
-        by_id = {x["id"]: x for x in self.items}
         good = float(rec.get("good", 0) or 0); bad = float(rec.get("bad", 0) or 0)
         rats = rec.get("ratifications", []) or []
         # distinct EXTERNAL ratifiers per kind, and distinct lenses (correlated-auditor guard)
@@ -1178,6 +1188,65 @@ class Mnemo:
             "multi_source": multi, "attested": attested, "earned_outcome": earned,
             "reproductions": len(repro), "witnesses": len(witness),
             "prior_art_empty": bool(prior_empty), "distinct_lenses": len(lenses)}}
+
+    def convergence_report(self, target, _by_id: dict | None = None) -> dict:
+        """Read-only: distinguish CONVERGENCE-BACKED (independent sources agree) from ADJUDICATED (an out-of-band
+        check with a DIFFERENT failure mode confirmed it). Corroboration measures independence of ORIGIN, never
+        correctness -- so genuinely independent sources can converge on a FALSE claim ("authenticated-but-false")
+        and nothing in the record content catches it. This surfaces the honest status so a consumer never reads
+        convergence as truth, and flags LOW SOURCE DIVERSITY (uniform agreement from few distinct origins should
+        RAISE suspicion, not confidence -- errors are correlated when checks share a substrate). Adjudication
+        belongs above this layer, through an ORTHOGONAL check: ratify(kind='reproduction'|'audit') from an
+        identity that is NOT the claim's own author -- only that lifts corroborated -> verified. Redundancy
+        recovers a wrong consensus only to the degree the checks' failure modes are independent (a known result:
+        Knight & Leveson 1986 on N-version programming; Condorcet/Ladha 1992 on correlated votes; Campbell &
+        Fiske 1959 on shared-method variance). Returns {status, grade, distinct_sources, corroborating_links,
+        low_source_diversity, adjudicated, notes}. Nothing here is settable by the writer. `_by_id` is an
+        optional cached id->record map (recall passes it when surfacing status for many results)."""
+        by_id = _by_id if _by_id is not None else {x["id"]: x for x in self.items}
+        rec = target if isinstance(target, dict) else by_id.get(target)
+        if rec is None:
+            return {"status": None, "reason": "no such id"}
+        g = self.grade(rec, _by_id=by_id)
+        ev = g["evidence"]
+        links = [l for l in (rec.get("links") or []) if l in by_id]
+        n_src = Mnemo._distinct_sources(rec.get("links"), by_id)
+        n_keys = Mnemo._distinct_verified_keys(rec.get("links"), by_id)
+        adjudicated = ev["reproductions"] > 0 or (ev["attested"] and (ev["multi_source"] or ev["witnesses"] > 0))
+        convergence_only = (ev["multi_source"] or ev["witnesses"] > 0) and not adjudicated
+        low_diversity = len(links) >= 2 and n_src <= 1
+        if g["grade"] in ("verified", "settled"):
+            status = "adjudicated"          # an out-of-band check (different failure mode) confirmed it
+        elif convergence_only:
+            status = "convergence-backed"   # sources agree; NOT established true -- do not promote to true
+        else:
+            status = g["grade"]             # claimed, or corroborated via an earned outcome only
+        notes = []
+        if convergence_only:
+            notes.append("convergence-backed: independent sources agree, but this is NOT adjudicated true; "
+                         "route to an ORTHOGONAL out-of-band check (ratify kind='reproduction'/'audit') before "
+                         "relying on it -- corroboration cannot see an authenticated-but-false claim")
+        if low_diversity:
+            notes.append("low source diversity: >=2 corroborating links resolve to <=1 distinct origin -- "
+                         "correlated-origin agreement; raise suspicion, do not read as stronger corroboration")
+        if adjudicated:
+            notes.append("adjudicated: confirmed by an out-of-band check with a different failure mode")
+        # lineage cap: a DERIVED memory (a summary/consolidation) is only as adjudicated as its WEAKEST parent
+        # -- a chain is as independent as its least-independent link, so trust taint propagates, not just source
+        # taint. grade() is non-recursive, so grading parents here cannot loop. One level (immediate parents).
+        parents = [p for p in (rec.get("derived_from") or []) if p in by_id]
+        lineage_grade = g["grade"]
+        if parents:
+            rank = {gr: i for i, gr in enumerate(Mnemo._GRADES)}
+            par_grades = [self.grade(by_id[p], _by_id=by_id)["grade"] for p in parents]
+            lineage_grade = min([g["grade"]] + par_grades, key=lambda gr: rank.get(gr, 0))
+            if rank.get(lineage_grade, 0) < rank.get(g["grade"], 0):
+                notes.append("lineage-capped: derived from a weaker input (grade '%s') -- a derived memory is "
+                             "only as adjudicated as its least-adjudicated parent" % lineage_grade)
+        return {"status": status, "grade": g["grade"], "lineage_grade": lineage_grade,
+                "distinct_sources": n_src, "distinct_verified_keys": n_keys, "corroborating_links": len(links),
+                "low_source_diversity": low_diversity, "adjudicated": adjudicated,
+                "notes": notes or ["no corroboration yet (claimed)"]}
 
     def slash(self, ids, scope: str = "source") -> dict:
         """Retroactive standing forfeiture — the accountability lever for a CAUGHT poison. When a memory is
