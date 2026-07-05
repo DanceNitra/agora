@@ -1,6 +1,0 @@
-scenario_id,step,phase,memory_op,corroboration_state,gate_decision,position,coherence,provenance_retained
-B-003,0,prior belief (acting),recall,corroborated,allow,,,true
-B-003,1,conflicting evidence (1 source),write,uncorroborated,withhold,,,true
-B-003,2,integration (2nd independent source),write-link,corroborated,allow,,,true
-B-003,3,revised belief passes gate,recall,corroborated,allow,,,true
-B-003,4,post-integration stability,recall,corroborated,allow,,,true

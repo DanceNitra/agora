@@ -1,2 +1,0 @@
-[console_scripts]
-mnemo-mcp = mnemo.mnemo_mcp:main

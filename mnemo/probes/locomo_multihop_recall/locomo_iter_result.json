@@ -1,8 +1,0 @@
-{
- "n": 276,
- "flat_full_recall@50": 0.145,
- "iterative_full_recall@50": 0.297,
- "delta": 0.152,
- "multiplier": 2.05,
- "questions_with_no_followup": 0
-}
