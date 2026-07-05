@@ -161,7 +161,26 @@ def main():
     for k in prov_reached:
         print(f"      {k:20s} load-bearing={t2[k]}")
 
+    # --- ADVERSARY-RESISTANT (store policy): the exact attack the caller-set `derived` flag missed ---
+    # An UNDECLARED summary omits derived=True AND has no source. In a normal store it is treated as a PRIMARY
+    # write and earns standing (the caller-elective hole the skeptic found). Under strict_provenance the store
+    # DENIES it standing with no flag required -- provenance must be SHOWN (a source or resolvable parents), so
+    # the untrusted caller no longer holds the switch.
+    def _undeclared_summary_lb(strict):
+        s = Mnemo(os.path.join(tempfile.mkdtemp(), "s.jsonl"))
+        s.strict_provenance = strict
+        u = s.remember("Undeclared LLM summary: retries stay disabled.")   # no source, no derived_from, no flag
+        s.credit([u], "good", weight=3.0)                                  # even with earned credit
+        return _load_bearing(s, u)
+    normal_lb = _undeclared_summary_lb(False)
+    strict_lb = _undeclared_summary_lb(True)
+    print(f"\nADVERSARY-RESISTANT (strict_provenance): an UNDECLARED summary (no flag, no source, no parents) is "
+          f"load-bearing={normal_lb} in a normal store vs {strict_lb} under strict_provenance -- the caller")
+    print(f"    cannot escape by omitting the flag; absence of SHOWN provenance denies standing by store policy.")
+
     # --- self-check (the falsifier) ---
+    assert normal_lb is True, "baseline: an undeclared no-provenance write is treated as primary in a non-strict store"
+    assert strict_lb is False, "ADVERSARY-RESISTANT broke: strict_provenance must deny standing to no-provenance writes"
     non_orphan = [k for k in ids if k != "O2 (derived orphan)"]
     assert all(t0[k] for k in non_orphan), "setup: every non-orphan node must start load-bearing"
     assert t0["O2 (derived orphan)"] is False, "FAIL-CLOSED broke: a declared-derived orphan must earn NO standing"
@@ -172,10 +191,12 @@ def main():
 
     print("\nVERDICT: the invariant HOLDS -- one slash reaches the full transitive provenance subtree (credit,")
     print("graduation, AND link-corroboration all fall), load-bearing -> 0, restore exact. The orphan boundary")
-    print("gets a Biba-style INTEGRITY FLOOR: a self-declared derived write that lost its lineage earns NO")
-    print("standing, so it cannot quietly survive a retraction; a primary write is unaffected. HONEST LIMIT: this")
-    print("is NOT adversary-proof -- `derived` is caller-set, so a caller that OMITS it fails OPEN (treated as")
-    print("primary). It closes the hole for COOPERATIVE callers; store-inferred derivation would be the real fix.")
+    print("gets a Biba-style INTEGRITY FLOOR at two levels: (1) a self-declared derived write that lost its")
+    print("lineage (derived=True) earns NO standing; (2) strict_provenance store policy denies standing to ANY")
+    print("write with no shown provenance (no source, no parents) -- so an UNDECLARED summary cannot escape by")
+    print("omitting the flag (measured above: primary in a normal store, orphan under strict_provenance). The")
+    print("caller no longer holds the switch. Residual: a FAKE source string -> priced by strict_corroboration/")
+    print("attestation (a verified key). A primary write with a real source is unaffected in both modes.")
 
 
 if __name__ == "__main__":

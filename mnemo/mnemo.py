@@ -218,6 +218,15 @@ class Mnemo:
         # "independence" rail to the "origin-signed" rail; it does NOT make a claim TRUE (an attested source
         # can still sign a false claim), only makes manufactured independence expensive. Reversible: OFF.
         self.strict_corroboration = False
+        # STRICT PROVENANCE (store policy; the adversary-resistant form of the orphan rule). Default OFF ->
+        # zero behavior change. When True, a write that shows NO provenance at all -- neither a `source` nor a
+        # resolvable `derived_from` -- earns NO standing (orphan), regardless of any caller flag. This removes
+        # the caller-elective hole in the `derived=` flag: an undeclared LLM summary (no source, lineage dropped)
+        # is denied standing BY DEFAULT, not by a switch the untrusted caller can omit. To earn standing a write
+        # must name a source (primary) OR name parents (derived); a bare fabrication can honestly do neither. (A
+        # FAKE source string still passes here -> pair with strict_corroboration/attestation, which demands a
+        # VERIFIED key, to price that too.) Biba-style default-deny at the store boundary. Reversible: OFF.
+        self.strict_provenance = False
         # _save() THROTTLE: serializing the whole store (json.dumps of every item) is O(store size); doing
         # it on EVERY recall/remember froze callers once the store grew (recall mutates access value, so it
         # used to re-serialize everything each call). Coalesce disk writes to at most once / _save_min_s;
@@ -306,6 +315,12 @@ class Mnemo:
         # correctly self-declare derivation but lose lineage in an untrusted transform. A truly adversary-resistant
         # version would INFER derivation from the summarize/consolidate call site rather than trust the flag.
         if derived and not rec.get("derived_from"):
+            rec["orphan"] = True
+        # STRICT-PROVENANCE store policy (adversary-resistant): standing requires SHOWN provenance -- a source
+        # (primary) or resolvable parents (derived). A write with NEITHER is an orphan by default, so an
+        # undeclared summary cannot escape by simply omitting derived=True (the caller-elective hole). See the
+        # strict_provenance note in __init__. rec['source'] is None when no source was passed.
+        if self.strict_provenance and not rec.get("source") and not rec.get("derived_from"):
             rec["orphan"] = True
         if key is not None:
             rec["key"] = str(key)
