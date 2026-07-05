@@ -29,23 +29,26 @@ source), and check the load-bearing set before / after / after-restore.
 
 FINDINGS (self-check asserts the core):
   1. PROPAGATION: one slash([P], scope='source') revokes load-bearing standing on 100% of the provenance-linked
-     descendants that earned it by outcome-credit or graduation -- INCLUDING the depth-2 node -- in a single
-     operation (taint rides transitively through summarization). Bounded blast radius = the full provenance
-     subtree, reached at once, not chased node by node.
+     descendants -- INCLUDING the depth-2 node AND a descendant that independently clears the >=2-distinct-source
+     bar -- in a single operation (taint rides transitively through summarization). Bounded blast radius = the
+     full provenance subtree, reached at once, not chased node by node.
   2. REVERSIBILITY: restore([P], scope='source') recovers every one of them to its EXACT pre-slash standing --
      so a mistaken/ weaponized retraction is undoable (slash cannot be used to permanently knock out a rival).
   3. CONFIDENCE-NOT-TRUTH: at its peak P grades 'corroborated' / convergence-backed, never 'verified' -- the
      substrate never granted it truth, exactly as the invariant requires.
-  BOUNDARY 1 (precondition, measured): the ORPHAN summary -- same content, lineage stripped -- is NOT reached.
+  BOUNDARY (precondition, measured): the ORPHAN summary -- same content, lineage stripped -- is NOT reached.
      Preserve derived_from through app-side summarization, or the retraction has nothing to propagate along.
-  BOUNDARY 2 (open hole, measured): a descendant that INDEPENDENTLY clears the >=2-distinct-source gate SURVIVES
-     the retraction. slash() books accountability (zeroes good, dominates bad, revokes graduation) but does NOT
-     invalidate corroboration LINKS, so the distinct-source path stays lit. => to fully honor the invariant,
-     slash must also VOID a slashed source's contribution to distinct-corroboration. (Candidate fix; measured.)
+     This is a usage requirement, not a store bug: if the app throws away provenance, no store can find the child.
+  FIXED THIS CYCLE (the link-corroboration hole): a descendant that independently cleared the >=2-distinct-source
+     gate used to SURVIVE the retraction, because slash() books accountability (zeroes good, dominates bad,
+     revokes graduation) but does not invalidate corroboration LINKS, so the distinct-source path stayed lit.
+     Closed by making a landed retraction win: _is_corroborated() (the recall influence gate + graduation bar)
+     now returns False for any slash()'d record on EVERY path, incl. distinct-link corroboration. restore()
+     clears the flag, so the fix stays fully reversible. C below now falls with the rest of the subtree.
 
-FALSIFIER: if any credit/graduation-standing provenance-descendant stayed load-bearing after the slash
-(incomplete propagation), or restore did not recover it, or P ever graded 'verified' from corroboration alone,
-the invariant would be violated on the path we claim it holds. It is not.
+FALSIFIER: if any provenance-descendant stayed load-bearing after the slash (incomplete propagation), or restore
+did not recover it, or P ever graded 'verified' from corroboration alone, the invariant would be violated. It is
+not. (Before the fix, C stayed load-bearing -- that regression test is the reason C is in the tree.)
 
 Zero-dependency, no network, no embedder. Deterministic. MIT. Part of Agora / mnemo.
 Run:  python mnemo/probes/retraction_propagation.py
@@ -106,7 +109,9 @@ def main():
 
     ids = {"P (root)": P, "A1 (summary)": A1, "A2 (graduated)": A2, "B1 (depth-2)": B1,
            "O (orphan)": O, "C (link-corrob.)": C}
-    prov_credit = ["P (root)", "A1 (summary)", "A2 (graduated)", "B1 (depth-2)"]   # where the invariant should hold
+    # every provenance-reached descendant should fall (incl. C, the link-corroborated one, after the fix);
+    # O is the only survivor -- it kept no lineage, so the retraction has no edge to travel along.
+    prov_reached = ["P (root)", "A1 (summary)", "A2 (graduated)", "B1 (depth-2)", "C (link-corrob.)"]
 
     print("=== jacksonxly's invariant: 'no false belief stays load-bearing past the correctness signal' ===")
     print("    measured on shipped mnemo -- load-bearing := the recall influence gate (Mnemo._is_corroborated)\n")
@@ -127,34 +132,31 @@ def main():
         flip = "  <-- revoked" if (t0[k] and not t1[k]) else ("  <-- SURVIVED" if t1[k] else "")
         print(f"      {k:20s} load-bearing={t1[k]}{flip}")
 
-    revoked = [k for k in prov_credit if t0[k] and not t1[k]]
-    print(f"\n    PROPAGATION: {len(revoked)}/{len(prov_credit)} credit/graduation-standing provenance-descendants "
-          f"revoked transitively (incl. depth-2 B1).")
-    print(f"    BOUNDARY 1: orphan O still load-bearing={t1['O (orphan)']} "
-          f"(lineage stripped -> retraction cannot reach it; preserve derived_from).")
-    print(f"    BOUNDARY 2: link-corroborated C still load-bearing={t1['C (link-corrob.)']} "
-          f"(>=2 distinct sources; slash books accountability but does not strip corroboration links).")
+    revoked = [k for k in prov_reached if t0[k] and not t1[k]]
+    print(f"\n    PROPAGATION: {len(revoked)}/{len(prov_reached)} provenance-reached descendants revoked "
+          f"transitively (incl. depth-2 B1 AND link-corroborated C).")
+    print(f"    BOUNDARY (precondition): orphan O still load-bearing={t1['O (orphan)']} "
+          f"(lineage stripped -> no edge to travel; preserve derived_from through summarization).")
 
     # --- reversibility: the retraction is undoable ---
     m.restore([P], scope="source")
     t2 = _row(m, ids)
-    recovered = [k for k in prov_credit if not t1[k] and t2[k]]
+    recovered = [k for k in prov_reached if not t1[k] and t2[k]]
     print(f"\nt2  restore([P], scope='source')  -> {len(recovered)}/{len(revoked)} recovered to exact pre-slash standing")
-    for k in prov_credit:
+    for k in prov_reached:
         print(f"      {k:20s} load-bearing={t2[k]}")
 
     # --- self-check (the falsifier) ---
     assert all(t0[k] for k in ids), "setup: every node must start load-bearing"
-    assert all(not t1[k] for k in prov_credit), "PROPAGATION incomplete: a credit/graduation descendant survived slash"
+    assert all(not t1[k] for k in prov_reached), "PROPAGATION incomplete: a provenance descendant survived slash"
     assert t1["O (orphan)"] is True, "control broke: orphan should be UNREACHED by source-scoped slash"
-    assert t1["C (link-corrob.)"] is True, "boundary-2 measurement: link-corroborated descendant should survive (the hole)"
-    assert all(t2[k] for k in prov_credit), "REVERSIBILITY failed: restore did not recover standing"
+    assert all(t2[k] for k in prov_reached), "REVERSIBILITY failed: restore did not recover standing"
     assert grade0.get("status") != "verified", "confidence-not-truth: P must never grade 'verified' from corroboration"
 
-    print("\nVERDICT: the invariant HOLDS for standing earned by outcome-credit or graduation -- one slash reaches")
-    print("the full transitive provenance subtree, load-bearing -> 0, and restore is exact. Two measured boundaries:")
-    print("preserve provenance (orphans escape) and slash must void a slashed source from distinct-corroboration")
-    print("(the link path survives). Bounded blast radius + reversible propagation is real on shipped mnemo.")
+    print("\nVERDICT: the invariant HOLDS -- one slash reaches the full transitive provenance subtree (credit,")
+    print("graduation, AND link-corroboration paths all fall), load-bearing -> 0, and restore is exact. The one")
+    print("boundary left is a usage precondition (preserve provenance; orphaned summaries escape), not a store")
+    print("bug. Bounded blast radius + reversible retraction propagation is real on shipped mnemo.")
 
 
 if __name__ == "__main__":
