@@ -1718,8 +1718,14 @@ async def brain_replication_record(request: Request):
     from agora.execution.replication import record
     b = await request.json()
     r = record(b.get("claim") or "", b.get("source") or "", b.get("outcome") or "",
-               b.get("lab_id") or "", b.get("note") or "")
-    return {"status": "ok" if r else "invalid", "record": r}
+               b.get("lab_id") or "", b.get("note") or "",
+               by_construction_checked=bool(b.get("by_construction_checked")))
+    gated = bool(r and r.get("auto_gated"))
+    return {"status": "ok" if r else "invalid", "record": r,
+            "gated": gated,
+            "note": ("Auto-gated to NOT_COMPUTABLE: this REPRODUCED read as by-construction. If it is a "
+                     "genuine replication on independent/real data, re-POST with by_construction_checked=true."
+                     if gated else None)}
 
 
 @router.get("/brain/replications")

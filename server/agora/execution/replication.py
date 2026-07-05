@@ -161,12 +161,47 @@ async def pick_target(db) -> dict | None:
     return None
 
 
-def record(claim: str, source: str, outcome: str, lab_id: str = "", note: str = "") -> dict | None:
+# BY-CONSTRUCTION GATE (verdict-logic self-check on REPRODUCED). The Crucible audit (2026-07-05) found
+# ~8 REPRODUCED verdicts that were not replications at all: a synthetic model that PLANTS the very
+# structure the mechanism detects, re-derives a TAUTOLOGICAL identity, or otherwise GUARANTEES its own
+# answer — so a FAILED was never a live possibility. A REPRODUCED whose note trips this (and carries no
+# independent/real-data counter-signal) is auto-downgraded to NOT_COMPUTABLE — the honest bucket for
+# "no genuinely-falsifiable computational replication was performed". Reversible: pass
+# by_construction_checked=True to attest you verified it stands on independent evidence and record it as-is.
+_BY_CONSTRUCTION = re.compile(
+    r"(by[- ]construction|\bplanted\b|baked[- ]in|tautolog\w*|guaranteed by (?:design|construction|the)|"
+    r"we (?:planted|built the interaction)|manufactur\w+ (?:the )?(?:ratio|result|answer)|"
+    r"(?:reproduces?|manufactures?) (?:its|the) own (?:conclusion|answer|assumption)|"
+    r"never (?:a )?live possibilit|impossible by (?:design|construction))", re.IGNORECASE)
+# the reproduction rests on INDEPENDENT / REAL evidence, not a rigged synthetic setup → do not gate
+_INDEPENDENT = re.compile(
+    r"(real[- ]data|real \w+ (?:data|corpus|network|graph|votes)|\bSNAP\b|\bLoCoMo\b|held identical|"
+    r"off[- ]critical|contrast class|not by[- ]construction|out[- ]of[- ]sample|independent\w*|"
+    r"measured \w+ vs|on the (?:original|released|public) (?:data|dataset|votes))", re.IGNORECASE)
+
+
+def by_construction_suspect(outcome: str, note: str) -> bool:
+    """True when a REPRODUCED note reads as guaranteed-by-construction with no independent-data signal."""
+    return ((outcome or "").strip().upper() == "REPRODUCED"
+            and bool(_BY_CONSTRUCTION.search(note or "")) and not _INDEPENDENT.search(note or ""))
+
+
+def record(claim: str, source: str, outcome: str, lab_id: str = "", note: str = "",
+           by_construction_checked: bool = False) -> dict | None:
     o = (outcome or "").strip().upper()
     if o not in _OUTCOMES or len((claim or "").strip()) < 10:
         return None
+    gated = False
+    if not by_construction_checked and by_construction_suspect(o, note):
+        o = "NOT_COMPUTABLE"
+        note = ("[AUTO-GATED: verdict-logic self-check — reads as by-construction (planted/tautological/"
+                "guaranteed), not a falsifiable replication; re-record with by_construction_checked=True if "
+                "it stands on independent/real data] " + (note or ""))
+        gated = True
     rec = {"claim": (claim or "")[:200], "source": (source or "")[:160], "outcome": o,
-           "lab_id": (lab_id or "")[:12], "note": (note or "")[:240], "ts": time.time()}
+           "lab_id": (lab_id or "")[:12], "note": (note or "")[:300], "ts": time.time()}
+    if gated:
+        rec["auto_gated"] = "by_construction"
     items = _load()
     items.append(rec)
     _save(items[-120:])
