@@ -46,6 +46,16 @@ def script_link(lab_rec):
     return f"{REPO}/blob/main/{rel}" if (ROOT / rel).exists() else None
 
 
+def entry_code(r, labs):
+    """Prefer an explicit repo-relative `code` path on the entry (a linked PUBLIC probe under mnemo/probes/);
+    fall back to the lab-script link. lab scripts live in gitignored agora_output/lab/, so most entries only get
+    a resolvable receipt once a public probe is wired here -- return a URL only if the file exists in the repo."""
+    p = (r.get("code") or "").strip().replace("\\", "/")
+    if p and (ROOT / p).exists():
+        return f"{REPO}/blob/main/{p}"
+    return script_link(labs.get(r.get("lab_id")))
+
+
 def e(s):
     return html.escape(str(s or ""))
 
@@ -70,14 +80,14 @@ def render():
         "entries": [{
             "claim": r.get("claim", ""), "source": r.get("source", ""),
             "verdict": r.get("outcome", ""), "note": r.get("note", ""),
-            "lab_id": r.get("lab_id", ""), "code": script_link(labs.get(r.get("lab_id"))) or "",
+            "lab_id": r.get("lab_id", ""), "code": entry_code(r, labs) or "",
             "date": time.strftime("%Y-%m-%d", time.localtime(r.get("ts", 0))) if r.get("ts") else "",
         } for r in reps[::-1]],
     }
 
     def meta(r):
         c = cur.get(r.get("lab_id", ""), {})
-        return c, script_link(labs.get(r.get("lab_id"))), \
+        return c, entry_code(r, labs), \
             (time.strftime("%Y-%m-%d", time.localtime(r.get("ts", 0))) if r.get("ts") else "")
 
     # ---- featured failure (case study) ----

@@ -209,7 +209,7 @@
             <span class="cfield"></span></div>
           <h3>A big-enough context window replaces retrieval (CAG / &quot;RAG is dead&quot;): preload the whole co</h3>
           <p class="cresult">Judge-free probe on one synthetic structured log at 5k/25k/60k/110k tokens, two task families. NEEDLE (single-fact lookup) = 1.00 at every length incl. 110k; SYNTH (read-everything count/filter aggregation) collapses 0.75-&gt;~0.25-0.375 by ~25k and stays there. Verdict FAILED for CAG *on synthesis*; needle lookup survives long context fine, so blanket &quot;context rot kills recall&quot; is also too strong. It is the task type, not the length. Replicates lost-in-the-middle (Liu 2023/TACL 2024), RULER (Hsieh/NVIDIA 2024), NoLiMa (2502.05167), Chroma context-rot (2025, non-peer-reviewed). HONEST LIMITS: n=8 synth Qs/length (the 0.75-&gt;0.3 drop is Fisher p~0.13, credible mainly by matching the replicated literature); one frontier model (exact model not logged); even at 5k synth is 0.75 so part of the failure is exhaustive arithmetic the model cannot do at any length -&gt; the real fix for count/filter is a TOOL, not retrieval. Probe: mnemo/probes/ragdead (generator + independent gold-re-derivation scorer). Post: public/posts/does-long-context-kill-rag.html.</p>
-          <div class="cfoot"><span class="cyear">CAG / &amp;quot;long context kills RAG&amp;quot; viral</span></div>
+          <div class="cfoot"><span class="cyear">CAG / &amp;quot;long context kills RAG&amp;quot; viral</span><a class="code" href="https://github.com/DanceNitra/agora/blob/main/mnemo/probes/ragdead/exp_ragdead_A.py" target="_blank" rel="noopener">runnable model &rarr;</a></div>
         </div>
       </article>
       <article class="card ok" data-v="REPRODUCED" data-reveal>
@@ -249,7 +249,7 @@
             <span class="cfield">AI evaluation</span></div>
           <h3>Chatbot Arena Elo ranks LLMs by genuine quality (cite Arena rank to pick a model)</h3>
           <p class="cresult">A classifier that sees ONLY answer style (length, markdown headers, bold, lists) and NO model identity predicts the human winner 61.5% of the time, and its per-model ranking correlates rho=0.74 with the real win-rate ranking across 48 models — it reproduces the leaderboard ORDER without knowing which model wrote anything.</p>
-          <div class="cfoot"><span class="cyear">Chiang et al. - 2024 (LMArena)</span></div>
+          <div class="cfoot"><span class="cyear">Chiang et al. - 2024 (LMArena)</span><a class="code" href="https://github.com/DanceNitra/agora/blob/main/mnemo/probes/arena_style_only.py" target="_blank" rel="noopener">runnable model &rarr;</a></div>
         </div>
       </article>
       <article class="card fail" data-v="FAILED" data-reveal>
@@ -259,7 +259,7 @@
             <span class="cfield">Management / Future of Work</span></div>
           <h3>Founder-led firms returned 3.1x more — the founders mentality drives performance</h3>
           <p class="cresult">With IDENTICAL expected returns, a founder-led cohort that is merely ~1.8x as volatile, run through the same survive-and-be-large index filter, shows an apparent 2.60x mean return gap — 76% of Bains 3.1x — from ZERO skill. The advantage is tail-driven: the MEDIAN gap is only 1.58x.</p>
-          <div class="cfoot"><span class="cyear">Zook &amp; Allen (Bain) - 2016</span></div>
+          <div class="cfoot"><span class="cyear">Zook &amp; Allen (Bain) - 2016</span><a class="code" href="https://github.com/DanceNitra/agora/blob/main/mnemo/probes/founder_survivorship_null.py" target="_blank" rel="noopener">runnable model &rarr;</a></div>
         </div>
       </article>
       <article class="card fail" data-v="FAILED" data-reveal>
@@ -269,7 +269,7 @@
             <span class="cfield">AI evaluation</span></div>
           <h3>LLM-as-judge agrees with humans ~80%, so it is a valid quality judge</h3>
           <p class="cresult">A zero-understanding null judge that simply picks the LONGER answer already agrees with human preferences 68.1% of the time (vs 50% chance), reproducing ~half of the GPT-4 judges celebrated above-chance agreement; the GPT-4 judge itself agrees with pick-the-longer 73.5% of the time.</p>
-          <div class="cfoot"><span class="cyear">Zheng et al. - 2023 (MT-Bench)</span></div>
+          <div class="cfoot"><span class="cyear">Zheng et al. - 2023 (MT-Bench)</span><a class="code" href="https://github.com/DanceNitra/agora/blob/main/mnemo/probes/llm_judge_length_null.py" target="_blank" rel="noopener">runnable model &rarr;</a></div>
         </div>
       </article>
       <article class="card fail" data-v="FAILED" data-reveal>
@@ -279,7 +279,7 @@
             <span class="cfield">Management / Future of Work</span></div>
           <h3>Good to Great: 11 companies, discoverable shared traits = sustained greatness</h3>
           <p class="cresult">A zero-skill null reproduces the whole pattern: select firms for a 15-year 3.8x-the-market leap from a population where NO firm is more skilled than any other, and their next 15 years revert to the market (forward excess +0.015, 95% CI spanning 0; ~47% beat the market = a coin flip).</p>
-          <div class="cfoot"><span class="cyear">Jim Collins, Good to Great - 2001</span></div>
+          <div class="cfoot"><span class="cyear">Jim Collins, Good to Great - 2001</span><a class="code" href="https://github.com/DanceNitra/agora/blob/main/mnemo/probes/good_to_great_null.py" target="_blank" rel="noopener">runnable model &rarr;</a></div>
         </div>
       </article>
       <article class="card fail" data-v="FAILED" data-reveal>
@@ -289,7 +289,7 @@
             <span class="cfield">Behavioral economics</span></div>
           <h3>Food nudges are 2.5x more responsive than other domains</h3>
           <p class="cresult">From an IDENTICAL true effect in every domain, differential publication bias alone reproduces a 2.63x food/other ratio (control with equal sample sizes = 1.00). The famous 2.5x is a small-study mirage.</p>
-          <div class="cfoot"><span class="cyear">Mertens, Herberz, Hahnel &amp; Brosch · 2021</span></div>
+          <div class="cfoot"><span class="cyear">Mertens, Herberz, Hahnel &amp; Brosch · 2021</span><a class="code" href="https://github.com/DanceNitra/agora/blob/main/mnemo/probes/nudge_pubbias_artifact.py" target="_blank" rel="noopener">runnable model &rarr;</a></div>
         </div>
       </article>
       <article class="card ok" data-v="REPRODUCED" data-reveal>
@@ -299,7 +299,7 @@
             <span class="cfield"></span></div>
           <h3>Cosine similarity cannot distinguish a superseded fact from its replacement (the &#x27;superses</h3>
           <p class="cresult">Replicated on local nomic (24 subject-relation-object facts, mean-centered): the cosine &#x27;is-this-a-supersession&#x27; classifier scores AUROC 0.613 (chance 0.5; Yadav ~0.59) -- a contradiction is often MORE embedding-similar to the original than a genuine rephrase (10/24 cases). A pure-cosine top-1 store served the stale value 41.7% of the time; a deterministic (subject,relation,object) supersession key drove that to 0% (shipped in mnemo v0.2.0). Falsifier: if the key did not cut stale below cosine it would be useless -- it did. Honest scope: synthetic, 24 facts, characterizes the mechanism, not a product benchmark.</p>
-          <div class="cfoot"><span class="cyear">Temporal Validity in Retrieval Memory: Elimina</span></div>
+          <div class="cfoot"><span class="cyear">Temporal Validity in Retrieval Memory: Elimina</span><a class="code" href="https://github.com/DanceNitra/agora/blob/main/mnemo/probes/supersession_replication.py" target="_blank" rel="noopener">runnable model &rarr;</a></div>
         </div>
       </article>
       <article class="card ok" data-v="REPRODUCED" data-reveal>
@@ -809,7 +809,7 @@
 
 <footer><div class="wrap">
   <span>Agora &mdash; autonomous research OS &middot; The Crucible</span>
-  <span>updated 2026-07-04 &middot; <a href="https://github.com/DanceNitra/agora" target="_blank" rel="noopener">source</a></span>
+  <span>updated 2026-07-05 &middot; <a href="https://github.com/DanceNitra/agora" target="_blank" rel="noopener">source</a></span>
 </div></footer>
 
 <script>

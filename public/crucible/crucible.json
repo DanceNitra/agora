@@ -1,7 +1,7 @@
 {
  "name": "The Crucible — machine replication ledger",
  "description": "Scientific and technical claims rebuilt as minimal computational models and tested. REPRODUCED = the mechanism holds in a minimal model; FAILED = it does not; NOT_COMPUTABLE = no simulable core (an honest pass).",
- "generated": "2026-07-04",
+ "generated": "2026-07-05",
  "counts": {
   "REPRODUCED": 43,
   "FAILED": 15,
@@ -14,7 +14,7 @@
    "verdict": "FAILED",
    "note": "Judge-free probe on one synthetic structured log at 5k/25k/60k/110k tokens, two task families. NEEDLE (single-fact lookup) = 1.00 at every length incl. 110k; SYNTH (read-everything count/filter aggregation) collapses 0.75->~0.25-0.375 by ~25k and stays there. Verdict FAILED for CAG *on synthesis*; needle lookup survives long context fine, so blanket \"context rot kills recall\" is also too strong. It is the task type, not the length. Replicates lost-in-the-middle (Liu 2023/TACL 2024), RULER (Hsieh/NVIDIA 2024), NoLiMa (2502.05167), Chroma context-rot (2025, non-peer-reviewed). HONEST LIMITS: n=8 synth Qs/length (the 0.75->0.3 drop is Fisher p~0.13, credible mainly by matching the replicated literature); one frontier model (exact model not logged); even at 5k synth is 0.75 so part of the failure is exhaustive arithmetic the model cannot do at any length -> the real fix for count/filter is a TOOL, not retrieval. Probe: mnemo/probes/ragdead (generator + independent gold-re-derivation scorer). Post: public/posts/does-long-context-kill-rag.html.",
    "lab_id": "ragdead",
-   "code": "",
+   "code": "https://github.com/DanceNitra/agora/blob/main/mnemo/probes/ragdead/exp_ragdead_A.py",
    "date": "2026-06-17"
   },
   {
@@ -50,7 +50,7 @@
    "verdict": "FAILED",
    "note": "Style-only null on real public votes (lmarena-ai/arena-human-preference-140k, 2 shards = 28,084 decided battles). Features = STYLE ONLY as side-A-minus-B differences (response length/tokens, markdown header count, list count, bold count) wi",
    "lab_id": "14c41f",
-   "code": "",
+   "code": "https://github.com/DanceNitra/agora/blob/main/mnemo/probes/arena_style_only.py",
    "date": "2026-06-29"
   },
   {
@@ -59,7 +59,7 @@
    "verdict": "FAILED",
    "note": "Zero-skill survivorship null (Lab 12b630). Two cohorts with IDENTICAL expected returns; founder-led differs ONLY by higher volatility (~1.8x) + more delisting; apply the same look-ahead index filter (survive to end AND be large enough). MEA",
    "lab_id": "12b630",
-   "code": "",
+   "code": "https://github.com/DanceNitra/agora/blob/main/mnemo/probes/founder_survivorship_null.py",
    "date": "2026-06-29"
   },
   {
@@ -68,7 +68,7 @@
    "verdict": "FAILED",
    "note": "Length-confound null on the ORIGINAL released data (lmsys/mt_bench_human_judgments: 3355 human + 2400 GPT-4 pairwise votes). NULL judge with zero understanding = pick the LONGER response. Measured (ties excluded): length-only vs human = 0.6",
    "lab_id": "bf7bb9",
-   "code": "",
+   "code": "https://github.com/DanceNitra/agora/blob/main/mnemo/probes/llm_judge_length_null.py",
    "date": "2026-06-29"
   },
   {
@@ -77,7 +77,7 @@
    "verdict": "FAILED",
    "note": "Zero-skill null (Lab 502d6c): N=1400 firms as geometric random walks with IDENTICAL drift+vol (no firm more skilled than any other); apply Collins selection-on-the-dependent-variable (mediocre 15y, then >=Nx the market 15y). Robust across t",
    "lab_id": "502d6c",
-   "code": "",
+   "code": "https://github.com/DanceNitra/agora/blob/main/mnemo/probes/good_to_great_null.py",
    "date": "2026-06-29"
   },
   {
@@ -86,7 +86,7 @@
    "verdict": "FAILED",
    "note": "Mechanism replication (we lack their raw per-study data). Smallest model: K domains with IDENTICAL true effect (d=0.20); food studies small-n (per-group ~30, point-of-choice field/lab), other domains large-n (~300); publish iff p<.05 in-dir",
    "lab_id": "39737a",
-   "code": "",
+   "code": "https://github.com/DanceNitra/agora/blob/main/mnemo/probes/nudge_pubbias_artifact.py",
    "date": "2026-06-29"
   },
   {
@@ -95,7 +95,7 @@
    "verdict": "REPRODUCED",
    "note": "Replicated on local nomic (24 subject-relation-object facts, mean-centered): the cosine 'is-this-a-supersession' classifier scores AUROC 0.613 (chance 0.5; Yadav ~0.59) -- a contradiction is often MORE embedding-similar to the original than a genuine rephrase (10/24 cases). A pure-cosine top-1 store served the stale value 41.7% of the time; a deterministic (subject,relation,object) supersession key drove that to 0% (shipped in mnemo v0.2.0). Falsifier: if the key did not cut stale below cosine it would be useless -- it did. Honest scope: synthetic, 24 facts, characterizes the mechanism, not a product benchmark.",
    "lab_id": "exp_supersession_replication",
-   "code": "",
+   "code": "https://github.com/DanceNitra/agora/blob/main/mnemo/probes/supersession_replication.py",
    "date": "2026-06-28"
   },
   {
