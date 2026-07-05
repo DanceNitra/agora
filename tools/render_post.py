@@ -133,17 +133,19 @@ META = {
     },
     "founder-led-survivorship-null": {
         "slug": "founder-led-survivorship-null",
-        "title": "Founder-Led Firms' 3.1× Edge: Mostly Survivorship",
-        "title_sk": "Náskok 3,1× founder firiem: hlavne survivorship",
-        "desc": "Bain says founder-led firms returned 3.1× more. A zero-skill cohort that's merely more "
-                "volatile, run through the same survivorship filter, reproduces 2.6× of it (76%) — and the "
-                "edge is tail-driven (median 1.58×). Measured, with the falsifier.",
-        "desc_sk": "Bain tvrdí, že founder firmy vyniesli 3,1× viac. Zero-skill kohorta, len volatilnejšia, "
-                   "cez ten istý survivorship filter reprodukuje 2,6× (76%) — a náskok je tail-driven "
-                   "(medián 1,58×). Odmerané, s falzifikátorom.",
+        "title": "Founder-Led Firms' 3.1× Edge: How Much Is Survivorship, How Much Is Real",
+        "title_sk": "Náskok 3,1× founder firiem: koľko je survivorship a koľko je reálne",
+        "desc": "Bain's founder-led 3.1× is built on current index membership, so survivorship can inflate "
+                "it a lot — a zero-skill null reproduces 26–179% of it depending on an unmeasured volatility "
+                "assumption. But it doesn't dispose of the question: a controlled study (Fahlenbrach 2009) "
+                "finds a real ~+4.4%/yr founder-CEO alpha. Inflated raw number, smaller real premium.",
+        "desc_sk": "Bainov founder 3,1× je postavený na súčasnom členstve v indexe, takže survivorship ho vie "
+                   "poriadne nafúknuť — zero-skill null reprodukuje 26–179% podľa nemeraného predpokladu "
+                   "volatility. Ale nevybavuje otázku: kontrolovaná štúdia (Fahlenbrach 2009) nachádza reálnu "
+                   "~+4,4%/rok founder-CEO alfu. Nafúknuté surové číslo, menšie reálne premium.",
         "date": "2026-06-29",
-        "tags": "Management · Survivorship bias · Look-ahead bias · Replication",
-        "tags_sk": "Manažment · Survivorship bias · Look-ahead bias · Replikácia",
+        "tags": "Management · Survivorship bias · Founder premium · Replication",
+        "tags_sk": "Manažment · Survivorship bias · Founder premium · Replikácia",
         "kicker": "The Crucible", "kicker_sk": "Crucible",
     },
     "llm-as-judge-length-confound": {
