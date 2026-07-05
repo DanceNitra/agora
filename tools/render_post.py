@@ -103,17 +103,19 @@ META = {
     },
     "chatbot-arena-style-not-skill": {
         "slug": "chatbot-arena-style-not-skill",
-        "title": "Chatbot Arena Ranks LLMs by Style as Much as Skill",
-        "title_sk": "Chatbot Arena radí modely podľa štýlu rovnako ako kvality",
-        "desc": "On real Arena votes, a judge that sees only answer style (length, markdown) and no model "
-                "identity predicts the winner 61.5% and reproduces the leaderboard order at ρ=0.74 across "
-                "48 models. The rank you cite to pick a model is largely formatting. Measured, with the falsifier.",
-        "desc_sk": "Na reálnych Arena hlasoch sudca, čo vidí len štýl odpovede (dĺžka, markdown) a žiadnu "
-                   "identitu modelu, predpovedá víťaza 61,5% a reprodukuje poradie leaderboardu pri ρ=0,74 "
-                   "cez 48 modelov. Poradie, čo citujeme, je z veľkej časti formátovanie. Odmerané, s falzifikátorom.",
+        "title": "How Much of Chatbot Arena Is Style? The Votes Are Biased; the Order Mostly Isn't",
+        "title_sk": "Koľko z Chatbot Areny je štýl? Hlasy sú zaujaté; poradie väčšinou nie",
+        "desc": "Two tests on real Arena votes. At the vote level style is a real bias: a style-only judge "
+                "(no model identity) predicts the winner 61.5%, and the longer answer wins ~62% even between "
+                "the same two models. But at the leaderboard level style mostly isn't ranked: the style-only "
+                "ρ=0.74 is a correlational ceiling, and LMSYS's style-controlled Elo reorders only modestly.",
+        "desc_sk": "Dva testy na reálnych Arena hlasoch. Na úrovni hlasov je štýl reálny bias: style-only "
+                   "sudca (bez identity modelu) predpovedá víťaza 61,5% a dlhšia odpoveď vyhráva ~62% aj medzi "
+                   "tými istými modelmi. Ale na úrovni leaderboardu sa štýl väčšinou nehodnotí: ρ=0,74 je "
+                   "korelačný strop a LMSYS style-controlled Elo reorderuje len mierne.",
         "date": "2026-06-29",
-        "tags": "AI evaluation · Chatbot Arena · Verbosity bias · Replication",
-        "tags_sk": "AI hodnotenie · Chatbot Arena · Verbosity bias · Replikácia",
+        "tags": "AI evaluation · Chatbot Arena · Verbosity bias · Confound vs proxy · Replication",
+        "tags_sk": "AI hodnotenie · Chatbot Arena · Verbosity bias · Confound vs proxy · Replikácia",
         "kicker": "The Crucible", "kicker_sk": "Crucible",
     },
     "verifiable-agent-receipts": {
