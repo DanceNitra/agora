@@ -218,6 +218,19 @@ class Mnemo:
         # "independence" rail to the "origin-signed" rail; it does NOT make a claim TRUE (an attested source
         # can still sign a false claim), only makes manufactured independence expensive. Reversible: OFF.
         self.strict_corroboration = False
+        # STRICT PROVENANCE (store policy; the adversary-resistant form of the orphan rule). Default OFF ->
+        # zero behavior change. When True, a write that shows NO provenance at all -- neither a `source` nor a
+        # resolvable `derived_from` -- earns NO standing (orphan), regardless of any caller flag. This removes
+        # the caller-elective hole in the `derived=` flag: an undeclared LLM summary (no source, lineage dropped)
+        # is denied standing BY DEFAULT, not by a switch the untrusted caller can omit. To earn standing a write
+        # must name a source (primary) OR name parents (derived); a bare fabrication can honestly do neither. (A
+        # FAKE source string still passes here -> pair with strict_corroboration/attestation, which demands a
+        # VERIFIED key, to price that too.) Biba-style default-deny at the store boundary. Reversible: OFF.
+        self.strict_provenance = False
+        # AUTO-STAMP LINEAGE substrate: the ids of the most recent recall(), so a derived write (a summary written
+        # right after) can inherit them as parents -- the lineage EDGE carried by the STORE from the recall->write
+        # flow, not supplied by the untrusted LLM. Transient (not persisted); see remember(derived=True).
+        self._last_recall: list[str] = []
         # _save() THROTTLE: serializing the whole store (json.dumps of every item) is O(store size); doing
         # it on EVERY recall/remember froze callers once the store grew (recall mutates access value, so it
         # used to re-serialize everything each call). Coalesce disk writes to at most once / _save_min_s;
@@ -246,7 +259,7 @@ class Mnemo:
     def remember(self, text: str, tags=None, value: float = 1.0, meta: dict | None = None,
                  mtype: str | None = None, valid_from: float | None = None,
                  source: dict | None = None, key: str | None = None,
-                 derived_from: list | None = None, attestation=None) -> str:
+                 derived_from: list | None = None, attestation=None, derived: bool = False) -> str:
         """Append-only raw capture. Stamped with an absolute UTC time; never edited afterward.
         mtype in {episodic, semantic, procedural} sets the decay prior (episodic fades fast,
         semantic slow, procedural barely); inferred from the text if not given. Pass it explicitly
@@ -262,6 +275,16 @@ class Mnemo:
         (~42% of the time in our test). A deterministic (subject, relation, object) ledger drives that to
         ~0%. Bi-temporal: a back-filled record (earlier valid_from) does NOT overwrite a genuinely newer
         same-key value — the stale-on-arrival record is the one retired."""
+        # AUTO-STAMP LINEAGE (jacksonxly / MemLineage arXiv:2605.14421): a derived write (a summary / consolidation)
+        # that names no explicit parent inherits the store's most recent recall as its parents. The lineage EDGE is
+        # carried by the STORE from the recall->write flow -- the untrusted LLM only supplies the summary text and
+        # never holds the switch -- so a summary written right after a recall automatically carries its ancestors'
+        # taint (a retraction reaches it; it is not an orphan) WITHOUT the caller threading derived_from through the
+        # rewrite. If no recent recall exists, an explicit derived=True falls through to the orphan rule (fail-closed).
+        # This is the store-side inference the storm/verify pass found to be the ONLY form with measured defense
+        # value (signature-only 6/6 attacks -> 0/6 once lineage propagates); a caller-supplied source string is not.
+        if derived and derived_from is None:
+            derived_from = list(getattr(self, "_last_recall", []) or [])
         mid = uuid.uuid4().hex[:10]
         now = time.time()
         rec = {"id": mid, "text": text, "tags": list(tags or []), "value": float(value),
@@ -292,6 +315,27 @@ class Mnemo:
                 rec["derived_from"] = list(links)   # explicit lineage (distinct from corroboration links) so
                 #                                     a derived memory's evidence grade can be capped at its
                 #                                     weakest parent's -- trust taint propagates, not just source taint
+        # INTEGRITY-FLOOR FOR SELF-DECLARED TRANSFORMATION OUTPUTS (prompted by jacksonxly). A write the caller
+        # DECLARES a transformation output (derived=True -- a summary / consolidation / LLM rewrite) that could
+        # not name/resolve ANY parent is an ORPHAN: missing lineage is treated as unverified, so it earns NO
+        # corroboration standing (fails the influence gate + graduation + distinct-source bar), defaulting to
+        # scope-local context, and cannot quietly survive a retraction it should have inherited. Reversible:
+        # re-remember with a resolvable derived_from. Primary observations (derived=False, default) are
+        # unaffected. This is Biba-style integrity (1977: low-integrity input cannot raise an object's integrity)
+        # / taint-tracking default-deny applied to the graduation+recall gate -- an APPLICATION, not a new idea.
+        # HONEST LIMIT (do NOT call this "fail-closed against an adversary"): `derived` is CALLER-SET, so a
+        # hostile or careless caller that OMITS it is treated as a primary observation and can still earn
+        # standing -- it fails OPEN. It closes the orphaned-summary hole only for COOPERATIVE callers that
+        # correctly self-declare derivation but lose lineage in an untrusted transform. A truly adversary-resistant
+        # version would INFER derivation from the summarize/consolidate call site rather than trust the flag.
+        if derived and not rec.get("derived_from"):
+            rec["orphan"] = True
+        # STRICT-PROVENANCE store policy (adversary-resistant): standing requires SHOWN provenance -- a source
+        # (primary) or resolvable parents (derived). A write with NEITHER is an orphan by default, so an
+        # undeclared summary cannot escape by simply omitting derived=True (the caller-elective hole). See the
+        # strict_provenance note in __init__. rec['source'] is None when no source was passed.
+        if self.strict_provenance and not rec.get("source") and not rec.get("derived_from"):
+            rec["orphan"] = True
         if key is not None:
             rec["key"] = str(key)
         # ORIGIN ATTESTATION (OPT-IN): bind this claim to a source's VERIFIED KEY. attestation is
@@ -907,7 +951,8 @@ class Mnemo:
             _distinct = (self._distinct_verified_keys(r.get("links"), _by_id) if self.strict_corroboration
                          else self._distinct_sources(r.get("links"), _by_id))
             corroborated = ((_good > 0 and _good >= _bad) or _distinct >= 2) \
-                and not (r.get("meta") or {}).get("slashed")   # a landed retraction blocks (re-)graduation too
+                and not (r.get("meta") or {}).get("slashed") \
+                and not r.get("orphan")   # landed retraction OR orphan (no lineage) blocks (re-)graduation too
             if r.get("mtype") == "episodic" and r["value"] >= _GRADUATE_VALUE and corroborated:
                 r["mtype"] = "semantic"
                 r.setdefault("meta", {})["graduated_from_episodic"] = True
@@ -923,6 +968,9 @@ class Mnemo:
                 if cr.get("low_source_diversity"):
                     _o["low_source_diversity"] = True
             out.append(_o)
+        # AUTO-STAMP LINEAGE: remember what this recall surfaced, so a derived write built from it (a summary
+        # written next) can inherit these as parents. Store-carried lineage from the recall->write flow.
+        self._last_recall = [o["id"] for o in out]
         # NOTE: recall is a READ. It nudges in-memory access value / graduation, but must NOT persist the
         # whole store here — serializing (json.dumps) on every recall, across many agents' stores,
         # saturated the thread pool and FROZE the world. The in-memory nudges are persisted on the next
@@ -994,8 +1042,11 @@ class Mnemo:
         A LANDED RETRACTION WINS: a record slash()'d (meta['slashed']) is not corroborated on ANY path — incl.
         distinct-link corroboration — so a caught poison cannot stay load-bearing via independent-looking links
         (jacksonxly's invariant: nothing false stays load-bearing past the correctness signal). restore() clears
-        the flag, so this is reversible; receipt mnemo/probes/retraction_propagation.py."""
-        if (rec.get("meta") or {}).get("slashed"):
+        the flag, so this is reversible; receipt mnemo/probes/retraction_propagation.py.
+        FAIL-CLOSED PROVENANCE: an ORPHAN (a declared transformation output that named no parent, meta-flag
+        rec['orphan']) is likewise not corroborated on any path -- missing lineage is treated as unverified, so
+        an app-side summary that dropped its derived_from cannot quietly earn standing or survive a retraction."""
+        if (rec.get("meta") or {}).get("slashed") or rec.get("orphan"):
             return False
         good = float(rec.get("good", 0) or 0)
         bad = float(rec.get("bad", 0) or 0)

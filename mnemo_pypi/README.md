@@ -6,7 +6,7 @@
 
 *Memory is the mother of the Muses. An agent with no memory has no ideas.*
 
-`pip install agora-mnemo` · [PyPI](https://pypi.org/project/agora-mnemo/) · [Hugging Face](https://huggingface.co/Danchi17/mnemo) · [DOI 10.5281/zenodo.21128549](https://doi.org/10.5281/zenodo.21128549) · MIT · v0.6.2
+`pip install agora-mnemo` · [PyPI](https://pypi.org/project/agora-mnemo/) · [Hugging Face](https://huggingface.co/Danchi17/mnemo) · [DOI 10.5281/zenodo.21128549](https://doi.org/10.5281/zenodo.21128549) · MIT · v0.6.3
 
 </div>
 
@@ -245,6 +245,27 @@ identities*, not truth — a wrong claim with real reproductions still climbs; a
 with `attestation` (then each identity is Douceur-costly). Evidence-grade / staged-promotion is textbook
 (argumentation & KR justification levels, staged review); the new bit is a runnable memory primitive that makes the
 grade externally-ratcheted by construction. Opt-in; default behavior unchanged.
+
+### Provenance that survives the LLM rewrite: auto-stamped lineage (0.6.3)
+
+The retraction in 0.6.2 rides `derived_from` taint — but an app-side summarize/consolidate step (an untrusted LLM
+rewrite) usually **drops** that link, orphaning the summary so a retraction can't reach it. 0.6.3 closes that at the
+**transformation boundary**, and — because we ran the claim through a full multi-lens review + citation check first
+— it does so **honestly**. A source-string default-deny (demote any write with no source) is textbook **Biba (1977)**:
+it authenticates *origin, not truth*, a caller can forge a source, and it doesn't touch poison that carries valid
+provenance (MINJA, [arXiv:2503.03704](https://arxiv.org/abs/2503.03704), NeurIPS 2025) or attacks retrieval geometry
+(AgentPoison, NeurIPS 2024). The form that actually **measures** is **store-carried lineage**: `recall()` records what
+it surfaced, and `remember(..., derived=True)` with no explicit parent **auto-stamps `derived_from` from that recall**,
+so a summary written right after a recall inherits its ancestors' taint **by the store** — the untrusted LLM only
+supplies the text and never holds the switch. Measured ([`probes/autostamp_lineage.py`](probes/autostamp_lineage.py)):
+the laundered summary inherits the root's taint, is not an orphan, and **falls with a `slash()` on the root** (reversible);
+a derived write with **no** preceding recall stays an **orphan** (fail-closed). This lines up with **MemLineage**
+([arXiv:2605.14421](https://arxiv.org/abs/2605.14421): signature-only 6/6 attacks → 0/6 once ancestor lineage propagates).
+Also ships `remember(derived=True)` (declare a transformation output) and a store-level `strict_provenance` flag
+(standing requires a shown source **or** resolvable parents). **Honest scope:** this is a Biba-style integrity /
+taint-tracking *application* (not novel) that closes the **laundered-summary** path; it does **not** stop
+provenance-carrying poison — that needs content moderation + trust-decay retrieval. All opt-in; `derived=False` default
+→ zero behavior change. Credit: jacksonxly (transformation-boundary framing) + marintkael.
 
 ### A landed retraction wins on every path: `slash()` → 0 load-bearing (0.6.2)
 
