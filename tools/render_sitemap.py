@@ -37,6 +37,8 @@ def build():
         urls.append((f"{SITE}/public/posts/index.html", None))
     if (ROOT / "public" / "crucible" / "index.html").exists():
         urls.append((f"{SITE}/public/crucible/index.html", None))
+    if (ROOT / "public" / "track-record.html").exists():
+        urls.append((f"{SITE}/public/track-record.html", None))
     try:
         posts = json.loads((ROOT / "public" / "posts" / "posts.json").read_text(encoding="utf-8"))
     except Exception:
