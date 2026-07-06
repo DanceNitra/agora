@@ -1,6 +1,6 @@
 Metadata-Version: 2.4
 Name: agora-mnemo
-Version: 0.6.4
+Version: 0.6.5
 Summary: mnemo - a zero-dependency memory layer for AI agents: value-ranked recall, per-type decay, consolidation, and semantic+lexical auto-mode. Extracted from an autonomous research system running over ~9,000 notes.
 Author: Agora (autonomous research organization)
 License: MIT
@@ -23,7 +23,7 @@ Requires-Dist: mcp[cli]>=1.0; extra == "mcp"
 
 *Memory is the mother of the Muses. An agent with no memory has no ideas.*
 
-`pip install agora-mnemo` · [PyPI](https://pypi.org/project/agora-mnemo/) · [Hugging Face](https://huggingface.co/Danchi17/mnemo) · [DOI 10.5281/zenodo.21128549](https://doi.org/10.5281/zenodo.21128549) · MIT · v0.6.4
+`pip install agora-mnemo` · [PyPI](https://pypi.org/project/agora-mnemo/) · [Hugging Face](https://huggingface.co/Danchi17/mnemo) · [DOI 10.5281/zenodo.21128549](https://doi.org/10.5281/zenodo.21128549) · MIT · v0.6.5
 
 </div>
 
@@ -262,6 +262,20 @@ identities*, not truth — a wrong claim with real reproductions still climbs; a
 with `attestation` (then each identity is Douceur-costly). Evidence-grade / staged-promotion is textbook
 (argumentation & KR justification levels, staged review); the new bit is a runnable memory primitive that makes the
 grade externally-ratcheted by construction. Opt-in; default behavior unchanged.
+
+### Independent in time, not just in source: the `temporal_gate` (0.6.5)
+
+A corroborating link proves independence of *source*, never of *timing* — genuinely independent sources rarely
+write within seconds of each other, but a coordinated forgery writes its witnesses in a burst. `temporal_gate`
+(opt-in, `m.temporal_gate = 60.0` seconds; default `None` → **zero behavior change**, suggested by **hannune** on
+r/RAG) collapses corroborating links that **co-arrive** (timestamps within the window of each other) to **one
+anchor** before the `≥2-distinct-source` count — exactly as source canonicalisation collapses `Wikipedia` /
+`wikipedia.org` to one, but on **time**. Measured ([`probes/temporal_gate_demo.py`](probes/temporal_gate_demo.py)):
+a genuine recovery whose witnesses are spread out in time is untouched, a **co-arrival burst is blocked**, and — the
+**honest limit** — a **patient** attacker who spaces the forged writes beyond the window still passes (a timing
+signal can't catch patience; the sleeper again). It's a soft, **decorrelated** layer — timing is orthogonal to both
+source-count and content-coherence — so its value is exactly the decorrelation the attacker leaves you; it composes
+with `coherence_gate`. Textbook coordinated-burst / Sybil-timing detection, shipped as one honest gate, not a wall.
 
 ### On-topic corroboration: the `coherence_gate` (0.6.4)
 
