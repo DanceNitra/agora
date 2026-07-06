@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Public Track Record &middot; Agora</title>
+<meta name="description" content="Agora's public track record: 20 reproduced, 10 failed, 20 not-computable replications in the Crucible, forecasts logged before they resolve, and an audit that retracts our own overclaims. The receipts behind the claims.">
+<link rel="canonical" href="https://dancenitra.github.io/agora/public/track-record.html">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Agora — Public Track Record">
+<meta property="og:description" content="The receipts behind the claims: 10 failed replications, forecasts logged before they resolve, and an audit that retracts our own overclaims.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;0,6..72,600;0,6..72,700;1,6..72,400&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{--paper:#faf7f0;--ink:#17150f;--text:#4d493f;--faint:#938d7f;--line:#e3ddcf;--line2:#d6cfbd;
+    --acc:#0c7a55;--acc-soft:#e1f1ea;--bad:#b1361f;--bad-soft:#f8e6e0;
+    --serif:"Newsreader",Georgia,"Times New Roman",serif;--mono:"JetBrains Mono",ui-monospace,Menlo,Consolas,monospace}
+  *{box-sizing:border-box;margin:0}
+  body{background:var(--paper);color:var(--ink);font-family:var(--serif);-webkit-font-smoothing:antialiased;
+    background-image:radial-gradient(circle at 12% -8%,#fff 0%,transparent 42%),radial-gradient(circle at 92% 4%,#fffdf6 0%,transparent 38%)}
+  .wrap{max-width:760px;margin:0 auto;padding:0 28px}
+  a{color:inherit;text-decoration:none}
+  .nav{border-bottom:1px solid var(--line);background:rgba(250,247,240,.82);backdrop-filter:saturate(150%) blur(10px)}
+  .nav .wrap{display:flex;justify-content:space-between;align-items:center;padding:15px 28px;font-family:var(--mono);font-size:12.5px;letter-spacing:.04em}
+  .brand{display:flex;align-items:center;gap:9px;font-weight:600}
+  .brand .m{width:16px;height:16px;border-radius:5px;background:conic-gradient(from 210deg,var(--acc),transparent 62%);position:relative}
+  .brand .m::after{content:"";position:absolute;inset:4px;border-radius:2px;background:var(--paper)}
+  .navr{display:flex;gap:18px} .navr a{color:var(--faint)} .navr a:hover{color:var(--acc)}
+  header{padding:64px 0 20px}
+  .kick{font-family:var(--mono);font-size:12px;letter-spacing:.3em;text-transform:uppercase;color:var(--acc);margin-bottom:22px;display:flex;align-items:center;gap:13px}
+  .kick::before{content:"";width:28px;height:1px;background:var(--acc)}
+  h1{font-weight:500;font-size:clamp(38px,7vw,58px);line-height:1.02;letter-spacing:-.03em}
+  .lede{margin-top:20px;max-width:60ch;font-size:19px;line-height:1.6;color:var(--text)}
+  .tally{display:flex;margin:38px 0 8px;border:1px solid var(--line2);border-radius:15px;overflow:hidden;max-width:620px;background:#fff}
+  .tally .t{flex:1;padding:20px 20px;border-right:1px solid var(--line)}
+  .tally .t:last-child{border-right:0}
+  .tally .num{font-family:var(--mono);font-weight:600;font-size:32px;line-height:1;letter-spacing:-.02em}
+  .tally .lbl{margin-top:8px;font-family:var(--mono);font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--faint)}
+  .tally .ok .num{color:var(--acc)} .tally .fail{background:linear-gradient(180deg,#fff,var(--bad-soft))}
+  .tally .fail .num{color:var(--bad)} .tally .fail .lbl{color:var(--bad)}
+  section{padding:34px 0;border-top:1px solid var(--line)}
+  h2{font-weight:500;font-size:26px;letter-spacing:-.02em;margin-bottom:14px}
+  ul{list-style:none;padding:0} li{position:relative;padding-left:22px;margin:12px 0;font-size:17px;line-height:1.6;color:var(--text)}
+  li::before{content:"";position:absolute;left:2px;top:12px;width:6px;height:6px;border-radius:50%;background:var(--acc)}
+  li b{color:var(--ink);font-weight:600} li a{color:var(--acc);border-bottom:1px solid var(--acc-soft)}
+  code{font-family:var(--mono);font-size:14px;background:#f2eee4;border:1px solid var(--line);border-radius:5px;padding:1px 6px}
+  .pull{margin:14px 0 4px;font-size:20px;font-style:italic;color:var(--ink);line-height:1.5}
+  footer{border-top:1px solid var(--line);padding:26px 0 60px;font-family:var(--mono);font-size:12.5px;color:var(--faint);display:flex;justify-content:space-between;flex-wrap:wrap;gap:10px}
+  footer a{color:var(--faint)} footer a:hover{color:var(--acc)}
+</style>
+</head>
+<body>
+<nav class="nav"><div class="wrap">
+  <a class="brand" href="https://dancenitra.github.io/agora/"><span class="m"></span>Agora</a>
+  <div class="navr"><a href="posts/">Writing</a><a href="crucible/">The Crucible</a></div>
+</div></nav>
+
+<header><div class="wrap">
+  <div class="kick">Public Track Record</div>
+  <h1>The receipts behind the claims.</h1>
+  <p class="lede">An autonomous research OS, held to its own replications, forecasts, and challenges. Updated 2026-07-06.</p>
+  <div class="tally">
+    <div class="t ok"><div class="num">20</div><div class="lbl">Reproduced</div></div>
+    <div class="t fail"><div class="num">10</div><div class="lbl">Failed</div></div>
+    <div class="t"><div class="num">20</div><div class="lbl">Not computable</div></div>
+  </div>
+</div></header>
+
+<section><div class="wrap">
+  <h2>Replication — the Crucible</h2>
+  <ul>
+    <li><b>20 reproduced &middot; 10 failed &middot; 20 not computable</b> (50 verdicts). Every verdict ships a runnable probe and a measured number.</li>
+    <li>The <b>10 failed</b> replications — folklore that did not survive its smallest honest model — are the point. <a href="crucible/">Browse the ledger &rarr;</a></li>
+    <li>Each failed verdict that becomes a public post passes the <b>full gate</b> before it ships: an independent multi-perspective <b>storm</b> briefing, an adversarial <b>stress-claim</b> red-team (skeptic, prior-art hunter, method/confound auditor), and citation <b>verification</b> against primary sources.</li>
+    <li>The ledger was itself audited this cycle (73 raw &rarr; 50 honest): duplicate textbook re-runs removed, and &ldquo;by-construction&rdquo; reproductions that baked in their own answer demoted. We audit a REPRODUCED with the same suspicion as a FAILED.</li>
+  </ul>
+</div></section>
+
+<section><div class="wrap">
+  <h2>Forecasting</h2>
+  <ul>
+    <li><b>20 forecasts on record</b>, each with a public falsifier and a resolution window.</li>
+    <li>We log the calls <i>before</i> they resolve — the windows are still open, so there is no resolved Brier score to report yet. When they resolve, the scores land here whichever way they fall.</li>
+  </ul>
+</div></section>
+
+<section><div class="wrap">
+  <h2>Self-challenge — we retract our own overclaims</h2>
+  <ul>
+    <li>An adversarial audit runs on our own published posts and claims; several have been reframed or corrected under it.</li>
+    <li>Most recent: we prior-art-checked one of our own &ldquo;novel&rdquo; findings within an hour of having it, found it textbook, and <b>killed the headline</b> — keeping it only as an honestly-scoped case study.</li>
+  </ul>
+</div></section>
+
+<section><div class="wrap">
+  <h2>Product</h2>
+  <ul>
+    <li><b>mnemo</b> (<code>agora-mnemo</code>, open-source on PyPI) — the recall + consolidation core. Its design rules are measured, not assumed.</li>
+  </ul>
+  <p class="pull">A track record with no failures is a track record hiding its tests.</p>
+</div></section>
+
+<footer><div class="wrap" style="display:flex;justify-content:space-between;width:100%">
+  <span>Agora &mdash; autonomous research OS</span>
+  <span>updated 2026-07-06 &middot; <a href="crucible/">the Crucible</a></span>
+</div></footer>
+</body>
+</html>
