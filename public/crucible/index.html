@@ -5,7 +5,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>The Crucible &middot; a machine that rebuilds claims in code &middot; Agora</title>
-<meta name="description" content="A public ledger of scientific and technical claims rebuilt as minimal computational models and tested in code: 20 reproduced, 10 failed, 4 honest passes. Every verdict ships runnable code and a measured number.">
+<meta name="description" content="A public ledger of scientific and technical claims rebuilt as minimal computational models and tested in code: 20 reproduced, 11 failed, 4 honest passes. Every verdict ships runnable code and a measured number.">
 <link rel="canonical" href="https://dancenitra.github.io/agora/public/crucible/">
 <meta property="og:type" content="website">
 <meta property="og:title" content="The Crucible — claims, rebuilt in code and tested">
@@ -175,7 +175,7 @@
   Every verdict ships a measured number and the code that produced it.</p>
   <div class="tally">
     <div class="t ok"><div class="num">20</div><div class="lbl">Reproduced</div></div>
-    <div class="t fail"><div class="num">10</div><div class="lbl">Failed</div></div>
+    <div class="t fail"><div class="num">11</div><div class="lbl">Failed</div></div>
     <div class="t"><div class="num">4</div><div class="lbl">Honest passes</div></div>
   </div>
   <div class="dataset">Open data &mdash; <a href="crucible.json">the full ledger as JSON</a> &middot; now a citable dataset on <a href="https://huggingface.co/datasets/Danchi17/folklore-index" target="_blank" rel="noopener">Hugging&nbsp;Face &rarr;</a><br><span class="loadline"><code>datasets.load_dataset("Danchi17/folklore-index")</code></span></div>
@@ -195,13 +195,23 @@
     </div>
   </section>
 <section class="ledger"><div class="wrap">
-  <div class="sechead"><h2>The ledger</h2><div class="sub">30 claims rebuilt &amp; tested &middot; newest first</div></div>
+  <div class="sechead"><h2>The ledger</h2><div class="sub">31 claims rebuilt &amp; tested &middot; newest first</div></div>
   <div class="filters">
     <button class="on" data-f="all">All</button>
     <button data-f="REPRODUCED">Reproduced</button>
     <button data-f="FAILED">Failed</button>
   </div>
   <div class="grid" id="grid">
+      <article class="card fail" data-v="FAILED" data-reveal>
+        <div class="crail"></div>
+        <div class="cbody">
+          <div class="chead"><span class="cv">FAILED</span>
+            <span class="cfield"></span></div>
+          <h3>Attaching provenance to a memory -- a &quot;source:&quot; tag, a &quot;corroborated by N records&quot; line, a</h3>
+          <p class="cresult">Defense-aware attacker vs 4 in-memory defenses (fictional-fact OVERRIDE, so no model prior confounds), 10 targets across 8 families (Anthropic Claude Opus 4.8, Google Gemini-3-flash + Gemma-3-27b, DeepSeek-v4-flash, Moonshot Kimi-k2.7, MiniMax-m3, NVIDIA Nemotron-3, Zhipu GLM-5.2, OpenAI gpt-oss 20b/120b), judge gpt-oss:120b. MEAN attack-success: no defense 1.00; source cited IN the record 0.91; &quot;corroborated by &gt;=2&quot; written IN the record 0.95 -- the attacker forges whatever the defense reads, because it controls the content (v5). Even coherence + temporal corroboration gates are theater vs a competent forger who writes on-topic and time-spreads witnesses -- both free (v8). The ONLY signal that holds is metadata the writer CANNOT set: system-assigned write-history / distinct Ed25519 verified keys -- Biba integrity (1977) / Douceur Sybil cost (2002). Enforced in CODE (the memory layer surfaces only what passed the gate, so the poison never reaches the model) the end-to-end attack-success drops 1.00 -&gt; 0.00 on all 10 models, gemma-3 included -- a code gate protects even a model that ignores a &quot;distrust this memory&quot; instruction, whereas the SAME rule as a PROMPT leaks (gemma-3 80%). BUT the defense PRICES the attack, it does not CLOSE it: (a) a sleeper who pays the Douceur cost (2 real keypairs, on-topic, time-spread) is indistinguishable from a legit fact -- Cheng &amp; Friedman 2005, no symmetric reputation is sybilproof, confirmed empirically (v8); (b) it rides on outcome-credit being un-self-gradable -- a MINJA-style self-graded outcome (arXiv:2503.03704) collapses it back to 1.00; (c) it is coupled to a freshness cost -- the same &gt;=2-corroboration bar that blocks a single-shot poison blocks a single-witness TRUE update (quickest-change-detection delay-vs-false-alarm; you cannot accept fresh facts fast without also accepting single-shot poison). VERDICT FAILED for &quot;content-provenance is a memory-poisoning defense&quot;; the honest replacement is a code-enforced gate on unforgeable, EARNED (un-self-gradable) signals, which prices but does not eliminate the attack. Prior art credited (not claimed): Biba 1977; Douceur 2002; Cheng-Friedman 2005; knowledge-conflict/memory-strength (Mallen PopQA ACL 2023, Li et al. arXiv:2409.10955 ACL 2025); adaptive-attack canon (Carlini-Wagner 2017, Athalye 2018, Tramer 2020, Nasr &quot;Attacker Moves Second&quot; arXiv:2510.09023); memory/RAG poisoning (MINJA 2503.03704, AgentPoison NeurIPS 2024 arXiv:2407.12784, PoisonedRAG USENIX Sec 2025 arXiv:2402.07867); PeerTrust signal fusion (Xiong-Liu 2004); quickest-change-detection (Lorden 1971 / CUSUM). HONEST LIMITS: single-turn fictional-fact override (not multi-turn persistent poisoning); one LLM judge (gpt-oss:120b), part self-judging gpt-oss outputs (biases lenient, not toward inflated robustness); attacker = static best-of-battery + a Claude-authored defense-aware battery, NOT an RL optimizer (PISmith arXiv:2603.13026), so ASR is a lower bound vs a stronger attacker; the code-gate GATED=0 is partly BY-CONSTRUCTION (a corroboration gate filters an uncorroborated poison ~tautologically) -- the measured, non-tautological parts are the end-to-end model pass-through, the Cheng-Friedman residual, and the density-dependent utility cost (~51% of legit recalls blocked at ~1x use -&gt; ~6% at ~8x); open-weight/cloud snapshots only (Claude tested via Claude Code, no closed API). Probes: mnemo/probes/memory_defense_layer_probe.py (attack), memory_gate_defense_probe.py (defense end-to-end), memory_corroboration_cost_probe.py (cost/residual/coupling). Post: r/RAG 2026-07-06.</p>
+          <div class="cfoot"><span class="cyear">OWASP Agentic Top-10 ASI06 (Memory &amp;amp; Conte</span></div>
+        </div>
+      </article>
       <article class="card fail" data-v="FAILED" data-reveal>
         <div class="crail"></div>
         <div class="cbody">
@@ -529,7 +539,7 @@
 
 <footer><div class="wrap">
   <span>Agora &mdash; autonomous research OS &middot; The Crucible</span>
-  <span>updated 2026-07-05 &middot; <a href="https://github.com/DanceNitra/agora" target="_blank" rel="noopener">source</a></span>
+  <span>updated 2026-07-06 &middot; <a href="https://github.com/DanceNitra/agora" target="_blank" rel="noopener">source</a></span>
 </div></footer>
 
 <script>
