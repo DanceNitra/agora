@@ -237,6 +237,16 @@ class Mnemo:
         # to "2 distinct source strings + ON-TOPIC witness text"; a coherent forgery still passes, at a small
         # false-withhold cost on genuine recoveries phrased differently. A defense-in-depth layer, not a wall.
         self.coherence_gate: float | None = None
+        # TEMPORAL GATE (OPT-IN, default None -> OFF -> zero behavior change; suggested by hannune on r/RAG). When
+        # set to a window in SECONDS, corroborating links that CO-ARRIVE (their timestamps fall within the window
+        # of each other) collapse to ONE anchor before the >=2-distinct-source count -- exactly as _distinct_sources
+        # collapses one canonical source, but on TIME. Genuinely independent sources rarely write within seconds of
+        # each other; a coordinated forgery writes its witnesses in a burst, so co-arrival is a soft flag even when
+        # each source looks individually legitimate. HONEST LIMIT (textbook coordinated-burst / Sybil-timing
+        # detection): a PATIENT attacker who spaces the forged writes out beyond the window defeats it (cf. the
+        # sleeper -- patience buys past a timing signal). A soft decorrelated layer (timing is orthogonal to source
+        # count and to content coherence), not a wall. Its value is exactly the decorrelation the attacker leaves.
+        self.temporal_gate: float | None = None
         # AUTO-STAMP LINEAGE substrate: the ids of the most recent recall(), so a derived write (a summary written
         # right after) can inherit them as parents -- the lineage EDGE carried by the STORE from the recall->write
         # flow, not supplied by the untrusted LLM. Transient (not persisted); see remember(derived=True).
@@ -958,7 +968,8 @@ class Mnemo:
             # Canonicalizing source identifiers before counting collapses those to one; a link whose record
             # has no source counts as its own id, so genuinely source-less corroboration is unchanged.
             _good = float(r.get("good", 0) or 0); _bad = float(r.get("bad", 0) or 0)
-            _links = self._coherent_links(r, _by_id) if self.coherence_gate is not None else r.get("links")
+            _links = (self._gated_links(r, _by_id)
+                      if (self.coherence_gate is not None or self.temporal_gate is not None) else r.get("links"))
             _distinct = (self._distinct_verified_keys(_links, _by_id) if self.strict_corroboration
                          else self._distinct_sources(_links, _by_id))
             corroborated = ((_good > 0 and _good >= _bad) or _distinct >= 2) \
@@ -1083,22 +1094,46 @@ class Mnemo:
         tb = set(re.findall(r"[a-z0-9]+", (b_rec.get("text") or "").lower()))
         return len(ta & tb) / len(ta | tb) if (ta or tb) else 0.0
 
+    def _temporal_collapse(self, links: list, by_id: dict) -> list:
+        """Collapse CO-ARRIVING corroborating links to one anchor each: greedy over ascending ts, a link opens a
+        new cluster only if it lands > self.temporal_gate seconds after the current cluster's anchor; links inside
+        the window are dropped (treated as one coordinated write). Genuinely independent sources spread out in
+        time; a burst collapses to one."""
+        win = self.temporal_gate
+        recs = sorted((by_id[l] for l in links if by_id.get(l) is not None),
+                      key=lambda r: float(r.get("ts", 0) or 0))
+        kept, anchor = [], None
+        for r in recs:
+            t = float(r.get("ts", 0) or 0)
+            if anchor is None or (t - anchor) > win:
+                kept.append(r["id"]); anchor = t
+        return kept
+
+    def _gated_links(self, rec: dict, by_id: dict) -> list:
+        """The effective corroborating links after the OPT-IN gates: drop off-topic witnesses (coherence_gate),
+        then collapse co-arriving witnesses to one anchor (temporal_gate). Both off (default) -> links unchanged."""
+        links = rec.get("links") or []
+        if self.coherence_gate is not None:
+            links = [lid for lid in links
+                     if by_id.get(lid) is not None and self._coherence(rec, by_id[lid]) >= self.coherence_gate]
+        if self.temporal_gate is not None and len(links) > 1:
+            links = self._temporal_collapse(links, by_id)
+        return links
+
+    # kept for back-compat; _gated_links is the combined path
     def _coherent_links(self, rec: dict, by_id: dict) -> list:
-        """The subset of rec['links'] whose witness is coherent with the claim at >= self.coherence_gate. When the
-        gate is off (None) this is a no-op returning the links unchanged."""
-        thr = self.coherence_gate
-        if thr is None:
+        if self.coherence_gate is None:
             return rec.get("links") or []
         return [lid for lid in (rec.get("links") or [])
-                if by_id.get(lid) is not None and self._coherence(rec, by_id[lid]) >= thr]
+                if by_id.get(lid) is not None and self._coherence(rec, by_id[lid]) >= self.coherence_gate]
 
     def _corroborated(self, rec: dict, by_id: dict) -> bool:
-        """Instance corroboration check = the static bar, plus the OPT-IN coherence gate: when coherence_gate is
-        set, only ON-TOPIC corroborating links count toward the >=2-distinct-source path. Default == static."""
-        if self.coherence_gate is not None and rec.get("links"):
-            coh = self._coherent_links(rec, by_id)
-            if coh != rec.get("links"):
-                rec = {**rec, "links": coh}   # shallow copy with filtered links; never mutate the stored record
+        """Instance corroboration check = the static bar, plus the OPT-IN coherence + temporal gates: only ON-TOPIC,
+        temporally-independent corroborating links count toward the >=2-distinct-source path. Default == static."""
+        if (self.coherence_gate is not None or self.temporal_gate is not None) and rec.get("links"):
+            eff = self._gated_links(rec, by_id)
+            if eff != rec.get("links"):
+                rec = {**rec, "links": eff}   # shallow copy with the effective links; never mutate the stored record
         return Mnemo._is_corroborated(rec, by_id, self.strict_corroboration)
 
     def influence_gate_report(self) -> dict:
