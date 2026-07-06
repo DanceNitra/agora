@@ -227,6 +227,16 @@ class Mnemo:
         # FAKE source string still passes here -> pair with strict_corroboration/attestation, which demands a
         # VERIFIED key, to price that too.) Biba-style default-deny at the store boundary. Reversible: OFF.
         self.strict_provenance = False
+        # COHERENCE GATE (OPT-IN, default None -> OFF -> zero behavior change). When set to a float threshold in
+        # [0,1], a corroborating `link` only COUNTS toward the >=2-distinct-source bar if its witness is actually
+        # COHERENT with the claim (embedder cosine if `embed` is set, else lexical token-Jaccard), >= the threshold.
+        # This closes the LAZY forged-source residual: a poison that clears the source COUNT with off-topic filler
+        # witnesses no longer corroborates, because the filler isn't about the claim. HONEST LIMIT (measured, and
+        # this is textbook adaptive-attack / common-mode territory -- Carlini-Wagner 2017, Knight-Leveson 1986,
+        # PoisonedRAG): it does NOT close the residual, it RAISES the forger's bar from "2 distinct source strings"
+        # to "2 distinct source strings + ON-TOPIC witness text"; a coherent forgery still passes, at a small
+        # false-withhold cost on genuine recoveries phrased differently. A defense-in-depth layer, not a wall.
+        self.coherence_gate: float | None = None
         # AUTO-STAMP LINEAGE substrate: the ids of the most recent recall(), so a derived write (a summary written
         # right after) can inherit them as parents -- the lineage EDGE carried by the STORE from the recall->write
         # flow, not supplied by the untrusted LLM. Transient (not persisted); see remember(derived=True).
@@ -802,7 +812,7 @@ class Mnemo:
         # generalizes across retrievers where geometry-based poison defenses do not (see the docstring).
         if influence_only:
             _byid = {x["id"]: x for x in self.items}
-            pool = [r for r in pool if self._is_corroborated(r, _byid, self.strict_corroboration)]
+            pool = [r for r in pool if self._corroborated(r, _byid)]
         # Mode selection. 'hybrid' = lexical (token overlap) + semantic (embedding) fused with Reciprocal
         # Rank Fusion. We MEASURED hybrid robustly beating EITHER channel alone for agent memory on LoCoMo
         # (recall@20 0.61 hybrid vs 0.55 lexical vs 0.53 semantic; +0.057 over the best single channel,
@@ -948,8 +958,9 @@ class Mnemo:
             # Canonicalizing source identifiers before counting collapses those to one; a link whose record
             # has no source counts as its own id, so genuinely source-less corroboration is unchanged.
             _good = float(r.get("good", 0) or 0); _bad = float(r.get("bad", 0) or 0)
-            _distinct = (self._distinct_verified_keys(r.get("links"), _by_id) if self.strict_corroboration
-                         else self._distinct_sources(r.get("links"), _by_id))
+            _links = self._coherent_links(r, _by_id) if self.coherence_gate is not None else r.get("links")
+            _distinct = (self._distinct_verified_keys(_links, _by_id) if self.strict_corroboration
+                         else self._distinct_sources(_links, _by_id))
             corroborated = ((_good > 0 and _good >= _bad) or _distinct >= 2) \
                 and not (r.get("meta") or {}).get("slashed") \
                 and not r.get("orphan")   # landed retraction OR orphan (no lineage) blocks (re-)graduation too
@@ -1057,6 +1068,38 @@ class Mnemo:
         if strict:
             return Mnemo._distinct_verified_keys(rec.get("links"), by_id) >= 2
         return Mnemo._distinct_sources(rec.get("links"), by_id) >= 2
+
+    def _coherence(self, a_rec: dict, b_rec: dict) -> float:
+        """Semantic coherence of two records in [0,1]: embedder cosine if `embed` is set and both carry a vec,
+        else lexical token-Jaccard. Used by the OPT-IN coherence gate to test whether a corroborating witness is
+        actually ABOUT the claim (not off-topic filler minted to game the source count)."""
+        va, vb = a_rec.get("vec"), b_rec.get("vec")
+        if self.embed and va and vb:
+            num = sum(x * y for x, y in zip(va, vb))
+            na = math.sqrt(sum(x * x for x in va)); nb = math.sqrt(sum(y * y for y in vb))
+            if na > 0 and nb > 0:
+                return max(0.0, min(1.0, num / (na * nb)))
+        ta = set(re.findall(r"[a-z0-9]+", (a_rec.get("text") or "").lower()))
+        tb = set(re.findall(r"[a-z0-9]+", (b_rec.get("text") or "").lower()))
+        return len(ta & tb) / len(ta | tb) if (ta or tb) else 0.0
+
+    def _coherent_links(self, rec: dict, by_id: dict) -> list:
+        """The subset of rec['links'] whose witness is coherent with the claim at >= self.coherence_gate. When the
+        gate is off (None) this is a no-op returning the links unchanged."""
+        thr = self.coherence_gate
+        if thr is None:
+            return rec.get("links") or []
+        return [lid for lid in (rec.get("links") or [])
+                if by_id.get(lid) is not None and self._coherence(rec, by_id[lid]) >= thr]
+
+    def _corroborated(self, rec: dict, by_id: dict) -> bool:
+        """Instance corroboration check = the static bar, plus the OPT-IN coherence gate: when coherence_gate is
+        set, only ON-TOPIC corroborating links count toward the >=2-distinct-source path. Default == static."""
+        if self.coherence_gate is not None and rec.get("links"):
+            coh = self._coherent_links(rec, by_id)
+            if coh != rec.get("links"):
+                rec = {**rec, "links": coh}   # shallow copy with filtered links; never mutate the stored record
+        return Mnemo._is_corroborated(rec, by_id, self.strict_corroboration)
 
     def influence_gate_report(self) -> dict:
         """Report the LIVE COST of the influence gate (recall(influence_only=True)) on THIS store, so you can

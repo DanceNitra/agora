@@ -6,7 +6,7 @@
 
 *Memory is the mother of the Muses. An agent with no memory has no ideas.*
 
-`pip install agora-mnemo` · [PyPI](https://pypi.org/project/agora-mnemo/) · [Hugging Face](https://huggingface.co/Danchi17/mnemo) · [DOI 10.5281/zenodo.21128549](https://doi.org/10.5281/zenodo.21128549) · MIT · v0.6.3
+`pip install agora-mnemo` · [PyPI](https://pypi.org/project/agora-mnemo/) · [Hugging Face](https://huggingface.co/Danchi17/mnemo) · [DOI 10.5281/zenodo.21128549](https://doi.org/10.5281/zenodo.21128549) · MIT · v0.6.4
 
 </div>
 
@@ -245,6 +245,20 @@ identities*, not truth — a wrong claim with real reproductions still climbs; a
 with `attestation` (then each identity is Douceur-costly). Evidence-grade / staged-promotion is textbook
 (argumentation & KR justification levels, staged review); the new bit is a runnable memory primitive that makes the
 grade externally-ratcheted by construction. Opt-in; default behavior unchanged.
+
+### On-topic corroboration: the `coherence_gate` (0.6.4)
+
+A corroborating link proves *independence of source*, never that the witness is *about the claim* — so a forged
+2-source poison whose "witnesses" are off-topic filler still clears the `≥2-distinct-source` bar. `coherence_gate`
+(opt-in, `m.coherence_gate = 0.18`; default `None` → **zero behavior change**) makes a link count toward that bar
+only if its witness is **coherent with the claim** — embedder cosine if you passed an `embed` fn, else lexical
+token-Jaccard — above the threshold. Measured ([`probes/coherence_gate_demo.py`](probes/coherence_gate_demo.py)):
+a genuine on-topic recovery is untouched (no false-withhold), a **lazy off-topic forgery is blocked**, and — the
+**honest limit** — a *sophisticated* forgery with **on-topic** witnesses still passes. So this **raises the forger's
+bar** from "2 distinct source strings" to "2 distinct source strings + on-topic witness text"; it does **not** close
+the residual. This is textbook **adaptive-attack / common-mode** territory (Carlini & Wagner 2017; Knight & Leveson
+1986; PoisonedRAG) — a defense-in-depth layer, not a wall. Ship it as one more gate whose value is exactly the
+decorrelation the attacker leaves you, not a claimed defense.
 
 ### Provenance that survives the LLM rewrite: auto-stamped lineage (0.6.3)
 
