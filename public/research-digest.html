@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Research Digest &middot; Agora</title>
+<meta name="description" content="Open research hypotheses from an autonomous research OS — each with a falsifier, each screened for prior-art and overclaim before it ships. Not settled findings.">
+<link rel="canonical" href="https://dancenitra.github.io/agora/public/research-digest.html">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Agora — Research Digest (open hypotheses)">
+<meta property="og:description" content="Hypotheses, not findings — each with a falsifier, each screened for prior-art and overclaim. This cycle, 4 candidates were cut as textbook or overclaimed.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;0,6..72,600;0,6..72,700;1,6..72,400&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{--paper:#faf7f0;--ink:#17150f;--text:#4d493f;--faint:#938d7f;--line:#e3ddcf;--line2:#d6cfbd;
+    --acc:#0c7a55;--acc-soft:#e1f1ea;--bad:#b1361f;
+    --serif:"Newsreader",Georgia,"Times New Roman",serif;--mono:"JetBrains Mono",ui-monospace,Menlo,Consolas,monospace}
+  *{box-sizing:border-box;margin:0}
+  body{background:var(--paper);color:var(--ink);font-family:var(--serif);-webkit-font-smoothing:antialiased;
+    background-image:radial-gradient(circle at 12% -8%,#fff 0%,transparent 42%),radial-gradient(circle at 92% 4%,#fffdf6 0%,transparent 38%)}
+  .wrap{max-width:760px;margin:0 auto;padding:0 28px}
+  a{color:inherit;text-decoration:none}
+  .nav{border-bottom:1px solid var(--line);background:rgba(250,247,240,.82);backdrop-filter:saturate(150%) blur(10px)}
+  .nav .wrap{display:flex;justify-content:space-between;align-items:center;padding:15px 28px;font-family:var(--mono);font-size:12.5px;letter-spacing:.04em}
+  .brand{display:flex;align-items:center;gap:9px;font-weight:600}
+  .brand .m{width:16px;height:16px;border-radius:5px;background:conic-gradient(from 210deg,var(--acc),transparent 62%);position:relative}
+  .brand .m::after{content:"";position:absolute;inset:4px;border-radius:2px;background:var(--paper)}
+  .navr{display:flex;gap:18px} .navr a{color:var(--faint)} .navr a:hover{color:var(--acc)}
+  header{padding:64px 0 26px}
+  .kick{font-family:var(--mono);font-size:12px;letter-spacing:.3em;text-transform:uppercase;color:var(--acc);margin-bottom:22px;display:flex;align-items:center;gap:13px}
+  .kick::before{content:"";width:28px;height:1px;background:var(--acc)}
+  h1{font-weight:500;font-size:clamp(36px,6.5vw,54px);line-height:1.04;letter-spacing:-.03em;max-width:16ch}
+  .lede{margin-top:20px;max-width:64ch;font-size:18px;line-height:1.62;color:var(--text)}
+  .lede b{color:var(--ink);font-weight:600}
+  .screen{margin-top:18px;font-family:var(--mono);font-size:13px;color:var(--faint);border-left:3px solid var(--line2);padding:6px 0 6px 14px}
+  .screen a{color:var(--acc)}
+  article{padding:34px 0;border-top:1px solid var(--line)}
+  .hn{font-family:var(--mono);font-size:12.5px;color:var(--acc);letter-spacing:.06em}
+  h2{font-weight:500;font-size:25px;letter-spacing:-.018em;margin:6px 0 14px;line-height:1.2}
+  p{font-size:17px;line-height:1.66;color:var(--text);margin:12px 0}
+  p b{color:var(--ink);font-weight:600} em{font-style:italic}
+  .tag{display:inline-block;font-family:var(--mono);font-size:11px;letter-spacing:.08em;text-transform:uppercase;
+    padding:3px 9px;border-radius:6px;margin:16px 0 4px}
+  .prior{background:#eef1f6;color:#4b5566} .fals{background:var(--bad);color:#fff}
+  .box{background:#fff;border:1px solid var(--line);border-radius:11px;padding:4px 18px 16px;margin-top:6px}
+  code{font-family:var(--mono);font-size:14px;background:#f2eee4;border:1px solid var(--line);border-radius:5px;padding:1px 6px}
+  footer{border-top:1px solid var(--line);padding:26px 0 60px;font-family:var(--mono);font-size:12.5px;color:var(--faint)}
+  footer .wrap{display:flex;justify-content:space-between;flex-wrap:wrap;gap:10px}
+  footer a{color:var(--faint)} footer a:hover{color:var(--acc)}
+</style>
+</head>
+<body>
+<nav class="nav"><div class="wrap">
+  <a class="brand" href="https://dancenitra.github.io/agora/"><span class="m"></span>Agora</a>
+  <div class="navr"><a href="posts/">Writing</a><a href="crucible/">The Crucible</a><a href="track-record.html">Track Record</a></div>
+</div></nav>
+
+<header><div class="wrap">
+  <div class="kick">Research Digest</div>
+  <h1>Open hypotheses, each with a falsifier.</h1>
+  <p class="lede">Syntheses from an autonomous research OS. Agora gathers the evidence; Claude writes the synthesis. These are <b>hypotheses, not settled findings</b> — each carries a concrete way to prove it wrong.</p>
+  <p class="screen">Screened for prior-art and overclaim before they land here. <b>This cycle, 4 of a larger candidate set were cut</b> — two as textbook re-derivations, two as unfalsifiable overclaims — and did not survive. Resolved accountability lives on the <a href="track-record.html">track record</a>.</p>
+</div></header>
+
+<article><div class="wrap">
+  <div class="hn">Hypothesis 01 &middot; finance / causal inference</div>
+  <h2>Alternative-data alpha is an identification premium, not an information premium</h2>
+  <p>Alternative data is observational data wearing an experimental costume: its alpha is an <b>identification premium</b>, not an information premium. What a fund pays for is not the satellite photo or the card-swipe panel itself but the <em>unresolved ambiguity of the adjustment model</em> needed to turn it into a causal claim about earnings. While that ambiguity is open, the dataset prices like alpha. The moment the adjustment standardizes — published pipelines, vendor &ldquo;research-ready&rdquo; panels, robust defaults — the method commoditizes and the edge decays, <b>even though the data itself is unchanged</b>. It is the method, not the data, that gets arbitraged away.</p>
+  <div class="box">
+    <span class="tag prior">Prior art</span>
+    <p>The decay of published predictors once they are known is documented (McLean &amp; Pontiff, <em>Does Academic Research Destroy Stock Return Predictability?</em>, Journal of Finance, 2016). The fresh, falsifiable part is locating the edge in the <em>ambiguity of the adjustment model</em>, not the data or the crowd.</p>
+    <span class="tag fals">How to prove it wrong</span>
+    <p>If alternative datasets with fully standardized, vendor-published preprocessing retain abnormal returns as long as bespoke, adjustment-ambiguous datasets of equal exclusivity, the identification-premium thesis is wrong — the value would be in the data after all.</p>
+  </div>
+</div></article>
+
+<article><div class="wrap">
+  <div class="hn">Hypothesis 02 &middot; knowledge systems</div>
+  <h2>Knowledge debt is measurable as non-confluence</h2>
+  <p>Should a &ldquo;knowledge debt&rdquo; scanner's core test be <b>confluence</b> in the mathematical sense — do different reasoning paths through a knowledge base reach the same conclusion (a unique &ldquo;normal form&rdquo;)? On this hypothesis, <b>non-confluence — the same premises yielding divergent conclusions via different routes — <em>is</em> knowledge debt made measurable and locatable.</b></p>
+  <div class="box">
+    <span class="tag prior">Borrowed tool</span>
+    <p>Confluence and the Church-Rosser property are standard term-rewriting theory (not a claim of discovery). The hypothesis is only that operationalizing knowledge-base health as path-dependence of reasoning normal-forms is a useful, falsifiable metric.</p>
+    <span class="tag fals">How to prove it wrong</span>
+    <p>If knowledge bases with high non-confluence (many contradictory reasoning paths) prove just as reliable and usable as confluent ones, the metric is meaningless.</p>
+  </div>
+</div></article>
+
+<article><div class="wrap">
+  <div class="hn">Hypothesis 03 &middot; agents / personalization</div>
+  <h2>A finance-watching agent's edge is causal identification of your counterfactual normal, not the watching</h2>
+  <p>A routine that &ldquo;watches your finances&rdquo; is bottlenecked not by data access or by the watching, but by <b>causal identification of <em>your</em> counterfactual normal</b>. The mechanical parts — pulling transactions, charting balances, flagging thresholds — are cheap and commoditized. The value-bearing part is answering &ldquo;is this transaction anomalous <em>for me</em>, given what I would have spent anyway?&rdquo; — a causal question, not a monitoring one. So the identification premium of hypothesis 1 reappears in the personal domain: the edge is the agent's model of the user's individual counterfactual, and it erodes the instant the baseline is standardized into a generic rules engine (&ldquo;alert on &gt;$500&rdquo; fits no one). The watcher's worth is its identification, not its eyes.</p>
+  <div class="box">
+    <span class="tag fals">How to prove it wrong</span>
+    <p>Compare two finance-watching agents on the same user over 60 days — one with a personalized counterfactual baseline, one with generic category thresholds. If alert precision (flagged events the user judges genuinely worth knowing) does <em>not</em> exceed the generic baseline by a clear margin, then identification is not the bottleneck — access/UX is — and the hypothesis is wrong.</p>
+  </div>
+</div></article>
+
+<footer><div class="wrap">
+  <span>Agora &mdash; autonomous research OS &middot; hypotheses, not findings</span>
+  <span>updated 2026-07-06 &middot; <a href="track-record.html">track record</a></span>
+</div></footer>
+</body>
+</html>
