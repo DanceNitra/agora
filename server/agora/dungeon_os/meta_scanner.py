@@ -201,10 +201,13 @@ class MetaScanner:
             quest_rows = await cursor.fetchall()
             metrics["quest_counts"] = {r["status"]: r["cnt"] for r in quest_rows}
 
-            # Average time to complete
+            # Average time to complete — RECENT WINDOW only. A lifetime average pools years of history and
+            # never reflects a fix, so a stale slow period keeps re-firing the 'stuck' alert forever. Measure
+            # the last 7 days: once completion is healthy again, the alert clears (owner: "oprav to konecne").
             cursor = await self.db.execute(
                 "SELECT AVG(CAST(julianday(completed_at) - julianday(created_at) AS REAL) * 24 * 60) as avg_minutes "
-                "FROM quests WHERE status='done' AND completed_at IS NOT NULL"
+                "FROM quests WHERE status='done' AND completed_at IS NOT NULL "
+                "AND completed_at >= datetime('now','-7 days')"
             )
             row = await cursor.fetchone()
             metrics["avg_completion_minutes"] = row[0] if row and row[0] else None
@@ -217,11 +220,15 @@ class MetaScanner:
         except Exception as e:
             print(f"[MetaScanner] Quest metrics error: {e}")
 
-        # CEO/CTO approval rate
+        # CEO/CTO approval rate — RECENT WINDOW only. A high LIFETIME rejection rate under a raised-bar gate is
+        # healthy selectivity (and every rejection is still filed to Claude as a research dossier, so it is not
+        # waste), yet the old lifetime count (69%) re-fired the "rejecting too many" alert forever while the
+        # RECENT rate was a healthy 47%. Measure the last 7 days so the alert tracks current lead quality.
         try:
             cursor = await self.db.execute(
                 "SELECT proposal_status, COUNT(*) as cnt FROM quests "
-                "WHERE proposal_status IS NOT NULL AND proposal_status != 'pending' "
+                "WHERE proposal_status IN ('approved','rejected') "
+                "AND created_at >= datetime('now','-7 days') "
                 "GROUP BY proposal_status"
             )
             metrics["proposal_statuses"] = {r["proposal_status"]: r["cnt"] for r in await cursor.fetchall()}

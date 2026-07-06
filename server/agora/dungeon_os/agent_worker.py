@@ -199,6 +199,7 @@ class CorporationWorker:
             # as a shippable proposal. Claude ships the ones with merit, skips the thin.
             if eval_result and eval_result.get("approved"):
                 self._file_ship_review(quest, eval_result)
+                await self._mark_handed_off(quest.get("id", ""))
             # REPOINT (owner 2026-06-26): a board NEAR-MISS (not ship-approved but with a decent
             # score and real research) still carries lead value — surface it to Claude as a research
             # DOSSIER instead of letting it die in HEAD. The score is a priority hint, not a kill
@@ -208,6 +209,7 @@ class CorporationWorker:
                 _has_research = bool(quest.get("research_summary") or quest.get("findings_path"))
                 if _score >= 55 and _has_research:
                     self._file_research_dossier(quest, eval_result)
+                    await self._mark_handed_off(quest.get("id", ""))
 
         # ── STEP 5: PATA execution ──
         pata_quests = await self._get_quests_by_phase("pata")
@@ -885,6 +887,27 @@ class CorporationWorker:
     # HELPERS
     # ═══════════════════════════════════════════
 
+    async def _mark_handed_off(self, quest_id: str) -> None:
+        """The corp's lifecycle ENDS at the hand-off to Claude (research → package → file to inbox).
+        SHIPPING is Claude's job — it develops the worthy ones into rigorous, Lab-tested work and records
+        the verdict in the Crucible; the corp cannot observe that and must not gate on it. Marking the quest
+        done HERE is the fix for the perpetual '0 shipped' + 'stuck in HEAD' alerts: the legacy PATA build
+        chain (Designer→Developer→QA→git, _process_pata) stranded every approved quest in 'open'/'pata'
+        forever, so throughput never registered and the pile-up kept re-firing the meta-scanner alert.
+        Reversible: revert this call to restore the legacy self-build path."""
+        if not (self.qe and getattr(self.qe, "db", None) and quest_id):
+            return
+        try:
+            await self.qe.db.execute(
+                "UPDATE quests SET status='done', proposal_status='handed_to_claude', "
+                "completed_at=datetime('now') WHERE id=?",
+                (quest_id,),
+            )
+            await self.qe.db.commit()
+            self._stats["handed_to_claude"] = self._stats.get("handed_to_claude", 0) + 1
+        except Exception as e:
+            print(f"[Corp] hand-off completion error: {e}")
+
     async def _get_quests_by_phase(self, phase: str) -> list[dict]:
         if not self.db:
             return []
@@ -1077,8 +1100,9 @@ class CorporationWorker:
         s = self._stats
         parts += [
             "",
-            f"Lifetime: {s['head_completed']} researched · {s['pata_completed']} shipped · "
-            f"{s.get('ship_reviews_filed', 0)} sent to Claude · {s['lessons_extracted']} lessons",
+            f"Lifetime: {s['head_completed']} researched · "
+            f"{s.get('handed_to_claude', s.get('ship_reviews_filed', 0))} handed to Claude "
+            f"(shipping tracked in the Crucible) · {s['lessons_extracted']} lessons",
         ]
         return "\n".join(parts)
 
