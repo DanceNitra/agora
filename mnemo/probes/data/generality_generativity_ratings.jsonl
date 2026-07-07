@@ -1,0 +1,761 @@
+{"field": "ML", "i": 0, "influential": 8, "raw": 126, "gen": {"deepseek": 9, "kimi": 9}}
+{"field": "ML", "i": 1, "influential": 0, "raw": 15, "gen": {"deepseek": 4, "kimi": 6}}
+{"field": "ML", "i": 2, "influential": 9, "raw": 112, "gen": {"deepseek": 4, "kimi": 5}}
+{"field": "ML", "i": 3, "influential": 0, "raw": 5, "gen": {"deepseek": 3, "kimi": 4}}
+{"field": "ML", "i": 4, "influential": 1, "raw": 27, "gen": {"deepseek": 2, "kimi": 3}}
+{"field": "ML", "i": 5, "influential": 2, "raw": 21, "gen": {"deepseek": 7, "kimi": 7}}
+{"field": "ML", "i": 6, "influential": 3, "raw": 194, "gen": {"deepseek": 2, "kimi": 5}}
+{"field": "ML", "i": 7, "influential": 0, "raw": 7, "gen": {"deepseek": 2, "kimi": 4}}
+{"field": "ML", "i": 8, "influential": 5, "raw": 67, "gen": {"deepseek": 2, "kimi": 2}}
+{"field": "ML", "i": 9, "influential": 0, "raw": 12, "gen": {"deepseek": 2, "kimi": 3}}
+{"field": "ML", "i": 10, "influential": 1, "raw": 6, "gen": {"deepseek": 3, "kimi": 4}}
+{"field": "ML", "i": 11, "influential": 10, "raw": 82, "gen": {"deepseek": 7, "kimi": 8}}
+{"field": "ML", "i": 12, "influential": 0, "raw": 26, "gen": {"deepseek": 2, "kimi": 2}}
+{"field": "ML", "i": 13, "influential": 0, "raw": 59, "gen": {"deepseek": 2, "kimi": 3}}
+{"field": "ML", "i": 14, "influential": 2, "raw": 9, "gen": {"deepseek": 0, "kimi": 0}}
+{"field": "ML", "i": 15, "influential": 6, "raw": 268, "gen": {"deepseek": 9, "kimi": 8}}
+{"field": "ML", "i": 16, "influential": 38, "raw": 596, "gen": {"deepseek": 9, "kimi": 9}}
+{"field": "ML", "i": 17, "influential": 8, "raw": 41, "gen": {"deepseek": 2, "kimi": 3}}
+{"field": "ML", "i": 18, "influential": 1, "raw": 59, "gen": {"deepseek": 2, "kimi": 2}}
+{"field": "ML", "i": 19, "influential": 0, "raw": 25, "gen": {"deepseek": 9, "kimi": 8}}
+{"field": "ML", "i": 20, "influential": 10, "raw": 97, "gen": {"deepseek": 5, "kimi": 8}}
+{"field": "ML", "i": 21, "influential": 5, "raw": 28, "gen": {"deepseek": 4, "kimi": 4}}
+{"field": "ML", "i": 22, "influential": 2, "raw": 43, "gen": {"deepseek": 2, "kimi": 2}}
+{"field": "ML", "i": 23, "influential": 0, "raw": 20, "gen": {"deepseek": 2, "kimi": 3}}
+{"field": "ML", "i": 24, "influential": 2, "raw": 53, "gen": {"deepseek": 8, "kimi": 6}}
+{"field": "ML", "i": 25, "influential": 0, "raw": 8, "gen": {"deepseek": 2}}
+{"field": "ML", "i": 26, "influential": 0, "raw": 7, "gen": {"deepseek": 3, "kimi": 5}}
+{"field": "ML", "i": 27, "influential": 6, "raw": 87, "gen": {"deepseek": 3, "kimi": 3}}
+{"field": "ML", "i": 28, "influential": 2, "raw": 27, "gen": {"deepseek": 5, "kimi": 4}}
+{"field": "ML", "i": 29, "influential": 4, "raw": 86, "gen": {"deepseek": 6, "kimi": 7}}
+{"field": "ML", "i": 30, "influential": 0, "raw": 10, "gen": {"deepseek": 2, "kimi": 3}}
+{"field": "ML", "i": 31, "influential": 3, "raw": 38, "gen": {"deepseek": 1, "kimi": 2}}
+{"field": "ML", "i": 32, "influential": 0, "raw": 5, "gen": {"deepseek": 3, "kimi": 5}}
+{"field": "ML", "i": 33, "influential": 1, "raw": 29, "gen": {"deepseek": 1, "kimi": 2}}
+{"field": "ML", "i": 34, "influential": 3, "raw": 74, "gen": {"deepseek": 2, "kimi": 2}}
+{"field": "ML", "i": 35, "influential": 0, "raw": 52, "gen": {"deepseek": 9, "kimi": 9}}
+{"field": "ML", "i": 36, "influential": 0, "raw": 6, "gen": {"deepseek": 2, "kimi": 2}}
+{"field": "ML", "i": 37, "influential": 0, "raw": 5, "gen": {"deepseek": 4, "kimi": 3}}
+{"field": "ML", "i": 38, "influential": 2, "raw": 28, "gen": {"deepseek": 2, "kimi": 2}}
+{"field": "ML", "i": 39, "influential": 1, "raw": 25, "gen": {"deepseek": 2, "kimi": 3}}
+{"field": "ML", "i": 40, "influential": 1, "raw": 29, "gen": {"deepseek": 2, "kimi": 4}}
+{"field": "ML", "i": 41, "influential": 1, "raw": 209, "gen": {"deepseek": 4, "kimi": 3}}
+{"field": "ML", "i": 42, "influential": 1, "raw": 28, "gen": {"deepseek": 4, "kimi": 3}}
+{"field": "ML", "i": 43, "influential": 3, "raw": 54, "gen": {"deepseek": 3, "kimi": 3}}
+{"field": "ML", "i": 44, "influential": 39, "raw": 183, "gen": {"deepseek": 9, "kimi": 9}}
+{"field": "ML", "i": 45, "influential": 0, "raw": 14, "gen": {"deepseek": 2, "kimi": 4}}
+{"field": "ML", "i": 46, "influential": 1, "raw": 17, "gen": {"deepseek": 7, "kimi": 6}}
+{"field": "ML", "i": 47, "influential": 9, "raw": 50, "gen": {"deepseek": 4, "kimi": 5}}
+{"field": "ML", "i": 48, "influential": 1, "raw": 16, "gen": {"deepseek": 3, "kimi": 5}}
+{"field": "ML", "i": 49, "influential": 1, "raw": 7, "gen": {"deepseek": 2, "kimi": 2}}
+{"field": "ML", "i": 50, "influential": 0, "raw": 16, "gen": {"deepseek": 1, "kimi": 2}}
+{"field": "ML", "i": 51, "influential": 1, "raw": 35, "gen": {"deepseek": 1, "kimi": 1}}
+{"field": "ML", "i": 52, "influential": 0, "raw": 7, "gen": {"deepseek": 7, "kimi": 8}}
+{"field": "ML", "i": 53, "influential": 3, "raw": 52, "gen": {"deepseek": 7, "kimi": 7}}
+{"field": "ML", "i": 54, "influential": 2, "raw": 47, "gen": {"deepseek": 4, "kimi": 6}}
+{"field": "ML", "i": 55, "influential": 19, "raw": 150, "gen": {"deepseek": 2, "kimi": 3}}
+{"field": "ML", "i": 56, "influential": 0, "raw": 27, "gen": {"deepseek": 2, "kimi": 4}}
+{"field": "ML", "i": 57, "influential": 1, "raw": 12, "gen": {"deepseek": 8, "kimi": 8}}
+{"field": "ML", "i": 58, "influential": 3, "raw": 36, "gen": {"deepseek": 9, "kimi": 9}}
+{"field": "ML", "i": 59, "influential": 1, "raw": 61, "gen": {"deepseek": 4, "kimi": 5}}
+{"field": "ML", "i": 60, "influential": 0, "raw": 8, "gen": {"deepseek": 2, "kimi": 3}}
+{"field": "ML", "i": 61, "influential": 0, "raw": 8, "gen": {"deepseek": 3, "kimi": 4}}
+{"field": "ML", "i": 62, "influential": 0, "raw": 14, "gen": {"deepseek": 5, "kimi": 6}}
+{"field": "ML", "i": 63, "influential": 0, "raw": 5, "gen": {"deepseek": 4, "kimi": 4}}
+{"field": "ML", "i": 64, "influential": 1, "raw": 25, "gen": {"deepseek": 4, "kimi": 5}}
+{"field": "ML", "i": 65, "influential": 6, "raw": 49, "gen": {"deepseek": 2, "kimi": 3}}
+{"field": "ML", "i": 66, "influential": 3, "raw": 88, "gen": {"deepseek": 2, "kimi": 1}}
+{"field": "ML", "i": 67, "influential": 2, "raw": 86, "gen": {"deepseek": 4, "kimi": 3}}
+{"field": "ML", "i": 68, "influential": 2, "raw": 59, "gen": {"deepseek": 6, "kimi": 5}}
+{"field": "ML", "i": 69, "influential": 3, "raw": 29, "gen": {"deepseek": 3, "kimi": 5}}
+{"field": "ML", "i": 70, "influential": 1, "raw": 10, "gen": {"deepseek": 8, "kimi": 8}}
+{"field": "ML", "i": 71, "influential": 6, "raw": 33, "gen": {"deepseek": 2, "kimi": 4}}
+{"field": "ML", "i": 72, "influential": 1, "raw": 21, "gen": {"deepseek": 2, "kimi": 2}}
+{"field": "ML", "i": 73, "influential": 0, "raw": 6, "gen": {"deepseek": 8, "kimi": 7}}
+{"field": "ML", "i": 74, "influential": 2, "raw": 34, "gen": {"deepseek": 2, "kimi": 3}}
+{"field": "ML", "i": 75, "influential": 0, "raw": 11, "gen": {"deepseek": 7, "kimi": 8}}
+{"field": "ML", "i": 76, "influential": 0, "raw": 36, "gen": {"deepseek": 2, "kimi": 2}}
+{"field": "ML", "i": 77, "influential": 1, "raw": 18, "gen": {"deepseek": 3, "kimi": 3}}
+{"field": "ML", "i": 78, "influential": 0, "raw": 7, "gen": {"deepseek": 3, "kimi": 2}}
+{"field": "ML", "i": 79, "influential": 1, "raw": 42, "gen": {"deepseek": 8, "kimi": 8}}
+{"field": "ML", "i": 80, "influential": 81, "raw": 1011, "gen": {"deepseek": 4, "kimi": 8}}
+{"field": "ML", "i": 81, "influential": 7, "raw": 87, "gen": {"deepseek": 9, "kimi": 9}}
+{"field": "ML", "i": 82, "influential": 8, "raw": 58, "gen": {"deepseek": 8, "kimi": 8}}
+{"field": "ML", "i": 83, "influential": 0, "raw": 8, "gen": {"deepseek": 2, "kimi": 3}}
+{"field": "ML", "i": 84, "influential": 5, "raw": 94, "gen": {"deepseek": 2, "kimi": 2}}
+{"field": "ML", "i": 85, "influential": 46, "raw": 279, "gen": {"deepseek": 5, "kimi": 7}}
+{"field": "ML", "i": 86, "influential": 1, "raw": 6, "gen": {"deepseek": 1, "kimi": 2}}
+{"field": "ML", "i": 87, "influential": 3, "raw": 51, "gen": {"deepseek": 2, "kimi": 4}}
+{"field": "ML", "i": 88, "influential": 0, "raw": 10, "gen": {"deepseek": 7, "kimi": 7}}
+{"field": "ML", "i": 89, "influential": 2, "raw": 11, "gen": {"deepseek": 3, "kimi": 2}}
+{"field": "ML", "i": 90, "influential": 1, "raw": 65, "gen": {"deepseek": 2, "kimi": 1}}
+{"field": "ML", "i": 91, "influential": 0, "raw": 65, "gen": {"deepseek": 3, "kimi": 5}}
+{"field": "ML", "i": 92, "influential": 0, "raw": 34, "gen": {"deepseek": 3, "kimi": 4}}
+{"field": "ML", "i": 93, "influential": 10, "raw": 484, "gen": {"deepseek": 10, "kimi": 8}}
+{"field": "ML", "i": 94, "influential": 11, "raw": 417, "gen": {"deepseek": 1, "kimi": 1}}
+{"field": "ML", "i": 95, "influential": 0, "raw": 23, "gen": {"deepseek": 2, "kimi": 2}}
+{"field": "ML", "i": 96, "influential": 0, "raw": 19, "gen": {"deepseek": 2, "kimi": 3}}
+{"field": "ML", "i": 97, "influential": 4, "raw": 87, "gen": {"deepseek": 4, "kimi": 7}}
+{"field": "ML", "i": 98, "influential": 3, "raw": 55, "gen": {"deepseek": 1, "kimi": 1}}
+{"field": "ML", "i": 99, "influential": 3, "raw": 128, "gen": {"deepseek": 2, "kimi": 2}}
+{"field": "ML", "i": 100, "influential": 1, "raw": 22, "gen": {"deepseek": 2, "kimi": 2}}
+{"field": "ML", "i": 101, "influential": 0, "raw": 14, "gen": {"deepseek": 2, "kimi": 2}}
+{"field": "ML", "i": 102, "influential": 0, "raw": 14, "gen": {"deepseek": 8, "kimi": 7}}
+{"field": "ML", "i": 103, "influential": 3, "raw": 48, "gen": {"deepseek": 7, "kimi": 6}}
+{"field": "ML", "i": 104, "influential": 0, "raw": 5, "gen": {"deepseek": 5, "kimi": 2}}
+{"field": "ML", "i": 105, "influential": 3, "raw": 10, "gen": {"deepseek": 4, "kimi": 7}}
+{"field": "ML", "i": 106, "influential": 0, "raw": 15, "gen": {"deepseek": 8, "kimi": 8}}
+{"field": "ML", "i": 107, "influential": 1, "raw": 14, "gen": {"deepseek": 2, "kimi": 3}}
+{"field": "ML", "i": 108, "influential": 0, "raw": 7, "gen": {"deepseek": 2, "kimi": 3}}
+{"field": "ML", "i": 109, "influential": 0, "raw": 14, "gen": {"deepseek": 9, "kimi": 9}}
+{"field": "ML", "i": 110, "influential": 2, "raw": 65, "gen": {"deepseek": 2, "kimi": 3}}
+{"field": "ML", "i": 111, "influential": 0, "raw": 23, "gen": {"deepseek": 7, "kimi": 7}}
+{"field": "ML", "i": 112, "influential": 3, "raw": 53, "gen": {"deepseek": 3, "kimi": 4}}
+{"field": "ML", "i": 113, "influential": 1, "raw": 30, "gen": {"deepseek": 2, "kimi": 2}}
+{"field": "ML", "i": 114, "influential": 26, "raw": 348, "gen": {"deepseek": 4, "kimi": 7}}
+{"field": "ML", "i": 115, "influential": 6, "raw": 65, "gen": {"deepseek": 2, "kimi": 2}}
+{"field": "ML", "i": 116, "influential": 143, "raw": 1605, "gen": {"deepseek": 8, "kimi": 7}}
+{"field": "ML", "i": 117, "influential": 13, "raw": 161, "gen": {"deepseek": 2, "kimi": 2}}
+{"field": "ML", "i": 118, "influential": 1, "raw": 26, "gen": {"deepseek": 3, "kimi": 3}}
+{"field": "ML", "i": 119, "influential": 0, "raw": 45, "gen": {"deepseek": 3, "kimi": 6}}
+{"field": "ML", "i": 120, "influential": 1, "raw": 10, "gen": {"deepseek": 6, "kimi": 5}}
+{"field": "ML", "i": 121, "influential": 6, "raw": 134, "gen": {"deepseek": 4, "kimi": 4}}
+{"field": "ML", "i": 122, "influential": 1, "raw": 18, "gen": {"deepseek": 2, "kimi": 2}}
+{"field": "ML", "i": 123, "influential": 0, "raw": 13, "gen": {"deepseek": 2, "kimi": 2}}
+{"field": "ML", "i": 124, "influential": 6, "raw": 63, "gen": {"deepseek": 3, "kimi": 5}}
+{"field": "ML", "i": 125, "influential": 1, "raw": 18, "gen": {"deepseek": 1, "kimi": 3}}
+{"field": "ML", "i": 126, "influential": 0, "raw": 13, "gen": {"deepseek": 2, "kimi": 4}}
+{"field": "ML", "i": 127, "influential": 1, "raw": 5, "gen": {"deepseek": 8, "kimi": 7}}
+{"field": "ML", "i": 128, "influential": 0, "raw": 15, "gen": {"deepseek": 7, "kimi": 5}}
+{"field": "ML", "i": 129, "influential": 0, "raw": 14, "gen": {"deepseek": 2, "kimi": 1}}
+{"field": "ML", "i": 130, "influential": 1, "raw": 62, "gen": {"deepseek": 1, "kimi": 3}}
+{"field": "ML", "i": 131, "influential": 0, "raw": 91, "gen": {"deepseek": 7, "kimi": 5}}
+{"field": "ML", "i": 132, "influential": 0, "raw": 12, "gen": {"deepseek": 6, "kimi": 6}}
+{"field": "ML", "i": 133, "influential": 2, "raw": 26, "gen": {"deepseek": 8, "kimi": 7}}
+{"field": "ML", "i": 134, "influential": 1, "raw": 16, "gen": {"deepseek": 1, "kimi": 2}}
+{"field": "ML", "i": 135, "influential": 1, "raw": 7, "gen": {"deepseek": 6, "kimi": 3}}
+{"field": "ML", "i": 136, "influential": 0, "raw": 12, "gen": {"deepseek": 3, "kimi": 4}}
+{"field": "ML", "i": 137, "influential": 0, "raw": 6, "gen": {"deepseek": 2, "kimi": 2}}
+{"field": "ML", "i": 138, "influential": 0, "raw": 32, "gen": {"deepseek": 3, "kimi": 4}}
+{"field": "ML", "i": 139, "influential": 1, "raw": 13, "gen": {"deepseek": 2, "kimi": 3}}
+{"field": "ML", "i": 140, "influential": 0, "raw": 10, "gen": {"deepseek": 1, "kimi": 2}}
+{"field": "ML", "i": 141, "influential": 1, "raw": 8, "gen": {"deepseek": 6, "kimi": 6}}
+{"field": "ML", "i": 142, "influential": 66, "raw": 564, "gen": {"deepseek": 3, "kimi": 6}}
+{"field": "ML", "i": 143, "influential": 0, "raw": 6, "gen": {"deepseek": 2, "kimi": 4}}
+{"field": "ML", "i": 144, "influential": 0, "raw": 5, "gen": {"deepseek": 2, "kimi": 2}}
+{"field": "ML", "i": 145, "influential": 4, "raw": 71, "gen": {"deepseek": 7, "kimi": 8}}
+{"field": "ML", "i": 146, "influential": 1, "raw": 26, "gen": {"deepseek": 8, "kimi": 7}}
+{"field": "ML", "i": 147, "influential": 3, "raw": 96, "gen": {"deepseek": 4, "kimi": 7}}
+{"field": "ML", "i": 148, "influential": 5, "raw": 30, "gen": {"deepseek": 2, "kimi": 4}}
+{"field": "ML", "i": 149, "influential": 0, "raw": 9, "gen": {"deepseek": 5, "kimi": 4}}
+{"field": "ML", "i": 150, "influential": 2, "raw": 28, "gen": {"deepseek": 9, "kimi": 10}}
+{"field": "ML", "i": 151, "influential": 2, "raw": 28, "gen": {"deepseek": 6, "kimi": 5}}
+{"field": "ML", "i": 152, "influential": 6, "raw": 120, "gen": {"deepseek": 4, "kimi": 4}}
+{"field": "ML", "i": 153, "influential": 1, "raw": 7, "gen": {"deepseek": 3, "kimi": 4}}
+{"field": "ML", "i": 154, "influential": 0, "raw": 6, "gen": {"deepseek": 6, "kimi": 6}}
+{"field": "ML", "i": 155, "influential": 0, "raw": 28, "gen": {"deepseek": 0, "kimi": 6}}
+{"field": "ML", "i": 156, "influential": 5, "raw": 19, "gen": {"deepseek": 3, "kimi": 7}}
+{"field": "ML", "i": 157, "influential": 3, "raw": 72, "gen": {"deepseek": 2, "kimi": 2}}
+{"field": "ML", "i": 158, "influential": 0, "raw": 6, "gen": {"deepseek": 2, "kimi": 2}}
+{"field": "ML", "i": 159, "influential": 12, "raw": 57, "gen": {"deepseek": 1, "kimi": 2}}
+{"field": "ML", "i": 160, "influential": 0, "raw": 19, "gen": {"deepseek": 3, "kimi": 4}}
+{"field": "ML", "i": 161, "influential": 2, "raw": 72, "gen": {"deepseek": 7, "kimi": 8}}
+{"field": "ML", "i": 162, "influential": 4, "raw": 87, "gen": {"deepseek": 7, "kimi": 6}}
+{"field": "ML", "i": 163, "influential": 13, "raw": 110, "gen": {"deepseek": 3, "kimi": 3}}
+{"field": "ML", "i": 164, "influential": 26, "raw": 187, "gen": {"deepseek": 9, "kimi": 9}}
+{"field": "ML", "i": 165, "influential": 1, "raw": 56, "gen": {"deepseek": 7, "kimi": 7}}
+{"field": "ML", "i": 166, "influential": 0, "raw": 17, "gen": {"deepseek": 5, "kimi": 5}}
+{"field": "ML", "i": 167, "influential": 0, "raw": 9, "gen": {"deepseek": 5, "kimi": 5}}
+{"field": "ML", "i": 168, "influential": 1, "raw": 16, "gen": {"deepseek": 2, "kimi": 2}}
+{"field": "ML", "i": 169, "influential": 0, "raw": 8, "gen": {"deepseek": 3, "kimi": 5}}
+{"field": "ML", "i": 170, "influential": 2, "raw": 113, "gen": {"deepseek": 8, "kimi": 4}}
+{"field": "ML", "i": 171, "influential": 0, "raw": 16, "gen": {"deepseek": 3, "kimi": 6}}
+{"field": "ML", "i": 172, "influential": 9, "raw": 131, "gen": {"deepseek": 7, "kimi": 7}}
+{"field": "ML", "i": 173, "influential": 2, "raw": 9, "gen": {"deepseek": 0, "kimi": 1}}
+{"field": "ML", "i": 174, "influential": 14, "raw": 296, "gen": {"deepseek": 2, "kimi": 3}}
+{"field": "ML", "i": 175, "influential": 2, "raw": 35, "gen": {"deepseek": 2, "kimi": 6}}
+{"field": "ML", "i": 176, "influential": 5, "raw": 80, "gen": {"deepseek": 2, "kimi": 4}}
+{"field": "ML", "i": 177, "influential": 1, "raw": 111, "gen": {"deepseek": 2, "kimi": 1}}
+{"field": "ML", "i": 178, "influential": 2, "raw": 39, "gen": {"deepseek": 2, "kimi": 4}}
+{"field": "ML", "i": 179, "influential": 2, "raw": 192, "gen": {"deepseek": 8, "kimi": 7}}
+{"field": "ML", "i": 180, "influential": 2, "raw": 52, "gen": {"deepseek": 1, "kimi": 1}}
+{"field": "ML", "i": 181, "influential": 7, "raw": 82, "gen": {"deepseek": 2, "kimi": 4}}
+{"field": "ML", "i": 182, "influential": 0, "raw": 77, "gen": {"deepseek": 3, "kimi": 3}}
+{"field": "ML", "i": 183, "influential": 4, "raw": 36, "gen": {"deepseek": 3, "kimi": 7}}
+{"field": "ML", "i": 184, "influential": 1, "raw": 15, "gen": {"deepseek": 2, "kimi": 4}}
+{"field": "ML", "i": 185, "influential": 1, "raw": 7, "gen": {"deepseek": 2, "kimi": 4}}
+{"field": "ML", "i": 186, "influential": 133, "raw": 1732, "gen": {"deepseek": 8, "kimi": 9}}
+{"field": "ML", "i": 187, "influential": 1, "raw": 12, "gen": {"deepseek": 3, "kimi": 3}}
+{"field": "ML", "i": 188, "influential": 1, "raw": 39, "gen": {"deepseek": 2, "kimi": 3}}
+{"field": "ML", "i": 189, "influential": 0, "raw": 12, "gen": {"deepseek": 3, "kimi": 3}}
+{"field": "ML", "i": 190, "influential": 9, "raw": 161, "gen": {"deepseek": 7, "kimi": 8}}
+{"field": "ML", "i": 191, "influential": 0, "raw": 6, "gen": {"deepseek": 3, "kimi": 4}}
+{"field": "ML", "i": 192, "influential": 0, "raw": 14, "gen": {"deepseek": 2, "kimi": 3}}
+{"field": "ML", "i": 193, "influential": 6, "raw": 69, "gen": {"deepseek": 2, "kimi": 2}}
+{"field": "ML", "i": 194, "influential": 1, "raw": 12, "gen": {"deepseek": 5, "kimi": 8}}
+{"field": "ML", "i": 195, "influential": 1, "raw": 19, "gen": {"deepseek": 7, "kimi": 7}}
+{"field": "ML", "i": 196, "influential": 0, "raw": 8, "gen": {"deepseek": 2, "kimi": 3}}
+{"field": "ML", "i": 197, "influential": 0, "raw": 9, "gen": {"deepseek": 2, "kimi": 3}}
+{"field": "ML", "i": 198, "influential": 13, "raw": 733, "gen": {"deepseek": 5, "kimi": 7}}
+{"field": "ML", "i": 199, "influential": 3, "raw": 55, "gen": {"deepseek": 3, "kimi": 7}}
+{"field": "ML", "i": 200, "influential": 1, "raw": 7, "gen": {"deepseek": 2, "kimi": 3}}
+{"field": "ML", "i": 201, "influential": 7, "raw": 92, "gen": {"deepseek": 8, "kimi": 7}}
+{"field": "ML", "i": 202, "influential": 4, "raw": 147, "gen": {"deepseek": 2, "kimi": 3}}
+{"field": "ML", "i": 203, "influential": 0, "raw": 8, "gen": {"deepseek": 2, "kimi": 2}}
+{"field": "ML", "i": 204, "influential": 0, "raw": 17, "gen": {"deepseek": 2, "kimi": 2}}
+{"field": "ML", "i": 205, "influential": 7, "raw": 68, "gen": {"deepseek": 2, "kimi": 2}}
+{"field": "ML", "i": 206, "influential": 6, "raw": 194, "gen": {"deepseek": 5, "kimi": 7}}
+{"field": "ML", "i": 207, "influential": 2, "raw": 59, "gen": {"deepseek": 8, "kimi": 9}}
+{"field": "ML", "i": 208, "influential": 3, "raw": 36, "gen": {"deepseek": 7, "kimi": 8}}
+{"field": "ML", "i": 209, "influential": 6, "raw": 132, "gen": {"deepseek": 3, "kimi": 2}}
+{"field": "ML", "i": 210, "influential": 2, "raw": 28, "gen": {"deepseek": 3, "kimi": 3}}
+{"field": "ML", "i": 211, "influential": 0, "raw": 21, "gen": {"deepseek": 3, "kimi": 4}}
+{"field": "ML", "i": 212, "influential": 18, "raw": 109, "gen": {"deepseek": 6, "kimi": 8}}
+{"field": "ML", "i": 213, "influential": 3, "raw": 8, "gen": {"deepseek": 9, "kimi": 7}}
+{"field": "ML", "i": 214, "influential": 1, "raw": 45, "gen": {"deepseek": 2, "kimi": 2}}
+{"field": "ML", "i": 215, "influential": 0, "raw": 5, "gen": {"deepseek": 2, "kimi": 1}}
+{"field": "ML", "i": 216, "influential": 4, "raw": 47, "gen": {"deepseek": 8, "kimi": 6}}
+{"field": "ML", "i": 217, "influential": 0, "raw": 23, "gen": {"deepseek": 4, "kimi": 6}}
+{"field": "ML", "i": 218, "influential": 2, "raw": 25, "gen": {"deepseek": 7, "kimi": 8}}
+{"field": "ML", "i": 219, "influential": 52, "raw": 409, "gen": {"deepseek": 2, "kimi": 2}}
+{"field": "ML", "i": 220, "influential": 4, "raw": 71, "gen": {"deepseek": 2, "kimi": 1}}
+{"field": "ML", "i": 221, "influential": 20, "raw": 462, "gen": {"deepseek": 3, "kimi": 7}}
+{"field": "ML", "i": 222, "influential": 15, "raw": 270, "gen": {"deepseek": 7, "kimi": 7}}
+{"field": "ML", "i": 223, "influential": 2, "raw": 49, "gen": {"deepseek": 2, "kimi": 1}}
+{"field": "ML", "i": 224, "influential": 4, "raw": 27, "gen": {"deepseek": 8, "kimi": 7}}
+{"field": "ML", "i": 225, "influential": 1, "raw": 22, "gen": {"deepseek": 7, "kimi": 4}}
+{"field": "ML", "i": 226, "influential": 1, "raw": 24, "gen": {"deepseek": 2, "kimi": 2}}
+{"field": "ML", "i": 227, "influential": 198, "raw": 1899, "gen": {"deepseek": 9, "kimi": 9}}
+{"field": "ML", "i": 228, "influential": 1, "raw": 18, "gen": {"deepseek": 8, "kimi": 8}}
+{"field": "ML", "i": 229, "influential": 2, "raw": 35, "gen": {"deepseek": 2, "kimi": 5}}
+{"field": "ML", "i": 230, "influential": 2, "raw": 40, "gen": {"deepseek": 8, "kimi": 6}}
+{"field": "ML", "i": 231, "influential": 0, "raw": 7, "gen": {"deepseek": 2, "kimi": 3}}
+{"field": "ML", "i": 232, "influential": 0, "raw": 8, "gen": {"deepseek": 9, "kimi": 5}}
+{"field": "ML", "i": 233, "influential": 2, "raw": 19, "gen": {"deepseek": 8, "kimi": 6}}
+{"field": "ML", "i": 234, "influential": 2, "raw": 32, "gen": {"deepseek": 2, "kimi": 3}}
+{"field": "ML", "i": 235, "influential": 0, "raw": 7, "gen": {"deepseek": 2, "kimi": 1}}
+{"field": "ML", "i": 236, "influential": 1, "raw": 53, "gen": {"deepseek": 3, "kimi": 2}}
+{"field": "ML", "i": 237, "influential": 1, "raw": 17, "gen": {"deepseek": 9, "kimi": 3}}
+{"field": "ML", "i": 238, "influential": 1, "raw": 47, "gen": {"deepseek": 2, "kimi": 2}}
+{"field": "ML", "i": 239, "influential": 1, "raw": 84, "gen": {"deepseek": 1, "kimi": 2}}
+{"field": "ML", "i": 240, "influential": 1, "raw": 18, "gen": {"deepseek": 1, "kimi": 4}}
+{"field": "ML", "i": 241, "influential": 1, "raw": 6, "gen": {"deepseek": 2, "kimi": 2}}
+{"field": "ML", "i": 242, "influential": 2, "raw": 42, "gen": {"deepseek": 7, "kimi": 6}}
+{"field": "ML", "i": 243, "influential": 2, "raw": 22, "gen": {"deepseek": 2, "kimi": 2}}
+{"field": "ML", "i": 244, "influential": 1, "raw": 32, "gen": {"deepseek": 1, "kimi": 2}}
+{"field": "ML", "i": 245, "influential": 19, "raw": 237, "gen": {"deepseek": 2, "kimi": 4}}
+{"field": "ML", "i": 246, "influential": 4, "raw": 18, "gen": {"deepseek": 3, "kimi": 3}}
+{"field": "ML", "i": 247, "influential": 1, "raw": 9, "gen": {"deepseek": 2, "kimi": 3}}
+{"field": "ML", "i": 248, "influential": 5, "raw": 54, "gen": {"deepseek": 2, "kimi": 2}}
+{"field": "ML", "i": 249, "influential": 4, "raw": 43, "gen": {"deepseek": 2, "kimi": 3}}
+{"field": "ML", "i": 250, "influential": 1, "raw": 114, "gen": {"deepseek": 3, "kimi": 4}}
+{"field": "ML", "i": 251, "influential": 4, "raw": 43, "gen": {"deepseek": 9, "kimi": 9}}
+{"field": "ML", "i": 252, "influential": 0, "raw": 6, "gen": {"deepseek": 1, "kimi": 2}}
+{"field": "ML", "i": 253, "influential": 5, "raw": 99, "gen": {"deepseek": 2, "kimi": 3}}
+{"field": "ML", "i": 254, "influential": 1, "raw": 11, "gen": {"deepseek": 2, "kimi": 2}}
+{"field": "ML", "i": 255, "influential": 0, "raw": 14, "gen": {"deepseek": 1, "kimi": 1}}
+{"field": "ML", "i": 256, "influential": 5, "raw": 53, "gen": {"deepseek": 4, "kimi": 6}}
+{"field": "ML", "i": 257, "influential": 20, "raw": 327, "gen": {"deepseek": 1, "kimi": 2}}
+{"field": "ML", "i": 258, "influential": 0, "raw": 5, "gen": {"deepseek": 2, "kimi": 2}}
+{"field": "ML", "i": 259, "influential": 0, "raw": 47, "gen": {"deepseek": 2, "kimi": 5}}
+{"field": "ML", "i": 260, "influential": 0, "raw": 18, "gen": {"deepseek": 1, "kimi": 1}}
+{"field": "ML", "i": 261, "influential": 3, "raw": 24, "gen": {"deepseek": 3, "kimi": 3}}
+{"field": "ML", "i": 262, "influential": 5, "raw": 46, "gen": {"deepseek": 8, "kimi": 8}}
+{"field": "ML", "i": 263, "influential": 0, "raw": 37, "gen": {"deepseek": 3, "kimi": 4}}
+{"field": "ML", "i": 264, "influential": 0, "raw": 13, "gen": {"deepseek": 5, "kimi": 3}}
+{"field": "ML", "i": 265, "influential": 0, "raw": 34, "gen": {"deepseek": 8, "kimi": 7}}
+{"field": "ML", "i": 266, "influential": 1, "raw": 31, "gen": {"deepseek": 6, "kimi": 5}}
+{"field": "ML", "i": 267, "influential": 1, "raw": 35, "gen": {"deepseek": 5, "kimi": 6}}
+{"field": "ML", "i": 268, "influential": 3, "raw": 63, "gen": {"deepseek": 2, "kimi": 2}}
+{"field": "ML", "i": 269, "influential": 1, "raw": 12, "gen": {"deepseek": 3, "kimi": 6}}
+{"field": "ML", "i": 270, "influential": 0, "raw": 36, "gen": {"deepseek": 2, "kimi": 2}}
+{"field": "ML", "i": 271, "influential": 1, "raw": 71, "gen": {"deepseek": 7, "kimi": 7}}
+{"field": "ML", "i": 272, "influential": 1, "raw": 24, "gen": {"deepseek": 9, "kimi": 9}}
+{"field": "ML", "i": 273, "influential": 46, "raw": 688, "gen": {"deepseek": 7, "kimi": 8}}
+{"field": "ML", "i": 274, "influential": 3, "raw": 60, "gen": {"deepseek": 4, "kimi": 3}}
+{"field": "ML", "i": 275, "influential": 0, "raw": 48, "gen": {"deepseek": 3, "kimi": 4}}
+{"field": "ML", "i": 276, "influential": 2, "raw": 23, "gen": {"deepseek": 5, "kimi": 5}}
+{"field": "ML", "i": 277, "influential": 0, "raw": 51, "gen": {"deepseek": 2, "kimi": 2}}
+{"field": "ML", "i": 278, "influential": 3, "raw": 37, "gen": {"deepseek": 2, "kimi": 4}}
+{"field": "ML", "i": 279, "influential": 1, "raw": 9, "gen": {"deepseek": 2, "kimi": 4}}
+{"field": "ML", "i": 280, "influential": 8, "raw": 74, "gen": {"deepseek": 0, "kimi": 2}}
+{"field": "ML", "i": 281, "influential": 1, "raw": 44, "gen": {"deepseek": 4, "kimi": 3}}
+{"field": "ML", "i": 282, "influential": 57, "raw": 890, "gen": {"deepseek": 9, "kimi": 8}}
+{"field": "ML", "i": 283, "influential": 0, "raw": 13, "gen": {"deepseek": 1, "kimi": 2}}
+{"field": "ML", "i": 284, "influential": 0, "raw": 6, "gen": {"deepseek": 4, "kimi": 7}}
+{"field": "ML", "i": 285, "influential": 0, "raw": 38, "gen": {"deepseek": 2, "kimi": 3}}
+{"field": "ML", "i": 286, "influential": 1, "raw": 20, "gen": {"deepseek": 3, "kimi": 4}}
+{"field": "ML", "i": 287, "influential": 0, "raw": 56, "gen": {"deepseek": 9, "kimi": 9}}
+{"field": "ML", "i": 288, "influential": 8, "raw": 73, "gen": {"deepseek": 3, "kimi": 6}}
+{"field": "ML", "i": 289, "influential": 0, "raw": 36, "gen": {"deepseek": 2, "kimi": 1}}
+{"field": "ML", "i": 290, "influential": 2, "raw": 34, "gen": {"deepseek": 3, "kimi": 4}}
+{"field": "ML", "i": 291, "influential": 2, "raw": 10, "gen": {"deepseek": 7, "kimi": 7}}
+{"field": "ML", "i": 292, "influential": 0, "raw": 65, "gen": {"deepseek": 2, "kimi": 2}}
+{"field": "ML", "i": 293, "influential": 0, "raw": 6, "gen": {"deepseek": 2, "kimi": 3}}
+{"field": "ML", "i": 294, "influential": 173, "raw": 2539, "gen": {"deepseek": 8, "kimi": 10}}
+{"field": "ML", "i": 295, "influential": 1, "raw": 14, "gen": {"deepseek": 1, "kimi": 1}}
+{"field": "ML", "i": 296, "influential": 0, "raw": 23, "gen": {"deepseek": 2, "kimi": 2}}
+{"field": "ML", "i": 297, "influential": 0, "raw": 16, "gen": {"deepseek": 2, "kimi": 3}}
+{"field": "ML", "i": 298, "influential": 5, "raw": 516, "gen": {"deepseek": 8, "kimi": 9}}
+{"field": "ML", "i": 299, "influential": 1, "raw": 8, "gen": {"deepseek": 7, "kimi": 7}}
+{"field": "ML", "i": 300, "influential": 0, "raw": 12, "gen": {"deepseek": 6, "kimi": 6}}
+{"field": "ML", "i": 301, "influential": 0, "raw": 13, "gen": {"deepseek": 2, "kimi": 4}}
+{"field": "ML", "i": 302, "influential": 21, "raw": 214, "gen": {"deepseek": 8, "kimi": 6}}
+{"field": "ML", "i": 303, "influential": 3, "raw": 145, "gen": {"deepseek": 2, "kimi": 7}}
+{"field": "ML", "i": 304, "influential": 3, "raw": 17, "gen": {"deepseek": 3, "kimi": 7}}
+{"field": "ML", "i": 305, "influential": 9, "raw": 273, "gen": {"deepseek": 7, "kimi": 6}}
+{"field": "ML", "i": 306, "influential": 1, "raw": 49, "gen": {"deepseek": 2, "kimi": 2}}
+{"field": "ML", "i": 307, "influential": 50, "raw": 798, "gen": {"deepseek": 0, "kimi": 1}}
+{"field": "ML", "i": 308, "influential": 3, "raw": 179, "gen": {"deepseek": 2, "kimi": 3}}
+{"field": "ML", "i": 309, "influential": 4, "raw": 28, "gen": {"deepseek": 3, "kimi": 7}}
+{"field": "ML", "i": 310, "influential": 0, "raw": 51, "gen": {"deepseek": 3, "kimi": 4}}
+{"field": "ML", "i": 311, "influential": 10, "raw": 100, "gen": {"deepseek": 7, "kimi": 7}}
+{"field": "ML", "i": 312, "influential": 0, "raw": 46, "gen": {"deepseek": 2, "kimi": 4}}
+{"field": "ML", "i": 313, "influential": 2, "raw": 25, "gen": {"deepseek": 2, "kimi": 2}}
+{"field": "ML", "i": 314, "influential": 4, "raw": 34, "gen": {"deepseek": 3, "kimi": 2}}
+{"field": "ML", "i": 315, "influential": 1, "raw": 36, "gen": {"deepseek": 3, "kimi": 4}}
+{"field": "ML", "i": 316, "influential": 56, "raw": 1034, "gen": {"deepseek": 7, "kimi": 8}}
+{"field": "ML", "i": 317, "influential": 2, "raw": 42, "gen": {"deepseek": 4, "kimi": 4}}
+{"field": "ML", "i": 318, "influential": 0, "raw": 30, "gen": {"deepseek": 2, "kimi": 4}}
+{"field": "ML", "i": 319, "influential": 0, "raw": 7, "gen": {"deepseek": 2, "kimi": 2}}
+{"field": "ML", "i": 320, "influential": 1, "raw": 21, "gen": {"deepseek": 0, "kimi": 2}}
+{"field": "ML", "i": 321, "influential": 1, "raw": 11, "gen": {"deepseek": 2, "kimi": 3}}
+{"field": "ML", "i": 322, "influential": 0, "raw": 22, "gen": {"deepseek": 2, "kimi": 3}}
+{"field": "ML", "i": 323, "influential": 0, "raw": 7, "gen": {"deepseek": 1, "kimi": 2}}
+{"field": "ML", "i": 324, "influential": 1, "raw": 39, "gen": {"deepseek": 2, "kimi": 2}}
+{"field": "ML", "i": 325, "influential": 1, "raw": 25, "gen": {"deepseek": 4, "kimi": 8}}
+{"field": "ML", "i": 326, "influential": 1, "raw": 34, "gen": {"deepseek": 8, "kimi": 7}}
+{"field": "ML", "i": 327, "influential": 5, "raw": 59, "gen": {"deepseek": 2, "kimi": 4}}
+{"field": "ML", "i": 328, "influential": 2, "raw": 214, "gen": {"deepseek": 2, "kimi": 2}}
+{"field": "ML", "i": 329, "influential": 1, "raw": 50, "gen": {"deepseek": 2, "kimi": 6}}
+{"field": "ML", "i": 330, "influential": 8, "raw": 120, "gen": {"deepseek": 0, "kimi": 1}}
+{"field": "ML", "i": 331, "influential": 3, "raw": 30, "gen": {"deepseek": 1, "kimi": 2}}
+{"field": "ML", "i": 332, "influential": 29, "raw": 275, "gen": {"deepseek": 3, "kimi": 7}}
+{"field": "ML", "i": 333, "influential": 2, "raw": 29, "gen": {"deepseek": 7, "kimi": 3}}
+{"field": "ML", "i": 334, "influential": 5, "raw": 52, "gen": {"deepseek": 2, "kimi": 3}}
+{"field": "ML", "i": 335, "influential": 0, "raw": 16, "gen": {"deepseek": 2, "kimi": 3}}
+{"field": "ML", "i": 336, "influential": 4, "raw": 17, "gen": {"deepseek": 7, "kimi": 7}}
+{"field": "ML", "i": 337, "influential": 0, "raw": 45, "gen": {"deepseek": 4, "kimi": 4}}
+{"field": "ML", "i": 338, "influential": 1, "raw": 26, "gen": {"deepseek": 1, "kimi": 1}}
+{"field": "ML", "i": 339, "influential": 1, "raw": 28, "gen": {"deepseek": 2, "kimi": 2}}
+{"field": "ML", "i": 340, "influential": 5, "raw": 107, "gen": {"deepseek": 10, "kimi": 9}}
+{"field": "ML", "i": 341, "influential": 0, "raw": 17, "gen": {"deepseek": 2, "kimi": 2}}
+{"field": "ML", "i": 342, "influential": 4, "raw": 108, "gen": {"deepseek": 2, "kimi": 2}}
+{"field": "ML", "i": 343, "influential": 1, "raw": 19, "gen": {"deepseek": 2, "kimi": 5}}
+{"field": "ML", "i": 344, "influential": 16, "raw": 209, "gen": {"deepseek": 3, "kimi": 6}}
+{"field": "ML", "i": 345, "influential": 5, "raw": 65, "gen": {"deepseek": 3, "kimi": 3}}
+{"field": "ML", "i": 346, "influential": 3, "raw": 33, "gen": {"deepseek": 2, "kimi": 2}}
+{"field": "MED", "i": 0, "influential": 0, "raw": 14, "gen": {"deepseek": 1, "kimi": 1, "glm": 0, "claude": 1}}
+{"field": "MED", "i": 1, "influential": 0, "raw": 18, "gen": {"deepseek": 2, "kimi": 1, "glm": 0, "claude": 1}}
+{"field": "MED", "i": 2, "influential": 2, "raw": 23, "gen": {"deepseek": 0, "kimi": 0, "glm": 0, "claude": 1}}
+{"field": "MED", "i": 3, "influential": 4, "raw": 51, "gen": {"deepseek": 3, "kimi": 2, "glm": 2, "claude": 3}}
+{"field": "MED", "i": 4, "influential": 1, "raw": 30, "gen": {"deepseek": 1, "kimi": 1, "glm": 0, "claude": 1}}
+{"field": "MED", "i": 5, "influential": 4, "raw": 149, "gen": {"deepseek": 0, "glm": 0, "claude": 1}}
+{"field": "MED", "i": 6, "influential": 0, "raw": 5, "gen": {"deepseek": 2, "kimi": 1, "glm": 0, "claude": 1}}
+{"field": "MED", "i": 7, "influential": 0, "raw": 59, "gen": {"deepseek": 2, "kimi": 2, "glm": 2, "claude": 3}}
+{"field": "MED", "i": 8, "influential": 2, "raw": 33, "gen": {"deepseek": 1, "kimi": 1, "glm": 0, "claude": 1}}
+{"field": "MED", "i": 9, "influential": 0, "raw": 8, "gen": {"deepseek": 2, "kimi": 1, "glm": 1, "claude": 1}}
+{"field": "MED", "i": 10, "influential": 2, "raw": 31, "gen": {"deepseek": 1, "kimi": 1, "glm": 0, "claude": 2}}
+{"field": "MED", "i": 11, "influential": 0, "raw": 10, "gen": {"deepseek": 0, "kimi": 0, "glm": 0, "claude": 1}}
+{"field": "MED", "i": 12, "influential": 1, "raw": 14, "gen": {"deepseek": 2, "kimi": 2, "glm": 1, "claude": 2}}
+{"field": "MED", "i": 13, "influential": 1, "raw": 39, "gen": {"deepseek": 1, "kimi": 1, "glm": 0, "claude": 1}}
+{"field": "MED", "i": 14, "influential": 0, "raw": 15, "gen": {"deepseek": 1, "kimi": 1, "glm": 1, "claude": 2}}
+{"field": "MED", "i": 15, "influential": 2, "raw": 7, "gen": {"deepseek": 0, "kimi": 1, "glm": 0, "claude": 2}}
+{"field": "MED", "i": 16, "influential": 3, "raw": 16, "gen": {"deepseek": 1, "kimi": 0, "glm": 1, "claude": 1}}
+{"field": "MED", "i": 17, "influential": 1, "raw": 63, "gen": {"deepseek": 2, "kimi": 2, "glm": 1, "claude": 3}}
+{"field": "MED", "i": 18, "influential": 6, "raw": 70, "gen": {"deepseek": 1, "kimi": 1, "glm": 0, "claude": 1}}
+{"field": "MED", "i": 19, "influential": 0, "raw": 7, "gen": {"deepseek": 1, "kimi": 1, "glm": 1, "claude": 1}}
+{"field": "MED", "i": 20, "influential": 2, "raw": 70, "gen": {"deepseek": 2, "kimi": 2, "glm": 1, "claude": 2}}
+{"field": "MED", "i": 21, "influential": 3, "raw": 21, "gen": {"deepseek": 1, "kimi": 1, "glm": 0, "claude": 1}}
+{"field": "MED", "i": 22, "influential": 3, "raw": 27, "gen": {"deepseek": 1, "kimi": 1, "glm": 0, "claude": 1}}
+{"field": "MED", "i": 23, "influential": 0, "raw": 5, "gen": {"deepseek": 0, "kimi": 0, "glm": 0, "claude": 1}}
+{"field": "MED", "i": 24, "influential": 0, "raw": 5, "gen": {"deepseek": 2, "kimi": 2, "glm": 1, "claude": 3}}
+{"field": "MED", "i": 25, "influential": 2, "raw": 27, "gen": {"deepseek": 2, "glm": 1, "claude": 2}}
+{"field": "MED", "i": 26, "influential": 2, "raw": 71, "gen": {"deepseek": 2, "kimi": 2, "glm": 1, "claude": 4}}
+{"field": "MED", "i": 27, "influential": 3, "raw": 66, "gen": {"deepseek": 0, "kimi": 0, "glm": 0, "claude": 1}}
+{"field": "MED", "i": 28, "influential": 1, "raw": 22, "gen": {"deepseek": 1, "kimi": 1, "glm": 0, "claude": 1}}
+{"field": "MED", "i": 29, "influential": 0, "raw": 6, "gen": {"deepseek": 0, "glm": 0, "claude": 1}}
+{"field": "MED", "i": 30, "influential": 2, "raw": 41, "gen": {"deepseek": 2, "kimi": 5, "glm": 1, "claude": 3}}
+{"field": "MED", "i": 31, "influential": 4, "raw": 74, "gen": {"deepseek": 1, "kimi": 2, "glm": 1, "claude": 2}}
+{"field": "MED", "i": 32, "influential": 0, "raw": 10, "gen": {"deepseek": 1, "kimi": 0, "glm": 0, "claude": 1}}
+{"field": "MED", "i": 33, "influential": 0, "raw": 10, "gen": {"deepseek": 1, "kimi": 1, "glm": 0, "claude": 1}}
+{"field": "MED", "i": 34, "influential": 0, "raw": 8, "gen": {"deepseek": 1, "kimi": 0, "glm": 0, "claude": 1}}
+{"field": "MED", "i": 35, "influential": 3, "raw": 52, "gen": {"deepseek": 2, "kimi": 1, "glm": 1, "claude": 2}}
+{"field": "MED", "i": 36, "influential": 1, "raw": 13, "gen": {"deepseek": 2, "kimi": 1, "glm": 1, "claude": 2}}
+{"field": "MED", "i": 37, "influential": 3, "raw": 53, "gen": {"deepseek": 1, "kimi": 1, "glm": 0, "claude": 1}}
+{"field": "MED", "i": 38, "influential": 0, "raw": 14, "gen": {"deepseek": 0, "kimi": 1, "glm": 0, "claude": 1}}
+{"field": "MED", "i": 39, "influential": 1, "raw": 31, "gen": {"deepseek": 1, "kimi": 1, "glm": 0, "claude": 1}}
+{"field": "MED", "i": 40, "influential": 0, "raw": 23, "gen": {"deepseek": 0, "kimi": 1, "glm": 0, "claude": 1}}
+{"field": "MED", "i": 41, "influential": 0, "raw": 5, "gen": {"deepseek": 7, "kimi": 2, "glm": 2, "claude": 2}}
+{"field": "MED", "i": 42, "influential": 12, "raw": 342, "gen": {"deepseek": 2, "kimi": 1, "glm": 1, "claude": 4}}
+{"field": "MED", "i": 43, "influential": 0, "raw": 21, "gen": {"deepseek": 1, "kimi": 1, "glm": 1, "claude": 1}}
+{"field": "MED", "i": 44, "influential": 3, "raw": 46, "gen": {"deepseek": 0, "kimi": 1, "glm": 1, "claude": 2}}
+{"field": "MED", "i": 45, "influential": 0, "raw": 25, "gen": {"deepseek": 2, "kimi": 1, "glm": 2, "claude": 2}}
+{"field": "MED", "i": 46, "influential": 0, "raw": 26, "gen": {"deepseek": 1, "kimi": 1, "glm": 0, "claude": 2}}
+{"field": "MED", "i": 47, "influential": 3, "raw": 22, "gen": {"deepseek": 1, "kimi": 0, "glm": 0, "claude": 1}}
+{"field": "MED", "i": 48, "influential": 1, "raw": 13, "gen": {"deepseek": 2, "kimi": 1, "glm": 1, "claude": 2}}
+{"field": "MED", "i": 49, "influential": 1, "raw": 53, "gen": {"deepseek": 1, "kimi": 0, "glm": 0, "claude": 2}}
+{"field": "MED", "i": 50, "influential": 0, "raw": 6, "gen": {"deepseek": 1, "kimi": 1, "glm": 1, "claude": 1}}
+{"field": "MED", "i": 51, "influential": 3, "raw": 43, "gen": {"deepseek": 2, "kimi": 3, "glm": 2, "claude": 4}}
+{"field": "MED", "i": 52, "influential": 1, "raw": 28, "gen": {"deepseek": 0, "kimi": 1, "glm": 0, "claude": 1}}
+{"field": "MED", "i": 53, "influential": 2, "raw": 22, "gen": {"deepseek": 1, "kimi": 1, "glm": 1, "claude": 3}}
+{"field": "MED", "i": 54, "influential": 0, "raw": 7, "gen": {"deepseek": 1, "kimi": 1, "glm": 0, "claude": 1}}
+{"field": "MED", "i": 55, "influential": 1, "raw": 28, "gen": {"deepseek": 0, "kimi": 0, "glm": 0, "claude": 1}}
+{"field": "MED", "i": 56, "influential": 0, "raw": 9, "gen": {"deepseek": 2, "kimi": 1, "glm": 1, "claude": 2}}
+{"field": "MED", "i": 57, "influential": 0, "raw": 22, "gen": {"deepseek": 0, "kimi": 0, "glm": 0, "claude": 1}}
+{"field": "MED", "i": 58, "influential": 1, "raw": 20, "gen": {"deepseek": 1, "kimi": 1, "glm": 1, "claude": 2}}
+{"field": "MED", "i": 59, "influential": 1, "raw": 13, "gen": {"deepseek": 2, "kimi": 1, "glm": 0, "claude": 1}}
+{"field": "MED", "i": 60, "influential": 3, "raw": 24, "gen": {"deepseek": 0, "kimi": 1, "glm": 1, "claude": 2}}
+{"field": "MED", "i": 61, "influential": 2, "raw": 67, "gen": {"deepseek": 2, "kimi": 2, "glm": 0, "claude": 3}}
+{"field": "MED", "i": 62, "influential": 0, "raw": 36, "gen": {"deepseek": 2, "kimi": 2, "glm": 1, "claude": 3}}
+{"field": "MED", "i": 63, "influential": 0, "raw": 5, "gen": {"deepseek": 1, "kimi": 1, "glm": 1, "claude": 1}}
+{"field": "MED", "i": 64, "influential": 5, "raw": 116, "gen": {"deepseek": 1, "kimi": 3, "glm": 1, "claude": 3}}
+{"field": "MED", "i": 65, "influential": 0, "raw": 9, "gen": {"deepseek": 1, "kimi": 1, "glm": 0, "claude": 1}}
+{"field": "MED", "i": 66, "influential": 1, "raw": 58, "gen": {"deepseek": 1, "kimi": 1, "glm": 0, "claude": 3}}
+{"field": "MED", "i": 67, "influential": 0, "raw": 26, "gen": {"deepseek": 2, "kimi": 2, "glm": 2, "claude": 4}}
+{"field": "MED", "i": 68, "influential": 3, "raw": 54, "gen": {"deepseek": 2, "kimi": 1, "glm": 0, "claude": 2}}
+{"field": "MED", "i": 69, "influential": 3, "raw": 31, "gen": {"deepseek": 1, "kimi": 2, "glm": 3, "claude": 2}}
+{"field": "MED", "i": 70, "influential": 8, "raw": 245, "gen": {"deepseek": 2, "kimi": 1, "glm": 1, "claude": 2}}
+{"field": "MED", "i": 71, "influential": 4, "raw": 63, "gen": {"deepseek": 1, "kimi": 1, "glm": 0, "claude": 2}}
+{"field": "MED", "i": 72, "influential": 0, "raw": 17, "gen": {"deepseek": 1, "kimi": 1, "glm": 0, "claude": 1}}
+{"field": "MED", "i": 73, "influential": 1, "raw": 17, "gen": {"deepseek": 0, "kimi": 1, "glm": 0, "claude": 1}}
+{"field": "MED", "i": 74, "influential": 0, "raw": 15, "gen": {"deepseek": 1, "kimi": 1, "glm": 0, "claude": 2}}
+{"field": "MED", "i": 75, "influential": 2, "raw": 31, "gen": {"deepseek": 1, "kimi": 1, "glm": 0}}
+{"field": "MED", "i": 76, "influential": 1, "raw": 10, "gen": {"deepseek": 1, "kimi": 0, "glm": 0}}
+{"field": "MED", "i": 77, "influential": 0, "raw": 7, "gen": {"deepseek": 1, "kimi": 1, "glm": 0}}
+{"field": "MED", "i": 78, "influential": 1, "raw": 76, "gen": {"deepseek": 2, "kimi": 1, "glm": 1}}
+{"field": "MED", "i": 79, "influential": 0, "raw": 10, "gen": {"deepseek": 2, "glm": 1}}
+{"field": "MED", "i": 80, "influential": 0, "raw": 20, "gen": {"deepseek": 1, "kimi": 0, "glm": 0}}
+{"field": "MED", "i": 81, "influential": 3, "raw": 91, "gen": {"deepseek": 2, "kimi": 2, "glm": 1}}
+{"field": "MED", "i": 82, "influential": 2, "raw": 17, "gen": {"deepseek": 5, "kimi": 3, "glm": 3}}
+{"field": "MED", "i": 83, "influential": 0, "raw": 46, "gen": {"deepseek": 2, "kimi": 1, "glm": 1}}
+{"field": "MED", "i": 84, "influential": 0, "raw": 6, "gen": {"deepseek": 2, "kimi": 3, "glm": 2}}
+{"field": "MED", "i": 85, "influential": 0, "raw": 26, "gen": {"deepseek": 1, "kimi": 1, "glm": 0}}
+{"field": "MED", "i": 86, "influential": 0, "raw": 6, "gen": {"deepseek": 2, "kimi": 1, "glm": 1}}
+{"field": "MED", "i": 87, "influential": 1, "raw": 5, "gen": {"deepseek": 1, "kimi": 1, "glm": 0}}
+{"field": "MED", "i": 88, "influential": 7, "raw": 116, "gen": {"deepseek": 1, "kimi": 0, "glm": 1}}
+{"field": "MED", "i": 89, "influential": 0, "raw": 12, "gen": {"deepseek": 2, "kimi": 2, "glm": 1}}
+{"field": "MED", "i": 90, "influential": 8, "raw": 212, "gen": {"deepseek": 1, "kimi": 2, "glm": 0}}
+{"field": "MED", "i": 91, "influential": 11, "raw": 102, "gen": {"deepseek": 1, "kimi": 1, "glm": 1}}
+{"field": "MED", "i": 92, "influential": 0, "raw": 13, "gen": {"deepseek": 2, "kimi": 1, "glm": 1}}
+{"field": "MED", "i": 93, "influential": 3, "raw": 47, "gen": {"deepseek": 2, "kimi": 3, "glm": 2}}
+{"field": "MED", "i": 94, "influential": 0, "raw": 5, "gen": {"deepseek": 1, "kimi": 1, "glm": 1}}
+{"field": "MED", "i": 95, "influential": 0, "raw": 5, "gen": {"deepseek": 0, "kimi": 1, "glm": 0}}
+{"field": "MED", "i": 96, "influential": 2, "raw": 14, "gen": {"deepseek": 1, "kimi": 1, "glm": 0}}
+{"field": "MED", "i": 97, "influential": 0, "raw": 15, "gen": {"deepseek": 1, "kimi": 1, "glm": 0}}
+{"field": "MED", "i": 98, "influential": 8, "raw": 109, "gen": {"deepseek": 1, "kimi": 1, "glm": 0}}
+{"field": "MED", "i": 99, "influential": 4, "raw": 80, "gen": {"deepseek": 1, "kimi": 1, "glm": 1}}
+{"field": "MED", "i": 100, "influential": 2, "raw": 45, "gen": {"deepseek": 1, "kimi": 1, "glm": 0}}
+{"field": "MED", "i": 101, "influential": 2, "raw": 33, "gen": {"deepseek": 0, "kimi": 1, "glm": 0}}
+{"field": "MED", "i": 102, "influential": 0, "raw": 8, "gen": {"deepseek": 0, "kimi": 0, "glm": 0}}
+{"field": "MED", "i": 103, "influential": 0, "raw": 18, "gen": {"deepseek": 2, "kimi": 1, "glm": 1}}
+{"field": "MED", "i": 104, "influential": 3, "raw": 25, "gen": {"deepseek": 0, "kimi": 1, "glm": 0}}
+{"field": "MED", "i": 105, "influential": 0, "raw": 71, "gen": {"deepseek": 1, "kimi": 1, "glm": 0}}
+{"field": "MED", "i": 106, "influential": 3, "raw": 82, "gen": {"deepseek": 1, "kimi": 2, "glm": 1}}
+{"field": "MED", "i": 107, "influential": 0, "raw": 20, "gen": {"deepseek": 1, "kimi": 1, "glm": 0}}
+{"field": "MED", "i": 108, "influential": 2, "raw": 27, "gen": {"deepseek": 1, "kimi": 1, "glm": 0}}
+{"field": "MED", "i": 109, "influential": 1, "raw": 16, "gen": {"deepseek": 1, "kimi": 1, "glm": 1}}
+{"field": "MED", "i": 110, "influential": 0, "raw": 9, "gen": {"deepseek": 2, "kimi": 2, "glm": 1}}
+{"field": "MED", "i": 111, "influential": 0, "raw": 13, "gen": {"deepseek": 1, "kimi": 1, "glm": 1}}
+{"field": "MED", "i": 112, "influential": 0, "raw": 5, "gen": {"deepseek": 1, "kimi": 1, "glm": 1}}
+{"field": "MED", "i": 113, "influential": 0, "raw": 30, "gen": {"deepseek": 0, "kimi": 1, "glm": 0}}
+{"field": "MED", "i": 114, "influential": 1, "raw": 29, "gen": {"deepseek": 0, "kimi": 1, "glm": 0}}
+{"field": "MED", "i": 115, "influential": 0, "raw": 24, "gen": {"deepseek": 2, "kimi": 1, "glm": 1}}
+{"field": "MED", "i": 116, "influential": 2, "raw": 38, "gen": {"deepseek": 2, "kimi": 2, "glm": 1}}
+{"field": "MED", "i": 117, "influential": 0, "raw": 18, "gen": {"deepseek": 1, "kimi": 0, "glm": 1}}
+{"field": "MED", "i": 118, "influential": 0, "raw": 12, "gen": {"deepseek": 1, "kimi": 1, "glm": 1}}
+{"field": "MED", "i": 119, "influential": 14, "raw": 208, "gen": {"deepseek": 1, "kimi": 0, "glm": 0}}
+{"field": "MED", "i": 120, "influential": 1, "raw": 27, "gen": {"deepseek": 1, "kimi": 0, "glm": 0}}
+{"field": "MED", "i": 121, "influential": 0, "raw": 40, "gen": {"deepseek": 2, "kimi": 1, "glm": 1}}
+{"field": "MED", "i": 122, "influential": 23, "raw": 306, "gen": {"deepseek": 1, "kimi": 2, "glm": 1}}
+{"field": "MED", "i": 123, "influential": 3, "raw": 40, "gen": {"deepseek": 2, "kimi": 1, "glm": 0}}
+{"field": "MED", "i": 124, "influential": 2, "raw": 82, "gen": {"deepseek": 1, "kimi": 1, "glm": 0}}
+{"field": "MED", "i": 125, "influential": 3, "raw": 18, "gen": {"deepseek": 1, "kimi": 1, "glm": 0}}
+{"field": "MED", "i": 126, "influential": 0, "raw": 14, "gen": {"deepseek": 0, "kimi": 0, "glm": 0}}
+{"field": "MED", "i": 127, "influential": 0, "raw": 10, "gen": {"deepseek": 1, "kimi": 1, "glm": 0}}
+{"field": "MED", "i": 128, "influential": 0, "raw": 33, "gen": {"deepseek": 1, "kimi": 1, "glm": 0}}
+{"field": "MED", "i": 129, "influential": 3, "raw": 59, "gen": {"deepseek": 1, "kimi": 1, "glm": 1}}
+{"field": "MED", "i": 130, "influential": 0, "raw": 5, "gen": {"deepseek": 1, "kimi": 1, "glm": 0}}
+{"field": "MED", "i": 131, "influential": 0, "raw": 16, "gen": {"deepseek": 6, "kimi": 5, "glm": 2}}
+{"field": "MED", "i": 132, "influential": 0, "raw": 15, "gen": {"deepseek": 1, "kimi": 1, "glm": 0}}
+{"field": "MED", "i": 133, "influential": 0, "raw": 8, "gen": {"deepseek": 1, "kimi": 0, "glm": 0}}
+{"field": "MED", "i": 134, "influential": 0, "raw": 24, "gen": {"deepseek": 2, "kimi": 1, "glm": 0}}
+{"field": "MED", "i": 135, "influential": 7, "raw": 153, "gen": {"deepseek": 2, "kimi": 2, "glm": 1}}
+{"field": "MED", "i": 136, "influential": 1, "raw": 8, "gen": {"deepseek": 7, "kimi": 8, "glm": 6}}
+{"field": "MED", "i": 137, "influential": 4, "raw": 29, "gen": {"deepseek": 1, "kimi": 1, "glm": 0}}
+{"field": "MED", "i": 138, "influential": 0, "raw": 8, "gen": {"deepseek": 1, "kimi": 1, "glm": 0}}
+{"field": "MED", "i": 139, "influential": 1, "raw": 81, "gen": {"deepseek": 1, "kimi": 1, "glm": 0}}
+{"field": "MED", "i": 140, "influential": 0, "raw": 9, "gen": {"deepseek": 1, "kimi": 1, "glm": 0}}
+{"field": "MED", "i": 141, "influential": 0, "raw": 17, "gen": {"deepseek": 1, "kimi": 0, "glm": 0}}
+{"field": "MED", "i": 142, "influential": 5, "raw": 114, "gen": {"deepseek": 6, "kimi": 7, "glm": 7}}
+{"field": "MED", "i": 143, "influential": 3, "raw": 29, "gen": {"deepseek": 1, "kimi": 1, "glm": 0}}
+{"field": "MED", "i": 144, "influential": 0, "raw": 31, "gen": {"deepseek": 3, "kimi": 3, "glm": 2}}
+{"field": "MED", "i": 145, "influential": 17, "raw": 486, "gen": {"deepseek": 2, "kimi": 1, "glm": 1}}
+{"field": "MED", "i": 146, "influential": 0, "raw": 20, "gen": {"deepseek": 1, "kimi": 2, "glm": 2}}
+{"field": "MED", "i": 147, "influential": 0, "raw": 9, "gen": {"deepseek": 1, "kimi": 1, "glm": 0}}
+{"field": "MED", "i": 148, "influential": 0, "raw": 29, "gen": {"deepseek": 0, "kimi": 1, "glm": 0}}
+{"field": "MED", "i": 149, "influential": 1, "raw": 20, "gen": {"deepseek": 1, "kimi": 0, "glm": 0}}
+{"field": "MED", "i": 150, "influential": 0, "raw": 14, "gen": {"deepseek": 1, "kimi": 1, "glm": 0}}
+{"field": "MED", "i": 151, "influential": 0, "raw": 5, "gen": {"deepseek": 1, "kimi": 0, "glm": 0}}
+{"field": "MED", "i": 152, "influential": 0, "raw": 22, "gen": {"deepseek": 1, "kimi": 1, "glm": 1}}
+{"field": "MED", "i": 153, "influential": 0, "raw": 19, "gen": {"deepseek": 2, "kimi": 1, "glm": 1}}
+{"field": "MED", "i": 154, "influential": 1, "raw": 15, "gen": {"deepseek": 0, "kimi": 1, "glm": 0}}
+{"field": "MED", "i": 155, "influential": 1, "raw": 21, "gen": {"deepseek": 2, "kimi": 3, "glm": 1}}
+{"field": "MED", "i": 156, "influential": 3, "raw": 20, "gen": {"deepseek": 2, "kimi": 1, "glm": 0}}
+{"field": "MED", "i": 157, "influential": 0, "raw": 22, "gen": {"deepseek": 0, "kimi": 0, "glm": 0}}
+{"field": "MED", "i": 158, "influential": 0, "raw": 5, "gen": {"deepseek": 1, "kimi": 1, "glm": 0}}
+{"field": "MED", "i": 159, "influential": 0, "raw": 11, "gen": {"deepseek": 0, "kimi": 1, "glm": 0}}
+{"field": "MED", "i": 160, "influential": 1, "raw": 23, "gen": {"deepseek": 1, "kimi": 1, "glm": 1}}
+{"field": "MED", "i": 161, "influential": 2, "raw": 47, "gen": {"deepseek": 2, "kimi": 1, "glm": 1}}
+{"field": "MED", "i": 162, "influential": 0, "raw": 21, "gen": {"deepseek": 2, "kimi": 1, "glm": 2}}
+{"field": "MED", "i": 163, "influential": 3, "raw": 103, "gen": {"deepseek": 2, "kimi": 1, "glm": 0}}
+{"field": "MED", "i": 164, "influential": 1, "raw": 13, "gen": {"deepseek": 1, "kimi": 1, "glm": 0}}
+{"field": "MED", "i": 165, "influential": 1, "raw": 10, "gen": {"deepseek": 1, "kimi": 0, "glm": 0}}
+{"field": "MED", "i": 166, "influential": 1, "raw": 20, "gen": {"deepseek": 2, "kimi": 3, "glm": 1}}
+{"field": "MED", "i": 167, "influential": 0, "raw": 12, "gen": {"deepseek": 1, "kimi": 1, "glm": 1}}
+{"field": "MED", "i": 168, "influential": 2, "raw": 29, "gen": {"deepseek": 2, "kimi": 1, "glm": 0}}
+{"field": "MED", "i": 169, "influential": 1, "raw": 21, "gen": {"deepseek": 1, "kimi": 1, "glm": 0}}
+{"field": "MED", "i": 170, "influential": 1, "raw": 9, "gen": {"deepseek": 1, "kimi": 1, "glm": 0}}
+{"field": "MED", "i": 171, "influential": 3, "raw": 22, "gen": {"deepseek": 1, "kimi": 1, "glm": 1}}
+{"field": "MED", "i": 172, "influential": 1, "raw": 9, "gen": {"deepseek": 1, "kimi": 1, "glm": 0}}
+{"field": "MED", "i": 173, "influential": 0, "raw": 12, "gen": {"deepseek": 0, "kimi": 0, "glm": 0}}
+{"field": "MED", "i": 174, "influential": 0, "raw": 22, "gen": {"deepseek": 0, "kimi": 1, "glm": 0}}
+{"field": "MED", "i": 175, "influential": 2, "raw": 31, "gen": {"deepseek": 1, "kimi": 0, "glm": 0}}
+{"field": "MED", "i": 176, "influential": 10, "raw": 90, "gen": {"deepseek": 8, "kimi": 6, "glm": 8}}
+{"field": "MED", "i": 177, "influential": 2, "raw": 59, "gen": {"deepseek": 2, "kimi": 1, "glm": 0}}
+{"field": "MED", "i": 178, "influential": 1, "raw": 11, "gen": {"deepseek": 0, "kimi": 1, "glm": 1}}
+{"field": "MED", "i": 179, "influential": 3, "raw": 27, "gen": {"deepseek": 8, "kimi": 8, "glm": 8}}
+{"field": "MED", "i": 180, "influential": 0, "raw": 38, "gen": {"deepseek": 2, "kimi": 2, "glm": 1}}
+{"field": "MED", "i": 181, "influential": 1, "raw": 56, "gen": {"deepseek": 2, "kimi": 1, "glm": 1}}
+{"field": "MED", "i": 182, "influential": 2, "raw": 122, "gen": {"deepseek": 1, "kimi": 0, "glm": 0}}
+{"field": "MED", "i": 183, "influential": 2, "raw": 29, "gen": {"deepseek": 1, "kimi": 1, "glm": 0}}
+{"field": "MED", "i": 184, "influential": 3, "raw": 27, "gen": {"deepseek": 1, "kimi": 1, "glm": 1}}
+{"field": "MED", "i": 185, "influential": 0, "raw": 39, "gen": {"deepseek": 1, "kimi": 1, "glm": 0}}
+{"field": "MED", "i": 186, "influential": 1, "raw": 10, "gen": {"deepseek": 1, "kimi": 1, "glm": 0}}
+{"field": "MED", "i": 187, "influential": 0, "raw": 6, "gen": {"deepseek": 2, "kimi": 1, "glm": 0}}
+{"field": "MED", "i": 188, "influential": 1, "raw": 24, "gen": {"deepseek": 2, "kimi": 1, "glm": 1}}
+{"field": "MED", "i": 189, "influential": 3, "raw": 61, "gen": {"deepseek": 1, "kimi": 1, "glm": 0}}
+{"field": "MED", "i": 190, "influential": 0, "raw": 21, "gen": {"deepseek": 1, "kimi": 1, "glm": 1}}
+{"field": "MED", "i": 191, "influential": 2, "raw": 23, "gen": {"deepseek": 1, "kimi": 1, "glm": 0}}
+{"field": "MED", "i": 192, "influential": 4, "raw": 160, "gen": {"deepseek": 1, "kimi": 2, "glm": 1}}
+{"field": "MED", "i": 193, "influential": 0, "raw": 12, "gen": {"deepseek": 2, "kimi": 2, "glm": 1}}
+{"field": "MED", "i": 194, "influential": 2, "raw": 38, "gen": {"deepseek": 1, "kimi": 1, "glm": 0}}
+{"field": "MED", "i": 195, "influential": 4, "raw": 21, "gen": {"deepseek": 1, "kimi": 0, "glm": 0}}
+{"field": "MED", "i": 196, "influential": 1, "raw": 9, "gen": {"deepseek": 2, "kimi": 2}}
+{"field": "MED", "i": 197, "influential": 1, "raw": 20, "gen": {"deepseek": 0, "kimi": 1, "glm": 1}}
+{"field": "MED", "i": 198, "influential": 2, "raw": 38, "gen": {"deepseek": 1, "kimi": 1, "glm": 0}}
+{"field": "MED", "i": 199, "influential": 2, "raw": 177, "gen": {"deepseek": 2, "glm": 1}}
+{"field": "MED", "i": 200, "influential": 0, "raw": 20, "gen": {"deepseek": 1, "kimi": 1, "glm": 1}}
+{"field": "MED", "i": 201, "influential": 1, "raw": 15, "gen": {"deepseek": 1, "kimi": 0, "glm": 1}}
+{"field": "MED", "i": 202, "influential": 1, "raw": 14, "gen": {"deepseek": 2, "kimi": 1, "glm": 1}}
+{"field": "MED", "i": 203, "influential": 2, "raw": 95, "gen": {"deepseek": 1, "kimi": 2, "glm": 0}}
+{"field": "MED", "i": 204, "influential": 0, "raw": 36, "gen": {"deepseek": 2, "kimi": 1, "glm": 1}}
+{"field": "MED", "i": 205, "influential": 3, "raw": 30, "gen": {"deepseek": 3, "kimi": 2, "glm": 1}}
+{"field": "MED", "i": 206, "influential": 1, "raw": 51, "gen": {"deepseek": 1, "kimi": 0, "glm": 0}}
+{"field": "MED", "i": 207, "influential": 2, "raw": 30, "gen": {"deepseek": 2, "kimi": 1, "glm": 1}}
+{"field": "MED", "i": 208, "influential": 0, "raw": 17, "gen": {"deepseek": 0, "kimi": 0, "glm": 0}}
+{"field": "MED", "i": 209, "influential": 0, "raw": 11, "gen": {"deepseek": 1, "kimi": 0, "glm": 0}}
+{"field": "MED", "i": 210, "influential": 4, "raw": 85, "gen": {"deepseek": 1, "kimi": 1, "glm": 1}}
+{"field": "MED", "i": 211, "influential": 3, "raw": 19, "gen": {"deepseek": 1, "kimi": 0, "glm": 0}}
+{"field": "MED", "i": 212, "influential": 1, "raw": 131, "gen": {"deepseek": 2, "kimi": 2, "glm": 1}}
+{"field": "MED", "i": 213, "influential": 0, "raw": 9, "gen": {"deepseek": 2, "kimi": 1, "glm": 1}}
+{"field": "MED", "i": 214, "influential": 2, "raw": 34, "gen": {"deepseek": 0, "kimi": 0, "glm": 1}}
+{"field": "MED", "i": 215, "influential": 1, "raw": 11, "gen": {"deepseek": 0, "kimi": 0, "glm": 0}}
+{"field": "MED", "i": 216, "influential": 0, "raw": 15, "gen": {"deepseek": 1, "kimi": 1, "glm": 0}}
+{"field": "MED", "i": 217, "influential": 0, "raw": 19, "gen": {"deepseek": 1, "kimi": 1, "glm": 1}}
+{"field": "MED", "i": 218, "influential": 2, "raw": 91, "gen": {"deepseek": 9, "kimi": 6, "glm": 7}}
+{"field": "MED", "i": 219, "influential": 1, "raw": 16, "gen": {"deepseek": 1, "kimi": 2, "glm": 2}}
+{"field": "MED", "i": 220, "influential": 0, "raw": 24, "gen": {"deepseek": 1, "kimi": 0, "glm": 0}}
+{"field": "MED", "i": 221, "influential": 3, "raw": 39, "gen": {"deepseek": 1, "kimi": 1, "glm": 0}}
+{"field": "MED", "i": 222, "influential": 0, "raw": 14, "gen": {"deepseek": 1, "kimi": 1, "glm": 1}}
+{"field": "MED", "i": 223, "influential": 0, "raw": 7, "gen": {"deepseek": 2, "kimi": 1, "glm": 1}}
+{"field": "MED", "i": 224, "influential": 2, "raw": 40, "gen": {"deepseek": 2, "kimi": 4, "glm": 2}}
+{"field": "MED", "i": 225, "influential": 1, "raw": 34, "gen": {"deepseek": 1, "kimi": 0, "glm": 1}}
+{"field": "MED", "i": 226, "influential": 1, "raw": 7, "gen": {"deepseek": 1, "kimi": 1, "glm": 1}}
+{"field": "MED", "i": 227, "influential": 1, "raw": 15, "gen": {"deepseek": 1, "kimi": 0, "glm": 0}}
+{"field": "MED", "i": 228, "influential": 0, "raw": 5, "gen": {"deepseek": 2, "kimi": 1, "glm": 1}}
+{"field": "MED", "i": 229, "influential": 3, "raw": 16, "gen": {"deepseek": 0, "kimi": 0, "glm": 0}}
+{"field": "MED", "i": 230, "influential": 0, "raw": 8, "gen": {"deepseek": 2, "kimi": 1, "glm": 1}}
+{"field": "MED", "i": 231, "influential": 0, "raw": 12, "gen": {"deepseek": 0, "kimi": 1, "glm": 0}}
+{"field": "MED", "i": 232, "influential": 3, "raw": 80, "gen": {"deepseek": 1, "kimi": 0, "glm": 1}}
+{"field": "MED", "i": 233, "influential": 1, "raw": 32, "gen": {"deepseek": 4, "kimi": 2, "glm": 2}}
+{"field": "MED", "i": 234, "influential": 10, "raw": 148, "gen": {"deepseek": 1, "kimi": 1, "glm": 0}}
+{"field": "MED", "i": 235, "influential": 1, "raw": 11, "gen": {"deepseek": 2, "kimi": 1, "glm": 1}}
+{"field": "MED", "i": 236, "influential": 3, "raw": 49, "gen": {"deepseek": 1, "kimi": 1, "glm": 0}}
+{"field": "MED", "i": 237, "influential": 1, "raw": 24, "gen": {"deepseek": 1, "kimi": 1, "glm": 0}}
+{"field": "MED", "i": 238, "influential": 0, "raw": 9, "gen": {"deepseek": 1, "kimi": 1, "glm": 0}}
+{"field": "MED", "i": 239, "influential": 1, "raw": 21, "gen": {"deepseek": 2, "kimi": 3, "glm": 1}}
+{"field": "MED", "i": 240, "influential": 1, "raw": 38, "gen": {"deepseek": 2, "kimi": 2, "glm": 1}}
+{"field": "MED", "i": 241, "influential": 3, "raw": 125, "gen": {"deepseek": 7, "kimi": 5, "glm": 3}}
+{"field": "MED", "i": 242, "influential": 2, "raw": 15, "gen": {"deepseek": 2, "kimi": 1, "glm": 1}}
+{"field": "MED", "i": 243, "influential": 4, "raw": 52, "gen": {"deepseek": 0, "kimi": 1, "glm": 1}}
+{"field": "MED", "i": 244, "influential": 0, "raw": 8, "gen": {"deepseek": 0, "kimi": 1, "glm": 1}}
+{"field": "MED", "i": 245, "influential": 1, "raw": 21, "gen": {"deepseek": 0, "kimi": 0, "glm": 0}}
+{"field": "MED", "i": 246, "influential": 1, "raw": 15, "gen": {"deepseek": 1, "kimi": 1, "glm": 0}}
+{"field": "MED", "i": 247, "influential": 0, "raw": 105, "gen": {"deepseek": 1, "kimi": 0, "glm": 0}}
+{"field": "MED", "i": 248, "influential": 0, "raw": 36, "gen": {"deepseek": 1, "kimi": 1, "glm": 1}}
+{"field": "MED", "i": 249, "influential": 0, "raw": 21, "gen": {"deepseek": 1, "kimi": 1, "glm": 0}}
+{"field": "MED", "i": 250, "influential": 0, "raw": 20, "gen": {"deepseek": 1, "kimi": 1, "glm": 0}}
+{"field": "MED", "i": 251, "influential": 0, "raw": 12, "gen": {"deepseek": 1, "kimi": 0, "glm": 0}}
+{"field": "MED", "i": 252, "influential": 3, "raw": 55, "gen": {"deepseek": 2, "kimi": 1, "glm": 0}}
+{"field": "MED", "i": 253, "influential": 9, "raw": 263, "gen": {"deepseek": 8, "kimi": 6, "glm": 2}}
+{"field": "MED", "i": 254, "influential": 1, "raw": 128, "gen": {"deepseek": 2, "kimi": 1, "glm": 1}}
+{"field": "MED", "i": 255, "influential": 2, "raw": 23, "gen": {"deepseek": 1, "kimi": 1, "glm": 0}}
+{"field": "MED", "i": 256, "influential": 1, "raw": 33, "gen": {"deepseek": 1, "kimi": 1, "glm": 0}}
+{"field": "MED", "i": 257, "influential": 0, "raw": 33, "gen": {"deepseek": 2, "kimi": 3, "glm": 0}}
+{"field": "MED", "i": 258, "influential": 7, "raw": 56, "gen": {"deepseek": 1, "kimi": 1, "glm": 0}}
+{"field": "MED", "i": 259, "influential": 2, "raw": 27, "gen": {"deepseek": 2, "kimi": 2, "glm": 1}}
+{"field": "MED", "i": 260, "influential": 0, "raw": 7, "gen": {"deepseek": 2, "kimi": 2, "glm": 1}}
+{"field": "MED", "i": 261, "influential": 1, "raw": 9, "gen": {"deepseek": 1, "kimi": 0, "glm": 1}}
+{"field": "MED", "i": 262, "influential": 0, "raw": 39, "gen": {"deepseek": 1, "kimi": 1, "glm": 0}}
+{"field": "MED", "i": 263, "influential": 1, "raw": 66, "gen": {"deepseek": 1, "kimi": 0, "glm": 0}}
+{"field": "MED", "i": 264, "influential": 10, "raw": 269, "gen": {"deepseek": 2, "kimi": 1, "glm": 1}}
+{"field": "MED", "i": 265, "influential": 1, "raw": 38, "gen": {"deepseek": 1, "kimi": 1, "glm": 1}}
+{"field": "MED", "i": 266, "influential": 0, "raw": 7, "gen": {"deepseek": 1, "kimi": 2, "glm": 1}}
+{"field": "MED", "i": 267, "influential": 2, "raw": 30, "gen": {"deepseek": 1, "kimi": 1, "glm": 0}}
+{"field": "MED", "i": 268, "influential": 2, "raw": 93, "gen": {"deepseek": 1, "kimi": 2, "glm": 1}}
+{"field": "MED", "i": 269, "influential": 0, "raw": 37, "gen": {"deepseek": 1, "kimi": 1, "glm": 0}}
+{"field": "MED", "i": 270, "influential": 0, "raw": 13, "gen": {"deepseek": 2, "kimi": 1, "glm": 1}}
+{"field": "MED", "i": 271, "influential": 1, "raw": 16, "gen": {"deepseek": 0, "kimi": 1, "glm": 0}}
+{"field": "MED", "i": 272, "influential": 0, "raw": 16, "gen": {"deepseek": 0, "kimi": 1, "glm": 1}}
+{"field": "MED", "i": 273, "influential": 0, "raw": 15, "gen": {"deepseek": 1, "kimi": 1, "glm": 1}}
+{"field": "MED", "i": 274, "influential": 3, "raw": 103, "gen": {"deepseek": 2, "kimi": 1, "glm": 1}}
+{"field": "MED", "i": 275, "influential": 4, "raw": 39, "gen": {"deepseek": 2, "kimi": 1, "glm": 1}}
+{"field": "MED", "i": 276, "influential": 3, "raw": 56, "gen": {"deepseek": 1, "kimi": 1, "glm": 0}}
+{"field": "MED", "i": 277, "influential": 0, "raw": 17, "gen": {"deepseek": 0, "kimi": 1, "glm": 1}}
+{"field": "MED", "i": 278, "influential": 4, "raw": 22, "gen": {"deepseek": 1, "kimi": 1, "glm": 0}}
+{"field": "MED", "i": 279, "influential": 0, "raw": 11, "gen": {"deepseek": 2, "kimi": 1, "glm": 1}}
+{"field": "MED", "i": 280, "influential": 0, "raw": 16, "gen": {"deepseek": 1, "kimi": 1, "glm": 0}}
+{"field": "MED", "i": 281, "influential": 0, "raw": 10, "gen": {"deepseek": 1, "kimi": 1, "glm": 1}}
+{"field": "MED", "i": 282, "influential": 1, "raw": 36, "gen": {"deepseek": 2, "kimi": 1, "glm": 0}}
+{"field": "MED", "i": 283, "influential": 0, "raw": 32, "gen": {"deepseek": 1, "kimi": 1, "glm": 0}}
+{"field": "MED", "i": 284, "influential": 2, "raw": 69, "gen": {"deepseek": 1, "kimi": 1, "glm": 0}}
+{"field": "MED", "i": 285, "influential": 1, "raw": 18, "gen": {"deepseek": 0, "kimi": 1, "glm": 0}}
+{"field": "MED", "i": 286, "influential": 10, "raw": 135, "gen": {"deepseek": 2, "kimi": 3, "glm": 1}}
+{"field": "MED", "i": 287, "influential": 0, "raw": 22, "gen": {"deepseek": 1, "kimi": 1, "glm": 0}}
+{"field": "MED", "i": 288, "influential": 0, "raw": 8, "gen": {"deepseek": 0, "kimi": 0, "glm": 0}}
+{"field": "MED", "i": 289, "influential": 2, "raw": 44, "gen": {"deepseek": 0, "kimi": 1, "glm": 0}}
+{"field": "MED", "i": 290, "influential": 1, "raw": 37, "gen": {"deepseek": 1, "kimi": 1, "glm": 1}}
+{"field": "MED", "i": 291, "influential": 0, "raw": 45, "gen": {"deepseek": 1, "kimi": 1, "glm": 0}}
+{"field": "MED", "i": 292, "influential": 0, "raw": 17, "gen": {"deepseek": 0, "kimi": 0, "glm": 0}}
+{"field": "MED", "i": 293, "influential": 0, "raw": 36, "gen": {"deepseek": 1, "kimi": 1, "glm": 0}}
+{"field": "MED", "i": 294, "influential": 0, "raw": 10, "gen": {"deepseek": 1, "kimi": 0, "glm": 0}}
+{"field": "MED", "i": 295, "influential": 0, "raw": 6, "gen": {"deepseek": 1, "kimi": 2, "glm": 1}}
+{"field": "MED", "i": 296, "influential": 3, "raw": 63, "gen": {"deepseek": 1, "kimi": 2, "glm": 1}}
+{"field": "MED", "i": 297, "influential": 0, "raw": 17, "gen": {"deepseek": 2, "kimi": 2, "glm": 1}}
+{"field": "MED", "i": 298, "influential": 0, "raw": 8, "gen": {"deepseek": 1, "kimi": 1, "glm": 1}}
+{"field": "MED", "i": 299, "influential": 0, "raw": 30, "gen": {"deepseek": 1, "kimi": 1, "glm": 1}}
+{"field": "MED", "i": 300, "influential": 0, "raw": 9, "gen": {"deepseek": 0, "kimi": 1, "glm": 1}}
+{"field": "MED", "i": 301, "influential": 0, "raw": 15, "gen": {"deepseek": 1, "kimi": 1, "glm": 0}}
+{"field": "MED", "i": 302, "influential": 1, "raw": 23, "gen": {"deepseek": 1, "kimi": 1, "glm": 0}}
+{"field": "MED", "i": 303, "influential": 1, "raw": 34, "gen": {"deepseek": 2, "kimi": 2, "glm": 1}}
+{"field": "MED", "i": 304, "influential": 0, "raw": 15, "gen": {"deepseek": 0, "kimi": 0, "glm": 0}}
+{"field": "MED", "i": 305, "influential": 7, "raw": 97, "gen": {"deepseek": 1, "kimi": 1, "glm": 1}}
+{"field": "MED", "i": 306, "influential": 1, "raw": 45, "gen": {"deepseek": 1, "kimi": 1, "glm": 0}}
+{"field": "MED", "i": 307, "influential": 0, "raw": 14, "gen": {"deepseek": 0, "kimi": 1, "glm": 0}}
+{"field": "MED", "i": 308, "influential": 0, "raw": 6, "gen": {"deepseek": 2, "kimi": 1, "glm": 0}}
+{"field": "MED", "i": 309, "influential": 0, "raw": 37, "gen": {"deepseek": 2, "kimi": 1, "glm": 1}}
+{"field": "MED", "i": 310, "influential": 0, "raw": 10, "gen": {"deepseek": 6, "kimi": 5, "glm": 3}}
+{"field": "MED", "i": 311, "influential": 4, "raw": 151, "gen": {"deepseek": 2, "kimi": 1, "glm": 1}}
+{"field": "MED", "i": 312, "influential": 3, "raw": 36, "gen": {"deepseek": 1, "kimi": 0, "glm": 0}}
+{"field": "MED", "i": 313, "influential": 1, "raw": 46, "gen": {"deepseek": 1, "kimi": 1, "glm": 1}}
+{"field": "MED", "i": 314, "influential": 0, "raw": 13, "gen": {"deepseek": 1, "kimi": 1, "glm": 0}}
+{"field": "MED", "i": 315, "influential": 4, "raw": 63, "gen": {"deepseek": 0, "kimi": 1, "glm": 0}}
+{"field": "MED", "i": 316, "influential": 1, "raw": 34, "gen": {"deepseek": 1, "kimi": 1, "glm": 0}}
+{"field": "MED", "i": 317, "influential": 0, "raw": 7, "gen": {"deepseek": 1, "kimi": 1, "glm": 0}}
+{"field": "MED", "i": 318, "influential": 0, "raw": 27, "gen": {"deepseek": 1, "kimi": 1, "glm": 0}}
+{"field": "MED", "i": 319, "influential": 2, "raw": 55, "gen": {"deepseek": 0, "kimi": 1, "glm": 0}}
+{"field": "MED", "i": 320, "influential": 4, "raw": 119, "gen": {"deepseek": 1, "kimi": 1, "glm": 0}}
+{"field": "MED", "i": 321, "influential": 0, "raw": 11, "gen": {"deepseek": 2, "kimi": 1, "glm": 0}}
+{"field": "MED", "i": 322, "influential": 0, "raw": 13, "gen": {"deepseek": 2, "kimi": 2, "glm": 1}}
+{"field": "MED", "i": 323, "influential": 0, "raw": 21, "gen": {"deepseek": 1, "kimi": 1, "glm": 0}}
+{"field": "MED", "i": 324, "influential": 0, "raw": 35, "gen": {"deepseek": 1, "kimi": 0, "glm": 0}}
+{"field": "MED", "i": 325, "influential": 1, "raw": 7, "gen": {"deepseek": 0, "kimi": 1, "glm": 0}}
+{"field": "MED", "i": 326, "influential": 4, "raw": 50, "gen": {"deepseek": 2, "kimi": 2, "glm": 1}}
+{"field": "MED", "i": 327, "influential": 2, "raw": 110, "gen": {"deepseek": 2, "kimi": 2, "glm": 0}}
+{"field": "MED", "i": 328, "influential": 0, "raw": 6, "gen": {"deepseek": 0, "kimi": 1, "glm": 0}}
+{"field": "MED", "i": 329, "influential": 1, "raw": 24, "gen": {"deepseek": 3, "kimi": 6, "glm": 3}}
+{"field": "MED", "i": 330, "influential": 1, "raw": 21, "gen": {"deepseek": 0, "kimi": 0, "glm": 0}}
+{"field": "MED", "i": 331, "influential": 2, "raw": 72, "gen": {"deepseek": 1, "kimi": 2, "glm": 0}}
+{"field": "MED", "i": 332, "influential": 2, "raw": 23, "gen": {"deepseek": 1, "kimi": 1, "glm": 0}}
+{"field": "MED", "i": 333, "influential": 1, "raw": 20, "gen": {"deepseek": 1, "kimi": 0, "glm": 1}}
+{"field": "MED", "i": 334, "influential": 6, "raw": 153, "gen": {"deepseek": 1, "kimi": 1, "glm": 1}}
+{"field": "MED", "i": 335, "influential": 0, "raw": 38, "gen": {"deepseek": 1, "kimi": 1, "glm": 0}}
+{"field": "MED", "i": 336, "influential": 4, "raw": 33, "gen": {"deepseek": 1, "kimi": 1, "glm": 0}}
+{"field": "MED", "i": 337, "influential": 31, "raw": 466, "gen": {"deepseek": 2, "kimi": 2, "glm": 2}}
+{"field": "MED", "i": 338, "influential": 0, "raw": 28, "gen": {"deepseek": 1, "kimi": 1, "glm": 1}}
+{"field": "MED", "i": 339, "influential": 0, "raw": 9, "gen": {"deepseek": 2, "kimi": 1, "glm": 1}}
+{"field": "MED", "i": 340, "influential": 0, "raw": 38, "gen": {"deepseek": 2, "kimi": 1, "glm": 1}}
+{"field": "MED", "i": 341, "influential": 6, "raw": 213, "gen": {"deepseek": 1, "kimi": 2, "glm": 1}}
+{"field": "MED", "i": 342, "influential": 1, "raw": 12, "gen": {"deepseek": 1, "kimi": 2, "glm": 1}}
+{"field": "MED", "i": 343, "influential": 1, "raw": 20, "gen": {"deepseek": 1, "kimi": 1, "glm": 0}}
+{"field": "MED", "i": 344, "influential": 1, "raw": 13, "gen": {"deepseek": 0, "kimi": 0, "glm": 0}}
+{"field": "MED", "i": 345, "influential": 2, "raw": 20, "gen": {"deepseek": 0, "kimi": 0, "glm": 0}}
+{"field": "MED", "i": 346, "influential": 6, "raw": 59, "gen": {"deepseek": 1, "kimi": 1, "glm": 1}}
+{"field": "MED", "i": 347, "influential": 1, "raw": 56, "gen": {"deepseek": 2, "kimi": 4, "glm": 2}}
+{"field": "MED", "i": 348, "influential": 5, "raw": 101, "gen": {"deepseek": 2, "kimi": 1, "glm": 1}}
+{"field": "MED", "i": 349, "influential": 6, "raw": 148, "gen": {"deepseek": 1, "kimi": 1, "glm": 0}}
+{"field": "MED", "i": 350, "influential": 1, "raw": 77, "gen": {"deepseek": 8, "kimi": 6, "glm": 4}}
+{"field": "MED", "i": 351, "influential": 4, "raw": 53, "gen": {"deepseek": 1, "kimi": 1, "glm": 0}}
+{"field": "MED", "i": 352, "influential": 0, "raw": 5, "gen": {"deepseek": 2, "kimi": 1, "glm": 0}}
+{"field": "MED", "i": 353, "influential": 0, "raw": 5, "gen": {"deepseek": 0, "kimi": 1, "glm": 0}}
+{"field": "MED", "i": 354, "influential": 0, "raw": 17, "gen": {"deepseek": 2, "kimi": 1, "glm": 0}}
+{"field": "MED", "i": 355, "influential": 1, "raw": 9, "gen": {"deepseek": 1, "kimi": 0, "glm": 1}}
+{"field": "MED", "i": 356, "influential": 1, "raw": 31, "gen": {"deepseek": 1, "kimi": 1, "glm": 1}}
+{"field": "MED", "i": 357, "influential": 0, "raw": 27, "gen": {"deepseek": 1, "kimi": 1, "glm": 0}}
+{"field": "MED", "i": 358, "influential": 0, "raw": 18, "gen": {"deepseek": 2, "kimi": 2, "glm": 1}}
+{"field": "MED", "i": 359, "influential": 0, "raw": 12, "gen": {"deepseek": 1, "kimi": 1, "glm": 0}}
+{"field": "MED", "i": 360, "influential": 0, "raw": 10, "gen": {"deepseek": 0, "kimi": 0, "glm": 0}}
+{"field": "MED", "i": 361, "influential": 5, "raw": 151, "gen": {"deepseek": 5, "kimi": 4, "glm": 4}}
+{"field": "MED", "i": 362, "influential": 7, "raw": 126, "gen": {"deepseek": 2, "kimi": 3, "glm": 1}}
+{"field": "MED", "i": 363, "influential": 1, "raw": 21, "gen": {"deepseek": 1, "kimi": 1, "glm": 0}}
+{"field": "MED", "i": 364, "influential": 1, "raw": 23, "gen": {"deepseek": 1, "kimi": 0, "glm": 0}}
+{"field": "MED", "i": 365, "influential": 1, "raw": 18, "gen": {"deepseek": 0, "kimi": 0, "glm": 0}}
+{"field": "MED", "i": 366, "influential": 1, "raw": 6, "gen": {"deepseek": 1, "kimi": 0, "glm": 0}}
+{"field": "MED", "i": 367, "influential": 1, "raw": 31, "gen": {"deepseek": 0, "kimi": 1, "glm": 0}}
+{"field": "MED", "i": 368, "influential": 0, "raw": 11, "gen": {"deepseek": 0, "kimi": 1, "glm": 0}}
+{"field": "MED", "i": 369, "influential": 2, "raw": 57, "gen": {"deepseek": 2, "kimi": 2, "glm": 1}}
+{"field": "MED", "i": 370, "influential": 6, "raw": 35, "gen": {"deepseek": 1, "kimi": 0, "glm": 0}}
+{"field": "MED", "i": 371, "influential": 3, "raw": 20, "gen": {"deepseek": 0, "kimi": 1, "glm": 0}}
+{"field": "MED", "i": 372, "influential": 0, "raw": 10, "gen": {"deepseek": 0, "glm": 0}}
+{"field": "MED", "i": 373, "influential": 4, "raw": 93, "gen": {"deepseek": 1, "kimi": 1, "glm": 0}}
+{"field": "MED", "i": 374, "influential": 0, "raw": 21, "gen": {"deepseek": 1, "kimi": 1, "glm": 1}}
+{"field": "MED", "i": 375, "influential": 2, "raw": 51, "gen": {"deepseek": 2, "glm": 2}}
+{"field": "MED", "i": 376, "influential": 1, "raw": 22, "gen": {"deepseek": 0, "kimi": 1, "glm": 1}}
+{"field": "MED", "i": 377, "influential": 1, "raw": 25, "gen": {"deepseek": 1, "kimi": 1, "glm": 0}}
+{"field": "MED", "i": 378, "influential": 0, "raw": 5, "gen": {"deepseek": 2, "kimi": 2, "glm": 2}}
+{"field": "MED", "i": 379, "influential": 1, "raw": 45, "gen": {"deepseek": 2, "kimi": 1, "glm": 1}}
+{"field": "MED", "i": 380, "influential": 0, "raw": 7, "gen": {"deepseek": 2, "kimi": 1, "glm": 0}}
+{"field": "MED", "i": 381, "influential": 2, "raw": 70, "gen": {"deepseek": 1, "kimi": 0, "glm": 0}}
+{"field": "MED", "i": 382, "influential": 0, "raw": 15, "gen": {"deepseek": 2, "kimi": 1, "glm": 1}}
+{"field": "MED", "i": 383, "influential": 0, "raw": 13, "gen": {"deepseek": 1, "kimi": 1, "glm": 1}}
+{"field": "MED", "i": 384, "influential": 0, "raw": 21, "gen": {"deepseek": 0, "kimi": 1, "glm": 0}}
+{"field": "MED", "i": 385, "influential": 0, "raw": 18, "gen": {"deepseek": 2, "kimi": 4, "glm": 1}}
+{"field": "MED", "i": 386, "influential": 1, "raw": 60, "gen": {"deepseek": 2, "kimi": 2, "glm": 1}}
+{"field": "MED", "i": 387, "influential": 1, "raw": 51, "gen": {"deepseek": 1, "kimi": 2, "glm": 1}}
+{"field": "MED", "i": 388, "influential": 3, "raw": 28, "gen": {"deepseek": 1, "kimi": 1, "glm": 0}}
+{"field": "MED", "i": 389, "influential": 2, "raw": 21, "gen": {"deepseek": 1, "kimi": 1, "glm": 0}}
+{"field": "MED", "i": 390, "influential": 1, "raw": 71, "gen": {"deepseek": 1, "kimi": 1, "glm": 1}}
+{"field": "MED", "i": 391, "influential": 0, "raw": 28, "gen": {"deepseek": 2, "kimi": 2, "glm": 1}}
+{"field": "MED", "i": 392, "influential": 1, "raw": 59, "gen": {"deepseek": 2, "kimi": 2, "glm": 1}}
+{"field": "MED", "i": 393, "influential": 0, "raw": 8, "gen": {"deepseek": 1, "kimi": 1, "glm": 1}}
+{"field": "MED", "i": 394, "influential": 1, "raw": 7, "gen": {"deepseek": 0, "kimi": 1, "glm": 1}}
+{"field": "MED", "i": 395, "influential": 1, "raw": 32, "gen": {"deepseek": 2, "kimi": 1, "glm": 1}}
+{"field": "MED", "i": 396, "influential": 3, "raw": 26, "gen": {"deepseek": 1, "kimi": 1, "glm": 0}}
+{"field": "MED", "i": 397, "influential": 0, "raw": 6, "gen": {"deepseek": 0, "kimi": 0, "glm": 0}}
+{"field": "MED", "i": 398, "influential": 0, "raw": 5, "gen": {"deepseek": 0, "kimi": 1, "glm": 0}}
+{"field": "MED", "i": 399, "influential": 0, "raw": 61, "gen": {"deepseek": 1, "kimi": 1, "glm": 1}}
+{"field": "MED", "i": 400, "influential": 0, "raw": 11, "gen": {"deepseek": 1, "kimi": 1, "glm": 0}}
+{"field": "MED", "i": 401, "influential": 1, "raw": 6, "gen": {"deepseek": 1, "kimi": 0, "glm": 0}}
+{"field": "MED", "i": 402, "influential": 1, "raw": 15, "gen": {"deepseek": 1, "kimi": 1, "glm": 0}}
+{"field": "MED", "i": 403, "influential": 1, "raw": 40, "gen": {"deepseek": 0, "kimi": 1, "glm": 0}}
+{"field": "MED", "i": 404, "influential": 0, "raw": 5, "gen": {"deepseek": 1, "kimi": 1, "glm": 0}}
+{"field": "MED", "i": 405, "influential": 1, "raw": 5, "gen": {"deepseek": 1, "kimi": 1, "glm": 0}}
+{"field": "MED", "i": 406, "influential": 0, "raw": 45, "gen": {"deepseek": 1, "kimi": 2, "glm": 1}}
+{"field": "MED", "i": 407, "influential": 1, "raw": 13, "gen": {"deepseek": 0, "kimi": 1, "glm": 0}}
+{"field": "MED", "i": 408, "influential": 0, "raw": 36, "gen": {"deepseek": 1, "kimi": 1, "glm": 0}}
+{"field": "MED", "i": 409, "influential": 1, "raw": 17, "gen": {"deepseek": 0, "kimi": 1, "glm": 1}}
+{"field": "MED", "i": 410, "influential": 1, "raw": 11, "gen": {"deepseek": 0, "kimi": 1, "glm": 0}}
+{"field": "MED", "i": 411, "influential": 0, "raw": 10, "gen": {"deepseek": 3, "kimi": 3, "glm": 3}}
+{"field": "MED", "i": 412, "influential": 1, "raw": 33, "gen": {"deepseek": 1, "kimi": 1, "glm": 1}}
+{"field": "MED", "i": 413, "influential": 2, "raw": 43, "gen": {"deepseek": 0, "kimi": 1, "glm": 0}}
