@@ -109,7 +109,7 @@ def attest(text: str, source_sk_hex: str, source_doc=None) -> str:
     sk = _Ed25519SK.from_private_bytes(bytes.fromhex(source_sk_hex))
     return sk.sign(_attest_message(text, source_doc)).hex()
 
-__version__ = "0.6.0"
+__version__ = "0.6.1"
 _WORD = re.compile(r"[a-z0-9][a-z0-9\-']{2,}")
 _STOP = frozenset("the a an of for to in on and or is are was were be been with this that it its as "
                   "by at from into our we us you your he she they them his her their not no".split())
@@ -697,7 +697,7 @@ class Mnemo:
                where: dict | None = None, influence_only: bool = False,
                prefer=None, prefer_trust: float = 1.0,
                prefer_max_boost: float | None = None, near: dict | None = None,
-               with_status: bool = False) -> list[dict]:
+               with_status: bool = False, with_warrant: bool = False) -> list[dict]:
         """Top-k memories by RELEVANCE × VALUE — high-value memories outrank merely-similar ones.
         Memories the dream pass flagged as hubs (universal matchers) are skipped unless include_hubs.
 
@@ -1026,6 +1026,21 @@ class Mnemo:
                 _o["convergence"] = cr["status"]
                 if cr.get("low_source_diversity"):
                     _o["low_source_diversity"] = True
+            if with_warrant:    # OPT-IN: a LEGIBLE warrant tier a consumer can BRANCH ON, so "no independent
+                # channel" is an explicit state, not a quiet low score a downstream reads as a soft yes (the
+                # silent-weight-0-decays-to-"unverified-but-present" failure; jacksonxly, r/RAG 2026-07). Tiers:
+                #   'earned'       -- un-self-gradable outcome credit (good>0>=bad) OR a graduated semantic memory
+                #   'corroborated' -- >=2 distinct sources/verified-keys, but not yet outcome-earned (weaker)
+                #   'unwarranted'  -- single self-asserted, orphan (no lineage), or slashed -> DO NOT treat as a
+                #                     confirmation; weight it ~0 and, critically, mark it so downstream sees the abstention.
+                if (r.get("meta") or {}).get("slashed") or r.get("orphan"):
+                    _o["warrant"] = "unwarranted"
+                elif (_good > 0 and _good >= _bad) or r.get("mtype") == "semantic":
+                    _o["warrant"] = "earned"
+                elif _distinct >= 2:
+                    _o["warrant"] = "corroborated"
+                else:
+                    _o["warrant"] = "unwarranted"
             out.append(_o)
         # AUTO-STAMP LINEAGE: remember what this recall surfaced, so a derived write built from it (a summary
         # written next) can inherit these as parents. Store-carried lineage from the recall->write flow.
@@ -1601,7 +1616,8 @@ class Mnemo:
             except Exception:
                 pass
 
-    def spend_irreversible(self, ids, amount: float = 1.0, budget: float = 1.0) -> dict:
+    def spend_irreversible(self, ids, amount: float = 1.0, budget: float = 1.0,
+                           provenance_lo: float | None = None) -> dict:
         """Per-source LIFETIME budget on IRREVERSIBLE influence — the integral cap that bounds the one residual
         the rate-detector (monitor) provably CANNOT: the strictly-below-k patient attacker. monitor()'s k is a
         tolerated RATE, so an attacker holding bad-rate BELOW k gives the CUSUM negative drift -> no detection
@@ -1644,8 +1660,24 @@ class Mnemo:
         recs = [by_id[i] for i in (ids or []) if i in by_id]
         srcs = sorted(set().union(*(Mnemo._rec_sources(r) for r in recs)) if recs else set())
         B = self._budget_state()
+        # PROVENANCE-SCALED cap (OPT-IN, provenance_lo=None -> uniform legacy path, byte-identical): a source with
+        # NO corroborated contributing record is capped at the small `provenance_lo` instead of `budget`, so a
+        # LOW-PROVENANCE memory recalled into an irreversible action binds that action's budget against ITSELF
+        # (not the honest actor). This scopes the hard floor to the consequential slice -- the thing that can
+        # actually cash out -- rather than the whole store (jacksonxly's lever-1 refinement, r/RAG 2026-07).
+        # HONEST: `provenance_lo` is a tunable policy knob, not a measured constant, and it still relocates to the
+        # Sybil identity axis (a fresh low-provenance identity gets a fresh provenance_lo). See
+        # mnemo/probes/soft_influence_taint_probe.py.
+        if provenance_lo is None:
+            _cap = lambda s: float(budget)
+        else:
+            _corr_srcs = set()
+            for r in recs:
+                if self._corroborated(r, by_id):
+                    _corr_srcs |= Mnemo._rec_sources(r)
+            _cap = lambda s: float(budget) if s in _corr_srcs else float(provenance_lo)
         # the tightest contributing source binds: deny if ANY contributing source would exceed its lifetime budget
-        exhausted = [s for s in srcs if float(B.get(s, 0.0)) + float(amount) > float(budget)]
+        exhausted = [s for s in srcs if float(B.get(s, 0.0)) + float(amount) > _cap(s)]
         allowed = not exhausted
         if allowed:
             for s in srcs:

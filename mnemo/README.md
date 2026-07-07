@@ -305,6 +305,27 @@ sum. Interestingly this is **not** a correlation effect — the gap is largest w
 and *shrinks* as they correlate (a redundant copy just can't miss when the real cue hits). Rule of thumb:
 compose a second cue **only when it is independently reliable for the query**, and weight it by that reliability.
 
+### Continuous state cue: `recall(near=...)` (0.6.1)
+`prefer` matches CATEGORICAL meta (`theme == "identity"`). For a **continuous** state vector — a TAT-style
+5-D chunk, or any embedding-like feature stored in meta — you want nearest-neighbour in the numeric subspace,
+not exact match. `recall(query, k, near={"target": {"theme": 0.29, "role": 0.33, ...}, "trust": 0.7, "half": 0.2})`
+boosts each record by `1 + trust*(coverage)*exp(-distance/half)` over the target's numeric dims (per-dim-
+normalised, coverage-weighted, NaN/bool-guarded). Soft (never hard-deletes; missing dims → neutral), composes
+with text sim and `prefer`, `near=None` = byte-identical legacy. MEASURED on a real TAT 5-D state trace:
+regime-relevance precision@5 **0.984 (near) vs 0.758 (plain text)**. It re-ranks the recall pool — not a
+vector index. Receipt: `mnemo/probes/continuous_chunk_recall_probe.py`.
+
+### Make the not-asserting visible: `recall(with_warrant=True)` + `spend_irreversible(provenance_lo=...)` (0.6.1)
+A silent low score for "no independent channel" decays into *"unverified but present"* — a downstream consumer
+reads quiet as a soft yes and you are back to consensus-over-poison with extra steps. So the abstention is made
+a first-class, branchable STATE: `recall(with_warrant=True)` tags each hit `earned` / `corroborated` /
+`unwarranted`, and the consumer rule is *never let `unwarranted` drive a consequential decision*. Complementing
+it, `spend_irreversible(ids, amount, budget, provenance_lo=0.15)` caps a source with **no corroborated
+contributing record** at the small `provenance_lo` instead of the full budget — a low-provenance memory
+recalled into an irreversible action binds that action's budget **against itself**, scoping the hard floor to
+the consequential slice rather than the whole store. Both opt-in (`with_warrant=False` / `provenance_lo=None` =
+legacy). Receipt: `mnemo/probes/legible_warrant_scoped_budget_probe.py`.
+
 ## Use it as an MCP server (any Claude / Cursor / agent client)
 
 `mnemo` ships an [MCP](https://modelcontextprotocol.io) stdio server so any MCP-compatible agent can
