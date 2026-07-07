@@ -414,6 +414,59 @@ its memory is value-ranked and append-only, not a recency buffer.
 
 (Methods + numbers live in the Agora track record: <https://dancenitra.github.io/agora/>.)
 
+## Threat model & layered defense (adversarial memory integrity)
+
+An untrusted-ingestion memory store cannot decide whether a written claim is *true*. mnemo doesn't try to;
+it makes the attacker **pay**, and the honest map of what each layer buys — worked to bedrock across a public
+practitioner thread with adversarial review — is below. Every claim here has a runnable receipt in
+[`mnemo/probes/`](probes/); this is textbook mechanism with a receipt, **not** a new theory.
+
+**A defense the attacker can also write is a suggestion, not a defense.** Content-declared provenance is
+theater: `Source: X` and `corroborated by N` are strings a writer controls, so default (distinct source
+*strings*) corroboration falls to a sybil that mints two labels (~0.9 attack-success across 10 models —
+[`memory_defense_layer_probe`](probes/memory_defense_layer_probe.py)). Only channels the writer does **not**
+control hold — distinct *verified keys* (`strict_corroboration`, Ed25519 `attest`) **whose issuance is itself
+costly/rate-limited** (a free-to-mint key is just another string a sybil spends), an *earned* Beta(good,bad)
+outcome credit a session can't self-grant, and *system write-history*.
+That is Biba integrity (1977) / Cheng-Friedman (2005): no symmetric reputation is sybilproof; the escape is
+an exogenous, un-writable anchor.
+
+**The layers, and the exact residual each leaves:**
+- **Provenance — did the call happen?** Bind standing to a *runtime* signature over the real `(tool, result)`,
+  not the session's log ([`execution_receipt_gate`](probes/execution_receipt_gate_probe.py)). Closes fabricated
+  logs **iff the executor is a trust domain separate from the session**; in-process tools → the key is
+  session-readable → theater.
+- **Veracity — is a real call's output true?** No write-time oracle (a novel fact has no priors; attestation =
+  authorship, not truth). Standing is *earned at use time* from an observed outcome
+  ([`veracity_outcome_grounding`](probes/veracity_outcome_grounding_probe.py)) — only helps where harm is observable.
+- **The irreversible tail.** A provenance-scaled `spend_irreversible` budget makes a low-provenance memory bind an
+  honest action's irreversible spend against itself ([`soft_influence_taint`](probes/soft_influence_taint_probe.py));
+  a reversibility checkpoint bounds a one-shot defector. Bounds, doesn't close (Sybil relocates it per identity).
+- **The sub-threshold coordinated campaign.** A temporal change-detector is evaded for free at bias `h→0`, but
+  `B≈N·h` forces a growing correlated low-provenance population a **cross-sectional** detector catches
+  ([`two_detector_trap`](probes/two_detector_trap_probe.py)); and randomized retrieval raises a *targeted*
+  attacker's coverage from O(1) to ~Θ(fN) with no anchor
+  ([`moving_target_retrieval`](probes/moving_target_retrieval_probe.py)).
+
+**The bedrock.** Checked from ~8 directions (detection, reputation, elicitation-without-ground-truth à la Bayesian
+Truth Serum, robust aggregation, moving-target), every layer we examined reduces to one of two exogenous anchors —
+a bounded corruption *count* (Byzantine; sybils break it) or a shared attacker-independent *prior* (peer-prediction;
+a coalition coordinating its reports breaks it). *(A synthesis over those cases, not a proof.)* You cannot separate
+a large coordinated coalition from genuine consensus from internal signals alone (Cheng-Friedman +
+Lamport-Shostak-Pease 1982; and no internal truth-oracle, by analogy to Tarski's undefinability). What that
+leaves is not "give up" but a shape: **localize the one exogenous check at the rare high-consequence irreversible
+step** (a human, a separately-provenanced feed — a channel the poison can't reach), and **don't let evidence-free
+consensus drive an irreversible action** (weight it ~0; on an observable target, require an independent evidentiary
+provenance, which is super-linear to forge, not N reputations). The residual is the integrity of that one minimal
+anchor — a standard, bounded problem, not the intractable verify-all-memory one.
+
+Prior art credited throughout: Biba 1977 · Douceur 2002 · Cheng-Friedman 2005 · Friedman-Resnick 2001 ·
+Lamport-Shostak-Pease 1982 · Lorden 1971 / Moustakides 1986 (CUSUM delay floor) ·
+Tarski (undefinability of truth, used by analogy) · Doyle 1979 (truth-maintenance) · Garcia-Molina & Salem 1987 (Sagas) ·
+Prelec 2004 (Bayesian Truth Serum) · Blanchard 2017 / Yin 2018 (Byzantine-robust aggregation) ·
+PoisonedRAG (Zou 2024) · MINJA (Dong, arXiv:2503.03704) · AgentPoison (Chen, arXiv:2407.12784) ·
+the shilling / Sybil-detection line (Mobasher-Burke 2007, Mehta-Nejdl 2009, SybilRank/Cao 2012, Viswanath 2010).
+
 ## The `second_brain` thinking layer
 
 `mnemo_mcp` gives an agent **memory**. `second_brain_mcp` gives it a **second brain to think over** —
