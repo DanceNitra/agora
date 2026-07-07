@@ -177,6 +177,21 @@ cumulative leakage across queries under composition; Dwork & Roth 2014), an SRE 
 limit**, and Sagas' **compensable-vs-non-compensable** transaction split (Garcia-Molina & Salem 1987) — "cap the
 integral, not the rate."
 
+*Independent convergence (r/RAG, 2026-07).* A practitioner, reasoning from the **undetectable one-shot
+sleeper** (a single honest-looking poisoned write you provably cannot detect), independently proposed the
+same two moves this plumbing already ships: **scale the stake to blast radius, not a flat cost**, and
+**route the promoted value's first high-consequence use through a reversibility checkpoint** so a one-shot
+poison is reverted before it's cashed. Those are exactly `spend_irreversible(ids, amount=blast, budget)`
+(a per-action **blast**-sized charge against a per-source cap) and the reversible `slash`/`restore` gate on
+the irreversible tail. One honest distinction worth keeping on the label: their framing is a *deterrence
+bond* — collateral posted up front and **forfeited on defection**, which makes a *rational* sleeper
+negative-EV — whereas mnemo ships *containment*: a cumulative **budget** that bounds realized blast even
+against an *irrational or anonymous* attacker you can't force to post a bond (the realistic case for
+untrusted ingestion). Complementary, not identical; the residual is **bounded**, not merely priced. Both
+moves — and their honest limits (blast must be estimable *at promote time*; the checkpoint must be
+independent of the promoted value, or the same poison moves both) — are runnable in
+[`probes/sleeper_bond_reversibility_probe.py`](probes/sleeper_bond_reversibility_probe.py).
+
 **Harden the floor the other three stand on: `verify_attribution()` (0.5.0).** `k`, the influence budget, the
 influence gate and `slash` are all keyed on a memory's canonical **source id**. So attribution is not a fourth
 axis — it is the **floor** the other three stand on, and the only one that isn't self-certifying: a single
