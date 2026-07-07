@@ -90,6 +90,25 @@ def _windowed_baselines(theme: str, days: int) -> dict:
             "baseline": bl[metric], "all_baselines": bl, "mode": "rate", "window_days": days}
 
 
+# CALIBRATION FLOOR (2026-07-07). The resolved ledger measured this organ WORSE than chance
+# (Brier 0.37 vs 0.25; hit-rate 0.23; even >75%-confidence directional calls hit only 25%). The proxies
+# it forecasts (14d Hacker News / GitHub / PubMed counts) are noise that does not support directional
+# conviction, and the specific defect is OVER-confidence, not ignorance. So every DIRECTIONAL (UP/DOWN)
+# forecast has its confidence shrunk toward 0.5 and capped, moving a demonstrably-uncalibrated organ's
+# Brier back toward chance and off the credibility storefront's liability column. A FLAT call keeps its
+# confidence (a no-change bet on a noisy metric is the honest default). Reversible: raise these toward 1.0
+# once the ledger EARNS calibration (resolved hit-rate > 0.5 at high confidence).
+_CONF_SHRINK = 0.4    # pull (confidence-0.5) toward 0 for directional calls
+_CONF_CAP = 0.62      # hard ceiling on a directional forecast's published confidence
+
+
+def _calibrate_conf(direction: str, confidence: float) -> float:
+    """Regularize an over-confident directional forecast toward chance; FLAT is left unchanged."""
+    if direction in ("UP", "DOWN"):
+        return round(min(_CONF_CAP, 0.5 + (confidence - 0.5) * _CONF_SHRINK), 3)
+    return confidence
+
+
 async def make_prediction(theme: str, horizon_days: int = 14) -> dict:
     """Record a falsifiable RATE forecast: will the NEXT window's activity beat the LAST window's
     (acceleration) — a genuinely ~50/50 question, not 'will a cumulative counter go up'."""
@@ -112,6 +131,7 @@ async def make_prediction(theme: str, horizon_days: int = 14) -> dict:
     wm = re.search(r"WHY:\s*(.+)", raw, re.DOTALL | re.I)
     direction = dm.group(1).upper() if dm else "FLAT"
     confidence = min(100, int(cm.group(1))) / 100 if cm else 0.5
+    confidence = _calibrate_conf(direction, confidence)   # shrink over-confident directional calls toward chance
     why = (wm.group(1).strip()[:200] if wm else "")
 
     pred = {"id": uuid.uuid4().hex[:8], "theme": theme[:120], "metric": metric,
@@ -199,7 +219,7 @@ async def run_tournament(theme: str, horizon_days: int = 14) -> dict:
             "metric_label": base["metric_label"], "baseline": int(base["baseline"]),
             "all_baselines": base["all_baselines"], "mode": "rate", "window_days": horizon_days,
             "direction": chosen,
-            "confidence": round(sum(c["confidence"] for c in sel) / max(1, len(sel)), 2),
+            "confidence": _calibrate_conf(chosen, round(sum(c["confidence"] for c in sel) / max(1, len(sel)), 3)),
             "why": "tournament (calibration-weighted)", "by": "tournament", "calls": calls,
             "made_ts": time.time(), "resolve_ts": time.time() + horizon_days * 86400,
             "horizon_days": horizon_days, "status": "pending"}
