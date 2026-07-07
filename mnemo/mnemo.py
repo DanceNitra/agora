@@ -696,7 +696,8 @@ class Mnemo:
                scope: str | None = None, as_of: float | None = None,
                where: dict | None = None, influence_only: bool = False,
                prefer=None, prefer_trust: float = 1.0,
-               prefer_max_boost: float | None = None, with_status: bool = False) -> list[dict]:
+               prefer_max_boost: float | None = None, near: dict | None = None,
+               with_status: bool = False) -> list[dict]:
         """Top-k memories by RELEVANCE × VALUE — high-value memories outrank merely-similar ones.
         Memories the dream pass flagged as hubs (universal matchers) are skipped unless include_hubs.
 
@@ -791,6 +792,26 @@ class Mnemo:
                         _prefer_specs.append((_c, _t))
             else:
                 raise ValueError("prefer must be a dict (one dimension) or a list of (cond, trust) specs")
+        # `near` (OPT-IN, default None -> zero behaviour change): a SOFT, CONTINUOUS proximity cue -- the
+        # numeric analogue of `prefer`. `prefer` matches CATEGORICAL meta (theme == 'identity'); `near`
+        # boosts records by their CLOSENESS to a target VECTOR in named NUMERIC meta dims (e.g. a TAT 5-D
+        # state chunk, or any embedding-like feature stored in meta). Spec:
+        #   near = {"target": {"theme": 0.29, "role": 0.33, ...}, "trust": 0.7, "half": 0.2}
+        # For each candidate, distance = per-dim-normalised Euclidean over the target dims present as NUMBERS
+        # in the record's meta; boost = 1 + trust * exp(-distance / half) (neutral 1.0 when far or when the
+        # record lacks the dims, so a missing/weak cue degrades gracefully, never hard-deletes). `half` is the
+        # distance at which the boost is ~1+trust/e. Composes multiplicatively with `prefer` and text sim.
+        # MEASURED (mnemo/probes/continuous_chunk_recall_probe.py): on a real TAT 5-D state trace, near-boost on
+        # the state vector beats plain text recall on state/regime-relevance retrieval (precision@5 0.984 vs 0.758)
+        # where categorical filters cannot (the values are continuous). Soft cue that re-ranks the pool, not a
+        # vector index; coverage-weighted + NaN-guarded. Reversible: near=None = byte-identical legacy recall.
+        _near = None
+        if near:
+            _nt = near.get("target") or {}
+            _numt = {d: float(v) for d, v in _nt.items()
+                     if isinstance(v, (int, float)) and not isinstance(v, bool) and v == v}   # numeric, not bool, not NaN
+            if _numt:
+                _near = (_numt, max(0.0, min(1.0, float(near.get("trust", 1.0)))), max(1e-9, float(near.get("half", 0.25))))
         def _eligible(r: dict) -> bool:
             s = r["status"]
             if as_of is not None:
@@ -933,7 +954,23 @@ class Mnemo:
                     pref *= (1.0 + _tr * _PREFER_GAIN)
             if prefer_max_boost is not None and pref > prefer_max_boost:
                 pref = prefer_max_boost
-            score = sim * (1.0 + math.log1p(max(0.0, evalue))) * prov * cal * pref
+            nb = 1.0
+            if _near is not None:
+                _tgt, _ntr, _half = _near
+                _rm = r.get("meta") or {}
+                _sq = 0.0; _dn = 0
+                for _d, _tv in _tgt.items():
+                    _rv = _rm.get(_d)
+                    if isinstance(_rv, (int, float)) and not isinstance(_rv, bool) and _rv == _rv:  # numeric, not bool/NaN
+                        _sq += (float(_rv) - _tv) ** 2; _dn += 1
+                if _dn:
+                    # per-dim-normalised proximity, coverage-weighted so a record matching FEWER target dims can't
+                    # unfairly out-boost one matching all with modest error; NaN-guarded so a bad value never
+                    # corrupts the whole ranking order.
+                    nb = 1.0 + _ntr * (_dn / len(_tgt)) * math.exp(-(math.sqrt(_sq / _dn)) / _half)
+                    if not math.isfinite(nb):
+                        nb = 1.0
+            score = sim * (1.0 + math.log1p(max(0.0, evalue))) * prov * cal * pref * nb
             scored.append((score, sim, r))
         scored.sort(key=lambda x: -x[0])
         out = []
