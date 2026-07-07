@@ -305,7 +305,7 @@ sum. Interestingly this is **not** a correlation effect — the gap is largest w
 and *shrinks* as they correlate (a redundant copy just can't miss when the real cue hits). Rule of thumb:
 compose a second cue **only when it is independently reliable for the query**, and weight it by that reliability.
 
-### Continuous state cue: `recall(near=...)` (0.6.1)
+### Continuous state cue: `recall(near=...)` (0.6.6)
 `prefer` matches CATEGORICAL meta (`theme == "identity"`). For a **continuous** state vector — a TAT-style
 5-D chunk, or any embedding-like feature stored in meta — you want nearest-neighbour in the numeric subspace,
 not exact match. `recall(query, k, near={"target": {"theme": 0.29, "role": 0.33, ...}, "trust": 0.7, "half": 0.2})`
@@ -315,7 +315,7 @@ with text sim and `prefer`, `near=None` = byte-identical legacy. MEASURED on a r
 regime-relevance precision@5 **0.984 (near) vs 0.758 (plain text)**. It re-ranks the recall pool — not a
 vector index. Receipt: `mnemo/probes/continuous_chunk_recall_probe.py`.
 
-### Make the not-asserting visible: `recall(with_warrant=True)` + `spend_irreversible(provenance_lo=...)` (0.6.1)
+### Make the not-asserting visible: `recall(with_warrant=True)` + `spend_irreversible(provenance_lo=...)` (0.6.6)
 A silent low score for "no independent channel" decays into *"unverified but present"* — a downstream consumer
 reads quiet as a soft yes and you are back to consensus-over-poison with extra steps. So the abstention is made
 a first-class, branchable STATE: `recall(with_warrant=True)` tags each hit `earned` / `corroborated` /
