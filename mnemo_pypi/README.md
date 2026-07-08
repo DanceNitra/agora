@@ -6,7 +6,7 @@
 
 *Memory is the mother of the Muses. An agent with no memory has no ideas.*
 
-`pip install agora-mnemo` · [PyPI](https://pypi.org/project/agora-mnemo/) · [Hugging Face](https://huggingface.co/Danchi17/mnemo) · [DOI 10.5281/zenodo.21128549](https://doi.org/10.5281/zenodo.21128549) · MIT · v0.6.5
+`pip install agora-mnemo` · [PyPI](https://pypi.org/project/agora-mnemo/) · [Hugging Face](https://huggingface.co/Danchi17/mnemo) · [DOI 10.5281/zenodo.21128549](https://doi.org/10.5281/zenodo.21128549) · MIT · v0.6.7
 
 </div>
 
@@ -391,6 +391,16 @@ contributing record** at the small `provenance_lo` instead of the full budget �
 recalled into an irreversible action binds that action's budget **against itself**, scoping the hard floor to
 the consequential slice rather than the whole store. Both opt-in (`with_warrant=False` / `provenance_lo=None` =
 legacy). Receipt: `mnemo/probes/legible_warrant_scoped_budget_probe.py`.
+
+### Require earned outcome for the irreversible tail: `spend_irreversible(require_earned=True)` (0.6.7)
+By default `spend_irreversible(provenance_lo=...)` grants the full irreversible budget to any *corroborated*
+source — and in the default (non-strict) config corroboration accepts ≥2 distinct **source strings**, which the
+attacker sets, so a forged-source sybil poison can earn the full budget for an irreversible action.
+`require_earned=True` narrows the full-budget grant to sources with an **earned outcome** (`good>0` and
+`good>=bad`, set by `credit()` on real downstream success) — the one signal a sybil cannot mint (a forged or
+attested ≥2-witness sybil clears corroboration but not this). Cost: any not-yet-earned legitimate source is
+throttled to `provenance_lo` too, so it is opt-in for high-stakes deployments; default `False` is a
+byte-identical legacy path. Receipt: `mnemo/probes/spend_irreversible_require_earned_probe.py`.
 
 ## Use it as an MCP server (any Claude / Cursor / agent client)
 
