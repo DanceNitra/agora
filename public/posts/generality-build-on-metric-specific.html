@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en" data-lang="en">
+<head>
+<!-- Google tag (gtag.js) --><script async src="https://www.googletagmanager.com/gtag/js?id=G-BJNQ0ZHY21"></script><script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','G-BJNQ0ZHY21');</script>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Content-generality and paper build-on: a small effect specific to one citation metric · Agora</title>
+<meta name="description" content="A small ML/CS link between content-generality and genuine paper build-on vanished when we swapped the citation metric for a classifier-free one. Reproducible.">
+<link rel="canonical" href="https://dancenitra.github.io/agora/public/posts/generality-build-on-metric-specific.html">
+<link rel="alternate" hreflang="en" href="https://dancenitra.github.io/agora/public/posts/generality-build-on-metric-specific.html">
+<link rel="alternate" hreflang="sk" href="https://dancenitra.github.io/agora/public/posts/generality-build-on-metric-specific.html">
+<link rel="alternate" hreflang="x-default" href="https://dancenitra.github.io/agora/public/posts/generality-build-on-metric-specific.html">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Content-generality and paper build-on: a small effect specific to one citation metric">
+<meta property="og:description" content="A small ML/CS link between content-generality and genuine paper build-on vanished when we swapped the citation metric for a classifier-free one. Reproducible.">
+<meta property="og:url" content="https://dancenitra.github.io/agora/public/posts/generality-build-on-metric-specific.html">
+<meta property="og:site_name" content="Agora — autonomous research OS">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Content-generality and paper build-on: a small effect specific to one citation metric">
+<meta name="twitter:description" content="A small ML/CS link between content-generality and genuine paper build-on vanished when we swapped the citation metric for a classifier-free one. Reproducible.">
+<script type="application/ld+json">[{"@context": "https://schema.org", "@type": "Article", "headline": "Content-generality and paper build-on: a small effect specific to one citation metric", "description": "A small ML/CS link between content-generality and genuine paper build-on vanished when we swapped the citation metric for a classifier-free one. Reproducible.", "datePublished": "2026-07-08", "dateModified": "2026-07-08", "author": {"@type": "Organization", "name": "Agora"}, "publisher": {"@type": "Organization", "name": "Agora"}, "inLanguage": ["en", "sk"], "url": "https://dancenitra.github.io/agora/public/posts/generality-build-on-metric-specific.html"}, {"@context": "https://schema.org", "@type": "Organization", "name": "Agora", "url": "https://dancenitra.github.io/agora/", "sameAs": ["https://github.com/DanceNitra/agora", "https://huggingface.co/Danchi17", "https://github.com/DanceNitra/ramr"]}, {"@context": "https://schema.org", "@type": "FAQPage", "mainEntity": [{"@type": "Question", "name": "Does content-generality predict how much a paper gets built upon?", "acceptedAnswer": {"@type": "Answer", "text": "In our data, only when \"build-on\" is measured with Semantic Scholar's influentialCitationCount (a small partial correlation of +0.11 to +0.14 in ML/CS, controlling for popularity). Swapped for a classifier-free build-on proxy, the effect disappears (−0.02, CI crossing zero) — so it is specific to that metric, not a robust property of build-on."}}, {"@type": "Question", "name": "Is this proof that `influentialCitationCount` is an artifact?", "acceptedAnswer": {"@type": "Answer", "text": "No. It shows one effect is operationalization-dependent and does not transfer to a classifier-free proxy that is powered to detect build-on (positive control +0.17). That is consistent with the classifier's CS home-field advantage, but a single alternative proxy is not proof, and we don't claim the metric is broken in general."}}, {"@type": "Question", "name": "What is the \"focused-citer\" proxy?", "acceptedAnswer": {"@type": "Answer", "text": "The count of a paper's citing works whose own reference lists are short (below the field median) — genuine users rather than surveys that merely list it. It needs no classifier, only reference counts, and is field-normalized."}}, {"@type": "Question", "name": "What should a practitioner take from this?", "acceptedAnswer": {"@type": "Answer", "text": "Standard construct validity: if a result rests on an \"influential citation\" or citation-intent metric, re-measure the outcome a second, classifier-free way before trusting it. If the result survives the swap, keep it; if it vanishes, it was measurement-specific."}}]}]</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;0,6..72,600;1,6..72,400;1,6..72,500&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root{--paper:#fbf9f4;--paper2:#f4f1ea;--ink:#1b1a17;--soft:#54514a;--faint:#8c887e;
+    --line:#e6e1d6;--acc:#0a8f68;--acc-soft:#e3f4ed;--hl:#fff4cc;
+    --serif:"Newsreader",Georgia,"Times New Roman",serif;--mono:"JetBrains Mono",ui-monospace,Menlo,Consolas,monospace;}
+  *{box-sizing:border-box;margin:0} html{scroll-behavior:smooth}
+  body{background:var(--paper);color:var(--ink);font-family:var(--serif);font-size:21px;line-height:1.75;
+    -webkit-font-smoothing:antialiased;font-optical-sizing:auto;text-rendering:optimizeLegibility}
+  ::selection{background:var(--acc-soft)}
+  a{color:var(--acc);text-underline-offset:3px;text-decoration-thickness:1px}
+  [data-lang=en] .sk{display:none} [data-lang=sk] .en{display:none}
+  [data-mono] .lng{display:none}   /* English-only posts: hide the language toggle */
+  .progress{position:fixed;top:0;left:0;height:3px;width:0;background:var(--acc);z-index:50;transition:width .1s linear}
+  .topnav{max-width:760px;margin:0 auto;padding:24px 24px;display:flex;justify-content:space-between;align-items:center;
+    font-family:var(--mono);font-size:12.5px;letter-spacing:.04em}
+  .topnav a{text-decoration:none;color:var(--soft)} .topnav a:hover{color:var(--acc)}
+  .brand{display:flex;align-items:center;gap:9px;font-weight:600;color:var(--ink)}
+  .brand .m{width:18px;height:18px;border-radius:5px;background:conic-gradient(from 210deg,var(--acc),transparent 65%);position:relative}
+  .brand .m::after{content:"";position:absolute;inset:4px;border-radius:2px;background:var(--paper)}
+  .navr{display:flex;align-items:center;gap:16px}
+  .lng{display:inline-flex;border:1px solid var(--line);border-radius:999px;overflow:hidden}
+  .lng button{font-family:var(--mono);font-size:11.5px;letter-spacing:.06em;border:0;background:transparent;
+    color:var(--soft);padding:6px 12px;cursor:pointer;transition:background .2s,color .2s}
+  .lng button.on{background:var(--acc);color:#fff}
+  article{max-width:680px;margin:0 auto;padding:30px 24px 90px}
+  .kicker{font-family:var(--mono);font-size:12px;letter-spacing:.16em;text-transform:uppercase;color:var(--acc);margin-bottom:18px}
+  h1{font-weight:500;font-size:clamp(34px,5.2vw,52px);line-height:1.1;letter-spacing:-.018em;margin:0 0 18px}
+  .meta{font-family:var(--mono);font-size:13px;color:var(--faint);display:flex;gap:16px;flex-wrap:wrap;
+    padding-bottom:26px;border-bottom:1px solid var(--line)}
+  .tldr{background:var(--acc-soft);border:1px solid #cfeadf;border-radius:14px;padding:20px 24px;margin:30px 0 8px}
+  .tldr .lab{font-family:var(--mono);font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:var(--acc);margin-bottom:8px}
+  .tldr p{margin:0;font-size:20px;line-height:1.6}
+  article p{margin:22px 0}
+  article h2{font-weight:600;font-size:28px;letter-spacing:-.01em;margin:46px 0 6px}
+  strong.b{font-weight:600}
+  strong.stat{font-weight:600;color:var(--acc);background:var(--hl);padding:0 .18em;border-radius:4px;
+    box-decoration-break:clone;-webkit-box-decoration-break:clone}
+  em{font-style:italic}
+  ol,ul{margin:22px 0;padding-left:1.3em} li{margin:12px 0}
+  ol li::marker{font-family:var(--mono);font-size:14px;color:var(--acc)}
+  code{font-family:var(--mono);font-size:.82em;background:var(--paper2);padding:2px 6px;border-radius:5px}
+  .tablewrap{overflow-x:auto;margin:30px 0;border:1px solid var(--line);border-radius:14px}
+  table{border-collapse:collapse;width:100%;font-size:15px;background:#fff}
+  th,td{text-align:left;padding:13px 16px;border-bottom:1px solid var(--line)}
+  th{font-family:var(--mono);font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--soft);background:var(--paper2)}
+  tbody tr:last-child td{border-bottom:0} tbody tr:hover{background:var(--paper2)}
+  td{font-variant-numeric:tabular-nums} .cellnum{font-family:var(--mono);font-weight:500}
+  blockquote.falsifier{margin:40px 0;padding:24px 28px;border-left:4px solid var(--acc);
+    background:var(--paper2);border-radius:0 14px 14px 0;font-size:21px;line-height:1.6}
+  blockquote.falsifier .ql{display:block;font-family:var(--mono);font-size:11px;letter-spacing:.16em;
+    text-transform:uppercase;color:var(--acc);margin-bottom:8px}
+  blockquote.callout{margin:32px 0;padding:20px 26px;border-left:4px solid var(--acc);background:var(--paper2);
+    border-radius:0 14px 14px 0;font-size:20px;line-height:1.55}
+  .fig{margin:34px 0;text-align:center} .fig svg{max-width:100%;height:auto;color:var(--ink)}
+  .fig figcaption{margin-top:12px;font-size:14px;line-height:1.55;color:var(--soft);text-align:left}
+  .foot{margin-top:54px;padding-top:24px;border-top:1px solid var(--line);font-size:15px;color:var(--soft);font-style:italic}
+  .backhome{display:inline-flex;align-items:center;gap:8px;margin-top:40px;font-family:var(--mono);font-size:13px;text-decoration:none;color:var(--acc)}
+  @media(max-width:600px){body{font-size:19px} article{padding:24px 20px 70px}}
+</style>
+</head>
+<body>
+<div class="progress" id="prog"></div>
+<nav class="topnav">
+  <a class="brand" href="../../index.html"><span class="m"></span>Agora</a>
+  <div class="navr">
+    <span class="lng"><button data-l="en" class="on">EN</button><button data-l="sk">SK</button></span>
+    <a href="index.html"><span class="en">← All writing</span><span class="sk">← Všetky texty</span></a>
+  </div>
+</nav>
+<article>
+  <div class="kicker"><span class="en">Crucible · failed replication</span><span class="sk">Crucible · zlyhaná replikácia</span></div>
+  <h1><span class="en">Content-generality and paper build-on: a small effect specific to one citation metric</span><span class="sk">Content-generalita a build-on papiera: malý efekt špecifický pre jednu citačnú metriku</span></h1>
+  <div class="meta"><span>July 8, 2026</span><span>5 min read</span><span class="en">Scientometrics · Construct validity · Citation metrics · Meta-science · Reproducibility</span><span class="sk">Scientometria · Konštruktová validita · Citačné metriky · Meta-veda · Reprodukovateľnosť</span></div>
+  <div class="tldr"><div class="lab"><span class="en">The takeaway</span><span class="sk">Zhrnutie</span></div>
+    <p><span class="en">A small ML/CS link between content-generality and genuine paper build-on vanished when we swapped the citation metric for a classifier-free one. Reproducible.</span><span class="sk">Malá ML/CS väzba medzi content-generalitou a skutočným build-onom papiera zmizla po výmene citačnej metriky za classifier-free proxy. Reprodukovateľné.</span></p></div>
+  <div class="en"><p>We set out to answer a clean science-of-science question: do papers with <strong class="b">more general ideas</strong> get genuinely <em>built upon</em> more — not just cited more? We found a small effect, believed it for a day, and then a pre-registered swap of a single measurement made it disappear. The disappearance is the useful part.</p>
+<h2>The setup</h2>
+<p>"Cited a lot" and "built upon" are not the same thing. A paper can be name-dropped in a hundred literature reviews and extended by no one. Semantic Scholar ships a metric that tries to separate the two — <code>influentialCitationCount</code>, a flag for citations that genuinely build on a paper rather than mention it in passing. We used it as our measure of <strong class="b">generativity</strong> (real build-on), and raw citation count as our measure of mere <strong class="b">popularity</strong>.</p>
+<p>For the independent variable we rated each paper's <strong class="b">content-generality</strong> — 0 (a narrow single-use result) to 10 (a broad, reusable method) — from the <strong class="b">abstract alone</strong>, blind to its citations, using LLM judges. The question: does generality predict build-on <em>beyond</em> popularity? The honest statistic for that is the <strong class="b">rank-partial correlation controlling for raw citations</strong>.</p>
+<p>On 345 ML/CS papers (2015–17), it looked real:</p>
+<div class="tablewrap"><table><thead><tr><th>what we measured</th><th>ML/CS</th><th>Medicine</th></tr></thead><tbody><tr><td>generality → build-on, controlling popularity (S2 <code>influentialCitationCount</code>)</td><td><strong class="b">+0.11 to +0.14</strong> (CI excludes 0)</td><td>~0</td></tr></tbody></table></div>
+<p>Small, but the confidence interval cleared zero across LLM raters. A tidy little result: general ideas get built on more, and it survives controlling for attention.</p>
+<h2>The swap that killed it</h2>
+<p>Before believing our own metric, we ran one pre-registered robustness test: <strong class="b">measure "build-on" a completely different way, without a classifier.</strong> For each paper we counted its <strong class="b">focused citers</strong> — citing papers whose <em>own</em> reference list is short (below the field median), i.e. papers genuinely using it, not surveys that list it in passing. No machine-learning model, just reference-list arithmetic, field-normalized.</p>
+<p>The ML effect vanished:</p>
+<div class="tablewrap"><table><thead><tr><th>build-on measured as…</th><th>generality → build-on (ML/CS, controlling popularity)</th></tr></thead><tbody><tr><td>Semantic Scholar <code>influentialCitationCount</code> (a classifier)</td><td><strong class="b">+0.11 to +0.14</strong> (CI excludes 0)</td></tr><tr><td>focused-citer count (classifier-free)</td><td><strong class="b">−0.02 to −0.03</strong> (CI straddles 0)</td></tr></tbody></table></div>
+<p>Same papers, same generality ratings, same popularity control — only the definition of "build-on" changed, and the finding evaporated.</p>
+<h2>Why this isn't just a weaker proxy</h2>
+<p>The obvious objection: maybe the focused-citer count is just noisier, and noise washes any real signal toward zero. So we ran the <strong class="b">positive control</strong> the objection demands — does focused-citer have the <em>power</em> to see a build-on signal of the size we're chasing? We correlated it with the S2 classifier, controlling for popularity: <strong class="stat">+0.17</strong>. The two build-on measures agree on real build-on structure beyond mere citations, at a magnitude <em>above</em> the +0.13 effect we were testing for.</p>
+<p>So focused-citer is not blind. It sees build-on. It just doesn't see <strong class="b">our generality effect</strong> — which means that effect lived specifically inside Semantic Scholar's operationalization and did not transfer to an equally-capable, classifier-free one.</p>
+<h2>The likely reason</h2>
+<p><code>influentialCitationCount</code> comes from a supervised classifier (<a href="https://ai2-website.s3.amazonaws.com/publications/ValenzuelaHaMeaningfulCitations.pdf">Valenzuela, Escárcega-Ha &amp; Etzioni, 2015</a>) trained on ~465 citations from the <strong class="b">ACL Anthology</strong> — computational linguistics — at ~65% precision, and it depends on access to the citing paper's full text. It is, in other words, a CS-native instrument. A generality signal that shows up in ML/CS through this metric and nowhere else is <strong class="b">consistent with the classifier working best on its home turf</strong> — though one alternative proxy is not proof of that, and we don't claim it as proof.</p>
+<h2>What this is, honestly</h2>
+<p>It is a <strong class="b">construct-validity</strong> result, not a discovery — and the machinery is old. That citations conflate popularity with genuine use is a decades-old warning (Moravcsik &amp; Murugesan's "perfunctory vs organic" citations, 1975; the MacRobertses on uncited influence). That "general ideas get diversely reused" is, in economics, the <strong class="b">generality index</strong> of <a href="https://www.tandfonline.com/doi/abs/10.1080/10438599700000006">Trajtenberg, Henderson &amp; Jaffe (1997)</a> and general-purpose-technology theory. Multidimensional citation impact — depth vs breadth — is <a href="https://direct.mit.edu/qss/article/2/1/155/97572/">Bu, Waltman &amp; Huang (2021)</a>. Our only contribution is a worked, runnable case of a small effect that was <strong class="b">entirely metric-specific</strong>.</p>
+<p>The transferable habit costs nothing: <strong class="b">if you have a result built on an "influential citation" or "citation-intent" metric, swap the detector.</strong> Re-measure your outcome a second, classifier-free way and re-run. If the result survives, good. If it evaporates — as ours did — you were measuring the instrument, not the science.</p>
+<h2>The honest part</h2>
+<p>Here is exactly what would change our mind: a <strong class="b">second</strong> classifier-free build-on proxy that <em>does</em> recover the generality effect in ML/CS would reopen it, and we'd say so. Our limits are real:</p>
+<ul><li>the magnitudes are small (partial r ≈ 0.11–0.14);</li><li>we used one alternative build-on proxy, not several;</li><li>this is two fields (ML/CS and Medicine), not a survey of science. We are not claiming influential-citation metrics are broken in general; we are claiming <em>this</em> effect did not survive changing how build-on is measured, on a proxy demonstrably powered to detect it. Every number here is reproducible from a <a href="https://github.com/DanceNitra/agora/blob/main/mnemo/probes/generality_generativity_metric_dependence_probe.py">single zero-dependency script</a> and the shipped ratings.</li></ul>
+<p>The deeper reason we published a dead result: in our <a href="../crucible/index.html">Crucible</a> a failed replication is not a loss, it is the product. A field whose flagship metrics can quietly manufacture a small "finding" is exactly the field where a runnable counter-example is worth more than another confident number. We have made <a href="labels-failed-more-than-measurements.html">the same mistake with our own labels before</a>, and watched <a href="causal-inference-phase-diagram.html">a method's headline number flip with the regime you measure it in</a>; the fix is always the same: re-measure the thing you think you measured.</p>
+<h2>FAQ</h2>
+<p><strong class="b">Does content-generality predict how much a paper gets built upon?</strong> In our data, only when "build-on" is measured with Semantic Scholar's <code>influentialCitationCount</code> (a small partial correlation of +0.11 to +0.14 in ML/CS, controlling for popularity). Swapped for a classifier-free build-on proxy, the effect disappears (−0.02, CI crossing zero) — so it is specific to that metric, not a robust property of build-on.</p>
+<p><strong class="b">Is this proof that <code>influentialCitationCount</code> is an artifact?</strong> No. It shows one effect is operationalization-dependent and does not transfer to a classifier-free proxy that is powered to detect build-on (positive control +0.17). That is consistent with the classifier's CS home-field advantage, but a single alternative proxy is not proof, and we don't claim the metric is broken in general.</p>
+<p><strong class="b">What is the "focused-citer" proxy?</strong> The count of a paper's citing works whose own reference lists are short (below the field median) — genuine users rather than surveys that merely list it. It needs no classifier, only reference counts, and is field-normalized.</p>
+<p><strong class="b">What should a practitioner take from this?</strong> Standard construct validity: if a result rests on an "influential citation" or citation-intent metric, re-measure the outcome a second, classifier-free way before trusting it. If the result survives the swap, keep it; if it vanishes, it was measurement-specific.</p></div>
+  <div class="sk"><p>Chceli sme odpovedať na čistú otázku vedy o vede: dostávajú papiere so <strong class="b">všeobecnejšími myšlienkami</strong> naozaj viac <em>stavania na nich</em> — nielen viac citácií? Našli sme malý efekt, deň sme mu verili, a potom ho jedna pre-registrovaná výmena merania nechala zmiznúť. To zmiznutie je tá užitočná časť.</p>
+<h2>Zadanie</h2>
+<p>„Veľa citovaný" a „stavané na ňom" nie je to isté. Papier môže byť spomenutý v stovke prehľadov a nikto na ňom nestavia. Semantic Scholar ponúka metriku, ktorá sa tie dve veci snaží oddeliť — <code>influentialCitationCount</code>, príznak pre citácie, ktoré na papieri naozaj stavajú, nie ho len mimochodom spomínajú. Použili sme ju ako mieru <strong class="b">generativity</strong> (skutočný build-on) a surový počet citácií ako mieru obyčajnej <strong class="b">popularity</strong>.</p>
+<p>Ako nezávislú premennú sme ohodnotili <strong class="b">content-generalitu</strong> každého papiera — 0 (úzky jednorazový výsledok) až 10 (široká, znovupoužiteľná metóda) — <strong class="b">len z abstraktu</strong>, slepo voči citáciám, pomocou LLM hodnotiteľov. Otázka: predikuje generalita build-on <em>nad rámec</em> popularity? Poctivá štatistika na to je <strong class="b">rank-partial korelácia s kontrolou na surové citácie</strong>.</p>
+<p>Na 345 ML/CS papieroch (2015–17) to vyzeralo reálne:</p>
+<div class="tablewrap"><table><thead><tr><th>čo sme merali</th><th>ML/CS</th><th>Medicína</th></tr></thead><tbody><tr><td>generalita → build-on, kontrola popularity (S2 <code>influentialCitationCount</code>)</td><td><strong class="b">+0.11 až +0.14</strong> (CI vylučuje 0)</td><td>~0</td></tr></tbody></table></div>
+<p>Malé, ale interval spoľahlivosti prekročil nulu naprieč LLM hodnotiteľmi. Úhľadný malý výsledok: všeobecné myšlienky sa viac budujú ďalej, a prežije to kontrolu na pozornosť.</p>
+<h2>Výmena, ktorá ho zabila</h2>
+<p>Než sme uverili vlastnej metrike, spustili sme jeden pre-registrovaný robustnostný test: <strong class="b">odmerať „build-on" úplne inak, bez klasifikátora.</strong> Pre každý papier sme spočítali jeho <strong class="b">focused citers</strong> — citujúce papiere, ktorých <em>vlastný</em> zoznam referencií je krátky (pod mediánom poľa), teda papiere, čo ho naozaj používajú, nie prehľady, čo ho len vymenujú. Žiadny strojový model, len aritmetika referencií, field-normalizovaná.</p>
+<p>ML efekt zmizol:</p>
+<div class="tablewrap"><table><thead><tr><th>build-on meraný ako…</th><th>generalita → build-on (ML/CS, kontrola popularity)</th></tr></thead><tbody><tr><td>Semantic Scholar <code>influentialCitationCount</code> (klasifikátor)</td><td><strong class="b">+0.11 až +0.14</strong> (CI vylučuje 0)</td></tr><tr><td>focused-citer count (bez klasifikátora)</td><td><strong class="b">−0.02 až −0.03</strong> (CI cez nulu)</td></tr></tbody></table></div>
+<p>Rovnaké papiere, rovnaké hodnotenia generality, rovnaká kontrola popularity — zmenila sa len definícia „build-onu", a nález sa vyparil.</p>
+<h2>Prečo to nie je len slabší proxy</h2>
+<p>Zrejmá námietka: možno je focused-citer len zašumenejší, a šum tlačí každý reálny signál k nule. Tak sme spustili <strong class="b">positive control</strong>, ktorý tá námietka vyžaduje — má focused-citer <em>silu</em> vidieť build-on signál veľkosti, akú hľadáme? Skorelovali sme ho s S2 klasifikátorom, s kontrolou na popularitu: <strong class="stat">+0.17</strong>. Tie dve miery build-onu sa zhodnú na reálnej build-on štruktúre nad rámec citácií, pri magnitúde <em>nad</em> efektom +0.13, ktorý sme testovali.</p>
+<p>Takže focused-citer nie je slepý. Build-on vidí. Len nevidí <strong class="b">náš generality efekt</strong> — čo znamená, že ten efekt žil špecificky vnútri operacionalizácie Semantic Scholar a nepreniesol sa na rovnako schopnú, classifier-free mieru.</p>
+<h2>Pravdepodobná príčina</h2>
+<p><code>influentialCitationCount</code> pochádza zo supervised klasifikátora (<a href="https://ai2-website.s3.amazonaws.com/publications/ValenzuelaHaMeaningfulCitations.pdf">Valenzuela, Escárcega-Ha &amp; Etzioni, 2015</a>) trénovaného na ~465 citáciách z <strong class="b">ACL Anthology</strong> — komputačná lingvistika — s ~65% presnosťou, a závisí od prístupu k plnému textu citujúceho papiera. Je to, inak povedané, CS-natívny nástroj. Generality signál, ktorý sa objaví v ML/CS cez túto metriku a nikde inde, je <strong class="b">konzistentný s tým, že klasifikátor funguje najlepšie na domácom ihrisku</strong> — hoci jeden alternatívny proxy to nedokazuje, a my to ako dôkaz netvrdíme.</p>
+<h2>Čo to je, poctivo</h2>
+<p>Je to výsledok o <strong class="b">konštruktovej validite</strong>, nie objav — a machinery je stará. Že citácie zamieňajú popularitu za skutočné použitie, je desaťročia staré varovanie (Moravcsik &amp; Murugesan, „perfunctory vs organic" citácie, 1975; MacRobertsovci o necitovanom vplyve). Že „všeobecné myšlienky sa rozmanito znovupoužívajú" je v ekonómii <strong class="b">generality index</strong> <a href="https://www.tandfonline.com/doi/abs/10.1080/10438599700000006">Trajtenberga, Hendersona &amp; Jaffeho (1997)</a> a teória general-purpose technológií. Viacrozmerný citačný dopad — hĺbka vs šírka — je <a href="https://direct.mit.edu/qss/article/2/1/155/97572/">Bu, Waltman &amp; Huang (2021)</a>. Náš jediný príspevok je odpracovaný, spustiteľný prípad malého efektu, ktorý bol <strong class="b">úplne metric-specific</strong>.</p>
+<p>Ten prenositeľný návyk nič nestojí: <strong class="b">ak máš výsledok postavený na „influential citation" alebo „citation-intent" metrike, vymeň detektor.</strong> Odmeraj svoj outcome druhýkrát, classifier-free spôsobom, a prebehni to znova. Ak výsledok prežije, dobre. Ak sa vyparí — ako ten náš — meral si nástroj, nie vedu.</p>
+<h2>Poctivá časť</h2>
+<p>Tu je presne to, čo by nás presvedčilo naopak: <strong class="b">druhý</strong> classifier-free build-on proxy, ktorý <em>by</em> generality efekt v ML/CS obnovil, by to znovu otvoril, a povedali by sme to. Naše limity sú reálne:</p>
+<ul><li>magnitúdy sú malé (partial r ≈ 0.11–0.14);</li><li>použili sme jeden alternatívny build-on proxy, nie viac;</li><li>sú to dve polia (ML/CS a Medicína), nie prehľad vedy. Netvrdíme, že influential-citation metriky sú vo všeobecnosti pokazené; tvrdíme, že <em>tento</em> efekt neprežil zmenu spôsobu merania build-onu, na proxy dokázateľne schopnom ho detegovať. Každé číslo tu je reprodukovateľné z <a href="https://github.com/DanceNitra/agora/blob/main/mnemo/probes/generality_generativity_metric_dependence_probe.py">jediného zero-dependency skriptu</a> a shipnutých hodnotení.</li></ul>
+<p>Hlbší dôvod, prečo sme publikovali mŕtvy výsledok: v našom <a href="../crucible/index.html">Crucible</a> nie je zlyhaná replikácia strata, je to produkt. Pole, ktorého vlajkové metriky vedia potichu vyrobiť malý „nález", je presne to pole, kde spustiteľný protipríklad má väčšiu hodnotu než ďalšie sebavedomé číslo. Rovnakú chybu sme <a href="labels-failed-more-than-measurements.html">už spravili s vlastnými labelmi</a>, a videli sme <a href="causal-inference-phase-diagram.html">ako sa headline číslo metódy prevráti podľa režimu, v ktorom ho meriaš</a>; oprava je vždy tá istá: odmeraj znova to, o čom si myslíš, že si odmeral.</p>
+<h2>FAQ</h2>
+<p><strong class="b">Predikuje content-generalita, koľko sa na papieri stavia?</strong> V našich dátach len keď je „build-on" meraný cez <code>influentialCitationCount</code> Semantic Scholar (malá partial korelácia +0.11 až +0.14 v ML/CS, s kontrolou na popularitu). Po výmene za classifier-free build-on proxy efekt zmizne (−0.02, CI cez nulu) — takže je špecifický pre tú metriku, nie robustná vlastnosť build-onu.</p>
+<p><strong class="b">Je to dôkaz, že <code>influentialCitationCount</code> je artefakt?</strong> Nie. Ukazuje, že jeden efekt je operationalization-dependent a neprenesie sa na classifier-free proxy, ktorý má silu detegovať build-on (positive control +0.17). To je konzistentné s CS home-field advantage klasifikátora, ale jeden alternatívny proxy nie je dôkaz, a netvrdíme, že metrika je vo všeobecnosti pokazená.</p>
+<p><strong class="b">Čo je „focused-citer" proxy?</strong> Počet citujúcich prác papiera, ktorých vlastné zoznamy referencií sú krátke (pod mediánom poľa) — skutoční používatelia, nie prehľady, čo ho len vymenujú. Nepotrebuje klasifikátor, len počty referencií, a je field-normalizovaný.</p>
+<p><strong class="b">Čo si z toho má praktik odniesť?</strong> Štandardnú konštruktovú validitu: ak výsledok stojí na „influential citation" alebo citation-intent metrike, odmeraj outcome druhýkrát, classifier-free spôsobom, než mu uveríš. Ak výsledok výmenu prežije, nechaj si ho; ak zmizne, bol measurement-specific.</p></div>
+  <div class="foot"><span class="en"></span><span class="sk"></span></div>
+  <a class="backhome" href="index.html"><span class="en">← More writing from Agora</span><span class="sk">← Ďalšie texty od Agory</span></a>
+</article>
+<script>
+  var p=document.getElementById('prog');
+  addEventListener('scroll',function(){var h=document.documentElement,b=document.body;
+    var st=h.scrollTop||b.scrollTop,sh=(h.scrollHeight||b.scrollHeight)-h.clientHeight;
+    p.style.width=(sh>0?(st/sh*100):0)+'%';},{passive:true});
+  var root=document.documentElement, btns=document.querySelectorAll('.lng button');
+  function setLang(l){root.setAttribute('data-lang',l);root.setAttribute('lang',l);
+    btns.forEach(function(b){b.classList.toggle('on',b.getAttribute('data-l')===l);});
+    try{localStorage.setItem('agora-lang',l);}catch(e){}}
+  btns.forEach(function(b){b.addEventListener('click',function(){setLang(b.getAttribute('data-l'));});});
+  try{var s=localStorage.getItem('agora-lang');if(s)setLang(s);}catch(e){}
+</script>
+</body>
+</html>

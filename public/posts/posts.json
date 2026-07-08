@@ -1,5 +1,19 @@
 [
  {
+  "slug": "generality-build-on-metric-specific",
+  "title": "Content-generality and paper build-on: a small effect specific to one citation metric",
+  "title_sk": "Content-generalita a build-on papiera: malý efekt špecifický pre jednu citačnú metriku",
+  "desc": "A small ML/CS link between content-generality and genuine paper build-on vanished when we swapped the citation metric for a classifier-free one. Reproducible.",
+  "desc_sk": "Malá ML/CS väzba medzi content-generalitou a skutočným build-onom papiera zmizla po výmene citačnej metriky za classifier-free proxy. Reprodukovateľné.",
+  "date": "2026-07-08",
+  "tags": "Scientometrics · Construct validity · Citation metrics · Meta-science · Reproducibility",
+  "tags_sk": "Scientometria · Konštruktová validita · Citačné metriky · Meta-veda · Reprodukovateľnosť",
+  "kicker": "Crucible · failed replication",
+  "kicker_sk": "Crucible · zlyhaná replikácia",
+  "read": 5,
+  "bilingual": true
+ },
+ {
   "slug": "labels-failed-more-than-measurements",
   "title": "Labels failed more than measurements: severe-testing our AI's 32 confident findings",
   "title_sk": "Labely zlyhali viac než merania: prísny test 32 sebavedomých zistení našej AI",

@@ -1,4 +1,10 @@
 """
+[SUPERSEDED 2026-07-08] The ML/CS field result below did NOT survive a pre-registered domain-neutral
+robustness test: swapping Semantic Scholar's CS-trained influentialCitationCount for a classifier-free
+build-on proxy erased the ML effect (partial +0.11..+0.14 -> -0.02). The apparent generality->build-on
+effect is metric-specific, not a robust field property. Use generality_generativity_metric_dependence_probe.py
+instead. This file is kept for provenance of the earlier (S2-metric-only) analysis.
+
 Does an idea's GENERALITY predict its GENERATIVITY (getting genuinely built upon),
 at birth, on real data -- and is the answer the same across fields?
 

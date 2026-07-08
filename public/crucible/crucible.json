@@ -1,13 +1,22 @@
 {
  "name": "The Crucible — machine replication ledger",
  "description": "Scientific and technical claims rebuilt as minimal computational models and tested. REPRODUCED = the mechanism holds in a minimal model; FAILED = it does not; NOT_COMPUTABLE = no simulable core (an honest pass).",
- "generated": "2026-07-06",
+ "generated": "2026-07-08",
  "counts": {
   "REPRODUCED": 20,
-  "FAILED": 11,
+  "FAILED": 12,
   "NOT_COMPUTABLE": 20
  },
  "entries": [
+  {
+   "claim": "A paper's content-generality (rated reference-blind from its abstract) predicts how much it gets genuinely BUILT UPON — beyond raw-citation popularity.",
+   "source": "A plausible science-of-science hypothesis in the lineage of the patent 'generality index' (Trajtenberg, Henderson & Jaffe 1997) and general-purpose-technology theory; operationalized with Semantic Scholar's influentialCitationCount (Valenzuela, Escarcega-Ha & Etzioni 2015, AAAI workshop) as the 'genuine build-on' signal.",
+   "verdict": "FAILED",
+   "note": "Reference-blind LLM generality ratings (deepseek-v4-flash + kimi-k2.7-code) vs build-on on real Semantic Scholar data (345 ML/CS + 413 Medicine papers, 2015-17). With S2 influentialCitationCount, generality->build-on rank-partial (controlling raw citations) = +0.11/+0.14 in ML/CS (95% CI excludes 0), ~0 in Medicine: a small apparent effect. PRE-REGISTERED domain-neutral swap to a classifier-free build-on proxy (focused-citer = citing papers with short reference lists, field-normalized) erases it: ML partial = -0.02/-0.03 (CI straddles 0). Positive control: focused-citer detects build-on beyond popularity at partial +0.17, so the null is not proxy noise. Verdict: the effect is metric-specific / operationalization-dependent - consistent with (not proof of) the CS-trained influential-citation classifier's home-field advantage. Limits: small magnitudes, one classifier-free proxy, two fields.",
+   "lab_id": "",
+   "code": "https://github.com/DanceNitra/agora/blob/main/mnemo/probes/generality_generativity_metric_dependence_probe.py",
+   "date": "2026-07-08"
+  },
   {
    "claim": "Attaching provenance to a memory -- a \"source:\" tag, a \"corroborated by N records\" line, an authority claim, even coherence/recency checks -- makes an LLM agent memory safe against poisoning.",
    "source": "OWASP Agentic Top-10 ASI06 (Memory & Context Poisoning) + widespread agent-memory/RAG guidance to trust records that cite a source or are corroborated; the folk assumption that provenance metadata is an integrity control.",
