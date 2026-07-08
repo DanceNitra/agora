@@ -1617,7 +1617,7 @@ class Mnemo:
                 pass
 
     def spend_irreversible(self, ids, amount: float = 1.0, budget: float = 1.0,
-                           provenance_lo: float | None = None) -> dict:
+                           provenance_lo: float | None = None, require_earned: bool = False) -> dict:
         """Per-source LIFETIME budget on IRREVERSIBLE influence — the integral cap that bounds the one residual
         the rate-detector (monitor) provably CANNOT: the strictly-below-k patient attacker. monitor()'s k is a
         tolerated RATE, so an attacker holding bad-rate BELOW k gives the CUSUM negative drift -> no detection
@@ -1671,11 +1671,23 @@ class Mnemo:
         if provenance_lo is None:
             _cap = lambda s: float(budget)
         else:
-            _corr_srcs = set()
+            # require_earned=True narrows the full-budget grant from _corroborated (which by default accepts the
+            # FORGEABLE >=2-distinct-source path) to EARNED OUTCOME only (good>0 and good>=bad — the one signal a
+            # sybil cannot mint; a forged/attested >=2-witness sybil clears _corroborated but not this). Slashed/
+            # orphan records never qualify. Cost: any source without earned outcome is capped at provenance_lo, so
+            # this heavily throttles the (large) not-yet-earned legitimate slice -- opt-in for high-stakes only.
+            def _grants_full(r):
+                if (r.get("meta") or {}).get("slashed") or r.get("orphan"):
+                    return False
+                if require_earned:
+                    g = float(r.get("good", 0) or 0); b = float(r.get("bad", 0) or 0)
+                    return g > 0 and g >= b
+                return self._corroborated(r, by_id)
+            _full_srcs = set()
             for r in recs:
-                if self._corroborated(r, by_id):
-                    _corr_srcs |= Mnemo._rec_sources(r)
-            _cap = lambda s: float(budget) if s in _corr_srcs else float(provenance_lo)
+                if _grants_full(r):
+                    _full_srcs |= Mnemo._rec_sources(r)
+            _cap = lambda s: float(budget) if s in _full_srcs else float(provenance_lo)
         # the tightest contributing source binds: deny if ANY contributing source would exceed its lifetime budget
         exhausted = [s for s in srcs if float(B.get(s, 0.0)) + float(amount) > _cap(s)]
         allowed = not exhausted
