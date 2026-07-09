@@ -6,7 +6,7 @@
 
 *Memory is the mother of the Muses. An agent with no memory has no ideas.*
 
-`pip install agora-mnemo` · [PyPI](https://pypi.org/project/agora-mnemo/) · [Hugging Face](https://huggingface.co/Danchi17/mnemo) · [DOI 10.5281/zenodo.21128549](https://doi.org/10.5281/zenodo.21128549) · MIT · v0.6.7
+`pip install agora-mnemo` · [PyPI](https://pypi.org/project/agora-mnemo/) · [Hugging Face](https://huggingface.co/Danchi17/mnemo) · [DOI 10.5281/zenodo.21128549](https://doi.org/10.5281/zenodo.21128549) · MIT · v0.6.8
 
 </div>
 
@@ -401,6 +401,21 @@ attacker sets, so a forged-source sybil poison can earn the full budget for an i
 attested ≥2-witness sybil clears corroboration but not this). Cost: any not-yet-earned legitimate source is
 throttled to `provenance_lo` too, so it is opt-in for high-stakes deployments; default `False` is a
 byte-identical legacy path. Receipt: `mnemo/probes/spend_irreversible_require_earned_probe.py`.
+
+### Near-tie recency reorder for corrected facts: `recall(tie_recent=eps)` (0.6.8)
+When a fact is later **corrected in free text**, SRO supersession never triggers and the stale value can
+outrank the fresh one: measured on MemBench (ACL 2025 Findings) knowledge-update questions, the **stale value
+wins rank-1 in 32.7%** of cases — identically for raw cosine and mnemo's semantic recall (receipt:
+`mnemo/probes/membench_recall_probe_v2.py`). `tie_recent=eps` re-orders candidates whose relevance is within
+`eps` of the strongest candidate **newest-first** (by `valid_from`, falling back to `ts`); everything below the
+band keeps its score order. Measured sweep (222 questions incl. 3 non-update control splits, receipt:
+`mnemo/probes/membench_recency_tiebreak_probe.py`): `tie_recent=0.05` on centered cosine cuts stale-beats-fresh
+**0.327 → 0.109 (3×) at ~zero hit@1/5 cost on the control splits**; a *linear* position bonus was measured
+useless (no movement before it damages controls) — the band reorder is the shape that works. Honest scope: the
+benchmark's corrections always come after the original mention (by construction; the control-split cost is the
+fairness check), and an adversarial **echo of the stale value re-stated after the correction would be
+promoted** — don't use on hostile ingestion without provenance gating (combine with `influence_only`).
+Opt-in; default `None` = byte-identical legacy recall.
 
 ## Use it as an MCP server (any Claude / Cursor / agent client)
 

@@ -109,7 +109,7 @@ def attest(text: str, source_sk_hex: str, source_doc=None) -> str:
     sk = _Ed25519SK.from_private_bytes(bytes.fromhex(source_sk_hex))
     return sk.sign(_attest_message(text, source_doc)).hex()
 
-__version__ = "0.6.7"
+__version__ = "0.6.8"
 _WORD = re.compile(r"[a-z0-9][a-z0-9\-']{2,}")
 _STOP = frozenset("the a an of for to in on and or is are was were be been with this that it its as "
                   "by at from into our we us you your he she they them his her their not no".split())
@@ -697,6 +697,7 @@ class Mnemo:
                where: dict | None = None, influence_only: bool = False,
                prefer=None, prefer_trust: float = 1.0,
                prefer_max_boost: float | None = None, near: dict | None = None,
+               tie_recent: float | None = None,
                with_status: bool = False, with_warrant: bool = False) -> list[dict]:
         """Top-k memories by RELEVANCE × VALUE — high-value memories outrank merely-similar ones.
         Memories the dream pass flagged as hubs (universal matchers) are skipped unless include_hubs.
@@ -770,7 +771,24 @@ class Mnemo:
         evidence — the classic 'combine outside the saturating form' failure, BM25F, Robertson et al. CIKM
         2004). So: compose as a PRODUCT, and if you cap, cap the product, not the summed trusts. This mirrors
         production search (Elasticsearch function_score defaults score_mode=multiply). Reversible: a single
-        dict / None behaves exactly as before."""
+        dict / None behaves exactly as before.
+
+        tie_recent (OPT-IN, default None -> zero behavior change): NEAR-TIE RECENCY REORDER for stale-vs-
+        fresh fact competition. When a fact is later corrected in free text, SRO supersession never triggers
+        and the STALE value can outrank the fresh one (measured on MemBench knowledge_update: the stale
+        value wins rank-1 in 32.7% of update questions, identically for raw cosine and mnemo semantic —
+        mnemo/probes/membench_recall_probe_v2.py). Pass a small similarity epsilon (measured sweet spot
+        0.02-0.05 on centered cosine): candidates whose RELEVANCE is within tie_recent of the strongest
+        candidate's relevance are re-ordered newest-first (by valid_from, falling back to ts) ahead of the
+        rest; everything below the band keeps its score order. MEASURED
+        (mnemo/probes/membench_recency_tiebreak_probe.py, 222 questions incl. 3 control splits):
+        tie_recent=0.05 cuts stale-beats-fresh 0.327 -> 0.109 (3x) at ~zero hit@1/5 cost on non-update
+        control splits; a LINEAR position bonus was measured USELESS (no SBF movement before it damages
+        controls) — the band reorder is the shape that works. HONEST SCOPE: (a) in the benchmark the
+        correction always comes after the original mention (by construction); the control-split cost is
+        the fairness check; (b) adversarial hole: an ECHO of the stale value re-stated AFTER the correction
+        would be promoted — tie_recent trusts recency inside the band, so do not use it on hostile
+        ingestion without provenance gating (combine with influence_only). Reversible: None = legacy."""
         # Normalize `prefer` into a list of (cond_dict, clamped_trust) specs. Back-compat: a plain dict uses
         # the scalar prefer_trust (the legacy one-dimension path, byte-identical scoring); a list composes.
         _prefer_specs: list = []
@@ -973,6 +991,16 @@ class Mnemo:
             score = sim * (1.0 + math.log1p(max(0.0, evalue))) * prov * cal * pref * nb
             scored.append((score, sim, r))
         scored.sort(key=lambda x: -x[0])
+        # Near-tie recency reorder (OPT-IN via tie_recent; see docstring for the measured provenance).
+        # Band on RELEVANCE (sim), not the composite score: the composite mixes value/calibration channels
+        # whose scale varies per store, while sim is the [0,1] channel the epsilon was measured on.
+        if tie_recent is not None and scored:
+            _eps = max(0.0, float(tie_recent))
+            _top_sim = max(t[1] for t in scored)
+            _tied = [t for t in scored if t[1] >= _top_sim - _eps]
+            _rest = [t for t in scored if t[1] < _top_sim - _eps]
+            _tied.sort(key=lambda t: -(t[2].get("valid_from") or t[2]["ts"]))
+            scored = _tied + _rest
         out = []
         _top_sim = scored[0][1] if scored else 1.0   # normalize reinforcement by this query's best match
         for score, sim, r in scored[:k]:
