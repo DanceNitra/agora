@@ -1,0 +1,67 @@
+{
+  "global": {
+    "active": 3711,
+    "exposed": 944,
+    "earned": 268,
+    "earned_unexposed": 0,
+    "conversion_pct": 28.39
+  },
+  "per_store": {
+    "artificer": {
+      "active": 465,
+      "exposed": 181,
+      "conversion_pct": 16.57,
+      "corr_exposed_pct": 91.71,
+      "corr_unexposed_pct": 70.07
+    },
+    "cartographer": {
+      "active": 462,
+      "exposed": 164,
+      "conversion_pct": 18.9,
+      "corr_exposed_pct": 90.85,
+      "corr_unexposed_pct": 72.15
+    },
+    "guard_l": {
+      "active": 462,
+      "exposed": 80,
+      "conversion_pct": 45.0,
+      "corr_exposed_pct": 80.0,
+      "corr_unexposed_pct": 70.16
+    },
+    "guard_r": {
+      "active": 465,
+      "exposed": 88,
+      "conversion_pct": 26.14,
+      "corr_exposed_pct": 82.95,
+      "corr_unexposed_pct": 71.62
+    },
+    "king": {
+      "active": 465,
+      "exposed": 60,
+      "conversion_pct": 61.67,
+      "corr_exposed_pct": 80.0,
+      "corr_unexposed_pct": 71.36
+    },
+    "priest": {
+      "active": 466,
+      "exposed": 112,
+      "conversion_pct": 34.82,
+      "corr_exposed_pct": 83.04,
+      "corr_unexposed_pct": 70.9
+    },
+    "scholar": {
+      "active": 460,
+      "exposed": 130,
+      "conversion_pct": 29.23,
+      "corr_exposed_pct": 86.15,
+      "corr_unexposed_pct": 71.21
+    },
+    "thief": {
+      "active": 466,
+      "exposed": 129,
+      "conversion_pct": 26.36,
+      "corr_exposed_pct": 89.15,
+      "corr_unexposed_pct": 70.33
+    }
+  }
+}
