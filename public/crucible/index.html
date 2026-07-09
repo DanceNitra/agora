@@ -5,8 +5,9 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>The Crucible &middot; a machine that rebuilds claims in code &middot; Agora</title>
-<meta name="description" content="A public ledger of scientific and technical claims rebuilt as minimal computational models and tested in code: 20 reproduced, 12 failed, 4 honest passes. Every verdict ships runnable code and a measured number.">
+<meta name="description" content="A public ledger of scientific and technical claims rebuilt as minimal computational models and tested in code: 21 reproduced, 12 failed, 4 honest passes. Every verdict ships runnable code and a measured number.">
 <link rel="canonical" href="https://dancenitra.github.io/agora/public/crucible/">
+<script type="application/ld+json">{"@context":"https://schema.org","@graph":[{"@type":"Dataset","name":"The Crucible — AI-claim replication ledger","description":"A public, machine-readable ledger of scientific and technical claims rebuilt as minimal computational models and tested in code (21 reproduced, 12 failed, 4 not-computable). Every verdict ships runnable code and a measured number.","url":"https://dancenitra.github.io/agora/public/crucible/","license":"https://opensource.org/licenses/MIT","creator":{"@type":"Organization","name":"Agora","url":"https://dancenitra.github.io/agora/"},"variableMeasured":["reproduced","failed","not-computable"]},{"@type":"WebSite","name":"Agora","url":"https://dancenitra.github.io/agora/","publisher":{"@type":"Organization","name":"Agora"}}]}</script>
 <meta property="og:type" content="website">
 <meta property="og:title" content="The Crucible — claims, rebuilt in code and tested">
 <meta property="og:description" content="A machine rebuilds scientific claims as minimal models and publishes the verdict — failures included. Every verdict ships runnable code.">
@@ -174,7 +175,7 @@
   rarest export, published here), and <b>not computable</b> when there&rsquo;s no simulable core.
   Every verdict ships a measured number and the code that produced it.</p>
   <div class="tally">
-    <div class="t ok"><div class="num">20</div><div class="lbl">Reproduced</div></div>
+    <div class="t ok"><div class="num">21</div><div class="lbl">Reproduced</div></div>
     <div class="t fail"><div class="num">12</div><div class="lbl">Failed</div></div>
     <div class="t"><div class="num">4</div><div class="lbl">Honest passes</div></div>
   </div>
@@ -195,13 +196,23 @@
     </div>
   </section>
 <section class="ledger"><div class="wrap">
-  <div class="sechead"><h2>The ledger</h2><div class="sub">32 claims rebuilt &amp; tested &middot; newest first</div></div>
+  <div class="sechead"><h2>The ledger</h2><div class="sub">33 claims rebuilt &amp; tested &middot; newest first</div></div>
   <div class="filters">
     <button class="on" data-f="all">All</button>
     <button data-f="REPRODUCED">Reproduced</button>
     <button data-f="FAILED">Failed</button>
   </div>
   <div class="grid" id="grid">
+      <article class="card ok" data-v="REPRODUCED" data-reveal>
+        <div class="crail"></div>
+        <div class="cbody">
+          <div class="chead"><span class="cv">REPRODUCED</span>
+            <span class="cfield"></span></div>
+          <h3>For T rounds, K actions, d-dim feature vectors, an O(sqrt(T d ln^3(K T ln(T)/delta))) regr</h3>
+          <p class="cresult">Smallest model: LinUCB w/ Sherman-Morrison ridge, easy + hard small-gap instances, 8 seeds, T up to 65536. Tail log-log slope &lt;= 0.51 everywhere; bound-shape ratio non-growing. HONEST CAVEATS: (1) replicating a PROVEN theorem is textbook-safe (FAILED was live only for the practical-LinUCB-vs-proven-</p>
+          <div class="cfoot"><span class="cyear">Chu, Li, Reyzin, Schapire (AISTATS 2011), Cont</span><a class="code" href="https://github.com/DanceNitra/agora/blob/main/agora_output/lab/20260708-170833_linucb-regret-bound-replication.py" target="_blank" rel="noopener">runnable model &rarr;</a></div>
+        </div>
+      </article>
       <article class="card fail" data-v="FAILED" data-reveal>
         <div class="crail"></div>
         <div class="cbody">
@@ -549,7 +560,7 @@
 
 <footer><div class="wrap">
   <span>Agora &mdash; autonomous research OS &middot; The Crucible</span>
-  <span>updated 2026-07-08 &middot; <a href="https://github.com/DanceNitra/agora" target="_blank" rel="noopener">source</a></span>
+  <span>updated 2026-07-09 &middot; <a href="https://github.com/DanceNitra/agora" target="_blank" rel="noopener">source</a></span>
 </div></footer>
 
 <script>
