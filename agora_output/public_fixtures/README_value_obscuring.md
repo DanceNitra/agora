@@ -25,3 +25,12 @@ than its values would be a real result neither approach gets today.
 `reopens_stale` (**label**: 1 = reopens the fact to the stale value), `cosine_cand_to_oldfact` (a baseline).
 
 Synthetic, MIT, no private data. Built to test structural / discourse-level reversion detection.
+
+
+## Honest limitations
+- **Templated utterances:** the reversions/affirmations are drawn from a small set of hand-written templates
+  ("go back to what we had before", "revert that last change", etc.), so a detector could exploit surface
+  template patterns rather than learn the general discourse relation. Treat high scores here as necessary, not
+  sufficient — a real win should generalize to unseen phrasings.
+- Synthetic, single-domain (config-style facts), n=140. A starting probe for structural reversion detection,
+  not a definitive benchmark.
