@@ -1,0 +1,18 @@
+{
+  "n_rows": 140,
+  "positives_reopen_stale": 60,
+  "negatives": 80,
+  "baselines": {
+    "object_value_match (== mnemo echo_guard mechanism)": {
+      "P": 0.333,
+      "R": 0.017,
+      "F1": 0.032
+    },
+    "cosine_candidate_vs_old_fact (best threshold dir)": {
+      "P": 0.514,
+      "R": 0.6,
+      "F1": 0.554
+    }
+  },
+  "note": "Both baselines fail: the reversion never names the value, so value-token and similarity signals are blind. The discriminant is the DISCOURSE RELATION (revert vs keep). Open challenge for structural detection."
+}

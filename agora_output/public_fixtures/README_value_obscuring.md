@@ -13,8 +13,8 @@ set (140 rows, 60 positive):
 
 | baseline | F1 | why it fails |
 |---|---|---|
-| object/value match | **0.032** | the reversion never names the old value — nothing to key on |
-| cosine (candidate vs old fact) | **0.372** | "go back" carries no lexical/semantic trace of the value |
+| object/value match (= mnemo `echo_guard`) | **0.032** | the reversion never names the old value — nothing to key on |
+| cosine (candidate vs old fact, best threshold) | **0.554 ≈ chance** | "go back" carries no lexical/semantic trace of the value (positive base rate 0.43) |
 
 A method that flags "this utterance re-opens a settled decision" from the **shape** of the exchange rather
 than its values would be a real result neither approach gets today.
