@@ -379,7 +379,7 @@
  },
  {
   "slug": "why-a-captured-company-doesnt-un-capture-itself-governance-h",
-  "title": "Why a captured company doesnt un-capture itself: an old physics idea, and the real (charter-based) reason",
+  "title": "Why a captured company can't un-capture itself: the charter reason",
   "title_sk": "Preco sa ovladnuta firma sama neuvolni: stara idea z fyziky a skutocny (charterovy) dovod",
   "desc": "Governance hysteresis is textbook Ising physics, and the real reason a captured firm stays captured is charter architecture (staggered boards, poison pills, coupled ownership) - not a tipping point in shareholder opinion.",
   "desc_sk": "Governance hysteresis je ucebnicova Isingova fyzika a skutocny dovod, preco ovladnuta firma zostane ovladnuta, je charterova architektura (staggered boards, poison pills, previazane vlastnictvo) - nie tipping point v nazoroch akcionarov.",
@@ -463,7 +463,7 @@
  },
  {
   "slug": "we-hunted-for-the-tipping-point-in-8-systems-only-one-is-a-t",
-  "title": "We hunted for the tipping point in 8 systems. Only one is a true critical cliff - and 'model collapse' isn't it.",
+  "title": "Model collapse isn't a critical cliff: we checked 8 systems",
   "title_sk": "Lovili sme bod zlomu v 8 systémoch. Len jeden je skutočný kritický útes - a kolaps modelu ním nie je.",
   "desc": "Extending a 4-system hunt: only the zero-grounding herding limit looks like a genuine critical transition; model collapse is a locatable threshold, not a cliff.",
   "desc_sk": "Rozšírenie lovu zo 4 na 8 systémov: len hranica nulového ukotvenia pri herdingu vyzerá kriticky; sebazosilnenie je lokalizovateľný prah, nie útes.",
@@ -491,7 +491,7 @@
  },
  {
   "slug": "a-pre-trend-too-gentle-to-see-can-bias-a-difference-in-diffe",
-  "title": "A pre-trend too gentle to see can bias a difference-in-differences estimate by ~77% — and the standard test usually misses it",
+  "title": "A pre-trend too small to see biases diff-in-diff by ~77%",
   "title_sk": "Pre-trend príliš jemný na to, aby bol vidieť, môže skresliť odhad difference-in-differences o ~77 % — a štandardný test to zvyčajne nezachytí",
   "desc": "A gentle pre-trend biases a difference-in-differences estimate by 77% — the correct test catches it only ~16% of the time. Reproduces Roth (2022).",
   "desc_sk": "Jemný pre-trend skreslí DiD odhad o 77 % — správny test to zvyčajne zachytí len v ~16 % prípadov. Reprodukuje Rotha (2022).",
@@ -505,7 +505,7 @@
  },
  {
   "slug": "the-calibrated-prior-for-we-reversed-aging-in-mice-near-zero",
-  "title": "The calibrated prior for 'we reversed aging in mice': low single digits, not zero - and here's the arithmetic",
+  "title": "How likely is 'we reversed aging in mice'? The calibrated prior",
   "title_sk": "Kalibrovaný prior pre „zvrátili sme starnutie u myší“: nízke jednotky percent, nie nula — a tu je tá aritmetika",
   "desc": "About 1 in 4 compounds extend lifespan in mice, yet the calibrated prior that a single mouse headline becomes a proven human benefit is only low single digits, not zero. Here is the arithmetic.",
   "desc_sk": "Asi 1 zo 4 zlúčenín predĺži život myší, no kalibrovaný prior, že sa jediný myší titulok premení na preukázaný ľudský prínos, je len nízke jednotky percent, nie nula. Tu je tá aritmetika.",
@@ -631,7 +631,7 @@
  },
  {
   "slug": "a-95-confidence-interval-that-covers-31-of-the-time-differen",
-  "title": "A 95% confidence interval that covers 31% of the time: difference-in-differences with one treated unit",
+  "title": "A 95% CI that covers 31% of the time: diff-in-diff, 1 treated unit",
   "title_sk": "95 % interval spoľahlivosti, ktorý pokrýva len 31 % prípadov: difference-in-differences s jednou ošetrenou jednotkou",
   "desc": "Replication: with one treated unit and serially correlated errors, difference-in-differences' nominal 95% confidence interval covered the true effect only 31% of the time — synthetic control restored ~89% coverage, at about 4x wider intervals.",
   "desc_sk": "Replikácia: s jednou ošetrenou jednotkou a korelovanými chybami pokrýva 95 % CI metódy DiD len ~31 %; synthetic control obnoví ~89 %, ale za cenu ~4× širších intervalov.",
