@@ -1,0 +1,50 @@
+{
+  "active_only|verbatim|deepseek-v4-flash": {
+    "resurrect_rate": 0.721,
+    "n": 43
+  },
+  "active_only|verbatim|kimi-k2.7-code": {
+    "resurrect_rate": 0.814,
+    "n": 43
+  },
+  "active_only|verbatim|glm-5.2": {
+    "resurrect_rate": 0.791,
+    "n": 43
+  },
+  "active_only|paraphrase|deepseek-v4-flash": {
+    "resurrect_rate": 0.825,
+    "n": 40
+  },
+  "active_only|paraphrase|kimi-k2.7-code": {
+    "resurrect_rate": 0.85,
+    "n": 40
+  },
+  "active_only|paraphrase|glm-5.2": {
+    "resurrect_rate": 0.75,
+    "n": 40
+  },
+  "with_stale|verbatim|deepseek-v4-flash": {
+    "resurrect_rate": 0.0,
+    "n": 43
+  },
+  "with_stale|verbatim|kimi-k2.7-code": {
+    "resurrect_rate": 0.0,
+    "n": 42
+  },
+  "with_stale|verbatim|glm-5.2": {
+    "resurrect_rate": 0.0,
+    "n": 43
+  },
+  "with_stale|paraphrase|deepseek-v4-flash": {
+    "resurrect_rate": 0.0,
+    "n": 40
+  },
+  "with_stale|paraphrase|kimi-k2.7-code": {
+    "resurrect_rate": 0.0,
+    "n": 40
+  },
+  "with_stale|paraphrase|glm-5.2": {
+    "resurrect_rate": 0.025,
+    "n": 40
+  }
+}
