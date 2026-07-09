@@ -109,7 +109,7 @@ def attest(text: str, source_sk_hex: str, source_doc=None) -> str:
     sk = _Ed25519SK.from_private_bytes(bytes.fromhex(source_sk_hex))
     return sk.sign(_attest_message(text, source_doc)).hex()
 
-__version__ = "0.6.11"
+__version__ = "0.6.12"
 _WORD = re.compile(r"[a-z0-9][a-z0-9\-']{2,}")
 _STOP = frozenset("the a an of for to in on and or is are was were be been with this that it its as "
                   "by at from into our we us you your he she they them his her their not no".split())
@@ -573,6 +573,20 @@ class Mnemo:
             new_sig = self._obj_sig(rec)
             same_key = [r for r in self.items if r is not rec and r.get("key") == k]
             active = [r for r in same_key if r.get("status") == "active"]
+            # OBJECT-LESS CLOBBER GUARD: on a key managed with explicit objects (a value ledger), a keyed
+            # write carrying NO object cannot displace an object-bearing value — measured hole: a value-free
+            # reversion utterance ("go back to the old one") keyed onto the ledger superseded the real value
+            # with junk text (revert_by_reference_probe.py, B2 resistance 0.00 -> 1.00 with this guard).
+            # Changing a ledgered value requires an explicit object, reaffirm=True, or revert(). Keys that
+            # never used explicit objects (text-fallback legacy) are unaffected.
+            if rec.get("object") is None and any(r.get("object") is not None for r in active):
+                rec["status"] = "superseded"               # retired stale-on-arrival
+                rec["superseded_ts"] = time.time()
+                rec["invalidated_at"] = vf_new
+                m = rec.setdefault("meta", {})
+                m["objectless_blocked"] = True
+                m["superseded_by_toggle"] = active[0]["id"]
+                return
             superseded_sigs = {self._obj_sig(r) for r in same_key if r.get("status") == "superseded"}
             if (active and new_sig in superseded_sigs
                     and all(self._obj_sig(a) != new_sig for a in active)):
@@ -656,6 +670,48 @@ class Mnemo:
         self._mat = None; self._mat_built_n = -1             # force vec-matrix rebuild (drops forgotten rows)
         self._save(force=True)                               # a deletion is real content change — persist now
         return {"forgotten": len(target), "ids": sorted(target), "scrubbed_links": scrubbed}
+
+    def revert(self, key: str) -> dict:
+        """CONTROL-PLANE revert: restore the value that the current active record for `key` superseded.
+        The ledger knows what "the old one" is — no value token needed.
+
+        Why an explicit API and not a content write: a value-OBSCURING reversion utterance ("go back
+        to the old one", "the earlier value was right") carries NO object to key on, so no content-level
+        mechanism can distinguish a legitimate user revert from an attacker-injected one — the two are
+        byte-identical text differing only in provenance. mnemo resolves this by CHANNEL SEPARATION:
+        content writes can never undo a supersession (echo_guard retires restatements; an object-less
+        utterance never touches the key at all), and reverting is possible ONLY through this explicit
+        call, which the harness invokes for an authorized principal. Honest boundary: this moves the
+        legitimate-vs-injected decision from the store to the calling agent — a store cannot make it
+        (identical content, different provenance), but it CAN guarantee that content alone never flips
+        a corrected value, which is the property injected text needs.
+
+        Target selection is deterministic from the supersession ledger: the record whose
+        `superseded_by_toggle` points at the current active record (i.e. exactly what the current value
+        replaced), never an echo-blocked arrival (those were retired stale-on-arrival, they were never
+        the current value). Append-only: history is not edited — the revert writes a NEW record with
+        reaffirm=True (the one sanctioned path past the echo guard), so the flip is itself a ledgered,
+        attributable event. Returns {"ok": True, "restored": id, "superseded": id, ...} or
+        {"ok": False, "reason": ...}."""
+        same_key = [r for r in self.items if r.get("key") == key]
+        active = [r for r in same_key if r.get("status") == "active"]
+        if not active:
+            return {"ok": False, "reason": "no active record for key"}
+        cur = max(active, key=lambda r: r.get("valid_from", r["ts"]))
+        prev = [r for r in same_key
+                if r.get("status") == "superseded"
+                and (r.get("meta") or {}).get("superseded_by_toggle") == cur["id"]
+                and not (r.get("meta") or {}).get("echo_blocked")
+                and not (r.get("meta") or {}).get("objectless_blocked")]
+        if not prev:
+            return {"ok": False, "reason": "no superseded predecessor for key"}
+        tgt = max(prev, key=lambda r: r.get("valid_from", r["ts"]))
+        rid = self.remember(tgt["text"], tags=tgt.get("tags"), value=tgt.get("value", 1.0),
+                            mtype=tgt.get("mtype"), key=key, object=tgt.get("object"),
+                            reaffirm=True,
+                            meta={"revert_of": tgt["id"], "reverted_from": cur["id"]})
+        return {"ok": True, "restored": rid, "superseded": cur["id"],
+                "reverted_to_object": tgt.get("object"), "reverted_to_text": tgt["text"]}
 
     # ── retrieval (value-ranked) ──────────────────────────────────────────────
     def _qvec(self, query: str):
