@@ -6,7 +6,7 @@
 
 *Memory is the mother of the Muses. An agent with no memory has no ideas.*
 
-`pip install agora-mnemo` · [PyPI](https://pypi.org/project/agora-mnemo/) · [Hugging Face](https://huggingface.co/Danchi17/mnemo) · [DOI 10.5281/zenodo.21128549](https://doi.org/10.5281/zenodo.21128549) · MIT · v0.6.8
+`pip install agora-mnemo` · [PyPI](https://pypi.org/project/agora-mnemo/) · [Hugging Face](https://huggingface.co/Danchi17/mnemo) · [DOI 10.5281/zenodo.21128549](https://doi.org/10.5281/zenodo.21128549) · MIT · v0.6.9
 
 </div>
 
@@ -416,6 +416,29 @@ benchmark's corrections always come after the original mention (by construction;
 fairness check), and an adversarial **echo of the stale value re-stated after the correction would be
 promoted** — don't use on hostile ingestion without provenance gating (combine with `influence_only`).
 Opt-in; default `None` = byte-identical legacy recall.
+
+### Echo-attack guard for corrected facts: `m.echo_guard = True` + `remember(object=...)` (0.6.9)
+A fact is corrected (old value → superseded); later the OLD value is **re-stated** — a benign restatement or
+an attacker re-injection. On a plain recency / bi-temporal / last-writer-wins store the restatement carries a
+newer timestamp and **resurrects the stale value**. Measured on a MemBench echo fixture
+(`mnemo/probes/echo_attack_probe_v2.py`, retrieval-level stale-answer-rate, 43 corrected-fact cases; echoes
+paraphrased cross-family with deepseek/kimi/glm): recency, a mem0-v1-faithful ADD/UPDATE/DELETE policy, and a
+**bi-temporal Graphiti-faithful** policy all go **0.21 → 1.00** under both verbatim *and* paraphrased echo; a
+verbatim-hash policy (MemStrata-style) holds against verbatim (0.21) but is **destroyed by paraphrase (1.00)**.
+mnemo's own keyed supersession is vulnerable too (end-to-end `echo_guard_e2e_probe.py`: **1.00** under both).
+
+Set `echo_guard=True` and pass the asserted value as `remember(text, key=..., object=...)`: a keyed write
+whose `object` matches a value **already superseded** for that key is a restatement-of-superseded — retired
+on arrival, current value preserved. End-to-end this holds the stale rate at its no-echo baseline (~0.28)
+under **both** verbatim and paraphrased echo (attack Δ ≈ 0, vs +0.65 without the guard).
+
+**Load-bearing limit (measured, not assumed):** paraphrase-resistance comes ONLY from `object` being
+value-preserving. Embedding near-duplicate **cannot** separate a same-value paraphrase (cos ≈ 0.95) from a
+different-value correction (≈ 0.84) — they overlap (~42% false-block at 0.9) — so the guard is object/text
+based, never similarity based. An echo that **obscures** the value (coreferent "her old hobby") is not
+caught, and without `object` the guard falls back to normalized text (verbatim-only, MemStrata-equivalent).
+A genuine reversal back to a superseded value needs `remember(..., reaffirm=True)` (the guard can't
+un-supersede on its own). Opt-in; `echo_guard=False` (default) = byte-identical legacy keyed supersession.
 
 ## Use it as an MCP server (any Claude / Cursor / agent client)
 

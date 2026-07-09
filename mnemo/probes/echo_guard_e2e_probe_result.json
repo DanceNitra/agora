@@ -1,0 +1,26 @@
+{
+  "guard_False|none": {
+    "stale_active_rate": 0.3488,
+    "n": 43
+  },
+  "guard_False|verbatim": {
+    "stale_active_rate": 1.0,
+    "n": 43
+  },
+  "guard_False|paraphrase": {
+    "stale_active_rate": 1.0,
+    "n": 40
+  },
+  "guard_True|none": {
+    "stale_active_rate": 0.2791,
+    "n": 43
+  },
+  "guard_True|verbatim": {
+    "stale_active_rate": 0.2791,
+    "n": 43
+  },
+  "guard_True|paraphrase": {
+    "stale_active_rate": 0.275,
+    "n": 40
+  }
+}

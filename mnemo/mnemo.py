@@ -109,7 +109,7 @@ def attest(text: str, source_sk_hex: str, source_doc=None) -> str:
     sk = _Ed25519SK.from_private_bytes(bytes.fromhex(source_sk_hex))
     return sk.sign(_attest_message(text, source_doc)).hex()
 
-__version__ = "0.6.8"
+__version__ = "0.6.9"
 _WORD = re.compile(r"[a-z0-9][a-z0-9\-']{2,}")
 _STOP = frozenset("the a an of for to in on and or is are was were be been with this that it its as "
                   "by at from into our we us you your he she they them his her their not no".split())
@@ -207,6 +207,24 @@ class Mnemo:
         # quickest-change-detection tradeoff; lab f490d8).
         # Reversible: 0 or 1 -> legacy fast supersession.
         self.supersede_persistence = 0
+        # ECHO GUARD (OPT-IN, default OFF -> byte-identical legacy). Closes the ECHO ATTACK on keyed
+        # supersession: after a fact is corrected (old value -> superseded), a later RE-STATEMENT of the
+        # OLD value (a benign restatement or an attacker re-injection) carries a newer valid_from and would
+        # otherwise retire the FRESH value and resurrect the stale one. With this ON, an incoming keyed write
+        # whose OBJECT (remember(..., object=...), else the normalized text) matches a value ALREADY
+        # superseded for that key is a restatement-of-superseded: it is retired stale-on-arrival and the
+        # current value is preserved. MEASURED (mnemo/probes/echo_attack_probe_v2.py) on a MemBench echo
+        # fixture: recency / mem0-v1 / bi-temporal-Graphiti-faithful all resurrect the stale value (stale
+        # rate 0.21 -> 1.00 under both verbatim and paraphrased echo), and a verbatim-hash policy (MemStrata)
+        # holds against verbatim (0.21) but is destroyed by paraphrase (1.00); the superseded-OBJECT ledger
+        # holds against BOTH (~0.15). LOAD-BEARING LIMIT (measured, not assumed): paraphrase-resistance comes
+        # ONLY from the OBJECT being value-preserving — embedding near-duplicate CANNOT separate a
+        # same-value paraphrase (cos mean 0.95) from a different-value correction (0.84), they overlap
+        # (~42% false-block at a 0.9 threshold), so the guard is object/text-based, NOT similarity-based; an
+        # echo that OBSCURES the value (coreferent "her old hobby") is NOT caught. A genuine reversal back to
+        # a superseded value needs remember(..., reaffirm=True) to bypass the guard (the guard cannot
+        # un-supersede on its own). Reversible: echo_guard=False = legacy keyed supersession.
+        self.echo_guard = False
         # STRICT corroboration (OPT-IN, default OFF -> identical legacy behavior). The corroboration bar
         # (episodic->semantic graduation AND the recall influence gate) counts ">=2 distinct sources". By
         # default a "source" is a canonical STRING (entity-resolved), which collapses honest sybil variants
@@ -279,7 +297,8 @@ class Mnemo:
     def remember(self, text: str, tags=None, value: float = 1.0, meta: dict | None = None,
                  mtype: str | None = None, valid_from: float | None = None,
                  source: dict | None = None, key: str | None = None,
-                 derived_from: list | None = None, attestation=None, derived: bool = False) -> str:
+                 derived_from: list | None = None, attestation=None, derived: bool = False,
+                 object: str | None = None, reaffirm: bool = False) -> str:
         """Append-only raw capture. Stamped with an absolute UTC time; never edited afterward.
         mtype in {episodic, semantic, procedural} sets the decay prior (episodic fades fast,
         semantic slow, procedural barely); inferred from the text if not given. Pass it explicitly
@@ -358,6 +377,11 @@ class Mnemo:
             rec["orphan"] = True
         if key is not None:
             rec["key"] = str(key)
+        # OBJECT (OPT-IN): the asserted VALUE for keyed supersession + the echo guard. Value-preserving
+        # paraphrases share it, so echo detection is object-identity (not similarity, which provably can't
+        # separate same-value paraphrase from different-value correction). Falls back to normalized text.
+        if object is not None:
+            rec["object"] = str(object)
         # ORIGIN ATTESTATION (OPT-IN): bind this claim to a source's VERIFIED KEY. attestation is
         # (pubkey_hex, sig_hex) or {"pubkey":..., "sig":...}; the signature (from mnemo.attest(text, sk,
         # source_doc)) must verify over the same claim+canonical-source message, else the write is REJECTED
@@ -385,7 +409,7 @@ class Mnemo:
                 rec["vec"] = None
         self.items.append(rec)
         if key is not None:
-            self._supersede_by_key(rec)   # deterministic SRO supersession (no embedding, no threshold)
+            self._supersede_by_key(rec, reaffirm=reaffirm)   # deterministic SRO supersession (no embedding, no threshold)
         self._save(force=True)        # a new memory is real content - persist immediately, not throttled
         if self.receipts_enabled:
             self._emit_write_receipt(rec)
@@ -519,18 +543,46 @@ class Mnemo:
         return {"ok": chain_ok and not relabeled, "chain_ok": chain_ok,
                 "relabeled": relabeled, "uncommitted": uncommitted, "missing": missing}
 
-    def _supersede_by_key(self, rec: dict) -> None:
+    @staticmethod
+    def _obj_sig(r: dict) -> str:
+        """The supersession OBJECT signature: the explicit `object` value if set, else normalized text.
+        Value-preserving paraphrases share the object; a verbatim-only fallback (text) matches MemStrata."""
+        o = r.get("object")
+        s = o if o is not None else r.get("text", "")
+        return re.sub(r"[^a-z0-9]+", " ", str(s).lower()).strip()
+
+    def _supersede_by_key(self, rec: dict, reaffirm: bool = False) -> None:
         """Deterministic (subject, relation, object) supersession: retire active records that share
         rec['key']. No similarity threshold, no LLM call — the fix our Crucible replication validated
         (stale-fact recall 41.7% -> 0.0%, where cosine-based detection is near chance at AUROC ~0.61).
         Bi-temporal: only same-key records with valid_from <= rec's are retired; if an active same-key
         record is genuinely newer (later valid_from), the INCOMING rec is the stale one and is retired
         instead — a back-filled value never overwrites the current one. recall() hides superseded records
-        by default, so a keyed store never surfaces a stale fact."""
+        by default, so a keyed store never surfaces a stale fact.
+
+        ECHO GUARD (self.echo_guard, default OFF): before the normal path, if the incoming rec asserts an
+        OBJECT that has ALREADY been superseded for this key AND differs from the current active value, it
+        is a restatement-of-superseded (an echo) — retire the incoming rec stale-on-arrival and keep the
+        current value, so a later re-mention of the old value cannot resurrect it. reaffirm=True bypasses
+        the guard (a genuine, authoritative reversal back to a previously-superseded value)."""
         k = rec.get("key")
         if not k:
             return
         vf_new = rec.get("valid_from", rec["ts"])
+        if self.echo_guard and not reaffirm:
+            new_sig = self._obj_sig(rec)
+            same_key = [r for r in self.items if r is not rec and r.get("key") == k]
+            active = [r for r in same_key if r.get("status") == "active"]
+            superseded_sigs = {self._obj_sig(r) for r in same_key if r.get("status") == "superseded"}
+            if (active and new_sig in superseded_sigs
+                    and all(self._obj_sig(a) != new_sig for a in active)):
+                rec["status"] = "superseded"           # the echo is retired on arrival
+                rec["superseded_ts"] = time.time()
+                rec["invalidated_at"] = vf_new
+                m = rec.setdefault("meta", {})
+                m["echo_blocked"] = True
+                m["superseded_by_toggle"] = active[0]["id"]
+                return                                 # current value preserved; skip normal supersession
         for r in self.items:
             if r is rec or r.get("status") != "active" or r.get("key") != k:
                 continue
