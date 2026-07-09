@@ -1,0 +1,15 @@
+{
+  "conversion_model": {
+    "baseline_pct": 17.1,
+    "propagate_pct": 60.0,
+    "params": {
+      "scored": 0.6,
+      "manual": 0.3
+    }
+  },
+  "poison_earn_pct": {
+    "full_set": 50.0,
+    "driving_only": 0.0,
+    "explicit": 0.0
+  }
+}

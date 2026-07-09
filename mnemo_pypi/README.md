@@ -6,7 +6,7 @@
 
 *Memory is the mother of the Muses. An agent with no memory has no ideas.*
 
-`pip install agora-mnemo` · [PyPI](https://pypi.org/project/agora-mnemo/) · [Hugging Face](https://huggingface.co/Danchi17/mnemo) · [DOI 10.5281/zenodo.21128549](https://doi.org/10.5281/zenodo.21128549) · MIT · v0.6.9
+`pip install agora-mnemo` · [PyPI](https://pypi.org/project/agora-mnemo/) · [Hugging Face](https://huggingface.co/Danchi17/mnemo) · [DOI 10.5281/zenodo.21128549](https://doi.org/10.5281/zenodo.21128549) · MIT · v0.6.10
 
 </div>
 
@@ -439,6 +439,21 @@ based, never similarity based. An echo that **obscures** the value (coreferent "
 caught, and without `object` the guard falls back to normalized text (verbatim-only, MemStrata-equivalent).
 A genuine reversal back to a superseded value needs `remember(..., reaffirm=True)` (the guard can't
 un-supersede on its own). Opt-in; `echo_guard=False` (default) = byte-identical legacy keyed supersession.
+
+### Close the retrieval loop: `propagate_outcome()` (0.6.10)
+The un-self-gradable earned-outcome signal (`credit()`) is what the influence gate and `echo_guard` ride on
+— but on a live store we measured retrieval→earned **conversion at only ~28%** (16–62% across 8 agents;
+`mnemo/probes/retrieval_exposure_coverage_probe.py`). That gap is an **attribution** problem, not a ceiling:
+the app hand-credits only some acted-on recalls, so most retrieved-and-used memory never earns its signal.
+`propagate_outcome(outcome)` auto-credits the **decision-driving** subset of the last recall when the action
+is scored, so coverage rises toward the app's scored-action rate without hand-threading ids into `credit()`.
+Measured (`mnemo/probes/outcome_propagation_probe.py`): conversion lifts from manual-attribution-limited to
+the scored-action rate, and a **non-driver poison in the recall set earns 0%** under the default
+`driving_only` mode (vs **50%** if you credit the whole set with `driving_only=False`) — so closing the loop
+does **not** open a recall-set-attribution poison surface. Load-bearing limit: `driving_only=True, ids=None`
+has a cold-start (a not-yet-corroborated fresh memory earns nothing) — pass the explicit driver id(s) for
+first-use credit; the explicit path's poison-safety equals that of the recall that picked the driver (use
+`recall(..., influence_only=True)` for high-stakes). Opt-in; nothing changes until you call it.
 
 ## Use it as an MCP server (any Claude / Cursor / agent client)
 

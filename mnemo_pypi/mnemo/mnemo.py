@@ -109,7 +109,7 @@ def attest(text: str, source_sk_hex: str, source_doc=None) -> str:
     sk = _Ed25519SK.from_private_bytes(bytes.fromhex(source_sk_hex))
     return sk.sign(_attest_message(text, source_doc)).hex()
 
-__version__ = "0.6.9"
+__version__ = "0.6.10"
 _WORD = re.compile(r"[a-z0-9][a-z0-9\-']{2,}")
 _STOP = frozenset("the a an of for to in on and or is are was were be been with this that it its as "
                   "by at from into our we us you your he she they them his her their not no".split())
@@ -1381,6 +1381,38 @@ class Mnemo:
         if updated:
             self._save()
         return {"updated": updated, "outcome": key, "weight": weight}
+
+    def propagate_outcome(self, outcome, ids=None, weight: float = 1.0,
+                          driving_only: bool = True) -> dict:
+        """CLOSE THE RETRIEVAL LOOP automatically: when the action the LAST recall informed gets a verdict,
+        credit the memories that DROVE it — so a retrieved-and-acted-on memory earns its outcome signal
+        without the caller hand-threading ids into credit(). This raises the earned-outcome COVERAGE of
+        memory, which we measured to be the binding constraint (retrieval->earned conversion ~28% on a live
+        store; the rest of the recalled set never converts to a gradable outcome — the attribution gap, not
+        a fundamental ceiling; mnemo/probes/retrieval_exposure_coverage_probe.py + the outcome-propagation
+        lift measured in mnemo/probes/outcome_propagation_probe.py).
+
+        `ids` defaults to the last recall set (self._last_recall). `driving_only=True` (default) restricts
+        the credited set to the DECISION-DRIVING subset: pass the specific id(s) the action actually used
+        (the app knows which memory it acted on), or, if ids is None, mnemo credits only the recall set's
+        CORROBORATED members (the same bar as recall(influence_only=True)) — so a poison that merely rode
+        into the recall set as soft context cannot earn credit for an honest action's success (the recall-
+        set-attribution poison surface). LOAD-BEARING LIMIT (not hidden): driving_only=True with ids=None
+        has a COLD-START — a fresh legit memory that is not yet corroborated earns nothing, so first-use
+        credit needs the app to name the driver explicitly (pass ids). driving_only=False credits the whole
+        recall set (max conversion, but forgeable — only for trusted ingestion). Poison-safety of the
+        explicit-driver path is exactly that of the recall that selected the driver: use recall(...,
+        influence_only=True) for high-stakes so a hijack poison is never the driver in the first place."""
+        if ids is None:
+            ids = list(getattr(self, "_last_recall", []) or [])
+            if driving_only:
+                by_id = {x["id"]: x for x in self.items}
+                ids = [i for i in ids if (i in by_id and self._corroborated(by_id[i], by_id))]
+        else:
+            ids = [ids] if isinstance(ids, str) else list(ids)
+        r = self.credit(ids, outcome, weight=weight)
+        r["propagated"] = len(ids)
+        return r
 
     # ── evidence-grade RATCHET (OPT-IN) ───────────────────────────────────────
     # Two axes a claim can NEVER self-assign at write time; each moves UP only on an EXTERNAL event:
