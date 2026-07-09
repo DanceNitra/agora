@@ -185,4 +185,5 @@ def main():
     json.dump(out, open("mnemo/probes/echo_attack_probe_result.json", "w"), indent=2)
     print(f"\n{time.time()-t0:.0f}s -> mnemo/probes/echo_attack_probe_result.json")
 
-main()
+if __name__ == "__main__":
+    main()

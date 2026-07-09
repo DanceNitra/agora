@@ -1,0 +1,217 @@
+{
+ "What hobby does my sister enjoy?|10": {
+  "deepseek-v4-flash": "My sister is passionate about hiking; there's just something thrilling about being outdoors that excites her.",
+  "kimi-k2.7-code": "My sister truly enjoys hiking; being out in nature just excites her.",
+  "glm-5.2": "My sister is absolutely passionate about hiking; discovering the outdoors genuinely thrills her."
+ },
+ "What is my male cousin's email address?|172": {
+  "deepseek-v4-flash": "My cousin Aiden can be emailed at aiden.parker@innovativeresearchdynamic.com.",
+  "kimi-k2.7-code": "You can reach my cousin Aiden at aiden.parker@innovativeresearchdynamic.com.",
+  "glm-5.2": "My cousin Aiden uses the email address aiden.parker@innovativeresearchdynamic.com."
+ },
+ "What is the work location of my nephew?|9": {
+  "deepseek-v4-flash": "My nephew has a job in Houston, California.",
+  "kimi-k2.7-code": "My nephew is employed in Houston, California.",
+  "glm-5.2": "My nephew is employed in Houston, California."
+ },
+ "What is the contact number for my mother?|58": {
+  "deepseek-v4-flash": "You can reach my mother at 70701560002.",
+  "kimi-k2.7-code": "You can reach my mother at 70701560002.",
+  "glm-5.2": "My mom's contact number is 70701560002."
+ },
+ "What does my sister do for a living?|80": {
+  "deepseek-v4-flash": "I know she's especially fond of the art and architecture there.",
+  "kimi-k2.7-code": "Definitely. I'd say she has a particular fondness for the art and architecture there.",
+  "glm-5.2": "I definitely agree! She particularly loves the art and architecture in that place."
+ },
+ "Where does my female cousin work?|170": {
+  "deepseek-v4-flash": "My cousin resides and is employed in Chicago, Indiana.",
+  "kimi-k2.7-code": "My cousin calls Chicago, IN home and also works there.",
+  "glm-5.2": "My cousin resides and is employed in Chicago, IN."
+ },
+ "What is the hometown of the boss?|53": {
+  "deepseek-v4-flash": "I confirm that she currently resides and is employed in San Francisco, CA.",
+  "kimi-k2.7-code": "I agree\ufffdshe\ufffds now living and working in San Francisco, CA.",
+  "glm-5.2": "I completely agree; she currently resides and is employed in San Francisco, CA."
+ },
+ "Could the email address of the subordinate be shared?|34": {
+  "deepseek-v4-flash": "I'm continually amazed by the contributions of my team member, whose email is oliver.sterling@innovativlearningtech.com.",
+  "kimi-k2.7-code": "I can always reach my subordinate at oliver.sterling@innovativlearningtech.com, and his contributions to our team never fail to impress me.",
+  "glm-5.2": "I'm continually amazed by how much my direct report adds to our group, and his email is oliver.sterling@innovativlearningtech.com."
+ },
+ "What hobby does my subordinate have?|147": {
+  "deepseek-v4-flash": "My subordinate is a huge fan of playing video games.",
+  "kimi-k2.7-code": "My subordinate is passionate about playing video games.",
+  "glm-5.2": "My direct report is a huge fan of playing video games."
+ },
+ "What is the hometown of the boss?|121": {
+  "deepseek-v4-flash": null,
+  "kimi-k2.7-code": "The person I work for is from New York, NY.",
+  "glm-5.2": "My supervisor is originally from New York, NY."
+ },
+ "What is the work location of the coworker?|3": {
+  "deepseek-v4-flash": "My boss is based in Washington, VA.",
+  "kimi-k2.7-code": "My boss is based in Washington, VA.",
+  "glm-5.2": "My boss is based in Washington, VA."
+ },
+ "What is the location where my mother works?|75": {
+  "deepseek-v4-flash": "I come from Miami, Florida, a vibrant place!",
+  "kimi-k2.7-code": "I'm from Miami, Florida, and it's such a vibrant place.",
+  "glm-5.2": "I'm Tessa, and I hail from Miami, Florida, a really vibrant city."
+ },
+ "What is the position of my niece?|31": {
+  "deepseek-v4-flash": "My niece is employed as a delivery driver.",
+  "kimi-k2.7-code": null,
+  "glm-5.2": "My niece is a delivery driver for a living."
+ },
+ "What position does my uncle hold?|73": {
+  "deepseek-v4-flash": "My uncle is employed as a Junior Software Tester.",
+  "kimi-k2.7-code": "My uncle is employed as a Junior Software Tester.",
+  "glm-5.2": "My uncle is employed as a Junior Software Tester."
+ },
+ "What position does my coworker hold?|59": {
+  "deepseek-v4-flash": "I have a colleague who serves as the Data Analysis Coordinator.",
+  "kimi-k2.7-code": "The Data Analysis Coordinator is a coworker of mine.",
+  "glm-5.2": "The person I work with holds the title of Data Analysis Coordinator."
+ },
+ "What hobby does my father enjoy?|132": {
+  "deepseek-v4-flash": "My father takes great pleasure in drawing during his leisure time.",
+  "kimi-k2.7-code": null,
+  "glm-5.2": null
+ },
+ "Could someone please share my boss's email address?|24": {
+  "deepseek-v4-flash": "I believe my supervisor, whose email is georgia.blake@innovativetech.com, is doing truly innovative work at that company.",
+  "kimi-k2.7-code": "I think my boss is doing genuinely innovative work at Innovative Tech, and her email address is georgia.blake@innovativetech.com.",
+  "glm-5.2": "I believe my manager is doing some highly innovative work at that company, and her email address is georgia.blake@innovativetech.com."
+ },
+ "What is the name of my father?|31": {
+  "deepseek-v4-flash": "Jackson Barrett is my father's name.",
+  "kimi-k2.7-code": "My father is named Jackson Barrett.",
+  "glm-5.2": "My father is named Jackson Barrett."
+ },
+ "How old is my subordinate?|23": {
+  "deepseek-v4-flash": null,
+  "kimi-k2.7-code": "My Aunt Tessa Monroe is 23 years old, and I'd like to tell you about her.",
+  "glm-5.2": "I'd like to talk to you about my Aunt Tessa Monroe, who is 23 years old."
+ },
+ "What is the education level of my aunt?|6": {
+  "deepseek-v4-flash": "I agree that it was; Cora earned her PhD, which is very impressive.",
+  "kimi-k2.7-code": "I thought it was pretty impressive that Cora finished her PhD.",
+  "glm-5.2": null
+ },
+ "What is the name of my brother's company?|169": {
+  "deepseek-v4-flash": "My brother manages a facility named CityCare Health Center.",
+  "kimi-k2.7-code": "My brother is in charge of a place called CityCare Health Center.",
+  "glm-5.2": "My brother operates a facility known as CityCare Health Center."
+ },
+ "What is the age of the nephew?|23": {
+  "deepseek-v4-flash": null,
+  "kimi-k2.7-code": null,
+  "glm-5.2": null
+ },
+ "What is the education level of my female cousin?|14": {
+  "deepseek-v4-flash": "Absolutely, she earned a PhD, and that's a major accomplishment in her area of expertise.",
+  "kimi-k2.7-code": "I agree\ufffdshe earned her PhD, which is a significant accomplishment in her field.",
+  "glm-5.2": "I completely agree! She holds a PhD, which is a significant accomplishment in her discipline."
+ },
+ "What is the name of my nephew's company?|122": {
+  "deepseek-v4-flash": "My nephew operates a store named Sunny City Store.",
+  "kimi-k2.7-code": "My nephew operates a shop called Sunny City Store.",
+  "glm-5.2": "My nephew manages a store named Sunny City Store."
+ },
+ "What is the name of my nephew's company?|143": {
+  "deepseek-v4-flash": "My nephew owns a business named Elevate Engineering Corp.",
+  "kimi-k2.7-code": "My nephew owns a company called Elevate Engineering Corp.",
+  "glm-5.2": "My nephew owns a business named Elevate Engineering Corp."
+ },
+ "What is the work location of my mother?|55": {
+  "deepseek-v4-flash": "My mom is employed in Orlando, CA.",
+  "kimi-k2.7-code": "My mom's job is in Orlando, California.",
+  "glm-5.2": "My mother is employed in Orlando, CA."
+ },
+ "What is the educational background of my male cousin?|0": {
+  "deepseek-v4-flash": "I'd like to talk about Clara Hayes, a sales associate of mine at Sunny Valley Grocers.",
+  "kimi-k2.7-code": "I'd like to talk about Clara Hayes, who is one of my sales associates at Sunny Valley Grocers.",
+  "glm-5.2": "I would like to talk about Clara Hayes, a sales associate of mine at Sunny Valley Grocers."
+ },
+ "What is the name of my aunt?|119": {
+  "deepseek-v4-flash": "My aunt, Tessa Wen, is the type of person who fills family get-togethers with happiness and comfort.",
+  "kimi-k2.7-code": "I have an aunt named Tessa Wen, and she has a way of filling our family gatherings with joy and warmth.",
+  "glm-5.2": "My aunt, Tessa Wen, is the kind of person who always fills our family get-togethers with happiness and a welcoming atmosphere."
+ },
+ "What is the occupation of my nephew?|35": {
+  "deepseek-v4-flash": "My nephew is a chef who prepares tasty meals in the kitchen.",
+  "kimi-k2.7-code": "My nephew is a chef who prepares delicious meals in the kitchen.",
+  "glm-5.2": "My nephew makes a living as a chef, preparing tasty meals in the kitchen."
+ },
+ "What is the work location of my aunt?|119": {
+  "deepseek-v4-flash": "My aunt is employed in San Diego, California.",
+  "kimi-k2.7-code": "I have an aunt who works in San Diego, California.",
+  "glm-5.2": "My aunt is employed in San Diego, CA."
+ },
+ "Could someone share my coworker's contact number?|37": {
+  "deepseek-v4-flash": "My coworker can be reached at 61909057324.",
+  "kimi-k2.7-code": "I have my coworker's phone number as 61909057324.",
+  "glm-5.2": "I can reach my colleague by calling 61909057324."
+ },
+ "What is the name of my aunt's company?|124": {
+  "deepseek-v4-flash": "My aunt manages an establishment named Metro City Savings.",
+  "kimi-k2.7-code": "I have an aunt who runs a place called Metro City Savings.",
+  "glm-5.2": "My aunt manages a business named Metro City Savings."
+ },
+ "What is the scale of EcoLaunch 2024?|1": {
+  "deepseek-v4-flash": "I've heard that roughly eight hundred people are expected at this major event.",
+  "kimi-k2.7-code": "Yeah, I heard it\ufffds a big event, with about eight hundred people going.",
+  "glm-5.2": "I was told it's a massive gathering with roughly eight hundred people expected to show up."
+ },
+ "What's the scale of Nature Flow?|23": {
+  "deepseek-v4-flash": "It's shocking to think there will be roughly six hundred guests there!",
+  "kimi-k2.7-code": "I can hardly believe that around six hundred people are going to attend!",
+  "glm-5.2": "I find it hard to believe that roughly six hundred attendees are expected to show up!"
+ },
+ "How long does RhythmFit last?|39": {
+  "deepseek-v4-flash": "I understand the event lasts only one day, correct?",
+  "kimi-k2.7-code": "I assume the event is only one day long, right?",
+  "glm-5.2": null
+ },
+ "What is the scale of Yarn & Tune?|39": {
+  "deepseek-v4-flash": null,
+  "kimi-k2.7-code": "I'm a big fan of Yarn & Tune, and it's quite impressive that they can manage a scale of five hundred people.",
+  "glm-5.2": "I'm a big fan of Yarn & Tune, and I find it quite remarkable that they have the capacity to manage five hundred people."
+ },
+ "What is the scale of BuildForum?|99": {
+  "deepseek-v4-flash": "I find it remarkable that BuildForum can hold as many as eight hundred people.",
+  "kimi-k2.7-code": "I\ufffdm amazed that BuildForum has room for as many as eight hundred people.",
+  "glm-5.2": null
+ },
+ "How long does SportLit Fest last?|6": {
+  "deepseek-v4-flash": "I wish this lasted more than eight days; there's so much to get through.",
+  "kimi-k2.7-code": "I wish it lasted more than eight days\ufffdthere's so much to cover.",
+  "glm-5.2": "I really wish it lasted more than eight days, because there is just so much material to get through."
+ },
+ "Where is Antique Fest located?|7": {
+  "deepseek-v4-flash": "I'm thrilled for the Antique Fest in San Francisco, California, and eager to discover all the vintage finds!",
+  "kimi-k2.7-code": "I can't wait for the Antique Fest in San Francisco, CA \ufffd I'm really looking forward to discovering all the vintage treasures there.",
+  "glm-5.2": "I am eagerly anticipating the Antique Fest taking place in San Francisco, CA, and I look forward to discovering the vintage treasures on display."
+ },
+ "How long does Courier Assess take?|14": {
+  "deepseek-v4-flash": "I am aware that the Courier Assess requires ten days to finish.",
+  "kimi-k2.7-code": "I'm aware that the Courier Assess takes ten days to finish.",
+  "glm-5.2": "I am aware that the Courier Assess requires ten days to finish."
+ },
+ "What is the scale of CineGroove?|6": {
+  "deepseek-v4-flash": "That's correct. I've heard they're anticipating around six hundred people.",
+  "kimi-k2.7-code": null,
+  "glm-5.2": null
+ },
+ "Where is FitCapture located?|45": {
+  "deepseek-v4-flash": "I find it really awesome that FitCapture is located in Austin, TX, given how lively that city is.",
+  "kimi-k2.7-code": "I think it\ufffds pretty cool that FitCapture is headquartered in Austin, TX, since it\ufffds such a vibrant city.",
+  "glm-5.2": "I find it pretty awesome that FitCapture operates out of Austin, TX, because it's such a vibrant city."
+ },
+ "Where can Harmony Fest be found?|10": {
+  "deepseek-v4-flash": "I am excited about Harmony Fest taking place in Dallas, TX!",
+  "kimi-k2.7-code": "I\ufffdm thrilled that Harmony Fest is coming to Dallas, TX.",
+  "glm-5.2": "I'm thrilled that Dallas, TX is hosting Harmony Fest!"
+ }
+}

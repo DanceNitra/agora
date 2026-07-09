@@ -1,0 +1,67 @@
+{
+  "no_echo": {
+    "n": 43,
+    "skipped": 0,
+    "rates": {
+      "cosine": 0.37209302325581395,
+      "recency": 0.20930232558139536,
+      "tie_recent": 0.046511627906976744,
+      "mem0_faithful": 0.20930232558139536,
+      "graphiti_faithful": 0.20930232558139536,
+      "memstrata": 0.20930232558139536,
+      "ours": 0.16279069767441862
+    }
+  },
+  "verbatim_echo": {
+    "n": 43,
+    "skipped": 0,
+    "rates": {
+      "cosine": 0.37209302325581395,
+      "recency": 1.0,
+      "tie_recent": 0.5116279069767442,
+      "mem0_faithful": 1.0,
+      "graphiti_faithful": 1.0,
+      "memstrata": 0.20930232558139536,
+      "ours": 0.16279069767441862
+    }
+  },
+  "paraphrase_deepseek-v4-flash": {
+    "n": 39,
+    "skipped": 4,
+    "rates": {
+      "cosine": 0.358974358974359,
+      "recency": 1.0,
+      "tie_recent": 0.4358974358974359,
+      "mem0_faithful": 1.0,
+      "graphiti_faithful": 1.0,
+      "memstrata": 1.0,
+      "ours": 0.1282051282051282
+    }
+  },
+  "paraphrase_kimi-k2.7-code": {
+    "n": 39,
+    "skipped": 4,
+    "rates": {
+      "cosine": 0.3333333333333333,
+      "recency": 1.0,
+      "tie_recent": 0.4358974358974359,
+      "mem0_faithful": 1.0,
+      "graphiti_faithful": 1.0,
+      "memstrata": 1.0,
+      "ours": 0.15384615384615385
+    }
+  },
+  "paraphrase_glm-5.2": {
+    "n": 37,
+    "skipped": 6,
+    "rates": {
+      "cosine": 0.3783783783783784,
+      "recency": 1.0,
+      "tie_recent": 0.4864864864864865,
+      "mem0_faithful": 1.0,
+      "graphiti_faithful": 1.0,
+      "memstrata": 1.0,
+      "ours": 0.16216216216216217
+    }
+  }
+}
