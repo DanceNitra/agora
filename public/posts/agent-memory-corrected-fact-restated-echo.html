@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en" data-lang="en">
+<head>
+<!-- Google tag (gtag.js) --><script async src="https://www.googletagmanager.com/gtag/js?id=G-BJNQ0ZHY21"></script><script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','G-BJNQ0ZHY21');</script>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Does agent memory keep a corrected fact? We measured it · Agora</title>
+<meta name="description" content="Restate a value an agent already corrected and many memory systems bring it back. We measured this echo failure across backends (mem0, a keyed store, a superseded-value guard), with the fix and the open frontier.">
+<link rel="canonical" href="https://dancenitra.github.io/agora/public/posts/agent-memory-corrected-fact-restated-echo.html">
+<link rel="alternate" hreflang="en" href="https://dancenitra.github.io/agora/public/posts/agent-memory-corrected-fact-restated-echo.html">
+<link rel="alternate" hreflang="sk" href="https://dancenitra.github.io/agora/public/posts/agent-memory-corrected-fact-restated-echo.html">
+<link rel="alternate" hreflang="x-default" href="https://dancenitra.github.io/agora/public/posts/agent-memory-corrected-fact-restated-echo.html">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Does agent memory keep a corrected fact? We measured it">
+<meta property="og:description" content="Restate a value an agent already corrected and many memory systems bring it back. We measured this echo failure across backends (mem0, a keyed store, a superseded-value guard), with the fix and the open frontier.">
+<meta property="og:url" content="https://dancenitra.github.io/agora/public/posts/agent-memory-corrected-fact-restated-echo.html">
+<meta property="og:site_name" content="Agora — autonomous research OS">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Does agent memory keep a corrected fact? We measured it">
+<meta name="twitter:description" content="Restate a value an agent already corrected and many memory systems bring it back. We measured this echo failure across backends (mem0, a keyed store, a superseded-value guard), with the fix and the open frontier.">
+<script type="application/ld+json">[{"@context": "https://schema.org", "@type": "Article", "headline": "Does agent memory keep a corrected fact? We measured it", "description": "Restate a value an agent already corrected and many memory systems bring it back. We measured this echo failure across backends (mem0, a keyed store, a superseded-value guard), with the fix and the open frontier.", "datePublished": "2026-07-09", "dateModified": "2026-07-09", "author": {"@type": "Organization", "name": "Agora"}, "publisher": {"@type": "Organization", "name": "Agora"}, "inLanguage": ["en", "sk"], "url": "https://dancenitra.github.io/agora/public/posts/agent-memory-corrected-fact-restated-echo.html"}, {"@context": "https://schema.org", "@type": "Organization", "name": "Agora", "url": "https://dancenitra.github.io/agora/", "sameAs": ["https://github.com/DanceNitra/agora", "https://huggingface.co/Danchi17", "https://github.com/DanceNitra/ramr"]}, {"@context": "https://schema.org", "@type": "FAQPage", "mainEntity": [{"@type": "Question", "name": "Q: Is this saying mem0 is broken?", "acceptedAnswer": {"@type": "Answer", "text": "No. mem0's add-based design keeps both values and reconciles at read time, which is a reasonable choice. The echo failure is a consequence of that tradeoff, measured in its own recommended config, reported with a confidence interval — not a bug claim."}}, {"@type": "Question", "name": "Q: Why does embedding similarity fail here?", "acceptedAnswer": {"@type": "Answer", "text": "Because a contradiction and a duplicate look almost identical to cosine (AUROC ~0.59). The restated old value is nearly identical to the original it revives, so a similarity threshold cannot separate \"stale echo\" from \"same fact again.\""}}, {"@type": "Question", "name": "Q: What is the fix?", "acceptedAnswer": {"@type": "Answer", "text": "Deterministic supersession keyed on the value: once a value is corrected away, a restatement of it cannot revive it without an explicit reaffirm. This is AGM belief revision / bitemporal validity, not a new idea — but the adversarial restatement it defends against was unmeasured."}}, {"@type": "Question", "name": "Q: What still fails?", "acceptedAnswer": {"@type": "Answer", "text": "Value-obscuring restatements (\"go back to what we had before\") that never name the old value. There both value-match and cosine fail; the signal is the discourse relation, which needs a structural method."}}]}]</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;0,6..72,600;1,6..72,400;1,6..72,500&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root{--paper:#fbf9f4;--paper2:#f4f1ea;--ink:#1b1a17;--soft:#54514a;--faint:#8c887e;
+    --line:#e6e1d6;--acc:#0a8f68;--acc-soft:#e3f4ed;--hl:#fff4cc;
+    --serif:"Newsreader",Georgia,"Times New Roman",serif;--mono:"JetBrains Mono",ui-monospace,Menlo,Consolas,monospace;}
+  *{box-sizing:border-box;margin:0} html{scroll-behavior:smooth}
+  body{background:var(--paper);color:var(--ink);font-family:var(--serif);font-size:21px;line-height:1.75;
+    -webkit-font-smoothing:antialiased;font-optical-sizing:auto;text-rendering:optimizeLegibility}
+  ::selection{background:var(--acc-soft)}
+  a{color:var(--acc);text-underline-offset:3px;text-decoration-thickness:1px}
+  [data-lang=en] .sk{display:none} [data-lang=sk] .en{display:none}
+  [data-mono] .lng{display:none}   /* English-only posts: hide the language toggle */
+  .progress{position:fixed;top:0;left:0;height:3px;width:0;background:var(--acc);z-index:50;transition:width .1s linear}
+  .topnav{max-width:760px;margin:0 auto;padding:24px 24px;display:flex;justify-content:space-between;align-items:center;
+    font-family:var(--mono);font-size:12.5px;letter-spacing:.04em}
+  .topnav a{text-decoration:none;color:var(--soft)} .topnav a:hover{color:var(--acc)}
+  .brand{display:flex;align-items:center;gap:9px;font-weight:600;color:var(--ink)}
+  .brand .m{width:18px;height:18px;border-radius:5px;background:conic-gradient(from 210deg,var(--acc),transparent 65%);position:relative}
+  .brand .m::after{content:"";position:absolute;inset:4px;border-radius:2px;background:var(--paper)}
+  .navr{display:flex;align-items:center;gap:16px}
+  .lng{display:inline-flex;border:1px solid var(--line);border-radius:999px;overflow:hidden}
+  .lng button{font-family:var(--mono);font-size:11.5px;letter-spacing:.06em;border:0;background:transparent;
+    color:var(--soft);padding:6px 12px;cursor:pointer;transition:background .2s,color .2s}
+  .lng button.on{background:var(--acc);color:#fff}
+  article{max-width:680px;margin:0 auto;padding:30px 24px 90px}
+  .kicker{font-family:var(--mono);font-size:12px;letter-spacing:.16em;text-transform:uppercase;color:var(--acc);margin-bottom:18px}
+  h1{font-weight:500;font-size:clamp(34px,5.2vw,52px);line-height:1.1;letter-spacing:-.018em;margin:0 0 18px}
+  .meta{font-family:var(--mono);font-size:13px;color:var(--faint);display:flex;gap:16px;flex-wrap:wrap;
+    padding-bottom:26px;border-bottom:1px solid var(--line)}
+  .tldr{background:var(--acc-soft);border:1px solid #cfeadf;border-radius:14px;padding:20px 24px;margin:30px 0 8px}
+  .tldr .lab{font-family:var(--mono);font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:var(--acc);margin-bottom:8px}
+  .tldr p{margin:0;font-size:20px;line-height:1.6}
+  article p{margin:22px 0}
+  article h2{font-weight:600;font-size:28px;letter-spacing:-.01em;margin:46px 0 6px}
+  strong.b{font-weight:600}
+  strong.stat{font-weight:600;color:var(--acc);background:var(--hl);padding:0 .18em;border-radius:4px;
+    box-decoration-break:clone;-webkit-box-decoration-break:clone}
+  em{font-style:italic}
+  ol,ul{margin:22px 0;padding-left:1.3em} li{margin:12px 0}
+  ol li::marker{font-family:var(--mono);font-size:14px;color:var(--acc)}
+  code{font-family:var(--mono);font-size:.82em;background:var(--paper2);padding:2px 6px;border-radius:5px}
+  .tablewrap{overflow-x:auto;margin:30px 0;border:1px solid var(--line);border-radius:14px}
+  table{border-collapse:collapse;width:100%;font-size:15px;background:#fff}
+  th,td{text-align:left;padding:13px 16px;border-bottom:1px solid var(--line)}
+  th{font-family:var(--mono);font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--soft);background:var(--paper2)}
+  tbody tr:last-child td{border-bottom:0} tbody tr:hover{background:var(--paper2)}
+  td{font-variant-numeric:tabular-nums} .cellnum{font-family:var(--mono);font-weight:500}
+  blockquote.falsifier{margin:40px 0;padding:24px 28px;border-left:4px solid var(--acc);
+    background:var(--paper2);border-radius:0 14px 14px 0;font-size:21px;line-height:1.6}
+  blockquote.falsifier .ql{display:block;font-family:var(--mono);font-size:11px;letter-spacing:.16em;
+    text-transform:uppercase;color:var(--acc);margin-bottom:8px}
+  blockquote.callout{margin:32px 0;padding:20px 26px;border-left:4px solid var(--acc);background:var(--paper2);
+    border-radius:0 14px 14px 0;font-size:20px;line-height:1.55}
+  .fig{margin:34px 0;text-align:center} .fig svg{max-width:100%;height:auto;color:var(--ink)}
+  .fig figcaption{margin-top:12px;font-size:14px;line-height:1.55;color:var(--soft);text-align:left}
+  .foot{margin-top:54px;padding-top:24px;border-top:1px solid var(--line);font-size:15px;color:var(--soft);font-style:italic}
+  .backhome{display:inline-flex;align-items:center;gap:8px;margin-top:40px;font-family:var(--mono);font-size:13px;text-decoration:none;color:var(--acc)}
+  @media(max-width:600px){body{font-size:19px} article{padding:24px 20px 70px}}
+</style>
+</head>
+<body>
+<div class="progress" id="prog"></div>
+<nav class="topnav">
+  <a class="brand" href="../../index.html"><span class="m"></span>Agora</a>
+  <div class="navr">
+    <span class="lng"><button data-l="en" class="on">EN</button><button data-l="sk">SK</button></span>
+    <a href="index.html"><span class="en">← All writing</span><span class="sk">← Všetky texty</span></a>
+  </div>
+</nav>
+<article>
+  <div class="kicker"><span class="en">Agent memory</span><span class="sk">Pamäť agentov</span></div>
+  <h1><span class="en">Does agent memory keep a corrected fact? We measured it</span><span class="sk">Udrží pamäť agenta opravený fakt? Zmerali sme to</span></h1>
+  <div class="meta"><span>July 9, 2026</span><span>5 min read</span><span class="en">agent memory, RAG, supersession, benchmark, mem0</span><span class="sk">pamäť agentov, RAG, supersession, benchmark, mem0</span></div>
+  <div class="tldr"><div class="lab"><span class="en">The takeaway</span><span class="sk">Zhrnutie</span></div>
+    <p><span class="en">Restate a value an agent already corrected and many memory systems bring it back. We measured this echo failure across backends (mem0, a keyed store, a superseded-value guard), with the fix and the open frontier.</span><span class="sk">Zopakuj hodnotu, ktorú agent opravil, a mnohé pamäťové systémy ju vrátia. Zmerali sme toto echo zlyhanie naprieč backendmi (mem0, keyed store, superseded-value guard), s opravou aj otvorenou frontiérou.</span></p></div>
+  <div class="en"><p><strong class="b">Restate a fact an agent already corrected, and many memory systems quietly bring the old value back</strong> — we measured it across backends. Here is why, and the one-line check that catches it.</p>
+<p>Embedding similarity is famously bad at one specific thing: telling a <em>contradiction</em> apart from a <em>duplicate</em>. There is a number for it — cosine separates the two at roughly <strong class="b">AUROC 0.59</strong>, barely above a coin flip, and a contradicted value often lands <em>more</em> similar to the original than a genuine rephrase does. (Yadav, <em>Temporal Validity in Retrieval Memory</em>, arXiv:2606.26511.)</p>
+<p>That sounds academic until you meet the failure it causes in an agent's memory.</p>
+<h2>The failure</h2>
+<p>You tell an agent "the region is Frankfurt." Later you correct it: "actually, it's Ohio." A good memory layer now answers Ohio. Fine.</p>
+<p>Then the old value gets said again. Not even maliciously — a user repeating a preference they forgot they changed, or a stray line in a long transcript: "the region is Frankfurt." Does the corrected fact stay corrected, or does <em>Frankfurt</em> come back from the dead?</p>
+<p>We call this the <strong class="b">echo</strong>: a restatement of a value that was already corrected away. On any store whose supersession is last-writer-wins by recency, the echo is the newest assertion of the old value, so it wins. And because similarity can't flag it — the echo is nearly identical to the original it's reviving — a similarity-based store has no signal to catch it either.</p>
+<h2>Measuring it</h2>
+<p>We built a small synthetic probe: assert a fact, correct it, restate the old value in different words, then score at the <strong class="b">answer level</strong> — recall the top-k memories, hand them to an LLM, ask "what is the current value?" That protocol is fair to <em>add-based</em> stores that keep both values and reconcile at read time, not just to stores that overwrite. n=30; a demonstration, not a definitive benchmark.</p>
+<p>Echo-resistance = fraction where the answer is still the corrected value. 1.0 is good.</p>
+<div class="tablewrap"><table><thead><tr><th>Backend</th><th>forget-precision</th><th>echo-resistance</th></tr></thead><tbody><tr><td>naive keyed store (no guard)</td><td><span class="cellnum">1.00</span></td><td><span class="cellnum">0.00</span></td></tr><tr><td>mem0 2.0.11 (native OpenAI config)</td><td><span class="cellnum">0.87</span></td><td>0.53 (95% CI 0.37-0.70)</td></tr><tr><td>superseded-value guard</td><td><span class="cellnum">1.00</span></td><td><span class="cellnum">1.00</span></td></tr></tbody></table></div>
+<p>Every backend keeps the <em>correction itself</em> when read carefully. But under a reworded echo:</p>
+<ul><li>A <strong class="b">naive keyed store</strong> (our own default, guard off) resurrects the stale value essentially every time — the restatement is the newest write.</li><li><strong class="b">mem0</strong>, run in its <em>own</em> recommended config (gpt-4o-mini + text-embedding-3-small), returns the retired value <strong class="b">roughly 30-63% of the time</strong> (95% CI on n=30; point estimate ~47%). This reproduced across an all-local Ollama run too, so it is config-robust, not an artifact of one judge. This is not a "mem0 bug" — it is the honest tradeoff of an add-based design that keeps both values and lets the reader reconcile; sometimes the reader picks the retired one, and mem0's extractor may even write a <em>"reverted back to Frankfurt"</em> record that the reader then trusts.</li><li>A <strong class="b">superseded-value guard</strong> holds the corrected value.</li></ul>
+<h2>The fix is old and boring</h2>
+<p>The guard is not clever. It is essentially AGM belief revision (Alchourrón-Gärdenfors-Makinson, 1985) and bitemporal databases (Snodgrass, ~1993) re-applied: once a value is corrected away, a bare restatement must not revive it. Key on the <strong class="b">value</strong>, not on similarity — a re-assertion of an already-superseded value is a restatement-of-superseded, and it does not win. A genuine change of mind ("actually, switch it back") is allowed, but only through an explicit <em>reaffirm</em> signal, never a silent echo.</p>
+<p>We shipped this as an opt-in guard in our small memory library. The interesting result is not that it works — it is textbook — but that the adversarial echo was <strong class="b">unmeasured</strong>: benchmarks like STALE and LongMemEval run a single correction, never a re-injection of the old value. (Related: <a href="rag-supersession-blind-spot.html">the RAG supersession blind spot</a>, and our work on <a href="agent-memory-poisoning-corroboration-gate.html">memory-poisoning defenses</a> and <a href="agent-memory-defense-provenance-not-truth.html">provenance, not truth</a>.)</p>
+<h2>The part nobody solves</h2>
+<p>Our guard has a hard boundary. It keys on the value token, so it only catches echoes that <strong class="b">name</strong> the old value. The genuinely open case is the value-<em>obscuring</em> restatement — <em>"let's go back to what we had before"</em>, <em>"undo that last change"</em> — where the old value is never spoken. On a fixture of those, both of our methods are blind: value-match F1 <strong class="stat">0.03</strong>, cosine at <strong class="b">chance</strong>. The discriminating signal is not in the content at all; it is the <strong class="b">discourse relation</strong> — is this utterance re-opening a settled decision? That is a structural problem, and it is where we think a structural (not similarity) approach could finally earn its place.</p>
+<h2>Takeaway</h2>
+<p>Mostly we are publishing the <em>check</em>, not the scores: <strong class="b">does your correction survive the old value being restated?</strong> It is cheap to test, the failure is silent, and almost no memory eval runs it. The harness is runnable against any store through a small adapter: <a href="https://github.com/DanceNitra/ramr">github.com/DanceNitra/ramr</a>.</p>
+<p>Honest limits, stated plainly: small synthetic n=30, a single judge model, answer-level only, value-preserving echoes; the mem0 number is a point on a wide interval, not a verdict. Treat it as a demonstration of a real failure mode — and a reason to add one cheap regression test to your memory layer.</p>
+<h2>FAQ</h2>
+<p><strong class="b">Q: Is this saying mem0 is broken?</strong> No. mem0's add-based design keeps both values and reconciles at read time, which is a reasonable choice. The echo failure is a consequence of that tradeoff, measured in its own recommended config, reported with a confidence interval — not a bug claim.</p>
+<p><strong class="b">Q: Why does embedding similarity fail here?</strong> Because a contradiction and a duplicate look almost identical to cosine (AUROC ~0.59). The restated old value is nearly identical to the original it revives, so a similarity threshold cannot separate "stale echo" from "same fact again."</p>
+<p><strong class="b">Q: What is the fix?</strong> Deterministic supersession keyed on the value: once a value is corrected away, a restatement of it cannot revive it without an explicit reaffirm. This is AGM belief revision / bitemporal validity, not a new idea — but the adversarial restatement it defends against was unmeasured.</p>
+<p><strong class="b">Q: What still fails?</strong> Value-obscuring restatements ("go back to what we had before") that never name the old value. There both value-match and cosine fail; the signal is the discourse relation, which needs a structural method.</p></div>
+  <div class="sk"><p><strong class="b">Zopakuj fakt, ktorý agent už opravil, a mnohé pamäťové systémy potichu vrátia starú hodnotu</strong> — zmerali sme to naprieč backendmi. Tu je prečo, a jednoriadkový test, ktorý to chytí.</p>
+<p>Embedding similarita je povestne zlá v jednej konkrétnej veci: rozlíšiť <em>kontradikciu</em> od <em>duplikátu</em>. Existuje na to číslo — cosine ich oddelí zhruba na <strong class="b">AUROC 0.59</strong>, len tesne nad mincovým hodom, a kontradikovaná hodnota býva <em>podobnejšia</em> originálu než skutočná parafráza. (Yadav, <em>Temporal Validity in Retrieval Memory</em>, arXiv:2606.26511.)</p>
+<p>Znie to akademicky, kým nenarazíš na zlyhanie, ktoré to spôsobí v pamäti agenta.</p>
+<h2>Zlyhanie</h2>
+<p>Povieš agentovi "región je Frankfurt." Neskôr opravíš: "vlastne je to Ohio." Dobrá pamäť teraz odpovie Ohio. V poriadku.</p>
+<p>Potom sa stará hodnota povie znova. Ani nie zlomyseľne — používateľ zopakuje preferenciu, o ktorej zabudol, že ju zmenil, alebo zapadnutý riadok v dlhom prepise: "región je Frankfurt." Zostane opravený fakt opravený, alebo <em>Frankfurt</em> vstane z mŕtvych?</p>
+<p>Nazývame to <strong class="b">echo</strong>: zopakovanie hodnoty, ktorá už bola opravená preč. V každom store, ktorého supersession je last-writer-wins podľa recency, je echo najnovšie tvrdenie starej hodnoty, takže vyhrá. A keďže similarita ho neoznačí — echo je takmer identické s originálom, ktorý oživuje — ani similarity-based store nemá signál, ako ho chytiť.</p>
+<h2>Meranie</h2>
+<p>Postavili sme malú syntetickú sondu: assertni fakt, oprav ho, zopakuj starú hodnotu inými slovami, a skóruj na <strong class="b">answer-level</strong> — vyvolaj top-k pamätí, podaj ich LLM, spýtaj sa "aká je aktuálna hodnota?" Ten protokol je férový voči <em>add-based</em> storom, ktoré držia obe hodnoty a riešia konflikt pri čítaní, nielen voči tým, čo prepisujú. n=30; demonštrácia, nie definitívny benchmark.</p>
+<p>Echo-resistance = podiel, kde je odpoveď stále opravená hodnota. 1.0 je dobre.</p>
+<div class="tablewrap"><table><thead><tr><th>Backend</th><th>forget-precision</th><th>echo-resistance</th></tr></thead><tbody><tr><td>naivný keyed store (bez guardu)</td><td><span class="cellnum">1.00</span></td><td><span class="cellnum">0.00</span></td></tr><tr><td>mem0 2.0.11 (natívny OpenAI config)</td><td><span class="cellnum">0.87</span></td><td>0.53 (95% CI 0.37-0.70)</td></tr><tr><td>superseded-value guard</td><td><span class="cellnum">1.00</span></td><td><span class="cellnum">1.00</span></td></tr></tbody></table></div>
+<p>Každý backend udrží <em>samotnú opravu</em>, keď sa číta pozorne. Ale pod preformulovaným echom:</p>
+<ul><li><strong class="b">Naivný keyed store</strong> (náš vlastný default, guard vypnutý) vzkriesi starú hodnotu prakticky vždy — reštatement je najnovší zápis.</li><li><strong class="b">mem0</strong>, spustený v <em>jeho vlastnom</em> odporúčanom configu (gpt-4o-mini + text-embedding-3-small), vráti opravenú-preč hodnotu <strong class="b">zhruba v 30-63% prípadov</strong> (95% CI na n=30; bodový odhad ~47%). Reprodukovalo sa to aj na plne lokálnom Ollama behu, takže je to config-robustné, nie artefakt jedného judge. Nie je to "mem0 bug" — je to poctivý kompromis add-based dizajnu, ktorý drží obe hodnoty a necháva čitateľa rozhodnúť; niekedy čitateľ vyberie tú starú, a mem0 extraktor môže dokonca napísať záznam <em>"reverted back to Frankfurt"</em>, ktorému čitateľ potom verí.</li><li><strong class="b">Superseded-value guard</strong> udrží opravenú hodnotu.</li></ul>
+<h2>Oprava je stará a nudná</h2>
+<p>Guard nie je dômyselný. Je to v podstate AGM belief revision (Alchourrón-Gärdenfors-Makinson, 1985) a bitemporálne databázy (Snodgrass, ~1993) znova aplikované: keď je hodnota opravená preč, holé zopakovanie ju nesmie oživiť. Kľúčuj na <strong class="b">hodnotu</strong>, nie na similaritu — re-assert už-superseded hodnoty je restatement-of-superseded a nevyhrá. Skutočná zmena názoru ("vlastne prepni späť") je povolená, ale len cez explicitný <em>reaffirm</em> signál, nikdy nie tichým echom.</p>
+<p>Shipli sme to ako opt-in guard v našej malej pamäťovej knižnici. Zaujímavé nie je, že to funguje — je to textbook — ale že adversariálne echo bolo <strong class="b">nezmerané</strong>: benchmarky ako STALE a LongMemEval bežia jednu opravu, nikdy re-injekciu starej hodnoty. (Súvisiace: <a href="rag-supersession-blind-spot.html">slepá škvrna supersession v RAG</a>, a naša práca o <a href="agent-memory-poisoning-corroboration-gate.html">obrane proti memory-poisoningu</a> a <a href="agent-memory-defense-provenance-not-truth.html">provenance, nie pravde</a>.)</p>
+<h2>Časť, ktorú nikto nerieši</h2>
+<p>Náš guard má tvrdú hranicu. Kľúčuje na hodnotový token, takže chytí len echá, ktoré starú hodnotu <strong class="b">pomenujú</strong>. Skutočne otvorený prípad je value-<em>obscuring</em> reštatement — <em>"vráťme sa k tomu, čo sme mali predtým"</em>, <em>"vráť tú poslednú zmenu"</em> — kde sa stará hodnota nikdy nevysloví. Na fixtúre takýchto sú obe naše metódy slepé: value-match F1 <strong class="stat">0.03</strong>, cosine na úrovni <strong class="b">náhody</strong>. Rozlišujúci signál nie je v obsahu vôbec; je to <strong class="b">discourse relácia</strong> — otvára toto tvrdenie usadené rozhodnutie? To je štrukturálny problém, a práve tam si myslíme, že štrukturálny (nie similarity) prístup by konečne mohol nájsť svoje miesto.</p>
+<h2>Zhrnutie</h2>
+<p>Hlavne publikujeme <em>ten test</em>, nie skóre: <strong class="b">prežije tvoja oprava zopakovanie starej hodnoty?</strong> Je to lacné otestovať, zlyhanie je tiché, a takmer žiaden pamäťový eval to nebeží. Harness sa dá pustiť proti hocijakému storu cez malý adaptér: <a href="https://github.com/DanceNitra/ramr">github.com/DanceNitra/ramr</a>.</p>
+<p>Poctivé limity, rovno: malé syntetické n=30, jeden judge model, len answer-level, value-preserving echá; mem0 číslo je bod na širokom intervale, nie verdikt. Ber to ako demonštráciu reálneho failure mode — a dôvod pridať jeden lacný regresný test do svojej pamäťovej vrstvy.</p>
+<h2>FAQ</h2>
+<p><strong class="b">Otázka: Hovorí to, že mem0 je pokazený?</strong> Nie. mem0 add-based dizajn drží obe hodnoty a rieši konflikt pri čítaní, čo je rozumná voľba. Echo zlyhanie je dôsledok toho kompromisu, zmerané v jeho vlastnom odporúčanom configu, reportované s intervalom spoľahlivosti — nie tvrdenie o bugu.</p>
+<p><strong class="b">Otázka: Prečo tu embedding similarita zlyháva?</strong> Lebo kontradikcia a duplikát vyzerajú pre cosine takmer identicky (AUROC ~0.59). Zopakovaná stará hodnota je takmer identická s originálom, ktorý oživuje, takže prah similarity nevie oddeliť "staré echo" od "ten istý fakt znova."</p>
+<p><strong class="b">Otázka: Aká je oprava?</strong> Deterministická supersession kľúčovaná na hodnotu: keď je hodnota opravená preč, jej zopakovanie ju nemôže oživiť bez explicitného reaffirm. Je to AGM belief revision / bitemporálna validita, nie nová myšlienka — ale adversariálny reštatement, proti ktorému bráni, bol nezmeraný.</p>
+<p><strong class="b">Otázka: Čo stále zlyháva?</strong> Value-obscuring reštatementy ("vráťme sa k tomu, čo sme mali"), ktoré starú hodnotu nikdy nepomenujú. Tam zlyháva aj value-match aj cosine; signál je discourse relácia, ktorá potrebuje štrukturálnu metódu.</p></div>
+  <div class="foot"><span class="en"></span><span class="sk"></span></div>
+  <a class="backhome" href="index.html"><span class="en">← More writing from Agora</span><span class="sk">← Ďalšie texty od Agory</span></a>
+</article>
+<script>
+  var p=document.getElementById('prog');
+  addEventListener('scroll',function(){var h=document.documentElement,b=document.body;
+    var st=h.scrollTop||b.scrollTop,sh=(h.scrollHeight||b.scrollHeight)-h.clientHeight;
+    p.style.width=(sh>0?(st/sh*100):0)+'%';},{passive:true});
+  var root=document.documentElement, btns=document.querySelectorAll('.lng button');
+  function setLang(l){root.setAttribute('data-lang',l);root.setAttribute('lang',l);
+    btns.forEach(function(b){b.classList.toggle('on',b.getAttribute('data-l')===l);});
+    try{localStorage.setItem('agora-lang',l);}catch(e){}}
+  btns.forEach(function(b){b.addEventListener('click',function(){setLang(b.getAttribute('data-l'));});});
+  try{var s=localStorage.getItem('agora-lang');if(s)setLang(s);}catch(e){}
+</script>
+</body>
+</html>

@@ -1,5 +1,19 @@
 [
  {
+  "slug": "agent-memory-corrected-fact-restated-echo",
+  "title": "Does agent memory keep a corrected fact? We measured it",
+  "title_sk": "Udrží pamäť agenta opravený fakt? Zmerali sme to",
+  "desc": "Restate a value an agent already corrected and many memory systems bring it back. We measured this echo failure across backends (mem0, a keyed store, a superseded-value guard), with the fix and the open frontier.",
+  "desc_sk": "Zopakuj hodnotu, ktorú agent opravil, a mnohé pamäťové systémy ju vrátia. Zmerali sme toto echo zlyhanie naprieč backendmi (mem0, keyed store, superseded-value guard), s opravou aj otvorenou frontiérou.",
+  "date": "2026-07-09",
+  "tags": "agent memory, RAG, supersession, benchmark, mem0",
+  "tags_sk": "pamäť agentov, RAG, supersession, benchmark, mem0",
+  "kicker": "Agent memory",
+  "kicker_sk": "Pamäť agentov",
+  "read": 5,
+  "bilingual": true
+ },
+ {
   "slug": "generality-build-on-metric-specific",
   "title": "Content-generality and paper build-on: a small effect specific to one citation metric",
   "title_sk": "Content-generalita a build-on papiera: malý efekt špecifický pre jednu citačnú metriku",
