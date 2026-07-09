@@ -1,4 +1,13 @@
-"""graphiti_echo_real_rate_probe.py — the REAL, LLM-in-the-loop Graphiti echo-resurrection rate.
+"""graphiti_echo_real_rate_probe.py
+CODE-VERIFIED CORRECTION (stress-claim audit): the FAITHFUL config is `with_stale`, NOT `active_only`.
+Reading graphiti_core/utils/maintenance/edge_operations.py directly: valid_edges = get_between_nodes(src,
+tgt) has NO validity filter (L365-367), related_edges is filtered to those uuids (L392-399), so the
+invalidated stale edge A IS surfaced (the echo restates its value -> maximal similarity). A verbatim echo
+folds onto A via the _normalize_string_exact fast-path BEFORE any LLM call (L685-695); a paraphrase has A in
+EXISTING FACTS so the LLM can dedupe onto it. => real Graphiti is the ~0% (with_stale) case; the ~78-81%
+(active_only) is a STRAWMAN artifact of withholding the candidate Graphiti actually retrieves. Graphiti is
+NOT echo-vulnerable in its real pipeline. Kept here only to document the corrected finding.
+ — the REAL, LLM-in-the-loop Graphiti echo-resurrection rate.
 
 Our echo_attack_probe_v2 modeled a 'graphiti_faithful' policy at the WORST CASE (contradiction always
 detected, dedupe never folds the echo onto the stale edge) -> 1.00. A code+STORM audit showed Graphiti is
