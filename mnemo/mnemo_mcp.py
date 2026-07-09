@@ -62,23 +62,37 @@ def _make_embedder():
 
 _PATH = os.environ.get("MNEMO_PATH", "mnemo_memory.json")
 _MEM = Mnemo(_PATH, embed=_make_embedder())
+# ECHO GUARD is ON by default on the MCP surface (a fresh product surface, not bound by the library's
+# byte-identical-legacy default): a keyed fact that is corrected and then RE-STATED (a benign restatement
+# or an attacker re-injecting the old value) otherwise resurrects the stale value. Measured on RAMR
+# (ramr_echo_resistance*): keyed supersession WITHOUT the guard = 0.00 echo-resistance; WITH it = 1.00,
+# and it beats a real add-based system (mem0 0.57) at the answer level. Set MNEMO_ECHO_GUARD=0 to disable.
+_MEM.echo_guard = os.environ.get("MNEMO_ECHO_GUARD", "1") != "0"
 
 mcp = FastMCP("mnemo")
 
 
 @mcp.tool()
 def remember(text: str, tags: list[str] | None = None, value: float = 1.0,
-             mtype: str | None = None, key: str | None = None) -> dict:
+             mtype: str | None = None, key: str | None = None,
+             object: str | None = None, reaffirm: bool = False) -> dict:
     """Store a memory (append-only; raw text is never edited afterward). `tags` group memories into
     cohorts; `value` (>=1) is its importance — higher-value memories outrank merely-similar ones at
     recall, and recall itself nudges value up. `mtype` ∈ {episodic, semantic, procedural} sets the
     decay prior — episodic (events) fades fast, semantic (durable facts) slow, procedural (rules /
-    preferences) barely; pass it when you know the kind, else it's inferred. Optional `key` is a
-    deterministic (subject, relation) supersession key (e.g. "billing-api::auth-method"): storing a new
-    value with the same key retires the old one so recall never returns the stale value — no similarity
-    threshold, no extra LLM call. Use it for facts that get updated (config, prices, versions, status).
+    preferences) barely; pass it when you know the kind, else it's inferred.
+
+    Optional `key` is a deterministic (subject, relation) supersession key (e.g. "billing-api::auth-method"):
+    storing a new value with the same key retires the old one so recall never returns the stale value — no
+    similarity threshold, no extra LLM call. Use it for facts that get updated (config, prices, versions,
+    status). Pass `object` = the asserted VALUE (e.g. "frankfurt") alongside `key`: with the echo guard on
+    (default here), a later RE-STATEMENT of an already-retired value cannot resurrect it (a corrected fact
+    stays corrected even if the old value is said again). Without `object` the guard still catches a verbatim
+    restatement (text hash), but a *reworded* one needs the value in `object` to be caught. Set `reaffirm=True`
+    to intentionally revert to a previously-retired value (an explicit change-of-mind, not an echo).
     Returns the new id."""
-    mid = _MEM.remember(text, tags=tags or [], value=value, mtype=mtype, key=key)
+    mid = _MEM.remember(text, tags=tags or [], value=value, mtype=mtype, key=key,
+                        object=object, reaffirm=reaffirm)
     rec = next((r for r in _MEM.items if r["id"] == mid), {})
     return {"id": mid, "stored": text[:120], "tags": tags or [], "value": value,
             "mtype": rec.get("mtype")}

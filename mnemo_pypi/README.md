@@ -6,7 +6,7 @@
 
 *Memory is the mother of the Muses. An agent with no memory has no ideas.*
 
-`pip install agora-mnemo` · [PyPI](https://pypi.org/project/agora-mnemo/) · [Hugging Face](https://huggingface.co/Danchi17/mnemo) · [DOI 10.5281/zenodo.21128549](https://doi.org/10.5281/zenodo.21128549) · MIT · v0.6.10
+`pip install agora-mnemo` · [PyPI](https://pypi.org/project/agora-mnemo/) · [Hugging Face](https://huggingface.co/Danchi17/mnemo) · [DOI 10.5281/zenodo.21128549](https://doi.org/10.5281/zenodo.21128549) · MIT · v0.6.11
 
 </div>
 
@@ -460,8 +460,11 @@ first-use credit; the explicit path's poison-safety equals that of the recall th
 `mnemo` ships an [MCP](https://modelcontextprotocol.io) stdio server so any MCP-compatible agent can
 use it as long-term memory — `remember` (with a per-type decay prior), value-ranked `recall`,
 `consolidate`, `consolidate_clusters`, `contradictions`, `value_by_cohort`, `forget` (verified erasure).
-`mnemo.py` stays
-zero-dependency; only the server needs the SDK:
+The MCP `remember` exposes `key` (deterministic supersession) plus `object` / `reaffirm`, and the server
+runs with **`echo_guard` ON by default** (0.6.11) so a corrected fact stays corrected even if the old value
+is re-stated later — the failure mode a plain keyed/add-based store shows on RAMR's ECHO-RESISTANCE
+(keyed-without-guard 0.00, a real add-based system 0.57, guard 1.00). Set `MNEMO_ECHO_GUARD=0` to disable.
+`mnemo.py` stays zero-dependency; only the server needs the SDK:
 
 ```bash
 pip install "mcp[cli]"
