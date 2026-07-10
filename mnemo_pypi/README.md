@@ -619,6 +619,24 @@ prompt. Verified end-to-end against real `llama-index-core`
 (`mnemo/probes/mnemo_llamaindex_adapter_probe.py`, 4/4, incl. "corrected value not re-injected"). Subclasses
 BaseMemoryBlock so importing it imports LlamaIndex (opt-in extra); `import mnemo` stays zero-dependency.
 
+### Persistent memory for Google ADK: `MnemoMemoryService` (0.7.4+)
+`mnemo.integrations.google_adk.MnemoMemoryService` is a drop-in Google ADK [`BaseMemoryService`](https://google.github.io/adk-docs/sessions/memory/)
+(`add_session_to_memory` / `search_memory`), backed by a mnemo store so memory persists and retrieval is
+value-ranked lexical+semantic instead of the built-in word-overlap:
+
+```python
+from google.adk.runners import Runner
+from mnemo.integrations.google_adk import MnemoMemoryService
+runner = Runner(agent=agent, app_name="app", session_service=...,
+                memory_service=MnemoMemoryService(path="mem.json"))
+```
+
+Two honest extras over `InMemoryMemoryService`: `search_memory` goes through supersession-filtered `recall()`
+(a corrected keyed fact is not returned), and `forget_subject_for(app_name, user_id, request_id=…)` gives
+per-user right-to-erasure with a signed deletion tombstone. Verified end-to-end against real `google-adk`
+2.4.0 (`mnemo/probes/mnemo_adk_adapter_probe.py`, 4/4, incl. per-user isolation, current-truth, and
+accounted-for erasure). Opt-in extra; `import mnemo` stays zero-dependency.
+
 ## Use it as an MCP server (any Claude / Cursor / agent client)
 
 `mnemo` ships an [MCP](https://modelcontextprotocol.io) stdio server so any MCP-compatible agent can
