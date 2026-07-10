@@ -109,7 +109,7 @@ def attest(text: str, source_sk_hex: str, source_doc=None) -> str:
     sk = _Ed25519SK.from_private_bytes(bytes.fromhex(source_sk_hex))
     return sk.sign(_attest_message(text, source_doc)).hex()
 
-__version__ = "0.6.14"
+__version__ = "0.6.15"
 _WORD = re.compile(r"[a-z0-9][a-z0-9\-']{2,}")
 _STOP = frozenset("the a an of for to in on and or is are was were be been with this that it its as "
                   "by at from into our we us you your he she they them his her their not no".split())
@@ -144,7 +144,8 @@ def _cosine(a, b) -> float:
 
 class Mnemo:
     def __init__(self, path: str | None = None, embed=None, receipts: bool = False,
-                 receipt_key: str | None = None, receipt_pubkey: str | None = None):
+                 receipt_key: str | None = None, receipt_pubkey: str | None = None,
+                 capacity: int | None = None):
         """path: optional JSON file to persist to. embed: optional fn(str)->list[float] for semantic
         recall; if omitted, recall uses lexical token overlap (zero dependencies).
 
@@ -158,6 +159,11 @@ class Mnemo:
         so a third party can verify it with the public key only. (Standalone version: agora-agent-receipts.)"""
         self.path = Path(path) if path else None
         self.embed = embed
+        # Bounded working set (OPT-IN, default None = unbounded append-only, byte-identical legacy).
+        # When set, remember() hard-evicts the lowest-value ACTIVE memories past `capacity` using the
+        # verified two-tier policy (value-protected + recency-aged, Lab 29992a). Lets mnemo run in
+        # production without unbounded growth — a gap vs bounded competitors (mem0/Letta).
+        self.capacity = capacity
         self.items: list[dict] = []
         self._tok_cache: dict[str, set] = {}     # id -> token set, so recall doesn't re-tokenize
         self._tc_cache: dict[str, dict] = {}     # id -> term-frequency map, for the BM25 hybrid channel
@@ -410,10 +416,35 @@ class Mnemo:
         self.items.append(rec)
         if key is not None:
             self._supersede_by_key(rec, reaffirm=reaffirm)   # deterministic SRO supersession (no embedding, no threshold)
+        if self.capacity is not None:
+            self._evict_to_capacity()                        # bounded working set (opt-in) BEFORE persisting
         self._save(force=True)        # a new memory is real content - persist immediately, not throttled
         if self.receipts_enabled:
             self._emit_write_receipt(rec)
         return mid
+
+    def _evict_to_capacity(self) -> None:
+        """Keep the ACTIVE working set at <= self.capacity by HARD-EVICTING the lowest-value active
+        memories, using the VERIFIED two-tier policy (Lab 29992a: value-protected + recency-aged is the
+        one eviction rule that is universal across regimes). Protect the top protect_frac of capacity by
+        RAW value (a rare-but-critical memory survives a flood); fill the remaining budget from the REST
+        by EFFECTIVE (decay-weighted) value (so a stale high-raw memory can't crowd out a freshly-useful
+        one, and pure junk floods age out). Eviction REMOVES (frees space) via forget(), unlike
+        consolidate(keep=) which only DEMOTES — a bounded store must actually shrink. Superseded history
+        is not counted or evicted here (it is low-overhead and preserves as_of); only the active set is
+        bounded. No-op when active <= capacity, so remember() stays O(1) amortized until the cap bites."""
+        active = [r for r in self.items if r.get("status") == "active"]
+        if len(active) <= self.capacity:
+            return
+        now = time.time()
+        active.sort(key=lambda r: -r["value"])               # by RAW value (protected tier order)
+        kprot = int(self.protect_frac * self.capacity) if self.two_tier_keep else 0
+        protected, rest = active[:kprot], active[kprot:]
+        rest_keep = set(id(r) for r in
+                        sorted(rest, key=lambda r: -self._effective_value(r, now))[:self.capacity - kprot])
+        evict_ids = [r["id"] for r in rest if id(r) not in rest_keep]
+        if evict_ids:
+            self.forget(evict_ids)                            # hard delete + link/toggle scrub
 
     # ── write receipts (OPT-IN: tamper-evident write history) ─────────────────
     def _write_commit(self, rec: dict) -> dict:
