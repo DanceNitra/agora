@@ -98,12 +98,31 @@ def evaluate(cases, thr):
     return by_cat, total_p, total_n
 
 
+INHOUSE = CASES.parent / "hipporag_cases_inhouse.json"
+
+
 def main():
     cases = json.load(open(CASES, encoding="utf-8"))
     print("=" * 72)
     print(f"mnemo on ForgetEval-Adv external subset ({len(cases)} oracle-validated cases)")
     print("deterministic no-LLM adapter — the paper's Lethe/LangGraph configuration")
     print("=" * 72)
+
+    # ── VALIDATE / stability check (the gate KILLED the single-number claim here) ──
+    # On the full 385-case in-house set the overall score is DOMINATED by the forget-match threshold,
+    # so no single headline number is defensible — a critic picks a threshold and gets 23% or 64%.
+    if INHOUSE.exists():
+        full = json.load(open(INHOUSE, encoding="utf-8"))
+        print(f"\n[stability] full {len(full)}-case set — overall by forget-match threshold:")
+        for thr in (0.4, 0.5, 0.6, 0.7, 0.8):
+            _, tp, tn = evaluate(full, thr)
+            print(f"    thr={thr}: {tp}/{tn} = {tp/tn:.1%}")
+        print("    => the number is a threshold artifact of THIS adapter, not a store-capability metric.")
+        print("    => NOT publishable as 'mnemo scores X%'. Only threshold-INVARIANT results are honest:")
+        print("       compound_fact = 0% at every threshold (deterministic partial-supersede is structurally")
+        print("       impossible — drop one fact from a compound sentence, keep the other → needs an LLM).")
+        print("    Same limit applies to the paper's own deterministic baselines (single points from their")
+        print("    adapters). The benchmark scores the ADAPTER's forget heuristic, not the store alone.\n")
 
     # primary threshold + sweep (honesty: the number is not threshold-cherry-picked)
     for thr in (0.5, 0.6, 0.7):
@@ -121,23 +140,14 @@ def main():
              ("A-MEM", 42.6), ("OpenMemory", 50.8), ("Letta+LLM", 80.3)]
     for name, rate in field:
         print(f"    {name:<18} {rate:.1f}%")
-    print("\nReading (honest):")
-    print("  * mnemo's deterministic no-LLM adapter lands at ~42% (range 30-44% over the forget-match")
-    print("    threshold) — at the TOP of the pure-deterministic band (Lethe 33.8 / LangGraph 32.5 /")
-    print("    Mem0 28.6), while staying zero-dependency. It is strong on lexically-explicit forgetting")
-    print("    (substring_trap 100%, temporal_qualifier 100%, paraphrase_supersession 75%).")
-    print("  * The gap to the LLM-hook configs (45-80%) is concentrated in the SURFACE-CANONICALIZATION")
-    print("    categories mnemo scores 0/8 on — identifier_obfuscation, cross_lingual_identifier,")
-    print("    compound_fact (partial supersede) — which are inherently LLM-at-mutation-time bound.")
-    print("    That 0/8 band is exactly what a 'bod 3' LLM adjudicator over mnemo would have to recover.")
-    print("\nHONEST CAVEATS (this is NOT an apples-to-apples head-to-head):")
-    print("  - This adapter is OURS, not an official ForgetEval adapter; the paper's numbers use the")
-    print("    authors' own adapters, so cross-system deltas reflect adapter choices too, not only stores.")
-    print("  - 'blob = top-10 = all surviving active facts' (faithful for these <=4-fact cases); an")
-    print("    earlier version scored an empty relevance-filtered recall and FALSELY passed the canonical")
-    print("    categories 100% (empty blob trivially satisfies must_not) — corrected here.")
-    print("  - Threshold 0.6 is a single global constant, reported across a sweep (not per-case tuned).")
-    print("  - Publishing any of this outward requires the full validate->storm->audit->verify gate.")
+    print("\nVERDICT (gate/VALIDATE): the single-number 'mnemo scores X% on ForgetEval' claim is KILLED --")
+    print("the score is threshold-dominated (23-64% on the 385 set), so it measures our adapter's forget")
+    print("heuristic, not mnemo. The only threshold-INVARIANT, honest result is the structural limit")
+    print("compound_fact = 0%% (deterministic partial-supersede is impossible). Everything else is not")
+    print("robust enough to take outward. The same limit hits the paper's own deterministic baselines")
+    print("(single points from their adapters). Two other artifacts this session caught the same class of")
+    print("error (v3 mnemo circular 1.0; the empty-recall false-100%%) — any knob-fed/oracle-fed memory")
+    print("number needs a stability check BEFORE it is reported.")
 
 
 if __name__ == "__main__":
