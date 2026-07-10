@@ -158,11 +158,15 @@ def main():
     if mm is None:
         print(f"\n[Marat model arm skipped: {err}]")
     print("-" * 78)
-    print("Reading: on v3 the lexical shortcut is gone, so the keyword feature (and Marat's model, which")
-    print("rests on it) collapses toward predicting 'keep' for every revert (recall -> 0); the value-")
-    print("identity oracle and mnemo's object-ledger, which key on WHICH value is re-asserted, stay perfect.")
-    print("v3 is FAIR: it rewards the structural signal (value identity) any method could compute, and")
-    print("only punishes reliance on revert vocabulary.")
+    print("Reading: on v3 the lexical shortcut is gone, so the keyword feature (and Marat's model, whose")
+    print("5D vectors are identical for revert vs keep here) collapses on the revert-vs-keep split")
+    print("(precision ~0.50). The value-identity oracle stays perfect -> v3 IS solvable, just not lexically.")
+    print("HONEST SCOPE (stress-claim, 2026-07-10): the mnemo echo_guard row is NOT independent evidence —")
+    print("this harness FEEDS mnemo the pre-extracted asserted value (same asserted_value() the oracle uses),")
+    print("so mnemo's 1.0 == the oracle by construction (one rule scored twice), NOT a demonstration that")
+    print("mnemo parses free text. It only shows a typed object-ledger resolves the conflict ONCE the value")
+    print("is extracted. v3 is also still value-STRING separable; a coreference-obscured revert (names")
+    print("neither the old value nor a revert verb) would defeat value-matching AND mnemo. Shared open problem.")
 
 
 if __name__ == "__main__":
