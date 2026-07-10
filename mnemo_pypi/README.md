@@ -637,6 +637,27 @@ per-user right-to-erasure with a signed deletion tombstone. Verified end-to-end 
 2.4.0 (`mnemo/probes/mnemo_adk_adapter_probe.py`, 4/4, incl. per-user isolation, current-truth, and
 accounted-for erasure). Opt-in extra; `import mnemo` stays zero-dependency.
 
+### Make the governance layer key itself over free text: the `extractor` hook (0.7.5+)
+mnemo's supersession, `echo_guard`, `check_conflict`, and `forget_subject` all key on the `(key, object)` of a
+fact. That's great when you write structured facts, but a conversation `Session` or a chat turn is free text
+with no key, so supersession never fires on it. Plug an `extractor` once and every `remember()` derives the
+key for you, so the whole governance layer composes over free text with no per-call keying:
+
+```python
+import re
+m.extractor = lambda t: (m := re.match(r"(.+?) is (\w+)", t)) and (f"fact::{m[1].strip()}", m[2])
+m.remember("server timezone is UTC")
+m.remember("server timezone is PST")   # same derived key -> supersedes UTC, no manual key=
+m.recall("server timezone")            # -> PST only
+```
+
+Your extractor can be a regex or an LLM you call and cache; it returns `(key, object)` or `None`. Explicit
+`key=`/`object=` always win, and a broken extractor fails open (the write still lands as a plain append).
+Honest limit: supersession is only as sound as your extractor, so a mis-derived key mis-supersedes (the same
+risk as a wrong manual `key=`) — keep it deterministic and reviewable. This is a before-save hook (DB trigger
+/ ORM before_save; textbook) packaged so the integrity primitives compose without threading keys everywhere.
+Receipt: `mnemo/probes/extractor_hook_probe.py` (7/7).
+
 ## Use it as an MCP server (any Claude / Cursor / agent client)
 
 `mnemo` ships an [MCP](https://modelcontextprotocol.io) stdio server so any MCP-compatible agent can

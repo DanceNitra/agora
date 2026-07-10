@@ -109,7 +109,7 @@ def attest(text: str, source_sk_hex: str, source_doc=None) -> str:
     sk = _Ed25519SK.from_private_bytes(bytes.fromhex(source_sk_hex))
     return sk.sign(_attest_message(text, source_doc)).hex()
 
-__version__ = "0.7.4"
+__version__ = "0.7.5"
 _WORD = re.compile(r"[a-z0-9][a-z0-9\-']{2,}")
 _STOP = frozenset("the a an of for to in on and or is are was were be been with this that it its as "
                   "by at from into our we us you your he she they them his her their not no".split())
@@ -262,6 +262,19 @@ class Mnemo:
         # empty set. Receipt: mnemo/probes/seed_anchored_trust_probe.py.
         self.trust_seeds: set = set()
         self.trust_hops: int = 1
+        # WRITE-PATH VALUE EXTRACTOR (OPT-IN, default None -> OFF -> zero behavior change). mnemo's whole
+        # governance layer keys on the supersession (key, object): keyed supersession, echo_guard, check_conflict,
+        # forget_subject. But the caller has to supply key=/object= on every remember(), which the free-text
+        # adapters (a conversation Session, a chat turn) don't do -- so supersession never fires on their writes.
+        # Set `extractor` to a callable text -> (key, object) | None (your regex, or an LLM you call once and
+        # cache) and remember() runs it whenever the caller didn't pass a key: the derived (key, object) then
+        # drives supersession/echo_guard/check_conflict/forget_subject automatically, so the governance layer
+        # composes over free text without threading keys through every call. HONEST: this is a before-save hook
+        # (DB trigger / ORM before_save; textbook) -- the packaging is the point, not the idea. The supersession
+        # is only as sound as your extractor: a mis-derived key mis-supersedes (the same risk as a wrong manual
+        # key=), so keep the extractor deterministic/reviewable and prefer an explicit key when the caller knows
+        # it. Fail-open: any exception in the extractor is swallowed and the write falls back to a plain append.
+        self.extractor = None
         # STRICT PROVENANCE (store policy; the adversary-resistant form of the orphan rule). Default OFF ->
         # zero behavior change. When True, a write that shows NO provenance at all -- neither a `source` nor a
         # resolvable `derived_from` -- earns NO standing (orphan), regardless of any caller flag. This removes
@@ -369,6 +382,19 @@ class Mnemo:
         # value (signature-only 6/6 attacks -> 0/6 once lineage propagates); a caller-supplied source string is not.
         if derived and derived_from is None:
             derived_from = list(getattr(self, "_last_recall", []) or [])
+        # WRITE-PATH EXTRACTOR: derive (key, object) from the text when the caller didn't supply a key and an
+        # extractor is plugged, so the governance layer keys itself over free text. Fail-open (never break a write).
+        if self.extractor is not None and key is None and not derived:
+            try:
+                ex = self.extractor(text)
+                if isinstance(ex, tuple) and len(ex) == 2:
+                    key = ex[0]
+                    if object is None:
+                        object = ex[1]
+                elif isinstance(ex, str):
+                    key = ex
+            except Exception:
+                pass
         mid = uuid.uuid4().hex[:10]
         now = time.time()
         rec = {"id": mid, "text": text, "tags": list(tags or []), "value": float(value),
