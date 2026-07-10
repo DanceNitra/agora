@@ -109,7 +109,7 @@ def attest(text: str, source_sk_hex: str, source_doc=None) -> str:
     sk = _Ed25519SK.from_private_bytes(bytes.fromhex(source_sk_hex))
     return sk.sign(_attest_message(text, source_doc)).hex()
 
-__version__ = "0.7.1"
+__version__ = "0.7.2"
 _WORD = re.compile(r"[a-z0-9][a-z0-9\-']{2,}")
 _STOP = frozenset("the a an of for to in on and or is are was were be been with this that it its as "
                   "by at from into our we us you your he she they them his her their not no".split())
@@ -2401,6 +2401,51 @@ class Mnemo:
                     flags.append({"a": a["id"], "b": b["id"],
                                   "a_text": a["text"][:120], "b_text": b["text"][:120]})
         return flags
+
+    def check_conflict(self, text: str, key: str | None = None, object: str | None = None,
+                       sim_threshold: float = 0.5, incompatible=None) -> list[dict]:
+        """WRITE-TIME conflict check (READ-ONLY, no LLM): would committing this new fact CONTRADICT an
+        existing active memory? Call it BEFORE remember() to flag/gate a write instead of trusting the
+        write path — the pattern practitioners land on ("score each new fact against what's stored, flag
+        conflicts before they commit"). Returns the conflicting active records (empty list = clean), each
+        tagged with the conflict kind; it does NOT write, so you decide (commit / review / reject).
+
+        Two deterministic signals, both cheap (O(neighbourhood), not the O(n^2) `contradictions()` scan):
+          - keyed_value_change: an active memory shares `key` but carries a DIFFERENT `object` (or, if no
+            object is given, its text clashes) — a value update on a managed key, the thing to gate on for
+            a high-stakes fact.
+          - clash: among memories SIMILAR to `text` (>= sim_threshold), a value clash (numeric update) or a
+            negation/polarity flip. Crucially this is NOT triggered by a pure duplicate — a restated
+            identical fact has no value/negation clash — so it separates a contradiction from a near-dup,
+            which a cosine-similarity gate cannot (a corrected value is often MORE embedding-similar to the
+            original than a rephrase). Pass `incompatible(a, b) -> bool` (e.g. an LLM judge) to also catch a
+            purely SEMANTIC contradiction with no numeric/negation marker ("...Berlin" vs "...Munich"),
+            which the deterministic default does not.
+
+        Mechanism is textbook — a DB CHECK-constraint / uniqueness validate-on-write, and TMS-style
+        contradiction-on-assert (Doyle 1979) / AGM consistency-on-revision — brought into a zero-dependency
+        memory store as a native, dependency-free primitive; the packaging is the point, not the idea."""
+        inc = incompatible or (lambda a, b: _value_clash(a, b) or _negation_clash(a, b))
+        active = [r for r in self.items if r.get("status") == "active"]
+        hits, seen = [], set()
+        if key is not None:                                    # (1) value change on a managed key
+            for r in active:
+                if r.get("key") != key or r["id"] in seen:
+                    continue
+                if object is not None and r.get("object") is not None:
+                    conflict = (r["object"] != object)         # both objects known -> compare directly
+                else:
+                    conflict = inc(text, r["text"])            # missing an object -> fall back to text clash
+                if conflict:
+                    hits.append((r, "keyed_value_change")); seen.add(r["id"])
+        tvec = self._qvec(text)                                # (2) clash among similar neighbours
+        for r in active:
+            if r["id"] in seen:
+                continue
+            if self._similarity(text, r, tvec) >= sim_threshold and inc(text, r["text"]):
+                hits.append((r, "clash")); seen.add(r["id"])
+        return [{"id": r["id"], "kind": kind, "key": r.get("key"), "object": r.get("object"),
+                 "text": r["text"][:200]} for r, kind in hits]
 
     # ── value, reported at the COHORT level ───────────────────────────────────
     def value_by_cohort(self) -> dict:

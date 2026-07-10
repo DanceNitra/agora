@@ -581,6 +581,27 @@ Verified end-to-end against real `langgraph` (`mnemo/probes/mnemo_langgraph_adap
 "InMemoryStore has no history" contrast). Subclasses BaseStore, so importing this module imports LangGraph
 (opt-in extra); `import mnemo` stays zero-dependency.
 
+### Flag conflicts before you trust the write: `check_conflict()` (0.7.2+)
+Practitioners keep landing on the same move: stop trusting the write path, check each new fact against what's
+already stored, and flag conflicts *before* they commit. `check_conflict(text, key=…, object=…)` does that,
+read-only and with no LLM: it returns the active memories the new fact would contradict — a value change on a
+managed `key`, or a numeric/negation clash with a similar memory — so you can gate, review, or reject the write
+before calling `remember()`.
+
+```python
+m.remember("the retry limit is 5 attempts")
+m.check_conflict("the retry limit is 12 attempts")   # -> [{'kind': 'clash', ...}]  (numeric update)
+m.check_conflict("the retry limit is 5 attempts")    # -> []  a duplicate is NOT a conflict
+```
+
+The signal is a value/negation clash, **not** cosine similarity — which is the whole point: a corrected value
+is often *more* embedding-similar to the original than a rephrase (AUROC ~0.59 at telling them apart), so a
+"too similar, must be a dup" gate silently swallows the contradiction. Pass `incompatible(a, b) -> bool` (e.g.
+an LLM judge) to also catch a purely semantic contradiction with no numeric/negation marker. The mechanism is
+textbook (a DB CHECK-constraint validate-on-write; TMS contradiction-on-assert, Doyle 1979) — here it's a
+native, zero-dependency primitive. Also exposed as the `check_conflict` MCP tool. Receipt:
+`mnemo/probes/check_conflict_probe.py` (8/8).
+
 ## Use it as an MCP server (any Claude / Cursor / agent client)
 
 `mnemo` ships an [MCP](https://modelcontextprotocol.io) stdio server so any MCP-compatible agent can

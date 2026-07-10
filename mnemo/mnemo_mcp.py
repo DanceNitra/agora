@@ -161,6 +161,16 @@ def contradictions() -> list[dict]:
 
 
 @mcp.tool()
+def check_conflict(text: str, key: str | None = None, object: str | None = None) -> list[dict]:
+    """WRITE-TIME conflict check (read-only, no LLM): BEFORE you remember() a fact, see whether it would
+    CONTRADICT an existing memory — a value change on a managed `key`, or a numeric/negation clash with a
+    similar memory. Returns the conflicting records (empty list = clean) so you can flag or gate the write
+    instead of blindly trusting it. A pure duplicate does NOT flag; a contradiction that merely looks like a
+    duplicate does. Detects, never writes — call remember() yourself once you decide."""
+    return _MEM.check_conflict(text, key=key, object=object)
+
+
+@mcp.tool()
 def value_by_cohort() -> dict:
     """Per-tag value rollup (count / total value / average). Reported at the cohort level on purpose:
     at n-of-1 a single memory's value is noise; the tag/time-block is where the signal is real."""
