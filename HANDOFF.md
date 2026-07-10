@@ -1,6 +1,57 @@
-# Agora — Session Handoff (2026-07-08)
+# Agora — Session Handoff (2026-07-10)
 
 ## PASTE THIS AFTER SESSION RESTART
+
+```
+Resume Agora. FIRST read C:\Users\Danculus\agora\HANDOFF.md top section (2026-07-10) fully. Chat SLOVAK, code/output ENGLISH.
+
+STANDING RULES REINFORCED THIS SESSION (owner, with frustration — obey):
+- BUILD/VERIFY BEFORE COMMUNICATE, applied to INBOUND too: when a post/comment/email hands us a buildable experiment, FLAG it upfront + BUILD it, THEN reply with the result — never a bare "we're stuck" reply leaving a runnable idea unrun. (marintkael's decay experiment — I drafted a reply instead of running it; owner furious.)
+- VERIFY 3x before anything outward: re-run for stability + recompute the headline a 2nd way + a construction-skeptic (did I rig it?). This session it caught my own overclaim ("AUROC 0.87 ~ 0.61" — false) and a rigged-looking cliff (majority-read was a counting artifact; real mem0 shows partial noisy decay).
+- OPENAI KEY = MONEY. Use Ollama cloud (deepseek-v4-flash / glm-5.2, key from server/.env AGORA_API_KEY) for ALL our own work; the OpenAI key is ONLY for measuring a competitor in ITS native config (mem0/Graphiti = gpt-4o-mini + text-embedding-3-small). I burned his OpenAI credits on a replication once — never again.
+- Reddit voice: SHORT, human, plain — a critic called our post "AI drivel". Owner replied himself (honest "not a native English speaker"). Draft in HIS plain voice, not polished AI prose; he posts Reddit, Claude posts approved GitHub.
+
+WHERE WE LEFT OFF (product-ship + new-direction day):
+- SHIPPED mnemo 0.6.12 + 0.6.13 (PyPI, live-verified): revert(key) control-plane un-supersession + objectless-clobber guard (value-obscuring reversion = channel separation, discrimination gap 1.0; pilot found+fixed a real hole in our own store); revert exposed as an MCP tool. Probes: revert_by_reference_probe.py, correction_decay_probe.py (majority-read cliff = artifact; real mem0 partial noisy decay ~0.88->~0.45, mnemo ledger flat 1.0).
+- SHIPPED RAMR cross-backend ECHO-RESISTANCE table COMPLETE with REAL runtime Graphiti (Neo4j+OpenAI): mnemo(guard off)0.00 / mem0-native 0.53 CI[.37,.70] / Graphiti echo-attributable 0/26 (bi-temporal DEFENDS; raw 0.87 residual = extraction misses not echo) / mnemo(guard on)1.00. graphiti_echo_run.py public in ramr repo.
+- GATES RUN (all KILLED speculative research honestly, saving weeks): value-obscuring-reversion PAPER = KILL (impossibility theorem is tautology + already published: arXiv 2606.24322 origin-bound-authority, 2606.12703 SMSR; the attack-class framing dies on the referent problem). replication-forecasting = passed gate as INFRASTRUCTURE not a paper (see below).
+- LAUNCHED "Crucible Live" — pre-registered replication-forecast loop. Protocol in agora_output/forecast/PROTOCOL.md: claim card -> frozen-prompt forecast (glm-5.2 + deepseek-v4-flash, prompt v1) -> PUBLIC COMMIT before any harness -> replicate -> resolve with Brier. Storefront page LIVE: dancenitra.github.io/agora/public/forecast.html (+ nav links + sitemap + claim-submission issue template). Contaminated retro pilot: LLM beat base rate (Brier 0.095 vs 0.231) but labeled CONTAMINATED, no skill claims before n>=60. Three live forecasts committed BEFORE harness: c001 compounding-error-law P(REP)=0.25, c002 MCP-tool-cliff-at-20 P=0.25, c003 AgenticSTS-memory-doubles P=0.175.
+- c001 RESULT (was running at handoff): geometric law R=p^n REPRODUCES almost exactly using measured in-situ per-step (~0.97; gaps <=0.009): E2E L=1/3/5/10 = 0.975/0.900/0.850/0.775. Self-check arm (Phase 3) is decisive per pre-stated rule — if one cheap verify-fix pass rescues L=10 far above 0.776, verdict FAILED (the "doomed past 10 steps" framing dies on trivial correction); else REPRODUCED for the bare law. RESOLVE with agora_output/forecast/resolve_claim.py, then add a Crucible entry + update forecast.html tally. c002/c003 harnesses READY (agora_output/lab/20260710_c00*/run.py) — run SEQUENTIALLY (same Ollama endpoint, 429 risk), never concurrent.
+- COLLAB: posted to deepseek #1462 (gated, owner-approved) two runnable probes — hindsight_credit_bias_probe.py (retrospective credit attribution credits the answer-restatement over the true driver 95%; action-time annotation immune) + negative_control_precision_probe.py (all-positive test set gives recall only; AUROC 0.87 but 100% recall = 100% FPR). marintkael (r/RAG echo-post commenter, owner values him) — his distance-gradient decay experiment: I built correction_decay_probe.py for it; reply drafted but NOT sent (he went quiet).
+- INBOX DRAINED 100->0 (was at cap): bulk-skipped stale/reddit/saturated leads with reasons; produced 4 real hypotheses-with-measured-baseline + 1 prediction + 1 roadmap (roadmap flagged: 199 open falsifiers but belief-kill organs idle ~22 days -> bottleneck is ADJUDICATION not ideation). Power-law-fitting-rigor cluster (Heathcote "repealing the power law of practice" etc.) triaged to Crucible backlog.
+- HEALTH: brain :8000 self-restarted 2026-07-10 09:44 (one listener OK), dungeon :5174 alive since 2026-07-04. GSC: our sitemap fix is live+correct (200, 56 URLs) but Google shows "can't fetch" with EMPTY last-read = it just hasn't crawled yet (normal days-latency, not our bug); Bing succeeded. Owner's manual step: GSC Request-indexing on key URLs.
+
+DO NEXT:
+1. Finish c001 (read Phase 3 in agora_output/lab/20260710_c001_compounding_error_law/result.json), RESOLVE it, add Crucible entry, update forecast.html tally + tally counts.
+2. Run c002 then c003 sequentially; resolve each; the loop now feeds itself (every Crucible verdict = a forecast data point).
+3. Product pipeline: any memory/RAG claim that SURVIVES replication -> ship into mnemo with provenance (that's how mnemo compounds; don't ship un-replicated hype). c003 (skill-memory) directly informs a mnemo skill-store if it holds.
+RULES: anon commits (agora-builder@users.noreply.github.com); PyPI/Telegram/OpenAI tokens from server/.env in a script, NEVER on a CLI; vault only via tools/safe_vault_push.py; verify ONE :8000 listener + ONE mcp_server.py; don't restart-spam the brain.
+```
+
+Chat **Slovak**, code + output **English**. Tokens in `server/.env` — never echo on a command line.
+
+---
+
+## RESUME HERE (2026-07-10 — product-ship + Crucible-Live launch day)
+
+> Chat **Slovak**; code + output **English**. Long interactive session (owner steering live), NOT the autonomous /loop.
+> Full prior-day handoff (2026-07-08 collaboration/ship day) preserved below this section.
+
+**WHAT SHIPPED (real, in hand):**
+- **mnemo 0.6.12 + 0.6.13** on PyPI (live-verified from a clean venv): `revert(key)` (control-plane un-supersession, resolved deterministically from the supersession ledger, append-only via reaffirm) + **objectless-clobber guard** (a keyed content write with no `object` can no longer displace a real ledgered value — a hole the pilot found in our OWN store, B2 0.00->1.00); `revert` exposed as an MCP tool. Discrimination gap 1.0 vs content-only ~0. Commits dfe2514, 4397dbe.
+- **RAMR echo-resistance table COMPLETE** (github.com/DanceNitra/ramr) with real runtime Graphiti — it DEFENDS (0/26 echo-attributable; the 13% raw residual is extraction misses, not the echo). Honest framing: not "we defend, they don't" — a real bi-temporal store and our object-ledger BOTH defend structurally; our edge is zero-dependency + the value-obscuring frontier. Commit 203e1ea (ramr repo).
+- **Crucible Live** (agora_output/forecast/) — the pre-registered replication-forecast loop; storefront `public/forecast.html` LIVE. This is the session's strategic bet: the scan feeds THREE consumers (Crucible verdicts, mnemo/RAMR product upgrades from surviving claims, distribution) and compounds.
+
+**GATES (the day's KILLS — the gate did its job):**
+- value-obscuring-reversion as a PAPER: **KILL** (tautology + already published 2606.24322/2606.12703; attack-class framing dies on the referent problem — an injected "go back to the old one" has no antecedent in the attacker's own content).
+- replication-forecasting as a PAPER: **not a paper, but SOUND as infrastructure** (power says ~15-22 months to a skill claim; ship the protocol, not results).
+- Both saved weeks of building on sand. Gate = validate/prior-art/skeptic on the IDEA before investing days (owner's explicit rule).
+
+**FORGET-ME-NOT for next session:** finish c001->resolve->Crucible entry; run c002/c003 sequentially; the marintkael reply is drafted-but-unsent (in this transcript) if he re-engages; the reading-list at agora_output/strategy/20260710_reading_list.md holds 15 on-beat leads for mnemo/RAMR upgrades.
+
+---
+
+## ARCHIVED — Session Handoff (2026-07-08)
 
 ```
 Resume Agora. FIRST read C:\Users\Danculus\agora\HANDOFF.md top section (2026-07-08) fully. Chat SLOVAK, code/output ENGLISH.
