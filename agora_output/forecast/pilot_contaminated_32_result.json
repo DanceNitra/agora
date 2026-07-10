@@ -1,0 +1,23 @@
+{
+  "n": 33,
+  "base_rate_reproduced": 0.636,
+  "brier_constant_base_rate": 0.2314,
+  "label": "CONTAMINATED PILOT \u2014 verdicts public since 2026-05; never citable as skill",
+  "prompt_version": "v1",
+  "models": {
+    "glm-5.2": {
+      "n_answered": 32,
+      "brier": 0.1085,
+      "mean_p": 0.566
+    },
+    "deepseek-v4-flash": {
+      "n_answered": 33,
+      "brier": 0.0946,
+      "mean_p": 0.63
+    }
+  },
+  "ensemble_mean": {
+    "n": 32,
+    "brier": 0.0972
+  }
+}

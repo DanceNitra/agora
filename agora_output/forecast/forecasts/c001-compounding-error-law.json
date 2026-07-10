@@ -1,0 +1,18 @@
+{
+  "claim_id": "c001-compounding-error-law",
+  "prompt_version": "v1",
+  "epoch": 1,
+  "forecast_utc": "2026-07-10T06:33:59Z",
+  "base_rate_comparator_trailing20": 0.8,
+  "models": {
+    "glm-5.2": {
+      "p_reproduced": 0.15,
+      "reason": null
+    },
+    "deepseek-v4-flash": {
+      "p_reproduced": 0.35,
+      "reason": "The claim is a mathematical tautology under independent errors, but LLM agent errors are often correlated, making the precise geometric compounding unlikely to hold empirically."
+    }
+  },
+  "ensemble_p_reproduced": 0.25
+}

@@ -1,0 +1,9 @@
+{
+  "id": "c001-compounding-error-law",
+  "claim": "Chaining LLM agents compounds per-step errors geometrically (R = p^n): at 95% per-step reliability, a 5-step agent pipeline drops to ~77% end-to-end success and ~60% by 10 steps, making multi-agent pipelines mathematically unreliable past ~10 steps.",
+  "source": "MindStudio blog 'The compounding problem' (2026-05-17) + repeated verbatim by Zartis, cloudai.pt, Stackademic (2026-07-06) and other vendor blogs, always without measured data",
+  "source_url": "https://www.mindstudio.ai/blog/multi-agent-reliability-compounding-problem-77-percent",
+  "date_claimed": "2026-05-17 (viral repeats through 2026-07-06)",
+  "intake_channel": "community-folklore scout (5+ independent repetitions, quoted as measured fact)",
+  "date_intake": "2026-07-10T06:33:51Z"
+}

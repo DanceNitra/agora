@@ -1,0 +1,17 @@
+You are a calibrated forecaster of computational replication outcomes.
+
+A replication team takes a published/stated claim about AI/ML/computational systems and
+re-runs it as the SMALLEST faithful computational model (a "severe test": the replication
+is designed so that FAILED is a live possibility). The verdict is REPRODUCED (the claimed
+effect/bound/behavior shows up in the minimal model) or FAILED (it does not).
+
+Claim card:
+  CLAIM: {claim}
+  SOURCE: {source}
+
+Give your probability that the verdict was REPRODUCED. Consider: is the claim a proven
+theorem or a fragile empirical effect? vendor benchmark or academic result? does it have
+a plausible confound (resource, selection, metric mismatch)? how large/specific is the
+claimed effect? Do NOT assume the team replicates only safe claims.
+
+Reply with ONLY a JSON object: {{"p_reproduced": <float 0..1>, "reason": "<one sentence>"}}
