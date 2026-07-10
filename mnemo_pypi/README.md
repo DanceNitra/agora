@@ -602,6 +602,23 @@ textbook (a DB CHECK-constraint validate-on-write; TMS contradiction-on-assert, 
 native, zero-dependency primitive. Also exposed as the `check_conflict` MCP tool. Receipt:
 `mnemo/probes/check_conflict_probe.py` (8/8).
 
+### Current-truth long-term memory for LlamaIndex: `MnemoMemoryBlock` (0.7.3+)
+`mnemo.integrations.llamaindex.MnemoMemoryBlock` is a LlamaIndex long-term [`BaseMemoryBlock`](https://developers.llamaindex.ai/python/framework/module_guides/deploying/agents/memory/)
+(async `_aget`/`_aput`), so it sits alongside the built-in Static/FactExtraction/Vector blocks on a `Memory`:
+
+```python
+from llama_index.core.memory import Memory
+from mnemo.integrations.llamaindex import MnemoMemoryBlock
+memory = Memory.from_defaults(session_id="s1", token_limit=40000,
+                              memory_blocks=[MnemoMemoryBlock(name="mnemo", path="mem.json", k=5)])
+```
+
+Same differentiator as the AutoGen block: `_aget` retrieves through mnemo's `recall()`, which hides superseded
+values, so once a fact is corrected (via a keyed write) the block never injects the stale value back into the
+prompt. Verified end-to-end against real `llama-index-core`
+(`mnemo/probes/mnemo_llamaindex_adapter_probe.py`, 4/4, incl. "corrected value not re-injected"). Subclasses
+BaseMemoryBlock so importing it imports LlamaIndex (opt-in extra); `import mnemo` stays zero-dependency.
+
 ## Use it as an MCP server (any Claude / Cursor / agent client)
 
 `mnemo` ships an [MCP](https://modelcontextprotocol.io) stdio server so any MCP-compatible agent can
