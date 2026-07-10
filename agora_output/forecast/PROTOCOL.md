@@ -14,6 +14,18 @@ social-science-domain).
    Intake rule: claims are selected for (a) freshness/attention, (b) computability as a
    minimal single-machine model, (c) FAILED being a live possibility. Claims considered
    but rejected are logged in `claim_cards/rejected.jsonl` with a one-line reason.
+1b. **INTAKE GATE (mandatory, BEFORE any forecast or compute)** — added 2026-07-10 after c001
+   burned ~90 min on a construction-invalid, textbook claim. Two adversarial lenses on the CLAIM:
+   - **PRIOR-ART / TRIVIALITY:** is the result textbook, or already measured/published? (c001 died
+     here: R=p^n is series-system reliability; correlated-error deviation + verifier mitigation
+     already published.)
+   - **CONSTRUCTION VALIDITY:** does the smallest faithful model actually test THIS claim, or an
+     easier proxy? (c001 died here too: a single-model sequential harness cannot test a MULTI-AGENT
+     claim.) A claim about a phenomenon we cannot faithfully reduce → NOT_COMPUTABLE at intake.
+   TARGET CLASS (owner steer, 2026-07-10): prefer UNDERPOWERED / CONTESTED EMPIRICAL claims (real
+   papers with weak n or live effects) and METHODOLOGY TRAPS (e.g. power-law-vs-lognormal fitting).
+   AVOID vendor-blog arithmetic folklore whose math is textbook — the debunk is below the bar.
+   A claim failing this gate is logged to `claim_cards/rejected.jsonl` and never forecast/run.
 2. **FORECAST** — the frozen forecaster (prompt v1 in `forecast_prompt_v1.txt`; models
    pre-registered below) reads ONLY the claim card and outputs P(REPRODUCED), a 3-way
    distribution (R/F/NC), and a one-sentence reason, written to `forecasts/<id>.json`.

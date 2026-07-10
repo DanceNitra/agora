@@ -14,5 +14,9 @@
       "reason": "The claim is a mathematical tautology under independent errors, but LLM agent errors are often correlated, making the precise geometric compounding unlikely to hold empirically."
     }
   },
-  "ensemble_p_reproduced": 0.25
+  "ensemble_p_reproduced": 0.25,
+  "verdict": "NOT_COMPUTABLE",
+  "resolved_utc": "2026-07-10T08:28:03Z",
+  "note": "NOT_COMPUTABLE: the claim is about MULTI-AGENT pipelines (heterogeneous agents, role handoffs, shared context) and cannot be faithfully reduced to a minimal single-machine model. Our single-model sequential-state harness IS a best-case independence generator, so it trivially obeys R=p^n (textbook series-system reliability) without testing the claim's live question: inter-agent error CORRELATION (MAST arXiv:2503.13657 shows real MAS failures are coordination, not iid per-step draws; correlated-error deviation already published in arXiv:2505.24187; verifier-mitigation already measured, ICML 2025). Gate (prior-art + construction-skeptic) run post-hoc found the claim textbook + the harness construction-invalid. Lesson applied: an INTAKE GATE now runs BEFORE forecast/compute. Excluded from the primary Brier metric (pre-registered).",
+  "intake_gate": "ADDED post-hoc; would have rejected c001 at intake"
 }
