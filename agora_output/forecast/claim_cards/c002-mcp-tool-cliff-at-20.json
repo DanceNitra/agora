@@ -1,0 +1,9 @@
+{
+  "id": "c002-mcp-tool-cliff-at-20",
+  "claim": "LLM agent tool-selection accuracy 'falls off a cliff' once more than ~20 MCP tools are registered \u2014 a sharp threshold effect (RAG-MCP's 13.62% accuracy figure is quoted as what happens past the cliff), rather than a smooth, model-dependent decline.",
+  "source": "Towards AI 'Adding more MCP tools made my AI agent dumber' (Jul 2026) + dev.to, jenova.ai, lunar.dev repeats; thresholds quoted range 5-50 across posts",
+  "source_url": "https://pub.towardsai.net/adding-more-mcp-tools-made-my-ai-agent-dumber-accuracy-collapses-past-20-8e754d09bee4",
+  "date_claimed": "2026-06/07 (4+ fresh posts)",
+  "intake_channel": "community-folklore scout (threshold quoted as universal constant)",
+  "date_intake": "2026-07-10T07:21:15Z"
+}

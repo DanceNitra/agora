@@ -1,0 +1,18 @@
+{
+  "claim_id": "c003-agenticsts-memory-doubles-winrate",
+  "prompt_version": "v1",
+  "epoch": 1,
+  "forecast_utc": "2026-07-10T07:21:26Z",
+  "base_rate_comparator_trailing20": 0.8,
+  "models": {
+    "glm-5.2": {
+      "p_reproduced": 0.15,
+      "reason": "The reported p-value of ~0.37 indicates a statistically weak and highly fragile effect, making it very unlikely to survive a severe minimal-model replication in a notoriously noisy LLM-agent game environment."
+    },
+    "deepseek-v4-flash": {
+      "p_reproduced": 0.2,
+      "reason": "The reported p-value of ~0.37 suggests the claimed doubling in win rate is not statistically significant, making it likely a fragile empirical effect that will fail to replicate in a minimal model."
+    }
+  },
+  "ensemble_p_reproduced": 0.175
+}

@@ -1,0 +1,18 @@
+{
+  "claim_id": "c002-mcp-tool-cliff-at-20",
+  "prompt_version": "v1",
+  "epoch": 1,
+  "forecast_utc": "2026-07-10T07:21:16Z",
+  "base_rate_comparator_trailing20": 0.8,
+  "models": {
+    "glm-5.2": {
+      "p_reproduced": 0.15,
+      "reason": "The 'cliff' is a fragile blog-sourced empirical claim with inconsistent thresholds (5\u201350) across posts, likely a smooth model-dependent decline rather than a sharp discontinuity, so a severe minimal replication is unlikely to confirm the specific 13.62% cliff."
+    },
+    "deepseek-v4-flash": {
+      "p_reproduced": 0.35,
+      "reason": "The claim is a specific empirical threshold from blog posts, likely fragile and dependent on model, tool definitions, and prompt engineering, making exact replication uncertain."
+    }
+  },
+  "ensemble_p_reproduced": 0.25
+}

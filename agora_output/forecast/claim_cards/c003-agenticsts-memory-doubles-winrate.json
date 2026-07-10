@@ -1,0 +1,9 @@
+{
+  "id": "c003-agenticsts-memory-doubles-winrate",
+  "claim": "Adding an explicit skill-memory layer to an LLM agent doubles its win rate (3/10 -> 6/10) in a long-horizon stochastic deck-building game where frontier LLMs otherwise score zero wins (AgenticSTS, 298 trajectories, reported at p~0.37).",
+  "source": "AgenticSTS, arXiv:2607.02255 (2026-07-02)",
+  "source_url": "https://arxiv.org/abs/2607.02255",
+  "date_claimed": "2026-07-02",
+  "intake_channel": "papers scout (agent-memory beat; underpowered n=10 headline)",
+  "date_intake": "2026-07-10T07:21:15Z"
+}
