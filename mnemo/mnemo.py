@@ -109,7 +109,7 @@ def attest(text: str, source_sk_hex: str, source_doc=None) -> str:
     sk = _Ed25519SK.from_private_bytes(bytes.fromhex(source_sk_hex))
     return sk.sign(_attest_message(text, source_doc)).hex()
 
-__version__ = "0.6.17"
+__version__ = "0.6.18"
 _WORD = re.compile(r"[a-z0-9][a-z0-9\-']{2,}")
 _STOP = frozenset("the a an of for to in on and or is are was were be been with this that it its as "
                   "by at from into our we us you your he she they them his her their not no".split())
@@ -637,6 +637,7 @@ class Mnemo:
                 m = rec.setdefault("meta", {})
                 m["objectless_blocked"] = True
                 m["superseded_by_toggle"] = active[0]["id"]
+                m["superseded_by_policy"] = "objectless_guard"
                 return
             superseded_sigs = {self._obj_sig(r) for r in same_key if r.get("status") == "superseded"}
             if (active and new_sig in superseded_sigs
@@ -647,6 +648,7 @@ class Mnemo:
                 m = rec.setdefault("meta", {})
                 m["echo_blocked"] = True
                 m["superseded_by_toggle"] = active[0]["id"]
+                m["superseded_by_policy"] = "echo_guard"
                 return                                 # current value preserved; skip normal supersession
         for r in self.items:
             if r is rec or r.get("status") != "active" or r.get("key") != k:
@@ -656,12 +658,16 @@ class Mnemo:
                 r["status"] = "superseded"
                 r["superseded_ts"] = time.time()
                 r["invalidated_at"] = vf_new
-                r.setdefault("meta", {})["superseded_by_toggle"] = rec["id"]
+                rm = r.setdefault("meta", {})
+                rm["superseded_by_toggle"] = rec["id"]
+                rm["superseded_by_policy"] = "keyed_reaffirm" if reaffirm else "keyed_lww"
             else:                              # an active same-key value is newer -> incoming is stale-on-arrival
                 rec["status"] = "superseded"
                 rec["superseded_ts"] = time.time()
                 rec["invalidated_at"] = vf_r
-                rec.setdefault("meta", {})["superseded_by_toggle"] = r["id"]
+                rm = rec.setdefault("meta", {})
+                rm["superseded_by_toggle"] = r["id"]
+                rm["superseded_by_policy"] = "keyed_lww_backfill"
 
     def remember_dedup(self, text: str, tags=None, value: float = 1.0, meta: dict | None = None,
                        mtype: str | None = None, dup_threshold: float = 0.95) -> str:
@@ -796,12 +802,30 @@ class Mnemo:
 
     def history(self, key: str) -> list[dict]:
         """The full validity timeline for `key`: every value it has held, in event-time order, each
-        with its [valid_from, invalidated_at) interval and status. The audit trail behind as_of()."""
+        with its [valid_from, invalidated_at) interval, status, and — when it was retired — WHICH
+        policy adjudicated the retirement (meta['superseded_by_policy']). The audit trail behind as_of()."""
         recs = [r for r in self.items if r.get("key") == key]
         recs.sort(key=lambda r: r.get("valid_from", r["ts"]))
         return [{"object": r.get("object"), "text": r.get("text"), "status": r.get("status"),
                  "valid_from": r.get("valid_from", r["ts"]), "invalidated_at": r.get("invalidated_at"),
+                 "policy": (r.get("meta") or {}).get("superseded_by_policy"),
                  "id": r["id"]} for r in recs]
+
+    def supersession_report(self) -> dict:
+        """Audit view of WHY memories were retired: a count of superseded records per adjudicating
+        policy (keyed_lww / keyed_lww_backfill / keyed_reaffirm / echo_guard / objectless_guard /
+        state_toggle / toggle_corroborated / toggle_persistence / keep_budget; 'unstamped' = retired
+        before 0.6.18 or by an external edit). Every supersession site stamps
+        meta['superseded_by_policy'] at write/consolidate time, so the resolver that adjudicated each
+        conflict is inspectable per record — the write-time judge log TOKI (arXiv:2606.06240) points
+        out most memory systems omit. Read-only; the raw rows stay untouched."""
+        counts: dict = {}
+        for r in self.items:
+            if r.get("status") != "superseded":
+                continue
+            p = (r.get("meta") or {}).get("superseded_by_policy") or "unstamped"
+            counts[p] = counts.get(p, 0) + 1
+        return {"superseded_total": sum(counts.values()), "by_policy": counts}
 
     # ── retrieval (value-ranked) ──────────────────────────────────────────────
     def _qvec(self, query: str):
@@ -2141,7 +2165,11 @@ class Mnemo:
                             older["status"] = "superseded"
                             older["superseded_ts"] = time.time()
                             older["invalidated_at"] = _vf(newer)   # bi-temporal: when this record stopped being current
-                            older.setdefault("meta", {})["superseded_by_toggle"] = newer["id"]
+                            om = older.setdefault("meta", {})
+                            om["superseded_by_toggle"] = newer["id"]
+                            om["superseded_by_policy"] = ("toggle_corroborated" if self.supersede_requires_corroboration
+                                                          else ("toggle_persistence" if self.supersede_persistence > 1
+                                                                else "state_toggle"))
                             # Accuracy loop, live consumer: being OVERTURNED by a later contradiction is
                             # a was-wrong signal — debit the superseded claim, credit the one that
                             # corrected the record. So the consolidation pass continuously feeds each
@@ -2170,6 +2198,7 @@ class Mnemo:
                 drop = active[keep:]
             for r in drop:
                 r["status"] = "superseded"; r["superseded_ts"] = time.time(); staled += 1
+                r.setdefault("meta", {})["superseded_by_policy"] = "keep_budget"
         self._save()
         return {"active": len([r for r in self.items if r["status"] == "active"]),
                 "hubs_flagged": hubs, "linked_pairs": linked, "toggled": toggled,
@@ -2220,7 +2249,9 @@ class Mnemo:
                         if _negation_clash(a["text"], b["text"]) or _value_clash(a["text"], b["text"]):
                             older, newer = (a, b) if a["ts"] <= b["ts"] else (b, a)
                             older["status"] = "superseded"; older["superseded_ts"] = time.time()
-                            older.setdefault("meta", {})["superseded_by_toggle"] = newer["id"]
+                            om = older.setdefault("meta", {})
+                            om["superseded_by_toggle"] = newer["id"]
+                            om["superseded_by_policy"] = "state_toggle"
                             toggled += 1
                             if older is a:
                                 break
@@ -2230,6 +2261,7 @@ class Mnemo:
                 act = sorted([r for r in members if r["status"] == "active"], key=lambda r: -r["value"])
                 for r in act[keep_per_cluster:]:
                     r["status"] = "superseded"; r["superseded_ts"] = time.time(); staled += 1
+                    r.setdefault("meta", {})["superseded_by_policy"] = "keep_budget"
         self._save()
         return {"clusters_total": len(clusters), "clusters_fired": fired, "threshold": threshold,
                 "linked_pairs": linked, "toggled": toggled, "staled": staled}
