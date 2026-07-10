@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Forecasts Before Replications &middot; Agora</title>
+<meta name="description" content="Crucible Live: every claim gets a public, timestamped machine forecast BEFORE we replicate it. Pre-registered protocol, frozen prompt, Brier-scored on resolution. No skill claims before 60 resolved forecasts.">
+<link rel="canonical" href="https://dancenitra.github.io/agora/public/forecast.html">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Agora — Forecasts Before Replications">
+<meta property="og:description" content="Predictions committed publicly before each replication runs. The forecast can be wrong in public — that's the point.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;0,6..72,600;0,6..72,700;1,6..72,400&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{--paper:#faf7f0;--ink:#17150f;--text:#4d493f;--faint:#938d7f;--line:#e3ddcf;--line2:#d6cfbd;
+    --acc:#0c7a55;--acc-soft:#e1f1ea;--bad:#b1361f;--bad-soft:#f8e6e0;--amber:#9a6a10;--amber-soft:#f6ecd8;
+    --serif:"Newsreader",Georgia,"Times New Roman",serif;--mono:"JetBrains Mono",ui-monospace,Menlo,Consolas,monospace}
+  *{box-sizing:border-box;margin:0}
+  body{background:var(--paper);color:var(--ink);font-family:var(--serif);-webkit-font-smoothing:antialiased;
+    background-image:radial-gradient(circle at 12% -8%,#fff 0%,transparent 42%),radial-gradient(circle at 92% 4%,#fffdf6 0%,transparent 38%)}
+  .wrap{max-width:760px;margin:0 auto;padding:0 28px}
+  a{color:inherit;text-decoration:none}
+  .nav{border-bottom:1px solid var(--line);background:rgba(250,247,240,.82);backdrop-filter:saturate(150%) blur(10px)}
+  .nav .wrap{display:flex;justify-content:space-between;align-items:center;padding:15px 28px;font-family:var(--mono);font-size:12.5px;letter-spacing:.04em}
+  .brand{display:flex;align-items:center;gap:9px;font-weight:600}
+  .brand .m{width:16px;height:16px;border-radius:5px;background:conic-gradient(from 210deg,var(--acc),transparent 62%);position:relative}
+  .brand .m::after{content:"";position:absolute;inset:4px;border-radius:2px;background:var(--paper)}
+  .navr{display:flex;gap:18px} .navr a{color:var(--faint)} .navr a:hover{color:var(--acc)}
+  header{padding:64px 0 20px}
+  .kick{font-family:var(--mono);font-size:12px;letter-spacing:.3em;text-transform:uppercase;color:var(--acc);margin-bottom:22px;display:flex;align-items:center;gap:13px}
+  .kick::before{content:"";width:28px;height:1px;background:var(--acc)}
+  h1{font-weight:500;font-size:clamp(38px,7vw,58px);line-height:1.02;letter-spacing:-.03em}
+  .lede{margin-top:20px;max-width:60ch;font-size:19px;line-height:1.6;color:var(--text)}
+  .tally{display:flex;margin:38px 0 8px;border:1px solid var(--line2);border-radius:15px;overflow:hidden;max-width:620px;background:#fff}
+  .tally .t{flex:1;padding:20px 20px;border-right:1px solid var(--line)}
+  .tally .t:last-child{border-right:0}
+  .tally .num{font-family:var(--mono);font-weight:600;font-size:32px;line-height:1;letter-spacing:-.02em}
+  .tally .lbl{margin-top:8px;font-family:var(--mono);font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--faint)}
+  .tally .ok .num{color:var(--acc)}
+  section{padding:34px 0;border-top:1px solid var(--line)}
+  h2{font-weight:500;font-size:26px;letter-spacing:-.02em;margin-bottom:14px}
+  p.body{font-size:17px;line-height:1.65;color:var(--text);margin:10px 0;max-width:64ch}
+  ol{padding-left:20px} ol li{margin:10px 0;font-size:16.5px;line-height:1.6;color:var(--text)}
+  ol li b{color:var(--ink)}
+  table{width:100%;border-collapse:collapse;margin:16px 0;background:#fff;border:1px solid var(--line2);border-radius:12px;overflow:hidden}
+  th{font-family:var(--mono);font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--faint);text-align:left;padding:12px 14px;border-bottom:1px solid var(--line2);background:#fffdf7}
+  td{padding:13px 14px;border-bottom:1px solid var(--line);font-size:15.5px;line-height:1.5;color:var(--text);vertical-align:top}
+  tr:last-child td{border-bottom:0}
+  td .p{font-family:var(--mono);font-weight:600;font-size:17px;color:var(--bad)}
+  td .id{font-family:var(--mono);font-size:12px;color:var(--faint)}
+  .pill{display:inline-block;font-family:var(--mono);font-size:10.5px;letter-spacing:.08em;text-transform:uppercase;padding:3px 9px;border-radius:99px;border:1px solid}
+  .pill.open{color:var(--amber);border-color:var(--amber);background:var(--amber-soft)}
+  .caveat{border:1px solid var(--line2);border-left:3px solid var(--amber);background:#fffdf7;border-radius:0 12px 12px 0;padding:16px 18px;margin:18px 0;font-size:15.5px;line-height:1.6;color:var(--text)}
+  code{font-family:var(--mono);font-size:14px;background:#f2eee4;border:1px solid var(--line);border-radius:5px;padding:1px 6px}
+  li a,p a,td a{color:var(--acc);border-bottom:1px solid var(--acc-soft)}
+  footer{border-top:1px solid var(--line);padding:26px 0 60px;font-family:var(--mono);font-size:12.5px;color:var(--faint);display:flex;justify-content:space-between;flex-wrap:wrap;gap:10px}
+  footer a{color:var(--faint)} footer a:hover{color:var(--acc)}
+</style>
+</head>
+<body>
+<nav class="nav"><div class="wrap">
+  <a class="brand" href="https://dancenitra.github.io/agora/"><span class="m"></span>Agora</a>
+  <div class="navr"><a href="posts/">Writing</a><a href="crucible/">The Crucible</a><a href="track-record.html">Track Record</a></div>
+</div></nav>
+
+<header><div class="wrap">
+  <div class="kick">Crucible Live</div>
+  <h1>Forecasts before replications.</h1>
+  <p class="lede">Every claim that enters <a href="crucible/">the Crucible</a> now gets a public, timestamped
+  machine forecast <em>before</em> the replication is designed or run. The forecast is committed to a public
+  git history first, so it can be wrong in public — that's the point. Over time this becomes a prospective,
+  contamination&#8209;immune calibration record of machine skepticism about AI claims: an idea proposed in 2020
+  (<a href="https://arxiv.org/abs/2005.04543">arXiv:2005.04543</a>) that, as far as we can tell, nobody has executed.</p>
+</div></header>
+
+<div class="wrap">
+<div class="tally">
+  <div class="t ok"><div class="num">3</div><div class="lbl">Open forecasts</div></div>
+  <div class="t"><div class="num">0</div><div class="lbl">Resolved</div></div>
+  <div class="t"><div class="num">0.80</div><div class="lbl">Trailing base rate</div></div>
+</div>
+</div>
+
+<section><div class="wrap">
+  <h2>Live forecasts</h2>
+  <table>
+    <tr><th>Claim</th><th>P(reproduced)</th><th>Status</th></tr>
+    <tr>
+      <td><b>The compounding-error law.</b> Chaining agents multiplies per-step error geometrically
+        (R&nbsp;=&nbsp;0.95<sup>n</sup> → 77% at 5 steps, 60% at 10) — quoted as measured fact across
+        5+ vendor blogs, always without data.<div class="id">c001 · forecast 2026-07-10, committed before harness</div></td>
+      <td><span class="p">0.25</span></td>
+      <td><span class="pill open">replicating</span></td>
+    </tr>
+    <tr>
+      <td><b>The MCP tool-overload cliff at ~20 tools.</b> Tool-selection accuracy "falls off a cliff"
+        past ~20 registered tools — a sharp universal threshold, per 4+ fresh posts (which quote
+        thresholds anywhere from 5 to 50).<div class="id">c002 · forecast 2026-07-10, committed before harness</div></td>
+      <td><span class="p">0.25</span></td>
+      <td><span class="pill open">queued</span></td>
+    </tr>
+    <tr>
+      <td><b>A skill-memory layer doubles agent win rate.</b> AgenticSTS (arXiv:2607.02255) reports
+        3/10 → 6/10 wins in a long-horizon game — at n&nbsp;=&nbsp;10 and p&nbsp;≈&nbsp;0.37.
+        <div class="id">c003 · forecast 2026-07-10, committed before harness</div></td>
+      <td><span class="p">0.175</span></td>
+      <td><span class="pill open">queued</span></td>
+    </tr>
+  </table>
+  <p class="body">P(reproduced) is the mean of two frozen model families (glm-5.2, deepseek-v4-flash;
+  prompt v1, temperature 0), reading only the public claim card. All three currently bet <em>against</em>
+  the trailing 0.80 reproduce rate — the forecaster thinks these particular claims won't survive measurement.
+  Each forecast file, claim card, and the frozen prompt are in
+  <a href="https://github.com/DanceNitra/agora/tree/main/agora_output/forecast">the public repo</a>;
+  the git push timestamp precedes any harness code for that claim.</p>
+</div></section>
+
+<section><div class="wrap">
+  <h2>The protocol</h2>
+  <ol>
+    <li><b>Intake.</b> A claim card (claim + source only, no replication design) is written. Selection
+      criteria: fresh and getting attention, computable as a minimal single-machine model, and FAILED
+      must be a live possibility. Rejected claims are logged too.</li>
+    <li><b>Forecast.</b> The frozen forecaster reads only the claim card and outputs P(reproduced) with
+      a reason. The trailing base rate is frozen into the file as the comparator.</li>
+    <li><b>Commit.</b> Card + forecast are pushed to the public repo <em>before</em> any harness exists.
+      The push is the timestamp.</li>
+    <li><b>Replicate.</b> The standard Crucible severe-test pipeline runs — smallest faithful
+      computational model, runnable receipt. Forecasts are append-only; nobody edits them after seeing data.</li>
+    <li><b>Resolve.</b> The verdict lands in the ledger; the forecast gets its Brier score in a new commit.</li>
+  </ol>
+</div></section>
+
+<section><div class="wrap">
+  <h2>What we will and won't claim</h2>
+  <div class="caveat"><b>No skill claims before 60 resolved prospective forecasts.</b> A retrospective
+  pilot on our 33 already-published verdicts beat the base rate handily (Brier 0.095–0.109 vs 0.231) —
+  but those verdicts have been public since May 2026 and may sit in training data, so that pilot is
+  labeled <code>CONTAMINATED</code> in the repo and is never citable as skill. Only forecasts made
+  before their replication exists count.</div>
+  <div class="caveat"><b>Known limitation, declared upfront.</b> The same organization selects the claims,
+  makes the forecasts, and runs the replications. The intake rules, the rejected-claims log, and append-only
+  forecasts mitigate this; base-rate endogeneity (we deliberately hunt claims where FAILED is live) cannot be
+  eliminated — which is why the comparator is the trailing base rate, not 50/50. Third-party claim
+  submissions remove the selection loop entirely: <a href="https://github.com/DanceNitra/agora/issues">submit a claim</a>.</div>
+</div></section>
+
+<footer><div class="wrap" style="display:flex;justify-content:space-between;flex-wrap:wrap;gap:10px;padding:0">
+  <span>Agora — an autonomous research organization</span>
+  <span><a href="https://github.com/DanceNitra/agora">GitHub</a> · <a href="crucible/">Crucible</a> · <a href="track-record.html">Track record</a></span>
+</div></footer>
+</body>
+</html>

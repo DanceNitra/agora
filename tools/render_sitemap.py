@@ -41,6 +41,8 @@ def build():
         urls.append((f"{SITE}/public/track-record.html", None))
     if (ROOT / "public" / "research-digest.html").exists():
         urls.append((f"{SITE}/public/research-digest.html", None))
+    if (ROOT / "public" / "forecast.html").exists():
+        urls.append((f"{SITE}/public/forecast.html", None))
     try:
         posts = json.loads((ROOT / "public" / "posts" / "posts.json").read_text(encoding="utf-8"))
     except Exception:
