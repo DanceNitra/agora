@@ -109,7 +109,7 @@ def attest(text: str, source_sk_hex: str, source_doc=None) -> str:
     sk = _Ed25519SK.from_private_bytes(bytes.fromhex(source_sk_hex))
     return sk.sign(_attest_message(text, source_doc)).hex()
 
-__version__ = "0.6.19"
+__version__ = "0.6.20"
 _WORD = re.compile(r"[a-z0-9][a-z0-9\-']{2,}")
 _STOP = frozenset("the a an of for to in on and or is are was were be been with this that it its as "
                   "by at from into our we us you your he she they them his her their not no".split())
@@ -318,6 +318,25 @@ class Mnemo:
                 self._receipts = json.loads(self._receipts_path.read_text(encoding="utf-8"))
             except Exception:
                 self._receipts = []
+        # DELETION TOMBSTONES (erasure-with-audit). forget() genuinely removes content, which otherwise makes
+        # verify_writes() report the now-missing record as "deleted out-of-band" — a legitimate GDPR-erasure is
+        # then INDISTINGUISHABLE from tampering. A tombstone is a hash-chained (optionally Ed25519-signed) marker
+        # that records the FACT of a deliberate erasure — the record's random surrogate id (uuid, NOT content-
+        # derived), a UTC ts, and an opaque caller request_id — and NOTHING derived from the content (a hash of PII
+        # is still PII, EDPB; so no content hash lands here). verify_writes() then treats a tombstoned missing
+        # record as ACCOUNTED-FOR (chain intact, erased at T), while a record missing WITHOUT a tombstone still
+        # flags as out-of-band tampering. HONEST SCOPE: this proves the ACT of deletion within THIS mnemo store
+        # only (not the app's vector store / logs / backups), it is NOT a compliance guarantee, and the signature
+        # is load-bearing only against a party OTHER than the key holder (an operator who holds receipt_key can
+        # forge tombstones too). Prior art credited: crypto-shredding, Cassandra tombstones, Art.30 erasure logs,
+        # Crosby-Wallach/Certificate-Transparency tamper-evident logs.
+        self._tombstones: list[dict] = []
+        self._tombstones_path = (self.path.parent / (self.path.name + ".tombstones.json")) if self.path else None
+        if self._tombstones_path and self._tombstones_path.exists():
+            try:
+                self._tombstones = json.loads(self._tombstones_path.read_text(encoding="utf-8"))
+            except Exception:
+                self._tombstones = []
 
     # ── capture ──────────────────────────────────────────────────────────────
     def remember(self, text: str, tags=None, value: float = 1.0, meta: dict | None = None,
@@ -525,7 +544,11 @@ class Mnemo:
                 problems.append(f"receipt {i}: unsigned, but a signature was required")
             cur = by_id.get(r["memory_id"])
             if cur is None:
-                problems.append(f"memory {r['memory_id']}: written but missing from the store (deleted out-of-band)")
+                # a missing record is only a PROBLEM if it was NOT deliberately erased. A deletion tombstone
+                # (forget_subject) makes the erasure accounted-for: the write-chain stays intact and the record
+                # is provably erased, not silently tampered away. No tombstone -> still flag as out-of-band.
+                if not any(t.get("memory_id") == r["memory_id"] for t in self._tombstones):
+                    problems.append(f"memory {r['memory_id']}: written but missing from the store (deleted out-of-band)")
             else:
                 # compare only the fields THIS receipt committed to (a receipt written before attribution was
                 # committed has no attrib_sha256 — don't fault it for a field it never promised)
@@ -533,6 +556,25 @@ class Mnemo:
                 if any(cc.get(k) != v for k, v in (r.get("commit") or {}).items()):
                     problems.append(f"memory {r['memory_id']}: stored content no longer matches its write receipt (edited after write)")
             prev = r.get("hash")
+        # verify the DELETION-TOMBSTONE chain too — else a forged tombstone could hide a real out-of-band delete
+        tprev = _GENESIS
+        for j, t in enumerate(self._tombstones):
+            core = {k: t.get(k) for k in ("seq", "memory_id", "ts", "request_id", "prev")}
+            if t.get("prev") != tprev:
+                problems.append(f"tombstone {j}: broken chain link (a prior tombstone was altered/removed)")
+            if _sha256_hex(_canon(core)) != t.get("hash"):
+                problems.append(f"tombstone {j}: tombstone tampered (hash mismatch)")
+            if "sig" in t and _HAVE_ED:
+                try:
+                    _Ed25519PK.from_public_bytes(bytes.fromhex(t["pubkey"])).verify(
+                        bytes.fromhex(t["sig"]), bytes.fromhex(t["hash"]))
+                    if expected_pubkey and t.get("pubkey") != expected_pubkey:
+                        problems.append(f"tombstone {j}: signed by an unexpected key")
+                except Exception:
+                    problems.append(f"tombstone {j}: invalid signature")
+            elif expected_pubkey:
+                problems.append(f"tombstone {j}: unsigned, but a signature was required")
+            tprev = t.get("hash")
         return (len(problems) == 0, problems)
 
     def verify_attribution(self) -> dict:
@@ -727,6 +769,64 @@ class Mnemo:
         self._mat = None; self._mat_built_n = -1             # force vec-matrix rebuild (drops forgotten rows)
         self._save(force=True)                               # a deletion is real content change — persist now
         return {"forgotten": len(target), "ids": sorted(target), "scrubbed_links": scrubbed}
+
+    def _emit_tombstone(self, memory_id: str, ts: float, request_id: str | None) -> dict:
+        """Append one hash-chained (optionally signed) deletion marker. Commits to the record's random
+        surrogate id + ts + opaque request_id ONLY — nothing content-derived (a hash of PII is still PII)."""
+        prev = self._tombstones[-1]["hash"] if self._tombstones else _GENESIS
+        t = {"seq": len(self._tombstones), "memory_id": memory_id, "ts": ts,
+             "request_id": request_id, "prev": prev}
+        t["hash"] = _sha256_hex(_canon({k: t[k] for k in ("seq", "memory_id", "ts", "request_id", "prev")}))
+        if self._receipt_sk and _HAVE_ED:
+            sk = _Ed25519SK.from_private_bytes(bytes.fromhex(self._receipt_sk))
+            t["pubkey"] = self.receipt_pubkey
+            t["sig"] = sk.sign(bytes.fromhex(t["hash"])).hex()
+        self._tombstones.append(t)
+        if self._tombstones_path:
+            try:
+                self._tombstones_path.write_text(json.dumps(self._tombstones, indent=2, ensure_ascii=False),
+                                                 encoding="utf-8")
+            except Exception:
+                pass
+        return t
+
+    def forget_subject(self, subject: str, request_id: str | None = None) -> dict:
+        """RIGHT-TO-ERASURE across provenance lineage, with a tamper-evident audit of the ACT. Hard-deletes
+        every active memory ATTRIBUTABLE to `subject` — its own canonical source OR any record that inherited
+        `subject` through derived_from taint (so a summary/consolidation built from the subject's data is erased
+        too, which a naive text-match delete would miss) — then records a signed, CONTENT-FREE tombstone per
+        erased record so verify_writes() reports the now-missing rows as deliberately erased (not out-of-band
+        tampering). `subject` is matched against canonical sources (`_rec_sources`): pass the same source string
+        you wrote with (`remember(..., source={'doc': subject})`) or an attested key as 'key:<hex>'.
+
+        Returns {erased, ids, request_id, tombstones}. HONEST SCOPE (read before relying on it for compliance):
+        this erases + proves-deletion WITHIN THIS mnemo store only — NOT the app's vector store, prompt logs,
+        or backups; it is an integrity primitive, NOT a compliance certification. The tombstone proves the ACT
+        (a record with this surrogate id was erased at T for request R), never the CONTENT, and its signature is
+        load-bearing only against a party who does NOT hold receipt_key (the operator who holds the key can forge
+        tombstones too — anchor the chain head externally for operator-adversarial audit). Prior art: crypto-
+        shredding; Cassandra/event-sourcing tombstones; GDPR Art.30 erasure logs; Crosby-Wallach / Certificate
+        Transparency tamper-evident logs."""
+        # match the subject against canonical sources; accept either the raw string the caller wrote or its
+        # entity-resolved form (_canon_source collapses "user-42"/"user_42"/"User 42" -> one canonical id).
+        cand = {subject, Mnemo._canon_source(subject)}
+        subj_ids = [r["id"] for r in self.items if cand & Mnemo._rec_sources(r)]
+        if not subj_ids:
+            return {"erased": 0, "ids": [], "request_id": request_id, "tombstones": 0}
+        now = time.time()
+        res = self.forget(ids=subj_ids)
+        for mid in res["ids"]:
+            self._emit_tombstone(mid, now, request_id)
+        return {"erased": res["forgotten"], "ids": res["ids"],
+                "request_id": request_id, "tombstones": len(res["ids"])}
+
+    def erasure_report(self) -> dict:
+        """Audit view of deliberate erasures: total tombstones + each {memory_id, ts, request_id}. Read-only;
+        carries NO erased content (by construction). The durable proof-of-deletion trail behind forget_subject."""
+        return {"tombstoned_total": len(self._tombstones),
+                "erasures": [{"memory_id": t["memory_id"], "ts": t.get("ts"),
+                              "request_id": t.get("request_id"), "signed": "sig" in t}
+                             for t in self._tombstones]}
 
     def revert(self, key: str) -> dict:
         """CONTROL-PLANE revert: restore the value that the current active record for `key` superseded.

@@ -504,6 +504,23 @@ A store's history says *what* was retired but not *why*. Every supersession path
 judge log most memory systems omit (cf. TOKI, arXiv:2606.06240). Additive metadata only; no resolution
 decision changes (`mnemo/probes/supersession_policy_stamp_probe.py`, 10/10).
 
+### Right-to-erasure that keeps the audit trail honest: `forget_subject()` + deletion tombstones (0.6.19+)
+`forget()` genuinely removes content — but a hard delete makes `verify_writes()` report the now-missing
+record as "deleted out-of-band", so a legitimate erasure is indistinguishable from tampering.
+`forget_subject(subject, request_id=…)` erases every memory attributable to a data subject **across
+provenance lineage** (its own canonical source *and* any record that inherited it through `derived_from`
+taint — so a summary built from the subject's data is erased too, which a naive text-match delete misses),
+then appends a signed, hash-chained **deletion tombstone** per record. The tombstone commits to the record's
+random surrogate id + a timestamp + your opaque `request_id` and **nothing content-derived** (a hash of PII
+is still PII), so `verify_writes()` now reports the erasure as *accounted-for* (chain intact, provably
+erased) while a record missing *without* a tombstone still flags as tampering — and a forged tombstone is
+caught by the same check. `erasure_report()` is the content-free proof-of-deletion trail.
+**Honest scope:** this erases + proves-the-act **within this mnemo store only** (not your vector store, prompt
+logs, or backups); it is an integrity primitive, **not** a compliance certification, and the signature is
+load-bearing only against a party who does not hold `receipt_key`. Prior art: crypto-shredding; Cassandra /
+event-sourcing tombstones; GDPR Art. 30 erasure logs; Crosby-Wallach / Certificate-Transparency
+tamper-evident logs. Receipt: `mnemo/probes/forget_subject_tombstone_probe.py` (8/8).
+
 ## Use it as an MCP server (any Claude / Cursor / agent client)
 
 `mnemo` ships an [MCP](https://modelcontextprotocol.io) stdio server so any MCP-compatible agent can
