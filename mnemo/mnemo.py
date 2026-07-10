@@ -109,7 +109,7 @@ def attest(text: str, source_sk_hex: str, source_doc=None) -> str:
     sk = _Ed25519SK.from_private_bytes(bytes.fromhex(source_sk_hex))
     return sk.sign(_attest_message(text, source_doc)).hex()
 
-__version__ = "0.6.15"
+__version__ = "0.6.16"
 _WORD = re.compile(r"[a-z0-9][a-z0-9\-']{2,}")
 _STOP = frozenset("the a an of for to in on and or is are was were be been with this that it its as "
                   "by at from into our we us you your he she they them his her their not no".split())
@@ -2171,6 +2171,27 @@ class Mnemo:
         self._save()
         return {"clusters_total": len(clusters), "clusters_fired": fired, "threshold": threshold,
                 "linked_pairs": linked, "toggled": toggled, "staled": staled}
+
+    def sleep(self, cluster_threshold: int = 15, keep: int | None = None) -> dict:
+        """SLEEP-TIME COMPUTE: one idempotent, cheap idle-maintenance call the host runs whenever the
+        agent is idle. The write path (remember) stays fast — append + keyed supersession + (opt-in)
+        capacity eviction — and the EXPENSIVE O(n) reorganization is deferred here: cluster-triggered
+        consolidation (dedup + state-toggle linking within ripe clusters), then optional keep-budget
+        pruning and capacity re-affirmation. Cheap-to-call: a no-op until a cluster is ripe / capacity
+        is exceeded, so the host can invoke it on every idle tick. Idempotent: a second immediate call
+        does no new work. Never edits raw text. Returns what the pass did.
+
+        This is mnemo's answer to Letta-style sleep-time compute, but as a pure library primitive (the
+        host schedules the idle window; mnemo provides the deferred maintenance op) — no agent loop, no
+        graph DB, no hosted service."""
+        report = {"consolidated_clusters": self.consolidate_clusters(threshold=cluster_threshold)}
+        if keep is not None:
+            report["keep_budget"] = self.consolidate(keep=keep)
+        elif self.capacity is not None:
+            before = sum(1 for r in self.items if r.get("status") == "active")
+            self._evict_to_capacity()
+            report["evicted_on_sleep"] = before - sum(1 for r in self.items if r.get("status") == "active")
+        return report
 
     # ── contradiction surfacing (flag, never auto-delete) ─────────────────────
     def contradictions(self, sim_threshold: float = 0.5, incompatible=None) -> list[dict]:

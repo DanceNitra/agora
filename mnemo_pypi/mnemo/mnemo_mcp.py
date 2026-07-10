@@ -134,6 +134,17 @@ def consolidate(keep: int | None = None) -> dict:
 
 
 @mcp.tool()
+def sleep(cluster_threshold: int = 15, keep: int | None = None) -> dict:
+    """SLEEP-TIME COMPUTE: call this whenever the agent is IDLE to run background memory maintenance in
+    one cheap, idempotent pass — the expensive reorganization the write path defers. It consolidates any
+    ripe near-duplicate clusters (dedup + preference-flip handling), and, if `keep` is given (or a
+    capacity was configured), prunes/re-affirms the memory budget. A no-op until something is ripe, so
+    it's safe to call on every idle tick; a second immediate call does no new work; it never edits raw
+    text. This is the recommended place to do heavy cleanup so remember()/recall() stay fast."""
+    return _MEM.sleep(cluster_threshold=cluster_threshold, keep=keep)
+
+
+@mcp.tool()
 def consolidate_clusters(threshold: int = 15) -> dict:
     """Cluster-TRIGGERED consolidation: consolidate a semantic cluster only once it has grown past
     `threshold` members — not a global blanket. Avoids prematurely consolidating sparse topics (raw
