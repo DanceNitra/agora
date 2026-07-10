@@ -1,6 +1,110 @@
-# Agora — Session Handoff (2026-07-10)
+# Agora — Session Handoff (2026-07-10 · session 2, evening)
 
 ## PASTE THIS AFTER SESSION RESTART
+
+```
+Resume Agora. FIRST read C:\Users\Danculus\agora\HANDOFF.md top section (2026-07-10 session 2) fully. Chat SLOVAK, code/output ENGLISH.
+
+THE DOCTRINE WE ARE ON (owner turned the card 2026-07-10 — this is the whole plan now):
+Stop hunting for a research breakthrough (memory-security pond is saturated; 3 idea-gates KILLED it in a
+day — everything is textbook/already-published/null). Instead use our SAME rigor machinery (prior-art
+hunter + construction-skeptic + verify agents) OFFENSIVELY to exponentially upgrade mnemo into the best
+memory product in the world. The loop: DRAIN two inexhaustible sources → GATE each candidate → VERIFY →
+SHIP with a runnable receipt → repeat.
+  - ARCHIVE = our own ~90 memory findings + the vault (~6000 notes) + Crucible ledger + past Labs — mine
+    for VERIFIED-but-unshipped wins.
+  - WEB = competitor feature sets + fresh 2026 research — audit each edge (VERIFIED-REAL vs HYPE), ship
+    only the real ones; sweep new papers for a memory/RAG technique that SURVIVES our replication.
+Why it compounds: THE FIELD'S BENCHMARKS ARE CONTAMINATED (LOCOMO answer-key 6.4% wrong, LLM-judge accepts
+63% of intentionally-wrong answers, mem0's paper mis-ran Zep) → every competitor % is marketing → mnemo
+becomes the ONLY memory library where each feature ships with a measured receipt. Rigor IS the moat.
+Full doctrine + the competitive audit + build queue: memory file [[mnemo-competitive-strategy-and-audit]].
+
+WHAT SHIPPED TODAY (session 2) — mnemo 0.6.11 → 0.6.16 on PyPI, each verified + regression-clean + live:
+  - 0.6.12/0.6.13 revert(key) + objectless-clobber guard + MCP (value-obscuring reversion = channel sep)
+  - 0.6.14 as_of() + history() point-in-time / bi-temporal queries — closes ZEP's only real technical
+    edge, built on existing [valid_from, invalidated_at] intervals, NO graph DB
+  - 0.6.15 Mnemo(capacity=N) bounded two-tier eviction (value-protected + recency-aged, Lab 29992a) —
+    closes the "unbounded append-only" gap vs mem0/Letta; default None = byte-identical legacy
+  - 0.6.16 sleep() sleep-time compute + MCP tool — defers O(n) reorg to idle (Letta parity), pure library
+  mnemo is now feature-competitive with mem0/Zep/Letta on REAL (non-hype) axes + our UNIQUE security layer
+  (echo_guard/receipts/taint/influence gate) that no competitor advertises. Probes in mnemo/probes/.
+
+VERIFIED-BUILD QUEUE (next, per the doctrine):
+  1-3 DONE (as_of / eviction / sleep). 4. procedural mtype — mnemo mostly has it, low priority.
+  5. A PUBLIC adversarial forgetting/temporal benchmark (RAMR extension) to prove our supersession +
+     security lead independently — this is the biggest lever (credibility, not a feature). OUTWARD → full
+     validate→storm→audit→verify gate. Everyone else publishes a benchmark; ours is internal.
+  ALSO keep sweeping: run a fresh competitor+paper audit each session, mine the vault/archive, add to queue.
+  AVOID graph-DB features (mem0g/Cognee) — infra mnemo correctly refuses; their numbers don't survive audit.
+
+LIVE COLLABORATIONS (gated; Claude posts approved GitHub, owner sends emails):
+  - Marat (TAT, valued): claimed his Triplenet-5D detector hits F1 0.9375 / AUROC 1.000 on our v2 held-out
+    fixture (built to be memorization-proof). His answers to our two checks were clean (anchors
+    TRAINING-only; features a-priori). BUT the results CHART he shared shows a DIFFERENT config (Adaptive
+    TAT F1 0.81 on 26 samples, 8 FP keeps) — doesn't match the headline. Owner sent a reply asking for the
+    runnable Colab-as-.py so WE reproduce on v2 independently (verify-don't-trust). NEXT: when his code
+    arrives, reproduce it on v2 ourselves; if it holds, wire into mnemo's coherence_gate + write up
+    together; if not, we found the leak. Do NOT integrate/co-publish before our own reproduction passes.
+  - icophy (Cophy, valued): #1462 collaboration going well. We posted 2 probes (hindsight-credit-bias +
+    negative-control-precision) then a diffuse-decision follow-up answering his question (his last-step
+    fallback is echo-safe on premise-endings but 0% on summary-endings) + shared the balanced fixture.
+    Ball in his court.
+  - DeepSeek #1462/#1466: luoxuejian posted a U/D/A/H cross-community report (Chinese) — NOT aimed at us,
+    external communities politely declined it (LangChain closed, Pydantic "already exists"); no reply
+    needed. Our lane = the substantive technical work with Marat + icophy, not the framework-promo thread.
+
+STRATEGIC STATE / stealth-yield & Crucible Live (parked, honest):
+  - Crucible Live (pre-registered replication-forecast loop) is BUILT: protocol + storefront page
+    (dancenitra.github.io/agora/public/forecast.html) + claim-submission template. c001 KILLED by the new
+    INTAKE GATE (textbook + construction-invalid, resolved NOT_COMPUTABLE); c002/c003 shelved. DORMANT
+    until a claim passes the intake gate. The intake gate (prior-art + construction-skeptic BEFORE compute)
+    is now mandatory in the protocol — it is the same gate we use for everything.
+  - stealth-yield inversion probe (agora_output/lab/20260710_stealth_yield_inversion): pre-registered
+    P=0.70, MEASURED = NULL (textbook tradeoff reproduced, no novel inversion). ramr_stealth_yield.py built
+    locally but NOT pushed to public RAMR (owner leaned shelve). Not a finding.
+
+OWNER ADMIN (pending, only he can do): rotate the OpenAI key (it passed through chat; used ONLY for
+competitor native-config measurements — all our own work runs on Ollama cloud free tier); GSC "Request
+indexing" on key storefront URLs (sitemap is technically fine, Google just hasn't crawled yet).
+
+DO NEXT (owner is here 5+ hours, wants to MAKE — keep building, do NOT wrap early):
+  1. Continue the doctrine: pick the next verified-build. Strong option = #5 the public adversarial
+     benchmark (biggest lever), OR run a fresh competitor+paper sweep for the next feature, OR mine the
+     vault/archive. Each candidate → intake gate FIRST (prior-art + construction-skeptic) BEFORE compute.
+  2. Marat reproduction when his code lands.
+RULES: anon commits (agora-builder@users.noreply.github.com); PyPI/Telegram/OpenAI tokens from server/.env
+in a script, NEVER on a CLI; vault only via tools/safe_vault_push.py; ship mnemo = bump __version__ in BOTH
+mnemo/mnemo.py AND mnemo_pypi/pyproject.toml, cp mnemo.py + mnemo_mcp.py to mnemo_pypi/mnemo/, build, VERIFY
+wheel content (0.6.8 lesson), twine upload (token from server/.env non-interactive), commit, AND git push
+(easy to forget the push after commit — I did 3x today), then live-verify from a fresh venv. VERIFY every
+probe's success-criterion honestly — twice today a probe caught a wrong criterion; reframe, never bend the
+test to the answer.
+```
+
+Chat **Slovak**, code + output **English**. Tokens in `server/.env` — never echo on a command line.
+
+---
+
+## RESUME HERE (2026-07-10 session 2 — the "turn the card" day: research→offensive product engineering)
+
+**THE PIVOT (the headline):** memory-security research pond is saturated for us (rigorous prior-art keeps
+finding textbook roots → 3 idea-gates KILLED in a day). So we turned our rigor machinery OFFENSIVE:
+systematically DRAIN the archive (our findings/vault) + the web (competitor features + fresh papers), gate
+each candidate, and ship only what's VERIFIED into mnemo — compounding it into the best memory product,
+because the field's benchmarks are contaminated and rigor is the only real differentiator. Doctrine in
+[[mnemo-competitive-strategy-and-audit]].
+
+**SHIPPED (mnemo 0.6.11→0.6.16, all live-verified from PyPI):** revert + objectless guard (0.6.12/13),
+as_of/history point-in-time (0.6.14, closes Zep), bounded two-tier eviction (0.6.15, closes mem0/Letta),
+sleep-time compute (0.6.16, closes Letta). Feature-competitive on real axes + our unique security layer.
+
+**NEXT:** the verified-build loop continues (queue item #5 public adversarial benchmark is the biggest
+lever; or a fresh sweep). Marat reproduction pending his code. icophy ball in his court.
+
+---
+
+## ARCHIVED — Session Handoff (2026-07-10 session 1, morning)
 
 ```
 Resume Agora. FIRST read C:\Users\Danculus\agora\HANDOFF.md top section (2026-07-10) fully. Chat SLOVAK, code/output ENGLISH.
