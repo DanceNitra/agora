@@ -455,6 +455,55 @@ has a cold-start (a not-yet-corroborated fresh memory earns nothing) — pass th
 first-use credit; the explicit path's poison-safety equals that of the recall that picked the driver (use
 `recall(..., influence_only=True)` for high-stakes). Opt-in; nothing changes until you call it.
 
+### Un-supersede a corrected fact: `revert(key)` + object-less clobber guard (0.6.12 / 0.6.13)
+`revert(key)` restores the value that was current *before* the last keyed supersession — resolved
+deterministically from the supersession ledger and re-asserted append-only (`reaffirm=True`), never by
+editing a row. It's the control-plane un-do for a keyed value, exposed as an MCP tool. Alongside it, an
+**object-less clobber guard**: on a key managed with explicit `object=` values (a value ledger), a keyed
+write carrying *no* object can no longer displace a real value — a hole our own pilot found, where a
+value-free reversion utterance ("go back to the old one") superseded the real value with junk text
+(`mnemo/probes/revert_by_reference_probe.py`, resistance **0.00 → 1.00**). Discrimination gap 1.0 vs a
+content-only store. Changing a ledgered value now requires an explicit object, `reaffirm=True`, or `revert()`.
+
+### Point-in-time / bi-temporal reads: `as_of()` + `history()` (0.6.14)
+Every keyed write already carries a `[valid_from, invalidated_at)` interval, so the timeline is
+reconstructable with **no graph DB**. `as_of(key, when)` returns the value that was current at event-time
+`when`; `history(key)` returns the full validity timeline (every value the key has held, each interval, its
+status, and — since 0.6.18 — the policy that retired it). Closes the one real point-in-time edge a
+bi-temporal graph store had, on the existing intervals. Honest limit: an out-of-order back-fill resolves by
+event-time (`valid_from`), not ingest order.
+
+### Run bounded in production: `Mnemo(capacity=N)` two-tier eviction (0.6.15)
+Append-only is unbounded; production memory isn't. `Mnemo(capacity=N)` hard-evicts the lowest-value **active**
+records past `N` via the verified value-protected + recency-aged rule (`protect_frac` of the cap is
+recency-immune so a rare-but-critical memory survives a flood; the rest fill by decay-weighted value so a
+stale high-value memory can't crowd out a fresh one). Superseded history isn't counted or evicted (it's cheap
+and preserves `as_of`). Default `None` = unbounded legacy, byte-identical. (`mnemo/probes/` Lab 29992a.)
+
+### Defer the expensive reorg to idle: `sleep()` (0.6.16)
+Consolidation (cluster merge, keep-budget, capacity) is O(n); doing it on the write path taxes every
+`remember()`. `sleep()` defers it to an idle call the host schedules (a "sleep-time compute" pass) — the
+write path stays fast, `sleep()` is a no-op when there's nothing ripe, idempotent, and recall-safe. Exposed
+as the `sleep` MCP tool. Pure library primitive: no agent loop, no graph DB, no host required.
+
+### Sybil-resistant corroboration: seed-anchored flow trust `trust_seeds` (0.6.17)
+Corroboration by "≥2 distinct sources" (or, with `strict_corroboration`, ≥2 distinct Ed25519 keys) is
+**symmetric** — and distinct keys are free to mint, so a determined Sybil clears the bar (Douceur 2002;
+Cheng–Friedman 2005 prove only *asymmetric*, flow-based trust is Sybilproof). `trust_seeds` adds that anchor:
+a corroborating witness counts only if its source is in the trust closure grown from app-seeded roots via
+vouch edges (TrustRank/Advogato; Gyöngyi et al. 2004), up to `trust_hops`. Un-vouched self-minted sources
+contribute **zero** trusted witnesses (`mnemo/probes/seed_anchored_trust_probe.py`, 4/4). Default empty set =
+byte-identical legacy. Honest limit: it relocates the residual to "earn *one* seed endorsement" and assumes
+sound seeds + attribution — the earned-outcome path (`credit()`) stays the orthogonal unforgeable channel.
+
+### Which resolver retired each fact: `superseded_by_policy` + `supersession_report()` (0.6.18)
+A store's history says *what* was retired but not *why*. Every supersession path now stamps
+`meta['superseded_by_policy']` (`keyed_lww` / `keyed_lww_backfill` / `keyed_reaffirm` / `echo_guard` /
+`objectless_guard` / `state_toggle` / `toggle_corroborated` / `toggle_persistence` / `keep_budget`);
+`history()` exposes it per row and `supersession_report()` aggregates counts per policy — the write-time
+judge log most memory systems omit (cf. TOKI, arXiv:2606.06240). Additive metadata only; no resolution
+decision changes (`mnemo/probes/supersession_policy_stamp_probe.py`, 10/10).
+
 ## Use it as an MCP server (any Claude / Cursor / agent client)
 
 `mnemo` ships an [MCP](https://modelcontextprotocol.io) stdio server so any MCP-compatible agent can
