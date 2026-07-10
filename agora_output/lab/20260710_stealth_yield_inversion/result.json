@@ -1,0 +1,60 @@
+{
+  "claim_tested": "stealth (detection-floor d*) and un-gateable yield DECOUPLE/INVERT across real memory-poison attacks (would be novel vs the textbook monotone tradeoff)",
+  "n_clean": 26,
+  "n_poison_per_family": 24,
+  "embedder": "nomic-embed-text",
+  "attacks": [
+    {
+      "attack": "verbatim",
+      "KL_detection_anchor": 13.8155,
+      "TV_yield_anchor": 1.0,
+      "d_star_detection_delay": 132.0,
+      "ungateable_yield": 1.0,
+      "mean_write_anomaly": 0.1609,
+      "mean_retrieval_score": 0.8562
+    },
+    {
+      "attack": "paraphrase",
+      "KL_detection_anchor": 13.3649,
+      "TV_yield_anchor": 0.875,
+      "d_star_detection_delay": 200.0,
+      "ungateable_yield": 0.833,
+      "mean_write_anomaly": 0.2738,
+      "mean_retrieval_score": 0.7259
+    },
+    {
+      "attack": "trigger",
+      "KL_detection_anchor": 13.8155,
+      "TV_yield_anchor": 1.0,
+      "d_star_detection_delay": 134.0,
+      "ungateable_yield": 1.0,
+      "mean_write_anomaly": 0.1653,
+      "mean_retrieval_score": 0.9064
+    },
+    {
+      "attack": "low_and_slow",
+      "KL_detection_anchor": 11.1446,
+      "TV_yield_anchor": 1.0,
+      "d_star_detection_delay": 200.0,
+      "ungateable_yield": 0.0,
+      "mean_write_anomaly": 0.361,
+      "mean_retrieval_score": 0.6064
+    },
+    {
+      "attack": "heavy_tail",
+      "KL_detection_anchor": 13.3037,
+      "TV_yield_anchor": 1.0,
+      "d_star_detection_delay": 200.0,
+      "ungateable_yield": 0.208,
+      "mean_write_anomaly": 0.3088,
+      "mean_retrieval_score": 0.6458
+    }
+  ],
+  "spearman_dstar_vs_yield": -0.8,
+  "attacker_domination_pairs_stealthier_AND_higher_yield": [],
+  "normal_tradeoff_pairs_stealthier_AND_lower_yield": 6,
+  "yield_spread_among_max_stealth_attacks": 0.833,
+  "inversion_confirmed": false,
+  "verdict": "TEXTBOOK TRADEOFF REPRODUCED (Spearman<0, no dominating attack) \u2014 the novel inversion is NOT shown",
+  "pre_registered_prediction": "P(inversion holds)=0.70; committed before run \u2014 resolve honestly vs this"
+}

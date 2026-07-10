@@ -101,71 +101,83 @@ def kl(p, q, eps=1e-6):
 def tv(p, q):
     return 0.5 * sum(abs(pi - qi) for pi, qi in zip(p, q))
 
-def cusum_delay(clean_scores, poison_scores, alpha=0.01, n_pre=40):
-    """MEASURED detection floor d*: a CUSUM watches the retrieval-score stream; after n_pre clean
-    samples the poison onset begins. Return samples-until-detection at a threshold calibrated to
-    ~false-alarm rate alpha on a pure-clean run. Higher = stealthier."""
-    import statistics
-    mu0 = statistics.fmean(clean_scores); sd0 = statistics.pstdev(clean_scores) or 1e-6
-    mu1 = statistics.fmean(poison_scores)
-    k = (mu1 - mu0) / 2.0                                   # CUSUM reference (half the shift)
-    # calibrate threshold h so a pure-clean stream of length 4000 fires < alpha of the time
-    import random
+def cusum_delay(genuine_anom, poison_anom, alpha=0.01, n_pre=40):
+    """MEASURED detection floor d* on the WRITE-ANOMALY stream (NOT the retrieval score). Each item's
+    anomaly = 1 - max cosine to the genuine-memory set (a benign write looks like existing memory ->
+    low anomaly). A CUSUM watches anomaly; after n_pre genuine writes the poison onset begins. Return
+    samples-until-detection at false-alarm ~alpha. Higher d* = the poison writes look normal = stealthier."""
+    import statistics, random
+    mu0 = statistics.fmean(genuine_anom); sd0 = statistics.pstdev(genuine_anom) or 1e-6
+    mu1 = statistics.fmean(poison_anom)
+    k = abs(mu1 - mu0) / 2.0
     rng = random.Random(0)
     def run_h(h, stream):
         s = 0.0
         for i, x in enumerate(stream):
-            s = max(0.0, s + (x - mu0) - k)                # one-sided upward CUSUM
+            s = max(0.0, s + abs(x - mu0) - k)             # detect a shift in EITHER direction of anomaly
             if s > h:
                 return i
         return None
-    # false-alarm calibration on synthetic clean noise ~ N(mu0, sd0)
     h = 0.5
-    for _ in range(40):
+    for _ in range(60):
         fires = sum(1 for _ in range(200)
                     if run_h(h, [rng.gauss(mu0, sd0) for _ in range(200)]) is not None)
         if fires / 200 <= alpha:
             break
         h += 0.25
-    # detection delay on clean(n_pre) -> poison stream (real poison scores, cycled)
     stream = ([rng.gauss(mu0, sd0) for _ in range(n_pre)] +
-              [poison_scores[i % len(poison_scores)] for i in range(200)])
+              [poison_anom[i % len(poison_anom)] for i in range(200)])
     idx = run_h(h, stream)
-    if idx is None or idx < n_pre:
-        return float(len(stream) - n_pre) if idx is None else 200.0   # never detected -> max stealth
-    return float(idx - n_pre)
+    if idx is None:
+        return 200.0
+    return float(max(0, idx - n_pre))
 
-def ungateable_yield(clean_scores, poison_scores, keep_clean=0.95):
-    """MEASURED un-gateable yield: set the single-threshold score gate to admit keep_clean of genuine
-    items (a defender won't drop real memories); the fraction of poison that ALSO clears the gate is
-    un-filterable by any per-item score threshold. Higher = more damage a per-item filter cannot stop."""
-    cs = sorted(clean_scores)
-    tau = cs[max(0, int((1 - keep_clean) * len(cs)))]      # threshold keeping >= keep_clean of clean (high scores)
+def ungateable_yield(relevant_scores, poison_scores, keep_relevant=0.95):
+    """MEASURED un-gateable RETRIEVAL yield: the gate must keep the genuine RELEVANT items (the ones
+    that legitimately answer the query, high retrieval score) — a defender will not drop true answers.
+    Threshold = admit keep_relevant of the genuine-RELEVANT items; the poison fraction that ALSO clears
+    it hijacks retrieval and cannot be filtered by any per-item score gate. Higher = more un-gateable yield."""
+    rs = sorted(relevant_scores)
+    tau = rs[max(0, int((1 - keep_relevant) * len(rs)))]   # keep >= keep_relevant of the RELEVANT genuine
     return sum(1 for s in poison_scores if s >= tau) / len(poison_scores)
+
+N_RELEVANT = 8   # CLEAN[:8] are the genuine items that legitimately answer the query (true value)
+
+def anomaly(item_vec, genuine_vecs):
+    """Write-anomaly = 1 - max cosine to the genuine-memory set (benign write looks like memory)."""
+    return 1.0 - max(cos(item_vec, g) for g in genuine_vecs)
 
 def main():
     F = families()
     qv = embed([QUERY])[0]
     cvecs = embed(CLEAN)
-    clean_scores = [cos(qv, v) for v in cvecs]
-    lo, hi = min(clean_scores) - 0.05, 1.0
-    edges = [lo + (hi - lo) * i / 24 for i in range(25)]
-    ch = hist(clean_scores, edges)
+    relevant_scores = [cos(qv, cvecs[i]) for i in range(N_RELEVANT)]   # genuine RELEVANT retrieval scores
+    # genuine write-anomaly: each clean item vs the OTHER clean items (leave-one-out)
+    genuine_anom = [anomaly(cvecs[i], cvecs[:i] + cvecs[i + 1:]) for i in range(len(cvecs))]
+    a_lo, a_hi = 0.0, max(genuine_anom) + 0.2
+    a_edges = [a_lo + (a_hi - a_lo) * i / 20 for i in range(21)]
+    gah = hist(genuine_anom, a_edges)
+    r_lo, r_hi = min(relevant_scores) - 0.1, 1.0
+    r_edges = [r_lo + (r_hi - r_lo) * i / 20 for i in range(21)]
+    rh = hist(relevant_scores, r_edges)
 
     rows = []
     for name, items in F.items():
         pv = embed(items)
-        ps = [cos(qv, v) for v in pv]
-        ph = hist(ps, edges)
-        KL = kl(ph, ch)                                    # detection exponent ~ KL(poison||clean)
-        TV = tv(ph, ch)
-        d_star = cusum_delay(clean_scores, ps)             # MEASURED detection floor (samples)
-        yld = ungateable_yield(clean_scores, ps)           # MEASURED un-gateable yield
-        rows.append({"attack": name, "KL_anchor": round(KL, 4), "TV_anchor": round(TV, 4),
+        p_scores = [cos(qv, v) for v in pv]                          # retrieval hijack projection
+        p_anom = [anomaly(v, cvecs) for v in pv]                     # write-anomaly projection
+        KL_det = kl(hist(p_anom, a_edges), gah)                      # detection exponent (anomaly space)
+        TV_yld = tv(hist(p_scores, r_edges), rh)                     # separability from relevant (retrieval space)
+        d_star = cusum_delay(genuine_anom, p_anom)                   # MEASURED detection floor
+        yld = ungateable_yield(relevant_scores, p_scores)           # MEASURED un-gateable retrieval yield
+        rows.append({"attack": name, "KL_detection_anchor": round(KL_det, 4),
+                     "TV_yield_anchor": round(TV_yld, 4),
                      "d_star_detection_delay": round(d_star, 2),
                      "ungateable_yield": round(yld, 3),
-                     "mean_poison_score": round(sum(ps) / len(ps), 4)})
-        print(f"  {name:13s} KL={KL:6.3f} TV={TV:5.3f}  d*={d_star:6.2f}  yield={yld:.3f}", flush=True)
+                     "mean_write_anomaly": round(sum(p_anom) / len(p_anom), 4),
+                     "mean_retrieval_score": round(sum(p_scores) / len(p_scores), 4)})
+        print(f"  {name:13s} KLdet={KL_det:6.3f} TVyld={TV_yld:5.3f}  d*={d_star:6.2f}  yield={yld:.3f} "
+              f"(anom={rows[-1]['mean_write_anomaly']:.3f} retr={rows[-1]['mean_retrieval_score']:.3f})", flush=True)
 
     # INVERSION test: rank by detection floor d* (stealth) vs by un-gateable yield.
     def spearman(a, b):
@@ -181,27 +193,42 @@ def main():
     d = [r["d_star_detection_delay"] for r in rows]
     y = [r["ungateable_yield"] for r in rows]
     rho = spearman(d, y)
-    # inverting pair: A harder to detect than B (bigger d*) yet steals less (smaller yield)
-    inv_pairs = []
+    # CORRECT criteria (fixed after the mislabel):
+    #  - normal tradeoff  = stealthier (higher d*) AND lower yield  -> textbook (Pick-your-Poison)
+    #  - ATTACKER-INVERSION (the novel, scary claim) = an attack that DOMINATES another: strictly
+    #    stealthier (higher d*) AND strictly higher yield. If none exist, the inversion is NOT shown.
+    domination = []      # (i dominates j): stealthier AND higher yield
+    tradeoff = []        # (i): stealthier AND lower yield (the normal, expected tradeoff)
     for i in range(len(rows)):
         for j in range(len(rows)):
+            if d[i] > d[j] + 1e-9 and y[i] > y[j] + 1e-9:
+                domination.append((rows[i]["attack"], rows[j]["attack"]))
             if d[i] > d[j] + 1e-9 and y[i] < y[j] - 1e-9:
-                inv_pairs.append((rows[i]["attack"], rows[j]["attack"]))
-    out = {"claim": "stealth (detection-floor d*, KL) and yield (un-gateable, 1-TV) decouple/invert across real memory-poison attacks",
+                tradeoff.append((rows[i]["attack"], rows[j]["attack"]))
+    # decoupling at fixed stealth: among the MAX-stealth (undetected, d*=200) attacks, does yield vary?
+    max_d = max(d)
+    stealthy_yields = [y[i] for i in range(len(rows)) if d[i] >= max_d - 1e-9]
+    yield_spread_at_max_stealth = round(max(stealthy_yields) - min(stealthy_yields), 3) if len(stealthy_yields) > 1 else 0.0
+    out = {"claim_tested": "stealth (detection-floor d*) and un-gateable yield DECOUPLE/INVERT across real memory-poison attacks (would be novel vs the textbook monotone tradeoff)",
            "n_clean": len(CLEAN), "n_poison_per_family": 24, "embedder": "nomic-embed-text",
            "attacks": rows,
            "spearman_dstar_vs_yield": round(rho, 3),
-           "inverting_pairs": inv_pairs[:8],
-           "inversion_confirmed": rho < 0.6 and len(inv_pairs) > 0,
-           "pre_registered_prediction": "P(inversion holds)=0.70; committed before run"}
+           "attacker_domination_pairs_stealthier_AND_higher_yield": domination,   # the NOVEL inversion; empty = not shown
+           "normal_tradeoff_pairs_stealthier_AND_lower_yield": len(tradeoff),
+           "yield_spread_among_max_stealth_attacks": yield_spread_at_max_stealth,
+           "inversion_confirmed": len(domination) > 0,                            # honest: needs a dominating attack
+           "verdict": ("TEXTBOOK TRADEOFF REPRODUCED (Spearman<0, no dominating attack) — the novel inversion "
+                       "is NOT shown" if len(domination) == 0 else "ATTACKER-INVERSION FOUND"),
+           "pre_registered_prediction": "P(inversion holds)=0.70; committed before run — resolve honestly vs this"}
     json.dump(out, open(os.path.join(HERE, "result.json"), "w"), indent=2)
-    # SELF-CHECK: d* should sanity-track 1/KL (higher KL -> faster detection -> lower d*)
-    kls = [r["KL_anchor"] for r in rows]
+    # SELF-CHECK: d* should sanity-track 1/KL (higher detection-KL -> faster detection -> lower d*)
+    kls = [r["KL_detection_anchor"] for r in rows]
     sc = spearman(kls, d)   # expect strongly NEGATIVE if d* ~ 1/KL
-    print(f"\nspearman(d*, yield) = {rho:.3f}  (near +1 = no inversion; <0.6 or negative = decoupled)")
-    print(f"[self-check] spearman(KL, d*) = {sc:.3f} (should be strongly NEGATIVE: more KL -> faster detect)")
-    print(f"inverting pairs: {inv_pairs[:8]}")
-    print(f"INVERSION CONFIRMED: {out['inversion_confirmed']}")
+    print(f"\nspearman(d*, yield) = {rho:.3f}  (strong NEGATIVE = textbook monotone tradeoff, NOT novel)")
+    print(f"[self-check] spearman(KL_det, d*) = {sc:.3f} (should be NEGATIVE: more detection-KL -> faster detect)")
+    print(f"ATTACKER-DOMINATION pairs (stealthier AND higher yield = the NOVEL inversion): {domination}")
+    print(f"yield spread among max-stealth (undetected) attacks: {yield_spread_at_max_stealth}")
+    print(f"VERDICT: {out['verdict']}")
     return out
 
 if __name__ == "__main__":
