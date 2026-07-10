@@ -109,7 +109,7 @@ def attest(text: str, source_sk_hex: str, source_doc=None) -> str:
     sk = _Ed25519SK.from_private_bytes(bytes.fromhex(source_sk_hex))
     return sk.sign(_attest_message(text, source_doc)).hex()
 
-__version__ = "0.6.16"
+__version__ = "0.6.17"
 _WORD = re.compile(r"[a-z0-9][a-z0-9\-']{2,}")
 _STOP = frozenset("the a an of for to in on and or is are was were be been with this that it its as "
                   "by at from into our we us you your he she they them his her their not no".split())
@@ -242,6 +242,26 @@ class Mnemo:
         # "independence" rail to the "origin-signed" rail; it does NOT make a claim TRUE (an attested source
         # can still sign a false claim), only makes manufactured independence expensive. Reversible: OFF.
         self.strict_corroboration = False
+        # SEED-ANCHORED FLOW TRUST (OPT-IN, default empty set -> OFF -> zero behavior change). The one axis
+        # strict_corroboration does NOT close: distinct Ed25519 keys prove DISTINCTNESS, not COST -- a Sybil
+        # mints N keypairs for free, so ">=2 distinct verified keys" is still forgeable by a determined
+        # attacker (Douceur 2002). Cheng & Friedman (2005) prove no SYMMETRIC reputation function is
+        # Sybilproof; only ASYMMETRIC, flow-based trust anchored to a costly/seeded root resists. This adds
+        # that anchor: `trust_seeds` is a set of canonical source strings (or "key:<attested_key>") the
+        # APPLICATION trusts a-priori (the operator's own source, an authenticated user). Trust then FLOWS
+        # from a seed to sources it VOUCHES for -- a source U is trusted iff U is a seed, or a record whose
+        # source is already trusted explicitly LINKS to a record authored by U (an endorsement edge),
+        # transitively up to `trust_hops` (TrustRank/Advogato-style; Gyongyi et al. 2004). When trust_seeds is
+        # non-empty, a corroborating witness counts toward the >=2-distinct-source bar ONLY if its source is
+        # in the trust closure. N self-minted sources that no seed vouches for contribute ZERO trusted
+        # witnesses, so they cannot manufacture standing. HONEST LIMITS: (1) inert without >=1 seed; (2) it
+        # RELOCATES the residual from "mint N free keys" to "earn ONE endorsement from a seeded node" -- a
+        # much higher bar, but a compromised/careless seed leaks trust into its vouched subtree (Cheng-Friedman's
+        # asymmetric-flow residual, not closed); (3) the EARNED-OUTCOME path (credit(), good>0) stays orthogonal
+        # and still grants standing regardless of seeds -- an unforgeable signal a writer cannot mint. Reversible:
+        # empty set. Receipt: mnemo/probes/seed_anchored_trust_probe.py.
+        self.trust_seeds: set = set()
+        self.trust_hops: int = 1
         # STRICT PROVENANCE (store policy; the adversary-resistant form of the orphan rule). Default OFF ->
         # zero behavior change. When True, a write that shows NO provenance at all -- neither a `source` nor a
         # resolvable `derived_from` -- earns NO standing (orphan), regardless of any caller flag. This removes
@@ -1385,13 +1405,55 @@ class Mnemo:
         return [lid for lid in (rec.get("links") or [])
                 if by_id.get(lid) is not None and self._coherence(rec, by_id[lid]) >= self.coherence_gate]
 
+    @staticmethod
+    def _canon_of(rec: dict) -> str:
+        """The single canonical source string of ONE record (same rule _distinct_sources counts by): its
+        entity-resolved `source.doc`/string, else 'id:'+its id. Also exposes the attested key as 'key:<k>'."""
+        src = rec.get("source")
+        doc = src.get("doc") if isinstance(src, dict) else (src if isinstance(src, str) else None)
+        return Mnemo._canon_source(doc) if doc else "id:" + rec.get("id", "")
+
+    def _trusted_sources(self, by_id: dict) -> set:
+        """Trust closure grown from `trust_seeds` via VOUCH edges, bounded by `trust_hops` (asymmetric,
+        flow-based; Gyongyi et al. 2004 TrustRank / Cheng-Friedman 2005). A source U enters the closure iff
+        U is a seed, or a record whose source is ALREADY trusted has a `link` to a record authored by U (an
+        explicit endorsement by a trusted actor). Free self-minted sources that no seed vouches for never
+        enter. Recomputed per corroboration check (stores are small; O(hops * links))."""
+        trusted = set(self.trust_seeds)
+        if not trusted:
+            return trusted
+        for _ in range(max(0, int(self.trust_hops))):
+            added = set()
+            for r in by_id.values():
+                # a record authored by a trusted source vouches for the sources of the records it links to
+                if self._canon_of(r) in trusted or ("key:" + str(r.get("attested_key"))) in trusted:
+                    for lid in (r.get("links") or []):
+                        lr = by_id.get(lid)
+                        if lr is not None:
+                            added.add(self._canon_of(lr))
+            if added <= trusted:
+                break
+            trusted |= added
+        return trusted
+
     def _corroborated(self, rec: dict, by_id: dict) -> bool:
         """Instance corroboration check = the static bar, plus the OPT-IN coherence + temporal gates: only ON-TOPIC,
-        temporally-independent corroborating links count toward the >=2-distinct-source path. Default == static."""
-        if (self.coherence_gate is not None or self.temporal_gate is not None) and rec.get("links"):
+        temporally-independent corroborating links count toward the >=2-distinct-source path, plus the OPT-IN
+        seed-anchored trust filter: when `trust_seeds` is set, only witnesses whose source is in the trust
+        closure count. Default (no gates, empty seeds) == static bar."""
+        links = rec.get("links")
+        if (self.coherence_gate is not None or self.temporal_gate is not None) and links:
             eff = self._gated_links(rec, by_id)
-            if eff != rec.get("links"):
-                rec = {**rec, "links": eff}   # shallow copy with the effective links; never mutate the stored record
+            if eff != links:
+                rec = {**rec, "links": eff}; links = eff   # shallow copy; never mutate the stored record
+        if self.trust_seeds and links:
+            trusted = self._trusted_sources(by_id)
+            # keep only corroborating witnesses authored by a trust-reachable source (own source or the
+            # seeds themselves always qualify); a Sybil's un-vouched sources are dropped before the count.
+            eff = [lid for lid in links if by_id.get(lid) is not None
+                   and self._canon_of(by_id[lid]) in trusted]
+            if eff != links:
+                rec = {**rec, "links": eff}
         return Mnemo._is_corroborated(rec, by_id, self.strict_corroboration)
 
     def influence_gate_report(self) -> dict:
