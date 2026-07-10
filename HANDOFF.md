@@ -64,6 +64,28 @@ STRATEGIC STATE / stealth-yield & Crucible Live (parked, honest):
     P=0.70, MEASURED = NULL (textbook tradeoff reproduced, no novel inversion). ramr_stealth_yield.py built
     locally but NOT pushed to public RAMR (owner leaned shelve). Not a finding.
 
+ARCHITECTURE / THE DUNGEON (alpha-omega — do NOT forget it): Agora is TWO long-lived processes.
+  - brain :8000 (FastAPI, agora.main:app, the MIND) — memory/emotion/trust, economy, the research organs
+    (tick/seminar, Telegram poll, dungeon watchdog, envoy, frontier-harvest, idea-forge, hypothesis,
+    scout-digest), the Crucible, mnemo store. Run from server/: PYTHONPATH=. python -m uvicorn
+    agora.main:app --host 127.0.0.1 --port 8000.
+  - dungeon :5174 HTTP + :5175 WS (the BODY) — the 8-agent autonomous research swarm (Shadow Kael/scout,
+    Sage Mira/curator, High Priest Orin/alchemist, King Aldric/eng-lead, Dame Elara/bridge, Sgt Voss/QA,
+    Artificer Rooke/replication, Cartographer Wren/maps), a watchable 3D world (open http://localhost:5174),
+    real cognition/trust/memory. ambient_life() plans quests, converses (builds trust), runs the
+    orchestrated pipeline + the GitHub Scout scan (~2.4h, loop_n%10000==4000). One process = mcp_server.py.
+  AT THIS HANDOFF: brain :8000 = ok (tick reset to 1 — restarted today; its in-process loops re-arm on
+  cadence, don't panic that it looks idle). dungeon :5174 = 200, EXACTLY ONE mcp_server.py (PID stable
+  since 2026-07-04), ZERO stray supervisors — the correct config (single bare `python -u mcp_server.py`
+  + the brain watchdog keeps it alive; NEVER run dungeon_supervisor.py at the same time as the brain
+  watchdog — they fight and cause ~hourly restart churn).
+  AFTER ANY restart/reset, DO NOT walk away — run the standing checklist ([[post-reset-loop-checklist-alpha-omega]]):
+  verify :5174=200 + ONE :8000 listener + ONE mcp_server.py + NO stray dungeon_supervisor; check the
+  dungeon loop_n heartbeat (NEVER trust HTTP 200 alone — the freeze root-cause was mnemo.recall json.dumps
+  on the loop); then verify+kickstart the Scout scan, the finding-reports, and Envoy, and DRAIN the Claude
+  inbox (it fills to a 100 cap; leads reach the owner only when a /loop processes it). Full run/restart
+  commands are lower in this file (§Relaunch + Health-check one-liners).
+
 OWNER ADMIN (pending, only he can do): rotate the OpenAI key (it passed through chat; used ONLY for
 competitor native-config measurements — all our own work runs on Ollama cloud free tier); GSC "Request
 indexing" on key storefront URLs (sitemap is technically fine, Google just hasn't crawled yet).
