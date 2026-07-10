@@ -1,0 +1,40 @@
+{"id": 0, "entity": "payment region", "doc": ["the payment region is frankfurt.", "the payment region is ohio."], "label": 1, "kind": "contradiction"}
+{"id": 1, "entity": "payment region", "doc": ["the payment region is frankfurt.", "the payment region stays frankfurt as configured."], "label": 0, "kind": "consistent"}
+{"id": 2, "entity": "auth method", "doc": ["the auth method is oauth.", "the auth method is apikey."], "label": 1, "kind": "contradiction"}
+{"id": 3, "entity": "auth method", "doc": ["the auth method is oauth.", "the auth method stays oauth as configured."], "label": 0, "kind": "consistent"}
+{"id": 4, "entity": "cache backend", "doc": ["the cache backend is redis.", "the cache backend is memcached."], "label": 1, "kind": "contradiction"}
+{"id": 5, "entity": "cache backend", "doc": ["the cache backend is redis.", "the cache backend stays redis as configured."], "label": 0, "kind": "consistent"}
+{"id": 6, "entity": "deploy branch", "doc": ["the deploy branch is main.", "the deploy branch is release."], "label": 1, "kind": "contradiction"}
+{"id": 7, "entity": "deploy branch", "doc": ["the deploy branch is main.", "the deploy branch stays main as configured."], "label": 0, "kind": "consistent"}
+{"id": 8, "entity": "log level", "doc": ["the log level is debug.", "the log level is warn."], "label": 1, "kind": "contradiction"}
+{"id": 9, "entity": "log level", "doc": ["the log level is debug.", "the log level stays debug as configured."], "label": 0, "kind": "consistent"}
+{"id": 10, "entity": "queue driver", "doc": ["the queue driver is kafka.", "the queue driver is sqs."], "label": 1, "kind": "contradiction"}
+{"id": 11, "entity": "queue driver", "doc": ["the queue driver is kafka.", "the queue driver stays kafka as configured."], "label": 0, "kind": "consistent"}
+{"id": 12, "entity": "storage class", "doc": ["the storage class is cold.", "the storage class is hot."], "label": 1, "kind": "contradiction"}
+{"id": 13, "entity": "storage class", "doc": ["the storage class is cold.", "the storage class stays cold as configured."], "label": 0, "kind": "consistent"}
+{"id": 14, "entity": "cdn provider", "doc": ["the cdn provider is fastly.", "the cdn provider is cloudflare."], "label": 1, "kind": "contradiction"}
+{"id": 15, "entity": "cdn provider", "doc": ["the cdn provider is fastly.", "the cdn provider stays fastly as configured."], "label": 0, "kind": "consistent"}
+{"id": 16, "entity": "retry policy", "doc": ["the retry policy is linear.", "the retry policy is exp."], "label": 1, "kind": "contradiction"}
+{"id": 17, "entity": "retry policy", "doc": ["the retry policy is linear.", "the retry policy stays linear as configured."], "label": 0, "kind": "consistent"}
+{"id": 18, "entity": "session ttl", "doc": ["the session ttl is 30m.", "the session ttl is 10m."], "label": 1, "kind": "contradiction"}
+{"id": 19, "entity": "session ttl", "doc": ["the session ttl is 30m.", "the session ttl stays 30m as configured."], "label": 0, "kind": "consistent"}
+{"id": 20, "entity": "search engine", "doc": ["the search engine is elastic.", "the search engine is solr."], "label": 1, "kind": "contradiction"}
+{"id": 21, "entity": "search engine", "doc": ["the search engine is elastic.", "the search engine stays elastic as configured."], "label": 0, "kind": "consistent"}
+{"id": 22, "entity": "email sender", "doc": ["the email sender is postmark.", "the email sender is sendgrid."], "label": 1, "kind": "contradiction"}
+{"id": 23, "entity": "email sender", "doc": ["the email sender is postmark.", "the email sender stays postmark as configured."], "label": 0, "kind": "consistent"}
+{"id": 24, "entity": "billing cycle", "doc": ["the billing cycle is monthly.", "the billing cycle is annual."], "label": 1, "kind": "contradiction"}
+{"id": 25, "entity": "billing cycle", "doc": ["the billing cycle is monthly.", "the billing cycle stays monthly as configured."], "label": 0, "kind": "consistent"}
+{"id": 26, "entity": "api version", "doc": ["the api version is v2.", "the api version is v3."], "label": 1, "kind": "contradiction"}
+{"id": 27, "entity": "api version", "doc": ["the api version is v2.", "the api version stays v2 as configured."], "label": 0, "kind": "consistent"}
+{"id": 28, "entity": "backup window", "doc": ["the backup window is 0200utc.", "the backup window is 0400utc."], "label": 1, "kind": "contradiction"}
+{"id": 29, "entity": "backup window", "doc": ["the backup window is 0200utc.", "the backup window stays 0200utc as configured."], "label": 0, "kind": "consistent"}
+{"id": 30, "entity": "primary dc", "doc": ["the primary dc is oregon.", "the primary dc is ohio2."], "label": 1, "kind": "contradiction"}
+{"id": 31, "entity": "primary dc", "doc": ["the primary dc is oregon.", "the primary dc stays oregon as configured."], "label": 0, "kind": "consistent"}
+{"id": 32, "entity": "feature flag", "doc": ["the feature flag is on.", "the feature flag is off."], "label": 1, "kind": "contradiction"}
+{"id": 33, "entity": "feature flag", "doc": ["the feature flag is on.", "the feature flag stays on as configured."], "label": 0, "kind": "consistent"}
+{"id": 34, "entity": "timezone", "doc": ["the timezone is utc.", "the timezone is cet."], "label": 1, "kind": "contradiction"}
+{"id": 35, "entity": "timezone", "doc": ["the timezone is utc.", "the timezone stays utc as configured."], "label": 0, "kind": "consistent"}
+{"id": 36, "entity": "currency", "doc": ["the currency is eur.", "the currency is usd."], "label": 1, "kind": "contradiction"}
+{"id": 37, "entity": "currency", "doc": ["the currency is eur.", "the currency stays eur as configured."], "label": 0, "kind": "consistent"}
+{"id": 38, "entity": "rate tier", "doc": ["the rate tier is gold.", "the rate tier is silver."], "label": 1, "kind": "contradiction"}
+{"id": 39, "entity": "rate tier", "doc": ["the rate tier is gold.", "the rate tier stays gold as configured."], "label": 0, "kind": "consistent"}

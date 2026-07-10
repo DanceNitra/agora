@@ -1,0 +1,12 @@
+{
+  "n": 20,
+  "clean_boundary_assumed": true,
+  "retrospective_credits_echo_on_diffuse": 0.7,
+  "retrospective_credits_true_contributor": 0.3,
+  "mean_sim_answer_to_last_premise": 0.796,
+  "mean_sim_answer_to_last_summary": 0.914,
+  "mean_sim_answer_to_echo": 0.826,
+  "last_step_fallback_echo_safe_when_ending_in_PREMISE": 0.85,
+  "last_step_fallback_echo_safe_when_ending_in_SUMMARY": 0.0,
+  "reading": "On diffuse chains the retrospective answer-similarity bias PERSISTS (it credits the post-hoc echo, not a contributor). icophy's last-reasoning-step fallback is echo-safe when the chain ends in a genuine premise (low answer-similarity), but when the chain ends in a SUMMARY that restates the conclusion, the last step's answer-similarity rises toward the echo's \u2014 so the fallback inherits the same bias exactly on summary-terminated diffuse chains. Clean act-time annotation avoids this; the last-step fallback only partially does."
+}
