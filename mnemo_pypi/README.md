@@ -541,6 +541,26 @@ of a user's turns with a signed, content-free deletion tombstone (`session.forge
 **tamper-evident** history (`store.verify_writes()` with receipts enabled). Receipt:
 `mnemo/probes/mnemo_session_adapter_probe.py` (11/11). Adapters live under `mnemo.integrations` (opt-in extras).
 
+### Current-truth memory for AutoGen: `MnemoMemory` (0.7.0+)
+`mnemo.integrations.autogen.MnemoMemory` implements AutoGen's [`Memory`](https://microsoft.github.io/autogen/stable/user-guide/agentchat-user-guide/memory.html)
+protocol (`add`/`query`/`update_context`/`clear`/`close`) — and here mnemo's value is not incidental. Unlike a
+verbatim `Session`, AutoGen `Memory` retrieves facts and injects them before each turn, so **`recall()` hiding
+superseded values means the agent is grounded on current-truth, not on a stale value a later correction
+already retired**:
+
+```python
+from autogen_agentchat.agents import AssistantAgent
+from mnemo.integrations.autogen import MnemoMemory
+mem = MnemoMemory(path="mem.json")
+agent = AssistantAgent("assistant", model_client=..., memory=[mem])
+```
+
+Pass a stable `key` (+ `object`) in a memory's `metadata` to drive deterministic supersession — a later
+`key="user::timezone", object="PST"` retires an earlier `UTC`, and `update_context` then injects only `PST`.
+Verified end-to-end against the real `autogen-core` (`mnemo/probes/mnemo_autogen_adapter_probe.py`, 7/7,
+including "superseded value is not injected"). Zero-dependency core: AutoGen is imported lazily inside the
+adapter, never by `import mnemo`.
+
 ## Use it as an MCP server (any Claude / Cursor / agent client)
 
 `mnemo` ships an [MCP](https://modelcontextprotocol.io) stdio server so any MCP-compatible agent can
