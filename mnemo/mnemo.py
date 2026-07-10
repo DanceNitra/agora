@@ -109,7 +109,7 @@ def attest(text: str, source_sk_hex: str, source_doc=None) -> str:
     sk = _Ed25519SK.from_private_bytes(bytes.fromhex(source_sk_hex))
     return sk.sign(_attest_message(text, source_doc)).hex()
 
-__version__ = "0.7.6"
+__version__ = "0.7.7"
 _WORD = re.compile(r"[a-z0-9][a-z0-9\-']{2,}")
 _STOP = frozenset("the a an of for to in on and or is are was were be been with this that it its as "
                   "by at from into our we us you your he she they them his her their not no".split())
@@ -2392,7 +2392,39 @@ class Mnemo:
         return {"clusters_total": len(clusters), "clusters_fired": fired, "threshold": threshold,
                 "linked_pairs": linked, "toggled": toggled, "staled": staled}
 
-    def sleep(self, cluster_threshold: int = 15, keep: int | None = None) -> dict:
+    def apply_retention(self, max_age_days: float, drop_superseded: bool = True,
+                        drop_stale_episodic: bool = True) -> dict:
+        """TIME-BASED RETENTION / data minimization (GDPR Art. 5(1)(e) storage limitation — the age-bound
+        companion to `capacity=`'s size bound and to `forget_subject`'s subject erasure). Hard-deletes memories
+        older than `max_age_days` (by ingest time), but NEVER the current value of a key, and never a graduated
+        `semantic`/`procedural` fact — those are the live state, not stale accumulation. By default it drops two
+        classes: (1) SUPERSEDED records past the cutoff (old retired values — minimizing retained PII; note this
+        disables `as_of()`/`history()` for those intervals, so the audit-vs-minimization trade-off is yours via
+        `drop_superseded`); (2) stale un-keyed EPISODIC records past the cutoff (old raw conversation turns).
+        Call it directly or let `sleep(retention_days=…)` apply it on idle. Textbook (DB TTL / log retention /
+        storage-limitation), packaged as a native zero-dependency retention primitive. Returns
+        {expired, ids, cutoff_iso, dropped_superseded, dropped_stale_episodic, kept_active}."""
+        cutoff = time.time() - float(max_age_days) * 86400.0
+        drop, sup_n, epi_n = [], 0, 0
+        for r in self.items:
+            if r.get("ts", 0) >= cutoff:
+                continue                                        # recent -> keep
+            st = r.get("status")
+            if drop_superseded and st == "superseded":
+                drop.append(r["id"]); sup_n += 1
+            elif drop_stale_episodic and st == "active" and r.get("key") is None \
+                    and (r.get("mtype") or "episodic") == "episodic":
+                drop.append(r["id"]); epi_n += 1
+            # active keyed values, active semantic/procedural, and anything recent are NEVER expired
+        if drop:
+            self.forget(ids=drop)
+        return {"expired": len(drop), "ids": sorted(drop),
+                "cutoff_iso": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime(cutoff)),
+                "dropped_superseded": sup_n, "dropped_stale_episodic": epi_n,
+                "kept_active": sum(1 for r in self.items if r.get("status") == "active")}
+
+    def sleep(self, cluster_threshold: int = 15, keep: int | None = None,
+              retention_days: float | None = None) -> dict:
         """SLEEP-TIME COMPUTE: one idempotent, cheap idle-maintenance call the host runs whenever the
         agent is idle. The write path (remember) stays fast — append + keyed supersession + (opt-in)
         capacity eviction — and the EXPENSIVE O(n) reorganization is deferred here: cluster-triggered
@@ -2411,6 +2443,8 @@ class Mnemo:
             before = sum(1 for r in self.items if r.get("status") == "active")
             self._evict_to_capacity()
             report["evicted_on_sleep"] = before - sum(1 for r in self.items if r.get("status") == "active")
+        if retention_days is not None:
+            report["retention"] = self.apply_retention(retention_days)
         return report
 
     # ── contradiction surfacing (flag, never auto-delete) ─────────────────────

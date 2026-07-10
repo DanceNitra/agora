@@ -669,6 +669,21 @@ mem = MnemoMemory(path="mem.json", extractor=my_extractor)   # AutoGen; same for
 Verified against real `autogen-core` (`mnemo/probes/extractor_adapter_wireup_probe.py`): without the extractor
 a corrected fact still leaks; with it, only the current value is recalled.
 
+### Data minimization: `apply_retention(max_age_days)` (0.7.7+)
+The age-bound companion to `capacity=` (size bound) and `forget_subject` (subject erasure), for the GDPR
+storage-limitation principle: don't keep data longer than you need it. `apply_retention(days)` hard-deletes old
+memories, but never the current value of a key and never a graduated `semantic`/`procedural` fact, those are
+the live state, not stale accumulation. By default it drops old *superseded* values (minimizing retained PII,
+which trades off `as_of()` history for those intervals, your call via `drop_superseded`) and old un-keyed
+*episodic* turns. Run it directly, or on idle via `sleep(retention_days=90)`.
+
+```python
+m.apply_retention(max_age_days=90)     # or: m.sleep(retention_days=90)
+```
+
+Textbook (DB TTL / log retention), packaged as a native zero-dependency retention primitive. Receipt:
+`mnemo/probes/retention_probe.py` (7/7, incl. "current keyed value and semantic facts are never expired").
+
 ## Use it as an MCP server (any Claude / Cursor / agent client)
 
 `mnemo` ships an [MCP](https://modelcontextprotocol.io) stdio server so any MCP-compatible agent can
