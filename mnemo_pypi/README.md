@@ -521,6 +521,26 @@ load-bearing only against a party who does not hold `receipt_key`. Prior art: cr
 event-sourcing tombstones; GDPR Art. 30 erasure logs; Crosby-Wallach / Certificate-Transparency
 tamper-evident logs. Receipt: `mnemo/probes/forget_subject_tombstone_probe.py` (8/8).
 
+### Drop-in memory for the OpenAI Agents SDK: `MnemoSession` (0.6.20+)
+`mnemo.integrations.openai_agents.MnemoSession` is a persistent [`Session`](https://openai.github.io/openai-agents-python/sessions/)
+backend — the same slot `SQLiteSession`/`RedisSession` fill — so agent conversations survive restarts:
+
+```python
+from agents import Agent, Runner
+from mnemo.integrations.openai_agents import MnemoSession
+session = MnemoSession("user-42", path="sessions.json")   # one store can hold many sessions
+Runner.run_sync(agent, "hi", session=session)
+```
+
+It faithfully implements the protocol (`get_items`/`add_items`/`pop_item`/`clear_session`, verbatim items,
+`limit`=latest-N, multi-session isolation) and needs **no dependency** — the SDK is matched structurally,
+never imported. **Honest scope:** a `Session` is a verbatim turn log, so mnemo's supersession/echo_guard
+(which key on *facts*) don't auto-clean replayed messages — for poison-resistant fact memory use mnemo's core
+`remember(key=…)`/`recall()` alongside. What it adds *for free* over a plain SQLite session: **right-to-erasure**
+of a user's turns with a signed, content-free deletion tombstone (`session.forget_subject()`), and
+**tamper-evident** history (`store.verify_writes()` with receipts enabled). Receipt:
+`mnemo/probes/mnemo_session_adapter_probe.py` (11/11). Adapters live under `mnemo.integrations` (opt-in extras).
+
 ## Use it as an MCP server (any Claude / Cursor / agent client)
 
 `mnemo` ships an [MCP](https://modelcontextprotocol.io) stdio server so any MCP-compatible agent can
