@@ -109,7 +109,7 @@ def attest(text: str, source_sk_hex: str, source_doc=None) -> str:
     sk = _Ed25519SK.from_private_bytes(bytes.fromhex(source_sk_hex))
     return sk.sign(_attest_message(text, source_doc)).hex()
 
-__version__ = "0.6.13"
+__version__ = "0.6.14"
 _WORD = re.compile(r"[a-z0-9][a-z0-9\-']{2,}")
 _STOP = frozenset("the a an of for to in on and or is are was were be been with this that it its as "
                   "by at from into our we us you your he she they them his her their not no".split())
@@ -712,6 +712,45 @@ class Mnemo:
                             meta={"revert_of": tgt["id"], "reverted_from": cur["id"]})
         return {"ok": True, "restored": rid, "superseded": cur["id"],
                 "reverted_to_object": tgt.get("object"), "reverted_to_text": tgt["text"]}
+
+    def as_of(self, key: str, when: float) -> dict | None:
+        """POINT-IN-TIME query: the value that was CURRENT for `key` at event-time `when` (a UTC
+        epoch float). This is the bi-temporal 'as-of' / time-travel read — reconstruct history, not
+        just the latest value. No graph DB: keyed supersession already stamps every record with a
+        validity interval [valid_from, invalidated_at) (invalidated_at=None means still current), so
+        the answer is the record whose interval contains `when`.
+
+        Why it matters: a plain memory store only tells you the value NOW; audit, debugging, and
+        'what did the agent believe when it made decision X' need the value as of that moment. A
+        back-filled record (added later with an earlier valid_from) is placed by its event-time, so
+        as_of reflects when facts were TRUE, not when they were written.
+
+        Returns {object, text, valid_from, invalidated_at, id} for the record valid at `when`, or
+        None if nothing was known for `key` yet at that time. Ties (overlapping intervals from an
+        unclean history) resolve to the latest valid_from <= when."""
+        best = None
+        for r in self.items:
+            if r.get("key") != key:
+                continue
+            vf = r.get("valid_from", r["ts"])
+            inv = r.get("invalidated_at")
+            if vf <= when and (inv is None or inv > when):
+                if best is None or vf > best.get("valid_from", best["ts"]):
+                    best = r
+        if best is None:
+            return None
+        return {"object": best.get("object"), "text": best.get("text"),
+                "valid_from": best.get("valid_from", best["ts"]),
+                "invalidated_at": best.get("invalidated_at"), "id": best["id"]}
+
+    def history(self, key: str) -> list[dict]:
+        """The full validity timeline for `key`: every value it has held, in event-time order, each
+        with its [valid_from, invalidated_at) interval and status. The audit trail behind as_of()."""
+        recs = [r for r in self.items if r.get("key") == key]
+        recs.sort(key=lambda r: r.get("valid_from", r["ts"]))
+        return [{"object": r.get("object"), "text": r.get("text"), "status": r.get("status"),
+                 "valid_from": r.get("valid_from", r["ts"]), "invalidated_at": r.get("invalidated_at"),
+                 "id": r["id"]} for r in recs]
 
     # ── retrieval (value-ranked) ──────────────────────────────────────────────
     def _qvec(self, query: str):
