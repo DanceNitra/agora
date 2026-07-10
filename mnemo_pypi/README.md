@@ -637,6 +637,27 @@ per-user right-to-erasure with a signed deletion tombstone. Verified end-to-end 
 2.4.0 (`mnemo/probes/mnemo_adk_adapter_probe.py`, 4/4, incl. per-user isolation, current-truth, and
 accounted-for erasure). Opt-in extra; `import mnemo` stays zero-dependency.
 
+### Memory-as-tools for Pydantic AI: `mnemo_toolset` (0.7.8+)
+Pydantic AI ships no built-in persistent memory by design; the pattern (Hindsight's `hindsight-pydantic-ai`,
+etc.) is to expose memory as agent tools. `mnemo.integrations.pydantic_ai.mnemo_toolset` returns a
+[`FunctionToolset`](https://ai.pydantic.dev/toolsets/) the agent can call — `remember`, `recall`,
+`check_conflict`, `forget`:
+
+```python
+from pydantic_ai import Agent
+from mnemo.integrations.pydantic_ai import mnemo_toolset
+agent = Agent("openai:gpt-4o-mini", toolsets=[mnemo_toolset(path="mem.json")])
+```
+
+The differentiators the built-in "give the model a scratchpad" pattern lacks: `recall` is
+supersession-filtered (a corrected value stops surfacing, so the agent reads current-truth), and
+`check_conflict` lets the agent test a fact for a contradiction with what is already stored BEFORE it commits
+it. Pass `extractor=` so the tools auto-key free text (so both supersession and conflict-detection fire
+without the model supplying a key). Verified end-to-end against real `pydantic-ai` 2.8.0 with `TestModel` (no
+API key): the agent invokes all four tools, and current-truth / conflict / erasure all hold
+(`mnemo/probes/mnemo_pydantic_ai_adapter_probe.py`). Importing this module imports Pydantic AI (opt-in
+extra); `import mnemo` stays zero-dependency.
+
 ### Make the governance layer key itself over free text: the `extractor` hook (0.7.5+)
 mnemo's supersession, `echo_guard`, `check_conflict`, and `forget_subject` all key on the `(key, object)` of a
 fact. That's great when you write structured facts, but a conversation `Session` or a chat turn is free text
@@ -659,8 +680,8 @@ risk as a wrong manual `key=`) — keep it deterministic and reviewable. This is
 Receipt: `mnemo/probes/extractor_hook_probe.py` (7/7).
 
 The free-text framework adapters (OpenAI Agents `Session`, AutoGen `Memory`, LlamaIndex `BaseMemoryBlock`,
-Google ADK `MemoryService`) accept `extractor=` and wire it into their store, so plugging it once makes their
-current-truth recall fire automatically over conversation turns:
+Google ADK `MemoryService`, Pydantic AI `mnemo_toolset`) accept `extractor=` and wire it into their store, so
+plugging it once makes their current-truth recall fire automatically over conversation turns:
 
 ```python
 mem = MnemoMemory(path="mem.json", extractor=my_extractor)   # AutoGen; same for the others
