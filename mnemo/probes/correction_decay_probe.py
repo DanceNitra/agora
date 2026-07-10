@@ -21,6 +21,15 @@ For each N in a sweep, query "what is the current value?" and score whether the 
 
 Deterministic, local embedder (nomic-embed-text), no LLM judge -> anyone can re-run it.
 Output: the correction-survival curve vs N for both stores.
+
+CAVEAT (verified 2026-07-10): the ARM-A majority-vote read below produces a clean 1.00 -> 0.00
+CLIFF at N=1, but that is an artifact of the counting rule (at N=1 the store holds 2 old + 1 new,
+so majority trivially flips). A REAL read-time reconciler behaves differently: running the same
+experiment against live mem0 (native OpenAI, its own LLM memory-manager) gives a PARTIAL, NOISY
+decay -- correction survival ~0.88 (N=0) -> ~0.50 (N=1) -> ~0.38 (N=2) -> ~0.50 (N=4), n=8 -- not a
+total collapse (mem0's ADD/UPDATE/DELETE manager sometimes merges the duplicates, so it is
+non-monotonic). The validity-interval store holds at 1.00 in BOTH the toy read and the live-mem0
+run. So treat arm A here as an UPPER BOUND / illustration of the mechanism, not the deployed rate.
 """
 import sys, os, json, urllib.request
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))

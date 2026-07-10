@@ -30,5 +30,14 @@
     "8": 1.0
   },
   "credit": "experiment suggested by marintkael, r/RAG echo-post comment 2026-07-09",
-  "note": "deterministic, local nomic-embed-text, retrieval-level; arm A ties favor the correction (generous)"
+  "note": "deterministic, local nomic-embed-text, retrieval-level; arm A ties favor the correction (generous)",
+  "CAVEAT": "arm-A majority-read is a counting artifact (clean cliff). VERIFIED real-system rate below.",
+  "real_mem0_native_survival_verified_20260710": {
+    "0": 0.875,
+    "1": 0.5,
+    "2": 0.375,
+    "4": 0.5,
+    "n_per_point": 8,
+    "note": "partial noisy decay, not a cliff; mnemo ledger flat 1.00 through same LLM judge"
+  }
 }
