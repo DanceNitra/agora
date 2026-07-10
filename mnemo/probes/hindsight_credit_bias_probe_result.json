@@ -1,0 +1,17 @@
+{
+  "n": 20,
+  "action_time_driver_accuracy": 1.0,
+  "MAIN_driver_is_premise": {
+    "retrospective_driver_accuracy": 0.05,
+    "retrospective_credits_the_echo": 0.95,
+    "mean_sim_driver": 0.792,
+    "mean_sim_nondriver_echo": 0.847
+  },
+  "CONTROL_driver_is_answerlike": {
+    "retrospective_driver_accuracy": 1.0,
+    "mean_sim_driver": 0.886,
+    "mean_sim_nondriver_premise": 0.792
+  },
+  "reading": "retrospective similarity-to-outcome credits whichever memory RESTATES the answer, not the causal driver: when the driver is a premise it is picked 5% of the time; swap the phrasing so the driver restates the answer and it jumps to 100%. The bias tracks answer-similarity, not the label. Action-time annotation is immune (driver recorded before the outcome).",
+  "credit": "answers our own #1462 open question (auto-crediting: recall-time vs retrospective)"
+}

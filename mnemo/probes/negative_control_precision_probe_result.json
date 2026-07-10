@@ -1,0 +1,19 @@
+{
+  "n_positives": 20,
+  "n_negatives": 20,
+  "detector": "tension = 1 - cosine(statement, restatement); same family as causal_density",
+  "all_positive_recall": 1.0,
+  "AUROC_balanced": 0.87,
+  "at_100pct_recall": {
+    "threshold": 0.0385,
+    "false_positive_rate": 1.0
+  },
+  "at_90pct_recall": {
+    "recall": 0.9,
+    "false_positive_rate": 0.35
+  },
+  "mean_tension_positive": 0.1822,
+  "mean_tension_negative": 0.0967,
+  "reading": "On an all-positive set the detector shows recall 1.0 and looks perfect. A balanced set shows the real picture: discrimination is AUROC 0.87 (decent, NOT chance) \u2014 but the price of the '100% recall' an all-positive set implies is a 100% false-positive rate (one true contradiction embeds like clean text, so catching it flags everything); backing off to 90% recall drops false alarms to 35%. None of AUROC, FPR, or the recall/precision tradeoff is computable without negative controls; an all-positive set yields only the recall number.",
+  "credit": "constructive follow-up to icophy's Cophy V2 all-positive set (#1466)"
+}
