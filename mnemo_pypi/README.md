@@ -658,6 +658,17 @@ risk as a wrong manual `key=`) — keep it deterministic and reviewable. This is
 / ORM before_save; textbook) packaged so the integrity primitives compose without threading keys everywhere.
 Receipt: `mnemo/probes/extractor_hook_probe.py` (7/7).
 
+The free-text framework adapters (OpenAI Agents `Session`, AutoGen `Memory`, LlamaIndex `BaseMemoryBlock`,
+Google ADK `MemoryService`) accept `extractor=` and wire it into their store, so plugging it once makes their
+current-truth recall fire automatically over conversation turns:
+
+```python
+mem = MnemoMemory(path="mem.json", extractor=my_extractor)   # AutoGen; same for the others
+```
+
+Verified against real `autogen-core` (`mnemo/probes/extractor_adapter_wireup_probe.py`): without the extractor
+a corrected fact still leaks; with it, only the current value is recalled.
+
 ## Use it as an MCP server (any Claude / Cursor / agent client)
 
 `mnemo` ships an [MCP](https://modelcontextprotocol.io) stdio server so any MCP-compatible agent can

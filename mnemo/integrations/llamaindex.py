@@ -35,12 +35,15 @@ class MnemoMemoryBlock(BaseMemoryBlock[str]):
     k: int = Field(default=5, description="How many memories to inject.")
     _store: Any = PrivateAttr(default=None)
 
-    def __init__(self, path: str | None = None, store: Any = None, **kwargs: Any):
+    def __init__(self, path: str | None = None, store: Any = None, extractor=None, **kwargs: Any):
         super().__init__(**kwargs)                      # only pydantic fields (name/description/priority/k)
         if store is None:
             from mnemo import Mnemo
             store = Mnemo(path=path)
         self._store = store
+        # OPT-IN extractor (text -> (key, object)): auto-keys _aput'd messages so _aget injects current-truth.
+        if extractor is not None:
+            self._store.extractor = extractor
 
     @property
     def store(self):

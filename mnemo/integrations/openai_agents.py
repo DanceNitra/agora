@@ -37,14 +37,19 @@ from typing import Any
 class MnemoSession:
     """Persistent OpenAI-Agents `Session` backed by a mnemo store (one store, many sessions)."""
 
-    def __init__(self, session_id: str, path: str | None = None, store: Any = None):
+    def __init__(self, session_id: str, path: str | None = None, store: Any = None, extractor=None):
         """Pass a `path` (a mnemo store is created/opened there) OR an existing mnemo `store` to share one
-        store across sessions. `session_id` namespaces this conversation within the store."""
+        store across sessions. `session_id` namespaces this conversation within the store. OPT-IN `extractor`
+        (text -> (key, object)) auto-keys turns so the store supersedes corrected facts across the session;
+        get_items() still replays the raw turn log (a Session is verbatim), but a fact recall over the store
+        is then current-truth. See Mnemo.extractor."""
         self.session_id = str(session_id)
         if store is None:
             from mnemo import Mnemo
             store = Mnemo(path=path)
         self.store = store
+        if extractor is not None:
+            self.store.extractor = extractor
         self._src = {"doc": "oai-session:" + self.session_id}   # canonical source -> enables forget_subject
 
     # ── internal: this session's items as (seq, record) sorted oldest-first ──

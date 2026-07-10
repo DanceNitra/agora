@@ -36,12 +36,16 @@ def _subject(app_name: str, user_id: str) -> str:
 class MnemoMemoryService(BaseMemoryService):
     """ADK BaseMemoryService over a mnemo store (persistent, current-truth recall, per-user erasure)."""
 
-    def __init__(self, path: str | None = None, store: Any = None, k: int = 10):
+    def __init__(self, path: str | None = None, store: Any = None, k: int = 10, extractor=None):
         if store is None:
             from mnemo import Mnemo
             store = Mnemo(path=path)
         self.store = store
         self.k = int(k)
+        # OPT-IN extractor (text -> (key, object)): auto-keys ingested event text so search_memory returns
+        # current-truth (a corrected fact stops surfacing) without keying each write. See Mnemo.extractor.
+        if extractor is not None:
+            self.store.extractor = extractor
 
     async def add_session_to_memory(self, session) -> None:
         subj = _subject(session.app_name, session.user_id)

@@ -28,13 +28,18 @@ from typing import Any
 class MnemoMemory:
     """AutoGen `Memory` backed by a mnemo store; injects supersession-filtered current-truth context."""
 
-    def __init__(self, path: str | None = None, store: Any = None, k: int = 5, source: str | None = None):
+    def __init__(self, path: str | None = None, store: Any = None, k: int = 5, source: str | None = None,
+                 extractor=None):
         if store is None:
             from mnemo import Mnemo
             store = Mnemo(path=path)
         self.store = store
         self.k = int(k)
         self._source = source   # optional canonical source tag (enables forget_subject on this memory's writes)
+        # OPT-IN: plug a text -> (key, object) extractor so free-text messages auto-key and the current-truth
+        # (supersession-filtered) recall fires without the caller keying each add(). See Mnemo.extractor.
+        if extractor is not None:
+            self.store.extractor = extractor
 
     async def add(self, content: Any, cancellation_token: Any = None) -> None:
         """Store one MemoryContent. metadata may carry {key, object, source} to drive keyed supersession."""
