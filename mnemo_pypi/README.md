@@ -561,6 +561,26 @@ Verified end-to-end against the real `autogen-core` (`mnemo/probes/mnemo_autogen
 including "superseded value is not injected"). Zero-dependency core: AutoGen is imported lazily inside the
 adapter, never by `import mnemo`.
 
+### LangGraph store with queryable history: `MnemoStore` (0.7.1+)
+`mnemo.integrations.langgraph.MnemoStore` is a LangGraph [`BaseStore`](https://langchain-ai.github.io/langgraph/reference/store/)
+(faithful `put`/`get`/`search`/`delete`/`list_namespaces` + `batch`/`abatch`) — and since LangMem sits on any
+BaseStore, one adapter reaches both. Same last-write-wins semantics as the built-in `InMemoryStore`, plus the
+thing it throws away: **history**. A second `put` on a key overwrites the first in `InMemoryStore` and the old
+value is gone; `MnemoStore` keeps it on mnemo's supersession ledger, so `store.history(namespace, key)` returns
+every value the key has held — plus point-in-time reads, tamper-evident receipts, and `forget_subject` erasure.
+
+```python
+from mnemo.integrations.langgraph import MnemoStore
+store = MnemoStore(path="lg.json")
+store.put(("user","42"), "timezone", {"tz": "UTC"}); store.put(("user","42"), "timezone", {"tz": "PST"})
+store.get(("user","42"), "timezone").value    # {"tz": "PST"}   (like InMemoryStore)
+store.history(("user","42"), "timezone")       # [{"tz":"UTC"}, {"tz":"PST"}]   (mnemo-only)
+```
+
+Verified end-to-end against real `langgraph` (`mnemo/probes/mnemo_langgraph_adapter_probe.py`, 9/9, incl. the
+"InMemoryStore has no history" contrast). Subclasses BaseStore, so importing this module imports LangGraph
+(opt-in extra); `import mnemo` stays zero-dependency.
+
 ## Use it as an MCP server (any Claude / Cursor / agent client)
 
 `mnemo` ships an [MCP](https://modelcontextprotocol.io) stdio server so any MCP-compatible agent can
