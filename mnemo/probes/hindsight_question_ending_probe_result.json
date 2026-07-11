@@ -1,0 +1,85 @@
+{
+  "n_entities": 20,
+  "reproduction_of_prior_probe": {
+    "mean_sim_answer_to_last_premise": 0.796,
+    "mean_sim_answer_to_last_summary": 0.914,
+    "mean_sim_answer_to_echo": 0.826,
+    "echo_safe_premise": 0.85,
+    "echo_safe_summary": 0.0
+  },
+  "families": {
+    "question_no_value": {
+      "n": 100,
+      "mean_sim_to_answer": 0.665,
+      "min": 0.573,
+      "max": 0.789,
+      "echo_safe_rate": 1.0
+    },
+    "question_names_value": {
+      "n": 100,
+      "mean_sim_to_answer": 0.791,
+      "min": 0.671,
+      "max": 0.88,
+      "echo_safe_rate": 0.8
+    },
+    "uncertainty_no_value": {
+      "n": 100,
+      "mean_sim_to_answer": 0.69,
+      "min": 0.567,
+      "max": 0.832,
+      "echo_safe_rate": 0.97
+    },
+    "uncertainty_names_value": {
+      "n": 100,
+      "mean_sim_to_answer": 0.844,
+      "min": 0.728,
+      "max": 0.921,
+      "echo_safe_rate": 0.32
+    }
+  },
+  "determinism_check_second_pass_identical": true,
+  "reading": "icophy's hypothesis: a question/uncertainty final step should sit BELOW the echo's answer-similarity, giving the last-step fallback a clean escape without act-time annotation. The severe case is the value-NAMING ending (the no-value case is nearly guaranteed to pass). echo_safe_rate is the fraction of rows where the ending's similarity is below the echo's, same criterion as the prior probe.",
+  "cross_embedder_check": {
+    "mxbai-embed-large": {
+      "baseline_safe_premise": 0.8,
+      "baseline_safe_summary": 0.0,
+      "question_no_value": {
+        "mean": 0.662,
+        "echo_safe": 1.0
+      },
+      "question_names_value": {
+        "mean": 0.788,
+        "echo_safe": 0.68
+      },
+      "uncertainty_no_value": {
+        "mean": 0.669,
+        "echo_safe": 1.0
+      },
+      "uncertainty_names_value": {
+        "mean": 0.796,
+        "echo_safe": 0.64
+      }
+    },
+    "bge-m3": {
+      "baseline_safe_premise": 0.7,
+      "baseline_safe_summary": 0.0,
+      "question_no_value": {
+        "mean": 0.63,
+        "echo_safe": 1.0
+      },
+      "question_names_value": {
+        "mean": 0.718,
+        "echo_safe": 0.94
+      },
+      "uncertainty_no_value": {
+        "mean": 0.68,
+        "echo_safe": 0.99
+      },
+      "uncertainty_names_value": {
+        "mean": 0.786,
+        "echo_safe": 0.51
+      }
+    }
+  },
+  "landed_finding": "CONFIRMED IN REFINED FORM across 3 embedders (nomic, mxbai-large, bge-m3): a value-free question/uncertainty final step is echo-safe 97-100pct on all three - the escape route works with no act-time annotation. BUT the operative variable is NOT the interrogative/hedged form; it is whether the final step NAMES the chosen value. Value-naming endings are unreliable and embedder-dependent (questions 0.68-0.94, uncertainty 0.32-0.64). The hedge does not lower answer-similarity much; naming the value does the damage. Summary-terminated remains 0pct safe on all three embedders."
+}
