@@ -730,6 +730,36 @@ so `policy=` picks the failure mode — `safe` (default) never restores on an un
 (0.00/1.00). The unforgeable separator is provenance — the explicit `revert()` channel or a revert marker —
 not smarter classification. Also an MCP tool (`route`).
 
+### Authorized revert channel: stop content from undoing a correction (0.7.10+)
+A value-obscuring "go back to what we had" and a stale echo are byte-identical, so — as a sharp r/RAG thread
+put it — the tie-break is an *authentication* problem, not an NLP one: it cannot come from the text, only from
+an authority whose origin an attacker who can write text cannot author. Opt in and `route()`/`revert()` require
+an out-of-band **capability** before they will restore a superseded value:
+
+```python
+from mnemo import Mnemo, new_receipt_keypair, sign_revert
+
+# symmetric (zero extra deps): the harness holds a secret; the content path can't mint the capability
+m = Mnemo(path="mem.json", revert_authority="a-harness-side-secret")
+m.route("go back to what we had for the region", policy="trusting")   # -> action="authorization_required"
+m.revert("region", capability=m.revert_capability("region"))          # principal path executes
+
+# asymmetric (closes the residual: even a compromised on-box harness can't mint):
+sk, pk = new_receipt_keypair()                 # private key stays OFF the box, store holds only pk
+m = Mnemo(path="mem.json", revert_pubkey=pk)
+cap = sign_revert(sk, m.revert_challenge("region"))   # only the off-box private key can produce this
+m.revert("region", capability=cap)
+```
+
+With an authority set, a text-derived revert never executes — `route()` returns `authorization_required` and
+the principal confirms out of band; `remember(reaffirm=True)` is gated the same way, so the raw primitive can't
+bypass it. The capability binds to the key and the current record (`revert_challenge`), so a captured one can't
+be replayed after the value moves or retargeted to another key. Textbook capability security (Dennis & Van Horn
+1966) / confused-deputy fix (Hardy 1988), packaged onto the memory store's revert path. Honest boundary: this
+closes the content→restore path (and, in asymmetric mode, the on-box-harness→restore path); it does not stop a
+stolen private key or authenticate a human. Adversarial receipt: `mnemo/probes/authorized_revert_probe.py`
+(11/11: content blocked, harness-can't-mint, replay/retarget/forgery refused, principal path works).
+
 ## Use it as an MCP server (any Claude / Cursor / agent client)
 
 `mnemo` ships an [MCP](https://modelcontextprotocol.io) stdio server so any MCP-compatible agent can

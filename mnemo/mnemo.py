@@ -40,6 +40,7 @@ MIT-licensed. Part of Agora (https://github.com/DanceNitra/agora).
 from __future__ import annotations
 
 import hashlib
+import hmac
 import json
 import math
 import os
@@ -109,7 +110,19 @@ def attest(text: str, source_sk_hex: str, source_doc=None) -> str:
     sk = _Ed25519SK.from_private_bytes(bytes.fromhex(source_sk_hex))
     return sk.sign(_attest_message(text, source_doc)).hex()
 
-__version__ = "0.7.9"
+
+def sign_revert(principal_sk_hex: str, challenge: str) -> str:
+    """Principal-side, OFF the memory store's box: Ed25519-sign a revert `challenge`
+    (Mnemo.revert_challenge(key) = "revert:{key}:{current_active_id}") with the private key whose public half
+    the store was given as `revert_pubkey`. The resulting hex signature is the capability passed to
+    revert()/route(); the store verifies it but cannot produce it. This is the affordance a text-only attacker
+    (and a store-only harness) cannot synthesize. Needs `cryptography`."""
+    if not _HAVE_ED:
+        raise RuntimeError("signing a revert needs the `cryptography` package (pip install cryptography)")
+    sk = _Ed25519SK.from_private_bytes(bytes.fromhex(principal_sk_hex))
+    return sk.sign(challenge.encode()).hex()
+
+__version__ = "0.7.10"
 _WORD = re.compile(r"[a-z0-9][a-z0-9\-']{2,}")
 _STOP = frozenset("the a an of for to in on and or is are was were be been with this that it its as "
                   "by at from into our we us you your he she they them his her their not no".split())
@@ -145,7 +158,8 @@ def _cosine(a, b) -> float:
 class Mnemo:
     def __init__(self, path: str | None = None, embed=None, receipts: bool = False,
                  receipt_key: str | None = None, receipt_pubkey: str | None = None,
-                 capacity: int | None = None):
+                 capacity: int | None = None, revert_authority: str | None = None,
+                 revert_pubkey: str | None = None):
         """path: optional JSON file to persist to. embed: optional fn(str)->list[float] for semantic
         recall; if omitted, recall uses lexical token overlap (zero dependencies).
 
@@ -164,6 +178,20 @@ class Mnemo:
         # verified two-tier policy (value-protected + recency-aged, Lab 29992a). Lets mnemo run in
         # production without unbounded growth — a gap vs bounded competitors (mem0/Letta).
         self.capacity = capacity
+        # AUTHORIZED REVERT CHANNEL (OPT-IN, default None = legacy: revert()/reaffirm are ungated).
+        # When set, restoring a superseded value (revert(), route()'s revert branches, remember(reaffirm=True))
+        # requires an out-of-band CAPABILITY = HMAC(revert_authority, key). The content path (route(text)) can
+        # never mint it (it doesn't hold the secret), so a text-derived 'go back' cannot execute a restore —
+        # it returns authorization_required and the principal confirms out of band. Textbook capability security
+        # (Dennis & Van Horn 1966) / confused-deputy fix (Hardy 1988): separate the AUTHORITY (unforgeable
+        # token) from the REQUEST (content). Honest boundary: this closes the content->restore path AT THE
+        # STORE; it cannot stop a caller who hands the capability to the content path, nor authenticate a human.
+        self.revert_authority = revert_authority
+        # Asymmetric authority: the store holds only the PUBLIC key; the principal signs a revert challenge
+        # with the matching PRIVATE key OFF the box (module-level sign_revert). The store can then VERIFY but
+        # never MINT an authorization -> even a compromised on-box harness cannot forge a revert. Closes the
+        # symmetric mode's residual (whoever holds the HMAC secret can mint). Both need cryptography for Ed25519.
+        self.revert_pubkey = revert_pubkey
         self.items: list[dict] = []
         self._tok_cache: dict[str, set] = {}     # id -> token set, so recall doesn't re-tokenize
         self._tc_cache: dict[str, dict] = {}     # id -> term-frequency map, for the BM25 hybrid channel
@@ -356,7 +384,7 @@ class Mnemo:
                  mtype: str | None = None, valid_from: float | None = None,
                  source: dict | None = None, key: str | None = None,
                  derived_from: list | None = None, attestation=None, derived: bool = False,
-                 object: str | None = None, reaffirm: bool = False) -> str:
+                 object: str | None = None, reaffirm: bool = False, capability: str | None = None) -> str:
         """Append-only raw capture. Stamped with an absolute UTC time; never edited afterward.
         mtype in {episodic, semantic, procedural} sets the decay prior (episodic fades fast,
         semantic slow, procedural barely); inferred from the text if not given. Pass it explicitly
@@ -453,6 +481,11 @@ class Mnemo:
         # separate same-value paraphrase from different-value correction). Falls back to normalized text.
         if object is not None:
             rec["object"] = str(object)
+        # AUTHORIZED-REVERT GATE: a reaffirm write is the one path that restores a superseded value past the
+        # echo guard, so when an authority is configured it needs the same capability as revert() — else the
+        # content path could just call remember(reaffirm=True) directly. A bad/missing capability is loud.
+        if reaffirm and (self.revert_authority is not None or self.revert_pubkey is not None)                 and not self._revert_authorized(key, capability):
+            raise PermissionError("reaffirm/revert requires a valid capability (revert authority is set)")
         # ORIGIN ATTESTATION (OPT-IN): bind this claim to a source's VERIFIED KEY. attestation is
         # (pubkey_hex, sig_hex) or {"pubkey":..., "sig":...}; the signature (from mnemo.attest(text, sk,
         # source_doc)) must verify over the same claim+canonical-source message, else the write is REJECTED
@@ -854,9 +887,62 @@ class Mnemo:
                               "request_id": t.get("request_id"), "signed": "sig" in t}
                              for t in self._tombstones]}
 
-    def revert(self, key: str) -> dict:
+    def _current_active_id(self, key: str) -> str:
+        """id of the record currently CURRENT for `key` (the thing a revert would undo), or "" if none.
+        The capability binds to this so a captured authorization cannot be REPLAYED after the state moves
+        or RETARGETED to another key."""
+        act = [r for r in self.items if r.get("key") == key and r.get("status") == "active"]
+        if not act:
+            return ""
+        return max(act, key=lambda r: r.get("valid_from", r["ts"]))["id"]
+
+    def revert_challenge(self, key: str) -> str:
+        """The exact message a revert authorization must be issued over: "revert:{key}:{current_active_id}".
+        The principal signs THIS (out of band) to authorize undoing the current value of `key`. Surfaced so an
+        asymmetric holder (who only has the private key, not the store) knows what to sign; route() also
+        returns it on an authorization_required result."""
+        return "revert:" + key + ":" + self._current_active_id(key)
+
+    def revert_capability(self, key: str) -> str:
+        """SYMMETRIC mint (needs `revert_authority`, the harness-held secret): HMAC(secret, challenge). Defends
+        the CONTENT path (text can't mint it) but the harness holding the secret can — for a store whose own box
+        must not be trusted to mint, use `revert_pubkey` + module-level sign_revert() instead (only the off-box
+        private key signs, the store only verifies)."""
+        if self.revert_authority is None:
+            raise RuntimeError("no revert_authority set (symmetric mint); use revert_pubkey for asymmetric")
+        return hmac.new(self.revert_authority.encode(), self.revert_challenge(key).encode(),
+                        hashlib.sha256).hexdigest()
+
+    def _revert_authorized(self, key: str, capability: str | None) -> bool:
+        """True if this restore is allowed. No authority configured -> always (legacy). Symmetric
+        (revert_authority) -> capability must equal revert_capability(key) (constant-time). Asymmetric
+        (revert_pubkey) -> capability is an Ed25519 signature (hex) by the principal's key over
+        revert_challenge(key); the store VERIFIES it but cannot MINT it, so a compromised on-box harness still
+        cannot authorize a revert. Both bind to the current active id (anti-replay / anti-retarget)."""
+        if self.revert_authority is None and self.revert_pubkey is None:
+            return True
+        if not capability:
+            return False
+        if self.revert_pubkey is not None:
+            if not _HAVE_ED:
+                raise RuntimeError("verifying a revert signature needs the `cryptography` package")
+            try:
+                _Ed25519PK.from_public_bytes(bytes.fromhex(self.revert_pubkey)).verify(
+                    bytes.fromhex(capability), self.revert_challenge(key).encode())
+                return True
+            except Exception:
+                return False
+        return hmac.compare_digest(self.revert_capability(key), capability)
+
+    def revert(self, key: str, capability: str | None = None) -> dict:
         """CONTROL-PLANE revert: restore the value that the current active record for `key` superseded.
         The ledger knows what "the old one" is — no value token needed.
+
+        If the store was created with `revert_authority`, this requires `capability` = revert_capability(key)
+        (an out-of-band token the content path cannot mint); a missing/wrong one returns
+        {"ok": False, "reason": "authorization_required"} and changes nothing. This is the AUTHENTICATION half:
+        an unmarked "go back" and a stale echo are byte-identical, so the tie-break cannot come from the text —
+        it comes from an authority whose origin an attacker who can only write text cannot author.
 
         Why an explicit API and not a content write: a value-OBSCURING reversion utterance ("go back
         to the old one", "the earlier value was right") carries NO object to key on, so no content-level
@@ -876,6 +962,9 @@ class Mnemo:
         reaffirm=True (the one sanctioned path past the echo guard), so the flip is itself a ledgered,
         attributable event. Returns {"ok": True, "restored": id, "superseded": id, ...} or
         {"ok": False, "reason": ...}."""
+        if not self._revert_authorized(key, capability):
+            return {"ok": False, "reason": "authorization_required",
+                    "challenge": self.revert_challenge(key)}
         same_key = [r for r in self.items if r.get("key") == key]
         active = [r for r in same_key if r.get("status") == "active"]
         if not active:
@@ -891,7 +980,7 @@ class Mnemo:
         tgt = max(prev, key=lambda r: r.get("valid_from", r["ts"]))
         rid = self.remember(tgt["text"], tags=tgt.get("tags"), value=tgt.get("value", 1.0),
                             mtype=tgt.get("mtype"), key=key, object=tgt.get("object"),
-                            reaffirm=True,
+                            reaffirm=True, capability=capability,
                             meta={"revert_of": tgt["id"], "reverted_from": cur["id"]})
         return {"ok": True, "restored": rid, "superseded": cur["id"],
                 "reverted_to_object": tgt.get("object"), "reverted_to_text": tgt["text"]}
@@ -927,7 +1016,7 @@ class Mnemo:
         return max(hits, key=len) if hits else None
 
     def route(self, text: str, key: str | None = None, object: str | None = None,
-              context: str | None = None, policy: str = "safe") -> dict:
+              context: str | None = None, policy: str = "safe", capability: str | None = None) -> dict:
         """WRITE-PATH INTENT ROUTER: tag an utterance (assert / correct / revert / echo), resolve a fuzzy
         version reference against the key's timeline, and execute the right ledger operation — so a
         value-obscuring revert ("go back to what we had") works without the caller naming a value, and a
@@ -978,6 +1067,10 @@ class Mnemo:
                         "reason": "no ledger key resolved from the utterance"}
             chain = self._route_chain(k)
             cur = chain[-1] if chain else None
+            if not self._revert_authorized(k, capability):
+                # content path cannot mint the capability; do NOT execute, hand the decision out of band
+                return {"intent": "revert", "action": "authorization_required", "key": k,
+                        "challenge": self.revert_challenge(k)}
             named = None
             for v in chain[:-1]:
                 if re.search(rf"\b{re.escape(str(v).lower())}\b", low):
@@ -986,13 +1079,13 @@ class Mnemo:
                 named = object
             if named is not None and named != cur:
                 rid = self.remember(f"restore {k} to {named}", key=k, object=named, reaffirm=True,
-                                    meta={"routed": "revert_named"})
+                                    capability=capability, meta={"routed": "revert_named"})
                 return {"intent": "revert", "action": "restored", "key": k, "target": named, "id": rid}
             if self._ROUTE_ORIGINAL.search(low) and len(chain) > 1 and chain[0] != cur:
                 rid = self.remember(f"restore {k} to {chain[0]}", key=k, object=chain[0], reaffirm=True,
-                                    meta={"routed": "revert_original"})
+                                    capability=capability, meta={"routed": "revert_original"})
                 return {"intent": "revert", "action": "restored", "key": k, "target": chain[0], "id": rid}
-            res = self.revert(k)
+            res = self.revert(k, capability=capability)
             return {"intent": "revert", "action": "reverted" if res.get("ok") else "failed",
                     "key": k, **{kk: vv for kk, vv in res.items() if kk != "ok"}}
         if object is None or key is None:
@@ -1008,7 +1101,10 @@ class Mnemo:
         if policy == "trusting" or (
                 policy == "context" and context and self._ROUTE_CHANGE_AWARE.search(context.lower())
                 and cur is not None and str(cur).lower() in context.lower()):
-            rid = self.remember(text, key=key, object=object, reaffirm=True,
+            if not self._revert_authorized(key, capability):
+                return {"intent": "reaffirm", "action": "authorization_required", "key": key,
+                        "target": object, "challenge": self.revert_challenge(key)}
+            rid = self.remember(text, key=key, object=object, reaffirm=True, capability=capability,
                                 meta={"routed": f"reaffirm_{policy}"})
             return {"intent": "reaffirm", "action": "restored", "key": key, "target": object, "id": rid}
         if self.echo_guard:
