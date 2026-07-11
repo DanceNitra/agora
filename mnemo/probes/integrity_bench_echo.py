@@ -99,13 +99,17 @@ def run_graphiti_echo(cases):
 
 
 def score(name, verdicts, n_cases):
-    B = sum(1 for v in verdicts if v == "B")      # resisted (good)
-    A = sum(1 for v in verdicts if v == "A")      # resurrected (bad)
-    o = sum(1 for v in verdicts if v == "other")
+    B = sum(1 for v in verdicts if v == "B")      # clean current-truth (returns the corrected value)
+    A = sum(1 for v in verdicts if v == "A")      # RESURRECTED the stale value (the actual attack success)
+    o = sum(1 for v in verdicts if v == "other")  # ambiguous — both facts visible, judge can't pick (not a fail)
     err = sum(1 for v in verdicts if v == "error")
     n = n_cases - err
-    return {"system": name, "n": n, "resisted_B": B, "resurrected_A": A, "other": o, "errors": err,
-            "echo_resistance": round(B / n, 3) if n else 0.0}
+    # TWO honest metrics: resurrection_rate is the attack (lower=better); clean_current_truth is answer clarity.
+    # "other" is NOT resurrection — a bitemporal store that returns old+new invalidated/valid edges reads
+    # ambiguous to the judge but never asserts the stale value as current.
+    return {"system": name, "n": n, "resurrected_A": A, "clean_current_B": B, "ambiguous_other": o, "errors": err,
+            "resurrection_rate": round(A / n, 3) if n else 0.0,
+            "clean_current_truth_rate": round(B / n, 3) if n else 0.0}
 
 
 def main():
@@ -124,9 +128,10 @@ def main():
         print("\ngraphiti (native, neo4j + OpenAI)..."); out["graphiti"] = score("graphiti", run_graphiti_echo(cases), len(cases)); print(json.dumps(out["graphiti"]))
     json.dump({"task": "echo resistance", "metric": "echo_resistance (current answer stays corrected B)",
                "results": out}, open(os.path.join(os.path.dirname(__file__), "integrity_bench_echo_result.json"), "w"), indent=2)
-    print("\n=== MATRIX (echo resistance: does the restated stale value stay retired?) ===")
+    print("\n=== ECHO MATRIX (honest: resurrection = the attack; clean-current-truth = answer clarity) ===")
     for k, v in out.items():
-        print(f"  {k:9s} {v['echo_resistance']:.2f}  (resisted={v['resisted_B']} resurrected={v['resurrected_A']} other={v['other']} err={v['errors']}, n={v['n']})")
+        print(f"  {k:9s} resurrection={v['resurrection_rate']:.2f}  clean-current-truth={v['clean_current_truth_rate']:.2f}"
+              f"  (resurrected={v['resurrected_A']} clean={v['clean_current_B']} ambiguous={v['ambiguous_other']}, n={v['n']})")
 
 
 if __name__ == "__main__":

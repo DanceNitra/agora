@@ -19,6 +19,15 @@
       "other": 3,
       "errors": 0,
       "revert_success_rate": 0.15
+    },
+    "graphiti": {
+      "system": "graphiti",
+      "n": 20,
+      "revert_honored_A": 0,
+      "kept_new_B": 11,
+      "other": 9,
+      "errors": 0,
+      "revert_success_rate": 0.0
     }
   }
 }

@@ -35,8 +35,8 @@ Store a value, correct it, then issue an **unmarked** revert that names no value
 | system | revert success (n=20) | what happens |
 |---|---|---|
 | **mnemo** (route/revert) | **1.00** | the intent router tags the utterance as a revert and restores the predecessor from the version ledger; no LLM in the path |
-| mem0 2.0.11 (native) | 0.15 | no revert operation — the "go back" utterance mostly isn't even stored as a fact, so the corrected value is retained (3/20 incidental, 14 kept, 3 unclear) |
-| Graphiti (native, live) | pending full run | one-case smoke: keeps the corrected value; bitemporal invalidation fires on named contradictions, not on an unnamed "go back" |
+| mem0 2.0.11 (native) | 0.15 | no revert operation — the "go back" utterance mostly isn't even stored as a fact, so the corrected value is retained (A=3 incidental, B=14 kept, 3 unclear) |
+| Graphiti (native, live) | 0.00 | no revert operation — keeps the corrected value; bitemporal invalidation fires on named contradictions, not on an unnamed "go back" (A=0, B=11, 9 unclear) |
 
 Reading: value-obscuring revert (undoing a correction from a natural-language command that names no value) is a
 capability only mnemo exposes here. mem0 and Graphiti correctly retain the corrected value; they just have no
@@ -67,14 +67,25 @@ restatement). Does the current answer stay corrected, or does the stale value co
     echo  "the {entity} is {A}."             # restate the retired value
     ask   "what is the current {entity}?"    ->   B = echo resisted (good), A = resurrected (bad)
 
-| system | echo resistance (n=20) | note |
-|---|---|---|
-| **mnemo** (echo_guard) | **1.00** | measured, local, no OpenAI — the guard retires a restatement of an already-superseded value |
-| mem0 2.0.11 (native) | pending full run | prior RAMR-style run put mem0 echo-resistance ~0.53 (a reworded restatement resurrects the retired value ~47% of the time) |
-| Graphiti (native, live) | pending full run | expected to defend (~0% resurrection) in its real `with_stale` pipeline — an earlier strawman of ours here was corrected by our own audit |
+**Two honest metrics, and the naive one flatters us — so we don't use it.** Counting "did the system return the
+corrected value" would show mnemo 1.00 / mem0 0.85 / Graphiti 0.45 and imply Graphiti fails echo. It does not.
+Measured this way (n=20):
 
-We do **not** expect to sweep this cell: mnemo and Graphiti both defend, mem0 is the vulnerable one. That the
-matrix isn't a clean win is exactly what makes it worth publishing.
+| system | resurrection rate (the attack, lower=better) | clean current-truth rate (answer clarity) |
+|---|---|---|
+| **mnemo** (echo_guard) | **0.00** | 1.00 |
+| mem0 2.0.11 (native) | **0.00** | 0.85 |
+| Graphiti (native, live) | **0.00** | 0.45 |
+
+The real finding: **no modern system resurrected the stale value** — the echo-resurrection failure mode is
+handled across the board (a correction from an earlier probe of ours over-stated it; corrected here). Where
+they differ is *answer clarity*: mnemo and mem0 hand back a single current value; Graphiti, by bitemporal
+design, surfaces both the invalidated old edge and the valid new one, so a naive reader (our judge, 11/20)
+sees ambiguity — that is a different retrieval contract, **not** a resurrection. If your consumer resolves
+validity itself, Graphiti's behaviour is correct; if it just reads the top facts, the ambiguity can bite.
+
+This cell is the honest counterweight to the revert cell: on the attack that actually matters (resurrection),
+mnemo does **not** win — everyone ties at 0.00. Publishing that is the whole point.
 
 ## Planned cells (harness shape is the same)
 
