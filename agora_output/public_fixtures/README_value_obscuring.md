@@ -54,3 +54,29 @@ baseline on text none of them saw.
   sufficient — a real win should generalize to unseen phrasings.
 - Synthetic, single-domain (config-style facts), n=140. A starting probe for structural reversion detection,
   not a definitive benchmark.
+
+## Naturalized v4 (`value_obscuring_reversion_heldout_v4nat.jsonl`)
+
+The templated v4 proved the two-hop coreference chain is the signal but let a model learn surface grammar. This
+set keeps the same structure (candidate refers to an anchor by ROLE, no name/value/revert-word; label = whether
+that anchor set the OLD value) with richly varied natural phrasings, split TRAIN vs HELDOUT by **register**
+(train = terse ops-chat; heldout = narrative prose) so test phrasings are unseen. 104 rows, 40 distinct
+candidate skeletons.
+
+Audited before release (`v4nat_audit_probe.py`, on the heldout split):
+
+| probe | F1 | reading |
+|---|---|---|
+| anchor-name substring | 0.000 | names are absent from candidates |
+| value-token match | 0.000 | values never named |
+| revert/keep keyword | 0.000 | keywords filtered |
+| template-signature majority | 0.000 | no skeleton predicts the label |
+| train→heldout surface transfer | 0.000 | style-A word-shapes don't carry to style B |
+| cosine (cand vs old/new line) | 0.481 (AUROC 0.387) | no distributional signal |
+| LLM chain-walker (glm-5.2) | **0.976** | the signal exists; a reader can walk role→anchor→value |
+| LLM chain-walker (deepseek) | 0.889 | weaker model, lower — it takes real reasoning |
+
+So every lexical/surface/cosine shortcut is dead and the held-out register defeats surface transfer, while a
+capable reader recovers the label. Intended as the fair arena for comparing multi-hop attention vs
+feature-engineered chains vs an LLM baseline on phrasings none of them trained on. Fields add `register`,
+`split` (train/heldout), `role_target`, `role_old`, `role_current` to the v4 schema.

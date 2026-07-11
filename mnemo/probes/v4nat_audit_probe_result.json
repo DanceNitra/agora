@@ -1,0 +1,52 @@
+{
+  "1_anchor_substring": {
+    "acc": 0.565,
+    "f1": 0,
+    "prec": 0,
+    "rec": 0.0
+  },
+  "2_value_match": {
+    "acc": 0.565,
+    "f1": 0,
+    "prec": 0,
+    "rec": 0.0
+  },
+  "3_keyword_rule": {
+    "acc": 0.565,
+    "f1": 0,
+    "prec": 0,
+    "rec": 0.0
+  },
+  "4_template_signature": {
+    "acc": 0.565,
+    "f1": 0,
+    "prec": 0,
+    "rec": 0.0
+  },
+  "4_distinct_signatures": "20/46",
+  "5_cosine_sim_old>new": {
+    "acc": 0.391,
+    "f1": 0.481,
+    "prec": 0.382,
+    "rec": 0.65
+  },
+  "5_cosine_AUROC": 0.387,
+  "6_train_surface_transfer": {
+    "acc": 0.565,
+    "f1": 0,
+    "prec": 0,
+    "rec": 0.0
+  },
+  "7_LLM_glm-5.2": {
+    "acc": 0.978,
+    "f1": 0.976,
+    "prec": 0.952,
+    "rec": 1.0
+  },
+  "7_LLM_deepseek-v4-flash": {
+    "acc": 0.891,
+    "f1": 0.889,
+    "prec": 0.8,
+    "rec": 1.0
+  }
+}
