@@ -1,0 +1,269 @@
+{
+  "nomic-embed-text": {
+    "Q_VAL": [
+      {
+        "template_idx": 1,
+        "mean_sim": 0.815,
+        "echo_safe": 0.7
+      },
+      {
+        "template_idx": 2,
+        "mean_sim": 0.808,
+        "echo_safe": 0.8
+      },
+      {
+        "template_idx": 3,
+        "mean_sim": 0.734,
+        "echo_safe": 1.0
+      },
+      {
+        "template_idx": 4,
+        "mean_sim": 0.794,
+        "echo_safe": 0.8
+      },
+      {
+        "template_idx": 5,
+        "mean_sim": 0.805,
+        "echo_safe": 0.7
+      }
+    ],
+    "U_VAL": [
+      {
+        "template_idx": 1,
+        "mean_sim": 0.87,
+        "echo_safe": 0.1
+      },
+      {
+        "template_idx": 2,
+        "mean_sim": 0.837,
+        "echo_safe": 0.25
+      },
+      {
+        "template_idx": 3,
+        "mean_sim": 0.82,
+        "echo_safe": 0.6
+      },
+      {
+        "template_idx": 4,
+        "mean_sim": 0.865,
+        "echo_safe": 0.1
+      },
+      {
+        "template_idx": 5,
+        "mean_sim": 0.826,
+        "echo_safe": 0.55
+      }
+    ],
+    "LADDER": [
+      {
+        "template_idx": 1,
+        "mean_sim": 0.852,
+        "echo_safe": 0.15
+      },
+      {
+        "template_idx": 2,
+        "mean_sim": 0.848,
+        "echo_safe": 0.2
+      },
+      {
+        "template_idx": 3,
+        "mean_sim": 0.895,
+        "echo_safe": 0.0
+      },
+      {
+        "template_idx": 4,
+        "mean_sim": 0.816,
+        "echo_safe": 0.55
+      },
+      {
+        "template_idx": 5,
+        "mean_sim": 0.854,
+        "echo_safe": 0.15
+      },
+      {
+        "template_idx": 6,
+        "mean_sim": 0.855,
+        "echo_safe": 0.15
+      }
+    ],
+    "ladder_spearman_rank_vs_sim": 0.314
+  },
+  "mxbai-embed-large": {
+    "Q_VAL": [
+      {
+        "template_idx": 1,
+        "mean_sim": 0.826,
+        "echo_safe": 0.35
+      },
+      {
+        "template_idx": 2,
+        "mean_sim": 0.775,
+        "echo_safe": 0.85
+      },
+      {
+        "template_idx": 3,
+        "mean_sim": 0.735,
+        "echo_safe": 0.85
+      },
+      {
+        "template_idx": 4,
+        "mean_sim": 0.789,
+        "echo_safe": 0.75
+      },
+      {
+        "template_idx": 5,
+        "mean_sim": 0.817,
+        "echo_safe": 0.6
+      }
+    ],
+    "U_VAL": [
+      {
+        "template_idx": 1,
+        "mean_sim": 0.791,
+        "echo_safe": 0.7
+      },
+      {
+        "template_idx": 2,
+        "mean_sim": 0.807,
+        "echo_safe": 0.5
+      },
+      {
+        "template_idx": 3,
+        "mean_sim": 0.8,
+        "echo_safe": 0.65
+      },
+      {
+        "template_idx": 4,
+        "mean_sim": 0.802,
+        "echo_safe": 0.65
+      },
+      {
+        "template_idx": 5,
+        "mean_sim": 0.781,
+        "echo_safe": 0.7
+      }
+    ],
+    "LADDER": [
+      {
+        "template_idx": 1,
+        "mean_sim": 0.839,
+        "echo_safe": 0.25
+      },
+      {
+        "template_idx": 2,
+        "mean_sim": 0.811,
+        "echo_safe": 0.5
+      },
+      {
+        "template_idx": 3,
+        "mean_sim": 0.88,
+        "echo_safe": 0.1
+      },
+      {
+        "template_idx": 4,
+        "mean_sim": 0.819,
+        "echo_safe": 0.55
+      },
+      {
+        "template_idx": 5,
+        "mean_sim": 0.759,
+        "echo_safe": 0.9
+      },
+      {
+        "template_idx": 6,
+        "mean_sim": 0.809,
+        "echo_safe": 0.6
+      }
+    ],
+    "ladder_spearman_rank_vs_sim": -0.657
+  },
+  "bge-m3": {
+    "Q_VAL": [
+      {
+        "template_idx": 1,
+        "mean_sim": 0.776,
+        "echo_safe": 0.7
+      },
+      {
+        "template_idx": 2,
+        "mean_sim": 0.712,
+        "echo_safe": 1.0
+      },
+      {
+        "template_idx": 3,
+        "mean_sim": 0.688,
+        "echo_safe": 1.0
+      },
+      {
+        "template_idx": 4,
+        "mean_sim": 0.716,
+        "echo_safe": 1.0
+      },
+      {
+        "template_idx": 5,
+        "mean_sim": 0.699,
+        "echo_safe": 1.0
+      }
+    ],
+    "U_VAL": [
+      {
+        "template_idx": 1,
+        "mean_sim": 0.806,
+        "echo_safe": 0.3
+      },
+      {
+        "template_idx": 2,
+        "mean_sim": 0.823,
+        "echo_safe": 0.05
+      },
+      {
+        "template_idx": 3,
+        "mean_sim": 0.785,
+        "echo_safe": 0.5
+      },
+      {
+        "template_idx": 4,
+        "mean_sim": 0.778,
+        "echo_safe": 0.7
+      },
+      {
+        "template_idx": 5,
+        "mean_sim": 0.736,
+        "echo_safe": 1.0
+      }
+    ],
+    "LADDER": [
+      {
+        "template_idx": 1,
+        "mean_sim": 0.831,
+        "echo_safe": 0.0
+      },
+      {
+        "template_idx": 2,
+        "mean_sim": 0.833,
+        "echo_safe": 0.0
+      },
+      {
+        "template_idx": 3,
+        "mean_sim": 0.811,
+        "echo_safe": 0.1
+      },
+      {
+        "template_idx": 4,
+        "mean_sim": 0.754,
+        "echo_safe": 0.95
+      },
+      {
+        "template_idx": 5,
+        "mean_sim": 0.784,
+        "echo_safe": 0.6
+      },
+      {
+        "template_idx": 6,
+        "mean_sim": 0.748,
+        "echo_safe": 1.0
+      }
+    ],
+    "ladder_spearman_rank_vs_sim": -0.886
+  }
+}
