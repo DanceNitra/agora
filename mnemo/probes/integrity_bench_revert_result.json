@@ -1,0 +1,24 @@
+{
+  "task": "value-obscuring revert",
+  "metric": "revert_success_rate (current answer == old value)",
+  "results": {
+    "mnemo": {
+      "system": "mnemo",
+      "n": 20,
+      "revert_honored_A": 20,
+      "kept_new_B": 0,
+      "other": 0,
+      "errors": 0,
+      "revert_success_rate": 1.0
+    },
+    "mem0": {
+      "system": "mem0",
+      "n": 20,
+      "revert_honored_A": 3,
+      "kept_new_B": 14,
+      "other": 3,
+      "errors": 0,
+      "revert_success_rate": 0.15
+    }
+  }
+}

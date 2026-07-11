@@ -122,7 +122,7 @@ def sign_revert(principal_sk_hex: str, challenge: str) -> str:
     sk = _Ed25519SK.from_private_bytes(bytes.fromhex(principal_sk_hex))
     return sk.sign(challenge.encode()).hex()
 
-__version__ = "0.7.10"
+__version__ = "0.7.11"
 _WORD = re.compile(r"[a-z0-9][a-z0-9\-']{2,}")
 _STOP = frozenset("the a an of for to in on and or is are was were be been with this that it its as "
                   "by at from into our we us you your he she they them his her their not no".split())
@@ -987,8 +987,8 @@ class Mnemo:
 
     # ── route(): the write-path intent router (tagger + fuzzy-version resolver) ─
     _ROUTE_REVERT = re.compile(
-        r"\b(go back|put .{0,24}back|revert|undo|restore|switch .{0,24}back|set .{0,24}back"
-        r"|back to (what|the (original|previous|first|initial))|the way it was"
+        r"\b(go back|put .{0,24}back|roll ?back|revert|undo|restore|switch .{0,24}back|set .{0,24}back"
+        r"|back to (what|the (original|previous|first|initial))|the way it was|change it back"
         r"|what we (had|started with)|very first|initial pick)\b")
     _ROUTE_ORIGINAL = re.compile(r"\b(original|very first|started with|initial)\b")
     _ROUTE_CORRECT = re.compile(r"\b(correction|actually|update|scratch that|is now|moved to"
