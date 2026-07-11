@@ -1330,7 +1330,7 @@ def _astar(start: tuple[int, int], goal: tuple[int, int]) -> list[tuple[int, int
 # if :8000 is down, these no-op and the local goal engine still runs.
 from urllib.parse import quote as _urlquote
 
-_BRAIN_URL = os.environ.get("AGORA_BRAIN_URL", "http://localhost:8000").rstrip("/")
+_BRAIN_URL = os.environ.get("AGORA_BRAIN_URL", "http://127.0.0.1:8000").rstrip("/")
 _BRAIN_ID = {   # dungeon entity → server/agora NPC UUID (names already aligned)
     "thief":   "00000000-0000-0000-0000-000000000001",  # Shadow Kael
     "scholar": "00000000-0000-0000-0000-000000000002",  # Sage Mira

@@ -17,7 +17,7 @@ import time
 import urllib.request
 from pathlib import Path
 
-DUNGEON_URL = "http://localhost:5174/"
+DUNGEON_URL = "http://127.0.0.1:5174/"
 DUNGEON_DIR = Path(__file__).resolve().parents[3] / "agora-game-server"
 CHECK_EVERY = int(os.environ.get("AGORA_WATCHDOG_INTERVAL", "300"))
 _state = {"misses": 0, "restarts": [], "muted_until": 0.0}
