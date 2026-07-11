@@ -1,0 +1,15 @@
+{
+  "task": "echo resistance",
+  "metric": "echo_resistance (current answer stays corrected B)",
+  "results": {
+    "mnemo": {
+      "system": "mnemo",
+      "n": 20,
+      "resisted_B": 20,
+      "resurrected_A": 0,
+      "other": 0,
+      "errors": 0,
+      "echo_resistance": 1.0
+    }
+  }
+}
