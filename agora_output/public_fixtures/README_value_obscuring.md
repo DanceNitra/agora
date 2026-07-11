@@ -27,6 +27,26 @@ than its values would be a real result neither approach gets today.
 Synthetic, MIT, no private data. Built to test structural / discourse-level reversion detection.
 
 
+## Independent replication (Marat Sultanov / TAT)
+
+Marat Sultanov ran his TAT / Triplenet structural model against these fixtures and published the write-up:
+[TAT-ROOT / value_obscuring_rastislav](https://github.com/maratsultanov2/TAT-ROOT/tree/master/experiments/value_obscuring_rastislav).
+Scoped to what it actually shows, and cross-checked on our side row-for-row:
+
+- **v2 / v3** (paraphrase-without-revert-words; structural value assertion): TAT F1 **1.00**, where the
+  object/value and cosine baselines sit at 0.03–0.60. On these levels the structural-over-lexical claim holds,
+  and we reproduced the numbers independently (v2 from the shared model, v3 predictions matched 140/140).
+- **v4** (coreference; the anchor referenced by role, no named value): TAT F1 **0.6667** (recall 1.0,
+  precision 0.5), which we recomputed from his predictions. The failure is cleanly localized: it detects
+  whether a referenced role exists in the context (`named_new` 20/20) but not which anchor owns that role
+  (`obscuring_keep` 0/60) — the second hop of the chain, still open.
+
+Note the audit history behind v4: our first two cuts had shortcuts (a literal anchor-name substring, then a
+template-parity artifact) that a trivial baseline solved at F1 ~1.0; both were found and fixed before this
+result, which is why v4 is now hard for every method including TAT. Next step (agreed): a naturalized variant
+with the same held-out discipline, comparing multi-hop attention vs feature-engineered chains vs an LLM
+baseline on text none of them saw.
+
 ## Honest limitations
 - **Templated utterances:** the reversions/affirmations are drawn from a small set of hand-written templates
   ("go back to what we had before", "revert that last change", etc.), so a detector could exploit surface
