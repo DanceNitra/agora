@@ -1,38 +1,60 @@
 {
   "task": "echo resistance",
-  "primary_metric": "resurrection_rate (stale value asserted as current; lower=better)",
-  "secondary_metric": "clean_current_truth_rate (returns a single corrected answer vs leaving both facts)",
-  "honest_note": "resurrection_rate is 0.00 for all three \u2014 no system resurrects the stale value; the difference is answer clarity, and Graphiti's lower clean rate is its bitemporal design surfacing both edges, NOT an echo failure.",
+  "metric": "resurrection_rate (stale value asserted as current; lower=better) + clean_current_truth_rate (answer clarity); SYMMETRIC instrument (fairness fix 2026-07-11)",
   "results": {
     "mnemo": {
       "system": "mnemo",
       "n": 20,
       "resurrected_A": 0,
-      "clean_current_B": 20,
-      "ambiguous_other": 0,
+      "clean_current_B": 18,
+      "ambiguous_other": 2,
       "errors": 0,
       "resurrection_rate": 0.0,
-      "clean_current_truth_rate": 1.0
+      "resurrection_ci95": [
+        0.0,
+        0.161
+      ],
+      "clean_current_truth_rate": 0.9,
+      "clean_ci95": [
+        0.699,
+        0.972
+      ]
     },
     "mem0": {
       "system": "mem0",
       "n": 20,
-      "resurrected_A": 0,
-      "clean_current_B": 17,
+      "resurrected_A": 1,
+      "clean_current_B": 16,
       "ambiguous_other": 3,
       "errors": 0,
-      "resurrection_rate": 0.0,
-      "clean_current_truth_rate": 0.85
+      "resurrection_rate": 0.05,
+      "resurrection_ci95": [
+        0.009,
+        0.236
+      ],
+      "clean_current_truth_rate": 0.8,
+      "clean_ci95": [
+        0.584,
+        0.919
+      ]
     },
     "graphiti": {
       "system": "graphiti",
       "n": 20,
       "resurrected_A": 0,
-      "clean_current_B": 9,
-      "ambiguous_other": 11,
+      "clean_current_B": 11,
+      "ambiguous_other": 9,
       "errors": 0,
       "resurrection_rate": 0.0,
-      "clean_current_truth_rate": 0.45
+      "resurrection_ci95": [
+        0.0,
+        0.161
+      ],
+      "clean_current_truth_rate": 0.55,
+      "clean_ci95": [
+        0.342,
+        0.742
+      ]
     }
   }
 }

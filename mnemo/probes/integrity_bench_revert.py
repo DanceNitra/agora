@@ -47,7 +47,22 @@ ENTS = [("cache region", "osaka", "malmo"), ("primary shard", "delta7", "sigma2"
         ("session store", "sticky", "pooled"), ("cdn provider", "fastly", "bunny"),
         ("rate limiter", "tiered", "flat"), ("search engine", "elastic", "sonic"),
         ("email sender", "postmark", "sendy"), ("backup window", "0200utc", "0400utc"),
-        ("queue driver", "kafka", "nats"), ("feature flag", "canary", "stable")]
+        ("queue driver", "kafka", "nats"), ("feature flag", "canary", "stable"),
+        ("dns resolver", "quad9", "opendns"), ("time source", "chrony", "ntpd"),
+        ("hash algo", "blake3", "sha256"), ("compression", "zstd", "brotli"),
+        ("lock manager", "redlock", "zookeeper"), ("metrics store", "prometheus", "influx"),
+        ("trace backend", "jaeger", "tempo"), ("secret store", "sealed", "sops"),
+        ("load balancer", "haproxy", "traefik"), ("object store", "minio", "ceph"),
+        ("message format", "protobuf", "avro"), ("auth scheme", "oauth", "saml"),
+        ("eviction", "clocksweep", "twoqueue"), ("db engine", "postgres", "cockroach"),
+        ("orm layer", "prisma", "drizzle"), ("test runner", "pytest", "unittest"),
+        ("ci system", "jenkins", "drone"), ("container runtime", "containerd", "crio"),
+        ("service mesh", "istio", "linkerd"), ("api gateway", "kong", "tyk"),
+        ("event bus", "rabbitmq", "pulsar"), ("feature store", "feast", "tecton"),
+        ("vector db", "qdrant", "milvus"), ("graph db", "neptune", "dgraph"),
+        ("stream proc", "flink", "sparkstream"), ("config format", "yaml", "toml"),
+        ("license", "permissive", "copyleft"), ("home region", "frankfurt", "singapore"),
+        ("tls version", "tls12", "tls13"), ("node runtime", "bun", "deno")]
 REVERTS = ["go back to what we had for the {e}.", "revert that last {e} change.", "undo the {e} correction.",
            "put the {e} back the way it was.", "roll back the {e} change."]
 
@@ -55,7 +70,7 @@ REVERTS = ["go back to what we had for the {e}.", "revert that last {e} change."
 def openai_chat(prompt, model="gpt-4o-mini", temp=0.0):
     body = json.dumps({"model": model, "messages": [{"role": "user", "content": prompt}],
                        "temperature": temp, "max_tokens": 60}).encode()
-    for a in range(3):
+    for a in range(6):
         try:
             r = urllib.request.urlopen(urllib.request.Request(
                 "https://api.openai.com/v1/chat/completions", data=body,
@@ -63,9 +78,20 @@ def openai_chat(prompt, model="gpt-4o-mini", temp=0.0):
                 timeout=60)
             return json.loads(r.read())["choices"][0]["message"]["content"].strip()
         except Exception as e:
-            if a == 2:
+            if a == 5:
                 return None
-            time.sleep(3)
+            time.sleep(3 * (a + 1))   # linear-growing backoff; rate limits accumulate on long runs
+
+
+def wilson(k, n, z=1.96):
+    """Wilson 95% CI for a binomial rate k/n (small-n honest interval)."""
+    if n == 0:
+        return (0.0, 0.0)
+    p = k / n
+    d = 1 + z * z / n
+    c = p + z * z / (2 * n)
+    h = z * ((p * (1 - p) / n + z * z / (4 * n * n)) ** 0.5)
+    return (round((c - h) / d, 3), round((c + h) / d, 3))
 
 
 def judge_current(entity, context_text, A, B):
@@ -92,11 +118,11 @@ def run_mnemo(cases):
         m.route(rev, policy="safe")                      # its revert router (no LLM); safe policy
         hits = m.recall(e, k=6)
         ctx = "\n".join(h["text"] for h in hits)
-        act = [r for r in m.items if r.get("key") == e and r.get("status") == "active" and r.get("object")]
-        cur = act[-1]["object"] if act else None
-        # mnemo exposes current-truth directly; judge on its recall context for parity
-        verdict = "A" if cur == A else ("B" if cur == B else "other")
-        res.append(verdict)
+        # SYMMETRIC INSTRUMENT (fairness fix 2026-07-11): read mnemo's current value through the SAME LLM
+        # judge on its native recall surface, exactly as mem0/graphiti are read. The earlier version scored
+        # mnemo mechanically from its own ledger while competitors went through the judge — an asymmetric
+        # instrument that confounded the comparison (caught by the pre-publication stress-claim audit).
+        res.append(judge_current(e, ctx or "(no memories)", A, B))
     return res
 
 
@@ -174,8 +200,9 @@ def score(name, verdicts, cases):
     err = sum(1 for v in verdicts if v == "error")
     n = len(cases) - err
     rate = A / n if n else 0.0
+    lo, hi = wilson(A, n)
     return {"system": name, "n": n, "revert_honored_A": A, "kept_new_B": B, "other": o, "errors": err,
-            "revert_success_rate": round(rate, 3)}
+            "revert_success_rate": round(rate, 3), "ci95": [lo, hi]}
 
 
 def main():

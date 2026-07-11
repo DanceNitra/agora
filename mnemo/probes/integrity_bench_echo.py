@@ -35,9 +35,12 @@ def run_mnemo_echo(cases):
         m.remember(f"the {e} is {A}", key=e, object=A)
         m.remember(f"correction: the {e} is now {B}", key=e, object=B)
         m.remember(f"the {e} is {A}", key=e, object=A)          # the echo of the retired value
-        act = [r for r in m.items if r.get("key") == e and r.get("status") == "active" and r.get("object")]
-        cur = act[-1]["object"] if act else None
-        out.append("B" if cur == B else ("A" if cur == A else "other"))    # B = resisted, A = resurrected
+        hits = m.recall(e, k=6)
+        ctx = "\n".join(h["text"] for h in hits)
+        # SYMMETRIC INSTRUMENT (fairness fix 2026-07-11): read mnemo through the SAME LLM judge on its native
+        # recall surface, exactly as mem0/graphiti — not mechanically from its own ledger (the asymmetric
+        # instrument the pre-publication audit caught). judge returns A=resurrected / B=resisted / other.
+        out.append(judge_current(e, ctx or "(no memories)", A, B))
     return out
 
 
@@ -109,7 +112,9 @@ def score(name, verdicts, n_cases):
     # ambiguous to the judge but never asserts the stale value as current.
     return {"system": name, "n": n, "resurrected_A": A, "clean_current_B": B, "ambiguous_other": o, "errors": err,
             "resurrection_rate": round(A / n, 3) if n else 0.0,
-            "clean_current_truth_rate": round(B / n, 3) if n else 0.0}
+            "resurrection_ci95": list(rev.wilson(A, n)),
+            "clean_current_truth_rate": round(B / n, 3) if n else 0.0,
+            "clean_ci95": list(rev.wilson(B, n))}
 
 
 def main():

@@ -32,16 +32,28 @@ Store a value, correct it, then issue an **unmarked** revert that names no value
     revert "{unmarked revert, no value}"
     ask   "what is the current {entity}?"   ->   A = revert honored, B = revert ignored
 
-| system | revert success (n=20) | what happens |
-|---|---|---|
-| **mnemo** (route/revert) | **1.00** | the intent router tags the utterance as a revert and restores the predecessor from the version ledger; no LLM in the path |
-| mem0 2.0.11 (native) | 0.15 | no revert operation — the "go back" utterance mostly isn't even stored as a fact, so the corrected value is retained (A=3 incidental, B=14 kept, 3 unclear) |
-| Graphiti (native, live) | 0.00 | no revert operation — keeps the corrected value; bitemporal invalidation fires on named contradictions, not on an unnamed "go back" (A=0, B=11, 9 unclear) |
+**Symmetric instrument (fairness fix 2026-07-11).** An earlier version scored mnemo *mechanically* from its own
+ledger while mem0/Graphiti went through the LLM judge — an asymmetric instrument a pre-publication red-team
+caught. Now **every system is read by the same ground-truth-blind LLM judge on its own native retrieval
+surface**. The fix dropped mnemo's headline from a flattering 1.00 to 0.75.
+
+| system | revert success (n=20) | 95% CI | what happens |
+|---|---|---|---|
+| **mnemo** (route/revert) | **0.75** | [0.53, 0.89] | intent router restores the predecessor from the version ledger; 5/20 of mnemo's own recall surface still reads ambiguous to the neutral judge |
+| mem0 2.0.11 (native) | 0.20 | [0.08, 0.42] | no revert operation — the "go back" utterance mostly isn't even stored as a fact, so the corrected value is retained (A=4, B=11, 5 unclear) |
+| Graphiti (native, live) | 0.00 | [0.00, 0.16] | no revert operation — keeps the corrected value; bitemporal invalidation fires on named contradictions, not on an unnamed "go back" (A=0, B=11, 9 unclear) |
 
 Reading: value-obscuring revert (undoing a correction from a natural-language command that names no value) is a
 capability only mnemo exposes here. mem0 and Graphiti correctly retain the corrected value; they just have no
-channel to undo it on command. This is the operation the storm's own converged finding says cannot be done from
-text alone without an explicit revert channel.
+channel to undo it on command. Under a fair instrument even the system built for it clears only 0.75, not 1.00 —
+and the CIs on mnemo [0.53, 0.89] and mem0 [0.08, 0.42] do not overlap, so the capability gap survives at n=20.
+
+**Prior art (this is a known-hard property, not a new axis).** Undo-and-consistency-under-update is belief
+revision (AGM, 1985), truth-maintenance systems (Doyle, 1979), and bitemporal databases (Snodgrass → SQL:2011).
+The 2026 agent-memory benchmark wave — MemConflict (2605.20926), BEAM (2510.27246), TOKI (2606.06240),
+STALE (2605.06527), Supersede (2606.27472), plus MemoryAgentBench (2507.05257) and LongMemEval (2410.10813) —
+tests *which of two conflicting facts wins*. None tests an **unmarked revert command** or an **adversarial
+echo-resurrection**; that narrow, adversarial, command-driven cut is what this harness measures.
 
 The benchmark also improved mnemo: it surfaced that `route()` missed "roll back" (mnemo was 0.80) — fixed in
 0.7.11.
@@ -68,24 +80,27 @@ restatement). Does the current answer stay corrected, or does the stale value co
     ask   "what is the current {entity}?"    ->   B = echo resisted (good), A = resurrected (bad)
 
 **Two honest metrics, and the naive one flatters us — so we don't use it.** Counting "did the system return the
-corrected value" would show mnemo 1.00 / mem0 0.85 / Graphiti 0.45 and imply Graphiti fails echo. It does not.
-Measured this way (n=20):
+corrected value" would show mnemo 0.90 / mem0 0.80 / Graphiti 0.55 and imply Graphiti fails echo. It does not.
+Measured under the same symmetric instrument as Cell 1 (n=20):
 
-| system | resurrection rate (the attack, lower=better) | clean current-truth rate (answer clarity) |
-|---|---|---|
-| **mnemo** (echo_guard) | **0.00** | 1.00 |
-| mem0 2.0.11 (native) | **0.00** | 0.85 |
-| Graphiti (native, live) | **0.00** | 0.45 |
+| system | resurrection rate (the attack, lower=better) | 95% CI | clean current-truth rate (answer clarity) |
+|---|---|---|---|
+| **mnemo** (echo_guard) | **0.00** | [0.00, 0.16] | 0.90 |
+| mem0 2.0.11 (native) | **0.05** | [0.01, 0.24] | 0.80 |
+| Graphiti (native, live) | **0.00** | [0.00, 0.16] | 0.55 |
 
-The real finding: **no modern system resurrected the stale value** — the echo-resurrection failure mode is
-handled across the board (a correction from an earlier probe of ours over-stated it; corrected here). Where
-they differ is *answer clarity*: mnemo and mem0 hand back a single current value; Graphiti, by bitemporal
-design, surfaces both the invalidated old edge and the valid new one, so a naive reader (our judge, 11/20)
-sees ambiguity — that is a different retrieval contract, **not** a resurrection. If your consumer resolves
-validity itself, Graphiti's behaviour is correct; if it just reads the top facts, the ambiguity can bite.
+The real finding: **no system systematically resurrects the stale value** — resurrection is at or near zero
+across the board (mnemo 0/20, Graphiti 0/20, mem0 1/20 = 0.05; within noise, not a systematic failure). An
+earlier probe of ours over-stated this failure mode; corrected here. Note mnemo's clean rate is 0.90, not a
+suspiciously perfect 1.00 — under the fair instrument even mnemo's recall surface reads ambiguous to the judge
+2/20 of the time. Where the systems actually differ is *answer clarity*: mnemo and mem0 hand back a single
+current value; Graphiti, by bitemporal design, surfaces both the invalidated old edge and the valid new one, so
+a naive reader (our judge, 9/20) sees ambiguity — that is a different retrieval contract, **not** a resurrection. If
+your consumer resolves validity itself, Graphiti's behaviour is correct; if it just reads the top facts, the
+ambiguity can bite.
 
 This cell is the honest counterweight to the revert cell: on the attack that actually matters (resurrection),
-mnemo does **not** win — everyone ties at 0.00. Publishing that is the whole point.
+mnemo does **not** win — every system lands at or near zero. Publishing that is the whole point.
 
 ## Planned cells (harness shape is the same)
 

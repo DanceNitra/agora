@@ -1,24 +1,32 @@
 {
   "task": "value-obscuring revert",
-  "metric": "revert_success_rate (current answer == old value)",
+  "metric": "revert_success_rate (current answer == old value); SYMMETRIC instrument: all systems read by the same ground-truth-blind LLM judge on their native retrieval surface (fairness fix 2026-07-11)",
   "results": {
     "mnemo": {
       "system": "mnemo",
       "n": 20,
-      "revert_honored_A": 20,
+      "revert_honored_A": 15,
       "kept_new_B": 0,
-      "other": 0,
+      "other": 5,
       "errors": 0,
-      "revert_success_rate": 1.0
+      "revert_success_rate": 0.75,
+      "ci95": [
+        0.531,
+        0.888
+      ]
     },
     "mem0": {
       "system": "mem0",
       "n": 20,
-      "revert_honored_A": 3,
-      "kept_new_B": 14,
-      "other": 3,
+      "revert_honored_A": 4,
+      "kept_new_B": 11,
+      "other": 5,
       "errors": 0,
-      "revert_success_rate": 0.15
+      "revert_success_rate": 0.2,
+      "ci95": [
+        0.081,
+        0.416
+      ]
     },
     "graphiti": {
       "system": "graphiti",
@@ -27,7 +35,11 @@
       "kept_new_B": 11,
       "other": 9,
       "errors": 0,
-      "revert_success_rate": 0.0
+      "revert_success_rate": 0.0,
+      "ci95": [
+        0.0,
+        0.161
+      ]
     }
   }
 }

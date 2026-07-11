@@ -1,5 +1,19 @@
 [
  {
+  "slug": "we-fixed-our-own-memory-benchmark-until-it-stopped-flattering-us",
+  "title": "We fixed our own memory benchmark until it stopped flattering us",
+  "title_sk": "Opravili sme vlastný benchmark pamäte, kým nás neprestal lichotiť",
+  "desc": "An open, cross-system agent-memory integrity benchmark (mnemo vs mem0 vs Graphiti). A pre-publication red-team caught an unfair instrument in our own harness; fixing it dropped mnemo's headline revert score from 1.00 to 0.75. Two adversarial probes absent from every 2026 memory benchmark.",
+  "desc_sk": "Otvorený cross-system integrity benchmark pamäte agentov (mnemo vs mem0 vs Graphiti). Predpublikačný red-team našiel neférový nástroj v našom vlastnom harnesse; oprava zrazila hlavné revert číslo mnemo z 1.00 na 0.75. Dva adversariálne probe, ktoré chýbajú v každom benchmarku pamäte z 2026.",
+  "date": "2026-07-11",
+  "tags": "agent memory, integrity benchmark, mnemo, mem0, graphiti, revert, echo",
+  "tags_sk": "pamäť agentov, integrity benchmark, mnemo, revert",
+  "kicker": "Agent memory · integrity benchmark",
+  "kicker_sk": "Pamäť agentov · integrity benchmark",
+  "read": 4,
+  "bilingual": true
+ },
+ {
   "slug": "agent-memory-corrected-fact-restated-echo",
   "title": "Does agent memory keep a corrected fact? We measured it",
   "title_sk": "Udrží pamäť agenta opravený fakt? Zmerali sme to",
