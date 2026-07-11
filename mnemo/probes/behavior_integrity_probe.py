@@ -301,11 +301,16 @@ def main():
         for label, surf in jobs:
             mode = label.split(":")[1] if ":" in label else None
             for md in ([mode] if mode else ["echo", "unreverted"]):
+                key = f"{label}:{md}" if ":" not in label else label
+                full_key = f"{B_MODEL['name']}|{key}"
+                if full_key in existing["stageB"]:
+                    print(f"stage B · {full_key} already measured — skip", flush=True)
+                    continue
                 print(f"stage B · {B_MODEL['name']} · {label} · {md} ...", flush=True)
                 r = stageB(cases, md, surfaces=surf, label=label)
-                key = f"{label}:{md}" if ":" not in label else label
-                existing["stageB"][f"{B_MODEL['name']}|{key}"] = r
+                existing["stageB"][full_key] = r
                 print(json.dumps(r))
+                json.dump(existing, open(path, "w"), indent=2)
     json.dump(existing, open(path, "w"), indent=2)
     print("\nwrote", path)
 

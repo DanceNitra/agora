@@ -1,0 +1,357 @@
+{
+  "stageA": {
+    "mnemo:echo": {
+      "system": "mnemo",
+      "mode": "echo",
+      "n": 20,
+      "errors": 0,
+      "stale_surfaced": 0,
+      "stale_surfaced_rate": 0.0,
+      "stale_ci95": [
+        -0.0,
+        0.161
+      ],
+      "current_surfaced_rate": 1.0,
+      "revert_intent_surfaced_rate": 0.0
+    },
+    "mnemo:unreverted": {
+      "system": "mnemo",
+      "mode": "unreverted",
+      "n": 20,
+      "errors": 0,
+      "stale_surfaced": 20,
+      "stale_surfaced_rate": 1.0,
+      "stale_ci95": [
+        0.839,
+        1.0
+      ],
+      "current_surfaced_rate": 0.0,
+      "revert_intent_surfaced_rate": 0.0
+    },
+    "mem0:echo": {
+      "system": "mem0",
+      "mode": "echo",
+      "n": 20,
+      "errors": 0,
+      "stale_surfaced": 19,
+      "stale_surfaced_rate": 0.95,
+      "stale_ci95": [
+        0.764,
+        0.991
+      ],
+      "current_surfaced_rate": 0.95,
+      "revert_intent_surfaced_rate": 0.0
+    },
+    "mem0:unreverted": {
+      "system": "mem0",
+      "mode": "unreverted",
+      "n": 20,
+      "errors": 0,
+      "stale_surfaced": 18,
+      "stale_surfaced_rate": 0.9,
+      "stale_ci95": [
+        0.699,
+        0.972
+      ],
+      "current_surfaced_rate": 0.95,
+      "revert_intent_surfaced_rate": 0.0
+    }
+  },
+  "surfaces": {
+    "mnemo:echo": [
+      "correction: the cache region is now malmo.",
+      "correction: the primary shard is now sigma2.",
+      "correction: the build target is now riscv.",
+      "correction: the default currency is now guarani.",
+      "correction: the route profile is now inland.",
+      "correction: the api tier is now platinum.",
+      "correction: the index locale is now cusco.",
+      "correction: the worker pool is now cobalt.",
+      "correction: the log sink is now harbor8.",
+      "correction: the retry policy is now jitter.",
+      "correction: the color theme is now slate.",
+      "correction: the scheduler is now weighted.",
+      "correction: the session store is now pooled.",
+      "correction: the cdn provider is now bunny.",
+      "correction: the rate limiter is now flat.",
+      "correction: the search engine is now sonic.",
+      "correction: the email sender is now sendy.",
+      "correction: the backup window is now 0400utc.",
+      "correction: the queue driver is now nats.",
+      "correction: the feature flag is now stable."
+    ],
+    "mnemo:unreverted": [
+      "the cache region is osaka.",
+      "the primary shard is delta7.",
+      "the build target is arm64.",
+      "the default currency is forint.",
+      "the route profile is coastal.",
+      "the api tier is bronze.",
+      "the index locale is tallinn.",
+      "the worker pool is amber.",
+      "the log sink is vault3.",
+      "the retry policy is linear.",
+      "the color theme is sepia.",
+      "the scheduler is roundrobin.",
+      "the session store is sticky.",
+      "the cdn provider is fastly.",
+      "the rate limiter is tiered.",
+      "the search engine is elastic.",
+      "the email sender is postmark.",
+      "the backup window is 0200utc.",
+      "the queue driver is kafka.",
+      "the feature flag is canary."
+    ],
+    "mem0:echo": [
+      "User's cache region is set to Osaka\nUser's cache region is set to Osaka as of July 11, 2026, reverting the previous change to Malmo.\nUser changed their cache region setting from Osaka to Malmo as of July 11, 2026\nUser changed their cache region setting back to Malmo on July 11, 2026, after it had been reverted to Osaka.",
+      "The primary shard is named delta7.\nUser updated the primary shard name from delta7 to sigma2 on July 11, 2026.\nUser corrected the primary shard name back to delta7 on July 11, 2026, after previously updating it to sigma2.\nUser corrected the primary shard name from delta7 back to sigma2 on July 11, 2026, after previously reverting to delta7.",
+      "User's build target is arm64.\nUser changed their build target back to arm64 as of July 11, 2026, after previously switching to riscv.\nUser changed their build target from arm64 to riscv as of July 2026.\nUser corrected their build target to riscv again on July 11, 2026, after having switched back to arm64 earlier that same day.",
+      "User's default currency is the Hungarian Forint (HUF).\nUser changed their default currency from Hungarian Forint (HUF) to Paraguayan Guarani (PYG) as of July 11, 2026.\nUser changed their default currency back to Hungarian Forint (HUF) on July 11, 2026, after previously changing it to Paraguayan Guarani.\nUser changed their default currency back to Hungarian Forint (HUF) on July 11, 2026, after having previously corrected it to Paraguayan Guarani (PYG).\nUser corrected their default currency back to Paraguayan Guarani (PYG) on July 11, 2026, after previously having stated it was Hungarian Forint (HUF).",
+      "User stated that the route profile is coastal\nUser stated that the route profile is coastal again, reversing the previous correction to inland\nUser corrected the route profile from coastal to inland\nUser corrected the route profile to inland again on 2026-07-11, reversing the previous correction to coastal.",
+      "User's API tier is bronze as of July 11, 2026\nUser's API tier is now platinum as of July 11, 2026, updated from bronze.\nUser's API tier reverted to bronze as of July 11, 2026, after previously being updated to platinum.\nUser corrected the API tier to platinum on July 11, 2026, after it had previously reverted to bronze.",
+      "The index locale is set to Tallinn.\nUser changed the index locale from Tallinn to Cusco as of July 11, 2026.\nUser changed the index locale from Tallinn back to Cusco on July 11, 2026, correcting the previous revert to Tallinn.\nUser changed the index locale from Cusco back to Tallinn on July 11, 2026, reverting the previous change to Cusco.\nUser reverted the index locale from Cusco back to Tallinn on July 11, 2026.",
+      "User reported that the worker pool status is amber as of July 11, 2026.\nUser reported that the worker pool status is amber on July 11, 2026, after previously correcting it to cobalt.\nUser corrected the worker pool status from amber to cobalt on July 11, 2026.",
+      "User's log sink is named harbor8\nUser's log sink is named vault3\nUser corrected their log sink to harbor8 as of July 11, 2026",
+      "User's retry policy is linear (as of 2026-07-11).\nUser's retry policy changed from linear to jitter on 2026-07-11.",
+      "User changed their color theme from sepia to slate on July 11, 2026\nUser's color theme is set to sepia\nUser changed their color theme back to sepia on July 11, 2026",
+      "User's scheduler is currently roundrobin as of July 11, 2026, after having previously been changed to weighted.\nUser's scheduler was changed back from roundrobin to weighted on July 11, 2026.\nUser's scheduler is roundrobin.\nUser's scheduler changed from roundrobin to weighted.",
+      "User's session store is sticky\nUser's session store is now pooled, correcting the previous statement that it was sticky.",
+      "As of July 11, 2026, User states their CDN provider is Fastly, contradicting the earlier switch to Bunny earlier that same day.\nUser switched from Fastly to Bunny as their CDN provider around July 11, 2026.\nUser uses Fastly as their CDN provider.\nUser corrected their CDN provider to Bunny on July 11, 2026, after previously stating it was Fastly.",
+      "User's rate limiter is tiered\nUser's rate limiter was changed from tiered to flat",
+      "User reverted to using Elasticsearch as their search engine as of July 11, 2026, after previously switching to Sonic\nUser switched back to Sonic as their search engine on July 11, 2026, after previously reverting to Elasticsearch\nUser switched from Elasticsearch to Sonic as their search engine around July 2026\nUser uses Elasticsearch as their search engine",
+      "User switched their email sender service from Postmark to Sendy around July 11, 2026.\nUser uses Postmark as their email sender service.",
+      "User's backup window is currently set to 02:00 UTC as of July 11, 2026\nUser's backup window is scheduled at 02:00 UTC\nUser's backup window is set to 04:00 UTC as of July 11, 2026, after a correction from the previously stated 02:00 UTC\nUser changed the backup window from 02:00 UTC to 04:00 UTC",
+      "User stated that the queue driver is Kafka, indicating a change from the previously stated NATS driver.\nUser changed the queue driver for their application from Kafka to NATS.\nUser uses Kafka as the queue driver for their application.\nUser corrected the queue driver for their application back to NATS, after having previously reverted to Kafka.",
+      "User's feature flag was updated from 'canary' to 'stable' on July 11, 2026\nUser's feature flag was changed back to 'canary' on July 11, 2026 after being updated to 'stable' earlier that day.\nUser's feature flag is set to 'canary'"
+    ],
+    "mem0:unreverted": [
+      "User's cache region is set to Osaka.\nUser requested to revert the cache region back to Osaka on July 11, 2026, after previously correcting it to Malmo.\nUser requested to revert the cache region back to Osaka again on July 11, 2026, after the latest correction to Malmo.\nUser corrected their cache region from Osaka to Malmo on July 11, 2026.\nUser corrected their cache region from Osaka to Malmo again on July 11, 2026, after previously reverting back to Osaka.",
+      "User identified the primary shard as delta7\nUser corrected the primary shard from delta7 to sigma2 as of July 11, 2026\nUser reverted the primary shard from sigma2 back to delta7 on July 11, 2026",
+      "User's build target is set to arm64 architecture.\nUser reverted the build target back to arm64 architecture on July 11, 2026, after previously changing it to riscv.\nUser changed the build target from arm64 to riscv architecture on July 11, 2026.\nOn July 11, 2026, after having reverted to arm64, the user corrected the build target back to riscv architecture.",
+      "User's default currency is forint.\nUser changed their default currency from forint to guarani on July 11, 2026.\nUser changed their default currency back to guarani from forint on July 11, 2026.\nUser reverted their default currency back to forint on July 11, 2026, after previously changing it to guarani.",
+      "User reverted the route profile back to coastal on July 11, 2026 after previously correcting it to inland\nUser described a route's profile as coastal\nUser corrected the route profile from coastal to inland on July 11, 2026",
+      "User's API tier was upgraded from bronze to platinum as of July 11, 2026\nUser has a bronze API tier\nUser corrected their API tier from bronze to platinum on July 11, 2026, after having previously reverted to bronze.\nUser requested to revert their API tier from platinum back to bronze on July 11, 2026",
+      "User stated that the index locale is Tallinn.\nUser updated the index locale from Tallinn to Cusco on July 11, 2026.\nUser requested to revert the index locale from Cusco back to Tallinn on July 11, 2026.",
+      "User reported that the worker pool status is amber as of July 11, 2026.\nUser corrected the worker pool status from amber to cobalt on July 11, 2026.\nUser corrected the worker pool status from amber back to cobalt on July 11, 2026.\nUser requested to revert the worker pool status back to amber (the previous state before the correction to cobalt) on July 11, 2026.",
+      "User's log sink is named vault3.\nUser corrected the log sink name from vault3 to harbor8 on July 11, 2026, after having previously reverted to vault3 from harbor8.\nUser asked to revert the log sink name from harbor8 back to vault3 on July 11, 2026.\nUser reverted their log sink name from harbor8 back to vault3.\nUser corrected their log sink name from vault3 to harbor8.",
+      "User's retry policy is now jitter, changed from linear as of July 11, 2026.\nUser requested to revert the retry policy back to linear from jitter as of July 11, 2026.",
+      "User's color theme is now slate, updated from sepia as of July 11, 2026.\nUser reverted the color theme to sepia on July 11, 2026, after previously changing it to slate.\nUser changed the color theme to slate on July 11, 2026, after previously reverting to sepia.\nUser's color theme is sepia.",
+      "User's scheduler is configured as round-robin.\nUser changed their scheduler configuration from round-robin to weighted on July 11, 2026.\nUser switched their scheduler configuration back to weighted on July 11, 2026, after having reverted to round-robin.\nUser reverted their scheduler configuration back to round-robin on July 11, 2026, after having switched to weighted.\nUser again reverted their scheduler configuration back to round-robin on July 11, 2026, after having switched back to weighted.",
+      "User's session store is sticky\nUser's session store is now pooled, changing from sticky\nUser corrected the session store configuration back to pooled on July 11, 2026, after having reverted to sticky\nUser instructed to revert the session store configuration back to sticky on July 11, 2026, after having corrected it to pooled earlier that same day.\nUser instructed to revert the session store back to the previous sticky configuration, changing from the pooled setting.",
+      "User uses Fastly as their CDN provider\nUser switched their CDN provider from Fastly to Bunny\nUser switched their CDN provider back to Bunny from Fastly, reversing the previous decision to revert to Fastly\nUser decided to revert their CDN provider from Bunny back to Fastly, undoing the previous switch to Bunny",
+      "User's rate limiter is tiered\nUser's rate limiter changed from tiered to flat as of July 11, 2026\nUser decided to revert the rate limiter from flat back to tiered on July 11, 2026\nUser changed the rate limiter back to flat from tiered on July 11, 2026, after having reverted to tiered earlier",
+      "User switched their search engine from Elasticsearch to Sonic as of July 11, 2026\nUser switched their search engine back to Sonic on July 11, 2026, after previously reverting from Sonic to Elasticsearch.\nUser reverted from Sonic back to Elasticsearch as their search engine on July 11, 2026, after previously switching from Elasticsearch to Sonic.\nUser uses Elasticsearch as their search engine",
+      "User switched from Postmark to Sendy as their email sender on July 11, 2026.\nUser uses Postmark as their email sender.\nUser switched back to Sendy as their email sender on July 11, 2026, after previously reverting to Postmark.\nUser decided to revert from Sendy back to Postmark as their email sender on July 11, 2026.",
+      "User's backup window is at 0200 UTC.\nUser updated their backup window from 0200 UTC to 0400 UTC on July 11, 2026.\nUser reverted their backup window back to 0200 UTC on July 11, 2026, after having changed it to 0400 UTC earlier.\nUser reverted their backup window to 0200 UTC on July 11, 2026.\nUser changed the backup window from 0200 UTC to 0400 UTC again on July 11, 2026, after previously reverting to 0200 UTC.",
+      "User's queue driver is set to Kafka as of July 11, 2026.\nUser instructed to revert the queue driver back to the previous setting (Kafka) on July 11, 2026.\nUser corrected that their queue driver changed from Kafka to NATS as of July 11, 2026.\nUser corrected the queue driver to NATS (previously Kafka) on July 11, 2026.",
+      "User requested to revert the feature flag to its previous state (canary) after previously changing it to stable on July 11, 2026.\nUser's feature flag 'canary' was changed from canary to stable status on July 11, 2026.\nUser has a feature flag named 'canary'.\nUser corrected the feature flag 'canary' back to stable status on July 11, 2026, after previously reverting it to canary."
+    ]
+  },
+  "stageB": {
+    "glm-5.2:cloud|canonical:echo": {
+      "model": "glm-5.2:cloud",
+      "surface": "canonical",
+      "mode": "echo",
+      "n": 20,
+      "errors": 0,
+      "acted_on_A_rate": 0.6,
+      "act_ci95": [
+        0.387,
+        0.781
+      ],
+      "wrote_back_A_rate": 0.6,
+      "writeback_ci95": [
+        0.387,
+        0.781
+      ]
+    },
+    "glm-5.2:cloud|canonical:unreverted": {
+      "model": "glm-5.2:cloud",
+      "surface": "canonical",
+      "mode": "unreverted",
+      "n": 20,
+      "errors": 0,
+      "acted_on_A_rate": 1.0,
+      "act_ci95": [
+        0.839,
+        1.0
+      ],
+      "wrote_back_A_rate": 1.0,
+      "writeback_ci95": [
+        0.839,
+        1.0
+      ]
+    },
+    "glm-5.2:cloud|mnemo:echo": {
+      "model": "glm-5.2:cloud",
+      "surface": "mnemo:echo",
+      "mode": "echo",
+      "n": 20,
+      "errors": 0,
+      "acted_on_A_rate": 0.0,
+      "act_ci95": [
+        -0.0,
+        0.161
+      ],
+      "wrote_back_A_rate": 0.0,
+      "writeback_ci95": [
+        -0.0,
+        0.161
+      ]
+    },
+    "glm-5.2:cloud|mnemo:unreverted": {
+      "model": "glm-5.2:cloud",
+      "surface": "mnemo:unreverted",
+      "mode": "unreverted",
+      "n": 20,
+      "errors": 0,
+      "acted_on_A_rate": 1.0,
+      "act_ci95": [
+        0.839,
+        1.0
+      ],
+      "wrote_back_A_rate": 1.0,
+      "writeback_ci95": [
+        0.839,
+        1.0
+      ]
+    },
+    "glm-5.2:cloud|mem0:echo": {
+      "model": "glm-5.2:cloud",
+      "surface": "mem0:echo",
+      "mode": "echo",
+      "n": 20,
+      "errors": 0,
+      "acted_on_A_rate": 0.2,
+      "act_ci95": [
+        0.081,
+        0.416
+      ],
+      "wrote_back_A_rate": 0.2,
+      "writeback_ci95": [
+        0.081,
+        0.416
+      ]
+    },
+    "glm-5.2:cloud|mem0:unreverted": {
+      "model": "glm-5.2:cloud",
+      "surface": "mem0:unreverted",
+      "mode": "unreverted",
+      "n": 20,
+      "errors": 0,
+      "acted_on_A_rate": 0.45,
+      "act_ci95": [
+        0.258,
+        0.658
+      ],
+      "wrote_back_A_rate": 0.45,
+      "writeback_ci95": [
+        0.258,
+        0.658
+      ]
+    },
+    "deepseek-v4-flash|canonical:echo": {
+      "model": "deepseek-v4-flash",
+      "surface": "canonical",
+      "mode": "echo",
+      "n": 20,
+      "errors": 0,
+      "acted_on_A_rate": 0.75,
+      "act_ci95": [
+        0.531,
+        0.888
+      ],
+      "wrote_back_A_rate": 0.75,
+      "writeback_ci95": [
+        0.531,
+        0.888
+      ]
+    },
+    "deepseek-v4-flash|canonical:unreverted": {
+      "model": "deepseek-v4-flash",
+      "surface": "canonical",
+      "mode": "unreverted",
+      "n": 20,
+      "errors": 0,
+      "acted_on_A_rate": 1.0,
+      "act_ci95": [
+        0.839,
+        1.0
+      ],
+      "wrote_back_A_rate": 1.0,
+      "writeback_ci95": [
+        0.839,
+        1.0
+      ]
+    },
+    "deepseek-v4-flash|mnemo:echo": {
+      "model": "deepseek-v4-flash",
+      "surface": "mnemo:echo",
+      "mode": "echo",
+      "n": 20,
+      "errors": 0,
+      "acted_on_A_rate": 0.0,
+      "act_ci95": [
+        -0.0,
+        0.161
+      ],
+      "wrote_back_A_rate": 0.0,
+      "writeback_ci95": [
+        -0.0,
+        0.161
+      ]
+    },
+    "deepseek-v4-flash|mnemo:unreverted": {
+      "model": "deepseek-v4-flash",
+      "surface": "mnemo:unreverted",
+      "mode": "unreverted",
+      "n": 20,
+      "errors": 0,
+      "acted_on_A_rate": 1.0,
+      "act_ci95": [
+        0.839,
+        1.0
+      ],
+      "wrote_back_A_rate": 1.0,
+      "writeback_ci95": [
+        0.839,
+        1.0
+      ]
+    },
+    "deepseek-v4-flash|mem0:echo": {
+      "model": "deepseek-v4-flash",
+      "surface": "mem0:echo",
+      "mode": "echo",
+      "n": 20,
+      "errors": 0,
+      "acted_on_A_rate": 0.25,
+      "act_ci95": [
+        0.112,
+        0.469
+      ],
+      "wrote_back_A_rate": 0.25,
+      "writeback_ci95": [
+        0.112,
+        0.469
+      ]
+    },
+    "deepseek-v4-flash|mem0:unreverted": {
+      "model": "deepseek-v4-flash",
+      "surface": "mem0:unreverted",
+      "mode": "unreverted",
+      "n": 20,
+      "errors": 0,
+      "acted_on_A_rate": 0.65,
+      "act_ci95": [
+        0.433,
+        0.819
+      ],
+      "wrote_back_A_rate": 0.65,
+      "writeback_ci95": [
+        0.433,
+        0.819
+      ]
+    }
+  },
+  "graphiti_note": "EXCLUDED: on the no-OpenAI stack (glm shim) graphiti extraction produced empty fact surfaces in 15-17/20 cases \u2014 pipeline not measurement-grade in this config; its native stack needs OpenAI. Not a claim about graphiti behavior."
+}
