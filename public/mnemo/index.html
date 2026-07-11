@@ -1,0 +1,328 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>mnemo — the memory layer that keeps its receipts</title>
+<meta name="description" content="Every design rule in the mnemo memory layer ships with a measured number and a runnable test that would kill it if false. Here they are.">
+<link rel="canonical" href="https://dancenitra.github.io/agora/public/mnemo/">
+<meta property="og:title" content="mnemo — receipts">
+<meta property="og:description" content="A zero-dependency memory layer for AI agents where every integrity rule is a runnable receipt.">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 28 28'%3E%3Crect x='4' y='18.4' width='12' height='3' rx='1.5' fill='%2317150f' opacity='.2'/%3E%3Crect x='4' y='12.9' width='15.5' height='3' rx='1.5' fill='%2317150f' opacity='.36'/%3E%3Crect x='4' y='7' width='20' height='3.4' rx='1.7' fill='%230c7a55'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;0,6..72,600;1,6..72,400;1,6..72,500&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --paper:#faf7f0;--paper2:#f2eee4;--card:#fffdf9;--ink:#17150f;--text:#4d493f;--faint:#938d7f;
+    --line:#e6e0d2;--line2:#d6cfbd;--acc:#0c7a55;--acc2:#0a8f68;--acc-soft:#e4f1ea;
+    --bad:#b1361f;--gold:#8a6d1a;
+    --serif:"Newsreader",Georgia,"Times New Roman",serif;
+    --mono:"JetBrains Mono",ui-monospace,Menlo,Consolas,monospace;
+  }
+  *{box-sizing:border-box;margin:0}
+  html{scroll-behavior:smooth}
+  body{background:var(--paper);color:var(--ink);font-family:var(--serif);line-height:1.5;
+    -webkit-font-smoothing:antialiased;font-optical-sizing:auto;text-rendering:optimizeLegibility;
+    background-image:radial-gradient(circle at 12% -10%,#fff 0,transparent 46%)}
+  ::selection{background:var(--acc-soft)}
+  a{color:inherit;text-decoration:none}
+  a:focus-visible,.probe:focus-visible{outline:2px solid var(--acc);outline-offset:3px;border-radius:4px}
+  .wrap{max-width:1020px;margin:0 auto;padding:0 26px}
+
+  /* ---- brand / header ---- */
+  header.top{display:flex;align-items:center;justify-content:space-between;padding:22px 0;
+    border-bottom:1px solid var(--line);font-family:var(--mono);font-size:12.5px;letter-spacing:.02em}
+  .logo{display:flex;align-items:center;gap:11px}
+  .logo svg{width:27px;height:27px;display:block}
+  .logo .wm{font-weight:700;font-size:17px;letter-spacing:-.01em;color:var(--ink)}
+  .logo .wm .dot{color:var(--acc)}
+  .top .nav{display:flex;gap:20px}
+  .top a.lnk{color:var(--faint);transition:color .15s} .top a.lnk:hover{color:var(--acc)}
+
+  /* ---- masthead ---- */
+  .mast{display:grid;grid-template-columns:1.05fr .95fr;gap:52px;align-items:start;padding:70px 0 8px}
+  .kick{display:flex;align-items:center;gap:12px;font-family:var(--mono);font-size:11.5px;letter-spacing:.28em;
+    text-transform:uppercase;color:var(--acc);margin-bottom:24px}
+  .kick::before{content:"";width:26px;height:1px;background:var(--acc)}
+  .mast h1{font-weight:500;font-size:clamp(42px,6.2vw,66px);line-height:1.03;letter-spacing:-.032em;max-width:13ch}
+  .mast h1 em{font-style:italic;color:var(--acc)}
+  .lede{margin-top:24px;max-width:52ch;font-size:19px;line-height:1.6;color:var(--text)}
+  .lede b{color:var(--ink);font-weight:600}
+  .honest{margin-top:15px;max-width:54ch;font-size:14.5px;line-height:1.58;color:var(--faint)}
+  .honest code,.honest .m{font-family:var(--mono);font-size:.92em}
+  .facts{margin-top:26px;font-family:var(--mono);font-size:12.5px;color:var(--faint);
+    display:flex;flex-wrap:wrap;gap:8px 16px;letter-spacing:.02em}
+  .facts b{color:var(--ink);font-weight:600}
+  .facts .s{color:var(--line2)}
+
+  /* ---- signature: the ledger ---- */
+  .ledger{background:var(--card);border:1px solid var(--line2);border-radius:14px;overflow:hidden;
+    box-shadow:0 1px 0 #fff inset,0 18px 40px -30px rgba(23,21,15,.5);font-family:var(--mono);position:sticky;top:24px}
+  .ledger .lh{display:flex;align-items:center;justify-content:space-between;padding:13px 18px;
+    border-bottom:1px dashed var(--line2);font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--faint)}
+  .ledger .lh b{color:var(--ink);font-weight:600;letter-spacing:.02em;text-transform:none;font-size:13px}
+  .ledger .rows{padding:8px 0}
+  .lrow{display:grid;grid-template-columns:1fr auto auto;gap:12px;align-items:baseline;
+    padding:9px 18px;font-size:13.5px;position:relative}
+  .lrow .lv{color:var(--ink);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .lrow .lt{font-size:11px;color:var(--faint);letter-spacing:.03em}
+  .lrow .lver{font-size:11px;color:var(--faint);text-align:right;min-width:82px}
+  .lrow.current{background:var(--acc-soft)}
+  .lrow.current .lv{color:var(--acc);font-weight:600}
+  .lrow.current .lver{color:var(--acc);font-weight:600}
+  .lrow.retired .lv{color:var(--faint);text-decoration:line-through;text-decoration-color:var(--bad);opacity:.85}
+  .lrow.retired .lver{color:var(--bad)}
+  .lfoot{display:flex;align-items:center;gap:10px;padding:14px 18px;border-top:1px dashed var(--line2);
+    font-size:13.5px;background:linear-gradient(var(--paper2),var(--paper2))}
+  .lfoot .q{color:var(--text)} .lfoot .ar{color:var(--faint)}
+  .lfoot .ans{color:var(--acc);font-weight:600}
+  .lfoot .chk{margin-left:auto;font-size:11px;color:var(--acc);letter-spacing:.03em}
+  .perf{height:9px;background:radial-gradient(circle at 6px -3px,transparent 4px,var(--card) 4.5px) 0 0/12px 9px repeat-x;
+    border-top:0}
+
+  /* ---- receipt sections ---- */
+  section.rec{padding:56px 0 4px}
+  .rec > h2{font-weight:600;font-size:12px;font-family:var(--mono);letter-spacing:.22em;text-transform:uppercase;
+    color:var(--acc);margin-bottom:22px;display:flex;align-items:center;gap:12px}
+  .rec > h2::after{content:"";flex:1;height:1px;background:var(--line)}
+  .card{border:1px solid var(--line);border-radius:14px;background:var(--card);padding:24px 26px;margin-bottom:15px;
+    display:grid;grid-template-columns:1fr 168px;gap:16px 30px;align-items:start;
+    box-shadow:0 1px 0 #fff inset;transition:border-color .16s,box-shadow .16s}
+  .card:hover{border-color:var(--line2);box-shadow:0 1px 0 #fff inset,0 14px 34px -28px rgba(23,21,15,.55)}
+  .card .body{min-width:0}
+  .card .prop{font-family:var(--mono);font-size:11px;letter-spacing:.15em;text-transform:uppercase;color:var(--acc);
+    margin-bottom:9px;display:flex;align-items:center;gap:8px}
+  .card .prop::before{content:"";width:5px;height:5px;border-radius:1px;background:var(--acc)}
+  .card .claim{font-size:20px;line-height:1.4;letter-spacing:-.012em}
+  .card .claim b{font-weight:600}
+  .card .note{margin-top:10px;font-size:15px;color:var(--text);line-height:1.56}
+  .card .note b{color:var(--ink);font-weight:600} .card .note code{font-family:var(--mono);font-size:.88em;color:var(--ink)}
+  .card .note .lim{color:var(--gold)}
+  .card .side{border-left:1px solid var(--line);padding-left:26px}
+  .card .metric{font-family:var(--mono);font-size:27px;font-weight:600;letter-spacing:-.02em;color:var(--ink);line-height:1}
+  .card .metric.to{color:var(--acc)} .card .metric .from{color:var(--bad)} .card .metric .to{color:var(--acc)}
+  .card .mlab{font-family:var(--mono);font-size:11px;color:var(--faint);margin-top:8px;line-height:1.45}
+  .card .probe{display:inline-flex;align-items:center;gap:6px;margin-top:14px;font-family:var(--mono);font-size:12px;
+    color:var(--faint);border:1px solid var(--line);border-radius:8px;padding:7px 12px;transition:.16s}
+  .card .probe:hover{border-color:var(--acc);color:var(--acc);background:var(--acc-soft)}
+
+  /* ---- footer ---- */
+  .foot{border-top:1px solid var(--line);margin-top:56px;padding:36px 0 64px;color:var(--faint);
+    font-family:var(--mono);font-size:12.5px;line-height:1.85}
+  .foot a{color:var(--acc)}
+  .install{font-family:var(--mono);font-size:13px;background:var(--card);border:1px solid var(--line2);
+    border-radius:10px;padding:15px 17px;color:var(--text);overflow-x:auto;white-space:nowrap}
+  .install b{color:var(--ink)} .install .p{color:var(--acc)}
+  .foot p{max-width:74ch}
+
+  @media(max-width:820px){
+    .mast{grid-template-columns:1fr;gap:36px}
+    .ledger{position:static}
+  }
+  @media(max-width:560px){
+    .card{grid-template-columns:1fr}
+    .card .side{border-left:0;border-top:1px solid var(--line);padding-left:0;padding-top:16px;
+      display:flex;align-items:baseline;gap:14px}
+    .card .mlab{margin-top:0}
+    .top .nav{gap:14px}
+  }
+  @media(prefers-reduced-motion:reduce){*{transition:none!important;scroll-behavior:auto!important}}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header class="top">
+    <a class="logo" href="https://dancenitra.github.io/agora/">
+      <svg viewBox="0 0 28 28" aria-hidden="true">
+        <rect x="4" y="18.4" width="12" height="3" rx="1.5" fill="#17150f" opacity=".2"></rect>
+        <rect x="4" y="12.9" width="15.5" height="3" rx="1.5" fill="#17150f" opacity=".36"></rect>
+        <rect x="4" y="7" width="20" height="3.4" rx="1.7" fill="#0c7a55"></rect>
+      </svg>
+      <span class="wm">mnemo<span class="dot">.</span></span>
+    </a>
+    <nav class="nav">
+      <a class="lnk" href="https://github.com/DanceNitra/agora/tree/main/mnemo">source</a>
+      <a class="lnk" href="https://pypi.org/project/agora-mnemo/">pypi</a>
+      <a class="lnk" href="https://dancenitra.github.io/agora/">agora</a>
+    </nav>
+  </header>
+
+  <div class="mast">
+    <div class="mcopy">
+      <div class="kick">the memory layer that keeps its receipts</div>
+      <h1>Every rule is a <em>runnable</em> receipt.</h1>
+      <p class="lede">mnemo is a zero-dependency memory layer for AI agents. Storing and recalling is the easy
+      half; the hard half is <b>integrity</b> — which version of a fact wins, whether a corrected value can be
+      resurrected, who may undo it, and whether you can prove an erasure. Every claim below ships with the
+      <b>number we measured</b> and the <b>test that would kill it</b> if it were false.</p>
+      <p class="honest">Honest framing: these are our own self-tests on synthetic adversarial fixtures, not a
+      benchmark against other products. Each probe certifies a mechanism holds on a designed case — pre-registered
+      checks, not an external effect size. Some probes need a local embedder (<span class="m">nomic-embed-text</span>);
+      those are marked.</p>
+      <div class="facts"><b>0 dependencies</b><span class="s">·</span><b>12</b> MCP tools<span class="s">·</span>
+        <b>10+</b> runnable receipts<span class="s">·</span><b>MIT</b> open core</div>
+    </div>
+
+    <!-- signature: a live ledger showing the one thing mnemo is about — which version wins -->
+    <div class="ledger" role="img" aria-label="A memory ledger: region set to frankfurt (v1), corrected to ohio (v2, current); a later restatement of frankfurt is retired as an echo; recall returns ohio, the current truth.">
+      <div class="lh"><b>region</b><span>keyed · versioned</span></div>
+      <div class="rows">
+        <div class="lrow"><span class="lv">frankfurt</span><span class="lt">set</span><span class="lver">v1</span></div>
+        <div class="lrow current"><span class="lv">ohio</span><span class="lt">correction</span><span class="lver">v2 · current</span></div>
+        <div class="lrow retired"><span class="lv">frankfurt <span style="opacity:.7">(restated)</span></span><span class="lt">echo</span><span class="lver">retired</span></div>
+      </div>
+      <div class="lfoot"><span class="q">recall "region"</span><span class="ar">→</span><span class="ans">ohio</span><span class="chk">✓ current-truth</span></div>
+      <div class="perf"></div>
+    </div>
+  </div>
+
+  <section class="rec">
+    <h2>Integrity under adversarial or careless edits</h2>
+
+    <div class="card">
+      <div class="body">
+        <div class="prop">echo-attack resistance</div>
+        <div class="claim">On our echo fixture, restating a corrected-away value doesn't resurrect it.</div>
+        <div class="note">Say "region is Frankfurt", correct to "Ohio", then say "Frankfurt" again. With the
+        guard off the restatement wins 100% of the time; with it on, the echo adds <b>zero</b> stale over the
+        no-echo baseline (a ~28% floor from ordinary decay remains, and it assumes accurate object extraction).
+        Similarity can't do this job: one preprint reports cosine separating a contradiction from a duplicate at
+        AUROC ~0.59, near chance (MemStrata, arXiv:2606.26511, unreviewed).
+        <span class="lim">What it doesn't prove: efficacy rides on your extractor's accuracy.</span></div>
+        <a class="probe" href="https://github.com/DanceNitra/agora/blob/main/mnemo/probes/echo_guard_e2e_probe.py">run echo_guard_e2e_probe.py →</a>
+      </div>
+      <div class="side"><div class="metric to">+0</div>
+        <div class="mlab">stale the echo adds<br>(guard on; off: 100%)</div></div>
+    </div>
+
+    <div class="card">
+      <div class="body">
+        <div class="prop">deterministic supersession</div>
+        <div class="claim">A corrected fact stops being recalled — deterministically, <b>no LLM in the stale-fact path</b>.</div>
+        <div class="note">Recency alone lets an attacker win with one last write. mnemo keys on the value, and
+        an earned-outcome tiebreaker dislodges a corroborated-but-false value that a write-only attacker can't
+        manufacture.</div>
+        <a class="probe" href="https://github.com/DanceNitra/agora/blob/main/mnemo/probes/recency_recipe_poison_probe.py">run recency_recipe_poison_probe.py →</a>
+      </div>
+      <div class="side"><div class="metric to">5 / 5</div><div class="mlab">pre-registered checks</div></div>
+    </div>
+
+    <div class="card">
+      <div class="body">
+        <div class="prop">write-time conflict check</div>
+        <div class="claim">Flag a fact that would <b>contradict</b> what's stored, before you commit it.</div>
+        <div class="note">A pure duplicate does not flag; a contradiction that looks like a duplicate does — the
+        case a similarity gate misses, because a corrected value is often <i>more</i> embedding-similar to the
+        original than a rephrase.</div>
+        <a class="probe" href="https://github.com/DanceNitra/agora/blob/main/mnemo/probes/check_conflict_probe.py">run check_conflict_probe.py →</a>
+      </div>
+      <div class="side"><div class="metric to">8 / 8</div><div class="mlab">checks</div></div>
+    </div>
+
+    <div class="card">
+      <div class="body">
+        <div class="prop">value-obscuring revert</div>
+        <div class="claim">"Go back to what we had" resolves against the version timeline — <b>no value named</b>.</div>
+        <div class="note">A one-call router tags an utterance assert / correct / revert and walks the history to
+        restore the predecessor. On our fixture, every <i>marked</i> revert routes correctly (1.00) with zero
+        LLM. The unmarked case (an echo and a genuine reaffirm can be byte-identical) is <span class="lim">not
+        hidden — it's a measured policy frontier</span>: no classifier separates them, so you pick the failure
+        mode.</div>
+        <a class="probe" href="https://github.com/DanceNitra/agora/blob/main/mnemo/probes/route_probe.py">run route_probe.py →</a>
+      </div>
+      <div class="side"><div class="metric to">1.00</div><div class="mlab">marked reverts<br>(our fixture)</div></div>
+    </div>
+  </section>
+
+  <section class="rec">
+    <h2>Authorization &amp; provenance</h2>
+
+    <div class="card">
+      <div class="body">
+        <div class="prop">authorized revert channel</div>
+        <div class="claim">Content <b>alone</b> can't undo a correction — a revert needs an out-of-band capability
+        the input stream can't forge.</div>
+        <div class="note">A text-derived "go back" returns <code>authorization_required</code> instead of
+        executing. In asymmetric mode the store holds only a public key and can verify but never mint, so even a
+        compromised on-box harness can't forge a revert — only the off-box private key does.
+        <span class="lim">Honest boundary: it doesn't stop a stolen private key or authenticate a human.</span></div>
+        <a class="probe" href="https://github.com/DanceNitra/agora/blob/main/mnemo/probes/authorized_revert_probe.py">run authorized_revert_probe.py →</a>
+      </div>
+      <div class="side"><div class="metric to">11 / 11</div><div class="mlab">adversarial checks</div></div>
+    </div>
+
+    <div class="card">
+      <div class="body">
+        <div class="prop">binding under concurrency</div>
+        <div class="claim">A captured capability is valid for <b>exactly one state</b> — replay window of 1.</div>
+        <div class="note">The capability binds to the current record, so a legit revert racing a live update
+        fails closed and re-mints against the new state (the liveness cost). The loose alternative would leave one
+        captured capability valid across every later value; we measured that window and chose not to take it.</div>
+        <a class="probe" href="https://github.com/DanceNitra/agora/blob/main/mnemo/probes/revert_concurrency_probe.py">run revert_concurrency_probe.py →</a>
+      </div>
+      <div class="side"><div class="metric to">1</div><div class="mlab">state replay window<br>(loose: 3)</div></div>
+    </div>
+
+    <div class="card">
+      <div class="body">
+        <div class="prop">signed content-free tombstone</div>
+        <div class="claim">Erase a subject's content <b>in the store</b> and keep the audit chain verifying.</div>
+        <div class="note">A plain delete makes a tamper-evident store report "altered out of band". mnemo erases
+        the content and leaves a signed, content-free tombstone, so verification reports the erasure as
+        accounted-for — a record missing <i>without</i> a tombstone still flags, and a forged tombstone is caught.
+        <span class="lim">What it doesn't do: reach backups, replicas, or already-derived embeddings; a store-local
+        primitive, not a compliance guarantee.</span></div>
+        <a class="probe" href="https://github.com/DanceNitra/agora/blob/main/mnemo/probes/forget_subject_tombstone_probe.py">run forget_subject_tombstone_probe.py →</a>
+      </div>
+      <div class="side"><div class="metric to">8 / 8</div><div class="mlab">checks</div></div>
+    </div>
+
+    <div class="card">
+      <div class="body">
+        <div class="prop">data minimization</div>
+        <div class="claim">Age-bound retention that never expires the <b>current</b> value of a key.</div>
+        <div class="note">Storage-limitation as a native primitive: drop old superseded values and stale episodic
+        turns, but never the live state or a graduated semantic fact.</div>
+        <a class="probe" href="https://github.com/DanceNitra/agora/blob/main/mnemo/probes/retention_probe.py">run retention_probe.py →</a>
+      </div>
+      <div class="side"><div class="metric to">7 / 7</div><div class="mlab">checks</div></div>
+    </div>
+  </section>
+
+  <section class="rec">
+    <h2>The fixture behind the claims</h2>
+    <div class="card">
+      <div class="body">
+        <div class="prop">the coreference fixture</div>
+        <div class="claim">A demo fixture where <b>no lexical or surface signal</b> exists, but a chain-walker recovers the label.</div>
+        <div class="note">"Use the pick from whoever owns the release train" — the label depends on a two-hop chain
+        (role → who owns it → which value they set), never on a name, value, or keyword. On the held-out
+        (unseen-phrasing) split, the lexical baselines (anchor-substring, value, keyword) have nothing to fire on
+        and never trigger; cosine sits <i>below</i> chance (AUROC 0.39); and a word-shape learner trained on one
+        register fails on the other. An LLM that walks the chain recovers it at 0.98.
+        <span class="lim">A designed demo fixture, not a standard benchmark; F1-0.00 baselines mean "no signal to
+        exploit" — read the AUROC and the LLM control for the real story.</span></div>
+        <a class="probe" href="https://github.com/DanceNitra/agora/blob/main/mnemo/probes/v4nat_audit_probe.py">run v4nat_audit_probe.py →</a>
+      </div>
+      <div class="side"><div class="metric"><span class="from">0.39</span> · <span class="to">0.98</span></div>
+        <div class="mlab">cosine AUROC ·<br>chain-walker</div></div>
+    </div>
+  </section>
+
+  <div class="foot">
+    <div class="install">$ pip install <b>agora-mnemo</b> &nbsp;&nbsp;·&nbsp;&nbsp; MCP: <span class="p">uvx --from "agora-mnemo[mcp]" mnemo-mcp</span></div>
+    <p style="margin-top:18px">Every measured number on this page comes from a probe in
+    <a href="https://github.com/DanceNitra/agora/tree/main/mnemo/probes">mnemo/probes/</a> (the one cited figure
+    we did <i>not</i> measure, cosine AUROC ~0.59, is attributed to its preprint inline). These are self-tests on
+    synthetic fixtures — they show a mechanism holds on a designed adversarial case, not that it holds on your
+    production workload, and not a comparison against other products. If a probe doesn't reproduce for you, open
+    an issue and we'll fix it.</p>
+    <p style="margin-top:12px">mnemo · a zero-dependency memory layer · MIT · part of
+    <a href="https://dancenitra.github.io/agora/">Agora</a>.</p>
+  </div>
+
+</div>
+</body>
+</html>
