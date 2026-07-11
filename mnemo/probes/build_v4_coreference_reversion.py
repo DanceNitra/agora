@@ -73,8 +73,11 @@ def _has_kw(t):
     return any(w in tl for w in REVERT_WORDS) or any(w in tl for w in KEEP_WORDS)
 
 
-def _cand(role, idx):
-    c = TEMPLATES[idx % len(TEMPLATES)].format(r=role)
+def _cand(role, idx=None):
+    # RANDOM template, independent of the label. The first fix of v4 still assigned templates by an
+    # alternating index (revert=even, keep=odd), so the template WORDING alone predicted the label at
+    # F1 0.92 — a pure phrasing shortcut. Random assignment + the template-balance assert below close it.
+    c = random.choice(TEMPLATES).format(r=role)
     assert not _has_kw(c), f"keyword leaked: {c!r}"
     return c
 
@@ -138,6 +141,23 @@ def main():
         assert r["anchor_old"].lower() not in c and r["anchor_current"].lower() not in c, \
             f"anchor name leaked into candidate (the v4 bug): {c!r}"
         assert r["anchor_old"] != r["anchor_current"] and r["role_old"] != r["role_current"], "degenerate row"
+    # template-balance assert: no template's wording may predict the label. For each template, the share of
+    # label-1 rows among the 120 obscuring rows must sit in [0.25, 0.75] (chance = 0.5).
+    def _sig(cand):
+        s = cand
+        for role in sorted(ROLES, key=len, reverse=True):
+            s = s.replace(role, "{r}")
+        return s
+    tstat = {}
+    for r in rows:
+        if r["kind"] == "named_new":
+            continue
+        s = _sig(r["candidate"])
+        a, b = tstat.get(s, (0, 0))
+        tstat[s] = (a + r["reopens_stale"], b + 1)
+    for s, (ones, tot) in tstat.items():
+        share = ones / tot
+        assert 0.25 <= share <= 0.75, f"template predicts the label ({share:.2f}): {s!r}"
     both_a = [a for a in ANCHORS if anchor_role[(a, "old")] and anchor_role[(a, "current")]]
     both_r = [r for r in ROLES if role_label[(r, "old")] and role_label[(r, "current")]]
     print(f"anchors used as BOTH old and current: {len(both_a)}/{len(ANCHORS)}")
