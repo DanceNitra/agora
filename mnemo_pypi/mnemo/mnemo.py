@@ -122,7 +122,11 @@ def sign_revert(principal_sk_hex: str, challenge: str) -> str:
     sk = _Ed25519SK.from_private_bytes(bytes.fromhex(principal_sk_hex))
     return sk.sign(challenge.encode()).hex()
 
-__version__ = "0.7.11"
+__version__ = "0.7.12"
+
+# Internal sentinel: marks a reaffirm write already authorized by submit_revert() (which verified the
+# signed INTENT). Object identity — no text/content path can ever produce it.
+_SANCTIONED = object()
 _WORD = re.compile(r"[a-z0-9][a-z0-9\-']{2,}")
 _STOP = frozenset("the a an of for to in on and or is are was were be been with this that it its as "
                   "by at from into our we us you your he she they them his her their not no".split())
@@ -192,6 +196,10 @@ class Mnemo:
         # never MINT an authorization -> even a compromised on-box harness cannot forge a revert. Closes the
         # symmetric mode's residual (whoever holds the HMAC secret can mint). Both need cryptography for Ed25519.
         self.revert_pubkey = revert_pubkey
+        # in-stream revert nonce ledger (0.7.12): consumed on EVALUATION, landed or not. Landed intents also
+        # persist their nonce in the record meta, so single-use survives a reload; a conflicted-but-unlanded
+        # nonce is only held in memory (honest boundary: after a restart it would conflict again, not land).
+        self._consumed_revert_nonces: set[str] = set()
         self.items: list[dict] = []
         self._tok_cache: dict[str, set] = {}     # id -> token set, so recall doesn't re-tokenize
         self._tc_cache: dict[str, dict] = {}     # id -> term-frequency map, for the BM25 hybrid channel
@@ -484,7 +492,7 @@ class Mnemo:
         # AUTHORIZED-REVERT GATE: a reaffirm write is the one path that restores a superseded value past the
         # echo guard, so when an authority is configured it needs the same capability as revert() — else the
         # content path could just call remember(reaffirm=True) directly. A bad/missing capability is loud.
-        if reaffirm and (self.revert_authority is not None or self.revert_pubkey is not None)                 and not self._revert_authorized(key, capability):
+        if reaffirm and (self.revert_authority is not None or self.revert_pubkey is not None)                 and capability is not _SANCTIONED and not self._revert_authorized(key, capability):
             raise PermissionError("reaffirm/revert requires a valid capability (revert authority is set)")
         # ORIGIN ATTESTATION (OPT-IN): bind this claim to a source's VERIFIED KEY. attestation is
         # (pubkey_hex, sig_hex) or {"pubkey":..., "sig":...}; the signature (from mnemo.attest(text, sk,
@@ -984,6 +992,115 @@ class Mnemo:
                             meta={"revert_of": tgt["id"], "reverted_from": cur["id"]})
         return {"ok": True, "restored": rid, "superseded": cur["id"],
                 "reverted_to_object": tgt.get("object"), "reverted_to_text": tgt["text"]}
+
+    # ── IN-STREAM revert (0.7.12, design by jacksonxly r/RAG): scheduling, not acceptance ────────
+    # The optimistic model (revert_challenge/revert_capability above) snapshots the current active id and
+    # then RACES the writer to redeem it: under sustained same-slot writes it starves by construction, and
+    # the only optimistic rescue (accepting a slightly stale base) is a bounded-N replay window. The
+    # in-stream model instead signs the COMMAND (an intent carrying its own precondition + a single-use
+    # nonce) and evaluates it at its position in the per-key write stream:
+    #   - a RELATIVE intent ("go back", base = the active id at mint) lands iff its base is still current,
+    #     else returns a CLEAN CONFLICT — a first-class outcome distinct from authorization_required. A
+    #     relative revert over a moved base does not deserve to land (landing it anyway IS replay).
+    #   - an ABSOLUTE intent (a named historical target) lands deterministically regardless of intervening
+    #     writes — an absolute target was never a stale cap. Single-use via the nonce ledger.
+    # Net: unconditional liveness for named reverts, bounded evaluation with clean conflict for relative
+    # ones, replay window stays 1. (In-process the stream IS the call order; multi-actor fairness is the
+    # caller's scheduling duty — an unfair writer-priority scheduler can still tail-latency the reverter.)
+
+    def revert_intent(self, key: str, nonce: str | None = None) -> str:
+        """Mint point for a RELATIVE in-stream revert: "revert:{key}@{base_id}#{nonce}". The principal signs
+        THIS string (sign_revert / HMAC); base = the active id now, so the precondition travels inside the
+        signed command instead of being re-derived at redeem time."""
+        nonce = nonce or hashlib.sha256(os.urandom(16)).hexdigest()[:16]
+        return "revert:" + key + "@" + self._current_active_id(key) + "#" + nonce
+
+    def restore_intent(self, key: str, target: str, nonce: str | None = None) -> str:
+        """Mint point for an ABSOLUTE in-stream revert to a NAMED historical value: no precondition, so it
+        lands regardless of intervening writes — exactly once (the nonce is single-use)."""
+        nonce = nonce or hashlib.sha256(os.urandom(16)).hexdigest()[:16]
+        return "restore:" + key + "=" + target + "#" + nonce
+
+    def _intent_authorized(self, intent: str, capability: str | None) -> bool:
+        """Same crypto as _revert_authorized, but over the INTENT string (the signed command)."""
+        if self.revert_authority is None and self.revert_pubkey is None:
+            return True
+        if not capability:
+            return False
+        if self.revert_pubkey is not None:
+            if not _HAVE_ED:
+                raise RuntimeError("verifying a revert signature needs the `cryptography` package")
+            try:
+                _Ed25519PK.from_public_bytes(bytes.fromhex(self.revert_pubkey)).verify(
+                    bytes.fromhex(capability), intent.encode())
+                return True
+            except Exception:
+                return False
+        want = hmac.new(self.revert_authority.encode(), intent.encode(), hashlib.sha256).hexdigest()
+        return hmac.compare_digest(want, capability)
+
+    def _nonce_consumed(self, nonce: str) -> bool:
+        if nonce in self._consumed_revert_nonces:
+            return True
+        # landed intents persist their nonce in the ledgered record, so single-use survives a reload
+        return any((r.get("meta") or {}).get("revert_nonce") == nonce for r in self.items)
+
+    def submit_revert(self, intent: str, capability: str | None = None) -> dict:
+        """Evaluate a signed revert INTENT at this position in the write stream. Outcomes are first-class:
+        {"ok": True, ...} landed · {"ok": False, "reason": "conflict"} the relative base moved (definitive,
+        not a retry loop — re-issue or name a target) · "replay_rejected" nonce already consumed ·
+        "authorization_required" bad/missing capability · "unknown_target" absolute target never held the
+        key. Consumes the nonce on evaluation, landed or not."""
+        if not self._intent_authorized(intent, capability):
+            return {"ok": False, "reason": "authorization_required", "intent": intent}
+        m_rel = re.match(r"^revert:(.+)@([0-9a-f]*)#([0-9a-f]+)$", intent)
+        m_abs = re.match(r"^restore:(.+?)=(.+)#([0-9a-f]+)$", intent)
+        if not m_rel and not m_abs:
+            return {"ok": False, "reason": "malformed_intent", "intent": intent}
+        nonce = (m_rel or m_abs).group(3)
+        if self._nonce_consumed(nonce):
+            return {"ok": False, "reason": "replay_rejected"}
+        self._consumed_revert_nonces.add(nonce)
+        if m_rel:
+            key, base = m_rel.group(1), m_rel.group(2)
+            cur_id = self._current_active_id(key)
+            if base != cur_id:
+                return {"ok": False, "reason": "conflict", "key": key, "base_id": base,
+                        "current_id": cur_id,
+                        "note": "base moved; a relative revert over a moved base does not deserve to land"}
+            same_key = [r for r in self.items if r.get("key") == key]
+            active = [r for r in same_key if r.get("status") == "active"]
+            if not active:
+                return {"ok": False, "reason": "no active record for key"}
+            cur = max(active, key=lambda r: r.get("valid_from", r["ts"]))
+            prev = [r for r in same_key
+                    if r.get("status") == "superseded"
+                    and (r.get("meta") or {}).get("superseded_by_toggle") == cur["id"]
+                    and not (r.get("meta") or {}).get("echo_blocked")
+                    and not (r.get("meta") or {}).get("objectless_blocked")]
+            if not prev:
+                return {"ok": False, "reason": "no superseded predecessor for key"}
+            tgt = max(prev, key=lambda r: r.get("valid_from", r["ts"]))
+            rid = self.remember(tgt["text"], tags=tgt.get("tags"), value=tgt.get("value", 1.0),
+                                mtype=tgt.get("mtype"), key=key, object=tgt.get("object"),
+                                reaffirm=True, capability=_SANCTIONED,
+                                meta={"revert_of": tgt["id"], "reverted_from": cur["id"],
+                                      "revert_nonce": nonce, "instream": "relative"})
+            return {"ok": True, "kind": "relative", "restored": rid, "superseded": cur["id"],
+                    "reverted_to_object": tgt.get("object")}
+        key, target = m_abs.group(1), m_abs.group(2)
+        chain = self._route_chain(key)
+        if target not in chain:
+            return {"ok": False, "reason": "unknown_target", "key": key, "target": target,
+                    "note": "an absolute intent can only restore a value that actually held the key"}
+        if chain and chain[-1] == target:
+            return {"ok": True, "kind": "absolute", "restored": None, "target": target,
+                    "note": "target already current (no-op land)"}
+        rid = self.remember(f"restore {key} to {target}", key=key, object=target,
+                            reaffirm=True, capability=_SANCTIONED,
+                            meta={"routed": "revert_named_instream", "revert_nonce": nonce,
+                                  "instream": "absolute"})
+        return {"ok": True, "kind": "absolute", "restored": rid, "target": target}
 
     # ── route(): the write-path intent router (tagger + fuzzy-version resolver) ─
     _ROUTE_REVERT = re.compile(
