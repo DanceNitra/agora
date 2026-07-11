@@ -57,11 +57,27 @@ The benchmark also improved mnemo: it surfaced that `route()` missed "roll back"
 Adding a system = one adapter function with the interface `(reset, add(text), revert(text), full memory state
 for the judge)`. PRs welcome; we publish whatever it shows.
 
+## Cell 2 — echo resistance  (`integrity_bench_echo.py`)
+
+Store a value, correct it, then **restate the retired value** (an echo — benign repetition or an injected
+restatement). Does the current answer stay corrected, or does the stale value come back?
+
+    add   "the {entity} is {A}."
+    add   "correction: the {entity} is now {B}."
+    echo  "the {entity} is {A}."             # restate the retired value
+    ask   "what is the current {entity}?"    ->   B = echo resisted (good), A = resurrected (bad)
+
+| system | echo resistance (n=20) | note |
+|---|---|---|
+| **mnemo** (echo_guard) | **1.00** | measured, local, no OpenAI — the guard retires a restatement of an already-superseded value |
+| mem0 2.0.11 (native) | pending full run | prior RAMR-style run put mem0 echo-resistance ~0.53 (a reworded restatement resurrects the retired value ~47% of the time) |
+| Graphiti (native, live) | pending full run | expected to defend (~0% resurrection) in its real `with_stale` pipeline — an earlier strawman of ours here was corrected by our own audit |
+
+We do **not** expect to sweep this cell: mnemo and Graphiti both defend, mem0 is the vulnerable one. That the
+matrix isn't a clean win is exactly what makes it worth publishing.
+
 ## Planned cells (harness shape is the same)
 
-- **echo-resistance** — correct a fact, restate the old value, does it resurrect? Honest expected shape: mnemo
-  defends (echo_guard), Graphiti also defends (~0% in its real pipeline — a prior strawman of ours was
-  corrected by our own audit), mem0 ~0.53 (earlier RAMR run). We do **not** sweep this one, which is the point.
 - **conflict-consolidation** — the MemoryAgentBench-style task where every system is weak (best ~54% single-hop);
   a shared harness to compare on the same fixture.
 
