@@ -353,5 +353,161 @@
       ]
     }
   },
-  "graphiti_note": "EXCLUDED: on the no-OpenAI stack (glm shim) graphiti extraction produced empty fact surfaces in 15-17/20 cases \u2014 pipeline not measurement-grade in this config; its native stack needs OpenAI. Not a claim about graphiti behavior."
+  "graphiti_note": "EXCLUDED: on the no-OpenAI stack (glm shim) graphiti extraction produced empty fact surfaces in 15-17/20 cases \u2014 pipeline not measurement-grade in this config; its native stack needs OpenAI. Not a claim about graphiti behavior.",
+  "stageB2": {
+    "glm-5.2:cloud|storeonly|canonical:echo": {
+      "model": "glm-5.2:cloud",
+      "surface": "canonical",
+      "mode": "echo",
+      "n": 20,
+      "errors": 0,
+      "store_only_A_rate": 0.45,
+      "store_only_ci95": [
+        0.258,
+        0.658
+      ]
+    },
+    "glm-5.2:cloud|storeonly|mnemo:echo": {
+      "model": "glm-5.2:cloud",
+      "surface": "mnemo:echo",
+      "mode": "echo",
+      "n": 20,
+      "errors": 0,
+      "store_only_A_rate": 0.0,
+      "store_only_ci95": [
+        -0.0,
+        0.161
+      ]
+    },
+    "glm-5.2:cloud|storeonly|mnemo:unreverted": {
+      "model": "glm-5.2:cloud",
+      "surface": "mnemo:unreverted",
+      "mode": "unreverted",
+      "n": 20,
+      "errors": 0,
+      "store_only_A_rate": 1.0,
+      "store_only_ci95": [
+        0.839,
+        1.0
+      ]
+    },
+    "glm-5.2:cloud|storeonly|mem0:echo": {
+      "model": "glm-5.2:cloud",
+      "surface": "mem0:echo",
+      "mode": "echo",
+      "n": 20,
+      "errors": 0,
+      "store_only_A_rate": 0.25,
+      "store_only_ci95": [
+        0.112,
+        0.469
+      ]
+    },
+    "glm-5.2:cloud|storeonly|mem0:unreverted": {
+      "model": "glm-5.2:cloud",
+      "surface": "mem0:unreverted",
+      "mode": "unreverted",
+      "n": 20,
+      "errors": 0,
+      "store_only_A_rate": 0.55,
+      "store_only_ci95": [
+        0.342,
+        0.742
+      ]
+    },
+    "glm-5.2:cloud|canonical_rev:echo": {
+      "model": "glm-5.2:cloud",
+      "surface": "canonical_rev",
+      "mode": "echo",
+      "n": 20,
+      "errors": 0,
+      "acted_on_A_rate": 0.0,
+      "act_ci95": [
+        -0.0,
+        0.161
+      ],
+      "wrote_back_A_rate": 0.0,
+      "writeback_ci95": [
+        -0.0,
+        0.161
+      ]
+    },
+    "deepseek-v4-flash|storeonly|canonical:echo": {
+      "model": "deepseek-v4-flash",
+      "surface": "canonical",
+      "mode": "echo",
+      "n": 20,
+      "errors": 0,
+      "store_only_A_rate": 0.85,
+      "store_only_ci95": [
+        0.64,
+        0.948
+      ]
+    },
+    "deepseek-v4-flash|storeonly|mnemo:echo": {
+      "model": "deepseek-v4-flash",
+      "surface": "mnemo:echo",
+      "mode": "echo",
+      "n": 20,
+      "errors": 0,
+      "store_only_A_rate": 0.0,
+      "store_only_ci95": [
+        -0.0,
+        0.161
+      ]
+    },
+    "deepseek-v4-flash|storeonly|mnemo:unreverted": {
+      "model": "deepseek-v4-flash",
+      "surface": "mnemo:unreverted",
+      "mode": "unreverted",
+      "n": 20,
+      "errors": 0,
+      "store_only_A_rate": 1.0,
+      "store_only_ci95": [
+        0.839,
+        1.0
+      ]
+    },
+    "deepseek-v4-flash|storeonly|mem0:echo": {
+      "model": "deepseek-v4-flash",
+      "surface": "mem0:echo",
+      "mode": "echo",
+      "n": 20,
+      "errors": 0,
+      "store_only_A_rate": 0.25,
+      "store_only_ci95": [
+        0.112,
+        0.469
+      ]
+    },
+    "deepseek-v4-flash|storeonly|mem0:unreverted": {
+      "model": "deepseek-v4-flash",
+      "surface": "mem0:unreverted",
+      "mode": "unreverted",
+      "n": 20,
+      "errors": 0,
+      "store_only_A_rate": 0.6,
+      "store_only_ci95": [
+        0.387,
+        0.781
+      ]
+    },
+    "deepseek-v4-flash|canonical_rev:echo": {
+      "model": "deepseek-v4-flash",
+      "surface": "canonical_rev",
+      "mode": "echo",
+      "n": 20,
+      "errors": 0,
+      "acted_on_A_rate": 0.0,
+      "act_ci95": [
+        -0.0,
+        0.161
+      ],
+      "wrote_back_A_rate": 0.0,
+      "writeback_ci95": [
+        -0.0,
+        0.161
+      ]
+    }
+  }
 }

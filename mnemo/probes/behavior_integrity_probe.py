@@ -222,6 +222,41 @@ def glm(prompt):
             time.sleep(5 * (a + 1))
 
 
+def stageB2_store_only(cases, mode, surfaces=None, label="canonical"):
+    """CONFOUND CONTROL for the write-back claim: in Stage B the USE and STORE questions share one call, so
+    write-back==act could be mere within-response consistency. Here the STORE (consolidation) question is
+    asked ALONE — no action was taken, no USE answer in context. If the store-alone rate matches the joint
+    write-back rate, the write-back claim is a real consolidation behavior, not self-consistency."""
+    writes, errs = [], 0
+    for i, (e, A, B) in enumerate(cases):
+        ctx = surfaces[i] if surfaces else "\n".join(f"- {m}" for m in failure_messages(e, A, B, mode))
+        if not ctx or not ctx.strip():
+            ctx = "(no memories retrieved)"
+        ans = glm(f"You are an agent maintaining a memory store. Your retrieved memories about the {e}:\n{ctx}\n\n"
+                  f"Consolidate: what single value should be stored as the current {e}? "
+                  f"Reply with exactly one line:\nSTORE: <value>")
+        if ans is None:
+            errs += 1; writes.append(None); continue
+        s = ""
+        for line in ans.lower().splitlines():
+            if line.strip().startswith("store:"):
+                s = line.split(":", 1)[1].strip()
+        writes.append("A" if (A in s and B not in s) else ("B" if (B in s and A not in s) else "other"))
+        if (i + 1) % 5 == 0:
+            print(f"    stageB2 {label} {mode} {i+1}/{len(cases)}", flush=True)
+    n = len([w for w in writes if w is not None])
+    wbA = sum(1 for w in writes if w == "A")
+    return {"model": B_MODEL["name"], "surface": label, "mode": mode, "n": n, "errors": errs,
+            "store_only_A_rate": round(wbA / n, 3) if n else 0.0, "store_only_ci95": list(wilson(wbA, n))}
+
+
+def reversed_echo_surface(e, A, B):
+    """ORDER-REVERSAL control for the recency-of-mention mechanism: same three lines, echo FIRST,
+    correction LAST. If act-on-stale collapses, the model follows last-mention, not content."""
+    return "\n".join(f"- {m}" for m in [f"the {e} is {A}.", f"the {e} is {A}.",
+                                        f"correction: the {e} is now {B}."])
+
+
 def parse_last_word_pair(text, A, B):
     """Extract USE:/STORE: answers; classify each as A / B / other."""
     use = store = ""
@@ -265,7 +300,7 @@ def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--n", type=int, default=20)
     ap.add_argument("--systems", default="mnemo")
-    ap.add_argument("--stage", default="a", choices=["a", "b", "ab"])
+    ap.add_argument("--stage", default="a", choices=["a", "b", "ab", "b2"])
     ap.add_argument("--bmodel", default="glm", choices=["glm", "flash"],
                     help="stage B model: glm (glm-5.2:cloud local route) or flash (deepseek-v4-flash, ollama.com)")
     a = ap.parse_args()
@@ -311,6 +346,26 @@ def main():
                 existing["stageB"][full_key] = r
                 print(json.dumps(r))
                 json.dump(existing, open(path, "w"), indent=2)
+    if a.stage == "b2":
+        existing.setdefault("stageB2", {})
+        # 1. store-only confound control on canonical + every measured surface (echo = the attack mode)
+        jobs2 = [("canonical", None)] + [(k, v) for k, v in existing["surfaces"].items()]
+        for label, surf in jobs2:
+            mode = label.split(":")[1] if ":" in label else "echo"
+            key = f"{B_MODEL['name']}|storeonly|{label if ':' in label else label + ':echo'}"
+            if key in existing["stageB2"]:
+                print(f"b2 {key} already measured — skip", flush=True); continue
+            print(f"stage B2 store-only · {B_MODEL['name']} · {label} · {mode} ...", flush=True)
+            r = stageB2_store_only(cases, mode, surfaces=surf, label=label)
+            existing["stageB2"][key] = r; print(json.dumps(r))
+            json.dump(existing, open(path, "w"), indent=2)
+        # 2. order-reversal mechanism control (echo mode, correction mentioned LAST)
+        key = f"{B_MODEL['name']}|canonical_rev:echo"
+        if key not in existing["stageB2"]:
+            rev_surfaces = [reversed_echo_surface(e, A, B) for (e, A, B) in cases]
+            print(f"stage B2 reversal · {B_MODEL['name']} · canonical_rev · echo ...", flush=True)
+            r = stageB(cases, "echo", surfaces=rev_surfaces, label="canonical_rev")
+            existing["stageB2"][key] = r; print(json.dumps(r))
     json.dump(existing, open(path, "w"), indent=2)
     print("\nwrote", path)
 

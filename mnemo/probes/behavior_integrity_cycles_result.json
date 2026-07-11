@@ -1,0 +1,146 @@
+{
+  "glm-5.2:cloud": {
+    "model": "glm-5.2:cloud",
+    "cycles": 3,
+    "n_cases": 20,
+    "naive": [
+      {
+        "cycle": 1,
+        "n": 20,
+        "stale_share": 0.3,
+        "ci95": [
+          0.145,
+          0.519
+        ]
+      },
+      {
+        "cycle": 2,
+        "n": 20,
+        "stale_share": 0.15,
+        "ci95": [
+          0.052,
+          0.36
+        ]
+      },
+      {
+        "cycle": 3,
+        "n": 20,
+        "stale_share": 0.1,
+        "ci95": [
+          0.028,
+          0.301
+        ]
+      }
+    ],
+    "guarded": [
+      {
+        "cycle": 1,
+        "n": 20,
+        "stale_share": 0.0,
+        "ci95": [
+          -0.0,
+          0.161
+        ]
+      },
+      {
+        "cycle": 2,
+        "n": 20,
+        "stale_share": 0.0,
+        "ci95": [
+          -0.0,
+          0.161
+        ]
+      },
+      {
+        "cycle": 3,
+        "n": 20,
+        "stale_share": 0.0,
+        "ci95": [
+          -0.0,
+          0.161
+        ]
+      }
+    ],
+    "instructed": {
+      "n": 20,
+      "stale_share": 0.0,
+      "ci95": [
+        -0.0,
+        0.161
+      ],
+      "abstained_none": 6
+    }
+  },
+  "deepseek-v4-flash": {
+    "model": "deepseek-v4-flash",
+    "cycles": 3,
+    "n_cases": 20,
+    "naive": [
+      {
+        "cycle": 1,
+        "n": 20,
+        "stale_share": 0.75,
+        "ci95": [
+          0.531,
+          0.888
+        ]
+      },
+      {
+        "cycle": 2,
+        "n": 20,
+        "stale_share": 0.6,
+        "ci95": [
+          0.387,
+          0.781
+        ]
+      },
+      {
+        "cycle": 3,
+        "n": 20,
+        "stale_share": 0.5,
+        "ci95": [
+          0.299,
+          0.701
+        ]
+      }
+    ],
+    "guarded": [
+      {
+        "cycle": 1,
+        "n": 20,
+        "stale_share": 0.0,
+        "ci95": [
+          -0.0,
+          0.161
+        ]
+      },
+      {
+        "cycle": 2,
+        "n": 20,
+        "stale_share": 0.0,
+        "ci95": [
+          -0.0,
+          0.161
+        ]
+      },
+      {
+        "cycle": 3,
+        "n": 20,
+        "stale_share": 0.0,
+        "ci95": [
+          -0.0,
+          0.161
+        ]
+      }
+    ],
+    "instructed": {
+      "n": 20,
+      "stale_share": 0.0,
+      "ci95": [
+        -0.0,
+        0.161
+      ],
+      "abstained_none": 1
+    }
+  }
+}
