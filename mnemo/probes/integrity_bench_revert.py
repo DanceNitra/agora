@@ -133,6 +133,40 @@ def run_mem0(cases):
     return res
 
 
+def run_graphiti(cases):
+    """Graphiti (native, live neo4j + OpenAI). Each case = its own group_id; three episodes at increasing
+    reference_time; then search the current value and judge on the returned (valid, non-invalidated) facts."""
+    import asyncio, datetime
+    from graphiti_core import Graphiti
+    from graphiti_core.nodes import EpisodeType
+
+    async def _run():
+        g = Graphiti("bolt://localhost:7687", "neo4j", "testpassword123")
+        out = []
+        try:
+            await g.build_indices_and_constraints()
+            for i, (e, A, B, rev) in enumerate(cases):
+                try:
+                    gid = f"revcase_{i}_{datetime.datetime.now(datetime.timezone.utc).strftime('%H%M%S%f')}"
+                    t0 = datetime.datetime(2026, 7, 11, 10, 0, 0, tzinfo=datetime.timezone.utc)
+                    for j, msg in enumerate([f"the {e} is {A}", f"correction: the {e} is now {B}", rev]):
+                        await g.add_episode(name=f"m{j}", episode_body=msg, source_description="chat",
+                                            reference_time=t0 + datetime.timedelta(minutes=j),
+                                            source=EpisodeType.message, group_id=gid)
+                    res = await g.search(f"what is the current {e}?", group_ids=[gid], num_results=10)
+                    ctx = "\n".join(getattr(x, "fact", str(x)) for x in res)
+                    out.append(judge_current(e, ctx or "(no facts)", A, B))
+                except Exception as ex:
+                    print(f"    [graphiti case {i} error: {str(ex)[:90]}]", flush=True)
+                    out.append("error")
+                if (i + 1) % 5 == 0:
+                    print(f"    graphiti {i+1}/{len(cases)}", flush=True)
+        finally:
+            await g.close()
+        return out
+    return asyncio.run(_run())
+
+
 def score(name, verdicts, cases):
     A = sum(1 for v in verdicts if v == "A")
     B = sum(1 for v in verdicts if v == "B")
@@ -145,19 +179,27 @@ def score(name, verdicts, cases):
 
 
 def main():
-    ap = argparse.ArgumentParser(); ap.add_argument("--n", type=int, default=20); a = ap.parse_args()
+    ap = argparse.ArgumentParser(); ap.add_argument("--n", type=int, default=20)
+    ap.add_argument("--systems", default="mnemo,mem0",
+                    help="comma list: mnemo (local/free), mem0 (OpenAI $), graphiti (OpenAI $ + neo4j). "
+                         "mem0/graphiti cost OpenAI calls — opt in explicitly.")
+    a = ap.parse_args()
+    want = [s.strip() for s in a.systems.split(",") if s.strip()]
     cases = []
     for i in range(min(a.n, len(ENTS))):
         e, A, B = ENTS[i]
         cases.append((e, A, B, REVERTS[i % len(REVERTS)].format(e=e)))
-    print(f"cross-system integrity benchmark — value-obscuring revert · n={len(cases)}\n")
+    print(f"cross-system integrity benchmark — value-obscuring revert · n={len(cases)} · systems={want}\n")
     out = {}
-    print("mnemo (local, route/revert)...")
-    out["mnemo"] = score("mnemo", run_mnemo(cases), cases)
-    print(json.dumps(out["mnemo"]))
-    print("\nmem0 (native, OpenAI gpt-4o-mini)...")
-    out["mem0"] = score("mem0", run_mem0(cases), cases)
-    print(json.dumps(out["mem0"]))
+    if "mnemo" in want:
+        print("mnemo (local, route/revert)...")
+        out["mnemo"] = score("mnemo", run_mnemo(cases), cases); print(json.dumps(out["mnemo"]))
+    if "mem0" in want:
+        print("\nmem0 (native, OpenAI gpt-4o-mini)...")
+        out["mem0"] = score("mem0", run_mem0(cases), cases); print(json.dumps(out["mem0"]))
+    if "graphiti" in want:
+        print("\ngraphiti (native, live neo4j + OpenAI)...")
+        out["graphiti"] = score("graphiti", run_graphiti(cases), cases); print(json.dumps(out["graphiti"]))
     json.dump({"task": "value-obscuring revert", "metric": "revert_success_rate (current answer == old value)",
                "results": out}, open(os.path.join(os.path.dirname(__file__),
                "integrity_bench_revert_result.json"), "w"), indent=2)
