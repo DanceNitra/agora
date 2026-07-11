@@ -1,3 +1,55 @@
+# Agora — Session Handoff (2026-07-12 · the "collaboration day": jackson + Marat + breaktruth B)
+
+## PASTE THIS AFTER SESSION RESTART
+
+```
+Resume Agora. FIRST read C:\Users\Danculus\agora\HANDOFF.md top section (2026-07-12) fully. Chat SLOVAK, code/output ENGLISH.
+
+WHAT SHIPPED (all committed + pushed, main @ cd62292):
+1. INTEGRITY BENCHMARK POST (flagship, live): "We fixed our own memory benchmark until it stopped
+   flattering us" — full validate/storm/audit/verify gate; the gate CAUGHT an asymmetric instrument in
+   our own harness (mnemo scored mechanically vs competitors via LLM judge). Fair symmetric instrument:
+   mnemo revert 1.00 -> 0.75 [0.53,0.89], mem0 0.20, graphiti 0.00; echo = tie (~0 resurrection all).
+   Live: dancenitra.github.io/agora/public/posts/we-fixed-our-own-memory-benchmark-...html (+FAQ schema).
+   GSC: sitemap was submitted with a leading slash (fixed); indexing requests hit daily quota — owner
+   retries; Bing OK. Sitemap correct URL: https://dancenitra.github.io/agora/sitemap.xml
+2. mnemo 0.7.12 ON PYPI: in-stream revert (jacksonxly design "scheduling not acceptance"):
+   revert_intent/restore_intent/submit_revert — signed COMMANDS w/ single-use nonce; relative -> clean
+   CONFLICT (distinct from authorization_required) when base moved; absolute -> lands always, once.
+   Verified 3x (revert_instream_real_probe.py ALL PASS; 4 prior probes regression-clean; nonce survives
+   reload). Reply with real numbers POSTED to jackson (Reddit) incl. open question: fairness = store or
+   harness? AWAIT his reply.
+3. MARAT CORRECTION + DECOMPOSITION (the big one): his 4-line cosine solved v4nat (F1 0.905; our repro
+   0.930/1.000) vs our published "cosine dead 0.481" — HE WAS RIGHT; our audit compared only value-lines,
+   never role-lines. Shuffle kills positional (0.930->0.500) BUT structure-match + LEDGER metadata holds
+   0.930 shuffled: the task FACTORIZES (reference resolution = text; old/new = provenance). All FPs (both
+   implementations, different embedders) = unresolvable references -> abstention boundary. Public README
+   corrected w/ credit (a0e004e). His 3 Drive files read + row-level verified (his chart contains BOTH
+   cosine variants). Reply POSTED (email) incl. YES to JOINT WRITE-UP (skeleton in scratchpad/memory).
+   AWAIT his reply. RULE learned: enumerate a shortcut FAMILY before declaring it dead.
+4. BREAKTRUTH B measured (behavior_integrity_probe.py + result JSON, committed): write-back == act in
+   ALL 12 cells (the loop makes every mistake permanent); store defense kills model echo-gullibility
+   (0.60-0.75 -> 0.00, both model families); mem0 extractor two-edged (defuses echo ->0.20-0.25 but
+   blurs revert intent 1.00->0.45-0.65). graphiti honestly excluded (no-OpenAI stack not measurement-
+   grade). NOT yet gated — full validate/storm/audit/verify REQUIRED before any outward claim.
+
+CONSTRAINTS: OpenAI quota DEAD, owner will NOT top up — Ollama cloud only (deepseek-v4-flash @
+ollama.com + glm-5.2:cloud @ localhost:11434) + local nomic-embed-text. mem0-on-Ollama config in the
+probe (768-dim qdrant in TEMP). Graphiti needs OpenAI Responses API for native quality.
+
+DO NEXT (owner-prioritized): 1) when Marat replies -> joint write-up (skeleton in
+[[marat-cosine-correction-decomposition]]); 2) when jackson replies -> fairness follow-up; 3) breaktruth B
+through the FULL GATE -> flagship post candidate; 4) mnemo feature: abstention-thresholded structure-match
++ ledger detector (the Marat resolution productized) + submit_revert MCP tool; 5) drain Claude inbox (33
+stale items). OWNER MOOD RULES (hard-learned today): NEVER claim something is done/read before it is;
+build-from-inbound BEFORE drafting any reply; no negativity about collaboration write-ups; don't escape
+into new fixture versions instead of solving the problem; humanize all outward text (no em dashes).
+```
+
+Chat **Slovak**, code + output **English**. Tokens in `server/.env` — never echo on a command line.
+
+---
+
 # Agora — Session Handoff (2026-07-10 · session 2, evening)
 
 ## PASTE THIS AFTER SESSION RESTART
