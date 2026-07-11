@@ -72,11 +72,39 @@ Audited before release (`v4nat_audit_probe.py`, on the heldout split):
 | revert/keep keyword | 0.000 | keywords filtered |
 | template-signature majority | 0.000 | no skeleton predicts the label |
 | train→heldout surface transfer | 0.000 | style-A word-shapes don't carry to style B |
-| cosine (cand vs old/new line) | 0.481 (AUROC 0.387) | no distributional signal |
+| cosine (cand vs **value-bearing lines only**) | 0.481 (AUROC 0.387) | ~~"no distributional signal"~~ — **this claim was too broad; see the correction below** |
 | LLM chain-walker (glm-5.2) | **0.976** | the signal exists; a reader can walk role→anchor→value |
 | LLM chain-walker (deepseek) | 0.889 | weaker model, lower — it takes real reasoning |
 
-So every lexical/surface/cosine shortcut is dead and the held-out register defeats surface transfer, while a
-capable reader recovers the label. Intended as the fair arena for comparing multi-hop attention vs
-feature-engineered chains vs an LLM baseline on phrasings none of them trained on. Fields add `register`,
-`split` (train/heldout), `role_target`, `role_old`, `role_current` to the v4 schema.
+The lexical/surface probes hold and the held-out register defeats surface transfer. The cosine line does
+**not** hold as originally stated — see below. Fields add `register`, `split` (train/heldout), `role_target`,
+`role_old`, `role_current` to the v4 schema.
+
+### Correction (2026-07-12): the cosine family was NOT dead — found by Marat Sultanov
+
+Our audit's cosine variant compared the candidate only against the **value-bearing action lines** (selected
+by value-token presence) and never against the **role lines** — but the candidate references its anchor by
+role, so that is exactly where the signal lives. We tested one member of the cosine family and published
+"cosine is dead" for the family. That was wrong. [Marat Sultanov](https://github.com/maratsultanov2/TAT-ROOT)
+ran cosine against **all four context lines** and reported F1 0.905 / AUROC 0.964 on the heldout split; we
+reproduced it independently at **F1 0.930 / AUROC 1.000** (identical confusion shape).
+
+Localizing it changed the conclusion rather than the fixture (`v4nat_decomposition_probe.py`, all measured):
+
+| variant (heldout, n=46) | F1 | reading |
+|---|---|---|
+| cosine vs 4 lines, fixture order (Marat) | 0.930 | works — but *why*? |
+| same method, context order **shuffled** | 0.500 | the old/new half rode the fixture's FIXED line order |
+| structure-match + **ledger metadata**, order shuffled | **0.930** | the resolution |
+
+The task **factorizes**: (a) *reference resolution* — match the candidate to the right context line
+(Marat's structural step, robust); (b) *old-vs-new attribution* — not a text problem at all: in any real
+memory system this is **provenance/ledger metadata** (who set which value; supersession order). The
+fixture's fixed line order was accidentally simulating the metadata every real store has, which is why the
+shuffle kills the positional method but not the decomposed one. The residual failures (3/46) are candidates
+whose target role matches *neither* context role — unresolvable references, where the correct behavior is
+abstention, not a guess.
+
+Scope of what survives: the **role-referenced** subfamily of value-obscuring reversion is decidable from
+text + ledger metadata. The truly obscuring twin — a bare "go back" with no anchor reference — remains
+undecidable from text alone (the channel-separation result, unchanged and now more precisely bounded).
