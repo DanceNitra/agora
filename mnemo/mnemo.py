@@ -109,7 +109,7 @@ def attest(text: str, source_sk_hex: str, source_doc=None) -> str:
     sk = _Ed25519SK.from_private_bytes(bytes.fromhex(source_sk_hex))
     return sk.sign(_attest_message(text, source_doc)).hex()
 
-__version__ = "0.7.8"
+__version__ = "0.7.9"
 _WORD = re.compile(r"[a-z0-9][a-z0-9\-']{2,}")
 _STOP = frozenset("the a an of for to in on and or is are was were be been with this that it its as "
                   "by at from into our we us you your he she they them his her their not no".split())
@@ -895,6 +895,128 @@ class Mnemo:
                             meta={"revert_of": tgt["id"], "reverted_from": cur["id"]})
         return {"ok": True, "restored": rid, "superseded": cur["id"],
                 "reverted_to_object": tgt.get("object"), "reverted_to_text": tgt["text"]}
+
+    # ── route(): the write-path intent router (tagger + fuzzy-version resolver) ─
+    _ROUTE_REVERT = re.compile(
+        r"\b(go back|put .{0,24}back|revert|undo|restore|switch .{0,24}back|set .{0,24}back"
+        r"|back to (what|the (original|previous|first|initial))|the way it was"
+        r"|what we (had|started with)|very first|initial pick)\b")
+    _ROUTE_ORIGINAL = re.compile(r"\b(original|very first|started with|initial)\b")
+    _ROUTE_CORRECT = re.compile(r"\b(correction|actually|update|scratch that|is now|moved to"
+                                r"|was switched|changed to)\b")
+    _ROUTE_CHANGE_AWARE = re.compile(r"\b(changed|moved|switched|updated|correction|went through)\b")
+
+    def _route_chain(self, key: str) -> list[str]:
+        """values that were actually CURRENT at some point for `key`, oldest->newest — skips arrivals the
+        guards retired stale-on-arrival (echo_blocked / objectless_blocked were never the current value)."""
+        chain = []
+        for r in self.items:
+            if r.get("key") != key or r.get("object") is None:
+                continue
+            m = r.get("meta") or {}
+            if m.get("echo_blocked") or m.get("objectless_blocked"):
+                continue
+            if not chain or chain[-1] != r["object"]:
+                chain.append(r["object"])
+        return chain
+
+    def _route_key(self, low: str) -> str | None:
+        """match the utterance to a ledgered key by token presence (longest key wins)."""
+        keys = {r["key"] for r in self.items if r.get("key") and r.get("object") is not None}
+        hits = [k for k in keys if k.lower() in low]
+        return max(hits, key=len) if hits else None
+
+    def route(self, text: str, key: str | None = None, object: str | None = None,
+              context: str | None = None, policy: str = "safe") -> dict:
+        """WRITE-PATH INTENT ROUTER: tag an utterance (assert / correct / revert / echo), resolve a fuzzy
+        version reference against the key's timeline, and execute the right ledger operation — so a
+        value-obscuring revert ("go back to what we had") works without the caller naming a value, and a
+        similarity/cosine path never runs on a revert (a revert is an instruction on the version graph,
+        not a value). This ships the split measured in mnemo/probes/intent_tagger_router_probe.py.
+
+        Resolution (deterministic, no LLM):
+          - a revert-marked utterance -> revert. Target: a named historical value if present in the text;
+            "original / very first / started with" -> the FIRST version; otherwise the predecessor via
+            revert(). Restores go through the sanctioned reaffirm channel, so the flip is ledgered.
+          - a value-bearing utterance whose value is new or current -> remember() (keyed supersession).
+          - a value-bearing utterance whose value was SUPERSEDED for the key, with no revert marker ->
+            the ambiguous echo-or-reaffirm case, and `policy` decides (see below).
+        key/object are derived from the extractor hook when not passed; a revert with no resolvable key
+        falls back to a plain note (never guesses a ledger key it can't match).
+
+        THE HONEST LIMIT (measured, not asserted): an unmarked restatement of a superseded value is
+        AMBIGUOUS BY CONSTRUCTION — a stale echo and a deliberate reaffirm can be byte-identical, so no
+        classifier (LLMs measured at ~coin-flip: 0.35-0.55) can separate them from text. `policy` picks
+        the failure mode you accept:
+          - "safe" (default): treat as an echo — never restores. With echo_guard on it lands retired
+            (judge-logged 'echo_guard'); with echo_guard off it is written WITHOUT the key so it cannot
+            LWW-clobber the current value. Cost: a legitimate unmarked reaffirm is refused (measured
+            1.00 echo-blocked / 0.00 reaffirm-honored).
+          - "context": restore when `context` (the preceding turn) shows change-awareness (a change word
+            + the current value). Separates honest twins (1.00/1.00) but is FORGEABLE — an attacker who
+            writes two turns walks through it (forged-context echo restored 100%). Use only when the
+            context channel is trusted.
+          - "trusting": treat as a reaffirm — always restores (0.00 echo-blocked / 1.00 honored).
+        The unforgeable separator is provenance — an authorized revert() call or an explicit marker —
+        never smarter classification; that is the channel-separation thesis, now with the receipt.
+
+        Returns {"intent", "action", "key", ...} describing what was done."""
+        low = text.lower()
+        if (key is None or object is None) and self.extractor is not None:
+            try:
+                ex = self.extractor(text)
+                if ex:
+                    key = key if key is not None else ex[0]
+                    object = object if object is not None else ex[1]
+            except Exception:
+                pass
+        if self._ROUTE_REVERT.search(low):
+            k = key or self._route_key(low)
+            if k is None:
+                rid = self.remember(text)
+                return {"intent": "revert", "action": "noted", "key": None, "id": rid,
+                        "reason": "no ledger key resolved from the utterance"}
+            chain = self._route_chain(k)
+            cur = chain[-1] if chain else None
+            named = None
+            for v in chain[:-1]:
+                if re.search(rf"\b{re.escape(str(v).lower())}\b", low):
+                    named = v
+            if named is None and object is not None and object in chain[:-1]:
+                named = object
+            if named is not None and named != cur:
+                rid = self.remember(f"restore {k} to {named}", key=k, object=named, reaffirm=True,
+                                    meta={"routed": "revert_named"})
+                return {"intent": "revert", "action": "restored", "key": k, "target": named, "id": rid}
+            if self._ROUTE_ORIGINAL.search(low) and len(chain) > 1 and chain[0] != cur:
+                rid = self.remember(f"restore {k} to {chain[0]}", key=k, object=chain[0], reaffirm=True,
+                                    meta={"routed": "revert_original"})
+                return {"intent": "revert", "action": "restored", "key": k, "target": chain[0], "id": rid}
+            res = self.revert(k)
+            return {"intent": "revert", "action": "reverted" if res.get("ok") else "failed",
+                    "key": k, **{kk: vv for kk, vv in res.items() if kk != "ok"}}
+        if object is None or key is None:
+            rid = self.remember(text, key=key, object=object)
+            return {"intent": "assert", "action": "remembered", "key": key, "id": rid}
+        chain = self._route_chain(key)
+        cur = chain[-1] if chain else None
+        if object == cur or object not in chain:
+            rid = self.remember(text, key=key, object=object)
+            intent = "correct" if (cur is not None and self._ROUTE_CORRECT.search(low)) else "assert"
+            return {"intent": intent, "action": "remembered", "key": key, "id": rid}
+        # unmarked assertion of a superseded value — the ambiguous echo-or-reaffirm case
+        if policy == "trusting" or (
+                policy == "context" and context and self._ROUTE_CHANGE_AWARE.search(context.lower())
+                and cur is not None and str(cur).lower() in context.lower()):
+            rid = self.remember(text, key=key, object=object, reaffirm=True,
+                                meta={"routed": f"reaffirm_{policy}"})
+            return {"intent": "reaffirm", "action": "restored", "key": key, "target": object, "id": rid}
+        if self.echo_guard:
+            rid = self.remember(text, key=key, object=object)      # guard retires it, judge-logged
+        else:
+            rid = self.remember(text, meta={"routed": "echo_unkeyed"})  # keyless: cannot LWW-clobber
+        return {"intent": "echo", "action": "blocked", "key": key, "id": rid,
+                "policy": policy, "note": "unmarked restatement of a superseded value; not restored"}
 
     def as_of(self, key: str, when: float) -> dict | None:
         """POINT-IN-TIME query: the value that was CURRENT for `key` at event-time `when` (a UTC

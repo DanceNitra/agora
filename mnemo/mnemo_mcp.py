@@ -117,6 +117,24 @@ def revert(key: str) -> dict:
 
 
 @mcp.tool()
+def route(text: str, key: str = "", object: str = "", context: str = "", policy: str = "safe") -> dict:
+    """ONE-CALL WRITE ROUTER: hand it any utterance and it decides the right ledger operation — a new
+    fact is remembered, a marked correction supersedes, and a revert instruction ("go back to what we
+    had", "restore the original") is resolved against the key's version timeline and executed through
+    the sanctioned revert channel, WITHOUT the caller naming the old value. Use it when you don't want
+    to pick between remember/revert yourself.
+
+    The honest limit (measured): an UNMARKED restatement of a superseded value ("the region is osaka",
+    said after the correction) is ambiguous by construction — a stale echo and a deliberate reaffirm can
+    be byte-identical, and no classifier separates them. `policy` picks the failure mode: "safe"
+    (default) never restores on an unmarked restatement; "context" restores when the preceding turn
+    (pass it as `context`) shows change-awareness — forgeable, use only if that channel is trusted;
+    "trusting" always restores. Returns {intent, action, key, ...} describing what was done."""
+    return _MEM.route(text, key=key or None, object=object or None,
+                      context=context or None, policy=policy)
+
+
+@mcp.tool()
 def recall(query: str, k: int = 6) -> list[dict]:
     """Retrieve the top-k memories by RELEVANCE × accrued VALUE (not recency). Use this to load
     relevant prior knowledge before reasoning. Returns text, tags, value, and a relevance score."""

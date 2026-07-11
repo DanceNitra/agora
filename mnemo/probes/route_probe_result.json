@@ -1,0 +1,148 @@
+{
+  "n": 148,
+  "policies": {
+    "safe": {
+      "correction": {
+        "n": 20,
+        "state_ok": 20,
+        "state_acc": 1.0
+      },
+      "revert_obscuring": {
+        "n": 20,
+        "state_ok": 20,
+        "state_acc": 1.0
+      },
+      "revert_named": {
+        "n": 20,
+        "state_ok": 20,
+        "state_acc": 1.0
+      },
+      "revert_original": {
+        "n": 8,
+        "state_ok": 8,
+        "state_acc": 1.0
+      },
+      "echo": {
+        "n": 20,
+        "state_ok": 20,
+        "state_acc": 1.0
+      },
+      "reaffirm_unmarked": {
+        "n": 20,
+        "state_ok": 0,
+        "state_acc": 0.0
+      },
+      "adversarial_context_echo": {
+        "n": 20,
+        "state_ok": 20,
+        "state_acc": 1.0
+      },
+      "innocent_temporal": {
+        "n": 20,
+        "state_ok": 20,
+        "state_acc": 1.0
+      }
+    },
+    "context": {
+      "correction": {
+        "n": 20,
+        "state_ok": 20,
+        "state_acc": 1.0
+      },
+      "revert_obscuring": {
+        "n": 20,
+        "state_ok": 20,
+        "state_acc": 1.0
+      },
+      "revert_named": {
+        "n": 20,
+        "state_ok": 20,
+        "state_acc": 1.0
+      },
+      "revert_original": {
+        "n": 8,
+        "state_ok": 8,
+        "state_acc": 1.0
+      },
+      "echo": {
+        "n": 20,
+        "state_ok": 20,
+        "state_acc": 1.0
+      },
+      "reaffirm_unmarked": {
+        "n": 20,
+        "state_ok": 20,
+        "state_acc": 1.0
+      },
+      "adversarial_context_echo": {
+        "n": 20,
+        "state_ok": 0,
+        "state_acc": 0.0
+      },
+      "innocent_temporal": {
+        "n": 20,
+        "state_ok": 20,
+        "state_acc": 1.0
+      }
+    },
+    "trusting": {
+      "correction": {
+        "n": 20,
+        "state_ok": 20,
+        "state_acc": 1.0
+      },
+      "revert_obscuring": {
+        "n": 20,
+        "state_ok": 20,
+        "state_acc": 1.0
+      },
+      "revert_named": {
+        "n": 20,
+        "state_ok": 20,
+        "state_acc": 1.0
+      },
+      "revert_original": {
+        "n": 8,
+        "state_ok": 8,
+        "state_acc": 1.0
+      },
+      "echo": {
+        "n": 20,
+        "state_ok": 0,
+        "state_acc": 0.0
+      },
+      "reaffirm_unmarked": {
+        "n": 20,
+        "state_ok": 20,
+        "state_acc": 1.0
+      },
+      "adversarial_context_echo": {
+        "n": 20,
+        "state_ok": 0,
+        "state_acc": 0.0
+      },
+      "innocent_temporal": {
+        "n": 20,
+        "state_ok": 20,
+        "state_acc": 1.0
+      }
+    }
+  },
+  "headline": {
+    "safe": {
+      "echo_blocked": 1.0,
+      "reaffirm_honored": 0.0,
+      "forged_ctx_echo_blocked": 1.0
+    },
+    "context": {
+      "echo_blocked": 1.0,
+      "reaffirm_honored": 1.0,
+      "forged_ctx_echo_blocked": 0.0
+    },
+    "trusting": {
+      "echo_blocked": 0.0,
+      "reaffirm_honored": 1.0,
+      "forged_ctx_echo_blocked": 0.0
+    }
+  }
+}

@@ -705,6 +705,31 @@ m.apply_retention(max_age_days=90)     # or: m.sleep(retention_days=90)
 Textbook (DB TTL / log retention), packaged as a native zero-dependency retention primitive. Receipt:
 `mnemo/probes/retention_probe.py` (7/7, incl. "current keyed value and semantic facts are never expired").
 
+### One-call write router with revert resolution: `route()` (0.7.9+)
+"Go back to what we had before" names no value, so a value-keyed store has nothing to match and cosine has
+nothing to grab — it is an unresolved pointer, not a similarity failure. `route(text)` ships the two-job split
+for exactly this: a deterministic, ledger-aware intent tagger (assert / correct / revert / echo) in front, and
+a fuzzy-version resolver behind it ("back / the way it was" → the predecessor via `revert()`; "the original /
+what we started with" → the first version; a named old value → that version) — so a revert executes on the
+version graph through the sanctioned reaffirm channel, and similarity never runs on a revert:
+
+```python
+m.route("the cache region is osaka", key="cache region", object="osaka")
+m.route("correction: the cache region is now malmo", key="cache region", object="malmo")
+m.route("go back to what we had for the cache region")   # no value named -> restores osaka from the ledger
+```
+
+Measured (`mnemo/probes/route_probe.py`, 148 rows): every *marked* class — corrections, value-obscuring
+reverts, named reverts, original-restores, innocent temporal chatter — routes at 1.00 end-to-end under every
+policy, with zero LLM (LLM taggers measured on the same rows add nothing: 1.00 on marked classes too). The
+honest limit is measured rather than hidden: an UNMARKED restatement of a superseded value is ambiguous by
+construction (a stale echo and a deliberate reaffirm can be byte-identical; LLMs land at ~coin-flip 0.35–0.55),
+so `policy=` picks the failure mode — `safe` (default) never restores on an unmarked restatement
+(echo-blocked 1.00 / legit-reaffirm-honored 0.00), `context` separates honest twins via the preceding turn
+(1.00/1.00) but is forgeable (a forged change-aware context walks through it), `trusting` always restores
+(0.00/1.00). The unforgeable separator is provenance — the explicit `revert()` channel or a revert marker —
+not smarter classification. Also an MCP tool (`route`).
+
 ## Use it as an MCP server (any Claude / Cursor / agent client)
 
 `mnemo` ships an [MCP](https://modelcontextprotocol.io) stdio server so any MCP-compatible agent can
