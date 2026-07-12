@@ -1,3 +1,43 @@
+# Agora — Session Handoff (2026-07-12 END OF DAY · the "ship day": mnemo 0.7.15→0.7.19, benchmark repo, dungeon quality, paper audited)
+
+## PASTE THIS AFTER SESSION RESTART
+
+```
+Resume Agora. FIRST read C:\Users\Danculus\agora\HANDOFF.md top section (2026-07-12 END OF DAY) fully. Chat SLOVAK, code/output ENGLISH. main @ ca28978.
+
+TWO STANDING RULES LEARNED TODAY (both in memory, obey):
+- NEVER read Gmail via the MCP tools (get_thread/get_message drag the whole 40-msg thread ~250KB through context; burned ~15-20% credit). When owner says "písal Marat", ask him to PASTE the text into chat. Drafting replies stays the same.
+- PROPOSE, don't edit, SHARED/OUTWARD artifacts (the co-authored Marat paper, real-name, going-public): show the change + wait for OK; don't edit the file and report after. Internal product code = direct edits fine.
+
+WHAT SHIPPED TODAY (all committed+pushed):
+1. mnemo 0.7.15→0.7.19 ON PYPI (each measurable):
+   - 0.7.15: id-bound absolute restore = ABA-immune (jacksonxly r/RAG; revert_aba_probe.py). Jackson praised it publicly + closed the thread.
+   - 0.7.16: retract_lineage (lineage-aware correction: demote subject+derived_from lineage, retained+flagged, cite Doyle-TMS/TOKI/MemLineage).
+   - 0.7.17: rederive() completes the correction lifecycle (regenerate demoted payload vs corrected root; measured harm 0.00 + payload 3/3 active).
+   - 0.7.18: governance_report() = erasure-with-proof in one call (GDPR/AI-Act; forget_subject+tombstone chain, honest in-band scope).
+   - 0.7.19: MCP-registry ownership token in README.
+   - mnemo README now leads with "Correction is a first-class operation (measured across systems)" (benchmark table).
+2. MCP REGISTRY: mnemo LIVE at registry.modelcontextprotocol.io as io.github.DanceNitra/mnemo v0.7.19 (owner did one browser device-auth click). mcp-publisher binary in scratchpad/mcp-pub/. MCP_LISTINGS.md has the pack for Smithery/PulseMCP/mcp.so (owner web-submits, optional).
+3. AGENT-MEMORY-INTEGRITY = standalone PUBLIC repo LIVE: github.com/DanceNitra/agent-memory-integrity (anon agora-builder). Adapter interface + MnemoAdapter + both cells (revert+echo) + pluggable free judge (local Ollama default) + canonical results. Others self-submit their systems.
+4. SEO: retargeted the top query "zero proof ai mcp receipts" — verifiable-agent-receipts post retitled "AI Agent MCP Receipts: Your Logs Aren't Proof" + homepage links it (row 01) + homepage title/meta to agent-memory entities + OG card. render_post.py favicon template fixed (was emitting external favicon.svg = the globe bug). OWNER TODO in GSC: re-request indexing for homepage + the receipts post URL.
+5. DUNGEON RESEARCH-QUALITY SYSTEM (owner "upgrade research QUALITY", 5 Tahy LIVE in brain): retargeted the corporation generator personas from a leftover "software corporation" framing (scout=GitHub trending) to a Frontier Scout hunting HARD OPEN questions (role_prompts.py); AMBITION axis 0-100 + 2x2 routing (ambitious-but-unmeasured -> needs_measurement, NOT killed) in corporation.py; "raise it twice" escalation in agent_worker._escalate_lead; death-reason feedback to CorporationMemory (also fixes the prompt_stale alert); earned per-source-kind standing weighting the seed rotation. Brain restarted clean (one :8000 listener, dungeon 200). See [[dungeon-research-quality-system]].
+
+RESEARCH KILLED AT THE GATE TODAY (both correctly — the gate working):
+- Recovery-half-life (reframed breaktruth B): behavioral 40-47% "override" was a context-UNION artifact (collapses to 0.00 under single realistic recall); gap+fix textbook (RippleEdits/TMS/TOKI/MemLineage, all verified real). BUT yielded two shipped products (retract_lineage + rederive). See [[recovery-halflife-finding]]. LESSON: run the single-realistic-recall control before ANY behavioral claim.
+- Gate-false-kill angle: killed at prior-art check — "novel-true" ground truth is irreducibly contestable (my own verified-true computational claims were novelty-borderline), so the metric isn't cleanly measurable.
+
+IN FLIGHT — waiting on OTHERS (do NOT over-produce more supply; distribution is the bottleneck and it's seeded):
+- MARAT PAPER: merged draft (his full arms-race arc + our decomposition sections) at agora_output/collab/value_obscuring_reversion_writeup_MERGED_v1.md (repo: github.com/DanceNitra/agora/blob/main/...). Nastrelovy gate = GO (PUBLISH); added Abstract + Related Work (AGM/TMS/bitemporal/RippleEdits) + author-built-fixture caveat + References + softened "solved"→"well-predicted". Author line = Marat's real-name proposal, owner approved his own real name public. Owner EMAILED Marat the audited version (2026-07-12) → AWAIT his final OK + venue (arXiv needs endorsement, Zenodo DOI is the no-friction fallback we already use). Every number verified locally (confusion arithmetic, cross-embedder 0.905 all-MiniLM vs 0.930 nomic, stress 0.675=51/49).
+- REDDIT: comment LIVE as u/Danculus on r/AI_Agents "my agents kept remembering things that weren't true" (bitemporal thread) — pitched echo-resurrection gap + the benchmark repo. AWAIT author reply; follow up via distribution_radar (NOT Gmail). Reddit = OWNER posts.
+- jackson: closed/satisfied on his end. icophy: dormant.
+
+HEALTH at close: brain ok (one :8000 listener, tick advancing), dungeon 200, scout running memory-integrity themes. The _brain.err ConnectionResetError 10054 tracebacks are BENIGN Windows/asyncio noise, not our code.
+
+DEFAULT NEXT: LET IT WORK. Most threads wait on external parties. React when Marat/Reddit-author/Scout surface something. Don't hunt more outreach (credit-sensitive) or produce more supply.
+```
+
+---
+
 # Agora — Session Handoff (2026-07-12 · the "collaboration day": jackson + Marat + breaktruth B)
 
 ## PASTE THIS AFTER SESSION RESTART
