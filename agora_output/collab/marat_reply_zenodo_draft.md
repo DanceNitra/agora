@@ -1,17 +1,24 @@
 Marat,
 
-Zenodo it is — good call. A citable DOI now, arXiv whenever an endorsement makes sense; no reason to let the
-endorser gate hold up a finished paper.
+It's live. Zenodo was the right call — a citable DOI now, arXiv whenever an endorsement makes sense.
 
-I've prepared the full submission (upload type, title, the abstract as the description, keywords, CC-BY, and
-both repos as related links) so it's a two-minute upload. I'll do the upload from our Zenodo account and send
-you the DOI the moment it mints — then it's a shared, citable record with both our names on it.
+The paper is published with both our names on it:
 
-On 1466: perfect, exactly as you said — you draft the short note linking the paper, send it over, and I'll take
-a quick look before anything goes up. No rush.
+  Paper (Zenodo, DOI):  https://doi.org/10.5281/zenodo.21326757
+  Record page:          https://zenodo.org/records/21326757
 
-Four days, two people, no hidden failures — same here, I'd do it again in a heartbeat. Thank you for catching
-what we got wrong and for turning it into something better than either draft alone.
+Related repos linked from the record:
+  Cross-system integrity benchmark:  https://github.com/DanceNitra/agent-memory-integrity
+  mnemo (classify_reversion impl):   https://github.com/DanceNitra/agora
+
+License is CC-BY 4.0, so anyone can cite and build on it. If you spot anything you'd want changed in the
+metadata or the text, Zenodo lets us publish a new version under the same concept DOI, so nothing is frozen.
+
+On 1466: whenever you're ready, draft the short note linking the DOI and send it over. I'll take a quick look
+before it goes up, then it's all yours to post.
+
+Four days, two people, no hidden failures. I'd do it again in a heartbeat. Thank you for catching what we got
+wrong and turning it into something better than either draft alone.
 
 Best,
 Rastislav

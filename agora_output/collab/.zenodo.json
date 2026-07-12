@@ -1,0 +1,19 @@
+{
+  "title": "When a Benchmark Shortcut Is the Answer: Decomposing Value-Obscuring Reversion Detection",
+  "upload_type": "publication",
+  "publication_type": "preprint",
+  "description": "Correcting a stored fact and reversing a memory to a prior value look similar but are different operations. We study value-obscuring reversion: an unmarked \"go back / roll back\" instruction that names no value, on a memory store that has already superseded an old value with a new one. A prior audit reported that plain cosine similarity (candidate utterance vs. the recent context lines) \"fails\" at this task (F1 0.481). An external red-team showed the opposite: the same cosine baseline solves the held-out set at F1 0.905-0.930. The audit had declared a family of shortcuts dead after testing a single member. Rather than escape into a harder fixture, we decompose the task: reference resolution is a text/similarity problem (the cosine baseline is right), while old-vs-new attribution is a ledger/provenance problem that no amount of text similarity can settle. A shuffle test confirms the split - positional similarity collapses to chance (0.930 to 0.500) once line order is destroyed, because the fixed order stood in for the provenance metadata every real store keeps. With explicit ledger metadata plus structure-match, F1 is 0.930 with order destroyed. Unresolvable references (target role in neither context line) are handled by abstention, not a guess. We ship the resolution as a store method, classify_reversion, that classifies (never restores) and defers the undecidable bare-\"go back\" twin to an authorized-revert channel. Lesson for practitioners: enumerate the shortcut family before declaring it dead, and separate the text channel from the ledger channel instead of building a bigger fixture. Fixtures are author-built synthetic scenarios (disclosed in the paper); numbers are reproducible from the linked repositories.",
+  "creators": [
+    {"name": "Sultanov, Marat", "affiliation": "Independent researcher (TAT / TreeAngleTap)"},
+    {"name": "Drahos, Rastislav", "affiliation": "Agora"}
+  ],
+  "keywords": ["agent memory", "memory integrity", "belief revision", "provenance", "value-obscuring reversion", "large language models", "retrieval", "benchmark shortcut"],
+  "license": "cc-by-4.0",
+  "access_right": "open",
+  "language": "eng",
+  "related_identifiers": [
+    {"identifier": "https://github.com/DanceNitra/agent-memory-integrity", "relation": "isSupplementedBy", "scheme": "url"},
+    {"identifier": "https://github.com/DanceNitra/agora", "relation": "isSupplementedBy", "scheme": "url"}
+  ],
+  "notes": "Fixtures are author-built synthetic scenarios (disclosed in the paper). Numbers are reproducible from the linked repositories. Preprint; may be submitted to arXiv later."
+}
