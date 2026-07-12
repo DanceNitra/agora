@@ -1,0 +1,14 @@
+{
+  "note": "Canonical results from the published cross-system run. Judge = gpt-4o-mini (neutral, ground-truth-blind). n=20, native configs. Source: mnemo/probes/integrity_bench_{revert,echo}.py in the Agora repo; write-up 'We fixed our own memory benchmark until it stopped flattering us'.",
+  "judge": "gpt-4o-mini",
+  "n": 20,
+  "results": {
+    "mnemo:revert":   {"rate": 0.75, "ci95": [0.53, 0.89], "note": "intent router restores the predecessor from the version ledger"},
+    "mem0:revert":    {"rate": 0.20, "ci95": [0.08, 0.42], "note": "no revert operation; the corrected value is retained"},
+    "graphiti:revert":{"rate": 0.00, "ci95": [0.00, 0.16], "note": "no revert operation; bitemporal invalidation fires on named contradictions, not an unnamed 'go back'"},
+    "mnemo:echo":     {"resurrection_rate": 0.00, "note": "echo_guard blocks the restated stale value"},
+    "mem0:echo":      {"resurrection_rate": 0.00, "note": "defends"},
+    "graphiti:echo":  {"resurrection_rate": 0.00, "note": "defends"}
+  },
+  "reading": "Value-obscuring revert is a capability gap: only mnemo exposes a channel to undo a correction on an unnamed command, and the mnemo/mem0 CIs do not overlap. Echo resurrection is a tie. The revert gap is judge-independent because the competitors structurally lack the operation; the judge model only shifts mnemo's absolute rate."
+}
