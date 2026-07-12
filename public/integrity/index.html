@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Agent-Memory Integrity — the ledger, the benchmark, the reference implementation</title>
+<meta name="description" content="We measure whether a corrected agent memory stays corrected: an open cross-system benchmark, the flagship write-up, a joint paper, and mnemo, the reference implementation with a first-class correction channel.">
+<link rel="canonical" href="https://dancenitra.github.io/agora/public/integrity/">
+<meta property="og:title" content="Agent-Memory Integrity — measured, not asserted">
+<meta property="og:description" content="Recall benchmarks skip the write step. We measure whether a correction takes and stays taken — open harness, reference implementation, joint paper.">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 28 28'%3E%3Crect x='4' y='18.4' width='12' height='3' rx='1.5' fill='%2317150f' opacity='.2'/%3E%3Crect x='4' y='12.9' width='15.5' height='3' rx='1.5' fill='%2317150f' opacity='.36'/%3E%3Crect x='4' y='7' width='20' height='3.4' rx='1.7' fill='%230c7a55'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;0,6..72,600;1,6..72,400;1,6..72,500&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --paper:#faf7f0;--paper2:#f2eee4;--card:#fffdf9;--ink:#17150f;--text:#4d493f;--faint:#938d7f;
+    --line:#e6e0d2;--line2:#d6cfbd;--acc:#0c7a55;--acc2:#0a8f68;--acc-soft:#e4f1ea;
+    --bad:#b1361f;--gold:#8a6d1a;
+    --serif:"Newsreader",Georgia,"Times New Roman",serif;
+    --mono:"JetBrains Mono",ui-monospace,Menlo,Consolas,monospace;
+  }
+  *{box-sizing:border-box;margin:0}
+  html{scroll-behavior:smooth}
+  body{background:var(--paper);color:var(--ink);font-family:var(--serif);line-height:1.5;
+    -webkit-font-smoothing:antialiased;font-optical-sizing:auto;text-rendering:optimizeLegibility;
+    background-image:radial-gradient(circle at 12% -10%,#fff 0,transparent 46%)}
+  ::selection{background:var(--acc-soft)}
+  a{color:inherit;text-decoration:none}
+  a:focus-visible{outline:2px solid var(--acc);outline-offset:3px;border-radius:4px}
+  .wrap{max-width:1020px;margin:0 auto;padding:0 26px}
+  header.top{display:flex;align-items:center;justify-content:space-between;padding:22px 0;
+    border-bottom:1px solid var(--line);font-family:var(--mono);font-size:12.5px;letter-spacing:.02em}
+  .logo{display:flex;align-items:center;gap:11px}
+  .logo svg{width:27px;height:27px;display:block}
+  .logo .wm{font-weight:700;font-size:17px;letter-spacing:-.01em;color:var(--ink)}
+  .logo .wm .dot{color:var(--acc)}
+  .top .nav{display:flex;gap:20px}
+  .top a.lnk{color:var(--faint);transition:color .15s} .top a.lnk:hover{color:var(--acc)}
+  .mast{display:grid;grid-template-columns:1.05fr .95fr;gap:52px;align-items:start;padding:70px 0 8px}
+  .kick{display:flex;align-items:center;gap:12px;font-family:var(--mono);font-size:11.5px;letter-spacing:.28em;
+    text-transform:uppercase;color:var(--acc);margin-bottom:24px}
+  .kick::before{content:"";width:26px;height:1px;background:var(--acc)}
+  .mast h1{font-weight:500;font-size:clamp(40px,5.8vw,62px);line-height:1.04;letter-spacing:-.032em;max-width:15ch}
+  .mast h1 em{font-style:italic;color:var(--acc)}
+  .lede{margin-top:24px;max-width:52ch;font-size:19px;line-height:1.6;color:var(--text)}
+  .lede b{color:var(--ink);font-weight:600}
+  .honest{margin-top:15px;max-width:54ch;font-size:14.5px;line-height:1.58;color:var(--faint)}
+  .facts{margin-top:26px;font-family:var(--mono);font-size:12.5px;color:var(--faint);
+    display:flex;flex-wrap:wrap;gap:8px 16px;letter-spacing:.02em}
+  .facts b{color:var(--ink);font-weight:600}
+  .facts .s{color:var(--line2)}
+  .ledger{background:var(--card);border:1px solid var(--line2);border-radius:14px;overflow:hidden;
+    box-shadow:0 1px 0 #fff inset,0 18px 40px -30px rgba(23,21,15,.5);font-family:var(--mono);position:sticky;top:24px}
+  .ledger .lh{display:flex;align-items:center;justify-content:space-between;padding:13px 18px;
+    border-bottom:1px dashed var(--line2);font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--faint)}
+  .ledger .lh b{color:var(--ink);font-weight:600;letter-spacing:.02em;text-transform:none;font-size:13px}
+  .ledger .rows{padding:8px 0}
+  .lrow{display:grid;grid-template-columns:1fr auto auto;gap:12px;align-items:baseline;padding:9px 18px;font-size:13.5px}
+  .lrow .lv{color:var(--ink);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .lrow .lt{font-size:11px;color:var(--faint);letter-spacing:.03em}
+  .lrow .lver{font-size:11px;color:var(--faint);text-align:right;min-width:82px}
+  .lrow.current{background:var(--acc-soft)}
+  .lrow.current .lv{color:var(--acc);font-weight:600}
+  .lrow.current .lver{color:var(--acc);font-weight:600}
+  .lrow.retired .lv{color:var(--faint);text-decoration:line-through;text-decoration-color:var(--bad);opacity:.85}
+  .lrow.retired .lver{color:var(--bad)}
+  .lfoot{display:flex;align-items:center;gap:10px;padding:14px 18px;border-top:1px dashed var(--line2);
+    font-size:13.5px;background:var(--paper2)}
+  .lfoot .q{color:var(--text)} .lfoot .ar{color:var(--faint)}
+  .lfoot .ans{color:var(--acc);font-weight:600}
+  .lfoot .chk{margin-left:auto;font-size:11px;color:var(--acc);letter-spacing:.03em}
+  section.rec{padding:56px 0 4px}
+  .rec > h2{font-weight:600;font-size:12px;font-family:var(--mono);letter-spacing:.22em;text-transform:uppercase;
+    color:var(--acc);margin-bottom:22px;display:flex;align-items:center;gap:12px}
+  .rec > h2::after{content:"";flex:1;height:1px;background:var(--line)}
+  .card{border:1px solid var(--line);border-radius:14px;background:var(--card);padding:24px 26px;margin-bottom:15px;
+    box-shadow:0 1px 0 #fff inset;transition:border-color .16s,box-shadow .16s}
+  .card:hover{border-color:var(--line2);box-shadow:0 1px 0 #fff inset,0 14px 34px -28px rgba(23,21,15,.55)}
+  .card .prop{font-family:var(--mono);font-size:11px;letter-spacing:.15em;text-transform:uppercase;color:var(--acc);
+    margin-bottom:9px;display:flex;align-items:center;gap:8px}
+  .card .prop::before{content:"";width:5px;height:5px;border-radius:1px;background:var(--acc)}
+  .card .claim{font-size:21px;line-height:1.36;letter-spacing:-.012em}
+  .card .claim b{font-weight:600}
+  .card .note{margin-top:11px;font-size:15.5px;color:var(--text);line-height:1.58;max-width:70ch}
+  .card .note b{color:var(--ink);font-weight:600} .card .note code{font-family:var(--mono);font-size:.88em;color:var(--ink)}
+  .tbl{margin-top:16px;font-family:var(--mono);font-size:12.5px;border:1px solid var(--line);border-radius:9px;overflow:hidden;max-width:520px}
+  .tbl .tr{display:grid;grid-template-columns:1fr auto auto;gap:14px;padding:8px 14px;border-top:1px solid var(--line)}
+  .tbl .tr:first-child{border-top:0;color:var(--faint);font-size:11px;letter-spacing:.08em;text-transform:uppercase}
+  .tbl .tr b{color:var(--ink)} .tbl .win{color:var(--acc);font-weight:600}
+  .card .go{display:inline-flex;align-items:center;gap:7px;margin-top:16px;font-family:var(--mono);font-size:12.5px;
+    color:var(--faint);border:1px solid var(--line);border-radius:8px;padding:8px 13px;transition:.16s}
+  .card .go:hover{border-color:var(--acc);color:var(--acc);background:var(--acc-soft)}
+  .card .go.solid{border-color:var(--acc);color:var(--acc);background:var(--acc-soft)}
+  .foot{border-top:1px solid var(--line);margin-top:56px;padding:36px 0 64px;color:var(--faint);
+    font-family:var(--mono);font-size:12.5px;line-height:1.85}
+  .foot a{color:var(--acc)} .foot p{max-width:74ch}
+  @media(max-width:820px){.mast{grid-template-columns:1fr;gap:36px}.ledger{position:static}}
+  @media(prefers-reduced-motion:reduce){*{transition:none!important;scroll-behavior:auto!important}}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header class="top">
+    <a class="logo" href="https://dancenitra.github.io/agora/">
+      <svg viewBox="0 0 28 28" aria-hidden="true">
+        <rect x="4" y="18.4" width="12" height="3" rx="1.5" fill="#17150f" opacity=".2"></rect>
+        <rect x="4" y="12.9" width="15.5" height="3" rx="1.5" fill="#17150f" opacity=".36"></rect>
+        <rect x="4" y="7" width="20" height="3.4" rx="1.7" fill="#0c7a55"></rect>
+      </svg>
+      <span class="wm">agent-memory integrity<span class="dot">.</span></span>
+    </a>
+    <nav class="nav">
+      <a class="lnk" href="https://github.com/DanceNitra/agent-memory-integrity">benchmark</a>
+      <a class="lnk" href="https://dancenitra.github.io/agora/public/mnemo/">mnemo</a>
+      <a class="lnk" href="https://dancenitra.github.io/agora/">agora</a>
+    </nav>
+  </header>
+
+  <div class="mast">
+    <div class="mcopy">
+      <div class="kick">measured, not asserted</div>
+      <h1>Does a corrected memory <em>stay</em> corrected?</h1>
+      <p class="lede">Recall benchmarks measure whether an agent's memory returns the right fact. They skip the
+      harder step: when a fact is <b>corrected</b>, does the correction take, and stay taken? We measure that —
+      an open cross-system benchmark, a reference implementation, and a joint paper — and we publish the cells
+      we <b>don't</b> win.</p>
+      <p class="honest">This is a narrow, adversarial, command-driven axis: value-obscuring revert, echo
+      resurrection, laundered-lineage recovery. Numbers below are re-runnable; the harness is open so you can
+      re-run them or add your own system.</p>
+      <div class="facts"><b>3</b> systems measured<span class="s">·</span><b>open</b> harness<span class="s">·</span>
+        <b>1</b> ground-truth-blind judge<span class="s">·</span><b>MIT</b></div>
+    </div>
+
+    <div class="ledger" role="img" aria-label="A memory ledger: region set to frankfurt, corrected to ohio (current); a later restatement of frankfurt is retired as an echo; recall returns ohio.">
+      <div class="lh"><b>region</b><span>keyed · versioned</span></div>
+      <div class="rows">
+        <div class="lrow"><span class="lv">frankfurt</span><span class="lt">set</span><span class="lver">v1</span></div>
+        <div class="lrow current"><span class="lv">ohio</span><span class="lt">correction</span><span class="lver">v2 · current</span></div>
+        <div class="lrow retired"><span class="lv">frankfurt <span style="opacity:.7">(restated)</span></span><span class="lt">echo</span><span class="lver">retired</span></div>
+      </div>
+      <div class="lfoot"><span class="q">recall "region"</span><span class="ar">→</span><span class="ans">ohio</span><span class="chk">✓ current-truth</span></div>
+    </div>
+  </div>
+
+  <section class="rec">
+    <h2>The open benchmark</h2>
+    <div class="card">
+      <div class="prop">run-it-yourself · cross-system</div>
+      <div class="claim">One shared, ground-truth-blind judge reads each system's own recall surface. Nobody is
+        scored on a home-field instrument.</div>
+      <p class="note">Two cells so far. <b>Value-obscuring revert</b> — undo a correction from an unmarked
+        "go back". <b>Echo resurrection</b> — restate the retired value and see if it comes back. We lead with
+        the cell we tie (echo), because a benchmark you only ever win is a benchmark you built to flatter you.</p>
+      <div class="tbl">
+        <div class="tr"><span>value-obscuring revert (n=20)</span><span>success</span><span>95% CI</span></div>
+        <div class="tr"><b>mnemo</b><span class="win">0.75</span><span>[0.53, 0.89]</span></div>
+        <div class="tr"><b>mem0 2.0.11</b><span>0.20</span><span>[0.08, 0.42]</span></div>
+        <div class="tr"><b>Graphiti</b><span>0.00</span><span>[0.00, 0.16]</span></div>
+      </div>
+      <p class="note" style="margin-top:12px">Only mnemo exposes a channel to undo a correction on command; the
+        CIs don't overlap, so the capability gap is real. Echo resurrection is a tie — all three defend.</p>
+      <a class="go solid" href="https://github.com/DanceNitra/agent-memory-integrity">run it / add your system →</a>
+    </div>
+  </section>
+
+  <section class="rec">
+    <h2>The reference implementation</h2>
+    <div class="card">
+      <div class="prop">mnemo · correction as a first-class channel</div>
+      <div class="claim">A zero-dependency memory layer where correcting a fact is a first-class operation,
+        not an afterthought.</div>
+      <p class="note"><code>revert</code> undoes a correction on an unmarked command; <code>echo_guard</code>
+        blocks a restated stale value; <code>retract_lineage</code> demotes a corrected fact's whole derived
+        lineage; <code>rederive</code> regenerates that payload against the corrected root; and
+        <code>governance_report</code> gives erasure-with-proof in one call. Every rule ships with the number
+        we measured and the test that would kill it.</p>
+      <a class="go" href="https://dancenitra.github.io/agora/public/mnemo/">the receipts →</a>
+      <a class="go" href="https://pypi.org/project/agora-mnemo/">pip install agora-mnemo →</a>
+    </div>
+  </section>
+
+  <section class="rec">
+    <h2>The write-up &amp; the paper</h2>
+    <div class="card">
+      <div class="prop">the story, honestly</div>
+      <div class="claim">We fixed our own memory benchmark until it stopped flattering us.</div>
+      <p class="note">The flagship write-up: how a pre-publication audit caught an <b>asymmetric instrument in
+        our own harness</b> (it dropped mnemo's headline from 1.00 to 0.75) — the correction is the story. And a
+        joint paper with an external collaborator (TAT) decomposing a hard case, value-obscuring reversion, into
+        a text half and a provenance half, with both sides reporting their own mistakes. Forthcoming.</p>
+      <a class="go" href="https://dancenitra.github.io/agora/public/posts/we-fixed-our-own-memory-benchmark-until-it-stopped-flattering-us.html">read the write-up →</a>
+    </div>
+  </section>
+
+  <div class="foot">
+    <p>Agent-memory integrity is under-benchmarked; recall is not. Prior art the axis builds on: AGM belief
+      revision (1985), truth-maintenance systems (Doyle, 1979), bitemporal databases. The reference
+      implementation is ours; the point is the instrument, not the leaderboard.</p>
+    <p style="margin-top:14px"><a href="https://github.com/DanceNitra/agent-memory-integrity">benchmark</a> ·
+      <a href="https://dancenitra.github.io/agora/public/mnemo/">mnemo</a> ·
+      <a href="https://pypi.org/project/agora-mnemo/">pypi</a> ·
+      <a href="https://dancenitra.github.io/agora/">agora</a> · MIT</p>
+  </div>
+
+</div>
+</body>
+</html>
