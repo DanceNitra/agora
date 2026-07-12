@@ -6,7 +6,7 @@
 
 *Memory is the mother of the Muses. An agent with no memory has no ideas.*
 
-`pip install agora-mnemo` · [PyPI](https://pypi.org/project/agora-mnemo/) · [Hugging Face](https://huggingface.co/Danchi17/mnemo) · [DOI 10.5281/zenodo.21128549](https://doi.org/10.5281/zenodo.21128549) · MIT · v0.6.0
+`pip install agora-mnemo` · [PyPI](https://pypi.org/project/agora-mnemo/) · [Hugging Face](https://huggingface.co/Danchi17/mnemo) · [DOI 10.5281/zenodo.21128549](https://doi.org/10.5281/zenodo.21128549) · MIT · v0.7.16
 
 </div>
 
@@ -19,6 +19,25 @@ the four things agent memory actually needs, the way that held up running in pro
 Most "agent memory" libraries are demos. This one is extracted from a system that has used it daily
 to curate a 6,000-note knowledge base, and whose consolidation behaviour we have **measured**, not
 assumed (see *Provenance* below).
+
+## Correction is a first-class operation (measured across systems)
+
+Any memory layer can store a fact and retrieve it. The harder, less-benchmarked property is **integrity**:
+when a fact is corrected, can the store *undo* the correction on command, and does restating a retired value
+*resurrect* it? mnemo treats correction as a first-class channel — `revert(key)`, `revert_now`,
+`retract_lineage`, `echo_guard`, and the `route()` intent tagger — and we measured it against mem0 and Graphiti
+in their **native configs** with a shared, **ground-truth-blind** judge
+([`probes/INTEGRITY_BENCHMARK.md`](probes/INTEGRITY_BENCHMARK.md)):
+
+| value-obscuring revert · undo a correction from an unmarked "go back" (n=20) | success | 95% CI |
+|---|---|---|
+| **mnemo** (route/revert) | **0.75** | [0.53, 0.89] |
+| mem0 2.0.11 (native) | 0.20 | [0.08, 0.42] |
+| Graphiti (native, live) | 0.00 | [0.00, 0.16] |
+
+Only mnemo exposes a channel to undo a correction on command; mnemo's and mem0's CIs do not overlap, so the
+gap survives at n=20. We lead with the cell we *don't* win: **echo-resurrection is a tie**. Narrow, adversarial,
+command-driven — run it yourself or add your system.
 
 ## Install
 
