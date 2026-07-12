@@ -13,6 +13,7 @@ on:
       - 'public/**'
       - 'sitemap.xml'
       - 'robots.txt'
+      - 'favicon.svg'
       - '.github/workflows/pages.yml'
   workflow_dispatch:
 
@@ -38,6 +39,7 @@ jobs:
           mkdir -p _site
           cp index.html _site/index.html
           touch _site/.nojekyll
+          [ -f favicon.svg ] && cp favicon.svg _site/favicon.svg || true
           cp -r public _site/public
           [ -f sitemap.xml ] && cp sitemap.xml _site/sitemap.xml || true
           [ -f robots.txt ] && cp robots.txt _site/robots.txt || true
