@@ -516,32 +516,50 @@ async def action_evaluate_proposal(config: dict, quest: dict, params: dict) -> d
         ceo_verdict = await _ceo_evaluate_llm(title, research_summary)
 
     approved = cto_verdict.get("approved", False) and ceo_verdict.get("approved", False)
+    # 2x2 routing (ambition x rigor): an AMBITIOUS lead that fails ONLY on measurement is NOT junk — preserve
+    # it and ask for a clean non-circular angle instead of discarding a possible breakthrough (the recovery-
+    # half-life lesson: don't kill an ambitious lead for lacking rigor, design the rigor).
+    ambition = ceo_verdict.get("ambition", ceo_verdict.get("score", 50))
+    needs_measurement = (not approved) and ambition >= 70 and (
+        ceo_verdict.get("needs_measurement") or not cto_verdict.get("approved", False))
     priority = "HIGH" if approved and cto_verdict["priority"] == "high" else "MEDIUM"
 
-    # If approved, advance quest to PATA phase
+    # advance quest: approved -> PATA; ambitious-but-unmeasured -> stay in HEAD with a design-a-measurement
+    # note (preserved, not rejected); shallow/junk -> rejected.
     qe = config.get("quest_engine")
-    if qe and quest_id and approved:
+    if qe and quest_id:
         try:
-            await qe.db.execute(
-                """UPDATE quests SET phase='pata', proposal_status='approved',
-                   research_summary=? WHERE id=?""",
-                (f"CTO: {cto_verdict['rationale'][:200]}\nCEO: {ceo_verdict['rationale'][:200]}",
-                 quest_id),
-            )
-            await qe.db.commit()
+            if approved:
+                await qe.db.execute(
+                    "UPDATE quests SET phase='pata', proposal_status='approved', research_summary=? WHERE id=?",
+                    (f"CTO: {cto_verdict['rationale'][:200]}\nCEO: {ceo_verdict['rationale'][:200]}", quest_id))
+                await qe.db.commit()
+            elif needs_measurement:
+                await qe.db.execute(
+                    "UPDATE quests SET phase='head', proposal_status='needs_measurement', research_summary=? WHERE id=?",
+                    (f"AMBITIOUS (ambition {ambition}) but the measurement is unclear or circular. Do NOT drop it "
+                     f"— design a clean, NON-circular measurement (external ground truth, no shared mediator) and "
+                     f"resubmit. CTO: {cto_verdict['rationale'][:180]}", quest_id))
+                await qe.db.commit()
         except Exception as e:
             print(f"[CEO/CTO] DB update error: {e}")
 
+    outcome = "✅ APPROVED" if approved else ("🔬 NEEDS MEASUREMENT" if needs_measurement else "❌ REJECTED")
+    next_step = ("→ Moving to PATA phase" if approved else
+                 "→ Ambitious — design a clean measurement and resubmit" if needs_measurement else
+                 "→ Shallow/textbook — research needs improvement")
     return {
-        "status": "ok" if approved else "rejected",
+        "status": "ok" if approved else ("needs_measurement" if needs_measurement else "rejected"),
         "output": (
-            f"CEO/CTO Evaluation for '{quest_id}': {'✅ APPROVED' if approved else '❌ REJECTED'}\n"
-            f"Priority: {priority}\n"
+            f"CEO/CTO Evaluation for '{quest_id}': {outcome}\n"
+            f"Priority: {priority} | Ambition: {ambition}\n"
             f"CTO: {cto_verdict['rationale']}\n"
             f"CEO: {ceo_verdict['rationale']}\n"
-            f"{'→ Moving to PATA phase' if approved else '→ Research needs improvement'}"
+            f"{next_step}"
         ),
         "approved": approved,
+        "needs_measurement": needs_measurement,
+        "ambition": ambition,
         "priority": priority,
         "cto": cto_verdict,
         "ceo": ceo_verdict,
@@ -642,13 +660,20 @@ async def _ceo_evaluate_llm(title: str, summary: str, enriched_prompt: str = "")
     user_msg = (
         f"Research lead: {title}\n\n"
         f"Findings: {summary[:800]}\n\n"
-        f"You run a research firm whose product is CREDIBILITY: a public ledger of claims rebuilt "
-        f"in code (famous/contested claims are the most valuable, especially potential FAILED "
-        f"verdicts), a 'methods break at the operating point' thesis, and board priorities in "
-        f"reasoning/AI/finance. Assess: would replicating this claim strengthen that portfolio? "
-        f"Is it interesting to a sophisticated audience? Approve strong fits; reject filler.\n"
+        f"You run a research firm whose product is CREDIBILITY: a public ledger of claims rebuilt in code, an "
+        f"'operating-point' thesis, and board priorities in the Science of Better Thinking (how intelligence "
+        f"generates, combines and validates ideas) + the Future of Work; finance and longevity are TEST-BEDS, "
+        f"not the headline.\n"
+        f"Score AMBITION 0-100: does this attack a HARD, OPEN question, with a mechanism nobody has measured "
+        f"and real stakes (would answering it change how someone thinks or acts)? 0-30 = shallow / incremental "
+        f"/ descriptive / textbook; 40-60 = solid but narrow; 70-100 = hard, original, could reframe the topic. "
+        f"A shallow-but-'clean' lead scores LOW — we do NOT want a stream of small notes.\n"
+        f"Then decide: APPROVE only high-ambition leads that could stand as serious science. If a lead is high-"
+        f"ambition but its measurement looks unclear or circular, do NOT reject it — set needs_measurement:true "
+        f"so we design a clean angle instead of discarding a possible breakthrough. Reject shallow or filler "
+        f"leads even if they are 'clean'.\n"
         f"Respond with JSON:\n"
-        f'{{"approved": true/false, "rationale": "reason", "score": 0-100}}'
+        f'{{"approved": true/false, "ambition": 0-100, "needs_measurement": true/false, "rationale": "reason", "score": 0-100}}'
     )
 
     try:
@@ -675,6 +700,8 @@ async def _ceo_evaluate_llm(title: str, summary: str, enriched_prompt: str = "")
             "approved": parsed.get("approved", False),
             "rationale": parsed.get("rationale", "LLM evaluation unavailable"),
             "score": parsed.get("score", 50),
+            "ambition": parsed.get("ambition", parsed.get("score", 50)),
+            "needs_measurement": bool(parsed.get("needs_measurement", False)),
         }
     except Exception as e:
         import traceback
