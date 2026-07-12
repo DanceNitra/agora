@@ -50,7 +50,9 @@ K_SWEEP = [0, 1, 2, 3]
 # lineage_demote (0.7.16) is the MIDDLE PATH: retract_lineage demotes the derived lineage to superseded
 # (excluded from default recall -> no residual harm) but RETAINS it (recallable, flagged needs_rederivation)
 # -> the re-derivation fix, vs forget_subject which hard-deletes the payload.
-METHODS = ["none", "naive_overwrite", "lineage_revert", "lineage_demote"]
+# lineage_rederive (0.7.17) COMPLETES the loop: retract_lineage + correction + rederive() regenerates the
+# derived payload against the corrected root -> 0 harm AND the payload back in ACTIVE recall.
+METHODS = ["none", "naive_overwrite", "lineage_revert", "lineage_demote", "lineage_rederive"]
 TOPK = 6
 
 # ── the scenario bank: independent entity domains, same structure. poison != correct; the 3 derived
@@ -208,6 +210,10 @@ def build_store(sc, k, method):
     elif method == "lineage_demote":
         m.retract_lineage(src)   # demote root + derived lineage to superseded, retained + flagged
         m.remember(sc["root"].format(v=sc["correct"]), key=sc["key"], object=sc["correct"])
+    elif method == "lineage_rederive":
+        m.retract_lineage(src)   # demote, correct, then regenerate the derived payload vs the corrected root
+        m.remember(sc["root"].format(v=sc["correct"]), key=sc["key"], object=sc["correct"])
+        m.rederive(src)          # deterministic default rewrite (verbatim value substitution)
     return m
 
 
@@ -240,19 +246,25 @@ def run_retrieval():
         print(f"{method:16s} " + "  ".join(f"{v:>4s}" for v in row))
     # collateral cost at k=3: how many of the k derived facts survive the correction? naive keeps them
     # (poisoned payload); lineage_revert erases them (information loss). The honest precision/recall tradeoff.
-    print("\ncollateral (k=3): derived-fact payload — active (surfaces) vs retained (recallable for re-derivation)")
-    for method in ["naive_overwrite", "lineage_revert", "lineage_demote"]:
-        act = ret = 0
+    print("\ncollateral (k=3): derived payload — poisoned-active / retained / CORRECTED-active (rederived)")
+    for method in ["naive_overwrite", "lineage_revert", "lineage_demote", "lineage_rederive"]:
+        act = ret = fixed = 0
         for sc in SCENARIOS:
             m = build_store(sc, 3, method)
             payload = [d.format(v=sc["poison"]).lower() for d in sc["derived"][:3]]
+            fixed_payload = [d.format(v=sc["correct"]).lower() for d in sc["derived"][:3]]
             act += sum(1 for r in m.items if r.get("status") == "active" and r.get("text", "").lower() in payload)
             ret += sum(1 for r in m.items if r.get("text", "").lower() in payload)  # any status = retained
-        R["cells"].setdefault("_collateral", {})[method] = {"active": round(act / len(SCENARIOS), 2),
-                                                            "retained": round(ret / len(SCENARIOS), 2)}
-        print(f"  {method:16s} active {act/len(SCENARIOS):.2f}/3 · retained {ret/len(SCENARIOS):.2f}/3")
-    print("  (naive: active+poisoned -> harm. revert: 0 retained -> info loss. demote: 0 active (no harm) but")
-    print("   3 retained + flagged needs_rederivation -> the re-derivation fix a value store cannot do.)")
+            fixed += sum(1 for r in m.items if r.get("status") == "active"
+                         and r.get("text", "").lower() in fixed_payload)
+        n = len(SCENARIOS)
+        R["cells"].setdefault("_collateral", {})[method] = {"poisoned_active": round(act / n, 2),
+                                                            "retained": round(ret / n, 2),
+                                                            "corrected_active": round(fixed / n, 2)}
+        print(f"  {method:17s} poisoned-active {act/n:.2f}/3 · retained {ret/n:.2f}/3 · corrected-active {fixed/n:.2f}/3")
+    print("  (naive: poisoned payload stays active -> harm. revert: payload gone -> info loss. demote: 0 harm,")
+    print("   payload parked. rederive: 0 harm AND the payload back ACTIVE asserting the corrected value —")
+    print("   the complete correction lifecycle: corrupt -> launder -> correct -> retract -> rederive.)")
     none3 = R["cells"]["none|k=3"]["residual_harm"]
     naive3 = R["cells"]["naive_overwrite|k=3"]["residual_harm"]
     rev3 = R["cells"]["lineage_revert|k=3"]["residual_harm"]

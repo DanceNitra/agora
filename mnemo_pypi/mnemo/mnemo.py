@@ -122,7 +122,7 @@ def sign_revert(principal_sk_hex: str, challenge: str) -> str:
     sk = _Ed25519SK.from_private_bytes(bytes.fromhex(principal_sk_hex))
     return sk.sign(challenge.encode()).hex()
 
-__version__ = "0.7.16"
+__version__ = "0.7.17"
 
 # Internal sentinel: marks a reaffirm write already authorized by submit_revert() (which verified the
 # signed INTENT). Object identity — no text/content path can ever produce it.
@@ -925,6 +925,67 @@ class Mnemo:
             self._mat = None; self._mat_built_n = -1        # status change alters the recall pool
             self._save(force=True)
         return {"demoted": len(ids), "ids": sorted(ids)}
+
+    def rederive(self, subject: str, rewrite=None, key: str | None = None) -> dict:
+        """Complete the correction lifecycle: REGENERATE the derived facts that retract_lineage demoted, against
+        the corrected root — so the payload entangled in a poisoned lineage (a connection-string location, a
+        backup schedule) comes back as ACTIVE facts asserting the corrected value, with clean derived_from
+        lineage to the corrected root. corrupt -> launder -> correct -> retract_lineage -> rederive is the full
+        loop; without this step the demoted facts stay out of active recall and the agent has simply lost them.
+
+        Flow: find records stamped needs_rederivation for `subject` (not yet rederived), read the OLD value from
+        the retracted keyed root and the NEW value from the key's current active record (write the correction
+        BEFORE calling this), rewrite each derived record's text, and re-remember it with derived_from -> the
+        corrected root (so a future correction can cascade again).
+
+        `rewrite(text, old_value, new_value) -> new_text | None` is caller-supplied — pass an LLM-backed
+        function for paraphrased facts. The DEFAULT is deterministic and honest: verbatim value substitution;
+        a derived fact that does not contain the old value verbatim is SKIPPED (returned in `skipped`), never
+        guessed. Each demoted record is stamped rederived_to (single-shot; a repeat call won't duplicate).
+        Returns {rederived, skipped, ids, old_value, new_value}."""
+        cand = {subject, Mnemo._canon_source(subject)}
+        flagged = [r for r in self.items
+                   if (r.get("meta") or {}).get("needs_rederivation")
+                   and not (r.get("meta") or {}).get("rederived_to")
+                   and (cand & Mnemo._rec_sources(r))]
+        if not flagged:
+            return {"rederived": 0, "skipped": 0, "ids": []}
+        root = next((r for r in flagged if r.get("key")), None)
+        k = key or (root.get("key") if root else None)
+        if not k:
+            return {"rederived": 0, "skipped": len(flagged), "ids": [],
+                    "note": "no key resolvable from the retracted lineage; pass key="}
+        old_v = str((root or {}).get("object") or "")
+        cur_id = self._current_active_id(k)
+        cur = next((r for r in self.items if r["id"] == cur_id), None)
+        new_v = str((cur or {}).get("object") or "")
+        if not cur or not new_v or new_v == old_v:
+            return {"rederived": 0, "skipped": len(flagged), "ids": [],
+                    "note": "no corrected current value for the key — write the correction first"}
+        if rewrite is None:
+            def rewrite(text, old, new):
+                if old and old.lower() in (text or "").lower():
+                    return re.sub(re.escape(old), new, text, flags=re.IGNORECASE)
+                return None                       # paraphrase: needs a caller-supplied (LLM) rewrite; skip
+        done, skipped, ids = 0, 0, []
+        for r in flagged:
+            if r.get("key"):                      # the root itself is replaced by the correction, not rederived
+                continue
+            try:
+                nt = rewrite(r.get("text", ""), old_v, new_v)
+            except Exception:
+                nt = None
+            if not nt or nt == r.get("text"):
+                skipped += 1
+                continue
+            rid = self.remember(nt, tags=r.get("tags"), value=r.get("value", 1.0), mtype=r.get("mtype"),
+                                derived_from=[cur_id], meta={"rederived_from": r["id"]})
+            r.setdefault("meta", {})["rederived_to"] = rid
+            done += 1
+            ids.append(rid)
+        if done:
+            self._save(force=True)
+        return {"rederived": done, "skipped": skipped, "ids": ids, "old_value": old_v, "new_value": new_v}
 
     def _current_active_id(self, key: str) -> str:
         """id of the record currently CURRENT for `key` (the thing a revert would undo), or "" if none.

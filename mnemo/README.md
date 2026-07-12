@@ -6,7 +6,7 @@
 
 *Memory is the mother of the Muses. An agent with no memory has no ideas.*
 
-`pip install agora-mnemo` · [PyPI](https://pypi.org/project/agora-mnemo/) · [Hugging Face](https://huggingface.co/Danchi17/mnemo) · [DOI 10.5281/zenodo.21128549](https://doi.org/10.5281/zenodo.21128549) · MIT · v0.7.16
+`pip install agora-mnemo` · [PyPI](https://pypi.org/project/agora-mnemo/) · [Hugging Face](https://huggingface.co/Danchi17/mnemo) · [DOI 10.5281/zenodo.21128549](https://doi.org/10.5281/zenodo.21128549) · MIT · v0.7.17
 
 </div>
 
@@ -629,3 +629,15 @@ marked `## Related (auto-suggested)` block of `[[links]]` to each orphan — add
 (re-running replaces its own block), **dry-run by default**. `python maintain.py` runs a verified
 round-trip on a synthetic vault (diagnose → suggest → apply); `maintenance_report` and `apply_links`
 in `second_brain_mcp.py` expose it to any MCP agent.
+
+### Regenerate the demoted payload: `rederive(subject)` (0.7.17)
+`retract_lineage` parks the derived facts; `rederive` brings them back. After you write the correction, it
+takes every record stamped `needs_rederivation`, rewrites its text against the corrected root (default:
+deterministic verbatim value substitution — a paraphrased fact that does not contain the old value verbatim
+is SKIPPED and reported, never guessed; pass `rewrite=` for an LLM-backed rewriter), and re-remembers it with
+`derived_from` -> the corrected root, so a future correction can cascade again. Measured
+(`recovery_halflife_pilot.py`, k=3): residual harm 0.00 with the derived payload back ACTIVE asserting the
+corrected value (3/3), vs naive correction (poisoned payload stays active, harm 0.98), hard delete (payload
+lost) or demote alone (payload parked). corrupt -> launder -> correct -> `retract_lineage` -> `rederive` is
+the complete correction lifecycle.
+
