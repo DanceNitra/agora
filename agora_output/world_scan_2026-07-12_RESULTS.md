@@ -24,7 +24,16 @@ READ-TIME provenance check (C) is order-independent (0.00). This falsifies the w
 the TOKI/lineage line and maps to Doyle 1979 (dependency-directed backtracking must be re-checkable, not fired
 once). Provenance survives the reorder (audit flags 100% of escapes) — it is just not exploited by the one-shot
 policy. STRONGEST of the five: attacks a just-posted formal claim with a runnable falsifier + yields a product
-fix (recall(lineage_guard=True)). Publish path: Crucible entry after full gate + a mnemo feature.
+fix (recall(lineage_guard=True)).
+
+**GATE RESULT (2026-07-13): KILL as research.** VALIDATE ok (reproduces). STORM (5 lenses) converged: the
+theory is TEXTBOOK — CRDT causal-delivery (Shapiro 2011), eager-vs-lazy view maintenance (Zhou VLDB'07), SQL
+DEFERRABLE constraints, TMS re-evaluation (Doyle 1979), bitemporal as-of-query; the real theorem is
+monotonicity/commutativity (CALM), not read-vs-write timing; TOKI itself ties soundness to isolation. SKEPTIC's
+killer: 0.92==0.92 (one-shot==value-only) is a CLOSED STRAWMAN — mnemo's own primitives, self-chosen ordering;
+must beat an external baseline. PRACTITIONER: Graphiti already SHIPS the read-time fix. Do NOT publish the
+theory. KEEP as a product feature only (recall(lineage_guard=True), honestly cited). Same pattern as
+recovery-halflife. Detail: agora_output/lead1_gate_storm_verdict.md.
 
 ## ④ Provenance injection-resistance — FAILED verdict (thesis holds), honest scope
 Probe: mnemo/probes/integrity_bench_inject.py · result: agora_output/integrity_inject_result.txt
