@@ -274,7 +274,7 @@
 <nav class="nav"><div class="wrap">
   <a class="brand" href="#"><span class="m"></span>AGORA</a>
   <div class="navlinks">
-    <a href="#mnemo" style="color:var(--ink);font-weight:600">mnemo</a>
+    <a href="public/mnemo/" style="color:var(--ink);font-weight:600">mnemo</a>
     <a href="#shipped"><span class="en">Shipped</span><span class="sk">Dodané</span></a>
     <a href="#ramr">RAMR</a>
     <a href="public/crucible/"><span class="en">The Crucible</span><span class="sk">Crucible</span></a>
@@ -391,7 +391,7 @@
     <div class="ship" style="border-color:var(--ink);box-shadow:0 20px 44px -34px rgb(26 24 19 / .45)"><div class="shipname">mnemo &middot; <span style="color:var(--ok)">the flagship</span></div>
       <div class="shipone"><span class="en">Open-source agent memory in one zero-dependency file + an MCP server. The only store here with an authorized-revert channel and echo resistance, each shipped with a measured receipt.</span><span class="sk">Open-source pamäť agentov v jednom súbore bez závislostí + MCP server. Jediný sklad tu s autorizovaným revert kanálom a echo odolnosťou, každé s odmeraným receiptom.</span></div>
       <div class="shipstat">v0.7.14 &middot; <span class="en">live on PyPI</span><span class="sk">live na PyPI</span> &middot; pip install agora-mnemo</div>
-      <div class="badges"><a href="#mnemo"><span class="en">How it works</span><span class="sk">Ako to funguje</span></a><a href="https://pypi.org/project/agora-mnemo/" target="_blank" rel="noopener">PyPI</a><a href="https://github.com/DanceNitra/agora/tree/main/mnemo" target="_blank" rel="noopener"><span class="en">Source</span><span class="sk">Zdroj</span></a></div></div>
+      <div class="badges"><a href="public/mnemo/"><span class="en">How it works</span><span class="sk">Ako to funguje</span></a><a href="https://pypi.org/project/agora-mnemo/" target="_blank" rel="noopener">PyPI</a><a href="https://github.com/DanceNitra/agora/tree/main/mnemo" target="_blank" rel="noopener"><span class="en">Source</span><span class="sk">Zdroj</span></a></div></div>
     <div class="ship"><div class="shipname">AI Audit</div>
       <div class="shipone"><span class="en">One prioritized PASS/WARN/FAIL reliability report for any AI/agent system, built on 8 zero-dependency checks.</span><span class="sk">Jeden prioritizovaný PASS/WARN/FAIL report pre ľubovoľný AI/agentový systém, na 8 kontrolách bez závislostí.</span></div>
       <div class="shipstat">8/8 self&#8209;audit healthy &middot; 94% externally grounded</div>
@@ -438,6 +438,7 @@ m.remember(<span class="s">"cache region is osaka"</span>, key=<span class="s">"
 m.recall(<span class="s">"region"</span>)          <span class="c"># -> malmo; the echo never resurrects</span>
 m.restore_now(<span class="s">"region"</span>, <span class="s">"osaka"</span>, sign=my_key)  <span class="c"># authorized revert</span></pre></div>
       <div class="mnfoot"><span class="en"><b>v0.7.14</b>, live on PyPI (<code>pip install agora-mnemo</code>) with the MCP server and six framework adapters. Since v0.2 it adds: a deterministic supersession key + <code>echo_guard</code> (a restated stale fact never resurrects), an <b>authorized-revert channel</b> (undo a correction on command, without letting text alone do it), <b>bitemporal</b> <code>as_of()</code> / <code>history()</code> queries, bounded two-tier eviction, tamper-evident receipts (hash-chain + Ed25519), and <code>classify_reversion()</code> &mdash; the value-obscuring reversion detector from our benchmark work. Every one ships with a runnable probe. <a href="public/posts/we-fixed-our-own-memory-benchmark-until-it-stopped-flattering-us.html">The cross-system integrity benchmark &rarr;</a></span><span class="sk"><b>v0.7.14</b>, live na PyPI (<code>pip install agora-mnemo</code>) s MCP serverom a šiestimi framework adaptérmi. Od v0.2 pribudlo: deterministický supersession kľúč + <code>echo_guard</code> (zopakovaný zastaraný fakt sa nevzkriesi), <b>autorizovaný revert kanál</b> (vráť opravu na príkaz, bez toho aby to zvládol samotný text), <b>bitemporálne</b> <code>as_of()</code> / <code>history()</code> dopyty, ohraničená dvojúrovňová eviction, tamper-evident receipty (hash-chain + Ed25519) a <code>classify_reversion()</code> &mdash; detektor value-obscuring reverzie z našej benchmark práce. Každá vec prichádza so spustiteľným probe. <a href="public/posts/we-fixed-our-own-memory-benchmark-until-it-stopped-flattering-us.html">Cross-system integrity benchmark &rarr;</a></span>
+      <a href="public/mnemo/" style="font-weight:600"><span class="en">Every rule, as a runnable receipt &rarr;</span><span class="sk">Každé pravidlo ako spustiteľný receipt &rarr;</span></a>
       <a href="https://github.com/DanceNitra/agora/tree/main/mnemo" target="_blank" rel="noopener">github.com/DanceNitra/agora/mnemo &rarr;</a></div>
     </div>
   </div>
