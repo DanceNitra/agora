@@ -367,6 +367,40 @@ class CorporationWorker:
             "finding": top,
         }
 
+    async def _escalate_lead(self, kind: str, short: str, prompt: str):
+        """Tah 3 — the 'raise it twice' escalation: take a raw candidate lead and return the AMBITIOUS version
+        of the SAME underlying question (the one that would matter 10x more, bridges two domains, or contradicts
+        a common assumption) — still OPEN (not a known-result re-derivation) and MEASURABLE with a small model.
+        Returns (question, falsifier) or (None, None) on failure (caller falls back to the raw candidate)."""
+        try:
+            import asyncio
+            from agora.execution.llm_client import call_llm
+            esc_prompt = (
+                "You are a Frontier Scout for an autonomous research organization. Here is a raw research lead:\n"
+                f"KIND: {kind}\nQUESTION: {prompt}\n\n"
+                "Treat it as the SHALLOW first draft. Produce the AMBITIOUS version of the SAME underlying "
+                "question: the version that would matter 10x more if answered, and/or bridges two domains that "
+                "rarely meet, and/or contradicts an assumption most people hold. HARD CONSTRAINTS: it must stay "
+                "genuinely OPEN (NOT a re-derivation of a known named result — regression to the mean, collider "
+                "bias, survivorship, ripple effects, majority-vote are textbook), and it must be MEASURABLE with "
+                "a small model (a number, threshold, exponent, or rate) via a NON-circular measurement. Bar: "
+                "could this stand as serious science?\n\n"
+                "Reply with exactly two lines:\nQUESTION: <one sharp sentence>\nFALSIFIER: <the single result that would kill it>"
+            )
+            raw = await asyncio.to_thread(call_llm, system_prompt="", user_prompt=esc_prompt,
+                                          tier="medium", temperature=0.5, max_tokens=400)
+            q = f = ""
+            for line in (raw or "").splitlines():
+                u = line.strip()
+                if u.upper().startswith("QUESTION:"):
+                    q = u.split(":", 1)[1].strip()
+                elif u.upper().startswith("FALSIFIER:"):
+                    f = u.split(":", 1)[1].strip()
+            return (q, f) if q else (None, None)
+        except Exception as e:
+            print(f"[seed] escalation failed: {e}")
+            return (None, None)
+
     async def _seed_research_frontier(self) -> Optional[dict]:
         """Seed the QuestBoard with a HARD, ORIGINAL research question drawn from REAL
         vault gaps — open flywheel falsifiers, belief contradictions, and structural
@@ -431,6 +465,13 @@ class CorporationWorker:
             if lead is None:
                 return None                       # everything fresh-worthy already on the board
             kind, short, prompt, seedkey = lead
+
+            # Tah 3 — "raise it twice": escalate the raw candidate to its hardest honest, still-measurable
+            # version before it hits the board, so the generator never hands off the shallow first framing.
+            esc_q, esc_f = await self._escalate_lead(kind, short, prompt)
+            if esc_q:
+                short = esc_q[:150]
+                prompt = esc_q + (f"\nFalsifier to target: {esc_f}" if esc_f else "")
 
             quest_id = f"frontier-{kind}-{datetime.now().strftime('%Y%m%d_%H%M%S')}"
             title = f"Research question: {short}"
