@@ -122,7 +122,7 @@ def sign_revert(principal_sk_hex: str, challenge: str) -> str:
     sk = _Ed25519SK.from_private_bytes(bytes.fromhex(principal_sk_hex))
     return sk.sign(challenge.encode()).hex()
 
-__version__ = "0.7.12"
+__version__ = "0.7.13"
 
 # Internal sentinel: marks a reaffirm write already authorized by submit_revert() (which verified the
 # signed INTENT). Object identity — no text/content path can ever produce it.
@@ -1101,6 +1101,34 @@ class Mnemo:
                             meta={"routed": "revert_named_instream", "revert_nonce": nonce,
                                   "instream": "absolute"})
         return {"ok": True, "kind": "absolute", "restored": rid, "target": target}
+
+    # ── the LIVENESS FLOOR (0.7.13, jacksonxly r/RAG): the store owns no-infinite-bypass ─────────
+    # jackson's boundary: the store must GUARANTEE a submitted revert can't be bypassed unboundedly
+    # (worst case "lands later" = harness policy; worst case "never lands" = a store liveness property).
+    # In this synchronous store the floor holds BY CONSTRUCTION: submit_revert is terminal — it evaluates
+    # atomically against the current state on the call itself and either lands or conflicts, it is never
+    # left "pending" for writes to bypass. So the maximum bypass of a submitted revert is ZERO; a harness
+    # can only choose WHEN the call runs (deprioritize -> lands later), never turn it into never-evaluated.
+    # revert_now / restore_now make that a first-class primitive: mint + submit in ONE call, so a caller
+    # cannot wedge writes into the mint->submit window and hand-roll a starvation-prone pattern. "If a
+    # caller can break it, it isn't a guarantee, it's a hope" — so the land-now path is the store's, not
+    # something every caller re-implements.
+
+    def restore_now(self, key: str, target: str, sign=None, capability: str | None = None) -> dict:
+        """ABSOLUTE revert, atomic: mint + submit with no gap. The absolute path owes the LAND, so this
+        lands (exactly once) regardless of intervening writes. `sign(intent)->cap` for the asymmetric
+        (revert_pubkey) store; `capability` for the symmetric one; neither for a no-authority store."""
+        intent = self.restore_intent(key, target)
+        cap = capability if capability is not None else (sign(intent) if sign else None)
+        return self.submit_revert(intent, cap)
+
+    def revert_now(self, key: str, sign=None, capability: str | None = None) -> dict:
+        """RELATIVE revert, atomic: mint + submit with zero gap, so the only failure is a genuine
+        same-instant conflict (the value already moved), never a bypass/starvation from writes sneaking
+        into the mint->submit window. The relative path owes FAIRNESS: evaluated now, lands or conflicts."""
+        intent = self.revert_intent(key)
+        cap = capability if capability is not None else (sign(intent) if sign else None)
+        return self.submit_revert(intent, cap)
 
     # ── route(): the write-path intent router (tagger + fuzzy-version resolver) ─
     _ROUTE_REVERT = re.compile(
