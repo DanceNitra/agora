@@ -1,0 +1,33 @@
+{
+  "$schema": "https://static.modelcontextprotocol.io/schemas/2025-07-09/server.schema.json",
+  "name": "io.github.dancenitra/mnemo",
+  "description": "Zero-dependency memory layer for AI agents: value-ranked recall, per-type decay, consolidation, and a first-class CORRECTION channel (revert, echo-guard, lineage-aware retract + re-derive) with tamper-evident erasure proof. 12 MCP tools.",
+  "repository": {
+    "url": "https://github.com/DanceNitra/agora",
+    "source": "github"
+  },
+  "version": "0.7.18",
+  "websiteUrl": "https://pypi.org/project/agora-mnemo/",
+  "packages": [
+    {
+      "registryType": "pypi",
+      "registryBaseUrl": "https://pypi.org",
+      "identifier": "agora-mnemo",
+      "version": "0.7.18",
+      "transport": { "type": "stdio" },
+      "runtimeHint": "python",
+      "environmentVariables": [
+        {
+          "name": "MNEMO_PATH",
+          "description": "Path to the JSON memory file the server persists to (defaults to ./mnemo_memory.json).",
+          "isRequired": false
+        },
+        {
+          "name": "MNEMO_ECHO_GUARD",
+          "description": "1 (default) blocks a restated retired value from resurrecting a corrected fact; set 0 for legacy keyed supersession.",
+          "isRequired": false
+        }
+      ]
+    }
+  ]
+}
