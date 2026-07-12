@@ -78,6 +78,18 @@ The behavioral override is not a weak-model artifact. Across two families the na
 NOT buffer the corruption away — if anything it takes the corroborating mass slightly more seriously (0.47 >
 0.40). The "a frontier model would just reason around it" objection is empirically rejected for glm-5.2.
 
+## Self-audit: is the override an artifact of context construction? (No — verified)
+
+The agent's context is a broad recall over the entity's neighborhood (the union of top-k over several
+questions about the entity), not a single direct-fact lookup. We verified the correction IS present in that
+context (e.g. "Our primary database is PostgreSQL." sits alongside two surviving "MongoDB ..." derivatives).
+So the override is genuine: with the correction visible, the corroborating mass (1 correction vs k surviving
+derivatives) still flips the answer 40-47% of the time. The effect scales with k precisely because more
+laundered derivatives outnumber the single correction — that IS the mechanism, not a rigged ratio. HONEST
+SCOPE: the harm requires the agent to retrieve the neighborhood (which realistic context-gathering agents
+do); an agent that only ever did a narrow direct-fact lookup, with the retriever ranking the correction
+top-1, would not see the derivatives and would not be harmed.
+
 ## Honest scope / limits
 
 - n=15 scenarios (pilot). One entity per scenario, synthetic domains.
