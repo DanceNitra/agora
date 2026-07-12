@@ -122,7 +122,7 @@ def sign_revert(principal_sk_hex: str, challenge: str) -> str:
     sk = _Ed25519SK.from_private_bytes(bytes.fromhex(principal_sk_hex))
     return sk.sign(challenge.encode()).hex()
 
-__version__ = "0.7.15"
+__version__ = "0.7.16"
 
 # Internal sentinel: marks a reaffirm write already authorized by submit_revert() (which verified the
 # signed INTENT). Object identity — no text/content path can ever produce it.
@@ -894,6 +894,34 @@ class Mnemo:
                 "erasures": [{"memory_id": t["memory_id"], "ts": t.get("ts"),
                               "request_id": t.get("request_id"), "signed": "sig" in t}
                              for t in self._tombstones]}
+
+    def retract_lineage(self, subject: str, reason: str = "lineage_corrected") -> dict:
+        """The MIDDLE PATH between a value-only correction and forget_subject, for when a fact was corrected
+        AFTER it had laundered itself into derived write-backs. A value-only correction leaves those derived
+        records ACTIVE, so they keep asserting the retired value and resurface (measured: recovery_halflife_
+        pilot.py — the corrected root is in context yet the corroborating mass flips the agent's answer). forget_
+        subject HARD-DELETES the lineage, which removes the poison but also the legitimate payload entangled in
+        those derived facts. retract_lineage DEMOTES `subject` and every record that inherited it through
+        derived_from taint to status='superseded' — excluded from default recall (so they stop asserting the
+        retired value) but RETAINED (recallable with include_superseded) and stamped needs_rederivation, so the
+        derived facts can be re-derived against the corrected root instead of lost. A store with provenance can
+        do this; a bag-of-embeddings cannot. `subject` matches canonical sources exactly like forget_subject.
+        Returns {demoted, ids}. Reversible: nothing is deleted; only status + meta change."""
+        cand = {subject, Mnemo._canon_source(subject)}
+        targets = [r for r in self.items if r.get("status") == "active" and (cand & Mnemo._rec_sources(r))]
+        now = time.time()
+        ids = []
+        for r in targets:
+            r["status"] = "superseded"
+            r["invalidated_at"] = now
+            meta = r.setdefault("meta", {})
+            meta["retracted_reason"] = reason
+            meta["needs_rederivation"] = True
+            ids.append(r["id"])
+        if ids:
+            self._mat = None; self._mat_built_n = -1        # status change alters the recall pool
+            self._save(force=True)
+        return {"demoted": len(ids), "ids": sorted(ids)}
 
     def _current_active_id(self, key: str) -> str:
         """id of the record currently CURRENT for `key` (the thing a revert would undo), or "" if none.

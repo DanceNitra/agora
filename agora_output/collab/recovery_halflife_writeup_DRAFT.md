@@ -50,9 +50,10 @@ Behavioral harm (agent answers with the poison value as current fact):
 
 | model | method | k=0 | k=3 |
 |---|---|---|---|
-| deepseek-v4-flash | none | 0.67 | 0.80 |
-| deepseek-v4-flash | naive_overwrite | 0.00 | **0.40** (6/15) |
-| deepseek-v4-flash | lineage_revert | 0.00 | **0.00** (0/15) |
+| deepseek-v4-flash | none | 0.67 | 0.73-0.80 |
+| deepseek-v4-flash | naive_overwrite | 0.00 | **0.40-0.47** |
+| deepseek-v4-flash | lineage_revert | 0.00 | **0.00** |
+| deepseek-v4-flash | lineage_demote (NEW) | 0.00 | **0.00** |
 | glm-5.2 (2nd family) | none | — | 1.00 (15/15) |
 | glm-5.2 (2nd family) | naive_overwrite | — | **0.47** (7/15) |
 | glm-5.2 (2nd family) | lineage_revert | — | **0.00** (0/15) |
@@ -64,12 +65,26 @@ Behavioral harm (agent answers with the poison value as current fact):
 - Buffering is partial, and now quantified: at naive k=3 the model split 6 poison / 4 correct / 5 other — it
   buffers some, the corroboration wins ~40%. The storm's "LLMs buffer corruption" is a half-truth.
 
-## The honest tradeoff (collateral cost)
+## The honest tradeoff, and the fix we built (mnemo 0.7.16 `retract_lineage`)
 
-`lineage_revert` erases the derived scaffolding: at k=3 it retains 0.0/3 derived facts vs naive's 3.0/3. So
-it removes the poison but also the legitimate payload entangled in those laundered entries (a connection
-string location, a backup schedule). Neither simple method RE-DERIVES the derived facts from the corrected
-root — that is the correct fix and the frontier question.
+The experiment exposed a frontier: `naive_overwrite` leaves the derived facts ACTIVE and poisoned (harm),
+while `lineage_revert` (forget_subject) HARD-DELETES them (0 harm but the legitimate payload — a connection
+string location, a backup schedule — is lost with the poison). Neither RE-DERIVES.
+
+So we built the middle path. `retract_lineage(subject)` demotes the subject and its derived_from lineage to
+`status='superseded'` — excluded from default recall (so they stop asserting the retired value) but RETAINED
+(recallable with `include_superseded`) and stamped `needs_rederivation`, so an agent can regenerate them
+against the corrected root instead of losing them. A store with provenance can do this; a bag-of-embeddings
+cannot. Measured (k=3):
+
+| method | behavioral harm | derived payload: active / retained |
+|---|---|---|
+| naive_overwrite | 0.40-0.47 | 3.0 / 3.0 (active, poisoned -> harm) |
+| lineage_revert | 0.00 | 0.0 / 0.0 (erased -> info loss) |
+| **lineage_demote (retract_lineage)** | **0.00** | **0.0 / 3.0 (no harm AND payload kept for re-derivation)** |
+
+This is the product half of the finding: the fix for laundered-lineage harm is not erasure, it is lineage-
+aware demotion + flagging for re-derivation, which requires the write-history a value store does not keep.
 
 ## Cross-family generality (the overclaim lens's main concern — now tested)
 
