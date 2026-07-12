@@ -896,17 +896,20 @@ class Mnemo:
                              for t in self._tombstones]}
 
     def retract_lineage(self, subject: str, reason: str = "lineage_corrected") -> dict:
-        """The MIDDLE PATH between a value-only correction and forget_subject, for when a fact was corrected
-        AFTER it had laundered itself into derived write-backs. A value-only correction leaves those derived
-        records ACTIVE, so they keep asserting the retired value and resurface (measured: recovery_halflife_
-        pilot.py — the corrected root is in context yet the corroborating mass flips the agent's answer). forget_
-        subject HARD-DELETES the lineage, which removes the poison but also the legitimate payload entangled in
-        those derived facts. retract_lineage DEMOTES `subject` and every record that inherited it through
-        derived_from taint to status='superseded' — excluded from default recall (so they stop asserting the
-        retired value) but RETAINED (recallable with include_superseded) and stamped needs_rederivation, so the
-        derived facts can be re-derived against the corrected root instead of lost. A store with provenance can
-        do this; a bag-of-embeddings cannot. `subject` matches canonical sources exactly like forget_subject.
-        Returns {demoted, ids}. Reversible: nothing is deleted; only status + meta change."""
+        """Lineage-aware correction: the MIDDLE PATH between a value-only supersession (which leaves records
+        DERIVED from a now-corrected fact still active — the knowledge-editing 'ripple effect', Cohen et al.
+        RippleEdits, TACL 2024) and forget_subject (which HARD-DELETES the lineage, losing the legitimate
+        payload entangled in those derived facts). retract_lineage DEMOTES `subject` and every record that
+        inherited it through derived_from taint to status='superseded' — excluded from default recall but
+        RETAINED (recallable with include_superseded) and stamped needs_rederivation, so an app can re-derive
+        the affected facts against the corrected root rather than lose them. This is retract-and-retain +
+        dependency-directed propagation — classic Truth-Maintenance (Doyle, AIJ 1979) and provenance/bitemporal
+        invalidation-with-retention, recently ported to LLM-agent memory (TOKI, arXiv 2606.06240; MemLineage,
+        arXiv 2605.14421); mnemo's contribution is only that it rides the same derived_from taint as forget_
+        subject, so it needs no separate graph. CAVEAT: it can only cascade on links that were actually
+        recorded — derived writes that never carried derived_from are invisible to it. `subject` matches
+        canonical sources exactly like forget_subject. Returns {demoted, ids}. Reversible: nothing is deleted;
+        only status + meta change."""
         cand = {subject, Mnemo._canon_source(subject)}
         targets = [r for r in self.items if r.get("status") == "active" and (cand & Mnemo._rec_sources(r))]
         now = time.time()

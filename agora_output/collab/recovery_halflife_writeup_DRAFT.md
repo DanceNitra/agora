@@ -1,6 +1,29 @@
 # Correcting a corrupted agent memory is not the same as reversing its harm
 
-**Status: DRAFT (pre-publish gate pending). Flash numbers locked; glm-5.2 generality arm + result-audit + verify-claims still to run before anything goes outward. Owner-gated for publication.**
+**STATUS: KILLED AT THE PUBLISH GATE — NOT FOR PUBLICATION (2026-07-12). Recorded as an honest dead-end.**
+
+Two independent reasons the audit (stress-claim, 5 lenses + citation verification) killed the flagship:
+
+1. **The behavioral 40-47% override was an artifact of the context construction.** The LLM context was built
+   as the UNION of top-k lexical recall over four neighborhood queries, which deterministically stacked all
+   k=3 poison-mentioning derived entries against a single correction line (a 3:1 majority). The decisive
+   control — a single realistic value-weighted recall on the direct question — collapses naive_overwrite
+   behavioral harm from 0.40-0.47 to **0.00 (0/15)**; the correction surfaces in 15/15 scenarios and poison
+   in 0/15 without it. The override was our own stacked context, not a store-integrity property. (What the
+   naive_overwrite arm does show — that a keyed supersession leaves keyless free-text derivatives active — is
+   real but is exactly the knowledge-editing ripple effect, textbook.)
+
+2. **The gap and the fix are both textbook, verified against real primary sources.** Recovery gap = Cohen et
+   al. RippleEdits (TACL 2024, arXiv 2307.12976) + Truth-Maintenance Systems (Doyle, AIJ 1979). The fix
+   (retract_lineage = demote-but-retain a derived lineage) = TMS retract-and-retain + provenance/bitemporal
+   invalidation-with-retention, already ported to LLM-agent memory in TOKI (arXiv 2606.06240) and MemLineage
+   (arXiv 2605.14421). Not a novel discovery.
+
+Kept: `mnemo.retract_lineage` ships as a modest product primitive with prior-art citations in its docstring.
+Not published. The original draft is preserved below for the record.
+
+---
+
 
 ## The question
 
