@@ -544,6 +544,29 @@ async def action_evaluate_proposal(config: dict, quest: dict, params: dict) -> d
         except Exception as e:
             print(f"[CEO/CTO] DB update error: {e}")
 
+    # Tah 5 (feedback loop): write the death-reason back into corporation memory so the PromptEngine injects
+    # it into the NEXT generation — the Frontier Scout learns from kills. This also keeps agent prompts fresh
+    # with corporation memory (the recurring 'prompt_stale' health alert) as a durable side effect.
+    if qe and quest_id and not approved:
+        try:
+            from agora.dungeon_os.corporation_memory import CorporationMemory
+            mem = CorporationMemory(qe.db)
+            await mem.ensure_tables()
+            if needs_measurement:
+                lesson = (f"Ambitious lead (ambition {ambition}) failed ONLY on measurement — design a clean, "
+                          f"NON-circular measurement (external ground truth, no shared mediator) before "
+                          f"proposing. Never drop an ambitious lead for lacking rigor; design the rigor.")
+                cat = "measurement"
+            else:
+                lesson = (f"Rejected a lead as shallow/textbook (ambition {ambition}): "
+                          f"{(ceo_verdict.get('rationale') or '')[:140]}. Aim higher — attack a HARD OPEN "
+                          f"question, not a re-derivation of a known result.")
+                cat = "ambition"
+            await mem.store_lesson(lesson=lesson, source_quest=quest_id, source_phase="evaluate",
+                                   role_target="scout", category=cat, impact_score=0.6)
+        except Exception as e:
+            print(f"[CEO/CTO] memory store failed: {e}")
+
     outcome = "✅ APPROVED" if approved else ("🔬 NEEDS MEASUREMENT" if needs_measurement else "❌ REJECTED")
     next_step = ("→ Moving to PATA phase" if approved else
                  "→ Ambitious — design a clean measurement and resubmit" if needs_measurement else
