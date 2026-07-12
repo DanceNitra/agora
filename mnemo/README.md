@@ -6,7 +6,7 @@
 
 *Memory is the mother of the Muses. An agent with no memory has no ideas.*
 
-`pip install agora-mnemo` · [PyPI](https://pypi.org/project/agora-mnemo/) · [Hugging Face](https://huggingface.co/Danchi17/mnemo) · [DOI 10.5281/zenodo.21128549](https://doi.org/10.5281/zenodo.21128549) · MIT · v0.7.18
+`pip install agora-mnemo` · [PyPI](https://pypi.org/project/agora-mnemo/) · [Hugging Face](https://huggingface.co/Danchi17/mnemo) · [DOI 10.5281/zenodo.21128549](https://doi.org/10.5281/zenodo.21128549) · MIT · v0.7.19
 
 </div>
 
@@ -664,3 +664,5 @@ who does **not** hold `receipt_key`; anchor the chain head externally for operat
 tamper-evident **integrity primitive, not a compliance certification**. Prior art: crypto-shredding, Cassandra
 / event-sourcing tombstones, Certificate Transparency.
 
+<!-- MCP registry ownership proof -->
+mcp-name: io.github.DanceNitra/mnemo

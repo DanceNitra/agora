@@ -6,7 +6,7 @@
 
 *Memory is the mother of the Muses. An agent with no memory has no ideas.*
 
-`pip install agora-mnemo` · [PyPI](https://pypi.org/project/agora-mnemo/) · [Hugging Face](https://huggingface.co/Danchi17/mnemo) · [DOI 10.5281/zenodo.21128549](https://doi.org/10.5281/zenodo.21128549) · MIT · v0.7.18
+`pip install agora-mnemo` · [PyPI](https://pypi.org/project/agora-mnemo/) · [Hugging Face](https://huggingface.co/Danchi17/mnemo) · [DOI 10.5281/zenodo.21128549](https://doi.org/10.5281/zenodo.21128549) · MIT · v0.7.19
 
 </div>
 
@@ -1113,3 +1113,6 @@ marked `## Related (auto-suggested)` block of `[[links]]` to each orphan — add
 (re-running replaces its own block), **dry-run by default**. `python maintain.py` runs a verified
 round-trip on a synthetic vault (diagnose → suggest → apply); `maintenance_report` and `apply_links`
 in `second_brain_mcp.py` expose it to any MCP agent.
+
+<!-- MCP registry ownership proof -->
+mcp-name: io.github.DanceNitra/mnemo

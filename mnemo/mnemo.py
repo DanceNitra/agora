@@ -122,7 +122,7 @@ def sign_revert(principal_sk_hex: str, challenge: str) -> str:
     sk = _Ed25519SK.from_private_bytes(bytes.fromhex(principal_sk_hex))
     return sk.sign(challenge.encode()).hex()
 
-__version__ = "0.7.18"
+__version__ = "0.7.19"
 
 # Internal sentinel: marks a reaffirm write already authorized by submit_revert() (which verified the
 # signed INTENT). Object identity — no text/content path can ever produce it.
