@@ -39,7 +39,7 @@ jobs:
           mkdir -p _site
           cp index.html _site/index.html
           touch _site/.nojekyll
-          [ -f favicon.svg ] && cp favicon.svg _site/favicon.svg || true
+          for ic in favicon.svg favicon-32.png favicon-180.png; do [ -f "$ic" ] && cp "$ic" "_site/$ic" || true; done
           cp -r public _site/public
           [ -f sitemap.xml ] && cp sitemap.xml _site/sitemap.xml || true
           [ -f robots.txt ] && cp robots.txt _site/robots.txt || true
