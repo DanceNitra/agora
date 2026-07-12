@@ -6,7 +6,7 @@
 
 *Memory is the mother of the Muses. An agent with no memory has no ideas.*
 
-`pip install agora-mnemo` · [PyPI](https://pypi.org/project/agora-mnemo/) · [Hugging Face](https://huggingface.co/Danchi17/mnemo) · [DOI 10.5281/zenodo.21128549](https://doi.org/10.5281/zenodo.21128549) · MIT · v0.7.17
+`pip install agora-mnemo` · [PyPI](https://pypi.org/project/agora-mnemo/) · [Hugging Face](https://huggingface.co/Danchi17/mnemo) · [DOI 10.5281/zenodo.21128549](https://doi.org/10.5281/zenodo.21128549) · MIT · v0.7.18
 
 </div>
 
@@ -640,4 +640,27 @@ is SKIPPED and reported, never guessed; pass `rewrite=` for an LLM-backed rewrit
 corrected value (3/3), vs naive correction (poisoned payload stays active, harm 0.98), hard delete (payload
 lost) or demote alone (payload parked). corrupt -> launder -> correct -> `retract_lineage` -> `rederive` is
 the complete correction lifecycle.
+
+### Erasure-with-proof, in one call: `governance_report()` (0.7.18)
+A right-to-erasure request (GDPR Art.17) is one place agent memory gets legally sharp: you must delete a
+subject's data *and* keep an auditable record of the act (Art.30), without the deletion looking like tampering.
+mnemo already has the parts — `forget_subject(subject, request_id=...)` hard-deletes the subject **plus its
+`derived_from` lineage** (a summary built from that subject's data goes too) and writes a hash-chained,
+optionally Ed25519-signed deletion tombstone; `verify_writes()` then proves both the write-receipt chain and
+the tombstone chain are intact, so a real erasure reads as *accounted-for* while a silent out-of-band delete
+still trips the verifier. `governance_report(expected_pubkey=...)` stitches these into one auditor-facing
+surface: erasures total, a per-`request_id` breakdown, and the tamper-evidence verdict.
+
+```python
+m.forget_subject("user-42", request_id="dsr-2026-07-12-0001")
+m.governance_report(expected_pubkey=pk)
+# -> {erasures_total, by_request:{"dsr-...":{erased, memory_ids}}, proof:{verified:True, all_signed:True, ...}, scope}
+```
+
+**Honest scope (stated in-band, because overclaiming here is the failure mode):** erasure is within *this*
+mnemo store only — not your vector store, prompt logs, or backups — and the tombstone proves the *act* of
+deletion, never the content (a hash of PII is still PII). The signature is load-bearing only against a party
+who does **not** hold `receipt_key`; anchor the chain head externally for operator-adversarial audit. It is a
+tamper-evident **integrity primitive, not a compliance certification**. Prior art: crypto-shredding, Cassandra
+/ event-sourcing tombstones, Certificate Transparency.
 

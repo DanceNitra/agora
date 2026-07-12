@@ -122,7 +122,7 @@ def sign_revert(principal_sk_hex: str, challenge: str) -> str:
     sk = _Ed25519SK.from_private_bytes(bytes.fromhex(principal_sk_hex))
     return sk.sign(challenge.encode()).hex()
 
-__version__ = "0.7.17"
+__version__ = "0.7.18"
 
 # Internal sentinel: marks a reaffirm write already authorized by submit_revert() (which verified the
 # signed INTENT). Object identity — no text/content path can ever produce it.
@@ -894,6 +894,48 @@ class Mnemo:
                 "erasures": [{"memory_id": t["memory_id"], "ts": t.get("ts"),
                               "request_id": t.get("request_id"), "signed": "sig" in t}
                              for t in self._tombstones]}
+
+    def governance_report(self, expected_pubkey: str | None = None) -> dict:
+        """ONE auditor-facing surface for erasure-with-proof — the compliance view of forget_subject, built for
+        the right-to-erasure demand (GDPR Art.17) that an EU-AI-Act operator has to satisfy while keeping an
+        auditable record of the ACT (Art.30). It stitches the three primitives an auditor would otherwise call
+        separately — the tombstone ledger, the per-request breakdown, and the tamper-evidence verdict — into a
+        single report, and states in-band exactly what it does and does NOT certify.
+
+        Returns {erasures_total, by_request:{request_id:{erased, memory_ids}}, proof:{verified, problems,
+        all_signed, expected_pubkey}, scope}. `proof.verified` is verify_writes() over BOTH the write-receipt
+        chain and the deletion-tombstone chain — a forged or dropped tombstone (hiding a real out-of-band
+        delete) shows up here.
+
+        HONEST SCOPE (read before relying on it for compliance): erasure is WITHIN this mnemo store only — NOT
+        the app's vector store, prompt logs, or backups — and it covers the subject PLUS its derived_from
+        lineage (a summary built from the subject's data is erased too). It is a tamper-evident INTEGRITY
+        primitive, NOT a compliance certification. The tombstone proves the ACT of deletion (a record with this
+        surrogate id was erased at T for request R), never the CONTENT (a hash of PII is still PII). The
+        signature is load-bearing only against a party who does NOT hold receipt_key (the operator who holds
+        the key can forge tombstones too — anchor the chain head externally for operator-adversarial audit).
+        Prior art: crypto-shredding; Cassandra / event-sourcing tombstones; GDPR Art.17/30 erasure logs;
+        Crosby-Wallach / Certificate Transparency tamper-evident logs."""
+        ok, problems = self.verify_writes(expected_pubkey)
+        by_req: dict = {}
+        for t in self._tombstones:
+            by_req.setdefault(t.get("request_id"), []).append(t.get("memory_id"))
+        return {
+            "erasures_total": len(self._tombstones),
+            "by_request": {rid: {"erased": len(ids), "memory_ids": sorted(i for i in ids if i)}
+                           for rid, ids in by_req.items()},
+            "proof": {
+                "verified": ok,
+                "problems": problems,
+                "all_signed": bool(self._tombstones) and all("sig" in t for t in self._tombstones),
+                "expected_pubkey": expected_pubkey,
+            },
+            "scope": ("Erasure is within THIS mnemo store only (not the app's vector store, prompt logs, or "
+                      "backups); covers the subject PLUS its derived_from lineage. Tamper-evident integrity "
+                      "primitive, NOT a compliance certification. The tombstone proves the ACT of deletion, "
+                      "never the content; its signature is load-bearing only against a non-holder of "
+                      "receipt_key. Anchor the chain head externally for operator-adversarial audit."),
+        }
 
     def retract_lineage(self, subject: str, reason: str = "lineage_corrected") -> dict:
         """Lineage-aware correction: the MIDDLE PATH between a value-only supersession (which leaves records
