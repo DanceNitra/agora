@@ -8,7 +8,27 @@ datasets, the cosine baseline is explicitly framed as one member of the cosine f
 adaptive strategy is cross-referenced to the order-shuffle result. Both authors review before anything goes
 public; the public version passes Agora's full validate -> storm -> audit -> verify gate.
 
+*Gate-added for review (2026-07-12), flagged for the co-authors: the Abstract, the Related Work section, a
+References list, and softened "solved" -> "well-predicted" wording. All additive; nothing about the method or
+numbers changed.*
+
 ---
+
+## Abstract
+
+Value-obscuring reversion is a memory-integrity failure in which a user reverts a corrected value without
+naming the value or issuing an explicit revert command, referring instead to the role or context that set it.
+Value matching, keyword search, and cosine-vs-value are near-blind (F1 ~0.03 and ~0.55). Working across two
+independent implementations (TAT-Monitor, native all-MiniLM-L6-v2; and an Agora reimplementation on
+nomic-embed-text) on author-built adversarial fixtures — mitigated by cross-party, cross-embedder reproduction
+and a real-noise set drawn from 2,769 live records — we find a training-free method, direct contextual
+comparison, reaches F1 0.905/0.930 on a naturalized held-out split. An order-shuffle experiment then shows the
+method's old-versus-new decision rides fixed line order (F1 0.500 shuffled), which exposes the real structure:
+the task factorizes into a text half (reference resolution) and a ledger half (recency attribution). Restoring
+provenance as an explicit ledger recovers the score with line order destroyed, and lifts a third-party
+detector on the real-noise set from F1 0.722 to 0.895. The contribution is the measured decomposition, its
+cross-implementation robustness, and a precisely bounded undecidable core: a bare, reference-free echo, which
+no text method can resolve and which needs a write-path authorization channel instead.
 
 ## 1. Introduction and problem statement
 
@@ -28,7 +48,29 @@ are practically blind here. This paper describes how we moved from initial attem
 the TAT architecture to a simple yet powerful method of direct contextual comparison, why that method works,
 and how the task factorizes into a text half and a provenance half with a precisely bounded undecidable core.
 
+## Related work
+
+That a correction's meaning depends on provenance rather than surface content is not a new idea; our
+contribution is the measurement, not the concept. Belief revision (Alchourrón, Gärdenfors & Makinson, 1985)
+formalizes how a knowledge base should absorb a change that contradicts prior commitments. Truth-maintenance
+systems (Doyle, 1979) track justification lineage so a retraction propagates to whatever depended on it.
+Bitemporal databases separate *valid time* (when a fact was true) from *transaction time* (when it was
+recorded) — exactly the distinction a stale re-mention collapses. In LLM systems the same shape recurs:
+knowledge-editing "ripple effects" (Cohen et al., *RippleEdits*, TACL 2024) show that editing one fact leaves
+entailed facts stale, and lineage-aware invalidation for agent memory has been proposed via bitemporal and
+derivation-graph designs. Against that backdrop, our contribution is specific and empirical: the measured
+decomposition of one hard, value-obscuring case into a text half (reference resolution) and a ledger half
+(recency attribution); order-shuffle evidence that a pure-text method smuggles provenance in through line
+order; cross-implementation, cross-embedder reproduction; and a precisely bounded undecidable core.
+
 ## 2. Data and experimental setup
+
+**A note on the fixtures (stated plainly):** the adversarial fixtures were built by this collaboration, so a
+single-team benchmark is a real risk. We mitigate it three ways, and the reader should weigh them: the method
+(TAT) and the fixtures (Agora) come from different parties; every headline number is reproduced independently
+on a second embedder; and the central result is re-measured on a real-noise set whose 2,769-record stream we
+did not author (Section 7). The honest arms-race below — shortcuts we shipped, caught, and retracted — is part
+of that mitigation, not decoration.
 
 For development and testing we used public fixtures created for this collaboration, available in the Agora
 repository (`agora_output/public_fixtures/`). **Provenance:** the value-obscuring fixtures
@@ -218,9 +260,11 @@ version; that the result holds across two embedders and two implementations is i
 
 ## 9. Conclusion and applicability boundaries
 
-The value-obscuring reversion task is solved by a combination of simple structural comparison and metadata:
-F1 0.905 on clean linguistic data (0.930 in independent reproduction) and F1 0.895 on noisy real data with
-provenance, against value-match ≈ 0.03 and value-cosine ≈ 0.55. The boundaries are clearly defined:
+On these fixtures the value-obscuring reversion task is well-predicted by a combination of simple structural
+comparison and metadata: F1 0.905 on clean linguistic data (0.930 in independent reproduction, n=46 heldout)
+and F1 0.895 on noisy real data with provenance (n=100), against value-match ≈ 0.03 and value-cosine ≈ 0.55.
+The sample sizes are small and the fixtures author-built (Section 2); the claim is scoped accordingly. The
+boundaries are clearly defined:
 
 - **Keyword distractors** — phrases carrying revert lexicon without being reverts — remain the cascade's
   false-positive source; they belong to the keyword stage's boundary.
@@ -245,6 +289,17 @@ generators, and audit probes are in the agora repository (`v4nat_decomposition_p
 `agora_output/public_fixtures/`). The audit lessons are stated plainly, including the two fixture shortcuts
 we shipped and retracted, the cosine-baseline claim published too broadly and corrected, and the memorised
 template result reported alongside the fix.
+
+## References
+
+- Alchourrón, C. E., Gärdenfors, P., & Makinson, D. (1985). On the logic of theory change: Partial meet
+  contraction and revision functions. *Journal of Symbolic Logic*, 50(2).
+- Doyle, J. (1979). A truth maintenance system. *Artificial Intelligence*, 12(3).
+- Snodgrass, R. T. (1999). *Developing Time-Oriented Database Applications in SQL* (bitemporal data models).
+- Cohen, R., Biran, E., Yoran, O., Globerson, A., & Geva, M. (2024). Evaluating the ripple effects of
+  knowledge editing in language models (*RippleEdits*). *TACL*.
+- Data, fixtures, and audit probes: github.com/DanceNitra/agora (`agora_output/public_fixtures/`,
+  `mnemo/probes/`). TAT-Monitor and experiment notebooks: TAT-ROOT / TAT-ONE-TAP.
 
 ## Acknowledgments
 
