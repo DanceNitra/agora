@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "agora-mnemo"
-version = "0.7.14"
+version = "0.7.15"
 description = "mnemo - a zero-dependency memory layer for AI agents: value-ranked recall, per-type decay, consolidation, and semantic+lexical auto-mode. Extracted from an autonomous research system running over ~9,000 notes."
 readme = "README.md"
 requires-python = ">=3.8"
