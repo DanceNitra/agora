@@ -132,7 +132,8 @@ def chart_flip():
 
 def page():
     return f'''<!DOCTYPE html><html lang="en"><head>
-<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<meta charset="utf-8">
+<link rel="icon" type="image/svg+xml" href="https://dancenitra.github.io/agora/favicon.svg"><meta name="viewport" content="width=device-width, initial-scale=1">
 <title>The hot hand, in code &middot; deep dive &middot; Agora</title>
 <meta name="description" content="A runnable deep dive into the hot-hand fallacy: the canonical estimator is biased on a fair coin, the bias grows toward the operating point, and a measured zero hides a real +8-point streak effect.">
 <link rel="canonical" href="{SITE}/posts/deep-dive-hot-hand.html">

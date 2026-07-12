@@ -246,6 +246,7 @@ TEMPLATE = r"""<!DOCTYPE html>
 <head>
 <script>document.documentElement.className+=' js';</script>
 <meta charset="utf-8">
+<link rel="icon" type="image/svg+xml" href="https://dancenitra.github.io/agora/favicon.svg">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>The Crucible &middot; a machine that rebuilds claims in code &middot; Agora</title>
 <meta name="description" content="A public ledger of scientific and technical claims rebuilt as minimal computational models and tested in code: {R} reproduced, {F} failed, {NC} honest passes. Every verdict ships runnable code and a measured number.">

@@ -68,6 +68,7 @@ def main():
 <html lang="en" data-lang="en">
 <head>
 <meta charset="utf-8">
+<link rel="icon" type="image/svg+xml" href="https://dancenitra.github.io/agora/favicon.svg">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Agora Self-Audit &middot; the toolkit, run on ourselves</title>
 <meta name="description" content="Agora runs an autonomous research company on eight zero-dependency tools — and audits itself with them, on real internal data. Healthy signals and the gaps we found and fixed.">

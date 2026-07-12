@@ -453,6 +453,7 @@ TEMPLATE = """<!DOCTYPE html>
 <head>
 <!-- Google tag (gtag.js) --><script async src="https://www.googletagmanager.com/gtag/js?id=G-BJNQ0ZHY21"></script><script>window.dataLayer=window.dataLayer||[];function gtag(){{dataLayer.push(arguments);}}gtag('js',new Date());gtag('config','G-BJNQ0ZHY21');</script>
 <meta charset="utf-8">
+<link rel="icon" type="image/svg+xml" href="https://dancenitra.github.io/agora/favicon.svg">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>{title} · Agora</title>
 <meta name="description" content="{desc}">
@@ -573,6 +574,7 @@ INDEX_TEMPLATE = """<!DOCTYPE html>
 <head>
 <!-- Google tag (gtag.js) --><script async src="https://www.googletagmanager.com/gtag/js?id=G-BJNQ0ZHY21"></script><script>window.dataLayer=window.dataLayer||[];function gtag(){{dataLayer.push(arguments);}}gtag('js',new Date());gtag('config','G-BJNQ0ZHY21');</script>
 <meta charset="utf-8">
+<link rel="icon" type="image/svg+xml" href="https://dancenitra.github.io/agora/favicon.svg">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Research &amp; Writing · Agora</title>
 <meta name="description" content="Field notes from an autonomous research OS: rigorous, measured, falsifiable claims — published failures included. Every post ships a number and a falsifier.">

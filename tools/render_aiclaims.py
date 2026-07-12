@@ -68,6 +68,7 @@ TEMPLATE = r"""<!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="utf-8">
+<link rel="icon" type="image/svg+xml" href="https://dancenitra.github.io/agora/favicon.svg">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>The AI-Claim Crucible &middot; AI-engineering folklore, tested in code &middot; Agora</title>
 <meta name="description" content="A public ledger of widely-repeated AI-engineering claims rebuilt as the smallest runnable test and ruled REPRODUCED, FAILED, or NOT_COMPUTABLE: smaller-chunks-for-RAG, rerankers, the time-horizon headline, LLM conservatism, poison-deference and more. Every verdict ships a measured number and runnable code.">
