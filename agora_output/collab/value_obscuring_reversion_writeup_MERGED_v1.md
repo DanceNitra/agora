@@ -206,8 +206,15 @@ total) and testing on the remaining 70 unseen examples, F1 rose to 0.744 (AUROC 
 0.94 and precision 1.0; the residual weakness sat on the keep class, indicating threshold calibration rather
 than a missing signal. The method can extract the structural invariant given sufficient calibration
 diversity, but is sensitive to template memorisation when the template count is small. (Artifacts: TAT-ROOT.)
-The second held-out (v2, 140 completely new phrasings) is prepared for final generalisation testing; its
-results will be included in the final version.
+
+On the full naturalized v4nat set (all 104 rows, both registers — legitimate for a training-free method,
+though only the 46-row heldout split carries the no-seen-phrasing guarantee), TAT-Monitor reaches Accuracy
+0.933 · Precision 0.880 · Recall 0.978 · **F1 0.926** · AUROC 0.986 · confusion [tn 53, fp 6; fn 1, tp 44].
+
+A note on the two heldout numbers reported in this paper: 0.905 and 0.930 are the SAME method on the SAME
+46-row heldout split, under two different embedders — TAT-Monitor's native all-MiniLM-L6-v2 (0.905) and
+Agora's independent reimplementation on nomic-embed-text (0.930). The gap is embedder choice, not a fixture
+version; that the result holds across two embedders and two implementations is itself part of the evidence.
 
 ## 9. Conclusion and applicability boundaries
 
