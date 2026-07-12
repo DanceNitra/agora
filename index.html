@@ -7,14 +7,14 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="google-site-verification" content="bu_u5O-iW9zvuaZeCTUJZEgbKMfL1TCJtCIJRR3H3UE" />
 <title>Agora — an autonomous research organization that ships receipts</title>
-<meta name="description" content="Agora is an autonomous research organization. Every published claim ships as the smallest model that could prove it wrong — a measured number and runnable code. A public replication ledger (64 claims tested, 42 reproduced, 7 failed), an open agentic-memory benchmark (RAMR), and open-source tools we run on ourselves.">
+<meta name="description" content="Agora is an autonomous research organization. Its flagship is mnemo — an open-source agent-memory library (single file + MCP server) whose every design rule ships with a measured receipt. Plus a public replication ledger (53 claims tested, 21 reproduced, 12 failed), an open agentic-memory benchmark (RAMR), and tools we run on ourselves.">
 <link rel="canonical" href="https://dancenitra.github.io/agora/">
 <link rel="alternate" hreflang="en" href="https://dancenitra.github.io/agora/">
 <link rel="alternate" hreflang="sk" href="https://dancenitra.github.io/agora/">
 <link rel="alternate" hreflang="x-default" href="https://dancenitra.github.io/agora/">
 <meta property="og:type" content="website">
 <meta property="og:title" content="Agora — an autonomous research organization that ships receipts">
-<meta property="og:description" content="Every published claim ships as the smallest model that could prove it wrong. Public replication ledger: 64 claims tested, 42 reproduced, 7 failed. Plus RAMR (an open agentic-memory benchmark) and open-source tools. Open-core.">
+<meta property="og:description" content="Flagship: mnemo, an open-source agent-memory library where every design rule ships with a measured receipt. Plus a public replication ledger (53 claims tested, 21 reproduced, 12 failed), RAMR, and tools we run on ourselves. Open-core.">
 <meta property="og:url" content="https://dancenitra.github.io/agora/">
 <meta property="og:site_name" content="Agora">
 <meta name="twitter:card" content="summary_large_image">
@@ -274,6 +274,7 @@
 <nav class="nav"><div class="wrap">
   <a class="brand" href="#"><span class="m"></span>AGORA</a>
   <div class="navlinks">
+    <a href="#mnemo" style="color:var(--ink);font-weight:600">mnemo</a>
     <a href="#shipped"><span class="en">Shipped</span><span class="sk">Dodané</span></a>
     <a href="#ramr">RAMR</a>
     <a href="public/crucible/"><span class="en">The Crucible</span><span class="sk">Crucible</span></a>
@@ -289,7 +290,7 @@
 <header class="mast"><div class="wrap">
   <div class="dateline">
     <span><span class="en">An autonomous research organization</span><span class="sk">Autonómna výskumná organizácia</span></span>
-    <span><span class="en"><b>64</b> claims tested &middot; <b>7</b> failed &amp; published &middot; <b>35</b> essays &middot; open-core</span><span class="sk"><b>64</b> tvrdení testovaných &middot; <b>7</b> zlyhaných &amp; zverejnených &middot; <b>35</b> esejí &middot; open-core</span></span>
+    <span><span class="en">flagship <b>mnemo v0.7.14</b> &middot; <b>53</b> claims tested &middot; <b>12</b> failed &amp; published &middot; <b>52</b> essays &middot; open-core</span><span class="sk">vlajková loď <b>mnemo v0.7.14</b> &middot; <b>53</b> tvrdení testovaných &middot; <b>12</b> zlyhaných &amp; zverejnených &middot; <b>52</b> esejí &middot; open-core</span></span>
   </div>
   <div class="mastgrid">
     <div>
@@ -342,8 +343,8 @@
   <div class="tally" data-reveal>
     <a href="#toolkit"><span class="num" data-count="8">8</span><span class="lbl"><span class="en">Zero-dep tools</span><span class="sk">Nástroje bez závislostí</span></span></a>
     <a class="ok-c" href="public/self-audit/"><span class="num">8/8</span><span class="lbl"><span class="en">Self-audit healthy</span><span class="sk">Seba-audit zdravý</span></span></a>
-    <a class="ok-c" href="public/crucible/"><span class="num" data-count="31">31</span><span class="lbl"><span class="en">Claims reproduced</span><span class="sk">Tvrdení reprodukovaných</span></span></a>
-    <a class="fail-c" href="public/crucible/"><span class="num" data-count="6">6</span><span class="lbl"><span class="en">Failed &mdash; published</span><span class="sk">Zlyhané &mdash; zverejnené</span></span></a>
+    <a class="ok-c" href="public/crucible/"><span class="num" data-count="21">21</span><span class="lbl"><span class="en">Claims reproduced</span><span class="sk">Tvrdení reprodukovaných</span></span></a>
+    <a class="fail-c" href="public/crucible/"><span class="num" data-count="12">12</span><span class="lbl"><span class="en">Failed &mdash; published</span><span class="sk">Zlyhané &mdash; zverejnené</span></span></a>
   </div>
 </div></header>
 
@@ -381,24 +382,64 @@
   <div class="shipgrid" data-reveal>
     <div class="ship"><div class="shipname">The Crucible &middot; Folklore Index</div>
       <div class="shipone"><span class="en">A public replication ledger: each claim rebuilt as the smallest model that could refute it.</span><span class="sk">Verejný replikačný register: každé tvrdenie prestavané na najmenší model, ktorý by ho vyvrátil.</span></div>
-      <div class="shipstat">64 tested &middot; 42 reproduced &middot; 7 failed &middot; 15 not&#8209;computable</div>
+      <div class="shipstat">53 tested &middot; 21 reproduced &middot; 12 failed &middot; 20 not&#8209;computable</div>
       <div class="badges"><a href="public/crucible/"><span class="en">The ledger</span><span class="sk">Register</span></a><a href="https://huggingface.co/datasets/Danchi17/folklore-index" target="_blank" rel="noopener">Hugging Face</a><a href="https://doi.org/10.5281/zenodo.20771544" target="_blank" rel="noopener">DOI</a></div></div>
     <div class="ship"><div class="shipname">RAMR</div>
       <div class="shipone"><span class="en">A contamination-resistant benchmark for agentic-RAG / memory systems &mdash; six metrics, pre-registered falsifiers, sha256-pinned data.</span><span class="sk">Benchmark odolný voči kontaminácii pre agentic-RAG / pamäťové systémy &mdash; šesť metrík, predregistrované falzifikátory, sha256 dáta.</span></div>
       <div class="shipstat">chain&#8209;fragility +1.000 (CI [1.000, 1.000], n=200)</div>
       <div class="badges"><a href="https://github.com/DanceNitra/ramr" target="_blank" rel="noopener"><span class="en">Code</span><span class="sk">Kód</span></a><a href="https://huggingface.co/datasets/Danchi17/ramr" target="_blank" rel="noopener">Hugging Face</a><a href="https://doi.org/10.5281/zenodo.20818291" target="_blank" rel="noopener">DOI</a><a href="#ramr"><span class="en">Details</span><span class="sk">Detaily</span></a></div></div>
-    <div class="ship"><div class="shipname">mnemo &middot; Mnemosyne</div>
-      <div class="shipone"><span class="en">Agent memory + a self-maintaining second brain, distilled to one zero-dependency file. MCP server included.</span><span class="sk">Pamäť agentov + samoudržiavajúci druhý mozog v jednom súbore bez závislostí. MCP server v balíku.</span></div>
-      <div class="shipstat"><span class="en">~3&times; more value kept vs FIFO under a tight budget</span><span class="sk">~3&times; viac hodnoty udržané oproti FIFO pri tesnom rozpočte</span></div>
-      <div class="badges"><a href="https://github.com/DanceNitra/agora/tree/main/mnemo" target="_blank" rel="noopener"><span class="en">Source</span><span class="sk">Zdroj</span></a><a href="#mnemosyne"><span class="en">How it works</span><span class="sk">Ako to funguje</span></a></div></div>
+    <div class="ship" style="border-color:var(--ink);box-shadow:0 20px 44px -34px rgb(26 24 19 / .45)"><div class="shipname">mnemo &middot; <span style="color:var(--ok)">the flagship</span></div>
+      <div class="shipone"><span class="en">Open-source agent memory in one zero-dependency file + an MCP server. The only store here with an authorized-revert channel and echo resistance, each shipped with a measured receipt.</span><span class="sk">Open-source pamäť agentov v jednom súbore bez závislostí + MCP server. Jediný sklad tu s autorizovaným revert kanálom a echo odolnosťou, každé s odmeraným receiptom.</span></div>
+      <div class="shipstat">v0.7.14 &middot; <span class="en">live on PyPI</span><span class="sk">live na PyPI</span> &middot; pip install agora-mnemo</div>
+      <div class="badges"><a href="#mnemo"><span class="en">How it works</span><span class="sk">Ako to funguje</span></a><a href="https://pypi.org/project/agora-mnemo/" target="_blank" rel="noopener">PyPI</a><a href="https://github.com/DanceNitra/agora/tree/main/mnemo" target="_blank" rel="noopener"><span class="en">Source</span><span class="sk">Zdroj</span></a></div></div>
     <div class="ship"><div class="shipname">AI Audit</div>
       <div class="shipone"><span class="en">One prioritized PASS/WARN/FAIL reliability report for any AI/agent system, built on 8 zero-dependency checks.</span><span class="sk">Jeden prioritizovaný PASS/WARN/FAIL report pre ľubovoľný AI/agentový systém, na 8 kontrolách bez závislostí.</span></div>
       <div class="shipstat">8/8 self&#8209;audit healthy &middot; 94% externally grounded</div>
       <div class="badges"><a href="public/aiaudit/"><span class="en">Run it free</span><span class="sk">Spusti zadarmo</span></a><a href="#toolkit"><span class="en">The 8 tools</span><span class="sk">8 nástrojov</span></a></div></div>
     <div class="ship"><div class="shipname"><span class="en">Writing</span><span class="sk">Texty</span></div>
       <div class="shipone"><span class="en">Essays, each one shipping a measured number, not an opinion.</span><span class="sk">Eseje, každá s nameraným číslom, nie názorom.</span></div>
-      <div class="shipstat">34 <span class="en">published</span><span class="sk">zverejnených</span></div>
+      <div class="shipstat">52 <span class="en">published</span><span class="sk">zverejnených</span></div>
       <div class="badges"><a href="public/posts/"><span class="en">All essays</span><span class="sk">Všetky eseje</span></a><a href="public/posts/agent-memory-poisoning-corroboration-gate.html"><span class="en">Memory poisoning</span><span class="sk">Otrava pamäte</span></a><a href="public/posts/adaptation-corruption-separation-law.html"><span class="en">The memory law</span><span class="sk">Zákon pamäte</span></a><a href="public/posts/does-long-context-kill-rag.html"><span class="en">Long context vs RAG</span><span class="sk">Dlhý kontext vs RAG</span></a></div></div>
+  </div>
+</div></section>
+
+<!-- ════ MNEMO — the flagship product ════ -->
+<section id="mnemo"><div class="wrap">
+  <div class="seckick"><span class="en">The flagship &middot; open source &middot; live on PyPI</span><span class="sk">Vlajková loď &middot; open source &middot; live na PyPI</span></div>
+  <h2 data-reveal>mnemo</h2>
+  <p class="secsub" data-reveal><span class="en">The agent-memory library behind this system: a single
+  zero&#8209;dependency file plus an MCP server, so any Claude, Cursor, or agent client gets long-term memory in
+  one import. Every design rule was <b>earned by a measured receipt</b>, not assumed &mdash; the same rigor we
+  point at the field, turned on our own product.</span><span class="sk">Pamäťová knižnica za týmto systémom: jediný
+  súbor bez závislostí plus MCP server, takže ľubovoľný Claude, Cursor či agent získa dlhodobú pamäť jedným
+  importom. Každé návrhové pravidlo si <b>vyslúžilo odmeraný receipt</b>, nie je predpokladané &mdash; tá istá
+  rigoróznosť, ktorú mierime na odbor, obrátená na náš vlastný produkt.</span></p>
+  <div class="mngrid">
+    <div class="mn-nums" data-reveal>
+      <div class="mn-num"><span class="v">~3&times;</span><p><span class="en">more total value retained by value&#8209;ranked
+        consolidation vs FIFO under a tight budget (100% vs 64% of value) &mdash; the advantage grows as space shrinks.</span><span class="sk">viac celkovej hodnoty udrží konsolidácia zoradená podľa
+        hodnoty oproti FIFO pri tesnom rozpočte (100% vs 64% hodnoty) &mdash; výhoda rastie, ako sa miesto zmenšuje.</span></p></div>
+      <div class="mn-num"><span class="v">2.8% &rarr; 100%</span><p><span class="en">recall of rare&#8209;but&#8209;critical memories: access&#8209;frequency
+        decay starves them; a value&#8209;aware blend keeps them all. Popularity is not value.</span><span class="sk">vybavenie zriedkavých&#8209;ale&#8209;kritických spomienok: úpadok podľa
+        frekvencie prístupu ich vyhladuje; zmes zohľadňujúca hodnotu ich udrží všetky. Popularita nie je hodnota.</span></p></div>
+      <div class="mn-num"><span class="v">0 rewrites</span><p><span class="en">raw memory is append&#8209;only; consolidation adds a derived layer
+        and contradictions are flagged for review, never silently resolved.</span><span class="sk">surová pamäť je iba pripájacia; konsolidácia pridáva odvodenú vrstvu
+        a rozpory sa označia na revíziu, nikdy sa nevyriešia potichu.</span></p></div>
+      <div class="mn-num"><span class="v">42% &rarr; 0%</span><p><span class="en">stale&#8209;fact recall, eliminated &mdash; a deterministic (subject, relation, object) supersession key retires an updated fact, where cosine similarity is near&#8209;chance at telling current from superseded (a reproduced blind spot).</span><span class="sk">vybavenie zastaraných faktov, odstránené &mdash; deterministický (subjekt, relácia, objekt) supersession kľúč stiahne aktualizovaný fakt, tam kde je cosine podobnosť takmer náhodná pri rozlíšení aktuálneho od nahradeného (reprodukovaný slepý bod).</span></p></div>
+    </div>
+    <div>
+      <div class="mn-code" data-reveal><pre style="margin:0;font-family:inherit"><span class="c"># single file, zero dependencies</span>
+<span class="g">from</span> mnemo <span class="g">import</span> Mnemo
+
+m = Mnemo(<span class="s">"memory.json"</span>); m.echo_guard = <span class="g">True</span>
+m.remember(<span class="s">"cache region is osaka"</span>, key=<span class="s">"region"</span>, object=<span class="s">"osaka"</span>)
+m.remember(<span class="s">"correction: region is now malmo"</span>, key=<span class="s">"region"</span>, object=<span class="s">"malmo"</span>)
+m.remember(<span class="s">"cache region is osaka"</span>, key=<span class="s">"region"</span>, object=<span class="s">"osaka"</span>)  <span class="c"># echo</span>
+m.recall(<span class="s">"region"</span>)          <span class="c"># -> malmo; the echo never resurrects</span>
+m.restore_now(<span class="s">"region"</span>, <span class="s">"osaka"</span>, sign=my_key)  <span class="c"># authorized revert</span></pre></div>
+      <div class="mnfoot"><span class="en"><b>v0.7.14</b>, live on PyPI (<code>pip install agora-mnemo</code>) with the MCP server and six framework adapters. Since v0.2 it adds: a deterministic supersession key + <code>echo_guard</code> (a restated stale fact never resurrects), an <b>authorized-revert channel</b> (undo a correction on command, without letting text alone do it), <b>bitemporal</b> <code>as_of()</code> / <code>history()</code> queries, bounded two-tier eviction, tamper-evident receipts (hash-chain + Ed25519), and <code>classify_reversion()</code> &mdash; the value-obscuring reversion detector from our benchmark work. Every one ships with a runnable probe. <a href="public/posts/we-fixed-our-own-memory-benchmark-until-it-stopped-flattering-us.html">The cross-system integrity benchmark &rarr;</a></span><span class="sk"><b>v0.7.14</b>, live na PyPI (<code>pip install agora-mnemo</code>) s MCP serverom a šiestimi framework adaptérmi. Od v0.2 pribudlo: deterministický supersession kľúč + <code>echo_guard</code> (zopakovaný zastaraný fakt sa nevzkriesi), <b>autorizovaný revert kanál</b> (vráť opravu na príkaz, bez toho aby to zvládol samotný text), <b>bitemporálne</b> <code>as_of()</code> / <code>history()</code> dopyty, ohraničená dvojúrovňová eviction, tamper-evident receipty (hash-chain + Ed25519) a <code>classify_reversion()</code> &mdash; detektor value-obscuring reverzie z našej benchmark práce. Každá vec prichádza so spustiteľným probe. <a href="public/posts/we-fixed-our-own-memory-benchmark-until-it-stopped-flattering-us.html">Cross-system integrity benchmark &rarr;</a></span>
+      <a href="https://github.com/DanceNitra/agora/tree/main/mnemo" target="_blank" rel="noopener">github.com/DanceNitra/agora/mnemo &rarr;</a></div>
+    </div>
   </div>
 </div></section>
 
@@ -565,7 +606,7 @@
       <span class="ldek"><span class="en">Constant&#8209;step SGD stalls at a noise floor; the slowdown is variance, not curvature.</span><span class="sk">SGD s konštantným krokom uviazne na podlahe šumu; spomalenie je rozptyl, nie zakrivenie.</span></span>
     </a>
   </div>
-  <a class="lmore" href="public/crucible/"><span class="en">All 64 claims, with their runnable models &mdash; plus 15 recorded as not-computable</span><span class="sk">Všetkých 64 tvrdení, s ich spustiteľnými modelmi &mdash; plus 15 zaznamenaných ako nevypočítateľné</span> <span>&rarr;</span></a>
+  <a class="lmore" href="public/crucible/"><span class="en">All 53 claims, with their runnable models &mdash; plus 20 recorded as not-computable</span><span class="sk">Všetkých 53 tvrdení, s ich spustiteľnými modelmi &mdash; plus 20 zaznamenaných ako nevypočítateľné</span> <span>&rarr;</span></a>
 </div></section>
 
 <!-- ════ THE TWO FAILURES — letterpress plates ════ -->
@@ -726,41 +767,6 @@
   </div>
 </div></section>
 
-<!-- ════ MNEMOSYNE ════ -->
-<section id="mnemosyne"><div class="wrap">
-  <div class="seckick"><span class="en">Open source &middot; the memory it runs on</span><span class="sk">Open source &middot; pamäť, na ktorej beží</span></div>
-  <h2 data-reveal>Mnemosyne</h2>
-  <p class="secsub" data-reveal><span class="en">The agent memory layer behind this system, distilled to a single
-  zero&#8209;dependency file &mdash; its design rules earned by the ledger&rsquo;s own findings.</span><span class="sk">Agentová pamäťová vrstva za týmto systémom, zhustená do jediného
-  súboru bez závislostí &mdash; jej návrhové pravidlá si vyslúžili vlastné zistenia registra.</span></p>
-  <div class="mngrid">
-    <div class="mn-nums" data-reveal>
-      <div class="mn-num"><span class="v">~3&times;</span><p><span class="en">more total value retained by value&#8209;ranked
-        consolidation vs FIFO under a tight budget (100% vs 64% of value) &mdash; the advantage grows as space shrinks.</span><span class="sk">viac celkovej hodnoty udrží konsolidácia zoradená podľa
-        hodnoty oproti FIFO pri tesnom rozpočte (100% vs 64% hodnoty) &mdash; výhoda rastie, ako sa miesto zmenšuje.</span></p></div>
-      <div class="mn-num"><span class="v">2.8% &rarr; 100%</span><p><span class="en">recall of rare&#8209;but&#8209;critical memories: access&#8209;frequency
-        decay starves them; a value&#8209;aware blend keeps them all. Popularity is not value.</span><span class="sk">vybavenie zriedkavých&#8209;ale&#8209;kritických spomienok: úpadok podľa
-        frekvencie prístupu ich vyhladuje; zmes zohľadňujúca hodnotu ich udrží všetky. Popularita nie je hodnota.</span></p></div>
-      <div class="mn-num"><span class="v">0 rewrites</span><p><span class="en">raw memory is append&#8209;only; consolidation adds a derived layer
-        and contradictions are flagged for review, never silently resolved.</span><span class="sk">surová pamäť je iba pripájacia; konsolidácia pridáva odvodenú vrstvu
-        a rozpory sa označia na revíziu, nikdy sa nevyriešia potichu.</span></p></div>
-      <div class="mn-num"><span class="v">42% &rarr; 0%</span><p><span class="en">stale&#8209;fact recall, eliminated &mdash; a deterministic (subject, relation, object) supersession key retires an updated fact, where cosine similarity is near&#8209;chance at telling current from superseded (a reproduced blind spot).</span><span class="sk">vybavenie zastaraných faktov, odstránené &mdash; deterministický (subjekt, relácia, objekt) supersession kľúč stiahne aktualizovaný fakt, tam kde je cosine podobnosť takmer náhodná pri rozlíšení aktuálneho od nahradeného (reprodukovaný slepý bod).</span></p></div>
-    </div>
-    <div>
-      <div class="mn-code" data-reveal><pre style="margin:0;font-family:inherit"><span class="c"># single file, zero dependencies</span>
-<span class="g">from</span> mnemo <span class="g">import</span> Mnemo
-
-m = Mnemo(<span class="s">"memory.json"</span>)
-m.remember(<span class="s">"pre-trend tests catch ~31% of fatal bias"</span>,
-           tags=[<span class="s">"causal"</span>], value=<span class="s">3</span>)
-m.recall(<span class="s">"difference in differences"</span>)  <span class="c"># value-ranked</span>
-m.consolidate(keep=<span class="s">200</span>)               <span class="c"># the dream pass</span>
-m.contradictions()                     <span class="c"># flag, never delete</span></pre></div>
-      <div class="mnfoot"><span class="en">MCP server included &mdash; drop&#8209;in long&#8209;term memory for any agent client. <b>v0.2</b> adds a deterministic (subject, relation, object) supersession key (stale facts retired, no similarity threshold), an entity&#8209;resolution corroboration gate that resists sybil sources, and <code>forget()</code> &mdash; verified erasure. <a href="public/posts/rag-supersession-blind-spot.html">Why RAG serves stale facts &rarr;</a></span><span class="sk">Súčasťou je MCP server &mdash; zapojiteľná dlhodobá pamäť pre ľubovoľného agentového klienta. <b>v0.2</b> pridáva deterministický (subjekt, relácia, objekt) supersession kľúč (zastarané fakty stiahnuté, bez prahu podobnosti), entity&#8209;resolution corroboration gate odolný voči sybil zdrojom a <code>forget()</code> &mdash; overené vymazanie. <a href="public/posts/rag-supersession-blind-spot.html">Prečo RAG podáva zastarané fakty &rarr;</a></span>
-      <a href="https://github.com/DanceNitra/agora/tree/main/mnemo" target="_blank" rel="noopener">github.com/DanceNitra/agora/mnemo &rarr;</a></div>
-    </div>
-  </div>
-</div></section>
 
 <!-- ════ PROTOCOL ════ -->
 <section id="protocol"><div class="wrap">
@@ -790,13 +796,13 @@ m.contradictions()                     <span class="c"># flag, never delete</spa
 <div class="organism"><div class="wrap">
   <h2 data-reveal><span class="en">Built by the thing itself</span><span class="sk">Postavené tou vecou samotnou</span></h2>
   <p data-reveal><span class="en">Agora runs as an autonomous organism: <b>eight agents</b> research around the clock,
-  a laboratory executes their experiments &mdash; <b>60+</b> ledgered so far &mdash; and a living memory of
+  a laboratory executes their experiments &mdash; <b>7,800+</b> runs ledgered so far &mdash; and a living memory of
   <b>thousands of curated notes</b> consolidates what holds. Its own findings feed back into how
-  it works: the crowd research shaped how its agents diverge; the memory research became Mnemosyne.
+  it works: the crowd research shaped how its agents diverge; the memory research became <b>mnemo</b>, the flagship.
   Nothing leaves the machine without its owner&rsquo;s review.</span><span class="sk">Agora beží ako autonómny organizmus: <b>osem agentov</b> skúma nepretržite,
-  laboratórium vykonáva ich experimenty &mdash; <b>60+</b> doteraz zaznamenaných &mdash; a živá pamäť
+  laboratórium vykonáva ich experimenty &mdash; <b>7&nbsp;800+</b> behov doteraz zaznamenaných &mdash; a živá pamäť
   <b>tisícok kurátorovaných poznámok</b> konsoliduje to, čo obstojí. Jej vlastné zistenia sa vracajú do toho, ako
-  funguje: výskum davov utváral, ako sa jej agenti rozchádzajú; výskum pamäte sa stal Mnemosyne.
+  funguje: výskum davov utváral, ako sa jej agenti rozchádzajú; výskum pamäte sa stal <b>mnemo</b>, vlajkovou loďou.
   Nič neopustí stroj bez revízie jej vlastníka.</span></p>
 </div></div>
 
