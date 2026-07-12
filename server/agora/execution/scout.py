@@ -31,6 +31,13 @@ _THEMES = [
     "personal knowledge management note decay",
     "vector store memory pruning",
     "experience replay catastrophic forgetting",
+    # memory-INTEGRITY themes (2026-07-12): we now have the open cross-system benchmark
+    # (github.com/DanceNitra/agent-memory-integrity) + measured receipts (echo_guard, revert,
+    # retract_lineage) to answer these with evidence — the receipts-flywheel outreach surface.
+    "agent memory stale facts correction",
+    "memory update supersede outdated fact",
+    "agent memory undo revert correction",
+    "temporal validity bitemporal agent memory",
     # frontier-aligned (only where we have measured evidence to back a reply)
     "LLM agent reasoning evaluation",
     "forecasting calibration prediction scoring",
