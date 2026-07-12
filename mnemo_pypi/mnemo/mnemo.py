@@ -122,7 +122,7 @@ def sign_revert(principal_sk_hex: str, challenge: str) -> str:
     sk = _Ed25519SK.from_private_bytes(bytes.fromhex(principal_sk_hex))
     return sk.sign(challenge.encode()).hex()
 
-__version__ = "0.7.14"
+__version__ = "0.7.15"
 
 # Internal sentinel: marks a reaffirm write already authorized by submit_revert() (which verified the
 # signed INTENT). Object identity — no text/content path can ever produce it.
@@ -1017,9 +1017,18 @@ class Mnemo:
 
     def restore_intent(self, key: str, target: str, nonce: str | None = None) -> str:
         """Mint point for an ABSOLUTE in-stream revert to a NAMED historical value: no precondition, so it
-        lands regardless of intervening writes — exactly once (the nonce is single-use)."""
+        lands regardless of intervening writes — exactly once (the nonce is single-use). ABA-immune (0.7.15,
+        jacksonxly): the intent also carries the ID of the specific historical record that held `target` at
+        mint time, so it revives THAT instance, never a same-value look-alike re-asserted (or legitimately
+        re-killed) in the gap. If no such record exists yet, the id is empty and submit falls back to value
+        resolution (and reports it)."""
         nonce = nonce or hashlib.sha256(os.urandom(16)).hexdigest()[:16]
-        return "restore:" + key + "=" + target + "#" + nonce
+        held = [r for r in self.items
+                if r.get("key") == key and r.get("object") == str(target)
+                and not (r.get("meta") or {}).get("echo_blocked")
+                and not (r.get("meta") or {}).get("objectless_blocked")]
+        tid = max(held, key=lambda r: r.get("valid_from", r["ts"]))["id"] if held else ""
+        return "restore:" + key + "=" + str(target) + "@" + tid + "#" + nonce
 
     def _intent_authorized(self, intent: str, capability: str | None) -> bool:
         """Same crypto as _revert_authorized, but over the INTENT string (the signed command)."""
@@ -1054,10 +1063,10 @@ class Mnemo:
         if not self._intent_authorized(intent, capability):
             return {"ok": False, "reason": "authorization_required", "intent": intent}
         m_rel = re.match(r"^revert:(.+)@([0-9a-f]*)#([0-9a-f]+)$", intent)
-        m_abs = re.match(r"^restore:(.+?)=(.+)#([0-9a-f]+)$", intent)
+        m_abs = re.match(r"^restore:(.+?)=([^@#]*)(?:@([0-9a-f]*))?#([0-9a-f]+)$", intent)
         if not m_rel and not m_abs:
             return {"ok": False, "reason": "malformed_intent", "intent": intent}
-        nonce = (m_rel or m_abs).group(3)
+        nonce = m_rel.group(3) if m_rel else m_abs.group(4)
         if self._nonce_consumed(nonce):
             return {"ok": False, "reason": "replay_rejected"}
         self._consumed_revert_nonces.add(nonce)
@@ -1088,19 +1097,30 @@ class Mnemo:
                                       "revert_nonce": nonce, "instream": "relative"})
             return {"ok": True, "kind": "relative", "restored": rid, "superseded": cur["id"],
                     "reverted_to_object": tgt.get("object")}
-        key, target = m_abs.group(1), m_abs.group(2)
+        key, target, tid = m_abs.group(1), m_abs.group(2), m_abs.group(3)
         chain = self._route_chain(key)
-        if target not in chain:
+        # ABA-immune (0.7.15): if the intent carries the id of the specific record it was minted against, that
+        # exact instance must still exist and still have held `target` — a re-asserted same-value look-alike is
+        # a different id and will NOT satisfy it. Fall back to value resolution only for legacy id-less intents.
+        id_bound = bool(tid)
+        if id_bound:
+            rec = next((r for r in self.items if r.get("id") == tid and r.get("key") == key
+                        and r.get("object") == target), None)
+            if rec is None:
+                return {"ok": False, "reason": "unknown_target", "key": key, "target": target,
+                        "target_id": tid, "id_bound": True,
+                        "note": "the specific record this restore was minted against is not in history"}
+        elif target not in chain:
             return {"ok": False, "reason": "unknown_target", "key": key, "target": target,
                     "note": "an absolute intent can only restore a value that actually held the key"}
         if chain and chain[-1] == target:
             return {"ok": True, "kind": "absolute", "restored": None, "target": target,
-                    "note": "target already current (no-op land)"}
+                    "id_bound": id_bound, "note": "target already current (no-op land)"}
         rid = self.remember(f"restore {key} to {target}", key=key, object=target,
                             reaffirm=True, capability=_SANCTIONED,
                             meta={"routed": "revert_named_instream", "revert_nonce": nonce,
-                                  "instream": "absolute"})
-        return {"ok": True, "kind": "absolute", "restored": rid, "target": target}
+                                  "instream": "absolute", "restore_of_id": tid or None})
+        return {"ok": True, "kind": "absolute", "restored": rid, "target": target, "id_bound": id_bound}
 
     # ── the LIVENESS FLOOR (0.7.13, jacksonxly r/RAG): the store owns no-infinite-bypass ─────────
     # jackson's boundary: the store must GUARANTEE a submitted revert can't be bypassed unboundedly
