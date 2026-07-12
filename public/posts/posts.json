@@ -1,5 +1,19 @@
 [
  {
+  "slug": "recency-of-mention-decides-what-llm-agents-write-back-to-memory",
+  "title": "In LLM memory consolidation, recency of mention decides what gets written back",
+  "title_sk": "V konsolidácii pamäte LLM rozhoduje o zápise recency of mention, nie oprava",
+  "desc": "Measured across two model families: a retired value echoed last is re-stored 45-85% of the time; put the correction last and it drops to 0.00. Over three real write-back cycles the error locks in rather than grows. A write-path guard zeroes it unconditionally; a prompt instruction works only if the model obeys.",
+  "desc_sk": "Zmerané naprieč dvoma rodinami modelov: stiahnutá hodnota zopakovaná posledná sa re-uloží v 45-85 % prípadov; daj opravu na koniec a padne to na 0.00. Cez tri reálne write-back cykly sa chyba zamyká, nerastie. Write-path guard ju nuluje bezpodmienečne; promptová inštrukcia len ak model poslúchne.",
+  "date": "2026-07-12",
+  "tags": "agent memory, write-back contamination, memory consolidation, recency of mention, mnemo, mem0",
+  "tags_sk": "pamäť agentov, write-back kontaminácia, konsolidácia pamäte, mnemo",
+  "kicker": "Agent memory · write-back contamination",
+  "kicker_sk": "Pamäť agentov · write-back kontaminácia",
+  "read": 5,
+  "bilingual": true
+ },
+ {
   "slug": "we-fixed-our-own-memory-benchmark-until-it-stopped-flattering-us",
   "title": "We fixed our own memory benchmark until it stopped flattering us",
   "title_sk": "Opravili sme vlastný benchmark pamäte, kým nás neprestal lichotiť",
