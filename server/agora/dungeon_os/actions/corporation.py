@@ -541,6 +541,11 @@ async def action_evaluate_proposal(config: dict, quest: dict, params: dict) -> d
                      f"— design a clean, NON-circular measurement (external ground truth, no shared mediator) and "
                      f"resubmit. CTO: {cto_verdict['rationale'][:180]}", quest_id))
                 await qe.db.commit()
+            else:
+                # mark shallow/textbook rejects explicitly -> clean per-source attribution for earned standing
+                await qe.db.execute(
+                    "UPDATE quests SET proposal_status='rejected' WHERE id=?", (quest_id,))
+                await qe.db.commit()
         except Exception as e:
             print(f"[CEO/CTO] DB update error: {e}")
 

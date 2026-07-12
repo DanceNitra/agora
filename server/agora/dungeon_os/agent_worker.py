@@ -367,6 +367,30 @@ class CorporationWorker:
             "finding": top,
         }
 
+    async def _source_standing(self) -> dict:
+        """Tah 5 — EARNED RESEARCH STANDING per source-KIND. Sources whose leads survive to approval / a
+        measured receipt earn more seeding throughput; sources that produce shallow rejects get throttled.
+        Standing = (approved + 1) / (rejected + 1), read live from the quests ledger (smoothed so no source
+        starves). This is the bench-slot weighting: the generation layer's earned throughput."""
+        standing = {}
+        try:
+            cur = await self.db.execute(
+                "SELECT research_source, proposal_status, phase FROM quests WHERE research_source LIKE 'frontier:%'")
+            rows = await cur.fetchall()
+            agg = {}
+            for src, status, phase in rows:
+                kind = (src or "").split(":", 1)[-1]
+                d = agg.setdefault(kind, {"good": 0, "bad": 0})
+                if status == "approved" or phase == "pata":
+                    d["good"] += 1
+                elif status == "rejected":
+                    d["bad"] += 1
+            for kind, d in agg.items():
+                standing[kind] = (d["good"] + 1.0) / (d["bad"] + 1.0)
+        except Exception as e:
+            print(f"[seed] standing read failed: {e}")
+        return standing
+
     async def _escalate_lead(self, kind: str, short: str, prompt: str):
         """Tah 3 — the 'raise it twice' escalation: take a raw candidate lead and return the AMBITIOUS version
         of the SAME underlying question (the one that would matter 10x more, bridges two domains, or contradicts
@@ -444,9 +468,13 @@ class CorporationWorker:
                                    ft.get("prompt", ""), ft.get("target")))
             if not candidates:
                 return None
-            # rotate priority each tick so no single source dominates
-            r = self._stats["ticks"] % len(candidates)
-            candidates = candidates[r:] + candidates[:r]
+            # EARNED THROUGHPUT (Tah 5): order candidates by their source-kind's earned standing — sources
+            # whose leads reach approval/receipts are tried first — with a 1-in-4 rotation for exploration so
+            # no source starves. The freshness check below still prevents repeating the same question.
+            standing = await self._source_standing()
+            candidates.sort(key=lambda c: standing.get(c[0], 1.0), reverse=True)
+            if self._stats["ticks"] % 4 == 0 and len(candidates) > 1:
+                candidates = candidates[1:] + candidates[:1]
 
             async def _recently_seeded(title: str) -> bool:
                 try:
