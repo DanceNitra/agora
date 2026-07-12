@@ -1,0 +1,28 @@
+=== GOVERNANCE-EVIDENCE SUFFICIENCY (mnemo self-score) ===
+8-question DEMM-style rubric (arXiv 2606.20634) over the receipt bytes an auditor actually gets.
+deterministic; predicates written to catch failures, not flatter. Leads with where mnemo FAILS.
+
+  [PASS] WHAT: specific records identified by id
+         -> 3 memory ids in by_request
+  [PASS] WHEN: every act carries a timestamp
+         -> ts present on receipts + tombstones
+  [PASS] TAMPER-EVIDENCE: chain verifies (no silent edit)
+         -> governance_report.proof.verified over write+tombstone chains
+  [PASS] COMPLETENESS: drops/inserts detectable (prev-linked)
+         -> every receipt/tombstone has prev+hash
+  [FAIL] AUTHORITY: act bound to an authenticated principal
+         -> request_id present (True) but it is a free string; signer is a key, not a bound identity
+  [FAIL] BASIS: decision basis / evidence recorded in the receipt
+         -> the retract reason lives in the record meta, not in the auditor-facing receipt bytes
+  [FAIL] ANCHORABILITY: verifiable without trusting the key-holder
+         -> no external chain-head anchor / inclusion proof in the bytes; scope admits operator can forge
+  [PASS] SCOPE HONESTY: states what it does NOT certify
+         -> governance_report.scope disclaims content/act and store-boundary
+
+SUFFICIENCY SCORE: 5/8
+VERDICT: LIVE — gap confirmed. mnemo implements the primitives but its receipt FAILS on: AUTHORITY, BASIS, ANCHORABILITY.
+  Sufficiency is NOT predicted by presence — the self-incriminating, Crucible-shaped result. The
+  three fails are concrete product gaps: emit the decision basis into the receipt; bind the request
+  to an authenticated principal; publish an external chain-head anchor (Certificate-Transparency-style).
+
+(scored bytes written to governance_sufficiency_bytes.json)

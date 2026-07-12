@@ -1,0 +1,18 @@
+=== FAULT-TO-FABRICATION: integrity-fault SURFACING against REAL agent stores ===
+agents=8  N=20 synthetic faults/agent  (deterministic, lexical recall, cloud-free)
+stores are COPIED to temp; the live files are never mutated.
+
+agent        active  stale OFF   stale ON   curr OFF   curr ON
+artificer       453       1.00       0.00       1.00      1.00
+cartographer    456       1.00       0.00       1.00      1.00
+guard_l         460       1.00       0.00       1.00      1.00
+guard_r         459       1.00       0.00       1.00      1.00
+king            464       1.00       0.00       1.00      1.00
+priest          466       1.00       0.00       1.00      1.00
+scholar         469       1.00       0.00       1.00      1.00
+thief           472       1.00       0.00       1.00      1.00
+
+POOLED echo_guard OFF: stale_surface 1.000 [0.977,1.000]  |  current_surface 1.000 [0.977,1.000]  (n=160)
+POOLED echo_guard ON : stale_surface 0.000 [-0.000,0.023]  |  current_surface 1.000 [0.977,1.000]  (n=160)
+
+VERDICT: LIVE — echo_guard cuts stale_surface 1.00 -> 0.00 on real backdrop.

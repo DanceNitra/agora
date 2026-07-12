@@ -1,0 +1,23 @@
+=== TOKI-UNDER-CONCURRENCY: does provenance survive out-of-order writes? ===
+facts=24  orderings=['in-order', 'reversed', 'interleaved']  units per policy=72  (deterministic, lexical recall)
+write-receipt chain intact across all runs: True
+
+stale-derived-active rate (default recall surfaces the retired value; lower is better):
+  A value-only LWW (no cascade)                0.917
+  B retract_lineage one-shot                   0.611
+  C read-time derived-from-superseded guard    0.000
+
+per-ordering breakdown (stale-active rate):
+  ordering         A       B       C
+  in-order      0.92    0.00    0.00
+  reversed      0.92    0.92    0.00
+  interleaved    0.92    0.92    0.00
+
+gap A - B = +0.306  95% CI [+0.208, +0.417]
+gap A - C = +0.917  95% CI [+0.847, +0.972]
+gap B - C = +0.611  95% CI [+0.500, +0.722]  (B's escape under reordering that C closes)
+
+audit reconstructibility (of B's stale-active escapes, flagged by derived-from-superseded): 46/46 = 1.00
+
+VERDICT: LIVE — A leaves stale facts active at 0.92; best lineage policy cuts it to 0.00.
+  FINDING: one-shot retract_lineage (B) does NOT survive reordering — late writes escape the single cascade; only the read-time guard (C) is order-independent. Provenance must be CHECKED at read, not FIRED once at write (dependency-directed backtracking, Doyle 1979).
