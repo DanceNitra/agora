@@ -1,13 +1,6 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
-  <!-- The Agora brand mark: the conic-gradient square from the site header (accent #0a8f68 on paper),
-       approximated for SVG with a radial sweep fading toward the lower-left, paper core inset. -->
-  <defs>
-    <radialGradient id="sweep" cx="78%" cy="18%" r="115%">
-      <stop offset="0%" stop-color="#0a8f68"/>
-      <stop offset="55%" stop-color="#0a8f68"/>
-      <stop offset="100%" stop-color="#0a8f68" stop-opacity="0.25"/>
-    </radialGradient>
-  </defs>
-  <rect x="2" y="2" width="60" height="60" rx="16" fill="url(#sweep)"/>
-  <rect x="16" y="16" width="32" height="32" rx="7" fill="#fbf9f4"/>
+<svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 64 64">
+  <!-- Agora brand mark: solid green rounded square with a paper inset (mirrors the site header mark).
+       Solid fills + explicit size so it rasterizes crisply at 16px tab size. -->
+  <rect width="64" height="64" rx="15" fill="#0a8f68"/>
+  <rect x="14" y="14" width="36" height="36" rx="8" fill="#faf7f0"/>
 </svg>
