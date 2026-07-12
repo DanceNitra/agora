@@ -122,7 +122,7 @@ def sign_revert(principal_sk_hex: str, challenge: str) -> str:
     sk = _Ed25519SK.from_private_bytes(bytes.fromhex(principal_sk_hex))
     return sk.sign(challenge.encode()).hex()
 
-__version__ = "0.7.13"
+__version__ = "0.7.14"
 
 # Internal sentinel: marks a reaffirm write already authorized by submit_revert() (which verified the
 # signed INTENT). Object identity — no text/content path can ever produce it.
@@ -1129,6 +1129,79 @@ class Mnemo:
         intent = self.revert_intent(key)
         cap = capability if capability is not None else (sign(intent) if sign else None)
         return self.submit_revert(intent, cap)
+
+    # ── value-obscuring reversion classifier (0.7.14): the Marat decomposition, shipped ─────────
+    def classify_reversion(self, candidate: str, key: str, embed=None,
+                           margin: float = 0.06, floor: float = 0.50) -> dict:
+        """Classify whether `candidate` reopens a SUPERSEDED value for `key` ("revert"), affirms the current
+        one ("keep"), or does not resolve ("abstain"). This is the value-obscuring reversion result from the
+        joint TAT/mnemo analysis (Marat Sultanov), factorized into its two independent halves and shipped:
+
+          1. REFERENCE RESOLUTION (a text problem): embed the candidate and, using the ledger's own split of
+             the key's history into SUPERSEDED (old) and CURRENT records, measure how much closer the
+             candidate sits to the old side than the current side. Needs an embedder (`self.embed` or the
+             `embed` arg); with none it abstains rather than guessing. This is the structural-similarity step,
+             scored as a MARGIN (max sim to old records minus max sim to current records) — the same
+             discriminating quantity the decomposition used, not an absolute similarity.
+          2. RECENCY ATTRIBUTION (a ledger problem): the old-versus-current split is read straight from
+             mnemo's supersession ledger. No text method is asked to decide which value is current.
+
+        Abstains when the reference does not DISCRIMINATE old from current: |margin| < `margin` (a bare
+        "go back" is roughly equally near both, so it names no side) or the best match is below `floor` (an
+        off-topic utterance). That is exactly the boundary the analysis measured — where a guess is wrong and
+        the authorized-revert channel (submit_revert) is the correct path instead.
+
+        CLASSIFIES ONLY, never restores: a content-path utterance must not flip a corrected value without an
+        out-of-band authorization. Returns {intent, target, confidence, current} for an authorized caller to
+        act on with submit_revert — consistent with the channel-separation design.
+        """
+        e = embed or self.embed
+        if e is None:
+            return {"intent": "abstain", "reason": "no_embedder"}
+        recs = [r for r in self.items
+                if r.get("key") == key and r.get("object") is not None
+                and not (r.get("meta") or {}).get("echo_blocked")
+                and not (r.get("meta") or {}).get("objectless_blocked")]
+        if len(recs) < 2:
+            return {"intent": "abstain", "reason": "insufficient_history"}
+        cur_id = self._current_active_id(key)
+        current_val = next((r["object"] for r in recs if r["id"] == cur_id), recs[-1]["object"])
+        try:
+            cvec = list(e(candidate))
+        except Exception:
+            return {"intent": "abstain", "reason": "embed_failed"}
+
+        def sim(r):
+            v = r.get("vec")
+            if not v:
+                try:
+                    v = list(e(r["text"]))
+                except Exception:
+                    return None
+            return _cosine(cvec, v)
+
+        old_scored = [(sim(r), r) for r in recs
+                      if not (r["id"] == cur_id or r.get("object") == current_val)]
+        cur_scored = [(sim(r), r) for r in recs
+                      if r["id"] == cur_id or r.get("object") == current_val]
+        old_scored = [(s, r) for s, r in old_scored if s is not None]
+        cur_scored = [(s, r) for s, r in cur_scored if s is not None]
+        if not old_scored or not cur_scored:
+            return {"intent": "abstain", "reason": "no_vectors"}
+        best_old_sim, best_old = max(old_scored, key=lambda x: x[0])
+        best_cur_sim = max(s for s, _ in cur_scored)
+        if max(best_old_sim, best_cur_sim) < floor:
+            return {"intent": "abstain", "reason": "unresolved_reference",
+                    "confidence": round(max(best_old_sim, best_cur_sim), 3)}
+        m = best_old_sim - best_cur_sim
+        if abs(m) < margin:
+            return {"intent": "abstain", "reason": "unresolved_reference",
+                    "margin": round(m, 3)}
+        if m > 0:
+            return {"intent": "revert", "target": best_old.get("object"), "current": current_val,
+                    "margin": round(m, 3),
+                    "note": "content-path signal only; restore via submit_revert with authorization"}
+        return {"intent": "keep", "current": current_val, "margin": round(m, 3)}
 
     # ── route(): the write-path intent router (tagger + fuzzy-version resolver) ─
     _ROUTE_REVERT = re.compile(
