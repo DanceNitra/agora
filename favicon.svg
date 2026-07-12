@@ -1,6 +1,0 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 64 64">
-  <!-- Agora brand mark: solid green rounded square with a paper inset (mirrors the site header mark).
-       Solid fills + explicit size so it rasterizes crisply at 16px tab size. -->
-  <rect width="64" height="64" rx="15" fill="#0a8f68"/>
-  <rect x="14" y="14" width="36" height="36" rx="8" fill="#faf7f0"/>
-</svg>
