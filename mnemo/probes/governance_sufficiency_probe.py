@@ -110,9 +110,12 @@ def score(bytes_out, pk):
     # 7. EXTERNAL ANCHORABILITY — can the auditor verify WITHOUT trusting the operator who holds the key?
     #    The scope text itself concedes the operator can forge the chain; there is no external anchor
     #    (no published chain-head / inclusion proof) in the bytes. EXPECTED TO FAIL.
-    anchored = any("anchor" in r or "witness" in r or "sth" in r for r in rcpts)  # signed-tree-head / external witness
-    Q.append(("ANCHORABILITY: verifiable without trusting the key-holder", bool(anchored),
-              "no external chain-head anchor / inclusion proof in the bytes; scope admits operator can forge"))
+    anc = (rep.get("proof") or {}).get("anchor") or {}
+    anchored = bool(anc.get("sth_hash") and ("writes_tip" in anc))  # CT-style externally-witnessable tree head
+    Q.append(("ANCHORABILITY: verifiable without trusting the key-holder", anchored,
+              "governance_report.proof.anchor = a CT-style signed tree head (witness it out of band; "
+              "verify_consistency() then catches a key-holder rewrite)" if anchored
+              else "no external chain-head anchor / inclusion proof in the bytes"))
 
     # 8. SCOPE HONESTY — does the receipt state what it does NOT certify (act vs content, store-only)?
     scope = rep.get("scope", "")
