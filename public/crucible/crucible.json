@@ -1,13 +1,22 @@
 {
  "name": "The Crucible — machine replication ledger",
  "description": "Scientific and technical claims rebuilt as minimal computational models and tested. REPRODUCED = the mechanism holds in a minimal model; FAILED = it does not; NOT_COMPUTABLE = no simulable core (an honest pass).",
- "generated": "2026-07-09",
+ "generated": "2026-07-13",
  "counts": {
-  "REPRODUCED": 21,
+  "REPRODUCED": 22,
   "FAILED": 12,
   "NOT_COMPUTABLE": 20
  },
  "entries": [
+  {
+   "claim": "Agent tool-action REVERSIBILITY is decidable ex-ante from the tool signature — the assumption underlying per-tool reversibility gates and severity grades (e.g. Action-Graded Severity Scale, arXiv:2607.07474, which fixes reversibility 'per tool' in a lookup table).",
+   "source": "Owiredu-Ashley, 'Beyond Attack-Success Rate: Action-Graded Severity Scale for Tool-Using AI Agents' (arXiv:2607.07474, 2026) — reversibility×scope grid; corpus: ToolEmu (Ruan et al., ICLR 2024, arXiv:2309.15817).",
+   "verdict": "REPRODUCED",
+   "note": "Smallest model: label every tool in the ToolEmu asset file (38 toolkits / 330 tools; paper reports 36/311) for argument-dependence of reversibility with TWO independent LLM labelers, then measure a granted universal executor's realized harm-reach under isolated vs networked assumptions. RESULT: reversibility IS ~93% decidable from the signature alone (arg-dependent 0.07; Cohen's kappa 0.82, 'almost perfect' Landis-Koch) — the per-tool assumption mostly holds. MEASURED FAILURE MODE: the ~7% undecidable residual is verb-polymorphic UNIVERSAL EXECUTORS (shell/SQL/eval; only ~0.3% of tools, cat-agreement 0.94), for which reversibility is undecidable from the signature AND realized harm-reach is ENVIRONMENT-conditional — an ISOLATED shell reaches ~0% of external/API irreversible harms but a realistically-credentialed NETWORKED shell reaches ~0.66 external / ~0.80 local. IMPLICATION (confirming the consensus, not new): the boundary that bounds a memory-poisoned agent's irreversible EXTERNAL harm is executor CONTAINMENT (no ambient network/credentials), NOT per-tool reversibility metadata. HONEST CAVEATS: (1) LLM labelers measure shared model priors, not ground truth (networked-external agreement is only 0.32 — genuinely CLI/credential-dependent); (2) ToolEmu under-weights shell/code-interpreter tools now standard in production (OpenAI CI, Claude computer-use), so the 0.3% universal-executor prevalence is a LOWER bound; (3) the harm-locality map itself is NOT novel — it is arXiv:2607.07474's scope×reversibility grid on a different corpus; the genuinely new, unpublished bits are the measured 93% signature-DECIDABILITY RATE (kappa) and the isolated→networked reach flip.",
+   "lab_id": "rev93",
+   "code": "https://github.com/DanceNitra/agora/blob/main/agora_output/lab/reversibility_predictability_probe.py",
+   "date": "2026-07-13"
+  },
   {
    "claim": "For T rounds, K actions, d-dim feature vectors, an O(sqrt(T d ln^3(K T ln(T)/delta))) regret bound holds w.p. 1-delta for the simplest known linear-payoff contextual bandit algorithm (LinUCB family; f",
    "source": "Chu, Li, Reyzin, Schapire (AISTATS 2011), Contextual Bandits with Linear Payoff Functions",
