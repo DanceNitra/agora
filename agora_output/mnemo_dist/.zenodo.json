@@ -4,7 +4,7 @@
  "upload_type": "software",
  "access_right": "open",
  "license": "mit",
- "version": "0.7.22",
+ "version": "1.0.0",
  "keywords": [
   "llm",
   "agent memory",
