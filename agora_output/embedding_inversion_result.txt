@@ -1,0 +1,11 @@
+=== EMBEDDING INVERSION: does a retained vector leak the deleted secret? ===
+cases=30 across 3 sensitive relations; local nomic; cloud-free.
+
+  top-1 attribute recovery from the retained embedding: 1.00  [0.89,1.00]  (30/30)
+  top-3 attribute recovery:                             1.00  (30/30)
+  random-chance baseline (1/|candidates|):              0.056
+
+FINDING: a RETAINED embedding recovers the deleted sensitive value at 1.00 top-1 — 18x chance. 'Delete the text, keep the vector' does NOT erase; the vector is a
+  fingerprint of the secret (a lower bound — full text reconstruction, Morris 2023, is stronger).
+  Consequence: a cross-store deletion manifest must PURGE/crypto-shred vectors, not just delete rows;
+  an erasure receipt that ignores retained embeddings overclaims. This bounds what deletion promises.
