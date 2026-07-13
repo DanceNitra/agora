@@ -14,7 +14,7 @@ ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SRC = os.path.join(ROOT, "agora_output", "mnemo_dist")
 SANDBOX = "--sandbox" in sys.argv
 BASE = "https://sandbox.zenodo.org" if SANDBOX else "https://zenodo.org"
-FILES = ["mnemo.py", "mnemo_mcp.py", "README.md", "CITATION.cff", "LICENSE"]
+FILES = ["mnemo.py", "mnemo_mcp.py", "deletion_manifest.py", "erasure_auditor.py", "README.md", "CITATION.cff", "LICENSE"]
 
 
 def _token():

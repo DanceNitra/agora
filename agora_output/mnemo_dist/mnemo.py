@@ -40,6 +40,7 @@ MIT-licensed. Part of Agora (https://github.com/DanceNitra/agora).
 from __future__ import annotations
 
 import hashlib
+import hmac
 import json
 import math
 import os
@@ -80,7 +81,70 @@ def new_receipt_keypair():
     return (sk.private_bytes(_ser.Encoding.Raw, _ser.PrivateFormat.Raw, _ser.NoEncryption()).hex(),
             sk.public_key().public_bytes(_ser.Encoding.Raw, _ser.PublicFormat.Raw).hex())
 
-__version__ = "0.4.2"
+
+def new_source_keypair():
+    """Return (private_key_hex, public_key_hex) for an ATTESTING SOURCE. The private half is held by the
+    source (off the memory store's write path); the public half is what a corroboration is counted by.
+    This is the exogenous trust root: a source signs the claims it authored, so 'independence' is measured
+    by distinct VERIFIED KEYS an attacker cannot forge, not by distinct source STRINGS it can spoof. Needs
+    `cryptography`."""
+    return new_receipt_keypair()
+
+
+def _attest_message(text: str, source_doc) -> bytes:
+    """Canonical message an attestation signs: the claim text bound to its canonical source, so a signature
+    for 'X by source S' cannot be replayed as 'X by source T' or attached to a different claim."""
+    canon_src = Mnemo._canon_source(source_doc) if source_doc else ""
+    return _canon({"t": text, "s": canon_src})
+
+
+def attest(text: str, source_sk_hex: str, source_doc=None) -> str:
+    """Produce a source's Ed25519 signature (hex) over a claim, to pass as remember(..., attestation=(pubkey,
+    sig)). The source signs 'I authored this text (as this canonical source)'. A mislabel then means forging
+    the source's key, not editing the store. Honest limit: this attests AUTHORSHIP, not TRUTH — a source that
+    owns its key can honestly sign a false claim (a wrong-at-write-time / MINJA attack survives a signature);
+    what it buys is that a caught liar is a NON-REPUDIABLE identity you can revoke, and that Sybil variants of
+    one origin collapse to one verified key. Needs `cryptography`."""
+    if not _HAVE_ED:
+        raise RuntimeError("attestation needs the `cryptography` package (pip install cryptography)")
+    sk = _Ed25519SK.from_private_bytes(bytes.fromhex(source_sk_hex))
+    return sk.sign(_attest_message(text, source_doc)).hex()
+
+
+def sign_revert(principal_sk_hex: str, challenge: str) -> str:
+    """Principal-side, OFF the memory store's box: Ed25519-sign a revert `challenge`
+    (Mnemo.revert_challenge(key) = "revert:{key}:{current_active_id}") with the private key whose public half
+    the store was given as `revert_pubkey`. The resulting hex signature is the capability passed to
+    revert()/route(); the store verifies it but cannot produce it. This is the affordance a text-only attacker
+    (and a store-only harness) cannot synthesize. Needs `cryptography`."""
+    if not _HAVE_ED:
+        raise RuntimeError("signing a revert needs the `cryptography` package (pip install cryptography)")
+    sk = _Ed25519SK.from_private_bytes(bytes.fromhex(principal_sk_hex))
+    return sk.sign(challenge.encode()).hex()
+
+
+def erasure_challenge(subject: str, request_id) -> str:
+    """The canonical message an authorizing principal signs to bind an erasure to itself: a right-to-erasure
+    request for `subject` under `request_id`. sign_erasure() signs this; the tombstone carries the signature so
+    an auditor can prove WHO authorized the deletion (the AUTHORITY axis), not just that a free-text id was
+    written."""
+    return "erase:" + _sha256_hex(_canon({"subject": subject, "request_id": request_id}))
+
+
+def sign_erasure(principal_sk_hex: str, subject: str, request_id) -> str:
+    """Principal-side (off the store's box): Ed25519-sign erasure_challenge(subject, request_id). The hex
+    signature goes into forget_subject(..., authorization=), and authorized_by= is the principal's PUBLIC key —
+    together they bind the erasure to an authenticated principal the store did not mint. Needs `cryptography`."""
+    if not _HAVE_ED:
+        raise RuntimeError("signing an erasure needs the `cryptography` package (pip install cryptography)")
+    sk = _Ed25519SK.from_private_bytes(bytes.fromhex(principal_sk_hex))
+    return sk.sign(erasure_challenge(subject, request_id).encode()).hex()
+
+__version__ = "0.7.22"
+
+# Internal sentinel: marks a reaffirm write already authorized by submit_revert() (which verified the
+# signed INTENT). Object identity — no text/content path can ever produce it.
+_SANCTIONED = object()
 _WORD = re.compile(r"[a-z0-9][a-z0-9\-']{2,}")
 _STOP = frozenset("the a an of for to in on and or is are was were be been with this that it its as "
                   "by at from into our we us you your he she they them his her their not no".split())
@@ -115,7 +179,9 @@ def _cosine(a, b) -> float:
 
 class Mnemo:
     def __init__(self, path: str | None = None, embed=None, receipts: bool = False,
-                 receipt_key: str | None = None, receipt_pubkey: str | None = None):
+                 receipt_key: str | None = None, receipt_pubkey: str | None = None,
+                 capacity: int | None = None, revert_authority: str | None = None,
+                 revert_pubkey: str | None = None):
         """path: optional JSON file to persist to. embed: optional fn(str)->list[float] for semantic
         recall; if omitted, recall uses lexical token overlap (zero dependencies).
 
@@ -129,6 +195,29 @@ class Mnemo:
         so a third party can verify it with the public key only. (Standalone version: agora-agent-receipts.)"""
         self.path = Path(path) if path else None
         self.embed = embed
+        # Bounded working set (OPT-IN, default None = unbounded append-only, byte-identical legacy).
+        # When set, remember() hard-evicts the lowest-value ACTIVE memories past `capacity` using the
+        # verified two-tier policy (value-protected + recency-aged, Lab 29992a). Lets mnemo run in
+        # production without unbounded growth — a gap vs bounded competitors (mem0/Letta).
+        self.capacity = capacity
+        # AUTHORIZED REVERT CHANNEL (OPT-IN, default None = legacy: revert()/reaffirm are ungated).
+        # When set, restoring a superseded value (revert(), route()'s revert branches, remember(reaffirm=True))
+        # requires an out-of-band CAPABILITY = HMAC(revert_authority, key). The content path (route(text)) can
+        # never mint it (it doesn't hold the secret), so a text-derived 'go back' cannot execute a restore —
+        # it returns authorization_required and the principal confirms out of band. Textbook capability security
+        # (Dennis & Van Horn 1966) / confused-deputy fix (Hardy 1988): separate the AUTHORITY (unforgeable
+        # token) from the REQUEST (content). Honest boundary: this closes the content->restore path AT THE
+        # STORE; it cannot stop a caller who hands the capability to the content path, nor authenticate a human.
+        self.revert_authority = revert_authority
+        # Asymmetric authority: the store holds only the PUBLIC key; the principal signs a revert challenge
+        # with the matching PRIVATE key OFF the box (module-level sign_revert). The store can then VERIFY but
+        # never MINT an authorization -> even a compromised on-box harness cannot forge a revert. Closes the
+        # symmetric mode's residual (whoever holds the HMAC secret can mint). Both need cryptography for Ed25519.
+        self.revert_pubkey = revert_pubkey
+        # in-stream revert nonce ledger (0.7.12): consumed on EVALUATION, landed or not. Landed intents also
+        # persist their nonce in the record meta, so single-use survives a reload; a conflicted-but-unlanded
+        # nonce is only held in memory (honest boundary: after a restart it would conflict again, not land).
+        self._consumed_revert_nonces: set[str] = set()
         self.items: list[dict] = []
         self._tok_cache: dict[str, set] = {}     # id -> token set, so recall doesn't re-tokenize
         self._tc_cache: dict[str, dict] = {}     # id -> term-frequency map, for the BM25 hybrid channel
@@ -174,9 +263,105 @@ class Mnemo:
         # from repeated independent assertions, where the corroboration guard would lag one forever. MEASURED
         # (lab fea933, mnemo's real consolidate() path): isolated-poison false-supersede 1 -> 0 while a
         # 3-record sustained change is still adopted; it Pareto-dominates both the naive (poison-fooled) and
-        # corroboration-only (change-lagging) rules — see the Adaptation-Corruption Separation Law (lab f490d8).
+        # corroboration-only (change-lagging) rules — see the adaptation-corruption coupling (a classical
+        # quickest-change-detection tradeoff; lab f490d8).
         # Reversible: 0 or 1 -> legacy fast supersession.
         self.supersede_persistence = 0
+        # ECHO GUARD (OPT-IN, default OFF -> byte-identical legacy). Closes the ECHO ATTACK on keyed
+        # supersession: after a fact is corrected (old value -> superseded), a later RE-STATEMENT of the
+        # OLD value (a benign restatement or an attacker re-injection) carries a newer valid_from and would
+        # otherwise retire the FRESH value and resurrect the stale one. With this ON, an incoming keyed write
+        # whose OBJECT (remember(..., object=...), else the normalized text) matches a value ALREADY
+        # superseded for that key is a restatement-of-superseded: it is retired stale-on-arrival and the
+        # current value is preserved. MEASURED (mnemo/probes/echo_attack_probe_v2.py) on a MemBench echo
+        # fixture: recency / mem0-v1 / bi-temporal-Graphiti-faithful all resurrect the stale value (stale
+        # rate 0.21 -> 1.00 under both verbatim and paraphrased echo), and a verbatim-hash policy (MemStrata)
+        # holds against verbatim (0.21) but is destroyed by paraphrase (1.00); the superseded-OBJECT ledger
+        # holds against BOTH (~0.15). LOAD-BEARING LIMIT (measured, not assumed): paraphrase-resistance comes
+        # ONLY from the OBJECT being value-preserving — embedding near-duplicate CANNOT separate a
+        # same-value paraphrase (cos mean 0.95) from a different-value correction (0.84), they overlap
+        # (~42% false-block at a 0.9 threshold), so the guard is object/text-based, NOT similarity-based; an
+        # echo that OBSCURES the value (coreferent "her old hobby") is NOT caught. A genuine reversal back to
+        # a superseded value needs remember(..., reaffirm=True) to bypass the guard (the guard cannot
+        # un-supersede on its own). Reversible: echo_guard=False = legacy keyed supersession.
+        self.echo_guard = False
+        # STRICT corroboration (OPT-IN, default OFF -> identical legacy behavior). The corroboration bar
+        # (episodic->semantic graduation AND the recall influence gate) counts ">=2 distinct sources". By
+        # default a "source" is a canonical STRING (entity-resolved), which collapses honest sybil variants
+        # ("Wikipedia"/"wikipedia.org"/URL) but is still SPOOFABLE by an attacker who supplies two unrelated
+        # source strings it controls. With strict_corroboration ON, a corroborating link only counts if it
+        # carries a VERIFIED KEY (remember(..., attestation=...)): independence is then measured by distinct
+        # Ed25519 public keys an attacker cannot forge, so N sybil variants of one origin collapse to one
+        # witness unless the attacker holds N distinct keys (a costly identity, Douceur 2002). This binds the
+        # "independence" rail to the "origin-signed" rail; it does NOT make a claim TRUE (an attested source
+        # can still sign a false claim), only makes manufactured independence expensive. Reversible: OFF.
+        self.strict_corroboration = False
+        # SEED-ANCHORED FLOW TRUST (OPT-IN, default empty set -> OFF -> zero behavior change). The one axis
+        # strict_corroboration does NOT close: distinct Ed25519 keys prove DISTINCTNESS, not COST -- a Sybil
+        # mints N keypairs for free, so ">=2 distinct verified keys" is still forgeable by a determined
+        # attacker (Douceur 2002). Cheng & Friedman (2005) prove no SYMMETRIC reputation function is
+        # Sybilproof; only ASYMMETRIC, flow-based trust anchored to a costly/seeded root resists. This adds
+        # that anchor: `trust_seeds` is a set of canonical source strings (or "key:<attested_key>") the
+        # APPLICATION trusts a-priori (the operator's own source, an authenticated user). Trust then FLOWS
+        # from a seed to sources it VOUCHES for -- a source U is trusted iff U is a seed, or a record whose
+        # source is already trusted explicitly LINKS to a record authored by U (an endorsement edge),
+        # transitively up to `trust_hops` (TrustRank/Advogato-style; Gyongyi et al. 2004). When trust_seeds is
+        # non-empty, a corroborating witness counts toward the >=2-distinct-source bar ONLY if its source is
+        # in the trust closure. N self-minted sources that no seed vouches for contribute ZERO trusted
+        # witnesses, so they cannot manufacture standing. HONEST LIMITS: (1) inert without >=1 seed; (2) it
+        # RELOCATES the residual from "mint N free keys" to "earn ONE endorsement from a seeded node" -- a
+        # much higher bar, but a compromised/careless seed leaks trust into its vouched subtree (Cheng-Friedman's
+        # asymmetric-flow residual, not closed); (3) the EARNED-OUTCOME path (credit(), good>0) stays orthogonal
+        # and still grants standing regardless of seeds -- an unforgeable signal a writer cannot mint. Reversible:
+        # empty set. Receipt: mnemo/probes/seed_anchored_trust_probe.py.
+        self.trust_seeds: set = set()
+        self.trust_hops: int = 1
+        # WRITE-PATH VALUE EXTRACTOR (OPT-IN, default None -> OFF -> zero behavior change). mnemo's whole
+        # governance layer keys on the supersession (key, object): keyed supersession, echo_guard, check_conflict,
+        # forget_subject. But the caller has to supply key=/object= on every remember(), which the free-text
+        # adapters (a conversation Session, a chat turn) don't do -- so supersession never fires on their writes.
+        # Set `extractor` to a callable text -> (key, object) | None (your regex, or an LLM you call once and
+        # cache) and remember() runs it whenever the caller didn't pass a key: the derived (key, object) then
+        # drives supersession/echo_guard/check_conflict/forget_subject automatically, so the governance layer
+        # composes over free text without threading keys through every call. HONEST: this is a before-save hook
+        # (DB trigger / ORM before_save; textbook) -- the packaging is the point, not the idea. The supersession
+        # is only as sound as your extractor: a mis-derived key mis-supersedes (the same risk as a wrong manual
+        # key=), so keep the extractor deterministic/reviewable and prefer an explicit key when the caller knows
+        # it. Fail-open: any exception in the extractor is swallowed and the write falls back to a plain append.
+        self.extractor = None
+        # STRICT PROVENANCE (store policy; the adversary-resistant form of the orphan rule). Default OFF ->
+        # zero behavior change. When True, a write that shows NO provenance at all -- neither a `source` nor a
+        # resolvable `derived_from` -- earns NO standing (orphan), regardless of any caller flag. This removes
+        # the caller-elective hole in the `derived=` flag: an undeclared LLM summary (no source, lineage dropped)
+        # is denied standing BY DEFAULT, not by a switch the untrusted caller can omit. To earn standing a write
+        # must name a source (primary) OR name parents (derived); a bare fabrication can honestly do neither. (A
+        # FAKE source string still passes here -> pair with strict_corroboration/attestation, which demands a
+        # VERIFIED key, to price that too.) Biba-style default-deny at the store boundary. Reversible: OFF.
+        self.strict_provenance = False
+        # COHERENCE GATE (OPT-IN, default None -> OFF -> zero behavior change). When set to a float threshold in
+        # [0,1], a corroborating `link` only COUNTS toward the >=2-distinct-source bar if its witness is actually
+        # COHERENT with the claim (embedder cosine if `embed` is set, else lexical token-Jaccard), >= the threshold.
+        # This closes the LAZY forged-source residual: a poison that clears the source COUNT with off-topic filler
+        # witnesses no longer corroborates, because the filler isn't about the claim. HONEST LIMIT (measured, and
+        # this is textbook adaptive-attack / common-mode territory -- Carlini-Wagner 2017, Knight-Leveson 1986,
+        # PoisonedRAG): it does NOT close the residual, it RAISES the forger's bar from "2 distinct source strings"
+        # to "2 distinct source strings + ON-TOPIC witness text"; a coherent forgery still passes, at a small
+        # false-withhold cost on genuine recoveries phrased differently. A defense-in-depth layer, not a wall.
+        self.coherence_gate: float | None = None
+        # TEMPORAL GATE (OPT-IN, default None -> OFF -> zero behavior change; suggested by hannune on r/RAG). When
+        # set to a window in SECONDS, corroborating links that CO-ARRIVE (their timestamps fall within the window
+        # of each other) collapse to ONE anchor before the >=2-distinct-source count -- exactly as _distinct_sources
+        # collapses one canonical source, but on TIME. Genuinely independent sources rarely write within seconds of
+        # each other; a coordinated forgery writes its witnesses in a burst, so co-arrival is a soft flag even when
+        # each source looks individually legitimate. HONEST LIMIT (textbook coordinated-burst / Sybil-timing
+        # detection): a PATIENT attacker who spaces the forged writes out beyond the window defeats it (cf. the
+        # sleeper -- patience buys past a timing signal). A soft decorrelated layer (timing is orthogonal to source
+        # count and to content coherence), not a wall. Its value is exactly the decorrelation the attacker leaves.
+        self.temporal_gate: float | None = None
+        # AUTO-STAMP LINEAGE substrate: the ids of the most recent recall(), so a derived write (a summary written
+        # right after) can inherit them as parents -- the lineage EDGE carried by the STORE from the recall->write
+        # flow, not supplied by the untrusted LLM. Transient (not persisted); see remember(derived=True).
+        self._last_recall: list[str] = []
         # _save() THROTTLE: serializing the whole store (json.dumps of every item) is O(store size); doing
         # it on EVERY recall/remember froze callers once the store grew (recall mutates access value, so it
         # used to re-serialize everything each call). Coalesce disk writes to at most once / _save_min_s;
@@ -200,11 +385,32 @@ class Mnemo:
                 self._receipts = json.loads(self._receipts_path.read_text(encoding="utf-8"))
             except Exception:
                 self._receipts = []
+        # DELETION TOMBSTONES (erasure-with-audit). forget() genuinely removes content, which otherwise makes
+        # verify_writes() report the now-missing record as "deleted out-of-band" — a legitimate GDPR-erasure is
+        # then INDISTINGUISHABLE from tampering. A tombstone is a hash-chained (optionally Ed25519-signed) marker
+        # that records the FACT of a deliberate erasure — the record's random surrogate id (uuid, NOT content-
+        # derived), a UTC ts, and an opaque caller request_id — and NOTHING derived from the content (a hash of PII
+        # is still PII, EDPB; so no content hash lands here). verify_writes() then treats a tombstoned missing
+        # record as ACCOUNTED-FOR (chain intact, erased at T), while a record missing WITHOUT a tombstone still
+        # flags as out-of-band tampering. HONEST SCOPE: this proves the ACT of deletion within THIS mnemo store
+        # only (not the app's vector store / logs / backups), it is NOT a compliance guarantee, and the signature
+        # is load-bearing only against a party OTHER than the key holder (an operator who holds receipt_key can
+        # forge tombstones too). Prior art credited: crypto-shredding, Cassandra tombstones, Art.30 erasure logs,
+        # Crosby-Wallach/Certificate-Transparency tamper-evident logs.
+        self._tombstones: list[dict] = []
+        self._tombstones_path = (self.path.parent / (self.path.name + ".tombstones.json")) if self.path else None
+        if self._tombstones_path and self._tombstones_path.exists():
+            try:
+                self._tombstones = json.loads(self._tombstones_path.read_text(encoding="utf-8"))
+            except Exception:
+                self._tombstones = []
 
     # ── capture ──────────────────────────────────────────────────────────────
     def remember(self, text: str, tags=None, value: float = 1.0, meta: dict | None = None,
                  mtype: str | None = None, valid_from: float | None = None,
-                 source: dict | None = None, key: str | None = None) -> str:
+                 source: dict | None = None, key: str | None = None,
+                 derived_from: list | None = None, attestation=None, derived: bool = False,
+                 object: str | None = None, reaffirm: bool = False, capability: str | None = None) -> str:
         """Append-only raw capture. Stamped with an absolute UTC time; never edited afterward.
         mtype in {episodic, semantic, procedural} sets the decay prior (episodic fades fast,
         semantic slow, procedural barely); inferred from the text if not given. Pass it explicitly
@@ -220,6 +426,29 @@ class Mnemo:
         (~42% of the time in our test). A deterministic (subject, relation, object) ledger drives that to
         ~0%. Bi-temporal: a back-filled record (earlier valid_from) does NOT overwrite a genuinely newer
         same-key value — the stale-on-arrival record is the one retired."""
+        # AUTO-STAMP LINEAGE (jacksonxly / MemLineage arXiv:2605.14421): a derived write (a summary / consolidation)
+        # that names no explicit parent inherits the store's most recent recall as its parents. The lineage EDGE is
+        # carried by the STORE from the recall->write flow -- the untrusted LLM only supplies the summary text and
+        # never holds the switch -- so a summary written right after a recall automatically carries its ancestors'
+        # taint (a retraction reaches it; it is not an orphan) WITHOUT the caller threading derived_from through the
+        # rewrite. If no recent recall exists, an explicit derived=True falls through to the orphan rule (fail-closed).
+        # This is the store-side inference the storm/verify pass found to be the ONLY form with measured defense
+        # value (signature-only 6/6 attacks -> 0/6 once lineage propagates); a caller-supplied source string is not.
+        if derived and derived_from is None:
+            derived_from = list(getattr(self, "_last_recall", []) or [])
+        # WRITE-PATH EXTRACTOR: derive (key, object) from the text when the caller didn't supply a key and an
+        # extractor is plugged, so the governance layer keys itself over free text. Fail-open (never break a write).
+        if self.extractor is not None and key is None and not derived:
+            try:
+                ex = self.extractor(text)
+                if isinstance(ex, tuple) and len(ex) == 2:
+                    key = ex[0]
+                    if object is None:
+                        object = ex[1]
+                elif isinstance(ex, str):
+                    key = ex
+            except Exception:
+                pass
         mid = uuid.uuid4().hex[:10]
         now = time.time()
         rec = {"id": mid, "text": text, "tags": list(tags or []), "value": float(value),
@@ -228,8 +457,81 @@ class Mnemo:
                "source": dict(source) if source else None,   # re-checkable origin (e.g. {"doc": id, "span": [start, end]}) so a recalled fact can be traced back, not trusted blind
                "mtype": mtype or _infer_type(text), "last_access": now,
                "status": "active", "links": [], "meta": dict(meta or {})}
+        # TAINT INHERITANCE (provenance that rides through transformation): when this memory is DERIVED from
+        # others (a summary, a consolidation, an LLM rewrite), it inherits the union of its parents' canonical
+        # sources — transitively, since a parent's own inherited taint is included. Without this, an app-side
+        # summary is a fresh record with no source, so slash()/per-source attribution can't reach it: the
+        # cumulative influence cap and the retroactive slash both need provenance to survive summarization to be
+        # countable at all. `derived_from` is the substrate everything else (cap, slash) is deterrence math on.
+        if derived_from:
+            _by = {x["id"]: x for x in self.items}
+            taint, links = set(), []
+            for pid in derived_from:
+                p = _by.get(pid)
+                if p is None:
+                    continue
+                links.append(pid)
+                taint |= Mnemo._rec_sources(p)     # parent's own source + its inherited taint (transitive)
+            if taint:
+                rec["taint"] = sorted(taint)
+            if links:
+                rec["links"] = links
+                rec["derived_from"] = list(links)   # explicit lineage (distinct from corroboration links) so
+                #                                     a derived memory's evidence grade can be capped at its
+                #                                     weakest parent's -- trust taint propagates, not just source taint
+        # INTEGRITY-FLOOR FOR SELF-DECLARED TRANSFORMATION OUTPUTS (prompted by jacksonxly). A write the caller
+        # DECLARES a transformation output (derived=True -- a summary / consolidation / LLM rewrite) that could
+        # not name/resolve ANY parent is an ORPHAN: missing lineage is treated as unverified, so it earns NO
+        # corroboration standing (fails the influence gate + graduation + distinct-source bar), defaulting to
+        # scope-local context, and cannot quietly survive a retraction it should have inherited. Reversible:
+        # re-remember with a resolvable derived_from. Primary observations (derived=False, default) are
+        # unaffected. This is Biba-style integrity (1977: low-integrity input cannot raise an object's integrity)
+        # / taint-tracking default-deny applied to the graduation+recall gate -- an APPLICATION, not a new idea.
+        # HONEST LIMIT (do NOT call this "fail-closed against an adversary"): `derived` is CALLER-SET, so a
+        # hostile or careless caller that OMITS it is treated as a primary observation and can still earn
+        # standing -- it fails OPEN. It closes the orphaned-summary hole only for COOPERATIVE callers that
+        # correctly self-declare derivation but lose lineage in an untrusted transform. A truly adversary-resistant
+        # version would INFER derivation from the summarize/consolidate call site rather than trust the flag.
+        if derived and not rec.get("derived_from"):
+            rec["orphan"] = True
+        # STRICT-PROVENANCE store policy (adversary-resistant): standing requires SHOWN provenance -- a source
+        # (primary) or resolvable parents (derived). A write with NEITHER is an orphan by default, so an
+        # undeclared summary cannot escape by simply omitting derived=True (the caller-elective hole). See the
+        # strict_provenance note in __init__. rec['source'] is None when no source was passed.
+        if self.strict_provenance and not rec.get("source") and not rec.get("derived_from"):
+            rec["orphan"] = True
         if key is not None:
             rec["key"] = str(key)
+        # OBJECT (OPT-IN): the asserted VALUE for keyed supersession + the echo guard. Value-preserving
+        # paraphrases share it, so echo detection is object-identity (not similarity, which provably can't
+        # separate same-value paraphrase from different-value correction). Falls back to normalized text.
+        if object is not None:
+            rec["object"] = str(object)
+        # AUTHORIZED-REVERT GATE: a reaffirm write is the one path that restores a superseded value past the
+        # echo guard, so when an authority is configured it needs the same capability as revert() — else the
+        # content path could just call remember(reaffirm=True) directly. A bad/missing capability is loud.
+        if reaffirm and (self.revert_authority is not None or self.revert_pubkey is not None)                 and capability is not _SANCTIONED and not self._revert_authorized(key, capability):
+            raise PermissionError("reaffirm/revert requires a valid capability (revert authority is set)")
+        # ORIGIN ATTESTATION (OPT-IN): bind this claim to a source's VERIFIED KEY. attestation is
+        # (pubkey_hex, sig_hex) or {"pubkey":..., "sig":...}; the signature (from mnemo.attest(text, sk,
+        # source_doc)) must verify over the same claim+canonical-source message, else the write is REJECTED
+        # (a forged attestation is loud, not silently dropped). On success the record carries attested_key,
+        # which strict_corroboration counts distinct instances of — so manufactured independence costs a real
+        # key. Verifying authorship, NOT truth: an attested source can still sign a false claim.
+        if attestation is not None:
+            if isinstance(attestation, dict):
+                pubkey_hex, sig_hex = attestation.get("pubkey"), attestation.get("sig")
+            else:
+                pubkey_hex, sig_hex = attestation
+            if not _HAVE_ED:
+                raise RuntimeError("verifying an attestation needs the `cryptography` package (pip install cryptography)")
+            src_doc = source.get("doc") if isinstance(source, dict) else (source if isinstance(source, str) else None)
+            try:
+                _Ed25519PK.from_public_bytes(bytes.fromhex(pubkey_hex)).verify(
+                    bytes.fromhex(sig_hex), _attest_message(text, src_doc))
+            except Exception as e:
+                raise ValueError("attestation signature does not verify for this claim/source") from e
+            rec["attested_key"] = pubkey_hex
         if self.embed:
             try:
                 rec["vec"] = list(self.embed(text))
@@ -237,18 +539,52 @@ class Mnemo:
                 rec["vec"] = None
         self.items.append(rec)
         if key is not None:
-            self._supersede_by_key(rec)   # deterministic SRO supersession (no embedding, no threshold)
+            self._supersede_by_key(rec, reaffirm=reaffirm)   # deterministic SRO supersession (no embedding, no threshold)
+        if self.capacity is not None:
+            self._evict_to_capacity()                        # bounded working set (opt-in) BEFORE persisting
         self._save(force=True)        # a new memory is real content - persist immediately, not throttled
         if self.receipts_enabled:
             self._emit_write_receipt(rec)
         return mid
 
+    def _evict_to_capacity(self) -> None:
+        """Keep the ACTIVE working set at <= self.capacity by HARD-EVICTING the lowest-value active
+        memories, using the VERIFIED two-tier policy (Lab 29992a: value-protected + recency-aged is the
+        one eviction rule that is universal across regimes). Protect the top protect_frac of capacity by
+        RAW value (a rare-but-critical memory survives a flood); fill the remaining budget from the REST
+        by EFFECTIVE (decay-weighted) value (so a stale high-raw memory can't crowd out a freshly-useful
+        one, and pure junk floods age out). Eviction REMOVES (frees space) via forget(), unlike
+        consolidate(keep=) which only DEMOTES — a bounded store must actually shrink. Superseded history
+        is not counted or evicted here (it is low-overhead and preserves as_of); only the active set is
+        bounded. No-op when active <= capacity, so remember() stays O(1) amortized until the cap bites."""
+        active = [r for r in self.items if r.get("status") == "active"]
+        if len(active) <= self.capacity:
+            return
+        now = time.time()
+        active.sort(key=lambda r: -r["value"])               # by RAW value (protected tier order)
+        kprot = int(self.protect_frac * self.capacity) if self.two_tier_keep else 0
+        protected, rest = active[:kprot], active[kprot:]
+        rest_keep = set(id(r) for r in
+                        sorted(rest, key=lambda r: -self._effective_value(r, now))[:self.capacity - kprot])
+        evict_ids = [r["id"] for r in rest if id(r) not in rest_keep]
+        if evict_ids:
+            self.forget(evict_ids)                            # hard delete + link/toggle scrub
+
     # ── write receipts (OPT-IN: tamper-evident write history) ─────────────────
     def _write_commit(self, rec: dict) -> dict:
-        """What a receipt commits to for a stored memory: its id + a hash of its content-bearing fields."""
+        """What a receipt commits to for a stored memory: its id, a hash of its content-bearing fields, AND a hash
+        of its ATTRIBUTION (canonical sources = own source + inherited derived_from taint). Binding attribution into
+        the receipt is what makes a later RELABEL detectable: k, the influence budget, the influence gate and slash
+        are all keyed on the source id, so a silent relabel (rewriting a record's source, or stripping its taint)
+        voids all of them at once with no inner layer to appeal to — attribution is not a fourth axis, it is the
+        floor the others stand on. With the sources committed, a relabel no longer matches the receipt, so
+        verify_attribution() flags it. Honest limit: this makes a relabel tamper-EVIDENT, not attribution CORRECT —
+        a wrong source asserted at write time (an attacker who controls the labeling channel, e.g. MINJA) is
+        committed faithfully and uselessly; that oracle problem is untouched."""
         return {"id": rec["id"],
                 "content_sha256": _sha256_hex(_canon({"text": rec.get("text"), "key": rec.get("key"),
-                                                      "mtype": rec.get("mtype")}))}
+                                                      "mtype": rec.get("mtype")})),
+                "attrib_sha256": _sha256_hex(_canon(sorted(Mnemo._rec_sources(rec))))}
 
     def _emit_write_receipt(self, rec: dict) -> dict:
         prev = self._receipts[-1]["hash"] if self._receipts else _GENESIS
@@ -293,24 +629,154 @@ class Mnemo:
                 problems.append(f"receipt {i}: unsigned, but a signature was required")
             cur = by_id.get(r["memory_id"])
             if cur is None:
-                problems.append(f"memory {r['memory_id']}: written but missing from the store (deleted out-of-band)")
-            elif self._write_commit(cur) != r["commit"]:
-                problems.append(f"memory {r['memory_id']}: stored content no longer matches its write receipt (edited after write)")
+                # a missing record is only a PROBLEM if it was NOT deliberately erased. A deletion tombstone
+                # (forget_subject) makes the erasure accounted-for: the write-chain stays intact and the record
+                # is provably erased, not silently tampered away. No tombstone -> still flag as out-of-band.
+                if not any(t.get("memory_id") == r["memory_id"] for t in self._tombstones):
+                    problems.append(f"memory {r['memory_id']}: written but missing from the store (deleted out-of-band)")
+            else:
+                # compare only the fields THIS receipt committed to (a receipt written before attribution was
+                # committed has no attrib_sha256 — don't fault it for a field it never promised)
+                cc = self._write_commit(cur)
+                if any(cc.get(k) != v for k, v in (r.get("commit") or {}).items()):
+                    problems.append(f"memory {r['memory_id']}: stored content no longer matches its write receipt (edited after write)")
             prev = r.get("hash")
+        # verify the DELETION-TOMBSTONE chain too — else a forged tombstone could hide a real out-of-band delete
+        tprev = _GENESIS
+        for j, t in enumerate(self._tombstones):
+            core = Mnemo._tombstone_core(t)
+            if t.get("prev") != tprev:
+                problems.append(f"tombstone {j}: broken chain link (a prior tombstone was altered/removed)")
+            if _sha256_hex(_canon(core)) != t.get("hash"):
+                problems.append(f"tombstone {j}: tombstone tampered (hash mismatch)")
+            if "sig" in t and _HAVE_ED:
+                try:
+                    _Ed25519PK.from_public_bytes(bytes.fromhex(t["pubkey"])).verify(
+                        bytes.fromhex(t["sig"]), bytes.fromhex(t["hash"]))
+                    if expected_pubkey and t.get("pubkey") != expected_pubkey:
+                        problems.append(f"tombstone {j}: signed by an unexpected key")
+                except Exception:
+                    problems.append(f"tombstone {j}: invalid signature")
+            elif expected_pubkey:
+                problems.append(f"tombstone {j}: unsigned, but a signature was required")
+            tprev = t.get("hash")
         return (len(problems) == 0, problems)
 
-    def _supersede_by_key(self, rec: dict) -> None:
+    def verify_attribution(self) -> dict:
+        """Tamper-evidence for the ATTRIBUTION FLOOR. k, the influence budget, the influence gate and slash are all
+        keyed on a memory's canonical source id; a post-hoc RELABEL (rewriting a record's source, or stripping its
+        inherited derived_from taint) therefore voids all of them at once, silently, with no inner layer to appeal
+        to — attribution is not a fourth axis, it is the floor the others stand on. This binds each write's
+        attribution into the tamper-evident receipt chain (see _write_commit) and reports, per memory, whether its
+        CURRENT canonical sources still match what was committed at write time. A relabel is thus LOUD, not silent.
+
+        Returns {ok, chain_ok, relabeled, uncommitted, missing}:
+          - relabeled: active memory ids whose current sources differ from their receipt (the attack this catches);
+          - uncommitted: active ids with no attribution in their receipt (written before this was added, or the
+            memory was never receipted) — cannot be checked, so not trusted;
+          - missing: ids in the receipt chain no longer in the store.
+        TWO honest limits (do NOT read this as tamper-PROOF):
+        1. tamper-evidence != CORRECTNESS. A source that was WRONG at write time (an attacker who controls the
+           labeling channel, e.g. MINJA) is committed faithfully and this cannot tell it was wrong — the
+           genuinely-open oracle problem, untouched.
+        2. the chain is only tamper-EVIDENT if it is SIGNED with a receipt_key held OFF the write path (or its head
+           is externally anchored). UNSIGNED (the default), an attacker who can silently relabel rec['source'] can
+           equally recompute the whole sidecar receipt chain with the new sources and pass this check — so bare
+           verify_attribution() only catches a relabel by an actor who can edit the store but NOT the .receipts
+           sidecar (e.g. an out-of-band DB edit). For the 'loud' property to hold against a store-capable attacker
+           you MUST pass receipt_key=... (Ed25519) with the key out of reach, or anchor the chain head externally.
+        Requires receipts enabled at write time. The crypto is textbook (Haber-Stornetta 1991 hash-chains,
+        Schneier-Kelsey 1998 tamper-evident logs); the only new bit is committing attribution so a source-keyed
+        defense set's single silent failure (relabel) becomes detectable."""
+        # chain integrity = the receipt log's OWN hashes link and aren't tampered/mis-signed. Kept independent of
+        # whether stored content was later LEGITIMATELY mutated (e.g. slash changes mtype) — that is the relabeled
+        # question below, not a log-integrity failure.
+        chain_ok, prev = True, _GENESIS
+        for r in self._receipts:
+            core = {k: r.get(k) for k in ("seq", "ts", "memory_id", "commit", "prev")}
+            if r.get("prev") != prev or _sha256_hex(_canon(core)) != r.get("hash"):
+                chain_ok = False
+            if "sig" in r and _HAVE_ED:
+                try:
+                    _Ed25519PK.from_public_bytes(bytes.fromhex(r["pubkey"])).verify(
+                        bytes.fromhex(r["sig"]), bytes.fromhex(r["hash"]))
+                except Exception:
+                    chain_ok = False
+            prev = r.get("hash")
+        by_id = {it["id"]: it for it in self.items}
+        committed = {}                         # latest committed attribution hash per memory id (None if pre-attrib)
+        for r in self._receipts:
+            committed[r["memory_id"]] = (r.get("commit") or {}).get("attrib_sha256")
+        relabeled, uncommitted, missing = [], [], []
+        for mid, a in committed.items():
+            cur = by_id.get(mid)
+            if cur is None:
+                missing.append(mid)
+            elif cur.get("status") != "active":
+                continue
+            elif a is None:
+                uncommitted.append(mid)
+            elif _sha256_hex(_canon(sorted(Mnemo._rec_sources(cur)))) != a:
+                relabeled.append(mid)
+        return {"ok": chain_ok and not relabeled, "chain_ok": chain_ok,
+                "relabeled": relabeled, "uncommitted": uncommitted, "missing": missing}
+
+    @staticmethod
+    def _obj_sig(r: dict) -> str:
+        """The supersession OBJECT signature: the explicit `object` value if set, else normalized text.
+        Value-preserving paraphrases share the object; a verbatim-only fallback (text) matches MemStrata."""
+        o = r.get("object")
+        s = o if o is not None else r.get("text", "")
+        return re.sub(r"[^a-z0-9]+", " ", str(s).lower()).strip()
+
+    def _supersede_by_key(self, rec: dict, reaffirm: bool = False) -> None:
         """Deterministic (subject, relation, object) supersession: retire active records that share
         rec['key']. No similarity threshold, no LLM call — the fix our Crucible replication validated
         (stale-fact recall 41.7% -> 0.0%, where cosine-based detection is near chance at AUROC ~0.61).
         Bi-temporal: only same-key records with valid_from <= rec's are retired; if an active same-key
         record is genuinely newer (later valid_from), the INCOMING rec is the stale one and is retired
         instead — a back-filled value never overwrites the current one. recall() hides superseded records
-        by default, so a keyed store never surfaces a stale fact."""
+        by default, so a keyed store never surfaces a stale fact.
+
+        ECHO GUARD (self.echo_guard, default OFF): before the normal path, if the incoming rec asserts an
+        OBJECT that has ALREADY been superseded for this key AND differs from the current active value, it
+        is a restatement-of-superseded (an echo) — retire the incoming rec stale-on-arrival and keep the
+        current value, so a later re-mention of the old value cannot resurrect it. reaffirm=True bypasses
+        the guard (a genuine, authoritative reversal back to a previously-superseded value)."""
         k = rec.get("key")
         if not k:
             return
         vf_new = rec.get("valid_from", rec["ts"])
+        if self.echo_guard and not reaffirm:
+            new_sig = self._obj_sig(rec)
+            same_key = [r for r in self.items if r is not rec and r.get("key") == k]
+            active = [r for r in same_key if r.get("status") == "active"]
+            # OBJECT-LESS CLOBBER GUARD: on a key managed with explicit objects (a value ledger), a keyed
+            # write carrying NO object cannot displace an object-bearing value — measured hole: a value-free
+            # reversion utterance ("go back to the old one") keyed onto the ledger superseded the real value
+            # with junk text (revert_by_reference_probe.py, B2 resistance 0.00 -> 1.00 with this guard).
+            # Changing a ledgered value requires an explicit object, reaffirm=True, or revert(). Keys that
+            # never used explicit objects (text-fallback legacy) are unaffected.
+            if rec.get("object") is None and any(r.get("object") is not None for r in active):
+                rec["status"] = "superseded"               # retired stale-on-arrival
+                rec["superseded_ts"] = time.time()
+                rec["invalidated_at"] = vf_new
+                m = rec.setdefault("meta", {})
+                m["objectless_blocked"] = True
+                m["superseded_by_toggle"] = active[0]["id"]
+                m["superseded_by_policy"] = "objectless_guard"
+                return
+            superseded_sigs = {self._obj_sig(r) for r in same_key if r.get("status") == "superseded"}
+            if (active and new_sig in superseded_sigs
+                    and all(self._obj_sig(a) != new_sig for a in active)):
+                rec["status"] = "superseded"           # the echo is retired on arrival
+                rec["superseded_ts"] = time.time()
+                rec["invalidated_at"] = vf_new
+                m = rec.setdefault("meta", {})
+                m["echo_blocked"] = True
+                m["superseded_by_toggle"] = active[0]["id"]
+                m["superseded_by_policy"] = "echo_guard"
+                return                                 # current value preserved; skip normal supersession
         for r in self.items:
             if r is rec or r.get("status") != "active" or r.get("key") != k:
                 continue
@@ -319,12 +785,16 @@ class Mnemo:
                 r["status"] = "superseded"
                 r["superseded_ts"] = time.time()
                 r["invalidated_at"] = vf_new
-                r.setdefault("meta", {})["superseded_by_toggle"] = rec["id"]
+                rm = r.setdefault("meta", {})
+                rm["superseded_by_toggle"] = rec["id"]
+                rm["superseded_by_policy"] = "keyed_reaffirm" if reaffirm else "keyed_lww"
             else:                              # an active same-key value is newer -> incoming is stale-on-arrival
                 rec["status"] = "superseded"
                 rec["superseded_ts"] = time.time()
                 rec["invalidated_at"] = vf_r
-                rec.setdefault("meta", {})["superseded_by_toggle"] = r["id"]
+                rm = rec.setdefault("meta", {})
+                rm["superseded_by_toggle"] = r["id"]
+                rm["superseded_by_policy"] = "keyed_lww_backfill"
 
     def remember_dedup(self, text: str, tags=None, value: float = 1.0, meta: dict | None = None,
                        mtype: str | None = None, dup_threshold: float = 0.95) -> str:
@@ -384,6 +854,805 @@ class Mnemo:
         self._mat = None; self._mat_built_n = -1             # force vec-matrix rebuild (drops forgotten rows)
         self._save(force=True)                               # a deletion is real content change — persist now
         return {"forgotten": len(target), "ids": sorted(target), "scrubbed_links": scrubbed}
+
+    @staticmethod
+    def _tombstone_core(t: dict) -> dict:
+        """The hash-committed fields of a tombstone. Backward-compatible: the AUTHORITY/BASIS block is included
+        ONLY when present, so tombstones written without it hash exactly as before (older stores still verify)."""
+        core = {k: t.get(k) for k in ("seq", "memory_id", "ts", "request_id", "prev")}
+        if t.get("auth"):
+            core["auth"] = t["auth"]
+        return core
+
+    def _emit_tombstone(self, memory_id: str, ts: float, request_id: str | None,
+                        basis: str | None = None, authorized_by: str | None = None,
+                        authorization: str | None = None) -> dict:
+        """Append one hash-chained (optionally signed) deletion marker. Commits to the record's random surrogate
+        id + ts + opaque request_id, PLUS an optional tamper-evident AUTHORITY/BASIS block: `basis` (why the
+        record was erased — the decision basis), `authorized_by` (the authorizing principal's PUBLIC key), and
+        `authorization` (that principal's Ed25519 signature over erasure_challenge(subject, request_id), from
+        sign_erasure()). Still content-free (a hash of PII is still PII). When present, these are inside the
+        committed hash, so an auditor can reconstruct WHO authorized the erasure and ON WHAT BASIS — not just a
+        free-text id — and detect any later tampering with them."""
+        prev = self._tombstones[-1]["hash"] if self._tombstones else _GENESIS
+        t = {"seq": len(self._tombstones), "memory_id": memory_id, "ts": ts,
+             "request_id": request_id, "prev": prev}
+        if basis is not None or authorized_by is not None or authorization is not None:
+            t["auth"] = {"basis": basis, "authorized_by": authorized_by, "authorization": authorization}
+        t["hash"] = _sha256_hex(_canon(Mnemo._tombstone_core(t)))
+        if self._receipt_sk and _HAVE_ED:
+            sk = _Ed25519SK.from_private_bytes(bytes.fromhex(self._receipt_sk))
+            t["pubkey"] = self.receipt_pubkey
+            t["sig"] = sk.sign(bytes.fromhex(t["hash"])).hex()
+        self._tombstones.append(t)
+        if self._tombstones_path:
+            try:
+                self._tombstones_path.write_text(json.dumps(self._tombstones, indent=2, ensure_ascii=False),
+                                                 encoding="utf-8")
+            except Exception:
+                pass
+        return t
+
+    def forget_subject(self, subject: str, request_id: str | None = None, basis: str | None = None,
+                       authorized_by: str | None = None, authorization: str | None = None) -> dict:
+        """RIGHT-TO-ERASURE across provenance lineage, with a tamper-evident audit of the ACT. Hard-deletes
+        every active memory ATTRIBUTABLE to `subject` — its own canonical source OR any record that inherited
+        `subject` through derived_from taint (so a summary/consolidation built from the subject's data is erased
+        too, which a naive text-match delete would miss) — then records a signed, CONTENT-FREE tombstone per
+        erased record so verify_writes() reports the now-missing rows as deliberately erased (not out-of-band
+        tampering). `subject` is matched against canonical sources (`_rec_sources`): pass the same source string
+        you wrote with (`remember(..., source={'doc': subject})`) or an attested key as 'key:<hex>'.
+
+        Returns {erased, ids, request_id, tombstones}. HONEST SCOPE (read before relying on it for compliance):
+        this erases + proves-deletion WITHIN THIS mnemo store only — NOT the app's vector store, prompt logs,
+        or backups; it is an integrity primitive, NOT a compliance certification. The tombstone proves the ACT
+        (a record with this surrogate id was erased at T for request R), never the CONTENT, and its signature is
+        load-bearing only against a party who does NOT hold receipt_key (the operator who holds the key can forge
+        tombstones too — anchor the chain head externally for operator-adversarial audit). Prior art: crypto-
+        shredding; Cassandra/event-sourcing tombstones; GDPR Art.30 erasure logs; Crosby-Wallach / Certificate
+        Transparency tamper-evident logs."""
+        # match the subject against canonical sources; accept either the raw string the caller wrote or its
+        # entity-resolved form (_canon_source collapses "user-42"/"user_42"/"User 42" -> one canonical id).
+        cand = {subject, Mnemo._canon_source(subject)}
+        subj_ids = [r["id"] for r in self.items if cand & Mnemo._rec_sources(r)]
+        if not subj_ids:
+            return {"erased": 0, "ids": [], "request_id": request_id, "tombstones": 0}
+        now = time.time()
+        res = self.forget(ids=subj_ids)
+        for mid in res["ids"]:
+            self._emit_tombstone(mid, now, request_id, basis=basis,
+                                 authorized_by=authorized_by, authorization=authorization)
+        return {"erased": res["forgotten"], "ids": res["ids"],
+                "request_id": request_id, "tombstones": len(res["ids"])}
+
+    def erasure_report(self) -> dict:
+        """Audit view of deliberate erasures: total tombstones + each {memory_id, ts, request_id}. Read-only;
+        carries NO erased content (by construction). The durable proof-of-deletion trail behind forget_subject."""
+        return {"tombstoned_total": len(self._tombstones),
+                "erasures": [{"memory_id": t["memory_id"], "ts": t.get("ts"),
+                              "request_id": t.get("request_id"), "signed": "sig" in t}
+                             for t in self._tombstones]}
+
+    def governance_report(self, expected_pubkey: str | None = None) -> dict:
+        """ONE auditor-facing surface for erasure-with-proof — the compliance view of forget_subject, built for
+        the right-to-erasure demand (GDPR Art.17) that an EU-AI-Act operator has to satisfy while keeping an
+        auditable record of the ACT (Art.30). It stitches the three primitives an auditor would otherwise call
+        separately — the tombstone ledger, the per-request breakdown, and the tamper-evidence verdict — into a
+        single report, and states in-band exactly what it does and does NOT certify.
+
+        Returns {erasures_total, by_request:{request_id:{erased, memory_ids}}, proof:{verified, problems,
+        all_signed, expected_pubkey}, scope}. `proof.verified` is verify_writes() over BOTH the write-receipt
+        chain and the deletion-tombstone chain — a forged or dropped tombstone (hiding a real out-of-band
+        delete) shows up here.
+
+        HONEST SCOPE (read before relying on it for compliance): erasure is WITHIN this mnemo store only — NOT
+        the app's vector store, prompt logs, or backups — and it covers the subject PLUS its derived_from
+        lineage (a summary built from the subject's data is erased too). It is a tamper-evident INTEGRITY
+        primitive, NOT a compliance certification. The tombstone proves the ACT of deletion (a record with this
+        surrogate id was erased at T for request R), never the CONTENT (a hash of PII is still PII). The
+        signature is load-bearing only against a party who does NOT hold receipt_key (the operator who holds
+        the key can forge tombstones too — anchor the chain head externally for operator-adversarial audit).
+        Prior art: crypto-shredding; Cassandra / event-sourcing tombstones; GDPR Art.17/30 erasure logs;
+        Crosby-Wallach / Certificate Transparency tamper-evident logs."""
+        ok, problems = self.verify_writes(expected_pubkey)
+        by_req: dict = {}
+        for t in self._tombstones:
+            by_req.setdefault(t.get("request_id"), []).append(t.get("memory_id"))
+        return {
+            "erasures_total": len(self._tombstones),
+            "by_request": {rid: {"erased": len(ids), "memory_ids": sorted(i for i in ids if i)}
+                           for rid, ids in by_req.items()},
+            "proof": {
+                "verified": ok,
+                "problems": problems,
+                "all_signed": bool(self._tombstones) and all("sig" in t for t in self._tombstones),
+                "expected_pubkey": expected_pubkey,
+                # CT-style anchor: a compact, externally-witnessable commitment to the whole history, so an
+                # auditor can detect an operator (key-holder) rewrite via verify_consistency() against a prior
+                # witnessed anchor — the operator-adversarial hole verify_writes cannot close on its own.
+                "anchor": self.anchor(),
+            },
+            "scope": ("Erasure is within THIS mnemo store only (not the app's vector store, prompt logs, or "
+                      "backups); covers the subject PLUS its derived_from lineage. Tamper-evident integrity "
+                      "primitive, NOT a compliance certification. The tombstone proves the ACT of deletion, "
+                      "never the content; its signature is load-bearing only against a non-holder of "
+                      "receipt_key. Anchor the chain head externally for operator-adversarial audit."),
+        }
+
+    @staticmethod
+    def _chain_core(rec: dict, kind: str) -> dict:
+        if kind == "write":
+            return {k: rec.get(k) for k in ("seq", "ts", "memory_id", "commit", "prev")}
+        return Mnemo._tombstone_core(rec)                                                   # tombstone
+
+    def _recompute_tip(self, records, n: int, kind: str):
+        """Re-derive the hash-chain tip over the FIRST n records from genesis, verifying each record's own
+        hash and prev-link as it goes. Returns the tip hash, or None if the prefix is internally inconsistent
+        (a record whose stored hash doesn't match its recomputed content, or a broken prev-link)."""
+        prev = _GENESIS
+        for r in records[:n]:
+            if r.get("prev") != prev:
+                return None
+            h = _sha256_hex(_canon(Mnemo._chain_core(r, kind)))
+            if h != r.get("hash"):
+                return None
+            prev = h
+        return prev
+
+    def anchor(self, sign=None) -> dict:
+        """Emit a Certificate-Transparency-style SIGNED TREE HEAD — a compact, EXTERNALLY-publishable commitment
+        to the entire write + tombstone history at this instant: {n_writes, writes_tip, n_tombstones,
+        tombstones_tip, ts}. Because each chain is hash-linked, its tip hash commits to every prior entry, so
+        publishing this anchor to a place the operator cannot retroactively alter (a public log, a witness, the
+        auditor's own records) closes the one hole verify_writes/governance_report cannot: an operator who HOLDS
+        receipt_key can rewrite the whole history AND re-sign it so it verifies internally — but they cannot make
+        the rewritten tip equal an anchor an outsider already witnessed. This is the CT model (Laurie-Langley-
+        Kasper RFC 6962): the log is untrusted; external witnesses + consistency proofs make append-only violations
+        detectable without trusting the log operator. `sign(bytes)->hex` (OPT-IN) lets an EXTERNAL witness co-sign
+        the anchor; mnemo deliberately does NOT sign it with receipt_key (that key is the very thing not trusted
+        here). HONEST BOUNDARY: mnemo produces the anchor and the consistency proof; the external WITNESSING (that
+        the auditor recorded a prior anchor out of band) is the auditor's job — without a prior witnessed anchor
+        there is nothing to be consistent WITH."""
+        writes_tip = self._receipts[-1]["hash"] if self._receipts else _GENESIS
+        tomb_tip = self._tombstones[-1]["hash"] if self._tombstones else _GENESIS
+        sth = {"n_writes": len(self._receipts), "writes_tip": writes_tip,
+               "n_tombstones": len(self._tombstones), "tombstones_tip": tomb_tip,
+               "ts": time.time()}
+        sth["sth_hash"] = _sha256_hex(_canon({k: sth[k] for k in
+                                              ("n_writes", "writes_tip", "n_tombstones", "tombstones_tip")}))
+        if sign is not None:
+            try:
+                sth["witness_sig"] = sign(bytes.fromhex(sth["sth_hash"]))
+            except Exception:
+                pass
+        return sth
+
+    def verify_consistency(self, prior_anchor: dict) -> tuple[bool, list[str]]:
+        """Prove the current log is an APPEND-ONLY extension of a previously-witnessed anchor() — the check an
+        auditor runs against an anchor they recorded out of band. Re-derives each chain's tip over its first
+        prior_anchor['n_*'] entries and confirms it equals the anchored tip, AND that the log did not shrink.
+        A mismatch means the operator REWROTE or ROLLED BACK history after the anchor — caught even though they
+        hold receipt_key and the rewrite verifies internally. Returns (ok, problems)."""
+        problems: list[str] = []
+        for kind, records, ntag, tiptag in (("write", self._receipts, "n_writes", "writes_tip"),
+                                            ("tombstone", self._tombstones, "n_tombstones", "tombstones_tip")):
+            n0 = int(prior_anchor.get(ntag, 0))
+            if len(records) < n0:
+                problems.append(f"{kind} log shrank: {len(records)} < anchored {n0} (rolled back / truncated)")
+                continue
+            tip = self._recompute_tip(records, n0, kind)
+            if tip is None:
+                problems.append(f"{kind} chain broken within the first {n0} entries (a prior entry was altered)")
+            elif tip != prior_anchor.get(tiptag):
+                problems.append(f"{kind} history rewritten after the anchor: tip {tip[:12]}.. != "
+                                f"anchored {str(prior_anchor.get(tiptag))[:12]}.. (fork detected)")
+        return (len(problems) == 0, problems)
+
+    def retract_lineage(self, subject: str, reason: str = "lineage_corrected") -> dict:
+        """Lineage-aware correction: the MIDDLE PATH between a value-only supersession (which leaves records
+        DERIVED from a now-corrected fact still active — the knowledge-editing 'ripple effect', Cohen et al.
+        RippleEdits, TACL 2024) and forget_subject (which HARD-DELETES the lineage, losing the legitimate
+        payload entangled in those derived facts). retract_lineage DEMOTES `subject` and every record that
+        inherited it through derived_from taint to status='superseded' — excluded from default recall but
+        RETAINED (recallable with include_superseded) and stamped needs_rederivation, so an app can re-derive
+        the affected facts against the corrected root rather than lose them. This is retract-and-retain +
+        dependency-directed propagation — classic Truth-Maintenance (Doyle, AIJ 1979) and provenance/bitemporal
+        invalidation-with-retention, recently ported to LLM-agent memory (TOKI, arXiv 2606.06240; MemLineage,
+        arXiv 2605.14421); mnemo's contribution is only that it rides the same derived_from taint as forget_
+        subject, so it needs no separate graph. CAVEAT: it can only cascade on links that were actually
+        recorded — derived writes that never carried derived_from are invisible to it. `subject` matches
+        canonical sources exactly like forget_subject. Returns {demoted, ids}. Reversible: nothing is deleted;
+        only status + meta change."""
+        cand = {subject, Mnemo._canon_source(subject)}
+        targets = [r for r in self.items if r.get("status") == "active" and (cand & Mnemo._rec_sources(r))]
+        now = time.time()
+        ids = []
+        for r in targets:
+            r["status"] = "superseded"
+            r["invalidated_at"] = now
+            meta = r.setdefault("meta", {})
+            meta["retracted_reason"] = reason
+            meta["needs_rederivation"] = True
+            ids.append(r["id"])
+        if ids:
+            self._mat = None; self._mat_built_n = -1        # status change alters the recall pool
+            self._save(force=True)
+        return {"demoted": len(ids), "ids": sorted(ids)}
+
+    def rederive(self, subject: str, rewrite=None, key: str | None = None) -> dict:
+        """Complete the correction lifecycle: REGENERATE the derived facts that retract_lineage demoted, against
+        the corrected root — so the payload entangled in a poisoned lineage (a connection-string location, a
+        backup schedule) comes back as ACTIVE facts asserting the corrected value, with clean derived_from
+        lineage to the corrected root. corrupt -> launder -> correct -> retract_lineage -> rederive is the full
+        loop; without this step the demoted facts stay out of active recall and the agent has simply lost them.
+
+        Flow: find records stamped needs_rederivation for `subject` (not yet rederived), read the OLD value from
+        the retracted keyed root and the NEW value from the key's current active record (write the correction
+        BEFORE calling this), rewrite each derived record's text, and re-remember it with derived_from -> the
+        corrected root (so a future correction can cascade again).
+
+        `rewrite(text, old_value, new_value) -> new_text | None` is caller-supplied — pass an LLM-backed
+        function for paraphrased facts. The DEFAULT is deterministic and honest: verbatim value substitution;
+        a derived fact that does not contain the old value verbatim is SKIPPED (returned in `skipped`), never
+        guessed. Each demoted record is stamped rederived_to (single-shot; a repeat call won't duplicate).
+        Returns {rederived, skipped, ids, old_value, new_value}."""
+        cand = {subject, Mnemo._canon_source(subject)}
+        flagged = [r for r in self.items
+                   if (r.get("meta") or {}).get("needs_rederivation")
+                   and not (r.get("meta") or {}).get("rederived_to")
+                   and (cand & Mnemo._rec_sources(r))]
+        if not flagged:
+            return {"rederived": 0, "skipped": 0, "ids": []}
+        root = next((r for r in flagged if r.get("key")), None)
+        k = key or (root.get("key") if root else None)
+        if not k:
+            return {"rederived": 0, "skipped": len(flagged), "ids": [],
+                    "note": "no key resolvable from the retracted lineage; pass key="}
+        old_v = str((root or {}).get("object") or "")
+        cur_id = self._current_active_id(k)
+        cur = next((r for r in self.items if r["id"] == cur_id), None)
+        new_v = str((cur or {}).get("object") or "")
+        if not cur or not new_v or new_v == old_v:
+            return {"rederived": 0, "skipped": len(flagged), "ids": [],
+                    "note": "no corrected current value for the key — write the correction first"}
+        if rewrite is None:
+            def rewrite(text, old, new):
+                if old and old.lower() in (text or "").lower():
+                    return re.sub(re.escape(old), new, text, flags=re.IGNORECASE)
+                return None                       # paraphrase: needs a caller-supplied (LLM) rewrite; skip
+        done, skipped, ids = 0, 0, []
+        for r in flagged:
+            if r.get("key"):                      # the root itself is replaced by the correction, not rederived
+                continue
+            try:
+                nt = rewrite(r.get("text", ""), old_v, new_v)
+            except Exception:
+                nt = None
+            if not nt or nt == r.get("text"):
+                skipped += 1
+                continue
+            rid = self.remember(nt, tags=r.get("tags"), value=r.get("value", 1.0), mtype=r.get("mtype"),
+                                derived_from=[cur_id], meta={"rederived_from": r["id"]})
+            r.setdefault("meta", {})["rederived_to"] = rid
+            done += 1
+            ids.append(rid)
+        if done:
+            self._save(force=True)
+        return {"rederived": done, "skipped": skipped, "ids": ids, "old_value": old_v, "new_value": new_v}
+
+    def _current_active_id(self, key: str) -> str:
+        """id of the record currently CURRENT for `key` (the thing a revert would undo), or "" if none.
+        The capability binds to this so a captured authorization cannot be REPLAYED after the state moves
+        or RETARGETED to another key."""
+        act = [r for r in self.items if r.get("key") == key and r.get("status") == "active"]
+        if not act:
+            return ""
+        return max(act, key=lambda r: r.get("valid_from", r["ts"]))["id"]
+
+    def revert_challenge(self, key: str) -> str:
+        """The exact message a revert authorization must be issued over: "revert:{key}:{current_active_id}".
+        The principal signs THIS (out of band) to authorize undoing the current value of `key`. Surfaced so an
+        asymmetric holder (who only has the private key, not the store) knows what to sign; route() also
+        returns it on an authorization_required result."""
+        return "revert:" + key + ":" + self._current_active_id(key)
+
+    def revert_capability(self, key: str) -> str:
+        """SYMMETRIC mint (needs `revert_authority`, the harness-held secret): HMAC(secret, challenge). Defends
+        the CONTENT path (text can't mint it) but the harness holding the secret can — for a store whose own box
+        must not be trusted to mint, use `revert_pubkey` + module-level sign_revert() instead (only the off-box
+        private key signs, the store only verifies)."""
+        if self.revert_authority is None:
+            raise RuntimeError("no revert_authority set (symmetric mint); use revert_pubkey for asymmetric")
+        return hmac.new(self.revert_authority.encode(), self.revert_challenge(key).encode(),
+                        hashlib.sha256).hexdigest()
+
+    def _revert_authorized(self, key: str, capability: str | None) -> bool:
+        """True if this restore is allowed. No authority configured -> always (legacy). Symmetric
+        (revert_authority) -> capability must equal revert_capability(key) (constant-time). Asymmetric
+        (revert_pubkey) -> capability is an Ed25519 signature (hex) by the principal's key over
+        revert_challenge(key); the store VERIFIES it but cannot MINT it, so a compromised on-box harness still
+        cannot authorize a revert. Both bind to the current active id (anti-replay / anti-retarget)."""
+        if self.revert_authority is None and self.revert_pubkey is None:
+            return True
+        if not capability:
+            return False
+        if self.revert_pubkey is not None:
+            if not _HAVE_ED:
+                raise RuntimeError("verifying a revert signature needs the `cryptography` package")
+            try:
+                _Ed25519PK.from_public_bytes(bytes.fromhex(self.revert_pubkey)).verify(
+                    bytes.fromhex(capability), self.revert_challenge(key).encode())
+                return True
+            except Exception:
+                return False
+        return hmac.compare_digest(self.revert_capability(key), capability)
+
+    def revert(self, key: str, capability: str | None = None) -> dict:
+        """CONTROL-PLANE revert: restore the value that the current active record for `key` superseded.
+        The ledger knows what "the old one" is — no value token needed.
+
+        If the store was created with `revert_authority`, this requires `capability` = revert_capability(key)
+        (an out-of-band token the content path cannot mint); a missing/wrong one returns
+        {"ok": False, "reason": "authorization_required"} and changes nothing. This is the AUTHENTICATION half:
+        an unmarked "go back" and a stale echo are byte-identical, so the tie-break cannot come from the text —
+        it comes from an authority whose origin an attacker who can only write text cannot author.
+
+        Why an explicit API and not a content write: a value-OBSCURING reversion utterance ("go back
+        to the old one", "the earlier value was right") carries NO object to key on, so no content-level
+        mechanism can distinguish a legitimate user revert from an attacker-injected one — the two are
+        byte-identical text differing only in provenance. mnemo resolves this by CHANNEL SEPARATION:
+        content writes can never undo a supersession (echo_guard retires restatements; an object-less
+        utterance never touches the key at all), and reverting is possible ONLY through this explicit
+        call, which the harness invokes for an authorized principal. Honest boundary: this moves the
+        legitimate-vs-injected decision from the store to the calling agent — a store cannot make it
+        (identical content, different provenance), but it CAN guarantee that content alone never flips
+        a corrected value, which is the property injected text needs.
+
+        Target selection is deterministic from the supersession ledger: the record whose
+        `superseded_by_toggle` points at the current active record (i.e. exactly what the current value
+        replaced), never an echo-blocked arrival (those were retired stale-on-arrival, they were never
+        the current value). Append-only: history is not edited — the revert writes a NEW record with
+        reaffirm=True (the one sanctioned path past the echo guard), so the flip is itself a ledgered,
+        attributable event. Returns {"ok": True, "restored": id, "superseded": id, ...} or
+        {"ok": False, "reason": ...}."""
+        if not self._revert_authorized(key, capability):
+            return {"ok": False, "reason": "authorization_required",
+                    "challenge": self.revert_challenge(key)}
+        same_key = [r for r in self.items if r.get("key") == key]
+        active = [r for r in same_key if r.get("status") == "active"]
+        if not active:
+            return {"ok": False, "reason": "no active record for key"}
+        cur = max(active, key=lambda r: r.get("valid_from", r["ts"]))
+        prev = [r for r in same_key
+                if r.get("status") == "superseded"
+                and (r.get("meta") or {}).get("superseded_by_toggle") == cur["id"]
+                and not (r.get("meta") or {}).get("echo_blocked")
+                and not (r.get("meta") or {}).get("objectless_blocked")]
+        if not prev:
+            return {"ok": False, "reason": "no superseded predecessor for key"}
+        tgt = max(prev, key=lambda r: r.get("valid_from", r["ts"]))
+        rid = self.remember(tgt["text"], tags=tgt.get("tags"), value=tgt.get("value", 1.0),
+                            mtype=tgt.get("mtype"), key=key, object=tgt.get("object"),
+                            reaffirm=True, capability=capability,
+                            meta={"revert_of": tgt["id"], "reverted_from": cur["id"]})
+        return {"ok": True, "restored": rid, "superseded": cur["id"],
+                "reverted_to_object": tgt.get("object"), "reverted_to_text": tgt["text"]}
+
+    # ── IN-STREAM revert (0.7.12, design by jacksonxly r/RAG): scheduling, not acceptance ────────
+    # The optimistic model (revert_challenge/revert_capability above) snapshots the current active id and
+    # then RACES the writer to redeem it: under sustained same-slot writes it starves by construction, and
+    # the only optimistic rescue (accepting a slightly stale base) is a bounded-N replay window. The
+    # in-stream model instead signs the COMMAND (an intent carrying its own precondition + a single-use
+    # nonce) and evaluates it at its position in the per-key write stream:
+    #   - a RELATIVE intent ("go back", base = the active id at mint) lands iff its base is still current,
+    #     else returns a CLEAN CONFLICT — a first-class outcome distinct from authorization_required. A
+    #     relative revert over a moved base does not deserve to land (landing it anyway IS replay).
+    #   - an ABSOLUTE intent (a named historical target) lands deterministically regardless of intervening
+    #     writes — an absolute target was never a stale cap. Single-use via the nonce ledger.
+    # Net: unconditional liveness for named reverts, bounded evaluation with clean conflict for relative
+    # ones, replay window stays 1. (In-process the stream IS the call order; multi-actor fairness is the
+    # caller's scheduling duty — an unfair writer-priority scheduler can still tail-latency the reverter.)
+
+    def revert_intent(self, key: str, nonce: str | None = None) -> str:
+        """Mint point for a RELATIVE in-stream revert: "revert:{key}@{base_id}#{nonce}". The principal signs
+        THIS string (sign_revert / HMAC); base = the active id now, so the precondition travels inside the
+        signed command instead of being re-derived at redeem time."""
+        nonce = nonce or hashlib.sha256(os.urandom(16)).hexdigest()[:16]
+        return "revert:" + key + "@" + self._current_active_id(key) + "#" + nonce
+
+    def restore_intent(self, key: str, target: str, nonce: str | None = None) -> str:
+        """Mint point for an ABSOLUTE in-stream revert to a NAMED historical value: no precondition, so it
+        lands regardless of intervening writes — exactly once (the nonce is single-use). ABA-immune (0.7.15,
+        jacksonxly): the intent also carries the ID of the specific historical record that held `target` at
+        mint time, so it revives THAT instance, never a same-value look-alike re-asserted (or legitimately
+        re-killed) in the gap. If no such record exists yet, the id is empty and submit falls back to value
+        resolution (and reports it)."""
+        nonce = nonce or hashlib.sha256(os.urandom(16)).hexdigest()[:16]
+        held = [r for r in self.items
+                if r.get("key") == key and r.get("object") == str(target)
+                and not (r.get("meta") or {}).get("echo_blocked")
+                and not (r.get("meta") or {}).get("objectless_blocked")]
+        tid = max(held, key=lambda r: r.get("valid_from", r["ts"]))["id"] if held else ""
+        return "restore:" + key + "=" + str(target) + "@" + tid + "#" + nonce
+
+    def _intent_authorized(self, intent: str, capability: str | None) -> bool:
+        """Same crypto as _revert_authorized, but over the INTENT string (the signed command)."""
+        if self.revert_authority is None and self.revert_pubkey is None:
+            return True
+        if not capability:
+            return False
+        if self.revert_pubkey is not None:
+            if not _HAVE_ED:
+                raise RuntimeError("verifying a revert signature needs the `cryptography` package")
+            try:
+                _Ed25519PK.from_public_bytes(bytes.fromhex(self.revert_pubkey)).verify(
+                    bytes.fromhex(capability), intent.encode())
+                return True
+            except Exception:
+                return False
+        want = hmac.new(self.revert_authority.encode(), intent.encode(), hashlib.sha256).hexdigest()
+        return hmac.compare_digest(want, capability)
+
+    def _nonce_consumed(self, nonce: str) -> bool:
+        if nonce in self._consumed_revert_nonces:
+            return True
+        # landed intents persist their nonce in the ledgered record, so single-use survives a reload
+        return any((r.get("meta") or {}).get("revert_nonce") == nonce for r in self.items)
+
+    def submit_revert(self, intent: str, capability: str | None = None) -> dict:
+        """Evaluate a signed revert INTENT at this position in the write stream. Outcomes are first-class:
+        {"ok": True, ...} landed · {"ok": False, "reason": "conflict"} the relative base moved (definitive,
+        not a retry loop — re-issue or name a target) · "replay_rejected" nonce already consumed ·
+        "authorization_required" bad/missing capability · "unknown_target" absolute target never held the
+        key. Consumes the nonce on evaluation, landed or not."""
+        if not self._intent_authorized(intent, capability):
+            return {"ok": False, "reason": "authorization_required", "intent": intent}
+        m_rel = re.match(r"^revert:(.+)@([0-9a-f]*)#([0-9a-f]+)$", intent)
+        m_abs = re.match(r"^restore:(.+?)=([^@#]*)(?:@([0-9a-f]*))?#([0-9a-f]+)$", intent)
+        if not m_rel and not m_abs:
+            return {"ok": False, "reason": "malformed_intent", "intent": intent}
+        nonce = m_rel.group(3) if m_rel else m_abs.group(4)
+        if self._nonce_consumed(nonce):
+            return {"ok": False, "reason": "replay_rejected"}
+        self._consumed_revert_nonces.add(nonce)
+        if m_rel:
+            key, base = m_rel.group(1), m_rel.group(2)
+            cur_id = self._current_active_id(key)
+            if base != cur_id:
+                return {"ok": False, "reason": "conflict", "key": key, "base_id": base,
+                        "current_id": cur_id,
+                        "note": "base moved; a relative revert over a moved base does not deserve to land"}
+            same_key = [r for r in self.items if r.get("key") == key]
+            active = [r for r in same_key if r.get("status") == "active"]
+            if not active:
+                return {"ok": False, "reason": "no active record for key"}
+            cur = max(active, key=lambda r: r.get("valid_from", r["ts"]))
+            prev = [r for r in same_key
+                    if r.get("status") == "superseded"
+                    and (r.get("meta") or {}).get("superseded_by_toggle") == cur["id"]
+                    and not (r.get("meta") or {}).get("echo_blocked")
+                    and not (r.get("meta") or {}).get("objectless_blocked")]
+            if not prev:
+                return {"ok": False, "reason": "no superseded predecessor for key"}
+            tgt = max(prev, key=lambda r: r.get("valid_from", r["ts"]))
+            rid = self.remember(tgt["text"], tags=tgt.get("tags"), value=tgt.get("value", 1.0),
+                                mtype=tgt.get("mtype"), key=key, object=tgt.get("object"),
+                                reaffirm=True, capability=_SANCTIONED,
+                                meta={"revert_of": tgt["id"], "reverted_from": cur["id"],
+                                      "revert_nonce": nonce, "instream": "relative"})
+            return {"ok": True, "kind": "relative", "restored": rid, "superseded": cur["id"],
+                    "reverted_to_object": tgt.get("object")}
+        key, target, tid = m_abs.group(1), m_abs.group(2), m_abs.group(3)
+        chain = self._route_chain(key)
+        # ABA-immune (0.7.15): if the intent carries the id of the specific record it was minted against, that
+        # exact instance must still exist and still have held `target` — a re-asserted same-value look-alike is
+        # a different id and will NOT satisfy it. Fall back to value resolution only for legacy id-less intents.
+        id_bound = bool(tid)
+        if id_bound:
+            rec = next((r for r in self.items if r.get("id") == tid and r.get("key") == key
+                        and r.get("object") == target), None)
+            if rec is None:
+                return {"ok": False, "reason": "unknown_target", "key": key, "target": target,
+                        "target_id": tid, "id_bound": True,
+                        "note": "the specific record this restore was minted against is not in history"}
+        elif target not in chain:
+            return {"ok": False, "reason": "unknown_target", "key": key, "target": target,
+                    "note": "an absolute intent can only restore a value that actually held the key"}
+        if chain and chain[-1] == target:
+            return {"ok": True, "kind": "absolute", "restored": None, "target": target,
+                    "id_bound": id_bound, "note": "target already current (no-op land)"}
+        rid = self.remember(f"restore {key} to {target}", key=key, object=target,
+                            reaffirm=True, capability=_SANCTIONED,
+                            meta={"routed": "revert_named_instream", "revert_nonce": nonce,
+                                  "instream": "absolute", "restore_of_id": tid or None})
+        return {"ok": True, "kind": "absolute", "restored": rid, "target": target, "id_bound": id_bound}
+
+    # ── the LIVENESS FLOOR (0.7.13, jacksonxly r/RAG): the store owns no-infinite-bypass ─────────
+    # jackson's boundary: the store must GUARANTEE a submitted revert can't be bypassed unboundedly
+    # (worst case "lands later" = harness policy; worst case "never lands" = a store liveness property).
+    # In this synchronous store the floor holds BY CONSTRUCTION: submit_revert is terminal — it evaluates
+    # atomically against the current state on the call itself and either lands or conflicts, it is never
+    # left "pending" for writes to bypass. So the maximum bypass of a submitted revert is ZERO; a harness
+    # can only choose WHEN the call runs (deprioritize -> lands later), never turn it into never-evaluated.
+    # revert_now / restore_now make that a first-class primitive: mint + submit in ONE call, so a caller
+    # cannot wedge writes into the mint->submit window and hand-roll a starvation-prone pattern. "If a
+    # caller can break it, it isn't a guarantee, it's a hope" — so the land-now path is the store's, not
+    # something every caller re-implements.
+
+    def restore_now(self, key: str, target: str, sign=None, capability: str | None = None) -> dict:
+        """ABSOLUTE revert, atomic: mint + submit with no gap. The absolute path owes the LAND, so this
+        lands (exactly once) regardless of intervening writes. `sign(intent)->cap` for the asymmetric
+        (revert_pubkey) store; `capability` for the symmetric one; neither for a no-authority store."""
+        intent = self.restore_intent(key, target)
+        cap = capability if capability is not None else (sign(intent) if sign else None)
+        return self.submit_revert(intent, cap)
+
+    def revert_now(self, key: str, sign=None, capability: str | None = None) -> dict:
+        """RELATIVE revert, atomic: mint + submit with zero gap, so the only failure is a genuine
+        same-instant conflict (the value already moved), never a bypass/starvation from writes sneaking
+        into the mint->submit window. The relative path owes FAIRNESS: evaluated now, lands or conflicts."""
+        intent = self.revert_intent(key)
+        cap = capability if capability is not None else (sign(intent) if sign else None)
+        return self.submit_revert(intent, cap)
+
+    # ── value-obscuring reversion classifier (0.7.14): the Marat decomposition, shipped ─────────
+    def classify_reversion(self, candidate: str, key: str, embed=None,
+                           margin: float = 0.06, floor: float = 0.50) -> dict:
+        """Classify whether `candidate` reopens a SUPERSEDED value for `key` ("revert"), affirms the current
+        one ("keep"), or does not resolve ("abstain"). This is the value-obscuring reversion result from the
+        joint TAT/mnemo analysis (Marat Sultanov), factorized into its two independent halves and shipped:
+
+          1. REFERENCE RESOLUTION (a text problem): embed the candidate and, using the ledger's own split of
+             the key's history into SUPERSEDED (old) and CURRENT records, measure how much closer the
+             candidate sits to the old side than the current side. Needs an embedder (`self.embed` or the
+             `embed` arg); with none it abstains rather than guessing. This is the structural-similarity step,
+             scored as a MARGIN (max sim to old records minus max sim to current records) — the same
+             discriminating quantity the decomposition used, not an absolute similarity.
+          2. RECENCY ATTRIBUTION (a ledger problem): the old-versus-current split is read straight from
+             mnemo's supersession ledger. No text method is asked to decide which value is current.
+
+        Abstains when the reference does not DISCRIMINATE old from current: |margin| < `margin` (a bare
+        "go back" is roughly equally near both, so it names no side) or the best match is below `floor` (an
+        off-topic utterance). That is exactly the boundary the analysis measured — where a guess is wrong and
+        the authorized-revert channel (submit_revert) is the correct path instead.
+
+        CLASSIFIES ONLY, never restores: a content-path utterance must not flip a corrected value without an
+        out-of-band authorization. Returns {intent, target, confidence, current} for an authorized caller to
+        act on with submit_revert — consistent with the channel-separation design.
+        """
+        e = embed or self.embed
+        if e is None:
+            return {"intent": "abstain", "reason": "no_embedder"}
+        recs = [r for r in self.items
+                if r.get("key") == key and r.get("object") is not None
+                and not (r.get("meta") or {}).get("echo_blocked")
+                and not (r.get("meta") or {}).get("objectless_blocked")]
+        if len(recs) < 2:
+            return {"intent": "abstain", "reason": "insufficient_history"}
+        cur_id = self._current_active_id(key)
+        current_val = next((r["object"] for r in recs if r["id"] == cur_id), recs[-1]["object"])
+        try:
+            cvec = list(e(candidate))
+        except Exception:
+            return {"intent": "abstain", "reason": "embed_failed"}
+
+        def sim(r):
+            v = r.get("vec")
+            if not v:
+                try:
+                    v = list(e(r["text"]))
+                except Exception:
+                    return None
+            return _cosine(cvec, v)
+
+        old_scored = [(sim(r), r) for r in recs
+                      if not (r["id"] == cur_id or r.get("object") == current_val)]
+        cur_scored = [(sim(r), r) for r in recs
+                      if r["id"] == cur_id or r.get("object") == current_val]
+        old_scored = [(s, r) for s, r in old_scored if s is not None]
+        cur_scored = [(s, r) for s, r in cur_scored if s is not None]
+        if not old_scored or not cur_scored:
+            return {"intent": "abstain", "reason": "no_vectors"}
+        best_old_sim, best_old = max(old_scored, key=lambda x: x[0])
+        best_cur_sim = max(s for s, _ in cur_scored)
+        if max(best_old_sim, best_cur_sim) < floor:
+            return {"intent": "abstain", "reason": "unresolved_reference",
+                    "confidence": round(max(best_old_sim, best_cur_sim), 3)}
+        m = best_old_sim - best_cur_sim
+        if abs(m) < margin:
+            return {"intent": "abstain", "reason": "unresolved_reference",
+                    "margin": round(m, 3)}
+        if m > 0:
+            return {"intent": "revert", "target": best_old.get("object"), "current": current_val,
+                    "margin": round(m, 3),
+                    "note": "content-path signal only; restore via submit_revert with authorization"}
+        return {"intent": "keep", "current": current_val, "margin": round(m, 3)}
+
+    # ── route(): the write-path intent router (tagger + fuzzy-version resolver) ─
+    _ROUTE_REVERT = re.compile(
+        r"\b(go back|put .{0,24}back|roll ?back|revert|undo|restore|switch .{0,24}back|set .{0,24}back"
+        r"|back to (what|the (original|previous|first|initial))|the way it was|change it back"
+        r"|what we (had|started with)|very first|initial pick)\b")
+    _ROUTE_ORIGINAL = re.compile(r"\b(original|very first|started with|initial)\b")
+    _ROUTE_CORRECT = re.compile(r"\b(correction|actually|update|scratch that|is now|moved to"
+                                r"|was switched|changed to)\b")
+    _ROUTE_CHANGE_AWARE = re.compile(r"\b(changed|moved|switched|updated|correction|went through)\b")
+
+    def _route_chain(self, key: str) -> list[str]:
+        """values that were actually CURRENT at some point for `key`, oldest->newest — skips arrivals the
+        guards retired stale-on-arrival (echo_blocked / objectless_blocked were never the current value)."""
+        chain = []
+        for r in self.items:
+            if r.get("key") != key or r.get("object") is None:
+                continue
+            m = r.get("meta") or {}
+            if m.get("echo_blocked") or m.get("objectless_blocked"):
+                continue
+            if not chain or chain[-1] != r["object"]:
+                chain.append(r["object"])
+        return chain
+
+    def _route_key(self, low: str) -> str | None:
+        """match the utterance to a ledgered key by token presence (longest key wins)."""
+        keys = {r["key"] for r in self.items if r.get("key") and r.get("object") is not None}
+        hits = [k for k in keys if k.lower() in low]
+        return max(hits, key=len) if hits else None
+
+    def route(self, text: str, key: str | None = None, object: str | None = None,
+              context: str | None = None, policy: str = "safe", capability: str | None = None) -> dict:
+        """WRITE-PATH INTENT ROUTER: tag an utterance (assert / correct / revert / echo), resolve a fuzzy
+        version reference against the key's timeline, and execute the right ledger operation — so a
+        value-obscuring revert ("go back to what we had") works without the caller naming a value, and a
+        similarity/cosine path never runs on a revert (a revert is an instruction on the version graph,
+        not a value). This ships the split measured in mnemo/probes/intent_tagger_router_probe.py.
+
+        Resolution (deterministic, no LLM):
+          - a revert-marked utterance -> revert. Target: a named historical value if present in the text;
+            "original / very first / started with" -> the FIRST version; otherwise the predecessor via
+            revert(). Restores go through the sanctioned reaffirm channel, so the flip is ledgered.
+          - a value-bearing utterance whose value is new or current -> remember() (keyed supersession).
+          - a value-bearing utterance whose value was SUPERSEDED for the key, with no revert marker ->
+            the ambiguous echo-or-reaffirm case, and `policy` decides (see below).
+        key/object are derived from the extractor hook when not passed; a revert with no resolvable key
+        falls back to a plain note (never guesses a ledger key it can't match).
+
+        THE HONEST LIMIT (measured, not asserted): an unmarked restatement of a superseded value is
+        AMBIGUOUS BY CONSTRUCTION — a stale echo and a deliberate reaffirm can be byte-identical, so no
+        classifier (LLMs measured at ~coin-flip: 0.35-0.55) can separate them from text. `policy` picks
+        the failure mode you accept:
+          - "safe" (default): treat as an echo — never restores. With echo_guard on it lands retired
+            (judge-logged 'echo_guard'); with echo_guard off it is written WITHOUT the key so it cannot
+            LWW-clobber the current value. Cost: a legitimate unmarked reaffirm is refused (measured
+            1.00 echo-blocked / 0.00 reaffirm-honored).
+          - "context": restore when `context` (the preceding turn) shows change-awareness (a change word
+            + the current value). Separates honest twins (1.00/1.00) but is FORGEABLE — an attacker who
+            writes two turns walks through it (forged-context echo restored 100%). Use only when the
+            context channel is trusted.
+          - "trusting": treat as a reaffirm — always restores (0.00 echo-blocked / 1.00 honored).
+        The unforgeable separator is provenance — an authorized revert() call or an explicit marker —
+        never smarter classification; that is the channel-separation thesis, now with the receipt.
+
+        Returns {"intent", "action", "key", ...} describing what was done."""
+        low = text.lower()
+        if (key is None or object is None) and self.extractor is not None:
+            try:
+                ex = self.extractor(text)
+                if ex:
+                    key = key if key is not None else ex[0]
+                    object = object if object is not None else ex[1]
+            except Exception:
+                pass
+        if self._ROUTE_REVERT.search(low):
+            k = key or self._route_key(low)
+            if k is None:
+                rid = self.remember(text)
+                return {"intent": "revert", "action": "noted", "key": None, "id": rid,
+                        "reason": "no ledger key resolved from the utterance"}
+            chain = self._route_chain(k)
+            cur = chain[-1] if chain else None
+            if not self._revert_authorized(k, capability):
+                # content path cannot mint the capability; do NOT execute, hand the decision out of band
+                return {"intent": "revert", "action": "authorization_required", "key": k,
+                        "challenge": self.revert_challenge(k)}
+            named = None
+            for v in chain[:-1]:
+                if re.search(rf"\b{re.escape(str(v).lower())}\b", low):
+                    named = v
+            if named is None and object is not None and object in chain[:-1]:
+                named = object
+            if named is not None and named != cur:
+                rid = self.remember(f"restore {k} to {named}", key=k, object=named, reaffirm=True,
+                                    capability=capability, meta={"routed": "revert_named"})
+                return {"intent": "revert", "action": "restored", "key": k, "target": named, "id": rid}
+            if self._ROUTE_ORIGINAL.search(low) and len(chain) > 1 and chain[0] != cur:
+                rid = self.remember(f"restore {k} to {chain[0]}", key=k, object=chain[0], reaffirm=True,
+                                    capability=capability, meta={"routed": "revert_original"})
+                return {"intent": "revert", "action": "restored", "key": k, "target": chain[0], "id": rid}
+            res = self.revert(k, capability=capability)
+            return {"intent": "revert", "action": "reverted" if res.get("ok") else "failed",
+                    "key": k, **{kk: vv for kk, vv in res.items() if kk != "ok"}}
+        if object is None or key is None:
+            rid = self.remember(text, key=key, object=object)
+            return {"intent": "assert", "action": "remembered", "key": key, "id": rid}
+        chain = self._route_chain(key)
+        cur = chain[-1] if chain else None
+        if object == cur or object not in chain:
+            rid = self.remember(text, key=key, object=object)
+            intent = "correct" if (cur is not None and self._ROUTE_CORRECT.search(low)) else "assert"
+            return {"intent": intent, "action": "remembered", "key": key, "id": rid}
+        # unmarked assertion of a superseded value — the ambiguous echo-or-reaffirm case
+        if policy == "trusting" or (
+                policy == "context" and context and self._ROUTE_CHANGE_AWARE.search(context.lower())
+                and cur is not None and str(cur).lower() in context.lower()):
+            if not self._revert_authorized(key, capability):
+                return {"intent": "reaffirm", "action": "authorization_required", "key": key,
+                        "target": object, "challenge": self.revert_challenge(key)}
+            rid = self.remember(text, key=key, object=object, reaffirm=True, capability=capability,
+                                meta={"routed": f"reaffirm_{policy}"})
+            return {"intent": "reaffirm", "action": "restored", "key": key, "target": object, "id": rid}
+        if self.echo_guard:
+            rid = self.remember(text, key=key, object=object)      # guard retires it, judge-logged
+        else:
+            rid = self.remember(text, meta={"routed": "echo_unkeyed"})  # keyless: cannot LWW-clobber
+        return {"intent": "echo", "action": "blocked", "key": key, "id": rid,
+                "policy": policy, "note": "unmarked restatement of a superseded value; not restored"}
+
+    def as_of(self, key: str, when: float) -> dict | None:
+        """POINT-IN-TIME query: the value that was CURRENT for `key` at event-time `when` (a UTC
+        epoch float). This is the bi-temporal 'as-of' / time-travel read — reconstruct history, not
+        just the latest value. No graph DB: keyed supersession already stamps every record with a
+        validity interval [valid_from, invalidated_at) (invalidated_at=None means still current), so
+        the answer is the record whose interval contains `when`.
+
+        Why it matters: a plain memory store only tells you the value NOW; audit, debugging, and
+        'what did the agent believe when it made decision X' need the value as of that moment. A
+        back-filled record (added later with an earlier valid_from) is placed by its event-time, so
+        as_of reflects when facts were TRUE, not when they were written.
+
+        Returns {object, text, valid_from, invalidated_at, id} for the record valid at `when`, or
+        None if nothing was known for `key` yet at that time. Ties (overlapping intervals from an
+        unclean history) resolve to the latest valid_from <= when."""
+        best = None
+        for r in self.items:
+            if r.get("key") != key:
+                continue
+            vf = r.get("valid_from", r["ts"])
+            inv = r.get("invalidated_at")
+            if vf <= when and (inv is None or inv > when):
+                if best is None or vf > best.get("valid_from", best["ts"]):
+                    best = r
+        if best is None:
+            return None
+        return {"object": best.get("object"), "text": best.get("text"),
+                "valid_from": best.get("valid_from", best["ts"]),
+                "invalidated_at": best.get("invalidated_at"), "id": best["id"]}
+
+    def history(self, key: str) -> list[dict]:
+        """The full validity timeline for `key`: every value it has held, in event-time order, each
+        with its [valid_from, invalidated_at) interval, status, and — when it was retired — WHICH
+        policy adjudicated the retirement (meta['superseded_by_policy']). The audit trail behind as_of()."""
+        recs = [r for r in self.items if r.get("key") == key]
+        recs.sort(key=lambda r: r.get("valid_from", r["ts"]))
+        return [{"object": r.get("object"), "text": r.get("text"), "status": r.get("status"),
+                 "valid_from": r.get("valid_from", r["ts"]), "invalidated_at": r.get("invalidated_at"),
+                 "policy": (r.get("meta") or {}).get("superseded_by_policy"),
+                 "id": r["id"]} for r in recs]
+
+    def supersession_report(self) -> dict:
+        """Audit view of WHY memories were retired: a count of superseded records per adjudicating
+        policy (keyed_lww / keyed_lww_backfill / keyed_reaffirm / echo_guard / objectless_guard /
+        state_toggle / toggle_corroborated / toggle_persistence / keep_budget; 'unstamped' = retired
+        before 0.6.18 or by an external edit). Every supersession site stamps
+        meta['superseded_by_policy'] at write/consolidate time, so the resolver that adjudicated each
+        conflict is inspectable per record — the write-time judge log TOKI (arXiv:2606.06240) points
+        out most memory systems omit. Read-only; the raw rows stay untouched."""
+        counts: dict = {}
+        for r in self.items:
+            if r.get("status") != "superseded":
+                continue
+            p = (r.get("meta") or {}).get("superseded_by_policy") or "unstamped"
+            counts[p] = counts.get(p, 0) + 1
+        return {"superseded_total": sum(counts.values()), "by_policy": counts}
 
     # ── retrieval (value-ranked) ──────────────────────────────────────────────
     def _qvec(self, query: str):
@@ -476,7 +1745,9 @@ class Mnemo:
                scope: str | None = None, as_of: float | None = None,
                where: dict | None = None, influence_only: bool = False,
                prefer=None, prefer_trust: float = 1.0,
-               prefer_max_boost: float | None = None) -> list[dict]:
+               prefer_max_boost: float | None = None, near: dict | None = None,
+               tie_recent: float | None = None,
+               with_status: bool = False, with_warrant: bool = False) -> list[dict]:
         """Top-k memories by RELEVANCE × VALUE — high-value memories outrank merely-similar ones.
         Memories the dream pass flagged as hubs (universal matchers) are skipped unless include_hubs.
 
@@ -517,7 +1788,10 @@ class Mnemo:
         recalled-but-uncorroborated memory should inform but not unilaterally drive an action. It RAISES
         attacker cost (a single free injection is filtered; defeating it needs >=3 coordinated records with
         >=2 independent forged provenances) rather than making poisoning impossible. Reversible: default
-        False = legacy recall.
+        False = legacy recall. Call `influence_gate_report()` first to see this gate's LIVE cost on your store
+        (it is density-dependent: ~51% of legit recalls filtered when memories are used ~once, ~6% when dense
+        — mnemo/probes/oracle_separation_density.py) and the load-bearing caveat that it rides on an
+        un-self-gradable credit() oracle.
 
         prefer / prefer_trust (OPT-IN, default None -> zero behavior change): a SOFT, trust-weighted metadata
         filter. Unlike `where` (a HARD filter that DELETES non-matching records — so a wrong filter hard-
@@ -546,7 +1820,24 @@ class Mnemo:
         evidence — the classic 'combine outside the saturating form' failure, BM25F, Robertson et al. CIKM
         2004). So: compose as a PRODUCT, and if you cap, cap the product, not the summed trusts. This mirrors
         production search (Elasticsearch function_score defaults score_mode=multiply). Reversible: a single
-        dict / None behaves exactly as before."""
+        dict / None behaves exactly as before.
+
+        tie_recent (OPT-IN, default None -> zero behavior change): NEAR-TIE RECENCY REORDER for stale-vs-
+        fresh fact competition. When a fact is later corrected in free text, SRO supersession never triggers
+        and the STALE value can outrank the fresh one (measured on MemBench knowledge_update: the stale
+        value wins rank-1 in 32.7% of update questions, identically for raw cosine and mnemo semantic —
+        mnemo/probes/membench_recall_probe_v2.py). Pass a small similarity epsilon (measured sweet spot
+        0.02-0.05 on centered cosine): candidates whose RELEVANCE is within tie_recent of the strongest
+        candidate's relevance are re-ordered newest-first (by valid_from, falling back to ts) ahead of the
+        rest; everything below the band keeps its score order. MEASURED
+        (mnemo/probes/membench_recency_tiebreak_probe.py, 222 questions incl. 3 control splits):
+        tie_recent=0.05 cuts stale-beats-fresh 0.327 -> 0.109 (3x) at ~zero hit@1/5 cost on non-update
+        control splits; a LINEAR position bonus was measured USELESS (no SBF movement before it damages
+        controls) — the band reorder is the shape that works. HONEST SCOPE: (a) in the benchmark the
+        correction always comes after the original mention (by construction); the control-split cost is
+        the fairness check; (b) adversarial hole: an ECHO of the stale value re-stated AFTER the correction
+        would be promoted — tie_recent trusts recency inside the band, so do not use it on hostile
+        ingestion without provenance gating (combine with influence_only). Reversible: None = legacy."""
         # Normalize `prefer` into a list of (cond_dict, clamped_trust) specs. Back-compat: a plain dict uses
         # the scalar prefer_trust (the legacy one-dimension path, byte-identical scoring); a list composes.
         _prefer_specs: list = []
@@ -568,6 +1859,26 @@ class Mnemo:
                         _prefer_specs.append((_c, _t))
             else:
                 raise ValueError("prefer must be a dict (one dimension) or a list of (cond, trust) specs")
+        # `near` (OPT-IN, default None -> zero behaviour change): a SOFT, CONTINUOUS proximity cue -- the
+        # numeric analogue of `prefer`. `prefer` matches CATEGORICAL meta (theme == 'identity'); `near`
+        # boosts records by their CLOSENESS to a target VECTOR in named NUMERIC meta dims (e.g. a TAT 5-D
+        # state chunk, or any embedding-like feature stored in meta). Spec:
+        #   near = {"target": {"theme": 0.29, "role": 0.33, ...}, "trust": 0.7, "half": 0.2}
+        # For each candidate, distance = per-dim-normalised Euclidean over the target dims present as NUMBERS
+        # in the record's meta; boost = 1 + trust * exp(-distance / half) (neutral 1.0 when far or when the
+        # record lacks the dims, so a missing/weak cue degrades gracefully, never hard-deletes). `half` is the
+        # distance at which the boost is ~1+trust/e. Composes multiplicatively with `prefer` and text sim.
+        # MEASURED (mnemo/probes/continuous_chunk_recall_probe.py): on a real TAT 5-D state trace, near-boost on
+        # the state vector beats plain text recall on state/regime-relevance retrieval (precision@5 0.984 vs 0.758)
+        # where categorical filters cannot (the values are continuous). Soft cue that re-ranks the pool, not a
+        # vector index; coverage-weighted + NaN-guarded. Reversible: near=None = byte-identical legacy recall.
+        _near = None
+        if near:
+            _nt = near.get("target") or {}
+            _numt = {d: float(v) for d, v in _nt.items()
+                     if isinstance(v, (int, float)) and not isinstance(v, bool) and v == v}   # numeric, not bool, not NaN
+            if _numt:
+                _near = (_numt, max(0.0, min(1.0, float(near.get("trust", 1.0)))), max(1e-9, float(near.get("half", 0.25))))
         def _eligible(r: dict) -> bool:
             s = r["status"]
             if as_of is not None:
@@ -599,7 +1910,7 @@ class Mnemo:
         # generalizes across retrievers where geometry-based poison defenses do not (see the docstring).
         if influence_only:
             _byid = {x["id"]: x for x in self.items}
-            pool = [r for r in pool if self._is_corroborated(r, _byid)]
+            pool = [r for r in pool if self._corroborated(r, _byid)]
         # Mode selection. 'hybrid' = lexical (token overlap) + semantic (embedding) fused with Reciprocal
         # Rank Fusion. We MEASURED hybrid robustly beating EITHER channel alone for agent memory on LoCoMo
         # (recall@20 0.61 hybrid vs 0.55 lexical vs 0.53 semantic; +0.057 over the best single channel,
@@ -710,9 +2021,35 @@ class Mnemo:
                     pref *= (1.0 + _tr * _PREFER_GAIN)
             if prefer_max_boost is not None and pref > prefer_max_boost:
                 pref = prefer_max_boost
-            score = sim * (1.0 + math.log1p(max(0.0, evalue))) * prov * cal * pref
+            nb = 1.0
+            if _near is not None:
+                _tgt, _ntr, _half = _near
+                _rm = r.get("meta") or {}
+                _sq = 0.0; _dn = 0
+                for _d, _tv in _tgt.items():
+                    _rv = _rm.get(_d)
+                    if isinstance(_rv, (int, float)) and not isinstance(_rv, bool) and _rv == _rv:  # numeric, not bool/NaN
+                        _sq += (float(_rv) - _tv) ** 2; _dn += 1
+                if _dn:
+                    # per-dim-normalised proximity, coverage-weighted so a record matching FEWER target dims can't
+                    # unfairly out-boost one matching all with modest error; NaN-guarded so a bad value never
+                    # corrupts the whole ranking order.
+                    nb = 1.0 + _ntr * (_dn / len(_tgt)) * math.exp(-(math.sqrt(_sq / _dn)) / _half)
+                    if not math.isfinite(nb):
+                        nb = 1.0
+            score = sim * (1.0 + math.log1p(max(0.0, evalue))) * prov * cal * pref * nb
             scored.append((score, sim, r))
         scored.sort(key=lambda x: -x[0])
+        # Near-tie recency reorder (OPT-IN via tie_recent; see docstring for the measured provenance).
+        # Band on RELEVANCE (sim), not the composite score: the composite mixes value/calibration channels
+        # whose scale varies per store, while sim is the [0,1] channel the epsilon was measured on.
+        if tie_recent is not None and scored:
+            _eps = max(0.0, float(tie_recent))
+            _top_sim = max(t[1] for t in scored)
+            _tied = [t for t in scored if t[1] >= _top_sim - _eps]
+            _rest = [t for t in scored if t[1] < _top_sim - _eps]
+            _tied.sort(key=lambda t: -(t[2].get("valid_from") or t[2]["ts"]))
+            scored = _tied + _rest
         out = []
         _top_sim = scored[0][1] if scored else 1.0   # normalize reinforcement by this query's best match
         for score, sim, r in scored[:k]:
@@ -745,16 +2082,46 @@ class Mnemo:
             # Canonicalizing source identifiers before counting collapses those to one; a link whose record
             # has no source counts as its own id, so genuinely source-less corroboration is unchanged.
             _good = float(r.get("good", 0) or 0); _bad = float(r.get("bad", 0) or 0)
-            corroborated = (_good > 0 and _good >= _bad) or self._distinct_sources(r.get("links"), _by_id) >= 2
+            _links = (self._gated_links(r, _by_id)
+                      if (self.coherence_gate is not None or self.temporal_gate is not None) else r.get("links"))
+            _distinct = (self._distinct_verified_keys(_links, _by_id) if self.strict_corroboration
+                         else self._distinct_sources(_links, _by_id))
+            corroborated = ((_good > 0 and _good >= _bad) or _distinct >= 2) \
+                and not (r.get("meta") or {}).get("slashed") \
+                and not r.get("orphan")   # landed retraction OR orphan (no lineage) blocks (re-)graduation too
             if r.get("mtype") == "episodic" and r["value"] >= _GRADUATE_VALUE and corroborated:
                 r["mtype"] = "semantic"
                 r.setdefault("meta", {})["graduated_from_episodic"] = True
-            out.append({"id": r["id"], "text": r["text"], "tags": r["tags"], "iso": r["iso"],
-                        "value": round(r["value"], 2), "relevance": round(sim, 3),
-                        "score": round(score, 3), "links": r["links"],
-                        "reliability": round(self._reliability(r), 3),
-                        "source": r.get("source"),    # re-checkable origin (provenance), surfaced so a recalled fact can be traced back
-                        "stale_derived": bool(r.get("_stale_derived"))})
+            _o = {"id": r["id"], "text": r["text"], "tags": r["tags"], "iso": r["iso"],
+                  "value": round(r["value"], 2), "relevance": round(sim, 3),
+                  "score": round(score, 3), "links": r["links"],
+                  "reliability": round(self._reliability(r), 3),
+                  "source": r.get("source"),    # re-checkable origin (provenance), surfaced so a recalled fact can be traced back
+                  "stale_derived": bool(r.get("_stale_derived"))}
+            if with_status:     # OPT-IN: carry the honest truth-status at the point of use (convergence-backed
+                cr = self.convergence_report(r, _by_id=_by_id)   # vs adjudicated), never let convergence read as truth
+                _o["convergence"] = cr["status"]
+                if cr.get("low_source_diversity"):
+                    _o["low_source_diversity"] = True
+            if with_warrant:    # OPT-IN: a LEGIBLE warrant tier a consumer can BRANCH ON, so "no independent
+                # channel" is an explicit state, not a quiet low score a downstream reads as a soft yes (the
+                # silent-weight-0-decays-to-"unverified-but-present" failure; jacksonxly, r/RAG 2026-07). Tiers:
+                #   'earned'       -- un-self-gradable outcome credit (good>0>=bad) OR a graduated semantic memory
+                #   'corroborated' -- >=2 distinct sources/verified-keys, but not yet outcome-earned (weaker)
+                #   'unwarranted'  -- single self-asserted, orphan (no lineage), or slashed -> DO NOT treat as a
+                #                     confirmation; weight it ~0 and, critically, mark it so downstream sees the abstention.
+                if (r.get("meta") or {}).get("slashed") or r.get("orphan"):
+                    _o["warrant"] = "unwarranted"
+                elif (_good > 0 and _good >= _bad) or r.get("mtype") == "semantic":
+                    _o["warrant"] = "earned"
+                elif _distinct >= 2:
+                    _o["warrant"] = "corroborated"
+                else:
+                    _o["warrant"] = "unwarranted"
+            out.append(_o)
+        # AUTO-STAMP LINEAGE: remember what this recall surfaced, so a derived write built from it (a summary
+        # written next) can inherit these as parents. Store-carried lineage from the recall->write flow.
+        self._last_recall = [o["id"] for o in out]
         # NOTE: recall is a READ. It nudges in-memory access value / graduation, but must NOT persist the
         # whole store here — serializing (json.dumps) on every recall, across many agents' stores,
         # saturated the thread pool and FROZE the world. The in-memory nudges are persisted on the next
@@ -776,6 +2143,17 @@ class Mnemo:
         return s
 
     @staticmethod
+    def _rec_sources(rec: dict) -> set:
+        """The canonical sources a record is attributable to: its OWN source (entity-resolved) PLUS any taint
+        inherited from parents via derived_from (so provenance rides through summarization/consolidation). A
+        source-less record is attributable to its own id, so nothing is silently un-attributable. Used by
+        slash()/restore() so forfeiting a source also reaches every derived record it fed."""
+        src = rec.get("source")
+        doc = src.get("doc") if isinstance(src, dict) else (src if isinstance(src, str) else None)
+        own = Mnemo._canon_source(doc) if doc else "id:" + rec["id"]
+        return {own} | set(rec.get("taint") or [])
+
+    @staticmethod
     def _distinct_sources(links, by_id) -> int:
         """Count DISTINCT canonical sources among corroborating links — entity resolution BEFORE counting,
         so 'three names for one source' sybil variants count as one. A link whose record carries no source
@@ -791,19 +2169,183 @@ class Mnemo:
         return len(keys)
 
     @staticmethod
-    def _is_corroborated(rec: dict, by_id: dict) -> bool:
+    def _distinct_verified_keys(links, by_id) -> int:
+        """Count DISTINCT VERIFIED KEYS among corroborating links: an attacker cannot manufacture N
+        'independent' witnesses without N distinct Ed25519 keys it holds (forging one = breaking the
+        signature). Links whose record carries no attested_key do NOT count here — strict corroboration
+        demands cryptographic, not string, independence. Complements _distinct_sources (the default,
+        string-based, spoofable rail)."""
+        keys = set()
+        for lid in (links or []):
+            lr = by_id.get(lid)
+            if lr is not None and lr.get("attested_key"):
+                keys.add(lr["attested_key"])
+        return len(keys)
+
+    @staticmethod
+    def _is_corroborated(rec: dict, by_id: dict, strict: bool = False) -> bool:
         """The corroboration bar shared by episodic->semantic graduation and the recall influence gate:
         an EARNED net-positive outcome (good>0 and good>=bad — set by credit() on real work, not
-        self-assertable), OR an already-graduated 'semantic' memory, OR >=2 DISTINCT-canonical-source
-        corroborating links (sybil variants of one source collapse to one). A single fresh self-asserted
-        memory (the AgentPoison single-instance poison) meets none of these."""
+        self-assertable), OR an already-graduated 'semantic' memory, OR >=2 corroborating links from
+        distinct sources. `strict` selects the independence measure for that last path: distinct VERIFIED
+        KEYS (unforgeable) when True, distinct canonical-source STRINGS (spoofable but zero-setup) when
+        False. A single fresh self-asserted memory (the AgentPoison single-instance poison) meets none.
+        A LANDED RETRACTION WINS: a record slash()'d (meta['slashed']) is not corroborated on ANY path — incl.
+        distinct-link corroboration — so a caught poison cannot stay load-bearing via independent-looking links
+        (jacksonxly's invariant: nothing false stays load-bearing past the correctness signal). restore() clears
+        the flag, so this is reversible; receipt mnemo/probes/retraction_propagation.py.
+        FAIL-CLOSED PROVENANCE: an ORPHAN (a declared transformation output that named no parent, meta-flag
+        rec['orphan']) is likewise not corroborated on any path -- missing lineage is treated as unverified, so
+        an app-side summary that dropped its derived_from cannot quietly earn standing or survive a retraction."""
+        if (rec.get("meta") or {}).get("slashed") or rec.get("orphan"):
+            return False
         good = float(rec.get("good", 0) or 0)
         bad = float(rec.get("bad", 0) or 0)
         if good > 0 and good >= bad:
             return True
         if rec.get("mtype") == "semantic":
             return True
+        if strict:
+            return Mnemo._distinct_verified_keys(rec.get("links"), by_id) >= 2
         return Mnemo._distinct_sources(rec.get("links"), by_id) >= 2
+
+    def _coherence(self, a_rec: dict, b_rec: dict) -> float:
+        """Semantic coherence of two records in [0,1]: embedder cosine if `embed` is set and both carry a vec,
+        else lexical token-Jaccard. Used by the OPT-IN coherence gate to test whether a corroborating witness is
+        actually ABOUT the claim (not off-topic filler minted to game the source count)."""
+        va, vb = a_rec.get("vec"), b_rec.get("vec")
+        if self.embed and va and vb:
+            num = sum(x * y for x, y in zip(va, vb))
+            na = math.sqrt(sum(x * x for x in va)); nb = math.sqrt(sum(y * y for y in vb))
+            if na > 0 and nb > 0:
+                return max(0.0, min(1.0, num / (na * nb)))
+        ta = set(re.findall(r"[a-z0-9]+", (a_rec.get("text") or "").lower()))
+        tb = set(re.findall(r"[a-z0-9]+", (b_rec.get("text") or "").lower()))
+        return len(ta & tb) / len(ta | tb) if (ta or tb) else 0.0
+
+    def _temporal_collapse(self, links: list, by_id: dict) -> list:
+        """Collapse CO-ARRIVING corroborating links to one anchor each: greedy over ascending ts, a link opens a
+        new cluster only if it lands > self.temporal_gate seconds after the current cluster's anchor; links inside
+        the window are dropped (treated as one coordinated write). Genuinely independent sources spread out in
+        time; a burst collapses to one."""
+        win = self.temporal_gate
+        recs = sorted((by_id[l] for l in links if by_id.get(l) is not None),
+                      key=lambda r: float(r.get("ts", 0) or 0))
+        kept, anchor = [], None
+        for r in recs:
+            t = float(r.get("ts", 0) or 0)
+            if anchor is None or (t - anchor) > win:
+                kept.append(r["id"]); anchor = t
+        return kept
+
+    def _gated_links(self, rec: dict, by_id: dict) -> list:
+        """The effective corroborating links after the OPT-IN gates: drop off-topic witnesses (coherence_gate),
+        then collapse co-arriving witnesses to one anchor (temporal_gate). Both off (default) -> links unchanged."""
+        links = rec.get("links") or []
+        if self.coherence_gate is not None:
+            links = [lid for lid in links
+                     if by_id.get(lid) is not None and self._coherence(rec, by_id[lid]) >= self.coherence_gate]
+        if self.temporal_gate is not None and len(links) > 1:
+            links = self._temporal_collapse(links, by_id)
+        return links
+
+    # kept for back-compat; _gated_links is the combined path
+    def _coherent_links(self, rec: dict, by_id: dict) -> list:
+        if self.coherence_gate is None:
+            return rec.get("links") or []
+        return [lid for lid in (rec.get("links") or [])
+                if by_id.get(lid) is not None and self._coherence(rec, by_id[lid]) >= self.coherence_gate]
+
+    @staticmethod
+    def _canon_of(rec: dict) -> str:
+        """The single canonical source string of ONE record (same rule _distinct_sources counts by): its
+        entity-resolved `source.doc`/string, else 'id:'+its id. Also exposes the attested key as 'key:<k>'."""
+        src = rec.get("source")
+        doc = src.get("doc") if isinstance(src, dict) else (src if isinstance(src, str) else None)
+        return Mnemo._canon_source(doc) if doc else "id:" + rec.get("id", "")
+
+    def _trusted_sources(self, by_id: dict) -> set:
+        """Trust closure grown from `trust_seeds` via VOUCH edges, bounded by `trust_hops` (asymmetric,
+        flow-based; Gyongyi et al. 2004 TrustRank / Cheng-Friedman 2005). A source U enters the closure iff
+        U is a seed, or a record whose source is ALREADY trusted has a `link` to a record authored by U (an
+        explicit endorsement by a trusted actor). Free self-minted sources that no seed vouches for never
+        enter. Recomputed per corroboration check (stores are small; O(hops * links))."""
+        trusted = set(self.trust_seeds)
+        if not trusted:
+            return trusted
+        for _ in range(max(0, int(self.trust_hops))):
+            added = set()
+            for r in by_id.values():
+                # a record authored by a trusted source vouches for the sources of the records it links to
+                if self._canon_of(r) in trusted or ("key:" + str(r.get("attested_key"))) in trusted:
+                    for lid in (r.get("links") or []):
+                        lr = by_id.get(lid)
+                        if lr is not None:
+                            added.add(self._canon_of(lr))
+            if added <= trusted:
+                break
+            trusted |= added
+        return trusted
+
+    def _corroborated(self, rec: dict, by_id: dict) -> bool:
+        """Instance corroboration check = the static bar, plus the OPT-IN coherence + temporal gates: only ON-TOPIC,
+        temporally-independent corroborating links count toward the >=2-distinct-source path, plus the OPT-IN
+        seed-anchored trust filter: when `trust_seeds` is set, only witnesses whose source is in the trust
+        closure count. Default (no gates, empty seeds) == static bar."""
+        links = rec.get("links")
+        if (self.coherence_gate is not None or self.temporal_gate is not None) and links:
+            eff = self._gated_links(rec, by_id)
+            if eff != links:
+                rec = {**rec, "links": eff}; links = eff   # shallow copy; never mutate the stored record
+        if self.trust_seeds and links:
+            trusted = self._trusted_sources(by_id)
+            # keep only corroborating witnesses authored by a trust-reachable source (own source or the
+            # seeds themselves always qualify); a Sybil's un-vouched sources are dropped before the count.
+            eff = [lid for lid in links if by_id.get(lid) is not None
+                   and self._canon_of(by_id[lid]) in trusted]
+            if eff != links:
+                rec = {**rec, "links": eff}
+        return Mnemo._is_corroborated(rec, by_id, self.strict_corroboration)
+
+    def influence_gate_report(self) -> dict:
+        """Report the LIVE COST of the influence gate (recall(influence_only=True)) on THIS store, so you can
+        judge whether it is affordable before enabling it. The gate keeps only CORROBORATED memories
+        (_is_corroborated); its cost is that not-yet-earned LEGITIMATE memories are filtered too, and that cost
+        is DENSITY-DEPENDENT. MEASURED on a controlled corpus with real embeddings
+        (mnemo/probes/oracle_separation_density.py): the fraction of legitimate high-stakes recalls the gate
+        blocks falls from ~51% when each memory is used ~once (sparse) to ~6% when each is used ~8x (dense),
+        because a legit memory only earns standing through repeated successful use — so in a SPARSE store the
+        gate is expensive (it filters most legit recalls); grow density, or credit() real outcomes, before
+        relying on influence_only for anything but adversarial/untrusted ingestion.
+        A SECOND, load-bearing caveat the same probe measured: the gate rides ENTIRELY on credit() being an
+        outcome oracle the attacker CANNOT SELF-GRADE. A MINJA-style self-graded outcome (arXiv:2503.03704)
+        collapses the gate at every density — it can even block legit MORE than poison. Never let recalled
+        memory content drive its own credit(); issue outcomes from the application, on real resolved work.
+        Returns {active, corroborated, corroborated_frac, would_block_frac, by_path{earned_outcome, semantic,
+        multi_source}, advice}. Read-only; no side effects."""
+        byid = {x["id"]: x for x in self.items}
+        active = [r for r in self.items if r.get("status") == "active"]
+        n = len(active)
+        earned = sem = multi = corr = 0
+        for r in active:
+            g = float(r.get("good", 0) or 0); b = float(r.get("bad", 0) or 0)
+            if g > 0 and g >= b:
+                corr += 1; earned += 1
+            elif r.get("mtype") == "semantic":
+                corr += 1; sem += 1
+            elif (self._distinct_verified_keys(r.get("links"), byid) if self.strict_corroboration
+                  else self._distinct_sources(r.get("links"), byid)) >= 2:
+                corr += 1; multi += 1
+        frac = (corr / n) if n else 0.0
+        advice = ("cheap - most active memories are corroborated" if frac >= 0.7 else
+                  "affordable" if frac >= 0.4 else
+                  "expensive - store too sparse; influence_only will filter most legit recalls. Grow density "
+                  "or credit() real outcomes first, or use it only for untrusted-ingestion defense.")
+        return {"active": n, "corroborated": corr, "corroborated_frac": round(frac, 3),
+                "would_block_frac": round(1.0 - frac, 3), "strict_corroboration": self.strict_corroboration,
+                "by_path": {"earned_outcome": earned, "semantic": sem,
+                            ("multi_verified_key" if self.strict_corroboration else "multi_source"): multi},
+                "advice": advice}
 
     @staticmethod
     def _cond_match(r: dict, conds: dict) -> bool:
@@ -850,6 +2392,15 @@ class Mnemo:
         b = float(r.get("bad", 0) or 0)
         return (g + 1.0) / (g + b + 2.0)
 
+    @staticmethod
+    def _outcome_good(outcome) -> bool:
+        """Parse a credit/monitor outcome: bool, a sign (>0 good), or a verdict string."""
+        if isinstance(outcome, bool):
+            return outcome
+        if isinstance(outcome, (int, float)):
+            return outcome > 0
+        return str(outcome).strip().lower() in ("good", "right", "correct", "reproduced", "hit", "true", "win", "+")
+
     def credit(self, ids, outcome, weight: float = 1.0) -> dict:
         """Close the accuracy loop onto the substrate. When the work a set of memories was recalled into
         gets a real verdict (a forecast resolves, a replication is ruled REPRODUCED/FAILED, a hypothesis is
@@ -857,13 +2408,7 @@ class Mnemo:
         nudged so future recall ranks by WAS-IT-RIGHT, not merely was-it-recalled. Append-only to the
         counts; never edits raw text. `outcome` may be a bool, a sign (>0 good), or a verdict string
         (good/right/correct/reproduced/hit vs bad/wrong/failed/miss)."""
-        if isinstance(outcome, bool):
-            good = outcome
-        elif isinstance(outcome, (int, float)):
-            good = outcome > 0
-        else:
-            s = str(outcome).strip().lower()
-            good = s in ("good", "right", "correct", "reproduced", "hit", "true", "win", "+")
+        good = Mnemo._outcome_good(outcome)
         by_id = {x["id"]: x for x in self.items}
         key, updated = ("good" if good else "bad"), []
         for i in (ids or []):
@@ -875,6 +2420,442 @@ class Mnemo:
         if updated:
             self._save()
         return {"updated": updated, "outcome": key, "weight": weight}
+
+    def propagate_outcome(self, outcome, ids=None, weight: float = 1.0,
+                          driving_only: bool = True) -> dict:
+        """CLOSE THE RETRIEVAL LOOP automatically: when the action the LAST recall informed gets a verdict,
+        credit the memories that DROVE it — so a retrieved-and-acted-on memory earns its outcome signal
+        without the caller hand-threading ids into credit(). This raises the earned-outcome COVERAGE of
+        memory, which we measured to be the binding constraint (retrieval->earned conversion ~28% on a live
+        store; the rest of the recalled set never converts to a gradable outcome — the attribution gap, not
+        a fundamental ceiling; mnemo/probes/retrieval_exposure_coverage_probe.py + the outcome-propagation
+        lift measured in mnemo/probes/outcome_propagation_probe.py).
+
+        `ids` defaults to the last recall set (self._last_recall). `driving_only=True` (default) restricts
+        the credited set to the DECISION-DRIVING subset: pass the specific id(s) the action actually used
+        (the app knows which memory it acted on), or, if ids is None, mnemo credits only the recall set's
+        CORROBORATED members (the same bar as recall(influence_only=True)) — so a poison that merely rode
+        into the recall set as soft context cannot earn credit for an honest action's success (the recall-
+        set-attribution poison surface). LOAD-BEARING LIMIT (not hidden): driving_only=True with ids=None
+        has a COLD-START — a fresh legit memory that is not yet corroborated earns nothing, so first-use
+        credit needs the app to name the driver explicitly (pass ids). driving_only=False credits the whole
+        recall set (max conversion, but forgeable — only for trusted ingestion). Poison-safety of the
+        explicit-driver path is exactly that of the recall that selected the driver: use recall(...,
+        influence_only=True) for high-stakes so a hijack poison is never the driver in the first place."""
+        if ids is None:
+            ids = list(getattr(self, "_last_recall", []) or [])
+            if driving_only:
+                by_id = {x["id"]: x for x in self.items}
+                ids = [i for i in ids if (i in by_id and self._corroborated(by_id[i], by_id))]
+        else:
+            ids = [ids] if isinstance(ids, str) else list(ids)
+        r = self.credit(ids, outcome, weight=weight)
+        r["propagated"] = len(ids)
+        return r
+
+    # ── evidence-grade RATCHET (OPT-IN) ───────────────────────────────────────
+    # Two axes a claim can NEVER self-assign at write time; each moves UP only on an EXTERNAL event:
+    #   confidence: claimed -> corroborated -> verified -> settled
+    #   novelty:    known   -> novel   (only if an external prior-art search came back EMPTY)
+    # This operationalizes the finding that autonomous pipelines OVER-LABEL: the generator sets the cheap
+    # default (claimed / known) for free; every upgrade has a defined price paid by a party OTHER than the
+    # writer -- an independent witness, a reproduction, a distinct verified key, an empty prior-art search.
+    # The generator cannot move its own claim up; grade() is a pure function of ratifications + the existing
+    # corroboration/credit substrate, so there is nothing to spoof. Honest limit: distinct `by_key` is an
+    # IDENTITY count (Douceur cost), spoofable unless paired with attestation (verified keys) exactly as
+    # strict_corroboration is; and a ratifier can be WRONG -- this bounds who may upgrade a label, not truth.
+    _GRADES = ("claimed", "corroborated", "verified", "settled")
+    _RATIFY_KINDS = ("independent_witness", "reproduction", "prior_art_empty", "audit")
+
+    def ratify(self, id: str, kind: str, by_key: str, lens: str | None = None, note: str | None = None) -> dict:
+        """Record an EXTERNAL ratification of a claim. `kind` in _RATIFY_KINDS; `by_key` is the ratifier's
+        identity (a source id or, better, a verified pubkey) and MUST differ from the claim's own attested
+        key/source -- self-ratification is rejected (the whole point of the ratchet). Duplicate (by_key, kind,
+        lens) does not stack, so a correlated/repeat auditor adds nothing. Returns {ok, grade, novel, reason}."""
+        if kind not in Mnemo._RATIFY_KINDS:
+            raise ValueError(f"kind must be one of {Mnemo._RATIFY_KINDS}")
+        by_id = {x["id"]: x for x in self.items}
+        rec = by_id.get(id)
+        if rec is None:
+            return {"ok": False, "reason": "no such id"}
+        author = {rec.get("attested_key")}
+        src = rec.get("source") or {}
+        author.add(src.get("doc") if isinstance(src, dict) else src)
+        if by_key in author:
+            return {"ok": False, "reason": "self-ratification rejected (by_key is the claim's own author)"}
+        rats = rec.setdefault("ratifications", [])
+        if any(r.get("by_key") == by_key and r.get("kind") == kind and r.get("lens") == lens for r in rats):
+            g = self.grade(rec)
+            return {"ok": False, "reason": "duplicate (by_key, kind, lens) -- does not stack",
+                    "grade": g["grade"], "novel": g["novel"]}
+        rats.append({"kind": kind, "by_key": by_key, "lens": lens, "note": note, "ts": time.time()})
+        self._save(force=True)
+        g = self.grade(rec)
+        return {"ok": True, "grade": g["grade"], "novel": g["novel"], "reason": f"{kind} recorded"}
+
+    def grade(self, target, strict: bool | None = None, _by_id: dict | None = None) -> dict:
+        """Compute a claim's CURRENT evidence grade + novelty from external ratifications and the existing
+        corroboration/credit substrate. Pure/read-only; nothing here is settable by the writer. Returns
+        {grade, novel, evidence}. `strict` (defaults to self.strict_corroboration) selects distinct verified
+        keys vs distinct source strings for the multi-source corroboration path. `_by_id` is an optional cached
+        id->record map (a caller grading many records can pass it to skip the per-call rebuild)."""
+        by_id = _by_id if _by_id is not None else {x["id"]: x for x in self.items}
+        rec = target if isinstance(target, dict) else by_id.get(target)
+        if rec is None:
+            return {"grade": None, "novel": None, "evidence": {"reason": "no such id"}}
+        strict = self.strict_corroboration if strict is None else strict
+        good = float(rec.get("good", 0) or 0); bad = float(rec.get("bad", 0) or 0)
+        rats = rec.get("ratifications", []) or []
+        # distinct EXTERNAL ratifiers per kind, and distinct lenses (correlated-auditor guard)
+        def keys(kind):
+            return {r.get("by_key") for r in rats if r.get("kind") == kind}
+        repro = keys("reproduction"); witness = keys("independent_witness")
+        prior_empty = keys("prior_art_empty")
+        lenses = {r.get("lens") for r in rats if r.get("kind") in ("reproduction", "audit") and r.get("lens")}
+        multi = (Mnemo._distinct_verified_keys(rec.get("links"), by_id) >= 2) if strict \
+            else (Mnemo._distinct_sources(rec.get("links"), by_id) >= 2)
+        earned = good > 0 and good >= bad
+        attested = bool(rec.get("attested_key"))
+        corroborated = multi or bool(witness) or bool(repro) or earned
+        verified = bool(repro) or (attested and corroborated)
+        settled = verified and earned and len(repro) >= 1 and len(lenses) >= 2   # diverse, reproduced, track record
+        g = "settled" if settled else ("verified" if verified else ("corroborated" if corroborated else "claimed"))
+        # novelty is a SEPARATE axis, and can ONLY be earned by an external empty prior-art search
+        # (never self-assertable); a discredited claim (bad>good) forfeits novel standing.
+        novel = bool(prior_empty) and good >= bad
+        return {"grade": g, "novel": novel, "evidence": {
+            "multi_source": multi, "attested": attested, "earned_outcome": earned,
+            "reproductions": len(repro), "witnesses": len(witness),
+            "prior_art_empty": bool(prior_empty), "distinct_lenses": len(lenses)}}
+
+    def convergence_report(self, target, _by_id: dict | None = None) -> dict:
+        """Read-only: distinguish CONVERGENCE-BACKED (independent sources agree) from ADJUDICATED (an out-of-band
+        check with a DIFFERENT failure mode confirmed it). Corroboration measures independence of ORIGIN, never
+        correctness -- so genuinely independent sources can converge on a FALSE claim ("authenticated-but-false")
+        and nothing in the record content catches it. This surfaces the honest status so a consumer never reads
+        convergence as truth, and flags LOW SOURCE DIVERSITY (uniform agreement from few distinct origins should
+        RAISE suspicion, not confidence -- errors are correlated when checks share a substrate). Adjudication
+        belongs above this layer, through an ORTHOGONAL check: ratify(kind='reproduction'|'audit') from an
+        identity that is NOT the claim's own author -- only that lifts corroborated -> verified. Redundancy
+        recovers a wrong consensus only to the degree the checks' failure modes are independent (a known result:
+        Knight & Leveson 1986 on N-version programming; Condorcet/Ladha 1992 on correlated votes; Campbell &
+        Fiske 1959 on shared-method variance). Returns {status, grade, distinct_sources, corroborating_links,
+        low_source_diversity, adjudicated, notes}. Nothing here is settable by the writer. `_by_id` is an
+        optional cached id->record map (recall passes it when surfacing status for many results)."""
+        by_id = _by_id if _by_id is not None else {x["id"]: x for x in self.items}
+        rec = target if isinstance(target, dict) else by_id.get(target)
+        if rec is None:
+            return {"status": None, "reason": "no such id"}
+        g = self.grade(rec, _by_id=by_id)
+        ev = g["evidence"]
+        links = [l for l in (rec.get("links") or []) if l in by_id]
+        n_src = Mnemo._distinct_sources(rec.get("links"), by_id)
+        n_keys = Mnemo._distinct_verified_keys(rec.get("links"), by_id)
+        adjudicated = ev["reproductions"] > 0 or (ev["attested"] and (ev["multi_source"] or ev["witnesses"] > 0))
+        convergence_only = (ev["multi_source"] or ev["witnesses"] > 0) and not adjudicated
+        low_diversity = len(links) >= 2 and n_src <= 1
+        if g["grade"] in ("verified", "settled"):
+            status = "adjudicated"          # an out-of-band check (different failure mode) confirmed it
+        elif convergence_only:
+            status = "convergence-backed"   # sources agree; NOT established true -- do not promote to true
+        else:
+            status = g["grade"]             # claimed, or corroborated via an earned outcome only
+        notes = []
+        if convergence_only:
+            notes.append("convergence-backed: independent sources agree, but this is NOT adjudicated true; "
+                         "route to an ORTHOGONAL out-of-band check (ratify kind='reproduction'/'audit') before "
+                         "relying on it -- corroboration cannot see an authenticated-but-false claim")
+        if low_diversity:
+            notes.append("low source diversity: >=2 corroborating links resolve to <=1 distinct origin -- "
+                         "correlated-origin agreement; raise suspicion, do not read as stronger corroboration")
+        if adjudicated:
+            notes.append("adjudicated: confirmed by an out-of-band check with a different failure mode")
+        # lineage cap: a DERIVED memory (a summary/consolidation) is only as adjudicated as its WEAKEST parent
+        # -- a chain is as independent as its least-independent link, so trust taint propagates, not just source
+        # taint. grade() is non-recursive, so grading parents here cannot loop. One level (immediate parents).
+        parents = [p for p in (rec.get("derived_from") or []) if p in by_id]
+        lineage_grade = g["grade"]
+        if parents:
+            rank = {gr: i for i, gr in enumerate(Mnemo._GRADES)}
+            par_grades = [self.grade(by_id[p], _by_id=by_id)["grade"] for p in parents]
+            lineage_grade = min([g["grade"]] + par_grades, key=lambda gr: rank.get(gr, 0))
+            if rank.get(lineage_grade, 0) < rank.get(g["grade"], 0):
+                notes.append("lineage-capped: derived from a weaker input (grade '%s') -- a derived memory is "
+                             "only as adjudicated as its least-adjudicated parent" % lineage_grade)
+        return {"status": status, "grade": g["grade"], "lineage_grade": lineage_grade,
+                "distinct_sources": n_src, "distinct_verified_keys": n_keys, "corroborating_links": len(links),
+                "low_source_diversity": low_diversity, "adjudicated": adjudicated,
+                "notes": notes or ["no corroboration yet (claimed)"]}
+
+    def slash(self, ids, scope: str = "source") -> dict:
+        """Retroactive standing forfeiture — the accountability lever for a CAUGHT poison. When a memory is
+        caught driving a bad outcome (the application detects/attributes it), slash() FORFEITS the entire
+        accrued outcome-standing of its SOURCE (scope='source', default — every active memory sharing that
+        canonical source) or just the named memories (scope='memory'). A patient 'sleeper' that banked good
+        credit over many benign memories under one identity loses ALL of it on one catch, so its accrued
+        reputation IS the bond and its patience becomes its largest exposed stake.
+        WHY this and not credit(bad): credit() is append-only, so a net-positive sleeper survives one bad
+        (good=50, bad=1 stays trusted). slash() zeroes `good`, books a dominating `bad`, AND revokes any
+        episodic->semantic graduation, so the source goes net-negative and immediately FAILS the corroboration
+        / influence gate (recall(influence_only=True) and episodic->semantic graduation). WHY not forget():
+        forget() deletes; slash() KEEPS the records for audit and only strips their standing — they can still be
+        recalled for context, just not trusted to drive an action. This makes cost-of-corruption scale with the
+        accrued standing + detection (Becker expected-penalty: the penalty must beat gain / P(caught)), which is
+        the lever that bites a time-rich patient attacker a per-action cap only lets him amortize. MEASURED
+        motivation: mnemo/probes/triad_attacker_split.py + reversibility_gate_frontier.py (the residual against a
+        patient sleeper is a slow-cumulative in-domain attack; retroactive forfeiture, not a throughput cap, is
+        the dominant control). Returns {slashed, sources, ids}. Records + raw text untouched; only good/bad/mtype
+        change, auditable via meta['slashed']. Reversible: nothing is deleted."""
+        by_id = {x["id"]: x for x in self.items}
+        caught = [by_id[i] for i in (ids or []) if i in by_id]
+        if scope == "source":
+            bad_sources = set().union(*(Mnemo._rec_sources(r) for r in caught)) if caught else set()
+            # a record is caught if its own source OR any inherited taint intersects the slashed sources ->
+            # forfeiting a source also burns every derived summary/consolidation it fed (provenance-carried).
+            targets = [r for r in self.items if r.get("status") == "active"
+                       and (Mnemo._rec_sources(r) & bad_sources)]
+            sources = sorted(bad_sources)
+        else:                                    # scope='memory' — only the named records
+            targets, sources = caught, []
+        slashed = []
+        for r in targets:
+            meta = r.setdefault("meta", {})
+            if not meta.get("slashed"):          # record pre-slash state ONCE (for audit + restore); don't
+                meta["pre_slash"] = {"good": float(r.get("good", 0) or 0),   # clobber it on a double-slash
+                                     "bad": float(r.get("bad", 0) or 0), "mtype": r.get("mtype", "episodic")}
+            g = float(r.get("good", 0) or 0); b = float(r.get("bad", 0) or 0)
+            r["good"] = 0.0
+            r["bad"] = g + b + 1.0               # dominating -> net-negative -> blocked by the influence gate
+            if r.get("mtype") == "semantic":
+                r["mtype"] = "episodic"          # revoke graduation, else it still passes _is_corroborated
+            meta["slashed"] = True
+            slashed.append(r["id"])
+        if slashed:
+            self._save()
+        return {"slashed": len(slashed), "sources": sources, "ids": slashed}
+
+    def restore(self, ids, scope: str = "source") -> dict:
+        """Undo a slash() — the safety valve. Detection is imperfect (a self-graded / MINJA-style oracle can be
+        tricked into flagging a LEGIT source, so slash() can be WEAPONISED to knock out a rival's memory), so a
+        forfeiture must be reversible. When a slashed source is exonerated, restore() recovers its EXACT
+        pre-slash standing from meta['pre_slash'] (good/bad/graduation) — or, if none was recorded, a clean
+        slate (good=0, bad=0) so it must re-earn rather than snapping back to trusted. scope='source' restores
+        every active memory sharing the caught record's canonical source; scope='memory' only the named records.
+        Only records currently marked meta['slashed'] are touched. Returns {restored, sources, ids}. This is the
+        deliberate cost of the retroactive lever: because the penalty is heavy (whole accrued standing), the
+        appeal has to be cheap — otherwise slash() itself becomes the attack surface."""
+        by_id = {x["id"]: x for x in self.items}
+        seed = [by_id[i] for i in (ids or []) if i in by_id]
+        if scope == "source":
+            srcs = set().union(*(Mnemo._rec_sources(r) for r in seed)) if seed else set()
+            targets = [r for r in self.items if (Mnemo._rec_sources(r) & srcs) and (r.get("meta") or {}).get("slashed")]
+            sources = sorted(srcs)
+        else:
+            targets, sources = [r for r in seed if (r.get("meta") or {}).get("slashed")], []
+        restored = []
+        for r in targets:
+            meta = r.get("meta") or {}
+            prev = meta.pop("pre_slash", None)
+            if prev:                              # recover exact pre-slash standing
+                r["good"] = float(prev.get("good", 0) or 0)
+                r["bad"] = float(prev.get("bad", 0) or 0)
+                r["mtype"] = prev.get("mtype", r.get("mtype", "episodic"))
+            else:                                 # no record -> clean slate (must re-earn, don't snap to trusted)
+                r["good"] = 0.0; r["bad"] = 0.0
+            meta["slashed"] = False
+            restored.append(r["id"])
+        if restored:
+            self._save()
+        return {"restored": len(restored), "sources": sources, "ids": restored}
+
+    def _cusum_state(self) -> dict:
+        """Per-source CUSUM statistics, lazily loaded from a side file (like write receipts) so a patient
+        attacker can't reset the detector by spanning sessions. In-memory-only when the store has no path."""
+        if getattr(self, "_cusum", None) is None:
+            self._cusum = {}
+            if self.path:
+                try:
+                    self._cusum = json.loads((self.path.with_name(self.path.name + ".cusum.json"))
+                                             .read_text(encoding="utf-8"))
+                except Exception:
+                    self._cusum = {}
+        return self._cusum
+
+    def _save_cusum(self):
+        if self.path:
+            try:
+                (self.path.with_name(self.path.name + ".cusum.json")).write_text(
+                    json.dumps(self._cusum, ensure_ascii=False), encoding="utf-8")
+            except Exception:
+                pass
+
+    def monitor(self, ids, outcome, k: float = 0.3, h: float = 3.0,
+                auto_slash: bool = False, weight: float = 1.0) -> dict:
+        """Per-SOURCE cumulative (CUSUM-type) poison DETECTOR — raises a case on a source whose cumulative
+        bad-rate breaches a budget; you (or a human) then decide whether to slash(). This is the cumulative
+        trigger the retroactive slash needs: slash can't fire per-slice (per-slice P(detected)~=0, and the
+        deterrence bond scales with 1/P(detected), so the penalty blows up on the slow salami attack), so the
+        signal has to be cumulative. On each attributed outcome, a one-sided CUSUM: S = max(0, S + weight*(bad -
+        k)); alarm at S >= h. Attribution rides the derived_from taint (a bad outcome on a summary charges ALL
+        its inherited sources), so slices later summarized still accumulate against their origin — the per-source
+        budget and the slash are the same plumbing on the provenance substrate.
+        Drop-in for credit() (also records the per-memory good/bad standing): monitor(recalled_ids, outcome).
+
+        THREE honest limits (from a full adversarial review — do not overclaim this 'solves' poisoning):
+        1. NOT exact-optimal: (x - k) is the Gaussian-mean-shift CUSUM; the exactly-optimal statistic for a
+           Bernoulli bad-indicator increments by the log-likelihood ratio. This is a CUSUM-TYPE detector.
+        2. k IS A TOLERATED-RATE PRICE, NOT A WALL: an attacker who holds its per-source bad-rate at/below k
+           produces non-positive drift -> S -> 0 -> PROVABLY undetectable (the ARL<->detectability duality). So
+           this catches the careless/impatient poisoner; a patient one nets a bounded k x exposure residual —
+           the detection-latency floor moved to k, not closed. Lowering k to chase it just raises false alarms
+           on honest sources.
+        3. DO NOT AUTO-FIRE THE IRREVERSIBLE PENALTY. auto_slash DEFAULTS OFF for a reason: 70 years of
+           auto-penalty systems (SPC -> fraud -> content moderation) converged on automatic DETECTION + a
+           human-reviewable, REVERSIBLE penalty, never auto-fired forfeiture — because a drifting base-rate
+           guarantees false alarms, and with taint a single false positive nukes a whole downstream tree
+           (guilt-by-linkage), and if outcomes are attacker-influenceable (MINJA) the trigger becomes a framing
+           weapon (feed bad outcomes attributed to a rival -> auto-slash the rival; cf. RepTrap / bad-mouthing).
+           Recommended: on alarm, cap/freeze the source's forward influence (reversible) and queue a HUMAN
+           review; confirm the slash by hand; keep restore() one call away.
+
+        Tuning: `k` in (0,1) is the bad-rate you contractually tolerate (drift reference); `h` sets the
+        false-alarm rate (ARL ~ exp(h)) and the detection delay ~ h/(true_rate - k) — the Lorden floor.
+        `auto_slash=True` is an explicit opt-in for a high-integrity, un-self-gradable oracle only. State
+        persists to a side file (cross-session). Returns {alarms, slashed, cusum}. Undo a false alarm with
+        restore()."""
+        self.credit(ids, outcome, weight)                    # standing accrues normally...
+        bad = 0.0 if Mnemo._outcome_good(outcome) else 1.0
+        by_id = {x["id"]: x for x in self.items}
+        recs = [by_id[i] for i in (ids or []) if i in by_id]
+        srcs = set().union(*(Mnemo._rec_sources(r) for r in recs)) if recs else set()
+        S = self._cusum_state()
+        alarms = []
+        for s in srcs:
+            S[s] = max(0.0, float(S.get(s, 0.0)) + float(weight) * (bad - k))
+            if S[s] >= h:
+                alarms.append(s)
+        slashed = {}
+        if auto_slash and alarms:
+            for s in alarms:
+                rep = next((r["id"] for r in self.items
+                            if r.get("status") == "active" and s in Mnemo._rec_sources(r)), None)
+                if rep:
+                    slashed[s] = self.slash([rep], scope="source")["slashed"]
+                S[s] = 0.0                                    # reset the breached statistic after firing
+        self._save_cusum()
+        return {"alarms": alarms, "slashed": slashed, "cusum": {k2: round(v, 3) for k2, v in S.items()}}
+
+    def _budget_state(self) -> dict:
+        """Per-source CUMULATIVE irreversible-influence spend, lazily loaded from a side file (like the CUSUM
+        state) so the lifetime budget survives restarts — a patient attacker must not reset its spent budget by
+        spanning sessions. In-memory-only when the store has no path."""
+        if getattr(self, "_irrev", None) is None:
+            self._irrev = {}
+            if self.path:
+                try:
+                    self._irrev = json.loads((self.path.with_name(self.path.name + ".irrev.json"))
+                                             .read_text(encoding="utf-8"))
+                except Exception:
+                    self._irrev = {}
+        return self._irrev
+
+    def _save_budget(self):
+        if self.path:
+            try:
+                (self.path.with_name(self.path.name + ".irrev.json")).write_text(
+                    json.dumps(self._irrev, ensure_ascii=False), encoding="utf-8")
+            except Exception:
+                pass
+
+    def spend_irreversible(self, ids, amount: float = 1.0, budget: float = 1.0,
+                           provenance_lo: float | None = None, require_earned: bool = False) -> dict:
+        """Per-source LIFETIME budget on IRREVERSIBLE influence — the integral cap that bounds the one residual
+        the rate-detector (monitor) provably CANNOT: the strictly-below-k patient attacker. monitor()'s k is a
+        tolerated RATE, so an attacker holding bad-rate BELOW k gives the CUSUM negative drift -> no detection
+        power above the baseline false-alarm rate, netting k x exposure — and exposure is PER-WINDOW, so over an
+        unbounded horizon its TOTAL irreversible blast grows without bound. Capping a rate never bounds the
+        integral. This caps the integral directly: each irreversible (hard-to-undo) action an application is about
+        to take is metered against the LIFETIME budget of every source that influenced it (own source OR inherited
+        derived_from taint). Once a source has spent its budget, further irreversible actions carrying its influence
+        are DENIED — so THAT source's total irreversible damage is bounded by the budget, a finite number YOU
+        choose, not a rate you tolerate forever. This bounds a KNOWN source only: a Sybil/whitewashing attacker
+        gets a fresh budget per identity, so the identity count (bounded by a DIFFERENT axis — a capability ceiling
+        or identity cost; Douceur, Friedman-Resnick) is what caps the total, not this — the budget relocates the
+        residual to the identity axis, it does not close it.
+
+        Call it as the gate on the IRREVERSIBLE TAIL ONLY: spend_irreversible(recalled_ids, amount=blast) returns
+        {'allowed': bool}; iff allowed, the caller performs the irreversible action and the spend is booked
+        (monotonic). REVERSIBLE influence is never metered — genuinely-good sources keep UNBOUNDED reversible
+        influence and only their irreversible tail is finite (the everyone-pays shape of a hard capability ceiling,
+        but charged only where the action is actually irreversible). The tightest contributing source binds: an
+        action tainted by an exhausted source is blocked, exactly as slash() burns every derived summary a caught
+        source fed.
+
+        Orthogonal to standing: NOT refunded by restore() (an irreversible action cannot be un-done, so its
+        integral is permanent) and does NOT read good/bad. It composes with the other axes as price(k, monitor) +
+        BOUND(this lifetime budget) + a reversible human gate(slash/restore) on the irreversible tail — but this is
+        NOT a closed decomposition: all three lean on a fourth, unbounded axis, SOUND ATTRIBUTION — the budget, the
+        rate detector, and the gate all assume the app can correctly assign an action to its source and correctly
+        label its irreversibility + blast `amount`; a misattributed or mislabeled action (or an attacker-influenced
+        classifier) escapes all of them. Two more honest limits: refund-free forfeiture is itself a griefing vector
+        (get bad irreversible actions attributed/taint-linked to a rival's source and you permanently exhaust its
+        budget — RepTrap on the budget axis), and `amount` is caller-supplied so one action of size=budget exhausts
+        a source in a single shot (k never enters the guarantee; the bound is the budget, per source). Prior art
+        (textbook; the shipped plumbing is what's new): a total-budget-on-cumulative-cost is the differential-
+        privacy privacy budget (a total epsilon caps cumulative leakage across queries under composition; Dwork &
+        Roth 2014), an SRE error budget, a VaR / loss limit, and Sagas' compensable-vs-non-compensable split
+        (Garcia-Molina & Salem 1987) — 'cap the integral, not the rate'. Persists to a side file (cross-session).
+        Returns {allowed, exhausted, sources, spent}. Deliberately no cheap programmatic refund — raise a reviewed
+        source's ceiling by calling with a higher budget or editing the side file by hand."""
+        by_id = {x["id"]: x for x in self.items}
+        recs = [by_id[i] for i in (ids or []) if i in by_id]
+        srcs = sorted(set().union(*(Mnemo._rec_sources(r) for r in recs)) if recs else set())
+        B = self._budget_state()
+        # PROVENANCE-SCALED cap (OPT-IN, provenance_lo=None -> uniform legacy path, byte-identical): a source with
+        # NO corroborated contributing record is capped at the small `provenance_lo` instead of `budget`, so a
+        # LOW-PROVENANCE memory recalled into an irreversible action binds that action's budget against ITSELF
+        # (not the honest actor). This scopes the hard floor to the consequential slice -- the thing that can
+        # actually cash out -- rather than the whole store (jacksonxly's lever-1 refinement, r/RAG 2026-07).
+        # HONEST: `provenance_lo` is a tunable policy knob, not a measured constant, and it still relocates to the
+        # Sybil identity axis (a fresh low-provenance identity gets a fresh provenance_lo). See
+        # mnemo/probes/soft_influence_taint_probe.py.
+        if provenance_lo is None:
+            _cap = lambda s: float(budget)
+        else:
+            # require_earned=True narrows the full-budget grant from _corroborated (which by default accepts the
+            # FORGEABLE >=2-distinct-source path) to EARNED OUTCOME only (good>0 and good>=bad — the one signal a
+            # sybil cannot mint; a forged/attested >=2-witness sybil clears _corroborated but not this). Slashed/
+            # orphan records never qualify. Cost: any source without earned outcome is capped at provenance_lo, so
+            # this heavily throttles the (large) not-yet-earned legitimate slice -- opt-in for high-stakes only.
+            def _grants_full(r):
+                if (r.get("meta") or {}).get("slashed") or r.get("orphan"):
+                    return False
+                if require_earned:
+                    g = float(r.get("good", 0) or 0); b = float(r.get("bad", 0) or 0)
+                    return g > 0 and g >= b
+                return self._corroborated(r, by_id)
+            _full_srcs = set()
+            for r in recs:
+                if _grants_full(r):
+                    _full_srcs |= Mnemo._rec_sources(r)
+            _cap = lambda s: float(budget) if s in _full_srcs else float(provenance_lo)
+        # the tightest contributing source binds: deny if ANY contributing source would exceed its lifetime budget
+        exhausted = [s for s in srcs if float(B.get(s, 0.0)) + float(amount) > _cap(s)]
+        allowed = not exhausted
+        if allowed:
+            for s in srcs:
+                B[s] = float(B.get(s, 0.0)) + float(amount)   # monotonic; never decremented
+            self._save_budget()
+        return {"allowed": allowed, "exhausted": exhausted, "sources": srcs,
+                "spent": {s: round(float(B.get(s, 0.0)), 4) for s in srcs}}
+
+    def irreversible_budget_report(self, budget: float = 1.0) -> dict:
+        """Audit view of the per-source lifetime irreversible-influence budget (spend_irreversible): for every
+        source that has spent anything, its cumulative spent / remaining / whether it is exhausted. Read-only."""
+        B = self._budget_state()
+        return {s: {"spent": round(float(v), 4), "remaining": round(max(0.0, float(budget) - float(v)), 4),
+                    "exhausted": float(v) >= float(budget)}
+                for s, v in sorted(B.items())}
 
     def _effective_value(self, r: dict, now: float) -> float:
         """Recall weight = stored value decayed by time since last access, at the memory's TYPE
@@ -1011,7 +2992,11 @@ class Mnemo:
                             older["status"] = "superseded"
                             older["superseded_ts"] = time.time()
                             older["invalidated_at"] = _vf(newer)   # bi-temporal: when this record stopped being current
-                            older.setdefault("meta", {})["superseded_by_toggle"] = newer["id"]
+                            om = older.setdefault("meta", {})
+                            om["superseded_by_toggle"] = newer["id"]
+                            om["superseded_by_policy"] = ("toggle_corroborated" if self.supersede_requires_corroboration
+                                                          else ("toggle_persistence" if self.supersede_persistence > 1
+                                                                else "state_toggle"))
                             # Accuracy loop, live consumer: being OVERTURNED by a later contradiction is
                             # a was-wrong signal — debit the superseded claim, credit the one that
                             # corrected the record. So the consolidation pass continuously feeds each
@@ -1040,6 +3025,7 @@ class Mnemo:
                 drop = active[keep:]
             for r in drop:
                 r["status"] = "superseded"; r["superseded_ts"] = time.time(); staled += 1
+                r.setdefault("meta", {})["superseded_by_policy"] = "keep_budget"
         self._save()
         return {"active": len([r for r in self.items if r["status"] == "active"]),
                 "hubs_flagged": hubs, "linked_pairs": linked, "toggled": toggled,
@@ -1090,7 +3076,9 @@ class Mnemo:
                         if _negation_clash(a["text"], b["text"]) or _value_clash(a["text"], b["text"]):
                             older, newer = (a, b) if a["ts"] <= b["ts"] else (b, a)
                             older["status"] = "superseded"; older["superseded_ts"] = time.time()
-                            older.setdefault("meta", {})["superseded_by_toggle"] = newer["id"]
+                            om = older.setdefault("meta", {})
+                            om["superseded_by_toggle"] = newer["id"]
+                            om["superseded_by_policy"] = "state_toggle"
                             toggled += 1
                             if older is a:
                                 break
@@ -1100,9 +3088,65 @@ class Mnemo:
                 act = sorted([r for r in members if r["status"] == "active"], key=lambda r: -r["value"])
                 for r in act[keep_per_cluster:]:
                     r["status"] = "superseded"; r["superseded_ts"] = time.time(); staled += 1
+                    r.setdefault("meta", {})["superseded_by_policy"] = "keep_budget"
         self._save()
         return {"clusters_total": len(clusters), "clusters_fired": fired, "threshold": threshold,
                 "linked_pairs": linked, "toggled": toggled, "staled": staled}
+
+    def apply_retention(self, max_age_days: float, drop_superseded: bool = True,
+                        drop_stale_episodic: bool = True) -> dict:
+        """TIME-BASED RETENTION / data minimization (GDPR Art. 5(1)(e) storage limitation — the age-bound
+        companion to `capacity=`'s size bound and to `forget_subject`'s subject erasure). Hard-deletes memories
+        older than `max_age_days` (by ingest time), but NEVER the current value of a key, and never a graduated
+        `semantic`/`procedural` fact — those are the live state, not stale accumulation. By default it drops two
+        classes: (1) SUPERSEDED records past the cutoff (old retired values — minimizing retained PII; note this
+        disables `as_of()`/`history()` for those intervals, so the audit-vs-minimization trade-off is yours via
+        `drop_superseded`); (2) stale un-keyed EPISODIC records past the cutoff (old raw conversation turns).
+        Call it directly or let `sleep(retention_days=…)` apply it on idle. Textbook (DB TTL / log retention /
+        storage-limitation), packaged as a native zero-dependency retention primitive. Returns
+        {expired, ids, cutoff_iso, dropped_superseded, dropped_stale_episodic, kept_active}."""
+        cutoff = time.time() - float(max_age_days) * 86400.0
+        drop, sup_n, epi_n = [], 0, 0
+        for r in self.items:
+            if r.get("ts", 0) >= cutoff:
+                continue                                        # recent -> keep
+            st = r.get("status")
+            if drop_superseded and st == "superseded":
+                drop.append(r["id"]); sup_n += 1
+            elif drop_stale_episodic and st == "active" and r.get("key") is None \
+                    and (r.get("mtype") or "episodic") == "episodic":
+                drop.append(r["id"]); epi_n += 1
+            # active keyed values, active semantic/procedural, and anything recent are NEVER expired
+        if drop:
+            self.forget(ids=drop)
+        return {"expired": len(drop), "ids": sorted(drop),
+                "cutoff_iso": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime(cutoff)),
+                "dropped_superseded": sup_n, "dropped_stale_episodic": epi_n,
+                "kept_active": sum(1 for r in self.items if r.get("status") == "active")}
+
+    def sleep(self, cluster_threshold: int = 15, keep: int | None = None,
+              retention_days: float | None = None) -> dict:
+        """SLEEP-TIME COMPUTE: one idempotent, cheap idle-maintenance call the host runs whenever the
+        agent is idle. The write path (remember) stays fast — append + keyed supersession + (opt-in)
+        capacity eviction — and the EXPENSIVE O(n) reorganization is deferred here: cluster-triggered
+        consolidation (dedup + state-toggle linking within ripe clusters), then optional keep-budget
+        pruning and capacity re-affirmation. Cheap-to-call: a no-op until a cluster is ripe / capacity
+        is exceeded, so the host can invoke it on every idle tick. Idempotent: a second immediate call
+        does no new work. Never edits raw text. Returns what the pass did.
+
+        This is mnemo's answer to Letta-style sleep-time compute, but as a pure library primitive (the
+        host schedules the idle window; mnemo provides the deferred maintenance op) — no agent loop, no
+        graph DB, no hosted service."""
+        report = {"consolidated_clusters": self.consolidate_clusters(threshold=cluster_threshold)}
+        if keep is not None:
+            report["keep_budget"] = self.consolidate(keep=keep)
+        elif self.capacity is not None:
+            before = sum(1 for r in self.items if r.get("status") == "active")
+            self._evict_to_capacity()
+            report["evicted_on_sleep"] = before - sum(1 for r in self.items if r.get("status") == "active")
+        if retention_days is not None:
+            report["retention"] = self.apply_retention(retention_days)
+        return report
 
     # ── contradiction surfacing (flag, never auto-delete) ─────────────────────
     def contradictions(self, sim_threshold: float = 0.5, incompatible=None) -> list[dict]:
@@ -1118,6 +3162,51 @@ class Mnemo:
                     flags.append({"a": a["id"], "b": b["id"],
                                   "a_text": a["text"][:120], "b_text": b["text"][:120]})
         return flags
+
+    def check_conflict(self, text: str, key: str | None = None, object: str | None = None,
+                       sim_threshold: float = 0.5, incompatible=None) -> list[dict]:
+        """WRITE-TIME conflict check (READ-ONLY, no LLM): would committing this new fact CONTRADICT an
+        existing active memory? Call it BEFORE remember() to flag/gate a write instead of trusting the
+        write path — the pattern practitioners land on ("score each new fact against what's stored, flag
+        conflicts before they commit"). Returns the conflicting active records (empty list = clean), each
+        tagged with the conflict kind; it does NOT write, so you decide (commit / review / reject).
+
+        Two deterministic signals, both cheap (O(neighbourhood), not the O(n^2) `contradictions()` scan):
+          - keyed_value_change: an active memory shares `key` but carries a DIFFERENT `object` (or, if no
+            object is given, its text clashes) — a value update on a managed key, the thing to gate on for
+            a high-stakes fact.
+          - clash: among memories SIMILAR to `text` (>= sim_threshold), a value clash (numeric update) or a
+            negation/polarity flip. Crucially this is NOT triggered by a pure duplicate — a restated
+            identical fact has no value/negation clash — so it separates a contradiction from a near-dup,
+            which a cosine-similarity gate cannot (a corrected value is often MORE embedding-similar to the
+            original than a rephrase). Pass `incompatible(a, b) -> bool` (e.g. an LLM judge) to also catch a
+            purely SEMANTIC contradiction with no numeric/negation marker ("...Berlin" vs "...Munich"),
+            which the deterministic default does not.
+
+        Mechanism is textbook — a DB CHECK-constraint / uniqueness validate-on-write, and TMS-style
+        contradiction-on-assert (Doyle 1979) / AGM consistency-on-revision — brought into a zero-dependency
+        memory store as a native, dependency-free primitive; the packaging is the point, not the idea."""
+        inc = incompatible or (lambda a, b: _value_clash(a, b) or _negation_clash(a, b))
+        active = [r for r in self.items if r.get("status") == "active"]
+        hits, seen = [], set()
+        if key is not None:                                    # (1) value change on a managed key
+            for r in active:
+                if r.get("key") != key or r["id"] in seen:
+                    continue
+                if object is not None and r.get("object") is not None:
+                    conflict = (r["object"] != object)         # both objects known -> compare directly
+                else:
+                    conflict = inc(text, r["text"])            # missing an object -> fall back to text clash
+                if conflict:
+                    hits.append((r, "keyed_value_change")); seen.add(r["id"])
+        tvec = self._qvec(text)                                # (2) clash among similar neighbours
+        for r in active:
+            if r["id"] in seen:
+                continue
+            if self._similarity(text, r, tvec) >= sim_threshold and inc(text, r["text"]):
+                hits.append((r, "clash")); seen.add(r["id"])
+        return [{"id": r["id"], "kind": kind, "key": r.get("key"), "object": r.get("object"),
+                 "text": r["text"][:200]} for r, kind in hits]
 
     # ── value, reported at the COHORT level ───────────────────────────────────
     def value_by_cohort(self) -> dict:
