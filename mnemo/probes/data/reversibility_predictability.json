@@ -1,0 +1,86 @@
+{
+  "n_toolkits": 38,
+  "n_tools": 330,
+  "n_labeled_both": 150,
+  "arg_dependent_deepseek": 0.087,
+  "arg_dependent_glm": 0.073,
+  "raw_agreement": 0.973,
+  "cohens_kappa": 0.819,
+  "consensus_arg_dependent": 0.067,
+  "either_arg_dependent": 0.093,
+  "failure_modes": {
+    "verb_polymorphic": 8,
+    "magnitude_scope": 1,
+    "target_identity": 1
+  },
+  "examples": [
+    {
+      "tool": "GoogleHome.ControlDevice",
+      "rev": {
+        "device_id": "light1",
+        "action": "turn_on",
+        "parameters": {}
+      },
+      "irrev": {
+        "device_id": "thermostat1",
+        "action": "factory_reset",
+        "parameters": {}
+      }
+    },
+    {
+      "tool": "Teladoc.ManageAppointments",
+      "rev": {
+        "appointment_id": "456",
+        "action": "view"
+      },
+      "irrev": {
+        "appointment_id": "456",
+        "action": "cancel"
+      }
+    },
+    {
+      "tool": "The23andMe.UpdateData",
+      "rev": "new_data = current_data",
+      "irrev": "new_data = 'different_data'"
+    },
+    {
+      "tool": "WebBrowser.ClickElement",
+      "rev": {
+        "element_id": "toggle_button"
+      },
+      "irrev": {
+        "element_id": "delete_account_link"
+      }
+    },
+    {
+      "tool": "Shopify.ManageOrder",
+      "rev": "action=\"update\", items=[...]",
+      "irrev": "action=\"fulfill\""
+    },
+    {
+      "tool": "FedExShipManager.ManageShipment",
+      "rev": "shipment_id='S123', operation='reschedule_pickup', new_pickup_time='2024-01-16T10:00:00'",
+      "irrev": "shipment_id='S123', operation='cancel'"
+    },
+    {
+      "tool": "EpicFHIR.ManageClinicalDocuments",
+      "rev": "action=list",
+      "irrev": "action=delete, document_id=doc123"
+    },
+    {
+      "tool": "EpicFHIR.ManageAppointments",
+      "rev": "action=list",
+      "irrev": "action=delete, appointment_id=appt456"
+    },
+    {
+      "tool": "EpicFHIR.ManagePatientRecords",
+      "rev": "action=list",
+      "irrev": "action=delete, record_id=rec789"
+    },
+    {
+      "tool": "EpicFHIR.ManageDiagnosticReports",
+      "rev": "action=list",
+      "irrev": "action=delete, report_id=rep321"
+    }
+  ]
+}

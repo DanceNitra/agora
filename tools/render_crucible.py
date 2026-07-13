@@ -58,7 +58,7 @@ _PROBE_BY_LAB = {
     "14c41f": "mnemo/probes/arena_style_only.py",                    # chatbot arena style
     "ragdead": "mnemo/probes/ragdead/exp_ragdead_A.py",             # RAG-is-dead / CAG
     "exp_supersession_replication": "mnemo/probes/supersession_replication.py",  # cosine supersession
-    "rev93": "agora_output/lab/reversibility_predictability_probe.py",  # tool-reversibility signature-decidability
+    "rev93": "mnemo/probes/reversibility_predictability_probe.py",  # tool-reversibility signature-decidability
 }
 
 

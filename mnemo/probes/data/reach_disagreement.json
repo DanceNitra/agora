@@ -1,0 +1,24 @@
+{
+  "overall_agreement": 0.889,
+  "by_class": {
+    "external": {
+      "n": 19,
+      "agreement": 0.895,
+      "ds_reach": 0.105,
+      "gl_reach": 0.105
+    },
+    "local": {
+      "n": 15,
+      "agreement": 0.867,
+      "ds_reach": 0.467,
+      "gl_reach": 0.6
+    },
+    "other": {
+      "n": 20,
+      "agreement": 0.9,
+      "ds_reach": 0.35,
+      "gl_reach": 0.45
+    }
+  },
+  "structured": false
+}

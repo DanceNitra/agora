@@ -1,0 +1,36 @@
+{
+  "isolated": {
+    "external": {
+      "n": 19,
+      "agree": 1.0,
+      "reach": 0.0
+    },
+    "local": {
+      "n": 15,
+      "agree": 0.73,
+      "reach": 0.4
+    },
+    "other": {
+      "n": 20,
+      "agree": 0.85,
+      "reach": 0.23
+    }
+  },
+  "networked": {
+    "external": {
+      "n": 19,
+      "agree": 0.32,
+      "reach": 0.66
+    },
+    "local": {
+      "n": 15,
+      "agree": 0.6,
+      "reach": 0.8
+    },
+    "other": {
+      "n": 20,
+      "agree": 0.6,
+      "reach": 0.75
+    }
+  }
+}
