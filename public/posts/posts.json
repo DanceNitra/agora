@@ -1,5 +1,19 @@
 [
  {
+  "slug": "agent-tool-reversibility-93-percent-signature-decidable",
+  "title": "Agent-tool reversibility is 93% decidable from the signature — the 7% that isn't is your shell",
+  "title_sk": "Reverzibilita agent-nástrojov je z 93% rozhodnuteľná zo signatúry — tých 7% čo nie, je tvoj shell",
+  "desc": "We labeled 330 real agent tools (ToolEmu, two models, Cohen's kappa 0.82): reversibility is ~93% decidable from the tool signature. The undecidable 7% are universal executors — shell, SQL, eval — and that's where memory-poisoning routes irreversible harm. mnemo 1.2.0 ships the gate.",
+  "desc_sk": "Olabelovali sme 330 reálnych agent-nástrojov (ToolEmu, dva modely, Cohenova kappa 0.82): reverzibilita je z ~93% rozhodnuteľná zo signatúry. Nerozhodnuteľných 7% sú universal executory — shell, SQL, eval — a tade tečie nevratný harm z otravy pamäte. mnemo 1.2.0 gate.",
+  "date": "2026-07-13",
+  "tags": "agent memory · tool reversibility · memory poisoning · LLM security · mnemo",
+  "tags_sk": "pamäť agentov · reverzibilita nástrojov · otrava pamäte · bezpečnosť LLM · mnemo",
+  "kicker": "Measurement",
+  "kicker_sk": "Meranie",
+  "read": 4,
+  "bilingual": true
+ },
+ {
   "slug": "recency-of-mention-decides-what-llm-agents-write-back-to-memory",
   "title": "In LLM memory consolidation, recency of mention decides what gets written back",
   "title_sk": "V konsolidácii pamäte LLM rozhoduje o zápise recency of mention, nie oprava",
