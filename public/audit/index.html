@@ -59,20 +59,27 @@
 
   <div class="lede">
     <div class="lab">The takeaway</div>
-    <p>Most memory benchmarks score recall. This one scores the properties that break agents in production and
-    that regulation is about to require: does a correction stick, does a retired fact stay retired, does a
-    "delete" actually erase, and can you <em>prove</em> it. Symmetric instrument, open harness, honest scope —
-    and yes, we build one of the systems measured (disclosed below).</p>
+    <p>Most public leaderboards score recall. This is a <strong>vendor-run, open measurement</strong> of the
+    properties that break agents in production instead: does a correction stick, does a retired fact stay
+    retired, does a "delete" actually erase, and can you <em>prove</em> it. We build one of the systems measured
+    (mnemo), so the real test is not our word — it is the open harness. Run it and contradict us.</p>
   </div>
 
-  <h2>Why this audit, and why now</h2>
-  <p>The agent-memory field competes on recall — LoCoMo, LongMemEval, BEAM — and that is a real axis. But the
+  <h2>Why these properties, and why now</h2>
+  <p>The agent-memory field competes on recall — LoCoMo, LongMemEval, BEAM — and that is a real axis. The
   failures that actually burn production agents are integrity failures: a corrected fact resurfacing, a stale
-  value being served as current, a "deleted" record that is still one query away. And the regulatory clock is
-  concrete: EU AI Act record-keeping obligations (Art. 12/19) bind on <strong>2 August 2026</strong> with a
-  minimum six-month log retention, and GDPR Article 17 erasure enforcement is already live, with the EDPB
-  naming vector embeddings as addressable personal data. The properties measured here are what those
-  obligations actually require. Nobody was scoring them side by side, so we started.</p>
+  value served as current, a "deleted" record still one query away. Related benchmarks already score pieces of
+  this — <a href="https://arxiv.org/abs/2605.20926">MemConflict</a> evaluates contradiction handling, BEAM
+  includes contradiction resolution, LongMemEval scores knowledge-update and abstention — but we have not seen
+  correction, echo, clarity, and cross-store forget-verification combined into one standing, re-runnable
+  measurement, so we made a first edition.</p>
+  <p>The timing is not incidental. These properties sit close to obligations regulators are formalizing:
+  verifiable erasure (GDPR Article 17, whose 2025 EDPB coordinated-enforcement action on the right to erasure is
+  live) and audit-traceable operation (EU AI Act event logging, with a minimum six-month log retention under
+  Article 19). Those dates are themselves in motion — the high-risk timeline is under active amendment, and the
+  2026 Digital Omnibus may push it toward late 2027 — and whether a stored embedding counts as erasable personal
+  data is argued in the literature (<a href="https://arxiv.org/abs/2606.18497">Ghost Vectors</a>), not yet
+  settled by the EDPB. Passing here is an engineering signal in that spirit, not a compliance certification.</p>
 
   <h2>The results</h2>
   <p>Four dimensions, three systems where cross-system measurement exists, <code>n=20</code> per cell with
@@ -120,20 +127,27 @@
   version of this benchmark flattered us, because it read mnemo on mnemo's terms, and we caught it and fixed it
   before publishing (11 July 2026). The correction, echo, and forget harnesses are all open and re-runnable;
   the numbers above regenerate from them.</p>
+  <p>Two honest limits sit in the <em>design</em>, not the scoring, and a blind judge cannot neutralise them:
+  we chose these four dimensions, and mnemo leads on the two — correction and forget-verification — that are its
+  own product thesis; and <code>n=20</code> per cell is thin (mnemo's echo 0.00 sits in a Wilson interval of
+  [0.00, 0.16], and a tie at this sample size can move). The open harness is the answer to both — change the
+  dimensions, add your own, raise the n, and contradict the numbers.</p>
 
   <div class="scope">
-    <strong>Honest scope.</strong> These are narrow adversarial cuts, not a general memory-quality score. The
-    samples are small. Agora builds mnemo, so treat the mnemo column as vendor-run — mitigated by the symmetric
-    instrument, the open harness, and by reporting the cells where mnemo does not win. Recall boards measure a
-    different thing, and mnemo does not compete there. Forget-verification audits only the stores you register,
-    is a lower bound on the leak, and cannot prove physical destruction.
+    <strong>Honest scope.</strong> These are narrow adversarial cuts, not a general memory-quality score, at
+    small n. Agora builds mnemo, so treat the mnemo column as vendor-run — the mitigation is the symmetric
+    instrument, the open harness, and the fact that we lead only on the axes we chose. Recall is out of scope,
+    and mem0 and Graphiti lead there; this measures a different thing. Forget-verification audits only the stores
+    you register, is a lower bound on the leak, and cannot prove physical destruction. The strongest version of
+    this report is one a competitor or a neutral party re-runs — the harness is public for exactly that.
   </div>
 
   <h2>Cadence</h2>
   <p>This is Report&nbsp;#1 of a recurring series. Each edition adds systems (mem0/Zep forget-verification,
   more memory layers), adds dimensions (poison resistance, provenance receipts), and re-measures the existing
-  ones. The point is not a leaderboard; it is a standing, auditable record of whether agent memory can be
-  trusted to keep a corrected fact corrected — and prove it.</p>
+  ones. Vendors and third parties can run the harness and submit their own numbers; a result that contradicts
+  ours is the point, not a problem. The aim is not a leaderboard but a standing, re-runnable record of whether
+  agent memory can be trusted to keep a corrected fact corrected — and prove it.</p>
 
   <div class="foot-links">
     <a href="audit_report.json">machine-readable JSON</a>

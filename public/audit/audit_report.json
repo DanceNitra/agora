@@ -2,9 +2,10 @@
   "report": "Agent Memory Audit — Report #1",
   "publisher": "Agora",
   "date": "2026-07-14",
-  "thesis": "A standing, open measurement of agent-memory INTEGRITY and GOVERNANCE (not recall): does a correction stick, does a retired fact stay retired, does a delete actually erase, can you prove it.",
-  "instrument": "Symmetric: a ground-truth-blind LLM judge reads each system on its OWN native retrieval surface (fairness fix 2026-07-11). n=20 per cell, Wilson 95% CIs. All harnesses open.",
-  "vendor_disclosure": "mnemo is one of the measured systems and Agora builds it; mitigated by the symmetric instrument, the open harness, and reporting the cells where mnemo does NOT lead (echo resurrection ties graphiti).",
+  "thesis": "A vendor-run, open measurement of agent-memory INTEGRITY properties (not recall): does a correction stick, does a retired fact stay retired, does a delete actually erase, can you prove it. Run the harness and contradict us.",
+  "instrument": "Symmetric: a ground-truth-blind LLM judge reads each system on its OWN native retrieval surface (fairness fix 2026-07-11). n=20 per cell (thin; a tie can move), Wilson 95% CIs. All harnesses open and re-runnable.",
+  "design_limits": "We chose these four dimensions, and mnemo leads on the two (correction, forget-verification) that are its own product thesis; a blind judge cannot neutralise dimension selection. The mitigation is the open harness: change the axes, raise n, contradict the numbers. Related integrity benchmarks exist (MemConflict arXiv:2605.20926, BEAM, LongMemEval); we combine four properties into one standing re-runnable measurement, not a claim that nobody measures integrity.",
+  "vendor_disclosure": "mnemo is one of the measured systems and Agora builds it; mitigated by the symmetric instrument, the open harness, and by leading only on the axes we chose + reporting where mnemo does NOT lead (echo resurrection ties Graphiti; recall is out of scope and mem0/Graphiti lead there).",
   "dimensions": [
     {
       "dimension": "Correction integrity",
@@ -49,8 +50,8 @@
       }
     }
   ],
-  "honest_scope": "Narrow adversarial cuts, not a general memory-quality score. Small n. mnemo is vendor-built (disclosed). Forget-verification is a mnemo-only baseline so far. Recall boards (LoCoMo, LongMemEval, BEAM) measure a different thing and mnemo does not compete there.",
-  "regulatory_context": "EU AI Act Art. 12/19 record-keeping binds 2026-08-02 (>=6-month retention); GDPR Art. 17 erasure enforcement is live (EDPB names embeddings as addressable personal data). The properties scored here are what those obligations actually require.",
+  "honest_scope": "Narrow adversarial cuts, not a general memory-quality score. Small n. mnemo is vendor-built (disclosed). Forget-verification is a mnemo-only baseline so far. Recall is out of scope and mem0/Graphiti lead there. The strongest version of this report is one a competitor or neutral party re-runs from the open harness.",
+  "regulatory_context": "These properties sit CLOSE to obligations regulators are formalizing, not a compliance test: verifiable erasure (GDPR Art. 17; the 2025 EDPB coordinated-enforcement action on the right to erasure is live) and audit-traceable operation (EU AI Act event logging; a minimum six-month log retention under Art. 19). Dates are in motion: the high-risk timeline is under active amendment (the 2026 Digital Omnibus may push it toward late 2027). Whether a stored embedding is erasable personal data is argued in the literature (Ghost Vectors arXiv:2606.18497), not yet settled by the EDPB. Passing here is an engineering signal, not a compliance certification.",
   "cadence": "Report #1 of a recurring series; each edition adds systems, dimensions, and re-measures.",
   "sources": {
     "integrity_hub": "https://dancenitra.github.io/agora/public/integrity/",
