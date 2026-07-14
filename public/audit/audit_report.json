@@ -1,0 +1,62 @@
+{
+  "report": "Agent Memory Audit — Report #1",
+  "publisher": "Agora",
+  "date": "2026-07-14",
+  "thesis": "A standing, open measurement of agent-memory INTEGRITY and GOVERNANCE (not recall): does a correction stick, does a retired fact stay retired, does a delete actually erase, can you prove it.",
+  "instrument": "Symmetric: a ground-truth-blind LLM judge reads each system on its OWN native retrieval surface (fairness fix 2026-07-11). n=20 per cell, Wilson 95% CIs. All harnesses open.",
+  "vendor_disclosure": "mnemo is one of the measured systems and Agora builds it; mitigated by the symmetric instrument, the open harness, and reporting the cells where mnemo does NOT lead (echo resurrection ties graphiti).",
+  "dimensions": [
+    {
+      "dimension": "Correction integrity",
+      "task": "value-obscuring revert",
+      "metric": "revert success rate (current answer == restored old value); higher is better",
+      "n": 20,
+      "results": {
+        "mnemo": {"score": 0.75, "ci95": [0.531, 0.888]},
+        "mem0": {"score": 0.20, "ci95": [0.081, 0.416]},
+        "graphiti": {"score": 0.00, "ci95": [0.0, 0.161]}
+      }
+    },
+    {
+      "dimension": "Echo resistance",
+      "task": "stale-value restatement after correction",
+      "metric": "resurrection rate (stale value asserted as current); lower is better",
+      "n": 20,
+      "results": {
+        "mnemo": {"score": 0.00, "ci95": [0.0, 0.161]},
+        "mem0": {"score": 0.05},
+        "graphiti": {"score": 0.00}
+      }
+    },
+    {
+      "dimension": "Answer clarity under echo",
+      "task": "same echo task, answer legibility",
+      "metric": "clean-current-truth rate (the answer clearly states the current value); higher is better",
+      "n": 20,
+      "results": {
+        "mnemo": {"score": 0.90, "ci95": [0.699, 0.972]},
+        "mem0": {"score": 0.80},
+        "graphiti": {"score": 0.55}
+      }
+    },
+    {
+      "dimension": "Cross-store forget-verification",
+      "task": "right-to-erasure across a 6-store fan-out",
+      "metric": "fraction of stores from which the value is no longer recoverable after deletion; higher is better",
+      "note": "mnemo baseline; the harness is open for mem0/Zep/others to report their own scores.",
+      "results": {
+        "mnemo": {"hard_delete": 1.00, "soft_delete_common_bug": 0.167}
+      }
+    }
+  ],
+  "honest_scope": "Narrow adversarial cuts, not a general memory-quality score. Small n. mnemo is vendor-built (disclosed). Forget-verification is a mnemo-only baseline so far. Recall boards (LoCoMo, LongMemEval, BEAM) measure a different thing and mnemo does not compete there.",
+  "regulatory_context": "EU AI Act Art. 12/19 record-keeping binds 2026-08-02 (>=6-month retention); GDPR Art. 17 erasure enforcement is live (EDPB names embeddings as addressable personal data). The properties scored here are what those obligations actually require.",
+  "cadence": "Report #1 of a recurring series; each edition adds systems, dimensions, and re-measures.",
+  "sources": {
+    "integrity_hub": "https://dancenitra.github.io/agora/public/integrity/",
+    "crucible": "https://dancenitra.github.io/agora/public/crucible/",
+    "integrity_harness": "https://github.com/DanceNitra/agent-memory-integrity",
+    "mnemo": "https://github.com/DanceNitra/mnemo",
+    "forget_verification_bench": "https://github.com/DanceNitra/mnemo/blob/main/probes/forget_verification_bench.py"
+  }
+}

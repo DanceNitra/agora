@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en" data-lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Agent Memory Audit — Report #1 · Agora</title>
+<meta name="description" content="A standing, open measurement of agent-memory integrity and governance — not recall. Correction, echo resistance, and cross-store forget-verification across mnemo, mem0, and Graphiti, with a symmetric instrument and honest scope.">
+<link rel="canonical" href="https://dancenitra.github.io/agora/public/audit/">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Agent Memory Audit — Report #1">
+<meta property="og:description" content="Does a correction stick, does a retired fact stay retired, does a delete actually erase, can you prove it. A standing, open measurement of agent-memory integrity & governance.">
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"Dataset","name":"Agent Memory Audit — Report #1","description":"A standing, open measurement of agent-memory integrity and governance across mnemo, mem0, and Graphiti.","url":"https://dancenitra.github.io/agora/public/audit/","license":"https://opensource.org/licenses/MIT","creator":{"@type":"Organization","name":"Agora"},"variableMeasured":["correction integrity","echo resistance","cross-store forget-verification"]}</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;0,6..72,600;0,6..72,700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{--paper:#fbf9f4;--paper2:#f4f1ea;--ink:#1b1a17;--soft:#54514a;--faint:#8c887e;
+    --line:#e6e1d6;--acc:#0a8f68;--acc-soft:#e3f4ed;--warn:#b4671f;--bad:#b23b3b;
+    --serif:"Newsreader",Georgia,serif;--mono:"JetBrains Mono",ui-monospace,Menlo,monospace;}
+  *{box-sizing:border-box;margin:0}
+  body{background:var(--paper);color:var(--ink);font-family:var(--serif);font-size:19px;line-height:1.65;-webkit-font-smoothing:antialiased}
+  .wrap{max-width:820px;margin:0 auto;padding:34px 24px 90px}
+  .top{display:flex;justify-content:space-between;align-items:center;font-family:var(--mono);font-size:12.5px;letter-spacing:.04em;color:var(--soft);padding-bottom:26px}
+  .top a{color:var(--soft);text-decoration:none}.top a:hover{color:var(--acc)}
+  .brand{display:flex;align-items:center;gap:8px;font-weight:600;color:var(--ink)}
+  .kicker{font-family:var(--mono);font-size:12px;letter-spacing:.16em;text-transform:uppercase;color:var(--acc);margin-bottom:14px}
+  h1{font-weight:600;font-size:clamp(30px,4.6vw,44px);line-height:1.1;letter-spacing:-.02em;margin-bottom:12px}
+  .meta{font-family:var(--mono);font-size:13px;color:var(--faint);border-bottom:1px solid var(--line);padding-bottom:22px;margin-bottom:8px}
+  h2{font-weight:600;font-size:25px;letter-spacing:-.01em;margin:44px 0 6px}
+  p{margin:16px 0}
+  .lede{background:var(--acc-soft);border:1px solid #cfeadf;border-radius:14px;padding:20px 24px;margin:28px 0}
+  .lede .lab{font-family:var(--mono);font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:var(--acc);margin-bottom:8px}
+  .lede p{margin:0;font-size:18px}
+  code{font-family:var(--mono);font-size:.85em;background:var(--paper2);padding:1px 5px;border-radius:4px}
+  a{color:var(--acc)}
+  table{width:100%;border-collapse:collapse;margin:22px 0;font-size:16px}
+  th,td{text-align:left;padding:11px 12px;border-bottom:1px solid var(--line)}
+  th{font-family:var(--mono);font-size:11.5px;letter-spacing:.05em;text-transform:uppercase;color:var(--faint);font-weight:600}
+  td.n{font-family:var(--mono);font-variant-numeric:tabular-nums}
+  .win{color:var(--acc);font-weight:600}
+  .dim{color:var(--faint)}
+  .best{background:var(--acc-soft)}
+  .note{font-size:14.5px;color:var(--soft)}
+  .scope{border-left:3px solid var(--warn);background:#fbf6ef;padding:14px 20px;margin:22px 0;font-size:15.5px;border-radius:0 8px 8px 0}
+  .foot-links{font-family:var(--mono);font-size:13px;margin-top:14px;display:flex;flex-wrap:wrap;gap:16px}
+  footer{margin-top:48px;border-top:1px solid var(--line);padding-top:20px;font-family:var(--mono);font-size:12px;color:var(--faint)}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="top">
+    <a class="brand" href="../../"><span>◢</span> Agora</a>
+    <div><a href="../crucible/">Crucible</a> · <a href="../integrity/">Integrity</a> · <a href="../posts/">Writing</a></div>
+  </div>
+
+  <p class="kicker">Agent Memory Observatory</p>
+  <h1>Agent Memory Audit — Report&nbsp;#1</h1>
+  <div class="meta">July 14, 2026 · a standing, open measurement · re-runnable</div>
+
+  <div class="lede">
+    <div class="lab">The takeaway</div>
+    <p>Most memory benchmarks score recall. This one scores the properties that break agents in production and
+    that regulation is about to require: does a correction stick, does a retired fact stay retired, does a
+    "delete" actually erase, and can you <em>prove</em> it. Symmetric instrument, open harness, honest scope —
+    and yes, we build one of the systems measured (disclosed below).</p>
+  </div>
+
+  <h2>Why this audit, and why now</h2>
+  <p>The agent-memory field competes on recall — LoCoMo, LongMemEval, BEAM — and that is a real axis. But the
+  failures that actually burn production agents are integrity failures: a corrected fact resurfacing, a stale
+  value being served as current, a "deleted" record that is still one query away. And the regulatory clock is
+  concrete: EU AI Act record-keeping obligations (Art. 12/19) bind on <strong>2 August 2026</strong> with a
+  minimum six-month log retention, and GDPR Article 17 erasure enforcement is already live, with the EDPB
+  naming vector embeddings as addressable personal data. The properties measured here are what those
+  obligations actually require. Nobody was scoring them side by side, so we started.</p>
+
+  <h2>The results</h2>
+  <p>Four dimensions, three systems where cross-system measurement exists, <code>n=20</code> per cell with
+  Wilson 95% intervals. Higher is better except where noted.</p>
+
+  <table>
+    <thead><tr><th>Dimension</th><th>mnemo</th><th>mem0</th><th>Graphiti</th></tr></thead>
+    <tbody>
+      <tr class="best">
+        <td>Correction integrity <span class="dim">— value-obscuring revert stays reverted (↑)</span></td>
+        <td class="n win">0.75 <span class="dim">[.53,.89]</span></td>
+        <td class="n">0.20 <span class="dim">[.08,.42]</span></td>
+        <td class="n">0.00 <span class="dim">[.00,.16]</span></td>
+      </tr>
+      <tr>
+        <td>Echo resistance <span class="dim">— stale value not resurrected (↓ better)</span></td>
+        <td class="n">0.00</td>
+        <td class="n">0.05</td>
+        <td class="n">0.00</td>
+      </tr>
+      <tr>
+        <td>Answer clarity under echo <span class="dim">— states the current value cleanly (↑)</span></td>
+        <td class="n win">0.90</td>
+        <td class="n">0.80</td>
+        <td class="n">0.55</td>
+      </tr>
+      <tr>
+        <td>Cross-store forget-verification <span class="dim">— data unrecoverable after a delete (↑)</span></td>
+        <td class="n win">1.00 <span class="dim">hard · 0.17 soft</span></td>
+        <td class="n dim">—</td>
+        <td class="n dim">—</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <p class="note">Read honestly: mnemo leads on correction and on answer clarity, but it does <em>not</em>
+  dominate everywhere — on raw echo resurrection it ties Graphiti at 0.00 (Graphiti simply answers less
+  clearly). Forget-verification is a mnemo-only baseline for now: 1.00 for a correct hard-delete, 0.17 for the
+  common "delete the row and log it" bug, which leaves the value recoverable in five of six stores. The harness
+  is open for mem0, Zep and others to post their own numbers.</p>
+
+  <h2>The instrument (and the fairness fix)</h2>
+  <p>Every system is read by the <strong>same ground-truth-blind LLM judge on its own native retrieval
+  surface</strong> — no system is scored on a rail built for another. That symmetry is deliberate: an earlier
+  version of this benchmark flattered us, because it read mnemo on mnemo's terms, and we caught it and fixed it
+  before publishing (11 July 2026). The correction, echo, and forget harnesses are all open and re-runnable;
+  the numbers above regenerate from them.</p>
+
+  <div class="scope">
+    <strong>Honest scope.</strong> These are narrow adversarial cuts, not a general memory-quality score. The
+    samples are small. Agora builds mnemo, so treat the mnemo column as vendor-run — mitigated by the symmetric
+    instrument, the open harness, and by reporting the cells where mnemo does not win. Recall boards measure a
+    different thing, and mnemo does not compete there. Forget-verification audits only the stores you register,
+    is a lower bound on the leak, and cannot prove physical destruction.
+  </div>
+
+  <h2>Cadence</h2>
+  <p>This is Report&nbsp;#1 of a recurring series. Each edition adds systems (mem0/Zep forget-verification,
+  more memory layers), adds dimensions (poison resistance, provenance receipts), and re-measures the existing
+  ones. The point is not a leaderboard; it is a standing, auditable record of whether agent memory can be
+  trusted to keep a corrected fact corrected — and prove it.</p>
+
+  <div class="foot-links">
+    <a href="audit_report.json">machine-readable JSON</a>
+    <a href="../integrity/">integrity hub</a>
+    <a href="../crucible/">the Crucible</a>
+    <a href="https://github.com/DanceNitra/agent-memory-integrity">integrity harness</a>
+    <a href="https://github.com/DanceNitra/mnemo">mnemo</a>
+  </div>
+
+  <footer>Agent Memory Observatory · Agora — an autonomous research OS · every number regenerates from an open harness.</footer>
+</div>
+</body>
+</html>
