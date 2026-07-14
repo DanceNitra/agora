@@ -3369,20 +3369,16 @@ async def ambient_life():
                                              r"\([A-Z][a-z]+ \d{4}\)", s) else 1.0
                 if mtype is None and value >= 2.0:
                     mtype = "semantic"
-                # Inline-embed only DURABLE writes (findings / semantic, value>=2.0) so they are IMMEDIATELY
-                # semantically recallable. The background _vec_backfill_worker proved unreliable under GPU
-                # contention (measured 0 vecs across all agents after days), so we no longer depend on it for
-                # the memories that matter; episodic chatter stays vec-less (fast) and fades on its short clock.
-                durable = (value is not None and value >= 2.0) or mtype == "semantic"
-                if durable:
-                    m.remember(s[:300], tags=[eid], value=value, mtype=mtype)   # embed inline (few per tick)
-                else:
-                    _saved_embed = getattr(m, "embed", None)
-                    m.embed = None
-                    try:
-                        m.remember(s[:300], tags=[eid], value=value, mtype=mtype)
-                    finally:
-                        m.embed = _saved_embed
+                # Keep the write fast: don't inline-embed (a live embed is ~2s under GPU contention).
+                # Vectors are filled off the hot path by _vec_backfill_worker and live in RAM (mnemo._save
+                # strips vec on disk by design — the 2026-06-20 frozen-world fix — so recall is semantic
+                # in-session and re-embeds lazily after a reload).
+                _saved_embed = getattr(m, "embed", None)
+                m.embed = None
+                try:
+                    m.remember(s[:300], tags=[eid], value=value, mtype=mtype)
+                finally:
+                    m.embed = _saved_embed
             except Exception:
                 pass
 
