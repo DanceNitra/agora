@@ -14,6 +14,20 @@
   "bilingual": true
  },
  {
+  "slug": "agent-memory-tenant-isolation-by-construction",
+  "title": "Tenant isolation in agent memory, by construction",
+  "title_sk": "Izolácia tenantov v agentovej pamäti, z konštrukcie",
+  "desc": "Most agent-memory libraries scope by a user_id you pass on each call. mnemo 1.6.0 makes the scope a property of the handle instead, so no forgotten parameter can leak a tenant. Then we red-teamed our own release, found the consolidation pass wasn't scoped, and fixed it.",
+  "desc_sk": "Väčšina agentových pamäťových knižníc filtruje podľa user_id, ktoré posielaš pri každom volaní. mnemo 1.6.0 robí zo scope vlastnosť handle, takže žiadny zabudnutý parameter nevypustí tenanta. Potom sme si vlastný release red-teamovali, našli, že konsolidačný priebeh nebol scopovaný, a opravili to.",
+  "date": "2026-07-14",
+  "tags": "agent memory · multi-tenancy · isolation · PII · mnemo",
+  "tags_sk": "agentová pamäť · multi-tenancy · izolácia · PII · mnemo",
+  "kicker": "Engineering note",
+  "kicker_sk": "Inžinierska poznámka",
+  "read": 6,
+  "bilingual": true
+ },
+ {
   "slug": "agent-tool-reversibility-93-percent-signature-decidable",
   "title": "Agent-tool reversibility is 93% decidable from the signature — the 7% that isn't is your shell",
   "title_sk": "Reverzibilita agent-nástrojov je z 93% rozhodnuteľná zo signatúry — tých 7% čo nie, je tvoj shell",
