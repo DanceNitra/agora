@@ -1,5 +1,19 @@
 [
  {
+  "slug": "proving-erasure-agent-memory-deletion-executed-vs-recoverable",
+  "title": "A GDPR 'delete' can pass every check while 5 of 6 stores keep the data",
+  "title_sk": "GDPR 'delete' môže prejsť každou kontrolou, kým 5 zo 6 stores stále má dáta",
+  "desc": "'We deleted the row' verifies a deletion executed; GDPR Article 17 asks that no recoverable copy survives. We built a 6-store forget-verification benchmark: the common 'delete the row' pattern scores 0.17 (five stores still leak) vs 1.00 for a correct hard-delete, plus a signed proof-of-erasure.",
+  "desc_sk": "'Zmazali sme riadok' overuje, že delete sa vykonal; GDPR Článok 17 žiada, že neprežije obnoviteľná kópia. Postavili sme 6-store forget-verification benchmark: bežný 'zmaž riadok' vzor skóruje 0.17 (5 stores stále tečie) vs 1.00 pre správny hard-delete, plus podpísaný proof-of-erasure.",
+  "date": "2026-07-14",
+  "tags": "agent memory · GDPR · right to erasure · vector store · memory integrity · mnemo",
+  "tags_sk": "pamäť agentov · GDPR · právo na výmaz · vektorový store · integrita pamäte · mnemo",
+  "kicker": "Governance",
+  "kicker_sk": "Governance",
+  "read": 4,
+  "bilingual": true
+ },
+ {
   "slug": "agent-tool-reversibility-93-percent-signature-decidable",
   "title": "Agent-tool reversibility is 93% decidable from the signature — the 7% that isn't is your shell",
   "title_sk": "Reverzibilita agent-nástrojov je z 93% rozhodnuteľná zo signatúry — tých 7% čo nie, je tvoj shell",
