@@ -611,8 +611,12 @@ def _vec_backfill_worker():
     """Background + throttled: give vec-less ACTIVE memories a vector (highest value / most recent
     first) so semantic recall has a corpus to match — without blocking the game loop or starving the
     planner's GPU. mnemo's atomic _save makes the shared-file writes corruption-safe."""
+    _round = 0
     while True:
         try:
+            _round += 1
+            if _round % 40 == 0:                  # periodically re-bound the stores (superseded accrue on writes)
+                _prune_superseded()
             did = 0
             for eid in list(_AGENT_NAMES):
                 m = _agent_mnemo(eid)
@@ -668,6 +672,35 @@ def _migrate_active_pool(target: int = 400):
             pass
 
 
+def _prune_superseded(keep_superseded: int = 1500) -> int:
+    """Bound agent WORKING memory: keep every ACTIVE record plus the most-recent `keep_superseded` superseded
+    (for history/revert), and hard-forget the older superseded tail. Agent working memory is ephemeral per-tick;
+    without this the append-only store grows unbounded (found at ~56k records, 99% dead superseded), which
+    drowns the vec-backfill worker in I/O (56k-item scans + ~2.4MB saves every round) so semantic recall never
+    fills. Uses mnemo's verified forget (scrubs links + toggle pointers). Idempotent; single-writer."""
+    if _Mnemo is None:
+        return 0
+    total = 0
+    for eid in list(_AGENT_NAMES):
+        m = _agent_mnemo(eid)
+        if m is None:
+            continue
+        try:
+            sup = [r for r in m.items if r.get("status") == "superseded"]
+            if len(sup) <= keep_superseded:
+                continue
+            sup.sort(key=lambda r: -float(r.get("superseded_ts") or r.get("ts") or 0))
+            drop = [r["id"] for r in sup[keep_superseded:]]     # oldest superseded beyond the cap
+            before = len(m.items)
+            res = m.forget(ids=drop)
+            total += res.get("forgotten", 0)
+            logger.info("prune %s: dropped %d old superseded (store %d -> %d)", eid,
+                        res.get("forgotten", 0), before, len(m.items))
+        except Exception:
+            pass
+    return total
+
+
 _vec_worker_started = False
 
 
@@ -675,6 +708,7 @@ def _start_vec_worker():
     global _vec_worker_started
     if _SEMANTIC and _Mnemo is not None and not _vec_worker_started:
         _vec_worker_started = True
+        _prune_superseded()              # unbloat FIRST (56k dead tail starved the worker) so vecs can fill
         _migrate_active_pool(400)        # cross the semantic crossover now, not in hours
         threading.Thread(target=_vec_backfill_worker, daemon=True, name="mnemo-vec").start()
         logger.info("mnemo semantic vec-backfill worker started (model=%s)", _EMB_MODEL)
@@ -3335,14 +3369,20 @@ async def ambient_life():
                                              r"\([A-Z][a-z]+ \d{4}\)", s) else 1.0
                 if mtype is None and value >= 2.0:
                     mtype = "semantic"
-                # Keep the write fast: don't inline-embed (a live embed is ~2s under GPU contention).
-                # The vec is filled off the hot path by _vec_backfill_worker; recall stays semantic.
-                _saved_embed = getattr(m, "embed", None)
-                m.embed = None
-                try:
-                    m.remember(s[:300], tags=[eid], value=value, mtype=mtype)
-                finally:
-                    m.embed = _saved_embed
+                # Inline-embed only DURABLE writes (findings / semantic, value>=2.0) so they are IMMEDIATELY
+                # semantically recallable. The background _vec_backfill_worker proved unreliable under GPU
+                # contention (measured 0 vecs across all agents after days), so we no longer depend on it for
+                # the memories that matter; episodic chatter stays vec-less (fast) and fades on its short clock.
+                durable = (value is not None and value >= 2.0) or mtype == "semantic"
+                if durable:
+                    m.remember(s[:300], tags=[eid], value=value, mtype=mtype)   # embed inline (few per tick)
+                else:
+                    _saved_embed = getattr(m, "embed", None)
+                    m.embed = None
+                    try:
+                        m.remember(s[:300], tags=[eid], value=value, mtype=mtype)
+                    finally:
+                        m.embed = _saved_embed
             except Exception:
                 pass
 
