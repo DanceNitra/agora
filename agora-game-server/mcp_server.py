@@ -686,11 +686,19 @@ def _prune_superseded(keep_superseded: int = 1500) -> int:
         if m is None:
             continue
         try:
-            sup = [r for r in m.items if r.get("status") == "superseded"]
-            if len(sup) <= keep_superseded:
+            # VALUE-PROTECTED: never drop a superseded record that carries durable knowledge — value>=2
+            # (findings), a semantic/procedural type, or a source/key. Only the low-value EPISODIC chatter
+            # tail is droppable, so a finding is never lost to pruning even as an old (superseded) value.
+            # (The org's canonical research output also lives in the vault + shared brain store, not this
+            # ephemeral per-tick scratchpad.)
+            def _durable(r):
+                return (float(r.get("value", 0) or 0) >= 2.0 or r.get("mtype") in ("semantic", "procedural")
+                        or bool(r.get("source")) or bool(r.get("key")))
+            droppable = [r for r in m.items if r.get("status") == "superseded" and not _durable(r)]
+            if len(droppable) <= keep_superseded:
                 continue
-            sup.sort(key=lambda r: -float(r.get("superseded_ts") or r.get("ts") or 0))
-            drop = [r["id"] for r in sup[keep_superseded:]]     # oldest superseded beyond the cap
+            droppable.sort(key=lambda r: -float(r.get("superseded_ts") or r.get("ts") or 0))
+            drop = [r["id"] for r in droppable[keep_superseded:]]   # oldest LOW-VALUE superseded beyond the cap
             before = len(m.items)
             res = m.forget(ids=drop)
             total += res.get("forgotten", 0)
