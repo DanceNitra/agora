@@ -5,9 +5,9 @@
    "dsar-2026-0042": {
     "erased": 3,
     "memory_ids": [
-     "108b582d8e",
-     "d1c3cebabf",
-     "d454526b2f"
+     "0cc8ea4bd4",
+     "4205f7910e",
+     "f7b11bf31a"
     ]
    }
   },
@@ -15,84 +15,107 @@
    "verified": true,
    "problems": [],
    "all_signed": true,
-   "expected_pubkey": "667906a27fed5204753f530cf8e97bdc92a616cd50e0e6b2dce3cba07cf9abec"
+   "expected_pubkey": "6aa6a7a45f5cad083797e0d1acedad5ed4a02ae29054cc53e98da90bf16fbd4f",
+   "anchor": {
+    "n_writes": 3,
+    "writes_tip": "f2003ca35a62660abffdae9f1257f8d5cac6b1fbaeedfef0b99e27457bb70b67",
+    "n_tombstones": 3,
+    "tombstones_tip": "643486e08c261db2cabdda8988501ed87093021b992b57afdfdc25ec3ace35f6",
+    "ts": 1783938082.0281522,
+    "sth_hash": "adbb6e1dde963d328926c171b57d2c256e62e872466684260b3f5f176bc82e78"
+   }
   },
   "scope": "Erasure is within THIS mnemo store only (not the app's vector store, prompt logs, or backups); covers the subject PLUS its derived_from lineage. Tamper-evident integrity primitive, NOT a compliance certification. The tombstone proves the ACT of deletion, never the content; its signature is load-bearing only against a non-holder of receipt_key. Anchor the chain head externally for operator-adversarial audit."
  },
  "write_receipts": [
   {
    "seq": 0,
-   "ts": 1783888881.9141183,
-   "memory_id": "d454526b2f",
+   "ts": 1783938082.0179353,
+   "memory_id": "4205f7910e",
    "commit": {
-    "id": "d454526b2f",
+    "id": "4205f7910e",
     "content_sha256": "5c4751e6972fb834955a0b70a8c3f99a1fe63fe6a500642814cd886078e49cbc",
     "attrib_sha256": "5b381c451dff55610d528b0f9de9f07466a20d0a35da39f1fda286a89882619a"
    },
    "prev": "0000000000000000000000000000000000000000000000000000000000000000",
-   "hash": "29252af7d580bc44bda99b107e8eebe4196891e28606487f817c49cd2a4c1e14",
-   "pubkey": "667906a27fed5204753f530cf8e97bdc92a616cd50e0e6b2dce3cba07cf9abec",
-   "sig": "fc36e202309279d59fdaf80f03327e5fb45a5b7668aee077a47ffe0dc9e38c337cd23b60ce447b2fb6e2e15d9387432761cd850dba25230a4b163b78aedee602"
+   "hash": "9364148d23af7c040648e9cf1d2ffa12324e9236b45c80ca60d64454f5e775ed",
+   "pubkey": "6aa6a7a45f5cad083797e0d1acedad5ed4a02ae29054cc53e98da90bf16fbd4f",
+   "sig": "2514485fd188617dd02de05c83c2799da7eed661b65ae0f08867ed52b93bd3c888d4bfd500fff1884779a6dc04cba06a4b47bf4dd45523e06ff8ad295946fb03"
   },
   {
    "seq": 1,
-   "ts": 1783888881.9156795,
-   "memory_id": "d1c3cebabf",
+   "ts": 1783938082.0199373,
+   "memory_id": "0cc8ea4bd4",
    "commit": {
-    "id": "d1c3cebabf",
+    "id": "0cc8ea4bd4",
     "content_sha256": "ca7c6d21e435df57043fab0f780da7958912a43e8b4f3aa4b0f6ba4dab00bee4",
     "attrib_sha256": "5b381c451dff55610d528b0f9de9f07466a20d0a35da39f1fda286a89882619a"
    },
-   "prev": "29252af7d580bc44bda99b107e8eebe4196891e28606487f817c49cd2a4c1e14",
-   "hash": "af014d6d04be8ccb25a5d2e00696de8c3531824dae301c9c4a0d9d2594cd6a95",
-   "pubkey": "667906a27fed5204753f530cf8e97bdc92a616cd50e0e6b2dce3cba07cf9abec",
-   "sig": "c38e8f47e8d2e2eb8a48587059d806b29eb339a2f9cde6b68c27fb577fdbbe35026bcd9f830b8bb552889584f2a425b4994ac742006abc6ee3209c05737e240e"
+   "prev": "9364148d23af7c040648e9cf1d2ffa12324e9236b45c80ca60d64454f5e775ed",
+   "hash": "909240b52d4153a8db4a5e27bd5231c2e8123b6680c527062c6b8d1f71bbd70c",
+   "pubkey": "6aa6a7a45f5cad083797e0d1acedad5ed4a02ae29054cc53e98da90bf16fbd4f",
+   "sig": "fef3026282e402ba4b5a742b34d72c3578106c707825101d6b9c2b7bd4b8bdc9a21a7d8a8b61c6b9b3374088c2a951cc19470d05124f84c5cd4a5cd9dda7350e"
   },
   {
    "seq": 2,
-   "ts": 1783888881.918212,
-   "memory_id": "108b582d8e",
+   "ts": 1783938082.02201,
+   "memory_id": "f7b11bf31a",
    "commit": {
-    "id": "108b582d8e",
+    "id": "f7b11bf31a",
     "content_sha256": "f0267da855697469ac9d1a2319567c6467a5e8f5f5ef6f1d25dc5aeb021f6f62",
     "attrib_sha256": "5b381c451dff55610d528b0f9de9f07466a20d0a35da39f1fda286a89882619a"
    },
-   "prev": "af014d6d04be8ccb25a5d2e00696de8c3531824dae301c9c4a0d9d2594cd6a95",
-   "hash": "6589d10e009fb41aef5ab23f6ab2591f1ec24f17a143e752af22ee538fb929b2",
-   "pubkey": "667906a27fed5204753f530cf8e97bdc92a616cd50e0e6b2dce3cba07cf9abec",
-   "sig": "3488691b920652e28665df0285f01ef5ba763649eee9ae9d9c7b05ecab084babe34ec010aa21985e7daa016b992e393aad7fd7b9b0e02e7d404545b5c86b320a"
+   "prev": "909240b52d4153a8db4a5e27bd5231c2e8123b6680c527062c6b8d1f71bbd70c",
+   "hash": "f2003ca35a62660abffdae9f1257f8d5cac6b1fbaeedfef0b99e27457bb70b67",
+   "pubkey": "6aa6a7a45f5cad083797e0d1acedad5ed4a02ae29054cc53e98da90bf16fbd4f",
+   "sig": "f56a17ea7349b9b5451006bb42abccb31046790899f5faaa28b801d7c6f6aca850cd3302151af4846d2f109c84d5711c3d32293fb1911e0121f5f19958db8b09"
   }
  ],
  "tombstones": [
   {
    "seq": 0,
-   "memory_id": "108b582d8e",
-   "ts": 1783888881.9202185,
+   "memory_id": "0cc8ea4bd4",
+   "ts": 1783938082.0256417,
    "request_id": "dsar-2026-0042",
    "prev": "0000000000000000000000000000000000000000000000000000000000000000",
-   "hash": "35a9cf49edcd39ca9bfc2cb64cb5cfc5211f39f836b78fe2d75648f29f48f504",
-   "pubkey": "667906a27fed5204753f530cf8e97bdc92a616cd50e0e6b2dce3cba07cf9abec",
-   "sig": "f91b6401cb46a4281b7f1ceee8d8a2b85cea565989406c3dca272a73ce3a77b2698c01d37834a943c7febc61b7c4fd2b3babcbd237ec50f42c22dae00ae3da02"
+   "auth": {
+    "basis": "GDPR Art.17 erasure request; verified data subject 'ops'",
+    "authorized_by": "6647f9ddc28de63d415976385921d8ca018b34cfefdfb6799d9703b006b0d6cc",
+    "authorization": "1aa1858fb07a2b705713692a2e34fdc0ad6f39aaae54f36add78ceb0fd06bee86de8a7a13b68bfa6eb0f318453d3d1880a4555e1ab6c28e9a271d2faf35de605"
+   },
+   "hash": "a476d8e6087b27dd107390ade316fef737cf4e146feb1cf87d98338e52ff9b7e",
+   "pubkey": "6aa6a7a45f5cad083797e0d1acedad5ed4a02ae29054cc53e98da90bf16fbd4f",
+   "sig": "41578e479d67573d2c9abb2af3fe70758a9115c306bfcc43ce4a69f489000b32a24f0c82b4f608ac60e360794aeda5ca1b0b58cc3fadfb423a7e5ac0b10a2403"
   },
   {
    "seq": 1,
-   "memory_id": "d1c3cebabf",
-   "ts": 1783888881.9202185,
+   "memory_id": "4205f7910e",
+   "ts": 1783938082.0256417,
    "request_id": "dsar-2026-0042",
-   "prev": "35a9cf49edcd39ca9bfc2cb64cb5cfc5211f39f836b78fe2d75648f29f48f504",
-   "hash": "6ee67c68bd5c9ff909c031edfb4487e5da8db343f9dab9257eb10b8825ad6d92",
-   "pubkey": "667906a27fed5204753f530cf8e97bdc92a616cd50e0e6b2dce3cba07cf9abec",
-   "sig": "298d26eb68d3bc43119ef8aa73dd57a637b34d580bf972576850e72e9648479b216c7df3a7419ecfd62cc147828ad70e21fd5f3d923f3faa5b0996d3fdab8b0a"
+   "prev": "a476d8e6087b27dd107390ade316fef737cf4e146feb1cf87d98338e52ff9b7e",
+   "auth": {
+    "basis": "GDPR Art.17 erasure request; verified data subject 'ops'",
+    "authorized_by": "6647f9ddc28de63d415976385921d8ca018b34cfefdfb6799d9703b006b0d6cc",
+    "authorization": "1aa1858fb07a2b705713692a2e34fdc0ad6f39aaae54f36add78ceb0fd06bee86de8a7a13b68bfa6eb0f318453d3d1880a4555e1ab6c28e9a271d2faf35de605"
+   },
+   "hash": "7a8997758ef9e275bf57a3264a12363430a1d815bc06415485646ce30d6006b4",
+   "pubkey": "6aa6a7a45f5cad083797e0d1acedad5ed4a02ae29054cc53e98da90bf16fbd4f",
+   "sig": "da28f396fbc919f41777b8c3d69b36c9c815665395c3ef36b1a54ce2e9fd5ca51bb52d978e023c4d6fa4895e6f53e89c64fd05b88f9d299c7c97da4569db7c04"
   },
   {
    "seq": 2,
-   "memory_id": "d454526b2f",
-   "ts": 1783888881.9202185,
+   "memory_id": "f7b11bf31a",
+   "ts": 1783938082.0256417,
    "request_id": "dsar-2026-0042",
-   "prev": "6ee67c68bd5c9ff909c031edfb4487e5da8db343f9dab9257eb10b8825ad6d92",
-   "hash": "2f210ba6f7da901c4e3463fb70c001888e9065686fb47c6432d4832c6018955f",
-   "pubkey": "667906a27fed5204753f530cf8e97bdc92a616cd50e0e6b2dce3cba07cf9abec",
-   "sig": "12e9373172f4d2446a297692bdd05cce292097956508c320dd7522252e56a61c8991bad7919cabab53bb80b31b5222de6b16875484ff6318c2dfa322d20ba807"
+   "prev": "7a8997758ef9e275bf57a3264a12363430a1d815bc06415485646ce30d6006b4",
+   "auth": {
+    "basis": "GDPR Art.17 erasure request; verified data subject 'ops'",
+    "authorized_by": "6647f9ddc28de63d415976385921d8ca018b34cfefdfb6799d9703b006b0d6cc",
+    "authorization": "1aa1858fb07a2b705713692a2e34fdc0ad6f39aaae54f36add78ceb0fd06bee86de8a7a13b68bfa6eb0f318453d3d1880a4555e1ab6c28e9a271d2faf35de605"
+   },
+   "hash": "643486e08c261db2cabdda8988501ed87093021b992b57afdfdc25ec3ace35f6",
+   "pubkey": "6aa6a7a45f5cad083797e0d1acedad5ed4a02ae29054cc53e98da90bf16fbd4f",
+   "sig": "357fae4d2d39ab628f7908c35aff79e2a6af4b37f0307ae681383f53a9ea44eca61d48ca1db63969b335ca053227b2e6697fbbb6b919a8f3bb4d335b4869170f"
   }
  ]
 }
