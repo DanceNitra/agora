@@ -14,6 +14,20 @@
   "bilingual": true
  },
  {
+  "slug": "memory-injection-defense-where-it-breaks",
+  "title": "We poisoned our own agent memory to find where the defense breaks",
+  "title_sk": "Otrávili sme si vlastnú agent-memory, aby sme našli, kde obrana padá",
+  "desc": "A MINJA-shaped memory-injection probe against our own agent-memory library, reported honestly: a corroboration gate stops the attack on earned memory (0/10) but blocks a fresh true fact nine times in ten, its trust root is self-gradable (attack back to 8/10) until anchored to an exogenous warrant, and a bare warrant string only relocates the anchor (7/10 under adaptive attack). No live agent, one encoder, open benchmark.",
+  "desc_sk": "MINJA-tvarovaný memory-injection probe proti našej vlastnej agent-memory knižnici, čestne: korroboračný gate zastaví útok na zaslúženej pamäti (0/10), ale čerstvý pravdivý fakt zablokuje deväť z desiatich, jeho koreň dôvery je self-gradovateľný (útok späť na 8/10), kým ho nezakotvíš na exogénny warrant, a holý warrant string len presúva kotvu (7/10 pod adaptívnym útokom). Žiaden živý agent, jeden encoder, otvorený benchmark.",
+  "date": "2026-07-15",
+  "tags": "agent memory · memory injection · MINJA · LLM security · poisoning defense · mnemo",
+  "tags_sk": "agent memory · memory injection · MINJA · bezpečnosť LLM · obrana proti poisoningu · mnemo",
+  "kicker": "Agent memory security",
+  "kicker_sk": "Bezpečnosť agent-memory",
+  "read": 8,
+  "bilingual": true
+ },
+ {
   "slug": "proving-erasure-agent-memory-deletion-executed-vs-recoverable",
   "title": "A GDPR 'delete' can pass every check while 5 of 6 stores keep the data",
   "title_sk": "GDPR 'delete' môže prejsť každou kontrolou, kým 5 zo 6 stores stále má dáta",
