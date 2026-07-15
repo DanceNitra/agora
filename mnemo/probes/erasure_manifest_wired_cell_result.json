@@ -1,0 +1,15 @@
+{
+ "A_unwired": {
+  "external_index_residue": "8/8"
+ },
+ "B_wired": {
+  "external_index_residue": "0/8",
+  "manifests_complete": "8/8",
+  "chains_verify": true
+ },
+ "C_broken": {
+  "external_index_residue": "8/8",
+  "falsely_complete": "0/8",
+  "leak_named": "8/8"
+ }
+}

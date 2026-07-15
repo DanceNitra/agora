@@ -55,7 +55,7 @@
 
   <p class="kicker">Agent Memory Observatory</p>
   <h1>Agent Memory Audit — Report&nbsp;#1</h1>
-  <div class="meta">July 14, 2026 · a standing, open measurement · re-runnable</div>
+  <div class="meta">July 14, 2026 (updated July 15) · a standing, open measurement · re-runnable</div>
 
   <div class="lede">
     <div class="lab">The takeaway</div>
@@ -107,26 +107,68 @@
         <td class="n">0.55</td>
       </tr>
       <tr>
-        <td>Cross-store forget-verification <span class="dim">— data unrecoverable after a delete (↑)</span></td>
-        <td class="n win">1.00 <span class="dim">hard · 0.17 soft</span></td>
-        <td class="n dim">—</td>
-        <td class="n dim">—</td>
+        <td>Forget-verification <span class="dim">— erased value unrecoverable from every native surface (↑)</span></td>
+        <td class="n win">1.00 <span class="dim">4/4 surfaces</span></td>
+        <td class="n">0.59–0.63 <span class="dim">2/4 leak</span></td>
+        <td class="n dim">excl.</td>
       </tr>
     </tbody>
   </table>
 
   <p class="note">Read honestly: mnemo leads on correction and on answer clarity, but it does <em>not</em>
   dominate everywhere — on raw echo resurrection it ties Graphiti at 0.00 (Graphiti simply answers less
-  clearly). Forget-verification is a mnemo-only baseline for now: 1.00 for a correct hard-delete, 0.17 for the
-  common "delete the row and log it" bug, which leaves the value recoverable in five of six stores. The harness
-  is open for mem0, Zep and others to post their own numbers.</p>
+  clearly), and no store, mnemo included, survives the where-everyone-fails row below.</p>
+
+  <h2>Forget-verification: where erasure actually stops <span class="dim">(updated 15 July 2026)</span></h2>
+  <p>The opening finding is the row where <strong>everyone fails, us included</strong>: a copy the application
+  embedded into its own vector index outlives <em>every</em> store's native delete — mnemo's too (8/8
+  recoverable). Store-level erasure is necessary, not sufficient. Because we could not fix that by store design
+  alone (no store can see infrastructure it was never told about), mnemo&nbsp;1.8.0 ships the wiring as a
+  first-class operation: register the app's fan-out stores as erasure targets and <code>forget_subject()</code>
+  cascades through them and returns an honest manifest. Measured on the same 8 subjects: unwired 8/8 leak →
+  wired 0/8 with 8/8 verifying <code>complete</code> receipts, and a deliberately broken wiring produces zero
+  falsely-complete receipts and names the leak (8/8) — the receipt cannot lie about the fan-out it was given.
+  It covers only <em>registered</em> targets; unknown copies stay unknown, for every system. With that stated,
+  the per-store cell: deterministic and judge-free — issue each system's documented native delete, then
+  adversarially attempt to recover the erased value (verbatim) from <em>each native surface the system
+  exposes</em>. n=8 subjects.</p>
+  <table>
+    <thead><tr><th>Surface</th><th>mnemo 1.7.0</th><th>mem0 2.0.11</th></tr></thead>
+    <tbody>
+      <tr><td>External app vector index <span class="dim">(outside every store's control)</span></td><td class="n">8/8 leak <span class="dim">· 0/8 wired (1.8.0)</span></td><td class="n">8/8 leak</td></tr>
+      <tr><td>Query <span class="dim">(recall / search)</span></td><td class="n">0/8</td><td class="n">0/8</td></tr>
+      <tr><td>Enumerate <span class="dim">(items / get_all)</span></td><td class="n">0/8</td><td class="n">0/8</td></tr>
+      <tr><td>History / audit API <span class="dim">(a design difference, see below)</span></td><td class="n">0/8</td><td class="n">8/8 <span class="dim">old_memory in the DELETE event</span></td></tr>
+      <tr><td>Raw storage files <span class="dim">(substrate property, see below)</span></td><td class="n">0/8</td><td class="n">4–5/8 <span class="dim">across 4 runs (qdrant-local)</span></td></tr>
+    </tbody>
+  </table>
+  <p class="note">Deletion clears every retrieval surface tested (query and enumerate, 0/8 on both systems);
+  the history API and, flush-dependently, the raw files still contain the value — erasure succeeds at the
+  retrieval layer and stops there. Two readings matter for fairness. The history row is an <strong>audit-trail
+  design difference</strong>, not defeated residue: mem0's history API returns the pre-deletion content
+  (<code>old_memory</code>) verbatim to any caller with store access, the only native clear is a global
+  <code>reset()</code> (per-record and per-user purges do not exist, and <code>delete_all()</code> in fact
+  <em>adds</em> a DELETE row per memory), and this retention is not documented as a privacy surface — while
+  mnemo's tombstones record the deletion event without the content, which is partly a capability difference
+  (mnemo does not offer a content-retaining audit trail). The raw-storage row is a <strong>substrate
+  property</strong>: bytes remain in Qdrant's embedded storage until segment vacuum — shared by any
+  embedded-Qdrant application, not a mem0 defect; server deployments or an optimizer run clear it. Graphiti is
+  excluded this edition (its native config is OpenAI and the account quota ran out mid-measurement); its
+  bitemporal retention-by-design is the documented behaviour we expect to measure, not a gotcha. On regulation:
+  GDPR Article 17(3) explicitly permits retention for audit and legal purposes — this cell is an engineering
+  signal about <em>where erased content remains readable</em>, not a compliance assessment, and no system here
+  "fails the right to erasure." Prior art, credited: soft-delete and vector residue are a known failure class
+  (Ghost&nbsp;Vectors, arXiv:2606.18497; the machine-unlearning literature's core thesis is that delete does not
+  delete) — this cell adds a standing, re-runnable cross-system measurement of that class on shipping systems,
+  not a novel discovery.</p>
 
   <h2>The instrument (and the fairness fix)</h2>
   <p>Every system is read by the <strong>same ground-truth-blind LLM judge on its own native retrieval
   surface</strong> — no system is scored on a rail built for another. That symmetry is deliberate: an earlier
   version of this benchmark flattered us, because it read mnemo on mnemo's terms, and we caught it and fixed it
-  before publishing (11 July 2026). The correction, echo, and forget harnesses are all open and re-runnable;
-  the numbers above regenerate from them.</p>
+  before publishing (11 July 2026). The forget-verification cell goes further and removes the judge entirely
+  (deterministic verbatim-recovery checks). All harnesses are open and re-runnable; the numbers above regenerate
+  from them.</p>
   <p>Two honest limits sit in the <em>design</em>, not the scoring, and a blind judge cannot neutralise them:
   we chose these four dimensions, and mnemo leads on the two — correction and forget-verification — that are its
   own product thesis; and <code>n=20</code> per cell is thin (mnemo's echo 0.00 sits in a Wilson interval of
@@ -137,14 +179,18 @@
     <strong>Honest scope.</strong> These are narrow adversarial cuts, not a general memory-quality score, at
     small n. Agora builds mnemo, so treat the mnemo column as vendor-run — the mitigation is the symmetric
     instrument, the open harness, and the fact that we lead only on the axes we chose. Recall is out of scope,
-    and mem0 and Graphiti lead there; this measures a different thing. Forget-verification audits only the stores
-    you register, is a lower bound on the leak, and cannot prove physical destruction. The strongest version of
-    this report is one a competitor or a neutral party re-runs — the harness is public for exactly that.
+    and mem0 and Graphiti lead there; this measures a different thing. Forget-verification checks verbatim
+    recoverability on native surfaces — it is a lower bound on the leak (paraphrase and embedding inversion are
+    out of scope) and cannot prove physical destruction. mnemo scores 1.00 on a cell we designed: the
+    counterweights are the judge-free instrument, the per-surface breakdown being the finding, and the
+    where-everyone-fails row that mnemo fails too. The strongest version of this report is one a competitor or a
+    neutral party re-runs — the harness is public for exactly that.
   </div>
 
   <h2>Cadence</h2>
-  <p>This is Report&nbsp;#1 of a recurring series. Each edition adds systems (mem0/Zep forget-verification,
-  more memory layers), adds dimensions (poison resistance, provenance receipts), and re-measures the existing
+  <p>This is Report&nbsp;#1 of a recurring series (forget-verification extended cross-system on 15 July 2026).
+  Each edition adds systems (Graphiti's forget cell on re-run, Zep, more memory layers), adds dimensions (poison
+  resistance, provenance receipts), and re-measures the existing
   ones. Vendors and third parties can run the harness and submit their own numbers; a result that contradicts
   ours is the point, not a problem. The aim is not a leaderboard but a standing, re-runnable record of whether
   agent memory can be trusted to keep a corrected fact corrected — and prove it.</p>
