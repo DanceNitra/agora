@@ -38,7 +38,8 @@ KEY = env.get("AGORA_API_KEY") or env.get("OLLAMA_API_KEY")   # Ollama cloud onl
 API_URL = "https://ollama.com/v1/chat/completions"
 MODEL = "deepseek-v4-flash"
 N_GAMES = int(os.getenv("C003_NGAMES", "40"))
-N_FIGHTS = 5
+N_FIGHTS = 3           # was 5 — shorter gauntlet: faster + lifts baseline off the 0-floor
+TURN_CAP = 8           # was 12
 TOP_K_SKILLS = 5
 
 def llm(prompt, max_tokens=200):
@@ -66,15 +67,24 @@ CARDS = {
 }
 REWARDS = ["bash", "guard_up", "drain", "strike", "block", "heal"]
 
+# ARM C — a FIXED generic-strategy blurb, token-matched to Arm B's top-K lessons, NO cross-episode
+# accumulation. Isolates "accumulated skill memory" (Arm B) from "any decent hint / longer prompt"
+# (the resource + generic-hint confound the intake gate flagged). REPRODUCED requires B > A AND B > C.
+STATIC_HINT = ("- kill the enemy quickly to cut total incoming damage.\n"
+               "- block when the enemy will hit for more than a heal restores.\n"
+               "- heal only when your HP is low, not proactively.\n"
+               "- bash trades your HP for damage; use it when you are ahead on HP.\n"
+               "- keep an HP buffer in reserve for the next, harder fight.")
+
 def game(rng, skills_text=None, log=None):
     """One micro-spire run. The LLM picks a card each turn. Returns (won, transcript)."""
-    hp, deck = 24, ["strike", "strike", "block", "heal"]
+    hp, deck = 28, ["strike", "strike", "block", "heal"]     # +HP for a near-zero-but-nonzero baseline
     transcript = []
     for fight in range(N_FIGHTS):
-        e_hp = rng.randint(13, 19) + fight * 2
-        e_dmg = rng.randint(4, 7) + fight
+        e_hp = rng.randint(12, 16) + fight * 2                 # eased enemy hp
+        e_dmg = rng.randint(4, 6) + fight                      # eased enemy dmg
         turn = 0
-        while hp > 0 and e_hp > 0 and turn < 12:
+        while hp > 0 and e_hp > 0 and turn < TURN_CAP:
             turn += 1
             hand = rng.sample(deck, min(3, len(deck)))
             opts = "; ".join(f"{c} ({CARDS[c]['desc']})" for c in hand)
@@ -119,34 +129,51 @@ def two_prop_p(w1, n1, w2, n2):
 
 def main():
     t0 = time.time()
-    # paired seeds: same gauntlet randomness for both arms
     seeds = [random.Random(1000 + i).randint(0, 10**9) for i in range(N_GAMES)]
+
+    # ARM A — baseline, no memory
     base_w = 0
     for i, sd in enumerate(seeds):
-        w, _ = game(random.Random(sd))
-        base_w += w
-        print(f"  base {i+1}/{N_GAMES} wins={base_w} ({time.time()-t0:.0f}s)", flush=True)
-    skills = []            # (lesson, wins_credited)
+        w, _ = game(random.Random(sd)); base_w += w
+        print(f"  A base {i+1}/{N_GAMES} wins={base_w} ({time.time()-t0:.0f}s)", flush=True)
+
+    # ARM C — token-matched static generic hint, NO accumulation
+    hint_w = 0
+    for i, sd in enumerate(seeds):
+        w, _ = game(random.Random(sd), skills_text=STATIC_HINT); hint_w += w
+        print(f"  C hint {i+1}/{N_GAMES} wins={hint_w} ({time.time()-t0:.0f}s)", flush=True)
+
+    # ARM B — accumulated skill memory (the paper's mechanism)
+    skills = []            # [lesson, wins_credited]
     mem_w = 0
     for i, sd in enumerate(seeds):
         top = sorted(skills, key=lambda s: -s[1])[:TOP_K_SKILLS]
         stext = "\n".join(f"- {s[0]}" for s in top) if top else None
-        w, tr = game(random.Random(sd), skills_text=stext)
-        mem_w += w
+        w, tr = game(random.Random(sd), skills_text=stext); mem_w += w
         lesson = extract_skill(w, tr)
         if lesson:
             skills.append([lesson, 0])
-        if w:                                          # credit surviving lessons on a win
+        if w:
             for s in top:
                 s[1] += 1
-        print(f"  mem  {i+1}/{N_GAMES} wins={mem_w} skills={len(skills)} ({time.time()-t0:.0f}s)", flush=True)
-    pval, z = two_prop_p(base_w, N_GAMES, mem_w, N_GAMES)
-    ratio = (mem_w / N_GAMES) / max(1e-9, base_w / N_GAMES)
-    out = {"claim_id": "c003-agenticsts-memory-doubles-winrate", "model": MODEL,
-           "n_per_arm": N_GAMES, "n_fights": N_FIGHTS,
-           "baseline_winrate": round(base_w / N_GAMES, 3),
-           "skill_memory_winrate": round(mem_w / N_GAMES, 3),
-           "ratio": round(ratio, 2), "one_sided_p_mem_gt_base": pval, "z": z,
+        print(f"  B mem  {i+1}/{N_GAMES} wins={mem_w} skills={len(skills)} ({time.time()-t0:.0f}s)", flush=True)
+
+    N = N_GAMES
+    p_BA, z_BA = two_prop_p(base_w, N, mem_w, N)      # B > A
+    p_BC, z_BC = two_prop_p(hint_w, N, mem_w, N)      # B > C
+    ratio_BA = (mem_w / N) / max(1e-9, base_w / N)
+    # PRE-STATED VERDICT: REPRODUCED iff B beats BOTH A and C (skill memory > matched hints), 1.5x + p<0.05
+    reproduced = (ratio_BA >= 1.5 and p_BA < 0.05 and mem_w > hint_w and p_BC < 0.05)
+    floored = base_w == 0 or base_w / N > 0.5         # calibration guard: baseline must be near-zero-nonzero
+    out = {"claim_id": "c003-agenticsts-memory-doubles-winrate", "model": MODEL, "n_per_arm": N,
+           "A_baseline_winrate": round(base_w / N, 3),
+           "C_static_hint_winrate": round(hint_w / N, 3),
+           "B_skill_memory_winrate": round(mem_w / N, 3),
+           "ratio_B_over_A": round(ratio_BA, 2),
+           "p_B_gt_A": p_BA, "p_B_gt_C": p_BC,
+           "verdict_repro_rule": "B>=1.5x A (p<0.05) AND B>C (p<0.05)",
+           "provisional_reproduced": reproduced,
+           "baseline_calibration_ok": not floored,
            "skills_accumulated": len(skills),
            "top_skills": [s[0] for s in sorted(skills, key=lambda x: -x[1])[:5]],
            "runtime_s": round(time.time() - t0)}

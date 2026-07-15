@@ -1,24 +1,21 @@
 Marat,
 
-It's live. Zenodo was the right call — a citable DOI now, arXiv whenever an endorsement makes sense.
+It's live. I just published it to Zenodo, so as of now there's a paper in the world with both our names on it:
 
-The paper is published with both our names on it:
+https://doi.org/10.5281/zenodo.21326757
 
-  Paper (Zenodo, DOI):  https://doi.org/10.5281/zenodo.21326757
-  Record page:          https://zenodo.org/records/21326757
+I linked both repositories from the record, put it under CC-BY so anyone can cite and build on it, and left it
+as a preprint so we can still add arXiv later if an endorsement comes along. And if you read it again and want
+anything changed, in the metadata or the text itself, Zenodo lets us push a new version under the same DOI, so
+nothing about this is frozen. It's ours to keep improving.
 
-Related repos linked from the record:
-  Cross-system integrity benchmark:  https://github.com/DanceNitra/agent-memory-integrity
-  mnemo (classify_reversion impl):   https://github.com/DanceNitra/agora
+Take your time with the 1466 note. Whenever it feels right, write the short version linking the DOI and send it
+my way. I'll read it once and then it's yours to post.
 
-License is CC-BY 4.0, so anyone can cite and build on it. If you spot anything you'd want changed in the
-metadata or the text, Zenodo lets us publish a new version under the same concept DOI, so nothing is frozen.
+Honestly, I keep coming back to the thing you said: four days, two people, no hidden failures. That's exactly
+how it felt from my side too. You caught what we'd gotten wrong, you were generous about how you did it, and the
+paper that came out of it is better than anything either of us would have written alone. I'm grateful, and I'd
+do it again without a second thought.
 
-On 1466: whenever you're ready, draft the short note linking the DOI and send it over. I'll take a quick look
-before it goes up, then it's all yours to post.
-
-Four days, two people, no hidden failures. I'd do it again in a heartbeat. Thank you for catching what we got
-wrong and turning it into something better than either draft alone.
-
-Best,
+Talk soon,
 Rastislav
