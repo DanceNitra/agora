@@ -18,5 +18,16 @@
   },
   "n": 8,
   "score": 0.59375
+ },
+ "graphiti": {
+  "per_surface": {
+   "query": 0,
+   "enumerate": 0,
+   "history": 0,
+   "raw_storage": 0
+  },
+  "n": 8,
+  "ingest_failed": [],
+  "score": 1.0
  }
 }

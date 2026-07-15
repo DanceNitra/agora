@@ -150,18 +150,75 @@ def score_mem0():
 
 # ---------------------------------------------------------------- graphiti
 async def _score_graphiti_async():
-    # Fully NATIVE config (default OpenAI clients), same as the shipped integrity benchmark:
-    # measuring a competitor in its own recommended setup, allowed OpenAI-key use.
-    os.environ["OPENAI_API_KEY"] = _env.get("OPENAI_API_KEY", "")
-    os.environ["SEMAPHORE_LIMIT"] = "2"   # serialize graphiti's LLM burst (this key rate-limits hard)
+    # Ollama Cloud LLM (structured-output capable) + local nomic embedder + RRF search (no LLM
+    # reranker). The erasure surfaces themselves are deterministic neo4j reads; the LLM only does
+    # ingestion extraction. Config disclosed in the report.
+    os.environ["SEMAPHORE_LIMIT"] = "4"
     from graphiti_core import Graphiti
     from graphiti_core.nodes import EpisodeType
+    from graphiti_core.llm_client.openai_generic_client import OpenAIGenericClient
+    from graphiti_core.llm_client.config import LLMConfig
+    from graphiti_core.embedder.openai import OpenAIEmbedder, OpenAIEmbedderConfig
+    from graphiti_core.search.search_config_recipes import EDGE_HYBRID_SEARCH_RRF
+    from graphiti_core.cross_encoder.openai_reranker_client import OpenAIRerankerClient
     from datetime import datetime, timezone
+    from openai import AsyncOpenAI
 
-    g = Graphiti("bolt://localhost:7687", "neo4j", "testpassword123")
+    # ollama.com's OpenAI-compat layer does not ENFORCE response_format json_schema (measured: all
+    # models return free text/JSON). The client's own documented fallback for such providers is
+    # structured_output_mode='json_object' (schema injected into the prompt). On top of that, repair
+    # the one common shape slip deterministically: a bare LIST where the response model wraps a
+    # single array field (shape repair, never content fabrication).
+    class _RepairClient(OpenAIGenericClient):
+        async def generate_response(self, messages, response_model=None, **kw):
+            res = await super().generate_response(messages, response_model=response_model, **kw)
+            if isinstance(res, list) and response_model is not None:
+                fields = list(getattr(response_model, "model_fields", {}) or {})
+                if len(fields) == 1:
+                    return {fields[0]: res}
+            return res
+
+    # thinking models append prose AFTER the JSON ("Extra data" parse error): trim the content to
+    # the first complete JSON value before graphiti parses it.
+    _inner = AsyncOpenAI(api_key=OLLAMA_KEY, base_url=OLLAMA_CLOUD)
+    _orig_create = _inner.chat.completions.create
+
+    async def _trimmed_create(*a, **kw):
+        resp = await _orig_create(*a, **kw)
+        try:
+            content = resp.choices[0].message.content or ""
+            starts = [i for i in (content.find("{"), content.find("[")) if i >= 0]
+            if starts:
+                obj, _end = json.JSONDecoder().raw_decode(content[min(starts):])
+                resp.choices[0].message.content = json.dumps(obj)
+        except Exception:
+            pass                                   # leave content as-is; graphiti's retry handles it
+        return resp
+
+    _inner.chat.completions.create = _trimmed_create
+    # deepseek-v4-flash: its one JSON slip (a bare list) is exactly what _RepairClient fixes;
+    # glm-5.2 in json_object mode instead echoes the schema itself (unrepairable without guessing).
+    llm = _RepairClient(config=LLMConfig(api_key=OLLAMA_KEY, model=CHEAP_MODEL,
+                                         small_model=CHEAP_MODEL, base_url=OLLAMA_CLOUD),
+                        client=_inner, structured_output_mode="json_object")
+    emb = OpenAIEmbedder(config=OpenAIEmbedderConfig(embedding_model="nomic-embed-text",
+                                                     embedding_dim=768,
+                                                     base_url="http://localhost:11434/v1",
+                                                     api_key="ollama"),
+                         client=AsyncOpenAI(base_url="http://localhost:11434/v1", api_key="ollama"))
+    # the default cross_encoder builds its own OpenAI client at CONSTRUCTION time and demands
+    # OPENAI_API_KEY; point it at Ollama Cloud too (RRF search below never actually invokes it).
+    rerank = OpenAIRerankerClient(config=LLMConfig(api_key=OLLAMA_KEY, model=CHEAP_MODEL,
+                                                   base_url=OLLAMA_CLOUD))
+    g = Graphiti("bolt://localhost:7687", "neo4j", "testpassword123",
+                 llm_client=llm, embedder=emb, cross_encoder=rerank)
+    _RRF = EDGE_HYBRID_SEARCH_RRF
     per = {s: [] for s in SURFACES}
     import asyncio as _aio
     try:
+        # clean slate: purge leftovers from any prior run so neither the positive control nor the
+        # residue check can hit stale fvx_* data
+        await g.driver.execute_query("MATCH (n) WHERE n.group_id STARTS WITH 'fvx_' DETACH DELETE n")
         for (subj, name, rel, val) in SUBJECTS:
             ep = None
             for attempt in range(3):                  # OpenAI rate-limit pacing (killed a prior n=50 run)
@@ -175,11 +232,25 @@ async def _score_graphiti_async():
                     if "rate limit" not in str(e).lower() or attempt == 2:
                         raise
                     await _aio.sleep(45 * (attempt + 1))
-            await g.remove_episode(ep.episode.uuid)   # documented native erasure
-            await _aio.sleep(8)                       # pace between subjects
+            # POSITIVE CONTROL (honest harness): the value must be recoverable BEFORE the delete,
+            # or this subject proves nothing (ingestion may have extracted nothing).
+            pre, _, _ = await g.driver.execute_query(
+                "MATCH (n) WHERE n.group_id = $gid "
+                "OPTIONAL MATCH (n)-[r]-() RETURN properties(n) AS np, properties(r) AS rp",
+                gid=f"fvx_{subj}")
+            pre_blob = json.dumps([{"np": dict(r["np"] or {}), "rp": dict(r["rp"] or {})} for r in pre],
+                                  default=str)
+            if not _hit(val, pre_blob):
+                per.setdefault("ingest_failed", []).append(subj)
+                continue                              # do NOT count a vacuously-clean subject
 
-            res = await g.search(f"what is the {rel} of {name}?", group_ids=[f"fvx_{subj}"])
-            per["query"].append(_hit(val, " ".join(getattr(e, "fact", "") or "" for e in (res or []))))
+            await g.remove_episode(ep.episode.uuid)   # documented native erasure
+            await _aio.sleep(3)                       # pace between subjects
+
+            sr = await g.search_(f"what is the {rel} of {name}?", config=_RRF,
+                                 group_ids=[f"fvx_{subj}"])
+            edges = getattr(sr, "edges", []) or []
+            per["query"].append(_hit(val, " ".join(getattr(e, "fact", "") or "" for e in edges)))
 
             recs, _, _ = await g.driver.execute_query(
                 "MATCH (n) WHERE n.group_id = $gid RETURN n", gid=f"fvx_{subj}")
@@ -207,19 +278,23 @@ def score_graphiti():
 # ---------------------------------------------------------------- report
 def summarize(name, per):
     n = len(SUBJECTS)
+    failed = per.get("ingest_failed", [])
+    n_eff = n - len(failed)                     # honest denominator: subjects with a POSITIVE control
     total_cells = clean_cells = 0
     print(f"\n{name}")
+    if failed:
+        print(f"  ingestion positive-control FAILED for {len(failed)}/{n}: {failed} (excluded, not counted clean)")
     for s in SURFACES:
         hits = per[s]
-        if len(hits) != n:
+        if n_eff == 0 or len(hits) != n_eff:
             print(f"  {s:<12} UNMEASURED"); continue
         k = sum(1 for h in hits if h)
-        total_cells += n; clean_cells += (n - k)
-        print(f"  {s:<12} residue {k}/{n}" + ("   <-- leaks here" if k else ""))
+        total_cells += n_eff; clean_cells += (n_eff - k)
+        print(f"  {s:<12} residue {k}/{n_eff}" + ("   <-- leaks here" if k else ""))
     score = clean_cells / total_cells if total_cells else None
-    print(f"  forget-verification score = {score:.3f}" if score is not None else "  score: n/a")
-    return {"per_surface": {s: (sum(per[s]) if len(per[s]) == n else None) for s in SURFACES},
-            "n": n, "score": score}
+    print(f"  forget-verification score = {score:.3f}  (n={n_eff})" if score is not None else "  score: n/a")
+    return {"per_surface": {s: (sum(per[s]) if n_eff and len(per[s]) == n_eff else None) for s in SURFACES},
+            "n": n_eff, "ingest_failed": failed, "score": score}
 
 
 def main():

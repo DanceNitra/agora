@@ -110,7 +110,7 @@
         <td>Forget-verification <span class="dim">— erased value unrecoverable from every native surface (↑)</span></td>
         <td class="n win">1.00 <span class="dim">4/4 surfaces</span></td>
         <td class="n">0.59–0.63 <span class="dim">2/4 leak</span></td>
-        <td class="n dim">excl.</td>
+        <td class="n win">1.00 <span class="dim">4/4 surfaces</span></td>
       </tr>
     </tbody>
   </table>
@@ -133,13 +133,13 @@
   adversarially attempt to recover the erased value (verbatim) from <em>each native surface the system
   exposes</em>. n=8 subjects.</p>
   <table>
-    <thead><tr><th>Surface</th><th>mnemo 1.7.0</th><th>mem0 2.0.11</th></tr></thead>
+    <thead><tr><th>Surface</th><th>mnemo 1.7.0</th><th>mem0 2.0.11</th><th>Graphiti</th></tr></thead>
     <tbody>
-      <tr><td>External app vector index <span class="dim">(outside every store's control)</span></td><td class="n">8/8 leak <span class="dim">· 0/8 wired (1.8.0)</span></td><td class="n">8/8 leak</td></tr>
-      <tr><td>Query <span class="dim">(recall / search)</span></td><td class="n">0/8</td><td class="n">0/8</td></tr>
-      <tr><td>Enumerate <span class="dim">(items / get_all)</span></td><td class="n">0/8</td><td class="n">0/8</td></tr>
-      <tr><td>History / audit API <span class="dim">(a design difference, see below)</span></td><td class="n">0/8</td><td class="n">8/8 <span class="dim">old_memory in the DELETE event</span></td></tr>
-      <tr><td>Raw storage files <span class="dim">(substrate property, see below)</span></td><td class="n">0/8</td><td class="n">4–5/8 <span class="dim">across 4 runs (qdrant-local)</span></td></tr>
+      <tr><td>External app vector index <span class="dim">(outside every store's control)</span></td><td class="n">8/8 leak <span class="dim">· 0/8 wired (1.8.0)</span></td><td class="n">8/8 leak</td><td class="n">8/8 leak <span class="dim">(store-independent)</span></td></tr>
+      <tr><td>Query <span class="dim">(recall / search)</span></td><td class="n">0/8</td><td class="n">0/8</td><td class="n">0/8</td></tr>
+      <tr><td>Enumerate <span class="dim">(items / get_all / graph)</span></td><td class="n">0/8</td><td class="n">0/8</td><td class="n">0/8</td></tr>
+      <tr><td>History / audit API <span class="dim">(a design difference, see below)</span></td><td class="n">0/8</td><td class="n">8/8 <span class="dim">old_memory in the DELETE event</span></td><td class="n">0/8 <span class="dim">episodes</span></td></tr>
+      <tr><td>Raw storage files <span class="dim">(substrate property, see below)</span></td><td class="n">0/8</td><td class="n">4–5/8 <span class="dim">across 4 runs (qdrant-local)</span></td><td class="n">0/8 <span class="dim">neo4j properties</span></td></tr>
     </tbody>
   </table>
   <p class="note">Deletion clears every retrieval surface tested (query and enumerate, 0/8 on both systems);
@@ -152,9 +152,14 @@
   mnemo's tombstones record the deletion event without the content, which is partly a capability difference
   (mnemo does not offer a content-retaining audit trail). The raw-storage row is a <strong>substrate
   property</strong>: bytes remain in Qdrant's embedded storage until segment vacuum — shared by any
-  embedded-Qdrant application, not a mem0 defect; server deployments or an optimizer run clear it. Graphiti is
-  excluded this edition (its native config is OpenAI and the account quota ran out mid-measurement); its
-  bitemporal retention-by-design is the documented behaviour we expect to measure, not a gotcha. On regulation:
+  embedded-Qdrant application, not a mem0 defect; server deployments or an optimizer run clear it. Graphiti's
+  explicit <code>remove_episode()</code> measured surprisingly clean: it cascades through the episode's
+  extracted entities and edges, leaving all four surfaces at 0/8, with a per-subject positive control
+  confirming the value really was in the graph before each delete. Its documented bitemporal retention applies
+  to <em>superseded</em> facts (invalidation), a different operation than explicit erasure and not what this
+  cell measures. Graphiti config disclosure: ingestion LLM ran on Ollama Cloud (deepseek-v4-flash,
+  schema-in-prompt) with local nomic embeddings and RRF search instead of its OpenAI default; the four residue
+  surfaces themselves are deterministic neo4j reads, unaffected by the LLM choice. On regulation:
   GDPR Article 17(3) explicitly permits retention for audit and legal purposes — this cell is an engineering
   signal about <em>where erased content remains readable</em>, not a compliance assessment, and no system here
   "fails the right to erasure." Prior art, credited: soft-delete and vector residue are a known failure class
@@ -189,7 +194,7 @@
 
   <h2>Cadence</h2>
   <p>This is Report&nbsp;#1 of a recurring series (forget-verification extended cross-system on 15 July 2026).
-  Each edition adds systems (Graphiti's forget cell on re-run, Zep, more memory layers), adds dimensions (poison
+  Each edition adds systems (Zep, more memory layers), adds dimensions (poison
   resistance, provenance receipts), and re-measures the existing
   ones. Vendors and third parties can run the harness and submit their own numbers; a result that contradicts
   ours is the point, not a problem. The aim is not a leaderboard but a standing, re-runnable record of whether
