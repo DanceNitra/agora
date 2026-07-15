@@ -20,9 +20,15 @@ async def agora_metrics(db) -> dict:
         r = await cur.fetchone()
         return (r[0] if r else 0) or 0
     findings = await _count("SELECT COUNT(*) FROM collective_knowledge WHERE knowledge_type='discovery'")
-    hypos = await _count("SELECT COUNT(*) FROM collective_knowledge WHERE knowledge_type='discovery' "
-                         "AND title LIKE 'Hypothesis%'")
-    return {"findings_total": findings, "hypothesis_findings": hypos}
+    # BUG FIX (2026-07-15): hypotheses are stored as knowledge_type='hypothesis', NOT as discoveries whose
+    # title starts with 'Hypothesis'. The old query matched ~3 rows (essentially none), so the architect prompt
+    # saw "10k findings, 3 hypotheses" and hallucinated a "severe hypothesis bottleneck" that does not exist
+    # (the loop actually records ~15/day, 318 total). Count the real type, and add a recent-window signal so a
+    # genuine stall (loop dead) is distinguishable from a healthy backlog.
+    hypos = await _count("SELECT COUNT(*) FROM collective_knowledge WHERE knowledge_type='hypothesis'")
+    hypos_7d = await _count("SELECT COUNT(*) FROM collective_knowledge WHERE knowledge_type='hypothesis' "
+                            "AND created_at > datetime('now','-7 days')")
+    return {"findings_total": findings, "hypotheses_total": hypos, "hypotheses_last_7d": hypos_7d}
 
 
 async def propose_self_upgrades(db) -> dict:
