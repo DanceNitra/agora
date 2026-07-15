@@ -152,3 +152,20 @@ storm-reports/
 
 # internal session handoffs (strategy/state — never public)
 HANDOFF_*.md
+
+# generated DMRG artifacts (scripts kept in git; cells + logs are regenerable outputs)
+agora_output/dmrg/cells/
+agora_output/dmrg/cells_U*/
+agora_output/dmrg/*.log
+agora_output/dmrg/_*.log
+
+# probe embedding caches + run logs (derived)
+mnemo/probes/*_embcache_v1.json
+mnemo/probes/membench_*.json
+mnemo/probes/_stress_*.log
+
+# python build artifacts (never source)
+*.egg-info/
+mnemo_pypi/mnemo/__pycache__/
+agora_output/dmrg/_*
+agora_output/forecast/*_cache.json
