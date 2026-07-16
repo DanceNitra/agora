@@ -1,3 +1,46 @@
+# Agora — Session Handoff (2026-07-16 END OF DAY · the "gate-discipline day": mnemo 1.9.1→1.9.3, EDRN → Zenodo DOI, selector prior-art gate fixed, 8 honest pre-build kills)
+
+## PASTE THIS AFTER SESSION RESTART
+
+```
+Resume Agora. FIRST read C:\Users\Danculus\agora\HANDOFF.md top section (2026-07-16 END OF DAY) fully. Chat SLOVAK, code/output ENGLISH.
+
+STANDING RULES (in memory, obey): never read Gmail via tools (owner PASTES); propose-don't-edit shared/outward artifacts; Reddit = OWNER posts, GitHub = Claude posts as DanceNitra after owner OK; secrets read INSIDE scripts (PYPI_TOKEN/ZENODO_TOKEN/AGORA_API_KEY in server/.env), never echo; never truncate a review / claim "read everything" unless 100%; run the validate→storm→audit→verify gate BEFORE anything goes outward; vault fragile (safe_vault_push only).
+
+BIGGEST LESSON TODAY: don't over-frame a shared-progress note into an obligation, and INFORM the owner clearly instead of quietly chasing results. (I mis-framed Guanghao's Prediction-1 data-share as "prior-art-check before WE co-sign" — nobody asked us to sign anything; the check exists only so our OPINION doesn't endorse an overclaim. Owner rightly caught it.)
+
+WHAT SHIPPED TODAY (all committed + pushed + logged in memory):
+1. mnemo 1.9.1 → 1.9.2 → 1.9.3 ON PYPI (three ships from ONE r/RAG thread with marintkael):
+   - 1.9.1: MINJA warrant gate (credit_requires_warrant + warrant_authorities); self-graded ASR 80%→0%. [[mnemo-191-warrant-gate-minja]]
+   - 1.9.2: read-path reopen (observe/reopened/resolve_reopened) — corroboration-gated POST-write review trigger. [[mnemo-192-readpath-reopen]]
+   - 1.9.3: SUPPORT-KEYED reopen (marintkael's fix: key on novelty-of-support not value; replay collapses to echo by construction). Textbook JTMS (Doyle 1979 / de Kleer 1986 ATMS / Dung 1995), credited. HONEST scope: NOT a security fix — DoS lever MOVES to the support level (fabricate 2 distinct grounds), not closed; independence asserted not certified.
+   - Every reply gate-reframed (stress-claim caught overclaims each time) + humanized + grateful. Owner posts the Reddit reply.
+2. EDRN physics paper → ZENODO DOI 10.5281/zenodo.21393316 (Li/Drahos/Sultanov). Compiled the corrected final .tex locally with TECTONIC (portable single-binary LaTeX in scratchpad; fixed a 4→5 col table typo), verified 16pp + all 3 corrections, published. Marat + Guanghao + qingkong gave warm sign-offs. [[edrn-dmrg-crossover-gate-caught-wrong-refutation]]
+3. SELECTOR PRIOR-ART GATE HARDENED (agora commit 9b5b8ff): frontier.py _direction_occupied now uses 3 query angles + web_search (Tavily/S2/Crossref) + strict medium judge. Root-caused why the selector proposed 4 already-occupied directions (arXiv/OpenAlex keyword APIs missed Prism 2604.19795 + Forensic 2606.30566). Validated: both now flag OCCUPIED. NOTE: live brain still runs the OLD module until next restart (no urgency).
+
+8 HONEST KILLS / NOT_COMPUTABLE (the gate + verify working — NOTHING false went out):
+   GA replication (textbook+published 3-4x) · conflict-depth compounding (gap 0% H=1-4) · evolutionary memory (Prism) · poison-detection (Forensic) · fallacy-resilience networks (SIR/Zollman, pre-build) · diversity×verifiability (Great Models Think Alike 2502.04313, pre-build) · memory-tipping/CSD-EWS (binomial-variance artifact) · Crucible shared-difficulty replication NOT_COMPUTABLE (truncation~difficulty r=0.78 manufactures the effect — verify caught 2 confounds, no false REPRODUCED). [[memory-tipping-ews-killed]] [[conflict-depth-compounding-killed]] [[crucible-shared-difficulty-not-computable]] [[generative-agents-replication-killed-textbook]]
+   META-LESSON: agent-memory / collective-epistemics flagship-finding frontier is SATURATED in 2025-26 — every clever question is already published, and our multi-model replication hit harness confounds. Our EDGE is shipping products + honest collaboration + distribution, NOT novel findings in a crowded field.
+
+LATE-SESSION ADDITIONS (after the section above was written — all done + logged):
+- mnemo 1.9.3 SHIPPED (PyPI + push db25397): SUPPORT-KEYED reopen (marintkael round 2 — key reopen on novelty-of-support, not value; textbook JTMS Doyle 1979 / de Kleer 1986, credited by name; honest scope: the DoS lever MOVES to the support level, does not close). Reply gate-reframed + humanized; owner has it to post. [[mnemo-192-readpath-reopen]]
+- BRAIN RESTARTED — the hardened prior-art gate + smart selector (9b5b8ff) are now LIVE (verified: one :8000 listener, dungeon 200, one mcp_server). The flywheel-OOD churn should stop; watch the inbox to confirm.
+- INBOX triaged 100→40 across two gatekeeper passes (74 items: flywheel-OOD-kernel/percolation churn + off-frontier scout noise). The remaining 40 are a normal loop pass.
+- EDRN Prediction-1 review posted as DanceNitra (comment 4993698778): Guanghao's single-bond-defect result is sound physics (Kane-Fisher weak-link -> L_eff explains the prefactor) but we advised AGAINST his "first DMRG verification" framing (pre-empted by arXiv:2405.09046 + 1811.09203) and to fit L_eff from the correlation decay + wait for Menu-2. LESSON: he only asked for our OPINION — don't escalate a shared-progress note into an obligation; inform the owner clearly.
+- VECTORIZE OUTREACH LIVE (possible collaboration/job — owner keen): issue vectorize-io/agent-memory-benchmark#27 as DanceNitra, offering our integrity axis (echo resurrection + value-obscuring revert) for their AMB benchmark (their manifesto explicitly asks for datasets that stress memory in new ways; they cover accuracy/speed/cost, NOT integrity). PATH B: public repo ships ONLY the mnemo adapter (VERIFIED runs out-of-the-box end-to-end: revert 3/5, echo 0/5, no errors, keys from env only) + documented native-config cross-system results; competitor adapter code stays internal; the offer = a PR in THEIR format, they run competitors themselves. Issue body EDITED to remove an early "runs all three" overclaim (owner caught it). WATCH #27. [[vectorize-amb-outreach]]
+
+OPEN / WAITING ON OTHERS (do NOT over-produce; 4 live threads seeded):
+- VECTORIZE #27 — await reply; if they engage, next step = concrete PR of the integrity cell into AMB's dataset/scoring format.
+- marintkael r/RAG — owner posts the 1.9.3 reply; open question handed to him: "where does 'support' come from and who certifies 2 grounds independent by MECHANISM not steward fiat?" His answer likely seeds the next mnemo round. Also unresolved design point: echo-guard vs observe() collision is now settled by support-keying, but the provenance channel question stands.
+- EDRN — Guanghao's Menu-2 (periodic-vs-open) control data pending. #1466 report → Zenodo PARKED (icophy silent ~1 week; not primarily ours).
+- icophy — silent; nothing to do until they resurface.
+
+INFRA STATE: brain :8000 healthy (restarted this session, gate fix live), dungeon :5174 = 200, one mcp_server. Inbox 40 pending (post-triage). Available Ollama Cloud models: 18 families (deepseek-v4-flash/pro, gemma4:31b, glm-5.1/5.2, gpt-oss:20b/120b, kimi-k2.5/6/7, minimax-m2.5/7/m3, mistral-large-3, nemotron-3-nano/super/ultra, qwen3.5:397b). Reasoning models truncate at low max_tokens — use 4096+ and CHECK corr(difficulty, extraction-fail) in any multi-model eval.
+```
+
+---
+---
+
 # Agora — Session Handoff (2026-07-12 END OF DAY · the "ship day": mnemo 0.7.15→0.7.19, benchmark repo, dungeon quality, paper audited)
 
 ## PASTE THIS AFTER SESSION RESTART
