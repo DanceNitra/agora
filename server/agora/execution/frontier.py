@@ -105,8 +105,50 @@ def _smart_frontier(vault: str, explore: bool) -> dict | None:
     tgt = str(d.get("target", "")).strip()
     if not tgt:
         return None
+    # PRIOR-ART GATE on the SELECTION (owner 2026-07-16, flag AGORA_NOVELTY_GATE): the selector optimizes
+    # for compelling + on-moat but NOT for "already published" — it can (and did: 'Memory as Causal
+    # Laboratory' = CausalFlow/CMI) propose an occupied field. Check the literature; if occupied, re-select
+    # ONCE toward a genuinely-open angle OR an explicit Crucible REPLICATION / stress-test of a recent claim
+    # (finding where it breaks is also our moat). Fail-open.
+    if os.getenv("AGORA_NOVELTY_GATE", "1") != "0":
+        occ, ref = _direction_occupied(tgt, str(d.get("prompt", "")))
+        if occ:
+            raw2 = call_llm(
+                sys + f"\n\nIMPORTANT: your pick '{tgt}' is ALREADY an active published field ({ref}). Do "
+                "NOT propose to invent it. Instead pick a GENUINELY OPEN direction, OR propose a Crucible "
+                "REPLICATION / adversarial stress-test of a SPECIFIC recent claim (name it; find the regime "
+                "where it BREAKS) — independent replication is our moat and nobody has done it.",
+                pool, "medium", 0.7, 1500)
+            d2 = _json(raw2)
+            if str(d2.get("target", "")).strip():
+                d = d2
+                tgt = str(d.get("target", "")).strip()
     return {"kind": str(d.get("kind", "frontier"))[:20], "target": tgt[:120],
             "prompt": str(d.get("prompt", ""))[:1000], "why": str(d.get("why", ""))[:300]}
+
+
+def _direction_occupied(target: str, prompt: str):
+    """Prior-art check for a chosen research direction: is it already an active, published field (someone
+    has built essentially this)? Returns (occupied: bool, reference: str). Fail-open (False) on error so the
+    frontier never starves. Uses the same free multi-source research the rest of the pipeline uses."""
+    try:
+        from agora.execution.research_tool import research, format_for_prompt
+        from agora.execution.llm_client import call_llm
+        q = (f"{target}. {prompt}")[:160]
+        papers = research(q, 5)
+        if not papers:
+            return (False, "")
+        raw = call_llm(
+            "Given the RESEARCH DIRECTION and the REAL abstracts, is this direction ALREADY an active, "
+            "published field — has someone essentially already built or established this (not merely a "
+            "related topic)? Reply ONLY JSON: {\"occupied\":true|false,\"ref\":\"<the closest existing "
+            "work: author/short-title/year, or empty>\"}.",
+            f"RESEARCH DIRECTION: {target} — {prompt[:300]}\n\nREAL ABSTRACTS:\n{format_for_prompt(papers)}",
+            "cheap", 0.0, 200)
+        dd = _json(raw)
+        return (bool(dd.get("occupied")), str(dd.get("ref", ""))[:120])
+    except Exception:
+        return (False, "")
 
 
 def frontier_target(vault: str) -> dict | None:
