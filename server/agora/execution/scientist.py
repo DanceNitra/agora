@@ -84,6 +84,27 @@ async def hypothesize_and_test(topic: str, vault_path: str) -> dict:
                 return {"topic": topic, "hypothesis": "", "verdict": "NONE",
                         "known": b.get("claims", []), "skipped": f"textbook: {named}"}
 
+        # PRIOR-ART SEARCH (same flag): the LLM self-check above judges from training memory and misses work
+        # it never saw. Actually hit the literature: if a REAL paper already answers this exact question, it
+        # is not open — do not record it. Runs on BOTH paths (lab + literature). Fail-open on any error.
+        try:
+            from agora.execution.research_tool import research, format_for_prompt
+            pa = await asyncio.to_thread(research, hyp[:100], 5)
+            if pa:
+                raw = await asyncio.to_thread(
+                    call_llm,
+                    "Given the HYPOTHESIS and the REAL abstracts, is this EXACT question already settled — "
+                    "directly and definitively ANSWERED by one of these papers (an established result, not "
+                    "merely a related topic)? Reply ONLY JSON: {\"settled\":true|false,\"paper\":\"<author, "
+                    "year if settled, else empty>\"}.",
+                    f"HYPOTHESIS: {hyp}\n\nREAL ABSTRACTS:\n{format_for_prompt(pa)}", "cheap", 0.0, 150)
+                dp = _json(raw)
+                if dp.get("settled"):
+                    return {"topic": topic, "hypothesis": "", "verdict": "NONE",
+                            "known": b.get("claims", []), "skipped": f"prior-art: {dp.get('paper', '')}"}
+        except Exception:
+            pass
+
     # SEVERE-TEST PATH (AGORA_SCIENTIST_LAB=1): a REAL Lab run via the Methods Library + a pre-commitment,
     # instead of the LLM-vibe-check below. No measured number -> verdict NONE, NOT recorded. (proof step;
     # flag off = old behavior, instant revert.)
