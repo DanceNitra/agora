@@ -130,21 +130,56 @@ def _smart_frontier(vault: str, explore: bool) -> dict | None:
 def _direction_occupied(target: str, prompt: str):
     """Prior-art check for a chosen research direction: is it already an active, published field (someone
     has built essentially this)? Returns (occupied: bool, reference: str). Fail-open (False) on error so the
-    frontier never starves. Uses the same free multi-source research the rest of the pipeline uses."""
+    frontier never starves.
+
+    HARDENED (owner 2026-07-16): the old single-query, 2-arXiv-result, cheap-judge version repeatedly PASSED
+    already-occupied fields (missed Prism 2604.19795 for 'evolutionary memory' and Forensic 2606.30566 for
+    'poison-detection') because the closest prior art is recent arXiv preprints under DIFFERENT terminology.
+    Fixes: (1) THREE query angles — the target name, the mechanism phrase, and their join — so a paper is
+    caught even if it renames the idea; (2) deeper arXiv (6/query, where 2026 preprints live) + OpenAlex for
+    breadth; (3) a stricter medium-tier judge told a CLOSE/differently-worded match counts and to ERR TOWARD
+    OCCUPIED (a false-positive only costs a re-pick; a miss wastes a whole research cycle)."""
     try:
-        from agora.execution.research_tool import research, format_for_prompt
+        from agora.execution.research_tool import (arxiv_search, openalex_search, format_for_prompt,
+                                                    distill_query)
         from agora.execution.llm_client import call_llm
-        q = (f"{target}. {prompt}")[:160]
-        papers = research(q, 5)
-        if not papers:
+        mech = re.sub(r"\s+", " ", prompt or "").strip()[:140]          # the "what to produce" core
+        queries = [target[:120], mech, (target + " " + mech)[:160]]
+        seen, papers = set(), []
+        for q in queries:
+            if not q.strip():
+                continue
+            kw = distill_query(q)
+            for p in arxiv_search(kw, 6) + openalex_search(kw, 4):
+                if p.get("error"):
+                    continue
+                key = (p.get("title") or "")[:80].lower()
+                if key and key not in seen:
+                    seen.add(key); papers.append(p)
+            if len(papers) >= 18:
+                break
+        # ALSO hit the broad web (Semantic Scholar / Tavily / Crossref / HF / DDG) — the arXiv+OpenAlex
+        # keyword APIs are brittle and miss recent preprints under renamed terminology (they missed Prism
+        # 2604.19795 entirely; web_search found it via Tavily). This is the retrieval half of the fix.
+        web_block = ""
+        try:
+            from agora.execution.web_search import web_search
+            wr = web_search((target + " " + mech)[:180], 5).get("results", [])
+            web_block = "\n".join(f"- {w.get('title','')}: {(w.get('snippet') or '')[:180]}" for w in wr[:10])
+        except Exception:
+            pass
+        if not papers and not web_block:
             return (False, "")
         raw = call_llm(
-            "Given the RESEARCH DIRECTION and the REAL abstracts, is this direction ALREADY an active, "
-            "published field — has someone essentially already built or established this (not merely a "
-            "related topic)? Reply ONLY JSON: {\"occupied\":true|false,\"ref\":\"<the closest existing "
-            "work: author/short-title/year, or empty>\"}.",
-            f"RESEARCH DIRECTION: {target} — {prompt[:300]}\n\nREAL ABSTRACTS:\n{format_for_prompt(papers)}",
-            "cheap", 0.0, 200)
+            "You are a PRIOR-ART GATE for an autonomous research org. Given the RESEARCH DIRECTION and REAL "
+            "abstracts + web hits, decide if the direction is ALREADY OCCUPIED: does any listed work already "
+            "do essentially this, OR publish its core mechanism/framing — EVEN under different terminology or "
+            "in an adjacent domain? A CLOSE match counts. ERR TOWARD OCCUPIED: a false 'occupied' only costs a "
+            "re-pick, but a missed one wastes an entire research cycle. Reply ONLY JSON: "
+            "{\"occupied\":true|false,\"ref\":\"<closest work: author/short-title/year + arxiv-id, or empty>\"}.",
+            f"RESEARCH DIRECTION: {target} — {prompt[:400]}\n\nREAL ABSTRACTS:\n{format_for_prompt(papers)}"
+            + (f"\n\nWEB HITS:\n{web_block}" if web_block else ""),
+            "medium", 0.0, 250)
         dd = _json(raw)
         return (bool(dd.get("occupied")), str(dd.get("ref", ""))[:120])
     except Exception:
