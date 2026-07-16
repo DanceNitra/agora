@@ -425,6 +425,28 @@ class CorporationWorker:
             print(f"[seed] escalation failed: {e}")
             return (None, None)
 
+    async def _lead_is_textbook(self, question: str) -> bool:
+        """Novelty gate for Crucible leads: is this research question an already-established, textbook /
+        named-law result a specialist would recognize as settled? True => do not seed it. Fail-open
+        (return False) on any error, so the gate never silently starves the board."""
+        try:
+            import asyncio
+            from agora.execution.llm_client import call_llm
+            raw = await asyncio.to_thread(
+                call_llm,
+                system_prompt=("You are a strict domain expert screening research questions for an "
+                               "autonomous lab. Is the QUESTION already settled by an established, textbook / "
+                               "named-law result (self-organized criticality, power-law tails, tipping/critical "
+                               "fraction, phase transition, regression to the mean, majority-vote — all known)? "
+                               "Reply ONLY JSON: {\"known\":true|false}."),
+                user_prompt=f"QUESTION: {question}", tier="cheap", temperature=0.0, max_tokens=60)
+            import json as _json
+            import re as _re
+            m = _re.search(r"\{.*\}", raw or "", _re.DOTALL)
+            return bool(_json.loads(m.group(0)).get("known")) if m else False
+        except Exception:
+            return False
+
     async def _seed_research_frontier(self) -> Optional[dict]:
         """Seed the QuestBoard with a HARD, ORIGINAL research question drawn from REAL
         vault gaps — open flywheel falsifiers, belief contradictions, and structural
@@ -500,6 +522,13 @@ class CorporationWorker:
             if esc_q:
                 short = esc_q[:150]
                 prompt = esc_q + (f"\nFalsifier to target: {esc_f}" if esc_f else "")
+
+            # NOVELTY GATE (owner RAISED BAR 2026-07-16, flag AGORA_NOVELTY_GATE default ON): the escalation
+            # ASKS for open-not-textbook but does not VERIFY it — which is how the flywheel / power-law /
+            # self-organized-criticality / critical-fraction flood got seeded. Verify: if the final question
+            # is an already-established textbook result, DO NOT seed it (quality over quantity). Reversible.
+            if os.getenv("AGORA_NOVELTY_GATE", "1") != "0" and await self._lead_is_textbook(short):
+                return None
 
             quest_id = f"frontier-{kind}-{datetime.now().strftime('%Y%m%d_%H%M%S')}"
             title = f"Research question: {short}"
