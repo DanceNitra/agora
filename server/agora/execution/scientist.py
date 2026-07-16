@@ -37,21 +37,52 @@ async def hypothesize_and_test(topic: str, vault_path: str) -> dict:
     # Orin rebuild: a hypothesis must name a concrete MECHANISM + a predicted DIRECTION/quantity a minimal
     # computational model could measure — so it is genuinely severe-testable AND maps to a Methods template
     # (raises Rooke's match + the quality of what gets tested), not a vague sentence.
+    # RAISED BAR (owner 2026-07-16, "the mill re-derives textbook"): the old prompt listed textbook
+    # claim-shapes (power-law, tipping, regression-to-mean...) — the very reason the output re-derived
+    # Albert-Barabasi / Staiger-Stock. Steer instead to an OPEN question at the edge of the given claims
+    # that is still computationally settleable, then GATE out anything a domain expert already knows.
     sysmsg = (
-        "Propose ONE NEW, specific, TESTABLE hypothesis about the topic — a single declarative sentence "
-        "that names a concrete MECHANISM and a PREDICTED DIRECTION or quantity a minimal computational "
-        "model could measure (e.g. 'X raises Y', 'the effect vanishes when Z', 'the distribution is "
-        "power-law, not lognormal', 'a committed minority above fraction f flips consensus'). Favour "
-        "claim-shapes a simulation can settle: streaks/runs, tipping/cascades, selection or "
-        "multiple-testing bias, scale-free/heavy-tail, regression-to-mean, ensemble-vs-individual, "
-        "critical-slowing-down. If prior claims are given, extend or challenge them (don't restate). "
-        "Reply ONLY the hypothesis sentence, nothing else.")
+        "Propose ONE hypothesis about the topic — a single declarative sentence naming a concrete MECHANISM "
+        "and a predicted DIRECTION or quantity a minimal computational model could measure. HARD REQUIREMENT: "
+        "it must be a GENUINELY OPEN question at the frontier of the given claims — something a domain expert "
+        "would NOT already know the answer to. Do NOT restate a known named law or textbook result (e.g. "
+        "hubs-fail-worse-than-random, weak-instrument-bias, regression-to-the-mean, power-law-tails); those "
+        "are already established and are WORTHLESS to us. Find the specific UNSETTLED edge: a boundary "
+        "condition, an interaction nobody has isolated, a regime where the known rule might break. If prior "
+        "claims are given, extend or challenge them, never restate. Reply ONLY the hypothesis sentence.")
     usr = f"Topic: {topic}\nAlready claimed:\n{known}"
-    hyp = (await asyncio.to_thread(call_llm, sysmsg, usr, "cheap", 0.5, 160) or "").strip().strip('"')
+    hyp = (await asyncio.to_thread(call_llm, sysmsg, usr, "cheap", 0.6, 160) or "").strip().strip('"')
     if not hyp:                                         # the LLM occasionally returns empty — retry once
         hyp = (await asyncio.to_thread(call_llm, sysmsg, usr, "cheap", 0.7, 200) or "").strip().strip('"')
     if not hyp:
         return {"topic": topic, "hypothesis": "", "verdict": "NONE", "known": b.get("claims", [])}
+
+    # NOVELTY GATE (owner's RAISED BAR; flag AGORA_NOVELTY_GATE, default ON — set "0" to revert). Kill
+    # textbook re-derivations at generation: ask whether the hypothesis is an already-established known
+    # result; if so, regenerate ONCE told exactly what known result it echoed; if still textbook, produce
+    # NOTHING (verdict NONE) — a genuinely-open miss beats a textbook hit.
+    if os.getenv("AGORA_NOVELTY_GATE", "1") != "0":
+        async def _is_textbook(h):
+            raw = await asyncio.to_thread(
+                call_llm,
+                "You are a strict domain expert. Is the HYPOTHESIS an already-established, textbook / "
+                "named-law result that a specialist would recognize as known (the answer is settled)? "
+                "Reply ONLY JSON: {\"known\":true|false,\"result\":\"<the established result/law it "
+                "matches, or empty>\"}.", f"HYPOTHESIS: {h}", "cheap", 0.0, 200)
+            d = _json(raw)
+            return bool(d.get("known")), str(d.get("result", ""))[:200]
+        known_tb, named = await _is_textbook(hyp)
+        if known_tb:
+            hyp2 = (await asyncio.to_thread(
+                call_llm, sysmsg + f"\n\nYour previous attempt was TEXTBOOK — it just restates the known "
+                f"result: {named}. Propose instead a genuinely OPEN question that is NOT this.",
+                usr, "cheap", 0.8, 200) or "").strip().strip('"')
+            still_tb, _ = await _is_textbook(hyp2) if hyp2 else (True, "")
+            if hyp2 and not still_tb:
+                hyp = hyp2
+            else:
+                return {"topic": topic, "hypothesis": "", "verdict": "NONE",
+                        "known": b.get("claims", []), "skipped": f"textbook: {named}"}
 
     # SEVERE-TEST PATH (AGORA_SCIENTIST_LAB=1): a REAL Lab run via the Methods Library + a pre-commitment,
     # instead of the LLM-vibe-check below. No measured number -> verdict NONE, NOT recorded. (proof step;
