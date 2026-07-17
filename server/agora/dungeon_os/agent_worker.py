@@ -1087,13 +1087,26 @@ class CorporationWorker:
         stop = {"the", "a", "an", "of", "in", "on", "for", "and", "or", "to", "at", "is", "are", "does",
                 "with", "that", "this", "which", "from", "into", "their", "its", "vs", "via"}
         def words(t):
-            return {w for w in _re.findall(r"[a-z][a-z-]{2,}", (t or "").lower()) if w not in stop}
+            # normalize: split hyphens + strip plural 's' so 'self-referential meta-rules' matches
+            # a recorded 'self-generated meta-rule' theme (the generator rewords between emissions)
+            raw = _re.findall(r"[a-z][a-z-]{2,}", (t or "").lower())
+            out = set()
+            for w in raw:
+                for part in w.split("-"):
+                    if len(part) < 3 or part in stop:
+                        continue
+                    if part.endswith("ies") and len(part) > 4:
+                        part = part[:-3] + "y"
+                    elif part.endswith("s") and len(part) > 4:
+                        part = part[:-1]
+                    out.add(part)
+            return out
         lead = words(title) | words(summary)
         if not lead:
             return ""
         for theme in skipped_themes():
             tw = words(theme)
-            if tw and len(tw & lead) / len(tw) >= 0.6:
+            if tw and len(tw & lead) / len(tw) >= 0.5:
                 return f"gatekeeper-skipped theme: {theme[:60]}"
         for txt in recent_texts():
             core = txt.split("||")[0] + " " + (txt.split("RESEARCH:")[1][:300] if "RESEARCH:" in txt else "")
