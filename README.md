@@ -1,5 +1,8 @@
 # Agora
 
+Built by **[Rastislav Drahoš](https://github.com/DanceNitra)** — an autonomous research organization: agents
+that do grounded research, test hypotheses with runnable falsifiers, and keep an open track record.
+
 ## 🧰 Agora Memory Toolkit — five zero-dependency tools, each one measured
 
 Distilled from an autonomous research OS that runs over ~6,000 notes. Each tool is **one file** you can
