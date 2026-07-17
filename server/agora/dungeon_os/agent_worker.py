@@ -199,7 +199,17 @@ class CorporationWorker:
             # as a shippable proposal. Claude ships the ones with merit, skips the thin.
             if eval_result and eval_result.get("approved"):
                 if not self._research_grounded(quest.get("research_summary") or ""):
-                    print(f"[Corp] approved lead DROPPED (research found no grounding): {(quest.get('title') or '')[:50]}")
+                    title = (quest.get("title") or "")
+                    print(f"[Corp] approved lead DROPPED (research found no grounding): {title[:50]}")
+                    try:
+                        # self-healing: an ungroundable lead's theme goes straight into the gatekeeper
+                        # ledger, so the seed-time filter never re-seeds this family — the loop closes.
+                        from agora.execution.gatekeeper import record_skip
+                        theme = title.replace("Research question:", "").strip()[:80]
+                        if len(theme) >= 12:
+                            record_skip(theme, "corp research found no grounding (auto-recorded at drop)")
+                    except Exception:
+                        pass
                     await self._mark_handed_off(quest.get("id", ""))
                 else:
                     self._file_ship_review(quest, eval_result)
@@ -407,12 +417,20 @@ class CorporationWorker:
                 "You are a Frontier Scout for an autonomous research organization. Here is a raw research lead:\n"
                 f"KIND: {kind}\nQUESTION: {prompt}\n\n"
                 "Treat it as the SHALLOW first draft. Produce the AMBITIOUS version of the SAME underlying "
-                "question: the version that would matter 10x more if answered, and/or bridges two domains that "
-                "rarely meet, and/or contradicts an assumption most people hold. HARD CONSTRAINTS: it must stay "
-                "genuinely OPEN (NOT a re-derivation of a known named result — regression to the mean, collider "
-                "bias, survivorship, ripple effects, majority-vote are textbook), and it must be MEASURABLE with "
-                "a small model (a number, threshold, exponent, or rate) via a NON-circular measurement. Bar: "
-                "could this stand as serious science?\n\n"
+                "question — the version that would matter 10x more if answered. HARD CONSTRAINTS:\n"
+                "1. ANCHORED: the question must name the CONCRETE system, dataset, or published literature it "
+                "would be measured against (a real benchmark, a real corpus, a named paper's setup). A question "
+                "with no named anchor is speculation — do not produce it.\n"
+                "2. SAME SUBJECT: stay in the raw lead's domain. Do NOT drift into generic complexity-science "
+                "framing. BANNED unless the raw lead itself already contains a cited instance: 'phase "
+                "transition', 'critical density/threshold/fraction', 'universal scaling/exponent', "
+                "'self-organized criticality', 'emergent criticality'. These framings are this lab's measured "
+                "failure mode — they generate unanswerable questions that research cannot ground.\n"
+                "3. OPEN: not a re-derivation of a known named result (regression to the mean, collider bias, "
+                "survivorship, ripple effects, majority-vote are textbook).\n"
+                "4. MEASURABLE: prefer the shape 'measure X on <named system> and compare to <named baseline or "
+                "published value>' — runnable as a small computational experiment via a NON-circular measurement.\n"
+                "If the raw lead cannot be escalated within these constraints, reply exactly: QUESTION: NONE\n\n"
                 "Reply with exactly two lines:\nQUESTION: <one sharp sentence>\nFALSIFIER: <the single result that would kill it>"
             )
             raw = await asyncio.to_thread(call_llm, system_prompt="", user_prompt=esc_prompt,
@@ -424,6 +442,8 @@ class CorporationWorker:
                     q = u.split(":", 1)[1].strip()
                 elif u.upper().startswith("FALSIFIER:"):
                     f = u.split(":", 1)[1].strip()
+            if q.strip().upper().rstrip(".") == "NONE":
+                return (None, None)
             return (q, f) if q else (None, None)
         except Exception as e:
             print(f"[seed] escalation failed: {e}")
@@ -513,6 +533,12 @@ class CorporationWorker:
 
             lead = None
             for c in candidates:
+                why = self._lead_saturated(c[1], c[2])
+                if why:
+                    # a gatekeeper-skipped / near-duplicate family must not even reach the board —
+                    # seeding it burns a full research+eval cycle on a question we already refused.
+                    print(f"[seed] candidate filtered ({why[:60]}): {c[1][:50]}")
+                    continue
                 if not await _recently_seeded(f"Research question: {c[1]}"):
                     lead = c
                     break
