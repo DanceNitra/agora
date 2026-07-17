@@ -198,15 +198,19 @@ class CorporationWorker:
             # Corp researched an idea and its CEO/CTO approved it → file it to Claude
             # as a shippable proposal. Claude ships the ones with merit, skips the thin.
             if eval_result and eval_result.get("approved"):
-                self._file_ship_review(quest, eval_result)
-                await self._mark_handed_off(quest.get("id", ""))
+                if not self._research_grounded(quest.get("research_summary") or ""):
+                    print(f"[Corp] approved lead DROPPED (research found no grounding): {(quest.get('title') or '')[:50]}")
+                    await self._mark_handed_off(quest.get("id", ""))
+                else:
+                    self._file_ship_review(quest, eval_result)
+                    await self._mark_handed_off(quest.get("id", ""))
             # REPOINT (owner 2026-06-26): a board NEAR-MISS (not ship-approved but with a decent
             # score and real research) still carries lead value — surface it to Claude as a research
             # DOSSIER instead of letting it die in HEAD. The score is a priority hint, not a kill
             # switch; Claude develops the ambitious ones and archives the rest (RAISED BAR).
             elif eval_result and not eval_result.get("approved"):
                 _score = max(eval_result.get("cto_score", 0) or 0, eval_result.get("ceo_score", 0) or 0)
-                _has_research = bool(quest.get("research_summary") or quest.get("findings_path"))
+                _has_research = self._research_grounded(quest.get("research_summary") or "") or bool(quest.get("findings_path"))
                 if _score >= 55 and _has_research:
                     self._file_research_dossier(quest, eval_result)
                     await self._mark_handed_off(quest.get("id", ""))
@@ -1070,6 +1074,23 @@ class CorporationWorker:
             "completed_at": _safe_get("completed_at"),
         }
 
+
+
+    @staticmethod
+    def _research_grounded(summary: str) -> bool:
+        """The corp's own research step writes the finding into research_summary. For the speculative
+        phase-transition/critical-density flood, that summary literally says it found NOTHING ('Neither
+        provided source addresses...', 'No sources were available', 'do not contain evidence'). Filing such a
+        lead as a Crucible candidate is the root of the daily inbox churn — the corp already knows it's
+        ungrounded. Return False for those so they are dropped at filing time, not triaged downstream."""
+        s = (summary or "").lower()
+        if len(s) < 20:
+            return False
+        ungrounded = ("no sources", "neither provided source", "neither source", "not contain evidence",
+                      "do not address", "does not address", "no external sources", "were not provided",
+                      "not publicly available", "no reliable sources", "unable to find", "could not find",
+                      "no grounding", "no supporting", "no direct source", "sources do not")
+        return not any(m in s for m in ungrounded)
 
     @staticmethod
     def _lead_saturated(title: str, summary: str) -> str:
