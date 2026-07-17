@@ -1070,6 +1070,38 @@ class CorporationWorker:
             "completed_at": _safe_get("completed_at"),
         }
 
+
+    @staticmethod
+    def _lead_saturated(title: str, summary: str) -> str:
+        """Root-cause guard for the daily inbox flood: a lead is refused at FILING time if (a) it matches a
+        theme Claude editorially skipped via the gatekeeper (the generators kept re-offering 'memory-capacity
+        threshold' variants 20x/day), or (b) its title+summary is a near-duplicate of a recently filed task.
+        Returns the refusal reason, or '' if the lead is fresh. Checks the LEAD text only (not the shared
+        instruction boilerplate, which inflates whole-task Jaccard past the inbox's 0.82 gate)."""
+        import re as _re
+        try:
+            from agora.execution.gatekeeper import skipped_themes
+            from agora.execution.claude_inbox import recent_texts
+        except Exception:
+            return ""
+        stop = {"the", "a", "an", "of", "in", "on", "for", "and", "or", "to", "at", "is", "are", "does",
+                "with", "that", "this", "which", "from", "into", "their", "its", "vs", "via"}
+        def words(t):
+            return {w for w in _re.findall(r"[a-z][a-z-]{2,}", (t or "").lower()) if w not in stop}
+        lead = words(title) | words(summary)
+        if not lead:
+            return ""
+        for theme in skipped_themes():
+            tw = words(theme)
+            if tw and len(tw & lead) / len(tw) >= 0.6:
+                return f"gatekeeper-skipped theme: {theme[:60]}"
+        for txt in recent_texts():
+            core = txt.split("||")[0] + " " + (txt.split("RESEARCH:")[1][:300] if "RESEARCH:" in txt else "")
+            ow = words(core)
+            if ow and len(lead & ow) / max(1, len(lead | ow)) >= 0.45:
+                return f"near-duplicate of a recent task: {txt[:60]}"
+        return ""
+
     def _file_ship_review(self, quest: dict, ev: dict) -> None:
         """An idea the corp RESEARCHED and its CEO/CTO approved → file it to Claude's
         inbox as a 'Ship-review' proposal. Claude develops the promising ones into
@@ -1079,6 +1111,14 @@ class CorporationWorker:
             from agora.execution.claude_inbox import add_task
             title = (quest.get("title") or "untitled idea")[:90]
             summary = (quest.get("research_summary") or quest.get("goal") or "")[:600]
+            why_refused = self._lead_saturated(title, summary)
+            if why_refused:
+                print(f"[Corp->Claude] dossier REFUSED ({why_refused}): {title[:50]}")
+                return
+            why_refused = self._lead_saturated(title, summary)
+            if why_refused:
+                print(f"[Corp→Claude] ship-review REFUSED ({why_refused}): {title[:50]}")
+                return
             src = quest.get("research_source") or quest.get("findings_path") or ""
             why = (ev.get("ceo_rationale") or ev.get("cto_rationale") or "")[:200]
             text = (
