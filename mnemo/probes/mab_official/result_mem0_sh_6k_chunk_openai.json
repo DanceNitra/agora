@@ -1,0 +1,12 @@
+{
+ "condition": "mem0",
+ "sample": "sh_6k",
+ "ingest": "chunk",
+ "llm": "openai",
+ "n": 40,
+ "correct": 5,
+ "accuracy": 0.125,
+ "answerer": "gpt-4o-mini",
+ "scoring": "official substring_exact_match max-over-golds",
+ "prompt": "official factconsolidation query template"
+}

@@ -1,0 +1,26 @@
+{
+ "n": 6,
+ "topk": 5,
+ "model": "gpt-4o-mini",
+ "metric_note": "surface_clean_rate is deterministic and LLM-free (poison value absent from the retrieved top-k surface); reader_resist_rate is the temp=0 downstream reader consequence. Raw surfaces saved per system in poison_realistic_surfaces_<system>.json for independent re-scoring.",
+ "results": {
+  "mem0": {
+   "surface_clean_rate": 0.0,
+   "reader_resist_rate": 0.0,
+   "resisted": 0,
+   "poisoned": 0,
+   "unclear": 0,
+   "empty_surface": 0,
+   "n": 6
+  },
+  "graphiti": {
+   "surface_clean_rate": 0.167,
+   "reader_resist_rate": 0.0,
+   "resisted": 0,
+   "poisoned": 0,
+   "unclear": 0,
+   "empty_surface": 3,
+   "n": 6
+  }
+ }
+}

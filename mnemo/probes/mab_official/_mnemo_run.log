@@ -1,0 +1,15 @@
+MAB Conflict Resolution (FactConsolidation sh_6k) · OFFICIAL data+scoring+prompt · answerer=deepseek-v4-flash · mnemo · n=100 · facts=455
+  [warm] cached 555 embeddings
+  mnemo 10/100  correct=10
+  mnemo 20/100  correct=20
+  mnemo 30/100  correct=30
+  mnemo 40/100  correct=40
+  mnemo 50/100  correct=50
+  mnemo 60/100  correct=60
+  mnemo 70/100  correct=70
+  mnemo 80/100  correct=79
+  mnemo 90/100  correct=88
+  mnemo 100/100  correct=97
+
+=== mnemo: 97/100 = 97.0%  (316s, 0 live-embed fallbacks) ===
+  published CR single-hop (gpt-4o-mini answerer, arXiv:2507.05257 Tab.2/11): GPT-4o long-ctx 60% (88% @32K) · HippoRAG-v2 54% · BM25-RAG 56% · mem0 18% (22% @32K). multi-hop: ALL <7%.

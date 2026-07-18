@@ -1,0 +1,8 @@
+{
+ "system": "graphiti",
+ "n": 15,
+ "correct": 0,
+ "accuracy": 0.0,
+ "graph_llm": "gpt-4o",
+ "answerer": "gpt-4o-mini"
+}

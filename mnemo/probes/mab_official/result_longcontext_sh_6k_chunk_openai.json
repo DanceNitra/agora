@@ -1,0 +1,12 @@
+{
+ "condition": "longcontext",
+ "sample": "sh_6k",
+ "ingest": "chunk",
+ "llm": "openai",
+ "n": 100,
+ "correct": 83,
+ "accuracy": 0.83,
+ "answerer": "gpt-4o-mini",
+ "scoring": "official substring_exact_match max-over-golds",
+ "prompt": "official factconsolidation query template"
+}

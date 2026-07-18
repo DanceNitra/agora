@@ -1,0 +1,12 @@
+{
+ "condition": "mnemo",
+ "sample": "sh_6k",
+ "ingest": "chunk",
+ "llm": "deepseek",
+ "n": 100,
+ "correct": 100,
+ "accuracy": 1.0,
+ "answerer": "deepseek-v4-flash",
+ "scoring": "official substring_exact_match max-over-golds",
+ "prompt": "official factconsolidation query template"
+}

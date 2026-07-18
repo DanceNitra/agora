@@ -1,0 +1,18 @@
+{
+ "dataset": "MemoryAgentBench/Conflict_Resolution/factconsolidation_sh_6k_no0",
+ "n": 100,
+ "top_k": 5,
+ "answerer": "deepseek-v4-flash",
+ "results": {
+  "naive": {
+   "correct": 75,
+   "stale_in_ctx": 80
+  },
+  "mnemo": {
+   "correct": 95,
+   "stale_in_ctx": 38
+  }
+ },
+ "lift": 0.2,
+ "conflict_keys": 122
+}

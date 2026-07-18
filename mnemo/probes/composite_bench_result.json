@@ -1,0 +1,34 @@
+{
+ "n": 40,
+ "pass_threshold": 0.75,
+ "rows": {
+  "mnemo": {
+   "fidelity": 1.0,
+   "poison-resistance": 1.0,
+   "verifiable-forgetting": 1.0,
+   "revert-on-command": 1.0,
+   "determinism": 1.0
+  },
+  "naive": {
+   "fidelity": 1.0,
+   "poison-resistance": 0.0,
+   "verifiable-forgetting": 0.0,
+   "revert-on-command": 0.0,
+   "determinism": 1.0
+  },
+  "mem0 (live)": {
+   "fidelity": 0.125,
+   "poison-resistance": null,
+   "verifiable-forgetting": 0.375,
+   "revert-on-command": 0.2,
+   "determinism": 0.7
+  },
+  "graphiti (live)": {
+   "fidelity": 0.0,
+   "poison-resistance": null,
+   "verifiable-forgetting": 1.0,
+   "revert-on-command": 0.0,
+   "determinism": null
+  }
+ }
+}

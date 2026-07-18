@@ -1,0 +1,11 @@
+{
+ "condition": "mem0",
+ "sample": "sh_6k",
+ "ingest": "chunk",
+ "n": 100,
+ "correct": 4,
+ "accuracy": 0.04,
+ "answerer": "deepseek-v4-flash",
+ "scoring": "official substring_exact_match max-over-golds",
+ "prompt": "official factconsolidation query template"
+}

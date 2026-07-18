@@ -1,0 +1,25 @@
+{
+ "harness": "MAB Conflict Resolution / FactConsolidation sh_6k, OFFICIAL data+prompt+scoring, MAB mem0 config replicated: agent_chunk_size=4096, retrieve_num=100, temperature=0.7 (openai), n=100",
+ "validation": "mem0 gpt-4o-mini = 16% REPRODUCES the published mem0 CR-SH ~18% (arXiv:2507.05257 Tab.2) -> our harness is faithful to the leaderboard methodology.",
+ "matrix_gpt4omini": {
+  "longcontext": 0.83,
+  "mnemo_verbatim": 0.85,
+  "naive_verbatim": 0.87,
+  "mem0_extraction": 0.16
+ },
+ "matrix_deepseek": {
+  "longcontext": 1.0,
+  "mnemo_verbatim": 1.0,
+  "naive_verbatim": 0.98,
+  "mem0_512k10": 0.04
+ },
+ "read": [
+  "ROBUST: on MAB's faithful protocol + gpt-4o-mini (the published config), mem0's LLM-extraction memory = 16% (reproduces published 18%) while a verbatim memory (mnemo 85%, naive 87%, longcontext 83%) is ~5x higher. Same answerer/protocol/data. mem0 destroys facts extracting from 228-fact chunks; verbatim stores keep them.",
+  "HONEST CAVEAT: mnemo 85% is within noise of naive 87% and longcontext 83% -> at sh_6k the differentiator is VERBATIM FACT PRESERVATION (which mnemo has and mem0 lacks), NOT supersession. naive (de-keyed verbatim) TIES/EDGES mnemo because chunk-ingest gives mnemo no per-fact keys to supersede on.",
+  "answerer sets the ceiling (deepseek 100%, gpt-4o-mini 83%); every verbatim store tracks it, mem0 falls ~5x below it.",
+  "temp=0.7 (MAB faithful) adds run-to-run variance; the 5x mem0 gap is robust to it, the mnemo-vs-naive 2pt tie is within it. 3x repeat would tighten the exact verbatim numbers.",
+  "the mnemo-SPECIFIC mechanism (keyed supersession) is NOT exercised by MAB's chunk-dump protocol; it needs either the atomic-keyed contract (mnemo 97% earlier) or sh_32k/64k retrieval pressure to show."
+ ],
+ "product_claim_honest": "mnemo preserves facts where mem0's LLM extraction destroys them: on MAB Conflict Resolution (faithful, reproduces mem0's published 18%), a verbatim mnemo scores ~5x mem0. Frame as 'deterministic/verbatim memory beats lossy LLM-extraction memory', with supersession as the additional integrity layer.",
+ "gate_status": "NOT yet run through validate->storm->audit->verify; required before ANY outward use."
+}

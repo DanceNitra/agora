@@ -1,0 +1,26 @@
+{
+ "poison": "exact",
+ "engine": "Claude Code (no LLM API)",
+ "results": {
+  "mnemo_poison": {
+   "hit": 12,
+   "n": 12,
+   "acc": 1.0
+  },
+  "naive_poison": {
+   "hit": 12,
+   "n": 12,
+   "acc": 1.0
+  },
+  "mnemo_legit": {
+   "hit": 12,
+   "n": 12,
+   "acc": 1.0
+  },
+  "naive_legit": {
+   "hit": 12,
+   "n": 12,
+   "acc": 1.0
+  }
+ }
+}

@@ -41,6 +41,11 @@ for line in open(os.path.join(os.path.dirname(__file__), "..", "..", "server", "
 OLLAMA_CLOUD = "https://ollama.com/v1"
 OLLAMA_KEY = _env.get("AGORA_API_KEY", "")
 CHEAP_MODEL = "deepseek-v4-flash"
+# GATE re-verify on live gpt-4o (owner 2026-07-18): FVX_MODEL=gpt-4o points mem0/graphiti LLM at OpenAI.
+if os.environ.get("FVX_MODEL", "").startswith("gpt"):
+    CHEAP_MODEL = os.environ["FVX_MODEL"]
+    OLLAMA_CLOUD = "https://api.openai.com/v1"
+    OLLAMA_KEY = _env.get("OPENAI_API_KEY", "")
 
 SURFACES = ["query", "enumerate", "history", "raw_storage"]
 

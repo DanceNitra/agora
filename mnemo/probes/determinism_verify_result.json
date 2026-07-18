@@ -1,0 +1,177 @@
+{
+ "model": "gpt-4o",
+ "runs": 3,
+ "results": {
+  "mnemo": {
+   "nondeterminism_rate": 0.0,
+   "unstable": 0,
+   "n": 10,
+   "per_subject": {
+    "Thomas Kyd was born in the city of": [
+     "Bonly",
+     "Bonly",
+     "Bonly"
+    ],
+    "The chairperson of Fatah": [
+     "Bonly",
+     "Bonly",
+     "Bonly"
+    ],
+    "Hines Ward plays the position of": [
+     "Bonly",
+     "Bonly",
+     "Bonly"
+    ],
+    "Bengaluru is located in the continent of": [
+     "Bonly",
+     "Bonly",
+     "Bonly"
+    ],
+    "Rog\u00e9rio Ceni plays the position of": [
+     "Bonly",
+     "Bonly",
+     "Bonly"
+    ],
+    "The director of British Broadcasting Corporation": [
+     "Bonly",
+     "Bonly",
+     "Bonly"
+    ],
+    "The author of A Wizard of Earthsea": [
+     "Bonly",
+     "Bonly",
+     "Bonly"
+    ],
+    "The headquarters of University of California, Berkeley": [
+     "Bonly",
+     "Bonly",
+     "Bonly"
+    ],
+    "The chief executive officer of Apple Inc.": [
+     "Bonly",
+     "Bonly",
+     "Bonly"
+    ],
+    "Lisa Leslie plays the position of": [
+     "Bonly",
+     "Bonly",
+     "Bonly"
+    ]
+   }
+  },
+  "mem0_temp0.0": {
+   "nondeterminism_rate": 0.1,
+   "unstable": 1,
+   "n": 10,
+   "per_subject": {
+    "Thomas Kyd was born in the city of": [
+     "both",
+     "both",
+     "both"
+    ],
+    "The chairperson of Fatah": [
+     "both",
+     "Aonly",
+     "both"
+    ],
+    "Hines Ward plays the position of": [
+     "both",
+     "both",
+     "both"
+    ],
+    "Bengaluru is located in the continent of": [
+     "Aonly",
+     "Aonly",
+     "Aonly"
+    ],
+    "Rog\u00e9rio Ceni plays the position of": [
+     "both",
+     "both",
+     "both"
+    ],
+    "The director of British Broadcasting Corporation": [
+     "both",
+     "both",
+     "both"
+    ],
+    "The author of A Wizard of Earthsea": [
+     "Aonly",
+     "Aonly",
+     "Aonly"
+    ],
+    "The headquarters of University of California, Berkeley": [
+     "both",
+     "both",
+     "both"
+    ],
+    "The chief executive officer of Apple Inc.": [
+     "both",
+     "both",
+     "both"
+    ],
+    "Lisa Leslie plays the position of": [
+     "both",
+     "both",
+     "both"
+    ]
+   }
+  },
+  "mem0_temp0.7": {
+   "nondeterminism_rate": 0.3,
+   "unstable": 3,
+   "n": 10,
+   "per_subject": {
+    "Thomas Kyd was born in the city of": [
+     "both",
+     "both",
+     "both"
+    ],
+    "The chairperson of Fatah": [
+     "both",
+     "both",
+     "Aonly"
+    ],
+    "Hines Ward plays the position of": [
+     "both",
+     "both",
+     "both"
+    ],
+    "Bengaluru is located in the continent of": [
+     "Aonly",
+     "Aonly",
+     "Aonly"
+    ],
+    "Rog\u00e9rio Ceni plays the position of": [
+     "both",
+     "both",
+     "both"
+    ],
+    "The director of British Broadcasting Corporation": [
+     "both",
+     "both",
+     "both"
+    ],
+    "The author of A Wizard of Earthsea": [
+     "Aonly",
+     "Aonly",
+     "Aonly"
+    ],
+    "The headquarters of University of California, Berkeley": [
+     "both",
+     "both",
+     "both"
+    ],
+    "The chief executive officer of Apple Inc.": [
+     "both",
+     "both",
+     "Aonly"
+    ],
+    "Lisa Leslie plays the position of": [
+     "both",
+     "Aonly",
+     "Aonly"
+    ]
+   }
+  }
+ }
+}

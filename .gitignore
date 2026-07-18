@@ -169,3 +169,17 @@ mnemo/probes/_stress_*.log
 mnemo_pypi/mnemo/__pycache__/
 agora_output/dmrg/_*
 agora_output/forecast/*_cache.json
+
+# transient probe/benchmark artifacts (logs, batches, caches) — keep the .py + result summaries, drop the noise
+mnemo/probes/_*.log
+mnemo/probes/_*.err
+mnemo/probes/_*.json
+mnemo/probes/*_batch*.json
+mnemo/probes/lqp_*.json
+mnemo/probes/locomo_qa_answers*.json
+mnemo/probes/locomo_qa_batch*.json
+mnemo/probes/poison_realistic_surfaces_*.json
+**/__pycache__/
+*.pyc
+*.egg-info/
+.mnemo/

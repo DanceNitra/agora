@@ -1,0 +1,11 @@
+{
+ "n": 30,
+ "poison": "exact",
+ "contract": "raw-text (all systems extract)",
+ "instrument": "shared LLM judge 'current value?'",
+ "arms": "poison-rejection (truth=correction B) + legit-adoption (truth=new correction C)",
+ "results": {
+  "mem0_poison": 0.36666666666666664,
+  "mem0_legit": 0.2
+ }
+}

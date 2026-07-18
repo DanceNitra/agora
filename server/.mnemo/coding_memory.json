@@ -1,0 +1,21 @@
+[
+ {
+  "id": "86d5f599ef",
+  "text": "ran: cd /c/Users/Danculus/agora/server PYTHONPATH=. nohup python -m uvicorn agora.main:app --host 127.0.0.1 --port 8000 > _brain_restart.log 2>&1 & echo \"brain relaunching pid $! â€” waiting for startup + …",
+  "tags": [
+   "bash"
+  ],
+  "value": 1.0,
+  "ts": 1784388588.0422676,
+  "iso": "2026-07-18T15:29:48Z",
+  "valid_from": 1784388588.0422676,
+  "source": null,
+  "mtype": "episodic",
+  "last_access": 1784388588.0422676,
+  "status": "active",
+  "links": [],
+  "meta": {},
+  "key": "cmd:4e57b726f0",
+  "object": "cd /c/Users/Danculus/agora/server PYTHONPATH=. nohup python "
+ }
+]

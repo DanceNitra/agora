@@ -1,0 +1,46 @@
+{
+ "n": 20,
+ "poison": "paraphrase",
+ "extractor": "semantic",
+ "runs": 3,
+ "contract": "raw-text (all systems extract)",
+ "instrument": "shared LLM judge 'current value?'",
+ "results": {
+  "mnemo_poison": {
+   "mean": 0.0,
+   "runs": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "spread": 0.0
+  },
+  "naive_poison": {
+   "mean": 0.0,
+   "runs": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "spread": 0.0
+  },
+  "mnemo_legit": {
+   "mean": 0.0,
+   "runs": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "spread": 0.0
+  },
+  "naive_legit": {
+   "mean": 0.0,
+   "runs": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "spread": 0.0
+  }
+ }
+}

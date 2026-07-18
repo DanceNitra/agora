@@ -1,0 +1,48 @@
+########## naive ##########
+MAB Conflict Resolution (FactConsolidation sh_6k) · OFFICIAL data+scoring+prompt · answerer=deepseek-v4-flash · naive · n=100 · facts=455
+  [warm] cached 555 embeddings
+  naive 10/100  correct=9
+  naive 20/100  correct=19
+  naive 30/100  correct=29
+  naive 40/100  correct=39
+  naive 50/100  correct=49
+  naive 60/100  correct=58
+  naive 70/100  correct=67
+  naive 80/100  correct=77
+  naive 90/100  correct=87
+  naive 100/100  correct=96
+
+=== naive: 96/100 = 96.0%  (240s, 0 live-embed fallbacks) ===
+  published CR single-hop (gpt-4o-mini answerer, arXiv:2507.05257 Tab.2/11): GPT-4o long-ctx 60% (88% @32K) · HippoRAG-v2 54% · BM25-RAG 56% · mem0 18% (22% @32K). multi-hop: ALL <7%.
+########## naive_drop ##########
+MAB Conflict Resolution (FactConsolidation sh_6k) · OFFICIAL data+scoring+prompt · answerer=deepseek-v4-flash · naive_drop · n=100 · facts=455
+  [warm] cached 555 embeddings
+  naive_drop 10/100  correct=8
+  naive_drop 20/100  correct=13
+  naive_drop 30/100  correct=20
+  naive_drop 40/100  correct=27
+  naive_drop 50/100  correct=33
+  naive_drop 60/100  correct=40
+  naive_drop 70/100  correct=47
+  naive_drop 80/100  correct=54
+  naive_drop 90/100  correct=61
+  naive_drop 100/100  correct=67
+
+=== naive_drop: 67/100 = 67.0%  (322s, 0 live-embed fallbacks) ===
+  published CR single-hop (gpt-4o-mini answerer, arXiv:2507.05257 Tab.2/11): GPT-4o long-ctx 60% (88% @32K) · HippoRAG-v2 54% · BM25-RAG 56% · mem0 18% (22% @32K). multi-hop: ALL <7%.
+########## longcontext ##########
+MAB Conflict Resolution (FactConsolidation sh_6k) · OFFICIAL data+scoring+prompt · answerer=deepseek-v4-flash · longcontext · n=100 · facts=455
+  longcontext 10/100  correct=10
+  longcontext 20/100  correct=20
+  longcontext 30/100  correct=30
+  longcontext 40/100  correct=40
+  longcontext 50/100  correct=50
+  longcontext 60/100  correct=60
+  longcontext 70/100  correct=70
+  longcontext 80/100  correct=80
+  longcontext 90/100  correct=90
+  longcontext 100/100  correct=100
+
+=== longcontext: 100/100 = 100.0%  (257s, 0 live-embed fallbacks) ===
+  published CR single-hop (gpt-4o-mini answerer, arXiv:2507.05257 Tab.2/11): GPT-4o long-ctx 60% (88% @32K) · HippoRAG-v2 54% · BM25-RAG 56% · mem0 18% (22% @32K). multi-hop: ALL <7%.
+########## ALL CONTROLS DONE ##########

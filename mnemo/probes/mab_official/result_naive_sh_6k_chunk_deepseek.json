@@ -1,0 +1,12 @@
+{
+ "condition": "naive",
+ "sample": "sh_6k",
+ "ingest": "chunk",
+ "llm": "deepseek",
+ "n": 100,
+ "correct": 98,
+ "accuracy": 0.98,
+ "answerer": "deepseek-v4-flash",
+ "scoring": "official substring_exact_match max-over-golds",
+ "prompt": "official factconsolidation query template"
+}

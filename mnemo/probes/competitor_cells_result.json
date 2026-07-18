@@ -1,0 +1,9 @@
+{
+ "n": 12,
+ "model": "gpt-4o",
+ "results": {
+  "mem0_poison": 0.0,
+  "graphiti_poison": 0.25,
+  "graphiti_determinism": 0.9166666666666666
+ }
+}

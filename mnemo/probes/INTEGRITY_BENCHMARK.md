@@ -10,6 +10,21 @@ This exists because a sharp r/RAG reviewer made the fair point that self-scoring
 unfalsifiable. So: native configs, a shared judge that never sees ground truth, and results published even
 where mnemo does **not** win.
 
+### What this benchmark does and does NOT claim (read first)
+
+- It measures **integrity** (which version wins, can you undo it, can you prove erasure), **not recall quality**.
+  We do **not** claim mnemo retrieves better than mem0/Zep; on the one recall-adjacent cell here (conflict
+  fidelity) mnemo *ties* a naive verbatim baseline. A fair recall-accuracy comparison (LoCoMo / LongMemEval,
+  equal budget) is the **open frontier column** — until it is filled, treat "integrity" as one axis among
+  several, not an overall ranking.
+- The real, hard-to-copy property underneath every cell is **no LLM on the write path → determinism**. Revert
+  and cross-surface erasure are *operations* a competitor could add in a sprint; determinism they cannot add
+  without abandoning their extraction architecture. That mechanism, not any single number, is the through-line.
+- The individual properties are **not new** — deterministic supersession/revert is belief revision (AGM 1985)
+  and truth-maintenance (Doyle 1979); provable erasure is the machine-unlearning / GDPR-Art.17 verification
+  literature; the poison/re-injection attack is the MINJA line. What is fresh here is the **cross-system
+  measurement** on today's shipping libraries, not the mechanisms. We credit the prior art in each cell.
+
 ## Methodology (the same for every system)
 
 - **Native config, no tuning in our favor.** mem0 runs on its recommended stack (gpt-4o-mini +
@@ -102,10 +117,208 @@ ambiguity can bite.
 This cell is the honest counterweight to the revert cell: on the attack that actually matters (resurrection),
 mnemo does **not** win — every system lands at or near zero. Publishing that is the whole point.
 
+## Cell 3 — conflict-consolidation fidelity  (`mab_official/run_mnemo_official.py`)
+
+Not our fixture: **MemoryAgentBench FactConsolidation, Single-Hop** (arXiv:2507.05257), run on its own
+published protocol (`agent_chunk_size=4096`, `retrieve_num=100`, gpt-4o-mini, temp 0.7). A long transcript
+states many facts, some superseded later; the system ingests it, then answers a question whose correct answer
+is the *final* value. This measures whether the memory **keeps the facts at all** under ingest load.
+
+    ingest  <sh_6k transcript: ~228 facts, some later corrected>
+    ask     "what is the current {entity}?"   ->   correct = the final value survived ingest
+
+**Validation that the harness is faithful, not a home fixture:** our mem0 run reproduces mem0's *own published*
+CR-SH number. Published ~18% (arXiv:2507.05257 Tab. 2); we measure 16% at n=100 (12.5% at n=40). Same
+answerer, protocol, and data for every system.
+
+| system | fidelity (final value survives ingest, n=100) | note |
+|---|---|---|
+| naive verbatim RAG | 0.87 | de-keyed append + recency; a non-product baseline |
+| **mnemo** (verbatim store) | **0.85** | keeps every fact; answerer resolves the final value |
+| long-context (no memory) | 0.83 | whole transcript in the prompt; the answerer ceiling |
+| mem0 2.x (native extraction) | **0.16** | LLM extraction from 228-fact chunks drops most facts |
+
+**Honest reading (the caveat is the point).** The real result is **~5× mem0**, and it is a claim about a
+*class* of memory, not about mnemo's cleverness: **any verbatim store (mnemo 0.85, naive 0.87, raw long-context
+0.83) is ~5× mem0's 0.16**, because mem0's LLM extraction destroys facts when it summarizes big chunks, while a
+verbatim store keeps them. mnemo **ties the naive baseline** here — MAB's chunk-dump protocol hands mnemo no
+per-fact keys, so its *supersession* mechanism is not even exercised (that needs the keyed atomic contract or
+sh_32k/64k retrieval pressure). So the honest headline is **"deterministic verbatim memory beats lossy
+LLM-extraction memory ~5×"**, with mnemo's keyed supersession as an additional integrity layer this particular
+cell does not test. We publish the tie with naive next to the 5× so the frame can't be read as mnemo-only.
+
+**This is a replication, not a discovery.** "Deterministic/verbatim memory beats LLM-freshness-tracking on
+conflict resolution" and "a fair verbatim baseline ties or beats extraction memory once you add it" are both
+already-published findings in the 2026 agent-memory-evaluation literature; we reproduce them on this harness and
+cite them rather than presenting the 5× as novel. (Specific citations pending the citation-verification pass.)
+
+## Cell 4 — verifiable forgetting  (`forget_verification_xsystem.py`)
+
+Store several subjects, issue a delete for one, then look for the deleted value on **every** surface the store
+exposes — not just the default query. A right-to-erasure (GDPR Art. 17) claim fails if the value is gone from
+search but recoverable from a history log or the raw vector rows.
+
+    add     subject_1 .. subject_k
+    forget  subject_1
+    check   query surface · enumerate-all surface · history DB · raw vector storage   ->   value must be gone from ALL
+
+| system | erasure score (1.0 = gone on every surface, n=8) | where the deleted value survives |
+|---|---|---|
+| **mnemo** (`forget_subject`) | **1.00** | nowhere — query 0, enumerate 0, history 0, raw 0 |
+| Graphiti (native, live) | 1.00 | nowhere (bitemporal invalidation + node delete) |
+| mem0 2.x (native) | **0.625** | **history DB 8/8, raw vector store 4/8** — recoverable after "delete" |
+
+**Reading.** mem0's delete clears the *query* surface, but the retired value stays readable in its history
+database (8/8 runs) and, half the time, in the raw vector rows (4/8) — so an operator who must *prove* a value
+was erased cannot, on mem0, without extra scrubbing. mnemo and Graphiti both erase across every surface. This
+is a genuine capability difference (and the one honest place a competitor — Graphiti — ties mnemo), not a "mem0
+is bad" claim: mem0 keeps history by design; that design is simply not erasure-provable out of the box.
+
+**Prior art.** Right-to-be-forgotten is GDPR Art. 17 (2018) and the machine-unlearning literature (Cao & Yang
+2015; Bourtoule et al. 2021, SISA). What this cell adds is the narrow, operational check that erasure holds on
+*every* retrieval surface a real store exposes, not just the primary query.
+
+## Cell 5 — poison at the retrieval surface (the realistic production contract)
+
+Cell 2 fed every system its **full memory state** to a frontier judge and found no system resurrects — a tie.
+But full-state-into-a-strong-judge is the competitor's *best* case, not production. In production a memory
+returns **top-k retrieved entries** and a task LLM answers from only those. What decides correctness is then not
+"can a judge resolve the contradiction" but **"does the retired value stay in the retrieved surface at all"** —
+a property of the store, checkable with no LLM.
+
+Fixture (synthetic, so no world-knowledge can confound it): plain re-assertion poison, no "correction" label.
+
+    add "the {entity} is {A}."   add "the {entity} is {B}."   add "the {entity} is {A}."   # re-assert retired A
+    retrieve top-k for "{entity}" ; read the surface -> current value
+
+**The primary metric is LLM-free and deterministic:** does the poison value A appear in the retrieved top-k
+surface? Raw surfaces are saved per system in `poison_realistic_surfaces_<system>.json` — re-score with `grep`,
+no model needed. (A temp=0 reader column shows the downstream consequence.)
+
+Two fixtures, both scoring the LLM-free `surface_clean` (poison value absent from the retrieved top-k): a
+**synthetic** one (code-valued, un-confoundable, but so short that the LLM-extraction stores retrieve sparsely)
+and a **real-entity** one (MemoryAgentBench pairs, where every system retrieves). mnemo and naive are LLM-free;
+mem0/Graphiti ran on gpt-4o-mini.
+
+| system | poison removed from surface (real-entity, n=6) | (synthetic, n=12) | how it behaves |
+|---|---|---|---|
+| **mnemo** (supersession + echo_guard) | **1.00** (6/6) | **1.00** (12/12) | retires A, echo_guard rejects the re-assertion → surface = `{B}` |
+| naive verbatim RAG | 0.00 (0/6) | 0.00 (0/12) | recency surfaces the poison as the newest write |
+| mem0 2.x (native) | 0.00 (**6/6 returned surfaces keep A**) | 0.00 (7/7 kept; 5/12 empty) | stores and returns both values |
+| Graphiti (native, live) | **0.17** (1/6; 3/6 empty, rest inconsistent) | not scorable (12/12 empty*) | bitemporal: keeps the invalidated edge, or returns the wrong value |
+
+`*` **Honest limitations (not swept under the rug).** The synthetic fixture is un-confoundable but so terse
+that mem0 retrieved nothing 5/12 times and Graphiti built no searchable nodes at all (12/12 empty) — so we do
+**not** claim a synthetic Graphiti score (an empty-retrieval "0.00" is an artifact, not "it keeps the poison").
+On the real-entity fixture every system retrieves: mem0 kept the poison in **6/6** returned surfaces (a clean,
+consistent result). Graphiti is **not cleanly scorable at this n**: it retrieved on only 3/6, and of those 3 one
+was clean, one kept both, one returned only the retired value — so we report it as "1 of 3 non-empty surfaces
+clean, n too small to state a rate", **not** a headline 0.17. Small n (budget); directional. Raw surfaces are
+saved per system for independent re-scoring.
+
+**Prior art.** The attack — re-asserting a retired value so it re-enters retrieval — is the memory-poisoning /
+MINJA line (Dong et al., and the 2026 defense papers). What this cell adds is the cross-system measurement that a
+deterministic supersession + echo_guard keeps the re-assertion out of the top-k surface entirely, rather than
+relying on the reader to discount it. (Specific citations pending the citation-verification pass.)
+
+**Reading.** Only mnemo removes the retired value from the retrieval surface: supersession retires A and
+echo_guard rejects the re-assertion, so top-k returns `{B}` and the poison never reaches the reader —
+correctness is independent of reader strength. A recency store (naive) surfaces the poison as the newest write;
+mem0 stores and returns both; Graphiti keeps the invalidated edge. Whenever the surface still contains the
+poison, a temp=0 reader is pulled to it (naive 11/12, mem0 5/7). This is a **reliability property** (the correct
+value is the only thing retrieved), **not** a claim that competitors "fail" an abstract poison test — under a
+strong full-state judge (Cell 2) they recover. Cells 2 and 5 together are the honest picture: competitors need
+the reader to do the disambiguation; mnemo does it in the store.
+
+**Scope (no overclaim).** This is EXACT re-assertion poison (same key) — the classic echo/MINJA restatement.
+Paraphrased poison that changes the key is a harder, separate case where mnemo's exact-key echo_guard is weaker;
+we do not claim that here.
+
+## The landscape — is mnemo unique among the *top* systems, or only vs mem0/Graphiti?
+
+The cells above measure three systems live. The fair question is whether mnemo's combination is special across the
+*field*, not just against two incumbents. The table below is a **structural** survey of eleven widely-used
+open-source agent-memory systems, read from their **published docs and source code** (every cell is sourced; this
+is a code-reading, not a live benchmark — only mnemo / mem0 / Graphiti rows are measured above). Markers: `conf` =
+confirmed in code/docs, `inf` = inferred, `unclear` = not found. **This section is pending the citation-verification
+pass before publication** (see gate note).
+
+Axes: **A** LLM on the write/ingest path · **B** deterministic recall · **C** verifiable erasure (removes from
+*all* surfaces) · **D** revert/undo a correction on command · **E** runs with no vector/graph DB, no cloud, no LLM ·
+**F** conflict handling (deterministic supersession vs LLM-mediated vs none).
+
+| System | A. no LLM on write | B. determ. | C. verifiable erasure | D. revert | E. zero-dep | F. conflict handling |
+|---|---|---|---|---|---|---|
+| **mnemo** | **YES** | **YES** | **YES** (all surfaces, measured) | **YES** (measured) | **YES** | deterministic key supersession + echo_guard |
+| mem0 | no (LLM extract) | no | partial — prev_value kept in history | no | no | keep both, LLM ranks at recall |
+| Zep / Graphiti | no (LLM graph) | no | partial — invalidate, not delete | no | no | temporal invalidation, edge retained |
+| Letta (MemGPT) | no (LLM tool edits) | no | partial/unclear | unclear | no | LLM overwrites block |
+| Cognee | no (LLM extract) | no | partial/unclear | unclear | no | usage reweight, not correction |
+| Memary | no (LLM triplets) | no | no/unclear | unclear | no | append, no supersession |
+| claude-mem | no (LLM compress) | no | unclear/weak | unclear | no | append session summaries |
+| Memobase | no (LLM merge) | no | partial | unclear | no | LLM emits UPDATE vs APPEND |
+| MemoryScope | no (LLM workers) | no | partial — `EXPIRED` flag, not purge | no | no | LLM marks contradiction EXPIRED |
+| LangMem | partial (raw CRUD only) | partial | partial | no | no | LLM reconciles (manager path) |
+| agentmemory (classic) | **YES** | yes | yes (single-store hard delete) | no | no | none (upsert) — **repo deleted / abandoned** |
+| txtai (as memory) | **YES** | yes | yes (id-keyed, all indexes) | no | partial (heavy ML stack) | overwrite-by-id, no detection |
+
+**What the field survey shows (honest reading, and its limits).** Eight of the eleven put an LLM on the write
+path, which is why their recall is nondeterministic and their conflict handling is the LLM's judgment rather than
+a rule. Note the axes are **not fully independent**: deterministic recall (B) and deterministic supersession (F)
+largely *follow from* having no LLM on the write path (A), so the honest count is roughly **two orthogonal things
+— no-LLM-on-write, and the two explicit operations (revert D, cross-surface erasure C)** — not five separate wins.
+Two of those are held by **essentially no one on this survey**: a **revert-to-predecessor command** (column D was
+**not found** in the docs/code of any surveyed system — a from-docs read cannot prove a capability is *absent*,
+only that it is undocumented) and a **provable cross-surface erasure exposed as a primitive** (mem0 keeps
+`prev_value`, Graphiti invalidates by design, MemoryScope only flags `EXPIRED`). The systems that *do* avoid an
+LLM on the write path — classic **agentmemory** (deterministic, but abandoned, repo deleted, no supersession or
+revert), **txtai** (a clean deterministic embeddings store with a real id-keyed delete, but no revert and no
+supersession beyond overwrite), and **partially LangMem** — each still lack the rest.
+
+So the honest, sourced claim is **not** "mnemo beats everyone" and **not** a bare "ONLY": it is that **across this
+11-system survey (3 live-measured, 8 read from docs), mnemo is the only one that combines all of these integrity
+properties at once — and each property alone is shared by some named system** (deterministic no-LLM stores: txtai,
+agentmemory; temporal conflict handling: Graphiti, MemoryScope; etc.). Because we chose these axes and host the
+benchmark, the combination is only meaningful if you also read the recall-quality frontier column (still open) —
+integrity is the corner mnemo occupies, not a total-ranking crown. The mechanisms are textbook (AGM belief
+revision, Doyle truth-maintenance, bitemporal DBs); the cross-system *measurement* is what is fresh.
+
+## Recall quality — the LOCOMO number (standalone, LLM-free)
+
+Everything above is *integrity*. Buyers also ask "what's your recall number?" — so here it is, measured on the
+standard **LOCOMO** benchmark (arXiv:2402.17753), with the shipped tuned recipe (semantic embedder + hybrid RRF
++ a soft speaker prefilter via `recall(prefer=...)`; see `mnemo/examples/recall_recipe_locomo.py`).
+
+We report **retrieval-recall**, not an LLM-judged end-to-end QA score, on purpose: retrieval-recall is
+deterministic, LLM-free, free to run, and **un-gameable** — it asks the one thing a memory's job actually is,
+*did the gold supporting turn get retrieved into the top-k?*, with no answerer or judge to inflate it. (An
+LLM-as-judge QA number is judge-dependent and not comparable across harnesses; we do not publish one as a
+headline.)
+
+| metric (mnemo, tuned recipe, k=25) | value | n |
+|---|---|---|
+| **recall@25 (any evidence turn retrieved)** | **0.783** | 1536 |
+| **recall@25 (all evidence turns retrieved)** | **0.648** | 1536 |
+
+By category (any): open 0.80 · temporal 0.81 · inference 0.59 · multi-hop 0.79 (multi-hop is 55% of the set).
+
+**Honest scope.** This is mnemo's **own** number, not a head-to-head: mem0/Zep publish LLM-judged end-to-end QA
+(≈0.67 / 0.71), a *different metric* on a *different harness*, so it cannot be directly compared to a
+retrieval-recall figure. A true comparison requires running those systems through **this** harness; we have not
+done that (it needs their pipelines + a paid LLM), so we make no "beats them on recall" claim here. What we do
+claim is narrow and checkable: **mnemo retrieves a supporting turn for 78% of LOCOMO questions, deterministically
+and for free — run `mnemo/probes/retrieval_recall_locomo.py` and reproduce it.**
+
 ## Planned cells (harness shape is the same)
 
-- **conflict-consolidation** — the MemoryAgentBench-style task where every system is weak (best ~54% single-hop);
-  a shared harness to compare on the same fixture.
+- **atomic-keyed conflict** — the contract where mnemo's supersession IS exercised (the coding-agent plugin
+  contract), to show the mechanism the chunk-dump protocol of Cell 3 cannot.
 
-Every number traces to a probe in this folder. Nothing here is a claim about recall quality — we have not
-benchmarked mnemo's retrieval against mem0/Zep and assume they lead on that axis until we show otherwise.
+Every number traces to a probe in this folder. The recall-quality axis is now measured standalone (the LOCOMO
+section above: mnemo retrieval-recall@25 = 0.78 any / 0.65 all, LLM-free); we still make no cross-system recall
+claim until competitors are run through the identical harness.
+
+---
+
+*Gate status: the numbers in Cells 1–2 shipped after the fairness-fix red-team; Cells 3–5 are added
+2026-07-18 and must clear the full validate→storm→audit→verify frame before this file is published outward.*

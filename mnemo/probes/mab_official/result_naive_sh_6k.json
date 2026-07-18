@@ -1,0 +1,10 @@
+{
+ "condition": "naive",
+ "sample": "sh_6k",
+ "n": 100,
+ "correct": 96,
+ "accuracy": 0.96,
+ "answerer": "deepseek-v4-flash",
+ "scoring": "official substring_exact_match max-over-golds",
+ "prompt": "official factconsolidation query template"
+}

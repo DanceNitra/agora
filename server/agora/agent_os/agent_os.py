@@ -22,7 +22,9 @@ NPC_UUIDS = {
     "High Priest Orin": "00000000-0000-0000-0000-000000000003",
     "King Aldric":     "00000000-0000-0000-0000-000000000004",
     "Dame Elara":     "00000000-0000-0000-0000-000000000005",
+    "Artificer Rooke": "00000000-0000-0000-0000-000000000006",
     "Sergeant Voss":  "00000000-0000-0000-0000-000000000007",
+    "Cartographer Wren": "00000000-0000-0000-0000-000000000008",
 }
 
 UUID_TO_NAME = {v: k for k, v in NPC_UUIDS.items()}
@@ -123,6 +125,36 @@ NPC_DEFS = {
         ],
         "skills": [("spear_fighting", 8), ("shield_defense", 9), ("patrol", 7), ("discipline", 8)],
     },
+    "Artificer Rooke": {
+        "name": "Artificer Rooke",
+        "role": "artificer",
+        "archetype": "engineer",
+        "personality": {"openness": 0.7, "conscientiousness": 0.95, "extraversion": 0.3, "agreeableness": 0.5, "neuroticism": 0.3},
+        "values": {"rigor": 1.0, "verification": 0.9, "truth": 0.9, "craftsmanship": 0.7, "knowledge": 0.6},
+        "emotional_state": "focused",
+        "moral_alignment": "lawful_neutral",
+        "abilities": [
+            ("Minimal Model", "Zredukuje cudzí claim na najmenší spustiteľný model", 9.0, True),
+            ("Compute or It Didn't Happen", "Verí len tomu, čo sa dá odmerať a zreprodukovať", 8.0, True),
+            ("Replication Forge", "Znovu-spustí experiment a rozhodne REPRODUCED/FAILED", 7.0, False),
+        ],
+        "skills": [("replication", 9), ("modeling", 8), ("coding", 8), ("statistics", 7)],
+    },
+    "Cartographer Wren": {
+        "name": "Cartographer Wren",
+        "role": "cartographer",
+        "archetype": "cartographer",
+        "personality": {"openness": 0.95, "conscientiousness": 0.6, "extraversion": 0.5, "agreeableness": 0.6, "neuroticism": 0.3},
+        "values": {"knowledge": 0.9, "connection": 0.9, "frontier": 0.8, "exploration": 0.7, "truth": 0.6},
+        "emotional_state": "curious",
+        "moral_alignment": "neutral_good",
+        "abilities": [
+            ("Knowledge Cartography", "Mapuje graf poznania a diery medzi doménami", 9.0, True),
+            ("Distant Neighbor", "Nájde najbližšiu cudziu doménu k danému claimu", 8.0, True),
+            ("Frontier Sight", "Vidí, kde sa oplatí prekopať medzi odbormi", 7.0, False),
+        ],
+        "skills": [("cartography", 9), ("graph_theory", 8), ("domain_mapping", 8), ("systems_thinking", 7)],
+    },
 }
 
 
@@ -195,14 +227,17 @@ class AgentOS:
         self._real_action_engine = engine
 
     async def ensure_os_initialized(self):
-        """Seed OS data for all 7 NPCs if not already present."""
-        cursor = await self.db.execute("SELECT COUNT(*) as c FROM agent_soul")
-        row = await cursor.fetchone()
-        if row and row["c"] > 0:
-            return  # already seeded
-
+        """Seed OS data for any roster NPC that isn't seeded yet. PER-AGENT idempotent: agent_soul is written
+        last per NPC, so a soul row marks that NPC fully seeded and it is skipped. Adding a new NPC to NPC_DEFS
+        therefore seeds ONLY that one on the next start (the existing agents are untouched)."""
         for name, defs in NPC_DEFS.items():
             npc_id = NPC_UUIDS[name]
+
+            # per-agent idempotency guard — skip an NPC that already has a soul row (fully seeded)
+            cursor = await self.db.execute("SELECT COUNT(*) as c FROM agent_soul WHERE npc_id=?", (npc_id,))
+            row = await cursor.fetchone()
+            if row and row["c"] > 0:
+                continue
 
             # ── First: ensure dungeon_npcs row exists (FK target) ──
             cursor = await self.db.execute(

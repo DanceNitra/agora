@@ -1,0 +1,104 @@
+######## DEEPSEEK backend (Ollama Cloud, free) ########
+===RUN=== mnemo deepseek chunk
+MAB Conflict Resolution (FactConsolidation sh_6k) · OFFICIAL data+scoring+prompt · answerer=deepseek-v4-flash · mnemo · ingest=chunk · n=100 · facts=455
+  [warm] cached 102 embeddings · ingest=chunk · units=2
+  mnemo 10/100  correct=10
+  mnemo 20/100  correct=20
+  mnemo 30/100  correct=30
+  mnemo 40/100  correct=40
+  mnemo 50/100  correct=50
+  mnemo 60/100  correct=60
+  mnemo 70/100  correct=70
+  mnemo 80/100  correct=80
+  mnemo 90/100  correct=90
+  mnemo 100/100  correct=100
+
+=== mnemo: 100/100 = 100.0%  (285s, 0 live-embed fallbacks) ===
+  published CR single-hop (gpt-4o-mini answerer, arXiv:2507.05257 Tab.2/11): GPT-4o long-ctx 60% (88% @32K) · HippoRAG-v2 54% · BM25-RAG 56% · mem0 18% (22% @32K). multi-hop: ALL <7%.
+===RUN=== naive deepseek chunk
+MAB Conflict Resolution (FactConsolidation sh_6k) · OFFICIAL data+scoring+prompt · answerer=deepseek-v4-flash · naive · ingest=chunk · n=100 · facts=455
+  [warm] cached 102 embeddings · ingest=chunk · units=2
+  naive 10/100  correct=10
+  naive 20/100  correct=20
+  naive 30/100  correct=30
+  naive 40/100  correct=40
+  naive 50/100  correct=50
+  naive 60/100  correct=59
+  naive 70/100  correct=69
+  naive 80/100  correct=78
+  naive 90/100  correct=88
+  naive 100/100  correct=98
+
+=== naive: 98/100 = 98.0%  (292s, 0 live-embed fallbacks) ===
+  published CR single-hop (gpt-4o-mini answerer, arXiv:2507.05257 Tab.2/11): GPT-4o long-ctx 60% (88% @32K) · HippoRAG-v2 54% · BM25-RAG 56% · mem0 18% (22% @32K). multi-hop: ALL <7%.
+######## OPENAI backend (gpt-4o-mini = faithful published config) ########
+===RUN=== longcontext openai chunk
+MAB Conflict Resolution (FactConsolidation sh_6k) · OFFICIAL data+scoring+prompt · answerer=gpt-4o-mini · longcontext · ingest=chunk · n=100 · facts=455
+  longcontext 10/100  correct=10
+  longcontext 20/100  correct=18
+  longcontext 30/100  correct=28
+  longcontext 40/100  correct=35
+  longcontext 50/100  correct=43
+  longcontext 60/100  correct=49
+  longcontext 70/100  correct=56
+  longcontext 80/100  correct=65
+  longcontext 90/100  correct=73
+  longcontext 100/100  correct=83
+
+=== longcontext: 83/100 = 83.0%  (128s, 0 live-embed fallbacks) ===
+  published CR single-hop (gpt-4o-mini answerer, arXiv:2507.05257 Tab.2/11): GPT-4o long-ctx 60% (88% @32K) · HippoRAG-v2 54% · BM25-RAG 56% · mem0 18% (22% @32K). multi-hop: ALL <7%.
+===RUN=== mem0 openai chunk
+MAB Conflict Resolution (FactConsolidation sh_6k) · OFFICIAL data+scoring+prompt · answerer=gpt-4o-mini · mem0 · ingest=chunk · n=100 · facts=455
+  [warm] cached 102 embeddings · ingest=chunk · units=2
+[PostHog] Multiple active PostHog clients detected for the same project API key and host. Reuse one Posthog instance per app or process when possible to avoid competing background queues and missed shutdown flushes. Multiple clients are supported when intentional.
+Error parsing extraction response: Expecting ',' delimiter: line 272 column 6 (char 6970)
+Error parsing extraction response: Expecting ',' delimiter: line 258 column 6 (char 7728)
+Failed to load spaCy lemma model: spaCy is not installed. Install it with: pip install mem0ai[nlp]
+Failed to load spaCy full model: spaCy is not installed. Install it with: pip install mem0ai[nlp]
+fastembed not installed - BM25 keyword search disabled. Install it with: pip install "mem0ai[extras]"
+  mem0 10/100  correct=2
+  mem0 20/100  correct=4
+  mem0 30/100  correct=6
+  mem0 40/100  correct=7
+  mem0 50/100  correct=8
+  mem0 60/100  correct=8
+  mem0 70/100  correct=10
+  mem0 80/100  correct=14
+  mem0 90/100  correct=14
+  mem0 100/100  correct=16
+
+=== mem0: 16/100 = 16.0%  (232s, 0 live-embed fallbacks) ===
+  published CR single-hop (gpt-4o-mini answerer, arXiv:2507.05257 Tab.2/11): GPT-4o long-ctx 60% (88% @32K) · HippoRAG-v2 54% · BM25-RAG 56% · mem0 18% (22% @32K). multi-hop: ALL <7%.
+===RUN=== mnemo openai chunk
+MAB Conflict Resolution (FactConsolidation sh_6k) · OFFICIAL data+scoring+prompt · answerer=gpt-4o-mini · mnemo · ingest=chunk · n=100 · facts=455
+  [warm] cached 102 embeddings · ingest=chunk · units=2
+  mnemo 10/100  correct=8
+  mnemo 20/100  correct=17
+  mnemo 30/100  correct=27
+  mnemo 40/100  correct=34
+  mnemo 50/100  correct=42
+  mnemo 60/100  correct=50
+  mnemo 70/100  correct=57
+  mnemo 80/100  correct=67
+  mnemo 90/100  correct=75
+  mnemo 100/100  correct=85
+
+=== mnemo: 85/100 = 85.0%  (131s, 0 live-embed fallbacks) ===
+  published CR single-hop (gpt-4o-mini answerer, arXiv:2507.05257 Tab.2/11): GPT-4o long-ctx 60% (88% @32K) · HippoRAG-v2 54% · BM25-RAG 56% · mem0 18% (22% @32K). multi-hop: ALL <7%.
+===RUN=== naive openai chunk
+MAB Conflict Resolution (FactConsolidation sh_6k) · OFFICIAL data+scoring+prompt · answerer=gpt-4o-mini · naive · ingest=chunk · n=100 · facts=455
+  [warm] cached 102 embeddings · ingest=chunk · units=2
+  naive 10/100  correct=8
+  naive 20/100  correct=17
+  naive 30/100  correct=27
+  naive 40/100  correct=34
+  naive 50/100  correct=42
+  naive 60/100  correct=50
+  naive 70/100  correct=58
+  naive 80/100  correct=68
+  naive 90/100  correct=77
+  naive 100/100  correct=87
+
+=== naive: 87/100 = 87.0%  (181s, 0 live-embed fallbacks) ===
+  published CR single-hop (gpt-4o-mini answerer, arXiv:2507.05257 Tab.2/11): GPT-4o long-ctx 60% (88% @32K) · HippoRAG-v2 54% · BM25-RAG 56% · mem0 18% (22% @32K). multi-hop: ALL <7%.
+######## MATRIX DONE ########

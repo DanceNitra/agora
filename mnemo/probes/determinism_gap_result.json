@@ -1,0 +1,27 @@
+{
+ "runs": 3,
+ "results": {
+  "mnemo": {
+   "nondeterminism_rate": 0.0,
+   "unstable_subjects": 0,
+   "n": 15,
+   "accuracy_per_run": [
+    1.0,
+    1.0,
+    1.0
+   ],
+   "accuracy_spread": 0.0
+  },
+  "mem0": {
+   "nondeterminism_rate": 0.06666666666666667,
+   "unstable_subjects": 1,
+   "n": 15,
+   "accuracy_per_run": [
+    0.267,
+    0.2,
+    0.2
+   ],
+   "accuracy_spread": 0.067
+  }
+ }
+}

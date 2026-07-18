@@ -1,0 +1,37 @@
+MAB Conflict Resolution (FactConsolidation sh_6k) · OFFICIAL data+scoring+prompt · answerer=deepseek-v4-flash · mem0 · n=100 · facts=455
+  [warm] cached 555 embeddings
+[PostHog] Multiple active PostHog clients detected for the same project API key and host. Reuse one Posthog instance per app or process when possible to avoid competing background queues and missed shutdown flushes. Multiple clients are supported when intentional.
+Failed to load spaCy lemma model: spaCy is not installed. Install it with: pip install mem0ai[nlp]
+fastembed not installed - BM25 keyword search disabled. Install it with: pip install "mem0ai[extras]"
+Failed to load spaCy full model: spaCy is not installed. Install it with: pip install mem0ai[nlp]
+  [mem0 ingest] 25/455
+  [mem0 ingest] 50/455
+  [mem0 ingest] 75/455
+  [mem0 ingest] 100/455
+  [mem0 ingest] 125/455
+  [mem0 ingest] 150/455
+  [mem0 ingest] 175/455
+  [mem0 ingest] 200/455
+  [mem0 ingest] 225/455
+  [mem0 ingest] 250/455
+  [mem0 ingest] 275/455
+  [mem0 ingest] 300/455
+  [mem0 ingest] 325/455
+  [mem0 ingest] 350/455
+  [mem0 ingest] 375/455
+  [mem0 ingest] 400/455
+  [mem0 ingest] 425/455
+  [mem0 ingest] 450/455
+  mem0 10/100  correct=8
+  mem0 20/100  correct=17
+  mem0 30/100  correct=26
+  mem0 40/100  correct=34
+  mem0 50/100  correct=43
+  mem0 60/100  correct=53
+  mem0 70/100  correct=60
+  mem0 80/100  correct=70
+  mem0 90/100  correct=80
+  mem0 100/100  correct=88
+
+=== mem0: 88/100 = 88.0%  (3380s, 0 live-embed fallbacks) ===
+  published CR single-hop (gpt-4o-mini answerer, arXiv:2507.05257 Tab.2/11): GPT-4o long-ctx 60% (88% @32K) · HippoRAG-v2 54% · BM25-RAG 56% · mem0 18% (22% @32K). multi-hop: ALL <7%.

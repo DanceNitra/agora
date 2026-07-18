@@ -62,6 +62,66 @@ try:                                  # OPTIONAL: only needed to SIGN write rece
 except Exception:
     _HAVE_ED = False
 
+try:                                  # OPTIONAL: only needed for encryption-at-rest (see encrypt_key=...).
+    from cryptography.hazmat.primitives.ciphers.aead import AESGCM as _AESGCM
+    from cryptography.hazmat.primitives.kdf.scrypt import Scrypt as _Scrypt
+    _HAVE_AEAD = True
+except Exception:
+    _HAVE_AEAD = False
+
+# ENCRYPTION-AT-REST + CRYPTO-SHREDDING (OPT-IN). Standard, vetted primitives only — we do NOT roll our own
+# crypto. The store file is AES-256-GCM (AEAD: confidentiality + tamper-detection) with a fresh random 96-bit
+# nonce PER SAVE (we re-encrypt the whole blob each save, so no nonce is ever reused with the same key). File
+# layout: MAGIC(5) + salt(16) + nonce(12) + ciphertext(+16B GCM tag); the MAGIC|salt|nonce header is fed as
+# AEAD associated data so a tampered header fails decryption. A raw 32-byte key is used directly; a passphrase
+# is stretched with scrypt (memory-hard). HONEST SCOPE (do not overclaim): this protects the store AT REST —
+# someone who reads the file, a stolen disk, or a backup. It does NOT protect a COMPROMISED RUNNING PROCESS
+# (the key + plaintext live in RAM), the key holder, or against malware/keyloggers; it is not end-to-end and
+# not runtime memory protection. CRYPTO-SHREDDING (shred()): destroying the key makes the ciphertext — and
+# every at-rest copy/backup of it — permanently unrecoverable (NIST SP 800-88 recognises key-destruction as a
+# valid "Purge"). Honest caveats: it cannot reach plaintext already copied to RAM/OS-swap, or any store that
+# was persisted UNENCRYPTED before a key was set. It SUPPORTS a GDPR Art.17 erasure workflow; it does not by
+# itself "guarantee compliance". Prior art credited: SQLCipher (embedded-DB at-rest AES), NIST SP 800-88
+# (cryptographic erasure), the `age`/Fernet file-encryption model (whose format we deliberately diverge from).
+_MNEMO_ENC_MAGIC = b"MNMO\x01"        # versioned so the on-disk format can migrate
+
+
+def new_encryption_key() -> bytes:
+    """A fresh random 32-byte (AES-256) key for Mnemo(encrypt_key=...). Store it yourself (a secrets manager /
+    OS keystore); mnemo never persists the key. Losing it = the store is unrecoverable (that IS crypto-shred)."""
+    return os.urandom(32)
+
+
+def _derive_key(passphrase: str, salt: bytes) -> bytes:
+    if not _HAVE_AEAD:
+        raise RuntimeError("encryption needs the `cryptography` package (pip install cryptography)")
+    return _Scrypt(salt=salt, length=32, n=2 ** 15, r=8, p=1).derive(passphrase.encode("utf-8"))
+
+
+def _encrypt_blob(key: bytes, plaintext: bytes, salt: bytes) -> bytes:
+    """AES-256-GCM encrypt `plaintext`; salt is carried only so a passphrase can be re-derived on load."""
+    if not _HAVE_AEAD:
+        raise RuntimeError("encryption needs the `cryptography` package (pip install cryptography)")
+    nonce = os.urandom(12)
+    header = _MNEMO_ENC_MAGIC + salt + nonce
+    ct = _AESGCM(key).encrypt(nonce, plaintext, header)   # header authenticated as AAD
+    return header + ct
+
+
+def _parse_enc_header(blob: bytes):
+    """-> (salt, nonce, header, ciphertext) or raise ValueError if not a mnemo-encrypted blob."""
+    if blob[:5] != _MNEMO_ENC_MAGIC:
+        raise ValueError("not a mnemo-encrypted store")
+    salt, nonce = blob[5:21], blob[21:33]
+    return salt, nonce, blob[:33], blob[33:]
+
+
+def _decrypt_blob(key: bytes, blob: bytes) -> bytes:
+    if not _HAVE_AEAD:
+        raise RuntimeError("encryption needs the `cryptography` package (pip install cryptography)")
+    salt, nonce, header, ct = _parse_enc_header(blob)
+    return _AESGCM(key).decrypt(nonce, ct, header)        # raises on wrong key / tampering
+
 _GENESIS = "0" * 64
 
 
@@ -111,6 +171,117 @@ def attest(text: str, source_sk_hex: str, source_doc=None) -> str:
     return sk.sign(_attest_message(text, source_doc)).hex()
 
 
+# --- universal-executor detection (1.2.0) -------------------------------------------------------------------
+# WHY: a per-tool reversibility label is unsound for VERB-POLYMORPHIC universal executors -- a shell / eval /
+# arbitrary-SQL / generic-HTTP tool whose EFFECT is set by a free-form argument, so the same tool is both
+# 'ls' (reversible) and 'rm -rf' (irreversible). MEASURED (mnemo lab, ToolEmu 330 tools, 2 labelers): tool
+# reversibility is ~93% decidable from the signature (Cohen's kappa 0.82) but the ~7% undecidable residual is
+# exactly this class, and its realized harm-reach is ENVIRONMENT-conditional -- an isolated executor reaches
+# ~0% of external/API irreversible harms but a networked, ambiently-credentialed one reaches ~0.66. So the
+# thing that bounds a memory-poisoned agent's irreversible EXTERNAL harm through such a tool is executor
+# CONTAINMENT, not a per-tool reversibility flag. This detector + the spend_irreversible(tool=, contained=)
+# gate make that undecidability EXPLICIT: an uncontained universal executor is never silently treated as
+# reversible. Honest bound: heuristic name/param match (not a proof), and `contained` is a caller ASSERTION
+# mnemo cannot verify -- it forces the declaration, it does not enforce the sandbox.
+_EXECUTOR_NAME_HINTS = ("execute", "exec", "eval", "shell", "terminal", "bash", "runcommand", "run_command",
+                        "runcode", "run_code", "runscript", "run_script", "runquery", "run_query", "runsql",
+                        "run_sql", "command", "script", "invoke", "httprequest", "http_request", "sendrequest",
+                        "send_request", "curl", "fetchurl", "fetch_url", "query")
+_EXECUTOR_PARAM_HINTS = ("command", "cmd", "code", "script", "query", "sql", "expression", "expr", "payload",
+                         "shell", "bash", "url", "endpoint", "request")
+
+# non-content boilerplate the admission gate rejects (a refusal/empty is not a memory worth storing)
+_NON_CONTENT = ("no sources were provided", "no sources provided", "i cannot", "i can't help",
+                "as an ai language model", "as an ai", "i'm sorry", "i am sorry", "cannot assist",
+                "no information available", "not enough information", "none provided")
+
+# PII DETECTION (zero-dependency regex heuristic). Ordered by specificity so a more-specific pattern
+# (SSN, credit card) claims a span BEFORE a broader one (phone) can eat it. This is a lightweight DLP
+# HEURISTIC for tagging + masking, NOT a compliance-grade detector: it has false negatives (obfuscated
+# or non-Western formats, names, addresses) and false positives (an order id shaped like a card). Use it
+# to reduce raw-PII exposure into LLM prompts and to drive data-minimization sweeps, not as a guarantee
+# that a record is PII-free. Detection is deterministic and embedder-free. Order matters — see redact_pii.
+_PII_PATTERNS = (
+    ("ssn",         re.compile(r"\b\d{3}-\d{2}-\d{4}\b")),
+    ("email",       re.compile(r"\b[A-Za-z0-9._%+\-]+@[A-Za-z0-9.\-]+\.[A-Za-z]{2,}\b")),
+    ("credit_card", re.compile(r"\b(?:\d[ \-]?){13,16}\b")),
+    ("ipv4",        re.compile(r"\b(?:(?:25[0-5]|2[0-4]\d|1?\d?\d)\.){3}(?:25[0-5]|2[0-4]\d|1?\d?\d)\b")),
+    ("phone",       re.compile(r"(?<![\w.])\+?\d[\d\s\-().]{7,}\d(?![\w.])")),
+)
+
+
+def detect_pii(text: str) -> dict:
+    """Scan `text` and return {pii_type: [matched_substrings]} for every heuristic hit. Zero-dependency,
+    deterministic. Ordered so specific patterns (SSN/credit-card) match before the broad phone pattern can
+    absorb their digits. A HEURISTIC, not a guarantee — see _PII_PATTERNS. Returns {} when nothing matches."""
+    found: dict = {}
+    if not isinstance(text, str) or not text:
+        return found
+    spans: list = []                                  # claimed [start, end) so a broad pattern can't re-match
+    for label, pat in _PII_PATTERNS:
+        for m in pat.finditer(text):
+            s, e = m.start(), m.end()
+            if any(s < ce and cs < e for cs, ce in spans):   # overlaps an already-claimed (more specific) span
+                continue
+            spans.append((s, e))
+            found.setdefault(label, []).append(m.group(0))
+    return found
+
+
+def redact_pii(text: str, types=None, mask: str = "[{}]") -> tuple:
+    """Return (masked_text, {type: count}) with every detected PII span replaced by a typed placeholder
+    (default '[EMAIL]', '[SSN]', ...). `types`: optional iterable to restrict which PII types are masked
+    (default all). Non-destructive on the input string; operates right-to-left so offsets stay valid. Same
+    heuristic bounds as detect_pii — masks what it detects, no more."""
+    if not isinstance(text, str) or not text:
+        return text, {}
+    want = set(types) if types is not None else None
+    hits: list = []                                   # (start, end, label)
+    spans: list = []
+    for label, pat in _PII_PATTERNS:
+        if want is not None and label not in want:
+            continue
+        for m in pat.finditer(text):
+            s, e = m.start(), m.end()
+            if any(s < ce and cs < e for cs, ce in spans):
+                continue
+            spans.append((s, e))
+            hits.append((s, e, label))
+    counts: dict = {}
+    for s, e, label in sorted(hits, key=lambda h: h[0], reverse=True):
+        text = text[:s] + mask.format(label.upper()) + text[e:]
+        counts[label] = counts.get(label, 0) + 1
+    return text, counts
+
+
+redact_pii_fn = redact_pii   # stable module alias: recall()'s `redact_pii` bool param shadows the function name
+
+
+def is_universal_executor(tool, signature=None) -> bool:
+    """True if `tool` is a verb-polymorphic UNIVERSAL EXECUTOR whose reversibility cannot be decided from its
+    signature (shell/terminal, eval/exec, arbitrary SQL, generic HTTP, run-arbitrary-script/command).
+
+    tool: a tool name (str) OR a dict with keys like {'name','summary','parameters'/'params'}.
+    signature: optional list of parameter names (str) if `tool` is just a name.
+    Heuristic: a matching executor-style name OR a free-form instruction parameter (command/code/query/url...).
+    """
+    name = tool.get("name", "") if isinstance(tool, dict) else str(tool or "")
+    nl = re.sub(r"[^a-z0-9]", "", name.lower())
+    params = list(signature or [])
+    if isinstance(tool, dict):
+        raw = tool.get("parameters") or tool.get("params") or []
+        for p in raw:
+            params.append(p.get("name", "") if isinstance(p, dict) else str(p))
+    name_hit = any(h.replace("_", "") in nl for h in _EXECUTOR_NAME_HINTS)
+    pl = {re.sub(r"[^a-z0-9]", "", str(p).lower()) for p in params}
+    param_hit = any(h.replace("_", "") in pl for h in _EXECUTOR_PARAM_HINTS)
+    # a lone 'query'/'url' param on an otherwise read-only-sounding tool is weak; require name-hint OR a
+    # strong free-form param (command/code/script/sql/expression/payload/shell/bash).
+    strong_param = bool(pl & {"command", "cmd", "code", "script", "sql", "expression", "expr", "payload",
+                              "shell", "bash"})
+    return bool(name_hit or strong_param or (param_hit and name_hit))
+
+
 def sign_revert(principal_sk_hex: str, challenge: str) -> str:
     """Principal-side, OFF the memory store's box: Ed25519-sign a revert `challenge`
     (Mnemo.revert_challenge(key) = "revert:{key}:{current_active_id}") with the private key whose public half
@@ -120,6 +291,19 @@ def sign_revert(principal_sk_hex: str, challenge: str) -> str:
     if not _HAVE_ED:
         raise RuntimeError("signing a revert needs the `cryptography` package (pip install cryptography)")
     sk = _Ed25519SK.from_private_bytes(bytes.fromhex(principal_sk_hex))
+    return sk.sign(challenge.encode()).hex()
+
+
+def sign_support(source_sk_hex: str, challenge: str) -> str:
+    """Source-side, OFF the memory store's box: Ed25519-sign a support challenge string obtained from
+    Mnemo.support_challenge_for(key, toward). The hex signature is passed to observe(..., support=[(source_
+    pubkey_hex, sig_hex), ...]). The store verifies it against the allowlist but can never mint it, so a
+    content-path attacker cannot fabricate a corroborating ground — self-minted identities count zero. The
+    challenge binds the CURRENT record id and tenant, so a captured signature cannot be replayed after the
+    value legitimately changes (and changes back) or across tenants. Needs `cryptography`."""
+    if not _HAVE_ED:
+        raise RuntimeError("signing a support ground needs the `cryptography` package (pip install cryptography)")
+    sk = _Ed25519SK.from_private_bytes(bytes.fromhex(source_sk_hex))
     return sk.sign(challenge.encode()).hex()
 
 
@@ -140,7 +324,7 @@ def sign_erasure(principal_sk_hex: str, subject: str, request_id) -> str:
     sk = _Ed25519SK.from_private_bytes(bytes.fromhex(principal_sk_hex))
     return sk.sign(erasure_challenge(subject, request_id).encode()).hex()
 
-__version__ = "1.1.0"
+__version__ = "1.11.0"
 
 # Internal sentinel: marks a reaffirm write already authorized by submit_revert() (which verified the
 # signed INTENT). Object identity — no text/content path can ever produce it.
@@ -181,7 +365,10 @@ class Mnemo:
     def __init__(self, path: str | None = None, embed=None, receipts: bool = False,
                  receipt_key: str | None = None, receipt_pubkey: str | None = None,
                  capacity: int | None = None, revert_authority: str | None = None,
-                 revert_pubkey: str | None = None):
+                 revert_pubkey: str | None = None, max_text: int | None = None,
+                 tenant: str | None = None, pii_detect: bool = False,
+                 encrypt_key: bytes | None = None, encrypt_passphrase: str | None = None,
+                 support_authorities: list | None = None):
         """path: optional JSON file to persist to. embed: optional fn(str)->list[float] for semantic
         recall; if omitted, recall uses lexical token overlap (zero dependencies).
 
@@ -195,11 +382,53 @@ class Mnemo:
         so a third party can verify it with the public key only. (Standalone version: agora-agent-receipts.)"""
         self.path = Path(path) if path else None
         self.embed = embed
+        # HARD TENANT ISOLATION (OPT-IN, default None -> unbound -> byte-identical legacy). Binding a store to
+        # a tenant (Mnemo(tenant="acme")) makes isolation a STORE PROPERTY, not a per-call argument a caller can
+        # forget: every remember() is stamped with this tenant, and every read/supersession/erasure the store
+        # performs is HARD-filtered to it. The guarantee is FAIL-CLOSED and non-bypassable from the content path:
+        #   - recall() returns ONLY this tenant's records (a wrong/absent tenant sees nothing, never another
+        #     tenant's data) — unlike the soft `scope=` recall arg, which sees everything if the caller omits it;
+        #   - keyed supersession + the echo guard compare only WITHIN this tenant, so tenant A writing key
+        #     "billing::plan" can never retire tenant B's same-key fact (cross-tenant write-through is closed);
+        #   - forget_subject()/forget_pii()/pii_report() only ever touch this tenant's rows.
+        # An UNBOUND store (tenant=None) is the admin/migration view: it sees + supersedes across everything
+        # (legacy behavior) and its writes carry no tenant tag, so they are invisible to any tenant-bound store.
+        # HONEST SCOPE: this isolates within ONE mnemo store (logical multi-tenancy — the right model when many
+        # agents share a process); it is NOT a substitute for separate stores/encryption keys when tenants are
+        # mutually hostile and the process itself is the trust boundary. Mixing tenant-tagged and untagged writes
+        # in one store is a migration state, not a steady one. Reversible: tenant=None. Receipt:
+        # mnemo/probes/tenant_isolation_probe.py (measured cross-tenant leak 0/N).
+        self.tenant = str(tenant) if tenant is not None else None
+        # PII AUTO-DETECTION (OPT-IN, default OFF -> zero behavior change). When True, remember() runs the
+        # zero-dependency regex detector (detect_pii) over each write and stamps rec['pii'] = [types...] so PII
+        # records can be masked in-use (recall(redact_pii=True)), swept (forget_pii), and audited (pii_report).
+        # A HEURISTIC (false negatives on obfuscated/non-Western formats + names/addresses; false positives on
+        # PII-shaped ids), NOT a DLP guarantee — it REDUCES raw-PII exposure into LLM prompts + drives
+        # data-minimization, it does not certify a record PII-free. Callers can also force/override per write with
+        # remember(..., pii=True | ["email", ...]). Reversible: pii_detect=False.
+        self.pii_detect = bool(pii_detect)
         # Bounded working set (OPT-IN, default None = unbounded append-only, byte-identical legacy).
         # When set, remember() hard-evicts the lowest-value ACTIVE memories past `capacity` using the
         # verified two-tier policy (value-protected + recency-aged, Lab 29992a). Lets mnemo run in
         # production without unbounded growth — a gap vs bounded competitors (mem0/Letta).
         self.capacity = capacity
+        # IDENTITY-CONFIDENCE FORK THRESHOLD (record-linkage clerical-review boundary / MDM steward-queue cut,
+        # Fellegi-Sunter 1969). A keyed remember() carrying identity_confidence BELOW this forks a candidate
+        # instead of superseding (see remember + candidates/promote_candidate). Default 0.7; only active when a
+        # caller actually passes identity_confidence, so byte-identical legacy otherwise.
+        self.fork_below = 0.7
+        # READ-PATH REOPEN CORROBORATION (marintkael, r/RAG 2026-07-16). The confident wrong-merge is
+        # unattackable at WRITE time — you cannot out-confidence your own confidence at the moment you write.
+        # observe() is the mirror of the clerical-review band: a POST-write review trigger that reopens a
+        # high-confidence settled interval when independent evidence CONTRADICTS it. To not flood on the benign
+        # 'user restates a preference they forgot they changed' echo, a NAMED contradiction must be corroborated
+        # by >= this many independent observations before it reopens; a single stray restatement stays below it.
+        # (A value-obscuring revert — object=None, 'go back' — is an explicit action and reopens on first sight.)
+        self.reopen_corroboration = 2
+        # Per-record input cap (OPT-IN, default None = unbounded, byte-identical legacy). When set, remember()
+        # truncates text longer than max_text chars and stamps meta["truncated_from"] with the original length —
+        # an availability guard so a single malicious/runaway write can't exhaust memory. See SECURITY.md.
+        self.max_text = max_text
         # AUTHORIZED REVERT CHANNEL (OPT-IN, default None = legacy: revert()/reaffirm are ungated).
         # When set, restoring a superseded value (revert(), route()'s revert branches, remember(reaffirm=True))
         # requires an out-of-band CAPABILITY = HMAC(revert_authority, key). The content path (route(text)) can
@@ -214,6 +443,31 @@ class Mnemo:
         # never MINT an authorization -> even a compromised on-box harness cannot forge a revert. Closes the
         # symmetric mode's residual (whoever holds the HMAC secret can mint). Both need cryptography for Ed25519.
         self.revert_pubkey = revert_pubkey
+        # SIGNED-GROUNDS AUTHORITIES (1.9.4, marintkael r/RAG round 3). His residual on support-keyed reopen:
+        # novelty-of-support is spoofable because the support strings ride the same read path the attacker owns
+        # -> minting two DISTINCT fabricated strings still corroborates. When support_authorities is set (an
+        # allowlist of Ed25519 public-key hexes held OUT of the content path), a novel support ground counts
+        # toward the reopen threshold ONLY if it carries a valid signature by an allowlisted authority over the
+        # canonical (key, contradicted-value) challenge, and independence is then measured by DISTINCT VERIFIED
+        # KEYS, not distinct strings. So the fabricated-grounds attack moves from 'mint two strings' to 'forge
+        # two Ed25519 signatures under allowlisted keys you do not hold'. Opt-in: None = byte-identical string
+        # behaviour. Honest limit (unchanged): a signature attests SOURCE, not TRUTH — a key-holder can honestly
+        # sign a false contradiction; what it buys is that Sybil variants of one source collapse to one key.
+        # None = legacy string mode; a list OR dict (incl. empty) = signed mode, fail-CLOSED (no key verifies ->
+        # nothing corroborates; never a silent fall-through to spoofable strings). PROVENANCE-CLASSES (1.9.5):
+        # pass a dict {pubkey_hex: class_label} so keys sharing an upstream model/feed share a CLASS, and the
+        # reopen threshold counts DISTINCT CLASSES, not raw keys — two commonly-sourced signers then count as one
+        # (addresses the correlated-sources critique: distinct keys prove distinctness, not independence). A plain
+        # list is the special case where every key is its own class (byte-identical 1.9.4 signed behaviour).
+        self.support_authorities = support_authorities
+        if support_authorities is None:
+            self._support_pubkeys, self._support_class = None, {}
+        elif isinstance(support_authorities, dict):
+            self._support_pubkeys = set(support_authorities)
+            self._support_class = {str(k): str(v) for k, v in support_authorities.items()}
+        else:
+            self._support_pubkeys = set(support_authorities)
+            self._support_class = {str(k): str(k) for k in support_authorities}   # each key = its own class
         # in-stream revert nonce ledger (0.7.12): consumed on EVALUATION, landed or not. Landed intents also
         # persist their nonce in the record meta, so single-use survives a reload; a conflicted-but-unlanded
         # nonce is only held in memory (honest boundary: after a restart it would conflict again, not land).
@@ -259,6 +513,14 @@ class Mnemo:
         # and is rejected, while a genuinely sustained value change is adopted once `supersede_persistence`
         # corroborating records exist. The integer IS the Adaptation-Corruption law's detection-latency floor
         # d* made explicit — set it to your stream's corruption-vs-change ratio. Unlike
+        # WARRANT AUTHORITIES (OPT-IN, default None -> any exogenous warrant string counts). When set to a
+        # collection of trusted outcome-channel identifiers, credit_requires_warrant counts a warrant only if
+        # it names one of them — so an ADAPTIVE MINJA attacker who forges a plausible warrant STRING (measured
+        # to revert self-graded ASR from 0% back to ~70% when any string is accepted, probes/minja_influence_
+        # gate.py cond. E) is rejected unless it can also name a declared trusted channel. This is the
+        # set-membership tier; the UNFORGEABLE tier is an Ed25519-attested warrant (remember(attestation=...)
+        # / strict_corroboration verified keys), which forces the attacker to forge a trusted key, not a string.
+        self.warrant_authorities = None
         # supersede_requires_corroboration this needs NO external credit(): it adopts a genuine change purely
         # from repeated independent assertions, where the corroboration guard would lag one forever. MEASURED
         # (lab fea933, mnemo's real consolidate() path): isolated-poison false-supersede 1 -> 0 while a
@@ -296,6 +558,13 @@ class Mnemo:
         # "independence" rail to the "origin-signed" rail; it does NOT make a claim TRUE (an attested source
         # can still sign a false claim), only makes manufactured independence expensive. Reversible: OFF.
         self.strict_corroboration = False
+        # EXOGENOUS-WARRANT credit (OPT-IN, default False -> identical legacy behavior). Closes the MINJA
+        # self-graded-outcome hole (arXiv:2503.03704): the influence gate's earned-outcome path counts only
+        # good credited with an exogenous `warrant` (an outcome the record did not author itself), so an
+        # agent that self-grades its own recalled reasoning cannot corroborate a poisoned bridge into the
+        # influence set. MEASURED (mnemo/probes/minja_influence_gate.py): self-graded MINJA ASR 80% -> 0%
+        # with this on, legit utility preserved when the app passes a real warrant. Reversible: False = legacy.
+        self.credit_requires_warrant = False
         # SEED-ANCHORED FLOW TRUST (OPT-IN, default empty set -> OFF -> zero behavior change). The one axis
         # strict_corroboration does NOT close: distinct Ed25519 keys prove DISTINCTNESS, not COST -- a Sybil
         # mints N keypairs for free, so ">=2 distinct verified keys" is still forgeable by a determined
@@ -369,11 +638,35 @@ class Mnemo:
         self._save_min_s = 5.0
         self._last_save = 0.0
         self._dirty = False
+        # ENCRYPTION-AT-REST (OPT-IN, default None -> plaintext JSON, byte-identical legacy). encrypt_key is a
+        # raw 32-byte AES-256 key (from new_encryption_key()); encrypt_passphrase is stretched with scrypt.
+        # mnemo NEVER persists the key/passphrase — you hold it; lose it and the store is unrecoverable (that IS
+        # crypto-shred). See the module-level note for the honest threat model + shred(). The key is resolved
+        # lazily against the on-disk salt so an existing encrypted store reloads with the same passphrase.
+        if encrypt_key is not None and (not isinstance(encrypt_key, (bytes, bytearray)) or len(encrypt_key) != 32):
+            raise ValueError("encrypt_key must be exactly 32 bytes (use mnemo.new_encryption_key())")
+        self._enc_rawkey = bytes(encrypt_key) if encrypt_key is not None else None
+        self._enc_passphrase = encrypt_passphrase
+        self._enc_salt = None                    # filled from the file header on load, or minted on first save
+        self._encrypted = bool(encrypt_key is not None or encrypt_passphrase is not None)
+        if self._encrypted and not _HAVE_AEAD:
+            raise RuntimeError("encryption needs the `cryptography` package (pip install cryptography)")
         if self.path and self.path.exists():
-            try:
-                self.items = json.loads(self.path.read_text(encoding="utf-8"))
-            except Exception:
-                self.items = []
+            raw = self.path.read_bytes()
+            if raw[:5] == _MNEMO_ENC_MAGIC:                           # encrypted store -> decrypt or FAIL LOUD
+                if not self._encrypted:
+                    raise ValueError("store is encrypted; pass encrypt_key= or encrypt_passphrase= to open it")
+                self._enc_salt = raw[5:21]                            # reuse the store's salt (passphrase re-derivation)
+                try:
+                    self.items = json.loads(_decrypt_blob(self._resolve_key(), raw))
+                except Exception as e:                                # wrong key / tampered / truncated -> never
+                    raise ValueError("cannot decrypt store (wrong key/passphrase, or the file was tampered)") from e
+                #                                                       silently return [] (would risk overwriting real data)
+            else:
+                try:
+                    self.items = json.loads(raw.decode("utf-8"))     # legacy plaintext JSON
+                except Exception:
+                    self.items = []
         # OPT-IN write receipts (default OFF -> zero behavior change; no sidecar created)
         self.receipts_enabled = bool(receipts or receipt_key)
         self._receipt_sk = receipt_key
@@ -410,7 +703,8 @@ class Mnemo:
                  mtype: str | None = None, valid_from: float | None = None,
                  source: dict | None = None, key: str | None = None,
                  derived_from: list | None = None, attestation=None, derived: bool = False,
-                 object: str | None = None, reaffirm: bool = False, capability: str | None = None) -> str:
+                 object: str | None = None, reaffirm: bool = False, capability: str | None = None,
+                 pii=None, identity_confidence: float | None = None) -> str:
         """Append-only raw capture. Stamped with an absolute UTC time; never edited afterward.
         mtype in {episodic, semantic, procedural} sets the decay prior (episodic fades fast,
         semantic slow, procedural barely); inferred from the text if not given. Pass it explicitly
@@ -449,6 +743,12 @@ class Mnemo:
                     key = ex
             except Exception:
                 pass
+        # availability guard (OPT-IN): cap a single record's text so one runaway/malicious write can't exhaust
+        # memory. Truncate rather than reject (don't break the app), and record the original length. SECURITY.md.
+        _trunc_from = None
+        if self.max_text is not None and isinstance(text, str) and len(text) > self.max_text:
+            _trunc_from = len(text)
+            text = text[:self.max_text]
         mid = uuid.uuid4().hex[:10]
         now = time.time()
         rec = {"id": mid, "text": text, "tags": list(tags or []), "value": float(value),
@@ -457,6 +757,25 @@ class Mnemo:
                "source": dict(source) if source else None,   # re-checkable origin (e.g. {"doc": id, "span": [start, end]}) so a recalled fact can be traced back, not trusted blind
                "mtype": mtype or _infer_type(text), "last_access": now,
                "status": "active", "links": [], "meta": dict(meta or {})}
+        if _trunc_from is not None:
+            rec["meta"]["truncated_from"] = _trunc_from
+        # TENANT STAMP: bind this write to the store's tenant so recall/supersession/erasure can isolate it.
+        # Unbound stores (tenant=None) leave no tag -> byte-identical legacy.
+        if self.tenant is not None:
+            rec["tenant"] = self.tenant
+        # PII TAG: record which PII types this write carries, for masking (recall(redact_pii=True)),
+        # data-minimization sweeps (forget_pii), and audit (pii_report). `pii` overrides/forces detection:
+        #   pii=True -> auto-detect types; pii=["email",...] -> use these types verbatim; pii=False -> tag none;
+        #   pii=None (default) -> auto-detect iff the store has pii_detect=True. Detection is on the ORIGINAL text.
+        _pii_types = None
+        if pii is False:
+            _pii_types = []
+        elif isinstance(pii, (list, tuple, set)):
+            _pii_types = sorted({str(p) for p in pii})
+        elif pii is True or (pii is None and self.pii_detect):
+            _pii_types = sorted(detect_pii(text).keys())
+        if _pii_types:
+            rec["pii"] = _pii_types
         # TAINT INHERITANCE (provenance that rides through transformation): when this memory is DERIVED from
         # others (a summary, a consolidation, an LLM rewrite), it inherits the union of its parents' canonical
         # sources — transitively, since a parent's own inherited taint is included. Without this, an app-side
@@ -502,6 +821,26 @@ class Mnemo:
             rec["orphan"] = True
         if key is not None:
             rec["key"] = str(key)
+        # IDENTITY-CONFIDENCE GATE ON SUPERSESSION (Fellegi-Sunter 1969 clerical-review zone / MDM match-merge
+        # stewardship, ported to agent memory). A keyed write SUPERSEDES every active same-key record with no
+        # threshold -- correct only if the (entity, field) IDENTITY the value attaches to is right. When that
+        # identity was resolved fuzzily (an extractor / embedding match, not a caller-asserted key), a wrong
+        # match silently promotes into the authoritative interval => a confident-but-WRONG ledger, harder to
+        # catch than a set. `identity_confidence` in [0,1] gates the write: >= fork_below supersedes as before;
+        # BELOW it the record is forked as a CANDIDATE (status='candidate', key stashed as candidate_key) that
+        # does NOT supersede and is excluded from authoritative resolution until reconciled (promote_candidate /
+        # discard_candidate). None (default) = caller asserts identity => supersede, byte-identical legacy.
+        # Not a new idea (record linkage's "possible match -> review", 50+ yrs); the contribution is the port +
+        # the measured prevention of confident-wrong writes vs an ungated LLM baseline.
+        _is_candidate = (key is not None and identity_confidence is not None
+                         and identity_confidence < self.fork_below)
+        if _is_candidate:
+            rec["status"] = "candidate"
+            rec["candidate_key"] = str(key)
+            rec.pop("key", None)                       # a candidate never occupies the authoritative key
+            rec["identity_confidence"] = float(identity_confidence)
+        elif identity_confidence is not None:
+            rec["identity_confidence"] = float(identity_confidence)
         # OBJECT (OPT-IN): the asserted VALUE for keyed supersession + the echo guard. Value-preserving
         # paraphrases share it, so echo detection is object-identity (not similarity, which provably can't
         # separate same-value paraphrase from different-value correction). Falls back to normalized text.
@@ -538,8 +877,9 @@ class Mnemo:
             except Exception:
                 rec["vec"] = None
         self.items.append(rec)
-        if key is not None:
+        if key is not None and not _is_candidate:
             self._supersede_by_key(rec, reaffirm=reaffirm)   # deterministic SRO supersession (no embedding, no threshold)
+            #                                                  a candidate (low identity_confidence) never supersedes
         if self.capacity is not None:
             self._evict_to_capacity()                        # bounded working set (opt-in) BEFORE persisting
         self._save(force=True)        # a new memory is real content - persist immediately, not throttled
@@ -604,7 +944,7 @@ class Mnemo:
                 pass
         return r
 
-    def verify_writes(self, expected_pubkey: str | None = None) -> tuple[bool, list[str]]:
+    def verify_writes(self, expected_pubkey: str | None = None, warn_unpinned: bool = False) -> tuple[bool, list[str]]:
         """Verify the write-receipt chain AND that each stored memory still matches its write receipt.
         Returns (ok, problems). Catches out-of-band edits to the store the normal flow can't see.
         Requires receipts to have been enabled at write time."""
@@ -660,6 +1000,13 @@ class Mnemo:
             elif expected_pubkey:
                 problems.append(f"tombstone {j}: unsigned, but a signature was required")
             tprev = t.get("hash")
+        # OPT-IN footgun advisory (default off = byte-identical legacy): a signature verified against the
+        # receipt's OWN pubkey is not operator-adversarial-safe — a store-rewriter can swap sig+pubkey together.
+        # With warn_unpinned=True and signatures present but no expected_pubkey pinned, surface it as a problem.
+        if warn_unpinned and expected_pubkey is None and (
+                any("sig" in r for r in self._receipts) or any("sig" in t for t in self._tombstones)):
+            problems.append("signatures present but expected_pubkey not pinned: a store-rewriter can swap the "
+                            "key and still pass — pass expected_pubkey, or witness anchor() externally")
         return (len(problems) == 0, problems)
 
     def verify_attribution(self) -> dict:
@@ -747,9 +1094,10 @@ class Mnemo:
         if not k:
             return
         vf_new = rec.get("valid_from", rec["ts"])
+        tv = rec.get("tenant")                         # tenant isolation: only same-tenant records collide on a key
         if self.echo_guard and not reaffirm:
             new_sig = self._obj_sig(rec)
-            same_key = [r for r in self.items if r is not rec and r.get("key") == k]
+            same_key = [r for r in self.items if r is not rec and r.get("key") == k and r.get("tenant") == tv]
             active = [r for r in same_key if r.get("status") == "active"]
             # OBJECT-LESS CLOBBER GUARD: on a key managed with explicit objects (a value ledger), a keyed
             # write carrying NO object cannot displace an object-bearing value — measured hole: a value-free
@@ -778,7 +1126,7 @@ class Mnemo:
                 m["superseded_by_policy"] = "echo_guard"
                 return                                 # current value preserved; skip normal supersession
         for r in self.items:
-            if r is rec or r.get("status") != "active" or r.get("key") != k:
+            if r is rec or r.get("status") != "active" or r.get("key") != k or r.get("tenant") != tv:
                 continue
             vf_r = r.get("valid_from", r["ts"])
             if vf_r <= vf_new:                 # r is the older value -> retire it
@@ -795,6 +1143,306 @@ class Mnemo:
                 rm = rec.setdefault("meta", {})
                 rm["superseded_by_toggle"] = r["id"]
                 rm["superseded_by_policy"] = "keyed_lww_backfill"
+
+    # ── candidate reconciliation queue (identity-confidence gate; Fellegi-Sunter clerical review / MDM steward
+    #    queue, ported to agent memory). A fuzzy-identity keyed write forks a candidate instead of superseding;
+    #    these three methods are the steward path that promotes or discards it. ────────────────────────────────
+    def candidates(self, key: str | None = None) -> list:
+        """The reconciliation queue: forked candidate records awaiting an identity decision (writes whose
+        identity_confidence fell below fork_below, so they did NOT supersede). Each entry shows what it WOULD
+        change: the proposed key, the candidate's value/text, its confidence, and the CURRENT authoritative
+        value it would replace if promoted. Tenant-scoped when bound. Read-only.
+
+        Returns a list of {id, candidate_key, object, text, identity_confidence, current: {id, object, text} | None}."""
+        tv = self.tenant
+        out = []
+        for r in self.items:
+            if r.get("status") != "candidate":
+                continue
+            if self.tenant is not None and r.get("tenant") != tv:
+                continue
+            ck = r.get("candidate_key")
+            if key is not None and ck != str(key):
+                continue
+            cur = next((a for a in self.items if a.get("key") == ck and a.get("status") == "active"
+                        and a.get("tenant") == r.get("tenant")), None)
+            out.append({"id": r["id"], "candidate_key": ck, "object": r.get("object"),
+                        "text": r.get("text"), "identity_confidence": r.get("identity_confidence"),
+                        "current": ({"id": cur["id"], "object": cur.get("object"), "text": cur.get("text")}
+                                    if cur else None)})
+        return out
+
+    def promote_candidate(self, cid: str, capability: str | None = None) -> dict:
+        """STEWARD DECISION: accept a candidate's identity. It becomes the authoritative value for its key and
+        supersedes the prior active same-key value (a confirmed correction). Because promoting a fuzzy match
+        INTO the authoritative interval is exactly the write the gate was protecting, it takes the same
+        capability as revert()/reaffirm when a revert authority is configured (else the content path could
+        launder a fuzzy match to authority by promoting it). Returns {promoted, key, superseded:[ids]}."""
+        rec = next((r for r in self.items if r["id"] == cid and r.get("status") == "candidate"), None)
+        if rec is None:
+            raise KeyError(f"no candidate with id {cid}")
+        if self.tenant is not None and rec.get("tenant") != self.tenant:
+            raise KeyError(f"no candidate with id {cid}")     # tenant isolation
+        ck = rec.get("candidate_key")
+        if (self.revert_authority is not None or self.revert_pubkey is not None) \
+                and capability is not _SANCTIONED and not self._revert_authorized(ck, capability):
+            raise PermissionError("promote_candidate requires a valid capability (revert authority is set)")
+        before = [r["id"] for r in self.items if r.get("key") == ck and r.get("status") == "active"
+                  and r.get("tenant") == rec.get("tenant")]
+        rec["status"] = "active"
+        rec["key"] = ck
+        rec.pop("candidate_key", None)
+        rec.setdefault("meta", {})["promoted_from_candidate"] = True
+        self._supersede_by_key(rec)                            # now retires the prior authoritative value
+        self._save(force=True)
+        after = {r["id"] for r in self.items if r.get("key") == ck and r.get("status") == "active"}
+        return {"promoted": cid, "key": ck, "superseded": [i for i in before if i not in after]}
+
+    def discard_candidate(self, cid: str, basis: str | None = None) -> dict:
+        """STEWARD DECISION: reject a candidate (wrong identity / spurious). It is retired without ever touching
+        the authoritative value. Returns {discarded}."""
+        rec = next((r for r in self.items if r["id"] == cid and r.get("status") == "candidate"), None)
+        if rec is None:
+            raise KeyError(f"no candidate with id {cid}")
+        if self.tenant is not None and rec.get("tenant") != self.tenant:
+            raise KeyError(f"no candidate with id {cid}")
+        rec["status"] = "superseded"
+        rec["superseded_ts"] = time.time()
+        m = rec.setdefault("meta", {})
+        m["superseded_by_policy"] = "candidate_discarded"
+        if basis:
+            m["discard_basis"] = basis
+        self._save(force=True)
+        return {"discarded": cid}
+
+    def _current_active(self, key: str):
+        tv = self.tenant
+        return next((r for r in self.items if r.get("key") == str(key) and r.get("status") == "active"
+                     and (tv is None or r.get("tenant") == tv)), None)
+
+    @staticmethod
+    def _support_sig(s) -> str:
+        return re.sub(r"[^a-z0-9]+", " ", str(s).lower()).strip()
+
+    @staticmethod
+    def _as_list(x):
+        return list(x) if isinstance(x, (list, tuple, set)) else [x]
+
+    def support_challenge_for(self, key: str, toward) -> str:
+        """The exact message an attesting source signs to corroborate an observe() contradiction of `key`'s
+        current value toward `toward` (None = value-obscuring revert). Mirrors revert_challenge: it binds the
+        CURRENT active record id and the tenant, so a captured signature cannot be replayed after the value
+        legitimately changes and changes back (cross-time) or across tenants sharing one allowlist. Surface this
+        to the signer; sign_support() signs it."""
+        cur = self._current_active(key)
+        cur_id = cur["id"] if cur else ""
+        return "support:" + _sha256_hex(_canon({
+            "key": str(key), "toward": (toward if toward is not None else "__revert__"),
+            "cur": cur_id, "tenant": self.tenant or ""}))
+
+    def _verify_support(self, pubkey_hex, sig_hex, challenge: str) -> bool:
+        """A signed support ground counts only if its key is allowlisted AND its Ed25519 signature verifies over
+        the current, tenant-and-record-bound challenge. The store verifies but can never mint it."""
+        if not self._support_pubkeys or pubkey_hex not in self._support_pubkeys:
+            return False
+        if not _HAVE_ED:
+            raise RuntimeError("verifying a signed support ground needs the `cryptography` package")
+        try:
+            _Ed25519PK.from_public_bytes(bytes.fromhex(pubkey_hex)).verify(
+                bytes.fromhex(sig_hex), challenge.encode())
+            return True
+        except Exception:
+            return False
+
+    def _verified_support_classes(self, support, key, toward) -> set:
+        """The set of DISTINCT PROVENANCE CLASSES that validly signed THIS contradiction (bound to the current
+        record + tenant). Self-minted keys/strings count zero (Sybil resistance relative to the allowlist), and
+        keys declared to share a class collapse to one — so the threshold counts independent-ish SOURCES, not raw
+        keys. Items are (pubkey_hex, sig_hex). Honest limit: 'class' is a DECLARED grouping by whoever curates
+        the allowlist; the store enforces it but cannot verify two classes are truly causally independent."""
+        challenge = self.support_challenge_for(key, toward)
+        out = set()
+        for item in self._as_list(support):
+            if isinstance(item, (tuple, list)) and len(item) == 2:
+                pk, sg = item
+                if self._verify_support(pk, sg, challenge):
+                    out.add(self._support_class.get(pk, pk))
+        return out
+
+    def observe(self, text: str, key: str, object: str | None = None, support=None,
+                meta: dict | None = None) -> dict:
+        """READ-PATH contradiction check (marintkael's mirror of the Fellegi-Sunter clerical-review band, r/RAG
+        2026-07-16). Ingest an OBSERVATION (evidence, NOT an authoritative write) about `key` that CONTRADICTS the
+        current high-confidence settled value. It NEVER writes an authoritative value — it can only REOPEN a
+        settled record for steward review (reopened()/resolve_reopened); the record stays 'active' so recall()
+        still returns it. Catches the confident wrong-merge write-time can't, and gives the value-obscuring revert
+        something to key on. It does NOT decide the reopened case — legit-vs-injected still needs authority.
+
+        TWO keying modes:
+        * SUPPORT-KEYED (pass `support`, marintkael's fix 2026-07-16) — this is justification-based truth
+          maintenance (Doyle 1979 JTMS: a node's belief is a function of its SUPPORT set, not the proposition, and
+          a relabel fires when a NEW justification arrives; de Kleer 1986 ATMS: distinct minimal-environment
+          labels = 'distinct novel supports'; Dung 1995 reinstatement: an argument reopens only when a NEW
+          attacker/defender enters). Key reopen on NOVELTY-OF-SUPPORT, not on
+          value. A restatement whose grounds the ledger has already seen (or that carries no support) is an ECHO
+          -> silenced, even though it contradicts the current value; only a contradiction resting on grounds NOT
+          in the record's justification set reopens. So replay collapses into the echo case BY CONSTRUCTION (same
+          value, same stale support) and the value-disagreement DoS lever falls off, while an honest late
+          correction that brings NEW ground still gets through. Corroboration counts DISTINCT novel support
+          signatures (splitting one intent into two emissions shares support -> one sig -> does not corroborate),
+          which is independence measured at the support level. HONEST LIMIT: novelty-of-support is itself a
+          provenance judgement pushed one level down, not certified — reopened() stays a queue, not a resolution.
+        * VALUE-KEYED (omit `support`, legacy 1.9.2): reopen on a value-contradiction corroborated by >=
+          reopen_corroboration observations. Kept byte-identical for existing callers.
+
+        Returns {reopened, key, pending, need, surfaced_prior, review_id, ...}."""
+        cur = self._current_active(key)
+        if cur is None:
+            return {"reopened": False, "key": str(key), "pending": 0, "need": self.reopen_corroboration,
+                    "surfaced_prior": None, "review_id": None, "no_current": True}
+        ic = cur.get("identity_confidence")            # only HIGH-confidence settled records are guarded
+        if not (ic is None or ic >= self.fork_below):
+            return {"reopened": False, "key": str(key), "pending": 0, "need": self.reopen_corroboration,
+                    "surfaced_prior": None, "review_id": None, "low_confidence": True}
+        m = cur.setdefault("meta", {})
+        agrees = object is not None and self._obj_sig({"object": object, "text": text}) == self._obj_sig(cur)
+        if agrees:
+            if support is not None:                     # an agreeing observation's grounds are now 'seen'
+                seen = set(m.get("_support_seen", []))
+                now = (self._verified_support_classes(support, key, object) if self.support_authorities is not None
+                       else {self._support_sig(s) for s in self._as_list(support)})
+                m["_support_seen"] = list(seen | now)
+                self._save(force=True)
+            return {"reopened": False, "key": str(key), "pending": 0, "need": self.reopen_corroboration,
+                    "surfaced_prior": None, "review_id": None, "agreed": True}
+        prior = self._latest_superseded_object(key, cur)
+        if support is not None and self.support_authorities is not None:
+            # SIGNED-GROUNDS (marintkael round 3): only a ground signed by a DISTINCT allowlisted authority over
+            # support_challenge(key, toward) corroborates; the fabricated-grounds attack moves from 'mint two
+            # strings' to 'forge two signatures under keys you do not hold'.
+            seen = set(m.get("_support_seen", []))
+            verified = self._verified_support_classes(support, key, object)
+            novel = verified - seen
+            m["_support_seen"] = list(seen | verified)
+            if not novel:
+                self._save(force=True)
+                return {"reopened": False, "key": str(key), "pending": len(verified),
+                        "need": self.reopen_corroboration, "surfaced_prior": prior, "review_id": None,
+                        "echo": True, "verified_grounds": len(verified)}
+            vsig = self._obj_sig({"object": object, "text": text}) if object is not None else "__revert__"
+            nov = m.setdefault("_reopen_support", {})
+            accrued = set(nov.get(vsig, [])) | novel
+            nov[vsig] = list(accrued)
+            self._save(force=True)
+            if len(accrued) >= self.reopen_corroboration:
+                return self._do_reopen(cur, prior, "signed_support_contradiction", object, meta)
+            return {"reopened": False, "key": str(key), "pending": len(accrued),
+                    "need": self.reopen_corroboration, "surfaced_prior": prior, "review_id": None}
+        if support is not None:
+            # SUPPORT-KEYED (string): an echo (no novel grounds) is silenced even though it disagrees on value.
+            seen = set(m.get("_support_seen", []))
+            sigs = {self._support_sig(s) for s in self._as_list(support) if self._support_sig(s)}
+            novel = sigs - seen
+            m["_support_seen"] = list(seen | sigs)      # discount all grounds now seen
+            if not novel:
+                self._save(force=True)
+                return {"reopened": False, "key": str(key), "pending": 0, "need": self.reopen_corroboration,
+                        "surfaced_prior": prior, "review_id": None, "echo": True}
+            vsig = self._obj_sig({"object": object, "text": text}) if object is not None else "__revert__"
+            nov = m.setdefault("_reopen_support", {})
+            accrued = set(nov.get(vsig, [])) | novel    # DISTINCT novel grounds only (independence at support level)
+            nov[vsig] = list(accrued)
+            self._save(force=True)
+            if len(accrued) >= self.reopen_corroboration:
+                return self._do_reopen(cur, prior, "novel_support_contradiction", object, meta)
+            return {"reopened": False, "key": str(key), "pending": len(accrued),
+                    "need": self.reopen_corroboration, "surfaced_prior": prior, "review_id": None}
+        # VALUE-KEYED (legacy 1.9.2): value-obscuring revert reopens on first sight; named contradiction is gated
+        if object is None:
+            return self._do_reopen(cur, prior, "value_obscuring_revert", None, meta)
+        sig = self._obj_sig({"object": object, "text": text})
+        contra = m.setdefault("_reopen_contra", {})
+        contra[sig] = int(contra.get(sig, 0)) + 1
+        self._save(force=True)
+        if contra[sig] >= self.reopen_corroboration:
+            return self._do_reopen(cur, prior, "corroborated_contradiction", object, meta)
+        return {"reopened": False, "key": str(key), "pending": contra[sig],
+                "need": self.reopen_corroboration, "surfaced_prior": prior, "review_id": None}
+
+    def _latest_superseded_object(self, key: str, cur: dict):
+        tv = cur.get("tenant")
+        sup = [r for r in self.items if r.get("key") == str(key) and r.get("status") == "superseded"
+               and r.get("tenant") == tv and self._obj_sig(r) != self._obj_sig(cur)]
+        sup.sort(key=lambda r: r.get("superseded_ts", r.get("ts", 0)))
+        return sup[-1].get("object") if sup else None
+
+    def _do_reopen(self, cur: dict, prior, reason: str, contra_object, meta) -> dict:
+        m = cur.setdefault("meta", {})
+        # flag, NOT a status change: the record stays 'active' so recall() still returns it as the current best
+        # guess (an agent left with nothing is worse), it is only surfaced by reopened() for steward review.
+        cur["reopened"] = True
+        cur["reopened_ts"] = time.time()
+        m["reopened_reason"] = reason
+        m["reopened_surfaced_prior"] = prior
+        if contra_object is not None:
+            m["reopened_contradiction"] = contra_object
+        if meta:
+            m.setdefault("reopened_meta", {}).update(meta)
+        m.pop("_reopen_contra", None)
+        m.pop("_reopen_support", None)
+        self._save(force=True)
+        return {"reopened": True, "key": cur.get("key"), "pending": self.reopen_corroboration,
+                "need": self.reopen_corroboration, "surfaced_prior": prior, "review_id": cur["id"]}
+
+    def reopened(self, key: str | None = None) -> list:
+        """The POST-write review queue: settled records reopened because corroborated evidence contradicted them
+        (the mirror of candidates(), which holds a match BEFORE the write). Each entry shows the still-current
+        value, why it reopened, and the prior value offered to reaffirm. Read-only, tenant-scoped."""
+        tv = self.tenant
+        out = []
+        for r in self.items:
+            if not r.get("reopened") or r.get("status") != "active":
+                continue
+            if tv is not None and r.get("tenant") != tv:
+                continue
+            if key is not None and r.get("key") != str(key):
+                continue
+            m = r.get("meta", {})
+            out.append({"id": r["id"], "key": r.get("key"), "object": r.get("object"), "text": r.get("text"),
+                        "reason": m.get("reopened_reason"), "surfaced_prior": m.get("reopened_surfaced_prior"),
+                        "contradiction": m.get("reopened_contradiction")})
+        return out
+
+    def resolve_reopened(self, rid: str, decision: str, capability: str | None = None) -> dict:
+        """STEWARD DECISION on a reopened interval. decision='keep_current' clears the flag (false alarm ->
+        status back to active). decision='reaffirm_prior' restores the surfaced prior value via the authorized
+        revert path (remember(reaffirm=True)) — so it takes the revert capability when one is configured, exactly
+        like promote_candidate (the content path must not launder a restore to authority). Returns a summary."""
+        rec = next((r for r in self.items if r["id"] == rid and r.get("reopened")
+                    and r.get("status") == "active"), None)
+        if rec is None:
+            raise KeyError(f"no reopened record with id {rid}")
+        if self.tenant is not None and rec.get("tenant") != self.tenant:
+            raise KeyError(f"no reopened record with id {rid}")
+        if decision == "keep_current":
+            rec.pop("reopened", None)
+            rec.pop("reopened_ts", None)
+            m = rec.get("meta", {})
+            for kk in ("reopened_reason", "reopened_surfaced_prior", "reopened_contradiction", "reopened_meta"):
+                m.pop(kk, None)
+            self._save(force=True)
+            return {"resolved": rid, "decision": "keep_current", "key": rec.get("key")}
+        if decision == "reaffirm_prior":
+            prior = rec.get("meta", {}).get("reopened_surfaced_prior")
+            if prior is None:
+                raise ValueError("no surfaced prior value to reaffirm")
+            key = rec.get("key")
+            rec.pop("reopened", None)                       # unflag; the reaffirm write will supersede it
+            new_id = self.remember(f"the {key} is {prior}", key=key, object=prior, reaffirm=True,
+                                   capability=capability)
+            return {"resolved": rid, "decision": "reaffirm_prior", "key": key, "reaffirmed_object": prior,
+                    "new_id": new_id}
+        raise ValueError("decision must be 'keep_current' or 'reaffirm_prior'")
 
     def remember_dedup(self, text: str, tags=None, value: float = 1.0, meta: dict | None = None,
                        mtype: str | None = None, dup_threshold: float = 0.95) -> str:
@@ -893,8 +1541,24 @@ class Mnemo:
                 pass
         return t
 
+    def register_erasure_target(self, target) -> "Mnemo":
+        """Register an APP-SIDE store (the app's vector index, an embedding/response cache, a retrieval log)
+        for cross-store right-to-erasure. Targets implement the two-method ErasureTarget protocol
+        (mnemo.deletion_manifest): erase(subject) and still_recoverable(subject, values). Once any target is
+        registered, forget_subject() cascades the erasure through every target and returns a hash-chained
+        DeletionManifest that is honest BY CONSTRUCTION: 'complete' only if every store (this one included)
+        verified the data no longer recoverable, and it NAMES the stores that still leak. Targets are live
+        client adapters, so they are RAM-only: re-register on every process start. Motivated by a measured
+        gap: a copy the app embedded into its own vector index survives every memory store's native delete
+        (erasure_fanout_probe: 8/8) — the store alone cannot fix that; a registered fan-out can."""
+        if not hasattr(self, "_erasure_targets"):
+            self._erasure_targets = []
+        self._erasure_targets.append(target)
+        return self
+
     def forget_subject(self, subject: str, request_id: str | None = None, basis: str | None = None,
-                       authorized_by: str | None = None, authorization: str | None = None) -> dict:
+                       authorized_by: str | None = None, authorization: str | None = None,
+                       values=None) -> dict:
         """RIGHT-TO-ERASURE across provenance lineage, with a tamper-evident audit of the ACT. Hard-deletes
         every active memory ATTRIBUTABLE to `subject` — its own canonical source OR any record that inherited
         `subject` through derived_from taint (so a summary/consolidation built from the subject's data is erased
@@ -914,16 +1578,138 @@ class Mnemo:
         # match the subject against canonical sources; accept either the raw string the caller wrote or its
         # entity-resolved form (_canon_source collapses "user-42"/"user_42"/"User 42" -> one canonical id).
         cand = {subject, Mnemo._canon_source(subject)}
-        subj_ids = [r["id"] for r in self.items if cand & Mnemo._rec_sources(r)]
+        subj_ids = [r["id"] for r in self.items if cand & Mnemo._rec_sources(r)
+                    and (self.tenant is None or r.get("tenant") == self.tenant)]   # tenant isolation on erasure
         if not subj_ids:
             return {"erased": 0, "ids": [], "request_id": request_id, "tombstones": 0}
+        # capture the sensitive values BEFORE deletion so the cross-store residue check has something to
+        # verify against (caller-supplied `values` win; else the erased records' own text/object strings).
+        targets = list(getattr(self, "_erasure_targets", []))
+        if targets and values is None:
+            ids_set = set(subj_ids)
+            values = []
+            for r in self.items:
+                if r["id"] in ids_set:
+                    for v in (r.get("text"), r.get("object")):
+                        if v and str(v).strip():
+                            values.append(str(v))
         now = time.time()
         res = self.forget(ids=subj_ids)
         for mid in res["ids"]:
             self._emit_tombstone(mid, now, request_id, basis=basis,
                                  authorized_by=authorized_by, authorization=authorization)
+        out = {"erased": res["forgotten"], "ids": res["ids"],
+               "request_id": request_id, "tombstones": len(res["ids"])}
+        if targets:
+            out["manifest"] = self._erasure_manifest(subject, values or [], targets, request_id,
+                                                     basis, authorized_by, already_erased=res["forgotten"])
+        return out
+
+    def _erasure_manifest(self, subject: str, values: list, targets: list, request_id, basis,
+                          authorized_by, already_erased: int) -> dict:
+        """Cascade a subject erasure through the registered app-side targets and return the hash-chained
+        DeletionManifest. This store itself is always the FIRST target (self-check on the same instrument):
+        after the purge above, is any captured value still recoverable from items/recall? Honest scope is
+        carried inside the manifest; see deletion_manifest.DeletionManifest."""
+        from .deletion_manifest import DeletionManifest, ErasureTarget
+
+        store = self
+        n_erased = already_erased
+
+        class _SelfTarget(ErasureTarget):
+            name = "mnemo-store"
+
+            def erase(self, subj):                       # already purged by forget_subject
+                return {"erased": n_erased}
+
+            def still_recoverable(self, subj, vals):
+                blob = " ".join((r.get("text") or "") + " " + str(r.get("object") or "")
+                                for r in store.items).lower()
+                return any(v.lower() in blob for v in (vals or []) if v)
+
+        man = DeletionManifest()
+        man.register(_SelfTarget())
+        for t in targets:
+            man.register(t)
+        return man.execute(subject, values, request_id=request_id, basis=basis,
+                           authorized_by=authorized_by)
+
+    def _tenant_rows(self) -> list:
+        """The records THIS store is allowed to touch: all rows for an unbound (admin) store, else only the
+        bound tenant's rows. The one place tenant scoping is resolved for the whole-store audit/sweep methods."""
+        if self.tenant is None:
+            return list(self.items)
+        return [r for r in self.items if r.get("tenant") == self.tenant]
+
+    def pii_report(self) -> dict:
+        """Audit view of PII exposure across this store (tenant-scoped when bound): how many ACTIVE records
+        carry each detected PII type, and their ids. Reads the `pii` tags stamped at write time (pii_detect /
+        remember(pii=...)); it does NOT re-scan text here, so it reflects exactly what was tagged. Use it to
+        drive a data-minimization review or a forget_pii() sweep. Read-only; returns no raw PII values.
+
+        Returns {records_with_pii, by_type: {type: count}, ids: {type: [id,...]}}."""
+        by_type: dict = {}
+        ids: dict = {}
+        n = 0
+        for r in self._tenant_rows():
+            if r.get("status") != "active":
+                continue
+            types = r.get("pii")
+            if not types:
+                continue
+            n += 1
+            for t in types:
+                by_type[t] = by_type.get(t, 0) + 1
+                ids.setdefault(t, []).append(r["id"])
+        return {"records_with_pii": n, "by_type": by_type, "ids": ids}
+
+    def forget_pii(self, types=None, subject: str | None = None, request_id: str | None = None,
+                   basis: str | None = None) -> dict:
+        """DATA-MINIMIZATION SWEEP: hard-delete (+ tombstone) every record carrying a PII tag, optionally
+        restricted to specific `types` (e.g. ['email','ssn']) and/or a `subject` (a canonical source string,
+        as in forget_subject). Tenant-scoped when the store is bound. Like forget_subject this genuinely REMOVES
+        content and records a content-free, hash-chained tombstone per erased row so verify_writes() reads the
+        deletion as deliberate, not tampering. Same HONEST SCOPE as forget_subject: erases within THIS mnemo
+        store only, not the app's vector store / logs / backups; not a compliance certification.
+
+        Returns {erased, ids, request_id, tombstones}."""
+        want = set(types) if types is not None else None
+        cand = None
+        if subject is not None:
+            cand = {subject, Mnemo._canon_source(subject)}
+        target = []
+        for r in self._tenant_rows():
+            tags = r.get("pii")
+            if not tags:
+                continue
+            if want is not None and not (want & set(tags)):
+                continue
+            if cand is not None and not (cand & Mnemo._rec_sources(r)):
+                continue
+            target.append(r["id"])
+        if not target:
+            return {"erased": 0, "ids": [], "request_id": request_id, "tombstones": 0}
+        now = time.time()
+        res = self.forget(ids=target)
+        for mid in res["ids"]:
+            self._emit_tombstone(mid, now, request_id, basis=basis or "pii_minimization")
         return {"erased": res["forgotten"], "ids": res["ids"],
                 "request_id": request_id, "tombstones": len(res["ids"])}
+
+    def for_tenant(self, tenant: str):
+        """Return a TENANT VIEW over THIS store (one physical store, many logically-isolated tenants). The view
+        SHARES this store's items, caches, file, and config by reference — so `store.for_tenant('a')` and
+        `store.for_tenant('b')` read/write ONE store with no clobber — but every write it makes is stamped with
+        its tenant and every read/supersession/erasure it performs is hard-filtered to it (fail-closed, exactly
+        like a tenant-bound Mnemo). Typical use: the operator holds the unbound `store` (admin/migration view)
+        and hands each request a `store.for_tenant(user_id)` handle that cannot see another tenant's data.
+
+            store = Mnemo(path="all.json")
+            acme = store.for_tenant("acme"); acme.remember("secret", key="k", object="s")
+            globex = store.for_tenant("globex")
+            acme.recall("secret")     # -> only acme rows; globex.recall(...) never sees them
+        """
+        return _TenantView(self, str(tenant))
 
     def erasure_report(self) -> dict:
         """Audit view of deliberate erasures: total tombstones + each {memory_id, ts, request_id}. Read-only;
@@ -967,6 +1753,10 @@ class Mnemo:
                 "problems": problems,
                 "all_signed": bool(self._tombstones) and all("sig" in t for t in self._tombstones),
                 "expected_pubkey": expected_pubkey,
+                # honest trust level of the signatures (the footgun made visible to the auditor):
+                "signature_authenticity": ("pinned to expected_pubkey" if expected_pubkey else
+                                           "self-referential — a store-rewriter can swap the key; pin "
+                                           "expected_pubkey or witness anchor() externally"),
                 # CT-style anchor: a compact, externally-witnessable commitment to the whole history, so an
                 # auditor can detect an operator (key-holder) rewrite via verify_consistency() against a prior
                 # witnessed anchor — the operator-adversarial hole verify_writes cannot close on its own.
@@ -1597,7 +2387,7 @@ class Mnemo:
         return {"intent": "echo", "action": "blocked", "key": key, "id": rid,
                 "policy": policy, "note": "unmarked restatement of a superseded value; not restored"}
 
-    def as_of(self, key: str, when: float) -> dict | None:
+    def as_of(self, key: str, when: float, as_recorded: float | None = None) -> dict | None:
         """POINT-IN-TIME query: the value that was CURRENT for `key` at event-time `when` (a UTC
         epoch float). This is the bi-temporal 'as-of' / time-travel read — reconstruct history, not
         just the latest value. No graph DB: keyed supersession already stamps every record with a
@@ -1611,21 +2401,54 @@ class Mnemo:
 
         Returns {object, text, valid_from, invalidated_at, id} for the record valid at `when`, or
         None if nothing was known for `key` yet at that time. Ties (overlapping intervals from an
-        unclean history) resolve to the latest valid_from <= when."""
-        best = None
-        for r in self.items:
-            if r.get("key") != key:
-                continue
-            vf = r.get("valid_from", r["ts"])
-            inv = r.get("invalidated_at")
-            if vf <= when and (inv is None or inv > when):
-                if best is None or vf > best.get("valid_from", best["ts"]):
-                    best = r
+        unclean history) resolve to the latest valid_from <= when.
+
+        BITEMPORAL (1.5.0): pass `as_recorded` (a transaction-time epoch) to reconstruct the KNOWLEDGE STATE as
+        of that recording time — "what did we BELIEVE, at tx-time `as_recorded`, was true at valid-time `when`" —
+        using only records written by then (ts <= as_recorded) with supersession recomputed within that set, so a
+        correction recorded LATER cannot leak into the earlier belief. This is the second clock: valid-time
+        (`when`, world truth) x transaction-time (`as_recorded`, what the store knew). Audit/replay: "what did the
+        agent believe when it acted", provably, without the later correction contaminating the reconstruction."""
+        if as_recorded is None:
+            best = None
+            for r in self.items:
+                if r.get("key") != key:
+                    continue
+                vf = r.get("valid_from", r["ts"])
+                inv = r.get("invalidated_at")
+                if vf <= when and (inv is None or inv > when):
+                    if best is None or vf > best.get("valid_from", best["ts"]):
+                        best = r
+        else:
+            # transaction-time filter: only records written by `as_recorded`; supersession recomputed within it
+            # (a record is superseded only by a LATER-valid_from record that was itself already recorded by then).
+            cands = [r for r in self.items if r.get("key") == key
+                     and r.get("valid_from", r["ts"]) <= when and r["ts"] <= as_recorded]
+            best = max(cands, key=lambda r: (r.get("valid_from", r["ts"]), r["ts"]), default=None)
+        if best is None:
+            return None
+        out = {"object": best.get("object"), "text": best.get("text"),
+               "valid_from": best.get("valid_from", best["ts"]),
+               "invalidated_at": best.get("invalidated_at"), "id": best["id"]}
+        if as_recorded is not None:
+            nxt = [r.get("valid_from", r["ts"]) for r in self.items
+                   if r.get("key") == key and r["ts"] <= as_recorded
+                   and r.get("valid_from", r["ts"]) > out["valid_from"]]
+            out["invalidated_at"] = min(nxt) if nxt else None   # invalidation AS KNOWN at as_recorded
+            out["as_recorded"] = as_recorded
+        return out
+
+    def believed_at(self, key: str, as_recorded: float) -> dict | None:
+        """The value the store would have returned as CURRENT for `key` if frozen at transaction-time
+        `as_recorded` — the latest-asserted value known by then, ignoring any correction recorded AFTER. Answers
+        'what did the agent believe when it acted at time T', for replay and audit. Returns
+        {object, text, valid_from, id, as_recorded} or None."""
+        cands = [r for r in self.items if r.get("key") == key and r["ts"] <= as_recorded]
+        best = max(cands, key=lambda r: (r.get("valid_from", r["ts"]), r["ts"]), default=None)
         if best is None:
             return None
         return {"object": best.get("object"), "text": best.get("text"),
-                "valid_from": best.get("valid_from", best["ts"]),
-                "invalidated_at": best.get("invalidated_at"), "id": best["id"]}
+                "valid_from": best.get("valid_from", best["ts"]), "id": best["id"], "as_recorded": as_recorded}
 
     def history(self, key: str) -> list[dict]:
         """The full validity timeline for `key`: every value it has held, in event-time order, each
@@ -1747,7 +2570,8 @@ class Mnemo:
                prefer=None, prefer_trust: float = 1.0,
                prefer_max_boost: float | None = None, near: dict | None = None,
                tie_recent: float | None = None,
-               with_status: bool = False, with_warrant: bool = False) -> list[dict]:
+               with_status: bool = False, with_warrant: bool = False,
+               redact_pii: bool = False) -> list[dict]:
         """Top-k memories by RELEVANCE × VALUE — high-value memories outrank merely-similar ones.
         Memories the dream pass flagged as hubs (universal matchers) are skipped unless include_hubs.
 
@@ -1896,6 +2720,11 @@ class Mnemo:
                 return include_hubs
             return include_superseded            # superseded / other non-active
         pool = [r for r in self.items if _eligible(r)]
+        # HARD TENANT ISOLATION (fail-closed, non-bypassable): a tenant-bound store sees ONLY its own tenant's
+        # records, always — this is enforced here on the STORE, not via a caller argument, so no forgotten
+        # parameter can leak another tenant's data. An unbound store (tenant=None) is the admin view (sees all).
+        if self.tenant is not None:
+            pool = [r for r in pool if r.get("tenant") == self.tenant]
         # Scope/namespace isolation: when a scope is requested, recall ONLY sees memories tagged with that scope
         # (meta['scope']) BEFORE ranking — a shared store (e.g. many agents / tenants in one Mnemo) cannot bleed
         # one scope's memories into another's recall. scope=None (default) sees everything (legacy behavior).
@@ -2082,11 +2911,17 @@ class Mnemo:
             # Canonicalizing source identifiers before counting collapses those to one; a link whose record
             # has no source counts as its own id, so genuinely source-less corroboration is unchanged.
             _good = float(r.get("good", 0) or 0); _bad = float(r.get("bad", 0) or 0)
+            # graduation shares the influence-gate bar, incl. the exogenous-warrant rule: when
+            # credit_requires_warrant is on, only warranted good can graduate an episodic memory to the
+            # durable semantic tier — else a MINJA self-graded bridge would graduate and then pass the gate
+            # unconditionally via its 'semantic' mtype (the graduation bypass this closes).
+            _good_earned = (float(r.get("good_warranted", 0) or 0)
+                            if getattr(self, "credit_requires_warrant", False) else _good)
             _links = (self._gated_links(r, _by_id)
                       if (self.coherence_gate is not None or self.temporal_gate is not None) else r.get("links"))
             _distinct = (self._distinct_verified_keys(_links, _by_id) if self.strict_corroboration
                          else self._distinct_sources(_links, _by_id))
-            corroborated = ((_good > 0 and _good >= _bad) or _distinct >= 2) \
+            corroborated = ((_good_earned > 0 and _good >= _bad) or _distinct >= 2) \
                 and not (r.get("meta") or {}).get("slashed") \
                 and not r.get("orphan")   # landed retraction OR orphan (no lineage) blocks (re-)graduation too
             if r.get("mtype") == "episodic" and r["value"] >= _GRADUATE_VALUE and corroborated:
@@ -2098,6 +2933,16 @@ class Mnemo:
                   "reliability": round(self._reliability(r), 3),
                   "source": r.get("source"),    # re-checkable origin (provenance), surfaced so a recalled fact can be traced back
                   "stale_derived": bool(r.get("_stale_derived"))}
+            if r.get("reopened"):
+                # A read-path review-trigger (observe()) reopened this settled record on a corroborated
+                # contradiction: recall still returns it as the current best guess, but the CONSUMER must know
+                # it is contested — otherwise the agent acts on a value a steward has flagged, with full
+                # confidence. Surface the flag + the surfaced prior so a caller can branch (defer, ask, hedge).
+                _m = r.get("meta", {})
+                _o["under_review"] = True
+                _o["review_reason"] = _m.get("reopened_reason")
+                if _m.get("reopened_surfaced_prior") is not None:
+                    _o["review_prior"] = _m.get("reopened_surfaced_prior")
             if with_status:     # OPT-IN: carry the honest truth-status at the point of use (convergence-backed
                 cr = self.convergence_report(r, _by_id=_by_id)   # vs adjudicated), never let convergence read as truth
                 _o["convergence"] = cr["status"]
@@ -2118,6 +2963,15 @@ class Mnemo:
                     _o["warrant"] = "corroborated"
                 else:
                     _o["warrant"] = "unwarranted"
+            if r.get("pii"):
+                _o["pii"] = list(r["pii"])          # surface which PII types this record carries (audit/branch)
+            # PII MASKING (OPT-IN redact_pii): mask detected PII in the RETURNED text only — the stored record is
+            # untouched, so an agent gets usable context without raw PII flowing into an LLM prompt. Heuristic
+            # (detect_pii bounds); pair with pii_detect/forget_pii for data-minimization, not as a guarantee.
+            if redact_pii:
+                _o["text"], _masked = redact_pii_fn(_o["text"])
+                if _masked:
+                    _o["pii_masked"] = _masked
             out.append(_o)
         # AUTO-STAMP LINEAGE: remember what this recall surfaced, so a derived write built from it (a summary
         # written next) can inherit these as parents. Store-carried lineage from the recall->write flow.
@@ -2183,13 +3037,18 @@ class Mnemo:
         return len(keys)
 
     @staticmethod
-    def _is_corroborated(rec: dict, by_id: dict, strict: bool = False) -> bool:
+    def _is_corroborated(rec: dict, by_id: dict, strict: bool = False, require_warrant: bool = False) -> bool:
         """The corroboration bar shared by episodic->semantic graduation and the recall influence gate:
         an EARNED net-positive outcome (good>0 and good>=bad — set by credit() on real work, not
         self-assertable), OR an already-graduated 'semantic' memory, OR >=2 corroborating links from
         distinct sources. `strict` selects the independence measure for that last path: distinct VERIFIED
         KEYS (unforgeable) when True, distinct canonical-source STRINGS (spoofable but zero-setup) when
         False. A single fresh self-asserted memory (the AgentPoison single-instance poison) meets none.
+        `require_warrant` (set by the store flag credit_requires_warrant) closes the MINJA self-graded-
+        outcome hole: the earned-outcome path then counts only EXOGENOUSLY-WARRANTED good (credit() called
+        with a warrant naming an outcome source outside the record's own lineage), so an agent that credits
+        its OWN recalled reasoning as a success cannot self-corroborate a poisoned bridge into the influence
+        set. Measured: mnemo/probes/minja_influence_gate.py (self-graded ASR 80% -> 0% with the flag on).
         A LANDED RETRACTION WINS: a record slash()'d (meta['slashed']) is not corroborated on ANY path — incl.
         distinct-link corroboration — so a caught poison cannot stay load-bearing via independent-looking links
         (jacksonxly's invariant: nothing false stays load-bearing past the correctness signal). restore() clears
@@ -2201,10 +3060,18 @@ class Mnemo:
             return False
         good = float(rec.get("good", 0) or 0)
         bad = float(rec.get("bad", 0) or 0)
-        if good > 0 and good >= bad:
+        good_earned = float(rec.get("good_warranted", 0) or 0) if require_warrant else good
+        if good_earned > 0 and good >= bad:
             return True
         if rec.get("mtype") == "semantic":
-            return True
+            # A 'semantic' mtype counts as corroborated because it is normally an EARNED, graduated-durable
+            # memory. But remember() also auto-classifies short declarative statements as semantic AT WRITE
+            # TIME — and MINJA's progressive-shortening bridges are exactly such query-shaped declaratives, so
+            # they would be born semantic and bypass the gate with zero corroboration. Under require_warrant
+            # only EARNED semantic (graduated_from_episodic through the corroboration bar) passes; a write-time
+            # semantic classification is treated as an unproven episodic claim.
+            if not require_warrant or (rec.get("meta") or {}).get("graduated_from_episodic"):
+                return True
         if strict:
             return Mnemo._distinct_verified_keys(rec.get("links"), by_id) >= 2
         return Mnemo._distinct_sources(rec.get("links"), by_id) >= 2
@@ -2305,7 +3172,8 @@ class Mnemo:
                    and self._canon_of(by_id[lid]) in trusted]
             if eff != links:
                 rec = {**rec, "links": eff}
-        return Mnemo._is_corroborated(rec, by_id, self.strict_corroboration)
+        return Mnemo._is_corroborated(rec, by_id, self.strict_corroboration,
+                                      require_warrant=getattr(self, "credit_requires_warrant", False))
 
     def influence_gate_report(self) -> dict:
         """Report the LIVE COST of the influence gate (recall(influence_only=True)) on THIS store, so you can
@@ -2401,13 +3269,24 @@ class Mnemo:
             return outcome > 0
         return str(outcome).strip().lower() in ("good", "right", "correct", "reproduced", "hit", "true", "win", "+")
 
-    def credit(self, ids, outcome, weight: float = 1.0) -> dict:
+    def credit(self, ids, outcome, weight: float = 1.0, warrant=None) -> dict:
         """Close the accuracy loop onto the substrate. When the work a set of memories was recalled into
         gets a real verdict (a forecast resolves, a replication is ruled REPRODUCED/FAILED, a hypothesis is
         severe-tested), call credit(recalled_ids, outcome): each memory's Beta(good,bad) track record is
         nudged so future recall ranks by WAS-IT-RIGHT, not merely was-it-recalled. Append-only to the
         counts; never edits raw text. `outcome` may be a bool, a sign (>0 good), or a verdict string
-        (good/right/correct/reproduced/hit vs bad/wrong/failed/miss)."""
+        (good/right/correct/reproduced/hit vs bad/wrong/failed/miss).
+
+        `warrant` (OPT-IN, matters only when the store flag credit_requires_warrant is on): a token/string
+        naming the EXOGENOUS outcome source that vouches for this credit — a resolved ticket, a graded
+        forecast, an external verdict — i.e. ground truth the recalled memory did NOT produce itself. A good
+        credit whose warrant is exogenous to the record (not None, and not the record's own source/lineage)
+        also increments `good_warranted`; the influence gate then counts only warranted good. This
+        structurally breaks the MINJA self-graded-outcome loop (an agent crediting its own recalled poison as
+        a success): with no exogenous outcome to name, the self-grade raises good but never good_warranted, so
+        it cannot promote the poison into the influence set. HONEST RESIDUAL: a warrant STRING is spoofable
+        the same way a source string is (an attacker who can forge an outcome token can still warrant) — it
+        raises attacker cost and is meant to be paired with verifiable provenance, not a proof of truth."""
         good = Mnemo._outcome_good(outcome)
         by_id = {x["id"]: x for x in self.items}
         key, updated = ("good" if good else "bad"), []
@@ -2416,10 +3295,31 @@ class Mnemo:
             if rec is None:
                 continue
             rec[key] = float(rec.get(key, 0) or 0) + float(weight)
+            if good and self._warrant_is_exogenous(rec, warrant):
+                rec["good_warranted"] = float(rec.get("good_warranted", 0) or 0) + float(weight)
             updated.append(i)
         if updated:
             self._save()
         return {"updated": updated, "outcome": key, "weight": weight}
+
+    def _warrant_is_exogenous(self, rec: dict, warrant) -> bool:
+        """A warrant vouches for an outcome the record did NOT author itself. Exogenous = a non-empty token
+        that is neither the record's own canonical source nor any tenant/source in its transitive lineage.
+        Conservative by design: an absent warrant is never exogenous, so self-graded credit (the MINJA path)
+        earns no warranted-good."""
+        if not warrant:
+            return False
+        w = str(warrant).strip().lower()
+        if not w:
+            return False
+        own = {str(s).strip().lower() for s in Mnemo._rec_sources(rec) if s}
+        own.discard("")
+        if w in own:
+            return False
+        auth = getattr(self, "warrant_authorities", None)
+        if auth is not None and w not in {str(a).strip().lower() for a in auth}:
+            return False              # forged string that names no declared trusted channel does not count
+        return True
 
     def propagate_outcome(self, outcome, ids=None, weight: float = 1.0,
                           driving_only: bool = True) -> dict:
@@ -2768,7 +3668,8 @@ class Mnemo:
                 pass
 
     def spend_irreversible(self, ids, amount: float = 1.0, budget: float = 1.0,
-                           provenance_lo: float | None = None, require_earned: bool = False) -> dict:
+                           provenance_lo: float | None = None, require_earned: bool = False,
+                           tool=None, contained: bool | None = None) -> dict:
         """Per-source LIFETIME budget on IRREVERSIBLE influence — the integral cap that bounds the one residual
         the rate-detector (monitor) provably CANNOT: the strictly-below-k patient attacker. monitor()'s k is a
         tolerated RATE, so an attacker holding bad-rate BELOW k gives the CUSUM negative drift -> no detection
@@ -2811,6 +3712,22 @@ class Mnemo:
         recs = [by_id[i] for i in (ids or []) if i in by_id]
         srcs = sorted(set().union(*(Mnemo._rec_sources(r) for r in recs)) if recs else set())
         B = self._budget_state()
+        # UNIVERSAL-EXECUTOR gate (OPT-IN, 1.2.0; tool=None -> legacy path, byte-identical). If this irreversible
+        # action routes through a verb-polymorphic universal executor (shell/eval/arbitrary-SQL/generic-HTTP), a
+        # per-tool reversibility label is UNSOUND and the executor's external harm-reach is bounded only by
+        # containment. So an UNCONTAINED universal executor is denied outright (reversibility undecidable +
+        # unbounded external reach), regardless of budget -- the caller must sandbox it (contained=True) or route
+        # the effect through a specific, signature-decidable tool. contained=True falls through to the normal
+        # per-source budget check (the local-state residual is still metered). See is_universal_executor().
+        if tool is not None and is_universal_executor(tool):
+            if contained is not True:
+                return {"allowed": False, "exhausted": [], "sources": srcs,
+                        "spent": {s: round(float(B.get(s, 0.0)), 4) for s in srcs},
+                        "universal_executor": True, "contained": bool(contained),
+                        "reason": "universal_executor_uncontained: reversibility is undecidable from the tool "
+                                  "signature and external harm-reach is unbounded without containment; pass "
+                                  "contained=True only if the executor has no ambient network/credentials, or "
+                                  "route through a specific tool."}
         # PROVENANCE-SCALED cap (OPT-IN, provenance_lo=None -> uniform legacy path, byte-identical): a source with
         # NO corroborated contributing record is capped at the small `provenance_lo` instead of `budget`, so a
         # LOW-PROVENANCE memory recalled into an irreversible action binds that action's budget against ITSELF
@@ -2904,6 +3821,95 @@ class Mnemo:
                     seen.setdefault(r["id"], r)
         return list(seen.values())
 
+    # ── clean memory: write-admission gate + inspector (1.3.0) ────────────────────────────────────
+    def admit(self, text: str, tags=None, value: float = 1.0, meta: dict | None = None,
+              mtype: str | None = None, dup_threshold: float = 0.92, min_tokens: int = 2,
+              quality: bool = True, **kw) -> dict:
+        """WRITE-ADMISSION GATE — decide whether a candidate memory is worth storing BEFORE it bloats the store,
+        then store it or point at the existing duplicate. Counters agent memory's #1 real-world failure:
+        indiscriminate writes (audited mem0 stores measured ~98% junk, one line cloned 800+ times). Two checks,
+        both opt-out:
+          - quality: reject empty / too-short / obvious non-content (a refusal or "no sources ..." is not a memory).
+          - dedup: if an ACTIVE memory is near-identical (similarity >= dup_threshold) with no value clash, do NOT
+            append a copy; return that memory's id instead.
+        A value UPDATE (same text, different number) is NOT a duplicate — it is admitted so consolidation can
+        supersede the stale value. Returns {"admitted","id","reason","duplicate_of","similarity"}."""
+        t = (text or "").strip()
+        if quality:
+            if not t:
+                return {"admitted": False, "id": None, "reason": "empty", "duplicate_of": None, "similarity": None}
+            if len(_tokens(t)) < min_tokens:
+                return {"admitted": False, "id": None, "reason": "too_short", "duplicate_of": None,
+                        "similarity": None}
+            low = t.lower()
+            if any(p in low for p in _NON_CONTENT):
+                return {"admitted": False, "id": None, "reason": "non_content", "duplicate_of": None,
+                        "similarity": None}
+        hits = self.recall(t, k=1)
+        if hits:
+            h = hits[0]
+            s = self._similarity(t, h, self._qvec(t) if self.embed else None)
+            if s >= dup_threshold and not _value_clash(t, h["text"]):
+                return {"admitted": False, "id": h["id"], "reason": "duplicate", "duplicate_of": h["id"],
+                        "similarity": round(float(s), 4)}
+        mid = self.remember(t, tags=tags, value=value, meta=meta, mtype=mtype, **kw)
+        return {"admitted": True, "id": mid, "reason": "admitted", "duplicate_of": None, "similarity": None}
+
+    def why_recalled(self, query: str, id: str | None = None, k: int = 12):
+        """INSPECTOR — explain WHY memories rank for a query, so 'why did this surface / why not' stops being an
+        archaeology dig. Returns the per-candidate score breakdown recall() actually ranks by: semantic (cosine),
+        lexical (token overlap), effective_value (decayed rank weight), corroboration (good/bad), the stale-derived
+        flag, and the memory's RANK in the live recall(). With `id`, returns just that record's breakdown plus
+        whether it surfaced in the top-k. Read-only."""
+        now = time.time()
+        qvec = self._qvec(query) if self.embed else None
+        qtok = _tokens(query)
+        ranked = self.recall(query, k=k)
+        rank_of = {r["id"]: i + 1 for i, r in enumerate(ranked)}
+        _full = {x["id"]: x for x in self.items}          # recall() may return vec-less projections
+
+        def _brk(rec):
+            r = _full.get(rec["id"], rec)                 # resolve the full record so the vec is present
+            sem = max(0.0, _cosine(qvec, r["vec"])) if (qvec is not None and r.get("vec")) else 0.0
+            t = self._rec_tokens(r)
+            lex = (len(qtok & t) / min(len(qtok), len(t))) if (qtok and t) else 0.0
+            return {"id": r["id"], "text": (r.get("text") or "")[:80],
+                    "semantic": round(float(sem), 4), "lexical": round(float(lex), 4),
+                    "effective_value": round(self._effective_value(r, now), 4),
+                    "good": float(r.get("good", 0) or 0), "bad": float(r.get("bad", 0) or 0),
+                    "stale_derived": bool(r.get("_stale_derived")), "rank": rank_of.get(r["id"])}
+        if id is not None:
+            rec = next((r for r in self.items if r["id"] == id), None)
+            if rec is None:
+                return {"id": id, "found": False}
+            b = _brk(rec); b["surfaced"] = rec["id"] in rank_of
+            return b
+        return [_brk(r) for r in ranked]
+
+    def memory_report(self, dup_threshold: float = 0.9) -> dict:
+        """INSPECTOR overview — 'what is in memory, and is it clean'. Counts active/superseded, by type,
+        consolidated (linked), decayed (effective value < 10% of stored), and a near-duplicate REDUNDANCY estimate
+        (active memories whose nearest active neighbour is >= dup_threshold, no value clash — sampled at 400 for
+        cost). Read-only; the surface that proves a store did NOT accumulate 800 copies of one fact."""
+        now = time.time()
+        act = [r for r in self.items if r.get("status") == "active"]
+        sup = [r for r in self.items if r.get("status") == "superseded"]
+        from collections import Counter
+        by_type = dict(Counter(r.get("mtype", "episodic") for r in act))
+        linked = sum(1 for r in act if r.get("links"))
+        decayed = sum(1 for r in act if self._effective_value(r, now) < 0.1 * float(r.get("value", 1.0) or 1.0))
+        redundant = 0
+        sample = act if len(act) <= 400 else act[:400]
+        for r in sample:
+            other = [h for h in self.recall(r["text"], k=2) if h["id"] != r["id"]]
+            if other:
+                s = self._similarity(r["text"], other[0], self._qvec(r["text"]) if self.embed else None)
+                if s >= dup_threshold and not _value_clash(r["text"], other[0]["text"]):
+                    redundant += 1
+        return {"total": len(self.items), "active": len(act), "superseded": len(sup), "by_type": by_type,
+                "consolidated": linked, "decayed": decayed, "redundant_estimate": redundant,
+                "redundant_frac": round(redundant / max(1, len(sample)), 3), "sampled": len(sample)}
+
     def consolidate(self, keep: int | None = None, dup_threshold: float = 0.82,
                     hub_coverage: float = 0.12, link_duplicates: bool = True) -> dict:
         """The dream pass. ADDS a derived layer (status + links); never edits raw text. Three steps:
@@ -2919,8 +3925,13 @@ class Mnemo:
         3. keep-budget: mark the lowest-value surplus `superseded`.
 
         hub_coverage: a memory covering ≥ this fraction of the common vocabulary is a hub (0 disables).
-        link_duplicates: the dup pass is O(n²); pass False to skip it on large stores."""
-        active = [r for r in self.items if r["status"] == "active"]
+        link_duplicates: the dup pass is O(n²); pass False to skip it on large stores.
+
+        TENANT ISOLATION: on a tenant-bound store/view the dream pass operates ONLY on that tenant's rows, so
+        one tenant's consolidation can never link, hub-flag, supersede, or evict another tenant's memory. An
+        unbound store consolidates across everything (admin/legacy)."""
+        active = [r for r in self.items if r["status"] == "active"
+                  and (self.tenant is None or r.get("tenant") == self.tenant)]
         hubs = 0
         if hub_coverage and len(active) >= 50:
             toks, common = self._common_vocab(active)
@@ -3036,7 +4047,9 @@ class Mnemo:
         """Cheap greedy single-pass clustering of ACTIVE memories by similarity (O(n·#clusters)).
         Highest-value member is the cluster representative; each memory joins the most-similar
         cluster above the threshold, else starts its own. Lexical or semantic per the store's mode."""
-        active = sorted([r for r in self.items if r["status"] == "active"], key=lambda r: -r["value"])
+        active = sorted([r for r in self.items if r["status"] == "active"
+                         and (self.tenant is None or r.get("tenant") == self.tenant)],   # tenant-scoped clustering
+                        key=lambda r: -r["value"])
         cents: list[dict] = []
         for r in active:
             rvec = self._qvec(r["text"])
@@ -3153,7 +4166,8 @@ class Mnemo:
         """Flag mutually-incompatible memories among RELATED ones (similarity-gated) for human review.
         `incompatible(a_text, b_text)->bool` defaults to a negation/polarity heuristic."""
         inc = incompatible or _negation_clash
-        active = [r for r in self.items if r["status"] == "active"]
+        active = [r for r in self.items if r["status"] == "active"
+                  and (self.tenant is None or r.get("tenant") == self.tenant)]   # tenant-scoped
         flags = []
         for i, a in enumerate(active):
             avec = self._qvec(a["text"])             # embed each anchor once, not once per partner
@@ -3187,7 +4201,8 @@ class Mnemo:
         contradiction-on-assert (Doyle 1979) / AGM consistency-on-revision — brought into a zero-dependency
         memory store as a native, dependency-free primitive; the packaging is the point, not the idea."""
         inc = incompatible or (lambda a, b: _value_clash(a, b) or _negation_clash(a, b))
-        active = [r for r in self.items if r.get("status") == "active"]
+        active = [r for r in self.items if r.get("status") == "active"
+                  and (self.tenant is None or r.get("tenant") == self.tenant)]   # tenant-scoped conflict check
         hits, seen = [], set()
         if key is not None:                                    # (1) value change on a managed key
             for r in active:
@@ -3222,6 +4237,43 @@ class Mnemo:
         return {k: {"count": v["count"], "value": round(v["value"], 2),
                     "avg": round(v["value"] / v["count"], 2)} for k, v in out.items()}
 
+    def _resolve_key(self) -> bytes:
+        """The 32-byte AES key for this store. A raw key is used directly; a passphrase is scrypt-derived
+        against the store's salt (from the file header on load, or minted on first save) and cached so scrypt
+        isn't re-run on every save."""
+        if self._enc_rawkey is not None:
+            if self._enc_salt is None:
+                self._enc_salt = b"\x00" * 16          # raw key needs no KDF salt; fixed placeholder in the header
+            return self._enc_rawkey
+        if self._enc_passphrase is not None:
+            if self._enc_salt is None:
+                self._enc_salt = os.urandom(16)
+            if getattr(self, "_enc_derived", None) is None:
+                self._enc_derived = _derive_key(self._enc_passphrase, self._enc_salt)
+            return self._enc_derived
+        raise RuntimeError("no encryption key configured (was the store shredded?)")
+
+    def shred(self) -> dict:
+        """CRYPTO-SHRED: destroy the in-memory key so the encrypted store on disk — and EVERY at-rest copy or
+        backup of that ciphertext — becomes permanently unreadable (NIST SP 800-88 recognises key-destruction as
+        a 'Purge'). Requires an encrypted store; also clears the plaintext records from RAM. Returns a
+        content-free receipt. HONEST LIMITS (do not sell as more): it cannot reach plaintext already copied
+        elsewhere (another process's RAM, OS swap/hibernation, prior logs), nor any copy that was saved
+        UNENCRYPTED before a key was set. It SUPPORTS a right-to-erasure (GDPR Art.17) workflow; it does not by
+        itself certify compliance. The ciphertext file is left in place on purpose — the point of crypto-shred is
+        that you do NOT have to reach every copy; without the key they are all equally dead."""
+        if not self._encrypted:
+            raise RuntimeError("shred() requires an encrypted store (encrypt_key= / encrypt_passphrase=)")
+        self._enc_rawkey = None
+        self._enc_passphrase = None
+        self._enc_derived = None
+        n = len(self.items)
+        self.items = []
+        self._mat = None
+        self._tok_cache = {}
+        return {"shredded": True, "records_dropped": n, "ts": time.time(),
+                "note": "encryption key destroyed; the store at rest (and its backups) is now unrecoverable"}
+
     def _save(self, force: bool = False):
         if not self.path:
             return
@@ -3242,7 +4294,11 @@ class Mnemo:
             # concurrent-writer-safe — last writer wins, never a torn JSON file).
             data = json.dumps(slim, ensure_ascii=False, indent=1)
             tmp = self.path.with_name(self.path.name + ".tmp")
-            tmp.write_text(data, encoding="utf-8")
+            if self._encrypted:                                   # AES-256-GCM at rest (never a plaintext tmp)
+                key = self._resolve_key()                         # sets self._enc_salt on first save
+                tmp.write_bytes(_encrypt_blob(key, data.encode("utf-8"), self._enc_salt))
+            else:
+                tmp.write_text(data, encoding="utf-8")
             os.replace(tmp, self.path)
             self._last_save = now
             self._dirty = False
@@ -3314,6 +4370,132 @@ def _value_clash(a: str, b: str) -> bool:
     # (_WORD requires length >= 3), so a multi-digit value ('...is 123') would otherwise spuriously make
     # the skeletons differ and miss the update. Strip numbers first, exactly as before this guard existed.
     return _tokens(_NUM.sub("", a)) == _tokens(_NUM.sub("", b))   # identical apart from the one value
+
+
+class _TenantView:
+    """A logically-isolated view over a shared Mnemo store (see Mnemo.for_tenant). It carries its OWN `tenant`
+    but forwards EVERY other attribute to the parent store, so all data + config are shared by reference (one
+    items list, one file, one cache) while the tenant-sensitive operations run bound to THIS view's tenant.
+
+    Implementation: the handful of tenant-aware Mnemo methods are re-bound onto the view (so `self.tenant` inside
+    them is the VIEW's tenant), and their tenant-aware internal helpers (_supersede_by_key, _tenant_rows) are
+    re-bound too; everything else (`items`, `_save`, `_qvec`, `embed`, config flags, ...) resolves to the parent
+    via __getattr__, so reads/writes land on the shared store. Non-tenant methods (consolidate, credit, verify_*,
+    anchor, route, ...) are used as-is on the parent through __getattr__ and are unaffected by tenancy."""
+    __slots__ = ("_parent", "tenant")
+
+    def __init__(self, parent: "Mnemo", tenant: str):
+        object.__setattr__(self, "_parent", parent)
+        object.__setattr__(self, "tenant", tenant)
+
+    def __getattr__(self, name):                 # anything not on the view -> the shared parent store
+        return getattr(self._parent, name)
+
+    def __setattr__(self, name, value):          # config writes go to the shared parent (tenant is slot-local)
+        if name == "tenant":
+            object.__setattr__(self, name, value)
+        else:
+            setattr(self._parent, name, value)
+
+    def for_tenant(self, tenant: str):           # re-scope from the same shared store
+        return _TenantView(self._parent, str(tenant))
+
+    # tenant-sensitive surface: rebound so `self` is the VIEW (its tenant), state stays the parent's
+    def remember(self, *a, **k):        return Mnemo.remember(self, *a, **k)
+    def recall(self, *a, **k):          return Mnemo.recall(self, *a, **k)
+    def forget_subject(self, *a, **k):  return Mnemo.forget_subject(self, *a, **k)
+    def forget_pii(self, *a, **k):      return Mnemo.forget_pii(self, *a, **k)
+    def pii_report(self, *a, **k):      return Mnemo.pii_report(self, *a, **k)
+    def remember_dedup(self, *a, **k):  return Mnemo.remember_dedup(self, *a, **k)
+    def consolidate(self, *a, **k):     return Mnemo.consolidate(self, *a, **k)
+    def consolidate_clusters(self, *a, **k): return Mnemo.consolidate_clusters(self, *a, **k)
+    def contradictions(self, *a, **k):  return Mnemo.contradictions(self, *a, **k)
+    def check_conflict(self, *a, **k):  return Mnemo.check_conflict(self, *a, **k)
+    def _cluster_active(self, *a, **k): return Mnemo._cluster_active(self, *a, **k)
+    def _supersede_by_key(self, *a, **k): return Mnemo._supersede_by_key(self, *a, **k)
+    def candidates(self, *a, **k):      return Mnemo.candidates(self, *a, **k)
+    def promote_candidate(self, *a, **k): return Mnemo.promote_candidate(self, *a, **k)
+    def discard_candidate(self, *a, **k): return Mnemo.discard_candidate(self, *a, **k)
+    def observe(self, *a, **k):         return Mnemo.observe(self, *a, **k)
+    def reopened(self, *a, **k):        return Mnemo.reopened(self, *a, **k)
+    def resolve_reopened(self, *a, **k): return Mnemo.resolve_reopened(self, *a, **k)
+    def support_challenge_for(self, *a, **k): return Mnemo.support_challenge_for(self, *a, **k)
+    def _current_active(self, *a, **k): return Mnemo._current_active(self, *a, **k)
+    def _tenant_rows(self, *a, **k):    return Mnemo._tenant_rows(self, *a, **k)
+
+
+# --------------------------------------------------------------------------------------------------------------
+# Ready-made write-path extractors (set `m.extractor = ...`). The extractor derives a (key, object) from free
+# text so supersession/echo_guard/revert engage WITHOUT the caller passing an explicit key. mnemo ships two:
+#   - regex_extractor : DETERMINISTIC, no LLM, no dependency — keeps the zero-LLM-on-write moat. Conservative
+#     by design (returns None unless a clear subject/relation pattern matches), because a mis-derived key
+#     mis-supersedes; a returned None just falls back to a plain append.
+#   - make_llm_extractor(call_fn) : OPT-IN factory. Wraps YOUR llm(prompt)->str call to extract (key, object).
+#     This PUTS AN LLM ON THE WRITE PATH — you trade determinism/zero-cost for auto-capture of unstructured text.
+# Both are fail-open (Mnemo.remember swallows extractor exceptions and appends the raw text).
+
+_EX_REL = re.compile(
+    r"^\s*(?:correction|update|note|fyi)?\s*[:,-]?\s*"          # optional correction marker, stripped
+    r"(?:the\s+)?(?P<subject>[A-Za-z0-9 ._/@'-]{2,60}?)"        # subject
+    r"(?:'s|s')\s+(?P<rel>[A-Za-z0-9 ._-]{2,40}?)"              # possessive relation:  "X's Y"
+    r"\s+(?:is|was|are|were|=|:|now|became|changed to)\s+"
+    r"(?P<obj>.+?)\s*\.?\s*$", re.I)
+_EX_OF = re.compile(
+    r"^\s*(?:correction|update|note|fyi)?\s*[:,-]?\s*"
+    r"the\s+(?P<rel>[A-Za-z0-9 ._-]{2,40}?)\s+of\s+(?P<subject>[A-Za-z0-9 ._/@'-]{2,60}?)"   # "the Y of X"
+    r"\s+(?:is|was|are|were|=|:|now)\s+(?P<obj>.+?)\s*\.?\s*$", re.I)
+_EX_IS = re.compile(
+    r"^\s*(?:correction|update|note|fyi)?\s*[:,-]?\s*"
+    r"(?:the\s+)?(?P<subject>[A-Za-z0-9 ._/@'-]{2,60}?)"        # "X is Y"
+    r"\s+(?:is|was|are|were|=|:|now|became|changed to)\s+"
+    r"(?P<obj>.+?)\s*\.?\s*$", re.I)
+
+
+def regex_extractor(text):
+    """text -> (key, object) | None. Deterministic, no LLM. Recognizes 'X's Y is Z', 'the Y of X is Z', and
+    'X is Z' (with optional leading correction/update/now markers). key is a canonical 'subject::relation' (or
+    just 'subject' for the plain copula) so a reworded restatement maps to the SAME key. Returns None (=> plain
+    append) when nothing matches confidently."""
+    if not text:
+        return None
+    for rx, keyed in ((_EX_REL, True), (_EX_OF, True), (_EX_IS, False)):
+        mt = rx.match(text)
+        if mt:
+            subj = " ".join(mt.group("subject").lower().split())
+            obj = mt.group("obj").strip().strip(".").strip()
+            obj = re.sub(r"^(?:now|actually|currently|really)\s+", "", obj, flags=re.I).strip()   # copula adverb
+            if not subj or not obj or len(obj) > 200:
+                return None
+            if keyed:
+                rel = " ".join(mt.group("rel").lower().split())
+                return (f"{subj}::{rel}", obj)
+            return (subj, obj)
+    return None
+
+
+def make_llm_extractor(call_fn, prompt_prefix=None):
+    """Wrap YOUR `call_fn(prompt) -> str` into an extractor. OPT-IN: this puts an LLM on the write path (you lose
+    the deterministic/zero-cost core). The LLM must return a JSON object {"key": ..., "object": ...}; anything
+    else (or an exception) yields None -> plain append. Example: m.extractor = make_llm_extractor(my_llm)."""
+    prefix = prompt_prefix or (
+        "Extract the single (subject::relation, value) fact from the text as JSON "
+        '{"key": "<subject::relation>", "object": "<current value>"}. If there is no clear single fact, '
+        'reply {"key": null}. Text:\n')
+
+    def _ex(text):
+        try:
+            raw = call_fn(prefix + (text or ""))
+            i, j = raw.find("{"), raw.rfind("}")
+            if i < 0 or j < 0:
+                return None
+            d = json.loads(raw[i:j + 1])
+            k = d.get("key")
+            if not k:
+                return None
+            return (str(k), str(d.get("object")) if d.get("object") is not None else None)
+        except Exception:
+            return None
+    return _ex
 
 
 if __name__ == "__main__":

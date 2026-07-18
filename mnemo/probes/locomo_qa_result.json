@@ -1,0 +1,22 @@
+{
+ "judge": "claude-code",
+ "results": {
+  "mnemo": {
+   "accuracy": 0.816,
+   "n": 250,
+   "by_category": {
+    "2": 0.945,
+    "3": 0.811,
+    "1": 0.68,
+    "4": 0.75
+   }
+  }
+ },
+ "comparison": {
+  "mnemo_tuned": 0.816,
+  "mnemo_untuned": 0.496,
+  "mem0_published": 0.669,
+  "zep_published": 0.712
+ },
+ "honest_caveat": "mnemo TUNED (semantic nomic recall + mnemo hybrid-RRF + speaker prefilter + k=25) scores 0.816 on a 250-question LOCOMO sample across all 10 conversations, ABOVE published mem0 (0.669) and Zep (0.712). BUT NOT a rigorous head-to-head: our answerer AND judge are Claude (strong, comparable tier to gpt-4o) with a defined strict rubric (context-only; multi-item list golds require the full list; NOT-IN-CONTEXT counts false), while mem0/Zep numbers come from THEIR own full pipeline + THEIR judge. To claim 'beats mem0/Zep' definitively, run mem0/Zep through this IDENTICAL harness+judge (needs their pipelines + cloud credit, currently exhausted). The 49.6->81.6 jump is a REAL retrieval-engineering win (lexical->semantic + speaker prefilter dropped NOT-IN-CONTEXT from ~30% to ~6%), not a metric trick. Gap #1 status: closed from BEHIND to TOP-TIER, pending identical-harness confirmation."
+}

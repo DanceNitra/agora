@@ -208,7 +208,8 @@ class EpochEngine:
 
         cursor = await db.execute(
             "SELECT agent_id, role, trust_score, energy_balance, generation "
-            "FROM agent_identities WHERE status='active' AND trust_score < ?",
+            "FROM agent_identities WHERE status='active' AND trust_score < ? "
+            "AND agent_id NOT LIKE '00000000%'",   # the 8 canonical NPCs are permanent — never culled
             (CULL_TRUST_THRESHOLD,),
         )
         doomed = await cursor.fetchall()

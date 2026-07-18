@@ -1,0 +1,12 @@
+{
+ "condition": "naive",
+ "sample": "sh_32k",
+ "ingest": "atomic",
+ "llm": "deepseek",
+ "n": 100,
+ "correct": 97,
+ "accuracy": 0.97,
+ "answerer": "deepseek-v4-flash",
+ "scoring": "official substring_exact_match max-over-golds",
+ "prompt": "official factconsolidation query template"
+}

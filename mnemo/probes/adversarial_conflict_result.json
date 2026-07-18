@@ -1,0 +1,8 @@
+{
+ "n": 3,
+ "task": "adversarial conflict: poison re-asserts retired value as newest write",
+ "metric": "truth-retained rate (current==correction B, not poison A)",
+ "results": {
+  "graphiti": 0.0
+ }
+}

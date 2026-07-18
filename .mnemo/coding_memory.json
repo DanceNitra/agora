@@ -1,0 +1,1180 @@
+[
+ {
+  "id": "82d0255bdd",
+  "text": "demo.py :: current state -> x=2",
+  "tags": [
+   "file",
+   "edit"
+  ],
+  "value": 1.0,
+  "ts": 1784387540.1693635,
+  "iso": "2026-07-18T15:12:20Z",
+  "valid_from": 1784387540.1693635,
+  "source": null,
+  "mtype": "semantic",
+  "last_access": 1784387540.1693635,
+  "status": "active",
+  "links": [],
+  "meta": {},
+  "key": "file:demo.py",
+  "object": "x=2"
+ },
+ {
+  "id": "ec1363377b",
+  "text": "ran: cd /c/Users/Danculus/agora echo \"=== plugin functional test (capture an edit event, then recall) ===\" python -c \" import mnemo.claude_code as cc, json # simulate a PostToolUse edit event ev={'tool_nam…",
+  "tags": [
+   "bash"
+  ],
+  "value": 1.0,
+  "ts": 1784387540.691346,
+  "iso": "2026-07-18T15:12:20Z",
+  "valid_from": 1784387540.691346,
+  "source": null,
+  "mtype": "episodic",
+  "last_access": 1784387540.691346,
+  "status": "active",
+  "links": [],
+  "meta": {},
+  "key": "cmd:4af051e491",
+  "object": "cd /c/Users/Danculus/agora echo \"=== plugin functional test "
+ },
+ {
+  "id": "a7a57d4c01",
+  "text": "ran: cd /c/Users/Danculus/agora echo \"=== did capture write the store? ===\" cat .mnemo/coding_memory.json 2>/dev/null | python -c \"import json,sys; d=json.load(sys.stdin); items=d.get('items',d) if isinsta…",
+  "tags": [
+   "bash"
+  ],
+  "value": 1.0,
+  "ts": 1784387566.6309762,
+  "iso": "2026-07-18T15:12:46Z",
+  "valid_from": 1784387566.6309762,
+  "source": null,
+  "mtype": "episodic",
+  "last_access": 1784387566.6309762,
+  "status": "active",
+  "links": [],
+  "meta": {},
+  "key": "cmd:dd85a3d4c5",
+  "object": "cd /c/Users/Danculus/agora echo \"=== did capture write the s"
+ },
+ {
+  "id": "203a6cd3e5",
+  "text": "ran: cd /c/Users/Danculus/agora echo \"=== the 8 agent roster definition ===\" grep -rnE \"thief|scholar|priest|king|guard_r|guard_l|artificer|cartographer\" server/agora --include=*.py 2>/dev/null | grep -iE …",
+  "tags": [
+   "bash"
+  ],
+  "value": 1.0,
+  "ts": 1784387690.1153252,
+  "iso": "2026-07-18T15:14:50Z",
+  "valid_from": 1784387690.1153252,
+  "source": null,
+  "mtype": "episodic",
+  "last_access": 1784387690.1153252,
+  "status": "active",
+  "links": [],
+  "meta": {},
+  "key": "cmd:6660dc8db3",
+  "object": "cd /c/Users/Danculus/agora echo \"=== the 8 agent roster defi"
+ },
+ {
+  "id": "a129d14116",
+  "text": "ran: cd /c/Users/Danculus/agora echo \"=== health endpoint count source (main.py ~1330-1345) ===\" sed -n '1330,1345p' server/agora/main.py echo \"\" echo \"=== the canonical 8-agent roster (search configs/db s…",
+  "tags": [
+   "bash"
+  ],
+  "value": 1.0,
+  "ts": 1784387703.3877795,
+  "iso": "2026-07-18T15:15:03Z",
+  "valid_from": 1784387703.3877795,
+  "source": null,
+  "mtype": "episodic",
+  "last_access": 1784387703.3877795,
+  "status": "active",
+  "links": [],
+  "meta": {},
+  "key": "cmd:841166e359",
+  "object": "cd /c/Users/Danculus/agora echo \"=== health endpoint count s"
+ },
+ {
+  "id": "f61bebbd09",
+  "text": "ran: cd /c/Users/Danculus/agora echo \"=== full 8-agent roster (agent_os.py 18-35) ===\" sed -n '18,35p' server/agora/agent_os/agent_os.py | grep -E \"0000|:\" | head -12 echo \"\" echo \"=== find the brain DB fi…",
+  "tags": [
+   "bash"
+  ],
+  "value": 1.0,
+  "ts": 1784387724.3882635,
+  "iso": "2026-07-18T15:15:24Z",
+  "valid_from": 1784387724.3882635,
+  "source": null,
+  "mtype": "episodic",
+  "last_access": 1784387724.3882635,
+  "status": "active",
+  "links": [],
+  "meta": {},
+  "key": "cmd:61a6e7a5cd",
+  "object": "cd /c/Users/Danculus/agora echo \"=== full 8-agent roster (ag"
+ },
+ {
+  "id": "0a2ab95367",
+  "text": "ran: cd /c/Users/Danculus/agora echo \"=== FULL canonical roster (all 8 UUIDs) ===\" grep -E \"0000-0000-0000-0000|00000000-0000\" server/agora/agent_os/agent_os.py | head -10 echo \"\" echo \"=== DB canonical ag…",
+  "tags": [
+   "bash"
+  ],
+  "value": 1.0,
+  "ts": 1784387765.6814656,
+  "iso": "2026-07-18T15:16:05Z",
+  "valid_from": 1784387765.6814656,
+  "source": null,
+  "mtype": "episodic",
+  "last_access": 1784387765.6814656,
+  "status": "active",
+  "links": [],
+  "meta": {},
+  "key": "cmd:91851359c3",
+  "object": "cd /c/Users/Danculus/agora echo \"=== FULL canonical roster ("
+ },
+ {
+  "id": "8611836577",
+  "text": "ran: cd /c/Users/Danculus/agora echo \"=== raw NPC_UUIDS block (are Rooke/Wren defined at all?) ===\" sed -n '18,34p' server/agora/agent_os/agent_os.py echo \"\" echo \"=== Rooke/Wren/artificer/cartographer def…",
+  "tags": [
+   "bash"
+  ],
+  "value": 1.0,
+  "ts": 1784387802.2350006,
+  "iso": "2026-07-18T15:16:42Z",
+  "valid_from": 1784387802.2350006,
+  "source": null,
+  "mtype": "episodic",
+  "last_access": 1784387802.2350006,
+  "status": "active",
+  "links": [],
+  "meta": {},
+  "key": "cmd:9531428a41",
+  "object": "cd /c/Users/Danculus/agora echo \"=== raw NPC_UUIDS block (ar"
+ },
+ {
+  "id": "80bfa8a49a",
+  "text": "ran: cd /c/Users/Danculus/agora echo \"=== (1) NPC PROFILES â€” are Rooke/Wren defined (soul/abilities)? which names have profiles? ===\" grep -nE \"^\\s*\\\"(Shadow Kael|Sage Mira|High Priest Orin|King Aldric|D…",
+  "tags": [
+   "bash"
+  ],
+  "value": 1.0,
+  "ts": 1784387965.5809085,
+  "iso": "2026-07-18T15:19:25Z",
+  "valid_from": 1784387965.5809085,
+  "source": null,
+  "mtype": "episodic",
+  "last_access": 1784387965.5809085,
+  "status": "active",
+  "links": [],
+  "meta": {},
+  "key": "cmd:c9796db7c3",
+  "object": "cd /c/Users/Danculus/agora echo \"=== (1) NPC PROFILES â€” ar"
+ },
+ {
+  "id": "408c99e5ca",
+  "text": "ran: cd /c/Users/Danculus/agora echo \"=== seed function (195-245): tables/cols, idempotent?, when runs ===\" sed -n '195,245p' server/agora/agent_os/agent_os.py echo \"\" echo \"=== does PROFILES contain Rooke…",
+  "tags": [
+   "bash"
+  ],
+  "value": 1.0,
+  "ts": 1784387995.8779998,
+  "iso": "2026-07-18T15:19:55Z",
+  "valid_from": 1784387995.8779998,
+  "source": null,
+  "mtype": "episodic",
+  "last_access": 1784387995.8779998,
+  "status": "active",
+  "links": [],
+  "meta": {},
+  "key": "cmd:9cd28e0a10",
+  "object": "cd /c/Users/Danculus/agora echo \"=== seed function (195-245)"
+ },
+ {
+  "id": "0631b0cd68",
+  "text": "ran: cd /c/Users/Danculus/agora echo \"=== rest of seed function â€” ALL tables it fills (245-300) ===\" sed -n '245,302p' server/agora/agent_os/agent_os.py | grep -nE \"INSERT INTO|await self.db.execute\\(\" |…",
+  "tags": [
+   "bash"
+  ],
+  "value": 1.0,
+  "ts": 1784388045.6608124,
+  "iso": "2026-07-18T15:20:45Z",
+  "valid_from": 1784388045.6608124,
+  "source": null,
+  "mtype": "episodic",
+  "last_access": 1784388045.6608124,
+  "status": "active",
+  "links": [],
+  "meta": {},
+  "key": "cmd:df7cf7777b",
+  "object": "cd /c/Users/Danculus/agora echo \"=== rest of seed function â"
+ },
+ {
+  "id": "3280c309cc",
+  "text": "ran: cd /c/Users/Danculus/agora echo \"=== full NPC_DEFS entry structure (Shadow Kael + one more) ===\" sed -n '34,96p' server/agora/agent_os/agent_os.py",
+  "tags": [
+   "bash"
+  ],
+  "value": 1.0,
+  "ts": 1784388336.2580388,
+  "iso": "2026-07-18T15:25:36Z",
+  "valid_from": 1784388336.2580388,
+  "source": null,
+  "mtype": "episodic",
+  "last_access": 1784388336.2580388,
+  "status": "active",
+  "links": [],
+  "meta": {},
+  "key": "cmd:d80341770d",
+  "object": "cd /c/Users/Danculus/agora echo \"=== full NPC_DEFS entry str"
+ },
+ {
+  "id": "0fe346fa44",
+  "text": "server\\agora\\agent_os\\agent_os.py :: current state -> \"Dame Elara\":     \"00000000-0000-0000-0000-000000000005\",     \"Artificer Rooke\": \"00000000-0000-0000-0000-000000000006\",     \"Sergeant Voss\":  \"00000000-0000-0000-0000-000000000007…",
+  "tags": [
+   "file",
+   "edit"
+  ],
+  "value": 1.0,
+  "ts": 1784388368.372914,
+  "iso": "2026-07-18T15:26:08Z",
+  "valid_from": 1784388368.372914,
+  "source": null,
+  "mtype": "semantic",
+  "last_access": 1784388368.372914,
+  "status": "superseded",
+  "links": [],
+  "meta": {
+   "superseded_by_toggle": "8664084d78",
+   "superseded_by_policy": "keyed_lww"
+  },
+  "key": "file:server\\agora\\agent_os\\agent_os.py",
+  "object": "\"Dame Elara\":     \"00000000-0000-0000-0000-000000000005\",     \"Artificer Rooke\":…",
+  "superseded_ts": 1784388418.240895,
+  "invalidated_at": 1784388418.240895
+ },
+ {
+  "id": "456c26c778",
+  "text": "ran: cd /c/Users/Danculus/agora grep -nE \"\\\"Sergeant Voss\\\":|\\\"Dame Elara\\\":|^}\" server/agora/agent_os/agent_os.py | head -8 echo \"--- Voss profile block ---\" sed -n '/\"Sergeant Voss\": {/,/^    },/p' serve…",
+  "tags": [
+   "bash"
+  ],
+  "value": 1.0,
+  "ts": 1784388378.3650198,
+  "iso": "2026-07-18T15:26:18Z",
+  "valid_from": 1784388378.3650198,
+  "source": null,
+  "mtype": "episodic",
+  "last_access": 1784388378.3650198,
+  "status": "active",
+  "links": [],
+  "meta": {},
+  "key": "cmd:83194eb50a",
+  "object": "cd /c/Users/Danculus/agora grep -nE \"\\\"Sergeant Voss\\\":|\\\"Da"
+ },
+ {
+  "id": "8664084d78",
+  "text": "server\\agora\\agent_os\\agent_os.py :: current state -> \"skills\": [(\"spear_fighting\", 8), (\"shield_defense\", 9), (\"patrol\", 7), (\"discipline\", 8)],     },     \"Artificer Rooke\": {         \"name\": \"Artificer Rooke\",         \"role\": \"arti…",
+  "tags": [
+   "file",
+   "edit"
+  ],
+  "value": 1.0,
+  "ts": 1784388418.240895,
+  "iso": "2026-07-18T15:26:58Z",
+  "valid_from": 1784388418.240895,
+  "source": null,
+  "mtype": "semantic",
+  "last_access": 1784388418.240895,
+  "status": "superseded",
+  "links": [],
+  "meta": {
+   "superseded_by_toggle": "aff80f8af8",
+   "superseded_by_policy": "keyed_lww"
+  },
+  "key": "file:server\\agora\\agent_os\\agent_os.py",
+  "object": "\"skills\": [(\"spear_fighting\", 8), (\"shield_defense\", 9), (\"patrol\", 7), (\"discip…",
+  "superseded_ts": 1784388444.8746524,
+  "invalidated_at": 1784388444.8746524
+ },
+ {
+  "id": "aff80f8af8",
+  "text": "server\\agora\\agent_os\\agent_os.py :: current state -> async def ensure_os_initialized(self):         \"\"\"Seed OS data for any roster NPC that isn't seeded yet. PER-AGENT idempotent: agent_soul is written         last per NPC, so a soul…",
+  "tags": [
+   "file",
+   "edit"
+  ],
+  "value": 1.0,
+  "ts": 1784388444.8746524,
+  "iso": "2026-07-18T15:27:24Z",
+  "valid_from": 1784388444.8746524,
+  "source": null,
+  "mtype": "semantic",
+  "last_access": 1784388444.8746524,
+  "status": "active",
+  "links": [],
+  "meta": {},
+  "key": "file:server\\agora\\agent_os\\agent_os.py",
+  "object": "async def ensure_os_initialized(self):         \"\"\"Seed OS data for any roster NP…"
+ },
+ {
+  "id": "c0e3d54533",
+  "text": "ran: cd /c/Users/Danculus/agora echo \"=== _cull_agents function ===\" sed -n '/async def _cull_agents/,/return culled/p' server/agora/lifecycle/epoch_engine.py 2>/dev/null | head -50",
+  "tags": [
+   "bash"
+  ],
+  "value": 1.0,
+  "ts": 1784388453.7781124,
+  "iso": "2026-07-18T15:27:33Z",
+  "valid_from": 1784388453.7781124,
+  "source": null,
+  "mtype": "episodic",
+  "last_access": 1784388453.7781124,
+  "status": "active",
+  "links": [],
+  "meta": {},
+  "key": "cmd:f43738b8bc",
+  "object": "cd /c/Users/Danculus/agora echo \"=== _cull_agents function ="
+ },
+ {
+  "id": "5b951a3ebb",
+  "text": "ran: cd /c/Users/Danculus/agora sed -n '/async def _cull_agents/,/return culled/p' server/agora/lifecycle/epoch_engine.py 2>/dev/null | sed -n '6,55p'",
+  "tags": [
+   "bash"
+  ],
+  "value": 1.0,
+  "ts": 1784388462.4483664,
+  "iso": "2026-07-18T15:27:42Z",
+  "valid_from": 1784388462.4483664,
+  "source": null,
+  "mtype": "episodic",
+  "last_access": 1784388462.4483664,
+  "status": "active",
+  "links": [],
+  "meta": {},
+  "key": "cmd:5f90049390",
+  "object": "cd /c/Users/Danculus/agora sed -n '/async def _cull_agents/,"
+ },
+ {
+  "id": "4a0a2d3011",
+  "text": "ran: cd /c/Users/Danculus/agora grep -nE \"_cull_agents|culled|status.*=.*'culled'|SET status|WHERE.*trust|SELECT.*agent_id|trust_score\" server/agora/lifecycle/epoch_engine.py | head -20",
+  "tags": [
+   "bash"
+  ],
+  "value": 1.0,
+  "ts": 1784388473.2653952,
+  "iso": "2026-07-18T15:27:53Z",
+  "valid_from": 1784388473.2653952,
+  "source": null,
+  "mtype": "episodic",
+  "last_access": 1784388473.2653952,
+  "status": "active",
+  "links": [],
+  "meta": {},
+  "key": "cmd:487f581a91",
+  "object": "cd /c/Users/Danculus/agora grep -nE \"_cull_agents|culled|sta"
+ },
+ {
+  "id": "842b80cd97",
+  "text": "server\\agora\\lifecycle\\epoch_engine.py :: current state -> cursor = await db.execute(             \"SELECT agent_id, role, trust_score, energy_balance, generation \"             \"FROM agent_identities WHERE status='active' AND trust_score < …",
+  "tags": [
+   "file",
+   "edit"
+  ],
+  "value": 1.0,
+  "ts": 1784388492.5673335,
+  "iso": "2026-07-18T15:28:12Z",
+  "valid_from": 1784388492.5673335,
+  "source": null,
+  "mtype": "semantic",
+  "last_access": 1784388492.5673335,
+  "status": "active",
+  "links": [],
+  "meta": {},
+  "key": "file:server\\agora\\lifecycle\\epoch_engine.py",
+  "object": "cursor = await db.execute(             \"SELECT agent_id, role, trust_score, ener…"
+ },
+ {
+  "id": "102b9d03e6",
+  "text": "ran: cd /c/Users/Danculus/agora echo \"=== py_compile edited files ===\" python -m py_compile server/agora/agent_os/agent_os.py && echo \"  agent_os.py OK\" || echo \"  agent_os.py FAIL\" python -m py_compile se…",
+  "tags": [
+   "bash"
+  ],
+  "value": 1.0,
+  "ts": 1784388513.633418,
+  "iso": "2026-07-18T15:28:33Z",
+  "valid_from": 1784388513.633418,
+  "source": null,
+  "mtype": "episodic",
+  "last_access": 1784388513.633418,
+  "status": "active",
+  "links": [],
+  "meta": {},
+  "key": "cmd:1832679ad9",
+  "object": "cd /c/Users/Danculus/agora echo \"=== py_compile edited files"
+ },
+ {
+  "id": "00df28160c",
+  "text": "ran: cd /c/Users/Danculus/agora grep -rnE \"ensure_os_initialized\" server/agora --include=*.py 2>/dev/null | grep -viE \"\\.pyc|def ensure_os_initialized\" | head",
+  "tags": [
+   "bash"
+  ],
+  "value": 1.0,
+  "ts": 1784388529.3235743,
+  "iso": "2026-07-18T15:28:49Z",
+  "valid_from": 1784388529.3235743,
+  "source": null,
+  "mtype": "episodic",
+  "last_access": 1784388529.3235743,
+  "status": "active",
+  "links": [],
+  "meta": {},
+  "key": "cmd:d4e1c3677e",
+  "object": "cd /c/Users/Danculus/agora grep -rnE \"ensure_os_initialized\""
+ },
+ {
+  "id": "4eaf16346f",
+  "text": "ran: cd /c/Users/Danculus/agora echo \"=== current :8000 listener PID (before) ===\" powershell -Command \"(Get-NetTCPConnection -LocalPort 8000 -State Listen -ErrorAction SilentlyContinue).OwningProcess | Se…",
+  "tags": [
+   "bash"
+  ],
+  "value": 1.0,
+  "ts": 1784388558.8744812,
+  "iso": "2026-07-18T15:29:18Z",
+  "valid_from": 1784388558.8744812,
+  "source": null,
+  "mtype": "episodic",
+  "last_access": 1784388558.8744812,
+  "status": "active",
+  "links": [],
+  "meta": {},
+  "key": "cmd:66296c1ec4",
+  "object": "cd /c/Users/Danculus/agora echo \"=== current :8000 listener "
+ },
+ {
+  "id": "2adb3fdc71",
+  "text": "ran: cd /c/Users/Danculus/agora echo \"=== /health ===\" curl -s http://127.0.0.1:8000/api/v1/health 2>/dev/null | python -c \"import json,sys; d=json.load(sys.stdin); print('  agents:', d['agents'], '| statu…",
+  "tags": [
+   "bash"
+  ],
+  "value": 1.0,
+  "ts": 1784388607.8756855,
+  "iso": "2026-07-18T15:30:07Z",
+  "valid_from": 1784388607.8756855,
+  "source": null,
+  "mtype": "episodic",
+  "last_access": 1784388607.8756855,
+  "status": "active",
+  "links": [],
+  "meta": {},
+  "key": "cmd:789c870ff5",
+  "object": "cd /c/Users/Danculus/agora echo \"=== /health ===\" curl -s ht"
+ },
+ {
+  "id": "598e882927",
+  "text": "ran: cd /c/Users/Danculus/agora for i in $(seq 1 15); do   sleep 6   code=$(curl -s http://127.0.0.1:5174/ -o /dev/null -w \"%{http_code}\" 2>/dev/null)   if [ \"$code\" = \"200\" ]; then echo \"dungeon UP after …",
+  "tags": [
+   "bash"
+  ],
+  "value": 1.0,
+  "ts": 1784388742.4402025,
+  "iso": "2026-07-18T15:32:22Z",
+  "valid_from": 1784388742.4402025,
+  "source": null,
+  "mtype": "episodic",
+  "last_access": 1784388742.4402025,
+  "status": "active",
+  "links": [],
+  "meta": {},
+  "key": "cmd:6137d517d9",
+  "object": "cd /c/Users/Danculus/agora for i in $(seq 1 15); do   sleep "
+ },
+ {
+  "id": "849dd8278f",
+  "text": "ran: cd /c/Users/Danculus/agora powershell -Command \" \\$m = @(Get-CimInstance Win32_Process -Filter \\\"name like '%python%'\\\" | Where-Object { \\$_.CommandLine -like '*mcp_server.py*' }) \\$s = @(Get-CimInsta…",
+  "tags": [
+   "bash"
+  ],
+  "value": 1.0,
+  "ts": 1784388761.9214551,
+  "iso": "2026-07-18T15:32:41Z",
+  "valid_from": 1784388761.9214551,
+  "source": null,
+  "mtype": "episodic",
+  "last_access": 1784388761.9214551,
+  "status": "active",
+  "links": [],
+  "meta": {},
+  "key": "cmd:8bbf1123bb",
+  "object": "cd /c/Users/Danculus/agora powershell -Command \" \\$m = @(Get"
+ },
+ {
+  "id": "510049df31",
+  "text": "..\\.claude\\projects\\C--Users-Danculus-agora\\memory\\dungeon-roster-was-6-not-8-rooke-wren-orphaned.md :: current state -> --- name: dungeon-roster-was-6-not-8-rooke-wren-orphaned description: \"ROOT CAUSE (found + fixed 2026-07-18) of the long-standing '/health shows 5 agents not 8' the owner flagged f…",
+  "tags": [
+   "file",
+   "edit"
+  ],
+  "value": 1.0,
+  "ts": 1784388801.0034683,
+  "iso": "2026-07-18T15:33:21Z",
+  "valid_from": 1784388801.0034683,
+  "source": null,
+  "mtype": "semantic",
+  "last_access": 1784388801.0034683,
+  "status": "active",
+  "links": [],
+  "meta": {},
+  "key": "file:..\\.claude\\projects\\C--Users-Danculus-agora\\memory\\dungeon-roster-was-6-not-8-rooke-wren-orphaned.md",
+  "object": "--- name: dungeon-roster-was-6-not-8-rooke-wren-orphaned description: \"ROOT CAUS…"
+ },
+ {
+  "id": "b85dda78f2",
+  "text": "..\\.claude\\projects\\C--Users-Danculus-agora\\memory\\MEMORY.md :: current state -> ## Infra / ops / diagnostics - [Dungeon roster was 6 not 8 (Rooke/Wren orphaned + Voss culled)](dungeon-roster-was-6-not-8-rooke-wren-orphaned.md) â€” FIXED; /health 5â†’8; check a…",
+  "tags": [
+   "file",
+   "edit"
+  ],
+  "value": 1.0,
+  "ts": 1784388827.1140287,
+  "iso": "2026-07-18T15:33:47Z",
+  "valid_from": 1784388827.1140287,
+  "source": null,
+  "mtype": "semantic",
+  "last_access": 1784388827.1140287,
+  "status": "active",
+  "links": [],
+  "meta": {},
+  "key": "file:..\\.claude\\projects\\C--Users-Danculus-agora\\memory\\MEMORY.md",
+  "object": "## Infra / ops / diagnostics - [Dungeon roster was 6 not 8 (Rooke/Wren orphaned …"
+ },
+ {
+  "id": "6c9137f9ea",
+  "text": "ran: gh api \"search/code?q=expired_at+repo:getzep/graphiti\" --jq '.items[].path' 2>/dev/null | head -20; echo \"---EDGES---\"; gh api repos/getzep/graphiti/contents/graphiti_core/edges.py --jq '.download_url…",
+  "tags": [
+   "bash"
+  ],
+  "value": 1.0,
+  "ts": 1784389098.4943688,
+  "iso": "2026-07-18T15:38:18Z",
+  "valid_from": 1784389098.4943688,
+  "source": null,
+  "mtype": "episodic",
+  "last_access": 1784389098.4943688,
+  "status": "active",
+  "links": [],
+  "meta": {},
+  "key": "cmd:f23f536c09",
+  "object": "gh api \"search/code?q=expired_at+repo:getzep/graphiti\" --jq "
+ },
+ {
+  "id": "c229411bf7",
+  "text": "..\\mnemo-repo\\README_DRAFT_TOP_v111.md :: current state -> <!-- DRAFT of the new README top (hero + \"why mnemo\") for v1.11.0 â€” GATED, for owner approval before it replaces the live top. EVERY competitor claim below was verified this sess…",
+  "tags": [
+   "file",
+   "edit"
+  ],
+  "value": 1.0,
+  "ts": 1784389229.4536524,
+  "iso": "2026-07-18T15:40:29Z",
+  "valid_from": 1784389229.4536524,
+  "source": null,
+  "mtype": "semantic",
+  "last_access": 1784389229.4536524,
+  "status": "superseded",
+  "links": [],
+  "meta": {
+   "superseded_by_toggle": "841eb35e73",
+   "superseded_by_policy": "keyed_lww"
+  },
+  "key": "file:..\\mnemo-repo\\README_DRAFT_TOP_v111.md",
+  "object": "<!-- DRAFT of the new README top (hero + \"why mnemo\") for v1.11.0 â€” GATED, for…",
+  "superseded_ts": 1784389726.5019305,
+  "invalidated_at": 1784389726.5019305
+ },
+ {
+  "id": "0cf71e3568",
+  "text": "..\\mnemo-repo\\assets_readme\\hero_banner.svg :: current state -> <svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 1600 400\" width=\"1600\" height=\"400\" role=\"img\" aria-label=\"mnemo â€” the self-correcting memory layer, shown as a glowing digit…",
+  "tags": [
+   "file",
+   "edit"
+  ],
+  "value": 1.0,
+  "ts": 1784389335.3785856,
+  "iso": "2026-07-18T15:42:15Z",
+  "valid_from": 1784389335.3785856,
+  "source": null,
+  "mtype": "semantic",
+  "last_access": 1784389335.3785856,
+  "status": "active",
+  "links": [],
+  "meta": {},
+  "key": "file:..\\mnemo-repo\\assets_readme\\hero_banner.svg",
+  "object": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 1600 400\" width=\"1600\" heig…"
+ },
+ {
+  "id": "63ac4ed0a9",
+  "text": "ran: cd /c/Users/Danculus/mnemo-repo python -c \"import cairosvg; cairosvg.svg2png(url='assets_readme/hero_banner.svg', write_to='assets_readme/_hero_preview.png', output_width=1600, output_height=400); pri…",
+  "tags": [
+   "bash"
+  ],
+  "value": 1.0,
+  "ts": 1784389358.311209,
+  "iso": "2026-07-18T15:42:38Z",
+  "valid_from": 1784389358.311209,
+  "source": null,
+  "mtype": "episodic",
+  "last_access": 1784389358.311209,
+  "status": "active",
+  "links": [],
+  "meta": {},
+  "key": "cmd:f25d668b31",
+  "object": "cd /c/Users/Danculus/mnemo-repo python -c \"import cairosvg; "
+ },
+ {
+  "id": "027ad027bb",
+  "text": "ran: cd /c/Users/Danculus/mnemo-repo rm -f assets_readme/hero_banner.svg assets_readme/_hero_preview.png && echo \"removed my SVG experiment\" echo \"=== existing assets_readme (so the raster fits the convent…",
+  "tags": [
+   "bash"
+  ],
+  "value": 1.0,
+  "ts": 1784389601.7202494,
+  "iso": "2026-07-18T15:46:41Z",
+  "valid_from": 1784389601.7202494,
+  "source": null,
+  "mtype": "episodic",
+  "last_access": 1784389601.7202494,
+  "status": "active",
+  "links": [],
+  "meta": {},
+  "key": "cmd:ed08720b7f",
+  "object": "cd /c/Users/Danculus/mnemo-repo rm -f assets_readme/hero_ban"
+ },
+ {
+  "id": "fecb960bf0",
+  "text": "ran: cd /c/Users/Danculus/mnemo-repo cp \"/c/Users/Danculus/Desktop/Screenshot_34.png\" assets_readme/hero_banner.png && echo \"copied to assets_readme/hero_banner.png\" echo \"=== dimensions + size ===\" python…",
+  "tags": [
+   "bash"
+  ],
+  "value": 1.0,
+  "ts": 1784389695.1205933,
+  "iso": "2026-07-18T15:48:15Z",
+  "valid_from": 1784389695.1205933,
+  "source": null,
+  "mtype": "episodic",
+  "last_access": 1784389695.1205933,
+  "status": "active",
+  "links": [],
+  "meta": {},
+  "key": "cmd:2c5753ec99",
+  "object": "cd /c/Users/Danculus/mnemo-repo cp \"/c/Users/Danculus/Deskto"
+ },
+ {
+  "id": "841eb35e73",
+  "text": "..\\mnemo-repo\\README_DRAFT_TOP_v111.md :: current state -> <div align=\"center\">  <img src=\"assets_readme/hero_banner.png\" alt=\"mnemo â€” a glowing digital memory layer resting on a robust machined-steel base\" width=\"800\">  # Mnemosyne Â· `…",
+  "tags": [
+   "file",
+   "edit"
+  ],
+  "value": 1.0,
+  "ts": 1784389726.5019305,
+  "iso": "2026-07-18T15:48:46Z",
+  "valid_from": 1784389726.5019305,
+  "source": null,
+  "mtype": "semantic",
+  "last_access": 1784389726.5019305,
+  "status": "active",
+  "links": [],
+  "meta": {},
+  "key": "file:..\\mnemo-repo\\README_DRAFT_TOP_v111.md",
+  "object": "<div align=\"center\">  <img src=\"assets_readme/hero_banner.png\" alt=\"mnemo â€” a …"
+ },
+ {
+  "id": "4c3af58eef",
+  "text": "ran: cd /c/Users/Danculus/mnemo-repo python - << 'PYEOF' import re draft = open('README_DRAFT_TOP_v111.md', encoding='utf-8').read() # strip the leading HTML comment (the gated-draft note) from the draft d…",
+  "tags": [
+   "bash"
+  ],
+  "value": 1.0,
+  "ts": 1784390020.247728,
+  "iso": "2026-07-18T15:53:40Z",
+  "valid_from": 1784390020.247728,
+  "source": null,
+  "mtype": "episodic",
+  "last_access": 1784390020.247728,
+  "status": "active",
+  "links": [],
+  "meta": {},
+  "key": "cmd:6796433661",
+  "object": "cd /c/Users/Danculus/mnemo-repo python - << 'PYEOF' import r"
+ },
+ {
+  "id": "035910979b",
+  "text": "ran: cd /c/Users/Danculus/mnemo-repo python - << 'PYEOF' import base64 b64 = base64.b64encode(open('assets_readme/hero_banner.png','rb').read()).decode() print('banner base64 len:', len(b64)) open('/tmp/_b…",
+  "tags": [
+   "bash"
+  ],
+  "value": 1.0,
+  "ts": 1784390073.272522,
+  "iso": "2026-07-18T15:54:33Z",
+  "valid_from": 1784390073.272522,
+  "source": null,
+  "mtype": "episodic",
+  "last_access": 1784390073.272522,
+  "status": "active",
+  "links": [],
+  "meta": {},
+  "key": "cmd:3a69f5d9ae",
+  "object": "cd /c/Users/Danculus/mnemo-repo python - << 'PYEOF' import b"
+ },
+ {
+  "id": "da89c847a1",
+  "text": "..\\mnemo-repo\\_readme_preview.html :: current state -> <style> :root{--bg:#ffffff;--fg:#1f2328;--muted:#59636e;--border:#d1d9e0;--code-bg:#f6f8fa;--accent:#0d7d84;--tbl-alt:#f6f8fa;--ok:#1a7f37;--no:#cf222e;} @media (prefers-color-sche…",
+  "tags": [
+   "file",
+   "edit"
+  ],
+  "value": 1.0,
+  "ts": 1784390174.9285367,
+  "iso": "2026-07-18T15:56:14Z",
+  "valid_from": 1784390174.9285367,
+  "source": null,
+  "mtype": "semantic",
+  "last_access": 1784390174.9285367,
+  "status": "active",
+  "links": [],
+  "meta": {},
+  "key": "file:..\\mnemo-repo\\_readme_preview.html",
+  "object": "<style> :root{--bg:#ffffff;--fg:#1f2328;--muted:#59636e;--border:#d1d9e0;--code-…"
+ },
+ {
+  "id": "ee78b46f4d",
+  "text": "ran: cd /c/Users/Danculus/mnemo-repo python - << 'PYEOF' b64 = open('/tmp/_banner_b64.txt').read().strip() html = open('_readme_preview.html', encoding='utf-8').read() html = html.replace('__BANNER_B64__',…",
+  "tags": [
+   "bash"
+  ],
+  "value": 1.0,
+  "ts": 1784390184.2679048,
+  "iso": "2026-07-18T15:56:24Z",
+  "valid_from": 1784390184.2679048,
+  "source": null,
+  "mtype": "episodic",
+  "last_access": 1784390184.2679048,
+  "status": "active",
+  "links": [],
+  "meta": {},
+  "key": "cmd:b5ba42c151",
+  "object": "cd /c/Users/Danculus/mnemo-repo python - << 'PYEOF' b64 = op"
+ },
+ {
+  "id": "7b5c9c7848",
+  "text": "ran: cd /c/Users/Danculus/mnemo-repo echo \"=== remove temp/preview files (must not ship) ===\" rm -f _readme_preview.html README_DRAFT_TOP_v111.md README.md.bak_pre111 && echo \"removed temp files\" rm -f /tm…",
+  "tags": [
+   "bash"
+  ],
+  "value": 1.0,
+  "ts": 1784390334.7542703,
+  "iso": "2026-07-18T15:58:54Z",
+  "valid_from": 1784390334.7542703,
+  "source": null,
+  "mtype": "episodic",
+  "last_access": 1784390334.7542703,
+  "status": "active",
+  "links": [],
+  "meta": {},
+  "key": "cmd:fb841ce118",
+  "object": "cd /c/Users/Danculus/mnemo-repo echo \"=== remove temp/previe"
+ },
+ {
+  "id": "9e8096c690",
+  "text": "ran: cd /c/Users/Danculus/mnemo-repo git branch --show-current git add CHANGELOG.md README.md pyproject.toml mnemo/__init__.py mnemo/mnemo.py mnemo/claude_code.py mnemo/integrations/langchain.py assets_rea…",
+  "tags": [
+   "bash"
+  ],
+  "value": 1.0,
+  "ts": 1784390373.4162974,
+  "iso": "2026-07-18T15:59:33Z",
+  "valid_from": 1784390373.4162974,
+  "source": null,
+  "mtype": "episodic",
+  "last_access": 1784390373.4162974,
+  "status": "active",
+  "links": [],
+  "meta": {},
+  "key": "cmd:7dbc8862aa",
+  "object": "cd /c/Users/Danculus/mnemo-repo git branch --show-current gi"
+ },
+ {
+  "id": "ec002dbb15",
+  "text": "ran: cd /c/Users/Danculus echo \"=== actual vault note count (read-only, never git-touch) ===\" find \"/c/Users/Danculus/my-second-brain\" -name \"*.md\" 2>/dev/null | wc -l | xargs echo \"  .md files:\" echo \"===…",
+  "tags": [
+   "bash"
+  ],
+  "value": 1.0,
+  "ts": 1784390401.7782614,
+  "iso": "2026-07-18T16:00:01Z",
+  "valid_from": 1784390401.7782614,
+  "source": null,
+  "mtype": "episodic",
+  "last_access": 1784390401.7782614,
+  "status": "active",
+  "links": [],
+  "meta": {},
+  "key": "cmd:0720dd6019",
+  "object": "cd /c/Users/Danculus echo \"=== actual vault note count (read"
+ },
+ {
+  "id": "7265848ca8",
+  "text": "ran: cd /c/Users/Danculus/mnemo-repo for ln in 11 1149 1186 1270 1335; do echo \"--- line $ln ---\"; sed -n \"${ln}p\" README.md; done",
+  "tags": [
+   "bash"
+  ],
+  "value": 1.0,
+  "ts": 1784390491.856598,
+  "iso": "2026-07-18T16:01:31Z",
+  "valid_from": 1784390491.856598,
+  "source": null,
+  "mtype": "episodic",
+  "last_access": 1784390491.856598,
+  "status": "active",
+  "links": [],
+  "meta": {},
+  "key": "cmd:f8bd62317a",
+  "object": "cd /c/Users/Danculus/mnemo-repo for ln in 11 1149 1186 1270 "
+ },
+ {
+  "id": "d8145fa883",
+  "text": "..\\mnemo-repo\\README.md :: current state -> it daily over 10,000 notes.*",
+  "tags": [
+   "file",
+   "edit"
+  ],
+  "value": 1.0,
+  "ts": 1784390521.553217,
+  "iso": "2026-07-18T16:02:01Z",
+  "valid_from": 1784390521.553217,
+  "source": null,
+  "mtype": "semantic",
+  "last_access": 1784390521.553217,
+  "status": "superseded",
+  "links": [],
+  "meta": {
+   "superseded_by_toggle": "9233403169",
+   "superseded_by_policy": "keyed_lww"
+  },
+  "key": "file:..\\mnemo-repo\\README.md",
+  "object": "it daily over 10,000 notes.*",
+  "superseded_ts": 1784390534.3989654,
+  "invalidated_at": 1784390534.3989654
+ },
+ {
+  "id": "9233403169",
+  "text": "..\\mnemo-repo\\README.md :: current state -> a corpus of several thousand notes, lexical `recall@5` decays from **0.94** (small store) to **0.25**,",
+  "tags": [
+   "file",
+   "edit"
+  ],
+  "value": 1.0,
+  "ts": 1784390534.3989654,
+  "iso": "2026-07-18T16:02:14Z",
+  "valid_from": 1784390534.3989654,
+  "source": null,
+  "mtype": "semantic",
+  "last_access": 1784390534.3989654,
+  "status": "superseded",
+  "links": [],
+  "meta": {
+   "superseded_by_toggle": "666b12b749",
+   "superseded_by_policy": "keyed_lww"
+  },
+  "key": "file:..\\mnemo-repo\\README.md",
+  "object": "a corpus of several thousand notes, lexical `recall@5` decays from **0.94** (sma…",
+  "superseded_ts": 1784390540.0279245,
+  "invalidated_at": 1784390540.0279245
+ },
+ {
+  "id": "666b12b749",
+  "text": "..\\mnemo-repo\\README.md :: current state -> - **Contradiction detection** runs in production over the 10,000-note vault; the lesson that it must",
+  "tags": [
+   "file",
+   "edit"
+  ],
+  "value": 1.0,
+  "ts": 1784390540.0279245,
+  "iso": "2026-07-18T16:02:20Z",
+  "valid_from": 1784390540.0279245,
+  "source": null,
+  "mtype": "semantic",
+  "last_access": 1784390540.0279245,
+  "status": "superseded",
+  "links": [],
+  "meta": {
+   "superseded_by_toggle": "6696e86078",
+   "superseded_by_policy": "keyed_lww"
+  },
+  "key": "file:..\\mnemo-repo\\README.md",
+  "object": "- **Contradiction detection** runs in production over the 10,000-note vault; the…",
+  "superseded_ts": 1784390548.2321095,
+  "invalidated_at": 1784390548.2321095
+ },
+ {
+  "id": "6696e86078",
+  "text": "..\\mnemo-repo\\README.md :: current state -> and matters **at scale**: at several-thousand-note scale, lexical recall@5 decays from 0.94 (small store) to",
+  "tags": [
+   "file",
+   "edit"
+  ],
+  "value": 1.0,
+  "ts": 1784390548.2321095,
+  "iso": "2026-07-18T16:02:28Z",
+  "valid_from": 1784390548.2321095,
+  "source": null,
+  "mtype": "semantic",
+  "last_access": 1784390548.2321095,
+  "status": "superseded",
+  "links": [],
+  "meta": {
+   "superseded_by_toggle": "0cadbb84e3",
+   "superseded_by_policy": "keyed_lww"
+  },
+  "key": "file:..\\mnemo-repo\\README.md",
+  "object": "and matters **at scale**: at several-thousand-note scale, lexical recall@5 decay…",
+  "superseded_ts": 1784390556.8750982,
+  "invalidated_at": 1784390556.8740933
+ },
+ {
+  "id": "0cadbb84e3",
+  "text": "..\\mnemo-repo\\README.md :: current state -> Dogfood result, stated honestly: pointed at the maintainer's own 10,000-note vault, an agent using",
+  "tags": [
+   "file",
+   "edit"
+  ],
+  "value": 1.0,
+  "ts": 1784390556.8740933,
+  "iso": "2026-07-18T16:02:36Z",
+  "valid_from": 1784390556.8740933,
+  "source": null,
+  "mtype": "semantic",
+  "last_access": 1784390556.8740933,
+  "status": "superseded",
+  "links": [],
+  "meta": {
+   "superseded_by_toggle": "509ef3991d",
+   "superseded_by_policy": "keyed_lww"
+  },
+  "key": "file:..\\mnemo-repo\\README.md",
+  "object": "Dogfood result, stated honestly: pointed at the maintainer's own 10,000-note vau…",
+  "superseded_ts": 1784390632.122706,
+  "invalidated_at": 1784390632.122706
+ },
+ {
+  "id": "9b09a62b72",
+  "text": "ran: cd /c/Users/Danculus/mnemo-repo echo \"=== remaining 6,000/6000 note refs anywhere shippable? ===\" grep -rnE \"6,000|6000|~6,?000\" README.md pyproject.toml mnemo/ 2>/dev/null | grep -viE \"\\.pyc\" | head …",
+  "tags": [
+   "bash"
+  ],
+  "value": 1.0,
+  "ts": 1784390568.5482414,
+  "iso": "2026-07-18T16:02:48Z",
+  "valid_from": 1784390568.5482414,
+  "source": null,
+  "mtype": "episodic",
+  "last_access": 1784390568.5482414,
+  "status": "active",
+  "links": [],
+  "meta": {},
+  "key": "cmd:3698002628",
+  "object": "cd /c/Users/Danculus/mnemo-repo echo \"=== remaining 6,000/60"
+ },
+ {
+  "id": "1d66f118a9",
+  "text": "ran: cd /c/Users/Danculus/mnemo-repo git add README.md git commit -q -m \"README: vault is now 10,000+ notes (was ~6,000); recall-decay measurement scoped honestly to 'several thousand notes' (measured at t…",
+  "tags": [
+   "bash"
+  ],
+  "value": 1.0,
+  "ts": 1784390597.232077,
+  "iso": "2026-07-18T16:03:17Z",
+  "valid_from": 1784390597.232077,
+  "source": null,
+  "mtype": "episodic",
+  "last_access": 1784390597.232077,
+  "status": "active",
+  "links": [],
+  "meta": {},
+  "key": "cmd:dfb0f486b0",
+  "object": "cd /c/Users/Danculus/mnemo-repo git add README.md git commit"
+ },
+ {
+  "id": "509ef3991d",
+  "text": "..\\mnemo-repo\\README.md :: current state -> <img src=\"https://raw.githubusercontent.com/DanceNitra/mnemo/main/assets_readme/hero_banner.png\" alt=\"mnemo â€” a glowing digital memory layer resting on a robust machined-steel ba…",
+  "tags": [
+   "file",
+   "edit"
+  ],
+  "value": 1.0,
+  "ts": 1784390632.122706,
+  "iso": "2026-07-18T16:03:52Z",
+  "valid_from": 1784390632.122706,
+  "source": null,
+  "mtype": "semantic",
+  "last_access": 1784390632.122706,
+  "status": "active",
+  "links": [],
+  "meta": {},
+  "key": "file:..\\mnemo-repo\\README.md",
+  "object": "<img src=\"https://raw.githubusercontent.com/DanceNitra/mnemo/main/assets_readme/…"
+ },
+ {
+  "id": "6d305f274c",
+  "text": "ran: cd /c/Users/Danculus/mnemo-repo git add README.md git commit -q -m \"README: absolute raw-GitHub URL for the hero banner so it renders on PyPI too\" git push origin HEAD 2>&1 | tail -2 echo \"=== clean o…",
+  "tags": [
+   "bash"
+  ],
+  "value": 1.0,
+  "ts": 1784390658.3961422,
+  "iso": "2026-07-18T16:04:18Z",
+  "valid_from": 1784390658.3961422,
+  "source": null,
+  "mtype": "episodic",
+  "last_access": 1784390658.3961422,
+  "status": "active",
+  "links": [],
+  "meta": {},
+  "key": "cmd:5c2a2ae0ea",
+  "object": "cd /c/Users/Danculus/mnemo-repo git add README.md git commit"
+ },
+ {
+  "id": "dd9cfd65d8",
+  "text": "ran: cd /c/Users/Danculus/mnemo-repo echo \"=== wheel contents (new modules present?) ===\" python -c \"import zipfile; z=zipfile.ZipFile('dist/agora_mnemo-1.11.0-py3-none-any.whl'); [print(' ',n) for n in z.…",
+  "tags": [
+   "bash"
+  ],
+  "value": 1.0,
+  "ts": 1784390674.6722486,
+  "iso": "2026-07-18T16:04:34Z",
+  "valid_from": 1784390674.6722486,
+  "source": null,
+  "mtype": "episodic",
+  "last_access": 1784390674.6722486,
+  "status": "active",
+  "links": [],
+  "meta": {},
+  "key": "cmd:32945fc8d0",
+  "object": "cd /c/Users/Danculus/mnemo-repo echo \"=== wheel contents (ne"
+ },
+ {
+  "id": "16791479b2",
+  "text": "ran: cd /c/Users/Danculus/mnemo-repo python -m twine upload dist/agora_mnemo-1.11.0* --non-interactive 2>&1 | tail -8",
+  "tags": [
+   "bash"
+  ],
+  "value": 1.0,
+  "ts": 1784390687.9186099,
+  "iso": "2026-07-18T16:04:47Z",
+  "valid_from": 1784390687.9186099,
+  "source": null,
+  "mtype": "episodic",
+  "last_access": 1784390687.9186099,
+  "status": "active",
+  "links": [],
+  "meta": {},
+  "key": "cmd:181885bdf6",
+  "object": "cd /c/Users/Danculus/mnemo-repo python -m twine upload dist/"
+ },
+ {
+  "id": "57bd6371d9",
+  "text": "ran: cd /c/Users/Danculus echo \"=== ~/.pypirc exists? ===\" test -f ~/.pypirc && echo \"  YES ~/.pypirc present\" || echo \"  NO ~/.pypirc\" echo \"=== TWINE env vars set? (existence only) ===\" [ -n \"$TWINE_USER…",
+  "tags": [
+   "bash"
+  ],
+  "value": 1.0,
+  "ts": 1784390710.432827,
+  "iso": "2026-07-18T16:05:10Z",
+  "valid_from": 1784390710.432827,
+  "source": null,
+  "mtype": "episodic",
+  "last_access": 1784390710.432827,
+  "status": "active",
+  "links": [],
+  "meta": {},
+  "key": "cmd:fce14c167f",
+  "object": "cd /c/Users/Danculus echo \"=== ~/.pypirc exists? ===\" test -"
+ },
+ {
+  "id": "1d084f1edb",
+  "text": "ran: cd /c/Users/Danculus/mnemo-repo TOKEN=$(grep '^PYPI_TOKEN=' /c/Users/Danculus/agora/server/.env | cut -d= -f2- | tr -d '\\r') if [ -z \"$TOKEN\" ]; then echo \"PYPI_TOKEN is EMPTY in server/.env â€” canno…",
+  "tags": [
+   "bash"
+  ],
+  "value": 1.0,
+  "ts": 1784390734.8390949,
+  "iso": "2026-07-18T16:05:34Z",
+  "valid_from": 1784390734.8390949,
+  "source": null,
+  "mtype": "episodic",
+  "last_access": 1784390734.8390949,
+  "status": "active",
+  "links": [],
+  "meta": {},
+  "key": "cmd:97ae01a56a",
+  "object": "cd /c/Users/Danculus/mnemo-repo TOKEN=$(grep '^PYPI_TOKEN=' "
+ },
+ {
+  "id": "e343507505",
+  "text": "ran: cd /c/Users/Danculus/mnemo-repo echo \"=== PyPI live check ===\" curl -s \"https://pypi.org/pypi/agora-mnemo/json\" 2>/dev/null | python -c \"import json,sys; d=json.load(sys.stdin); print('  latest on PyP…",
+  "tags": [
+   "bash"
+  ],
+  "value": 1.0,
+  "ts": 1784390750.5317023,
+  "iso": "2026-07-18T16:05:50Z",
+  "valid_from": 1784390750.5317023,
+  "source": null,
+  "mtype": "episodic",
+  "last_access": 1784390750.5317023,
+  "status": "active",
+  "links": [],
+  "meta": {},
+  "key": "cmd:bf177bc83b",
+  "object": "cd /c/Users/Danculus/mnemo-repo echo \"=== PyPI live check =="
+ },
+ {
+  "id": "805ffd95a9",
+  "text": "ran: cd /c/Users/Danculus/agora echo \"=== agora git: how many + what kinds ===\" git status --short | wc -l | xargs echo \"  total uncommitted:\" echo \"  breakdown:\" git status --short | awk '{print $1}' | so…",
+  "tags": [
+   "bash"
+  ],
+  "value": 1.0,
+  "ts": 1784391057.044536,
+  "iso": "2026-07-18T16:10:57Z",
+  "valid_from": 1784391057.044536,
+  "source": null,
+  "mtype": "episodic",
+  "last_access": 1784391057.044536,
+  "status": "active",
+  "links": [],
+  "meta": {},
+  "key": "cmd:5529a23b48",
+  "object": "cd /c/Users/Danculus/agora echo \"=== agora git: how many + w"
+ },
+ {
+  "id": "72eb7a7996",
+  "text": "ran: cd /c/Users/Danculus/agora echo \"=== existing .gitignore tail ===\" tail -5 .gitignore 2>/dev/null echo \"=== append transient-probe ignore patterns ===\" cat >> .gitignore << 'EOF'  # transient probe/be…",
+  "tags": [
+   "bash"
+  ],
+  "value": 1.0,
+  "ts": 1784391083.0583932,
+  "iso": "2026-07-18T16:11:23Z",
+  "valid_from": 1784391083.0583932,
+  "source": null,
+  "mtype": "episodic",
+  "last_access": 1784391083.0583932,
+  "status": "active",
+  "links": [],
+  "meta": {},
+  "key": "cmd:c64291a7f3",
+  "object": "cd /c/Users/Danculus/agora echo \"=== existing .gitignore tai"
+ }
+]

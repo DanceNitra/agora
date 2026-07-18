@@ -1,0 +1,28 @@
+{
+ "n": 6,
+ "runs": 3,
+ "model": "llama3.1:8b",
+ "results": {
+  "mnemo": {
+   "state_jaccard": 1.0,
+   "runs": 3,
+   "stored_strings_per_run": [
+    12,
+    12,
+    12
+   ],
+   "answer_flip_rate": 0.0
+  },
+  "mem0": {
+   "state_jaccard": 1.0,
+   "runs": 3,
+   "stored_strings_per_run": [
+    13,
+    13,
+    13
+   ],
+   "answer_flip_rate": null
+  }
+ },
+ "honest_finding": "At temp=0 with a fixed local LLM (llama3.1:8b), mem0's store-state is REPRODUCIBLE (Jaccard=1.0, 13 strings identical across 3 runs) \u2014 SAME as mnemo. So 'mem0's stored state churns' is FALSE at temp=0; the store-state determinism moat does NOT hold here. mem0 nondeterminism appears only at its default temp=0.7 (~30% answer-class flips, see determinism_verify) or on nondeterministic endpoints \u2014 a config/deployment property, not architecture. What DOES hold architecturally: (1) mnemo is deterministic BY CONSTRUCTION (guaranteed for any/no model, zero config) vs mem0 only conditionally (temp=0 + stable endpoint); (2) ZERO LLM calls / cost / latency per write. The honest moat is cost + guaranteed-determinism-with-any-backend, NOT 'mem0 diverges'."
+}

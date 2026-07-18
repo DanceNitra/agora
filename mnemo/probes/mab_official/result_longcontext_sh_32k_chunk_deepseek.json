@@ -1,0 +1,12 @@
+{
+ "condition": "longcontext",
+ "sample": "sh_32k",
+ "ingest": "chunk",
+ "llm": "deepseek",
+ "n": 100,
+ "correct": 95,
+ "accuracy": 0.95,
+ "answerer": "deepseek-v4-flash",
+ "scoring": "official substring_exact_match max-over-golds",
+ "prompt": "official factconsolidation query template"
+}

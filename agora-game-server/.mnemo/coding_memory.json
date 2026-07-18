@@ -1,0 +1,21 @@
+[
+ {
+  "id": "4de9d91d40",
+  "text": "ran: cd /c/Users/Danculus/agora echo \"=== current dungeon processes (mcp_server + any supervisor) ===\" powershell -Command \"Get-CimInstance Win32_Process -Filter \\\"name like '%python%'\\\" | Where-Object { \\…",
+  "tags": [
+   "bash"
+  ],
+  "value": 1.0,
+  "ts": 1784388720.9427722,
+  "iso": "2026-07-18T15:32:00Z",
+  "valid_from": 1784388720.9427722,
+  "source": null,
+  "mtype": "episodic",
+  "last_access": 1784388720.9427722,
+  "status": "active",
+  "links": [],
+  "meta": {},
+  "key": "cmd:46021ec99b",
+  "object": "cd /c/Users/Danculus/agora echo \"=== current dungeon process"
+ }
+]
