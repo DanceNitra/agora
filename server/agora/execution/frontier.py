@@ -75,7 +75,30 @@ def _smart_frontier(vault: str, explore: bool) -> dict | None:
     if ndoms < 2:
         return None
     recent = _recent_targets(time.time())
-    pool = ("THIN vault domains (underdeveloped):\n"
+    # MOAT VEIN (owner 2026-07-18): the vault candidate pool is dominated by abstract complexity/network toy
+    # gaps that pass the Lab gate but re-derive textbook results (Condorcet, Griffiths) and never touch the
+    # product. Seed the pool with the CONCRETE, business-critical agent-memory vein validated by hand this
+    # session — measurable competitor-weakness probes + mnemo-capability questions. Each is a runnable head-to-
+    # head that builds the #1 product, not an isolated toy fact. In COMPOUND MODE the CRO must PREFER these.
+    moat_vein = (
+        "MOAT VEIN — concrete, runnable agent-memory / mnemo product questions (PREFER these in compound mode; "
+        "each competitor weakness is a fair, measurable head-to-head vs mnemo):\n"
+        "- Run-to-run NONDETERMINISM: fraction of subjects whose stored/returned value flips across identical "
+        "re-ingests, for mem0/Zep/Letta/Cognee (LLM on write path) vs mnemo's deterministic core (=0).\n"
+        "- CORRECTION-UNDER-POISON (FAIR contract: raw text for all, each extracts, shared LLM judge): after a "
+        "genuine correction, an adversarial re-assertion of the retired value as the newest write — measure "
+        "poison-rejection AND legit-new-value-adoption, mnemo vs mem0.\n"
+        "- WRITE-COMPLETION across LLM backends: silent fact-drop rate of mem0/Letta extraction on "
+        "Qwen/Ollama/Mistral vs mnemo's backend-agnostic write.\n"
+        "- INGEST COST/LATENCY per write: LLM calls + tokens + ms for Graphiti/Cognee (cognify) vs mnemo ~0.\n"
+        "- MEMORY-POISONING ASR reduction of mnemo's warrant-gate on an ASB/MINJA-style attack vs an "
+        "undefended vector store, fair identical stream.\n"
+        "- REPRODUCE a published agent-memory benchmark (LoCoMo / LongMemEval / MemoryAgentBench) with a "
+        "runnable fixed-seed harness that shows WHERE each system loses, honestly scoped.\n"
+        "- mnemo SEMANTIC-KEYING: does embedding-resolved keys let deterministic supersession survive "
+        "paraphrased conflicts where exact-key match fails? measure vs a plain-extractor baseline.\n")
+    pool = (moat_vein
+            + "\n\nTHIN vault domains (underdeveloped — deprioritize abstract complexity/network toys here):\n"
             + ("\n".join(f"- {d} ({c} notes)" for c, d in thin) or "- (none)")
             + "\n\nSTRUCTURAL HOLES (substantial domains with no bridge):\n"
             + ("\n".join(f"- {a} <-> {b}" for _s, a, b in holes) or "- (none)"))
@@ -83,9 +106,10 @@ def _smart_frontier(vault: str, explore: bool) -> dict | None:
     mode = ("EXPLORE MODE: pick a BOLD broad-frontier bet — a high-novelty, high-impact question that "
             "could open a whole new field for us, even if it is not yet on our edge."
             if explore else
-            "COMPOUND MODE: pick the direction that most COMPOUNDS our moat (agent memory + the mnemo "
-            "library + the Crucible replication ledger + memory/reasoning integrity) — one that builds on "
-            "what we already lead and makes that lead harder to catch.")
+            "COMPOUND MODE: pick a MOAT-VEIN question (a concrete, runnable competitor-weakness head-to-head or "
+            "an mnemo-capability measurement from the MOAT VEIN list) — one that directly builds the mnemo #1 "
+            "product and earns credibility/income. STRONGLY prefer the MOAT VEIN over abstract vault toy-gaps; "
+            "only pick a vault domain if it is genuinely more product-critical than every moat-vein item.")
     sys = (
         "You are the Chief Research Officer of Agora, an autonomous research organization. Our MOAT is "
         "agent memory, the mnemo open-source memory library, and the Crucible replication ledger; our "
@@ -190,7 +214,8 @@ def frontier_target(vault: str) -> dict | None:
     """Intelligent CRO selection (default) with the hourly thin/hole rotation as fallback."""
     if os.getenv("AGORA_SMART_FRONTIER", "1") != "0":
         try:
-            explore = int(time.time()) % 10 < 3          # ~30% bold-exploration slice
+            explore = int(time.time()) % 10 < 1          # ~10% explore (was 30%): retarget to the moat vein,
+            #                                              the 90% compound slice now mines agent-memory product Qs
             r = _smart_frontier(vault, explore)
             if r:
                 return r
