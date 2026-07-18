@@ -1,3 +1,44 @@
+# Agora — Session Handoff (2026-07-18 END OF DAY · SHIPPED mnemo 1.11.0 + fixed the month-old 5→8 agents bug)
+
+## PASTE THIS AFTER SESSION RESTART (2026-07-18)
+
+```
+Resume Agora. FIRST read C:\Users\Danculus\agora\HANDOFF.md TOP section (2026-07-18) fully. Chat SLOVAK, code/output ENGLISH.
+
+THE ROBUST PLAN we are executing (do not lose it): make mnemo NUMERO UNO — the #1 agent-memory product ahead of EVERY competitor. Not by one number (we can't blanket-claim "beats mem0/Zep" without running them on our harness), but by (a) leading the memory-integrity moat NOBODY else has — deterministic no-LLM-on-write + corrections-stick + revert-to-predecessor + provable signed erasure — and (b) closing the buyer-facing gap list ONE BY ONE. Gap roadmap lives in memory `mnemo-path-to-number-one-gap-roadmap` and the task list (#33 adapters, #34 multi-hop, #35 hosted API, #36 credibility, #37 publish INTEGRITY_BENCHMARK.md).
+
+STANDING RULES (in memory, obey): NEVER skip the embedder / shortcut a measurement — if slow, BATCH it (owner forbade this, emphatic); never suggest stopping, always bring 2-3 sharp next moves; validate→storm→audit→verify gate BEFORE anything goes outward; secrets read INSIDE scripts (PYPI_TOKEN in server/.env), never echo; propose-don't-edit shared/outward; vault fragile (safe_vault_push only); GitHub posts as DanceNitra after owner OK.
+
+WHAT SHIPPED TODAY (live): agora-mnemo 1.11.0 on PyPI (https://pypi.org/project/agora-mnemo/1.11.0/) + GitHub DanceNitra/mnemo — write-path extractors (regex_extractor + make_llm_extractor), LangChain integration (MnemoRetriever), tuned recall recipe, and a VERIFIED top-of-the-top README (owner's steel+cyan hero banner, "why mnemo" moat, competitor comparison table where every cell was verified against the rival's current source, standalone LLM-free LOCOMO recall 0.78/0.65). Vault count corrected 6,000→10,000+.
+
+SYSTEM STATE: brain :8000 UP /health agents=8 (FIXED the month-old bug: Rooke+Wren were orphaned/never seeded, Voss culled — see memory dungeon-roster-was-6-not-8-rooke-wren-orphaned); dungeon :5174 UP (one mcp_server, zero supervisors); mnemo everywhere = 1.11.0 (canonical mnemo-repo, pip -e, agora copies synced — version schism fixed); mnemo Claude Code plugin INSTALLED (activates now on THIS restart — so I should already have my own memory). Cloud LLM credit EXHAUSTED (cross-system LOCOMO head-to-head deferred until topped up).
+
+FIRST verify health (agents=8, one :8000 listener, mnemo 1.11.0), then continue the gap roadmap: gap #5 CrewAI adapter + smoke-test integrations, then publish INTEGRITY_BENCHMARK.md (#37). Ask me what's next or just continue in order.
+```
+
+## Detailed state (2026-07-18)
+
+**SHIPPED LIVE:** agora-mnemo **1.11.0** — PyPI https://pypi.org/project/agora-mnemo/1.11.0/ + GitHub DanceNitra/mnemo (main @ bf1d124). Extractors · LangChain (`MnemoRetriever`) · tuned recall recipe · verified README (hero banner, "why mnemo" moat, competitor comparison verified cell-by-cell, standalone LLM-free LOCOMO recall 0.78/0.65). Vault note count 6,000→10,000+ (real 10,904).
+
+**THE MOAT (stated, verified):** mnemo is the only mainstream agent-memory lib with NO LLM on the write path → deterministic; the only one combining corrections-stick + revert-to-predecessor + provable signed erasure. Verified this session: none of mem0/Zep/Letta/Cognee/Memobase/MemoryScope/LangMem/txtai exposes revert; mem0 keeps the deleted value in its history table; Graphiti invalidates-not-deletes. Erasure-receipt scoped to "mainstream libs" (Engram/Heartwood do have receipts).
+
+**SYSTEM / DUNGEON:** brain :8000 UP, `/health agents:8` (was 5 for a month — Rooke+Wren orphaned + Voss culled; fixed in agent_os.py + epoch_engine.py, memory `dungeon-roster-was-6-not-8-rooke-wren-orphaned`), one :8000 listener. Dungeon :5174 UP, one mcp_server, zero supervisors. mnemo = 1.11.0 everywhere (mnemo-repo canonical, `pip install -e mnemo-repo`, agora/mnemo + agora/mnemo_pypi synced — schism fixed; RULE: edit mnemo-repo, re-sync). mnemo Claude Code plugin installed in this project (activates on restart; store ./.mnemo/ gitignored). Cloud LLM credit (OpenAI + Ollama Cloud) EXHAUSTED — cross-system LOCOMO head-to-head deferred.
+
+**ROBUST PLAN — mnemo NUMERO UNO (gap roadmap, one by one; full detail in memory `mnemo-path-to-number-one-gap-roadmap`):**
+1. LOCOMO recall — ✅ DONE (standalone LLM-free 0.78, in README + INTEGRITY_BENCHMARK.md)
+6. optional extractor — ✅ DONE (shipped 1.11.0)
+5. ecosystem adapters — PARTIAL: LangChain ✅; REMAINING CrewAI + smoke-test others + MCP registry (task #33)
+3. graph/multi-hop — REMAINING, without breaking the determinism moat (#34)
+2. hosted API — REMAINING (the revenue path) (#35)
+4. credibility/team — PARTIAL (benchmark+receipts flywheel) (#36)
+- PEARL #37: publish INTEGRITY_BENCHMARK.md — competitor-claim verify DONE; needs final own-number verify + owner publish decision.
+
+**NEXT MOVES:** (1) gap #5 CrewAI adapter + smoke-test integrations → 1.12.0 bundle; (2) publish INTEGRITY_BENCHMARK.md (#37); (3) when credit returns → cross-system LOCOMO head-to-head (mem0/Zep through OUR harness) = upgrades "top-tier" to "we beat them"; (4) swap hero banner if owner wants.
+
+**HEALTH CHECK:** `curl :8000/api/v1/health`→agents:8 · `curl :5174/`→200 · `python -c "import mnemo;print(mnemo.__version__)"`→1.11.0 · tasks #33-37 open.
+
+---
+
 # Agora — Session Handoff (2026-07-16 END OF DAY · the "gate-discipline day": mnemo 1.9.1→1.9.3, EDRN → Zenodo DOI, selector prior-art gate fixed, 8 honest pre-build kills)
 
 ## PASTE THIS AFTER SESSION RESTART
