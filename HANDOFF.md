@@ -1,3 +1,39 @@
+# Agora — Session Handoff
+
+> **LIVE COLLABORATION — DO NOT FORGET AFTER A RESET (owner flagged 2026-07-18):** Marat Sultanov (GitHub
+> `maratsultanov2`, project **TAT = Tree Angle Tap**; `TAT-ONE-TAP` = LLM memory via hash fingerprint) + Li
+> Guanghao (GitHub `luoxuejian000`) + Qingkong (`qingkong66`). The CURRENT EDRN "Menu-2" paper (1D Hubbard
+> boundary-CFT / Kane-Fisher / cross-sector) is **NOT yet published** — it awaits Guanghao's 3 revisions +
+> Marat's TAT appendix (DELIVERED, comment #82) + Qingkong's structural OK, **THEN WE (Drahoš) are the final
+> technical sign-off + submitter** (SciPost Physics Core + a fresh Zenodo DOI; a PRIOR paper had DOI
+> 10.5281/zenodo.21393316 — don't conflate). Marat's TAT (Tree Angle Tap; TAT-ONE-TAP = LLM memory via hash
+> fingerprint) bridges EDRN structural methods → mnemo integrity. FULL current state (who owes what) + the whole
+> 83-comment thread digest: memory `marat-tat-edrn-collaboration-live`. Read the whole Issue #1, fetch data from
+> GitHub yourself (public) — never via Gmail.
+
+# Agora — Session Handoff (2026-07-19 · the "erasure flagship, gate-hardened" day)
+
+## PASTE THIS AFTER RESTART (2026-07-19)
+```
+Resume Agora. FIRST read HANDOFF.md top (2026-07-19) + the LIVE-COLLABORATION callout above it. Chat SLOVAK, code/output ENGLISH.
+MISSION (memory mnemo-core-must-be-1-before-pro-sells, PERMANENT): make mnemo-CORE provably #1 ahead of ALL competitors FIRST; PRO sells only on that. Open-core: free core = credibility; PRO (later, ~month+budget, NO API yet) = hosted anchor-witnessing + cross-infra ErasureTargets + DSR workflow. Don't monetize before core is provably #1.
+STANDING RULES (obey): run the FULL gate before anything outward (validate→storm→audit→verify — it KILLED our accusatory erasure artifact this session & re-scoped it honestly); skeptic on our OWN wins before believing them; NO local GPU models (owner: GPU overloaded — do LLM work via SUBAGENTS, credit-free); never publish accusatory competitor artifacts (coordinated disclosure); no-overclaim; secrets inside scripts; vault safe_vault_push only; GitHub posts as DanceNitra after owner OK.
+STATE: mnemo agora-mnemo 1.13.0 live (PyPI+GitHub). CORE-ahead pillar = ERASURE, honest+gate-survived: content-free deletion + crypto-shred (shred(), NIST) + auditor erasure_certificate + ORG-WIDE erasure receipt (DeletionManifest cascade, names non-compliant stores) — all probe-verified, headline in README. brain :8000 UP agents=8; dungeon :5174 UP; mnemo-frontier locked; vault synced.
+NEXT: (per owner) scope PRO around the org-wide receipt; and re-assess the poison/echo adversarial axis HONESTLY (prior gates: adversarial-conflict KILLED, MINJA warrant-gate is the real win). Ask me or continue.
+```
+
+## What happened 2026-07-19 (this session, all committed)
+- **mnemo 1.11.0 → 1.13.0 shipped** (PyPI + GitHub DanceNitra/mnemo): CrewAI adapter · Claude-Code semantic recall + `persist_vectors` · opt-out star nudge · opt-out update-check · `recall(rerank=)` hook · **`mnemo` shell CLI** · **`erasure_certificate()` + `verify_erasure_certificate()`** (1.13.0). LangChain docs added; README hero rebranded to **agora-mnemo** (keep PyPI name + `import mnemo`). MCP registry refreshed to 1.12.1 (server.json at 1.12.2, next bump awaits device-auth).
+- **Dungeon fixed + retargeted:** produces ~18 measured notes/day (roster 5→8 fix held); was 93% OFF-mission → **locked the mnemo frontier** (`board/decide`) + concentrated scout `_THEMES` on agent-memory; inbox triaged 44→9; **vault pushed** (safe_vault_push, 9-day lag, 0 deletions). Memory: dungeon-off-mission-frontier-locked-to-mnemo.
+- **Competitor audit (all 10, not just mem0):** 11-system **integrity capability matrix** (source-verified) → competitor-audit-2026-07-18. Ran the **full gate** (storm 5-lens + skeptic + stress-claim 5-lens) on the "mnemo owns integrity" thesis.
+- **ERASURE FLAGSHIP (the win of the session), gate-hardened honest:** the accusatory "delete is a lie / competitors leak / mnemo removes it" framing was KILLED by the gate (not novel — Ghost Vectors 2606.18497; self-owning — mnemo plaintext JSON also leaves bytes at block level; mislabels by-design history as a bug; moot under FDE; CVE-shaped). RE-SCOPED honestly + shipped: content-free deletion + crypto-shred + certificate + **org-wide erasure receipt** (DeletionManifest cascade across every registered store, NAMES non-compliant ones). Probes: erasure_raw_store 12/12 · edge-cases 9/9 · certificate 9/9 · org_wide 10/10. README claims corrected (no "removes from every surface").
+- **Gap #3 multi-hop:** exhausted (entity-bridge/PRF/multi-query/k-tune/MMR/cross-encoder all fail; `recall_iterative` is the model-in-loop lever). **Selective-forgetting:** measured WEAK on LOCOMO (not a flagship). Memory: locomo-zero-llm-multihop-bridge-killed, competitor-audit-2026-07-18.
+- **MAB-CR:** settled honestly (mnemo ~5× mem0 = verbatim>lossy; supersession ties naive under the official prompt). Do NOT re-run mem0-on-CR.
+- **EDRN/Marat:** read the FULL Issue #1 (83 comments); the current "Menu-2" paper is NOT published — awaits Guanghao's revisions + Marat's TAT appendix (delivered) + Qingkong; WE are final sign-off + submitter (SciPost Core + fresh Zenodo). Owner emailed Marat our 2 appendix findings. Memory: marat-tat-edrn-collaboration-live.
+- **Business model clarified:** open-core (memory mnemo-free-core-vs-paid-pro-boundary).
+
+---
+
 # Agora — Session Handoff (2026-07-18 END OF DAY · SHIPPED mnemo 1.11.0 + fixed the month-old 5→8 agents bug)
 
 ## PASTE THIS AFTER SESSION RESTART (2026-07-18)
