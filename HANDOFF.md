@@ -25,7 +25,23 @@ STATE: agora-mnemo 1.15.0 LIVE on PyPI (token-pack: compact recall + get/neighbo
 
 
 
-## What happened 2026-07-19 LATE (this session, all committed/verified)
+## What happened 2026-07-19 (FULL day — EARLY EDRN/Marat work included; do NOT omit this)
+- **EDRN / Marat (early session) — WE REVIEWED MARAT'S TAT APPENDIX + owner emailed Marat.** Read the full Issue #1
+  (83 comments), corrected the memory (the current "Menu-2" paper is NOT yet published), then downloaded Marat's
+  TAT-Defense appendix (Drive IDs from comment #82 → scratchpad `tat_folder/`: TAT_APPENDIX.md, tat_diff.py, EDRN/
+  Guanghao/CERN CSVs, plots) and did the final-entity review vs our DMRG/CFT data. **Verdict: appendix sound + honest.**
+  Findings sent to Marat (owner's email): (1) TAT's "honest silence" holds — no anchors on χ0_vs_L (correct), clean
+  U=2 positive control; spin gap anchors at L=20,80 + a ConvergenceWarning; (2) the L=120/160 anchors sit where the
+  χ=100 sequence departs the CFT trend (L≳160) → TAT catches the **convergence onset / χ_max artifact (Marat's own 2nd
+  interpretation), NOT a physical crossover**; offered the U=2 tables as a resolved-gap positive control. Advanced the
+  physics too: log-corrected Mott-gap extrapolation (naive 1/L gives Δc_∞≈0.156 vs exact Lieb-Wu 0.1728, ~10% low),
+  "same Mott physics two windows" (α_charge bend needs L≫380 at U=1), iDMRG U=1 thermodynamic-limit run; Prediction-2
+  original formulation REFUTED (finite-size effect). Spin-velocity anchor π·v_s(U=0.5)=6.02776 exact. FULL detail +
+  who-owes-what: memory `marat-tat-edrn-collaboration-live` (updated 2026-07-19). STILL PENDING: our final sign-off +
+  SciPost-Core submission after Guanghao's revisions + Qingkong's structural OK.
+- **LESSON — our own mnemo dogfood did NOT help me recall this** (owner rightly furious): the `.mnemo` auto-capture
+  logs COMMANDS/file-states, not CONCLUSIONS/decisions, so recall returns "ran: curl…" not "the 2 findings we sent
+  Marat"; and I skipped writing the EDRN conclusions to curated memory. Log ≠ memory. Memory: `mnemo-dogfood-captures-mechanics-not-decisions`.
 - **mnemo 1.15.0 SHIPPED live (PyPI + GitHub `7b3bc9c` + tag v1.15.0):** (a) **token-pack** — compact MCP recall projection + `get(id)`/`neighbors(id,k)` progressive disclosure + `token_report` (honest same-k payload estimate, NOT a whole-store strawman) + snippet truncation OPT-IN (protects echo-guard) + k hard-cap; (b) **nomic `embed_query`** asymmetric correctness fix (search_document:/search_query:; MCP auto-applies, `MNEMO_NOMIC_PREFIX=0` to opt out); (c) **persist_vectors `embed_id` migration guard** (re-embeds on recipe change → no silent recall corruption on prefix upgrade). Suite 148/148; probes token_pack 7/7 + embed_query + migration_guard. **Full gate caught+fixed: strawman token_report ratio, default-truncation integrity regression, confounded mem0 comparison (dropped), the migration bug.**
 - **⚠️ CONFOUND CAUGHT (the #1 handoff item):** mnemo `recall()` reinforces value each call → all per-conversation aggregate recall numbers this session are CONTAMINATED, INCLUDING the 1.15.0 CHANGELOG self-comparison `recall_any@1 0.193→0.294`. Direction (nomic prefixes help = documented correctness fix) HOLDS; absolute deltas NOT clean. **Next session: re-measure recall with reinforcement controlled** + add a 1.15.1 caveat. Memory: `mnemo-native-ranking-underperforms-cosine-cold-recall`.
 - **Cognee deep no-skip scan** (7 agents) + plan `agora_output/strategy/cognee_deep_scan_and_implementation_plan.md`: "token reduction" = MCP payload filters (not benchmarked); 550-dep framework validates our zero-dep bet; NO supersession/revert/erasure (moat holds). A) token-pack shipped; C) erasure refcount **does NOT port** (our derivation-taint delete-cascade is more compliance-correct — don't weaken it).
