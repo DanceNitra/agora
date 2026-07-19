@@ -42,6 +42,7 @@ from __future__ import annotations
 import hashlib
 import hmac
 import json
+import sys
 import math
 import os
 import re
@@ -324,7 +325,91 @@ def sign_erasure(principal_sk_hex: str, subject: str, request_id) -> str:
     sk = _Ed25519SK.from_private_bytes(bytes.fromhex(principal_sk_hex))
     return sk.sign(erasure_challenge(subject, request_id).encode()).hex()
 
-__version__ = "1.11.0"
+
+def verify_erasure_certificate(cert: dict, store_path: str | None = None,
+                               store_items: list | None = None,
+                               expected_pubkey: str | None = None) -> dict:
+    """Independently verify a mnemo erasure certificate (from Mnemo.erasure_certificate()). The AUDITOR's check:
+    needs NO private key and does NOT trust the operator. Confirms, in order:
+      1. tombstone hash-chain re-derives from genesis (append-only, untampered);
+      2. every tombstone Ed25519 signature verifies against the certificate's pubkey (pinned to
+         expected_pubkey if you pass one);
+      3. the anchor commits to the tombstone-chain tip (a rewrite that re-signs internally still fails this if
+         you pinned the anchor against an externally-witnessed one);
+      4. GIVEN the store (store_path to the JSON/encrypted file, or store_items as a decrypted list), every
+         erased memory id is genuinely ABSENT from it — the 'read the raw store' proof soft-delete systems fail.
+    Returns {valid, checks, problems}. Pure-stdlib + Ed25519; import it standalone: `from mnemo import
+    verify_erasure_certificate`. HONEST: signatures are load-bearing only against a party who does not hold
+    receipt_key; for operator-adversarial audit, pin the anchor against one you witnessed out of band."""
+    problems: list = []
+    checks: dict = {}
+    toms = cert.get("tombstones") or []
+    pub = expected_pubkey or cert.get("pubkey")
+
+    tprev = _GENESIS
+    chain_ok = True
+    sigs_ok = True
+    for j, t in enumerate(toms):
+        core = {k: t.get(k) for k in ("seq", "memory_id", "ts", "request_id", "prev")}
+        if t.get("auth"):                                       # optional committed AUTHORITY/BASIS block
+            core["auth"] = t["auth"]
+        if t.get("prev") != tprev:
+            problems.append(f"tombstone {j}: broken chain link (a prior tombstone was altered/removed)")
+            chain_ok = False
+        if _sha256_hex(_canon(core)) != t.get("hash"):
+            problems.append(f"tombstone {j}: hash mismatch (tampered)")
+            chain_ok = False
+        if "sig" in t:
+            if not _HAVE_ED:
+                problems.append("cannot verify signatures (cryptography not installed)")
+                sigs_ok = False
+            else:
+                try:
+                    _Ed25519PK.from_public_bytes(bytes.fromhex(t.get("pubkey") or pub or "")).verify(
+                        bytes.fromhex(t["sig"]), bytes.fromhex(t["hash"]))
+                    if pub and t.get("pubkey") and t.get("pubkey") != pub:
+                        problems.append(f"tombstone {j}: signed by an unexpected key")
+                        sigs_ok = False
+                except Exception:
+                    problems.append(f"tombstone {j}: invalid signature")
+                    sigs_ok = False
+        elif expected_pubkey:
+            problems.append(f"tombstone {j}: unsigned, but a signature was required")
+            sigs_ok = False
+        tprev = t.get("hash")
+    checks["chain_intact"] = chain_ok
+    checks["signatures_valid"] = sigs_ok
+
+    anc = cert.get("anchor") or {}
+    tip = toms[-1]["hash"] if toms else _GENESIS
+    checks["anchor_matches_tip"] = (anc.get("tombstones_tip") == tip)
+    if not checks["anchor_matches_tip"]:
+        problems.append("anchor tombstones_tip does not match the tombstone chain tip")
+
+    erased = set(cert.get("erased_memory_ids") or [])
+    checks["store_absent"] = None
+    if store_items is None and store_path:
+        try:
+            raw = Path(store_path).read_bytes()
+            if raw[:5] == _MNEMO_ENC_MAGIC:
+                problems.append("store is encrypted — supply decrypted store_items to check id-absence, "
+                                "or rely on shred() (crypto-erasure) for the encrypted case")
+            else:
+                store_items = json.loads(raw.decode("utf-8"))
+        except Exception as e:
+            problems.append(f"cannot read store at {store_path}: {repr(e)[:80]}")
+    if store_items is not None:
+        present = {r.get("id") for r in store_items}
+        leaked = sorted(erased & present)
+        checks["store_absent"] = (len(leaked) == 0)
+        if leaked:
+            problems.append(f"{len(leaked)} erased id(s) STILL PRESENT in the store: {leaked[:5]}")
+
+    valid = chain_ok and sigs_ok and checks["anchor_matches_tip"] and (checks["store_absent"] is not False)
+    return {"valid": valid, "checks": checks, "problems": problems, "count": cert.get("count")}
+
+
+__version__ = "1.15.0"
 
 # Internal sentinel: marks a reaffirm write already authorized by submit_revert() (which verified the
 # signed INTENT). Object identity — no text/content path can ever produce it.
@@ -368,9 +453,13 @@ class Mnemo:
                  revert_pubkey: str | None = None, max_text: int | None = None,
                  tenant: str | None = None, pii_detect: bool = False,
                  encrypt_key: bytes | None = None, encrypt_passphrase: str | None = None,
-                 support_authorities: list | None = None):
+                 support_authorities: list | None = None, persist_vectors: bool = False,
+                 embed_query=None, embed_id: str | None = None):
         """path: optional JSON file to persist to. embed: optional fn(str)->list[float] for semantic
-        recall; if omitted, recall uses lexical token overlap (zero dependencies).
+        recall; if omitted, recall uses lexical token overlap (zero dependencies). embed_query: optional
+        SEPARATE fn for embedding the recall QUERY (defaults to `embed`) — set it for an asymmetric
+        embedder like nomic-embed-text, which is trained to prefix stored text with 'search_document: ' and
+        queries with 'search_query: '; measured on LoCoMo (n=1536) to lift recall_any@1 from 0.19 to 0.29.
 
         receipts/receipt_key (OPT-IN, default OFF -> identical legacy behavior): when enabled, every
         remember() appends a tamper-evident, hash-chained WRITE RECEIPT committing to the memory's
@@ -382,6 +471,14 @@ class Mnemo:
         so a third party can verify it with the public key only. (Standalone version: agora-agent-receipts.)"""
         self.path = Path(path) if path else None
         self.embed = embed
+        self.embed_query = embed_query        # asymmetric query embedder (e.g. nomic search_query:); None -> use self.embed
+        self.embed_id = embed_id              # opaque fingerprint of the embed recipe (model+prefix); guards persisted vecs
+        # OPT-IN vector persistence (default False -> legacy: vecs are a RAM-only cache, STRIPPED on save
+        # to keep the file small and dodge the frozen-world GIL stall on big stores). Set True for a SMALL
+        # store (e.g. the Claude Code coding memory, a few hundred items) whose process is short-lived and
+        # reloaded often, so semantic recall survives a reload WITHOUT re-embedding every item each start.
+        # Do NOT enable on large brain-scale stores — that is exactly the case the strip exists to protect.
+        self._persist_vectors = bool(persist_vectors)
         # HARD TENANT ISOLATION (OPT-IN, default None -> unbound -> byte-identical legacy). Binding a store to
         # a tenant (Mnemo(tenant="acme")) makes isolation a STORE PROPERTY, not a per-call argument a caller can
         # forget: every remember() is stamped with this tenant, and every read/supersession/erasure the store
@@ -667,6 +764,31 @@ class Mnemo:
                     self.items = json.loads(raw.decode("utf-8"))     # legacy plaintext JSON
                 except Exception:
                     self.items = []
+        # EMBED-RECIPE GUARD (persist_vectors only): persisted vectors are only comparable to a query embedded the
+        # SAME way. If the store was written with a different embed recipe than the one now in use — most importantly
+        # an ASYMMETRIC upgrade (e.g. adding nomic's search_document:/search_query: prefixes) — a query in the new
+        # space would silently mis-match the old stored vectors and DEGRADE recall. When embed_id changes, we drop
+        # the stale vectors and re-embed with the current document embedder (once, on load) so the spaces realign.
+        # RAM-only stores (persist_vectors=False) strip vectors on save, so they never hit this. Sidecar: <path>.embedid.
+        self._embedid_path = (self.path.parent / (self.path.name + ".embedid")) if self.path else None
+        if self._persist_vectors and self._embedid_path is not None:
+            _prev = None
+            if self._embedid_path.exists():
+                try:
+                    _prev = self._embedid_path.read_text(encoding="utf-8").strip()
+                except Exception:
+                    _prev = None
+            _cur = self.embed_id or ""
+            if _prev is not None and _prev != _cur and self.embed is not None and any(r.get("vec") for r in self.items):
+                sys.stderr.write(f"[mnemo] embed recipe changed ({_prev!r} -> {_cur!r}); re-embedding "
+                                 f"{sum(1 for r in self.items if r.get('vec'))} persisted vectors to realign the space\n")
+                for r in self.items:
+                    if r.get("text") is not None:
+                        try:
+                            r["vec"] = list(self.embed(r["text"]))
+                        except Exception:
+                            r["vec"] = None
+                self._mat = None                                    # invalidate the cached matrix (realigned vecs persist on next save)
         # OPT-IN write receipts (default OFF -> zero behavior change; no sidecar created)
         self.receipts_enabled = bool(receipts or receipt_key)
         self._receipt_sk = receipt_key
@@ -1719,6 +1841,41 @@ class Mnemo:
                               "request_id": t.get("request_id"), "signed": "sig" in t}
                              for t in self._tombstones]}
 
+    def erasure_certificate(self, request_id: str | None = None, expected_pubkey: str | None = None) -> dict:
+        """Portable, INDEPENDENTLY-VERIFIABLE erasure certificate — the auditor-grade receipt for a
+        right-to-erasure demand. Packages the signed deletion tombstones (the full hash-chain, so it can be
+        re-derived from genesis), the request-scoped erased ids, the receipt public key, and a CT-style
+        anchor() into ONE self-contained JSON document. A third party checks it with the module-level
+        `verify_erasure_certificate(cert, store_path=...)` WITHOUT the operator's private key and WITHOUT
+        trusting the operator: it re-derives the tombstone chain, verifies each Ed25519 signature, confirms the
+        anchor commits to the chain tip, and — given the store — confirms every erased id is genuinely ABSENT
+        from it (the 'read the raw store' proof that soft-delete / history-keeping systems fail). Content-free:
+        commits to surrogate ids + timestamps + opaque request, never PII. HONEST SCOPE = governance_report()'s
+        (within THIS store; the ACT not the content; the signature is load-bearing only against a non-holder of
+        receipt_key — witness the anchor externally). Pair with shred() for encrypted-at-rest crypto-erasure."""
+        toms = self._tombstones                                  # full chain (content-free) so it verifies from genesis
+        scoped = [t for t in toms if request_id is None or t.get("request_id") == request_id]
+        erased_ids = sorted({t.get("memory_id") for t in scoped if t.get("memory_id")})
+        ok, problems = self.verify_writes(expected_pubkey)
+        return {
+            "mnemo_erasure_certificate": "1.0",
+            "issued_ts": time.time(),
+            "issued_iso": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()),
+            "request_ids": sorted({t.get("request_id") for t in scoped if t.get("request_id") is not None}),
+            "erased_memory_ids": erased_ids,
+            "count": len(erased_ids),
+            "tombstones": toms,                                  # full signed chain for independent re-verification
+            "pubkey": self.receipt_pubkey,
+            "anchor": self.anchor(),
+            "self_check": {"verified": ok, "problems": problems},
+            "scope": ("Erasure is within THIS mnemo store only (not the app's vector store, prompt logs, or "
+                      "backups); covers the subject PLUS its derived_from lineage. Tamper-evident integrity "
+                      "primitive, NOT a compliance certification. The tombstone proves the ACT of deletion, "
+                      "never the content; its signature is load-bearing only against a non-holder of "
+                      "receipt_key — witness the anchor externally (see verify_consistency)."),
+            "verify_with": "mnemo.verify_erasure_certificate(cert, store_path=<file>)  # or store_items=<list>",
+        }
+
     def governance_report(self, expected_pubkey: str | None = None) -> dict:
         """ONE auditor-facing surface for erasure-with-proof — the compliance view of forget_subject, built for
         the right-to-erasure demand (GDPR Art.17) that an EU-AI-Act operator has to satisfy while keeping an
@@ -2478,13 +2635,17 @@ class Mnemo:
         return {"superseded_total": sum(counts.values()), "by_policy": counts}
 
     # ── retrieval (value-ranked) ──────────────────────────────────────────────
-    def _qvec(self, query: str):
+    def _qvec(self, query: str, embedder=None):
         """Embed a query ONCE per scan, or None (no embedder / failure). Callers pass the result
-        into _similarity so a recall over N memories costs 1 embedding, not N."""
-        if not self.embed:
+        into _similarity so a recall over N memories costs 1 embedding, not N. `embedder` overrides
+        the default `self.embed` — recall() passes `self.embed_query` so an asymmetric embedder (e.g.
+        nomic-embed-text, which wants `search_query:` for queries vs `search_document:` for stored text)
+        embeds the query correctly; internal callers embedding STORED text keep the document embedder."""
+        emb = embedder or self.embed
+        if not emb:
             return None
         try:
-            return self.embed(query)
+            return emb(query)
         except Exception:
             return None
 
@@ -2571,7 +2732,7 @@ class Mnemo:
                prefer_max_boost: float | None = None, near: dict | None = None,
                tie_recent: float | None = None,
                with_status: bool = False, with_warrant: bool = False,
-               redact_pii: bool = False) -> list[dict]:
+               redact_pii: bool = False, rerank=None, rerank_pool: int | None = None) -> list[dict]:
         """Top-k memories by RELEVANCE × VALUE — high-value memories outrank merely-similar ones.
         Memories the dream pass flagged as hubs (universal matchers) are skipped unless include_hubs.
 
@@ -2753,7 +2914,7 @@ class Mnemo:
             sel = mode
         else:                                                 # 'auto': fuse once the store is worth it
             sel = "hybrid" if len(pool) >= self.semantic_threshold else "lexical"
-        qvec = self._qvec(query) if sel in ("semantic", "hybrid") else None
+        qvec = self._qvec(query, self.embed_query) if sel in ("semantic", "hybrid") else None
         if qvec is None and sel != "lexical":
             sel = "lexical"                                   # embedder absent or failed -> graceful fallback
         self._last_mode = sel
@@ -2879,6 +3040,23 @@ class Mnemo:
             _rest = [t for t in scored if t[1] < _top_sim - _eps]
             _tied.sort(key=lambda t: -(t[2].get("valid_from") or t[2]["ts"]))
             scored = _tied + _rest
+        # OPT-IN reranker hook (retrieve-then-rerank). `rerank(query, records) -> list[float]` (one relevance
+        # score per record, higher=better) lets a caller plug a cross-encoder / model reranker over the top
+        # candidates — the one lever MEASURED to lift multi-hop recall beyond mnemo's zero-LLM base (LoCoMo
+        # multi-hop full-recall ~0.30 -> ~0.48 with a reader-reranker; [[locomo-iterative-lever-full-benchmark]]).
+        # Model-agnostic (mnemo never imports a model) and MOAT-SAFE: no LLM runs unless the caller supplies one,
+        # and the WRITE path is untouched. rerank_pool bounds how many top candidates are reranked (default
+        # max(4*k, 50)). Fail-open: any error keeps the pre-rerank order.
+        if rerank is not None and scored:
+            _m = int(rerank_pool) if rerank_pool else max(4 * k, 50)
+            _head = scored[:_m]
+            try:
+                _rs = rerank(query, [t[2] for t in _head])
+                if _rs is not None and len(_rs) == len(_head):
+                    _order = sorted(range(len(_head)), key=lambda i: -float(_rs[i]))
+                    scored = [_head[i] for i in _order] + scored[_m:]
+            except Exception:
+                pass
         out = []
         _top_sim = scored[0][1] if scored else 1.0   # normalize reinforcement by this query's best match
         for score, sim, r in scored[:k]:
@@ -4289,7 +4467,8 @@ class Mnemo:
             # GIL for many seconds - which froze the whole event loop even from a worker thread (the
             # frozen-world bug, 2026-06-20). Vectors stay in self.items (RAM) so recall is unaffected this
             # session; on reload they are re-embedded lazily. Keeps the store file small + the save fast.
-            slim = [{k: v for k, v in r.items() if k != "vec"} for r in self.items]
+            slim = self.items if self._persist_vectors else \
+                [{k: v for k, v in r.items() if k != "vec"} for r in self.items]
             # Atomic write: a partial/interleaved write can't corrupt the store (crash- and
             # concurrent-writer-safe — last writer wins, never a torn JSON file).
             data = json.dumps(slim, ensure_ascii=False, indent=1)
@@ -4300,6 +4479,13 @@ class Mnemo:
             else:
                 tmp.write_text(data, encoding="utf-8")
             os.replace(tmp, self.path)
+            # record the embed recipe the persisted vectors were made with (only when vectors are actually
+            # persisted) so a later open with a different recipe re-embeds instead of silently mismatching.
+            if self._persist_vectors and getattr(self, "_embedid_path", None) is not None:
+                try:
+                    self._embedid_path.write_text(self.embed_id or "", encoding="utf-8")
+                except Exception:
+                    pass
             self._last_save = now
             self._dirty = False
         except Exception:
