@@ -4868,9 +4868,13 @@ class Mnemo:
             os.replace(tmp, self.path)
             # record the embed recipe the persisted vectors were made with (only when vectors are actually
             # persisted) so a later open with a different recipe re-embeds instead of silently mismatching.
-            if self._persist_vectors and getattr(self, "_embedid_path", None) is not None:
+            # embed_id None means THIS opener has no recipe (e.g. a lexical hook run on a semantic store) —
+            # the persisted vectors keep whatever recipe made them, so the sidecar must stay untouched:
+            # blanking it here would make the next semantic open see ''->recipe and realign for nothing.
+            if self._persist_vectors and getattr(self, "_embedid_path", None) is not None \
+                    and self.embed_id is not None:
                 try:
-                    self._embedid_path.write_text(self.embed_id or "", encoding="utf-8")
+                    self._embedid_path.write_text(self.embed_id, encoding="utf-8")
                 except Exception:
                     pass
             self._last_save = now
