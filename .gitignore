@@ -197,3 +197,4 @@ id_ed25519*
 secrets.json
 credentials.json
 service-account*.json
+PRIVATE_NOTES.md
