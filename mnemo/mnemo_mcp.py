@@ -114,7 +114,8 @@ def _compact(rec: dict, snippet_chars: int) -> dict:
 @mcp.tool()
 def remember(text: str, tags: list[str] | None = None, value: float = 1.0,
              mtype: str | None = None, key: str | None = None,
-             object: str | None = None, reaffirm: bool = False) -> dict:
+             object: str | None = None, reaffirm: bool = False,
+             user_id: str | None = None, agent_id: str | None = None, session_id: str | None = None) -> dict:
     """Store a memory (append-only; raw text is never edited afterward). `tags` group memories into
     cohorts; `value` (>=1) is its importance — higher-value memories outrank merely-similar ones at
     recall, and recall itself nudges value up. `mtype` ∈ {episodic, semantic, procedural} sets the
@@ -131,10 +132,28 @@ def remember(text: str, tags: list[str] | None = None, value: float = 1.0,
     to intentionally revert to a previously-retired value (an explicit change-of-mind, not an echo).
     Returns the new id."""
     mid = _MEM.remember(text, tags=tags or [], value=value, mtype=mtype, key=key,
-                        object=object, reaffirm=reaffirm)
+                        object=object, reaffirm=reaffirm,
+                        user_id=user_id, agent_id=agent_id, session_id=session_id)
     rec = next((r for r in _MEM.items if r["id"] == mid), {})
     return {"id": mid, "stored": text[:120], "tags": tags or [], "value": value,
             "mtype": rec.get("mtype")}
+
+
+@mcp.tool()
+def remember_decision(decision: str, because: str = "", context: str = "", topic: str = "") -> dict:
+    """Store a DECISION — the thing that actually matters and that a raw event/command log misses. Use this
+    whenever you (or the user) CONCLUDE or CHOOSE something: "we decided X", "we're going with Y", "dropped Z",
+    "the plan is W". Pass `because` (the rationale) and `context` (the situation) — they're kept for retrieval so a
+    later recall answers "what did we decide, and why", not just "what commands ran".
+
+    `topic` (recommended) gives the decision deterministic keyed supersession (`decision::<topic>`): a NEW decision
+    on the same topic RETIRES the old one, recall returns the CURRENT decision, and `revert('decision::<topic>')`
+    restores the prior one — decisions stay current, correctable, revertible, and auditable, with NO LLM and no
+    similarity guesswork (mnemo's integrity moat applied to decisions; an LLM-extracted fact store can't do this).
+    Returns the new memory id."""
+    mid = _MEM.remember_decision(decision, because=because or None, context=context or None,
+                                 topic=topic or None)
+    return {"id": mid, "decision": decision[:120], "topic": topic or None, "supersedes_by_key": bool(topic)}
 
 
 @mcp.tool()
@@ -205,7 +224,10 @@ def resolve_reopened(id: str, decision: str, capability: str = "") -> dict:
 
 
 @mcp.tool()
-def recall(query: str, k: int = 6, full: bool = False, snippet_chars: int = 0) -> list[dict]:
+def recall(query: str, k: int = 6, full: bool = False, snippet_chars: int = 0,
+           mmr: float | None = None, trusted_only: bool = False,
+           user_id: str | None = None, agent_id: str | None = None, session_id: str | None = None,
+           rerank_by: str | None = None) -> list[dict]:
     """Retrieve the top-k memories by RELEVANCE × accrued VALUE (not recency). Use this to load relevant prior
     knowledge before reasoning.
 
@@ -214,9 +236,15 @@ def recall(query: str, k: int = 6, full: bool = False, snippet_chars: int = 0) -
     KEPT (no truncation by default). Pass `snippet_chars>0` to opt into snippet truncation (flags `truncated`; then
     use get(id) for full text) — note that truncation can cut off a corrected value past the boundary, so it is
     off by default. Set `full=True` to return complete records (all fields). `k` is hard-capped for safety.
+
+    `mmr` (0..1, off by default) reranks for DIVERSITY so you don't get k near-duplicate memories — 1.0 = pure
+    relevance, lower = more diverse (deterministic Maximal Marginal Relevance, zero-LLM). `trusted_only=True` (needs
+    a configured trust root) returns only memories anchored to a trusted signing key — a deterministic defense
+    against injected/poisoned memories from untrusted writers.
     (Standard progressive-disclosure / small-to-big retrieval practice, not a mnemo-specific technique.)"""
     k = max(1, min(int(k), _MAX_K))
-    hits = _MEM.recall(query, k=k) or []
+    hits = _MEM.recall(query, k=k, mmr=mmr, trusted_only=trusted_only,
+                       user_id=user_id, agent_id=agent_id, session_id=session_id, rerank_by=rerank_by) or []
     if full:
         return hits
     n = snippet_chars if snippet_chars > 0 else _SNIPPET
@@ -348,6 +376,150 @@ def forget(ids: list[str] | None = None, where_contains: str | None = None) -> d
         needle = where_contains.lower()
         where = lambda r: needle in (r.get("text") or "").lower()
     return _MEM.forget(ids=ids, where=where)
+
+
+# ── GOVERNANCE / INTEGRITY tools (the surface a serious buyer checks — previously absent from the MCP) ──────
+@mcp.tool()
+def forget_subject(subject: str, basis: str = "") -> dict:
+    """Right-to-erasure by SUBJECT (GDPR Art.17 / DSR): delete every memory about `subject` AND scrub its id from
+    survivors' links/supersession pointers, so it can't resurface via recall or consolidation. `basis` records the
+    legal/operational reason. Returns a receipt (forgotten count, ids, scrubbed_links) you can keep as evidence."""
+    return _MEM.forget_subject(subject, basis=basis or None)
+
+
+@mcp.tool()
+def governance_report() -> dict:
+    """One-call GOVERNANCE snapshot: erasure/retention posture, tamper-evidence status of the write chain, and
+    integrity counters — the summary a DPO/CISO or auditor asks for. Deterministic, no LLM."""
+    return _MEM.governance_report()
+
+
+@mcp.tool()
+def verify_writes() -> dict:
+    """TAMPER-EVIDENCE check: verify the hash-chained write ledger is intact (no silent edits/insertions/reordering).
+    Returns {ok, problems} — ok=false with the offending ids if the chain doesn't verify."""
+    ok, problems = _MEM.verify_writes()
+    return {"ok": bool(ok), "problems": problems}
+
+
+@mcp.tool()
+def witness() -> dict:
+    """HYDRATION WITNESS: a compact, deterministic receipt of the store state your answer was derived from —
+    "this answer reflects store state as of revision X". Call it right after recall() and attach the result to
+    the answer; any later write/supersession/revert/erasure changes the digest, and verify_witness() makes that
+    visible. When write receipts are enabled it is anchored to the tamper-evident write chain. No LLM."""
+    return _MEM.witness()
+
+
+@mcp.tool()
+def verify_witness(witness: dict) -> dict:
+    """Check a hydration witness against the store as it is NOW. digest_match=true means the store is still in
+    the exact state the witness pinned; false means the answer that carried it predates a change (stale serve
+    made visible instead of silent). Deterministic re-computation, no LLM."""
+    return _MEM.verify_witness(witness)
+
+
+@mcp.tool()
+def index_coherence() -> dict:
+    """Does the derived semantic index agree with the store? Reports active text records missing a vector while
+    an embedder is configured (index behind store), persisted-vector recipe vs the current embedder, and the
+    persistence regime. A governed store can still serve stale answers through a lagging index — this is the
+    deterministic check for exactly that. Read-only."""
+    return _MEM.index_coherence()
+
+
+@mcp.tool()
+def pii_report() -> dict:
+    """What PII the store currently holds, by type (emails, phones, cards, …) — a data-minimization / audit view.
+    Read-only; pair with forget_pii to act on it."""
+    return _MEM.pii_report()
+
+
+@mcp.tool()
+def forget_pii(types: list[str] | None = None, subject: str = "") -> dict:
+    """Erase detected PII — of the given `types` (default all), optionally scoped to a `subject`. Deletes the
+    offending content deterministically (not an LLM guess). Returns what was erased."""
+    return _MEM.forget_pii(types=types, subject=subject or None)
+
+
+@mcp.tool()
+def influence_gate_report() -> dict:
+    """POISON / adversarial-integrity status: which memories are gated from influencing recall durability (self-
+    asserted / uncorroborated / slashed) vs earned. The at-a-glance view of the store's poison-resistance state."""
+    return _MEM.influence_gate_report()
+
+
+@mcp.tool()
+def why_recalled(query: str, id: str = "") -> dict:
+    """EXPLAINABILITY: why did (or didn't) a memory surface for `query`? Returns the per-channel breakdown
+    (relevance/value/provenance) for the top hits, or for a specific `id`. Deterministic — no LLM rationalization."""
+    return {"query": query, "explanations": _MEM.why_recalled(query, id=id or None)}
+
+
+@mcp.tool()
+def supersession_report() -> dict:
+    """The correction ledger: which facts have been superseded/reverted, by key — the auditable 'what changed and
+    what's current' view that an append-only-plus-supersession store can produce and a plain vector store cannot."""
+    return _MEM.supersession_report()
+
+
+# ── RESOURCES (read-only URIs — the second MCP primitive; lets a client browse memory as addressable context) ──
+@mcp.resource("mnemo://digest")
+def digest_resource() -> str:
+    """A compact digest of the store: size, cohorts, contradictions count, governance posture — a session-start
+    overview a client can load as context without a tool call."""
+    items = getattr(_MEM, "items", [])
+    active = [r for r in items if r.get("status") != "superseded"]
+    try:
+        contra = len(_MEM.contradictions())
+    except Exception:
+        contra = None
+    return json.dumps({"total": len(items), "active": len(active),
+                       "cohorts": _MEM.value_by_cohort(), "contradictions": contra}, default=str)
+
+
+@mcp.resource("mnemo://contradictions")
+def contradictions_resource() -> str:
+    """The current mutually-incompatible memory pairs (flagged, not auto-resolved) as a browsable resource."""
+    return json.dumps(_MEM.contradictions(), default=str)
+
+
+@mcp.resource("mnemo://governance")
+def governance_resource() -> str:
+    """The governance/erasure/tamper-evidence snapshot as a browsable resource (same as the governance_report tool)."""
+    return json.dumps(_MEM.governance_report(), default=str)
+
+
+@mcp.resource("mnemo://memory/{id}")
+def memory_resource(id: str) -> str:
+    """One memory's full record by id, addressable as a resource URI (mnemo://memory/<id>)."""
+    rec = next((r for r in getattr(_MEM, "items", []) if r.get("id") == id), None)
+    return json.dumps(rec or {}, default=str)
+
+
+# ── PROMPTS (the third MCP primitive — reusable instruction templates the client can invoke) ──────────────────
+@mcp.prompt()
+def recall_before_answer(question: str) -> str:
+    """A prompt template: recall relevant memory BEFORE answering, and prefer the current (superseded-aware) value."""
+    return (f"Before answering, call recall(query={question!r}) and ground your answer in the returned memories. "
+            f"If a memory carries a supersession key, trust the CURRENT value it returns (not any older restatement). "
+            f"If nothing relevant is recalled, say so rather than guessing. Question: {question}")
+
+
+@mcp.prompt()
+def consolidate_session() -> str:
+    """A prompt template: at session end, distill durable decisions/facts into memory and run maintenance."""
+    return ("This session is ending. 1) Store the durable DECISIONS made (remember_decision with a topic + because). "
+            "2) Store durable FACTS worth recalling later (remember). 3) Skip chit-chat and transient state. "
+            "4) Call sleep() to run idle maintenance (dedup/consolidation). Keep only what has future retrieval value.")
+
+
+@mcp.prompt()
+def review_contradictions() -> str:
+    """A prompt template: surface and resolve contradictions instead of silently trusting the latest write."""
+    return ("Call contradictions() to list mutually-incompatible memories. For each, decide which is current and "
+            "either supersede the stale one (remember with its key) or, if it was a bad update, revert(key). "
+            "Never silently overwrite — keep the correction auditable.")
 
 
 def main():
