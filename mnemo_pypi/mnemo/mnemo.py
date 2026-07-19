@@ -409,7 +409,7 @@ def verify_erasure_certificate(cert: dict, store_path: str | None = None,
     return {"valid": valid, "checks": checks, "problems": problems, "count": cert.get("count")}
 
 
-__version__ = "1.15.0"
+__version__ = "1.18.0"
 
 # Internal sentinel: marks a reaffirm write already authorized by submit_revert() (which verified the
 # signed INTENT). Object identity — no text/content path can ever produce it.
@@ -771,6 +771,7 @@ class Mnemo:
         # the stale vectors and re-embed with the current document embedder (once, on load) so the spaces realign.
         # RAM-only stores (persist_vectors=False) strip vectors on save, so they never hit this. Sidecar: <path>.embedid.
         self._embedid_path = (self.path.parent / (self.path.name + ".embedid")) if self.path else None
+        self._realigned = False
         if self._persist_vectors and self._embedid_path is not None:
             _prev = None
             if self._embedid_path.exists():
@@ -779,16 +780,35 @@ class Mnemo:
                 except Exception:
                     _prev = None
             _cur = self.embed_id or ""
-            if _prev is not None and _prev != _cur and self.embed is not None and any(r.get("vec") for r in self.items):
-                sys.stderr.write(f"[mnemo] embed recipe changed ({_prev!r} -> {_cur!r}); re-embedding "
-                                 f"{sum(1 for r in self.items if r.get('vec'))} persisted vectors to realign the space\n")
-                for r in self.items:
-                    if r.get("text") is not None:
+            # ONLY records that carry a vec are in the old space, so they are the only ones to realign.
+            # Re-embedding vec-less records here would (a) make a load cost one network call per record —
+            # an unbounded stall, and (b) silently ADD vectors the store never had.
+            _stale = [r for r in self.items if r.get("vec") and r.get("text") is not None]
+            if _prev is not None and _prev != _cur and self.embed is not None and _stale:
+                try:
+                    _cap = int(os.environ.get("MNEMO_REALIGN_MAX", "256"))
+                except Exception:
+                    _cap = 256
+                if len(_stale) > _cap:
+                    # BOUNDED: past the cap we DROP the stale vectors instead of re-embedding them. A dropped
+                    # vec degrades that record to lexical recall and is re-embedded on its next write; a
+                    # synchronous re-embed of a large store on the load path would hang the caller for
+                    # minutes-to-hours (and every hook-style short-lived process would pay it again).
+                    sys.stderr.write(f"[mnemo] embed recipe changed ({_prev!r} -> {_cur!r}); {len(_stale)} persisted "
+                                     f"vectors exceed MNEMO_REALIGN_MAX={_cap} -> dropping them (recall degrades to "
+                                     f"lexical for those records; each is re-embedded on its next write)\n")
+                    for r in _stale:
+                        r["vec"] = None
+                else:
+                    sys.stderr.write(f"[mnemo] embed recipe changed ({_prev!r} -> {_cur!r}); re-embedding "
+                                     f"{len(_stale)} persisted vectors to realign the space\n")
+                    for r in _stale:
                         try:
                             r["vec"] = list(self.embed(r["text"]))
                         except Exception:
                             r["vec"] = None
-                self._mat = None                                    # invalidate the cached matrix (realigned vecs persist on next save)
+                self._mat = None                                    # invalidate the cached matrix
+                self._realigned = True                              # -> persisted ONCE at the end of __init__
         # OPT-IN write receipts (default OFF -> zero behavior change; no sidecar created)
         self.receipts_enabled = bool(receipts or receipt_key)
         self._receipt_sk = receipt_key
@@ -819,6 +839,14 @@ class Mnemo:
                 self._tombstones = json.loads(self._tombstones_path.read_text(encoding="utf-8"))
             except Exception:
                 self._tombstones = []
+        # PERSIST A REALIGNMENT EXACTLY ONCE. The realigned vectors and the recipe sidecar must land together:
+        # the sidecar is written only inside _save(), so a caller that never saves (a READ-ONLY path — recall(),
+        # a session-digest, any short-lived hook process) would redo the whole realignment on EVERY open, turning
+        # one migration into a permanent per-open network storm. Saving here ends it after the first open.
+        # It must NOT be done by writing the sidecar alone: that would leave the OLD vectors on disk labelled
+        # with the NEW recipe — precisely the silent mismatch this guard exists to prevent.
+        if self._realigned:
+            self._save(force=True)
 
     # ── capture ──────────────────────────────────────────────────────────────
     def remember(self, text: str, tags=None, value: float = 1.0, meta: dict | None = None,
@@ -826,7 +854,8 @@ class Mnemo:
                  source: dict | None = None, key: str | None = None,
                  derived_from: list | None = None, attestation=None, derived: bool = False,
                  object: str | None = None, reaffirm: bool = False, capability: str | None = None,
-                 pii=None, identity_confidence: float | None = None) -> str:
+                 pii=None, identity_confidence: float | None = None,
+                 user_id: str | None = None, agent_id: str | None = None, session_id: str | None = None) -> str:
         """Append-only raw capture. Stamped with an absolute UTC time; never edited afterward.
         mtype in {episodic, semantic, procedural} sets the decay prior (episodic fades fast,
         semantic slow, procedural barely); inferred from the text if not given. Pass it explicitly
@@ -881,6 +910,16 @@ class Mnemo:
                "status": "active", "links": [], "meta": dict(meta or {})}
         if _trunc_from is not None:
             rec["meta"]["truncated_from"] = _trunc_from
+        # MEMORY HIERARCHY (user > agent > session): stamp the scope this memory belongs to. A memory with only
+        # uid set is user-level (shared across that user's agents/sessions); adding aid/sid narrows it. recall()
+        # then filters by hierarchical VISIBILITY (a session query sees session + agent + user memories, but a
+        # user-level query does NOT pull session-specifics). Only set fields are stamped -> unset = wildcard.
+        if user_id is not None:
+            rec["meta"]["uid"] = str(user_id)
+        if agent_id is not None:
+            rec["meta"]["aid"] = str(agent_id)
+        if session_id is not None:
+            rec["meta"]["sid"] = str(session_id)
         # TENANT STAMP: bind this write to the store's tenant so recall/supersession/erasure can isolate it.
         # Unbound stores (tenant=None) leave no tag -> byte-identical legacy.
         if self.tenant is not None:
@@ -1390,6 +1429,120 @@ class Mnemo:
                 if self._verify_support(pk, sg, challenge):
                     out.add(self._support_class.get(pk, pk))
         return out
+
+    def remember_decision(self, decision: str, because: str | None = None, context: str | None = None,
+                          topic: str | None = None, tags=None, value: float = 2.0,
+                          capability: str | None = None) -> str:
+        """Capture a DECISION — the memory that actually matters and that a raw event-log misses. A coding/agent
+        session logging only commands + file-states records the MECHANICS but not the CONCLUSIONS ("we decided X
+        because Y"), so recall can't answer "what did we decide / send / choose". This stores the decision as a
+        durable (procedural-decay), higher-value memory, with its rationale (`because`) and situation (`context`)
+        kept in meta for retrieval.
+
+        `topic` (recommended) becomes a deterministic supersession key `decision::<topic>` — so a NEW decision on
+        the same topic RETIRES the old one (mnemo's keyed supersession: recall always returns the CURRENT decision,
+        the reversal is a ledgered/attributable event, and `revert('decision::<topic>')` restores the prior one).
+        This is mnemo's integrity moat applied to decisions — something an LLM-extracted fact store cannot do:
+        decisions stay current, correctable, revertible, and auditable, with NO LLM and NO similarity guesswork.
+
+        This is the DETERMINISTIC half of decision capture (the caller/agent states the decision). The OPTIONAL
+        LLM half — distilling decisions out of a raw transcript automatically, the way mem0/Zep extract facts on
+        write — is `distill_and_remember()` (you choose whether to pay an LLM; the store/correction/erasure stays
+        deterministic). Returns the new memory id."""
+        text = "DECISION: " + decision.strip()
+        if because:
+            text += " — because: " + because.strip()
+        md = {"kind": "decision"}
+        if because:
+            md["rationale"] = because.strip()
+        if context:
+            md["context"] = context.strip()
+        key = ("decision::" + topic.strip()) if topic else None
+        return self.remember(text, tags=(list(tags) if tags else []) + ["decision"], value=value,
+                             mtype="procedural", key=key, object=(topic.strip() if topic else None),
+                             meta=md, capability=capability)
+
+    # The extraction contract for distill_and_remember (the OPTIONAL LLM capture half). A caller's distiller feeds
+    # this prompt + the raw text to any LLM and returns the parsed JSON list. mnemo owns the STRUCTURE (extract ->
+    # remember with keyed supersession) + this spec; the LLM only proposes what to keep. Analogous to mem0's
+    # FACT_RETRIEVAL_PROMPT, but the distilled items land in mnemo's deterministic, correctable, revertible store.
+    DISTILL_PROMPT = (
+        "You distill a conversation/transcript into the few memories worth keeping. Extract ONLY durable, "
+        "reusable items; drop chit-chat, transient state, and anything already obvious. Return a JSON object "
+        "{\"items\": [...]} where each item is:\n"
+        "  {\"kind\": \"decision\"|\"fact\", \"text\": <one clear sentence>, \"topic\": <short stable slug or \"\">, "
+        "\"because\": <rationale, only for decisions, else \"\">, "
+        "\"support\": <a SHORT verbatim quote (>=12 chars) copied EXACTLY from the transcript that grounds this item>}\n"
+        "- kind=\"decision\": a choice/conclusion/plan (\"we decided/chose/dropped/will…\"). Give a `topic` slug so "
+        "a later decision on the same topic supersedes it (e.g. \"release::v2\", \"vendor::db\").\n"
+        "- kind=\"fact\": a durable fact/preference/detail worth recalling later.\n"
+        "- `support` MUST be an exact substring of the transcript (do NOT paraphrase it). Items whose `support` is not "
+        "found verbatim in the transcript are DROPPED — never invent a quote to pass this check.\n"
+        "Return {\"items\": []} if nothing is worth keeping. No prose outside the JSON."
+    )
+
+    @staticmethod
+    def _support_ok(support, text: str) -> bool:
+        """Correctness gate: an extracted item is kept ONLY if its `support` quote appears VERBATIM in the source
+        transcript (case-insensitive, whitespace-collapsed, >=12 non-space chars). This is the deterministic guard
+        that stops a hallucinated decision — a plausible sentence the LLM invented but that was never said — from
+        landing in the durable store and inverting the correction moat. No LLM, no similarity: pure substring."""
+        s = " ".join(str(support or "").split()).lower()
+        if len(s.replace(" ", "")) < 12:
+            return False
+        return s in " ".join(str(text or "").split()).lower()
+
+    def distill_and_remember(self, text: str, distiller, source: dict | None = None,
+                             require_support: bool = True) -> dict:
+        """OPTIONAL LLM capture: turn a raw conversation/transcript into the few memories worth keeping — the
+        auto-capture-what-matters that a raw event log misses and that mem0/Zep do with an LLM on the write path.
+        mnemo stays zero-dependency/zero-LLM in its CORE: YOU inject `distiller`, a callable `distiller(prompt, text)
+        -> str|dict|list` that runs any LLM (or a subagent) with `Mnemo.DISTILL_PROMPT` and returns the JSON (a
+        raw string is parsed here; a dict/list is accepted directly). Each extracted item is then stored
+        DETERMINISTICALLY: a `decision` via remember_decision() (durable, with `topic`-keyed supersession + revert),
+        a `fact` via remember() (semantic). So the LLM only proposes WHAT to keep; the store/correction/erasure/
+        supersession stay deterministic and auditable — the trust layer never depends on the LLM.
+
+        Fail-open: a distiller error or a malformed item is skipped, never crashes the call. Returns
+        {captured, decisions, facts, ids}."""
+        import json as _json
+        try:
+            raw = distiller(Mnemo.DISTILL_PROMPT, text)
+        except Exception:
+            return {"captured": 0, "decisions": 0, "facts": 0, "ids": [], "error": "distiller_failed"}
+        items = raw
+        if isinstance(raw, str):
+            try:
+                s = raw.strip()
+                if "```" in s:                                   # tolerate ```json fenced output
+                    s = s.split("```")[1].lstrip("json").strip() if s.count("```") >= 2 else s
+                obj = _json.loads(s)
+                items = obj.get("items", obj) if isinstance(obj, dict) else obj
+            except Exception:
+                return {"captured": 0, "decisions": 0, "facts": 0, "ids": [], "error": "unparseable_distiller_output"}
+        if isinstance(items, dict):
+            items = items.get("items", [])
+        ids, nd, nf, dropped = [], 0, 0, 0
+        for it in (items or []):
+            if not isinstance(it, dict):
+                continue
+            t = str(it.get("text") or "").strip()
+            if not t:
+                continue
+            if require_support and not self._support_ok(it.get("support"), text):
+                dropped += 1                                  # unsupported/hallucinated item -> never stored
+                continue
+            topic = str(it.get("topic") or "").strip() or None
+            try:
+                if str(it.get("kind") or "").lower() == "decision":
+                    ids.append(self.remember_decision(t, because=(it.get("because") or None), topic=topic)); nd += 1
+                else:
+                    ids.append(self.remember(t, mtype="semantic", tags=["distilled"],
+                                             key=("fact::" + topic) if topic else None,
+                                             object=topic, source=source)); nf += 1
+            except Exception:
+                continue
+        return {"captured": len(ids), "decisions": nd, "facts": nf, "dropped": dropped, "ids": ids}
 
     def observe(self, text: str, key: str, object: str | None = None, support=None,
                 meta: dict | None = None) -> dict:
@@ -2424,6 +2577,9 @@ class Mnemo:
     _ROUTE_CORRECT = re.compile(r"\b(correction|actually|update|scratch that|is now|moved to"
                                 r"|was switched|changed to)\b")
     _ROUTE_CHANGE_AWARE = re.compile(r"\b(changed|moved|switched|updated|correction|went through)\b")
+    _ROUTE_DELETE = re.compile(r"\b(forget|delete|remove|erase|scrub|wipe|drop) (that|this|it|the|my|about)"
+                               r"|\bno longer (true|valid|the case|relevant|applies)"
+                               r"|\bdisregard (that|this|the)|\bthat'?s? (wrong|no longer)|\bnever ?mind\b")
 
     def _route_chain(self, key: str) -> list[str]:
         """values that were actually CURRENT at some point for `key`, oldest->newest — skips arrivals the
@@ -2489,6 +2645,24 @@ class Mnemo:
                     object = object if object is not None else ex[1]
             except Exception:
                 pass
+        # DELETE intent ("forget/delete/remove that", "no longer true"). Content alone must NOT be able to destroy
+        # memory (the channel-separation moat), so a routed delete is gated by the SAME capability as revert — an
+        # unauthorized utterance gets authorization_required, never silent deletion. This is the mem0 DELETE event,
+        # done safely: mem0 lets its LLM issue DELETE on the write path; mnemo requires an out-of-band capability.
+        if self._ROUTE_DELETE.search(low):
+            k = key or self._route_key(low)
+            if k is None:
+                rid = self.remember(text)
+                return {"intent": "delete", "action": "noted", "event": "NOOP", "key": None, "id": rid,
+                        "reason": "no ledger key resolved to delete"}
+            if not self._revert_authorized(k, capability):
+                return {"intent": "delete", "action": "authorization_required", "event": "DELETE", "key": k,
+                        "challenge": self.revert_challenge(k)}
+            ids = [r["id"] for r in self.items if r.get("key") == k and r.get("status") == "active"
+                   and r.get("tenant") == self.tenant]
+            res = self.forget(ids=ids) if ids else {"forgotten": 0}
+            return {"intent": "delete", "action": "deleted", "event": "DELETE", "key": k,
+                    "forgotten": res.get("forgotten", 0)}
         if self._ROUTE_REVERT.search(low):
             k = key or self._route_key(low)
             if k is None:
@@ -2520,13 +2694,17 @@ class Mnemo:
                     "key": k, **{kk: vv for kk, vv in res.items() if kk != "ok"}}
         if object is None or key is None:
             rid = self.remember(text, key=key, object=object)
-            return {"intent": "assert", "action": "remembered", "key": key, "id": rid}
+            return {"intent": "assert", "action": "remembered", "event": "ADD", "key": key, "id": rid}
         chain = self._route_chain(key)
         cur = chain[-1] if chain else None
-        if object == cur or object not in chain:
+        if object == cur:                                    # NOOP: value already current -> skip the duplicate write
+            return {"intent": "assert", "action": "noop", "event": "NOOP", "key": key,
+                    "note": "value already current; duplicate write skipped (dedup)"}
+        if object not in chain:
             rid = self.remember(text, key=key, object=object)
             intent = "correct" if (cur is not None and self._ROUTE_CORRECT.search(low)) else "assert"
-            return {"intent": intent, "action": "remembered", "key": key, "id": rid}
+            event = "UPDATE" if cur is not None else "ADD"   # supersedes a prior value vs first value for the key
+            return {"intent": intent, "action": "remembered", "event": event, "key": key, "id": rid}
         # unmarked assertion of a superseded value — the ambiguous echo-or-reaffirm case
         if policy == "trusting" or (
                 policy == "context" and context and self._ROUTE_CHANGE_AWARE.search(context.lower())
@@ -2732,7 +2910,10 @@ class Mnemo:
                prefer_max_boost: float | None = None, near: dict | None = None,
                tie_recent: float | None = None,
                with_status: bool = False, with_warrant: bool = False,
-               redact_pii: bool = False, rerank=None, rerank_pool: int | None = None) -> list[dict]:
+               redact_pii: bool = False, rerank=None, rerank_pool: int | None = None,
+               reinforce: bool = True, trusted_only: bool = False, mmr: float | None = None,
+               user_id: str | None = None, agent_id: str | None = None, session_id: str | None = None,
+               rerank_by: str | None = None) -> list[dict]:
         """Top-k memories by RELEVANCE × VALUE — high-value memories outrank merely-similar ones.
         Memories the dream pass flagged as hubs (universal matchers) are skipped unless include_hubs.
 
@@ -2891,6 +3072,37 @@ class Mnemo:
         # one scope's memories into another's recall. scope=None (default) sees everything (legacy behavior).
         if scope is not None:
             pool = [r for r in pool if (r.get("meta") or {}).get("scope") == scope]
+        # MEMORY HIERARCHY visibility (user > agent > session): when the query names any of user/agent/session,
+        # a memory is visible iff, for each NAMED level, the memory is EITHER unscoped at that level (wildcard)
+        # OR equal to the query's value; an UNNAMED query level is unconstrained. So (a) a session query sees that
+        # session's memories PLUS the user's/agent's shared (unscoped-session) memories, but NOT a peer session's;
+        # (b) users are isolated from each other and peer sessions from each other; (c) a broad user-only query
+        # sees all that user's own memories (incl. their sessions' — same user, not a leak). All None = legacy.
+        if user_id is not None or agent_id is not None or session_id is not None:
+            _want = {"uid": user_id, "aid": agent_id, "sid": session_id}
+
+            def _visible(r):
+                m = r.get("meta") or {}
+                for lvl, qv in _want.items():
+                    if qv is None:
+                        continue
+                    mv = m.get(lvl)
+                    if mv is not None and str(mv) != str(qv):
+                        return False
+                return True
+            pool = [r for r in pool if _visible(r)]
+        # TRUSTED-ONLY (OPT-IN, needs trust_seeds): keep only candidates whose ORIGIN is anchored to the trust root —
+        # the record is itself attested by a seed key, its (entity-resolved) source is seed-vouched, OR a trusted
+        # actor endorses it via a link (the trust closure). Filtered HERE, BEFORE ranking, so recall returns the top
+        # TRUSTED hit even at k=1 (not the top hit then dropped). The deterministic, zero-LLM defense against
+        # forged-provenance memory poisoning: an attacker can forge a warrant STRING and mint Sybil Ed25519 keys, but
+        # cannot sign as a TRUSTED key, so its poison never enters the pool. Trust is a root set ONCE (CA-style), not
+        # a per-query oracle. High-friction by design — anchor the facts that MATTER (bank, medication, instructions).
+        if trusted_only and self.trust_seeds:
+            _trusted = self._trusted_sources({it["id"]: it for it in self.items})
+            pool = [r for r in pool
+                    if ("key:" + str(r.get("attested_key"))) in self.trust_seeds
+                    or self._canon_of(r) in _trusted]
         # Metadata pre-filter (the 'filter before you rank' lever): keep only records matching ALL `where`
         # conditions, matched against top-level fields then meta. Deterministic, no embedder, O(pool).
         if where:
@@ -3057,6 +3269,60 @@ class Mnemo:
                     scored = [_head[i] for i in _order] + scored[_m:]
             except Exception:
                 pass
+        # OPT-IN MMR / result-dedup (mmr in [0,1]): rerank the top pool for DIVERSITY so recall does not return k
+        # near-duplicate memories (the unbounded-redundant-results failure that mem0/hindsight explicitly declined
+        # to fix). Greedy Maximal Marginal Relevance: next = argmax [ mmr*rel(d) - (1-mmr)*max cos(d, chosen) ].
+        # rel = the composite score min-max normalized over the pool (comparable to the [0,1] cosine diversity
+        # term); diversity uses record vectors, falling back to token-Jaccard so LEXICAL recall dedups too.
+        # mmr=1.0 == pure relevance (no-op); lower = more diverse. Zero-LLM, deterministic. Composes AFTER rerank.
+        if mmr is not None and len(scored) > 1:
+            lam = max(0.0, min(1.0, float(mmr)))
+            _mp = int(rerank_pool) if rerank_pool else max(4 * k, 50)
+            pool, tail = scored[:_mp], scored[_mp:]
+            rels = [t[0] for t in pool]
+            lo, hi = min(rels), max(rels)
+            norm = [((rl - lo) / (hi - lo)) if hi > lo else 1.0 for rl in rels]
+            _toks = [set((t[2].get("text") or "").lower().split()) for t in pool]
+
+            def _dsim(i, j):
+                vi, vj = pool[i][2].get("vec"), pool[j][2].get("vec")
+                if vi and vj:
+                    return max(0.0, _cosine(vi, vj))
+                a, b = _toks[i], _toks[j]
+                return (len(a & b) / len(a | b)) if (a and b) else 0.0
+
+            chosen, remaining = [], list(range(len(pool)))
+            while remaining:
+                best_i, best_v = remaining[0], None
+                for i in remaining:
+                    div = max((_dsim(i, c) for c in chosen), default=0.0)
+                    val = lam * norm[i] - (1.0 - lam) * div
+                    if best_v is None or val > best_v:
+                        best_v, best_i = val, i
+                chosen.append(best_i)
+                remaining.remove(best_i)
+            scored = [pool[i] for i in chosen] + tail
+        # OPT-IN NAMED RERANKER MENU (rerank_by): a discoverable set of deterministic, zero-LLM reorderings of the
+        # top relevant pool — the "named reranker" depth a serious retrieval layer exposes (cf. Zep's menu), no LLM.
+        # Complements the `mmr=` diversity knob and the `rerank=` cross-encoder hook:
+        #   'recency'     — newest (event-time valid_from, else ts) first among the relevant pool
+        #   'value'       — highest accrued importance first
+        #   'reliability' — best track record first (Beta good/bad posterior: was-it-right, not just similar)
+        #   'relevance'   — pure relevance order (explicit no-op passthrough)
+        # Reorders only the top pool (rerank_pool, default max(4k,50)); relevance filtering already applied.
+        if rerank_by:
+            _mp = int(rerank_pool) if rerank_pool else max(4 * k, 50)
+            pool, tail = scored[:_mp], scored[_mp:]
+            rb = rerank_by.lower()
+            if rb == "recency":
+                pool.sort(key=lambda t: -(t[2].get("valid_from") or t[2].get("ts") or 0))
+            elif rb == "value":
+                pool.sort(key=lambda t: -float(t[2].get("value") or 0))
+            elif rb == "reliability":
+                pool.sort(key=lambda t: -self._reliability(t[2]))
+            elif rb == "relevance":
+                pass                                          # explicit no-op: keep pure relevance order
+            scored = pool + tail
         out = []
         _top_sim = scored[0][1] if scored else 1.0   # normalize reinforcement by this query's best match
         for score, sim, r in scored[:k]:
@@ -3067,9 +3333,14 @@ class Mnemo:
             # ties reinforcement to how well the memory actually answered. (Independently converged on
             # in production by the Dakera and mem0 teams: weight access events by recall score, not raw
             # count.)
-            rel = (sim / _top_sim) if _top_sim > 0 else 1.0
-            r["value"] += 0.25 * rel
-            r["last_access"] = _now                 # ...and resets the per-type decay clock
+            # reinforce=False: a NON-MUTATING read (no value bump, no decay-clock reset, no graduation) — for
+            # eval/benchmark or read-only consumers where recall order must not depend on prior queries. The
+            # per-hit reinforcement below optimizes value-weighted importance for a WARM store, but on a cold
+            # query stream it is an order-dependent confound (measured to depress recall_any ~0.10 @low-k).
+            if reinforce:
+                rel = (sim / _top_sim) if _top_sim > 0 else 1.0
+                r["value"] += 0.25 * rel
+                r["last_access"] = _now             # ...and resets the per-type decay clock
             # Type GRADUATION: an episodic memory recalled into high accrued value has proven durable,
             # so promote it to semantic — it stops fading on the fast 7-day episodic clock and decays
             # on the slow semantic one instead. (Dakera's access-driven episodic->semantic promotion,
@@ -3102,7 +3373,7 @@ class Mnemo:
             corroborated = ((_good_earned > 0 and _good >= _bad) or _distinct >= 2) \
                 and not (r.get("meta") or {}).get("slashed") \
                 and not r.get("orphan")   # landed retraction OR orphan (no lineage) blocks (re-)graduation too
-            if r.get("mtype") == "episodic" and r["value"] >= _GRADUATE_VALUE and corroborated:
+            if reinforce and r.get("mtype") == "episodic" and r["value"] >= _GRADUATE_VALUE and corroborated:
                 r["mtype"] = "semantic"
                 r.setdefault("meta", {})["graduated_from_episodic"] = True
             _o = {"id": r["id"], "text": r["text"], "tags": r["tags"], "iso": r["iso"],
@@ -4415,6 +4686,55 @@ class Mnemo:
         return {k: {"count": v["count"], "value": round(v["value"], 2),
                     "avg": round(v["value"] / v["count"], 2)} for k, v in out.items()}
 
+    def graph(self, include_superseded: bool = False) -> dict:
+        """Deterministic knowledge GRAPH over keyed (subject::relation, object) memories — zero-LLM, no graph DB.
+        Every memory stored with a key of the form 'subject::relation' AND an `object` is an edge
+        subject -[relation]-> object; entities are the subjects + objects. This gives the 'graph memory' view
+        mem0/Zep/cognee ship, but DERIVED deterministically from mnemo's existing supersession triples (no LLM
+        entity-extraction, no separate graph store). It covers memories keyed explicitly OR via the optional
+        `extractor` hook, so extractor-keyed free text also enters the graph. Only ACTIVE edges by default, so a
+        superseded fact drops out of the graph (the graph reflects CURRENT truth) unless include_superseded.
+        Returns {'nodes': [entity,...], 'edges': [{subject, relation, object, id, text}, ...]}."""
+        edges, nodes = [], set()
+        for r in self.items:
+            if not include_superseded and r.get("status") != "active":
+                continue
+            if self.tenant is not None and r.get("tenant") != self.tenant:
+                continue
+            k = r.get("key") or ""
+            obj = r.get("object")
+            if "::" in k and obj:
+                subj, rel = k.split("::", 1)
+                edges.append({"subject": subj, "relation": rel, "object": str(obj),
+                              "id": r["id"], "text": r.get("text", "")})
+                nodes.add(subj); nodes.add(str(obj))
+        return {"nodes": sorted(nodes), "edges": edges}
+
+    def subgraph(self, entity: str, hops: int = 1, include_superseded: bool = False) -> dict:
+        """MULTI-HOP graph traversal from `entity` (matched as a subject OR an object), up to `hops` edges away —
+        the 'connected memories' / multi-hop retrieval a graph memory offers, as a deterministic BFS over the
+        (subject, relation, object) edges (no LLM, no graph DB). Returns {'nodes', 'edges'} reachable within hops."""
+        g = self.graph(include_superseded=include_superseded)
+        adj: dict = {}
+        for e in g["edges"]:
+            adj.setdefault(e["subject"], []).append(e)
+            adj.setdefault(e["object"], []).append(e)
+        seen_nodes, seen_edges, edge_ids = {entity}, [], set()
+        frontier = {entity}
+        for _ in range(max(0, int(hops))):
+            nxt = set()
+            for node in frontier:
+                for e in adj.get(node, []):
+                    if e["id"] not in edge_ids:
+                        edge_ids.add(e["id"]); seen_edges.append(e)
+                    for other in (e["subject"], e["object"]):
+                        if other not in seen_nodes:
+                            seen_nodes.add(other); nxt.add(other)
+            frontier = nxt
+            if not frontier:
+                break
+        return {"nodes": sorted(seen_nodes), "edges": seen_edges}
+
     def _resolve_key(self) -> bytes:
         """The 32-byte AES key for this store. A raw key is used directly; a passphrase is scrypt-derived
         against the store's salt (from the file header on load, or minted on first save) and cached so scrypt
@@ -4682,6 +5002,34 @@ def make_llm_extractor(call_fn, prompt_prefix=None):
         except Exception:
             return None
     return _ex
+
+
+def default_distiller(url=None, model=None, key=None, timeout=60):
+    """Batteries-included distiller for distill_and_remember(): a zero-dependency urllib chat caller against any
+    OpenAI-compatible /chat/completions endpoint (args or env MNEMO_LLM_URL / MNEMO_LLM_MODEL / MNEMO_LLM_KEY —
+    e.g. local Ollama at http://localhost:11434/v1/chat/completions). Returns a `distiller(prompt, text) -> str`
+    you pass straight to distill_and_remember, so capture works out of the box instead of forcing every caller to
+    wire an LLM. OPT-IN: this is the only place an LLM touches capture; the core store/recall/revert stay zero-LLM.
+    Raises if no URL is configured (so you know to inject your own)."""
+    import urllib.request
+    url = (url or os.environ.get("MNEMO_LLM_URL", "")).strip()
+    if not url:
+        raise RuntimeError("default_distiller needs MNEMO_LLM_URL (an OpenAI-compatible /chat/completions endpoint) "
+                           "or explicit url= ; the core stays zero-LLM, so a distiller is opt-in.")
+    model = (model or os.environ.get("MNEMO_LLM_MODEL", "gpt-4o-mini")).strip()
+    key = (key or os.environ.get("MNEMO_LLM_KEY", "")).strip()
+
+    def distiller(prompt, text):
+        body = json.dumps({"model": model, "temperature": 0, "messages": [
+            {"role": "system", "content": prompt}, {"role": "user", "content": text or ""}]}).encode()
+        headers = {"Content-Type": "application/json"}
+        if key:
+            headers["Authorization"] = f"Bearer {key}"
+        req = urllib.request.Request(url, data=body, headers=headers)
+        with urllib.request.urlopen(req, timeout=timeout) as r:
+            return json.loads(r.read())["choices"][0]["message"]["content"]
+
+    return distiller
 
 
 if __name__ == "__main__":

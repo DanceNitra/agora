@@ -3,9 +3,16 @@ publish_mnemo_pypi.py - build + upload agora-mnemo to PyPI.
 Reads PYPI_TOKEN from server/.env; passes it to twine via env vars only (never on a command line / in
 printed output). Re-run after bumping the version for a new release.
 
+BUILDS FROM THE CANONICAL REPO (../mnemo-repo), not agora/mnemo_pypi. Until 2026-07-19 this script pointed
+at agora/mnemo_pypi, a staging copy that stopped being the release source after 0.7.19 while every actual
+release (1.9.x .. 1.17.0) came out of mnemo-repo. Its pyproject was still pinned at 0.7.19, so this script
+built a 0.7.19 artifact that PyPI then rejected as a duplicate - the release tool had quietly been dead for
+months, and a release made "by hand" instead is how mnemo_pypi and mnemo-repo drifted apart in the first
+place. Override the location with MNEMO_REPO=<path> if the checkout lives somewhere else.
+
 Usage:  python tools/publish_mnemo_pypi.py
 """
-import os, re, sys, glob, shutil, subprocess
+import os, re, sys, glob, json, shutil, subprocess, urllib.request
 
 try:
     sys.stdout.reconfigure(encoding="utf-8", errors="replace")
@@ -13,7 +20,7 @@ except Exception:
     pass
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-PKG = os.path.join(ROOT, "mnemo_pypi")
+PKG = os.environ.get("MNEMO_REPO") or os.path.join(os.path.dirname(ROOT), "mnemo-repo")
 
 
 def _token():
@@ -24,7 +31,40 @@ def _token():
     return m.group(1).strip().strip('"')
 
 
+def _version():
+    """The version about to be published, cross-checked against the library's own __version__.
+
+    These two have drifted before (the package said one thing, `mnemo.__version__` another), which ships a
+    wheel whose reported version is a lie. Refuse rather than publish a mismatch."""
+    pyproject = open(os.path.join(PKG, "pyproject.toml"), encoding="utf-8").read()
+    m = re.search(r'^version\s*=\s*"([^"]+)"', pyproject, re.M)
+    if not m:
+        sys.exit(f"no version in {PKG}/pyproject.toml")
+    v = m.group(1)
+    src = open(os.path.join(PKG, "mnemo", "mnemo.py"), encoding="utf-8").read()
+    m2 = re.search(r'^__version__\s*=\s*"([^"]+)"', src, re.M)
+    if m2 and m2.group(1) != v:
+        sys.exit(f"version mismatch: pyproject says {v}, mnemo/mnemo.py says {m2.group(1)} - bump both")
+    return v
+
+
+def _already_on_pypi(v):
+    try:
+        d = json.load(urllib.request.urlopen("https://pypi.org/pypi/agora-mnemo/json", timeout=20))
+        return v in d.get("releases", {}), d["info"]["version"]
+    except Exception:
+        return False, "?"      # network trouble: don't block the release on it
+
+
 def main():
+    if not os.path.isdir(PKG):
+        sys.exit(f"package dir not found: {PKG}  (set MNEMO_REPO=<path to the mnemo checkout>)")
+    v = _version()
+    taken, live = _already_on_pypi(v)
+    print(f"publishing agora-mnemo {v} from {PKG}   (PyPI currently: {live})")
+    if taken:
+        sys.exit(f"{v} is already on PyPI - PyPI never allows re-uploading a version. Bump first.")
+
     tok = _token()
     for d in ("dist", "build"):
         shutil.rmtree(os.path.join(PKG, d), ignore_errors=True)
@@ -38,6 +78,11 @@ def main():
         print(b.stdout[-1500:]); print(b.stderr[-1500:]); sys.exit("build failed")
     dists = glob.glob(os.path.join(PKG, "dist", "*"))
     print("built:", [os.path.basename(d) for d in dists])
+    # A stale dist/ from an earlier release would otherwise be re-uploaded alongside the new one.
+    stale = [d for d in dists if v not in os.path.basename(d)]
+    if stale or not dists:
+        sys.exit(f"refusing to upload: dist/ does not hold exactly {v} "
+                 f"(unexpected: {[os.path.basename(d) for d in stale]})")
 
     print("uploading to PyPI ...")
     env = dict(os.environ, TWINE_USERNAME="__token__", TWINE_PASSWORD=tok)
@@ -46,7 +91,7 @@ def main():
     print(((u.stdout + "\n" + u.stderr).replace(tok, "***"))[-2000:])
     if u.returncode != 0:
         sys.exit("upload failed (see output above)")
-    print("\nLIVE: https://pypi.org/project/agora-mnemo/   ->   pip install agora-mnemo")
+    print(f"\nLIVE: https://pypi.org/project/agora-mnemo/{v}/   ->   pip install agora-mnemo")
 
 
 if __name__ == "__main__":
