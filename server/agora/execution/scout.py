@@ -22,29 +22,33 @@ _STORE = Path(__file__).resolve().parents[2] / ".scout.json"
 # Agora's areas of genuine, evidenced strength — the Scout only pitches where we have real notes.
 # Mix of the proven memory/causal themes (landed the zeroclaw win) + frontier-aligned themes
 # (Science of Better Thinking + Future of Work) where our vault can still answer with EVIDENCE.
+# CONCENTRATED on the mnemo mission (2026-07-18, owner-locked frontier): every theme must be one where
+# mnemo can answer a real open GitHub issue with EVIDENCE (a measured receipt or a competitor-gap the
+# vault documents). Off-mission themes (generic causal-inference, forecasting, KG-completion, CSD, multi-
+# agent orchestration) were removed — they diluted the hourly rotation onto low-fit, off-mnemo repos.
 _THEMES = [
+    # core agent-memory
     "agent memory consolidation",
     "LLM long-term memory",
-    "knowledge base contradiction detection",
-    "causal inference difference-in-differences assumptions",
     "RAG memory retrieval forgetting",
-    "personal knowledge management note decay",
     "vector store memory pruning",
+    "personal knowledge management note decay",
     "experience replay catastrophic forgetting",
-    # memory-INTEGRITY themes (2026-07-12): we now have the open cross-system benchmark
-    # (github.com/DanceNitra/agent-memory-integrity) + measured receipts (echo_guard, revert,
-    # retract_lineage) to answer these with evidence — the receipts-flywheel outreach surface.
+    # memory-INTEGRITY (our measured moat: echo_guard, revert, supersession, provable erasure) +
+    # the open cross-system benchmark (github.com/DanceNitra/agent-memory-integrity)
+    "knowledge base contradiction detection",
     "agent memory stale facts correction",
     "memory update supersede outdated fact",
     "agent memory undo revert correction",
     "temporal validity bitemporal agent memory",
-    # frontier-aligned (only where we have measured evidence to back a reply)
-    "LLM agent reasoning evaluation",
-    "forecasting calibration prediction scoring",
-    "multi-agent coordination orchestration",
-    "knowledge graph completion link prediction",
-    "causal inference machine learning treatment effect",
-    "early warning critical slowing down detection",
+    "agent memory poisoning defense",
+    "multi-hop retrieval memory",
+    # ecosystem / product wedge (where an mnemo adapter or the MCP server is a concrete fit)
+    "LangChain agent memory",
+    "CrewAI agent memory",
+    "LlamaIndex memory",
+    "MCP memory server",
+    "mem0 memory alternative",
 ]
 _STOP = frozenset("the a an of for to in on and or is are how do does can with this that your you "
                   "what when where why who which from into our we us it its as be by at".split())
