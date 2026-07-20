@@ -99,8 +99,15 @@ def arxiv_search(query: str, max_results: int = 5, sort: str = "relevance") -> l
     """Search arXiv for real papers. Returns [{title, authors, summary, url, published}].
     sort='relevance' (default) for best-match; sort='submittedDate' for newest-first (used by the
     frontier harvester so it pulls FRESH papers instead of re-finding the same already-read top hits)."""
+    # A bare multi-word phrase under `all:` is OR-matched by arXiv, so combining it with
+    # sortBy=submittedDate returns "the newest papers containing ANY of these words" — effectively the
+    # arXiv firehose (measured 2026-07-20: the query "conversational memory long-term dialogue" returned
+    # MoE serving, risky-driving vision and physics-RL papers). Callers may therefore pass FULL arXiv
+    # query syntax (field prefixes, quoted phrases, AND/OR); we only wrap a bare phrase in `all:`.
+    _raw = (query or "").strip()
+    _structured = bool(re.search(r'(?:\b(?:all|ti|abs|au|cat|id):)|\b(?:AND|OR|ANDNOT)\b', _raw))
     params = {
-        "search_query": f"all:{query}",
+        "search_query": _raw if _structured else f"all:{_raw}",
         "start": 0,
         "max_results": max_results,
         "sortBy": sort,

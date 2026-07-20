@@ -1620,6 +1620,26 @@ async def _renewable_quests(eid: str, want: int = 3) -> list:
             if len(b) > i:
                 interleaved.append(b[i])
         i += 1
+    # BOARD-PRIORITY GATE (2026-07-20). Root cause of an all-night off-mission run: the `findings` bucket
+    # re-seeds "Hypothesize on: <topic>" from the top-8 of collective knowledge, but nothing new displaces
+    # that top-8 — so the same stale off-mission hypotheses (SCN neurons, CT scans, vertical transmission)
+    # kept re-seeding themselves while the owner-locked mnemo directions sat in a 1-of-4 bucket. That is a
+    # self-reinforcing echo loop in our OWN swarm. Route the assembled pool through the SAME gatekeeper the
+    # insight/predict generators already use: when ANY candidate matches the board priorities, only those
+    # are eligible. Soft by design — if nothing matches, the full pool passes, so the swarm never starves.
+    # Gate the PAYLOAD (the text after "<verb>: "), never the whole intent: the boilerplate prefixes
+    # ("Ground a finding from", "Pursue direction", "Test Agora's claim") share generic words with the
+    # board text itself ("every FINDING must answer...", "prioritize RESEARCH..."), so gating the raw
+    # string matched on boilerplate and passed every off-domain paper. Measured: with the raw string the
+    # first post-gate pick was still "Ground a finding from: GEAR ... Image Synthesis".
+    try:
+        _payload = {x[0]: (x[0].split(": ", 1)[1] if ": " in x[0] else x[0]) for x in interleaved}
+        _keep = set(await _gate_filter(list(_payload.values())))
+        _on = [x for x in interleaved if _payload[x[0]] in _keep]
+        if _on:
+            interleaved = _on
+    except Exception as e:
+        logger.debug(f"quest board-gate {eid}: {e}")
     # SELF-UPGRADE #1: don't re-pursue a topic done recently — avoid the repetition the OS fell into.
     # _recent_intents is PERSISTED, so this dedup now survives dungeon restarts (kills the cross-restart dups).
     fresh = [x for x in interleaved if x[0] not in _recent_intents]
