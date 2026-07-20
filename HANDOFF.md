@@ -11,6 +11,55 @@
 > 83-comment thread digest: memory `marat-tat-edrn-collaboration-live`. Read the whole Issue #1, fetch data from
 > GitHub yourself (public) — never via Gmail.
 
+# Agora — Session Handoff (2026-07-20 · "test your own claim" day)
+
+## PASTE THIS AFTER RESTART (2026-07-20 — newest; supersedes every block below)
+```
+Resume Agora. FIRST read HANDOFF.md top (2026-07-20) + the LIVE-COLLABORATION callout above it. Chat SLOVAK, code/output ENGLISH.
+MISSION (mnemo-core-must-be-1-before-pro-sells, PERMANENT): mnemo-CORE provably #1 first. TODAY'S EVIDENCE CHANGED THE ROUTE: benchmarks are NOT the bottleneck (3 nulls), DISTRIBUTION is.
+STANDING RULES: FULL gate before anything outward; skeptic on our OWN wins; state each number's PARAMETERS before sending (a U=1 bias table went into a U=4 review); SATURATE the machine on any batch >2 min (fan out independent units, verify CPU in the first minute); a competitor's 0.000 is OUR bug until a positive control says otherwise; PUBLISH mnemo ONLY via tools/publish_mnemo_pypi.py; pre-push secret scan on public repos; GitHub as DanceNitra after owner OK.
+STATE: agora-mnemo 1.24.1 LIVE (PyPI + GitHub, 3 copies synced). brain :8000 + dungeon :5174 UP, 1/1/0, keepalive Ready, dungeon_health OK (loop_n advancing). MemOps pilot CLOSED as a third null; erasure/revert probe PARKED (mem0 arm unrun).
+#1 TASK: distribution, not measurement — get claims_audit + the write-cost number in front of buyers (MCP registry listing; 78% of installs come through registries). #2: EDRN final sign-off the moment they answer which definition of C they want. #3 (optional): the mem0 arm of the erasure probe, one command.
+Ask me or continue with #1.
+```
+
+## What happened 2026-07-20 (all shipped, pushed, released)
+
+- **mnemo 1.24.0 — a REAL bug, found by testing our own README.** The owner asked "where is it written that this
+  actually exists and works, and that you did not invent it?" Instead of arguing, I downloaded the published wheel
+  into a clean room and tested one README sentence. It failed: plain `forget()` deleted the record and scrubbed the
+  bytes but wrote **no receipt**, so `verify_writes()` reported `deleted out-of-band` — the store accusing its own
+  legitimate API call of tampering. Fixed: every deletion path now emits a hash-chained tombstone, `request_id`/
+  `basis` committed inside its hash. Regression probe `forget_emits_tombstone_probe.py`. Also fixed
+  `trusted_only_poison_defense_probe`, which asserted pre-1.19.0 fail-OPEN behaviour and had been reporting FAILED
+  against correct code — a permanently red test teaches you to ignore red.
+- **mnemo 1.24.1 — `claims_audit.py`, and the README now opens with it.** One command downloads the published wheel,
+  prints its sha256 and runs 13 checks against THAT artifact (never the working tree): zero deps, no socket on the
+  write path (enforced by disabling `socket`), supersession, unaided `revert`, receipts on delete, deletion not
+  flagged as tampering, silent edit IS flagged, determinism, `trusted_only` fail-closed, tenant isolation,
+  `witness`, `forget_pii`, MCP present. **13/13 PASS on the released 1.24.1.** Claims about OTHER systems are
+  listed separately as NOT TESTABLE HERE and never counted as passing. Two of my own checks were wrong first
+  (receipts are opt-in; the API is `for_tenant()` not `tenant_view()`) — documented in place.
+- **MemOps pilot CLOSED = the THIRD null on supersession.** At matched context budget: mnemo 0.593, naive keep-all
+  0.592, mem0 0.544, session_rag 0.442, floor 0.058 — every mnemo-vs-mem0 CI crosses zero. Two traps caught, both
+  ours: the first run compared arms at a **9x unequal context budget** (accuracy 0.28 → 0.59 once matched), and
+  mem0 scored 0.000 twice from OUR defects (`sess[:6000]` truncation; `limit=` where mem0 takes `top_k`). What DID
+  separate: **write cost** — 600–730 s of LLM extraction per scenario against 0 s. Full record in
+  `agora_output/lab/memops/PREREGISTRATION.md` (Appendices A–C).
+- **Erasure/revert probe PARKED** after E1 SUPPORTED (tie with naive, as predicted against ourselves), R1 REFUTED
+  (0.6 against a 0.8 threshold — mnemo reverts unaided but only where the extractor keyed the chain), R2 SUPPORTED
+  (naive needs external knowledge 9/9). E2/E4/R3 need the mem0 arm and were not run.
+- **EDRN: we finished the manuscript for them.** Public repo `DanceNitra/edrn-appendix-fix` with a compiling
+  `paper_full.tex` + PDF + every script. The C "48% drop" was a normalisation artefact (`/2.0` in
+  `menu2_periodic.py:88`): in one convention it is **+4.2%**, per-bond connectivity unchanged. Experiment 3
+  independently reproduced AND corrected — their χ=100 fit (c=0.3407, R²=0.840) reproduces exactly, and dw→0
+  extrapolation removes an L-graded bias, improving it to **c=0.3246, R²=0.980**. Appendix tables regenerated from
+  the CSVs because the shipped ones matched the data only at the endpoints. **Open, and only they can answer it:
+  which definition of C.**
+- **Marat/TAT:** our suggestion (feed the histogram, not the event list) produced TAT's first verifiable positive
+  control — a blind anchor on J/ψ at 30.7σ. We then checked it: the "1.2% deviation" is 0.55 of one bin, and the
+  Υ silence is not established until the median window is widened past the triplet. Reply drafted, owner sends it.
+
 # Agora — Session Handoff (2026-07-19 NIGHT · "the frozen-session autopsy → 1.20.0" session)
 
 ## PASTE THIS AFTER RESTART (2026-07-19 NIGHT — newest; supersedes the LATE block below)
