@@ -1838,6 +1838,62 @@ async def brain_scout_record(request: Request):
     return {"status": "ok" if r else "duplicate", "record": r}
 
 
+@router.get("/brain/scout/box")
+async def brain_scout_box():
+    """THE SCOUT BOX — leads collected but not yet triaged, capped so it cannot grow into a landfill.
+
+    Discovery is cheap and perishable; triage is the scarce thing. The scan fills this and never waits
+    for the inbox to clear (it used to skip entirely while one outreach task sat pending, which read as
+    a dead scanner for 23h). `contribute` = an issue we could answer with evidence; `learn` = a merged
+    PR in our problem space worth reading.
+    """
+    from agora.execution.scout import box_load, box_stats
+    items = box_load()
+    return {"status": "ok", "stats": box_stats(),
+            "open": [x for x in items if x.get("status") == "open"][-40:]}
+
+
+@router.post("/brain/scout/box/add")
+async def brain_scout_box_add(request: Request):
+    """Scan once and file what it finds. Returns added=null when the lead is a duplicate or the box is
+    full — full is reported, never silently overwritten, because a dropped lead is indistinguishable
+    from one that was never found."""
+    import asyncio as _aio
+    from agora.execution.scout import box_add, box_stats, find_learning, find_opportunity
+    b = await request.json() if await request.body() else {}
+    kind = (b.get("kind") or "contribute").strip()
+    finder = find_learning if kind == "learn" else find_opportunity
+    lead = await _aio.to_thread(finder)
+    if not lead or lead.get("error"):
+        return {"status": "ok", "added": None, "reason": (lead or {}).get("error") or "nothing found",
+                "stats": box_stats()}
+    return {"status": "ok", "added": box_add(lead, kind=kind), "stats": box_stats()}
+
+
+@router.post("/brain/scout/box/mark")
+async def brain_scout_box_mark(request: Request):
+    """Close a lead: done | no_fit | dropped."""
+    from agora.execution.scout import box_mark, box_stats
+    b = await request.json()
+    ok = box_mark(b.get("url") or "", b.get("status") or "done")
+    return {"status": "ok" if ok else "not_found", "stats": box_stats()}
+
+
+@router.get("/brain/scout/box/take")
+async def brain_scout_box_take(kind: str = "contribute", n: int = 1):
+    """Hand out the top `n` open leads for triage, highest score first.
+
+    Batched on purpose: judging "does our vault actually answer this?" takes seconds per lead and most
+    answers are no. Promoting one lead per cycle capped throughput at ~10/day and made the whole box
+    pointless; promoting them as separate inbox tasks would flood the inbox instead. One task carrying
+    several leads is the shape that matches the work.
+    """
+    from agora.execution.scout import box_stats, box_take
+    leads = [x for x in (box_take(kind) for _ in range(max(1, min(int(n), 10)))) if x]
+    return {"status": "ok", "leads": leads, "lead": leads[0] if leads else None,
+            "stats": box_stats()}
+
+
 @router.get("/brain/scout")
 async def brain_scout():
     from agora.execution.scout import format_scout, _load

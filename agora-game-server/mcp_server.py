@@ -1970,14 +1970,26 @@ async def _gate_refresh() -> None:
 
 
 async def _gate_filter(pool: list[str]) -> list[str]:
-    """Drop editorially-refused themes; when board priorities exist and any candidate matches
-    them, queue ONLY the on-priority ones (off-priority themes wait their turn)."""
+    """Drop editorially-refused themes; when board priorities exist, queue ONLY on-priority themes.
+
+    HARD since 2026-07-21. It used to fall through to `return pool` when NOTHING in the pool matched
+    the board — which is exactly the case that needed gating, so an off-mission batch passed whole.
+    Measured cost of that one line: 17 of 22 pending inbox tasks were off-mission (eight
+    `Hypothesize from findings` on vault themes like Landauer, orphan nodes, ADHD fMRI meta-analyses),
+    while the board had been locked to the mnemo frontier for days. The lab door was gated and the
+    generator walked in through the window.
+
+    Starvation is visible on purpose: returning [] logs the miss instead of quietly manufacturing work.
+    An organ with nothing on-mission to do should say so, not fill the queue.
+    """
     await _gate_refresh()
     pool = [t for t in pool if not _theme_is_covered(t, _gate_cache["skips"])]
     if _gate_cache["prio"]:
         on = [t for t in pool if _theme_words(t) & _gate_cache["prio"]]
-        if on:
-            return on
+        if not on and pool:
+            logger.info("[gate] %d candidate(s) dropped: none on-priority (board=%s)",
+                     len(pool), sorted(_gate_cache["prio"])[:6])
+        return on
     return pool
 
 
@@ -2658,30 +2670,68 @@ async def _run_portfolio() -> None:
                            f"not yet honest to publish"})
 
 
+def loop_n_is_even_cycle() -> bool:
+    """True on every other scout cycle — read from the heartbeat file, which is where loop_n actually
+    persists (it survives restarts; it was at 2.2M when this was written, not reset by a relaunch).
+    Used to alternate what the Scout hunts: an issue we can answer, then a PR we can learn from."""
+    try:
+        _, ln = _HEARTBEAT_FILE.read_text(encoding="utf-8").split()
+        return (int(ln) // 10000) % 2 == 0
+    except Exception:
+        return False
+
+
 async def _queue_scout() -> None:
     """THE OPPORTUNITY SCOUT: Shadow Kael hunts an open GitHub issue Agora can answer with
     evidence and queues Claude to judge + draft a GATED outreach reply. Systematizes the
     first public win (answer someone else's open problem with running architecture + numbers).
     Owner-facing trust surface, so ~6h and strictly gated."""
-    if await _task_already_pending("Scout outreach"):
+    # COLLECT FIRST, ALWAYS. This used to open with `if await _task_already_pending("Scout outreach"):
+    # return`, so a single untriaged task stopped every later scan — the status read "last scan 23h ago"
+    # while the loop fired on schedule and did nothing. Discovery is cheap and perishable (a thread older
+    # than ~45 days is already cold); triage is the scarce part. So every firing files into the capped
+    # box, and only the promotion into the inbox is rate-limited. The outreach gate itself is unchanged.
+    await asyncio.to_thread(_brain_post_sync, "/api/v1/agent-os/brain/scout/box/add",
+                            {"kind": "contribute"})
+    if loop_n_is_even_cycle():                      # alternate: half the firings hunt something to LEARN
+        await asyncio.to_thread(_brain_post_sync, "/api/v1/agent-os/brain/scout/box/add",
+                                {"kind": "learn"})
+
+    # PROMOTE A BATCH, NOT A LEAD. Judging "does our vault actually answer this?" takes seconds per
+    # lead and the answer is usually no, so one lead per ~2.3h cycle capped the whole pipeline at
+    # ~10/day and made a 30-slot box pointless. Five leads in ONE task is the shape that matches the
+    # work: one pass, five verdicts, and the inbox still holds a single Scout item.
+    if await _task_already_pending("Scout triage"):
+        return                                      # collected above; the batch just isn't drained yet
+    d = await asyncio.to_thread(_brain_get_sync,
+                                "/api/v1/agent-os/brain/scout/box/take?kind=contribute&n=5", 30)
+    leads = (d or {}).get("leads") or []
+    dl = await asyncio.to_thread(_brain_get_sync,
+                                 "/api/v1/agent-os/brain/scout/box/take?kind=learn&n=2", 30)
+    learn = (dl or {}).get("leads") or []
+    if not leads and not learn:
         return
-    d = await asyncio.to_thread(_brain_get_sync, "/api/v1/agent-os/brain/scout-target", 30)
-    t = (d or {}).get("target") or {}
-    if not t.get("url") or t.get("error"):
-        return
+
+    def _one(x, i):
+        return (f"[{i}] {x['repo']}#{x['issue_number']} (fit {x.get('score')}) {x['url']} || "
+                f"TITLE: {x.get('title','')} || BODY: {(x.get('body') or '')[:320]}")
+
+    body = " ||| ".join(_one(x, i + 1) for i, x in enumerate(leads))
+    learn_body = " ||| ".join(_one(x, i + 1) for i, x in enumerate(learn))
     await asyncio.to_thread(
         _brain_post_sync, "/api/v1/agent-os/brain/claude-inbox",
-        {"text": f"Scout outreach: {t['repo']}#{t['issue_number']} (fit {t.get('score')}) || "
-                 f"TITLE: {t['title']} || BODY: {t['body'][:500]} || Judge HONESTLY: does Agora's "
-                 f"vault genuinely answer this with EVIDENCE (real mechanism + a measured number "
-                 f"from our notes/Lab)? If yes, draft a gated outreach comment via POST "
-                 f"/brain/correspondent/draft {{title, body, repo: '{t['repo']}', issue_number: "
-                 f"{t['issue_number']}}} - helpful, specific, no overselling, mapped to their pain. "
-                 f"Then POST /brain/scout-record {{url: '{t['url']}', repo: '{t['repo']}', issue: "
-                 f"{t['issue_number']}, outcome}}. If we cannot genuinely help, record outcome "
-                 f"'no real fit' and DO NOT draft - reputation dies on a bad pitch."})
+        {"text": f"Scout triage: {len(leads)} leads to answer + {len(learn)} to learn from. "
+                 f"TO ANSWER: {body} || TO LEARN FROM (merged PRs in our problem space — read, "
+                 f"extract what we did not know, do NOT pitch): {learn_body} || "
+                 f"For each lead judge HONESTLY whether Agora/mnemo answers it with EVIDENCE (a real "
+                 f"mechanism + a measured number from our notes/Lab). Where yes, draft a gated reply: "
+                 f"POST /brain/correspondent/draft {{title, body, repo, issue_number}} — helpful, "
+                 f"specific, no overselling. Where no, say so and move on; reputation dies on a bad "
+                 f"pitch. CLOSE EVERY LEAD either way: POST /brain/scout/box/mark {{url, status: "
+                 f"'done'|'no_fit'}}, and POST /brain/scout-record {{url, repo, issue, outcome}} for "
+                 f"the ones you judged. An unclosed lead is the only thing that holds a box slot."})
     broadcast({"type": "os_build", "kind": "discovery", "who": "Shadow Kael",
-               "text": f"scouted an opportunity: {t['repo']}#{t['issue_number']}"})
+               "text": f"filed {len(leads)} leads + {len(learn)} to learn from"})
     _mind_spark("#8fd3ff")        # cyan — a lead spotted outside the walls
 
 

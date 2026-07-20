@@ -173,3 +173,142 @@ def format_scout() -> str:
     for x in items[-6:][::-1]:
         lines.append(f"• [{x.get('outcome', '?')}] {x['repo']}#{x['issue']}")
     return "\n".join(lines)
+
+
+# ---------------------------------------------------------------------------------------------
+# THE SCOUT BOX — the Scout collects; Claude drains. Separately.
+#
+# Until 2026-07-20 the dungeon's _queue_scout() returned early whenever a "Scout outreach" task was
+# still pending in the Claude inbox, so ONE unprocessed task stopped every subsequent scan: the
+# status read "last scan 23h ago" while the loop was firing on schedule and finding nothing to do.
+# Discovery is cheap and perishable (a 45-day-old thread is already cold); triage is what is scarce.
+# So scanning now fills a capped box and never waits, and exactly one lead is promoted into the inbox
+# at a time — the outreach gate is unchanged, only the queueing is.
+#
+# Two kinds of lead, because not every useful find is something to answer:
+#   contribute — an open issue where mnemo/Agora can answer with evidence (the outreach path)
+#   learn      — a PR or issue in the same problem space worth READING: how others solved what we are
+#                solving, or a design decision we should not have to rediscover
+_BOX = Path(__file__).resolve().parents[2] / ".scout_box.json"
+BOX_CAP = 30
+
+
+def box_load() -> list:
+    try:
+        return json.loads(_BOX.read_text(encoding="utf-8"))
+    except Exception:
+        return []
+
+
+def _box_save(items: list) -> None:
+    try:
+        _BOX.write_text(json.dumps(items, ensure_ascii=False, indent=1), encoding="utf-8")
+    except Exception:
+        pass
+
+
+def box_add(lead: dict, kind: str = "contribute") -> dict | None:
+    """Add a lead if it is new and there is room. Returns None when duplicate or full.
+
+    Full means full: the cap is a signal that triage has stopped, not a buffer to silently overwrite.
+    A dropped lead would be indistinguishable from one that was never found.
+    """
+    url = (lead or {}).get("url")
+    if not url:
+        return None
+    items = box_load()
+    if any(x.get("url") == url for x in items):
+        return None
+    if any(x.get("url") == url for x in _load()):      # already engaged in the ledger
+        return None
+    if len([x for x in items if x.get("status") == "open"]) >= BOX_CAP:
+        return None
+    rec = dict(lead)
+    rec.update({"kind": kind, "status": "open", "found_ts": time.time()})
+    items.append(rec)
+    _box_save(items[-200:])
+    return rec
+
+
+def box_take(kind: str = "contribute") -> dict | None:
+    """Highest-scoring open lead of a kind, marked as taken. This is what gets promoted to the inbox."""
+    items = box_load()
+    open_ = [x for x in items if x.get("status") == "open" and x.get("kind") == kind]
+    if not open_:
+        return None
+    best = max(open_, key=lambda z: (z.get("score", 0), z.get("found_ts", 0)))
+    for x in items:
+        if x.get("url") == best.get("url"):
+            x["status"] = "taken"
+            x["taken_ts"] = time.time()
+    _box_save(items)
+    return best
+
+
+def box_mark(url: str, status: str = "done") -> bool:
+    items = box_load()
+    hit = False
+    for x in items:
+        if x.get("url") == url:
+            x["status"] = (status or "done")[:20]
+            x["closed_ts"] = time.time()
+            hit = True
+    if hit:
+        _box_save(items)
+    return hit
+
+
+def box_stats() -> dict:
+    items = box_load()
+    open_ = [x for x in items if x.get("status") == "open"]
+    return {"open": len(open_), "cap": BOX_CAP, "full": len(open_) >= BOX_CAP,
+            "by_kind": {k: len([x for x in open_ if x.get("kind") == k])
+                        for k in ("contribute", "learn")},
+            "total_seen": len(items),
+            "oldest_open_days": round((time.time() - min((x.get("found_ts", time.time())
+                                                          for x in open_), default=time.time())) / 86400, 1)}
+
+
+def find_learning() -> dict | None:
+    """A merged PR in our problem space worth READING — not something to answer.
+
+    The outreach scan deliberately skips pull requests: you do not pitch a PR. But a merged PR in an
+    agent-memory project is the most concentrated form of "how somebody else solved the thing we are
+    solving", and reading one costs nothing and cannot embarrass us. Scored for substance (files and
+    review discussion) rather than for fit with our strengths — the point is what we do NOT know.
+    """
+    from agora.execution.correspondent import _api
+    seen = {x.get("url") for x in box_load()} | {x.get("url") for x in _load()}
+    rot = int(time.time() // 3600) % len(_THEMES)
+    theme = _THEMES[rot]
+    q = urllib.parse.quote(f"{theme} is:pr is:merged")
+    try:
+        res = _api("GET", f"/search/issues?q={q}&sort=updated&order=desc&per_page=15")
+    except Exception as e:
+        return {"error": str(e)[:120], "theme": theme}
+    now = time.time()
+    best = None
+    for it in res.get("items", []):
+        url = it.get("html_url", "")
+        if not url or url in seen:
+            continue
+        m = re.match(r"https://github\.com/([^/]+/[^/]+)/pull/(\d+)", url)
+        if not m:
+            continue
+        repo = m.group(1)
+        if repo.lower().startswith("dancenitra/"):        # our own work teaches us nothing new
+            continue
+        upd = it.get("updated_at") or ""
+        age_d = (now - _iso_to_ts(upd)) / 86400 if upd else 999
+        if age_d > 120:                                   # older than that and the code has moved on
+            continue
+        comments = it.get("comments", 0)
+        body = (it.get("body") or "")[:900]
+        # substance: a reviewed PR with a written rationale teaches more than a one-line fix
+        score = min(comments, 8) + (3 if len(body) > 400 else 0) + (2 if age_d <= 30 else 0)
+        cand = {"url": url, "repo": repo, "issue_number": int(m.group(2)),
+                "title": it.get("title", "")[:160], "body": body, "theme": theme,
+                "score": score, "comments": comments, "age_days": round(age_d, 1)}
+        if best is None or cand["score"] > best["score"]:
+            best = cand
+    return best
