@@ -68,10 +68,43 @@ def pick_challenge_target(vault_path: str, recent_blob: str = "") -> dict | None
         return bool(blob) and (bn in blob or (b.get("title", "")[:40].lower() in blob))
 
     fresh = [b for b in alive if not handled(b)] or alive    # if all recent, fall back to all
+
+    # ON-MISSION FIRST. Sorting purely by staleness picks the OLDEST belief, and the current mission's
+    # beliefs are the newest — so this reliably reached into the pre-mission back-catalogue and filed
+    # things like "you can't DiD a trait: conscientiousness -> longevity" while the board was locked to
+    # agent-memory integrity. Staleness still decides WITHIN the on-mission set; the old order only
+    # applies once there is nothing on-mission left to challenge.
+    prio = _board_tokens()
+    if prio:
+        on = [b for b in fresh if _tokens(b.get("title", "")) & prio]
+        if on:
+            fresh = on
+
     never = [b for b in fresh if not b["last_challenged"]]
     if never:
         return sorted(never, key=lambda b: Path(b["path"]).stat().st_mtime)[0]
     return sorted(fresh, key=lambda b: b["last_challenged"])[0]
+
+
+_STOP = {"the", "and", "for", "with", "that", "this", "from", "into", "our", "its", "make",
+         "one", "two", "how", "why", "not", "any", "all", "can", "are", "was", "has"}
+
+
+def _tokens(text: str) -> set:
+    return {w for w in re.findall(r"[a-z]{3,}", (text or "").lower()) if w not in _STOP}
+
+
+def _board_tokens() -> set:
+    """Word-set of the owner's standing priorities, or an empty set if the board is unreadable.
+
+    Empty means "do not constrain": a board that fails to load must never silence belief revision,
+    it must only stop steering it.
+    """
+    try:
+        from agora.execution.board import priorities_text
+        return _tokens(priorities_text())
+    except Exception:
+        return set()
 
 
 def stamp_belief(path: str, verdict: str, by_note: str = "", reason: str = "") -> dict:

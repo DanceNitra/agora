@@ -1396,8 +1396,46 @@ def _brain_get_sync(path: str, timeout: int = 4):
         return None
 
 
+# Inbox tasks that are MACHINERY, not research themes — they carry no subject to gate on and must
+# always get through (draining the queue, learning from what happened, owner-facing synthesis).
+# `update canon` and `draft press` were here and should not have been: both carry a research subject
+# and are exactly the kind of thing that must answer to the board.
+_INBOX_ALWAYS = ("learn from outcomes", "forge ideas", "synthesize roadmap", "scout triage",
+                 "scout outreach", "correspondence reply",
+                 "cc:", "build:", "number-picks", "compose outreach")
+
+
+def _inbox_theme_allowed(text: str) -> bool:
+    """THE ONE CHOKE POINT for off-mission work.
+
+    Thirty-one functions queue Claude-inbox tasks and only five of them called the board gate, which
+    is why the churn kept coming back after each individual path was patched: 90 minutes after the
+    inbox was cleared, a belief-challenge on conscientiousness-and-longevity and a replication of a
+    deep-RL claim had already arrived, with the board locked to agent-memory integrity.
+
+    Gating here instead covers every path at once, including ones added later. Uses the gate cache the
+    async paths already refresh; when the cache is cold nothing is dropped, so a restart cannot
+    silence the whole queue.
+    """
+    t = (text or "").strip().lower()
+    if any(t.startswith(p) for p in _INBOX_ALWAYS):
+        return True
+    prio = _gate_cache.get("prio") or set()
+    if not prio:
+        return True                                  # no board priorities known yet -> do not block
+    theme = t.split(" ||", 1)[0]
+    theme = theme.split(":", 1)[1] if ":" in theme else theme
+    if _theme_words(theme) & prio:
+        return True
+    logger.info("[gate] inbox task dropped, off-board: %s", theme.strip()[:90])
+    return False
+
+
 def _brain_post_sync(path: str, body: dict, timeout: int = 4):
     # default 4s for the fast endpoints; pass a longer timeout for slow LLM endpoints.
+    if path.endswith("/claude-inbox") and isinstance(body, dict) and "text" in body:
+        if not _inbox_theme_allowed(body["text"]):
+            return {"status": "skipped", "reason": "off-board"}
     try:
         req = _urlreq.Request(_BRAIN_URL + path, data=json.dumps(body).encode(),
                               headers={"Content-Type": "application/json"})
@@ -2526,6 +2564,11 @@ async def _queue_belief_challenge() -> None:
     t = (d or {}).get("target")
     if not t:
         return
+    # BOARD GATE. This path never called it, so it kept queueing off-mission work straight past the
+    # hardened filter — 90 minutes after the inbox was cleared it had filed a challenge on a
+    # conscientiousness/longevity belief while the board was locked to agent-memory integrity.
+    if not await _gate_filter([t["title"]]):
+        return
     await asyncio.to_thread(_brain_post_sync, "/api/v1/agent-os/brain/claude-inbox",
                             {"text": f"Challenge belief: {t['title'][:90]} || path: {t['path']}"})
     broadcast({"type": "os_build", "kind": "collab", "who": "Sergeant Voss",
@@ -2600,9 +2643,17 @@ async def _queue_hypothesis_induction() -> None:
     """HYPOTHESIS INDUCTION: when a coherent cross-agent finding cluster exists, queue it for
     Claude to unify into ONE falsifiable hypothesis (the falsifier auto-registers in the
     flywheel, so the agents then go test the conjecture — findings become science)."""
+    # PENDING CAP. Every other generator has one; this one did not, and it is the single largest
+    # producer of off-mission work: its pool is a RANDOM sample of the whole 8k-finding corpus, so
+    # each firing yields a brand-new theme that sails past the theme-dedup below. Eight of them
+    # accumulated in one day. Capping it costs nothing — an unread hypothesis is not worth a ninth.
+    if await _task_already_pending("Hypothesize from findings"):
+        return
     d = await asyncio.to_thread(_brain_get_sync, "/api/v1/agent-os/brain/hypothesis-inputs", 60)
     theme = (d or {}).get("theme", "")
     if not theme or len((d or {}).get("cluster", [])) < 3:
+        return
+    if not await _gate_filter([theme]):        # the pool is vault-wide; the board decides what leaves
         return
     covered = await asyncio.to_thread(_covered_note_themes, "hypothesis*.md")
     covered += await _pending_task_themes("Hypothesize from findings:")
@@ -2940,6 +2991,8 @@ async def _queue_replication() -> None:
     d = await asyncio.to_thread(_brain_get_sync, "/api/v1/agent-os/brain/replication-target", 30)
     t = (d or {}).get("target") or {}
     if not t.get("claim"):
+        return
+    if not await _gate_filter([t["claim"]]):      # same missing gate as the belief-challenge path
         return
     await asyncio.to_thread(
         _brain_post_sync, "/api/v1/agent-os/brain/claude-inbox",
@@ -3388,6 +3441,23 @@ _ROLE_HINT = {  # each thinker owns a real research domain
 _LOCATIONS = {k: v["tile"] for k, v in _POSTS.items()}  # throne, treasury, library, ...
 
 
+# ORGANS WITH NO ON-MISSION VERSION — switched OFF, not filtered.
+#
+# A code audit traced the off-mission work to the SELECTORS, not to a missing filter. These eight
+# choose their subject in a way that is anti-correlated with a single-product frontier and cannot be
+# repaired by gating:
+#   cartography      picks the domain pair with the FEWEST bridges — in a vault holding physics, ADHD
+#                    and category theory, the widest hole is by construction two things unrelated to
+#                    agent memory, and it is inserted at the FRONT of the hypothesis queue
+#   analogy_forge    argmax over mechanism-density across all of 04 Resources/Concepts
+#   debate / red_team / coherence_audit / contradiction_sweep / counterfactual / oracle
+#                    all read the whole vault-wide belief list, oldest-first
+#
+# Gating them would produce permanent silence dressed up as filtering, which is the thing the owner
+# objected to: "nesmu ani len vznikat a nie ze ich len budeme filtrovat". So they are off. Flip
+# ORGANS_OFFMISSION_ENABLED to bring them back if the frontier ever widens again.
+ORGANS_OFFMISSION_ENABLED = False
+
 async def ambient_life():
     """LLM-driven emergent simulation. Each agent decides its OWN goal via the LLM
     based on its persona, recent memory, who's nearby and the latest keep news — then
@@ -3420,6 +3490,12 @@ async def ambient_life():
     # watchdog's restart churn kept resetting the countdown so the dungeon rarely ran the ~400-1500
     # uninterrupted loops needed to queue a task -> the Claude inbox starved (empty for hours). Loading
     # the last loop_n from the heartbeat makes the schedule accumulate across restarts. 2026-06-19.
+    # Warm the board cache BEFORE any organ fires. `_inbox_theme_allowed` lets everything through
+    # while the cache is cold (so a brain outage cannot silence the queue), and the cache was only
+    # filled by `_gate_filter` — which just five of thirty-one organs call. On a fresh start that left
+    # a window where every path was ungated.
+    await _gate_refresh()
+
     loop_n = 0
     try:
         _hb = _HEARTBEAT_FILE.read_text(encoding="utf-8").split()
@@ -4140,30 +4216,30 @@ async def ambient_life():
         # rate (~1 wake/15 min, a few tasks each) so the bench stays stocked WITHOUT a
         # perpetual backlog that starves low-priority work. ~0.85s/tick → ~75-110 min, staggered.
         if loop_n % 3500 == 900:                       # Analogy Forge  (~50 min)
-            asyncio.create_task(_queue_analogy_forge())
+            ORGANS_OFFMISSION_ENABLED and asyncio.create_task(_queue_analogy_forge())
         if loop_n % 3300 == 1200:                      # Belief revision  (~47 min)
             asyncio.create_task(_queue_belief_challenge())
         if loop_n % 5500 == 2100:                      # The Court — structured debate  (~78 min)
-            asyncio.create_task(_run_debate())
+            ORGANS_OFFMISSION_ENABLED and asyncio.create_task(_run_debate())
         if loop_n % 2000 == 600:                       # Replication Unit (Rooke) - BOOSTED 2026-06-19 (Crucible=moat, ~28 min)
             asyncio.create_task(_queue_replication())
         if loop_n % 3000 == 1700:                      # Cartographer (Wren)  (~43 min)
-            asyncio.create_task(_queue_cartography())
+            ORGANS_OFFMISSION_ENABLED and asyncio.create_task(_queue_cartography())
         if loop_n % 6000 == 1100:                      # Kael's Red Team  (~85 min)
-            asyncio.create_task(_run_red_team())
+            ORGANS_OFFMISSION_ENABLED and asyncio.create_task(_run_red_team())
         if loop_n % 2500 == 1200:                      # Orin's Synthesis Detector  (~35 min; fires only when due)
             asyncio.create_task(_run_synthesis_detector())
         if loop_n % 6500 == 800:                       # Elara's Coherence Audit  (~92 min, offset)
-            asyncio.create_task(_run_coherence_audit())
+            ORGANS_OFFMISSION_ENABLED and asyncio.create_task(_run_coherence_audit())
         # CONTRADICTION SWEEP — find where the vault disagrees with itself (~95 min, offset).
         if loop_n % 6700 == 2400:
-            asyncio.create_task(_run_contradiction_sweep())
+            ORGANS_OFFMISSION_ENABLED and asyncio.create_task(_run_contradiction_sweep())
         # COHERENCE AUDIT — does AGORA contradict itself? one new belief per day (~daily offset).
         if loop_n % 64000 == 50000:
             asyncio.create_task(_run_coherence())
         # THE COUNTERFACTUAL SELF — weekly review of history replayed under other policies.
         if loop_n % 448000 == 330000:
-            asyncio.create_task(_queue_counterfactual_review())
+            ORGANS_OFFMISSION_ENABLED and asyncio.create_task(_queue_counterfactual_review())
         # THE THEORY ENGINE — run one mechanistic belief as a formal model (~95 min, offset).
         if loop_n % 6700 == 3000:
             asyncio.create_task(_queue_theory_run())
@@ -4175,7 +4251,7 @@ async def ambient_life():
             asyncio.create_task(_run_reply_harvest())
         # THE ORACLE — pick one live market for an independent call (~daily) + resolve (~daily).
         if loop_n % 64000 == 7000:
-            asyncio.create_task(_run_oracle_scan())
+            ORGANS_OFFMISSION_ENABLED and asyncio.create_task(_run_oracle_scan())
         if loop_n % 64000 == 33000:
             asyncio.create_task(_run_oracle_resolve())
         # THE CANON — when enough new artifacts landed, queue the living-book merge (~2 days).
