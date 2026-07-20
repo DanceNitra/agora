@@ -23,6 +23,39 @@ STATE: agora-mnemo 1.24.1 LIVE (PyPI + GitHub, 3 copies synced). brain :8000 + d
 Ask me or continue with #1.
 ```
 
+## Late-evening addendum (2026-07-20, after the first block was written)
+
+- **mnemo 1.24.1 → 1.24.3 shipped.** `claims_audit.py` (13 README claims against the PyPI wheel, sockets
+  disabled to *enforce* the no-LLM-write claim), `governance_audit.py` (the erasure sentence attacked over
+  3 scenarios x 3 repeats, incl. `derived_from` lineage, bytes-of-every-file, exactly one receipt with the
+  caller's basis, tamper detection, survival across reload), and `store_audit.py` (**MnemoStore vs
+  LangGraph's own InMemoryStore — parity on every operation**). Each has a falsification mode that MUST
+  fail, and CI fails the build if it comes back green.
+- **Two real bugs caught by our own audits, both mine from the same day:** `forget()` left no receipt so
+  `verify_writes()` called a legitimate delete "out-of-band" (1.24.0); then `forget_subject()`/`forget_pii()`
+  wrote TWO receipts per record with conflicting reasons (1.24.3) — caught only after the audit's assertion
+  was tightened from "at least one" to "exactly one".
+- **Public CI** (`.github/workflows/audit.yml`): every push + daily, Linux/Windows/macOS x Py3.10/3.12,
+  source AND published wheel, reports as artifacts, badge in README. 9/9 green.
+- **`MnemoStore` (LangGraph BaseStore) ALREADY EXISTED** — a scan agent said it was missing and I nearly
+  rebuilt it. The gap is visibility, not code: it is in no LangChain integrations page and
+  `awesome-LangGraph#88` still sits unmerged.
+- **MCP registry fixed**: the live entry advertised **0.7.19** pointing at the wrong repo; republished at
+  1.24.2 (owner device-auth; token expires, so the next bump needs another login). README 124 KB → 31 KB,
+  reference moved into `docs/`.
+- **PENDING, owner-only (web UI):** PyPI Trusted Publishing at
+  https://pypi.org/manage/project/agora-mnemo/settings/publishing/ → DanceNitra / mnemo / release.yml /
+  env `pypi`. Until then releases show `provenance=None`. `release.yml` is already written and refuses to
+  publish unless all audits + falsification controls pass.
+- **Dungeon diagnosed healthy; the Scout's "23h idle" is US.** `_queue_scout` returns early while a
+  "Scout outreach" task is pending, and the inbox holds **22 pending tasks** — including
+  `openclaw/openclaw#7707 "Memory Trust Tagging by Source"`, which is squarely mnemo territory. Read the
+  inbox with the `.pending` key; `loop_n` persists across restarts in `.dungeon_heartbeat` (2,200,595).
+- **Marat/TAT:** he ran the negative controls and honestly reported that TAT cannot separate real from
+  shuffled. Our reply (drafted, owner sends) argues the null is likely his CONTROL, not his method —
+  shuffling bins destroys the falling background, so the right control is a background-only Poisson toy
+  or a signal-free mass window.
+
 ## What happened 2026-07-20 (all shipped, pushed, released)
 
 - **mnemo 1.24.0 — a REAL bug, found by testing our own README.** The owner asked "where is it written that this
