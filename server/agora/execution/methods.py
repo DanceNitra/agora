@@ -421,6 +421,28 @@ def _norm_theme(t: str) -> str:
     return " ".join((t or "").lower().split())[:200]
 
 
+# Board-gate helpers (see match_and_run). Same shape as the dungeon gatekeeper's: content words only, and
+# a stop-list for the words the BOARD TEXT ITSELF uses to give instructions ("prioritize research that
+# ...", "every finding must answer ..."). Without that stop-list the gate matches on the board's own
+# boilerplate and passes everything — the exact bug measured on the quest-pool gate the same day.
+_BOARD_STOP = frozenset("""priority priorities prioritize prioritise research finding findings theme themes
+question questions standing owner deprioritize topic topics work make better every answer does that this
+which their they there been more most only very also into from with must should when where what have
+about test tests testing measure measured result results claim claims
+""".split()) | frozenset("""
+finance financial health longevity physics politics cloud trivia generic meta beds headline never
+""".split())
+# The second group is the board's NEGATIVE clauses ("Finance/health/physics are ONLY test-beds, never the
+# headline", "Deprioritize generic meta-science, politics, cloud/trivia"). Naively tokenizing the board
+# text turns those into PRIORITY words, so a finance or cloud theme would pass the gate on the strength of
+# the sentence telling us to deprioritize it. Measured on the real board text before this fix.
+
+
+def _theme_tokens(t: str) -> set:
+    import re as _re
+    return {w for w in _re.findall(r"[a-z0-9]+", (t or "").lower()) if len(w) > 3}
+
+
 def _match_cache_get(key: str):
     """Return a fresh cached match decision for this normalized theme, or None."""
     try:
@@ -460,6 +482,29 @@ async def match_and_run(theme: str, requester: str = "") -> dict:
     organ; matching LOGIC is unchanged (the LLM still decides on every cache MISS)."""
     import asyncio as _aio
     from agora.execution.llm_client import call_llm
+    # BOARD GATE AT THE LAB DOOR (2026-07-20). The Lab is fed by SEVERAL organs — the dungeon quest pool,
+    # the dungeon's hypothesis-induction (/brain/hypothesis-inputs), and the brain's scientist severe-test.
+    # Gating any one of them leaves the others free, which is exactly what we measured: after gating the
+    # quest pool, the next Lab runs were still amygdala-salience and heavy-tail-reward themes. This is the
+    # ONE choke point every path goes through, so the board question ("does this advance mnemo?") belongs
+    # here. Soft + self-healing: an off-board theme is refused WITHOUT burning the LLM matcher or a Lab
+    # slot, and is recorded in the gatekeeper ledger so the upstream generators stop re-seeding it.
+    # Bypasses: no board priorities set, an explicit human/API requester, or AGORA_LAB_BOARD_GATE=0.
+    if (os.getenv("AGORA_LAB_BOARD_GATE", "1") != "0"
+            and not str(requester or "").lower().startswith(("claude", "api", "owner"))):
+        try:
+            from agora.execution.board import priorities_text
+            _prio = {w for w in _theme_tokens(priorities_text()) if w not in _BOARD_STOP}
+            if _prio and not (_theme_tokens(theme) & _prio):
+                try:
+                    from agora.execution.gatekeeper import record_skip
+                    record_skip(theme[:120], "off-board: no overlap with the owner's standing priorities")
+                except Exception:
+                    pass
+                return {"status": "off_board", "theme": theme[:120],
+                        "reason": "no overlap with the board's standing priorities"}
+        except Exception:
+            pass                                   # never let the gate break the Lab
     use_cache = os.getenv("AGORA_MATCH_CACHE", "1") != "0"
     ckey = _norm_theme(theme)
     if use_cache:
