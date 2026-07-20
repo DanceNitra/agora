@@ -1,0 +1,729 @@
+{
+ "candidates": [
+  {
+   "title": "Feature: Documentation for Production Code Execution in Crews",
+   "url": "https://github.com/crewAIInc/crewAI/issues/6180",
+   "repo": "crewAIInc/crewAI",
+   "kind": "issue",
+   "source": "github",
+   "comments": 12,
+   "updated": "2026-07-20",
+   "offers": [
+    "revert to predecessor",
+    "no LLM on the write path / cost",
+    "measurement / benchmark",
+    "drop-in store for a framework"
+   ],
+   "what_we_bring": [
+    "revert(key) restores the superseded value without the caller knowing it",
+    "zero model calls at write; measured 519-917s of extraction per scenario for an LLM-on-write pipeline against none, with answer accuracy statistically indistinguishable"
+   ],
+   "excerpt": "[github issue] crewAIInc/crewAI: Feature: Documentation for Production Code Execution in Crews ## Problem CrewAI teams building production crews need documented patterns for: - Agents executing generated code safely - Lo",
+   "score": 34
+  },
+  {
+   "title": "Implement encrypted durable wallet state and crash-safe lifecycle recovery",
+   "url": "https://github.com/advatar/EUWallet/issues/16",
+   "repo": "advatar/EUWallet",
+   "kind": "issue",
+   "source": "github",
+   "comments": 23,
+   "updated": "2026-07-20",
+   "offers": [
+    "supersession / corrections that stick",
+    "memory poisoning / trust"
+   ],
+   "what_we_bring": [
+    "keyed supersession + echo_guard, deterministic, no model call on the write path",
+    "attestation + trusted_only (fails closed), echo_guard, and the honest scope: a provenance gate is authorization, NOT truth — trust_is_not_truth.py demonstrates it"
+   ],
+   "excerpt": "[github issue] advatar/EUWallet: Implement encrypted durable wallet state and crash-safe lifecycle recovery ## Launch gap The current Rust engine and demo clients keep credentials, replay state, transaction history, WUA/",
+   "score": 26
+  },
+  {
+   "title": "Feature Request: On-Device Persistent Memory with Cryptographic Identity Binding (Local Storage Architecture)",
+   "url": "https://github.com/deepseek-ai/DeepSeek-V3/issues/1121",
+   "repo": "deepseek-ai/DeepSeek-V3",
+   "kind": "issue",
+   "source": "github",
+   "comments": 210,
+   "updated": "2026-07-20",
+   "offers": [
+    "no LLM on the write path / cost",
+    "memory poisoning / trust"
+   ],
+   "what_we_bring": [
+    "zero model calls at write; measured 519-917s of extraction per scenario for an LLM-on-write pipeline against none, with answer accuracy statistically indistinguishable",
+    "attestation + trusted_only (fails closed), echo_guard, and the honest scope: a provenance gate is authorization, NOT truth — trust_is_not_truth.py demonstrates it"
+   ],
+   "excerpt": "[github issue] deepseek-ai/DeepSeek-V3: Feature Request: On-Device Persistent Memory with Cryptographic Identity Binding (Local Storage Architecture) 1. Problem Statement: Session Isolation & Identity Amnesia Current Dee",
+   "score": 26
+  },
+  {
+   "title": "[BOUNTY $100] 🐜The Memanto Bug & Exploit Challenge",
+   "url": "https://github.com/moorcheh-ai/memanto/issues/770",
+   "repo": "moorcheh-ai/memanto",
+   "kind": "issue",
+   "source": "github",
+   "comments": 226,
+   "updated": "2026-07-20",
+   "offers": [
+    "supersession / corrections that stick",
+    "measurement / benchmark"
+   ],
+   "what_we_bring": [
+    "keyed supersession + echo_guard, deterministic, no model call on the write path",
+    "published pre-registered harness with the null included (benchmarks/memops), plus RAMR"
+   ],
+   "excerpt": "[github issue] moorcheh-ai/memanto: [BOUNTY $100] 🐜The Memanto Bug & Exploit Challenge ## Description In our last bounty, we asked the community to benchmark **Memanto** against the competition. You helped us prove that ",
+   "score": 26
+  },
+  {
+   "title": "User experience of Bonsai-Ternary-27B on 4060Ti 16GB for KB management and productivity assistant use cases",
+   "url": "https://reddit.com/r/LocalLLaMA/comments/1uz0z0t/user_experience_of_bonsaiternary27b_on_4060ti/",
+   "repo": "r/LocalLLaMA",
+   "kind": "thread",
+   "source": "reddit",
+   "comments": 41,
+   "updated": "2026-07-17",
+   "offers": [
+    "measurement / benchmark",
+    "drop-in store for a framework"
+   ],
+   "what_we_bring": [
+    "published pre-registered harness with the null included (benchmarks/memops), plus RAMR",
+    "MnemoStore passes an operation-by-operation parity audit against LangGraph's own InMemoryStore; CrewAI adapter and an MCP server ship in the package"
+   ],
+   "excerpt": "[reddit r/LocalLLaMA] User experience of Bonsai-Ternary-27B on 4060Ti 16GB for KB management and productivity assistant use cases Howdy folks, Long time reader here. This time, I would like to share my experience with th",
+   "score": 25
+  },
+  {
+   "title": "Program: distributed actors, durable delivery, and arbitrary-node XMPP resume",
+   "url": "https://github.com/waddle-social/waddle/issues/1425",
+   "repo": "waddle-social/waddle",
+   "kind": "issue",
+   "source": "github",
+   "comments": 12,
+   "updated": "2026-07-20",
+   "offers": [
+    "memory poisoning / trust"
+   ],
+   "what_we_bring": [
+    "attestation + trusted_only (fails closed), echo_guard, and the honest scope: a provenance gate is authorization, NOT truth — trust_is_not_truth.py demonstrates it"
+   ],
+   "excerpt": "[github issue] waddle-social/waddle: Program: distributed actors, durable delivery, and arbitrary-node XMPP resume ## Objective Any healthy, ready Waddle node may terminate a WebSocket. The physical socket remains node-l",
+   "score": 22
+  },
+  {
+   "title": "Feature Request: Memory Trust Tagging by Source",
+   "url": "https://github.com/openclaw/openclaw/issues/7707",
+   "repo": "openclaw/openclaw",
+   "kind": "issue",
+   "source": "github",
+   "comments": 19,
+   "updated": "2026-07-20",
+   "offers": [
+    "memory poisoning / trust"
+   ],
+   "what_we_bring": [
+    "attestation + trusted_only (fails closed), echo_guard, and the honest scope: a provenance gate is authorization, NOT truth — trust_is_not_truth.py demonstrates it"
+   ],
+   "excerpt": "[github issue] openclaw/openclaw: Feature Request: Memory Trust Tagging by Source **Feature:** Tag agent memory entries by trust level based on their origin (user commands, web scrapes, third-party skills). **Use case:**",
+   "score": 22
+  },
+  {
+   "title": "[FR] Add Mem0 tracing integration via mlflow.mem0.autolog()",
+   "url": "https://github.com/mlflow/mlflow/issues/24191",
+   "repo": "mlflow/mlflow",
+   "kind": "issue",
+   "source": "github",
+   "comments": 10,
+   "updated": "2026-07-20",
+   "offers": [
+    "drop-in store for a framework"
+   ],
+   "what_we_bring": [
+    "MnemoStore passes an operation-by-operation parity audit against LangGraph's own InMemoryStore; CrewAI adapter and an MCP server ship in the package"
+   ],
+   "excerpt": "[github issue] mlflow/mlflow: [FR] Add Mem0 tracing integration via mlflow.mem0.autolog() <!-- issue-warning --> > [!WARNING] > Before submitting a PR, please make sure that: > - A maintainer has triaged this issue and a",
+   "score": 22
+  },
+  {
+   "title": "feat: Idempotency-Key support on pack run routes — safe client retries without double LLM spend",
+   "url": "https://github.com/Brescou/langgraph-agent-stack/issues/101",
+   "repo": "Brescou/langgraph-agent-stack",
+   "kind": "issue",
+   "source": "github",
+   "comments": 6,
+   "updated": "2026-07-20",
+   "offers": [
+    "no LLM on the write path / cost",
+    "drop-in store for a framework"
+   ],
+   "what_we_bring": [
+    "zero model calls at write; measured 519-917s of extraction per scenario for an LLM-on-write pipeline against none, with answer accuracy statistically indistinguishable",
+    "MnemoStore passes an operation-by-operation parity audit against LangGraph's own InMemoryStore; CrewAI adapter and an MCP server ship in the package"
+   ],
+   "excerpt": "[github issue] Brescou/langgraph-agent-stack: feat: Idempotency-Key support on pack run routes — safe client retries without double LLM spend ## Context A client that times out and retries a pack run pays for the LLM cal",
+   "score": 22
+  },
+  {
+   "title": "Example proposal: optional causal audit for agent action traces",
+   "url": "https://github.com/crewAIInc/crewAI/issues/6063",
+   "repo": "crewAIInc/crewAI",
+   "kind": "issue",
+   "source": "github",
+   "comments": 28,
+   "updated": "2026-07-20",
+   "offers": [
+    "drop-in store for a framework"
+   ],
+   "what_we_bring": [
+    "MnemoStore passes an operation-by-operation parity audit against LangGraph's own InMemoryStore; CrewAI adapter and an MCP server ship in the package"
+   ],
+   "excerpt": "[github issue] crewAIInc/crewAI: Example proposal: optional causal audit for agent action traces Hi CrewAI maintainers, I’m exploring a small optional integration idea around agent workflow auditability. I maintain `caus",
+   "score": 22
+  },
+  {
+   "title": "🚨 Security: 2 critical & 4 high vulnerabilities found in project dependencies",
+   "url": "https://github.com/tbrandenburg/pyrag/issues/34",
+   "repo": "tbrandenburg/pyrag",
+   "kind": "issue",
+   "source": "github",
+   "comments": 51,
+   "updated": "2026-07-20",
+   "offers": [
+    "memory poisoning / trust"
+   ],
+   "what_we_bring": [
+    "attestation + trusted_only (fails closed), echo_guard, and the honest scope: a provenance gate is authorization, NOT truth — trust_is_not_truth.py demonstrates it"
+   ],
+   "excerpt": "[github issue] tbrandenburg/pyrag: 🚨 Security: 2 critical & 4 high vulnerabilities found in project dependencies ## Security Vulnerability Scan Results A security audit using `pip-audit` against the project's locked depe",
+   "score": 22
+  },
+  {
+   "title": "[V4.6 Epic] Frontier operational memory and honest evaluation",
+   "url": "https://github.com/100yenadmin/hermes-lcm/issues/1",
+   "repo": "100yenadmin/hermes-lcm",
+   "kind": "issue",
+   "source": "github",
+   "comments": 52,
+   "updated": "2026-07-20",
+   "offers": [
+    "measurement / benchmark"
+   ],
+   "what_we_bring": [
+    "published pre-registered harness with the null included (benchmarks/memops), plus RAMR"
+   ],
+   "excerpt": "[github issue] 100yenadmin/hermes-lcm: [V4.6 Epic] Frontier operational memory and honest evaluation # Goal Evolve the integrated Hermes-LCM capability baseline into a production-relevant frontier operational memory subs",
+   "score": 22
+  },
+  {
+   "title": "Add bbox-preserving OCR for scanned, mixed, and two-page PDFs",
+   "url": "https://github.com/erniesg/erniesg/issues/26",
+   "repo": "erniesg/erniesg",
+   "kind": "issue",
+   "source": "github",
+   "comments": 9,
+   "updated": "2026-07-20",
+   "offers": [
+    "memory poisoning / trust"
+   ],
+   "what_we_bring": [
+    "attestation + trusted_only (fails closed), echo_guard, and the honest scope: a provenance gate is authorization, NOT truth — trust_is_not_truth.py demonstrates it"
+   ],
+   "excerpt": "[github issue] erniesg/erniesg: Add bbox-preserving OCR for scanned, mixed, and two-page PDFs <!-- rucksack-issue-spec:014 --> <!-- rucksack-issue-source:v1 path=docs/issues/014-bbox-preserving-ocr.md spec=014 commit=7c4",
+   "score": 21
+  },
+  {
+   "title": "Feature Request: Correct & Forget operations for memory lifecycle management",
+   "url": "https://github.com/vectorize-io/hindsight/issues/2696",
+   "repo": "vectorize-io/hindsight",
+   "kind": "issue",
+   "source": "github",
+   "comments": 5,
+   "updated": "2026-07-20",
+   "offers": [
+    "supersession / corrections that stick",
+    "receipted erasure / GDPR delete"
+   ],
+   "what_we_bring": [
+    "keyed supersession + echo_guard, deterministic, no model call on the write path",
+    "forget_subject() erases through derived_from lineage and emits a hash-chained, content-free receipt; audited by governance_audit.py across 3 scenarios x 3 repeats"
+   ],
+   "excerpt": "[github issue] vectorize-io/hindsight: Feature Request: Correct & Forget operations for memory lifecycle management ## Problem Hindsight has no intentional mechanism to handle outdated, incorrect, or no-longer-relevant m",
+   "score": 21
+  },
+  {
+   "title": "You guys asked for it: my local coding agent (llama.cpp + MCP delegation from Claude) is now public — MIT, with a full guide to my daily-dri",
+   "url": "https://reddit.com/r/LocalLLaMA/comments/1v04rsv/you_guys_asked_for_it_my_local_coding_agent/",
+   "repo": "r/LocalLLaMA",
+   "kind": "thread",
+   "source": "reddit",
+   "comments": 13,
+   "updated": "2026-07-18",
+   "offers": [
+    "drop-in store for a framework"
+   ],
+   "what_we_bring": [
+    "MnemoStore passes an operation-by-operation parity audit against LangGraph's own InMemoryStore; CrewAI adapter and an MCP server ship in the package"
+   ],
+   "excerpt": "[reddit r/LocalLLaMA] You guys asked for it: my local coding agent (llama.cpp + MCP delegation from Claude) is now public — MIT, with a full guide to my daily-driver rig Several fellow members here have asked me for this",
+   "score": 21
+  },
+  {
+   "title": "Qwen 3.6 27B is solid up to 262K context. How high have you guys gone above that using Rope/Yarn scaling?",
+   "url": "https://reddit.com/r/LocalLLaMA/comments/1uxstxs/qwen_36_27b_is_solid_up_to_262k_context_how_high/",
+   "repo": "r/LocalLLaMA",
+   "kind": "thread",
+   "source": "reddit",
+   "comments": 107,
+   "updated": "2026-07-16",
+   "offers": [
+    "drop-in store for a framework"
+   ],
+   "what_we_bring": [
+    "MnemoStore passes an operation-by-operation parity audit against LangGraph's own InMemoryStore; CrewAI adapter and an MCP server ship in the package"
+   ],
+   "excerpt": "[reddit r/LocalLLaMA] Qwen 3.6 27B is solid up to 262K context. How high have you guys gone above that using Rope/Yarn scaling? Stack: * i7 12700K | RTX 3090 TI | 96GB RAM * Qwen 3.6 27B Q3/Q4/Q5 KXL UD I've been pushing",
+   "score": 21
+  },
+  {
+   "title": "Maxing out 64GB of RAM - Qwen3.5 122B A10B at UD-Q2_K_XL w/ MTP fully replaced Qwen3 Next 80B at UD-Q4_K_XL for me",
+   "url": "https://reddit.com/r/LocalLLaMA/comments/1uxkltr/maxing_out_64gb_of_ram_qwen35_122b_a10b_at_udq2_k/",
+   "repo": "r/LocalLLaMA",
+   "kind": "thread",
+   "source": "reddit",
+   "comments": 25,
+   "updated": "2026-07-15",
+   "offers": [
+    "supersession / corrections that stick"
+   ],
+   "what_we_bring": [
+    "keyed supersession + echo_guard, deterministic, no model call on the write path"
+   ],
+   "excerpt": "[reddit r/LocalLLaMA] Maxing out 64GB of RAM - Qwen3.5 122B A10B at UD-Q2_K_XL w/ MTP fully replaced Qwen3 Next 80B at UD-Q4_K_XL for me I've got 64GB of regular RAM, and I ran Qwen3 Next 80B at UD-Q4\\_K\\_XL, enjoying bo",
+   "score": 21
+  },
+  {
+   "title": "PrismML’s new Ternary Qwen3.6 27B runs near fp16 precision on 10GB of memory!!!",
+   "url": "https://reddit.com/r/LocalLLaMA/comments/1uwehzt/prismmls_new_ternary_qwen36_27b_runs_near_fp16/",
+   "repo": "r/LocalLLaMA",
+   "kind": "thread",
+   "source": "reddit",
+   "comments": 125,
+   "updated": "2026-07-14",
+   "offers": [
+    "measurement / benchmark"
+   ],
+   "what_we_bring": [
+    "published pre-registered harness with the null included (benchmarks/memops), plus RAMR"
+   ],
+   "excerpt": "[reddit r/LocalLLaMA] PrismML’s new Ternary Qwen3.6 27B runs near fp16 precision on 10GB of memory!!! &gt;**EDIT**: \"near fp16 precision\" I intended **performance** in terms of benchmarks/output. Obviously 1,0,-1 cannot ",
+   "score": 21
+  },
+  {
+   "title": "Wire layered memory (org/agent/project) into the working loop on a durable substrate",
+   "url": "https://github.com/Aureliolo/synthorg/pull/2615",
+   "repo": "Aureliolo/synthorg",
+   "kind": "pr",
+   "source": "github",
+   "comments": 7,
+   "updated": "2026-07-20",
+   "offers": [
+    "memory poisoning / trust",
+    "drop-in store for a framework"
+   ],
+   "what_we_bring": [
+    "attestation + trusted_only (fails closed), echo_guard, and the honest scope: a provenance gate is authorization, NOT truth — trust_is_not_truth.py demonstrates it",
+    "MnemoStore passes an operation-by-operation parity audit against LangGraph's own InMemoryStore; CrewAI adapter and an MCP server ship in the package"
+   ],
+   "excerpt": "[github pr] Aureliolo/synthorg: Wire layered memory (org/agent/project) into the working loop on a durable substrate ## What this does Makes three-layer memory (org / agent / project) actually reach a working agent's con",
+   "score": 20
+  },
+  {
+   "title": "Add Voyage AI as an Embedding Provider",
+   "url": "https://github.com/mem0ai/mem0/issues/4838",
+   "repo": "mem0ai/mem0",
+   "kind": "issue",
+   "source": "github",
+   "comments": 3,
+   "updated": "2026-07-20",
+   "offers": [
+    "measurement / benchmark",
+    "drop-in store for a framework"
+   ],
+   "what_we_bring": [
+    "published pre-registered harness with the null included (benchmarks/memops), plus RAMR",
+    "MnemoStore passes an operation-by-operation parity audit against LangGraph's own InMemoryStore; CrewAI adapter and an MCP server ship in the package"
+   ],
+   "excerpt": "[github issue] mem0ai/mem0: Add Voyage AI as an Embedding Provider ### Component Core / Python SDK ### Description ### Use Case Voyage AI offers high-quality embedding models (voyage-3, voyage-3-lite, voyage-code-3) that",
+   "score": 19
+  },
+  {
+   "title": "Architecture Proposal: \"Differential\" Local Memory Provider (Zero-DB Overhead via Serverless WFA & JSON)",
+   "url": "https://github.com/mem0ai/mem0/issues/4978",
+   "repo": "mem0ai/mem0",
+   "kind": "issue",
+   "source": "github",
+   "comments": 7,
+   "updated": "2026-07-20",
+   "offers": [
+    "no LLM on the write path / cost"
+   ],
+   "what_we_bring": [
+    "zero model calls at write; measured 519-917s of extraction per scenario for an LLM-on-write pipeline against none, with answer accuracy statistically indistinguishable"
+   ],
+   "excerpt": "[github issue] mem0ai/mem0: Architecture Proposal: \"Differential\" Local Memory Provider (Zero-DB Overhead via Serverless WFA & JSON) ### Component Core / Python SDK ### Description 1. The Current Bottleneck for Local Age",
+   "score": 19
+  },
+  {
+   "title": "Add max_memories config with automatic compaction (merge-first, evict-fallback)",
+   "url": "https://github.com/mem0ai/mem0/issues/5850",
+   "repo": "mem0ai/mem0",
+   "kind": "issue",
+   "source": "github",
+   "comments": 3,
+   "updated": "2026-07-20",
+   "offers": [
+    "no LLM on the write path / cost",
+    "measurement / benchmark"
+   ],
+   "what_we_bring": [
+    "zero model calls at write; measured 519-917s of extraction per scenario for an LLM-on-write pipeline against none, with answer accuracy statistically indistinguishable",
+    "published pre-registered harness with the null included (benchmarks/memops), plus RAMR"
+   ],
+   "excerpt": "[github issue] mem0ai/mem0: Add max_memories config with automatic compaction (merge-first, evict-fallback) ### Component Core / Python SDK ### Description ### Use Case What problem are you trying to solve? The v3 ADD-on",
+   "score": 19
+  },
+  {
+   "title": "Harden agent orchestration layer + RAG-grounded tutoring (Phase 0 + Phase 1)",
+   "url": "https://github.com/DavidRoyBlue/Autodidact/pull/22",
+   "repo": "DavidRoyBlue/Autodidact",
+   "kind": "pr",
+   "source": "github",
+   "comments": 6,
+   "updated": "2026-07-20",
+   "offers": [
+    "no LLM on the write path / cost",
+    "drop-in store for a framework"
+   ],
+   "what_we_bring": [
+    "zero model calls at write; measured 519-917s of extraction per scenario for an LLM-on-write pipeline against none, with answer accuracy statistically indistinguishable",
+    "MnemoStore passes an operation-by-operation parity audit against LangGraph's own InMemoryStore; CrewAI adapter and an MCP server ship in the package"
+   ],
+   "excerpt": "[github pr] DavidRoyBlue/Autodidact: Harden agent orchestration layer + RAG-grounded tutoring (Phase 0 + Phase 1) ## Summary Production-hardening of the LangGraph agent orchestration layer, plus the first capability trac",
+   "score": 19
+  },
+  {
+   "title": "🐛 Bug: Agent failed to execute: 'messages'",
+   "url": "https://github.com/CopilotKit/CopilotKit/issues/2215",
+   "repo": "CopilotKit/CopilotKit",
+   "kind": "issue",
+   "source": "github",
+   "comments": 5,
+   "updated": "2026-07-20",
+   "offers": [
+    "drop-in store for a framework"
+   ],
+   "what_we_bring": [
+    "MnemoStore passes an operation-by-operation parity audit against LangGraph's own InMemoryStore; CrewAI adapter and an MCP server ship in the package"
+   ],
+   "excerpt": "[github issue] CopilotKit/CopilotKit: 🐛 Bug: Agent failed to execute: 'messages' ### ♻️ Reproduction Steps My setup: * FastAPI server with langgraph agent accessible through add_fastapi_endpoint / CopilotKitRemoteEndpoin",
+   "score": 17
+  },
+  {
+   "title": "trusty-search embeddings ~19× slower than mcp-vector-search (fp16/MPS) — structural, no env-var fix",
+   "url": "https://github.com/bobmatnyc/trusty-tools/issues/3486",
+   "repo": "bobmatnyc/trusty-tools",
+   "kind": "issue",
+   "source": "github",
+   "comments": 5,
+   "updated": "2026-07-20",
+   "offers": [
+    "measurement / benchmark"
+   ],
+   "what_we_bring": [
+    "published pre-registered harness with the null included (benchmarks/memops), plus RAMR"
+   ],
+   "excerpt": "[github issue] bobmatnyc/trusty-tools: trusty-search embeddings ~19× slower than mcp-vector-search (fp16/MPS) — structural, no env-var fix ## Benchmark Finding A controlled, same-corpus (8,000 chunks) benchmark on an App",
+   "score": 17
+  },
+  {
+   "title": "Delete documents from knowledge in UI",
+   "url": "https://github.com/bbvch-ai/aihub-core/issues/609",
+   "repo": "bbvch-ai/aihub-core",
+   "kind": "issue",
+   "source": "github",
+   "comments": 5,
+   "updated": "2026-07-20",
+   "offers": [
+    "supersession / corrections that stick"
+   ],
+   "what_we_bring": [
+    "keyed supersession + echo_guard, deterministic, no model call on the write path"
+   ],
+   "excerpt": "[github issue] bbvch-ai/aihub-core: Delete documents from knowledge in UI ## Problem Users can upload documents to a knowledge namespace in the UI, but there is no way to remove them. Once a document is ingested it stays",
+   "score": 17
+  },
+  {
+   "title": "RESEARCH: prevent the \"git checkout wipes uncommitted edits\" revert-check footgun (recurring)",
+   "url": "https://github.com/avidrucker/pycats/issues/791",
+   "repo": "avidrucker/pycats",
+   "kind": "issue",
+   "source": "github",
+   "comments": 1,
+   "updated": "2026-07-20",
+   "offers": [
+    "receipted erasure / GDPR delete",
+    "revert to predecessor"
+   ],
+   "what_we_bring": [
+    "forget_subject() erases through derived_from lineage and emits a hash-chained, content-free receipt; audited by governance_audit.py across 3 scenarios x 3 repeats",
+    "revert(key) restores the superseded value without the caller knowing it"
+   ],
+   "excerpt": "[github issue] avidrucker/pycats: RESEARCH: prevent the \"git checkout wipes uncommitted edits\" revert-check footgun (recurring) **Role.** RESEARCH · scope: moderate (survey → recommend one canonical method → note guidanc",
+   "score": 17
+  },
+  {
+   "title": "Add knowledge graph reasoning and semantic rules",
+   "url": "https://github.com/mthotaml/EchoSense-Platform-Specification/issues/10",
+   "repo": "mthotaml/EchoSense-Platform-Specification",
+   "kind": "issue",
+   "source": "github",
+   "comments": 0,
+   "updated": "2026-07-20",
+   "offers": [
+    "supersession / corrections that stick",
+    "memory poisoning / trust"
+   ],
+   "what_we_bring": [
+    "keyed supersession + echo_guard, deterministic, no model call on the write path",
+    "attestation + trusted_only (fails closed), echo_guard, and the honest scope: a provenance gate is authorization, NOT truth — trust_is_not_truth.py demonstrates it"
+   ],
+   "excerpt": "[github issue] mthotaml/EchoSense-Platform-Specification: Add knowledge graph reasoning and semantic rules ## Goal Extend the EchoSense Knowledge Graph from memory storage into an auditable semantic reasoning substrate. ",
+   "score": 16
+  },
+  {
+   "title": "[WR] ADD Phi-4-reasoning",
+   "url": "https://github.com/midnghtsapphire/revvel-standards/issues/16218",
+   "repo": "midnghtsapphire/revvel-standards",
+   "kind": "issue",
+   "source": "github",
+   "comments": 43,
+   "updated": "2026-07-20",
+   "offers": [
+    "measurement / benchmark"
+   ],
+   "what_we_bring": [
+    "published pre-registered harness with the null included (benchmarks/memops), plus RAMR"
+   ],
+   "excerpt": "[github issue] midnghtsapphire/revvel-standards: [WR] ADD Phi-4-reasoning ### Output Type (required) production-app ### PDF pipeline batch Not applicable ### Research Mode deepresearch ### Delivery Mode build-direct ### ",
+   "score": 14
+  },
+  {
+   "title": "Optimization: Remove unused \"linked_memory_ids\" from extraction prompt schema to reduce token consumption",
+   "url": "https://github.com/mem0ai/mem0/issues/4970",
+   "repo": "mem0ai/mem0",
+   "kind": "issue",
+   "source": "github",
+   "comments": 2,
+   "updated": "2026-07-20",
+   "offers": [
+    "no LLM on the write path / cost"
+   ],
+   "what_we_bring": [
+    "zero model calls at write; measured 519-917s of extraction per scenario for an LLM-on-write pipeline against none, with answer accuracy statistically indistinguishable"
+   ],
+   "excerpt": "[github issue] mem0ai/mem0: Optimization: Remove unused \"linked_memory_ids\" from extraction prompt schema to reduce token consumption ### Component Core / Python SDK ### Description ### Use Case Currently, the `ADDITIVE_",
+   "score": 14
+  },
+  {
+   "title": "[DEV] Aperio Components Audit Plan",
+   "url": "https://github.com/BaiGanio/aperio/issues/205",
+   "repo": "BaiGanio/aperio",
+   "kind": "issue",
+   "source": "github",
+   "comments": 2,
+   "updated": "2026-07-20",
+   "offers": [
+    "receipted erasure / GDPR delete"
+   ],
+   "what_we_bring": [
+    "forget_subject() erases through derived_from lineage and emits a hash-chained, content-free receipt; audited by governance_audit.py across 3 scenarios x 3 repeats"
+   ],
+   "excerpt": "[github issue] BaiGanio/aperio: [DEV] Aperio Components Audit Plan > For Aperio developers. Pick a component, read its entry, then drill into the key files. > Each entry stands alone — you don't need to read the whole pl",
+   "score": 14
+  },
+  {
+   "title": "feat(kilo-plugin): add @mem0/kilo-plugin for cross-session memory",
+   "url": "https://github.com/mem0ai/mem0/pull/5617",
+   "repo": "mem0ai/mem0",
+   "kind": "pr",
+   "source": "github",
+   "comments": 5,
+   "updated": "2026-07-20",
+   "offers": [
+    "drop-in store for a framework"
+   ],
+   "what_we_bring": [
+    "MnemoStore passes an operation-by-operation parity audit against LangGraph's own InMemoryStore; CrewAI adapter and an MCP server ship in the package"
+   ],
+   "excerpt": "[github pr] mem0ai/mem0: feat(kilo-plugin): add @mem0/kilo-plugin for cross-session memory ## Linked Issue Closes #5606 ## Description Adds a first-class **Kilo** integration under `integrations/kilo-plugin/` (`@mem0/kil",
+   "score": 14
+  },
+  {
+   "title": "feat(langgraph-v36): Class Deep-Dives Vol. 36 — Pregel internals, channels, store, task scheduling",
+   "url": "https://github.com/CodeHalwell/AgentGuides/pull/276",
+   "repo": "CodeHalwell/AgentGuides",
+   "kind": "pr",
+   "source": "github",
+   "comments": 1,
+   "updated": "2026-07-20",
+   "offers": [
+    "supersession / corrections that stick",
+    "drop-in store for a framework"
+   ],
+   "what_we_bring": [
+    "keyed supersession + echo_guard, deterministic, no model call on the write path",
+    "MnemoStore passes an operation-by-operation parity audit against LangGraph's own InMemoryStore; CrewAI adapter and an MCP server ship in the package"
+   ],
+   "excerpt": "[github pr] CodeHalwell/AgentGuides: feat(langgraph-v36): Class Deep-Dives Vol. 36 — Pregel internals, channels, store, task scheduling ## Summary - Adds **Class Deep-Dives Vol. 36** (`langgraph_class_deep_dives_v36.md`)",
+   "score": 14
+  },
+  {
+   "title": "RFC: per-capsule fs namespacing â€” capability â‰  ownership in shared workspace",
+   "url": "https://github.com/astrid-runtime/astrid/issues/755",
+   "repo": "astrid-runtime/astrid",
+   "kind": "issue",
+   "source": "github",
+   "comments": 1,
+   "updated": "2026-07-20",
+   "offers": [
+    "memory poisoning / trust"
+   ],
+   "what_we_bring": [
+    "attestation + trusted_only (fails closed), echo_guard, and the honest scope: a provenance gate is authorization, NOT truth — trust_is_not_truth.py demonstrates it"
+   ],
+   "excerpt": "[github issue] astrid-runtime/astrid: RFC: per-capsule fs namespacing â€” capability â‰ ownership in shared workspace ## Threat model Astrid is heading toward an untrusted-capsule deployment where an LLM can be persuaded",
+   "score": 13
+  },
+  {
+   "title": "Spec: Organization admin panel with server-side Scan Record store",
+   "url": "https://github.com/madamski9/AI-Powered-Phishing-Detection/issues/86",
+   "repo": "madamski9/AI-Powered-Phishing-Detection",
+   "kind": "issue",
+   "source": "github",
+   "comments": 1,
+   "updated": "2026-07-20",
+   "offers": [
+    "no LLM on the write path / cost"
+   ],
+   "what_we_bring": [
+    "zero model calls at write; measured 519-917s of extraction per scenario for an LLM-on-write pipeline against none, with answer accuracy statistically indistinguishable"
+   ],
+   "excerpt": "[github issue] madamski9/AI-Powered-Phishing-Detection: Spec: Organization admin panel with server-side Scan Record store > Spec produced by `/to-spec`. Realizes **ADR-0003** (`docs/adr/0003-org-admin-panel-and-scan-reco",
+   "score": 13
+  },
+  {
+   "title": "memory CRUD silently degrades to a sql.js whole-image rename-over that can corrupt WAL databases under concurrent native writers",
+   "url": "https://github.com/ruvnet/ruflo/issues/2735",
+   "repo": "ruvnet/ruflo",
+   "kind": "issue",
+   "source": "github",
+   "comments": 1,
+   "updated": "2026-07-20",
+   "offers": [
+    "receipted erasure / GDPR delete"
+   ],
+   "what_we_bring": [
+    "forget_subject() erases through derived_from lineage and emits a hash-chained, content-free receipt; audited by governance_audit.py across 3 scenarios x 3 repeats"
+   ],
+   "excerpt": "[github issue] ruvnet/ruflo: memory CRUD silently degrades to a sql.js whole-image rename-over that can corrupt WAL databases under concurrent native writers ## Summary Every memory CRUD operation in `@claude-flow/cli` (",
+   "score": 13
+  },
+  {
+   "title": "Evaluate: Compound Engineering Plugin — 37 Skills + Compounding Knowledge Paradigm (⭐17.9K)",
+   "url": "https://github.com/greeves89/AI-Employee/issues/189",
+   "repo": "greeves89/AI-Employee",
+   "kind": "issue",
+   "source": "github",
+   "comments": 1,
+   "updated": "2026-07-20",
+   "offers": [
+    "measurement / benchmark"
+   ],
+   "what_we_bring": [
+    "published pre-registered harness with the null included (benchmarks/memops), plus RAMR"
+   ],
+   "excerpt": "[github issue] greeves89/AI-Employee: Evaluate: Compound Engineering Plugin — 37 Skills + Compounding Knowledge Paradigm (⭐17.9K) ## Compound Engineering Plugin — Systematisches Wissens-Compounding für Agent-Teams **Repo",
+   "score": 13
+  },
+  {
+   "title": "docs(langgraph): Add Class Deep-Dives Vol. 34 — 10 source-verified class groups (langgraph==1.2.7)",
+   "url": "https://github.com/CodeHalwell/AgentGuides/pull/268",
+   "repo": "CodeHalwell/AgentGuides",
+   "kind": "pr",
+   "source": "github",
+   "comments": 0,
+   "updated": "2026-07-20",
+   "offers": [
+    "revert to predecessor",
+    "drop-in store for a framework"
+   ],
+   "what_we_bring": [
+    "revert(key) restores the superseded value without the caller knowing it",
+    "MnemoStore passes an operation-by-operation parity audit against LangGraph's own InMemoryStore; CrewAI adapter and an MCP server ship in the package"
+   ],
+   "excerpt": "[github pr] CodeHalwell/AgentGuides: docs(langgraph): Add Class Deep-Dives Vol. 34 — 10 source-verified class groups (langgraph==1.2.7) ## Summary - **New guide**: `langgraph_class_deep_dives_v34.md` (sidebar order 65) —",
+   "score": 13
+  },
+  {
+   "title": "Infra/state persistence threads",
+   "url": "https://github.com/hyunseo-and-children/jarvis-ai/pull/46",
+   "repo": "hyunseo-and-children/jarvis-ai",
+   "kind": "pr",
+   "source": "github",
+   "comments": 0,
+   "updated": "2026-07-20",
+   "offers": [
+    "revert to predecessor",
+    "drop-in store for a framework"
+   ],
+   "what_we_bring": [
+    "revert(key) restores the superseded value without the caller knowing it",
+    "MnemoStore passes an operation-by-operation parity audit against LangGraph's own InMemoryStore; CrewAI adapter and an MCP server ship in the package"
+   ],
+   "excerpt": "[github pr] hyunseo-and-children/jarvis-ai: Infra/state persistence threads 설명 ## Summary - ThreadFilterStore·CartStateStore·RevertStore(멀티턴 필터/직전 추천/소모품 억제 되돌리기)를 인메모리 dict placeholder에서 LangGraph BaseStore(AsyncPostgre",
+   "score": 13
+  },
+  {
+   "title": "W7D5: multistate-agent-svc three-node LangGraph capstone",
+   "url": "https://github.com/AI-Native-2026-05-26-Intuit/shrasti-pandey-multi-state/pull/32",
+   "repo": "AI-Native-2026-05-26-Intuit/shrasti-pandey-multi-state",
+   "kind": "pr",
+   "source": "github",
+   "comments": 4,
+   "updated": "2026-07-20",
+   "offers": [
+    "drop-in store for a framework"
+   ],
+   "what_we_bring": [
+    "MnemoStore passes an operation-by-operation parity audit against LangGraph's own InMemoryStore; CrewAI adapter and an MCP server ship in the package"
+   ],
+   "excerpt": "[github pr] AI-Native-2026-05-26-Intuit/shrasti-pandey-multi-state: W7D5: multistate-agent-svc three-node LangGraph capstone ## Summary - New sibling project `multistate-agent-svc/`: supervisor-routed three-node LangGrap",
+   "score": 13
+  }
+ ],
+ "total_matching": 53,
+ "library_scanned": 200,
+ "demand_by_offer": {
+  "drop-in store for a framework": 20,
+  "measurement / benchmark": 11,
+  "supersession / corrections that stick": 11,
+  "memory poisoning / trust": 11,
+  "no LLM on the write path / cost": 9,
+  "receipted erasure / GDPR delete": 5,
+  "revert to predecessor": 4
+ }
+}

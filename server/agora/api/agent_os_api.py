@@ -1838,6 +1838,20 @@ async def brain_scout_record(request: Request):
     return {"status": "ok" if r else "duplicate", "record": r}
 
 
+@router.get("/brain/contribute/shortlist")
+async def brain_contribute_shortlist(limit: int = 25):
+    """WHERE WE CAN ACTUALLY HELP — the external library filtered down to threads where something we
+    have SHIPPED answers what is being asked, ranked by liveness and fit.
+
+    Conservative on purpose: a thread has to be about memory at all before any offer of ours counts,
+    and the offer has to point at working code rather than an intention. A bad pitch in a busy thread
+    costs more than silence.
+    """
+    import asyncio as _aio
+    from agora.execution.contribution_finder import find
+    return {"status": "ok", **await _aio.to_thread(find, limit)}
+
+
 @router.post("/brain/library/external/harvest")
 async def brain_external_harvest(request: Request):
     """Pull the next slice of the query bank from GitHub + Reddit into the external library."""
