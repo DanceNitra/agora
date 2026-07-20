@@ -1405,6 +1405,23 @@ _INBOX_ALWAYS = ("learn from outcomes", "forge ideas", "synthesize roadmap", "sc
                  "cc:", "build:", "number-picks", "compose outreach")
 
 
+# Subjects the board explicitly refuses, kept separate from what it asks for. Derived from the tail of
+# the standing priorities ("ONLY test-beds, never the headline" + "Deprioritize ...") — these are the
+# words a naive tokenizer turned into permissions.
+_BOARD_BANNED = {"physics", "finance", "health", "politics", "trivia", "cloud", "meta", "science",
+                 "statistics", "neuroscience", "adhd", "longevity", "trading", "crypto", "fmri",
+                 "psychology", "biology", "climate", "economics"}
+
+# The SUBJECT has to be ours, not merely a word the board happens to contain. Matching any board token
+# let "Specification curve correction tool" through on `correction` and "Build Vault Linter ... quality
+# standards" through on `quality`, because the board prose contains those words in passing. A task that
+# names none of these is not about our mission, whatever else it matches.
+_BOARD_CORE = {"memory", "memories", "mnemo", "recall", "retrieval", "retrieve", "supersession",
+               "supersede", "revert", "erasure", "erase", "forget", "poison", "provenance",
+               "embedding", "embeddings", "rag", "vector", "mem0", "zep", "graphiti", "letta",
+               "cognee", "memobase", "langmem", "benchmark", "locomo", "memops", "store", "context",
+               "consolidation", "attestation", "tombstone", "receipt", "echo", "agent-memory"}
+
 def _inbox_theme_allowed(text: str) -> bool:
     """THE ONE CHOKE POINT for off-mission work.
 
@@ -1425,9 +1442,19 @@ def _inbox_theme_allowed(text: str) -> bool:
         return True                                  # no board priorities known yet -> do not block
     theme = t.split(" ||", 1)[0]
     theme = theme.split(":", 1)[1] if ":" in theme else theme
-    if _theme_words(theme) & prio:
+    words = _theme_words(theme)
+
+    # REFUSED beats matched. The board names what it does NOT want in the same breath as what it
+    # does ("Finance/health/physics are ONLY test-beds"; "Deprioritize generic meta-science,
+    # politics, cloud/trivia"), and reading the text flat turned those into PASS tokens.
+    banned = words & _BOARD_BANNED
+    if banned:
+        logger.info("[gate] inbox task dropped, deprioritised subject %s: %s",
+                    sorted(banned), theme.strip()[:80])
+        return False
+    if words & _BOARD_CORE:
         return True
-    logger.info("[gate] inbox task dropped, off-board: %s", theme.strip()[:90])
+    logger.info("[gate] inbox task dropped, names no subject of ours: %s", theme.strip()[:90])
     return False
 
 
