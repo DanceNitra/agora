@@ -1838,6 +1838,60 @@ async def brain_scout_record(request: Request):
     return {"status": "ok" if r else "duplicate", "record": r}
 
 
+@router.post("/brain/library/external/harvest")
+async def brain_external_harvest(request: Request):
+    """Pull the next slice of the query bank from GitHub + Reddit into the external library."""
+    import asyncio as _aio
+    from agora.execution.external_library import harvest
+    b = await request.json() if await request.body() else {}
+    return {"status": "ok", **await _aio.to_thread(harvest, int(b.get("batch", 6)))}
+
+
+@router.get("/brain/library/external/search")
+async def brain_external_search(q: str, k: int = 12):
+    """Dig into what the outside world has said — the reason the library is kept, not just reported."""
+    import asyncio as _aio
+    from agora.execution.external_library import search
+    return {"status": "ok", "query": q, "hits": await _aio.to_thread(search, q, k)}
+
+
+@router.get("/brain/library/external/map")
+async def brain_external_map():
+    """THE CARTOGRAPHER'S MAP, redrawn on the outside world.
+
+    Wren's old objective — the two vault domains with the fewest bridges — guaranteed an off-mission
+    answer, because in a vault of physics and category theory the widest hole is always between two
+    things unrelated to agent memory. Same instinct, honest map: which needs recur across how many
+    UNRELATED projects, and which ones nobody answers. A hole here is a market gap.
+    """
+    import asyncio as _aio
+    from agora.execution.external_library import map_external, stats
+    m = await _aio.to_thread(map_external)
+    return {"status": "ok", "stats": await _aio.to_thread(stats), **m}
+
+
+@router.get("/brain/watch/competitors")
+async def brain_watch_competitors():
+    """EYES OUTSIDE THE POT — what the competition actually shipped since the last check.
+
+    Every other intake this system has is the vault (what we already thought) or arXiv (what academics
+    publish). Neither would tell us that a competitor shipped a revert command last week, which is the
+    news that would make three of our public claims false while we kept repeating them. Reports DELTAS
+    only, and flags loudly when a release touches our own axis (correction, revert, erasure,
+    provenance, determinism).
+    """
+    import asyncio as _aio
+    import subprocess
+    from agora.execution.competitor_watch import format_report, scan
+    try:
+        tok = subprocess.run(["gh", "auth", "token"], capture_output=True, text=True,
+                             timeout=10).stdout.strip()
+    except Exception:
+        tok = ""
+    res = await _aio.to_thread(scan, tok)
+    return {"status": "ok", "report": format_report(res), **res}
+
+
 @router.get("/brain/scout/box")
 async def brain_scout_box():
     """THE SCOUT BOX — leads collected but not yet triaged, capped so it cannot grow into a landfill.

@@ -2956,28 +2956,40 @@ async def _run_red_team() -> None:
 
 
 async def _queue_cartography() -> None:
-    """THE CARTOGRAPHER: Wren scans the whole knowledge graph for the widest structural hole
-    (two substantial domains with the fewest bridges) and queues it for Claude to bridge with
-    ONE honest mechanism note — brokerage across holes is where new ideas live. His yield is
-    measured later: did bridges actually appear where he pointed?"""
-    if await _task_already_pending("Chart structural hole"):
+    """THE CARTOGRAPHER, remapped onto the outside world.
+
+    Wren used to hunt the two vault domains with the FEWEST bridges. That objective guarantees an
+    off-mission answer: in a vault holding physics, ADHD and category theory, the widest hole is always
+    between two things unrelated to agent memory — and it was injected at the FRONT of the hypothesis
+    queue, so it steered the whole swarm.
+
+    Same instinct, honest map. He now charts the EXTERNAL library (GitHub issues/PRs + Reddit threads):
+    which needs recur across how many UNRELATED projects, and which of them nobody answers. A hole in
+    that map is a market gap; a hole in the vault map was a gap in our reading.
+    """
+    if await _task_already_pending("Chart the external map"):
         return
-    d = await asyncio.to_thread(_brain_get_sync, "/api/v1/agent-os/brain/cartography-hole", 90)
-    h = (d or {}).get("hole") or {}
-    if not h.get("a"):
+    d = await asyncio.to_thread(_brain_get_sync, "/api/v1/agent-os/brain/library/external/map", 90)
+    needs = (d or {}).get("map") or []
+    if not needs:
         return
+    top = needs[0]
+    ours = [n for n in needs if n["need"] in ("revert/undo", "forget/erasure", "provenance/trust")]
     await asyncio.to_thread(
         _brain_post_sync, "/api/v1/agent-os/brain/claude-inbox",
-        {"text": f"Chart structural hole: {h['a']} x {h['b']} || bridges now: {h.get('bridges', 0)} "
-                 f"|| {h['a']} notes: {', '.join(h.get('a_notes', [])[:3])} || {h['b']} notes: "
-                 f"{', '.join(h.get('b_notes', [])[:3])} || Write ONE bridge note connecting the "
-                 f"strongest pair via a REAL shared mechanism (not surface similarity), tags "
-                 f"['agora','bridge','claude-synthesis'], push; then POST /brain/cartography-record "
-                 f"{{a,b,bridges_then,note,outcome}}. If no honest bridge exists, record outcome "
-                 f"'no honest bridge' without a note - a charted dead hole is also a map."})
+        {"text": f"Chart the external map: loudest need '{top['need']}' raised in "
+                 f"{top['distinct_projects']} unrelated projects ({top['mentions']} mentions). "
+                 f"OUR axis right now: "
+                 f"{'; '.join(str(n['need']) + ': ' + str(n['distinct_projects']) + ' projects' for n in ours)}. "
+                 f"Loudest threads: {'; '.join((x.get('title') or '')[:60] + ' ' + (x.get('url') or '') for x in (top.get('loudest') or [])[:3])} "
+                 f"|| Read the actual threads via GET /brain/library/external/search?q=<need>. Then "
+                 f"answer ONE question in a note: where does external demand and what we have built "
+                 f"actually MEET, and where are we building for a need nobody in the corpus is voicing? "
+                 f"Name the gap in both directions - a need with many projects and no implementation is "
+                 f"a market; a feature of ours that appears nowhere in the corpus is either early or "
+                 f"imaginary, and say which you think it is and why. Tags ['agora','external-map']."})
     broadcast({"type": "os_build", "kind": "discovery", "who": "Cartographer Wren",
-               "text": f"charted a hole in the map: {h['a'][:22]} × {h['b'][:22]} "
-                       f"({h.get('bridges', 0)} bridges)"})
+               "text": f"charted external demand: {top['need']} in {top['distinct_projects']} projects"})
     _mind_spark("#5dade2")        # blue — a hole appears on the map
 
 
@@ -3441,23 +3453,26 @@ _ROLE_HINT = {  # each thinker owns a real research domain
 _LOCATIONS = {k: v["tile"] for k, v in _POSTS.items()}  # throne, treasury, library, ...
 
 
-# ORGANS WITH NO ON-MISSION VERSION — switched OFF, not filtered.
+# REASSIGNMENT, NOT REDUNDANCY.
 #
-# A code audit traced the off-mission work to the SELECTORS, not to a missing filter. These eight
-# choose their subject in a way that is anti-correlated with a single-product frontier and cannot be
-# repaired by gating:
-#   cartography      picks the domain pair with the FEWEST bridges — in a vault holding physics, ADHD
-#                    and category theory, the widest hole is by construction two things unrelated to
-#                    agent memory, and it is inserted at the FRONT of the hypothesis queue
-#   analogy_forge    argmax over mechanism-density across all of 04 Resources/Concepts
-#   debate / red_team / coherence_audit / contradiction_sweep / counterfactual / oracle
-#                    all read the whole vault-wide belief list, oldest-first
+# These organs were briefly switched off because their selectors are anti-correlated with a
+# single-product frontier — cartography hunts the vault domain pair with the FEWEST bridges, which in
+# a vault of physics and category theory is guaranteed to be off-mission. The owner's correction was
+# the right one: the instinct is fine, the map was wrong. So each is being repointed at the OUTSIDE
+# world (the external library of GitHub issues/PRs and Reddit threads) rather than at our own notes.
 #
-# Gating them would produce permanent silence dressed up as filtering, which is the thing the owner
-# objected to: "nesmu ani len vznikat a nie ze ich len budeme filtrovat". So they are off. Flip
-# ORGANS_OFFMISSION_ENABLED to bring them back if the frontier ever widens again.
-ORGANS_OFFMISSION_ENABLED = False
-
+#   cartography   -> /brain/library/external/map      DONE — which needs recur across unrelated
+#                                                     projects, and which nobody answers
+#   red_team      -> our public claims vs competitor docs and benchmarks        (next)
+#   contradiction -> what we assert vs what the external corpus says            (next)
+#   debate        -> the strongest external counter-position, sourced           (next)
+#   analogy_forge -> how another project solved a problem we still have         (next)
+#   coherence     -> our own public artifacts (README, benchmarks, posts)       (next)
+#   counterfactual-> the design decisions we already shipped                    (next)
+#   oracle        -> checkable forecasts about our own space, Brier-scored      (next)
+#
+# Until a role is rewritten, the choke point in _brain_post_sync keeps its output off the board, so a
+# not-yet-reassigned organ costs a cycle but cannot fill the queue with noise.
 async def ambient_life():
     """LLM-driven emergent simulation. Each agent decides its OWN goal via the LLM
     based on its persona, recent memory, who's nearby and the latest keep news — then
@@ -4216,30 +4231,30 @@ async def ambient_life():
         # rate (~1 wake/15 min, a few tasks each) so the bench stays stocked WITHOUT a
         # perpetual backlog that starves low-priority work. ~0.85s/tick → ~75-110 min, staggered.
         if loop_n % 3500 == 900:                       # Analogy Forge  (~50 min)
-            ORGANS_OFFMISSION_ENABLED and asyncio.create_task(_queue_analogy_forge())
+            asyncio.create_task(_queue_analogy_forge())
         if loop_n % 3300 == 1200:                      # Belief revision  (~47 min)
             asyncio.create_task(_queue_belief_challenge())
         if loop_n % 5500 == 2100:                      # The Court — structured debate  (~78 min)
-            ORGANS_OFFMISSION_ENABLED and asyncio.create_task(_run_debate())
+            asyncio.create_task(_run_debate())
         if loop_n % 2000 == 600:                       # Replication Unit (Rooke) - BOOSTED 2026-06-19 (Crucible=moat, ~28 min)
             asyncio.create_task(_queue_replication())
         if loop_n % 3000 == 1700:                      # Cartographer (Wren)  (~43 min)
-            ORGANS_OFFMISSION_ENABLED and asyncio.create_task(_queue_cartography())
+            asyncio.create_task(_queue_cartography())
         if loop_n % 6000 == 1100:                      # Kael's Red Team  (~85 min)
-            ORGANS_OFFMISSION_ENABLED and asyncio.create_task(_run_red_team())
+            asyncio.create_task(_run_red_team())
         if loop_n % 2500 == 1200:                      # Orin's Synthesis Detector  (~35 min; fires only when due)
             asyncio.create_task(_run_synthesis_detector())
         if loop_n % 6500 == 800:                       # Elara's Coherence Audit  (~92 min, offset)
-            ORGANS_OFFMISSION_ENABLED and asyncio.create_task(_run_coherence_audit())
+            asyncio.create_task(_run_coherence_audit())
         # CONTRADICTION SWEEP — find where the vault disagrees with itself (~95 min, offset).
         if loop_n % 6700 == 2400:
-            ORGANS_OFFMISSION_ENABLED and asyncio.create_task(_run_contradiction_sweep())
+            asyncio.create_task(_run_contradiction_sweep())
         # COHERENCE AUDIT — does AGORA contradict itself? one new belief per day (~daily offset).
         if loop_n % 64000 == 50000:
             asyncio.create_task(_run_coherence())
         # THE COUNTERFACTUAL SELF — weekly review of history replayed under other policies.
         if loop_n % 448000 == 330000:
-            ORGANS_OFFMISSION_ENABLED and asyncio.create_task(_queue_counterfactual_review())
+            asyncio.create_task(_queue_counterfactual_review())
         # THE THEORY ENGINE — run one mechanistic belief as a formal model (~95 min, offset).
         if loop_n % 6700 == 3000:
             asyncio.create_task(_queue_theory_run())
@@ -4251,7 +4266,7 @@ async def ambient_life():
             asyncio.create_task(_run_reply_harvest())
         # THE ORACLE — pick one live market for an independent call (~daily) + resolve (~daily).
         if loop_n % 64000 == 7000:
-            ORGANS_OFFMISSION_ENABLED and asyncio.create_task(_run_oracle_scan())
+            asyncio.create_task(_run_oracle_scan())
         if loop_n % 64000 == 33000:
             asyncio.create_task(_run_oracle_resolve())
         # THE CANON — when enough new artifacts landed, queue the living-book merge (~2 days).
