@@ -36,6 +36,43 @@ DATE_TITLE = re.compile(r"^\d{4}[-_]\d{2}[-_]\d{2}")   # daily notes → noisy t
 MACHINE_REPORT = re.compile(r"^(autolinker_(report|pending)|quality_report)", re.I)
 MARK = "## Related (AutoLinker)"
 
+# Bookkeeping the swarm writes about itself. It is text, so it scores like any other note and — being
+# numerous and near-identical — it wins the similarity race and becomes a hub: measured 2026-07-21, an
+# unlocked run's most-linked targets were all generated files, and a first keyword blocklist merely
+# moved the problem from `orphans_*` to `Archival_Candidate_2026*`. A blocklist cannot work here; the
+# structural signal can. A generator stamps a DATE into the filename and emits the same note daily, so
+# a snapshot family is: several notes whose stems are identical once the date is removed. Members of
+# such a family are machinery whatever they are called, and a dated one-off (a real deep-research
+# report) keeps its place because it has no siblings.
+# No \b around the date: in `Archival_Candidate_20260615_...` an underscore IS a word character, so
+# there is no boundary between `_` and `2` and the token would never match.
+_DATE_TOKEN = re.compile(r"[_\-. ]*(20\d{2}[-_.]?\d{2}[-_.]?\d{2}|20\d{2}[-_.]\d{2})(?!\d)[_\-. ]*")
+_FAMILY_MIN = 3
+
+
+def _family_key(stem: str) -> str:
+    return _DATE_TOKEN.sub("_", stem).strip("_- ").lower()
+
+
+# The other half of the same problem needs no heuristic at all: the swarm writes its own output into
+# known folders. Everything under a dated `Agora Agents/YYYY-MM-DD/` subfolder is a machine artifact by
+# construction — including near-duplicate names a date rule cannot see (`blueprint-archive-station-
+# spec-request`, `request-for-blueprint-archive-station-spec`, … the same request re-phrased daily).
+_AGENT_OUTPUT = re.compile(r"Agora Agents[/\\]\d{4}-\d{2}-\d{2}[/\\]")
+
+
+def _snapshot_families(stems) -> set:
+    """Stems belonging to a dated snapshot family (>= _FAMILY_MIN same-name-modulo-date siblings)."""
+    fams = defaultdict(list)
+    for s in stems:
+        if _DATE_TOKEN.search(s):
+            fams[_family_key(s)].append(s)
+    out = set()
+    for members in fams.values():
+        if len(members) >= _FAMILY_MIN:
+            out.update(members)
+    return out
+
 STOPWORDS = set("""
 the a an and or but if then else of to in on at by for with from into over under
 is are was were be been being do does did has have had will would can could should
@@ -79,7 +116,13 @@ def main() -> None:
                     help="gate auto-apply on the curator agent's live trust standing")
     ap.add_argument("--curator", default="Dame Elara",
                     help="which Vault-Company agent owns this curation (links → Bridge Builder)")
-    ap.add_argument("--standing-gate", type=float, default=0.55)
+    ap.add_argument("--standing-gate", type=float, default=0.55,
+                    help="legacy absolute gate; kept for callers, superseded by the rank gate")
+    ap.add_argument("--max-notes", type=int, default=25,
+                    help="how many notes one run may edit; the backlog drips instead of flooding "
+                         "(a first unlocked run offered 2931 links across 763 notes at once)")
+    ap.add_argument("--standing-floor", type=float, default=0.35,
+                    help="absolute floor below which no curator may auto-apply, whatever its rank")
     ap.add_argument("--standing-file",
                     default=str(Path(__file__).resolve().parent.parent
                                 / "agora-game-server" / "agent_standing.json"))
@@ -236,13 +279,27 @@ def main() -> None:
             print(f"[AutoLinker] standing unavailable ({e}); curator assumed neutral 0.50")
         cur = float(standing.get(args.curator, 0.5))
         provenance = f"  —  curated by {args.curator} (trust {cur:.2f})"
-        if cur >= args.standing_gate:
+        # The gate's INTENT is relative ("the most trustworthy curator may apply, the rest queue"),
+        # but it was written as an absolute constant. _compute_standing blends hit-rate, mastery and
+        # bounty into the ESS trust mean, and every blend pulls DOWNWARD, so the whole roster drifts
+        # under the constant and the organ locks out permanently — measured 2026-07-21: the highest
+        # standing of all eight agents was 0.476 against a 0.55 gate, i.e. curation had not applied
+        # once. Gate on RANK within the live roster instead, keeping an absolute floor so a roster
+        # that has genuinely collapsed still can't write.
+        peers = sorted(float(v) for v in standing.values()) if standing else []
+        rank_ok = True
+        if len(peers) >= 4:
+            median = peers[len(peers) // 2]
+            rank_ok = cur >= median
+        floor_ok = cur >= args.standing_floor
+        if rank_ok and floor_ok:
             args.apply = True
-            print(f"[AutoLinker] {args.curator} standing {cur:.2f} >= {args.standing_gate} "
-                  f"-> AUTO-CURATING")
+            print(f"[AutoLinker] {args.curator} standing {cur:.2f} in the top half of the roster "
+                  f"(floor {args.standing_floor}) -> AUTO-CURATING")
         else:
             args.apply = False
-            print(f"[AutoLinker] {args.curator} standing {cur:.2f} < {args.standing_gate} "
+            why = "below the roster median" if not rank_ok else f"below the {args.standing_floor} floor"
+            print(f"[AutoLinker] {args.curator} standing {cur:.2f} {why} "
                   f"-> held in PENDING for review (not enough trust)")
 
     # ── 7b. QA mode (Sergeant Voss): flag TRUE content duplicates (identical body) ──
@@ -276,14 +333,25 @@ def main() -> None:
 
     # ── 8. (optional) apply strong links into the notes ─────
     if args.apply:
+        machinery = _snapshot_families(notes.keys())
+        machinery |= {s for s, nt in notes.items()
+                      if _AGENT_OUTPUT.search(str(nt["path"]))}
+        print(f"[AutoLinker] {len(machinery)} notes are machine output (dated snapshot families or "
+              f"agent-output folders) — excluded as link targets")
         applied_notes = applied_links = 0
         for stem, cands in suggestions:
+            if applied_notes >= args.max_notes:
+                print(f"[AutoLinker] budget reached ({args.max_notes} notes) — the rest stays "
+                      f"in pending for the next run")
+                break
             note = notes[stem]
             seen = set(note["links"])          # already-linked targets (lowercased)
             new = []
             for s, other in cands:
                 if s < args.apply_threshold:
                     break
+                if other in machinery:
+                    continue                   # never link a real note to bookkeeping
                 ot = notes[other]["title"]
                 key = ot.lower()
                 if key == note["title"].lower() or key in seen:
