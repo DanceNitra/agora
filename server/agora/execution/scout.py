@@ -207,6 +207,24 @@ def _box_save(items: list) -> None:
         pass
 
 
+# The lead has to be ABOUT memory, not merely score well on a theme. Third time tonight this exact
+# class of bug appeared: the task gate matched any board token, the contribution finder matched any
+# offer keyword, and the scout matched any theme — each time dragging in something unrelated. Here it
+# surfaced "[BOUNTY] Implement Device-Age Oracle Fields (fingerprint check)" from a bounty repo the
+# July audit had already flagged as off-mission. Scout tasks bypass the inbox gate by design (they are
+# machinery, not research themes), so the subject check has to live at the point of collection.
+_SUBJECT = ("memory", "memories", "remember", "recall", "retrieval", "rag", "context window",
+            "embedding", "vector store", "knowledge base", "mem0", "zep", "letta", "cognee",
+            "langmem", "checkpointer", "basestore", "conversation history", "long-term memory",
+            "long term memory", "agent memory", "supersede", "provenance", "forget")
+
+
+def _about_memory(lead: dict) -> bool:
+    blob = ((lead.get("title") or "") + " " + (lead.get("body") or "") + " " +
+            (lead.get("repo") or "")).lower()
+    return any(s in blob for s in _SUBJECT)
+
+
 def box_add(lead: dict, kind: str = "contribute") -> dict | None:
     """Add a lead if it is new and there is room. Returns None when duplicate or full.
 
@@ -215,6 +233,8 @@ def box_add(lead: dict, kind: str = "contribute") -> dict | None:
     """
     url = (lead or {}).get("url")
     if not url:
+        return None
+    if not _about_memory(lead):
         return None
     items = box_load()
     if any(x.get("url") == url for x in items):

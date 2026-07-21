@@ -198,3 +198,8 @@ secrets.json
 credentials.json
 service-account*.json
 PRIVATE_NOTES.md
+
+# harvested external corpus — other people's content, rebuilt on demand, not ours to republish
+server/.external_library.jsonl
+server/.external_library_state.json
+server/.competitor_watch.json
