@@ -230,6 +230,23 @@ Look at a few. From here she adds 25 notes per run until the backlog is gone.
 To undo all of it at any point: every line lives under a `## Related (AutoLinker)` heading and nothing
 else was touched, so it is a mechanical strip — tell me and it is gone in a minute.
 
+**And a third silent failure in the same organ, found at 08:18.** Voss's tool flags **33 true-duplicate
+groups (89 redundant copies)** — I ran it by hand to check. The dungeon logged *"no duplicates found"*
+every single run. Its number parser split the output on the word `duplicate` and read the remainder as
+an integer: `FLAGGED 33 true-duplicate groups` therefore parsed as **0**, because the word it split on
+sits *inside* the token after the number. Voss had been working and his result was being zeroed on the
+way out. Fixed (`d99d66a`), dungeon restarted, one process, 200 — and he now reports *"flagged 33
+duplicates"*.
+
+Three failures in one organ, and all three were **silent**: a gate that never passes, a flood that
+looks like productivity, and a parser that turns a result into zero. None of them logged an error. The
+common tell is a line that is *identical every cycle* — "held to pending", "no duplicates found". A
+repeated calm line is the thing to grep for, not a stack trace.
+
+**Where it stands at 08:46:** Elara has applied **551 links across 121 notes** over six budgeted runs,
+Voss reports his 33 groups, and Elara's standing has begun to climb (0.446 → 0.48) because she finally
+completes work — the death spiral running backwards.
+
 ---
 
 **State at 06:15:** brain and dungeon up, inbox 3 (all machinery or on-mission), **31 off-mission
