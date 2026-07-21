@@ -10,7 +10,7 @@ deterministic and reproducible.
 Policies (all get: per-message sims, ordered value-bearing events with their {old|new} object, echo idxs):
   cosine            - similarity only, no update semantics
   recency           - last-mention-wins (strawman)
-  tie_recent        - mnemo 0.6.8 near-tie recency reorder (HONEST SELF-ATTACK)
+  tie_recent        - inspeximus 0.6.8 near-tie recency reorder (HONEST SELF-ATTACK)
   mem0_faithful     - v1 ADD/UPDATE/DELETE proxy: a contradicting new object UPDATEs (replaces) current
                       => last-writer-wins at the object level (no hash, no ledger)
   graphiti_faithful - bi-temporal: an edge is expired only if old.valid_at < new.valid_at; valid_at

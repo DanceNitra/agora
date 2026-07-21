@@ -2,21 +2,21 @@
 """
 second_brain_mcp — turn ANY notes folder into a thinking partner over MCP.
 
-Where mnemo_mcp exposes the MEMORY layer, this exposes the THINKING layer: point it at a folder of
+Where mcp exposes the MEMORY layer, this exposes the THINKING layer: point it at a folder of
 Markdown notes (e.g. an Obsidian vault) and a Claude / Cursor / custom agent gets the substrate to
 make that second brain *think*, not just store — ground a claim, find the gaps between notes,
 surface non-obvious bridges, and generate ideas BY documented idea-generation methods.
 
 Design (deliberate): the server provides RETRIEVAL + STRUCTURE; the calling LLM does the reasoning.
-That is mnemo's philosophy — the tool is the memory/structure, the agent is the mind. So the tools
+That is inspeximus's philosophy — the tool is the memory/structure, the agent is the mind. So the tools
 return *material to think over* (relevant notes, under-linked notes, candidate bridges, claim
 sentences, the method toolkit), not canned "insights". No LLM call lives here, so it runs anywhere.
 
-Run (stdio):   NOTES_DIR=/path/to/your/vault python -m mnemo.second_brain_mcp
+Run (stdio):   NOTES_DIR=/path/to/your/vault python -m inspeximus.second_brain_mcp
 Config (env):
     NOTES_DIR          folder of .md notes to think over (default: ./notes)
     SECOND_BRAIN_CAP   max chars indexed per note (default 4000)
-    MNEMO_EMBED_URL/MODEL/KEY  optional OpenAI-compatible embedder for SEMANTIC bridges
+    INSPEXIMUS_EMBED_URL/MODEL/KEY  optional OpenAI-compatible embedder for SEMANTIC bridges
                        (no embedder -> lexical-overlap fallback; runs today with zero config)
 """
 from __future__ import annotations
@@ -29,13 +29,13 @@ import urllib.request
 from pathlib import Path
 
 # Load the zero-dep store directly by path so it works whether launched as a script
-# (python second_brain_mcp.py) or as a package submodule (python -m mnemo.second_brain_mcp),
-# without the `mnemo` package dir shadowing `mnemo.py`.
+# (python second_brain_mcp.py) or as a package submodule (python -m inspeximus.second_brain_mcp),
+# without the `inspeximus` package dir shadowing `inspeximus.py`.
 import importlib.util as _ilu  # noqa: E402
-_spec = _ilu.spec_from_file_location("mnemo_core", str(Path(__file__).resolve().parent / "mnemo.py"))
-_mnemo_core = _ilu.module_from_spec(_spec)
-_spec.loader.exec_module(_mnemo_core)
-Inspeximus = _mnemo_core.Inspeximus
+_spec = _ilu.spec_from_file_location("inspeximus_core", str(Path(__file__).resolve().parent / "inspeximus.py"))
+_inspeximus_core = _ilu.module_from_spec(_spec)
+_spec.loader.exec_module(_inspeximus_core)
+Inspeximus = _inspeximus_core.Inspeximus
 
 try:
     from mcp.server.fastmcp import FastMCP
@@ -79,29 +79,29 @@ def _embed_url_ok(url: str) -> bool:
     except Exception:
         return False
     if u.scheme not in ("http", "https"):
-        sys.stderr.write("second_brain: MNEMO_EMBED_URL must be http(s) — embedder disabled.\n")
+        sys.stderr.write("second_brain: INSPEXIMUS_EMBED_URL must be http(s) — embedder disabled.\n")
         return False
     host = (u.hostname or "").lower()
     try:
         ip = ipaddress.ip_address(host)
         if ip.is_link_local or str(ip) == "169.254.169.254":      # cloud-metadata / link-local
-            sys.stderr.write("second_brain: refusing link-local/metadata MNEMO_EMBED_URL — embedder disabled.\n")
+            sys.stderr.write("second_brain: refusing link-local/metadata INSPEXIMUS_EMBED_URL — embedder disabled.\n")
             return False
         loopback = ip.is_loopback
     except ValueError:
         loopback = host in ("localhost",) or host.endswith(".localhost")
     if u.scheme == "http" and not loopback:
-        sys.stderr.write("second_brain: refusing non-loopback http MNEMO_EMBED_URL (cleartext) — use https.\n")
+        sys.stderr.write("second_brain: refusing non-loopback http INSPEXIMUS_EMBED_URL (cleartext) — use https.\n")
         return False
     return True
 
 
 def _make_embedder():
-    url = os.environ.get("MNEMO_EMBED_URL", "").strip()
+    url = os.environ.get("INSPEXIMUS_EMBED_URL", "").strip()
     if not url or not _embed_url_ok(url):
         return None
-    model = os.environ.get("MNEMO_EMBED_MODEL", "text-embedding-3-small").strip()
-    key = os.environ.get("MNEMO_EMBED_KEY", "").strip()
+    model = os.environ.get("INSPEXIMUS_EMBED_MODEL", "text-embedding-3-small").strip()
+    key = os.environ.get("INSPEXIMUS_EMBED_KEY", "").strip()
 
     def embed(text: str):
         body = json.dumps({"model": model, "input": text}).encode()
@@ -149,7 +149,7 @@ def _read_notes() -> list[dict]:
     return notes
 
 
-# ---- index once at startup; load notes into a mnemo store for value/semantic recall ----
+# ---- index once at startup; load notes into a inspeximus store for value/semantic recall ----
 _NOTES = _read_notes()
 _MEM = Inspeximus(":memory:" if False else os.environ.get("SECOND_BRAIN_INDEX", "second_brain_index.json"),
              embed=_make_embedder())
@@ -174,7 +174,7 @@ def index_status() -> dict:
 
 @mcp.tool()
 def relevant_notes(query: str, k: int = 6) -> list[dict]:
-    """Retrieve the k notes most relevant to a topic, ranked by relevance x accrued value (mnemo).
+    """Retrieve the k notes most relevant to a topic, ranked by relevance x accrued value (inspeximus).
     Use this to pull the substrate before you GROUND a claim, CHALLENGE a belief, or CONNECT ideas."""
     hits = _MEM.recall(query, k=k)
     out = []

@@ -1,5 +1,5 @@
-"""RAMR OUTCOME-RANKED-RECALL task family (mnemo's differentiator). Every shipped memory layer ranks recall by
-relevance x recency/value; NONE rank by whether a recalled memory actually LED TO A CORRECT OUTCOME. mnemo ships
+"""RAMR OUTCOME-RANKED-RECALL task family (inspeximus's differentiator). Every shipped memory layer ranks recall by
+relevance x recency/value; NONE rank by whether a recalled memory actually LED TO A CORRECT OUTCOME. inspeximus ships
 that channel (recall score x cal; cal=0.5+Beta(good,bad) reliability; fed by credit(ids, outcome)). The lab
 already validated the core lift (0.37->0.66) and its robustness to a noisy credit signal. This turns it into a
 benchmark family and adds the decisive new dimension: HOW DOES THE LIFT SCALE WITH RETRIEVAL AMBIGUITY?
@@ -9,7 +9,7 @@ similarity ~equal -> relevance ranking is ~chance among them). For each ambiguit
 them and randomly designate ONE as CORRECT (per set). Over T sessions, for each topic: recall top-1, score hit
 (top-1 == correct), then credit([top-1], outcome=hit). Three arms over identical stores:
   NONE    : never credit -> reliability neutral -> rank by relevance only (the field's status quo)
-  OUTCOME : credit with the TRUE outcome -> was-it-right reranking (mnemo)
+  OUTCOME : credit with the TRUE outcome -> was-it-right reranking (inspeximus)
   RANDOM  : credit with a RANDOM outcome (control) -> if this lifts too, the gain is reranking noise, not signal
 Sweep D in {1,2,4,8} (ambiguity rises; relevance chance = 1/(1+D)). Metric: OUTCOME-RANKED LIFT = final-session
 accuracy(OUTCOME) - accuracy(NONE), per D, bootstrap CI over N_SETS. FALSIFIER (pre-registered): if the OUTCOME
@@ -21,7 +21,7 @@ label and ambiguity window vary across conditions. This keeps embeddings identic
 and avoids re-embedding under GPU contention. Cloud-free (local nomic-embed-text). ASCII prints."""
 import os, sys, json, time, urllib.request
 import numpy as np
-sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "..", "mnemo"))
+sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "..", "inspeximus"))
 from inspeximus import Inspeximus
 
 OLL = "http://localhost:11434/api/embeddings"
@@ -135,14 +135,14 @@ if __name__ == "__main__":
                f"OUTCOME signal, not reranking noise. ")
         msg += (f"The lift GROWS with retrieval ambiguity (D=1 -> {lifts[0]:+.2f}, D={D_LEVELS[-1]} -> {lifts[-1]:+.2f}): "
                 f"when relevance can't disambiguate near-identical memories, outcome feedback is the only signal -- "
-                f"exactly where mnemo's differentiator pays off." if grows else
+                f"exactly where inspeximus's differentiator pays off." if grows else
                 f"The lift does not clearly grow with ambiguity over the tested range.")
         print("  " + msg, flush=True)
     elif any_sig:
         print(f"  outcome-credit lifts recall (CI>0) BUT random credit lifts comparably (max {rnd_max:.2f}) -> the gain "
               f"may be reranking dynamics, not the outcome signal. Needs a cleaner control.", flush=True)
     else:
-        print(f"  DECORATIVE: the outcome-ranked lift CI overlaps 0 at every ambiguity level -> on this task mnemo's "
+        print(f"  DECORATIVE: the outcome-ranked lift CI overlaps 0 at every ambiguity level -> on this task inspeximus's "
               f"was-it-right channel does not measurably beat relevance ranking. Honest negative.", flush=True)
     json.dump({"final": {str(D): fin[D] for D in D_LEVELS}, "lift_by_D": {str(D): lift_by_D[D] for D in D_LEVELS},
                "M": M_TOPICS, "T": T_SESS, "sets": N_SETS},

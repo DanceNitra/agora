@@ -27,18 +27,18 @@ INSIDE a legitimate authenticated session, so a provenance anchor passes it clea
 FLOOR you retreat to, not a fix -- pricing veracity (not just provenance) is the open problem.
 
 Honest limits: these are stylized, runnable demonstrations on our own code, not a benchmark; each demo
-DISABLES the other layers to isolate one assumption (mnemo ships them layered, and the layered config is
+DISABLES the other layers to isolate one assumption (inspeximus ships them layered, and the layered config is
 stronger than any single primitive here). Every piece is textbook (Douceur sybil-cost; Shapiro LWW;
 Goodhart; Tramer adaptive-eval; MINJA; PoisonedRAG), and provenance-as-the-surviving-anchor is already
 surveyed. The contribution is the unified adaptive red-team of one shipped stack + the honest ceiling.
 
-Run: python research/probes/adaptive_defenses.py    MIT. Part of Agora / mnemo.
+Run: python research/probes/adaptive_defenses.py    MIT. Part of Agora / inspeximus.
 """
 import importlib.util, os
 import numpy as np
 
-_core = os.path.join(os.path.dirname(__file__), "..", "mnemo.py")
-_spec = importlib.util.spec_from_file_location("mnemo_core", _core)
+_core = os.path.join(os.path.dirname(__file__), "..", "inspeximus.py")
+_spec = importlib.util.spec_from_file_location("inspeximus_core", _core)
 _m = importlib.util.module_from_spec(_spec); _spec.loader.exec_module(_m)
 Inspeximus, attest, new_source_keypair = _m.Inspeximus, _m.attest, _m.new_source_keypair
 
@@ -122,4 +122,4 @@ if __name__ == "__main__":
     print("fall to whoever writes the memory. The retreat is to an external forge-costly PROVENANCE anchor")
     print("(strict_corroboration + attestation + the 0.6.0 ratchet) -- which RAISES cost (Douceur) but only")
     print("BOUNDS the attack, and authenticates the SOURCE not the TRUTH (MINJA rides genuine provenance).")
-    print("Provenance is a floor, not a fix; pricing veracity is the open problem. mnemo", _m.__version__)
+    print("Provenance is a floor, not a fix; pricing veracity is the open problem. inspeximus", _m.__version__)

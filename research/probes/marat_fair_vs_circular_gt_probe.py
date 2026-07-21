@@ -1,6 +1,6 @@
 """
 Fair vs circular ground truth for "does the full chunk beat the flat 5-D projection?"
-(motivated by the TAT / mnemo cross-framework thread, DeepSeek-V3 #1466).
+(motivated by the TAT / inspeximus cross-framework thread, DeepSeek-V3 #1466).
 
 Context. A state-relevance benchmark that defines relevance as "the 5 nearest neighbours
 in the 5-D chunk" is CIRCULAR for the full-vs-flat question: relevance IS 5-D proximity,

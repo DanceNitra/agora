@@ -66,7 +66,7 @@ All commits below are LOCAL; deploy is owner-gated ("deploy"). #1–#13 already 
 
 ## agent-receipts distribution (owner asked: do #3, prep #1+#2)
 GSC query "zero proof ai mcp receipts" is GROWING; the product is fully shipped (PyPI/Zenodo/CLI/MCP-wrapper/
-mnemo). Done this session: post title front-loaded "MCP & Proof" to convert the query; **#3 README now leads
+inspeximus). Done this session: post title front-loaded "MCP & Proof" to convert the query; **#3 README now leads
 with the one-line MCP drop-in quickstart** (`ReceiptedDispatcher(chain, tools)`; verified runnable; pushed).
 **AWAITING OWNER APPROVAL (gated drafts in agora_output/distribution_radar/):**
 - `agent_receipts_mcp_listing_draft.md` (#1) — listing in awesome-MCP lists (Tools/Security section ONLY; it's
@@ -84,7 +84,7 @@ with the one-line MCP drop-in quickstart** (`ReceiptedDispatcher(chain, tools)`;
   don't rival-organize. hermes #10771, openclaw 35203 — drafts gated, last=us. [[collaboration-fair-never-snub]]
 
 ## What shipped earlier (live)
-agent-receipts v0.1.0 + agora-mnemo 0.2.2 (native tamper-evident receipts) on PyPI. Skills committed:
+agent-receipts v0.1.0 + inspeximus 0.2.2 (native tamper-evident receipts) on PyPI. Skills committed:
 `/audit-post`, `/stress-claim`, `/verify-claims`, `/storm-research`. Sitemap now derives `<lastmod>` from each
 post's JSON-LD `dateModified` (audited posts signal freshness for re-crawl) — `tools/render_sitemap.py`.
 After a deploy: optionally GSC request-index the audited URLs (async; sitemap nudges the rest).

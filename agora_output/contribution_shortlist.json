@@ -92,7 +92,7 @@
    ],
    "what_we_bring": [
     "published pre-registered harness with the null included (benchmarks/memops), plus RAMR",
-    "MnemoStore passes an operation-by-operation parity audit against LangGraph's own InMemoryStore; CrewAI adapter and an MCP server ship in the package"
+    "InspeximusStore passes an operation-by-operation parity audit against LangGraph's own InMemoryStore; CrewAI adapter and an MCP server ship in the package"
    ],
    "excerpt": "[reddit r/LocalLLaMA] User experience of Bonsai-Ternary-27B on 4060Ti 16GB for KB management and productivity assistant use cases Howdy folks, Long time reader here. This time, I would like to share my experience with th",
    "score": 25
@@ -143,7 +143,7 @@
     "drop-in store for a framework"
    ],
    "what_we_bring": [
-    "MnemoStore passes an operation-by-operation parity audit against LangGraph's own InMemoryStore; CrewAI adapter and an MCP server ship in the package"
+    "InspeximusStore passes an operation-by-operation parity audit against LangGraph's own InMemoryStore; CrewAI adapter and an MCP server ship in the package"
    ],
    "excerpt": "[github issue] mlflow/mlflow: [FR] Add Mem0 tracing integration via mlflow.mem0.autolog() <!-- issue-warning --> > [!WARNING] > Before submitting a PR, please make sure that: > - A maintainer has triaged this issue and a",
    "score": 22
@@ -162,7 +162,7 @@
    ],
    "what_we_bring": [
     "zero model calls at write; measured 519-917s of extraction per scenario for an LLM-on-write pipeline against none, with answer accuracy statistically indistinguishable",
-    "MnemoStore passes an operation-by-operation parity audit against LangGraph's own InMemoryStore; CrewAI adapter and an MCP server ship in the package"
+    "InspeximusStore passes an operation-by-operation parity audit against LangGraph's own InMemoryStore; CrewAI adapter and an MCP server ship in the package"
    ],
    "excerpt": "[github issue] Brescou/langgraph-agent-stack: feat: Idempotency-Key support on pack run routes — safe client retries without double LLM spend ## Context A client that times out and retries a pack run pays for the LLM cal",
    "score": 22
@@ -179,7 +179,7 @@
     "drop-in store for a framework"
    ],
    "what_we_bring": [
-    "MnemoStore passes an operation-by-operation parity audit against LangGraph's own InMemoryStore; CrewAI adapter and an MCP server ship in the package"
+    "InspeximusStore passes an operation-by-operation parity audit against LangGraph's own InMemoryStore; CrewAI adapter and an MCP server ship in the package"
    ],
    "excerpt": "[github issue] crewAIInc/crewAI: Example proposal: optional causal audit for agent action traces Hi CrewAI maintainers, I’m exploring a small optional integration idea around agent workflow auditability. I maintain `caus",
    "score": 22
@@ -266,7 +266,7 @@
     "drop-in store for a framework"
    ],
    "what_we_bring": [
-    "MnemoStore passes an operation-by-operation parity audit against LangGraph's own InMemoryStore; CrewAI adapter and an MCP server ship in the package"
+    "InspeximusStore passes an operation-by-operation parity audit against LangGraph's own InMemoryStore; CrewAI adapter and an MCP server ship in the package"
    ],
    "excerpt": "[reddit r/LocalLLaMA] You guys asked for it: my local coding agent (llama.cpp + MCP delegation from Claude) is now public — MIT, with a full guide to my daily-driver rig Several fellow members here have asked me for this",
    "score": 21
@@ -283,7 +283,7 @@
     "drop-in store for a framework"
    ],
    "what_we_bring": [
-    "MnemoStore passes an operation-by-operation parity audit against LangGraph's own InMemoryStore; CrewAI adapter and an MCP server ship in the package"
+    "InspeximusStore passes an operation-by-operation parity audit against LangGraph's own InMemoryStore; CrewAI adapter and an MCP server ship in the package"
    ],
    "excerpt": "[reddit r/LocalLLaMA] Qwen 3.6 27B is solid up to 262K context. How high have you guys gone above that using Rope/Yarn scaling? Stack: * i7 12700K | RTX 3090 TI | 96GB RAM * Qwen 3.6 27B Q3/Q4/Q5 KXL UD I've been pushing",
    "score": 21
@@ -336,7 +336,7 @@
    ],
    "what_we_bring": [
     "attestation + trusted_only (fails closed), echo_guard, and the honest scope: a provenance gate is authorization, NOT truth — trust_is_not_truth.py demonstrates it",
-    "MnemoStore passes an operation-by-operation parity audit against LangGraph's own InMemoryStore; CrewAI adapter and an MCP server ship in the package"
+    "InspeximusStore passes an operation-by-operation parity audit against LangGraph's own InMemoryStore; CrewAI adapter and an MCP server ship in the package"
    ],
    "excerpt": "[github pr] Aureliolo/synthorg: Wire layered memory (org/agent/project) into the working loop on a durable substrate ## What this does Makes three-layer memory (org / agent / project) actually reach a working agent's con",
    "score": 20
@@ -355,7 +355,7 @@
    ],
    "what_we_bring": [
     "published pre-registered harness with the null included (benchmarks/memops), plus RAMR",
-    "MnemoStore passes an operation-by-operation parity audit against LangGraph's own InMemoryStore; CrewAI adapter and an MCP server ship in the package"
+    "InspeximusStore passes an operation-by-operation parity audit against LangGraph's own InMemoryStore; CrewAI adapter and an MCP server ship in the package"
    ],
    "excerpt": "[github issue] mem0ai/mem0: Add Voyage AI as an Embedding Provider ### Component Core / Python SDK ### Description ### Use Case Voyage AI offers high-quality embedding models (voyage-3, voyage-3-lite, voyage-code-3) that",
    "score": 19
@@ -410,7 +410,7 @@
    ],
    "what_we_bring": [
     "zero model calls at write; measured 519-917s of extraction per scenario for an LLM-on-write pipeline against none, with answer accuracy statistically indistinguishable",
-    "MnemoStore passes an operation-by-operation parity audit against LangGraph's own InMemoryStore; CrewAI adapter and an MCP server ship in the package"
+    "InspeximusStore passes an operation-by-operation parity audit against LangGraph's own InMemoryStore; CrewAI adapter and an MCP server ship in the package"
    ],
    "excerpt": "[github pr] DavidRoyBlue/Autodidact: Harden agent orchestration layer + RAG-grounded tutoring (Phase 0 + Phase 1) ## Summary Production-hardening of the LangGraph agent orchestration layer, plus the first capability trac",
    "score": 19
@@ -427,7 +427,7 @@
     "drop-in store for a framework"
    ],
    "what_we_bring": [
-    "MnemoStore passes an operation-by-operation parity audit against LangGraph's own InMemoryStore; CrewAI adapter and an MCP server ship in the package"
+    "InspeximusStore passes an operation-by-operation parity audit against LangGraph's own InMemoryStore; CrewAI adapter and an MCP server ship in the package"
    ],
    "excerpt": "[github issue] CopilotKit/CopilotKit: 🐛 Bug: Agent failed to execute: 'messages' ### ♻️ Reproduction Steps My setup: * FastAPI server with langgraph agent accessible through add_fastapi_endpoint / CopilotKitRemoteEndpoin",
    "score": 17
@@ -567,7 +567,7 @@
     "drop-in store for a framework"
    ],
    "what_we_bring": [
-    "MnemoStore passes an operation-by-operation parity audit against LangGraph's own InMemoryStore; CrewAI adapter and an MCP server ship in the package"
+    "InspeximusStore passes an operation-by-operation parity audit against LangGraph's own InMemoryStore; CrewAI adapter and an MCP server ship in the package"
    ],
    "excerpt": "[github pr] mem0ai/mem0: feat(kilo-plugin): add @mem0/kilo-plugin for cross-session memory ## Linked Issue Closes #5606 ## Description Adds a first-class **Kilo** integration under `integrations/kilo-plugin/` (`@mem0/kil",
    "score": 14
@@ -586,7 +586,7 @@
    ],
    "what_we_bring": [
     "keyed supersession + echo_guard, deterministic, no model call on the write path",
-    "MnemoStore passes an operation-by-operation parity audit against LangGraph's own InMemoryStore; CrewAI adapter and an MCP server ship in the package"
+    "InspeximusStore passes an operation-by-operation parity audit against LangGraph's own InMemoryStore; CrewAI adapter and an MCP server ship in the package"
    ],
    "excerpt": "[github pr] CodeHalwell/AgentGuides: feat(langgraph-v36): Class Deep-Dives Vol. 36 — Pregel internals, channels, store, task scheduling ## Summary - Adds **Class Deep-Dives Vol. 36** (`langgraph_class_deep_dives_v36.md`)",
    "score": 14
@@ -673,7 +673,7 @@
    ],
    "what_we_bring": [
     "revert(key) restores the superseded value without the caller knowing it",
-    "MnemoStore passes an operation-by-operation parity audit against LangGraph's own InMemoryStore; CrewAI adapter and an MCP server ship in the package"
+    "InspeximusStore passes an operation-by-operation parity audit against LangGraph's own InMemoryStore; CrewAI adapter and an MCP server ship in the package"
    ],
    "excerpt": "[github pr] CodeHalwell/AgentGuides: docs(langgraph): Add Class Deep-Dives Vol. 34 — 10 source-verified class groups (langgraph==1.2.7) ## Summary - **New guide**: `langgraph_class_deep_dives_v34.md` (sidebar order 65) —",
    "score": 13
@@ -692,7 +692,7 @@
    ],
    "what_we_bring": [
     "revert(key) restores the superseded value without the caller knowing it",
-    "MnemoStore passes an operation-by-operation parity audit against LangGraph's own InMemoryStore; CrewAI adapter and an MCP server ship in the package"
+    "InspeximusStore passes an operation-by-operation parity audit against LangGraph's own InMemoryStore; CrewAI adapter and an MCP server ship in the package"
    ],
    "excerpt": "[github pr] hyunseo-and-children/jarvis-ai: Infra/state persistence threads 설명 ## Summary - ThreadFilterStore·CartStateStore·RevertStore(멀티턴 필터/직전 추천/소모품 억제 되돌리기)를 인메모리 dict placeholder에서 LangGraph BaseStore(AsyncPostgre",
    "score": 13
@@ -709,7 +709,7 @@
     "drop-in store for a framework"
    ],
    "what_we_bring": [
-    "MnemoStore passes an operation-by-operation parity audit against LangGraph's own InMemoryStore; CrewAI adapter and an MCP server ship in the package"
+    "InspeximusStore passes an operation-by-operation parity audit against LangGraph's own InMemoryStore; CrewAI adapter and an MCP server ship in the package"
    ],
    "excerpt": "[github pr] AI-Native-2026-05-26-Intuit/shrasti-pandey-multi-state: W7D5: multistate-agent-svc three-node LangGraph capstone ## Summary - New sibling project `multistate-agent-svc/`: supervisor-routed three-node LangGrap",
    "score": 13

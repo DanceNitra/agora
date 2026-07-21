@@ -23,7 +23,7 @@ except OSError:
     pass
 
 import sys
-sys.path.insert(0, str(HERE.parent / "mnemo"))
+sys.path.insert(0, str(HERE.parent / "inspeximus"))
 import second_brain_mcp as sb  # noqa: E402
 
 

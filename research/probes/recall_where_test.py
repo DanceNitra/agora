@@ -1,4 +1,4 @@
-"""Severe-test for mnemo recall(where=) — the metadata pre-filter ('filter before you rank').
+"""Severe-test for inspeximus recall(where=) — the metadata pre-filter ('filter before you rank').
 
 Confirms the HARD metadata filter selects the right records (not just the right count) across scalar
 equality, list membership, operator conditions ($in/$gte/$lte), top-level fields (valid_from, mtype) vs

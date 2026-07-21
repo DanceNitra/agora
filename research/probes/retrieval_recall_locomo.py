@@ -1,7 +1,7 @@
-"""retrieval_recall_locomo.py — the CLEAN, judge-free, FREE mnemo LOCOMO number.
+"""retrieval_recall_locomo.py — the CLEAN, judge-free, FREE inspeximus LOCOMO number.
 
 Not end-to-end QA (that needs an LLM answerer + judge, which is judge-dependent and not comparable across systems).
-This measures the memory system's ACTUAL job, deterministically and for free: given a question, does mnemo's
+This measures the memory system's ACTUAL job, deterministically and for free: given a question, does inspeximus's
 top-k recall retrieve the gold EVIDENCE turn(s) LOCOMO labels as supporting the answer? No LLM, no credit, fully
 reproducible. Uses the shipped tuned recipe (semantic embedder + hybrid RRF + soft speaker prefilter).
 
@@ -14,7 +14,7 @@ import os, sys, json, argparse, collections
 HERE = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, HERE)
 sys.path.insert(0, os.path.join(HERE, "..", ".."))
-sys.path.insert(0, os.path.join(HERE, "..", "..", "mnemo_pypi"))
+sys.path.insert(0, os.path.join(HERE, "..", "..", "inspeximus_pypi"))
 import locomo_qa as LQ
 
 DATA = os.path.join(HERE, "..", "..", "agora_output", "lab", "data", "locomo10.json")
@@ -33,7 +33,7 @@ def main():
         # batch-embed the whole conv (turns + questions) once, build the store once
         qa = [q for q in sample["qa"] if q.get("evidence") and q.get("category") != 5]
         LQ.nomic_embed([f"{sp}: {tx}" for _i, sp, tx in turns if tx.strip()] + [q["question"] for q in qa])
-        store = LQ.build_mnemo_store(turns)
+        store = LQ.build_inspeximus_store(turns)
         text2id = {f"{sp}: {tx}": tid for tid, sp, tx in turns if tx.strip()}   # recall hits carry text, not key
         speakers = {sp for _i, sp, _tx in turns if sp}
         for q in qa:

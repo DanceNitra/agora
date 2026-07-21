@@ -20,7 +20,7 @@ that is stated plainly, not spun.
   Marat's TAT-7 divergence confirmed our out→out prediction row-for-row (B-003 out→in vs B-002 out→out, same
   mechanism opposite verdict). We're the named "storage/substrate" layer; qingkong66 called our influence-gate
   "the cleanest substrate-level contribution so far." Joint report due **July 6**.
-- **M2 forged-provenance attack CONFIRMED (commit e3389d2)** — measured that mnemo's `>=2 distinct-source`
+- **M2 forged-provenance attack CONFIRMED (commit e3389d2)** — measured that inspeximus's `>=2 distinct-source`
   corroboration gate is Sybil-forgeable (two fresh domains pass). Answered the open #1462 obligation with a
   receipt. Posted (comment 4878412868).
 - **B-001 recall + composed-soft-filter deployment numbers** published (commits c88f33b, fa25743) — jacksonxly

@@ -17,7 +17,7 @@ Falsifier: if top-1 recovery is near chance (1/|candidates|), the retained embed
 and "keep the vector" is safe — the thesis is wrong.
 
 Run: python research/probes/embedding_inversion_probe.py   (cloud-free; needs numpy + local Ollama nomic-embed-text)
-Part of Agora / mnemo (MIT).
+Part of Agora / inspeximus (MIT).
 """
 import os
 import sys

@@ -41,8 +41,8 @@ META = {
         "desc_sk": "Adaptívny útočník porazí štyri obrany pamäte AI agenta: každý iba-obsahový signál padne "
                    "a proveniencia overuje zdroj, nie pravdu.",
         "date": "2026-07-05", "modified": "2026-07-05",
-        "tags": "AI agents · Memory · Security · Poisoning · mnemo · Provenance",
-        "tags_sk": "AI agenti · Pamäť · Bezpečnosť · Poisoning · mnemo · Proveniencia",
+        "tags": "AI agents · Memory · Security · Poisoning · inspeximus · Provenance",
+        "tags_sk": "AI agenti · Pamäť · Bezpečnosť · Poisoning · inspeximus · Proveniencia",
         "kicker": "Agent memory security", "kicker_sk": "Bezpečnosť pamäte agentov",
     },
     "agent-memory-poisoning-influence-gate": {
@@ -54,8 +54,8 @@ META = {
         "desc_sk": "Jedna otrávená spomienka s triggerom z obyčajnej vety unesie retrieval AI agenta na "
                    "88–100% aj pri 10k. Gejtovanie vplyvu korroboráciou ho zrazí na 0%.",
         "date": "2026-07-02", "modified": "2026-07-02",
-        "tags": "AI agents · Memory · Security · Poisoning · mnemo",
-        "tags_sk": "AI agenti · Pamäť · Bezpečnosť · Poisoning · mnemo",
+        "tags": "AI agents · Memory · Security · Poisoning · inspeximus",
+        "tags_sk": "AI agenti · Pamäť · Bezpečnosť · Poisoning · inspeximus",
         "kicker": "Agent memory security", "kicker_sk": "Bezpečnosť pamäte agentov",
     },
     "agent-memory-retrieval": {
@@ -225,8 +225,8 @@ META = {
                    "(norma−dĺžka CI cez 0), zisk dekompozície boli tokeny (Δ=0 pri matchnutom compute). "
                    "Reality-check — variancia, compute-match, proxy — plus bežateľný helper a verejné receipty.",
         "date": "2026-07-03", "modified": "2026-07-03",
-        "tags": "AI memory · RAG · Reality check · Strong baselines · mnemo",
-        "tags_sk": "AI pamäť · RAG · Reality check · Strong baselines · mnemo",
+        "tags": "AI memory · RAG · Reality check · Strong baselines · inspeximus",
+        "tags_sk": "AI pamäť · RAG · Reality check · Strong baselines · inspeximus",
         "kicker": "Method-win reality check", "kicker_sk": "Reality-check method-wins",
     },
     "agent-memory-poisoning-layered-defense-residual": {
@@ -236,14 +236,14 @@ META = {
         "desc": "Layered defenses against agent-memory poisoning don't multiply into a wall. Four composition "
                 "claims verified against the dependability, Sybil and change-point literature — all correct and "
                 "all textbook — leave a priced, appealable residual on top of provenance that survives "
-                "transformation. Plus five shipped mnemo primitives, each limit in the code.",
+                "transformation. Plus five shipped inspeximus primitives, each limit in the code.",
         "desc_sk": "Vrstvené obrany proti otrave pamäte agentov sa nevynásobia do steny. Štyri kompozičné "
                    "tvrdenia overené proti literatúre spoľahlivosti, Sybil a change-point — všetky správne a "
                    "učebnicové — nechávajú oceniteľné, odvolateľné rezíduum nad provenance, čo prežije "
-                   "transformáciu. Plus päť shipnutých mnemo primitív, každý limit v kóde.",
+                   "transformáciu. Plus päť shipnutých inspeximus primitív, každý limit v kóde.",
         "date": "2026-07-04", "modified": "2026-07-04",
-        "tags": "Agent memory · Memory poisoning · Security · Sybil · mnemo",
-        "tags_sk": "Pamäť agentov · Otrava pamäte · Bezpečnosť · Sybil · mnemo",
+        "tags": "Agent memory · Memory poisoning · Security · Sybil · inspeximus",
+        "tags_sk": "Pamäť agentov · Otrava pamäte · Bezpečnosť · Sybil · inspeximus",
         "kicker": "Agent memory security", "kicker_sk": "Bezpečnosť pamäte agentov",
     },
 }

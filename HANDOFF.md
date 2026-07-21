@@ -7,7 +7,7 @@
 > Marat's TAT appendix (DELIVERED, comment #82) + Qingkong's structural OK, **THEN WE (Drahoš) are the final
 > technical sign-off + submitter** (SciPost Physics Core + a fresh Zenodo DOI; a PRIOR paper had DOI
 > 10.5281/zenodo.21393316 — don't conflate). Marat's TAT (Tree Angle Tap; TAT-ONE-TAP = LLM memory via hash
-> fingerprint) bridges EDRN structural methods → mnemo integrity. FULL current state (who owes what) + the whole
+> fingerprint) bridges EDRN structural methods → inspeximus integrity. FULL current state (who owes what) + the whole
 > 83-comment thread digest: memory `marat-tat-edrn-collaboration-live`. Read the whole Issue #1, fetch data from
 > GitHub yourself (public) — never via Gmail.
 
@@ -16,7 +16,7 @@
 ## 2026-07-21 — EDRN paper 2 PUBLISHED · rename decided · adoption measured at ~zero · dungeon's three silent failures
 
 **Read this first.** Two tracks ran today and they are unrelated to each other — do not merge them:
-**(A) the EDRN physics collaboration** (Li / Drahos / Sultanov, 1D Hubbard DMRG), and **(B) mnemo**, our
+**(A) the EDRN physics collaboration** (Li / Drahos / Sultanov, 1D Hubbard DMRG), and **(B) inspeximus**, our
 own product, where a Reddit post's comment thread produced a new experiment. Nothing in (A) touches (B).
 
 ---
@@ -88,7 +88,7 @@ appealable**.
 
 ---
 
-# TRACK B — mnemo
+# TRACK B — inspeximus
 
 ### B1. The rename is DECIDED but NOT executed: `inspeximus`
 
@@ -137,8 +137,8 @@ baseline, which is rare — any movement after the distribution work will be una
 
 **`agora_output/IMPLEMENTATION_PLAN_2026-07-21.md`** — ten items in build order, each with an acceptance
 test rather than an opinion. It front-loads findability because the bottleneck is not capability. Phase 0 is
-`mnemo install` (one command per IDE, and the place where the untested Codex-TOML claim finally gets tested)
-then the `langchain-mnemo` package and catalogue listings. Phase 1 reframes the README around **correction
+`inspeximus install` (one command per IDE, and the place where the untested Codex-TOML claim finally gets tested)
+then the `langchain-inspeximus` package and catalogue listings. Phase 1 reframes the README around **correction
 and provenance** — asked for by 69 and 84 distinct projects — with **revert demoted to proof**, asked for by
 10. Phase 2 is the one axis where we are honestly behind: ingest granularity, then re-measure.
 
@@ -219,7 +219,7 @@ transcript; the two most useful artefacts to keep are the construction audit pat
 ### B4b. THE FINDING OF THE DAY — supersession retires a RECORD, not a VALUE
 
 After the experiment was killed, the owner's instruction was: measure it, verify it three times, and do
-whatever it takes to make mnemo dominate rather than lose. That produced the real result.
+whatever it takes to make inspeximus dominate rather than lose. That produced the real result.
 
 **Step 1 — the cross-vendor stale-fact rate, from runs already paid for (zero new cloud calls).** The
 judge had recorded a `stale_value` flag on every probe all along; we had simply been reading accuracy.
@@ -227,7 +227,7 @@ judge had recorded a `stale_value` flag on every probe all along; we had simply 
 from raw rows, and a per-scenario breakdown) and all three agree:
 
 ```
-mnemo    0.2105  n=38      <- tied with mem0, WORSE than a keep-everything store
+inspeximus    0.2105  n=38      <- tied with mem0, WORSE than a keep-everything store
 mem0     0.2105  n=38
 naive    0.1250  n=40
 session  0.1143  n=35
@@ -235,7 +235,7 @@ none     0.0000  n=29      (trivial: no context, and 5.8% accuracy)
 ```
 
 A first attempt at this number gave 0.194 and was wrong: it pooled `pilot_raw_k150` (budget-matched)
-with `pilot_raw_cheap` (the earlier unmatched run), both of which contain a `mnemo` arm. The published
+with `pilot_raw_cheap` (the earlier unmatched run), both of which contain a `inspeximus` arm. The published
 accuracy table identifies the authoritative file per arm. The three-way check also surfaced an apparent
 0.11 "mismatch" on mem0 that was only a **denominator difference** — `summarize()` grades stale_value
 on `update` scenarios only, while the naive recomputation used every graded probe. State the
@@ -243,7 +243,7 @@ denominator or the number means nothing.
 
 **Step 2 — why.** Across ten scenarios the store holds **33,186 records, 1,728 keyed (5.2%), 108
 superseded (0.33%)**. The correction layer can only suppress what it has keyed, so on 95% of the corpus
-mnemo IS the keep-everything store it ties with.
+inspeximus IS the keep-everything store it ties with.
 
 **Step 3 — the free harness.** `keying_recall.py` measures, with no model involved and ground truth
 taken from the corpus's own `chain_id`/`old_value`/`new_value`:
@@ -283,7 +283,7 @@ and nothing should reach the expensive pilot until it moves there. Memory:
 B4b said the fix was value-level suppression and the bottleneck was chain binding. Both were built and
 measured. **The line is now closed, with a harder answer than either.**
 
-**Built and shipped** (mnemo `513befd`, `a22d200`; 160 tests, store parity audit unchanged):
+**Built and shipped** (inspeximus `513befd`, `a22d200`; 160 tests, store parity audit unchanged):
 - `recall(suppress_stale_values=True)` — withholds any candidate carrying a key's retired value without
   the current one, decided on **distinguishing tokens** (extracted objects carry tails like `Senior Data
   Analyst as of yesterday`, so full-string containment fails in both directions). Opt-in; a 2-tuple
@@ -374,7 +374,7 @@ arms, 892s, zero drops, arms verified paired. Full record: `ORACLE_HEADROOM_RESU
 - **Supersession is destructive, not neutral**: current-only is 35 pp worse overall and scores
   **exactly 0.000** on both history categories (n=18). A third of the corpus asks for the history that
   a correction layer hides.
-- The headroom that exists is in **retrieval** (0.870 vs mnemo 0.545 on the same probes) — direction
+- The headroom that exists is in **retrieval** (0.870 vs inspeximus 0.545 on the same probes) — direction
   only, not budget-matched, no quantified claim.
 
 **Consequence for the product.** The correction layer's case cannot be made on QA accuracy — it is
@@ -434,19 +434,19 @@ verified up, one process each.
 ## PASTE THIS AFTER RESTART (2026-07-20 — newest; supersedes every block below)
 ```
 Resume Agora. FIRST read HANDOFF.md top (2026-07-20) + the LIVE-COLLABORATION callout above it. Chat SLOVAK, code/output ENGLISH.
-MISSION (mnemo-core-must-be-1-before-pro-sells, PERMANENT): mnemo-CORE provably #1 first. TODAY'S EVIDENCE CHANGED THE ROUTE: benchmarks are NOT the bottleneck (3 nulls), DISTRIBUTION is.
-STANDING RULES: FULL gate before anything outward; skeptic on our OWN wins; state each number's PARAMETERS before sending (a U=1 bias table went into a U=4 review); SATURATE the machine on any batch >2 min (fan out independent units, verify CPU in the first minute); a competitor's 0.000 is OUR bug until a positive control says otherwise; PUBLISH mnemo ONLY via tools/publish_mnemo_pypi.py; pre-push secret scan on public repos; GitHub as DanceNitra after owner OK.
-STATE: agora-mnemo 1.24.1 LIVE (PyPI + GitHub, 3 copies synced). brain :8000 + dungeon :5174 UP, 1/1/0, keepalive Ready, dungeon_health OK (loop_n advancing). MemOps pilot CLOSED as a third null; erasure/revert probe PARKED (mem0 arm unrun).
+MISSION (inspeximus-core-must-be-1-before-pro-sells, PERMANENT): inspeximus-CORE provably #1 first. TODAY'S EVIDENCE CHANGED THE ROUTE: benchmarks are NOT the bottleneck (3 nulls), DISTRIBUTION is.
+STANDING RULES: FULL gate before anything outward; skeptic on our OWN wins; state each number's PARAMETERS before sending (a U=1 bias table went into a U=4 review); SATURATE the machine on any batch >2 min (fan out independent units, verify CPU in the first minute); a competitor's 0.000 is OUR bug until a positive control says otherwise; PUBLISH inspeximus ONLY via tools/publish_inspeximus_pypi.py; pre-push secret scan on public repos; GitHub as DanceNitra after owner OK.
+STATE: inspeximus 1.24.1 LIVE (PyPI + GitHub, 3 copies synced). brain :8000 + dungeon :5174 UP, 1/1/0, keepalive Ready, dungeon_health OK (loop_n advancing). MemOps pilot CLOSED as a third null; erasure/revert probe PARKED (mem0 arm unrun).
 #1 TASK: distribution, not measurement — get claims_audit + the write-cost number in front of buyers (MCP registry listing; 78% of installs come through registries). #2: EDRN final sign-off the moment they answer which definition of C they want. #3 (optional): the mem0 arm of the erasure probe, one command.
 Ask me or continue with #1.
 ```
 
 ## Late-evening addendum (2026-07-20, after the first block was written)
 
-- **mnemo 1.24.1 → 1.24.3 shipped.** `claims_audit.py` (13 README claims against the PyPI wheel, sockets
+- **inspeximus 1.24.1 → 1.24.3 shipped.** `claims_audit.py` (13 README claims against the PyPI wheel, sockets
   disabled to *enforce* the no-LLM-write claim), `governance_audit.py` (the erasure sentence attacked over
   3 scenarios x 3 repeats, incl. `derived_from` lineage, bytes-of-every-file, exactly one receipt with the
-  caller's basis, tamper detection, survival across reload), and `store_audit.py` (**MnemoStore vs
+  caller's basis, tamper detection, survival across reload), and `store_audit.py` (**InspeximusStore vs
   LangGraph's own InMemoryStore — parity on every operation**). Each has a falsification mode that MUST
   fail, and CI fails the build if it comes back green.
 - **Two real bugs caught by our own audits, both mine from the same day:** `forget()` left no receipt so
@@ -455,19 +455,19 @@ Ask me or continue with #1.
   was tightened from "at least one" to "exactly one".
 - **Public CI** (`.github/workflows/audit.yml`): every push + daily, Linux/Windows/macOS x Py3.10/3.12,
   source AND published wheel, reports as artifacts, badge in README. 9/9 green.
-- **`MnemoStore` (LangGraph BaseStore) ALREADY EXISTED** — a scan agent said it was missing and I nearly
+- **`InspeximusStore` (LangGraph BaseStore) ALREADY EXISTED** — a scan agent said it was missing and I nearly
   rebuilt it. The gap is visibility, not code: it is in no LangChain integrations page and
   `awesome-LangGraph#88` still sits unmerged.
 - **MCP registry fixed**: the live entry advertised **0.7.19** pointing at the wrong repo; republished at
   1.24.2 (owner device-auth; token expires, so the next bump needs another login). README 124 KB → 31 KB,
   reference moved into `docs/`.
 - **PENDING, owner-only (web UI):** PyPI Trusted Publishing at
-  https://pypi.org/manage/project/agora-mnemo/settings/publishing/ → DanceNitra / mnemo / release.yml /
+  https://pypi.org/manage/project/inspeximus/settings/publishing/ → DanceNitra / inspeximus / release.yml /
   env `pypi`. Until then releases show `provenance=None`. `release.yml` is already written and refuses to
   publish unless all audits + falsification controls pass.
 - **Dungeon diagnosed healthy; the Scout's "23h idle" is US.** `_queue_scout` returns early while a
   "Scout outreach" task is pending, and the inbox holds **22 pending tasks** — including
-  `openclaw/openclaw#7707 "Memory Trust Tagging by Source"`, which is squarely mnemo territory. Read the
+  `openclaw/openclaw#7707 "Memory Trust Tagging by Source"`, which is squarely inspeximus territory. Read the
   inbox with the `.pending` key; `loop_n` persists across restarts in `.dungeon_heartbeat` (2,200,595).
 - **Marat/TAT:** he ran the negative controls and honestly reported that TAT cannot separate real from
   shuffled. Our reply (drafted, owner sends) argues the null is likely his CONTROL, not his method —
@@ -476,7 +476,7 @@ Ask me or continue with #1.
 
 ## What happened 2026-07-20 (all shipped, pushed, released)
 
-- **mnemo 1.24.0 — a REAL bug, found by testing our own README.** The owner asked "where is it written that this
+- **inspeximus 1.24.0 — a REAL bug, found by testing our own README.** The owner asked "where is it written that this
   actually exists and works, and that you did not invent it?" Instead of arguing, I downloaded the published wheel
   into a clean room and tested one README sentence. It failed: plain `forget()` deleted the record and scrubbed the
   bytes but wrote **no receipt**, so `verify_writes()` reported `deleted out-of-band` — the store accusing its own
@@ -484,21 +484,21 @@ Ask me or continue with #1.
   `basis` committed inside its hash. Regression probe `forget_emits_tombstone_probe.py`. Also fixed
   `trusted_only_poison_defense_probe`, which asserted pre-1.19.0 fail-OPEN behaviour and had been reporting FAILED
   against correct code — a permanently red test teaches you to ignore red.
-- **mnemo 1.24.1 — `claims_audit.py`, and the README now opens with it.** One command downloads the published wheel,
+- **inspeximus 1.24.1 — `claims_audit.py`, and the README now opens with it.** One command downloads the published wheel,
   prints its sha256 and runs 13 checks against THAT artifact (never the working tree): zero deps, no socket on the
   write path (enforced by disabling `socket`), supersession, unaided `revert`, receipts on delete, deletion not
   flagged as tampering, silent edit IS flagged, determinism, `trusted_only` fail-closed, tenant isolation,
   `witness`, `forget_pii`, MCP present. **13/13 PASS on the released 1.24.1.** Claims about OTHER systems are
   listed separately as NOT TESTABLE HERE and never counted as passing. Two of my own checks were wrong first
   (receipts are opt-in; the API is `for_tenant()` not `tenant_view()`) — documented in place.
-- **MemOps pilot CLOSED = the THIRD null on supersession.** At matched context budget: mnemo 0.593, naive keep-all
-  0.592, mem0 0.544, session_rag 0.442, floor 0.058 — every mnemo-vs-mem0 CI crosses zero. Two traps caught, both
+- **MemOps pilot CLOSED = the THIRD null on supersession.** At matched context budget: inspeximus 0.593, naive keep-all
+  0.592, mem0 0.544, session_rag 0.442, floor 0.058 — every inspeximus-vs-mem0 CI crosses zero. Two traps caught, both
   ours: the first run compared arms at a **9x unequal context budget** (accuracy 0.28 → 0.59 once matched), and
   mem0 scored 0.000 twice from OUR defects (`sess[:6000]` truncation; `limit=` where mem0 takes `top_k`). What DID
   separate: **write cost** — 600–730 s of LLM extraction per scenario against 0 s. Full record in
   `agora_output/lab/memops/PREREGISTRATION.md` (Appendices A–C).
 - **Erasure/revert probe PARKED** after E1 SUPPORTED (tie with naive, as predicted against ourselves), R1 REFUTED
-  (0.6 against a 0.8 threshold — mnemo reverts unaided but only where the extractor keyed the chain), R2 SUPPORTED
+  (0.6 against a 0.8 threshold — inspeximus reverts unaided but only where the extractor keyed the chain), R2 SUPPORTED
   (naive needs external knowledge 9/9). E2/E4/R3 need the mem0 arm and were not run.
 - **EDRN: we finished the manuscript for them.** Public repo `DanceNitra/edrn-appendix-fix` with a compiling
   `paper_full.tex` + PDF + every script. The C "48% drop" was a normalisation artefact (`/2.0` in
@@ -516,31 +516,31 @@ Ask me or continue with #1.
 ## PASTE THIS AFTER RESTART (2026-07-19 NIGHT — newest; supersedes the LATE block below)
 ```
 Resume Agora. FIRST read HANDOFF.md top (2026-07-19 NIGHT) + the LIVE-COLLABORATION callout above it. Chat SLOVAK, code/output ENGLISH.
-MISSION (memory mnemo-core-must-be-1-before-pro-sells, PERMANENT): make mnemo-CORE provably #1 ahead of ALL competitors FIRST; PRO sells only on that.
-STANDING RULES: FULL gate before anything outward; skeptic on our OWN wins; NO local GPU LLMs (subagents); to compute on the GPU STOP THE DUNGEON FIRST (unloading qwen is not enough — the dungeon reloads it; AgoraKeepalive schtask re-spawns brain+dungeon every 10 min — Disable-ScheduledTask it, kill brain BEFORE dungeon); no-overclaim; secrets inside scripts; vault safe_vault_push only; GitHub as DanceNitra after owner OK; PUBLISH mnemo ONLY via tools/publish_mnemo_pypi.py (builds from CANONICAL C:/Users/Danculus/inspeximus-repo — mnemo_pypi/ is a staging copy the lab imports, NOT the release source); pre-push SECRET SCAN on any public repo (git log -p origin/main..HEAD | grep token patterns).
-STATE: agora-mnemo 1.20.0 LIVE (PyPI + GitHub, 3 copies synced, pip 1.20.0). Claude Code hooks INSTALLED in agora/.claude/settings.json and FIXED — lexical by default (0.65s/hook, ZERO GPU; semantic = opt-in MNEMO_EMBED_HOOKS=1); this session's hooks were dead (pre-restart processes hung in the old re-embed storm) → RESTART Claude Code to arm them. brain :8000 + dungeon :5174 UP 1/1/0, AgoraKeepalive Ready. agora history REWRITTEN locally before push (a tracked .env backup was in the unpushed range — never reached the remote, verified 404 post-push; no rotation needed for never-pushed material) — file kept on disk, untracked; .gitignore now covers .env.* in 10 repos (8 uncommitted). Sensitive follow-ups live in `PRIVATE_NOTES.md` (repo root, gitignored — NEVER commit it); pointer memory decision::env-backup-scrub-2026-07-19. NOT here (this file is public).
+MISSION (memory inspeximus-core-must-be-1-before-pro-sells, PERMANENT): make inspeximus-CORE provably #1 ahead of ALL competitors FIRST; PRO sells only on that.
+STANDING RULES: FULL gate before anything outward; skeptic on our OWN wins; NO local GPU LLMs (subagents); to compute on the GPU STOP THE DUNGEON FIRST (unloading qwen is not enough — the dungeon reloads it; AgoraKeepalive schtask re-spawns brain+dungeon every 10 min — Disable-ScheduledTask it, kill brain BEFORE dungeon); no-overclaim; secrets inside scripts; vault safe_vault_push only; GitHub as DanceNitra after owner OK; PUBLISH inspeximus ONLY via tools/publish_inspeximus_pypi.py (builds from CANONICAL C:/Users/Danculus/inspeximus-repo — inspeximus_pypi/ is a staging copy the lab imports, NOT the release source); pre-push SECRET SCAN on any public repo (git log -p origin/main..HEAD | grep token patterns).
+STATE: inspeximus 1.20.0 LIVE (PyPI + GitHub, 3 copies synced, pip 1.20.0). Claude Code hooks INSTALLED in agora/.claude/settings.json and FIXED — lexical by default (0.65s/hook, ZERO GPU; semantic = opt-in INSPEXIMUS_EMBED_HOOKS=1); this session's hooks were dead (pre-restart processes hung in the old re-embed storm) → RESTART Claude Code to arm them. brain :8000 + dungeon :5174 UP 1/1/0, AgoraKeepalive Ready. agora history REWRITTEN locally before push (a tracked .env backup was in the unpushed range — never reached the remote, verified 404 post-push; no rotation needed for never-pushed material) — file kept on disk, untracked; .gitignore now covers .env.* in 10 repos (8 uncommitted). Sensitive follow-ups live in `PRIVATE_NOTES.md` (repo root, gitignored — NEVER commit it); pointer memory decision::env-backup-scrub-2026-07-19. NOT here (this file is public).
 #1 TASK (unchanged from LATE): CLEAN RECALL RE-MEASURE — the reinforcement confound taints 1.15.0's recall_any@1 0.193→0.294; recall(reinforce=False) EXISTS since 1.16.0 (commit 01cf175), use it with the disk cache agora_output/lab/data/nomic_prefix_embcache.json. THEN the LATE block's items (2)-(5).
 Ask me or continue with #1.
 ```
 
 ## What happened 2026-07-19 NIGHT (this session, all committed + pushed)
-- **FROZEN-SESSION AUTOPSY (the trigger):** the previous Claude Code session froze via the mnemo plugin. Root cause CONFIRMED EMPIRICALLY, two bugs multiplying: (a) the 1.15.0 embed-recipe guard re-embedded ALL 1214 records (not the 7 vec-bearing) and recorded the new recipe only in `_save()` — which read-only paths (recall/UserPromptSubmit) never call → the FULL realign re-ran on EVERY store open, forever: 1214 GPU embed calls × ~2.2s = ~44 min PER HOOK, and UserPromptSubmit blocks prompt submission (3 hung hook processes found); (b) `_make_embedder` returned bare `None` vs 3-tuple unpack → TypeError swallowed by fail-open = capture silently dead in every project without `.mnemo/config.json` (server/, agora-game-server/).
-- **mnemo 1.18.0 → 1.19.0 → 1.20.0 shipped** (PyPI + GitHub, canonical `inspeximus-repo`, 20 backlog commits reviewed + pushed after a 2-agent audit): **1.18.0** = the storm fix (realign only vec-bearing, persist-once vectors+sidecar together, `MNEMO_REALIGN_MAX=256` cap; measured 44min → 17s once → 2.6s) + `_make_embedder` tuple fix. **1.19.0** = the audit's 6 real defects, 3 of which CONTRADICTED shipped CHANGELOG claims: stored XSS in `browser.py` (`</script>` breakout in inlined JSON — verified live, now `\uXXXX`-escaped), `route()` DELETE hard-deleting on a DEFAULT store by content alone (`_revert_authorized`=True when no authority configured; now requires authority CONFIGURED then satisfied), DELETE regex pre-empting corrections/reverts, `trusted_only=True` failing OPEN with no trust_seeds (**REVERSED a probe-asserted deliberate behavior** — owner approved; now fails closed = []), `_TenantView` cross-tenant leak (remember_decision/distill_and_remember/graph/subgraph/route ran parent-bound → no tenant stamp / all-tenant edges; rebound), cubic MMR (bounded to k + memoized; rerank_pool=2000 was an effective hang) + `reembed()`/`mnemo reembed` (explicit rebuild after cap-drop). **1.20.0** = hooks LEXICAL BY DEFAULT (owner: GPU maxed) — embedder fully off the hook hot path (2.8s → 0.65s, zero GPU; opt-in `MNEMO_EMBED_HOOKS=1` or config `{"embed":{"hooks":true}}`), + two core guarantees so a lexical open can't damage a semantic store: plugin always `persist_vectors=True` (else first save strips persisted vecs) and `_save()` leaves `.embedid` untouched when `embed_id=None` (else next semantic open realigns for nothing). Probes grew regressions for ALL of the above; suite steady 49 pass / 10 pre-existing environmental fails.
-- **RELEASE-TOOL TRAP FIXED:** `tools/publish_mnemo_pypi.py` pointed at `agora/mnemo_pypi` (pyproject stuck at 0.7.19) = dead for months, releases were being made by hand = how the trees drifted. Now builds from canonical `inspeximus-repo` (`MNEMO_REPO=` overrides) + refuses on version mismatch (pyproject vs `__version__`), version-already-on-PyPI, or stale dist/.
+- **FROZEN-SESSION AUTOPSY (the trigger):** the previous Claude Code session froze via the inspeximus plugin. Root cause CONFIRMED EMPIRICALLY, two bugs multiplying: (a) the 1.15.0 embed-recipe guard re-embedded ALL 1214 records (not the 7 vec-bearing) and recorded the new recipe only in `_save()` — which read-only paths (recall/UserPromptSubmit) never call → the FULL realign re-ran on EVERY store open, forever: 1214 GPU embed calls × ~2.2s = ~44 min PER HOOK, and UserPromptSubmit blocks prompt submission (3 hung hook processes found); (b) `_make_embedder` returned bare `None` vs 3-tuple unpack → TypeError swallowed by fail-open = capture silently dead in every project without `.inspeximus/config.json` (server/, agora-game-server/).
+- **inspeximus 1.18.0 → 1.19.0 → 1.20.0 shipped** (PyPI + GitHub, canonical `inspeximus-repo`, 20 backlog commits reviewed + pushed after a 2-agent audit): **1.18.0** = the storm fix (realign only vec-bearing, persist-once vectors+sidecar together, `INSPEXIMUS_REALIGN_MAX=256` cap; measured 44min → 17s once → 2.6s) + `_make_embedder` tuple fix. **1.19.0** = the audit's 6 real defects, 3 of which CONTRADICTED shipped CHANGELOG claims: stored XSS in `browser.py` (`</script>` breakout in inlined JSON — verified live, now `\uXXXX`-escaped), `route()` DELETE hard-deleting on a DEFAULT store by content alone (`_revert_authorized`=True when no authority configured; now requires authority CONFIGURED then satisfied), DELETE regex pre-empting corrections/reverts, `trusted_only=True` failing OPEN with no trust_seeds (**REVERSED a probe-asserted deliberate behavior** — owner approved; now fails closed = []), `_TenantView` cross-tenant leak (remember_decision/distill_and_remember/graph/subgraph/route ran parent-bound → no tenant stamp / all-tenant edges; rebound), cubic MMR (bounded to k + memoized; rerank_pool=2000 was an effective hang) + `reembed()`/`inspeximus reembed` (explicit rebuild after cap-drop). **1.20.0** = hooks LEXICAL BY DEFAULT (owner: GPU maxed) — embedder fully off the hook hot path (2.8s → 0.65s, zero GPU; opt-in `INSPEXIMUS_EMBED_HOOKS=1` or config `{"embed":{"hooks":true}}`), + two core guarantees so a lexical open can't damage a semantic store: plugin always `persist_vectors=True` (else first save strips persisted vecs) and `_save()` leaves `.embedid` untouched when `embed_id=None` (else next semantic open realigns for nothing). Probes grew regressions for ALL of the above; suite steady 49 pass / 10 pre-existing environmental fails.
+- **RELEASE-TOOL TRAP FIXED:** `tools/publish_inspeximus_pypi.py` pointed at `agora/inspeximus_pypi` (pyproject stuck at 0.7.19) = dead for months, releases were being made by hand = how the trees drifted. Now builds from canonical `inspeximus-repo` (`INSPEXIMUS_REPO=` overrides) + refuses on version mismatch (pyproject vs `__version__`), version-already-on-PyPI, or stale dist/.
 - **SECRET NEAR-MISS (agora, PUBLIC repo):** a tracked `.env` backup slipped past `.gitignore` (a bare `.env` pattern does NOT match `.env.<suffix>`) and sat in the unpushed range. Verified NEVER on remote (GitHub API 404 + absent from origin/main tree + no remote branch had the commit). History of ONLY the unpushed range rewritten (lesson: scope filter-branch to `origin/main..HEAD` — a full-history attempt wasted 10 min on 1322 commits/136MB), file kept on disk untracked, the safety backup tag deleted (it still held the secret and would leave with `--tags`), THEN pushed clean (post-push API 404 re-verified). `.gitignore` hardened in 10 repos (`.env.*` + key material; `.env.example/.sample/.template` still allowed; verified 0 already-tracked files newly match) — committed only in inspeximus-repo + agora. Sensitive follow-ups live in `PRIVATE_NOTES.md` (repo root, gitignored) via pointer memory decision::env-backup-scrub-2026-07-19, not in this public file.
 - **DUNGEON OPS (start of session):** took down brain+dungeon+qwen for GPU work — found the resurrection chain: `AgoraKeepalive` schtask (every 10 min) → `start_agora_hidden.vbs` → `start_agora.ps1` re-spawns BOTH; brain's own watchdog re-spawns the dungeon; the dungeon reloads qwen. Correct order: Disable-ScheduledTask AgoraKeepalive → kill brain → kill dungeon → `ollama stop qwen3:30b-a3b`. Everything restarted + verified healthy at session end (1/1/0, brain /api/v1/health 200, dungeon 200, keepalive Ready).
-- **PLUGIN STATE FOR NEXT SESSION:** hooks are configured (agora/.claude/settings.json: PostToolUse/UserPromptSubmit/SessionStart → `python -m mnemo.claude_code`) and the code path they import is `agora/mnemo` (cwd precedes PYTHONPATH — a stale local copy silently shadows the canonical repo; all 3 copies synced now). THIS session's hooks were dead (the pre-restart hung processes were the old code); a Claude Code RESTART arms the fixed ones. Store healthy: 1216+ records, 10 vecs preserved, sidecar correct.
+- **PLUGIN STATE FOR NEXT SESSION:** hooks are configured (agora/.claude/settings.json: PostToolUse/UserPromptSubmit/SessionStart → `python -m inspeximus.claude_code`) and the code path they import is `agora/inspeximus` (cwd precedes PYTHONPATH — a stale local copy silently shadows the canonical repo; all 3 copies synced now). THIS session's hooks were dead (the pre-restart hung processes were the old code); a Claude Code RESTART arms the fixed ones. Store healthy: 1216+ records, 10 vecs preserved, sidecar correct.
 
 # Agora — Session Handoff (2026-07-19 LATE · "recall levers, 1.15.0, and a CONFOUND caught" day)
 
 ## PASTE THIS AFTER RESTART (2026-07-19 LATE — superseded by the NIGHT block above)
 ```
 Resume Agora. FIRST read HANDOFF.md top (2026-07-19 LATE) + the LIVE-COLLABORATION callout above it. Chat SLOVAK, code/output ENGLISH.
-MISSION (memory mnemo-core-must-be-1-before-pro-sells, PERMANENT): make mnemo-CORE provably #1 ahead of ALL competitors FIRST; PRO sells only on that. Don't monetize before core is provably #1.
+MISSION (memory inspeximus-core-must-be-1-before-pro-sells, PERMANENT): make inspeximus-CORE provably #1 ahead of ALL competitors FIRST; PRO sells only on that. Don't monetize before core is provably #1.
 STANDING RULES: FULL gate before anything outward (validate→storm→audit→verify — it caught 5+ real defects this session: strawman token_report ratio, a default-truncation integrity regression, a confounded mem0 comparison, a silent persist_vectors recall-corruption bug, and the recall-reinforcement confound below); skeptic on our OWN wins; NO local GPU LLMs (do LLM work via SUBAGENTS); for a big local-embedding batch PAUSE dungeon+brain and UNLOAD big models from GPU (qwen3:30b ate 21.7GB), run ONE batch with a disk cache + progress via Monitor, restart both after; no-overclaim; secrets inside scripts; vault safe_vault_push only; GitHub as DanceNitra after owner OK.
-#1 TASK — CLEAN RECALL RE-MEASURE (a confound taints today's numbers): mnemo recall() REINFORCES value on every call, so building one store per conversation and recalling all ~150 questions on it CONTAMINATES the ranking of later questions (confirmed: same query fresh-store vs after-40-recalls = totally different top-3). This taints the centering/cosine numbers AND the FULL10 self-comparison numbers shipped in the 1.15.0 CHANGELOG (recall_any@1 0.193→0.294). The DIRECTION (nomic prefixes help — a documented correctness fix per nomic's model card) HOLDS; the absolute deltas are NOT clean. Re-measure recall with reinforcement CONTROLLED (fresh store per query, OR add a recall(reinforce=False) kwarg, OR freeze value/credit). Reuse the disk cache agora_output/lab/data/nomic_prefix_embcache.json (7407 prefixed vecs — NO re-embed needed). Memory: mnemo-native-ranking-underperforms-cosine-cold-recall.
-THEN: (2) 1.15.1 CHANGELOG caveat — correctness-fix + direction sound, mark the absolute delta "pending clean re-measure" (or replace with clean numbers). (3) The centering question, cleanly: is mnemo's centered ranking worse than correct raw cosine once prefixes are on, and is the center_embeddings=False path buggy? decide a regime-aware fix; FULL gate + probe before shipping (recall-core change). (4) 7 frontier inbox keepers (each carries the severe-test rule) — this is /loop work. (5) verify the dungeon actually PRODUCES mnemo findings now (it was starved by 9 fighting processes, now clean 1/1/0).
-STATE: agora-mnemo 1.15.0 LIVE on PyPI (token-pack: compact recall + get/neighbors + token_report; nomic embed_query correctness fix; persist_vectors embed_id migration guard). 3 mnemo copies synced (inspeximus-repo canonical, agora/mnemo, agora/mnemo_pypi — the lab imports mnemo_pypi). brain :8000 + dungeon :5174 clean 1/1/0, agents=8; canon updated (6696 chars) + pushed; inbox 33→7; PyPI baseline recorded 783/4331/10051 (downloads≠users). Ask me or continue with #1.
+#1 TASK — CLEAN RECALL RE-MEASURE (a confound taints today's numbers): inspeximus recall() REINFORCES value on every call, so building one store per conversation and recalling all ~150 questions on it CONTAMINATES the ranking of later questions (confirmed: same query fresh-store vs after-40-recalls = totally different top-3). This taints the centering/cosine numbers AND the FULL10 self-comparison numbers shipped in the 1.15.0 CHANGELOG (recall_any@1 0.193→0.294). The DIRECTION (nomic prefixes help — a documented correctness fix per nomic's model card) HOLDS; the absolute deltas are NOT clean. Re-measure recall with reinforcement CONTROLLED (fresh store per query, OR add a recall(reinforce=False) kwarg, OR freeze value/credit). Reuse the disk cache agora_output/lab/data/nomic_prefix_embcache.json (7407 prefixed vecs — NO re-embed needed). Memory: inspeximus-native-ranking-underperforms-cosine-cold-recall.
+THEN: (2) 1.15.1 CHANGELOG caveat — correctness-fix + direction sound, mark the absolute delta "pending clean re-measure" (or replace with clean numbers). (3) The centering question, cleanly: is inspeximus's centered ranking worse than correct raw cosine once prefixes are on, and is the center_embeddings=False path buggy? decide a regime-aware fix; FULL gate + probe before shipping (recall-core change). (4) 7 frontier inbox keepers (each carries the severe-test rule) — this is /loop work. (5) verify the dungeon actually PRODUCES inspeximus findings now (it was starved by 9 fighting processes, now clean 1/1/0).
+STATE: inspeximus 1.15.0 LIVE on PyPI (token-pack: compact recall + get/neighbors + token_report; nomic embed_query correctness fix; persist_vectors embed_id migration guard). 3 inspeximus copies synced (inspeximus-repo canonical, agora/inspeximus, agora/inspeximus_pypi — the lab imports inspeximus_pypi). brain :8000 + dungeon :5174 clean 1/1/0, agents=8; canon updated (6696 chars) + pushed; inbox 33→7; PyPI baseline recorded 783/4331/10051 (downloads≠users). Ask me or continue with #1.
 ```
 
 
@@ -559,67 +559,67 @@ STATE: agora-mnemo 1.15.0 LIVE on PyPI (token-pack: compact recall + get/neighbo
   original formulation REFUTED (finite-size effect). Spin-velocity anchor π·v_s(U=0.5)=6.02776 exact. FULL detail +
   who-owes-what: memory `marat-tat-edrn-collaboration-live` (updated 2026-07-19). STILL PENDING: our final sign-off +
   SciPost-Core submission after Guanghao's revisions + Qingkong's structural OK.
-- **LESSON — our own mnemo dogfood did NOT help me recall this** (owner rightly furious): the `.mnemo` auto-capture
+- **LESSON — our own inspeximus dogfood did NOT help me recall this** (owner rightly furious): the `.inspeximus` auto-capture
   logs COMMANDS/file-states, not CONCLUSIONS/decisions, so recall returns "ran: curl…" not "the 2 findings we sent
-  Marat"; and I skipped writing the EDRN conclusions to curated memory. Log ≠ memory. Memory: `mnemo-dogfood-captures-mechanics-not-decisions`.
-- **mnemo 1.15.0 SHIPPED live (PyPI + GitHub `7b3bc9c` + tag v1.15.0):** (a) **token-pack** — compact MCP recall projection + `get(id)`/`neighbors(id,k)` progressive disclosure + `token_report` (honest same-k payload estimate, NOT a whole-store strawman) + snippet truncation OPT-IN (protects echo-guard) + k hard-cap; (b) **nomic `embed_query`** asymmetric correctness fix (search_document:/search_query:; MCP auto-applies, `MNEMO_NOMIC_PREFIX=0` to opt out); (c) **persist_vectors `embed_id` migration guard** (re-embeds on recipe change → no silent recall corruption on prefix upgrade). Suite 148/148; probes token_pack 7/7 + embed_query + migration_guard. **Full gate caught+fixed: strawman token_report ratio, default-truncation integrity regression, confounded mem0 comparison (dropped), the migration bug.**
-- **⚠️ CONFOUND CAUGHT (the #1 handoff item):** mnemo `recall()` reinforces value each call → all per-conversation aggregate recall numbers this session are CONTAMINATED, INCLUDING the 1.15.0 CHANGELOG self-comparison `recall_any@1 0.193→0.294`. Direction (nomic prefixes help = documented correctness fix) HOLDS; absolute deltas NOT clean. **Next session: re-measure recall with reinforcement controlled** + add a 1.15.1 caveat. Memory: `mnemo-native-ranking-underperforms-cosine-cold-recall`.
+  Marat"; and I skipped writing the EDRN conclusions to curated memory. Log ≠ memory. Memory: `inspeximus-dogfood-captures-mechanics-not-decisions`.
+- **inspeximus 1.15.0 SHIPPED live (PyPI + GitHub `7b3bc9c` + tag v1.15.0):** (a) **token-pack** — compact MCP recall projection + `get(id)`/`neighbors(id,k)` progressive disclosure + `token_report` (honest same-k payload estimate, NOT a whole-store strawman) + snippet truncation OPT-IN (protects echo-guard) + k hard-cap; (b) **nomic `embed_query`** asymmetric correctness fix (search_document:/search_query:; MCP auto-applies, `INSPEXIMUS_NOMIC_PREFIX=0` to opt out); (c) **persist_vectors `embed_id` migration guard** (re-embeds on recipe change → no silent recall corruption on prefix upgrade). Suite 148/148; probes token_pack 7/7 + embed_query + migration_guard. **Full gate caught+fixed: strawman token_report ratio, default-truncation integrity regression, confounded mem0 comparison (dropped), the migration bug.**
+- **⚠️ CONFOUND CAUGHT (the #1 handoff item):** inspeximus `recall()` reinforces value each call → all per-conversation aggregate recall numbers this session are CONTAMINATED, INCLUDING the 1.15.0 CHANGELOG self-comparison `recall_any@1 0.193→0.294`. Direction (nomic prefixes help = documented correctness fix) HOLDS; absolute deltas NOT clean. **Next session: re-measure recall with reinforcement controlled** + add a 1.15.1 caveat. Memory: `inspeximus-native-ranking-underperforms-cosine-cold-recall`.
 - **Cognee deep no-skip scan** (7 agents) + plan `agora_output/strategy/cognee_deep_scan_and_implementation_plan.md`: "token reduction" = MCP payload filters (not benchmarked); 550-dep framework validates our zero-dep bet; NO supersession/revert/erasure (moat holds). A) token-pack shipped; C) erasure refcount **does NOT port** (our derivation-taint delete-cascade is more compliance-correct — don't weaken it).
-- **Erasure self-check tool published + benchmark CONSOLIDATED under RAMR** (`DanceNitra/ramr` `integrity/`; `agent-memory-integrity` → redirect+ARCHIVED); bi-temporal honest-parity cell (mnemo 4/4 but Zep/Graphiti also bitemporal = parity not win). **Un-named revert** = real no-LLM differentiator (embedding clf CV 0.905/0.830/0.190; regex 0.625 was overfit) — lab only.
-- **Dungeon fixed:** was **5 brains + 4 supervisors + 5 dungeons FIGHTING** (scout starved 45h despite mnemo-aligned theme) → cleaned to canonical **1/1/0** (verify python procs match `uvicorn agora|mcp_server|dungeon_supervisor` = 1/1/0). **Inbox 33→7** (keepers frontier-aligned; scout-outreach declined; theme-skips recorded). **Canon** 7790→6696 (<7000), merged "corroboration-gate is regressive" + "corrections must stick", pushed (`3fdc3906`). **PyPI baseline** 783/4331/10051 (downloads≠users; memory `pypi-download-baseline`).
+- **Erasure self-check tool published + benchmark CONSOLIDATED under RAMR** (`DanceNitra/ramr` `integrity/`; `agent-memory-integrity` → redirect+ARCHIVED); bi-temporal honest-parity cell (inspeximus 4/4 but Zep/Graphiti also bitemporal = parity not win). **Un-named revert** = real no-LLM differentiator (embedding clf CV 0.905/0.830/0.190; regex 0.625 was overfit) — lab only.
+- **Dungeon fixed:** was **5 brains + 4 supervisors + 5 dungeons FIGHTING** (scout starved 45h despite inspeximus-aligned theme) → cleaned to canonical **1/1/0** (verify python procs match `uvicorn agora|mcp_server|dungeon_supervisor` = 1/1/0). **Inbox 33→7** (keepers frontier-aligned; scout-outreach declined; theme-skips recorded). **Canon** 7790→6696 (<7000), merged "corroboration-gate is regressive" + "corrections must stick", pushed (`3fdc3906`). **PyPI baseline** 783/4331/10051 (downloads≠users; memory `pypi-download-baseline`).
 - **RAG thread (tewkberry/praxis):** owner decided NOT to reply — out-built it (un-named revert). praxis = a business-RAG governance CLI (read from actual docs), not our layer.
-- **Decision-capture / distill_and_remember = honest SCAFFOLD, NOT a shipped capability (gate-corrected, do NOT overclaim).** Built + committed (inspeximus-repo `98a2570`/`cbc79a6`, callable, probes pass, synced 3 copies): `remember_decision()` (typed convenience over `remember(key=, mtype='procedural')` — `decision::<topic>` keyed supersession + revert) and `distill_and_remember(text, distiller)` (mnemo owns the `DISTILL_PROMPT` contract + deterministic storage; the CALLER injects the LLM). A 5-lens stress-claim REFRAMED it hard: (a) capture quality UNMEASURED (probe uses a MOCK distiller = orchestration/fail-open only; the one end-to-end run was a self-authored circular toy transcript); (b) it does NOT fix the dogfood (`mnemo_hooks.py` still logs commands, unwired) — wiring needs an OFF-hot-path trigger (session-end, not per-event, else the zero-LLM-write wedge breaks) + a correctness gate (drop any extracted decision that doesn't cite a source turn, else a hallucinated decision poisons the durable store and INVERTS the moat); (c) NO CHANGELOG/version/PyPI shipped — good, gate caught it before outward.
-- **PERMANENT lessons this session (both in memory):** (1) `competitors-CAN-erase-revert-mnemo-moat-is-determinism` — STOP saying "competitors can't X"; mem0 HAS delete()/update()/history(), Zep invalidates edges, both ship LLM extraction. The true, narrow moat = mnemo does correction/supersession/revert/erasure DETERMINISTICALLY (zero-LLM read/revert, keyed, single-file, signed erasure), never "they can't". I made this overclaim TWICE today (recall + erase). (2) `mnemo-dogfood-captures-mechanics-not-decisions` — log != memory; write conclusions to curated memory as-you-go; HANDOFF the WHOLE day. (3) VERIFY subagent FACTS — a stress-claim lens falsely claimed distill_and_remember "doesn't exist / vaporware"; direct grep proved it exists (line 1442, committed, callable). Don't relay a subagent's factual claim without checking; over-claim AND under-claim are both errors.
+- **Decision-capture / distill_and_remember = honest SCAFFOLD, NOT a shipped capability (gate-corrected, do NOT overclaim).** Built + committed (inspeximus-repo `98a2570`/`cbc79a6`, callable, probes pass, synced 3 copies): `remember_decision()` (typed convenience over `remember(key=, mtype='procedural')` — `decision::<topic>` keyed supersession + revert) and `distill_and_remember(text, distiller)` (inspeximus owns the `DISTILL_PROMPT` contract + deterministic storage; the CALLER injects the LLM). A 5-lens stress-claim REFRAMED it hard: (a) capture quality UNMEASURED (probe uses a MOCK distiller = orchestration/fail-open only; the one end-to-end run was a self-authored circular toy transcript); (b) it does NOT fix the dogfood (`inspeximus_hooks.py` still logs commands, unwired) — wiring needs an OFF-hot-path trigger (session-end, not per-event, else the zero-LLM-write wedge breaks) + a correctness gate (drop any extracted decision that doesn't cite a source turn, else a hallucinated decision poisons the durable store and INVERTS the moat); (c) NO CHANGELOG/version/PyPI shipped — good, gate caught it before outward.
+- **PERMANENT lessons this session (both in memory):** (1) `competitors-CAN-erase-revert-inspeximus-moat-is-determinism` — STOP saying "competitors can't X"; mem0 HAS delete()/update()/history(), Zep invalidates edges, both ship LLM extraction. The true, narrow moat = inspeximus does correction/supersession/revert/erasure DETERMINISTICALLY (zero-LLM read/revert, keyed, single-file, signed erasure), never "they can't". I made this overclaim TWICE today (recall + erase). (2) `inspeximus-dogfood-captures-mechanics-not-decisions` — log != memory; write conclusions to curated memory as-you-go; HANDOFF the WHOLE day. (3) VERIFY subagent FACTS — a stress-claim lens falsely claimed distill_and_remember "doesn't exist / vaporware"; direct grep proved it exists (line 1442, committed, callable). Don't relay a subagent's factual claim without checking; over-claim AND under-claim are both errors.
 - **EDRN full-day work is documented above** (TAT appendix reviewed + owner emailed Marat) — do NOT omit early-session workstreams from the handoff again (owner flagged this explicitly).
 
 ## PASTE THIS AFTER RESTART (2026-07-19 · EARLIER erasure-flagship block — superseded by the LATE block at top)
 ```
 Resume Agora. FIRST read HANDOFF.md top (2026-07-19) + the LIVE-COLLABORATION callout above it. Chat SLOVAK, code/output ENGLISH.
-MISSION (memory mnemo-core-must-be-1-before-pro-sells, PERMANENT): make mnemo-CORE provably #1 ahead of ALL competitors FIRST; PRO sells only on that. Open-core: free core = credibility; PRO (later, ~month+budget, NO API yet) = hosted anchor-witnessing + cross-infra ErasureTargets + DSR workflow. Don't monetize before core is provably #1.
+MISSION (memory inspeximus-core-must-be-1-before-pro-sells, PERMANENT): make inspeximus-CORE provably #1 ahead of ALL competitors FIRST; PRO sells only on that. Open-core: free core = credibility; PRO (later, ~month+budget, NO API yet) = hosted anchor-witnessing + cross-infra ErasureTargets + DSR workflow. Don't monetize before core is provably #1.
 STANDING RULES (obey): run the FULL gate before anything outward (validate→storm→audit→verify — it KILLED our accusatory erasure artifact this session & re-scoped it honestly); skeptic on our OWN wins before believing them; NO local GPU models (owner: GPU overloaded — do LLM work via SUBAGENTS, credit-free); never publish accusatory competitor artifacts (coordinated disclosure); no-overclaim; secrets inside scripts; vault safe_vault_push only; GitHub posts as DanceNitra after owner OK.
-STATE: mnemo agora-mnemo 1.13.0 live (PyPI+GitHub). CORE-ahead pillar = ERASURE, honest+gate-survived: content-free deletion + crypto-shred (shred(), NIST) + auditor erasure_certificate + ORG-WIDE erasure receipt (DeletionManifest cascade, names non-compliant stores) — all probe-verified, headline in README. brain :8000 UP agents=8; dungeon :5174 UP; mnemo-frontier locked; vault synced.
+STATE: inspeximus inspeximus 1.13.0 live (PyPI+GitHub). CORE-ahead pillar = ERASURE, honest+gate-survived: content-free deletion + crypto-shred (shred(), NIST) + auditor erasure_certificate + ORG-WIDE erasure receipt (DeletionManifest cascade, names non-compliant stores) — all probe-verified, headline in README. brain :8000 UP agents=8; dungeon :5174 UP; inspeximus-frontier locked; vault synced.
 NEXT: (per owner) scope PRO around the org-wide receipt; and re-assess the poison/echo adversarial axis HONESTLY (prior gates: adversarial-conflict KILLED, MINJA warrant-gate is the real win). Ask me or continue.
 ```
 
 ## What happened 2026-07-19 (this session, all committed)
-- **mnemo 1.11.0 → 1.13.0 shipped** (PyPI + GitHub DanceNitra/mnemo): CrewAI adapter · Claude-Code semantic recall + `persist_vectors` · opt-out star nudge · opt-out update-check · `recall(rerank=)` hook · **`mnemo` shell CLI** · **`erasure_certificate()` + `verify_erasure_certificate()`** (1.13.0). LangChain docs added; README hero rebranded to **agora-mnemo** (keep PyPI name + `import mnemo`). MCP registry refreshed to 1.12.1 (server.json at 1.12.2, next bump awaits device-auth).
-- **Dungeon fixed + retargeted:** produces ~18 measured notes/day (roster 5→8 fix held); was 93% OFF-mission → **locked the mnemo frontier** (`board/decide`) + concentrated scout `_THEMES` on agent-memory; inbox triaged 44→9; **vault pushed** (safe_vault_push, 9-day lag, 0 deletions). Memory: dungeon-off-mission-frontier-locked-to-mnemo.
-- **Competitor audit (all 10, not just mem0):** 11-system **integrity capability matrix** (source-verified) → competitor-audit-2026-07-18. Ran the **full gate** (storm 5-lens + skeptic + stress-claim 5-lens) on the "mnemo owns integrity" thesis.
-- **ERASURE FLAGSHIP (the win of the session), gate-hardened honest:** the accusatory "delete is a lie / competitors leak / mnemo removes it" framing was KILLED by the gate (not novel — Ghost Vectors 2606.18497; self-owning — mnemo plaintext JSON also leaves bytes at block level; mislabels by-design history as a bug; moot under FDE; CVE-shaped). RE-SCOPED honestly + shipped: content-free deletion + crypto-shred + certificate + **org-wide erasure receipt** (DeletionManifest cascade across every registered store, NAMES non-compliant ones). Probes: erasure_raw_store 12/12 · edge-cases 9/9 · certificate 9/9 · org_wide 10/10. README claims corrected (no "removes from every surface").
+- **inspeximus 1.11.0 → 1.13.0 shipped** (PyPI + GitHub DanceNitra/inspeximus): CrewAI adapter · Claude-Code semantic recall + `persist_vectors` · opt-out star nudge · opt-out update-check · `recall(rerank=)` hook · **`inspeximus` shell CLI** · **`erasure_certificate()` + `verify_erasure_certificate()`** (1.13.0). LangChain docs added; README hero rebranded to **inspeximus** (keep PyPI name + `import inspeximus`). MCP registry refreshed to 1.12.1 (server.json at 1.12.2, next bump awaits device-auth).
+- **Dungeon fixed + retargeted:** produces ~18 measured notes/day (roster 5→8 fix held); was 93% OFF-mission → **locked the inspeximus frontier** (`board/decide`) + concentrated scout `_THEMES` on agent-memory; inbox triaged 44→9; **vault pushed** (safe_vault_push, 9-day lag, 0 deletions). Memory: dungeon-off-mission-frontier-locked-to-inspeximus.
+- **Competitor audit (all 10, not just mem0):** 11-system **integrity capability matrix** (source-verified) → competitor-audit-2026-07-18. Ran the **full gate** (storm 5-lens + skeptic + stress-claim 5-lens) on the "inspeximus owns integrity" thesis.
+- **ERASURE FLAGSHIP (the win of the session), gate-hardened honest:** the accusatory "delete is a lie / competitors leak / inspeximus removes it" framing was KILLED by the gate (not novel — Ghost Vectors 2606.18497; self-owning — inspeximus plaintext JSON also leaves bytes at block level; mislabels by-design history as a bug; moot under FDE; CVE-shaped). RE-SCOPED honestly + shipped: content-free deletion + crypto-shred + certificate + **org-wide erasure receipt** (DeletionManifest cascade across every registered store, NAMES non-compliant ones). Probes: erasure_raw_store 12/12 · edge-cases 9/9 · certificate 9/9 · org_wide 10/10. README claims corrected (no "removes from every surface").
 - **Gap #3 multi-hop:** exhausted (entity-bridge/PRF/multi-query/k-tune/MMR/cross-encoder all fail; `recall_iterative` is the model-in-loop lever). **Selective-forgetting:** measured WEAK on LOCOMO (not a flagship). Memory: locomo-zero-llm-multihop-bridge-killed, competitor-audit-2026-07-18.
-- **MAB-CR:** settled honestly (mnemo ~5× mem0 = verbatim>lossy; supersession ties naive under the official prompt). Do NOT re-run mem0-on-CR.
+- **MAB-CR:** settled honestly (inspeximus ~5× mem0 = verbatim>lossy; supersession ties naive under the official prompt). Do NOT re-run mem0-on-CR.
 - **EDRN/Marat:** read the FULL Issue #1 (83 comments); the current "Menu-2" paper is NOT published — awaits Guanghao's revisions + Marat's TAT appendix (delivered) + Qingkong; WE are final sign-off + submitter (SciPost Core + fresh Zenodo). Owner emailed Marat our 2 appendix findings. Memory: marat-tat-edrn-collaboration-live.
-- **Business model clarified:** open-core (memory mnemo-free-core-vs-paid-pro-boundary).
+- **Business model clarified:** open-core (memory inspeximus-free-core-vs-paid-pro-boundary).
 
 ---
 
-# Agora — Session Handoff (2026-07-18 END OF DAY · SHIPPED mnemo 1.11.0 + fixed the month-old 5→8 agents bug)
+# Agora — Session Handoff (2026-07-18 END OF DAY · SHIPPED inspeximus 1.11.0 + fixed the month-old 5→8 agents bug)
 
 ## PASTE THIS AFTER SESSION RESTART (2026-07-18)
 
 ```
 Resume Agora. FIRST read C:\Users\Danculus\agora\HANDOFF.md TOP section (2026-07-18) fully. Chat SLOVAK, code/output ENGLISH.
 
-THE ROBUST PLAN we are executing (do not lose it): make mnemo NUMERO UNO — the #1 agent-memory product ahead of EVERY competitor. Not by one number (we can't blanket-claim "beats mem0/Zep" without running them on our harness), but by (a) leading the memory-integrity moat NOBODY else has — deterministic no-LLM-on-write + corrections-stick + revert-to-predecessor + provable signed erasure — and (b) closing the buyer-facing gap list ONE BY ONE. Gap roadmap lives in memory `mnemo-path-to-number-one-gap-roadmap` and the task list (#33 adapters, #34 multi-hop, #35 hosted API, #36 credibility, #37 publish INTEGRITY_BENCHMARK.md).
+THE ROBUST PLAN we are executing (do not lose it): make inspeximus NUMERO UNO — the #1 agent-memory product ahead of EVERY competitor. Not by one number (we can't blanket-claim "beats mem0/Zep" without running them on our harness), but by (a) leading the memory-integrity moat NOBODY else has — deterministic no-LLM-on-write + corrections-stick + revert-to-predecessor + provable signed erasure — and (b) closing the buyer-facing gap list ONE BY ONE. Gap roadmap lives in memory `inspeximus-path-to-number-one-gap-roadmap` and the task list (#33 adapters, #34 multi-hop, #35 hosted API, #36 credibility, #37 publish INTEGRITY_BENCHMARK.md).
 
 STANDING RULES (in memory, obey): NEVER skip the embedder / shortcut a measurement — if slow, BATCH it (owner forbade this, emphatic); never suggest stopping, always bring 2-3 sharp next moves; validate→storm→audit→verify gate BEFORE anything goes outward; secrets read INSIDE scripts (PYPI_TOKEN in server/.env), never echo; propose-don't-edit shared/outward; vault fragile (safe_vault_push only); GitHub posts as DanceNitra after owner OK.
 
-WHAT SHIPPED TODAY (live): agora-mnemo 1.11.0 on PyPI (https://pypi.org/project/agora-mnemo/1.11.0/) + GitHub DanceNitra/mnemo — write-path extractors (regex_extractor + make_llm_extractor), LangChain integration (MnemoRetriever), tuned recall recipe, and a VERIFIED top-of-the-top README (owner's steel+cyan hero banner, "why mnemo" moat, competitor comparison table where every cell was verified against the rival's current source, standalone LLM-free LOCOMO recall 0.78/0.65). Vault count corrected 6,000→10,000+.
+WHAT SHIPPED TODAY (live): inspeximus 1.11.0 on PyPI (https://pypi.org/project/inspeximus/1.11.0/) + GitHub DanceNitra/inspeximus — write-path extractors (regex_extractor + make_llm_extractor), LangChain integration (InspeximusRetriever), tuned recall recipe, and a VERIFIED top-of-the-top README (owner's steel+cyan hero banner, "why inspeximus" moat, competitor comparison table where every cell was verified against the rival's current source, standalone LLM-free LOCOMO recall 0.78/0.65). Vault count corrected 6,000→10,000+.
 
-SYSTEM STATE: brain :8000 UP /health agents=8 (FIXED the month-old bug: Rooke+Wren were orphaned/never seeded, Voss culled — see memory dungeon-roster-was-6-not-8-rooke-wren-orphaned); dungeon :5174 UP (one mcp_server, zero supervisors); mnemo everywhere = 1.11.0 (canonical inspeximus-repo, pip -e, agora copies synced — version schism fixed); mnemo Claude Code plugin INSTALLED (activates now on THIS restart — so I should already have my own memory). Cloud LLM credit EXHAUSTED (cross-system LOCOMO head-to-head deferred until topped up).
+SYSTEM STATE: brain :8000 UP /health agents=8 (FIXED the month-old bug: Rooke+Wren were orphaned/never seeded, Voss culled — see memory dungeon-roster-was-6-not-8-rooke-wren-orphaned); dungeon :5174 UP (one mcp_server, zero supervisors); inspeximus everywhere = 1.11.0 (canonical inspeximus-repo, pip -e, agora copies synced — version schism fixed); inspeximus Claude Code plugin INSTALLED (activates now on THIS restart — so I should already have my own memory). Cloud LLM credit EXHAUSTED (cross-system LOCOMO head-to-head deferred until topped up).
 
-FIRST verify health (agents=8, one :8000 listener, mnemo 1.11.0), then continue the gap roadmap: gap #5 CrewAI adapter + smoke-test integrations, then publish INTEGRITY_BENCHMARK.md (#37). Ask me what's next or just continue in order.
+FIRST verify health (agents=8, one :8000 listener, inspeximus 1.11.0), then continue the gap roadmap: gap #5 CrewAI adapter + smoke-test integrations, then publish INTEGRITY_BENCHMARK.md (#37). Ask me what's next or just continue in order.
 ```
 
 ## Detailed state (2026-07-18)
 
-**SHIPPED LIVE:** agora-mnemo **1.11.0** — PyPI https://pypi.org/project/agora-mnemo/1.11.0/ + GitHub DanceNitra/mnemo (main @ bf1d124). Extractors · LangChain (`MnemoRetriever`) · tuned recall recipe · verified README (hero banner, "why mnemo" moat, competitor comparison verified cell-by-cell, standalone LLM-free LOCOMO recall 0.78/0.65). Vault note count 6,000→10,000+ (real 10,904).
+**SHIPPED LIVE:** inspeximus **1.11.0** — PyPI https://pypi.org/project/inspeximus/1.11.0/ + GitHub DanceNitra/inspeximus (main @ bf1d124). Extractors · LangChain (`InspeximusRetriever`) · tuned recall recipe · verified README (hero banner, "why inspeximus" moat, competitor comparison verified cell-by-cell, standalone LLM-free LOCOMO recall 0.78/0.65). Vault note count 6,000→10,000+ (real 10,904).
 
-**THE MOAT (stated, verified):** mnemo is the only mainstream agent-memory lib with NO LLM on the write path → deterministic; the only one combining corrections-stick + revert-to-predecessor + provable signed erasure. Verified this session: none of mem0/Zep/Letta/Cognee/Memobase/MemoryScope/LangMem/txtai exposes revert; mem0 keeps the deleted value in its history table; Graphiti invalidates-not-deletes. Erasure-receipt scoped to "mainstream libs" (Engram/Heartwood do have receipts).
+**THE MOAT (stated, verified):** inspeximus is the only mainstream agent-memory lib with NO LLM on the write path → deterministic; the only one combining corrections-stick + revert-to-predecessor + provable signed erasure. Verified this session: none of mem0/Zep/Letta/Cognee/Memobase/MemoryScope/LangMem/txtai exposes revert; mem0 keeps the deleted value in its history table; Graphiti invalidates-not-deletes. Erasure-receipt scoped to "mainstream libs" (Engram/Heartwood do have receipts).
 
-**SYSTEM / DUNGEON:** brain :8000 UP, `/health agents:8` (was 5 for a month — Rooke+Wren orphaned + Voss culled; fixed in agent_os.py + epoch_engine.py, memory `dungeon-roster-was-6-not-8-rooke-wren-orphaned`), one :8000 listener. Dungeon :5174 UP, one mcp_server, zero supervisors. mnemo = 1.11.0 everywhere (inspeximus-repo canonical, `pip install -e inspeximus-repo`, agora/mnemo + agora/mnemo_pypi synced — schism fixed; RULE: edit inspeximus-repo, re-sync). mnemo Claude Code plugin installed in this project (activates on restart; store ./.mnemo/ gitignored). Cloud LLM credit (OpenAI + Ollama Cloud) EXHAUSTED — cross-system LOCOMO head-to-head deferred.
+**SYSTEM / DUNGEON:** brain :8000 UP, `/health agents:8` (was 5 for a month — Rooke+Wren orphaned + Voss culled; fixed in agent_os.py + epoch_engine.py, memory `dungeon-roster-was-6-not-8-rooke-wren-orphaned`), one :8000 listener. Dungeon :5174 UP, one mcp_server, zero supervisors. inspeximus = 1.11.0 everywhere (inspeximus-repo canonical, `pip install -e inspeximus-repo`, agora/inspeximus + agora/inspeximus_pypi synced — schism fixed; RULE: edit inspeximus-repo, re-sync). inspeximus Claude Code plugin installed in this project (activates on restart; store ./.inspeximus/ gitignored). Cloud LLM credit (OpenAI + Ollama Cloud) EXHAUSTED — cross-system LOCOMO head-to-head deferred.
 
-**ROBUST PLAN — mnemo NUMERO UNO (gap roadmap, one by one; full detail in memory `mnemo-path-to-number-one-gap-roadmap`):**
+**ROBUST PLAN — inspeximus NUMERO UNO (gap roadmap, one by one; full detail in memory `inspeximus-path-to-number-one-gap-roadmap`):**
 1. LOCOMO recall — ✅ DONE (standalone LLM-free 0.78, in README + INTEGRITY_BENCHMARK.md)
 6. optional extractor — ✅ DONE (shipped 1.11.0)
 5. ecosystem adapters — PARTIAL: LangChain ✅; REMAINING CrewAI + smoke-test others + MCP registry (task #33)
@@ -630,11 +630,11 @@ FIRST verify health (agents=8, one :8000 listener, mnemo 1.11.0), then continue 
 
 **NEXT MOVES:** (1) gap #5 CrewAI adapter + smoke-test integrations → 1.12.0 bundle; (2) publish INTEGRITY_BENCHMARK.md (#37); (3) when credit returns → cross-system LOCOMO head-to-head (mem0/Zep through OUR harness) = upgrades "top-tier" to "we beat them"; (4) swap hero banner if owner wants.
 
-**HEALTH CHECK:** `curl :8000/api/v1/health`→agents:8 · `curl :5174/`→200 · `python -c "import mnemo;print(mnemo.__version__)"`→1.11.0 · tasks #33-37 open.
+**HEALTH CHECK:** `curl :8000/api/v1/health`→agents:8 · `curl :5174/`→200 · `python -c "import inspeximus;print(inspeximus.__version__)"`→1.11.0 · tasks #33-37 open.
 
 ---
 
-# Agora — Session Handoff (2026-07-16 END OF DAY · the "gate-discipline day": mnemo 1.9.1→1.9.3, EDRN → Zenodo DOI, selector prior-art gate fixed, 8 honest pre-build kills)
+# Agora — Session Handoff (2026-07-16 END OF DAY · the "gate-discipline day": inspeximus 1.9.1→1.9.3, EDRN → Zenodo DOI, selector prior-art gate fixed, 8 honest pre-build kills)
 
 ## PASTE THIS AFTER SESSION RESTART
 
@@ -646,9 +646,9 @@ STANDING RULES (in memory, obey): never read Gmail via tools (owner PASTES); pro
 BIGGEST LESSON TODAY: don't over-frame a shared-progress note into an obligation, and INFORM the owner clearly instead of quietly chasing results. (I mis-framed Guanghao's Prediction-1 data-share as "prior-art-check before WE co-sign" — nobody asked us to sign anything; the check exists only so our OPINION doesn't endorse an overclaim. Owner rightly caught it.)
 
 WHAT SHIPPED TODAY (all committed + pushed + logged in memory):
-1. mnemo 1.9.1 → 1.9.2 → 1.9.3 ON PYPI (three ships from ONE r/RAG thread with marintkael):
-   - 1.9.1: MINJA warrant gate (credit_requires_warrant + warrant_authorities); self-graded ASR 80%→0%. [[mnemo-191-warrant-gate-minja]]
-   - 1.9.2: read-path reopen (observe/reopened/resolve_reopened) — corroboration-gated POST-write review trigger. [[mnemo-192-readpath-reopen]]
+1. inspeximus 1.9.1 → 1.9.2 → 1.9.3 ON PYPI (three ships from ONE r/RAG thread with marintkael):
+   - 1.9.1: MINJA warrant gate (credit_requires_warrant + warrant_authorities); self-graded ASR 80%→0%. [[inspeximus-191-warrant-gate-minja]]
+   - 1.9.2: read-path reopen (observe/reopened/resolve_reopened) — corroboration-gated POST-write review trigger. [[inspeximus-192-readpath-reopen]]
    - 1.9.3: SUPPORT-KEYED reopen (marintkael's fix: key on novelty-of-support not value; replay collapses to echo by construction). Textbook JTMS (Doyle 1979 / de Kleer 1986 ATMS / Dung 1995), credited. HONEST scope: NOT a security fix — DoS lever MOVES to the support level (fabricate 2 distinct grounds), not closed; independence asserted not certified.
    - Every reply gate-reframed (stress-claim caught overclaims each time) + humanized + grateful. Owner posts the Reddit reply.
 2. EDRN physics paper → ZENODO DOI 10.5281/zenodo.21393316 (Li/Drahos/Sultanov). Compiled the corrected final .tex locally with TECTONIC (portable single-binary LaTeX in scratchpad; fixed a 4→5 col table typo), verified 16pp + all 3 corrections, published. Marat + Guanghao + qingkong gave warm sign-offs. [[edrn-dmrg-crossover-gate-caught-wrong-refutation]]
@@ -659,15 +659,15 @@ WHAT SHIPPED TODAY (all committed + pushed + logged in memory):
    META-LESSON: agent-memory / collective-epistemics flagship-finding frontier is SATURATED in 2025-26 — every clever question is already published, and our multi-model replication hit harness confounds. Our EDGE is shipping products + honest collaboration + distribution, NOT novel findings in a crowded field.
 
 LATE-SESSION ADDITIONS (after the section above was written — all done + logged):
-- mnemo 1.9.3 SHIPPED (PyPI + push db25397): SUPPORT-KEYED reopen (marintkael round 2 — key reopen on novelty-of-support, not value; textbook JTMS Doyle 1979 / de Kleer 1986, credited by name; honest scope: the DoS lever MOVES to the support level, does not close). Reply gate-reframed + humanized; owner has it to post. [[mnemo-192-readpath-reopen]]
+- inspeximus 1.9.3 SHIPPED (PyPI + push db25397): SUPPORT-KEYED reopen (marintkael round 2 — key reopen on novelty-of-support, not value; textbook JTMS Doyle 1979 / de Kleer 1986, credited by name; honest scope: the DoS lever MOVES to the support level, does not close). Reply gate-reframed + humanized; owner has it to post. [[inspeximus-192-readpath-reopen]]
 - BRAIN RESTARTED — the hardened prior-art gate + smart selector (9b5b8ff) are now LIVE (verified: one :8000 listener, dungeon 200, one mcp_server). The flywheel-OOD churn should stop; watch the inbox to confirm.
 - INBOX triaged 100→40 across two gatekeeper passes (74 items: flywheel-OOD-kernel/percolation churn + off-frontier scout noise). The remaining 40 are a normal loop pass.
 - EDRN Prediction-1 review posted as DanceNitra (comment 4993698778): Guanghao's single-bond-defect result is sound physics (Kane-Fisher weak-link -> L_eff explains the prefactor) but we advised AGAINST his "first DMRG verification" framing (pre-empted by arXiv:2405.09046 + 1811.09203) and to fit L_eff from the correlation decay + wait for Menu-2. LESSON: he only asked for our OPINION — don't escalate a shared-progress note into an obligation; inform the owner clearly.
-- VECTORIZE OUTREACH LIVE (possible collaboration/job — owner keen): issue vectorize-io/agent-memory-benchmark#27 as DanceNitra, offering our integrity axis (echo resurrection + value-obscuring revert) for their AMB benchmark (their manifesto explicitly asks for datasets that stress memory in new ways; they cover accuracy/speed/cost, NOT integrity). PATH B: public repo ships ONLY the mnemo adapter (VERIFIED runs out-of-the-box end-to-end: revert 3/5, echo 0/5, no errors, keys from env only) + documented native-config cross-system results; competitor adapter code stays internal; the offer = a PR in THEIR format, they run competitors themselves. Issue body EDITED to remove an early "runs all three" overclaim (owner caught it). WATCH #27. [[vectorize-amb-outreach]]
+- VECTORIZE OUTREACH LIVE (possible collaboration/job — owner keen): issue vectorize-io/agent-memory-benchmark#27 as DanceNitra, offering our integrity axis (echo resurrection + value-obscuring revert) for their AMB benchmark (their manifesto explicitly asks for datasets that stress memory in new ways; they cover accuracy/speed/cost, NOT integrity). PATH B: public repo ships ONLY the inspeximus adapter (VERIFIED runs out-of-the-box end-to-end: revert 3/5, echo 0/5, no errors, keys from env only) + documented native-config cross-system results; competitor adapter code stays internal; the offer = a PR in THEIR format, they run competitors themselves. Issue body EDITED to remove an early "runs all three" overclaim (owner caught it). WATCH #27. [[vectorize-amb-outreach]]
 
 OPEN / WAITING ON OTHERS (do NOT over-produce; 4 live threads seeded):
 - VECTORIZE #27 — await reply; if they engage, next step = concrete PR of the integrity cell into AMB's dataset/scoring format.
-- marintkael r/RAG — owner posts the 1.9.3 reply; open question handed to him: "where does 'support' come from and who certifies 2 grounds independent by MECHANISM not steward fiat?" His answer likely seeds the next mnemo round. Also unresolved design point: echo-guard vs observe() collision is now settled by support-keying, but the provenance channel question stands.
+- marintkael r/RAG — owner posts the 1.9.3 reply; open question handed to him: "where does 'support' come from and who certifies 2 grounds independent by MECHANISM not steward fiat?" His answer likely seeds the next inspeximus round. Also unresolved design point: echo-guard vs observe() collision is now settled by support-keying, but the provenance channel question stands.
 - EDRN — Guanghao's Menu-2 (periodic-vs-open) control data pending. #1466 report → Zenodo PARKED (icophy silent ~1 week; not primarily ours).
 - icophy — silent; nothing to do until they resurface.
 
@@ -677,7 +677,7 @@ INFRA STATE: brain :8000 healthy (restarted this session, gate fix live), dungeo
 ---
 ---
 
-# Agora — Session Handoff (2026-07-12 END OF DAY · the "ship day": mnemo 0.7.15→0.7.19, benchmark repo, dungeon quality, paper audited)
+# Agora — Session Handoff (2026-07-12 END OF DAY · the "ship day": inspeximus 0.7.15→0.7.19, benchmark repo, dungeon quality, paper audited)
 
 ## PASTE THIS AFTER SESSION RESTART
 
@@ -689,15 +689,15 @@ TWO STANDING RULES LEARNED TODAY (both in memory, obey):
 - PROPOSE, don't edit, SHARED/OUTWARD artifacts (the co-authored Marat paper, real-name, going-public): show the change + wait for OK; don't edit the file and report after. Internal product code = direct edits fine.
 
 WHAT SHIPPED TODAY (all committed+pushed):
-1. mnemo 0.7.15→0.7.19 ON PYPI (each measurable):
+1. inspeximus 0.7.15→0.7.19 ON PYPI (each measurable):
    - 0.7.15: id-bound absolute restore = ABA-immune (jacksonxly r/RAG; revert_aba_probe.py). Jackson praised it publicly + closed the thread.
    - 0.7.16: retract_lineage (lineage-aware correction: demote subject+derived_from lineage, retained+flagged, cite Doyle-TMS/TOKI/MemLineage).
    - 0.7.17: rederive() completes the correction lifecycle (regenerate demoted payload vs corrected root; measured harm 0.00 + payload 3/3 active).
    - 0.7.18: governance_report() = erasure-with-proof in one call (GDPR/AI-Act; forget_subject+tombstone chain, honest in-band scope).
    - 0.7.19: MCP-registry ownership token in README.
-   - mnemo README now leads with "Correction is a first-class operation (measured across systems)" (benchmark table).
-2. MCP REGISTRY: mnemo LIVE at registry.modelcontextprotocol.io as io.github.DanceNitra/mnemo v0.7.19 (owner did one browser device-auth click). mcp-publisher binary in scratchpad/mcp-pub/. MCP_LISTINGS.md has the pack for Smithery/PulseMCP/mcp.so (owner web-submits, optional).
-3. AGENT-MEMORY-INTEGRITY = standalone PUBLIC repo LIVE: github.com/DanceNitra/agent-memory-integrity (anon agora-builder). Adapter interface + MnemoAdapter + both cells (revert+echo) + pluggable free judge (local Ollama default) + canonical results. Others self-submit their systems.
+   - inspeximus README now leads with "Correction is a first-class operation (measured across systems)" (benchmark table).
+2. MCP REGISTRY: inspeximus LIVE at registry.modelcontextprotocol.io as io.github.DanceNitra/inspeximus v0.7.19 (owner did one browser device-auth click). mcp-publisher binary in scratchpad/mcp-pub/. MCP_LISTINGS.md has the pack for Smithery/PulseMCP/mcp.so (owner web-submits, optional).
+3. AGENT-MEMORY-INTEGRITY = standalone PUBLIC repo LIVE: github.com/DanceNitra/agent-memory-integrity (anon agora-builder). Adapter interface + InspeximusAdapter + both cells (revert+echo) + pluggable free judge (local Ollama default) + canonical results. Others self-submit their systems.
 4. SEO: retargeted the top query "zero proof ai mcp receipts" — verifiable-agent-receipts post retitled "AI Agent MCP Receipts: Your Logs Aren't Proof" + homepage links it (row 01) + homepage title/meta to agent-memory entities + OG card. render_post.py favicon template fixed (was emitting external favicon.svg = the globe bug). OWNER TODO in GSC: re-request indexing for homepage + the receipts post URL.
 5. DUNGEON RESEARCH-QUALITY SYSTEM (owner "upgrade research QUALITY", 5 Tahy LIVE in brain): retargeted the corporation generator personas from a leftover "software corporation" framing (scout=GitHub trending) to a Frontier Scout hunting HARD OPEN questions (role_prompts.py); AMBITION axis 0-100 + 2x2 routing (ambitious-but-unmeasured -> needs_measurement, NOT killed) in corporation.py; "raise it twice" escalation in agent_worker._escalate_lead; death-reason feedback to CorporationMemory (also fixes the prompt_stale alert); earned per-source-kind standing weighting the seed rotation. Brain restarted clean (one :8000 listener, dungeon 200). See [[dungeon-research-quality-system]].
 
@@ -727,12 +727,12 @@ Resume Agora. FIRST read C:\Users\Danculus\agora\HANDOFF.md top section (2026-07
 WHAT SHIPPED (all committed + pushed, main @ cd62292):
 1. INTEGRITY BENCHMARK POST (flagship, live): "We fixed our own memory benchmark until it stopped
    flattering us" — full validate/storm/audit/verify gate; the gate CAUGHT an asymmetric instrument in
-   our own harness (mnemo scored mechanically vs competitors via LLM judge). Fair symmetric instrument:
-   mnemo revert 1.00 -> 0.75 [0.53,0.89], mem0 0.20, graphiti 0.00; echo = tie (~0 resurrection all).
+   our own harness (inspeximus scored mechanically vs competitors via LLM judge). Fair symmetric instrument:
+   inspeximus revert 1.00 -> 0.75 [0.53,0.89], mem0 0.20, graphiti 0.00; echo = tie (~0 resurrection all).
    Live: dancenitra.github.io/agora/public/posts/we-fixed-our-own-memory-benchmark-...html (+FAQ schema).
    GSC: sitemap was submitted with a leading slash (fixed); indexing requests hit daily quota — owner
    retries; Bing OK. Sitemap correct URL: https://dancenitra.github.io/agora/sitemap.xml
-2. mnemo 0.7.12 ON PYPI: in-stream revert (jacksonxly design "scheduling not acceptance"):
+2. inspeximus 0.7.12 ON PYPI: in-stream revert (jacksonxly design "scheduling not acceptance"):
    revert_intent/restore_intent/submit_revert — signed COMMANDS w/ single-use nonce; relative -> clean
    CONFLICT (distinct from authorization_required) when base moved; absolute -> lands always, once.
    Verified 3x (revert_instream_real_probe.py ALL PASS; 4 prior probes regression-clean; nonce survives
@@ -758,7 +758,7 @@ probe (768-dim qdrant in TEMP). Graphiti needs OpenAI Responses API for native q
 
 DO NEXT (owner-prioritized): 1) when Marat replies -> joint write-up (skeleton in
 [[marat-cosine-correction-decomposition]]); 2) when jackson replies -> fairness follow-up; 3) breaktruth B
-through the FULL GATE -> flagship post candidate; 4) mnemo feature: abstention-thresholded structure-match
+through the FULL GATE -> flagship post candidate; 4) inspeximus feature: abstention-thresholded structure-match
 + ledger detector (the Marat resolution productized) + submit_revert MCP tool; 5) drain Claude inbox (33
 stale items). OWNER MOOD RULES (hard-learned today): NEVER claim something is done/read before it is;
 build-from-inbound BEFORE drafting any reply; no negativity about collaboration write-ups; don't escape
@@ -779,7 +779,7 @@ Resume Agora. FIRST read C:\Users\Danculus\agora\HANDOFF.md top section (2026-07
 THE DOCTRINE WE ARE ON (owner turned the card 2026-07-10 — this is the whole plan now):
 Stop hunting for a research breakthrough (memory-security pond is saturated; 3 idea-gates KILLED it in a
 day — everything is textbook/already-published/null). Instead use our SAME rigor machinery (prior-art
-hunter + construction-skeptic + verify agents) OFFENSIVELY to exponentially upgrade mnemo into the best
+hunter + construction-skeptic + verify agents) OFFENSIVELY to exponentially upgrade inspeximus into the best
 memory product in the world. The loop: DRAIN two inexhaustible sources → GATE each candidate → VERIFY →
 SHIP with a runnable receipt → repeat.
   - ARCHIVE = our own ~90 memory findings + the vault (~6000 notes) + Crucible ledger + past Labs — mine
@@ -787,27 +787,27 @@ SHIP with a runnable receipt → repeat.
   - WEB = competitor feature sets + fresh 2026 research — audit each edge (VERIFIED-REAL vs HYPE), ship
     only the real ones; sweep new papers for a memory/RAG technique that SURVIVES our replication.
 Why it compounds: THE FIELD'S BENCHMARKS ARE CONTAMINATED (LOCOMO answer-key 6.4% wrong, LLM-judge accepts
-63% of intentionally-wrong answers, mem0's paper mis-ran Zep) → every competitor % is marketing → mnemo
+63% of intentionally-wrong answers, mem0's paper mis-ran Zep) → every competitor % is marketing → inspeximus
 becomes the ONLY memory library where each feature ships with a measured receipt. Rigor IS the moat.
-Full doctrine + the competitive audit + build queue: memory file [[mnemo-competitive-strategy-and-audit]].
+Full doctrine + the competitive audit + build queue: memory file [[inspeximus-competitive-strategy-and-audit]].
 
-WHAT SHIPPED TODAY (session 2) — mnemo 0.6.11 → 0.6.16 on PyPI, each verified + regression-clean + live:
+WHAT SHIPPED TODAY (session 2) — inspeximus 0.6.11 → 0.6.16 on PyPI, each verified + regression-clean + live:
   - 0.6.12/0.6.13 revert(key) + objectless-clobber guard + MCP (value-obscuring reversion = channel sep)
   - 0.6.14 as_of() + history() point-in-time / bi-temporal queries — closes ZEP's only real technical
     edge, built on existing [valid_from, invalidated_at] intervals, NO graph DB
-  - 0.6.15 Mnemo(capacity=N) bounded two-tier eviction (value-protected + recency-aged, Lab 29992a) —
+  - 0.6.15 Inspeximus(capacity=N) bounded two-tier eviction (value-protected + recency-aged, Lab 29992a) —
     closes the "unbounded append-only" gap vs mem0/Letta; default None = byte-identical legacy
   - 0.6.16 sleep() sleep-time compute + MCP tool — defers O(n) reorg to idle (Letta parity), pure library
-  mnemo is now feature-competitive with mem0/Zep/Letta on REAL (non-hype) axes + our UNIQUE security layer
+  inspeximus is now feature-competitive with mem0/Zep/Letta on REAL (non-hype) axes + our UNIQUE security layer
   (echo_guard/receipts/taint/influence gate) that no competitor advertises. Probes in research/probes/.
 
 VERIFIED-BUILD QUEUE (next, per the doctrine):
-  1-3 DONE (as_of / eviction / sleep). 4. procedural mtype — mnemo mostly has it, low priority.
+  1-3 DONE (as_of / eviction / sleep). 4. procedural mtype — inspeximus mostly has it, low priority.
   5. A PUBLIC adversarial forgetting/temporal benchmark (RAMR extension) to prove our supersession +
      security lead independently — this is the biggest lever (credibility, not a feature). OUTWARD → full
      validate→storm→audit→verify gate. Everyone else publishes a benchmark; ours is internal.
   ALSO keep sweeping: run a fresh competitor+paper audit each session, mine the vault/archive, add to queue.
-  AVOID graph-DB features (mem0g/Cognee) — infra mnemo correctly refuses; their numbers don't survive audit.
+  AVOID graph-DB features (mem0g/Cognee) — infra inspeximus correctly refuses; their numbers don't survive audit.
 
 LIVE COLLABORATIONS (gated; Claude posts approved GitHub, owner sends emails):
   - Marat (TAT, valued): claimed his Triplenet-5D detector hits F1 0.9375 / AUROC 1.000 on our v2 held-out
@@ -815,7 +815,7 @@ LIVE COLLABORATIONS (gated; Claude posts approved GitHub, owner sends emails):
     TRAINING-only; features a-priori). BUT the results CHART he shared shows a DIFFERENT config (Adaptive
     TAT F1 0.81 on 26 samples, 8 FP keeps) — doesn't match the headline. Owner sent a reply asking for the
     runnable Colab-as-.py so WE reproduce on v2 independently (verify-don't-trust). NEXT: when his code
-    arrives, reproduce it on v2 ourselves; if it holds, wire into mnemo's coherence_gate + write up
+    arrives, reproduce it on v2 ourselves; if it holds, wire into inspeximus's coherence_gate + write up
     together; if not, we found the leak. Do NOT integrate/co-publish before our own reproduction passes.
   - icophy (Cophy, valued): #1462 collaboration going well. We posted 2 probes (hindsight-credit-bias +
     negative-control-precision) then a diffuse-decision follow-up answering his question (his last-step
@@ -838,7 +838,7 @@ STRATEGIC STATE / stealth-yield & Crucible Live (parked, honest):
 ARCHITECTURE / THE DUNGEON (alpha-omega — do NOT forget it): Agora is TWO long-lived processes.
   - brain :8000 (FastAPI, agora.main:app, the MIND) — memory/emotion/trust, economy, the research organs
     (tick/seminar, Telegram poll, dungeon watchdog, envoy, frontier-harvest, idea-forge, hypothesis,
-    scout-digest), the Crucible, mnemo store. Run from server/: PYTHONPATH=. python -m uvicorn
+    scout-digest), the Crucible, inspeximus store. Run from server/: PYTHONPATH=. python -m uvicorn
     agora.main:app --host 127.0.0.1 --port 8000.
   - dungeon :5174 HTTP + :5175 WS (the BODY) — the 8-agent autonomous research swarm (Shadow Kael/scout,
     Sage Mira/curator, High Priest Orin/alchemist, King Aldric/eng-lead, Dame Elara/bridge, Sgt Voss/QA,
@@ -852,7 +852,7 @@ ARCHITECTURE / THE DUNGEON (alpha-omega — do NOT forget it): Agora is TWO long
   watchdog — they fight and cause ~hourly restart churn).
   AFTER ANY restart/reset, DO NOT walk away — run the standing checklist ([[post-reset-loop-checklist-alpha-omega]]):
   verify :5174=200 + ONE :8000 listener + ONE mcp_server.py + NO stray dungeon_supervisor; check the
-  dungeon loop_n heartbeat (NEVER trust HTTP 200 alone — the freeze root-cause was mnemo.recall json.dumps
+  dungeon loop_n heartbeat (NEVER trust HTTP 200 alone — the freeze root-cause was inspeximus.recall json.dumps
   on the loop); then verify+kickstart the Scout scan, the finding-reports, and Envoy, and DRAIN the Claude
   inbox (it fills to a 100 cap; leads reach the owner only when a /loop processes it). Full run/restart
   commands are lower in this file (§Relaunch + Health-check one-liners).
@@ -867,8 +867,8 @@ DO NEXT (owner is here 5+ hours, wants to MAKE — keep building, do NOT wrap ea
      vault/archive. Each candidate → intake gate FIRST (prior-art + construction-skeptic) BEFORE compute.
   2. Marat reproduction when his code lands.
 RULES: anon commits (agora-builder@users.noreply.github.com); PyPI/Telegram/OpenAI tokens from server/.env
-in a script, NEVER on a CLI; vault only via tools/safe_vault_push.py; ship mnemo = bump __version__ in BOTH
-mnemo/mnemo.py AND mnemo_pypi/pyproject.toml, cp mnemo.py + mnemo_mcp.py to mnemo_pypi/mnemo/, build, VERIFY
+in a script, NEVER on a CLI; vault only via tools/safe_vault_push.py; ship inspeximus = bump __version__ in BOTH
+inspeximus/inspeximus.py AND inspeximus_pypi/pyproject.toml, cp inspeximus.py + mcp.py to inspeximus_pypi/inspeximus/, build, VERIFY
 wheel content (0.6.8 lesson), twine upload (token from server/.env non-interactive), commit, AND git push
 (easy to forget the push after commit — I did 3x today), then live-verify from a fresh venv. VERIFY every
 probe's success-criterion honestly — twice today a probe caught a wrong criterion; reframe, never bend the
@@ -884,11 +884,11 @@ Chat **Slovak**, code + output **English**. Tokens in `server/.env` — never ec
 **THE PIVOT (the headline):** memory-security research pond is saturated for us (rigorous prior-art keeps
 finding textbook roots → 3 idea-gates KILLED in a day). So we turned our rigor machinery OFFENSIVE:
 systematically DRAIN the archive (our findings/vault) + the web (competitor features + fresh papers), gate
-each candidate, and ship only what's VERIFIED into mnemo — compounding it into the best memory product,
+each candidate, and ship only what's VERIFIED into inspeximus — compounding it into the best memory product,
 because the field's benchmarks are contaminated and rigor is the only real differentiator. Doctrine in
-[[mnemo-competitive-strategy-and-audit]].
+[[inspeximus-competitive-strategy-and-audit]].
 
-**SHIPPED (mnemo 0.6.11→0.6.16, all live-verified from PyPI):** revert + objectless guard (0.6.12/13),
+**SHIPPED (inspeximus 0.6.11→0.6.16, all live-verified from PyPI):** revert + objectless guard (0.6.12/13),
 as_of/history point-in-time (0.6.14, closes Zep), bounded two-tier eviction (0.6.15, closes mem0/Letta),
 sleep-time compute (0.6.16, closes Letta). Feature-competitive on real axes + our unique security layer.
 
@@ -909,8 +909,8 @@ STANDING RULES REINFORCED THIS SESSION (owner, with frustration — obey):
 - Reddit voice: SHORT, human, plain — a critic called our post "AI drivel". Owner replied himself (honest "not a native English speaker"). Draft in HIS plain voice, not polished AI prose; he posts Reddit, Claude posts approved GitHub.
 
 WHERE WE LEFT OFF (product-ship + new-direction day):
-- SHIPPED mnemo 0.6.12 + 0.6.13 (PyPI, live-verified): revert(key) control-plane un-supersession + objectless-clobber guard (value-obscuring reversion = channel separation, discrimination gap 1.0; pilot found+fixed a real hole in our own store); revert exposed as an MCP tool. Probes: revert_by_reference_probe.py, correction_decay_probe.py (majority-read cliff = artifact; real mem0 partial noisy decay ~0.88->~0.45, mnemo ledger flat 1.0).
-- SHIPPED RAMR cross-backend ECHO-RESISTANCE table COMPLETE with REAL runtime Graphiti (Neo4j+OpenAI): mnemo(guard off)0.00 / mem0-native 0.53 CI[.37,.70] / Graphiti echo-attributable 0/26 (bi-temporal DEFENDS; raw 0.87 residual = extraction misses not echo) / mnemo(guard on)1.00. graphiti_echo_run.py public in ramr repo.
+- SHIPPED inspeximus 0.6.12 + 0.6.13 (PyPI, live-verified): revert(key) control-plane un-supersession + objectless-clobber guard (value-obscuring reversion = channel separation, discrimination gap 1.0; pilot found+fixed a real hole in our own store); revert exposed as an MCP tool. Probes: revert_by_reference_probe.py, correction_decay_probe.py (majority-read cliff = artifact; real mem0 partial noisy decay ~0.88->~0.45, inspeximus ledger flat 1.0).
+- SHIPPED RAMR cross-backend ECHO-RESISTANCE table COMPLETE with REAL runtime Graphiti (Neo4j+OpenAI): inspeximus(guard off)0.00 / mem0-native 0.53 CI[.37,.70] / Graphiti echo-attributable 0/26 (bi-temporal DEFENDS; raw 0.87 residual = extraction misses not echo) / inspeximus(guard on)1.00. graphiti_echo_run.py public in ramr repo.
 - GATES RUN (all KILLED speculative research honestly, saving weeks): value-obscuring-reversion PAPER = KILL (impossibility theorem is tautology + already published: arXiv 2606.24322 origin-bound-authority, 2606.12703 SMSR; the attack-class framing dies on the referent problem). replication-forecasting = passed gate as INFRASTRUCTURE not a paper (see below).
 - LAUNCHED "Crucible Live" — pre-registered replication-forecast loop. Protocol in agora_output/forecast/PROTOCOL.md: claim card -> frozen-prompt forecast (glm-5.2 + deepseek-v4-flash, prompt v1) -> PUBLIC COMMIT before any harness -> replicate -> resolve with Brier. Storefront page LIVE: dancenitra.github.io/agora/public/forecast.html (+ nav links + sitemap + claim-submission issue template). Contaminated retro pilot: LLM beat base rate (Brier 0.095 vs 0.231) but labeled CONTAMINATED, no skill claims before n>=60. Three live forecasts committed BEFORE harness: c001 compounding-error-law P(REP)=0.25, c002 MCP-tool-cliff-at-20 P=0.25, c003 AgenticSTS-memory-doubles P=0.175.
 - c001 RESULT (was running at handoff): geometric law R=p^n REPRODUCES almost exactly using measured in-situ per-step (~0.97; gaps <=0.009): E2E L=1/3/5/10 = 0.975/0.900/0.850/0.775. Self-check arm (Phase 3) is decisive per pre-stated rule — if one cheap verify-fix pass rescues L=10 far above 0.776, verdict FAILED (the "doomed past 10 steps" framing dies on trivial correction); else REPRODUCED for the bare law. RESOLVE with agora_output/forecast/resolve_claim.py, then add a Crucible entry + update forecast.html tally. c002/c003 harnesses READY (agora_output/lab/20260710_c00*/run.py) — run SEQUENTIALLY (same Ollama endpoint, 429 risk), never concurrent.
@@ -921,7 +921,7 @@ WHERE WE LEFT OFF (product-ship + new-direction day):
 DO NEXT:
 1. Finish c001 (read Phase 3 in agora_output/lab/20260710_c001_compounding_error_law/result.json), RESOLVE it, add Crucible entry, update forecast.html tally + tally counts.
 2. Run c002 then c003 sequentially; resolve each; the loop now feeds itself (every Crucible verdict = a forecast data point).
-3. Product pipeline: any memory/RAG claim that SURVIVES replication -> ship into mnemo with provenance (that's how mnemo compounds; don't ship un-replicated hype). c003 (skill-memory) directly informs a mnemo skill-store if it holds.
+3. Product pipeline: any memory/RAG claim that SURVIVES replication -> ship into inspeximus with provenance (that's how inspeximus compounds; don't ship un-replicated hype). c003 (skill-memory) directly informs a inspeximus skill-store if it holds.
 RULES: anon commits (agora-builder@users.noreply.github.com); PyPI/Telegram/OpenAI tokens from server/.env in a script, NEVER on a CLI; vault only via tools/safe_vault_push.py; verify ONE :8000 listener + ONE mcp_server.py; don't restart-spam the brain.
 ```
 
@@ -935,16 +935,16 @@ Chat **Slovak**, code + output **English**. Tokens in `server/.env` — never ec
 > Full prior-day handoff (2026-07-08 collaboration/ship day) preserved below this section.
 
 **WHAT SHIPPED (real, in hand):**
-- **mnemo 0.6.12 + 0.6.13** on PyPI (live-verified from a clean venv): `revert(key)` (control-plane un-supersession, resolved deterministically from the supersession ledger, append-only via reaffirm) + **objectless-clobber guard** (a keyed content write with no `object` can no longer displace a real ledgered value — a hole the pilot found in our OWN store, B2 0.00->1.00); `revert` exposed as an MCP tool. Discrimination gap 1.0 vs content-only ~0. Commits dfe2514, 4397dbe.
+- **inspeximus 0.6.12 + 0.6.13** on PyPI (live-verified from a clean venv): `revert(key)` (control-plane un-supersession, resolved deterministically from the supersession ledger, append-only via reaffirm) + **objectless-clobber guard** (a keyed content write with no `object` can no longer displace a real ledgered value — a hole the pilot found in our OWN store, B2 0.00->1.00); `revert` exposed as an MCP tool. Discrimination gap 1.0 vs content-only ~0. Commits dfe2514, 4397dbe.
 - **RAMR echo-resistance table COMPLETE** (github.com/DanceNitra/ramr) with real runtime Graphiti — it DEFENDS (0/26 echo-attributable; the 13% raw residual is extraction misses, not the echo). Honest framing: not "we defend, they don't" — a real bi-temporal store and our object-ledger BOTH defend structurally; our edge is zero-dependency + the value-obscuring frontier. Commit 203e1ea (ramr repo).
-- **Crucible Live** (agora_output/forecast/) — the pre-registered replication-forecast loop; storefront `public/forecast.html` LIVE. This is the session's strategic bet: the scan feeds THREE consumers (Crucible verdicts, mnemo/RAMR product upgrades from surviving claims, distribution) and compounds.
+- **Crucible Live** (agora_output/forecast/) — the pre-registered replication-forecast loop; storefront `public/forecast.html` LIVE. This is the session's strategic bet: the scan feeds THREE consumers (Crucible verdicts, inspeximus/RAMR product upgrades from surviving claims, distribution) and compounds.
 
 **GATES (the day's KILLS — the gate did its job):**
 - value-obscuring-reversion as a PAPER: **KILL** (tautology + already published 2606.24322/2606.12703; attack-class framing dies on the referent problem — an injected "go back to the old one" has no antecedent in the attacker's own content).
 - replication-forecasting as a PAPER: **not a paper, but SOUND as infrastructure** (power says ~15-22 months to a skill claim; ship the protocol, not results).
 - Both saved weeks of building on sand. Gate = validate/prior-art/skeptic on the IDEA before investing days (owner's explicit rule).
 
-**FORGET-ME-NOT for next session:** finish c001->resolve->Crucible entry; run c002/c003 sequentially; the marintkael reply is drafted-but-unsent (in this transcript) if he re-engages; the reading-list at agora_output/strategy/20260710_reading_list.md holds 15 on-beat leads for mnemo/RAMR upgrades.
+**FORGET-ME-NOT for next session:** finish c001->resolve->Crucible entry; run c002/c003 sequentially; the marintkael reply is drafted-but-unsent (in this transcript) if he re-engages; the reading-list at agora_output/strategy/20260710_reading_list.md holds 15 on-beat leads for inspeximus/RAMR upgrades.
 
 ---
 
@@ -956,8 +956,8 @@ Resume Agora. FIRST read C:\Users\Danculus\agora\HANDOFF.md top section (2026-07
 STANDING GATE (burned us TWICE on 2026-07-08 — obey it): nothing goes outward — no GitHub/Reddit reply, post, Crucible entry, or ANY number/citation shared with a collaborator — until validate->storm->audit->verify passes 100%, and the AUDIT must include a method-skeptic on the MODEL/FIXTURE CONSTRUCTION (is the fixture pre-baking the conclusion? would a fairer construction flip the magnitudes?), not just param-robustness WITHIN my model, PLUS a prior-art hunter. A collaboration reply carrying a number IS outward; no "informal reply" exception.
 
 WHERE WE LEFT OFF (marathon collaboration + ship day):
-- SHIPPED (a) Crucible FAILED post "content-generality -> genuine build-on is METRIC-SPECIFIC" (bilingual, full gate, SEO) — live at dancenitra.github.io/agora/public/posts/generality-build-on-metric-specific.html; Crucible now 20R/12F/20NC. Frontier "is generativity predictable at birth" KILLED (the ML/CS +0.11-0.14 vanished under a classifier-free build-on proxy = a Semantic-Scholar-classifier home-field artifact). (b) mnemo 0.6.7 on PyPI — spend_irreversible(require_earned=True) gates the irreversible tail on UNFORGEABLE earned-outcome (good>0), not forgeable >=2-source corroboration; probe spend_irreversible_require_earned_probe.py. Default False = byte-identical legacy.
-- GITHUB (deepseek-ai/DeepSeek-V3; we are DanceNitra, gated, Claude posts after owner OK): #1462 (field-dynamics / read-path poison-defense, with Marat + icophy) = OPEN, awaiting their response to MY CORRECTION — I had overclaimed graph-shift "defeats the flood"; corrected honestly: graph-shift (randomized retrieval) is a targeted-only cost-raiser, the unforgeable earned-outcome gate strongly helps the TARGETED case but DEGRADES under a flood (not a hard block), a forgeable gate does nothing, coverage ~18% of live Core caps reach; BOTH mechanisms are textbook (moving-target-defense + Cheng-Friedman), our only original bit is the measurement. #1466 (TAT/mnemo cross-framework, Marat) = CLOSED positively (transition-layer helps trajectory/phase retrieval +3-7pp on his independent GT; Marat took it into TAT-ROOT).
+- SHIPPED (a) Crucible FAILED post "content-generality -> genuine build-on is METRIC-SPECIFIC" (bilingual, full gate, SEO) — live at dancenitra.github.io/agora/public/posts/generality-build-on-metric-specific.html; Crucible now 20R/12F/20NC. Frontier "is generativity predictable at birth" KILLED (the ML/CS +0.11-0.14 vanished under a classifier-free build-on proxy = a Semantic-Scholar-classifier home-field artifact). (b) inspeximus 0.6.7 on PyPI — spend_irreversible(require_earned=True) gates the irreversible tail on UNFORGEABLE earned-outcome (good>0), not forgeable >=2-source corroboration; probe spend_irreversible_require_earned_probe.py. Default False = byte-identical legacy.
+- GITHUB (deepseek-ai/DeepSeek-V3; we are DanceNitra, gated, Claude posts after owner OK): #1462 (field-dynamics / read-path poison-defense, with Marat + icophy) = OPEN, awaiting their response to MY CORRECTION — I had overclaimed graph-shift "defeats the flood"; corrected honestly: graph-shift (randomized retrieval) is a targeted-only cost-raiser, the unforgeable earned-outcome gate strongly helps the TARGETED case but DEGRADES under a flood (not a hard block), a forgeable gate does nothing, coverage ~18% of live Core caps reach; BOTH mechanisms are textbook (moving-target-defense + Cheng-Friedman), our only original bit is the measurement. #1466 (TAT/inspeximus cross-framework, Marat) = CLOSED positively (transition-layer helps trajectory/phase retrieval +3-7pp on his independent GT; Marat took it into TAT-ROOT).
 - DUNGEON healthy: loop ALIVE (loop_n ~1.36M, heartbeat fresh), brain :8000 + dungeon :5174 both 200. Scout world-scan STALE ~7 days (last_scan 2026-07-01) — loop + trigger (loop_n%10000==4000) intact, so it is a DOWNSTREAM queue->process->record gap, NOT a freeze; needs a real trace.
 
 DO NEXT (owner's steer: reliable-yield lane — fewer speculative research bets, more shipped receipts):
@@ -977,7 +977,7 @@ Chat **Slovak**, code + output **English**. Telegram/PyPI tokens in `server/.env
 
 **WHAT SHIPPED (real, in hand):**
 1. **Crucible FAILED post** `generality-build-on-metric-specific` (EN `+ .sk`, full gate: validate/storm/audit/verify + SEO). Finding: content-generality predicts genuine build-on (S2 `influentialCitationCount`) in ML/CS (+0.11–0.14) but it VANISHES under a classifier-free proxy (focused-citer) → metric-specific, a CS-classifier home-field artifact, NOT a robust field law. Positive control +0.17 (proxy has power). Probes: `generality_generativity_metric_dependence_probe.py` (+ old field-contrast probe marked SUPERSEDED). Crucible 20R/**12F**/20NC.
-2. **mnemo 0.6.7 → PyPI** (https://pypi.org/project/agora-mnemo/0.6.7/). `spend_irreversible(require_earned=True)`: grants full irreversible budget only to sources with earned outcome (`good>0>=bad`), the one signal a sybil can't mint — closes the forged-≥2-source-gets-full-budget hole on the irreversible tail. Opt-in (coverage tradeoff throttles the not-yet-earned legit slice). Verified end-to-end (clean install from PyPI).
+2. **inspeximus 0.6.7 → PyPI** (https://pypi.org/project/inspeximus/0.6.7/). `spend_irreversible(require_earned=True)`: grants full irreversible budget only to sources with earned outcome (`good>0>=bad`), the one signal a sybil can't mint — closes the forged-≥2-source-gets-full-budget hole on the irreversible tail. Opt-in (coverage tradeoff throttles the not-yet-earned legit slice). Verified end-to-end (clean install from PyPI).
 3. **GitHub collaboration** (#1462, #1466) advanced with hard numbers + honest corrections.
 
 **THE HARD LESSON (encoded in `[[validate-audit-verify-gate]]` + `[[measurement-denominator-and-fair-comparison-before-out]]`):** twice today I let a number go out before the full gate — (a) an icophy measurement over the wrong denominator (counted superseded rows; "7%" → real live-Core 84/18/8), and (b) a graph-shift analysis whose quantitative curves were MODEL ARTIFACTS (fixed-margin pre-baked co-movement; argmax over 198 distractors) and whose claims were textbook — caught only on a later prior-art + method-skeptic pass, after I'd posted an overclaim to Marat. Fix burned in: FULL gate (incl. model-construction skeptic + prior-art) before EVERY outward number, collaboration replies included.
@@ -1037,14 +1037,14 @@ Dynamic `/loop`, self-paced ~30 min. Telegram token in `server/.env` — never e
 
 ---
 
-## 🟣🟣🟣 RESUME HERE (2026-06-25 — the mnemo-forget + hybrid-sonda + distribution session) 🟣🟣🟣
+## 🟣🟣🟣 RESUME HERE (2026-06-25 — the inspeximus-forget + hybrid-sonda + distribution session) 🟣🟣🟣
 
-> Chat **Slovak**; code + output **English**. The owner drove a 3-step plan this session: **mnemo upgrade → Crucible sonda → make the posts visible.** All three done. Auto-memory loads `hybrid-rrf-no-win-with-good-embedder`, `mnemo-poison-guard-hole`, `distribution-experiment-live-reddit`, `no-overclaim-cite-prior-art-strong-baseline`.
+> Chat **Slovak**; code + output **English**. The owner drove a 3-step plan this session: **inspeximus upgrade → Crucible sonda → make the posts visible.** All three done. Auto-memory loads `hybrid-rrf-no-win-with-good-embedder`, `inspeximus-poison-guard-hole`, `distribution-experiment-live-reddit`, `no-overclaim-cite-prior-art-strong-baseline`.
 
 **RUN STATE (verified clean at handoff):** brain `agora.main` :8000 = ONE listener (health ok); dungeon ONE `mcp_server.py` :5174 = 200, advancing; 3 watchers alive (canary / activity-monitor / self-improvement-controller). **All 5 processes survive a Claude Code / VS Code restart — they are detached; closing/restarting the editor does NOT stop them.** Only relaunch if §Relaunch shows one actually dead. Inbox ~21 pending (backlog of agent-generated tasks; drain/skip per the loop). agora HEAD `b14263a`.
 
 **WHAT THIS SESSION SHIPPED (all verified, small commits, noreply identity):**
-1. **mnemo `forget()` — verified erasure (commit `c15f46e`).** Closes the documented append-only gap: hard-deletes records AND scrubs their ids from every survivor's links + toggle pointers + vec/token caches → a forgotten memory can't resurface via recall, a consolidation link, or the dream pass. Severe-test `agora_output/lab/exp_mnemo_forget.py` = **15/15**. Also an MCP tool (`ids` + `where_contains`) + README API row. (Recall behavior unchanged → running processes unaffected; picks up forget() on next natural restart.)
+1. **inspeximus `forget()` — verified erasure (commit `c15f46e`).** Closes the documented append-only gap: hard-deletes records AND scrubs their ids from every survivor's links + toggle pointers + vec/token caches → a forgotten memory can't resurface via recall, a consolidation link, or the dream pass. Severe-test `agora_output/lab/exp_inspeximus_forget.py` = **15/15**. Also an MCP tool (`ids` + `where_contains`) + README API row. (Recall behavior unchanged → running processes unaffected; picks up forget() on next natural restart.)
 2. **Hybrid/RRF recall — MEASURED + REVERTED (no cargo-cult).** Tried adding a `hybrid` recall mode; severe-tested it; it does NOT beat pure semantic with a good embedder (ties recall, hurts MRR) → reverted, shipped forget() instead. See `hybrid-rrf-no-win-with-good-embedder`.
 3. **Crucible sonda "is hybrid search cargo-cult?" — RAN + adversarially verified (7-agent workflow) → NOT publishable (it's a replication, not news).** Honest verdict: with a STRONG embedder on NL queries fusion benefit is a NULL (standard RRF-60 even hurts −3.3pt on real MuSiQue n=100); fusion helps materially only for WEAK embedders / OOV exact-token queries (synth, but n=24 too small to quote magnitude). The panel killed the exciting headline (3/3 red-team) BEFORE publishing — process win. Harness `agora_output/lab/crucible_hybrid_probe.py`; full record `agora_output/strategy/20260625_hybrid-sonda-verification.json`. Owner chose (A) **skip publishing** (known replication).
 4. **RAG-dead post sharpened (commit `43bafba`, LIVE).** Added the count/filter-vs-max nuance after a multi-angle audit (all 3 published posts re-validated, claims HOLD).
@@ -1059,7 +1059,7 @@ Dynamic `/loop`, self-paced ~30 min. Telegram token in `server/.env` — never e
 - Watch the 2 Reddit threads for replies (above) → gated Slovak briefing.
 - The 3 verified posts (RAG-dead / poison-resistance / LoCoMo) are all LIVE + audited; can seed 1-2 more on-topic threads if the owner wants.
 - Backlog ~21 inbox tasks (drain severe-tested / skip off-Board each cycle).
-- mnemo `forget()` is local-committed; pushing the public agora repo is product maintenance (owner /goal authorizes) — pre-push leak audit first.
+- inspeximus `forget()` is local-committed; pushing the public agora repo is product maintenance (owner /goal authorizes) — pre-push leak audit first.
 
 ---
 
@@ -1089,7 +1089,7 @@ no controller AUTO-REBUILD/SCAN tasks fired). Telegram throttled to **breakthrou
 3. `d67a36`/`037c3f` — Algorithmic pricing collusion is a **sharp δ-threshold** (~0.8, rise 10× steeper than linear); replicates Calvano 2020 as a minimal model.
 4. `133313` 📱 — **AI↔human-verification coupling → catastrophic-collapse threshold**: graceful below q~0.3, first-order cliff above (excess 0.08→0.24, collapses at lower stress); Buldyrev applied to AI oversight.
 5. `56e5de` — Optimal forgetting mis-read as miscalibration: perfect-memory Bayes is ~chance in a drift world; λ*<1 buys +23–44%, yet a stationary audit flags it "conservative". Extends the calibration thesis.
-6. `35a748`/`cbc52d` — Demand-driven memory store self-organizes to a scale-free critical attractor, but at τ≈1.70 (NOT canonical BTW 1.5); honest split verdict; mnemo hypothesis.
+6. `35a748`/`cbc52d` — Demand-driven memory store self-organizes to a scale-free critical attractor, but at τ≈1.70 (NOT canonical BTW 1.5); honest split verdict; inspeximus hypothesis.
 7. `6e3832` — Inequality ≠ merit: identical agents → top-1% owns 64% from super-linear cumulative advantage (control accel=0 → Gini 0.11).
 8. `48c213` 📱 — **Multi-proxy basket helps only if gaming costs are uniform**: low dispersion → optimal ~15 proxies; high dispersion → K*=1 (one hard-to-game metric beats the basket). Goodhart/alignment.
 9. `7a4558` — NULL (clean FAILED): quenched disorder did NOT open a Griffiths band in a minimal contagion (no broadening even at max disorder/N=1500; control validated). Threshold-smearing is not automatic.
@@ -1363,7 +1363,7 @@ the `deepseek-v4-*` lines in the older section below are STALE. Vault push:
 The metabolism ledger showed ~7M tokens of near-zero-value agent cognition vs verify-findings (ROI 0.92,
 the real value engine). Three commits, all verified (brain 200 + ticking no-errors, dungeon 200):
 1. **`40528b9` Dungeon value fix:** DELETED the ungated group brainstorm in `_brain_ecosystem_tick`
-   (3 unconditional LLM rounds, ROI 0.04) — the MNEMO-gated **seminar** is now the sole group-cognition
+   (3 unconditional LLM rounds, ROI 0.04) — the INSPEXIMUS-gated **seminar** is now the sole group-cognition
    path. Also disabled the ExecutionEngine duplicate think-loop (`llm_client=None`).
 2. **`9d03e2e` agent-think fix:** found the real `agent-think` source was the **tick_loop roleplay batch**
    (NOT the ExecutionEngine — that was mistargeted). Added `roleplay_use_llm=False`. (Made moot by #3.)
@@ -1372,7 +1372,7 @@ the real value engine). Three commits, all verified (brain 200 + ticking no-erro
    the tick_loop roleplay block, `AGENT_SYSTEM_PROMPTS` + `agent_think()` (execution/llm_client.py), 3
    `ROLE_SKILLS` keys (lifecycle/genome_bridge.py), the whole `server/agora/agents/` dir, test_all.py
    #9/#10, + a one-time DB sweep (0 rows). A 6-agent **read-only** Workflow (map + adversarial verify)
-   first confirmed they were pure dead scaffolding: **0 DB rows, no mnemo entries, no vault notes, no
+   first confirmed they were pure dead scaffolding: **0 DB rows, no inspeximus entries, no vault notes, no
    dungeon refs.** Verify-pass mandatory fixes applied (removed a dangling `thinking_agents` heartbeat
    key that would NameError every tick; removed the dead import).
 
@@ -1393,7 +1393,7 @@ the real value engine). Three commits, all verified (brain 200 + ticking no-erro
   `roleplay_use_llm`/`roleplay_think_pct` config settings are now inert. Remove only if convenient.
 - **Outreach:** all 4 tracked threads (hermes-agent#10771, zeroclaw#5849, deer-flow#1898, mem0#5330) have
   US as last author — caught up. Keep running the backstop each cycle (verify last-author, never trust inbox).
-- Launch materials (OSS mnemo, EN+SK) remain GATED — owner posts when ready.
+- Launch materials (OSS inspeximus, EN+SK) remain GATED — owner posts when ready.
 
 ---
 
@@ -1426,7 +1426,7 @@ life-loop). Both should be 200. Vault push: `DUNGEON_AUTOPUSH=1 python -X utf8 t
 4. **NEW FLAGSHIP HOMEPAGE (just shipped, commit 08ce98a):** rebuilt `index.html` from a dark Three.js
    SaaS page into an **editorial "newspaper A1"** — Fraunces+Newsreader+JetBrains Mono, paper grain,
    the ledger IS the hero, hero hot-hand SVG chart, 2 FAILED "letterpress plates", a dark thesis panel
-   with the mean/median chart, writing index, Mnemosyne, protocol. Informed by a 5-agent design
+   with the mean/median chart, writing index, Inspeximus, protocol. Informed by a 5-agent design
    workflow (Anthropic/Arc/Stripe Press/Ink&Switch/Asterisk/Observable). **Deploy QUEUED at push time
    — VERIFY LIVE first thing next session:** `https://dancenitra.github.io/agora/` (Pages build_type=
    workflow; if the Actions run is stuck queued, cancel it + re-dispatch `gh workflow run pages.yml`,
@@ -1447,7 +1447,7 @@ life-loop). Both should be 200. Vault push: `DUNGEON_AUTOPUSH=1 python -X utf8 t
    IDEAS" panel shows LIVE quests only (was padding with day-old DONE corp quests).
 9. **OUTREACH:** Envoy now files a "Correspondence reply by X" inbox task + Slovak briefing on every
    reply (`main.py envoy_watch_loop`). Posted a measured reply to **bytedance/deer-flow#1898** (live).
-   New skill `.claude/skills/outreach-briefing/`. Mnemosyne README updated with the popularity-trap
+   New skill `.claude/skills/outreach-briefing/`. Inspeximus README updated with the popularity-trap
    retention finding.
 
 **PENDING / NEXT (priority):**
@@ -1534,21 +1534,21 @@ to avoid repeated dungeon restarts** (each restart re-fires startup tasks → mo
 
 **Firm roadmap status:**
 - **A1 storefront — LIVE:** `https://dancenitra.github.io/agora/` (source = `index.html` at repo root;
-  Pages serves main/root, `.nojekyll`). Three.js orb + GSAP + theme toggle + a **Mnemosyne** section.
+  Pages serves main/root, `.nojekyll`). Three.js orb + GSAP + theme toggle + a **Inspeximus** section.
 - **A2 distribution — RUNNING:** 2 live gated-then-posted outreach threads — zeroclaw#5849 (got 🚀) +
   jerseycheese/Narraitor#441. Envoy watches replies. **OPEN: pick broad channel (X/blog/HN).**
 - **A3 track record — fixed:** Oracle retargeted to AI/tech/science markets (edge) not crypto
   (`oracle.py _DOMAIN_RX`); resolvers auto-run; record grows ~2 wks. 8 REPRODUCED / 0 FAILED reps.
 - **A5 product — DEFINED + BUILT:** open-source **memory layer for AI agents**, founder-first,
-  open-core, credibility vehicle. **Mnemosyne** (handle `mnemo`): `mnemo/mnemo.py` (zero-dep ref impl,
-  dogfooded), `mnemo/README.md`, storefront section.
+  open-core, credibility vehicle. **Inspeximus** (handle `inspeximus`): `inspeximus/inspeximus.py` (zero-dep ref impl,
+  dogfooded), `inspeximus/README.md`, storefront section.
 - **Posts:** rebuilt as beautiful **EN/SK bilingual** SEO-slugged HTML via `tools/render_post.py`
   (`public/posts/src/{name}.{en,sk}.md` → `{slug}.html`; computed read-time).
 
 **NEXT (priority):**
 1. OWNER DECISIONS: A2 channel; auto-post policy (all outreach/press currently GATED → `approve <id>`).
 2. **Wire `tools/render_post.py` into the Press organ** so future posts auto-render bilingual HTML.
-3. Mnemosyne MCP server (any agent uses `mnemo` as memory) + examples.
+3. Inspeximus MCP server (any agent uses `inspeximus` as memory) + examples.
 4. Inbox task `8da953` (Lee-Spekkens causal-geometry synthesis) — loop will take it.
 
 **Gotchas:** screenshot UI before claiming done (headless Edge, see memory); Telegram one-liners ASCII

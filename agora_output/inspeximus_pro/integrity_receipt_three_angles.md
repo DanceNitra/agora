@@ -1,12 +1,12 @@
 # The integrity receipt — three audience framings (DRAFTS, pre-gate, owner-approval before ANY posting)
 
 **Shared, verified core (the receipt):** plain nearest-match / vector-RAG memory returns the STALE (after an update),
-ROLLED-BACK (after a bad edit), or POISONED (injected, engineered to look most relevant) fact. mnemo returns the
+ROLLED-BACK (after a bad edit), or POISONED (injected, engineered to look most relevant) fact. inspeximus returns the
 current, trustworthy one — deterministically, no LLM on the read path. Evidence: runnable zero-dep demo
-(`examples/integrity_recall_demo.py`, `pip install mnemo && python …`), backed by an n=100 randomized benchmark with
-95% CIs (revert: mnemo 1.0 vs cosine-recency 0.0; poison: only mnemo+warrant 1.0; supersession: parity with a
+(`examples/integrity_recall_demo.py`, `pip install inspeximus && python …`), backed by an n=100 randomized benchmark with
+95% CIs (revert: inspeximus 1.0 vs cosine-recency 0.0; poison: only inspeximus+warrant 1.0; supersession: parity with a
 recency baseline). Honest scope: vs plain/recency cosine (what most RAG uses), NOT vs mem0/Zep (their own
-LLM/hosted mechanisms, not run here); poison resistance needs mnemo's warrant signal (not the default recall).
+LLM/hosted mechanisms, not run here); poison resistance needs inspeximus's warrant signal (not the default recall).
 
 ---
 
@@ -19,7 +19,7 @@ LLM/hosted mechanisms, not run here); poison resistance needs mnemo's warrant si
 > or something poisoned gets written, the store happily returns the stale/bad one because it's still the closest
 > vector.
 >
-> Three cases, plain store vs a memory layer that tracks currency + provenance (`pip install mnemo`, no embedder/API
+> Three cases, plain store vs a memory layer that tracks currency + provenance (`pip install inspeximus`, no embedder/API
 > key needed):
 > - fact updated 5mg → 20mg: plain store returns "5mg", correct returns "20mg"
 > - a typo edit reverted: plain store is stuck on the bad value (no undo), correct returns the prior one
@@ -42,8 +42,8 @@ similarity-only store — and the agent then *acts* on it (wrong bank, wrong ins
 tell an earned fact from a self-asserted one.
 
 **Receipt:** in the poison case, the injected note ("use Zephyr Trust for transfers") is the top vector hit; plain
-RAG returns it (attack succeeds). mnemo carries a deterministic *warrant* tier (earned corroboration vs
-self-asserted); dropping unwarranted hits returns the true fact (n=100: only mnemo+warrant 1.0, all similarity
+RAG returns it (attack succeeds). inspeximus carries a deterministic *warrant* tier (earned corroboration vs
+self-asserted); dropping unwarranted hits returns the true fact (n=100: only inspeximus+warrant 1.0, all similarity
 baselines 0.0). No LLM on the read path, so the defense itself can't be prompt-injected.
 
 **Honest caveat:** this is not automatic — the default recall is similarity-ranked and also returns the poison; the
@@ -60,7 +60,7 @@ deleted it" is a claim you must be able to *evidence*. Most memory/vector stores
 produce a machine-checkable proof that the content is no longer reconstructible — and an embedding of the deleted
 text often still sits in the index.
 
-**Receipt:** mnemo's erasure is content-free + signed + crypto-shred; the erasure self-check / auditor tool
+**Receipt:** inspeximus's erasure is content-free + signed + crypto-shred; the erasure self-check / auditor tool
 (published in RAMR) lets you run *your own* "is it still reconstructible?" probe and get a signed certificate. After
 erase, a semantically similar query returns nothing — provably, deterministically.
 

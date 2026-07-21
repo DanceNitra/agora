@@ -1,30 +1,30 @@
 """fair_conflict.py — the FAIR adversarial-conflict experiment the stress-claim gate demanded.
 
 Fixes every flaw the gate found in adversarial_conflict.py:
- (skeptik)  ALL systems get RAW TEXT — mnemo derives (key, object) itself via an LLM extractor (deepseek, the
-            same tier mem0 uses for extraction). No spoon-fed structure. Isolates mnemo's GATE, not its input.
+ (skeptik)  ALL systems get RAW TEXT — inspeximus derives (key, object) itself via an LLM extractor (deepseek, the
+            same tier mem0 uses for extraction). No spoon-fed structure. Isolates inspeximus's GATE, not its input.
  (method)   ALL systems scored by the SAME instrument: retrieve context -> one neutral LLM judge "current value?"
             -> compare to truth. No substring-on-store-surface asymmetry that manufactured mem0's 10%.
  (skeptik)  Poison tested EXACT and PARAPHRASED (does the guard survive a reworded re-assertion?).
  (blindspot) BOTH arms measured: POISON-rejection AND LEGIT-update-adoption, on the same subjects. A guard that
             rejects poison must not also reject genuine corrections; we report both (the frontier, not a corner).
  (priorart) The defense is textbook (anti-replay / trust-sensitive belief revision / TMS); we credit it and only
-            measure whether mnemo occupies a better operating point than mem0 under a fair contract.
+            measure whether inspeximus occupies a better operating point than mem0 under a fair contract.
 
 Arms per subject (key K, stale A, correction B):
   POISON arm:  raw "A"  ->  raw "B" (correction)  ->  raw "A" or paraphrase(A) (poison, newest).  Truth = B.
   LEGIT  arm:  raw "A"  ->  raw "B"               ->  raw "C" (a genuine NEW correction, newest).   Truth = C.
 Metric per system per arm = fraction the judged current value == the arm's truth.
 
-RUN (free, mnemo+naive):  python research/probes/fair_conflict.py --systems mnemo,naive --n 40 --poison exact
-RUN (with mem0):          python research/probes/fair_conflict.py --systems mnemo,naive,mem0 --n 30 --poison paraphrase
+RUN (free, inspeximus+naive):  python research/probes/fair_conflict.py --systems inspeximus,naive --n 40 --poison exact
+RUN (with mem0):          python research/probes/fair_conflict.py --systems inspeximus,naive,mem0 --n 30 --poison paraphrase
 """
 import os, sys, json, time, argparse
 HERE = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, os.path.join(HERE, "mab_official"))
 sys.path.insert(0, os.path.join(HERE, "..", ".."))
-sys.path.insert(0, os.path.join(HERE, "..", "..", "mnemo_pypi"))
-import run_mnemo_official as H
+sys.path.insert(0, os.path.join(HERE, "..", "..", "inspeximus_pypi"))
+import run_inspeximus_official as H
 from inspeximus import Inspeximus
 
 
@@ -46,7 +46,7 @@ def _llm(prompt, temp=0.0, maxtok=800):   # deepseek-v4-flash is a REASONING mod
 
 def llm_extract(text):
     """RAW TEXT -> (key, object). Same kind of extraction mem0 does; deepseek. Deterministic key = subject::relation
-    so a re-statement of the same fact (even reworded) maps to the SAME key -> mnemo's gate can see the retired value."""
+    so a re-statement of the same fact (even reworded) maps to the SAME key -> inspeximus's gate can see the retired value."""
     p = ('Extract the subject-relation KEY and the VALUE from this fact. The KEY must be the same for any '
          'restatement of the same fact (canonical "subject :: relation", no value). Reply ONLY compact JSON '
          '{"key":"...","object":"..."}.\n\nFact: ' + text)
@@ -69,7 +69,7 @@ def _cos(a, b):
 def make_semantic_extractor(threshold=0.80):
     """The FIX for paraphrase-brittleness: resolve a new fact's (subject::relation) key to an EXISTING key by
     EMBEDDING similarity instead of exact string match, so 'X born in' and 'X birthplace' converge to one key ->
-    mnemo's supersession/echo_guard finally engages on reworded conflicts. Deterministic given the embedder."""
+    inspeximus's supersession/echo_guard finally engages on reworded conflicts. Deterministic given the embedder."""
     keys = []  # (key_str, emb)
     def ex(text):
         raw = llm_extract(text)
@@ -124,13 +124,13 @@ def truth_hit(ans, truth_val, other_val):
 
 
 # ---- systems: each takes the ordered RAW writes, returns the judged current-value answer ----
-def sys_mnemo(subject, writes, hardened=False, extractor=None):
+def sys_inspeximus(subject, writes, hardened=False, extractor=None):
     m = Inspeximus(path=None); m.echo_guard = True
     m.extractor = extractor if extractor is not None else llm_extract  # semantic extractor passed FRESH per subject
     if hardened:
         m.supersede_requires_corroboration = True
     for w in writes:
-        m.remember(w)                                        # RAW text; mnemo extracts key+object itself
+        m.remember(w)                                        # RAW text; inspeximus extracts key+object itself
     ctx = "\n".join(h["text"] for h in m.recall(subject, k=6))
     return judge_current(ctx, subject)
 
@@ -154,7 +154,7 @@ def sys_mem0(mem, uid, subject, writes):
 
 def main():
     ap = argparse.ArgumentParser()
-    ap.add_argument("--systems", default="mnemo,naive")
+    ap.add_argument("--systems", default="inspeximus,naive")
     ap.add_argument("--n", type=int, default=40)
     ap.add_argument("--poison", default="exact", choices=["exact", "paraphrase"])
     ap.add_argument("--extractor", default="plain", choices=["plain", "semantic"],
@@ -197,9 +197,9 @@ def main():
                         writes = [d["A"], d["B"], d["pois"]]; truth, other = d["vB"], d["vA"]
                     else:
                         writes = [d["A"], d["B"], d["Df"]]; truth, other = d["vD"], d["vB"]
-                    if s == "mnemo":
+                    if s == "inspeximus":
                         ex = make_semantic_extractor() if a.extractor == "semantic" else None
-                        ans = sys_mnemo(d["k"], writes, extractor=ex)
+                        ans = sys_inspeximus(d["k"], writes, extractor=ex)
                     elif s == "naive":
                         ans = sys_naive(d["k"], writes)
                     elif s == "mem0":

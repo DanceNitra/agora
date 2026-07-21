@@ -20,12 +20,12 @@ Measured on the real store, both in-stream paths:
 Deterministic, no LLM, no network. RUN: python research/probes/revert_aba_probe.py
 """
 import sys, pathlib, json, re
-sys.path.insert(0, str(pathlib.Path(__file__).resolve().parents[2] / "mnemo_pypi"))
+sys.path.insert(0, str(pathlib.Path(__file__).resolve().parents[2] / "inspeximus_pypi"))
 from inspeximus import Inspeximus, new_receipt_keypair, sign_revert, __version__
 
 sk, pk = new_receipt_keypair()
 signer = lambda i: sign_revert(sk, i)
-R = {"mnemo_version": __version__}
+R = {"inspeximus_version": __version__}
 
 
 def cur(m, k="region"):

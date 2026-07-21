@@ -7,7 +7,7 @@ leaking stores (and, for the vector index, recovering the value by NN-inversion 
 Then we wire the stores to actually purge and the auditor verifies erasure.
 
 Run: python research/probes/erasure_auditor_probe.py   (cloud-free; needs Ollama nomic-embed-text for the vector probe)
-Part of Agora / mnemo (MIT).
+Part of Agora / inspeximus (MIT).
 """
 import os
 import sys

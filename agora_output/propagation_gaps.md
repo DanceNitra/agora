@@ -2,8 +2,8 @@
 
 ## DONE autonomously (our own surfaces, all pushed)
 1. **Crucible** — re-rendered the ledger (was frozen at the 2026-06-20 render): 51 → **64 entries** (42 reproduced / 7 failed / 15 not-computable), added the supersession replication, synced landing counts (64/42/7/15, 35 essays).
-2. **Landing — Mnemosyne section** — refreshed to **mnemo v0.2**: new stat card `42% → 0%` (supersession), footer rewritten (deterministic supersession key, sybil-resistant entity-resolution gate, `forget()`), links the new post. EN/SK.
-3. **Landing — RAMR section** — reconciled with the repo: added the acronym **Retrieval-Augmented Memory Reliability**, **Six → Nine metrics**, added `TEMPORAL-AS-OF` (bi-temporal supersession — ties to mnemo v0.2) + `OPERATIONAL-CONTINUITY` rows. EN/SK.
+2. **Landing — Inspeximus section** — refreshed to **inspeximus v0.2**: new stat card `42% → 0%` (supersession), footer rewritten (deterministic supersession key, sybil-resistant entity-resolution gate, `forget()`), links the new post. EN/SK.
+3. **Landing — RAMR section** — reconciled with the repo: added the acronym **Retrieval-Augmented Memory Reliability**, **Six → Nine metrics**, added `TEMPORAL-AS-OF` (bi-temporal supersession — ties to inspeximus v0.2) + `OPERATIONAL-CONTINUITY` rows. EN/SK.
 
 ## OPEN — needs owner go (credentialed external-publication acts; NOT done overnight)
 4. **HF dataset card `Danchi17/ramr`** is STALE: says "six metrics", data files at `v0.1.0`. Repo is **v0.1.9 / 9 metrics** (adds COMPRESSION-vs-RAW, OPERATIONAL-CONTINUITY, TEMPORAL-AS-OF). Fix = update the HF README/card + re-upload the current data files. Needs HF token (Danchi17). Tool: `tools/publish_*_hf.py` pattern.

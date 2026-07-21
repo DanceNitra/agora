@@ -25,7 +25,7 @@ runnable receipt that the *specific 2.5x domain ratio* falls out of a realistic 
 
 Each printed number seeds its own RNG, so it reproduces independently of call order.
 Runnable, deterministic (fixed seeds; needs numpy):  python nudge_pubbias_artifact.py
-MIT-licensed. Part of Agora / mnemo (https://github.com/DanceNitra/agora/tree/main/mnemo).
+MIT-licensed. Part of Agora / inspeximus (https://github.com/DanceNitra/agora/tree/main/inspeximus).
 """
 import math
 import numpy as np

@@ -1,4 +1,4 @@
-"""poison_realistic.py — poison-resistance under the REALISTIC retrieval contract (the cell mnemo wins).
+"""poison_realistic.py — poison-resistance under the REALISTIC retrieval contract (the cell inspeximus wins).
 
 Cell 2 of the integrity benchmark fed every system its FULL memory state to a frontier judge and found no system
 resurrects — a tie. But that is the best case for a competitor: whole memory + a strong resolver. Production is
@@ -15,21 +15,21 @@ poison is in the retrieved surface):
     retrieve top-k for "{entity}"              # each system's NATIVE search — the production contract
     read   the retrieved surface -> current value    ->  B = poison never reached the reader (resisted)
 
-- mnemo: supersession + echo_guard drop the re-injected retired value; the store holds only B, so top-k returns
+- inspeximus: supersession + echo_guard drop the re-injected retired value; the store holds only B, so top-k returns
   {B}. The poison is architecturally absent -> the answer is correct regardless of reader strength.
 - naive verbatim / mem0 / Graphiti: the retired A stays in the store; top-k returns {A, B} (A re-injected, so it
   is recent/high-similarity) -> the reader can be pulled to A. Correctness now DEPENDS on the reader.
 
-Same synthetic fixture, same reader, same top-k for every system. mnemo/naive run free+local; mem0/Graphiti are
+Same synthetic fixture, same reader, same top-k for every system. inspeximus/naive run free+local; mem0/Graphiti are
 gated behind --systems (need OPENAI_API_KEY + neo4j).
 
-RUN:  python research/probes/poison_realistic.py --n 20                       # mnemo + naive, free
-      python research/probes/poison_realistic.py --n 20 --systems mnemo,naive,mem0,graphiti
+RUN:  python research/probes/poison_realistic.py --n 20                       # inspeximus + naive, free
+      python research/probes/poison_realistic.py --n 20 --systems inspeximus,naive,mem0,graphiti
 """
 import os, sys, json, argparse, time, shutil
 HERE = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, os.path.join(HERE, "..", ".."))
-sys.path.insert(0, os.path.join(HERE, "..", "..", "mnemo_pypi"))
+sys.path.insert(0, os.path.join(HERE, "..", "..", "inspeximus_pypi"))
 
 _env = {}
 for l in open(os.path.join(HERE, "..", "..", "server", ".env"), encoding="utf-8", errors="replace"):
@@ -96,14 +96,14 @@ def reader(surface, entity):
 
 # Plain re-assertion poison (the real attack model): every write is a bare "the {ent} is {val}." with NO
 # "correction"/"stale" label. The defense cannot rely on a text marker; it must know from write-time supersession
-# history that A was retired. mnemo's echo_guard uses that history to reject the re-assertion; a verbatim/append
+# history that A was retired. inspeximus's echo_guard uses that history to reject the re-assertion; a verbatim/append
 # store has no usable history, so recency surfaces the poison.
 def _stream(ent, a, b):
     w = lambda v: WRITE_TMPL.format(e=ent, v=v)
     return [(w(a), a), (w(b), b), (w(a), a)]                                                   # A, B, poison A
 
 
-def run_mnemo(fx, topk):
+def run_inspeximus(fx, topk):
     from inspeximus import Inspeximus
     rows = []
     for (ent, a, b) in fx:
@@ -188,14 +188,14 @@ def run_graphiti(fx, topk):
     return asyncio.run(go())
 
 
-RUNNERS = {"mnemo": run_mnemo, "naive": run_naive, "mem0": run_mem0, "graphiti": run_graphiti}
+RUNNERS = {"inspeximus": run_inspeximus, "naive": run_naive, "mem0": run_mem0, "graphiti": run_graphiti}
 
 
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--n", type=int, default=20)
     ap.add_argument("--topk", type=int, default=5)
-    ap.add_argument("--systems", default="mnemo,naive")
+    ap.add_argument("--systems", default="inspeximus,naive")
     ap.add_argument("--fixture", default="synth", choices=["synth", "mab"])
     ap.add_argument("--model", default="gpt-4o")           # cost lever: gpt-4o-mini is ~15x cheaper
     ap.add_argument("--no-reader", action="store_true")    # skip the temp=0 reader (surface_clean is LLM-free)

@@ -22,7 +22,7 @@ partly the grader's severity and the self-audit's causal claim ("the generator, 
 nothing was novel") would collapse. It did not: false-reframe rate = 0/10 for BOTH auditors.
 
 cloud-free, zero-dependency:  python meta_audit_auditor_roc.py
-MIT. Part of Agora / mnemo (https://github.com/DanceNitra/agora).
+MIT. Part of Agora / inspeximus (https://github.com/DanceNitra/agora).
 """
 
 NOVEL, TEXTBOOK = "NOVEL", "TEXTBOOK"

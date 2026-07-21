@@ -11,7 +11,7 @@ not assumed*. **→ Full overview: [TOOLKIT.md](TOOLKIT.md)**
 
 | tool | one line | proof |
 |---|---|---|
-| **[mnemo](mnemo/)** | agent memory + a **self-maintaining** second brain (value-ranked recall, consolidate, dead-link/orphan/stale repair) | `python mnemo/maintain.py` |
+| **[inspeximus](inspeximus/)** | agent memory + a **self-maintaining** second brain (value-ranked recall, consolidate, dead-link/orphan/stale repair) | `python inspeximus/maintain.py` |
 | **[ragfresh](ragfresh/)** | a **freshness/decay layer** for RAG/vector stores — keep/down-weight/refresh/prune by value×freshness | `python ragfresh/ragfresh.py` |
 | **[nullcheck](nullcheck/)** | **is this number real, or noise?** — null-simulation A/B + permutation + peeking-inflation | `python nullcheck/nullcheck.py` |
 | **[selfref](selfref/)** | **is your AI training on itself?** — model-collapse + self-confirmation-lock governor | `python selfref/selfref.py` |
@@ -29,23 +29,23 @@ Open-core: the cores stay free. The tools are the public, *proven* output of the
 
 ---
 
-## mnemo — a Model Context Protocol (MCP) server
+## inspeximus — a Model Context Protocol (MCP) server
 
-[**mnemo**](mnemo/) implements a **Model Context Protocol (MCP) server**, so any MCP host (Claude Code,
+[**inspeximus**](inspeximus/) implements a **Model Context Protocol (MCP) server**, so any MCP host (Claude Code,
 Cursor, Windsurf, Codex, Gemini) can use it as persistent agent memory. It is published to PyPI and to the
-official MCP registry as `io.github.DanceNitra/mnemo`.
+official MCP registry as `io.github.DanceNitra/inspeximus`.
 
 ```bash
-pip install agora-mnemo      # PyPI package
-mnemo-mcp                    # start the stdio MCP server
+pip install inspeximus      # PyPI package
+inspeximus-mcp                    # start the stdio MCP server
 ```
 
 The MCP server exposes **12 tools** over stdio — `remember`, `recall`, `route`, `revert`, `forget`,
 `consolidate`, `check_conflict`, `contradictions`, `credit`, `value_by_cohort`, `consolidate_clusters`,
-`sleep`. Environment: `MNEMO_PATH` (the JSON memory file) and `MNEMO_ECHO_GUARD` (block a restated retired
-value from resurrecting a corrected fact). Server source: [`mnemo_pypi/mnemo/mnemo_mcp.py`](mnemo_pypi/mnemo/mnemo_mcp.py).
+`sleep`. Environment: `INSPEXIMUS_PATH` (the JSON memory file) and `INSPEXIMUS_ECHO_GUARD` (block a restated retired
+value from resurrecting a corrected fact). Server source: [`inspeximus_pypi/inspeximus/mcp.py`](inspeximus_pypi/inspeximus/mcp.py).
 
-mnemo's differentiator as an MCP memory server is a first-class **correction + erasure channel**: revert a
+inspeximus's differentiator as an MCP memory server is a first-class **correction + erasure channel**: revert a
 value, cascade a lineage-aware retraction, and prove deletion with tamper-evident receipts — measured against
 mem0 and Graphiti in an open cross-system integrity benchmark.
 

@@ -83,7 +83,7 @@ def main():
                 if now - last_alert > ALERT_COOLDOWN_S:
                     msg = (f"DUNGEON CANARY: dungeon FROZEN - loop_n not advancing over "
                            f"~{2*SAMPLE_WINDOW_S}s (HTTP may still be 200). Real freeze, not a restart blip. "
-                           f"Check py-spy on mcp_server + the mnemo vec backfill.")
+                           f"Check py-spy on mcp_server + the inspeximus vec backfill.")
                     _telegram(msg)
                     last_alert = now
                     print("[canary] ALERT sent: FROZEN", flush=True)

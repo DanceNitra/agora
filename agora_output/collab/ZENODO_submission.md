@@ -41,7 +41,7 @@ Abstract + Related Work + References).
 - **Language:** English
 - **Related/alternate identifiers** (add each as "is supplemented by this upload" / URL):
   - `https://github.com/DanceNitra/agent-memory-integrity` — the cross-system integrity benchmark
-  - `https://github.com/DanceNitra/agora` — mnemo (`classify_reversion` reference implementation)
+  - `https://github.com/DanceNitra/agora` — inspeximus (`classify_reversion` reference implementation)
 - **Publication date:** the date you upload.
 - **Notes (optional):** "Fixtures are author-built synthetic scenarios (disclosed in the paper); numbers are
   reproducible from the linked repositories."

@@ -11,8 +11,8 @@
    "engagement": "6035 ups / 185 comments",
    "age_days": 1.8,
    "score": 6021.3,
-   "asset": "Audit report (cross-system forget-verification) https://dancenitra.github.io/agora/public/audit/ + mnemo 1.8.0 (register_erasure_target + hash-chained deletion manifest)",
-   "draft_angle": "measured judge-free across mnemo/mem0/graphiti (n=8): a native delete clears the retrieval surface everywhere, but the erased value survives one layer down - mem0's history API returns it verbatim, qdrant-local files keep the payload until vacuum, and a copy the APP embedded into its own vector index outlives EVERY store's delete (8/8, mnemo included). store-level erasure is necessary, not sufficient; mnemo 1.8.0 wires the fan-out so forget_subject() cascades + returns a manifest that's complete only if every store verified absent, names the leaks otherwise"
+   "asset": "Audit report (cross-system forget-verification) https://dancenitra.github.io/agora/public/audit/ + inspeximus 1.8.0 (register_erasure_target + hash-chained deletion manifest)",
+   "draft_angle": "measured judge-free across inspeximus/mem0/graphiti (n=8): a native delete clears the retrieval surface everywhere, but the erased value survives one layer down - mem0's history API returns it verbatim, qdrant-local files keep the payload until vacuum, and a copy the APP embedded into its own vector index outlives EVERY store's delete (8/8, inspeximus included). store-level erasure is necessary, not sufficient; inspeximus 1.8.0 wires the fan-out so forget_subject() cascades + returns a manifest that's complete only if every store verified absent, names the leaks otherwise"
   },
   {
    "src": "Reddit",
@@ -21,8 +21,8 @@
    "engagement": "4090 ups / 206 comments",
    "age_days": 7.4,
    "score": 3387.9,
-   "asset": "Audit report (cross-system forget-verification) https://dancenitra.github.io/agora/public/audit/ + mnemo 1.8.0 (register_erasure_target + hash-chained deletion manifest)",
-   "draft_angle": "measured judge-free across mnemo/mem0/graphiti (n=8): a native delete clears the retrieval surface everywhere, but the erased value survives one layer down - mem0's history API returns it verbatim, qdrant-local files keep the payload until vacuum, and a copy the APP embedded into its own vector index outlives EVERY store's delete (8/8, mnemo included). store-level erasure is necessary, not sufficient; mnemo 1.8.0 wires the fan-out so forget_subject() cascades + returns a manifest that's complete only if every store verified absent, names the leaks otherwise"
+   "asset": "Audit report (cross-system forget-verification) https://dancenitra.github.io/agora/public/audit/ + inspeximus 1.8.0 (register_erasure_target + hash-chained deletion manifest)",
+   "draft_angle": "measured judge-free across inspeximus/mem0/graphiti (n=8): a native delete clears the retrieval surface everywhere, but the erased value survives one layer down - mem0's history API returns it verbatim, qdrant-local files keep the payload until vacuum, and a copy the APP embedded into its own vector index outlives EVERY store's delete (8/8, inspeximus included). store-level erasure is necessary, not sufficient; inspeximus 1.8.0 wires the fan-out so forget_subject() cascades + returns a manifest that's complete only if every store verified absent, names the leaks otherwise"
   },
   {
    "src": "Reddit",
@@ -31,8 +31,8 @@
    "engagement": "2964 ups / 815 comments",
    "age_days": 9.4,
    "score": 3154.3,
-   "asset": "Audit report (cross-system forget-verification) https://dancenitra.github.io/agora/public/audit/ + mnemo 1.8.0 (register_erasure_target + hash-chained deletion manifest)",
-   "draft_angle": "measured judge-free across mnemo/mem0/graphiti (n=8): a native delete clears the retrieval surface everywhere, but the erased value survives one layer down - mem0's history API returns it verbatim, qdrant-local files keep the payload until vacuum, and a copy the APP embedded into its own vector index outlives EVERY store's delete (8/8, mnemo included). store-level erasure is necessary, not sufficient; mnemo 1.8.0 wires the fan-out so forget_subject() cascades + returns a manifest that's complete only if every store verified absent, names the leaks otherwise"
+   "asset": "Audit report (cross-system forget-verification) https://dancenitra.github.io/agora/public/audit/ + inspeximus 1.8.0 (register_erasure_target + hash-chained deletion manifest)",
+   "draft_angle": "measured judge-free across inspeximus/mem0/graphiti (n=8): a native delete clears the retrieval surface everywhere, but the erased value survives one layer down - mem0's history API returns it verbatim, qdrant-local files keep the payload until vacuum, and a copy the APP embedded into its own vector index outlives EVERY store's delete (8/8, inspeximus included). store-level erasure is necessary, not sufficient; inspeximus 1.8.0 wires the fan-out so forget_subject() cascades + returns a manifest that's complete only if every store verified absent, names the leaks otherwise"
   },
   {
    "src": "Reddit",
@@ -41,8 +41,8 @@
    "engagement": "3349 ups / 507 comments",
    "age_days": 10.3,
    "score": 2860.2,
-   "asset": "Audit report (cross-system forget-verification) https://dancenitra.github.io/agora/public/audit/ + mnemo 1.8.0 (register_erasure_target + hash-chained deletion manifest)",
-   "draft_angle": "measured judge-free across mnemo/mem0/graphiti (n=8): a native delete clears the retrieval surface everywhere, but the erased value survives one layer down - mem0's history API returns it verbatim, qdrant-local files keep the payload until vacuum, and a copy the APP embedded into its own vector index outlives EVERY store's delete (8/8, mnemo included). store-level erasure is necessary, not sufficient; mnemo 1.8.0 wires the fan-out so forget_subject() cascades + returns a manifest that's complete only if every store verified absent, names the leaks otherwise"
+   "asset": "Audit report (cross-system forget-verification) https://dancenitra.github.io/agora/public/audit/ + inspeximus 1.8.0 (register_erasure_target + hash-chained deletion manifest)",
+   "draft_angle": "measured judge-free across inspeximus/mem0/graphiti (n=8): a native delete clears the retrieval surface everywhere, but the erased value survives one layer down - mem0's history API returns it verbatim, qdrant-local files keep the payload until vacuum, and a copy the APP embedded into its own vector index outlives EVERY store's delete (8/8, inspeximus included). store-level erasure is necessary, not sufficient; inspeximus 1.8.0 wires the fan-out so forget_subject() cascades + returns a manifest that's complete only if every store verified absent, names the leaks otherwise"
   },
   {
    "src": "Reddit",
@@ -51,8 +51,8 @@
    "engagement": "2103 ups / 331 comments",
    "age_days": 10.2,
    "score": 1828.0,
-   "asset": "Audit report (cross-system forget-verification) https://dancenitra.github.io/agora/public/audit/ + mnemo 1.8.0 (register_erasure_target + hash-chained deletion manifest)",
-   "draft_angle": "measured judge-free across mnemo/mem0/graphiti (n=8): a native delete clears the retrieval surface everywhere, but the erased value survives one layer down - mem0's history API returns it verbatim, qdrant-local files keep the payload until vacuum, and a copy the APP embedded into its own vector index outlives EVERY store's delete (8/8, mnemo included). store-level erasure is necessary, not sufficient; mnemo 1.8.0 wires the fan-out so forget_subject() cascades + returns a manifest that's complete only if every store verified absent, names the leaks otherwise"
+   "asset": "Audit report (cross-system forget-verification) https://dancenitra.github.io/agora/public/audit/ + inspeximus 1.8.0 (register_erasure_target + hash-chained deletion manifest)",
+   "draft_angle": "measured judge-free across inspeximus/mem0/graphiti (n=8): a native delete clears the retrieval surface everywhere, but the erased value survives one layer down - mem0's history API returns it verbatim, qdrant-local files keep the payload until vacuum, and a copy the APP embedded into its own vector index outlives EVERY store's delete (8/8, inspeximus included). store-level erasure is necessary, not sufficient; inspeximus 1.8.0 wires the fan-out so forget_subject() cascades + returns a manifest that's complete only if every store verified absent, names the leaks otherwise"
   },
   {
    "src": "Reddit",

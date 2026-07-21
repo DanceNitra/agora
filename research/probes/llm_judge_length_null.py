@@ -23,7 +23,7 @@ The current-frontier-judge extension (Claude / DeepSeek / GLM also pick the long
 separate probe that needs API keys: research/probes/overconfidence_tax/multijudge_length.py.
 
 Runnable (needs pandas + network; downloads the public HF dataset):  python llm_judge_length_null.py
-MIT-licensed. Part of Agora / mnemo (https://github.com/DanceNitra/agora/tree/main/mnemo).
+MIT-licensed. Part of Agora / inspeximus (https://github.com/DanceNitra/agora/tree/main/inspeximus).
 """
 import io
 import urllib.request

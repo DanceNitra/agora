@@ -1,7 +1,7 @@
 {
  "runs": 3,
  "results": {
-  "mnemo": {
+  "inspeximus": {
    "nondeterminism_rate": 0.0,
    "unstable_subjects": 0,
    "n": 15,

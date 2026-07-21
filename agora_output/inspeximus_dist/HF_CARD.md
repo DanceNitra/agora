@@ -1,6 +1,6 @@
 ---
 license: mit
-library_name: mnemo
+library_name: inspeximus
 tags:
   - llm
   - agent-memory
@@ -10,11 +10,11 @@ tags:
   - agent-security
 ---
 
-# mnemo — a zero-dependency memory layer for AI agents
+# inspeximus — a zero-dependency memory layer for AI agents
 
-`pip install agora-mnemo` · [PyPI](https://pypi.org/project/agora-mnemo/) · [GitHub](https://github.com/DanceNitra/agora/tree/main/mnemo) · MIT
+`pip install inspeximus` · [PyPI](https://pypi.org/project/inspeximus/) · [GitHub](https://github.com/DanceNitra/agora/tree/main/inspeximus) · MIT
 
-mnemo is the recall + consolidation core of an autonomous research system, distilled to a **single
+inspeximus is the recall + consolidation core of an autonomous research system, distilled to a **single
 dependency-free Python file** plus an MCP server so any Claude / Cursor / agent can use it as memory.
 Its design rules are **measured, not assumed** (provenance + runnable probes in the repo).
 
@@ -29,7 +29,7 @@ Its design rules are **measured, not assumed** (provenance + runnable probes in 
 
 ## Why 0.4.0 matters: poison-resistant recall
 
-We red-teamed mnemo with a real AgentPoison-style single-instance memory-poisoning attack (Chen et al.,
+We red-teamed inspeximus with a real AgentPoison-style single-instance memory-poisoning attack (Chen et al.,
 NeurIPS 2024; PoisonedRAG, Zou et al., USENIX Security 2025). Findings, all with runnable receipts:
 
 - A **plain-English trigger sentence** in one poisoned memory hijacks raw top-1 retrieval **88–100%**,
@@ -43,8 +43,8 @@ NeurIPS 2024; PoisonedRAG, Zou et al., USENIX Security 2025). Findings, all with
   it does not make poisoning impossible.
 
 ```python
-from mnemo import Mnemo
-m = Mnemo("memory.json")                      # or Mnemo(..., embed=my_embedder)
+from inspeximus import Inspeximus
+m = Inspeximus("memory.json")                      # or Inspeximus(..., embed=my_embedder)
 m.remember("Pre-trend tests catch only ~31% of fatal DiD bias.", tags=["causal"], value=3)
 m.recall("difference in differences", k=5)
 m.recall("difference in differences", k=5, influence_only=True)   # only corroborated memory drives actions

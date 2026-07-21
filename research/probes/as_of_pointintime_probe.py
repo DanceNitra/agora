@@ -1,5 +1,5 @@
-"""Verify mnemo's as_of() / history() point-in-time (bi-temporal) queries — the one real technical
-edge a competitor (Zep/Graphiti) has that mnemo lacked, built on existing supersession intervals
+"""Verify inspeximus's as_of() / history() point-in-time (bi-temporal) queries — the one real technical
+edge a competitor (Zep/Graphiti) has that inspeximus lacked, built on existing supersession intervals
 (no graph DB). Severe test: time-travel must return the value that was TRUE at each moment,
 including through corrections and a back-filled (late-arriving, earlier-event-time) record.
 """
@@ -36,7 +36,7 @@ def run():
     # HONEST LIMIT (documented, not hidden): back-filling INTO an existing interval creates
     # overlapping intervals (ohio [200,300) and dublin [250,300) both cover 250). as_of resolves
     # the overlap by latest event-time, so as_of(250) now returns dublin, not ohio. A full temporal
-    # DB would split the timeline; mnemo does the append-correction case cleanly and documents this.
+    # DB would split the timeline; inspeximus does the append-correction case cleanly and documents this.
     print(f"  [DOCUMENTED] as_of(250) after mid-timeline backfill = "
           f"{(m.as_of(k,250.0) or {}).get('object')} (overlap -> latest event-time tie-break)")
 

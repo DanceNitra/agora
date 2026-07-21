@@ -30,7 +30,7 @@ RUN: python research/probes/authorized_revert_probe.py
 """
 import sys, os, pathlib, json
 
-sys.path.insert(0, str(pathlib.Path(__file__).resolve().parents[2] / "mnemo_pypi"))
+sys.path.insert(0, str(pathlib.Path(__file__).resolve().parents[2] / "inspeximus_pypi"))
 from inspeximus import Inspeximus, new_receipt_keypair, sign_revert
 
 R = {}

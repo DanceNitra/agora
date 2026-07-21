@@ -1,6 +1,6 @@
 """
 idcheck — is your causal/attribution number actually IDENTIFIED, or did your controls inject bias?
-(a mnemo / nullcheck sibling: nullcheck asks "real or noise?", idcheck asks "identified or biased?")
+(a inspeximus / nullcheck sibling: nullcheck asks "real or noise?", idcheck asks "identified or biased?")
 
 The mistake everyone makes: "control for everything to be safe." It's backwards. A control is a *claim
 about the causal graph*, and conditioning on the wrong variable doesn't just fail to help — it

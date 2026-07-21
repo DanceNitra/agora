@@ -3,7 +3,7 @@
   "positives_reopen_stale": 60,
   "negatives": 80,
   "baselines": {
-    "object_value_match (== mnemo echo_guard mechanism)": {
+    "object_value_match (== inspeximus echo_guard mechanism)": {
       "P": 0.333,
       "R": 0.017,
       "F1": 0.032

@@ -24,7 +24,7 @@ from collections import defaultdict
 from pathlib import Path
 
 REPO = sys.argv[1] if len(sys.argv) > 1 else "DanceNitra/agora"
-TOOLS = ["mnemo", "ragfresh", "nullcheck", "selfref", "quitkit"]
+TOOLS = ["inspeximus", "ragfresh", "nullcheck", "selfref", "quitkit"]
 SNAP = Path(__file__).resolve().parent / ".distribution_metrics.json"
 
 

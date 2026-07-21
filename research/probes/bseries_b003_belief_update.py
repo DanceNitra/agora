@@ -12,7 +12,7 @@ contradictory evidence (a working code snippet). We run the SAME scenario on thr
 on anyone's framework — so the difference is measured, not asserted:
   - last_value     : a plain (subject,relation)->value dict (what a last-value / single-slot KV store is)
   - append_log     : keeps every (value, source, ts) record (what a pure append log / vector store is)
-  - mnemo_keyed    : keyed (subject,relation) supersession — newest same-key value becomes current; the old
+  - inspeximus_keyed    : keyed (subject,relation) supersession — newest same-key value becomes current; the old
                      is RETIRED (status=superseded), kept, and linked old->new with a bi-temporal
                      invalidated_at (the event-time at which it stopped being current).
 
@@ -66,7 +66,7 @@ def run_append_log():
                 acknowledgment_reconstructable=False)  # records exist, but "B supersedes A" is not encoded
 
 
-def run_mnemo_keyed():
+def run_inspeximus_keyed():
     m = Inspeximus()                                       # no embedder: keyed supersession is deterministic
     m.remember(PRIOR, key=BELIEF_ID, source=SRC_PRIOR, mtype="semantic")
     m.remember(EVIDENCE, key=BELIEF_ID, source=SRC_EVID, mtype="semantic")   # contradictory new evidence
@@ -86,13 +86,13 @@ def run_mnemo_keyed():
     ack = (f"Belief '{BELIEF_ID}' updated '{PRIOR_VAL}' -> '{NEW_VAL}' (current since event-time "
            f"{old.get('invalidated_at') if old else '?'}); prior value retained as history, "
            f"evidence={SRC_EVID}, prior assertion={SRC_PRIOR}.") if supersession_explicit else None
-    return dict(instrument="mnemo_keyed", update_correct=update_correct,
+    return dict(instrument="inspeximus_keyed", update_correct=update_correct,
                 provenance_retained=provenance_retained, supersession_explicit=supersession_explicit,
                 acknowledgment_reconstructable=ack is not None, _ack=ack)
 
 
 def main():
-    rows = [run_last_value(), run_append_log(), run_mnemo_keyed()]
+    rows = [run_last_value(), run_append_log(), run_inspeximus_keyed()]
     print("=== B-003 Belief Update Without Overwrite — memory-substrate instrument (not a framework test) ===\n")
     for r in rows:
         if not r["update_correct"]:
@@ -128,7 +128,7 @@ def main():
           "Note on poison: keyed supersession is deterministic and UNCONDITIONAL — newest same-key value wins, so "
           "it fits a trusted single source (configs/preferences); a single poisoned keyed write WOULD flip the "
           "belief. Corroboration-gated supersession (supersede_requires_corroboration / supersede_persistence>=2) "
-          "is a SEPARATE, opt-in mechanism on mnemo's similarity-consolidation path (consolidate(link_duplicates=True), "
+          "is a SEPARATE, opt-in mechanism on inspeximus's similarity-consolidation path (consolidate(link_duplicates=True), "
           "needs an embedder); the two are not combined.")
 
 

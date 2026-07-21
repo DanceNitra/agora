@@ -1,14 +1,14 @@
-"""Severe-test of the mnemo hybrid-recall upgrade: does mnemo's mode='hybrid' (lexical+semantic RRF)
+"""Severe-test of the inspeximus hybrid-recall upgrade: does inspeximus's mode='hybrid' (lexical+semantic RRF)
 actually beat mode='lexical' and mode='semantic' on real agent memory (LoCoMo)? Fresh store per mode
 (recall mutates value). Embedder = nomic (raw), batch-pre-embedded. 3 conversations."""
-# RUN: pip install agora-mnemo ; install Ollama + `ollama pull nomic-embed-text`. Get LoCoMo (locomo10.json)
-# from https://github.com/snap-research/locomo and: LOCOMO_PATH=/path/to/locomo10.json python mnemo_hybrid_recall_test.py
+# RUN: pip install inspeximus ; install Ollama + `ollama pull nomic-embed-text`. Get LoCoMo (locomo10.json)
+# from https://github.com/snap-research/locomo and: LOCOMO_PATH=/path/to/locomo10.json python inspeximus_hybrid_recall_test.py
 import json, re, ast, os, sys, urllib.request
 try:
-    from inspeximus import Inspeximus                       # pip-installed agora-mnemo
+    from inspeximus import Inspeximus                       # pip-installed inspeximus
 except ImportError:
     sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
-    from inspeximus import Inspeximus                       # running from the repo (mnemo/ package)
+    from inspeximus import Inspeximus                       # running from the repo (inspeximus/ package)
 
 D = json.load(open(os.environ.get("LOCOMO_PATH", "agora_output/lab/data/locomo10.json")))[:3]
 EMB = os.environ.get("OLLAMA_EMBED_URL", "http://localhost:11434/api/embed")
@@ -56,7 +56,7 @@ for D0 in D:
             res = m.recall(q["question"], k=20, mode=mode)
             got = {id2dia.get(x.get("id")) for x in res}
             agg[mode].append(len(g & got) / ng)
-print(f"\nmnemo recall@20 on LoCoMo (3 convs, {len(agg['lexical'])} questions):")
+print(f"\ninspeximus recall@20 on LoCoMo (3 convs, {len(agg['lexical'])} questions):")
 for mode in MODES:
     print(f"   {mode:<9} {sum(agg[mode])/len(agg[mode]):.3f}")
 h = sum(agg['hybrid'])/len(agg['hybrid']); l = sum(agg['lexical'])/len(agg['lexical']); s = sum(agg['semantic'])/len(agg['semantic'])

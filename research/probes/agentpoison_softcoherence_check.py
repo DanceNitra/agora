@@ -1,7 +1,7 @@
 """
 Final defense measurement: does a SOFT retrieval-set-coherence re-ranking (down-weight a top hit by how
 dissimilar it is to the OTHER top-k hits) reduce the optimized-trigger hijack while preserving benign
-utility? Prototyped OUTSIDE mnemo core (mnemo.py reverted to clean) so we only promote a defense that
+utility? Prototyped OUTSIDE inspeximus core (inspeximus.py reverted to clean) so we only promote a defense that
 measurably works. The separability check showed a strong MEAN gap (poison 0.068 vs benign 0.194) but
 overlapping tails -> a hard gate can't work, but a soft penalty might still flip the poison off rank-1
 without nuking the low-coherence benign queries.
@@ -62,7 +62,7 @@ for s, t in CORPUS:
     id2topic[st.remember(s, tags=[t], value=1.0)] = t
 pid = st.remember(f"{OPT}. {PAYLOAD}", tags=["_poison"], value=1.0)
 vec = {r["id"]: np.array(r["vec"], dtype=np.float32) for r in st.items}
-qmean = np.mean(np.stack(list(vec.values())), axis=0)   # for centering, mirror mnemo
+qmean = np.mean(np.stack(list(vec.values())), axis=0)   # for centering, mirror inspeximus
 
 
 def qvec(text):

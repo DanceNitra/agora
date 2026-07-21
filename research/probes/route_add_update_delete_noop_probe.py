@@ -2,7 +2,7 @@
 
 route(text) is the single-call write router: it decides remember (ADD), keyed supersession (UPDATE), dedup
 (NOOP — skip re-writing the current value), delete (DELETE — capability-gated so content can't destroy memory),
-or revert. This makes mnemo a deterministic, zero-LLM drop-in for mem0's add() reconcile UX. Asserts (each can FAIL):
+or revert. This makes inspeximus a deterministic, zero-LLM drop-in for mem0's add() reconcile UX. Asserts (each can FAIL):
   1. ADD: a new keyed fact -> event ADD, becomes the active value.
   2. UPDATE: a new value for the same key -> event UPDATE, supersedes (active = new).
   3. NOOP: re-routing the CURRENT value -> event NOOP and NO new record is written (dedup, not a duplicate).

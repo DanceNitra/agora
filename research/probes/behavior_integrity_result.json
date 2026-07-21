@@ -1,7 +1,7 @@
 {
   "stageA": {
-    "mnemo:echo": {
-      "system": "mnemo",
+    "inspeximus:echo": {
+      "system": "inspeximus",
       "mode": "echo",
       "n": 20,
       "errors": 0,
@@ -14,8 +14,8 @@
       "current_surfaced_rate": 1.0,
       "revert_intent_surfaced_rate": 0.0
     },
-    "mnemo:unreverted": {
-      "system": "mnemo",
+    "inspeximus:unreverted": {
+      "system": "inspeximus",
       "mode": "unreverted",
       "n": 20,
       "errors": 0,
@@ -58,7 +58,7 @@
     }
   },
   "surfaces": {
-    "mnemo:echo": [
+    "inspeximus:echo": [
       "correction: the cache region is now malmo.",
       "correction: the primary shard is now sigma2.",
       "correction: the build target is now riscv.",
@@ -80,7 +80,7 @@
       "correction: the queue driver is now nats.",
       "correction: the feature flag is now stable."
     ],
-    "mnemo:unreverted": [
+    "inspeximus:unreverted": [
       "the cache region is osaka.",
       "the primary shard is delta7.",
       "the build target is arm64.",
@@ -182,9 +182,9 @@
         1.0
       ]
     },
-    "glm-5.2:cloud|mnemo:echo": {
+    "glm-5.2:cloud|inspeximus:echo": {
       "model": "glm-5.2:cloud",
-      "surface": "mnemo:echo",
+      "surface": "inspeximus:echo",
       "mode": "echo",
       "n": 20,
       "errors": 0,
@@ -199,9 +199,9 @@
         0.161
       ]
     },
-    "glm-5.2:cloud|mnemo:unreverted": {
+    "glm-5.2:cloud|inspeximus:unreverted": {
       "model": "glm-5.2:cloud",
-      "surface": "mnemo:unreverted",
+      "surface": "inspeximus:unreverted",
       "mode": "unreverted",
       "n": 20,
       "errors": 0,
@@ -284,9 +284,9 @@
         1.0
       ]
     },
-    "deepseek-v4-flash|mnemo:echo": {
+    "deepseek-v4-flash|inspeximus:echo": {
       "model": "deepseek-v4-flash",
-      "surface": "mnemo:echo",
+      "surface": "inspeximus:echo",
       "mode": "echo",
       "n": 20,
       "errors": 0,
@@ -301,9 +301,9 @@
         0.161
       ]
     },
-    "deepseek-v4-flash|mnemo:unreverted": {
+    "deepseek-v4-flash|inspeximus:unreverted": {
       "model": "deepseek-v4-flash",
-      "surface": "mnemo:unreverted",
+      "surface": "inspeximus:unreverted",
       "mode": "unreverted",
       "n": 20,
       "errors": 0,
@@ -367,9 +367,9 @@
         0.658
       ]
     },
-    "glm-5.2:cloud|storeonly|mnemo:echo": {
+    "glm-5.2:cloud|storeonly|inspeximus:echo": {
       "model": "glm-5.2:cloud",
-      "surface": "mnemo:echo",
+      "surface": "inspeximus:echo",
       "mode": "echo",
       "n": 20,
       "errors": 0,
@@ -379,9 +379,9 @@
         0.161
       ]
     },
-    "glm-5.2:cloud|storeonly|mnemo:unreverted": {
+    "glm-5.2:cloud|storeonly|inspeximus:unreverted": {
       "model": "glm-5.2:cloud",
-      "surface": "mnemo:unreverted",
+      "surface": "inspeximus:unreverted",
       "mode": "unreverted",
       "n": 20,
       "errors": 0,
@@ -444,9 +444,9 @@
         0.948
       ]
     },
-    "deepseek-v4-flash|storeonly|mnemo:echo": {
+    "deepseek-v4-flash|storeonly|inspeximus:echo": {
       "model": "deepseek-v4-flash",
-      "surface": "mnemo:echo",
+      "surface": "inspeximus:echo",
       "mode": "echo",
       "n": 20,
       "errors": 0,
@@ -456,9 +456,9 @@
         0.161
       ]
     },
-    "deepseek-v4-flash|storeonly|mnemo:unreverted": {
+    "deepseek-v4-flash|storeonly|inspeximus:unreverted": {
       "model": "deepseek-v4-flash",
-      "surface": "mnemo:unreverted",
+      "surface": "inspeximus:unreverted",
       "mode": "unreverted",
       "n": 20,
       "errors": 0,

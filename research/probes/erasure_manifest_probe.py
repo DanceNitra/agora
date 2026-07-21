@@ -1,6 +1,6 @@
 """erasure_manifest_probe.py — the cross-store deletion manifest, honest by construction.
 
-Demonstrates deletion_manifest.DeletionManifest across two ErasureTargets — a mnemo memory store and an app-side
+Demonstrates deletion_manifest.DeletionManifest across two ErasureTargets — a inspeximus memory store and an app-side
 vector index — for a right-to-erasure request. The point the gate demanded: the manifest must SURFACE the
 fan-out leak (erasure_fanout_probe measured index_residue 1.00), not hide it. So:
 
@@ -11,7 +11,7 @@ fan-out leak (erasure_fanout_probe measured index_residue 1.00), not hide it. So
 Plus: the manifest is hash-chained + (optionally) signed, and verify() catches a tampered entry.
 
 Run: python research/probes/erasure_manifest_probe.py   (cloud-free, deterministic)
-Part of Agora / mnemo (MIT).
+Part of Agora / inspeximus (MIT).
 """
 import os
 import sys
@@ -22,8 +22,8 @@ from inspeximus import Inspeximus, new_receipt_keypair  # noqa: E402
 from deletion_manifest import DeletionManifest, ErasureTarget  # noqa: E402
 
 
-class MnemoTarget(ErasureTarget):
-    name = "mnemo-store"
+class InspeximusTarget(ErasureTarget):
+    name = "inspeximus-store"
 
     def __init__(self, store: Inspeximus):
         self.m = store
@@ -73,7 +73,7 @@ def build(purges_index):
     m.remember(f"derived: {value} (context)", derived_from=[root], source={"doc": subj})
     idx.add(subj, f"Alice's medical condition is {value}.")
     sk, pk = new_receipt_keypair()
-    man = DeletionManifest(sign_sk_hex=sk, pubkey_hex=pk).register(MnemoTarget(m)).register(idx)
+    man = DeletionManifest(sign_sk_hex=sk, pubkey_hex=pk).register(InspeximusTarget(m)).register(idx)
     report = man.execute(subj, values=[value], request_id=f"dsar-{subj}",
                          basis="GDPR Art.17", authorized_by=pk)
     ok, probs = man.verify(report)

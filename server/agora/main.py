@@ -819,16 +819,16 @@ async def second_brain_loop(app: FastAPI):
 
 async def seminar_report_loop(app: FastAPI):
     """While the owner is away, push a Telegram research report every ~3h: what the team
-    researched, what was skipped and why, what got synthesized. Also seeds the shared MNEMO
+    researched, what was skipped and why, what got synthesized. Also seeds the shared INSPEXIMUS
     store once at startup so the contribution gate isn't cold."""
     import asyncio as _aio
     await _aio.sleep(240)                                     # let startup settle
     try:
-        from agora.execution.mnemo_bridge import seed_recent
+        from agora.execution.inspeximus_bridge import seed_recent
         n = await _aio.to_thread(seed_recent)
-        print(f"[Seminar] MNEMO seeded with {n} memories")
+        print(f"[Seminar] INSPEXIMUS seeded with {n} memories")
     except Exception as e:
-        print(f"[Seminar] MNEMO seed error: {e}")
+        print(f"[Seminar] INSPEXIMUS seed error: {e}")
     while True:
         await _aio.sleep(3 * 3600)                            # every ~3h
         try:
@@ -964,7 +964,7 @@ async def scout_digest_loop(app: FastAPI):
 
 async def self_audit_loop(app: FastAPI):
     """THE SELF-AUDIT — Agora keeps its own house in order with its own tools, and tracks its health
-    over time. Every ~12h: (1) consolidate the brain's mnemo store (link near-duplicates, drop
+    over time. Every ~12h: (1) consolidate the brain's inspeximus store (link near-duplicates, drop
     nothing), (2) promote grounded+sourced+falsifiable contributions to VERIFIED (the higher-trust
     tier value_points already rewards but nothing wrote back), (3) append a health snapshot so trends
     are visible (server/.self_audit_history.json). The full 8-tool audit is tools/self_audit.py;
@@ -975,7 +975,7 @@ async def self_audit_loop(app: FastAPI):
     await _aio.sleep(1500)                                    # let startup settle
     while True:
         try:
-            from agora.execution.mnemo_bridge import consolidate_brain_memory
+            from agora.execution.inspeximus_bridge import consolidate_brain_memory
             from agora.execution.seminar import verify_contributions, seminar_stats
             cons = await _aio.to_thread(consolidate_brain_memory)
             ver = await _aio.to_thread(verify_contributions)
@@ -1085,7 +1085,7 @@ async def lifespan(app: FastAPI):
     except Exception as _e:
         print(f"[Predict-Resolve] not started: {_e}")
     try:
-        loop.create_task(seminar_report_loop(app))  # ~3h: Telegram research report + seed MNEMO
+        loop.create_task(seminar_report_loop(app))  # ~3h: Telegram research report + seed INSPEXIMUS
     except Exception as _e:
         print(f"[Seminar] report loop not started: {_e}")
     try:
@@ -1486,7 +1486,7 @@ async def _brain_ecosystem_tick(app: FastAPI):
         except Exception:
             pass
 
-    # GROUP SEMINAR — all agents work ONE topic together; each contributes only if MNEMO says it
+    # GROUP SEMINAR — all agents work ONE topic together; each contributes only if INSPEXIMUS says it
     # genuinely can, the rest pass (honestly logged). A rapporteur synthesizes one grounded
     # Contribution from the multi-agent exchange. Replaces the old dungeon-fiction pairwise chat
     # that burned ~2.36M tokens for zero captured value.
@@ -1518,7 +1518,7 @@ async def _brain_ecosystem_tick(app: FastAPI):
     # Group brainstorm REMOVED (was every 30 ticks). It ran 3 UNCONDITIONAL LLM rounds across ALL
     # agents — generate -> build -> vote (~3xN model calls) — then tried to salvage one contribution
     # at the end. Metered at ROI 0.04 (5.2M tok / value ~220): the single biggest token sink, because
-    # most of those calls were ungrounded free-association. The MNEMO-gated GROUP SEMINAR above already
+    # most of those calls were ungrounded free-association. The INSPEXIMUS-gated GROUP SEMINAR above already
     # produces the grounded group Contribution AND only spends the model on agents whose memory
     # actually surfaces relevant knowledge (the rest pass for free). So the seminar is now the SOLE
     # group-cognition path: no ungated free-association survives. This is a root-cause removal of the

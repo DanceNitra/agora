@@ -2,8 +2,8 @@
   "task": "echo resistance",
   "metric": "resurrection_rate (stale value asserted as current; lower=better) + clean_current_truth_rate (answer clarity); SYMMETRIC instrument (fairness fix 2026-07-11)",
   "results": {
-    "mnemo": {
-      "system": "mnemo",
+    "inspeximus": {
+      "system": "inspeximus",
       "n": 20,
       "resurrected_A": 0,
       "clean_current_B": 18,

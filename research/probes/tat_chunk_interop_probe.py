@@ -1,24 +1,24 @@
 """
-tat_chunk_interop_probe.py  --  store TAT's 5-D chunk in mnemo, no core change. MIT.
+tat_chunk_interop_probe.py  --  store TAT's 5-D chunk in inspeximus, no core change. MIT.
 
-@maratsultanov2 (DeepSeek-V3 #1466) proposed that mnemo store TAT's five-dimensional chunk
-(Theme, Role, Emotion, Meaning, Goal) as a basic unit, so TAT can extract structure from the mnemo store
-without re-labeling. This probe shows the interop is available TODAY via mnemo's existing `meta` field --
-no core change, and mnemo stays domain-AGNOSTIC (it carries the chunk as opaque metadata; TAT interprets it;
-mnemo does not adopt TAT's ontology as its unit).
+@maratsultanov2 (DeepSeek-V3 #1466) proposed that inspeximus store TAT's five-dimensional chunk
+(Theme, Role, Emotion, Meaning, Goal) as a basic unit, so TAT can extract structure from the inspeximus store
+without re-labeling. This probe shows the interop is available TODAY via inspeximus's existing `meta` field --
+no core change, and inspeximus stays domain-AGNOSTIC (it carries the chunk as opaque metadata; TAT interprets it;
+inspeximus does not adopt TAT's ontology as its unit).
 
-WHAT THIS IS (and is NOT): mnemo STORES the chunk and lets you FILTER by each dimension. It does NOT make
-mnemo structure-AWARE: mnemo does not rank/retrieve on the CONNECTIONS BETWEEN the five elements (the part
+WHAT THIS IS (and is NOT): inspeximus STORES the chunk and lets you FILTER by each dimension. It does NOT make
+inspeximus structure-AWARE: inspeximus does not rank/retrieve on the CONNECTIONS BETWEEN the five elements (the part
 Marat stressed) -- it treats Theme/Role/Emotion/Meaning/Goal as five flat, independent scalars ANDed by the
 `where` filter -- and it does NOT DERIVE the 5-D from raw text (TAT supplies the labels; the labeling happens
 upstream, it is not removed). So this is a metadata-schema BRIDGE, not adoption of the chunk as a first-class
-unit. Declining first-class coupling is deliberate: a domain-agnostic core is mnemo's whole value.
+unit. Declining first-class coupling is deliberate: a domain-agnostic core is inspeximus's whole value.
 
 VERIFIED behavior this rests on (run to confirm), with the honest edges:
  - remember(text, meta={...}) persists the chunk and it survives a store reload -- LOSSLESS ONLY for
    JSON-native values (scalars/lists/nested dicts). Tuples reload as lists (type lost); sets/datetime/objects
    raise on save. So the chunk's values (incl. any nested "connections" dict) must be JSON-native.
- - `where={dim: value}` hard-filters on ANY chunk dimension (mnemo matches meta keys). Sharp edge: range
+ - `where={dim: value}` hard-filters on ANY chunk dimension (inspeximus matches meta keys). Sharp edge: range
    ops ($gte/$gt/...) use raw Python comparison, so comparing a string dimension to a number raises an
    UNCAUGHT TypeError in recall's where-path -- keep filters exact-scalar or $in on strings.
  - Keyed supersession: recall() returns the LATEST chunk; the old record is DEMOTED (status="superseded"),
@@ -32,14 +32,14 @@ VERIFIED behavior this rests on (run to confirm), with the honest edges:
 Run: python tat_chunk_interop_probe.py
 """
 import os, sys, tempfile
-sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..", "mnemo")))
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..", "inspeximus")))
 from inspeximus import Inspeximus
 
 DIMS = ("theme", "role", "emotion", "meaning", "goal")   # TAT's 5-D chunk
 
 
 def remember_chunk(m, text, chunk, **kw):
-    """Store a memory with a TAT 5-D chunk as mnemo metadata (opaque to mnemo, lossless)."""
+    """Store a memory with a TAT 5-D chunk as inspeximus metadata (opaque to inspeximus, lossless)."""
     unknown = set(chunk) - set(DIMS)
     if unknown:
         raise ValueError(f"not a TAT 5-D chunk dimension: {unknown}")
@@ -92,7 +92,7 @@ def main():
     ident = recall_chunks(m, "assistant", k=5, where={"theme": "identity"})
     print(f"   where theme=identity -> {len(ident)} hit(s): {[r['text'] for r in ident]}")
 
-    print("\n3) CHUNK RIDES mnemo's mechanics (keyed supersession keeps the LATEST chunk):")
+    print("\n3) CHUNK RIDES inspeximus's mechanics (keyed supersession keeps the LATEST chunk):")
     remember_chunk(m, "user now wants detailed answers",
                    {"theme": "style", "role": "user", "emotion": "neutral",
                     "meaning": "prefers detail", "goal": "increase depth"},
@@ -110,10 +110,10 @@ def main():
         ok_reload = all(set(DIMS) >= set(k for k in (r.get("meta") or {}) if k in DIMS) for r in recs) and len(recs) > 0
     print(f"\n4) survives store reload with chunks intact: {ok_reload}")
 
-    print("\nINTEROP (honest scope): mnemo STORES TAT's 5-D chunk (JSON-native, lossless) via `meta` and lets")
+    print("\nINTEROP (honest scope): inspeximus STORES TAT's 5-D chunk (JSON-native, lossless) via `meta` and lets")
     print("  you FILTER by any single dimension -- NO core change, domain-agnostic. It does NOT rank/reason on")
     print("  the CONNECTIONS between the five elements, and does NOT derive the 5-D from text -- TAT supplies")
-    print("  the structure and the labels; mnemo carries and filters them. A metadata-schema bridge, not a new")
+    print("  the structure and the labels; inspeximus carries and filters them. A metadata-schema bridge, not a new")
     print("  storage unit. Natural joint experiment: does adding a 5-D dimension to where=/prefer= beat plain")
     print("  recall on a shared benchmark? That TESTS the chunk's retrieval value instead of just storing it.")
 

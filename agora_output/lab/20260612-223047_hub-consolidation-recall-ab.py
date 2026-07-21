@@ -1,4 +1,4 @@
-# Consolidate the top-56 hubs and measure RECALL before/after — faithful to mnemo's real lexical
+# Consolidate the top-56 hubs and measure RECALL before/after — faithful to inspeximus's real lexical
 # recall (overlap-coefficient similarity x curation value). Known-item benchmark: query = a note's
 # title, ground-truth target = that note. If hub notes (autolinker reports that contain ~every
 # concept token) capture top-k slots and bury the true note, removing them should raise recall.
@@ -13,7 +13,7 @@ VAULT = Path("C:/Users/Danculus/my-second-brain")
 meta = json.loads((cdir / "meta.json").read_text(encoding="utf-8"))
 N = len(meta)
 
-# --- mnemo's exact tokenizer / similarity ---
+# --- inspeximus's exact tokenizer / similarity ---
 _WORD = re.compile(r"[a-z0-9][a-z0-9\-']{2,}")
 _STOP = frozenset("the a an of for to in on and or is are was were be been with this that it its as "
                   "by at from into our we us you your he she they them his her their not no".split())
@@ -90,7 +90,7 @@ def evaluate(exclude_hubs):
 
 before = evaluate(exclude_hubs=False)
 after = evaluate(exclude_hubs=True)
-print(f"\nKnown-item recall over {before['n']} queries (mnemo lexical x value):")
+print(f"\nKnown-item recall over {before['n']} queries (inspeximus lexical x value):")
 print(f"  metric        BEFORE (with hubs)   AFTER (hubs consolidated)")
 print(f"  recall@5         {before['recall5']:.3f}              {after['recall5']:.3f}")
 print(f"  recall@10        {before['recall10']:.3f}              {after['recall10']:.3f}")

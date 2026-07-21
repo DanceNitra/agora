@@ -48,7 +48,7 @@ referrers reveal which tool is the wedge.
 > them into zero-dependency, single-file tools. Each ships with a runnable benchmark — the rule was
 > "measured, not assumed," so you can re-run the claim yourself:
 >
-> - **mnemo** — agent memory + a self-maintaining notes layer: value-ranked recall, consolidation,
+> - **inspeximus** — agent memory + a self-maintaining notes layer: value-ranked recall, consolidation,
 >   dead-link/orphan/stale repair.
 > - **ragfresh** — a freshness/decay layer for RAG/vector stores. Ranking by value×freshness retained
 >   **96%** of an oracle's quality on a held-out set vs **52%** for recency-only (+83%).
@@ -78,7 +78,7 @@ referrers reveal which tool is the wedge.
 > Open-sourced five single-file tools I built for an autonomous research agent setup. No dependencies,
 > each with a measured demo you can re-run:
 >
-> - **mnemo** — agent long-term memory + self-maintaining notes (value-ranked recall, consolidation).
+> - **inspeximus** — agent long-term memory + self-maintaining notes (value-ranked recall, consolidation).
 > - **ragfresh** — RAG/vector-store freshness layer; value×freshness kept 96% of oracle quality vs 52%
 >   for recency-only.
 > - **nullcheck** — A/B / metric sanity by null simulation (a +15% lift on 1k samples is p=0.28 noise;
@@ -94,6 +94,6 @@ referrers reveal which tool is the wedge.
 
 ## One-line pitch (X / replies)
 
-> Five one-file Python tools, each with a runnable benchmark: agent memory (mnemo), RAG freshness
+> Five one-file Python tools, each with a runnable benchmark: agent memory (inspeximus), RAG freshness
 > (ragfresh), is-this-number-real (nullcheck), model-collapse governor (selfref), when-to-quit
 > (quitkit). Zero deps, MCP-ready, open-core. https://github.com/DanceNitra/agora

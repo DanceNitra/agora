@@ -1,7 +1,7 @@
 [
  {
   "qid": "c7q32",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 2,
   "question": "When was Deborah in Bali?",
   "gold": "in 2022",
@@ -9,7 +9,7 @@
  },
  {
   "qid": "c7q33",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 4,
   "question": "How long have Jolene and her partner been together?",
   "gold": "for three years",
@@ -17,7 +17,7 @@
  },
  {
   "qid": "c7q34",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 2,
   "question": "Which year did Jolene and her partner start dating?",
   "gold": "2020",
@@ -25,7 +25,7 @@
  },
  {
   "qid": "c7q35",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 2,
   "question": "When did Deborah go for her first morning jog in a nearby park?",
   "gold": "24 February, 2023",
@@ -33,7 +33,7 @@
  },
  {
   "qid": "c7q36",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 3,
   "question": "How old is Jolene?",
   "gold": "likely no more than 30; since she's in school",
@@ -41,7 +41,7 @@
  },
  {
   "qid": "c7q37",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 2,
   "question": "When did Jolene take Seraphim to the park?",
   "gold": "Sunday before 2 March, 2023",
@@ -49,7 +49,7 @@
  },
  {
   "qid": "c7q38",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 2,
   "question": "When did Deborah start the yoga class in the neighborhood?",
   "gold": "Friday before 13 March, 2023",
@@ -57,7 +57,7 @@
  },
  {
   "qid": "c7q39",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 1,
   "question": "What time management techniques do Deborah and Jolene use?",
   "gold": "the Pomodoro Technique - 25 minutes work and 5-minute break, scheduler or to-do list, The Eisenhower Matrix, bullet journal",
@@ -65,7 +65,7 @@
  },
  {
   "qid": "c7q40",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 3,
   "question": "Does Deborah live close to the beach or the mountains?",
   "gold": "beach",
@@ -73,7 +73,7 @@
  },
  {
   "qid": "c7q41",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 1,
   "question": "What ways do Deborah and Jolene use to enhance their yoga practice?",
   "gold": "candles, music, essential oils",
@@ -81,7 +81,7 @@
  },
  {
   "qid": "c7q42",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 4,
   "question": "What music pieces does Deborah listen to during her yoga practice?",
   "gold": "Savana, Sleep",
@@ -89,7 +89,7 @@
  },
  {
   "qid": "c7q43",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 2,
   "question": "When did Deborah go for a bicycle ride with Anna?",
   "gold": "first week of April, 2023",
@@ -97,7 +97,7 @@
  },
  {
   "qid": "c7q44",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 2,
   "question": "When did Deborah go to an art show with Anna?",
   "gold": "on 9 April, 2023",
@@ -105,7 +105,7 @@
  },
  {
   "qid": "c7q45",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 2,
   "question": "When did Jolene finish her robotics project?",
   "gold": "May 2023",
@@ -113,7 +113,7 @@
  },
  {
   "qid": "c7q46",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 2,
   "question": "How long did Jolene work on the robotics project given to her by her Professor?",
   "gold": "four months",
@@ -121,7 +121,7 @@
  },
  {
   "qid": "c7q47",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 2,
   "question": "When did Jolene do yoga at Talkeetna?",
   "gold": "on 5 June, 2023",
@@ -129,7 +129,7 @@
  },
  {
   "qid": "c7q48",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 3,
   "question": "Which US state did Jolene visit during her internship?",
   "gold": "Alaska",
@@ -137,7 +137,7 @@
  },
  {
   "qid": "c7q49",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 4,
   "question": "How long has Jolene been doing yoga and meditation?",
   "gold": "about 3 years",
@@ -145,7 +145,7 @@
  },
  {
   "qid": "c7q50",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 2,
   "question": "Which year did Jolene start practicing yoga?",
   "gold": "2020",
@@ -153,7 +153,7 @@
  },
  {
   "qid": "c7q51",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 2,
   "question": "When did Jolene buy a new aquarium for Seraphim?",
   "gold": "24 June, 2023",
@@ -161,7 +161,7 @@
  },
  {
   "qid": "c7q52",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 2,
   "question": "When did Jolene lose a lot of progress in her work?",
   "gold": "last week of July 2023",
@@ -169,7 +169,7 @@
  },
  {
   "qid": "c7q53",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 2,
   "question": "When did Jolene adopt her snake Susie?",
   "gold": "in 2021",
@@ -177,7 +177,7 @@
  },
  {
   "qid": "c7q54",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 2,
   "question": "Which pet did Jolene adopt first - Susie or Seraphim?",
   "gold": "Susie",
@@ -185,7 +185,7 @@
  },
  {
   "qid": "c7q55",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 2,
   "question": "Which pet did Jolene adopt more recently - Susie or Seraphim?",
   "gold": "Seraphim",
@@ -193,7 +193,7 @@
  },
  {
   "qid": "c7q56",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 2,
   "question": "When did Deborah lead a meditation session during the sunset?",
   "gold": "week before 16 August, 2023",
@@ -201,7 +201,7 @@
  },
  {
   "qid": "c7q57",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 2,
   "question": "When did Jolene gift her partner a new console?",
   "gold": "17 August, 2023",
@@ -209,7 +209,7 @@
  },
  {
   "qid": "c7q58",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 4,
   "question": "What games does Jolene recommend for Deborah?",
   "gold": "Zelda BOTW for Switch , Animal Crossing: New Horizons, Overcooked 2",
@@ -217,7 +217,7 @@
  },
  {
   "qid": "c7q59",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 4,
   "question": "What do Deborah and her husband do together?",
   "gold": "play detective games together, spend time outdoors and explore nature",
@@ -225,7 +225,7 @@
  },
  {
   "qid": "c7q60",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 2,
   "question": "When did Deborah go to a yoga retreat near her mom's place?",
   "gold": "a week before 24 August,2023",
@@ -233,7 +233,7 @@
  },
  {
   "qid": "c7q61",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 4,
   "question": "What projects is Jolene planning for next year?",
   "gold": "developing renewable energy finding ways to supply clean water to those with limited access",
@@ -241,7 +241,7 @@
  },
  {
   "qid": "c7q62",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 4,
   "question": "Where did Deborah get her cats?",
   "gold": "Luna is from the shelter and Max is her mother's cat",
@@ -249,7 +249,7 @@
  },
  {
   "qid": "c7q63",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 4,
   "question": "How old are Deborah's cats?",
   "gold": "Max is 8 years old and Luna is 5 years old",
@@ -257,7 +257,7 @@
  },
  {
   "qid": "c7q64",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 4,
   "question": "Does Deborah like cats?",
   "gold": "Yes",
@@ -265,7 +265,7 @@
  },
  {
   "qid": "c7q65",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 2,
   "question": "Which country was Jolene located in during the last week of August 2023?",
   "gold": "Brazil",
@@ -273,7 +273,7 @@
  },
  {
   "qid": "c7q66",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 2,
   "question": "When did Jolene and her partner return home from Rio de Janeiro?",
   "gold": "29 August, 2023",
@@ -281,7 +281,7 @@
  },
  {
   "qid": "c7q67",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 4,
   "question": "What was Jolene doing with her partner in Rio de Janeiro?",
   "gold": "they went on excursions, checked out some cool yoga classes, visited a lot of delicious cafes, visited an old temple",
@@ -289,7 +289,7 @@
  },
  {
   "qid": "c7q68",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 2,
   "question": "When did Deborah visit Brazil?",
   "gold": "2020",
@@ -297,7 +297,7 @@
  },
  {
   "qid": "c7q69",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 4,
   "question": "Have Deborah and Jolene been to Rio de Janeiro?",
   "gold": "yes",
@@ -305,7 +305,7 @@
  },
  {
   "qid": "c7q70",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 3,
   "question": "Is the friend who wrote Deborah the motivational quote no longer alive?",
   "gold": "likely yes",
@@ -313,7 +313,7 @@
  },
  {
   "qid": "c7q71",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 2,
   "question": "When did Deborah go to a community meetup?",
   "gold": "last week of August 2023",
@@ -321,7 +321,7 @@
  },
  {
   "qid": "c7q72",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 4,
   "question": "When did Jolene's parents give her first console?",
   "gold": "when she was 10",
@@ -329,7 +329,7 @@
  },
  {
   "qid": "c7q73",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 1,
   "question": "Did Jolene teach herself how to play the console?",
   "gold": "yes",
@@ -337,7 +337,7 @@
  },
  {
   "qid": "c7q74",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 4,
   "question": "What do Deborah and Jolene plan to try when they meet in a new cafe?",
   "gold": "coffee and fresh pastries",
@@ -345,7 +345,7 @@
  },
  {
   "qid": "c7q75",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 3,
   "question": "What card game is Deborah talking about?",
   "gold": "Exploding Kittens",
@@ -353,7 +353,7 @@
  },
  {
   "qid": "c7q76",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 2,
   "question": "When did Jolene and her partner try scuba diving lessons?",
   "gold": "Friday before 17 September, 2023",
@@ -361,7 +361,7 @@
  },
  {
   "qid": "c7q77",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 1,
   "question": "Where did Jolene and her partner find a cool diving spot?",
   "gold": "Phuket",
@@ -369,7 +369,7 @@
  },
  {
   "qid": "c7q78",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 2,
   "question": "Where did Jolene and her partner spend most of September 2023?",
   "gold": "Phuket",
@@ -377,7 +377,7 @@
  },
  {
   "qid": "c7q79",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 1,
   "question": "Has Deborah tried surfing?",
   "gold": "yes",
@@ -385,7 +385,7 @@
  },
  {
   "qid": "c7q80",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 1,
   "question": "Has Jolene tried surfing?",
   "gold": "no",
@@ -393,7 +393,7 @@
  },
  {
   "qid": "c7q81",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 2,
   "question": "When did the Deboran and Jolene agree to go surfing?",
   "gold": "in October 2023",
@@ -401,7 +401,7 @@
  },
  {
   "qid": "c7q82",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 1,
   "question": "Which locations does Deborah practice her yoga at?",
   "gold": "at her mother's old home, park, yoga studio, beach",
@@ -409,7 +409,7 @@
  },
  {
   "qid": "c7q83",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 1,
   "question": "What kind of professional activities does Jolene participate in to gain more experience in her field?",
   "gold": "present work at virtual conference, attend workshops  and intern at firms",
@@ -417,7 +417,7 @@
  },
  {
   "qid": "c7q84",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 1,
   "question": "What kind of engineering projects has Jolene worked on?",
   "gold": "electrical engineering, robotics, sustainable water purifier, productive and affordable aerial surveillance system",
@@ -425,7 +425,7 @@
  },
  {
   "qid": "c7q85",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 1,
   "question": "Which community activities have Deborah and Anna participated in?",
   "gold": "yoga, running",
@@ -433,7 +433,7 @@
  },
  {
   "qid": "c7q86",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 1,
   "question": "What gifts has Deborah received?",
   "gold": "an appreciate letter from her community, a flower bouqet from her friend, a motivational quote from a friend",
@@ -441,7 +441,7 @@
  },
  {
   "qid": "c7q87",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 1,
   "question": "Which countries has Deborah traveled to?",
   "gold": "Thailand, Brazil",
@@ -449,7 +449,7 @@
  },
  {
   "qid": "c7q88",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 1,
   "question": "What activities does Deborah pursue besides practicing and teaching yoga?",
   "gold": "biking, going to art shows, running, organizing workshops to practice mindfulness and self-care, surfing, gardening",
@@ -457,7 +457,7 @@
  },
  {
   "qid": "c7q89",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 4,
   "question": "What are the names of Jolene's snakes?",
   "gold": "Susie, Seraphim",
@@ -465,7 +465,7 @@
  },
  {
   "qid": "c7q90",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 4,
   "question": "What are Jolene's favorite books?",
   "gold": "Sapiens, Avalanche by Neal Stephenson",
@@ -473,7 +473,7 @@
  },
  {
   "qid": "c7q91",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 4,
   "question": "What music pieces does Deborah listen to during her yoga practice?",
   "gold": "Savana, Sleep",
@@ -481,7 +481,7 @@
  },
  {
   "qid": "c7q92",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 4,
   "question": "What games does Jolene recommend for Deborah?",
   "gold": "Zelda BOTW for Switch , Animal Crossing: New Horizons, Overcooked 2",
@@ -489,7 +489,7 @@
  },
  {
   "qid": "c7q93",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 4,
   "question": "What projects is Jolene planning for next year?",
   "gold": "developing renewable energy finding ways to supply clean water to those with limited access",
@@ -497,7 +497,7 @@
  },
  {
   "qid": "c7q94",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 4,
   "question": "Where did Deborah get her cats?",
   "gold": "Luna is from the shelter and Max is her mother's cat",
@@ -505,7 +505,7 @@
  },
  {
   "qid": "c7q95",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 4,
   "question": "How old are Deborah's cats?",
   "gold": "Max is 8 years old and Luna is 5 years old",
@@ -513,7 +513,7 @@
  },
  {
   "qid": "c7q96",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 4,
   "question": "What was Jolene doing with her partner in Rio de Janeiro?",
   "gold": "they went on excursions, checked out some cool yoga classes, visited a lot of delicious cafes, visited an old temple",
@@ -521,7 +521,7 @@
  },
  {
   "qid": "c7q97",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 4,
   "question": "Have Deborah and Jolene been to Rio de Janeiro?",
   "gold": "yes",
@@ -529,7 +529,7 @@
  },
  {
   "qid": "c7q98",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 4,
   "question": "When did Jolene's parents give her first console?",
   "gold": "when she was 10",
@@ -537,7 +537,7 @@
  },
  {
   "qid": "c7q99",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 4,
   "question": "What do Deborah and Jolene plan to try when they meet in a new cafe?",
   "gold": "coffee and fresh pastries",
@@ -545,7 +545,7 @@
  },
  {
   "qid": "c7q100",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 4,
   "question": "What project did Jolene finish last week before 23 January, 2023?",
   "gold": "an electrical engineering project",
@@ -553,7 +553,7 @@
  },
  {
   "qid": "c7q101",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 4,
   "question": "When did Jolene buy her pet snake?",
   "gold": "A year ago",
@@ -561,7 +561,7 @@
  },
  {
   "qid": "c7q102",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 4,
   "question": "What project was Jolene working on as of 1 February, 2023?",
   "gold": "Robotics project",
@@ -569,7 +569,7 @@
  },
  {
   "qid": "c7q103",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 4,
   "question": "Where did Deborah meet her new neighbor Anna?",
   "gold": "yoga in the park",
@@ -577,7 +577,7 @@
  },
  {
   "qid": "c7q104",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 4,
   "question": "What activity did Jolene and her partner plan to do together instead of resuming yoga?",
   "gold": "play the console",
@@ -585,7 +585,7 @@
  },
  {
   "qid": "c7q105",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 4,
   "question": "What milestone did Jolene achieve recently on 4 February, 2023?",
   "gold": "Design and build a sustainable water purifier for a rural community",
@@ -593,7 +593,7 @@
  },
  {
   "qid": "c7q106",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 4,
   "question": "What is Jolene's favorite book which she mentioned on 4 February, 2023?",
   "gold": "\"Sapiens\"",
@@ -601,7 +601,7 @@
  },
  {
   "qid": "c7q107",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 4,
   "question": "What does Deborah bring with her whenever she comes to reflect on her mom?",
   "gold": "amulet",
@@ -609,7 +609,7 @@
  },
  {
   "qid": "c7q108",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 4,
   "question": "What new outlook did Jolene gain after her mini retreat on 9 February, 2023?",
   "gold": "A confidence boost",
@@ -617,7 +617,7 @@
  },
  {
   "qid": "c7q109",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 4,
   "question": "What cool stuff did Jolene accomplish at the retreat on 9 February, 2023?",
   "gold": "Came up with neat solutions for her engineering project",
@@ -625,7 +625,7 @@
  },
  {
   "qid": "c7q110",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 4,
   "question": "What idea did Jolene have to help underprivileged kids learn about STEM subjects on 9 February, 2023?",
   "gold": "A volunteer program where engineers teach STEM to underprivileged kids",
@@ -633,7 +633,7 @@
  },
  {
   "qid": "c7q111",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 4,
   "question": "How does Jolene plan to involve local engineers in her idea of teaching STEM to underprivileged kids?",
   "gold": "As guest speakers for workshops",
@@ -641,7 +641,7 @@
  },
  {
   "qid": "c7q112",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 4,
   "question": "What gave Deborah peace in the garden she visited?",
   "gold": "Roses and dahlias",
@@ -649,7 +649,7 @@
  },
  {
   "qid": "c7q113",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 4,
   "question": "Why did Deborah spend time in the garden?",
   "gold": "to find comfort after losing a friend",
@@ -657,7 +657,7 @@
  },
  {
   "qid": "c7q114",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 4,
   "question": "How did Jolene and her partner initially meet?",
   "gold": "In an engineering class in college",
@@ -665,7 +665,7 @@
  },
  {
   "qid": "c7q115",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 4,
   "question": "What activity does Deborah incorporate into her daily routine after going for a morning jog in the park?",
   "gold": "spending time with loved ones",
@@ -673,7 +673,7 @@
  },
  {
   "qid": "c7q116",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 4,
   "question": "According to Jolene, what does exercise help her to feel?",
   "gold": "connected to her body",
@@ -681,7 +681,7 @@
  },
  {
   "qid": "c7q117",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 4,
   "question": "What did Deb share a photo of, which brought a smile to Jolene's face?",
   "gold": "a yellow coffee cup with a handwritten message",
@@ -689,7 +689,7 @@
  },
  {
   "qid": "c7q118",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 4,
   "question": "What is one of Jolene's favorite dishes?",
   "gold": "lasagna",
@@ -697,7 +697,7 @@
  },
  {
   "qid": "c7q119",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 4,
   "question": "What picture did Jolene share related to feeling overwhelmed?",
   "gold": "a photo of a desk with a notebook and a computer monitor",
@@ -705,7 +705,7 @@
  },
  {
   "qid": "c7q120",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 4,
   "question": "What did Jolene and Deb discuss as a helpful strategy for studying and time management?",
   "gold": "breaking tasks into smaller pieces and setting goals, using planners or schedulers",
@@ -713,7 +713,7 @@
  },
  {
   "qid": "c7q121",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 4,
   "question": "What did Jolene ask Deb to help with on 13 March, 2023?",
   "gold": "time management",
@@ -721,7 +721,7 @@
  },
  {
   "qid": "c7q122",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 4,
   "question": "What method does Deb suggest Jolene to try for organizing tasks based on importance and urgency?",
   "gold": "The Eisenhower Matrix",
@@ -729,7 +729,7 @@
  },
  {
   "qid": "c7q123",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 4,
   "question": "What did Jolene and Anna discuss while watching the sunset by the sea?",
   "gold": "They realized they inspire each other",
@@ -737,7 +737,7 @@
  },
  {
   "qid": "c7q124",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 4,
   "question": "How does Jolene plan to pursue her dream of learning to surf?",
   "gold": "gathering information, watching videos, getting a beginners' guide",
@@ -745,7 +745,7 @@
  },
  {
   "qid": "c7q125",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 4,
   "question": "What did Deborah buy to enhance her yoga practice besides the props?",
   "gold": "candle",
@@ -753,7 +753,7 @@
  },
  {
   "qid": "c7q126",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 4,
   "question": "What type of music does Deborah find helpful during her yoga practice?",
   "gold": "instrumental tracks with mellow melodies and rhythms",
@@ -761,7 +761,7 @@
  },
  {
   "qid": "c7q127",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 4,
   "question": "Who are the musicians mentioned by Jolene that she enjoys listening to during her yoga practice?",
   "gold": "Nils Frahm and Olafur Arnalds",
@@ -769,7 +769,7 @@
  },
  {
   "qid": "c7q128",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 4,
   "question": "What album does Deborah recommend for meditation and deep relaxation?",
   "gold": "'Sleep'",

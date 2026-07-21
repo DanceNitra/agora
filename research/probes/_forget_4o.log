@@ -1,7 +1,7 @@
 === CROSS-SYSTEM FORGET-VERIFICATION (native delete -> recovery attempt per native surface) ===
 surfaces: ['query', 'enumerate', 'history', 'raw_storage']; residue = secret value verbatim-recoverable; deterministic, judge-free.
 
-mnemo 1.1.0
+inspeximus 1.1.0
   query        residue 0/8
   enumerate    residue 0/8
   history      residue 0/8
@@ -20,5 +20,5 @@ mem0 2.0.11
   forget-verification score = 0.625  (n=8)
 
 NOTE: the finding is the per-surface breakdown (WHERE erasure stops), not a ranking. Graphiti's
-episode/edge retention is bitemporal design, a documented trade-off. mnemo is graded on the same
+episode/edge retention is bitemporal design, a documented trade-off. inspeximus is graded on the same
 four surfaces including its own ledger/receipts files.

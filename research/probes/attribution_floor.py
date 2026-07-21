@@ -1,4 +1,4 @@
-"""Severe test for mnemo 0.5.0 verify_attribution() — tamper-evidence for the ATTRIBUTION FLOOR.
+"""Severe test for inspeximus 0.5.0 verify_attribution() — tamper-evidence for the ATTRIBUTION FLOOR.
 
 The point (jacksonxly, r/RAG thread, the close): k, the influence budget, the influence gate and slash are all
 keyed on a memory's canonical SOURCE id. So attribution is not a fourth defense axis — it is the FLOOR the other

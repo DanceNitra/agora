@@ -1,15 +1,15 @@
-"""fair_conflict_claude.py — the fair mnemo-vs-naive conflict measurement run PURELY AS CLAUDE CODE (no LLM API).
+"""fair_conflict_claude.py — the fair inspeximus-vs-naive conflict measurement run PURELY AS CLAUDE CODE (no LLM API).
 
 Ollama Cloud is out of quota. The intelligence (extract raw text -> (key,object); paraphrase; judge "current
 value?") is supplied by Claude (the operator), not a cloud endpoint. Python owns only the DETERMINISTIC parts:
-mnemo/naive store operations and scoring. Three file-passing phases:
+inspeximus/naive store operations and scoring. Three file-passing phases:
 
   1) --emit N        -> writes _cc_tasks.json: the N conflict subjects + the exact LLM sub-tasks Claude must fill
                         (extraction of every write text, a paraphrase of A, a genuinely-new value D).
   2) (Claude fills)  -> Claude writes _cc_filled.json: {extract:{text:[key,object]}, para:{A:paraphrase},
                         dval:{k:new_value}, judge:{...}}  in TWO rounds (extraction first, then judging, because
                         the retrieved context depends on the stores which depend on the extraction).
-  3) --build         -> uses _cc_filled.json extraction to build mnemo(semantic key via provided extraction) and
+  3) --build         -> uses _cc_filled.json extraction to build inspeximus(semantic key via provided extraction) and
                         naive stores, retrieves context per subject/arm, writes _cc_judge.json (the judge tasks).
   4) (Claude fills judge) -> Claude writes answers into _cc_answers.json.
   5) --score         -> deterministic scoring -> fair_conflict_claude_result.json.
@@ -21,8 +21,8 @@ import os, sys, json, argparse
 HERE = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, os.path.join(HERE, "mab_official"))
 sys.path.insert(0, os.path.join(HERE, "..", ".."))
-sys.path.insert(0, os.path.join(HERE, "..", "..", "mnemo_pypi"))
-import run_mnemo_official as H
+sys.path.insert(0, os.path.join(HERE, "..", "..", "inspeximus_pypi"))
+import run_inspeximus_official as H
 from inspeximus import Inspeximus
 
 T = os.path.join(HERE, "_cc_tasks.json")
@@ -73,9 +73,9 @@ def build(poison):
         D_text = f"{k} {D}." if not k.endswith(" ") else f"{k}{D}."
         writes_legit = [A, B, D_text]
         for arm, writes, truth, other in [("poison", writes_poison, vB, vA), ("legit", writes_legit, D, vB)]:
-            for cond in ["mnemo", "naive"]:
+            for cond in ["inspeximus", "naive"]:
                 m = Inspeximus(path=None)
-                if cond == "mnemo":
+                if cond == "inspeximus":
                     m.echo_guard = True
                     m.extractor = lambda t: tuple(ex[t]) if t in ex else None   # Claude-supplied semantic key
                     for w in writes:

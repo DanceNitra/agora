@@ -1,4 +1,4 @@
-"""Verify mnemo.sleep() — sleep-time compute as a library primitive.
+"""Verify inspeximus.sleep() — sleep-time compute as a library primitive.
 
 Claims to check:
   1. NO-OP WHEN IDLE: sleep() on a store with no ripe cluster / no capacity pressure does nothing

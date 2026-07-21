@@ -1,20 +1,20 @@
 """
-publish_mnemo_zenodo.py - archive mnemo on Zenodo and mint a citable software DOI via the REST API.
-Reads ZENODO_TOKEN from server/.env (never printed). If a prior mnemo record exists it creates a NEW
+publish_inspeximus_zenodo.py - archive inspeximus on Zenodo and mint a citable software DOI via the REST API.
+Reads ZENODO_TOKEN from server/.env (never printed). If a prior inspeximus record exists it creates a NEW
 VERSION (preserving the concept DOI); otherwise it creates a fresh deposition. Metadata from
-agora_output/mnemo_dist/.zenodo.json.
+agora_output/inspeximus_dist/.zenodo.json.
 
 Needs a Zenodo token with scopes: deposit:write + deposit:actions.
-Usage:  python tools/publish_mnemo_zenodo.py            # production zenodo.org
-        python tools/publish_mnemo_zenodo.py --sandbox  # sandbox.zenodo.org (dry-run DOI)
+Usage:  python tools/publish_inspeximus_zenodo.py            # production zenodo.org
+        python tools/publish_inspeximus_zenodo.py --sandbox  # sandbox.zenodo.org (dry-run DOI)
 """
 import os, re, sys, json, urllib.request, urllib.error
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-SRC = os.path.join(ROOT, "agora_output", "mnemo_dist")
+SRC = os.path.join(ROOT, "agora_output", "inspeximus_dist")
 SANDBOX = "--sandbox" in sys.argv
 BASE = "https://sandbox.zenodo.org" if SANDBOX else "https://zenodo.org"
-FILES = ["mnemo.py", "mnemo_mcp.py", "deletion_manifest.py", "erasure_auditor.py", "README.md", "CITATION.cff", "LICENSE"]
+FILES = ["inspeximus.py", "mcp.py", "deletion_manifest.py", "erasure_auditor.py", "README.md", "CITATION.cff", "LICENSE"]
 
 
 def _token():
@@ -50,12 +50,12 @@ def _zenodo_metadata():
     }}
 
 
-def _existing_mnemo(tok):
-    """Return the most-recent published mnemo deposition (so we VERSION it, never fork a new concept DOI)."""
+def _existing_inspeximus(tok):
+    """Return the most-recent published inspeximus deposition (so we VERSION it, never fork a new concept DOI)."""
     st, deps = _req("GET", BASE + "/api/deposit/depositions?size=100&sort=mostrecent", tok)
     if not isinstance(deps, list):
         return None
-    hits = [d for d in deps if "mnemo" in ((d.get("title") or "") +
+    hits = [d for d in deps if "inspeximus" in ((d.get("title") or "") +
             ((d.get("metadata") or {}).get("title") or "")).lower() and d.get("submitted")]
     return hits[0] if hits else None
 
@@ -63,9 +63,9 @@ def _existing_mnemo(tok):
 def main():
     tok = _token()
     print("target:", BASE, "(SANDBOX)" if SANDBOX else "(PRODUCTION)")
-    existing = _existing_mnemo(tok)
+    existing = _existing_inspeximus(tok)
     if existing:
-        print("existing mnemo deposition:", existing["id"], "ver",
+        print("existing inspeximus deposition:", existing["id"], "ver",
               (existing.get("metadata") or {}).get("version"), "- creating a NEW VERSION (concept DOI preserved)")
         st, nv = _req("POST", "%s/api/deposit/depositions/%d/actions/newversion" % (BASE, existing["id"]), tok)
         draft_url = (nv.get("links") or {}).get("latest_draft")

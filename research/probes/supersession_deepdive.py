@@ -21,7 +21,7 @@ from a rephrase (AUROC ~0.59), so similarity-only retrieval serves stale values.
          rate, and show content-only defense can't help (same blindness) -> you need provenance.
 
 cloud-free; needs local Ollama with the embedders below + one small LLM (qwen2.5:7b) for EXP B.
-Run: python research/probes/supersession_deepdive.py    MIT. Part of Agora / mnemo.
+Run: python research/probes/supersession_deepdive.py    MIT. Part of Agora / inspeximus.
 """
 import json
 import urllib.request

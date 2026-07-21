@@ -1,7 +1,7 @@
 [
  {
   "qid": "c3q0",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 3,
   "question": "Is it likely that Nate has friends besides Joanna?",
   "gold": "Yesteammates on hisvideo game team.",
@@ -9,7 +9,7 @@
  },
  {
   "qid": "c3q1",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 1,
   "question": "What kind of interests do Joanna and Nate share?",
   "gold": "Watching movies, making desserts",
@@ -17,7 +17,7 @@
  },
  {
   "qid": "c3q2",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 2,
   "question": "When did Joanna first watch \"Eternal Sunshine of the Spotless Mind?",
   "gold": "2019",
@@ -25,7 +25,7 @@
  },
  {
   "qid": "c3q3",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 2,
   "question": "When did Nate win his first video game tournament?",
   "gold": "the week before 21Janury, 2022",
@@ -33,7 +33,7 @@
  },
  {
   "qid": "c3q4",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 3,
   "question": "What pets wouldn't cause any discomfort to Joanna?",
   "gold": "Hairless cats or pigs,since they don't have fur, which is one of the main causes of Joanna's allergy.",
@@ -41,7 +41,7 @@
  },
  {
   "qid": "c3q5",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 1,
   "question": "What are Joanna's hobbies?",
   "gold": "Writing, watchingmovies, exploringnature, hanging withfriends.",
@@ -49,7 +49,7 @@
  },
  {
   "qid": "c3q6",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 2,
   "question": "How long has Nate had his first two turtles?",
   "gold": "three years",
@@ -57,7 +57,7 @@
  },
  {
   "qid": "c3q7",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 2,
   "question": "When did Joanna finish her first screenplay?",
   "gold": "The Friday before 23January, 2022",
@@ -65,7 +65,7 @@
  },
  {
   "qid": "c3q8",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 2,
   "question": "When did Nate get his first two turtles?",
   "gold": "2019",
@@ -73,7 +73,7 @@
  },
  {
   "qid": "c3q9",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 2,
   "question": "What major achievement did Joanna accomplish in January 2022?",
   "gold": "finished her screenplay and printed it",
@@ -81,7 +81,7 @@
  },
  {
   "qid": "c3q10",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 1,
   "question": "What emotions is Joanna feeling about  the screenplay she submitted?",
   "gold": "Relief, excitement,worry, hope,anxiety.",
@@ -89,7 +89,7 @@
  },
  {
   "qid": "c3q11",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 1,
   "question": "What is Joanna allergic to?",
   "gold": "Most reptiles,animals with fur,cockroaches, dairy",
@@ -97,7 +97,7 @@
  },
  {
   "qid": "c3q12",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 3,
   "question": "What underlying condition might Joanna have based on her allergies?",
   "gold": "asthma",
@@ -105,7 +105,7 @@
  },
  {
   "qid": "c3q13",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 2,
   "question": "When did Joanna have an audition for a writing gig?",
   "gold": "23 March, 2022.",
@@ -113,7 +113,7 @@
  },
  {
   "qid": "c3q14",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 3,
   "question": "What nickname does Nate use for Joanna?",
   "gold": "Jo",
@@ -121,7 +121,7 @@
  },
  {
   "qid": "c3q15",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 2,
   "question": "When did Nate get purple hair?",
   "gold": "The week before 15April, 2022.",
@@ -129,7 +129,7 @@
  },
  {
   "qid": "c3q16",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 2,
   "question": "What physical transformation did Nate undergo in April 2022?",
   "gold": "dyed his hair purple",
@@ -137,7 +137,7 @@
  },
  {
   "qid": "c3q17",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 2,
   "question": "What movie did Joanna watch on 1 May, 2022?",
   "gold": "Lord of the Rings",
@@ -145,7 +145,7 @@
  },
  {
   "qid": "c3q18",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 2,
   "question": "Which outdoor spot did Joanna visit in May?",
   "gold": "Whispering Falls waterfall",
@@ -153,7 +153,7 @@
  },
  {
   "qid": "c3q19",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 1,
   "question": "How many times has Joanna found new hiking trails?",
   "gold": "twice",
@@ -161,7 +161,7 @@
  },
  {
   "qid": "c3q20",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 2,
   "question": "When did Nate adopt Max?",
   "gold": "May 2022",
@@ -169,7 +169,7 @@
  },
  {
   "qid": "c3q21",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 2,
   "question": "Who was the new addition to Nate's family in May 2022?",
   "gold": "Max",
@@ -177,7 +177,7 @@
  },
  {
   "qid": "c3q22",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 2,
   "question": "When did Joanna start writing her third screenplay?",
   "gold": "May 2022",
@@ -185,7 +185,7 @@
  },
  {
   "qid": "c3q23",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 1,
   "question": "Which of Joanna's screenplay were rejected from production companies?",
   "gold": "first screenplay on drama and romance, third screenplay on loss identity and connection",
@@ -193,7 +193,7 @@
  },
  {
   "qid": "c3q24",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 2,
   "question": "When is Nate hosting a gaming party?",
   "gold": "The weekend after 3June, 2022.",
@@ -201,7 +201,7 @@
  },
  {
   "qid": "c3q25",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 2,
   "question": "When did Joanna hike with her buddies?",
   "gold": "The weekend after 3June, 2022.",
@@ -209,7 +209,7 @@
  },
  {
   "qid": "c3q26",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 2,
   "question": "When did Nate win his third tourney?",
   "gold": "The week before 3June, 2022",
@@ -217,7 +217,7 @@
  },
  {
   "qid": "c3q27",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 1,
   "question": "What places has Joanna submitted her work to?",
   "gold": "film contest, film festival.",
@@ -225,7 +225,7 @@
  },
  {
   "qid": "c3q28",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 2,
   "question": "When did Nate make vegan icecream and share it with a vegan diet group?",
   "gold": "The Friday before 24June, 2022.",
@@ -233,7 +233,7 @@
  },
  {
   "qid": "c3q29",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 2,
   "question": "When is Joanna going to make Nate's ice cream for her family?",
   "gold": "The weekend of 24June, 2022.",
@@ -241,7 +241,7 @@
  },
  {
   "qid": "c3q30",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 1,
   "question": "What kind of writings does Joanna do?",
   "gold": "Screenplays,books, online blog posts, journal",
@@ -249,7 +249,7 @@
  },
  {
   "qid": "c3q31",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 2,
   "question": "When did Nate win his fourth video game tournament?",
   "gold": "The Friday before 10July, 2022.",
@@ -257,7 +257,7 @@
  },
  {
   "qid": "c3q32",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 2,
   "question": "Where did Joanna travel to in July 2022?",
   "gold": "Woodhaven",
@@ -265,7 +265,7 @@
  },
  {
   "qid": "c3q33",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 2,
   "question": "When did someone write Joanna a touching letter?",
   "gold": "The week before 14August, 2022.",
@@ -273,7 +273,7 @@
  },
  {
   "qid": "c3q34",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 1,
   "question": "What book recommendations has Joanna given to Nate?",
   "gold": "\"Little Women\",'A Court of Thorns andRoses'.",
@@ -281,7 +281,7 @@
  },
  {
   "qid": "c3q35",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 2,
   "question": "When did Nate take time off to chill with his pets?",
   "gold": "The weekend of 22August, 2022.",
@@ -289,7 +289,7 @@
  },
  {
   "qid": "c3q36",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 2,
   "question": "When did Joanna share her book with her writers group?",
   "gold": "The week before 22August, 2022.",
@@ -297,7 +297,7 @@
  },
  {
   "qid": "c3q37",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 2,
   "question": "When did Nate win an international tournament?",
   "gold": "21 August, 2022",
@@ -305,7 +305,7 @@
  },
  {
   "qid": "c3q38",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 2,
   "question": "When did Joanna make a desert with almond milk?",
   "gold": "The Friday before 14September, 2022",
@@ -313,7 +313,7 @@
  },
  {
   "qid": "c3q39",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 2,
   "question": "When did Nate attend a cooking show?",
   "gold": "The Monday before 14September, 2022",
@@ -321,7 +321,7 @@
  },
  {
   "qid": "c3q40",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 2,
   "question": "When did Joanna's laptop crash?",
   "gold": "The week before 14September, 2022",
@@ -329,7 +329,7 @@
  },
  {
   "qid": "c3q41",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 2,
   "question": "When did Joanna make a chocolate tart with raspberries?",
   "gold": "5 October, 2022",
@@ -337,7 +337,7 @@
  },
  {
   "qid": "c3q42",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 1,
   "question": "What movies have both Joanna and Nate seen?",
   "gold": "\"Little Women\", \"Lord of the Rings\"",
@@ -345,7 +345,7 @@
  },
  {
   "qid": "c3q43",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 2,
   "question": "How long did it take for Joanna to finish writing her book?",
   "gold": "four months",
@@ -353,7 +353,7 @@
  },
  {
   "qid": "c3q44",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 2,
   "question": "When did Nate win a lot of money in a video game tournament?",
   "gold": "September 2022",
@@ -361,7 +361,7 @@
  },
  {
   "qid": "c3q45",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 2,
   "question": "When did Joanna finish up the writing for her book?",
   "gold": "The week before 6October, 2022",
@@ -369,7 +369,7 @@
  },
  {
   "qid": "c3q46",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 1,
   "question": "What board games has Nate played?",
   "gold": "Chess, Catan.",
@@ -377,7 +377,7 @@
  },
  {
   "qid": "c3q47",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 1,
   "question": "What places has Nate met new people?",
   "gold": "A tournament and agaming convention.",
@@ -385,7 +385,7 @@
  },
  {
   "qid": "c3q48",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 2,
   "question": "When did Nate go to a convention and meet new people?",
   "gold": "The Friday before 9October, 2022.",
@@ -393,7 +393,7 @@
  },
  {
   "qid": "c3q49",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 1,
   "question": "How many times has Joanna's scripts been rejected?",
   "gold": "Twice",
@@ -401,7 +401,7 @@
  },
  {
   "qid": "c3q50",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 1,
   "question": "What is something Nate gave to Joanna that brings her a lot of joy?",
   "gold": "stuffed toy pup",
@@ -409,7 +409,7 @@
  },
  {
   "qid": "c3q51",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 1,
   "question": "When did Nate get Tilly for Joanna?",
   "gold": "25 May, 2022",
@@ -417,7 +417,7 @@
  },
  {
   "qid": "c3q52",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 1,
   "question": "How many of Joanna's writing have made it to the big screen?",
   "gold": "two",
@@ -425,7 +425,7 @@
  },
  {
   "qid": "c3q53",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 1,
   "question": "How many times has Nate taken his turtles on a walk?",
   "gold": "Twice.",
@@ -433,7 +433,7 @@
  },
  {
   "qid": "c3q54",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 2,
   "question": "When was Joanna's second movie script shown on the big screens?",
   "gold": "The Sunday before 25October, 2022.",
@@ -441,7 +441,7 @@
  },
  {
   "qid": "c3q55",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 1,
   "question": "What is Joanna inspired by?",
   "gold": "Personal experiences,her own journey ofself discovery, Nate,nature, validation,stories about findingcourage and takingrisks, people she knows, stuff she sees, imagination",
@@ -449,7 +449,7 @@
  },
  {
   "qid": "c3q56",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 1,
   "question": "What animal do both Nate and Joanna like?",
   "gold": "Turtles.",
@@ -457,7 +457,7 @@
  },
  {
   "qid": "c3q57",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 2,
   "question": "When did Joanna plan to go over to Nate's and share recipes?",
   "gold": "5 November, 2022.",
@@ -465,7 +465,7 @@
  },
  {
   "qid": "c3q58",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 1,
   "question": "What things has Nate reccomended to Joanna?",
   "gold": "A pet,\"The Lord of the Rings\" movies,a dragon book series,coconut flavoring,\"Project Hail Mary\" book,Xenoblade Chronicles, dairy-free margarine, coconut oil",
@@ -473,7 +473,7 @@
  },
  {
   "qid": "c3q59",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 1,
   "question": "What does Joanna do to remember happy memories?",
   "gold": "Hangs them on a corkboard, writes themin a notebook.",
@@ -481,7 +481,7 @@
  },
  {
   "qid": "c3q60",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 3,
   "question": "What Console does Nate own?",
   "gold": "A Nintendo Switch; since the game \"Xenoblade 2\" is made for this console.",
@@ -489,7 +489,7 @@
  },
  {
   "qid": "c3q61",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 1,
   "question": "What mediums does Nate use to play games?",
   "gold": "Gamecube, PC,Playstation.",
@@ -497,7 +497,7 @@
  },
  {
   "qid": "c3q62",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 1,
   "question": "How many letters has Joanna recieved?",
   "gold": "Two",
@@ -505,7 +505,7 @@
  },
  {
   "qid": "c3q63",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 1,
   "question": "What video games does Nate play?",
   "gold": "Valorant, Counter Strike:Global Offensive,Xenoblade Chronicles, StreetFighter, Cyberpunk 2077",
@@ -513,7 +513,7 @@
  },
  {
   "qid": "c3q64",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 2,
   "question": "When did Nate win a big Valorant tourney?",
   "gold": "The Saturday before 7November, 2022",
@@ -521,7 +521,7 @@
  },
  {
   "qid": "c3q65",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 2,
   "question": "Which torunament did Nate win in the beginning of November 2022?",
   "gold": "Valorant",
@@ -529,7 +529,7 @@
  },
  {
   "qid": "c3q66",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 3,
   "question": "What alternative career might Nate consider after gaming?",
   "gold": "an animalkeeper at a localzoo and workingwith turtles; as heknows a great dealabout turtles andhow to care for them,and he enjoys it.",
@@ -537,7 +537,7 @@
  },
  {
   "qid": "c3q67",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 1,
   "question": "What pets does Nate have?",
   "gold": "A dog and threeturtles.",
@@ -545,7 +545,7 @@
  },
  {
   "qid": "c3q68",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 3,
   "question": "How many hikes has Joanna been on?",
   "gold": "Four",
@@ -553,7 +553,7 @@
  },
  {
   "qid": "c3q69",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 1,
   "question": "How many turtles does Nate have?",
   "gold": "Three",
@@ -561,7 +561,7 @@
  },
  {
   "qid": "c3q70",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 1,
   "question": "What activities does Nate do with his turtles?",
   "gold": "takes them onwalks, holds them,feeds themstrawberries, givesthem baths.",
@@ -569,7 +569,7 @@
  },
  {
   "qid": "c3q71",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 1,
   "question": "What do both Joanna and Nate appreciate the beauty of?",
   "gold": "Nature",
@@ -577,7 +577,7 @@
  },
  {
   "qid": "c3q72",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 2,
   "question": "When did Joanna plan on going to Nate's to watch him play with his turtles?",
   "gold": "10 November, 2022",
@@ -585,7 +585,7 @@
  },
  {
   "qid": "c3q73",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 3,
   "question": "What state did Joanna visit in summer 2021?",
   "gold": "Indiana",
@@ -593,7 +593,7 @@
  },
  {
   "qid": "c3q74",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 1,
   "question": "What recommendations has Nate received from Joanna?",
   "gold": "\"Eternal Sunshine of the Spotless Mind\" movie, \"A Court of Thorns and Roses\" book, pointers for making living room comfy, starting a cork board for memories, \"Little Women\" movie",
@@ -601,7 +601,7 @@
  },
  {
   "qid": "c3q75",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 1,
   "question": "What are Nate's favorite desserts?",
   "gold": "coconut milk icecream, dairy-free chocolate cake with berries, chocolate and mixed-berry icecream, dairy-free chocolate mousse",
@@ -609,7 +609,7 @@
  },
  {
   "qid": "c3q76",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 1,
   "question": "How has Nate tried to disburse his vegan ice-cream recipes?",
   "gold": "teaching others, cooking show",
@@ -617,7 +617,7 @@
  },
  {
   "qid": "c3q77",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 2,
   "question": "When did Nate win his second tournament?",
   "gold": "The week before 2 May, 2022.",
@@ -625,7 +625,7 @@
  },
  {
   "qid": "c3q78",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 1,
   "question": "How many video game tournaments has Nate participated in?",
   "gold": "nine",
@@ -633,7 +633,7 @@
  },
  {
   "qid": "c3q79",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 1,
   "question": "How many screenplays has Joanna written?",
   "gold": "three",
@@ -641,7 +641,7 @@
  },
  {
   "qid": "c3q80",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 1,
   "question": "How many tournaments has Nate won?",
   "gold": "seven",
@@ -649,7 +649,7 @@
  },
  {
   "qid": "c3q81",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 1,
   "question": "What recipes has Joanna made?",
   "gold": "dairy free vanilla cake with strawberry filling and coconut cream frosting, parfait, strawberry chocolate cake, chocolate coconut cupcakes, chocolate raspberry tart, chocolate cake with raspberries, blueberry cheesecake bars",
@@ -657,7 +657,7 @@
  },
  {
   "qid": "c3q82",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 1,
   "question": "What recipes has Nate made?",
   "gold": "coconut milk icecream, chocolate and vanilla swirl",
@@ -665,7 +665,7 @@
  },
  {
   "qid": "c3q83",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 1,
   "question": "What are the skills that Nate has helped others learn?",
   "gold": "coconut milk ice cream recipe, reset high scores, tips to improve gaming skills",
@@ -673,7 +673,7 @@
  },
  {
   "qid": "c3q84",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 3,
   "question": "Was the first half of September 2022 a good month career-wise for Nate and Joanna? Answer yes or no.",
   "gold": "No; because both of them faced setbacks in their career",
@@ -681,7 +681,7 @@
  },
  {
   "qid": "c3q85",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 3,
   "question": "What kind of job is Joanna beginning to preform the duties of because of her movie scripts?",
   "gold": "filmmaker.",
@@ -689,7 +689,7 @@
  },
  {
   "qid": "c3q86",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 2,
   "question": "When did Nate take his turtles to the beach?",
   "gold": "10 November, 2022",
@@ -697,7 +697,7 @@
  },
  {
   "qid": "c3q87",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 3,
   "question": "What state did Nate visit?",
   "gold": "Florida",
@@ -705,7 +705,7 @@
  },
  {
   "qid": "c3q88",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 4,
   "question": "What is one of Joanna's favorite movies?",
   "gold": "\"Eternal Sunshineof the Spotless Mind\"",
@@ -713,7 +713,7 @@
  },
  {
   "qid": "c3q89",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 4,
   "question": "What color did Nate choose for his hair?",
   "gold": "purple",
@@ -721,7 +721,7 @@
  },
  {
   "qid": "c3q90",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 4,
   "question": "What is Nate's favorite movie trilogy?",
   "gold": "Lord of the Rings",
@@ -729,7 +729,7 @@
  },
  {
   "qid": "c3q91",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 4,
   "question": "What is Nate's favorite book series about?",
   "gold": "dragons",
@@ -737,7 +737,7 @@
  },
  {
   "qid": "c3q92",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 4,
   "question": "What kind of lighting does Nate's gaming room have?",
   "gold": "red and purple lighting",
@@ -745,7 +745,7 @@
  },
  {
   "qid": "c3q93",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 4,
   "question": "What game was the second tournament that Nate won based on?",
   "gold": "Street Fighter",
@@ -753,7 +753,7 @@
  },
  {
   "qid": "c3q94",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 4,
   "question": "What is Joanna's third screenplay about?",
   "gold": "loss, identity, and connection",
@@ -761,7 +761,7 @@
  },
  {
   "qid": "c3q95",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 4,
   "question": "What is Nate's favorite video game?",
   "gold": "Xenoblade Chronicles",
@@ -769,7 +769,7 @@
  },
  {
   "qid": "c3q96",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 4,
   "question": "What type of movies does Nate enjoy watching the most?",
   "gold": "action and sci-fi",
@@ -777,7 +777,7 @@
  },
  {
   "qid": "c3q97",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 4,
   "question": "What did Joanna just finish last Friday on 23 January, 2022?",
   "gold": "screenplay",
@@ -785,7 +785,7 @@
  },
  {
   "qid": "c3q98",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 4,
   "question": "What genre is Joanna's first screenplay?",
   "gold": "drama and romance",
@@ -793,7 +793,7 @@
  },
  {
   "qid": "c3q99",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 4,
   "question": "What are Joanna's plans for her finished screenplay in January 2022?",
   "gold": "submit it to film festivals and get producers and directors to check it out",
@@ -801,7 +801,7 @@
  },
  {
   "qid": "c3q100",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 4,
   "question": "For how long has Nate had his turtles?",
   "gold": "3 years",
@@ -809,7 +809,7 @@
  },
  {
   "qid": "c3q101",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 4,
   "question": "What did Nate think of the coconut milk ice cream he made?",
   "gold": "Super good, rich and creamy",
@@ -817,7 +817,7 @@
  },
  {
   "qid": "c3q102",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 4,
   "question": "Which dairy-free dessert flavors does Nate enjoy?",
   "gold": "chocolate and mixed berry",
@@ -825,7 +825,7 @@
  },
  {
   "qid": "c3q103",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 4,
   "question": "What did Joanna recently watch and recommend to Nate on February 7, 2022?",
   "gold": "\"Little Women\"",
@@ -833,7 +833,7 @@
  },
  {
   "qid": "c3q104",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 4,
   "question": "What is \"Little Women\" about according to Joanna?",
   "gold": "Sisterhood, love, and reaching for your dreams",
@@ -841,7 +841,7 @@
  },
  {
   "qid": "c3q105",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 4,
   "question": "What flavor of ice cream did Nate make for his friend on 25 February, 2022?",
   "gold": "chocolate and vanilla swirl",
@@ -849,7 +849,7 @@
  },
  {
   "qid": "c3q106",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 4,
   "question": "What inspired Joanna's new screenplay on 25 February, 2022?",
   "gold": "personal experiences and her own journey of self-discovery",
@@ -857,7 +857,7 @@
  },
  {
   "qid": "c3q107",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 4,
   "question": "Why does Nate like turtles as pets?",
   "gold": "Their slow pace and calming nature",
@@ -865,7 +865,7 @@
  },
  {
   "qid": "c3q108",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 4,
   "question": "How does Nate describe the process of taking care of turtles?",
   "gold": "Not tough; keep their area clean, feed them properly, give them enough light.",
@@ -873,7 +873,7 @@
  },
  {
   "qid": "c3q109",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 4,
   "question": "What was Joanna's audition for?",
   "gold": "writing gig",
@@ -881,7 +881,7 @@
  },
  {
   "qid": "c3q110",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 4,
   "question": "Why did Nate choose the hair color he did?",
   "gold": "Bright and bold - like him",
@@ -889,7 +889,7 @@
  },
  {
   "qid": "c3q111",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 4,
   "question": "What are the main ingredients of the ice cream recipe shared by Nate?",
   "gold": "Coconut milk, vanilla extract, sugar, salt",
@@ -897,7 +897,7 @@
  },
  {
   "qid": "c3q112",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 4,
   "question": "What is Joanna's project called in the writers group?",
   "gold": "\"Finding Home\"",
@@ -905,7 +905,7 @@
  },
  {
   "qid": "c3q113",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 4,
   "question": "What is Nate's favorite genre of movies?",
   "gold": "Fantasy and sci-fi",
@@ -913,7 +913,7 @@
  },
  {
   "qid": "c3q114",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 4,
   "question": "What kind of books does Nate enjoy?",
   "gold": "Adventures and magic",
@@ -921,7 +921,7 @@
  },
  {
   "qid": "c3q115",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 4,
   "question": "What kind of films does Joanna enjoy?",
   "gold": "Dramas and emotionally-driven films",
@@ -929,7 +929,7 @@
  },
  {
   "qid": "c3q116",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 4,
   "question": "Which activity helps Nate escape and stimulates his imagination?",
   "gold": "watching fantasy and sci-fi movies",
@@ -937,7 +937,7 @@
  },
  {
   "qid": "c3q117",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 4,
   "question": "What filling did Joanna use in the cake she made recently in May 2022?",
   "gold": "strawberry",
@@ -945,7 +945,7 @@
  },
  {
   "qid": "c3q118",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 4,
   "question": "What kind of frosting did Joanna use on the cake she made recently in May 2022?",
   "gold": "coconut cream",
@@ -953,7 +953,7 @@
  },
  {
   "qid": "c3q119",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 4,
   "question": "What does Nate feel he could do when out in cool places like Whispering Falls?",
   "gold": "write a whole movie",
@@ -961,7 +961,7 @@
  },
  {
   "qid": "c3q120",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 4,
   "question": "What creative activity does Nate joke about pursuing after being inspired by their hikes with Jo?",
   "gold": "Start thinking about a drama and publish a screenplay",
@@ -969,7 +969,7 @@
  },
  {
   "qid": "c3q121",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 4,
   "question": "Who invited Nate to join her on the trails sometime?",
   "gold": "Joanna",
@@ -977,7 +977,7 @@
  },
  {
   "qid": "c3q122",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 4,
   "question": "What did Nate do for Joanna on 25 May, 2022?",
   "gold": "get her a stuffed animal",
@@ -985,7 +985,7 @@
  },
  {
   "qid": "c3q123",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 4,
   "question": "How does Nate describe the stuffed animal he got for Joanna?",
   "gold": "A stuffed animal to remind you of the good vibes",
@@ -993,7 +993,7 @@
  },
  {
   "qid": "c3q124",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 4,
   "question": "What event is Nate organizing in June 2022?",
   "gold": "A gaming party",
@@ -1001,7 +1001,7 @@
  },
  {
   "qid": "c3q125",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 4,
   "question": "Who did Nate plan to invite to his gaming party in June 2022?",
   "gold": "Tournament friends, old friends, teammates",
@@ -1009,7 +1009,7 @@
  },
  {
   "qid": "c3q126",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 4,
   "question": "What special items did Nate get for everyone at his gaming party?",
   "gold": "Custom controller decorations",
@@ -1017,7 +1017,7 @@
  },
  {
   "qid": "c3q127",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 4,
   "question": "What did Joanna write yesterday that appeared on the big screen?",
   "gold": "screenplay bits",
@@ -1025,7 +1025,7 @@
  },
  {
   "qid": "c3q128",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 4,
   "question": "What superhero is Joanna a fan of?",
   "gold": "Spider-Man",
@@ -1033,7 +1033,7 @@
  },
  {
   "qid": "c3q129",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 4,
   "question": "Which superhero toy figure does Nate share a photo of?",
   "gold": "Iron Man",
@@ -1041,7 +1041,7 @@
  },
  {
   "qid": "c3q130",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 4,
   "question": "What is displayed on Joanna's cork board for motivation and creativity?",
   "gold": "inspiring quotes, photos, and little keepsakes",
@@ -1049,7 +1049,7 @@
  },
  {
   "qid": "c3q131",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 4,
   "question": "What does the photo on Joanna's cork board remind her of?",
   "gold": "love and encouragement from her family",
@@ -1057,7 +1057,7 @@
  },
  {
   "qid": "c3q132",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 4,
   "question": "What did Nate make and share with his vegan diet group?",
   "gold": "vegan ice cream",
@@ -1065,7 +1065,7 @@
  },
  {
   "qid": "c3q133",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 4,
   "question": "How many people attended the gaming party hosted by Nate in June 2022?",
   "gold": "7",
@@ -1073,7 +1073,7 @@
  },
  {
   "qid": "c3q134",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 4,
   "question": "What recipe Nate offer to share with Joanna?",
   "gold": "vegan ice cream recipe",
@@ -1081,7 +1081,7 @@
  },
  {
   "qid": "c3q135",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 4,
   "question": "What did Joanna plan to do with the recipe Nate promised to share?",
   "gold": "make it for her family",
@@ -1089,7 +1089,7 @@
  },
  {
   "qid": "c3q136",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 4,
   "question": "How many video game tournaments has Nate won by July 10, 2022?",
   "gold": "Four",
@@ -1097,7 +1097,7 @@
  },
  {
   "qid": "c3q137",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 4,
   "question": "Where did Joanna go for a road trip for research?",
   "gold": "Woodhaven",
@@ -1105,7 +1105,7 @@
  },
  {
   "qid": "c3q138",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 4,
   "question": "What did Joanna discover at the library in Woodhaven?",
   "gold": "cool old book collection",
@@ -1113,7 +1113,7 @@
  },
  {
   "qid": "c3q139",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 4,
   "question": "What specific themes are explored in Joanna's new book?",
   "gold": "loss, redemption, and forgiveness",
@@ -1121,7 +1121,7 @@
  },
  {
   "qid": "c3q140",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 4,
   "question": "What inspired Joanna's new script in July 2022?",
   "gold": "Woodhaven's interesting past and people",
@@ -1129,7 +1129,7 @@
  },
  {
   "qid": "c3q141",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 4,
   "question": "What did Nate do while Joanna was on her road trip?",
   "gold": "Won a video game tournament",
@@ -1137,7 +1137,7 @@
  },
  {
   "qid": "c3q142",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 4,
   "question": "What does Nate do that he loves and can make money from?",
   "gold": "Competing in video game tournaments",
@@ -1145,7 +1145,7 @@
  },
  {
   "qid": "c3q143",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 4,
   "question": "How did Joanna feel when someone wrote her a letter after reading her blog post?",
   "gold": "Touched",
@@ -1153,7 +1153,7 @@
  },
  {
   "qid": "c3q144",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 4,
   "question": "What kind of impact does Joanna hope to have with her writing?",
   "gold": "share her stories and hopefully have an impact",
@@ -1161,7 +1161,7 @@
  },
  {
   "qid": "c3q145",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 4,
   "question": "What kind of content did Joanna share that someone wrote her a letter about?",
   "gold": "A blog post about a hard moment in her life",
@@ -1169,7 +1169,7 @@
  },
  {
   "qid": "c3q146",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 4,
   "question": "What motivates Joanna to keep writing even on tough days?",
   "gold": "Knowing that her writing can make a difference",
@@ -1177,7 +1177,7 @@
  },
  {
   "qid": "c3q147",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 4,
   "question": "What type of ice cream does Joanna mention that Nate makes and is delicious?",
   "gold": "Coconut milk ice cream",
@@ -1185,7 +1185,7 @@
  },
  {
   "qid": "c3q148",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 4,
   "question": "How did Nate feel about sharing his love for dairy-free desserts with Joanna?",
   "gold": "Happy to share",
@@ -1193,7 +1193,7 @@
  },
  {
   "qid": "c3q149",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 4,
   "question": "What did Joanna share with her writers group in August 2022?",
   "gold": "her book",
@@ -1201,7 +1201,7 @@
  },
  {
   "qid": "c3q150",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 4,
   "question": "How did Joanna celebrate after sharing her book with her writers group?",
   "gold": "making a delicious treat",
@@ -1209,7 +1209,7 @@
  },
  {
   "qid": "c3q151",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 4,
   "question": "How did Nate celebrate winning the international tournament?",
   "gold": "Taking time off to chill with pets",
@@ -1217,7 +1217,7 @@
  },
  {
   "qid": "c3q152",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 4,
   "question": "Why is Joanna experimenting with dairy-free options in her dessert recipes?",
   "gold": "lactose intolerance",
@@ -1225,7 +1225,7 @@
  },
  {
   "qid": "c3q153",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 4,
   "question": "What substitution does Nate suggest for butter in dairy-free baking?",
   "gold": "dairy-free margarine or coconut oil",
@@ -1233,7 +1233,7 @@
  },
  {
   "qid": "c3q154",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 4,
   "question": "What type of show did Nate host where he taught vegan ice cream recipes?",
   "gold": "a cooking show",
@@ -1241,7 +1241,7 @@
  },
  {
   "qid": "c3q155",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 4,
   "question": "What is Nate's favorite dish from the cooking show he hosted?",
   "gold": "Coconut milk ice cream",
@@ -1249,7 +1249,7 @@
  },
  {
   "qid": "c3q156",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 4,
   "question": "What is one of Nate's favorite dairy-free treats besides coconut milk ice cream?",
   "gold": "dairy-free chocolate mousse",
@@ -1257,7 +1257,7 @@
  },
  {
   "qid": "c3q157",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 4,
   "question": "What dessert did Joanna share a photo of that has an almond flour crust, chocolate ganache, and fresh raspberries?",
   "gold": "chocolate raspberry tart",
@@ -1265,7 +1265,7 @@
  },
  {
   "qid": "c3q158",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 4,
   "question": "What kind of cake did Joanna share a photo of that she likes making for birthdays and special days?",
   "gold": "chocolate cake with raspberries",
@@ -1273,7 +1273,7 @@
  },
  {
   "qid": "c3q159",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 4,
   "question": "What two main ingredients are part of the dessert Joanna shared a photo of with blueberries, coconut milk, and a gluten-free crust?",
   "gold": "blueberries and coconut milk",
@@ -1281,7 +1281,7 @@
  },
  {
   "qid": "c3q160",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 4,
   "question": "What movie did Nate recently watch and enjoy on October 6, 2022?",
   "gold": "Little Women",
@@ -1289,7 +1289,7 @@
  },
  {
   "qid": "c3q161",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 4,
   "question": "What did Joanna make for one of the ladies at her writing club?",
   "gold": "a bookmark",
@@ -1297,7 +1297,7 @@
  },
  {
   "qid": "c3q162",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 4,
   "question": "What game did Nate play at the game convention he attended on 9 October, 2022?",
   "gold": "Catan",
@@ -1305,7 +1305,7 @@
  },
  {
   "qid": "c3q163",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 4,
   "question": "What movie has Nate recently seen that blew his mind?",
   "gold": "\"Inception\"",
@@ -1313,7 +1313,7 @@
  },
  {
   "qid": "c3q164",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 4,
   "question": "What game has Nate been playing nonstop with a futuristic setting and gameplay on October 9, 2022?",
   "gold": "Cyberpunk 2077",
@@ -1321,7 +1321,7 @@
  },
  {
   "qid": "c3q165",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 4,
   "question": "What did Nate share a photo of when mentioning unwinding at home?",
   "gold": "a bookcase filled with dvds and movies",
@@ -1329,7 +1329,7 @@
  },
  {
   "qid": "c3q166",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 4,
   "question": "How did Joanna describe the classic movie he watched?",
   "gold": "gripping with great actors",
@@ -1337,7 +1337,7 @@
  },
  {
   "qid": "c3q167",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 4,
   "question": "What does Joanna recommend to make a living room comfy like hers?",
   "gold": "couch for multiple people, fluffy blanket, lights that can be dimmed",
@@ -1345,7 +1345,7 @@
  },
  {
   "qid": "c3q168",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 4,
   "question": "What helps Joanna stay focused and brings her joy?",
   "gold": "stuffed animal dog named Tilly",
@@ -1353,7 +1353,7 @@
  },
  {
   "qid": "c3q169",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 4,
   "question": "What does Joanna do while she writes?",
   "gold": "have a stuffed animal dog named Tilly with her",
@@ -1361,7 +1361,7 @@
  },
  {
   "qid": "c3q170",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 4,
   "question": "Why did Joanna name the stuffed animal dog Tilly?",
   "gold": "after a dog she had in Michigan",
@@ -1369,7 +1369,7 @@
  },
  {
   "qid": "c3q171",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 4,
   "question": "What does Joanna do after receiving a rejection from a production company?",
   "gold": "keep grinding and moving ahead",
@@ -1377,7 +1377,7 @@
  },
  {
   "qid": "c3q172",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 4,
   "question": "How does Nate feel about Joanna's ability to bounce back from setbacks?",
   "gold": "respect Joanna for being able to bounce back",
@@ -1385,7 +1385,7 @@
  },
  {
   "qid": "c3q173",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 4,
   "question": "What encouragement does Nate give to Joanna after her setback?",
   "gold": "rejections don't define her, keep grinding and she'll find the perfect opportunity",
@@ -1393,7 +1393,7 @@
  },
  {
   "qid": "c3q174",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 4,
   "question": "What does Nate rely on for cheer and joy?",
   "gold": "his turtles",
@@ -1401,7 +1401,7 @@
  },
  {
   "qid": "c3q175",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 4,
   "question": "What does Joanna use to remember her dog from Michigan?",
   "gold": "naming a stuffed animal dog Tilly",
@@ -1409,7 +1409,7 @@
  },
  {
   "qid": "c3q176",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 4,
   "question": "What did Joanna contribute to that was shown on the big screen on the Sunday before October 25, 2022?",
   "gold": "movie script",
@@ -1417,7 +1417,7 @@
  },
  {
   "qid": "c3q177",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 4,
   "question": "What inspires Joanna to create drawings of her characters?",
   "gold": "visuals to help bring the characters alive in her head so she can write better",
@@ -1425,7 +1425,7 @@
  },
  {
   "qid": "c3q178",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 4,
   "question": "Where does Joanna get her ideas for the characters from?",
   "gold": "people she knows, things she saw, her imagination",
@@ -1433,7 +1433,7 @@
  },
  {
   "qid": "c3q179",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 4,
   "question": "How did Joanna feel on October 25, 2022 about seeing her characters come alive on the big screen?",
   "gold": "surreal and cool",
@@ -1441,7 +1441,7 @@
  },
  {
   "qid": "c3q180",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 4,
   "question": "What type of diet do Nate's turtles have?",
   "gold": "combination of vegetables, fruits, and insects",
@@ -1449,7 +1449,7 @@
  },
  {
   "qid": "c3q181",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 4,
   "question": "What ingredient did Nate use to make the ice cream lactose-free?",
   "gold": "coconut milk",
@@ -1457,7 +1457,7 @@
  },
  {
   "qid": "c3q182",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 4,
   "question": "What did Joanna find in old notebooks last week that prompted her to reflect on her progress as a writer?",
   "gold": "early writings",
@@ -1465,7 +1465,7 @@
  },
  {
   "qid": "c3q183",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 4,
   "question": "What game is Nate currently playing and recommends to others on November 7, 2022?",
   "gold": "\"Xenoblade Chronicles\"",
@@ -1473,7 +1473,7 @@
  },
  {
   "qid": "c3q184",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 4,
   "question": "What did Joanna receive from her brother that brought back childhood memories?",
   "gold": "a handwritten letter",
@@ -1481,7 +1481,7 @@
  },
  {
   "qid": "c3q185",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 4,
   "question": "What is the type of game \"Xenoblade Chronicles\" that Nate is playing?",
   "gold": "fantasy RPG",
@@ -1489,7 +1489,7 @@
  },
  {
   "qid": "c3q186",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 4,
   "question": "What dish did Nate make on 9 November, 2022?",
   "gold": "Homemade coconut ice cream",
@@ -1497,7 +1497,7 @@
  },
  {
   "qid": "c3q187",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 4,
   "question": "What project is Joanna working on in her notebook on November 9, 2022?",
   "gold": "A suspenseful thriller set in a small Midwestern town",
@@ -1505,7 +1505,7 @@
  },
  {
   "qid": "c3q188",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 4,
   "question": "What is Nate creating for YouTube on 9 November, 2022?",
   "gold": "gaming content",
@@ -1513,7 +1513,7 @@
  },
  {
   "qid": "c3q189",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 4,
   "question": "What inspired Nate to start making gaming videos?",
   "gold": "Love of gaming and connecting with others who enjoy it too",
@@ -1521,7 +1521,7 @@
  },
  {
   "qid": "c3q190",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 4,
   "question": "What new content is Nate creating for YouTube?",
   "gold": "Gaming videos",
@@ -1529,7 +1529,7 @@
  },
  {
   "qid": "c3q191",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 4,
   "question": "What advice does Joanna give to Nate about making YouTube videos?",
   "gold": "Watch other people's videos to understand what the audience likes",
@@ -1537,7 +1537,7 @@
  },
  {
   "qid": "c3q192",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 4,
   "question": "What did Joanna take a picture of near Fort Wayne last summer?",
   "gold": "Sunset",
@@ -1545,7 +1545,7 @@
  },
  {
   "qid": "c3q193",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 4,
   "question": "What inspired Joanna to take a picture of the sunset in the field near Fort Wayne?",
   "gold": "The incredible sunset and surrounding beauty",
@@ -1553,7 +1553,7 @@
  },
  {
   "qid": "c3q194",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 4,
   "question": "Why did Nate get a third turtle?",
   "gold": "He saw another one at a pet store and wanted to get it",
@@ -1561,7 +1561,7 @@
  },
  {
   "qid": "c3q195",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 4,
   "question": "What does Nate want to do when he goes over to Joanna's place?",
   "gold": "Watch one of Joanna's movies together or go to the park",
@@ -1569,7 +1569,7 @@
  },
  {
   "qid": "c3q196",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 4,
   "question": "What did Nate take to the beach in Tampa?",
   "gold": "turtles",
@@ -1577,7 +1577,7 @@
  },
  {
   "qid": "c3q197",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 4,
   "question": "What does Nate love most about having turtles?",
   "gold": "They make him feel calm and don't require much looking after",
@@ -1585,7 +1585,7 @@
  },
  {
   "qid": "c3q198",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 4,
   "question": "What did Nate share a photo of as a part of his experimentation in November 2022?",
   "gold": "colorful bowls of coconut milk ice cream",
@@ -1593,7 +1593,7 @@
  },
  {
   "qid": "c4q0",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 1,
   "question": "what are John's goals with regards to his basketball career?",
   "gold": "improve shooting percentage, win a championship",
@@ -1601,7 +1601,7 @@
  },
  {
   "qid": "c4q1",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 1,
   "question": "What are John's goals for his career that are not related to his basketball skills?",
   "gold": "get endorsements, build his brand, do charity work",
@@ -1609,7 +1609,7 @@
  },
  {
   "qid": "c4q2",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 1,
   "question": "What items does John collect?",
   "gold": "sneakers, fantasy movie DVDs, jerseys",
@@ -1617,7 +1617,7 @@
  },
  {
   "qid": "c4q3",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 3,
   "question": "Would Tim enjoy reading books by C. S. Lewis or John Greene?",
   "gold": "C. S.Lewis",
@@ -1625,7 +1625,7 @@
  },
  {
   "qid": "c4q4",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 1,
   "question": "What books has Tim read?",
   "gold": "Harry Potter, Game of Thrones, the Name of the Wind, The Alchemist, The Hobbit, A Dance with Dragons, and the Wheel of Time.",
@@ -1633,7 +1633,7 @@
  },
  {
   "qid": "c4q5",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 3,
   "question": "Based on Tim's collections, what is a shop that he would enjoy visiting in New York city?",
   "gold": "House of MinaLima",
@@ -1641,7 +1641,7 @@
  },
  {
   "qid": "c4q6",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 2,
   "question": "In which month's game did John achieve a career-high score in points?",
   "gold": "June 2023",
@@ -1649,7 +1649,7 @@
  },
  {
   "qid": "c4q7",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 1,
   "question": "Which geographical locations has Tim been to?",
   "gold": "California, London, the Smoky Mountains",
@@ -1657,7 +1657,7 @@
  },
  {
   "qid": "c4q8",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 3,
   "question": "Which outdoor gear company likely signed up John for an endorsement deal?",
   "gold": "Under Armour",
@@ -1665,7 +1665,7 @@
  },
  {
   "qid": "c4q9",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 1,
   "question": "Which endorsement deals has John been offered?",
   "gold": "basketball shoes and gear deal with Nike, potential sponsorship with Gatorade, Moxie a popular beverage company, outdoor gear company",
@@ -1673,7 +1673,7 @@
  },
  {
   "qid": "c4q10",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 2,
   "question": "When was John in Seattle for a game?",
   "gold": "early August, 2023",
@@ -1681,7 +1681,7 @@
  },
  {
   "qid": "c4q11",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 1,
   "question": "What sports does John like besides basketball?",
   "gold": "surfing",
@@ -1689,7 +1689,7 @@
  },
  {
   "qid": "c4q12",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 2,
   "question": "What year did John start surfing?",
   "gold": "2018",
@@ -1697,7 +1697,7 @@
  },
  {
   "qid": "c4q13",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 1,
   "question": "What does Tim do to escape reality?",
   "gold": "Read fantasy books.",
@@ -1705,7 +1705,7 @@
  },
  {
   "qid": "c4q14",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 1,
   "question": "What kind of writing does Tim do?",
   "gold": "comments on favorite books in a fantasy literature forum, articles on fantasy novels, studying characters, themes, and making book recommendations, writing a fantasy novel",
@@ -1713,7 +1713,7 @@
  },
  {
   "qid": "c4q15",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 3,
   "question": "Who is Anthony?",
   "gold": "likely John's friend, colleague or family",
@@ -1721,7 +1721,7 @@
  },
  {
   "qid": "c4q16",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 2,
   "question": "After how many weeks did Tim reconnect with the fellow Harry Potter fan from California?",
   "gold": "three weeks",
@@ -1729,7 +1729,7 @@
  },
  {
   "qid": "c4q17",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 1,
   "question": "How many games has John mentioned winning?",
   "gold": "6",
@@ -1737,7 +1737,7 @@
  },
  {
   "qid": "c4q18",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 1,
   "question": "What authors has Tim read books from?",
   "gold": "J.K. Rowling, R.R. Martin, Patrick Rothfuss, Paulo Coelho, and J. R. R. Tolkien.",
@@ -1745,7 +1745,7 @@
  },
  {
   "qid": "c4q19",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 3,
   "question": "What is a prominent charity organization that John might want to work with and why?",
   "gold": "Good Sports, because they work with Nike, Gatorade, and Under Armour and they aim toprovide youth sports opportunities for kids ages 3-18 in high-need communities.",
@@ -1753,7 +1753,7 @@
  },
  {
   "qid": "c4q20",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 2,
   "question": "Which city was John in before traveling to Chicago?",
   "gold": "Seattle",
@@ -1761,7 +1761,7 @@
  },
  {
   "qid": "c4q21",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 1,
   "question": "Which US cities does John mention visiting to Tim?",
   "gold": "Seattle, Chicago, New York",
@@ -1769,7 +1769,7 @@
  },
  {
   "qid": "c4q22",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 2,
   "question": "When did John meet with his teammates after returning from Chicago?",
   "gold": "August 15, 2023",
@@ -1777,7 +1777,7 @@
  },
  {
   "qid": "c4q23",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 2,
   "question": "When is Tim attending a book conference?",
   "gold": "September 2023",
@@ -1785,7 +1785,7 @@
  },
  {
   "qid": "c4q24",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 2,
   "question": "Where was John between August 11 and August 15 2023?",
   "gold": "Chicago",
@@ -1793,7 +1793,7 @@
  },
  {
   "qid": "c4q25",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 1,
   "question": "What similar sports collectible do Tim and John own?",
   "gold": "signed basketball",
@@ -1801,7 +1801,7 @@
  },
  {
   "qid": "c4q26",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 1,
   "question": "Which TV series does Tim mention watching?",
   "gold": "That, Wheel of Time",
@@ -1809,7 +1809,7 @@
  },
  {
   "qid": "c4q27",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 3,
   "question": "Which popular time management technique does Tim use to prepare for exams?",
   "gold": "Pomodoro technique",
@@ -1817,7 +1817,7 @@
  },
  {
   "qid": "c4q28",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 3,
   "question": "Which popular music composer's tunes does Tim enjoy playing on the piano?",
   "gold": "John Williams",
@@ -1825,7 +1825,7 @@
  },
  {
   "qid": "c4q29",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 1,
   "question": "What schools did John play basketball in and how many years was he with his team during high school?",
   "gold": "Middle school, high school, and college and he was with his high school team for 4 years.",
@@ -1833,7 +1833,7 @@
  },
  {
   "qid": "c4q30",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 1,
   "question": "Which cities has John been to?",
   "gold": "Seattle, Chicago, New York, and Paris.",
@@ -1841,7 +1841,7 @@
  },
  {
   "qid": "c4q31",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 2,
   "question": "What month did Tim plan on going to Universal Studios?",
   "gold": "September, 2023",
@@ -1849,7 +1849,7 @@
  },
  {
   "qid": "c4q32",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 3,
   "question": "Which US states might Tim be in during September 2023 based on his plans of visiting Universal Studios?",
   "gold": "California or Florida",
@@ -1857,7 +1857,7 @@
  },
  {
   "qid": "c4q33",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 2,
   "question": "When does John plan on traveling with his team on a team trip?",
   "gold": "October, 2023",
@@ -1865,7 +1865,7 @@
  },
  {
   "qid": "c4q34",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 3,
   "question": "What could John do after his basketball career?",
   "gold": "become a basketball coach since he likes giving back and leadership",
@@ -1873,7 +1873,7 @@
  },
  {
   "qid": "c4q35",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 1,
   "question": "What outdoor activities does John enjoy?",
   "gold": "Hiking, surfing",
@@ -1881,7 +1881,7 @@
  },
  {
   "qid": "c4q36",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 1,
   "question": "Who is Tim and John's favorite basketball player?",
   "gold": "LeBron James",
@@ -1889,7 +1889,7 @@
  },
  {
   "qid": "c4q37",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 2,
   "question": "Which week did Tim visit the UK for the Harry Potter Conference?",
   "gold": "The week before October 13th, 2023.",
@@ -1897,7 +1897,7 @@
  },
  {
   "qid": "c4q38",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 1,
   "question": "which country has Tim visited most frequently in his travels?",
   "gold": "UK",
@@ -1905,7 +1905,7 @@
  },
  {
   "qid": "c4q39",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 2,
   "question": "What year did Tim go to the Smoky Mountains?",
   "gold": "2022",
@@ -1913,7 +1913,7 @@
  },
  {
   "qid": "c4q40",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 2,
   "question": "Has Tim been to North Carolina and/or Tennesee states in the US?",
   "gold": "Yes",
@@ -1921,7 +1921,7 @@
  },
  {
   "qid": "c4q41",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 1,
   "question": "What kind of fiction stories does Tim write?",
   "gold": "Fantasy stories with plot twists",
@@ -1929,7 +1929,7 @@
  },
  {
   "qid": "c4q42",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 1,
   "question": "What has John cooked?",
   "gold": "Soup, a slow cooker meal, and honey garlic chicken with roasted veg.",
@@ -1937,7 +1937,7 @@
  },
  {
   "qid": "c4q43",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 1,
   "question": "What does John like about Lebron James?",
   "gold": "His heart, determination, skills, and leadership.",
@@ -1945,7 +1945,7 @@
  },
  {
   "qid": "c4q44",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 2,
   "question": "When did John and his wife go on a European vacation?",
   "gold": "November, 2023.",
@@ -1953,7 +1953,7 @@
  },
  {
   "qid": "c4q45",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 2,
   "question": "Which country was Tim visiting in the second week of November?",
   "gold": "UK",
@@ -1961,7 +1961,7 @@
  },
  {
   "qid": "c4q46",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 2,
   "question": "Where was Tim in the week before 16 November 2023?",
   "gold": "UK",
@@ -1969,7 +1969,7 @@
  },
  {
   "qid": "c4q47",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 2,
   "question": "When did John get married at a greenhouse?",
   "gold": "last week of September 2023",
@@ -1977,7 +1977,7 @@
  },
  {
   "qid": "c4q48",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 1,
   "question": "When did John get an ankle injury in 2023?",
   "gold": "around November 16, 2023",
@@ -1985,7 +1985,7 @@
  },
  {
   "qid": "c4q49",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 1,
   "question": "How many times has John injured his ankle?",
   "gold": "two times",
@@ -1993,7 +1993,7 @@
  },
  {
   "qid": "c4q50",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 1,
   "question": "Which book was John reading during his recovery from an ankle injury?",
   "gold": "The Alchemist",
@@ -2001,7 +2001,7 @@
  },
  {
   "qid": "c4q51",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 3,
   "question": "What kind of yoga for building core strength might John benefit from?",
   "gold": "Hatha Yoga",
@@ -2009,7 +2009,7 @@
  },
  {
   "qid": "c4q52",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 1,
   "question": "What does John do to supplement his basketball training?",
   "gold": "Yoga, strength training",
@@ -2017,7 +2017,7 @@
  },
  {
   "qid": "c4q53",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 3,
   "question": "What other exercises can help John with his basketball performance?",
   "gold": "Sprinting, long-distance running, and boxing.",
@@ -2025,7 +2025,7 @@
  },
  {
   "qid": "c4q54",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 2,
   "question": "When did John take a trip to the Rocky Mountains?",
   "gold": "2022",
@@ -2033,7 +2033,7 @@
  },
  {
   "qid": "c4q55",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 2,
   "question": "When did John start playing professionally?",
   "gold": "May, 2023",
@@ -2041,7 +2041,7 @@
  },
  {
   "qid": "c4q56",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 2,
   "question": "When did Tim start playing the violin?",
   "gold": "August 2023",
@@ -2049,7 +2049,7 @@
  },
  {
   "qid": "c4q57",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 1,
   "question": "What instruments does Tim play?",
   "gold": "piano, violin",
@@ -2057,7 +2057,7 @@
  },
  {
   "qid": "c4q58",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 2,
   "question": "When did John attend the Harry Potter trivia?",
   "gold": "August 2023.",
@@ -2065,7 +2065,7 @@
  },
  {
   "qid": "c4q59",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 1,
   "question": "Which career-high performances did John achieve in 2023?",
   "gold": "highest point score, highest assist",
@@ -2073,7 +2073,7 @@
  },
  {
   "qid": "c4q60",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 2,
   "question": "When did John achieve a career-high assist performance?",
   "gold": "December 11, 2023",
@@ -2081,7 +2081,7 @@
  },
  {
   "qid": "c4q61",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 1,
   "question": "What books has John read?",
   "gold": "inpsiring book on dreaming big, The Alchemist, fantasy series, non-fiction books on personal development, Dune",
@@ -2089,7 +2089,7 @@
  },
  {
   "qid": "c4q62",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 1,
   "question": "What does John do to share his knowledge?",
   "gold": "gives seminars, mentors younger players.",
@@ -2097,7 +2097,7 @@
  },
  {
   "qid": "c4q63",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 2,
   "question": "When did John organize a basketball camp for kids?",
   "gold": "summer 2023",
@@ -2105,7 +2105,7 @@
  },
  {
   "qid": "c4q64",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 2,
   "question": "Which month was John in Italy?",
   "gold": "December, 2023",
@@ -2113,7 +2113,7 @@
  },
  {
   "qid": "c4q65",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 1,
   "question": "What fantasy movies does Tim like?",
   "gold": "Lord of the Rings, Harry Potter, and Star Wars.",
@@ -2121,7 +2121,7 @@
  },
  {
   "qid": "c4q66",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 3,
   "question": "What is a Star Wars book that Tim might enjoy?",
   "gold": "Star Wars: Jedi Apprentice by Judy Blundell and David Farland. It is a highly rated and immersive series about his favorite movies.",
@@ -2129,7 +2129,7 @@
  },
  {
   "qid": "c4q67",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 3,
   "question": "What would be a good hobby related to his travel dreams for Tim to pick up?",
   "gold": "Writing a travel blog.",
@@ -2137,7 +2137,7 @@
  },
  {
   "qid": "c4q68",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 2,
   "question": "What day did Tim get into his study abroad program?",
   "gold": "Januarty 5, 2024",
@@ -2145,7 +2145,7 @@
  },
  {
   "qid": "c4q69",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 2,
   "question": "When will Tim leave for Ireland?",
   "gold": "February, 2024",
@@ -2153,7 +2153,7 @@
  },
  {
   "qid": "c4q70",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 3,
   "question": "Which Star Wars-related locations would Tim enjoy during his visit to Ireland?",
   "gold": "Skellig Michael, Malin Head, Loop Head, Ceann Sibéal, and Brow Head because they are Star Wars filming locations.",
@@ -2161,7 +2161,7 @@
  },
  {
   "qid": "c4q71",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 4,
   "question": "Which team did John sign with on 21 May, 2023?",
   "gold": "The Minnesota Wolves",
@@ -2169,7 +2169,7 @@
  },
  {
   "qid": "c4q72",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 4,
   "question": "What is John's position on the team he signed with?",
   "gold": "shooting guard",
@@ -2177,7 +2177,7 @@
  },
  {
   "qid": "c4q73",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 4,
   "question": "What challenge did John encounter during pre-season training?",
   "gold": "fitting into the new team's style of play",
@@ -2185,7 +2185,7 @@
  },
  {
   "qid": "c4q74",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 4,
   "question": "What aspects of the Harry Potter universe will be discussed in John's fan project collaborations?",
   "gold": "characters, spells, magical creatures",
@@ -2193,7 +2193,7 @@
  },
  {
   "qid": "c4q75",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 4,
   "question": "What forum did Tim join recently?",
   "gold": "fantasy literature forum",
@@ -2201,7 +2201,7 @@
  },
  {
   "qid": "c4q76",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 4,
   "question": "What kind of picture did Tim share as part of their Harry Potter book collection?",
   "gold": "MinaLima's creation from the Harry Potter films",
@@ -2209,7 +2209,7 @@
  },
  {
   "qid": "c4q77",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 4,
   "question": "What was the highest number of points John scored in a game recently?",
   "gold": "40 points",
@@ -2217,7 +2217,7 @@
  },
  {
   "qid": "c4q78",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 4,
   "question": "What did John celebrate at a restaurant with teammates?",
   "gold": "a tough win",
@@ -2225,7 +2225,7 @@
  },
  {
   "qid": "c4q79",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 4,
   "question": "What kind of deals did John sign with Nike and Gatorade?",
   "gold": "basketball shoe and gear deal with Nike, potential sponsorship deal with Gatorade",
@@ -2233,7 +2233,7 @@
  },
  {
   "qid": "c4q80",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 4,
   "question": "Which city is John excited to have a game at?",
   "gold": "Seattle",
@@ -2241,7 +2241,7 @@
  },
  {
   "qid": "c4q81",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 4,
   "question": "How long has John been surfing?",
   "gold": "five years",
@@ -2249,7 +2249,7 @@
  },
  {
   "qid": "c4q82",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 4,
   "question": "How does John feel while surfing?",
   "gold": "super exciting and free-feeling",
@@ -2257,7 +2257,7 @@
  },
  {
   "qid": "c4q83",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 4,
   "question": "What kind of articles has Tim been writing about for the online magazine?",
   "gold": "different fantasy novels, characters, themes, and book recommendations",
@@ -2265,7 +2265,7 @@
  },
  {
   "qid": "c4q84",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 4,
   "question": "Which two fantasy novels does Tim particularly enjoy writing about?",
   "gold": "Harry Potter and Game of Thrones",
@@ -2273,7 +2273,7 @@
  },
  {
   "qid": "c4q85",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 4,
   "question": "What did Anthony and John end up playing during the charity event?",
   "gold": "an intense Harry Potter trivia contest",
@@ -2281,7 +2281,7 @@
  },
  {
   "qid": "c4q86",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 4,
   "question": "What did John share with the person he skyped about?",
   "gold": "Characters from Harry Potter",
@@ -2289,7 +2289,7 @@
  },
  {
   "qid": "c4q87",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 4,
   "question": "How did John describe the team bond?",
   "gold": "Awesome",
@@ -2297,7 +2297,7 @@
  },
  {
   "qid": "c4q88",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 4,
   "question": "How did John get introduced to basketball?",
   "gold": "Dad signed him up for a local league",
@@ -2305,7 +2305,7 @@
  },
  {
   "qid": "c4q89",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 4,
   "question": "What is John's number one goal in his basketball career?",
   "gold": "Winning a championship",
@@ -2313,7 +2313,7 @@
  },
  {
   "qid": "c4q90",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 4,
   "question": "What organization is John teaming up with for his charity work?",
   "gold": "A local organization helping disadvantaged kids with sports and school",
@@ -2321,7 +2321,7 @@
  },
  {
   "qid": "c4q91",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 4,
   "question": "When did John meet back up with his teammates after his trip in August 2023?",
   "gold": "Aug 15th",
@@ -2329,7 +2329,7 @@
  },
  {
   "qid": "c4q92",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 4,
   "question": "What did John's teammates give him when they met on Aug 15th?",
   "gold": "a basketball with autographs on it",
@@ -2337,7 +2337,7 @@
  },
  {
   "qid": "c4q93",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 4,
   "question": "Why did John's teammates sign the basketball they gave him?",
   "gold": "to show their friendship and appreciation",
@@ -2345,7 +2345,7 @@
  },
  {
   "qid": "c4q94",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 4,
   "question": "What is the main intention behind Tim wanting to attend the book conference?",
   "gold": "to learn more about literature and create a stronger bond to it",
@@ -2353,7 +2353,7 @@
  },
  {
   "qid": "c4q95",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 4,
   "question": "What new activity has Tim started learning in August 2023?",
   "gold": "play the piano",
@@ -2361,7 +2361,7 @@
  },
  {
   "qid": "c4q96",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 4,
   "question": "Which movie's theme is Tim's favorite to play on the piano?",
   "gold": "\"Harry Potter and the Philosopher's Stone\"",
@@ -2369,7 +2369,7 @@
  },
  {
   "qid": "c4q97",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 4,
   "question": "What special memory does \"Harry Potter and the Philosopher's Stone\" bring to Tim?",
   "gold": "Watching it with his family",
@@ -2377,7 +2377,7 @@
  },
  {
   "qid": "c4q98",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 4,
   "question": "Which movie does Tim mention they enjoy watching during Thanksgiving?",
   "gold": "\"Home Alone\"",
@@ -2385,7 +2385,7 @@
  },
  {
   "qid": "c4q99",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 4,
   "question": "What tradition does Tim mention they love during Thanksgiving?",
   "gold": "Prepping the feast and talking about what they're thankful for",
@@ -2393,7 +2393,7 @@
  },
  {
   "qid": "c4q100",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 4,
   "question": "How long did John and his high school basketball teammates play together?",
   "gold": "Four years",
@@ -2401,7 +2401,7 @@
  },
  {
   "qid": "c4q101",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 4,
   "question": "How was John's experience in New York City?",
   "gold": "Amazing",
@@ -2409,7 +2409,7 @@
  },
  {
   "qid": "c4q102",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 4,
   "question": "What did John say about NYC, enticing Tim to visit?",
   "gold": "It's got so much to check out - the culture, food - you won't regret it.",
@@ -2417,7 +2417,7 @@
  },
  {
   "qid": "c4q103",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 4,
   "question": "What kind of soup did John make recently?",
   "gold": "tasty soup with sage",
@@ -2425,7 +2425,7 @@
  },
  {
   "qid": "c4q104",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 4,
   "question": "What spice did John add to the soup for flavor?",
   "gold": "sage",
@@ -2433,7 +2433,7 @@
  },
  {
   "qid": "c4q105",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 4,
   "question": "What is Tim excited to see at Universal Studios?",
   "gold": "The Harry Potter stuff",
@@ -2441,7 +2441,7 @@
  },
  {
   "qid": "c4q106",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 4,
   "question": "Where are John and his teammates planning to explore on a team trip?",
   "gold": "a new city",
@@ -2449,7 +2449,7 @@
  },
  {
   "qid": "c4q107",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 4,
   "question": "What city did Tim suggest to John for the team trip next month?",
   "gold": "Edinburgh, Scotland",
@@ -2457,7 +2457,7 @@
  },
  {
   "qid": "c4q108",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 4,
   "question": "What does John want to do after his basketball career?",
   "gold": "positively influence and inspire others, potentially start a foundation and engage in charity work",
@@ -2465,7 +2465,7 @@
  },
  {
   "qid": "c4q109",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 4,
   "question": "What advice did Tim give John about picking endorsements?",
   "gold": "Ensure they align with values and brand, look for companies that share the desire to make a change and help others, make sure the endorsement feels authentic",
@@ -2473,7 +2473,7 @@
  },
  {
   "qid": "c4q110",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 4,
   "question": "What book recommendation did Tim give to John for the trip?",
   "gold": "A fantasy novel by Patrick Rothfuss",
@@ -2481,7 +2481,7 @@
  },
  {
   "qid": "c4q111",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 4,
   "question": "What type of venue did John and his girlfriend choose for their wedding ceremony?",
   "gold": "Greenhouse",
@@ -2489,7 +2489,7 @@
  },
  {
   "qid": "c4q112",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 4,
   "question": "What was the setting for John and his wife's first dance?",
   "gold": "Cozy restaurant",
@@ -2497,7 +2497,7 @@
  },
  {
   "qid": "c4q113",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 4,
   "question": "Which basketball team does Tim support?",
   "gold": "The Wolves",
@@ -2505,7 +2505,7 @@
  },
  {
   "qid": "c4q114",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 4,
   "question": "What passion does Tim mention connects him with people from all over the world?",
   "gold": "passion for fantasy stuff",
@@ -2513,7 +2513,7 @@
  },
  {
   "qid": "c4q115",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 4,
   "question": "How does John describe the game season for his team?",
   "gold": "intense with tough losses and great wins",
@@ -2521,7 +2521,7 @@
  },
  {
   "qid": "c4q116",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 4,
   "question": "How does John say his team handles tough opponents?",
   "gold": "by backing each other up and not quitting",
@@ -2529,7 +2529,7 @@
  },
  {
   "qid": "c4q117",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 4,
   "question": "What motivates John's team to get better, according to John?",
   "gold": "facing tough opponents",
@@ -2537,7 +2537,7 @@
  },
  {
   "qid": "c4q118",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 4,
   "question": "What did John's team win at the end of the season?",
   "gold": "a trophy",
@@ -2545,7 +2545,7 @@
  },
  {
   "qid": "c4q119",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 4,
   "question": "Where did Tim capture the photography of the sunset over the mountain range?",
   "gold": "Smoky Mountains",
@@ -2553,7 +2553,7 @@
  },
  {
   "qid": "c4q120",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 4,
   "question": "How does John feel about being seen as a mentor by some of the younger players?",
   "gold": "It feels great",
@@ -2561,7 +2561,7 @@
  },
  {
   "qid": "c4q121",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 4,
   "question": "What does John find rewarding about mentoring the younger players?",
   "gold": "Seeing their growth, improvement, and confidence",
@@ -2569,7 +2569,7 @@
  },
  {
   "qid": "c4q122",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 4,
   "question": "What has John been able to help the younger players achieve?",
   "gold": "reach their goals",
@@ -2577,7 +2577,7 @@
  },
  {
   "qid": "c4q123",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 4,
   "question": "What genre is the novel that Tim is writing?",
   "gold": "Fantasy",
@@ -2585,7 +2585,7 @@
  },
  {
   "qid": "c4q124",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 4,
   "question": "Who is one of Tim's sources of inspiration for writing?",
   "gold": "J.K. Rowling",
@@ -2593,7 +2593,7 @@
  },
  {
   "qid": "c4q125",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 4,
   "question": "What J.K. Rowling quote does Tim resonate with?",
   "gold": "\"Turn on the light - happiness hides in the darkest of times.\"",
@@ -2601,7 +2601,7 @@
  },
  {
   "qid": "c4q126",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 4,
   "question": "What does John write on the whiteboard to help him stay motivated?",
   "gold": "motivational quotes and strategies",
@@ -2609,7 +2609,7 @@
  },
  {
   "qid": "c4q127",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 4,
   "question": "What hobby is a therapy for John when away from the court?",
   "gold": "Cooking",
@@ -2617,7 +2617,7 @@
  },
  {
   "qid": "c4q128",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 4,
   "question": "What type of meal does John often cook using a slow cooker?",
   "gold": "honey garlic chicken with roasted veg",
@@ -2625,7 +2625,7 @@
  },
  {
   "qid": "c4q129",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 4,
   "question": "How will John share the honey garlic chicken recipe with the other person?",
   "gold": "write it down and mail it",
@@ -2633,7 +2633,7 @@
  },
  {
   "qid": "c4q130",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 4,
   "question": "What was Tim's huge writing issue last week,as mentioned on November 6, 2023?",
   "gold": "He got stuck on a plot twist",
@@ -2641,7 +2641,7 @@
  },
  {
   "qid": "c4q131",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 4,
   "question": "What does Tim have that serves as a reminder of hard work and is his prized possession?",
   "gold": "a basketball signed by his favorite player",
@@ -2649,7 +2649,7 @@
  },
  {
   "qid": "c4q132",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 4,
   "question": "Why do Tim and John find LeBron inspiring?",
   "gold": "LeBron's determination and the epic block in Game 7 of the '16 Finals",
@@ -2657,7 +2657,7 @@
  },
  {
   "qid": "c4q133",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 4,
   "question": "How did John describe the views during their road trip out on the European coastline?",
   "gold": "Spectacular",
@@ -2665,7 +2665,7 @@
  },
  {
   "qid": "c4q134",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 4,
   "question": "What is one of Tim's favorite fantasy TV shows, as mentioned on November 11, 2023?",
   "gold": "\"That\"",
@@ -2673,7 +2673,7 @@
  },
  {
   "qid": "c4q135",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 4,
   "question": "How does Tim stay motivated during difficult study sessions?",
   "gold": "Visualizing goals and success",
@@ -2681,7 +2681,7 @@
  },
  {
   "qid": "c4q136",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 4,
   "question": "What did Tim say about his injury on 16 November, 2023?",
   "gold": "The doctor said it's not too serious",
@@ -2689,7 +2689,7 @@
  },
  {
   "qid": "c4q137",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 4,
   "question": "What was the setback Tim faced in his writing project on 21 November, 2023?",
   "gold": "Story based on experiences in the UK didn't go as planned",
@@ -2697,7 +2697,7 @@
  },
  {
   "qid": "c4q138",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 4,
   "question": "How did John overcome his ankle injury from last season?",
   "gold": "stayed focused on recovery and worked hard to strengthen his body",
@@ -2705,7 +2705,7 @@
  },
  {
   "qid": "c4q139",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 4,
   "question": "What motivated Tim to keep pushing himself to get better in writing and reading?",
   "gold": "Love for writing and reading",
@@ -2713,7 +2713,7 @@
  },
  {
   "qid": "c4q140",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 4,
   "question": "How did John overcome a mistake he made during a big game in basketball?",
   "gold": "Worked hard to get better and focused on growth",
@@ -2721,7 +2721,7 @@
  },
  {
   "qid": "c4q141",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 4,
   "question": "What book did John recently finish rereading that left him feeling inspired and hopeful about following dreams?",
   "gold": "The Alchemist",
@@ -2729,7 +2729,7 @@
  },
  {
   "qid": "c4q142",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 4,
   "question": "How did \"The Alchemist\" impact John's perspective on following dreams?",
   "gold": "made him think again about following dreams and searching for personal legends",
@@ -2737,7 +2737,7 @@
  },
  {
   "qid": "c4q143",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 4,
   "question": "What is John trying out to improve his strength and flexibility after recovery from ankle injury?",
   "gold": "yoga",
@@ -2745,7 +2745,7 @@
  },
  {
   "qid": "c4q144",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 4,
   "question": "How long does John usually hold the yoga pose he shared with Tim?",
   "gold": "30-60 seconds",
@@ -2753,7 +2753,7 @@
  },
  {
   "qid": "c4q145",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 4,
   "question": "Where was the forest picture shared by John on December 1,2023 taken?",
   "gold": "near his hometown",
@@ -2761,7 +2761,7 @@
  },
  {
   "qid": "c4q146",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 4,
   "question": "What did Tim recently start learning in addition to being part of a travel club and working on studies?",
   "gold": "an instrument",
@@ -2769,7 +2769,7 @@
  },
  {
   "qid": "c4q147",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 4,
   "question": "What instrument is Tim learning to play in December 2023?",
   "gold": "violin",
@@ -2777,7 +2777,7 @@
  },
  {
   "qid": "c4q148",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 4,
   "question": "How long has Tim been playing the piano for, as of December 2023?",
   "gold": "about four months",
@@ -2785,7 +2785,7 @@
  },
  {
   "qid": "c4q149",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 4,
   "question": "What book did Tim just finish reading on 8th December, 2023?",
   "gold": "\"A Dance with Dragons\"",
@@ -2793,7 +2793,7 @@
  },
  {
   "qid": "c4q150",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 4,
   "question": "Which book did Tim recommend to John as a good story on 8th December, 2023?",
   "gold": "\"A Dance with Dragons\"",
@@ -2801,7 +2801,7 @@
  },
  {
   "qid": "c4q151",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 4,
   "question": "What is the topic of discussion between John and Tim on 11 December, 2023?",
   "gold": "Academic achievements and sports successes",
@@ -2809,7 +2809,7 @@
  },
  {
   "qid": "c4q152",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 4,
   "question": "What kind of game did John have a career-high in assists in?",
   "gold": "basketball",
@@ -2817,7 +2817,7 @@
  },
  {
   "qid": "c4q153",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 4,
   "question": "What was John's way of dealing with doubts and stress when he was younger?",
   "gold": "practicing basketball outside for hours",
@@ -2825,7 +2825,7 @@
  },
  {
   "qid": "c4q154",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 4,
   "question": "How did John feel about the atmosphere during the big game against the rival team?",
   "gold": "electric and intense",
@@ -2833,7 +2833,7 @@
  },
  {
   "qid": "c4q155",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 4,
   "question": "How did John feel after being able to jog without pain?",
   "gold": "It was a huge success.",
@@ -2841,7 +2841,7 @@
  },
  {
   "qid": "c4q156",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 4,
   "question": "What kind of deal did John get in December?",
   "gold": "Deal with a renowned outdoor gear company",
@@ -2849,7 +2849,7 @@
  },
  {
   "qid": "c4q157",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 4,
   "question": "Where was the photoshoot done for John's gear deal?",
   "gold": "In a gorgeous forest",
@@ -2857,7 +2857,7 @@
  },
  {
   "qid": "c4q158",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 4,
   "question": "In which area has John's team seen the most growth during training?",
   "gold": "Communication and bonding",
@@ -2865,7 +2865,7 @@
  },
  {
   "qid": "c4q159",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 4,
   "question": "What type of seminars is John conducting?",
   "gold": "Sports and marketing seminars",
@@ -2873,7 +2873,7 @@
  },
  {
   "qid": "c4q160",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 4,
   "question": "What activity did Tim do after reading the stories about the Himalayan trek?",
   "gold": "visited a travel agency",
@@ -2881,7 +2881,7 @@
  },
  {
   "qid": "c4q161",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 4,
   "question": "What is one cause that John supports with his influence and resources?",
   "gold": "youth sports and fair chances in sports",
@@ -2889,7 +2889,7 @@
  },
  {
   "qid": "c4q162",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 4,
   "question": "What new fantasy TV series is Tim excited about?",
   "gold": "\"The Wheel of Time\"",
@@ -2897,7 +2897,7 @@
  },
  {
   "qid": "c4q163",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 4,
   "question": "Which language is Tim learning?",
   "gold": "German",
@@ -2905,7 +2905,7 @@
  },
  {
   "qid": "c4q164",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 4,
   "question": "What language does Tim know besides German?",
   "gold": "Spanish",
@@ -2913,7 +2913,7 @@
  },
  {
   "qid": "c4q165",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 4,
   "question": "What book did Tim get in Italy that inspired him to cook?",
   "gold": "a cooking book",
@@ -2921,7 +2921,7 @@
  },
  {
   "qid": "c4q166",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 4,
   "question": "What is John's favorite book series?",
   "gold": "Harry Potter",
@@ -2929,7 +2929,7 @@
  },
  {
   "qid": "c4q167",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 4,
   "question": "According to John, who is his favorite character from Lord of the Rings?",
   "gold": "Aragorn",
@@ -2937,7 +2937,7 @@
  },
  {
   "qid": "c4q168",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 4,
   "question": "Why does John like Aragorn from Lord of the Rings?",
   "gold": "brave, selfless, down-to-earth attitude",
@@ -2945,7 +2945,7 @@
  },
  {
   "qid": "c4q169",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 4,
   "question": "What kind of painting does John have in his room as a reminder?",
   "gold": "a painting of Aragorn",
@@ -2953,7 +2953,7 @@
  },
  {
   "qid": "c4q170",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 4,
   "question": "What is the painting of Aragorn a reminder for John to be in everything he does?",
   "gold": "be a leader",
@@ -2961,7 +2961,7 @@
  },
  {
   "qid": "c4q171",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 4,
   "question": "What map does Tim show to his friend John?",
   "gold": "a map of Middle-earth from LOTR",
@@ -2969,7 +2969,7 @@
  },
  {
   "qid": "c4q172",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 4,
   "question": "Where will Tim be going for a semester abroad?",
   "gold": "Ireland",
@@ -2977,7 +2977,7 @@
  },
  {
   "qid": "c4q173",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 4,
   "question": "Which city in Ireland will Tim be staying in during his semester abroad?",
   "gold": "Galway",
@@ -2985,7 +2985,7 @@
  },
  {
   "qid": "c4q174",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 4,
   "question": "What charity event did John organize recently in 2024?",
   "gold": "benefit basketball game",
@@ -2993,7 +2993,7 @@
  },
  {
   "qid": "c4q175",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 4,
   "question": "What achievement did John share with Tim in January 2024?",
   "gold": "endorsement with a popular beverage company",
@@ -3001,7 +3001,7 @@
  },
  {
   "qid": "c4q176",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 4,
   "question": "What was Johns's reaction to sealing the deal with the beverage company?",
   "gold": "crazy feeling, sense of accomplishment",
@@ -3009,7 +3009,7 @@
  },
  {
   "qid": "c4q177",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 4,
   "question": "Which city did John recommend to Tim in January 2024?",
   "gold": "Barcelona",
@@ -3017,7 +3017,7 @@
  },
  {
   "qid": "c5q0",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 2,
   "question": "Which year did Audrey adopt the first three of her dogs?",
   "gold": "2020",
@@ -3025,7 +3025,7 @@
  },
  {
   "qid": "c5q1",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 2,
   "question": "When did Andrew start his new job as a financial analyst?",
   "gold": "The week before March 27, 2023",
@@ -3033,7 +3033,7 @@
  },
  {
   "qid": "c5q2",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 1,
   "question": "What kind of indoor activities has Andrew pursued with his girlfriend?",
   "gold": "boardgames, volunteering at pet shelter, wine tasting, growing flowers",
@@ -3041,7 +3041,7 @@
  },
  {
   "qid": "c5q3",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 1,
   "question": "What kind of places have Andrew and his girlfriend checked out around the city?",
   "gold": "cafes, new places to eat, open space for hikes, pet shelter, wine tasting event, park",
@@ -3049,7 +3049,7 @@
  },
  {
   "qid": "c5q4",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 2,
   "question": "When did Audrey make muffins for herself?",
   "gold": "The week of April 3rd to 9th",
@@ -3057,7 +3057,7 @@
  },
  {
   "qid": "c5q5",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 2,
   "question": "When did Audrey see a hummingbird?",
   "gold": "first week of May 2023",
@@ -3065,7 +3065,7 @@
  },
  {
   "qid": "c5q6",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 2,
   "question": "When did Audrey adopt Pixie?",
   "gold": "around April 2, 2023",
@@ -3073,7 +3073,7 @@
  },
  {
   "qid": "c5q7",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 2,
   "question": "How many years passed between Audrey adopting Pixie and her other three dogs?",
   "gold": "three years",

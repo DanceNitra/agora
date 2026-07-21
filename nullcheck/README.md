@@ -3,7 +3,7 @@
 > A result is evidence of a real effect only if a model with **no effect** can't reproduce it.
 > `nullcheck` simulates that null — the world where there's no true difference — at *your* sample
 > sizes, and tells you, in plain language, whether your number survives. One file, zero deps.
-> A sibling of [mnemo](../mnemo) / [ragfresh](../ragfresh).
+> A sibling of [inspeximus](../inspeximus) / [ragfresh](../ragfresh).
 
 ## The problem (2026)
 Teams are "awash in data, can't tell signal from noise." A/B tools flash *significant* on a fluke; a

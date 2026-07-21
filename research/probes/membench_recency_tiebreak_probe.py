@@ -1,7 +1,7 @@
 """membench_recency_tiebreak_probe.py — measure the recency-tiebreak lever on MemBench.
 
 v2 finding: on knowledge_update questions the STALE (pre-correction) value outranks the fresh
-one at rank 1 in 32.7% of cases, identically for plain cosine and mnemo semantic recall
+one at rank 1 in 32.7% of cases, identically for plain cosine and inspeximus semantic recall
 (free-text SRO supersession never triggers). Hypothesized lever: a small position (recency)
 bonus in the recall score.
 

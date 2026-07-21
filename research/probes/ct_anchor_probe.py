@@ -1,7 +1,7 @@
 """ct_anchor_probe.py — does an EXTERNAL Certificate-Transparency-style anchor detect an operator who rewrites
 history while holding the receipt key?
 
-mnemo's governance_report docstring concedes the one hole verify_writes cannot close: "the operator who holds
+inspeximus's governance_report docstring concedes the one hole verify_writes cannot close: "the operator who holds
 receipt_key can forge tombstones too — anchor the chain head externally for operator-adversarial audit." The
 new anchor() / verify_consistency() close it (RFC 6962 model: an untrusted log + external witnesses + a
 consistency proof). This probe proves the boundary is real, not decorative:
@@ -13,7 +13,7 @@ consistency proof). This probe proves the boundary is real, not decorative:
   3. operator rolls the log back (truncates) -> verify_consistency FAILS (log shrank).
 
 Run: python research/probes/ct_anchor_probe.py   (deterministic, no LLM, no network)
-Part of Agora / mnemo (MIT).
+Part of Agora / inspeximus (MIT).
 """
 import os
 import sys
@@ -93,7 +93,7 @@ def main():
     if passed:
         print("VERDICT: PASS — the external anchor closes the operator-adversarial hole: a re-chained rewrite")
         print("  that verify_writes accepts is CAUGHT by verify_consistency against a witnessed anchor, and a")
-        print("  rollback is caught too. mnemo's ANCHORABILITY gap (self-conceded) is now sealed — given the")
+        print("  rollback is caught too. inspeximus's ANCHORABILITY gap (self-conceded) is now sealed — given the")
         print("  auditor witnessed a prior anchor out of band (the honest CT boundary).")
     else:
         print("VERDICT: FAIL — the anchor did not behave as specified; do not claim ANCHORABILITY is closed.")

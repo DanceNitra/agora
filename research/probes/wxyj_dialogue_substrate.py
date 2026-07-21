@@ -25,10 +25,10 @@ public same-corpus rows:
   P2 date-capability: "old versions lagged (2023 in 2026)" -> "correct date" stated together   [turn 316]
   P3 architecture:    "Markov chains ... уже нет ... Сейчас Трансформер" stated together   [turn 340]
 
-Runs the three memory substrates via the SHIPPED mnemo store (keyed supersession = remember(key=...)):
+Runs the three memory substrates via the SHIPPED inspeximus store (keyed supersession = remember(key=...)):
   last_value  = a dict that keeps only the newest value
   append_log  = keep every assertion, no supersession relation encoded
-  keyed       = mnemo remember(..., key=(subject,relation)) -> deterministic SRO supersession
+  keyed       = inspeximus remember(..., key=(subject,relation)) -> deterministic SRO supersession
 For each pair x substrate: does it UPDATE to the new value, does it RETAIN provenance of the old, and is
 the SUPERSESSION relation explicit (which value is dead + a link to what replaced it). Raw CSV out.
 
@@ -63,7 +63,7 @@ def observe(subject_relation, old, new):
     log = [(subj, old), (subj, new)]
     append_log = {"update": any(v == new for _, v in log), "provenance_retained": any(v == old for _, v in log),
                   "supersession_explicit": False, "live_value": "ambiguous (must re-derive from recency)"}
-    # keyed supersession via SHIPPED mnemo
+    # keyed supersession via SHIPPED inspeximus
     m = Inspeximus(); m.remember(old, key=subj); m.remember(new, key=subj)
     active = [r for r in m.items if r["status"] == "active"]
     superseded = [r for r in m.items if r["status"] == "superseded"]

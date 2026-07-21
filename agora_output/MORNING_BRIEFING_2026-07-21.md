@@ -48,7 +48,7 @@ Every intake this system had was the vault (what we already thought) or arXiv (w
 publish). Neither would have told us a competitor shipped a revert command last week.
 
 - **External library** — 367 items harvested from GitHub issues, PRs and Reddit, deduplicated and
-  searchable, stored in mnemo itself. Endpoints: `/brain/library/external/{harvest,search,map}`.
+  searchable, stored in inspeximus itself. Endpoints: `/brain/library/external/{harvest,search,map}`.
 - **Competitor watch** — 10 rivals snapshotted (GitHub releases, PyPI versions, stars); reports only
   *deltas*, and flags loudly when a release touches our axis.
 - **Contribution finder** — 125 threads where something we have shipped answers what is being asked.
@@ -80,14 +80,14 @@ Full list of ten upgrades with the evidence per item: `agora_output/TOP10_UPGRAD
 
 ## 4. The number that says we have no users
 
-`agora-mnemo` on PyPI, mirrors excluded, 29 days:
+`inspeximus` on PyPI, mirrors excluded, 29 days:
 
 | | days | mean downloads/day |
 |---|---|---|
 | days we published a release | 20 | **555** |
 | days we did not | 9 | **9** |
 
-r = 0.977 across 97 releases. **Nine people install mnemo on a day we ship nothing.** Nothing public
+r = 0.977 across 97 releases. **Nine people install inspeximus on a day we ship nothing.** Nothing public
 cites the weekly figure — checked — and nothing should until that baseline moves.
 
 **Marketing or capability? Neither. The capability is real and unfindable.** Three audit harnesses, a
@@ -103,12 +103,12 @@ stars — Graphiti's arXiv month was its worst.
 
 ## 5. Shipped overnight
 
-- **mnemo 1.24.4** via GitHub Actions with **PyPI Trusted Publishing** — first release carrying a
+- **inspeximus 1.24.4** via GitHub Actions with **PyPI Trusted Publishing** — first release carrying a
   signed attestation binding the wheel to this repo, workflow and commit. Verified on the integrity
   endpoint.
 - **The repo is now its own Claude Code plugin marketplace**: `/plugin marketplace add
-  DanceNitra/mnemo` → `/plugin install mnemo@mnemo`. Both manifests verified as served by GitHub.
-  The first manifest I wrote would have been **dead on arrival** — `uvx --from agora-mnemo mnemo-mcp`
+  DanceNitra/inspeximus` → `/plugin install inspeximus@inspeximus`. Both manifests verified as served by GitHub.
+  The first manifest I wrote would have been **dead on arrival** — `uvx --from inspeximus inspeximus-mcp`
   fails because the core is deliberately zero-dependency; caught by running the exact declared command
   from a clean environment.
 - **README corrected**: it claimed "600–730 s of LLM extraction"; the real distribution across all 24
@@ -133,7 +133,7 @@ stars — Graphiti's arXiv month was its worst.
 
 ## 7. What I would do first this morning
 
-**Item 1 of the ten: make the drop-in story findable.** `MnemoStore` already passes an
+**Item 1 of the ten: make the drop-in story findable.** `InspeximusStore` already passes an
 operation-by-operation parity audit against LangGraph's own store — and it appears in no LangChain
 integrations page, and `awesome-LangGraph#88` still sits unmerged. 39 threads are asking for exactly
 this. It is a day of packaging, not a month of building, and it is the shortest path from "we have a
@@ -144,7 +144,7 @@ verified product" to "someone outside can find it".
 ## 8. Two things I could not verify from here, so they are yours
 
 **Other MCP hosts.** The README documents the config generically and the snippet is correct
-(`uvx --from "agora-mnemo[mcp]" mnemo-mcp`), but only Claude Code is installed on this machine, so
+(`uvx --from "inspeximus[mcp]" inspeximus-mcp`), but only Claude Code is installed on this machine, so
 only that path is verified end to end. Cursor, Windsurf, Codex, Cline and Continue each keep their MCP
 config in a different file, and Codex uses TOML rather than JSON — a user copying our JSON into Codex
 would fail. Writing those paths without testing them is the same "fairly confident" that cost us three
@@ -156,7 +156,7 @@ maintainer last merged anything on 10 July, in a single batch, and **eight PRs a
 date, ours among them**. Nothing is wrong with our submission; the channel is simply slow and outside
 our control. Do not nudge with seven others waiting.
 
-**Verified instead, on the exact artifact the new plugin installs** (`agora_mnemo-1.24.4`, sha256
+**Verified instead, on the exact artifact the new plugin installs** (`inspeximus-1.24.4`, sha256
 `7b4bdd71e8a2…`): claims audit 13/13, governance audit CLAIM HOLDS. What we are telling people to
 install is what we tested.
 

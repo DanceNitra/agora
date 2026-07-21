@@ -2,7 +2,7 @@
 2026-07-21 08:19:15,280 [dungeon.mcp_server] INFO: WebSocket server on ws://127.0.0.1:5175
 2026-07-21 08:19:16,846 [dungeon.mcp_server] INFO: WebSocket client connected: ('127.0.0.1', 62757)
 2026-07-21 08:19:17,380 [dungeon.mcp_server] INFO: ESS TrustEngine bridged (real server/agora code, db=C:\Users\Danculus\agora\agora-game-server\dungeon_trust.db)
-2026-07-21 08:19:17,722 [dungeon.mcp_server] INFO: mnemo semantic vec-backfill worker started (model=nomic-embed-text)
+2026-07-21 08:19:17,722 [dungeon.mcp_server] INFO: inspeximus semantic vec-backfill worker started (model=nomic-embed-text)
 2026-07-21 08:19:17,723 [dungeon.mcp_server] INFO: LLM-driven life loop started
 2026-07-21 08:19:21,093 [dungeon.mcp_server] INFO: [plan] Sergeant Voss: LLM_quests=0 (planner OFF — grounded pool only)
 2026-07-21 08:19:21,118 [dungeon.mcp_server] INFO: [plan] Cartographer Wren: LLM_quests=0 (planner OFF — grounded pool only)

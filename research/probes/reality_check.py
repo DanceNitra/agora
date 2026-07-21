@@ -19,7 +19,7 @@ Feed it per-item scores from several seeds pooled if you want that; otherwise tr
 on uncertainty.
 
 Bring your own scores (lists of per-item metric values for method / baseline / proxy). Zero dependencies.
-MIT. Part of Agora / mnemo. See the four worked receipts in this folder.
+MIT. Part of Agora / inspeximus. See the four worked receipts in this folder.
 Run the self-demo:  python research/probes/reality_check.py
 """
 import random, math, json, os

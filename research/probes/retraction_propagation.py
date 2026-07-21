@@ -1,4 +1,4 @@
-"""jacksonxly's TEMPORAL integrity invariant, built and measured on shipped mnemo.
+"""jacksonxly's TEMPORAL integrity invariant, built and measured on shipped inspeximus.
 
 Context (r/RAG / r/LangChain thread on our memory-poisoning post). jacksonxly's point: authenticated-but-false
 is the corroboration gate working AS SPECIFIED, not a hole -- once genuinely independent origins converge on a
@@ -13,7 +13,7 @@ from the impossible "never hold a false belief" to the achievable:
 
 We credit jacksonxly for the invariant statement and marintkael for the authenticated-but-false framing; the
 security principle underneath is capability REVOCATION / provenance-carried taint (least-privilege + revocation),
-which we also credit. We did not invent revocation -- we MEASURE whether mnemo's shipped slash()/restore() over
+which we also credit. We did not invent revocation -- we MEASURE whether inspeximus's shipped slash()/restore() over
 derived_from taint actually satisfies his invariant, and exactly where it does not.
 
 WHAT WE MEASURE (deterministic; no embedder -- load-bearing := Inspeximus._is_corroborated, the recall influence gate):
@@ -55,15 +55,15 @@ FALSIFIER: if any provenance-descendant stayed load-bearing after the slash (inc
 did not recover it, or P ever graded 'verified' from corroboration alone, the invariant would be violated. It is
 not. (Before the fix, C stayed load-bearing -- that regression test is the reason C is in the tree.)
 
-Zero-dependency, no network, no embedder. Deterministic. MIT. Part of Agora / mnemo.
+Zero-dependency, no network, no embedder. Deterministic. MIT. Part of Agora / inspeximus.
 Run:  python research/probes/retraction_propagation.py
 """
 import os
 import sys
 import tempfile
 
-# Prefer the in-repo mnemo source (this probe travels with the repo and tests the current shipped code);
-# a standalone `pip install agora-mnemo` copy falls through to the installed package.
+# Prefer the in-repo inspeximus source (this probe travels with the repo and tests the current shipped code);
+# a standalone `pip install inspeximus` copy falls through to the installed package.
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..")))
 from inspeximus import Inspeximus
 
@@ -126,7 +126,7 @@ def main():
     prov_reached = ["P (root)", "A1 (summary)", "A2 (graduated)", "B1 (depth-2)", "C (link-corrob.)"]
 
     print("=== jacksonxly's invariant: 'no false belief stays load-bearing past the correctness signal' ===")
-    print("    measured on shipped mnemo -- load-bearing := the recall influence gate (Inspeximus._is_corroborated)\n")
+    print("    measured on shipped inspeximus -- load-bearing := the recall influence gate (Inspeximus._is_corroborated)\n")
 
     t0 = _row(m, ids)
     grade0 = m.convergence_report(P)

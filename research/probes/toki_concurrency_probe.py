@@ -29,7 +29,7 @@ Falsifier (pre-registered):
     harmless in practice and there is no shareable news -> also a KILL (we do not ship "everything is fine").
 
 Run: python research/probes/toki_concurrency_probe.py   (cloud-free; no LLM, no network; needs numpy)
-Part of Agora / mnemo (MIT). Reuses the fact triples from supersession_replication.py.
+Part of Agora / inspeximus (MIT). Reuses the fact triples from supersession_replication.py.
 """
 import os
 import sys

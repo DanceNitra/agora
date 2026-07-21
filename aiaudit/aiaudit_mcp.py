@@ -36,7 +36,7 @@ def ai_audit(spec: dict) -> dict:
       multi_agent {peers_seen,own_weight,discount}- will an ensemble herd? (herdcheck)
       causal      {controls:{name:role}}         - is a causal number identified? (idcheck)
       rag_store   {items:[{id,updated_ts,value,source_exists}]} - is the vector store rotting? (ragfresh)
-      memory      {items:[{text,value,links}]}   - agent-memory health (mnemo)
+      memory      {items:[{text,value,links}]}   - agent-memory health (inspeximus)
     Returns {overall PASS/WARN/FAIL, health_score, dimensions[], fixes[]}."""
     return _audit(spec)
 

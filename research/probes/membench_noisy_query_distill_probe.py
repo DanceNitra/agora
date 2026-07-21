@@ -1,7 +1,7 @@
 """membench_noisy_query_distill_probe.py — how much does query distillation recover on noisy agent queries?
 
 MemBench v2 finding: on the `noisy` split (the real question buried in ~4 sentences of small-talk
-distractors) retrieval hit@5 collapses from ~1.0 (clean) to ~0.52-0.56 for BOTH plain cosine and mnemo.
+distractors) retrieval hit@5 collapses from ~1.0 (clean) to ~0.52-0.56 for BOTH plain cosine and inspeximus.
 That's the realistic regime — users don't ask clean questions. This measures the obvious lever, honestly:
 extract the core question with a cheap LLM, recall on THAT.
 
@@ -13,7 +13,7 @@ Arms (retrieval-level hit@k against the gold evidence turn, target_step_id[0] = 
 
 This is NOT a novelty claim — query rewriting/distillation is standard IR practice. The point is the MEASURED
 recovery on this specific noisy-agent-memory regime, to decide whether a `distill` preprocessing helper earns
-its place in mnemo. Cross-family so the number isn't tied to one distiller. Own embed + distill caches.
+its place in inspeximus. Cross-family so the number isn't tied to one distiller. Own embed + distill caches.
 RUN: python -u research/probes/membench_noisy_query_distill_probe.py
 """
 import json, os, sys, re, time, hashlib, urllib.request

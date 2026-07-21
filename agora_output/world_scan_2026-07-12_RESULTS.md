@@ -30,7 +30,7 @@ fix (recall(lineage_guard=True)).
 theory is TEXTBOOK — CRDT causal-delivery (Shapiro 2011), eager-vs-lazy view maintenance (Zhou VLDB'07), SQL
 DEFERRABLE constraints, TMS re-evaluation (Doyle 1979), bitemporal as-of-query; the real theorem is
 monotonicity/commutativity (CALM), not read-vs-write timing; TOKI itself ties soundness to isolation. SKEPTIC's
-killer: 0.92==0.92 (one-shot==value-only) is a CLOSED STRAWMAN — mnemo's own primitives, self-chosen ordering;
+killer: 0.92==0.92 (one-shot==value-only) is a CLOSED STRAWMAN — inspeximus's own primitives, self-chosen ordering;
 must beat an external baseline. PRACTITIONER: Graphiti already SHIPS the read-time fix. Do NOT publish the
 theory. KEEP as a product feature only (recall(lineage_guard=True), honestly cited). Same pattern as
 recovery-halflife. Detail: agora_output/lead1_gate_storm_verdict.md.
@@ -55,12 +55,12 @@ but do NOT ship until (b) runs against the actual PAM/AIP/AP2 code.
 Probe: research/probes/governance_sufficiency_probe.py · result: agora_output/governance_sufficiency_result.txt
 One real correction+erasure lifecycle; 8-question DEMM-style rubric over the exact receipt bytes; deterministic.
 
-mnemo SUFFICIENCY SCORE 5/8.
+inspeximus SUFFICIENCY SCORE 5/8.
   PASS: WHAT, WHEN, TAMPER-EVIDENCE, COMPLETENESS, SCOPE-HONESTY.
   FAIL: AUTHORITY (no binding to an authenticated principal), BASIS (decision reason not in the receipt bytes),
         ANCHORABILITY (no external chain-head anchor; operator with the key can forge).
 
-FINDING: sufficiency is NOT predicted by primitive presence — mnemo implements everything yet its receipt fails
+FINDING: sufficiency is NOT predicted by primitive presence — inspeximus implements everything yet its receipt fails
 3/8 governance questions. Doubles as a product roadmap: emit the decision basis into the receipt; bind the
 request to an authenticated principal; publish a Certificate-Transparency-style external anchor. Publish path:
 a standing sufficiency leaderboard (self-cell first, competitors self-submit) after the gate.
@@ -84,7 +84,7 @@ the follow-up that would make it a finding.
 Probe: research/probes/consistency_class_probe.py
 serialized 0 lost / 40; two-writers-unsynchronized 20 lost / 40. The class formally moves with the control
 plane, BUT the anomaly is a classic lost-update from a DELIBERATE misuse (two full-rewrite writers on one JSON
-file, no locking) — textbook since the 1970s, a deployment mistake mnemo never claims to support, and the
+file, no locking) — textbook since the 1970s, a deployment mistake inspeximus never claims to support, and the
 taxonomy itself is pre-existing (2606.17182, June 2026). No surprising falsifiable result. KILL — do not dress a
 demonstration as a finding (Agora raised bar). The gate working, same as the workflow's own cascade-repair kill.
 

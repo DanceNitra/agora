@@ -13,8 +13,8 @@ from datetime import datetime, timezone, timedelta
 HERE = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, os.path.join(HERE, "mab_official"))
 sys.path.insert(0, os.path.join(HERE, "..", ".."))
-sys.path.insert(0, os.path.join(HERE, "..", "..", "mnemo_pypi"))
-import run_mnemo_official as H
+sys.path.insert(0, os.path.join(HERE, "..", "..", "inspeximus_pypi"))
+import run_inspeximus_official as H
 
 _env = {}
 for l in open(os.path.join(HERE, "..", "..", "server", ".env"), encoding="utf-8", errors="replace"):

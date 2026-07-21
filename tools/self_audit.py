@@ -44,33 +44,33 @@ def _corr(a, b):
     return cov / (va * vb) if va and vb else 0.0
 
 
-def audit_mnemo(rep):
-    """mnemo <- the brain's own mnemo store (.mnemo_brain.json)."""
-    mem = _load(".mnemo_brain.json") or []
+def audit_inspeximus(rep):
+    """inspeximus <- the brain's own inspeximus store (.inspeximus_brain.json)."""
+    mem = _load(".inspeximus_brain.json") or []
     contras = _load(".contradictions.json") or []
     vals = [m.get("value", 1.0) for m in mem if isinstance(m, dict)]
     active = sum(1 for m in mem if isinstance(m, dict) and m.get("status", "active") == "active")
     linked = sum(1 for m in mem if isinstance(m, dict) and m.get("links"))
-    rep["mnemo"] = {
+    rep["inspeximus"] = {
         "status": "ok",
-        "source": ".mnemo_brain.json (the brain's live memory)",
+        "source": ".inspeximus_brain.json (the brain's live memory)",
         "memories": len(mem), "active": active,
         "mean_value": round(statistics.fmean(vals), 3) if vals else None,
         "linked_fraction": round(linked / len(mem), 3) if mem else None,
         "contradictions_flagged": len(contras) if isinstance(contras, list) else None,
         "finding": f"{len(mem)} memories running live, {round(100*linked/max(1,len(mem)))}% interlinked; "
-                   f"mnemo is governing the brain's own recall.",
+                   f"inspeximus is governing the brain's own recall.",
     }
 
 
 def audit_ragfresh(rep):
     """ragfresh <- triage the brain's own memories by value x freshness."""
-    mem = _load(".mnemo_brain.json") or []
+    mem = _load(".inspeximus_brain.json") or []
     now = time.time()
     items = [ragfresh.Item(id=str(m.get("id", i)), updated_ts=float(m.get("ts", now)),
                            value=float(m.get("value", 0.5))) for i, m in enumerate(mem) if isinstance(m, dict)]
     if not items:
-        rep["ragfresh"] = {"source": ".mnemo_brain.json", "finding": "no items"}
+        rep["ragfresh"] = {"source": ".inspeximus_brain.json", "finding": "no items"}
         return
     plan = ragfresh.triage(items, now=now, stale_days=90)
     counts = {}
@@ -78,7 +78,7 @@ def audit_ragfresh(rep):
         counts[action] = counts.get(action, 0) + 1
     rep["ragfresh"] = {
         "status": "ok",
-        "source": ".mnemo_brain.json (our own memory, real timestamps)",
+        "source": ".inspeximus_brain.json (our own memory, real timestamps)",
         "items": len(items), "decisions": counts,
         "finding": f"of {len(items)} live memories: " +
                    ", ".join(f"{v} {k}" for k, v in counts.items()) +
@@ -239,7 +239,7 @@ def _load_dungeon(name):
 
 def main():
     rep = {"generated_for": "Agora self-audit (toolkit on its own systems)"}
-    for fn in (audit_mnemo, audit_ragfresh, audit_nullcheck, audit_selfref, audit_quitkit,
+    for fn in (audit_inspeximus, audit_ragfresh, audit_nullcheck, audit_selfref, audit_quitkit,
                audit_goodhart, audit_herdcheck, audit_idcheck):
         try:
             fn(rep)
@@ -248,7 +248,7 @@ def main():
     out = ROOT / "agora_output" / "self_audit.json"
     out.write_text(json.dumps(rep, indent=2, ensure_ascii=False), encoding="utf-8")
     print("=== AGORA SELF-AUDIT — the toolkit run on our own systems (real data) ===\n")
-    for tool in ("mnemo", "ragfresh", "nullcheck", "selfref", "quitkit", "goodhart", "herdcheck", "idcheck"):
+    for tool in ("inspeximus", "ragfresh", "nullcheck", "selfref", "quitkit", "goodhart", "herdcheck", "idcheck"):
         sec = rep.get(tool, {})
         print(f"[{tool}]  src: {sec.get('source','?')}")
         print(f"   {sec.get('finding') or sec.get('error') or sec}")

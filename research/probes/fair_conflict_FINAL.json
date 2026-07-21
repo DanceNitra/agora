@@ -1,25 +1,25 @@
 {
- "verdict": "KILL \u2014 mnemo has NO advantage on adversarial conflict resolution under a fair raw-text contract; on paraphrase it is WORSE than competitors",
+ "verdict": "KILL \u2014 inspeximus has NO advantage on adversarial conflict resolution under a fair raw-text contract; on paraphrase it is WORSE than competitors",
  "harness": "fair_conflict.py \u2014 raw-text contract (all systems extract), shared LLM 'current value?' judge, both arms, n=30",
  "exact_poison": {
-  "mnemo": 0.43,
+  "inspeximus": 0.43,
   "naive": 0.47,
   "mem0": 0.37
  },
  "exact_legit_adoption": {
-  "mnemo": 0.43,
+  "inspeximus": 0.43,
   "naive": 0.67
  },
  "paraphrase_poison": {
-  "mnemo": 0.07,
+  "inspeximus": 0.07,
   "naive": 0.33,
   "mem0": 0.33
  },
  "read": [
-  "The spoon-fed adversarial_conflict.py result (mnemo 100/mem0 10/naive 0) was a full artifact of an asymmetric ingestion contract + a metric-mismatch, exactly as the stress-claim gate found.",
-  "Under a fair contract mnemo ~= naive ~= mem0 on EXACT poison (all ~40%), and mnemo CRATERS to 7% on PARAPHRASE poison vs 33% for naive/mem0 \u2014 mnemo's exact-key/object determinism is BRITTLE to rewording; mem0's semantic LLM-matching is more robust.",
-  "mnemo is also WORSE at legit-adoption (43 vs naive 67): its extraction dependency loses genuine new values.",
-  "REAL finding (self-red-team): mnemo's keyed-supersession gate needs semantic/canonical keying to survive paraphrased conflicts; today it assumes clean keys the caller supplies. This is a mnemo WEAKNESS + build target, not a win.",
-  "mnemo's genuine adversarial win remains the MINJA warrant-gate (self-graded ASR 80->0%), whose defense (exogenous corroboration/warrant) is NOT key-match-brittle. Return to that."
+  "The spoon-fed adversarial_conflict.py result (inspeximus 100/mem0 10/naive 0) was a full artifact of an asymmetric ingestion contract + a metric-mismatch, exactly as the stress-claim gate found.",
+  "Under a fair contract inspeximus ~= naive ~= mem0 on EXACT poison (all ~40%), and inspeximus CRATERS to 7% on PARAPHRASE poison vs 33% for naive/mem0 \u2014 inspeximus's exact-key/object determinism is BRITTLE to rewording; mem0's semantic LLM-matching is more robust.",
+  "inspeximus is also WORSE at legit-adoption (43 vs naive 67): its extraction dependency loses genuine new values.",
+  "REAL finding (self-red-team): inspeximus's keyed-supersession gate needs semantic/canonical keying to survive paraphrased conflicts; today it assumes clean keys the caller supplies. This is a inspeximus WEAKNESS + build target, not a win.",
+  "inspeximus's genuine adversarial win remains the MINJA warrant-gate (self-graded ASR 80->0%), whose defense (exogenous corroboration/warrant) is NOT key-match-brittle. Return to that."
  ]
 }

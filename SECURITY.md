@@ -2,7 +2,7 @@
 
 Agora is two things with **very different threat models**, and they should be judged separately:
 
-1. **The shipped product — `mnemo/`** (`mnemo.py`, `mnemo_mcp.py`, `second_brain_mcp.py`). This is what
+1. **The shipped product — `inspeximus/`** (`inspeximus.py`, `mcp.py`, `second_brain_mcp.py`). This is what
    an outside user installs and runs. It is designed to be low-risk.
 2. **The live autonomous system** (the FastAPI *brain* on `:8000`, the *dungeon* on `:5174`/`:5175`,
    the agent loops). This is the maintainer's single-user research rig. It is **not** intended to be
@@ -17,9 +17,9 @@ proof of concept.
 
 ---
 
-## 1. The shipped product (`mnemo/`)
+## 1. The shipped product (`inspeximus/`)
 
-`mnemo.py` is a single-file, zero-dependency memory store. `mnemo_mcp.py` and `second_brain_mcp.py`
+`inspeximus.py` is a single-file, zero-dependency memory store. `mcp.py` and `second_brain_mcp.py`
 expose it over MCP. **None of them call an LLM, `eval`, a shell, or a subprocess.** They read your
 notes, score/link them, and (optionally) call an embeddings HTTP endpoint you configure.
 
@@ -31,15 +31,15 @@ notes, score/link them, and (optionally) call an embeddings HTTP endpoint you co
   parent check (not `is_symlink()`, because junctions defeat it), so a planted link inside a shared
   or cloned vault cannot leak files from elsewhere on disk. Files larger than
   `SECOND_BRAIN_MAX_BYTES` (default 2 MB) are skipped so a single huge file can't exhaust memory.
-- **`MNEMO_EMBED_URL` is a trust boundary.** If you configure an embedder, the **full text of every
+- **`INSPEXIMUS_EMBED_URL` is a trust boundary.** If you configure an embedder, the **full text of every
   remembered/recalled note** is POSTed to that URL. It is validated at startup: `https` is allowed
   anywhere, plain `http` only to loopback (e.g. a local Ollama), and link-local / cloud-metadata
   targets (`169.254.0.0/16`, `169.254.169.254`) are refused. **Point it only at an endpoint you
   trust** — there is no other egress.
-- **The on-disk index/memory JSON is trusted input.** Don't point `MNEMO_PATH` /
+- **The on-disk index/memory JSON is trusted input.** Don't point `INSPEXIMUS_PATH` /
   `SECOND_BRAIN_INDEX` at a file an untrusted party can write.
 
-**Not a vulnerability in `mnemo/`:** there is no remote attack surface — it is a local stdio MCP
+**Not a vulnerability in `inspeximus/`:** there is no remote attack surface — it is a local stdio MCP
 server with no network listener of its own.
 
 ## 2. The autonomous system — the loopback invariant

@@ -1,8 +1,8 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://github.com/DanceNitra/agora/blob/main/mnemo/schema_v0.json",
-  "title": "mnemo fact-record interchange — schema_v0",
-  "description": "Open, composable-not-coupled interchange for agentic memory. mnemo emits a fact record on the WRITE side (corroboration counting + deterministic (subject,relation) supersession key + bi-temporal valid_from/recorded_at). A read-side ledger (e.g. MemStrata, arXiv:2606.26511) ingests the record, owns the bitemporal transaction boundary, and returns a synchronous ack-by-id so the writer knows the fact was durably committed. A plain vector store may ingest the same record and ignore fields it does not use. mnemo also runs standalone (its own (subject,relation) supersession drives stale recall to 0% without any external ledger); in that mode `status` is authoritative, in a combined deployment the read-side ledger overrides it. Versioned so both sides code against one thing.",
+  "$id": "https://github.com/DanceNitra/agora/blob/main/inspeximus/schema_v0.json",
+  "title": "inspeximus fact-record interchange — schema_v0",
+  "description": "Open, composable-not-coupled interchange for agentic memory. inspeximus emits a fact record on the WRITE side (corroboration counting + deterministic (subject,relation) supersession key + bi-temporal valid_from/recorded_at). A read-side ledger (e.g. MemStrata, arXiv:2606.26511) ingests the record, owns the bitemporal transaction boundary, and returns a synchronous ack-by-id so the writer knows the fact was durably committed. A plain vector store may ingest the same record and ignore fields it does not use. inspeximus also runs standalone (its own (subject,relation) supersession drives stale recall to 0% without any external ledger); in that mode `status` is authoritative, in a combined deployment the read-side ledger overrides it. Versioned so both sides code against one thing.",
   "type": "object",
   "$defs": {
     "source": {
@@ -17,21 +17,21 @@
     },
     "fact_record": {
       "type": "object",
-      "description": "What a mnemo write emits (this is what the runnable probes output).",
+      "description": "What a inspeximus write emits (this is what the runnable probes output).",
       "properties": {
         "id": {"type": "string", "description": "write-side record id (echoed back in the ack). STORED."},
         "valid_from": {"type": "number", "description": "event-time (bitemporal VALID-time): when the fact became true. STORED."},
-        "recorded_at": {"type": "number", "description": "ingest/system-time: when the writer recorded it (mnemo's `ts`). Both timestamps are emitted so the READ-side owns the transaction boundary. STORED."},
+        "recorded_at": {"type": "number", "description": "ingest/system-time: when the writer recorded it (inspeximus's `ts`). Both timestamps are emitted so the READ-side owns the transaction boundary. STORED."},
         "key": {"type": ["string", "null"], "description": "(subject, relation) identifier, e.g. 'billing-api::auth-method' — the deterministic supersession key (no similarity threshold, no LLM). STORED; null for non-keyed facts."},
         "subject": {"type": ["string", "null"], "description": "DERIVED: key.split('::')[0]"},
         "relation": {"type": ["string", "null"], "description": "DERIVED: key.split('::')[1]"},
-        "object": {"type": ["string", "number", "boolean", "null"], "description": "the current value for (subject, relation). NOT stored separately by mnemo (the value lives in `text`); null unless the caller separates it — read `text`."},
+        "object": {"type": ["string", "number", "boolean", "null"], "description": "the current value for (subject, relation). NOT stored separately by inspeximus (the value lives in `text`); null unless the caller separates it — read `text`."},
         "text": {"type": "string", "description": "the fact, carrying the value. STORED."},
         "sources": {"type": "array", "items": {"$ref": "#/$defs/source"}, "description": "DERIVED: this record's `source` + its corroborating links' sources, entity-deduped."},
         "corroboration_count": {"type": "integer", "minimum": 0, "description": "DERIVED: number of DISTINCT sources (record + links), not repetitions."},
         "effective_value": {"type": "number", "description": "DERIVED: value * 0.5^(age / type_half_life), clock reset on access (not on write)."},
         "mtype": {"type": "string", "enum": ["episodic", "semantic", "procedural"], "description": "decay prior. STORED."},
-        "status": {"type": "string", "enum": ["active", "superseded", "hub"], "description": "mnemo's LOCAL/standalone view. STORED; in a combined deployment the read-side ledger is authoritative and overrides this."}
+        "status": {"type": "string", "enum": ["active", "superseded", "hub"], "description": "inspeximus's LOCAL/standalone view. STORED; in a combined deployment the read-side ledger is authoritative and overrides this."}
       },
       "required": ["id", "valid_from", "recorded_at", "text", "sources", "corroboration_count", "status"],
       "additionalProperties": true

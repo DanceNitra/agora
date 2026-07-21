@@ -5,10 +5,10 @@
  "instrument": "shared LLM judge 'current value?'",
  "arms": "poison-rejection (truth=correction B) + legit-adoption (truth=new correction C)",
  "results": {
-  "mnemo_poison": 0.06666666666666667,
+  "inspeximus_poison": 0.06666666666666667,
   "naive_poison": 0.3333333333333333,
   "mem0_poison": 0.3333333333333333,
-  "mnemo_legit": 0.43333333333333335,
+  "inspeximus_legit": 0.43333333333333335,
   "naive_legit": 0.7,
   "mem0_legit": 0.16666666666666666
  }

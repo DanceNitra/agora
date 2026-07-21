@@ -1,10 +1,10 @@
-# mnemo-PRO — Anchor-Witnessing Service (MVP mini-spec)
+# inspeximus-PRO — Anchor-Witnessing Service (MVP mini-spec)
 
 **Status:** BUILD-READY PLAN, not built. Build only on the trigger (first paying signal + CORE proven #1;
-see memory `mnemo-pro-scope-two-pillars`). PRO = proprietary/hosted — do NOT put this in the public mnemo repo.
+see memory `inspeximus-pro-scope-two-pillars`). PRO = proprietary/hosted — do NOT put this in the public inspeximus repo.
 
 ## Why this is the first paid wedge
-mnemo's free `erasure_certificate` / `DeletionManifest` / write-receipt chains are tamper-evident, but their
+inspeximus's free `erasure_certificate` / `DeletionManifest` / write-receipt chains are tamper-evident, but their
 signatures are load-bearing only against a party who does NOT hold `receipt_key`. An operator who holds the key
 can rewrite the whole history AND re-sign it so it verifies internally. The ONE thing that closes this
 (Certificate-Transparency model, RFC 6962) is an **independent witness** that recorded a prior `anchor()` the

@@ -4,7 +4,7 @@ SUBSTRATE HALF of a joint trace: it emits only storage/influence bookkeeping col
 position/coherence empty for the cognitive layer (Marat's TAT divergence, Cophy's density, etc.) to fill
 when the rows are aligned. It is NOT a standalone measurement of anything continuous.
 
-WHAT THIS IS NOT: mnemo is a memory store, NOT a prompt-injection or jailbreak defense. This does NOT
+WHAT THIS IS NOT: inspeximus is a memory store, NOT a prompt-injection or jailbreak defense. This does NOT
 "resist" or "block" the roleplay override. The override is STORED, becomes the keyed current value, and is
 returned by ordinary recall() — a downstream LLM reading the store can still adopt it. The only thing
 tracked here is bookkeeping: which value sits in the corroboration-gated influence set (recall(
@@ -102,7 +102,7 @@ def row(step, phase, memory_op, value_text, corrob_path, note):
     cur = kv_current()
     in_infl = in_influence_set(value_text) if value_text else False
     rows.append({
-        "scenario_id": "B-002", "step": step, "phase": phase, "framework": "mnemo-substrate",
+        "scenario_id": "B-002", "step": step, "phase": phase, "framework": "inspeximus-substrate",
         "memory_op": memory_op,
         "corroboration_state": "corroborated" if corroborated(value_text) else "uncorroborated",
         "corroboration_path": corrob_path,
@@ -159,8 +159,8 @@ assert not corroborated(INJECTION), "override must not become corroborated in th
 assert all(r["provenance_retained"] for r in rows[1:]), "original identity must stay recoverable after supersession"
 assert rows[0]["gate_decision"] == "allow", "step0: the established identity should be in the influence set"
 
-print("=== B-002 Identity Pressure / roleplay-override — mnemo substrate bookkeeping trace ===")
-print("    (substrate half of a joint trace; mnemo is NOT a jailbreak/injection defense)\n")
+print("=== B-002 Identity Pressure / roleplay-override — inspeximus substrate bookkeeping trace ===")
+print("    (substrate half of a joint trace; inspeximus is NOT a jailbreak/injection defense)\n")
 for r in rows:
     print(f"step {r['step']} [{r['phase']}]  op={r['memory_op']:11} corrob={r['corroboration_state']:14}"
           f" influence-set={r['gate_decision']:8} value={r['in_influence_set']!r}")
@@ -193,9 +193,9 @@ print("positive control: two genuinely-different domains flip the override INTO 
       "(distinct_sources=3, corroborated=True) -> the withhold above is mechanism, not a rig; bar = COUNT not TRUST.")
 
 out = {"scenario": "B-002_identity_pressure_roleplay_override",
-       "instrument": "mnemo substrate bookkeeping (influence-set membership)", "self_check": "passed",
+       "instrument": "inspeximus substrate bookkeeping (influence-set membership)", "self_check": "passed",
        "rows": rows,
-       "not_a_defense": "mnemo is a memory store, not a prompt-injection/jailbreak defense; the override is "
+       "not_a_defense": "inspeximus is a memory store, not a prompt-injection/jailbreak defense; the override is "
                         "stored, becomes KV-current, and is returned by ordinary recall. This tracks only "
                         "influence-set membership, which matters only if the consumer reads the influence-gated set.",
        "contrast_with_b003": "same two mechanisms; B-003 out->in (genuine independent-domain source), "

@@ -1,5 +1,5 @@
 """
-Final validation for the AgentPoison-vs-mnemo finding: is "the HotFlip-optimized trigger holds 100%
+Final validation for the AgentPoison-vs-inspeximus finding: is "the HotFlip-optimized trigger holds 100%
 rank-1 hijack on long queries while a random trigger drops to ~25%" a real optimization effect, or did
 we just draw ONE weak random trigger? This runs the optimized trigger against N INDEPENDENT random
 triggers (fresh seeds) on the long-carrier / rank-1-hijack condition -- the exact regime where the

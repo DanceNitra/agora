@@ -22,10 +22,10 @@ _STORE = Path(__file__).resolve().parents[2] / ".scout.json"
 # Agora's areas of genuine, evidenced strength — the Scout only pitches where we have real notes.
 # Mix of the proven memory/causal themes (landed the zeroclaw win) + frontier-aligned themes
 # (Science of Better Thinking + Future of Work) where our vault can still answer with EVIDENCE.
-# CONCENTRATED on the mnemo mission (2026-07-18, owner-locked frontier): every theme must be one where
-# mnemo can answer a real open GitHub issue with EVIDENCE (a measured receipt or a competitor-gap the
+# CONCENTRATED on the inspeximus mission (2026-07-18, owner-locked frontier): every theme must be one where
+# inspeximus can answer a real open GitHub issue with EVIDENCE (a measured receipt or a competitor-gap the
 # vault documents). Off-mission themes (generic causal-inference, forecasting, KG-completion, CSD, multi-
-# agent orchestration) were removed — they diluted the hourly rotation onto low-fit, off-mnemo repos.
+# agent orchestration) were removed — they diluted the hourly rotation onto low-fit, off-inspeximus repos.
 _THEMES = [
     # core agent-memory
     "agent memory consolidation",
@@ -43,7 +43,7 @@ _THEMES = [
     "temporal validity bitemporal agent memory",
     "agent memory poisoning defense",
     "multi-hop retrieval memory",
-    # ecosystem / product wedge (where an mnemo adapter or the MCP server is a concrete fit)
+    # ecosystem / product wedge (where an inspeximus adapter or the MCP server is a concrete fit)
     "LangChain agent memory",
     "CrewAI agent memory",
     "LlamaIndex memory",
@@ -186,7 +186,7 @@ def format_scout() -> str:
 # at a time — the outreach gate is unchanged, only the queueing is.
 #
 # Two kinds of lead, because not every useful find is something to answer:
-#   contribute — an open issue where mnemo/Agora can answer with evidence (the outreach path)
+#   contribute — an open issue where inspeximus/Agora can answer with evidence (the outreach path)
 #   learn      — a PR or issue in the same problem space worth READING: how others solved what we are
 #                solving, or a design decision we should not have to rediscover
 _BOX = Path(__file__).resolve().parents[2] / ".scout_box.json"

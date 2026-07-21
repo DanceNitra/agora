@@ -6,7 +6,7 @@ import json, re, sys, time
 import numpy as np
 from pathlib import Path
 sys.path.insert(0, "C:/Users/Danculus/agora/server")
-sys.path.insert(0, "C:/Users/Danculus/agora/mnemo")
+sys.path.insert(0, "C:/Users/Danculus/agora/inspeximus")
 from agora.execution.semantic_index import _embed_batch
 from inspeximus import _tokens
 import urllib.request

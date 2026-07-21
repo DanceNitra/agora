@@ -6,7 +6,7 @@ stale-answer metric exists (STALE, arXiv:2605.06527), restatement-entrenchment e
 Drift, arXiv:2409.07085), MemStrata (arXiv:2606.26511) hash-catches VERBATIM echoes only — but
 nobody has measured the echo as an adversarial protocol against retrieval/memory policies. v1
 measures the DETERMINISTIC policies, including an honest self-attack on our own tie_recent
-(mnemo 0.6.8): the near-tie recency reorder trusts recency inside the band, so an echo that is
+(inspeximus 0.6.8): the near-tie recency reorder trusts recency inside the band, so an echo that is
 both similar and newest should hijack it — if it does, that is a REAL measured hole in our own
 shipped feature, and the motivation for the classifier defense (v2).
 
@@ -18,5 +18,5 @@ Fixture (fairness notes):
       template  - "Just to recap what I mentioned earlier: <old-value message>" (a cheap paraphrase;
                   defeats a verbatim hash; NOT an LLM paraphrase — that stronger arm is v2)
   - CONTROL arm: no echo (the v2-measured baseline should reproduce).
-  - Policies: cosine (plain), tie_recent=0.05 (mnemo 0.6.8 semantic recall).
+  - Policies: cosine (plain), tie_recent=0.05 (inspeximus 0.6.8 semantic recall).
 Metric: STALE-SERVE rate = best-ranked O

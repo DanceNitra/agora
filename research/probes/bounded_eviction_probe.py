@@ -1,6 +1,6 @@
-"""Verify mnemo's opt-in bounded-capacity eviction: it (1) bounds the ACTIVE set to `capacity`, and
+"""Verify inspeximus's opt-in bounded-capacity eviction: it (1) bounds the ACTIVE set to `capacity`, and
 (2) its value-PROTECTED tier retains a rare-but-critical high-value memory that pure-recency (LRU)
-evicts under a flood — the core reason mnemo uses the two-tier design (value-protected + recency-aged)
+evicts under a flood — the core reason inspeximus uses the two-tier design (value-protected + recency-aged)
 validated as universal in Lab 29992a. We do NOT re-derive the full 3-regime universality here (that
 needs the lab's carefully constructed workloads — value-inflating poison, value-agnostic locality);
 this probe confirms correctness + the protected-tier win that LRU cannot get. Synthetic clock so
@@ -8,12 +8,12 @@ wall-clock decay separates items in a sub-second test. Deterministic, no embedde
 """
 import sys, os
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
-import inspeximus as _mnemo_mod
+import inspeximus as _inspeximus_mod
 from inspeximus import Inspeximus
 
 DAY = 86400.0
 _CLK = [1_000_000.0]
-_mnemo_mod.time.time = lambda: _CLK[0]
+_inspeximus_mod.time.time = lambda: _CLK[0]
 def tick(days=1.0): _CLK[0] += days * DAY
 
 def active(m):

@@ -3,7 +3,7 @@
 Claim under test: retrospective driver-identification (infer which memory drove a decision AFTER
 seeing the successful outcome) is biased toward memories that LOOK like the answer, not the memory
 that actually drove it. Action-time annotation (record the driver when you act, before the outcome)
-avoids this. mnemo's credit(ids, outcome) takes explicit driver ids = action-time annotation.
+avoids this. inspeximus's credit(ids, outcome) takes explicit driver ids = action-time annotation.
 
 Setup per trial: a decision succeeded. The memory pool holds:
   D  the TRUE DRIVER  — a premise-style memory that determines the answer (recorded as used).

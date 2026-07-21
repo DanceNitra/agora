@@ -1,15 +1,15 @@
-"""mnemo + agent-receipts: tamper-evident memory.
+"""inspeximus + agent-receipts: tamper-evident memory.
 
-mnemo is already append-only and has deterministic supersession, so it never silently edits a fact in
+inspeximus is already append-only and has deterministic supersession, so it never silently edits a fact in
 the normal flow. But the store is just a file — anyone who can touch that file can rewrite a stored
-memory after the fact, and mnemo (like any store) would then serve the altered text as if it were the
+memory after the fact, and inspeximus (like any store) would then serve the altered text as if it were the
 original. Receipts close that: every `remember()` emits a signed receipt committing to the memory's
 content hash, so the *write history* becomes independently verifiable. Re-hash the current store against
 the receipts and any out-of-band edit is named.
 
-This is a thin wrapper — it does NOT modify mnemo's zero-dependency core; it composes the two.
+This is a thin wrapper — it does NOT modify inspeximus's zero-dependency core; it composes the two.
 
-Run:  python mnemo_receipts.py
+Run:  python inspeximus_receipts.py
 MIT. Part of the Agora project / agent-receipts.
 """
 from __future__ import annotations
@@ -19,8 +19,8 @@ from typing import Any, Optional
 
 from agent_receipts import ReceiptChain, generate_keypair, hash_content, _HAVE_CRYPTO
 
-# mnemo lives in the sibling mnemo/ package of the Agora repo
-sys.path.insert(0, os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "mnemo"))
+# inspeximus lives in the sibling inspeximus/ package of the Agora repo
+sys.path.insert(0, os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "inspeximus"))
 from inspeximus import Inspeximus  # noqa: E402
 
 
@@ -31,12 +31,12 @@ def _content_commit(rec: dict) -> dict:
                                             "mtype": rec.get("mtype")})}
 
 
-class ReceiptedMnemo:
+class Receiptedinspeximus:
     """Wrap a Inspeximus instance so every write produces a signed, hash-chained receipt."""
 
-    def __init__(self, mnemo: Inspeximus, private_key_hex: Optional[str] = None,
-                 public_key_hex: Optional[str] = None, actor: str = "mnemo"):
-        self.m = mnemo
+    def __init__(self, inspeximus: Inspeximus, private_key_hex: Optional[str] = None,
+                 public_key_hex: Optional[str] = None, actor: str = "inspeximus"):
+        self.m = inspeximus
         self.public_key_hex = public_key_hex
         self.chain = ReceiptChain(actor=actor, private_key_hex=private_key_hex,
                                   public_key_hex=public_key_hex)
@@ -44,7 +44,7 @@ class ReceiptedMnemo:
     def remember(self, text: str, **kwargs: Any) -> str:
         mid = self.m.remember(text, **kwargs)
         rec = next(r for r in self.m.items if r["id"] == mid)
-        self.chain.record("mnemo.remember",
+        self.chain.record("inspeximus.remember",
                           {"text": text, "key": kwargs.get("key"), "mtype": rec.get("mtype")},
                           _content_commit(rec),
                           meta={"memory_id": mid})
@@ -55,14 +55,14 @@ class ReceiptedMnemo:
         return self.m.recall(*a, **k)
 
 
-def audit_memory(mnemo: Inspeximus, chain: ReceiptChain,
+def audit_memory(inspeximus: Inspeximus, chain: ReceiptChain,
                  expected_pubkey: Optional[str] = None) -> tuple[bool, list[str]]:
     """Verify the write-receipt chain AND that each stored memory still matches what was written.
 
-    Catches out-of-band edits to the store file that mnemo itself cannot see."""
+    Catches out-of-band edits to the store file that inspeximus itself cannot see."""
     ok, problems = chain.verify(expected_pubkey=expected_pubkey)
     problems = list(problems)
-    by_id = {r["id"]: r for r in mnemo.items}
+    by_id = {r["id"]: r for r in inspeximus.items}
     for rcpt in chain.receipts:
         mid = (rcpt.get("meta") or {}).get("memory_id")
         if mid is None:
@@ -77,9 +77,9 @@ def audit_memory(mnemo: Inspeximus, chain: ReceiptChain,
 
 
 def _demo() -> None:
-    print("=== mnemo + receipts: tamper-evident memory ===\n")
+    print("=== inspeximus + receipts: tamper-evident memory ===\n")
     import tempfile
-    path = os.path.join(tempfile.gettempdir(), "mnemo_receipts_demo.json")
+    path = os.path.join(tempfile.gettempdir(), "inspeximus_receipts_demo.json")
     if os.path.exists(path):
         os.remove(path)
 
@@ -89,7 +89,7 @@ def _demo() -> None:
         kw = {"private_key_hex": sk, "public_key_hex": pk}
     else:
         pk = None
-    rm = ReceiptedMnemo(Inspeximus(path=path), actor="agent-memory", **kw)
+    rm = Receiptedinspeximus(Inspeximus(path=path), actor="agent-memory", **kw)
 
     rm.remember("The prod database host is db-prod-01.", key="prod-db::host", mtype="semantic")
     rm.remember("The on-call engineer this week is Maria.", key="oncall::engineer", mtype="episodic")
@@ -108,7 +108,7 @@ def _demo() -> None:
     for p in problems2:
         print(f"      - {p}")
 
-    print("\nMEASURED: mnemo's normal flow never edits a fact; an out-of-band edit to the store IS")
+    print("\nMEASURED: inspeximus's normal flow never edits a fact; an out-of-band edit to the store IS")
     print("detectable here because each write left a signed receipt committing to the content hash.")
 
 

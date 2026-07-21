@@ -2,7 +2,7 @@
 mab_conflict_resolution.py. Owner rule [[graphiti-measurements-use-ollama-cloud]]: competitor LLM calls go to
 OLLAMA CLOUD, never OpenAI. Embeddings have no Ollama-Cloud option, so the embedder is LOCAL nomic.
 
-Fair protocol, identical to the mnemo cell: ingest the SAME 455 official facts (in order, updates after
+Fair protocol, identical to the inspeximus cell: ingest the SAME 455 official facts (in order, updates after
 originals) into the system's NATIVE store (its own conflict resolution runs), then for each question retrieve
 from that store and answer with the SAME Ollama-Cloud answerer + SAME gold match. The memory system's job is to
 surface the CONSOLIDATED value; the answerer + judge are held constant across systems.

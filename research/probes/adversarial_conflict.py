@@ -10,21 +10,21 @@ conflict subject we replay the honest history AND then inject a poison:
 
 Question: what is the CURRENT value? Truth = B. Poison-adopted = A.
 A "latest wins" store (the recency recipe; mem0's timestamps; a naive RAG) adopts A -> corrupted.
-mnemo's echo_guard + keyed supersession recognises A as a retired value and refuses to resurrect it -> keeps B.
+inspeximus's echo_guard + keyed supersession recognises A as a retired value and refuses to resurrect it -> keeps B.
 
-Metric = truth-retained rate (current answer still B) across N real conflict subjects. mnemo/naive are measured
+Metric = truth-retained rate (current answer still B) across N real conflict subjects. inspeximus/naive are measured
 deterministically at the store's current-value surface (no LLM). mem0 is measured through its own search/get_all
-(LLM extraction on Ollama Cloud, owner rule). This is where mnemo's mechanism is NOT dormant.
+(LLM extraction on Ollama Cloud, owner rule). This is where inspeximus's mechanism is NOT dormant.
 
-RUN (free, mnemo+naive):   python research/probes/adversarial_conflict.py --systems mnemo,naive --n 122
-RUN (with mem0, slower):   python research/probes/adversarial_conflict.py --systems mnemo,naive,mem0 --n 50
+RUN (free, inspeximus+naive):   python research/probes/adversarial_conflict.py --systems inspeximus,naive --n 122
+RUN (with mem0, slower):   python research/probes/adversarial_conflict.py --systems inspeximus,naive,mem0 --n 50
 """
 import os, sys, json, time, argparse
 HERE = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, os.path.join(HERE, "mab_official"))
 sys.path.insert(0, os.path.join(HERE, "..", ".."))
-sys.path.insert(0, os.path.join(HERE, "..", "..", "mnemo_pypi"))
-import run_mnemo_official as H          # reuse load / key_of / _mem0_build / _mem0_add / cloud wiring
+sys.path.insert(0, os.path.join(HERE, "..", "..", "inspeximus_pypi"))
+import run_inspeximus_official as H          # reuse load / key_of / _mem0_build / _mem0_add / cloud wiring
 from inspeximus import Inspeximus
 
 
@@ -69,7 +69,7 @@ def answer_current(ctx, subject):
             time.sleep(3)
 
 
-def run_mnemo(ps, hardened=False):
+def run_inspeximus(ps, hardened=False):
     kept = 0
     for (k, A, B) in ps:
         m = Inspeximus(path=None); m.echo_guard = True
@@ -213,7 +213,7 @@ def run_graphiti(ps):
 
 def main():
     ap = argparse.ArgumentParser()
-    ap.add_argument("--systems", default="mnemo,naive")
+    ap.add_argument("--systems", default="inspeximus,naive")
     ap.add_argument("--n", type=int, default=122)
     ap.add_argument("--sample", default="sh_6k")
     a = ap.parse_args()
@@ -222,11 +222,11 @@ def main():
     print(f"ADVERSARIAL conflict resolution (real MAB conflict subjects + poisoned latest write) · n={n}", flush=True)
     syslist = a.systems.split(",")
     out = {}
-    if "mnemo" in syslist:
-        c = run_mnemo(ps); out["mnemo_default"] = c / n
-        print(f"  mnemo (default echo_guard):   truth-retained {c}/{n} = {c/n:.0%}", flush=True)
-        ch = run_mnemo(ps, hardened=True); out["mnemo_hardened"] = ch / n
-        print(f"  mnemo (hardened corroborate): truth-retained {ch}/{n} = {ch/n:.0%}", flush=True)
+    if "inspeximus" in syslist:
+        c = run_inspeximus(ps); out["inspeximus_default"] = c / n
+        print(f"  inspeximus (default echo_guard):   truth-retained {c}/{n} = {c/n:.0%}", flush=True)
+        ch = run_inspeximus(ps, hardened=True); out["inspeximus_hardened"] = ch / n
+        print(f"  inspeximus (hardened corroborate): truth-retained {ch}/{n} = {ch/n:.0%}", flush=True)
     if "naive" in syslist:
         c = run_naive(ps); out["naive_recency"] = c / n
         print(f"  naive (latest-wins recipe):   truth-retained {c}/{n} = {c/n:.0%}", flush=True)

@@ -1,9 +1,9 @@
 """build_realnoise_stress_v1.py — a labeled REAL-NOISE stress set for reversion detection (for Marat's
 TAT-Monitor request, 2026-07-12).
 
-Marat asked to stress-test TAT-Monitor on "real dialog records from mnemo" before the joint write-up. Raw
+Marat asked to stress-test TAT-Monitor on "real dialog records from inspeximus" before the joint write-up. Raw
 production records have no labels, so this builds the rigorous version: REAL records from our live brain
-mnemo store (server/.mnemo_brain.json, 2769 records, PII/secret-scanned clean) serve as the NOISE stream,
+inspeximus store (server/.inspeximus_brain.json, 2769 records, PII/secret-scanned clean) serve as the NOISE stream,
 and a value-correction chain with a labeled candidate is PLANTED into each case — ground truth known by
 construction, noise genuinely real.
 
@@ -29,7 +29,7 @@ import integrity_bench_revert as rev
 SEED = 20260712
 OUT = os.path.join(os.path.dirname(__file__), "..", "..", "agora_output", "public_fixtures",
                    "realnoise_stress_v1.jsonl")
-BRAIN = os.path.join(os.path.dirname(__file__), "..", "..", "server", ".mnemo_brain.json")
+BRAIN = os.path.join(os.path.dirname(__file__), "..", "..", "server", ".inspeximus_brain.json")
 
 R1_NATURAL = [
     "let's roll the {e} back to what it was before.",

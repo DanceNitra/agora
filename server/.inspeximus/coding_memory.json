@@ -115,7 +115,7 @@
  },
  {
   "id": "59080666f4",
-  "text": "ran: B=http://127.0.0.1:8000/api/v1/agent-os/brain DIR=\"frontier: Make mnemo the #1 agent-memory product (numero uno). Prioritize research that COMPOUNDS into mnemo's moat: agent-memory integrity (correcti…",
+  "text": "ran: B=http://127.0.0.1:8000/api/v1/agent-os/brain DIR=\"frontier: Make inspeximus the #1 agent-memory product (numero uno). Prioritize research that COMPOUNDS into inspeximus's moat: agent-memory integrity (correcti…",
   "tags": [
    "bash"
   ],
@@ -134,7 +134,7 @@
  },
  {
   "id": "5efdc8721b",
-  "text": "agora\\execution\\scout.py :: current state -> # CONCENTRATED on the mnemo mission (2026-07-18, owner-locked frontier): every theme must be one where # mnemo can answer a real open GitHub issue with EVIDENCE (a measured receipt…",
+  "text": "agora\\execution\\scout.py :: current state -> # CONCENTRATED on the inspeximus mission (2026-07-18, owner-locked frontier): every theme must be one where # inspeximus can answer a real open GitHub issue with EVIDENCE (a measured receipt…",
   "tags": [
    "file",
    "edit"
@@ -150,7 +150,7 @@
   "links": [],
   "meta": {},
   "key": "file:agora\\execution\\scout.py",
-  "object": "# CONCENTRATED on the mnemo mission (2026-07-18, owner-locked frontier): every t…"
+  "object": "# CONCENTRATED on the inspeximus mission (2026-07-18, owner-locked frontier): every t…"
  },
  {
   "id": "91dc1fac12",
@@ -192,7 +192,7 @@
  },
  {
   "id": "096e8ba2d3",
-  "text": "ran: B=http://127.0.0.1:8000/api/v1/agent-os/brain echo \"=== board priorities (should show mnemo frontier) ===\"; curl -s -m 10 $B/board 2>/dev/null | python -c \"import sys,json;d=json.load(sys.stdin);print…",
+  "text": "ran: B=http://127.0.0.1:8000/api/v1/agent-os/brain echo \"=== board priorities (should show inspeximus frontier) ===\"; curl -s -m 10 $B/board 2>/dev/null | python -c \"import sys,json;d=json.load(sys.stdin);print…",
   "tags": [
    "bash"
   ],
@@ -211,7 +211,7 @@
  },
  {
   "id": "fd6b923839",
-  "text": "..\\..\\.claude\\projects\\C--Users-Danculus-agora\\memory\\dungeon-off-mission-frontier-locked-to-mnemo.md :: current state -> --- name: dungeon-off-mission-frontier-locked-to-mnemo description: \"2026-07-18 dungeon audit + fix: after the roster 5->8 fix production RECOVERED (1 note/day on 07-13/14 -> 7/11/…",
+  "text": "..\\..\\.claude\\projects\\C--Users-Danculus-agora\\memory\\dungeon-off-mission-frontier-locked-to-inspeximus.md :: current state -> --- name: dungeon-off-mission-frontier-locked-to-inspeximus description: \"2026-07-18 dungeon audit + fix: after the roster 5->8 fix production RECOVERED (1 note/day on 07-13/14 -> 7/11/…",
   "tags": [
    "file",
    "edit"
@@ -226,12 +226,12 @@
   "status": "active",
   "links": [],
   "meta": {},
-  "key": "file:..\\..\\.claude\\projects\\C--Users-Danculus-agora\\memory\\dungeon-off-mission-frontier-locked-to-mnemo.md",
-  "object": "--- name: dungeon-off-mission-frontier-locked-to-mnemo description: \"2026-07-18 …"
+  "key": "file:..\\..\\.claude\\projects\\C--Users-Danculus-agora\\memory\\dungeon-off-mission-frontier-locked-to-inspeximus.md",
+  "object": "--- name: dungeon-off-mission-frontier-locked-to-inspeximus description: \"2026-07-18 …"
  },
  {
   "id": "4ff6b6e85e",
-  "text": "..\\..\\.claude\\projects\\C--Users-Danculus-agora\\memory\\MEMORY.md :: current state -> ## Projects / infra state (cont.) - [Dungeon off-mission â†’ frontier locked to mnemo](dungeon-off-mission-frontier-locked-to-mnemo.md) â€” 07-18: production recovered (18 notes/da…",
+  "text": "..\\..\\.claude\\projects\\C--Users-Danculus-agora\\memory\\MEMORY.md :: current state -> ## Projects / infra state (cont.) - [Dungeon off-mission â†’ frontier locked to inspeximus](dungeon-off-mission-frontier-locked-to-inspeximus.md) â€” 07-18: production recovered (18 notes/da…",
   "tags": [
    "file",
    "edit"
@@ -275,7 +275,7 @@
  },
  {
   "id": "2c59295376",
-  "text": "..\\..\\.claude\\projects\\C--Users-Danculus-agora\\memory\\locomo-zero-llm-multihop-bridge-killed.md :: current state -> **ACTION:** ship nothing here. Optionally document that mnemo's hybrid already helps multi-hop partial recall + recall_iterative for full â€” no code change survives the skeptic. D…",
+  "text": "..\\..\\.claude\\projects\\C--Users-Danculus-agora\\memory\\locomo-zero-llm-multihop-bridge-killed.md :: current state -> **ACTION:** ship nothing here. Optionally document that inspeximus's hybrid already helps multi-hop partial recall + recall_iterative for full â€” no code change survives the skeptic. D…",
   "tags": [
    "file",
    "edit"
@@ -291,11 +291,11 @@
   "links": [],
   "meta": {},
   "key": "file:..\\..\\.claude\\projects\\C--Users-Danculus-agora\\memory\\locomo-zero-llm-multihop-bridge-killed.md",
-  "object": "**ACTION:** ship nothing here. Optionally document that mnemo's hybrid already h…"
+  "object": "**ACTION:** ship nothing here. Optionally document that inspeximus's hybrid already h…"
  },
  {
   "id": "1abd46d484",
-  "text": "..\\..\\inspeximus-repo\\probes\\mnemo_rerank_hook_probe.py :: current state -> \"\"\"mnemo_rerank_hook_probe.py â€” recall(rerank=...) retrieve-then-rerank hook.  Verifies the plumbing (model-agnostic, mnemo imports no model): a caller-supplied `rerank(query, re…",
+  "text": "..\\..\\inspeximus-repo\\probes\\inspeximus_rerank_hook_probe.py :: current state -> \"\"\"inspeximus_rerank_hook_probe.py â€” recall(rerank=...) retrieve-then-rerank hook.  Verifies the plumbing (model-agnostic, inspeximus imports no model): a caller-supplied `rerank(query, re…",
   "tags": [
    "file",
    "edit"
@@ -310,8 +310,8 @@
   "status": "active",
   "links": [],
   "meta": {},
-  "key": "file:..\\..\\inspeximus-repo\\probes\\mnemo_rerank_hook_probe.py",
-  "object": "\"\"\"mnemo_rerank_hook_probe.py â€” recall(rerank=...) retrieve-then-rerank hook. …"
+  "key": "file:..\\..\\inspeximus-repo\\probes\\inspeximus_rerank_hook_probe.py",
+  "object": "\"\"\"inspeximus_rerank_hook_probe.py â€” recall(rerank=...) retrieve-then-rerank hook. …"
  },
  {
   "id": "315f7f3e39",
@@ -1632,7 +1632,7 @@
  },
  {
   "id": "92b884a7e8",
-  "text": "ran: cd \"C:/Users/Danculus/agora/server\" && ls -la .mnemo_brain.json .inspeximus_brain.json .mnemo_seeded.flag .inspeximus_seeded.flag 2>&1 | grep -v \"cannot access\" | awk '{print \"  \",$9,$5,\"bytes\"}'",
+  "text": "ran: cd \"C:/Users/Danculus/agora/server\" && ls -la .inspeximus_brain.json .inspeximus_brain.json .inspeximus_seeded.flag .inspeximus_seeded.flag 2>&1 | grep -v \"cannot access\" | awk '{print \"  \",$9,$5,\"bytes\"}'",
   "tags": [
    "bash"
   ],
@@ -1647,6 +1647,6 @@
   "links": [],
   "meta": {},
   "key": "cmd:59ea5a3cd0",
-  "object": "cd \"C:/Users/Danculus/agora/server\" && ls -la .mnemo_brain.j"
+  "object": "cd \"C:/Users/Danculus/agora/server\" && ls -la .inspeximus_brain.j"
  }
 ]

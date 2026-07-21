@@ -6,7 +6,7 @@ costs ~10 minutes, not a flagship post. This is the Phase-3 mechanism from the 2
 ## When an edition triggers (event-driven, NOT a forced calendar)
 
 Publish a new edition when ONE of these is true — never publish filler:
-1. A tracked system (mnemo, mem0, Graphiti, or any added) ships a version that MOVES a benchmark cell.
+1. A tracked system (inspeximus, mem0, Graphiti, or any added) ships a version that MOVES a benchmark cell.
 2. A new system is added (by us or via an external PR to github.com/DanceNitra/agent-memory-integrity).
 3. A new cell is added (a new integrity property is measured — e.g. laundered-lineage recovery, staleness).
 4. An external submission arrives (the highest-value trigger — someone else populated the leaderboard).
@@ -34,11 +34,11 @@ If none of these is true, there is no edition. A living index earns trust by onl
 - Cite the source (which probe / which submission) so it stays re-runnable.
 - Lead with the honest cell — if we lose or tie a cell, that edition says so first.
 - Competitor numbers: never on the page unless their SDK ran 0-error, or they self-submitted (then they own it).
-- OpenAI is dead: WE only grow mnemo cells for free (local/Ollama judge); competitors self-submit their own.
+- OpenAI is dead: WE only grow inspeximus cells for free (local/Ollama judge); competitors self-submit their own.
 
 ## Current state (Edition 1, 2026-07-12)
 
-- Systems: mnemo 0.7.19, mem0 2.0.11, Graphiti. Cells: value-obscuring revert, echo resurrection.
-- Numbers (gpt-4o-mini judge, n=20): revert mnemo 0.75 [0.53,0.89] / mem0 0.20 / Graphiti 0.00; echo = tie.
+- Systems: inspeximus 0.7.19, mem0 2.0.11, Graphiti. Cells: value-obscuring revert, echo resurrection.
+- Numbers (gpt-4o-mini judge, n=20): revert inspeximus 0.75 [0.53,0.89] / mem0 0.20 / Graphiti 0.00; echo = tie.
 - Source: benchmark repo canonical.json; harness research/probes/integrity_bench_{revert,echo}.py.
 - Hub: https://dancenitra.github.io/agora/public/integrity/

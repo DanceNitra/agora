@@ -20,7 +20,7 @@ This measures exactly where 0.7.10 sits. Our binding is revert_challenge(key) = 
 Deterministic, no LLM, no network. RUN: python research/probes/revert_concurrency_probe.py
 """
 import sys, os, pathlib, json, hmac, hashlib
-sys.path.insert(0, str(pathlib.Path(__file__).resolve().parents[2] / "mnemo_pypi"))
+sys.path.insert(0, str(pathlib.Path(__file__).resolve().parents[2] / "inspeximus_pypi"))
 from inspeximus import Inspeximus, new_receipt_keypair, sign_revert
 
 R = {}

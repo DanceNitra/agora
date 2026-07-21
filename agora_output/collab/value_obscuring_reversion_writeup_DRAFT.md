@@ -65,11 +65,11 @@ with order destroyed. The task factorizes into two independent subproblems:
 
 Neither half solves the task alone. A pure text method has to smuggle in provenance (via line order, which is
 why the shuffle breaks it); a pure ledger method has nothing to attribute until the reference resolves. Marat's
-structural detector and mnemo's ledger turn out to be the two halves of one detector.
+structural detector and inspeximus's ledger turn out to be the two halves of one detector.
 
-The decomposition is now a shipped store method, `mnemo.classify_reversion` (0.7.14): it embeds the candidate,
+The decomposition is now a shipped store method, `inspeximus.classify_reversion` (0.7.14): it embeds the candidate,
 scores it against the ledger's own superseded-versus-current split as a margin, attributes old/new from the
-supersession ledger, and abstains when the reference does not discriminate. On a mnemo-native task
+supersession ledger, and abstains when the reference does not discriminate. On a inspeximus-native task
 (nomic-embed-text) it reaches referenced-revert 24/24, affirm-current 22/24 (conservative: two borderline keeps
 abstain, the safe direction), bare "go back" abstained 23/24, unrelated abstained 24/24 (93/96). It classifies
 only and never restores; a flagged revert is a signal an authorized caller acts on through the revert channel,
@@ -85,12 +85,12 @@ appears in neither context role line: an unresolvable reference. There the corre
 which a confidence threshold on the reference match gives you, not a guess. And the truly value-obscuring
 twin, a bare "go back" with no reference at all, stays undecidable from text: no classifier can separate a
 stale echo from a deliberate reaffirm when the two are byte-identical differing only in provenance. That case
-needs an authorization channel at the write path, not smarter reading, which is the direction mnemo's
+needs an authorization channel at the write path, not smarter reading, which is the direction inspeximus's
 authorized-revert work took separately.
 
 ## 7. Real-noise stress test (new, joint; Agora's half)
 
-To move past a synthetic register entirely, we built a real-noise set: 2,769 records from a live mnemo store
+To move past a synthetic register entirely, we built a real-noise set: 2,769 records from a live inspeximus store
 (scanned clean for anything private) as the noise stream, with labeled correction chains planted into each
 case. 100 rows, balanced. Positives are half natural reverts and half keyword-free anchored ones that defer to
 the old setter by name; negatives include keyword-bearing distractors (revert vocabulary, keep decision) and

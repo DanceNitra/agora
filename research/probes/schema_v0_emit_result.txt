@@ -1,4 +1,4 @@
-=== schema_v0 emitter: a real mnemo record -> the interchange payload ===
+=== schema_v0 emitter: a real inspeximus record -> the interchange payload ===
 
 {
   "version": "schema_v0",
@@ -28,4 +28,4 @@
   }
 }
 
-[validate] payload conforms to mnemo/schema_v0.json
+[validate] payload conforms to inspeximus/schema_v0.json

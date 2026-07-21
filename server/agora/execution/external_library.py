@@ -5,11 +5,11 @@ publish. Neither surfaces the issue somebody filed yesterday asking for exactly 
 Reddit thread where three people compare the libraries we compete with.
 
 So: harvest GitHub and Reddit continuously against a rotating query bank, keep everything (deduped) in
-a mnemo store, and expose search over it. Items accumulate — the point is not a report that scrolls
+a inspeximus store, and expose search over it. Items accumulate — the point is not a report that scrolls
 past, it is a corpus that gets deeper the longer it runs and that we can interrogate later
 ("who has asked for erasure?", "what did people say about mem0 in June?").
 
-Stored in mnemo on purpose: it is our own product doing the job it exists for, it deduplicates by key,
+Stored in inspeximus on purpose: it is our own product doing the job it exists for, it deduplicates by key,
 and a re-harvest of the same thread supersedes rather than duplicates.
 """
 from __future__ import annotations
@@ -50,7 +50,7 @@ REDDIT = [
 ]
 
 
-def _mnemo():
+def _inspeximus():
     try:
         from inspeximus import Inspeximus
     except ImportError:                       # pre-1.25 install still under the old name
@@ -121,7 +121,7 @@ def harvest(batch: int = 6) -> dict:
     """Run one rotating slice of the query bank. Designed to be called on a loop, not once."""
     st = _state()
     cur = int(st.get("cursor", 0))
-    m = _mnemo()
+    m = _inspeximus()
     added = {"gh_issues": 0, "gh_prs": 0, "reddit": 0}
     touched = []
 
@@ -185,7 +185,7 @@ def harvest(batch: int = 6) -> dict:
 
 def search(q: str, k: int = 12) -> list:
     """Dig into what has accumulated. This is the point of keeping it rather than reporting it."""
-    m = _mnemo()
+    m = _inspeximus()
     out = []
     for h in (m.recall(q, k=k, mode="lexical", reinforce=False) or []):
         meta = h.get("meta") or {}
@@ -197,7 +197,7 @@ def search(q: str, k: int = 12) -> list:
 
 
 def stats() -> dict:
-    m = _mnemo()
+    m = _inspeximus()
     by = {}
     repos = {}
     for r in m.items:
@@ -239,7 +239,7 @@ def map_external(min_repos: int = 2) -> dict:
     Returns buckets sorted by how many DISTINCT projects raise them — one loud repo is a customer,
     the same need in six unrelated repos is a market.
     """
-    m = _mnemo()
+    m = _inspeximus()
     buckets: dict = {k: {"items": [], "repos": set()} for k in AXIS}
     for r in m.items:
         meta = r.get("meta") or {}

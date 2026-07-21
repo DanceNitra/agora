@@ -1,11 +1,11 @@
-"""recall_recipe_locomo.py — the tuned recall recipe that puts mnemo in the top tier on LOCOMO.
+"""recall_recipe_locomo.py — the tuned recall recipe that puts inspeximus in the top tier on LOCOMO.
 
-Out of the box, mnemo recall with NO embedder is lexical (token overlap) — it misses paraphrased questions
+Out of the box, inspeximus recall with NO embedder is lexical (token overlap) — it misses paraphrased questions
 ("When did Caroline go to the support group?" vs a turn "I went to a LGBTQ support group yesterday"). Three
 BUILT-IN levers close that gap (measured: LOCOMO QA 0.50 -> 0.82 on a 250-question, 10-conversation sample,
 LLM-answered/judged; retrieval "fact not in context" dropped from ~30% to ~6%):
 
-  1. an EMBEDDER  -> mnemo's lexical+semantic hybrid recall (Reciprocal Rank Fusion) + anisotropy centering
+  1. an EMBEDDER  -> inspeximus's lexical+semantic hybrid recall (Reciprocal Rank Fusion) + anisotropy centering
   2. mode="hybrid" (forces the fusion; 'auto' also switches to it once the store grows past semantic_threshold)
   3. a SPEAKER/ENTITY prefilter via prefer={...} -> a soft, trust-weighted boost for records whose metadata
      matches a hint parsed from the query (the single biggest LOCOMO lever). prefer is SOFT (it re-ranks); use
@@ -14,7 +14,7 @@ LLM-answered/judged; retrieval "fact not in context" dropped from ~30% to ~6%):
 None of this puts an LLM on the write path — recall stays deterministic and free; the embedder is the only
 dependency, and any text->vector function works.
 
-    pip install agora-mnemo
+    pip install inspeximus
     # embedder here = local Ollama nomic-embed-text; swap for OpenAI, sentence-transformers, or your own.
 """
 import json, urllib.request

@@ -46,7 +46,7 @@ Rules that make it a *valuable* reply, not filler:
 ## 5 · Close + feed the system
 - Mark the inbox task done: `POST /brain/claude-inbox/done {id, result}`.
 - If the exchange produced a real finding, feed it onward: a Crucible/Lab note, the thesis, or the
-  product (e.g. a memory finding → `mnemo` design doc). The loop is: reply → measure → publish →
+  product (e.g. a memory finding → `inspeximus` design doc). The loop is: reply → measure → publish →
   product, each step reinforcing the others.
 
 ## Gotchas

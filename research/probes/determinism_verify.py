@@ -3,7 +3,7 @@
 The earlier determinism_gap run showed mem0 100% nondeterministic, but it was CONTAMINATED by cloud 429s (later
 runs emptied). This re-measures cleanly on a fast local model (qwen2.5:7b, no thinking) at temp=0 (the HARDEST
 case for the claim — if mem0 is deterministic at temp=0 the '100%' was pure artifact) AND temp=0.7 (mem0's
-realistic default). mnemo (deterministic core, no LLM) is the 0% baseline. Reports whatever it is.
+realistic default). inspeximus (deterministic core, no LLM) is the 0% baseline. Reports whatever it is.
 
 RUN:  python research/probes/determinism_verify.py --n 10 --runs 3
 """
@@ -11,8 +11,8 @@ import os, sys, json, time, argparse, shutil
 HERE = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, os.path.join(HERE, "mab_official"))
 sys.path.insert(0, os.path.join(HERE, "..", ".."))
-sys.path.insert(0, os.path.join(HERE, "..", "..", "mnemo_pypi"))
-import run_mnemo_official as H
+sys.path.insert(0, os.path.join(HERE, "..", "..", "inspeximus_pypi"))
+import run_inspeximus_official as H
 from inspeximus import Inspeximus
 
 MODEL = os.environ.get("VERIFY_MODEL", "gpt-4o")
@@ -76,7 +76,7 @@ def mem0_run(ps, temp, run):
     return out
 
 
-def mnemo_run(ps):
+def inspeximus_run(ps):
     out = {}
     for (k, A, B) in ps:
         m = Inspeximus(path=None)
@@ -101,10 +101,10 @@ def main():
     ps = pairs(a.n)
     print(f"DETERMINISM VERIFY (LOCAL {MODEL}, no rate limits) · n={len(ps)} · runs={a.runs}", flush=True)
     out = {}
-    # mnemo baseline (deterministic, instant)
-    mr = [mnemo_run(ps) for _ in range(a.runs)]
-    out["mnemo"] = analyze(mr, ps)
-    print(f"  mnemo:            nondeterminism {out['mnemo']['nondeterminism_rate']:.0%}", flush=True)
+    # inspeximus baseline (deterministic, instant)
+    mr = [inspeximus_run(ps) for _ in range(a.runs)]
+    out["inspeximus"] = analyze(mr, ps)
+    print(f"  inspeximus:            nondeterminism {out['inspeximus']['nondeterminism_rate']:.0%}", flush=True)
     # mem0 at temp=0 (hardest case) and temp=0.7 (realistic)
     for temp in (0.0, 0.7):
         runs = []

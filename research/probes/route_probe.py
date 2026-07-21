@@ -3,7 +3,7 @@
 Re-runs the full 148-row fixture from intent_tagger_router_probe (assert / correct / value-obscuring +
 named + original reverts / byte-identical echo-vs-reaffirm twins incl. the forged-context adversarial
 class / innocent temporal chatter) — but every decision is made by the SHIPPED store.route() on the
-mnemo_pypi package layout, exactly as an installed user would call it. Expected to reproduce the probe's
+inspeximus_pypi package layout, exactly as an installed user would call it. Expected to reproduce the probe's
 measured picture: marked classes 1.00 end-to-end under every policy; the unmarked twins land on the
 documented policy frontier (safe 1.00/0.00, context 1.00/1.00 honest twins but forged-context 0.00,
 trusting 0.00/1.00).
@@ -12,7 +12,7 @@ RUN: python research/probes/route_probe.py
 """
 import sys, os, json, pathlib, importlib.util
 
-sys.path.insert(0, str(pathlib.Path(__file__).resolve().parents[2] / "mnemo_pypi"))
+sys.path.insert(0, str(pathlib.Path(__file__).resolve().parents[2] / "inspeximus_pypi"))
 from inspeximus import Inspeximus  # the SHIPPED layout
 
 _spec = importlib.util.spec_from_file_location(

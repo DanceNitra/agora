@@ -1,7 +1,7 @@
 [
  {
   "qid": "c0q0",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 2,
   "question": "When did Caroline go to the LGBTQ support group?",
   "gold": "7 May 2023",
@@ -9,7 +9,7 @@
  },
  {
   "qid": "c0q1",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 2,
   "question": "When did Melanie paint a sunrise?",
   "gold": "2022",
@@ -17,7 +17,7 @@
  },
  {
   "qid": "c0q2",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 3,
   "question": "What fields would Caroline be likely to pursue in her educaton?",
   "gold": "Psychology, counseling certification",
@@ -25,7 +25,7 @@
  },
  {
   "qid": "c0q3",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 1,
   "question": "What did Caroline research?",
   "gold": "Adoption agencies",
@@ -33,7 +33,7 @@
  },
  {
   "qid": "c0q4",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 1,
   "question": "What is Caroline's identity?",
   "gold": "Transgender woman",
@@ -41,7 +41,7 @@
  },
  {
   "qid": "c0q5",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 2,
   "question": "When did Melanie run a charity race?",
   "gold": "The sunday before 25 May 2023",
@@ -49,7 +49,7 @@
  },
  {
   "qid": "c0q6",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 2,
   "question": "When is Melanie planning on going camping?",
   "gold": "June 2023",
@@ -57,7 +57,7 @@
  },
  {
   "qid": "c0q7",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 1,
   "question": "What is Caroline's relationship status?",
   "gold": "Single",
@@ -65,7 +65,7 @@
  },
  {
   "qid": "c0q8",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 2,
   "question": "When did Caroline give a speech at a school?",
   "gold": "The week before 9 June 2023",
@@ -73,7 +73,7 @@
  },
  {
   "qid": "c0q9",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 2,
   "question": "When did Caroline meet up with her friends, family, and mentors?",
   "gold": "The week before 9 June 2023",
@@ -81,7 +81,7 @@
  },
  {
   "qid": "c0q10",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 2,
   "question": "How long has Caroline had her current group of friends for?",
   "gold": "4 years",
@@ -89,7 +89,7 @@
  },
  {
   "qid": "c0q11",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 1,
   "question": "Where did Caroline move from 4 years ago?",
   "gold": "Sweden",
@@ -97,7 +97,7 @@
  },
  {
   "qid": "c0q12",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 2,
   "question": "How long ago was Caroline's 18th birthday?",
   "gold": "10 years ago",
@@ -105,7 +105,7 @@
  },
  {
   "qid": "c0q13",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 1,
   "question": "What career path has Caroline decided to persue?",
   "gold": "counseling or mental health for Transgender people",

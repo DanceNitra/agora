@@ -8,7 +8,7 @@ claim this is a real defense, not an overclaim:
       the influence layer instead of retrieval).
   (2) ATTACKER-CORROBORATION LADDER: the gate isn't "poison impossible", it's "poison must EARN
       corroboration". Measure the cost ladder: 1 poison (free) -> filtered; 2 poison same source
-      (cheap) -> does mnemo's distinct-source canonicalization still filter it?; 2 poison with distinct
+      (cheap) -> does inspeximus's distinct-source canonicalization still filter it?; 2 poison with distinct
       forged sources (costlier) -> passes. This quantifies exactly how much the gate RAISES attacker cost.
   (3) SCALE: the STORM/stress-claim skeptic's killer point. Does the raw retrieval hijack survive as the
       corpus grows 60 -> 10k (or does it collapse, making the whole thing a toy artifact)? And does the

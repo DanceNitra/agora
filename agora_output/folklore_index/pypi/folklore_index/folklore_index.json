@@ -757,7 +757,7 @@
    "claim": "Cosine similarity cannot distinguish a superseded fact from its replacement (the 'supersession blind spot'); a deterministic (subject, relation, object) ledger removes stale-fact recall.",
    "source": "Temporal Validity in Retrieval Memory: Eliminating Stale-Fact Errors (Yadav, MemStrata, arXiv:2606.26511)",
    "verdict": "REPRODUCED",
-   "note": "Replicated on local nomic (24 subject-relation-object facts, mean-centered): the cosine 'is-this-a-supersession' classifier scores AUROC 0.613 (chance 0.5; Yadav ~0.59) -- a contradiction is often MORE embedding-similar to the original than a genuine rephrase (10/24 cases). A pure-cosine top-1 store served the stale value 41.7% of the time; a deterministic (subject,relation,object) supersession key drove that to 0% (shipped in mnemo v0.2.0). Falsifier: if the key did not cut stale below cosine it would be useless -- it did. Honest scope: synthetic, 24 facts, characterizes the mechanism, not a product benchmark.",
+   "note": "Replicated on local nomic (24 subject-relation-object facts, mean-centered): the cosine 'is-this-a-supersession' classifier scores AUROC 0.613 (chance 0.5; Yadav ~0.59) -- a contradiction is often MORE embedding-similar to the original than a genuine rephrase (10/24 cases). A pure-cosine top-1 store served the stale value 41.7% of the time; a deterministic (subject,relation,object) supersession key drove that to 0% (shipped in inspeximus v0.2.0). Falsifier: if the key did not cut stale below cosine it would be useless -- it did. Honest scope: synthetic, 24 facts, characterizes the mechanism, not a product benchmark.",
    "lab_file": "",
    "code_url": "",
    "code_resolves": false,

@@ -1,5 +1,5 @@
 """
-mnemo — a memory layer for AI agents.  (brand: Mnemosyne)
+inspeximus — a memory layer for AI agents.  (brand: Inspeximus)
 
 The memory that runs an autonomous research OS over ~5,800 notes, distilled to a single file with
 no required dependencies. It does the four things agent memory actually needs, the way that held up
@@ -25,7 +25,7 @@ Design rules that are not optional (each one cost us to learn):
     is statistical noise; cohorts are where the signal lives.
   • Contradictions are flagged for review, not auto-resolved. Silent rewrites destroy trust.
 
-Bring your own embedder for semantic recall (any text->vector fn); with none, mnemo falls back to a
+Bring your own embedder for semantic recall (any text->vector fn); with none, inspeximus falls back to a
 lexical token overlap so it runs anywhere, today.
 
     from inspeximus import Inspeximus
@@ -51,7 +51,7 @@ import uuid
 from pathlib import Path
 
 try:                                  # OPTIONAL: numpy only ACCELERATES semantic recall at scale.
-    import numpy as _np               # mnemo still runs (pure-Python cosine) with no numpy installed.
+    import numpy as _np               # inspeximus still runs (pure-Python cosine) with no numpy installed.
 except Exception:
     _np = None
 
@@ -84,12 +84,12 @@ except Exception:
 # was persisted UNENCRYPTED before a key was set. It SUPPORTS a GDPR Art.17 erasure workflow; it does not by
 # itself "guarantee compliance". Prior art credited: SQLCipher (embedded-DB at-rest AES), NIST SP 800-88
 # (cryptographic erasure), the `age`/Fernet file-encryption model (whose format we deliberately diverge from).
-_MNEMO_ENC_MAGIC = b"MNMO\x01"        # versioned so the on-disk format can migrate
+_INSPEXIMUS_ENC_MAGIC = b"MNMO\x01"        # versioned so the on-disk format can migrate
 
 
 def new_encryption_key() -> bytes:
     """A fresh random 32-byte (AES-256) key for Inspeximus(encrypt_key=...). Store it yourself (a secrets manager /
-    OS keystore); mnemo never persists the key. Losing it = the store is unrecoverable (that IS crypto-shred)."""
+    OS keystore); inspeximus never persists the key. Losing it = the store is unrecoverable (that IS crypto-shred)."""
     return os.urandom(32)
 
 
@@ -104,15 +104,15 @@ def _encrypt_blob(key: bytes, plaintext: bytes, salt: bytes) -> bytes:
     if not _HAVE_AEAD:
         raise RuntimeError("encryption needs the `cryptography` package (pip install cryptography)")
     nonce = os.urandom(12)
-    header = _MNEMO_ENC_MAGIC + salt + nonce
+    header = _INSPEXIMUS_ENC_MAGIC + salt + nonce
     ct = _AESGCM(key).encrypt(nonce, plaintext, header)   # header authenticated as AAD
     return header + ct
 
 
 def _parse_enc_header(blob: bytes):
-    """-> (salt, nonce, header, ciphertext) or raise ValueError if not a mnemo-encrypted blob."""
-    if blob[:5] != _MNEMO_ENC_MAGIC:
-        raise ValueError("not a mnemo-encrypted store")
+    """-> (salt, nonce, header, ciphertext) or raise ValueError if not a inspeximus-encrypted blob."""
+    if blob[:5] != _INSPEXIMUS_ENC_MAGIC:
+        raise ValueError("not a inspeximus-encrypted store")
     salt, nonce = blob[5:21], blob[21:33]
     return salt, nonce, blob[:33], blob[33:]
 
@@ -135,7 +135,7 @@ def _sha256_hex(b: bytes) -> str:
 
 
 def new_receipt_keypair():
-    """Return (private_key_hex, public_key_hex) for signing mnemo write receipts. Needs `cryptography`."""
+    """Return (private_key_hex, public_key_hex) for signing inspeximus write receipts. Needs `cryptography`."""
     if not _HAVE_ED:
         raise RuntimeError("signing write receipts needs the `cryptography` package (pip install cryptography)")
     sk = _Ed25519SK.generate()
@@ -175,7 +175,7 @@ def attest(text: str, source_sk_hex: str, source_doc=None) -> str:
 # --- universal-executor detection (1.2.0) -------------------------------------------------------------------
 # WHY: a per-tool reversibility label is unsound for VERB-POLYMORPHIC universal executors -- a shell / eval /
 # arbitrary-SQL / generic-HTTP tool whose EFFECT is set by a free-form argument, so the same tool is both
-# 'ls' (reversible) and 'rm -rf' (irreversible). MEASURED (mnemo lab, ToolEmu 330 tools, 2 labelers): tool
+# 'ls' (reversible) and 'rm -rf' (irreversible). MEASURED (inspeximus lab, ToolEmu 330 tools, 2 labelers): tool
 # reversibility is ~93% decidable from the signature (Cohen's kappa 0.82) but the ~7% undecidable residual is
 # exactly this class, and its realized harm-reach is ENVIRONMENT-conditional -- an isolated executor reaches
 # ~0% of external/API irreversible harms but a networked, ambiently-credentialed one reaches ~0.66. So the
@@ -183,7 +183,7 @@ def attest(text: str, source_sk_hex: str, source_doc=None) -> str:
 # CONTAINMENT, not a per-tool reversibility flag. This detector + the spend_irreversible(tool=, contained=)
 # gate make that undecidability EXPLICIT: an uncontained universal executor is never silently treated as
 # reversible. Honest bound: heuristic name/param match (not a proof), and `contained` is a caller ASSERTION
-# mnemo cannot verify -- it forces the declaration, it does not enforce the sandbox.
+# inspeximus cannot verify -- it forces the declaration, it does not enforce the sandbox.
 _EXECUTOR_NAME_HINTS = ("execute", "exec", "eval", "shell", "terminal", "bash", "runcommand", "run_command",
                         "runcode", "run_code", "runscript", "run_script", "runquery", "run_query", "runsql",
                         "run_sql", "command", "script", "invoke", "httprequest", "http_request", "sendrequest",
@@ -329,7 +329,7 @@ def sign_erasure(principal_sk_hex: str, subject: str, request_id) -> str:
 def verify_erasure_certificate(cert: dict, store_path: str | None = None,
                                store_items: list | None = None,
                                expected_pubkey: str | None = None) -> dict:
-    """Independently verify a mnemo erasure certificate (from Inspeximus.erasure_certificate()). The AUDITOR's check:
+    """Independently verify a inspeximus erasure certificate (from Inspeximus.erasure_certificate()). The AUDITOR's check:
     needs NO private key and does NOT trust the operator. Confirms, in order:
       1. tombstone hash-chain re-derives from genesis (append-only, untampered);
       2. every tombstone Ed25519 signature verifies against the certificate's pubkey (pinned to
@@ -391,7 +391,7 @@ def verify_erasure_certificate(cert: dict, store_path: str | None = None,
     if store_items is None and store_path:
         try:
             raw = Path(store_path).read_bytes()
-            if raw[:5] == _MNEMO_ENC_MAGIC:
+            if raw[:5] == _INSPEXIMUS_ENC_MAGIC:
                 problems.append("store is encrypted — supply decrypted store_items to check id-absence, "
                                 "or rely on shred() (crypto-erasure) for the encrypted case")
             else:
@@ -492,7 +492,7 @@ class Inspeximus:
         #   - forget_subject()/forget_pii()/pii_report() only ever touch this tenant's rows.
         # An UNBOUND store (tenant=None) is the admin/migration view: it sees + supersedes across everything
         # (legacy behavior) and its writes carry no tenant tag, so they are invisible to any tenant-bound store.
-        # HONEST SCOPE: this isolates within ONE mnemo store (logical multi-tenancy — the right model when many
+        # HONEST SCOPE: this isolates within ONE inspeximus store (logical multi-tenancy — the right model when many
         # agents share a process); it is NOT a substitute for separate stores/encryption keys when tenants are
         # mutually hostile and the process itself is the trust boundary. Mixing tenant-tagged and untagged writes
         # in one store is a migration state, not a steady one. Reversible: tenant=None. Receipt:
@@ -508,7 +508,7 @@ class Inspeximus:
         self.pii_detect = bool(pii_detect)
         # Bounded working set (OPT-IN, default None = unbounded append-only, byte-identical legacy).
         # When set, remember() hard-evicts the lowest-value ACTIVE memories past `capacity` using the
-        # verified two-tier policy (value-protected + recency-aged, Lab 29992a). Lets mnemo run in
+        # verified two-tier policy (value-protected + recency-aged, Lab 29992a). Lets inspeximus run in
         # production without unbounded growth — a gap vs bounded competitors (mem0/Letta).
         self.capacity = capacity
         # IDENTITY-CONFIDENCE FORK THRESHOLD (record-linkage clerical-review boundary / MDM steward-queue cut,
@@ -592,11 +592,11 @@ class Inspeximus:
         # of the budget by RAW value (recency-immune) and fill the REST by EFFECTIVE (decay-weighted)
         # value — so a freshly-useful memory isn't evicted by a stale high-value one. A pure top-N-by-raw
         # prune keeps old high-value items forever and starves a drifting working set. MEASURED on a
-        # simulation of mnemo's own value-accrual + per-type decay: locality served-hit 0.22 -> 0.78,
+        # simulation of inspeximus's own value-accrual + per-type decay: locality served-hit 0.22 -> 0.78,
         # neutral on rare-critical + poison-flood. Reversible: two_tier_keep=False -> legacy top-N-by-raw.
         self.two_tier_keep = True
         self.protect_frac = 0.30
-        # Fast-novelty channel guard (OPT-IN, default OFF). mnemo's state-toggle supersedes a standing
+        # Fast-novelty channel guard (OPT-IN, default OFF). inspeximus's state-toggle supersedes a standing
         # fact the moment a single similar+contradicting memory arrives — correct + fast for a TRUSTED
         # single source (configs/preferences: latest assertion wins), but a single-shot poison flip
         # (AgentPoison / MINJA) can then override a true fact. With this ON, a contradiction supersedes
@@ -623,7 +623,7 @@ class Inspeximus:
         self.warrant_authorities = None
         # supersede_requires_corroboration this needs NO external credit(): it adopts a genuine change purely
         # from repeated independent assertions, where the corroboration guard would lag one forever. MEASURED
-        # (lab fea933, mnemo's real consolidate() path): isolated-poison false-supersede 1 -> 0 while a
+        # (lab fea933, inspeximus's real consolidate() path): isolated-poison false-supersede 1 -> 0 while a
         # 3-record sustained change is still adopted; it Pareto-dominates both the naive (poison-fooled) and
         # corroboration-only (change-lagging) rules — see the adaptation-corruption coupling (a classical
         # quickest-change-detection tradeoff; lab f490d8).
@@ -685,7 +685,7 @@ class Inspeximus:
         # empty set. Receipt: research/probes/seed_anchored_trust_probe.py.
         self.trust_seeds: set = set()
         self.trust_hops: int = 1
-        # WRITE-PATH VALUE EXTRACTOR (OPT-IN, default None -> OFF -> zero behavior change). mnemo's whole
+        # WRITE-PATH VALUE EXTRACTOR (OPT-IN, default None -> OFF -> zero behavior change). inspeximus's whole
         # governance layer keys on the supersession (key, object): keyed supersession, echo_guard, check_conflict,
         # forget_subject. But the caller has to supply key=/object= on every remember(), which the free-text
         # adapters (a conversation Session, a chat turn) don't do -- so supersession never fires on their writes.
@@ -740,11 +740,11 @@ class Inspeximus:
         self._dirty = False
         # ENCRYPTION-AT-REST (OPT-IN, default None -> plaintext JSON, byte-identical legacy). encrypt_key is a
         # raw 32-byte AES-256 key (from new_encryption_key()); encrypt_passphrase is stretched with scrypt.
-        # mnemo NEVER persists the key/passphrase — you hold it; lose it and the store is unrecoverable (that IS
+        # inspeximus NEVER persists the key/passphrase — you hold it; lose it and the store is unrecoverable (that IS
         # crypto-shred). See the module-level note for the honest threat model + shred(). The key is resolved
         # lazily against the on-disk salt so an existing encrypted store reloads with the same passphrase.
         if encrypt_key is not None and (not isinstance(encrypt_key, (bytes, bytearray)) or len(encrypt_key) != 32):
-            raise ValueError("encrypt_key must be exactly 32 bytes (use mnemo.new_encryption_key())")
+            raise ValueError("encrypt_key must be exactly 32 bytes (use inspeximus.new_encryption_key())")
         self._enc_rawkey = bytes(encrypt_key) if encrypt_key is not None else None
         self._enc_passphrase = encrypt_passphrase
         self._enc_salt = None                    # filled from the file header on load, or minted on first save
@@ -753,7 +753,7 @@ class Inspeximus:
             raise RuntimeError("encryption needs the `cryptography` package (pip install cryptography)")
         if self.path and self.path.exists():
             raw = self.path.read_bytes()
-            if raw[:5] == _MNEMO_ENC_MAGIC:                           # encrypted store -> decrypt or FAIL LOUD
+            if raw[:5] == _INSPEXIMUS_ENC_MAGIC:                           # encrypted store -> decrypt or FAIL LOUD
                 if not self._encrypted:
                     raise ValueError("store is encrypted; pass encrypt_key= or encrypt_passphrase= to open it")
                 self._enc_salt = raw[5:21]                            # reuse the store's salt (passphrase re-derivation)
@@ -789,7 +789,7 @@ class Inspeximus:
             _stale = [r for r in self.items if r.get("vec") and r.get("text") is not None]
             if _prev is not None and _prev != _cur and self.embed is not None and _stale:
                 try:
-                    _cap = int(os.environ.get("MNEMO_REALIGN_MAX", "256"))
+                    _cap = int(os.environ.get("INSPEXIMUS_REALIGN_MAX", "256"))
                 except Exception:
                     _cap = 256
                 if len(_stale) > _cap:
@@ -797,14 +797,14 @@ class Inspeximus:
                     # vec degrades that record to lexical recall and is re-embedded on its next write; a
                     # synchronous re-embed of a large store on the load path would hang the caller for
                     # minutes-to-hours (and every hook-style short-lived process would pay it again).
-                    sys.stderr.write(f"[mnemo] embed recipe changed ({_prev!r} -> {_cur!r}); {len(_stale)} persisted "
-                                     f"vectors exceed MNEMO_REALIGN_MAX={_cap} -> dropping them (recall degrades to "
+                    sys.stderr.write(f"[inspeximus] embed recipe changed ({_prev!r} -> {_cur!r}); {len(_stale)} persisted "
+                                     f"vectors exceed INSPEXIMUS_REALIGN_MAX={_cap} -> dropping them (recall degrades to "
                                      f"lexical for those records; each is re-embedded on its next write). Rebuild "
-                                     f"the space deliberately with reembed() / `mnemo reembed`, or raise the cap.\n")
+                                     f"the space deliberately with reembed() / `inspeximus reembed`, or raise the cap.\n")
                     for r in _stale:
                         r["vec"] = None
                 else:
-                    sys.stderr.write(f"[mnemo] embed recipe changed ({_prev!r} -> {_cur!r}); re-embedding "
+                    sys.stderr.write(f"[inspeximus] embed recipe changed ({_prev!r} -> {_cur!r}); re-embedding "
                                      f"{len(_stale)} persisted vectors to realign the space\n")
                     for r in _stale:
                         try:
@@ -831,7 +831,7 @@ class Inspeximus:
         # derived), a UTC ts, and an opaque caller request_id — and NOTHING derived from the content (a hash of PII
         # is still PII, EDPB; so no content hash lands here). verify_writes() then treats a tombstoned missing
         # record as ACCOUNTED-FOR (chain intact, erased at T), while a record missing WITHOUT a tombstone still
-        # flags as out-of-band tampering. HONEST SCOPE: this proves the ACT of deletion within THIS mnemo store
+        # flags as out-of-band tampering. HONEST SCOPE: this proves the ACT of deletion within THIS inspeximus store
         # only (not the app's vector store / logs / backups), it is NOT a compliance guarantee, and the signature
         # is load-bearing only against a party OTHER than the key holder (an operator who holds receipt_key can
         # forge tombstones too). Prior art credited: crypto-shredding, Cassandra tombstones, Art.30 erasure logs,
@@ -1017,7 +1017,7 @@ class Inspeximus:
         if reaffirm and (self.revert_authority is not None or self.revert_pubkey is not None)                 and capability is not _SANCTIONED and not self._revert_authorized(key, capability):
             raise PermissionError("reaffirm/revert requires a valid capability (revert authority is set)")
         # ORIGIN ATTESTATION (OPT-IN): bind this claim to a source's VERIFIED KEY. attestation is
-        # (pubkey_hex, sig_hex) or {"pubkey":..., "sig":...}; the signature (from mnemo.attest(text, sk,
+        # (pubkey_hex, sig_hex) or {"pubkey":..., "sig":...}; the signature (from inspeximus.attest(text, sk,
         # source_doc)) must verify over the same claim+canonical-source message, else the write is REJECTED
         # (a forged attestation is loud, not silently dropped). On success the record carries attested_key,
         # which strict_corroboration counts distinct instances of — so manufactured independence costs a real
@@ -1444,9 +1444,9 @@ class Inspeximus:
         kept in meta for retrieval.
 
         `topic` (recommended) becomes a deterministic supersession key `decision::<topic>` — so a NEW decision on
-        the same topic RETIRES the old one (mnemo's keyed supersession: recall always returns the CURRENT decision,
+        the same topic RETIRES the old one (inspeximus's keyed supersession: recall always returns the CURRENT decision,
         the reversal is a ledgered/attributable event, and `revert('decision::<topic>')` restores the prior one).
-        This is mnemo's integrity moat applied to decisions — something an LLM-extracted fact store cannot do:
+        This is inspeximus's integrity moat applied to decisions — something an LLM-extracted fact store cannot do:
         decisions stay current, correctable, revertible, and auditable, with NO LLM and NO similarity guesswork.
 
         This is the DETERMINISTIC half of decision capture (the caller/agent states the decision). The OPTIONAL
@@ -1467,9 +1467,9 @@ class Inspeximus:
                              meta=md, capability=capability)
 
     # The extraction contract for distill_and_remember (the OPTIONAL LLM capture half). A caller's distiller feeds
-    # this prompt + the raw text to any LLM and returns the parsed JSON list. mnemo owns the STRUCTURE (extract ->
+    # this prompt + the raw text to any LLM and returns the parsed JSON list. inspeximus owns the STRUCTURE (extract ->
     # remember with keyed supersession) + this spec; the LLM only proposes what to keep. Analogous to mem0's
-    # FACT_RETRIEVAL_PROMPT, but the distilled items land in mnemo's deterministic, correctable, revertible store.
+    # FACT_RETRIEVAL_PROMPT, but the distilled items land in inspeximus's deterministic, correctable, revertible store.
     DISTILL_PROMPT = (
         "You distill a conversation/transcript into the few memories worth keeping. Extract ONLY durable, "
         "reusable items; drop chit-chat, transient state, and anything already obvious. Return a JSON object "
@@ -1500,7 +1500,7 @@ class Inspeximus:
                              require_support: bool = True) -> dict:
         """OPTIONAL LLM capture: turn a raw conversation/transcript into the few memories worth keeping — the
         auto-capture-what-matters that a raw event log misses and that mem0/Zep do with an LLM on the write path.
-        mnemo stays zero-dependency/zero-LLM in its CORE: YOU inject `distiller`, a callable `distiller(prompt, text)
+        inspeximus stays zero-dependency/zero-LLM in its CORE: YOU inject `distiller`, a callable `distiller(prompt, text)
         -> str|dict|list` that runs any LLM (or a subagent) with `Inspeximus.DISTILL_PROMPT` and returns the JSON (a
         raw string is parsed here; a dict/list is accepted directly). Each extracted item is then stored
         DETERMINISTICALLY: a `decision` via remember_decision() (durable, with `topic`-keyed supersession + revert),
@@ -1742,7 +1742,7 @@ class Inspeximus:
     def forget(self, ids=None, where=None, redact_links: bool = True,
                request_id: str | None = None, basis: str | None = None,
                authorized_by: str | None = None, authorization: str | None = None) -> dict:
-        """HARD-DELETE memories — the one operation that genuinely REMOVES content. mnemo is otherwise
+        """HARD-DELETE memories — the one operation that genuinely REMOVES content. inspeximus is otherwise
         append-only: supersession / invalidation only DEMOTE a record (it still exists, recallable with
         include_superseded). forget() is for the cases where demotion is not enough: a right-to-be-forgotten
         / erasure request, a poisoned or libellous memory, or a hard correction.
@@ -1840,7 +1840,7 @@ class Inspeximus:
     def register_erasure_target(self, target) -> "Inspeximus":
         """Register an APP-SIDE store (the app's vector index, an embedding/response cache, a retrieval log)
         for cross-store right-to-erasure. Targets implement the two-method ErasureTarget protocol
-        (mnemo.deletion_manifest): erase(subject) and still_recoverable(subject, values). Once any target is
+        (inspeximus.deletion_manifest): erase(subject) and still_recoverable(subject, values). Once any target is
         registered, forget_subject() cascades the erasure through every target and returns a hash-chained
         DeletionManifest that is honest BY CONSTRUCTION: 'complete' only if every store (this one included)
         verified the data no longer recoverable, and it NAMES the stores that still leak. Targets are live
@@ -1864,7 +1864,7 @@ class Inspeximus:
         you wrote with (`remember(..., source={'doc': subject})`) or an attested key as 'key:<hex>'.
 
         Returns {erased, ids, request_id, tombstones}. HONEST SCOPE (read before relying on it for compliance):
-        this erases + proves-deletion WITHIN THIS mnemo store only — NOT the app's vector store, prompt logs,
+        this erases + proves-deletion WITHIN THIS inspeximus store only — NOT the app's vector store, prompt logs,
         or backups; it is an integrity primitive, NOT a compliance certification. The tombstone proves the ACT
         (a record with this surrogate id was erased at T for request R), never the CONTENT, and its signature is
         load-bearing only against a party who does NOT hold receipt_key (the operator who holds the key can forge
@@ -1914,7 +1914,7 @@ class Inspeximus:
         n_erased = already_erased
 
         class _SelfTarget(ErasureTarget):
-            name = "mnemo-store"
+            name = "inspeximus-store"
 
             def erase(self, subj):                       # already purged by forget_subject
                 return {"erased": n_erased}
@@ -1966,7 +1966,7 @@ class Inspeximus:
         restricted to specific `types` (e.g. ['email','ssn']) and/or a `subject` (a canonical source string,
         as in forget_subject). Tenant-scoped when the store is bound. Like forget_subject this genuinely REMOVES
         content and records a content-free, hash-chained tombstone per erased row so verify_writes() reads the
-        deletion as deliberate, not tampering. Same HONEST SCOPE as forget_subject: erases within THIS mnemo
+        deletion as deliberate, not tampering. Same HONEST SCOPE as forget_subject: erases within THIS inspeximus
         store only, not the app's vector store / logs / backups; not a compliance certification.
 
         Returns {erased, ids, request_id, tombstones}."""
@@ -2038,7 +2038,7 @@ class Inspeximus:
         the tamper-evident write history. HONEST SCOPE: the witness pins the STORE + this store's view of
         its index inputs; it cannot attest external caches or copies it never saw."""
         act = sum(1 for r in self.items if r.get("status") == "active")
-        w = {"mnemo_hydration_witness": 1, "digest": self.state_digest(),
+        w = {"inspeximus_hydration_witness": 1, "digest": self.state_digest(),
              "records": len(self.items), "active": act,
              "iso": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime())}
         if self.embed_id:
@@ -2063,7 +2063,7 @@ class Inspeximus:
     def index_coherence(self) -> dict:
         """Does the derived semantic index agree with the store? An append-only or git-backed store can be
         perfectly governed and STILL serve a stale value if the embedding index lags or was built with a
-        different recipe (the class of bug behind mnemo's own 1.15-1.18 realign fixes). Deterministic,
+        different recipe (the class of bug behind inspeximus's own 1.15-1.18 realign fixes). Deterministic,
         read-only. Reports: active text-bearing records missing a vector while an embedder is configured
         (index behind store), vectors persisted under a DIFFERENT embed recipe than the current one
         (unrankable against fresh queries), and whether vectors survive a save at all on this store.
@@ -2110,7 +2110,7 @@ class Inspeximus:
         erased_ids = sorted({t.get("memory_id") for t in scoped if t.get("memory_id")})
         ok, problems = self.verify_writes(expected_pubkey)
         return {
-            "mnemo_erasure_certificate": "1.0",
+            "inspeximus_erasure_certificate": "1.0",
             "issued_ts": time.time(),
             "issued_iso": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()),
             "request_ids": sorted({t.get("request_id") for t in scoped if t.get("request_id") is not None}),
@@ -2120,12 +2120,12 @@ class Inspeximus:
             "pubkey": self.receipt_pubkey,
             "anchor": self.anchor(),
             "self_check": {"verified": ok, "problems": problems},
-            "scope": ("Erasure is within THIS mnemo store only (not the app's vector store, prompt logs, or "
+            "scope": ("Erasure is within THIS inspeximus store only (not the app's vector store, prompt logs, or "
                       "backups); covers the subject PLUS its derived_from lineage. Tamper-evident integrity "
                       "primitive, NOT a compliance certification. The tombstone proves the ACT of deletion, "
                       "never the content; its signature is load-bearing only against a non-holder of "
                       "receipt_key — witness the anchor externally (see verify_consistency)."),
-            "verify_with": "mnemo.verify_erasure_certificate(cert, store_path=<file>)  # or store_items=<list>",
+            "verify_with": "inspeximus.verify_erasure_certificate(cert, store_path=<file>)  # or store_items=<list>",
         }
 
     def governance_report(self, expected_pubkey: str | None = None) -> dict:
@@ -2140,7 +2140,7 @@ class Inspeximus:
         chain and the deletion-tombstone chain — a forged or dropped tombstone (hiding a real out-of-band
         delete) shows up here.
 
-        HONEST SCOPE (read before relying on it for compliance): erasure is WITHIN this mnemo store only — NOT
+        HONEST SCOPE (read before relying on it for compliance): erasure is WITHIN this inspeximus store only — NOT
         the app's vector store, prompt logs, or backups — and it covers the subject PLUS its derived_from
         lineage (a summary built from the subject's data is erased too). It is a tamper-evident INTEGRITY
         primitive, NOT a compliance certification. The tombstone proves the ACT of deletion (a record with this
@@ -2171,7 +2171,7 @@ class Inspeximus:
                 # witnessed anchor — the operator-adversarial hole verify_writes cannot close on its own.
                 "anchor": self.anchor(),
             },
-            "scope": ("Erasure is within THIS mnemo store only (not the app's vector store, prompt logs, or "
+            "scope": ("Erasure is within THIS inspeximus store only (not the app's vector store, prompt logs, or "
                       "backups); covers the subject PLUS its derived_from lineage. Tamper-evident integrity "
                       "primitive, NOT a compliance certification. The tombstone proves the ACT of deletion, "
                       "never the content; its signature is load-bearing only against a non-holder of "
@@ -2208,8 +2208,8 @@ class Inspeximus:
         the rewritten tip equal an anchor an outsider already witnessed. This is the CT model (Laurie-Langley-
         Kasper RFC 6962): the log is untrusted; external witnesses + consistency proofs make append-only violations
         detectable without trusting the log operator. `sign(bytes)->hex` (OPT-IN) lets an EXTERNAL witness co-sign
-        the anchor; mnemo deliberately does NOT sign it with receipt_key (that key is the very thing not trusted
-        here). HONEST BOUNDARY: mnemo produces the anchor and the consistency proof; the external WITNESSING (that
+        the anchor; inspeximus deliberately does NOT sign it with receipt_key (that key is the very thing not trusted
+        here). HONEST BOUNDARY: inspeximus produces the anchor and the consistency proof; the external WITNESSING (that
         the auditor recorded a prior anchor out of band) is the auditor's job — without a prior witnessed anchor
         there is nothing to be consistent WITH."""
         writes_tip = self._receipts[-1]["hash"] if self._receipts else _GENESIS
@@ -2257,7 +2257,7 @@ class Inspeximus:
         the affected facts against the corrected root rather than lose them. This is retract-and-retain +
         dependency-directed propagation — classic Truth-Maintenance (Doyle, AIJ 1979) and provenance/bitemporal
         invalidation-with-retention, recently ported to LLM-agent memory (TOKI, arXiv 2606.06240; MemLineage,
-        arXiv 2605.14421); mnemo's contribution is only that it rides the same derived_from taint as forget_
+        arXiv 2605.14421); inspeximus's contribution is only that it rides the same derived_from taint as forget_
         subject, so it needs no separate graph. CAVEAT: it can only cascade on links that were actually
         recorded — derived writes that never carried derived_from are invisible to it. `subject` matches
         canonical sources exactly like forget_subject. Returns {demoted, ids}. Reversible: nothing is deleted;
@@ -2399,7 +2399,7 @@ class Inspeximus:
         Why an explicit API and not a content write: a value-OBSCURING reversion utterance ("go back
         to the old one", "the earlier value was right") carries NO object to key on, so no content-level
         mechanism can distinguish a legitimate user revert from an attacker-injected one — the two are
-        byte-identical text differing only in provenance. mnemo resolves this by CHANNEL SEPARATION:
+        byte-identical text differing only in provenance. inspeximus resolves this by CHANNEL SEPARATION:
         content writes can never undo a supersession (echo_guard retires restatements; an object-less
         utterance never touches the key at all), and reverting is possible ONLY through this explicit
         call, which the harness invokes for an authorized principal. Honest boundary: this moves the
@@ -2599,7 +2599,7 @@ class Inspeximus:
                            margin: float = 0.06, floor: float = 0.50) -> dict:
         """Classify whether `candidate` reopens a SUPERSEDED value for `key` ("revert"), affirms the current
         one ("keep"), or does not resolve ("abstain"). This is the value-obscuring reversion result from the
-        joint TAT/mnemo analysis (Marat Sultanov), factorized into its two independent halves and shipped:
+        joint TAT/inspeximus analysis (Marat Sultanov), factorized into its two independent halves and shipped:
 
           1. REFERENCE RESOLUTION (a text problem): embed the candidate and, using the ledger's own split of
              the key's history into SUPERSEDED (old) and CURRENT records, measure how much closer the
@@ -2608,7 +2608,7 @@ class Inspeximus:
              scored as a MARGIN (max sim to old records minus max sim to current records) — the same
              discriminating quantity the decomposition used, not an absolute similarity.
           2. RECENCY ATTRIBUTION (a ledger problem): the old-versus-current split is read straight from
-             mnemo's supersession ledger. No text method is asked to decide which value is current.
+             inspeximus's supersession ledger. No text method is asked to decide which value is current.
 
         Abstains when the reference does not DISCRIMINATE old from current: |margin| < `margin` (a bare
         "go back" is roughly equally near both, so it names no side) or the best match is below `floor` (an
@@ -2747,7 +2747,7 @@ class Inspeximus:
         # DELETE intent ("forget/delete/remove that", "no longer true"). Content alone must NOT be able to destroy
         # memory (the channel-separation moat), so a routed delete is gated by the SAME capability as revert — an
         # unauthorized utterance gets authorization_required, never silent deletion. This is the mem0 DELETE event,
-        # done safely: mem0 lets its LLM issue DELETE on the write path; mnemo requires an out-of-band capability.
+        # done safely: mem0 lets its LLM issue DELETE on the write path; inspeximus requires an out-of-band capability.
         # ORDERING: only a delete utterance that carries NO value and NO revert marker reaches this branch.
         # The delete vocabulary overlaps both of the branches below, and it used to run first, so
         # "drop the beta flag; region is now us-east" (a correction) and "undo that, it's no longer valid"
@@ -3112,7 +3112,7 @@ class Inspeximus:
         over an aggressive one, since a wrong filter hard-deletes the answer (measured harm mode).
 
         influence_only (OPT-IN, default False -> zero behavior change): restrict the result to CORROBORATED
-        memories — those that meet the same bar mnemo uses for episodic->semantic GRADUATION (an EARNED
+        memories — those that meet the same bar inspeximus uses for episodic->semantic GRADUATION (an EARNED
         net-positive outcome via credit() [good>0 and good>=bad], OR already-graduated 'semantic' type, OR
         >=2 DISTINCT-canonical-source corroborating links). This is the retrieve-then-INFLUENCE split: recall
         freely for context, but call with influence_only=True for the set that is allowed to DRIVE an action.
@@ -3166,7 +3166,7 @@ class Inspeximus:
         tie_recent (OPT-IN, default None -> zero behavior change): NEAR-TIE RECENCY REORDER for stale-vs-
         fresh fact competition. When a fact is later corrected in free text, SRO supersession never triggers
         and the STALE value can outrank the fresh one (measured on MemBench knowledge_update: the stale
-        value wins rank-1 in 32.7% of update questions, identically for raw cosine and mnemo semantic —
+        value wins rank-1 in 32.7% of update questions, identically for raw cosine and inspeximus semantic —
         research/probes/membench_recall_probe_v2.py). Pass a small similarity epsilon (measured sweet spot
         0.02-0.05 on centered cosine): candidates whose RELEVANCE is within tie_recent of the strongest
         candidate's relevance are re-ordered newest-first (by valid_from, falling back to ts) ahead of the
@@ -3451,9 +3451,9 @@ class Inspeximus:
             scored, _rc_losers = self._resolve_read_conflicts(scored, k)
         # OPT-IN reranker hook (retrieve-then-rerank). `rerank(query, records) -> list[float]` (one relevance
         # score per record, higher=better) lets a caller plug a cross-encoder / model reranker over the top
-        # candidates — the one lever MEASURED to lift multi-hop recall beyond mnemo's zero-LLM base (LoCoMo
+        # candidates — the one lever MEASURED to lift multi-hop recall beyond inspeximus's zero-LLM base (LoCoMo
         # multi-hop full-recall ~0.30 -> ~0.48 with a reader-reranker; [[locomo-iterative-lever-full-benchmark]]).
-        # Model-agnostic (mnemo never imports a model) and MOAT-SAFE: no LLM runs unless the caller supplies one,
+        # Model-agnostic (inspeximus never imports a model) and MOAT-SAFE: no LLM runs unless the caller supplies one,
         # and the WRITE path is untouched. rerank_pool bounds how many top candidates are reranked (default
         # max(4*k, 50)). Fail-open: any error keeps the pre-rerank order.
         if rerank is not None and scored:
@@ -3993,7 +3993,7 @@ class Inspeximus:
 
         `ids` defaults to the last recall set (self._last_recall). `driving_only=True` (default) restricts
         the credited set to the DECISION-DRIVING subset: pass the specific id(s) the action actually used
-        (the app knows which memory it acted on), or, if ids is None, mnemo credits only the recall set's
+        (the app knows which memory it acted on), or, if ids is None, inspeximus credits only the recall set's
         CORROBORATED members (the same bar as recall(influence_only=True)) — so a poison that merely rode
         into the recall set as soft context cannot earn credit for an honest action's success (the recall-
         set-attribution poison surface). LOAD-BEARING LIMIT (not hidden): driving_only=True with ids=None
@@ -4461,7 +4461,7 @@ class Inspeximus:
         """Multi-hop recall. One-shot top-k misses evidence reachable only via a BRIDGE entity (a fact whose
         detail lives in a memory NOT similar to the query). This does: retrieve -> let a capable model read the
         results and name what's missing, emitting follow-up queries -> retrieve again -> merge (dedup by id).
-        `ask_followup(query, current_results) -> list[str]` is caller-supplied, so mnemo stays model-agnostic
+        `ask_followup(query, current_results) -> list[str]` is caller-supplied, so inspeximus stays model-agnostic
         (inject any model/LLM). MEASURED ~3.3x multi-hop full-evidence recall vs one-shot top-k on LoCoMo
         (0.057 -> 0.186, n=70 across 3 conversations) — the one mechanism that moved the multi-hop bottleneck
         where static retrieval tricks (dense-neighbor, lexical bridges) did not. More expensive (a model call
@@ -4807,8 +4807,8 @@ class Inspeximus:
         is exceeded, so the host can invoke it on every idle tick. Idempotent: a second immediate call
         does no new work. Never edits raw text. Returns what the pass did.
 
-        This is mnemo's answer to Letta-style sleep-time compute, but as a pure library primitive (the
-        host schedules the idle window; mnemo provides the deferred maintenance op) — no agent loop, no
+        This is inspeximus's answer to Letta-style sleep-time compute, but as a pure library primitive (the
+        host schedules the idle window; inspeximus provides the deferred maintenance op) — no agent loop, no
         graph DB, no hosted service."""
         report = {"consolidated_clusters": self.consolidate_clusters(threshold=cluster_threshold)}
         if keep is not None:
@@ -4901,7 +4901,7 @@ class Inspeximus:
         """Deterministic knowledge GRAPH over keyed (subject::relation, object) memories — zero-LLM, no graph DB.
         Every memory stored with a key of the form 'subject::relation' AND an `object` is an edge
         subject -[relation]-> object; entities are the subjects + objects. This gives the 'graph memory' view
-        mem0/Zep/cognee ship, but DERIVED deterministically from mnemo's existing supersession triples (no LLM
+        mem0/Zep/cognee ship, but DERIVED deterministically from inspeximus's existing supersession triples (no LLM
         entity-extraction, no separate graph store). It covers memories keyed explicitly OR via the optional
         `extractor` hook, so extractor-keyed free text also enters the graph. Only ACTIVE edges by default, so a
         superseded fact drops out of the graph (the graph reflects CURRENT truth) unless include_superseded.
@@ -4985,7 +4985,7 @@ class Inspeximus:
 
     def reembed(self, only_missing: bool = True, batch: int | None = None) -> dict:
         """Re-embed records that carry no vector, then persist. The EXPLICIT counterpart to the bounded
-        embed-recipe guard: when a recipe change finds more than MNEMO_REALIGN_MAX stale vectors, the guard
+        embed-recipe guard: when a recipe change finds more than INSPEXIMUS_REALIGN_MAX stale vectors, the guard
         DROPS them (those records fall back to lexical recall) rather than making every open pay one network
         call per record. This is how you deliberately pay that cost once — a foreground call with a count you
         can see — instead of implicitly on a load path that might be a short-lived hook process.
@@ -5185,7 +5185,7 @@ class _TenantView:
 
 # --------------------------------------------------------------------------------------------------------------
 # Ready-made write-path extractors (set `m.extractor = ...`). The extractor derives a (key, object) from free
-# text so supersession/echo_guard/revert engage WITHOUT the caller passing an explicit key. mnemo ships two:
+# text so supersession/echo_guard/revert engage WITHOUT the caller passing an explicit key. inspeximus ships two:
 #   - regex_extractor : DETERMINISTIC, no LLM, no dependency — keeps the zero-LLM-on-write moat. Conservative
 #     by design (returns None unless a clear subject/relation pattern matches), because a mis-derived key
 #     mis-supersedes; a returned None just falls back to a plain append.
@@ -5284,18 +5284,18 @@ def make_llm_extractor(call_fn, prompt_prefix=None):
 
 def default_distiller(url=None, model=None, key=None, timeout=60):
     """Batteries-included distiller for distill_and_remember(): a zero-dependency urllib chat caller against any
-    OpenAI-compatible /chat/completions endpoint (args or env MNEMO_LLM_URL / MNEMO_LLM_MODEL / MNEMO_LLM_KEY —
+    OpenAI-compatible /chat/completions endpoint (args or env INSPEXIMUS_LLM_URL / INSPEXIMUS_LLM_MODEL / INSPEXIMUS_LLM_KEY —
     e.g. local Ollama at http://localhost:11434/v1/chat/completions). Returns a `distiller(prompt, text) -> str`
     you pass straight to distill_and_remember, so capture works out of the box instead of forcing every caller to
     wire an LLM. OPT-IN: this is the only place an LLM touches capture; the core store/recall/revert stay zero-LLM.
     Raises if no URL is configured (so you know to inject your own)."""
     import urllib.request
-    url = (url or os.environ.get("MNEMO_LLM_URL", "")).strip()
+    url = (url or os.environ.get("INSPEXIMUS_LLM_URL", "")).strip()
     if not url:
-        raise RuntimeError("default_distiller needs MNEMO_LLM_URL (an OpenAI-compatible /chat/completions endpoint) "
+        raise RuntimeError("default_distiller needs INSPEXIMUS_LLM_URL (an OpenAI-compatible /chat/completions endpoint) "
                            "or explicit url= ; the core stays zero-LLM, so a distiller is opt-in.")
-    model = (model or os.environ.get("MNEMO_LLM_MODEL", "gpt-4o-mini")).strip()
-    key = (key or os.environ.get("MNEMO_LLM_KEY", "")).strip()
+    model = (model or os.environ.get("INSPEXIMUS_LLM_MODEL", "gpt-4o-mini")).strip()
+    key = (key or os.environ.get("INSPEXIMUS_LLM_KEY", "")).strip()
 
     def distiller(prompt, text):
         body = json.dumps({"model": model, "temperature": 0, "messages": [

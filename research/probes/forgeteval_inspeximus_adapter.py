@@ -1,4 +1,4 @@
-"""forgeteval_mnemo_adapter.py — measure mnemo, honestly, on the PUBLIC ForgetEval-Adv external subset.
+"""forgeteval_inspeximus_adapter.py — measure inspeximus, honestly, on the PUBLIC ForgetEval-Adv external subset.
 
 Benchmark: ForgetEval (Yang, "Control-Plane Placement Shapes Forgetting", arXiv:2606.15903; MIT,
 WaylandYang/forgeteval-anon-supp). We run the 77 oracle-validated EXTERNAL adversarial cases
@@ -9,10 +9,10 @@ exact deterministic substring rule). No LLM judge.
 
 This is a DETERMINISTIC, no-LLM adapter — the same configuration the paper measures for Lethe / LangGraph
 (their deterministic baselines score ~5% on identifier_obfuscation, 0% on cross_lingual because lexical
-matching cannot canonicalize surface variants). We expect mnemo to show the SAME structural profile: fine
+matching cannot canonicalize surface variants). We expect inspeximus to show the SAME structural profile: fine
 on lexically-explicit supersession/purge, near-0 on the canonicalization categories that are inherently
 LLM-bound. The point is an HONEST measured number + per-category map that quantifies exactly what an
-LLM-at-mutation-time layer ("bod 3") would have to recover — not a claim mnemo wins.
+LLM-at-mutation-time layer ("bod 3") would have to recover — not a claim inspeximus wins.
 
 ADAPTER (deterministic, disclosed — no per-case tuning):
   remember(fact) for each setup fact (free text; ForgetEval facts carry no app keys).
@@ -71,7 +71,7 @@ def run_case(case, thr):
             if ids:
                 m.forget(ids)
             m.remember(new)
-    # ForgetEval scores the TOP-K RECALL BLOB. mnemo's relevance-filtered recall() returns nothing when the
+    # ForgetEval scores the TOP-K RECALL BLOB. inspeximus's relevance-filtered recall() returns nothing when the
     # query shares no tokens with the SURVIVING facts (e.g. after the query-matching fact is purged), which
     # would let must_not pass on an EMPTY blob — a false 'forgot it' when the forbidden fact is still stored
     # (caught by the cross_lingual debug: survivors kept 北京/Peking but recall returned ''). The faithful blob
@@ -104,7 +104,7 @@ INHOUSE = CASES.parent / "hipporag_cases_inhouse.json"
 def main():
     cases = json.load(open(CASES, encoding="utf-8"))
     print("=" * 72)
-    print(f"mnemo on ForgetEval-Adv external subset ({len(cases)} oracle-validated cases)")
+    print(f"inspeximus on ForgetEval-Adv external subset ({len(cases)} oracle-validated cases)")
     print("deterministic no-LLM adapter — the paper's Lethe/LangGraph configuration")
     print("=" * 72)
 
@@ -118,7 +118,7 @@ def main():
             _, tp, tn = evaluate(full, thr)
             print(f"    thr={thr}: {tp}/{tn} = {tp/tn:.1%}")
         print("    => the number is a threshold artifact of THIS adapter, not a store-capability metric.")
-        print("    => NOT publishable as 'mnemo scores X%'. Only threshold-INVARIANT results are honest:")
+        print("    => NOT publishable as 'inspeximus scores X%'. Only threshold-INVARIANT results are honest:")
         print("       compound_fact = 0% at every threshold (deterministic partial-supersede is structurally")
         print("       impossible — drop one fact from a compound sentence, keep the other → needs an LLM).")
         print("    Same limit applies to the paper's own deterministic baselines (single points from their")
@@ -140,13 +140,13 @@ def main():
              ("A-MEM", 42.6), ("OpenMemory", 50.8), ("Letta+LLM", 80.3)]
     for name, rate in field:
         print(f"    {name:<18} {rate:.1f}%")
-    print("\nVERDICT (gate/VALIDATE): the single-number 'mnemo scores X% on ForgetEval' claim is KILLED --")
+    print("\nVERDICT (gate/VALIDATE): the single-number 'inspeximus scores X% on ForgetEval' claim is KILLED --")
     print("the score is threshold-dominated (23-64% on the 385 set), so it measures our adapter's forget")
-    print("heuristic, not mnemo. The only threshold-INVARIANT, honest result is the structural limit")
+    print("heuristic, not inspeximus. The only threshold-INVARIANT, honest result is the structural limit")
     print("compound_fact = 0%% (deterministic partial-supersede is impossible). Everything else is not")
     print("robust enough to take outward. The same limit hits the paper's own deterministic baselines")
     print("(single points from their adapters). Two other artifacts this session caught the same class of")
-    print("error (v3 mnemo circular 1.0; the empty-recall false-100%%) — any knob-fed/oracle-fed memory")
+    print("error (v3 inspeximus circular 1.0; the empty-recall false-100%%) — any knob-fed/oracle-fed memory")
     print("number needs a stability check BEFORE it is reported.")
 
 

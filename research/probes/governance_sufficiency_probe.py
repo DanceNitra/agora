@@ -4,22 +4,22 @@ questions, or just look like it does?
 Lead 2 of the 2026-07-12 world scan, and a self-incriminating Crucible-shaped test. "Governance-evidence
 sufficiency" (can an INDEPENDENT auditor reconstruct who/what/when/on-what-authority/on-what-basis, and verify
 it wasn't forged, from ONLY the emitted receipt bytes) is DIFFERENT from "primitive presence" (does the API
-expose revert/retract/erase/audit at all). mnemo implements all the primitives; this probe asks whether its
+expose revert/retract/erase/audit at all). inspeximus implements all the primitives; this probe asks whether its
 receipt is SUFFICIENT — and leads with where it is NOT.
 
-We run one real correction+erasure lifecycle through mnemo's actual primitives, capture the exact receipt
+We run one real correction+erasure lifecycle through inspeximus's actual primitives, capture the exact receipt
 bytes an auditor would get (governance_report + the hash-chained write/tombstone receipts), and score them
 against an 8-question DEMM-style rubric (arXiv 2606.20634, generalized to a memory store). Each question is a
 STRICT, defensible predicate over the bytes — deterministic, no LLM, no judge variance. We deliberately write
-the predicates to catch the questions mnemo FAILS, not to flatter it.
+the predicates to catch the questions inspeximus FAILS, not to flatter it.
 
-Falsifier: if mnemo scores 8/8, presence == sufficiency and there is nothing to publish (the leaderboard would
+Falsifier: if inspeximus scores 8/8, presence == sufficiency and there is nothing to publish (the leaderboard would
 collapse to a feature matrix). The finding is the GAP: the primitives are present but the receipt does not, on
 its own, answer every governance question — specifically authority-binding, decision-basis, and
-external-anchorability (mnemo's own governance_report docstring concedes the third).
+external-anchorability (inspeximus's own governance_report docstring concedes the third).
 
 Run: python research/probes/governance_sufficiency_probe.py   (deterministic, cloud-free)
-Part of Agora / mnemo (MIT).
+Part of Agora / inspeximus (MIT).
 """
 import os
 import sys
@@ -150,9 +150,9 @@ def main():
     bytes_out, pk = run_lifecycle()
     Q = score(bytes_out, pk)
     passed = sum(1 for _, ok, _ in Q if ok)
-    print("=== GOVERNANCE-EVIDENCE SUFFICIENCY (mnemo self-score) ===")
+    print("=== GOVERNANCE-EVIDENCE SUFFICIENCY (inspeximus self-score) ===")
     print("8-question DEMM-style rubric (arXiv 2606.20634) over the receipt bytes an auditor actually gets.")
-    print("deterministic; predicates written to catch failures, not flatter. Leads with where mnemo FAILS.\n")
+    print("deterministic; predicates written to catch failures, not flatter. Leads with where inspeximus FAILS.\n")
     for q, ok, note in Q:
         mark = "PASS" if ok else "FAIL"
         print(f"  [{mark}] {q}")
@@ -163,7 +163,7 @@ def main():
     if passed == 8:
         print("VERDICT: KILL — presence == sufficiency; the receipt answers every governance question, nothing to publish.")
     else:
-        print(f"VERDICT: LIVE — gap confirmed. mnemo implements the primitives but its receipt FAILS on: "
+        print(f"VERDICT: LIVE — gap confirmed. inspeximus implements the primitives but its receipt FAILS on: "
               f"{', '.join(fails)}.")
         print("  Sufficiency is NOT predicted by presence — the self-incriminating, Crucible-shaped result. The")
         print("  three fails are concrete product gaps: emit the decision basis into the receipt; bind the request")

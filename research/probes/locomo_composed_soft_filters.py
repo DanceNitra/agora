@@ -13,7 +13,7 @@ Composes the two measured single arms IN THEIR WINNING CONFIGURATIONS:
          exact-name questions (alias_strength=1); on ambiguous questions it backs off to 0 (disclosed —
          no guessed-speaker filter is ever applied here).
 
-Arms (all on the SHIPPED mnemo hybrid scoring; pref term formula identical to mnemo.recall's
+Arms (all on the SHIPPED inspeximus hybrid scoring; pref term formula identical to inspeximus.recall's
   `pref = 1 + trust * _PREFER_GAIN` — see SELF-CHECK below):
   hybrid       : no soft term (floor)
   time_soft    : shipped single-term arm, trust 0.9 on the resolved window

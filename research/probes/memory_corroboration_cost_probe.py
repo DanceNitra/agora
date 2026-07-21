@@ -1,9 +1,9 @@
-"""v8 — the freshness-vs-poison Pareto on mnemo's REAL corroboration gates (the one thing the prior-art hunt
+"""v8 — the freshness-vs-poison Pareto on inspeximus's REAL corroboration gates (the one thing the prior-art hunt
 found UNMEASURED). NOT a new law: the two-channel/coupling idea is textbook (PeerTrust fusion; quickest-change-
 detection delay-vs-false-alarm; Cheng-Friedman 2005 no-symmetric-reputation-is-sybilproof). This just MEASURES
 what those gates actually do to an ADAPTIVE forger's cost, and confirms the Cheng-Friedman residual empirically.
 
-A memory earns standing (influences an action) via mnemo's bar: earned credit (un-self-gradable) OR >=2
+A memory earns standing (influences an action) via inspeximus's bar: earned credit (un-self-gradable) OR >=2
 corroborating witnesses that pass the OPT-IN gates — coherence_gate (witness must be ON-TOPIC, not filler),
 temporal_gate (co-arriving witnesses collapse to one; genuine ones spread over time), strict_corroboration
 (distinct VERIFIED KEYS, not spoofable source strings). We run the real gate on four actors:

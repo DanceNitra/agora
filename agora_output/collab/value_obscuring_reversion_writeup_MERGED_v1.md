@@ -76,7 +76,7 @@ For development and testing we used public fixtures created for this collaborati
 repository (`agora_output/public_fixtures/`). **Provenance:** the value-obscuring fixtures
 (`value_obscuring_reversion_fixture.jsonl` and its held-out variants) are synthetic constructions built for
 this study — MIT-licensed, no private data. The real-noise stress set (`realnoise_stress_v1.jsonl`, Section 7)
-is *not* synthetic: its noise stream is 2,769 real records from a live mnemo store, scanned clean of anything
+is *not* synthetic: its noise stream is 2,769 real records from a live inspeximus store, scanned clean of anything
 private, with labeled correction chains planted in — planted cases are labeled by construction, the noise is
 genuinely real.
 
@@ -186,11 +186,11 @@ Neither half solves the task alone. A pure text method has to smuggle in provena
 why the shuffle breaks it); a pure ledger method has nothing to attribute until the reference resolves. The
 structural detector and the ledger turn out to be the two halves of one detector.
 
-The decomposition is shipped on both sides. In mnemo it is a store method, `classify_reversion` (0.7.14): it
+The decomposition is shipped on both sides. In inspeximus it is a store method, `classify_reversion` (0.7.14): it
 embeds the candidate, scores it against the ledger's own superseded-versus-current split as a margin,
 attributes old/new from the supersession ledger, and abstains when the reference does not discriminate
 (referenced-revert 24/24, affirm-current 22/24 with two safe abstains, bare "go back" abstained 23/24,
-unrelated abstained 24/24 — 93/96 on a mnemo-native task). It classifies only and never restores; a flagged
+unrelated abstained 24/24 — 93/96 on a inspeximus-native task). It classifies only and never restores; a flagged
 revert is a signal an authorized caller acts on through the revert channel. In TAT it is TAT-Monitor's
 provenance mode (Section 7).
 
@@ -202,7 +202,7 @@ There the correct behaviour is abstention — a confidence threshold on the refe
 guess. And the truly value-obscuring twin, a bare "go back" with no reference at all, stays undecidable from
 text: no classifier can separate a stale echo from a deliberate reaffirm when the two are byte-identical,
 differing only in provenance. That case needs an authorization channel at the write path, not smarter
-reading — the direction mnemo's authorized-revert work took separately.
+reading — the direction inspeximus's authorized-revert work took separately.
 
 ## 7. Real-noise stress test
 

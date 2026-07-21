@@ -7,9 +7,9 @@ integrity of everything in its context, so the instant a single-source read ente
 integrity drops and it fails closed. Provenance rides with the value and taints whatever consumes it. RBAC
 gates the actor; IFC gates the data.
 
-We implement it on mnemo state and MEASURE what it buys and what it costs.
+We implement it on inspeximus state and MEASURE what it buys and what it costs.
 
-MECHANISM (the new wrapper — labels come from mnemo's real corroboration state, no new trust assumed):
+MECHANISM (the new wrapper — labels come from inspeximus's real corroboration state, no new trust assumed):
   integrity(rec)      = 1.0 if _is_corroborated(rec) else 0.3        (corroborated = high, single-source = low)
   context_integrity   = min(integrity(v) for v in the recall set)    (Biba low-water-mark)
   action_permitted(b) = context_integrity >= threshold(b)            (read 0.2, write 0.5, destructive 0.9)

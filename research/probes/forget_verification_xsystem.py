@@ -1,6 +1,6 @@
 """forget_verification_xsystem.py — after each system's NATIVE erasure, from HOW MANY of its native surfaces
 is the subject's value still recoverable? (Observatory cell: fills the audit report's admitted gap where
-forget-verification was a mnemo-only baseline.)
+forget-verification was a inspeximus-only baseline.)
 
 Symmetric, deterministic instrument (no LLM judge): for every system, issue its documented native deletion,
 then adversarially attempt recovery of the secret VALUE (verbatim, case-insensitive) from each native surface
@@ -8,11 +8,11 @@ the system exposes:
 
   S1 query        the native retrieval call (recall / search)
   S2 enumerate    the native list-everything call (items / get_all / graph search)
-  S3 history      the native history/audit surface (mnemo ledger+receipts / mem0 history DB / graphiti episodes)
-  S4 raw storage  the persistence layer itself (mnemo JSON files / Qdrant payloads / neo4j properties)
+  S3 history      the native history/audit surface (inspeximus ledger+receipts / mem0 history DB / graphiti episodes)
+  S4 raw storage  the persistence layer itself (inspeximus JSON files / Qdrant payloads / neo4j properties)
 
 FORGET-VERIFICATION SCORE per system = fraction of (subject x surface) cells with NO residue (higher = better).
-Per-surface breakdown is the point: WHERE erasure stops is the finding, not who "wins". mnemo is graded on the
+Per-surface breakdown is the point: WHERE erasure stops is the finding, not who "wins". inspeximus is graded on the
 same four surfaces including its own receipts/ledger files; if the value survives there, that is reported.
 Graphiti is bitemporal BY DESIGN (retains invalidated facts); a residue there is a documented trade-off, not a
 bug — we measure it rather than assert it.
@@ -20,9 +20,9 @@ bug — we measure it rather than assert it.
 Honest-harness rule: a competitor's number is reported ONLY from a clean run (0 SDK errors); any per-surface
 probe error marks the cell UNMEASURED (None), never a pass or fail.
 
-RUN:  python research/probes/forget_verification_xsystem.py               # mnemo + mem0
+RUN:  python research/probes/forget_verification_xsystem.py               # inspeximus + mem0
       python research/probes/forget_verification_xsystem.py --graphiti    # + graphiti (needs neo4j up)
-Part of Agora / mnemo (MIT).
+Part of Agora / inspeximus (MIT).
 """
 import os
 import sys
@@ -65,8 +65,8 @@ def _hit(val, blob):
     return val.lower() in (blob or "").lower()
 
 
-# ---------------------------------------------------------------- mnemo
-def score_mnemo():
+# ---------------------------------------------------------------- inspeximus
+def score_inspeximus():
     fd, p = tempfile.mkstemp(suffix=".json", prefix="fvx_"); os.close(fd)
     for suf in ("", ".receipts.json"):
         try: os.remove(p + suf)
@@ -304,15 +304,15 @@ def summarize(name, per):
 
 def main():
     ap = argparse.ArgumentParser(); ap.add_argument("--graphiti", action="store_true")
-    ap.add_argument("--only", type=str, default=None, choices=["mnemo", "mem0", "graphiti"])
+    ap.add_argument("--only", type=str, default=None, choices=["inspeximus", "mem0", "graphiti"])
     args = ap.parse_args()
     rpath = os.path.join(os.path.dirname(__file__), "forget_verification_xsystem_result.json")
     out = json.load(open(rpath)) if (args.only and os.path.exists(rpath)) else {}
     print("=== CROSS-SYSTEM FORGET-VERIFICATION (native delete -> recovery attempt per native surface) ===")
     print(f"surfaces: {SURFACES}; residue = secret value verbatim-recoverable; deterministic, judge-free.")
 
-    if args.only in (None, "mnemo"):
-        out["mnemo"] = summarize("mnemo " + __import__("mnemo").__version__, score_mnemo())
+    if args.only in (None, "inspeximus"):
+        out["inspeximus"] = summarize("inspeximus " + __import__("inspeximus").__version__, score_inspeximus())
     if args.only in (None, "mem0"):
         try:
             out["mem0"] = summarize("mem0 2.0.11", score_mem0())
@@ -326,7 +326,7 @@ def main():
 
     json.dump(out, open(rpath, "w"), indent=1)
     print("\nNOTE: the finding is the per-surface breakdown (WHERE erasure stops), not a ranking. Graphiti's")
-    print("episode/edge retention is bitemporal design, a documented trade-off. mnemo is graded on the same")
+    print("episode/edge retention is bitemporal design, a documented trade-off. inspeximus is graded on the same")
     print("four surfaces including its own ledger/receipts files.")
 
 

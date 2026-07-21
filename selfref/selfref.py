@@ -1,5 +1,5 @@
 """
-selfref — is your AI quietly training on itself?  (a mnemo sibling)
+selfref — is your AI quietly training on itself?  (a inspeximus sibling)
 
 A self-reference GOVERNOR. Any system that consumes its own output — a model retrained on synthetic
 data, an agent whose memory is its own past generations, a RAG store indexing the system's prior

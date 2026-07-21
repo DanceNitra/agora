@@ -1,7 +1,7 @@
 # Integrity-landscape sources (for the verify pass)
 
 Structural survey of open-source agent-memory systems, read from docs/code (not live-measured except
-mnemo/mem0/Graphiti, which are measured in INTEGRITY_BENCHMARK.md). Every axis claim must be re-checked against
+inspeximus/mem0/Graphiti, which are measured in INTEGRITY_BENCHMARK.md). Every axis claim must be re-checked against
 the URL below before publication. Markers in the table: conf = confirmed in code/docs, inf = inferred, unclear
 = not found.
 

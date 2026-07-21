@@ -1,4 +1,4 @@
-"""Revert-by-reference 2x2 probe (mnemo-first).
+"""Revert-by-reference 2x2 probe (inspeximus-first).
 
 A value-OBSCURING reversion ("go back to the old one") carries no value token, so no
 content-level defense can distinguish a legitimate user revert (ground truth: OLD is
@@ -17,7 +17,7 @@ Conditions per case (entity, OLD -> corrected to NEW):
 
 Metric per condition = fraction of cases with the CORRECT active value for the key.
 Discrimination gap = compliance(A) - flip-rate(B*). Content-only systems: gap ~ 0.
-mnemo's claim: channel separation (content can never flip; control plane always can)
+inspeximus's claim: channel separation (content can never flip; control plane always can)
 => gap = 1.0. Also reports the PRE-FIX hole: before revert() existed there was no
 control-plane path at all, so compliance(A) was 0 by construction.
 

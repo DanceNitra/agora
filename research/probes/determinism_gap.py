@@ -1,8 +1,8 @@
-"""determinism_gap.py — the FAIR, architecture-intrinsic mnemo win the whole 2026-07-17/18 session converged on.
+"""determinism_gap.py — the FAIR, architecture-intrinsic inspeximus win the whole 2026-07-17/18 session converged on.
 
 Every competitor puts an LLM on the WRITE path (mem0 extraction, Graphiti/Cognee cognify, Letta self-edit),
 which makes the stored state NON-DETERMINISTIC: the same input, ingested twice, can yield a different memory.
-mnemo's core write path has NO LLM -> identical input always yields the identical store.
+inspeximus's core write path has NO LLM -> identical input always yields the identical store.
 
 We MEASURE it (discipline: don't assert). R independent runs, the SAME conflict facts (raw text, A then
 corrected to B), fresh store each run. For each subject we read back what value the store now holds for it
@@ -11,19 +11,19 @@ corrected to B), fresh store each run. For each subject we read back what value 
   NONDETERMINISM RATE = fraction of subjects whose read-back CLASS is not identical across all R runs.
   ACCURACY (current==B) per run + its spread across runs.
 
-mnemo (deterministic core, plain keyed remember) is expected 0.0 nondeterminism by architecture; the NUMBER we
+inspeximus (deterministic core, plain keyed remember) is expected 0.0 nondeterminism by architecture; the NUMBER we
 care about is mem0's. Fair: identical raw input, identical read instrument, run-to-run stability is exactly the
 property claimed. mem0 CANNOT be deterministic without removing its extraction (its whole design).
 
-RUN (free, mnemo):    python research/probes/determinism_gap.py --systems mnemo --n 30 --runs 5
-RUN (with mem0):      python research/probes/determinism_gap.py --systems mnemo,mem0 --n 25 --runs 5
+RUN (free, inspeximus):    python research/probes/determinism_gap.py --systems inspeximus --n 30 --runs 5
+RUN (with mem0):      python research/probes/determinism_gap.py --systems inspeximus,mem0 --n 25 --runs 5
 """
 import os, sys, json, time, argparse
 HERE = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, os.path.join(HERE, "mab_official"))
 sys.path.insert(0, os.path.join(HERE, "..", ".."))
-sys.path.insert(0, os.path.join(HERE, "..", "..", "mnemo_pypi"))
-import run_mnemo_official as H
+sys.path.insert(0, os.path.join(HERE, "..", "..", "inspeximus_pypi"))
+import run_inspeximus_official as H
 from inspeximus import Inspeximus
 import adversarial_conflict as ADV
 
@@ -48,7 +48,7 @@ def klass(blob, vA, vB):
     return "both" if (a and b) else "Bonly" if b else "Aonly" if a else "neither"
 
 
-def read_mnemo(ps):
+def read_inspeximus(ps):
     out = {}
     for (k, A, B) in ps:
         m = Inspeximus(path=None)                                  # deterministic core, keyed supersession, NO LLM
@@ -84,7 +84,7 @@ def analyze(runs, ps):
 
 def main():
     ap = argparse.ArgumentParser()
-    ap.add_argument("--systems", default="mnemo")
+    ap.add_argument("--systems", default="inspeximus")
     ap.add_argument("--n", type=int, default=30)
     ap.add_argument("--runs", type=int, default=5)
     ap.add_argument("--sample", default="sh_6k")
@@ -96,7 +96,7 @@ def main():
         runs = []
         for r in range(a.runs):
             t0 = time.time()
-            runs.append(read_mnemo(ps) if s == "mnemo" else read_mem0(ps, r))
+            runs.append(read_inspeximus(ps) if s == "inspeximus" else read_mem0(ps, r))
             print(f"  {s} run {r+1}/{a.runs} done ({time.time()-t0:.0f}s)", flush=True)
         out[s] = analyze(runs, ps)
         print(f"  == {s}: nondeterminism {out[s]['nondeterminism_rate']:.0%} "

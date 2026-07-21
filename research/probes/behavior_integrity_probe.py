@@ -23,9 +23,9 @@ Synthetic entities only (the model CANNOT parametrically know them): silent worl
 by construction, so propagation is measured clean. The known-fact "correction ceiling" is a MODEL property
 and out of scope here.
 
-RUN (free, local):   python research/probes/behavior_integrity_probe.py --systems mnemo --stage a
+RUN (free, local):   python research/probes/behavior_integrity_probe.py --systems inspeximus --stage a
 RUN (stage B, glm):  python research/probes/behavior_integrity_probe.py --stage b
-RUN (paid, full A):  python research/probes/behavior_integrity_probe.py --systems mnemo,mem0,graphiti --stage a
+RUN (paid, full A):  python research/probes/behavior_integrity_probe.py --systems inspeximus,mem0,graphiti --stage a
 """
 import os, sys, json, re, time, urllib.request, argparse
 
@@ -59,18 +59,18 @@ def surface_flags(ctx_lower, e, A, B):
     """What is on the retrieval surface: the stale value, the corrected value, the revert intent.
     NOTE (design lesson from the first run): token presence is ~1.0 everywhere because stores legitimately
     keep history — it measures history, not corruption. The system-level difference is the SHAPE of the
-    surface each store hands the agent (mnemo retires the echo, graphiti marks edges). So Stage A's real
+    surface each store hands the agent (inspeximus retires the echo, graphiti marks edges). So Stage A's real
     output is the raw surface text itself, consumed by Stage B; the flags below are descriptive only."""
     return {"stale": A in ctx_lower, "current": B in ctx_lower,
             "revert_intent": bool(re.search(r"go back", ctx_lower))}
 
 
 # ── STAGE A adapters: inject the failure state, retrieve for the task query, return context ──
-def stageA_mnemo(cases, mode):
-    """mnemo native config: route() as the write path with an oracle extractor (we author the fixture, so
+def stageA_inspeximus(cases, mode):
+    """inspeximus native config: route() as the write path with an oracle extractor (we author the fixture, so
     key/object are known — the same information mem0's LLM extractor and graphiti's pipeline recover).
-    With no revert authority configured, route() executes a content-path revert (mnemo's legacy default),
-    which IS mnemo's capability difference; the echo lands guard-retired."""
+    With no revert authority configured, route() executes a content-path revert (inspeximus's legacy default),
+    which IS inspeximus's capability difference; the echo lands guard-retired."""
     out = []
     for (e, A, B) in cases:
         m = Inspeximus(path=None); m.echo_guard = True
@@ -299,7 +299,7 @@ def stageB(cases, mode, surfaces=None, label="canonical"):
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--n", type=int, default=20)
-    ap.add_argument("--systems", default="mnemo")
+    ap.add_argument("--systems", default="inspeximus")
     ap.add_argument("--stage", default="a", choices=["a", "b", "ab", "b2"])
     ap.add_argument("--bmodel", default="glm", choices=["glm", "flash"],
                     help="stage B model: glm (glm-5.2:cloud local route) or flash (deepseek-v4-flash, ollama.com)")
@@ -317,7 +317,7 @@ def main():
     existing.setdefault("stageA", {}); existing.setdefault("surfaces", {}); existing.setdefault("stageB", {})
     if a.stage in ("a", "ab"):
         want = [s.strip() for s in a.systems.split(",") if s.strip()]
-        fns = {"mnemo": stageA_mnemo, "mem0": stageA_mem0, "graphiti": stageA_graphiti}
+        fns = {"inspeximus": stageA_inspeximus, "mem0": stageA_mem0, "graphiti": stageA_graphiti}
         for sysname in want:
             for mode in ("echo", "unreverted"):
                 print(f"stage A · {sysname} · {mode} ...", flush=True)

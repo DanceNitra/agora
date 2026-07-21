@@ -12,7 +12,7 @@ import os, sys, json, time, argparse, shutil
 HERE = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, os.path.join(HERE, "mab_official"))
 sys.path.insert(0, os.path.join(HERE, "..", ".."))
-import run_mnemo_official as H
+import run_inspeximus_official as H
 
 _env = {}
 for l in open(os.path.join(HERE, "..", "..", "server", ".env"), encoding="utf-8", errors="replace"):
@@ -90,7 +90,7 @@ def mem0_poison(ps):
         # STORE-LEVEL (fair, un-confounded): is the poison A absent from the retrieval surface AND is B present?
         # The judge-level metric is confounded on MAB data (the "correction" B inverts a WORLD-TRUE fact A, so a
         # knowledgeable LLM judge answers A regardless of the store) — see _diag_blob. Score the SAME surface
-        # property for every system: mnemo delivers {B}, competitors leave {A,B} -> poison reaches the reader.
+        # property for every system: inspeximus delivers {B}, competitors leave {A,B} -> poison reaches the reader.
         held += 1 if (vA not in blob) else 0
         if blob == "":          # empty retrieval is not "resistance" — count as fail (no clean surface delivered)
             held -= 1

@@ -1,5 +1,5 @@
 """
-quitkit — when to quit a depleting effort, with a MEASURED threshold.  (a mnemo sibling)
+quitkit — when to quit a depleting effort, with a MEASURED threshold.  (a inspeximus sibling)
 
 Everyone says "set exit criteria and ignore the sunk cost." Nobody gives you the number. quitkit does:
 quit a yield process when its recent yield falls a fraction theta below its running peak (a drawdown

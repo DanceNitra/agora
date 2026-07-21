@@ -1,18 +1,18 @@
-"""FLAGSHIP cell — mnemo on MemoryAgentBench's Conflict Resolution (CR) competency.
+"""FLAGSHIP cell — inspeximus on MemoryAgentBench's Conflict Resolution (CR) competency.
 
 CR = FactConsolidation (Hu/Wang/McAuley, arXiv:2507.05257, ICLR 2026): a long list of facts where the SAME
 subject-relation is stated twice with DIFFERENT values; the LATER value is the consolidated truth and the gold
-answer. This is exactly mnemo's supersession-by-key. We measure the value of that mechanism cleanly:
+answer. This is exactly inspeximus's supersession-by-key. We measure the value of that mechanism cleanly:
 
   naive     — all facts live in the pool (no supersession). A near-duplicate stale fact competes with the
               consolidated one at retrieval, so the answering LLM can pick the stale value.
-  mnemo     — each fact ingested with key = subject-relation; a later fact SUPERSEDES the earlier one, so only
+  inspeximus     — each fact ingested with key = subject-relation; a later fact SUPERSEDES the earlier one, so only
               the consolidated value is retrievable.
 
 Everything else is held identical: same nomic embedder + same top-k retrieval + same Ollama-Cloud answerer +
-same gold match. The lift (mnemo - naive) is the CR-competency value of supersession, on the OFFICIAL MAB data.
+same gold match. The lift (inspeximus - naive) is the CR-competency value of supersession, on the OFFICIAL MAB data.
 
-This is flagship STEP 1 (mnemo vs its own no-supersession control on the real CR task). It is NOT yet a
+This is flagship STEP 1 (inspeximus vs its own no-supersession control on the real CR task). It is NOT yet a
 published SOTA claim: that needs the competitors (mem0/zep/graphiti) and the standing gate. No number leaves
 this repo until then.
 
@@ -109,7 +109,7 @@ def main():
     n_q = int(sys.argv[1]) if len(sys.argv) > 1 else 40
     d = json.load(open(DATA, encoding="utf-8"))
     facts = [re.sub(r'^\d+\.\s*', '', l).strip() for l in d["context"].split("\n") if re.match(r'^\d+\.', l.strip())]
-    # supersession: for each key keep the LAST fact (mnemo's later-wins). Track stale values per key too.
+    # supersession: for each key keep the LAST fact (inspeximus's later-wins). Track stale values per key too.
     active_by_key, stale_by_key = {}, {}
     for f in facts:
         k = key_of(f)
@@ -117,9 +117,9 @@ def main():
             stale_by_key.setdefault(k, []).append(value_of(active_by_key[k], k))
         active_by_key[k] = f
     naive_pool = list(facts)                       # every statement, stale + consolidated
-    mnemo_pool = list(active_by_key.values())      # consolidated only (later-wins supersession)
+    inspeximus_pool = list(active_by_key.values())      # consolidated only (later-wins supersession)
     print(f"facts={len(facts)}  conflict-keys={len(stale_by_key)}  "
-          f"naive_pool={len(naive_pool)}  mnemo_pool={len(mnemo_pool)}")
+          f"naive_pool={len(naive_pool)}  inspeximus_pool={len(inspeximus_pool)}")
 
     # pre-embed pools + questions
     embed(naive_pool, "d")
@@ -136,7 +136,7 @@ def main():
         scored = sorted(((cos(qv, embed([p], "d")[0]), p) for p in pool), reverse=True)
         return [p for _, p in scored[:TOP_K]]
 
-    res = {"naive": {"correct": 0, "stale_in_ctx": 0}, "mnemo": {"correct": 0, "stale_in_ctx": 0}}
+    res = {"naive": {"correct": 0, "stale_in_ctx": 0}, "inspeximus": {"correct": 0, "stale_in_ctx": 0}}
     conflict_q = 0
     for i, (q, gold) in enumerate(zip(qs, golds)):
         qv = embed([q], "q")[0]
@@ -144,7 +144,7 @@ def main():
         is_conflict = any(any(norm(gg) in norm(value_of(active_by_key[k], k)) for gg in gold) for k in stale_by_key)
         if is_conflict:
             conflict_q += 1
-        for cond, pool in (("naive", naive_pool), ("mnemo", mnemo_pool)):
+        for cond, pool in (("naive", naive_pool), ("inspeximus", inspeximus_pool)):
             ctx = retrieve(pool, qv)
             ans = llm_answer(q, ctx)
             if hit(ans, gold):
@@ -156,17 +156,17 @@ def main():
                     res[cond]["stale_in_ctx"] += 1
                     break
         if (i + 1) % 10 == 0:
-            print(f"  {i+1}/{len(qs)}  naive={res['naive']['correct']}  mnemo={res['mnemo']['correct']}")
+            print(f"  {i+1}/{len(qs)}  naive={res['naive']['correct']}  inspeximus={res['inspeximus']['correct']}")
     json.dump(_cache, open(CACHE, "w"))
 
     n = len(qs)
     print("\n=== MemoryAgentBench Conflict Resolution (FactConsolidation sh_6k), n=%d questions ===" % n)
-    for cond in ("naive", "mnemo"):
+    for cond in ("naive", "inspeximus"):
         c = res[cond]
         print(f"  {cond:6s}  accuracy={c['correct']}/{n}={c['correct']/n:.2%}   "
               f"stale-in-retrieved-context={c['stale_in_ctx']}/{n}")
-    lift = (res["mnemo"]["correct"] - res["naive"]["correct"]) / n
-    print(f"  LIFT (mnemo supersession - naive): {lift:+.2%}  |  conflict questions ~{conflict_q}/{n}")
+    lift = (res["inspeximus"]["correct"] - res["naive"]["correct"]) / n
+    print(f"  LIFT (inspeximus supersession - naive): {lift:+.2%}  |  conflict questions ~{conflict_q}/{n}")
     out = {"dataset": "MemoryAgentBench/Conflict_Resolution/factconsolidation_sh_6k_no0", "n": n,
            "top_k": TOP_K, "answerer": CLOUD_MODEL, "results": res, "lift": lift,
            "conflict_keys": len(stale_by_key)}

@@ -56,7 +56,7 @@ SUPPLY = [
                      "let low-value items lapse instead of cleaning by recency or access-count.",
         "unmet_need": "Stores silently fill with stale, low-value items that degrade retrieval; cleanup "
                       "is done by recency/frequency, not by future value.",
-        "lab": "mnemo recall benchmark + per-type decay (dogfooded on dungeon mnemo)",
+        "lab": "inspeximus recall benchmark + per-type decay (dogfooded on dungeon inspeximus)",
         "exapts_to": ["AI agent memory / context rot", "RAG chunk freshness", "feature-flag cleanup",
                       "alert/notification fatigue", "CRM record decay"],
         "queries": [

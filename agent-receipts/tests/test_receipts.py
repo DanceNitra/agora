@@ -1,7 +1,7 @@
 """Tests for agent-receipts. Run: `pytest` (or `python tests/test_receipts.py`).
 
 Covers the core chain (integrity + signature), tamper/forgery detection, the verifier CLI exit codes,
-the external mediator + reconcile, and the optional mnemo audit (skipped if mnemo isn't importable)."""
+the external mediator + reconcile, and the optional inspeximus audit (skipped if inspeximus isn't importable)."""
 import json
 import os
 import sys
@@ -102,16 +102,16 @@ def test_mediator_reconcile_catches_omission_and_lie():
     assert not ok2 and any("OMITTED" in p for p in problems)
 
 
-def test_mnemo_audit_if_available():
+def test_inspeximus_audit_if_available():
     try:
-        from mnemo_receipts import ReceiptedMnemo, audit_memory
+        from inspeximus_receipts import Receiptedinspeximus, audit_memory
         from inspeximus import Inspeximus
     except Exception:
-        return  # mnemo not importable in this layout; integration test skipped
+        return  # inspeximus not importable in this layout; integration test skipped
     import tempfile
     path = os.path.join(tempfile.mkdtemp(), "m.json")
     mk = (generate_keypair() if _HAVE_CRYPTO else (None, None))
-    rm = ReceiptedMnemo(Inspeximus(path=path), private_key_hex=mk[0], public_key_hex=mk[1])
+    rm = Receiptedinspeximus(Inspeximus(path=path), private_key_hex=mk[0], public_key_hex=mk[1])
     rm.remember("host is db-prod-01", key="db::host", mtype="semantic")
     ok, _ = audit_memory(rm.m, rm.chain, expected_pubkey=mk[1])
     assert ok

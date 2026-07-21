@@ -24,7 +24,7 @@ the illusion of validity). The contribution here is only the runnable two-part n
 cohort AND its forward collapse end to end, with no data and no tuning.
 
 Deterministic (fixed seeds; needs numpy):  python good_to_great_null.py
-MIT-licensed. Part of Agora / mnemo (https://github.com/DanceNitra/agora/tree/main/mnemo).
+MIT-licensed. Part of Agora / inspeximus (https://github.com/DanceNitra/agora/tree/main/inspeximus).
 """
 import statistics as st
 import numpy as np

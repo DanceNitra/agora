@@ -13,7 +13,7 @@ economics follow from the construction, they are not empirical surprises. The po
 show the crossover a flat bond leaves open, and that the residual is bounded by a
 reversibility gate you already want for other reasons, not that poisoning becomes impossible.
 
-Lever 2 is wired to the SAME reversible checkpoint mnemo already ships (slash()/restore()):
+Lever 2 is wired to the SAME reversible checkpoint inspeximus already ships (slash()/restore()):
 a promoted value's first high-consequence use re-checks corroboration/independence; a caught
 poison is reverted before it can be cashed on an irreversible action, and the bond still burns.
 """
@@ -51,13 +51,13 @@ def lever1():
 # ---------------------------------------------------------------- Lever 2
 # Reversibility checkpoint before an irreversible cash-out. A promoted poison's first
 # high-consequence use routes through the same re-check you'd gate any irreversible step
-# behind. Caught => reverted (0 irreversible damage) AND bond burns. This is the mnemo
+# behind. Caught => reverted (0 irreversible damage) AND bond burns. This is the inspeximus
 # slash()/restore() path applied at ACTION time, not a new detector.
 #
 # Deterministic sweep (no RNG so the result is reproducible): p_catch is the fraction of
 # poisons the action-time re-check reverts before the irreversible step.
 def lever2(value=500):
-    print("LEVER 2  reversibility checkpoint at the irreversible step (mnemo slash/restore)")
+    print("LEVER 2  reversibility checkpoint at the irreversible step (inspeximus slash/restore)")
     for p_catch in (0.0, 0.8, 0.99):
         realized = value * (1.0 - p_catch)   # expected irreversible damage per attempt
         print(f"  p_catch={p_catch:<4}: irreversible damage={realized:5.1f}/attempt "

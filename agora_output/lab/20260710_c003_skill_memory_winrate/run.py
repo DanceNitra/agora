@@ -10,7 +10,7 @@ DESIGN (smallest faithful model, properly powered):
   damage rolls; after each fight it picks one of two random reward cards. Win = clear the gauntlet
   alive. Difficulty tuned so the BASELINE agent wins ~25-35% (the claim's 3/10 regime).
   Arm A BASELINE: each game fresh, no memory.
-  Arm B SKILL-MEMORY (AgenticSTS-style, mnemo-flavored): after every game the agent writes ONE
+  Arm B SKILL-MEMORY (AgenticSTS-style, inspeximus-flavored): after every game the agent writes ONE
     short lesson ("skill") from the outcome; lessons accumulate in a store and the top-K most
     valuable (win-credited) are injected into future games' prompts. Memory accrues sequentially
     across the arm's games, exactly like the paper's cross-episode skill layer.

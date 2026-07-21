@@ -9,8 +9,8 @@ jacksonxly's sharper poke, after the tight-vs-loose window (see revert_concurren
    correctly, because that one is a real conflict. i'll pull the concurrency probe and check whether same-slot
    vs cross-slot is separable in your fixture."
 
-He is right about the failure mode of a PER-RECORD binding. This probe measures where mnemo actually sits.
-mnemo's challenge is revert_challenge(key) = "revert:{key}:{current_active_id}", and _current_active_id(key)
+He is right about the failure mode of a PER-RECORD binding. This probe measures where inspeximus actually sits.
+inspeximus's challenge is revert_challenge(key) = "revert:{key}:{current_active_id}", and _current_active_id(key)
 is computed ONLY over records whose .key == key. So the binding granularity is the KEY (the slot), not a
 multi-field record. The prediction: a write to a DIFFERENT key must NOT invalidate a revert capability minted
 for our key (no false conflict), while a write to the SAME key MUST (a real conflict). This probe tests that
@@ -22,7 +22,7 @@ store's global last-write id) and counts the false invalidations it would cause 
 Deterministic, no LLM, no network. RUN: python research/probes/revert_slot_binding_probe.py
 """
 import sys, pathlib, json
-sys.path.insert(0, str(pathlib.Path(__file__).resolve().parents[2] / "mnemo_pypi"))
+sys.path.insert(0, str(pathlib.Path(__file__).resolve().parents[2] / "inspeximus_pypi"))
 from inspeximus import Inspeximus, new_receipt_keypair, sign_revert
 
 R = {}
@@ -85,7 +85,7 @@ passed = (R["cross_slot_write_does_not_invalidate"] and R["same_slot_write_does_
           and R["region_revert_survives_4_orthogonal_writes"]
           and R["per_record_binding_false_invalidations_on_4_orthogonal_writes"] == 4
           and R["per_slot_binding_false_invalidations_on_4_orthogonal_writes"] == 0)
-print("\nREADING: mnemo already binds PER-SLOT (per-key), not per-record. A revert capability minted for one")
+print("\nREADING: inspeximus already binds PER-SLOT (per-key), not per-record. A revert capability minted for one")
 print("slot survives any number of orthogonal writes to other slots (0 false conflicts), and is invalidated")
 print("only by a real write to the SAME slot — exactly the separability jacksonxly proposed. The per-record")
 print("alternative would have raised 4 false invalidations on the same 4 orthogonal writes.")

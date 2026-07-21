@@ -22,7 +22,7 @@ degrades materially under the real backdrop, that is the finding.
 
 Run: python research/probes/fault_to_fabrication_probe.py            (all 8 agents, N=20, cloud-free)
      python research/probes/fault_to_fabrication_probe.py --n 10 --agents king,priest
-Part of Agora / mnemo (MIT).
+Part of Agora / inspeximus (MIT).
 """
 import os
 import sys

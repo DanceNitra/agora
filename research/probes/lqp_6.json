@@ -1,7 +1,7 @@
 [
  {
   "qid": "c3q197",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 4,
   "question": "What does Nate love most about having turtles?",
   "gold": "They make him feel calm and don't require much looking after",
@@ -9,7 +9,7 @@
  },
  {
   "qid": "c3q198",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 4,
   "question": "What did Nate share a photo of as a part of his experimentation in November 2022?",
   "gold": "colorful bowls of coconut milk ice cream",
@@ -17,7 +17,7 @@
  },
  {
   "qid": "c4q0",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 1,
   "question": "what are John's goals with regards to his basketball career?",
   "gold": "improve shooting percentage, win a championship",
@@ -25,7 +25,7 @@
  },
  {
   "qid": "c4q1",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 1,
   "question": "What are John's goals for his career that are not related to his basketball skills?",
   "gold": "get endorsements, build his brand, do charity work",
@@ -33,7 +33,7 @@
  },
  {
   "qid": "c4q2",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 1,
   "question": "What items does John collect?",
   "gold": "sneakers, fantasy movie DVDs, jerseys",
@@ -41,7 +41,7 @@
  },
  {
   "qid": "c4q3",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 3,
   "question": "Would Tim enjoy reading books by C. S. Lewis or John Greene?",
   "gold": "C. S.Lewis",
@@ -49,7 +49,7 @@
  },
  {
   "qid": "c4q4",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 1,
   "question": "What books has Tim read?",
   "gold": "Harry Potter, Game of Thrones, the Name of the Wind, The Alchemist, The Hobbit, A Dance with Dragons, and the Wheel of Time.",
@@ -57,7 +57,7 @@
  },
  {
   "qid": "c4q5",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 3,
   "question": "Based on Tim's collections, what is a shop that he would enjoy visiting in New York city?",
   "gold": "House of MinaLima",
@@ -65,7 +65,7 @@
  },
  {
   "qid": "c4q6",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 2,
   "question": "In which month's game did John achieve a career-high score in points?",
   "gold": "June 2023",
@@ -73,7 +73,7 @@
  },
  {
   "qid": "c4q7",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 1,
   "question": "Which geographical locations has Tim been to?",
   "gold": "California, London, the Smoky Mountains",
@@ -81,7 +81,7 @@
  },
  {
   "qid": "c4q8",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 3,
   "question": "Which outdoor gear company likely signed up John for an endorsement deal?",
   "gold": "Under Armour",
@@ -89,7 +89,7 @@
  },
  {
   "qid": "c4q9",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 1,
   "question": "Which endorsement deals has John been offered?",
   "gold": "basketball shoes and gear deal with Nike, potential sponsorship with Gatorade, Moxie a popular beverage company, outdoor gear company",
@@ -97,7 +97,7 @@
  },
  {
   "qid": "c4q10",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 2,
   "question": "When was John in Seattle for a game?",
   "gold": "early August, 2023",
@@ -105,7 +105,7 @@
  },
  {
   "qid": "c4q11",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 1,
   "question": "What sports does John like besides basketball?",
   "gold": "surfing",
@@ -113,7 +113,7 @@
  },
  {
   "qid": "c4q12",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 2,
   "question": "What year did John start surfing?",
   "gold": "2018",
@@ -121,7 +121,7 @@
  },
  {
   "qid": "c4q13",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 1,
   "question": "What does Tim do to escape reality?",
   "gold": "Read fantasy books.",
@@ -129,7 +129,7 @@
  },
  {
   "qid": "c4q14",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 1,
   "question": "What kind of writing does Tim do?",
   "gold": "comments on favorite books in a fantasy literature forum, articles on fantasy novels, studying characters, themes, and making book recommendations, writing a fantasy novel",
@@ -137,7 +137,7 @@
  },
  {
   "qid": "c4q15",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 3,
   "question": "Who is Anthony?",
   "gold": "likely John's friend, colleague or family",
@@ -145,7 +145,7 @@
  },
  {
   "qid": "c4q16",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 2,
   "question": "After how many weeks did Tim reconnect with the fellow Harry Potter fan from California?",
   "gold": "three weeks",
@@ -153,7 +153,7 @@
  },
  {
   "qid": "c4q17",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 1,
   "question": "How many games has John mentioned winning?",
   "gold": "6",
@@ -161,7 +161,7 @@
  },
  {
   "qid": "c4q18",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 1,
   "question": "What authors has Tim read books from?",
   "gold": "J.K. Rowling, R.R. Martin, Patrick Rothfuss, Paulo Coelho, and J. R. R. Tolkien.",
@@ -169,7 +169,7 @@
  },
  {
   "qid": "c4q19",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 3,
   "question": "What is a prominent charity organization that John might want to work with and why?",
   "gold": "Good Sports, because they work with Nike, Gatorade, and Under Armour and they aim toprovide youth sports opportunities for kids ages 3-18 in high-need communities.",
@@ -177,7 +177,7 @@
  },
  {
   "qid": "c4q20",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 2,
   "question": "Which city was John in before traveling to Chicago?",
   "gold": "Seattle",
@@ -185,7 +185,7 @@
  },
  {
   "qid": "c4q21",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 1,
   "question": "Which US cities does John mention visiting to Tim?",
   "gold": "Seattle, Chicago, New York",
@@ -193,7 +193,7 @@
  },
  {
   "qid": "c4q22",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 2,
   "question": "When did John meet with his teammates after returning from Chicago?",
   "gold": "August 15, 2023",
@@ -201,7 +201,7 @@
  },
  {
   "qid": "c4q23",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 2,
   "question": "When is Tim attending a book conference?",
   "gold": "September 2023",
@@ -209,7 +209,7 @@
  },
  {
   "qid": "c4q24",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 2,
   "question": "Where was John between August 11 and August 15 2023?",
   "gold": "Chicago",
@@ -217,7 +217,7 @@
  },
  {
   "qid": "c4q25",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 1,
   "question": "What similar sports collectible do Tim and John own?",
   "gold": "signed basketball",
@@ -225,7 +225,7 @@
  },
  {
   "qid": "c4q26",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 1,
   "question": "Which TV series does Tim mention watching?",
   "gold": "That, Wheel of Time",
@@ -233,7 +233,7 @@
  },
  {
   "qid": "c4q27",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 3,
   "question": "Which popular time management technique does Tim use to prepare for exams?",
   "gold": "Pomodoro technique",
@@ -241,7 +241,7 @@
  },
  {
   "qid": "c4q28",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 3,
   "question": "Which popular music composer's tunes does Tim enjoy playing on the piano?",
   "gold": "John Williams",
@@ -249,7 +249,7 @@
  },
  {
   "qid": "c4q29",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 1,
   "question": "What schools did John play basketball in and how many years was he with his team during high school?",
   "gold": "Middle school, high school, and college and he was with his high school team for 4 years.",
@@ -257,7 +257,7 @@
  },
  {
   "qid": "c4q30",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 1,
   "question": "Which cities has John been to?",
   "gold": "Seattle, Chicago, New York, and Paris.",
@@ -265,7 +265,7 @@
  },
  {
   "qid": "c4q31",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 2,
   "question": "What month did Tim plan on going to Universal Studios?",
   "gold": "September, 2023",
@@ -273,7 +273,7 @@
  },
  {
   "qid": "c4q32",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 3,
   "question": "Which US states might Tim be in during September 2023 based on his plans of visiting Universal Studios?",
   "gold": "California or Florida",
@@ -281,7 +281,7 @@
  },
  {
   "qid": "c4q33",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 2,
   "question": "When does John plan on traveling with his team on a team trip?",
   "gold": "October, 2023",
@@ -289,7 +289,7 @@
  },
  {
   "qid": "c4q34",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 3,
   "question": "What could John do after his basketball career?",
   "gold": "become a basketball coach since he likes giving back and leadership",
@@ -297,7 +297,7 @@
  },
  {
   "qid": "c4q35",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 1,
   "question": "What outdoor activities does John enjoy?",
   "gold": "Hiking, surfing",
@@ -305,7 +305,7 @@
  },
  {
   "qid": "c4q36",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 1,
   "question": "Who is Tim and John's favorite basketball player?",
   "gold": "LeBron James",
@@ -313,7 +313,7 @@
  },
  {
   "qid": "c4q37",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 2,
   "question": "Which week did Tim visit the UK for the Harry Potter Conference?",
   "gold": "The week before October 13th, 2023.",
@@ -321,7 +321,7 @@
  },
  {
   "qid": "c4q38",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 1,
   "question": "which country has Tim visited most frequently in his travels?",
   "gold": "UK",
@@ -329,7 +329,7 @@
  },
  {
   "qid": "c4q39",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 2,
   "question": "What year did Tim go to the Smoky Mountains?",
   "gold": "2022",
@@ -337,7 +337,7 @@
  },
  {
   "qid": "c4q40",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 2,
   "question": "Has Tim been to North Carolina and/or Tennesee states in the US?",
   "gold": "Yes",
@@ -345,7 +345,7 @@
  },
  {
   "qid": "c4q41",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 1,
   "question": "What kind of fiction stories does Tim write?",
   "gold": "Fantasy stories with plot twists",
@@ -353,7 +353,7 @@
  },
  {
   "qid": "c4q42",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 1,
   "question": "What has John cooked?",
   "gold": "Soup, a slow cooker meal, and honey garlic chicken with roasted veg.",
@@ -361,7 +361,7 @@
  },
  {
   "qid": "c4q43",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 1,
   "question": "What does John like about Lebron James?",
   "gold": "His heart, determination, skills, and leadership.",
@@ -369,7 +369,7 @@
  },
  {
   "qid": "c4q44",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 2,
   "question": "When did John and his wife go on a European vacation?",
   "gold": "November, 2023.",
@@ -377,7 +377,7 @@
  },
  {
   "qid": "c4q45",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 2,
   "question": "Which country was Tim visiting in the second week of November?",
   "gold": "UK",
@@ -385,7 +385,7 @@
  },
  {
   "qid": "c4q46",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 2,
   "question": "Where was Tim in the week before 16 November 2023?",
   "gold": "UK",
@@ -393,7 +393,7 @@
  },
  {
   "qid": "c4q47",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 2,
   "question": "When did John get married at a greenhouse?",
   "gold": "last week of September 2023",
@@ -401,7 +401,7 @@
  },
  {
   "qid": "c4q48",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 1,
   "question": "When did John get an ankle injury in 2023?",
   "gold": "around November 16, 2023",
@@ -409,7 +409,7 @@
  },
  {
   "qid": "c4q49",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 1,
   "question": "How many times has John injured his ankle?",
   "gold": "two times",
@@ -417,7 +417,7 @@
  },
  {
   "qid": "c4q50",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 1,
   "question": "Which book was John reading during his recovery from an ankle injury?",
   "gold": "The Alchemist",
@@ -425,7 +425,7 @@
  },
  {
   "qid": "c4q51",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 3,
   "question": "What kind of yoga for building core strength might John benefit from?",
   "gold": "Hatha Yoga",
@@ -433,7 +433,7 @@
  },
  {
   "qid": "c4q52",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 1,
   "question": "What does John do to supplement his basketball training?",
   "gold": "Yoga, strength training",
@@ -441,7 +441,7 @@
  },
  {
   "qid": "c4q53",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 3,
   "question": "What other exercises can help John with his basketball performance?",
   "gold": "Sprinting, long-distance running, and boxing.",
@@ -449,7 +449,7 @@
  },
  {
   "qid": "c4q54",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 2,
   "question": "When did John take a trip to the Rocky Mountains?",
   "gold": "2022",
@@ -457,7 +457,7 @@
  },
  {
   "qid": "c4q55",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 2,
   "question": "When did John start playing professionally?",
   "gold": "May, 2023",
@@ -465,7 +465,7 @@
  },
  {
   "qid": "c4q56",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 2,
   "question": "When did Tim start playing the violin?",
   "gold": "August 2023",
@@ -473,7 +473,7 @@
  },
  {
   "qid": "c4q57",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 1,
   "question": "What instruments does Tim play?",
   "gold": "piano, violin",
@@ -481,7 +481,7 @@
  },
  {
   "qid": "c4q58",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 2,
   "question": "When did John attend the Harry Potter trivia?",
   "gold": "August 2023.",
@@ -489,7 +489,7 @@
  },
  {
   "qid": "c4q59",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 1,
   "question": "Which career-high performances did John achieve in 2023?",
   "gold": "highest point score, highest assist",
@@ -497,7 +497,7 @@
  },
  {
   "qid": "c4q60",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 2,
   "question": "When did John achieve a career-high assist performance?",
   "gold": "December 11, 2023",
@@ -505,7 +505,7 @@
  },
  {
   "qid": "c4q61",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 1,
   "question": "What books has John read?",
   "gold": "inpsiring book on dreaming big, The Alchemist, fantasy series, non-fiction books on personal development, Dune",
@@ -513,7 +513,7 @@
  },
  {
   "qid": "c4q62",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 1,
   "question": "What does John do to share his knowledge?",
   "gold": "gives seminars, mentors younger players.",
@@ -521,7 +521,7 @@
  },
  {
   "qid": "c4q63",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 2,
   "question": "When did John organize a basketball camp for kids?",
   "gold": "summer 2023",
@@ -529,7 +529,7 @@
  },
  {
   "qid": "c4q64",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 2,
   "question": "Which month was John in Italy?",
   "gold": "December, 2023",
@@ -537,7 +537,7 @@
  },
  {
   "qid": "c4q65",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 1,
   "question": "What fantasy movies does Tim like?",
   "gold": "Lord of the Rings, Harry Potter, and Star Wars.",
@@ -545,7 +545,7 @@
  },
  {
   "qid": "c4q66",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 3,
   "question": "What is a Star Wars book that Tim might enjoy?",
   "gold": "Star Wars: Jedi Apprentice by Judy Blundell and David Farland. It is a highly rated and immersive series about his favorite movies.",
@@ -553,7 +553,7 @@
  },
  {
   "qid": "c4q67",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 3,
   "question": "What would be a good hobby related to his travel dreams for Tim to pick up?",
   "gold": "Writing a travel blog.",
@@ -561,7 +561,7 @@
  },
  {
   "qid": "c4q68",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 2,
   "question": "What day did Tim get into his study abroad program?",
   "gold": "Januarty 5, 2024",
@@ -569,7 +569,7 @@
  },
  {
   "qid": "c4q69",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 2,
   "question": "When will Tim leave for Ireland?",
   "gold": "February, 2024",
@@ -577,7 +577,7 @@
  },
  {
   "qid": "c4q70",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 3,
   "question": "Which Star Wars-related locations would Tim enjoy during his visit to Ireland?",
   "gold": "Skellig Michael, Malin Head, Loop Head, Ceann Sibéal, and Brow Head because they are Star Wars filming locations.",
@@ -585,7 +585,7 @@
  },
  {
   "qid": "c4q71",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 4,
   "question": "Which team did John sign with on 21 May, 2023?",
   "gold": "The Minnesota Wolves",
@@ -593,7 +593,7 @@
  },
  {
   "qid": "c4q72",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 4,
   "question": "What is John's position on the team he signed with?",
   "gold": "shooting guard",
@@ -601,7 +601,7 @@
  },
  {
   "qid": "c4q73",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 4,
   "question": "What challenge did John encounter during pre-season training?",
   "gold": "fitting into the new team's style of play",
@@ -609,7 +609,7 @@
  },
  {
   "qid": "c4q74",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 4,
   "question": "What aspects of the Harry Potter universe will be discussed in John's fan project collaborations?",
   "gold": "characters, spells, magical creatures",
@@ -617,7 +617,7 @@
  },
  {
   "qid": "c4q75",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 4,
   "question": "What forum did Tim join recently?",
   "gold": "fantasy literature forum",
@@ -625,7 +625,7 @@
  },
  {
   "qid": "c4q76",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 4,
   "question": "What kind of picture did Tim share as part of their Harry Potter book collection?",
   "gold": "MinaLima's creation from the Harry Potter films",
@@ -633,7 +633,7 @@
  },
  {
   "qid": "c4q77",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 4,
   "question": "What was the highest number of points John scored in a game recently?",
   "gold": "40 points",
@@ -641,7 +641,7 @@
  },
  {
   "qid": "c4q78",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 4,
   "question": "What did John celebrate at a restaurant with teammates?",
   "gold": "a tough win",
@@ -649,7 +649,7 @@
  },
  {
   "qid": "c4q79",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 4,
   "question": "What kind of deals did John sign with Nike and Gatorade?",
   "gold": "basketball shoe and gear deal with Nike, potential sponsorship deal with Gatorade",
@@ -657,7 +657,7 @@
  },
  {
   "qid": "c4q80",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 4,
   "question": "Which city is John excited to have a game at?",
   "gold": "Seattle",
@@ -665,7 +665,7 @@
  },
  {
   "qid": "c4q81",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 4,
   "question": "How long has John been surfing?",
   "gold": "five years",
@@ -673,7 +673,7 @@
  },
  {
   "qid": "c4q82",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 4,
   "question": "How does John feel while surfing?",
   "gold": "super exciting and free-feeling",
@@ -681,7 +681,7 @@
  },
  {
   "qid": "c4q83",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 4,
   "question": "What kind of articles has Tim been writing about for the online magazine?",
   "gold": "different fantasy novels, characters, themes, and book recommendations",
@@ -689,7 +689,7 @@
  },
  {
   "qid": "c4q84",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 4,
   "question": "Which two fantasy novels does Tim particularly enjoy writing about?",
   "gold": "Harry Potter and Game of Thrones",
@@ -697,7 +697,7 @@
  },
  {
   "qid": "c4q85",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 4,
   "question": "What did Anthony and John end up playing during the charity event?",
   "gold": "an intense Harry Potter trivia contest",
@@ -705,7 +705,7 @@
  },
  {
   "qid": "c4q86",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 4,
   "question": "What did John share with the person he skyped about?",
   "gold": "Characters from Harry Potter",
@@ -713,7 +713,7 @@
  },
  {
   "qid": "c4q87",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 4,
   "question": "How did John describe the team bond?",
   "gold": "Awesome",
@@ -721,7 +721,7 @@
  },
  {
   "qid": "c4q88",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 4,
   "question": "How did John get introduced to basketball?",
   "gold": "Dad signed him up for a local league",
@@ -729,7 +729,7 @@
  },
  {
   "qid": "c4q89",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 4,
   "question": "What is John's number one goal in his basketball career?",
   "gold": "Winning a championship",
@@ -737,7 +737,7 @@
  },
  {
   "qid": "c4q90",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 4,
   "question": "What organization is John teaming up with for his charity work?",
   "gold": "A local organization helping disadvantaged kids with sports and school",
@@ -745,7 +745,7 @@
  },
  {
   "qid": "c4q91",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 4,
   "question": "When did John meet back up with his teammates after his trip in August 2023?",
   "gold": "Aug 15th",
@@ -753,7 +753,7 @@
  },
  {
   "qid": "c4q92",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 4,
   "question": "What did John's teammates give him when they met on Aug 15th?",
   "gold": "a basketball with autographs on it",
@@ -761,7 +761,7 @@
  },
  {
   "qid": "c4q93",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 4,
   "question": "Why did John's teammates sign the basketball they gave him?",
   "gold": "to show their friendship and appreciation",
@@ -769,7 +769,7 @@
  },
  {
   "qid": "c4q94",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 4,
   "question": "What is the main intention behind Tim wanting to attend the book conference?",
   "gold": "to learn more about literature and create a stronger bond to it",

@@ -1,7 +1,7 @@
 """M1 severe-test: does an EMBEDDING-NORM re-ranking term improve recall over pure cosine?
 
 Motivation: arXiv:2606.30625 claims contrastive training imprints concept SPECIFICITY into the vector
-NORM that cosine normalizes away. mnemo keeps raw vectors, so if true it's a free re-ranking signal.
+NORM that cosine normalizes away. inspeximus keeps raw vectors, so if true it's a free re-ranking signal.
 
 PRECHECK (run separately): nomic-embed-text is NOT unit-normalized (norm 18.9-23.3, CV ~7.8%) — so there
 IS a norm signal. BUT the norms are confounded with LENGTH (short/generic text -> higher norm, long/specific

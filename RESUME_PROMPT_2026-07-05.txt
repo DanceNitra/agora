@@ -4,7 +4,7 @@ HEALTH-CHECK FIRST:
 - git: origin/main == HEAD (should be 9c41721 or later), tree clean-ish (pycache + untracked supersession_deepdive.py are expected).
 - brain :8000: curl /api/v1/health -> {"status":"ok"} + exactly ONE :8000 LISTEN.
 - dungeon :5174 -> HTTP 200; verify exactly ONE mcp_server.py + ZERO stray supervisors.
-- mnemo: local import 0.6.0; PyPI agora-mnemo == 0.6.0 (already released).
+- inspeximus: local import 0.6.0; PyPI inspeximus == 0.6.0 (already released).
 
 THEN: continue the published-post AUDIT PROGRAM.
 
@@ -16,12 +16,12 @@ VALIDATE is DONE and both defects are already investigated (see the #34 RESUME n
   -> "highest average ASR 84.30%".
 - DEFECT 2 (RESOLVED - the post is CORRECT): the "entrench sybil = 100%" is right for a REALISTIC sybil
   (2 real distinct-source records); the v2 lab's en_forged=0.00 was a fake-link-string artifact (fake
-  strings don't resolve on the hardened current mnemo). BONUS: strict_corroboration BOUNDS not CLOSES
+  strings don't resolve on the hardened current inspeximus). BONUS: strict_corroboration BOUNDS not CLOSES
   (2 attested records = 2 verified keys still clear a 2-witness gate, same as Veracity-Gap D2) - add this
   honest update + cross-link the Veracity-Gap post (agent-memory-defense-provenance-not-truth).
 REMAINING #34 steps (FULL /audit-post from STORM on, do NOT shorten):
   1. Build a clean PUBLIC probe (research/probes/) with the REALISTIC sybil (real distinct-source records,
-     NOT fake link strings) AND the correct OVERWRITE mechanics (mnemo supersession = STATE-TOGGLE +
+     NOT fake link strings) AND the correct OVERWRITE mechanics (inspeximus supersession = STATE-TOGGLE +
      supersede_requires_corroboration, NOT the key= path - my quick attempt got hardened-single overwrite
      wrong at 100% instead of 0%). Reproduce the post's table + the strict-bounds result. Link it EN+SK.
   2. STORM (dominant) + 5-lens stress-claim + verify-claims (MINJA 2503.03704, ASB 2410.02644, credit

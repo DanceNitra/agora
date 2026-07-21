@@ -19,7 +19,7 @@ Two independent reasons the audit (stress-claim, 5 lenses + citation verificatio
    invalidation-with-retention, already ported to LLM-agent memory in TOKI (arXiv 2606.06240) and MemLineage
    (arXiv 2605.14421). Not a novel discovery.
 
-Kept: `mnemo.retract_lineage` ships as a modest product primitive with prior-art citations in its docstring.
+Kept: `inspeximus.retract_lineage` ships as a modest product primitive with prior-art citations in its docstring.
 Not published. The original draft is preserved below for the record.
 
 ---
@@ -50,8 +50,8 @@ correction efficacy, not task/retrieval selection.
   - `none` — no correction (baseline).
   - `naive_overwrite` — write the correct value to the key (what a bag-of-embeddings store can do); the k
     laundered derived entries survive.
-  - `lineage_revert` — `mnemo.forget_subject(root)` erases the root AND its derived_from lineage, then write
-    the correct value. This is the mnemo differentiator a value store lacks.
+  - `lineage_revert` — `inspeximus.forget_subject(root)` erases the root AND its derived_from lineage, then write
+    the correct value. This is the inspeximus differentiator a value store lacks.
 - Two metrics: (1) DETERMINISTIC retrieval residual harm (does the poison token still surface on neighborhood
   queries — no LLM); (2) BEHAVIORAL harm (does the agent, deepseek-v4-flash / glm-5.2 at temp 0, ANSWER with
   the poison value). The harm classifier is a deterministic string match, so there is NO LLM judge to
@@ -59,7 +59,7 @@ correction efficacy, not task/retrieval selection.
 - FALSIFIER: if naive_overwrite reverses harm as well as lineage_revert (both ~0), the lineage infra is
   unnecessary and we publish the NULL. It could have fired; it didn't.
 
-## Results (n=15 scenarios, mnemo 0.7.15)
+## Results (n=15 scenarios, inspeximus 0.7.15)
 
 Retrieval residual harm (fraction of neighborhood queries still surfacing the poison token):
 
@@ -88,7 +88,7 @@ Behavioral harm (agent answers with the poison value as current fact):
 - Buffering is partial, and now quantified: at naive k=3 the model split 6 poison / 4 correct / 5 other — it
   buffers some, the corroboration wins ~40%. The storm's "LLMs buffer corruption" is a half-truth.
 
-## The honest tradeoff, and the fix we built (mnemo 0.7.16 `retract_lineage`)
+## The honest tradeoff, and the fix we built (inspeximus 0.7.16 `retract_lineage`)
 
 The experiment exposed a frontier: `naive_overwrite` leaves the derived facts ACTIVE and poisoned (harm),
 while `lineage_revert` (forget_subject) HARD-DELETES them (0 harm but the legitimate payload — a connection
@@ -144,6 +144,6 @@ top-1, would not see the derivatives and would not be harmed.
 "Correcting a corrupted agent memory is not the same as reversing its harm. After a wrong fact launders into
 k corroborating write-backs, a value-only correction (what a bag-of-embeddings store can do) is overridden by
 the corroborating mass and the agent asserts the retired value ~40-47% of the time — on two different model
-families, even with the correction present in context. A lineage-aware revert (mnemo's provenance erasure)
+families, even with the correction present in context. A lineage-aware revert (inspeximus's provenance erasure)
 holds behavioral harm at 0%. The cost: lineage revert also erases the derived scaffolding, so the real fix is
 re-derivation from the corrected root."

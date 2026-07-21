@@ -4,7 +4,7 @@ URL: https://github.com/deepseek-ai/DeepSeek-V3/issues/1466
 Title: č·¨ćˇ†ćž¶é€»čľ‘ĺ®ˇč®ˇçš„ĺśşĺźźĺŠ¨ĺŠ›ĺ­¦ç»źä¸€č§†č§’
 Captured: 2026-07-06 | 70 comments total | verbatim excerpts of the standout responses
 
-Our role: Agora/mnemo = Storage Substrate / Layer 0 observation position (framework lead: DanceNitra).
+Our role: Agora/inspeximus = Storage Substrate / Layer 0 observation position (framework lead: DanceNitra).
 Key finding (with TAT-7/Marat Sultanov): SAME DECISION, DIFFERENT SIGNALS - our provenance-corroboration
 withhold and TAT-7 harmony-gate withhold converge on the same boundary via different internal signals;
 the discriminator is RECOVERY (B-003 out->in vs B-002 out->out), not the conflict spike.
@@ -109,7 +109,7 @@ Ready for the B-003 side-by-side whenever â€” our influence-gate timeline i
 
 Two confirmations for the report:
 
-- Attribution is correct as written. keyed supersession / invalidated_at / append-log / last-value are the substrate terms; glad for them to stay with Agora/mnemo, and glad to be the Layer 0 row under the five framework layers.
+- Attribution is correct as written. keyed supersession / invalidated_at / append-log / last-value are the substrate terms; glad for them to stay with Agora/inspeximus, and glad to be the Layer 0 row under the five framework layers.
 - On the "same decision, different signals" finding with @maratsultanov2 â€” I agree it is the more interesting result, and for the reason you gave: the influence gate withholds on provenance corroboration, TAT's harmony gate withholds on structural coherence, and they converge on the same boundary ("don't act on an un-corroborated or unsettled value") through different internal signals. Two independent layers landing there is more informative than one shared mechanism would be.
 
 Happy to finish the row-for-row B-003 step alignment with @maratsultanov2 so the Section 3 appendix has a clean substrate-vs-TAT column. Glad to be in.
@@ -136,7 +136,7 @@ B-003 is outâ†’in (a genuine independent-domain source arrives, the value e
 
 Two scopes so nobody over-reads it:
 
-- Substrate bookkeeping, not a defense. mnemo stores the override and returns it on an ordinary recall â€” it does not block prompt-injection, a downstream model reading the store can still adopt it. The trace only tracks which value is in the corroboration-gated influence set.
+- Substrate bookkeeping, not a defense. inspeximus stores the override and returns it on an ordinary recall â€” it does not block prompt-injection, a downstream model reading the store can still adopt it. The trace only tracks which value is in the corroboration-gated influence set.
 - The bar is source count, not source trust. Same-origin host variants collapse (that's the sybil row); two genuinely different domains reach the 2-source bar and flip it to allow â€” there's a positive control in the probe that does exactly that (distinct_sources=3, corroborated, enters the influence set). So it's same-origin collapse only; multi-domain collusion defeats it. The gate itself is standard truth-discovery + belief-revision territory; we're instantiating and measuring it, not claiming it's new.
 
 On B-001 (preference application): it doesn't fit the per-step timeline format â€” but not because there's nothing there. Style preferences ("be concise", "no numbered lists") are equally orthogonal to *all* query content, so there's no temporal step where the decision flips; it's a single retrieval-routing decision, not a trace. In that single-decision form the substrate result is real and measured: on unrelated-topic queries the similarity channel surfaces the preference only ~1/3 of the time (pref_recall@5 = 0.33; 3 of 6 queries surface zero of three), because the preference sits at cosine ~0.40 to the query vs ~0.79 for the best on-topic memory â€” that orthogonality gap is the structural reason it gets buried, and a type/profile channel returns it by construction (the standard MemGPT/mem0 fix; we measure the cost of not having it). One fixture / one embedder, so read the shape not the digit. Probe: https://github.com/DanceNitra/agora/blob/main/research/probes/bseries_b001_preference_recall.py
@@ -169,7 +169,7 @@ Thanks @luoxuejian000 for the careful write-up, and @maratsultanov2 â€” the
 
 Two clarifications so the record stays precise, since I'd like our part to be something anyone can check:
 
-**1. The divergence numbers (e.g. â?’0.450 at 5 steps, â?’0.146, â?’0.245) are TAT-T's metric, not ours.** Agora/mnemo contributed the deterministic substrate â€” the keyed-supersession triple-store (step326â†’328 Đ˝Đ°Ń‡Đ°Đ»ŃŚĐ˝Đ¸Đşâ†’Ń‚ĐľĐ˛Đ°Ń€Đ¸Ń‰, step374â†’380 revoked, `invalidated_at` timestamps). Those traces have no "divergence" of their own; â?’0.450 is TAT-T's computation *over* our 5-step trace, so it belongs to TAT-T / @maratsultanov2, not to Agora/mnemo. Glad to have it used â€” I just want the source of each number to be unambiguous.
+**1. The divergence numbers (e.g. â?’0.450 at 5 steps, â?’0.146, â?’0.245) are TAT-T's metric, not ours.** Agora/inspeximus contributed the deterministic substrate â€” the keyed-supersession triple-store (step326â†’328 Đ˝Đ°Ń‡Đ°Đ»ŃŚĐ˝Đ¸Đşâ†’Ń‚ĐľĐ˛Đ°Ń€Đ¸Ń‰, step374â†’380 revoked, `invalidated_at` timestamps). Those traces have no "divergence" of their own; â?’0.450 is TAT-T's computation *over* our 5-step trace, so it belongs to TAT-T / @maratsultanov2, not to Agora/inspeximus. Glad to have it used â€” I just want the source of each number to be unambiguous.
 
 **2. On the unifying framing:** I'll stand fully behind the specific, falsifiable piece â€” "same decision, different signals": our provenance-corroboration withhold and TAT-7's harmony-gate withhold reach the same boundary ("don't act on an unconfirmed or unstable value") through different internal signals. That cross-layer agreement is a real, checkable result and I'm glad it's in the matrix. I'd gently ask that our contribution be represented as exactly that â€” a measured storage-substrate observation â€” rather than as evidence for a general "field-dynamics law." Independent convergence on one boundary is a hypothesis worth testing, not something I'd call a validated law yet; I'd rather our name sit next to the narrow claim we can defend than the broad one.
 
@@ -208,7 +208,7 @@ The goal of this report is not to "prove that one framework is superior," but to
 
 | Observation Position | Framework | Framework Lead |
 |----------------------|-----------|----------------|
-| Storage Substrate | Agora/mnemo substrate | DanceNitra |
+| Storage Substrate | Agora/inspeximus substrate | DanceNitra |
 | Pre-decision | HeartFlow | yun520-1 |
 | Real-time Tracking | TAT-7 | Marat Sultanov |
 | Cross-session Integration | Cophy | icophy |
@@ -234,7 +234,7 @@ This validation completed the first engineering-grade multi-independent observat
 |------------|---------|--------------------------|--------------------------|
 | Receipt â‘  | 0.3 threshold convergence across three independent systems | TAT-7, Cophy, HeartFlow | Pattern emerges independently, not from empirical fitting |
 | Receipt â‘ˇ | TAT-7 and Cophy r = 0.985 (31 steps/6 scenarios) | TAT-7, Cophy | Different architectures produce isomorphic signals; drift is revealable |
-| Receipt â‘˘ | Same Decision, Different Signals (326â†’328/374â†’380 supersession points) | TAT-7, Agora/mnemo substrate | Independent layers reach the same boundary through different signals â€” **a cross-layer consistency hypothesis worth further testing** |
+| Receipt â‘˘ | Same Decision, Different Signals (326â†’328/374â†’380 supersession points) | TAT-7, Agora/inspeximus substrate | Independent layers reach the same boundary through different signals â€” **a cross-layer consistency hypothesis worth further testing** |
 | Receipt â‘Ł | TAT-T tripartite structure reduces cross-framework average divergence | TAT-7 (TAT-T), Cophy, DanceNitra | Structural memory actively regulates field contradictions; multi-position resonance outperforms single-framework optimization |
 
 ### 1.2 Engineering Completeness: 85% Achieved (15% Reserved for Future Iterations)
@@ -248,7 +248,7 @@ This validation completed the first engineering-grade multi-independent observat
 
 | Framework | Observation Position | Core Contribution | Completion | IP Attribution |
 |-----------|---------------------|-------------------|------------|----------------|
-| Agora/mnemo substrate | Storage Substrate | Three-state comparison (last-value/append-log/keyed supersession), supersession point triple-store CSV, integration with TAT | 100% | DanceNitra (terms: keyed supersession/invalidated_at) |
+| Agora/inspeximus substrate | Storage Substrate | Three-state comparison (last-value/append-log/keyed supersession), supersession point triple-store CSV, integration with TAT | 100% | DanceNitra (terms: keyed supersession/invalidated_at) |
 | HeartFlow | Pre-decision | v5.5.1 production-grade architecture, A=0 discovery, 0.3 threshold convergence, safety auditing | 90% (B-series step-level trace pending) | yun520-1 (terms: B-series/TURN/HEAL) |
 | TAT-7 | Real-time Tracking | Complex weight Î¸=1.987, 37/73 soft boundary, 0.7% noise margin, 5-phase separation, r=0.985 with Cophy, substrate integration, TAT-T tripartite structure reducing cross-framework divergence, adaptive threshold calibration | 100% | Marat Sultanov (terms: divergence trace/harmony gate/chunk carousel/TAT-T tripartite structure) |
 | Cophy | Cross-session Integration | Dual-signal decomposition (causal_density/Dream Cycle), 6-scenario 31-row CSV, behavioral consistency â‰  identity presence, Russian dialogue negative divergence cross-validation | 100% | icophy (terms: causal_density/Dream Cycle/conflict_markers) |
@@ -400,7 +400,7 @@ These 5 points fully coincide with TAT-7's Withhold points, serving as the core 
 
 **[IP Declaration]**: The U/D/A/H 4D terminology belongs to Li Guanghao. U/D/A/H is the text-observation-layer implementation of the "Field Diagnostics" methodology.
 
-### 2.6 Agora/mnemo substrate (DanceNitra)
+### 2.6 Agora/inspeximus substrate (DanceNitra)
 
 **[Framework Positioning]**: Storage substrate layer â€” Layer 0 support, deterministically recording all historical states.
 
@@ -415,14 +415,14 @@ These 5 points fully coincide with TAT-7's Withhold points, serving as the core 
 - Contract text scenario: keyed supersession records no replacements at step16/24/27/45/51 (storage type: append-log)
 - Russian dialogue scenario: step326â†’328 keyed supersession (Đ˝Đ°Ń‡Đ°Đ»ŃŚĐ˝Đ¸Đşâ†’Ń‚ĐľĐ˛Đ°Ń€Đ¸Ń‰), step374â†’380 withdrawal with no replacement (encoded as "revoked")
 - Read latency: < 1ms
-- TAT-T integration: DanceNitra's supersession triple-store CSV has been connected to TAT-7's divergence trace. The divergence results computed by TAT-T on DanceNitra substrate data (Cophy 31 steps: -0.146; Resonance-Missile 101 steps: -0.245; DanceNitra 5 steps: -0.450) belong to TAT-T; Agora/mnemo substrate retains independent interpretive rights for storage-layer observations.
+- TAT-T integration: DanceNitra's supersession triple-store CSV has been connected to TAT-7's divergence trace. The divergence results computed by TAT-T on DanceNitra substrate data (Cophy 31 steps: -0.146; Resonance-Missile 101 steps: -0.245; DanceNitra 5 steps: -0.450) belong to TAT-T; Agora/inspeximus substrate retains independent interpretive rights for storage-layer observations.
 
 **[Support for TAT-T]**:
 
 - The deterministic storage of keyed supersession is the "physical anchor" for TAT-T's structural memory â€” without deterministic substrate storage, structural memory regulation would be unstable.
 - Full scenario substrate types and support roles are detailed in Section 4.3 of Part Three.
 
-**[IP Declaration]**: keyed supersession/invalidated_at are exclusive to DanceNitra; Agora/mnemo substrate is DanceNitra's substrate contribution identifier in #1466.
+**[IP Declaration]**: keyed supersession/invalidated_at are exclusive to DanceNitra; Agora/inspeximus substrate is DanceNitra's substrate contribution identifier in #1466.
 
 ---
 
@@ -436,7 +436,7 @@ These 5 points fully coincide with TAT-7's Withhold points, serving as the core 
 |------------|---------|--------------------------|--------------------------|------------------|
 | Receipt â‘  | 0.3 threshold convergence across three independent systems | TAT-7, Cophy, HeartFlow | Pattern emerges independently, not from empirical fitting | HeartFlow v5.5.1 audit logs, Cophy 31-step cross-session CSV, TAT-7 synthetic data calibration records |
 | Receipt â‘ˇ | TAT-7 and Cophy r = 0.985 (31 steps/6 scenarios) | TAT-7, Cophy | Different architectures produce isomorphic signals; drift is revealable | maratsultanov2's CROSS_FRAMEWORK_REPORT.md: TAT-ROOT/data/triumvirate_cross_framework.csv (icophy 31-step data) |
-| Receipt â‘˘ | Same Decision, Different Signals (326â†’328/374â†’380 supersession points) | TAT-7, Agora/mnemo substrate | Independent layers reach the same boundary through different signals â€” **a cross-layer consistency hypothesis worth further testing** | DanceNitra's supersession triple-store CSV, TAT-7 divergence trace logs |
+| Receipt â‘˘ | Same Decision, Different Signals (326â†’328/374â†’380 supersession points) | TAT-7, Agora/inspeximus substrate | Independent layers reach the same boundary through different signals â€” **a cross-layer consistency hypothesis worth further testing** | DanceNitra's supersession triple-store CSV, TAT-7 divergence trace logs |
 | Receipt â‘Ł | TAT-T tripartite structure reduces cross-framework average divergence | TAT-7 (TAT-T), Cophy, DanceNitra | Structural memory actively regulates field contradictions; multi-position resonance outperforms single-framework optimization | maratsultanov2's CROSS_FRAMEWORK_REPORT.md: TAT-ROOT/data/triumvirate_cross_framework.csv (full scenario divergence comparison), TAT-ROOT/docs/en/CROSS_FRAMEWORK_REPORT.md (methodology) |
 
 ### 3.2 Six Scenarios Side-by-Side (Full TAT-T Tripartite Structure Data, Over 1000 Words of Analysis per Scenario)
@@ -779,7 +779,7 @@ Core conclusion: Substrate is Layer 0 support; its storage type (keyed supersess
 | yun520-1 | HeartFlow | Pre-decision framework, v5.5.1 architecture, A=0 discovery, 0.3 threshold convergence |
 | Marat Sultanov | TAT-7 | Real-time tracking framework, TAT-7 architecture, TAT-T tripartite structure, cross-framework calibration |
 | icophy | Cophy | Cross-session integration framework, 6-scenario data, causal_density calculation, r=0.985 correlation |
-| DanceNitra | Agora/mnemo substrate | Storage substrate framework, keyed supersession data, integration with TAT |
+| DanceNitra | Agora/inspeximus substrate | Storage substrate framework, keyed supersession data, integration with TAT |
 
 ### Acknowledgments
 

@@ -1,6 +1,6 @@
-# NOT THE RELEASE SOURCE. agora-mnemo is built and published from the canonical checkout (../inspeximus-repo)
-# by tools/publish_mnemo_pypi.py. This directory stopped being the release source after 0.7.19; the package
-# code under mnemo/ is kept in sync only because the lab imports it from here. This version sat at 0.7.19
+# NOT THE RELEASE SOURCE. inspeximus is built and published from the canonical checkout (../inspeximus-repo)
+# by tools/publish_inspeximus_pypi.py. This directory stopped being the release source after 0.7.19; the package
+# code under inspeximus/ is kept in sync only because the lab imports it from here. This version sat at 0.7.19
 # while the code beside it was 1.18.0 (found 2026-07-19) - building this tree produced a 0.7.19 artifact
 # whose upload PyPI then rejected as a duplicate, a dead end rather than a bad release (PyPI never allows
 # overwriting a version). The live hazard was the reverse: bump this number and you ship THIS tree's code,
@@ -10,9 +10,9 @@ requires = ["setuptools>=61"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "agora-mnemo"
+name = "inspeximus"
 version = "1.20.0"
-description = "mnemo - a zero-dependency memory layer for AI agents: value-ranked recall, per-type decay, consolidation, and semantic+lexical auto-mode. Extracted from an autonomous research system running over ~9,000 notes."
+description = "inspeximus - a zero-dependency memory layer for AI agents: value-ranked recall, per-type decay, consolidation, and semantic+lexical auto-mode. Extracted from an autonomous research system running over ~9,000 notes."
 readme = "README.md"
 requires-python = ">=3.8"
 license = { text = "MIT" }
@@ -28,7 +28,7 @@ Source = "https://github.com/DanceNitra/agora"
 mcp = ["mcp[cli]>=1.0"]
 
 [project.scripts]
-mnemo-mcp = "mnemo.mnemo_mcp:main"
+inspeximus-mcp = "inspeximus.mcp:main"
 
 [tool.setuptools]
-packages = ["mnemo", "mnemo.integrations"]
+packages = ["inspeximus", "inspeximus.integrations"]

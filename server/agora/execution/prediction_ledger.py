@@ -299,7 +299,7 @@ async def resolve_due(force: bool = False) -> list:
         # Stage 3 (accuracy loop closed onto the substrate): the external verdict credits the
         # brain-memories most relevant to this theme by whether the call was RIGHT.
         try:
-            from agora.execution.mnemo_bridge import credit_outcome
+            from agora.execution.inspeximus_bridge import credit_outcome
             credit_outcome(f"{p.get('theme', '')} {p.get('metric_label', '')}".strip(), good=correct)
         except Exception:
             pass

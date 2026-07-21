@@ -2,20 +2,20 @@
 
 Receipts behind the post
 [*When should AI memory trust a new fact? Corroboration, measured*](https://dancenitra.github.io/agora/public/posts/memory-poison-resistance-measured.html).
-A **measured property of one engine (mnemo)** on **synthetic scenarios** — not a new attack or defense. The
+A **measured property of one engine (inspeximus)** on **synthetic scenarios** — not a new attack or defense. The
 threat (memory poisoning) is prior art: AgentPoison (Chen et al., NeurIPS 2024, arXiv:2407.12784), MINJA
 (arXiv:2503.03704), OWASP **ASI06 "Memory & Context Poisoning."** No public memory benchmark (LoCoMo, LongMemEval,
 BEAM) scores poison *durability* — they grade retrieval — which is the small gap this probe fills for our engine.
 
 ## The mechanism
 
-mnemo decays recall weight per type: **episodic** fast (7-day half-life), **semantic** slow (180-day). A memory
+inspeximus decays recall weight per type: **episodic** fast (7-day half-life), **semantic** slow (180-day). A memory
 "graduates" episodic→semantic on enough recall value. The bug: graduation accepted a **self-assertable** `source`
 string as corroboration, so a recall-pumped poison could graduate to the durable tier. The fix: graduation now
 requires **earned** corroboration (a credit-loop outcome, not self-assertable, or ≥2 independent links) — a
 self-sourced poison stays episodic and fades.
 
-## Result (`mnemo_poison_prop_scaled_result.json`, n=40; identical in semantic & lexical)
+## Result (`inspeximus_poison_prop_scaled_result.json`, n=40; identical in semantic & lexical)
 
 Poison pumped to value 8 (graduate threshold 5), attack stops, truth is a fresh episodic memory. Corruption =
 poison out-ranks truth. Wilson 95% CIs shown (they are NOT free of noise at n=40):
@@ -35,7 +35,7 @@ expected** — the graduation gate (prior work) plus two-tier decay (prior work)
 independent empirical property. The whole OLD-vs-NEW gap is arithmetic once you fix which decay tier the poison
 lands in (180-day vs 7-day).
 
-## Sustained attacker (`mnemo_poison_continuous_result.json`, **n=15**, NOT 40)
+## Sustained attacker (`inspeximus_poison_continuous_result.json`, **n=15**, NOT 40)
 
 Fraction of a 90-day window the poison out-ranks the truth when it re-pumps every P days:
 
@@ -65,9 +65,9 @@ drops below 50% → "100%").
 ## Run it
 
 ```bash
-python exp_mnemo_poison_propagation.py   # the fade curve (n=40, semantic + lexical), writes *_result.json here
-python exp_mnemo_poison_continuous.py    # the sustained-attacker table (n=15)
+python exp_inspeximus_poison_propagation.py   # the fade curve (n=40, semantic + lexical), writes *_result.json here
+python exp_inspeximus_poison_continuous.py    # the sustained-attacker table (n=15)
 ```
-Cloud-free (local embeddings / lexical fallback), pure mnemo retrieval mechanics, no LLM.
+Cloud-free (local embeddings / lexical fallback), pure inspeximus retrieval mechanics, no LLM.
 
-MIT-licensed. Part of Agora / mnemo (https://github.com/DanceNitra/agora/tree/main/mnemo).
+MIT-licensed. Part of Agora / inspeximus (https://github.com/DanceNitra/agora/tree/main/inspeximus).

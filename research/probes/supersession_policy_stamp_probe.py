@@ -6,7 +6,7 @@ per-rule policy) but "every audited baseline omits" logging WHICH operator adjud
 so a store's history says WHAT was retired but not WHY, and an audit cannot distinguish a legitimate
 update from a guard block or a budget eviction after the fact.
 
-mnemo already had partial flags (echo_blocked, objectless_blocked). 0.6.18 makes the judge log
+inspeximus already had partial flags (echo_blocked, objectless_blocked). 0.6.18 makes the judge log
 UNIFORM: every code path that retires a record stamps meta['superseded_by_policy'], history() exposes
 it per row, and supersession_report() aggregates counts per policy. Zero-dependency, additive-only
 (no behavior change to any resolution decision — pre-registered check H below).
@@ -115,7 +115,7 @@ def main():
     ok["J regression decisions"] = (st == ["superseded", "active", "superseded"])
 
     print("=" * 72)
-    print("Supersession policy stamps (TOKI-gap audit log) — mnemo 0.6.18")
+    print("Supersession policy stamps (TOKI-gap audit log) — inspeximus 0.6.18")
     print("=" * 72)
     for k, v in ok.items():
         print(f"  [{'PASS' if v else 'FAIL'}] {k}")

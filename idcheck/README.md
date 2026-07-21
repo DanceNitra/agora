@@ -4,7 +4,7 @@
 > causal graph**, and conditioning on the wrong variable doesn't just fail to help — it **injects
 > bias** into an otherwise-correct estimate. `idcheck` makes you state the graph and tells you which
 > controls to keep and which to drop. One file, zero dependencies.
-> A sibling of [nullcheck](../nullcheck) (real-or-noise → identified-or-biased) / [mnemo](../mnemo) / [selfref](../selfref).
+> A sibling of [nullcheck](../nullcheck) (real-or-noise → identified-or-biased) / [inspeximus](../inspeximus) / [selfref](../selfref).
 
 ## The proof (`python idcheck.py`)
 ```

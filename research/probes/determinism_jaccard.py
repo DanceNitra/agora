@@ -5,23 +5,23 @@ understates the moat, because it ignores that the whole STORED STATE churns. Thi
 run the SAME ingest R times (fresh store each run), capture the full set of memory strings the store now holds,
 and compute the mean pairwise **Jaccard** across runs.
 
-  mnemo  (no LLM on write) -> byte-identical store every run -> Jaccard = 1.00 by construction.
+  inspeximus  (no LLM on write) -> byte-identical store every run -> Jaccard = 1.00 by construction.
   mem0   (LLM extraction on write) -> paraphrases/merges differently each run -> Jaccard < 1.00.
 
 A competitor CANNOT raise this without removing the LLM from its write path (its whole design). That is the moat:
-not "mnemo is a bit more stable", but "mnemo's memory is reproducible and a from-LLM store's is not, structurally".
+not "inspeximus is a bit more stable", but "inspeximus's memory is reproducible and a from-LLM store's is not, structurally".
 We ALSO report the answer-class stability (current value == correction B, and its run-to-run flip rate).
 
-RUN (free):        python research/probes/determinism_jaccard.py --systems mnemo --n 8 --runs 3
-RUN (with mem0):   python research/probes/determinism_jaccard.py --systems mnemo,mem0 --n 8 --runs 3 --model gpt-4o-mini
+RUN (free):        python research/probes/determinism_jaccard.py --systems inspeximus --n 8 --runs 3
+RUN (with mem0):   python research/probes/determinism_jaccard.py --systems inspeximus,mem0 --n 8 --runs 3 --model gpt-4o-mini
 """
 import os, sys, json, argparse, re
 HERE = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, os.path.join(HERE, "mab_official"))
 sys.path.insert(0, os.path.join(HERE, "..", ".."))
-sys.path.insert(0, os.path.join(HERE, "..", "..", "mnemo_pypi"))
+sys.path.insert(0, os.path.join(HERE, "..", "..", "inspeximus_pypi"))
 sys.path.insert(0, HERE)
-import run_mnemo_official as H
+import run_inspeximus_official as H
 from inspeximus import Inspeximus
 import competitor_cells as C
 
@@ -56,7 +56,7 @@ def jaccard(sets):
     return tot / c if c else 1.0
 
 
-def state_mnemo(ps):
+def state_inspeximus(ps):
     """Full stored-state string-set after ingesting each subject's [A, B]."""
     s = set()
     for (k, A, B) in ps:
@@ -110,7 +110,7 @@ def answer_class(ps, system):
     out = {}
     for (k, A, B) in ps:
         vA, vB = val_of(A, k).lower(), val_of(B, k).lower()
-        if system == "mnemo":
+        if system == "inspeximus":
             m = Inspeximus(path=None); m.echo_guard = True
             m.remember(A, key=k, object=vA); m.remember(B, key=k, object=vB)
             blob = " ".join((it.get("text") or "") for it in m.items).lower()
@@ -129,13 +129,13 @@ def answer_class(ps, system):
     return out
 
 
-STATE = {"mnemo": state_mnemo, "mem0": state_mem0}
+STATE = {"inspeximus": state_inspeximus, "mem0": state_mem0}
 
 
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--n", type=int, default=8); ap.add_argument("--runs", type=int, default=3)
-    ap.add_argument("--systems", default="mnemo"); ap.add_argument("--model", default="gpt-4o")
+    ap.add_argument("--systems", default="inspeximus"); ap.add_argument("--model", default="gpt-4o")
     a = ap.parse_args()
     C.MODEL = a.model
     ps = pairs(a.n)
@@ -150,8 +150,8 @@ def main():
             states.append(STATE[sysname](ps))
             print(f"  {sysname} run {r+1}/{a.runs}: {len(states[-1])} stored strings", flush=True)
         jac = jaccard(states)
-        # answer-class stability across the same runs (cheap, mnemo free)
-        classes = [answer_class(ps, sysname) for _ in range(a.runs)] if sysname == "mnemo" else None
+        # answer-class stability across the same runs (cheap, inspeximus free)
+        classes = [answer_class(ps, sysname) for _ in range(a.runs)] if sysname == "inspeximus" else None
         flips = None
         if classes:
             flips = sum(1 for k in classes[0] if len({c[k] for c in classes}) > 1) / len(ps)

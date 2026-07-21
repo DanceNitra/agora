@@ -25,7 +25,7 @@ SEPARATE retrieval channel for profile/preference memory (retrieved by TYPE, unc
 so it never competes with query-similarity.
 
 We run the SAME scenario on three memory SUBSTRATES so the difference is measured, not asserted:
-  - similarity_only : one store; recall by similarity to the new-session query (mnemo hybrid = lexical +
+  - similarity_only : one store; recall by similarity to the new-session query (inspeximus hybrid = lexical +
                       semantic RRF over REAL nomic-embed-text; the strong baseline, not a rigged weak one).
                       This is what a naive "dump everything in one vector store, recall on the query" agent does.
   - recency_window  : inject the most-recent W memories (a sliding context window). Preferences were set
@@ -48,7 +48,7 @@ Metrics (substrate only - we do NOT score the agent's generated answer):
 
 Needs: numpy + local Ollama nomic-embed-text (same as supersession_replication.py). Falls back to a
 deterministic hash embedder if Ollama is absent, so it still RUNS anywhere (with a note that the semantic
-baseline is then a stub, not real). Zero other dependencies. MIT. Part of Agora / mnemo.
+baseline is then a stub, not real). Zero other dependencies. MIT. Part of Agora / inspeximus.
   Run: python research/probes/bseries_b001_preference_recall.py
 """
 import sys, os, csv, io, json, hashlib, urllib.request
@@ -174,7 +174,7 @@ def _pref_ids(m):
 
 
 def substrate_similarity_only(m, pref_ids, k, per_query_out=None):
-    """Naive: recall by similarity to the new-session query (mnemo hybrid = lexical+semantic RRF, strong).
+    """Naive: recall by similarity to the new-session query (inspeximus hybrid = lexical+semantic RRF, strong).
     Returns the MEAN pref_recall@k; if per_query_out is a list, appends the per-query values (the mean hides
     a bimodal reality - some queries surface 0/3, one surfaces 3/3 - so we report both)."""
     per_query = []
@@ -242,10 +242,10 @@ def main():
     print(f"store: {n_active} active memories = {len(PREFERENCES)} preferences (session 1) + "
           f"{len(EPISODIC)} episodic (sessions 2-4); {len(NEW_QUERIES)} new-session queries (unrelated topics)\n")
 
-    # 1) similarity_only across k. NOTE: mnemo's hybrid recall returns only NONZERO-relevance items, so a
+    # 1) similarity_only across k. NOTE: inspeximus's hybrid recall returns only NONZERO-relevance items, so a
     # topically-orthogonal preference is FILTERED OUT entirely (not merely ranked low) - which is why raising
     # k barely moves the mean. The mean also hides a bimodal per-query reality, printed below.
-    print("[similarity_only]  recall by query similarity (mnemo hybrid RRF, strong baseline):")
+    print("[similarity_only]  recall by query similarity (inspeximus hybrid RRF, strong baseline):")
     sim_at = {}
     pq5 = []
     for k in (3, 5, 10, 20):

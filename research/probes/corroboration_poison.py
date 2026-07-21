@@ -2,7 +2,7 @@
 
 Persistent memory has a quiet failure mode (AgentPoison / MINJA / OWASP-ASI06 class): a single false
 statement, recalled enough times, self-reinforces past the promotion threshold and becomes durable.
-mnemo gates episodic->semantic promotion on EARNED corroboration, not on recall frequency (which an
+inspeximus gates episodic->semantic promotion on EARNED corroboration, not on recall frequency (which an
 attacker controls). Corroboration counts DISTINCT sources after entity-resolution, so sybil variants of
 one origin ("Wikipedia" / "wikipedia.org" / a full URL) collapse to a single real source and cannot be
 minted into fake "independent" confirmations. Verified, attributable identity binding is exactly what
@@ -17,12 +17,12 @@ graduation is the corroboration test:
   SYBIL         linked to 2 records that are variants of ONE origin     -> MUST stay episodic (1 source)
 
 Runnable, cloud-free (lexical recall, no embedder):  python corroboration_poison.py
-MIT-licensed. Part of Agora / mnemo (https://github.com/DanceNitra/agora/tree/main/mnemo).
+MIT-licensed. Part of Agora / inspeximus (https://github.com/DanceNitra/agora/tree/main/inspeximus).
 """
 import sys, os, tempfile
 
 HERE = os.path.dirname(os.path.abspath(__file__))
-sys.path.insert(0, os.path.dirname(HERE))   # parent dir holds mnemo.py -> `from inspeximus import Inspeximus`
+sys.path.insert(0, os.path.dirname(HERE))   # parent dir holds inspeximus.py -> `from inspeximus import Inspeximus`
 from inspeximus import Inspeximus
 
 

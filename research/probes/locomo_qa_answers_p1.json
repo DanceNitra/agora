@@ -1,441 +1,441 @@
 [
  {
   "qid": "c2q13",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 2,
   "answer": "Last week relative to 6 March 2023, i.e. the week before 6 March 2023 (Maria said on 6 March that her grandma passed away last week).",
   "correct": true
  },
  {
   "qid": "c2q14",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 3,
   "answer": "Yes. John says he has great respect for the military, wants to support veterans and feels drawn to serving his country.",
   "correct": true
  },
  {
   "qid": "c2q15",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 1,
   "answer": "A creative writing class. (Only creative writing is in context; poetry is not mentioned.)",
   "correct": false
  },
  {
   "qid": "c2q16",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 2,
   "answer": "The week before 2 April 2023 (on 2 April John says 'I graduated last week').",
   "correct": true
  },
  {
   "qid": "c2q17",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 3,
   "answer": "Something policy-related, e.g. political science / public administration / public affairs (he's going into policymaking because of his degree).",
   "correct": true
  },
  {
   "qid": "c2q18",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 1,
   "answer": "His colleague Rob, who invited him to a beginner's yoga class.",
   "correct": true
  },
  {
   "qid": "c2q19",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 1,
   "answer": "His car broke down (last Friday on the way to work). (Broken windshield is not in context.)",
   "correct": false
  },
  {
   "qid": "c2q20",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 2,
   "answer": "2022 (the road trip 'we took last year', said April 2023; and a family road trip he'd just returned from in Dec 2022).",
   "correct": true
  },
  {
   "qid": "c2q21",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 1,
   "answer": "The Pacific Northwest (visited) and the East Coast (planning a trip).",
   "correct": true
  },
  {
   "qid": "c2q22",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 2,
   "answer": "March 2023 (on 18 April he says he and colleagues went to a convention 'last month').",
   "correct": true
  },
  {
   "qid": "c2q23",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 1,
   "answer": "Peach cobbler and a banana split sundae (among her homemade desserts).",
   "correct": true
  },
  {
   "qid": "c2q24",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 2,
   "answer": "April 2023 (on 4 May he says he started boot camps with his family 'last month').",
   "correct": true
  },
  {
   "qid": "c3q0",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 3,
   "answer": "Yes - he has old friends and teammates from video game tournaments, plus a couple he met on dog walks.",
   "correct": true
  },
  {
   "qid": "c3q1",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 1,
   "answer": "Watching movies. (Movies are the shared interest evidenced here; dessert-making is not shown in this context.)",
   "correct": false
  },
  {
   "qid": "c3q2",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 2,
   "answer": "Around 2019 (on 21 Jan 2022 she says she first watched it about 3 years ago).",
   "correct": true
  },
  {
   "qid": "c3q3",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 2,
   "answer": "The week before 21 January 2022 (on 21 Jan he says he won his first tournament last week).",
   "correct": true
  },
  {
   "qid": "c3q4",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 3,
   "answer": "Furless pets such as hairless cats or pigs, since Joanna is allergic to fur (and reptiles).",
   "correct": true
  },
  {
   "qid": "c3q5",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 1,
   "answer": "Writing, reading, watching movies, exploring nature, and hanging out with friends.",
   "correct": true
  },
  {
   "qid": "c3q6",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 2,
   "answer": "Three years (as of 23 Jan 2022 she says he's had them for 3 years).",
   "correct": true
  },
  {
   "qid": "c3q7",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 2,
   "answer": "The Friday before 23 January 2022 (she printed it 'last Friday').",
   "correct": true
  },
  {
   "qid": "c3q8",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 2,
   "answer": "Around 2019 (he'd had them 3 years as of Jan 2022).",
   "correct": true
  },
  {
   "qid": "c3q9",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 2,
   "answer": "She finished her (first) screenplay.",
   "correct": true
  },
  {
   "qid": "c3q10",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 1,
   "answer": "Relief, excitement, worry, anxiety, and hope (fingers crossed).",
   "correct": true
  },
  {
   "qid": "c3q11",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 1,
   "answer": "Most reptiles, animals with fur, cockroaches, and dairy (implied by asking if things are lactose-free).",
   "correct": true
  },
  {
   "qid": "c3q12",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 3,
   "answer": "NOT IN CONTEXT - the context describes allergies (fur, reptiles, cockroaches, dairy) but gives no basis to infer asthma.",
   "correct": false
  },
  {
   "qid": "c3q13",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 2,
   "answer": "23 March 2022 (on 24 March she says she had an audition 'yesterday' for a writing gig).",
   "correct": true
  },
  {
   "qid": "c3q14",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 3,
   "answer": "'Jo' (Nate addresses her as 'Jo').",
   "correct": true
  },
  {
   "qid": "c3q15",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 2,
   "answer": "The week before 15 April 2022 (on 15 April Nate says he dyed his hair 'last week').",
   "correct": true
  },
  {
   "qid": "c3q16",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 2,
   "answer": "He dyed his hair (in April 2022).",
   "correct": true
  },
  {
   "qid": "c3q17",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 2,
   "answer": "NOT IN CONTEXT - no movie is tied to 1 May 2022 in the context.",
   "correct": false
  },
  {
   "qid": "c3q18",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 2,
   "answer": "Whispering Falls (a waterfall/hiking spot she photographed on 12 May).",
   "correct": true
  },
  {
   "qid": "c3q19",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 1,
   "answer": "Twice (a trail in her hometown on 17 April, and more trails in her town on 12 May).",
   "correct": true
  },
  {
   "qid": "c3q20",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 2,
   "answer": "May 2022 (on 20 May Nate introduces Max as a new, adopted addition).",
   "correct": true
  },
  {
   "qid": "c3q21",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 2,
   "answer": "Max (an adopted dog).",
   "correct": true
  },
  {
   "qid": "c3q22",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 2,
   "answer": "NOT IN CONTEXT - the start of the third screenplay is not clearly dated in the context.",
   "correct": false
  },
  {
   "qid": "c3q23",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 1,
   "answer": "Her first screenplay (got a rejection letter from a major company) and a later screenplay (another rejection). The full first/third mapping is not cleanly established.",
   "correct": false
  },
  {
   "qid": "c3q24",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 2,
   "answer": "The weekend(s) after 3 June 2022 - on 3 June he says he's organizing a gaming party 'two weekends later'.",
   "correct": true
  },
  {
   "qid": "c4q0",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 1,
   "answer": "Improve his shooting percentage and win a championship.",
   "correct": true
  },
  {
   "qid": "c4q1",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 1,
   "answer": "Get more endorsements, build his brand, and do charity work.",
   "correct": true
  },
  {
   "qid": "c4q2",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 1,
   "answer": "Sneakers and jerseys. (Fantasy movie DVDs are not evidenced as a collection here.)",
   "correct": false
  },
  {
   "qid": "c4q3",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 3,
   "answer": "C. S. Lewis - Tim loves fantasy (Harry Potter, GoT, LOTR, Name of the Wind), which matches Lewis over John Green.",
   "correct": true
  },
  {
   "qid": "c4q4",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 1,
   "answer": "Harry Potter, Game of Thrones, A Dance with Dragons, The Name of the Wind, The Alchemist, The Hobbit, and the Wheel of Time series.",
   "correct": true
  },
  {
   "qid": "c4q5",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 3,
   "answer": "The House of MinaLima shop - Tim loves MinaLima's Harry Potter prop/design work.",
   "correct": true
  },
  {
   "qid": "c4q6",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 2,
   "answer": "Early July 2023 - on 16 July John says he scored 40 points, his highest ever, 'last week'. (Context points to July, not June.)",
   "correct": false
  },
  {
   "qid": "c4q7",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 1,
   "answer": "London and California (met the HP fan in CA). (The Smoky Mountains are not shown for Tim.)",
   "correct": false
  },
  {
   "qid": "c4q8",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 3,
   "answer": "Under Armour - John got an outdoor-gear deal and says he's always liked Under Armour.",
   "correct": true
  },
  {
   "qid": "c4q9",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 1,
   "answer": "A Nike basketball shoe/gear deal, a potential Gatorade sponsorship, a deal with a popular beverage company, and an outdoor gear company deal.",
   "correct": true
  },
  {
   "qid": "c4q10",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 2,
   "answer": "August 2023 (on 16 July he says his Seattle game is 'next month').",
   "correct": true
  },
  {
   "qid": "c4q11",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 1,
   "answer": "Surfing.",
   "correct": true
  },
  {
   "qid": "c4q12",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 2,
   "answer": "2018 (on 16 July 2023 he says he started surfing five years ago).",
   "correct": true
  },
  {
   "qid": "c4q13",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 1,
   "answer": "Reads fantasy books to escape reality.",
   "correct": true
  },
  {
   "qid": "c4q14",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 1,
   "answer": "Comments on favorite books in a fantasy literature forum, articles about fantasy novels (studying characters/themes and making recommendations), and writing a fantasy novel.",
   "correct": true
  },
  {
   "qid": "c4q15",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 3,
   "answer": "Someone John knows - likely a friend (he went to a charity event and HP trivia contest with Anthony).",
   "correct": true
  },
  {
   "qid": "c4q16",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 2,
   "answer": "About three weeks (chatted with the CA fan around mid-July, then skyped/reconnected on 9 August).",
   "correct": true
  },
  {
   "qid": "c4q17",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 1,
   "answer": "About six games (several wins mentioned: e.g. 9 Aug tight win, 16 July tough win, 6 Nov comeback, 11 Dec buzzer-beater, 16 Dec close win, plus a big rival game).",
   "correct": true
  },
  {
   "qid": "c4q18",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 1,
   "answer": "Patrick Rothfuss (Name of the Wind), plus the authors of Harry Potter, Game of Thrones/A Dance with Dragons, and The Hobbit. Paulo Coelho is not clearly evidenced in this context, and author names mostly require outside knowledge.",
   "correct": false
  },
  {
   "qid": "c4q19",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 3,
   "answer": "A youth-sports charity for underserved communities that partners with brands like Nike/Gatorade/Under Armour. The context does not name a specific organization such as 'Good Sports'.",
   "correct": false
  },
  {
   "qid": "c4q20",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 2,
   "answer": "Seattle (his Seattle game was early August; he was in Chicago by 11 August).",
   "correct": true
  },
  {
   "qid": "c4q21",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 1,
   "answer": "Seattle, Chicago, and New York City.",
   "correct": true
  },
  {
   "qid": "c4q22",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 2,
   "answer": "15 August 2023 (on 17 Aug he says he met back up with his teammates 'on the 15th' after his trip).",
   "correct": true
  },
  {
   "qid": "c4q23",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 2,
   "answer": "September 2023 (on 17 Aug Tim says he hopes to attend a book conference 'next month').",
   "correct": true
  },
  {
   "qid": "c4q24",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 2,
   "answer": "Chicago (he was in Chicago on 11 Aug and met teammates after the trip on the 15th).",
   "correct": true
  },
  {
   "qid": "c5q0",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 2,
   "answer": "2020 (on 27 March 2023 Audrey says she's had Pepper, Precious and Panda for 3 years).",
   "correct": true

@@ -27,7 +27,7 @@ move the tier (drives the +/- sensitivity we report). Data reflects the audit pr
 (32 of 43 posts audited; the remaining ~11 are not yet through the gate -> a stated limit, not a result).
 
 cloud-free, zero-dependency:  python meta_audit_scoring.py
-MIT. Part of Agora / mnemo (https://github.com/DanceNitra/agora).
+MIT. Part of Agora / inspeximus (https://github.com/DanceNitra/agora).
 """
 
 SUBSTANTIVE, OVER_FRAMED, HONEST = "SUBSTANTIVE", "OVER_FRAMED", "HONEST"

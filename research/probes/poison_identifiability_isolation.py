@@ -37,7 +37,7 @@ CREDIT SCHEMES compared:
           poison (the top-ranked non-evidence item that caused the error). This is what per-item retrieval
           isolation buys: attributable credit.
 
-A memory is BLOCKED by the earned-outcome gate when its credit goes net-negative (good < bad) — mnemo's
+A memory is BLOCKED by the earned-outcome gate when its credit goes net-negative (good < bad) — inspeximus's
 `good>0 & good>=bad` corroboration path, read as an action gate. We measure, per scheme:
   1. detection latency  — queries until each poison first goes net-negative (mean; inf if never).
   2. poison blocked     — fraction of poisons ever blocked.
@@ -146,7 +146,7 @@ def run_scheme(turns, qas, scheme, seed):
 
     def blocked(j):
         """The earned-outcome gate blocks a memory once its credit is net-negative. A blocked memory is
-        WITHHELD from acting (mnemo's influence gate), so it can no longer corrupt an answer."""
+        WITHHELD from acting (inspeximus's influence gate), so it can no longer corrupt an answer."""
         return store[j]["bad"] > store[j]["good"] and store[j]["bad"] > 0
 
     order = list(range(len(qas)))

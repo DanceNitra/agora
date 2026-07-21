@@ -4,7 +4,7 @@
 > quit a yield process when its recent yield falls a fraction **θ ≈ 0.6** below its running peak (a
 > drawdown stop), then reallocate. And the part most people miss — there's an **interior optimum**:
 > quitting too early *and* too late both lose. One file, zero dependencies.
-> A sibling of [mnemo](../mnemo) / [ragfresh](../ragfresh) / [nullcheck](../nullcheck) / [selfref](../selfref).
+> A sibling of [inspeximus](../inspeximus) / [ragfresh](../ragfresh) / [nullcheck](../nullcheck) / [selfref](../selfref).
 
 ## The pain
 A project, an ad campaign, a research line, a content series, a sales channel, a job-search source —

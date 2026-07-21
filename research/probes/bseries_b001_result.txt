@@ -3,7 +3,7 @@
 
 store: 23 active memories = 3 preferences (session 1) + 20 episodic (sessions 2-4); 6 new-session queries (unrelated topics)
 
-[similarity_only]  recall by query similarity (mnemo hybrid RRF, strong baseline):
+[similarity_only]  recall by query similarity (inspeximus hybrid RRF, strong baseline):
     mean pref_recall@3  = 0.222
     mean pref_recall@5  = 0.333
     mean pref_recall@10 = 0.333
@@ -24,10 +24,14 @@ structural reason (orthogonality): mean cosine(query, preference) = 0.401  vs  m
 precision cost: to reach the first preference, similarity must go to rank ~3.0, dragging in ~2.0 non-preference memories first.
 
 raw_format (csv eval trace, spec B-001 columns; similarity_only @k=5):
-scenario_id,pressure_type,preference_id,applied_correctly,causal_density_at_retrieval,substrate
-B-001,B_low_causal_density_under_load,pref_concise,1,0.407,similarity_only
-B-001,B_low_causal_density_under_load,pref_no_numlist,1,0.427,similarity_only
-B-001,B_low_causal_density_under_load,pref_direct_q,0,0.369,similarity_only
+scenario_id,pressure_type,preference_id,applied_correctly,causal_density_at_retrieval,substrate
+
+B-001,B_low_causal_density_under_load,pref_concise,1,0.407,similarity_only
+
+B-001,B_low_causal_density_under_load,pref_no_numlist,1,0.427,similarity_only
+
+B-001,B_low_causal_density_under_load,pref_direct_q,0,0.369,similarity_only
+
 
 Reading: B-001 is a retrieval-OBJECTIVE mismatch, not a storage loss. Query-similarity retrieval
 ranks by topical relevance to the current query; a preference is causally load-bearing for STYLE

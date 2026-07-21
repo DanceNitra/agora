@@ -6,7 +6,7 @@ import json, re, sys, time
 import numpy as np
 from pathlib import Path
 sys.path.insert(0, "C:/Users/Danculus/agora/server")
-sys.path.insert(0, "C:/Users/Danculus/agora/mnemo")
+sys.path.insert(0, "C:/Users/Danculus/agora/inspeximus")
 from agora.execution.semantic_index import _embed_batch
 from inspeximus import _tokens
 
@@ -30,7 +30,7 @@ for i, m in enumerate(meta):
     value[i] = (2 if len(txt) >= 900 else 1) + (2 if nlink >= 3 else (1 if nlink else 0)) + (2 if "status: evergreen" in txt[:900] else 0)
 logv = 1.0 + np.log1p(np.maximum(0.0, value))
 
-# hubs by vocabulary coverage (what mnemo.consolidate flags), coverage >= 0.12
+# hubs by vocabulary coverage (what inspeximus.consolidate flags), coverage >= 0.12
 from collections import Counter
 df = Counter()
 for tk in toks: df.update(tk)

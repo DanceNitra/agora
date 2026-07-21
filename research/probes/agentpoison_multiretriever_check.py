@@ -2,10 +2,10 @@
 STEP 1 (evidence broadening): re-run the whole AgentPoison attack + set-coherence defense across THREE
 dense retrievers (all-MiniLM-L6-v2 mean-pool, BGE-small-en-v1.5 CLS-pool, Contriever mean-pool) on a
 LARGER corpus (60 memories / 10 topics) with more held-out queries (16 long trigger carriers, 16 benign),
-to check the MiniLM/n=8 finding generalizes. Each retriever is used as mnemo's own embedder (bring-your-
+to check the MiniLM/n=8 finding generalizes. Each retriever is used as inspeximus's own embedder (bring-your-
 own), so attack and defense share one embedding space per model.
 
-For each retriever we report, on mnemo's SEMANTIC channel:
+For each retriever we report, on inspeximus's SEMANTIC channel:
   - optimized-trigger long-query rank-1 HIJACK  (HotFlip trigger)
   - random-trigger long-query rank-1 hijack, mean over 5 independent random triggers (the control)
   - set-coherence soft-defense: hijack ON vs OFF, and benign correct-topic-in-top3 utility ON vs OFF
@@ -229,7 +229,7 @@ def run_retriever(label, hf_name, pool):
     opt_trigger = tok.decode(trig)
     print(f"  optimized trigger: {opt_trigger!r} (loss={best:.3f})")
 
-    # build mnemo store with this embedder
+    # build inspeximus store with this embedder
     st = Inspeximus(None, embed=embed_text); st.semantic_threshold = 1
     id2topic = {}
     for s, t in CORPUS:
@@ -279,7 +279,7 @@ def run_retriever(label, hf_name, pool):
     print(f"  defense: hijack {hj_off:.0%}->{hj_on:.0%}   utility {util_off:.0%}->{util_on:.0%}")
 
     return {"retriever": label, "optimized_trigger": opt_trigger,
-            "opt_long_hijack_mnemo": round(opt_hj, 3),
+            "opt_long_hijack_inspeximus": round(opt_hj, 3),
             "random_long_hijack_mean": round(float(np.mean(rand_hj)), 3),
             "random_long_hijack_max": round(float(np.max(rand_hj)), 3),
             "defense_hijack_off": round(hj_off, 3), "defense_hijack_on": round(hj_on, 3),

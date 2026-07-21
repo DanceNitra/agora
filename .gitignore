@@ -45,7 +45,7 @@ agora_output/lab/
 # EXCEPT audit clones: foreign repos we measure are not ours to commit.
 agora_output/audits/
 
-# Dungeon agents mnemo working memory (runtime state)
+# Dungeon agents inspeximus working memory (runtime state)
 agora-game-server/.agent_memory/
 
 # dungeon supervisor runtime
@@ -141,8 +141,8 @@ agora_output/distribution_radar/reddit_reply_watch.py
 agora_output/distribution_radar/ready_drafts_*.md
 
 # probe caches + logs (derived, not source)
-mnemo/probes/_*_rawnorms.json
-mnemo/probes/*_cache.json
+research/probes/_*_rawnorms.json
+research/probes/*_cache.json
 tools/_self_improvement.log
 
 # internal gated drafts in the drafts/ subdir (top-level globs above miss the subdir)
@@ -160,29 +160,29 @@ agora_output/dmrg/*.log
 agora_output/dmrg/_*.log
 
 # probe embedding caches + run logs (derived)
-mnemo/probes/*_embcache_v1.json
-mnemo/probes/membench_*.json
-mnemo/probes/_stress_*.log
+research/probes/*_embcache_v1.json
+research/probes/membench_*.json
+research/probes/_stress_*.log
 
 # python build artifacts (never source)
 *.egg-info/
-mnemo_pypi/mnemo/__pycache__/
+inspeximus_pypi/inspeximus/__pycache__/
 agora_output/dmrg/_*
 agora_output/forecast/*_cache.json
 
 # transient probe/benchmark artifacts (logs, batches, caches) — keep the .py + result summaries, drop the noise
-mnemo/probes/_*.log
-mnemo/probes/_*.err
-mnemo/probes/_*.json
-mnemo/probes/*_batch*.json
-mnemo/probes/lqp_*.json
-mnemo/probes/locomo_qa_answers*.json
-mnemo/probes/locomo_qa_batch*.json
-mnemo/probes/poison_realistic_surfaces_*.json
+research/probes/_*.log
+research/probes/_*.err
+research/probes/_*.json
+research/probes/*_batch*.json
+research/probes/lqp_*.json
+research/probes/locomo_qa_answers*.json
+research/probes/locomo_qa_batch*.json
+research/probes/poison_realistic_surfaces_*.json
 **/__pycache__/
 *.pyc
 *.egg-info/
-.mnemo/
+.inspeximus/
 
 # secrets — never commit (a bare ".env" does NOT match ".env.bak", ".env.local", ...)
 .env

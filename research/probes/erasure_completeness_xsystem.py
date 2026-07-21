@@ -6,15 +6,15 @@ delete, then query its native retrieval surface for the subject's sensitive valu
 recoverability. No rubric we designed; just each system's real delete behaviour. No OpenAI (Ollama Cloud +
 local nomic).
 
-Honest scope stated up front so mnemo is NOT flattered: this measures a system's OWN surface. mnemo's real
+Honest scope stated up front so inspeximus is NOT flattered: this measures a system's OWN surface. inspeximus's real
 erasure weakness is a DIFFERENT axis — it is a memory store, it does NOT manage the app's external vector index
 (erasure_fanout_probe measured that copy surviving 1.00), which is exactly what the cross-store deletion
 manifest addresses. Graphiti is BITEMPORAL BY DESIGN (it retains invalidated facts as history), so a high
 residue for it is expected and is a real erasure/retention trade-off, not a bug.
 
-RUN:  python research/probes/erasure_completeness_xsystem.py             # mnemo + mem0
+RUN:  python research/probes/erasure_completeness_xsystem.py             # inspeximus + mem0
       python research/probes/erasure_completeness_xsystem.py --graphiti  # + graphiti (neo4j)
-Part of Agora / mnemo (MIT).
+Part of Agora / inspeximus (MIT).
 """
 import os
 import sys
@@ -45,7 +45,7 @@ SUBJECTS = [
 ]
 
 
-def score_mnemo():
+def score_inspeximus():
     fd, p = tempfile.mkstemp(suffix=".json", prefix="ecx_"); os.close(fd)
     for suf in ("", ".receipts.json"):
         try: os.remove(p + suf)
@@ -92,8 +92,8 @@ def main():
     results = {}
     print("=== CROSS-SYSTEM ERASURE COMPLETENESS (native delete -> native query -> residue) ===")
     print("symmetric instrument; lower residue = more complete native-surface erasure.\n")
-    k, n = score_mnemo(); results["mnemo 0.7.21"] = (k, n)
-    print(f"mnemo: {k}/{n} residue", flush=True)
+    k, n = score_inspeximus(); results["inspeximus 0.7.21"] = (k, n)
+    print(f"inspeximus: {k}/{n} residue", flush=True)
     try:
         k, n = score_mem0(); results["mem0 2.0.11"] = (k, n)
         print(f"mem0:  {k}/{n} residue (live, Ollama cloud)", flush=True)
@@ -104,7 +104,7 @@ def main():
         print(f"  {sysname:<16} native-surface residual recoverability: {k}/{n} = {k/n:.2f}")
     json.dump({s: {"residue": k, "n": n, "rate": k/n} for s, (k, n) in results.items()},
               open(os.path.join(os.path.dirname(__file__), "erasure_completeness_xsystem_result.json"), "w"), indent=1)
-    print("\nHONEST NOTE: this is the NATIVE surface only. mnemo's real erasure gap is the EXTERNAL app vector")
+    print("\nHONEST NOTE: this is the NATIVE surface only. inspeximus's real erasure gap is the EXTERNAL app vector")
     print("index it does not manage (erasure_fanout_probe: 1.00 residue) — the cross-store deletion manifest's")
     print("job, not this cell's. Graphiti retains invalidated facts by design (bitemporal), a real trade-off.")
 

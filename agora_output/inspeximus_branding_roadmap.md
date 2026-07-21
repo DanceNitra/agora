@@ -1,4 +1,4 @@
-# mnemo — Branding & first-revenue roadmap
+# inspeximus — Branding & first-revenue roadmap
 
 > Fixed 2026-07-17 from a 3-lens research gate (case studies of mem0/Zep/Letta/Cognee/Supermemory/Crawl4AI/Marker ·
 > solo-OSS monetization data · real-name/naming research). Metric-triggered stages, not dates. Owner reviews at
@@ -22,32 +22,32 @@
 academic repo) · Hacker News (4 of 7 comparables never cracked 10 points; our account is shadowbanned anyway) ·
 early pricing pages.
 
-## DECISION #1 — RESOLVED (owner, 2026-07-17): anchor on `agora-mnemo`, no rename
+## DECISION #1 — RESOLVED (owner, 2026-07-17): anchor on `inspeximus`, no rename
 
-The owner's call, and it's right: the actual funnel handle is **`agora-mnemo`** (the PyPI package, the pip
-command, all 5.3k weekly downloads) — and THAT token is unique; the collisions live on the bare word "mnemo".
-So: (1) canonical searchable token = `agora-mnemo`, never changed, visible next to every install block;
-(2) display brand = "mnemo — self-correcting agent memory", always paired with `agora-mnemo` in titles/OG;
-(3) MCP registry name is namespaced (io.github.DanceNitra/mnemo), no collision, stays; (4) the rename escape
-hatch stays open for later WITHOUT breaking funnels — a new package name with `agora-mnemo` kept as a
+The owner's call, and it's right: the actual funnel handle is **`inspeximus`** (the PyPI package, the pip
+command, all 5.3k weekly downloads) — and THAT token is unique; the collisions live on the bare word "inspeximus".
+So: (1) canonical searchable token = `inspeximus`, never changed, visible next to every install block;
+(2) display brand = "inspeximus — self-correcting agent memory", always paired with `inspeximus` in titles/OG;
+(3) MCP registry name is namespaced (io.github.DanceNitra/inspeximus), no collision, stays; (4) the rename escape
+hatch stays open for later WITHOUT breaking funnels — a new package name with `inspeximus` kept as a
 dependency shim (pip keeps working; GitHub renames redirect; mem0 renamed at 8k stars and inherited its
-audience). Revisit ONLY at the Stage-2 gate if mnemo.dev launches loudly into Claude Code and real confusion
+audience). Revisit ONLY at the Stage-2 gate if inspeximus.dev launches loudly into Claude Code and real confusion
 incidents appear.
 
 ### (superseded analysis, kept for the record)
 
-"mnemo" is saturated in *exactly our category*: **mnemo.dev is a live-in-progress "AI agent memory system"**
-(The Water Works; deep Claude Code integration; literally ships a `mnemo recall` CLI — verified 2026-07-17),
-plus 6+ GitHub repos and a `mnemo-mcp` PyPI package by others, plus Mnemosyne flashcards and the MNemo caving
-device owning adjacent search results. "mnemo AI memory" is not a winnable search phrase.
+"inspeximus" is saturated in *exactly our category*: **inspeximus.dev is a live-in-progress "AI agent memory system"**
+(The Water Works; deep Claude Code integration; literally ships a `inspeximus recall` CLI — verified 2026-07-17),
+plus 6+ GitHub repos and a `inspeximus-mcp` PyPI package by others, plus Inspeximus flashcards and the inspeximus caving
+device owning adjacent search results. "inspeximus AI memory" is not a winnable search phrase.
 
 - **Option A — rename now (research recommendation).** Cheap today, expensive after traction. mem0 renamed
   in-place at 8k stars and *inherited* the audience, so a later rename is survivable but costly. A rename doubles
   as a relaunch event (pattern #3). Naming seed: the differentiator (self-correcting / corrections / supersession
   / "stays corrected"), not the memory-Greek root everyone mines.
-- **Option B — keep, always paired.** "mnemo (agora-mnemo) — self-correcting agent memory" everywhere; accept
+- **Option B — keep, always paired.** "inspeximus (inspeximus) — self-correcting agent memory" everywhere; accept
   the SERP loss; rely on the PyPI name and MCP registry entry being ours. Zero migration cost, permanent
-  discoverability tax, and a live collision risk if mnemo.dev launches loudly into Claude Code — our main channel.
+  discoverability tax, and a live collision risk if inspeximus.dev launches loudly into Claude Code — our main channel.
 - Until decided: **no paid ads-level pushes on the name**; keep shipping under the paired form.
 
 ## Stage 0 — now → ~100 engaged users/stars ("the face + the spine")
@@ -74,7 +74,7 @@ Cost: ~0 EUR. Everything here is evidence-backed as high-leverage.
 Trigger: already met on downloads; wait for the first organic inbound (issue/question from a stranger) so the
 paid thing answers a demonstrated need.
 
-1. **mnemo-pro audit/governance add-on — $29 one-time via Polar** (license-key file, zero servers). Content:
+1. **inspeximus-pro audit/governance add-on — $29 one-time via Polar** (license-key file, zero servers). Content:
    tamper-evident log export, tenant/compliance reports, signed-build attestation — monetizes the integrity
    story we already measured, doesn't paywall the core. Evidence: sub-$5 products = 0.8% of revenue (KILLED the
    50-cent idea); $30–49 band converts 28% better. Realistic: $0–300/mo.
@@ -89,7 +89,7 @@ paid thing answers a demonstrated need.
    for hosted. Do not build our own hosting (owner decision 2026-07-17: no money, no clientele — parked).
 2. **Paid support tier** ($99+/incident or retainer) at the first company user.
 3. **Real name, stage 3**: a talk/podcast/meetup; storefront byline.
-4. Revisit the name decision with data (SERP position, confusion incidents, mnemo.dev's status).
+4. Revisit the name decision with data (SERP position, confusion incidents, inspeximus.dev's status).
 
 ## Anti-goals (fixed)
 

@@ -4,7 +4,7 @@
 > reward keeps rising while the **true goal peaks and then declines** (reward hacking / Goodhart's law).
 > `goodhart` measures how fast your proxy stops tracking the goal, and how many independent metrics it
 > takes to fix it. One file, zero dependencies.
-> A sibling of [nullcheck](../nullcheck) / [idcheck](../idcheck) / [mnemo](../mnemo).
+> A sibling of [nullcheck](../nullcheck) / [idcheck](../idcheck) / [inspeximus](../inspeximus).
 
 ## The measured decay (`python goodhart.py`)
 ```

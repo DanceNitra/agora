@@ -16,7 +16,7 @@ Falsifier (ours): if a deterministic SRO-supersession rule does NOT cut the stal
 pure-cosine retrieval, the mechanism is useless and we drop it.
 
 Run: python research/probes/supersession_replication.py   (cloud-free; needs numpy + local Ollama nomic-embed-text)
-Part of Agora / mnemo (MIT). Reproduces the numbers cited in the rag-supersession-blind-spot post.
+Part of Agora / inspeximus (MIT). Reproduces the numbers cited in the rag-supersession-blind-spot post.
 """
 import json
 import urllib.request

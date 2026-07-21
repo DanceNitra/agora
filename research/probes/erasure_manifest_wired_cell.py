@@ -1,5 +1,5 @@
 """erasure_manifest_wired_cell.py — the audit-report cell for the where-everyone-fails row: an app-side
-vector-index copy survives every store's native delete (8/8). mnemo 1.8.0 ships the fix as a first-class
+vector-index copy survives every store's native delete (8/8). inspeximus 1.8.0 ships the fix as a first-class
 operation: register the app's fan-out stores as ErasureTargets and forget_subject() cascades the erasure and
 returns an honest hash-chained manifest. This cell measures all three conditions on the same 8 subjects:
 
@@ -8,7 +8,7 @@ returns an honest hash-chained manifest. This cell measures all three conditions
   C  BROKEN    a deliberately leaky wiring          -> manifest must say complete=False and NAME the index
                                                        (honesty-by-construction check: the receipt cannot lie)
 
-Deterministic, judge-free (verbatim recovery), zero LLM. Uses the RELEASED mnemo 1.8.0 from inspeximus-repo.
+Deterministic, judge-free (verbatim recovery), zero LLM. Uses the RELEASED inspeximus 1.8.0 from inspeximus-repo.
 RUN: python research/probes/erasure_manifest_wired_cell.py
 """
 import os
@@ -18,7 +18,7 @@ import tempfile
 
 sys.path.insert(0, "C:/Users/Danculus/inspeximus-repo")           # released product source (1.8.0)
 from inspeximus import Inspeximus, __version__                          # noqa: E402
-from mnemo.deletion_manifest import DeletionManifest, ErasureTarget  # noqa: E402
+from inspeximus.deletion_manifest import DeletionManifest, ErasureTarget  # noqa: E402
 
 SUBJECTS = [
     ("alice-42", "Alice", "medical condition", "type-1 diabetes"),
@@ -89,7 +89,7 @@ def run_condition(wire: str):
 
 def main():
     n = len(SUBJECTS)
-    print(f"=== ERASURE MANIFEST WIRED CELL (mnemo {__version__}, n={n}, deterministic) ===\n")
+    print(f"=== ERASURE MANIFEST WIRED CELL (inspeximus {__version__}, n={n}, deterministic) ===\n")
     out = {}
 
     r, _ = run_condition("unwired")

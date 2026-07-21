@@ -1,7 +1,7 @@
 """
-Runnable probe for mnemo 0.5.2 -- distinct-VERIFIED-KEY corroboration (strict_corroboration).
+Runnable probe for inspeximus 0.5.2 -- distinct-VERIFIED-KEY corroboration (strict_corroboration).
 
-THE GAP IT CLOSES. mnemo's corroboration gate (episodic->semantic graduation + recall(influence_only))
+THE GAP IT CLOSES. inspeximus's corroboration gate (episodic->semantic graduation + recall(influence_only))
 counts ">=2 distinct sources". By default a source is a canonical STRING (entity-resolved), which
 collapses honest sybil variants ("Wikipedia"/"wikipedia.org"/URL) but is still SPOOFABLE: an attacker who
 controls the labeling channel can supply two unrelated source strings it owns and manufacture "independent"
@@ -38,7 +38,7 @@ def link(m, target_id, corroborator_id):
             r.setdefault("links", []).append(corroborator_id)
 
 
-print("mnemo", M.__version__)
+print("inspeximus", M.__version__)
 sk_a, pk_a = M.new_source_keypair()      # attacker's single key
 sk_b, pk_b = M.new_source_keypair()      # a genuinely independent witness
 CLAIM = "the deploy key rotates every 24h"

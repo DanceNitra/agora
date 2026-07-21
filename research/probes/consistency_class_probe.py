@@ -9,7 +9,7 @@ yet the consistency CLASS of that behavior is rarely measured from an observed h
 HONEST PRIOR ART (do not overclaim): the taxonomy itself is NOT ours — 2606.17182 ("Verified Detection and
 Prevention of Concurrency Anomalies in Multi-Agent LLM Systems", June 2026) already ported SC/TSO/causal into
 agent memory. Our only contribution here is a small RUNNABLE receipt with a PLACEMENT axis: hold the product
-fixed (mnemo) and move only the control plane (single-writer-serialized vs two-writers-unsynchronized on a
+fixed (inspeximus) and move only the control plane (single-writer-serialized vs two-writers-unsynchronized on a
 shared store), and show whether the consistency class MOVES — i.e. whether the field's integrity failures are
 placement failures, not library failures.
 
@@ -18,12 +18,12 @@ increasing version. A read that returns a version LOWER than one already observe
 re-write of that value, is a value resurrection / non-monotonic read that NO single total order can explain =
 an SC violation. (This is exactly the anomaly a lost write under unsynchronized clobbering produces.)
 
-Falsifier: if SC-violations are 0 under BOTH configs (the knob is inert — mnemo serializes either way) OR >0
+Falsifier: if SC-violations are 0 under BOTH configs (the knob is inert — inspeximus serializes either way) OR >0
 under BOTH (the library is unsafe even single-writer), the placement thesis is dead -> KILL. The thesis holds
 only if serialized=0 and concurrent>0 (same product, class moved).
 
 Run: python research/probes/consistency_class_probe.py   (deterministic, no LLM, no network)
-Part of Agora / mnemo (MIT).
+Part of Agora / inspeximus (MIT).
 """
 import os
 import sys
@@ -134,14 +134,14 @@ def main():
               f" control plane.")
         print("VERDICT: KILL (textbook demonstration, not news). The anomaly is a classic lost-update from a"
               " DELIBERATE misuse (two full-rewrite writers on one JSON file with no locking) — known since the"
-              " 1970s and a deployment mistake mnemo never claims to support. The placement thesis is TRUE but"
+              " 1970s and a deployment mistake inspeximus never claims to support. The placement thesis is TRUE but"
               " trivial here; there is no surprising, falsifiable result to ship. Do not dress a demonstration"
               " as a finding (Agora raised bar). A real version would need a NON-trivial divergence (e.g. causal"
               " but not SC under a realistic merge policy), which this setup does not produce.")
     elif ser_v == 0 and con_v == 0:
-        print("VERDICT: KILL — the knob is inert (mnemo serializes under both configs); no class movement to publish.")
+        print("VERDICT: KILL — the knob is inert (inspeximus serializes under both configs); no class movement to publish.")
     else:
-        print(f"VERDICT: KILL — mnemo shows {ser_v} SC-violations even single-writer; the library itself is the"
+        print(f"VERDICT: KILL — inspeximus shows {ser_v} SC-violations even single-writer; the library itself is the"
               f" problem, which contradicts the placement thesis and is a different (worse) story.")
 
 

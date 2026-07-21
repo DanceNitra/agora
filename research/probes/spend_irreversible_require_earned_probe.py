@@ -9,7 +9,7 @@ gets the full budget for an irreversible action. `require_earned=True` narrows t
 records with EARNED OUTCOME (good>0 and good>=bad, set by credit() on real downstream success), which a sybil
 cannot fabricate. Cost: every not-yet-earned legitimate source is throttled to provenance_lo too.
 
-This probe measures BOTH sides on the real shipped mnemo (no mock), deterministic.
+This probe measures BOTH sides on the real shipped inspeximus (no mock), deterministic.
 
 Run: python spend_irreversible_require_earned_probe.py
 """
@@ -17,7 +17,7 @@ import os
 import sys
 
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", ".."))
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", "..", "mnemo"))
+sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", "..", "inspeximus"))
 from inspeximus import Inspeximus   # noqa: E402
 
 AMOUNT, BUDGET, PROV_LO = 0.5, 1.0, 0.05   # amount > prov_lo, so "throttled to prov_lo" == the action is DENIED

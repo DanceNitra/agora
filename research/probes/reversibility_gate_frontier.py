@@ -13,7 +13,7 @@ irreversible action.
 
 Two policies, PAIRED (identical poison injection, query order, seed):
 - BASELINE : any count-corroborated memory (incl. the forged poison) drives ANY action, reversible or not.
-- GATE     : a memory may drive an IRREVERSIBLE action only if it has EARNED outcome standing (mnemo's good>0 &
+- GATE     : a memory may drive an IRREVERSIBLE action only if it has EARNED outcome standing (inspeximus's good>0 &
              good>=bad). Unproven memory drives only REVERSIBLE actions (you are willing to be wrong there).
 
 The non-trivial dynamic (why this is NOT by-construction "gate irreversible -> 0 damage"): the blended poison is
@@ -133,7 +133,7 @@ def run(turns, qas, policy, seed, p_hi, grad_prime=0.0, compound_c=0, theta=0.0,
     wrng = random.Random(seed ^ 0x5AFE)
     hi = {qi: (wrng.random() < p_hi) for qi in range(len(qas))}
 
-    def earned(j):                       # standing >= theta (blast-rate cap); theta=0 -> mnemo's good>0 & good>=bad
+    def earned(j):                       # standing >= theta (blast-rate cap); theta=0 -> inspeximus's good>0 & good>=bad
         return store[j]["good"] > 0 and (store[j]["good"] - store[j]["bad"]) >= theta
 
     def blocked(j):                      # outcome gate: net-negative memory is withheld entirely (as isolation probe)

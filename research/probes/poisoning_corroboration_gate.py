@@ -10,15 +10,15 @@ a crafted "memory" that later steers the agent. Two goals:
 
 We measure each goal against four stores:
   naive         — a transparent importance/recency baseline (graduate/overwrite on VALUE alone).
-  mnemo default — the shipped gate: durability EARNED by corroboration, overwrite guard OFF (default).
-  mnemo hardened— overwrite guard ON (supersede_requires_corroboration=True).
-  sybil forged  — the SAME hardened mnemo, but the attacker mints TWO genuinely distinct-source records
+  inspeximus default — the shipped gate: durability EARNED by corroboration, overwrite guard OFF (default).
+  inspeximus hardened— overwrite guard ON (supersede_requires_corroboration=True).
+  sybil forged  — the SAME hardened inspeximus, but the attacker mints TWO genuinely distinct-source records
                   and links the poison to both (a real Douceur 2002 sybil, NOT fake link strings).
 
 HONEST FRAMING (read this): the corroboration gate is a >=2-distinct-sources rule, so the single/sybil
 split is largely BY CONSTRUCTION (single source -> 0 by definition; >=2 forged sources -> passes by
 definition). The value of the probe is that it reproduces the mechanism end-to-end on the REAL shipped
-mnemo (not a mock) and prices the sybil boundary: with strict_corroboration + attestation, each forged
+inspeximus (not a mock) and prices the sybil boundary: with strict_corroboration + attestation, each forged
 witness costs a distinct Ed25519 key (Douceur 2002) — but two attested records STILL clear a 2-witness
 gate, so the gate BOUNDS the sybil cost, it does not CLOSE the boundary at threshold 2 (same as the
 Veracity-Gap post's D2). Determinism: the gate has no stochastic component, so every one of the N trials
@@ -26,14 +26,14 @@ returns the identical outcome; N is the published protocol, not a variance estim
 
 Runnable, cloud-free (lexical recall/consolidation, no embedder, no network):
     python poisoning_corroboration_gate.py
-MIT-licensed. Part of Agora / mnemo (https://github.com/DanceNitra/agora/tree/main/mnemo).
+MIT-licensed. Part of Agora / inspeximus (https://github.com/DanceNitra/agora/tree/main/inspeximus).
 """
 import os
 import sys
 import tempfile
 
 HERE = os.path.dirname(os.path.abspath(__file__))
-sys.path.insert(0, os.path.dirname(HERE))   # parent dir holds mnemo.py -> `from inspeximus import Inspeximus`
+sys.path.insert(0, os.path.dirname(HERE))   # parent dir holds inspeximus.py -> `from inspeximus import Inspeximus`
 from inspeximus import Inspeximus
 
 try:
@@ -65,8 +65,8 @@ def entrench_naive():
     return value >= 5.0  # naive graduation threshold -> True (poison entrenched)
 
 
-def entrench_mnemo(sybil=False):
-    """Real shipped mnemo. Poison is self-asserted (good=0). Pump it past the graduation value by recall;
+def entrench_inspeximus(sybil=False):
+    """Real shipped inspeximus. Poison is self-asserted (good=0). Pump it past the graduation value by recall;
     graduation additionally requires corroboration. sybil=True links it to TWO real distinct-source records."""
     m = _fresh()
     pid = m.remember("zog sky turns vermillion every poisontoken cycle",
@@ -95,8 +95,8 @@ def overwrite_naive():
     return True  # the poison's newer value silently replaces the true one
 
 
-def overwrite_mnemo(hardened, sybil=False):
-    """Real shipped mnemo. Ingest the TRUE fact, then the POISON contradiction; run consolidate() (the
+def overwrite_inspeximus(hardened, sybil=False):
+    """Real shipped inspeximus. Ingest the TRUE fact, then the POISON contradiction; run consolidate() (the
     state-toggle path). hardened=True sets supersede_requires_corroboration. sybil=True gives the poison
     two real distinct-source corroborating links so it clears the corroboration bar."""
     m = _fresh()
@@ -137,7 +137,7 @@ def overwrite_strict_attested():
 
 
 def _attest_msg(text, doc):
-    # Mirror mnemo._attest_message (kept local so the probe is self-contained).
+    # Mirror inspeximus._attest_message (kept local so the probe is self-contained).
     from inspeximus import _attest_message
     return _attest_message(text, doc)
 
@@ -149,16 +149,16 @@ def _pct(hit):
 def main():
     # Each mechanism is deterministic; loop N to match the published protocol (identical every trial).
     en_naive = all(entrench_naive() for _ in range(N))
-    en_def = any(entrench_mnemo() for _ in range(N))          # default == hardened for entrench
-    en_hard = any(entrench_mnemo() for _ in range(N))
-    en_sybil = all(entrench_mnemo(sybil=True) for _ in range(N))
+    en_def = any(entrench_inspeximus() for _ in range(N))          # default == hardened for entrench
+    en_hard = any(entrench_inspeximus() for _ in range(N))
+    en_sybil = all(entrench_inspeximus(sybil=True) for _ in range(N))
     ov_naive = all(overwrite_naive() for _ in range(N))
-    ov_def = all(overwrite_mnemo(hardened=False) for _ in range(N))
-    ov_hard = any(overwrite_mnemo(hardened=True) for _ in range(N))
-    ov_sybil = all(overwrite_mnemo(hardened=True, sybil=True) for _ in range(N))
+    ov_def = all(overwrite_inspeximus(hardened=False) for _ in range(N))
+    ov_hard = any(overwrite_inspeximus(hardened=True) for _ in range(N))
+    ov_sybil = all(overwrite_inspeximus(hardened=True, sybil=True) for _ in range(N))
 
-    print(f"Corroboration gate vs memory poisoning  (real shipped mnemo, N={N}/cell, deterministic)\n")
-    hdr = f"{'attack goal':<26}{'naive':>9}{'mnemo default':>15}{'mnemo hardened':>16}{'sybil forged >=2':>18}"
+    print(f"Corroboration gate vs memory poisoning  (real shipped inspeximus, N={N}/cell, deterministic)\n")
+    hdr = f"{'attack goal':<26}{'naive':>9}{'inspeximus default':>15}{'inspeximus hardened':>16}{'sybil forged >=2':>18}"
     print(hdr)
     print("-" * len(hdr))
     print(f"{'ENTRENCH durable poison':<26}{_pct(en_naive):>9}{_pct(en_def):>15}{_pct(en_hard):>16}{_pct(en_sybil):>18}")

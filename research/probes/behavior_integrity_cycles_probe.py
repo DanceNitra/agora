@@ -5,7 +5,7 @@ Skeptic hit (d): "self-compounding is asserted, measured zero times (no multi-cy
 REAL loop for 3 cycles: surface -> model consolidates (store-only call) -> the consolidated fact is WRITTEN
 BACK into the store -> next cycle's surface is what that store now hands back. Two arms per case:
   - NAIVE arm: an append-only store (what most agent memories are) — the consolidated fact just lands.
-  - GUARDED arm: a REAL mnemo store (echo_guard on) — the same consolidated fact goes through route(),
+  - GUARDED arm: a REAL inspeximus store (echo_guard on) — the same consolidated fact goes through route(),
     where a restatement of a superseded value is retired on arrival. The guard is in the write path.
 Measured per cycle: the fraction of cases whose CURRENT consolidated value is the stale A. If contamination
 compounds, the naive arm's stale share should persist or grow across cycles while the guarded arm pins to ~0.
@@ -49,7 +49,7 @@ def consolidate(e, A, B, surface, instructed=False):
 
 
 def run_cycles(cases, cycles, arm):
-    """arm: 'naive' (append-only store) or 'guarded' (real mnemo, echo_guard write path)."""
+    """arm: 'naive' (append-only store) or 'guarded' (real inspeximus, echo_guard write path)."""
     per_cycle_staleA = []
     states = {}
     for (e, A, B) in cases:
@@ -102,7 +102,7 @@ def main():
     print(f"MULTI-CYCLE COMPOUNDING · {bi.B_MODEL['name']} · {a.cycles} cycles · {len(cases)} cases")
     print("naive arm (append-only store):", flush=True)
     out["naive"] = run_cycles(cases, a.cycles, "naive")
-    print("guarded arm (real mnemo, echo_guard write path):", flush=True)
+    print("guarded arm (real inspeximus, echo_guard write path):", flush=True)
     out["guarded"] = run_cycles(cases, a.cycles, "guarded")
 
     print("INSTRUCTED WRITE-BACK (cycle-1 canonical surface, store-only + verification instruction):")

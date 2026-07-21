@@ -19,7 +19,7 @@ integrity and a real distribution:
 
 RBAC gates the actor, IFC gates the data, membership-cost gates the identity — the declassifier is where IFC
 and membership-cost meet, and where the cold-start tail becomes irreducible. Zero-dependency, deterministic
-(seeded). MIT. This probe IS the graded-IFC + earned-standing-declassifier prototype for mnemo.
+(seeded). MIT. This probe IS the graded-IFC + earned-standing-declassifier prototype for inspeximus.
 Run: python research/probes/bseries_ifc_frontier_declassify.py"""
 import json, os, random
 

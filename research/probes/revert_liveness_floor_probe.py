@@ -1,12 +1,12 @@
 """revert_liveness_floor_probe.py — the store owns no-infinite-bypass; the harness owns who-goes-first.
-Jacksonxly's fairness boundary, measured on the real mnemo 0.7.13 (r/RAG, 2026-07-12).
+Jacksonxly's fairness boundary, measured on the real inspeximus 0.7.13 (r/RAG, 2026-07-12).
 
 His boundary, and the test that draws it:
   - If the worst case is "the revert lands LATER", it is harness scheduling (policy, control layer).
   - If the worst case is "the revert NEVER lands", it is a liveness property and belongs in the STORE.
   Priority only deprioritizes (control). Bounded bypass is the thing that can silently become "never" (content).
 
-This measures where mnemo sits. The claim under test: in this synchronous store the liveness floor holds BY
+This measures where inspeximus sits. The claim under test: in this synchronous store the liveness floor holds BY
 CONSTRUCTION, because submit_revert is TERMINAL — it evaluates atomically against the current state on the
 call itself and lands-or-conflicts, never left pending. So a hostile scheduler can delay WHEN a submitted
 revert's call runs, but cannot bypass it unboundedly or turn it into never-evaluated.
@@ -14,11 +14,11 @@ revert's call runs, but cannot bypass it unboundedly or turn it into never-evalu
 Deterministic, no LLM, no network. RUN: python research/probes/revert_liveness_floor_probe.py
 """
 import sys, pathlib, json
-sys.path.insert(0, str(pathlib.Path(__file__).resolve().parents[2] / "mnemo_pypi"))
+sys.path.insert(0, str(pathlib.Path(__file__).resolve().parents[2] / "inspeximus_pypi"))
 from inspeximus import Inspeximus, new_receipt_keypair, sign_revert, __version__
 
 sk, pk = new_receipt_keypair()
-R = {"mnemo_version": __version__}
+R = {"inspeximus_version": __version__}
 
 
 def fresh(depth=1):

@@ -11,7 +11,7 @@ That isn't a liveness bug, it's the correct conflict... unconditional liveness f
 evaluation with clean conflict for relative ones, N stays 0... unconditional landing for a relative op over a
 moving base just is replay."
 
-This is a SIMULATION of that design (mnemo core unchanged — like the bounded-N sim), measuring five claims:
+This is a SIMULATION of that design (inspeximus core unchanged — like the bounded-N sim), measuring five claims:
   1. named (absolute) reverts land under ANY same-slot burst — full liveness;
   2. relative reverts under a burst reach a DECISION in bounded steps (land or clean conflict) — never starve;
      vs the optimistic mint-then-redeem model, which never reaches a decision under the same burst;
@@ -29,7 +29,7 @@ R = {}
 
 
 class Stream:
-    """A per-key serialized op stream (the thing mnemo's per-key active_id computation already implies).
+    """A per-key serialized op stream (the thing inspeximus's per-key active_id computation already implies).
     Ops enter a FIFO queue; apply() evaluates one op at the head. Nonces are consumed on first evaluation."""
     def __init__(self):
         self.q = []                      # FIFO of ops

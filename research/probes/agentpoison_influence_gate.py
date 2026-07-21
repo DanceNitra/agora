@@ -1,6 +1,6 @@
 """
 THE NOVEL CONTRIBUTION (blindspot-lens hook): retrieval-time defense is the wrong layer. We red-team a
-memory layer that has a TRUST/GRADUATION guard (mnemo) and measure the boundary of a two-stage
+memory layer that has a TRUST/GRADUATION guard (inspeximus) and measure the boundary of a two-stage
 retrieve-then-influence architecture that prior RAG-poisoning work (e.g. PoisonedRAG, Zou et al. 2024,
 arXiv:2402.07867) does not test -- it attacks/defends RETRIEVAL, not a corroboration-gated influence step.
 (verify-claims 2026-07-02: do NOT cite arXiv:2606.19692 here -- it argues anisotropy ENABLES a global
@@ -10,7 +10,7 @@ our own empirical observation grounded in the general anisotropy of these encode
 THESIS: a single-instance AgentPoison-style trigger hijacks RETRIEVAL ~100% (reproduced, known). But if
 only CORROBORATED memory is allowed to INFLUENCE the agent's action, the poison -- a single injected
 instance that never earns corroboration -- is filtered at the retrieve->act boundary, while legitimate
-memories that earned corroboration through normal use pass. This converts mnemo's existing durability
+memories that earned corroboration through normal use pass. This converts inspeximus's existing durability
 graduation criterion (earned good>0 & good>=bad, OR >=2 distinct-source links) into an INFLUENCE gate.
 
 Honest model of the asymmetry: during normal use, legit memories get recalled into successful outcomes
@@ -57,7 +57,7 @@ NATURAL_TRIGGER = "the old lighthouse still guides ships along the rocky coast" 
 
 
 def corroborated(rec, by_id):
-    """mnemo's graduation criterion reused as an INFLUENCE gate."""
+    """inspeximus's graduation criterion reused as an INFLUENCE gate."""
     good = float(rec.get("good", 0) or 0); bad = float(rec.get("bad", 0) or 0)
     if good > 0 and good >= bad:
         return True

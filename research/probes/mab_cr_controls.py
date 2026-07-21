@@ -1,12 +1,12 @@
-"""GATE CONTROLS for the mnemo CR result — separate 'supersession removed the STALE value' (H1) from
+"""GATE CONTROLS for the inspeximus CR result — separate 'supersession removed the STALE value' (H1) from
 'a smaller pool is just less cluttered' (H2), the confound the stress-claim panel flagged. Also fixes the
 unfair answerer prompt and reports the free conflict/non-conflict split.
 
 Conditions (identical nomic retrieval top-5, identical NEUTRAL answerer, identical gold match):
   naive_455        — all 455 facts (stale + consolidated + non-conflict).
-  mnemo_333        — supersession: last-per-key only (122 consolidated + 211 non-conflict).
-  twinskept_333    — DECISIVE: same pool SIZE as mnemo (333) but KEEP the stale twins
-                     (122 consolidated + 122 stale + 89 random non-conflict). If this ~= mnemo -> the lift is
+  inspeximus_333        — supersession: last-per-key only (122 consolidated + 211 non-conflict).
+  twinskept_333    — DECISIVE: same pool SIZE as inspeximus (333) but KEEP the stale twins
+                     (122 consolidated + 122 stale + 89 random non-conflict). If this ~= inspeximus -> the lift is
                      pool-size/clutter (H2), supersession earns ~0. If this ~= naive -> keeping stale hurts
                      even at small size -> supersession (removing it) is the mechanism (H1).
 
@@ -108,12 +108,12 @@ def main():
     conf_consol = [active[k] for k in order if k in conflict_keys]  # 122 consolidated conflict values
 
     naive_pool = list(facts)                                     # 455
-    mnemo_pool = list(consolidated)                              # 333
-    # twins-kept, size-matched to mnemo (333): all conflict facts (consol+stale=244) + random non-conflict fill
-    fill = random.sample(nonconf, len(mnemo_pool) - len(conf_consol) - len(stale_facts))
+    inspeximus_pool = list(consolidated)                              # 333
+    # twins-kept, size-matched to inspeximus (333): all conflict facts (consol+stale=244) + random non-conflict fill
+    fill = random.sample(nonconf, len(inspeximus_pool) - len(conf_consol) - len(stale_facts))
     twinskept_pool = conf_consol + stale_facts + fill
     print(f"facts={len(facts)} conflict_keys={len(conflict_keys)} | naive={len(naive_pool)} "
-          f"mnemo={len(mnemo_pool)} twinskept={len(twinskept_pool)}", flush=True)
+          f"inspeximus={len(inspeximus_pool)} twinskept={len(twinskept_pool)}", flush=True)
 
     embed(naive_pool, "d")
     qs, golds = d["questions"][:n_q], d["answers"][:n_q]
@@ -122,7 +122,7 @@ def main():
     consol_vals = {norm(value_of(active[k], k)): k for k in conflict_keys}
     def is_conf(gold): return any(norm(g) in consol_vals or any(norm(g) in cv for cv in consol_vals) for g in gold)
 
-    pools = {"naive_455": naive_pool, "mnemo_333": mnemo_pool, "twinskept_333": twinskept_pool}
+    pools = {"naive_455": naive_pool, "inspeximus_333": inspeximus_pool, "twinskept_333": twinskept_pool}
     embcache = {}
     def emb1(t):
         if t not in embcache: embcache[t] = embed([t], "d")[0]
@@ -154,7 +154,7 @@ def main():
         out[c] = {"overall": tot/n, "conflict": cacc, "nonconflict": nacc, **r}
     json.dump({"n": n, "answerer": CLOUD_MODEL, "neutral_prompt": True, "results": out},
               open(os.path.join(HERE, "mab_cr_controls_result.json"), "w"), indent=1)
-    print("\n  READ: twinskept ~= mnemo -> lift is pool-size/clutter (H2). twinskept ~= naive -> supersession (H1).")
+    print("\n  READ: twinskept ~= inspeximus -> lift is pool-size/clutter (H2). twinskept ~= naive -> supersession (H1).")
     print("  wrote mab_cr_controls_result.json")
 
 if __name__ == "__main__":

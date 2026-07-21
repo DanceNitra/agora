@@ -2,7 +2,7 @@
  "poison": "exact",
  "tasks": [
   {
-   "id": "mnemo|poison|Thomas Kyd was born in the city of",
+   "id": "inspeximus|poison|Thomas Kyd was born in the city of",
    "subject": "Thomas Kyd was born in the city of",
    "context": "Thomas Kyd was born in the city of Leeds.",
    "truth": "Leeds",
@@ -16,7 +16,7 @@
    "other": "London"
   },
   {
-   "id": "mnemo|legit|Thomas Kyd was born in the city of",
+   "id": "inspeximus|legit|Thomas Kyd was born in the city of",
    "subject": "Thomas Kyd was born in the city of",
    "context": "Thomas Kyd was born in the city of Leeds.\nThomas Kyd was born in the city of Bristol.",
    "truth": "Bristol",
@@ -30,7 +30,7 @@
    "other": "Leeds"
   },
   {
-   "id": "mnemo|poison|The chairperson of Fatah",
+   "id": "inspeximus|poison|The chairperson of Fatah",
    "subject": "The chairperson of Fatah",
    "context": "The chairperson of Fatah is Moshe Kahlon.",
    "truth": "is Moshe Kahlon",
@@ -44,7 +44,7 @@
    "other": "is Mahmoud Abbas"
   },
   {
-   "id": "mnemo|legit|The chairperson of Fatah",
+   "id": "inspeximus|legit|The chairperson of Fatah",
    "subject": "The chairperson of Fatah",
    "context": "The chairperson of Fatah is Moshe Kahlon.\nThe chairperson of Fatah Yasser Arafat.",
    "truth": "Yasser Arafat",
@@ -58,7 +58,7 @@
    "other": "is Moshe Kahlon"
   },
   {
-   "id": "mnemo|poison|Hines Ward plays the position of",
+   "id": "inspeximus|poison|Hines Ward plays the position of",
    "subject": "Hines Ward plays the position of",
    "context": "Hines Ward plays the position of cornerback.",
    "truth": "cornerback",
@@ -72,7 +72,7 @@
    "other": "wide receiver"
   },
   {
-   "id": "mnemo|legit|Hines Ward plays the position of",
+   "id": "inspeximus|legit|Hines Ward plays the position of",
    "subject": "Hines Ward plays the position of",
    "context": "Hines Ward plays the position of cornerback.\nHines Ward plays the position of quarterback.",
    "truth": "quarterback",
@@ -86,7 +86,7 @@
    "other": "cornerback"
   },
   {
-   "id": "mnemo|poison|Bengaluru is located in the continent of",
+   "id": "inspeximus|poison|Bengaluru is located in the continent of",
    "subject": "Bengaluru is located in the continent of",
    "context": "Bengaluru is located in the continent of Oceania.",
    "truth": "Oceania",
@@ -100,7 +100,7 @@
    "other": "Asia"
   },
   {
-   "id": "mnemo|legit|Bengaluru is located in the continent of",
+   "id": "inspeximus|legit|Bengaluru is located in the continent of",
    "subject": "Bengaluru is located in the continent of",
    "context": "Bengaluru is located in the continent of Oceania.\nBengaluru is located in the continent of Europe.",
    "truth": "Europe",
@@ -114,7 +114,7 @@
    "other": "Oceania"
   },
   {
-   "id": "mnemo|poison|Rog\u00e9rio Ceni plays the position of",
+   "id": "inspeximus|poison|Rog\u00e9rio Ceni plays the position of",
    "subject": "Rog\u00e9rio Ceni plays the position of",
    "context": "Rog\u00e9rio Ceni plays the position of flanker.",
    "truth": "flanker",
@@ -128,7 +128,7 @@
    "other": "goalkeeper"
   },
   {
-   "id": "mnemo|legit|Rog\u00e9rio Ceni plays the position of",
+   "id": "inspeximus|legit|Rog\u00e9rio Ceni plays the position of",
    "subject": "Rog\u00e9rio Ceni plays the position of",
    "context": "Rog\u00e9rio Ceni plays the position of flanker.\nRog\u00e9rio Ceni plays the position of striker.",
    "truth": "striker",
@@ -142,7 +142,7 @@
    "other": "flanker"
   },
   {
-   "id": "mnemo|poison|The director of British Broadcasting Corporation",
+   "id": "inspeximus|poison|The director of British Broadcasting Corporation",
    "subject": "The director of British Broadcasting Corporation",
    "context": "The director of British Broadcasting Corporation is Narendra Modi.",
    "truth": "is Narendra Modi",
@@ -156,7 +156,7 @@
    "other": "is Tony Hall, Baron Hall of Birkenhead"
   },
   {
-   "id": "mnemo|legit|The director of British Broadcasting Corporation",
+   "id": "inspeximus|legit|The director of British Broadcasting Corporation",
    "subject": "The director of British Broadcasting Corporation",
    "context": "The director of British Broadcasting Corporation is Narendra Modi.\nThe director of British Broadcasting Corporation Greg Dyke.",
    "truth": "Greg Dyke",
@@ -170,7 +170,7 @@
    "other": "is Narendra Modi"
   },
   {
-   "id": "mnemo|poison|The author of A Wizard of Earthsea",
+   "id": "inspeximus|poison|The author of A Wizard of Earthsea",
    "subject": "The author of A Wizard of Earthsea",
    "context": "The author of A Wizard of Earthsea is Pius XII.",
    "truth": "is Pius XII",
@@ -184,7 +184,7 @@
    "other": "is Ursula K. Le Guin"
   },
   {
-   "id": "mnemo|legit|The author of A Wizard of Earthsea",
+   "id": "inspeximus|legit|The author of A Wizard of Earthsea",
    "subject": "The author of A Wizard of Earthsea",
    "context": "The author of A Wizard of Earthsea is Pius XII.\nThe author of A Wizard of Earthsea J. R. R. Tolkien.",
    "truth": "J. R. R. Tolkien",
@@ -198,7 +198,7 @@
    "other": "is Pius XII"
   },
   {
-   "id": "mnemo|poison|The headquarters of University of California, Berkeley",
+   "id": "inspeximus|poison|The headquarters of University of California, Berkeley",
    "subject": "The headquarters of University of California, Berkeley",
    "context": "The headquarters of University of California, Berkeley is located in the city of Botevgrad.",
    "truth": "is located in the city of Botevgrad",
@@ -212,7 +212,7 @@
    "other": "is located in the city of Berkeley"
   },
   {
-   "id": "mnemo|legit|The headquarters of University of California, Berkeley",
+   "id": "inspeximus|legit|The headquarters of University of California, Berkeley",
    "subject": "The headquarters of University of California, Berkeley",
    "context": "The headquarters of University of California, Berkeley is located in the city of Botevgrad.\nThe headquarters of University of California, Berkeley Oakland.",
    "truth": "Oakland",
@@ -226,7 +226,7 @@
    "other": "is located in the city of Botevgrad"
   },
   {
-   "id": "mnemo|poison|The chief executive officer of Apple Inc.",
+   "id": "inspeximus|poison|The chief executive officer of Apple Inc.",
    "subject": "The chief executive officer of Apple Inc",
    "context": "The chief executive officer of Apple Inc. is Vijay Mallya.",
    "truth": "is Vijay Mallya",
@@ -240,7 +240,7 @@
    "other": "is Tim Cook"
   },
   {
-   "id": "mnemo|legit|The chief executive officer of Apple Inc.",
+   "id": "inspeximus|legit|The chief executive officer of Apple Inc.",
    "subject": "The chief executive officer of Apple Inc",
    "context": "The chief executive officer of Apple Inc. is Vijay Mallya.\nThe chief executive officer of Apple Inc. Steve Jobs.",
    "truth": "Steve Jobs",
@@ -254,7 +254,7 @@
    "other": "is Vijay Mallya"
   },
   {
-   "id": "mnemo|poison|Lisa Leslie plays the position of",
+   "id": "inspeximus|poison|Lisa Leslie plays the position of",
    "subject": "Lisa Leslie plays the position of",
    "context": "Lisa Leslie plays the position of goaltender.",
    "truth": "goaltender",
@@ -268,7 +268,7 @@
    "other": "center"
   },
   {
-   "id": "mnemo|legit|Lisa Leslie plays the position of",
+   "id": "inspeximus|legit|Lisa Leslie plays the position of",
    "subject": "Lisa Leslie plays the position of",
    "context": "Lisa Leslie plays the position of goaltender.\nLisa Leslie plays the position of point guard.",
    "truth": "point guard",
@@ -282,7 +282,7 @@
    "other": "goaltender"
   },
   {
-   "id": "mnemo|poison|Slovakia national football team is associated with the sport of",
+   "id": "inspeximus|poison|Slovakia national football team is associated with the sport of",
    "subject": "Slovakia national football team is associated with the sport of",
    "context": "Slovakia national football team is associated with the sport of cricket.",
    "truth": "cricket",
@@ -296,7 +296,7 @@
    "other": "association football"
   },
   {
-   "id": "mnemo|legit|Slovakia national football team is associated with the sport of",
+   "id": "inspeximus|legit|Slovakia national football team is associated with the sport of",
    "subject": "Slovakia national football team is associated with the sport of",
    "context": "Slovakia national football team is associated with the sport of cricket.\nSlovakia national football team is associated with the sport of ice hockey.",
    "truth": "ice hockey",
@@ -310,7 +310,7 @@
    "other": "cricket"
   },
   {
-   "id": "mnemo|poison|Alta IF is associated with the sport of",
+   "id": "inspeximus|poison|Alta IF is associated with the sport of",
    "subject": "Alta IF is associated with the sport of",
    "context": "Alta IF is associated with the sport of baseball.",
    "truth": "baseball",
@@ -324,7 +324,7 @@
    "other": "association football"
   },
   {
-   "id": "mnemo|legit|Alta IF is associated with the sport of",
+   "id": "inspeximus|legit|Alta IF is associated with the sport of",
    "subject": "Alta IF is associated with the sport of",
    "context": "Alta IF is associated with the sport of baseball.\nAlta IF is associated with the sport of handball.",
    "truth": "handball",

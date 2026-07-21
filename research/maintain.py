@@ -1,5 +1,5 @@
 """
-maintain — the self-maintaining second brain.  (mnemo's maintenance layer)
+maintain — the self-maintaining second brain.  (inspeximus's maintenance layer)
 
 The #1 frustration with second brains (measured, 2026): *capture is easy, maintenance is hard.*
 People set up Obsidian/Notion, take notes for two weeks, then the review/re-link/summarise/reorganise
@@ -14,7 +14,7 @@ This is that maintenance pass, run over a folder of Markdown notes. It does the 
                     plus orphan/dead-link/stale fractions. Knowledge debt is a PERCOLATION collapse:
                     legibility holds, then drops abruptly — so this warns BEFORE the cliff, not after.
 
-Safety rule (non-negotiable, same as mnemo): this is ADVISORY. It READS notes and returns a plan;
+Safety rule (non-negotiable, same as inspeximus): this is ADVISORY. It READS notes and returns a plan;
 it never edits, moves, or deletes a note. You (or an explicit apply step) act on the report.
 
 Zero dependencies. With an embedder, duplicate detection gets sharper; without one it uses a

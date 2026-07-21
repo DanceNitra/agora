@@ -1,4 +1,4 @@
-# Launch posts — second_brain_mcp + mnemo (DRAFT, gated — nothing posted until owner ships)
+# Launch posts — second_brain_mcp + inspeximus (DRAFT, gated — nothing posted until owner ships)
 
 > Corrected after an adversarial honesty review (run wf_ec21e760). Every number below is verified
 > against the real lab ledger; the run command is tested working after a flat download.
@@ -18,7 +18,7 @@
 
 **Title:** `Show HN: MCP server that turns a Markdown vault into a thinking partner`
 
-I run an autonomous research system whose memory layer (mnemo) is a single zero-dependency Python
+I run an autonomous research system whose memory layer (inspeximus) is a single zero-dependency Python
 file. I pulled the "think over my notes" part out into an MCP server and want to show it honestly —
 because the design choice is the whole point.
 
@@ -39,7 +39,7 @@ reasoning over *your own* notes possible.
 - `idea_methods` — a toolkit of named idea-generation recipes, so generation is principled, not a vibe
 
 **Zero config, true:** with no embedder it uses a lexical-overlap fallback and runs today. An
-embedder is optional (`MNEMO_EMBED_URL/MODEL/KEY`, any OpenAI-compatible endpoint). It matters most
+embedder is optional (`INSPEXIMUS_EMBED_URL/MODEL/KEY`, any OpenAI-compatible endpoint). It matters most
 **at scale**: on my vault, lexical recall@5 decayed from 0.94 on a small store to **0.25 at ~6k
 notes**, while semantic recall held at **~0.65** (≈2.6× at full corpus). Lexical is a real floor for
 a small vault, not a stub; semantic is what stops the floor from falling out as you grow.
@@ -61,8 +61,8 @@ not as verified fact. No invented benchmarks, no "10×", no testimonials.
 
 **Try it (works after a flat download):**
 ```
-curl -O https://raw.githubusercontent.com/DanceNitra/agora/main/mnemo/mnemo.py
-curl -O https://raw.githubusercontent.com/DanceNitra/agora/main/mnemo/second_brain_mcp.py
+curl -O https://raw.githubusercontent.com/DanceNitra/agora/main/inspeximus/inspeximus.py
+curl -O https://raw.githubusercontent.com/DanceNitra/agora/main/inspeximus/second_brain_mcp.py
 pip install "mcp[cli]"
 NOTES_DIR=/path/to/your/vault python second_brain_mcp.py
 ```
@@ -71,7 +71,7 @@ store is append-only and contradictions are flagged, never auto-resolved — I d
 silently rewrites my notes.
 
 **License / model:** MIT, open core, free. A hosted/pro tier is a maybe later, not a promise — nothing
-here is paywalled. Repo: https://github.com/DanceNitra/agora (`mnemo/`). Track record + methods:
+here is paywalled. Repo: https://github.com/DanceNitra/agora (`inspeximus/`). Track record + methods:
 https://dancenitra.github.io/agora/
 
 The part I'm least sure of is the gap/bridge heuristic — happy to be told where it's too crude on a
@@ -117,13 +117,13 @@ Runs with zero config (lexical fallback). Optional embedder for semantic bridges
 required deps, MIT.
 
 ```
-curl -O https://raw.githubusercontent.com/DanceNitra/agora/main/mnemo/mnemo.py
-curl -O https://raw.githubusercontent.com/DanceNitra/agora/main/mnemo/second_brain_mcp.py
+curl -O https://raw.githubusercontent.com/DanceNitra/agora/main/inspeximus/inspeximus.py
+curl -O https://raw.githubusercontent.com/DanceNitra/agora/main/inspeximus/second_brain_mcp.py
 pip install "mcp[cli]"
 NOTES_DIR=/path/to/your/vault python second_brain_mcp.py
 ```
 
-Repo: https://github.com/DanceNitra/agora (look in `mnemo/`). Genuinely interested whether the
+Repo: https://github.com/DanceNitra/agora (look in `inspeximus/`). Genuinely interested whether the
 gap/bridge heuristics surface anything useful on a vault that isn't mine — it's read-only, local, no
 telemetry.
 
@@ -133,7 +133,7 @@ telemetry.
 
 **Titulok:** `Show HN: MCP server, ktorý zmení Markdown vault na partnera na premýšľanie`
 
-Prevádzkujem autonómny výskumný systém, ktorého pamäťová vrstva (mnemo) je jeden Python súbor bez
+Prevádzkujem autonómny výskumný systém, ktorého pamäťová vrstva (inspeximus) je jeden Python súbor bez
 závislostí. Časť „premýšľaj nad mojimi poznámkami" som vytiahol do MCP servera a chcem to ukázať
 úprimne — lebo práve to dizajnové rozhodnutie je celá pointa.
 
@@ -153,7 +153,7 @@ veštba — tvrdím, že je to substrát, ktorý umožní agentovi uvažovať na
 - `idea_methods` — sada pomenovaných receptov na tvorbu ideí, aby generovanie bolo princípom, nie vibe-om
 
 **Zero config, naozaj:** bez embeddera používa lexikálny fallback a beží dnes. Embedder je voliteľný
-(`MNEMO_EMBED_URL/MODEL/KEY`, akýkoľvek OpenAI-kompatibilný endpoint). Najviac sa oplatí **pri škále**:
+(`INSPEXIMUS_EMBED_URL/MODEL/KEY`, akýkoľvek OpenAI-kompatibilný endpoint). Najviac sa oplatí **pri škále**:
 na mojom vaulte lexikálny recall@5 klesol z 0,94 na malom úložisku na **0,25 pri ~6 000 poznámkach**,
 kým sémantický držal **~0,65** (≈2,6× pri plnom korpuse).
 
@@ -173,14 +173,14 @@ som ju citoval verejne — uvádzam to ako „agent to označil a u mňa to obst
 
 **Vyskúšaj (funguje po obyčajnom stiahnutí):**
 ```
-curl -O https://raw.githubusercontent.com/DanceNitra/agora/main/mnemo/mnemo.py
-curl -O https://raw.githubusercontent.com/DanceNitra/agora/main/mnemo/second_brain_mcp.py
+curl -O https://raw.githubusercontent.com/DanceNitra/agora/main/inspeximus/inspeximus.py
+curl -O https://raw.githubusercontent.com/DanceNitra/agora/main/inspeximus/second_brain_mcp.py
 pip install "mcp[cli]"
 NOTES_DIR=/cesta/k/tvojmu/vaultu python second_brain_mcp.py
 ```
 
 **Licencia / model:** MIT, open core, zadarmo. Hostovaný/pro tier je možno neskôr, nie sľub — nič tu nie
-je za paywallom. Repo: https://github.com/DanceNitra/agora (`mnemo/`).
+je za paywallom. Repo: https://github.com/DanceNitra/agora (`inspeximus/`).
 
 ---
 
@@ -206,10 +206,10 @@ Beží bez konfigurácie (lexikálny fallback). Voliteľný embedder pre sémant
 škále. Jeden súbor, bez nutných závislostí, MIT.
 
 ```
-curl -O https://raw.githubusercontent.com/DanceNitra/agora/main/mnemo/mnemo.py
-curl -O https://raw.githubusercontent.com/DanceNitra/agora/main/mnemo/second_brain_mcp.py
+curl -O https://raw.githubusercontent.com/DanceNitra/agora/main/inspeximus/inspeximus.py
+curl -O https://raw.githubusercontent.com/DanceNitra/agora/main/inspeximus/second_brain_mcp.py
 pip install "mcp[cli]"
 NOTES_DIR=/cesta/k/vaultu python second_brain_mcp.py
 ```
 
-Repo: https://github.com/DanceNitra/agora (`mnemo/`). Je to read-only, lokálne, bez telemetrie.
+Repo: https://github.com/DanceNitra/agora (`inspeximus/`). Je to read-only, lokálne, bez telemetrie.

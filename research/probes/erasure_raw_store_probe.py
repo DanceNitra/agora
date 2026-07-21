@@ -2,7 +2,7 @@
 arXiv:2601.07004 shows Letta/Zep/mem0 deletion leaves data recoverable from the raw store).
 
 We do NOT trust the API's "is it gone?" — we read the RAW store on disk after erasure and try to recover the
-forgotten content AND its embedding vector. mnemo must leave ZERO recoverable trace.
+forgotten content AND its embedding vector. inspeximus must leave ZERO recoverable trace.
 
 Three settings:
   A. plaintext store, persist_vectors=True  -> forget_subject must remove text AND the persisted vec.

@@ -2,7 +2,7 @@
  "model": "gpt-4o",
  "runs": 3,
  "results": {
-  "mnemo": {
+  "inspeximus": {
    "nondeterminism_rate": 0.0,
    "unstable": 0,
    "n": 10,

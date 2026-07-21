@@ -2,8 +2,8 @@
   "task": "value-obscuring revert",
   "metric": "revert_success_rate (current answer == old value); SYMMETRIC instrument: all systems read by the same ground-truth-blind LLM judge on their native retrieval surface (fairness fix 2026-07-11)",
   "results": {
-    "mnemo": {
-      "system": "mnemo",
+    "inspeximus": {
+      "system": "inspeximus",
       "n": 20,
       "revert_honored_A": 15,
       "kept_new_B": 0,

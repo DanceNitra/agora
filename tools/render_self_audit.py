@@ -16,8 +16,8 @@ OUT = ROOT / "public" / "self-audit" / "index.html"
 
 # Per-tool bilingual framing (the data line is pulled live from the report's `finding`).
 TOOLS = [
-    ("mnemo", "agent memory", "pamäť agentov",
-     "Our own brain memory store, governed by mnemo.", "Vlastná pamäť brainu, riadená cez mnemo."),
+    ("inspeximus", "agent memory", "pamäť agentov",
+     "Our own brain memory store, governed by inspeximus.", "Vlastná pamäť brainu, riadená cez inspeximus."),
     ("ragfresh", "RAG freshness", "čerstvosť RAG",
      "Triage of our memory by value × freshness.", "Triáž pamäte podľa hodnota × čerstvosť."),
     ("nullcheck", "is it real?", "je to reálne?",

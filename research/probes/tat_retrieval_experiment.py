@@ -1,7 +1,7 @@
 """
 tat_retrieval_experiment.py  --  the exact joint experiment for @maratsultanov2 (DeepSeek-V3 #1466). MIT.
 
-Question: does adding a TAT 5-D chunk (Theme, Role, Emotion, Meaning, Goal) to mnemo's recall -- as a HARD
+Question: does adding a TAT 5-D chunk (Theme, Role, Emotion, Meaning, Goal) to inspeximus's recall -- as a HARD
 `where=` filter or a SOFT `prefer=` weight -- measurably beat plain semantic recall on a retrieval task?
 
 This file is the harness, validated END-TO-END on synthetic B-trace-like data so the input spec is proven
@@ -28,7 +28,7 @@ Run:  python tat_retrieval_experiment.py                 # synthetic validation
       python tat_retrieval_experiment.py --records r.jsonl --queries q.jsonl   # real data
 """
 import os, sys, json, argparse, random
-sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..", "mnemo")))
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..", "inspeximus")))
 from inspeximus import Inspeximus
 
 DIMS = ("theme", "role", "emotion", "meaning", "goal")
@@ -48,7 +48,7 @@ def load(m, records):
     for r in records:
         chunk = {d: (r.get("chunk") or {}).get(d) for d in DIMS}
         mid = m.remember(r["text"], meta=chunk)
-        id_map[r["id"]] = mid          # map external id -> internal mnemo id
+        id_map[r["id"]] = mid          # map external id -> internal inspeximus id
     return id_map
 
 

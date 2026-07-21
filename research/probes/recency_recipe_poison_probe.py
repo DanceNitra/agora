@@ -1,10 +1,10 @@
 """recency_recipe_poison_probe.py — the deterministic "recency wins" recipe is not truth-safe;
-mnemo's layered defense (corroboration gate + unforgeable earned-outcome) is.
+inspeximus's layered defense (corroboration gate + unforgeable earned-outcome) is.
 
 CONTEXT. arXiv 2606.01435 ("Don't Ask the LLM to Track Freshness: A Deterministic Recipe for
 Memory Conflict Resolution", 2026) resolves conflicting memories deterministically: when the same
 item has several versions, KEEP THE ONE WITH THE MOST RECENT TIMESTAMP. That rule is correct and
-cheap when writes are TRUSTED (it is exactly mnemo's bi-temporal keyed ledger). This probe measures
+cheap when writes are TRUSTED (it is exactly inspeximus's bi-temporal keyed ledger). This probe measures
 what the recipe does not address: when a write may be ADVERSARIAL, "latest wins" gives the attacker
 the write they most want — the LAST one. None of the 2026 conflict/forgetting benchmarks (MemConflict,
 Memory-Agent-Bench Fact-Consolidation, From-Recall-to-Forgetting, LongMemEval knowledge-updates)
@@ -15,7 +15,7 @@ THREE MEASURED LAYERS (same numeric fixture; a config value the store must keep 
   A. RECIPE (pure recency, faithful ref-impl of 2606.01435)
         -> a single later write ALWAYS wins. Poison cost = 1 write. No notion of truth.
 
-  B. + CORROBORATION GATE (mnemo, supersede_requires_corroboration=True, opt-in)
+  B. + CORROBORATION GATE (inspeximus, supersede_requires_corroboration=True, opt-in)
         -> a single UNcorroborated later write is LINKED, not adopted: single-shot poison is held,
            and a genuinely corroborated/earned update is still ADOPTED (not "never change").
         -> BUT this gate is FIRST-MOVER, not truth-aware: an attacker who ESTABLISHES a corroborated
@@ -23,14 +23,14 @@ THREE MEASURED LAYERS (same numeric fixture; a config value the store must keep 
            Sybil-forgeable (our prior finding: membership-cost-vs-outcome-accountability). So the gate
            raises the single-shot cost; it is NOT a truth guarantee on its own.
 
-  C. + EARNED OUTCOME (mnemo, credit(ids, outcome) — the UNFORGEABLE channel)
+  C. + EARNED OUTCOME (inspeximus, credit(ids, outcome) — the UNFORGEABLE channel)
         -> a single correction carrying earned good (a real resolved outcome, which an attacker who can
            only WRITE cannot manufacture) DOES dislodge a corroborated-but-unearned false and restore
            truth. This is the layer the recipe and the corroboration gate both lack.
 
 HONEST FRAMING. Not a new law — a runnable product receipt. That recency is forgeable and that
 write-count corroboration is Sybil-forgeable is established (ours + textbook moving-target/Cheng-
-Friedman). The contribution is: mnemo already ships the recipe (trusted keyed path) AND the two
+Friedman). The contribution is: inspeximus already ships the recipe (trusted keyed path) AND the two
 defenses it lacks, and this probe MEASURES exactly where each layer holds and where it breaks —
 tied to a recipe the field published this year.
 """
@@ -39,7 +39,7 @@ sys.path.insert(0, str(pathlib.Path(__file__).resolve().parents[1]))
 from inspeximus import Inspeximus
 
 TRUE_V, FALSE_V, UPDATE_V = 30, 5, 45
-def fact(v):  # paraphrase-stable numeric assertion; a numeric clash reliably fires mnemo's toggle path
+def fact(v):  # paraphrase-stable numeric assertion; a numeric clash reliably fires inspeximus's toggle path
     return f"The server request timeout is configured to {v} seconds."
 
 
@@ -106,7 +106,7 @@ def gate_firstmover_false(n_false=3, correction_earned=False):
 
 def main():
     print("=" * 78)
-    print("The deterministic 'recency wins' recipe (arXiv 2606.01435) is not truth-safe; mnemo layers are")
+    print("The deterministic 'recency wins' recipe (arXiv 2606.01435) is not truth-safe; inspeximus layers are")
     print("=" * 78)
     print(f"true={TRUE_V}  poison={FALSE_V}  legit-update={UPDATE_V}\n")
 

@@ -1,12 +1,12 @@
-"""Intent tagger + version resolver in front of mnemo — builds and measures the split jacksonxly proposed
+"""Intent tagger + version resolver in front of inspeximus — builds and measures the split jacksonxly proposed
 (Reddit, 2026-07-11): tag each utterance assert / correct / revert, resolve "before" against the timeline,
 and let cosine/value-matching never touch a revert (a revert is an instruction on the version graph).
 
-WHAT WE ALREADY HAD: the plumbing — mnemo.revert(key) restores the superseded predecessor from the ledger
+WHAT WE ALREADY HAD: the plumbing — inspeximus.revert(key) restores the superseded predecessor from the ledger
 (channel separation), as_of()/history() is the bitemporal part, echo_guard retires content restatements.
 WHAT THIS PROBE BUILDS: the missing front — a deterministic, ledger-aware intent tagger + a fuzzy-temporal
 resolver ("back/before" -> predecessor, "original/at first" -> first version) — wired end-to-end into real
-mnemo ops, and measured against the case that motivated it all.
+inspeximus ops, and measured against the case that motivated it all.
 
 THE HARD PAIR, measured, not hand-waved: an ECHO ("the cache region is osaka", stale value restated) and an
 UNMARKED LEGITIMATE REAFFIRM (the same sentence, said by someone who KNOWS it changed and wants it back) can
@@ -136,7 +136,7 @@ def current_value(store, key):
 
 def value_chain(store, key):
     """the values that were actually CURRENT at some point, oldest->newest. Skips echo-retired arrivals
-    (meta.echo_blocked — retired stale-on-arrival, never the current value); mnemo's per-record
+    (meta.echo_blocked — retired stale-on-arrival, never the current value); inspeximus's per-record
     superseded_by_policy judge-log is what makes this distinction readable."""
     chain = []
     for r in store.items:

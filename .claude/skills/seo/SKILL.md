@@ -24,7 +24,7 @@ Work on the piece spec / draft and adjust the EN + SK bodies and the spec fields
 - Choose ONE primary long-tail query the post targets (3–8 words, high intent, low competition). For us these are specific technical questions, e.g. *"does long context kill RAG"*, *"agent memory poisoning defense"*, *"LoCoMo multi-hop recall benchmark"*. We can win these because almost nobody has the measured answer.
 - Mine real demand for free: Google **autocomplete** (type the seed), **People Also Ask**, **Related searches**, and once GSC is live, the **Performance → queries** already showing impressions. Harvest the sub-questions — each becomes an H2 or an FAQ entry.
 - Classify intent = **informational** (almost always for us) → the page is an explainer/benchmark, answer-first, not a pitch.
-- Reuse our **signature terminology** consistently so AI associates it with us and cites it by name: *Adaptation–Corruption Separation Law, the Crucible, Diversity-Flip Law, mnemo, RAMR*. Coin a memorable name for each new result.
+- Reuse our **signature terminology** consistently so AI associates it with us and cites it by name: *Adaptation–Corruption Separation Law, the Crucible, Diversity-Flip Law, inspeximus, RAMR*. Coin a memorable name for each new result.
 
 ### 2. The "Three Kings" — primary keyword in all three
 - **`<title>`** (spec `title` / `title_sk`): primary keyword **near the front**, ≤ ~60 chars so it doesn't truncate, and **lead with the measured result** for CTR. Good: `"Does long context kill RAG? We measured it"`, `"Memory poisoning hits 70–95% — a corroboration gate stops it"`. Avoid vague clever titles.
@@ -93,7 +93,7 @@ Run a thorough pass over `public/` and `tools/render_post.py`; fan out sub-agent
 5. **Figure(s)** with alt text/figcaption (SVG charts of the measured result).
 6. **Falsifier + honest limits** (our standard) — doubles as E-E-A-T.
 7. **FAQ** block (3–5 Q&A) → FAQ schema.
-8. **Conclusion** with a next-step internal link (no dead end) + the repo/mnemo CTA.
+8. **Conclusion** with a next-step internal link (no dead end) + the repo/inspeximus CTA.
 9. **Schema** (Article + FAQ + Organization), **canonical**, **dates**.
 10. **LLM-summary self-test** passes → render → request indexing (Google + Bing).
 

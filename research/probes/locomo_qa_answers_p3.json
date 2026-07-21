@@ -1,427 +1,427 @@
 [
  {
   "qid": "c7q14",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 1,
   "answer": "Reading, traveling, and art (also loved flowers). No mention of cooking.",
   "correct": false
  },
  {
   "qid": "c7q15",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 4,
   "answer": "NOT IN CONTEXT - context refers to 'unusual/tamed pets' named Susie but never identifies the type as snakes.",
   "correct": false
  },
  {
   "qid": "c7q16",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 4,
   "answer": "Susie and Seraphim.",
   "correct": true
  },
  {
   "qid": "c7q17",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 2,
   "answer": "Last year, i.e. 2022 (as of June 2023 she 'got her last year').",
   "correct": true
  },
  {
   "qid": "c7q18",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 3,
   "answer": "France - she bought it a year ago in Paris.",
   "correct": true
  },
  {
   "qid": "c7q19",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 1,
   "answer": "Two times - Paris in 2010 (pendant) and about a year ago (~2022).",
   "correct": true
  },
  {
   "qid": "c7q20",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 1,
   "answer": "Detroit, It Takes Two, Overcooked 2, Battlefield 1 (no Walking Dead played yet in context).",
   "correct": false
  },
  {
   "qid": "c7q21",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 2,
   "answer": "Next Saturday after 27 January 2023.",
   "correct": true
  },
  {
   "qid": "c7q22",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 2,
   "answer": "31 January 2023 (met neighbor Anna 'yesterday' as of 1 Feb 2023).",
   "correct": true
  },
  {
   "qid": "c7q23",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 3,
   "answer": "NOT IN CONTEXT - no statement that she put off yoga in favor of video games.",
   "correct": false
  },
  {
   "qid": "c7q24",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 1,
   "answer": "Tree pose, Dancer Pose (Natarajasana), and Warrior II.",
   "correct": true
  },
  {
   "qid": "c8q0",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 1,
   "answer": "A Prius.",
   "correct": true
  },
  {
   "qid": "c8q1",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 1,
   "answer": "His old Prius (broke down) and his new Prius (broke down).",
   "correct": true
  },
  {
   "qid": "c8q2",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 1,
   "answer": "Rockies (Rocky Mountains) and Jasper.",
   "correct": true
  },
  {
   "qid": "c8q3",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 1,
   "answer": "Two - an old Prius and a new Prius.",
   "correct": true
  },
  {
   "qid": "c8q4",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 2,
   "answer": "Painting.",
   "correct": true
  },
  {
   "qid": "c8q5",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 3,
   "answer": "Canada (Jasper / Icefields Parkway).",
   "correct": true
  },
  {
   "qid": "c8q6",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 1,
   "answer": "Two - a family trip (Rockies) and a road trip to Jasper.",
   "correct": true
  },
  {
   "qid": "c8q7",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 1,
   "answer": "Painting (and trying outdoor activities); not the full list of kayaking/hiking/cooking/running.",
   "correct": false
  },
  {
   "qid": "c8q8",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 1,
   "answer": "Watercolor painting.",
   "correct": true
  },
  {
   "qid": "c8q9",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 2,
   "answer": "The weekend before 24 May 2023.",
   "correct": true
  },
  {
   "qid": "c8q10",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 3,
   "answer": "A camping trip in the outdoors.",
   "correct": true
  },
  {
   "qid": "c8q11",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 1,
   "answer": "A weight problem (weight was a serious health risk).",
   "correct": true
  },
  {
   "qid": "c8q12",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 2,
   "answer": "A few days before 24 May 2023.",
   "correct": true
  },
  {
   "qid": "c8q13",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 2,
   "answer": "About a week before 6 June 2023 (first week of June).",
   "correct": true
  },
  {
   "qid": "c8q14",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 1,
   "answer": "Ginger snaps.",
   "correct": true
  },
  {
   "qid": "c8q15",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 1,
   "answer": "Soda and candy.",
   "correct": true
  },
  {
   "qid": "c8q16",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 1,
   "answer": "Malfunctioning/broken self-checkout machines.",
   "correct": true
  },
  {
   "qid": "c8q17",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 2,
   "answer": "The Friday before 27 July 2023.",
   "correct": true
  },
  {
   "qid": "c8q18",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 1,
   "answer": "Flavored seltzer water, dark chocolate (high cocoa), air-popped popcorn and fruit, energy balls, veggies (not the full gold list).",
   "correct": false
  },
  {
   "qid": "c8q19",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 3,
   "answer": "Embrace small, consistent changes; find stress-relieving activities; lean on friendship and support.",
   "correct": true
  },
  {
   "qid": "c8q20",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 3,
   "answer": "A healthy-recipe cookbook or a healthy meal-delivery subscription.",
   "correct": true
  },
  {
   "qid": "c8q21",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 1,
   "answer": "She's incredible, like something out of a movie, and being with her makes him feel alive.",
   "correct": true
  },
  {
   "qid": "c8q22",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 2,
   "answer": "The week before 7 August 2023.",
   "correct": true
  },
  {
   "qid": "c8q23",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 2,
   "answer": "28 July 2023 (starting 'tomorrow' as of 27 July).",
   "correct": true
  },
  {
   "qid": "c8q24",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 3,
   "answer": "NOT IN CONTEXT - the Canadian-woman romance was Evan's, not Sam's; no such Sam event in context.",
   "correct": false
  },
  {
   "qid": "c9q0",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 2,
   "answer": "Between 26 March and 20 April 2023.",
   "correct": true
  },
  {
   "qid": "c9q1",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 1,
   "answer": "A mansion (in Japan) and a new luxury car.",
   "correct": true
  },
  {
   "qid": "c9q2",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 2,
   "answer": "The weekend before 26 March 2023.",
   "correct": true
  },
  {
   "qid": "c9q3",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 1,
   "answer": "Aerosmith and The Fireworks.",
   "correct": true
  },
  {
   "qid": "c9q4",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 3,
   "answer": "United States (Boston).",
   "correct": true
  },
  {
   "qid": "c9q5",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 1,
   "answer": "Open a car maintenance shop, work on classic cars, and build a custom car from scratch.",
   "correct": true
  },
  {
   "qid": "c9q6",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 1,
   "answer": "Classic (vintage) cars.",
   "correct": true
  },
  {
   "qid": "c9q7",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 3,
   "answer": "NOT IN CONTEXT - no clear evidence the shop employs a lot of people.",
   "correct": false
  },
  {
   "qid": "c9q8",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 2,
   "answer": "1 May 2023.",
   "correct": true
  },
  {
   "qid": "c9q9",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 2,
   "answer": "The week before 16 May 2023.",
   "correct": true
  },
  {
   "qid": "c9q10",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 2,
   "answer": "The week before 16 May 2023.",
   "correct": true
  },
  {
   "qid": "c9q11",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 1,
   "answer": "Flooding of his place and a car accident/car trouble.",
   "correct": true
  },
  {
   "qid": "c9q12",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 2,
   "answer": "The last week of May 2023.",
   "correct": true
  },
  {
   "qid": "c9q13",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 3,
   "answer": "Yes - he loves the rush and connection of performing live to big crowds.",
   "correct": true
  },
  {
   "qid": "c9q14",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 2,
   "answer": "8 June 2023 ('yesterday' as of 9 June).",
   "correct": true
  },
  {
   "qid": "c9q15",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 1,
   "answer": "Because it relaxes and calms him / recharges him.",
   "correct": true
  },
  {
   "qid": "c9q16",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 2,
   "answer": "July 2023 (booked 'next month' as of 9 June).",
   "correct": true
  },
  {
   "qid": "c9q17",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 2,
   "answer": "The Friday before 21 June 2023.",
   "correct": true
  },
  {
   "qid": "c9q18",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 1,
   "answer": "Two times - for the flood and for the car accident.",
   "correct": true
  },
  {
   "qid": "c9q19",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 1,
   "answer": "Music festival, Shibuya Crossing, and Shinjuku (no car museum in context).",
   "correct": false
  },
  {
   "qid": "c9q20",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 1,
   "answer": "His dad (took him to his first car show at age 10).",
   "correct": true
  },
  {
   "qid": "c9q21",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 3,
   "answer": "Yes - he wants to grow his fanbase.",
   "correct": true
  },
  {
   "qid": "c9q22",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 1,
   "answer": "Yes.",
   "correct": true
  },
  {
   "qid": "c9q23",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 1,
   "answer": "Auto engineering / working on cars.",
   "correct": true
  },
  {
   "qid": "c9q24",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 1,
   "answer": "Yes - he works on engines (engine swaps, vintage Mustang engine).",
   "correct": true

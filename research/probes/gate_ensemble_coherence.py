@@ -1,11 +1,11 @@
-"""Two REAL gates on the recovery verdict: does set-coherence close mnemo's forged-source residual -- and where
+"""Two REAL gates on the recovery verdict: does set-coherence close inspeximus's forged-source residual -- and where
 do the two gates SHARE a blind spot? (No modelled gate; both are computed.)
 
 Follow-up to gate_ensemble_recovery.py, whose gate 2 was modelled (so its exact 1-rho shape was partly
 by-construction). Here BOTH gates are real, and we measure the ACTUAL failure-correlation between them as a
 function of attack sophistication -- the non-by-construction result.
 
-  Gate 1 = mnemo PROVENANCE (Inspeximus._is_corroborated): a contested value 'recovers' iff it has >=2 distinct
+  Gate 1 = inspeximus PROVENANCE (Inspeximus._is_corroborated): a contested value 'recovers' iff it has >=2 distinct
            corroborating sources. Its residual (storm/verify): a forged 2-source attack clears the bar -> it
            lets the poison recover. Provenance counts sources; it never reads whether the witnesses are ABOUT
            the claim.
@@ -33,7 +33,7 @@ FINDINGS (self-check asserts the core):
 FALSIFIER: if AND-agreement false-allow were flat across forgery coherence (coherence caught coherent and
 incoherent forgeries equally, OR neither), 'coherence adds a decorrelated signal' would be false. It is not flat.
 
-Deterministic (fixed seed; needs numpy). MIT. Part of Agora / mnemo.
+Deterministic (fixed seed; needs numpy). MIT. Part of Agora / inspeximus.
 Run:  python research/probes/gate_ensemble_coherence.py
 """
 import os
@@ -69,7 +69,7 @@ def _jacc(a, b):
 
 
 def _provenance_recovers(n_distinct_sources):
-    """REAL mnemo gate 1: build a record with n distinct-source corroborating links, return _is_corroborated."""
+    """REAL inspeximus gate 1: build a record with n distinct-source corroborating links, return _is_corroborated."""
     m = Inspeximus(os.path.join(tempfile.mkdtemp(), "g.jsonl"))
     P = m.remember("contested value", source={"doc": "origin"})
     links = [m.remember(f"w{i}", source={"doc": f"src-{i}"}) for i in range(n_distinct_sources)]
@@ -82,10 +82,10 @@ def main():
     rng = np.random.default_rng(SEED)
     print("=== Two REAL gates on recovery: provenance vs set-coherence, vs forgery sophistication (#1466/TAT-7) ===\n")
 
-    # gate 1 is REAL mnemo and deterministic on the source count: a 2-distinct-source forgery recovers (residual).
+    # gate 1 is REAL inspeximus and deterministic on the source count: a 2-distinct-source forgery recovers (residual).
     prov_forged = _provenance_recovers(2)     # True -> false-allow
     prov_legit = _provenance_recovers(2)      # True -> correct
-    print(f"gate 1 (REAL mnemo provenance): 2-source forgery recovers -> {prov_forged} (residual); "
+    print(f"gate 1 (REAL inspeximus provenance): 2-source forgery recovers -> {prov_forged} (residual); "
           f"genuine 2-source recovery -> {prov_legit}\n")
 
     # LEGIT episodes: witnesses genuinely on-topic (coherence high). Measure gate-2 false-withhold once.
@@ -119,7 +119,7 @@ def main():
     print(f"\n  legit-recovery FALSE-WITHHOLD from the coherence gate: {fw_rate:.3f} (its honest utility cost)")
 
     # --- self-check (the falsifier) ---
-    assert prov_forged is True, "gate 1 must be the real mnemo gate with the forged-source residual"
+    assert prov_forged is True, "gate 1 must be the real inspeximus gate with the forged-source residual"
     assert fa_curve[0.0] < 0.2, "against an INCOHERENT forgery, coherence must catch it -> AND-agreement closes it"
     assert fa_curve[0.6] > fa_curve[0.0] + 0.4, "AND-agreement false-allow must RISE with forgery coherence (shared blind spot)"
 

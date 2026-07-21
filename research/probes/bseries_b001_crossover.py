@@ -29,7 +29,7 @@ Measurements:
                           (the B-003 machinery). Shows B-001-at-scale needs B-003.
 
 Needs: numpy + local Ollama with nomic-embed-text and (optionally) mxbai-embed-large. TF-IDF is pure
-numpy (always runs). Missing embedders are skipped with a note, not faked. MIT. Part of Agora / mnemo.
+numpy (always runs). Missing embedders are skipped with a note, not faked. MIT. Part of Agora / inspeximus.
   Run: python research/probes/bseries_b001_crossover.py
 """
 import sys, os, csv, io, json, math, urllib.request
@@ -192,7 +192,7 @@ def m1_tfidf(k=5):
         qv = tf.vec(q)
         nearest = max(_cos(qv, pv) for pv in pref_vecs)
         top_epi = max(_cos(qv, ev) for ev in epi_vecs)
-        # top-k among docs with NONZERO similarity only (mirror mnemo's nonzero-relevance behavior; a
+        # top-k among docs with NONZERO similarity only (mirror inspeximus's nonzero-relevance behavior; a
         # zero-cosine doc is not a match - counting it would be an index tie-break artifact, not retrieval)
         scored = [(i, _cos(qv, doc_vecs[i])) for i in range(len(all_docs))]
         scored = [i for i, s in sorted(scored, key=lambda x: -x[1]) if s > 0][:k]
@@ -254,7 +254,7 @@ def m3_supersession():
     naive_active = [r for r in m_naive.items if r["status"] == "active"]
     naive_stale_active = sum(1 for r in naive_active if "concise" in r["text"])   # 1 = stale still injectable
     naive_current_active = sum(1 for r in naive_active if "detailed" in r["text"])
-    # keyed supersession (mnemo): the new same-key value RETIRES the old (deterministic, no embedder)
+    # keyed supersession (inspeximus): the new same-key value RETIRES the old (deterministic, no embedder)
     m_key = Inspeximus()
     m_key.remember("prefers concise answers", key=key, mtype="procedural")
     m_key.remember("prefers detailed answers", key=key, mtype="procedural")

@@ -9,18 +9,18 @@ only one of those copies. So we measure the thing that actually fails audits, on
 We store a subject fact, let it fan out into (1) a DERIVED summary and (2) an app-side VECTOR INDEX (the copy
 a real RAG app keeps for retrieval), then issue forget_subject() and measure RESIDUAL RECOVERABILITY on each
 axis:
-  derived_residue : is the value still in an ACTIVE derived record?  (mnemo's lineage cascade should -> 0)
+  derived_residue : is the value still in an ACTIVE derived record?  (inspeximus's lineage cascade should -> 0)
   store_residue   : is the fact still in the store's active recall?  (a delete should -> 0)
   index_residue   : after the store delete, does the APP's vector index still return the fact for a NN query?
                     (the fan-out leak: deleting from the store does NOT purge the app index -> expected ~1.0)
 
-Honest thesis (Crucible-shaped, WE can fail): mnemo's lineage cascade genuinely removes the DERIVED-fact copy —
+Honest thesis (Crucible-shaped, WE can fail): inspeximus's lineage cascade genuinely removes the DERIVED-fact copy —
 a real but NARROW win — while the vector-index copy survives for EVERY memory store, because that copy lives in
-the app's fan-out, not the store. Memory-store erasure != fan-out erasure. No single-store receipt (mnemo's
+the app's fan-out, not the store. Memory-store erasure != fan-out erasure. No single-store receipt (inspeximus's
 included) fixes it; the missing primitive is a CROSS-STORE deletion manifest.
 
 Falsifier: if index_residue is ~0 (the store delete somehow also purges the app index) OR if derived_residue is
-high even WITH the lineage cascade (mnemo doesn't remove the derived copy), the thesis is wrong.
+high even WITH the lineage cascade (inspeximus doesn't remove the derived copy), the thesis is wrong.
 
 Prior art (credit, not claim): text-embedding INVERSION recovers input text from a retained vector (Morris et
 al., "Text Embeddings Reveal (Almost) As Much As Text", EMNLP 2023 / vec2text); soft-deleted embeddings in
@@ -28,7 +28,7 @@ HNSW stores remain reconstructible (arXiv 2606.18497); EDPB requires erasure be 
 crypto-shredding. This probe measures the FAN-OUT gap; it does not claim to solve inversion.
 
 Run: python research/probes/erasure_fanout_probe.py   (cloud-free; needs numpy + local Ollama nomic-embed-text)
-Part of Agora / mnemo (MIT).
+Part of Agora / inspeximus (MIT).
 """
 import os
 import sys
@@ -97,7 +97,7 @@ def main():
         m.remember(summary, derived_from=[root], source={"doc": subj})     # fan-out copy 1: derived fact
         app_index.append((subj, fact, embed(fact)))                        # fan-out copy 2: app vector index
 
-        # the right-to-erasure act: erase the subject from the STORE (mnemo cascades via lineage)
+        # the right-to-erasure act: erase the subject from the STORE (inspeximus cascades via lineage)
         m.forget_subject(subj, request_id=f"dsar-{subj}",
                          basis="GDPR Art.17 erasure request")
 
@@ -112,7 +112,7 @@ def main():
         index_hit += 1 if (value.lower() in best[1].lower()) else 0
 
     print("=== ERASURE FAN-OUT: is the data actually gone after forget_subject()? ===")
-    print(f"subjects={n}  (cloud-free, local nomic; mnemo store + a derived copy + an app vector index)\n")
+    print(f"subjects={n}  (cloud-free, local nomic; inspeximus store + a derived copy + an app vector index)\n")
     for label, k in (("derived_residue (active derived copy of the value)", derived_hit),
                      ("store_residue   (value still in store recall)", store_hit),
                      ("index_residue   (app vector index still recovers it)", index_hit)):
@@ -126,10 +126,10 @@ def main():
         try: os.remove(path + suf)
         except OSError: pass
 
-    print(f"FINDING: mnemo's lineage cascade removes the DERIVED copy (derived_residue {dr:.2f}) and the store "
+    print(f"FINDING: inspeximus's lineage cascade removes the DERIVED copy (derived_residue {dr:.2f}) and the store "
           f"copy (store_residue {sr:.2f}) — a real but NARROW win. But the APP VECTOR INDEX copy survives "
           f"(index_residue {ir:.2f}): deleting from the memory store does NOT purge the fan-out. Memory-store "
-          f"erasure != fan-out erasure — for EVERY store, mnemo included. The missing primitive is a cross-store")
+          f"erasure != fan-out erasure — for EVERY store, inspeximus included. The missing primitive is a cross-store")
     print("  deletion manifest (and even then, embedding inversion — Morris 2023 — bounds what deletion can promise).")
     if ir < 0.5:
         print("  [NOTE: index_residue unexpectedly low — falsifier region; re-examine before any claim.]")

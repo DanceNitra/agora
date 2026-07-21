@@ -32,18 +32,18 @@ a real state model, cited in support of the correction story, rather than the he
 
 ## 1. Make the drop-in story real and findable — 39 threads, the single loudest ask
 
-`MnemoStore` already passes an operation-by-operation parity audit against LangGraph's own
+`InspeximusStore` already passes an operation-by-operation parity audit against LangGraph's own
 `InMemoryStore` (`store_audit.py`, in CI). Nobody knows it exists: it is in no LangChain integrations
 page, and `awesome-LangGraph#88` still sits unmerged.
 
-Do: a `langchain-mnemo` package + the docs PR (LangChain now requires third-party integrations to be
+Do: a `langchain-inspeximus` package + the docs PR (LangChain now requires third-party integrations to be
 your own package), the LlamaIndex `BaseMemoryBlock`, and Google ADK's `BaseMemoryService` — ADK runs an
 integrations catalogue with little competition. Effort: ~1 day each. This is distribution, not code.
 
-## 2. `mnemo install` — one command, MCP + hooks configured
+## 2. `inspeximus install` — one command, MCP + hooks configured
 
 claude-mem has **87,990 stars** on an `npx` install and no benchmark; we have three audit harnesses and
-4 stars. Installability is the variable. `uvx mnemo install --ide claude|cursor|codex` writing the MCP
+4 stars. Installability is the variable. `uvx inspeximus install --ide claude|cursor|codex` writing the MCP
 config, plus a `.claude-plugin/marketplace.json` so it is one click from a marketplace.
 
 ## 3. Lead with provenance — 84 projects, our loudest unclaimed need
@@ -68,7 +68,7 @@ let the caller choose granularity, then re-measure. This is the one item where t
 ## 6. Name and expose dedup / conflict resolution — 22 projects
 
 Consolidation and the read-time conflict resolver exist and are unnamed in the docs. A feature page
-plus `mnemo contradictions` in the CLI costs hours.
+plus `inspeximus contradictions` in the CLI costs hours.
 
 ## 7. REST server + OpenAPI + a published image
 
@@ -76,7 +76,7 @@ Every competitor has one; we do not. "Can my Node/Go service call it?" is a proc
 it unlocks the TypeScript client without porting the core (the OSS TS memory SDKs are all vestigial —
 porting would be a trap).
 
-## 8. `mnemo import --from mem0|zep` — nobody has it
+## 8. `inspeximus import --from mem0|zep` — nobody has it
 
 Anti-lock-in is the loudest unanswered complaint in the competitive field, and a migration path is
 simultaneously a feature and an outreach story. Two days.
@@ -118,7 +118,7 @@ not on rigour.
 
 ## The download figure is us
 
-`agora-mnemo` on PyPI, mirrors excluded, 29 days:
+`inspeximus` on PyPI, mirrors excluded, 29 days:
 
 | | days | mean downloads/day |
 |---|---|---|
@@ -127,7 +127,7 @@ not on rigour.
 
 Correlation between our releases and our downloads: **r = 0.977**, across 97 releases in 29 days. The
 weekly download figure is CI and mirror traffic responding to our own publishing. On a day when we ship
-nothing, **nine** people install mnemo. That is the honest adoption signal, and it must never appear in
+nothing, **nine** people install inspeximus. That is the honest adoption signal, and it must never appear in
 a pitch as evidence of traction — anyone competent will run this same query.
 
 Nothing public currently cites the number, checked across the README, docs and the site. Keep it that
@@ -155,15 +155,15 @@ motivated non-technical constituency is not a mechanism we would want even if it
 
 ## What that changes in the list above
 
-1. **Item 2 (`mnemo install`) is now the best-evidenced item, and it grows a second half:** make the
+1. **Item 2 (`inspeximus install`) is now the best-evidenced item, and it grows a second half:** make the
    repo *its own plugin marketplace* (`.claude-plugin/marketplace.json`), so `/plugin marketplace add
-   DanceNitra/mnemo` makes every install a repo visit. Then **annex each new agent host as it launches**
+   DanceNitra/inspeximus` makes every install a repo visit. Then **annex each new agent host as it launches**
    — that is the repeatable move behind the 88k, and it costs a day per host.
 2. **Freeze the release cadence** until someone is watching. 97 releases into an audience of 19 unique
    visitors and 0 watchers buys no Trending eligibility and manufactures the fake download number above.
    Resume later as deliberate major bumps timed to host expansions.
 3. **The rename decision deserves an explicit re-decision.** The standing call was "no rename, anchor on
-   `agora-mnemo`". The single highest-leverage move observed anywhere in this dataset was a
+   `inspeximus`". The single highest-leverage move observed anywhere in this dataset was a
    rename-relaunch, and we carry an eight-way name collision. That is now a quantified cost, not a
    preference — owner's call, but it should be made again rather than inherited.
 

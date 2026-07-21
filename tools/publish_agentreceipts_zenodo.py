@@ -13,7 +13,7 @@ SRC = os.path.join(ROOT, "agent-receipts")
 SANDBOX = "--sandbox" in sys.argv
 BASE = "https://sandbox.zenodo.org" if SANDBOX else "https://zenodo.org"
 FILES = ["agent_receipts.py", "mediator.py", "mcp_wrapper.py", "verify_cli.py",
-         "mnemo_receipts.py", "README.md", "LICENSE", "pyproject.toml", "CITATION.cff"]
+         "inspeximus_receipts.py", "README.md", "LICENSE", "pyproject.toml", "CITATION.cff"]
 
 
 def _token():

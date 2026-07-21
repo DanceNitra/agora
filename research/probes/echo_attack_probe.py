@@ -19,7 +19,7 @@ STAGE 1 (this file): deterministic policies only (free after embedding) + VERBAT
   Policies:
     cosine        - plain similarity ranking (no update semantics)
     recency       - last-mention-wins (the strawman; included to show it's NOT what we claim against)
-    tie_recent    - mnemo 0.6.8 near-tie recency reorder (HONEST SELF-ATTACK: newest-first => echo wins)
+    tie_recent    - inspeximus 0.6.8 near-tie recency reorder (HONEST SELF-ATTACK: newest-first => echo wins)
     memstrata     - SRO (subject,relation) last-assertion-wins + VERBATIM-hash short-circuit
                     (a verbatim echo of an already-superseded value is recognized as a dup and ignored)
 
@@ -109,7 +109,7 @@ def policy_recency(sims, tags, texts, echo_idxs):
     return max(old) > max(new)
 
 def policy_tie_recent(sims, tags, texts, echo_idxs, eps=TIE_EPS):
-    # mnemo 0.6.8: within eps of top sim, newest-first (index as time). Honest self-attack.
+    # inspeximus 0.6.8: within eps of top sim, newest-first (index as time). Honest self-attack.
     order = sorted(range(len(sims)), key=lambda i: -sims[i])
     top = sims[order[0]]
     tied = sorted([i for i in order if sims[i] >= top - eps], key=lambda i: -i)

@@ -1,19 +1,19 @@
-"""Reference emitter: a real mnemo record -> the schema_v0 fact-record interchange (mnemo/schema_v0.json).
+"""Reference emitter: a real inspeximus record -> the schema_v0 fact-record interchange (inspeximus/schema_v0.json).
 
-Makes the DanceNitra/agora Discussion #2 contract (mnemo write-side -> a bitemporal read-side ledger,
-e.g. MemStrata / arXiv:2606.26511) runnable and HONEST: it shows exactly which schema_v0 fields mnemo
-stores directly vs derives, so the claim "mnemo emits schema_v0" is checkable, not asserted.
+Makes the DanceNitra/agora Discussion #2 contract (inspeximus write-side -> a bitemporal read-side ledger,
+e.g. MemStrata / arXiv:2606.26511) runnable and HONEST: it shows exactly which schema_v0 fields inspeximus
+stores directly vs derives, so the claim "inspeximus emits schema_v0" is checkable, not asserted.
 
-Field provenance (verified against mnemo.py):
-  STORED directly on a mnemo record : id, valid_from, ts (-> recorded_at), key, text, source, mtype, status, links
+Field provenance (verified against inspeximus.py):
+  STORED directly on a inspeximus record : id, valid_from, ts (-> recorded_at), key, text, source, mtype, status, links
   DERIVED here                      : subject/relation  = key.split("::")               (key is the stored "subject::relation")
                                       sources[]         = this record's source + its corroborating links' sources, deduped
                                       corroboration_count = number of DISTINCT sources (record + links)
-                                      effective_value   = mnemo._effective_value(record, now)  (value * 0.5^(age/half_life), clock reset on access)
-  NOT stored separately             : object  -> null. mnemo keys on (subject, relation) but keeps the VALUE in `text`,
+                                      effective_value   = inspeximus._effective_value(record, now)  (value * 0.5^(age/half_life), clock reset on access)
+  NOT stored separately             : object  -> null. inspeximus keys on (subject, relation) but keeps the VALUE in `text`,
                                       it does not store a separate object slot. The reader takes the value from `text`.
 
-Zero deps beyond mnemo (+ numpy if the store has vectors). MIT. Run: python research/probes/schema_v0_emit.py
+Zero deps beyond inspeximus (+ numpy if the store has vectors). MIT. Run: python research/probes/schema_v0_emit.py
 """
 import sys, os, json, time
 
@@ -25,7 +25,7 @@ except ImportError:
 
 
 def _norm_source(src):
-    """mnemo stores a single `source` dict (or str) per record. Normalize to {channel, principal}."""
+    """inspeximus stores a single `source` dict (or str) per record. Normalize to {channel, principal}."""
     if not src:
         return None
     if isinstance(src, dict):
@@ -38,8 +38,8 @@ def _norm_source(src):
 
 
 def emit_schema_v0(m: "Inspeximus", record: dict) -> dict:
-    """Serialize ONE mnemo record to a schema_v0 payload. Corroboration = this record's source plus the
-    sources of its corroborating links, entity-deduped by principal (mirrors mnemo's _distinct_sources)."""
+    """Serialize ONE inspeximus record to a schema_v0 payload. Corroboration = this record's source plus the
+    sources of its corroborating links, entity-deduped by principal (mirrors inspeximus's _distinct_sources)."""
     by_id = {r["id"]: r for r in m.items}
     key = record.get("key")
     subject, relation = (key.split("::", 1) + [None])[:2] if key else (None, None)
@@ -65,13 +65,13 @@ def emit_schema_v0(m: "Inspeximus", record: dict) -> dict:
             "corroboration_count": len(sources),                   # DERIVED (distinct sources)
             "effective_value": round(m._effective_value(record, time.time()), 4),  # DERIVED (decayed value)
             "mtype": record.get("mtype"),                          # STORED
-            "status": record["status"],                            # STORED (mnemo's local view)
+            "status": record["status"],                            # STORED (inspeximus's local view)
         },
     }
 
 
 def _demo():
-    """A real mnemo write with a key + a corroborating linked record, serialized to schema_v0."""
+    """A real inspeximus write with a key + a corroborating linked record, serialized to schema_v0."""
     m = Inspeximus()
     # primary fact (keyed) with a source
     fid = m.remember("The billing API authenticates with API keys.",
@@ -84,7 +84,7 @@ def _demo():
     primary["links"] = [cid]                                        # corroboration link (what consolidate() would set)
 
     payload = emit_schema_v0(m, primary)
-    print("=== schema_v0 emitter: a real mnemo record -> the interchange payload ===\n")
+    print("=== schema_v0 emitter: a real inspeximus record -> the interchange payload ===\n")
     print(json.dumps(payload, indent=2))
     # validate against the pinned schema if jsonschema is available (optional; skipped cleanly if absent)
     try:
@@ -92,7 +92,7 @@ def _demo():
         here = os.path.dirname(__file__)
         schema = json.load(open(os.path.join(here, "..", "schema_v0.json"), encoding="utf-8"))
         jsonschema.validate(payload, schema)
-        print("\n[validate] payload conforms to mnemo/schema_v0.json")
+        print("\n[validate] payload conforms to inspeximus/schema_v0.json")
     except ImportError:
         print("\n[validate] jsonschema not installed - skipped (payload shape shown above)")
     except Exception as e:

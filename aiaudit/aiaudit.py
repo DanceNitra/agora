@@ -11,7 +11,7 @@ prioritized report: what's failing, how bad, and the fix. It's the audit we run 
   multi_agent   -> herdcheck   : will an ensemble / multi-agent system herd?
   causal        -> idcheck     : is a causal/attribution number identified, or biased by bad controls?
   rag_store     -> ragfresh    : is the vector store rotting (stale, orphaned chunks)?
-  memory        -> mnemo       : agent-memory health (size, value, links)
+  memory        -> inspeximus       : agent-memory health (size, value, links)
 
 Pass only the parts you have; the audit runs what it can. Zero dependencies beyond the toolkit cores.
 
@@ -110,7 +110,7 @@ def _memory(spec):
     n = len(items)
     linked = sum(1 for m in items if m.get("links"))
     sev = "ok"
-    return {"dimension": "Agent memory (mnemo)", "severity": sev,
+    return {"dimension": "Agent memory (inspeximus)", "severity": sev,
             "finding": f"{n} memories, {round(100*linked/max(1,n))}% linked",
             "fix": None}
 

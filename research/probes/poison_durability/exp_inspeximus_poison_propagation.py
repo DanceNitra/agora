@@ -1,7 +1,7 @@
 """
 import os
-POISON-PROPAGATION metric (BET 1 beachhead, de-risking): does the mnemo corroboration guard reduce
-DOWNSTREAM corruption, not just block graduation? Cloud-free, no LLM (pure mnemo retrieval mechanics).
+POISON-PROPAGATION metric (BET 1 beachhead, de-risking): does the inspeximus corroboration guard reduce
+DOWNSTREAM corruption, not just block graduation? Cloud-free, no LLM (pure inspeximus retrieval mechanics).
 
 Scenario: an attacker injects ONE false fact (poison P, contradicts the truth L), recall-pumps it to high
 value, then STOPS. The truth L is a normal, freshly-used legit memory. We then let time pass and, at each
@@ -17,7 +17,7 @@ would be irrelevant to propagation and the guard would only be cosmetic. Predict
 below the truth within ~2-3 weeks; semantic poison corrupts for months.
 """
 import sys, os, tempfile, json
-sys.path.insert(0, "mnemo")
+sys.path.insert(0, "inspeximus")
 from inspeximus import Inspeximus
 
 DAY = 86400.0
@@ -72,4 +72,4 @@ result["verdict"] = {
     "interpretation": "guard reduces poison propagation if NEW fades fast while OLD persists",
 }
 print(json.dumps(result, indent=1))
-json.dump(result, open(os.path.join(os.path.dirname(os.path.abspath(__file__)), "mnemo_poison_propagation_result.json"), "w"), indent=1)
+json.dump(result, open(os.path.join(os.path.dirname(os.path.abspath(__file__)), "inspeximus_poison_propagation_result.json"), "w"), indent=1)

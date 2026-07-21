@@ -1,9 +1,9 @@
-"""Adapter + cross-architecture demo: Elina-Seed memory format <-> mnemo probes.
+"""Adapter + cross-architecture demo: Elina-Seed memory format <-> inspeximus probes.
 
 Elina-Seed (deepseek-launch-community/Elina-seed, memory_loop.py) stores memory as:
     { "fact_0": {"timestamp": "<iso>", "note": "<text>"}, "fact_1": {...}, ... }
 recall = recency / substring match. That cleanly handles *linear supersession* (the newest note wins),
-but a recency store is exposed where mnemo's mechanisms help:
+but a recency store is exposed where inspeximus's mechanisms help:
   1. POISONING — a repeated false note keeps fresh timestamps, so recency happily recalls it as current.
   2. EVICTION — no value accounting, so when the store is capped, rare-but-critical facts age out under junk.
 
@@ -12,7 +12,7 @@ across the two architectures. Point it at a real Elina memory dump with --file <
 
 Run: python elina_adapter.py            (built-in demo)
      python elina_adapter.py --file memory.json
-MIT. Part of Agora / mnemo (https://github.com/DanceNitra/agora/tree/main/mnemo).
+MIT. Part of Agora / inspeximus (https://github.com/DanceNitra/agora/tree/main/inspeximus).
 """
 import sys, json, os
 from collections import Counter
@@ -63,7 +63,7 @@ def recency_recall(recs, query_substr):
 
 
 def corroboration_view(recs):
-    """mnemo-style: a claim is durable only if corroborated by DISTINCT sources, not by repetition.
+    """inspeximus-style: a claim is durable only if corroborated by DISTINCT sources, not by repetition.
     Repetition (same text, many timestamps) != corroboration. Distinct [src: X] tags = corroboration."""
     by_claim = {}
     for r in recs:

@@ -2,7 +2,7 @@
 side-by-side rows promised to @maratsultanov2 in deepseek-ai/DeepSeek-V3 #1462.
 
 Marat asked for our columns (memory_op / corroboration_state / gate_decision) aligned to his B-003 CSV
-timeline, next to TAT's divergence trace. This walks the SAME B-003 scenario through the SHIPPED mnemo
+timeline, next to TAT's divergence trace. This walks the SAME B-003 scenario through the SHIPPED inspeximus
 store and reports, at each step, what the STORAGE layer does — nothing about the agent's generated answer,
 no position/coherence (those are the cognitive layer's; we leave them empty on purpose).
 
@@ -76,7 +76,7 @@ def row(step, phase, memory_op, value_text, corrob_path, note):
     cur = kv_current()
     acts = in_influence_set(value_text) if value_text else False
     rows.append({
-        "scenario_id": "B-003", "step": step, "phase": phase, "framework": "mnemo-substrate",
+        "scenario_id": "B-003", "step": step, "phase": phase, "framework": "inspeximus-substrate",
         "memory_op": memory_op,
         "corroboration_state": "corroborated" if corroborated(value_text) else "uncorroborated",
         "corroboration_path": corrob_path,
@@ -125,7 +125,7 @@ assert rows[3]["gate_decision"] == "allow", "step3: corroborated value must be A
 assert all(r["provenance_retained"] for r in rows[1:]), "prior value must stay recoverable after supersession"
 assert rows[0]["gate_decision"] == "allow", "step0: the established prior belief should act"
 
-print("=== B-003 Belief Update Without Overwrite — mnemo substrate + influence-gate timeline ===\n")
+print("=== B-003 Belief Update Without Overwrite — inspeximus substrate + influence-gate timeline ===\n")
 for r in rows:
     print(f"step {r['step']} [{r['phase']}]  op={r['memory_op']:10} corrob={r['corroboration_state']:14}"
           f" gate={r['gate_decision']:8} acts={r['acting_value']!r}")
@@ -139,7 +139,7 @@ buf = io.StringIO(); w = csv.DictWriter(buf, fieldnames=cols); w.writeheader()
 for r in rows: w.writerow(r)
 print("\n--- CSV (aligned to the unified trace; position/coherence intentionally empty) ---")
 print(buf.getvalue())
-out = {"scenario": "B-003_belief_update_without_overwrite", "instrument": "mnemo substrate + influence gate",
+out = {"scenario": "B-003_belief_update_without_overwrite", "instrument": "inspeximus substrate + influence gate",
        "self_check": "passed", "rows": rows,
        "note": "Two separable storage decisions: (1) keyed supersession is unconditional -> KV-current flips "
                "at step 1; (2) the corroboration influence gate withholds the fresh single-sourced value from "

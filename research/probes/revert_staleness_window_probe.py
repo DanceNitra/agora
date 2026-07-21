@@ -8,7 +8,7 @@ jacksonxly's first point:
 
 He is arguing against a *tempting* relaxation: to cut the liveness cost of tight binding (a legit revert
 fails when a write races it), let the verifier accept a capability whose bound state is within N supersessions
-of the current one. This probe MEASURES what that costs. mnemo ships tight (N=0); we simulate the bounded-N
+of the current one. This probe MEASURES what that costs. inspeximus ships tight (N=0); we simulate the bounded-N
 verifier and count, for a capability an attacker captured once, how many DIFFERENT later current-values it
 could still revert as N grows. If jacksonxly is right, the replay window is exactly N+1 (the minted state plus
 N moves), i.e. relaxing liveness re-opens replay linearly. That is "tuning the horn, not escaping it."
@@ -16,7 +16,7 @@ N moves), i.e. relaxing liveness re-opens replay linearly. That is "tuning the h
 Deterministic, no LLM, no network. RUN: python research/probes/revert_staleness_window_probe.py
 """
 import sys, pathlib, json
-sys.path.insert(0, str(pathlib.Path(__file__).resolve().parents[2] / "mnemo_pypi"))
+sys.path.insert(0, str(pathlib.Path(__file__).resolve().parents[2] / "inspeximus_pypi"))
 from inspeximus import Inspeximus, new_receipt_keypair, sign_revert
 
 sk, pk = new_receipt_keypair()
@@ -38,7 +38,7 @@ def build_chain(depth):
 def bounded_N_accepts(state_ids, minted_idx, current_idx, N):
     """Simulate a bounded-staleness verifier: it accepts a capability minted for state `minted_idx` while the
     live state is `current_idx` iff current is within N supersessions ahead of the minted one
-    (0 <= current_idx - minted_idx <= N). N=0 is mnemo's actual tight binding."""
+    (0 <= current_idx - minted_idx <= N). N=0 is inspeximus's actual tight binding."""
     return 0 <= (current_idx - minted_idx) <= N
 
 
@@ -55,18 +55,18 @@ for N in (0, 1, 2, 3, 4):
             window += 1        # a captured cap would be honored against this current-state
     R["replay_window_by_N"][f"N={N}"] = window
 
-# mnemo's real binding is N=0. Confirm it against the live store: a captured cap dies after exactly one move.
+# inspeximus's real binding is N=0. Confirm it against the live store: a captured cap dies after exactly one move.
 captured = sign_revert(sk, m.revert_challenge("region"))   # cap for the CURRENT state (v8)
 first = m.revert("region", capability=captured)            # v8 -> v7, succeeds once
 replay = m.revert("region", capability=captured)           # state moved to v7, same cap now refused
-R["mnemo_tight_binding_single_use"] = first["ok"] and (not replay["ok"])
+R["inspeximus_tight_binding_single_use"] = first["ok"] and (not replay["ok"])
 
 print(json.dumps(R, indent=2))
 win = R["replay_window_by_N"]
 linear = all(win[f"N={n}"] == n + 1 for n in (0, 1, 2, 3, 4))
 print("\nREADING: the replay window grows EXACTLY as N+1 (N=0 -> 1 state, N=3 -> 4 states). A bounded staleness")
 print("allowance does not escape the replay horn; it widens it one state per unit of tolerance, precisely as")
-print("jacksonxly said. mnemo keeps N=0 (window = 1, single-use), paying the liveness cost instead of buying")
+print("jacksonxly said. inspeximus keeps N=0 (window = 1, single-use), paying the liveness cost instead of buying")
 print("it back with replay surface.")
-print("\nALL PASS" if (linear and R["mnemo_tight_binding_single_use"]) else "\nFAIL")
-sys.exit(0 if (linear and R["mnemo_tight_binding_single_use"]) else 1)
+print("\nALL PASS" if (linear and R["inspeximus_tight_binding_single_use"]) else "\nFAIL")
+sys.exit(0 if (linear and R["inspeximus_tight_binding_single_use"]) else 1)

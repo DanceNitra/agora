@@ -16,7 +16,7 @@ python -m aiaudit spec.json     # exit code 2 on FAIL → gate your CI
 ## The eight checks it runs (each works standalone too)
 | tool | one line | run the proof |
 |---|---|---|
-| **[mnemo](mnemo/)** | agent memory + a **self-maintaining** second brain (recall by value, consolidate, find dead-links/orphans/stale, suggest+apply links, health gauge) | `python mnemo/maintain.py` |
+| **[inspeximus](inspeximus/)** | agent memory + a **self-maintaining** second brain (recall by value, consolidate, find dead-links/orphans/stale, suggest+apply links, health gauge) | `python inspeximus/maintain.py` |
 | **[ragfresh](ragfresh/)** | a **freshness/decay layer** for RAG/vector stores — keep/down-weight/refresh/prune by value×freshness, not recency | `python ragfresh/ragfresh.py` |
 | **[nullcheck](nullcheck/)** | **is this number real, or just noise?** — null-simulation A/B + permutation test + peeking-inflation | `python nullcheck/nullcheck.py` |
 | **[selfref](selfref/)** | **is your AI training on itself?** — measures collapse (data-mix) + lock (self-trust) risk for any system that learns from its own output | `python selfref/selfref.py` |
@@ -25,7 +25,7 @@ python -m aiaudit spec.json     # exit code 2 on FAIL → gate your CI
 | **[goodhart](goodhart/)** | **how gameable is your proxy/metric?** — measures Goodhart fidelity decay (80%→20%) and how many independent metrics fix it (reward hacking / KPI drift) | `python goodhart/goodhart.py` |
 | **[herdcheck](herdcheck/)** | **will your multi-agent system herd?** — measures when a crowd of agents collapses to one member's competence (popularity trap) and the fix | `python herdcheck/herdcheck.py` |
 
-They share one idea: **keep / trust what survives contact with a null or with reality.** mnemo keeps
+They share one idea: **keep / trust what survives contact with a null or with reality.** inspeximus keeps
 the memory that proves valuable; ragfresh keeps the chunk that's still fresh and worth its cost;
 nullcheck keeps only the effect a no-effect null can't reproduce; selfref keeps a system anchored to
 the outside world so its own output can't quietly take it over; quitkit keeps your effort on a vein only
@@ -37,12 +37,12 @@ catching the moment they start copying each other.
 ## Install
 ```bash
 pip install .                 # the three cores (dependency-free)
-pip install ".[mcp]"          # + the MCP servers (mnemo-mcp, second-brain-mcp, ragfresh-mcp)
+pip install ".[mcp]"          # + the MCP servers (inspeximus-mcp, second-brain-mcp, ragfresh-mcp)
 pip install ".[pgvector]"     # + ragfresh Postgres/pgvector adapter
 ```
 ```python
-import mnemo, ragfresh, nullcheck, selfref, quitkit, idcheck, goodhart
-m = mnemo.Mnemo("agent_memory.json")           # remember / recall / consolidate
+import inspeximus, ragfresh, nullcheck, selfref, quitkit, idcheck, goodhart
+m = inspeximus.Inspeximus("agent_memory.json")           # remember / recall / consolidate
 plan = ragfresh.triage(items, now=...)         # keep/downweight/refresh/prune
 verdict = nullcheck.ab_test(100, 1000, 115, 1000)   # real or noise?
 risk = selfref.audit(external_fraction=0.0, self_trust_p=2.0)  # collapse / lock?
@@ -54,7 +54,7 @@ hc = herdcheck.audit(peers_seen=2, own_weight=1.0)  # will the agent crowd herd?
 
 ## MCP (use them from Claude / Cursor / any agent)
 ```bash
-mnemo-mcp            # agent long-term memory
+inspeximus-mcp            # agent long-term memory
 second-brain-mcp     # think over + MAINTAIN a notes folder  (NOTES_DIR=...)
 ragfresh-mcp         # decide what to keep/prune in a vector store
 selfref-mcp          # is this agent/model training on itself? (collapse + lock)

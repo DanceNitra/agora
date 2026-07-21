@@ -8,7 +8,7 @@
    "store_facts": 455,
    "accuracy": 1.0
   },
-  "mnemo": {
+  "inspeximus": {
    "store_facts": 333,
    "accuracy": 0.97
   },
@@ -34,11 +34,11 @@
   "multi_hop_all": "<0.07"
  },
  "read": [
-  "mem0 on OUR clean per-fact harness (same deepseek answerer) = 88%, NOT its published 18% \u2014 the 18% is a default-pipeline/raw-conversation artifact. mnemo 97 vs mem0 88 = 9pt honest gap = cost of LLM-nondeterministic consolidation vs deterministic supersession. 'mnemo 97 vs mem0 18' would be a credibility-killer.",
-  "supersession does NOT lift CR accuracy vs verbatim keep-all (mnemo 97% vs naive 96%) \u2014 the serial-number prompt lets the answerer resolve the conflict from retrieved facts itself; pre-resolving is redundant when facts are preserved verbatim.",
-  "the pool-size confound the earlier gate flagged is REFUTED: a same-size store built by RANDOM drops craters to 67% (loses the fresh fact ~27% of the time); mnemo's keyed drop stays at 97% because it removes only the stale duplicate.",
-  "so mnemo's real, honest value here = SELECTIVE FORGETTING SAFETY: 27% smaller store at zero accuracy cost, where equal-volume random forgetting costs 29 points. NOT a conflict-resolution-accuracy win.",
+  "mem0 on OUR clean per-fact harness (same deepseek answerer) = 88%, NOT its published 18% \u2014 the 18% is a default-pipeline/raw-conversation artifact. inspeximus 97 vs mem0 88 = 9pt honest gap = cost of LLM-nondeterministic consolidation vs deterministic supersession. 'inspeximus 97 vs mem0 18' would be a credibility-killer.",
+  "supersession does NOT lift CR accuracy vs verbatim keep-all (inspeximus 97% vs naive 96%) \u2014 the serial-number prompt lets the answerer resolve the conflict from retrieved facts itself; pre-resolving is redundant when facts are preserved verbatim.",
+  "the pool-size confound the earlier gate flagged is REFUTED: a same-size store built by RANDOM drops craters to 67% (loses the fresh fact ~27% of the time); inspeximus's keyed drop stays at 97% because it removes only the stale duplicate.",
+  "so inspeximus's real, honest value here = SELECTIVE FORGETTING SAFETY: 27% smaller store at zero accuracy cost, where equal-volume random forgetting costs 29 points. NOT a conflict-resolution-accuracy win.",
   "the published mem0=18% gap is therefore likely fact-FIDELITY loss (LLM extraction mangles/drops facts), not conflict-resolution logic \u2014 UNPROVEN until mem0 is run on this same harness+answerer."
  ],
- "verdict": "KILL the 'mnemo supersession wins MAB Conflict Resolution' headline (naive ties it). Possible REFRAME = a diagnostic post 'why memory systems score 18% on CR: fact-fidelity loss, not conflict logic' \u2014 but that REQUIRES a mem0 run on this harness to prove the mechanism (the invest step). Selective-forgetting-safety finding is real but borderline-tautological given the task (gold IS the latest fact)."
+ "verdict": "KILL the 'inspeximus supersession wins MAB Conflict Resolution' headline (naive ties it). Possible REFRAME = a diagnostic post 'why memory systems score 18% on CR: fact-fidelity loss, not conflict logic' \u2014 but that REQUIRES a mem0 run on this harness to prove the mechanism (the invest step). Selective-forgetting-safety finding is real but borderline-tautological given the task (gold IS the latest fact)."
 }

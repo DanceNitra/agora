@@ -1,17 +1,17 @@
 """
-bseries_matrix_probe.py — mnemo's corroboration/withhold trace for the cross-framework B-series
+bseries_matrix_probe.py — inspeximus's corroboration/withhold trace for the cross-framework B-series
 (B-001 preference application, B-002 same-origin sybil, B-003 belief update / independent 2nd source).
 
-Runs the actual mnemo mechanics (not a model of them) so a claim about mnemo's behavior can be checked
+Runs the actual inspeximus mechanics (not a model of them) so a claim about inspeximus's behavior can be checked
 against code BEFORE it goes into a joint matrix/paper. The honest result:
   B-001 (preference): a keyed latest-wins supersession -> ALLOW (preferences need no corroboration bar).
   B-002 (same-origin sybil re-asserts the override): withheld ONLY under strict (verified-key) corroboration,
         where the same origin collapses to one key. In the DEFAULT string-corroboration mode, a sybil that
-        uses two distinct source *labels* clears the >=2 gate and mnemo wrongly resumes — two labels from the
+        uses two distinct source *labels* clears the >=2 gate and inspeximus wrongly resumes — two labels from the
         same origin are not two independent votes, and a naive count can't tell them apart.
   B-003 (genuinely independent second source): resumes/ALLOW in both modes (2 distinct sources).
 
-Run: python bseries_matrix_probe.py   (imports the shipped mnemo; no keys)
+Run: python bseries_matrix_probe.py   (imports the shipped inspeximus; no keys)
 """
 import os, sys, tempfile
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..")))
@@ -72,7 +72,7 @@ def main():
     c["links"] = [w1, w2]
     print(f"B-003 independent 2nd source | step1_withhold={s1} step2_distinct_sources={_dsrc(s, c)} "
           f"-> {'RESUME/ALLOW' if _corrob(s, c) else 'still withheld'}")
-    print("\nmnemo's B-002 withhold is CONDITIONAL on strict/attested corroboration; the default string count is "
+    print("\ninspeximus's B-002 withhold is CONDITIONAL on strict/attested corroboration; the default string count is "
           "fooled by a distinct-label same-origin sybil. B-003 resumes on a genuinely independent source.")
 
 

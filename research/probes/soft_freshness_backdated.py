@@ -27,7 +27,7 @@ camp (TimeQA; "When Facts Expire," CIKM 2025; production "valid from-to" layers)
 and is NOT affected (a given production system must be checked to confirm it stores valid-time, not ingest).
 Falsifier: if the verbatim creation-time blend does NOT drop on back_dated, the receipt is wrong.
 
-Run: python research/probes/soft_freshness_backdated.py   (numpy + local Ollama nomic-embed-text). Agora/mnemo MIT."""
+Run: python research/probes/soft_freshness_backdated.py   (numpy + local Ollama nomic-embed-text). Agora/inspeximus MIT."""
 import json, urllib.request, numpy as np
 
 OLLAMA = "http://localhost:11434/api/embed"

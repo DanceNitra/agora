@@ -23,7 +23,7 @@ print(format_report(audit(spec)))
 | `multi_agent` `{peers_seen,own_weight,discount}` | **herdcheck** | an ensemble/multi-agent system that herds |
 | `causal` `{controls:{name:role}}` | **idcheck** | a causal/attribution number biased by bad controls |
 | `rag_store` `{items:[{id,updated_ts,value,source_exists}]}` | **ragfresh** | a vector store rotting with stale/orphaned chunks |
-| `memory` `{items:[{text,value,links}]}` | **mnemo** | agent-memory health |
+| `memory` `{items:[{text,value,links}]}` | **inspeximus** | agent-memory health |
 
 ## Example
 ```json

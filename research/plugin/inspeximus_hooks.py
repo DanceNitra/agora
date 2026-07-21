@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
-"""mnemo Claude Code plugin — deterministic, no-LLM auto-capture + recall of coding-agent memory.
+"""inspeximus Claude Code plugin — deterministic, no-LLM auto-capture + recall of coding-agent memory.
 
 The top coding-agent memories (Claude-Mem, agentmemory) auto-capture sessions via lifecycle hooks, but they
-LLM-summarize on the write path, which loses facts, leaks on erasure, and goes nondeterministic. mnemo does the
+LLM-summarize on the write path, which loses facts, leaks on erasure, and goes nondeterministic. inspeximus does the
 same auto-capture with NO LLM: it writes tool events into a deterministic, keyed store, so a corrected fact
 (a changed API signature, a renamed symbol, a moved file) SUPERSEDES the stale one and cannot be resurrected
 by an echo. Persistent across sessions, provably erasable, zero-dependency.
@@ -15,14 +15,14 @@ tool_response, cwd, prompt, ...}):
 
 Fail-open: any error exits 0 with no output, so the hook never blocks the agent.
 
-Install: see README.md (a settings.json hooks block + `pip install agora-mnemo`). Store lives at
-<project>/.mnemo/coding_memory.json — local, inspectable, deletable.
+Install: see README.md (a settings.json hooks block + `pip install inspeximus`). Store lives at
+<project>/.inspeximus/coding_memory.json — local, inspectable, deletable.
 """
 import sys, os, json, hashlib
 
 def _store(cwd):
     from inspeximus import Inspeximus
-    d = os.path.join(cwd or os.getcwd(), ".mnemo")
+    d = os.path.join(cwd or os.getcwd(), ".inspeximus")
     os.makedirs(d, exist_ok=True)
     m = Inspeximus(path=os.path.join(d, "coding_memory.json"))
     m.echo_guard = True                         # a re-stated stale value cannot resurrect a correction
@@ -66,7 +66,7 @@ def recall(ev):
     if not hits:
         return
     lines = "\n".join(f"- {h['text']}" for h in hits)
-    print(f"[mnemo] relevant project memory (deterministic, corrections already applied):\n{lines}")
+    print(f"[inspeximus] relevant project memory (deterministic, corrections already applied):\n{lines}")
 
 def session_start(ev):
     m = _store(ev.get("cwd") or os.getcwd())
@@ -74,7 +74,7 @@ def session_start(ev):
              and it.get("status") != "superseded"][:8]
     if files:
         lines = "\n".join(f"- {it['text']}" for it in files)
-        print(f"[mnemo] this project's current known files (latest state only):\n{lines}")
+        print(f"[inspeximus] this project's current known files (latest state only):\n{lines}")
 
 def main():
     try:

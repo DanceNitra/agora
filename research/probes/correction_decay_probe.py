@@ -14,7 +14,7 @@ For each N in a sweep, query "what is the current value?" and score whether the 
     append every utterance, recall top-k by similarity, answer = MAJORITY value among
     the top-k. No validity field. As OLD restatements pile up they dominate top-k ->
     "recency/frequency of mention" wins and the correction decays.
-  ARM B — VALIDITY-INTERVAL store (mnemo keyed supersession, valid_from/superseded-by):
+  ARM B — VALIDITY-INTERVAL store (inspeximus keyed supersession, valid_from/superseded-by):
     the OLD value is superseded on correction and HIDDEN from recall; a later restatement
     is retired stale-on-arrival by echo_guard. Resolves by the ledger, not by whichever
     value was mentioned most/last.

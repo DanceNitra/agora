@@ -1,5 +1,5 @@
 """
-Before/after measurement of mnemo's new retrieval-time ISOLATION guard against the HotFlip-optimized
+Before/after measurement of inspeximus's new retrieval-time ISOLATION guard against the HotFlip-optimized
 AgentPoison trigger. The guard down-weights an embedding-space isolate (a memory whose nearest-neighbor
 cosine to the rest of the store is a strong low-outlier) -- targeting the attack's OWN mechanism (the
 uniqueness loss that isolates the poison), not a keyword/perplexity signature.

@@ -13,7 +13,7 @@ import time
 
 # Rotating queries that span the standing frontier. One topic per harvest so the feed stays varied
 # and on-direction; the Library dedups against already-read/queued papers.
-# RETARGETED 2026-07-20 to the owner-locked mnemo frontier. Root cause of an all-night off-mission run:
+# RETARGETED 2026-07-20 to the owner-locked inspeximus frontier. Root cause of an all-night off-mission run:
 # this list is the ONLY RENEWABLE source of research themes (the durable .frontier_directions.json is a
 # fixed 11 that the experiment-dedup exhausts after one pass, and the `findings` bucket just re-seeds the
 # stale top-8). So whatever THIS list says is what the swarm actually researches over a long night — and it

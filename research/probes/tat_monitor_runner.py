@@ -1,7 +1,7 @@
 """tat_monitor_runner.py — metrics harness for Marat's TAT-Monitor on realnoise_stress_v1 (2026-07-12).
 
 Runs a detection module against agora_output/public_fixtures/realnoise_stress_v1.jsonl (100 rows: REAL
-mnemo-store noise + planted, labeled correction chains; shortcut-family audited — no trivial rule beats
+inspeximus-store noise + planted, labeled correction chains; shortcut-family audited — no trivial rule beats
 the all-positive baseline). Reports overall accuracy/P/R/F1/AUROC + per-subset recall (revert_natural,
 revert_anchored) and per-subset false-positive rates on the three distractor classes.
 

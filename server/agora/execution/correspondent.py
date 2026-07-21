@@ -39,7 +39,7 @@ def _save(items: list) -> None:
 # ── Novelty guard: stop templated outreach (same stats / same self-promo plug / copy-pasted
 #    sentences across different threads) — that reads as astroturf and erodes the credibility the
 #    genuine engagement was meant to build. Surfaced in the gated proposal BEFORE anything posts. ──
-_PLUG_RX = re.compile(r"open[- ]?source|reference implementation|zero[- ]?dependency|\bmnemo\b", re.I)
+_PLUG_RX = re.compile(r"open[- ]?source|reference implementation|zero[- ]?dependency|\binspeximus\b", re.I)
 _NUM_RX = re.compile(r"\d+(?:\.\d+)?\s?(?:x|×|%)", re.I)
 
 
@@ -104,7 +104,7 @@ def format_novelty(nr: dict) -> str:
     if nr.get("reused_stats"):
         lines.append(f"• reused stats: {', '.join(nr['reused_stats'])}")
     if nr.get("reused_plug"):
-        lines.append("• repeats the open-source/mnemo plug used before")
+        lines.append("• repeats the open-source/inspeximus plug used before")
     if nr.get("repeated_sentences"):
         lines.append(f'• e.g. "{nr["repeated_sentences"][0]["sentence"]}…"')
     lines.append("Tailor to THEIR specific point; plug sparingly.")

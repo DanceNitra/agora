@@ -1,4 +1,4 @@
-"""Membership-cost frontier — BUILD all four Sybil-resistance backends on mnemo's corroboration gate and
+"""Membership-cost frontier — BUILD all four Sybil-resistance backends on inspeximus's corroboration gate and
 MEASURE, on the real LoCoMo Sybil harness, exactly what each one buys and where it fails. This is the
 constructive follow-up to the IFC honest-negative (ifc_frontier_empirical_locomo.py): that probe proved
 corroboration-integrity does NOT stop on-topic blended poison and "reduces to membership cost we don't
@@ -7,9 +7,9 @@ poison that blends in, and at what price?
 
 Two measured parts, no hand-set distributions:
 
-PART 1 — SYBIL PASS-THROUGH (mnemo-real, deterministic).
-  We build a REAL mnemo poison: a value with two forged corroborating links under two distinct attacker
-  domains (the exact 2-domain forgery that beats _distinct_sources today). We then re-run mnemo's
+PART 1 — SYBIL PASS-THROUGH (inspeximus-real, deterministic).
+  We build a REAL inspeximus poison: a value with two forged corroborating links under two distinct attacker
+  domains (the exact 2-domain forgery that beats _distinct_sources today). We then re-run inspeximus's
   corroboration gate under each membership backend and record: does the forgery still reach ">=2 distinct
   admitted sources"? What did minting those two identities COST the attacker vs an honest 2-source writer?
     - Open      : passes (the hole; free).
@@ -207,13 +207,13 @@ print(f"   intent-blind: this bounds the sleeper's ECONOMICS, it does not detect
 sleeper_ceiling = ceiling
 
 print("\n=== PART 3 — the path that is NOT Sybil-forgeable: EARNED-OUTCOME credit ===\n")
-# The reframe (blind-spot lens): mnemo's corroboration gate has THREE paths — earned good-outcome credit
+# The reframe (blind-spot lens): inspeximus's corroboration gate has THREE paths — earned good-outcome credit
 # (good>0 & good>=bad), a graduated 'semantic' tier, OR >=2 distinct sources. Everything above attacks ONLY
 # the source-count path. But the earned-credit path is set by credit() on REAL outcomes and is NOT self-
 # assertable: a poison that produces WRONG answers cannot earn good-outcome credit, and accrues bad. So the
 # SAME blended sybil that forges source-count corroboration is still blocked by an earned-credit gate — no
 # identity cost required, because the defense is OUTCOME ACCOUNTABILITY, not identity scarcity. This is a
-# capability mnemo ALREADY HAS; the actionable fix is to gate high-blast actions on earned credit, not source
+# capability inspeximus ALREADY HAS; the actionable fix is to gate high-blast actions on earned credit, not source
 # count. Honest limit: there is a DETECTION LATENCY — the poison acts until enough bad outcomes accumulate to
 # flip good>=bad (our own Adaptation-Corruption Separation Law: an irreducible detect-latency floor d*).
 def earned_gate(rec, byd):
@@ -242,7 +242,7 @@ genuine_earned = earned_gate(next(r for r in m.items if r["id"] == gid), by(m))
 print(f"blended sybil: source-count gate = {src_count_pass} (FORGED) | earned-outcome gate = {earned_pass_after} "
       f"(blocked after {latency} bad outcomes)")
 print(f"genuine right memory: earned-outcome gate = {genuine_earned} (passes by being RIGHT, not by asserting sources)")
-print(f"=> The lever is OUTCOME ACCOUNTABILITY, already in mnemo (credit()/good>=bad), NOT identity cost.")
+print(f"=> The lever is OUTCOME ACCOUNTABILITY, already in inspeximus (credit()/good>=bad), NOT identity cost.")
 print(f"   Actionable: gate high-blast actions on EARNED credit, not source count. Honest limit: detection")
 print(f"   latency (~{latency} bad outcomes here) — the poison acts until reality catches up (the d* floor).")
 part3 = {"blended_sybil_source_count_gate": src_count_pass, "blended_sybil_earned_gate": earned_pass_after,
@@ -270,7 +270,7 @@ assert Sstar_on == float("inf"), "on-topic/sybil poison has p=0 at a usable tau 
 
 verdict = (
     "DEMONSTRATION, NOT A DISCOVERY (KILL as a research finding or product upgrade; keep only as a runnable "
-    "receipt). Built a prototype of all four membership-cost backends on mnemo's corroboration gate and "
+    "receipt). Built a prototype of all four membership-cost backends on inspeximus's corroboration gate and "
     "characterized each. Every mechanism-level claim is TEXTBOOK, verified against primary sources: registrar/"
     "attestation defeating the 2-domain forgery is Douceur 2002 (the Sybil impossibility — a certifying "
     "authority is the one full prevention); PoW being a SYMMETRIC tax a resourced attacker pays is Douceur's "

@@ -1,4 +1,4 @@
-"""echo_guard_e2e_probe.py — validate the SHIPPED mnemo echo_guard end-to-end on the MemBench echo fixture.
+"""echo_guard_e2e_probe.py — validate the SHIPPED inspeximus echo_guard end-to-end on the MemBench echo fixture.
 
 Runs every fixture case through actual Inspeximus.remember(key=, object=) + keyed supersession (NOT the probe's
 policy abstraction), granting oracle object extraction (the documented limit: real efficacy rides on the
@@ -12,7 +12,7 @@ Needs echo_attack_paraphrases.json. RUN: python research/probes/echo_guard_e2e_p
 
 import json, os, sys, tempfile
 sys.stdout.reconfigure(errors="replace")
-sys.path.insert(0, "mnemo"); sys.path.insert(0, "research/probes")
+sys.path.insert(0, "inspeximus"); sys.path.insert(0, "research/probes")
 from inspeximus import Inspeximus
 from echo_attack_probe import build_fixture
 

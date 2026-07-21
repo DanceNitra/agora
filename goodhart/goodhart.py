@@ -1,6 +1,6 @@
 """
 goodhart — when a measure becomes a target, it stops measuring. How gameable is YOUR proxy, and how
-many independent metrics does it take to fix it?  (a mnemo / nullcheck / idcheck sibling)
+many independent metrics does it take to fix it?  (a inspeximus / nullcheck / idcheck sibling)
 
 "Optimize the proxy" is everywhere now — reward models in RLHF, KPIs and OKRs, eval benchmarks, ad
 metrics — and the failure mode is universal: the proxy reward keeps rising while the TRUE goal peaks

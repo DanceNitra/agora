@@ -1,4 +1,4 @@
-"""membench_recall_probe.py — FEASIBILITY: can mnemo be measured on MemBench? (ACL 2025 Findings)
+"""membench_recall_probe.py — FEASIBILITY: can inspeximus be measured on MemBench? (ACL 2025 Findings)
 
 MemBench (Tan et al., ACL Findings 2025, github.com/import-myself/Membench) evaluates LLM-agent
 memory on dialogue trajectories with QA whose evidence location is annotated: QA.target_step_id[i][0]
@@ -6,13 +6,13 @@ is the GLOBAL FLAT index of the evidence user-message in the trajectory (verifie
 simple.json + 3/3 on highlevel.json before this probe was written; the [sess,msg] reading is OOB).
 
 That annotation makes a RETRIEVAL-ONLY evaluation possible — no LLM in the loop, exactly the LoCoMo
-protocol we already run: ingest each user message into a fresh mnemo store, recall(question, k),
+protocol we already run: ingest each user message into a fresh inspeximus store, recall(question, k),
 score hit@k / full_recall@k against the annotated evidence indices.
 
 Arms:
-  cosine  - plain nomic cosine top-k over the same embeddings (the floor mnemo must not fall below;
-            mnemo's recall is cosine + centering + its scoring pipeline, so a big gap = a bug)
-  mnemo   - mnemo.recall() semantic mode with the same nomic embedder (asymmetric prefixes)
+  cosine  - plain nomic cosine top-k over the same embeddings (the floor inspeximus must not fall below;
+            inspeximus's recall is cosine + centering + its scoring pipeline, so a big gap = a bug)
+  inspeximus   - inspeximus.recall() semantic mode with the same nomic embedder (asymmetric prefixes)
 
 Splits: FirstAgent/simple (factual, ~165 msgs/traj — the real retrieval load) and
 FirstAgent/highlevel (reflective, ~13 msgs/traj — short; near-ceiling expected, kept for coverage).
@@ -31,7 +31,7 @@ Own embedding cache (probe-cache lesson: never share a cache file across probes)
 import json, os, sys, hashlib, urllib.request, tempfile
 
 sys.stdout.reconfigure(errors="replace")
-sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..", "mnemo")))
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..", "inspeximus")))
 from inspeximus import Inspeximus
 
 DATA_DIR = os.environ.get("MEMBENCH_DATA", "agora_output/lab/data/membench")
@@ -107,7 +107,7 @@ def main():
 
         # arm 1: plain cosine
         ranked = sorted(range(len(flat)), key=lambda i: -cos(qvec, dvecs[i]))
-        # arm 2: mnemo semantic recall over the same embedder
+        # arm 2: inspeximus semantic recall over the same embedder
         doc_vec = {DP + t: v for t, v in zip(flat, dvecs)}
         def emb_fn(text):
             v = doc_vec.get(DP + text)
@@ -120,7 +120,7 @@ def main():
         mn_ranked = [idx_of[r["id"]] for r in got if r["id"] in idx_of]
         if os.path.exists(p): os.remove(p)
 
-        for arm, rk in (("cosine", ranked), ("mnemo", mn_ranked)):
+        for arm, rk in (("cosine", ranked), ("inspeximus", mn_ranked)):
             for k in KS:
                 top = set(rk[:k])
                 scores.setdefault((split, arm, "hit", k), []).append(
@@ -133,7 +133,7 @@ def main():
     for split in ("simple", "highlevel"):
         n = len(scores.get((split, "cosine", "hit", 1), []))
         print(f"\n=== MEASURED {split} (n={n} questions) ===")
-        for arm in ("cosine", "mnemo"):
+        for arm in ("cosine", "inspeximus"):
             hit = " ".join(f"hit@{k}={sum(scores[(split,arm,'hit',k)])/n:.3f}" for k in KS)
             full = " ".join(f"full@{k}={sum(scores[(split,arm,'full',k)])/n:.3f}" for k in (5, 10))
             print(f"  {arm:7s} {hit}  {full}")

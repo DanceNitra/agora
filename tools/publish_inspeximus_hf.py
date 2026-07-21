@@ -1,12 +1,12 @@
-"""publish_mnemo_hf.py - push mnemo to the Hugging Face Hub (discoverability) as a model-type repo.
+"""publish_inspeximus_hf.py - push inspeximus to the Hugging Face Hub (discoverability) as a model-type repo.
 Reads HF_TOKEN from server/.env (never printed); uses the huggingface_hub API (no token on any command
-line). Publishes the HF card + the single-file core + MCP server + CITATION + LICENSE to <account>/mnemo
+line). Publishes the HF card + the single-file core + MCP server + CITATION + LICENSE to <account>/inspeximus
 (namespace = the token's authenticated account). Idempotent: re-run to update. ASCII prints."""
 import os, re, sys
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-SRC = os.path.join(ROOT, "agora_output", "mnemo_dist")
-REPO_NAME = "mnemo"
+SRC = os.path.join(ROOT, "agora_output", "inspeximus_dist")
+REPO_NAME = "inspeximus"
 
 
 def _token():
@@ -26,8 +26,8 @@ def main():
     api.create_repo(repo_id, repo_type="model", exist_ok=True)
     uploads = [
         (os.path.join(SRC, "HF_CARD.md"), "README.md"),   # HF renders this as the card
-        (os.path.join(SRC, "mnemo.py"), "mnemo.py"),
-        (os.path.join(SRC, "mnemo_mcp.py"), "mnemo_mcp.py"),
+        (os.path.join(SRC, "inspeximus.py"), "inspeximus.py"),
+        (os.path.join(SRC, "mcp.py"), "mcp.py"),
         (os.path.join(SRC, "CITATION.cff"), "CITATION.cff"),
         (os.path.join(SRC, "LICENSE"), "LICENSE"),
     ]

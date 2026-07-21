@@ -145,7 +145,7 @@ def _periodic(st, now):
     if now - st.get("last_opp", 0) > OPP_EVERY_S:
         st["last_opp"] = now
         _queue("OPPORTUNITY SCAN (where can we apply ourselves): sweep GitHub repos + forums (HN, "
-               "r/LocalLLaMA, r/MachineLearning) for live pain that fits our assets (mnemo memory layer, "
+               "r/LocalLLaMA, r/MachineLearning) for live pain that fits our assets (inspeximus memory layer, "
                "grounding-firewall, the AI-claim Crucible, freelance RAG-hardening). Surface 3-5 concrete, "
                "evidenced fits with links; draft gated outreach only where we genuinely answer.")
         print("[selfimp] queued opportunity scan", flush=True)

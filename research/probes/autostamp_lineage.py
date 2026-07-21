@@ -9,7 +9,7 @@ is AUTO-STAMPED LINEAGE PROPAGATION -- the store inherits the retrieved parents 
 lineage EDGE is carried by the store from the recall->write flow, not supplied by the untrusted LLM (MemLineage,
 arXiv:2605.14421: signature-only 6/6 attacks -> 0/6 once ancestor lineage propagates, sub-ms overhead).
 
-This probe MEASURES that mechanism on shipped mnemo: recall() records what it surfaced; a subsequent
+This probe MEASURES that mechanism on shipped inspeximus: recall() records what it surfaced; a subsequent
 remember(..., derived=True) with no explicit parent auto-stamps derived_from from that recall, so the summary
 carries its ancestors' taint and a slash on the root REACHES it -- the untrusted summarize step never had to
 preserve the link. A derived write with NO preceding recall stays an orphan (fail-closed).
@@ -23,7 +23,7 @@ those need content-moderation + trust-decay retrieval, where provenance appears 
 FALSIFIER: if the auto-stamped summary did NOT carry the root's taint (so a slash on the root missed it), or if a
 derived write with no preceding recall were NOT an orphan, the mechanism would be doing nothing. Neither holds.
 
-Deterministic, zero-dependency (lexical recall, no embedder). MIT. Part of Agora / mnemo.
+Deterministic, zero-dependency (lexical recall, no embedder). MIT. Part of Agora / inspeximus.
 Run:  python research/probes/autostamp_lineage.py
 """
 import os

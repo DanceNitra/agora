@@ -1,7 +1,7 @@
 """Where can we actually HELP — the contribution shortlist, mined from the external library.
 
 The library collects everything the outside world says about our problem. This is the filter that
-turns it into a work queue: which of those threads is a place where mnemo/Agora has something real to
+turns it into a work queue: which of those threads is a place where inspeximus/Agora has something real to
 offer, ranked so the best one is obvious at 3am.
 
 Deliberately conservative about "we can help". A thread scores only when the need it voices maps onto
@@ -45,7 +45,7 @@ OFFERS = {
     "drop-in store for a framework": (
         ("langgraph", "basestore", "checkpointer", "llamaindex", "crewai", "autogen", "mcp server",
          "memory backend", "swap"),
-        "MnemoStore passes an operation-by-operation parity audit against LangGraph's own InMemoryStore; "
+        "InspeximusStore passes an operation-by-operation parity audit against LangGraph's own InMemoryStore; "
         "CrewAI adapter and an MCP server ship in the package"),
 }
 
@@ -83,8 +83,8 @@ def _score(item: dict, offers: list) -> int:
 
 
 def find(limit: int = 25) -> dict:
-    from agora.execution.external_library import _mnemo
-    m = _mnemo()
+    from agora.execution.external_library import _inspeximus
+    m = _inspeximus()
     out = []
     for r in m.items:
         meta = r.get("meta") or {}

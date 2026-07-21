@@ -24,7 +24,7 @@ GROUND-TRUTH NOTES (fixture-construction honesty):
     fresh (corrected) message in the arm's ranking — the retrieval failure mode that answers
     the old value.
 
-Arms: plain nomic cosine vs mnemo.recall(mode='semantic') with the same embedder (asymmetric
+Arms: plain nomic cosine vs inspeximus.recall(mode='semantic') with the same embedder (asymmetric
 prefixes). No disk embedding cache: ~50k vectors would be a ~400MB JSON (probe-cache lesson);
 nomic is deterministic and the GPU is idle, so we embed streaming per-trajectory instead.
 
@@ -36,7 +36,7 @@ RUN: python research/probes/membench_recall_probe_v2.py   (local Ollama, nomic-e
 import json, os, sys, math, time, urllib.request, tempfile
 
 sys.stdout.reconfigure(errors="replace")
-sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..", "mnemo")))
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..", "inspeximus")))
 from inspeximus import Inspeximus
 
 DATA_DIR = os.environ.get("MEMBENCH_DATA", "agora_output/lab/data/membench")
@@ -135,7 +135,7 @@ def main():
         mn_ranked = [idx_of[r["id"]] for r in got if r["id"] in idx_of]
         if os.path.exists(p): os.remove(p)
 
-        for arm, rk in (("cosine", ranked), ("mnemo", mn_ranked)):
+        for arm, rk in (("cosine", ranked), ("inspeximus", mn_ranked)):
             for k in KS:
                 top = set(rk[:k])
                 scores.setdefault((split, arm, "hit", k), []).append(
@@ -158,7 +158,7 @@ def main():
         n = len(scores.get((split, "cosine", "hit", 1), []))
         if not n: continue
         print(f"\n=== MEASURED {split} (n={n}) ===")
-        for arm in ("cosine", "mnemo"):
+        for arm in ("cosine", "inspeximus"):
             parts = []
             for k in KS:
                 v = scores[(split, arm, "hit", k)]

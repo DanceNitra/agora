@@ -36,4 +36,4 @@ for name,pol in [("blind (no observability)","blind"),
 print("\nVERDICT: observability-ONLY leaves dead weight ~unchanged (it merely SEES it); the ~0% metric")
 print("is produced by the PRUNING response, not the observation. Reconfirms the supersession:")
 print("observability is the SURVEILLANCE half of immunity; without a response (prune/consolidate) it is")
-print("eyes, not an immune system. (mnemo.consolidate() is exactly that response half.)")
+print("eyes, not an immune system. (inspeximus.consolidate() is exactly that response half.)")

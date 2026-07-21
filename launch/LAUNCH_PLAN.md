@@ -1,4 +1,4 @@
-# Launch plan — second_brain_mcp + mnemo (DRAFT, gated)
+# Launch plan — second_brain_mcp + inspeximus (DRAFT, gated)
 
 **Nothing here is published. This is the owner's "how to ship it" checklist. You press the button.**
 Posts are in `LAUNCH_POSTS.md` (EN + SK). Passed an adversarial honesty review (wf_ec21e760); the two

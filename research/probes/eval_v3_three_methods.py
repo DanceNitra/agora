@@ -1,4 +1,4 @@
-"""eval_v3_three_methods.py — run keyword-rule, Marat's Triplenet-5D, mnemo echo_guard, and a
+"""eval_v3_three_methods.py — run keyword-rule, Marat's Triplenet-5D, inspeximus echo_guard, and a
 value-identity oracle on the v3 held-out. Shows v3 is FAIR (structurally solvable) but not lexically.
 
 Run: python research/probes/eval_v3_three_methods.py
@@ -55,8 +55,8 @@ def value_oracle(rows):
     return [1 if asserted_value(r) == "old" else 0 for r in rows]
 
 
-def mnemo_echo_guard(rows):
-    """mnemo's object-ledger: build the key's supersession history (old -> current), enable echo_guard,
+def inspeximus_echo_guard(rows):
+    """inspeximus's object-ledger: build the key's supersession history (old -> current), enable echo_guard,
     then test whether the candidate's asserted value is a restatement of a SUPERSEDED object. Phrasing-
     independent; keys on the OBJECT. Predict reopens_stale=1 iff echo_guard retires the write as an echo."""
     preds = []
@@ -143,7 +143,7 @@ def main():
     print("=" * 78)
     results = [
         ("keyword rule (Marat's `emotion` feature)", kw_rule(rows)),
-        ("mnemo echo_guard / object-ledger", mnemo_echo_guard(rows)),
+        ("inspeximus echo_guard / object-ledger", inspeximus_echo_guard(rows)),
         ("value-identity ORACLE (task is solvable)", value_oracle(rows)),
     ]
     mm, err = marat_model(rows, args.pt)
@@ -161,12 +161,12 @@ def main():
     print("Reading: on v3 the lexical shortcut is gone, so the keyword feature (and Marat's model, whose")
     print("5D vectors are identical for revert vs keep here) collapses on the revert-vs-keep split")
     print("(precision ~0.50). The value-identity oracle stays perfect -> v3 IS solvable, just not lexically.")
-    print("HONEST SCOPE (stress-claim, 2026-07-10): the mnemo echo_guard row is NOT independent evidence —")
-    print("this harness FEEDS mnemo the pre-extracted asserted value (same asserted_value() the oracle uses),")
-    print("so mnemo's 1.0 == the oracle by construction (one rule scored twice), NOT a demonstration that")
-    print("mnemo parses free text. It only shows a typed object-ledger resolves the conflict ONCE the value")
+    print("HONEST SCOPE (stress-claim, 2026-07-10): the inspeximus echo_guard row is NOT independent evidence —")
+    print("this harness FEEDS inspeximus the pre-extracted asserted value (same asserted_value() the oracle uses),")
+    print("so inspeximus's 1.0 == the oracle by construction (one rule scored twice), NOT a demonstration that")
+    print("inspeximus parses free text. It only shows a typed object-ledger resolves the conflict ONCE the value")
     print("is extracted. v3 is also still value-STRING separable; a coreference-obscured revert (names")
-    print("neither the old value nor a revert verb) would defeat value-matching AND mnemo. Shared open problem.")
+    print("neither the old value nor a revert verb) would defeat value-matching AND inspeximus. Shared open problem.")
 
 
 if __name__ == "__main__":

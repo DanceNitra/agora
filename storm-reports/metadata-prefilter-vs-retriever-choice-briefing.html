@@ -191,7 +191,7 @@
     <p>Every lens (and our probe) implicitly assumes retrieval is <b>brute-force</b>, where applying a
     filter is free. The missing lens is the <b>index-structure engineer</b>: on production ANN (HNSW), a
     pre-filter interacts with the graph and can hurt recall unless the DB does filtered-ANN. This flips the
-    conclusion for anyone on a managed vector DB — and, conversely, means a brute-force store (like mnemo)
+    conclusion for anyone on a managed vector DB — and, conversely, means a brute-force store (like inspeximus)
     is in the one regime where the measured filtering gain is safe to bank.</p>
   </section>
 
@@ -201,7 +201,7 @@
       <li>Treat a cheap metadata/entity/time pre-filter as a first-class stage, not an afterthought — but apply it <em>inside</em> the ANN traversal (Qdrant filterable-HNSW, pgvector iterative scan), never as a naive pre/post filter on a plain HNSW index.</li>
       <li>Do not present metadata filtering as a finding; it is standard. If you measure it, publish the <em>isolated effect-size on agent memory</em> — that is the only part not already in the literature.</li>
       <li>When you quote a filtering win, state the selectivity and the extraction method: a gain from a gold 2-way label is not evidence for many-entity, predicted-extraction settings.</li>
-      <li>On a brute-force store (small corpora, mnemo-style), a metadata pre-filter is safe and cheap — ship it; the HNSW caveat doesn't apply.</li>
+      <li>On a brute-force store (small corpora, inspeximus-style), a metadata pre-filter is safe and cheap — ship it; the HNSW caveat doesn't apply.</li>
     </ul>
   </section>
 

@@ -210,7 +210,7 @@ def record(claim: str, source: str, outcome: str, lab_id: str = "", note: str = 
     # debunked claim. NOT_COMPUTABLE carries no signal (skip).
     if o in ("REPRODUCED", "FAILED"):
         try:
-            from agora.execution.mnemo_bridge import credit_outcome
+            from agora.execution.inspeximus_bridge import credit_outcome
             credit_outcome(claim, good=(o == "REPRODUCED"))
         except Exception:
             pass

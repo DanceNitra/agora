@@ -5,10 +5,10 @@ action must clear by that action's BLAST RADIUS. A rare single-source memory the
 read, but cannot unilaterally drive a destructive/irreversible action until it earns more authority.
 
 We credit the idea to jacksonxly; the security principle underneath is risk-based / least-privilege
-authorization (capability security), which we also credit — we MEASURE it on mnemo's corroboration substrate,
+authorization (capability security), which we also credit — we MEASURE it on inspeximus's corroboration substrate,
 we did not invent risk-scaled auth.
 
-MECHANISM (the new wrapper on mnemo state):
+MECHANISM (the new wrapper on inspeximus state):
   authority(rec) = min(1, 0.30 + 0.35*distinct_sources + 0.15*max(0, good-bad))   in [0,1]
      single fresh source, no credit -> 0.30 ; >=2 distinct sources -> 1.0 ; credit can also raise it.
   threshold(blast) = blast                              (read 0.2, write 0.5, destructive 0.9)

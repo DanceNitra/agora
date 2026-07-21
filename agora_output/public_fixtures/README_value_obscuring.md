@@ -13,7 +13,7 @@ set (140 rows, 60 positive):
 
 | baseline | F1 | why it fails |
 |---|---|---|
-| object/value match (= mnemo `echo_guard`) | **0.032** | the reversion never names the old value — nothing to key on |
+| object/value match (= inspeximus `echo_guard`) | **0.032** | the reversion never names the old value — nothing to key on |
 | cosine (candidate vs old fact, best threshold) | **0.554 ≈ chance** | "go back" carries no lexical/semantic trace of the value (positive base rate 0.43) |
 
 A method that flags "this utterance re-opens a settled decision" from the **shape** of the exchange rather

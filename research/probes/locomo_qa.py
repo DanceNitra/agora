@@ -1,22 +1,22 @@
-"""locomo_qa.py — END-TO-END LOCOMO QA accuracy for mnemo (the number buyers open with).
+"""locomo_qa.py — END-TO-END LOCOMO QA accuracy for inspeximus (the number buyers open with).
 
 Prior lab work measured retrieval RECALL@K (did the gold turn get retrieved). Buyers quote the END-TO-END
 QA-ACCURACY that mem0 (66.9% LOCOMO, LLM-as-judge) and Zep (71.2% LongMemEval) publish. This harness produces
-the comparable metric for mnemo: ingest each conversation into mnemo, for each question recall top-k, an LLM
+the comparable metric for inspeximus: ingest each conversation into inspeximus, for each question recall top-k, an LLM
 answers from ONLY the recalled context, and an LLM judge scores the answer vs the gold answer.
 
-Fair design: mnemo vs a full-context ceiling vs a naive-recency baseline all answered+judged by the SAME model,
+Fair design: inspeximus vs a full-context ceiling vs a naive-recency baseline all answered+judged by the SAME model,
 so the RELATIVE result is fair even when the absolute number is not directly comparable to mem0's gpt-4o judge.
 Answerer/judge model is configurable: local (llama3.1:8b, free) for a pilot, gpt-4o for the mem0-comparable run
-(needs OpenAI credit). Retrieval (mnemo) is always free/local.
+(needs OpenAI credit). Retrieval (inspeximus) is always free/local.
 
-RUN (free pilot, local LLM):  python research/probes/locomo_qa.py --convs 1 --systems mnemo,fullcontext,naive --model llama3.1:8b --base local
-RUN (mem0-comparable):        python research/probes/locomo_qa.py --convs 10 --systems mnemo --model gpt-4o --base openai
+RUN (free pilot, local LLM):  python research/probes/locomo_qa.py --convs 1 --systems inspeximus,fullcontext,naive --model llama3.1:8b --base local
+RUN (mem0-comparable):        python research/probes/locomo_qa.py --convs 10 --systems inspeximus --model gpt-4o --base openai
 """
 import os, sys, json, argparse, time, urllib.request
 HERE = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, os.path.join(HERE, "..", ".."))
-sys.path.insert(0, os.path.join(HERE, "..", "..", "mnemo_pypi"))
+sys.path.insert(0, os.path.join(HERE, "..", "..", "inspeximus_pypi"))
 from inspeximus import Inspeximus
 
 DATA = os.path.join(HERE, "..", "..", "agora_output", "lab", "data", "locomo10.json")
@@ -87,9 +87,9 @@ def _embed_one(t):
     return nomic_embed([t])[0]
 
 
-def build_mnemo_store(turns):
-    """Build the mnemo store for a conversation ONCE (not per question). Batch-embeds all turns in one pass, then
-    ingests them. This is the shippable recipe using only built-in mnemo features (embed + meta speaker)."""
+def build_inspeximus_store(turns):
+    """Build the inspeximus store for a conversation ONCE (not per question). Batch-embeds all turns in one pass, then
+    ingests them. This is the shippable recipe using only built-in inspeximus features (embed + meta speaker)."""
     texts = [f"{sp}: {tx}" for _i, sp, tx in turns if tx.strip()]
     nomic_embed(texts)                                               # ONE batched embed pass for the whole conv
     m = Inspeximus(path=None, embed=_embed_one)
@@ -100,7 +100,7 @@ def build_mnemo_store(turns):
 
 
 def recall_context(store, turns, question, k):
-    """Recall the top-k context for a question from a prebuilt store — mnemo's hybrid RRF + the SOFT speaker
+    """Recall the top-k context for a question from a prebuilt store — inspeximus's hybrid RRF + the SOFT speaker
     prefilter (prefer=), the two biggest measured LOCOMO levers."""
     speakers = {sp for _i, sp, _tx in turns if sp}
     named = [s for s in speakers if s and s.lower() in question.lower()]
@@ -110,13 +110,13 @@ def recall_context(store, turns, question, k):
 
 
 def build_context(system, turns, question, k):
-    """Backward-compatible single-shot context builder (rebuilds the mnemo store each call — used only by the
+    """Backward-compatible single-shot context builder (rebuilds the inspeximus store each call — used only by the
     local/openai answerer paths). The --base claude path builds the store ONCE per conversation instead."""
     if system == "fullcontext":
         return "\n".join(f"{sp}: {tx}" for _i, sp, tx in turns)
     if system == "naive":
         return "\n".join(f"{sp}: {tx}" for _i, sp, tx in turns[-k:])
-    return recall_context(build_mnemo_store(turns), turns, question, k)
+    return recall_context(build_inspeximus_store(turns), turns, question, k)
 
 
 def judge(base, model, question, gold, pred):
@@ -131,7 +131,7 @@ def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--convs", type=int, default=1); ap.add_argument("--k", type=int, default=20)
     ap.add_argument("--maxq", type=int, default=0, help="cap questions per conv (0=all)")
-    ap.add_argument("--systems", default="mnemo"); ap.add_argument("--model", default="llama3.1:8b")
+    ap.add_argument("--systems", default="inspeximus"); ap.add_argument("--model", default="llama3.1:8b")
     ap.add_argument("--base", default="local", choices=["local", "openai", "claude"])
     ap.add_argument("--score-claude", action="store_true", help="score locomo_qa_answers.json (Claude judged)")
     a = ap.parse_args()
@@ -154,7 +154,7 @@ def main():
     data = json.load(open(DATA, encoding="utf-8"))[:a.convs]
 
     if a.base == "claude":
-        # Claude-Code-as-the-LLM: dump (question, mnemo-retrieved context, gold) per item; Claude answers
+        # Claude-Code-as-the-LLM: dump (question, inspeximus-retrieved context, gold) per item; Claude answers
         # STRICTLY from the context (no world knowledge) + judges vs gold, writes locomo_qa_answers.json, and
         # score_claude() computes accuracy. Free, strong answerer, no cloud credit.
         batch = []
@@ -164,14 +164,14 @@ def main():
             if a.maxq:
                 qa = qa[:a.maxq]
             # BATCH + BUILD-ONCE: embed every turn AND every question of this conversation in one pass, and build
-            # the mnemo store a SINGLE time — not once per question (that was 250x rebuild = 150k wasted writes).
+            # the inspeximus store a SINGLE time — not once per question (that was 250x rebuild = 150k wasted writes).
             nomic_embed([f"{sp}: {tx}" for _i, sp, tx in turns if tx.strip()] + [q["question"] for q in qa])
-            mstore = build_mnemo_store(turns) if "mnemo" in syslist else None
+            mstore = build_inspeximus_store(turns) if "inspeximus" in syslist else None
             for qi, q in enumerate(qa):
                 if not str(q.get("answer", "")).strip() or q.get("category") == 5:
                     continue
                 for system in syslist:
-                    ctx = (recall_context(mstore, turns, q["question"], a.k) if system == "mnemo"
+                    ctx = (recall_context(mstore, turns, q["question"], a.k) if system == "inspeximus"
                            else build_context(system, turns, q["question"], a.k))
                     batch.append({"qid": f"c{ci}q{qi}", "system": system, "category": q.get("category"),
                                   "question": q["question"], "gold": str(q["answer"]).strip(),

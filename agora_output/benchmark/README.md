@@ -68,7 +68,7 @@ _All numbers below are traceable to a persisted result JSON and recomputed by `v
   the *value* of an outcome/credit channel, it is **not** a head-to-head win over shipped products (mem0/Zep were
   not run).
   - The independent scikit-learn `NearestNeighbors(cosine)` retriever (not our code) scores **identically** to
-    mnemo-NONE (gap 0.000 at every D), confirming NONE is a faithful standard retriever, not a strawman;
+    inspeximus-NONE (gap 0.000 at every D), confirming NONE is a faithful standard retriever, not a strawman;
     outcome-ranked beats this independent baseline by **+0.469 at D=8, CI [+0.438, +0.500]**.
 
 See `VERIFIED_NUMBERS.md` for the full ledger (each headline recomputed from its source arrays).
@@ -85,7 +85,7 @@ See `VERIFIED_NUMBERS.md` for the full ledger (each headline recomputed from its
 3. **Falsifiable.** Every metric ships with a pre-registered falsifier and bootstrap CIs; we record honest
    negatives (e.g. adversarial lexical distractors did NOT bite) and corrections (we caught our own
    summary-budget confound) rather than hiding them.
-4. **Independent baselines.** Claims about our own components (mnemo) are checked against standard, independent
+4. **Independent baselines.** Claims about our own components (inspeximus) are checked against standard, independent
    libraries on identical inputs.
 
 ---

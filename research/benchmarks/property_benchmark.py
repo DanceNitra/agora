@@ -1,4 +1,4 @@
-"""property_benchmark.py — one runnable scorecard proving EVERY mnemo property we claim.
+"""property_benchmark.py — one runnable scorecard proving EVERY inspeximus property we claim.
 
 Self-contained (synthetic data, lexical recall — no network, no GPU, no external dataset), deterministic, and
 reproducible by anyone: `python benchmarks/property_benchmark.py`. Each property yields a NUMBER, a fair baseline
@@ -21,7 +21,7 @@ POOL = [f"unrelated fact number {i} about topic {i%7}" for i in range(40)]
 
 # 1. SUPERSESSION — stale-serve rate after updates
 def supersession(N=100):
-    mnemo_ok = naive_ok = 0
+    inspeximus_ok = naive_ok = 0
     for _ in range(N):
         m = Inspeximus(path=None)
         for d in random.sample(POOL, 6): m.remember(d)
@@ -29,15 +29,15 @@ def supersession(N=100):
         for v in vals: m.remember(f"the setting is {v}", key="setting", object=v)   # 4 updates
         cur = vals[-1]
         hit = (m.recall("what is the setting", k=1) or [{}])[0].get("text", "")
-        mnemo_ok += cur in hit
+        inspeximus_ok += cur in hit
         # naive: keeps all, nearest lexical — often returns a stale value
         naive = Inspeximus(path=None)
         for d in random.sample(POOL, 6): naive.remember(d)
         for v in vals: naive.remember(f"the setting is {v}")                        # no key -> all kept
         nhit = (naive.recall("what is the setting", k=1) or [{}])[0].get("text", "")
         naive_ok += cur in nhit
-    rec("supersession_returns_current", "current@1", round(mnemo_ok/N, 3), round(naive_ok/N, 3),
-        mnemo_ok/N >= 0.99, "mnemo keyed vs naive keep-all")
+    rec("supersession_returns_current", "current@1", round(inspeximus_ok/N, 3), round(naive_ok/N, 3),
+        inspeximus_ok/N >= 0.99, "inspeximus keyed vs naive keep-all")
 
 # 2. REVERT
 def revert(N=100):

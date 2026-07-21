@@ -1,5 +1,5 @@
 """
-nullcheck — is this number real, or just what noise would produce anyway?  (a mnemo sibling)
+nullcheck — is this number real, or just what noise would produce anyway?  (a inspeximus sibling)
 
 The one-line idea: a result is evidence of a real effect only if a model containing NO effect can't
 reproduce it. So instead of trusting a p-value formula (and its assumptions), we SIMULATE the null —

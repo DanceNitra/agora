@@ -1,11 +1,11 @@
 """distill_and_remember_probe.py — the OPTIONAL LLM capture half (deterministic orchestration).
 
-mnemo core stays zero-dep/zero-LLM: the caller injects a `distiller(prompt, text)` (any LLM / subagent) that runs
-Inspeximus.DISTILL_PROMPT and returns JSON; mnemo parses it and stores each item DETERMINISTICALLY — decisions via
+inspeximus core stays zero-dep/zero-LLM: the caller injects a `distiller(prompt, text)` (any LLM / subagent) that runs
+Inspeximus.DISTILL_PROMPT and returns JSON; inspeximus parses it and stores each item DETERMINISTICALLY — decisions via
 remember_decision (topic-keyed supersession + revert), facts via remember. This probe uses a MOCK distiller (no
 LLM) to lock the orchestration + fail-open behavior; a live subagent distiller is tested separately.
 Asserts:
-  1. mnemo passes its DISTILL_PROMPT to the distiller.
+  1. inspeximus passes its DISTILL_PROMPT to the distiller.
   2. decisions + facts from the returned JSON are stored (decision -> remember_decision, fact -> semantic).
   3. malformed items (empty text, non-dict) are skipped, not crashed.
   4. a distilled decision's topic gives keyed supersession (new decision retires old; one active per topic).
@@ -34,7 +34,7 @@ def mock(prompt, text):
         "not-a-dict -> skip",
     ]})
 r = m.distill_and_remember(TRANSCRIPT, mock)
-check("1 mnemo passed its DISTILL_PROMPT", "distill" in seen_prompt.get("p", "").lower())
+check("1 inspeximus passed its DISTILL_PROMPT", "distill" in seen_prompt.get("p", "").lower())
 check("2 decision + fact stored (2 captured)", r["captured"] == 2 and r["decisions"] == 1 and r["facts"] == 1)
 check("2b decision recallable", "1.16" in (m.recall("what to ship", k=1) or [{}])[0].get("text", ""))
 check("2c fact recallable", "nomic" in (m.recall("nomic prefixes", k=1) or [{}])[0].get("text", ""))

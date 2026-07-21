@@ -11,7 +11,7 @@ generate GROUNDBREAKING, non-obvious ideas aimed at four standing targets:
 
     - SYSTEM / OS    : the agent operating system & dungeon substrate
     - AGORA          : the epistemic engine itself (organs, loops, quality)
-    - MCP MEMORY     : the memory product (mnemo / second-brain-as-a-service)
+    - MCP MEMORY     : the memory product (inspeximus / second-brain-as-a-service)
     - REAL-WORLD     : a shippable product the outside world would pay for
 
 The established division of labour holds: AGORA GATHERS, CLAUDE CREATES. This module is the
@@ -37,7 +37,7 @@ TARGETS = [
      "framing": "Agora itself as a knowledge-creating organism — new organs, sharper loops, "
                 "higher-yield research, better quality firewalls, compounding mechanisms"},
     {"id": "mcp_memory", "name": "MCP memory product",
-     "framing": "the memory product (mnemo / second-brain-as-a-service over MCP) — how an "
+     "framing": "the memory product (inspeximus / second-brain-as-a-service over MCP) — how an "
                 "external user's notes become a thinking partner; retrieval, consolidation, recall"},
     {"id": "realworld", "name": "Real-world product",
      "framing": "a shippable product the outside world would pay for, grounded in what the vault "

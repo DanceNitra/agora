@@ -23,10 +23,10 @@ LIVE_LOG = "_live.log"
 def setup_live_logging():
     lg = logging.getLogger("tenpy")
     lg.setLevel(logging.INFO)
-    lg.handlers = [h for h in lg.handlers if getattr(h, "_mnemo_live", False)]
+    lg.handlers = [h for h in lg.handlers if getattr(h, "_inspeximus_live", False)]
     if not lg.handlers:
         fh = logging.FileHandler(LIVE_LOG, mode="w")
-        fh._mnemo_live = True
+        fh._inspeximus_live = True
         fh.setFormatter(logging.Formatter("%(asctime)s %(name)s %(message)s",
                                           datefmt="%H:%M:%S"))
         lg.addHandler(fh)

@@ -1,441 +1,441 @@
 [
  {
   "qid": "c0q0",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 2,
   "answer": "7 May 2023 (\"yesterday\" of the 8 May message)",
   "correct": true
  },
  {
   "qid": "c0q1",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 2,
   "answer": "2022 (she painted the lake sunrise \"last year\" as of 2023)",
   "correct": true
  },
  {
   "qid": "c0q2",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 3,
   "answer": "Counseling / mental health (psychology-adjacent)",
   "correct": true
  },
  {
   "qid": "c0q3",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 1,
   "answer": "Adoption agencies",
   "correct": true
  },
  {
   "qid": "c0q4",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 1,
   "answer": "Transgender woman",
   "correct": true
  },
  {
   "qid": "c0q5",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 2,
   "answer": "The Saturday before 25 May 2023 (~20 May 2023)",
   "correct": true
  },
  {
   "qid": "c0q6",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 2,
   "answer": "June 2023 (\"next month\" as of the 25 May message)",
   "correct": true
  },
  {
   "qid": "c0q7",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 1,
   "answer": "NOT IN CONTEXT",
   "correct": false
  },
  {
   "qid": "c0q8",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 2,
   "answer": "The week before 9 June 2023",
   "correct": true
  },
  {
   "qid": "c0q9",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 2,
   "answer": "The week before 9 June 2023",
   "correct": true
  },
  {
   "qid": "c0q10",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 2,
   "answer": "4 years",
   "correct": true
  },
  {
   "qid": "c0q11",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 1,
   "answer": "NOT IN CONTEXT (she says \"my home country\" but never names it)",
   "correct": false
  },
  {
   "qid": "c0q12",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 2,
   "answer": "10 years ago",
   "correct": true
  },
  {
   "qid": "c0q13",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 1,
   "answer": "Counseling / mental health, focused on transgender people",
   "correct": true
  },
  {
   "qid": "c0q14",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 3,
   "answer": "Likely no (her motivation is the support she herself received)",
   "correct": true
  },
  {
   "qid": "c0q15",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 1,
   "answer": "Pottery, painting, clarinet (camping and swimming not in context)",
   "correct": false
  },
  {
   "qid": "c0q16",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 2,
   "answer": "2 July 2023 (\"yesterday\" of the 3 July message)",
   "correct": true
  },
  {
   "qid": "c0q17",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 2,
   "answer": "July 2023 (\"this month\" as of the 3 July message)",
   "correct": true
  },
  {
   "qid": "c0q18",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 1,
   "answer": "Mountains and forests (beach not in this context)",
   "correct": false
  },
  {
   "qid": "c0q19",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 1,
   "answer": "Dinosaurs/animals and nature",
   "correct": true
  },
  {
   "qid": "c0q20",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 2,
   "answer": "5 July 2023 (\"yesterday\" of the 6 July message)",
   "correct": true
  },
  {
   "qid": "c0q21",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 2,
   "answer": "The week before 6 July 2023",
   "correct": true
  },
  {
   "qid": "c0q22",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 3,
   "answer": "Yes - she collects classic children's books",
   "correct": true
  },
  {
   "qid": "c0q23",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 1,
   "answer": "Charlotte's Web (\"Nothing is Impossible\" not in context)",
   "correct": false
  },
  {
   "qid": "c0q24",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 1,
   "answer": "Running (pottery not shown as destress in this context)",
   "correct": false
  },
  {
   "qid": "c1q0",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 2,
   "answer": "19 January 2023 (\"yesterday\" of the 20 Jan message)",
   "correct": true
  },
  {
   "qid": "c1q1",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 2,
   "answer": "January 2023 (\"this month\" as of the 20 Jan message)",
   "correct": true
  },
  {
   "qid": "c1q2",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 4,
   "answer": "By dancing",
   "correct": true
  },
  {
   "qid": "c1q3",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 1,
   "answer": "They both lost their jobs and started their own businesses",
   "correct": true
  },
  {
   "qid": "c1q4",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 4,
   "answer": "He lost his job, which pushed him to start his own business and share his passion for dance",
   "correct": true
  },
  {
   "qid": "c1q5",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 1,
   "answer": "By the water, with natural light and Marley flooring",
   "correct": true
  },
  {
   "qid": "c1q6",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 2,
   "answer": "February 2023 (\"next month\" as of 20 Jan; performance recalled on 8 Feb)",
   "correct": true
  },
  {
   "qid": "c1q7",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 2,
   "answer": "29 January 2023",
   "correct": true
  },
  {
   "qid": "c1q8",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 2,
   "answer": "28 January 2023 (\"yesterday\" of the 29 Jan message)",
   "correct": true
  },
  {
   "qid": "c1q9",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 1,
   "answer": "NOT IN CONTEXT (only Gina visited Rome; Jon visited Paris - no city both visited)",
   "correct": false
  },
  {
   "qid": "c1q10",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 2,
   "answer": "February 2023 (8 Feb message)",
   "correct": true
  },
  {
   "qid": "c1q11",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 2,
   "answer": "A few years ago",
   "correct": true
  },
  {
   "qid": "c1q12",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 2,
   "answer": "March 2023 (\"last week\" as of the 16 March message)",
   "correct": true
  },
  {
   "qid": "c1q13",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 2,
   "answer": "16 March 2023",
   "correct": true
  },
  {
   "qid": "c1q14",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 2,
   "answer": "April 2023 (3 April message)",
   "correct": true
  },
  {
   "qid": "c1q15",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 2,
   "answer": "May 2023 (\"next month\" as of the 3 April message)",
   "correct": true
  },
  {
   "qid": "c1q16",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 2,
   "answer": "24 April 2023 (\"yesterday\" of the 25 April message)",
   "correct": true
  },
  {
   "qid": "c1q17",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 1,
   "answer": "She loves fashion trends/unique pieces and, after losing her job, started her own business",
   "correct": true
  },
  {
   "qid": "c1q18",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 1,
   "answer": "Yes",
   "correct": true
  },
  {
   "qid": "c1q19",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 2,
   "answer": "10 May 2023 (\"yesterday\" of the 11 May message)",
   "correct": true
  },
  {
   "qid": "c1q20",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 2,
   "answer": "27 May 2023",
   "correct": true
  },
  {
   "qid": "c1q21",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 2,
   "answer": "May 2023 (reading it as of the 27 May message)",
   "correct": true
  },
  {
   "qid": "c1q22",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 2,
   "answer": "June 2023 (13 June message)",
   "correct": true
  },
  {
   "qid": "c1q23",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 1,
   "answer": "Teamed with an artist for unique pieces, made a limited-edition line, ran offers/promotions and an ad campaign, made a styling video presentation",
   "correct": true
  },
  {
   "qid": "c1q24",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 1,
   "answer": "A fair, networking events, and a dance competition",
   "correct": true
  },
  {
   "qid": "c2q0",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 2,
   "answer": "Her mom/mother (\"last night\" of the 4 May message = 3 May)",
   "correct": true
  },
  {
   "qid": "c2q1",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 2,
   "answer": "21 December 2022 (\"yesterday\" of the 22 Dec message)",
   "correct": true
  },
  {
   "qid": "c2q2",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 1,
   "answer": "Kickboxing and taekwondo",
   "correct": true
  },
  {
   "qid": "c2q3",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 1,
   "answer": "Homeless shelter (clear for Maria; John's shelter volunteering not established in context)",
   "correct": false
  },
  {
   "qid": "c2q4",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 2,
   "answer": "The week before 1 January 2023",
   "correct": true
  },
  {
   "qid": "c2q5",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 2,
   "answer": "December 2022 (\"last month\" as of the 1 Jan 2023 message)",
   "correct": true
  },
  {
   "qid": "c2q6",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 1,
   "answer": "Homeless shelter and church (gym not in this context)",
   "correct": false
  },
  {
   "qid": "c2q7",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 1,
   "answer": "A doll (film camera not in context)",
   "correct": false
  },
  {
   "qid": "c2q8",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 3,
   "answer": "Middle-class or comfortable (finished a degree, got a promotion/new job, stable family and hobbies)",
   "correct": true
  },
  {
   "qid": "c2q9",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 1,
   "answer": "Her aunt/auntie",
   "correct": true
  },
  {
   "qid": "c2q10",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 2,
   "answer": "24 February 2023 (\"yesterday\" of the 25 Feb message)",
   "correct": true
  },
  {
   "qid": "c2q11",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 1,
   "answer": "David and Jean (Cindy and Laura not in context)",
   "correct": false
  },
  {
   "qid": "c2q12",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 1,
   "answer": "The military aptitude test",
   "correct": true

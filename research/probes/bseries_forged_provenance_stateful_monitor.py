@@ -1,11 +1,11 @@
-"""M2 severe-test: manufactured-corroboration (forged-provenance) attack vs mnemo's corroboration gate,
+"""M2 severe-test: manufactured-corroboration (forged-provenance) attack vs inspeximus's corroboration gate,
 and an HONEST negative on the naive stateful "coordination monitor" that seems to close it. Answers the
 open #1462 obligation ("3 coordinated records with 2 independent-looking forged provenances PASS the bar")
 with a MEASURED receipt, and is roadmap item M2.
 
 TWO findings, and the second kills a tempting fix:
 
-FINDING 1 (CONFIRMED — the vulnerability). mnemo's `_is_corroborated` gate is STATELESS: it trusts a value
+FINDING 1 (CONFIRMED — the vulnerability). inspeximus's `_is_corroborated` gate is STATELESS: it trusts a value
 on >=2 DISTINCT canonical sources. It de-dups same-origin sybils (`_canon_source`), so host-variant
 re-assertion fails (B-002). But the bar is source COUNT, not source TRUST/INDEPENDENCE/PATTERN — so an
 attacker who registers TWO fresh domains manufactures corroboration and the poison passes. Measured here.

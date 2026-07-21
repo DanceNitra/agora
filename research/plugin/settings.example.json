@@ -1,13 +1,13 @@
 {
   "hooks": {
     "PostToolUse": [
-      { "hooks": [{ "type": "command", "command": "python /ABSOLUTE/PATH/TO/mnemo/plugin/mnemo_hooks.py" }] }
+      { "hooks": [{ "type": "command", "command": "python /ABSOLUTE/PATH/TO/inspeximus/plugin/inspeximus_hooks.py" }] }
     ],
     "UserPromptSubmit": [
-      { "hooks": [{ "type": "command", "command": "python /ABSOLUTE/PATH/TO/mnemo/plugin/mnemo_hooks.py" }] }
+      { "hooks": [{ "type": "command", "command": "python /ABSOLUTE/PATH/TO/inspeximus/plugin/inspeximus_hooks.py" }] }
     ],
     "SessionStart": [
-      { "hooks": [{ "type": "command", "command": "python /ABSOLUTE/PATH/TO/mnemo/plugin/mnemo_hooks.py" }] }
+      { "hooks": [{ "type": "command", "command": "python /ABSOLUTE/PATH/TO/inspeximus/plugin/inspeximus_hooks.py" }] }
     ]
   }
 }

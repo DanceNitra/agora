@@ -1,23 +1,23 @@
-"""mnemo on MemoryAgentBench Conflict Resolution (FactConsolidation) — OFFICIAL data + OFFICIAL scoring +
+"""inspeximus on MemoryAgentBench Conflict Resolution (FactConsolidation) — OFFICIAL data + OFFICIAL scoring +
 OFFICIAL prompt template, so the number is produced the way the published leaderboard was (mem0 18%,
 Zep/Graphiti 7%, GPT-4o full-context 60% on the CR/FactConsolidation axis).
 
 Answerer = Ollama Cloud (deepseek-v4-flash) — NOT OpenAI (owner rule + no OpenAI budget). The leaderboard
 used gpt-4o-mini; we therefore report the answerer explicitly and VALIDATE the harness with the benchmark's
 own LONG-CONTEXT baseline: if long-context reproduces a sane FactConsolidation number, the answerer swap does
-not invalidate the mnemo-vs-leaderboard read.
+not invalidate the inspeximus-vs-leaderboard read.
 
 Conditions (only the memory layer differs; prompt/scoring/answerer identical):
   longcontext — the full numbered fact list in context (the benchmark's own baseline; validates the harness).
-  mnemo       — ingest each numbered fact into mnemo with key-supersession (later fact retires the earlier);
-                retrieve top-k=10 via mnemo.recall.
+  inspeximus       — ingest each numbered fact into inspeximus with key-supersession (later fact retires the earlier);
+                retrieve top-k=10 via inspeximus.recall.
 
 Official pieces (verbatim): scoring = mab_score.substring_exact_match max-over-golds; prompt = the
 factconsolidation query template ("serial number ... newer fact has larger serial number ... very concise
 answer ... Answer:"); answer parsed after "Answer:"; system = the official SYSTEM_MESSAGE.
 
-Run:  python research/probes/mab_official/run_mnemo_official.py --condition longcontext --n 15   (validate first)
-      python research/probes/mab_official/run_mnemo_official.py --condition mnemo --n 100
+Run:  python research/probes/mab_official/run_inspeximus_official.py --condition longcontext --n 15   (validate first)
+      python research/probes/mab_official/run_inspeximus_official.py --condition inspeximus --n 100
 """
 import json, os, re, sys, time, argparse, urllib.request
 
@@ -151,8 +151,8 @@ def _embed(texts):
 
 
 # The Ollama embed endpoint has a ~2.1s FIXED per-request overhead (GPU stays ~idle), so 455 one-at-a-time
-# embeds = 16 min. Batching amortizes it (n=100 -> 27ms/item). We pre-embed every text mnemo will need in a few
-# batched calls and serve mnemo a cache-lookup embedder; anything unforeseen falls back to a live (slow) call.
+# embeds = 16 min. Batching amortizes it (n=100 -> 27ms/item). We pre-embed every text inspeximus will need in a few
+# batched calls and serve inspeximus a cache-lookup embedder; anything unforeseen falls back to a live (slow) call.
 _CACHE = {}
 _LIVE = [0]
 def warm(texts):
@@ -205,11 +205,11 @@ def run(condition, facts, questions, golds, seed=0, ingest="atomic"):
         print(f"  [warm] cached {len(_CACHE)} embeddings · ingest={ingest} · units={len(units)}", flush=True)
     m = None
     mem0obj = None
-    if condition == "mnemo":
+    if condition == "inspeximus":
         m = Inspeximus(path=None, embed=cached_embed)
         m.echo_guard = True
         if ingest == "chunk":
-            for c in units:                                   # verbatim chunk store — mnemo does NOT LLM-extract
+            for c in units:                                   # verbatim chunk store — inspeximus does NOT LLM-extract
                 m.remember(c)
         else:
             for i, f in enumerate(facts):
@@ -266,7 +266,7 @@ def main():
     global RETRIEVE_NUM, CHUNK_SIZE, TEMP
     ap = argparse.ArgumentParser()
     ap.add_argument("--condition", required=True,
-                    choices=["mnemo", "longcontext", "naive", "naive_drop", "mem0"])
+                    choices=["inspeximus", "longcontext", "naive", "naive_drop", "mem0"])
     ap.add_argument("--n", type=int, default=100)
     ap.add_argument("--sample", default="sh_6k")
     ap.add_argument("--ingest", default="chunk", choices=["atomic", "chunk"],

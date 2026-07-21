@@ -1,17 +1,17 @@
-"""MnemoMemoryService — a Google ADK `BaseMemoryService` backed by mnemo.
+"""InspeximusMemoryService — a Google ADK `BaseMemoryService` backed by inspeximus.
 
 Google ADK agents get long-term memory from a `BaseMemoryService`: the runner calls
 `add_session_to_memory(session)` to ingest a finished session's events, and the agent calls
 `search_memory(app_name, user_id, query)` (exposed as `tool_context.search_memory`) to retrieve. This
-adapter is a drop-in replacement for `InMemoryMemoryService`, backed by a mnemo store so memory persists and
+adapter is a drop-in replacement for `InMemoryMemoryService`, backed by a inspeximus store so memory persists and
 retrieval is value-ranked lexical+semantic instead of plain word overlap.
 
     from google.adk.runners import Runner
-    from mnemo.integrations.google_adk import MnemoMemoryService
-    runner = Runner(agent=agent, app_name="app", session_service=..., memory_service=MnemoMemoryService(path="mem.json"))
+    from inspeximus.integrations.google_adk import InspeximusMemoryService
+    runner = Runner(agent=agent, app_name="app", session_service=..., memory_service=InspeximusMemoryService(path="mem.json"))
 
 Two honest extras over the built-in service:
-  - Current-truth retrieval: `search_memory` goes through mnemo's `recall()`, which hides SUPERSEDED values,
+  - Current-truth retrieval: `search_memory` goes through inspeximus's `recall()`, which hides SUPERSEDED values,
     so a corrected fact (written with a supersession `key`) is not returned. Plain event text is stored
     append-only like any service; the filtering bites when you key your facts.
   - Right-to-erasure per user: `forget_subject_for(app_name, user_id, request_id=…)` hard-deletes a user's
@@ -33,8 +33,8 @@ def _subject(app_name: str, user_id: str) -> str:
     return f"adk::{app_name}::{user_id}"
 
 
-class MnemoMemoryService(BaseMemoryService):
-    """ADK BaseMemoryService over a mnemo store (persistent, current-truth recall, per-user erasure)."""
+class InspeximusMemoryService(BaseMemoryService):
+    """ADK BaseMemoryService over a inspeximus store (persistent, current-truth recall, per-user erasure)."""
 
     def __init__(self, path: str | None = None, store: Any = None, k: int = 10, extractor=None):
         if store is None:
@@ -82,7 +82,7 @@ class MnemoMemoryService(BaseMemoryService):
                 break
         return resp
 
-    # ── governance bonus (mnemo-specific) ──
+    # ── governance bonus (inspeximus-specific) ──
     def forget_subject_for(self, app_name: str, user_id: str, request_id: str | None = None) -> dict:
         """Right-to-erasure for one ADK user: hard-delete their memories across sessions and leave a signed,
         content-free deletion tombstone (verify_writes stays intact). Needs receipts enabled on the store for

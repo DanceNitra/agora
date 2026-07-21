@@ -2,7 +2,7 @@
 
 Tests icophy's cross-framework hypothesis (DeepSeek-V3 #1462): "the fastest way to raise the earned-outcome
 coverage of memory is to close retrieval loops — a memory that is retrieved and acted on generates a natural
-outcome signal; unused memory stays dark." Measured on Agora's OWN live store (8 dungeon-agent mnemo files).
+outcome signal; unused memory stays dark." Measured on Agora's OWN live store (8 dungeon-agent inspeximus files).
 
 FINDING (verified 2nd-way + per-store; the AUDIT is the point):
  1. STRUCTURAL, not correlational: 0 of the earned-outcome (good>0) records were NEVER retrieved — earned

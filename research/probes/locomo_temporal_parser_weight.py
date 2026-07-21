@@ -5,7 +5,7 @@ parser (SUTime/duckling) is the reliable signal." So for the TIME dimension the 
 the RULE PARSER's resolution confidence: an unambiguous expression ("in July 2023") resolves to a clean
 window and is trustworthy; a vague one ("recently", "last year" with no anchor) does not, so the filter
 should back off there. This is the temporal analog of the alias-strength result (locomo_alias_strength_
-weight.py) and, like it, tests through mnemo's SHIPPED soft `prefer` filter (recall(prefer=, prefer_trust=)).
+weight.py) and, like it, tests through inspeximus's SHIPPED soft `prefer` filter (recall(prefer=, prefer_trust=)).
 
 Scope: the 243 answerable LoCoMo questions that CONTAIN a filterable temporal expression (15% of 1531;
 the rest have no time constraint to filter on). A lightweight SUTime-lite regex parser resolves the
@@ -13,7 +13,7 @@ expression against the conversation's session dates to a target (year and/or mon
   month+year -> 1.0 ; year-only -> 0.7 ; month-only -> 0.6 ; vague relative / weekday -> 0.2 ; none -> 0.
 Turns carry meta {year, month} from their session date (dia_id 'D<session>:<turn>').
 
-Four arms, all via mnemo.recall(mode='hybrid'):
+Four arms, all via inspeximus.recall(mode='hybrid'):
   no_filter    : recall(q)
   hard_where   : recall(q, where=<resolved window>)                 -- hard filter (deletes non-matching)
   soft_flat    : recall(q, prefer=<window>, prefer_trust=0.9)       -- always-trust the extraction (flat)

@@ -1,7 +1,7 @@
-"""Membership-cost layer for mnemo corroboration — make a *corroborating source* costly or impossible to
+"""Membership-cost layer for inspeximus corroboration — make a *corroborating source* costly or impossible to
 mint, so "two distinct sources" stops being free.
 
-mnemo's corroboration bar (`_is_corroborated` / `_distinct_sources`) counts DISTINCT canonical source
+inspeximus's corroboration bar (`_is_corroborated` / `_distinct_sources`) counts DISTINCT canonical source
 strings. `_canon_source` collapses host-variants of ONE origin, but two genuinely different strings
 ('evil-a.example', 'evil-b.example') count as two independent sources for FREE. That is the Sybil hole
 Douceur (2002) formalized: with no cost to mint an identity, corroboration ("N independent sources agree")
@@ -9,16 +9,16 @@ is forgeable by one actor wearing N hats. No downstream integrity/IFC/low-water-
 they all rest on the same forgeable independence.
 
 This module makes identity SCARCE. A `Membership` decides whether a source identifier counts as an
-independent, costly-to-mint identity; mnemo's gate counts a source toward corroboration only if it is
+independent, costly-to-mint identity; inspeximus's gate counts a source toward corroboration only if it is
 `admits()`-ed. Four backends, each a different Sybil-resistance mechanism from the literature:
 
-  OpenMembership  — the current mnemo behavior: any string counts (free). The baseline / the hole.
+  OpenMembership  — the current inspeximus behavior: any string counts (free). The baseline / the hole.
   Registrar       — a certifying authority: the canon must sit in a trusted allowlist (Douceur's
                     "trusted agency certifies identities" — the one path he proves defeats Sybil).
   Attestation     — an unforgeable credential: the source presents a signature over its identity that
                     verifies against an ISSUER key it does not control (Myers&Liskov DLM authority root).
                     Zero-dep crypto stand-in = HMAC-SHA256 (symmetric: models "the issuer signed this";
-                    swap in Ed25519 for a real asymmetric deployment — see mnemo agent-receipts).
+                    swap in Ed25519 for a real asymmetric deployment — see inspeximus agent-receipts).
   ProofOfWork     — a resource cost: the source presents a hashcash proof of `bits` difficulty binding its
                     identity. Minting K identities costs ~K * 2**bits hashes. Real, permissionless, but a
                     SYMMETRIC tax (honest writers pay it too) that a resourced attacker simply pays.
@@ -28,14 +28,14 @@ independent, costly-to-mint identity; mnemo's gate counts a source toward corrob
                     decaying-standing idea, made real. This is the only backend with a non-by-construction
                     frontier: deterrence holds iff expected forfeiture (detect_prob * stake) >= damage.
 
-Zero-dependency (hashlib/hmac from the stdlib). Deterministic. MIT. Dogfood-first (mnemo's own gate).
+Zero-dependency (hashlib/hmac from the stdlib). Deterministic. MIT. Dogfood-first (inspeximus's own gate).
 Roots: Douceur 2002 (Sybil), Myers&Liskov DLM POPL 1997, Biba 1977, CaMeL 2503.18813; framing/staked
 standing credited to jacksonxly (r/LangChain)."""
 import hashlib
 import hmac
 import re
 
-# Reuse mnemo's own entity-resolution so a Membership sees the SAME canonical key the corroboration gate does
+# Reuse inspeximus's own entity-resolution so a Membership sees the SAME canonical key the corroboration gate does
 # (host-variant sybils already collapsed before we even ask whether the identity is costly).
 try:
     from inspeximus import Inspeximus
@@ -80,7 +80,7 @@ class Membership:
 
 
 class OpenMembership(Membership):
-    """The current mnemo behavior and the baseline: any source string counts. Free to mint => Sybil-open."""
+    """The current inspeximus behavior and the baseline: any source string counts. Free to mint => Sybil-open."""
     kind = "open"
 
     def admits(self, canon, cred=None):
@@ -198,11 +198,11 @@ class StakedStanding(Membership):
 
 
 def count_independent_sources(links, by_id, membership: Membership | None = None) -> int:
-    """mnemo's `_distinct_sources`, gated by a membership-cost backend: count DISTINCT canonical sources
+    """inspeximus's `_distinct_sources`, gated by a membership-cost backend: count DISTINCT canonical sources
     among corroborating links, but only those the membership `admits()`. A source-less link still counts as
     its own id (no regression) UNLESS a membership is set that requires a credential — then an un-credentialed
     source does not count (that is the whole point: identity must be paid for). Backward-compatible: with
-    membership=None or OpenMembership, this equals mnemo's current count exactly."""
+    membership=None or OpenMembership, this equals inspeximus's current count exactly."""
     m = membership or OpenMembership()
     keys = set()
     for lid in (links or []):
@@ -219,7 +219,7 @@ def count_independent_sources(links, by_id, membership: Membership | None = None
 
 
 def is_corroborated(rec: dict, by_id: dict, membership: Membership | None = None) -> bool:
-    """mnemo's `_is_corroborated` with the membership-gated source count. Earned net-positive credit and an
+    """inspeximus's `_is_corroborated` with the membership-gated source count. Earned net-positive credit and an
     already-graduated 'semantic' memory still short-circuit (those are not source-count claims); the >=2
     distinct-source path is what the membership hardens."""
     good = float(rec.get("good", 0) or 0)

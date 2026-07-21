@@ -13,7 +13,7 @@ TRANSIENT — the attacker must keep re-pumping (~weekly) to stay effective, whe
 corrupting for months off a SINGLE attack. Cloud-free, lexical recall (the scaled run showed lexical==semantic).
 """
 import sys, os, tempfile, json, time, random
-sys.path.insert(0, "mnemo")
+sys.path.insert(0, "inspeximus")
 from inspeximus import Inspeximus
 DAY = 86400.0
 rng = random.Random(20260625)
@@ -60,5 +60,5 @@ for label, P in INTERVALS.items():
     new = sum(frac_corrupt(s, "episodic", P) for s in scen) / len(scen)
     res[label] = {"OLD_guard_corrupt_fraction": round(old, 3), "NEW_guard_corrupt_fraction": round(new, 3)}
     print(f"{label:14s}  OLD={old:.3f}  NEW={new:.3f}", flush=True)
-json.dump(res, open(os.path.join(os.path.dirname(os.path.abspath(__file__)), "mnemo_poison_continuous_result.json"), "w"), indent=1)
-print("saved mnemo_poison_continuous_result.json")
+json.dump(res, open(os.path.join(os.path.dirname(os.path.abspath(__file__)), "inspeximus_poison_continuous_result.json"), "w"), indent=1)
+print("saved inspeximus_poison_continuous_result.json")

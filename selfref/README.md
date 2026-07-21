@@ -4,7 +4,7 @@
 > data, an agent whose memory is its past generations, a RAG store indexing the system's prior
 > answers, a recommender fed by the clicks it shaped. Strange loops fail in two measured ways.
 > `selfref` measures both at *your* settings. One file, zero dependencies.
-> A sibling of [mnemo](../mnemo) / [ragfresh](../ragfresh) / [nullcheck](../nullcheck).
+> A sibling of [inspeximus](../inspeximus) / [ragfresh](../ragfresh) / [nullcheck](../nullcheck).
 
 ## The two failure modes (and the two knobs that fix them)
 

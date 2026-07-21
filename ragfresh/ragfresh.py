@@ -1,5 +1,5 @@
 """
-ragfresh — a freshness & decay layer for RAG / vector stores.  (a mnemo sibling)
+ragfresh — a freshness & decay layer for RAG / vector stores.  (a inspeximus sibling)
 
 The problem (measured in the wild, 2026): production RAG stores rot and bloat. Teams report vector-DB
 cost climbing $50 -> $380 -> $2,847/mo on the SAME data, "orphaned" vectors lingering for days after
@@ -19,7 +19,7 @@ Two API surfaces:
     triage(items, ...)            -> per-item decisions + a savings report (the batch "dream" pass)
     retrieval_weight(item, ...)   -> a 0..1 multiplier to fold into your similarity score at query time
 
-Design rules (each one measured, not assumed — same provenance as mnemo):
+Design rules (each one measured, not assumed — same provenance as inspeximus):
   • Value-ranked, capacity-aware — rank what to KEEP by value, not by recency (recency-only retains
     ~62% of the value-only optimum, ~56% when content-age is independent of value -> ~random). With no
     value labels a DECAYED hit-count is a strong proxy (~91%): don't discard frequency, AGE it

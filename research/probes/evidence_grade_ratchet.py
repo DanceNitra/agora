@@ -1,4 +1,4 @@
-"""The evidence-grade RATCHET (mnemo 0.6.0): a claim's grade + novelty can only move UP on an EXTERNAL
+"""The evidence-grade RATCHET (inspeximus 0.6.0): a claim's grade + novelty can only move UP on an EXTERNAL
 event, never self-assigned. This probe shows (1) the ratchet holds (a generator can't upgrade its own
 claim), (2) forge-cost (climbing costs distinct identities -- Douceur), and (3) replay: run our own 32
 audited storefront claims through the ratchet and reproduce the audit's headline (0/32 'novel') for free.
@@ -7,12 +7,12 @@ Operationalizes the flagship "Labels failed more than measurements": novelty was
 self-assigned at write time; here it becomes a status a claim EARNS from an external empty prior-art
 search -- so the over-labeling that audit found cannot happen in the first place.
 
-Run: python research/probes/evidence_grade_ratchet.py    MIT. Part of Agora / mnemo.
+Run: python research/probes/evidence_grade_ratchet.py    MIT. Part of Agora / inspeximus.
 """
 import importlib.util, os
 
-_core = os.path.join(os.path.dirname(__file__), "..", "mnemo.py")
-_spec = importlib.util.spec_from_file_location("mnemo_core", _core)
+_core = os.path.join(os.path.dirname(__file__), "..", "inspeximus.py")
+_spec = importlib.util.spec_from_file_location("inspeximus_core", _core)
 _m = importlib.util.module_from_spec(_spec); _spec.loader.exec_module(_m)
 Inspeximus = _m.Inspeximus
 
@@ -111,4 +111,4 @@ if __name__ == "__main__":
     test_ratchet_property()
     test_forge_cost()
     test_replay_32()
-    print("mnemo", _m.__version__, "-- evidence-grade ratchet green.")
+    print("inspeximus", _m.__version__, "-- evidence-grade ratchet green.")

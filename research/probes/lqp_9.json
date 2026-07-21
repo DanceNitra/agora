@@ -1,7 +1,7 @@
 [
  {
   "qid": "c5q111",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 4,
   "question": "What do Andrew and Buddy like doing on walks?",
   "gold": "Checking out new hiking trails",
@@ -9,7 +9,7 @@
  },
  {
   "qid": "c5q112",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 4,
   "question": "What cuisine did Andrew recently try at a new spot in town?",
   "gold": "sushi",
@@ -17,7 +17,7 @@
  },
  {
   "qid": "c5q113",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 4,
   "question": "Which type of sushi did Audrey suggest trying first to someone new to sushi?",
   "gold": "California or salmon roll",
@@ -25,7 +25,7 @@
  },
  {
   "qid": "c5q114",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 4,
   "question": "What type of date is Andrew going on Sunday?",
   "gold": "picnic date",
@@ -33,7 +33,7 @@
  },
  {
   "qid": "c5q115",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 4,
   "question": "What did Andrew and Audrey plan to do on the Saturday after October 28, 2023?",
   "gold": "Go hiking",
@@ -41,7 +41,7 @@
  },
  {
   "qid": "c5q116",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 4,
   "question": "What aspect of autumn does Andrew find beautiful?",
   "gold": "The autumn colors",
@@ -49,7 +49,7 @@
  },
  {
   "qid": "c5q117",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 4,
   "question": "What did Audrey do in November 2023 to better take care of her dogs?",
   "gold": "Joined a dog owners group",
@@ -57,7 +57,7 @@
  },
  {
   "qid": "c5q118",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 4,
   "question": "How often does Audrey meet up with other dog owners for tips and playdates?",
   "gold": "Once a week",
@@ -65,7 +65,7 @@
  },
  {
   "qid": "c5q119",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 4,
   "question": "What did Audrey share to show ways to keep dogs active in the city?",
   "gold": "photography of a basket full of stuffed animals",
@@ -73,7 +73,7 @@
  },
  {
   "qid": "c5q120",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 4,
   "question": "What type of activities does Audrey suggest for mental stimulation of the dogs?",
   "gold": "puzzles, training, hide-and-seek",
@@ -81,7 +81,7 @@
  },
  {
   "qid": "c5q121",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 4,
   "question": "What is Andrew planning to do with Scout, Toby, and Buddy?",
   "gold": "Take them to a nearby park",
@@ -89,7 +89,7 @@
  },
  {
   "qid": "c5q122",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 4,
   "question": "What did Andrew get for Scout to create a safe and fun space for them?",
   "gold": "essentials like a bed, toys, and puppy pads",
@@ -97,7 +97,7 @@
  },
  {
   "qid": "c6q0",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 3,
   "question": "What are John's suspected health problems?",
   "gold": "Obesity",
@@ -105,7 +105,7 @@
  },
  {
   "qid": "c6q1",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 2,
   "question": "Which recreational activity was James pursuing on March 16, 2022?",
   "gold": "bowling",
@@ -113,7 +113,7 @@
  },
  {
   "qid": "c6q2",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 1,
   "question": "Which places or events have John and James planned to meet at?",
   "gold": "VR Club, McGee's, baseball game",
@@ -121,7 +121,7 @@
  },
  {
   "qid": "c6q3",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 1,
   "question": "Do both James and John have pets?",
   "gold": "No",
@@ -129,7 +129,7 @@
  },
  {
   "qid": "c6q4",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 2,
   "question": "When did John resume playing drums in his adulthood?",
   "gold": "February 2022",
@@ -137,7 +137,7 @@
  },
  {
   "qid": "c6q5",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 1,
   "question": "What are John and James' favorite games?",
   "gold": "John's favorite game is CS:GO, and James's is Apex Legends.",
@@ -145,7 +145,7 @@
  },
  {
   "qid": "c6q6",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 3,
   "question": "Does James live in Connecticut?",
   "gold": "Likely yes",
@@ -153,7 +153,7 @@
  },
  {
   "qid": "c6q7",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 3,
   "question": "In which state is the shelter from which James adopted the puppy?",
   "gold": "Connecticut.",
@@ -161,7 +161,7 @@
  },
  {
   "qid": "c6q8",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 1,
   "question": "How many pets does James have?",
   "gold": "Three dogs.",
@@ -169,7 +169,7 @@
  },
  {
   "qid": "c6q9",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 1,
   "question": "What are the names of James's dogs?",
   "gold": "Ned, Daisy, Max",
@@ -177,7 +177,7 @@
  },
  {
   "qid": "c6q10",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 2,
   "question": "When did James adopt Ned?",
   "gold": "first week of April 2022",
@@ -185,7 +185,7 @@
  },
  {
   "qid": "c6q11",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 2,
   "question": "How was John feeling on April 10, 2022?",
   "gold": "seeking solitude",
@@ -193,7 +193,7 @@
  },
  {
   "qid": "c6q12",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 3,
   "question": "Did James have a girlfriend during April 2022?",
   "gold": "Presumably not",
@@ -201,7 +201,7 @@
  },
  {
   "qid": "c6q13",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 2,
   "question": "When did James visit Italy?",
   "gold": "In 2021",
@@ -209,7 +209,7 @@
  },
  {
   "qid": "c6q14",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 2,
   "question": "When did James buy himself a new adventure book?",
   "gold": "April 26, 2022",
@@ -217,7 +217,7 @@
  },
  {
   "qid": "c6q15",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 2,
   "question": "When did James start playing Civilization VI?",
   "gold": "March 2022",
@@ -225,7 +225,7 @@
  },
  {
   "qid": "c6q16",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 3,
   "question": "What is the game with different colored cards that was John talking about with James?",
   "gold": "UNO",
@@ -233,7 +233,7 @@
  },
  {
   "qid": "c6q17",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 3,
   "question": "What is the board game where you have to find the imposter that John mentions to James?",
   "gold": "Mafia",
@@ -241,7 +241,7 @@
  },
  {
   "qid": "c6q18",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 1,
   "question": "Which books has John recommended to James?",
   "gold": "The Name of the Wind, Stormlight Archive, Kingkiller Chronicles, Expanse",
@@ -249,7 +249,7 @@
  },
  {
   "qid": "c6q19",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 3,
   "question": "Was James feeling lonely before meeting Samantha?",
   "gold": "Most likely yes, because he mentioned that the only creatures that gave him joy are dogs and he was actively trying to date.",
@@ -257,7 +257,7 @@
  },
  {
   "qid": "c6q20",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 1,
   "question": "How many charity tournaments has John organized till date?",
   "gold": "two",
@@ -265,7 +265,7 @@
  },
  {
   "qid": "c6q21",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 2,
   "question": "When did John first organize a charity tournament with his friends?",
   "gold": "May 7, 2022",
@@ -273,7 +273,7 @@
  },
  {
   "qid": "c6q22",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 1,
   "question": "Who or which organizations have been the beneficiaries of John's charity tournaments?",
   "gold": "animal shelter, homeless, children's hospital",
@@ -281,7 +281,7 @@
  },
  {
   "qid": "c6q23",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 2,
   "question": "When will John start his new job?",
   "gold": "In July, 2022",
@@ -289,7 +289,7 @@
  },
  {
   "qid": "c6q24",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 1,
   "question": "What kind of games has James tried to develop?",
   "gold": "football simulator, virtual world inspired by Witcher 3",
@@ -297,7 +297,7 @@
  },
  {
   "qid": "c6q25",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 3,
   "question": "Are John and James fans of the same football team?",
   "gold": "No, James is a Liverpool fan and John is a Manchester City fan.",
@@ -305,7 +305,7 @@
  },
  {
   "qid": "c6q26",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 1,
   "question": "Which countries has James visited?",
   "gold": "Italy, Mexico, Turkey, Canada, Greenland",
@@ -313,7 +313,7 @@
  },
  {
   "qid": "c6q27",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 1,
   "question": "What kind of classes has James joined?",
   "gold": "game design course, cooking classes",
@@ -321,7 +321,7 @@
  },
  {
   "qid": "c6q28",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 2,
   "question": "When did James volunteer at an organization?",
   "gold": "May 2022",
@@ -329,7 +329,7 @@
  },
  {
   "qid": "c6q29",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 2,
   "question": "When did James depart for his trip to Canada?",
   "gold": "July 11, 2022",
@@ -337,7 +337,7 @@
  },
  {
   "qid": "c6q30",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 3,
   "question": "Which country did James book tickets for in July 2022?",
   "gold": "Canada",
@@ -345,7 +345,7 @@
  },
  {
   "qid": "c6q31",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 2,
   "question": "How many days did James plan to spend on his trip in Canada?",
   "gold": "19 days",
@@ -353,7 +353,7 @@
  },
  {
   "qid": "c6q32",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 2,
   "question": "Where was James at on July 12, 2022?",
   "gold": "Toronto, Canada",
@@ -361,7 +361,7 @@
  },
  {
   "qid": "c6q33",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 3,
   "question": "Did John and James study together?",
   "gold": "Yes",
@@ -369,7 +369,7 @@
  },
  {
   "qid": "c6q34",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 1,
   "question": "Which countries did James visit in July 2022?",
   "gold": "Canada, Greenland",
@@ -377,7 +377,7 @@
  },
  {
   "qid": "c6q35",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 3,
   "question": "What additional country did James visit during his trip to Canada?",
   "gold": "Greenland",
@@ -385,7 +385,7 @@
  },
  {
   "qid": "c6q36",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 3,
   "question": "Who is Jill?",
   "gold": "Most likely John's partner.",
@@ -393,7 +393,7 @@
  },
  {
   "qid": "c6q37",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 2,
   "question": "When did John spend time with his sister and dogs?",
   "gold": "July 21, 2022",
@@ -401,7 +401,7 @@
  },
  {
   "qid": "c6q38",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 1,
   "question": "What happened to John's job situation in 2022?",
   "gold": "quit his IT Job, secured his dream job, aspires to become an eSports competition organizer",
@@ -409,7 +409,7 @@
  },
  {
   "qid": "c6q39",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 2,
   "question": "When did John start his job in IT?",
   "gold": "2019",
@@ -417,7 +417,7 @@
  },
  {
   "qid": "c6q40",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 1,
   "question": "What kind of tricks do James's pets know?",
   "gold": "swimming, catching frisbees, balancing on a skateboard, sit, stay, paw, and rollover",
@@ -425,7 +425,7 @@
  },
  {
   "qid": "c6q41",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 2,
   "question": "When did James meet Samantha?",
   "gold": "August 9, 2022",
@@ -433,7 +433,7 @@
  },
  {
   "qid": "c6q42",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 2,
   "question": "When did James take his 3 dogs to the beach?",
   "gold": "August 9, 2022",
@@ -441,7 +441,7 @@
  },
  {
   "qid": "c6q43",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 2,
   "question": "When did John plan his next meeting with his siblings?",
   "gold": "In September, 2022",
@@ -449,7 +449,7 @@
  },
  {
   "qid": "c6q44",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 3,
   "question": "Why didn't John want to go to Starbucks?",
   "gold": "Possibly because he likes to drink beer on his days off.",
@@ -457,7 +457,7 @@
  },
  {
   "qid": "c6q45",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 1,
   "question": "What kind of beer does McGee's bar serve?",
   "gold": "Stout, lager",
@@ -465,7 +465,7 @@
  },
  {
   "qid": "c6q46",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 2,
   "question": "When did John and James meet at McGee's bar?",
   "gold": "August 27, 2022",
@@ -473,7 +473,7 @@
  },
  {
   "qid": "c6q47",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 2,
   "question": "When did James ask Samantha to be his girlfriend?",
   "gold": "September 3, 2022",
@@ -481,7 +481,7 @@
  },
  {
   "qid": "c6q48",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 2,
   "question": "When did James, Samantha and John go to the baseball game together?",
   "gold": "September 11, 2022",
@@ -489,7 +489,7 @@
  },
  {
   "qid": "c6q49",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 1,
   "question": "What gaming equipments did John buy or refurbish?",
   "gold": "Sennheiser headphones, Logitech mouse, gaming desk",
@@ -497,7 +497,7 @@
  },
  {
   "qid": "c6q50",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 2,
   "question": "When did James start taking cooking classes?",
   "gold": "September 2, 2022",
@@ -505,7 +505,7 @@
  },
  {
   "qid": "c6q51",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 1,
   "question": "Which new games did John start play during the course of the conversation with James?",
   "gold": "AC Valhalla, Witcher 3, FIFA 23, Dungeons of the Dragons, futuristic dystopian game",
@@ -513,7 +513,7 @@
  },
  {
   "qid": "c6q52",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 2,
   "question": "When did John start working on his 2D Adventure mobile game?",
   "gold": "approximately summer of 2022",
@@ -521,7 +521,7 @@
  },
  {
   "qid": "c6q53",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 2,
   "question": "How long did it take for James to complete his Witcher-inspired game?",
   "gold": "six months",
@@ -529,7 +529,7 @@
  },
  {
   "qid": "c6q54",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 1,
   "question": "What kind of programming-related events has John hosted?",
   "gold": "online programming competition, programming seminar",
@@ -537,7 +537,7 @@
  },
  {
   "qid": "c6q55",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 2,
   "question": "When did John and his programming friends host an online programming competition?",
   "gold": "Last week before 13 October 2022.",
@@ -545,7 +545,7 @@
  },
  {
   "qid": "c6q56",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 1,
   "question": "Which of James's family members have visited him in the last year?",
   "gold": "mother, sister",
@@ -553,7 +553,7 @@
  },
  {
   "qid": "c6q57",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 2,
   "question": "When did James' mother and her friend visit him?",
   "gold": "October 19, 2022",
@@ -561,7 +561,7 @@
  },
  {
   "qid": "c6q58",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 2,
   "question": "When did James try Cyberpunk 2077 game?",
   "gold": "October 20, 2022",
@@ -569,7 +569,7 @@
  },
  {
   "qid": "c6q59",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 2,
   "question": "When did John and his gaming friends organize the charity tournament?",
   "gold": "On the night of October 30 to 31, 2022",
@@ -577,7 +577,7 @@
  },
  {
   "qid": "c6q60",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 1,
   "question": "What games has John played with his friends at charity tournaments?",
   "gold": "CS:GO, Fortnite, Overwatch and Apex Legends",
@@ -585,7 +585,7 @@
  },
  {
   "qid": "c6q61",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 2,
   "question": "What was James' big moment with Samantha in October 2023?",
   "gold": "They decided to live together and rented an apartment not far from McGee's bar.",
@@ -593,7 +593,7 @@
  },
  {
   "qid": "c6q62",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 2,
   "question": "How long did James and Samantha date for before deciding to move in together?",
   "gold": "nearly three months",
@@ -601,7 +601,7 @@
  },
  {
   "qid": "c6q63",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 2,
   "question": "When did James, his family and his dogs start on a road trip together?",
   "gold": "November 4, 2022",
@@ -609,7 +609,7 @@
  },
  {
   "qid": "c6q64",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 2,
   "question": "How long did John practice chess for before winning the chess tournament?",
   "gold": "nearly four months",
@@ -617,7 +617,7 @@
  },
  {
   "qid": "c6q65",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 2,
   "question": "When did James and his family visit Mark and Josh?",
   "gold": "November 7, 2022",
@@ -625,7 +625,7 @@
  },
  {
   "qid": "c6q66",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 2,
   "question": "When did John work with a game developer on a project?",
   "gold": "November 5-6, 2022",
@@ -633,7 +633,7 @@
  },
  {
   "qid": "c6q67",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 4,
   "question": "What programming languages has James worked with?",
   "gold": "Python and C++",
@@ -641,7 +641,7 @@
  },
  {
   "qid": "c6q68",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 4,
   "question": "What type of mobile application does James plan to build with John?",
   "gold": "An app for dog walking and pet care",
@@ -649,7 +649,7 @@
  },
  {
   "qid": "c6q69",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 4,
   "question": "How does James plan to make his dog-sitting app unique?",
   "gold": "By allowing users to customize their pup's preferences/needs",
@@ -657,7 +657,7 @@
  },
  {
   "qid": "c6q70",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 4,
   "question": "What has John mostly found with the metal detector so far?",
   "gold": "bottle caps",
@@ -665,7 +665,7 @@
  },
  {
   "qid": "c6q71",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 4,
   "question": "What did James offer to do for John regarding pets?",
   "gold": "help find the perfect pet",
@@ -673,7 +673,7 @@
  },
  {
   "qid": "c6q72",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 4,
   "question": "What instrument is John learning to play as of 27 March, 2022?",
   "gold": "Drums",
@@ -681,7 +681,7 @@
  },
  {
   "qid": "c6q73",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 4,
   "question": "How long has John been playing the drums as of 27 March, 2022?",
   "gold": "One month",
@@ -689,7 +689,7 @@
  },
  {
   "qid": "c6q74",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 4,
   "question": "What game did John play in an intense tournament at the gaming convention in March 2022?",
   "gold": "CS:GO",
@@ -697,7 +697,7 @@
  },
  {
   "qid": "c6q75",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 4,
   "question": "What game was James playing in the online gaming tournament in April 2022?",
   "gold": "Apex Legends",
@@ -705,7 +705,7 @@
  },
  {
   "qid": "c6q76",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 4,
   "question": "How does James communicate with his gaming team?",
   "gold": "voice chat",
@@ -713,7 +713,7 @@
  },
  {
   "qid": "c6q77",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 4,
   "question": "What advice did James receive from the famous players he met at the tournament?",
   "gold": "never put your ego above team success",
@@ -721,7 +721,7 @@
  },
  {
   "qid": "c6q78",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 4,
   "question": "What did James adopt in April 2022?",
   "gold": "a pup",
@@ -729,7 +729,7 @@
  },
  {
   "qid": "c6q79",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 4,
   "question": "What is the name of the pup that was adopted by James?",
   "gold": "Ned",
@@ -737,7 +737,7 @@
  },
  {
   "qid": "c6q80",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 4,
   "question": "Why did James embody the appearance of the game character from the woman he saw during a walk?",
   "gold": "He found her appearance and eyes amazing.",
@@ -745,7 +745,7 @@
  },
  {
   "qid": "c6q81",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 4,
   "question": "What inspired James to create the game character in the virtual world?",
   "gold": "Appearance of a woman he saw during a walk",
@@ -753,7 +753,7 @@
  },
  {
   "qid": "c6q82",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 4,
   "question": "Which country did James visit in 2021?",
   "gold": "Italy",
@@ -761,7 +761,7 @@
  },
  {
   "qid": "c6q83",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 4,
   "question": "What impresses John about Japan?",
   "gold": "Technologically advanced megacities and tasty street food",
@@ -769,7 +769,7 @@
  },
  {
   "qid": "c6q84",
-  "system": "mnemo",
+  "system": "inspeximus",
   "category": 4,
   "question": "What kind of assignment was giving John a hard time at work?",
   "gold": "Coding assignment",

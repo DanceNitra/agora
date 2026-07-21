@@ -15,7 +15,7 @@ Pre-committed falsifier: if two-tier does NOT match-or-beat max(lru, lfu, value)
 architecture cannot give a universal eviction policy and regime-switching is mandatory.
 
 Runnable, cloud-free, pure-numpy:  python eviction_twotier.py
-MIT-licensed. Part of Agora / mnemo (https://github.com/DanceNitra/agora/tree/main/mnemo).
+MIT-licensed. Part of Agora / inspeximus (https://github.com/DanceNitra/agora/tree/main/inspeximus).
 """
 import numpy as np
 

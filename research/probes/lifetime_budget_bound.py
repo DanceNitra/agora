@@ -1,4 +1,4 @@
-"""Severe test for mnemo 0.4.9 `spend_irreversible` — the lifetime irreversible-influence budget.
+"""Severe test for inspeximus 0.4.9 `spend_irreversible` — the lifetime irreversible-influence budget.
 
 The hole it closes (jacksonxly, r/RAG thread): monitor()'s CUSUM reference `k` is a tolerated RATE. An attacker
 who holds its per-source bad-rate strictly below `k` drifts the statistic to 0 -> is PROVABLY undetectable -> nets

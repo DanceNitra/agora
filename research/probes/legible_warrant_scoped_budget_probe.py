@@ -24,7 +24,7 @@ Both are OPT-IN: with_warrant=False and provenance_lo=None reproduce byte-identi
 Run:  python legible_warrant_scoped_budget_probe.py
 """
 import os, sys
-sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..", "mnemo")))
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..", "inspeximus")))
 from inspeximus import Inspeximus
 
 

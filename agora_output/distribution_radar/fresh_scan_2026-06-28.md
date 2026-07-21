@@ -13,8 +13,8 @@ Sources firing: HF papers (5/q), Crossref (5/q), Tavily (5/q), Brave (4-5/q), Re
 ## B. Crucible-fit leads (FAILED is a live possibility — engage our RAG-dead post)
 - **"When Context Overwhelms: Long-Context vs Retrieval-Based QA Under Noise"** (Crossref 2026, doi 10.33774/coe-2026-tvxc6) — directly on our turf.
 - **"Does RAG Really Perform Bad For Long-Context Processing?"** (HF 2502.11444) — CONTRARIAN to our context-rot finding; replication/comparison = Crucible gold.
-- **SuperLocalMemory: Bayesian Trust Defense Against Memory Poisoning** (SSRN 6273819) — direct neighbor to mnemo's corroboration gate; cite or replicate.
-- **Temporal Dynamics of Memory Poisoning** (IEEE Access 2026) + **A-MemGuard** (2510.02373) + **AgentSys** (2602.07398) — the poisoning-defense conversation mnemo lives in.
+- **SuperLocalMemory: Bayesian Trust Defense Against Memory Poisoning** (SSRN 6273819) — direct neighbor to inspeximus's corroboration gate; cite or replicate.
+- **Temporal Dynamics of Memory Poisoning** (IEEE Access 2026) + **A-MemGuard** (2510.02373) + **AgentSys** (2602.07398) — the poisoning-defense conversation inspeximus lives in.
 
 ## C. FLAGSHIP prior-art check — "conservatism is normative under meta-uncertainty"
 **RESULT: the abstract decision-theory framing is TEXTBOOK — re-derivation trap.**
@@ -29,6 +29,6 @@ Sources firing: HF papers (5/q), Crossref (5/q), Tavily (5/q), Brave (4-5/q), Re
 ### Recommended flagship reframe (original + falsifiable + on real systems)
 Not the theorem (known). Instead the EMPIRICAL question the field is circling but hasn't pinned with a runnable normative test:
 > **"The overconfidence tax": do real frontier agents systematically UNDER-apply conservatism, and how much outcome do they lose by it?**
-Measure, on a real agentic task with a verifiable outcome: (1) each agent's optimal abstain/hedge threshold under its OWN self-estimated success probability (the maxmin-EU-rational policy), (2) the policy the agent actually follows, (3) the utility gap. Falsifier: if agents already hedge at ~the rational threshold (gap ~0), the "overconfidence tax" is folklore. Ties directly to mnemo (corroboration gate = conservatism over an uncertain fact), RAMR's ABSTENTION metric, and the Grounding Meter (confident-wrongness). Lab baseline measurable in-cycle (severe-test rule satisfiable).
+Measure, on a real agentic task with a verifiable outcome: (1) each agent's optimal abstain/hedge threshold under its OWN self-estimated success probability (the maxmin-EU-rational policy), (2) the policy the agent actually follows, (3) the utility gap. Falsifier: if agents already hedge at ~the rational threshold (gap ~0), the "overconfidence tax" is folklore. Ties directly to inspeximus (corroboration gate = conservatism over an uncertain fact), RAMR's ABSTENTION metric, and the Grounding Meter (confident-wrongness). Lab baseline measurable in-cycle (severe-test rule satisfiable).
 
 ## GitHub scout: stale (last scan 2026-06-23). Web scan above is the fresh discovery surface this cycle.

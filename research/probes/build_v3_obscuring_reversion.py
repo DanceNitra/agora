@@ -14,7 +14,7 @@ re-asserted relative to the ledger:
   named_new        -> asserts a genuinely NEW value                  -> reopens_stale = 0
 Revert and keep share the SAME phrasings and differ ONLY by the value token, so no surface cue exists.
 A method must recover the asserted value and compare it to the ledger. This is fair to everyone: a
-genuine structural feature (value identity) passes; a lexical keyword feature cannot; mnemo's
+genuine structural feature (value identity) passes; a lexical keyword feature cannot; inspeximus's
 object-ledger passes by design (it keys on the object, not the phrasing).
 
 Balanced 140 to mirror v2: 60 revert / 60 keep / 20 named_new. New entities/values (memorization-proof).

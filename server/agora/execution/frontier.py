@@ -67,7 +67,7 @@ def _candidate_pool(vault: str):
 def _smart_frontier(vault: str, explore: bool) -> dict | None:
     """INTELLIGENT target selection (owner 2026-07-16): a reasoning-tier CRO picks the SINGLE next research
     direction that moves the whole org forward the most — scoring impact / novelty / buildability /
-    compounding / alignment over a diverse candidate pool, COMPOUNDING on our moat (agent memory, mnemo,
+    compounding / alignment over a diverse candidate pool, COMPOUNDING on our moat (agent memory, inspeximus,
     the Crucible) by default, with a ~30% bold broad-frontier exploration slice. Replaces the hourly
     thin/hole rotation. Reversible: AGORA_SMART_FRONTIER=0 falls back to _rotation_target."""
     from agora.execution.llm_client import call_llm
@@ -78,24 +78,24 @@ def _smart_frontier(vault: str, explore: bool) -> dict | None:
     # MOAT VEIN (owner 2026-07-18): the vault candidate pool is dominated by abstract complexity/network toy
     # gaps that pass the Lab gate but re-derive textbook results (Condorcet, Griffiths) and never touch the
     # product. Seed the pool with the CONCRETE, business-critical agent-memory vein validated by hand this
-    # session — measurable competitor-weakness probes + mnemo-capability questions. Each is a runnable head-to-
+    # session — measurable competitor-weakness probes + inspeximus-capability questions. Each is a runnable head-to-
     # head that builds the #1 product, not an isolated toy fact. In COMPOUND MODE the CRO must PREFER these.
     moat_vein = (
-        "MOAT VEIN — concrete, runnable agent-memory / mnemo product questions (PREFER these in compound mode; "
-        "each competitor weakness is a fair, measurable head-to-head vs mnemo):\n"
+        "MOAT VEIN — concrete, runnable agent-memory / inspeximus product questions (PREFER these in compound mode; "
+        "each competitor weakness is a fair, measurable head-to-head vs inspeximus):\n"
         "- Run-to-run NONDETERMINISM: fraction of subjects whose stored/returned value flips across identical "
-        "re-ingests, for mem0/Zep/Letta/Cognee (LLM on write path) vs mnemo's deterministic core (=0).\n"
+        "re-ingests, for mem0/Zep/Letta/Cognee (LLM on write path) vs inspeximus's deterministic core (=0).\n"
         "- CORRECTION-UNDER-POISON (FAIR contract: raw text for all, each extracts, shared LLM judge): after a "
         "genuine correction, an adversarial re-assertion of the retired value as the newest write — measure "
-        "poison-rejection AND legit-new-value-adoption, mnemo vs mem0.\n"
+        "poison-rejection AND legit-new-value-adoption, inspeximus vs mem0.\n"
         "- WRITE-COMPLETION across LLM backends: silent fact-drop rate of mem0/Letta extraction on "
-        "Qwen/Ollama/Mistral vs mnemo's backend-agnostic write.\n"
-        "- INGEST COST/LATENCY per write: LLM calls + tokens + ms for Graphiti/Cognee (cognify) vs mnemo ~0.\n"
-        "- MEMORY-POISONING ASR reduction of mnemo's warrant-gate on an ASB/MINJA-style attack vs an "
+        "Qwen/Ollama/Mistral vs inspeximus's backend-agnostic write.\n"
+        "- INGEST COST/LATENCY per write: LLM calls + tokens + ms for Graphiti/Cognee (cognify) vs inspeximus ~0.\n"
+        "- MEMORY-POISONING ASR reduction of inspeximus's warrant-gate on an ASB/MINJA-style attack vs an "
         "undefended vector store, fair identical stream.\n"
         "- REPRODUCE a published agent-memory benchmark (LoCoMo / LongMemEval / MemoryAgentBench) with a "
         "runnable fixed-seed harness that shows WHERE each system loses, honestly scoped.\n"
-        "- mnemo SEMANTIC-KEYING: does embedding-resolved keys let deterministic supersession survive "
+        "- inspeximus SEMANTIC-KEYING: does embedding-resolved keys let deterministic supersession survive "
         "paraphrased conflicts where exact-key match fails? measure vs a plain-extractor baseline.\n")
     pool = (moat_vein
             + "\n\nTHIN vault domains (underdeveloped — deprioritize abstract complexity/network toys here):\n"
@@ -107,12 +107,12 @@ def _smart_frontier(vault: str, explore: bool) -> dict | None:
             "could open a whole new field for us, even if it is not yet on our edge."
             if explore else
             "COMPOUND MODE: pick a MOAT-VEIN question (a concrete, runnable competitor-weakness head-to-head or "
-            "an mnemo-capability measurement from the MOAT VEIN list) — one that directly builds the mnemo #1 "
+            "an inspeximus-capability measurement from the MOAT VEIN list) — one that directly builds the inspeximus #1 "
             "product and earns credibility/income. STRONGLY prefer the MOAT VEIN over abstract vault toy-gaps; "
             "only pick a vault domain if it is genuinely more product-critical than every moat-vein item.")
     sys = (
         "You are the Chief Research Officer of Agora, an autonomous research organization. Our MOAT is "
-        "agent memory, the mnemo open-source memory library, and the Crucible replication ledger; our "
+        "agent memory, the inspeximus open-source memory library, and the Crucible replication ledger; our "
         "frontier is the Science of Better Thinking and the Future of Work & Society. Choose the SINGLE "
         "best NEXT research direction to move the whole organization forward the most — think exponential "
         "leverage, not one isolated fact. Judge candidates on IMPACT (would answering it matter 10x?), "

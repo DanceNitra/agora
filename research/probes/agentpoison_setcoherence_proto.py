@@ -1,5 +1,5 @@
 """
-Prototype (NOT yet in mnemo core): does a RETRIEVAL-SET-COHERENCE signal discriminate the poison from
+Prototype (NOT yet in inspeximus core): does a RETRIEVAL-SET-COHERENCE signal discriminate the poison from
 legit top hits? The first defense (stored-memory isolation outlier) was FALSIFIED: the attacker pads the
 poison with generic text so it isn't a clean embedding isolate (measured nn-support 0.16 vs 2-sigma floor
 0.09 -> not flagged).
@@ -9,7 +9,7 @@ are topically COHERENT (near each other); a trigger-injected poison is retrieved
 TRIGGER with the query, but it is topically UNRELATED to the query's real intent -- so within the top-k
 retrieved SET it is the odd one out (low mean cosine to the other hits). We measure whether "rank-1 hit's
 mean cosine to ranks 2..k" separates poisoned (triggered) queries from benign ones. If it does, that's a
-per-query, attacker-uncontrolled defense signal worth adding to mnemo.
+per-query, attacker-uncontrolled defense signal worth adding to inspeximus.
 """
 import json
 import os

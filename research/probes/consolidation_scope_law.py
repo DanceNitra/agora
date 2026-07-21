@@ -15,7 +15,7 @@ centered nomic embeddings the "coupling holds" leg did NOT reproduce cleanly (ti
 robust error WORSE, not better) -- so we report the coupling as a property of the unbounded-magnitude
 simulations, not a universal law across regimes.
 
-Run: python research/probes/consolidation_scope_law.py    MIT. Part of Agora / mnemo.
+Run: python research/probes/consolidation_scope_law.py    MIT. Part of Agora / inspeximus.
 """
 from collections import deque
 import numpy as np
@@ -174,4 +174,4 @@ if __name__ == "__main__":
     case_bounded_scope()
     print("SCOPE LAW: a corroboration gate Pareto-helps IFF observation magnitude is unbounded; for bounded")
     print("embedding recall use a tuned decay. Frontier = Huber/Hampel breakdown point; two-channel = CLS")
-    print("(McClelland 1995); latency floor = change-point detection delay (Page/Lorden/Moustakides). mnemo probe.")
+    print("(McClelland 1995); latency floor = change-point detection delay (Page/Lorden/Moustakides). inspeximus probe.")

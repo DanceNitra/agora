@@ -1,7 +1,7 @@
 # VHS tape — render the second_brain demo to a GIF for the README.
 #   1. install vhs once:  go install github.com/charmbracelet/vhs@latest   (or: brew install vhs)
 #   2. from the repo root: vhs examples/demo.tape   ->   examples/demo.gif
-#   3. reference it in mnemo/README.md:  ![second_brain demo](../examples/demo.gif)
+#   3. reference it in inspeximus/README.md:  ![second_brain demo](../examples/demo.gif)
 
 Output examples/demo.gif
 

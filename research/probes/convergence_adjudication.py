@@ -14,7 +14,7 @@ CORRELATED its failure mode is with the first:
   check's errors. A second text-agreement check (correlated failure) adds ~0; an orthogonal check (recompute /
   ground-truth / a different modality) adds the most -- and the marginal gain scales with 1 - failure_corr.
 
-This is the measured basis for mnemo's grade ladder (corroboration -> `corroborated`, never `verified`) and for
+This is the measured basis for inspeximus's grade ladder (corroboration -> `corroborated`, never `verified`) and for
 `settled` requiring >=2 DISTINCT lenses: distinctness is not decoration, it is the whole mechanism -- correlated
 lenses are one lens counted twice.
 
@@ -22,7 +22,7 @@ FALSIFIER: if a highly-correlated second adjudicator (failure_corr ~ 1) detected
 as an orthogonal one (failure_corr ~ 0), "different failure mode" would be doing no work and the thesis is wrong.
 
 Deterministic (fixed seed; needs numpy):  python convergence_adjudication.py
-MIT-licensed. Part of Agora / mnemo (https://github.com/DanceNitra/agora/tree/main/mnemo).
+MIT-licensed. Part of Agora / inspeximus (https://github.com/DanceNitra/agora/tree/main/inspeximus).
 """
 import math
 import numpy as np
@@ -91,7 +91,7 @@ def main():
     print("A second adjudicator recovers detection in proportion to how ORTHOGONAL its failure mode is: an")
     print("orthogonal check (recompute / ground-truth) catches nearly all of it; a correlated second text check")
     print("adds almost nothing. => 'different failure mode' is the whole mechanism; distinct lenses aren't decoration.")
-    print("This is why mnemo carries convergence as `corroborated` (never `verified`) and reserves `verified`/")
+    print("This is why inspeximus carries convergence as `corroborated` (never `verified`) and reserves `verified`/")
     print("`settled` for out-of-band reproduction + >=2 DISTINCT lenses. Falsifier: a correlated 2nd check would")
     print("have matched the orthogonal one -- it does not.")
 

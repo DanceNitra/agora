@@ -484,7 +484,7 @@ def log_round(topic: dict, contributors: list, passed: list, contribution: dict 
 
 def run_group_seminar(npcs: list[dict], vault: str) -> dict:
     """ALL agents work ONE topic together. Each agent brings the relevant KNOWLEDGE its memory
-    surfaces (MNEMO recall) — not decorative chatter — and only if it genuinely has something;
+    surfaces (INSPEXIMUS recall) — not decorative chatter — and only if it genuinely has something;
     the rest pass (honestly logged). ONE rapporteur then synthesizes the team's combined knowledge
     into a single grounded Contribution. One synthesis LLM call per round (fast on a shared GPU,
     and 'work not chat'). Sync (network + LLM); call via to_thread. Returns a round summary."""
@@ -500,14 +500,14 @@ def run_group_seminar(npcs: list[dict], vault: str) -> dict:
 
 
 def _run_group_seminar_inner(npcs: list[dict], vault: str) -> dict:
-    from agora.execution import mnemo_bridge
+    from agora.execution import inspeximus_bridge
 
     topic = pick_topic(vault)
     contributors, passed, brought = [], [], []
     for n in npcs[:8]:
         name = n.get("npc_name") or n.get("npc_id", "agent")
         role = n.get("role") or name
-        can, ctx = mnemo_bridge.agent_can_contribute(role, topic.get("headline", ""))
+        can, ctx = inspeximus_bridge.agent_can_contribute(role, topic.get("headline", ""))
         if can and ctx:
             contributors.append({"id": n.get("npc_id"), "name": name})
             brought.append(f"{name} brings: {ctx[:200]}")
@@ -519,7 +519,7 @@ def _run_group_seminar_inner(npcs: list[dict], vault: str) -> dict:
         transcript = "\n".join(brought)
         contribution = extract_contribution(topic, transcript, [c["name"] for c in contributors])
         if contribution:
-            mnemo_bridge.remember_contribution(contribution["claim"], contribution.get("evidence", ""),
+            inspeximus_bridge.remember_contribution(contribution["claim"], contribution.get("evidence", ""),
                                                tags=[topic.get("headline", "")[:40]])
     log_round(topic, [c["name"] for c in contributors], passed, contribution)
     _record_attempt(topic.get("id"))      # count the round so a saturated topic eventually retires

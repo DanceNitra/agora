@@ -7,7 +7,7 @@ witnesses no longer corroborates). HONEST LIMIT (textbook adaptive-attack / comm
 Carlini-Wagner 2017, Knight-Leveson 1986, PoisonedRAG 2402.07867): it RAISES the forger's bar to on-topic
 witnesses, it does not close the residual. Default OFF -> zero behavior change.
 
-Four cases, real mnemo (`_corroborated`), no embedder (lexical coherence):
+Four cases, real inspeximus (`_corroborated`), no embedder (lexical coherence):
   1. genuine recovery  (on-topic witnesses, 2 real sources)  -> corroborated OFF and ON  (no false-withhold)
   2. LAZY forgery      (off-topic filler, 2 forged sources)  -> corroborated OFF, BLOCKED ON  (the win)
   3. SOPHISTICATED forgery (on-topic witnesses, 2 forged src) -> corroborated OFF and ON  (the honest limit)
@@ -15,7 +15,7 @@ Four cases, real mnemo (`_corroborated`), no embedder (lexical coherence):
 FALSIFIER: if the gate blocked the genuine recovery (case 1 ON) or failed to block the lazy forgery (case 2 ON),
 the feature would be either too costly or useless. Neither holds.
 
-Deterministic, zero-dependency. MIT. Part of Agora / mnemo.
+Deterministic, zero-dependency. MIT. Part of Agora / inspeximus.
 Run:  python research/probes/coherence_gate_demo.py
 """
 import os
@@ -34,7 +34,7 @@ OFF_TOPIC = ["the weather in helsinki was mild and grey all week",
 
 def _make(coherence_gate, witness_texts, sources):
     """Build a store: a claim P with 2 corroborating links (given witness texts + source docs). Return whether
-    the real mnemo corroboration check (with the given coherence_gate) counts P as corroborated."""
+    the real inspeximus corroboration check (with the given coherence_gate) counts P as corroborated."""
     m = Inspeximus(os.path.join(tempfile.mkdtemp(), "c.jsonl"))
     m.coherence_gate = coherence_gate
     P = m.remember(CLAIM, source={"doc": "origin"})
@@ -45,7 +45,7 @@ def _make(coherence_gate, witness_texts, sources):
 
 
 def main():
-    print("=== mnemo coherence_gate (opt-in): does a corroborating witness have to be ABOUT the claim? ===\n")
+    print("=== inspeximus coherence_gate (opt-in): does a corroborating witness have to be ABOUT the claim? ===\n")
     thr = 0.18
     cases = [
         ("genuine recovery (on-topic, 2 real sources)", ON_TOPIC, ["indep-lab", "indep-forum"]),

@@ -486,7 +486,7 @@ async def match_and_run(theme: str, requester: str = "") -> dict:
     # the dungeon's hypothesis-induction (/brain/hypothesis-inputs), and the brain's scientist severe-test.
     # Gating any one of them leaves the others free, which is exactly what we measured: after gating the
     # quest pool, the next Lab runs were still amygdala-salience and heavy-tail-reward themes. This is the
-    # ONE choke point every path goes through, so the board question ("does this advance mnemo?") belongs
+    # ONE choke point every path goes through, so the board question ("does this advance inspeximus?") belongs
     # here. Soft + self-healing: an off-board theme is refused WITHOUT burning the LLM matcher or a Lab
     # slot, and is recorded in the gatekeeper ledger so the upstream generators stop re-seeding it.
     # Bypasses: no board priorities set, an explicit human/API requester, or AGORA_LAB_BOARD_GATE=0.

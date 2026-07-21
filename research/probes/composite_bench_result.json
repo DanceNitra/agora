@@ -2,7 +2,7 @@
  "n": 40,
  "pass_threshold": 0.75,
  "rows": {
-  "mnemo": {
+  "inspeximus": {
    "fidelity": 1.0,
    "poison-resistance": 1.0,
    "verifiable-forgetting": 1.0,

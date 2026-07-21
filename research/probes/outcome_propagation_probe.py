@@ -24,7 +24,7 @@ RUN: python research/probes/outcome_propagation_probe.py
 """
 import os, sys, tempfile, json
 sys.stdout.reconfigure(errors="replace")
-sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..", "mnemo")))
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..", "inspeximus")))
 from inspeximus import Inspeximus
 
 def _store():

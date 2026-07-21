@@ -67,7 +67,7 @@ def main():
           f"worst stall {worst_stall:.0f}s)")
     if verdict != "OK":
         print("  -> agent loop not progressing healthily despite HTTP 200. Likely GPU/brain contention "
-              "(check the mnemo-vec backfill + brain endpoint latency); py-spy the process for the real frame.")
+              "(check the inspeximus-vec backfill + brain endpoint latency); py-spy the process for the real frame.")
     sys.exit(code)
 
 

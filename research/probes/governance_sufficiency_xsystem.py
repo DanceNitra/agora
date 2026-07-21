@@ -1,6 +1,6 @@
 """governance_sufficiency_xsystem.py — cross-system governance-evidence sufficiency (Observatory, pillar 1).
 
-Extends governance_sufficiency_probe (mnemo self-score, now 8/8) into a leaderboard: score mem0 and Graphiti on
+Extends governance_sufficiency_probe (inspeximus self-score, now 8/8) into a leaderboard: score mem0 and Graphiti on
 the SAME 8-question DEMM-style rubric, against the erasure evidence THEIR OWN API produces after a
 right-to-erasure delete. Fair framing (same as the integrity-bench revert cell): a low score is a CAPABILITY
 gap — mem0/Graphiti are memory stores, not tamper-evident audit logs — NOT "bad". We run every system to
@@ -12,9 +12,9 @@ The 8 questions (can an INDEPENDENT auditor reconstruct, from ONLY the erasure e
   (drops detectable)  5 AUTHORITY (authenticated principal)  6 BASIS (decision reason)  7 ANCHORABILITY
   (verifiable without trusting the operator)  8 SCOPE-HONESTY (states what it does NOT certify).
 
-RUN:  python research/probes/governance_sufficiency_xsystem.py            # mnemo + mem0
+RUN:  python research/probes/governance_sufficiency_xsystem.py            # inspeximus + mem0
       python research/probes/governance_sufficiency_xsystem.py --graphiti # + graphiti (needs neo4j up)
-Part of Agora / mnemo (MIT).
+Part of Agora / inspeximus (MIT).
 """
 import os
 import sys
@@ -43,8 +43,8 @@ CHEAP_MODEL = "deepseek-v4-flash"
 Q_LABELS = ["WHAT", "WHEN", "TAMPER-EVIDENCE", "COMPLETENESS", "AUTHORITY", "BASIS", "ANCHORABILITY", "SCOPE-HONESTY"]
 
 
-# ── mnemo: run the full authenticated lifecycle; score from governance_report + tombstones ──
-def score_mnemo():
+# ── inspeximus: run the full authenticated lifecycle; score from governance_report + tombstones ──
+def score_inspeximus():
     fd, p = tempfile.mkstemp(suffix=".json", prefix="govx_"); os.close(fd)
     for suf in ("", ".receipts.json"):
         try: os.remove(p + suf)
@@ -138,8 +138,8 @@ def main():
     print("=== CROSS-SYSTEM GOVERNANCE-EVIDENCE SUFFICIENCY (Observatory pillar 1) ===")
     print("8-question rubric over each system's REAL erasure evidence. Low score = capability gap, not 'bad'.\n")
 
-    results["mnemo 0.7.21"] = score_mnemo()
-    print("scored mnemo (deterministic).", flush=True)
+    results["inspeximus 0.7.21"] = score_inspeximus()
+    print("scored inspeximus (deterministic).", flush=True)
     try:
         m0, ev0 = score_mem0(); results["mem0 2.0.11"] = m0
         print("scored mem0 (Ollama cloud). evidence keys:", list(ev0.keys()), flush=True)
@@ -161,9 +161,9 @@ def main():
     json.dump({k: {"scores": v, "total": sum(v)} for k, v in results.items()},
               open(out, "w", encoding="utf-8"), indent=1)
     print("\nsaved", os.path.basename(out))
-    print("\nFINDING: only mnemo emits an erasure receipt an independent auditor can fully reconstruct + verify")
+    print("\nFINDING: only inspeximus emits an erasure receipt an independent auditor can fully reconstruct + verify")
     print("without trusting the operator. mem0/Graphiti are memory stores, not tamper-evident audit logs — the")
-    print("gap is CAPABILITY (like the revert cell), and mnemo self-fixed its own 5/8 to 8/8 before publishing.")
+    print("gap is CAPABILITY (like the revert cell), and inspeximus self-fixed its own 5/8 to 8/8 before publishing.")
 
 
 if __name__ == "__main__":

@@ -5,7 +5,7 @@ build-backend = "setuptools.build_meta"
 [project]
 name = "agora-memory-toolkit"
 version = "0.7.0"
-description = "AI-system reliability tools from an autonomous research OS. The product: aiaudit (one PASS/WARN/FAIL reliability report for an AI/agent system). Plus the eight checks it runs: mnemo (agent memory), ragfresh (RAG freshness), nullcheck (is-this-number-real), selfref (model-collapse/lock), quitkit (when-to-quit), idcheck (causal identification), goodhart (reward-hacking/metric-gaming), herdcheck (multi-agent herding)."
+description = "AI-system reliability tools from an autonomous research OS. The product: aiaudit (one PASS/WARN/FAIL reliability report for an AI/agent system). Plus the eight checks it runs: inspeximus (agent memory), ragfresh (RAG freshness), nullcheck (is-this-number-real), selfref (model-collapse/lock), quitkit (when-to-quit), idcheck (causal identification), goodhart (reward-hacking/metric-gaming), herdcheck (multi-agent herding)."
 readme = "TOOLKIT.md"
 requires-python = ">=3.10"
 authors = [{ name = "Agora" }]
@@ -13,13 +13,13 @@ keywords = ["llm", "agent-memory", "rag", "vector-store", "second-brain", "ab-te
 
 # The cores are dependency-free. Extras only enable the optional surfaces:
 [project.optional-dependencies]
-mcp = ["mcp[cli]"]              # the MCP servers (mnemo-mcp, second-brain-mcp, ragfresh-mcp)
+mcp = ["mcp[cli]"]              # the MCP servers (inspeximus-mcp, second-brain-mcp, ragfresh-mcp)
 pgvector = ["psycopg[binary]"] # ragfresh PgVectorAdapter
 pinecone = ["pinecone"]        # ragfresh PineconeAdapter
 
 [project.scripts]
-mnemo-mcp = "mnemo.mnemo_mcp:main"
-second-brain-mcp = "mnemo.second_brain_mcp:main"
+inspeximus-mcp = "inspeximus.mcp:main"
+second-brain-mcp = "inspeximus.second_brain_mcp:main"
 ragfresh-mcp = "ragfresh.ragfresh_mcp:main"
 selfref-mcp = "selfref.selfref_mcp:main"
 quitkit-mcp = "quitkit.quitkit_mcp:main"
@@ -29,4 +29,4 @@ herdcheck-mcp = "herdcheck.herdcheck_mcp:main"
 aiaudit-mcp = "aiaudit.aiaudit_mcp:main"
 
 [tool.setuptools]
-packages = ["mnemo", "ragfresh", "nullcheck", "selfref", "quitkit", "idcheck", "goodhart", "herdcheck", "aiaudit"]
+packages = ["inspeximus", "ragfresh", "nullcheck", "selfref", "quitkit", "idcheck", "goodhart", "herdcheck", "aiaudit"]

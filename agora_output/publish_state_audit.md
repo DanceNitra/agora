@@ -10,12 +10,12 @@
 - Rebuilt from the grown Crucible (51→64): **60 → 73 claims** (43 REPRODUCED / 15 FAILED / 15 NOT_COMPUTABLE; 64 replication + 9 ai-claim).
 - **HF** Danchi17/folklore-index ✓ v0.1.2. **PyPI** folklore-index 0.1.2 ✓ (`pip install folklore-index`). **Zenodo** new version **v0.1.2 → DOI 10.5281/zenodo.20996247** (concept 10.5281/zenodo.20771544 preserved).
 
-## mnemo
-- v0.2.1 in github.com/DanceNitra/agora /mnemo — supersession key + entity-resolution sybil gate + forget(). Shipped 2026-06-28.
+## inspeximus
+- v0.2.1 in github.com/DanceNitra/agora /inspeximus — supersession key + entity-resolution sybil gate + forget(). Shipped 2026-06-28.
 
 ## WEBSITE (dancenitra.github.io/agora) — synced 2026-06-28
 - Landing RAMR section: **nine metrics shown** (added COMPRESSION-vs-RAW, verified −0.55 @k=50 n=20) + **Folklore Meter / RAMR↔LS interop** line. ✓
-- Landing Mnemosyne: mnemo v0.2 ✓. Crucible: 64 entries (42/7/15) ✓. RAMR DOI badge = concept DOI (always latest) ✓.
+- Landing Inspeximus: inspeximus v0.2 ✓. Crucible: 64 entries (42/7/15) ✓. RAMR DOI badge = concept DOI (always latest) ✓.
 
 ## STATUS: all external mirrors (HF + Zenodo + PyPI) now MATCH the repos. Nothing stale.
 Note: RAMR_HF_CARD.md lives under gitignored agora_output/benchmark/ (build input, on HF only — not in the public repo, by design).

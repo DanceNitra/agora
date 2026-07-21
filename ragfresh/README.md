@@ -3,7 +3,7 @@
 > Your vector store rots. `ragfresh` decides what to **keep, down-weight, refresh, or prune** —
 > ranked by **value**, not recency — so answers stay current and the bill stops climbing.
 > (Value-aware eviction is the [GreedyDual-Size-Frequency](https://www.usenix.org/legacy/publications/library/proceedings/usits97/full_papers/cao/cao.pdf) cache-eviction family applied to vector stores; freshness is the query-time + lifecycle layer on top.)
-> One file, zero dependencies. A sibling of [mnemo](../mnemo).
+> One file, zero dependencies. A sibling of [inspeximus](../inspeximus).
 
 ## The problem (measured in the wild, 2026)
 Production RAG isn't "scrape once, embed, forget." Teams report:

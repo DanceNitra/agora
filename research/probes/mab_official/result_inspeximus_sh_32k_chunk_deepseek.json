@@ -1,5 +1,5 @@
 {
- "condition": "mnemo",
+ "condition": "inspeximus",
  "sample": "sh_32k",
  "ingest": "chunk",
  "llm": "deepseek",

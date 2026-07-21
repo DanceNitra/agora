@@ -1,4 +1,4 @@
-"""revert_instream_real_probe.py — jacksonxly's in-stream revert, measured on the REAL mnemo 0.7.12.
+"""revert_instream_real_probe.py — jacksonxly's in-stream revert, measured on the REAL inspeximus 0.7.12.
 
 The simulation (revert_instream_sim_probe.py) showed the construction is coherent; this measures the actual
 implementation (revert_intent / restore_intent / submit_revert) against the same five claims — including the
@@ -8,11 +8,11 @@ instead of beside it?
 Deterministic, no LLM, no network. RUN: python research/probes/revert_instream_real_probe.py
 """
 import sys, pathlib, json
-sys.path.insert(0, str(pathlib.Path(__file__).resolve().parents[2] / "mnemo_pypi"))
+sys.path.insert(0, str(pathlib.Path(__file__).resolve().parents[2] / "inspeximus_pypi"))
 from inspeximus import Inspeximus, new_receipt_keypair, sign_revert, __version__
 
 sk, pk = new_receipt_keypair()
-R = {"mnemo_version": __version__}
+R = {"inspeximus_version": __version__}
 
 
 def fresh(depth=1, keys=("region",)):

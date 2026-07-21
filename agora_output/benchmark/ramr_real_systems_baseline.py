@@ -4,8 +4,8 @@ baseline' gap without fragile end-to-end installs (several are hosted/paid or ne
 We reproduce the actual retrieval primitives faithfully:
   KEYWORD (SQLite FTS5 / BM25)  -- claude-brain's keyword search mode; the engine grep/FTS file-memory tools use.
   VECTOR  (dense cosine over a real sentence-embedding model, local nomic-embed-text) -- claude-brain's semantic
-           mode, mem0's vector recall, mnemo's relevance ranking.
-  mnemo NONE (relevance-only) and mnemo OUTCOME (was-it-right reranking) for reference.
+           mode, mem0's vector recall, inspeximus's relevance ranking.
+  inspeximus NONE (relevance-only) and inspeximus OUTCOME (was-it-right reranking) for reference.
 Task: M topics, each 1 correct + D distractor memories that are NEAR-IDENTICAL (share all query tokens, differ
 only in the stored value) -- the realistic 'which of several similar remembered facts is the right one' case.
 Top-1 retrieval accuracy. Same fixed pool + cached embeddings as ramr_external_baseline (seed 99). Cloud-free.
@@ -44,7 +44,7 @@ def cos_top1(qv, mvs):
 
 
 if __name__ == "__main__":
-    print(f"compile OK - RAMR REAL-SYSTEM retrieval-engine baseline (FTS5/BM25 keyword + dense vector vs mnemo; "
+    print(f"compile OK - RAMR REAL-SYSTEM retrieval-engine baseline (FTS5/BM25 keyword + dense vector vs inspeximus; "
           f"sets={N_SEEDS})", flush=True)
     load_cache()
     pool = oro.build_pool()
@@ -56,7 +56,7 @@ if __name__ == "__main__":
         for t in texts:
             oro.embed(t)
         json.dump(oro._emb_cache, open(EMB_CACHE, "w"))
-    acc = {D: {"keyword_fts5": [], "vector_nomic": [], "mnemo_none": [], "mnemo_outcome": []} for D in D_LEVELS}
+    acc = {D: {"keyword_fts5": [], "vector_nomic": [], "inspeximus_none": [], "inspeximus_outcome": []} for D in D_LEVELS}
     for si in range(N_SEEDS):
         rs = np.random.default_rng(300 + si)
         for D in D_LEVELS:
@@ -71,22 +71,22 @@ if __name__ == "__main__":
                     vec += 1
             acc[D]["keyword_fts5"].append(kw / oro.M_TOPICS)
             acc[D]["vector_nomic"].append(vec / oro.M_TOPICS)
-            acc[D]["mnemo_none"].append(oro.run_arm(pool, D, correct_idx, "none", seed=si * 100 + D * 7)[-1])
-            acc[D]["mnemo_outcome"].append(oro.run_arm(pool, D, correct_idx, "outcome", seed=si * 100 + D * 7 + 31)[-1])
+            acc[D]["inspeximus_none"].append(oro.run_arm(pool, D, correct_idx, "none", seed=si * 100 + D * 7)[-1])
+            acc[D]["inspeximus_outcome"].append(oro.run_arm(pool, D, correct_idx, "outcome", seed=si * 100 + D * 7 + 31)[-1])
         print(f"  set {si} done", flush=True)
 
     print(f"\n  === REAL-SYSTEM RETRIEVAL ENGINES on near-duplicate disambiguation (top-1 acc, n={N_SEEDS}) ===", flush=True)
-    print(f"  D (chance)  | KEYWORD FTS5/BM25 | VECTOR (nomic) | mnemo-NONE | mnemo-OUTCOME", flush=True)
+    print(f"  D (chance)  | KEYWORD FTS5/BM25 | VECTOR (nomic) | inspeximus-NONE | inspeximus-OUTCOME", flush=True)
     for D in D_LEVELS:
         a = {k: float(np.mean(v)) for k, v in acc[D].items()}
         print(f"   {D} ({1/(1+D):.2f})   |      {a['keyword_fts5']:.3f}       |    {a['vector_nomic']:.3f}     |   "
-              f"{a['mnemo_none']:.3f}    |   {a['mnemo_outcome']:.3f}", flush=True)
+              f"{a['inspeximus_none']:.3f}    |   {a['inspeximus_outcome']:.3f}", flush=True)
     Dh = D_LEVELS[-1]; ch = 1 / (1 + Dh)
     kw_h = float(np.mean(acc[Dh]["keyword_fts5"])); vec_h = float(np.mean(acc[Dh]["vector_nomic"]))
-    out_h = float(np.mean(acc[Dh]["mnemo_outcome"]))
+    out_h = float(np.mean(acc[Dh]["inspeximus_outcome"]))
     # CI of outcome vs the BEST real-system engine at hardest D
     best_rs = np.maximum(np.array(acc[Dh]["keyword_fts5"]), np.array(acc[Dh]["vector_nomic"]))
-    d = np.array(acc[Dh]["mnemo_outcome"]) - best_rs
+    d = np.array(acc[Dh]["inspeximus_outcome"]) - best_rs
     rng = np.random.default_rng(7); bs = [d[rng.integers(0, len(d), len(d))].mean() for _ in range(5000)]
     lo, hi = np.percentile(bs, [2.5, 97.5])
     print(f"\n  === VERDICT ===", flush=True)

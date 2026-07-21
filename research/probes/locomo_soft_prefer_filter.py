@@ -1,4 +1,4 @@
-"""Validate mnemo's SHIPPED soft `prefer` filter on LoCoMo — end-to-end through mnemo.recall(), not a
+"""Validate inspeximus's SHIPPED soft `prefer` filter on LoCoMo — end-to-end through inspeximus.recall(), not a
 standalone reimplementation. Confirms the alias-strength-weighted soft filter beats BOTH no filter and a
 hard `where` filter under imperfect (ambiguous) metadata extraction.
 
@@ -9,9 +9,9 @@ speaker to filter on + an alias-strength trust:
     (reliable; not error-injected).
   - AMBIGUOUS: no name in the question -> the extractor GUESSES (majority speaker of the top-10 plain
     recall) -> alias_strength = 0.0 (unreliable; this is where extraction actually fails).
-Three retrievals, all via mnemo.recall:
+Three retrievals, all via inspeximus.recall:
   - no_filter:  recall(q)                              (plain hybrid)
-  - hard_where: recall(q, where={"speaker": chosen})   (mnemo's existing HARD filter)
+  - hard_where: recall(q, where={"speaker": chosen})   (inspeximus's existing HARD filter)
   - soft_prefer: recall(q, prefer={"speaker": chosen}, prefer_trust=alias_strength)  (the NEW feature)
 Metric: recall@20 overall + on the harm subset (chosen speaker is wrong). Value/last_access are snapshotted
 and restored around each method so recall's reinforcement can't bias the comparison. Reuses the warm cache.
@@ -124,7 +124,7 @@ def boot(dl, it=10000, seed=17):
     r = random.Random(seed); n = len(dl); s = [mean([dl[r.randrange(n)] for _ in range(n)]) for _ in range(it)]
     s.sort(); return s[int(.025*it)], s[int(.975*it)]
 base = per_conv["no_filter"]
-print(f"\n=== mnemo SHIPPED soft `prefer` filter on LoCoMo (recall@{K}, n_q={n_q}, 10 conv) ===")
+print(f"\n=== inspeximus SHIPPED soft `prefer` filter on LoCoMo (recall@{K}, n_q={n_q}, 10 conv) ===")
 print(f"exact-name firings {fex} (wrong {wex}, {100*wex//max(fex,1)}%); ambiguous-guess firings {fam} "
       f"(wrong {wam}, {100*wam//max(fam,1)}%); harm subset n={len(harm['no_filter'])}")
 print(f"\n{'method':<14}{'recall@20':>10}{'delta':>9}{'wins':>7}")

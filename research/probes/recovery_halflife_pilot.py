@@ -4,7 +4,7 @@ QUESTION (the one the intake-gate red-team left standing): correcting a corrupte
 the same as reversing its downstream harm. After a poisoned fact launders itself into k derived write-back
 entries (a mechanism prior art already establishes — Xiong et al. "Experience-Following", arXiv 2505.16067;
 "State Contamination", arXiv 2605.16746), does a VALUE-ONLY correction (what a bag-of-embeddings store can
-do) leave residual harm that grows with k, while a LINEAGE-AWARE revert (mnemo's provenance erasure) removes
+do) leave residual harm that grows with k, while a LINEAGE-AWARE revert (inspeximus's provenance erasure) removes
 it regardless of k? This is the recovery half-life, and nobody measures it — prior art measures corruption
 -> harm one-way, never harm-reversal-after-correction.
 
@@ -13,7 +13,7 @@ WHY THIS ESCAPES THE RED-TEAM (see storm + stress-claim, 2026-07-12):
     correction efficacy, not task/retrieval selection (the axis that made the original ARM-1 circular).
   * Not pre-empted: the recovery direction is the empty cell; we STAND ON the laundering prior art, not
     re-derive it.
-  * Ours: forget_subject (provenance-lineage erasure) is a real mnemo differentiator a value store lacks.
+  * Ours: forget_subject (provenance-lineage erasure) is a real inspeximus differentiator a value store lacks.
   * Severe test: if naive_overwrite reverses harm as well as lineage_revert, the lineage infra is
     unnecessary and we PUBLISH THE NULL (our own premise dies). The falsifier can actually fire.
 
@@ -37,13 +37,13 @@ PRE-REGISTERED PARAMETERS (fixed before running; do not tune to the result):
     scenario x query -> Wilson 95% CI.
   * FALSIFIER: if naive_overwrite residual harm ~= lineage_revert (both near 0) across k, the lineage infra
     is unnecessary -> NULL result, published as an honest refutation of the memory-integrity premise
-    (including mnemo's). CONFIRMATION only if naive grows with k while lineage_revert stays ~0.
+    (including inspeximus's). CONFIRMATION only if naive grows with k while lineage_revert stays ~0.
 
 Deterministic (mode='lexical', no embedder, no network). RUN: python research/probes/recovery_halflife_pilot.py
 """
 import sys, pathlib, json, math, io
 sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding="utf-8", errors="replace")
-sys.path.insert(0, str(pathlib.Path(__file__).resolve().parents[2] / "mnemo_pypi"))
+sys.path.insert(0, str(pathlib.Path(__file__).resolve().parents[2] / "inspeximus_pypi"))
 from inspeximus import Inspeximus, __version__
 
 K_SWEEP = [0, 1, 2, 3]
@@ -194,7 +194,7 @@ def wilson(k, n, z=1.96):
 
 
 def build_store(sc, k, method):
-    """Corrupt -> launder to depth k -> correct at time T. Returns the mnemo store post-correction."""
+    """Corrupt -> launder to depth k -> correct at time T. Returns the inspeximus store post-correction."""
     m = Inspeximus(path=None); m.echo_guard = True
     src = sc["key"] + "-root"
     root_id = m.remember(sc["root"].format(v=sc["poison"]), key=sc["key"], object=sc["poison"],
@@ -229,8 +229,8 @@ def build_and_measure(sc, k, method):
 
 
 def run_retrieval():
-    R = {"mnemo_version": __version__, "topk": TOPK, "n_scenarios": len(SCENARIOS), "cells": {}}
-    print(f"recovery-half-life pilot | mnemo {__version__} | {len(SCENARIOS)} scenarios | lexical recall\n")
+    R = {"inspeximus_version": __version__, "topk": TOPK, "n_scenarios": len(SCENARIOS), "cells": {}}
+    print(f"recovery-half-life pilot | inspeximus {__version__} | {len(SCENARIOS)} scenarios | lexical recall\n")
     print(f"{'method':16s} " + "  ".join(f"k={k}" for k in K_SWEEP))
     for method in METHODS:
         row = []

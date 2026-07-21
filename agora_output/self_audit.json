@@ -1,18 +1,18 @@
 {
   "generated_for": "Agora self-audit (toolkit on its own systems)",
-  "mnemo": {
+  "inspeximus": {
     "status": "ok",
-    "source": ".mnemo_brain.json (the brain's live memory)",
+    "source": ".inspeximus_brain.json (the brain's live memory)",
     "memories": 443,
     "active": 443,
     "mean_value": 5.739,
     "linked_fraction": 0.007,
     "contradictions_flagged": 300,
-    "finding": "443 memories running live, 1% interlinked; mnemo is governing the brain's own recall."
+    "finding": "443 memories running live, 1% interlinked; inspeximus is governing the brain's own recall."
   },
   "ragfresh": {
     "status": "ok",
-    "source": ".mnemo_brain.json (our own memory, real timestamps)",
+    "source": ".inspeximus_brain.json (our own memory, real timestamps)",
     "items": 443,
     "decisions": {
       "KEEP": 443

@@ -79,10 +79,10 @@ m7 = Inspeximus(path=p4, embed=embA, persist_vectors=True, embed_id="A")
 for i in range(12):
     m7.remember(f"rec {i}", key=f"b{i}")
 m7._save(force=True)
-os.environ["MNEMO_REALIGN_MAX"] = "5"
+os.environ["INSPEXIMUS_REALIGN_MAX"] = "5"
 calls["n"] = 0
 m8 = Inspeximus(path=p4, embed=embC, persist_vectors=True, embed_id="C")
-check("7 past MNEMO_REALIGN_MAX the guard drops vectors instead of stalling", calls["n"] == 0)
+check("7 past INSPEXIMUS_REALIGN_MAX the guard drops vectors instead of stalling", calls["n"] == 0)
 check("7b dropped vectors degrade to lexical (vec=None), never a stale-space mismatch",
       all(r.get("vec") is None for r in m8.items))
 
@@ -92,7 +92,7 @@ r8 = m8.reembed()
 check("8 reembed() rebuilds the dropped vectors", r8["reembedded"] == 12 and r8["remaining"] == 0)
 m9 = Inspeximus(path=p4, embed=embC, persist_vectors=True, embed_id="C")
 check("8b the rebuilt vectors are persisted", all(r.get("vec") == [0.0, 0.0, 1.0] for r in m9.items))
-os.environ.pop("MNEMO_REALIGN_MAX", None)
+os.environ.pop("INSPEXIMUS_REALIGN_MAX", None)
 
 # 9: a LEXICAL open of a semantic store must be a pure bystander. The Claude Code hooks default to
 # embed=None (GPU-free hot path) while the store may hold vectors from a semantic session:

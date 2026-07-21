@@ -62,10 +62,10 @@ TOPICS = [
     {"q": "multi-hop RAG retrieval agent memory recall", "kw": ["multi-hop", "multihop", "recall", "retriev", "memory", "locomo"],
      "asset": "Crucible: model-in-the-loop multi-hop recall https://dancenitra.github.io/agora/public/posts/multihop-recall-model-in-the-loop.html",
      "hook": "on full LoCoMo (n=276) letting the model emit follow-up bridge queries in the loop ~doubled multi-hop recall at equal budget (0.145->0.297); it's mainstream iterative retrieval (IRCoT/PRISM family) measured cleanly vs a naive flat baseline - not a new method"},
-    # --- 2026-07-15: cross-system forget-verification + mnemo 1.8.0 cross-store erasure ---
+    # --- 2026-07-15: cross-system forget-verification + inspeximus 1.8.0 cross-store erasure ---
     {"q": "vector database delete data still there GDPR erasure agent memory", "kw": ["delete", "erasure", "forget", "right to be forgotten", "gdpr", "vector", "mem0", "soft delete", "ghost vector", "unlearning"],
-     "asset": "Audit report (cross-system forget-verification) https://dancenitra.github.io/agora/public/audit/ + mnemo 1.8.0 (register_erasure_target + hash-chained deletion manifest)",
-     "hook": "measured judge-free across mnemo/mem0/graphiti (n=8): a native delete clears the retrieval surface everywhere, but the erased value survives one layer down - mem0's history API returns it verbatim, qdrant-local files keep the payload until vacuum, and a copy the APP embedded into its own vector index outlives EVERY store's delete (8/8, mnemo included). store-level erasure is necessary, not sufficient; mnemo 1.8.0 wires the fan-out so forget_subject() cascades + returns a manifest that's complete only if every store verified absent, names the leaks otherwise"},
+     "asset": "Audit report (cross-system forget-verification) https://dancenitra.github.io/agora/public/audit/ + inspeximus 1.8.0 (register_erasure_target + hash-chained deletion manifest)",
+     "hook": "measured judge-free across inspeximus/mem0/graphiti (n=8): a native delete clears the retrieval surface everywhere, but the erased value survives one layer down - mem0's history API returns it verbatim, qdrant-local files keep the payload until vacuum, and a copy the APP embedded into its own vector index outlives EVERY store's delete (8/8, inspeximus included). store-level erasure is necessary, not sufficient; inspeximus 1.8.0 wires the fan-out so forget_subject() cascades + returns a manifest that's complete only if every store verified absent, names the leaks otherwise"},
 ]
 
 UA = {"User-Agent": "agora-distribution-radar/0.1"}
