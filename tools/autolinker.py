@@ -47,7 +47,14 @@ MARK = "## Related (AutoLinker)"
 # No \b around the date: in `Archival_Candidate_20260615_...` an underscore IS a word character, so
 # there is no boundary between `_` and `2` and the token would never match.
 _DATE_TOKEN = re.compile(r"[_\-. ]*(20\d{2}[-_.]?\d{2}[-_.]?\d{2}|20\d{2}[-_.]\d{2})(?!\d)[_\-. ]*")
-_FAMILY_MIN = 3
+_FAMILY_MIN = 2      # two same-named dated files already ARE a snapshot family, not a coincidence
+
+
+def _norm_title(t: str) -> str:
+    """Collapse the forms the same note is saved under (`A — B`, `A_—_B`, `A - B`) to one key, so a
+    note never gains a link to another copy of ITSELF. Observed on the Breaktruth newsletters, which
+    exist as a spaced title, an underscored title and a `Bridge_` prefix of the same words."""
+    return re.sub(r"[^a-z0-9]+", " ", t.lower()).strip()
 
 
 def _family_key(stem: str) -> str:
@@ -346,6 +353,7 @@ def main() -> None:
                 break
             note = notes[stem]
             seen = set(note["links"])          # already-linked targets (lowercased)
+            seen_norm = {_norm_title(l) for l in note["links"]}
             new = []
             for s, other in cands:
                 if s < args.apply_threshold:
@@ -354,9 +362,14 @@ def main() -> None:
                     continue                   # never link a real note to bookkeeping
                 ot = notes[other]["title"]
                 key = ot.lower()
-                if key == note["title"].lower() or key in seen:
-                    continue                   # self / duplicate / already linked
+                nk = _norm_title(ot)
+                if key in seen or nk in seen_norm:
+                    continue                   # duplicate / already linked
+                if nk == _norm_title(note["title"]) or nk.startswith(_norm_title(note["title"])) \
+                        or _norm_title(note["title"]).startswith(nk):
+                    continue                   # another copy of this same note
                 seen.add(key)
+                seen_norm.add(nk)
                 new.append(ot)
             if not new:
                 continue
