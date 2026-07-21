@@ -216,6 +216,67 @@ Nothing was written or sent from it. The full red-team and prior-art findings ar
 transcript; the two most useful artefacts to keep are the construction audit pattern and the
 `call()` token-floor guard.
 
+### B4b. THE FINDING OF THE DAY — supersession retires a RECORD, not a VALUE
+
+After the experiment was killed, the owner's instruction was: measure it, verify it three times, and do
+whatever it takes to make mnemo dominate rather than lose. That produced the real result.
+
+**Step 1 — the cross-vendor stale-fact rate, from runs already paid for (zero new cloud calls).** The
+judge had recorded a `stale_value` flag on every probe all along; we had simply been reading accuracy.
+`stale_rate_verify3.py` derives it three independent ways (the pilot's own summary files, a recomputation
+from raw rows, and a per-scenario breakdown) and all three agree:
+
+```
+mnemo    0.2105  n=38      <- tied with mem0, WORSE than a keep-everything store
+mem0     0.2105  n=38
+naive    0.1250  n=40
+session  0.1143  n=35
+none     0.0000  n=29      (trivial: no context, and 5.8% accuracy)
+```
+
+A first attempt at this number gave 0.194 and was wrong: it pooled `pilot_raw_k150` (budget-matched)
+with `pilot_raw_cheap` (the earlier unmatched run), both of which contain a `mnemo` arm. The published
+accuracy table identifies the authoritative file per arm. The three-way check also surfaced an apparent
+0.11 "mismatch" on mem0 that was only a **denominator difference** — `summarize()` grades stale_value
+on `update` scenarios only, while the naive recomputation used every graded probe. State the
+denominator or the number means nothing.
+
+**Step 2 — why.** Across ten scenarios the store holds **33,186 records, 1,728 keyed (5.2%), 108
+superseded (0.33%)**. The correction layer can only suppress what it has keyed, so on 95% of the corpus
+mnemo IS the keep-everything store it ties with.
+
+**Step 3 — the free harness.** `keying_recall.py` measures, with no model involved and ground truth
+taken from the corpus's own `chain_id`/`old_value`/`new_value`:
+
+```
+                    baseline   candidate+fallback   candidate alone
+KEYING RECALL         0.203          0.211              0.034
+CHAIN BINDING         0.083          0.083              0.333   <- 4x better
+SUPERSESSION          0.006          0.024              0.018
+LEAK RATE             0.111          0.111              0.111   <- never moved
+```
+
+`extractor_candidate.py` keys the head noun of a possessed attribute (`my <...> title <...> was X` ->
+`my::title`) and lifted CHAIN BINDING four-fold. **The leak rate did not move at all.**
+
+**Step 4 — the finding.** `Junior Data Analyst` appears in **fifteen records** of one scenario: the user
+states it, the assistant echoes it, a summary repeats it, an HR template quotes it. Supersession retires
+the ONE record that carried a key; the other fourteen stay `active` and lexical recall returns them.
+
+**The defect is not the extractor. Supersession retires a RECORD, not a VALUE.** In structured data
+those are the same thing. In conversational prose one value is smeared across a dozen sentences and
+retiring one of them accomplishes nothing. This explains all four nulls at once, and explains why
+`integrity-conditioned-recall` showed revert 1.0 vs 0.0 — that test used ONE keyed record, the case
+that works.
+
+**The fix is a new mechanism: value-level suppression at READ time.** When the current value for
+`my::title` is `Senior Data Analyst`, recall should filter records containing that key's superseded
+values, keyed or not. Deterministic, no LLM, and it is what the product already claims to do.
+
+**It costs nothing to try.** `keying_recall.py` is the harness, LEAK RATE is the number to drive down,
+and nothing should reach the expensive pilot until it moves there. Memory:
+`supersession-retires-a-record-not-a-value`.
+
 ### B5. The dungeon: three silent failures, all fixed
 
 None of them logged an error. **The common tell is a log line that is identical every cycle.**
