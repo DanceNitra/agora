@@ -14,6 +14,6 @@ Implication for Auto Dream: if the consolidation judge (the model deciding "is t
 
 That also reinforces the state-toggle point upthread: a supersede is a *structural* event (same subject + relation, new value) resolvable by a deterministic key with **no model judgment at all** — exactly the kind of decision you don't want a coin-flip-confident model making by similarity.
 
-Single-file runnable probes for all of this, with raw data so you can re-check or run them on your own models — eviction (two-tier), corroboration/sybil poisoning, supersession, and the confidence-vs-correctness measurement: https://github.com/DanceNitra/agora/tree/main/mnemo/probes
+Single-file runnable probes for all of this, with raw data so you can re-check or run them on your own models — eviction (two-tier), corroboration/sybil poisoning, supersession, and the confidence-vs-correctness measurement: https://github.com/DanceNitra/agora/tree/main/research/probes
 Writeup of the confidence result: https://dancenitra.github.io/agora/public/posts/can-an-llm-trust-its-own-confidence.html
 ---

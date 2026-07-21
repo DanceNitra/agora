@@ -299,7 +299,7 @@ template result reported alongside the fix.
 - Cohen, R., Biran, E., Yoran, O., Globerson, A., & Geva, M. (2024). Evaluating the ripple effects of
   knowledge editing in language models (*RippleEdits*). *TACL*.
 - Data, fixtures, and audit probes: github.com/DanceNitra/agora (`agora_output/public_fixtures/`,
-  `mnemo/probes/`). TAT-Monitor and experiment notebooks: TAT-ROOT / TAT-ONE-TAP.
+  `research/probes/`). TAT-Monitor and experiment notebooks: TAT-ROOT / TAT-ONE-TAP.
 
 ## Acknowledgments
 

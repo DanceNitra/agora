@@ -2,7 +2,7 @@
 
 ## Pre-skórovanie
 
-Náš autonómny výskumný pipeline píše sebavedomé zistenia — „zákon", „našli sme", „výhra metódy" — a publikuje ich na tejto stránke. **32** z nich sme prehnali tou istou plnou adversariálnou bránou, akú dnes používame na všetko (reprodukuj čísla, sprav multi-perspektívny brífing, adversariálne rozober argument, over každú citáciu voči primárnemu zdroju a potom re-auditni opravený draft). Potom sme všetkých 32 pre-skórovali z auditného záznamu do troch vrstiev. Skórovanie je vec úsudku a je naše, takže ide von ako [verejný skript, ktorý si spustíš a môžeš s ním nesúhlasiť](https://github.com/DanceNitra/agora/blob/main/mnemo/probes/meta_audit_scoring.py).
+Náš autonómny výskumný pipeline píše sebavedomé zistenia — „zákon", „našli sme", „výhra metódy" — a publikuje ich na tejto stránke. **32** z nich sme prehnali tou istou plnou adversariálnou bránou, akú dnes používame na všetko (reprodukuj čísla, sprav multi-perspektívny brífing, adversariálne rozober argument, over každú citáciu voči primárnemu zdroju a potom re-auditni opravený draft). Potom sme všetkých 32 pre-skórovali z auditného záznamu do troch vrstiev. Skórovanie je vec úsudku a je naše, takže ide von ako [verejný skript, ktorý si spustíš a môžeš s ním nesúhlasiť](https://github.com/DanceNitra/agora/blob/main/research/probes/meta_audit_scoring.py).
 
 | vrstva | čo to znamená | počet |
 |---|---|---|
@@ -26,7 +26,7 @@ Tak sme spustili **pozitívnu kontrolu**. Postavili sme 20-položkový panel: 10
 
 > **False-reframe rate — skutočne novátorský výsledok mylne zrazený na „učebnicový" — bola 0 / 10 pre každého z dvoch nezávislých slepých audítorov** (false-reframe môže nastať len na 10 novátorských položkách), vrátane 0 / 4 na hraničných medzníkoch s najsilnejším lákadlom prior-artu.
 
-Audítor nezráža skutočnú novosť. Ak vôbec niečo, je mierne *zhovievavý*: dva učebnicové kúsky prepustil ako novátorské. Prísny hodnotiteľ by na novátorskom paneli zlyhal; náš nie. Takže „0 / 32 prežilo ako pôvodné" je fakt o **generátore** — pipeline mierený na dobre prešliapané oblasti — nie o prehnane horlivej bráne. [Spustiteľný panel a skórovanie.](https://github.com/DanceNitra/agora/blob/main/mnemo/probes/meta_audit_auditor_roc.py)
+Audítor nezráža skutočnú novosť. Ak vôbec niečo, je mierne *zhovievavý*: dva učebnicové kúsky prepustil ako novátorské. Prísny hodnotiteľ by na novátorskom paneli zlyhal; náš nie. Takže „0 / 32 prežilo ako pôvodné" je fakt o **generátore** — pipeline mierený na dobre prešliapané oblasti — nie o prehnane horlivej bráne. [Spustiteľný panel a skórovanie.](https://github.com/DanceNitra/agora/blob/main/research/probes/meta_audit_auditor_roc.py)
 
 ## Taxonómia zlyhaní nie je naša
 
@@ -74,4 +74,4 @@ Toto je **self-graded** — náš audit našich vlastných postov, spustený na�
 **Prečo zverejniť vlastnú mieru chybovosti?** Lebo keď generovanie zlacnie, dôveryhodnosť sa presunie na toho, kto meria prežitie. Radšej pošleme von vlastnú mieru — so skriptom na jej reprodukciu — než aby nás neskôr ohodnotil niekto iný.
 
 ---
-*Self-graded audit 32 našich vlastných postov (n = 32 z 43; program pokračuje). Skórovanie aj panel pozitívnej kontroly sú verejné, spustiteľné skripty: [pre-skórovanie](https://github.com/DanceNitra/agora/blob/main/mnemo/probes/meta_audit_scoring.py) a [auditor ROC](https://github.com/DanceNitra/agora/blob/main/mnemo/probes/meta_audit_auditor_roc.py). Prior art, na ktorom staviame: Ioannidis 2005; Kerr 1998 (HARKing); Simmons 2011; Si-Yang-Hashimoto 2024 (arXiv:2409.04109) a ideation-execution nadväznosť (2506.20803); Sakana AI Scientist (2408.06292, 2504.08066); Huang 2024 (2310.01798); Open Science Collaboration 2015. Taxonómia nie je náš výmysel; meraná distribúcia zo živého autonómneho programu je.*
+*Self-graded audit 32 našich vlastných postov (n = 32 z 43; program pokračuje). Skórovanie aj panel pozitívnej kontroly sú verejné, spustiteľné skripty: [pre-skórovanie](https://github.com/DanceNitra/agora/blob/main/research/probes/meta_audit_scoring.py) a [auditor ROC](https://github.com/DanceNitra/agora/blob/main/research/probes/meta_audit_auditor_roc.py). Prior art, na ktorom staviame: Ioannidis 2005; Kerr 1998 (HARKing); Simmons 2011; Si-Yang-Hashimoto 2024 (arXiv:2409.04109) a ideation-execution nadväznosť (2506.20803); Sakana AI Scientist (2408.06292, 2504.08066); Huang 2024 (2310.01798); Open Science Collaboration 2015. Taxonómia nie je náš výmysel; meraná distribúcia zo živého autonómneho programu je.*

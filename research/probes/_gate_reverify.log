@@ -1,0 +1,9 @@
+######## GATE RE-VERIFY (live OpenAI) ########
+===== 1) VERIFIABLE FORGETTING — mnemo vs mem0 on gpt-4o =====
+usage: forget_verification_xsystem.py [-h] [--graphiti]
+                                      [--only {mnemo,mem0,graphiti}]
+forget_verification_xsystem.py: error: unrecognized arguments: --systems mnemo,mem0
+===== 2) FIDELITY (MAB CR) — mem0 on gpt-4o-mini (published native config) =====
+  mem0 40/40  correct=5
+=== mem0: 5/40 = 12.5%  (87s, 0 live-embed fallbacks) ===
+######## GATE RE-VERIFY DONE ########

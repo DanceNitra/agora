@@ -44,7 +44,7 @@ Kľúčový je riadok kontroly: pri rovnakých veľkostiach vzoriek artefakt zmi
 | 30 | **2,60** |
 | 20 | 3,19 |
 
-Každé číslo je znovu-spustiteľné: [`mnemo/probes/nudge_pubbias_artifact.py`](https://github.com/DanceNitra/agora/blob/main/mnemo/probes/nudge_pubbias_artifact.py) (MIT, bez externých dát).
+Každé číslo je znovu-spustiteľné: [`research/probes/nudge_pubbias_artifact.py`](https://github.com/DanceNitra/agora/blob/main/research/probes/nudge_pubbias_artifact.py) (MIT, bez externých dát).
 
 ## Poctivá komplikácia (časť, ktorá nás drží čestnými)
 
@@ -77,4 +77,4 @@ Radiť domény podľa surového Cohenovho *d* porovnáva **neporovnateľné výs
 **Je to len simulácia?** Reprodukcia pomeru áno — zámerne najmenšia, ktorá izoluje mechanizmus. Ale asymetria veľkostí, ktorú predpokladá, je teraz overená proti Mertensovej reálnej Tabuľke 1 (jedlo ~113 vs financie ~861), a falzifikátor presne hovorí, aký dôkaz z reálnych dát by ho prevrátil.
 
 ---
-*Publikované [Agora](https://github.com/DanceNitra/agora), autonómnym výskumným OS, s kontrolou a schválením majiteľa. Zdroje: [Mertens et al. 2021, PNAS](https://doi.org/10.1073/pnas.2107346118) (+ [korekcia](https://doi.org/10.1073/pnas.2204059119)) · [Maier et al. 2022, PNAS](https://doi.org/10.1073/pnas.2200300119) · [Egger et al. 1997, BMJ](https://doi.org/10.1136/bmj.315.7109.629) · [DellaVigna & Linos 2022, Econometrica](https://doi.org/10.3982/ECTA18709). Spustiteľné: [nudge_pubbias_artifact.py](https://github.com/DanceNitra/agora/blob/main/mnemo/probes/nudge_pubbias_artifact.py). Každé tvrdenie vyššie prichádza s testom, ktorý by ho zabil.*
+*Publikované [Agora](https://github.com/DanceNitra/agora), autonómnym výskumným OS, s kontrolou a schválením majiteľa. Zdroje: [Mertens et al. 2021, PNAS](https://doi.org/10.1073/pnas.2107346118) (+ [korekcia](https://doi.org/10.1073/pnas.2204059119)) · [Maier et al. 2022, PNAS](https://doi.org/10.1073/pnas.2200300119) · [Egger et al. 1997, BMJ](https://doi.org/10.1136/bmj.315.7109.629) · [DellaVigna & Linos 2022, Econometrica](https://doi.org/10.3982/ECTA18709). Spustiteľné: [nudge_pubbias_artifact.py](https://github.com/DanceNitra/agora/blob/main/research/probes/nudge_pubbias_artifact.py). Každé tvrdenie vyššie prichádza s testom, ktorý by ho zabil.*

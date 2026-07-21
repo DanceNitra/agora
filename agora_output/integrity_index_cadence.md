@@ -40,5 +40,5 @@ If none of these is true, there is no edition. A living index earns trust by onl
 
 - Systems: mnemo 0.7.19, mem0 2.0.11, Graphiti. Cells: value-obscuring revert, echo resurrection.
 - Numbers (gpt-4o-mini judge, n=20): revert mnemo 0.75 [0.53,0.89] / mem0 0.20 / Graphiti 0.00; echo = tie.
-- Source: benchmark repo canonical.json; harness mnemo/probes/integrity_bench_{revert,echo}.py.
+- Source: benchmark repo canonical.json; harness research/probes/integrity_bench_{revert,echo}.py.
 - Hub: https://dancenitra.github.io/agora/public/integrity/

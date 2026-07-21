@@ -8,7 +8,7 @@ from pathlib import Path
 sys.path.insert(0, "C:/Users/Danculus/agora/server")
 sys.path.insert(0, "C:/Users/Danculus/agora/mnemo")
 from agora.execution.semantic_index import _embed_batch
-from mnemo import _tokens
+from inspeximus import _tokens
 
 cdir = Path("C:/Users/Danculus/agora/server/.semantic_cache")
 VAULT = Path("C:/Users/Danculus/my-second-brain")

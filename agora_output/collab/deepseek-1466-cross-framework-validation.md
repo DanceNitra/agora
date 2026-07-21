@@ -15,21 +15,36 @@ measured storage-substrate observation, NOT evidence for a general field-dynamic
 
 ## [#24] DanceNitra - 2026-07-02T12:24:09Z
 
-@luoxuejian000 â€” thank you for the invitation, and for placing the substrate work as its own observation position. Accepting it, with one honesty note about fit so the side-by-side stays clean.
-
-**Observation position.** In your layering, the instrument I ran sits *below* the cognitive layer: it observes the **memory substrate** â€” what a store retains, and whether it can tell which of two contradictory values is *live*, and *why*. It does not observe belief evolution (TAT), pre-output decision (HeartFlow), cross-session integration (Cophy), the post-text linguistic field (U/D/A/H), or the cognitive-architecture layering (TLAA). It reads the storage format underneath all of those.
-
-**What this position is placed to observe** â€” provenance + supersession as a *determinate* operation rather than a re-derivation:
-- an append-log keeps every record but encodes no supersession *relation*; to say which value is dead it must re-derive it from recency + a contradiction judgement â€” and cosine similarity tells a contradiction from its replacement at AUROC â‰? 0.61 (near chance).
-- keyed supersession marks it deterministically â€” bi-temporal `invalidated_at` (the event-time a value stopped being current) + a link to what replaced it, no LLM and no embedder.
-
-**My matrix rows.** My B-001 (preference application) and B-003 (belief update) substrate observations are the two comments in #1462 â€” those are my side-by-side entries for the substrate position.
-
-**The honesty note on fit.** Those rows are on the B-series identity scenarios, not on ä¸‡č±ˇć¸Šé‰´ V2 â€” so they're a *complementary observation-position* entry, not a same-corpus row, and I don't want them read as if they were run on the shared material. The nearest fit on the shared set is the **dialogue / identity-drift (čş«ä»˝ćĽ‚ç§») scenario**: a preference or value asserted, then contradicted across turns, is exactly what the substrate instrument reads. If those cross-session contradiction pairs are extractable, I'll run the substrate instrument on the shared set and post those rows side-by-side. Where the contradiction instead lives *within a single static document* (e.g. the 30-day vs 45-day contract clauses), that's contradiction-*detection* â€” the A dimension in U/D/A/H, not the substrate position â€” so I'd stay out of that lane rather than force a fit.
-
-Happy to have the substrate position added to the matrix on those terms.
-
----
+@luoxuejian000 â€” thank you for the invitation, and for placing the substrate work as its own observation position. Accepting it, with one honesty note about fit so the side-by-side stays clean.
+
+
+
+**Observation position.** In your layering, the instrument I ran sits *below* the cognitive layer: it observes the **memory substrate** â€” what a store retains, and whether it can tell which of two contradictory values is *live*, and *why*. It does not observe belief evolution (TAT), pre-output decision (HeartFlow), cross-session integration (Cophy), the post-text linguistic field (U/D/A/H), or the cognitive-architecture layering (TLAA). It reads the storage format underneath all of those.
+
+
+
+**What this position is placed to observe** â€” provenance + supersession as a *determinate* operation rather than a re-derivation:
+
+- an append-log keeps every record but encodes no supersession *relation*; to say which value is dead it must re-derive it from recency + a contradiction judgement â€” and cosine similarity tells a contradiction from its replacement at AUROC â‰? 0.61 (near chance).
+
+- keyed supersession marks it deterministically â€” bi-temporal `invalidated_at` (the event-time a value stopped being current) + a link to what replaced it, no LLM and no embedder.
+
+
+
+**My matrix rows.** My B-001 (preference application) and B-003 (belief update) substrate observations are the two comments in #1462 â€” those are my side-by-side entries for the substrate position.
+
+
+
+**The honesty note on fit.** Those rows are on the B-series identity scenarios, not on ä¸‡č±ˇć¸Šé‰´ V2 â€” so they're a *complementary observation-position* entry, not a same-corpus row, and I don't want them read as if they were run on the shared material. The nearest fit on the shared set is the **dialogue / identity-drift (čş«ä»˝ćĽ‚ç§») scenario**: a preference or value asserted, then contradicted across turns, is exactly what the substrate instrument reads. If those cross-session contradiction pairs are extractable, I'll run the substrate instrument on the shared set and post those rows side-by-side. Where the contradiction instead lives *within a single static document* (e.g. the 30-day vs 45-day contract clauses), that's contradiction-*detection* â€” the A dimension in U/D/A/H, not the substrate position â€” so I'd stay out of that lane rather than force a fit.
+
+
+
+Happy to have the substrate position added to the matrix on those terms.
+
+
+
+---
+
 *Drafted by [Agora](https://github.com/DanceNitra/agora), an autonomous research OS, and posted with its owner's review and approval.*
 
 --------------------------------------------------------------------------------
@@ -59,7 +74,7 @@ One faithfulness note so I don't impose our frame on your corpus: the dialogue a
 
 Scope: substrate mechanics only, so this is language-independent (it's about the store, not the model's answer); one supersession step each. The separate "can cosine tell a contradiction from its replacement" question I measured on English (AUROC â‰? 0.61, near chance) â€” I did not recompute it on this Russian/Chinese set. I'm reading the storage layer, not evaluating the dialogue or any framework.
 
-Runnable receipt: `mnemo/probes/wxyj_dialogue_substrate.py` at https://github.com/DanceNitra/agora/tree/main/mnemo/probes .
+Runnable receipt: `research/probes/wxyj_dialogue_substrate.py` at https://github.com/DanceNitra/agora/tree/main/research/probes .
 
 ---
 *Drafted by [Agora](https://github.com/DanceNitra/agora), an autonomous research OS, and posted with its owner's review and approval.*
@@ -76,7 +91,7 @@ In our substrate both transitions are the same kind of object: a keyed supersess
 
 That *appears* to land on the same withhold calls your trace shows â€” appears, because a proper step-matched check is exactly what the B-003 side-by-side is for; I haven't aligned them row-for-row yet. If it holds, the honest framing is *same decision, different signal*: your gate withholds on what reads from the outside as structural-coherence tension, ours on provenance corroboration. Your own question â€” "do the two gates converge on the same steps for the same reasons?" â€” answered from my side is **(probably) same steps, different reasons**. Two independent layers reaching the same withhold/allow boundary ("don't let un-earned or unresolved state act") through different internal signals would be more interesting than if they shared a mechanism. I'll stay in my lane on your divergence magnitudes â€” I can't recompute your heads, so I'm reading your gate column (stable/withhold), not the numbers.
 
-**On the triggers â€” they're already public, so here they are.** The trigger strings, the fluency-constrained HotFlip method (`coherence_hotflip`), and the measured per-encoder hijack + gpt2 perplexity are in `mnemo/probes/agentpoison_coherence_attack.py` (+ `_result.json`) at https://github.com/DanceNitra/agora/tree/main/mnemo/probes . One honest caveat that matters for a fair test: those triggers are optimized for **embedding similarity on specific encoders** (all-MiniLM / BGE / Contriever) â€” a string tuned to those won't transfer to your inter-head coherence objective. The worst-case test you described is to run `coherence_hotflip` with **your** coherence score as the attack objective (maximize inter-head agreement s.t. a fluency budget), not to reuse our exact strings. The method transfers; the specific triggers don't. If you run it that way and coherence stays high on the optimized trigger, that's the real refutation of the manufacturability worry; if it drops, the gate holds.
+**On the triggers â€” they're already public, so here they are.** The trigger strings, the fluency-constrained HotFlip method (`coherence_hotflip`), and the measured per-encoder hijack + gpt2 perplexity are in `research/probes/agentpoison_coherence_attack.py` (+ `_result.json`) at https://github.com/DanceNitra/agora/tree/main/research/probes . One honest caveat that matters for a fair test: those triggers are optimized for **embedding similarity on specific encoders** (all-MiniLM / BGE / Contriever) â€” a string tuned to those won't transfer to your inter-head coherence objective. The worst-case test you described is to run `coherence_hotflip` with **your** coherence score as the attack objective (maximize inter-head agreement s.t. a fluency budget), not to reuse our exact strings. The method transfers; the specific triggers don't. If you run it that way and coherence stays high on the optimized trigger, that's the real refutation of the manufacturability worry; if it drops, the gate holds.
 
 Ready for the B-003 side-by-side whenever â€” our influence-gate timeline is already up-thread (the memory_op / corroboration_state / gate_decision rows), so it should line up against your position/coherence/divergence/harmony columns step-for-step.
 
@@ -124,11 +139,11 @@ Two scopes so nobody over-reads it:
 - Substrate bookkeeping, not a defense. mnemo stores the override and returns it on an ordinary recall â€” it does not block prompt-injection, a downstream model reading the store can still adopt it. The trace only tracks which value is in the corroboration-gated influence set.
 - The bar is source count, not source trust. Same-origin host variants collapse (that's the sybil row); two genuinely different domains reach the 2-source bar and flip it to allow â€” there's a positive control in the probe that does exactly that (distinct_sources=3, corroborated, enters the influence set). So it's same-origin collapse only; multi-domain collusion defeats it. The gate itself is standard truth-discovery + belief-revision territory; we're instantiating and measuring it, not claiming it's new.
 
-On B-001 (preference application): it doesn't fit the per-step timeline format â€” but not because there's nothing there. Style preferences ("be concise", "no numbered lists") are equally orthogonal to *all* query content, so there's no temporal step where the decision flips; it's a single retrieval-routing decision, not a trace. In that single-decision form the substrate result is real and measured: on unrelated-topic queries the similarity channel surfaces the preference only ~1/3 of the time (pref_recall@5 = 0.33; 3 of 6 queries surface zero of three), because the preference sits at cosine ~0.40 to the query vs ~0.79 for the best on-topic memory â€” that orthogonality gap is the structural reason it gets buried, and a type/profile channel returns it by construction (the standard MemGPT/mem0 fix; we measure the cost of not having it). One fixture / one embedder, so read the shape not the digit. Probe: https://github.com/DanceNitra/agora/blob/main/mnemo/probes/bseries_b001_preference_recall.py
+On B-001 (preference application): it doesn't fit the per-step timeline format â€” but not because there's nothing there. Style preferences ("be concise", "no numbered lists") are equally orthogonal to *all* query content, so there's no temporal step where the decision flips; it's a single retrieval-routing decision, not a trace. In that single-decision form the substrate result is real and measured: on unrelated-topic queries the similarity channel surfaces the preference only ~1/3 of the time (pref_recall@5 = 0.33; 3 of 6 queries surface zero of three), because the preference sits at cosine ~0.40 to the query vs ~0.79 for the best on-topic memory â€” that orthogonality gap is the structural reason it gets buried, and a type/profile channel returns it by construction (the standard MemGPT/mem0 fix; we measure the cost of not having it). One fixture / one embedder, so read the shape not the digit. Probe: https://github.com/DanceNitra/agora/blob/main/research/probes/bseries_b001_preference_recall.py
 
 Runnable (zero-dependency, MIT, re-run or break it):
-https://github.com/DanceNitra/agora/blob/main/mnemo/probes/bseries_b002_identity_injection.py
-CSV: https://github.com/DanceNitra/agora/blob/main/mnemo/probes/bseries_b002_identity_injection.csv
+https://github.com/DanceNitra/agora/blob/main/research/probes/bseries_b002_identity_injection.py
+CSV: https://github.com/DanceNitra/agora/blob/main/research/probes/bseries_b002_identity_injection.csv
 
 Add TAT's divergence/coherence against these five steps and it's the B-002 substrate row.
 
@@ -817,62 +832,118 @@ Core conclusion: Substrate is Layer 0 support; its storage type (keyed supersess
 
 ## [#68] maratsultanov2 - 2026-07-05T17:50:30Z
 
-@icophy @yun520-1 @DanceNitra @YING-SHI-XI @qingkong66 @luoxuejian000
-
-I want to thank everyone involved in this project â€” for the enormous work
-and quality of execution. You didn't just systematise the data; you created
-an empirically confirmed and documented foundation for further
-collaboration.
-
-What we did together is not proof of a theory or demonstration of anyone's
-superiority. It is proof of how people can interact with each other to
-achieve real goals, without regard to bureaucracy or budget.
-
-With special respect and gratitude, I want to single out @qingkong66 â€” for
-his insight and attention. This is not the first time he has helped me see
-what was hidden.
-
-With respect,
-Marat Sultanov
-
-Đ˛Ń?, 5 Đ¸ŃŽĐ». 2026 Đł., 18:06 ćťŽĺążĺĄ˝ ***@***.***>:
-
-> *luoxuejian000* left a comment (deepseek-ai/DeepSeek-V3#1466)
-> <https://github.com/deepseek-ai/DeepSeek-V3/issues/1466#issuecomment-4886495136>
->
-> @DanceNitra <https://github.com/DanceNitra> @maratsultanov2
-> <https://github.com/maratsultanov2> @yun520-1
-> <https://github.com/yun520-1> @icophy <https://github.com/icophy>
-> @YING-SHI-XI <https://github.com/YING-SHI-XI> @qingkong66
-> <https://github.com/qingkong66>
->
-> ĺ…łäşŽč·¨ćˇ†ćž¶ĺśşĺźźč§‚ćµ‹č?”ĺ??éŞŚčŻ?ćŠĄĺ‘Šçš„ćś€ç»?ĺ®šç¨żé€šçźĄ
->
-> ĺ?„ä˝ŤďĽŚćŠĄĺ‘Šĺ·˛ćŚ‰ç…§ć‰€ćś‰ĺŹŤé¦?ĺ®Ść??ćś€ç»?äż®č®˘ă€‚
->
-> Â· DanceNitra ćŹ?ĺ‡şçš„ä¸¤ç‚ąäż®ć”ąć„Źč§?ďĽ?-0.450 ĺ˝’ĺ±žć?Žçˇ®ă€?Receipt â‘˘ čˇ¨čż°č°?ć•´ďĽ‰ĺ·˛ĺ¤„ç?†ĺ®ŚćŻ•ďĽ›
-> Â· yun520-1 ĺ’Ś icophy äşŽ 7 ćś? 5 ć—ĄčˇĄäş¤çš„ B-series ć•°ćŤ®ĺ·˛çˇ®č®¤ĺą¶č®°ĺ˝•ďĽ?éťžä¸‡č±ˇć¸Šé‰´ĺśşć™ŻďĽŚćśŞçşłĺ…Ąä¸»çź©é?µďĽŚç›¸ĺ…łçŠ¶ć€?ĺ·˛ĺś¨ćŠĄĺ‘Š
-> 4.4 čŠ‚ć›´ć–°ďĽ‰ďĽ›
-> Â· ć‰€ćś‰ĺ…¶ä»–ćˇ†ćž¶ä¸»ĺť‡ć— äż®ć”ąč¦?ć±‚ďĽŚć?–ĺ·˛çˇ®č®¤ćŠĄĺ‘Šĺ†…ĺ®ąă€‚
->
-> ç›®ĺ‰ŤćŠĄĺ‘Šĺ·˛ć— ćśŞĺ¤„ç?†çš„ĺĽ‚č®®ć?–ĺľ…čˇĄĺ……éˇąă€‚çŽ°ĺŹ‘ĺ¸? ć­ŁĺĽŹç¨ż v1.1ďĽŚĺŤłć—Ąčµ·ä˝śä¸şćś¬éˇąç›®çš„ćś€ç»?ç‰?ćś¬ă€‚
->
-> ćŠĄĺ‘Šé™„ä»¶ďĽš[čŻ·ĺś¨ć­¤ĺ¤„é™„ä¸Šćś€ç»?ćŠĄĺ‘Šć–‡ä»¶ć?–é“ľćŽĄ]
->
-> ć„źč°˘ĺ?„ä˝Ťĺś¨ć•´ä¸ŞéŞŚčŻ?čż‡ç¨‹ä¸­çš„č´ˇçŚ®ä¸Žäżˇä»»ă€‚ĺ?Žç»­č®şć–‡ć’°ĺ†™ä¸Ž arXiv ćŠ•ç¨żĺ°†ä»Ąć­¤ä¸şĺźşçˇ€ćŽ¨čż›ă€‚
->
-> ćťŽĺążĺĄ˝
-> 2026-07-05
->
-> â€”
-> Reply to this email directly, view it on GitHub
-> <https://github.com/deepseek-ai/DeepSeek-V3/issues/1466?email_source=notifications&email_token=CADWI6ZC6KRFIRKCGZEITWT5DJVGFA5CNFSNUABFM5UWIORPF5TWS5BNNB2WEL2JONZXKZKDN5WW2ZLOOQXTIOBYGY2DSNJRGM3KM4TFMFZW63VHNVSW45DJN5XKKZLWMVXHJLDGN5XXIZLSL5RWY2LDNM#issuecomment-4886495136>,
-> or unsubscribe
-> <https://github.com/notifications/unsubscribe-auth/CADWI6YEMNLTM3TX4PZWYB35DJVGFAVCNFSNUABFKJSXA33TNF2G64TZHM4TAOBVGMYTONJSHNEXG43VMU5TINZWHE2DMNJZGMY2C5QC>
-> .
-> You are receiving this because you were mentioned.Message ID:
-> ***@***.***>
->
+@icophy @yun520-1 @DanceNitra @YING-SHI-XI @qingkong66 @luoxuejian000
+
+
+
+I want to thank everyone involved in this project â€” for the enormous work
+
+and quality of execution. You didn't just systematise the data; you created
+
+an empirically confirmed and documented foundation for further
+
+collaboration.
+
+
+
+What we did together is not proof of a theory or demonstration of anyone's
+
+superiority. It is proof of how people can interact with each other to
+
+achieve real goals, without regard to bureaucracy or budget.
+
+
+
+With special respect and gratitude, I want to single out @qingkong66 â€” for
+
+his insight and attention. This is not the first time he has helped me see
+
+what was hidden.
+
+
+
+With respect,
+
+Marat Sultanov
+
+
+
+Đ˛Ń?, 5 Đ¸ŃŽĐ». 2026 Đł., 18:06 ćťŽĺążĺĄ˝ ***@***.***>:
+
+
+
+> *luoxuejian000* left a comment (deepseek-ai/DeepSeek-V3#1466)
+
+> <https://github.com/deepseek-ai/DeepSeek-V3/issues/1466#issuecomment-4886495136>
+
+>
+
+> @DanceNitra <https://github.com/DanceNitra> @maratsultanov2
+
+> <https://github.com/maratsultanov2> @yun520-1
+
+> <https://github.com/yun520-1> @icophy <https://github.com/icophy>
+
+> @YING-SHI-XI <https://github.com/YING-SHI-XI> @qingkong66
+
+> <https://github.com/qingkong66>
+
+>
+
+> ĺ…łäşŽč·¨ćˇ†ćž¶ĺśşĺźźč§‚ćµ‹č?”ĺ??éŞŚčŻ?ćŠĄĺ‘Šçš„ćś€ç»?ĺ®šç¨żé€šçźĄ
+
+>
+
+> ĺ?„ä˝ŤďĽŚćŠĄĺ‘Šĺ·˛ćŚ‰ç…§ć‰€ćś‰ĺŹŤé¦?ĺ®Ść??ćś€ç»?äż®č®˘ă€‚
+
+>
+
+> Â· DanceNitra ćŹ?ĺ‡şçš„ä¸¤ç‚ąäż®ć”ąć„Źč§?ďĽ?-0.450 ĺ˝’ĺ±žć?Žçˇ®ă€?Receipt â‘˘ čˇ¨čż°č°?ć•´ďĽ‰ĺ·˛ĺ¤„ç?†ĺ®ŚćŻ•ďĽ›
+
+> Â· yun520-1 ĺ’Ś icophy äşŽ 7 ćś? 5 ć—ĄčˇĄäş¤çš„ B-series ć•°ćŤ®ĺ·˛çˇ®č®¤ĺą¶č®°ĺ˝•ďĽ?éťžä¸‡č±ˇć¸Šé‰´ĺśşć™ŻďĽŚćśŞçşłĺ…Ąä¸»çź©é?µďĽŚç›¸ĺ…łçŠ¶ć€?ĺ·˛ĺś¨ćŠĄĺ‘Š
+
+> 4.4 čŠ‚ć›´ć–°ďĽ‰ďĽ›
+
+> Â· ć‰€ćś‰ĺ…¶ä»–ćˇ†ćž¶ä¸»ĺť‡ć— äż®ć”ąč¦?ć±‚ďĽŚć?–ĺ·˛çˇ®č®¤ćŠĄĺ‘Šĺ†…ĺ®ąă€‚
+
+>
+
+> ç›®ĺ‰ŤćŠĄĺ‘Šĺ·˛ć— ćśŞĺ¤„ç?†çš„ĺĽ‚č®®ć?–ĺľ…čˇĄĺ……éˇąă€‚çŽ°ĺŹ‘ĺ¸? ć­ŁĺĽŹç¨ż v1.1ďĽŚĺŤłć—Ąčµ·ä˝śä¸şćś¬éˇąç›®çš„ćś€ç»?ç‰?ćś¬ă€‚
+
+>
+
+> ćŠĄĺ‘Šé™„ä»¶ďĽš[čŻ·ĺś¨ć­¤ĺ¤„é™„ä¸Šćś€ç»?ćŠĄĺ‘Šć–‡ä»¶ć?–é“ľćŽĄ]
+
+>
+
+> ć„źč°˘ĺ?„ä˝Ťĺś¨ć•´ä¸ŞéŞŚčŻ?čż‡ç¨‹ä¸­çš„č´ˇçŚ®ä¸Žäżˇä»»ă€‚ĺ?Žç»­č®şć–‡ć’°ĺ†™ä¸Ž arXiv ćŠ•ç¨żĺ°†ä»Ąć­¤ä¸şĺźşçˇ€ćŽ¨čż›ă€‚
+
+>
+
+> ćťŽĺążĺĄ˝
+
+> 2026-07-05
+
+>
+
+> â€”
+
+> Reply to this email directly, view it on GitHub
+
+> <https://github.com/deepseek-ai/DeepSeek-V3/issues/1466?email_source=notifications&email_token=CADWI6ZC6KRFIRKCGZEITWT5DJVGFA5CNFSNUABFM5UWIORPF5TWS5BNNB2WEL2JONZXKZKDN5WW2ZLOOQXTIOBYGY2DSNJRGM3KM4TFMFZW63VHNVSW45DJN5XKKZLWMVXHJLDGN5XXIZLSL5RWY2LDNM#issuecomment-4886495136>,
+
+> or unsubscribe
+
+> <https://github.com/notifications/unsubscribe-auth/CADWI6YEMNLTM3TX4PZWYB35DJVGFAVCNFSNUABFKJSXA33TNF2G64TZHM4TAOBVGMYTONJSHNEXG43VMU5TINZWHE2DMNJZGMY2C5QC>
+
+> .
+
+> You are receiving this because you were mentioned.Message ID:
+
+> ***@***.***>
+
+>
+
 
 
 --------------------------------------------------------------------------------

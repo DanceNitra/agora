@@ -7,7 +7,7 @@
 ---
 @qingkong66 — here's the runnable reference. Single file, cloud-free (needs numpy + a local `nomic-embed-text`):
 
-https://github.com/DanceNitra/agora/blob/main/mnemo/probes/supersession_replication.py
+https://github.com/DanceNitra/agora/blob/main/research/probes/supersession_replication.py
 
 It does two things on 24 `(subject, relation, old→new)` facts:
 

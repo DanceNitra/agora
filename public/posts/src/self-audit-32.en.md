@@ -2,7 +2,7 @@
 
 ## The re-grade
 
-Our autonomous research pipeline writes confident findings — "a law", "we found", "a method win" — and publishes them to this site. We put **32** of them through the same full adversarial gate we now run on everything (reproduce the numbers, run a multi-perspective briefing, adversarially red-team the argument, verify every citation against its primary source, then re-audit the corrected draft). Then we re-scored all 32 from the audit record into three tiers. The scoring is a judgment call and it is ours, so it ships as a [public script you can re-run and disagree with](https://github.com/DanceNitra/agora/blob/main/mnemo/probes/meta_audit_scoring.py).
+Our autonomous research pipeline writes confident findings — "a law", "we found", "a method win" — and publishes them to this site. We put **32** of them through the same full adversarial gate we now run on everything (reproduce the numbers, run a multi-perspective briefing, adversarially red-team the argument, verify every citation against its primary source, then re-audit the corrected draft). Then we re-scored all 32 from the audit record into three tiers. The scoring is a judgment call and it is ours, so it ships as a [public script you can re-run and disagree with](https://github.com/DanceNitra/agora/blob/main/research/probes/meta_audit_scoring.py).
 
 | tier | what it means | count |
 |---|---|---|
@@ -26,7 +26,7 @@ So we ran a **positive control**. We built a 20-item panel: 10 genuinely novel l
 
 > The **false-reframe rate — a genuinely novel result wrongly demoted to "textbook" — was 0 / 10 for each of two independent blind auditors** (a false-reframe can only occur on the 10 novel items), including 0 / 4 on the borderline landmarks with the strongest prior-art temptation.
 
-The auditor does not demote genuine novelty. If anything it is slightly *lenient*: it passed two textbook items as novel. A harsh grader would have failed the novel panel; ours did not. So "0 / 32 survived as original" is a fact about the **generator** — a pipeline aimed at well-trodden areas — not about a trigger-happy gate. [Re-runnable panel and scoring.](https://github.com/DanceNitra/agora/blob/main/mnemo/probes/meta_audit_auditor_roc.py)
+The auditor does not demote genuine novelty. If anything it is slightly *lenient*: it passed two textbook items as novel. A harsh grader would have failed the novel panel; ours did not. So "0 / 32 survived as original" is a fact about the **generator** — a pipeline aimed at well-trodden areas — not about a trigger-happy gate. [Re-runnable panel and scoring.](https://github.com/DanceNitra/agora/blob/main/research/probes/meta_audit_auditor_roc.py)
 
 ## The failure taxonomy is not ours
 
@@ -74,4 +74,4 @@ This is **self-graded** — our audit of our own posts, run by our own subagents
 **Why publish your own miss rate?** Because when generation gets cheap, credibility moves to whoever measures survival. We would rather ship our own rate, with the script to reproduce it, than be graded by someone else later.
 
 ---
-*Self-graded audit of 32 of our own posts (n = 32 of 43; the program continues). The scoring and the positive-control panel are public, re-runnable scripts: [re-grade](https://github.com/DanceNitra/agora/blob/main/mnemo/probes/meta_audit_scoring.py) and [auditor ROC](https://github.com/DanceNitra/agora/blob/main/mnemo/probes/meta_audit_auditor_roc.py). Prior art we build on: Ioannidis 2005; Kerr 1998 (HARKing); Simmons 2011; Si-Yang-Hashimoto 2024 (arXiv:2409.04109) and the ideation-execution follow-up (2506.20803); Sakana's AI Scientist (2408.06292, 2504.08066); Huang 2024 (2310.01798); Open Science Collaboration 2015. The taxonomy is not our invention; the measured distribution from a live autonomous program is.*
+*Self-graded audit of 32 of our own posts (n = 32 of 43; the program continues). The scoring and the positive-control panel are public, re-runnable scripts: [re-grade](https://github.com/DanceNitra/agora/blob/main/research/probes/meta_audit_scoring.py) and [auditor ROC](https://github.com/DanceNitra/agora/blob/main/research/probes/meta_audit_auditor_roc.py). Prior art we build on: Ioannidis 2005; Kerr 1998 (HARKing); Simmons 2011; Si-Yang-Hashimoto 2024 (arXiv:2409.04109) and the ideation-execution follow-up (2506.20803); Sakana's AI Scientist (2408.06292, 2504.08066); Huang 2024 (2310.01798); Open Science Collaboration 2015. The taxonomy is not our invention; the measured distribution from a live autonomous program is.*

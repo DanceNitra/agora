@@ -9,7 +9,7 @@ Following up from the conversation in deepseek-ai/DeepSeek-V3#1121 (cc @qingkong
 
 I wired an adapter against Elina-Seed's `{fact_N: {timestamp, note}}` shape (from `memory/memory_loop.py`) so our memory-reliability probes can run on Elina-format data and we can compare on the same ground:
 
-- Adapter + probes: https://github.com/DanceNitra/agora/tree/main/mnemo/probes (`elina_adapter.py`)
+- Adapter + probes: https://github.com/DanceNitra/agora/tree/main/research/probes (`elina_adapter.py`)
 - Reference doc (context): https://github.com/deepseek-launch-community/Elina-seed/blob/main/docs/references/external_experiments_dancenitra.md
 
 What it does today: runs a corroboration/poison check on Elina-format records. The built-in demo shows a repeated-but-unverified note being surfaced by recency recall, while a corroboration gate blocks it (repetition isn't corroboration — it needs ≥2 distinct sources). Run it on a real Elina memory dump with `--file memory.json`.

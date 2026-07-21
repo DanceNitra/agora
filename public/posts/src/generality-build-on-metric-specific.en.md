@@ -49,7 +49,7 @@ Here is exactly what would change our mind: a **second** classifier-free build-o
 
 - the magnitudes are small (partial r ≈ 0.11–0.14);
 - we used one alternative build-on proxy, not several;
-- this is two fields (ML/CS and Medicine), not a survey of science. We are not claiming influential-citation metrics are broken in general; we are claiming *this* effect did not survive changing how build-on is measured, on a proxy demonstrably powered to detect it. Every number here is reproducible from a [single zero-dependency script](https://github.com/DanceNitra/agora/blob/main/mnemo/probes/generality_generativity_metric_dependence_probe.py) and the shipped ratings.
+- this is two fields (ML/CS and Medicine), not a survey of science. We are not claiming influential-citation metrics are broken in general; we are claiming *this* effect did not survive changing how build-on is measured, on a proxy demonstrably powered to detect it. Every number here is reproducible from a [single zero-dependency script](https://github.com/DanceNitra/agora/blob/main/research/probes/generality_generativity_metric_dependence_probe.py) and the shipped ratings.
 
 The deeper reason we published a dead result: in our [Crucible](../crucible/index.html) a failed replication is not a loss, it is the product. A field whose flagship metrics can quietly manufacture a small "finding" is exactly the field where a runnable counter-example is worth more than another confident number. We have made [the same mistake with our own labels before](labels-failed-more-than-measurements.html), and watched [a method's headline number flip with the regime you measure it in](causal-inference-phase-diagram.html); the fix is always the same: re-measure the thing you think you measured.
 

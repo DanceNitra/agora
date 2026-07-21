@@ -1,0 +1,1633 @@
+[
+ {
+  "id": "86d5f599ef",
+  "text": "ran: cd /c/Users/Danculus/agora/server PYTHONPATH=. nohup python -m uvicorn agora.main:app --host 127.0.0.1 --port 8000 > _brain_restart.log 2>&1 & echo \"brain relaunching pid $! â€” waiting for startup + …",
+  "tags": [
+   "bash"
+  ],
+  "value": 1.0,
+  "ts": 1784388588.0422676,
+  "iso": "2026-07-18T15:29:48Z",
+  "valid_from": 1784388588.0422676,
+  "source": null,
+  "mtype": "episodic",
+  "last_access": 1784388588.0422676,
+  "status": "active",
+  "links": [],
+  "meta": {},
+  "key": "cmd:4e57b726f0",
+  "object": "cd /c/Users/Danculus/agora/server PYTHONPATH=. nohup python "
+ },
+ {
+  "id": "e222895324",
+  "text": "ran: cd /c/Users/Danculus/agora/server echo \"=== scout search queries / target ===\"; grep -rniE \"search.*quer|github.*search|q=|topics?=|SCOUT_QUER|scan_queries|search_issues|rustchain|fit_score|min_fit\" a…",
+  "tags": [
+   "bash"
+  ],
+  "value": 1.0,
+  "ts": 1784399891.0692444,
+  "iso": "2026-07-18T18:38:11Z",
+  "valid_from": 1784399891.0692444,
+  "source": null,
+  "mtype": "episodic",
+  "last_access": 1784399891.0692444,
+  "status": "active",
+  "links": [],
+  "meta": {},
+  "key": "cmd:4e5e62ed8f",
+  "object": "cd /c/Users/Danculus/agora/server echo \"=== scout search que"
+ },
+ {
+  "id": "47d7e7e720",
+  "text": "ran: cd /c/Users/Danculus/agora/server echo \"=== board/decide endpoint ===\"; grep -rniE \"board/decide|def.*board_decide|def.*decide|frontier|board_priority|set_frontier\" agora/api/agent_os_api.py 2>/dev/nu…",
+  "tags": [
+   "bash"
+  ],
+  "value": 1.0,
+  "ts": 1784400117.306563,
+  "iso": "2026-07-18T18:41:57Z",
+  "valid_from": 1784400117.306563,
+  "source": null,
+  "mtype": "episodic",
+  "last_access": 1784400117.306563,
+  "status": "active",
+  "links": [],
+  "meta": {},
+  "key": "cmd:dbd2d830ff",
+  "object": "cd /c/Users/Danculus/agora/server echo \"=== board/decide end"
+ },
+ {
+  "id": "dbb7f000a0",
+  "text": "ran: cd /c/Users/Danculus/agora/server echo \"=== find board decide route ===\"; grep -rniE \"board/decide|\\\"/brain/board|board_decide|def brain_board\" agora/api/agent_os_api.py 2>/dev/null | head echo; echo …",
+  "tags": [
+   "bash"
+  ],
+  "value": 1.0,
+  "ts": 1784400123.6841018,
+  "iso": "2026-07-18T18:42:03Z",
+  "valid_from": 1784400123.6841018,
+  "source": null,
+  "mtype": "episodic",
+  "last_access": 1784400123.6841018,
+  "status": "active",
+  "links": [],
+  "meta": {},
+  "key": "cmd:d95c70fe10",
+  "object": "cd /c/Users/Danculus/agora/server echo \"=== find board decid"
+ },
+ {
+  "id": "beb6ee5c89",
+  "text": "ran: cd /c/Users/Danculus/agora/server echo \"=== board/decide handler ===\"; sed -n '1334,1345p' agora/api/agent_os_api.py echo; echo \"=== scout _THEMES ===\"; grep -n \"_THEMES\" agora/execution/scout.py | he…",
+  "tags": [
+   "bash"
+  ],
+  "value": 1.0,
+  "ts": 1784400132.813001,
+  "iso": "2026-07-18T18:42:12Z",
+  "valid_from": 1784400132.813001,
+  "source": null,
+  "mtype": "episodic",
+  "last_access": 1784400132.813001,
+  "status": "active",
+  "links": [],
+  "meta": {},
+  "key": "cmd:d04d2c82ca",
+  "object": "cd /c/Users/Danculus/agora/server echo \"=== board/decide han"
+ },
+ {
+  "id": "db1b567e55",
+  "text": "ran: sed -n \"/def record_directives/,/return/p\" agora/execution/board.py | head -40",
+  "tags": [
+   "bash"
+  ],
+  "value": 1.0,
+  "ts": 1784400170.7830482,
+  "iso": "2026-07-18T18:42:50Z",
+  "valid_from": 1784400170.7830482,
+  "source": null,
+  "mtype": "episodic",
+  "last_access": 1784400170.7830482,
+  "status": "active",
+  "links": [],
+  "meta": {},
+  "key": "cmd:adc285f88e",
+  "object": "sed -n \"/def record_directives/,/return/p\" agora/execution/b"
+ },
+ {
+  "id": "59080666f4",
+  "text": "ran: B=http://127.0.0.1:8000/api/v1/agent-os/brain DIR=\"frontier: Make mnemo the #1 agent-memory product (numero uno). Prioritize research that COMPOUNDS into mnemo's moat: agent-memory integrity (correcti…",
+  "tags": [
+   "bash"
+  ],
+  "value": 1.0,
+  "ts": 1784400191.8670602,
+  "iso": "2026-07-18T18:43:11Z",
+  "valid_from": 1784400191.8670602,
+  "source": null,
+  "mtype": "episodic",
+  "last_access": 1784400191.8670602,
+  "status": "active",
+  "links": [],
+  "meta": {},
+  "key": "cmd:665fcc57ff",
+  "object": "B=http://127.0.0.1:8000/api/v1/agent-os/brain DIR=\"frontier:"
+ },
+ {
+  "id": "5efdc8721b",
+  "text": "agora\\execution\\scout.py :: current state -> # CONCENTRATED on the mnemo mission (2026-07-18, owner-locked frontier): every theme must be one where # mnemo can answer a real open GitHub issue with EVIDENCE (a measured receipt…",
+  "tags": [
+   "file",
+   "edit"
+  ],
+  "value": 1.0,
+  "ts": 1784400215.688689,
+  "iso": "2026-07-18T18:43:35Z",
+  "valid_from": 1784400215.688689,
+  "source": null,
+  "mtype": "semantic",
+  "last_access": 1784400215.688689,
+  "status": "active",
+  "links": [],
+  "meta": {},
+  "key": "file:agora\\execution\\scout.py",
+  "object": "# CONCENTRATED on the mnemo mission (2026-07-18, owner-locked frontier): every t…"
+ },
+ {
+  "id": "91dc1fac12",
+  "text": "ran: python -m py_compile agora/execution/scout.py agora/execution/board.py && echo \"COMPILE OK\"",
+  "tags": [
+   "bash"
+  ],
+  "value": 1.0,
+  "ts": 1784400228.286318,
+  "iso": "2026-07-18T18:43:48Z",
+  "valid_from": 1784400228.286318,
+  "source": null,
+  "mtype": "episodic",
+  "last_access": 1784400228.286318,
+  "status": "active",
+  "links": [],
+  "meta": {},
+  "key": "cmd:c6d26581cb",
+  "object": "python -m py_compile agora/execution/scout.py agora/executio"
+ },
+ {
+  "id": "e069c7b46a",
+  "text": "ran: for i in $(seq 1 20); do code=$(curl -s -m 5 http://127.0.0.1:8000/api/v1/health -o /dev/null -w \"%{http_code}\" 2>/dev/null); if [ \"$code\" = \"200\" ]; then echo \"brain UP after ${i}x\"; curl -s -m 5 htt…",
+  "tags": [
+   "bash"
+  ],
+  "value": 1.0,
+  "ts": 1784400253.9378636,
+  "iso": "2026-07-18T18:44:13Z",
+  "valid_from": 1784400253.9378636,
+  "source": null,
+  "mtype": "episodic",
+  "last_access": 1784400253.9378636,
+  "status": "active",
+  "links": [],
+  "meta": {},
+  "key": "cmd:58e1ad604e",
+  "object": "for i in $(seq 1 20); do code=$(curl -s -m 5 http://127.0.0."
+ },
+ {
+  "id": "096e8ba2d3",
+  "text": "ran: B=http://127.0.0.1:8000/api/v1/agent-os/brain echo \"=== board priorities (should show mnemo frontier) ===\"; curl -s -m 10 $B/board 2>/dev/null | python -c \"import sys,json;d=json.load(sys.stdin);print…",
+  "tags": [
+   "bash"
+  ],
+  "value": 1.0,
+  "ts": 1784400273.978759,
+  "iso": "2026-07-18T18:44:33Z",
+  "valid_from": 1784400273.978759,
+  "source": null,
+  "mtype": "episodic",
+  "last_access": 1784400273.978759,
+  "status": "active",
+  "links": [],
+  "meta": {},
+  "key": "cmd:ddc0aa0adb",
+  "object": "B=http://127.0.0.1:8000/api/v1/agent-os/brain echo \"=== boar"
+ },
+ {
+  "id": "fd6b923839",
+  "text": "..\\..\\.claude\\projects\\C--Users-Danculus-agora\\memory\\dungeon-off-mission-frontier-locked-to-mnemo.md :: current state -> --- name: dungeon-off-mission-frontier-locked-to-mnemo description: \"2026-07-18 dungeon audit + fix: after the roster 5->8 fix production RECOVERED (1 note/day on 07-13/14 -> 7/11/…",
+  "tags": [
+   "file",
+   "edit"
+  ],
+  "value": 1.0,
+  "ts": 1784400324.5230467,
+  "iso": "2026-07-18T18:45:24Z",
+  "valid_from": 1784400324.5230467,
+  "source": null,
+  "mtype": "semantic",
+  "last_access": 1784400324.5230467,
+  "status": "active",
+  "links": [],
+  "meta": {},
+  "key": "file:..\\..\\.claude\\projects\\C--Users-Danculus-agora\\memory\\dungeon-off-mission-frontier-locked-to-mnemo.md",
+  "object": "--- name: dungeon-off-mission-frontier-locked-to-mnemo description: \"2026-07-18 …"
+ },
+ {
+  "id": "4ff6b6e85e",
+  "text": "..\\..\\.claude\\projects\\C--Users-Danculus-agora\\memory\\MEMORY.md :: current state -> ## Projects / infra state (cont.) - [Dungeon off-mission â†’ frontier locked to mnemo](dungeon-off-mission-frontier-locked-to-mnemo.md) â€” 07-18: production recovered (18 notes/da…",
+  "tags": [
+   "file",
+   "edit"
+  ],
+  "value": 1.0,
+  "ts": 1784400336.4328692,
+  "iso": "2026-07-18T18:45:36Z",
+  "valid_from": 1784400336.4328692,
+  "source": null,
+  "mtype": "semantic",
+  "last_access": 1784400336.4328692,
+  "status": "superseded",
+  "links": [],
+  "meta": {
+   "superseded_by_toggle": "045b6c63bb",
+   "superseded_by_policy": "keyed_lww"
+  },
+  "key": "file:..\\..\\.claude\\projects\\C--Users-Danculus-agora\\memory\\MEMORY.md",
+  "object": "## Projects / infra state (cont.) - [Dungeon off-mission â†’ frontier locked to …",
+  "superseded_ts": 1784529395.2857516,
+  "invalidated_at": 1784529395.2857516
+ },
+ {
+  "id": "40ac63371d",
+  "text": "ran: cat \"C:\\Users\\Danculus\\AppData\\Local\\Temp\\claude\\C--Users-Danculus-agora\\00217351-b8ad-4b4a-8d80-0724fdc0a600\\tasks\\bfb0330w3.output\" | grep -vE \"Warning|warn|symlink|Xet|hf_xet|Developer Mode|docs.mi…",
+  "tags": [
+   "bash"
+  ],
+  "value": 1.0,
+  "ts": 1784400341.4438612,
+  "iso": "2026-07-18T18:45:41Z",
+  "valid_from": 1784400341.4438612,
+  "source": null,
+  "mtype": "episodic",
+  "last_access": 1784400341.4438612,
+  "status": "active",
+  "links": [],
+  "meta": {},
+  "key": "cmd:c1145fc3b0",
+  "object": "cat \"C:\\Users\\Danculus\\AppData\\Local\\Temp\\claude\\C--Users-Da"
+ },
+ {
+  "id": "2c59295376",
+  "text": "..\\..\\.claude\\projects\\C--Users-Danculus-agora\\memory\\locomo-zero-llm-multihop-bridge-killed.md :: current state -> **ACTION:** ship nothing here. Optionally document that mnemo's hybrid already helps multi-hop partial recall + recall_iterative for full â€” no code change survives the skeptic. D…",
+  "tags": [
+   "file",
+   "edit"
+  ],
+  "value": 1.0,
+  "ts": 1784400393.3958828,
+  "iso": "2026-07-18T18:46:33Z",
+  "valid_from": 1784400393.3958828,
+  "source": null,
+  "mtype": "semantic",
+  "last_access": 1784400393.3958828,
+  "status": "active",
+  "links": [],
+  "meta": {},
+  "key": "file:..\\..\\.claude\\projects\\C--Users-Danculus-agora\\memory\\locomo-zero-llm-multihop-bridge-killed.md",
+  "object": "**ACTION:** ship nothing here. Optionally document that mnemo's hybrid already h…"
+ },
+ {
+  "id": "1abd46d484",
+  "text": "..\\..\\inspeximus-repo\\probes\\mnemo_rerank_hook_probe.py :: current state -> \"\"\"mnemo_rerank_hook_probe.py â€” recall(rerank=...) retrieve-then-rerank hook.  Verifies the plumbing (model-agnostic, mnemo imports no model): a caller-supplied `rerank(query, re…",
+  "tags": [
+   "file",
+   "edit"
+  ],
+  "value": 1.0,
+  "ts": 1784400545.5726383,
+  "iso": "2026-07-18T18:49:05Z",
+  "valid_from": 1784400545.5726383,
+  "source": null,
+  "mtype": "semantic",
+  "last_access": 1784400545.5726383,
+  "status": "active",
+  "links": [],
+  "meta": {},
+  "key": "file:..\\..\\inspeximus-repo\\probes\\mnemo_rerank_hook_probe.py",
+  "object": "\"\"\"mnemo_rerank_hook_probe.py â€” recall(rerank=...) retrieve-then-rerank hook. …"
+ },
+ {
+  "id": "315f7f3e39",
+  "text": "ran: cd /c/Users/Danculus/agora/server echo \"=== gatekeeper/skip body ===\"; sed -n '1283,1300p' agora/api/agent_os_api.py echo \"=== claude-inbox done/remove endpoint ===\"; grep -rn \"claude-inbox/done\\|clau…",
+  "tags": [
+   "bash"
+  ],
+  "value": 1.0,
+  "ts": 1784400702.335902,
+  "iso": "2026-07-18T18:51:42Z",
+  "valid_from": 1784400702.335902,
+  "source": null,
+  "mtype": "episodic",
+  "last_access": 1784400702.335902,
+  "status": "active",
+  "links": [],
+  "meta": {},
+  "key": "cmd:6ac73edaa8",
+  "object": "cd /c/Users/Danculus/agora/server echo \"=== gatekeeper/skip "
+ },
+ {
+  "id": "b172c50567",
+  "text": "ran: cd /c/Users/Danculus/agora/server; sed -n '2804,2820p' agora/api/agent_os_api.py",
+  "tags": [
+   "bash"
+  ],
+  "value": 1.0,
+  "ts": 1784400716.0253716,
+  "iso": "2026-07-18T18:51:56Z",
+  "valid_from": 1784400716.0253716,
+  "source": null,
+  "mtype": "episodic",
+  "last_access": 1784400716.0253716,
+  "status": "active",
+  "links": [],
+  "meta": {},
+  "key": "cmd:86ae7ea321",
+  "object": "cd /c/Users/Danculus/agora/server; sed -n '2804,2820p' agora"
+ },
+ {
+  "id": "3ed137d65a",
+  "text": "ran: cd /c/Users/Danculus/agora/server && grep -rn \"directions\" agora/api/*.py | grep -i \"post\\|router\\|def \" | head -10; grep -rln \"directions\" agora/ --include=*.py | head",
+  "tags": [
+   "bash"
+  ],
+  "value": 1.0,
+  "ts": 1784494511.576789,
+  "iso": "2026-07-19T20:55:11Z",
+  "valid_from": 1784494511.576789,
+  "source": null,
+  "mtype": "episodic",
+  "last_access": 1784494511.576789,
+  "status": "active",
+  "links": [],
+  "meta": {},
+  "key": "cmd:491a780667",
+  "object": "cd /c/Users/Danculus/agora/server && grep -rn \"directions\" a"
+ },
+ {
+  "id": "3314c03b83",
+  "text": "ran: sed -n '730,790p' agora/api/agent_os_api.py",
+  "tags": [
+   "bash"
+  ],
+  "value": 1.0,
+  "ts": 1784494518.411102,
+  "iso": "2026-07-19T20:55:18Z",
+  "valid_from": 1784494518.411102,
+  "source": null,
+  "mtype": "episodic",
+  "last_access": 1784494518.411102,
+  "status": "active",
+  "links": [],
+  "meta": {},
+  "key": "cmd:3e013b5dd9",
+  "object": "sed -n '730,790p' agora/api/agent_os_api.py"
+ },
+ {
+  "id": "653851769e",
+  "text": "ran: cd server && python - <<'EOF' 2>&1 | tail -20 import sys, time sys.path.insert(0, \".\") from agora.config import settings print(\"CONFIG SEEN BY THE BRAIN:\") print(\"  base_url        :\", getattr(setting…",
+  "tags": [
+   "bash"
+  ],
+  "value": 1.0,
+  "ts": 1784525224.279519,
+  "iso": "2026-07-20T05:27:04Z",
+  "valid_from": 1784525224.279519,
+  "source": null,
+  "mtype": "episodic",
+  "last_access": 1784525224.279519,
+  "status": "active",
+  "links": [],
+  "meta": {},
+  "key": "cmd:f0c29cb656",
+  "object": "cd server && python - <<'EOF' 2>&1 | tail -20 import sys, ti"
+ },
+ {
+  "id": "a7193b7be8",
+  "text": "ran: python - <<'EOF' 2>&1 | tail -8 import sys, time sys.path.insert(0, \".\") from agora.execution.llm_client import call_llm stamp = str(int(time.time())) for tier in (\"cheap\", \"main\", \"medium\"):     t0 =…",
+  "tags": [
+   "bash"
+  ],
+  "value": 1.0,
+  "ts": 1784525251.3112607,
+  "iso": "2026-07-20T05:27:31Z",
+  "valid_from": 1784525251.3112607,
+  "source": null,
+  "mtype": "episodic",
+  "last_access": 1784525251.3112607,
+  "status": "active",
+  "links": [],
+  "meta": {},
+  "key": "cmd:9d30152dda",
+  "object": "python - <<'EOF' 2>&1 | tail -8 import sys, time sys.path.in"
+ },
+ {
+  "id": "7d0fadaf2b",
+  "text": "ran: echo \"=== resident models (ollama ps) ===\"; curl -s http://localhost:11434/api/ps | python -c \" import json,sys d=json.load(sys.stdin) for m in d.get('models',[]):     print(f\\\"  {m['name']:32} {m.get…",
+  "tags": [
+   "bash"
+  ],
+  "value": 1.0,
+  "ts": 1784525262.5134199,
+  "iso": "2026-07-20T05:27:42Z",
+  "valid_from": 1784525262.5134199,
+  "source": null,
+  "mtype": "episodic",
+  "last_access": 1784525262.5134199,
+  "status": "active",
+  "links": [],
+  "meta": {},
+  "key": "cmd:d4118fc911",
+  "object": "echo \"=== resident models (ollama ps) ===\"; curl -s http://l"
+ },
+ {
+  "id": "a0c47e7c8a",
+  "text": "ran: curl -s http://localhost:11434/api/generate -X POST -d '{\"model\":\"qwen3:30b-a3b\",\"keep_alive\":0}' -m 60 -o /dev/null -w \"unload request: %{http_code}\\n\" until [ \"$(curl -s http://localhost:11434/api/p…",
+  "tags": [
+   "bash"
+  ],
+  "value": 1.0,
+  "ts": 1784525272.3520474,
+  "iso": "2026-07-20T05:27:52Z",
+  "valid_from": 1784525272.3520474,
+  "source": null,
+  "mtype": "episodic",
+  "last_access": 1784525272.3520474,
+  "status": "active",
+  "links": [],
+  "meta": {},
+  "key": "cmd:5dfb5eb28a",
+  "object": "curl -s http://localhost:11434/api/generate -X POST -d '{\"mo"
+ },
+ {
+  "id": "82b80b40ee",
+  "text": "ran: python - <<'EOF' import json, time, urllib.request t0=time.time() req = urllib.request.Request(\"http://localhost:11434/api/embeddings\",     data=json.dumps({\"model\":\"nomic-embed-text\",\"prompt\":\"search…",
+  "tags": [
+   "bash"
+  ],
+  "value": 1.0,
+  "ts": 1784525296.345889,
+  "iso": "2026-07-20T05:28:16Z",
+  "valid_from": 1784525296.345889,
+  "source": null,
+  "mtype": "episodic",
+  "last_access": 1784525296.345889,
+  "status": "active",
+  "links": [],
+  "meta": {},
+  "key": "cmd:0362af9b91",
+  "object": "python - <<'EOF' import json, time, urllib.request t0=time.t"
+ },
+ {
+  "id": "4c330e4f6a",
+  "text": "ran: grep -n \"planner OFF\\|LLM_quests\\|_PLANNER\\|planner_on\\|DUNGEON_PLANNER\" agora-game-server/mcp_server.py | head -12",
+  "tags": [
+   "bash"
+  ],
+  "value": 1.0,
+  "ts": 1784525309.7498436,
+  "iso": "2026-07-20T05:28:29Z",
+  "valid_from": 1784525309.7498436,
+  "source": null,
+  "mtype": "episodic",
+  "last_access": 1784525309.7498436,
+  "status": "active",
+  "links": [],
+  "meta": {},
+  "key": "cmd:b2a386f4ae",
+  "object": "grep -n \"planner OFF\\|LLM_quests\\|_PLANNER\\|planner_on\\|DUNG"
+ },
+ {
+  "id": "b1a91f4fdb",
+  "text": "ran: python -m py_compile server/agora/execution/research_tool.py server/agora/execution/frontier_harvest.py && echo \"compile OK\" cd server && python - <<'PYEOF' import sys; sys.path.insert(0, \".\") from ag…",
+  "tags": [
+   "bash"
+  ],
+  "value": 1.0,
+  "ts": 1784528151.816349,
+  "iso": "2026-07-20T06:15:51Z",
+  "valid_from": 1784528151.816349,
+  "source": null,
+  "mtype": "episodic",
+  "last_access": 1784528151.816349,
+  "status": "active",
+  "links": [],
+  "meta": {},
+  "key": "cmd:694643df8e",
+  "object": "python -m py_compile server/agora/execution/research_tool.py"
+ },
+ {
+  "id": "0ba363b5d2",
+  "text": "ran: cd /c/Users/Danculus/agora until curl -s -m 3 -o /dev/null http://127.0.0.1:8000/api/v1/health; do sleep 2; done; echo \"brain up\" cd server && python - <<'PYEOF' import sys, time; sys.path.insert(0, \"…",
+  "tags": [
+   "bash"
+  ],
+  "value": 1.0,
+  "ts": 1784528235.5886023,
+  "iso": "2026-07-20T06:17:15Z",
+  "valid_from": 1784528235.5886023,
+  "source": null,
+  "mtype": "episodic",
+  "last_access": 1784528235.5886023,
+  "status": "active",
+  "links": [],
+  "meta": {},
+  "key": "cmd:1b4adc42df",
+  "object": "cd /c/Users/Danculus/agora until curl -s -m 3 -o /dev/null h"
+ },
+ {
+  "id": "a2cadde8f8",
+  "text": "ran: cd /c/Users/Danculus/agora/server && python - <<'PYEOF' 2>&1 import sys; sys.path.insert(0, \".\") sys.stdout.reconfigure(encoding=\"utf-8\", errors=\"replace\") from agora.execution.research_tool import ar…",
+  "tags": [
+   "bash"
+  ],
+  "value": 1.0,
+  "ts": 1784529273.7252254,
+  "iso": "2026-07-20T06:34:33Z",
+  "valid_from": 1784529273.7252254,
+  "source": null,
+  "mtype": "episodic",
+  "last_access": 1784529273.7252254,
+  "status": "active",
+  "links": [],
+  "meta": {},
+  "key": "cmd:fd24084087",
+  "object": "cd /c/Users/Danculus/agora/server && python - <<'PYEOF' 2>&1"
+ },
+ {
+  "id": "7e48ccd25f",
+  "text": "ran: python - <<'PYEOF' 2>&1 import sys, urllib.request, re; sys.path.insert(0, \".\") sys.stdout.reconfigure(encoding=\"utf-8\", errors=\"replace\") from agora.execution.research_tool import arxiv_search ps = a…",
+  "tags": [
+   "bash"
+  ],
+  "value": 1.0,
+  "ts": 1784529295.0529447,
+  "iso": "2026-07-20T06:34:55Z",
+  "valid_from": 1784529295.0529447,
+  "source": null,
+  "mtype": "episodic",
+  "last_access": 1784529295.0529447,
+  "status": "active",
+  "links": [],
+  "meta": {},
+  "key": "cmd:58c3d4abff",
+  "object": "python - <<'PYEOF' 2>&1 import sys, urllib.request, re; sys."
+ },
+ {
+  "id": "bcf6bef3f1",
+  "text": "ran: python - <<'PYEOF' 2>&1 import urllib.request, xml.etree.ElementTree as ET, sys sys.stdout.reconfigure(encoding=\"utf-8\", errors=\"replace\") NS = {\"a\": \"http://www.w3.org/2005/Atom\"} url = \"http://expor…",
+  "tags": [
+   "bash"
+  ],
+  "value": 1.0,
+  "ts": 1784529304.757385,
+  "iso": "2026-07-20T06:35:04Z",
+  "valid_from": 1784529304.757385,
+  "source": null,
+  "mtype": "episodic",
+  "last_access": 1784529304.757385,
+  "status": "active",
+  "links": [],
+  "meta": {},
+  "key": "cmd:0d02adb3f2",
+  "object": "python - <<'PYEOF' 2>&1 import urllib.request, xml.etree.Ele"
+ },
+ {
+  "id": "6b2bfb77d6",
+  "text": "ran: python - <<'PYEOF' 2>&1 import json, urllib.request, sys sys.stdout.reconfigure(encoding=\"utf-8\", errors=\"replace\") def gh(q):     u = \"https://api.github.com/search/repositories?q=\" + urllib.parse.qu…",
+  "tags": [
+   "bash"
+  ],
+  "value": 1.0,
+  "ts": 1784529332.5211205,
+  "iso": "2026-07-20T06:35:32Z",
+  "valid_from": 1784529332.5211205,
+  "source": null,
+  "mtype": "episodic",
+  "last_access": 1784529332.5211205,
+  "status": "active",
+  "links": [],
+  "meta": {},
+  "key": "cmd:f7f1a6e9b9",
+  "object": "python - <<'PYEOF' 2>&1 import json, urllib.request, sys sys"
+ },
+ {
+  "id": "272c07fb26",
+  "text": "ran: python - <<'PYEOF' 2>&1 import sys; sys.path.insert(0, \".\") sys.stdout.reconfigure(encoding=\"utf-8\", errors=\"replace\") from agora.execution.research_tool import arxiv_search import time for q, lab in …",
+  "tags": [
+   "bash"
+  ],
+  "value": 1.0,
+  "ts": 1784529361.552024,
+  "iso": "2026-07-20T06:36:01Z",
+  "valid_from": 1784529361.552024,
+  "source": null,
+  "mtype": "episodic",
+  "last_access": 1784529361.552024,
+  "status": "active",
+  "links": [],
+  "meta": {},
+  "key": "cmd:7350fa6260",
+  "object": "python - <<'PYEOF' 2>&1 import sys; sys.path.insert(0, \".\") "
+ },
+ {
+  "id": "427a37048c",
+  "text": "..\\..\\.claude\\projects\\C--Users-Danculus-agora\\memory\\memops-benchmark-our-missing-axis.md :: current state -> --- name: memops-benchmark-our-missing-axis description: \"MemOps (arXiv 2607.12893, 2026-07-14, Hao/Zhang/Lin/Sun) â€” a THIRD-PARTY benchmark that scores memory as LIFECYCLE OPERA…",
+  "tags": [
+   "file",
+   "edit"
+  ],
+  "value": 1.0,
+  "ts": 1784529387.5347593,
+  "iso": "2026-07-20T06:36:27Z",
+  "valid_from": 1784529387.5347593,
+  "source": null,
+  "mtype": "semantic",
+  "last_access": 1784529387.5347593,
+  "status": "active",
+  "links": [],
+  "meta": {},
+  "key": "file:..\\..\\.claude\\projects\\C--Users-Danculus-agora\\memory\\memops-benchmark-our-missing-axis.md",
+  "object": "--- name: memops-benchmark-our-missing-axis description: \"MemOps (arXiv 2607.128…"
+ },
+ {
+  "id": "045b6c63bb",
+  "text": "..\\..\\.claude\\projects\\C--Users-Danculus-agora\\memory\\MEMORY.md :: current state -> - [Dungeon churn ROOT CAUSE = arXiv OR-firehose](dungeon-churn-rootcause-arxiv-or-firehose.md) â€” 33/68 on-mission overnight; harvest was the only RENEWABLE source and still on th…",
+  "tags": [
+   "file",
+   "edit"
+  ],
+  "value": 1.0,
+  "ts": 1784529395.2857516,
+  "iso": "2026-07-20T06:36:35Z",
+  "valid_from": 1784529395.2857516,
+  "source": null,
+  "mtype": "semantic",
+  "last_access": 1784529395.2857516,
+  "status": "active",
+  "links": [],
+  "meta": {},
+  "key": "file:..\\..\\.claude\\projects\\C--Users-Danculus-agora\\memory\\MEMORY.md",
+  "object": "- [Dungeon churn ROOT CAUSE = arXiv OR-firehose](dungeon-churn-rootcause-arxiv-o…"
+ },
+ {
+  "id": "e28ee8a15c",
+  "text": "ran: python -m py_compile server/agora/execution/methods.py && echo \"compile OK\" cd server && python - <<'PYEOF' import sys, re; sys.path.insert(0, \".\") sys.stdout.reconfigure(encoding=\"utf-8\", errors=\"rep…",
+  "tags": [
+   "bash"
+  ],
+  "value": 1.0,
+  "ts": 1784529713.5655525,
+  "iso": "2026-07-20T06:41:53Z",
+  "valid_from": 1784529713.5655525,
+  "source": null,
+  "mtype": "episodic",
+  "last_access": 1784529713.5655525,
+  "status": "active",
+  "links": [],
+  "meta": {},
+  "key": "cmd:01afa91d68",
+  "object": "python -m py_compile server/agora/execution/methods.py && ec"
+ },
+ {
+  "id": "2ada174ded",
+  "text": "agora\\execution\\methods.py :: current state -> _BOARD_STOP = frozenset(\"\"\"priority priorities prioritize prioritise research finding findings theme themes question questions standing owner deprioritize topic topics work make be…",
+  "tags": [
+   "file",
+   "edit"
+  ],
+  "value": 1.0,
+  "ts": 1784529733.726979,
+  "iso": "2026-07-20T06:42:13Z",
+  "valid_from": 1784529733.726979,
+  "source": null,
+  "mtype": "semantic",
+  "last_access": 1784529733.726979,
+  "status": "active",
+  "links": [],
+  "meta": {},
+  "key": "file:agora\\execution\\methods.py",
+  "object": "_BOARD_STOP = frozenset(\"\"\"priority priorities prioritize prioritise research fi…"
+ },
+ {
+  "id": "94dc4a60ce",
+  "text": "ran: cd /c/Users/Danculus/agora && python -m py_compile server/agora/execution/methods.py && cd server && python - <<'PYEOF' import sys; sys.path.insert(0, \".\") sys.stdout.reconfigure(encoding=\"utf-8\", err…",
+  "tags": [
+   "bash"
+  ],
+  "value": 1.0,
+  "ts": 1784529746.7975812,
+  "iso": "2026-07-20T06:42:26Z",
+  "valid_from": 1784529746.7975812,
+  "source": null,
+  "mtype": "episodic",
+  "last_access": 1784529746.7975812,
+  "status": "active",
+  "links": [],
+  "meta": {},
+  "key": "cmd:b850f1145b",
+  "object": "cd /c/Users/Danculus/agora && python -m py_compile server/ag"
+ },
+ {
+  "id": "0a0654d7bb",
+  "text": "ran: cd /c/Users/Danculus/agora/server && grep -rn \"scout-target\\|scout-record\\|scout/status\" agora/ --include=*.py | head -8; echo \"=== scout storage ===\"; grep -rn \"scout\" agora/ --include=*.py -l | head…",
+  "tags": [
+   "bash"
+  ],
+  "value": 1.0,
+  "ts": 1784582469.608776,
+  "iso": "2026-07-20T21:21:09Z",
+  "valid_from": 1784582469.608776,
+  "source": null,
+  "mtype": "episodic",
+  "last_access": 1784582469.608776,
+  "status": "active",
+  "links": [],
+  "meta": {},
+  "key": "cmd:ce0d04e509",
+  "object": "cd /c/Users/Danculus/agora/server && grep -rn \"scout-target\\"
+ },
+ {
+  "id": "2fa0b25c21",
+  "text": "ran: sed -n '1823,1870p' agora/api/agent_os_api.py",
+  "tags": [
+   "bash"
+  ],
+  "value": 1.0,
+  "ts": 1784582475.5353189,
+  "iso": "2026-07-20T21:21:15Z",
+  "valid_from": 1784582475.5353189,
+  "source": null,
+  "mtype": "episodic",
+  "last_access": 1784582475.5353189,
+  "status": "active",
+  "links": [],
+  "meta": {},
+  "key": "cmd:c273780ff9",
+  "object": "sed -n '1823,1870p' agora/api/agent_os_api.py"
+ },
+ {
+  "id": "ef8209da15",
+  "text": "ran: grep -n \"_STORE\\|def _load\\|def _save\\|def record_contacted\\|def find_opportunity\\|_THEMES =\" agora/execution/scout.py | head -12; echo \"=== size ===\"; wc -l agora/execution/scout.py",
+  "tags": [
+   "bash"
+  ],
+  "value": 1.0,
+  "ts": 1784582481.811941,
+  "iso": "2026-07-20T21:21:21Z",
+  "valid_from": 1784582481.811941,
+  "source": null,
+  "mtype": "episodic",
+  "last_access": 1784582481.811941,
+  "status": "active",
+  "links": [],
+  "meta": {},
+  "key": "cmd:14b5e3ac21",
+  "object": "grep -n \"_STORE\\|def _load\\|def _save\\|def record_contacted\\"
+ },
+ {
+  "id": "b76e5b9a88",
+  "text": "ran: sed -n '86,155p' agora/execution/scout.py",
+  "tags": [
+   "bash"
+  ],
+  "value": 1.0,
+  "ts": 1784582486.2610884,
+  "iso": "2026-07-20T21:21:26Z",
+  "valid_from": 1784582486.2610884,
+  "source": null,
+  "mtype": "episodic",
+  "last_access": 1784582486.2610884,
+  "status": "active",
+  "links": [],
+  "meta": {},
+  "key": "cmd:b9390ef30d",
+  "object": "sed -n '86,155p' agora/execution/scout.py"
+ },
+ {
+  "id": "03db348837",
+  "text": "ran: sed -n '14,30p' agora/execution/scout.py; echo \"...\"; sed -n '155,175p' agora/execution/scout.py",
+  "tags": [
+   "bash"
+  ],
+  "value": 1.0,
+  "ts": 1784582503.291708,
+  "iso": "2026-07-20T21:21:43Z",
+  "valid_from": 1784582503.291708,
+  "source": null,
+  "mtype": "episodic",
+  "last_access": 1784582503.291708,
+  "status": "active",
+  "links": [],
+  "meta": {},
+  "key": "cmd:81b0524e5f",
+  "object": "sed -n '14,30p' agora/execution/scout.py; echo \"...\"; sed -n"
+ },
+ {
+  "id": "4570a2480d",
+  "text": "ran: cat >> agora/execution/scout.py << 'PYEOF'   # --------------------------------------------------------------------------------------------- # THE SCOUT BOX â€” the Scout collects; Claude drains. Sepa…",
+  "tags": [
+   "bash"
+  ],
+  "value": 1.0,
+  "ts": 1784582527.5796874,
+  "iso": "2026-07-20T21:22:07Z",
+  "valid_from": 1784582527.5796874,
+  "source": null,
+  "mtype": "episodic",
+  "last_access": 1784582527.5796874,
+  "status": "active",
+  "links": [],
+  "meta": {},
+  "key": "cmd:f7fc3fe7e0",
+  "object": "cat >> agora/execution/scout.py << 'PYEOF'   # -------------"
+ },
+ {
+  "id": "d7241eb6e2",
+  "text": "ran: cat >> agora/execution/scout.py << 'PYEOF'   def find_learning() -> dict | None:     \"\"\"A merged PR in our problem space worth READING â€” not something to answer.      The outreach scan deliberately …",
+  "tags": [
+   "bash"
+  ],
+  "value": 1.0,
+  "ts": 1784582546.1650536,
+  "iso": "2026-07-20T21:22:26Z",
+  "valid_from": 1784582546.1650536,
+  "source": null,
+  "mtype": "episodic",
+  "last_access": 1784582546.1650536,
+  "status": "active",
+  "links": [],
+  "meta": {},
+  "key": "cmd:cba2d9ab32",
+  "object": "cat >> agora/execution/scout.py << 'PYEOF'   def find_learni"
+ },
+ {
+  "id": "9d32660e04",
+  "text": "agora\\api\\agent_os_api.py :: current state -> @router.get(\"/brain/scout/box\") async def brain_scout_box():     \"\"\"THE SCOUT BOX â€” leads collected but not yet triaged, capped so it cannot grow into a landfill.      Discovery …",
+  "tags": [
+   "file",
+   "edit"
+  ],
+  "value": 1.0,
+  "ts": 1784582561.9799852,
+  "iso": "2026-07-20T21:22:41Z",
+  "valid_from": 1784582561.9799852,
+  "source": null,
+  "mtype": "semantic",
+  "last_access": 1784582561.9799852,
+  "status": "superseded",
+  "links": [],
+  "meta": {
+   "superseded_by_toggle": "5850f2a62f",
+   "superseded_by_policy": "keyed_lww"
+  },
+  "key": "file:agora\\api\\agent_os_api.py",
+  "object": "@router.get(\"/brain/scout/box\") async def brain_scout_box():     \"\"\"THE SCOUT BO…",
+  "superseded_ts": 1784582664.1209805,
+  "invalidated_at": 1784582664.1209805
+ },
+ {
+  "id": "9dff64b2b4",
+  "text": "ran: python -m py_compile agora/api/agent_os_api.py agora/execution/scout.py && echo COMPILE_OK",
+  "tags": [
+   "bash"
+  ],
+  "value": 1.0,
+  "ts": 1784582567.1410291,
+  "iso": "2026-07-20T21:22:47Z",
+  "valid_from": 1784582567.1410291,
+  "source": null,
+  "mtype": "episodic",
+  "last_access": 1784582567.1410291,
+  "status": "active",
+  "links": [],
+  "meta": {},
+  "key": "cmd:4b004d0ba6",
+  "object": "python -m py_compile agora/api/agent_os_api.py agora/executi"
+ },
+ {
+  "id": "de1c8ff946",
+  "text": "..\\agora-game-server\\mcp_server.py :: current state -> # COLLECT FIRST, ALWAYS. This used to open with `if await _task_already_pending(\"Scout outreach\"):     # return`, so a single untriaged task stopped every later scan â€” the status…",
+  "tags": [
+   "file",
+   "edit"
+  ],
+  "value": 1.0,
+  "ts": 1784582579.882459,
+  "iso": "2026-07-20T21:22:59Z",
+  "valid_from": 1784582579.882459,
+  "source": null,
+  "mtype": "semantic",
+  "last_access": 1784582579.882459,
+  "status": "active",
+  "links": [],
+  "meta": {},
+  "key": "file:..\\agora-game-server\\mcp_server.py",
+  "object": "# COLLECT FIRST, ALWAYS. This used to open with `if await _task_already_pending(…"
+ },
+ {
+  "id": "5850f2a62f",
+  "text": "agora\\api\\agent_os_api.py :: current state -> @router.get(\"/brain/scout/box/take\") async def brain_scout_box_take(kind: str = \"contribute\", n: int = 1):     \"\"\"Hand out the top `n` open leads for triage, highest score first.  …",
+  "tags": [
+   "file",
+   "edit"
+  ],
+  "value": 1.0,
+  "ts": 1784582664.1209805,
+  "iso": "2026-07-20T21:24:24Z",
+  "valid_from": 1784582664.1209805,
+  "source": null,
+  "mtype": "semantic",
+  "last_access": 1784582664.1209805,
+  "status": "superseded",
+  "links": [],
+  "meta": {
+   "superseded_by_toggle": "46ccec13de",
+   "superseded_by_policy": "keyed_lww"
+  },
+  "key": "file:agora\\api\\agent_os_api.py",
+  "object": "@router.get(\"/brain/scout/box/take\") async def brain_scout_box_take(kind: str = …",
+  "superseded_ts": 1784586086.7615075,
+  "invalidated_at": 1784586086.7615075
+ },
+ {
+  "id": "32ddad715d",
+  "text": "ran: cd /c/Users/Danculus/agora/server && head -20 agora/execution/belief_revision.py | grep -n \"^import\\|^from\" ; grep -n \"def priorities_text\\|def priorities\" agora/execution/board.py | head -3",
+  "tags": [
+   "bash"
+  ],
+  "value": 1.0,
+  "ts": 1784585853.4266846,
+  "iso": "2026-07-20T22:17:33Z",
+  "valid_from": 1784585853.4266846,
+  "source": null,
+  "mtype": "episodic",
+  "last_access": 1784585853.4266846,
+  "status": "active",
+  "links": [],
+  "meta": {},
+  "key": "cmd:7fc36cd9e6",
+  "object": "cd /c/Users/Danculus/agora/server && head -20 agora/executio"
+ },
+ {
+  "id": "dc1edc005b",
+  "text": "ran: PYTHONIOENCODING=utf-8 python - << 'PYEOF' import pathlib p = pathlib.Path(\"agora/execution/belief_revision.py\") t = p.read_text(encoding=\"utf-8\") helper = '''  _STOP = {\"the\", \"and\", \"for\", \"with\", \"…",
+  "tags": [
+   "bash"
+  ],
+  "value": 1.0,
+  "ts": 1784585865.4570868,
+  "iso": "2026-07-20T22:17:45Z",
+  "valid_from": 1784585865.4570868,
+  "source": null,
+  "mtype": "episodic",
+  "last_access": 1784585865.4570868,
+  "status": "active",
+  "links": [],
+  "meta": {},
+  "key": "cmd:3b687c9a24",
+  "object": "PYTHONIOENCODING=utf-8 python - << 'PYEOF' import pathlib p "
+ },
+ {
+  "id": "087f050c1b",
+  "text": "ran: cd /c/Users/Danculus/agora/server && python -m py_compile agora/execution/competitor_watch.py && PYTHONIOENCODING=utf-8 python -c \" import sys; sys.path.insert(0,'.') import subprocess, json tok = sub…",
+  "tags": [
+   "bash"
+  ],
+  "value": 1.0,
+  "ts": 1784586060.487831,
+  "iso": "2026-07-20T22:21:00Z",
+  "valid_from": 1784586060.487831,
+  "source": null,
+  "mtype": "episodic",
+  "last_access": 1784586060.487831,
+  "status": "active",
+  "links": [],
+  "meta": {},
+  "key": "cmd:22f70ca19d",
+  "object": "cd /c/Users/Danculus/agora/server && python -m py_compile ag"
+ },
+ {
+  "id": "94578f3566",
+  "text": "ran: PYTHONIOENCODING=utf-8 python -c \" import json d=json.load(open('.competitor_watch.json')) print(f\\\"{'project':22} {'gh release':16} {'pypi':12} stars\\\") for k,v in d.items():     if k.startswith('_')…",
+  "tags": [
+   "bash"
+  ],
+  "value": 1.0,
+  "ts": 1784586067.293803,
+  "iso": "2026-07-20T22:21:07Z",
+  "valid_from": 1784586067.293803,
+  "source": null,
+  "mtype": "episodic",
+  "last_access": 1784586067.293803,
+  "status": "active",
+  "links": [],
+  "meta": {},
+  "key": "cmd:146db6d0d4",
+  "object": "PYTHONIOENCODING=utf-8 python -c \" import json d=json.load(o"
+ },
+ {
+  "id": "46ccec13de",
+  "text": "agora\\api\\agent_os_api.py :: current state -> @router.get(\"/brain/watch/competitors\") async def brain_watch_competitors():     \"\"\"EYES OUTSIDE THE POT â€” what the competition actually shipped since the last check.      Every …",
+  "tags": [
+   "file",
+   "edit"
+  ],
+  "value": 1.0,
+  "ts": 1784586086.7615075,
+  "iso": "2026-07-20T22:21:26Z",
+  "valid_from": 1784586086.7615075,
+  "source": null,
+  "mtype": "semantic",
+  "last_access": 1784586086.7615075,
+  "status": "superseded",
+  "links": [],
+  "meta": {
+   "superseded_by_toggle": "0fcba9f0d7",
+   "superseded_by_policy": "keyed_lww"
+  },
+  "key": "file:agora\\api\\agent_os_api.py",
+  "object": "@router.get(\"/brain/watch/competitors\") async def brain_watch_competitors():    …",
+  "superseded_ts": 1784586377.7118998,
+  "invalidated_at": 1784586377.7118998
+ },
+ {
+  "id": "c0276aa46a",
+  "text": "agora\\execution\\external_library.py :: current state -> \"\"\"The EXTERNAL LIBRARY â€” everything the outside world says about our problem, kept and searchable.  The system's whole intake was its own vault plus arXiv: what we already thoug…",
+  "tags": [
+   "file",
+   "edit"
+  ],
+  "value": 1.0,
+  "ts": 1784586144.2327502,
+  "iso": "2026-07-20T22:22:24Z",
+  "valid_from": 1784586144.2327502,
+  "source": null,
+  "mtype": "semantic",
+  "last_access": 1784586144.2327502,
+  "status": "superseded",
+  "links": [],
+  "meta": {
+   "superseded_by_toggle": "e317813d7b",
+   "superseded_by_policy": "keyed_lww"
+  },
+  "key": "file:agora\\execution\\external_library.py",
+  "object": "\"\"\"The EXTERNAL LIBRARY â€” everything the outside world says about our problem,…",
+  "superseded_ts": 1784586185.2276835,
+  "invalidated_at": 1784586185.2276835
+ },
+ {
+  "id": "288e91a893",
+  "text": "ran: python -m py_compile agora/execution/external_library.py && PYTHONIOENCODING=utf-8 timeout 600 python -c \" import sys; sys.path.insert(0,'.'); sys.path.insert(0,r'C:\\Users\\Danculus\\inspeximus-repo') from a…",
+  "tags": [
+   "bash"
+  ],
+  "value": 1.0,
+  "ts": 1784586169.7027159,
+  "iso": "2026-07-20T22:22:49Z",
+  "valid_from": 1784586169.7027159,
+  "source": null,
+  "mtype": "episodic",
+  "last_access": 1784586169.7027159,
+  "status": "active",
+  "links": [],
+  "meta": {},
+  "key": "cmd:ce2f6ec11f",
+  "object": "python -m py_compile agora/execution/external_library.py && "
+ },
+ {
+  "id": "e317813d7b",
+  "text": "agora\\execution\\external_library.py :: current state -> def _gh(path: str) -> dict:     # encoding is explicit: `text=True` decodes with the locale codec, which on this box is cp1250 and     # dies on the first non-Latin character in an…",
+  "tags": [
+   "file",
+   "edit"
+  ],
+  "value": 1.0,
+  "ts": 1784586185.2276835,
+  "iso": "2026-07-20T22:23:05Z",
+  "valid_from": 1784586185.2276835,
+  "source": null,
+  "mtype": "semantic",
+  "last_access": 1784586185.2276835,
+  "status": "superseded",
+  "links": [],
+  "meta": {
+   "superseded_by_toggle": "60b29d47e1",
+   "superseded_by_policy": "keyed_lww"
+  },
+  "key": "file:agora\\execution\\external_library.py",
+  "object": "def _gh(path: str) -> dict:     # encoding is explicit: `text=True` decodes with…",
+  "superseded_ts": 1784586232.771509,
+  "invalidated_at": 1784586232.771509
+ },
+ {
+  "id": "f473395c86",
+  "text": "ran: PYTHONIOENCODING=utf-8 timeout 300 python -c \" import sys; sys.path.insert(0,'.') from agora.execution.external_library import _reddit r=_reddit('LocalLLaMA','agent memory',5) print('reddit items:', l…",
+  "tags": [
+   "bash"
+  ],
+  "value": 1.0,
+  "ts": 1784586194.2252996,
+  "iso": "2026-07-20T22:23:14Z",
+  "valid_from": 1784586194.2252996,
+  "source": null,
+  "mtype": "episodic",
+  "last_access": 1784586194.2252996,
+  "status": "active",
+  "links": [],
+  "meta": {},
+  "key": "cmd:cb77d9450d",
+  "object": "PYTHONIOENCODING=utf-8 timeout 300 python -c \" import sys; s"
+ },
+ {
+  "id": "c12ca93b19",
+  "text": "ran: PYTHONIOENCODING=utf-8 timeout 300 python -c \" import urllib.request, urllib.parse, json url='https://www.reddit.com/r/LocalLLaMA/search.json?q='+urllib.parse.quote('agent memory')+'&restrict_sr=1&sor…",
+  "tags": [
+   "bash"
+  ],
+  "value": 1.0,
+  "ts": 1784586205.8573465,
+  "iso": "2026-07-20T22:23:25Z",
+  "valid_from": 1784586205.8573465,
+  "source": null,
+  "mtype": "episodic",
+  "last_access": 1784586205.8573465,
+  "status": "active",
+  "links": [],
+  "meta": {},
+  "key": "cmd:ecf61f2b28",
+  "object": "PYTHONIOENCODING=utf-8 timeout 300 python -c \" import urllib"
+ },
+ {
+  "id": "54f91ba2fa",
+  "text": "ran: grep -rln \"reddit\" agora/ --include=*.py | head -5; echo \"=== oauth path ===\"; grep -rn \"oauth.reddit.com\\|REDDIT_CLIENT\\|access_token\" agora/execution/*.py | head -6",
+  "tags": [
+   "bash"
+  ],
+  "value": 1.0,
+  "ts": 1784586215.3063326,
+  "iso": "2026-07-20T22:23:35Z",
+  "valid_from": 1784586215.3063326,
+  "source": null,
+  "mtype": "episodic",
+  "last_access": 1784586215.3063326,
+  "status": "active",
+  "links": [],
+  "meta": {},
+  "key": "cmd:1ef54ea682",
+  "object": "grep -rln \"reddit\" agora/ --include=*.py | head -5; echo \"=="
+ },
+ {
+  "id": "b87ee7b573",
+  "text": "ran: sed -n '150,200p' agora/execution/web_search.py",
+  "tags": [
+   "bash"
+  ],
+  "value": 1.0,
+  "ts": 1784586221.2186604,
+  "iso": "2026-07-20T22:23:41Z",
+  "valid_from": 1784586221.2186604,
+  "source": null,
+  "mtype": "episodic",
+  "last_access": 1784586221.2186604,
+  "status": "active",
+  "links": [],
+  "meta": {},
+  "key": "cmd:f24e32cfde",
+  "object": "sed -n '150,200p' agora/execution/web_search.py"
+ },
+ {
+  "id": "60b29d47e1",
+  "text": "agora\\execution\\external_library.py :: current state -> def _reddit(sub: str, query: str, limit: int = 15) -> list:     \"\"\"Read-only, through the OAuth token the distribution radar already holds.      The anonymous www.reddit.com/*.json…",
+  "tags": [
+   "file",
+   "edit"
+  ],
+  "value": 1.0,
+  "ts": 1784586232.771509,
+  "iso": "2026-07-20T22:23:52Z",
+  "valid_from": 1784586232.771509,
+  "source": null,
+  "mtype": "semantic",
+  "last_access": 1784586232.771509,
+  "status": "active",
+  "links": [],
+  "meta": {},
+  "key": "file:agora\\execution\\external_library.py",
+  "object": "def _reddit(sub: str, query: str, limit: int = 15) -> list:     \"\"\"Read-only, th…"
+ },
+ {
+  "id": "6e3c8f0dab",
+  "text": "ran: ls /c/Users/Danculus/agora/tools/distribution_radar.py 2>/dev/null && python -m py_compile agora/execution/external_library.py && PYTHONIOENCODING=utf-8 timeout 300 python -c \" import sys; sys.path.in…",
+  "tags": [
+   "bash"
+  ],
+  "value": 1.0,
+  "ts": 1784586240.8880098,
+  "iso": "2026-07-20T22:24:00Z",
+  "valid_from": 1784586240.8880098,
+  "source": null,
+  "mtype": "episodic",
+  "last_access": 1784586240.8880098,
+  "status": "active",
+  "links": [],
+  "meta": {},
+  "key": "cmd:d08709d66d",
+  "object": "ls /c/Users/Danculus/agora/tools/distribution_radar.py 2>/de"
+ },
+ {
+  "id": "f39d48b7c5",
+  "text": "ran: cd /c/Users/Danculus/agora/server && sed -i 's|sys.path.insert(0, str(Path(__file__).resolve().parents\\[2\\] / \"tools\"))|sys.path.insert(0, str(Path(__file__).resolve().parents[3] / \"tools\"))|' agora/e…",
+  "tags": [
+   "bash"
+  ],
+  "value": 1.0,
+  "ts": 1784586291.847011,
+  "iso": "2026-07-20T22:24:51Z",
+  "valid_from": 1784586291.847011,
+  "source": null,
+  "mtype": "episodic",
+  "last_access": 1784586291.847011,
+  "status": "active",
+  "links": [],
+  "meta": {},
+  "key": "cmd:d01a69b91a",
+  "object": "cd /c/Users/Danculus/agora/server && sed -i 's|sys.path.inse"
+ },
+ {
+  "id": "c87f7e569e",
+  "text": "ran: cat >> agora/execution/external_library.py << 'PYEOF'   # -------------------------------------------------------------------------------------------- # THE CARTOGRAPHER'S NEW MAP # # Wren used to loo…",
+  "tags": [
+   "bash"
+  ],
+  "value": 1.0,
+  "ts": 1784586322.4790788,
+  "iso": "2026-07-20T22:25:22Z",
+  "valid_from": 1784586322.4790788,
+  "source": null,
+  "mtype": "episodic",
+  "last_access": 1784586322.4790788,
+  "status": "active",
+  "links": [],
+  "meta": {},
+  "key": "cmd:7af3ff25c8",
+  "object": "cat >> agora/execution/external_library.py << 'PYEOF'   # --"
+ },
+ {
+  "id": "cf1202bc40",
+  "text": "ran: PYTHONIOENCODING=utf-8 timeout 900 python -c \" import sys; sys.path.insert(0,'.') from agora.execution.external_library import harvest, map_external, stats r=harvest(batch=8) print('added:', r['added'…",
+  "tags": [
+   "bash"
+  ],
+  "value": 1.0,
+  "ts": 1784586350.3739336,
+  "iso": "2026-07-20T22:25:50Z",
+  "valid_from": 1784586350.3739336,
+  "source": null,
+  "mtype": "episodic",
+  "last_access": 1784586350.3739336,
+  "status": "active",
+  "links": [],
+  "meta": {},
+  "key": "cmd:8721db6a73",
+  "object": "PYTHONIOENCODING=utf-8 timeout 900 python -c \" import sys; s"
+ },
+ {
+  "id": "0fcba9f0d7",
+  "text": "agora\\api\\agent_os_api.py :: current state -> @router.post(\"/brain/library/external/harvest\") async def brain_external_harvest(request: Request):     \"\"\"Pull the next slice of the query bank from GitHub + Reddit into the exter…",
+  "tags": [
+   "file",
+   "edit"
+  ],
+  "value": 1.0,
+  "ts": 1784586377.7118998,
+  "iso": "2026-07-20T22:26:17Z",
+  "valid_from": 1784586377.7118998,
+  "source": null,
+  "mtype": "semantic",
+  "last_access": 1784586377.7118998,
+  "status": "active",
+  "links": [],
+  "meta": {},
+  "key": "file:agora\\api\\agent_os_api.py",
+  "object": "@router.post(\"/brain/library/external/harvest\") async def brain_external_harvest…"
+ },
+ {
+  "id": "9d59b5993b",
+  "text": "ran: cd /c/Users/Danculus/agora/server && PYTHONIOENCODING=utf-8 python -c \" import sys; sys.path.insert(0,'.') from agora.execution.belief_revision import _board_tokens t=sorted(_board_tokens()); print(le…",
+  "tags": [
+   "bash"
+  ],
+  "value": 1.0,
+  "ts": 1784588408.3414834,
+  "iso": "2026-07-20T23:00:08Z",
+  "valid_from": 1784588408.3414834,
+  "source": null,
+  "mtype": "episodic",
+  "last_access": 1784588408.3414834,
+  "status": "active",
+  "links": [],
+  "meta": {},
+  "key": "cmd:005f3d76dc",
+  "object": "cd /c/Users/Danculus/agora/server && PYTHONIOENCODING=utf-8 "
+ },
+ {
+  "id": "e21bd19cc7",
+  "text": "ran: curl -s \"http://127.0.0.1:8000/api/v1/agent-os/brain/board\" 2>/dev/null | PYTHONIOENCODING=utf-8 python -c \" import json,sys; d=json.load(sys.stdin); print((d.get('priorities') or '')[:700]) \"",
+  "tags": [
+   "bash"
+  ],
+  "value": 1.0,
+  "ts": 1784588423.889065,
+  "iso": "2026-07-20T23:00:23Z",
+  "valid_from": 1784588423.889065,
+  "source": null,
+  "mtype": "episodic",
+  "last_access": 1784588423.889065,
+  "status": "active",
+  "links": [],
+  "meta": {},
+  "key": "cmd:a6f9015884",
+  "object": "curl -s \"http://127.0.0.1:8000/api/v1/agent-os/brain/board\" "
+ },
+ {
+  "id": "998b69234a",
+  "text": "..\\..\\AppData\\Local\\Temp\\claude\\C--Users-Danculus-agora\\c5317a10-d6e1-4480-8deb-effafb6407b2\\scratchpad\\fix_board_polarity.py :: current state -> \"\"\"The board has POLARITY and we were reading it flat.  The standing priorities end with \"Finance/health/physics are ONLY test-beds, never the headline. Deprioritize generic meta-s…",
+  "tags": [
+   "file",
+   "edit"
+  ],
+  "value": 1.0,
+  "ts": 1784588446.0533886,
+  "iso": "2026-07-20T23:00:46Z",
+  "valid_from": 1784588446.0533886,
+  "source": null,
+  "mtype": "semantic",
+  "last_access": 1784588446.0533886,
+  "status": "active",
+  "links": [],
+  "meta": {},
+  "key": "file:..\\..\\AppData\\Local\\Temp\\claude\\C--Users-Danculus-agora\\c5317a10-d6e1-4480-8deb-effafb6407b2\\scratchpad\\fix_board_polarity.py",
+  "object": "\"\"\"The board has POLARITY and we were reading it flat.  The standing priorities …"
+ },
+ {
+  "id": "559141aa8e",
+  "text": "ran: cd /c/Users/Danculus/agora/server && PYTHONIOENCODING=utf-8 timeout 900 python -c \" import sys; sys.path.insert(0,'.') from agora.execution.external_library import harvest, stats r=harvest(batch=10) p…",
+  "tags": [
+   "bash"
+  ],
+  "value": 1.0,
+  "ts": 1784588569.337596,
+  "iso": "2026-07-20T23:02:49Z",
+  "valid_from": 1784588569.337596,
+  "source": null,
+  "mtype": "episodic",
+  "last_access": 1784588569.337596,
+  "status": "superseded",
+  "links": [],
+  "meta": {
+   "superseded_by_toggle": "bc6ec03820",
+   "superseded_by_policy": "keyed_lww"
+  },
+  "key": "cmd:48e6bc335e",
+  "object": "cd /c/Users/Danculus/agora/server && PYTHONIOENCODING=utf-8 ",
+  "superseded_ts": 1784592507.326297,
+  "invalidated_at": 1784592507.326297
+ },
+ {
+  "id": "f967d73c2b",
+  "text": "ran: cd /c/Users/Danculus/agora/server && python -m py_compile agora/execution/contribution_finder.py && PYTHONIOENCODING=utf-8 timeout 300 python -c \" import sys; sys.path.insert(0,'.') from agora.executi…",
+  "tags": [
+   "bash"
+  ],
+  "value": 1.0,
+  "ts": 1784590509.601035,
+  "iso": "2026-07-20T23:35:09Z",
+  "valid_from": 1784590509.601035,
+  "source": null,
+  "mtype": "episodic",
+  "last_access": 1784590509.601035,
+  "status": "active",
+  "links": [],
+  "meta": {},
+  "key": "cmd:e887ee2696",
+  "object": "cd /c/Users/Danculus/agora/server && python -m py_compile ag"
+ },
+ {
+  "id": "56ec60a4eb",
+  "text": "ran: PYTHONIOENCODING=utf-8 python - << 'PYEOF' import pathlib p = pathlib.Path(\"agora/execution/contribution_finder.py\"); t = p.read_text(encoding=\"utf-8\")  SUBJ = ''' # The thread has to be ABOUT memory …",
+  "tags": [
+   "bash"
+  ],
+  "value": 1.0,
+  "ts": 1784590535.8488204,
+  "iso": "2026-07-20T23:35:35Z",
+  "valid_from": 1784590535.8488204,
+  "source": null,
+  "mtype": "episodic",
+  "last_access": 1784590535.8488204,
+  "status": "active",
+  "links": [],
+  "meta": {},
+  "key": "cmd:2c3fe3c1ff",
+  "object": "PYTHONIOENCODING=utf-8 python - << 'PYEOF' import pathlib p "
+ },
+ {
+  "id": "ffa033dedf",
+  "text": "ran: PYTHONIOENCODING=utf-8 python - << 'PYEOF' import pathlib p = pathlib.Path(\"agora/api/agent_os_api.py\"); t = p.read_text(encoding=\"utf-8\") ep = '''@router.get(\"/brain/contribute/shortlist\") async def …",
+  "tags": [
+   "bash"
+  ],
+  "value": 1.0,
+  "ts": 1784590561.7670727,
+  "iso": "2026-07-20T23:36:01Z",
+  "valid_from": 1784590561.7670727,
+  "source": null,
+  "mtype": "episodic",
+  "last_access": 1784590561.7670727,
+  "status": "active",
+  "links": [],
+  "meta": {},
+  "key": "cmd:cb945738b0",
+  "object": "PYTHONIOENCODING=utf-8 python - << 'PYEOF' import pathlib p "
+ },
+ {
+  "id": "bc6ec03820",
+  "text": "ran: cd /c/Users/Danculus/agora/server && PYTHONIOENCODING=utf-8 timeout 900 python -c \" import sys; sys.path.insert(0,'.') from agora.execution.external_library import harvest, stats r=harvest(batch=10) p…",
+  "tags": [
+   "bash"
+  ],
+  "value": 1.0,
+  "ts": 1784592507.326297,
+  "iso": "2026-07-21T00:08:27Z",
+  "valid_from": 1784592507.326297,
+  "source": null,
+  "mtype": "episodic",
+  "last_access": 1784592507.326297,
+  "status": "active",
+  "links": [],
+  "meta": {},
+  "key": "cmd:48e6bc335e",
+  "object": "cd /c/Users/Danculus/agora/server && PYTHONIOENCODING=utf-8 "
+ },
+ {
+  "id": "a5f3604ad2",
+  "text": "ran: PYTHONIOENCODING=utf-8 timeout 300 python -c \" import sys,json; sys.path.insert(0,'.') from agora.execution.contribution_finder import find from agora.execution.external_library import map_external r=…",
+  "tags": [
+   "bash"
+  ],
+  "value": 1.0,
+  "ts": 1784592522.5440814,
+  "iso": "2026-07-21T00:08:42Z",
+  "valid_from": 1784592522.5440814,
+  "source": null,
+  "mtype": "episodic",
+  "last_access": 1784592522.5440814,
+  "status": "active",
+  "links": [],
+  "meta": {},
+  "key": "cmd:bd464bfcd0",
+  "object": "PYTHONIOENCODING=utf-8 timeout 300 python -c \" import sys,js"
+ },
+ {
+  "id": "1edbeb523f",
+  "text": "..\\agora_output\\TOP10_UPGRADES.md :: current state -> # Ten upgrades, ranked by measured external demand  Built from evidence gathered overnight 2026-07-20/21, not from taste. Three independent instruments agreed, which is why the ran…",
+  "tags": [
+   "file",
+   "edit"
+  ],
+  "value": 1.0,
+  "ts": 1784592572.6325295,
+  "iso": "2026-07-21T00:09:32Z",
+  "valid_from": 1784592572.6325295,
+  "source": null,
+  "mtype": "semantic",
+  "last_access": 1784592572.6325295,
+  "status": "active",
+  "links": [],
+  "meta": {},
+  "key": "file:..\\agora_output\\TOP10_UPGRADES.md",
+  "object": "# Ten upgrades, ranked by measured external demand  Built from evidence gathered…"
+ },
+ {
+  "id": "14fed4d9f7",
+  "text": "ran: cd /c/Users/Danculus/agora/server && PYTHONIOENCODING=utf-8 timeout 900 python -c \" import sys; sys.path.insert(0,'.') from agora.execution.external_library import harvest, map_external from agora.exe…",
+  "tags": [
+   "bash"
+  ],
+  "value": 1.0,
+  "ts": 1784599197.9014163,
+  "iso": "2026-07-21T01:59:57Z",
+  "valid_from": 1784599197.9014163,
+  "source": null,
+  "mtype": "episodic",
+  "last_access": 1784599197.9014163,
+  "status": "active",
+  "links": [],
+  "meta": {},
+  "key": "cmd:8abe2a2c06",
+  "object": "cd /c/Users/Danculus/agora/server && PYTHONIOENCODING=utf-8 "
+ },
+ {
+  "id": "2d965ea602",
+  "text": "..\\agora_output\\MORNING_BRIEFING_2026-07-21.md :: current state -> # Morning briefing â€” 21 July 2026  Everything below was produced overnight while you slept, in half-hour loop iterations. Where a number appears, the file that produced it is nam…",
+  "tags": [
+   "file",
+   "edit"
+  ],
+  "value": 1.0,
+  "ts": 1784599238.5940685,
+  "iso": "2026-07-21T02:00:38Z",
+  "valid_from": 1784599238.5940685,
+  "source": null,
+  "mtype": "semantic",
+  "last_access": 1784599238.5940685,
+  "status": "active",
+  "links": [],
+  "meta": {},
+  "key": "file:..\\agora_output\\MORNING_BRIEFING_2026-07-21.md",
+  "object": "# Morning briefing â€” 21 July 2026  Everything below was produced overnight whi…"
+ },
+ {
+  "id": "703fefd014",
+  "text": "ran: cd /c/Users/Danculus/agora/server && PYTHONIOENCODING=utf-8 timeout 600 python -c \" import sys; sys.path.insert(0,'.') from agora.execution.external_library import harvest, stats r=harvest(batch=6); p…",
+  "tags": [
+   "bash"
+  ],
+  "value": 1.0,
+  "ts": 1784603203.0712793,
+  "iso": "2026-07-21T03:06:43Z",
+  "valid_from": 1784603203.0712793,
+  "source": null,
+  "mtype": "episodic",
+  "last_access": 1784603203.0712793,
+  "status": "active",
+  "links": [],
+  "meta": {},
+  "key": "cmd:a3f34e9412",
+  "object": "cd /c/Users/Danculus/agora/server && PYTHONIOENCODING=utf-8 "
+ },
+ {
+  "id": "684347343e",
+  "text": "ran: echo \"=== uncommitted work? ===\"; for r in /c/Users/Danculus/agora /c/Users/Danculus/inspeximus-repo; do printf \"%-28s \" \"$(basename $r)\"; git -C $r status --porcelain 2>/dev/null | wc -l | xargs echo \"cha…",
+  "tags": [
+   "bash"
+  ],
+  "value": 1.0,
+  "ts": 1784605117.413337,
+  "iso": "2026-07-21T03:38:37Z",
+  "valid_from": 1784605117.413337,
+  "source": null,
+  "mtype": "episodic",
+  "last_access": 1784605117.413337,
+  "status": "active",
+  "links": [],
+  "meta": {},
+  "key": "cmd:3989fb4593",
+  "object": "echo \"=== uncommitted work? ===\"; for r in /c/Users/Danculus"
+ },
+ {
+  "id": "0eb7366312",
+  "text": "ran: curl -s \"http://127.0.0.1:8000/api/v1/agent-os/brain/claude-inbox\" 2>/dev/null | PYTHONIOENCODING=utf-8 python -c \" import json,sys; d=json.load(sys.stdin) for t in d.get('pending',[]): print(' -', (t…",
+  "tags": [
+   "bash"
+  ],
+  "value": 1.0,
+  "ts": 1784605128.1082826,
+  "iso": "2026-07-21T03:38:48Z",
+  "valid_from": 1784605128.1082826,
+  "source": null,
+  "mtype": "episodic",
+  "last_access": 1784605128.1082826,
+  "status": "active",
+  "links": [],
+  "meta": {},
+  "key": "cmd:eadeeb0ef9",
+  "object": "curl -s \"http://127.0.0.1:8000/api/v1/agent-os/brain/claude-"
+ },
+ {
+  "id": "fc7b4b0113",
+  "text": "ran: cd /c/Users/Danculus/agora/server && PYTHONIOENCODING=utf-8 python - << 'PYEOF' import pathlib p = pathlib.Path(\"agora/execution/scout.py\"); t = p.read_text(encoding=\"utf-8\")  SUBJ = ''' # The lead ha…",
+  "tags": [
+   "bash"
+  ],
+  "value": 1.0,
+  "ts": 1784605175.1973176,
+  "iso": "2026-07-21T03:39:35Z",
+  "valid_from": 1784605175.1973176,
+  "source": null,
+  "mtype": "episodic",
+  "last_access": 1784605175.1973176,
+  "status": "active",
+  "links": [],
+  "meta": {},
+  "key": "cmd:a5030e5da6",
+  "object": "cd /c/Users/Danculus/agora/server && PYTHONIOENCODING=utf-8 "
+ }
+]

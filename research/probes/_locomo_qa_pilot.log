@@ -1,0 +1,26 @@
+LOCOMO QA end-to-end · convs=1 k=20 answerer/judge=llama3.1:8b (local)
+
+  conv0 mnemo        acc=0.583 (7/12)
+  conv0 naive        acc=0.417 (5/12)
+
+{
+ "mnemo": {
+  "accuracy": 0.583,
+  "n": 12,
+  "by_category": {
+   "2": 0.286,
+   "3": 1.0,
+   "1": 1.0
+  }
+ },
+ "naive": {
+  "accuracy": 0.417,
+  "n": 12,
+  "by_category": {
+   "2": 0.286,
+   "3": 1.0,
+   "1": 0.5
+  }
+ }
+}
+saved locomo_qa_result.json

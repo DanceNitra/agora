@@ -51,14 +51,14 @@ def script_link(lab_rec):
 # survive re-renders regardless of the ledger file). Only add a mapping you are confident about -- a wrong
 # receipt is worse than none. Extend as more probes are confirmed (agentpoison, eviction, separation-law, ...).
 _PROBE_BY_LAB = {
-    "39737a": "mnemo/probes/nudge_pubbias_artifact.py",              # food-nudges 2.5x
-    "502d6c": "mnemo/probes/good_to_great_null.py",                  # good-to-great
-    "bf7bb9": "mnemo/probes/llm_judge_length_null.py",               # llm-as-judge length
-    "12b630": "mnemo/probes/founder_survivorship_null.py",           # founder-led 3.1x
-    "14c41f": "mnemo/probes/arena_style_only.py",                    # chatbot arena style
-    "ragdead": "mnemo/probes/ragdead/exp_ragdead_A.py",             # RAG-is-dead / CAG
-    "exp_supersession_replication": "mnemo/probes/supersession_replication.py",  # cosine supersession
-    "rev93": "mnemo/probes/reversibility_predictability_probe.py",  # tool-reversibility signature-decidability
+    "39737a": "research/probes/nudge_pubbias_artifact.py",              # food-nudges 2.5x
+    "502d6c": "research/probes/good_to_great_null.py",                  # good-to-great
+    "bf7bb9": "research/probes/llm_judge_length_null.py",               # llm-as-judge length
+    "12b630": "research/probes/founder_survivorship_null.py",           # founder-led 3.1x
+    "14c41f": "research/probes/arena_style_only.py",                    # chatbot arena style
+    "ragdead": "research/probes/ragdead/exp_ragdead_A.py",             # RAG-is-dead / CAG
+    "exp_supersession_replication": "research/probes/supersession_replication.py",  # cosine supersession
+    "rev93": "research/probes/reversibility_predictability_probe.py",  # tool-reversibility signature-decidability
 }
 
 

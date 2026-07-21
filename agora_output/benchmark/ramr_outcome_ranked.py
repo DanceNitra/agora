@@ -22,7 +22,7 @@ and avoids re-embedding under GPU contention. Cloud-free (local nomic-embed-text
 import os, sys, json, time, urllib.request
 import numpy as np
 sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "..", "mnemo"))
-from mnemo import Mnemo
+from inspeximus import Inspeximus
 
 OLL = "http://localhost:11434/api/embeddings"
 M_TOPICS = int(os.getenv("RAMR_M", "24"))
@@ -66,7 +66,7 @@ def build_pool():
 
 def run_arm(pool, D, correct_idx, mode, seed):
     rr = np.random.default_rng(seed)
-    store = Mnemo(path=None, embed=embed); store.semantic_threshold = 1
+    store = Inspeximus(path=None, embed=embed); store.semantic_threshold = 1
     correct = []
     for ti, tp in enumerate(pool):
         cs = set()

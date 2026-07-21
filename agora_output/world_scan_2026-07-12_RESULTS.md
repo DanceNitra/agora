@@ -1,14 +1,14 @@
 # World-scan leads — MEASURED results (2026-07-12)
 
 Owner goal ("sprav vsetky na co si prisiel ... dokonci vsetko"): built + measured a runnable first-step for all
-5 designed leads from the deep world scan. Each has a probe under mnemo/probes/ and a saved result. Deterministic
+5 designed leads from the deep world scan. Each has a probe under research/probes/ and a saved result. Deterministic
 + cloud-free unless noted. Publishing outward (Crucible/posts) is a SEPARATE gated step (validate->storm->audit
 ->verify) — flagged per lead below; nothing here has gone out.
 
 ---
 
 ## ① TOKI under concurrency — LIVE, real finding
-Probe: mnemo/probes/toki_concurrency_probe.py · result: agora_output/toki_concurrency_result.txt
+Probe: research/probes/toki_concurrency_probe.py · result: agora_output/toki_concurrency_result.txt
 n=72 (24 facts x 3 orderings), deterministic, write-receipt chain intact.
 
 stale-derived-active rate (default recall surfaces a retired value; lower better):
@@ -36,7 +36,7 @@ theory. KEEP as a product feature only (recall(lineage_guard=True), honestly cit
 recovery-halflife. Detail: agora_output/lead1_gate_storm_verdict.md.
 
 ## ④ Provenance injection-resistance — FAILED verdict (thesis holds), honest scope
-Probe: mnemo/probes/integrity_bench_inject.py · result: agora_output/integrity_inject_result.txt
+Probe: research/probes/integrity_bench_inject.py · result: agora_output/integrity_inject_result.txt
 n=45/cell, deterministic, MINJA-style authentic-channel injection.
 
   (a) no-guard              ASR 1.000 [0.921,1.000]
@@ -52,7 +52,7 @@ any outward publish (the world-scan's own first-step spec). Distribution value h
 but do NOT ship until (b) runs against the actual PAM/AIP/AP2 code.
 
 ## ② Governance-evidence sufficiency — LIVE, self-incriminating
-Probe: mnemo/probes/governance_sufficiency_probe.py · result: agora_output/governance_sufficiency_result.txt
+Probe: research/probes/governance_sufficiency_probe.py · result: agora_output/governance_sufficiency_result.txt
 One real correction+erasure lifecycle; 8-question DEMM-style rubric over the exact receipt bytes; deterministic.
 
 mnemo SUFFICIENCY SCORE 5/8.
@@ -66,7 +66,7 @@ request to an authenticated principal; publish a Certificate-Transparency-style 
 a standing sufficiency leaderboard (self-cell first, competitors self-submit) after the gate.
 
 ## ⑤ Fault-to-fabrication on the LIVE 8-agent economy — LIVE but MODEST (robustness confirmation)
-Probe: mnemo/probes/fault_to_fabrication_probe.py · result: agora_output/fault_to_fabrication_result.txt
+Probe: research/probes/fault_to_fabrication_probe.py · result: agora_output/fault_to_fabrication_result.txt
 N=20 synthetic keyed faults into a temp COPY of each of the 8 real agent stores (live files never mutated);
 stale-surface + current-surface with echo_guard OFF vs ON against the real active backdrop (453-472 active/agent).
 
@@ -81,7 +81,7 @@ Defensibility is real (nobody else has live stores) but the result is not surpri
 the follow-up that would make it a finding.
 
 ## ③ Consistency-class classifier — KILLED at judgment (textbook demonstration)
-Probe: mnemo/probes/consistency_class_probe.py
+Probe: research/probes/consistency_class_probe.py
 serialized 0 lost / 40; two-writers-unsynchronized 20 lost / 40. The class formally moves with the control
 plane, BUT the anomaly is a classic lost-update from a DELIBERATE misuse (two full-rewrite writers on one JSON
 file, no locking) — textbook since the 1970s, a deployment mistake mnemo never claims to support, and the

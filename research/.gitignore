@@ -1,0 +1,5 @@
+memory.json
+
+# Embedding caches are rebuildable artifacts, not source. One of these is 115 MB and GitHub
+# rejects the push; they were never meant to be tracked.
+*embcache*.json

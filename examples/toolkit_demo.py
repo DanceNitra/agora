@@ -6,11 +6,11 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT))
 
-import mnemo, ragfresh, nullcheck, selfref, quitkit, idcheck, goodhart, herdcheck   # noqa: E402
+import inspeximus, ragfresh, nullcheck, selfref, quitkit, idcheck, goodhart, herdcheck   # noqa: E402
 
 print("=" * 70)
 print("1) mnemo — agent memory: remember, then value-ranked recall")
-m = mnemo.Mnemo(str(ROOT / "examples" / "_toolkit_demo_mem.json"))
+m = mnemo.Inspeximus(str(ROOT / "examples" / "_toolkit_demo_mem.json"))
 m.remember("The deploy key rotates every 90 days; last rotated 2026-05-01.", tags=["ops"], value=3.0)
 m.remember("Coffee machine is on the 3rd floor.", tags=["trivia"], value=1.0)
 hits = m.recall("when does the deploy key expire", k=1)

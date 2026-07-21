@@ -13,4 +13,4 @@ Quick follow-up — I re-ran this on SimpleQA (n=150) to check it wasn't an arit
 
 On multi-sample (someone raised this earlier): it recovers small models on arithmetic (~0.97) but not on SimpleQA recall (0.57–0.71). Re-sampling helps when the model can re-derive an answer, not when it just doesn't know the fact.
 
-Probe + raw per-item data: https://github.com/DanceNitra/agora/tree/main/mnemo/probes/overconfidence_tax
+Probe + raw per-item data: https://github.com/DanceNitra/agora/tree/main/research/probes/overconfidence_tax

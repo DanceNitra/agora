@@ -51,7 +51,7 @@ predictability — generativity remains path-dominated regardless of generality.
    the identification real science cannot run).
 2. A **real, replicated positive** (generality → cross-field scope).
 3. An **honest null** (generality → predictability) + a **3-method refutation** (artifact-vs-claim).
-4. Runnable receipt: [`mnemo/probes/idea_generativity_generality_probe.py`](../mnemo/probes/idea_generativity_generality_probe.py).
+4. Runnable receipt: [`research/probes/idea_generativity_generality_probe.py`](../research/probes/idea_generativity_generality_probe.py).
 
 ## Honest caveats & next steps
 n=60 per field, one era (2015–2017), single LLM rater; "generality" may correlate with clarity/quality; the

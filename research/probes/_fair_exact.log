@@ -1,0 +1,19 @@
+FAIR conflict (raw-text contract, shared LLM judge) · poison=exact · n=30 · systems=['mnemo', 'naive']
+  [poison] mnemo 10/30 hit=0
+  [poison] mnemo 20/30 hit=0
+  [poison] mnemo 30/30 hit=0
+  poison mnemo     : 0/30 = 0%
+  [poison] naive 10/30 hit=0
+  [poison] naive 20/30 hit=0
+  [poison] naive 30/30 hit=0
+  poison naive     : 0/30 = 0%
+  [legit] mnemo 10/30 hit=0
+  [legit] mnemo 20/30 hit=0
+  [legit] mnemo 30/30 hit=0
+  legit  mnemo     : 0/30 = 0%
+  [legit] naive 10/30 hit=0
+  [legit] naive 20/30 hit=0
+  [legit] naive 30/30 hit=0
+  legit  naive     : 0/30 = 0%
+
+saved fair_conflict result.

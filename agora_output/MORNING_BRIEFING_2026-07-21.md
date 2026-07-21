@@ -250,6 +250,6 @@ completes work — the death spiral running backwards.
 ---
 
 **State at 06:15:** brain and dungeon up, inbox 3 (all machinery or on-mission), **31 off-mission
-births blocked overnight**, external library 392 items, `mnemo-repo` clean and pushed. The `agora`
+births blocked overnight**, external library 392 items, `inspeximus-repo` clean and pushed. The `agora`
 repo has 20 unpushed commits — left for you, since a push to a public repo deserves a secret scan in
 daylight rather than at dawn.

@@ -49,7 +49,7 @@ Tu je presne to, čo by nás presvedčilo naopak: **druhý** classifier-free bui
 
 - magnitúdy sú malé (partial r ≈ 0.11–0.14);
 - použili sme jeden alternatívny build-on proxy, nie viac;
-- sú to dve polia (ML/CS a Medicína), nie prehľad vedy. Netvrdíme, že influential-citation metriky sú vo všeobecnosti pokazené; tvrdíme, že *tento* efekt neprežil zmenu spôsobu merania build-onu, na proxy dokázateľne schopnom ho detegovať. Každé číslo tu je reprodukovateľné z [jediného zero-dependency skriptu](https://github.com/DanceNitra/agora/blob/main/mnemo/probes/generality_generativity_metric_dependence_probe.py) a shipnutých hodnotení.
+- sú to dve polia (ML/CS a Medicína), nie prehľad vedy. Netvrdíme, že influential-citation metriky sú vo všeobecnosti pokazené; tvrdíme, že *tento* efekt neprežil zmenu spôsobu merania build-onu, na proxy dokázateľne schopnom ho detegovať. Každé číslo tu je reprodukovateľné z [jediného zero-dependency skriptu](https://github.com/DanceNitra/agora/blob/main/research/probes/generality_generativity_metric_dependence_probe.py) a shipnutých hodnotení.
 
 Hlbší dôvod, prečo sme publikovali mŕtvy výsledok: v našom [Crucible](../crucible/index.html) nie je zlyhaná replikácia strata, je to produkt. Pole, ktorého vlajkové metriky vedia potichu vyrobiť malý „nález", je presne to pole, kde spustiteľný protipríklad má väčšiu hodnotu než ďalšie sebavedomé číslo. Rovnakú chybu sme [už spravili s vlastnými labelmi](labels-failed-more-than-measurements.html), a videli sme [ako sa headline číslo metódy prevráti podľa režimu, v ktorom ho meriaš](causal-inference-phase-diagram.html); oprava je vždy tá istá: odmeraj znova to, o čom si myslíš, že si odmeral.
 

@@ -105,13 +105,13 @@ def test_mediator_reconcile_catches_omission_and_lie():
 def test_mnemo_audit_if_available():
     try:
         from mnemo_receipts import ReceiptedMnemo, audit_memory
-        from mnemo import Mnemo
+        from inspeximus import Inspeximus
     except Exception:
         return  # mnemo not importable in this layout; integration test skipped
     import tempfile
     path = os.path.join(tempfile.mkdtemp(), "m.json")
     mk = (generate_keypair() if _HAVE_CRYPTO else (None, None))
-    rm = ReceiptedMnemo(Mnemo(path=path), private_key_hex=mk[0], public_key_hex=mk[1])
+    rm = ReceiptedMnemo(Inspeximus(path=path), private_key_hex=mk[0], public_key_hex=mk[1])
     rm.remember("host is db-prod-01", key="db::host", mtype="semantic")
     ok, _ = audit_memory(rm.m, rm.chain, expected_pubkey=mk[1])
     assert ok

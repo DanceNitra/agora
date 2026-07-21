@@ -1,0 +1,28 @@
+######## determinism done â€” starting SEMANTIC fair re-measure ########
+===== SEMANTIC exact (mnemo defended + verified x3) =====
+FAIR conflict (raw-text contract, shared LLM judge) · poison=exact · n=20 · systems=['mnemo', 'naive']
+  run0 poison mnemo     : 0/20 = 0%
+  run0 poison naive     : 0/20 = 0%
+===== SEMANTIC paraphrase (the case plain-extractor mnemo scored 7%) =====
+FAIR conflict (raw-text contract, shared LLM judge) · poison=paraphrase · n=20 · systems=['mnemo', 'naive']
+  run0 poison mnemo     : 0/20 = 0%
+  run0 poison naive     : 0/20 = 0%
+  run0 legit  mnemo     : 0/20 = 0%
+  run0 legit  naive     : 0/20 = 0%
+  run1 poison mnemo     : 0/20 = 0%
+  run1 poison naive     : 0/20 = 0%
+  run1 legit  mnemo     : 0/20 = 0%
+  run1 legit  naive     : 0/20 = 0%
+  run2 poison mnemo     : 0/20 = 0%
+  run2 poison naive     : 0/20 = 0%
+  run2 legit  mnemo     : 0/20 = 0%
+  run2 legit  naive     : 0/20 = 0%
+
+=== SUMMARY (mean over runs) ===
+  mnemo_poison      : mean 0%  runs [0.0, 0.0, 0.0]  spread 0%
+  naive_poison      : mean 0%  runs [0.0, 0.0, 0.0]  spread 0%
+  mnemo_legit       : mean 0%  runs [0.0, 0.0, 0.0]  spread 0%
+  naive_legit       : mean 0%  runs [0.0, 0.0, 0.0]  spread 0%
+
+saved fair_conflict result.
+######## SEMANTIC FAIR DONE ########

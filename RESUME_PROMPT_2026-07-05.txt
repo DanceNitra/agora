@@ -20,7 +20,7 @@ VALIDATE is DONE and both defects are already investigated (see the #34 RESUME n
   (2 attested records = 2 verified keys still clear a 2-witness gate, same as Veracity-Gap D2) - add this
   honest update + cross-link the Veracity-Gap post (agent-memory-defense-provenance-not-truth).
 REMAINING #34 steps (FULL /audit-post from STORM on, do NOT shorten):
-  1. Build a clean PUBLIC probe (mnemo/probes/) with the REALISTIC sybil (real distinct-source records,
+  1. Build a clean PUBLIC probe (research/probes/) with the REALISTIC sybil (real distinct-source records,
      NOT fake link strings) AND the correct OVERWRITE mechanics (mnemo supersession = STATE-TOGGLE +
      supersede_requires_corroboration, NOT the key= path - my quick attempt got hardened-single overwrite
      wrong at 100% instead of 0%). Reproduce the post's table + the strict-bounds result. Link it EN+SK.

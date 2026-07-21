@@ -1,0 +1,115 @@
+{
+ "subjects": [
+  {
+   "k": "Thomas Kyd was born in the city of",
+   "A": "Thomas Kyd was born in the city of London.",
+   "B": "Thomas Kyd was born in the city of Leeds.",
+   "vA": "London",
+   "vB": "Leeds"
+  },
+  {
+   "k": "The chairperson of Fatah",
+   "A": "The chairperson of Fatah is Mahmoud Abbas.",
+   "B": "The chairperson of Fatah is Moshe Kahlon.",
+   "vA": "is Mahmoud Abbas",
+   "vB": "is Moshe Kahlon"
+  },
+  {
+   "k": "Hines Ward plays the position of",
+   "A": "Hines Ward plays the position of wide receiver.",
+   "B": "Hines Ward plays the position of cornerback.",
+   "vA": "wide receiver",
+   "vB": "cornerback"
+  },
+  {
+   "k": "Bengaluru is located in the continent of",
+   "A": "Bengaluru is located in the continent of Asia.",
+   "B": "Bengaluru is located in the continent of Oceania.",
+   "vA": "Asia",
+   "vB": "Oceania"
+  },
+  {
+   "k": "Rog\u00e9rio Ceni plays the position of",
+   "A": "Rog\u00e9rio Ceni plays the position of goalkeeper.",
+   "B": "Rog\u00e9rio Ceni plays the position of flanker.",
+   "vA": "goalkeeper",
+   "vB": "flanker"
+  },
+  {
+   "k": "The director of British Broadcasting Corporation",
+   "A": "The director of British Broadcasting Corporation is Tony Hall, Baron Hall of Birkenhead.",
+   "B": "The director of British Broadcasting Corporation is Narendra Modi.",
+   "vA": "is Tony Hall, Baron Hall of Birkenhead",
+   "vB": "is Narendra Modi"
+  },
+  {
+   "k": "The author of A Wizard of Earthsea",
+   "A": "The author of A Wizard of Earthsea is Ursula K. Le Guin.",
+   "B": "The author of A Wizard of Earthsea is Pius XII.",
+   "vA": "is Ursula K. Le Guin",
+   "vB": "is Pius XII"
+  },
+  {
+   "k": "The headquarters of University of California, Berkeley",
+   "A": "The headquarters of University of California, Berkeley is located in the city of Berkeley.",
+   "B": "The headquarters of University of California, Berkeley is located in the city of Botevgrad.",
+   "vA": "is located in the city of Berkeley",
+   "vB": "is located in the city of Botevgrad"
+  },
+  {
+   "k": "The chief executive officer of Apple Inc.",
+   "A": "The chief executive officer of Apple Inc. is Tim Cook.",
+   "B": "The chief executive officer of Apple Inc. is Vijay Mallya.",
+   "vA": "is Tim Cook",
+   "vB": "is Vijay Mallya"
+  },
+  {
+   "k": "Lisa Leslie plays the position of",
+   "A": "Lisa Leslie plays the position of center.",
+   "B": "Lisa Leslie plays the position of goaltender.",
+   "vA": "center",
+   "vB": "goaltender"
+  },
+  {
+   "k": "Slovakia national football team is associated with the sport of",
+   "A": "Slovakia national football team is associated with the sport of association football.",
+   "B": "Slovakia national football team is associated with the sport of cricket.",
+   "vA": "association football",
+   "vB": "cricket"
+  },
+  {
+   "k": "Alta IF is associated with the sport of",
+   "A": "Alta IF is associated with the sport of association football.",
+   "B": "Alta IF is associated with the sport of baseball.",
+   "vA": "association football",
+   "vB": "baseball"
+  }
+ ],
+ "extract_texts": [
+  "Alta IF is associated with the sport of association football.",
+  "Alta IF is associated with the sport of baseball.",
+  "Bengaluru is located in the continent of Asia.",
+  "Bengaluru is located in the continent of Oceania.",
+  "Hines Ward plays the position of cornerback.",
+  "Hines Ward plays the position of wide receiver.",
+  "Lisa Leslie plays the position of center.",
+  "Lisa Leslie plays the position of goaltender.",
+  "Rog\u00e9rio Ceni plays the position of flanker.",
+  "Rog\u00e9rio Ceni plays the position of goalkeeper.",
+  "Slovakia national football team is associated with the sport of association football.",
+  "Slovakia national football team is associated with the sport of cricket.",
+  "The author of A Wizard of Earthsea is Pius XII.",
+  "The author of A Wizard of Earthsea is Ursula K. Le Guin.",
+  "The chairperson of Fatah is Mahmoud Abbas.",
+  "The chairperson of Fatah is Moshe Kahlon.",
+  "The chief executive officer of Apple Inc. is Tim Cook.",
+  "The chief executive officer of Apple Inc. is Vijay Mallya.",
+  "The director of British Broadcasting Corporation is Narendra Modi.",
+  "The director of British Broadcasting Corporation is Tony Hall, Baron Hall of Birkenhead.",
+  "The headquarters of University of California, Berkeley is located in the city of Berkeley.",
+  "The headquarters of University of California, Berkeley is located in the city of Botevgrad.",
+  "Thomas Kyd was born in the city of Leeds.",
+  "Thomas Kyd was born in the city of London."
+ ],
+ "instructions": "Claude fills _cc_filled.json: (1) extract{each text -> [canonical 'subject :: relation' key, value]; a paraphrase of A must get the SAME key as A}; (2) para{A_text -> a reworded sentence keeping the same value}; (3) dval{k -> a plausible NEW value different from vA and vB}."
+}

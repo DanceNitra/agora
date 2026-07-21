@@ -8,7 +8,7 @@ from pathlib import Path
 sys.path.insert(0, "C:/Users/Danculus/agora/server")
 sys.path.insert(0, "C:/Users/Danculus/agora/mnemo")
 from agora.execution.semantic_index import _embed_batch
-from mnemo import _tokens
+from inspeximus import _tokens
 import urllib.request
 
 def call_llm(SYS, up, tier="cheap", temperature=0.3, max_tokens=40):

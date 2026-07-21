@@ -1,0 +1,14 @@
+wrote 100 rows -> agora_output\public_fixtures\realnoise_stress_v1.jsonl
+labels: 1=51 0=49 | subsets: {'keep': 13, 'keep_kw_distractor': 12, 'keep_name_distractor': 12, 'named_new': 12, 'revert_anchored': 26, 'revert_natural': 25}
+
+shortcut-family audit (F1 on all 100; label base rate 0.5):
+  value-token (old value named in candidate): 0.0
+  revert-keyword rule: 0.602
+  last-context-line-is-old-value (recency): 0.0
+  planted-correction-position rule (new line last): 0.6
+  cosine: cand closer to planted-old than planted-new: 0.612
+  cosine: planted-old beats best noise line: 0.675
+  cosine: old-vs-new margin > 0.05: 0.621
+  name-token (old-setter's name in candidate): 0.627
+  cosine old>new recall on revert_natural: 4/25
+  cosine old>new recall on revert_anchored: 26/26

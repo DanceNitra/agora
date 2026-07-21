@@ -1,0 +1,7 @@
+{
+  "embed": {
+    "url": "http://localhost:11434/v1/embeddings",
+    "model": "nomic-embed-text",
+    "timeout": 10
+  }
+}

@@ -1,0 +1,40 @@
+[
+ {
+  "id": "fa15f1156e",
+  "text": "ran: cd /c/Users/Danculus/agora/tools && cat start_agora_hidden.vbs 2>/dev/null | head -8; echo \"=== ps1 guard check ===\"; grep -n -i \"netstat\\|Get-NetTCP\\|Get-CimInstance\\|Get-Process\\|already\\|exit\" star…",
+  "tags": [
+   "bash"
+  ],
+  "value": 1.0,
+  "ts": 1784567547.9881582,
+  "iso": "2026-07-20T17:12:27Z",
+  "valid_from": 1784567547.9881582,
+  "source": null,
+  "mtype": "episodic",
+  "last_access": 1784567547.9881582,
+  "status": "active",
+  "links": [],
+  "meta": {},
+  "key": "cmd:ceee24620e",
+  "object": "cd /c/Users/Danculus/agora/tools && cat start_agora_hidden.v"
+ },
+ {
+  "id": "4417401267",
+  "text": "ran: sed -n '1,30p' start_agora.ps1",
+  "tags": [
+   "bash"
+  ],
+  "value": 1.0,
+  "ts": 1784567551.9757571,
+  "iso": "2026-07-20T17:12:31Z",
+  "valid_from": 1784567551.9757571,
+  "source": null,
+  "mtype": "episodic",
+  "last_access": 1784567551.9757571,
+  "status": "active",
+  "links": [],
+  "meta": {},
+  "key": "cmd:23cbc55b63",
+  "object": "sed -n '1,30p' start_agora.ps1"
+ }
+]

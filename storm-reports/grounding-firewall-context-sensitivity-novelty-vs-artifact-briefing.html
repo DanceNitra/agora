@@ -24,7 +24,7 @@
 <div class="f"><b>5. "Black-box, works on closed APIs" is false. (8/10)</b> The method needs token logprobs; Anthropic silently ignores them and the strong Ollama Cloud models (glm-5.2, kimi) don't return them. SelfCheckGPT is the real logprob-free black-box baseline. <small>Supported by: Practitioner, Economist.</small></div>
 
 <h2>The problem is real (measured this cycle, strong models, GPU-free)</h2>
-<p>Plain-answer poison-following on the same 24-fact bank, top cloud models (no logprobs needed), all with <b>0 errors given no context</b>: <b>glm-5.2 22/24, deepseek-v4-pro 20/24</b> followed the false document, versus <b>qwen2.5-7B 5/24</b> and <b>kimi-k2.7-code 4/24</b> (from <code>mnemo/probes/grounding_firewall_cloud_poison.py</code>, run this cycle). Takeaway: over-trusting a poisoned retrieved document is not a weak-model quirk - it is worst on the strongest, most context-faithful models, which is what they are built to do (the PoisonedRAG threat, Zou et al. 2024, ~90% attack success with 5 injected texts). The weak 7B the post used UNDERSTATED the problem.</p>
+<p>Plain-answer poison-following on the same 24-fact bank, top cloud models (no logprobs needed), all with <b>0 errors given no context</b>: <b>glm-5.2 22/24, deepseek-v4-pro 20/24</b> followed the false document, versus <b>qwen2.5-7B 5/24</b> and <b>kimi-k2.7-code 4/24</b> (from <code>research/probes/grounding_firewall_cloud_poison.py</code>, run this cycle). Takeaway: over-trusting a poisoned retrieved document is not a weak-model quirk - it is worst on the strongest, most context-faithful models, which is what they are built to do (the PoisonedRAG threat, Zou et al. 2024, ~90% attack success with 5 injected texts). The weak 7B the post used UNDERSTATED the problem.</p>
 
 <h2>Contradiction map</h2>
 <table><tr><th>Axis</th><th>Post as written</th><th>Panel's honest read</th></tr>
@@ -64,5 +64,5 @@
 <li>Geifman & El-Yaniv, "Selective Classification for DNNs", NeurIPS 2017; El-Yaniv & Wiener, JMLR 2010. <span class="ok">CONFIRMED</span></li>
 <li>Guo, Pleiss, Sun, Weinberger, "On Calibration of Modern Neural Networks", ICML 2017. <span class="ok">CONFIRMED</span></li>
 </ol>
-<p><small>Our numbers: qwen2.5:7b reproduction (24 items, 5 wrong, AUC firewall 0.028 vs confidence 0.095) re-run this cycle; strong-model poison-following measured via <code>mnemo/probes/grounding_firewall_cloud_poison.py</code>; the saturated-prior confound + signed-margin baseline in <code>mnemo/probes/grounding_firewall_hardened.py</code>.</small></p>
+<p><small>Our numbers: qwen2.5:7b reproduction (24 items, 5 wrong, AUC firewall 0.028 vs confidence 0.095) re-run this cycle; strong-model poison-following measured via <code>research/probes/grounding_firewall_cloud_poison.py</code>; the saturated-prior confound + signed-margin baseline in <code>research/probes/grounding_firewall_hardened.py</code>.</small></p>
 </body></html>

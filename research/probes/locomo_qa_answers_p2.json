@@ -1,0 +1,443 @@
+[
+ {
+  "qid": "c5q1",
+  "system": "mnemo",
+  "category": 2,
+  "answer": "He started his new job as a Financial Analyst the week before 27 March 2023 (on 27 March he said he started 'last week').",
+  "correct": true
+ },
+ {
+  "qid": "c5q2",
+  "system": "mnemo",
+  "category": 1,
+  "answer": "NOT IN CONTEXT (the indoor activities named in the gold - boardgames, pet-shelter volunteering, wine tasting, growing flowers - are not in this context; context only shows eating out, fishing, camping).",
+  "correct": false
+ },
+ {
+  "qid": "c5q3",
+  "system": "mnemo",
+  "category": 1,
+  "answer": "New places to eat, the new cafe scene, a park outside town, a wine tasting event, and nearby parks/hikes.",
+  "correct": true
+ },
+ {
+  "qid": "c5q4",
+  "system": "mnemo",
+  "category": 2,
+  "answer": "The week before 16 April 2023 ('last week'), i.e. the week of 3-9 April 2023, when she made her favorite treats/pastries.",
+  "correct": true
+ },
+ {
+  "qid": "c5q5",
+  "system": "mnemo",
+  "category": 2,
+  "answer": "The week before 3 May 2023 (she reported the hike + hummingbird as 'last week' on 3 May), i.e. around the first week of May 2023.",
+  "correct": true
+ },
+ {
+  "qid": "c5q6",
+  "system": "mnemo",
+  "category": 2,
+  "answer": "Around 2 April 2023 (she announced adopting Pixie on 2 April 2023).",
+  "correct": true
+ },
+ {
+  "qid": "c5q7",
+  "system": "mnemo",
+  "category": 2,
+  "answer": "Three years (she had Pepper, Precious and Panda for 3 years before adopting Pixie in April 2023).",
+  "correct": true
+ },
+ {
+  "qid": "c5q8",
+  "system": "mnemo",
+  "category": 2,
+  "answer": "No - on 27 March 2023 Andrew said 'No, no pets right now.'",
+  "correct": true
+ },
+ {
+  "qid": "c5q9",
+  "system": "mnemo",
+  "category": 1,
+  "answer": "Dog owners group, agility classes, a dog training course, and a dog grooming course.",
+  "correct": true
+ },
+ {
+  "qid": "c5q10",
+  "system": "mnemo",
+  "category": 2,
+  "answer": "NOT IN CONTEXT - she saw the positive-reinforcement class flyer on 11 May 2023 and wanted to try it, but no date placing it in June 2023 is given.",
+  "correct": false
+ },
+ {
+  "qid": "c5q11",
+  "system": "mnemo",
+  "category": 2,
+  "answer": "11 June 2023 - on 13 June (Tuesday) he said he took a rock climbing class 'last Sunday'.",
+  "correct": true
+ },
+ {
+  "qid": "c5q12",
+  "system": "mnemo",
+  "category": 1,
+  "answer": "Rock climbing (and he mentions wanting to try kayaking/bungee jumping); fishing and camping are not in this context.",
+  "correct": false
+ },
+ {
+  "qid": "c5q13",
+  "system": "mnemo",
+  "category": 2,
+  "answer": "June 2023 - on 26 June 2023 she said she got a new place with a bigger backyard and was unboxing after moving.",
+  "correct": true
+ },
+ {
+  "qid": "c5q14",
+  "system": "mnemo",
+  "category": 1,
+  "answer": "Being in nature / the outdoors.",
+  "correct": true
+ },
+ {
+  "qid": "c5q15",
+  "system": "mnemo",
+  "category": 1,
+  "answer": "Not being able to find pet-friendly places/spots in the city.",
+  "correct": true
+ },
+ {
+  "qid": "c5q16",
+  "system": "mnemo",
+  "category": 2,
+  "answer": "August 2023 - in July they agreed to hike 'next month'.",
+  "correct": true
+ },
+ {
+  "qid": "c5q17",
+  "system": "mnemo",
+  "category": 1,
+  "answer": "They planned to hike together multiple times, but the context does not clearly establish exactly three.",
+  "correct": false
+ },
+ {
+  "qid": "c5q18",
+  "system": "mnemo",
+  "category": 1,
+  "answer": "From a breeder - she got lucky finding a breeder nearby with the dogs she wanted.",
+  "correct": true
+ },
+ {
+  "qid": "c5q19",
+  "system": "mnemo",
+  "category": 3,
+  "answer": "NOT IN CONTEXT - no basis in this context to infer he would cook dog treats.",
+  "correct": false
+ },
+ {
+  "qid": "c5q20",
+  "system": "mnemo",
+  "category": 3,
+  "answer": "Chicken (her favorites are Roasted Chicken and Chicken Pot Pie).",
+  "correct": true
+ },
+ {
+  "qid": "c5q21",
+  "system": "mnemo",
+  "category": 1,
+  "answer": "Agility classes, a dog training course, and a dog grooming course; the positive-reinforcement bonding class is not in this context.",
+  "correct": false
+ },
+ {
+  "qid": "c5q22",
+  "system": "mnemo",
+  "category": 2,
+  "answer": "Camping with his girlfriend (and Toby) - on 4 August 2023 he said they were going camping that weekend.",
+  "correct": true
+ },
+ {
+  "qid": "c5q23",
+  "system": "mnemo",
+  "category": 1,
+  "answer": "Finding the right dog and finding pet-friendly apartments near open spaces/parks.",
+  "correct": true
+ },
+ {
+  "qid": "c5q24",
+  "system": "mnemo",
+  "category": 1,
+  "answer": "Yes - Audrey had childhood dog Max, and Andrew grew up with his family's dog.",
+  "correct": true
+ },
+ {
+  "qid": "c6q0",
+  "system": "mnemo",
+  "category": 3,
+  "answer": "Obesity / being overweight - implied by 'my fingers are too big' and wanting to start exercising/running.",
+  "correct": true
+ },
+ {
+  "qid": "c6q1",
+  "system": "mnemo",
+  "category": 2,
+  "answer": "Bowling - on 17 March 2022 he said he went bowling 'yesterday' (16 March).",
+  "correct": true
+ },
+ {
+  "qid": "c6q2",
+  "system": "mnemo",
+  "category": 1,
+  "answer": "McGee's bar (and Starbucks was suggested); VR Club and the baseball game are not in this context.",
+  "correct": false
+ },
+ {
+  "qid": "c6q3",
+  "system": "mnemo",
+  "category": 1,
+  "answer": "No - James has dogs, but John repeatedly said he does not have pets yet.",
+  "correct": true
+ },
+ {
+  "qid": "c6q4",
+  "system": "mnemo",
+  "category": 2,
+  "answer": "NOT IN CONTEXT - he mentions he used to play drums when younger, but no date for resuming in adulthood (Feb 2022) is given.",
+  "correct": false
+ },
+ {
+  "qid": "c6q5",
+  "system": "mnemo",
+  "category": 1,
+  "answer": "John's favorite is CS:GO; James's favorite is not stated in this context.",
+  "correct": false
+ },
+ {
+  "qid": "c6q6",
+  "system": "mnemo",
+  "category": 3,
+  "answer": "NOT IN CONTEXT - no location evidence in this context tying James to Connecticut.",
+  "correct": false
+ },
+ {
+  "qid": "c6q7",
+  "system": "mnemo",
+  "category": 3,
+  "answer": "Connecticut - James adopted the pup from a shelter in Stamford, which is in Connecticut.",
+  "correct": true
+ },
+ {
+  "qid": "c6q8",
+  "system": "mnemo",
+  "category": 1,
+  "answer": "Three dogs.",
+  "correct": true
+ },
+ {
+  "qid": "c6q9",
+  "system": "mnemo",
+  "category": 1,
+  "answer": "Max and Daisy are named; the third dog Ned is not named in this context.",
+  "correct": false
+ },
+ {
+  "qid": "c6q10",
+  "system": "mnemo",
+  "category": 2,
+  "answer": "First week of April 2022 - on 12 April 2022 he said he adopted the pup (Ned) 'last week'.",
+  "correct": true
+ },
+ {
+  "qid": "c6q11",
+  "system": "mnemo",
+  "category": 2,
+  "answer": "NOT IN CONTEXT - no 10 April 2022 message or 'seeking solitude' feeling is present.",
+  "correct": false
+ },
+ {
+  "qid": "c6q12",
+  "system": "mnemo",
+  "category": 3,
+  "answer": "Presumably not - he got girlfriend Samantha only in September 2022.",
+  "correct": true
+ },
+ {
+  "qid": "c6q13",
+  "system": "mnemo",
+  "category": 2,
+  "answer": "2021 - on 20 April 2022 he said he visited Italy 'last year'.",
+  "correct": true
+ },
+ {
+  "qid": "c6q14",
+  "system": "mnemo",
+  "category": 2,
+  "answer": "26 April 2022 - on 29 April he said he bought the adventure book 'three days ago'.",
+  "correct": true
+ },
+ {
+  "qid": "c6q15",
+  "system": "mnemo",
+  "category": 2,
+  "answer": "Around March 2022 - on 29 April 2022 he said he'd been playing the Civilization-style strategy game 'for a month now'.",
+  "correct": true
+ },
+ {
+  "qid": "c6q16",
+  "system": "mnemo",
+  "category": 3,
+  "answer": "UNO - multi-colored numbered cards matched by color/number, with draw/skip/trade actions.",
+  "correct": true
+ },
+ {
+  "qid": "c6q17",
+  "system": "mnemo",
+  "category": 3,
+  "answer": "Mafia - the game to figure out who the impostors are.",
+  "correct": true
+ },
+ {
+  "qid": "c6q18",
+  "system": "mnemo",
+  "category": 1,
+  "answer": "John recommends epic sci-fi/fantasy series, but the specific titles are not named in this context.",
+  "correct": false
+ },
+ {
+  "qid": "c6q19",
+  "system": "mnemo",
+  "category": 3,
+  "answer": "Most likely yes - he relied on his dogs and games for comfort when down and was actively trying to date before Samantha.",
+  "correct": true
+ },
+ {
+  "qid": "c6q20",
+  "system": "mnemo",
+  "category": 1,
+  "answer": "Two (a CS:GO charity tournament, and a Fortnite/Overwatch/Apex tournament for a children's hospital).",
+  "correct": true
+ },
+ {
+  "qid": "c6q21",
+  "system": "mnemo",
+  "category": 2,
+  "answer": "Around 7 May 2022 - announced in the early hours of 8 May 2022.",
+  "correct": true
+ },
+ {
+  "qid": "c6q22",
+  "system": "mnemo",
+  "category": 1,
+  "answer": "A dog/animal shelter, the homeless, and a children's hospital.",
+  "correct": true
+ },
+ {
+  "qid": "c6q23",
+  "system": "mnemo",
+  "category": 2,
+  "answer": "July 2022 - on 13 June 2022 he said he starts his dream job 'next month'.",
+  "correct": true
+ },
+ {
+  "qid": "c6q24",
+  "system": "mnemo",
+  "category": 1,
+  "answer": "A game/virtual world inspired by Witcher 3 (and a strategy game); the football simulator is not in this context.",
+  "correct": false
+ },
+ {
+  "qid": "c7q0",
+  "system": "mnemo",
+  "category": 2,
+  "answer": "An electrical engineering project - she finished it around mid-January 2023, having worked on it in early January.",
+  "correct": true
+ },
+ {
+  "qid": "c7q1",
+  "system": "mnemo",
+  "category": 1,
+  "answer": "Her mother, her father, and her friend Karlie.",
+  "correct": true
+ },
+ {
+  "qid": "c7q2",
+  "system": "mnemo",
+  "category": 2,
+  "answer": "A few years before 2023 (she said her mother passed away 'a few years ago' in Jan 2023).",
+  "correct": true
+ },
+ {
+  "qid": "c7q3",
+  "system": "mnemo",
+  "category": 2,
+  "answer": "2022 - on 23 January 2023 she said her mother passed away 'last year'.",
+  "correct": true
+ },
+ {
+  "qid": "c7q4",
+  "system": "mnemo",
+  "category": 2,
+  "answer": "In 2010 - her mother gave her the pendant in 2010 in Paris.",
+  "correct": true
+ },
+ {
+  "qid": "c7q5",
+  "system": "mnemo",
+  "category": 3,
+  "answer": "France - the pendant was given in Paris.",
+  "correct": true
+ },
+ {
+  "qid": "c7q6",
+  "system": "mnemo",
+  "category": 1,
+  "answer": "Pendants - both Deborah and Jolene have a pendant from their mothers.",
+  "correct": true
+ },
+ {
+  "qid": "c7q7",
+  "system": "mnemo",
+  "category": 2,
+  "answer": "France - the 2010 pendant was given in Paris.",
+  "correct": true
+ },
+ {
+  "qid": "c7q8",
+  "system": "mnemo",
+  "category": 1,
+  "answer": "Yoga, old photos, the roses and dahlias in her garden, and nature.",
+  "correct": true
+ },
+ {
+  "qid": "c7q9",
+  "system": "mnemo",
+  "category": 2,
+  "answer": "25 January 2023 - on 27 January she said her dad passed away 'two days ago'.",
+  "correct": true
+ },
+ {
+  "qid": "c7q10",
+  "system": "mnemo",
+  "category": 2,
+  "answer": "1993 - her parents' wedding was in 1993.",
+  "correct": true
+ },
+ {
+  "qid": "c7q11",
+  "system": "mnemo",
+  "category": 3,
+  "answer": "Yes - she refers to her husband and to where she got married.",
+  "correct": true
+ },
+ {
+  "qid": "c7q12",
+  "system": "mnemo",
+  "category": 2,
+  "answer": "26 January 2023 - on 27 January she said she received the letter 'yesterday'.",
+  "correct": true
+ },
+ {
+  "qid": "c7q13",
+  "system": "mnemo",
+  "category": 1,
+  "answer": "The spot by the window in her mom's house, the beach, Bali, and the forest trail in a nearby park.",
+  "correct": true
+ }
+]

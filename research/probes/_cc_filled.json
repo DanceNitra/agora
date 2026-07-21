@@ -1,0 +1,172 @@
+{
+ "extract": {
+  "Thomas Kyd was born in the city of London.": [
+   "Thomas Kyd :: birthplace",
+   "London"
+  ],
+  "Thomas Kyd was born in the city of Leeds.": [
+   "Thomas Kyd :: birthplace",
+   "Leeds"
+  ],
+  "London is the city where Thomas Kyd was born.": [
+   "Thomas Kyd :: birthplace",
+   "London"
+  ],
+  "The chairperson of Fatah is Mahmoud Abbas.": [
+   "Fatah :: chairperson",
+   "Mahmoud Abbas"
+  ],
+  "The chairperson of Fatah is Moshe Kahlon.": [
+   "Fatah :: chairperson",
+   "Moshe Kahlon"
+  ],
+  "Mahmoud Abbas serves as the chairperson of Fatah.": [
+   "Fatah :: chairperson",
+   "Mahmoud Abbas"
+  ],
+  "Hines Ward plays the position of wide receiver.": [
+   "Hines Ward :: playing position",
+   "wide receiver"
+  ],
+  "Hines Ward plays the position of cornerback.": [
+   "Hines Ward :: playing position",
+   "cornerback"
+  ],
+  "The position Hines Ward plays is wide receiver.": [
+   "Hines Ward :: playing position",
+   "wide receiver"
+  ],
+  "Bengaluru is located in the continent of Asia.": [
+   "Bengaluru :: continent",
+   "Asia"
+  ],
+  "Bengaluru is located in the continent of Oceania.": [
+   "Bengaluru :: continent",
+   "Oceania"
+  ],
+  "The continent in which Bengaluru is located is Asia.": [
+   "Bengaluru :: continent",
+   "Asia"
+  ],
+  "Rog\u00e9rio Ceni plays the position of goalkeeper.": [
+   "Rogerio Ceni :: playing position",
+   "goalkeeper"
+  ],
+  "Rog\u00e9rio Ceni plays the position of flanker.": [
+   "Rogerio Ceni :: playing position",
+   "flanker"
+  ],
+  "Rogerio Ceni's playing position is goalkeeper.": [
+   "Rogerio Ceni :: playing position",
+   "goalkeeper"
+  ],
+  "The director of British Broadcasting Corporation is Tony Hall, Baron Hall of Birkenhead.": [
+   "British Broadcasting Corporation :: director",
+   "Tony Hall, Baron Hall of Birkenhead"
+  ],
+  "The director of British Broadcasting Corporation is Narendra Modi.": [
+   "British Broadcasting Corporation :: director",
+   "Narendra Modi"
+  ],
+  "The BBC is directed by Tony Hall, Baron Hall of Birkenhead.": [
+   "British Broadcasting Corporation :: director",
+   "Tony Hall, Baron Hall of Birkenhead"
+  ],
+  "The author of A Wizard of Earthsea is Ursula K. Le Guin.": [
+   "A Wizard of Earthsea :: author",
+   "Ursula K. Le Guin"
+  ],
+  "The author of A Wizard of Earthsea is Pius XII.": [
+   "A Wizard of Earthsea :: author",
+   "Pius XII"
+  ],
+  "A Wizard of Earthsea was written by Ursula K. Le Guin.": [
+   "A Wizard of Earthsea :: author",
+   "Ursula K. Le Guin"
+  ],
+  "The headquarters of University of California, Berkeley is located in the city of Berkeley.": [
+   "University of California, Berkeley :: headquarters city",
+   "Berkeley"
+  ],
+  "The headquarters of University of California, Berkeley is located in the city of Botevgrad.": [
+   "University of California, Berkeley :: headquarters city",
+   "Botevgrad"
+  ],
+  "The University of California, Berkeley is headquartered in the city of Berkeley.": [
+   "University of California, Berkeley :: headquarters city",
+   "Berkeley"
+  ],
+  "The chief executive officer of Apple Inc. is Tim Cook.": [
+   "Apple Inc. :: chief executive officer",
+   "Tim Cook"
+  ],
+  "The chief executive officer of Apple Inc. is Vijay Mallya.": [
+   "Apple Inc. :: chief executive officer",
+   "Vijay Mallya"
+  ],
+  "Apple Inc.'s chief executive officer is Tim Cook.": [
+   "Apple Inc. :: chief executive officer",
+   "Tim Cook"
+  ],
+  "Lisa Leslie plays the position of center.": [
+   "Lisa Leslie :: playing position",
+   "center"
+  ],
+  "Lisa Leslie plays the position of goaltender.": [
+   "Lisa Leslie :: playing position",
+   "goaltender"
+  ],
+  "The position that Lisa Leslie plays is center.": [
+   "Lisa Leslie :: playing position",
+   "center"
+  ],
+  "Slovakia national football team is associated with the sport of association football.": [
+   "Slovakia national football team :: sport",
+   "association football"
+  ],
+  "Slovakia national football team is associated with the sport of cricket.": [
+   "Slovakia national football team :: sport",
+   "cricket"
+  ],
+  "The sport associated with the Slovakia national football team is association football.": [
+   "Slovakia national football team :: sport",
+   "association football"
+  ],
+  "Alta IF is associated with the sport of association football.": [
+   "Alta IF :: sport",
+   "association football"
+  ],
+  "Alta IF is associated with the sport of baseball.": [
+   "Alta IF :: sport",
+   "baseball"
+  ]
+ },
+ "para": {
+  "Thomas Kyd was born in the city of London.": "London is the city where Thomas Kyd was born.",
+  "The chairperson of Fatah is Mahmoud Abbas.": "Mahmoud Abbas serves as the chairperson of Fatah.",
+  "Hines Ward plays the position of wide receiver.": "The position Hines Ward plays is wide receiver.",
+  "Bengaluru is located in the continent of Asia.": "The continent in which Bengaluru is located is Asia.",
+  "Rog\u00e9rio Ceni plays the position of goalkeeper.": "Rogerio Ceni's playing position is goalkeeper.",
+  "The director of British Broadcasting Corporation is Tony Hall, Baron Hall of Birkenhead.": "The BBC is directed by Tony Hall, Baron Hall of Birkenhead.",
+  "The author of A Wizard of Earthsea is Ursula K. Le Guin.": "A Wizard of Earthsea was written by Ursula K. Le Guin.",
+  "The headquarters of University of California, Berkeley is located in the city of Berkeley.": "The University of California, Berkeley is headquartered in the city of Berkeley.",
+  "The chief executive officer of Apple Inc. is Tim Cook.": "Apple Inc.'s chief executive officer is Tim Cook.",
+  "Lisa Leslie plays the position of center.": "The position that Lisa Leslie plays is center.",
+  "Slovakia national football team is associated with the sport of association football.": "The sport associated with the Slovakia national football team is association football.",
+  "Alta IF is associated with the sport of association football.": "Alta IF is associated with the sport of association football."
+ },
+ "dval": {
+  "Thomas Kyd was born in the city of": "Bristol",
+  "The chairperson of Fatah": "Yasser Arafat",
+  "Hines Ward plays the position of": "quarterback",
+  "Bengaluru is located in the continent of": "Europe",
+  "Rog\u00e9rio Ceni plays the position of": "striker",
+  "The director of British Broadcasting Corporation": "Greg Dyke",
+  "The author of A Wizard of Earthsea": "J. R. R. Tolkien",
+  "The headquarters of University of California, Berkeley": "Oakland",
+  "The chief executive officer of Apple Inc.": "Steve Jobs",
+  "Lisa Leslie plays the position of": "point guard",
+  "Slovakia national football team is associated with the sport of": "ice hockey",
+  "Alta IF is associated with the sport of": "handball"
+ }
+}

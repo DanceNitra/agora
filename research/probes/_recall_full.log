@@ -1,0 +1,33 @@
+LOCOMO RETRIEVAL-RECALL (LLM-free, tuned recipe) k=25 convs=10
+
+  conv0: 150 q processed (any-hit 108)
+  conv1: 231 q processed (any-hit 171)
+  conv2: 383 q processed (any-hit 288)
+  conv3: 582 q processed (any-hit 434)
+  conv4: 760 q processed (any-hit 577)
+  conv5: 883 q processed (any-hit 675)
+  conv6: 1033 q processed (any-hit 798)
+  conv7: 1224 q processed (any-hit 954)
+  conv8: 1380 q processed (any-hit 1084)
+  conv9: 1536 q processed (any-hit 1203)
+
+{
+ "k": 25,
+ "n": 1536,
+ "recall_any": 0.783,
+ "recall_all": 0.648,
+ "by_category_any": {
+  "1": 0.801,
+  "2": 0.81,
+  "3": 0.587,
+  "4": 0.788
+ },
+ "by_category_n": {
+  "1": 282,
+  "2": 321,
+  "3": 92,
+  "4": 841
+ }
+}
+
+saved retrieval_recall_locomo_result.json

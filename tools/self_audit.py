@@ -22,7 +22,7 @@ ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT))
 SERVER = ROOT / "server"
 
-import mnemo, ragfresh, nullcheck, selfref, quitkit, idcheck, goodhart, herdcheck  # noqa: E402
+import inspeximus, ragfresh, nullcheck, selfref, quitkit, idcheck, goodhart, herdcheck  # noqa: E402
 
 
 def _load(name):

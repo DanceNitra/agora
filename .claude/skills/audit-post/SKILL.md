@@ -47,9 +47,9 @@ verified. Confirm each published figure matches the re-run. If a script is missi
 finding — build an independent from-scratch re-derivation and disclose it as such (see #16/#18/#19).
 **A private re-derivation is NOT enough (standing-gate requirement, added audit #20):** every published
 headline number must resolve to a runnable artifact a reader can OPEN. `agora_output/lab/` is gitignored,
-so a script there cannot be linked — **promote the re-derivation to a PUBLIC tracked path (`mnemo/probes/`),
+so a script there cannot be linked — **promote the re-derivation to a PUBLIC tracked path (`research/probes/`),
 make it self-contained (no local paths / secrets / PII), have it print every number the post cites, and add
-an `<a href>` from the post body (EN + SK) to the file in the public repo** (`github.com/DanceNitra/agora/blob/main/mnemo/probes/<name>.py`).
+an `<a href>` from the post body (EN + SK) to the file in the public repo** (`github.com/DanceNitra/agora/blob/main/research/probes/<name>.py`).
 A post that carries a headline figure with no linked runnable probe is a NEEDS-FIX, not a PUBLISH — this
 is exactly the gap the re-audit skeptic caught on #20. Consolidate one probe that reproduces the whole
 number set (naive result + every correction + the sensitivity sweep), not a scatter of throwaway scripts.

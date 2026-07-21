@@ -35,7 +35,7 @@ The small/mid models slap ~maxed-out confidence on almost everything, including 
 
 **Honest limits:** one task family (arithmetic), a handful of models — directional, not a scaling law. Arithmetic probably exaggerates the confidence-maxing (models treat it as deterministic). *glm-5.2 didn't emit a usable confidence on ~34% of items, so its score is on a subset; Claude gave one every time (cleanest data point).
 
-Runnable single-file probe + raw per-item data, so you can re-run it on your own models: https://github.com/DanceNitra/agora/tree/main/mnemo/probes/overconfidence_tax
+Runnable single-file probe + raw per-item data, so you can re-run it on your own models: https://github.com/DanceNitra/agora/tree/main/research/probes/overconfidence_tax
 Fuller writeup: https://dancenitra.github.io/agora/public/posts/can-an-llm-trust-its-own-confidence.html
 
 How are you deciding when your agent abstains — its own confidence, a separate verifier, or corroboration? And has anyone gotten a 7B–30B model above coin-flip on this?

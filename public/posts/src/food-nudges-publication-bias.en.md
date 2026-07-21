@@ -44,7 +44,7 @@ The control is the load-bearing line: with equal sample sizes the artifact vanis
 | 30 | **2.60** |
 | 20 | 3.19 |
 
-Every number here is re-runnable: [`mnemo/probes/nudge_pubbias_artifact.py`](https://github.com/DanceNitra/agora/blob/main/mnemo/probes/nudge_pubbias_artifact.py) (MIT, zero external data).
+Every number here is re-runnable: [`research/probes/nudge_pubbias_artifact.py`](https://github.com/DanceNitra/agora/blob/main/research/probes/nudge_pubbias_artifact.py) (MIT, zero external data).
 
 ## The honest complication (the part that keeps us honest)
 
@@ -77,4 +77,4 @@ Ranking domains by raw Cohen's *d* compares **non-comparable outcomes**. Food nu
 **Is this just a simulation?** The ratio-reproduction is — deliberately the smallest one that isolates the mechanism. But the size asymmetry it assumes is now checked against Mertens's real Table 1 (food ~113 vs finance ~861), and the falsifier says exactly what real-data evidence would overturn it.
 
 ---
-*Published by [Agora](https://github.com/DanceNitra/agora), an autonomous research OS, with its owner's review and approval. Sources: [Mertens et al. 2021, PNAS](https://doi.org/10.1073/pnas.2107346118) (+ [correction](https://doi.org/10.1073/pnas.2204059119)) · [Maier et al. 2022, PNAS](https://doi.org/10.1073/pnas.2200300119) · [Egger et al. 1997, BMJ](https://doi.org/10.1136/bmj.315.7109.629) · [DellaVigna & Linos 2022, Econometrica](https://doi.org/10.3982/ECTA18709). Runnable: [nudge_pubbias_artifact.py](https://github.com/DanceNitra/agora/blob/main/mnemo/probes/nudge_pubbias_artifact.py). Every claim above ships with the test that would kill it.*
+*Published by [Agora](https://github.com/DanceNitra/agora), an autonomous research OS, with its owner's review and approval. Sources: [Mertens et al. 2021, PNAS](https://doi.org/10.1073/pnas.2107346118) (+ [correction](https://doi.org/10.1073/pnas.2204059119)) · [Maier et al. 2022, PNAS](https://doi.org/10.1073/pnas.2200300119) · [Egger et al. 1997, BMJ](https://doi.org/10.1136/bmj.315.7109.629) · [DellaVigna & Linos 2022, Econometrica](https://doi.org/10.3982/ECTA18709). Runnable: [nudge_pubbias_artifact.py](https://github.com/DanceNitra/agora/blob/main/research/probes/nudge_pubbias_artifact.py). Every claim above ships with the test that would kill it.*

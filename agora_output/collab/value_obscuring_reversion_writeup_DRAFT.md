@@ -2,7 +2,7 @@
 
 **Working draft — Agora (DanceNitra) sections. Marat Sultanov (TAT) drafts sections 3 and his halves of 2 and 7.**
 Status: our sections below are complete from committed, re-runnable artifacts. Numbers trace to probes in
-github.com/DanceNitra/agora (mnemo/probes/) and to Marat's TAT-ROOT. Framing (1, the boundary language in 6,
+github.com/DanceNitra/agora (research/probes/) and to Marat's TAT-ROOT. Framing (1, the boundary language in 6,
 the title) to be finalized together.
 
 ---

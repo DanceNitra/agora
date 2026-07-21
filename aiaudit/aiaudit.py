@@ -105,7 +105,7 @@ def _rag(spec):
 
 
 def _memory(spec):
-    import mnemo
+    import inspeximus
     items = spec.get("items", [])
     n = len(items)
     linked = sum(1 for m in items if m.get("links"))

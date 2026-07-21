@@ -3,7 +3,7 @@
 ---
 @qingkong66 — went ahead and wired an adapter against your public memory format (`memory_loop.py`'s `{fact_N: {timestamp, note}}` shape) so we can compare on the same data, not just talk about it:
 
-https://github.com/DanceNitra/agora/blob/main/mnemo/probes/elina_adapter.py
+https://github.com/DanceNitra/agora/blob/main/research/probes/elina_adapter.py
 
 It runs our corroboration check on Elina-format records. The built-in demo makes the cross-architecture point concretely: a repeated false, unverified note ("the capital of Australia is Sydney", stored across several sessions) is surfaced as current by recency recall, but blocked by a corroboration gate — because repetition isn't corroboration (it needs ≥2 *distinct* sources, sybil-resistant). A genuinely 2-source fact passes.
 
