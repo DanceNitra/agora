@@ -1,0 +1,14 @@
+{
+ "L": 40,
+ "defect": 1.2,
+ "chi": 100,
+ "sector": "singlet",
+ "E": -22.79125273907157,
+ "disc_weight": 3.950334961798239e-07,
+ "sweeps": 61,
+ "max_chi": 100,
+ "Sz_total": 4.136871306127145e-14,
+ "N_total": 40.00000000000001,
+ "sector_ok": true,
+ "seconds": 212.5
+}
