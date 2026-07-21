@@ -215,9 +215,20 @@ Recorded as a permanent rule: `absolute-threshold-on-a-relative-score` — **nev
 with an absolute constant**, and when unlocking any organ after a long lockout, assume a backlog and
 cap the first run.
 
-**Your vault is unchanged** apart from the two generated reports. If you want Elara's links, she will
-add 25 notes' worth per run from here; if you would rather see a sample first, say so and I will hold
-her in pending.
+**Update at 08:00 — she is live and there is a sample in your vault to look at.** Two live runs went
+through (07:18 and 07:45) and I watched what they wrote. Two residual noise sources showed up and are
+fixed (`54e7605`): a dated snapshot family now counts at two members rather than three, and a note can
+no longer gain a link to another *copy of itself* — the Breaktruth newsletters exist as a spaced
+title, an underscored title and a `Bridge_` prefix of the same words, so each was collecting three
+links back to itself.
+
+What is in your vault right now: **92 links across 25 notes**, one budgeted run. The links read
+sensibly — `Cognoscope` → its own validation note and the Debiased Prompt Builder; `Stigmergic
+Self-Awareness` → Theory of Mind and Stigmy; each Breaktruth newsletter → its one article note.
+Look at a few. From here she adds 25 notes per run until the backlog is gone.
+
+To undo all of it at any point: every line lives under a `## Related (AutoLinker)` heading and nothing
+else was touched, so it is a mechanical strip — tell me and it is gone in a minute.
 
 ---
 
