@@ -177,6 +177,50 @@ bypass the task gate by design.
 
 Recorded as a permanent rule: `keyword-match-without-subject-check`.
 
+---
+
+## 10. Post-briefing (07:15–08:00): two of eight agents had been working for nothing
+
+Checking the dungeon for churn, I found the opposite problem. No churn — but Elara and Voss logged the
+same line every ten minutes, all night: *"curation held to pending (standing 0.47)"*. They were each
+spending a 120-second vault-scanning subprocess and having **every** result thrown away.
+
+The gate was an absolute constant, `0.55`, applied to a score that is relative. Standing starts from
+mean pairwise trust and then blends in hit-rate, mastery and bounty — and every blend pulls the number
+*down*. The whole roster had drifted underneath it: the highest standing of all eight agents that
+morning was **0.476**. The organ had never applied, not once. And it feeds back: an agent that
+completes nothing loses standing for producing nothing, sinking further below the gate that stopped it.
+
+A gate that has never once passed looks exactly like a working gate in the logs. Both are calm.
+
+**Fixed** (`tools/autolinker.py`, commit `291d3e3`): gate on rank within the live roster, with an
+absolute value kept only as a real floor. Voss immediately produced his first result — **33
+true-duplicate groups, 89 redundant copies** in the vault, now in
+`04 Resources/Concepts/Agora Agents/quality_report_duplicates.md`.
+
+**Then unlocking it revealed a second problem, which is why nothing was left in your vault.** Elara's
+first unlocked run offered **2931 links across 763 notes at once**, and its most-linked targets were
+all bookkeeping — `orphans_*`, `quest-request-to-king-aldric`, daily `Falsification_*`. I let it write,
+saw what it wrote, and reverted it line by line: **0 added link lines remain in any real note.** Two
+guards went in before it may write again — a 25-note budget per run so a backlog drips instead of
+flooding, and machine output excluded as a link *target*.
+
+Worth saying plainly: my first attempt at that exclusion was a keyword blocklist, and it merely moved
+the hub from `orphans_*` to `Archival_Candidate_2026*` — the exact error I had recorded as a permanent
+rule ninety minutes earlier. The working version is structural: a dated snapshot family (three or more
+filenames identical once the date is removed) and anything under an agent-output folder. 3979 notes now
+excluded as targets; the links that survive point at real concepts.
+
+Recorded as a permanent rule: `absolute-threshold-on-a-relative-score` — **never gate a relative score
+with an absolute constant**, and when unlocking any organ after a long lockout, assume a backlog and
+cap the first run.
+
+**Your vault is unchanged** apart from the two generated reports. If you want Elara's links, she will
+add 25 notes' worth per run from here; if you would rather see a sample first, say so and I will hold
+her in pending.
+
+---
+
 **State at 06:15:** brain and dungeon up, inbox 3 (all machinery or on-mission), **31 off-mission
 births blocked overnight**, external library 392 items, `mnemo-repo` clean and pushed. The `agora`
 repo has 20 unpushed commits — left for you, since a push to a public repo deserves a secret scan in
