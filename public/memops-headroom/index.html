@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Is there any headroom for a write-side memory-correction layer? — pre-registration and raw data</title>
+<meta name="description" content="Pre-registration, audit appendices and raw per-probe rows for an oracle experiment measuring whether a write-side correction layer (keyed supersession) can improve LLM answer quality.">
+<link rel="canonical" href="https://dancenitra.github.io/agora/memops-headroom/">
+<style>
+  :root{--paper:#fbf9f4;--ink:#1b1a17;--soft:#54514a;--line:#e6e1d6;--acc:#0a8f68;
+    --serif:"Newsreader",Georgia,"Times New Roman",serif;--mono:ui-monospace,Menlo,Consolas,monospace}
+  *{box-sizing:border-box;margin:0}
+  body{background:var(--paper);color:var(--ink);font-family:var(--serif);
+    line-height:1.6;padding:40px 24px 80px}
+  main{max-width:760px;margin:0 auto}
+  h1{font-weight:500;font-size:32px;letter-spacing:-.02em;margin-bottom:8px}
+  h2{font-weight:500;font-size:21px;margin:36px 0 10px}
+  p{color:var(--ink);margin-bottom:14px}
+  .lede{color:var(--soft);font-size:18px;margin-bottom:26px}
+  table{border-collapse:collapse;width:100%;font-family:var(--mono);font-size:13px;margin:14px 0 20px}
+  th,td{text-align:left;padding:7px 10px;border-bottom:1px solid var(--line)}
+  th{color:var(--soft);font-weight:400}
+  td.n{text-align:right}
+  ul{margin:0 0 16px 20px;color:var(--ink)}
+  li{margin-bottom:7px}
+  a{color:var(--acc)}
+  .files{font-family:var(--mono);font-size:14px;line-height:2.1}
+  .note{color:var(--soft);font-size:15px;border-left:2px solid var(--line);padding-left:14px;margin:18px 0}
+  code{font-family:var(--mono);font-size:.92em}
+  footer{color:var(--soft);font-size:14px;margin-top:44px;border-top:1px solid var(--line);padding-top:16px}
+  @media (prefers-color-scheme:dark){
+    :root{--paper:#14140f;--ink:#eceades;--soft:#a3a08e;--line:#2e2d24;--acc:#4fd1a5}
+  }
+</style>
+</head>
+<body>
+<main>
+
+<h1>Is there any headroom for a write-side memory-correction layer?</h1>
+<p class="lede">Pre-registration, both audit appendices, and the raw per-probe rows for an oracle
+experiment on the MemOps corpus. Published so the numbers in the write-up can be checked rather than
+taken on trust.</p>
+
+<p>The question: a deterministic correction layer retires superseded records so recall cannot return
+them. Does that buy anything on answer quality, or does the model already resolve the contradiction
+when it sees both values? Retrieval is removed entirely and every context is built from the
+benchmark's own ground truth, per probe.</p>
+
+<h2>Arms</h2>
+<ul>
+  <li><code>oracle_state</code> — the corpus's own resolved, labelled state. It leaks the graded
+      answer, so it is a positive control on the harness, not a target.</li>
+  <li><code>oracle_evidence</code> / <code>oracle_evidence_neutral</code> — the probe's own
+      provenance quotes, verbatim, contradictions intact, in conversation order. The neutral variant
+      removes the prompt line telling the model to prefer current values.</li>
+  <li><code>oracle_evidence_shuffled</code> — the same quotes, deterministically shuffled out of
+      chronological order.</li>
+  <li><code>oracle_current</code> — current values only. What a perfect supersession layer emits.</li>
+</ul>
+
+<h2>Result</h2>
+<table>
+<tr><th>arm</th><th class="n">all (53)</th><th class="n">non-history (35)</th><th class="n">history (18)</th></tr>
+<tr><td>oracle_state</td><td class="n">0.868</td><td class="n">0.943</td><td class="n">0.722</td></tr>
+<tr><td>oracle_evidence</td><td class="n">0.868</td><td class="n">0.914</td><td class="n">0.778</td></tr>
+<tr><td>oracle_evidence_neutral</td><td class="n">0.830</td><td class="n">0.857</td><td class="n">0.778</td></tr>
+<tr><td>oracle_evidence_shuffled</td><td class="n">0.736</td><td class="n">0.886</td><td class="n">0.444</td></tr>
+<tr><td>oracle_current</td><td class="n">0.491</td><td class="n">0.743</td><td class="n">0.000</td></tr>
+</table>
+
+<ul>
+  <li><strong>Registered primary</strong> — <code>oracle_current − oracle_evidence_neutral</code> on
+      the non-history probes, decisive only at |Δ| ≥ 25 pp: <strong>−11.4 pp, CI [−25.7, +2.9]</strong>.
+      That is "no effect detectable at n=35", which the pre-registration says must not be written as
+      "no headroom".</li>
+  <li><strong>Secondary</strong> — resolved state minus raw contradictory quotes: +3.8 pp over all 53
+      probes, CI [−7.5, +15.1]; +8.6 pp on non-history. The comparison arm is already at 0.857–0.886,
+      so the arithmetic maximum gain is +14.3 pp: these arms are compressed against the harness
+      ceiling and the null is weak evidence, not strong.</li>
+  <li><strong>Order control</strong> — shuffling the same quotes costs −33.3 pp on history questions,
+      CI [−55.6, −11.1], and the stale-value rate goes 0.000 → 0.091. On non-history questions order
+      did not matter (+2.9 pp, CI through zero).</li>
+  <li><strong>Current-values-only scores exactly 0.000 on both history categories</strong> (n=18).
+      True by construction — a third of these probes ask what the value used to be. No overall delta
+      is quoted for that arm because it strips the stale values <em>and</em> the surrounding context.</li>
+</ul>
+
+<div class="note">
+Deltas are paired per probe on the 53 probes present in all arms, so they do not equal subtraction of
+the marginals above. The shuffled arm has n=53 (one logged drop); every other arm has n=54.
+</div>
+
+<h2>Files</h2>
+<p class="files">
+<a href="prereg.md">prereg.md</a> — pre-registration, including Appendix D and E written before the run<br>
+<a href="result.md">result.md</a> — result, plus the addendum recording the order control<br>
+<a href="raw_oracle_headroom.json">raw_oracle_headroom.json</a> — raw per-probe rows, four arms<br>
+<a href="raw_oracle_shuffle.json">raw_oracle_shuffle.json</a> — raw per-probe rows, order control
+</p>
+
+<h2>Scope</h2>
+<p>One answerer (deepseek-v4-flash), one judge, 53–54 probes across 8 persona families, one benchmark,
+about four updates per correction chain. Published work reports that read-time resolution degrades as
+update depth grows, and these probes never approach that depth. The oracle arms are not budget-matched
+to any retrieval arm (200–800 characters against ~11.9k), so no quantified headroom figure against a
+retrieval baseline is admissible from this data — only the direction.</p>
+
+<footer>
+Part of the Agora public record. Two defects in an earlier run on this corpus are documented in the
+pre-registration: every probe is stored twice in the corpus, and the judge's ground truth was
+truncated below the length of half the scenarios. Every number on this page was computed after both
+were fixed.
+</footer>
+
+</main>
+</body>
+</html>
