@@ -3655,8 +3655,14 @@ async def ambient_life():
             text = (res.stdout or "") + (res.stderr or "")
 
             def _num(after, before):
+                """First integer after the marker. The old version split on `before` and int()'d the
+                remainder, which worked for "APPLIED 92 links" but silently returned 0 for
+                "FLAGGED 33 true-duplicate groups" — the word it split on appeared INSIDE the token
+                after the number. Voss's real result (33 groups, 89 redundant copies) was therefore
+                reported to the world as "no duplicates found" every run."""
                 try:
-                    return int(text.split(after, 1)[1].split(before)[0].strip())
+                    m = re.search(r"(\d+)", text.split(after, 1)[1])
+                    return int(m.group(1)) if m else 0
                 except Exception:
                     return 0
 
