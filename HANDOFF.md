@@ -52,11 +52,14 @@ at least ten live third-party ones (`zep-adk`, `adk-redis`, `adk-milvus`, `adk-a
 differentiator; correction/erasure semantics are. Real remaining gap: **mem0 ships no ADK service** — its
 docs tell users to write the class themselves.
 
+**SHIPPED:** `inspeximus 1.28.0` and `adk-inspeximus 0.1.0` are both on PyPI (trusted publishing, attested;
+the owner created the pending publisher and the first upload consumed it). Verified the way a user meets it:
+a clean venv, `pip install adk-inspeximus`, which pulled `inspeximus 1.28.0` + `google-adk 2.5.0`, and
+ingesting the same session twice returned **1** memory — the defect this release fixes, confirmed in the
+shipped artifact rather than the working tree.
+
 **NEXT / BLOCKED ON THE OWNER:**
-1. **PyPI trusted publisher for `adk-inspeximus`** does not exist yet (name is free, core `v1.28.0` published
-   fine). Until it is created — repo `DanceNitra/inspeximus`, workflow `release.yml`, environment `pypi` —
-   the tag `adk-inspeximus-v0.1.0` will fail OIDC.
-2. **Google CLA** — owner agreed to sign under his own name. Not urgent: the `adk-docs` PR must NOT be filed
+1. **Google CLA** — owner agreed to sign under his own name. Not urgent: the `adk-docs` PR must NOT be filed
    the same day the package ships. Their PR #1565 was closed in 13 hours for exactly that, and the author
    conceded the point. Ship first, accumulate adoption, file later. Details: memory
    `adk-docs-open-but-maturity-gated`.
