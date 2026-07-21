@@ -102,19 +102,35 @@ directory would have found the same gap, and now there is nothing to find.
 Marat, thank you — both settled as you asked. The CERN data is out of the paper, and the U = 2 spin gap
 table stays on our own DMRG run. Nothing further is open on your side.
 
-## 5. What is left before I sign off
+## 5. What I have done with it, and the sign-off
 
-- Regenerate the affected tables with the SUM convention and add the extrapolated column. I will do
-  this and push it, so you do not have to touch the LaTeX.
-- Guanghao, one thing only you can confirm: whether you want the convergence data as a new appendix
-  table or as an extra column in the existing ones. I would suggest a new short appendix table, so the
-  main tables stay readable.
+Nothing is open on your side. You both handed these decisions to me, so I have made them rather than
+pass them back:
 
-Once those are in, I am ready to sign.
+- Every C in the defect-scan tables is restated in the SUM convention, so the paper uses one
+  definition throughout. This also fixes a contradiction that was already there: Table 4's caption
+  gives the uniform open-chain baseline as C = 0.958885 while its own 1.0t row — which IS that
+  uniform chain — reads 0.479442. One convention removes it.
+- The convergence data goes in as a new short appendix table rather than as extra columns, so the
+  main tables stay readable. If you would rather have it inline, say so and I will move it — but do
+  not hold the submission for that.
+- The regenerated LaTeX, both scripts and all 80 raw cells are pushed, so nobody has to open
+  Overleaf again.
 
-Everything here is reproducible from the repository: `defect_scan_chi_sweep.py` runs the grid,
-`defect_scan_analysis.py` does the extrapolation and prints the table above, and the 80 raw cells are
-committed so anyone can redo the fit without rerunning a single DMRG sweep.
+With that, **the manuscript is technically signed off from my side.** Guanghao, it is ready to submit
+whenever you are.
+
+Everything above is already pushed and reproducible:
+https://github.com/DanceNitra/edrn-appendix-fix
+
+- `scripts/defect_scan_chi_sweep.py` runs the grid
+- `scripts/defect_scan_analysis.py` does the extrapolation and prints the table above
+- `cells_defect_scan/` holds all 80 raw DMRG cells, so anyone can redo the fit without running a
+  single sweep
+- `scripts/edrn_fix_tables.py` applies the C convention and refuses to run if the result would not
+  match `predict1_topology_spin.csv`
+- `appendix_defect_convergence.tex` is the new appendix table, and `paper_full.pdf` is recompiled
+  with everything in place
 
 Separately, Guanghao — I have read your PXP letter and the "silent detuning" result. I will not mix it
 into a submission thread; I will reply on it properly once this paper is signed. Two things I can say
