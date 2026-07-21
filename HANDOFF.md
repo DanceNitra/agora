@@ -13,6 +13,54 @@
 
 # Agora — Session Handoff (2026-07-20 · "test your own claim" day)
 
+## 2026-07-21 (later) — distribution track: LangGraph docs PR filed, ADK shipped, and a market read I got wrong
+
+Track B only (the memory product). Two integration ecosystems, both entered through their official routes.
+
+**LangGraph — [PR #5019](https://github.com/langchain-ai/docs/pull/5019) is OPEN and green.** Adds a provider
+page plus one row in the third-party checkpointer table and one card in `all_providers`. All 20 checks pass,
+including their own Vale 3.9.6 (0 errors / 0 warnings / 0 suggestions — their `install-vale.sh` refuses to run
+on Windows, so the pinned binary was fetched from their release and run directly rather than assumed).
+Every code sample was executed against the released package and the outputs are the real ones. The PR
+discloses AI assistance, per their contributing guidelines. Reviewer `@mdrxy` was asked in a comment —
+GitHub refuses a review request from an external contributor (`does not have the correct permissions`),
+so their bot's "please add the relevant reviewers" can only be honoured that way. Two labels applied by
+their triage bot: `external`, `python`.
+
+**Google ADK — `inspeximus 1.28.0` shipped (PyPI, verified from `site-packages` not the repo).** ADK ships
+**no conformance suite** for `BaseMemoryService`, so "drop-in replacement for `InMemoryMemoryService`" had
+been an unchecked claim since 0.7.4. `adk_audit.py` now checks it — eight scenarios against ADK's own
+service, three repeats, `ADK_FALSIFY=1` as the control that must fail (it fails 7 checks). Writing the audit
+caught two real defects:
+
+- **Re-adding a session stored it twice.** ADK documents a session *"may be added multiple times during its
+  lifetime"* and the runner does exactly that, so a long conversation was written once per turn. Ingestion is
+  now idempotent per event; the seen-set rebuilds from the store, so it survives a restart.
+- **`add_events_to_memory` was never implemented** — the incremental path raised `NotImplementedError`.
+
+Also `from_uri()` + `register()`, so `adk web --memory_service_uri=inspeximus://memory.json` works with no
+Python glue, and the `adk-inspeximus` wrapper distribution. CI gained an `adk-parity` job that ran green on a
+clean Linux runner against the current `google-adk` release. Latent bug found in `release.yml` on the way:
+the import check derived the module name by string surgery written for `langgraph.*` namespace packages and
+would have produced the non-existent `adk.inspeximus`, failing the release of a package that was fine.
+
+**Where I was wrong, on the record.** I told the owner the ADK ecosystem had no local persistent memory
+service. That was a bad read — I looked only at what ships *inside* `google-adk` and generalized. There are
+at least ten live third-party ones (`zep-adk`, `adk-redis`, `adk-milvus`, `adk-aerospike`,
+`adk-database-memory`, `adk-perseus-vault-memory`, `hindsight-google-adk`, `kagent-adk`,
+`google-adk-community`, `goodmem-adk`), all verified on PyPI. "Local and persistent" is therefore NOT the
+differentiator; correction/erasure semantics are. Real remaining gap: **mem0 ships no ADK service** — its
+docs tell users to write the class themselves.
+
+**NEXT / BLOCKED ON THE OWNER:**
+1. **PyPI trusted publisher for `adk-inspeximus`** does not exist yet (name is free, core `v1.28.0` published
+   fine). Until it is created — repo `DanceNitra/inspeximus`, workflow `release.yml`, environment `pypi` —
+   the tag `adk-inspeximus-v0.1.0` will fail OIDC.
+2. **Google CLA** — owner agreed to sign under his own name. Not urgent: the `adk-docs` PR must NOT be filed
+   the same day the package ships. Their PR #1565 was closed in 13 hours for exactly that, and the author
+   conceded the point. Ship first, accumulate adoption, file later. Details: memory
+   `adk-docs-open-but-maturity-gated`.
+
 ## 2026-07-21 — EDRN paper 2 PUBLISHED · rename decided · adoption measured at ~zero · dungeon's three silent failures
 
 **Read this first.** Two tracks ran today and they are unrelated to each other — do not merge them:
