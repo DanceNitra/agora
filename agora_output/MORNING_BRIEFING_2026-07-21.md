@@ -138,3 +138,24 @@ operation-by-operation parity audit against LangGraph's own store — and it app
 integrations page, and `awesome-LangGraph#88` still sits unmerged. 39 threads are asking for exactly
 this. It is a day of packaging, not a month of building, and it is the shortest path from "we have a
 verified product" to "someone outside can find it".
+
+---
+
+## 8. Two things I could not verify from here, so they are yours
+
+**Other MCP hosts.** The README documents the config generically and the snippet is correct
+(`uvx --from "agora-mnemo[mcp]" mnemo-mcp`), but only Claude Code is installed on this machine, so
+only that path is verified end to end. Cursor, Windsurf, Codex, Cline and Continue each keep their MCP
+config in a different file, and Codex uses TOML rather than JSON — a user copying our JSON into Codex
+would fail. Writing those paths without testing them is the same "fairly confident" that cost us three
+corrections tonight, so they are not in the README. If you have Cursor open, confirming one path takes
+a minute and then we can annex hosts properly, which is the mechanism behind claude-mem's 88k.
+
+**The awesome-LangGraph listing.** Our PR #88 has been open since 17 July with no comment — but the
+maintainer last merged anything on 10 July, in a single batch, and **eight PRs are queued behind that
+date, ours among them**. Nothing is wrong with our submission; the channel is simply slow and outside
+our control. Do not nudge with seven others waiting.
+
+**Verified instead, on the exact artifact the new plugin installs** (`agora_mnemo-1.24.4`, sha256
+`7b4bdd71e8a2…`): claims audit 13/13, governance audit CLAIM HOLDS. What we are telling people to
+install is what we tested.
