@@ -563,24 +563,19 @@ def _persona(eid: str) -> str:
     return _PERSONA.get(eid, "a weary dungeon dweller")
 
 
-# ── Dogfood: the agents' working memory runs on mnemo (Agora's own open-source memory layer) ──
-# Each agent gets a mnemo store; recall is value-ranked (relevance × accrued value), not recency.
-# Guarded so a missing/broken mnemo never takes the dungeon down — it falls back to the plain list.
+# ── Dogfood: the agents' working memory runs on inspeximus (Agora's own open-source memory layer) ──
+# Each agent gets an inspeximus store; recall is value-ranked (relevance × accrued value), not recency.
+# Guarded so a missing/broken memory layer never takes the dungeon down — it falls back to a plain list.
+# Was: a sys.path.insert into a vendored copy of the library that sat beside the research
+# probes, which had drifted a release behind. The library is now a normal installed dependency.
 try:
-    # Was: sys.path.insert(... / "mnemo") + `from inspeximus import Inspeximus`, which loaded a VENDORED copy
-    # of the library that sat beside the research probes and drifted a release behind the real one.
-    # The library is now a normal installed dependency (`pip install inspeximus`); only the probes
-    # stay in that directory. The fallback covers a pre-1.25 install still carrying the old name.
-    try:
-        from inspeximus import Inspeximus as _Mnemo
-    except ImportError:
-        from inspeximus import Inspeximus as _Mnemo
+    from inspeximus import Inspeximus as _Store
 except Exception:
-    _Mnemo = None
+    _Store = None
 _AGENT_MEM_DIR = Path(__file__).resolve().parent / ".agent_memory"
 _agent_mem_stores: dict = {}
 
-# ── Semantic recall for the agents (dogfood mnemo's embedder path) ─────────────────────────────
+# ── Semantic recall for the agents (dogfood the embedder path) ─────────────────────────────
 # On a single GPU shared with the 30B planner, a live embed costs ~2s (it queues behind qwen). So
 # embedding is kept OFF the hot path: writes stay fast (the vec is filled later by a throttled
 # background worker) and recall query-embeds are cached. AGENT_SEMANTIC=0 -> pure lexical (original).
@@ -592,7 +587,7 @@ _EMB_CACHE_MAX = 4000
 
 
 def _ollama_embed(text: str):
-    """text -> embedding via the local ollama embed model. Raises on failure (mnemo then falls back
+    """text -> embedding via the local ollama embed model. Raises on failure (inspeximus then falls back
     to lexical, never crashes). keep_alive holds the embedder resident so it never cold-loads."""
     body = json.dumps({"model": _EMB_MODEL, "prompt": (text or "")[:512],
                        "keep_alive": "30m"}).encode()
@@ -616,7 +611,7 @@ def _cached_embed(text: str):
 def _vec_backfill_worker():
     """Background + throttled: give vec-less ACTIVE memories a vector (highest value / most recent
     first) so semantic recall has a corpus to match — without blocking the game loop or starving the
-    planner's GPU. mnemo's atomic _save makes the shared-file writes corruption-safe."""
+    planner's GPU. inspeximus's atomic _save makes the shared-file writes corruption-safe."""
     _round = 0
     while True:
         try:
@@ -625,7 +620,7 @@ def _vec_backfill_worker():
                 _prune_superseded()
             did = 0
             for eid in list(_AGENT_NAMES):
-                m = _agent_mnemo(eid)
+                m = _agent_store(eid)
                 if m is None:
                     continue
                 cand = [r for r in list(m.items)
@@ -653,13 +648,13 @@ def _vec_backfill_worker():
 
 def _migrate_active_pool(target: int = 400):
     """One-time alignment with the keep=400 policy. Past keep=150 consolidations over-superseded, so
-    each store sits below mnemo's semantic crossover (300 active). Revive the highest-value superseded
+    each store sits below inspeximus's semantic crossover (300 active). Revive the highest-value superseded
     records up to `target` so recall actually runs the embedder. Idempotent (no-op once active>=target;
     the genuinely low-value tail stays superseded). Runs at startup, single-writer-safe."""
-    if _Mnemo is None:
+    if _Store is None:
         return
     for eid in list(_AGENT_NAMES):
-        m = _agent_mnemo(eid)
+        m = _agent_store(eid)
         if m is None:
             continue
         try:
@@ -683,12 +678,12 @@ def _prune_superseded(keep_superseded: int = 1500) -> int:
     (for history/revert), and hard-forget the older superseded tail. Agent working memory is ephemeral per-tick;
     without this the append-only store grows unbounded (found at ~56k records, 99% dead superseded), which
     drowns the vec-backfill worker in I/O (56k-item scans + ~2.4MB saves every round) so semantic recall never
-    fills. Uses mnemo's verified forget (scrubs links + toggle pointers). Idempotent; single-writer."""
-    if _Mnemo is None:
+    fills. Uses inspeximus's verified forget (scrubs links + toggle pointers). Idempotent; single-writer."""
+    if _Store is None:
         return 0
     total = 0
     for eid in list(_AGENT_NAMES):
-        m = _agent_mnemo(eid)
+        m = _agent_store(eid)
         if m is None:
             continue
         try:
@@ -720,16 +715,16 @@ _vec_worker_started = False
 
 def _start_vec_worker():
     global _vec_worker_started
-    if _SEMANTIC and _Mnemo is not None and not _vec_worker_started:
+    if _SEMANTIC and _Store is not None and not _vec_worker_started:
         _vec_worker_started = True
         _prune_superseded()              # unbloat FIRST (56k dead tail starved the worker) so vecs can fill
         _migrate_active_pool(400)        # cross the semantic crossover now, not in hours
-        threading.Thread(target=_vec_backfill_worker, daemon=True, name="mnemo-vec").start()
-        logger.info("mnemo semantic vec-backfill worker started (model=%s)", _EMB_MODEL)
+        threading.Thread(target=_vec_backfill_worker, daemon=True, name="inspeximus-vec").start()
+        logger.info("inspeximus semantic vec-backfill worker started (model=%s)", _EMB_MODEL)
 
 
-def _agent_mnemo(eid: str):
-    if _Mnemo is None:
+def _agent_store(eid: str):
+    if _Store is None:
         return None
     m = _agent_mem_stores.get(eid)
     if m is None:
@@ -737,7 +732,7 @@ def _agent_mnemo(eid: str):
             _AGENT_MEM_DIR.mkdir(exist_ok=True)
             # embed= gives recall the semantic path (query-embedded, value-ranked over vec-bearing
             # memories); vectors themselves are populated off the hot path by _vec_backfill_worker.
-            m = _Mnemo(str(_AGENT_MEM_DIR / f"{eid}.json"),
+            m = _Store(str(_AGENT_MEM_DIR / f"{eid}.json"),
                        embed=(_cached_embed if _SEMANTIC else None))
             _agent_mem_stores[eid] = m
         except Exception:
@@ -746,8 +741,8 @@ def _agent_mnemo(eid: str):
 
 
 def _recall_mem(eid: str, query: str, k: int = 4) -> str:
-    """Value-ranked recall from the agent's mnemo store — relevant past work, not just recent."""
-    m = _agent_mnemo(eid)
+    """Value-ranked recall from the agent's inspeximus store — relevant past work, not just recent."""
+    m = _agent_store(eid)
     if m is None:
         return ""
     try:
@@ -757,15 +752,15 @@ def _recall_mem(eid: str, query: str, k: int = 4) -> str:
 
 
 def _collective_recall(query: str, k: int = 4, exclude: str | None = None) -> str:
-    """The keep as ONE mind: top-k value-ranked memories across ALL agents' mnemo stores, attributed
+    """The keep as ONE mind: top-k value-ranked memories across ALL agents' inspeximus stores, attributed
     by author — so an agent builds on a colleague's prior finding instead of re-deriving it."""
-    if _Mnemo is None:
+    if _Store is None:
         return ""
     pooled = []
     for oid in _AGENT_NAMES:
         if oid == exclude:
             continue
-        m = _agent_mnemo(oid)
+        m = _agent_store(oid)
         if m is None:
             continue
         try:
@@ -787,17 +782,17 @@ def _collective_recall(query: str, k: int = 4, exclude: str | None = None) -> st
 
 
 def _collective_top(query: str, exclude: str | None = None, min_score: float = 1.0):
-    """The single strongest colleague memory for `query` across all other agents' mnemo stores.
+    """The single strongest colleague memory for `query` across all other agents' inspeximus stores.
     Returns (colleague_eid, text, score) if it clears `min_score`, else None — the deterministic
     hook that lets an agent collaborate on a colleague's finding even when the flaky planner LLM
     returns nothing."""
-    if _Mnemo is None:
+    if _Store is None:
         return None
     best = None
     for oid in _AGENT_NAMES:
         if oid == exclude:
             continue
-        m = _agent_mnemo(oid)
+        m = _agent_store(oid)
         if m is None:
             continue
         try:
@@ -811,12 +806,12 @@ def _collective_top(query: str, exclude: str | None = None, min_score: float = 1
 
 def _keep_memory_signal() -> dict:
     """Reflect on the COLLECTIVE memory: the densest-value cohort + any flagged contradiction across
-    all agents' stores. Uses mnemo's value_by_cohort + contradictions — the product, on ourselves."""
-    if _Mnemo is None:
+    all agents' stores. Uses inspeximus's value_by_cohort + contradictions — the product, on ourselves."""
+    if _Store is None:
         return {}
     cohorts, contras = {}, []
     for oid in _AGENT_NAMES:
-        m = _agent_mnemo(oid)
+        m = _agent_store(oid)
         if m is None:
             continue
         try:
@@ -1422,7 +1417,7 @@ _BOARD_BANNED = {"physics", "finance", "health", "politics", "trivia", "cloud", 
 # let "Specification curve correction tool" through on `correction` and "Build Vault Linter ... quality
 # standards" through on `quality`, because the board prose contains those words in passing. A task that
 # names none of these is not about our mission, whatever else it matches.
-_BOARD_CORE = {"memory", "memories", "mnemo", "recall", "retrieval", "retrieve", "supersession",
+_BOARD_CORE = {"memory", "memories", "inspeximus", "recall", "retrieval", "retrieve", "supersession",
                "supersede", "revert", "erasure", "erase", "forget", "poison", "provenance",
                "embedding", "embeddings", "rag", "vector", "mem0", "zep", "graphiti", "letta",
                "cognee", "memobase", "langmem", "benchmark", "locomo", "memops", "store", "context",
@@ -1694,7 +1689,7 @@ async def _renewable_quests(eid: str, want: int = 3) -> list:
     # BOARD-PRIORITY GATE (2026-07-20). Root cause of an all-night off-mission run: the `findings` bucket
     # re-seeds "Hypothesize on: <topic>" from the top-8 of collective knowledge, but nothing new displaces
     # that top-8 — so the same stale off-mission hypotheses (SCN neurons, CT scans, vertical transmission)
-    # kept re-seeding themselves while the owner-locked mnemo directions sat in a 1-of-4 bucket. That is a
+    # kept re-seeding themselves while the owner-locked inspeximus directions sat in a 1-of-4 bucket. That is a
     # self-reinforcing echo loop in our OWN swarm. Route the assembled pool through the SAME gatekeeper the
     # insight/predict generators already use: when ANY candidate matches the board priorities, only those
     # are eligible. Soft by design — if nothing matches, the full pool passes, so the swarm never starves.
@@ -2047,7 +2042,7 @@ async def _gate_filter(pool: list[str]) -> list[str]:
     the board — which is exactly the case that needed gating, so an off-mission batch passed whole.
     Measured cost of that one line: 17 of 22 pending inbox tasks were off-mission (eight
     `Hypothesize from findings` on vault themes like Landauer, orphan nodes, ADHD fMRI meta-analyses),
-    while the board had been locked to the mnemo frontier for days. The lab door was gated and the
+    while the board had been locked to the inspeximus frontier for days. The lab door was gated and the
     generator walked in through the window.
 
     Starvation is visible on purpose: returning [] logs the miss instead of quietly manufacturing work.
@@ -2807,7 +2802,7 @@ async def _queue_scout() -> None:
         {"text": f"Scout triage: {len(leads)} leads to answer + {len(learn)} to learn from. "
                  f"TO ANSWER: {body} || TO LEARN FROM (merged PRs in our problem space — read, "
                  f"extract what we did not know, do NOT pitch): {learn_body} || "
-                 f"For each lead judge HONESTLY whether Agora/mnemo answers it with EVIDENCE (a real "
+                 f"For each lead judge HONESTLY whether Agora/inspeximus answers it with EVIDENCE (a real "
                  f"mechanism + a measured number from our notes/Lab). Where yes, draft a gated reply: "
                  f"POST /brain/correspondent/draft {{title, body, repo, issue_number}} — helpful, "
                  f"specific, no overselling. Where no, say so and move on; reputation dies on a bad "
@@ -3301,7 +3296,7 @@ def _credit_agent_mem(eid: str, subject: str, good: bool, k: int = 4, min_rel: f
     relevant to the subject it was contributing on — so each agent's recall sharpens by WAS-IT-RIGHT,
     not just by use. Strong-relevance only; gentle (bounded Beta), so one miss can't erase a memory."""
     try:
-        m = _agent_mnemo(eid)
+        m = _agent_store(eid)
         if m is None or not hasattr(m, "credit"):
             return
         ids = [h["id"] for h in m.recall(subject or "", k=k) if h.get("relevance", 0) >= min_rel]
@@ -3559,20 +3554,20 @@ async def ambient_life():
     def remember(eid, text, mtype=None, value=None):
         memory.setdefault(eid, []).append(text)
         memory[eid] = memory[eid][-8:]
-        m = _agent_mnemo(eid)                       # dogfood: persist into the agent's mnemo store
+        m = _agent_store(eid)                       # dogfood: persist into the agent's inspeximus store
         if m is not None:
             try:
                 s = str(text)
                 # Findings/discoveries are durable knowledge -> semantic + higher value (long
                 # half-life so they persist); plain quest chatter stays episodic and fades fast.
-                # Engages mnemo's per-type decay + value-ranking on our own agents.
+                # Engages inspeximus's per-type decay + value-ranking on our own agents.
                 if value is None:
                     value = 2.5 if re.search(r"Source:|Hypothesis|Finding|Falsifier|"
                                              r"\([A-Z][a-z]+ \d{4}\)", s) else 1.0
                 if mtype is None and value >= 2.0:
                     mtype = "semantic"
                 # Keep the write fast: don't inline-embed (a live embed is ~2s under GPU contention).
-                # Vectors are filled off the hot path by _vec_backfill_worker and live in RAM (mnemo._save
+                # Vectors are filled off the hot path by _vec_backfill_worker and live in RAM (inspeximus._save
                 # strips vec on disk by design — the 2026-06-20 frozen-world fix — so recall is semantic
                 # in-session and re-embeds lazily after a reload).
                 _saved_embed = getattr(m, "embed", None)
@@ -3931,11 +3926,11 @@ async def ambient_life():
             nearby = [_AGENT_NAMES.get(o, o) for o, e in engine.state.entities.items()
                       if o != eid and abs(e.x - cx) + abs(e.y - cy) <= 8]
             locs = ", ".join(locations.keys())
-            # Value-ranked recall from the agent's mnemo store (relevant past work), with the plain
-            # recency list as a fallback when mnemo is empty/unavailable.
+            # Value-ranked recall from the agent's inspeximus store (relevant past work), with the plain
+            # recency list as a fallback when inspeximus is empty/unavailable.
             _q = f"{_ROLE_HINT.get(eid, '')} {(memory.get(eid) or ['research'])[-1]}"
-            # mnemo recall can serialize the store (json.dumps) — run it OFF the event loop so it can
-            # never freeze the ambient loop (the frozen-world bug, 2026-06-20). See mnemo _save throttle.
+            # inspeximus recall can serialize the store (json.dumps) — run it OFF the event loop so it can
+            # never freeze the ambient loop (the frozen-world bug, 2026-06-20). See inspeximus _save throttle.
             mem = (await asyncio.to_thread(_recall_mem, eid, _q)) or " | ".join(memory.get(eid, [])[-4:]) or "(nothing yet)"
             # Collective recall — what colleagues already found that's relevant to this agent's focus.
             colleague_mem = await asyncio.to_thread(_collective_recall, _q, exclude=eid)
@@ -4120,15 +4115,15 @@ async def ambient_life():
             if loop_n % 17000 == 300 and not orchestration["running"]:  # Aldric: doctrine + GitHub (~4 h)
                 asyncio.create_task(_run_orchestration("king", _stm.get("king", 0.5)))
 
-        # Dogfood: run mnemo's consolidation "dream pass" over each agent's memory (~every 28 min) —
+        # Dogfood: run inspeximus's consolidation "dream pass" over each agent's memory (~every 28 min) —
         # value-rank under a keep-budget + link near-duplicates. Agora's product, on Agora's agents.
-        if loop_n % 2000 == 123 and _Mnemo is not None:
+        if loop_n % 2000 == 123 and _Store is not None:
             def _consolidate_agent_mem():
                 for _eid in list(_AGENT_NAMES):
-                    mm = _agent_mnemo(_eid)
+                    mm = _agent_store(_eid)
                     if mm is not None:
                         try:
-                            # keep>300 holds the active pool above mnemo's measured semantic
+                            # keep>300 holds the active pool above inspeximus's measured semantic
                             # crossover, so recall runs the embedder (below it, lexical is as good).
                             mm.consolidate(keep=400)              # hubs + dedup + state-toggle + keep
                             mm.consolidate_clusters(threshold=15)  # cluster-triggered consolidation
@@ -4144,7 +4139,7 @@ async def ambient_life():
                                + (f"; {sig['contradictions']} memory contradiction(s) flagged"
                                   if sig.get("contradictions") else ""))
                 if sig.get("contradictions"):
-                    _os_build("challenge", "the keep", f"mnemo flagged {sig['contradictions']} "
+                    _os_build("challenge", "the keep", f"inspeximus flagged {sig['contradictions']} "
                               f"contradictory memories for review")
             asyncio.create_task(_reflect())
 

@@ -5,7 +5,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "python -m mnemo.claude_code"
+            "command": "python -m inspeximus.claude_code"
           }
         ]
       }
@@ -15,7 +15,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "python -m mnemo.claude_code"
+            "command": "python -m inspeximus.claude_code"
           }
         ]
       }
@@ -25,7 +25,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "python -m mnemo.claude_code"
+            "command": "python -m inspeximus.claude_code"
           }
         ]
       }

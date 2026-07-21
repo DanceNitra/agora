@@ -1,12 +1,12 @@
 """
-MNEMO ↔ brain bridge — the agents' shared memory, and the gate on who may contribute.
+INSPEXIMUS <-> brain bridge — the agents' shared memory, and the gate on who may contribute.
 
 The owner's rule: any of the 8 agents may join a group seminar, but only if it GENUINELY has
-something to add — and "genuinely" means its memory surfaces relevant knowledge. So MNEMO is wired
+something to add — and "genuinely" means its memory surfaces relevant knowledge. So INSPEXIMUS is wired
 into the brain as the team's shared store: a contribution is remembered back into it, so the
 memory compounds as the team works, and the next "can you contribute?" check is richer.
 
-Uses the open-source mnemo module (single-file, lexical recall at this scale — fast, no GPU). The
+Uses the open-source inspeximus package (single-file, lexical recall at this scale — fast, no GPU). The
 vault's semantic index is a bootstrap backstop so domain-relevant agents can contribute before the
 shared store has warmed up. Dogfoods the mcp_memory product inside Agora's own loop.
 """
@@ -17,13 +17,13 @@ from pathlib import Path
 
 _SERVER = Path(__file__).resolve().parents[2]
 _REPO = _SERVER.parent
-_STORE_PATH = _SERVER / ".mnemo_brain.json"
-_SEED_FLAG = _SERVER / ".mnemo_seeded.flag"
+_STORE_PATH = _SERVER / ".inspeximus_brain.json"
+_SEED_FLAG = _SERVER / ".inspeximus_seeded.flag"
 
 _store = None
 
 
-def _mnemo():
+def _inspeximus():
     """The shared brain store (lexical mode — no embedder, instant at a few hundred memories)."""
     global _store
     if _store is None:
@@ -43,7 +43,7 @@ def seed_recent(db_path: str | None = None, cap: int = 250) -> int:
     if _SEED_FLAG.exists():
         return 0
     import sqlite3
-    m = _mnemo()
+    m = _inspeximus()
     added = 0
     try:
         con = sqlite3.connect(f"file:{(_SERVER / 'agora.db').as_posix()}?mode=ro", uri=True)
@@ -70,7 +70,7 @@ def remember_contribution(claim: str, evidence: str = "", tags=None) -> None:
     try:
         txt = (claim + (" — " + evidence if evidence else "")).strip()
         if len(txt) > 25:
-            _mnemo().remember(txt[:500], tags=list(tags or []) + ["contribution"], value=1.5)
+            _inspeximus().remember(txt[:500], tags=list(tags or []) + ["contribution"], value=1.5)
     except Exception:
         pass
 
@@ -83,7 +83,7 @@ def credit_outcome(subject: str, good: bool, k: int = 5, min_rel: float = 0.30) 
     STRONG relevance floor (0.30, above the contribution gate) so only clearly-on-subject memories take
     the signal — a defensible proxy for the exact grounding without creation-time recall-set stamping."""
     try:
-        m = _mnemo()
+        m = _inspeximus()
         hits = m.recall(subject or "", k=k)
         ids = [h["id"] for h in hits if h.get("relevance", 0) >= min_rel]
         if not ids:
@@ -99,18 +99,18 @@ def consolidate_brain_memory() -> dict:
     supersede markers. The dungeon agents already run this on their stores; this brings the brain's
     store the same hygiene so links compound as it grows. Returns the consolidation stats."""
     try:
-        return _mnemo().consolidate()      # keep=None -> never drops; links + state-toggles only
+        return _inspeximus().consolidate()      # keep=None -> never drops; links + state-toggles only
     except Exception as e:
         return {"error": str(e)[:120]}
 
 
 def agent_can_contribute(role_hint: str, topic: str, min_rel: float = 0.22) -> tuple[bool, str]:
-    """Can this agent genuinely add to the topic? True only if its memory (shared MNEMO, or the
+    """Can this agent genuinely add to the topic? True only if its memory (shared INSPEXIMUS, or the
     vault as a bootstrap backstop) surfaces relevant knowledge. Returns (can, context_snippets)."""
     query = f"{role_hint} {topic}".strip()
-    # 1) shared MNEMO recall (the team's accumulated knowledge)
+    # 1) shared INSPEXIMUS recall (the team's accumulated knowledge)
     try:
-        hits = _mnemo().recall(query, k=3)
+        hits = _inspeximus().recall(query, k=3)
         strong = [h for h in hits if h.get("relevance", 0) >= min_rel]
         if strong:
             ctx = " | ".join(h["text"][:160] for h in strong[:2])
