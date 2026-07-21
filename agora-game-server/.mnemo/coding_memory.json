@@ -17,5 +17,2185 @@
   "meta": {},
   "key": "cmd:46021ec99b",
   "object": "cd /c/Users/Danculus/agora echo \"=== current dungeon process"
+ },
+ {
+  "id": "aeea62487d",
+  "text": "ran: cd /c/Users/Danculus/agora # 1) write the mem0 empirical finding INTO mnemo (dogfood) python -c \" import sys; sys.path.insert(0, r'C:\\Users\\Danculus\\agora') from mnemo import Mnemo m = Mnemo(path=r'C:…",
+  "tags": [
+   "bash"
+  ],
+  "value": 1.0,
+  "ts": 1784474963.8467054,
+  "iso": "2026-07-19T15:29:23Z",
+  "valid_from": 1784474963.8467054,
+  "source": null,
+  "mtype": "episodic",
+  "last_access": 1784474963.8467054,
+  "status": "active",
+  "links": [],
+  "meta": {},
+  "key": "cmd:44aee4ea36",
+  "object": "cd /c/Users/Danculus/agora # 1) write the mem0 empirical fin"
+ },
+ {
+  "id": "c6ad15372d",
+  "text": "ran: powershell -NoProfile -Command \"@(Get-CimInstance Win32_Process -Filter \\\"name like '%python%'\\\" | Where-Object { \\$_.CommandLine -like '*mcp_server.py*' }).Count\" 2>&1 | tail -1 | xargs -I{} echo \"mc…",
+  "tags": [
+   "bash"
+  ],
+  "value": 1.0,
+  "ts": 1784474972.726188,
+  "iso": "2026-07-19T15:29:32Z",
+  "valid_from": 1784474972.726188,
+  "source": null,
+  "mtype": "episodic",
+  "last_access": 1784474972.726188,
+  "status": "active",
+  "links": [],
+  "meta": {},
+  "key": "cmd:27130e704a",
+  "object": "powershell -NoProfile -Command \"@(Get-CimInstance Win32_Proc"
+ },
+ {
+  "id": "68180d0a86",
+  "text": "..\\agora_output\\mnemo_pro\\integrity_receipt_v2.md :: current state -> # Integrity receipt v2 â€” empirically grounded (DRAFT, pre-gate, owner approval before ANY posting)  ## The one claim A leading, real, running agent-memory system (mem0, LLM-merge…",
+  "tags": [
+   "file",
+   "edit"
+  ],
+  "value": 1.0,
+  "ts": 1784475180.8513021,
+  "iso": "2026-07-19T15:33:00Z",
+  "valid_from": 1784475180.8513021,
+  "source": null,
+  "mtype": "semantic",
+  "last_access": 1784475180.8513021,
+  "status": "active",
+  "links": [],
+  "meta": {},
+  "key": "file:..\\agora_output\\mnemo_pro\\integrity_receipt_v2.md",
+  "object": "# Integrity receipt v2 â€” empirically grounded (DRAFT, pre-gate, owner approval…"
+ },
+ {
+  "id": "1e6a710c61",
+  "text": "..\\agora_output\\lab\\trust_vs_truth_test.py :: current state -> \"\"\"trust_vs_truth_test.py â€” is recall(trusted_only) DETECTING truth, or just reading a label we painted?  Method-auditor v2: the poison-defense 1.00 may be tautological â€” in th…",
+  "tags": [
+   "file",
+   "edit"
+  ],
+  "value": 1.0,
+  "ts": 1784475302.6707273,
+  "iso": "2026-07-19T15:35:02Z",
+  "valid_from": 1784475302.6707273,
+  "source": null,
+  "mtype": "semantic",
+  "last_access": 1784475302.6707273,
+  "status": "active",
+  "links": [],
+  "meta": {},
+  "key": "file:..\\agora_output\\lab\\trust_vs_truth_test.py",
+  "object": "\"\"\"trust_vs_truth_test.py â€” is recall(trusted_only) DETECTING truth, or just r…"
+ },
+ {
+  "id": "62a0d2be52",
+  "text": "ran: cd /c/Users/Danculus/agora/agora-game-server && python ../tools/dungeon_health.py 2>/dev/null || python tools/dungeon_health.py 2>/dev/null || tail -5 _dungeon.log 2>/dev/null",
+  "tags": [
+   "bash"
+  ],
+  "value": 1.0,
+  "ts": 1784494095.8402314,
+  "iso": "2026-07-19T20:48:15Z",
+  "valid_from": 1784494095.8402314,
+  "source": null,
+  "mtype": "episodic",
+  "last_access": 1784494095.8402314,
+  "status": "active",
+  "links": [],
+  "meta": {},
+  "key": "cmd:f86ccf7fda",
+  "object": "cd /c/Users/Danculus/agora/agora-game-server && python ../to"
+ },
+ {
+  "id": "57de54e56a",
+  "text": "ran: cd /c/Users/Danculus/agora/agora-game-server && grep -in \"scout\" _dungeon.log | tail -10; echo \"=== err ===\"; grep -in \"scout\" _dungeon.err 2>/dev/null | tail -5; echo \"=== loop_n ===\"; curl -s http:/…",
+  "tags": [
+   "bash"
+  ],
+  "value": 1.0,
+  "ts": 1784494318.6099162,
+  "iso": "2026-07-19T20:51:58Z",
+  "valid_from": 1784494318.6099162,
+  "source": null,
+  "mtype": "episodic",
+  "last_access": 1784494318.6099162,
+  "status": "active",
+  "links": [],
+  "meta": {},
+  "key": "cmd:0871ff7dec",
+  "object": "cd /c/Users/Danculus/agora/agora-game-server && grep -in \"sc"
+ },
+ {
+  "id": "7e80cd8b5c",
+  "text": "ran: ls -la _dungeon.log _dungeon.err 2>/dev/null; ls -lat *.log 2>/dev/null | head; python ../tools/dungeon_health.py 2>/dev/null; ls ../tools/dungeon_health.py 2>/dev/null || ls tools/ 2>/dev/null | head",
+  "tags": [
+   "bash"
+  ],
+  "value": 1.0,
+  "ts": 1784494365.526155,
+  "iso": "2026-07-19T20:52:45Z",
+  "valid_from": 1784494365.526155,
+  "source": null,
+  "mtype": "episodic",
+  "last_access": 1784494365.526155,
+  "status": "active",
+  "links": [],
+  "meta": {},
+  "key": "cmd:c9769cc969",
+  "object": "ls -la _dungeon.log _dungeon.err 2>/dev/null; ls -lat *.log "
+ },
+ {
+  "id": "259138fca3",
+  "text": "ran: cat _dungeon.log; echo \"=== err tail ===\"; tail -20 _dungeon.err; echo \"=== scout in err ===\"; grep -ic scout _dungeon.err",
+  "tags": [
+   "bash"
+  ],
+  "value": 1.0,
+  "ts": 1784494370.414794,
+  "iso": "2026-07-19T20:52:50Z",
+  "valid_from": 1784494370.414794,
+  "source": null,
+  "mtype": "episodic",
+  "last_access": 1784494370.414794,
+  "status": "active",
+  "links": [],
+  "meta": {},
+  "key": "cmd:e72d960121",
+  "object": "cat _dungeon.log; echo \"=== err tail ===\"; tail -20 _dungeon"
+ },
+ {
+  "id": "4f93c4b276",
+  "text": "ran: curl -s \"http://127.0.0.1:8000/api/v1/agent-os/brain/claude-inbox\" | python -c \" import json,sys d=json.load(sys.stdin) tasks=d.get('pending') or d.get('tasks') or d if isinstance(tasks,dict): tasks=l…",
+  "tags": [
+   "bash"
+  ],
+  "value": 1.0,
+  "ts": 1784494384.929996,
+  "iso": "2026-07-19T20:53:04Z",
+  "valid_from": 1784494384.929996,
+  "source": null,
+  "mtype": "episodic",
+  "last_access": 1784494384.929996,
+  "status": "active",
+  "links": [],
+  "meta": {},
+  "key": "cmd:b546ca7829",
+  "object": "curl -s \"http://127.0.0.1:8000/api/v1/agent-os/brain/claude-"
+ },
+ {
+  "id": "3d0aa3cf48",
+  "text": "ran: cd /c/Users/Danculus/agora/agora-game-server && sed -n '3170,3200p' mcp_server.py",
+  "tags": [
+   "bash"
+  ],
+  "value": 1.0,
+  "ts": 1784494454.3717215,
+  "iso": "2026-07-19T20:54:14Z",
+  "valid_from": 1784494454.3717215,
+  "source": null,
+  "mtype": "episodic",
+  "last_access": 1784494454.3717215,
+  "status": "active",
+  "links": [],
+  "meta": {},
+  "key": "cmd:e76ba2f9b1",
+  "object": "cd /c/Users/Danculus/agora/agora-game-server && sed -n '3170"
+ },
+ {
+  "id": "220ca3cf79",
+  "text": "ran: sed -n '2010,2060p' mcp_server.py && echo ======= && sed -n '2110,2150p' mcp_server.py",
+  "tags": [
+   "bash"
+  ],
+  "value": 1.0,
+  "ts": 1784494468.7295556,
+  "iso": "2026-07-19T20:54:28Z",
+  "valid_from": 1784494468.7295556,
+  "source": null,
+  "mtype": "episodic",
+  "last_access": 1784494468.7295556,
+  "status": "active",
+  "links": [],
+  "meta": {},
+  "key": "cmd:df3a72d76d",
+  "object": "sed -n '2010,2060p' mcp_server.py && echo ======= && sed -n "
+ },
+ {
+  "id": "4bf4ceb1c0",
+  "text": "ran: curl -s \"http://127.0.0.1:8000/api/v1/agent-os/brain/directions/current\" | python -c \" import json,sys d=json.load(sys.stdin) ds=d.get('directions',[]) print('directions:',len(ds)) for x in ds[:15]: p…",
+  "tags": [
+   "bash"
+  ],
+  "value": 1.0,
+  "ts": 1784494500.5888104,
+  "iso": "2026-07-19T20:55:00Z",
+  "valid_from": 1784494500.5888104,
+  "source": null,
+  "mtype": "episodic",
+  "last_access": 1784494500.5888104,
+  "status": "active",
+  "links": [],
+  "meta": {},
+  "key": "cmd:0094fc12bd",
+  "object": "curl -s \"http://127.0.0.1:8000/api/v1/agent-os/brain/directi"
+ },
+ {
+  "id": "a014f35427",
+  "text": "ran: cd agora-game-server && python -m py_compile mcp_server.py && echo \"compile OK\" python - <<'PYEOF' # dry-run the gate logic against the REAL board priorities + the real pool the dungeon would see impo…",
+  "tags": [
+   "bash"
+  ],
+  "value": 1.0,
+  "ts": 1784526192.4216168,
+  "iso": "2026-07-20T05:43:12Z",
+  "valid_from": 1784526192.4216168,
+  "source": null,
+  "mtype": "episodic",
+  "last_access": 1784526192.4216168,
+  "status": "active",
+  "links": [],
+  "meta": {},
+  "key": "cmd:82ba971af6",
+  "object": "cd agora-game-server && python -m py_compile mcp_server.py &"
+ },
+ {
+  "id": "4ec0066454",
+  "text": "ran: until curl -s -m 3 -o /dev/null http://127.0.0.1:5174/ 2>/dev/null; do sleep 2; done; echo \"dungeon up\" curl -s -o /dev/null -w \"  HTTP %{http_code}\\n\" http://127.0.0.1:5174/ curl -s -m 10 http://127.…",
+  "tags": [
+   "bash"
+  ],
+  "value": 1.0,
+  "ts": 1784526218.458151,
+  "iso": "2026-07-20T05:43:38Z",
+  "valid_from": 1784526218.458151,
+  "source": null,
+  "mtype": "episodic",
+  "last_access": 1784526218.458151,
+  "status": "active",
+  "links": [],
+  "meta": {},
+  "key": "cmd:e3977cbfaf",
+  "object": "until curl -s -m 3 -o /dev/null http://127.0.0.1:5174/ 2>/de"
+ },
+ {
+  "id": "ae1257fd6e",
+  "text": "ran: cd /c/Users/Danculus/agora/agora-game-server && python -m py_compile mcp_server.py && echo \"compile OK\" python - <<'PYEOF' # dry-run the CORRECTED gate (payload-only) against the real pool import json…",
+  "tags": [
+   "bash"
+  ],
+  "value": 1.0,
+  "ts": 1784526951.3160658,
+  "iso": "2026-07-20T05:55:51Z",
+  "valid_from": 1784526951.3160658,
+  "source": null,
+  "mtype": "episodic",
+  "last_access": 1784526951.3160658,
+  "status": "active",
+  "links": [],
+  "meta": {},
+  "key": "cmd:0b571de172",
+  "object": "cd /c/Users/Danculus/agora/agora-game-server && python -m py"
+ },
+ {
+  "id": "298ad65e40",
+  "text": "ran: cd /c/Users/Danculus/agora/agora-game-server && tail -12 _dungeon.log 2>/dev/null | cut -c1-160; echo \"=== brain organs ===\"; curl -s \"http://127.0.0.1:8000/api/v1/agent-os/brain/scout/status\" 2>/dev/…",
+  "tags": [
+   "bash"
+  ],
+  "value": 1.0,
+  "ts": 1784567573.0046477,
+  "iso": "2026-07-20T17:12:53Z",
+  "valid_from": 1784567573.0046477,
+  "source": null,
+  "mtype": "episodic",
+  "last_access": 1784567573.0046477,
+  "status": "active",
+  "links": [],
+  "meta": {},
+  "key": "cmd:350c9fb610",
+  "object": "cd /c/Users/Danculus/agora/agora-game-server && tail -12 _du"
+ },
+ {
+  "id": "95c660f6ec",
+  "text": "..\\agora_output\\lab\\memops\\erasure_revert_probe.py :: current state -> def _unit(job):     \"\"\"One (test, arm, scenario) work unit â€” the parallel granularity.      Scenarios are completely independent: each builds its own store in its own temp direct…",
+  "tags": [
+   "file",
+   "edit"
+  ],
+  "value": 1.0,
+  "ts": 1784567870.9933167,
+  "iso": "2026-07-20T17:17:50Z",
+  "valid_from": 1784567870.9933167,
+  "source": null,
+  "mtype": "semantic",
+  "last_access": 1784567870.9933167,
+  "status": "superseded",
+  "links": [],
+  "meta": {
+   "superseded_by_toggle": "7b7a9a6e72",
+   "superseded_by_policy": "keyed_lww"
+  },
+  "key": "file:..\\agora_output\\lab\\memops\\erasure_revert_probe.py",
+  "object": "def _unit(job):     \"\"\"One (test, arm, scenario) work unit â€” the parallel gran…",
+  "superseded_ts": 1784567876.621086,
+  "invalidated_at": 1784567876.621086
+ },
+ {
+  "id": "7b7a9a6e72",
+  "text": "..\\agora_output\\lab\\memops\\erasure_revert_probe.py :: current state -> import argparse import collections import hashlib import json import os import pathlib import re import shutil import sys import tempfile import time from concurrent.futures import…",
+  "tags": [
+   "file",
+   "edit"
+  ],
+  "value": 1.0,
+  "ts": 1784567876.621086,
+  "iso": "2026-07-20T17:17:56Z",
+  "valid_from": 1784567876.621086,
+  "source": null,
+  "mtype": "semantic",
+  "last_access": 1784567876.621086,
+  "status": "active",
+  "links": [],
+  "meta": {},
+  "key": "file:..\\agora_output\\lab\\memops\\erasure_revert_probe.py",
+  "object": "import argparse import collections import hashlib import json import os import p…"
+ },
+ {
+  "id": "f68abba485",
+  "text": "ran: python -m py_compile erasure_revert_probe.py && echo COMPILE_OK && PYTHONIOENCODING=utf-8 MEMOPS_TOPK=150 nohup python -u erasure_revert_probe.py --arms mnemo,naive > run_erasure.log 2>&1 & sleep 25; …",
+  "tags": [
+   "bash"
+  ],
+  "value": 1.0,
+  "ts": 1784567882.2015936,
+  "iso": "2026-07-20T17:18:02Z",
+  "valid_from": 1784567882.2015936,
+  "source": null,
+  "mtype": "episodic",
+  "last_access": 1784567882.2015936,
+  "status": "active",
+  "links": [],
+  "meta": {},
+  "key": "cmd:f5b8e2e1dc",
+  "object": "python -m py_compile erasure_revert_probe.py && echo COMPILE"
+ },
+ {
+  "id": "0d27deac9d",
+  "text": "ran: head -4 run_erasure.log; echo \"--- procs:\"; ps -W 2>/dev/null | grep -c python; powershell -Command \"[math]::Round((Get-Counter '\\Processor(_Total)\\% Processor Time').CounterSamples[0].CookedValue)\" 2…",
+  "tags": [
+   "bash"
+  ],
+  "value": 1.0,
+  "ts": 1784567889.2764733,
+  "iso": "2026-07-20T17:18:09Z",
+  "valid_from": 1784567889.2764733,
+  "source": null,
+  "mtype": "episodic",
+  "last_access": 1784567889.2764733,
+  "status": "active",
+  "links": [],
+  "meta": {},
+  "key": "cmd:6984fa6bb2",
+  "object": "head -4 run_erasure.log; echo \"--- procs:\"; ps -W 2>/dev/nul"
+ },
+ {
+  "id": "e5ba49d16a",
+  "text": "ran: ls -la /c/Users/Danculus/agora/run_erasure.log 2>/dev/null; ls -la /c/Users/Danculus/agora/agora_output/lab/memops/run_erasure.log 2>/dev/null; ps -W 2>/dev/null | grep -i python | tail -4",
+  "tags": [
+   "bash"
+  ],
+  "value": 1.0,
+  "ts": 1784567897.2744474,
+  "iso": "2026-07-20T17:18:17Z",
+  "valid_from": 1784567897.2744474,
+  "source": null,
+  "mtype": "episodic",
+  "last_access": 1784567897.2744474,
+  "status": "active",
+  "links": [],
+  "meta": {},
+  "key": "cmd:0efe02b004",
+  "object": "ls -la /c/Users/Danculus/agora/run_erasure.log 2>/dev/null; "
+ },
+ {
+  "id": "81f68a07ae",
+  "text": "ran: cat /c/Users/Danculus/agora/agora_output/lab/memops/run_erasure.log | tail -25",
+  "tags": [
+   "bash"
+  ],
+  "value": 1.0,
+  "ts": 1784567904.406208,
+  "iso": "2026-07-20T17:18:24Z",
+  "valid_from": 1784567904.406208,
+  "source": null,
+  "mtype": "episodic",
+  "last_access": 1784567904.406208,
+  "status": "active",
+  "links": [],
+  "meta": {},
+  "key": "cmd:dc5e0a7790",
+  "object": "cat /c/Users/Danculus/agora/agora_output/lab/memops/run_eras"
+ },
+ {
+  "id": "7a967db938",
+  "text": "ran: cd /c/Users/Danculus/agora/agora_output/lab/memops && cp run_erasure.log run_erasure_serial_partial.log && PYTHONIOENCODING=utf-8 MEMOPS_TOPK=150 nohup python -u erasure_revert_probe.py --arms mnemo,n…",
+  "tags": [
+   "bash"
+  ],
+  "value": 1.0,
+  "ts": 1784567925.8713953,
+  "iso": "2026-07-20T17:18:45Z",
+  "valid_from": 1784567925.8713953,
+  "source": null,
+  "mtype": "episodic",
+  "last_access": 1784567925.8713953,
+  "status": "active",
+  "links": [],
+  "meta": {},
+  "key": "cmd:a6c0927beb",
+  "object": "cd /c/Users/Danculus/agora/agora_output/lab/memops && cp run"
+ },
+ {
+  "id": "8c287ee310",
+  "text": "ran: cd /c/Users/Danculus/agora/agora-game-server && grep -c \"\" _dungeon.log; grep -in \"scout\\|scan\" _dungeon.log | tail -5; echo \"=== cadence in code ===\"; grep -n \"scout\\|SCAN_EVERY\\|scan_interval\\|2.4\\|…",
+  "tags": [
+   "bash"
+  ],
+  "value": 1.0,
+  "ts": 1784582130.7921221,
+  "iso": "2026-07-20T21:15:30Z",
+  "valid_from": 1784582130.7921221,
+  "source": null,
+  "mtype": "episodic",
+  "last_access": 1784582130.7921221,
+  "status": "active",
+  "links": [],
+  "meta": {},
+  "key": "cmd:523ae8f23e",
+  "object": "cd /c/Users/Danculus/agora/agora-game-server && grep -c \"\" _"
+ },
+ {
+  "id": "c4c03e395b",
+  "text": "ran: grep -n \"_queue_scout\" mcp_server.py | head; echo \"=== caller context ===\"; grep -n -B6 \"_queue_scout()\" mcp_server.py | grep -E \"loop_n|if |await|def |%\" | head -12",
+  "tags": [
+   "bash"
+  ],
+  "value": 1.0,
+  "ts": 1784582137.0851207,
+  "iso": "2026-07-20T21:15:37Z",
+  "valid_from": 1784582137.0851207,
+  "source": null,
+  "mtype": "episodic",
+  "last_access": 1784582137.0851207,
+  "status": "active",
+  "links": [],
+  "meta": {},
+  "key": "cmd:59a58114e7",
+  "object": "grep -n \"_queue_scout\" mcp_server.py | head; echo \"=== calle"
+ },
+ {
+  "id": "60fe2ca048",
+  "text": "ran: curl -s \"http://127.0.0.1:5174/api/state\" 2>/dev/null | PYTHONIOENCODING=utf-8 python -c \" import json,sys d=json.load(sys.stdin) print('loop_n:', d.get('loop_n'), '| agents:', len(d.get('agents',[]))…",
+  "tags": [
+   "bash"
+  ],
+  "value": 1.0,
+  "ts": 1784582152.617284,
+  "iso": "2026-07-20T21:15:52Z",
+  "valid_from": 1784582152.617284,
+  "source": null,
+  "mtype": "episodic",
+  "last_access": 1784582152.617284,
+  "status": "active",
+  "links": [],
+  "meta": {},
+  "key": "cmd:ddfaee943f",
+  "object": "curl -s \"http://127.0.0.1:5174/api/state\" 2>/dev/null | PYTH"
+ },
+ {
+  "id": "b9dd6ab96c",
+  "text": "ran: grep -n \"loop_n\\|requests.get\\|urlopen\\|http\" /c/Users/Danculus/agora/tools/dungeon_health.py | head -8",
+  "tags": [
+   "bash"
+  ],
+  "value": 1.0,
+  "ts": 1784582160.1659303,
+  "iso": "2026-07-20T21:16:00Z",
+  "valid_from": 1784582160.1659303,
+  "source": null,
+  "mtype": "episodic",
+  "last_access": 1784582160.1659303,
+  "status": "active",
+  "links": [],
+  "meta": {},
+  "key": "cmd:dd6550aeb2",
+  "object": "grep -n \"loop_n\\|requests.get\\|urlopen\\|http\" /c/Users/Dancu"
+ },
+ {
+  "id": "afc66be94b",
+  "text": "ran: sed -n '20,45p' /c/Users/Danculus/agora/tools/dungeon_health.py",
+  "tags": [
+   "bash"
+  ],
+  "value": 1.0,
+  "ts": 1784582164.5951424,
+  "iso": "2026-07-20T21:16:04Z",
+  "valid_from": 1784582164.5951424,
+  "source": null,
+  "mtype": "episodic",
+  "last_access": 1784582164.5951424,
+  "status": "active",
+  "links": [],
+  "meta": {},
+  "key": "cmd:2c3f0b1560",
+  "object": "sed -n '20,45p' /c/Users/Danculus/agora/tools/dungeon_health"
+ },
+ {
+  "id": "36733e6711",
+  "text": "ran: cat /c/Users/Danculus/agora/agora-game-server/.dungeon_heartbeat 2>/dev/null; echo; PYTHONIOENCODING=utf-8 python -c \" ts,ln=open(r'C:\\Users\\Danculus\\agora\\agora-game-server\\.dungeon_heartbeat').read(…",
+  "tags": [
+   "bash"
+  ],
+  "value": 1.0,
+  "ts": 1784582171.4493215,
+  "iso": "2026-07-20T21:16:11Z",
+  "valid_from": 1784582171.4493215,
+  "source": null,
+  "mtype": "episodic",
+  "last_access": 1784582171.4493215,
+  "status": "active",
+  "links": [],
+  "meta": {},
+  "key": "cmd:c2ecf8fd17",
+  "object": "cat /c/Users/Danculus/agora/agora-game-server/.dungeon_heart"
+ },
+ {
+  "id": "95a39d7e32",
+  "text": "ran: sed -n '2661,2695p' mcp_server.py; echo \"=== stderr ===\"; tail -5 _dungeon.err 2>/dev/null | cut -c1-140",
+  "tags": [
+   "bash"
+  ],
+  "value": 1.0,
+  "ts": 1784582188.815761,
+  "iso": "2026-07-20T21:16:28Z",
+  "valid_from": 1784582188.815761,
+  "source": null,
+  "mtype": "episodic",
+  "last_access": 1784582188.815761,
+  "status": "active",
+  "links": [],
+  "meta": {},
+  "key": "cmd:a7842cd40f",
+  "object": "sed -n '2661,2695p' mcp_server.py; echo \"=== stderr ===\"; ta"
+ },
+ {
+  "id": "a8e4734f1f",
+  "text": "ran: curl -s \"http://127.0.0.1:8000/api/v1/agent-os/brain/claude-inbox\" 2>/dev/null | PYTHONIOENCODING=utf-8 python -c \" import json,sys d=json.load(sys.stdin) items=d.get('tasks') or d.get('items') or (d …",
+  "tags": [
+   "bash"
+  ],
+  "value": 1.0,
+  "ts": 1784582202.6196375,
+  "iso": "2026-07-20T21:16:42Z",
+  "valid_from": 1784582202.6196375,
+  "source": null,
+  "mtype": "episodic",
+  "last_access": 1784582202.6196375,
+  "status": "active",
+  "links": [],
+  "meta": {},
+  "key": "cmd:37dbf30632",
+  "object": "curl -s \"http://127.0.0.1:8000/api/v1/agent-os/brain/claude-"
+ },
+ {
+  "id": "1630e9103a",
+  "text": "ran: sed -n '4055,4080p' mcp_server.py",
+  "tags": [
+   "bash"
+  ],
+  "value": 1.0,
+  "ts": 1784582217.0135565,
+  "iso": "2026-07-20T21:16:57Z",
+  "valid_from": 1784582217.0135565,
+  "source": null,
+  "mtype": "episodic",
+  "last_access": 1784582217.0135565,
+  "status": "active",
+  "links": [],
+  "meta": {},
+  "key": "cmd:9eaee64692",
+  "object": "sed -n '4055,4080p' mcp_server.py"
+ },
+ {
+  "id": "05b79a9686",
+  "text": "ran: for ep in \"claude-inbox?include_done=1\" \"claude-inbox/history\" \"claude-inbox?all=1\"; do printf \"%-28s \" \"$ep\"; curl -s \"http://127.0.0.1:8000/api/v1/agent-os/brain/$ep\" 2>/dev/null | head -c 150; echo…",
+  "tags": [
+   "bash"
+  ],
+  "value": 1.0,
+  "ts": 1784582243.8571572,
+  "iso": "2026-07-20T21:17:23Z",
+  "valid_from": 1784582243.8571572,
+  "source": null,
+  "mtype": "episodic",
+  "last_access": 1784582243.8571572,
+  "status": "active",
+  "links": [],
+  "meta": {},
+  "key": "cmd:c3dcdd7fc8",
+  "object": "for ep in \"claude-inbox?include_done=1\" \"claude-inbox/histor"
+ },
+ {
+  "id": "4679a2f297",
+  "text": "ran: curl -s \"http://127.0.0.1:8000/api/v1/agent-os/brain/claude-inbox\" 2>/dev/null | PYTHONIOENCODING=utf-8 python -c \" import json,sys,collections d=json.load(sys.stdin) p=d.get('pending',[]) print(f'PEN…",
+  "tags": [
+   "bash"
+  ],
+  "value": 1.0,
+  "ts": 1784582255.366099,
+  "iso": "2026-07-20T21:17:35Z",
+  "valid_from": 1784582255.366099,
+  "source": null,
+  "mtype": "episodic",
+  "last_access": 1784582255.366099,
+  "status": "active",
+  "links": [],
+  "meta": {},
+  "key": "cmd:bca1b0a56e",
+  "object": "curl -s \"http://127.0.0.1:8000/api/v1/agent-os/brain/claude-"
+ },
+ {
+  "id": "2bb796c645",
+  "text": "..\\..\\.claude\\projects\\C--Users-Danculus-agora\\memory\\mnemo-audit-trilogy-and-public-ci.md :: current state -> --- name: mnemo-audit-trilogy-and-public-ci description: \"2026-07-20: three falsifiable audit harnesses now guard every mnemo claim (claims_audit, governance_audit, store_audit), e…",
+  "tags": [
+   "file",
+   "edit"
+  ],
+  "value": 1.0,
+  "ts": 1784582313.3694506,
+  "iso": "2026-07-20T21:18:33Z",
+  "valid_from": 1784582313.3694506,
+  "source": null,
+  "mtype": "semantic",
+  "last_access": 1784582313.3694506,
+  "status": "active",
+  "links": [],
+  "meta": {},
+  "key": "file:..\\..\\.claude\\projects\\C--Users-Danculus-agora\\memory\\mnemo-audit-trilogy-and-public-ci.md",
+  "object": "--- name: mnemo-audit-trilogy-and-public-ci description: \"2026-07-20: three fals…"
+ },
+ {
+  "id": "054c711b92",
+  "text": "..\\..\\.claude\\projects\\C--Users-Danculus-agora\\memory\\scout-blocks-on-an-unprocessed-inbox-task.md :: current state -> --- name: scout-blocks-on-an-unprocessed-inbox-task description: \"The dungeon's GitHub Scout is not broken when its scan looks stale â€” `_queue_scout` returns early while a 'Scout…",
+  "tags": [
+   "file",
+   "edit"
+  ],
+  "value": 1.0,
+  "ts": 1784582330.956051,
+  "iso": "2026-07-20T21:18:50Z",
+  "valid_from": 1784582330.956051,
+  "source": null,
+  "mtype": "semantic",
+  "last_access": 1784582330.956051,
+  "status": "active",
+  "links": [],
+  "meta": {},
+  "key": "file:..\\..\\.claude\\projects\\C--Users-Danculus-agora\\memory\\scout-blocks-on-an-unprocessed-inbox-task.md",
+  "object": "--- name: scout-blocks-on-an-unprocessed-inbox-task description: \"The dungeon's …"
+ },
+ {
+  "id": "f44d8f8f39",
+  "text": "ran: cd /c/Users/Danculus/agora/agora-game-server && grep -n \"def loop_n_is_even_cycle\\|^loop_n\\|global loop_n\" mcp_server.py | head -5; grep -n \"_dungeon_heartbeat\\|\\.dungeon_heartbeat\" mcp_server.py | he…",
+  "tags": [
+   "bash"
+  ],
+  "value": 1.0,
+  "ts": 1784582586.935071,
+  "iso": "2026-07-20T21:23:06Z",
+  "valid_from": 1784582586.935071,
+  "source": null,
+  "mtype": "episodic",
+  "last_access": 1784582586.935071,
+  "status": "active",
+  "links": [],
+  "meta": {},
+  "key": "cmd:4ba8f29f19",
+  "object": "cd /c/Users/Danculus/agora/agora-game-server && grep -n \"def"
+ },
+ {
+  "id": "d92cf0e839",
+  "text": "mcp_server.py :: current state -> def loop_n_is_even_cycle() -> bool:     \"\"\"True on every other scout cycle â€” read from the heartbeat file, which is where loop_n actually     persists (it survives restarts; it w…",
+  "tags": [
+   "file",
+   "edit"
+  ],
+  "value": 1.0,
+  "ts": 1784582597.6501095,
+  "iso": "2026-07-20T21:23:17Z",
+  "valid_from": 1784582597.6501095,
+  "source": null,
+  "mtype": "semantic",
+  "last_access": 1784582597.6501095,
+  "status": "superseded",
+  "links": [],
+  "meta": {
+   "superseded_by_toggle": "1af23f2e97",
+   "superseded_by_policy": "keyed_lww"
+  },
+  "key": "file:mcp_server.py",
+  "object": "def loop_n_is_even_cycle() -> bool:     \"\"\"True on every other scout cycle â€” r…",
+  "superseded_ts": 1784582615.1534004,
+  "invalidated_at": 1784582615.1534004
+ },
+ {
+  "id": "d51a5f3636",
+  "text": "ran: python -m py_compile mcp_server.py && echo COMPILE_OK && grep -n \"scout-record\\|scout/box/mark\" mcp_server.py | head -3",
+  "tags": [
+   "bash"
+  ],
+  "value": 1.0,
+  "ts": 1784582604.5869386,
+  "iso": "2026-07-20T21:23:24Z",
+  "valid_from": 1784582604.5869386,
+  "source": null,
+  "mtype": "episodic",
+  "last_access": 1784582604.5869386,
+  "status": "active",
+  "links": [],
+  "meta": {},
+  "key": "cmd:be6efbed56",
+  "object": "python -m py_compile mcp_server.py && echo COMPILE_OK && gre"
+ },
+ {
+  "id": "1af23f2e97",
+  "text": "mcp_server.py :: current state -> f\"When done, ALSO close the box lead: POST /brain/scout/box/mark {{url: '{t['url']}', \"                  f\"status: 'done'|'no_fit'}} â€” the box keeps collecting while you triage, …",
+  "tags": [
+   "file",
+   "edit"
+  ],
+  "value": 1.0,
+  "ts": 1784582615.1534004,
+  "iso": "2026-07-20T21:23:35Z",
+  "valid_from": 1784582615.1534004,
+  "source": null,
+  "mtype": "semantic",
+  "last_access": 1784582615.1534004,
+  "status": "superseded",
+  "links": [],
+  "meta": {
+   "superseded_by_toggle": "24bc0e36fd",
+   "superseded_by_policy": "keyed_lww"
+  },
+  "key": "file:mcp_server.py",
+  "object": "f\"When done, ALSO close the box lead: POST /brain/scout/box/mark {{url: '{t['url…",
+  "superseded_ts": 1784582692.0022814,
+  "invalidated_at": 1784582692.0022814
+ },
+ {
+  "id": "e7df50e6d2",
+  "text": "ran: cd /c/Users/Danculus/agora/agora-game-server && sed -n '2672,2712p' mcp_server.py",
+  "tags": [
+   "bash"
+  ],
+  "value": 1.0,
+  "ts": 1784582669.819345,
+  "iso": "2026-07-20T21:24:29Z",
+  "valid_from": 1784582669.819345,
+  "source": null,
+  "mtype": "episodic",
+  "last_access": 1784582669.819345,
+  "status": "active",
+  "links": [],
+  "meta": {},
+  "key": "cmd:2948d02627",
+  "object": "cd /c/Users/Danculus/agora/agora-game-server && sed -n '2672"
+ },
+ {
+  "id": "24bc0e36fd",
+  "text": "mcp_server.py :: current state -> # PROMOTE A BATCH, NOT A LEAD. Judging \"does our vault actually answer this?\" takes seconds per     # lead and the answer is usually no, so one lead per ~2.3h cycle capped the whol…",
+  "tags": [
+   "file",
+   "edit"
+  ],
+  "value": 1.0,
+  "ts": 1784582692.0022814,
+  "iso": "2026-07-20T21:24:52Z",
+  "valid_from": 1784582692.0022814,
+  "source": null,
+  "mtype": "semantic",
+  "last_access": 1784582692.0022814,
+  "status": "superseded",
+  "links": [],
+  "meta": {
+   "superseded_by_toggle": "3b10d6153e",
+   "superseded_by_policy": "keyed_lww"
+  },
+  "key": "file:mcp_server.py",
+  "object": "# PROMOTE A BATCH, NOT A LEAD. Judging \"does our vault actually answer this?\" ta…",
+  "superseded_ts": 1784582765.7176218,
+  "invalidated_at": 1784582765.7176218
+ },
+ {
+  "id": "93f028042e",
+  "text": "ran: curl -s \"http://127.0.0.1:8000/api/v1/agent-os/brain/claude-inbox\" 2>/dev/null | PYTHONIOENCODING=utf-8 python -c \" import json,sys,collections,time d=json.load(sys.stdin) p=d.get('pending',[]) print(…",
+  "tags": [
+   "bash"
+  ],
+  "value": 1.0,
+  "ts": 1784582704.6443403,
+  "iso": "2026-07-20T21:25:04Z",
+  "valid_from": 1784582704.6443403,
+  "source": null,
+  "mtype": "episodic",
+  "last_access": 1784582704.6443403,
+  "status": "active",
+  "links": [],
+  "meta": {},
+  "key": "cmd:167a9c0598",
+  "object": "curl -s \"http://127.0.0.1:8000/api/v1/agent-os/brain/claude-"
+ },
+ {
+  "id": "c8cd7dbfe9",
+  "text": "ran: cd /c/Users/Danculus/agora/agora-game-server && sed -n '1972,2010p' mcp_server.py; echo \"=== who queues 'Hypothesize from findings' ===\"; grep -rn \"Hypothesize from findings\" mcp_server.py ../server/a…",
+  "tags": [
+   "bash"
+  ],
+  "value": 1.0,
+  "ts": 1784582739.7655454,
+  "iso": "2026-07-20T21:25:39Z",
+  "valid_from": 1784582739.7655454,
+  "source": null,
+  "mtype": "episodic",
+  "last_access": 1784582739.7655454,
+  "status": "active",
+  "links": [],
+  "meta": {},
+  "key": "cmd:09fd5bd963",
+  "object": "cd /c/Users/Danculus/agora/agora-game-server && sed -n '1972"
+ },
+ {
+  "id": "3b10d6153e",
+  "text": "mcp_server.py :: current state -> \"\"\"Drop editorially-refused themes; when board priorities exist, queue ONLY on-priority themes.      HARD since 2026-07-21. It used to fall through to `return pool` when NOTHING in…",
+  "tags": [
+   "file",
+   "edit"
+  ],
+  "value": 1.0,
+  "ts": 1784582765.7176218,
+  "iso": "2026-07-20T21:26:05Z",
+  "valid_from": 1784582765.7176218,
+  "source": null,
+  "mtype": "semantic",
+  "last_access": 1784582765.7176218,
+  "status": "superseded",
+  "links": [],
+  "meta": {
+   "superseded_by_toggle": "a588dd2f0c",
+   "superseded_by_policy": "keyed_lww"
+  },
+  "key": "file:mcp_server.py",
+  "object": "\"\"\"Drop editorially-refused themes; when board priorities exist, queue ONLY on-p…",
+  "superseded_ts": 1784585332.9826355,
+  "invalidated_at": 1784585332.9826355
+ },
+ {
+  "id": "f7690c4235",
+  "text": "ran: grep -n \"^log = \\|^log=\" mcp_server.py | head -2; python -m py_compile mcp_server.py && echo COMPILE_OK",
+  "tags": [
+   "bash"
+  ],
+  "value": 1.0,
+  "ts": 1784582771.7325747,
+  "iso": "2026-07-20T21:26:11Z",
+  "valid_from": 1784582771.7325747,
+  "source": null,
+  "mtype": "episodic",
+  "last_access": 1784582771.7325747,
+  "status": "active",
+  "links": [],
+  "meta": {},
+  "key": "cmd:f5d8432a95",
+  "object": "grep -n \"^log = \\|^log=\" mcp_server.py | head -2; python -m "
+ },
+ {
+  "id": "c726107652",
+  "text": "ran: grep -n \"log\\.\\(info\\|warning\\)\" mcp_server.py | head -2; grep -n \"logger\\|getLogger\" mcp_server.py | head -3",
+  "tags": [
+   "bash"
+  ],
+  "value": 1.0,
+  "ts": 1784582778.6419628,
+  "iso": "2026-07-20T21:26:18Z",
+  "valid_from": 1784582778.6419628,
+  "source": null,
+  "mtype": "episodic",
+  "last_access": 1784582778.6419628,
+  "status": "active",
+  "links": [],
+  "meta": {},
+  "key": "cmd:deaebf8c8a",
+  "object": "grep -n \"log\\.\\(info\\|warning\\)\" mcp_server.py | head -2; gr"
+ },
+ {
+  "id": "1813f36ff7",
+  "text": "ran: sed -i 's/            log\\.info(\"\\[gate\\] %d candidate(s) dropped: none on-priority (board=%s)\",/            logger.info(\"[gate] %d candidate(s) dropped: none on-priority (board=%s)\",/' mcp_server.py …",
+  "tags": [
+   "bash"
+  ],
+  "value": 1.0,
+  "ts": 1784582784.7586162,
+  "iso": "2026-07-20T21:26:24Z",
+  "valid_from": 1784582784.7586162,
+  "source": null,
+  "mtype": "episodic",
+  "last_access": 1784582784.7586162,
+  "status": "active",
+  "links": [],
+  "meta": {},
+  "key": "cmd:fcb77fa93a",
+  "object": "sed -i 's/            log\\.info(\"\\[gate\\] %d candidate(s) dr"
+ },
+ {
+  "id": "799820532f",
+  "text": "ran: curl -s -X POST \"http://127.0.0.1:8000/api/v1/agent-os/brain/scout/box/add\" -H \"Content-Type: application/json\" -d '{\"kind\":\"contribute\"}' 2>/dev/null | head -c 400; echo; echo \"=== box ===\"; curl -s …",
+  "tags": [
+   "bash"
+  ],
+  "value": 1.0,
+  "ts": 1784582825.8088984,
+  "iso": "2026-07-20T21:27:05Z",
+  "valid_from": 1784582825.8088984,
+  "source": null,
+  "mtype": "episodic",
+  "last_access": 1784582825.8088984,
+  "status": "active",
+  "links": [],
+  "meta": {},
+  "key": "cmd:509845eeff",
+  "object": "curl -s -X POST \"http://127.0.0.1:8000/api/v1/agent-os/brain"
+ },
+ {
+  "id": "57dc48707e",
+  "text": "ran: curl -s -X POST \"http://127.0.0.1:8000/api/v1/agent-os/brain/scout/box/add\" -H \"Content-Type: application/json\" -d '{\"kind\":\"learn\"}' 2>/dev/null | PYTHONIOENCODING=utf-8 python -c \" import json,sys d…",
+  "tags": [
+   "bash"
+  ],
+  "value": 1.0,
+  "ts": 1784582839.4497495,
+  "iso": "2026-07-20T21:27:19Z",
+  "valid_from": 1784582839.4497495,
+  "source": null,
+  "mtype": "episodic",
+  "last_access": 1784582839.4497495,
+  "status": "active",
+  "links": [],
+  "meta": {},
+  "key": "cmd:6df837eccf",
+  "object": "curl -s -X POST \"http://127.0.0.1:8000/api/v1/agent-os/brain"
+ },
+ {
+  "id": "1e458a25d6",
+  "text": "ran: cd /c/Users/Danculus/agora/agora-game-server && grep -n -A6 \"async def _gate_refresh\" mcp_server.py | head -14",
+  "tags": [
+   "bash"
+  ],
+  "value": 1.0,
+  "ts": 1784583074.1281295,
+  "iso": "2026-07-20T21:31:14Z",
+  "valid_from": 1784583074.1281295,
+  "source": null,
+  "mtype": "episodic",
+  "last_access": 1784583074.1281295,
+  "status": "active",
+  "links": [],
+  "meta": {},
+  "key": "cmd:ca8a22078e",
+  "object": "cd /c/Users/Danculus/agora/agora-game-server && grep -n -A6 "
+ },
+ {
+  "id": "52de6ca24c",
+  "text": "ran: curl -s \"http://127.0.0.1:8000/api/v1/agent-os/brain/gatekeeper/skips\" 2>/dev/null | PYTHONIOENCODING=utf-8 python -c \" import json,sys d=json.load(sys.stdin); th=d.get('themes',[]) print(f'refused th…",
+  "tags": [
+   "bash"
+  ],
+  "value": 1.0,
+  "ts": 1784583081.0623949,
+  "iso": "2026-07-20T21:31:21Z",
+  "valid_from": 1784583081.0623949,
+  "source": null,
+  "mtype": "episodic",
+  "last_access": 1784583081.0623949,
+  "status": "active",
+  "links": [],
+  "meta": {},
+  "key": "cmd:dcf7dd230e",
+  "object": "curl -s \"http://127.0.0.1:8000/api/v1/agent-os/brain/gatekee"
+ },
+ {
+  "id": "6b8d51df3f",
+  "text": "ran: gh api repos/openclaw/openclaw/issues/7707 --jq '\"REPO: openclaw/openclaw\", \"TITLE: \\(.title)\", \"STATE: \\(.state) | comments: \\(.comments) | reactions: \\(.reactions.total_count) | updated: \\(.updated_…",
+  "tags": [
+   "bash"
+  ],
+  "value": 1.0,
+  "ts": 1784583205.328932,
+  "iso": "2026-07-20T21:33:25Z",
+  "valid_from": 1784583205.328932,
+  "source": null,
+  "mtype": "episodic",
+  "last_access": 1784583205.328932,
+  "status": "active",
+  "links": [],
+  "meta": {},
+  "key": "cmd:d58de677a2",
+  "object": "gh api repos/openclaw/openclaw/issues/7707 --jq '\"REPO: open"
+ },
+ {
+  "id": "6a02dcc841",
+  "text": "ran: gh api repos/openclaw/openclaw/issues/7707/comments --paginate --jq '.[] | \"\\(.created_at[0:10]) | \\(.user.login) | \\(.body[0:260] | gsub(\"\\n\";\" \"))\"' 2>&1 | tail -8",
+  "tags": [
+   "bash"
+  ],
+  "value": 1.0,
+  "ts": 1784583232.664238,
+  "iso": "2026-07-20T21:33:52Z",
+  "valid_from": 1784583232.664238,
+  "source": null,
+  "mtype": "episodic",
+  "last_access": 1784583232.664238,
+  "status": "active",
+  "links": [],
+  "meta": {},
+  "key": "cmd:9ccfbb2ecf",
+  "object": "gh api repos/openclaw/openclaw/issues/7707/comments --pagina"
+ },
+ {
+  "id": "0fc35e49eb",
+  "text": "ran: cd \"C:/Users/Danculus/AppData/Local/Temp/claude/C--Users-Danculus-agora/c5317a10-d6e1-4480-8deb-effafb6407b2/scratchpad\" && PYTHONIOENCODING=utf-8 python -c \" import json,urllib.request B='http://127.…",
+  "tags": [
+   "bash"
+  ],
+  "value": 1.0,
+  "ts": 1784583418.813589,
+  "iso": "2026-07-20T21:36:58Z",
+  "valid_from": 1784583418.813589,
+  "source": null,
+  "mtype": "episodic",
+  "last_access": 1784583418.813589,
+  "status": "superseded",
+  "links": [],
+  "meta": {
+   "superseded_by_toggle": "bfd2ff01a8",
+   "superseded_by_policy": "keyed_lww"
+  },
+  "key": "cmd:a9084c083e",
+  "object": "cd \"C:/Users/Danculus/AppData/Local/Temp/claude/C--Users-Dan",
+  "superseded_ts": 1784585463.3094497,
+  "invalidated_at": 1784585463.3094497
+ },
+ {
+  "id": "46212acdfa",
+  "text": "ran: ls -la /c/Users/Danculus/agora/agora_output/lab/trust_vs_truth_test.py 2>/dev/null && head -30 /c/Users/Danculus/agora/agora_output/lab/trust_vs_truth_test.py",
+  "tags": [
+   "bash"
+  ],
+  "value": 1.0,
+  "ts": 1784583425.8874485,
+  "iso": "2026-07-20T21:37:05Z",
+  "valid_from": 1784583425.8874485,
+  "source": null,
+  "mtype": "episodic",
+  "last_access": 1784583425.8874485,
+  "status": "active",
+  "links": [],
+  "meta": {},
+  "key": "cmd:49b050f7a2",
+  "object": "ls -la /c/Users/Danculus/agora/agora_output/lab/trust_vs_tru"
+ },
+ {
+  "id": "606d60f327",
+  "text": "ran: cd /c/Users/Danculus/agora/agora-game-server && sed -n '2518,2532p' mcp_server.py; echo \"=== replicate ===\"; sed -n '2936,2950p' mcp_server.py",
+  "tags": [
+   "bash"
+  ],
+  "value": 1.0,
+  "ts": 1784585311.2669737,
+  "iso": "2026-07-20T22:08:31Z",
+  "valid_from": 1784585311.2669737,
+  "source": null,
+  "mtype": "episodic",
+  "last_access": 1784585311.2669737,
+  "status": "active",
+  "links": [],
+  "meta": {},
+  "key": "cmd:4b9589370f",
+  "object": "cd /c/Users/Danculus/agora/agora-game-server && sed -n '2518"
+ },
+ {
+  "id": "6ae2b89710",
+  "text": "ran: sed -n '3112,3118p' mcp_server.py",
+  "tags": [
+   "bash"
+  ],
+  "value": 1.0,
+  "ts": 1784585323.4742332,
+  "iso": "2026-07-20T22:08:43Z",
+  "valid_from": 1784585323.4742332,
+  "source": null,
+  "mtype": "episodic",
+  "last_access": 1784585323.4742332,
+  "status": "active",
+  "links": [],
+  "meta": {},
+  "key": "cmd:90dca0b9bd",
+  "object": "sed -n '3112,3118p' mcp_server.py"
+ },
+ {
+  "id": "a588dd2f0c",
+  "text": "mcp_server.py :: current state -> d = await asyncio.to_thread(_brain_get_sync, \"/api/v1/agent-os/brain/belief-challenge-target\", 30)     t = (d or {}).get(\"target\")     if not t:         return     # BOARD GATE. Th…",
+  "tags": [
+   "file",
+   "edit"
+  ],
+  "value": 1.0,
+  "ts": 1784585332.9826355,
+  "iso": "2026-07-20T22:08:52Z",
+  "valid_from": 1784585332.9826355,
+  "source": null,
+  "mtype": "semantic",
+  "last_access": 1784585332.9826355,
+  "status": "superseded",
+  "links": [],
+  "meta": {
+   "superseded_by_toggle": "7feac660b0",
+   "superseded_by_policy": "keyed_lww"
+  },
+  "key": "file:mcp_server.py",
+  "object": "d = await asyncio.to_thread(_brain_get_sync, \"/api/v1/agent-os/brain/belief-chal…",
+  "superseded_ts": 1784585339.2466335,
+  "invalidated_at": 1784585339.2466335
+ },
+ {
+  "id": "7feac660b0",
+  "text": "mcp_server.py :: current state -> d = await asyncio.to_thread(_brain_get_sync, \"/api/v1/agent-os/brain/replication-target\", 30)     t = (d or {}).get(\"target\") or {}     if not t.get(\"claim\"):         return     if…",
+  "tags": [
+   "file",
+   "edit"
+  ],
+  "value": 1.0,
+  "ts": 1784585339.2466335,
+  "iso": "2026-07-20T22:08:59Z",
+  "valid_from": 1784585339.2466335,
+  "source": null,
+  "mtype": "semantic",
+  "last_access": 1784585339.2466335,
+  "status": "superseded",
+  "links": [],
+  "meta": {
+   "superseded_by_toggle": "61271b2360",
+   "superseded_by_policy": "keyed_lww"
+  },
+  "key": "file:mcp_server.py",
+  "object": "d = await asyncio.to_thread(_brain_get_sync, \"/api/v1/agent-os/brain/replication…",
+  "superseded_ts": 1784585407.9995844,
+  "invalidated_at": 1784585407.9995844
+ },
+ {
+  "id": "376a29aa9a",
+  "text": "ran: python -m py_compile mcp_server.py && echo COMPILE_OK && echo \"=== every claude-inbox POST, and whether its function gates ===\" && PYTHONIOENCODING=utf-8 python - << 'PYEOF' import re, pathlib src = p…",
+  "tags": [
+   "bash"
+  ],
+  "value": 1.0,
+  "ts": 1784585348.1278203,
+  "iso": "2026-07-20T22:09:08Z",
+  "valid_from": 1784585348.1278203,
+  "source": null,
+  "mtype": "episodic",
+  "last_access": 1784585348.1278203,
+  "status": "active",
+  "links": [],
+  "meta": {},
+  "key": "cmd:1f14368e36",
+  "object": "python -m py_compile mcp_server.py && echo COMPILE_OK && ech"
+ },
+ {
+  "id": "0f03cbb00d",
+  "text": "ran: grep -c 'brain/claude-inbox\"' mcp_server.py; echo \"--- call-site shapes (first 4) ---\"; grep -n -B1 -A1 'brain/claude-inbox\"' mcp_server.py | head -20",
+  "tags": [
+   "bash"
+  ],
+  "value": 1.0,
+  "ts": 1784585372.0747457,
+  "iso": "2026-07-20T22:09:32Z",
+  "valid_from": 1784585372.0747457,
+  "source": null,
+  "mtype": "episodic",
+  "last_access": 1784585372.0747457,
+  "status": "active",
+  "links": [],
+  "meta": {},
+  "key": "cmd:08d169a4c1",
+  "object": "grep -c 'brain/claude-inbox\"' mcp_server.py; echo \"--- call-"
+ },
+ {
+  "id": "95ae50cbd8",
+  "text": "ran: grep -n -A 12 \"^def _brain_post_sync\" mcp_server.py | head -18",
+  "tags": [
+   "bash"
+  ],
+  "value": 1.0,
+  "ts": 1784585392.8465364,
+  "iso": "2026-07-20T22:09:52Z",
+  "valid_from": 1784585392.8465364,
+  "source": null,
+  "mtype": "episodic",
+  "last_access": 1784585392.8465364,
+  "status": "active",
+  "links": [],
+  "meta": {},
+  "key": "cmd:0699c54987",
+  "object": "grep -n -A 12 \"^def _brain_post_sync\" mcp_server.py | head -"
+ },
+ {
+  "id": "61271b2360",
+  "text": "mcp_server.py :: current state -> # Inbox tasks that are MACHINERY, not research themes â€” they carry no subject to gate on and must # always get through (draining the queue, learning from what happened, owner-fac…",
+  "tags": [
+   "file",
+   "edit"
+  ],
+  "value": 1.0,
+  "ts": 1784585407.9995844,
+  "iso": "2026-07-20T22:10:07Z",
+  "valid_from": 1784585407.9995844,
+  "source": null,
+  "mtype": "semantic",
+  "last_access": 1784585407.9995844,
+  "status": "superseded",
+  "links": [],
+  "meta": {
+   "superseded_by_toggle": "a49c14186a",
+   "superseded_by_policy": "keyed_lww"
+  },
+  "key": "file:mcp_server.py",
+  "object": "# Inbox tasks that are MACHINERY, not research themes â€” they carry no subject …",
+  "superseded_ts": 1784585760.677046,
+  "invalidated_at": 1784585760.677046
+ },
+ {
+  "id": "e33e5c994d",
+  "text": "ran: grep -n \"^_gate_cache\\|_gate_cache = \\|def _theme_words\" mcp_server.py | head -3; python -m py_compile mcp_server.py && echo COMPILE_OK",
+  "tags": [
+   "bash"
+  ],
+  "value": 1.0,
+  "ts": 1784585414.184598,
+  "iso": "2026-07-20T22:10:14Z",
+  "valid_from": 1784585414.184598,
+  "source": null,
+  "mtype": "episodic",
+  "last_access": 1784585414.184598,
+  "status": "active",
+  "links": [],
+  "meta": {},
+  "key": "cmd:6422ec99cd",
+  "object": "grep -n \"^_gate_cache\\|_gate_cache = \\|def _theme_words\" mcp"
+ },
+ {
+  "id": "bfd2ff01a8",
+  "text": "ran: cd \"C:/Users/Danculus/AppData/Local/Temp/claude/C--Users-Danculus-agora/c5317a10-d6e1-4480-8deb-effafb6407b2/scratchpad\" && PYTHONIOENCODING=utf-8 python -c \" import json,urllib.request B='http://127.…",
+  "tags": [
+   "bash"
+  ],
+  "value": 1.0,
+  "ts": 1784585463.3094497,
+  "iso": "2026-07-20T22:11:03Z",
+  "valid_from": 1784585463.3094497,
+  "source": null,
+  "mtype": "episodic",
+  "last_access": 1784585463.3094497,
+  "status": "superseded",
+  "links": [],
+  "meta": {
+   "superseded_by_toggle": "f7bded4320",
+   "superseded_by_policy": "keyed_lww"
+  },
+  "key": "cmd:a9084c083e",
+  "object": "cd \"C:/Users/Danculus/AppData/Local/Temp/claude/C--Users-Dan",
+  "superseded_ts": 1784588534.8020878,
+  "invalidated_at": 1784588534.8009548
+ },
+ {
+  "id": "358ae893b2",
+  "text": "ran: cd \"C:/Users/Danculus/AppData/Local/Temp/claude/C--Users-Danculus-agora/c5317a10-d6e1-4480-8deb-effafb6407b2/scratchpad\" && PYTHONIOENCODING=utf-8 python -c \" import json,urllib.request,time B='http:/…",
+  "tags": [
+   "bash"
+  ],
+  "value": 1.0,
+  "ts": 1784585500.0411367,
+  "iso": "2026-07-20T22:11:40Z",
+  "valid_from": 1784585500.0411367,
+  "source": null,
+  "mtype": "episodic",
+  "last_access": 1784585500.0411367,
+  "status": "active",
+  "links": [],
+  "meta": {},
+  "key": "cmd:34efd8de0c",
+  "object": "cd \"C:/Users/Danculus/AppData/Local/Temp/claude/C--Users-Dan"
+ },
+ {
+  "id": "28cd0f49c2",
+  "text": "ran: cd /c/Users/Danculus/agora && ls server/agora/ && wc -l agora-game-server/mcp_server.py server/agora/*.py | tail -40",
+  "tags": [
+   "bash"
+  ],
+  "value": 1.0,
+  "ts": 1784585539.616484,
+  "iso": "2026-07-20T22:12:19Z",
+  "valid_from": 1784585539.616484,
+  "source": null,
+  "mtype": "episodic",
+  "last_access": 1784585539.616484,
+  "status": "active",
+  "links": [],
+  "meta": {},
+  "key": "cmd:a38eda67a8",
+  "object": "cd /c/Users/Danculus/agora && ls server/agora/ && wc -l agor"
+ },
+ {
+  "id": "c86f637f5e",
+  "text": "ran: cd /c/Users/Danculus/agora/server/agora && sed -n '1615,1740p;1820,1840p;1990,2010p' api/agent_os_api.py",
+  "tags": [
+   "bash"
+  ],
+  "value": 1.0,
+  "ts": 1784585551.422894,
+  "iso": "2026-07-20T22:12:31Z",
+  "valid_from": 1784585551.422894,
+  "source": null,
+  "mtype": "episodic",
+  "last_access": 1784585551.422894,
+  "status": "active",
+  "links": [],
+  "meta": {},
+  "key": "cmd:cc06f78e88",
+  "object": "cd /c/Users/Danculus/agora/server/agora && sed -n '1615,1740"
+ },
+ {
+  "id": "9330e17b4d",
+  "text": "ran: cd /c/Users/Danculus/agora/server/agora && sed -n '2120,2300p;2440,2470p' api/agent_os_api.py",
+  "tags": [
+   "bash"
+  ],
+  "value": 1.0,
+  "ts": 1784585552.209494,
+  "iso": "2026-07-20T22:12:32Z",
+  "valid_from": 1784585552.209494,
+  "source": null,
+  "mtype": "episodic",
+  "last_access": 1784585552.209494,
+  "status": "active",
+  "links": [],
+  "meta": {},
+  "key": "cmd:78998c6b54",
+  "object": "cd /c/Users/Danculus/agora/server/agora && sed -n '2120,2300"
+ },
+ {
+  "id": "e2ce7f2b3c",
+  "text": "ran: cd /c/Users/Danculus/agora/server/agora/execution && echo \"=== belief_revision pick_challenge_target ===\" && grep -n \"def pick_challenge_target\" -A 70 belief_revision.py && echo \"=== replication pick_…",
+  "tags": [
+   "bash"
+  ],
+  "value": 1.0,
+  "ts": 1784585557.8644693,
+  "iso": "2026-07-20T22:12:37Z",
+  "valid_from": 1784585557.8644693,
+  "source": null,
+  "mtype": "episodic",
+  "last_access": 1784585557.8644693,
+  "status": "active",
+  "links": [],
+  "meta": {},
+  "key": "cmd:42be14606d",
+  "object": "cd /c/Users/Danculus/agora/server/agora/execution && echo \"="
+ },
+ {
+  "id": "a796341604",
+  "text": "ran: cd /c/Users/Danculus/agora/server/agora/execution && echo \"=== hypothesis_induction ===\" && grep -n \"def gather_hypothesis_inputs\" -A 80 hypothesis_induction.py && echo \"=== board.py ===\" && cat board…",
+  "tags": [
+   "bash"
+  ],
+  "value": 1.0,
+  "ts": 1784585558.9857779,
+  "iso": "2026-07-20T22:12:38Z",
+  "valid_from": 1784585558.9857779,
+  "source": null,
+  "mtype": "episodic",
+  "last_access": 1784585558.9857779,
+  "status": "active",
+  "links": [],
+  "meta": {},
+  "key": "cmd:b4253d9d0f",
+  "object": "cd /c/Users/Danculus/agora/server/agora/execution && echo \"="
+ },
+ {
+  "id": "2b01ee1cdf",
+  "text": "ran: cd /c/Users/Danculus/agora && echo \"=== priorities_text callers ===\" && grep -rn \"priorities_text\\|from agora.execution.board\" server/agora --include=*.py | grep -v \"def priorities_text\"",
+  "tags": [
+   "bash"
+  ],
+  "value": 1.0,
+  "ts": 1784585564.3742325,
+  "iso": "2026-07-20T22:12:44Z",
+  "valid_from": 1784585564.3742325,
+  "source": null,
+  "mtype": "episodic",
+  "last_access": 1784585564.3742325,
+  "status": "active",
+  "links": [],
+  "meta": {},
+  "key": "cmd:b38edbc365",
+  "object": "cd /c/Users/Danculus/agora && echo \"=== priorities_text call"
+ },
+ {
+  "id": "5f8af33ac8",
+  "text": "ran: cd /c/Users/Danculus/agora/server/agora/execution && sed -n '1,180p' hypothesis_induction.py",
+  "tags": [
+   "bash"
+  ],
+  "value": 1.0,
+  "ts": 1784585564.9971914,
+  "iso": "2026-07-20T22:12:44Z",
+  "valid_from": 1784585564.9971914,
+  "source": null,
+  "mtype": "episodic",
+  "last_access": 1784585564.9971914,
+  "status": "active",
+  "links": [],
+  "meta": {},
+  "key": "cmd:f0d2cffc25",
+  "object": "cd /c/Users/Danculus/agora/server/agora/execution && sed -n "
+ },
+ {
+  "id": "370ea1f706",
+  "text": "ran: sed -n '2086,2130p;2239,2270p;2556,2580p;2599,2615p;2640,2675p;2948,3000p' mcp_server.py",
+  "tags": [
+   "bash"
+  ],
+  "value": 1.0,
+  "ts": 1784585572.77975,
+  "iso": "2026-07-20T22:12:52Z",
+  "valid_from": 1784585572.77975,
+  "source": null,
+  "mtype": "episodic",
+  "last_access": 1784585572.77975,
+  "status": "active",
+  "links": [],
+  "meta": {},
+  "key": "cmd:1dff1cda94",
+  "object": "sed -n '2086,2130p;2239,2270p;2556,2580p;2599,2615p;2640,267"
+ },
+ {
+  "id": "01e27066b9",
+  "text": "ran: cd /c/Users/Danculus/agora && echo \"=== _gate_filter / gate ===\" && grep -rn \"_gate_filter\\|def _on_mission\\|frontier_directions\\|\\.frontier_directions\" --include=*.py . | head -40",
+  "tags": [
+   "bash"
+  ],
+  "value": 1.0,
+  "ts": 1784585577.6126966,
+  "iso": "2026-07-20T22:12:57Z",
+  "valid_from": 1784585577.6126966,
+  "source": null,
+  "mtype": "episodic",
+  "last_access": 1784585577.6126966,
+  "status": "active",
+  "links": [],
+  "meta": {},
+  "key": "cmd:aa37147c04",
+  "object": "cd /c/Users/Danculus/agora && echo \"=== _gate_filter / gate "
+ },
+ {
+  "id": "2a6acacb28",
+  "text": "ran: sed -n '1995,2050p;1660,1690p;3155,3180p' mcp_server.py",
+  "tags": [
+   "bash"
+  ],
+  "value": 1.0,
+  "ts": 1784585583.823103,
+  "iso": "2026-07-20T22:13:03Z",
+  "valid_from": 1784585583.823103,
+  "source": null,
+  "mtype": "episodic",
+  "last_access": 1784585583.823103,
+  "status": "active",
+  "links": [],
+  "meta": {},
+  "key": "cmd:cefac01eba",
+  "object": "sed -n '1995,2050p;1660,1690p;3155,3180p' mcp_server.py"
+ },
+ {
+  "id": "cfe7c8db78",
+  "text": "ran: cd /c/Users/Danculus/agora/server/agora && sed -n '730,800p' api/agent_os_api.py && echo \"=== gatekeeper.py ===\" && cat execution/gatekeeper.py",
+  "tags": [
+   "bash"
+  ],
+  "value": 1.0,
+  "ts": 1784585585.2146552,
+  "iso": "2026-07-20T22:13:05Z",
+  "valid_from": 1784585585.2146552,
+  "source": null,
+  "mtype": "episodic",
+  "last_access": 1784585585.2146552,
+  "status": "active",
+  "links": [],
+  "meta": {},
+  "key": "cmd:cce528e04b",
+  "object": "cd /c/Users/Danculus/agora/server/agora && sed -n '730,800p'"
+ },
+ {
+  "id": "ec53ae8019",
+  "text": "ran: cd /c/Users/Danculus/agora && git log --oneline -3 -- agora-game-server/mcp_server.py && echo \"--- diff HEAD vs worktree for gate lines ---\" && git diff --stat HEAD -- agora-game-server/mcp_server.py …",
+  "tags": [
+   "bash"
+  ],
+  "value": 1.0,
+  "ts": 1784585595.6895976,
+  "iso": "2026-07-20T22:13:15Z",
+  "valid_from": 1784585595.6895976,
+  "source": null,
+  "mtype": "episodic",
+  "last_access": 1784585595.6895976,
+  "status": "active",
+  "links": [],
+  "meta": {},
+  "key": "cmd:0a784449d3",
+  "object": "cd /c/Users/Danculus/agora && git log --oneline -3 -- agora-"
+ },
+ {
+  "id": "68852463b1",
+  "text": "ran: cd /c/Users/Danculus/agora && python - <<'EOF' import re src=open('agora-game-server/mcp_server.py',encoding='utf-8',errors='replace').read().split('\\n') # find function blocks idx=[(i,l) for i,l in e…",
+  "tags": [
+   "bash"
+  ],
+  "value": 1.0,
+  "ts": 1784585599.0407848,
+  "iso": "2026-07-20T22:13:19Z",
+  "valid_from": 1784585599.0407848,
+  "source": null,
+  "mtype": "episodic",
+  "last_access": 1784585599.0407848,
+  "status": "active",
+  "links": [],
+  "meta": {},
+  "key": "cmd:bed64906e9",
+  "object": "cd /c/Users/Danculus/agora && python - <<'EOF' import re src"
+ },
+ {
+  "id": "de876d0e62",
+  "text": "ran: cd /c/Users/Danculus/agora && git diff -U2 -- agora-game-server/mcp_server.py",
+  "tags": [
+   "bash"
+  ],
+  "value": 1.0,
+  "ts": 1784585608.7204003,
+  "iso": "2026-07-20T22:13:28Z",
+  "valid_from": 1784585608.7204003,
+  "source": null,
+  "mtype": "episodic",
+  "last_access": 1784585608.7204003,
+  "status": "active",
+  "links": [],
+  "meta": {},
+  "key": "cmd:b5a3538a3e",
+  "object": "cd /c/Users/Danculus/agora && git diff -U2 -- agora-game-ser"
+ },
+ {
+  "id": "751ce92291",
+  "text": "ran: cd /c/Users/Danculus/agora/server/agora/execution && for f in analogy_forge cartography press theory library flywheel; do echo \"=== $f ===\"; grep -n \"def pick_mechanism\\|def find_hole\\|def pick_target…",
+  "tags": [
+   "bash"
+  ],
+  "value": 1.0,
+  "ts": 1784585611.9757922,
+  "iso": "2026-07-20T22:13:31Z",
+  "valid_from": 1784585611.9757922,
+  "source": null,
+  "mtype": "episodic",
+  "last_access": 1784585611.9757922,
+  "status": "active",
+  "links": [],
+  "meta": {},
+  "key": "cmd:1480702565",
+  "object": "cd /c/Users/Danculus/agora/server/agora/execution && for f i"
+ },
+ {
+  "id": "1f1b3c209e",
+  "text": "ran: cd /c/Users/Danculus/agora && grep -n \"loop_n\\|% *[0-9]\\+ == \\|_queue_\\|_run_\" agora-game-server/mcp_server.py | sed -n '/ambient/,$p' | grep -n \"%\" | head -60; echo \"=== ambient scheduler ===\"; grep …",
+  "tags": [
+   "bash"
+  ],
+  "value": 1.0,
+  "ts": 1784585619.2188466,
+  "iso": "2026-07-20T22:13:39Z",
+  "valid_from": 1784585619.2188466,
+  "source": null,
+  "mtype": "episodic",
+  "last_access": 1784585619.2188466,
+  "status": "active",
+  "links": [],
+  "meta": {},
+  "key": "cmd:6ef48f4066",
+  "object": "cd /c/Users/Danculus/agora && grep -n \"loop_n\\|% *[0-9]\\+ =="
+ },
+ {
+  "id": "05eb7830ae",
+  "text": "ran: cd /c/Users/Danculus/agora/server/agora/execution && echo \"=== list_beliefs ===\" && sed -n '1,54p' belief_revision.py && echo \"=== frontier_harvest topics ===\" && sed -n '1,60p' frontier_harvest.py",
+  "tags": [
+   "bash"
+  ],
+  "value": 1.0,
+  "ts": 1784585620.0392134,
+  "iso": "2026-07-20T22:13:40Z",
+  "valid_from": 1784585620.0392134,
+  "source": null,
+  "mtype": "episodic",
+  "last_access": 1784585620.0392134,
+  "status": "active",
+  "links": [],
+  "meta": {},
+  "key": "cmd:42ecb31fad",
+  "object": "cd /c/Users/Danculus/agora/server/agora/execution && echo \"="
+ },
+ {
+  "id": "b93fd2b3bf",
+  "text": "ran: cd /c/Users/Danculus/agora && sed -n '4176,4235p' agora-game-server/mcp_server.py && echo \"=== tick sleep ===\" && grep -n \"await asyncio.sleep\" agora-game-server/mcp_server.py | sed -n '1,25p' && grep…",
+  "tags": [
+   "bash"
+  ],
+  "value": 1.0,
+  "ts": 1784585627.7277777,
+  "iso": "2026-07-20T22:13:47Z",
+  "valid_from": 1784585627.7277777,
+  "source": null,
+  "mtype": "episodic",
+  "last_access": 1784585627.7277777,
+  "status": "active",
+  "links": [],
+  "meta": {},
+  "key": "cmd:d3f56d869e",
+  "object": "cd /c/Users/Danculus/agora && sed -n '4176,4235p' agora-game"
+ },
+ {
+  "id": "6ae4261a7c",
+  "text": "ran: cd /c/Users/Danculus/agora && grep -n \"_queue_hypothesis_induction\\|_queue_insight_theme()\\|_queue_dialectic()\\|_queue_deepening()\\|_queue_library_read()\\|_queue_press()\\|_sense_and_queue()\" agora-gam…",
+  "tags": [
+   "bash"
+  ],
+  "value": 1.0,
+  "ts": 1784585637.157184,
+  "iso": "2026-07-20T22:13:57Z",
+  "valid_from": 1784585637.157184,
+  "source": null,
+  "mtype": "episodic",
+  "last_access": 1784585637.157184,
+  "status": "active",
+  "links": [],
+  "meta": {},
+  "key": "cmd:a55d10bbe4",
+  "object": "cd /c/Users/Danculus/agora && grep -n \"_queue_hypothesis_ind"
+ },
+ {
+  "id": "1f3dc49a32",
+  "text": "ran: cd /c/Users/Danculus/agora && grep -n \"hypothesis_loop\\|idea_forge_loop\\|frontier_harvest_loop\\|seminar_report_loop\" -A 25 server/agora/main.py | grep -n \"async def hypothesis_loop\" -A 30",
+  "tags": [
+   "bash"
+  ],
+  "value": 1.0,
+  "ts": 1784585638.047677,
+  "iso": "2026-07-20T22:13:58Z",
+  "valid_from": 1784585638.047677,
+  "source": null,
+  "mtype": "episodic",
+  "last_access": 1784585638.047677,
+  "status": "active",
+  "links": [],
+  "meta": {},
+  "key": "cmd:9a6286e044",
+  "object": "cd /c/Users/Danculus/agora && grep -n \"hypothesis_loop\\|idea"
+ },
+ {
+  "id": "fac3843f5b",
+  "text": "ran: cd /c/Users/Danculus/agora && grep -rn \"Hypothesize from findings\\|Hypothesize on\" --include=*.py . | head -20; echo \"=== _pending_task_themes / _task_already_pending defs ===\"; grep -n \"def _pending_…",
+  "tags": [
+   "bash"
+  ],
+  "value": 1.0,
+  "ts": 1784585649.78665,
+  "iso": "2026-07-20T22:14:09Z",
+  "valid_from": 1784585649.78665,
+  "source": null,
+  "mtype": "episodic",
+  "last_access": 1784585649.78665,
+  "status": "active",
+  "links": [],
+  "meta": {},
+  "key": "cmd:ade2142d0c",
+  "object": "cd /c/Users/Danculus/agora && grep -rn \"Hypothesize from fin"
+ },
+ {
+  "id": "a49c14186a",
+  "text": "mcp_server.py :: current state -> # `update canon` and `draft press` were here and should not have been: both carry a research subject # and are exactly the kind of thing that must answer to the board. _INBOX_ALWAY…",
+  "tags": [
+   "file",
+   "edit"
+  ],
+  "value": 1.0,
+  "ts": 1784585760.677046,
+  "iso": "2026-07-20T22:16:00Z",
+  "valid_from": 1784585760.677046,
+  "source": null,
+  "mtype": "semantic",
+  "last_access": 1784585760.677046,
+  "status": "superseded",
+  "links": [],
+  "meta": {
+   "superseded_by_toggle": "e076c39bd5",
+   "superseded_by_policy": "keyed_lww"
+  },
+  "key": "file:mcp_server.py",
+  "object": "# `update canon` and `draft press` were here and should not have been: both carr…",
+  "superseded_ts": 1784585782.5596771,
+  "invalidated_at": 1784585782.5596771
+ },
+ {
+  "id": "24dbe035f6",
+  "text": "ran: grep -n \"async def ambient_life\\|await _gate_refresh()\" mcp_server.py | head -4; grep -n \"loop_n = 0\\|while True:\" mcp_server.py | head -3",
+  "tags": [
+   "bash"
+  ],
+  "value": 1.0,
+  "ts": 1784585766.1075897,
+  "iso": "2026-07-20T22:16:06Z",
+  "valid_from": 1784585766.1075897,
+  "source": null,
+  "mtype": "episodic",
+  "last_access": 1784585766.1075897,
+  "status": "active",
+  "links": [],
+  "meta": {},
+  "key": "cmd:a7db2644a5",
+  "object": "grep -n \"async def ambient_life\\|await _gate_refresh()\" mcp_"
+ },
+ {
+  "id": "a1a8ac5b31",
+  "text": "ran: sed -n '3466,3472p' mcp_server.py",
+  "tags": [
+   "bash"
+  ],
+  "value": 1.0,
+  "ts": 1784585772.947859,
+  "iso": "2026-07-20T22:16:12Z",
+  "valid_from": 1784585772.947859,
+  "source": null,
+  "mtype": "episodic",
+  "last_access": 1784585772.947859,
+  "status": "active",
+  "links": [],
+  "meta": {},
+  "key": "cmd:ed00fd21ec",
+  "object": "sed -n '3466,3472p' mcp_server.py"
+ },
+ {
+  "id": "e076c39bd5",
+  "text": "mcp_server.py :: current state -> # Warm the board cache BEFORE any organ fires. `_inbox_theme_allowed` lets everything through     # while the cache is cold (so a brain outage cannot silence the queue), and the ca…",
+  "tags": [
+   "file",
+   "edit"
+  ],
+  "value": 1.0,
+  "ts": 1784585782.5596771,
+  "iso": "2026-07-20T22:16:22Z",
+  "valid_from": 1784585782.5596771,
+  "source": null,
+  "mtype": "semantic",
+  "last_access": 1784585782.5596771,
+  "status": "active",
+  "links": [],
+  "meta": {},
+  "key": "file:mcp_server.py",
+  "object": "# Warm the board cache BEFORE any organ fires. `_inbox_theme_allowed` lets every…"
+ },
+ {
+  "id": "4f2784dcbb",
+  "text": "ran: cd /c/Users/Danculus/agora/agora-game-server && grep -n \"_queue_cartography()\\|_queue_analogy_forge()\\|_run_contradiction_sweep()\\|_run_coherence_audit()\\|_run_oracle_scan()\\|_queue_counterfactual_rev…",
+  "tags": [
+   "bash"
+  ],
+  "value": 1.0,
+  "ts": 1784585811.1975865,
+  "iso": "2026-07-20T22:16:51Z",
+  "valid_from": 1784585811.1975865,
+  "source": null,
+  "mtype": "episodic",
+  "last_access": 1784585811.1975865,
+  "status": "active",
+  "links": [],
+  "meta": {},
+  "key": "cmd:04439eea55",
+  "object": "cd /c/Users/Danculus/agora/agora-game-server && grep -n \"_qu"
+ },
+ {
+  "id": "b70f2d6fab",
+  "text": "ran: PYTHONIOENCODING=utf-8 python - << 'PYEOF' import pathlib, re p = pathlib.Path(\"mcp_server.py\"); t = p.read_text(encoding=\"utf-8\")  BANNER = ''' # ORGANS WITH NO ON-MISSION VERSION â€” switched OFF, n…",
+  "tags": [
+   "bash"
+  ],
+  "value": 1.0,
+  "ts": 1784585827.1634383,
+  "iso": "2026-07-20T22:17:07Z",
+  "valid_from": 1784585827.1634383,
+  "source": null,
+  "mtype": "episodic",
+  "last_access": 1784585827.1634383,
+  "status": "active",
+  "links": [],
+  "meta": {},
+  "key": "cmd:bce91fb789",
+  "object": "PYTHONIOENCODING=utf-8 python - << 'PYEOF' import pathlib, r"
+ },
+ {
+  "id": "a230de6c6f",
+  "text": "ran: cd /c/Users/Danculus/agora && PYTHONIOENCODING=utf-8 python - << 'PYEOF' import pathlib p = pathlib.Path(\"agora-game-server/mcp_server.py\"); t = p.read_text(encoding=\"utf-8\")  # 1. NOBODY IS FIRED. Un…",
+  "tags": [
+   "bash"
+  ],
+  "value": 1.0,
+  "ts": 1784586394.8933296,
+  "iso": "2026-07-20T22:26:34Z",
+  "valid_from": 1784586394.8933296,
+  "source": null,
+  "mtype": "episodic",
+  "last_access": 1784586394.8933296,
+  "status": "active",
+  "links": [],
+  "meta": {},
+  "key": "cmd:3c5d4fb0fa",
+  "object": "cd /c/Users/Danculus/agora && PYTHONIOENCODING=utf-8 python "
+ },
+ {
+  "id": "716bf7e069",
+  "text": "ran: grep -n -A 8 \"async def _queue_cartography\" mcp_server.py | head -12",
+  "tags": [
+   "bash"
+  ],
+  "value": 1.0,
+  "ts": 1784586400.9280007,
+  "iso": "2026-07-20T22:26:40Z",
+  "valid_from": 1784586400.9280007,
+  "source": null,
+  "mtype": "episodic",
+  "last_access": 1784586400.9280007,
+  "status": "active",
+  "links": [],
+  "meta": {},
+  "key": "cmd:7f17679c46",
+  "object": "grep -n -A 8 \"async def _queue_cartography\" mcp_server.py | "
+ },
+ {
+  "id": "d598449e6b",
+  "text": "ran: sed -n '2966,2985p' mcp_server.py",
+  "tags": [
+   "bash"
+  ],
+  "value": 1.0,
+  "ts": 1784586406.0375483,
+  "iso": "2026-07-20T22:26:46Z",
+  "valid_from": 1784586406.0375483,
+  "source": null,
+  "mtype": "episodic",
+  "last_access": 1784586406.0375483,
+  "status": "active",
+  "links": [],
+  "meta": {},
+  "key": "cmd:c8ca6ebedd",
+  "object": "sed -n '2966,2985p' mcp_server.py"
+ },
+ {
+  "id": "5c646b49c9",
+  "text": "..\\..\\AppData\\Local\\Temp\\claude\\C--Users-Danculus-agora\\c5317a10-d6e1-4480-8deb-effafb6407b2\\scratchpad\\repoint_wren.py :: current state -> \"\"\"Repoint the Cartographer at the outside world (kept as a file â€” the payload has braces everywhere).\"\"\" import pathlib  p = pathlib.Path(r\"C:\\Users\\Danculus\\agora\\agora-game-se…",
+  "tags": [
+   "file",
+   "edit"
+  ],
+  "value": 1.0,
+  "ts": 1784586431.246303,
+  "iso": "2026-07-20T22:27:11Z",
+  "valid_from": 1784586431.246303,
+  "source": null,
+  "mtype": "semantic",
+  "last_access": 1784586431.246303,
+  "status": "active",
+  "links": [],
+  "meta": {},
+  "key": "file:..\\..\\AppData\\Local\\Temp\\claude\\C--Users-Danculus-agora\\c5317a10-d6e1-4480-8deb-effafb6407b2\\scratchpad\\repoint_wren.py",
+  "object": "\"\"\"Repoint the Cartographer at the outside world (kept as a file â€” the payload…"
+ },
+ {
+  "id": "c412acca38",
+  "text": "ran: python -m py_compile mcp_server.py && echo COMPILE_OK && sed -n '2975,2990p' mcp_server.py",
+  "tags": [
+   "bash"
+  ],
+  "value": 1.0,
+  "ts": 1784586444.5996299,
+  "iso": "2026-07-20T22:27:24Z",
+  "valid_from": 1784586444.5996299,
+  "source": null,
+  "mtype": "episodic",
+  "last_access": 1784586444.5996299,
+  "status": "active",
+  "links": [],
+  "meta": {},
+  "key": "cmd:001cf73775",
+  "object": "python -m py_compile mcp_server.py && echo COMPILE_OK && sed"
+ },
+ {
+  "id": "6fbc0d77f6",
+  "text": "ran: PYTHONIOENCODING=utf-8 python - << 'PYEOF' import pathlib p = pathlib.Path(\"mcp_server.py\"); t = p.read_text(encoding=\"utf-8\") junk = \"\"\"                 f\"OUR axis right now: \"                  f\"{';…",
+  "tags": [
+   "bash"
+  ],
+  "value": 1.0,
+  "ts": 1784586456.2796962,
+  "iso": "2026-07-20T22:27:36Z",
+  "valid_from": 1784586456.2796962,
+  "source": null,
+  "mtype": "episodic",
+  "last_access": 1784586456.2796962,
+  "status": "active",
+  "links": [],
+  "meta": {},
+  "key": "cmd:30ef6402d1",
+  "object": "PYTHONIOENCODING=utf-8 python - << 'PYEOF' import pathlib p "
+ },
+ {
+  "id": "86994c1232",
+  "text": "ran: cd \"C:/Users/Danculus/AppData/Local/Temp/claude/C--Users-Danculus-agora/c5317a10-d6e1-4480-8deb-effafb6407b2/scratchpad\" && PYTHONIOENCODING=utf-8 python fix_board_polarity.py && cd /c/Users/Danculus/…",
+  "tags": [
+   "bash"
+  ],
+  "value": 1.0,
+  "ts": 1784588462.0533023,
+  "iso": "2026-07-20T23:01:02Z",
+  "valid_from": 1784588462.0533023,
+  "source": null,
+  "mtype": "episodic",
+  "last_access": 1784588462.0533023,
+  "status": "active",
+  "links": [],
+  "meta": {},
+  "key": "cmd:ffebd4d22f",
+  "object": "cd \"C:/Users/Danculus/AppData/Local/Temp/claude/C--Users-Dan"
+ },
+ {
+  "id": "aa1404e73a",
+  "text": "ran: PYTHONIOENCODING=utf-8 python - << 'PYEOF' import pathlib p = pathlib.Path(\"mcp_server.py\"); t = p.read_text(encoding=\"utf-8\")  CORE = ''' # The SUBJECT has to be ours, not merely a word the board hap…",
+  "tags": [
+   "bash"
+  ],
+  "value": 1.0,
+  "ts": 1784588493.0597334,
+  "iso": "2026-07-20T23:01:33Z",
+  "valid_from": 1784588493.0597334,
+  "source": null,
+  "mtype": "episodic",
+  "last_access": 1784588493.0597334,
+  "status": "active",
+  "links": [],
+  "meta": {},
+  "key": "cmd:e0e6a3e6e6",
+  "object": "PYTHONIOENCODING=utf-8 python - << 'PYEOF' import pathlib p "
+ },
+ {
+  "id": "f7bded4320",
+  "text": "ran: cd \"C:/Users/Danculus/AppData/Local/Temp/claude/C--Users-Danculus-agora/c5317a10-d6e1-4480-8deb-effafb6407b2/scratchpad\" && PYTHONIOENCODING=utf-8 python -c \" import json,urllib.request B='http://127.…",
+  "tags": [
+   "bash"
+  ],
+  "value": 1.0,
+  "ts": 1784588534.8009548,
+  "iso": "2026-07-20T23:02:14Z",
+  "valid_from": 1784588534.8009548,
+  "source": null,
+  "mtype": "episodic",
+  "last_access": 1784588534.8009548,
+  "status": "active",
+  "links": [],
+  "meta": {},
+  "key": "cmd:a9084c083e",
+  "object": "cd \"C:/Users/Danculus/AppData/Local/Temp/claude/C--Users-Dan"
+ },
+ {
+  "id": "373f70e553",
+  "text": "ran: cd agora-game-server && cat .dungeon_heartbeat 2>/dev/null; echo; tail -25 _dungeon.err 2>/dev/null | tail -25",
+  "tags": [
+   "bash"
+  ],
+  "value": 1.0,
+  "ts": 1784610735.4093356,
+  "iso": "2026-07-21T05:12:15Z",
+  "valid_from": 1784610735.4093356,
+  "source": null,
+  "mtype": "episodic",
+  "last_access": 1784610735.4093356,
+  "status": "active",
+  "links": [],
+  "meta": {},
+  "key": "cmd:fbe448f4ee",
+  "object": "cd agora-game-server && cat .dungeon_heartbeat 2>/dev/null; "
+ },
+ {
+  "id": "b459aa2442",
+  "text": "ran: cd agora-game-server && grep -n \"planner OFF â€” grounded pool only\" mcp_server.py | head -5; grep -n \"grounded pool\\|_grounded_quest_pool\\|def _plan_quests\\|LLM_quests\" mcp_server.py | head -30",
+  "tags": [
+   "bash"
+  ],
+  "value": 1.0,
+  "ts": 1784610741.9345496,
+  "iso": "2026-07-21T05:12:21Z",
+  "valid_from": 1784610741.9345496,
+  "source": null,
+  "mtype": "episodic",
+  "last_access": 1784610741.9345496,
+  "status": "active",
+  "links": [],
+  "meta": {},
+  "key": "cmd:3a98a9b58c",
+  "object": "cd agora-game-server && grep -n \"planner OFF â€” grounded po"
+ },
+ {
+  "id": "45e47b8920",
+  "text": "ran: grep -aoE \"\\[(quest|curation|research|finding|vault|gate)\\][^\\n]{0,80}\" _dungeon.err | tail -40 | sort | uniq -c | sort -rn | head -20",
+  "tags": [
+   "bash"
+  ],
+  "value": 1.0,
+  "ts": 1784610746.968153,
+  "iso": "2026-07-21T05:12:26Z",
+  "valid_from": 1784610746.968153,
+  "source": null,
+  "mtype": "episodic",
+  "last_access": 1784610746.968153,
+  "status": "active",
+  "links": [],
+  "meta": {},
+  "key": "cmd:de36724abc",
+  "object": "grep -aoE \"\\[(quest|curation|research|finding|vault|gate)\\]["
+ },
+ {
+  "id": "02333e34f3",
+  "text": "ran: grep -av \"\\[plan\\]\" _dungeon.err | tail -40",
+  "tags": [
+   "bash"
+  ],
+  "value": 1.0,
+  "ts": 1784610750.3628733,
+  "iso": "2026-07-21T05:12:30Z",
+  "valid_from": 1784610750.3628733,
+  "source": null,
+  "mtype": "episodic",
+  "last_access": 1784610750.3628733,
+  "status": "active",
+  "links": [],
+  "meta": {},
+  "key": "cmd:b6e8ec5579",
+  "object": "grep -av \"\\[plan\\]\" _dungeon.err | tail -40"
+ },
+ {
+  "id": "754cb6eebd",
+  "text": "ran: grep -n \"held to pending\\|standing\" mcp_server.py | head -30",
+  "tags": [
+   "bash"
+  ],
+  "value": 1.0,
+  "ts": 1784610764.772445,
+  "iso": "2026-07-21T05:12:44Z",
+  "valid_from": 1784610764.772445,
+  "source": null,
+  "mtype": "episodic",
+  "last_access": 1784610764.772445,
+  "status": "active",
+  "links": [],
+  "meta": {},
+  "key": "cmd:c69f94b85d",
+  "object": "grep -n \"held to pending\\|standing\" mcp_server.py | head -30"
+ },
+ {
+  "id": "da6b84b8a1",
+  "text": "ran: sed -n 3632,3700p mcp_server.py",
+  "tags": [
+   "bash"
+  ],
+  "value": 1.0,
+  "ts": 1784610767.1841092,
+  "iso": "2026-07-21T05:12:47Z",
+  "valid_from": 1784610767.1841092,
+  "source": null,
+  "mtype": "episodic",
+  "last_access": 1784610767.1841092,
+  "status": "active",
+  "links": [],
+  "meta": {},
+  "key": "cmd:c9f146175d",
+  "object": "sed -n 3632,3700p mcp_server.py"
+ },
+ {
+  "id": "f4943ecb15",
+  "text": "ran: grep -rn \"held in pending\\|held to pending\\|trust-weighted\\|TRUST_APPLY\\|0.6\\|threshold\" $(ls tools/*autolink* 2>/dev/null || echo \"\") 2>/dev/null | head -20; ls tools 2>/dev/null | head; grep -n \"_AU…",
+  "tags": [
+   "bash"
+  ],
+  "value": 1.0,
+  "ts": 1784610771.2281258,
+  "iso": "2026-07-21T05:12:51Z",
+  "valid_from": 1784610771.2281258,
+  "source": null,
+  "mtype": "episodic",
+  "last_access": 1784610771.2281258,
+  "status": "active",
+  "links": [],
+  "meta": {},
+  "key": "cmd:6c96aa68db",
+  "object": "grep -rn \"held in pending\\|held to pending\\|trust-weighted\\|"
+ },
+ {
+  "id": "ed371c9629",
+  "text": "ran: cd agora-game-server && python -m py_compile mcp_server.py && echo COMPILE_OK",
+  "tags": [
+   "bash"
+  ],
+  "value": 1.0,
+  "ts": 1784614738.4481459,
+  "iso": "2026-07-21T06:18:58Z",
+  "valid_from": 1784614738.4481459,
+  "source": null,
+  "mtype": "episodic",
+  "last_access": 1784614738.4481459,
+  "status": "active",
+  "links": [],
+  "meta": {},
+  "key": "cmd:a0594c227c",
+  "object": "cd agora-game-server && python -m py_compile mcp_server.py &"
  }
 ]

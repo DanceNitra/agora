@@ -79,6 +79,10 @@ def main():
     ap.add_argument("--threads", type=int, default=2)
     ap.add_argument("--Ls", type=str, default=None, help="comma list, e.g. 80,160,320")
     ap.add_argument("--U", type=float, default=1.0)
+    # Narrow the grid to what a given question actually needs: a spin-gap claim needs only the
+    # singlet/triplet pair, so computing Nm1/Np1 doubles the wall clock for nothing.
+    ap.add_argument("--sectors", type=str, default=None, help="comma list, e.g. singlet,triplet")
+    ap.add_argument("--chis", type=str, default=None, help="comma list, e.g. 100,200,400")
     args = ap.parse_args()
 
     global CELLDIR, SHARED, U
@@ -88,7 +92,9 @@ def main():
         SHARED = os.path.join(HERE, f"hubbard_dmrg_results_U{U:g}.json")
 
     Ls = [int(x) for x in args.Ls.split(",")] if args.Ls else LS_DEFAULT
-    cells = [(L, chi, s) for L in Ls for chi in CHIS for s in SECTORS]
+    chis = [int(x) for x in args.chis.split(",")] if args.chis else CHIS
+    sectors = args.sectors.split(",") if args.sectors else SECTORS
+    cells = [(L, chi, s) for L in Ls for chi in chis for s in sectors]
     cells.sort(key=lambda c: (c[0], c[1]))   # ascending L, then chi
     todo = [c for c in cells if not already_done(cell_key(*c))]
     done0 = len(cells) - len(todo)

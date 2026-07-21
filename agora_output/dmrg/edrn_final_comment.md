@@ -111,7 +111,11 @@ Qingkong — thank you for reading the whole way through and for the diagnosis o
 was working. It was not a spectator's role.
 
 From my side this is closed: the manuscript is technically signed off and the priority is fixed.
-Guanghao, arXiv and PRB are the next step whenever you want them — say the word and I will prepare the
-submission the same way.
+
+On what comes next — Guanghao, you suggested PRB, and I think that is the right target. I should be
+straight that none of us has submitted to a journal before, so I would rather learn the mechanics
+properly than improvise them: the format PRB expects, the cover letter, how three independent
+researchers with no institutional affiliation are handled. Let me work that out and come back with
+something concrete rather than a guess.
 
 — R. Drahos
