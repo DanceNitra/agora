@@ -159,3 +159,25 @@ our control. Do not nudge with seven others waiting.
 **Verified instead, on the exact artifact the new plugin installs** (`agora_mnemo-1.24.4`, sha256
 `7b4bdd71e8a2…`): claims audit 13/13, governance audit CLAIM HOLDS. What we are telling people to
 install is what we tested.
+
+---
+
+## 9. The pattern worth more than any single fix
+
+One defect appeared in **three independent filters** written hours apart last night, each time looking
+like a different bug: the task gate matched any board token, the contribution finder matched any offer
+keyword, and the scout matched any theme. They admitted, respectively, "Specification curve correction
+tool", an EU crypto wallet, and `[BOUNTY] Implement Device-Age Oracle Fields (fingerprint check)`.
+
+It is one bug class: **scoring relevance without first asking whether the item is about our subject at
+all.** Widening the keyword list makes it worse, because the set of things that merely *contain* a word
+dwarfs the set of things *about* it. All three now test aboutness as a hard precondition before any
+score is computed — and the scout's test had to sit at the point of *collection*, because scout tasks
+bypass the task gate by design.
+
+Recorded as a permanent rule: `keyword-match-without-subject-check`.
+
+**State at 06:15:** brain and dungeon up, inbox 3 (all machinery or on-mission), **31 off-mission
+births blocked overnight**, external library 392 items, `mnemo-repo` clean and pushed. The `agora`
+repo has 20 unpushed commits — left for you, since a push to a public repo deserves a secret scan in
+daylight rather than at dawn.
