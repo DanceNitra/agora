@@ -277,6 +277,58 @@ values, keyed or not. Deterministic, no LLM, and it is what the product already 
 and nothing should reach the expensive pilot until it moves there. Memory:
 `supersession-retires-a-record-not-a-value`.
 
+### B4c. CLOSED: the correction layer is not extractor-limited. The corpus is built to defeat
+### statement-order supersession.
+
+B4b said the fix was value-level suppression and the bottleneck was chain binding. Both were built and
+measured. **The line is now closed, with a harder answer than either.**
+
+**Built and shipped** (mnemo `513befd`, `a22d200`; 160 tests, store parity audit unchanged):
+- `recall(suppress_stale_values=True)` — withholds any candidate carrying a key's retired value without
+  the current one, decided on **distinguishing tokens** (extracted objects carry tails like `Senior Data
+  Analyst as of yesterday`, so full-string containment fails in both directions). Opt-in; a 2-tuple
+  world is byte-identical.
+- **Agreement is not correction.** Keyed last-write-wins used to retire an active same-key record even
+  when it stated the SAME value, so a restatement retired the record it agrees with. Plus an optional
+  third extractor return element declaring whether a sentence *asserts a change* (`your address remains
+  742 Birchwood Lane, Unit 4A` vs `Unit 4A` are one fact at two granularities).
+
+**Measured** (`keying_recall.py`, zero cloud calls; `extractor_candidate_v2.py` keys the assistant's
+echoes and named third parties, with negative tests so `your friend Priya holds the title X` never
+becomes `my::title`):
+
+```
+                    shipped    v2        no-harm: CURRENT-VALUE COVERAGE 5/12 -> 3/12
+KEYING RECALL        0.203    0.211      LEAK RATE moved for the first time, but coverage paid for it
+CHAIN BINDING        0.083    0.500
+SUPERSESSION         0.006    0.139
+LEAK RATE            0.074    0.037
+```
+
+**Three corrections to what we believed:**
+1. **The registered baseline 0.111 was wrong; it is 0.074.** The corpus corrects `Data Analyst` ->
+   `Junior Data Analyst` -> `Senior Data Analyst`, so a raw substring test scores the first two as
+   leaked in every context containing the RIGHT answer. The only way to score zero on them is to
+   withhold the correct record — which the first implementation did, showing a clean 0.111 -> 0.074.
+   **No leak-rate gain counts without a paired coverage number** (`stale_suppression_noharm.py`).
+2. **The probe recall is noise-dominated.** Its top hits are `Of course!`, and the current value is
+   absent from the top 100 for 5 of 12 chains even with the shipped store. Both metrics ride on it.
+3. **THE ANSWER: the corpus states half of all chain values in DISTRACTOR segments, out of order.**
+   Of the segments carrying a chain value, **31 are evidence-inserted and 31 are distractor-inserted**,
+   and in **8 of 12 chains the corrected-TO value is stated before the corrected-FROM value**. Segments
+   are ingested in their own order (1..50) — this is the benchmark's design, not our bug.
+
+**So keyed last-write-wins on statement order cannot recover the current value on this corpus, however
+good the extractor gets.** A better extractor raises chain binding 6x and still loses current-value
+coverage, because more keying means more planted distractors keyed. **The missing mechanism is
+separating evidence from distractor — provenance / event time — not more keying.** That is a different
+and larger piece of work, and it is the honest reason the four nulls happened.
+
+**Nothing shipped from the extractor** (`extractor_candidate_v2.py` stays in the lab, gitignored) and
+**nothing went to the expensive pilot**: the gate said the number must move without harm, and coverage
+fell. A `value_birth` recap rule was written, measured to change nothing, and reverted rather than
+shipped unmeasured.
+
 ### B5. The dungeon: three silent failures, all fixed
 
 None of them logged an error. **The common tell is a log line that is identical every cycle.**
