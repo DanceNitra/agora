@@ -353,6 +353,41 @@ is a re-derivation, not a discovery.
 fell. A `value_birth` recap rule was written, measured to change nothing, and reverted rather than
 shipped unmeasured.
 
+### B4d. THE CEILING, MEASURED — the four nulls are correct, and supersession is *negative* for QA
+
+The blind-spot lens asked the question nobody had: is there any headroom at all? Measured, with
+retrieval removed and contexts built from the corpus's own ground truth. Pre-registered
+(`ORACLE_HEADROOM_PREREG.md` + two audit appendices written before the run); 54 deduped probes x 4
+arms, 892s, zero drops, arms verified paired. Full record: `ORACLE_HEADROOM_RESULT.md`.
+
+| arm | accuracy |
+|---|---|
+| `oracle_state` — corpus's own resolved labelled state (positive control, leaks the answer) | 0.870 |
+| `oracle_evidence` — raw unresolved quotes, instructed prompt | 0.870 |
+| `oracle_evidence_neutral` — same quotes, instruction removed | 0.833 |
+| `oracle_current` — current values only = what a perfect supersession layer emits | **0.481** |
+
+- **Liveness gate passes** (`oracle_state` 0.870 >= 0.85), so a null here is interpretable.
+- **Resolution buys nothing**: state − evidence_neutral = **+3.7 pp**, CI [−7.4, +14.8]. Handed a pile
+  of contradictory raw quotes, the answerer resolves the correction unaided.
+- **The prompt line buys nothing**: removing "use the CURRENT one" costs +3.7 pp, CI through zero.
+- **Supersession is destructive, not neutral**: current-only is 35 pp worse overall and scores
+  **exactly 0.000** on both history categories (n=18). A third of the corpus asks for the history that
+  a correction layer hides.
+- The headroom that exists is in **retrieval** (0.870 vs mnemo 0.545 on the same probes) — direction
+  only, not budget-matched, no quantified claim.
+
+**Consequence for the product.** The correction layer's case cannot be made on QA accuracy — it is
+negative there. It has to be made where hiding a superseded value is the point rather than the cost:
+deterministic export, erasure receipts, right-to-be-forgotten, audit. Or read-time suppression must
+keep the history visible and merely MARK it stale, which is what `suppress_stale_values` does and what
+record-level supersession does not.
+
+**Two corrections owed to earlier numbers, found by the pre-run audits:** every probe is stored twice
+in the corpus, so the published k150 bootstrap CIs were computed on duplicated rows and are ~1.41x too
+narrow; and the judge's ground truth was truncated at 14k/4k while 14 of 30 conversations and 16 of 30
+traces are longer, cutting the END where late-chain corrections live.
+
 ### B5. The dungeon: three silent failures, all fixed
 
 None of them logged an error. **The common tell is a log line that is identical every cycle.**
