@@ -299,30 +299,54 @@ becomes `my::title`):
 
 ```
                     shipped    v2        no-harm: CURRENT-VALUE COVERAGE 5/12 -> 3/12
-KEYING RECALL        0.203    0.211      LEAK RATE moved for the first time, but coverage paid for it
-CHAIN BINDING        0.083    0.500
+KEYING RECALL        0.203    0.211      (CHAIN BINDING re-measured after the red-team; see below)
+CHAIN BINDING        0.000    0.417
 SUPERSESSION         0.006    0.139
-LEAK RATE            0.074    0.037
+LEAK RATE            0.074    0.037      <- DO NOT QUOTE, see correction 3
 ```
 
-**Three corrections to what we believed:**
-1. **The registered baseline 0.111 was wrong; it is 0.074.** The corpus corrects `Data Analyst` ->
-   `Junior Data Analyst` -> `Senior Data Analyst`, so a raw substring test scores the first two as
-   leaked in every context containing the RIGHT answer. The only way to score zero on them is to
-   withhold the correct record — which the first implementation did, showing a clean 0.111 -> 0.074.
-   **No leak-rate gain counts without a paired coverage number** (`stale_suppression_noharm.py`).
-2. **The probe recall is noise-dominated.** Its top hits are `Of course!`, and the current value is
-   absent from the top 100 for 5 of 12 chains even with the shipped store. Both metrics ride on it.
-3. **THE ANSWER: the corpus states half of all chain values in DISTRACTOR segments, out of order.**
-   Of the segments carrying a chain value, **31 are evidence-inserted and 31 are distractor-inserted**,
-   and in **8 of 12 chains the corrected-TO value is stated before the corrected-FROM value**. Segments
-   are ingested in their own order (1..50) — this is the benchmark's design, not our bug.
+> **RETRACTION (same evening, by our own red-team — this section originally claimed a "root cause" that
+> does not survive).** The `stress-claim` panel and a strict re-derivation killed the causal story
+> below. What was published here first is kept visible on purpose; the corrected state follows.
 
-**So keyed last-write-wins on statement order cannot recover the current value on this corpus, however
-good the extractor gets.** A better extractor raises chain binding 6x and still loses current-value
-coverage, because more keying means more planted distractors keyed. **The missing mechanism is
-separating evidence from distractor — provenance / event time — not more keying.** That is a different
-and larger piece of work, and it is the honest reason the four nulls happened.
+**Four corrections, three of them to our own numbers:**
+1. **CHAIN BINDING was inflated at both ends.** The metric took the set of non-null keys and scored
+   `len(keys)==1` as bound — so a chain with a SINGLE keyed record counted as bound, and the metric
+   *rewarded keying less*. Fixed to require >= 2 keyed records sharing one key. Re-measured: **shipped
+   binds 0/12 chains (not 1/12), v2 binds 5/12 (not 6/12)**. The direction survives; the endpoints move.
+2. **The probe recall is noise-dominated.** Top hits are `Of course!`, and the current value is absent
+   from the top 100 for 5 of 12 chains even with the shipped store. Both metrics ride on it.
+3. **The LEAK RATE "correction" is itself suspect.** Masking current-value occurrences before the stale
+   test is right for nested values — but **9 of 12 chains REVERT** (the final value re-states an earlier
+   step), so for those the current and stale strings are IDENTICAL and the mask erases the only
+   occurrences that could score. 0.074 -> 0.037 is also 2 events -> 1. Neither number should be quoted.
+4. **THE RETRACTED CLAIM: "the corpus plants chain values out of order as distractors".** Re-derived
+   with word-boundary matching, nesting exclusion, and reversion chains separated:
+   **all 12 chains are reversion chains; ZERO non-reversion chains remain; zero genuine inversions.**
+   The "8 of 12 out of order" was the reversion design (`Unit 3B -> 3A -> 3C -> 3A`) plus the
+   `Data Analyst` ⊂ `Junior Data Analyst` substring — the exact nesting artifact caught earlier the
+   same day, made twice. The 31/31 evidence/distractor split is raw counts with no denominators and the
+   same unbounded substring match. **There is no measured out-of-order finding.**
+
+**So the honest state is: we do not have a root cause.** What holds is descriptive — the shipped
+extractor keys 5.11% of 101,874 records, supersedes 0.359%, and binds 0 of 12 correction chains, so on
+this corpus the correction config and the keep-everything config are mostly the same store, which is
+consistent with the tie. Everything beyond that was artifact.
+
+**The unasked question the blind-spot lens found, and the next thing to run:** nobody measured the
+CEILING. If the answerer already resolves a contradiction when handed both values, the accuracy headroom
+for ANY write-side correction layer is ~0 and all four nulls are the correct result of a well-specified
+experiment rather than a defect. Two oracle arms on the existing pilot settle it: (1) inject only the
+true post-correction value = max achievable; (2) inject stale + corrected together with no supersession
+= how much the answerer closes unaided. If (2) ~ (1), the write layer is provably redundant for QA and
+the honest product surface is deterministic export / erasure / audit, not answer accuracy.
+
+**Prior art we must credit either way** (verified against primary sources): the statement-order-vs-event
+-time argument is the textbook bitemporal model and is already Zep/Graphiti's stated design
+(arXiv:2501.13956); outdated-info distraction is HoH (arXiv:2503.04800, ACL 2025); deterministic
+freshness over explicit version metadata is Reddy & Challaram (arXiv:2606.01435); "one value restated
+across many records" is the classic update anomaly / belief-base kernel contraction. Our version of it
+is a re-derivation, not a discovery.
 
 **Nothing shipped from the extractor** (`extractor_candidate_v2.py` stays in the lab, gitignored) and
 **nothing went to the expensive pilot**: the gate said the number must move without harm, and coverage
