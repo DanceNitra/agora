@@ -13,6 +13,252 @@
 
 # Agora — Session Handoff (2026-07-20 · "test your own claim" day)
 
+## 2026-07-21 — EDRN paper 2 PUBLISHED · rename decided · adoption measured at ~zero · dungeon's three silent failures
+
+**Read this first.** Two tracks ran today and they are unrelated to each other — do not merge them:
+**(A) the EDRN physics collaboration** (Li / Drahos / Sultanov, 1D Hubbard DMRG), and **(B) mnemo**, our
+own product, where a Reddit post's comment thread produced a new experiment. Nothing in (A) touches (B).
+
+---
+
+# TRACK A — EDRN physics
+
+### A1. Paper 2 is OUT, and the standing header above is now stale
+
+The "Menu-2" paper the header calls unpublished **is published**:
+**https://doi.org/10.5281/zenodo.21473160** — *Systematic numerical study of the spin-gap prefactor in a
+one-dimensional Mott insulator: defect response, boundary effect, and cross-sector conservation*, Li /
+Drahos / Sultanov, CC-BY, open access.
+
+It is a **NEW record**, deliberately not a version of 10.5281/zenodo.21393316. That DOI belongs to a
+*different, earlier* paper which reports Prediction 1 as negated in its initial test and leaves the correct
+test "pending". This paper IS that test. Linked as `isContinuedBy`. (An earlier plan to publish it as
+"version 2" of the old record was wrong and was caught before it happened — it would have put two different
+papers under one DOI.)
+
+The sign-off comment is posted in the thread (issue comment 5033674061). **Nothing is open on the
+collaborators' side.** Marat closed his two items (CERN data out of the paper, U=2 spin gap from our own
+DMRG). Guanghao handed us the C decision, the LaTeX, and — back in July — *"the rest, I leave to you."*
+
+**What earned the sign-off, all pushed to `github.com/DanceNitra/edrn-appendix-fix`:**
+
+- **80 DMRG runs.** Every one of the ten defect-scan points at chi = 100/200/300/400 in both spin sectors,
+  energies extrapolated linearly in the discarded weight, gaps rebuilt from extrapolated energies only.
+  **Control first: our chi=100 reproduces their published A = 5.469862 as 5.469865** — six significant
+  figures from independent code, without which nothing downstream is comparable. Result: the open chain was
+  **already converged**; largest bias 1.0%, eight of ten points at 0.3% or less. Contrast the periodic ring,
+  where the same check moved A from 0.47 to 3.19 — on a ring the wrap bond is long-range for an MPS.
+- **The C normalization, settled from their own code rather than our judgement.**
+  `game1_defect_scan.py:72` and `menu2_periodic.py:88` accumulate the MEAN of the two spin channels;
+  `predict1_topology_spin.py` their SUM. That single `/ 2.0` is the entire apparent "48% drop": the open
+  chain was reported as a SUM and the ring as a MEAN, so a ring with one *more* bond looked half as
+  connected. Verified on data both sides already held — the scan at defect 1.0 IS the uniform L=40 chain,
+  and 2 x 0.479442 = 0.958884 against that file's 0.9588847979.
+- **A manuscript row with no data file behind it.** L=40, 0.8t (A = 4.3666) appeared in no committed CSV;
+  the only record for that point anywhere reads `delta_s = 6.5e-9, A = 0.000000` — a run that failed to
+  resolve the two sectors. Rather than ask where the number came from, it was recomputed independently:
+  **A = 4.365966**, 0.014% away. The row was right all along; only its provenance was missing.
+- Both table files regenerated in one convention, a new convergence appendix wired in, `paper_full.pdf`
+  recompiled. Scripts and all 80 raw cells are public so any table can be re-derived without a new sweep.
+
+### A2. The journal is the ONLY remaining route — arXiv is closed, permanently
+
+**Do not raise arXiv again.** cond-mat requires an endorsement, none of the three authors has one, and the
+owner has had to say this several times. Memory: `arxiv-excluded-journal-is-the-only-path`.
+
+Verified mechanics for PRB: **`agora_output/dmrg/PRB_SUBMISSION_GUIDE.md`** — every requirement carries the
+APS URL it came from. (APS returns 403 to the normal fetch tool; use a browser user-agent.)
+
+Better than feared: **no submission fee, publishing behind the paywall is free**, Regular Article has no
+length limit, a single PDF is all that is needed to submit, and our `revtex4-2` `prb` class is already right.
+
+**The risk we created ourselves:** the Zenodo record is **CC-BY**, and APS requires gold open access
+($2,910) for a CC-BY licence on an accepted manuscript, while the copyright transfer warrants the work is
+"unpublished". No APS page addresses a CC-BY preprint posted *before* submission. **First action, before
+anything else: one email to `prb@aps.org`** with the DOI, asking that, and whether "Independent Researcher"
+is acceptable as a byline affiliation. Both unknowns fit in one paragraph.
+
+**What the manuscript still needs:** not one `\section{}` exists — 21 bold inline labels stand in for them;
+no Data Availability Statement (required by APS); no Author Contributions paragraph; ORCIDs for two of the
+three authors (free, self-service at orcid.org/register — **not** an endorsement wall, the owner reasonably
+feared it was another one); a native-English pass. And a decision on the collaboration-ethics material
+("tool-rationality paradox", "honest silence", six numbered principles): sincere, the best thing about how
+the paper was made, and a live desk-rejection risk at APS's first screening filter — which is **not
+appealable**.
+
+---
+
+# TRACK B — mnemo
+
+### B1. The rename is DECIDED but NOT executed: `inspeximus`
+
+Chosen after a four-lens scan plus registry verification. A medieval charter that recites an earlier charter
+verbatim and attests it unaltered — the same act the product performs.
+
+**Verified:** PyPI, npm, crates, the GitHub username, `inspeximus.com` and `.org` all free; **zero** GitHub
+repos carry the name; TMview returns zero; the only occurrences anywhere are medieval-charter scholarship.
+USPTO and EUIPO were searched by hand **with a `deepki` positive control that returned records in both**, so
+those zeros are real zeros and not a broken search.
+
+**The one live mark found:** EUTM 018905799, `inspex CYBERSECURITY PROFESSIONAL SERVICE`, figurative, Thai
+owner, registered 2023, **class 42 including general software-development terms**. Assessed low-to-moderate:
+different word, figurative rather than word mark, weak suggestive root, remote field of use. Not a blocker;
+the owner explicitly rejected paying for a clearance opinion at this stage and was right that the downside
+is a rename, which today costs nothing.
+
+Killed along the way: **`kudurru`** (Spawning Inc. has used it for an AI tool since 2023 with WIRED and NPR
+coverage — the exact Deepkit fact pattern) and **`speximus`** (it fails its own standard: the word appears
+in no Latin text ever written, and a name that cannot survive its own verification standard is a bad name
+for a verification tool).
+
+**Why it has not shipped:** the plan bakes the name into install commands and framework catalogues, so the
+rename must land *before* those, not after. Nothing else blocks it.
+
+### B2. Adoption, measured properly for the first time: essentially zero
+
+Via ClickHouse's public PyPI dataset (`sql-clickhouse.clickhouse.com`, user `demo`, database `pypi` — free,
+no key, and it carries the `installer` field that pypistats lacks):
+
+```
+42,000 downloads / 30 days
+  -> 2,334 are pip / uv / Nexus (anything resembling an install)
+  -> the discriminator: Singapore pulled ALL 103 versions, Japan 101, China 90,
+     Britain exactly 72 downloads across 72 versions
+```
+
+Nobody installs 103 versions of a library. **The honest statement is "no organic signal distinguishable from
+automated traffic", with a defensible ceiling of about 16/day** — not "zero", which overstates what the data
+supports. US traffic is largely our own CI; SK is the owner's own machine.
+
+Two consequences: the rename is free (**there is no installed base to disrupt**), and we have a clean zero
+baseline, which is rare — any movement after the distribution work will be unambiguous rather than arguable.
+
+### B3. The plan we are working from
+
+**`agora_output/IMPLEMENTATION_PLAN_2026-07-21.md`** — ten items in build order, each with an acceptance
+test rather than an opinion. It front-loads findability because the bottleneck is not capability. Phase 0 is
+`mnemo install` (one command per IDE, and the place where the untested Codex-TOML claim finally gets tested)
+then the `langchain-mnemo` package and catalogue listings. Phase 1 reframes the README around **correction
+and provenance** — asked for by 69 and 84 distinct projects — with **revert demoted to proof**, asked for by
+10. Phase 2 is the one axis where we are honestly behind: ingest granularity, then re-measure.
+
+### B4. IN FLIGHT — the noise-vs-contradiction experiment
+
+This came out of a comment on our Reddit post about the MemOps nulls. The commenter said our "less evidence,
+better answers" result (0.593 turn-level vs 0.442 session-level) is attention distraction / "lost in the
+middle" (arXiv:2307.03172 — verified real, Liu, Lin, Hewitt, Paranjape, 2023). His explanation is plausible
+but confounded: session chunks in this corpus do not merely contain more text, they contain **the superseded
+values themselves**.
+
+The experiment builds contexts directly instead of retrieving them: identical evidence, padded with either
+**neutral** filler (turns from other scenarios) or **contradicting** filler (this scenario's turns carrying
+superseded values), at matched character counts, split evenly around the evidence so position is held
+constant. The only difference at each rung is whether the filler contradicts.
+
+- Pre-registration, **predictions and a falsifier written before the run**:
+  `agora_output/lab/memops/NOISE_VS_CONTRADICTION_PREREG.md`, including Amendment 1.
+- Runner `noise_vs_contradiction.py` · analysis `noise_vs_contradiction_analysis.py` · construction audit
+  `nvc_construction_audit.py`.
+- **Resume is built in**: re-running with the same `--tag` skips work already scored. Progress:
+  `grep "/316" agora_output/lab/memops/_nvc2.log | tail -1`.
+
+**Amendment 1 matters.** The construction audit was written *during* the first run and failed two of three
+checks: the "neutral" control carried the target scenario's own superseded values (this corpus reuses entity
+strings — `Data Analyst`, `Unit 3B`, `Basenji`), and for two scenarios the "contradicting" filler contained
+no contradiction. That run was discarded, ~440 cloud calls wasted, and the discarded raw file is kept as
+`nvc_raw_INVALID_v1.json` so the correction is checkable. Note the bias direction: a contaminated control
+would have *understated* the effect, not invented one.
+
+**RESULT: KILLED, twice over. Do not resurrect it without reading both reasons.**
+
+**Reason 1 — the finding is already published.** A prior-art sweep (arXiv only; ACL Anthology and
+Scholar not checked) found the question is an occupied axis:
+- **HoH** (arXiv:2503.04800, 2025) runs nearly this design: relevant-only / outdated-only / both, with a
+  sweep over the number of neutral distractors. Its "harmful (-1)" score *is* our stale-value metric.
+- **Yadav** (arXiv:2606.26511, 2026) already publishes the number we were about to measure: standard RAG
+  serves superseded facts **15-40%** of the time.
+- **MemOps itself** (arXiv:2607.12893) — the benchmark this lab is already built on — explicitly names
+  "relying on stale values after a correction" as a distinct failure type.
+- **Cuconasu et al.** (arXiv:2505.15561) further argues positional "lost in the middle" effects are
+  marginal in realistic retrieval and content-based distraction dominates — which weakens the premise
+  that volume was ever the natural null hypothesis.
+The only residue: HoH does not *equalise token count* between its contradiction and no-contradiction
+arms. That is a methods refinement, not a finding.
+
+**Reason 2 — the design cannot support the claim anyway.** A hostile red-team of the construction found
+three fatal problems, all verified against the actual data:
+1. **`stale_value` is an UNREGISTERED endpoint.** The prereg names accuracy as the quantity, and the
+   registered accuracy endpoint came back **null at every rung** — the fourth consecutive null, exactly
+   as the falsifier anticipated. The analysis script had grown a `STALE-VALUE SEPARATION` block with its
+   own decision rule, printing *above* the registered verdict. That is the precise failure mode
+   pre-registration exists to prevent, and I wrote it.
+2. **The separation is one scenario.** Ten of the seventeen stale events come from `A05_update` alone;
+   leave-one-scenario-out kills the only significant rung three different ways and flips the 12k sign.
+   And the dose-response runs backwards — the effect is largest at 2k and shrinks as contradiction
+   triples, which is not a mechanism.
+3. **Arm C is confounded with repetition and topicality.** `pad()` cycles a 4-14 turn pool without
+   reshuffling, so at 12k **55% of arm C's filler lines are verbatim repeats** and the stale string
+   appears ~33 times, versus 27 distinct off-topic turns in arm B. The manipulation is "one string
+   repeated 33 times vs diverse off-topic text", not "contradiction present vs absent". On top of that,
+   **74 of 82 probes carry a superseded value inside the shared evidence block itself**, so arm B was
+   never a contradiction-free control.
+
+**What would be needed to ask the question properly** (recorded, not scheduled): arm D — filler from the
+*same* scenario with no stale value (topicality held constant); arm E — neutral filler subsampled and
+cycled on C's exact repeat schedule (repetition held constant); reshuffle per cycle; drop any
+(scenario, rung) whose pool cannot fill the rung without repeats, which removes the 12k rung for 7 of 10
+scenarios. Plus a fresh prereg naming one endpoint and one rung, a sign-flip permutation test instead of
+a 10-cluster bootstrap, blind hand-labelling of ~40 arm-C answers, and a second judge.
+
+**The honest position: the registered endpoint returned the fourth null, and the axis is already
+occupied by published work.** ~950 cloud calls total, 412 probes scored and kept in `nvc_raw_v2.json`.
+Nothing was written or sent from it. The full red-team and prior-art findings are in this session's
+transcript; the two most useful artefacts to keep are the construction audit pattern and the
+`call()` token-floor guard.
+
+### B5. The dungeon: three silent failures, all fixed
+
+None of them logged an error. **The common tell is a log line that is identical every cycle.**
+
+- **The curation gate was an absolute 0.55 applied to a relative score.** `_compute_standing` blends
+  hit-rate, mastery and bounty into the trust mean and every blend pulls downward, so the whole roster sat
+  at 0.389-0.476 — Elara and Voss had been running a 120-second vault scan every ten minutes for weeks with
+  every result discarded, losing standing for producing nothing they were prevented from producing. Fixed to
+  a rank-based gate with a real absolute floor. Memory: `absolute-threshold-on-a-relative-score`.
+- **Unlocking it released a flood.** The first unlocked run offered 2931 links across 763 notes, mostly to
+  bookkeeping. Reverted line-precisely (zero added link lines remain in real notes), then a 25-note per-run
+  budget and a *structural* machine-output exclusion. My first attempt at that exclusion was a keyword
+  blocklist, which merely moved the hub from `orphans_*` to `Archival_Candidate_2026*` — the exact error I
+  had recorded as a permanent rule ninety minutes earlier.
+- **A number parser erased Voss's entire output.** It split on the word "duplicate", so
+  `FLAGGED 33 true-duplicate groups` parsed as **0** and was reported as "no duplicates found" every single
+  run. Fixed; he now reports his 33 groups.
+
+---
+
+# What the owner is waiting on
+
+**His decisions:** execute the rename; whether Elara's vault links stay (551 links across 121 notes are in
+the vault right now); the reply to the Reddit commenter (Reddit is his to post — and the draft comes only
+*after* the experiment is gated); the PRB email.
+
+**Corrections he gave today, all fair:**
+
+- **Stop bouncing decisions back to collaborators who have already handed them to us.** He caught a
+  formatting question put to Guanghao that was ours to decide.
+- **Test, build, verify, gate — and only then write the draft.** Not draft-first.
+- **Delegate the preparation to subagents, in parallel with the run.** Subagents cost no cloud quota; only
+  the answerer and judge do. Working serially made him wait twice in one day.
+- Three self-inflicted costs are recorded in `audit-the-construction-before-spending-the-budget`: the
+  construction audit written *during* the run instead of before it (~440 cloud calls discarded); an
+  inherited `CONCURRENCY = 3` never measured (n=8 is 7x faster on the answerer, though the judge leg only
+  gains 1.6x and is the real bottleneck); and the reasoning-model token floor violated **again** despite
+  being written down repeatedly. That last one is now a **guard inside `call()` in `pilot.py`** — when a
+  written rule is violated twice, stop rewriting the rule and put it in the code path.
+
+**Background at handoff:** the experiment runner (detached, resumable), the brain and the dungeon — all last
+verified up, one process each.
+
 ## PASTE THIS AFTER RESTART (2026-07-20 — newest; supersedes every block below)
 ```
 Resume Agora. FIRST read HANDOFF.md top (2026-07-20) + the LIVE-COLLABORATION callout above it. Chat SLOVAK, code/output ENGLISH.
