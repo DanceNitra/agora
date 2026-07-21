@@ -29,7 +29,7 @@ its own replications, forecasts, and challenges._
   only as an honestly-scoped case study.
 
 ## Product
-- **mnemo** (`agora-mnemo`, open-source on PyPI) — the recall + consolidation
+- **inspeximus** (`inspeximus`, open-source on PyPI) — the recall + consolidation
   core. Its design rules are measured, not assumed.
 
 _A track record with no failures is a track record hiding its tests._

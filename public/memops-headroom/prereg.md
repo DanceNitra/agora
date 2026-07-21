@@ -5,7 +5,7 @@ the design below is the post-audit version, not the one first written).
 
 ## Why
 
-Four consecutive nulls say mnemo's correction layer buys nothing on answer accuracy against a
+Four consecutive nulls say inspeximus's correction layer buys nothing on answer accuracy against a
 keep-everything store. Every diagnosis so far argued about the WRITE side — what gets retired — without
 ever establishing that there is anything to win. If the answerer already resolves a contradiction when
 handed both the stale and the corrected value, the ceiling for ANY write-side correction layer is ~0,
@@ -29,7 +29,7 @@ not yet in effect).
 The **108 probes in the 12 scenarios that contain a correction chain**. A correction layer cannot help
 where there is nothing to correct; including the other 192 probes would dilute any effect toward the
 null by construction. Baselines for the identical subset are recomputed from the existing
-`pilot_raw_k150.json` at zero cost: **mnemo 0.545 (n=88), naive 0.578 (n=90)**.
+`pilot_raw_k150.json` at zero cost: **inspeximus 0.545 (n=88), naive 0.578 (n=90)**.
 
 ## Endpoint and predictions (registered)
 
@@ -40,7 +40,7 @@ Primary contrast: **`oracle_current` − `oracle_evidence_neutral`** = what writ
 worth with retrieval held perfect and no prompt hand-holding.
 
 Secondary: `oracle_evidence` − `oracle_evidence_neutral` = what one prompt line already buys.
-`oracle_state` − `oracle_current` = what history + labelling add. `oracle_state` − mnemo(0.545) = total
+`oracle_state` − `oracle_current` = what history + labelling add. `oracle_state` − inspeximus(0.545) = total
 headroom from perfect memory — **not budget-matched** (oracle contexts are 200-800 chars vs ~11.9k) and
 therefore reported as an upper bound only, never as a fair comparison.
 
@@ -179,7 +179,7 @@ that setting and the rows now carry `setting` so it is visible.
   resolution one. Now falls back to that target's last confirmed value: **verified present**.
 
 **E5. Paired analysis was impossible from the output.** Rows carried no probe id, so no paired
-bootstrap could ever have been computed, and silent drops are real (the published k150 run has mnemo
+bootstrap could ever have been computed, and silent drops are real (the published k150 run has inspeximus
 236 vs naive 238 of 240, arm-asymmetric, never logged). Rows now carry `qpid` and `setting`, every drop
 prints its reason, and a per-file pairing check warns when arms disagree.
 

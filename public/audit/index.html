@@ -4,12 +4,12 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Agent Memory Audit — Report #1 · Agora</title>
-<meta name="description" content="A standing, open measurement of agent-memory integrity and governance — not recall. Correction, echo resistance, and cross-store forget-verification across mnemo, mem0, and Graphiti, with a symmetric instrument and honest scope.">
+<meta name="description" content="A standing, open measurement of agent-memory integrity and governance — not recall. Correction, echo resistance, and cross-store forget-verification across inspeximus, mem0, and Graphiti, with a symmetric instrument and honest scope.">
 <link rel="canonical" href="https://dancenitra.github.io/agora/public/audit/">
 <meta property="og:type" content="article">
 <meta property="og:title" content="Agent Memory Audit — Report #1">
 <meta property="og:description" content="Does a correction stick, does a retired fact stay retired, does a delete actually erase, can you prove it. A standing, open measurement of agent-memory integrity & governance.">
-<script type="application/ld+json">{"@context":"https://schema.org","@type":"Dataset","name":"Agent Memory Audit — Report #1","description":"A standing, open measurement of agent-memory integrity and governance across mnemo, mem0, and Graphiti.","url":"https://dancenitra.github.io/agora/public/audit/","license":"https://opensource.org/licenses/MIT","creator":{"@type":"Organization","name":"Agora"},"variableMeasured":["correction integrity","echo resistance","cross-store forget-verification"]}</script>
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"Dataset","name":"Agent Memory Audit — Report #1","description":"A standing, open measurement of agent-memory integrity and governance across inspeximus, mem0, and Graphiti.","url":"https://dancenitra.github.io/agora/public/audit/","license":"https://opensource.org/licenses/MIT","creator":{"@type":"Organization","name":"Agora"},"variableMeasured":["correction integrity","echo resistance","cross-store forget-verification"]}</script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;0,6..72,600;0,6..72,700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
@@ -62,7 +62,7 @@
     <p>Most public leaderboards score recall. This is a <strong>vendor-run, open measurement</strong> of the
     properties that break agents in production instead: does a correction stick, does a retired fact stay
     retired, does a "delete" actually erase, and can you <em>prove</em> it. We build one of the systems measured
-    (mnemo), so the real test is not our word — it is the open harness. Run it and contradict us.</p>
+    (inspeximus), so the real test is not our word — it is the open harness. Run it and contradict us.</p>
   </div>
 
   <h2>Why these properties, and why now</h2>
@@ -86,7 +86,7 @@
   Wilson 95% intervals. Higher is better except where noted.</p>
 
   <table>
-    <thead><tr><th>Dimension</th><th>mnemo</th><th>mem0</th><th>Graphiti</th></tr></thead>
+    <thead><tr><th>Dimension</th><th>inspeximus</th><th>mem0</th><th>Graphiti</th></tr></thead>
     <tbody>
       <tr class="best">
         <td>Correction integrity <span class="dim">— value-obscuring revert stays reverted (↑)</span></td>
@@ -115,15 +115,15 @@
     </tbody>
   </table>
 
-  <p class="note">Read honestly: mnemo leads on correction and on answer clarity, but it does <em>not</em>
+  <p class="note">Read honestly: inspeximus leads on correction and on answer clarity, but it does <em>not</em>
   dominate everywhere — on raw echo resurrection it ties Graphiti at 0.00 (Graphiti simply answers less
-  clearly), and no store, mnemo included, survives the where-everyone-fails row below.</p>
+  clearly), and no store, inspeximus included, survives the where-everyone-fails row below.</p>
 
   <h2>Forget-verification: where erasure actually stops <span class="dim">(updated 15 July 2026)</span></h2>
   <p>The opening finding is the row where <strong>everyone fails, us included</strong>: a copy the application
-  embedded into its own vector index outlives <em>every</em> store's native delete — mnemo's too (8/8
+  embedded into its own vector index outlives <em>every</em> store's native delete — inspeximus's too (8/8
   recoverable). Store-level erasure is necessary, not sufficient. Because we could not fix that by store design
-  alone (no store can see infrastructure it was never told about), mnemo&nbsp;1.8.0 ships the wiring as a
+  alone (no store can see infrastructure it was never told about), inspeximus&nbsp;1.8.0 ships the wiring as a
   first-class operation: register the app's fan-out stores as erasure targets and <code>forget_subject()</code>
   cascades through them and returns an honest manifest. Measured on the same 8 subjects: unwired 8/8 leak →
   wired 0/8 with 8/8 verifying <code>complete</code> receipts, and a deliberately broken wiring produces zero
@@ -133,7 +133,7 @@
   adversarially attempt to recover the erased value (verbatim) from <em>each native surface the system
   exposes</em>. n=8 subjects.</p>
   <table>
-    <thead><tr><th>Surface</th><th>mnemo 1.7.0</th><th>mem0 2.0.11</th><th>Graphiti</th></tr></thead>
+    <thead><tr><th>Surface</th><th>inspeximus 1.7.0</th><th>mem0 2.0.11</th><th>Graphiti</th></tr></thead>
     <tbody>
       <tr><td>External app vector index <span class="dim">(outside every store's control)</span></td><td class="n">8/8 leak <span class="dim">· 0/8 wired (1.8.0)</span></td><td class="n">8/8 leak</td><td class="n">8/8 leak <span class="dim">(store-independent)</span></td></tr>
       <tr><td>Query <span class="dim">(recall / search)</span></td><td class="n">0/8</td><td class="n">0/8</td><td class="n">0/8</td></tr>
@@ -149,8 +149,8 @@
   (<code>old_memory</code>) verbatim to any caller with store access, the only native clear is a global
   <code>reset()</code> (per-record and per-user purges do not exist, and <code>delete_all()</code> in fact
   <em>adds</em> a DELETE row per memory), and this retention is not documented as a privacy surface — while
-  mnemo's tombstones record the deletion event without the content, which is partly a capability difference
-  (mnemo does not offer a content-retaining audit trail). The raw-storage row is a <strong>substrate
+  inspeximus's tombstones record the deletion event without the content, which is partly a capability difference
+  (inspeximus does not offer a content-retaining audit trail). The raw-storage row is a <strong>substrate
   property</strong>: bytes remain in Qdrant's embedded storage until segment vacuum — shared by any
   embedded-Qdrant application, not a mem0 defect; server deployments or an optimizer run clear it. Graphiti's
   explicit <code>remove_episode()</code> measured surprisingly clean: it cascades through the episode's
@@ -170,25 +170,25 @@
   <h2>The instrument (and the fairness fix)</h2>
   <p>Every system is read by the <strong>same ground-truth-blind LLM judge on its own native retrieval
   surface</strong> — no system is scored on a rail built for another. That symmetry is deliberate: an earlier
-  version of this benchmark flattered us, because it read mnemo on mnemo's terms, and we caught it and fixed it
+  version of this benchmark flattered us, because it read inspeximus on inspeximus's terms, and we caught it and fixed it
   before publishing (11 July 2026). The forget-verification cell goes further and removes the judge entirely
   (deterministic verbatim-recovery checks). All harnesses are open and re-runnable; the numbers above regenerate
   from them.</p>
   <p>Two honest limits sit in the <em>design</em>, not the scoring, and a blind judge cannot neutralise them:
-  we chose these four dimensions, and mnemo leads on the two — correction and forget-verification — that are its
-  own product thesis; and <code>n=20</code> per cell is thin (mnemo's echo 0.00 sits in a Wilson interval of
+  we chose these four dimensions, and inspeximus leads on the two — correction and forget-verification — that are its
+  own product thesis; and <code>n=20</code> per cell is thin (inspeximus's echo 0.00 sits in a Wilson interval of
   [0.00, 0.16], and a tie at this sample size can move). The open harness is the answer to both — change the
   dimensions, add your own, raise the n, and contradict the numbers.</p>
 
   <div class="scope">
     <strong>Honest scope.</strong> These are narrow adversarial cuts, not a general memory-quality score, at
-    small n. Agora builds mnemo, so treat the mnemo column as vendor-run — the mitigation is the symmetric
+    small n. Agora builds inspeximus, so treat the inspeximus column as vendor-run — the mitigation is the symmetric
     instrument, the open harness, and the fact that we lead only on the axes we chose. Recall is out of scope,
     and mem0 and Graphiti lead there; this measures a different thing. Forget-verification checks verbatim
     recoverability on native surfaces — it is a lower bound on the leak (paraphrase and embedding inversion are
-    out of scope) and cannot prove physical destruction. mnemo scores 1.00 on a cell we designed: the
+    out of scope) and cannot prove physical destruction. inspeximus scores 1.00 on a cell we designed: the
     counterweights are the judge-free instrument, the per-surface breakdown being the finding, and the
-    where-everyone-fails row that mnemo fails too. The strongest version of this report is one a competitor or a
+    where-everyone-fails row that inspeximus fails too. The strongest version of this report is one a competitor or a
     neutral party re-runs — the harness is public for exactly that.
   </div>
 
@@ -205,7 +205,7 @@
     <a href="../integrity/">integrity hub</a>
     <a href="../crucible/">the Crucible</a>
     <a href="https://github.com/DanceNitra/agent-memory-integrity">integrity harness</a>
-    <a href="https://github.com/DanceNitra/mnemo">mnemo</a>
+    <a href="https://github.com/DanceNitra/inspeximus">inspeximus</a>
   </div>
 
   <footer>Agent Memory Observatory · Agora — an autonomous research OS · every number regenerates from an open harness.</footer>

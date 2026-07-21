@@ -12,7 +12,7 @@ before the run). 54 deduped probes x 4 arms = 216 rows, 892s, zero drops, arms v
 | `oracle_evidence_neutral` | the same raw quotes, instruction removed | **0.833** |
 | `oracle_current` | current values only — what a perfect supersession layer can emit | **0.481** |
 
-Baselines on the identical probe subset, from the existing run: mnemo 0.545, naive 0.578.
+Baselines on the identical probe subset, from the existing run: inspeximus 0.545, naive 0.578.
 
 ## Against the registered predictions
 
@@ -46,7 +46,7 @@ almost nothing, so the earlier arms were not propped up by that instruction eith
 2. **On this task supersession is not neutral, it is destructive.** The best a correction layer can
    emit is 35 pp worse overall and zero on history questions. Hiding superseded records deletes the
    answer to a third of the corpus.
-3. **The headroom that does exist is in RETRIEVAL, not resolution.** oracle_state 0.870 vs mnemo 0.545
+3. **The headroom that does exist is in RETRIEVAL, not resolution.** oracle_state 0.870 vs inspeximus 0.545
    on the same probes — direction only, NOT budget-matched (200-800 chars vs ~11.9k, retrieval removed
    entirely), so no quantified "headroom = 0.325" claim is admissible.
 4. **Therefore the product case for the correction layer cannot be made on QA accuracy.** It has to be

@@ -4,8 +4,8 @@
   "date": "2026-07-14",
   "thesis": "A vendor-run, open measurement of agent-memory INTEGRITY properties (not recall): does a correction stick, does a retired fact stay retired, does a delete actually erase, can you prove it. Run the harness and contradict us.",
   "instrument": "Symmetric: a ground-truth-blind LLM judge reads each system on its OWN native retrieval surface (fairness fix 2026-07-11). n=20 per cell (thin; a tie can move), Wilson 95% CIs. All harnesses open and re-runnable.",
-  "design_limits": "We chose these four dimensions, and mnemo leads on the two (correction, forget-verification) that are its own product thesis; a blind judge cannot neutralise dimension selection. The mitigation is the open harness: change the axes, raise n, contradict the numbers. Related integrity benchmarks exist (MemConflict arXiv:2605.20926, BEAM, LongMemEval); we combine four properties into one standing re-runnable measurement, not a claim that nobody measures integrity.",
-  "vendor_disclosure": "mnemo is one of the measured systems and Agora builds it; mitigated by the symmetric instrument, the open harness, and by leading only on the axes we chose + reporting where mnemo does NOT lead (echo resurrection ties Graphiti; recall is out of scope and mem0/Graphiti lead there).",
+  "design_limits": "We chose these four dimensions, and inspeximus leads on the two (correction, forget-verification) that are its own product thesis; a blind judge cannot neutralise dimension selection. The mitigation is the open harness: change the axes, raise n, contradict the numbers. Related integrity benchmarks exist (MemConflict arXiv:2605.20926, BEAM, LongMemEval); we combine four properties into one standing re-runnable measurement, not a claim that nobody measures integrity.",
+  "vendor_disclosure": "inspeximus is one of the measured systems and Agora builds it; mitigated by the symmetric instrument, the open harness, and by leading only on the axes we chose + reporting where inspeximus does NOT lead (echo resurrection ties Graphiti; recall is out of scope and mem0/Graphiti lead there).",
   "dimensions": [
     {
       "dimension": "Correction integrity",
@@ -13,7 +13,7 @@
       "metric": "revert success rate (current answer == restored old value); higher is better",
       "n": 20,
       "results": {
-        "mnemo": {"score": 0.75, "ci95": [0.531, 0.888]},
+        "inspeximus": {"score": 0.75, "ci95": [0.531, 0.888]},
         "mem0": {"score": 0.20, "ci95": [0.081, 0.416]},
         "graphiti": {"score": 0.00, "ci95": [0.0, 0.161]}
       }
@@ -24,7 +24,7 @@
       "metric": "resurrection rate (stale value asserted as current); lower is better",
       "n": 20,
       "results": {
-        "mnemo": {"score": 0.00, "ci95": [0.0, 0.161]},
+        "inspeximus": {"score": 0.00, "ci95": [0.0, 0.161]},
         "mem0": {"score": 0.05},
         "graphiti": {"score": 0.00}
       }
@@ -35,7 +35,7 @@
       "metric": "clean-current-truth rate (the answer clearly states the current value); higher is better",
       "n": 20,
       "results": {
-        "mnemo": {"score": 0.90, "ci95": [0.699, 0.972]},
+        "inspeximus": {"score": 0.90, "ci95": [0.699, 0.972]},
         "mem0": {"score": 0.80},
         "graphiti": {"score": 0.55}
       }
@@ -46,7 +46,7 @@
       "metric": "verbatim residue per surface (lower is better); deterministic string-containment instrument, no LLM judge",
       "n": 8,
       "updated": "2026-07-15",
-      "finding": "OPENING FINDING (where everyone fails, us included): a copy the application embedded into its own external vector index outlives every store's native delete, mnemo's too (8/8). Within the stores: deletion clears every retrieval surface tested (query and enumerate 0/8 on all three systems); on mem0 the history API and, flush-dependently, the raw files still contain the value — erasure succeeds at the retrieval layer and stops there. Graphiti's explicit remove_episode() cascades clean (0/8 on all four surfaces, positive-control verified), TYING mnemo at 1.000 on the store cell. The history row is an audit-trail DESIGN DIFFERENCE, not defeated residue: mem0's history API returns the pre-deletion content (old_memory) verbatim to any caller with store access, the only native clear is a global reset() (per-record/per-user purges do not exist; delete_all() in fact ADDS a DELETE row per memory), and this retention is not documented as a privacy surface — while mnemo's tombstones record the deletion event without content, partly a capability difference (mnemo offers no content-retaining audit trail). The raw-storage row is a SUBSTRATE property: bytes remain in Qdrant's embedded storage until segment vacuum — shared by any embedded-Qdrant application, not a mem0 defect; server deployments or an optimizer run clear it.",
+      "finding": "OPENING FINDING (where everyone fails, us included): a copy the application embedded into its own external vector index outlives every store's native delete, inspeximus's too (8/8). Within the stores: deletion clears every retrieval surface tested (query and enumerate 0/8 on all three systems); on mem0 the history API and, flush-dependently, the raw files still contain the value — erasure succeeds at the retrieval layer and stops there. Graphiti's explicit remove_episode() cascades clean (0/8 on all four surfaces, positive-control verified), TYING inspeximus at 1.000 on the store cell. The history row is an audit-trail DESIGN DIFFERENCE, not defeated residue: mem0's history API returns the pre-deletion content (old_memory) verbatim to any caller with store access, the only native clear is a global reset() (per-record/per-user purges do not exist; delete_all() in fact ADDS a DELETE row per memory), and this retention is not documented as a privacy surface — while inspeximus's tombstones record the deletion event without content, partly a capability difference (inspeximus offers no content-retaining audit trail). The raw-storage row is a SUBSTRATE property: bytes remain in Qdrant's embedded storage until segment vacuum — shared by any embedded-Qdrant application, not a mem0 defect; server deployments or an optimizer run clear it.",
       "results": {
         "external_app_vector_index": {"mnemo_unwired": "8/8 leak", "mnemo_1.8.0_wired": "0/8 (register_erasure_target + forget_subject cascade; 8/8 complete manifests, chains verify; a broken wiring yields 0/8 falsely-complete receipts and names the leak 8/8)", "mem0_2.0.11": "8/8 leak", "note": "outside every store's control; the fix covers only REGISTERED targets (unknown copies stay unknown, for every system); open two-method ErasureTarget protocol, any store can implement it"},
         "mnemo_1.7.0": {"query": "0/8", "enumerate": "0/8", "history_ledger_receipts": "0/8", "raw_storage_files": "0/8"},
@@ -55,17 +55,17 @@
       },
       "regulatory_note": "GDPR Article 17(3) explicitly permits retention for audit and legal purposes; this cell is an engineering signal about where erased content remains readable, not a compliance assessment, and no system here 'fails the right to erasure'.",
       "prior_art": "Soft-delete/vector residue is a known failure class: Ghost Vectors (arXiv:2606.18497) reconstructs soft-deleted HNSW vectors; the machine-unlearning literature's thesis is that delete does not delete (Bourtoule et al., SISA). This cell contributes a standing, re-runnable cross-system measurement of that class on shipping systems, not a novel discovery.",
-      "note": "mnemo's 6-store fan-out self-baseline (hard delete 1.00 / soft-delete bug 0.167) remains available in forget_verification_bench.py; this edition replaces it as the headline with a symmetric cross-system cell."
+      "note": "inspeximus's 6-store fan-out self-baseline (hard delete 1.00 / soft-delete bug 0.167) remains available in forget_verification_bench.py; this edition replaces it as the headline with a symmetric cross-system cell."
     }
   ],
-  "honest_scope": "Narrow adversarial cuts, not a general memory-quality score. Small n. mnemo is vendor-built (disclosed) and scores 1.000 on the forget-verification cell we designed; the counterweights are the deterministic judge-free instrument, the per-surface breakdown being the finding (not the ranking), the where-everyone-fails row (the external vector index defeats mnemo too), Graphiti TYING mnemo at 1.000 on the store surfaces, and the open harness. Recall is out of scope and mem0/Graphiti lead there. The strongest version of this report is one a competitor or neutral party re-runs from the open harness.",
+  "honest_scope": "Narrow adversarial cuts, not a general memory-quality score. Small n. inspeximus is vendor-built (disclosed) and scores 1.000 on the forget-verification cell we designed; the counterweights are the deterministic judge-free instrument, the per-surface breakdown being the finding (not the ranking), the where-everyone-fails row (the external vector index defeats inspeximus too), Graphiti TYING inspeximus at 1.000 on the store surfaces, and the open harness. Recall is out of scope and mem0/Graphiti lead there. The strongest version of this report is one a competitor or neutral party re-runs from the open harness.",
   "regulatory_context": "These properties sit CLOSE to obligations regulators are formalizing, not a compliance test: verifiable erasure (GDPR Art. 17; the 2025 EDPB coordinated-enforcement action on the right to erasure is live) and audit-traceable operation (EU AI Act event logging; a minimum six-month log retention under Art. 19). Dates are in motion: the high-risk timeline is under active amendment (the 2026 Digital Omnibus may push it toward late 2027). Whether a stored embedding is erasable personal data is argued in the literature (Ghost Vectors arXiv:2606.18497), not yet settled by the EDPB. Passing here is an engineering signal, not a compliance certification.",
   "cadence": "Report #1 of a recurring series; each edition adds systems, dimensions, and re-measures.",
   "sources": {
     "integrity_hub": "https://dancenitra.github.io/agora/public/integrity/",
     "crucible": "https://dancenitra.github.io/agora/public/crucible/",
     "integrity_harness": "https://github.com/DanceNitra/agent-memory-integrity",
-    "mnemo": "https://github.com/DanceNitra/mnemo",
-    "forget_verification_bench": "https://github.com/DanceNitra/mnemo/blob/main/probes/forget_verification_bench.py"
+    "inspeximus": "https://github.com/DanceNitra/inspeximus",
+    "forget_verification_bench": "https://github.com/DanceNitra/inspeximus/blob/main/probes/forget_verification_bench.py"
   }
 }

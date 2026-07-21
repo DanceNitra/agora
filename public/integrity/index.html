@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Agent-Memory Integrity — the ledger, the benchmark, the reference implementation</title>
-<meta name="description" content="We measure whether a corrected agent memory stays corrected: an open cross-system benchmark, the flagship write-up, a joint paper, and mnemo, the reference implementation with a first-class correction channel.">
+<meta name="description" content="We measure whether a corrected agent memory stays corrected: an open cross-system benchmark, the flagship write-up, a joint paper, and inspeximus, the reference implementation with a first-class correction channel.">
 <link rel="canonical" href="https://dancenitra.github.io/agora/public/integrity/">
 <meta property="og:title" content="Agent-Memory Integrity — measured, not asserted">
 <meta property="og:description" content="Recall benchmarks skip the write step. We measure whether a correction takes and stays taken — open harness, reference implementation, joint paper.">
@@ -113,7 +113,7 @@
     </a>
     <nav class="nav">
       <a class="lnk" href="https://github.com/DanceNitra/agent-memory-integrity">benchmark</a>
-      <a class="lnk" href="https://dancenitra.github.io/agora/public/mnemo/">mnemo</a>
+      <a class="lnk" href="https://dancenitra.github.io/agora/public/inspeximus/">inspeximus</a>
       <a class="lnk" href="https://dancenitra.github.io/agora/">agora</a>
     </nav>
   </header>
@@ -155,11 +155,11 @@
         the cell we tie (echo), because a benchmark you only ever win is a benchmark you built to flatter you.</p>
       <div class="tbl">
         <div class="tr"><span>value-obscuring revert (n=20)</span><span>success</span><span>95% CI</span></div>
-        <div class="tr"><b>mnemo</b><span class="win">0.75</span><span>[0.53, 0.89]</span></div>
+        <div class="tr"><b>inspeximus</b><span class="win">0.75</span><span>[0.53, 0.89]</span></div>
         <div class="tr"><b>mem0 2.0.11</b><span>0.20</span><span>[0.08, 0.42]</span></div>
         <div class="tr"><b>Graphiti</b><span>0.00</span><span>[0.00, 0.16]</span></div>
       </div>
-      <p class="note" style="margin-top:12px">Only mnemo exposes a channel to undo a correction on command; the
+      <p class="note" style="margin-top:12px">Only inspeximus exposes a channel to undo a correction on command; the
         CIs don't overlap, so the capability gap is real. Echo resurrection is a tie — all three defend.</p>
       <a class="go solid" href="https://github.com/DanceNitra/agent-memory-integrity">run it / add your system →</a>
     </div>
@@ -168,7 +168,7 @@
   <section class="rec">
     <h2>The reference implementation</h2>
     <div class="card">
-      <div class="prop">mnemo · correction as a first-class channel</div>
+      <div class="prop">inspeximus · correction as a first-class channel</div>
       <div class="claim">A zero-dependency memory layer where correcting a fact is a first-class operation,
         not an afterthought.</div>
       <p class="note"><code>revert</code> undoes a correction on an unmarked command; <code>echo_guard</code>
@@ -176,8 +176,8 @@
         lineage; <code>rederive</code> regenerates that payload against the corrected root; and
         <code>governance_report</code> gives erasure-with-proof in one call. Every rule ships with the number
         we measured and the test that would kill it.</p>
-      <a class="go" href="https://dancenitra.github.io/agora/public/mnemo/">the receipts →</a>
-      <a class="go" href="https://pypi.org/project/agora-mnemo/">pip install agora-mnemo →</a>
+      <a class="go" href="https://dancenitra.github.io/agora/public/inspeximus/">the receipts →</a>
+      <a class="go" href="https://pypi.org/project/inspeximus/">pip install inspeximus →</a>
     </div>
   </section>
 
@@ -187,7 +187,7 @@
       <div class="prop">the story, honestly</div>
       <div class="claim">We fixed our own memory benchmark until it stopped flattering us.</div>
       <p class="note">The flagship write-up: how a pre-publication audit caught an <b>asymmetric instrument in
-        our own harness</b> (it dropped mnemo's headline from 1.00 to 0.75) — the correction is the story. And a
+        our own harness</b> (it dropped inspeximus's headline from 1.00 to 0.75) — the correction is the story. And a
         joint paper with an external collaborator (TAT) decomposing a hard case, value-obscuring reversion, into
         a text half and a provenance half, with both sides reporting their own mistakes. Forthcoming.</p>
       <a class="go" href="https://dancenitra.github.io/agora/public/posts/we-fixed-our-own-memory-benchmark-until-it-stopped-flattering-us.html">read the write-up →</a>
@@ -199,10 +199,10 @@
     <div class="card">
       <div class="prop">a living index, not a snapshot</div>
       <div class="claim">This page updates as memory systems ship new versions, and as new systems are measured.</div>
-      <p class="note"><b>Edition 1 · 2026-07-12</b> — baseline. Three systems (mnemo, mem0 2.0.11, Graphiti)
+      <p class="note"><b>Edition 1 · 2026-07-12</b> — baseline. Three systems (inspeximus, mem0 2.0.11, Graphiti)
         across two cells (value-obscuring revert, echo resurrection), read by one ground-truth-blind judge. The
-        pre-publication audit caught an asymmetric instrument in our own harness and dropped mnemo's revert
-        headline from 1.00 to 0.75. Reference implementation at mnemo 0.7.19 (<code>revert</code>,
+        pre-publication audit caught an asymmetric instrument in our own harness and dropped inspeximus's revert
+        headline from 1.00 to 0.75. Reference implementation at inspeximus 0.7.19 (<code>revert</code>,
         <code>echo_guard</code>, <code>retract_lineage</code>, <code>rederive</code>,
         <code>governance_report</code>).</p>
       <p class="note" style="color:var(--gold)">Next edition triggers when a tracked system ships a version that
@@ -216,8 +216,8 @@
       revision (1985), truth-maintenance systems (Doyle, 1979), bitemporal databases. The reference
       implementation is ours; the point is the instrument, not the leaderboard.</p>
     <p style="margin-top:14px"><a href="https://github.com/DanceNitra/agent-memory-integrity">benchmark</a> ·
-      <a href="https://dancenitra.github.io/agora/public/mnemo/">mnemo</a> ·
-      <a href="https://pypi.org/project/agora-mnemo/">pypi</a> ·
+      <a href="https://dancenitra.github.io/agora/public/inspeximus/">inspeximus</a> ·
+      <a href="https://pypi.org/project/inspeximus/">pypi</a> ·
       <a href="https://dancenitra.github.io/agora/">agora</a> · MIT</p>
   </div>
 
