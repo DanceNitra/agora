@@ -567,8 +567,14 @@ def _persona(eid: str) -> str:
 # Each agent gets a mnemo store; recall is value-ranked (relevance × accrued value), not recency.
 # Guarded so a missing/broken mnemo never takes the dungeon down — it falls back to the plain list.
 try:
-    sys.path.insert(0, str(Path(__file__).resolve().parent.parent / "mnemo"))
-    from mnemo import Mnemo as _Mnemo
+    # Was: sys.path.insert(... / "mnemo") + `from mnemo import Mnemo`, which loaded a VENDORED copy
+    # of the library that sat beside the research probes and drifted a release behind the real one.
+    # The library is now a normal installed dependency (`pip install inspeximus`); only the probes
+    # stay in that directory. The fallback covers a pre-1.25 install still carrying the old name.
+    try:
+        from inspeximus import Mnemo as _Mnemo
+    except ImportError:
+        from mnemo import Mnemo as _Mnemo
 except Exception:
     _Mnemo = None
 _AGENT_MEM_DIR = Path(__file__).resolve().parent / ".agent_memory"

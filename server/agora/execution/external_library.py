@@ -51,7 +51,10 @@ REDDIT = [
 
 
 def _mnemo():
-    from mnemo import Mnemo
+    try:
+        from inspeximus import Mnemo
+    except ImportError:                       # pre-1.25 install still under the old name
+        from mnemo import Mnemo
     m = Mnemo(path=str(_STORE_PATH))
     m.echo_guard = True
     return m

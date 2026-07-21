@@ -29,7 +29,10 @@ def _mnemo():
     if _store is None:
         if str(_REPO) not in sys.path:
             sys.path.insert(0, str(_REPO))
-        from mnemo.mnemo import Mnemo
+        try:
+            from inspeximus import Mnemo
+        except ImportError:                   # pre-1.25 install still under the old name
+            from mnemo.mnemo import Mnemo
         _store = Mnemo(path=str(_STORE_PATH), embed=None)
     return _store
 
