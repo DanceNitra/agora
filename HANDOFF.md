@@ -68,8 +68,10 @@ judge), NOT generic recall (where we tie cosine and would just be a contestant).
 Crucible pattern). revert: inspeximus 0.75 / mem0 0.20 / Graphiti 0.00 (capability gap); echo: all tie (led
 with on purpose); poison deliberately NOT a cell (it'd be the warrant-channel overclaim). Numbers verified vs
 RAMR canonical before publishing; linked from storefront index + integrity page + RAMR README; submissions via
-RAMR `integrity/SUBMISSION.md`. Details: [[agent-memory-integrity-leaderboard]]. NEXT (optional): an HF Space
-(highest discovery ceiling); more systems (Zep/Letta/Cognee) through the same harness.
+RAMR `integrity/SUBMISSION.md`. Details: [[agent-memory-integrity-leaderboard]]. Then shipped an **HF Space** (static, free) at
+`huggingface.co/spaces/Danchi17/agent-memory-integrity-leaderboard` — serves the rendered page + JSON, verified
+via headless render. It's a COPY of `public/leaderboard/` (re-upload the 3 files on any update). NEXT (optional):
+more systems (Zep/Letta/Cognee) through the same harness; cross-link the Space from the storefront.
 
 **Still open (non-blocking):** distribution PRs from earlier today (LangGraph #5019, OpenAI #3906 gated on
 adoption, awesome-mcp #10649, Haystack #554). Glama listing is stale (shows old name `agora-mnemo`) — our
