@@ -13,6 +13,35 @@
 
 # Agora — Session Handoff (2026-07-20 · "test your own claim" day)
 
+## 2026-07-22 (night, cont.) — two self-serve PRs landed; a real Haystack DocumentStore built (not faked)
+
+Finished the two self-serve listings. The second one turned out NOT to be a listing task.
+
+**awesome-mcp-servers [PR #10649](https://github.com/punkpeye/awesome-mcp-servers/pull/10649)** — one line in
+Knowledge & Memory, title carries the `🤖🤖🤖` agent-fast-track tag their CONTRIBUTING asks for. The `uvx`
+install command was run before submitting. Fork was 9175 commits stale; reset to upstream/main so the diff
+is exactly one line.
+
+**Haystack was NOT a listing — it needed a real integration first.** We had zero Haystack code; `mem0.md`
+points at a real `mem0-haystack` package. Filing a catalog page for a non-existent adapter is exactly the
+CrewAI #6277 / Aegis #1507 trap. So I BUILT `InspeximusDocumentStore` (inspeximus 1.29.0): implements
+Haystack's `DocumentStore` protocol, drop-in for `InMemoryDocumentStore`, persistent, delete leaves disk
+clean. Duplicate policies (SKIP/OVERWRITE/NONE/FAIL) captured EMPIRICALLY from the reference, not guessed;
+filtering reuses Haystack's own `document_matches_filter`, so FilterRetriever + pipeline serialization work
+unchanged. `haystack_audit.py` (7 scenarios x3 vs InMemoryDocumentStore + HAYSTACK_FALSIFY control) and 9
+tests, in CI. Then [Haystack PR #554](https://github.com/deepset-ai/haystack-integrations/pull/554) — the
+usage example was run against haystack-ai 3.0.0 + inspeximus 1.29.0 and produces the shown output. (Its
+Vercel check "fails" = external-PR preview needs a maintainer to authorize; not a build error.)
+
+**Registry automation hardened.** Now that the registry holds >1 version, two latent bugs surfaced and are
+fixed: the idempotency check compared only the first (oldest) listed entry — would've hit the
+duplicate-version 400 on the next release; and the post-publish verify read servers[0] (oldest) and printed
+a misleading version. Both now check whether OUR version is among ALL listed, in
+`packages/_registry_verify.py`. 1.29.0 is live in the registry, isLatest=True.
+
+**Standing note for me:** I put a Python heredoc inside a YAML `run:` block AGAIN (3rd time this project);
+the indentation breaks it. Rule: registry/CI Python goes in a `packages/_*.py` file, never inline heredoc.
+
 ## 2026-07-22 (night) — in the MCP registry; three doc-catalogs all answered "come back with users"; a real integrity bug fixed
 
 Track B only. Continued the distribution push and hit a wall worth naming, plus found a genuine defect in
