@@ -1,0 +1,96 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Agent-Memory Integrity Leaderboard</title>
+<meta name="description" content="Recall leaderboards measure whether memory returns the right fact. None measure whether a CORRECTION sticks. This one does.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;0,6..72,600;1,6..72,400&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{--bg:#faf8f3;--ink:#17150f;--muted:#6b6656;--line:#e4dfd2;--accent:#0c7a55;--lead:#0c7a55}
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--ink);font-family:Newsreader,Georgia,serif;font-size:19px;line-height:1.55}
+  .wrap{max-width:820px;margin:0 auto;padding:56px 22px 90px}
+  .kicker{font-family:'JetBrains Mono',monospace;font-size:12.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--accent);margin:0 0 12px}
+  h1{font-size:40px;line-height:1.1;font-weight:600;margin:0 0 14px;letter-spacing:-.01em}
+  .tagline{font-size:22px;color:var(--ink);margin:0 0 8px}
+  .principle{color:var(--muted);font-style:italic;margin:0 0 26px}
+  .meta{font-family:'JetBrains Mono',monospace;font-size:12.5px;color:var(--muted);border-top:1px solid var(--line);border-bottom:1px solid var(--line);padding:12px 0;margin:0 0 34px;display:flex;flex-wrap:wrap;gap:8px 20px}
+  .cell{margin:0 0 40px}
+  h2{font-size:26px;font-weight:600;margin:0 0 6px}
+  .q{color:var(--muted);margin:0 0 16px}
+  table{width:100%;border-collapse:collapse;font-size:16px}
+  th{font-family:'JetBrains Mono',monospace;font-size:11.5px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);text-align:left;font-weight:500;padding:0 10px 8px;border-bottom:1px solid var(--line)}
+  .dir{text-transform:none;letter-spacing:0;font-weight:400}
+  td{padding:11px 10px;border-bottom:1px solid var(--line);vertical-align:top}
+  .pos{font-family:'JetBrains Mono',monospace;color:var(--muted);width:26px}
+  .sys{font-family:'JetBrains Mono',monospace;font-weight:500;white-space:nowrap}
+  .val{font-family:'JetBrains Mono',monospace;font-weight:600;white-space:nowrap}
+  .ci{font-weight:400;color:var(--muted);font-size:12.5px}
+  .note{color:var(--muted);font-size:15px}
+  tr.lead .sys,tr.lead .val{color:var(--lead)}
+  .framing{font-size:16px;color:var(--muted);margin:14px 0 0;padding:12px 16px;background:#f2efe6;border-left:3px solid var(--accent);border-radius:0 6px 6px 0}
+  .submit{margin:44px 0 0;padding:22px 24px;border:1px solid var(--line);border-radius:12px;background:#fff}
+  .submit h3{margin:0 0 8px;font-size:20px}
+  .submit p{margin:0 0 14px;color:var(--muted);font-size:16px}
+  a.go{display:inline-block;font-family:'JetBrains Mono',monospace;font-size:13px;font-weight:600;color:#fff;background:var(--accent);text-decoration:none;padding:9px 15px;border-radius:7px}
+  a{color:var(--accent)}
+  footer{margin:40px 0 0;font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--muted)}
+  footer a{color:var(--muted)}
+</style>
+</head>
+<body>
+  <div class="wrap">
+    <p class="kicker">agent-memory integrity · a standing leaderboard</p>
+    <h1>Agent-Memory Integrity Leaderboard</h1>
+    <p class="tagline">Recall leaderboards measure whether memory returns the right fact. None measure whether a CORRECTION sticks. This one does.</p>
+    <p class="principle">We lead with the cell we TIE, and we publish the cells we don&#x27;t win. A leaderboard you only ever top is one you built to flatter yourself.</p>
+    <div class="meta">
+      <span>3 systems</span>
+      <span>judge: gpt-4o-mini, blind</span>
+      <span>n=20 · native configs</span>
+      <span>updated 2026-07-22</span>
+    </div>
+    <section class="cell">
+      <h2>Value-obscuring revert</h2>
+      <p class="q">The user says “go back to what we had” and names no value. Can the store undo a correction on that unmarked command?</p>
+      <table>
+        <thead><tr><th>#</th><th>system</th><th>success rate <span class="dir">(higher is better)</span></th><th>how</th></tr></thead>
+        <tbody>
+<tr class="lead"><td class="pos">1</td><td class="sys">inspeximus</td><td class="val">0.75 <span class="ci">CI [0.53, 0.89]</span></td><td class="note">intent router restores the predecessor from the version ledger</td></tr>
+<tr class=""><td class="pos">2</td><td class="sys">mem0 2.0.11</td><td class="val">0.20 <span class="ci">CI [0.08, 0.42]</span></td><td class="note">no revert operation; the corrected value is retained</td></tr>
+<tr class=""><td class="pos">3</td><td class="sys">Graphiti</td><td class="val">0.00 <span class="ci">CI [0.00, 0.16]</span></td><td class="note">no revert operation; bitemporal invalidation fires on named contradictions, not an unnamed “go back”</td></tr>
+        </tbody>
+      </table>
+      <p class="framing">A capability gap, not a tuning gap: only a system with an explicit revert channel can undo a correction on command. Judge-independent — the competitors structurally lack the operation; the judge model only shifts inspeximus&#x27;s absolute rate.</p>
+    </section>
+    <section class="cell">
+      <h2>Echo resurrection</h2>
+      <p class="q">After a correction, if the OLD value is re-stated, does the store keep the corrected value or resurrect the stale one?</p>
+      <table>
+        <thead><tr><th>#</th><th>system</th><th>resurrection rate <span class="dir">(lower is better)</span></th><th>how</th></tr></thead>
+        <tbody>
+<tr class=""><td class="pos">—</td><td class="sys">inspeximus</td><td class="val">0.00 </td><td class="note">echo_guard blocks the restated stale value</td></tr>
+<tr class=""><td class="pos">—</td><td class="sys">mem0 2.0.11</td><td class="val">0.00 </td><td class="note">defends</td></tr>
+<tr class=""><td class="pos">—</td><td class="sys">Graphiti</td><td class="val">0.00 </td><td class="note">defends</td></tr>
+        </tbody>
+      </table>
+      <p class="framing">A TIE — all three defend. This is the cell we lead with on purpose.</p>
+    </section>
+    <div class="submit">
+      <h3>Add your system</h3>
+      <p>One shared, ground-truth-blind judge reads each system's own recall surface — no home-field instrument. The harness is open; run it or submit your system by PR and it appears here.</p>
+      <a class="go" href="https://github.com/DanceNitra/ramr/blob/main/integrity/SUBMISSION.md">submit your system →</a>
+    </div>
+    <footer>
+      machine-readable: <a href="leaderboard.json">leaderboard.json</a> ·
+      method: <a href="https://github.com/DanceNitra/ramr/blob/main/integrity/METHODOLOGY.md">METHODOLOGY</a> ·
+      benchmark: <a href="https://github.com/DanceNitra/ramr/tree/main/integrity">RAMR</a> ·
+      <a href="https://doi.org/10.5281/zenodo.20818291">DOI</a> ·
+      <a href="https://dancenitra.github.io/agora/">agora</a> · MIT
+    </footer>
+  </div>
+</body>
+</html>
