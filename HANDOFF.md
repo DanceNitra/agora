@@ -60,8 +60,21 @@ live home for the integrity benchmark; the two peripheral surfaces point at it.
   (archived repos also return 200) + last-push date, NOT `.archived`. LESSON: judge a repo's liveness with
   `gh api repos/X --jq .archived`, not the HTTP code.
 
+**Then: shipped the Agent-Memory Integrity Leaderboard** (owner "poď na ten leaderboard") — the top
+value/effort lever from the distribution map. LoCoMo/LongMemEval have NO leaderboard, so we host one and are
+the REFEREE, not a contestant; deliberately on the INTEGRITY axis (revert/echo cross-system through a blind
+judge), NOT generic recall (where we tie cosine and would just be a contestant). LIVE at
+`dancenitra.github.io/agora/public/leaderboard/` (+ machine-readable `leaderboard.json`, `tools/render_leaderboard.py`,
+Crucible pattern). revert: inspeximus 0.75 / mem0 0.20 / Graphiti 0.00 (capability gap); echo: all tie (led
+with on purpose); poison deliberately NOT a cell (it'd be the warrant-channel overclaim). Numbers verified vs
+RAMR canonical before publishing; linked from storefront index + integrity page + RAMR README; submissions via
+RAMR `integrity/SUBMISSION.md`. Details: [[agent-memory-integrity-leaderboard]]. NEXT (optional): an HF Space
+(highest discovery ceiling); more systems (Zep/Letta/Cognee) through the same harness.
+
 **Still open (non-blocking):** distribution PRs from earlier today (LangGraph #5019, OpenAI #3906 gated on
-adoption, awesome-mcp #10649, Haystack #554). Full RAMR state: [[ramr-integrity-conditioned-recall-metric]].
+adoption, awesome-mcp #10649, Haystack #554). Glama listing is stale (shows old name `agora-mnemo`) — our
+`glama.json` maintainers marker is correct but Glama hasn't re-crawled; the claim/refresh is an owner web
+action on glama.ai (no API), LOW PRIORITY cosmetic. Full RAMR state: [[ramr-integrity-conditioned-recall-metric]].
 
 ## 2026-07-22 (night, cont.) — two self-serve PRs landed; a real Haystack DocumentStore built (not faked)
 
