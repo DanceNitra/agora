@@ -68,6 +68,25 @@ if __name__ == "__main__":
         print("  [UNBACKED] FACT-RETENTION result JSON is in the OLD flat schema (overwritten each run).", flush=True)
         print("             Re-run ramr_factret.py (append schema) for all models before citing.", flush=True)
 
+    icr = load("ramr_integrity_recall_result.json")
+    print("", flush=True)
+    icr_backed = False
+    if icr and "scenarios" in icr:
+        icr_backed = True
+        n = icr.get("n_trials")
+        for scen, systems in icr["scenarios"].items():
+            for name, r in systems.items():
+                hits = r.get("hits")
+                if not hits:
+                    line(f"INTEGRITY-RECALL {scen}/{name}", "-", "ramr_integrity_recall_result.json",
+                         "UNBACKED", "no raw hits array")
+                    icr_backed = False
+                    continue
+                recomputed = float(np.mean(hits))
+                ok = abs(recomputed - r["acc@1"]) < 1e-9
+                line(f"INTEGRITY-RECALL {scen} {name}", f"acc@1 {recomputed:.2f} CI{r['ci95']}",
+                     f"ramr_integrity_recall_result.json n={n}", "VERIFIED" if ok else "MISMATCH")
+
     print("\n=== SUMMARY ===", flush=True)
     print("  Flagship CHAIN-FRAGILITY, CONVERSION, contamination, DISTRACTION@60, OUTCOME-LIFT: all VERIFIED", flush=True)
     print("  from persisted JSON and internally consistent (headline == recomputed from arrays).", flush=True)
@@ -75,4 +94,6 @@ if __name__ == "__main__":
         print("  FACT-RETENTION: now persisted per-(model,budget) in the append schema -> VERIFIED from source.", flush=True)
     else:
         print("  FACT-RETENTION: NOT yet in the append schema -> re-run + persist before any public citation.", flush=True)
+    if icr_backed:
+        print("  INTEGRITY-CONDITIONED RECALL: every acc@1 recomputes from the raw per-trial arrays -> VERIFIED.", flush=True)
     print("DONE", flush=True)

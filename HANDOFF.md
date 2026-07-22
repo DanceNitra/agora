@@ -13,6 +13,47 @@
 
 # Agora — Session Handoff (2026-07-20 · "test your own claim" day)
 
+## 2026-07-22 (latest) — RAMR shipped the integrity metric via 3 gated releases; the gate caught 3 real defects
+
+Track B. The owner's steer: "don't proliferate parallel benchmarks — build ON RAMR" ([[ramr-benchmark-published]]).
+So INTEGRITY-CONDITIONED RECALL (does recall return the correct CURRENT value after supersession/revert/poison)
+was folded INTO the public RAMR benchmark, over three gated public releases + one package patch. **Every public
+push was owner-gated ("pushni to") and ran a 2-agent adversarial pre-pub audit first.**
+
+**What shipped (all verified live):**
+- **RAMR v0.4.2** (tag): renamed the vendored library `mnemo` → `inspeximus` across the repo, zero trace
+  (`mnemo/mnemo.py` now 404s on the remote). Rename-only → numbers reproduce. Zenodo DOI …21495564.
+- **RAMR v0.4.3** (tag): the INTEGRITY-CONDITIONED RECALL metric (`ramr_integrity_recall.py`, verify_numbers-backed,
+  raw arrays) + re-vendored the core 0.6.10 → 1.29.0. Zenodo DOI **10.5281/zenodo.21496078** (concept
+  …20818291 preserved). HF dataset `Danchi17/ramr` refreshed (card + CITATION at 0.4.3).
+- **inspeximus 1.29.1** (PyPI): cleaned an internal path (`agora_output/lab/memops/keying_recall.py`) that a core
+  docstring leaked — it was live in the published package. Verified gone from the installed wheel.
+
+**The numbers (honest framing is the point):** revert = the unique win (inspeximus 1.00 vs cosine-recency 0.00,
+naive 0.55 — recency has no revert op); supersession = a TIE with a fair recency baseline (both 1.00); poison =
+a WARRANT-CHANNEL DEMONSTRATION, **not injection detection** (see below).
+
+**The gate caught THREE real defects nobody would expect from "it's just a rename":**
+1. A `pip install agora-inspeximus` line in the README that 404s (the package is `inspeximus`) — a broken
+   install instruction every user would hit.
+2. The internal-path leak in the re-vendored core — which was ALSO live in the published PyPI package (→ 1.29.1).
+3. **The poison overclaim, caught AGAIN** (same class as [[adversarial-conflict-the-real-inspeximus-moat]]):
+   the poison headline (warrant 1.00 vs 0.00) does NOT measure injection resistance — it measures obedience to a
+   trust label the harness HANDS the truth (`credit(warrant="external")`) and withholds from the poison, using a
+   warrant string the core's own docs call spoofable by the injecting attacker. REFRAMED, not killed (revert +
+   the supersession-tie are clean). LESSON: any "inspeximus beats X on poison/conflict" via warrant/credit is a
+   trust==truth tautology unless the attacker is denied the warrant channel too.
+
+**Re-vendor validation (0.6.10 → 1.29.0):** all inspeximus harnesses re-run — verdicts hold, OUTCOME-LIFT drift
++0.000; two secondary numbers refreshed and disclosed (CROSS-SCOPE-LEAKAGE 0.82→0.80; breakeven boost arm ≤0.03,
+cited +0.00 holds). Every Zenodo mint built a FRESH `git archive HEAD` zip (the tool hardcodes a pre-built zip —
+the old one still had mnemo; verify mnemo-free + no internal-path before every upload). Full state:
+[[ramr-integrity-conditioned-recall-metric]].
+
+**NOT done / open:** nothing blocking. The standalone `agora/public/integrity/index.html` is now redundant with
+the RAMR metric (point it at RAMR or retire it). Distribution PRs from earlier today still open (LangGraph #5019,
+OpenAI #3906 gated on adoption, awesome-mcp #10649, Haystack #554).
+
 ## 2026-07-22 (night, cont.) — two self-serve PRs landed; a real Haystack DocumentStore built (not faked)
 
 Finished the two self-serve listings. The second one turned out NOT to be a listing task.
