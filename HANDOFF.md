@@ -13,6 +13,49 @@
 
 # Agora — Session Handoff (2026-07-20 · "test your own claim" day)
 
+## 2026-07-22 (night) — in the MCP registry; three doc-catalogs all answered "come back with users"; a real integrity bug fixed
+
+Track B only. Continued the distribution push and hit a wall worth naming, plus found a genuine defect in
+our own integrity layer while preparing a PR.
+
+**LIVE: the official MCP registry.** `io.github.DanceNitra/inspeximus` 1.28.1, status active, package
+`pypi inspeximus 1.28.1`. Published from CI via `mcp-publisher login github-oidc` — no human login, and it
+re-runs on every release so the listing can't drift (it had: server.json was pinned at 1.24.4 while 1.28.0
+shipped). The job is idempotent (asks the registry before publishing; the registry 400s a duplicate
+version) and fetches registry state with curl, because urllib times out against that host on the runner AND
+locally while curl and the Go publisher succeed. Glama/Smithery/PulseMCP all crawl this registry, so the
+one publish should cascade.
+
+**A REAL BUG, found by dogfooding before a PR (fixed, 1.28.1).** Constructing `Inspeximus` with
+`receipt_key` but no `receipt_pubkey` signed every write receipt with `"pubkey": None`, so `verify_writes()`
+reported "invalid signature" on records the store had just written itself — the integrity layer we sell was
+crying tampering at its own output. Every existing receipts test passed BOTH halves (the documented happy
+path), which is why it survived. Public key is now derived from the private one; a bad key is rejected at
+construction, not thousands of writes later. Three regression tests, including the control that tamper
+detection still fires on a real edit. Found only because I verified the claim instead of describing it.
+
+**THE WALL (this is the strategic point). Three doc-catalogs now say the same thing:**
+- OpenAI Agents SDK [PR #3906](https://github.com/openai/openai-agents-python/pull/3906) — OPEN, but
+  maintainer `seratch`: *"It seems like the project is still pretty new, so we'd like to wait and see
+  whether people start using it."*
+- ADK docs — their own precedent (#1565 closed in 13h) is "don't file the same day you ship."
+- Pydantic AI — rejected two memory packages last month as "brand new… not quite there yet."
+
+The bottleneck is no longer *routes*, it is *adoption evidence*. Under the new name every download counter
+resets to today (pypistats has no data yet; zep-cloud does 342k/mo for scale). Filing more gated catalog
+PRs now just collects more "come back later" replies and can sour a first impression. **The next lever is
+usage, not listings** — self-serve surfaces that don't gate (MCP registry: done; awesome-mcp-servers and
+Haystack: still open, both self-serve), plus something that actually drives installs. Full route map with
+OPEN/CLOSED verdicts + evidence: memory `distribution-routes-map-2026-07-21`.
+
+**Sittng OPEN, no action needed from us:** LangGraph docs [#5019](https://github.com/langchain-ai/docs/pull/5019)
+(20/20 green, in their queue), OpenAI [#3906](https://github.com/openai/openai-agents-python/pull/3906)
+(labeled `documentation`, maintainer watching for adoption).
+
+**NEXT (no owner action needed):** awesome-mcp-servers PR, Haystack integrations PR (both one file, no
+maturity gate). Then stop listing and think about what drives real usage. Google CLA still only needed for
+the ADK docs PR, which is deliberately deferred.
+
 ## 2026-07-21 (later) — distribution track: LangGraph docs PR filed, ADK shipped, and a market read I got wrong
 
 Track B only (the memory product). Two integration ecosystems, both entered through their official routes.
