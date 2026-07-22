@@ -50,9 +50,18 @@ cited +0.00 holds). Every Zenodo mint built a FRESH `git archive HEAD` zip (the 
 the old one still had mnemo; verify mnemo-free + no internal-path before every upload). Full state:
 [[ramr-integrity-conditioned-recall-metric]].
 
-**NOT done / open:** nothing blocking. The standalone `agora/public/integrity/index.html` is now redundant with
-the RAMR metric (point it at RAMR or retire it). Distribution PRs from earlier today still open (LangGraph #5019,
-OpenAI #3906 gated on adoption, awesome-mcp #10649, Haystack #554).
+**Consolidation to ONE canonical home — DONE + VERIFIED (every link resolves, no 404):** RAMR is now the single
+live home for the integrity benchmark; the two peripheral surfaces point at it.
+- `agora/public/integrity/index.html` — repointed its three benchmark links from the standalone
+  `agent-memory-integrity` repo to RAMR (repo + `integrity/` module + concept DOI); links-only, page design
+  untouched; cited revert numbers (0.75 / 0.20 / 0.00) confirmed to match RAMR's METHODOLOGY.
+- `github.com/DanceNitra/agent-memory-integrity` — was ALREADY archived (read-only) with a live "→ moved into
+  RAMR" README (done 2026-07-19). I first mis-flagged it as "live, needs archiving" because I checked HTTP 200
+  (archived repos also return 200) + last-push date, NOT `.archived`. LESSON: judge a repo's liveness with
+  `gh api repos/X --jq .archived`, not the HTTP code.
+
+**Still open (non-blocking):** distribution PRs from earlier today (LangGraph #5019, OpenAI #3906 gated on
+adoption, awesome-mcp #10649, Haystack #554). Full RAMR state: [[ramr-integrity-conditioned-recall-metric]].
 
 ## 2026-07-22 (night, cont.) — two self-serve PRs landed; a real Haystack DocumentStore built (not faked)
 
