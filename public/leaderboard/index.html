@@ -64,7 +64,7 @@
 <tr class=""><td class="pos">3</td><td class="sys">Graphiti</td><td class="val">0.00 <span class="ci">CI [0.00, 0.16]</span></td><td class="note">no revert operation; bitemporal invalidation fires on named contradictions, not an unnamed “go back”</td></tr>
         </tbody>
       </table>
-      <p class="framing">A capability gap, not a tuning gap: only a system with an explicit revert channel can undo a correction on command. Judge-independent — mem0 and Graphiti structurally lack the operation; the judge model only shifts inspeximus&#x27;s absolute rate. (Revert is rare, not unique: Letta ships an engine-level checkpoint-undo, not tested here.)</p>
+      <p class="framing">A capability gap, not a tuning gap: only a system with an explicit revert channel can undo a correction on command. Judge-independent — mem0 and Graphiti structurally lack the operation; the judge model only shifts inspeximus&#x27;s absolute rate. (Revert is rare, not unique: Letta ships an engine-level checkpoint-undo, not tested here.) It is also broadly underserved: even <a href="https://platform.claude.com/docs/en/managed-agents/memory">Anthropic&#x27;s own agent-memory API</a> (<code>agent-memory-2026-07-22</code> beta) has no dedicated restore endpoint — to roll back you retrieve a prior version and write its content back by hand — so revert-conditioned recall is an industry-wide gap, not a two-vendor one.</p>
     </section>
     <section class="cell">
       <h2>Echo resurrection</h2>

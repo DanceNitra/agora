@@ -162,7 +162,7 @@
       <p class="note" style="margin-top:12px">Among the systems tested here, only inspeximus exposes a <em>first-class</em>
         channel to undo a correction on command; mem0 and Graphiti have none, so the CIs don't overlap and the capability
         gap is real. (Revert is rare, not ours alone — Letta ships an engine-level checkpoint-undo, though it is not
-        surfaced as a recall-integrity operation.) Echo resurrection is a tie — all three defend.</p>
+        surfaced as a recall-integrity operation.) Revert is broadly underserved — even <a href="https://platform.claude.com/docs/en/managed-agents/memory">Anthropic&#x27;s agent-memory API</a> (beta, Jul 2026) has no dedicated restore endpoint, only manual version write-back. Echo resurrection is a tie — all three defend.</p>
       <a class="go solid" href="https://github.com/DanceNitra/ramr/tree/main/integrity">run it / add your system →</a>
     </div>
   </section>
