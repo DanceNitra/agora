@@ -159,8 +159,10 @@
         <div class="tr"><b>mem0 2.0.11</b><span>0.20</span><span>[0.08, 0.42]</span></div>
         <div class="tr"><b>Graphiti</b><span>0.00</span><span>[0.00, 0.16]</span></div>
       </div>
-      <p class="note" style="margin-top:12px">Only inspeximus exposes a channel to undo a correction on command; the
-        CIs don't overlap, so the capability gap is real. Echo resurrection is a tie — all three defend.</p>
+      <p class="note" style="margin-top:12px">Among the systems tested here, only inspeximus exposes a <em>first-class</em>
+        channel to undo a correction on command; mem0 and Graphiti have none, so the CIs don't overlap and the capability
+        gap is real. (Revert is rare, not ours alone — Letta ships an engine-level checkpoint-undo, though it is not
+        surfaced as a recall-integrity operation.) Echo resurrection is a tie — all three defend.</p>
       <a class="go solid" href="https://github.com/DanceNitra/ramr/tree/main/integrity">run it / add your system →</a>
     </div>
   </section>
