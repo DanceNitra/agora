@@ -79,13 +79,17 @@ def _windowed_baselines(theme: str, days: int) -> dict:
     from agora.execution.data_tool import (hackernews_window_count, github_window_count,
                                            pubmed_window_count)
     bl = {}
-    for m, fn in (("pubmed_papers", pubmed_window_count), ("github_repos", github_window_count),
+    # pubmed_papers DROPPED 2026-07-23: the resolved ledger measured it 90% wrong (98/109 incorrect),
+    # far worse than github_repos (65%) / hackernews (75%), and it dominated the ledger (62% of resolved
+    # calls) because cumulative PubMed counts are usually the max baseline. Volatile/laggy proxy; removed
+    # from the metric set so predictions run on the two less-noisy attention rates.
+    for m, fn in (("github_repos", github_window_count),
                   ("hackernews_stories", hackernews_window_count)):
         try:
             bl[m] = int(fn(theme, days) or 0)
         except Exception:
             bl[m] = 0
-    metric = max(bl, key=lambda k: bl[k]) if any(bl.values()) else "pubmed_papers"
+    metric = max(bl, key=lambda k: bl[k]) if any(bl.values()) else "github_repos"
     return {"theme": theme, "metric": metric, "metric_label": f"{_METRIC_LABEL[metric]} ({days}d)",
             "baseline": bl[metric], "all_baselines": bl, "mode": "rate", "window_days": days}
 
