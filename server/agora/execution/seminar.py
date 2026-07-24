@@ -394,7 +394,14 @@ def record_contribution(topic: dict, partners: list[str], claim: str, evidence: 
     cid = _id(claim)
     c = {"id": cid, "ts": time.time(), "topic_id": topic.get("id"),
          "topic": topic.get("headline") or topic.get("topic", "")[:80],
-         "partners": partners[:4], "claim": claim[:400], "evidence": evidence[:300],
+         # EVERY contributor is named, not the first four. `partners[:4]` silently credited the same
+         # half of the roster on every contribution: measured 2026-07-25 over 7 days, Kael/Mira/Orin/
+         # Aldric appeared in all 118 records while Elara, Voss, Wren and Rooke appeared in ZERO --
+         # despite the seminar log showing they took part in 146, 146, 114 and 114 rounds and were
+         # never once skipped by agent_can_contribute. The cap was truncating by NPC order, so it
+         # always cut the same four, and two of them (Wren, Rooke) carry the lowest trust scores in
+         # the roster. Contributor lists are bounded by the 8-agent seminar anyway.
+         "partners": list(partners), "claim": claim[:400], "evidence": evidence[:300],
          "falsifier": falsifier[:300], "links": [str(x)[:80] for x in links][:5],
          "basis": basis,
          "grounded": bool(evidence and not _REFUSAL.search(evidence)), "verified": False}
@@ -544,7 +551,10 @@ def research_report(hours: int = 3) -> str:
     lines.append(f"Rounds: {len(rounds)} | Contributions: {len(contribs)} "
                  f"(grounded {sum(1 for c in contribs if c.get('grounded'))})")
     for c in contribs[-5:]:
-        who = "+".join(c.get("partners", [])[:3])
+        # Still abbreviated for Telegram, but it now SAYS so. Showing a bare three of eight is what
+        # made the seminar read like a three-agent club in every report the owner saw.
+        _p = c.get("partners", [])
+        who = "+".join(_p[:3]) + (f" +{len(_p) - 3} more" if len(_p) > 3 else "")
         lines.append(f"+ [{c.get('topic','')[:32]}] {c['claim'][:90]}  ({who})")
     if not contribs:
         lines.append("(no new contributions — topics too thin or memory had nothing relevant)")
