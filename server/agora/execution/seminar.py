@@ -114,6 +114,39 @@ def _id(seed: str) -> str:
 
 
 # ── Layer 3: topics as the unit of value ────────────────────────────────────
+_FRONTIER_FILE = _SERVER.parent / ".frontier_directions.json"   # repo root, same file the API serves
+
+
+def _open_frontier_topic(topics: list) -> dict | None:
+    """Open the next unused question from the owner's standing frontier directions.
+
+    These are curated research questions (same file `/brain/directions/current` serves), so they skip
+    the junk filter the way board/claude topics do. Rotates: the first direction whose headline is not
+    already a topic. Returns None when the file is missing or every direction is already in the pool.
+    """
+    import json
+    try:
+        dirs = list(json.loads(_FRONTIER_FILE.read_text(encoding="utf-8")))
+    except Exception:
+        return None
+    seen = {t.get("headline", "").lower() for t in topics}
+    for d in dirs:
+        title = (d.get("title") or "").strip() if isinstance(d, dict) else str(d).strip()
+        if not title or title.lower() in seen:
+            continue
+        t = {"id": _id(title), "headline": title,
+             "topic": (d.get("why") or "").strip() if isinstance(d, dict) else "",
+             "source": "frontier", "status": "open", "n_contrib": 0, "contribution_ids": [],
+             "opened": time.time(), "last_advanced": 0.0}
+        if not t["topic"]:
+            t["topic"] = (f"Advance this frontier question with a NEW finding: {title} — state what "
+                          f"would refute it and what a runnable test would measure.")
+        topics.append(t)
+        _save(_TOPICS, topics)
+        return t
+    return None
+
+
 def pick_topic(vault: str) -> dict:
     """A REAL open research question to collaborate on. Prefers deepening an existing open
     thread (fewest contributions first) so topics actually advance; otherwise opens a fresh one
@@ -126,6 +159,21 @@ def pick_topic(vault: str) -> dict:
     live = [t for t in topics if t.get("status") in ("open", "advancing")
             and t.get("n_contrib", 0) < _MAX_PER_TOPIC and t.get("attempts", 0) < _MAX_ATTEMPTS
             and (t.get("source") in ("board", "claude") or _is_real_topic(t.get("headline", "")))]
+
+    # FRONTIER QUOTA — always keep at least one live topic from the owner's standing frontier.
+    #
+    # Measured 2026-07-25: 11 live topics, 10 cross-domain vault bridges + 1 board, and ZERO from
+    # .frontier_directions.json — which held 11 well-formed agent-memory questions the board had set.
+    # The frontier reached the dungeon's quest pool (via /brain/directions/current) but there was no
+    # path from it into the SEMINAR's topic pool, which is what produces the visible research. And the
+    # deepen rule below fires whenever len(live) >= 3, so with a pool of bridges it never reached the
+    # fresh-open branch at all: the drift was self-sustaining, and the owner read reports about
+    # "Dopamine Reward System x Embedded Systems" while the frontier questions sat unread.
+    # Checked BEFORE deepening, or a full pool would keep starving it.
+    if not any(t.get("source") == "frontier" for t in live):
+        ft = _open_frontier_topic(topics)
+        if ft:
+            return ft
     # 1) deepen the least-advanced live thread most of the time
     if live and (len(live) >= 3 or (int(time.time()) % 3) != 0):
         # fewest contributions first, then fewest attempts → rotate across live topics instead of
