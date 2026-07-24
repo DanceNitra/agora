@@ -1403,7 +1403,23 @@ def _brain_get_sync(path: str, timeout: int = 4):
 # and are exactly the kind of thing that must answer to the board.
 _INBOX_ALWAYS = ("learn from outcomes", "forge ideas", "synthesize roadmap", "scout triage",
                  "scout outreach", "correspondence reply",
-                 "cc:", "build:", "number-picks", "compose outreach")
+                 "cc:", "build:", "number-picks", "compose outreach",
+                 # These two have no RESEARCH subject to gate on — their subject is Agora itself, the
+                 # same reason "synthesize roadmap" and "learn from outcomes" are already here. Gating
+                 # them against a 37-word research vocabulary was a category error, and it was eating
+                 # them whole: measured 2026-07-25 over one log window, 54 drops, of which 17 were
+                 # "attempt grand synthesis" and 12 were "forge analogy".
+                 # The synthesis one is the worse loss. _run_synthesis_detector is Orin's flagship
+                 # ability and deliberately rare — it fires ONLY when the canon's phase-transition
+                 # precursors cross threshold, and its theme text ("the phase-transition precursors
+                 # crossed threshold (bridge accel x2.0, 200 open falsifiers...)") can never contain a
+                 # board keyword, so every single firing was discarded. That is why the panel reads
+                 # "open falsifiers 200 · deepened 0 · synthesis pressure 35.33": the pressure kept
+                 # climbing precisely because the attempts never arrived.
+                 # NOT added: bridges and deepened insights (18 + 17 drops in the same window). Those
+                 # DO name a research subject and are exactly the off-mission vault churn this gate
+                 # was built to stop — they stay gated.
+                 "attempt grand synthesis", "forge analogy")
 
 
 # Subjects the board explicitly refuses, kept separate from what it asks for. Derived from the tail of
