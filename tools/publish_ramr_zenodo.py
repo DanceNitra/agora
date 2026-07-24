@@ -35,7 +35,7 @@ META = {"metadata": {
                     "SQLite FTS5/BM25 and dense-vector retrieval), and a number-verification ledger. A "
                     "findings+method release; numbers are synthetic and directional. Code: "
                     "https://github.com/DanceNitra/ramr"),
-    "creators": [{"name": "Agora"}],
+    "creators": [{"name": "Drahoš, Rastislav", "affiliation": "Agora"}],
     "keywords": ["benchmark", "agent-memory", "retrieval-augmented-generation", "evaluation", "llm",
                  "vector-search", "consolidation"],
     "license": "MIT",
