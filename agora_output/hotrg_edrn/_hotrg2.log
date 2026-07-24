@@ -1,0 +1,5 @@
+=== re-validate (nlow=8) ===
+  L2 chi=8 E0=-16.921463  (ED -16.921463)
+=== L3 energy convergence in chi (bare gasket, 42 spins) ===
+  chi=  8: L3 E0=-48.51850  E0/N=-1.15520  (12s)
+  chi= 12: L3 E0=-48.96744  E0/N=-1.16589  dE=-0.4489  (185s)

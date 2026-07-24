@@ -1,0 +1,8 @@
+L3 chi=3 dim=1769472 built (182s)
+C:\Users\Danculus\AppData\Local\Temp\claude\C--Users-Danculus-agora\503fb1b2-baee-4249-9bce-547fa7a671e0\scratchpad\exp8\hotrg_imp_gpu.py:17: UserWarning: Sparse CSR tensor support is in beta state. If you miss a functionality in the sparse tensor support, please submit a feature request to https://github.com/pytorch/pytorch/issues. (Triggered internally at C:\actions-runner\_work\pytorch\pytorch\pytorch\aten\src\ATen\SparseCsrTensorImpl.cpp:55.)
+  return torch.sparse_csr_tensor(torch.tensor(c.indptr,dtype=torch.int64),
+L3 chi=3: DEPTH=0.0775 bonds=18 min_at=0.50 (GPU 15s)
+  curve=[np.float64(0.2671), np.float64(0.2554), np.float64(0.3041), np.float64(0.3177), np.float64(0.3245), np.float64(0.328), np.float64(0.33), np.float64(0.3312), np.float64(0.332), np.float64(0.3325), np.float64(0.3329), np.float64(0.3332)]
+L3 chi=4 dim=4194304 built (1344s)
+L3 chi=4: DEPTH=0.1972 bonds=18 min_at=0.25 (GPU 521s)
+  curve=[np.float64(0.0748), np.float64(0.0833), np.float64(0.132), np.float64(0.1782), np.float64(0.2097), np.float64(0.2304), np.float64(0.2445), np.float64(0.2546), np.float64(0.2621), np.float64(0.2678), np.float64(0.2723), np.float64(0.276)]
