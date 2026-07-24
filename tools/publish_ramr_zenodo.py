@@ -10,7 +10,7 @@ import os, re, sys, json, urllib.request
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 REPO = os.environ.get("RAMR_REPO_DIR", "C:/Users/Danculus/ramr-pub")
-ZIP = os.path.join(REPO, "ramr-v0.5.0.zip")
+ZIP = os.path.join(REPO, "ramr-v0.5.1.zip")
 SANDBOX = "--sandbox" in sys.argv
 BASE = "https://sandbox.zenodo.org" if SANDBOX else "https://zenodo.org"
 FILES = [ZIP, os.path.join(REPO, "README.md"), os.path.join(REPO, "CITATION.cff")]
@@ -40,7 +40,7 @@ META = {"metadata": {
                  "vector-search", "consolidation"],
     "license": "MIT",
     "access_right": "open",
-    "version": "0.5.0",
+    "version": "0.5.1",
     "related_identifiers": [
         {"relation": "isSupplementTo", "identifier": "https://github.com/DanceNitra/ramr", "scheme": "url"}],
 }}
