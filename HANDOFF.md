@@ -13,6 +13,50 @@
 
 # Agora — Session Handoff (2026-07-20 · "test your own claim" day)
 
+## 2026-07-25 (latest) — 1.64.0: the documented install path silently lost everything
+
+Six rounds audited the source. This one audited the **shipped wheel as a new user meets it** — clean venv,
+`pip install inspeximus`, README followed verbatim, never look at the checkout. Two of three findings mean the
+product forgot everything between sessions on the paths its own docs tell you to use.
+
+**No directory was ever created.** The plugin advertises `.inspeximus/memory.json`; in a fresh project that
+folder does not exist and nothing created it. `remember()` returned an id, in-process recall worked, a NEW
+process saw `[]`, nothing was written and nothing printed — over MCP not even a warning.
+
+**`~` was never expanded.** The README's headline MCP command is
+`INSPEXIMUS_PATH=~/.inspeximus_memory.json`, as is the Claude Desktop / Cursor JSON. A literal `~` is not a
+directory, so **every documented MCP setup lost its memory on restart**. Both fixed at one place (expanduser +
+mkdir); an *unwritable* parent still surfaces, pinned by a test so the fix cannot turn a real failure silent.
+
+**My 1.63.0 certificate fix rejected honest certificates.** `erasure_certificate(request_id=X)` summarises ONE
+request but ships the WHOLE tombstone chain, and I compared the scoped claim against the unscoped chain — so
+any store that had served more than one DSAR failed its own certificate. Now scoped by the certificate's own
+`request_ids`; forgery still caught, including swapping in another request's ids under the same scope label.
+**The test I wrote for that fix could not see it** — its fixture made a single request, the one shape where
+scoped and unscoped are identical. *Ask what shape a fixture CANNOT express.*
+
+**Smaller, all from the shipped artefact:** the update check pointed at `agora-inspeximus`, which 404s, so the
+notice could never fire and would have named a package that does not exist (twin of the `claims_audit.py` bug
+fixed in 1.54.0); the MCP handshake reported the SDK's version `1.28.1` as inspeximus's; and the LlamaIndex
+adapter failed on `pydantic` before reaching llama_index, naming the wrong dependency.
+
+500 tests; 6 mutations each killed by its own test. Verified from PyPI in a fresh directory: nested dir
+created, new process recalls, `~` expanded with no literal `~` dir, scoped certificate valid with count 1,
+forgery still rejected.
+
+**Method note:** the `expanduser removed` mutation created a literal `~` directory inside the repo. Removed it
+via Python with a resolve-and-confirm-inside-repo check rather than `rm -rf '~'`, which one missing quote turns
+into the home directory.
+
+**Still open:** `verify_bundle` coverage checks are ADVISORY (unkeyed hash); tenant isolation is a boundary
+for your own workloads, not between distrusting parties; single-writer is enforced, not solved. Mutation score
+**36.4% (51/140)** independently reproduced by a second harness — 47 of 89 survivors triaged as REAL GAPs with
+a named killing test each, 35 low-value (ranking order, report counts), 7 equivalent. The wheel also ships
+`__pycache__` (~half its size), and `INSPEXIMUS_RECEIPTS` is documented but is not actually read by the MCP
+server.
+
+---
+
 ## 2026-07-25 (latest) — 1.63.0: covering the untested surfaces, and a certificate that could be forged
 
 **A defect found on the first call of a function that had never been tested.**
