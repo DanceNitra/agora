@@ -13,6 +13,47 @@
 
 # Agora — Session Handoff (2026-07-20 · "test your own claim" day)
 
+## 2026-07-25 (latest) — 1.60.0: the surfaces brought in line with the library
+
+Four rounds hardened `core.py`. Everything in this release is one step out from it and shares a shape: **the
+library was correct and the thing the user actually touches was not.**
+
+**The two product surfaces disagreed on a flagship property.** `cli.py` and `mcp_server.py` are documented as
+sharing one store, and the echo guard was ON in the MCP and OFF in the CLI. One CLI write could resurrect a
+value the MCP had retired — undoing the measured 0.00 → 1.00 echo-resistance on the very store that advertises
+it. Both now read `INSPEXIMUS_ECHO_GUARD`; the library keeps its legacy default.
+
+**A "clear" that left the data on disk.** `langchain.clear()` and `crewai.reset()` set `status="deleted"` in
+memory and stopped — no forget, no tombstone, no save. `.messages` filters by TAG and never looked at status,
+so the history still returned them, and a reload brought every record back **active with the content still in
+the file**. Both erase through `forget()` now.
+
+**Records nothing could erase.** Seven adapters wrote without `source=`, so every record fell back to
+`id:<record id>` and no subject erasure could reach it — the governance surface the integrations advertise did
+not apply to anything they themselves stored. All sites now carry a subject. A per-user DSAR through LangGraph
+works: `forget_subject("lg::users::u1")` erases u1, u2 survives.
+
+**The trap that cost a round-trip:** the first version joined the LangGraph namespace with `/`, and
+`_canon_source` keeps only the host of a path-shaped id — so `users/u1` and `users/u2` both resolved to
+`users` and every per-user erasure was refused as ambiguous **by our own guard**. A path-shaped subject is a
+collision by construction; the separator is `::`.
+
+Also: MCP `forget_subject`/`forget_pii` can record a `request_id` (without it the erasure report keyed
+everything under `None`, on tools sold as Art.17 evidence), and `inspeximus remember --source` exists —
+`forget-subject`'s help had pointed at it for a release while it did not.
+
+442 tests, 5 mutations each killed by its own test. Verified from PyPI: echo guard holds across surfaces
+(`['osaka']`), CLI write is attributable and erasable (`erased 1 record(s), 1 tombstone(s)`); the LangGraph
+DSAR was verified locally (langgraph is an optional dep, absent from the clean venv).
+
+**Still open, honestly:** `verify_bundle`'s coverage checks stay ADVISORY (unkeyed bundle hash). Tenant
+isolation is a boundary for your own workloads, not between distrusting parties. Single-writer is *enforced*,
+not *solved*. And from round four's sweep, not yet addressed: `_obj_sig` strips non-Latin scripts so
+`observe()` reads 東京 vs 北京 as agreement; `_budget_state` silently zeroes the lifetime irreversible budget
+on a corrupt sidecar; `anchor(sign=…)` returns an unsigned anchor when the signer raises.
+
+---
+
 ## 2026-07-25 (latest) — 1.59.0: round four, and the guard that repeated its own bug
 
 **Three regressions from yesterday's fix, and three verdicts that signed an untruth.**
