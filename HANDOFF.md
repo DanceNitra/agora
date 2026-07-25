@@ -13,7 +13,7 @@
 
 # Agora — Session Handoff (2026-07-20 · "test your own claim" day)
 
-## 2026-07-25 (latest) — 4 releases + 3 dungeon defects, and the day the gate earned its keep
+## 2026-07-25 (latest) — 6 releases, 4 defects fixed, 5 things killed by measurement, and a press piece
 
 **The one sentence:** a signal that cannot say no is not a signal. It held four separate times today —
 Orin's synthesis detector, a `clean=True` boolean, a test suite that survived mutation, and an inbox gate
@@ -118,15 +118,102 @@ fifth public brand, while distribution is the acknowledged bottleneck. RAMR was 
 in the session's opening git status. Owner caught it. Cost about an hour; ported to `ramr_preflight.py` and
 armparity deleted. Now a mechanical check, not a resolution: [[new-artifact-must-check-existing-products-first]].
 
-**RESUME POINTERS (read first next session):** inspeximus **1.48.0** and RAMR **0.5.1** live; inbox 0; brain
-+ dungeon healthy (one process each, no stray supervisor). Open items, nothing on fire: (1) **owner owes the
-Polar account** — everything else is done, `python swap_cta_to_polar.py <url>` finishes it; (2) the Reddit
-reply to jacksonxly is drafted and sitting on Telegram as a copy-block, unposted; (3) **WATCH** for replies
-from `ssdavidai` (alfred#307), `Keesan12`/`hegu-1` (agentos#16) and `jacksonxly` (Reddit); (4) `crewAI#6043`
-held, revisit only if the thread revives; (5) the AI-Act vertical needs a **positioning** decision now that
-the deadline moved 18 months — the landing's urgency frame is dead even though its dates are correct;
-(6) the synthesis detector will keep firing `due=true` forever until one of the four fixes in its vault note
-lands — treat it as "the pipe is blocked", not "the canon is poised".
+### Later the same day — two more releases, a self-correction, three organs repaired, and a killed post
+
+**inspeximus 1.49.0 → 1.50.0, four hours apart, the second withdrawing the first.** 1.49.0 shipped
+`infer_lineage` — stamp a derivation edge from what the store can see, since the flagged path measured 0.00%.
+It reported a **firing rate** (~22%, stable across thresholds) and called it *calibrated*. A firing rate is
+not an accuracy. Building ground truth the next hour (`probes/infer_lineage_precision.py`, ships in the repo)
+gave **precision 0.06–0.23** on a diverse store with same-topic negatives — 43 wrong parents for every 13
+right — and **recall ~0** on a homogeneous store, blind BY CONSTRUCTION because the derived write overlaps the
+whole store exactly as much as its parent (0.943 vs 0.943, lift +0.000). 1.50.0 withdrew the claim, kept the
+code OFF, and shipped the probe. Standing rule from it:
+[[a-firing-rate-is-not-an-accuracy]] — construct ground truth BEFORE shipping, not after.
+
+**THE LAW THAT CAME OUT OF IT (the most transferable thing today):** measured on our own 8-agent, 43-day,
+**27,290-record** deployment, every field the WRITER must declare reads **0.00%** — `derived_from`, `taint`,
+`key`, `object`, `source`, `attested_key` — while fields the STORE computes for itself run at **88–90%**
+(`links`, `superseded`). The entire dungeon has one write call passing four arguments, and nobody noticed for
+six weeks. **Anything the writer must declare will read zero; only what the store computes for itself
+survives contact with a real agent.** See [[declared-fields-read-zero-design-inferences-not-contracts]].
+
+**The synthesis detector is fixed (`87980c0`) — it can now say no.** Left running for hours after the morning
+diagnosis as a known liar, pressure climbing 35.33 → 53.0 while we watched. Three faults in two lines: the
+divisor counted one closure status whose writer is disabled by an env flag (0 across 200 questions,
+mathematically unreachable); it timed closures by the question's CREATION timestamp; and `(recent+1)/(prior+1)`
+let ONE bridge score 2.0 and clear the ≥1.5 gate alone. Now closure counts any organ that settles a question
+(flywheel non-open, replications, burials, court kills) timed by the closing event, with `_MIN_BRIDGES = 3`.
+Live: closures 0 → 1, pressure 53.0 → **26.5**, due True → **False for the first time**. Six tests pin BOTH
+directions. **Lesson: we had shipped a workaround into this file ("read due=true as 'the pipe is blocked'")
+and left the instrument lying. A known-bad instrument plus a note telling readers to distrust it is exactly
+how the other three defects survived six weeks. Fix the instrument.**
+
+**A post was written and killed.** A piece arguing "a memory record must carry these five fields" died on two
+fatal counts: (1) it cited alfred#307 and agentos#16 as *independent* demand while **we had commented in both
+that same day** and disclosed nothing — and alfred#307 is 39/39 the maintainer's own comments; (2) prior-art
+put it at 80–85% Truth Maintenance Systems (Doyle 1979) + incremental view maintenance (Gupta-Mumick 1993) +
+bitemporal (Snodgrass) + PROV, with MemLineage (arXiv:2605.14421) already shipping the field set in our exact
+domain — cited by our own `remember()`. Deleted from `public/posts/src/`. **Note: the first deletion silently
+failed** — `rm -f` returns 0 whether or not it removed anything, and it was chained to an `echo "removed"`. It
+was reported as done and was not. Verified gone on the second attempt with a real condition.
+
+**Inbox drained 6 → 0 twice over.** Highlights: **the external-demand premise was rejected** — the corpus says
+provenance/trust is our loudest axis (108 projects vs 26 for forget), but checking whether the hits are ABOUT
+agent memory inverts it: provenance **4/12 = 33%** on-subject (misses include pentest evidence acquisition,
+sub-agent token counting, driver permission modes, XMPP delivery), forget **9/10 = 90%**, revert 3/6. Same
+substring-without-subject-check method as the 84/69/10 figure pulled that morning — **it returned through a
+different pipeline and arrived as an instruction**. Real demand is in the erasure lane
+(vectorize-io/hindsight "Correct & Forget", kyzo crypto-shred, r/AI_Agents). Also skipped a hypothesis whose
+auto-baseline turned out to reproduce Parshani/Buldyrev/Havlin PRL 105 048701 (2010) — their decoupling
+threshold ~0.4 against our p_c~0.39, which is a **harness validation** worth more than the hypothesis.
+
+**Press piece PUBLISHED** (owner-approved): *"Knowledge decay may not be a slope. It may be a cliff you cannot
+climb back up."* Numbers re-verified in `.lab.json` rather than trusted from the vault note — and the check
+found a framing error: the lab's own verdict is **ROBUST** (a third of a store must be stale before anything
+tips) while the draft implied danger. The original proposal was **rejected and rewritten** to lead with that,
+which made it a better piece: the finding is not the cliff, it is the **asymmetry** — recovery edge 0%, so the
+fraction you can carry going up is not the fraction that gets you back down. Live at
+`public/posts/knowledge-decay-may-not-be-a-slope-it-may-be-a-cliff-you-can.html`.
+
+**Outreach, three surfaces.** `agentos#16` — posted (comment 5075753395), answering an open question in the
+thread with two NEGATIVE findings and a counterweight against our own product, plus a runnable script
+(`examples/trust_is_not_truth.py`) so the strongest claim is checkable. `alfred#307` — measured the thread and
+found an **automated loop**: 23 of 44 comments open `## Alfred Code spec`, hourly cadence, **none references
+any earlier one**, and one arrived 6 minutes after ours without engaging. Posted a second comment
+(5077509204) about the cadence only — no complaint, no mention of ours — because we found the same shape in
+ourselves twice today. **Lesson: live + on-topic + maintainer-owned ≠ reachable; check cadence and
+self-reference before valuing a thread.** `EDRN #1` — caught a real defect: Marat posted the 60-file triadic
+analysis twice with the outer buckets **swapped** (31/7/22 vs 22/7/31), and Guanghao has already committed in
+writing to 22/7/31, calling it "exactly the kind of independent fingerprint we need". Asked Marat to confirm,
+and asked Guanghao to write his PREDICTION into the issue **before** sending the file→topology mapping, which
+converts Marat's blind analysis into pre-registered cross-framework evidence. Our own L3 logs independently
+confirm his chi=3 match (min_at=0.50 in two runs) — and the detail he could not see is that DEPTH moves
+between those runs while POSITION does not, so TAT locked onto the quantity that is actually stable.
+
+**RESUME POINTERS (read first next session):** inspeximus **1.50.0** and RAMR **0.5.1** live; **inbox 0**;
+brain + dungeon healthy (one process each, no stray supervisor); everything pushed. Open, nothing on fire:
+
+1. **Owner owes the Polar account** — the only blocker. Wheel re-verified against the current core today
+   (installs clean; the load-bearing sales claim PASSES: a bundle verifies offline with the free CLI, store
+   moved away, no key). Slovakia IS a supported payout country; Starter is 5% + 50c (+1.5% international),
+   payouts 0.25% + $0.25 and **$2/month**, so low volume is disproportionately expensive; the 4% Early Member
+   rate closed to new sellers 27 May 2026; Polar is Merchant of Record so **it owes the VAT, not us** — the
+   main value for a Slovak seller. Approval time is NOT in Polar's own docs (a competitor page claims ~2
+   weeks, unverified), which is the argument for opening the account BEFORE launching. Then one command:
+   `python swap_cta_to_polar.py <url>`.
+2. **Reddit reply to jacksonxly** — drafted, on Telegram as a copy-block, unposted. (The Marat email is DONE;
+   the owner sent it.)
+3. **WATCH** for replies: `ssdavidai` (alfred#307 — but see the automated-loop finding, a human may never
+   read it), `Keesan12`/`hegu-1` (agentos#16), `jacksonxly` (Reddit), and **EDRN #1 for the two things we
+   asked**: which grouping is correct (31/7/22 or 22/7/31) and Guanghao's pre-mapping prediction.
+4. **crewAI#6043 and fak#82 are HELD, not dropped.** Both are strong content fits; both threads are cold or
+   spam-buried. Revisit only if they revive.
+5. **The AI-Act vertical needs a positioning decision.** Dates are correct, but the deadline moved 18 months
+   and the landing's urgency frame is dead. This is a strategy call, not a copy fix.
+6. **The identity decision is executed and irreversible.** Named maintainer across CITATION.cff, future
+   Zenodo versions and future commits; email is GitHub noreply; history NOT rewritten; the published 0.5.0
+   record keeps "Agora" and was superseded by 0.5.1 rather than edited.
+
 
 ## 2026-07-24 (evening) — the EU AI Act agent-memory vertical: 10 releases (1.37→1.46), a paid product, a live landing, SEO, distribution
 
