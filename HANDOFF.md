@@ -13,6 +13,82 @@
 
 # Agora — Session Handoff (2026-07-20 · "test your own claim" day)
 
+## 2026-07-25 (latest, cont.) — inspeximus 1.52.0 + 1.53.0, and the gate stopping two bad ships
+
+**The one sentence for the second half of the day:** every instrument built today was wrong in the same
+direction — it reported safe. The erasure audit, the regression guard, and the erasure selector each said
+"clean" while the thing they existed to catch was live.
+
+### inspeximus 1.52.0 — two more internal writes declare the record their text came from
+Continuation of the `revert` lineage hole from 1.51.0. `rederive()` builds new text out of a demoted record
+(`rewrite(r["text"], old, new)`) but declared only the *corrected root*, filing the real text parent in
+`meta["rederived_from"]` — a field nothing traverses. Measured pre-fix: `forget_subject("alice-ticket")`
+reported **erased 1**, the copy carrying that subject's wording stayed live, and `erasure_audit` returned
+**`no_declared_residue`** — it certified the leak as clean. Post-fix erased 1 → 2. Second defect: a stale
+`meta["rederived_to"]` (rederive's single-shot guard) pointing at an erased record froze a derived fact on the
+value just corrected away, with `rederive` returning `0/0` and no note; re-apply 0 → 1. The other six
+id-bearing fields are deliberately KEPT on erasure — they are history, `erasure_audit` reports them as
+`dangling_lineage`, and a test fails the tempting over-fix that scrubs them.
+
+**The gate scored 15/15 against this release and two agents demonstrated rather than argued.** My "closes a
+class" static guard was a regex: injected four offending shapes, it caught **two**, missed a multi-line call
+and an unfamiliar local name, and **false-alarmed** on the legitimate `pid = r["id"]; derived_from=[pid]`.
+Reproduced independently before accepting. Rewritten with `ast` over the whole package → **5 of 5**, false
+alarm gone, negative control in both directions. It immediately found a fifth site the regex could not see
+(`distill_and_remember`), which turned out to be a false positive of the NEW guard — `it` there is a dict from
+an LLM's JSON, not a store record — so it now discriminates by **origin** (traces to `self.items` /
+`self.recall`), not by shape. Prior art killed the novelty claim outright: deletion propagation is NP-hard
+(Buneman/Khanna/Tan, PODS 2002), the failure is **under-tainting** (DTA++, NDSS 2011), and the static rule is
+what the Checker Framework Tainting Checker and Semgrep taint-mode already express. Shipped as a changelog,
+not a result.
+
+### inspeximus 1.53.0 — a DSAR for one person no longer erases another
+Built `forget_subject(dry_run=True)` (the gap 1.52.0 exposed: the operation that CASCADES had no preview,
+while `forget()` had one since 1.46.0). Reviewing it found **a data-loss defect in the erasure path itself**:
+
+```
+forget_subject("crm.example.com/alice")  ->  erased 2
+survivors                                ->  ['Carol Kiss, unrelated']
+```
+
+`_canon_source` keeps only the host — right for collapsing sybil variants of one *publisher*, catastrophic as
+an erasure selector. Bob's salary/PIP record was hard-deleted by Alice's DSAR, and the new preview's
+`also_carrying` reported `{}` because as far as the selector could tell **Bob was the request**. Now raises
+`AmbiguousSubject` naming the collisions and deletes nothing; `allow_ambiguous=True` proceeds deliberately.
+Detection is narrow so `user-42` / `User 42` still resolves. **Unfixable limit, stated:** `taint` stores
+canonical keys, so colliding subjects cannot be separated in the derived tier without rewriting taint.
+
+The preview returns `would_erase / direct / inherited / sample / also_carrying (+ ambiguous_with)`, mutates
+nothing, is tenant-scoped, and is exposed via MCP. Three defects in my own split were caught by review before
+shipping (read every dict value → taint-only match reported as direct; no `id:` fallback; subject reappearing
+in `also_carrying` under another spelling). Limits documented rather than discovered later: `forget()`
+silently MODIFIES survivors (scrubs `links`, drops `superseded_by_toggle`) and none of it appears in
+`would_erase`; erasure targets are named but not cascaded; `sample` returns record text and writes no receipt.
+Also fixed a docstring offering `'key:<hex>'` as a subject form that `_rec_sources` has never emitted — such a
+call silently erased nothing.
+
+**335 tests; 8 mutations, each killed by its own test.** Both releases verified by installing the published
+wheel from PyPI into a clean venv and re-running the defect scenario.
+
+### Storm briefing (17/17 citations, 0 fabricated, 7 corrected)
+`storm-reports/correction-propagation-erasure-completeness-agent-memory-briefing.html`. Two findings that
+change positioning: **do not sell this on GDPR** — the EDPB's Feb-2026 coordinated erasure action (32 DPAs,
+764 controllers) found nothing about derived records and no fine has turned on one (though Art. 17(2)'s
+"reasonable steps" is gated on PUBLICISED data, so internal derivatives sit under 17(1), which has no cost
+qualifier — strict text, zero precedent). And **never frame competitors as broken here**: our audit follows
+declared edges too, and Zep documents its own limit openly. Corrections that would otherwise have shipped: the
+RippleEdits author list was wrong (two named authors are not on the paper), the "~1.4% of GDPR fines" share is
+unverifiable (mixes two trackers, 17-month-stale base), and the CNIL €100,000 fine was annulled in 2020.
+
+### Open
+- `forget_subject` has a preview but **no cap and no cascade preview** for registered erasure targets.
+- The static guard is **syntactic** — it cannot tell whether the declared parent is the semantically right
+  one, and cannot see a paraphrase written back as a fresh unparented record (the dominant production path;
+  writer-declared lineage measured **0.00%** on our 27,290-record store).
+- Owner-blocked, unchanged: Polar account; Reddit reply to jacksonxly drafted and unposted.
+
+---
+
 ## 2026-07-25 (latest) — 6 releases, 4 defects fixed, 5 things killed by measurement, and a press piece
 
 **The one sentence:** a signal that cannot say no is not a signal. It held four separate times today —

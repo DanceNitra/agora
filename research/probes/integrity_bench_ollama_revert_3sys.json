@@ -1,0 +1,72 @@
+{
+  "cell": "revert",
+  "judge": "gemma2:9b (Ollama, local)",
+  "embedder": "nomic-embed-text",
+  "n": 24,
+  "results": {
+    "inspeximus": {
+      "system": "inspeximus",
+      "n": 24,
+      "retained": 24,
+      "value": 0.0,
+      "ci95": [
+        0.0,
+        0.138
+      ],
+      "among_retained_contradiction": 0.0,
+      "drop_rate": 0.0,
+      "contradictory": 0,
+      "clean": 24,
+      "dropped": 0,
+      "errors": 0
+    },
+    "mem0": {
+      "system": "mem0",
+      "n": 0,
+      "retained": 0,
+      "value": 0.0,
+      "ci95": [
+        0.0,
+        0.0
+      ],
+      "among_retained_contradiction": 0.0,
+      "drop_rate": 0.0,
+      "contradictory": 0,
+      "clean": 0,
+      "dropped": 0,
+      "errors": 24
+    },
+    "graphiti": {
+      "system": "graphiti",
+      "n": 24,
+      "retained": 0,
+      "value": 0.0,
+      "ci95": [
+        0.0,
+        0.0
+      ],
+      "among_retained_contradiction": 0.0,
+      "drop_rate": 1.0,
+      "contradictory": 0,
+      "clean": 0,
+      "dropped": 24,
+      "errors": 0
+    },
+    "letta": {
+      "system": "letta",
+      "n": 24,
+      "retained": 22,
+      "value": 0.0,
+      "ci95": [
+        0.0,
+        0.149
+      ],
+      "among_retained_contradiction": 0.0,
+      "drop_rate": 0.083,
+      "contradictory": 0,
+      "clean": 22,
+      "dropped": 2,
+      "errors": 0
+    }
+  }
+}

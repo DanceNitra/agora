@@ -1,0 +1,2 @@
+{"system": "inspeximus", "n": 24, "retained": 24, "value": 0.0, "ci95": [0.0, 0.138], "among_retained_contradiction": 0.0, "drop_rate": 0.0, "contradictory": 0, "clean": 24, "dropped": 0, "errors": 0} (0s)
+{"system": "mem0", "n": 24, "retained": 1, "value": 1.0, "ci95": [0.207, 1.0], "among_retained_contradiction": 1.0, "drop_rate": 0.958, "contradictory": 1, "clean": 0, "dropped": 23, "errors": 0} (1142s)

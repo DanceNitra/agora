@@ -45,15 +45,19 @@ real-corpus accuracy. Treat small-n magnitudes as directional; the orderings are
 | `drop_index` | which hop to drop for the PARTIAL condition (CHAIN-FRAGILITY) |
 | `distractor_pool` | fixed irrelevant facts; take first *k* for DISTRACTION |
 
-## The nine metrics (measured in the code repo)
+## The metrics (measured in the code repo)
 
 CONVERSION (does complete retrieval convert to a correct answer), **CHAIN-FRAGILITY** (cost of one missing hop —
 near-total collapse across 7 models / 6 families), DISTRACTION (cost of noisy context — model-specific),
 FACT-RETENTION (compaction lossy under a fixed budget), OUTCOME-RANKED-RECALL (was-it-right vs was-it-recalled),
 FORGET-PRECISION (after a fact is updated, does recall return the current or the stale value),
+ECHO-RESISTANCE (after a correction, does a re-stated old value resurrect the stale one),
 COMPRESSION-vs-RAW (does a compiled summary beat the raw noisy context, or only lose to it),
 OPERATIONAL-CONTINUITY (on resume after compaction, is an already-completed action re-executed),
-and TEMPORAL-AS-OF (out-of-order ingest: supersession resolves by validity-time, not arrival order).
+TEMPORAL-AS-OF (out-of-order ingest: supersession resolves by validity-time, not arrival order),
+and INTEGRITY-CONDITIONED RECALL (after a supersession / revert / poison, does recall return the correct
+current value — revert is a clean win over a recency baseline; the poison row is an honestly-scoped
+warrant-channel demonstration, not injection detection).
 Plus auxiliary metrics in the repo (ABSTENTION / false-recall, CROSS-SCOPE-LEAKAGE).
 
 ## Tooling + interoperability (v0.4)

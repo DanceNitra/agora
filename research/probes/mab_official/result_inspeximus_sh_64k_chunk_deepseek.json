@@ -1,0 +1,12 @@
+{
+ "condition": "inspeximus",
+ "sample": "sh_64k",
+ "ingest": "chunk",
+ "llm": "deepseek",
+ "n": 8,
+ "correct": 0,
+ "accuracy": 0.0,
+ "answerer": "qwen3:30b-a3b",
+ "scoring": "official substring_exact_match max-over-golds",
+ "prompt": "official factconsolidation query template"
+}

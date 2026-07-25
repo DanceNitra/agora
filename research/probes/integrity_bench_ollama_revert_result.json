@@ -1,0 +1,24 @@
+{
+  "cell": "revert",
+  "judge": "gemma2:9b (Ollama, local)",
+  "embedder": "nomic-embed-text",
+  "n": 24,
+  "results": {
+    "inspeximus": {
+      "system": "inspeximus",
+      "n": 24,
+      "retained": 24,
+      "value": 0.0,
+      "ci95": [
+        0.0,
+        0.138
+      ],
+      "among_retained_contradiction": 0.0,
+      "drop_rate": 0.0,
+      "contradictory": 0,
+      "clean": 24,
+      "dropped": 0,
+      "errors": 0
+    }
+  }
+}

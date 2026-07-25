@@ -1,0 +1,60 @@
+{
+  "cell": "echo",
+  "judge": "gemma2:9b (Ollama, local)",
+  "embedder": "nomic-embed-text",
+  "n": 20,
+  "results": {
+    "inspeximus": {
+      "system": "inspeximus",
+      "n": 20,
+      "value": 0.0,
+      "ci95": [
+        -0.0,
+        0.161
+      ],
+      "contradictory": 0,
+      "clean": 20,
+      "dropped": 0,
+      "errors": 0
+    },
+    "mem0": {
+      "system": "mem0",
+      "n": 20,
+      "value": 0.95,
+      "ci95": [
+        0.764,
+        0.991
+      ],
+      "contradictory": 19,
+      "clean": 0,
+      "dropped": 1,
+      "errors": 0
+    },
+    "graphiti": {
+      "system": "graphiti",
+      "n": 20,
+      "value": 0.75,
+      "ci95": [
+        0.531,
+        0.888
+      ],
+      "contradictory": 15,
+      "clean": 2,
+      "dropped": 3,
+      "errors": 0
+    },
+    "letta": {
+      "system": "letta",
+      "n": 20,
+      "value": 0.0,
+      "ci95": [
+        -0.0,
+        0.161
+      ],
+      "contradictory": 0,
+      "clean": 0,
+      "dropped": 20,
+      "errors": 0
+    }
+  }
+}

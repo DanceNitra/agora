@@ -2,38 +2,141 @@
   "name": "Agent-Memory Integrity Leaderboard",
   "tagline": "Recall leaderboards measure whether memory returns the right fact. None measure whether a CORRECTION sticks. This one does.",
   "generated": "2026-07-22",
-  "judge": "gpt-4o-mini (neutral, ground-truth-blind — reads each system's own recall surface; nobody is scored on a home-field instrument)",
+  "metric": "surface cleanliness — after a correction, does a query return ONE current value, or keep serving the retired one alongside it?",
+  "measurement": "Deterministic and judge-independent: the score reads whether the retired value is still present in each system's own recall surface. No LLM decides the outcome, so the result cannot be flipped by choosing a more or less capable judge. Each system builds its memory on a local Ollama model (mem0/graphiti: gemma2:9b; Letta agent: qwen2.5:7b), embeddings nomic-embed-text — so the whole board reproduces at zero cost.",
   "n": 20,
   "source": "https://github.com/DanceNitra/ramr/tree/main/integrity",
   "doi": "https://doi.org/10.5281/zenodo.20818291",
   "submit": "https://github.com/DanceNitra/ramr/blob/main/integrity/SUBMISSION.md",
   "method": "https://github.com/DanceNitra/ramr/blob/main/integrity/METHODOLOGY.md",
-  "principle": "We lead with the cell we TIE, and we publish the cells we don't win. A leaderboard you only ever top is one you built to flatter yourself.",
+  "principle": "We publish the cells we don't win and the caveats that cut against us. This board replaced its own earlier judge-based metric after we found it was model-dependent — a capable judge silently resolved the contradiction and hid it. The metric here cannot be flipped that way.",
+  "caveats": [
+    "Letta is an AGENT, not a store: its surface reflects the agent model's decisions (qwen2.5:7b here), and a stronger agent model may retain more — read its row as agent-and-model dependent, not a fixed store property.",
+    "Zep is not yet on the board: modern Zep is cloud-only and we have not run it through the same harness. It will be added when measured, not assumed."
+  ],
   "cells": [
     {
       "id": "revert",
       "title": "Value-obscuring revert",
-      "question": "The user says “go back to what we had” and names no value. Can the store undo a correction on that unmarked command?",
-      "metric": "success rate",
+      "question": "After the user says “go back” (naming no value), does a query for the current value return ONE clean answer, or does the store still serve the retired value alongside it?",
+      "metric": "clean rate",
       "direction": "higher is better",
-      "framing": "A capability gap, not a tuning gap: only a system with an explicit revert channel can undo a correction on command. Judge-independent — the competitors structurally lack the operation; the judge model only shifts inspeximus's absolute rate.",
+      "framing": "A clean surface presents exactly the current value; a contradictory one keeps serving both (the consumer's LLM then has to guess) and a dropped one has lost the fact. Deterministic: we read whether the retired value is still present, we do NOT ask a model ‘what is current’. inspeximus retires the record; the others accumulate.",
       "systems": [
-        {"system": "inspeximus", "value": 0.75, "ci95": [0.53, 0.89], "note": "intent router restores the predecessor from the version ledger"},
-        {"system": "mem0 2.0.11", "value": 0.20, "ci95": [0.08, 0.42], "note": "no revert operation; the corrected value is retained"},
-        {"system": "Graphiti", "value": 0.00, "ci95": [0.00, 0.16], "note": "no revert operation; bitemporal invalidation fires on named contradictions, not an unnamed “go back”"}
+        {
+          "system": "inspeximus",
+          "value": 1.0,
+          "ci95": [
+            0.839,
+            1.0
+          ],
+          "clean": 20,
+          "contradictory": 0,
+          "dropped": 0,
+          "n": 20,
+          "note": "retires the superseded record, so recall returns only the current value"
+        },
+        {
+          "system": "mem0 2.0.11",
+          "value": 0.0,
+          "ci95": [
+            0.0,
+            0.161
+          ],
+          "clean": 0,
+          "contradictory": 19,
+          "dropped": 1,
+          "n": 20,
+          "note": "keeps every memory; a query for the current value returns both the old and new one"
+        },
+        {
+          "system": "Graphiti",
+          "value": 0.05,
+          "ci95": [
+            0.009,
+            0.236
+          ],
+          "clean": 1,
+          "contradictory": 8,
+          "dropped": 11,
+          "n": 20,
+          "note": "under this config it usually keeps both facts or loses the fact entirely"
+        },
+        {
+          "system": "Letta (agent)",
+          "value": 0.1,
+          "ci95": [
+            0.028,
+            0.301
+          ],
+          "clean": 2,
+          "contradictory": 0,
+          "dropped": 18,
+          "n": 20,
+          "note": "an agent (qwen2.5:7b here), not a store; it frequently does not retain the literal value in its memory blocks"
+        }
       ]
     },
     {
       "id": "echo",
       "title": "Echo resurrection",
-      "question": "After a correction, if the OLD value is re-stated, does the store keep the corrected value or resurrect the stale one?",
-      "metric": "resurrection rate",
-      "direction": "lower is better",
-      "framing": "A TIE — all three defend. This is the cell we lead with on purpose.",
+      "question": "After a correction, the OLD value is re-stated. Does the store keep the corrected value cleanly, or resurrect the stale one alongside it?",
+      "metric": "clean rate",
+      "direction": "higher is better",
+      "framing": "A clean surface presents exactly the current value; a contradictory one keeps serving both (the consumer's LLM then has to guess) and a dropped one has lost the fact. Deterministic: we read whether the retired value is still present, we do NOT ask a model ‘what is current’.",
       "systems": [
-        {"system": "inspeximus", "value": 0.00, "note": "echo_guard blocks the restated stale value"},
-        {"system": "mem0 2.0.11", "value": 0.00, "note": "defends"},
-        {"system": "Graphiti", "value": 0.00, "note": "defends"}
+        {
+          "system": "inspeximus",
+          "value": 1.0,
+          "ci95": [
+            0.839,
+            1.0
+          ],
+          "clean": 20,
+          "contradictory": 0,
+          "dropped": 0,
+          "n": 20,
+          "note": "retires the superseded record, so recall returns only the current value"
+        },
+        {
+          "system": "mem0 2.0.11",
+          "value": 0.0,
+          "ci95": [
+            0.0,
+            0.161
+          ],
+          "clean": 0,
+          "contradictory": 19,
+          "dropped": 1,
+          "n": 20,
+          "note": "keeps every memory; a query for the current value returns both the old and new one"
+        },
+        {
+          "system": "Graphiti",
+          "value": 0.1,
+          "ci95": [
+            0.028,
+            0.301
+          ],
+          "clean": 2,
+          "contradictory": 15,
+          "dropped": 3,
+          "n": 20,
+          "note": "under this config it usually keeps both facts or loses the fact entirely"
+        },
+        {
+          "system": "Letta (agent)",
+          "value": 0.0,
+          "ci95": [
+            0.0,
+            0.161
+          ],
+          "clean": 0,
+          "contradictory": 0,
+          "dropped": 20,
+          "n": 20,
+          "note": "an agent (qwen2.5:7b here), not a store; it frequently does not retain the literal value in its memory blocks"
+        }
       ]
     }
   ]
