@@ -74,6 +74,43 @@ true, and 516 tests pass.
 
 ---
 
+## 2026-07-26 — 1.67.0: testing SEQUENCES, and four defects inside my own recent fixes
+
+Eight rounds tested FUNCTIONS. This one tested **sequences** — 2,700 random operations over a small pool of
+keys/subjects/tenants, eight invariants re-checked after every one (~21,600 evaluations). A different lens,
+and it found two things no unit test had.
+
+**`reload()` retired another tenant's value.** Its last-write-wins keyed on `key` ALONE, so tenant A's current
+value was superseded because tenant B used the same key name — **cross-tenant data loss in the recovery
+path**, with `verify_writes()` True throughout. Found by a THREE-operation random sequence. It also demoted
+restatements `_supersede_by_key` deliberately keeps, so `reload()` was not state-preserving where
+`flush()`+reopen is. Now keyed on `(tenant, key)` and only across differing values.
+
+**`slash()` reported itself as tampering.** It rewrites `mtype`, a committed field, so a legitimate in-band
+operation made `verify_writes()` say "edited after write" — in **27 of 45** sequences, first at operation 3.
+A tamper-evidence product raising a false alarm from its own accountability lever poisons the signal. `slash`
+and `restore` now amend the chain, and only the LATEST receipt binds a record. *My first cut of that fix used
+`continue`, which skipped the loop's own `prev = r["hash"]` and made every later receipt report "broken chain
+link".*
+
+**`exact=True` reintroduced the over-erasure it prevents.** Clearing `collisions` left in records carrying the
+shared canonical taint, so a summary derived from the OTHER subject was hard-deleted. Now a forward lineage
+closure of the exact-source records. The fixture could not see it — the attacker had no derived record, the
+same fixture-blindness that hid two earlier fixes.
+
+**An honest UNSCOPED certificate failed its own chain** in any store where one erasure ran without a
+`request_id`. Producer now emits an explicit `scoped_to`; older certificates still verify. (This also settles
+an earlier disputed report: the SCOPED case was fine — my repro was right — the UNSCOPED one was broken.)
+
+**Invariants that HELD across 2,700 ops**, stated as a result and not just the failures: one active VALUE per
+`(tenant, key)`; `recall()` never returning superseded; `state_digest()` surviving `flush()`+reopen; tombstone
+soundness both directions; tenant containment; `erasure_audit` residue iff live attributable; monotonic
+receipts with `anchor().n_writes == len(_receipts)`.
+
+529 tests; 7 mutations each killed by its own test. Verified from PyPI.
+
+---
+
 ## OPEN WORK — inspeximus, carried forward (as of 1.64.0, 2026-07-25)
 
 Everything below is **reported and reproduced**, and deliberately NOT yet fixed. Kept here rather than in a
