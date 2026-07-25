@@ -13,6 +13,43 @@
 
 # Agora — Session Handoff (2026-07-20 · "test your own claim" day)
 
+## 2026-07-25 (latest) — 1.61.0: three controls that failed OPEN
+
+The last of round four's sweep, and all three share a shape worse than a crash: each **silently granted what
+it exists to withhold**, and its presence is what stopped anyone looking.
+
+**The value signature erased whole writing systems.** `_obj_sig` normalised with `[^a-z0-9]`, so `東京` and
+`北京` both became the **empty string** and compared equal — `observe()` recorded a flat contradiction as
+**agreement** and marked its support seen, discounting later corrections. Any store holding Chinese, Japanese,
+Korean, Cyrillic, Greek, Hebrew, Arabic or Thai values had one signature for all of them. Now Unicode-aware,
+with a raw-value fallback so nothing can share the empty signature; punctuation still folds (`3-2` = `3/2`).
+
+**The lifetime irreversible budget reset itself on a corrupt file.** Its docstring says *"a patient attacker
+must not reset its spent budget by spanning sessions"* — and a corrupt `.irrev.json` was swallowed, the state
+reset to `{}`, and a 0.9 spend against a 1.0 budget was allowed a **second** time (cumulative 1.8) with
+nothing reported. Corrupting one file *was* the reset. Fails closed now; a missing file is still fine.
+
+**An anchor that looked witnessed.** `anchor(sign=…)` swallowed a raising signer and returned a dict
+byte-identical to the unsigned one. External witnessing is the **only** operator-adversarial property in the
+design, and the caller who asked for it could not tell it had not happened.
+
+453 tests. Verified from PyPI: CJK distinct, `observe` no longer agrees, budget fails closed, anchor raises,
+a working signer still signs.
+
+**Mutation note worth keeping:** reverting *either* signature layer alone left the tests green — the Unicode
+regex and the empty-signature fallback each cover the other, and only reverting both together killed them.
+**A single mutation reporting "no teeth" is not proof that a test is toothless.** Three other mutations in
+this round also mis-targeted (one hit the first `raise RuntimeError` in the file rather than the anchor's), so
+verify the mutation landed where you meant before believing its verdict.
+
+**Still open, honestly:** `verify_bundle`'s coverage checks stay ADVISORY (unkeyed bundle hash — an exporter
+can forge `n_records`/`proof.verified`); only witness co-signatures are operator-adversarial. Tenant isolation
+is a boundary for your own workloads, not between mutually distrusting parties — the file, receipt chain,
+anchor and encryption key are shared. Single-writer is *enforced*, not *solved*: two writers are told so
+instead of one silently losing.
+
+---
+
 ## 2026-07-25 (latest) — 1.60.0: the surfaces brought in line with the library
 
 Four rounds hardened `core.py`. Everything in this release is one step out from it and shares a shape: **the
