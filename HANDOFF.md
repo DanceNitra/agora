@@ -13,6 +13,48 @@
 
 # Agora — Session Handoff (2026-07-20 · "test your own claim" day)
 
+## 2026-07-25 (latest) — 1.63.0: covering the untested surfaces, and a certificate that could be forged
+
+**A defect found on the first call of a function that had never been tested.**
+`verify_erasure_certificate` echoed `count`, `erased_memory_ids` and `request_ids` straight from the
+certificate and never re-derived them from the tombstones - which ARE hash-chained and signed. An operator
+could hand an auditor a certificate claiming to have erased ids that **never existed** and it verified
+`valid: True` with no problems. Same defect as the DeletionManifest verdict fixed in 1.59.0, one artifact
+over, on the thing literally called a certificate. *And the first cut of my fix did not work* - it appended
+to `problems` while `valid` is computed from `checks` alone, so a forged count still verified. **A check
+absent from the verdict expression is decorative.**
+
+**Coverage, measured properly.** Count BODY lines only: the `def` line executes at import, so including it
+makes every function look covered - my first measurement said 2% uncovered where the truth was 42%.
+**132 of 318 public functions had zero executed body lines**, among them `verify_erasure_certificate` (62
+lines), `submit_revert` (58), `erasure_certificate`, `witness`/`verify_witness`, the whole revert-capability
+chain, and **58 MCP tools**. Two new files, 21 tests, including an MCP sweep that calls **every** tool and
+fails if one cannot be driven or is not exempted with a reason. **132/318 (42%) -> 56/318 (18%).**
+
+**Tests that ran in no environment at all.** `tests/test_haystack.py` skips locally and its CI job ran a
+*different* file, so 9 tests - including `test_delete_removes_the_value_from_disk` - executed nowhere. Wired
+in, plus an `optional-adapters` CI job installing crewai and llama-index-core so those permanent skips
+un-skip somewhere.
+
+**The mutation score, honestly: 36.0% (36/100, seed 1337, clean tree, code-only population.)** NOT comparable
+to the 32.8% quoted at 1.62.0 - different population, operators and sample. Treat 36.0% as the new baseline.
+What IS comparable is the coverage figure above.
+
+**And the harness itself failed open.** An earlier run reported **92.5%** because a previous overlapping run
+had left three files mutated: the suite was already red, so every mutant looked killed. The harness now
+refuses to start unless pre-flight is green. Also: exclude docstrings/comments from the mutant population
+(mutating prose yields dead mutants that deflate the score), and never run two passes concurrently - they
+restore each other's files, and the corruption presents as an implausibly GOOD score. See
+[[mutation-score-not-test-count]].
+
+487 tests. Verified from PyPI: honest certificate valid, all three forgeries rejected, witness verifies and
+stops verifying once the state moves.
+
+**Process note:** I ran `git checkout -- inspeximus/` on a tree holding uncommitted work and destroyed the
+certificate fix, then had to re-apply it. Commit before running anything that rewrites the working tree.
+
+---
+
 ## 2026-07-25 (latest) — 1.62.0: three regressions, and a mutation run that graded the whole suite
 
 **The most useful audit of the day audited the TESTS, not the code.**
