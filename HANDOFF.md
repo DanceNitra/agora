@@ -13,7 +13,269 @@
 
 # Agora — Session Handoff (2026-07-20 · "test your own claim" day)
 
-## 2026-07-22 (latest) — RAMR shipped the integrity metric via 3 gated releases; the gate caught 3 real defects
+## 2026-07-25 (latest) — 4 releases + 3 dungeon defects, and the day the gate earned its keep
+
+**The one sentence:** a signal that cannot say no is not a signal. It held four separate times today —
+Orin's synthesis detector, a `clean=True` boolean, a test suite that survived mutation, and an inbox gate
+that only passed what it already recognised. Same mistake, four places.
+
+### Shipped outward
+- **inspeximus 1.47.0** — `provenance(key|id)`: one answer to "where did this fact come from", assembling
+  source + transitively-inherited lineage taint + attestation + supersession timeline + write-receipt
+  integrity, with a `limits` field that rides along so a renderer cannot drop the caveat. `ComplianceMixin`
+  extended from 2 adapters to all 8 class-based ones (Pydantic AI stays out — function toolset, no object).
+- **inspeximus 1.48.0** — `erasure_audit(subject)`: after a deletion, what survived *through the
+  derivatives*. Four structural checks + one labelled heuristic. **`coverage` is the load-bearing field** and
+  the CLI prints it BEFORE the verdict; zero declared lineage returns `unaudited`, never a pass. Housekeeping
+  deletions (capacity eviction, keep-budget) land in `advisory`, never `residue`. Plus a real fix: the CLI
+  opened stores with receipts OFF, so a shell `remember` against a receipted store silently did not extend
+  the chain — the CLI was punching a hole in the evidence it exists to produce.
+- **RAMR 0.5.0** — `ramr_preflight.py`, four admissibility gates that abort NAMING the dead layer (budget
+  parity / retrieval / liveness / parameter efficacy). DOI 10.5281/zenodo.21541292.
+- **RAMR 0.5.1** — attribution only, named author. DOI **10.5281/zenodo.21541881**; the concept DOI
+  10.5281/zenodo.20818291 now resolves here.
+- **Outreach, both posted after owner approval:** `ssdavidai/alfred#307` (comment 5075556864 — he is speccing
+  provenance-aware claims + downstream correction propagation, i.e. 1.47/1.48 almost verbatim; **39 of 39
+  comments were his own**, so it is a solo spec loop, not a discussion) and `framerslab/agentos#16` (comment
+  5075753395 — three real humans settling a memory contract; `Keesan12` asked the thread an open question we
+  had measured answers to). `crewAI#6043` HELD deliberately: real substance early, but its last three
+  comments are link-drops and lead-gen.
+
+### THE LAW CHANGED THE DAY WE WERE PUBLISHING ON IT
+**Regulation (EU) 2026/1744** (Digital Omnibus on AI) hit the OJ on **24 Jul 2026**, in force 27 Jul, and
+deferred the Annex III high-risk obligations from 2 Aug 2026 to **2 Dec 2027** (Annex I to 2 Aug 2028).
+Every one of our 7 published date claims was wrong as of that morning. All corrected, and the CHANGELOG says
+so out loud rather than quietly editing — a compliance-adjacent project that silently fixes its own deadline
+copy has not earned the word "evidence". Also removed the implication that the Act *requires* memory
+provenance: Art. 12 requires automatic event logging, Art. 19 retention, Art. 15 accuracy/robustness, and
+**none of them name memory, provenance or tamper-evidence**. Our features exceed the text; they are not
+mandated by it. **The urgency premise behind the whole AI-Act vertical moved 18 months** — that is a
+positioning question, not a copy fix.
+
+### Three dungeon defects, one shape
+The machinery worked and the dashboards were green in all three; a gate or truncation sat between a working
+organ and its output, invisible from the metric you would naturally watch. See
+[[seminar-frontier-quota-and-credit-truncation]].
+1. **`record_contribution` stored `partners[:4]`** — Kael/Mira/Orin/Aldric appeared in all 118 contribution
+   records over 7 days; **Elara, Voss, Wren and Rooke in ZERO**, despite taking part in 146/146/114/114
+   rounds and never once being skipped. Two of the four uncredited carry the lowest trust in the roster.
+2. **The frontier never reached the seminar.** 11 live topics = 10 cross-domain vault bridges + 1 board,
+   **zero** from `.frontier_directions.json` (which held 11 good agent-memory questions). Self-sustaining:
+   `pick_topic` deepens whenever `len(live) >= 3`, so the fresh-open branch was never reached. Fixed with a
+   frontier QUOTA checked BEFORE the deepen branch.
+3. **The inbox gate ate two organs whole.** 54 drops in one window, 52 of them "names no subject of ours"
+   (no keyword match) vs 2 genuine off-mission. 17 were `attempt grand synthesis`, 12 `forge analogy`.
+   Bridges/insights stay gated — they DO name a subject. Confirmed on live traffic: within 30 minutes of the
+   fix, all three organs delivered their first output in a month.
+
+**Ops facts:** `LLM_quests=0 (planner OFF)` in `_dungeon.err` is the INTENDED default since 2026-06-19 — do
+not "fix" it. Scout stalls exactly as [[scout-blocks-on-an-unprocessed-inbox-task]] says: it always collects
+into the box, but PROMOTION gates on a pending "Scout triage" task. Inbox drained 6 → 0.
+
+### Three honest nulls, none of them comfortable
+- **Bridge notes are ordinary notes.** Tested the vault's own core claim on the vault: raw 58.1% vs 72.3%
+  cited looked like a clean refutation; age-matched (≥2026-06-01) it is **67.2% vs 66.8%** — gap gone. It also
+  contradicted my own prior. The real mechanism is **displacement, not quality**.
+- **The synthesis detector is a ratchet, not a detector.** `pressure = bridge_accel × (1+open/12) ÷
+  (1+deepened)`. 200 flywheel questions, **all open, zero ever deepened**; the sole writer's caller is
+  disabled by `AGORA_QUIET_GENERATORS=1`; `bridge_accel` 2.0 is literally 1 event vs 0. Pressure is monotone
+  increasing BY CONSTRUCTION and will now fire forever. It measures an operational blockage, not epistemic
+  poise. Same CSD/EWS premise that already died in [[memory-tipping-ews-killed]]. **No grand synthesis
+  written** — candidates were examined and rejected as restatements of information cascades / collider bias.
+- **Integrator windup does not generalise.** Predicted more disconnected drains findable by scanning code;
+  31 terms, 19 modules, 3 flagged, **3/3 false positives**, 0 real. Lesson worth more than the analogy:
+  **disconnection here is a RUNTIME property, not a code property** — in the confirmed case the writer,
+  endpoint and ledger all exist and only the caller is silenced. Rule: for any stock÷drain signal, assert at
+  runtime that the drain has fired at least once.
+
+### What the gate caught before it went outward
+Not one was a code bug; the code was green all day. It caught **claims**: the law change; my own 84/69/10
+demand metric (violating our own two standing rules on substring matching and denominators); "a relabel is
+loud" (stronger than we can support); "the only open agent-memory library" (engram exists); uncredited prior
+art (DELF USENIX Sec 2020, Hasan/Sion/Winslett FAST 2009, MemLineage — which our own `remember()` already
+cites); `clean=True` as a false assurance on a GDPR operation; a test suite that survived a mutation deleting
+the check it was testing; a non-deterministic 0.407 about to be published as exact; and a regex that silently
+lost every value ending a sentence.
+
+### Decisions
+- **NAMED IDENTITY (irreversible).** Rastislav Drahoš is the named maintainer. Driver: in the one channel
+  with live demand — downstream vendor-security review — supplier attestation needs a nameable party and
+  cryptography does not substitute. Email is GitHub **noreply**, history is **not** rewritten, and the
+  published 0.5.0 Zenodo record keeps "Agora" (permanent record — superseded by 0.5.1, never rewritten).
+  See [[public-repo-anon-git-identity]] (superseded).
+- **Polar: wire it, don't launch.** Wheel re-verified against the current core (built against 1.41, core is
+  now 1.48): installs clean, dossier generates, and the load-bearing sales claim PASSES — bundle verifies
+  offline with the free CLI, store physically moved away, no key. Slovakia IS a supported payout country.
+  Fees: Starter 5% + 50¢ (+1.5% international), payouts 0.25%+$0.25 and **$2/month** — so low volume is
+  disproportionately expensive. The 4%+40¢ Early Member rate closed to new sellers 27 May 2026. Polar is
+  Merchant of Record, so **it owes the VAT, not you** — the main value for a Slovak seller. Approval time is
+  NOT stated in Polar's own docs (a competitor page claims ~2 weeks — unverified). `swap_cta_to_polar.py`
+  makes the last step one command.
+
+### My own mistake, recorded
+Built the measurement work as a brand-new package (**armparity**) when **RAMR was obviously its home** — a
+fifth public brand, while distribution is the acknowledged bottleneck. RAMR was in MEMORY.md three times and
+in the session's opening git status. Owner caught it. Cost about an hour; ported to `ramr_preflight.py` and
+armparity deleted. Now a mechanical check, not a resolution: [[new-artifact-must-check-existing-products-first]].
+
+**RESUME POINTERS (read first next session):** inspeximus **1.48.0** and RAMR **0.5.1** live; inbox 0; brain
++ dungeon healthy (one process each, no stray supervisor). Open items, nothing on fire: (1) **owner owes the
+Polar account** — everything else is done, `python swap_cta_to_polar.py <url>` finishes it; (2) the Reddit
+reply to jacksonxly is drafted and sitting on Telegram as a copy-block, unposted; (3) **WATCH** for replies
+from `ssdavidai` (alfred#307), `Keesan12`/`hegu-1` (agentos#16) and `jacksonxly` (Reddit); (4) `crewAI#6043`
+held, revisit only if the thread revives; (5) the AI-Act vertical needs a **positioning** decision now that
+the deadline moved 18 months — the landing's urgency frame is dead even though its dates are correct;
+(6) the synthesis detector will keep firing `due=true` forever until one of the four fixes in its vault note
+lands — treat it as "the pipe is blocked", not "the canon is poised".
+
+## 2026-07-24 (evening) — the EU AI Act agent-memory vertical: 10 releases (1.37→1.46), a paid product, a live landing, SEO, distribution
+
+The single long thread of the afternoon/evening: **turn inspeximus into THE compliance-evidence layer for the
+agent-memory slice of the EU AI Act — honestly (not the whole Act, evidence not certification) — and build the
+full vertical.** Owner drove it ("marketingová top appka … jediní ktorí to robia do 1. augusta"); I pushed back
+on the "covers ALL of the Act" claim (false + legal risk + kills the honesty moat) and he chose the honest
+agent-memory-slice framing via AskUserQuestion. Everything below passed the standing gate before going outward.
+
+**Free-core releases (all on PyPI, all: tests + gate + trusted-publish, anon identity agora-builder):**
+- **1.37.0 witness server** — `inspeximus.witness_server` (stdlib http witness) + `witness_pool.http_witness(url)`;
+  makes the k-of-n co-signing pool deployable across independent hosts (operator-adversarial layer).
+- **1.38.0 code_guard** — coding-agent wedge (build-plan pillar 2): `deprecate_symbol`/`symbol_status`/`check_code`
+  (echo-guard for code — flags a resurrected deprecated symbol). Built on keyed supersession.
+- **1.39.0 code_guard CI gate** — `inspeximus deprecate` + `inspeximus check-code <files>` (exit 1) +
+  `.pre-commit-hooks.yaml`. The distribution mechanism.
+- **1.40.0 portable audit bundle** — `audit_bundle.build_bundle` + `verify_bundle`; CLI `inspeximus audit-build`
+  / `audit-verify` (offline, no store, no key). Art. 12/19 portable evidence.
+- **1.41.0 compliance overlay** — `inspeximus compliance` → article-labelled EVIDENCE report (HTML/JSON) with
+  LIVE per-store counts + honest per-control status. `compliance.compliance_report` / `render_html`.
+- **1.42.0 continuous compliance gate** — `inspeximus compliance --check` (CI gate; violations: receipts_disabled
+  / integrity_failed / not_append_only / pii_over_retention).
+- **1.43.0 retention enforcement** — `inspeximus retention --max-age-days N [--apply]` (GDPR 5(1)(e) storage
+  limitation; dry-run default; each erasure leaves a tombstone). Closes detect→enforce.
+- **1.44.0 compliance-aware integrations** — `integrations.governance.ComplianceMixin` on LangGraph
+  `InspeximusStore` + CrewAI `InspeximusStorage` (+`receipts=True` flag): the agent's memory object yields the
+  AI-Act evidence with zero wiring.
+- **1.45.0 compliance surface over MCP** — 5 MCP tools (`compliance_report`/`compliance_check`/`retention`/
+  `audit_bundle`/`verify_audit_bundle`); env `INSPEXIMUS_RECEIPTS=1` (opt-in) turns on the chain. Any MCP client
+  (Claude Code/Cursor) now produces + verifies its own AI-Act evidence in-loop. MCP surface = 53 tools.
+- **1.46.0 forget(dry_run=True)** — safety valve on the one irreversible op: preview a bulk delete
+  (`{would_forget, ids, sample}`, deletes nothing) via `inspeximus forget --contains X --dry-run` / MCP. The
+  "bulk forget w/ dryRun" moat.
+- **CI lesson (fixed):** 1.45's new MCP test failed CI (base env has no `mcp`/`langgraph`/`crewai`); every test
+  touching an optional dep MUST `pytest.importorskip`. Memory [[test-optional-dep-needs-importorskip-guard]].
+  Now VERIFY CI green (not just release) after any test-touching push.
+
+**Paid product (PRIVATE, do NOT push public):** `C:/Users/Danculus/inspeximus-pro/` (local git, NO remote) —
+**inspeximus-pro 0.2.0**, the Auditor Evidence-Pack generator (`inspeximus-pro dossier --store … --org … --pdf`).
+Assembles many stores into ONE branded, signed dossier + bundles + PDF (headless Chrome/Edge, no pip dep).
+Open-core: orchestrates free APIs only, never paywalls a primitive. Owner still owes the Polar + private-dist
+wiring. See memory [[inspeximus-pro-evidence-pack-built]].
+
+**Positioning + landing (public, gated-verified):** README hero + `docs/AI_ACT.md` + `docs/COMPLIANCE.md`
+(article quotes verified verbatim vs EUR-Lex/EU-Publications-Office; enforcement dates fixed: Annex III high-risk
+duties bite 2 Aug 2026, NOT "the whole Act"). Live landing **dancenitra.github.io/inspeximus/ai-act.html**
+(charter/seal design) with a "For auditors" inspeximus-pro CTA (a GitHub-issue request link; swap to Polar when
+live). Competitor gap VERIFIED vs 9 products (none ship verifiable-erasure/tamper-evident/AI-Act). Memory
+[[inspeximus-euaiact-memory-slice-positioning]].
+
+**Outreach (both POSTED, gated + owner-approved):**
+- **anthropics/claude-code#14227** (Persistent Memory Between CC Sessions) — offered inspeximus as the local
+  file-based MCP memory; comment 5070790809. (The failed "Claude Issue Triage" workflow the owner forwarded is
+  THEIR internal automation choking on our legit comment — not ours, harmless.) Memory
+  [[claude-code-14227-persistent-memory-reply]]. WATCH for replies.
+- **EDRN (luoxuejian000/edrn-dmrg-verification#1)** — graceful low-touch close: published the TRG toolchain to
+  `github.com/DanceNitra/agora/tree/main/agora_output/hotrg_edrn`, comment 5072111532 (agreed the finite-size
+  finding stands, handed over the toolchain, stepped back). Our heavy compute is done + Guanghao called our role
+  "irreplaceable". Memory [[hotrg-edrn-thermodynamic-limit-effort]] (updated). We are now LOW-TOUCH on EDRN.
+
+**Standing gate paid off again:** the storm-research grounding + a verify subagent (article quotes vs EUR-Lex)
++ the stress-audit (softened "the only one we've FOUND", "evidence" not "compliance") — every outward artifact
+carried the honest scope. And each release re-ran its demo numbers this cycle (VALIDATE) rather than asserting.
+
+**SEO + README + distribution (later evening):** 2 audit subagents → README first-screen now leads with an
+honest "What you install … vs alternatives" comparison table (competitor grid = the un-taken slot); landing got
+og:image (a teal `ai-act-og.png` card), Twitter cards, JSON-LD; homepage schema version fixed; added
+`sitemap.xml`+`robots.txt`; repo topics → 14 (mem0-alternative, self-correcting-memory, eu-ai-act…). Winnable
+keyword targets recorded in [[inspeximus-euaiact-memory-slice-positioning]]. **Reddit honest-null post is LIVE**
+(owner-posted, 1.1K views: "I spent a day trying to prove my memory layer beats plain RAG. It doesn't") — a
+strong distribution asset; jacksonxly = a sharp valued-contact; WATCH the comments and draft replies
+([[reddit-honest-null-post-live]]). **LinkedIn attempt DROPPED** — owner (rightly) said the AI-Act/compliance
+LinkedIn copy was jargon-y and assumed the reader knows the field; a general-audience LinkedIn post needs
+plain-language stakes in line 1, not a feature link. Lesson: for LinkedIn, write for someone who's never heard
+of agent memory, or skip it. **Owner-comms tip that worked:** he can't easily copy long text from this chat on
+his phone — send copy-blocks straight to his Telegram (script reads `HERMES_TELEGRAM_BOT_TOKEN`/`_CHAT_ID` from
+`server/.env`, sends `<pre>` HTML = one-tap copy; never echo the token).
+
+**RESUME POINTERS (read first next session):** inspeximus **1.46.0** live; the EU-AI-Act vertical is COMPLETE
+across every surface (Python/CLI/MCP/framework-stores/paid dossier). Open items, nothing on fire: (1) **owner
+owes** the Polar wiring for inspeximus-pro — the wheel + copy are ready in `inspeximus-pro/GO_TO_MARKET.md`
+(private repo, no remote), then swap the landing CTA href to the Polar URL; (2) **WATCH** the Reddit thread +
+#14227 for replies; (3) EDRN is low-touch; (4) LinkedIn is parked. Distribution is the real bottleneck (owner's
+22 X followers won't move it) — the levers are SEO (shipped, compounds), Reddit (live), and borrowed reach on
+neutral ground; HN account is shadowbanned, and don't pitch on competitors' repos.
+
+## 2026-07-24 (earlier) — EDRN scaling done honestly (gate caught 2 overclaims) + inspeximus gap-closure sprint (5 releases) + inbox pipeline cleared
+
+Three tracks in one long day. The through-line: **the standing gate earned its keep repeatedly — it caught a
+real overclaim in a physics reply AND a real correctness hole in an already-shipped product function.**
+
+### Track A — EDRN Exp-8 Sierpinski "silent dissonance" valley: finite-size scaling, done right
+Owner asked to build the L3 scaling / HOTRG for Li Guanghao's fractal-defect valley. Full arc:
+- First attempt (raw std over ALL bonds) said "valley washes out with size" (L2 0.197 → L3 ~0.02). **The gate
+  KILLED it**: adversarial audit found the collapse was largely a DILUTION artifact (one defect bond diluted by a
+  growing flat bulk), L3 DMRG unconverged, numbers not artifact-backed. Reframed with a **size-intensive order
+  parameter**: split bonds into LOCAL (fixed 18-bond radius-2 defect neighborhood, self-similar → identical at L2
+  AND L3) vs BULK. Result: **the valley is a real LOCAL defect mode** (L2 exact 0.190; L3 DMRG ≈0.15-0.21), the
+  bulk is flat (~0.003) — the global "washout" was the bulk diluting the signal.
+- **Honest boundary:** L3 does NOT converge (gasket is a gapless spin liquid, ξ≈1; MPS entanglement outruns χ≤256;
+  run-to-run state-selection unstable at the valley bottom). DMRG is the wrong tool — HOTRG (Krčmár et al. PRE 98
+  062114 2018) is the decisive next step. Gave a LOWER BOUND, not a fabricated converged number.
+- **Marat's s=2.50** ("divergence"): checked in exact ED (`_s25.log`) — smooth, no gap closing, no kink. His own
+  TAT-7 agrees (max error at the valley s=0.5, near-perfect at s=2.50). Normalization artifact, framed constructively.
+- Method validated: DMRG == ED to the digit at L1 AND L2 (global + local). No code bug — a physical tool limit.
+- **Posted the honest reply** (comment 5063784161, gated + owner-approved, through validate→storm→audit→verify with
+  v4 after 5 audit edits). **Li responded (comment @22:05, 2026-07-23) with deep appreciation**: fully ACCEPTED
+  holding the "Deep Valley" naming until HOTRG settles the thermodynamic limit; reframed it as the honest "fractal
+  local deep valley — a real N=15-42 defect-mode signal, cross-validated by three researchers." No new request/gate.
+  Scripts in scratchpad exp8/ (dmrg_orderparam.py, chi_extrap_local.py, order_param.py, dmrg_valley.py, s25_gapcheck.py).
+  Memory: [[marat-tat-edrn-collaboration-live]].
+
+### Track B — inspeximus gap-closure sprint: competitive scan → 5 releases (1.31→1.35), MCP tools 41→47
+Trigger: external-map inbox task → scanned **Mistikguard** (obscuraknight — a memory-integrity SIBLING that
+independently converged on our supersession/gate/provenance/zero-dep core) + the **Merkle-DAG provenance camp**
+(MemLineage, Portable Agent Memory, mnemosyne-guard). Verdict: NOBODY has stronger crypto than our RFC-6962 anchor;
+the unclaimed frontier is witness-cosigning. Closed 7/7 gaps, each WITH tests:
+- **1.32.0 `verify_claim`** — read-time grounding, supersession-aware (catches a reply citing a CORRECTED fact).
+- **1.33.0 `check_self_narration`** — flags assistant self-talk stored as a user fact. (Origin-binding #4 found
+  ALREADY covered by the attestation layer.)
+- **1.34.0 witness co-signing** — `witness_cosign` / `verify_cosigned_anchor` / `detect_split_view` / `new_ed25519_keypair`.
+  THE differentiator no competitor ships: external witnesses k-of-n cosign the anchor; split-view/fork detection.
+- **1.35.0 `selection_integrity`** (AUTHSELECT-adjacent, from arXiv 2606.12290) + **docs/COMPLIANCE.md** (NIST/OWASP/
+  GDPR/AI-Act honest mapping) + **adversarial-gate fixes**.
+- **The gate caught a REAL hole in the ALREADY-SHIPPED 1.32.0 verify_claim**: the numeric/negation clash heuristic
+  was blind to CATEGORICAL corrections (Berlin→Munich), so with `object` omitted it read `supported` for a corrected
+  fact. FIXED in 1.35.0 (record's stored object is the discriminator on keyed AND keyless paths). **Lesson: gate
+  BEFORE release, and RE-GATE shipped primitives when you extend the family.** Full suite green (226 passed).
+  Memory: [[inspeximus-gapclosure-sprint-2026-07-24]].
+
+### Track C — inbox research pipeline cleared 8/8 (2 Lab results + 5 forged ideas + a second-brain briefing)
+- **9903c5 REPRODUCED** (lab 7e2ae1): LinUCB regret (Chu et al. 2011) — sublinear in T (satisfies O(√(Td))), ~√d exactly.
+- **74ee1a honest NULL** (lab c43de7): consolidating a procedure buys STORAGE cost (R→1), NOT interference resistance
+  (threshold M≤R identical raw vs consolidated) — corrects the naive hypothesis.
+- **694704**: 5 grounded ideas across targets (public witness pool; AUTHSELECT prevention; compliance_bundle();
+  agent-memory claim registry; ground_reply()) — recorded to the ideation ledger.
+- **fc6fa2 second-brain briefing** (owner's Aging/Longevity notes): GROUND (his epigenetic-clock-as-causal-driver
+  CONTESTED; CR-universal CONTESTED via NIA-rhesus null; chronotherapy Ruben-2019 SUPPORTED); GAP (circadian-timed
+  CR × methylation age); CONNECT (clock-reset-without-function ↔ our value-revert-without-lineage-rederivation).
+- Triaged bac9df (off-mission PR), 69cd09 (done deeper), 7acf48 (lesson). **Inbox now 0 pending.**
+
+### Infra
+Brain (:8000) + dungeon (:5174) healthy all day on LOCAL GPU models (qwen3:30b-a3b — Ollama cloud quota was
+exhausted earlier). One :8000 listener, one mcp_server, zero strays. Invariants held.
+
+**Nothing pending, nothing awaiting approval. Next natural step if resumed: HOTRG for the EDRN thermodynamic limit,
+or build the highest-leverage forged idea (public witness pool / AUTHSELECT prevention).**
+
+## 2026-07-22 — RAMR shipped the integrity metric via 3 gated releases; the gate caught 3 real defects
 
 Track B. The owner's steer: "don't proliferate parallel benchmarks — build ON RAMR" ([[ramr-benchmark-published]]).
 So INTEGRITY-CONDITIONED RECALL (does recall return the correct CURRENT value after supersession/revert/poison)
