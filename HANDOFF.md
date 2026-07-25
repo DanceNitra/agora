@@ -13,6 +13,37 @@
 
 # Agora — Session Handoff (2026-07-20 · "test your own claim" day)
 
+## 2026-07-25 (latest) — 1.56.0: tenant isolation fixed STRUCTURALLY
+
+Three rounds had patched tenant leaks method by method and each round found more. The cause was the shape, not
+the methods: `self.items` was a plain attribute holding **every** tenant's rows, read directly by **46
+methods**, so isolation depended on each remembering to filter — and 1.55.0 shipped with that as a stated
+limitation.
+
+**`items` is now a tenant-scoped property over the real list (`_items`).** Scoping moved *under* the reads
+instead of beside them, so a method is isolated by construction. Only four sites touch the real list (load,
+append, forget, shred). The setter refuses a whole-list assignment, because `self.items = [...]` under a
+scoped read would replace every tenant's records with this tenant's survivors — which is how `forget()` used
+to work. Verified from the published wheel: **no leak** across `items`, `history`, `provenance`, `as_of`,
+`revert`, `memory_report`, `graph`, `value_by_cohort`; `apply_retention`, `sleep`, `forget`, `forget_pii`,
+`retract_lineage` and `consolidate` no longer reach another tenant; and the integration adapters that read
+`store.items` became correct **without being touched**. `shred()` now refuses from a tenant view (it destroys
+the shared encryption key).
+
+**The test that keeps it true:** a sweep calls EVERY public method from a tenant handle with arguments aimed
+at the other tenant and fails if their secret appears in the output — over **both** binding styles, because
+`for_tenant()` gets default-deny while a `tenant=`-bound store relies only on the property. A method the sweep
+cannot drive must be named with a reason; the first version skipped them on `TypeError`, so a newly added
+leaking method was invisible to it. Proved by injection: reading `items` passes, reading `_items` fails.
+
+**Honest scope, kept:** this isolates your own workloads on one store, not mutually distrusting parties — the
+file, receipt chain, anchor and encryption key remain shared.
+
+391 tests. The transferable lesson: **if a fix has to be applied at N call sites and a re-audit finds site
+N+1, the shape is wrong — move the invariant one level down instead of patching again.**
+
+---
+
 ## 2026-07-25 (latest) — a full codebase audit, 1.54.0 + 1.55.0, and the lesson of the day
 
 **Audited the whole package for the defect CLASS we had just fixed, not the defect.** Five parallel audits,
