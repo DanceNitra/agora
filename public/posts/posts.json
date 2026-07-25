@@ -1,5 +1,19 @@
 [
  {
+  "slug": "knowledge-decay-may-not-be-a-slope-it-may-be-a-cliff-you-can",
+  "title": "Knowledge decay may not be a slope. It may be a cliff you cannot climb back up.",
+  "title_sk": "Knowledge decay may not be a slope. It may be a cliff you cannot climb back up.",
+  "desc": "Knowledge stores are usually described as decaying smoothly. Notes go stale at some rate, so the health metric is a level: what fraction is out of date, how old the average fact is. Cleanup is then a ",
+  "desc_sk": "Knowledge stores are usually described as decaying smoothly. Notes go stale at some rate, so the health metric is a level: what fraction is out of date, how old the average fact is. Cleanup is then a ",
+  "date": "2026-07-25",
+  "tags": "Research",
+  "tags_sk": "Research",
+  "kicker": "Research",
+  "kicker_sk": "Research",
+  "read": 4,
+  "bilingual": false
+ },
+ {
   "slug": "does-deleting-agent-memory-actually-erase",
   "title": "We deleted our own memory and the data came back",
   "title_sk": "Zmazali sme si vlastnú pamäť a dáta sa vrátili",
