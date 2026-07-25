@@ -13,6 +13,52 @@
 
 # Agora — Session Handoff (2026-07-20 · "test your own claim" day)
 
+## 2026-07-25 — 1.65.0 / 1.65.1: a path regression, and the first attacker-model pass
+
+**`os.PathLike` and `bytes` paths were silently corrupted.** 1.64.0 added `expanduser` via `str(path)`, and
+`str()` REPR's a PathLike into `<object at 0x...>`. `Path(x)` had honoured `__fspath__` correctly before — so
+the fix that made the documented install paths work **broke callers who were already doing it right**. Now
+`os.fspath`, which raises `TypeError` rather than inventing a filename.
+
+**The first deliberate attacker-model pass.** Seven rounds hunted correctness; none had asked what someone
+who can WRITE but does not hold `receipt_key` can do. Two findings, both answered by correcting a CLAIM,
+because both limits are inherent:
+
+- **`state_digest` was blind to `value` and outcome standing** while claiming *"any out-of-band edit changes
+  the digest"*. Editing `value` or calling `credit()` leaves the digest identical and `verify_witness()` still
+  says `valid` — and those are the two fields RANKING uses, i.e. the ones that decide which fact wins. The
+  mechanism cannot be widened: `recall()` bumps `value`, so a digest covering it would change on every READ
+  and no witness could match. The claim changed; `witness()` carries the same note.
+- **Supersession is unauthenticated** and never said so: anyone who knows the key retires the current value.
+  `revert()` is capability-gated; the write path achieving the same outcome is not.
+
+**1.65.1 — and then the mitigation I had just documented turned out to be overstated.** Caught while
+verifying 1.65.0 from the published wheel, when the run printed `trusted_only: []` where I expected the truth.
+`trust_seeds` + `trusted_only` stops the attacker's value being SERVED; it does not stop the honest record
+being RETIRED, so the trusted read returns **nothing**, and the truth survives only under
+`include_superseded=True`. The guarantee is *"you will not be told the attacker's answer"*, not *"you will be
+told the right one"*.
+
+**And the test I wrote to prove that mitigation could not see it** — it asserted only "no 0xEVIL in the
+result", which passes trivially when the result is empty, and it was. The same weak-assertion shape this
+series keeps finding, this time guarding a **security claim**. It now pins all three facts: the poison is not
+served, the truth is not served either, and the truth survives as history.
+
+509 tests. Verified from PyPI at both versions.
+
+**Not reproduced, and recorded as such:** an agent reported that the scoped certificate rejects honest certs
+when the chain holds an unattributed tombstone (`forget()` with no `request_id`). My repro verified `True` —
+the producer scopes `erased_memory_ids` too. Left unfixed deliberately rather than acting on an unconfirmed
+report.
+
+**Also reported, unverified by me, worth a look next:** `credit()` leaves no receipt and no digest change, so
+a standing promotion is invisible to every evidence surface; attribution laundering via `derived_from` lets a
+record inherit a trusted source's canonical id and spend its budget; one junk write whose source canonicalizes
+onto a victim's turns every later DSAR into `AmbiguousSubject`; and `capacity=` (the documented mitigation for
+growth-DoS) converts it into a targeted eviction-DoS, since `value` is caller-supplied and unbounded.
+
+---
+
 ## OPEN WORK — inspeximus, carried forward (as of 1.64.0, 2026-07-25)
 
 Everything below is **reported and reproduced**, and deliberately NOT yet fixed. Kept here rather than in a
