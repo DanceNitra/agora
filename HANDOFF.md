@@ -13,6 +13,50 @@
 
 # Agora — Session Handoff (2026-07-20 · "test your own claim" day)
 
+## 2026-07-25 (latest) — 1.59.0: round four, and the guard that repeated its own bug
+
+**Three regressions from yesterday's fix, and three verdicts that signed an untruth.**
+
+**The concurrency guard had the shape of the bug it replaced.** `_file_sig = None` meant BOTH "no path" and
+"the file is not there yet", and `_save` skipped the guard on `None` — so two handles opening a store that
+does not exist yet (**two workers starting together, the commonest concurrency case**) both had an ungated
+first write. Absent is now a distinct sentinel.
+
+**The recovery path broke the property the store exists for.** `reload()` unions by id, so the disk copy of a
+record this handle had SUPERSEDED came back active: two contradictory active values under one key, with
+`verify_writes()` True. It now re-applies last-write-wins per key and no longer resurrects a tombstoned
+record — my first version of that filter covered only the re-added side, so a deliberate erasure was undone by
+its own recovery path while the tombstone still claimed it had happened. Load normalisation also used
+`time.time()` for a missing `ts`, so `state_digest` differed across two opens of **identical bytes**.
+
+**Three verdicts that signed an untruth.** `DeletionManifest.verify` returned `(True, [])` on a forged
+manifest — `complete`, `residual_targets`, `subject` and `authorized_by` sat OUTSIDE the hash chain, and an
+empty manifest verified clean too. `ErasureAuditor.audit()` with no probes returned `erasure_verified: True`,
+and `compliance_receipt()` **signs** that. And the CLI printed `remembered <id>` and exited 0 on a store that
+never reached disk — a typo'd `--path` discarded every write for the session while the library had recorded
+the failure all along.
+
+**Three more silent wrongs.** `forget(where=)` swallowed a raising predicate and reported a complete sweep;
+`source={"who": ...}` was accepted and silently un-attributed to `id:<record>`, killing provenance and
+`slash(scope='source')`; and `route()` matched a key inside a longer word and executed on it — *"the earlier
+**heart** condition"* reverted the key `art`, unconfirmed.
+
+433 tests, 10 mutations each killed by its own test. Verified from PyPI: bootstrap guarded, reload keeps one
+active value, forged manifest `False`, zero-probe audit `False`, CLI bad path `exit 3`.
+
+**The pattern, four rounds in:** every round has found defects **inside the previous round's fix**. That is
+now the expectation, not the surprise — see [[fix-the-class-not-the-instance-reaudit-always]].
+
+**Still open, honestly:** `verify_bundle`'s coverage checks stay ADVISORY (unkeyed bundle hash). Tenant
+isolation is a boundary for your own workloads, not between distrusting parties. Single-writer is *enforced*,
+not *solved*. Reported but not yet fixed: the echo guard differs between surfaces (MCP on, library and CLI
+off) so one CLI write can undo the flagship echo-resistance property on a shared store; `langchain.clear()`
+and `crewai.reset()` mark records deleted in memory without persisting or tombstoning, so content survives on
+disk after a user-visible "clear"; MCP erasure tools cannot record a `request_id`; several adapters write
+without a `source`, making those records un-erasable by subject; and the CLI `remember` has no `--source`.
+
+---
+
 ## 2026-07-25 (latest) — 1.58.0: the known-and-unfixed list, cleared
 
 Everything carried as **known and unfixed** across three releases is now shipped and verified from the
