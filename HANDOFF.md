@@ -51,11 +51,26 @@ when the chain holds an unattributed tombstone (`forget()` with no `request_id`)
 the producer scopes `erased_memory_ids` too. Left unfixed deliberately rather than acting on an unconfirmed
 report.
 
-**Also reported, unverified by me, worth a look next:** `credit()` leaves no receipt and no digest change, so
-a standing promotion is invisible to every evidence surface; attribution laundering via `derived_from` lets a
-record inherit a trusted source's canonical id and spend its budget; one junk write whose source canonicalizes
-onto a victim's turns every later DSAR into `AmbiguousSubject`; and `capacity=` (the documented mitigation for
-growth-DoS) converts it into a targeted eviction-DoS, since `value` is caller-supplied and unbounded.
+**All four were then verified and answered in 1.66.0.** Each reproduced before I acted:
+
+- **One hostile write blocked every later DSAR — FIXED.** A junk write whose source canonicalises onto a
+  victim's made `forget_subject` raise forever, and the only escape erased both subjects. `exact=True` now
+  proceeds on the collision-safe subset the resolver had already computed (erased 2 — the record and its
+  derived summary — attacker junk kept). *A guard that cannot be satisfied is a denial of service with good
+  intentions.*
+- **`credit()` leaves no evidence trail — DISCLOSED.** It sets `good`, which the influence gate reads, so it
+  decides what `recall(influence_only=True)` may serve. Measured: receipts `1 -> 1`, digest unchanged,
+  `verify_writes() -> True`. Invisible to every integrity surface the library sells.
+- **`derived_from` inherits a source you do not own — DISCLOSED.** The attacker's record became attributable
+  to a trusted auditor and **spent its irreversible budget**; the real owner was then denied.
+- **`capacity=` is not a clean mitigation — SECURITY.md CORRECTED.** Eviction ranks by caller-supplied,
+  unbounded `value`. Measured: `capacity=10`, fifty writes at `value=1000`, **5 of 5** victim records
+  evicted. The recommended defence is the weapon.
+
+Three are inherent to a store with **no writer identity** — that is the single root behind unauthenticated
+supersession, `derived_from` laundering and the un-auditable `credit()`. An authenticated write path is the
+real fix and is a design change, not an audit fix. Until then the disclosures carry tests that keep them
+true, and 516 tests pass.
 
 ---
 
