@@ -13,6 +13,45 @@
 
 # Agora — Session Handoff (2026-07-20 · "test your own claim" day)
 
+## 2026-07-25 (latest) — 1.57.0: round three, and two regressions the FIX introduced
+
+Third audit round, on the fixed code. The pattern held again and **I was the source of half of it.**
+
+**Two regressions from my own 1.56.0 tenant work.** The scoped view was cached as a list and returned as the
+object itself, so `view.items.append(rec)` planted a **phantom record**: every later reader saw it including
+fresh handles, `recall` ranked it FIRST, it was never on disk, and it vanished on the next write. A bound
+store now returns an immutable **tuple**. And `get()`/`neighbors()` were rebound onto the tenant view although
+they do not exist on `Inspeximus` (they are MCP-level tools) — every tenant-scoped `get()` raised.
+
+**A truncated store destroyed itself.** A corrupt plaintext file loaded as `[]` and the very next save wrote
+that empty list over it — 5 records in, 0 loaded, 1 on disk. The encrypted branch had always raised; the
+plaintext one destroyed the file, and receipts are off by default, so the default path was a silent total
+wipe. It now refuses to open and leaves the file byte-identical.
+
+**The collision class, on the levers round two missed.** `monitor()`, `spend_irreversible()` and
+`restore(scope='source')` all expand by canonical source: 20 bad outcomes on Alice left Bob one call from an
+alarm he never earned; Alice's spend exhausted Bob's lifetime budget; and restoring Alice **cleared a slash
+Bob had earned on his own catch** — the worst, because it re-admits a correctly forfeited source.
+
+**My own verifier checks are forgeable, and now say so.** `bundle_hash` is an UNKEYED sha256, so an exporter
+can set `proof.verified` or `n_records` and recompute it in three lines — demonstrated against the checks I
+added in 1.54/1.55. Kept (the accidental case is the common one), relabelled **ADVISORY**. Also:
+`compliance_check` never got the partial-coverage check `verify_bundle` received, so 5 unreceipted + 1
+receipted reported `ok: True`.
+
+403 tests. Verified from the published wheel: phantom refused, `monitor`/`spend_irreversible` refuse the
+collision, truncated store refuses and leaves the file at 749 bytes.
+
+**KNOWN AND UNFIXED** (reported, reproduced, deliberately not shipped this round): cross-process
+last-writer-wins data loss — two handles on one path, the loser's committed+flushed record is erased and
+`verify_writes()` still returns True; this is the shipped default (`mcp_server.py` and `cli.py` share
+`INSPEXIMUS_PATH`). Also: `NaN`/`Infinity` reach the store file and make it invalid JSON for any strict
+parser; a record missing `status` crashes six methods and makes `index_coherence` report `coherent: true`
+with an undercount; the CLI has no `forget-subject` at all; and `forget_pii` plus the openai-agents and
+google-adk adapters have no `allow_ambiguous` escape hatch.
+
+---
+
 ## 2026-07-25 (latest) — 1.56.0: tenant isolation fixed STRUCTURALLY
 
 Three rounds had patched tenant leaks method by method and each round found more. The cause was the shape, not
