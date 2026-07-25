@@ -13,6 +13,50 @@
 
 # Agora — Session Handoff (2026-07-20 · "test your own claim" day)
 
+## 2026-07-25 (latest) — a full codebase audit, 1.54.0 + 1.55.0, and the lesson of the day
+
+**Audited the whole package for the defect CLASS we had just fixed, not the defect.** Five parallel audits,
+each required to run code; I re-verified every severe finding myself before acting. Then re-ran the audit on
+the FIXED code — and that second pass is the finding worth keeping.
+
+**1.54.0 — what the first audit found.** Tenant isolation was enforced in **25 of 79** methods:
+`A.history(B_key)` returned `sk-globex-999` verbatim, `beta.forget([acme_id])` deleted the row, `credit()`
+wrote across, six reports counted other tenants, and two tenants shared a `state_digest`. `_save()` swallowed
+every exception AND left `_dirty` False, so `flush()` no-opped and **verify_writes() returned True with 5
+records in memory and 1 on disk**. The 1.53.0 collision guard covered **1 of 5** paths — `forget_pii` erased
+the third party, `retract_lineage` demoted him, `rederive` rewrote his text. `verify_bundle` — the side an
+external auditor runs — passed a bundle carrying its own `verified: False`. Plus: `remember()` returned the id
+of a record it had just evicted; `verify_claim` verdicted `supported` for a retired password; a raising
+rewriter and a raising extractor both vanished silently; `selection_integrity` reported `stable=True` with the
+whole top-k untrusted on wrong seeds.
+
+**1.55.0 — what the RE-audit found, and this is the lesson.** Every 1.54.0 fix held **at the instance** and the
+**class survived in every case**: the new default-deny allow-list itself listed `apply_retention`, `shred`,
+`sleep`, `grade`, `erasure_certificate`; `revert` was *rebound* and still returned another tenant's plaintext
+(**rebinding is not scoping**); the guard covered erasure but not `slash`, which forfeited a colliding
+subject's standing; the persistence fix covered the store file but not the receipt/tombstone **sidecars**,
+which is worse — the erasure proof a DSAR rests on vanished with `verify_writes()` still True. Both verifiers
+also still passed vacuously on partially- or un-receipted stores. And my own guard made a legitimate GDPR
+erasure **unreachable** through MCP for want of an override.
+
+**README, honestly.** It claimed *"every number traces to a runnable probe"*. One does not — the LOCOMO
+recall@25 0.78/0.65 harness is not in the repo and the file it named does not exist. Now marked **reported,
+not independently reproducible**, with the promise reworded rather than the standard lowered.
+
+**Stated limit, not implied.** Tenant isolation is **not complete**: 46 methods still read `self.items`
+directly. Documented as a soft boundary for isolating your own workloads, not a security boundary between
+distrusting parties. Claiming it done after patching 12 of 46 would have repeated the exact mistake.
+
+**379 tests; 18 mutations across the three rounds, each killed by its own test** — including one that exposed
+a test covering only half the branch it claimed. Both releases verified by installing the published wheel from
+PyPI into a clean venv and re-running the defect scenarios. Detailed findings are LOCAL ONLY (both repos are
+public): `scratchpad/AUDIT_2026-07-25.md`.
+
+**The one sentence:** a fix lands where the report pointed; the class lives one call site over. Re-audit after
+fixing, and audit the guard you just added — see [[fix-the-class-not-the-instance-reaudit-always]].
+
+---
+
 ## 2026-07-25 (latest, cont.) — inspeximus 1.52.0 + 1.53.0, and the gate stopping two bad ships
 
 **The one sentence for the second half of the day:** every instrument built today was wrong in the same
