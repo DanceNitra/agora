@@ -13,6 +13,47 @@
 
 # Agora — Session Handoff (2026-07-20 · "test your own claim" day)
 
+## 2026-07-25 (latest) — 1.62.0: three regressions, and a mutation run that graded the whole suite
+
+**The most useful audit of the day audited the TESTS, not the code.**
+
+**Mutation score: 32.8%** — 400 single-point mutants, 131 killed; **54.9%** on lines the suite executes at
+all, with **165 mutants on lines no test ever reaches**. The survivors sat on the predicates the product is
+sold on: `verify_attribution`'s source-hash comparison could be **inverted** with the suite green; three of
+`verify_bundle`'s tamper checks could have `or` -> `and`; the MCP echo-guard default could be flipped **off**;
+and tenant-scope comparisons in `contradictions`, `resolve_reopened`, `_stale_by_value` could be inverted.
+Thirteen new tests target those mutants by name - all five re-checked survivors now die. See
+[[mutation-score-not-test-count]].
+
+**Three of my own tests could not fail.** One ran its early-return branch and asserted a **regex over
+`core.py` as a string** (the live branch was dead *and* broken - it read a key that method never returns).
+One was `assert not hasattr(m.forget_subject, "dry_run")` - an attribute lookup on a bound method, pinning a
+limitation 1.53.0 had already removed. One was `assert A and B if False else C`. And one asserted a
+**spelling**: "the CLI and MCP agree on the echo guard" grepped both files for the env-var name, which is
+exactly why flipping the default survived.
+
+**Three regressions from my own last two releases:**
+- **1.60.0 turned under-erasure into OVER-erasure.** Giving adapter writes a `source=` made them erasable,
+  but two subjects were not namespaced - `forget_subject("user_42")` erased the person's record **and** a
+  Haystack document whose id happened to be `user_42`. Before 1.60.0 a DSAR matched nothing; after it, it
+  **hard-deleted a third party**, which is the worse failure. All adapter subjects are prefixed now.
+- **1.61.0 reported a READ failure as a persistence failure** - an unreadable `.irrev.json` went into
+  `_sidecar_errors`, which `flush()` raises on, so a perfectly persisted store said "could not persist" and
+  the CLI exited 3. Read failures have their own channel now.
+- **1.60.0 made a reader need write access** - `recall` bumps `last_access`, so on a read-only store it
+  printed the right answer then exited 3. Read commands warn and exit 0.
+
+466 tests. Verified from PyPI: over-erasure fixed, read != persist, reader exits 0.
+
+**Carry forward, honestly:** the number that matters is **32.8%**, not 466. Also still open - 136 of 272
+public functions have zero executed statements (including `verify_erasure_certificate`, `erasure_certificate`,
+`submit_revert`, `witness`/`verify_witness` and the whole revert-capability surface); 50 of 55 MCP tools never
+execute in the suite; `test_haystack.py` runs in no environment at all (skipped locally, and its CI job runs a
+different file). `verify_bundle`'s coverage checks stay ADVISORY, tenant isolation is a boundary for your own
+workloads, and single-writer is enforced rather than solved.
+
+---
+
 ## 2026-07-25 (latest) — 1.61.0: three controls that failed OPEN
 
 The last of round four's sweep, and all three share a shape worse than a crash: each **silently granted what
