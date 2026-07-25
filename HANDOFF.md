@@ -13,6 +13,49 @@
 
 # Agora — Session Handoff (2026-07-20 · "test your own claim" day)
 
+## 2026-07-25 (latest) — 1.58.0: the known-and-unfixed list, cleared
+
+Everything carried as **known and unfixed** across three releases is now shipped and verified from the
+published wheel.
+
+**Cross-process data loss — the largest.** One JSON file written whole and read once at open, no lock, no
+re-check, so a second handle won by writing last: B's committed and `flush()`ed record erased by A's next
+save, with `verify_writes()` True on both sides. That is the SHIPPED DEFAULT — `mcp_server.py` and `cli.py`
+both resolve `$INSPEXIMUS_PATH`, so a long-running MCP server plus one CLI call is the ordinary case. Losing
+data and then certifying it is the worst thing an integrity store can do. inspeximus is a **single-writer**
+store and that is now enforced: each handle fingerprints the file `(mtime_ns, size)` at load and after its own
+saves, and a save into a changed file raises **`StoreChangedOnDisk`**. `reload()` re-reads and re-adds this
+handle's records by id, so **neither writer loses a write** (verified: all three records survive). A single
+writer never sees a false conflict. Receipt/tombstone sidecars are atomic now too — a crash mid-write could
+leave the *evidence* truncated while the store was fine.
+
+**The store file stays valid JSON.** `value=float('nan')` wrote a bare `NaN` literal — Python re-reads it,
+jq/JS/serde do not, so the file silently stopped being JSON for the audit bundle and every non-Python
+consumer while `state_digest` and `verify_writes` reported healthy. `inf` also sorted first in every recall
+forever. Refused at the write, and at the serializer as a second layer.
+
+**Foreign/older records.** A record missing `status` raised a bare `KeyError` in six methods and made
+`index_coherence` report `coherent: true` with an **undercount** — a wrong answer, worse than a crash.
+Normalised once at load; only absent keys are filled.
+
+**Reachability.** The library has had subject erasure since 1.0 and **the CLI never exposed it**, so the one
+operation a DSAR needs was unreachable from a terminal. Added `inspeximus forget-subject` with `--dry-run`
+(direct vs inherited + which other subjects go along) and `--allow-ambiguous`. `forget_pii` on MCP,
+`google_adk.forget_subject_for` and `openai_agents.forget_subject` gained the escape hatch — without it a
+legitimate erasure was unreachable there too.
+
+420 tests; 6 mutations each killed by its own test. Verified from PyPI: conflict refused then merged
+(`reloaded 2, readded 1`, all three records present), NaN refused, legacy record recallable, CLI erasure
+`erased 1 record(s), 1 tombstone(s)`.
+
+**Still open, honestly:** `verify_bundle`'s coverage checks remain ADVISORY (unkeyed bundle hash — an exporter
+can forge `n_records`/`proof.verified`); only witness co-signatures are operator-adversarial. Tenant isolation
+remains a boundary for your own workloads, not between distrusting parties — the file, receipt chain, anchor
+and encryption key are shared. And single-writer is now *enforced*, not *solved*: two writers still cannot
+proceed concurrently, they are merely told so instead of one silently losing.
+
+---
+
 ## 2026-07-25 (latest) — 1.57.0: round three, and two regressions the FIX introduced
 
 Third audit round, on the fixed code. The pattern held again and **I was the source of half of it.**
