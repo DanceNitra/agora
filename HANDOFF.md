@@ -111,6 +111,41 @@ receipts with `anchor().n_writes == len(_receipts)`.
 
 ---
 
+## 2026-07-26 — 1.68.0: the accountability lever laundered the tamper (SECURITY)
+
+**The sharpest finding of the campaign, and it was my own regression, live on PyPI for hours.**
+
+1.67.0 let `slash()`/`restore()` amend the receipt chain (fixing a false tamper alarm) and had
+`verify_writes` bind only the LATEST receipt. The commit was ONE hash over text+key+mtype and the receipt
+is recomputed from the record's CURRENT state — so "latest binds" forgave the text. Measured: edit the
+stored text out of band (`verify_writes()` -> False), call the **public** `slash()` (no key, no privilege)
+-> True, forged text standing. It reached `erasure_certificate.self_check`, the document handed to a DPA.
+`audit_bundle` is content-free and was NOT on this path.
+
+Fixed structurally in **1.68.0** (verified from PyPI, not the repo): a receipt DECLARES what it rewrites
+(`amends: ["mtype"]`), verification forgives exactly that and nothing else, and the declaration is inside
+the receipt hash — otherwise an attacker appends `amends: ["immutable_sha256"]` and switches the text check
+off while the chain verifies. Six mutations each fail their own test.
+
+**The first repair was wrong one field over.** It bound text+key everywhere but still forgave
+`attrib_sha256` on an amendment — and catching a later RELABEL is the whole reason attribution is
+committed. Dropping that check survived all 541 tests. Now covered.
+
+**Two CI checks had silently stopped covering their subject** (both found by the red release, neither by
+the suite):
+- `session_audit` went red: two `InspeximusSession(path=same_file)` built two independent handles, so the
+  single-writer guard fired on the second session's first write. The reference `SQLiteSession` keeps one
+  connection per file and the class's own docstring promises "one store, many sessions". Sessions now share
+  a weak-referenced handle per resolved path; cross-process writers still get the guard. 7 tests.
+- The MCP-registry checks read page ONE of a 30-per-page API. Past 30 published versions the verifier could
+  not see the new version (failing every release) and the state check would have driven publish into the
+  duplicate 400 it exists to prevent. Both now follow `nextCursor` and report the denominator they saw.
+  1.68.0 had published fine — PyPI serves it, the registry already marks it latest. Only our checks were blind.
+
+**553 tests. tests + audit jobs green on main.**
+
+---
+
 ## OPEN WORK — inspeximus, carried forward (as of 1.64.0, 2026-07-25)
 
 Everything below is **reported and reproduced**, and deliberately NOT yet fixed. Kept here rather than in a
