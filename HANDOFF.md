@@ -146,87 +146,80 @@ the suite):
 
 ---
 
-## OPEN WORK — inspeximus, carried forward (as of 1.64.0, 2026-07-25)
+## OPEN WORK — inspeximus, carried forward (re-verified 2026-07-26 against 1.69.0)
 
-Everything below is **reported and reproduced**, and deliberately NOT yet fixed. Kept here rather than in a
-release note so it cannot quietly disappear. Ordered by what a user would care about.
+**Four of the five carried items were STALE.** They are closed below with the measurement that closed
+them. An open-work list nobody re-checks is the same failure as a gate that always passes: it reports work
+that does not exist and buries the one item that does.
 
-### Stated limits — by design, not bugs
+### CLOSED on re-measurement (2026-07-26)
 
-- **`verify_bundle`'s coverage checks are ADVISORY.** `bundle_hash` is an unkeyed SHA-256, so an exporter can
-  set `governance.proof.verified` or `n_records` and recompute it in three lines. Both were demonstrated
-  against our own 1.54/1.55 checks. They catch a misconfigured or accidentally altered export — the common
-  case — and prove nothing against a determined operator. Only the witness co-signature is
-  operator-adversarial.
-- **Tenant isolation is a boundary for your own workloads**, not between mutually distrusting parties: the
-  file, receipt chain, anchor and encryption key are all shared. `items` is structurally scoped and
-  destructive methods are tenant-bound, but anything holding `_items` holds everything.
-- **Single-writer is ENFORCED, not SOLVED.** Two writers are told about the conflict (`StoreChangedOnDisk`)
-  and `reload()` merges them; they still cannot proceed concurrently. A real fix is a lock or a different
-  storage format.
+- **`reload()` LWW leaving two active rows** — does not reproduce. Same key + same value keeps both rows on
+  the write path AND after `reload()` (a restatement is not a supersession); byte-identical text collapses
+  to one on both paths; a genuine two-value conflict still collapses to one. `state_digest()` preserved in
+  every case.
+- **`INSPEXIMUS_RECEIPTS` unread by the MCP server** — it IS read (`mcp_server.py:81`) and passed to the
+  store. Verified by importing the server module with the var set: `_RECEIPTS=True`,
+  `_MEM.receipts_enabled=True`.
+- **The wheel ships `__pycache__`** — the published 1.69.0 wheel has **0** pycache entries out of 33.
+- **The 47 triaged mutation gaps / 15 named killing tests** — written and shipped as
+  `tests/test_mutation_gaps.py`, `test_mutation_gaps_runners_up.py`, `test_absolute_revert_and_gaps.py`.
+  Five of the 15 triage lines were WRONG about the contract and are now characterisation tests: `route()`
+  has no delete intent (it STORES "delete X" as an assertion), `slash()` deliberately keeps records
+  readable, `revert()` restores via a new ledger entry rather than reviving the old row, `index_coherence`
+  is coherent with no embedder, `distill_and_remember` takes `distiller(prompt, text)`.
 
-### Measured, unfixed
+### CONFIRMED, and not fixable from our side
 
-- **Mutation score 36.4% (51/140)**, independently reproduced by a second harness against my 36.0% (36/100).
-  Of 89 survivors: **47 REAL GAPS**, 35 low-value (recall ranking order, report-only counts, log strings),
-  7 equivalent mutants. The 15 highest-value, each with the test that would kill it:
+- **Mixed library versions on one store file silently lose writes.** The single-writer guard shipped in
+  1.67.0; an older handle has none and saves anyway. Measured with real installs, 1.51.0 alongside 1.69.0:
 
-  | file:line | mutation | the test that kills it |
-  |---|---|---|
-  | core.py:3662 | `and`→`or` | `route("delete X")` must forget ONLY that key's active rows — assert other keys and tenants survive |
-  | core.py:472 | `==`→`!=` | `verify_erasure_certificate` against a **plaintext** store still holding an allegedly-erased id must fail (the encrypted-branch skip hides it today) |
-  | core.py:3301 | `and`→`or` | two supersession chains on one key: `revert()` must restore the record superseded BY THE CURRENT one |
-  | core.py:3413 | `or`→`and` | `submit_revert` must refuse to revive a predecessor whose meta has `echo_blocked` |
-  | core.py:3432 | `==`→`!=` | ABA: re-assert then re-kill the same value; submit must revive the PINNED id, not the look-alike |
-  | core.py:6126 | `or`→`and` | `for_tenant("a").verify_claim(text)` on the keyless path must not see tenant b, and must still see its own |
-  | core.py:6135 | `and`→`or` | `verify_claim` on a similar but non-contradicting record must return `unsupported`, not `contradicted` |
-  | core.py:5017 | `not in`→`in` | `recall(where={"f": {"$in": [x]}})` must exclude the complement |
-  | core.py:5828 | `and`→`or` | with `supersede_persistence=2` a NEGATING record must not count as support |
-  | core.py:5960 | `and`→`or` | `apply_retention(drop_stale_episodic=True)` must keep semantic/procedural and drop only episodic |
-  | core.py:4739 | `or`→`and` | a slashed (non-orphan) record must not appear in `recall()` |
-  | core.py:4704 | `>=`→`<` | an episodic record at graduate-value with `bad > good` and <2 sources must stay episodic |
-  | core.py:5080 | `or`→`and` | `credit(id, "good")` twice must accumulate to 2.0, not reset to 1.0 |
-  | core.py:2861 | `and`→`or` | `index_coherence()` with missing vectors must report `coherent: False` even when `recipe_match` is True |
-  | core.py:1750 | `12`→`0` | `distill_and_remember` must reject an item whose `support` quote is under 12 non-space characters |
+  ```
+  1.51.0 opens -> 1.69.0 writes+flushes -> 1.51.0 flushes
+  final: ['baseline record', 'written by OLD after the fact']       <- the 1.69.0 record is GONE
+  same interleave, both handles on 1.69.0
+  final: ['baseline record', 'written by NEW while OLD held a handle']    <- guard refuses
+  ```
 
-  Runners-up worth one test each: core.py:3103 (`both_cosigned` true when only one side co-signed), 3773
-  (`believed_at` matches the wrong key), 4897 (coherence gate admits all links), 5582 (`require_earned` grants
-  the full cap when bad>good), compliance.py:120 (`controls_with_evidence` counts the wrong status).
+  1.51.0 is published and cannot be patched. Documented in SECURITY.md with the measurement, and pinned by
+  `tests/test_single_writer_guard.py` so the warning cannot outlive the code it describes. The
+  partially-upgraded fleet is the dangerous state, not the fully-old one.
 
-- **Coverage: 56 of 318 public functions (18%) still have zero executed body lines** — down from 132/318
-  (42%). Remaining concentrations: `integrations/langgraph.py` (11), `mcp_server.py` (9), `autogen.py`,
-  `openai_agents.py`, `pydantic_ai.py` (5 each), `witness_server.py` (3).
+### Still open
 
-- **The MCP sweep is coverage, not verification.** `tests/test_mcp_surface.py` asserts only "did not raise"
-  and "JSON-serialisable" — demonstrated to pass with six tools replaced by `lambda: {'lol':'garbage'}`. Its
-  docstring says so, but it needs behavioural assertions per tool to be worth more than a smoke test.
+- **Coverage: 56 of 318 public functions (18%) have zero executed body lines.** Concentrations:
+  `integrations/langgraph.py` (11), `mcp_server.py` (9), `autogen.py`, `openai_agents.py`,
+  `pydantic_ai.py` (5 each), `witness_server.py` (3).
+- **The MCP sweep is coverage, not verification** — `tests/test_mcp_surface.py` asserts only "did not
+  raise" and "JSON-serialisable"; demonstrated to pass with six tools replaced by
+  `lambda: {'lol':'garbage'}`.
+- **`tests/test_mcp_surface.py` leaks env vars** (`INSPEXIMUS_PATH` / `INSPEXIMUS_RECEIPTS` never restored).
+- **`verify_erasure_certificate`'s `store_path` branch has no test.**
+- **Stated limits, by design:** `verify_bundle`'s coverage checks are advisory (unkeyed SHA-256 — only the
+  witness co-signature is operator-adversarial); tenant isolation is a boundary for your own workloads, not
+  between mutually distrusting parties; single-writer is enforced, not solved.
 
-- **`tests/test_mcp_surface.py` leaks env vars.** It sets `INSPEXIMUS_PATH` / `INSPEXIMUS_RECEIPTS` in
-  `os.environ` and never restores them. Harmless today; process-global state escaping a test module.
+### Process lessons that cost real time
 
-- **The wheel ships `__pycache__`** — 25 `.cpython-312.pyc` files, roughly half the 283 KB wheel.
-
-- **`INSPEXIMUS_RECEIPTS` is documented but the MCP server does not read it** — receipts are reachable from
-  the CLI's `--receipts` flag only, so an MCP-only user cannot turn on the evidence chain at all.
-
-- **`verify_erasure_certificate`'s `store_path` branch has no test.** Inverting its encryption-magic check
-  survives the whole suite.
-
-### Process lessons that cost real time today
-
-- **Commit before running anything that rewrites the working tree.** `git checkout -- inspeximus/` destroyed
-  an uncommitted fix that had to be written twice.
-- **Never run two mutation passes concurrently**, and **verify the suite is green before the first mutant** —
-  an overlapping run left three files mutated, so every mutant looked killed and the harness reported 92.5%
-  where the clean tree gives ~36%.
-- **Keep the measurement artefact.** The first clean survivor list (25 minutes of compute) was deleted with
-  the temp file and had to be re-derived.
-- **Exclude docstrings and comments from the mutant population** (`tokenize`), or dead prose mutants deflate
-  the score.
-- **Count BODY lines when measuring per-function coverage** — the `def` line executes at import, which made a
-  first measurement report 2% uncovered where the truth was 42%.
-- **Ask what shape a fixture CANNOT express.** Two fixes shipped with tests that could not see the defect:
-  the rederive guard (regex matched a parent hidden in `meta`) and the scoped certificate (one request only).
+- **Read the contract BEFORE writing the assertion.** Five rewrites in one round came from asserting what I
+  assumed the API promised; five more from wrong API locations (`detect_split_view` is a staticmethod on
+  `Inspeximus`, `compliance_report` lives in `inspeximus.compliance`, the hook is `embed` not `embedder`,
+  `distiller` takes two arguments).
+- **Ask what the fixture CANNOT express.** Repeatedly a test passed while testing nothing: a non-hex nonce
+  made the intent malformed so assertions behind `if res["ok"]:` were unreachable; a bare signature string
+  is silently skipped as malformed so `both_cosigned` read False on BOTH branches; a bare slashed record is
+  dropped by the corroboration term so the retraction term was never exercised; a net-negative record is
+  denied by BOTH `require_earned` paths.
+- **Verify the mutation landed where intended.** Two "SURVIVES" reports were my own mis-located mutations
+  and one was a bad substitute (`b = -1.0` instead of `and`->`or`). The tool that grades the tests needs the
+  same scrutiny as the tests.
+- **Use Edit, not string replace, for anything with line continuations** — three silent non-matching
+  replaces this session, each leaving the old code in place while I believed it was patched.
+- **Never anchor a test to a line number** — the recorded survivor lines were already stale; what was
+  `core.py:3662` is now a comment.
+- Commit before anything that rewrites the working tree; never run two mutation passes concurrently; verify
+  the suite is green before the first mutant; exclude docstrings from the mutant population; count BODY
+  lines for per-function coverage.
 
 ---
 
