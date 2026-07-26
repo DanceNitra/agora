@@ -146,80 +146,89 @@ the suite):
 
 ---
 
-## OPEN WORK — inspeximus, carried forward (re-verified 2026-07-26 against 1.69.0)
+## OPEN WORK — inspeximus, re-verified 2026-07-26 against 1.71.0
 
-**Four of the five carried items were STALE.** They are closed below with the measurement that closed
-them. An open-work list nobody re-checks is the same failure as a gate that always passes: it reports work
-that does not exist and buries the one item that does.
+**772 tests. Coverage went 85 -> 24 of 373 public functions with no executed body line (23% -> 6%), and
+what remains is DELIBERATE — listed below with the reason, so nobody re-opens it as unfinished work.**
 
-### CLOSED on re-measurement (2026-07-26)
+An open-work list nobody re-checks is the same failure as a gate that always passes. Four of the five items
+carried into today were already stale; they are recorded as closed with the measurement that closed them.
 
-- **`reload()` LWW leaving two active rows** — does not reproduce. Same key + same value keeps both rows on
-  the write path AND after `reload()` (a restatement is not a supersession); byte-identical text collapses
-  to one on both paths; a genuine two-value conflict still collapses to one. `state_digest()` preserved in
-  every case.
-- **`INSPEXIMUS_RECEIPTS` unread by the MCP server** — it IS read (`mcp_server.py:81`) and passed to the
-  store. Verified by importing the server module with the var set: `_RECEIPTS=True`,
-  `_MEM.receipts_enabled=True`.
-- **The wheel ships `__pycache__`** — the published 1.69.0 wheel has **0** pycache entries out of 33.
-- **The 47 triaged mutation gaps / 15 named killing tests** — written and shipped as
-  `tests/test_mutation_gaps.py`, `test_mutation_gaps_runners_up.py`, `test_absolute_revert_and_gaps.py`.
-  Five of the 15 triage lines were WRONG about the contract and are now characterisation tests: `route()`
-  has no delete intent (it STORES "delete X" as an assertion), `slash()` deliberately keeps records
-  readable, `revert()` restores via a new ledger entry rather than reviving the old row, `index_coherence`
-  is coherent with no embedder, `distill_and_remember` takes `distiller(prompt, text)`.
+### DELIBERATELY uncovered (not a backlog)
 
-### CONFIRMED, and not fixable from our side
+- **One-line async delegates** — `langgraph`'s six `aput -> self.put` wrappers, `abatch`, `alist`. There is
+  nothing in `return self.put(*a, **k)` for a test to catch.
+- **Abstract protocol methods** — `ErasureTarget.erase` / `.still_recoverable`, `StoreProbe.recover`,
+  `VectorIndexProbe.purge`. The bodies are `...`; the REAL implementations are covered in
+  `tests/test_first_party_uncovered.py` through concrete probes.
+- **Process entry points** — `mcp_server.main`, `witness_server.serve` / `main` / `do_GET`,
+  `claude_code.main`. They start a server or read stdin; only a subprocess harness could drive them, and
+  the logic they call is covered directly.
+- **`memoryagentbench` (4 functions)** — the benchmark package cannot be installed from PyPI, so there is
+  no way to exercise the adapter at all. Blocked, not skipped.
+- **Thin MCP re-exports** — `verify_consistency`, `verify_cosigned_anchor`, `detect_split_view`,
+  `verify_witness`, `resolve_reopened` are 1-2 line pass-throughs to core functions that are covered.
+
+### CONFIRMED and not fixable from our side
 
 - **Mixed library versions on one store file silently lose writes.** The single-writer guard shipped in
-  1.67.0; an older handle has none and saves anyway. Measured with real installs, 1.51.0 alongside 1.69.0:
+  1.67.0; an older handle has none and saves anyway. Measured with real installs, 1.51.0 beside 1.71.0:
 
   ```
-  1.51.0 opens -> 1.69.0 writes+flushes -> 1.51.0 flushes
-  final: ['baseline record', 'written by OLD after the fact']       <- the 1.69.0 record is GONE
-  same interleave, both handles on 1.69.0
-  final: ['baseline record', 'written by NEW while OLD held a handle']    <- guard refuses
+  1.51.0 opens -> 1.71.0 writes+flushes -> 1.51.0 flushes
+  final: ['baseline record', 'written by OLD after the fact']    <- the newer write is GONE, silently
   ```
 
-  1.51.0 is published and cannot be patched. Documented in SECURITY.md with the measurement, and pinned by
-  `tests/test_single_writer_guard.py` so the warning cannot outlive the code it describes. The
-  partially-upgraded fleet is the dangerous state, not the fully-old one.
+  Documented in SECURITY.md with the measurement, pinned by `tests/test_single_writer_guard.py`. The
+  partially-upgraded fleet is the dangerous state, not the fully-old one. See RELEASING.md for why this
+  makes version count itself a cost.
 
-### Still open
+### Still genuinely open
 
-- **Coverage: 56 of 318 public functions (18%) have zero executed body lines.** Concentrations:
-  `integrations/langgraph.py` (11), `mcp_server.py` (9), `autogen.py`, `openai_agents.py`,
-  `pydantic_ai.py` (5 each), `witness_server.py` (3).
-- **The MCP sweep is coverage, not verification** — `tests/test_mcp_surface.py` asserts only "did not
-  raise" and "JSON-serialisable"; demonstrated to pass with six tools replaced by
-  `lambda: {'lol':'garbage'}`.
-- **`tests/test_mcp_surface.py` leaks env vars** (`INSPEXIMUS_PATH` / `INSPEXIMUS_RECEIPTS` never restored).
-- **`verify_erasure_certificate`'s `store_path` branch has no test.**
+- **`cli.py _embedder.embed` (7 lines)** and **`governance.ComplianceMixin.write_compliance_report`
+  (5 lines)** — small, coverable, not yet done.
+- **31 functions are under half-covered.** Not measured per-function beyond the count.
 - **Stated limits, by design:** `verify_bundle`'s coverage checks are advisory (unkeyed SHA-256 — only the
   witness co-signature is operator-adversarial); tenant isolation is a boundary for your own workloads, not
   between mutually distrusting parties; single-writer is enforced, not solved.
 
+### Closed today, with the measurement
+
+- 1.68.0 — a public `slash()` laundered an out-of-band tamper past `verify_writes()`. My own 1.67.0
+  regression, live on PyPI for hours.
+- 1.69.0 — the entire ABSOLUTE revert path raised `UnboundLocalError`; `restore_now`, the documented
+  liveness primitive, could not be called at all. 572 tests exercised the relative path only.
+- 1.70.0 — `verify_erasure_certificate` returned `valid: True` when the absence proof never ran. A typo in
+  `store_path` gave a clean verdict.
+- 1.71.0 — the Claude Code installer overwrote a `settings.json` it could not parse, losing the user's
+  model, permissions and their own hooks.
+- `reload()` LWW, `INSPEXIMUS_RECEIPTS` unread by MCP, `__pycache__` in the wheel, and the 47 triaged
+  mutation gaps: all STALE, closed on re-measurement.
+- The MCP surface sweep is no longer the only MCP test: five plausible sabotages pass it and all five are
+  caught by `tests/test_mcp_behaviour.py`.
+
 ### Process lessons that cost real time
 
-- **Read the contract BEFORE writing the assertion.** Five rewrites in one round came from asserting what I
-  assumed the API promised; five more from wrong API locations (`detect_split_view` is a staticmethod on
-  `Inspeximus`, `compliance_report` lives in `inspeximus.compliance`, the hook is `embed` not `embedder`,
-  `distiller` takes two arguments).
+- **Read the contract BEFORE writing the assertion.** Roughly fifteen test rewrites today came from
+  assuming an API rather than reading it: `classify_reversion` returns `intent` not `verdict`; MCP
+  `remember` returns a dict and takes no `source`; `history` returns a dict not a list; `get` returns `{}`
+  not `None`; `detect_split_view` is a staticmethod; `compliance_report` lives in `inspeximus.compliance`;
+  the embedder hook is `embed` not `embedder`; `distiller` takes two arguments; `execute`/
+  `compliance_receipt` take `values`; ADK `add_memory` reads `m.content.parts[].text`.
 - **Ask what the fixture CANNOT express.** Repeatedly a test passed while testing nothing: a non-hex nonce
-  made the intent malformed so assertions behind `if res["ok"]:` were unreachable; a bare signature string
-  is silently skipped as malformed so `both_cosigned` read False on BOTH branches; a bare slashed record is
-  dropped by the corroboration term so the retraction term was never exercised; a net-negative record is
-  denied by BOTH `require_earned` paths.
-- **Verify the mutation landed where intended.** Two "SURVIVES" reports were my own mis-located mutations
-  and one was a bad substitute (`b = -1.0` instead of `and`->`or`). The tool that grades the tests needs the
-  same scrutiny as the tests.
-- **Use Edit, not string replace, for anything with line continuations** — three silent non-matching
-  replaces this session, each leaving the old code in place while I believed it was patched.
-- **Never anchor a test to a line number** — the recorded survivor lines were already stale; what was
-  `core.py:3662` is now a comment.
+  made an intent malformed so assertions behind `if res["ok"]:` were unreachable; a bare signature string
+  is skipped as malformed so `both_cosigned` read False on both branches; `slash()` zeroes `good`, so the
+  retraction term was never exercised; counting raw rows equals counting documents in a store where every
+  row is a document; a lexically similar conflict pair never exercises the auto-keying it was testing.
+- **Verify the mutation landed where intended, and count ERROR as caught.** Three "SURVIVES" reports were
+  my own mis-located mutations or a runner that only grepped for FAILED.
+- **Distinguish an equivalent mutant from a gap.** Removing ADK's empty-query short-circuit changes nothing
+  observable (`recall("")` returns 0 hits). Recorded as such rather than chased or papered over.
+- **Use Edit, not string replace, for anything with line continuations.** Five silent non-matching replaces
+  today, each leaving the old code in place while I believed it was patched.
+- **Never anchor a test to a line number** — the recorded survivor lines were stale within a day.
 - Commit before anything that rewrites the working tree; never run two mutation passes concurrently; verify
-  the suite is green before the first mutant; exclude docstrings from the mutant population; count BODY
-  lines for per-function coverage.
+  green before the first mutant; exclude docstrings from the mutant population; count BODY lines only.
 
 ---
 
