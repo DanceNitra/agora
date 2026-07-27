@@ -11,6 +11,76 @@
 > 83-comment thread digest: memory `marat-tat-edrn-collaboration-live`. Read the whole Issue #1, fetch data from
 > GitHub yourself (public) — never via Gmail.
 
+# Agora — Session Handoff (2026-07-27 · the audit day: 8 releases, one adversarial audit, two tools that lied)
+
+**REPO: `C:/Users/Danculus/inspeximus-repo` (separate from agora). PyPI latest = 1.85.0. HEAD = `ebabfa8`
+(WIP, package A, NOT released).**
+
+## What shipped today (all on PyPI, CI green, mutation-verified)
+
+| version | the defect, in one line |
+|---|---|
+| 1.79.0 | `verify_bundle` printed PASS on forged content and never said it had not looked at content |
+| 1.80.0 | `verify_claim` answered **`supported`** for a claim its own evidence contradicted ("allergic to shellfish" backed "allergic to peanuts"); `scan_residue` said "clean" while the value sat in `.git`; `bind_content` passed an audit in which **nothing was compared** |
+| 1.81.0 | AutoGen `clear()` hard-deleted the WHOLE store (3 records in, 0 out, 2 of them another component's); `verify_attribution` returned `ok=True` on a store whose every source label was rewritten; `compliance_check` measured receipt coverage as two integers |
+| 1.82.0 | the **value the store serves** (`object`) was outside every commitment — edit `90d`→`30d` on disk and `verify_writes()` still said True. New `value_sha256` + `recommit()` |
+| 1.83.0 | a **deletion manifest could be repointed at a different data subject** and still verify `(True, [])` — subject/authoriser/request-id/targets were bound to nothing. Chain now seeded from a header hash |
+| 1.84.0 | `remember_decision` kept EVERY decision on a topic active at once (it passed the topic as `object`, and the topic is already the key). Exposed over MCP. Found by a probe nothing ran |
+| 1.85.0 | **recall was not deterministic** — 7% of runs returned a different top-k; `PYTHONHASHSEED` changed the answer outright |
+
+Also shipped: CI now runs **every** probe (was 53 of 101); an `integrations` CI job that installs the
+optional deps (the base job silently never ran 155 tests); `tools/probe_gate.py`, `tools/skip_census.py`,
+`tools/mutation_check.py` committed as instruments.
+
+## Where the work stands
+
+**Package C (memory_report sampling) — DONE, in `49f29f0`.** Sampled the OLDEST 400 and called it a
+sample; the same store reported 1.0 / 0.245 / 0.99 by insertion order. Seeded random sample now.
+
+**Package B (claims without artifacts) — DONE, in `ebabfa8`.** CLI `revert` exited 0 on a REFUSED revert;
+`docs/API.md` published numbers the cited probe contradicts; CHANGELOG cited two probes never committed
+(now inside the citation guard); the `--store` guard reached one of two entry points; README's "one
+exception" claim was false (three numbers have no producing script).
+
+**Package A (surface parity) — HALF DONE, in `ebabfa8`, NOT released.**
+- DONE: `inspeximus/_surface.py` — one opener holding the echo-guard posture and the receipts-sidecar rule.
+  All 12 construction sites in the nine adapters call it. **The defect it fixes is the worst of the audit:**
+  through any adapter, one restatement UNDID a correction and then WEDGED the store (the honest
+  re-correction was refused as an echo). Verified through a real LangChain adapter: BBB/BBB/BBB.
+- **STILL OPEN:** (a) MCP `verify_audit_bundle` has no `store_items`, so a substituted store always
+  verifies clean there and the returned `limits` names a parameter that surface does not have;
+  (b) MCP `compliance_check` drops `prior_anchor`, so `not_append_only` can never fire;
+  (c) `claude_code.py`'s hook does not use the shared opener;
+  (d) **no tests and no mutations for the adapter change yet — do this FIRST, before any release.**
+
+## Standing hazards learned today (these cost real time)
+
+1. **COMMIT BEFORE RUNNING THE SUITE.** `tests/test_mutation_check_harness.py` mutates LIVE source. Any
+   edit made to the same file inside its read→restore window is lost. The same one-line fix was lost
+   **twice**. Committed work is safe (verified: 1333 passed, `core.py` still matched HEAD).
+2. **Never edit the repo while a background suite/gate runs.** It produced a false test failure and two
+   false "SURVIVES" verdicts.
+3. **Heredocs mangle escapes.** `
+`, `\s`, `\w`, backslashes → broken f-strings and regexes, five times
+   today. Use the `Edit` tool for anything containing an escape.
+4. **Windows:** PYTHONPATH separator is `;` not `:`; console is cp1250 so an em-dash in a regex silently
+   matches nothing.
+
+## The through-line, for whoever picks this up
+
+The audit found 28 defects; 20+ are closed. **Six were the same shape:** a function whose entire purpose is
+to REFUSE returned `True` about input it structurally never examined — `verify_claim`, `verify_attribution`,
+`DeletionManifest.verify`, `compliance_check`, `scan_residue`, MCP `verify_audit_bundle`. Those are the
+surfaces the README and `docs/AI_ACT.md` point at as the moat.
+
+**The runner-up class: the fix landed and the class lived one file over.** In three cases the correct code
+was already in the repo, one file away, with a comment explaining why it was needed.
+
+Two of our own instruments lied today: the mutation harness reported `SURVIVES` for mutants its tests had
+killed (it ran pytest with `-x -rf`, so fixture-level kills were invisible), and `skip_census` over-counted
+hidden tests by treating a `def` as a module-level guard. **Check the instrument before believing its
+verdict** — and prefer a measurement to a re-read.
+
 # Agora — Session Handoff (2026-07-20 · "test your own claim" day)
 
 ## 2026-07-25 — 1.65.0 / 1.65.1: a path regression, and the first attacker-model pass
