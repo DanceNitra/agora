@@ -946,8 +946,31 @@ async def scout_digest_loop(app: FastAPI):
                 for x in fresh[-6:][::-1]:
                     lines.append(f"• [{x.get('outcome','?')[:40]}] {x.get('repo','')}#{x.get('issue','')}")
             else:
-                lines = ["\U0001F52D *Scout digest* — no new GitHub issues engaged in ~8h "
-                         "(scan may be idle — check the dungeon supervisor is running)."]
+                # NAME THE STAGE THAT IS ACTUALLY STUCK. This used to read "no new issues engaged in
+                # ~8h (scan may be idle — check the dungeon supervisor is running)" and both halves
+                # misled: nothing was engaged for SIX DAYS, not eight hours, and the scan was not
+                # idle at all — discovery kept filling the box while TRIAGE (a Claude inbox task) was
+                # the stalled stage. The advice pointed at a supervisor that is not the mechanism in
+                # use. A digest that cannot tell which stage stopped reads exactly like a healthy one.
+                from agora.execution.scout import box_stats as _bs
+                try:
+                    st = _bs()
+                except Exception:
+                    st = {}
+                since = ""
+                last_t = max((x.get("ts", 0) for x in items), default=0.0)
+                if last_t:
+                    d = (_t.time() - last_t) / 86400.0
+                    since = f" — last triaged {d:.1f}d ago" if d >= 1 else f" — last triaged {d * 24:.0f}h ago"
+                if st.get("open"):
+                    lines = [f"\U0001F52D *Scout digest* — TRIAGE is the blocker{since}. "
+                             f"Discovery is running: *{st['open']}* lead(s) waiting in the box "
+                             f"(oldest {st.get('oldest_open_days', 0)}d, {st.get('total_seen', 0)} seen). "
+                             f"Drain them with the `Scout triage` task in the Claude inbox."]
+                else:
+                    lines = [f"\U0001F52D *Scout digest* — nothing engaged and the box is EMPTY{since}: "
+                             f"discovery itself is not producing. Check the dungeon is running its "
+                             f"scan cycle (`mcp_server.py` alive, loop_n advancing)."]
             try:
                 tgt = await _aio.to_thread(find_opportunity)
                 if tgt and tgt.get("url"):
