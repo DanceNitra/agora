@@ -1642,6 +1642,12 @@ def _strip_quest_prefix(title: str) -> str:
     return t
 
 
+#: Why an agent ended a planning cycle with nothing — so the escalation tells the owner the truth.
+#: "off_priority" (the board is narrower than the pool) is a DIFFERENT condition from an unreachable
+#: brain, and reporting the first as the second sends "the brain may be down" while it is serving fine.
+_plan_reason: dict = {}
+
+
 async def _renewable_quests(eid: str, want: int = 3) -> list:
     """A GUARANTEED supply of REAL RESEARCH (no combinatorial filler): test Agora's own claims
     (flywheel), pursue harvested frontier directions, ground findings from FRESH papers, and form+test
@@ -1714,14 +1720,30 @@ async def _renewable_quests(eid: str, want: int = 3) -> list:
     # board text itself ("every FINDING must answer...", "prioritize RESEARCH..."), so gating the raw
     # string matched on boilerplate and passed every off-domain paper. Measured: with the raw string the
     # first post-gate pick was still "Ground a finding from: GEAR ... Image Synthesis".
+    # HONOUR AN EMPTY GATE. `_gate_filter` was made HARD on 2026-07-21 -- it returns [] when nothing in
+    # the pool is on-priority, precisely because a soft fall-through passed off-mission batches whole.
+    # This caller then threw that away: `if _on: interleaved = _on` left the FULL off-mission pool in
+    # place on exactly the empty result the hard gate exists to produce. The fix landed in the gate and
+    # the class went on living one function up. Measured cost while it did: the day's research ran on VR
+    # episodic memory, sleep science, Earth-systems Markov chains, contract law and crypto trading with
+    # the board locked to the inspeximus frontier, at a 9% land rate over ~15.5k LLM calls.
+    #
+    # Empty now means empty: no renewable quests this cycle. The agent falls through to a wander thought
+    # (cheap, no cloud research), which is the correct cost for having nothing on-mission to do --
+    # starvation is meant to be VISIBLE, not quietly filled with work nobody asked for.
+    _off_priority = False
     try:
         _payload = {x[0]: (x[0].split(": ", 1)[1] if ": " in x[0] else x[0]) for x in interleaved}
         _keep = set(await _gate_filter(list(_payload.values())))
         _on = [x for x in interleaved if _payload[x[0]] in _keep]
-        if _on:
-            interleaved = _on
+        if interleaved and not _on:
+            _off_priority = True
+            logger.info("[plan] %s: %d candidate(s) ALL off-priority -> no research this cycle",
+                        _AGENT_NAMES.get(eid, eid), len(interleaved))
+        interleaved = _on
     except Exception as e:
         logger.debug(f"quest board-gate {eid}: {e}")
+    _plan_reason[eid] = "off_priority" if _off_priority else ""
     # SELF-UPGRADE #1: don't re-pursue a topic done recently — avoid the repetition the OS fell into.
     # _recent_intents is PERSISTED, so this dedup now survives dungeon restarts (kills the cross-restart dups).
     fresh = [x for x in interleaved if x[0] not in _recent_intents]
@@ -4032,6 +4054,11 @@ async def ambient_life():
                 for q in await _renewable_quests(eid, 3):
                     quests.setdefault(eid, []).append(q)
             if quests.get(eid):
+                _plan_fails[eid] = 0
+            elif _plan_reason.get(eid) == "off_priority":
+                # NOT a blocker: the sources delivered, the BOARD is narrower than what they delivered.
+                # Counting this as a plan failure escalated "the brain may be down" while the brain was
+                # serving perfectly — an alarm that names the wrong system trains everyone to ignore it.
                 _plan_fails[eid] = 0
             else:
                 # even gaps/bridges/findings were empty → the brain is likely unreachable: a REAL blocker
