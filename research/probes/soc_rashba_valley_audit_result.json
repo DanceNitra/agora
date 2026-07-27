@@ -1,0 +1,21 @@
+{
+ "ratio_mean": 0.9577902572360975,
+ "ratio_spread": 0.0005712138870146433,
+ "heisenberg": {
+  "bottom": 0.1041,
+  "at_s": 0.38,
+  "shoulders": 0.165,
+  "absolute_depth": 0.06090000000000001,
+  "relative_depth": 0.36909090909090914
+ },
+ "rashba_soc": {
+  "bottom": 0.0997,
+  "at_s": 0.38,
+  "shoulders": 0.15805,
+  "absolute_depth": 0.05835,
+  "relative_depth": 0.36918696614995256
+ },
+ "uniform_rescaling": true,
+ "relative_depth_unchanged": true,
+ "soc_gap_all_zero": true
+}

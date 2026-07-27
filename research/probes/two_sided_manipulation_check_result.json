@@ -1,0 +1,20 @@
+{
+ "n": 400,
+ "rows": [
+  {
+   "patch": "honest patch (ids distinct)",
+   "records": 400,
+   "score": 1.0,
+   "one_sided_gate": "PASS",
+   "two_sided_gate": "PASS"
+  },
+  {
+   "patch": "broken patch (ids collapse)",
+   "records": 1,
+   "score": 0.025,
+   "one_sided_gate": "PASS",
+   "two_sided_gate": "FAIL"
+  }
+ ],
+ "verdict_reproduces": true
+}

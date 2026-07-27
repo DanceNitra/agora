@@ -1,0 +1,16 @@
+{
+ "ticker": "^GSPC",
+ "start": "2021-01-01",
+ "end": "2026-01-01",
+ "horizon": 10,
+ "n": 1234,
+ "results": {
+  "linear regression (his baseline), 5 features": 0.580330260489719,
+  "PERSISTENCE: today's 10d realised vol, no model": 0.34472907738342856,
+  "linear regression on vol_now ALONE": 0.34472907738342834,
+  "linear regression, 5 features + vol_now": 0.5075989551547351,
+  "linear regression, RANDOM split (overlapping windows leak)": 0.44382306698682883
+ },
+ "his_tat": 0.7385,
+ "his_baseline": 0.652
+}
