@@ -21,6 +21,28 @@ import re
 
 _WORD = re.compile(r"[A-Za-z][A-Za-z\-]{3,}")
 
+# An INTERNAL citation: "Lab 89ffff", "lab_id 89ffff", "(Lab be8da5)". Our own experiment ledger.
+_LAB_CITE = re.compile(r"\blab[_\s-]*(?:id\s*)?[:#]?\s*([0-9a-f]{6})\b", re.I)
+
+
+def _lab_run(claim: str) -> tuple[str, dict | None]:
+    """Resolve an internal `Lab <id>` citation against the experiment ledger.
+
+    Returns (cited_id, run_or_None). `("", None)` when the claim cites no Lab at all.
+    """
+    m = _LAB_CITE.search(claim or "")
+    if not m:
+        return "", None
+    cid = m.group(1).lower()
+    try:
+        from agora.execution.lab import _load as _lab_load
+        for r in _lab_load():
+            if str(r.get("id", "")).lower() == cid:
+                return cid, r
+    except Exception:
+        pass
+    return cid, None
+
 
 def _content_words(text: str) -> set[str]:
     from agora.execution.research_tool import _STOP
@@ -54,6 +76,35 @@ async def verify_finding(title: str, claim: str) -> dict:
     # claim); re-fetching that wrong paper guaranteed a false UNSUPPORTED. The topic gives literature
     # actually relevant to the claim, so the reviewer judges the claim, not a citation accident.
     body = re.sub(r"\bSource:.*$", "", claim, flags=re.DOTALL).strip()
+
+    # INTERNAL EVIDENCE FIRST — a claim whose evidence is OUR OWN Lab run is not a literature claim,
+    # and asking the literature about it is a category error the reviewer cannot detect. It cost six
+    # days: Lab 89ffff measured `deltaG(q=0.6)-deltaG(0) = 0.077 N (SE 0.009, t=8.6)` in a simulation
+    # on 2026-07-19, and every agent that met the claim re-fetched papers, found (correctly) that no
+    # paper states it, and filed "the provided sources do not support ΔG = 0.077 N or the Lab 89ffff
+    # reference" as a FINDING. Five-plus times, across agents, one of them reaching the vault. The
+    # verifier was answering about evidence it had no way to look at -- it never opened the ledger.
+    #
+    # So the citation is resolved before any fetch, and the two branches are different verdicts:
+    #   the run EXISTS      -> LAB_SOURCED. Internally evidenced; literature neither confirms nor
+    #                          refutes it, and the honest next step is a re-run, not a search.
+    #   the run DOES NOT    -> UNSUPPORTED, and FINAL. A citation to an experiment we never ran is
+    #                          fabricated, and "not in the ledger" is decidable, so it must never
+    #                          come back as INCONCLUSIVE to be re-judged forever.
+    cited, run = _lab_run(claim)
+    if cited and run is not None:
+        out = " ".join((run.get("output") or "").split())[:180]
+        return {"verdict": "LAB_SOURCED",
+                "reason": f"evidence is internal: Lab {cited} ({run.get('source') or 'simulation'}, "
+                          f"{'ok' if run.get('ok') else 'FAILED'}) measured this — literature cannot "
+                          f"confirm a simulation of ours; re-run the experiment to test it",
+                "source": f"Lab {cited}: {out}"}
+    if cited and run is None:
+        return {"verdict": "UNSUPPORTED",
+                "reason": f"cites Lab {cited}, which is not in the experiment ledger — a fabricated "
+                          f"internal citation, not a claim to be checked against papers",
+                "source": ""}
+
     topic = title
     for _ in range(4):                       # peel any stacked quest/finding prefixes to the real topic
         new = re.sub(r"^(?:Hypothesize on|Pursue direction|Deepen|Develop the gap|Connect|Frontier|"

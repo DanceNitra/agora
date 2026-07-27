@@ -634,6 +634,14 @@ async def verify_findings(request: Request, n: int = 4, incorporate: bool = True
         if v["verdict"] == "INCONCLUSIVE":
             _VERIFIED.discard(title)        # not actually judged → allow a re-check later
             continue
+        if v["verdict"] == "LAB_SOURCED":
+            # The claim's evidence is one of OUR OWN Lab runs. It is settled here on purpose: no
+            # literature fetch, no note, no credit or blame to the contributor — and NOT re-queued,
+            # which is the whole point. Six days of quota went into re-asking the literature about
+            # Lab 89ffff's simulated 0.077 N, a question no paper can answer.
+            results.append({"title": title[:60], "verdict": v["verdict"],
+                            "reason": v["reason"], "incorporated": False})
+            continue
         inc = False
         if v["verdict"] in ("VERIFIED", "OVERSTATED") and incorporate and writer:
             ok = v["verdict"] == "VERIFIED"
@@ -1970,12 +1978,20 @@ async def brain_scout():
 
 @router.get("/brain/scout/status")
 async def brain_scout_status():
-    """VISIBILITY for the GitHub Opportunity Scout: what was scanned, the outcomes, when it last
-    scanned, and the live current candidate. The scan itself runs autonomously from the dungeon
-    supervisor (~2.4h); this is the read-only surface so the owner can SEE it without typing /scout."""
+    """VISIBILITY for the GitHub Opportunity Scout: what was DISCOVERED, what was TRIAGED, and the
+    live candidate. The scan runs autonomously from the dungeon (~2.4h); this is the read-only
+    surface so the owner can SEE it without typing /scout.
+
+    THE TWO ARE NOT THE SAME NUMBER, and reporting one of them as both hid a six-day stall. This
+    endpoint derived `last_scan` from the OUTCOME ledger, which is written by triage — so when
+    triage stopped and discovery kept running, it read "last scan 2026-07-21", the digest announced
+    an idle scanner, and its advice was to check a supervisor that is not even the mechanism in use.
+    Discovery was fine the whole time: 7 leads in the box, the oldest 2.2 days old. Both timestamps
+    are reported now, and the blocked stage is named.
+    """
     import asyncio as _aio
     from datetime import datetime, timezone
-    from agora.execution.scout import _load, _STORE, find_opportunity, _THEMES
+    from agora.execution.scout import _load, _STORE, find_opportunity, _THEMES, box_load, box_stats
     import time as _t
     items = _load()
     # last-scan time: newest recorded item ts, falling back to the ledger file's mtime (the file is
@@ -2003,8 +2019,25 @@ async def brain_scout_status():
         target = await _aio.to_thread(find_opportunity)
     except Exception as e:
         target = {"error": str(e)[:120]}
+    # DISCOVERY, measured where discovery actually lands: the box. `last_scan*` keeps its old name and
+    # old meaning for existing callers, but it is TRIAGE time and is now labelled as such beside it.
+    try:
+        bstats = box_stats()
+        last_disc = max((x.get("ts", 0) for x in box_load()), default=0.0)
+    except Exception:
+        bstats, last_disc = {}, 0.0
+    hrs = lambda ts: round((_t.time() - ts) / 3600.0, 1) if ts else None    # noqa: E731
+    stage = "ok"
+    if bstats.get("open") and (hrs(last_scan) or 0) > 24:
+        stage = "triage_blocked"          # discovery is filling the box; nobody is draining it
+    elif (hrs(last_disc) or 999) > 6:
+        stage = "discovery_stalled"       # the dungeon is not scanning — THAT is a process problem
     return {"status": "ok", "scanned_count": len(items),
             "last_scan_unix": last_scan, "last_scan_iso": _iso(last_scan),
+            "last_triage_unix": last_scan, "last_triage_iso": _iso(last_scan),
+            "hours_since_triage": hrs(last_scan),
+            "last_discovery_iso": _iso(last_disc), "hours_since_discovery": hrs(last_disc),
+            "box": bstats, "stage": stage,
             "outcomes": outcomes, "current_theme": cur_theme,
             "current_target": target, "recent": recent}
 
