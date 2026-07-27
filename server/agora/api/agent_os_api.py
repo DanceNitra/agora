@@ -2023,7 +2023,11 @@ async def brain_scout_status():
     # old meaning for existing callers, but it is TRIAGE time and is now labelled as such beside it.
     try:
         bstats = box_stats()
-        last_disc = max((x.get("ts", 0) for x in box_load()), default=0.0)
+        # `found_ts`, not `ts` -- the box records when a lead was FOUND, the outcome ledger records
+        # when one was judged. Reading the wrong key returned 0 for every lead, so the freshness
+        # number came back empty and the discovery_stalled branch could never fire: a second
+        # can't-fail check inside the fix for the first one. Verified against a real box record.
+        last_disc = max((x.get("found_ts") or x.get("ts") or 0 for x in box_load()), default=0.0)
     except Exception:
         bstats, last_disc = {}, 0.0
     hrs = lambda ts: round((_t.time() - ts) / 3600.0, 1) if ts else None    # noqa: E731
