@@ -30,6 +30,7 @@ from __future__ import annotations
 
 import argparse
 import io
+import json
 import pathlib
 import re
 import sys
@@ -166,7 +167,109 @@ def _clip(text: str, n: int = 155) -> str:
     return cut + "…"
 
 
-def _localise_head(soup: BeautifulSoup, keep: str, self_url: str) -> None:
+def _sk_twin_url(url: str, mirrored: set) -> str | None:
+    """The /agora/sk/ address of an internal URL, when the mirror actually holds that document."""
+    if not url.startswith(SITE + "/") or "/sk/" in url:
+        return None
+    rel = url[len(SITE) + 1:]
+    path = rel if rel.endswith(".html") else rel + "index.html"
+    return f"{SITE}/sk/{rel}" if path in mirrored else None
+
+
+def _retag_jsonld(soup: BeautifulSoup, keep: str, self_url: str, en_url: str,
+                  mirrored: set | None = None) -> None:
+    """Retag the JSON-LD by PARSING it, rewriting only the entity that refers to THIS page.
+
+    The first version did this with a regex over the raw text: `("url":\\s*)"..."` -> the page's own url.
+    That replaced EVERY url field in the block, so on a Slovak post `Organization.url` became the post's
+    own address -- every Slovak page asserting that the organisation Agora *is* that blog post -- and on
+    the Slovak homepage `Blog.url` stopped pointing at the posts index. Measured live before this fix:
+    5 of 5 Slovak documents checked were wrong.
+
+    It is the same defect I spent the day finding in other people's code: a blunt textual operation
+    standing in for a structural one. The rule now is precise -- rewrite a `url` ONLY where it equals the
+    English page's own url, i.e. only the entity that was pointing at this document. `Organization`,
+    `Blog` and every other site-wide entity keep the address they had, because they describe the site,
+    not the page.
+    """
+    for script in soup.find_all("script", type="application/ld+json"):
+        raw = script.string or ""
+        try:
+            data = json.loads(raw)
+        except Exception:
+            continue                        # malformed already; do not make it worse
+        en_variants = {en_url, en_url.rstrip("/"), en_url.rstrip("/") + "/"}
+
+        def walk(node):
+            if isinstance(node, list):
+                for x in node:
+                    walk(x)
+                return
+            if not isinstance(node, dict):
+                return
+            # Organization is ONE entity with ONE identity. It is not a language variant, and on the
+            # homepage its url happens to equal the page's url -- so a plain self-reference rule rewrote
+            # the organisation's identity to the Slovak homepage. Excluded by type, deliberately.
+            if node.get("@type") != "Organization":
+                u = node.get("url")
+                if isinstance(u, str):
+                    if u in en_variants:
+                        node["url"] = self_url
+                    elif keep == "sk" and mirrored is not None:
+                        # any other internal link that HAS a Slovak twin points at the twin -- this is
+                        # what makes Blog.url on the Slovak homepage reach the Slovak posts index
+                        # instead of the English one
+                        twin = _sk_twin_url(u, mirrored)
+                        if twin:
+                            node["url"] = twin
+            if "inLanguage" in node:
+                node["inLanguage"] = keep
+            for v in node.values():
+                walk(v)
+
+        walk(data)
+        script.string = json.dumps(data, ensure_ascii=False)
+
+
+def _set_on_page_entity(soup: BeautifulSoup, field: str, value: str) -> None:
+    """Set one field on the node that describes THIS page, leaving site-wide entities alone."""
+    for script in soup.find_all("script", type="application/ld+json"):
+        raw = script.string or ""
+        try:
+            data = json.loads(raw)
+        except Exception:
+            continue
+        node = _page_entity(data)
+        if node is not None and field in node:
+            node[field] = value
+            script.string = json.dumps(data, ensure_ascii=False)
+            return
+
+
+def _page_entity(data):
+    """The JSON-LD node that describes the page itself (Article/BlogPosting/WebPage/Dataset/...)."""
+    order = ("Article", "BlogPosting", "NewsArticle", "WebPage", "Dataset", "CollectionPage")
+    found = {}
+
+    def walk(node):
+        if isinstance(node, list):
+            for x in node:
+                walk(x)
+        elif isinstance(node, dict):
+            t = node.get("@type")
+            if isinstance(t, str) and t in order:
+                found.setdefault(t, node)
+            for v in node.values():
+                walk(v)
+
+    walk(data)
+    for t in order:
+        if t in found:
+            return found[t]
+    return None
+
+
+def _localise_head(soup: BeautifulSoup, keep: str, self_url: str, en_url: str, mirrored: set | None = None) -> None:
     """Give the Slovak document Slovak <title>, description and headline.
 
     Those three live in <head> as plain text, outside the language wrappers, so stripping `.en` left the
@@ -177,13 +280,8 @@ def _localise_head(soup: BeautifulSoup, keep: str, self_url: str) -> None:
     description from its first Slovak paragraph. Nothing is translated, guessed or invented -- if the
     Slovak h1 is missing the English title is left alone rather than fabricated.
     """
+    _retag_jsonld(soup, keep, self_url, en_url, mirrored)
     if keep != "sk":
-        # the English document is now monolingual too: inLanguage ["en","sk"] described the page that no
-        # longer exists, and a bilingual declaration on a single-language URL is the same defect as the
-        # hreflang pair this split exists to fix
-        for s in soup.find_all("script", type="application/ld+json"):
-            s.string = re.sub(r'"inLanguage":\s*(?:"[^"]*"|\[[^\]]*\])',
-                              '"inLanguage": "en"', s.string or "")
         return
     h1 = soup.find("h1")
     sk_title = h1.get_text(" ", strip=True) if h1 else ""
@@ -193,9 +291,7 @@ def _localise_head(soup: BeautifulSoup, keep: str, self_url: str) -> None:
             soup.title.string = sk_title + suffix
         for m in soup.find_all("meta", property="og:title"):
             m["content"] = sk_title + suffix
-        for s in soup.find_all("script", type="application/ld+json"):
-            s.string = re.sub(r'("headline":\s*)"(?:[^"\\]|\\.)*"',
-                              lambda mo: mo.group(1) + _json_str(sk_title), s.string or "")
+        _set_on_page_entity(soup, "headline", sk_title)
 
     body = soup.find("article") or soup.body
     para = ""
@@ -212,17 +308,13 @@ def _localise_head(soup: BeautifulSoup, keep: str, self_url: str) -> None:
             m["content"] = desc
         for m in soup.find_all("meta", attrs={"name": "twitter:description"}):
             m["content"] = desc
+        # ...and into the structured data. Leaving it out meant the Slovak page carried a Slovak meta
+        # description and an ENGLISH Article.description -- one document disagreeing with itself about
+        # what it is about, in two languages, in two metadata channels a machine reads.
+        _set_on_page_entity(soup, "description", desc)
 
-    for s in soup.find_all("script", type="application/ld+json"):
-        txt = s.string or ""
-        txt = re.sub(r'("url":\s*)"(?:[^"\\]|\\.)*"', lambda mo: mo.group(1) + _json_str(self_url), txt)
-        txt = re.sub(r'"inLanguage":\s*(?:"[^"]*"|\[[^\]]*\])', '"inLanguage": "sk"', txt)
-        s.string = txt
-
-
-def _json_str(v: str) -> str:
-    import json as _json
-    return _json.dumps(v, ensure_ascii=False)
+    # (url and inLanguage are handled structurally in _retag_jsonld -- the regex that used to live here
+    #  rewrote EVERY url in the block, including Organization's and Blog's.)
 
 
 def _toggle_to_links(soup: BeautifulSoup, keep: str, en_url: str, sk_url: str) -> None:
@@ -311,7 +403,7 @@ def split_one(page: pathlib.Path, mirrored: set[str] | None = None) -> bool:
         soup = BeautifulSoup(original, "html.parser")
         _strip_other_language(soup, keep)
         _set_head(soup, keep, en_url, sk_url)
-        _localise_head(soup, keep, sk_url if keep == "sk" else en_url)
+        _localise_head(soup, keep, sk_url if keep == "sk" else en_url, en_url, mirrored)
         _toggle_to_links(soup, keep, en_url, sk_url)
         if keep == "sk":
             _rewrite_links_for_sk(soup, page, mirrored)
@@ -362,7 +454,7 @@ def main() -> int:
             soup = BeautifulSoup(original, "html.parser")
             _strip_other_language(soup, "en")
             _set_head(soup, "en", en_url, sk_url)
-            _localise_head(soup, "en", en_url)
+            _localise_head(soup, "en", en_url, en_url, mirrored)
             _drop_sk_alternate(soup)
             html = str(soup)
             if _text(html) != want_en:
@@ -382,7 +474,7 @@ def main() -> int:
             soup = BeautifulSoup(original, "html.parser")
             _strip_other_language(soup, keep)
             _set_head(soup, keep, en_url, sk_url)
-            _localise_head(soup, keep, sk_url if keep == "sk" else en_url)
+            _localise_head(soup, keep, sk_url if keep == "sk" else en_url, en_url, mirrored)
             _toggle_to_links(soup, keep, en_url, sk_url)
             dest = page if keep == "en" else SK_DIR / page.relative_to(ROOT)
             if keep == "sk":

@@ -45,7 +45,13 @@ def build():
     for f in ("track-record.html", "research-digest.html", "forecast.html"):
         if (ROOT / "public" / f).exists():
             urls.append((f"{SITE}/public/{f}", None))
-    for d in ("inspeximus", "leaderboard"):
+    # `inspeximus` is deliberately NOT here. /public/inspeximus/ canonicalises CROSS-SITE to
+    # https://dancenitra.github.io/inspeximus/ -- the product's own Pages site, which is live and holds
+    # near-identical content (measured: 88% 5-gram overlap). A sitemap must not submit a URL the page
+    # itself disavows. I added it as a "missing page" earlier today and rewrote its canonical to match,
+    # on the untested assumption that the target was dead because the DOMAIN ROOT 404s; it is not, and
+    # the cross-site canonical was correct all along. Both changes reverted.
+    for d in ("leaderboard",):
         if (ROOT / "public" / d / "index.html").exists():
             urls.append((f"{SITE}/public/{d}/", None))
     try:
