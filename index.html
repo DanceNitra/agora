@@ -28,7 +28,7 @@
 <link href="https://fonts.googleapis.com" rel="preconnect"/>
 <link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght,SOFT,WONK@0,9..144,400..700,0..100,0..1&amp;family=Newsreader:ital,opsz,wght@0,6..72,300..700;1,6..72,300..700&amp;family=JetBrains+Mono:wght@400;500;600&amp;display=swap" rel="stylesheet"/>
-<style>
+<style>@font-face{font-family:"Newsreader-fallback";src:local("Georgia"),local("Times New Roman");size-adjust:95.18%;ascent-override:77.22%;descent-override:27.84%;line-gap-override:0%}
   /* ── tokens: a 4-colour SEMANTIC palette — colour is meaning, never decoration ── */
   :root{
     --paper:#faf7f0; --paper2:#f2eee4; --ink:#1b1a17; --text:#4d493f; --faint:#938d7f;
@@ -37,7 +37,7 @@
     --fail:#b3361f; --fail-soft:#f8e6e0;      /* red   = FAILED, nothing else          */
     --plate:#1a1813; --plate-text:#f3efe4; --plate-soft:#ddd7c9; --gold:#c9a23f;
     --display:"Fraunces",Georgia,serif;
-    --serif:"Newsreader",Georgia,"Times New Roman",serif;
+    --serif:"Newsreader","Newsreader-fallback",Georgia,"Times New Roman",serif;
     --mono:"JetBrains Mono",ui-monospace,Menlo,Consolas,monospace;
   }
   *{box-sizing:border-box;margin:0}

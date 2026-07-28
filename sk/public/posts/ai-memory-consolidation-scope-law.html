@@ -23,10 +23,10 @@
 <link href="https://fonts.googleapis.com" rel="preconnect"/>
 <link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
 <link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;0,6..72,600;1,6..72,400;1,6..72,500&amp;family=JetBrains+Mono:wght@400;500&amp;display=swap" rel="stylesheet"/>
-<style>
+<style>@font-face{font-family:"Newsreader-fallback";src:local("Georgia"),local("Times New Roman");size-adjust:95.18%;ascent-override:77.22%;descent-override:27.84%;line-gap-override:0%}
   :root{--paper:#fbf9f4;--paper2:#f4f1ea;--ink:#1b1a17;--soft:#54514a;--faint:#8c887e;
     --line:#e6e1d6;--acc:#0a8f68;--acc-soft:#e3f4ed;--hl:#fff4cc;
-    --serif:"Newsreader",Georgia,"Times New Roman",serif;--mono:"JetBrains Mono",ui-monospace,Menlo,Consolas,monospace;}
+    --serif:"Newsreader","Newsreader-fallback",Georgia,"Times New Roman",serif;--mono:"JetBrains Mono",ui-monospace,Menlo,Consolas,monospace;}
   *{box-sizing:border-box;margin:0} html{scroll-behavior:smooth}
   body{background:var(--paper);color:var(--ink);font-family:var(--serif);font-size:21px;line-height:1.75;
     -webkit-font-smoothing:antialiased;font-optical-sizing:auto;text-rendering:optimizeLegibility}
