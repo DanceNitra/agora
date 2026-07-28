@@ -303,6 +303,22 @@ async def add_collective(request: Request):
                         return {"status": "rejected", "reason": "near-duplicate of a recent finding (stream dedup)"}
         except Exception:
             pass
+    # A SECOND REFUSAL FAMILY, and the two are COMPLEMENTARY — do not delete either believing the
+    # other covers it. `_garbage_finding`'s `_REFUSAL_AT_SOURCE` above is the older one and it works;
+    # it missed 20 of 400 recent discoveries by ONE LETTER. Its alternation has
+    # `does not (support|fit|apply)` — singular — and the production text reads "the provided sources
+    # DO not support the claim about deltaG(q=0.6)...". The rest of that pattern keys on
+    # "no paper/source/study...", which this sentence never says: it NAMES the sources it was given
+    # and then denies them. So it was stored as knowledge, rose to the top of the collective pool,
+    # re-seeded itself as a quest, and was re-researched for days.
+    # Measured both ways: this gate rejects all five envelope/plural variants and ACCEPTS
+    # "No source supports the claim", which the older pattern catches. Neither is a superset.
+    # It also runs server-side on purpose — the dungeon checks before it POSTs, but this endpoint
+    # takes writes from every organ, and a guard on the client is a guard the next client forgets.
+    from agora.execution.non_finding import is_non_finding
+    if is_non_finding(body.get("title"), body.get("content")):
+        _PROMOTE_STATS["src_refusal"] = _PROMOTE_STATS.get("src_refusal", 0) + 1
+        return {"status": "rejected", "reason": "not a finding — a refusal / no-fit statement"}
     npc_id = DUNGEON_AGENT_IDS.get(body["npc"]) or body["npc"]
     os_engine = get_os(request)
     await os_engine._contribute_to_collective(
