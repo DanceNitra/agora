@@ -43,6 +43,85 @@ def _is_real_topic(headline: str) -> bool:
     return bool(headline) and len(headline) > 3 and not _JUNK.search(headline)
 
 
+#: Topic sources ranked by how much the owner's frontier is served. `pick_topic` sorts on this FIRST,
+#: so an on-mission question is always worked before an off-mission one no matter how new it is.
+_SOURCE_RANK = {"frontier": 0, "board": 0, "claude": 1, "gap": 2, "cross-domain": 3}
+_STALE_HOURS = 168.0            # a topic nobody has advanced in a week is abandoned, not live
+
+
+_BOARD_STOP = {
+    "the", "and", "for", "that", "with", "this", "must", "every", "not", "our", "are", "its", "into",
+    "from", "how", "what", "does", "than", "them", "they", "their", "research", "priorities", "owner",
+    "standing", "old", "make", "prioritize", "deprioritize", "never", "only", "each", "answer", "better",
+    "more", "most", "other", "some", "any", "system", "systems", "build", "using", "used", "work",
+    # generic connectives a bridge headline shares with any prose — matching on these would pass
+    # everything, which is how a gate comes to look like it is working while gating nothing.
+    "bridge", "complex", "science", "sciences", "engine", "model", "models", "theory", "principle",
+}
+
+
+def _words(text: str) -> set:
+    """Content words, with hyphenated compounds ALSO split into their parts.
+
+    The first cut of this matched `[A-Za-z][A-Za-z\\-]{3,}` and kept `agent-memory` as one token, so a
+    question about "an agent's MEMORY layer" shared nothing with a board that says "agent-memory
+    integrity". It rejected 3 of 4 real frontier questions — a gate that blocks the work it exists to
+    protect, caught by its own control before it shipped.
+    """
+    out = set()
+    for w in re.findall(r"[A-Za-z][A-Za-z\-]{2,}", text or ""):
+        w = w.lower().strip("-")
+        for part in [w] + (w.split("-") if "-" in w else []):
+            if len(part) >= 4 and part not in _BOARD_STOP:
+                out.add(part)
+    return out
+
+
+#: Clauses after these markers name what the board EXCLUDES, not what it wants.
+_NEG_MARKERS = re.compile(
+    r"\b(deprioriti[sz]e|de-prioriti[sz]e|only\s+test-?beds?|never\s+the\s+headline|"
+    r"not\s+the\s+headline|off-?domain|avoid|exclude|do\s+not\s+advance)\b", re.I)
+
+
+def _board_vocab(prio: str) -> tuple[set, set]:
+    """Split the priorities into wanted vocabulary and EXCLUDED vocabulary.
+
+    Sentences carrying a negative marker contribute to the excluded set; everything else to the wanted
+    set; a word appearing in both is treated as excluded, because the demotion is the more specific
+    instruction ("physics" is named exactly once, to say it is only ever a test-bed).
+    """
+    pos, neg = set(), set()
+    for sent in re.split(r"(?<=[.;])\s+|\n", prio or ""):
+        (neg if _NEG_MARKERS.search(sent) else pos).update(_words(sent))
+    return pos - neg, neg
+
+
+def _on_board(headline: str, topic: str = "") -> bool:
+    """Does this topic share vocabulary with the owner's standing priorities?
+
+    Deliberately the SAME shape of test the dungeon's quest gate uses (content-word overlap), and
+    deliberately SOFT-FAILS OPEN when no priorities are set — a board that has never been used must not
+    silence the seminar. It is applied only where a topic is OPENED, never to what is already live.
+    """
+    try:
+        from agora.execution.board import priorities_text
+        prio = priorities_text()
+    except Exception:
+        return True
+    if not prio:
+        return True
+    # POLARITY. The board names things in order to EXCLUDE them — "Finance/health/physics are ONLY
+    # test-beds, never the headline. Deprioritize generic meta-science, politics, cloud/trivia..." — so a
+    # bag-of-words overlap accepts "Bridge: ... x Physics" on the strength of a word the owner wrote to
+    # demote it. Measured: that was the single bridge still passing the gate. The excluded vocabulary is
+    # subtracted from the positive set and a topic that matches ONLY excluded words is refused.
+    pos, neg = _board_vocab(prio)
+    tw = _words(f"{headline} {topic}")
+    if tw & neg and not (tw & pos):
+        return False
+    return bool(tw & pos)
+
+
 # Board-aligned open research questions — the priorities the seminar should advance (finance &
 # causal inference PREMIUM; Science of Better Thinking; Future of Work). These ground reliably in
 # real literature (unlike the thinnest vault gaps), so the dialogue reliably produces a
@@ -159,6 +238,20 @@ def pick_topic(vault: str) -> dict:
     live = [t for t in topics if t.get("status") in ("open", "advancing")
             and t.get("n_contrib", 0) < _MAX_PER_TOPIC and t.get("attempts", 0) < _MAX_ATTEMPTS
             and (t.get("source") in ("board", "claude") or _is_real_topic(t.get("headline", "")))]
+    # RETIRE THE ABANDONED. A topic opened 975 hours ago, still at one contribution, is not live — but
+    # it sorted FIRST under "fewest contributions first" and so was handed out ahead of every fresh
+    # frontier question. Measured before this: the live pool was 11 cross-domain bridges, 2 frontier,
+    # 1 gap, and the head of the queue was "Bridge: Dopamine Reward System x Embedded Systems", opened
+    # 40 days earlier. A stale topic is a permanent squatter at the front of a queue sorted by scarcity.
+    _now = time.time()
+
+    def _fresh(t) -> bool:
+        last = float(t.get("last_advanced") or t.get("opened") or 0.0)
+        return (_now - last) / 3600.0 <= _STALE_HOURS if last else True
+
+    live_fresh = [t for t in live if _fresh(t)]
+    if live_fresh:
+        live = live_fresh
 
     # FRONTIER QUOTA — always keep at least one live topic from the owner's standing frontier.
     #
@@ -179,16 +272,30 @@ def pick_topic(vault: str) -> dict:
         # fewest contributions first, then fewest attempts → rotate across live topics instead of
         # spinning on one (a rejected round doesn't bump last_advanced, so without attempts the same
         # saturated topic would stay first forever).
-        live.sort(key=lambda t: (t.get("n_contrib", 0), t.get("attempts", 0), t.get("last_advanced", 0)))
+        # SOURCE FIRST, then scarcity. Sorting on n_contrib alone is a scarcity rule, and scarcity is
+        # exactly what an ignored off-mission topic has most of — so cross-domain bridges nobody had
+        # touched in forty days outranked frontier questions the owner had set that week. Measured
+        # lifetime split before this change: 96% of all seminar contributions went to gap + cross-domain
+        # topics and 1% to the frontier. The board's questions are worked first now, and the rest of the
+        # ordering is unchanged.
+        live.sort(key=lambda t: (_SOURCE_RANK.get(t.get("source", ""), 2), t.get("n_contrib", 0),
+                                 t.get("attempts", 0), t.get("last_advanced", 0)))
         return live[0]
     seen = {t.get("headline", "").lower() for t in topics}
     # 2) NETWORK-FILTERED CROSS-DOMAIN bridge — the validated mechanism (network filtering surfaces
     #    +67.5% more cross-domain concepts than keyword search on the real vault). Interleaved with the
     #    board bank (~half of fresh opens) so the agents regularly research real cross-domain links.
+    # ...but ONLY when the bridge is on-mission. This branch opened a fresh bridge on every even
+    # second with no board check at all, which is how the pool came to be 79% cross-domain while the
+    # owner's frontier held 14%. `_on_board` fails OPEN when no priorities are set, so a board nobody
+    # has used cannot switch cross-domain research off; when priorities DO exist, a bridge has to
+    # share vocabulary with them to be worth eight agents' time.
     if int(time.time()) % 2 == 0:
         try:
             from agora.execution.cross_domain import cross_domain_topic
             cd = cross_domain_topic()
+            if cd and not _on_board(cd["headline"], cd.get("prompt", "")):
+                cd = None
             if cd and cd["headline"].lower() not in seen:
                 t = {"id": _id(cd["headline"]), "topic": cd["prompt"], "headline": cd["headline"],
                      "source": "cross-domain", "status": "open", "n_contrib": 0,
