@@ -56,6 +56,20 @@ def build():
         slug = p.get("slug")
         if slug and slug not in CANONICALIZED:
             urls.append((f"{SITE}/public/posts/{slug}.html", _lastmod_for(slug, p.get("date"))))
+    # The Slovak half. Since 2026-07-28 each page exists once per language -- EN at its original URL, SK
+    # mirrored under /agora/sk/ -- so the Slovak URLs need listing too or they are discoverable only by
+    # following the on-page toggle. Listed only where the mirrored file actually exists, so a page that
+    # was never bilingual does not get a phantom entry. lastmod is inherited from the English twin.
+    sk_root = ROOT / "sk"
+    if sk_root.exists():
+        for loc, lastmod in list(urls):
+            rel = loc[len(SITE):].lstrip("/") or "index.html"
+            cand = sk_root / (rel if rel.endswith(".html") else rel.rstrip("/") + "/index.html")
+            if rel.endswith("/") or not rel:
+                cand = sk_root / (rel + "index.html")
+            if cand.exists():
+                urls.append((f"{SITE}/sk/" + cand.relative_to(sk_root).as_posix(), lastmod))
+
     out = ['<?xml version="1.0" encoding="UTF-8"?>',
            '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">']
     for loc, lastmod in urls:

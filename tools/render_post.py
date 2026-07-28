@@ -409,7 +409,19 @@ def _emit_html(m: dict, body_en, foot_en, body_sk, foot_sk, read: int, bilingual
         tags=m["tags"], tags_sk=tags_sk,
         tldr=html.escape(m["desc"]), tldr_sk=html.escape(desc_sk),
         body=body_en, body_sk=body_sk, foot=foot_en, foot_sk=foot_sk)
-    (ROOT / "public" / "posts" / f"{m['slug']}.html").write_text(out, encoding="utf-8")
+    dest = ROOT / "public" / "posts" / f"{m['slug']}.html"
+    dest.write_text(out, encoding="utf-8")
+    # ONE URL PER LANGUAGE. This template emits both languages into one document, CSS-toggled -- which is
+    # what put the two languages into one extracted text blob, gave hreflang two annotations pointing at
+    # the same URL, and left every Slovak element declared lang="en". The site was split on 2026-07-28
+    # (EN in place, SK under /agora/sk/); without this call the very next post rendered would reintroduce
+    # the bilingual document the split removed, one page at a time and unnoticed.
+    if bilingual:
+        try:
+            import split_languages
+            split_languages.split_one(dest)
+        except Exception as e:                                    # never fail a render over the mirror
+            print(f"  [warn] SK mirror not written for {m['slug']}: {type(e).__name__}: {e}")
     _upsert_manifest({"slug": m["slug"], "title": m["title"], "title_sk": title_sk,
                       "desc": m["desc"], "desc_sk": desc_sk, "date": m["date"],
                       "tags": m["tags"], "tags_sk": tags_sk, "kicker": m["kicker"],

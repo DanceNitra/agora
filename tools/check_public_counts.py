@@ -60,10 +60,16 @@ CHECKS = [
     ("index.html", r"(\d+)\s+claims tested", "TOTAL"),
     ("index.html", r"(\d+)\s+reproduced", "REPRODUCED"),
     ("index.html", r"(\d+)\s+failed", "FAILED"),
-    ("index.html", r"(\d+)\s+not&#8209;computable", "NOT_COMPUTABLE"),
+    # the hyphen here is U+2011 NON-BREAKING HYPHEN, which the page wrote as the entity `&#8209;` until
+    # the language split re-serialised the document and emitted the literal character. Match both, or
+    # this check silently stops covering the surface -- which is what it caught itself doing.
+    ("index.html", r"(\d+)\s+not(?:&#8209;|‑|-)computable", "NOT_COMPUTABLE"),
     ("index.html", r"All\s+(\d+)\s+claims", "TOTAL"),
     ("index.html", r"<b>(\d+)</b>\s+claims tested", "TOTAL"),
-    ("index.html", r"<b>(\d+)</b>\s+tvrdení testovaných", "TOTAL"),
+    # Slovak moved to its own document in the 2026-07-28 language split; the numbers must agree there too,
+    # and a Slovak page quietly keeping a stale count is exactly as wrong as an English one.
+    ("sk/index.html", r"<b>(\d+)</b>\s+tvrdení testovaných", "TOTAL"),
+    ("sk/index.html", r"Všetkých\s+(\d+)\s+tvrdení", "TOTAL"),
     ("public/track-record.html", r"(\d+)\s+reproduced", "REPRODUCED"),
     ("public/track-record.html", r"(\d+)\s+failed", "FAILED"),
     ("public/track-record.html", r"(\d+)\s+not[- ]computable", "NOT_COMPUTABLE"),
@@ -100,7 +106,7 @@ def main() -> int:
 
     # the essay count, same class of defect, different source of truth
     for rel, pattern in (("index.html", r"<b>(\d+)</b>\s+essays"),
-                         ("index.html", r"<b>(\d+)</b>\s+esejí")):
+                         ("sk/index.html", r"<b>(\d+)</b>\s+esejí")):
         text = (ROOT / rel).read_text(encoding="utf-8", errors="replace")
         hits = re.findall(pattern, text)
         if not hits:
