@@ -38,6 +38,40 @@ def _save(items: list) -> None:
         pass
 
 
+def models_line(code: str) -> str:
+    """What the script says it MODELS — its module docstring or leading comment block, or "".
+
+    The ledger records `name`, which is the QUEST title, and a quest title and the model underneath it
+    can disagree completely. A real case: a run named
+    `method:basket-goodhart-interior-k In a competitive matrix where frontier k...` printed
+    `mean K* = 10.5`, and I read it as an optimal RETRIEVAL DEPTH for recall and nearly rebuilt a product
+    default on it. The script models an adversary splitting an effort budget across K PROXY METRICS in an
+    incentive scheme. Nothing in the record said so. A number attributed to the wrong subject is worse
+    than no number, because it looks like a result.
+
+    ONLY a genuine LEADING block counts — a docstring or `#` lines before any code. An earlier version
+    scanned the first 60 lines for any comment and picked up an inline formula
+    (`Beta(a,b) with mean qbar => ...`) from inside a function, which describes an equation rather than
+    the model and made the record look documented when it was not. Measured on the last 60 runs: 37
+    carry no leading description at all. Returning "" for those is the honest answer, and it is what
+    makes the gap visible — the fix is that a lab script must OPEN with what it models.
+    """
+    text = (code or "").lstrip()
+    m = re.match(r'^(?:[rubRUB]{0,2})("""|\'\'\')(.*?)\1', text, re.DOTALL)
+    if m:
+        return " ".join(m.group(2).split())[:400]
+    out = []
+    for ln in text.splitlines():
+        s = ln.strip()
+        if s.startswith("#"):
+            out.append(s.lstrip("# ").strip())
+        elif not s and not out:
+            continue
+        else:
+            break
+    return " ".join(out)[:400]
+
+
 def run_experiment(name: str, code: str) -> dict:
     """Persist + execute one experiment script; record the outcome in the lab ledger."""
     slug = re.sub(r"[^a-z0-9]+", "-", (name or "experiment").lower()).strip("-")[:50]
@@ -54,7 +88,15 @@ def run_experiment(name: str, code: str) -> dict:
         output = (r.stdout or "")[:_OUT_CAP] + (("\n[stderr] " + r.stderr[:1500]) if (not ok and r.stderr) else "")
     except subprocess.TimeoutExpired:
         ok, output = False, f"[timeout after {_TIMEOUT}s]"
+    # `undocumented` rather than a mismatch FLAG. The flag I first wrote compared the title's vocabulary
+    # against the model's and was wrong on both of its own test cases — it cleared the run that fooled me
+    # (they happened to share the word "basket") and flagged the honest control, ending at 87% flagged,
+    # which is a guard that fires on everything and therefore says nothing. Dropped rather than tuned:
+    # what is verifiable here is whether the script SAYS what it models, not whether a bag of words
+    # agrees with the quest title.
+    models = models_line(code)
     rec = {"id": eid, "name": (name or slug)[:120], "script": str(path),
+           "models": models, "undocumented": not models,
            "ok": ok, "seconds": round(time.time() - t0, 1),
            "output": output.strip()[:_OUT_CAP], "source": "simulation", "ts": time.time()}
     items = _load()

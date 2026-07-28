@@ -1387,14 +1387,31 @@ async def brain_annals(day: str = ""):
 @router.post("/brain/lab/run")
 async def brain_lab_run(request: Request):
     """THE LABORATORY — execute a Claude-written experiment script (deterministic runner:
-    hard timeout, output cap, results ledgered with source 'simulation')."""
+    hard timeout, output cap, results ledgered with source 'simulation').
+
+    THE SCRIPT MUST OPEN WITH A DOCSTRING SAYING WHAT IT MODELS. The ledger's `name` is the QUEST
+    title, and a quest title and the model underneath it can disagree completely: a run titled
+    "basket-goodhart-interior-k / In a competitive matrix where frontier k..." printed `mean K* = 10.5`
+    and was read as an optimal RETRIEVAL DEPTH; the script models an adversary splitting a budget across
+    K PROXY METRICS. Measured on the last 60 runs: **100% carried no description of the model at all**,
+    so every number in the ledger is attributable only through its quest title.
+
+    A script with no leading docstring/comment block still runs — silencing the Lab would be worse — but
+    it is recorded `undocumented: true`, and the response says so, so the gap is visible instead of
+    being inherited by whoever quotes the number next.
+    """
     import asyncio as _aio
     from agora.execution.lab import run_experiment
     b = await request.json()
     code = b.get("code") or ""
     if len(code) < 20:
         return {"status": "empty"}
-    return {"status": "ok", **await _aio.to_thread(run_experiment, b.get("name") or "", code)}
+    rec = await _aio.to_thread(run_experiment, b.get("name") or "", code)
+    out = {"status": "ok", **rec}
+    if rec.get("undocumented"):
+        out["warning"] = ("this script does not say what it models — open it with a docstring stating "
+                          "the mechanism, or the number can only be attributed by its quest title")
+    return out
 
 
 @router.get("/brain/lab")
