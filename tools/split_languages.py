@@ -62,10 +62,16 @@ def rel_url(path: pathlib.Path) -> str:
 
 
 def urls_for(path: pathlib.Path) -> tuple[str, str]:
+    """The canonical URL of each language twin.
+
+    DIRECTORY FORM for any index.html, because that is what these pages already declare as their own
+    canonical and what the sitemap lists. Building the URL naively from the file path rewrote
+    public/posts/ 's canonical to `.../public/posts/index.html` -- reintroducing, inside the pages, the
+    exact sitemap-vs-canonical contradiction fixed hours earlier one layer up.
+    """
     rel = path.relative_to(ROOT).as_posix()
-    en = f"{SITE}/" + ("" if rel == "index.html" else rel)
-    sk = f"{SITE}/sk/" + rel
-    return en, sk
+    pretty = rel[:-len("index.html")] if rel.endswith("index.html") else rel
+    return f"{SITE}/{pretty}", f"{SITE}/sk/{pretty}"
 
 
 def _strip_other_language(soup: BeautifulSoup, keep: str) -> None:
@@ -85,6 +91,19 @@ def _set_head(soup: BeautifulSoup, keep: str, en_url: str, sk_url: str) -> None:
     self_url = en_url if keep == "en" else sk_url
     for link in soup.find_all("link", rel="canonical"):
         link["href"] = self_url
+
+    # INSERT the alternates when the page never had any. Several bilingual pages (the posts index among
+    # them) carried no hreflang at all, so rewriting-in-place left both twins silently unaware of each
+    # other -- a split whose whole purpose is the reciprocal declaration, not making it.
+    have = {(l.get("hreflang") or "").lower() for l in soup.find_all("link", rel="alternate")}
+    head = soup.head
+    if head is not None:
+        for hl, href in (("en", en_url), ("sk", sk_url), ("x-default", en_url)):
+            if hl not in have:
+                tag = soup.new_tag("link", rel="alternate", href=href)
+                tag["hreflang"] = hl
+                head.append(tag)
+
     for link in soup.find_all("link", rel="alternate"):
         hl = (link.get("hreflang") or "").lower()
         if hl == "en":

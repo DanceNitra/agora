@@ -39,8 +39,35 @@ jobs:
           cp index.html _site/index.html
           touch _site/.nojekyll
           cp -r public _site/public
+          # The Slovak half of the site. Since the 2026-07-28 language split each page exists once per
+          # language: English at its original URL, Slovak under /agora/sk/. This staging list is
+          # hand-maintained, so the split shipped a sitemap advertising 59 Slovak URLs while every one of
+          # them 404'd -- the deploy reported success because it only ever copies what it is told to.
+          [ -d sk ] && cp -r sk _site/sk || true
           [ -f sitemap.xml ] && cp sitemap.xml _site/sitemap.xml || true
           [ -f robots.txt ] && cp robots.txt _site/robots.txt || true
+      - name: Every URL in the sitemap must exist in what we are about to publish
+        run: |
+          python3 - <<'PY'
+          # A hand-maintained staging list cannot be trusted to stay complete: it was already wrong once,
+          # and the deploy still reported success. The sitemap is the site's own claim about what it
+          # serves, so assert the artifact against it BEFORE publishing rather than discovering 404s live.
+          import sys, xml.etree.ElementTree as ET
+          from pathlib import Path
+          SITE, ROOT = "https://dancenitra.github.io/agora", Path("_site")
+          ns = {"s": "http://www.sitemaps.org/schemas/sitemap/0.9"}
+          locs = [u.find("s:loc", ns).text for u in ET.parse("_site/sitemap.xml").getroot().findall("s:url", ns)]
+          missing = []
+          for loc in locs:
+              rel = loc[len(SITE):].lstrip("/") or "index.html"
+              p = ROOT / (rel if rel.endswith(".html") else rel.rstrip("/") + "/index.html")
+              if not p.exists():
+                  missing.append(loc)
+          print(f"{len(locs)} sitemap urls, {len(missing)} missing from the artifact")
+          for m in missing[:20]:
+              print("  MISSING:", m)
+          sys.exit(1 if missing else 0)
+          PY
       - uses: actions/configure-pages@v5
       - uses: actions/upload-pages-artifact@v3
         with:

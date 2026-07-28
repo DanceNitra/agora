@@ -65,7 +65,11 @@ def main() -> int:
         # wearing the opposite sign. What must never happen is claiming one that is missing.
         twin = (ROOT / rel) if is_sk else (SK / rel)
         expects_sk = twin.exists() if not is_sk else True
-        if alts:
+        if expects_sk and not alts:
+            # silence is the failure mode that looks fine: both twins exist and neither declares the
+            # other, so the split does nothing for either of them
+            problems.append(f"{rel}: has a language twin but declares NO hreflang at all")
+        elif alts:
             if not alts.get("en") or (expects_sk and not alts.get("sk")):
                 problems.append(f"{rel}: hreflang set is incomplete: {sorted(alts)}")
             elif alts.get("sk") and not expects_sk:
