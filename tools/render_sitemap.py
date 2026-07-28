@@ -63,12 +63,16 @@ def build():
     sk_root = ROOT / "sk"
     if sk_root.exists():
         for loc, lastmod in list(urls):
-            rel = loc[len(SITE):].lstrip("/") or "index.html"
-            cand = sk_root / (rel if rel.endswith(".html") else rel.rstrip("/") + "/index.html")
-            if rel.endswith("/") or not rel:
-                cand = sk_root / (rel + "index.html")
+            rel = loc[len(SITE):].lstrip("/")                      # "" | "public/posts/" | "a/b.html"
+            # The FILE to test for existence, and separately the URL to publish. Deriving the URL from
+            # the file path emitted ".../sk/index.html" and ".../sk/public/posts/index.html" while those
+            # pages canonicalise to the directory form -- reintroducing on the Slovak side the exact
+            # sitemap-vs-canonical contradiction fixed on the English side hours earlier. The EN entry
+            # already decided the correct shape; mirror THAT, and use the path only to check the file is
+            # really there.
+            cand = sk_root / (rel if rel.endswith(".html") else rel + "index.html")
             if cand.exists():
-                urls.append((f"{SITE}/sk/" + cand.relative_to(sk_root).as_posix(), lastmod))
+                urls.append((f"{SITE}/sk/{rel}", lastmod))
 
     out = ['<?xml version="1.0" encoding="UTF-8"?>',
            '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">']
