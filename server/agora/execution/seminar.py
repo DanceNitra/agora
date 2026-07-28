@@ -226,6 +226,34 @@ def _open_frontier_topic(topics: list) -> dict | None:
     return None
 
 
+#: Sources whose topics are CURATED research questions and must not meet the junk filter.
+_CURATED = ("board", "claude", "frontier")
+
+
+def live_pool(topics: list) -> list:
+    """The topics that are eligible to be worked on, in one place so a check can exercise it.
+
+    FRONTIER IS CURATED TOO. `_open_frontier_topic`'s docstring has said since it was written that these
+    "skip the junk filter the way board/claude topics do" — and the filter listed only board and claude,
+    so `_is_real_topic` was applied to the owner's own research questions. Measured: BOTH remaining live
+    frontier topics were dropped because the junk word 'system' occurs in them —
+
+        "At what optimization pressure does tuning an agent-memory SYSTEM to a single recall benchmark"
+        "How should a memory SYSTEM's write-acceptance conservatism scale with meta-uncertainty"
+
+    — leaving a live pool of two vault gaps and one bridge, headed by "Assessment_in_Education". The
+    comment inside `_is_real_topic` already warned about exactly this shape ('meta' inside
+    'meta-prediction'); the exemption was granted to two sources and the third was forgotten.
+
+    It is a FUNCTION rather than an inline comprehension because the check that verifies the ordering
+    had its own copy of these conditions, and a duplicated filter is how a fix passes its own test while
+    the product keeps the bug — which happened twice today already.
+    """
+    return [t for t in topics if t.get("status") in ("open", "advancing")
+            and t.get("n_contrib", 0) < _MAX_PER_TOPIC and t.get("attempts", 0) < _MAX_ATTEMPTS
+            and (t.get("source") in _CURATED or _is_real_topic(t.get("headline", "")))]
+
+
 def pick_topic(vault: str) -> dict:
     """A REAL open research question to collaborate on. Prefers deepening an existing open
     thread (fewest contributions first) so topics actually advance; otherwise opens a fresh one
@@ -235,9 +263,7 @@ def pick_topic(vault: str) -> dict:
     # board/claude topics are curated research questions — trust them; only frontier/gap topics
     # (raw folder/domain names) need the junk filter. (Without this, 'meta-prediction' etc. were
     # wrongly dropped because the junk word 'meta' is a substring of a real topic.)
-    live = [t for t in topics if t.get("status") in ("open", "advancing")
-            and t.get("n_contrib", 0) < _MAX_PER_TOPIC and t.get("attempts", 0) < _MAX_ATTEMPTS
-            and (t.get("source") in ("board", "claude") or _is_real_topic(t.get("headline", "")))]
+    live = live_pool(topics)
     # RETIRE THE ABANDONED. A topic opened 975 hours ago, still at one contribution, is not live — but
     # it sorted FIRST under "fewest contributions first" and so was handed out ahead of every fresh
     # frontier question. Measured before this: the live pool was 11 cross-domain bridges, 2 frontier,
