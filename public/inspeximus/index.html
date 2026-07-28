@@ -1,284 +1,236 @@
-<!doctype html>
+<!DOCTYPE html>
+
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>inspeximus — Agent memory that keeps a corrected fact corrected</title>
-    <meta
-      name="description"
-      content="A zero-dependency memory layer and MCP server for AI agents. Value-ranked recall, consolidation, and a first-class correction and erasure channel — measured, not assumed."
-    />
-    <meta name="theme-color" content="#0a0a0b" />
-    <link rel="canonical" href="https://dancenitra.github.io/inspeximus/" />
-    <meta property="og:title" content="inspeximus — Agent memory that keeps a corrected fact corrected" />
-    <meta property="og:description" content="A zero-dependency memory layer and MCP server for AI agents. Correction and erasure as a first-class channel — measured, not assumed." />
-    <meta property="og:type" content="website" />
-    <meta property="og:url" content="https://dancenitra.github.io/inspeximus/" />
-    <meta property="og:image" content="https://dancenitra.github.io/inspeximus/og.png" />
-    <meta property="og:image:width" content="1200" />
-    <meta property="og:image:height" content="630" />
-    <meta name="twitter:card" content="summary_large_image" />
-    <meta name="twitter:title" content="inspeximus — Agent memory that keeps a corrected fact corrected" />
-    <meta name="twitter:description" content="Zero-dependency agent memory + MCP server. Value-ranked recall, correction &amp; erasure channel — measured, not assumed." />
-    <meta name="twitter:image" content="https://dancenitra.github.io/inspeximus/og.png" />
-    <script type="application/ld+json">
-    {
-      "@context": "https://schema.org",
-      "@graph": [
-        {
-          "@type": "SoftwareApplication",
-          "name": "inspeximus",
-          "applicationCategory": "DeveloperApplication",
-          "operatingSystem": "Windows, macOS, Linux",
-          "softwareVersion": "1.7.0",
-          "description": "A zero-dependency memory layer and MCP server for AI agents. Value-ranked recall, consolidation, and a first-class correction and erasure channel.",
-          "license": "https://opensource.org/licenses/MIT",
-          "url": "https://dancenitra.github.io/inspeximus/",
-          "downloadUrl": "https://pypi.org/project/inspeximus/",
-          "codeRepository": "https://github.com/DanceNitra/inspeximus",
-          "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" },
-          "author": { "@type": "Organization", "name": "Agora", "url": "https://dancenitra.github.io/agora/" }
-        },
-        {
-          "@type": "Organization",
-          "name": "Agora",
-          "url": "https://dancenitra.github.io/agora/",
-          "sameAs": [
-            "https://github.com/DanceNitra",
-            "https://doi.org/10.5281/zenodo.21128549"
-          ]
-        }
-      ]
-    }
-    </script>
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link
-      href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap"
-      rel="stylesheet"
-    />
-    <link
-      rel="icon"
-      href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 28 28'%3E%3Crect x='4' y='18.4' width='12' height='3' rx='1.5' fill='%238892a0'/%3E%3Crect x='4' y='12.9' width='15.5' height='3' rx='1.5' fill='%23c9d1dc'/%3E%3Crect x='4' y='7' width='20' height='3.4' rx='1.7' fill='%2338f2d6'/%3E%3C/svg%3E"
-    />
-    <script type="module" crossorigin src="./assets/index-D7ygK78B.js"></script>
-    <link rel="modulepreload" crossorigin href="./assets/three-Bkb2dqNl.js">
-    <link rel="modulepreload" crossorigin href="./assets/motion-B8OfwHgZ.js">
-    <link rel="stylesheet" crossorigin href="./assets/index-B6yfpjLI.css">
-  </head>
-  <body>
-    <!-- Texture overlays -->
-    <div class="grain" aria-hidden="true"></div>
-    <div class="cursor-glow" aria-hidden="true"></div>
-
-    <!-- Nav -->
-    <header class="nav" id="nav">
-      <a class="nav__brand" href="#top" aria-label="inspeximus home">
-        <svg class="nav__logo" viewBox="0 0 28 28" width="26" height="26" aria-hidden="true">
-          <rect x="4" y="18.4" width="12" height="3" rx="1.5" fill="currentColor" opacity=".34" />
-          <rect x="4" y="12.9" width="15.5" height="3" rx="1.5" fill="currentColor" opacity=".62" />
-          <rect x="4" y="7" width="20" height="3.4" rx="1.7" fill="var(--signal)" />
-        </svg>
-        <span class="nav__word">inspeximus<span class="dot">.</span></span>
-      </a>
-      <nav class="nav__links" aria-label="Primary">
-        <a href="#story">Story</a>
-        <a href="#measured">Measured</a>
-        <a href="#features">Features</a>
-        <a href="#mcp">MCP</a>
-        <a href="#governance">Governance</a>
-      </nav>
-      <a class="btn btn--ghost magnetic" href="https://github.com/DanceNitra/inspeximus" target="_blank" rel="noopener">
-        <span>Star on GitHub</span>
-      </a>
-    </header>
-
-    <!-- The pinned WebGL scene lives behind the narrative -->
-    <main id="top">
-      <div class="narrative" id="story">
-        <div class="stage">
-          <canvas id="gl" aria-hidden="true"></canvas>
-          <div class="stage__vignette" aria-hidden="true"></div>
-          <div class="stage__scan" aria-hidden="true"></div>
-        </div>
-
-        <!-- Beat 0 — hero -->
-        <section class="panel panel--hero" data-beat="0">
-          <div class="panel__inner reveal">
-            <p class="eyebrow">v1.7 · MIT · zero dependencies</p>
-            <h1 class="hero__title">
-              Agent memory that keeps a<br />
-              <span class="glow-text">corrected fact corrected.</span>
-            </h1>
-            <p class="hero__sub">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>inspeximus — Agent memory that keeps a corrected fact corrected</title>
+<meta content="A zero-dependency memory layer and MCP server for AI agents. Value-ranked recall, consolidation, and a first-class correction and erasure channel — measured, not assumed." name="description"/>
+<meta content="#0a0a0b" name="theme-color"/>
+<link href="https://dancenitra.github.io/inspeximus/" rel="canonical"/>
+<meta content="inspeximus — Agent memory that keeps a corrected fact corrected" property="og:title"/>
+<meta content="A zero-dependency memory layer and MCP server for AI agents. Correction and erasure as a first-class channel — measured, not assumed." property="og:description"/>
+<meta content="website" property="og:type"/>
+<meta content="https://dancenitra.github.io/inspeximus/" property="og:url"/>
+<meta content="https://dancenitra.github.io/inspeximus/og.png" property="og:image"/>
+<meta content="1200" property="og:image:width"/>
+<meta content="630" property="og:image:height"/>
+<meta content="summary_large_image" name="twitter:card"/>
+<meta content="inspeximus — Agent memory that keeps a corrected fact corrected" name="twitter:title"/>
+<meta content="Zero-dependency agent memory + MCP server. Value-ranked recall, correction &amp; erasure channel — measured, not assumed." name="twitter:description"/>
+<meta content="https://dancenitra.github.io/inspeximus/og.png" name="twitter:image"/>
+<script type="application/ld+json">{"@context": "https://schema.org", "@graph": [{"@type": "SoftwareApplication", "name": "inspeximus", "applicationCategory": "DeveloperApplication", "operatingSystem": "Windows, macOS, Linux", "softwareVersion": "1.7.0", "description": "A zero-dependency memory layer and MCP server for AI agents. Value-ranked recall, consolidation, and a first-class correction and erasure channel.", "license": "https://opensource.org/licenses/MIT", "url": "https://dancenitra.github.io/inspeximus/", "downloadUrl": "https://pypi.org/project/inspeximus/", "codeRepository": "https://github.com/DanceNitra/inspeximus", "offers": {"@type": "Offer", "price": "0", "priceCurrency": "USD"}, "author": {"@type": "Organization", "name": "Agora", "url": "https://dancenitra.github.io/agora/"}}, {"@type": "Organization", "name": "Agora", "url": "https://dancenitra.github.io/agora/", "sameAs": ["https://github.com/DanceNitra", "https://doi.org/10.5281/zenodo.21128549", "https://github.com/DanceNitra/inspeximus", "https://pypi.org/project/inspeximus/", "https://dancenitra.github.io/inspeximus/", "https://dancenitra.github.io/"]}]}</script>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&amp;family=JetBrains+Mono:wght@400;500;600&amp;display=swap" rel="stylesheet"/>
+<link href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 28 28'%3E%3Crect x='4' y='18.4' width='12' height='3' rx='1.5' fill='%238892a0'/%3E%3Crect x='4' y='12.9' width='15.5' height='3' rx='1.5' fill='%23c9d1dc'/%3E%3Crect x='4' y='7' width='20' height='3.4' rx='1.7' fill='%2338f2d6'/%3E%3C/svg%3E" rel="icon"/>
+<script crossorigin="" src="./assets/index-D7ygK78B.js" type="module"></script>
+<link crossorigin="" href="./assets/three-Bkb2dqNl.js" rel="modulepreload"/>
+<link crossorigin="" href="./assets/motion-B8OfwHgZ.js" rel="modulepreload"/>
+<link crossorigin="" href="./assets/index-B6yfpjLI.css" rel="stylesheet"/>
+</head>
+<body>
+<!-- Texture overlays -->
+<div aria-hidden="true" class="grain"></div>
+<div aria-hidden="true" class="cursor-glow"></div>
+<!-- Nav -->
+<header class="nav" id="nav">
+<a aria-label="inspeximus home" class="nav__brand" href="#top">
+<svg aria-hidden="true" class="nav__logo" height="26" viewbox="0 0 28 28" width="26">
+<rect fill="currentColor" height="3" opacity=".34" rx="1.5" width="12" x="4" y="18.4"></rect>
+<rect fill="currentColor" height="3" opacity=".62" rx="1.5" width="15.5" x="4" y="12.9"></rect>
+<rect fill="var(--signal)" height="3.4" rx="1.7" width="20" x="4" y="7"></rect>
+</svg>
+<span class="nav__word">inspeximus<span class="dot">.</span></span>
+</a>
+<nav aria-label="Primary" class="nav__links">
+<a href="#story">Story</a>
+<a href="#measured">Measured</a>
+<a href="#features">Features</a>
+<a href="#mcp">MCP</a>
+<a href="#governance">Governance</a>
+</nav>
+<a class="btn btn--ghost magnetic" href="https://github.com/DanceNitra/inspeximus" rel="noopener" target="_blank">
+<span>Star on GitHub</span>
+</a>
+</header>
+<!-- The pinned WebGL scene lives behind the narrative -->
+<main id="top">
+<div class="narrative" id="story">
+<div class="stage">
+<canvas aria-hidden="true" id="gl"></canvas>
+<div aria-hidden="true" class="stage__vignette"></div>
+<div aria-hidden="true" class="stage__scan"></div>
+</div>
+<!-- Beat 0 — hero -->
+<section class="panel panel--hero" data-beat="0">
+<div class="panel__inner reveal">
+<p class="eyebrow">v1.7 · MIT · zero dependencies</p>
+<h1 class="hero__title">
+              Agent memory that keeps a<br/>
+<span class="glow-text">corrected fact corrected.</span>
+</h1>
+<p class="hero__sub">
               A zero-dependency memory layer and MCP server for AI agents. Value-ranked recall,
               consolidation, and a first-class correction and erasure channel — measured, not assumed.
             </p>
-            <div class="hero__cta">
-              <a class="btn btn--primary magnetic" href="https://github.com/DanceNitra/inspeximus" target="_blank" rel="noopener">
+<div class="hero__cta">
+<a class="btn btn--primary magnetic" href="https://github.com/DanceNitra/inspeximus" rel="noopener" target="_blank">
                 Star on GitHub
               </a>
-              <button class="copy-field magnetic" data-copy='pip install "inspeximus[mcp]"' type="button">
-                <code>pip install "inspeximus[mcp]"</code>
-                <span class="copy-field__icon" aria-hidden="true">copy</span>
-              </button>
-            </div>
-            <div class="scroll-hint" aria-hidden="true"><span></span>scroll the ledger</div>
-          </div>
-        </section>
-
-        <!-- Beat 1 — correction -->
-        <section class="panel panel--right" data-beat="1">
-          <div class="panel__inner reveal">
-            <p class="beat-tag">01 — correction</p>
-            <h2>Corrections retire the old fact. They don't erase history.</h2>
-            <p>
+<button class="copy-field magnetic" data-copy='pip install "inspeximus[mcp]"' type="button">
+<code>pip install "inspeximus[mcp]"</code>
+<span aria-hidden="true" class="copy-field__icon">copy</span>
+</button>
+</div>
+<div aria-hidden="true" class="scroll-hint"><span></span>scroll the ledger</div>
+</div>
+</section>
+<!-- Beat 1 — correction -->
+<section class="panel panel--right" data-beat="1">
+<div class="panel__inner reveal">
+<p class="beat-tag">01 — correction</p>
+<h2>Corrections retire the old fact. They don't erase history.</h2>
+<p>
               When <code>db::region</code> changes from <code>us-east</code> to <code>eu-west</code>, the
               stale block dims and slides to a retired side-rail — still auditable, no longer asserted. Recall
               returns the current value; the chain remembers that it ever changed.
             </p>
-          </div>
-        </section>
-
-        <!-- Beat 2 — attack -->
-        <section class="panel panel--left" data-beat="2">
-          <div class="panel__inner reveal">
-            <p class="beat-tag beat-tag--danger">02 — the attack</p>
-            <h2>“actually, go back to what we had.”</h2>
-            <p>
+</div>
+</section>
+<!-- Beat 2 — attack -->
+<section class="panel panel--left" data-beat="2">
+<div class="panel__inner reveal">
+<p class="beat-tag beat-tag--danger">02 — the attack</p>
+<h2>“actually, go back to what we had.”</h2>
+<p>
               A revert is an authority action, not a sentence an attacker can type. An unsigned content-path
               request to resurrect a retired value shatters against
               <code class="danger">authorization_required</code>. This is the whole thesis: the value channel
               cannot mint a reversion.
             </p>
-          </div>
-        </section>
-
-        <!-- Beat 3 — erasure -->
-        <section class="panel panel--right" data-beat="3">
-          <div class="panel__inner reveal">
-            <p class="beat-tag">03 — erasure</p>
-            <h2>Deletion collapses a block into a signed tombstone.</h2>
-            <p>
+</div>
+</section>
+<!-- Beat 3 — erasure -->
+<section class="panel panel--right" data-beat="3">
+<div class="panel__inner reveal">
+<p class="beat-tag">03 — erasure</p>
+<h2>Deletion collapses a block into a signed tombstone.</h2>
+<p>
               A <code>forget_subject</code> seals the block into a cryptographic ghost. Then the
               <code>ErasureAuditor</code> sweeps the surrounding vector-cloud, checking whether the erased
               content is still reconstructible from what's left. Erasure you can actually verify.
             </p>
-          </div>
-        </section>
-      </div>
-
-      <!-- Stat strip -->
-      <section class="strip" id="stats">
-        <ul class="strip__grid">
-          <li><b class="count" data-count="12">0</b><span>MCP tools</span></li>
-          <li><b class="count" data-count="6">0</b><span>framework adapters</span></li>
-          <li><b class="count" data-count="0.75" data-decimals="2">0</b><span>revert success (vs 0.20, n=20)</span></li>
-          <li><b>A</b><span>Glama quality</span></li>
-          <li><b>v1.7</b><span>current release</span></li>
-          <li><b>0</b><span>runtime dependencies</span></li>
-        </ul>
-      </section>
-
-      <!-- Terminal demo -->
-      <section class="section terminal-section">
-        <div class="section__head reveal">
-          <p class="eyebrow">the correction channel</p>
-          <h2 class="section__title">Store a fact. Correct it. It stays corrected.</h2>
-        </div>
-        <div class="terminal reveal" id="terminal" aria-label="inspeximus session replay">
-          <div class="terminal__bar">
-            <span class="terminal__dot"></span><span class="terminal__dot"></span><span class="terminal__dot"></span>
-            <span class="terminal__name">inspeximus — correction that sticks</span>
-          </div>
-          <pre class="terminal__body" id="term-body"></pre>
-        </div>
-      </section>
-
-      <!-- Benchmark -->
-      <section class="section" id="measured">
-        <div class="section__head reveal">
-          <p class="eyebrow">measured, not assumed</p>
-          <h2 class="section__title">Cross-system correction integrity</h2>
-          <p class="section__lede">
+</div>
+</section>
+</div>
+<!-- Stat strip -->
+<section class="strip" id="stats">
+<ul class="strip__grid">
+<li><b class="count" data-count="12">0</b><span>MCP tools</span></li>
+<li><b class="count" data-count="6">0</b><span>framework adapters</span></li>
+<li><b class="count" data-count="0.75" data-decimals="2">0</b><span>revert success (vs 0.20, n=20)</span></li>
+<li><b>A</b><span>Glama quality</span></li>
+<li><b>v1.7</b><span>current release</span></li>
+<li><b>0</b><span>runtime dependencies</span></li>
+</ul>
+</section>
+<!-- Terminal demo -->
+<section class="section terminal-section">
+<div class="section__head reveal">
+<p class="eyebrow">the correction channel</p>
+<h2 class="section__title">Store a fact. Correct it. It stays corrected.</h2>
+</div>
+<div aria-label="inspeximus session replay" class="terminal reveal" id="terminal">
+<div class="terminal__bar">
+<span class="terminal__dot"></span><span class="terminal__dot"></span><span class="terminal__dot"></span>
+<span class="terminal__name">inspeximus — correction that sticks</span>
+</div>
+<pre class="terminal__body" id="term-body"></pre>
+</div>
+</section>
+<!-- Benchmark -->
+<section class="section" id="measured">
+<div class="section__head reveal">
+<p class="eyebrow">measured, not assumed</p>
+<h2 class="section__title">Cross-system correction integrity</h2>
+<p class="section__lede">
             Does a correction stick after the value is contested? One open, adversarial cut — revert success
             over 20 trials, with 95% Wilson intervals.
           </p>
-        </div>
-        <div class="bench reveal" id="bench">
-          <div class="bench__row" data-value="0.75" data-lo="0.53" data-hi="0.89" data-self="1">
-            <div class="bench__label">inspeximus <span>1.5</span></div>
-            <div class="bench__track"><div class="bench__fill"></div><div class="bench__ci"></div></div>
-            <div class="bench__num">0.75</div>
-          </div>
-          <div class="bench__row" data-value="0.20" data-lo="0.08" data-hi="0.42">
-            <div class="bench__label">mem0</div>
-            <div class="bench__track"><div class="bench__fill"></div><div class="bench__ci"></div></div>
-            <div class="bench__num">0.20</div>
-          </div>
-          <div class="bench__row" data-value="0.00" data-lo="0.00" data-hi="0.16">
-            <div class="bench__label">Graphiti</div>
-            <div class="bench__track"><div class="bench__fill"></div><div class="bench__ci"></div></div>
-            <div class="bench__num">0.00</div>
-          </div>
-        </div>
-        <p class="bench__caveat reveal">
+</div>
+<div class="bench reveal" id="bench">
+<div class="bench__row" data-hi="0.89" data-lo="0.53" data-self="1" data-value="0.75">
+<div class="bench__label">inspeximus <span>1.5</span></div>
+<div class="bench__track"><div class="bench__fill"></div><div class="bench__ci"></div></div>
+<div class="bench__num">0.75</div>
+</div>
+<div class="bench__row" data-hi="0.42" data-lo="0.08" data-value="0.20">
+<div class="bench__label">mem0</div>
+<div class="bench__track"><div class="bench__fill"></div><div class="bench__ci"></div></div>
+<div class="bench__num">0.20</div>
+</div>
+<div class="bench__row" data-hi="0.16" data-lo="0.00" data-value="0.00">
+<div class="bench__label">Graphiti</div>
+<div class="bench__track"><div class="bench__fill"></div><div class="bench__ci"></div></div>
+<div class="bench__num">0.00</div>
+</div>
+</div>
+<p class="bench__caveat reveal">
           Honest scope: this is a narrow adversarial cut, not a general memory-quality score. On the separate
           echo-resurrection cell all three systems tie. Run it yourself —
-          <a href="https://github.com/DanceNitra/inspeximus" target="_blank" rel="noopener">the harness is open</a>.
+          <a href="https://github.com/DanceNitra/inspeximus" rel="noopener" target="_blank">the harness is open</a>.
         </p>
-      </section>
-
-      <!-- Features -->
-      <section class="section" id="features">
-        <div class="section__head reveal">
-          <p class="eyebrow">the surface</p>
-          <h2 class="section__title">A memory layer with a correction spine</h2>
-        </div>
-        <div class="grid reveal" id="feature-grid">
-          <article class="card spotlight">
-            <div class="card__icon" data-i="recall"></div>
-            <h3>Clean, value-ranked recall</h3>
-            <p>Retrieval ordered by earned value, not just recency or cosine. A write-admission gate (<code>admit</code>) rejects junk and near-duplicates before they bloat the store, and <code>why_recalled</code> shows exactly why a memory surfaced.</p>
-          </article>
-          <article class="card spotlight">
-            <div class="card__icon" data-i="correct"></div>
-            <h3>Correction, erasure &amp; time-travel</h3>
-            <p>A first-class channel: <code>revert</code>, <code>retract_lineage</code>, <code>echo_guard</code>, <code>forget_subject</code>. Bitemporal <code>as_of(when, as_recorded)</code> and <code>believed_at</code> reconstruct what the agent believed at any moment — a corrected fact stays corrected, and history stays auditable.</p>
-          </article>
-          <article class="card spotlight">
-            <div class="card__icon" data-i="receipt"></div>
-            <h3>Tamper-evident receipts</h3>
-            <p>Every write is hash-chained. <code>verify_writes</code> and <code>anchor</code> catch a history rewrite by a key-holder.</p>
-          </article>
-          <article class="card spotlight">
-            <div class="card__icon" data-i="poison"></div>
-            <h3>Poison-resistant influence</h3>
-            <p>Corroboration-gated influence with <code>recall(influence_only=True)</code> so one laundered write can't dominate the answer.</p>
-          </article>
-          <article class="card spotlight">
-            <div class="card__icon" data-i="audit"></div>
-            <h3>Cross-store erasure audit</h3>
-            <p><code>DeletionManifest</code> plus <code>ErasureAuditor</code>: an adversarial check that erased content isn't reconstructible across the fan-out — including the soft-delete residue a <code>200 OK</code> leaves in Qdrant, pgvector, and S3.</p>
-          </article>
-          <article class="card spotlight">
-            <div class="card__icon" data-i="adapter"></div>
-            <h3>Framework adapters</h3>
-            <p>Drop-in for OpenAI Agents, AutoGen, LangGraph, LlamaIndex, Google ADK, and Pydantic AI.</p>
-          </article>
-        </div>
-      </section>
-
-      <!-- MCP -->
-      <section class="section mcp-section" id="mcp">
-        <div class="mcp__grid">
-          <div class="mcp__copy reveal">
-            <p class="eyebrow">model context protocol</p>
-            <h2 class="section__title">12 tools any MCP host can call</h2>
-            <p class="section__lede">Point Claude, Cursor, or any MCP agent at inspeximus and it gets a real memory with a correction channel — no glue code.</p>
-            <div class="code-block scanlines">
-              <div class="code-block__bar"><span>claude_desktop_config.json</span>
-                <button class="copy-mini magnetic" data-copy='{
+</section>
+<!-- Features -->
+<section class="section" id="features">
+<div class="section__head reveal">
+<p class="eyebrow">the surface</p>
+<h2 class="section__title">A memory layer with a correction spine</h2>
+</div>
+<div class="grid reveal" id="feature-grid">
+<article class="card spotlight">
+<div class="card__icon" data-i="recall"></div>
+<h3>Clean, value-ranked recall</h3>
+<p>Retrieval ordered by earned value, not just recency or cosine. A write-admission gate (<code>admit</code>) rejects junk and near-duplicates before they bloat the store, and <code>why_recalled</code> shows exactly why a memory surfaced.</p>
+</article>
+<article class="card spotlight">
+<div class="card__icon" data-i="correct"></div>
+<h3>Correction, erasure &amp; time-travel</h3>
+<p>A first-class channel: <code>revert</code>, <code>retract_lineage</code>, <code>echo_guard</code>, <code>forget_subject</code>. Bitemporal <code>as_of(when, as_recorded)</code> and <code>believed_at</code> reconstruct what the agent believed at any moment — a corrected fact stays corrected, and history stays auditable.</p>
+</article>
+<article class="card spotlight">
+<div class="card__icon" data-i="receipt"></div>
+<h3>Tamper-evident receipts</h3>
+<p>Every write is hash-chained. <code>verify_writes</code> and <code>anchor</code> catch a history rewrite by a key-holder.</p>
+</article>
+<article class="card spotlight">
+<div class="card__icon" data-i="poison"></div>
+<h3>Poison-resistant influence</h3>
+<p>Corroboration-gated influence with <code>recall(influence_only=True)</code> so one laundered write can't dominate the answer.</p>
+</article>
+<article class="card spotlight">
+<div class="card__icon" data-i="audit"></div>
+<h3>Cross-store erasure audit</h3>
+<p><code>DeletionManifest</code> plus <code>ErasureAuditor</code>: an adversarial check that erased content isn't reconstructible across the fan-out — including the soft-delete residue a <code>200 OK</code> leaves in Qdrant, pgvector, and S3.</p>
+</article>
+<article class="card spotlight">
+<div class="card__icon" data-i="adapter"></div>
+<h3>Framework adapters</h3>
+<p>Drop-in for OpenAI Agents, AutoGen, LangGraph, LlamaIndex, Google ADK, and Pydantic AI.</p>
+</article>
+</div>
+</section>
+<!-- MCP -->
+<section class="section mcp-section" id="mcp">
+<div class="mcp__grid">
+<div class="mcp__copy reveal">
+<p class="eyebrow">model context protocol</p>
+<h2 class="section__title">12 tools any MCP host can call</h2>
+<p class="section__lede">Point Claude, Cursor, or any MCP agent at inspeximus and it gets a real memory with a correction channel — no glue code.</p>
+<div class="code-block scanlines">
+<div class="code-block__bar"><span>claude_desktop_config.json</span>
+<button class="copy-mini magnetic" data-copy='{
   "mcpServers": {
     "inspeximus": {
       "command": "uvx",
@@ -286,7 +238,7 @@
     }
   }
 }' type="button">copy</button>
-              </div>
+</div>
 <pre>{
   <span class="k">"mcpServers"</span>: {
     <span class="k">"inspeximus"</span>: {
@@ -295,64 +247,61 @@
     }
   }
 }</pre>
-          </div>
-          </div>
-          <div class="mcp__orbit reveal" id="orbit" aria-hidden="true">
-            <div class="orbit__node"><svg viewBox="0 0 28 28" width="30" height="30"><rect x="4" y="18.4" width="12" height="3" rx="1.5" fill="currentColor" opacity=".34"/><rect x="4" y="12.9" width="15.5" height="3" rx="1.5" fill="currentColor" opacity=".62"/><rect x="4" y="7" width="20" height="3.4" rx="1.7" fill="var(--signal)"/></svg></div>
-            <div class="orbit__ring" data-r="1"></div>
-            <div class="orbit__ring" data-r="2"></div>
-            <div class="orbit__ring" data-r="3"></div>
-          </div>
-        </div>
-      </section>
-
-      <!-- Governance -->
-      <section class="section" id="governance">
-        <div class="section__head reveal">
-          <p class="eyebrow">governance</p>
-          <h2 class="section__title">Deletion you can actually verify</h2>
-        </div>
-        <div class="grid grid--2 reveal">
-          <article class="card spotlight">
-            <h3>CT-style anchor</h3>
-            <p>An RFC 6962 signed tree head over the write log. <code>anchor()</code> plus <code>verify_consistency()</code> catches a key-holder who rewrites history.</p>
-          </article>
-          <article class="card spotlight">
-            <h3>Authenticated erasure + proof</h3>
-            <p><code>forget_subject</code> is bound to an Ed25519 principal with a decision basis, and <code>compliance_receipt()</code> emits a signed, verifiable proof-of-erasure — the artifact a DPO hands a regulator under GDPR Art. 17.</p>
-          </article>
-          <article class="card spotlight">
-            <h3>Reconstruction audit</h3>
-            <p>The <code>ErasureAuditor</code> asks the adversarial question: after deletion, is the content still reconstructible? It catches the soft-delete residue a <code>200 OK</code> leaves behind — Qdrant points under the optimizer threshold, pgvector dead tuples, an S3 delete-marker over a live version.</p>
-          </article>
-          <article class="card spotlight">
-            <h3>Crypto-shred erasure</h3>
-            <p>Store encrypted at rest with opt-in <code>AES-256-GCM</code> (standard crypto, key never persisted), so <code>shred()</code> destroys the key and makes the store — and every backup of it — provably unrecoverable. NIST SP 800-88 cryptographic-erase, beside the tombstone and reconstruction proofs.</p>
-          </article>
-        </div>
-        <p class="bench__caveat reveal">
+</div>
+</div>
+<div aria-hidden="true" class="mcp__orbit reveal" id="orbit">
+<div class="orbit__node"><svg height="30" viewbox="0 0 28 28" width="30"><rect fill="currentColor" height="3" opacity=".34" rx="1.5" width="12" x="4" y="18.4"></rect><rect fill="currentColor" height="3" opacity=".62" rx="1.5" width="15.5" x="4" y="12.9"></rect><rect fill="var(--signal)" height="3.4" rx="1.7" width="20" x="4" y="7"></rect></svg></div>
+<div class="orbit__ring" data-r="1"></div>
+<div class="orbit__ring" data-r="2"></div>
+<div class="orbit__ring" data-r="3"></div>
+</div>
+</div>
+</section>
+<!-- Governance -->
+<section class="section" id="governance">
+<div class="section__head reveal">
+<p class="eyebrow">governance</p>
+<h2 class="section__title">Deletion you can actually verify</h2>
+</div>
+<div class="grid grid--2 reveal">
+<article class="card spotlight">
+<h3>CT-style anchor</h3>
+<p>An RFC 6962 signed tree head over the write log. <code>anchor()</code> plus <code>verify_consistency()</code> catches a key-holder who rewrites history.</p>
+</article>
+<article class="card spotlight">
+<h3>Authenticated erasure + proof</h3>
+<p><code>forget_subject</code> is bound to an Ed25519 principal with a decision basis, and <code>compliance_receipt()</code> emits a signed, verifiable proof-of-erasure — the artifact a DPO hands a regulator under GDPR Art. 17.</p>
+</article>
+<article class="card spotlight">
+<h3>Reconstruction audit</h3>
+<p>The <code>ErasureAuditor</code> asks the adversarial question: after deletion, is the content still reconstructible? It catches the soft-delete residue a <code>200 OK</code> leaves behind — Qdrant points under the optimizer threshold, pgvector dead tuples, an S3 delete-marker over a live version.</p>
+</article>
+<article class="card spotlight">
+<h3>Crypto-shred erasure</h3>
+<p>Store encrypted at rest with opt-in <code>AES-256-GCM</code> (standard crypto, key never persisted), so <code>shred()</code> destroys the key and makes the store — and every backup of it — provably unrecoverable. NIST SP 800-88 cryptographic-erase, beside the tombstone and reconstruction proofs.</p>
+</article>
+</div>
+<p class="bench__caveat reveal">
           Honest scope: inspeximus has no RCE or ReDoS surface (JSON-only, no pickle/eval/subprocess) and uses
           constant-time HMAC, with two documented residuals in
-          <a href="https://github.com/DanceNitra/inspeximus/blob/main/SECURITY.md" target="_blank" rel="noopener">SECURITY.md</a>.
+          <a href="https://github.com/DanceNitra/inspeximus/blob/main/SECURITY.md" rel="noopener" target="_blank">SECURITY.md</a>.
         </p>
-      </section>
-
-      <!-- Footer -->
-      <footer class="footer">
-        <div class="footer__brand">
-          <svg viewBox="0 0 28 28" width="24" height="24" aria-hidden="true"><rect x="4" y="18.4" width="12" height="3" rx="1.5" fill="currentColor" opacity=".34"/><rect x="4" y="12.9" width="15.5" height="3" rx="1.5" fill="currentColor" opacity=".62"/><rect x="4" y="7" width="20" height="3.4" rx="1.7" fill="var(--signal)"/></svg>
-          <span class="nav__word">inspeximus<span class="dot">.</span></span>
-        </div>
-        <nav class="footer__links" aria-label="Footer">
-          <a href="https://github.com/DanceNitra/inspeximus" target="_blank" rel="noopener">GitHub</a>
-          <a href="https://pypi.org/project/inspeximus/" target="_blank" rel="noopener">PyPI</a>
-          <a href="https://doi.org/10.5281/zenodo.21128549" target="_blank" rel="noopener">Zenodo DOI</a>
-          <a href="https://github.com/DanceNitra/inspeximus#readme" target="_blank" rel="noopener">Docs</a>
-          <a href="https://github.com/DanceNitra/inspeximus/blob/main/CHANGELOG.md" target="_blank" rel="noopener">Changelog</a>
-        </nav>
-        <p class="footer__note">MIT · part of <a href="https://dancenitra.github.io/agora/" target="_blank" rel="noopener">Agora</a></p>
-      </footer>
-    </main>
-
-  </body>
+</section>
+<!-- Footer -->
+<footer class="footer">
+<div class="footer__brand">
+<svg aria-hidden="true" height="24" viewbox="0 0 28 28" width="24"><rect fill="currentColor" height="3" opacity=".34" rx="1.5" width="12" x="4" y="18.4"></rect><rect fill="currentColor" height="3" opacity=".62" rx="1.5" width="15.5" x="4" y="12.9"></rect><rect fill="var(--signal)" height="3.4" rx="1.7" width="20" x="4" y="7"></rect></svg>
+<span class="nav__word">inspeximus<span class="dot">.</span></span>
+</div>
+<nav aria-label="Footer" class="footer__links">
+<a href="https://github.com/DanceNitra/inspeximus" rel="noopener" target="_blank">GitHub</a>
+<a href="https://pypi.org/project/inspeximus/" rel="noopener" target="_blank">PyPI</a>
+<a href="https://doi.org/10.5281/zenodo.21128549" rel="noopener" target="_blank">Zenodo DOI</a>
+<a href="https://github.com/DanceNitra/inspeximus#readme" rel="noopener" target="_blank">Docs</a>
+<a href="https://github.com/DanceNitra/inspeximus/blob/main/CHANGELOG.md" rel="noopener" target="_blank">Changelog</a>
+</nav>
+<p class="footer__note">MIT · part of <a href="https://dancenitra.github.io/agora/" rel="noopener" target="_blank">Agora</a></p>
+</footer>
+</main>
+</body>
 </html>
