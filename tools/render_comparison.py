@@ -166,9 +166,9 @@ def main() -> int:
     <thead><tr><th>system</th><th class="num">residual recoverability</th><th class="num">rate</th></tr></thead>
     <tbody>{er_rows}</tbody>
   </table>
-  <p class="note">A tie, and it belongs on this page. Graphiti is bitemporal by design and retains
-  invalidated facts as history — if you need an auditable record of what was believed when, that is a
-  reason to choose it over us, not a defect.</p>
+  <p class="note">A tie, and it belongs on this page: a comparison that reported a win on every axis would
+  tell you more about the author than about the systems. Graphiti is bitemporal by design and retains
+  invalidated facts as history, which is a different trade-off on this axis rather than a worse score.</p>
 </section>
 
 <section>
