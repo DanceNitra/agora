@@ -26,6 +26,147 @@ def _load() -> list:
         return []
 
 
+#: Textbook families. A second entry in one of these is not a new replication -- it is the same known
+#: result restated, which the standing bar forbids re-deriving. Kept in sync with the renderer's list
+#: (tools/render_crucible.py::_DD_FAMILIES); the agreement is asserted in tests rather than imported, so
+#: the brain does not depend on a build tool.
+_FAMILIES = ("k-clique", "clique percolation", "epidemic threshold", "finite-size", "branching",
+             "linucb", "regret bound", "percolation threshold", "universality class",
+             "power law", "power-law", "scale-free", "preferential attach")
+_STOP = {"the", "and", "for", "with", "that", "this", "from", "are", "was", "not", "但", "its",
+         "than", "when", "which", "into", "under", "over", "per", "has", "have", "been", "can"}
+_DUP_THR = 0.5
+
+
+def _tokens(claim: str) -> set:
+    s = re.sub(r"\([^)]*\)", " ", (claim or "").lower())
+    s = re.sub(r"[^a-z\s]", " ", s)
+    return {t for t in s.split() if len(t) > 2 and t not in _STOP}
+
+
+def already_covered(claim: str, entries: list | None = None) -> str:
+    """Have we already spent a replication on this claim? Returns a reason, or "" if it is genuinely new.
+
+    THE DEFECT THIS REPLACES. The freshness check was `claim[:60].lower() in attempted` -- exact equality
+    on a 60-character prefix, standing in for "is this the same claim". Two wordings of one result share
+    no prefix, so both read as fresh and both cost a full replication cycle. Measured on the live ledger
+    2026-07-28: the LinUCB regret bound of Chu et al. 2011 was replicated THREE times over six weeks under
+    three notations, and the public REPRODUCED count read 23 where the truth was 21.
+
+    Three checks, because no single one is sufficient and I measured that rather than assuming it:
+      * PREFIX -- the original, kept: catches a literal re-queue.
+      * TOKEN OVERLAP -- catches restatements that share vocabulary. Would have stopped the three
+        BA-network percolation entries (jaccard 0.89-1.00) the prefix check let through.
+      * FAMILY -- catches what neither of the above can. The three LinUCB claims score jaccard 0.26-0.43,
+        BELOW the overlap threshold, because a theorem written in three notations shares almost no words.
+        All three do contain a family term. Without this the fix would have addressed a different failure
+        than the one that actually happened.
+
+    Skipping is cheap here and wrong-accepting is not: the scanner simply takes the next candidate, while
+    a false accept costs a full cycle AND inflates a published number.
+    """
+    entries = _load() if entries is None else entries
+    c = (claim or "").strip()
+    if not c:
+        return "empty claim"
+    if c[:60].lower() in {(r.get("claim") or "")[:60].lower() for r in entries}:
+        return "identical opening -- already attempted"
+    tk = _tokens(c)
+    if tk:
+        for r in entries:
+            rt = _tokens(r.get("claim", ""))
+            if rt and len(tk & rt) / len(tk | rt) >= _DUP_THR:
+                return f"restates lab {r.get('lab_id') or '?'} ({r.get('outcome')})"
+    return ""
+
+
+def family_prior(claim: str, entries: list | None = None) -> list:
+    """Prior ledger entries in the same textbook family. EVIDENCE, deliberately not a block.
+
+    Blocking on family was implemented first and measured before shipping, which is the only reason it is
+    not in here. Replaying the live ledger through it showed it would have refused 9 of 58 entries -- and
+    one of them was "Real-world networks are scale-free", verdict FAILED. A FAILED is the Crucible's most
+    valuable output and the entire reason to hunt claims where failure is a live possibility; a guard that
+    discards one because the topic was touched before is working against the thing it protects.
+
+    The three LinUCB entries are the SAME PROPOSITION restated. "scale-free is FALSE" and "the power law
+    reproduces" are DIFFERENT propositions in one topical family. Nothing lexical separates those, and at
+    queue time the verdict is not yet known -- so this refuses to guess. It reports the prior entries, they
+    are stamped onto the record, and tools/render_crucible.py FAILS the render until a human declares them
+    duplicate or genuinely distinct. One decision per family, made once, with the evidence attached --
+    instead of a silent block or a silent inflation.
+    """
+    entries = _load() if entries is None else entries
+    low = (claim or "").lower()
+    out = []
+    for fam in _FAMILIES:
+        if fam in low:
+            out += [r.get("lab_id") or "?" for r in entries
+                    if fam in (r.get("claim", "") or "").lower()]
+    return sorted(set(out))
+
+
+_VEC_CACHE = _STORE.parent / ".replication_vectors.json"
+#: Conservative. MEASURED on a 10-pair fixture (research/probes/audit_claim_semantic_dedup.py): the
+#: weakest restatement of one theorem scores 0.813 and the closest DIFFERENT claim in a shared topic
+#: (LinUCB vs Thompson sampling) scores 0.776. Separable, but by 0.037 on ten pairs -- nowhere near enough
+#: margin to block on. It flags; a human decides.
+_SIM_THR = 0.80
+
+
+def _embed(text: str) -> list | None:
+    """Local embedder, best effort. Never raises: a replication must still be recordable with the
+    embedder down, and a missing flag is recoverable while a lost verdict is not."""
+    import urllib.request
+    try:
+        body = json.dumps({"model": "nomic-embed-text",
+                           "prompt": "search_document: " + text[:2000]}).encode()
+        req = urllib.request.Request("http://localhost:11434/api/embeddings", data=body,
+                                     headers={"Content-Type": "application/json"})
+        return json.loads(urllib.request.urlopen(req, timeout=20).read()).get("embedding") or None
+    except Exception:
+        return None
+
+
+def semantic_prior(claim: str, entries: list | None = None) -> list:
+    """Prior entries whose claim MEANS the same thing. Evidence, like family_prior -- never a block.
+
+    Keyword families miss what they were not told about: a fourth LinUCB wording ("the optimism-based
+    bandit algorithm of Chu et al. attains sublinear cumulative regret") contains neither 'linucb' nor
+    'regret bound' and sailed past every lexical check, including the family list added to catch exactly
+    it. Cosine on the local embedder scores it 0.81-0.84 against the other three.
+
+    Thin margin, so this only ever stamps. See _SIM_THR.
+    """
+    entries = _load() if entries is None else entries
+    v = _embed(claim or "")
+    if not v:
+        return []
+    try:
+        cache = json.loads(_VEC_CACHE.read_text(encoding="utf-8"))
+    except Exception:
+        cache = {}
+    hits, dirty = [], False
+    nv = sum(x * x for x in v) ** 0.5 or 1.0
+    for r in entries:
+        key = (r.get("lab_id") or "") + "|" + (r.get("claim") or "")[:40]
+        pv = cache.get(key)
+        if pv is None:
+            pv = _embed(r.get("claim", ""))
+            if not pv:
+                continue
+            cache[key], dirty = pv, True
+        npv = sum(x * x for x in pv) ** 0.5 or 1.0
+        if sum(a * b for a, b in zip(v, pv)) / (nv * npv) >= _SIM_THR:
+            hits.append(r.get("lab_id") or "?")
+    if dirty:
+        try:
+            _VEC_CACHE.write_text(json.dumps(cache), encoding="utf-8")
+        except Exception:
+            pass
+    return sorted(set(hits))
+
+
 def _save(items: list) -> None:
     try:
         _STORE.write_text(json.dumps(items, ensure_ascii=False, indent=1), encoding="utf-8")
@@ -99,7 +240,7 @@ _RESULT_STRONG = re.compile(
     r"\bexponent\b|\bthreshold\b|\bscal\w+\b|\bvanish\w+\b|\bdiverg\w+\b)", re.IGNORECASE)
 
 
-def _scan_topic(topic: str, attempted: set) -> dict | None:
+def _scan_topic(topic: str, attempted: list) -> dict | None:
     """Best fresh measurable-RESULT paper for one topic, or None. Prefers a real effect/exponent
     over a methods sentence that merely contains a number (e.g. 'n = 28 participants')."""
     from agora.execution.research_tool import openalex_search, arxiv_search
@@ -107,7 +248,11 @@ def _scan_topic(topic: str, attempted: set) -> dict | None:
     best = None
     for p in papers:
         claim, score = _best_claim((p.get("summary") or "").strip())
-        if score < 2 or len(claim) < 40 or claim[:60].lower() in attempted:
+        if score < 2 or len(claim) < 40:
+            continue
+        why = already_covered(claim, attempted)
+        if why:
+            print(f"  [replication] skipping candidate: {why} :: {claim[:70]}")
             continue
         if _METHODS_NOISE.search(claim) and not _RESULT_STRONG.search(claim):
             continue                                   # a methods sentence, not a testable result
@@ -125,7 +270,7 @@ def pick_paper_target() -> dict | None:
     a genuine REPRODUCED/FAILED. Tries the hour's physics-replication topic first, then the
     board-aligned corp topics in a rotated order, returning the first fresh measurable claim — so a
     single exhausted topic can no longer starve the pipeline (the corp 'exhausted sources' bug)."""
-    attempted = {(r.get("claim") or "")[:60].lower() for r in _load()}
+    attempted = _load()          # the ENTRIES, not a set of prefixes -- already_covered needs the claims
     pool = [_REPLICABLE_TOPICS[int(time.time() // 3600) % len(_REPLICABLE_TOPICS)]]
     r = int(time.time() // 1800) % len(_CORP_TOPICS)
     pool += _CORP_TOPICS[r:] + _CORP_TOPICS[:r]
@@ -143,7 +288,7 @@ async def pick_target(db) -> dict | None:
     paper = await _aio.to_thread(pick_paper_target)
     if paper:
         return paper
-    attempted = {(r.get("claim") or "")[:60].lower() for r in _load()}
+    attempted = _load()
     cur = await db.execute(
         "SELECT title, content FROM collective_knowledge WHERE knowledge_type='discovery' "
         "AND content LIKE '%Source:%' ORDER BY created_at DESC LIMIT 60")
@@ -151,7 +296,11 @@ async def pick_target(db) -> dict | None:
     for r in rows:
         content = (r["content"] or "").strip()
         claim = re.split(r"(?<=[.!?])\s", content)[0][:200]
-        if len(claim) < 40 or claim[:60].lower() in attempted:
+        if len(claim) < 40:
+            continue
+        why = already_covered(claim, attempted)
+        if why:
+            print(f"  [replication] skipping internal candidate: {why}")
             continue
         m = re.search(r"Source:\s*(.+)$", content, re.MULTILINE)
         source = (m.group(1).strip() if m else "")[:160]
@@ -203,6 +352,15 @@ def record(claim: str, source: str, outcome: str, lab_id: str = "", note: str = 
     if gated:
         rec["auto_gated"] = "by_construction"
     items = _load()
+    # Stamp prior entries in the same textbook family onto the record. Not a block -- see family_prior --
+    # but the evidence the renderer's fatal duplicate check and the human declaration both need, computed
+    # once, at the moment we actually know what was recorded.
+    prior = family_prior(rec["claim"], items)
+    if prior:
+        rec["family_prior"] = prior[:8]
+    sim = semantic_prior(rec["claim"], items)
+    if sim:
+        rec["similar_prior"] = sim[:8]
     items.append(rec)
     _save(items[-120:])
     # Stage 3 (accuracy loop): a hard external verdict credits the brain-memories about this claim —

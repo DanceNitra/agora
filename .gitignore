@@ -203,3 +203,6 @@ PRIVATE_NOTES.md
 server/.external_library.jsonl
 server/.external_library_state.json
 server/.competitor_watch.json
+
+# derived embedding cache for replication dedup (regenerates on demand)
+server/.replication_vectors.json
