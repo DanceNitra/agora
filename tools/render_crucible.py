@@ -101,12 +101,43 @@ def _dd_tokens(claim):
     return {t for t in s.split() if len(t) > 2 and t not in _DD_STOP}
 
 
-def _dedup_ledger(reps):
+def _dedup_ledger(reps, curation=None):
     """Collapse same-verdict near-duplicate entries to one canonical (prefer a real hex lab-hash, then
-    the longest note). Returns the deduped list; prints what it collapsed + family warnings."""
+    the longest note). Returns the deduped list; prints what it collapsed.
+
+    TWO passes, and the order matters. First the DECLARED duplicates from crucible_curation.json
+    `_duplicates` -- a human's judgement that two entries are the same claim, recorded by lab_id. Then the
+    token-overlap heuristic for the rest.
+
+    The declaration exists because the heuristic cannot see through paraphrase. Measured 2026-07-28: the
+    LinUCB regret bound (Chu et al. 2011) sat in the ledger three times, worded three ways across three
+    dates, and only two of the three even contain the string "linucb" -- so token overlap kept all three
+    and the public REPRODUCED count read 23 instead of 21. The site's hand-typed pages said 21, which was
+    RIGHT; the ledger was inflated, and the next person to re-render would have published the inflation
+    over the top of a correct number.
+
+    The family check below used to print a WARN and carry on. A warning that does not stop the number from
+    shipping is not a check -- the inflated count ships and the warning scrolls past. It now FAILS the
+    render until each flagged family is resolved: either the duplicates are declared in `_duplicates`, or
+    the family is declared reviewed-and-genuinely-distinct in `_distinct_families`.
+    """
     def canon_score(r):
         lab = r.get("lab_id", "") or ""
         return (bool(re.fullmatch(r"[0-9a-f]{6,}", lab)), len(r.get("note", "") or ""))
+
+    cur = curation or {}
+    declared_dupes, dupe_of = set(), {}
+    for grp in cur.get("_duplicates", []):
+        canon = grp.get("canonical", "")
+        for d in grp.get("duplicates", []):
+            declared_dupes.add(d)
+            dupe_of[d] = (canon, grp.get("reason", ""))
+    if declared_dupes:
+        dropped = [r for r in reps if (r.get("lab_id") or "") in declared_dupes]
+        for r in dropped:
+            canon, why = dupe_of[r["lab_id"]]
+            print(f"  [dedup][declared] {r['lab_id']} -> {canon}: {why[:70]}")
+        reps = [r for r in reps if (r.get("lab_id") or "") not in declared_dupes]
 
     kept, sigs, clusters = [], [], []
     for r in reps:
@@ -123,21 +154,35 @@ def _dedup_ledger(reps):
 
     for c in (c for c in clusters if len(c) > 1):
         print(f"  [dedup] collapsed x{len(c)} [{c[0].get('outcome')}]: {c[0].get('claim','')[:64]}")
-    # warn on textbook families the fingerprint may have under-merged (paraphrased re-runs)
+    # textbook families the fingerprint may have under-merged (paraphrased re-runs). FATAL, not advisory:
+    # this is the only thing standing between a paraphrased re-run and an inflated public count.
+    reviewed = set(cur.get("_distinct_families", []))
+    unresolved = []
     for fam in _DD_FAMILIES:
         for oc in ("REPRODUCED", "FAILED", "NOT_COMPUTABLE"):
-            n = sum(1 for r in kept if fam in (r.get("claim", "").lower()) and r.get("outcome") == oc)
-            if n >= 3:
-                print(f"  [dedup][WARN] {n}x '{fam}' survive as {oc} -- likely paraphrased re-runs, review by hand")
+            hits = [r for r in kept if fam in (r.get("claim", "").lower()) and r.get("outcome") == oc]
+            if len(hits) >= 3 and f"{fam}|{oc}" not in reviewed:
+                unresolved.append((fam, oc, hits))
+    if unresolved:
+        print("\n  [dedup][FATAL] paraphrased re-runs may be inflating the public count:")
+        for fam, oc, hits in unresolved:
+            print(f"    {len(hits)}x '{fam}' survive as {oc}:")
+            for r in hits:
+                print(f"      {r.get('lab_id','?'):>8}  {r.get('claim','')[:88]}")
+        print("\n  Resolve each before publishing, in tools/crucible_curation.json:")
+        print('    "_duplicates": [{"canonical": "<lab_id>", "duplicates": ["<lab_id>", ...],')
+        print('                     "reason": "why these are one claim"}]')
+        print('    "_distinct_families": ["<family>|<VERDICT>"]   <- reviewed, genuinely different claims')
+        raise SystemExit("refusing to publish a count that may be inflated by paraphrased re-runs")
     if len(kept) < len(reps):
         print(f"  [dedup] {len(reps)} ledger entries -> {len(kept)} after de-duplication")
     return kept
 
 
 def render():
-    reps = _dedup_ledger(load(REPS))
-    labs = lab_index(load(LAB))
     cur = load(CURATION)
+    reps = _dedup_ledger(load(REPS), cur)
+    labs = lab_index(load(LAB))
     by = {o: sum(1 for r in reps if r.get("outcome") == o)
           for o in ("REPRODUCED", "FAILED", "NOT_COMPUTABLE")}
     tested = [r for r in reps if r.get("outcome") in ("REPRODUCED", "FAILED")][::-1]
@@ -230,8 +275,14 @@ def render():
         for pc in shown_passes)
     nc_shown = len(shown_passes)
 
+    # NC vs NCT: `nc_shown` is how many curated EXAMPLES are listed below the tally (4). The tally tile
+    # and every published COUNT must use the real total (20) -- they were the same placeholder, so the
+    # page told a reader "4 not-computable" in its tally AND in its JSON-LD while crucible.json's own
+    # `counts` field said 20. A curated sample and a category count are not the same number and must not
+    # share a variable. Verified by tools/check_public_counts.py, which fails the build on any divergence.
     page = TEMPLATE.format(
         site=SITE, repo=REPO, R=by["REPRODUCED"], F=by["FAILED"], NC=nc_shown,
+        NCT=by["NOT_COMPUTABLE"], total=sum(by.values()),
         tested=len(tested), updated=time.strftime("%Y-%m-%d"),
         featured=featured_html, cards="".join(cards), passes=passes)
 
@@ -250,9 +301,9 @@ TEMPLATE = r"""<!DOCTYPE html>
 <link rel="icon" type="image/svg+xml" href="https://dancenitra.github.io/agora/favicon.svg">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>The Crucible &middot; a machine that rebuilds claims in code &middot; Agora</title>
-<meta name="description" content="A public ledger of scientific and technical claims rebuilt as minimal computational models and tested in code: {R} reproduced, {F} failed, {NC} honest passes. Every verdict ships runnable code and a measured number.">
+<meta name="description" content="A public ledger of scientific and technical claims rebuilt as minimal computational models and tested in code: {R} reproduced, {F} failed, {NCT} not-computable ({total} verdicts). Every verdict ships runnable code and a measured number.">
 <link rel="canonical" href="{site}/public/crucible/">
-<script type="application/ld+json">{{"@context":"https://schema.org","@graph":[{{"@type":"Dataset","name":"The Crucible — AI-claim replication ledger","description":"A public, machine-readable ledger of scientific and technical claims rebuilt as minimal computational models and tested in code ({R} reproduced, {F} failed, {NC} not-computable). Every verdict ships runnable code and a measured number.","url":"{site}/public/crucible/","license":"https://opensource.org/licenses/MIT","creator":{{"@type":"Organization","name":"Agora","url":"{site}/"}},"variableMeasured":["reproduced","failed","not-computable"]}},{{"@type":"WebSite","name":"Agora","url":"{site}/","publisher":{{"@type":"Organization","name":"Agora"}}}}]}}</script>
+<script type="application/ld+json">{{"@context":"https://schema.org","@graph":[{{"@type":"Dataset","name":"The Crucible — AI-claim replication ledger","description":"A public, machine-readable ledger of scientific and technical claims rebuilt as minimal computational models and tested in code ({R} reproduced, {F} failed, {NCT} not-computable; {total} verdicts). Every verdict ships runnable code and a measured number.","url":"{site}/public/crucible/","license":"https://opensource.org/licenses/MIT","creator":{{"@type":"Organization","name":"Agora","url":"{site}/"}},"variableMeasured":["reproduced","failed","not-computable"]}},{{"@type":"WebSite","name":"Agora","url":"{site}/","publisher":{{"@type":"Organization","name":"Agora"}}}}]}}</script>
 <meta property="og:type" content="website">
 <meta property="og:title" content="The Crucible — claims, rebuilt in code and tested">
 <meta property="og:description" content="A machine rebuilds scientific claims as minimal models and publishes the verdict — failures included. Every verdict ships runnable code.">
@@ -405,7 +456,7 @@ TEMPLATE = r"""<!DOCTYPE html>
 <body>
 <nav class="nav"><div class="wrap">
   <a class="brand" href="{site}/"><span class="m"></span>Agora</a>
-  <div class="navr"><a class="lnk" href="{site}/posts/">Writing</a>
+  <div class="navr"><a class="lnk" href="{site}/public/posts/">Writing</a>
     <a class="lnk" href="{site}/public/ai-claims/">AI&nbsp;Claims</a>
     <a class="lnk" href="crucible.json">Dataset</a>
     <a class="lnk" href="https://huggingface.co/datasets/Danchi17/folklore-index" target="_blank" rel="noopener">Hugging&nbsp;Face</a></div>
@@ -422,7 +473,7 @@ TEMPLATE = r"""<!DOCTYPE html>
   <div class="tally">
     <div class="t ok"><div class="num">{R}</div><div class="lbl">Reproduced</div></div>
     <div class="t fail"><div class="num">{F}</div><div class="lbl">Failed</div></div>
-    <div class="t"><div class="num">{NC}</div><div class="lbl">Honest passes</div></div>
+    <div class="t"><div class="num">{NCT}</div><div class="lbl">Not computable</div></div>
   </div>
   <div class="dataset">Open data &mdash; <a href="crucible.json">the full ledger as JSON</a> &middot; now a citable dataset on <a href="https://huggingface.co/datasets/Danchi17/folklore-index" target="_blank" rel="noopener">Hugging&nbsp;Face &rarr;</a><br><span class="loadline"><code>datasets.load_dataset("Danchi17/folklore-index")</code></span></div>
 </div></header>
@@ -439,9 +490,11 @@ TEMPLATE = r"""<!DOCTYPE html>
 </div></section>
 
 <section class="passes"><div class="wrap">
-  <div class="sechead"><h2>Honest passes</h2><div class="sub">no simulable core &mdash; on the record anyway</div></div>
+  <div class="sechead"><h2>Honest passes</h2><div class="sub">{NC} of {NCT} shown &mdash; no simulable core, on the record anyway</div></div>
   <p class="intro">Not every claim has a computable mechanism. When a claim is descriptive rather
-  than mechanistic, the honest verdict is <em>not computable</em> &mdash; recorded, not quietly dropped.</p>
+  than mechanistic, the honest verdict is <em>not computable</em> &mdash; recorded, not quietly dropped.
+  {NCT} verdicts fall in this class; {NC} are shown here as examples and
+  <a href="crucible.json">all of them are in the ledger JSON</a>.</p>
   <ul class="plist">{passes}</ul>
 </div></section>
 

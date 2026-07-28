@@ -65,4 +65,4 @@ phase-A/B intermediates from the lab dir, so they document the method rather tha
 self-contained, one-command LoCoMo retrieval diagnostic see
 [`research/probes/locomo_retrieval_map.py`](../locomo_retrieval_map.py).
 
-MIT-licensed. Part of Agora / inspeximus (https://github.com/DanceNitra/agora/tree/main/inspeximus).
+MIT-licensed. Part of Agora / inspeximus (https://github.com/DanceNitra/inspeximus).

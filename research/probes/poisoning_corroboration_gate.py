@@ -26,7 +26,7 @@ returns the identical outcome; N is the published protocol, not a variance estim
 
 Runnable, cloud-free (lexical recall/consolidation, no embedder, no network):
     python poisoning_corroboration_gate.py
-MIT-licensed. Part of Agora / inspeximus (https://github.com/DanceNitra/agora/tree/main/inspeximus).
+MIT-licensed. Part of Agora / inspeximus (https://github.com/DanceNitra/inspeximus).
 """
 import os
 import sys

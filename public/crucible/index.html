@@ -6,9 +6,9 @@
 <link rel="icon" type="image/svg+xml" href="https://dancenitra.github.io/agora/favicon.svg">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>The Crucible &middot; a machine that rebuilds claims in code &middot; Agora</title>
-<meta name="description" content="A public ledger of scientific and technical claims rebuilt as minimal computational models and tested in code: 22 reproduced, 12 failed, 4 honest passes. Every verdict ships runnable code and a measured number.">
+<meta name="description" content="A public ledger of scientific and technical claims rebuilt as minimal computational models and tested in code: 21 reproduced, 12 failed, 20 not-computable (53 verdicts). Every verdict ships runnable code and a measured number.">
 <link rel="canonical" href="https://dancenitra.github.io/agora/public/crucible/">
-<script type="application/ld+json">{"@context":"https://schema.org","@graph":[{"@type":"Dataset","name":"The Crucible — AI-claim replication ledger","description":"A public, machine-readable ledger of scientific and technical claims rebuilt as minimal computational models and tested in code (22 reproduced, 12 failed, 4 not-computable). Every verdict ships runnable code and a measured number.","url":"https://dancenitra.github.io/agora/public/crucible/","license":"https://opensource.org/licenses/MIT","creator":{"@type":"Organization","name":"Agora","url":"https://dancenitra.github.io/agora/"},"variableMeasured":["reproduced","failed","not-computable"]},{"@type":"WebSite","name":"Agora","url":"https://dancenitra.github.io/agora/","publisher":{"@type":"Organization","name":"Agora"}}]}</script>
+<script type="application/ld+json">{"@context":"https://schema.org","@graph":[{"@type":"Dataset","name":"The Crucible — AI-claim replication ledger","description":"A public, machine-readable ledger of scientific and technical claims rebuilt as minimal computational models and tested in code (21 reproduced, 12 failed, 20 not-computable; 53 verdicts). Every verdict ships runnable code and a measured number.","url":"https://dancenitra.github.io/agora/public/crucible/","license":"https://opensource.org/licenses/MIT","creator":{"@type":"Organization","name":"Agora","url":"https://dancenitra.github.io/agora/"},"variableMeasured":["reproduced","failed","not-computable"]},{"@type":"WebSite","name":"Agora","url":"https://dancenitra.github.io/agora/","publisher":{"@type":"Organization","name":"Agora"}}]}</script>
 <meta property="og:type" content="website">
 <meta property="og:title" content="The Crucible — claims, rebuilt in code and tested">
 <meta property="og:description" content="A machine rebuilds scientific claims as minimal models and publishes the verdict — failures included. Every verdict ships runnable code.">
@@ -161,7 +161,7 @@
 <body>
 <nav class="nav"><div class="wrap">
   <a class="brand" href="https://dancenitra.github.io/agora/"><span class="m"></span>Agora</a>
-  <div class="navr"><a class="lnk" href="https://dancenitra.github.io/agora/posts/">Writing</a>
+  <div class="navr"><a class="lnk" href="https://dancenitra.github.io/agora/public/posts/">Writing</a>
     <a class="lnk" href="https://dancenitra.github.io/agora/public/ai-claims/">AI&nbsp;Claims</a>
     <a class="lnk" href="crucible.json">Dataset</a>
     <a class="lnk" href="https://huggingface.co/datasets/Danchi17/folklore-index" target="_blank" rel="noopener">Hugging&nbsp;Face</a></div>
@@ -176,9 +176,9 @@
   rarest export, published here), and <b>not computable</b> when there&rsquo;s no simulable core.
   Every verdict ships a measured number and the code that produced it.</p>
   <div class="tally">
-    <div class="t ok"><div class="num">22</div><div class="lbl">Reproduced</div></div>
+    <div class="t ok"><div class="num">21</div><div class="lbl">Reproduced</div></div>
     <div class="t fail"><div class="num">12</div><div class="lbl">Failed</div></div>
-    <div class="t"><div class="num">4</div><div class="lbl">Honest passes</div></div>
+    <div class="t"><div class="num">20</div><div class="lbl">Not computable</div></div>
   </div>
   <div class="dataset">Open data &mdash; <a href="crucible.json">the full ledger as JSON</a> &middot; now a citable dataset on <a href="https://huggingface.co/datasets/Danchi17/folklore-index" target="_blank" rel="noopener">Hugging&nbsp;Face &rarr;</a><br><span class="loadline"><code>datasets.load_dataset("Danchi17/folklore-index")</code></span></div>
 </div></header>
@@ -193,11 +193,11 @@
         <div class="fcol"><div class="flab">What we rebuilt</div><p>We rebuilt their exact estimator — P(hit | 3 prior hits) − P(hit | 3 prior misses), averaged per shooting record — and ran it on i.i.d. shooters with provably no hot hand.</p></div>
       </div>
       <div class="fverdict-block"><div class="flab">The verdict</div><p>On a no-hot-hand shooter the estimator does not read 0; it reads −7.9pp (t=−28 at n=100, growing to −17pp at streak length 4). This is the streak-selection bias of Miller &amp; Sanjurjo (2018): selecting shots that follow a streak inside a finite sequence is a biased sample. A GVT measurement of ~0 therefore implies a real hot hand of roughly +8.5pp. The famous fallacy was the analysis, not the players.</p></div>
-      <div class="ffoot"><a class="codelink" href="../../posts/deep-dive-hot-hand.html">The deep dive, with charts &rarr;</a>  <span class="flabid">lab ebce40 &middot; 2026-06-12</span></div>
+      <div class="ffoot"><a class="codelink" href="../posts/deep-dive-hot-hand.html">The deep dive, with charts &rarr;</a>  <span class="flabid">lab ebce40 &middot; 2026-06-12</span></div>
     </div>
   </section>
 <section class="ledger"><div class="wrap">
-  <div class="sechead"><h2>The ledger</h2><div class="sub">34 claims rebuilt &amp; tested &middot; newest first</div></div>
+  <div class="sechead"><h2>The ledger</h2><div class="sub">33 claims rebuilt &amp; tested &middot; newest first</div></div>
   <div class="filters">
     <button class="on" data-f="all">All</button>
     <button data-f="REPRODUCED">Reproduced</button>
@@ -212,16 +212,6 @@
           <h3>Agent tool-action REVERSIBILITY is decidable ex-ante from the tool signature — the assumpt</h3>
           <p class="cresult">Smallest model: label every tool in the ToolEmu asset file (38 toolkits / 330 tools; paper reports 36/311) for argument-dependence of reversibility with TWO independent LLM labelers, then measure a granted universal executor&#x27;s realized harm-reach under isolated vs networked assumptions. RESULT: reversibility IS ~93% decidable from the signature alone (arg-dependent 0.07; Cohen&#x27;s kappa 0.82, &#x27;almost perfect&#x27; Landis-Koch) — the per-tool assumption mostly holds. MEASURED FAILURE MODE: the ~7% undecidable residual is verb-polymorphic UNIVERSAL EXECUTORS (shell/SQL/eval; only ~0.3% of tools, cat-agreement 0.94), for which reversibility is undecidable from the signature AND realized harm-reach is ENVIRONMENT-conditional — an ISOLATED shell reaches ~0% of external/API irreversible harms but a realistically-credentialed NETWORKED shell reaches ~0.66 external / ~0.80 local. IMPLICATION (confirming the consensus, not new): the boundary that bounds a memory-poisoned agent&#x27;s irreversible EXTERNAL harm is executor CONTAINMENT (no ambient network/credentials), NOT per-tool reversibility metadata. HONEST CAVEATS: (1) LLM labelers measure shared model priors, not ground truth (networked-external agreement is only 0.32 — genuinely CLI/credential-dependent); (2) ToolEmu under-weights shell/code-interpreter tools now standard in production (OpenAI CI, Claude computer-use), so the 0.3% universal-executor prevalence is a LOWER bound; (3) the harm-locality map itself is NOT novel — it is arXiv:2607.07474&#x27;s scope×reversibility grid on a different corpus; the genuinely new, unpublished bits are the measured 93% signature-DECIDABILITY RATE (kappa) and the isolated→networked reach flip.</p>
           <div class="cfoot"><span class="cyear">Owiredu-Ashley, &amp;#x27;Beyond Attack-Success Ra</span><a class="code" href="https://github.com/DanceNitra/agora/blob/main/research/probes/reversibility_predictability_probe.py" target="_blank" rel="noopener">runnable model &rarr;</a></div>
-        </div>
-      </article>
-      <article class="card ok" data-v="REPRODUCED" data-reveal>
-        <div class="crail"></div>
-        <div class="cbody">
-          <div class="chead"><span class="cv">REPRODUCED</span>
-            <span class="cfield"></span></div>
-          <h3>For T rounds, K actions, d-dim feature vectors, an O(sqrt(T d ln^3(K T ln(T)/delta))) regr</h3>
-          <p class="cresult">Smallest model: LinUCB w/ Sherman-Morrison ridge, easy + hard small-gap instances, 8 seeds, T up to 65536. Tail log-log slope &lt;= 0.51 everywhere; bound-shape ratio non-growing. HONEST CAVEATS: (1) replicating a PROVEN theorem is textbook-safe (FAILED was live only for the practical-LinUCB-vs-proven-</p>
-          <div class="cfoot"><span class="cyear">Chu, Li, Reyzin, Schapire (AISTATS 2011), Cont</span><a class="code" href="https://github.com/DanceNitra/agora/blob/main/agora_output/lab/20260708-170833_linucb-regret-bound-replication.py" target="_blank" rel="noopener">runnable model &rarr;</a></div>
         </div>
       </article>
       <article class="card fail" data-v="FAILED" data-reveal>
@@ -538,9 +528,11 @@
 </div></section>
 
 <section class="passes"><div class="wrap">
-  <div class="sechead"><h2>Honest passes</h2><div class="sub">no simulable core &mdash; on the record anyway</div></div>
+  <div class="sechead"><h2>Honest passes</h2><div class="sub">4 of 20 shown &mdash; no simulable core, on the record anyway</div></div>
   <p class="intro">Not every claim has a computable mechanism. When a claim is descriptive rather
-  than mechanistic, the honest verdict is <em>not computable</em> &mdash; recorded, not quietly dropped.</p>
+  than mechanistic, the honest verdict is <em>not computable</em> &mdash; recorded, not quietly dropped.
+  20 verdicts fall in this class; 4 are shown here as examples and
+  <a href="crucible.json">all of them are in the ledger JSON</a>.</p>
   <ul class="plist"><li data-reveal><span class="pclaim">Generative AI is rapidly automating software-engineering tasks</span><span class="preason">trend claim, no mechanism to simulate</span></li><li data-reveal><span class="pclaim">Safe-Sora: invisible watermarking for generative video (Su et al. 2025)</span><span class="preason">engineering system, not a quantitative mechanism</span></li><li data-reveal><span class="pclaim">Glass-transition duration falls exponentially with cooling rate in a metallic alloy</span><span class="preason">claim under-specified for a faithful minimal model</span></li><li data-reveal><span class="pclaim">The AI–biology analogy breaks: brains use local Hebbian synaptic homeostasis</span><span class="preason">conceptual claim, no single simulable quantity</span></li></ul>
 </div></section>
 
@@ -571,7 +563,7 @@
 
 <footer><div class="wrap">
   <span>Agora &mdash; autonomous research OS &middot; The Crucible</span>
-  <span>updated 2026-07-13 &middot; <a href="https://github.com/DanceNitra/agora" target="_blank" rel="noopener">source</a></span>
+  <span>updated 2026-07-28 &middot; <a href="https://github.com/DanceNitra/agora" target="_blank" rel="noopener">source</a></span>
 </div></footer>
 
 <script>

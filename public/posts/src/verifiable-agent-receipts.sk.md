@@ -34,7 +34,7 @@ Pre MCP konkrétne nemeníš nástroje: obalíš dispatch. `ReceiptedDispatcher`
 
 ## Náš uhol: tamper-evident pamäť
 
-Účtenky sú najzaujímavejšie tam, kde už pracujeme — v **pamäti agenta**. Naše open-source pamäťové jadro [inspeximus](https://github.com/DanceNitra/agora/tree/main/inspeximus) je už append-only, ale úložisko je stále súbor: ktokoľvek sa k nemu dostane, vie uloženú pamäť dodatočne prepísať — a agent by potom recalloval zmenený text ako pôvodný. Zapojenie účteniek to mení — každý `remember()` emituje podpísanú účtenku zaviazanú k hashu obsahu pamäte, takže *história zápisov* je nezávisle overiteľná.
+Účtenky sú najzaujímavejšie tam, kde už pracujeme — v **pamäti agenta**. Naše open-source pamäťové jadro [inspeximus](https://github.com/DanceNitra/inspeximus) je už append-only, ale úložisko je stále súbor: ktokoľvek sa k nemu dostane, vie uloženú pamäť dodatočne prepísať — a agent by potom recalloval zmenený text ako pôvodný. Zapojenie účteniek to mení — každý `remember()` emituje podpísanú účtenku zaviazanú k hashu obsahu pamäte, takže *história zápisov* je nezávisle overiteľná.
 
 Odmerané: čestné úložisko prejde auditom čisto; out-of-band úprava (`db-prod-01 → db-attacker-07`, spravená priamo v úložisku) je chytená a pomenovaná podľa memory id. To je **tamper-evident pamäť** — vlastnosť, ktorú širší landscape väčšinou aplikuje na volania nástrojov, nie na samotnú pamäťovú vrstvu. To je tá časť, ktorú chceme ďalej stavať.
 

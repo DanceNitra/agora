@@ -1,12 +1,16 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url><loc>https://dancenitra.github.io/agora/</loc></url>
-  <url><loc>https://dancenitra.github.io/agora/public/posts/index.html</loc></url>
-  <url><loc>https://dancenitra.github.io/agora/public/crucible/index.html</loc></url>
+  <url><loc>https://dancenitra.github.io/agora/public/posts/</loc></url>
+  <url><loc>https://dancenitra.github.io/agora/public/crucible/</loc></url>
   <url><loc>https://dancenitra.github.io/agora/public/track-record.html</loc></url>
   <url><loc>https://dancenitra.github.io/agora/public/research-digest.html</loc></url>
   <url><loc>https://dancenitra.github.io/agora/public/forecast.html</loc></url>
+  <url><loc>https://dancenitra.github.io/agora/public/inspeximus/</loc></url>
+  <url><loc>https://dancenitra.github.io/agora/public/leaderboard/</loc></url>
+  <url><loc>https://dancenitra.github.io/agora/public/posts/knowledge-decay-may-not-be-a-slope-it-may-be-a-cliff-you-can.html</loc><lastmod>2026-07-25</lastmod></url>
   <url><loc>https://dancenitra.github.io/agora/public/posts/does-deleting-agent-memory-actually-erase.html</loc><lastmod>2026-07-15</lastmod></url>
+  <url><loc>https://dancenitra.github.io/agora/public/posts/memory-injection-defense-where-it-breaks.html</loc><lastmod>2026-07-15</lastmod></url>
   <url><loc>https://dancenitra.github.io/agora/public/posts/proving-erasure-agent-memory-deletion-executed-vs-recoverable.html</loc><lastmod>2026-07-14</lastmod></url>
   <url><loc>https://dancenitra.github.io/agora/public/posts/agent-memory-tenant-isolation-by-construction.html</loc><lastmod>2026-07-14</lastmod></url>
   <url><loc>https://dancenitra.github.io/agora/public/posts/agent-tool-reversibility-93-percent-signature-decidable.html</loc><lastmod>2026-07-13</lastmod></url>
@@ -20,7 +24,7 @@
   <url><loc>https://dancenitra.github.io/agora/public/posts/reality-check-ai-memory-method-wins.html</loc><lastmod>2026-07-03</lastmod></url>
   <url><loc>https://dancenitra.github.io/agora/public/posts/agent-memory-poisoning-influence-gate.html</loc><lastmod>2026-07-02</lastmod></url>
   <url><loc>https://dancenitra.github.io/agora/public/posts/agent-memory-retrieval-bm25-vector-hybrid.html</loc><lastmod>2026-06-30</lastmod></url>
-  <url><loc>https://dancenitra.github.io/agora/public/posts/ai-coding-productivity-operating-point.html</loc><lastmod>2026-06-29</lastmod></url>
+  <url><loc>https://dancenitra.github.io/agora/public/posts/ai-coding-productivity-operating-point.html</loc><lastmod>2026-07-23</lastmod></url>
   <url><loc>https://dancenitra.github.io/agora/public/posts/chatbot-arena-style-not-skill.html</loc><lastmod>2026-06-29</lastmod></url>
   <url><loc>https://dancenitra.github.io/agora/public/posts/verifiable-agent-receipts.html</loc><lastmod>2026-06-29</lastmod></url>
   <url><loc>https://dancenitra.github.io/agora/public/posts/founder-led-survivorship-null.html</loc><lastmod>2026-06-29</lastmod></url>
@@ -62,5 +66,4 @@
   <url><loc>https://dancenitra.github.io/agora/public/posts/why-crowds-get-dumber-when-they-watch-each-other-and-the-sur.html</loc><lastmod>2026-06-30</lastmod></url>
   <url><loc>https://dancenitra.github.io/agora/public/posts/pre-trends-test-weak-evidence.html</loc><lastmod>2026-06-30</lastmod></url>
   <url><loc>https://dancenitra.github.io/agora/public/posts/causal-inference-phase-diagram.html</loc><lastmod>2026-06-29</lastmod></url>
-  <url><loc>https://dancenitra.github.io/agora/public/posts/memory-injection-defense-where-it-breaks.html</loc><lastmod>2026-07-15</lastmod></url>
 </urlset>

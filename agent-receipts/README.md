@@ -154,7 +154,7 @@ prints `signed by an unexpected key` (exit 1).
 
 ## Tamper-evident memory: the `inspeximus` integration (`inspeximus_receipts.py`)
 
-[inspeximus](https://github.com/DanceNitra/agora/tree/main/inspeximus) (our open-source memory core) is already
+[inspeximus](https://github.com/DanceNitra/inspeximus) (our open-source memory core) is already
 append-only with deterministic supersession, so it never silently edits a fact in normal use. But the
 store is a file — anyone who can touch it can rewrite a stored memory after the fact, and any store
 would then serve the altered text as the original. Receipts close that: every `remember()` emits a

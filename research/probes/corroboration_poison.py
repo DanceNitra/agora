@@ -17,7 +17,7 @@ graduation is the corroboration test:
   SYBIL         linked to 2 records that are variants of ONE origin     -> MUST stay episodic (1 source)
 
 Runnable, cloud-free (lexical recall, no embedder):  python corroboration_poison.py
-MIT-licensed. Part of Agora / inspeximus (https://github.com/DanceNitra/agora/tree/main/inspeximus).
+MIT-licensed. Part of Agora / inspeximus (https://github.com/DanceNitra/inspeximus).
 """
 import sys, os, tempfile
 

@@ -1,9 +1,9 @@
 {
  "name": "The Crucible — machine replication ledger",
  "description": "Scientific and technical claims rebuilt as minimal computational models and tested. REPRODUCED = the mechanism holds in a minimal model; FAILED = it does not; NOT_COMPUTABLE = no simulable core (an honest pass).",
- "generated": "2026-07-13",
+ "generated": "2026-07-28",
  "counts": {
-  "REPRODUCED": 22,
+  "REPRODUCED": 21,
   "FAILED": 12,
   "NOT_COMPUTABLE": 20
  },
@@ -16,15 +16,6 @@
    "lab_id": "rev93",
    "code": "https://github.com/DanceNitra/agora/blob/main/research/probes/reversibility_predictability_probe.py",
    "date": "2026-07-13"
-  },
-  {
-   "claim": "For T rounds, K actions, d-dim feature vectors, an O(sqrt(T d ln^3(K T ln(T)/delta))) regret bound holds w.p. 1-delta for the simplest known linear-payoff contextual bandit algorithm (LinUCB family; f",
-   "source": "Chu, Li, Reyzin, Schapire (AISTATS 2011), Contextual Bandits with Linear Payoff Functions",
-   "verdict": "REPRODUCED",
-   "note": "Smallest model: LinUCB w/ Sherman-Morrison ridge, easy + hard small-gap instances, 8 seeds, T up to 65536. Tail log-log slope <= 0.51 everywhere; bound-shape ratio non-growing. HONEST CAVEATS: (1) replicating a PROVEN theorem is textbook-safe (FAILED was live only for the practical-LinUCB-vs-proven-",
-   "lab_id": "ff88bc",
-   "code": "https://github.com/DanceNitra/agora/blob/main/agora_output/lab/20260708-170833_linucb-regret-bound-replication.py",
-   "date": "2026-07-08"
   },
   {
    "claim": "A paper's content-generality (rated reference-blind from its abstract) predicts how much it gets genuinely BUILT UPON — beyond raw-citation popularity.",

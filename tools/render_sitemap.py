@@ -33,16 +33,21 @@ CANONICALIZED = {
 
 def build():
     urls = [(f"{SITE}/", None)]
-    if (ROOT / "public" / "posts" / "index.html").exists():
-        urls.append((f"{SITE}/public/posts/index.html", None))
-    if (ROOT / "public" / "crucible" / "index.html").exists():
-        urls.append((f"{SITE}/public/crucible/index.html", None))
-    if (ROOT / "public" / "track-record.html").exists():
-        urls.append((f"{SITE}/public/track-record.html", None))
-    if (ROOT / "public" / "research-digest.html").exists():
-        urls.append((f"{SITE}/public/research-digest.html", None))
-    if (ROOT / "public" / "forecast.html").exists():
-        urls.append((f"{SITE}/public/forecast.html", None))
+    # DIRECTORY form, not index.html. These two pages canonicalise to ".../posts/" and ".../crucible/",
+    # so listing ".../index.html" submitted Google a URL the page itself disavows -- a sitemap arguing
+    # with its own canonical tag. Both forms serve byte-identical bodies; the canonical is the one that
+    # counts. (The homepage already did this correctly.)
+    for d in ("posts", "crucible"):
+        if (ROOT / "public" / d / "index.html").exists():
+            urls.append((f"{SITE}/public/{d}/", None))
+    # Hub pages. `inspeximus` and `leaderboard` were live (HTTP 200) and absent from the sitemap
+    # entirely -- inspeximus is the flagship product page, linked twice from the homepage hero.
+    for f in ("track-record.html", "research-digest.html", "forecast.html"):
+        if (ROOT / "public" / f).exists():
+            urls.append((f"{SITE}/public/{f}", None))
+    for d in ("inspeximus", "leaderboard"):
+        if (ROOT / "public" / d / "index.html").exists():
+            urls.append((f"{SITE}/public/{d}/", None))
     try:
         posts = json.loads((ROOT / "public" / "posts" / "posts.json").read_text(encoding="utf-8"))
     except Exception:

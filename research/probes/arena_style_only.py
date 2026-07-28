@@ -27,7 +27,7 @@ for individual votes; the rank order is mostly real skill. Prior art: Zheng 2023
 2024, Feuer et al. "Style Outweighs Substance" 2024 (LLM judges, not the human Arena).
 
 Runnable (needs numpy + pandas + network; downloads the public HF dataset):  python arena_style_only.py
-MIT-licensed. Part of Agora / inspeximus (https://github.com/DanceNitra/agora/tree/main/inspeximus).
+MIT-licensed. Part of Agora / inspeximus (https://github.com/DanceNitra/inspeximus).
 """
 import io
 import json

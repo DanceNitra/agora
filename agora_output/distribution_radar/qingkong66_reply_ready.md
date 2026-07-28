@@ -19,7 +19,7 @@ Happy to share both probes — they're small, single-file, cloud-free:
 
 2. **Corroboration / poisoning probe** — the self-reinforcement failure mode (a false statement, recalled enough, hardens into a "durable trait") and the corroboration gate that defends against it, including the sybil-resistance piece: we run entity-resolution on source identifiers before counting, so variants of one origin ("Wikipedia" / "wikipedia.org" / a full URL) collapse to a single real source. That's exactly where your verified, attributable identity binding plugs in — bound identities give the gate the *attributable provenance* that makes corroboration counting sybil-proof, instead of an anonymous count an attacker can mint.
 
-Both mechanisms ship in our open memory core (inspeximus, MIT): https://github.com/DanceNitra/agora/tree/main/inspeximus . I'll drop the two standalone runnable probes in a discussion thread on our repo so they're versioned and easy to lift as reference implementations — use them however suits Elina-Seed (a link or a vendored copy are both fine).
+Both mechanisms ship in our open memory core (inspeximus, MIT): https://github.com/DanceNitra/inspeximus . I'll drop the two standalone runnable probes in a discussion thread on our repo so they're versioned and easy to lift as reference implementations — use them however suits Elina-Seed (a link or a vendored copy are both fine).
 
 On **"memory governance as a scarcity multiplier"** — yes, that's the same problem: when the store is finite, the governance policy (what gets promoted / protected / evicted) multiplies or destroys the value of every byte you keep. I'll write the framing up and link it in the thread.
 

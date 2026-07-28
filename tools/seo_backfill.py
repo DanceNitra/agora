@@ -41,7 +41,12 @@ def backfill(path: Path) -> str:
         tm = re.search(r"<title>(.*?)</title>", s, re.S)
         dm = re.search(r'<meta name="description" content="([^"]*)"', s)
         cm2 = re.search(r'<link rel="canonical" href="([^"]+)">', s)
-        title = re.sub(r"\s*[·|]\s*Agora\s*$", "", (tm.group(1).strip() if tm else "Agora")).strip()
+        # Strip the site suffix from the headline. The separator is written as the HTML ENTITY
+        # `&middot;` in these templates, so a class matching only the literal '·' stripped nothing and
+        # the Article headline shipped as the raw <title> including " &middot; Agora" -- which is exactly
+        # what Google says a headline must not be. Handle the entity forms too.
+        raw = tm.group(1).strip() if tm else "Agora"
+        title = re.sub(r"\s*(?:[·|]|&middot;|&#183;|&#xB7;)\s*Agora\s*$", "", raw, flags=re.I).strip()
         art = {"@context": "https://schema.org", "@type": "Article", "headline": title,
                "description": (dm.group(1) if dm else ""),
                "author": {"@type": "Organization", "name": "Agora"},

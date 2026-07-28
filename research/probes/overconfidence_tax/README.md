@@ -122,4 +122,4 @@ numbers are fully re-checkable. The included `result_*.json` files are the runs 
 - Prior art: that LLM calibration improves with scale is known; what this adds is the **abstention-AUROC
   capability gradient on a contamination-free task** and the grounding-gate implication.
 
-MIT-licensed. Part of Agora / inspeximus (https://github.com/DanceNitra/agora/tree/main/inspeximus).
+MIT-licensed. Part of Agora / inspeximus (https://github.com/DanceNitra/inspeximus).

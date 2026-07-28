@@ -12,7 +12,7 @@ across the two architectures. Point it at a real Elina memory dump with --file <
 
 Run: python elina_adapter.py            (built-in demo)
      python elina_adapter.py --file memory.json
-MIT. Part of Agora / inspeximus (https://github.com/DanceNitra/agora/tree/main/inspeximus).
+MIT. Part of Agora / inspeximus (https://github.com/DanceNitra/inspeximus).
 """
 import sys, json, os
 from collections import Counter

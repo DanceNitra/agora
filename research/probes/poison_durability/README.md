@@ -70,4 +70,4 @@ python exp_inspeximus_poison_continuous.py    # the sustained-attacker table (n=
 ```
 Cloud-free (local embeddings / lexical fallback), pure inspeximus retrieval mechanics, no LLM.
 
-MIT-licensed. Part of Agora / inspeximus (https://github.com/DanceNitra/agora/tree/main/inspeximus).
+MIT-licensed. Part of Agora / inspeximus (https://github.com/DanceNitra/inspeximus).

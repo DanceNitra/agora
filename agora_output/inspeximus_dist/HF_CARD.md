@@ -12,7 +12,7 @@ tags:
 
 # inspeximus — a zero-dependency memory layer for AI agents
 
-`pip install inspeximus` · [PyPI](https://pypi.org/project/inspeximus/) · [GitHub](https://github.com/DanceNitra/agora/tree/main/inspeximus) · MIT
+`pip install inspeximus` · [PyPI](https://pypi.org/project/inspeximus/) · [GitHub](https://github.com/DanceNitra/inspeximus) · MIT
 
 inspeximus is the recall + consolidation core of an autonomous research system, distilled to a **single
 dependency-free Python file** plus an MCP server so any Claude / Cursor / agent can use it as memory.

@@ -50,4 +50,4 @@ the generator, so they are not shipped). `audit_ragdead.py` is the credibility c
 and re-derives the needle+synth gold from scratch, so the published accuracies are checkable against a second,
 independent implementation.
 
-MIT-licensed. Part of Agora / inspeximus (https://github.com/DanceNitra/agora/tree/main/inspeximus).
+MIT-licensed. Part of Agora / inspeximus (https://github.com/DanceNitra/inspeximus).

@@ -94,4 +94,4 @@ constraint + arithmetic controls, which reproduce the checkable-vs-uncheckable c
 - Self-verification is the **tool-free floor**; verifier-with-tools / process-supervision / best-of-N + a
   trained verifier are different (and likely lower-residual) regimes not tested here.
 
-MIT-licensed. Part of Agora / inspeximus (https://github.com/DanceNitra/agora/tree/main/inspeximus).
+MIT-licensed. Part of Agora / inspeximus (https://github.com/DanceNitra/inspeximus).

@@ -22,7 +22,7 @@ FALSIFIER: if a highly-correlated second adjudicator (failure_corr ~ 1) detected
 as an orthogonal one (failure_corr ~ 0), "different failure mode" would be doing no work and the thesis is wrong.
 
 Deterministic (fixed seed; needs numpy):  python convergence_adjudication.py
-MIT-licensed. Part of Agora / inspeximus (https://github.com/DanceNitra/agora/tree/main/inspeximus).
+MIT-licensed. Part of Agora / inspeximus (https://github.com/DanceNitra/inspeximus).
 """
 import math
 import numpy as np

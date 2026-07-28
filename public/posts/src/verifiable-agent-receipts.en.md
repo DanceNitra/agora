@@ -34,7 +34,7 @@ For MCP specifically, you don't change your tools: you wrap the dispatch. A `Rec
 
 ## Our angle: tamper-evident memory
 
-Receipts get most interesting where we already work — **agent memory**. Our open-source memory core, [inspeximus](https://github.com/DanceNitra/agora/tree/main/inspeximus), is already append-only, but the store is still a file: anyone who can touch it can rewrite a stored memory after the fact, and the agent would then recall the altered text as if it were the original. Wiring receipts in changes that — every `remember()` emits a signed receipt committing to the memory's content hash, so the *write history* becomes independently verifiable.
+Receipts get most interesting where we already work — **agent memory**. Our open-source memory core, [inspeximus](https://github.com/DanceNitra/inspeximus), is already append-only, but the store is still a file: anyone who can touch it can rewrite a stored memory after the fact, and the agent would then recall the altered text as if it were the original. Wiring receipts in changes that — every `remember()` emits a signed receipt committing to the memory's content hash, so the *write history* becomes independently verifiable.
 
 Measured: an honest store audits clean; an out-of-band edit (`db-prod-01 → db-attacker-07`, made straight in the store) is caught and named by memory id. That is **tamper-evident memory** — a property the broader landscape mostly applies to tool calls, not to the memory layer itself. It is the part of this we intend to keep building.
 

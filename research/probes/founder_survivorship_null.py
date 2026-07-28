@@ -23,7 +23,7 @@ controls, which a survivorship null does not address. Survivorship bias in perfo
 (Brown, Goetzmann, Ibbotson & Ross 1992, "Survivorship Bias in Performance Studies", Rev. Financial Studies).
 
 Deterministic (fixed seeds; needs numpy):  python founder_survivorship_null.py
-MIT-licensed. Part of Agora / inspeximus (https://github.com/DanceNitra/agora/tree/main/inspeximus).
+MIT-licensed. Part of Agora / inspeximus (https://github.com/DanceNitra/inspeximus).
 """
 import statistics as st
 import numpy as np

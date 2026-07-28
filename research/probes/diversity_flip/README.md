@@ -73,4 +73,4 @@ python divergent_replicate.py      # trio 2 (independent replication)
 python neff_selfconsistency_exp1.py   # convergent side: reads model endpoints from your env/.env; writes neff_selfconsistency.json
 ```
 
-MIT-licensed. Part of Agora / inspeximus (https://github.com/DanceNitra/agora/tree/main/inspeximus).
+MIT-licensed. Part of Agora / inspeximus (https://github.com/DanceNitra/inspeximus).
