@@ -45,6 +45,7 @@ jobs:
           # them 404'd -- the deploy reported success because it only ever copies what it is told to.
           [ -d sk ] && cp -r sk _site/sk || true
           [ -f sitemap.xml ] && cp sitemap.xml _site/sitemap.xml || true
+          [ -f sitemap_index.xml ] && cp sitemap_index.xml _site/sitemap_index.xml || true
           [ -f robots.txt ] && cp robots.txt _site/robots.txt || true
       - name: Every URL in the sitemap must exist in what we are about to publish
         run: |

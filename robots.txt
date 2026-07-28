@@ -16,3 +16,4 @@ User-agent: bingbot
 Allow: /
 
 Sitemap: https://dancenitra.github.io/agora/sitemap.xml
+Sitemap: https://dancenitra.github.io/agora/sitemap_index.xml

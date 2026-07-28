@@ -87,6 +87,19 @@ def build():
         out.append(f"  <url><loc>{html.escape(loc)}</loc>{lm}</url>")
     out.append("</urlset>\n")
     (ROOT / "sitemap.xml").write_text("\n".join(out), encoding="utf-8")
+
+    # A sitemap INDEX at a second URL. Search Console has reported "couldn't fetch" for
+    # /agora/sitemap.xml across four submissions in a month, while the file itself is provably fine:
+    # HTTP 200 to a Googlebot UA, application/xml, no BOM, no redirect, valid schema, every one of its
+    # URLs live. When the artifact is good and the report is bad for a month, the remaining candidate is
+    # a cached failure on that exact URL, and re-submitting the same address does not clear it. This
+    # gives a path Search Console has never seen, and it is a standard construct rather than a trick --
+    # an index is what a growing site is supposed to submit anyway.
+    idx = ['<?xml version="1.0" encoding="UTF-8"?>',
+           '<sitemapindex xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">',
+           f"  <sitemap><loc>{SITE}/sitemap.xml</loc></sitemap>",
+           "</sitemapindex>\n"]
+    (ROOT / "sitemap_index.xml").write_text("\n".join(idx), encoding="utf-8")
     return len(urls)
 
 
