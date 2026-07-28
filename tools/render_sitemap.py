@@ -51,7 +51,7 @@ def build():
     # itself disavows. I added it as a "missing page" earlier today and rewrote its canonical to match,
     # on the untested assumption that the target was dead because the DOMAIN ROOT 404s; it is not, and
     # the cross-site canonical was correct all along. Both changes reverted.
-    for d in ("leaderboard",):
+    for d in ("leaderboard", "compare"):
         if (ROOT / "public" / d / "index.html").exists():
             urls.append((f"{SITE}/public/{d}/", None))
     try:
