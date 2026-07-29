@@ -3115,10 +3115,19 @@ async def _queue_bridge_test() -> None:
     if await _task_already_pending("Test bridge"):
         return
     d = await asyncio.to_thread(_brain_get_sync, "/api/v1/agent-os/brain/cartography/untested", 30)
-    t = (d or {}).get("target") or {}
-    if not t.get("id"):
+    cands = (d or {}).get("targets") or ([(d or {}).get("target")] if (d or {}).get("target") else [])
+    cands = [c for c in cands if c and c.get("id")]
+    if not cands:
         return
-    if not await _gate_filter([f"{t.get('a', '')} {t.get('b', '')} {t.get('note', '')}"]):
+    # WALK. Judging only the head is the dead end that left Bounty/Court and the Graveyard silent for
+    # 42 days; I fixed it in the belief sweep this morning and wrote it again here the same day.
+    t = None
+    for c in cands:
+        if await _gate_filter([f"{c.get('a', '')} {c.get('b', '')} {c.get('note', '')}"]):
+            t = c
+            break
+    if not t:
+        print(f"[BridgeBench] all {len(cands)} bridges refused by the board gate — nothing queued")
         return
     await asyncio.to_thread(
         _brain_post_sync, "/api/v1/agent-os/brain/claude-inbox",

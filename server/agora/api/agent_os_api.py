@@ -3482,8 +3482,12 @@ async def brain_cartography_untested():
     it. A chart changes nothing; a verdict does. This is what turns Wren's output into work someone
     must close.
     """
-    from agora.execution.cartography import pick_untested_bridge
-    return {"status": "ok", "target": pick_untested_bridge()}
+    from agora.execution.cartography import pick_untested_bridges
+    # `targets` is the walkable list; `target` stays as its head for compatibility. A caller with its
+    # own gate MUST walk `targets` — taking only the head is the dead end that killed two organs for
+    # 42 days, and which I then reproduced here the same afternoon.
+    ts = pick_untested_bridges(8)
+    return {"status": "ok", "target": (ts[0] if ts else None), "targets": ts}
 
 
 @router.post("/brain/cartography/resolve")

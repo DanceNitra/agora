@@ -117,9 +117,25 @@ def pick_untested_bridge() -> dict | None:
     Skips entries with no id: those predate this change and cannot be resolved, so offering them would
     queue work that can never be closed.
     """
+    return (pick_untested_bridges(1) or [None])[0]
+
+
+def pick_untested_bridges(n: int = 8) -> list[dict]:
+    """The n oldest unresolved bridges, oldest first — so a caller whose own gate refuses the head
+    can WALK to the next instead of stopping.
+
+    Returning a single target made this a dead end, and I shipped that dead end HOURS after fixing
+    the identical one in the belief-challenge sweep. The dungeon's bridge bench applies a board gate
+    the brain knows nothing about; when the gate refused the oldest bridge, the caller returned and
+    that bridge — still the oldest unresolved — was re-offered and re-refused on every cycle
+    thereafter. Same shape as _task_already_pending with no expiry, and as verify_contributions
+    spending its budget on a wall of permanent failures at the front of the list. A selector must
+    never hand out one item to a caller that is allowed to say no.
+    """
     live = [r for r in _load()
             if r.get("id") and str(r.get("outcome", "")).strip().lower() in _UNTESTED]
-    return sorted(live, key=lambda r: float(r.get("ts", 0) or 0))[0] if live else None
+    live.sort(key=lambda r: float(r.get("ts", 0) or 0))
+    return live[:max(1, n)]
 
 
 def resolve_bridge(bridge_id: str, outcome: str, note: str = "") -> dict | None:
