@@ -284,6 +284,40 @@ wired to `starvation_report()`.
 5. **I am the execution bottleneck.** Organs queue; execution runs through my inbox. Bounty sat 42 days
    because I closed 3 challenge tasks without posting verdicts. `owed` (`0212060`) now surfaces it.
 
+## 5b. OPEN MEASUREMENT — world-model-mcp (queued 2026-07-29, inbox `56360c`)
+
+A peer project, `SaravananJaichandar/world-model-mcp`, ships the full provenance/trust axis:
+`asserted_by`, `confirmer`, `confirmation_state`, `evidence_type`, `last_decay_at`,
+`influence_state`, `expires_at`, with evidence-type half-lives. MIT, MCP-native, pip-installable,
+Zenodo DOI 10.5281/zenodo.20834508, 20 stars.
+
+**It PREDATES us.** Repo created 2026-01-10; releases running continuously since at least v0.6.1
+(2026-05-05). The openclaw issue #7707 where the exchange happened was filed 2026-02-03 by
+`LumenLantern` — it is not ours, we only commented on it. I initially told the owner this was "our
+issue" and that the axis had been taken from us. Both were wrong, and the timeline is the reason to
+state it plainly: nothing was copied. He was there first and has been shipping for six months.
+
+This matters because provenance is the #1 external demand signal we measured (84 project mentions vs
+correction 69, revert 10) — and someone shipped the schema for it before us.
+
+**The open question is NOT the schema — it is enforcement.** He states outright what he does not
+ship: citation polarity, and self-verifying claims via replay recipe ("needs a probe executor").
+Enforced erasure appears nowhere; `expires_at` is a timestamp, i.e. a declaration. Our own lesson
+`declared-fields-read-zero` says a declared field is not a guarantee, and our conformance suite exists
+because two erasure defects shipped past 1600 library tests.
+
+So the measurement, not the argument: run our erasure cell with a world-model-mcp adapter beside the
+mem0 one. (1) After `expires_at` passes, is the VALUE still on disk or only filtered from retrieval?
+(2) Does `influence_state='blocked'` remove or merely hide? (3) Is there any delete equivalent to
+`forget_subject`? Controls first: `erasure_works_at_all` (a no-op adapter must score 0), and re-run
+our own cell in the same cycle so both ends of the delta are measured. My mem0 adapter once scored
+0.00 purely because I called a rejected API inside a bare `except` — I nearly published a false
+accusation. **Assume our adapter is wrong before assuming the competitor is.**
+
+Outcome is REPRODUCED (they enforce it too — then our erasure moat claim is dead and we record that
+plainly), FAILED (declared but not enforced — a real measured gap), or NOT_COMPUTABLE. Gated: a
+FAILED goes to HIM first with the runnable artifact, per BLOCKER 1.
+
 ## 6. COMMITS SO FAR (this workstream)
 
 - `4639e0c` arXiv AND-join at the single choke point
