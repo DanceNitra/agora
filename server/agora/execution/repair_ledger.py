@@ -41,8 +41,22 @@ _ORGANS = {
 #: A repair is only worth counting when it CHANGED the knowledge base. A replication that reproduces a
 #: claim confirms it; one that FAILS removes an error, which is the scarcer and more valuable event --
 #: and the Crucible thesis is built on exactly those. Both are counted, separately, never merged.
+#: EACH ORGAN SPEAKS ITS OWN VOCABULARY, and a ledger that only knows one of them reports the others
+#: as idle. Measured 2026-07-29: this list first held only the replication/bounty words, so
+#: Cartographer Wren scored 0 decisive across 80 entries — while 9 of them read "no honest bridge",
+#: which is a decision, just a negative one, and one read "already bridged". I reported him as pure
+#: volume-without-value on that reading. He was not; I was measuring him in a language he does not
+#: speak. Before adding an organ here, read its store and take ITS words.
 _DECISIVE = ("failed", "killed", "retired", "revised", "rejected", "falsified", "dead",
-             "not_computable", "buried")
+             "not_computable", "buried",
+             # cartography (Wren): a refusal to bridge is a finding, not an absence of one
+             "no honest bridge", "no bridge", "already bridged", "forged",
+             # analogy forge (Orin)
+             "no viable mapping", "mapped")
+
+#: Outcomes that record only that work STARTED. Counted as repairs, never as decisive — 68 of Wren's
+#: 80 entries end here, which is the real defect: a hypothesis nobody is obliged to test.
+_INCONCLUSIVE = ("hypothesized", "charted", "queued", "pending", "open")
 
 
 def _load(name: str) -> list:
@@ -54,7 +68,13 @@ def _load(name: str) -> list:
 
 
 def _is_decisive(rec: dict) -> bool:
+    """Decisive = this entry CHANGED the knowledge base. Checked against the inconclusive list first,
+    because 'hypothesized' must never be talked into counting by a stray word elsewhere in the record.
+    """
     blob = " ".join(str(rec.get(k, "")) for k in ("verdict", "outcome", "status", "cause", "kill")).lower()
+    outcome = str(rec.get("outcome", "") or rec.get("verdict", "")).lower().strip()
+    if any(outcome.startswith(w) for w in _INCONCLUSIVE):
+        return False
     return any(w in blob for w in _DECISIVE)
 
 

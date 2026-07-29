@@ -218,9 +218,31 @@ external, not *changing* anything. Keep the intent (external anchoring, anti-rec
 acceptance test becomes: **"could a named external party act on this?"** — not "does a proper noun
 appear in the title."
 
-**BLOCKER 3 — Aldric as referee is structurally conflicted** while inspeximus is scored on a board we
-keep. No audit fixes a conflict; it wears a badge. **Decision required: exclude inspeximus from the
-leaderboard entirely** (preferred), or declare ourselves a contestant and hand scoring to a third party.
+**BLOCKER 3 — RESOLVED, and my first answer was wrong.** The red team called Aldric-as-referee
+structurally conflicted while inspeximus is scored on our own board, and I proposed excluding
+inspeximus from the leaderboard. The owner rejected that, correctly: it throws away the ability to
+demonstrate we are the best in order to dodge a problem instead of solving it.
+
+**The conflict is not that we are ON the board. It is that the numbers come from us and must be
+trusted.** Remove the need for trust and the conflict dissolves:
+
+- The harness is **public and runnable by anyone**; every row carries the exact command that
+  reproduces it.
+- Numbers are **not produced on our machine** — the leaderboard runs in CI on neutral infrastructure,
+  so we have nothing to reach into.
+- Competitors may **submit their own configuration** and challenge any row, ours included.
+- **Our row goes through the same procedure as everyone else's**, and when someone refutes it, the
+  refutation stays on the record permanently.
+
+Jepsen is the proof: Kingsbury is *paid by vendors* and remains the most trusted name in the field,
+because the tests are published and re-runnable. Credibility there comes from reproducibility, not
+from disinterest. And reproducibility is exactly inspeximus's moat — so a leaderboard built on
+re-runnability is not a concession, it is a product demonstration.
+
+**Aldric's beat therefore changes:** not "audit our referee-hood" (a conflict wearing a badge) but
+**own the reproducibility guarantee** — every row re-runnable on neutral infra, challenge procedure
+open, refutations recorded. That is a real job with a real consumer (the board's credibility) and it
+is falsifiable: pick any row at random, re-run it, and the number must match.
 
 **ACCEPTED LIMITATION — no throughput gain.** Every artifact still executes through one Claude
 instance; partitioning inputs changes queue *composition*, not service rate. The real gain is queue

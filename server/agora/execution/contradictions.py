@@ -34,6 +34,20 @@ def _save(items: list) -> None:
         pass
 
 
+#: Notes the SYSTEM generated about its own contents. A contradiction between two of these is a
+#: contradiction between two retellings of the same material, not between two beliefs — and judging one
+#: costs an LLM call and produces an inbox task nobody can act on. Measured 2026-07-29: the only open
+#: contradiction Dame Elara held was `vault-digest-2026-06-20-1821` against another vault-digest. Her
+#: organ was running, spending tokens, and finding disagreements inside our own summaries.
+_ARTIFACT_MARKERS = ("vault-digest", "autolinker", "vault digest", "daily-digest",
+                     "agora-agents-index", "seminar-report", "weekly-retrospective")
+
+
+def _is_artifact(m: dict) -> bool:
+    blob = f"{m.get('title', '')} {m.get('path', '')}".lower().replace("_", "-")
+    return any(k in blob for k in _ARTIFACT_MARKERS)
+
+
 def _known_pairs() -> set[tuple]:
     return {tuple(sorted((c["a"], c["b"]))) for c in _load()}
 
@@ -75,6 +89,8 @@ async def sweep(vault_path: str, max_judged: int = 8) -> dict:
             s = float(sims[i, j])
             if 0.78 < s < 0.97 and si._is_knowledge(meta[i]) and si._is_knowledge(meta[j]):
                 cand[(min(i, j), max(i, j))] = s
+    cand = {k: s for k, s in cand.items()
+            if not (_is_artifact(meta[k[0]]) or _is_artifact(meta[k[1]]))}
     known = _known_pairs()
     root = Path(vault_path)
     judged = found = 0
