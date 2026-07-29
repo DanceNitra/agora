@@ -3472,3 +3472,29 @@ async def brain_repair_ledger(days: float = 14.0):
     from agora.execution.repair_ledger import repair_ledger, starvation_report, format_repair_ledger
     return {"status": "ok", "ledger": repair_ledger(days),
             "starvation": starvation_report(), "report": format_repair_ledger(days)}
+
+
+@router.get("/brain/cartography/untested")
+async def brain_cartography_untested():
+    """The oldest charted bridge still awaiting a verdict — the Cartographer's backlog.
+
+    68 of 80 charts ended at 'hypothesized', which is a proposal with no consumer obliged to act on
+    it. A chart changes nothing; a verdict does. This is what turns Wren's output into work someone
+    must close.
+    """
+    from agora.execution.cartography import pick_untested_bridge
+    return {"status": "ok", "target": pick_untested_bridge()}
+
+
+@router.post("/brain/cartography/resolve")
+async def brain_cartography_resolve(request: Request):
+    """Close a charted bridge with a verdict: forged | no honest bridge | already bridged."""
+    from agora.execution.cartography import resolve_bridge
+    b = await request.json()
+    r = resolve_bridge(b.get("id") or "", b.get("outcome") or "", b.get("note") or "")
+    if r is None:
+        raise HTTPException(status_code=404,
+                            detail="unknown bridge id, or a missing outcome. Resolving must UPDATE "
+                                   "an existing chart; silently creating one is how a ledger fills "
+                                   "with work nobody did.")
+    return {"status": "ok", "bridge": r}

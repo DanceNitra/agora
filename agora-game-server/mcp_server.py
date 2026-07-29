@@ -3099,6 +3099,43 @@ async def _queue_cartography() -> None:
     _mind_spark("#5dade2")        # blue — a hole appears on the map
 
 
+async def _queue_bridge_test() -> None:
+    """THE BRIDGE BENCH: take one of Cartographer Wren's charted bridges and make someone rule on it.
+
+    Wren produced 80 charts and 68 ended at 'hypothesized' — a proposal with no consumer obliged to
+    act on it, so his organ looked like pure volume. It was not: the 9 charts he DID close read
+    'no honest bridge', which is a finding. What was missing was anything that made a hypothesis
+    into a claim awaiting a verdict.
+
+    A structural hole between two domains is a claim ("these two clusters SHOULD connect and do
+    not"), and it is falsifiable: either a mechanism transfers or it does not. The honest verdicts
+    are `forged` (a real mapping, named), `no honest bridge` (the domains share surface vocabulary
+    and nothing else — the outcome to expect most of the time), or `already bridged`.
+    """
+    if await _task_already_pending("Test bridge"):
+        return
+    d = await asyncio.to_thread(_brain_get_sync, "/api/v1/agent-os/brain/cartography/untested", 30)
+    t = (d or {}).get("target") or {}
+    if not t.get("id"):
+        return
+    if not await _gate_filter([f"{t.get('a', '')} {t.get('b', '')} {t.get('note', '')}"]):
+        return
+    await asyncio.to_thread(
+        _brain_post_sync, "/api/v1/agent-os/brain/claude-inbox",
+        {"text": f"Test bridge [{t['id']}]: does a real mechanism connect '{t.get('a')}' and "
+                 f"'{t.get('b')}'? || charted note: {str(t.get('note'))[:150]} || "
+                 f"Name the candidate mechanism, then try to KILL it: does it transfer structurally "
+                 f"(same skeleton, not the same words), or do the two domains merely share "
+                 f"vocabulary? Prefer a runnable check via /brain/lab/run where the mapping makes a "
+                 f"numeric prediction. Then POST /brain/cartography/resolve "
+                 f"{{id,outcome,note}} with outcome 'forged' | 'no honest bridge' | 'already "
+                 f"bridged'. 'no honest bridge' is the expected answer and is a RESULT — record it "
+                 f"without hesitation rather than manufacturing a mapping."})
+    broadcast({"type": "os_build", "kind": "discovery", "who": "Cartographer Wren",
+               "text": f"put a bridge on the bench: {t.get('a', '')} x {t.get('b', '')}"})
+    _mind_spark("#9b59b6")
+
+
 async def _queue_replication() -> None:
     """THE REPLICATION UNIT: Artificer Rooke picks a sourced claim from the collective
     knowledge and queues it for Claude to re-run as a MINIMAL computational model in the Lab.
@@ -4408,6 +4445,10 @@ async def ambient_life():
             asyncio.create_task(_queue_replication())
         if loop_n % 3000 == 1700:                      # Cartographer (Wren)  (~43 min)
             asyncio.create_task(_queue_cartography())
+        # The bench that CONSUMES what Wren charts. Offset from the chartering fire so a fresh chart
+        # is not tested in the same breath it is drawn; 2600 ticks ~ 45 min at the measured 1.05s.
+        if loop_n % 2600 == 900:
+            asyncio.create_task(_queue_bridge_test())
         if loop_n % 6000 == 1100:                      # Kael's Red Team  (~85 min)
             asyncio.create_task(_run_red_team())
         if loop_n % 2500 == 1200:                      # Orin's Synthesis Detector  (~35 min; fires only when due)
