@@ -3013,28 +3013,21 @@ async def claude_inbox_done(request: Request):
     entry (an inconclusive challenge) -- it makes the omission VISIBLE at the moment it happens,
     which is the whole difference between this failure and one that gets noticed.
     """
-    import time as _t
     from agora.execution.claude_inbox import mark_done, _load as _inbox_load
+    from agora.execution.completion_gate import check_completion
     body = await request.json()
     tid = body.get("id") or ""
-    #: task-kind -> (the endpoint that writes the ledger, a probe returning its newest entry ts)
     task = next((t for t in _inbox_load() if t.get("id") == tid), None)
-    text = (task or {}).get("text", "") or ""
+    verdict = check_completion((task or {}).get("text", "") or "",
+                               skip_reason=body.get("skip_reason") or body.get("no_artifact_reason"))
+    if not verdict["ok"]:
+        # REFUSE the close. Warning was not enough: `owed` shipped as advice earlier today and the
+        # executor -- me -- is exactly who ignores advice at 2am. A task whose ledger entry never
+        # landed is indistinguishable from finished work, and that is how two organs read dead for
+        # 42 days while every health check passed.
+        raise HTTPException(status_code=409, detail=verdict["detail"])
     mark_done(tid, body.get("result") or "")
-    owed = None
-    try:
-        if "Challenge belief" in text or "Red-team belief" in text:
-            from agora.execution.bounty import _load as _bounty
-            rows = _bounty()
-            newest = max((float(r.get("ts", 0) or 0) for r in rows), default=0.0)
-            if _t.time() - newest > 3600:
-                owed = ("This task owes the bounty ledger an entry and none was written in the last "
-                        "hour. POST /brain/belief-revise with a verdict of survived | revised | "
-                        "retired -- record_challenge() silently ignores any other word, and that is "
-                        "how Bounty/Court and the Graveyard both read dead for 42 days.")
-    except Exception:
-        owed = None
-    return {"status": "ok", **({"owed": owed} if owed else {})}
+    return {"status": "ok", **({"note": verdict["note"]} if verdict.get("note") else {})}
 
 
 @router.get("/brain/brainstorm")
