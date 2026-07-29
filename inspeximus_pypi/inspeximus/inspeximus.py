@@ -665,6 +665,27 @@ class Inspeximus:
         # influence set. MEASURED (research/probes/minja_influence_gate.py): self-graded MINJA ASR 80% -> 0%
         # with this on, legit utility preserved when the app passes a real warrant. Reversible: False = legacy.
         self.credit_requires_warrant = False
+        # CREDIT BURST COLLAPSE (OPT-IN, default None -> OFF -> identical legacy behavior). Corroborating
+        # LINKS already get this treatment: `temporal_gate` collapses co-arriving witnesses to one anchor,
+        # because genuinely independent evidence spreads out in time while a burst is one coordinated act.
+        # Credit never got the same rule, and that asymmetry is exploitable in BOTH directions.
+        #   NEGATIVE: the influence gate is `good_earned > 0 and good >= bad`, so a correct memory with G
+        #   earned goods leaves the gate after G+1 failing episodes. An adversary who writes NOTHING,
+        #   injects no content and forges no provenance -- controlling only the text of queries they may
+        #   legitimately ask -- shapes queries so the target is co-recalled on episodes that genuinely
+        #   fail. Every write-time defense (content scan, signed receipt, source diversity) authenticates
+        #   a WRITER; a credit edge has no author, so all of them are blind to it. This is bad-mouthing
+        #   (Hoffman/Zage/Nita-Rotaru, ACM CSUR 42(1) 2009) without ratings: prior formulations require
+        #   the attacker to SUPPLY the negative evidence, this one supplies none.
+        #   POSITIVE: the mirror image, a non-causal memory riding along on successes (Simsek,
+        #   arXiv:2604.12007, "associational, not causal"; Joachims-style exposure bias).
+        # Set to a number of seconds and same-polarity credit for one record inside that window counts
+        # ONCE, so cost scales with DISTINCT occasions rather than raw volume.
+        # MEASURED (research/probes/credit_demotion_defenses.py): suppression cost 6 -> 51 episodes (8.5x),
+        # and the attacker now needs 6 separate windows instead of one burst.
+        # HONEST RESIDUAL: this raises cost, it does not prevent. An adversary with unlimited independent
+        # occasions and real failures is indistinguishable from genuine evidence that the memory is wrong.
+        self.credit_burst_window = None
         # SEED-ANCHORED FLOW TRUST (OPT-IN, default empty set -> OFF -> zero behavior change). The one axis
         # strict_corroboration does NOT close: distinct Ed25519 keys prove DISTINCTNESS, not COST -- a Sybil
         # mints N keypairs for free, so ">=2 distinct verified keys" is still forgeable by a determined
@@ -3950,17 +3971,26 @@ class Inspeximus:
         good = Inspeximus._outcome_good(outcome)
         by_id = {x["id"]: x for x in self.items}
         key, updated = ("good" if good else "bad"), []
+        win, now, collapsed = self.credit_burst_window, time.time(), []
         for i in (ids or []):
             rec = by_id.get(i)
             if rec is None:
                 continue
+            if win:
+                # Same-polarity credit for this record inside the window is one occasion, not many.
+                last = (rec.get("credit_seen") or {}).get(key)
+                if last is not None and (now - float(last)) < float(win):
+                    collapsed.append(i)
+                    continue
+                rec.setdefault("credit_seen", {})[key] = now
             rec[key] = float(rec.get(key, 0) or 0) + float(weight)
             if good and self._warrant_is_exogenous(rec, warrant):
                 rec["good_warranted"] = float(rec.get("good_warranted", 0) or 0) + float(weight)
             updated.append(i)
         if updated:
             self._save()
-        return {"updated": updated, "outcome": key, "weight": weight}
+        return {"updated": updated, "outcome": key, "weight": weight,
+                **({"collapsed": collapsed} if collapsed else {})}
 
     def _warrant_is_exogenous(self, rec: dict, warrant) -> bool:
         """A warrant vouches for an outcome the record did NOT author itself. Exogenous = a non-empty token
