@@ -339,6 +339,49 @@ Controls are non-negotiable and named in the task: `erasure_works_at_all` (a no-
 0), and every adapter's API calls verified OUTSIDE a bare `except`. Assume our adapter is wrong
 before assuming the peer is.
 
+### CODE READ, 2026-07-29 — HeartFlow's `src/memory/forgetting.js` (844 lines, read in full)
+
+Read because the owner caught me judging a peer's project from its README and one comment, one
+paragraph after I had criticised someone else for exactly that. `index.js` is 205 KB and
+`heartflow.js` 137 KB — a real codebase, and two minutes of reading settles what a README cannot.
+
+```js
+FORGETTING_LEVELS = {
+  RECENT:      { maxAge: 3600000,    compression:  1, precision: 1.00, label: 'vivid'    },
+  SHORT_TERM:  { maxAge: 86400000,   compression:  4, precision: 0.95, label: 'clear'    },
+  MEDIUM_TERM: { maxAge: 604800000,  compression: 10, precision: 0.90, label: 'faded'    },
+  LONG_TERM:   { maxAge: 2592000000, compression: 16, precision: 0.75, label: 'blurred'  },
+  ARCHIVE:     { maxAge: Infinity,   compression: 20, precision: 0.60, label: 'abstract' },
+}
+referenceCountProtectionThreshold: 3   // 3+ references => forgetting is FORBIDDEN
+```
+
+- **The terminal state of forgetting is `maxAge: Infinity`.** Nothing is ever removed. Forgetting is
+  progressive lossy compression, 1x -> 20x, precision 1.00 -> 0.60.
+- **No `unlink`, `delete`, `rm`, `splice`, `purge` or `destroy` anywhere in the file.**
+- A memory referenced 3+ times is exempt from forgetting entirely. Under a retention obligation this
+  inverts the usual expectation: the better-connected the subject, the less removable it is.
+
+**yun520-1 described his own system exactly.** His public "Forgotten != deleted — below-threshold
+memories archived" matches the code to the letter; he does not sell compression as deletion. That
+deserves saying plainly in any writeup, and it is the opposite of what my README-level reading had
+implied.
+
+The difference from inspeximus is therefore **real and now evidenced in code rather than asserted**:
+their deepest forgetting is 20x lossy compression retained forever; `forget_subject` removes the
+value from disk. That is a design divergence between two honest definitions of one word, not a
+defect — and the measurement's job is now to quantify it, not to discover it.
+
+**Also live and unresolved (context the measurement must respect):** qingkong66 publicly challenged
+HeartFlow on 2026-07-20 (`deepseek-ai/DeepSeek-V3#1447`), reporting a code audit finding heavy
+hardcoded keyword matching in `deep-emotion.js` / `heartflow-engine.js` against the README's
+"self-healing cognitive engine". Nine days without a direct answer. Neither of those two files
+exists at the cited paths in `yun520-1/mark-heartflow-skill`, so the audit's target is itself
+unverified — do NOT take a side on it. We have not read those files and have no standing to judge
+them. A FAILED from our measurement must not land as another stone on a project already under
+community pressure: it goes to him first, privately, with the runnable artifact. A REPRODUCED is
+usable evidence in his defence and should reach him just as fast.
+
 ## 6. COMMITS SO FAR (this workstream)
 
 - `4639e0c` arXiv AND-join at the single choke point
