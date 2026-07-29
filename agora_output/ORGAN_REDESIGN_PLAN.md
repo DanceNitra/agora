@@ -170,6 +170,82 @@ must be answered before the roster size is decided.
 behaviour, i.e. our per-agent ledgers and starvation alarms are themselves a quota risk; Segment and
 Prime Video re-consolidating over-decomposed services.
 
+## 3a. GATE RESULT — CITATION VERIFICATION. Most of the distribution evidence did not survive.
+
+**THE CENTRAL CASE HAS A REVERSAL I DID NOT HAVE.** Mem0 *did* publicly rebut Zep
+([getzep/zep-papers#5](https://github.com/getzep/zep-papers/issues/5), Deshraj Yadav, 2025-05-08):
+Zep counted Category-5 adversarial answers in the numerator while excluding them from the
+denominator, inflating its figure by ~25.6pp — correct value **58.44% ±0.20**, not 75.14%. Zep quietly
+revised its headline from a 24% win to ~10% and never answered the issue.
+
+So the adversarial replicator **was itself successfully counter-replicated.** This is BLOCKER 1
+happening in reality, in our own market, to the exact play we were about to copy. It remains a valid
+*distribution* case study (the attack drew a response) but it is **not** a credibility exemplar, and
+citing it as "adversarial replication works" cuts both ways.
+
+| claim | verdict |
+|---|---|
+| Zep 75.14 vs 65.99, three named defects | numbers and direction CONFIRMED — but see the reversal above |
+| mem0 has ~51k stars | **FALSE** — 62,016 (GitHub API, 2026-07-29) |
+| Jepsen: "~26 systems with violations" | **UNVERIFIED, do not use.** Page says "over two dozen analyzed"; actually 38 systems / ~50 reports. No per-system violation count is published |
+| Jepsen: MongoDB, Cassandra, etcd all pay | **PARTLY FALSE** — Cassandra (2013) and etcd (2014) were independent. Say "vendors including MongoDB commission and republish" |
+| HF leaderboard 2M+ visitors / 300k monthly | CONFIRMED verbatim (window ~Aug 2023–Jun 2024). The "200+ community leaderboards" is on a DIFFERENT page — cite both |
+| ReScience C: ~17 articles in 2 years, never scaled | **FALSE ON BOTH HALVES, AND IT INVERTS THE ARGUMENT.** 8 articles in the first two years; and it DID scale — Vol 8 (2022) = 54, Vol 9 = 51, largely because MLRC fed it |
+| MLRC: 8 years to an official NeurIPS track (2026) | CONFIRMED verbatim |
+
+**Consequence for the plan:** I was using ReScience as evidence that neutral replication venues starve
+without a named target. It is evidence of the *opposite*. The "name a third party or you get no
+distribution" argument loses its strongest support and must be re-argued or dropped.
+
+## 3b. GATE RESULT — RED TEAM VERDICT: **REFRAME** (2026-07-29). Blocking changes below.
+
+**BLOCKER 0 — SHIP THE COMPLETION-INTEGRITY GATE FIRST.** The last outage was three tasks closed
+without their verdicts posted, *by the executor*. The plan adds seven more producers upstream of that
+same unguarded sink. A partition of inputs cannot fix a defect in the sink. **"No close without a
+posted, linked artifact" must land BEFORE any beat is reassigned**, or the redesign multiplies the
+failure it exists to prevent. (`owed` in `0212060` warns; it does not enforce.)
+
+**BLOCKER 1 — responsible disclosure on FAILED.** A FAILED verdict on mem0/Zep/Letta is a public claim
+about a commercial product whose authors can produce a refuting config in a day; we cannot re-verify at
+that speed with one executor and a backlog. The first refuted FAILED permanently inverts the ledger's
+premise from "we check" to "they publish sloppy takedowns."
+→ REPRODUCED and NOT_COMPUTABLE publish freely. **Every FAILED goes to the vendor first** with the
+runnable artifact, held until they respond or a stated window elapses. Mira's writeups lead with the
+harness, never a vendor name in the title.
+
+**BLOCKER 2 — "names an external system" is Goodhart-shaped.** It rewards *touching* something
+external, not *changing* anything. Keep the intent (external anchoring, anti-recycling) but the
+acceptance test becomes: **"could a named external party act on this?"** — not "does a proper noun
+appear in the title."
+
+**BLOCKER 3 — Aldric as referee is structurally conflicted** while inspeximus is scored on a board we
+keep. No audit fixes a conflict; it wears a badge. **Decision required: exclude inspeximus from the
+leaderboard entirely** (preferred), or declare ourselves a contestant and hand scoring to a third party.
+
+**ACCEPTED LIMITATION — no throughput gain.** Every artifact still executes through one Claude
+instance; partitioning inputs changes queue *composition*, not service rate. The real gain is queue
+diversity, which is what kills the 80-outputs-zero-decisive failure. **Budget beats by execution cost,
+not by symmetry — eight equal beats will starve six.**
+
+## 3c. CADENCE DEFECT found while gating (2026-07-29) — fix before Phase 3
+
+Organ triggers are `loop_n % N == M`. Measured from the live dungeon: **a full roster pass takes ~1.3
+minutes**, not the ~0.85s the code comments assume. Real first-fire times versus documented:
+
+| organ | trigger tick | REAL first fire | code comment says |
+|---|---|---|---|
+| Replication (Rooke) | 600 | **12.8 h** | ~28 min |
+| Analogy Forge | 900 | **19.3 h** | ~50 min |
+| Belief revision | 1200 | **25.7 h** | ~47 min |
+| Cartography (Wren) | 1700 | **36.4 h** | ~43 min |
+
+Off by ~25x, and `loop_n` resets on every dungeon restart — so Cartography effectively never fires
+unless the process runs 36h+ uninterrupted. **The death ordering matches the trigger ordering exactly**
+(replication survived longest, cartography died first), which is the corroboration.
+
+CAVEAT ON MY OWN NUMBER: this assumes **one `loop_n` per roster pass**. Not verified. Verify the
+increment site before acting on these figures.
+
 ## 4. PHASE 3 — implement, one organ per commit
 
 Rule: one organ, one commit, measured before and after. No organ ships without its starvation signal
