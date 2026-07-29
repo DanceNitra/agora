@@ -3000,11 +3000,41 @@ async def claude_inbox_list():
 
 @router.post("/brain/claude-inbox/done")
 async def claude_inbox_done(request: Request):
-    """Claude Code marks a task done with a short result."""
-    from agora.execution.claude_inbox import mark_done
+    """Claude Code marks a task done with a short result.
+
+    SOME TASKS OWE A LEDGER ENTRY, AND CLOSING THEM WITHOUT IT IS A SILENT LOSS. Bounty/Court read
+    as dead for 42 days while three 'Challenge belief' tasks sat marked done: the bounty ledger is
+    written only by POST /brain/belief-revise, and closing the inbox task does not call it. The work
+    was recorded as finished in one place and never arrived in the other, so every dashboard showed a
+    dead organ and every health check passed.
+
+    The response now carries `owed` when a task closes without the side effect its kind requires.
+    It does not block the close -- refusing would strand tasks whose ledger legitimately gets no
+    entry (an inconclusive challenge) -- it makes the omission VISIBLE at the moment it happens,
+    which is the whole difference between this failure and one that gets noticed.
+    """
+    import time as _t
+    from agora.execution.claude_inbox import mark_done, _load as _inbox_load
     body = await request.json()
-    mark_done(body.get("id") or "", body.get("result") or "")
-    return {"status": "ok"}
+    tid = body.get("id") or ""
+    #: task-kind -> (the endpoint that writes the ledger, a probe returning its newest entry ts)
+    task = next((t for t in _inbox_load() if t.get("id") == tid), None)
+    text = (task or {}).get("text", "") or ""
+    mark_done(tid, body.get("result") or "")
+    owed = None
+    try:
+        if "Challenge belief" in text or "Red-team belief" in text:
+            from agora.execution.bounty import _load as _bounty
+            rows = _bounty()
+            newest = max((float(r.get("ts", 0) or 0) for r in rows), default=0.0)
+            if _t.time() - newest > 3600:
+                owed = ("This task owes the bounty ledger an entry and none was written in the last "
+                        "hour. POST /brain/belief-revise with a verdict of survived | revised | "
+                        "retired -- record_challenge() silently ignores any other word, and that is "
+                        "how Bounty/Court and the Graveyard both read dead for 42 days.")
+    except Exception:
+        owed = None
+    return {"status": "ok", **({"owed": owed} if owed else {})}
 
 
 @router.get("/brain/brainstorm")
