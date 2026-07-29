@@ -46,7 +46,11 @@ _ORGANS = {
     ".analogies.json":     ("High Priest Orin", None),
     ".contradictions.json": ("Dame Elara", None),            # WAS MISSING — and it is her liveliest
     ".scout_box.json":     ("Shadow Kael", None),            # no ts field; freshness via mtime
-    ".contributions.json": ("Sage Mira", None),              # curation output
+    # NOT an individual's organ. Every record carries a `partners` list naming ALL EIGHT agents —
+    # this is the Seminar, where the group co-produces one Contribution. Crediting it to Mira, as the
+    # first version of this map did, hands one agent the work eight of them did together and then
+    # scores her 0 decisive on a store that has no verdict field at all. Attributed to the group.
+    ".contributions.json": ("THE SEMINAR (all 8, co-produced)", None),
 }
 
 #: Stores whose records carry NO `ts`, so per-record age is unavailable and file mtime is the only
@@ -106,6 +110,11 @@ def _is_decisive(rec: dict) -> bool:
     """Decisive = this entry CHANGED the knowledge base. Checked against the inconclusive list first,
     because 'hypothesized' must never be talked into counting by a stray word elsewhere in the record.
     """
+    # The Seminar store carries no verdict vocabulary at all — its quality signal is the boolean
+    # `verified`, set when a Contribution passed verification. Reading it for outcome words scores
+    # every one of 3023 records at 0, which is how the whole organ read as pure volume.
+    if "verified" in rec and "claim" in rec:
+        return bool(rec.get("verified"))
     blob = " ".join(str(rec.get(k, "")) for k in ("verdict", "outcome", "status", "cause", "kill")).lower()
     outcome = str(rec.get("outcome", "") or rec.get("verdict", "")).lower().strip()
     if any(outcome.startswith(w) for w in _INCONCLUSIVE):
@@ -174,10 +183,16 @@ def starvation_report(idle_alarm_h: float = 72.0) -> dict:
     #: and that silence used to read as "produces nothing".
     roster = {"Shadow Kael", "Sage Mira", "High Priest Orin", "King Aldric",
               "Dame Elara", "Sergeant Voss", "Artificer Rooke", "Cartographer Wren"}
+    #: Agents whose organ is CREATION, not repair. Their absence from this ledger is correct, not a
+    #: blind spot — Mira curates findings into the vault and is measured by authored notes (92 in the
+    #: last 14 days). Listing her under `unwatched_agents` would read as a gap and invite the same
+    #: false "produces nothing" conclusion this file exists to prevent.
+    creation_side = {"Sage Mira": "curation -> authored vault notes (creation ledger)"}
     watched = {o for _s, (o, _f) in _ORGANS.items()}
     return {"alarm_after_h": idle_alarm_h, "organs": out,
             "starving": [o["organ"] for o in out if o["starving"]],
-            "unwatched_agents": sorted(roster - watched),
+            "unwatched_agents": sorted(roster - watched - set(creation_side)),
+            "measured_on_the_creation_ledger": creation_side,
             "ownership_caveat": _AMBIGUOUS_OWNERSHIP}
 
 
