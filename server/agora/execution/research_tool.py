@@ -104,10 +104,22 @@ def arxiv_search(query: str, max_results: int = 5, sort: str = "relevance") -> l
     # arXiv firehose (measured 2026-07-20: the query "conversational memory long-term dialogue" returned
     # MoE serving, risky-driving vision and physics-RL papers). Callers may therefore pass FULL arXiv
     # query syntax (field prefixes, quoted phrases, AND/OR); we only wrap a bare phrase in `all:`.
+    #
+    # Documenting the trap did not stop it: this function went on wrapping a bare phrase in `all:`, and
+    # four of its five callers pass exactly that. The Library's fallback asked for 'AI/agent systems' and
+    # so read the newest papers matching "AI" OR "agent" OR "systems" -- "systems" alone matches an
+    # astronomy instrument paper and a 3D-texture paper -- IN FULL TEXT. So the join happens here, at the
+    # one place every caller goes through, rather than in each caller in turn.
     _raw = (query or "").strip()
     _structured = bool(re.search(r'(?:\b(?:all|ti|abs|au|cat|id):)|\b(?:AND|OR|ANDNOT)\b', _raw))
+    if not _structured:
+        # AND the terms instead of OR-ing them. Failing to zero results is a SAFE failure (nothing is
+        # read); returning the firehose is not, because every hit is then read as if it were on-mission.
+        _terms = [t for t in re.split(r"[^A-Za-z0-9+#-]+", _raw) if len(t) > 2]
+        _raw = " AND ".join(f"all:{t}" for t in _terms) if _terms else f"all:{_raw}"
+        _structured = True
     params = {
-        "search_query": _raw if _structured else f"all:{_raw}",
+        "search_query": _raw,
         "start": 0,
         "max_results": max_results,
         "sortBy": sort,

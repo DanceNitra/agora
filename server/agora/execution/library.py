@@ -116,14 +116,26 @@ async def gather_paper_inputs(query: str = "") -> dict:
                 "url": f"http://arxiv.org/abs/{aid}", "published": "", "query": entry.get("source", ""),
                 "fulltext": text[:14000]}
     if not query:
+        # FALL BACK TO THE FRONTIER LIST, not to a word from the vault.
+        #
+        # This took `domains[0]` from the vault model -- currently 'AI/agent systems', a bare multi-word
+        # string, and the vault's domains are the owner's GENERAL interests, not the locked frontier. So
+        # the fallback aimed at a different target than every other reader in the system.
+        #
+        # It is NOT where the 202 off-mission papers in .library.json came from -- I accused it of that and
+        # the measurement refuted me: under sort='relevance' (what this caller uses) even the bare phrase
+        # returns 8/8 on-mission hits. Those papers came in through the READING LIST, queued by the
+        # pre-2026-07-20 frontier queries, and their `source` field says so. Fixing this is still right,
+        # but it fixes an aim, not that incident.
+        #
+        # _FRONTIER_QUERIES is curated, quoted-phrase, AND-joined and locked to the owner's frontier. The
+        # reading list drains precisely because those queries are narrow, so the moment the Library needs
+        # a fallback is the moment it most needs them.
         try:
-            from agora.execution.user_model import build_user_model
-            from agora.config import settings
-            model = await build_user_model(settings.vault_path or "C:/Users/Danculus/my-second-brain")
-            doms = [d.strip() for d in (model.get("domains", "") or "").split(",") if d.strip()]
-            query = doms[0] if doms else "machine learning"
+            from agora.execution.frontier_harvest import _FRONTIER_QUERIES
+            query = _FRONTIER_QUERIES[int(time.time() // 3600) % len(_FRONTIER_QUERIES)]
         except Exception:
-            query = "machine learning"
+            query = 'abs:"agent memory" AND (abs:"language model" OR abs:LLM)'
     papers = await asyncio.to_thread(arxiv_search, query, 8)
     seen = _already_read()
     for p in papers:
