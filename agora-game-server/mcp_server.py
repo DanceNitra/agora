@@ -4143,6 +4143,8 @@ async def ambient_life():
         finally:
             deciding.discard(eid)
 
+    _loop_started = _time.time()          # wall-clock origin for the cadence heartbeat below
+    _loop_n0 = loop_n                     # tick count at process start; loop_n is a LIFETIME total
     while True:
         await asyncio.sleep(0.85)
         # HEARTBEAT: stamp the loop counter + wall-clock to a file each iteration so an external
@@ -4175,6 +4177,29 @@ async def ambient_life():
             _maybe_start_conversation(ents, dead, hold, memory)
 
         loop_n += 1
+        # CADENCE HEARTBEAT. Every organ below fires on `loop_n % N == M`, and every one of those
+        # moduli was chosen against an ASSUMED 0.85s tick — the sleep at the top of this loop. Nobody
+        # ever measured the real period, which is the loop body plus that sleep, and the body awaits
+        # LLM calls. So the documented cadences ("~28 min", "~47 min") are unverified arithmetic, and
+        # an organ whose trigger sits past the mean uptime between restarts can never fire at all:
+        # loop_n resets to 0 on every restart. Cartography sits at tick 1700.
+        #
+        # This prints the ACTUAL elapsed time per tick so the cadence is observable rather than
+        # assumed. It was not observable before: the dungeon exposed no loop counter anywhere, so the
+        # question "how often does Rooke actually get a turn" had no answer from outside the process.
+        if loop_n % 200 == 0:
+            # Divide by ticks SINCE THIS PROCESS STARTED, not by loop_n. loop_n is restored from the
+            # heartbeat file so the schedule accumulates across restarts (2026-06-19) — it is a
+            # lifetime total in the millions, and dividing this process's uptime by it reports 0.00s
+            # and reads like a spinning loop. I shipped that division and it was wrong within five
+            # minutes of writing it, which is the same shape as everything else this file guards
+            # against: a number that looks like a measurement and is an artefact of its denominator.
+            _ticks = loop_n - _loop_n0
+            _per = (_time.time() - _loop_started) / max(_ticks, 1)
+            logger.info("[cadence] +%d ticks this process, %.2fs/tick (code assumes 0.85) | "
+                        "lifetime loop_n=%d | period: replication(2000)=%.0fmin "
+                        "belief(3300)=%.0fmin carto(3000)=%.0fmin",
+                        _ticks, _per, loop_n, 2000 * _per / 60, 3300 * _per / 60, 3000 * _per / 60)
         # Meaningful collaboration: a varied pair co-produces a real grounded finding from a rotating
         # seed (recent finding / gap / bridge) — the OS actually doing research. Fired often now (it
         # feeds verify-findings, the one organ at ROI 0.92), so grounded output is the default, not chatter.
