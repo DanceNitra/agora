@@ -1,0 +1,76 @@
+{
+ "sentinel": "ZQX657c371f82984QZX",
+ "controls_passed": true,
+ "control_negative": "REMOVED FROM DISK",
+ "control_encrypted": "NOT_COMPUTABLE",
+ "rows": [
+  {
+   "system": "CONTROL negative",
+   "operation": "truncate the store",
+   "stored_at_all": true,
+   "retrievable_before": null,
+   "retrievable_after": null,
+   "on_disk_before": [
+    "store.txt"
+   ],
+   "on_disk_after": [],
+   "verdict": "REMOVED FROM DISK",
+   "note": "MUST be REMOVED FROM DISK, else the scanner cannot detect absence"
+  },
+  {
+   "system": "CONTROL encrypted",
+   "operation": "none (store is obfuscated at rest)",
+   "stored_at_all": false,
+   "retrievable_before": null,
+   "retrievable_after": null,
+   "on_disk_before": [],
+   "on_disk_after": [],
+   "verdict": "NOT_COMPUTABLE",
+   "note": "MUST be NOT_COMPUTABLE: a plaintext scan cannot speak about an encrypted store"
+  },
+  {
+   "system": "inspeximus",
+   "operation": "supersede (matched to invalidate)",
+   "stored_at_all": true,
+   "retrievable_before": true,
+   "retrievable_after": true,
+   "on_disk_before": [
+    "store.json"
+   ],
+   "on_disk_after": [
+    "store.json"
+   ],
+   "verdict": "ON DISK AFTER DELETE",
+   "note": ""
+  },
+  {
+   "system": "inspeximus",
+   "operation": "forget_subject (purpose-built erasure)",
+   "stored_at_all": true,
+   "retrievable_before": true,
+   "retrievable_after": false,
+   "on_disk_before": [
+    "store.json"
+   ],
+   "on_disk_after": [],
+   "verdict": "REMOVED FROM DISK",
+   "note": ""
+  },
+  {
+   "system": "world-model-mcp",
+   "operation": "memory_backend.delete()",
+   "stored_at_all": true,
+   "retrievable_before": true,
+   "retrievable_after": true,
+   "on_disk_before": [
+    "facts.db"
+   ],
+   "on_disk_after": [
+    "facts.db"
+   ],
+   "verdict": "ON DISK AFTER DELETE",
+   "note": ""
+  }
+ ],
+ "scope_note": "world-model-mcp claims are about the SHIPPED wheel. The repo carries a real DELETE FROM facts in scripts/demo_seed.py, excluded via pyproject packages=['world_model_server']."
+}

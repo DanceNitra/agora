@@ -206,3 +206,4 @@ server/.competitor_watch.json
 
 # derived embedding cache for replication dedup (regenerates on demand)
 server/.replication_vectors.json
+research/probes/_erasure_v2_work/
