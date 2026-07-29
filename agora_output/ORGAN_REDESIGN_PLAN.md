@@ -318,6 +318,27 @@ Outcome is REPRODUCED (they enforce it too — then our erasure moat claim is de
 plainly), FAILED (declared but not enforced — a real measured gap), or NOT_COMPUTABLE. Gated: a
 FAILED goes to HIM first with the runnable artifact, per BLOCKER 1.
 
+**EXTENDED TO THREE-WAY (inbox `43993d`, run together with `56360c`, not separately).** HeartFlow
+(yun520-1, DeepSeek#1121) states the same distinction *outright and unprompted*: "Forgotten !=
+deleted — below-threshold memories archived", Ebbinghaus `R=e^(-t/S)` in `src/memory/forgetting.js`,
+plus `verifier-grant.js` signing `author_id + session_id + content_hash`, checked at retrieval.
+
+That is a documented design choice, not a hidden defect, and any writeup must say so in its first
+sentence. Both of these are peers who shipped honestly and one of them shipped before us.
+
+**The whole question is one word carrying two definitions.** "Forgotten" means *unreachable by
+retrieval* to them and *gone from storage* to us. For an agent under a retention obligation that is
+the difference between compliance and not — and it is measurable rather than arguable. Third arm is
+inspeximus itself, re-run in the same cycle, so every delta has both ends measured.
+
+Second axis, HeartFlow only: conflict arbitration keeps BOTH claims until 5+ independent
+confirmations. Our adversarial conflict cell can ask whether five confirmations are cheap to
+manufacture — a threshold an attacker can buy is not a threshold.
+
+Controls are non-negotiable and named in the task: `erasure_works_at_all` (a no-op adapter must score
+0), and every adapter's API calls verified OUTSIDE a bare `except`. Assume our adapter is wrong
+before assuming the peer is.
+
 ## 6. COMMITS SO FAR (this workstream)
 
 - `4639e0c` arXiv AND-join at the single choke point
