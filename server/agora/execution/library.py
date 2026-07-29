@@ -50,6 +50,42 @@ def queue_reading(arxiv_ids: list[str], source: str = "") -> dict:
     return {"added": added, "queued_total": len(rl)}
 
 
+def prune_reading_list() -> dict:
+    """Drop queued papers that were harvested under a frontier query we no longer run.
+
+    The reading list is served BEFORE any fresh search, so it is the system's real reading agenda --
+    and it outlives the queries that filled it. When the frontier was retargeted on 2026-07-20, the
+    queue kept 199 papers stocked by the old 'knowledge management' / 'human-AI collaboration' topics.
+    Retargeting the queries changed what we HARVEST and nothing about what we would next READ: the
+    Library would have spent 199 full-text reads working through the previous frontier before reaching
+    the current one. A queue is a second place the old target hides, and pruning the source is not
+    enough while the queue survives it.
+
+    Matching is on the query PREFIX because queue_reading truncates `source` to 80 chars. Entries with
+    no source (hand-queued, or queued before sources were recorded) are KEPT -- an unlabelled entry is
+    unknown, not stale, and silently discarding it would make this prune the very thing it guards
+    against. Returns what it removed so a caller can log it rather than prune invisibly.
+    """
+    try:
+        from agora.execution.frontier_harvest import _FRONTIER_QUERIES
+    except Exception:
+        return {"pruned": 0, "kept": len(_read_list()), "reason": "frontier queries unavailable"}
+    current = [f"frontier:{q}"[:80] for q in _FRONTIER_QUERIES]
+    rl = _read_list()
+    keep, dropped = [], []
+    for entry in rl:
+        src = (entry.get("source") or "").strip()
+        if not src or not src.startswith("frontier:") or any(src.startswith(c) or c.startswith(src)
+                                                             for c in current):
+            keep.append(entry)
+        else:
+            dropped.append(entry)
+    if dropped:
+        _save_read_list(keep)
+    return {"pruned": len(dropped), "kept": len(keep),
+            "stale_sources": sorted({(d.get("source") or "")[:46] for d in dropped})[:6]}
+
+
 def _load() -> list:
     try:
         return json.loads(_STORE.read_text(encoding="utf-8"))
@@ -95,6 +131,10 @@ async def gather_paper_inputs(query: str = "") -> dict:
     digest into a structured note. Query defaults to the user's top domain."""
     import asyncio
     from agora.execution.research_tool import arxiv_search
+    # Keep the agenda aligned with the CURRENT frontier before serving it — the queue outlives the
+    # queries that filled it, so a retarget that only changes _FRONTIER_QUERIES leaves the next N reads
+    # pointed at the previous frontier.
+    prune_reading_list()
     # PRIORITY: serve the curated reading list first (deep-read what we deliberately queued)
     seen0 = _already_read()
     rl = _read_list()

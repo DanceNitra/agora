@@ -710,6 +710,68 @@ async def idea_forge_loop(app: FastAPI):
         await _aio.sleep(90 * 60)                             # re-check every ~90 min
 
 
+async def library_loop(app: FastAPI):
+    """Drain the Library's reading list: ~once a day, file a 'Read paper' inbox task so the main loop
+    deep-reads ONE queued paper end to end and writes a structured note.
+
+    THIS LOOP DID NOT EXIST. frontier_harvest_loop stocked the reading list every 2h and nothing ever
+    emptied it: `gather_paper_inputs` was reachable only from an on-demand endpoint, so the deep-read
+    organ ran exactly as often as someone called it by hand. Measured 2026-07-29: 199 papers queued,
+    202 read in total, and the newest read was 2026-07-03 -- 26 days idle. The whole point of the
+    Library is that the rest of the system grounds itself in abstracts, so an idle Library means no
+    part of Agora had read a full paper in almost a month.
+
+    RESTART-RESILIENT the same way idea_forge_loop is: the cadence is anchored to the newest ts in
+    server/.library.json (the real record of when we last read something) rather than to an in-process
+    timer, so restarts cannot keep pushing the next fire out of reach. That failure mode is why the
+    forge needed the same treatment; a loop whose clock resets on restart fires only if the process
+    happens to outlive its own interval.
+    """
+    import asyncio as _aio
+    import json as _json
+    import time as _time
+    from pathlib import Path as _P
+    _ledger = _P(__file__).resolve().parent.parent / ".library.json"
+    _INTERVAL = 24 * 3600
+
+    def _last_read() -> float:
+        try:
+            items = _json.loads(_ledger.read_text(encoding="utf-8"))
+            return max((float(it.get("ts", 0) or 0) for it in items), default=0.0)
+        except Exception:
+            return 0.0
+
+    await _aio.sleep(180)
+    while True:
+        try:
+            from agora.execution.claude_inbox import add_task, pending
+            from agora.execution.library import prune_reading_list
+            # Prune here too, not only on serve: this is where we can SEE it, and a queue quietly
+            # pointed at a retired frontier is the failure the last audit found.
+            pr = prune_reading_list()
+            if pr.get("pruned"):
+                print(f"[Library] pruned {pr['pruned']} papers queued under retired frontier queries "
+                      f"({pr.get('kept')} remain)")
+            if (_time.time() - _last_read()) > _INTERVAL and \
+                    not any("Read paper" in (t.get("text", "") or "") for t in pending()):
+                _before = {t.get("id") for t in pending()}
+                _tid = add_task(
+                    "Read paper: GET /brain/library-inputs to pull ONE queued paper's FULL TEXT, then "
+                    "read it properly — central claims, strength of evidence (N, method, limitations, "
+                    "what the authors themselves scope out), and what it changes for us. Link it to "
+                    "the owner's real notes. Push ONE vault note via safe_vault_push.py, POST "
+                    "/brain/library-record with the arxiv_id + note path so it is not re-read, then "
+                    "POST /brain/claude-inbox/done and send ONE ASCII Telegram line.")
+                # add_task returns the EXISTING id when its 36h dedup fires, so printing "queued"
+                # unconditionally reports a success it never checked -- the same shape of defect as a
+                # surface returning a clean verdict about input it never examined. Say which happened.
+                print(f"[Library] queued a Read paper task ({_tid})" if _tid not in _before
+                      else f"[Library] Read paper task NOT queued — deduped against {_tid}")
+        except Exception as e:
+            print(f"[Library] loop error: {e}")
+        await _aio.sleep(4 * 3600)
+
+
 async def exaptation_scan_loop(app: FastAPI):
     """The OUTWARD scanner cadence: ~once a day, file an 'Exaptation scan' inbox task so the main
     loop turns Agora outward — GET /brain/exaptation/supply (our proven mechanisms + ready-made
@@ -1095,6 +1157,10 @@ async def lifespan(app: FastAPI):
         loop.create_task(idea_forge_loop(app))     # ~2x/day: queue a Forge ideas task for the loop
     except Exception as _e:
         print(f"[IdeaForge] not started: {_e}")
+    try:
+        loop.create_task(library_loop(app))        # ~daily: DRAIN the reading list (nothing did)
+    except Exception as _e:
+        print(f"[Library] not started: {_e}")
     try:
         loop.create_task(exaptation_scan_loop(app))  # ~daily: queue an outward real-world scan task
     except Exception as _e:

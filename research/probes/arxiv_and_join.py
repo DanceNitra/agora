@@ -22,6 +22,10 @@ CASES = [
     ("bare      replication topic", "agent memory benchmark"),
     ("CONTROL   structured (untouched)", 'abs:"machine unlearning" AND (abs:verification OR abs:deletion)'),
     ("CONTROL   single word", "unlearning"),
+    # The Library looks a queued paper's title up BY ID. The first version of this fix split the id on
+    # its '.' and asked for "2607 AND 13157", so every title came back as the bare id -- a caller
+    # starved, exactly the failure the controls exist to catch, and no control covered an identifier.
+    ("CONTROL   arXiv id lookup", "2607.13157"),
 ]
 
 #: an on-mission phrase must still match; an off-mission one must not. Both are checked per case.
@@ -42,12 +46,11 @@ def fetch(search_query, n=8):
             for e in root.findall("a:entry", NS)], None
 
 
-def new_query(raw):
-    """The shipped transform, copied from research_tool.arxiv_search."""
-    if re.search(r'(?:\b(?:all|ti|abs|au|cat|id):)|\b(?:AND|OR|ANDNOT)\b', raw):
-        return raw
-    terms = [t for t in re.split(r"[^A-Za-z0-9+#-]+", raw) if len(t) > 2]
-    return " AND ".join(f"all:{t}" for t in terms) if terms else f"all:{raw}"
+sys.path.insert(0, r"C:\Users\Danculus\agora\server")
+#: IMPORT the shipped transform; do not re-implement it. The first version of this probe carried its own
+#: copy, so when the arXiv-id starvation was fixed in research_tool the probe kept reporting it starved.
+#: A probe holding a duplicate of the code under test measures the duplicate.
+from agora.execution.research_tool import build_arxiv_query as new_query  # noqa: E402
 
 
 print("on-mission share of the top 8 hits, OLD (all:<phrase>, OR-matched) vs NEW (AND-joined)\n")

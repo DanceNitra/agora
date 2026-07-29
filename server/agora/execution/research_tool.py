@@ -95,6 +95,31 @@ def _get_json(url: str, headers: dict, retries: int = 2):
     raise RuntimeError("unreachable")
 
 
+def build_arxiv_query(query: str) -> str:
+    """Turn a caller's query into arXiv search syntax. Public so a probe can measure THIS function
+    rather than its own copy of it -- the first probe for this carried a duplicate of the transform,
+    reported the arXiv-id control as starved after the starvation had already been fixed, and would
+    have gone on agreeing with itself no matter what shipped.
+
+    A bare multi-word phrase under `all:` is OR-matched by arXiv, so combined with sortBy=submittedDate
+    it returns "the newest papers containing ANY of these words" -- the arXiv firehose (measured
+    2026-07-20: "conversational memory long-term dialogue" returned MoE serving, risky-driving vision
+    and physics-RL papers). The docstring said so for nine days and four of five callers passed a bare
+    phrase anyway, so the join happens here rather than in each caller.
+    """
+    raw = (query or "").strip()
+    if re.search(r'(?:\b(?:all|ti|abs|au|cat|id):)|\b(?:AND|OR|ANDNOT)\b', raw):
+        return raw                                    # caller passed full arXiv syntax — leave it alone
+    if re.fullmatch(r"\d{4}\.\d{4,5}(v\d+)?", raw):
+        # An arXiv id is a LOOKUP. Splitting it on the '.' asks for "2607 AND 13157" and finds nothing,
+        # which is how the Library's title lookup began returning the bare id as the title.
+        return f"id:{raw}"
+    # AND the terms instead of OR-ing them. Failing to zero results is a SAFE failure (nothing is read);
+    # the firehose is not, because every hit is then read as if it were on-mission.
+    terms = [t for t in re.split(r"[^A-Za-z0-9+#-]+", raw) if len(t) > 2]
+    return " AND ".join(f"all:{t}" for t in terms) if terms else f"all:{raw}"
+
+
 def arxiv_search(query: str, max_results: int = 5, sort: str = "relevance") -> list[dict]:
     """Search arXiv for real papers. Returns [{title, authors, summary, url, published}].
     sort='relevance' (default) for best-match; sort='submittedDate' for newest-first (used by the
@@ -110,16 +135,8 @@ def arxiv_search(query: str, max_results: int = 5, sort: str = "relevance") -> l
     # so read the newest papers matching "AI" OR "agent" OR "systems" -- "systems" alone matches an
     # astronomy instrument paper and a 3D-texture paper -- IN FULL TEXT. So the join happens here, at the
     # one place every caller goes through, rather than in each caller in turn.
-    _raw = (query or "").strip()
-    _structured = bool(re.search(r'(?:\b(?:all|ti|abs|au|cat|id):)|\b(?:AND|OR|ANDNOT)\b', _raw))
-    if not _structured:
-        # AND the terms instead of OR-ing them. Failing to zero results is a SAFE failure (nothing is
-        # read); returning the firehose is not, because every hit is then read as if it were on-mission.
-        _terms = [t for t in re.split(r"[^A-Za-z0-9+#-]+", _raw) if len(t) > 2]
-        _raw = " AND ".join(f"all:{t}" for t in _terms) if _terms else f"all:{_raw}"
-        _structured = True
     params = {
-        "search_query": _raw,
+        "search_query": build_arxiv_query(query),
         "start": 0,
         "max_results": max_results,
         "sortBy": sort,
