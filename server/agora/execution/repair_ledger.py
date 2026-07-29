@@ -75,7 +75,19 @@ _DECISIVE = ("failed", "killed", "retired", "revised", "rejected", "falsified", 
              # cartography (Wren): a refusal to bridge is a finding, not an absence of one
              "no honest bridge", "no bridge", "already bridged", "forged",
              # analogy forge (Orin)
-             "no viable mapping", "mapped")
+             "no viable mapping", "mapped",
+             # coherence audit (Elara): "compatible" means she EXAMINED the pair and ruled they do
+             # not conflict. 289 of her 300 records say that. A negative verdict closes the pair and
+             # is exactly as decisive as finding a contradiction — arguably more useful, since it is
+             # the outcome nobody bothers to record.
+             "compatible", "resolved", "no conflict")
+
+#: THE RULE THAT SHOULD HAVE EXISTED BEFORE THE FIRST ENTRY IN THIS FILE.
+#: Three times in one day I scored an agent at zero because this list did not speak its organ's
+#: language — Wren (11 decisive, read as 0), Orin (10, read as 1), Elara (93 in a single day, read
+#: as 0). Every time the error fell AGAINST the agent, and every time I reported it to the owner as
+#: the agent producing nothing. Before adding an organ to _ORGANS: open its store, run a Counter over
+#: the outcome/status field, and take ITS words. Do not extend this tuple from memory.
 
 #: Outcomes that record only that work STARTED. Counted as repairs, never as decisive — 68 of Wren's
 #: 80 entries end here, which is the real defect: a hypothesis nobody is obliged to test.
