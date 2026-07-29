@@ -1,0 +1,35 @@
+{
+  "arm1_1.86.0": "erased 1",
+  "arm1_1.87.0": "erased 0",
+  "arm1_1.88.0": "erased 0",
+  "arm2_1.86.0": {
+    "erased": 1,
+    "current_value_survives": true
+  },
+  "arm2_1.87.0": {
+    "erased": 1,
+    "current_value_survives": true
+  },
+  "arm2_1.88.0": {
+    "erased": 2,
+    "current_value_survives": false
+  },
+  "arm3_1.86.0": {
+    "library": 1,
+    "mcp": {
+      "alice": 0,
+      "hr/alice": 0,
+      "5 Elm St": 0
+    },
+    "mcp_can_attach_source": false
+  },
+  "arm3_1.87.0": {
+    "library": 1,
+    "mcp": {
+      "alice": 0,
+      "hr/alice": 1,
+      "5 Elm St": 0
+    },
+    "mcp_can_attach_source": true
+  }
+}
