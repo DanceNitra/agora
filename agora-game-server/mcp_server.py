@@ -2148,11 +2148,39 @@ def _attn_report(trigger: str, yielded: bool) -> None:
         pass
 
 
+#: How long one unprocessed task may hold an organ shut before the guard stops honouring it.
+#: A de-duplication guard with no expiry is an off-switch that anything can pull and nothing resets.
+_PENDING_GUARD_MAX_H = 36.0
+
+
 async def _task_already_pending(prefix: str) -> bool:
     """True when a task of this kind is already waiting in the Claude inbox (for the fixed-text
-    daily tasks — a second copy adds nothing, Claude would just editorial-skip it)."""
+    daily tasks — a second copy adds nothing, Claude would just editorial-skip it).
+
+    THE GUARD EXPIRES, because without an expiry it is the starvation mechanism. Every organ opens
+    with this call, so ONE task that never gets processed shuts that organ down for as long as it
+    sits there — silently, with the process healthy and every check green. Measured 2026-07-29:
+    Rooke queued a 'Replicate claim' task on 07-25, it sat in the inbox for four days, and the
+    Replication Unit — the most productive member of the organization by decisive repairs — returned
+    at this line on every one of the ~200 sweeps in between. We have hit this exact class before and
+    fixed it in one place: the Scout had the same wedge (see the scout-blocks-on-unprocessed-inbox
+    memory). Fixing the instance and not the class is why it came back somewhere else.
+
+    Past the deadline the organ is allowed to queue again. That risks a second copy of a task nobody
+    is draining, which is a nuisance; the alternative is an organ that stays dead until a human
+    notices, which is what actually happened for four days.
+    """
     inbox = await asyncio.to_thread(_brain_get_sync, "/api/v1/agent-os/brain/claude-inbox")
-    return any(t.get("text", "").startswith(prefix) for t in (inbox or {}).get("pending", []))
+    now = _time.time()
+    for t in (inbox or {}).get("pending", []):
+        if not t.get("text", "").startswith(prefix):
+            continue
+        age_h = (now - float(t.get("ts", 0) or 0)) / 3600
+        if age_h <= _PENDING_GUARD_MAX_H:
+            return True
+        logger.info("[guard] '%s' pending %.1fh (> %.0fh) — releasing the organ rather than "
+                    "letting one stuck task keep it shut", prefix, age_h, _PENDING_GUARD_MAX_H)
+    return False
 
 
 async def _queue_insight_theme() -> None:
