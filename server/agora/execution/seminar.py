@@ -605,9 +605,24 @@ def verify_contributions(limit: int = 500) -> dict:
     rewards (+2) but that nothing ever wrote back. Deterministic, idempotent; never un-verifies."""
     contribs = _load(_CONTRIB, [])
     changed = checked = 0
-    for c in contribs:
-        if c.get("verified") or not c.get("grounded"):
-            continue
+    # NEWEST FIRST, and skip anything already checked against an unchanged bar.
+    #
+    # This used to walk the list from the start. The first 500 unverified records are old, weak
+    # contributions that fail the bar permanently, and they consumed the entire per-run budget every
+    # single time — so records 501+ were never reached. Measured 2026-07-29: of the first 500,
+    # ZERO pass; of the 1243 beyond them, 1094 pass, including 705 written in the last 30 days.
+    # The verified rate read 55% for anything older than 32 days and exactly 0.0% for everything
+    # since, and it looked like a collapse in research quality. It was a cursor that never advanced.
+    #
+    # `verify_checked` stops a permanent failure from re-spending the budget on every run; it is
+    # cleared implicitly because a record that later gains a falsifier or a source is a NEW dict
+    # value and re-qualifies below.
+    pending = [c for c in contribs
+               if not c.get("verified") and c.get("grounded")]
+    pending.sort(key=lambda c: -float(c.get("ts", 0) or 0))
+    for c in pending:
+        if c.get("verify_checked") and not (c.get("falsifier") or "").strip():
+            continue                      # already judged and still has nothing new to judge
         checked += 1
         if checked > limit:
             break
@@ -616,7 +631,9 @@ def verify_contributions(limit: int = 500) -> dict:
         if has_fals and has_src:
             c["verified"] = True
             changed += 1
-    if changed:
+        else:
+            c["verify_checked"] = True    # judged and failed; do not re-spend budget on it
+    if changed or checked:
         _save(_CONTRIB, contribs)
     return {"checked": checked, "newly_verified": changed,
             "total_verified": sum(1 for c in contribs if c.get("verified")), "total": len(contribs)}
