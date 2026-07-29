@@ -30,13 +30,36 @@ from pathlib import Path
 _ROOT = Path(__file__).resolve().parents[2]
 
 #: organ store -> (owning agent, the field naming the actor if the store records one)
+#:
+#: THE FIRST VERSION OF THIS MAP COVERED FIVE STORES AND HALF THE ROSTER WENT UNWATCHED. Kael, Mira,
+#: Voss and Elara had no organ here at all, so those four could go dark and nothing would fire — an
+#: alarm with a blind spot over half the thing it guards, which is the exact defect class this file
+#: was written to catch. Worse, it made me report "Elara produces nothing" when .contradictions.json
+#: had been written to an hour earlier. I was measuring my map, not the system.
+#:
+#: Every entry below was read off the live store on 2026-07-29, not assumed.
 _ORGANS = {
-    ".bounty.json":       ("King Aldric", "by"),
-    ".graveyard.json":    ("King Aldric", "killed_by"),
-    ".replications.json": ("Artificer Rooke", None),
-    ".cartography.json":  ("Cartographer Wren", None),
-    ".analogies.json":    ("High Priest Orin", None),
+    ".bounty.json":        ("Sergeant Voss", "by"),          # belief challenges; `by` names the actor
+    ".graveyard.json":     ("King Aldric", "killed_by"),     # buried ideas; `killed_by` names it
+    ".replications.json":  ("Artificer Rooke", None),
+    ".cartography.json":   ("Cartographer Wren", None),
+    ".analogies.json":     ("High Priest Orin", None),
+    ".contradictions.json": ("Dame Elara", None),            # WAS MISSING — and it is her liveliest
+    ".scout_box.json":     ("Shadow Kael", None),            # no ts field; freshness via mtime
+    ".contributions.json": ("Sage Mira", None),              # curation output
 }
+
+#: Stores whose records carry NO `ts`, so per-record age is unavailable and file mtime is the only
+#: freshness signal there is. Reading `ts` on these returns 0 and would report them permanently
+#: starving — a false alarm is as useless as a missing one.
+_NO_TS = {".scout_box.json", ".predictions.json", ".topics.json"}
+
+#: Ownership that could not be settled from the code and is NOT guessed here. CLAUDE.md gives Voss
+#: belief-challenge duty while the roadmap panel labels Bounty/Court as Aldric's instrument; the
+#: bounty store's own `by` field is therefore the authority, and Aldric is credited only through the
+#: graveyard. Stated so nobody later mistakes this for a measured fact.
+_AMBIGUOUS_OWNERSHIP = ("bounty: CLAUDE.md assigns belief challenges to Voss, the roadmap panel "
+                        "shows Bounty/Court under Aldric. The store's `by` field decides per record.")
 
 #: A repair is only worth counting when it CHANGED the knowledge base. A replication that reproduces a
 #: claim confirms it; one that FAILS removes an error, which is the scarcer and more valuable event --
@@ -121,14 +144,29 @@ def starvation_report(idle_alarm_h: float = 72.0) -> dict:
     for store, (owner, _f) in _ORGANS.items():
         rows = _load(store)
         last = max((float(r.get("ts", 0) or 0) for r in rows if isinstance(r, dict)), default=0.0)
+        via = "record ts"
+        if not last:
+            # No per-record timestamp: fall back to file mtime rather than reporting a permanent
+            # starve. Three stores are in this shape, and a false alarm discredits the alarm.
+            try:
+                last, via = (_ROOT / store).stat().st_mtime, "file mtime"
+            except Exception:
+                last, via = 0.0, "unreadable"
         idle_h = (now - last) / 3600 if last else float("inf")
         out.append({"organ": store.strip(".").replace(".json", ""), "owner": owner,
-                    "entries": len(rows),
+                    "entries": len(rows), "freshness_from": via,
                     "idle_h": round(idle_h, 1) if last else None,
                     "starving": (idle_h > idle_alarm_h)})
-    out.sort(key=lambda x: -(x["idle_h"] or 1e9))
+    out.sort(key=lambda x: -(x["idle_h"] if x["idle_h"] is not None else 1e9))
+    #: Which of the eight are covered at all. An agent absent from _ORGANS cannot starve *visibly*,
+    #: and that silence used to read as "produces nothing".
+    roster = {"Shadow Kael", "Sage Mira", "High Priest Orin", "King Aldric",
+              "Dame Elara", "Sergeant Voss", "Artificer Rooke", "Cartographer Wren"}
+    watched = {o for _s, (o, _f) in _ORGANS.items()}
     return {"alarm_after_h": idle_alarm_h, "organs": out,
-            "starving": [o["organ"] for o in out if o["starving"]]}
+            "starving": [o["organ"] for o in out if o["starving"]],
+            "unwatched_agents": sorted(roster - watched),
+            "ownership_caveat": _AMBIGUOUS_OWNERSHIP}
 
 
 def format_repair_ledger(days: float = 14.0) -> str:
