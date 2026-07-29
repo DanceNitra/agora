@@ -3435,3 +3435,17 @@ async def write_note(request: Request):
         "tags": body.get("tags", []),
     }, agent_name=agent)
     return result
+
+
+@router.get("/brain/repair-ledger")
+async def brain_repair_ledger(days: float = 14.0):
+    """THE SECOND BOOK — repair output per agent, beside the creation (note-count) view.
+
+    Counting vault notes made four agents read as zero and one as 64%. On this ledger over 60 days
+    Artificer Rooke is the most productive member in the organization (58 repairs, 33 of them
+    decisive) and scored zero on the note count, while the top note-writer has 7. A creation metric
+    applied to repairers reports idleness that is not there.
+    """
+    from agora.execution.repair_ledger import repair_ledger, starvation_report, format_repair_ledger
+    return {"status": "ok", "ledger": repair_ledger(days),
+            "starvation": starvation_report(), "report": format_repair_ledger(days)}
