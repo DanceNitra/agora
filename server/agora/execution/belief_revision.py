@@ -86,6 +86,47 @@ def pick_challenge_target(vault_path: str, recent_blob: str = "") -> dict | None
     return sorted(fresh, key=lambda b: b["last_challenged"])[0]
 
 
+def pick_challenge_targets(vault_path: str, recent_blob: str = "", n: int = 8) -> list[dict]:
+    """The n stalest challengeable beliefs, best first — so a caller whose own gate rejects the top
+    pick can WALK to the next one instead of stopping.
+
+    Returning a single target made the challenge sweep a dead end. Two different relevance filters
+    are in play and they disagree: this module ranks by loose token overlap with the board, while the
+    dungeon applies a hard gate before queueing. When the loose filter proposed a belief the hard gate
+    refused, the sweep returned empty-handed -- and because the refused belief REMAINS the stalest, it
+    was re-proposed and re-refused every cycle. Bounty/Court and the Graveyard both died that way
+    (idle 1005h and 1002h; the Graveyard only fills from a succeeded challenge). Measured 2026-07-29:
+    38 on-mission beliefs were challengeable and 30 had never been challenged, while the sweep sat on
+    a June A/B-testing note the gate would never pass. That is head-of-line blocking, and MAST
+    (NeurIPS 2025) names it FM-1.3 "Step Repetition" -- at 15.7%, the single most common failure mode
+    in multi-agent systems.
+
+    Ordering matches pick_challenge_target so the head of this list IS that function's answer: never-
+    challenged first (oldest note first), then the stalest last_challenged.
+    """
+    alive = [b for b in list_beliefs(vault_path)
+             if b["belief_status"] in ("active", "survived")]
+    if not alive:
+        return []
+    blob = (recent_blob or "").lower()
+
+    def handled(b) -> bool:
+        bn = Path(b["path"]).name.lower()
+        return bool(blob) and (bn in blob or (b.get("title", "")[:40].lower() in blob))
+
+    fresh = [b for b in alive if not handled(b)] or alive
+    prio = _board_tokens()
+    if prio:
+        on = [b for b in fresh if _tokens(b.get("title", "")) & prio]
+        if on:
+            fresh = on
+    never = sorted((b for b in fresh if not b["last_challenged"]),
+                   key=lambda b: Path(b["path"]).stat().st_mtime)
+    rest = sorted((b for b in fresh if b["last_challenged"]),
+                  key=lambda b: b["last_challenged"])
+    return (never + rest)[:max(1, n)]
+
+
 _STOP = {"the", "and", "for", "with", "that", "this", "from", "into", "our", "its", "make",
          "one", "two", "how", "why", "not", "any", "all", "can", "are", "was", "has"}
 

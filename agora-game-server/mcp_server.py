@@ -2627,13 +2627,25 @@ async def _queue_belief_challenge() -> None:
     if await _task_already_pending("Challenge belief:"):
         return
     d = await asyncio.to_thread(_brain_get_sync, "/api/v1/agent-os/brain/belief-challenge-target", 30)
-    t = (d or {}).get("target")
-    if not t:
+    targets = (d or {}).get("targets") or ([(d or {}).get("target")] if (d or {}).get("target") else [])
+    if not targets:
         return
     # BOARD GATE. This path never called it, so it kept queueing off-mission work straight past the
     # hardened filter — 90 minutes after the inbox was cleared it had filed a challenge on a
     # conscientiousness/longevity belief while the board was locked to agent-memory integrity.
-    if not await _gate_filter([t["title"]]):
+    #
+    # WALK the list; do not judge only the head. The brain ranks by loose token overlap with the board
+    # and this gate is hard, so the two disagree — and when they did, taking only the head meant the
+    # sweep returned nothing AND the refused belief stayed the stalest, so it was re-proposed and
+    # re-refused forever. Bounty/Court and the Graveyard both starved to death behind it (1005h/1002h
+    # idle) while 30 never-challenged on-mission beliefs waited. A rejection must advance the cursor.
+    t = None
+    for cand in targets:
+        if cand and await _gate_filter([cand["title"]]):
+            t = cand
+            break
+    if not t:
+        print(f"[Challenge] all {len(targets)} candidates refused by the board gate — nothing queued")
         return
     await asyncio.to_thread(_brain_post_sync, "/api/v1/agent-os/brain/claude-inbox",
                             {"text": f"Challenge belief: {t['title'][:90]} || path: {t['path']}"})

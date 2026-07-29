@@ -1661,11 +1661,14 @@ async def brain_canon():
 async def brain_belief_challenge_target():
     """BELIEF REVISION — the belief that has gone longest untested (the challenge sweep's prey)."""
     from agora.config import settings
-    from agora.execution.belief_revision import pick_challenge_target
+    from agora.execution.belief_revision import pick_challenge_targets
     from agora.execution.claude_inbox import recent_texts
     vault = settings.vault_path or "C:/Users/Danculus/my-second-brain"
-    t = pick_challenge_target(vault, recent_blob=" || ".join(recent_texts()))
-    return {"status": "ok", "target": t}
+    # `targets` is the walkable list; `target` stays as its head so existing callers keep working.
+    # A caller with its own gate MUST walk `targets` -- taking only the head is what wedged the
+    # challenge sweep for 42 days when this module's filter and the dungeon's gate disagreed.
+    ts = pick_challenge_targets(vault, recent_blob=" || ".join(recent_texts()), n=8)
+    return {"status": "ok", "target": (ts[0] if ts else None), "targets": ts}
 
 
 @router.post("/brain/belief-revise")
