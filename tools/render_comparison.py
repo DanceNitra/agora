@@ -40,6 +40,7 @@ def pypi(name: str) -> dict:
 
 def main() -> int:
     echo = load("echo_attack_probe_v2_result.json")
+    live = load("echo_live_xsystem_result.json")
     er = load("erasure_completeness_xsystem_result.json")
     wired = load("erasure_manifest_wired_cell_result.json")
     packs = {n: pypi(n) for n in ("inspeximus", "mem0ai", "graphiti-core")}
@@ -63,6 +64,28 @@ def main() -> int:
                  + f"<td class='num'><b>{sum(vals) / len(vals):.3f}</b></td></tr>")
     heads = "".join(f"<th>{a.replace('paraphrase_', '')}</th>" for a in arms)
     n_arm = echo[arms[0]]["n"]
+
+    live_names = {"inspeximus": "inspeximus (product surface)", "mem0": "mem0 2.0.14",
+                  "graphiti": "Graphiti"}
+    # RANGE AND RUN COUNT, not a single figure. The first version of this page published mem0 at 1.000
+    # from ONE run; repeating the panel put it at 0.875 three times over. A system whose extraction is
+    # LLM-driven does not return the same number twice by default, so one run is a sample and printing it
+    # as a rate is the defect this page was built to avoid, committed on the page itself.
+    live_rows, live_n, live_runs, ins_rate = "", 0, 0, "—"
+    for k, v in live.items():
+        label = live_names.get(k, k)
+        if "stale" in v:
+            live_n = max(live_n, v["n"])
+            live_runs = max(live_runs, v.get("runs", 1))
+            cls = " class='win'" if k == "inspeximus" else ""
+            spread = (f"{v['min']:.3f} – {v['max']:.3f}"
+                      if v.get("min") != v.get("max") else "no variation")
+            live_rows += (f"<tr{cls}><td>{label}</td><td class='num'>{v['stale']:.3f}</td>"
+                          f"<td class='num'>{spread}</td><td class='num'>{v.get('runs', 1)}</td></tr>")
+            if k == "inspeximus":
+                ins_rate = f"{v['stale']:.3f}"
+        else:
+            live_rows += (f"<tr><td>{label}</td><td colspan='3'>NOT RUN — {v['not_run']}</td></tr>")
 
     er_rows = "".join(f"<tr><td>{k}</td><td class='num'>{v['residue']}/{v['n']}</td>"
                       f"<td class='num'>{v['rate']:.2f}</td></tr>" for k, v in er.items())
@@ -126,11 +149,35 @@ def main() -> int:
   the edge with the later validity time wins, and a paraphrased echo IS the newest assertion. inspeximus
   records the superseded <em>object</em> against its (subject, relation) key, so a later assertion of an
   already-retired value is recognised whatever words carry it.</p>
-  <p class="note"><b>Read this honestly.</b> These are faithful re-implementations of each system's
-  documented resolution logic, not the live products — the cell isolates the supersession rule, and every
-  policy is granted oracle value-extraction so it is not measuring extractor quality. The italic row is
-  our own version 0.6.8, which fails a third of the time: this is the same panel we use to attack
-  ourselves, which is why we trust it pointing the other way.</p>
+  <p class="note">The italic row is our own version 0.6.8, which fails a third of the time: this is the
+  same panel we use to attack ourselves, which is why we trust it pointing the other way. The panel
+  measures each system's <em>documented resolution logic</em>, which isolates the supersession rule and
+  grants every policy oracle value-extraction so it is not measuring extractor quality — see the live run
+  below for the same question put to the real software.</p>
+</section>
+
+<section>
+  <h2>1b. The same attack, against the live products</h2>
+  <p>The section above models each system's documented logic. The obvious objection is "that is not our
+  product, that is your model of our product", so here is the same procedure run against the real
+  software: write a fact, correct it, restate the retired value in different words, then ask each system
+  at its own retrieval surface and read <b>rank&nbsp;1</b> — what an agent would actually act on. Each
+  system in its shipped product configuration, {live_n} cases, the whole panel repeated {live_runs} times
+  because LLM-driven fact extraction does not return the same answer twice.</p>
+  <table class="tbl">
+    <thead><tr><th>system</th><th class="num">mean</th><th class="num">range across runs</th><th class="num">runs</th></tr></thead>
+    <tbody>{live_rows}</tbody>
+  </table>
+  <p class="note"><b>mem0 does not overwrite the corrected fact — it keeps both and ranks the stale one
+  first.</b> Searching the corrected fact returns "…is db-old-07" at 0.872 and its own "changed from
+  db-old-07 to db-new-12" at 0.828, so rank 1 is the retired value. <b>Graphiti is reported as NOT RUN</b>,
+  not estimated: it needs a graph database we could not reach, and carrying the modelled number over and
+  relabelling it "live" would be the exact overclaim this run exists to remove.</p>
+  <p class="note"><b>And the configuration matters, so here it is.</b> Measured through the product
+  surface — the MCP server, the CLI, the editor plugin — inspeximus scores {ins_rate}. Constructed as a
+  bare library object before version 1.87.0 it scored <b>1.000</b>, because the echo guard shipped off for
+  byte-identical legacy compatibility. That is not a footnote we polished: it is why the guard is now on by
+  default in the library too. Set <code>echo_guard = False</code> and you get the old number back.</p>
 </section>
 
 <section>
@@ -190,8 +237,8 @@ def main() -> int:
     <li><b>Graphiti on the erasure cells.</b> It needs a graph database we did not stand up for this run,
     so it is absent rather than estimated.</li>
     <li><b>Cost and latency.</b> Not measured at all.</li>
-    <li><b>The live products on the echo panel.</b> Section 1 measures documented resolution logic. A
-    live-integration run is the obvious next step and would be the stronger evidence.</li>
+    <li><b>Graphiti live.</b> Sections 1b and 3 could not reach a graph database, so it is absent from
+    both rather than estimated. Configure one and the harness fills the cell in.</li>
   </ul>
 </section>
 

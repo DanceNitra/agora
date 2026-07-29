@@ -83,11 +83,34 @@
   the edge with the later validity time wins, and a paraphrased echo IS the newest assertion. inspeximus
   records the superseded <em>object</em> against its (subject, relation) key, so a later assertion of an
   already-retired value is recognised whatever words carry it.</p>
-  <p class="note"><b>Read this honestly.</b> These are faithful re-implementations of each system's
-  documented resolution logic, not the live products — the cell isolates the supersession rule, and every
-  policy is granted oracle value-extraction so it is not measuring extractor quality. The italic row is
-  our own version 0.6.8, which fails a third of the time: this is the same panel we use to attack
-  ourselves, which is why we trust it pointing the other way.</p>
+  <p class="note">The italic row is our own version 0.6.8, which fails a third of the time: this is the
+  same panel we use to attack ourselves, which is why we trust it pointing the other way. The panel
+  measures each system's <em>documented resolution logic</em>, which isolates the supersession rule and
+  grants every policy oracle value-extraction so it is not measuring extractor quality — see the live run
+  below for the same question put to the real software.</p>
+</section>
+
+<section>
+  <h2>1b. The same attack, against the live products</h2>
+  <p>The section above models each system's documented logic. The obvious objection is "that is not our
+  product, that is your model of our product", so here is the same procedure run against the real
+  software: write a fact, correct it, restate the retired value in different words, then ask each system
+  at its own retrieval surface and read <b>rank&nbsp;1</b> — what an agent would actually act on. Each
+  system in its shipped product configuration. n=8.</p>
+  <table class="tbl">
+    <thead><tr><th>system</th><th class="num">serves the retired value</th><th class="num">n</th></tr></thead>
+    <tbody><tr class='win'><td>inspeximus (product surface)</td><td class='num'>0.000</td><td class='num'>8</td></tr><tr><td>mem0 2.0.14</td><td class='num'>1.000</td><td class='num'>8</td></tr><tr><td>Graphiti</td><td colspan='2'>NOT RUN — no NEO4J_PASSWORD configured; a graph database is required</td></tr></tbody>
+  </table>
+  <p class="note"><b>mem0 does not overwrite the corrected fact — it keeps both and ranks the stale one
+  first.</b> Searching the corrected fact returns "…is db-old-07" at 0.872 and its own "changed from
+  db-old-07 to db-new-12" at 0.828, so rank 1 is the retired value. <b>Graphiti is reported as NOT RUN</b>,
+  not estimated: it needs a graph database we could not reach, and carrying the modelled number over and
+  relabelling it "live" would be the exact overclaim this run exists to remove.</p>
+  <p class="note"><b>And the configuration matters, so here it is.</b> Measured through the product
+  surface — the MCP server, the CLI, the editor plugin — inspeximus scores 0.000. Constructed as a
+  bare library object before version 1.87.0 it scored <b>1.000</b>, because the echo guard shipped off for
+  byte-identical legacy compatibility. That is not a footnote we polished: it is why the guard is now on by
+  default in the library too. Set <code>echo_guard = False</code> and you get the old number back.</p>
 </section>
 
 <section>
@@ -147,8 +170,8 @@
     <li><b>Graphiti on the erasure cells.</b> It needs a graph database we did not stand up for this run,
     so it is absent rather than estimated.</li>
     <li><b>Cost and latency.</b> Not measured at all.</li>
-    <li><b>The live products on the echo panel.</b> Section 1 measures documented resolution logic. A
-    live-integration run is the obvious next step and would be the stronger evidence.</li>
+    <li><b>Graphiti live.</b> Sections 1b and 3 could not reach a graph database, so it is absent from
+    both rather than estimated. Configure one and the harness fills the cell in.</li>
   </ul>
 </section>
 

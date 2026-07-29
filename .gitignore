@@ -207,3 +207,8 @@ server/.competitor_watch.json
 # derived embedding cache for replication dedup (regenerates on demand)
 server/.replication_vectors.json
 research/probes/_erasure_v2_work/
+_seo_audit_tmp/
+err.log
+err2.log
+*.json.bak
+agora-game-server/_dungeon.err2

@@ -1,13 +1,97 @@
 [
-  {"kind": "research", "title": "Below what extraction accuracy does an LLM-on-the-write-path memory pipeline (mem0-style) AMPLIFY stored errors via self-consistency / majority voting instead of reducing them?", "why": "inspeximus's no-LLM-write moat, measured: self-consistency amplification with the voter = the memory extractor; falsifier: no base-accuracy threshold below which the reconciled store is worse than verbatim capture."},
-  {"kind": "research", "title": "Do retrieval/association cascades in an agent memory store self-organize to criticality with power-law recall-avalanche sizes, and does value-reinforcement on recall push the store toward the critical regime?", "why": "Direct model of inspeximus recall()+reinforcement (the measured reinforcement confound); falsifier: avalanche sizes stay exponential (no SOC) at all reinforcement rates."},
-  {"kind": "research", "title": "At what optimization pressure does tuning an agent-memory system to a single recall benchmark (LOCOMO-style Goodhart proxy) make the proxy diverge from true downstream answer quality?", "why": "The competitor LOCOMO race, measured as goodhart-proxy with proxy = benchmark recall, target = task success; falsifier: proxy and target never decouple under optimization pressure."},
-  {"kind": "research", "title": "Is there an interior optimal retrieval depth k* in memory recall — a basket size beyond which adding retrieved records degrades answers (Goodhart interior optimum in k)?", "why": "Maps inspeximus's k hard-cap + token-pack design to the interior-K basket optimum; falsifier: answer quality is monotone nondecreasing in k."},
-  {"kind": "research", "title": "Does a poisoned or echoed fact in an agent memory lock in via citation-bandwagon dynamics (each recall re-cites it) where independent re-verification would have filtered it out?", "why": "The echo_guard mechanism, measured as citation-bandwagon lock-in; falsifier: recall-frequency coupling does not raise false-fact survival over independent evaluation."},
-  {"kind": "research", "title": "Do sequential agents writing to a shared team memory form information cascades where early wrong writes dominate later correct private signals?", "why": "The shared-team-memory risk model (multi-writer stores): info-cascade with writes as public actions; falsifier: cascade probability does not exceed the independent-write error rate."},
-  {"kind": "research", "title": "Does a degrading agent memory store under rising conflict/supersession load show critical slowing down — rising autocorrelation and variance of recall rank — as an early warning before retrieval quality collapses?", "why": "An early-warning signal for memory-integrity failure: csd-earlywarning on store-health time series; falsifier: no EWS trend precedes the collapse point."},
-  {"kind": "research", "title": "How much does embedding measurement error attenuate the observed correlation between memory-similarity rank and true relevance, and does correcting for attenuation change which recall recipe wins?", "why": "Our centering-vs-raw-cosine recall question as measurement-error attenuation; falsifier: disattenuated rankings preserve the same winner as raw rankings."},
-  {"kind": "research", "title": "Do agent-memory benchmark leaderboards overstate the leader via winner's curse and selection effects, and by how much does the leader's expected true score shrink on re-measurement?", "why": "Competitor-audit follow-up (the inflated LOCOMO race), measured via winner's-curse + selection-FDR on leaderboard entries; falsifier: leader scores replicate within CI on fresh runs."},
-  {"kind": "research", "title": "When an agent's task loop is tightly coupled to its memory layer, does memory corruption cause a first-order interdependent-cascade collapse of task success rather than graceful degradation?", "why": "The cost-of-integrity-failure claim: interdependent-cascade cliff with layers = (memory, task); falsifier: task success degrades smoothly with corruption fraction at realistic coupling."},
-  {"kind": "research", "title": "How should a memory system's write-acceptance conservatism scale with meta-uncertainty about a source's own validity (trust seeds, provenance), and where does a trusted-only fail-closed policy sit vs the optimum?", "why": "The 1.19.0 trusted_only fail-closed decision, measured via meta-uncertainty conservatism with sources = memory writers; falsifier: optimal conservatism is flat in source-validity uncertainty."}
+ {
+  "kind": "research",
+  "title": "Below what extraction accuracy does an LLM-on-the-write-path memory pipeline (mem0-style) AMPLIFY stored errors via self-consistency / majority voting instead of reducing them?",
+  "why": "inspeximus's no-LLM-write moat, measured: self-consistency amplification with the voter = the memory extractor; falsifier: no base-accuracy threshold below which the reconciled store is worse than verbatim capture."
+ },
+ {
+  "kind": "research",
+  "title": "Do retrieval/association cascades in an agent memory store self-organize to criticality with power-law recall-avalanche sizes, and does value-reinforcement on recall push the store toward the critical regime?",
+  "why": "Direct model of inspeximus recall()+reinforcement (the measured reinforcement confound); falsifier: avalanche sizes stay exponential (no SOC) at all reinforcement rates."
+ },
+ {
+  "kind": "research",
+  "title": "At what optimization pressure does tuning an agent-memory system to a single recall benchmark (LOCOMO-style Goodhart proxy) make the proxy diverge from true downstream answer quality?",
+  "why": "The competitor LOCOMO race, measured as goodhart-proxy with proxy = benchmark recall, target = task success; falsifier: proxy and target never decouple under optimization pressure."
+ },
+ {
+  "kind": "research",
+  "title": "Is there an interior optimal retrieval depth k* in memory recall — a basket size beyond which adding retrieved records degrades answers (Goodhart interior optimum in k)?",
+  "why": "Maps inspeximus's k hard-cap + token-pack design to the interior-K basket optimum; falsifier: answer quality is monotone nondecreasing in k."
+ },
+ {
+  "kind": "research",
+  "title": "Does a poisoned or echoed fact in an agent memory lock in via citation-bandwagon dynamics (each recall re-cites it) where independent re-verification would have filtered it out?",
+  "why": "The echo_guard mechanism, measured as citation-bandwagon lock-in; falsifier: recall-frequency coupling does not raise false-fact survival over independent evaluation."
+ },
+ {
+  "kind": "research",
+  "title": "Do sequential agents writing to a shared team memory form information cascades where early wrong writes dominate later correct private signals?",
+  "why": "The shared-team-memory risk model (multi-writer stores): info-cascade with writes as public actions; falsifier: cascade probability does not exceed the independent-write error rate."
+ },
+ {
+  "kind": "research",
+  "title": "Does a degrading agent memory store under rising conflict/supersession load show critical slowing down — rising autocorrelation and variance of recall rank — as an early warning before retrieval quality collapses?",
+  "why": "An early-warning signal for memory-integrity failure: csd-earlywarning on store-health time series; falsifier: no EWS trend precedes the collapse point."
+ },
+ {
+  "kind": "research",
+  "title": "How much does embedding measurement error attenuate the observed correlation between memory-similarity rank and true relevance, and does correcting for attenuation change which recall recipe wins?",
+  "why": "Our centering-vs-raw-cosine recall question as measurement-error attenuation; falsifier: disattenuated rankings preserve the same winner as raw rankings."
+ },
+ {
+  "kind": "research",
+  "title": "Do agent-memory benchmark leaderboards overstate the leader via winner's curse and selection effects, and by how much does the leader's expected true score shrink on re-measurement?",
+  "why": "Competitor-audit follow-up (the inflated LOCOMO race), measured via winner's-curse + selection-FDR on leaderboard entries; falsifier: leader scores replicate within CI on fresh runs."
+ },
+ {
+  "kind": "research",
+  "title": "When an agent's task loop is tightly coupled to its memory layer, does memory corruption cause a first-order interdependent-cascade collapse of task success rather than graceful degradation?",
+  "why": "The cost-of-integrity-failure claim: interdependent-cascade cliff with layers = (memory, task); falsifier: task success degrades smoothly with corruption fraction at realistic coupling."
+ },
+ {
+  "kind": "research",
+  "title": "How should a memory system's write-acceptance conservatism scale with meta-uncertainty about a source's own validity (trust seeds, provenance), and where does a trusted-only fail-closed policy sit vs the optimum?",
+  "why": "The 1.19.0 trusted_only fail-closed decision, measured via meta-uncertainty conservatism with sources = memory writers; falsifier: optimal conservatism is flat in source-validity uncertainty."
+ },
+ {
+  "kind": "research",
+  "title": "At what query-repeat rate does recall value-reinforcement start paying for itself — is there a crossover between the accuracy it buys on repeated questions and the answer instability it causes on everything else?",
+  "why": "Measured on MemoryAgentBench (their facts/questions): reinforce=True costs -0.0264 top-1 MRR [-0.0362, -0.0177] over 480 paired questions AND makes 69.4% of answers change with query order, while reinforce=False diverges by exactly 0.0000. A one-shot workload cannot reward reinforcement, so the trade curve vs repeat rate is unmeasured. Falsifier: no repeat rate at which reinforcement's accuracy gain exceeds its divergence cost — i.e. the default is simply worse everywhere."
+ },
+ {
+  "kind": "research",
+  "title": "Is there a store size above which reading-as-writing stops mattering — does order-dependence of recall decay with corpus size, and does it reach zero?",
+  "why": "Measured: divergence under the shipped default falls 0.929 -> 0.721 -> 0.533 -> 0.346 as the store grows 455 -> 2,310 -> 4,580 -> 18,332 facts. A value bump is a fixed perturbation against a growing field of candidates. Buyer-facing: it says which deployments the determinism claim actually holds for. Falsifier: divergence is flat in store size, so the decay is an artifact of the four corpora rather than a law."
+ },
+ {
+  "kind": "research",
+  "title": "Can a value-update rule be made ORDER-INVARIANT without losing what reinforcement buys — does a commutative or idempotent aggregation (max, log-count, decayed set union) preserve the ranking benefit while making replay reproducible?",
+  "why": "This is the constructive half of the order-dependence finding and it is a product feature if it works: value is a MULTIPLIER in ranking, so any non-commutative update makes the answer depend on question order. Directly serves the determinism moat. Falsifier: every order-invariant rule that preserves the accuracy benefit is itself order-dependent under some access pattern, or the benefit vanishes with commutativity."
+ },
+ {
+  "kind": "research",
+  "title": "What does the semantic_threshold=300 cliff cost at the boundary — how much recall quality is lost by a store of 299 records running lexical-only versus the same content at 301 running the hybrid?",
+  "why": "recall(mode='auto') uses LEXICAL token overlap below semantic_threshold and only fuses the semantic channel above it, so every embedding feature we ship is inert for stores under 300 records — which is most agents on day one. Nobody has measured the discontinuity. Falsifier: recall quality is continuous across the boundary, i.e. the threshold costs nothing and the lexical channel is sufficient at that scale."
+ },
+ {
+  "kind": "research",
+  "title": "Does value-reinforcement leak across a supersession boundary — can a retired value accumulate enough value from being recalled while current to outrank its own replacement after it is superseded?",
+  "why": "Straight at the moat: 'a corrected fact stays corrected'. Reinforcement writes value on every read, supersession changes status but not accumulated value, and ranking multiplies by value. If a long-lived popular fact is corrected, the replacement starts cold. Falsifier: the status filter removes retired records before ranking in every path, so accumulated value can never surface them."
+ },
+ {
+  "kind": "research",
+  "title": "Do mem0, Zep and Cognee also mutate ranking state on read — is recall reproducible under query reordering in the competitor stores, or is order-dependence an industry-wide unmeasured property?",
+  "why": "Our determinism claim needs a comparative number, and the honest answer may go either way: if they are order-stable and we are not, that is a gap against US and we must fix it before we sell determinism. Same protocol as our own measurement (same store, same queries, shuffled order, divergence of top-k). Falsifier: every competitor is exactly reproducible, making this a defect of ours rather than an axis."
+ },
+ {
+  "kind": "research",
+  "title": "Where does iterative retrieval actually pay on multi-hop memory questions — is the gain concentrated in questions whose first hop is retrievable, and is there a detectable signal for when a second hop is worth its cost?",
+  "why": "Measured on MemoryAgentBench: recall@10 reaches 1.000 on half the rows while MRR sits at 0.435, so the evidence is present but ranked badly — a reranking/iteration problem, not a coverage one. Falsifier: the second hop's benefit is independent of first-hop success, so no cheap gate can decide when to spend it."
+ },
+ {
+  "kind": "research",
+  "title": "Is retrieval-order sensitivity a usable POISONING channel — can an attacker who only controls the ORDER of benign queries (never the content) steer which fact a later honest query returns?",
+  "why": "Follows directly from reading being a write: if 69.4% of answers change with query order, an adversary who can influence query sequencing has an attack surface that requires no write access at all, which no memory-poisoning threat model we have seen covers (OWASP ASI06 assumes injected CONTENT). Falsifier: order effects are not steerable toward a chosen target — divergence is symmetric noise rather than a controllable direction."
+ }
 ]
