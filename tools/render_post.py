@@ -409,9 +409,16 @@ def _emit_html(m: dict, body_en, foot_en, body_sk, foot_sk, read: int, bilingual
          "url": f"{SITE}/posts/{m['slug']}.html"},
         {"@context": "https://schema.org", "@type": "Organization", "name": "Agora",
          "url": "https://dancenitra.github.io/agora/",
+         # PARITY: the deployed pages carry all eight. The renderer emitted three, so re-running it
+         # silently stripped the inspeximus / PyPI / Zenodo-DOI entity links from every post.
          "sameAs": ["https://github.com/DanceNitra/agora",
                     "https://huggingface.co/Danchi17",
-                    "https://github.com/DanceNitra/ramr"]},
+                    "https://github.com/DanceNitra/ramr",
+                    "https://github.com/DanceNitra/inspeximus",
+                    "https://pypi.org/project/inspeximus/",
+                    "https://dancenitra.github.io/inspeximus/",
+                    "https://dancenitra.github.io/",
+                    "https://doi.org/10.5281/zenodo.21648053"]},
     ]
     if m.get("faq"):
         _graph.append({"@context": "https://schema.org", "@type": "FAQPage",
@@ -503,10 +510,10 @@ TEMPLATE = """<!DOCTYPE html>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;0,6..72,600;1,6..72,400;1,6..72,500&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
-<style>
+<style>@font-face{{font-family:"Newsreader-fallback";src:local("Georgia"),local("Times New Roman");size-adjust:95.18%;ascent-override:77.22%;descent-override:27.84%;line-gap-override:0%}}
   :root{{--paper:#fbf9f4;--paper2:#f4f1ea;--ink:#1b1a17;--soft:#54514a;--faint:#8c887e;
     --line:#e6e1d6;--acc:#0a8f68;--acc-soft:#e3f4ed;--hl:#fff4cc;
-    --serif:"Newsreader",Georgia,"Times New Roman",serif;--mono:"JetBrains Mono",ui-monospace,Menlo,Consolas,monospace;}}
+    --serif:"Newsreader","Newsreader-fallback",Georgia,"Times New Roman",serif;--mono:"JetBrains Mono",ui-monospace,Menlo,Consolas,monospace;}}
   *{{box-sizing:border-box;margin:0}} html{{scroll-behavior:smooth}}
   body{{background:var(--paper);color:var(--ink);font-family:var(--serif);font-size:21px;line-height:1.75;
     -webkit-font-smoothing:antialiased;font-optical-sizing:auto;text-rendering:optimizeLegibility}}
@@ -619,10 +626,10 @@ INDEX_TEMPLATE = """<!DOCTYPE html>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;0,6..72,600;1,6..72,400;1,6..72,500&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
-<style>
+<style>@font-face{{font-family:"Newsreader-fallback";src:local("Georgia"),local("Times New Roman");size-adjust:95.18%;ascent-override:77.22%;descent-override:27.84%;line-gap-override:0%}}
   :root{{--paper:#fbf9f4;--paper2:#f4f1ea;--ink:#1b1a17;--soft:#54514a;--faint:#8c887e;
     --line:#e6e1d6;--acc:#0a8f68;--acc-soft:#e3f4ed;--hl:#fff4cc;
-    --serif:"Newsreader",Georgia,"Times New Roman",serif;--mono:"JetBrains Mono",ui-monospace,Menlo,Consolas,monospace;}}
+    --serif:"Newsreader","Newsreader-fallback",Georgia,"Times New Roman",serif;--mono:"JetBrains Mono",ui-monospace,Menlo,Consolas,monospace;}}
   *{{box-sizing:border-box;margin:0}} html{{scroll-behavior:smooth}}
   body{{background:var(--paper);color:var(--ink);font-family:var(--serif);
     -webkit-font-smoothing:antialiased;font-optical-sizing:auto;text-rendering:optimizeLegibility}}

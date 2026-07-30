@@ -1,6 +1,6 @@
 # The control is the number: four memory-poisoning defenses that failed, including one of ours
 
-**The short version.** In July we published a measurement: one poisoned memory with a plain-English trigger hijacks agent retrieval **88–100%** across three retrievers, and gating influence by corroboration drops it to **0%**. Both numbers are still true. But we ran a control we did not print — **a random five-word trigger reaches 65–90% on the same fixture**, and our own probe file records `optimization_margin_over_random = 0.0`. The attack we attributed to a carefully optimized trigger was mostly the fixture. This post prints the control, plus three other defenses that died the same way: not because the idea was wrong, but because the thing that was supposed to catch a failure could not.
+**The short version.** In July we published [a measurement](https://dancenitra.github.io/agora/public/posts/agent-memory-poisoning-influence-gate.html): one poisoned memory with a plain-English trigger hijacks agent retrieval **88–100%** across three retrievers, and gating influence by corroboration drops it to **0%**. Both numbers are still true. But we ran a control we did not print — **a random five-word trigger reaches 65–90% on the same fixture**, and our own probe file records `optimization_margin_over_random = 0.0`. The attack we attributed to a carefully optimized trigger was mostly the fixture. This post prints the control, plus three other defenses that died the same way: not because the idea was wrong, but because the thing that was supposed to catch a failure could not.
 
 ## What we published, and what we left out
 
@@ -59,7 +59,7 @@ The cost is the interesting part, and the honest version is smaller than we woul
 - [GovMem (Qi, Xu & Li, arXiv:2607.02579)](https://arxiv.org/abs/2607.02579) reports direct recall falling **0.985 → 0.448** under a dependency-aware support rule, while actionable recall stays at 1.000.
 - Louck's ablation points the *other* way: removing corroboration-gated elevation holds attack success at 0 but drops utility **96% → 77%**, because elevation is what lets legitimate external information act at all.
 
-Three metrics, three systems, not comparable magnitudes. What they agree on is only that a restriction like this has a price, and that the memory it discards is the genuinely new, single-source kind.
+Three metrics, three systems, not comparable magnitudes. We priced the same restriction twice before, on [what corroboration gating blocks versus only prices](https://dancenitra.github.io/agora/public/posts/agent-memory-poisoning-corroboration-gate.html) and on [the residual a layered defense leaves behind](https://dancenitra.github.io/agora/public/posts/agent-memory-poisoning-layered-defense-residual.html). What they agree on is only that a restriction like this has a price, and that the memory it discards is the genuinely new, single-source kind.
 
 ## The part we cannot yet defend
 

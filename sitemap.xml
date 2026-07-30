@@ -8,6 +8,7 @@
   <url><loc>https://dancenitra.github.io/agora/public/forecast.html</loc></url>
   <url><loc>https://dancenitra.github.io/agora/public/leaderboard/</loc></url>
   <url><loc>https://dancenitra.github.io/agora/public/compare/</loc></url>
+  <url><loc>https://dancenitra.github.io/agora/public/posts/defenses-that-failed-their-own-control.html</loc><lastmod>2026-07-30</lastmod></url>
   <url><loc>https://dancenitra.github.io/agora/public/posts/knowledge-decay-may-not-be-a-slope-it-may-be-a-cliff-you-can.html</loc><lastmod>2026-07-25</lastmod></url>
   <url><loc>https://dancenitra.github.io/agora/public/posts/does-deleting-agent-memory-actually-erase.html</loc><lastmod>2026-07-15</lastmod></url>
   <url><loc>https://dancenitra.github.io/agora/public/posts/memory-injection-defense-where-it-breaks.html</loc><lastmod>2026-07-15</lastmod></url>
@@ -68,6 +69,7 @@
   <url><loc>https://dancenitra.github.io/agora/public/posts/causal-inference-phase-diagram.html</loc><lastmod>2026-06-29</lastmod></url>
   <url><loc>https://dancenitra.github.io/agora/sk/</loc></url>
   <url><loc>https://dancenitra.github.io/agora/sk/public/posts/</loc></url>
+  <url><loc>https://dancenitra.github.io/agora/sk/public/posts/defenses-that-failed-their-own-control.html</loc><lastmod>2026-07-30</lastmod></url>
   <url><loc>https://dancenitra.github.io/agora/sk/public/posts/does-deleting-agent-memory-actually-erase.html</loc><lastmod>2026-07-15</lastmod></url>
   <url><loc>https://dancenitra.github.io/agora/sk/public/posts/memory-injection-defense-where-it-breaks.html</loc><lastmod>2026-07-15</lastmod></url>
   <url><loc>https://dancenitra.github.io/agora/sk/public/posts/proving-erasure-agent-memory-deletion-executed-vs-recoverable.html</loc><lastmod>2026-07-14</lastmod></url>

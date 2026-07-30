@@ -1,6 +1,6 @@
 # Kontrola je to číslo: štyri obrany proti otrave pamäte, ktoré zlyhali — vrátane našej
 
-**V skratke.** V júli sme publikovali meranie: jedna otrávená spomienka s bežne znejúcim spúšťačom unesie vyhľadávanie agenta na **88 – 100 %** naprieč tromi retrievermi, a bránenie vplyvu cez korobáciu to zrazí na **0 %**. Obe čísla stále platia. Lenže sme spustili kontrolu, ktorú sme nevytlačili — **náhodný päťslovný spúšťač dosiahne na tom istom fixture 65 – 90 %**, a náš vlastný súbor s výsledkami má zapísané `optimization_margin_over_random = 0.0`. Útok, ktorý sme pripísali starostlivo optimalizovanému spúšťaču, bol z veľkej časti vlastnosť fixture. Tento text tú kontrolu vytláča — spolu s tromi ďalšími obranami, ktoré zomreli rovnako: nie preto, že by bol nápad zlý, ale preto, že to, čo malo zachytiť zlyhanie, ho zachytiť nevedelo.
+**V skratke.** V júli sme publikovali [meranie](https://dancenitra.github.io/agora/sk/public/posts/agent-memory-poisoning-influence-gate.html): jedna otrávená spomienka s bežne znejúcim spúšťačom unesie vyhľadávanie agenta na **88 – 100 %** naprieč tromi retrievermi, a bránenie vplyvu cez korobáciu to zrazí na **0 %**. Obe čísla stále platia. Lenže sme spustili kontrolu, ktorú sme nevytlačili — **náhodný päťslovný spúšťač dosiahne na tom istom fixture 65 – 90 %**, a náš vlastný súbor s výsledkami má zapísané `optimization_margin_over_random = 0.0`. Útok, ktorý sme pripísali starostlivo optimalizovanému spúšťaču, bol z veľkej časti vlastnosť fixture. Tento text tú kontrolu vytláča — spolu s tromi ďalšími obranami, ktoré zomreli rovnako: nie preto, že by bol nápad zlý, ale preto, že to, čo malo zachytiť zlyhanie, ho zachytiť nevedelo.
 
 ## Čo sme publikovali a čo sme vynechali
 
@@ -59,7 +59,7 @@ Zaujímavá je cena a poctivá verzia je menšia, než by sme si priali:
 - [GovMem (Qi, Xu a Li, arXiv:2607.02579)](https://arxiv.org/abs/2607.02579) uvádza pokles priameho recallu **0,985 → 0,448** pri pravidle závislostnej podpory, pričom akcieschopný recall zostáva na 1,000.
 - Louckova ablácia ukazuje *opačným* smerom: odstránenie korobáciou bránenej elevácie drží úspešnosť útoku na 0, ale zráža úžitkovosť **96 % → 77 %**, lebo práve elevácia je to, čo legitímnej externej informácii vôbec dovolí konať.
 
-Tri metriky, tri systémy, neporovnateľné veľkosti. Zhodujú sa len na tom, že takéto obmedzenie má cenu — a že spomienka, ktorú zahodí, je práve tá naozaj nová a jednozdrojová.
+Tri metriky, tri systémy, neporovnateľné veľkosti. To isté obmedzenie sme ocenili už dvakrát predtým — [čo koroboračná brána blokuje a čo len spoplatňuje](https://dancenitra.github.io/agora/sk/public/posts/agent-memory-poisoning-corroboration-gate.html) a [aký zvyšok necháva vrstvená obrana](https://dancenitra.github.io/agora/sk/public/posts/agent-memory-poisoning-layered-defense-residual.html). Zhodujú sa len na tom, že takéto obmedzenie má cenu — a že spomienka, ktorú zahodí, je práve tá naozaj nová a jednozdrojová.
 
 ## Časť, ktorú zatiaľ neobhájime
 
