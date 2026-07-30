@@ -14,7 +14,14 @@ ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SRC = os.path.join(ROOT, "agora_output", "inspeximus_dist")
 SANDBOX = "--sandbox" in sys.argv
 BASE = "https://sandbox.zenodo.org" if SANDBOX else "https://zenodo.org"
-FILES = ["inspeximus.py", "mcp.py", "deletion_manifest.py", "erasure_auditor.py", "README.md", "CITATION.cff", "LICENSE"]
+# ARCHIVE THE CANONICAL REPO, not a staging folder. The old list named files in
+# agora_output/inspeximus_dist, which held the library at version 1.1.0 while PyPI served 1.88.1 -- so a
+# run would have minted a citable DOI for a two-month-old snapshot. Same defect the Hugging Face
+# publisher had. `git archive HEAD` also guarantees only tracked, guard-cleared files ship.
+CANON = os.environ.get("INSPEXIMUS_REPO", os.path.join(os.path.dirname(ROOT), "inspeximus-repo"))
+ARCHIVE = "inspeximus-source.zip"
+# The concept DOI this software versions under. Everything published here must land on ONE lineage.
+CONCEPT_RECID = int(os.environ.get("ZENODO_CONCEPT_RECID", "21708778"))
 
 
 def _token():
@@ -55,9 +62,18 @@ def _existing_inspeximus(tok):
     st, deps = _req("GET", BASE + "/api/deposit/depositions?size=100&sort=mostrecent", tok)
     if not isinstance(deps, list):
         return None
-    hits = [d for d in deps if "inspeximus" in ((d.get("title") or "") +
-            ((d.get("metadata") or {}).get("title") or "")).lower() and d.get("submitted")]
-    return hits[0] if hits else None
+    # PIN THE CONCEPT DOI. This used to match the word "inspeximus" in the deposition title -- and the
+    # prior record is titled "mnemo: ...", from before the rename. So it found nothing, minted a SECOND
+    # concept DOI (10.5281/zenodo.21708778) beside the original (10.5281/zenodo.21128549), and split the
+    # citation record for one piece of software. A title substring is not an identity; the concept
+    # recid is.
+    want = str(CONCEPT_RECID)
+    hits = [d for d in deps if d.get("submitted") and (
+        str(d.get("conceptrecid") or "") == want or str(d.get("id") or "") == want)]
+    if not hits:
+        sys.exit("no deposition under concept recid %s -- refusing to mint a THIRD concept DOI. "
+                 "Set CONCEPT_RECID or pass --new deliberately." % want)
+    return hits[0]
 
 
 def main():
@@ -85,11 +101,20 @@ def main():
         bucket = dep["links"]["bucket"]
         print("created NEW deposition (no prior record):", dep_id)
 
-    for fn in FILES:
-        path = os.path.join(SRC, fn)
+    import subprocess, tempfile
+    zpath = os.path.join(tempfile.mkdtemp(), ARCHIVE)
+    r = subprocess.run(["git", "-C", CANON, "archive", "--format=zip", "-o", zpath, "HEAD"],
+                       capture_output=True, text=True)
+    if r.returncode != 0 or not os.path.exists(zpath):
+        sys.exit("git archive failed: " + (r.stderr or "")[:200])
+    with open(zpath, 'rb') as f:
+        _req("PUT", "%s/%s" % (bucket, ARCHIVE), tok, data=f.read(), ctype="application/octet-stream")
+    print("  uploaded:", ARCHIVE, "(%.1f KB)" % (os.path.getsize(zpath) / 1024))
+    for fn in ("README.md", "CITATION.cff", "LICENSE"):
+        path = os.path.join(CANON, fn)
         if not os.path.exists(path):
             print("  SKIP (missing):", fn); continue
-        with open(path, "rb") as f:
+        with open(path, 'rb') as f:
             _req("PUT", "%s/%s" % (bucket, fn), tok, data=f.read(), ctype="application/octet-stream")
         print("  uploaded:", fn)
 

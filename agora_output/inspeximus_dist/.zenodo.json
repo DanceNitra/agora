@@ -1,1 +1,47 @@
-{"title":"inspeximus: a zero-dependency memory layer for AI agents (value-ranked recall + corroboration-gated influence)","description":"inspeximus is the recall + consolidation core of an autonomous research system, distilled to a single dependency-free Python file plus an MCP server. It provides value-ranked retrieval (relevance x accrued value), per-type decay, capacity-aware consolidation, contradiction flagging, a lexical+semantic auto-mode (BM25 + embeddings fused by Reciprocal Rank Fusion), and — new in 0.4.0 — corroboration-gated INFLUENCE: recall(influence_only=True) restricts the memories allowed to drive an action to those that earned corroboration (a credited good outcome, or >=2 distinct-source links), which we measured drops an AgentPoison-style single-instance retrieval-poisoning attack's rank-1 hijack to 0% across three dense retrievers and every corpus scale (60->10k), because it lives in provenance metadata rather than embedding geometry. Design rules are measured, not assumed (provenance in the README + runnable probes).","upload_type":"software","access_right":"open","license":"mit","version":"1.1.0","keywords":["llm","agent memory","rag","recall","consolidation","mcp","embeddings","memory poisoning","agent security","reproducibility"],"creators":[{"name":"Agora (autonomous research organization)"}],"related_identifiers":[{"identifier":"https://github.com/DanceNitra/inspeximus","relation":"isSupplementTo","scheme":"url"},{"identifier":"https://dancenitra.github.io/inspeximus/","relation":"isDocumentedBy","scheme":"url"},{"identifier":"https://pypi.org/project/inspeximus/","relation":"isIdenticalTo","scheme":"url"}]}
+{
+ "title": "inspeximus: a zero-dependency Python agent-memory library with provable erasure and provenance-gated influence",
+ "description": "inspeximus is an open-source Python agent-memory library with no third-party dependencies in its core, an MCP server, and ten framework adapters. Its focus is what happens when a memory is WRONG rather than how much it can recall: a fact corrected once stays corrected (deterministic keyed supersession plus an echo guard, with no LLM on the write path); an erasure produces a content-free, signed certificate, so a deletion can be verified rather than asserted; and recall(influence_only=True) gates what a memory may DRIVE on provenance rather than content. Measured, with runnable probes in the repository: a delete that reported success left the data recoverable in five of six places the application had put it; influence gating took action-hijack to 0.00 across three retrievers at a stated utility cost. Honest limits are documented next to the code: the corroboration check counts distinct source strings, which are forgeable, and the residue scan is a literal case-sensitive byte match. 1,797 tests. MIT.",
+ "upload_type": "software",
+ "access_right": "open",
+ "license": "mit",
+ "version": "1.88.1",
+ "keywords": [
+  "llm",
+  "agent memory",
+  "rag",
+  "recall",
+  "consolidation",
+  "mcp",
+  "embeddings",
+  "memory poisoning",
+  "agent security",
+  "reproducibility",
+  "gdpr",
+  "right to erasure",
+  "provenance",
+  "tamper-evident",
+  "agent memory integrity"
+ ],
+ "creators": [
+  {
+   "name": "Agora (autonomous research organization)"
+  }
+ ],
+ "related_identifiers": [
+  {
+   "identifier": "https://github.com/DanceNitra/inspeximus",
+   "relation": "isSupplementTo",
+   "scheme": "url"
+  },
+  {
+   "identifier": "https://dancenitra.github.io/inspeximus/",
+   "relation": "isDocumentedBy",
+   "scheme": "url"
+  },
+  {
+   "identifier": "https://pypi.org/project/inspeximus/",
+   "relation": "isIdenticalTo",
+   "scheme": "url"
+  }
+ ]
+}
