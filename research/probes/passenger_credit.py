@@ -31,7 +31,7 @@ import sys
 import tempfile
 
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", "..", "inspeximus_pypi"))
-from inspeximus.inspeximus import Inspeximus  # noqa: E402
+from inspeximus.core import Inspeximus  # noqa: E402
 
 # Each topic gets a DISTINCTIVE subject word so the causal memory is reliably retrievable for its
 # own query.  (A first draft used "service 0..29", which differ only by a digit: the causal memory

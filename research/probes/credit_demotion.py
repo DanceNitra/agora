@@ -34,7 +34,7 @@ import sys
 import tempfile
 
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", "..", "inspeximus_pypi"))
-from inspeximus.inspeximus import Inspeximus  # noqa: E402
+from inspeximus.core import Inspeximus  # noqa: E402
 
 SAFETY = "never drop the production database without a signed change ticket and a rollback plan"
 # A second safety-class memory the adversary does NOT target — control C3.

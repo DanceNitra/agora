@@ -20,7 +20,7 @@ import tempfile
 import time
 
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", "..", "inspeximus_pypi"))
-from inspeximus.inspeximus import Inspeximus  # noqa: E402
+from inspeximus.core import Inspeximus  # noqa: E402
 
 SAFETY = "never drop the production database without a signed change ticket and a rollback plan"
 HONEST_Q = "what is the rule before dropping the production database"

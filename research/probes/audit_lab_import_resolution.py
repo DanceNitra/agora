@@ -63,14 +63,33 @@ def resolve(paths):
     return None
 
 
+# A LIBRARY MODULE beside the package __init__ is what makes a directory a real second copy.
+# Canonical ships the core as core.py; the pre-1.53 layout called it inspeximus.py.
+_LIB_MODULES = ("core.py", "inspeximus.py")
+
+
 def flavour(path: str) -> str:
+    """Classify what a script's imports actually resolve to.
+
+    DETECT BY CONTENT, NOT BY PATH. This used to return "STALE COPY (1.20.0)" for anything under
+    inspeximus_pypi/, which was right while that directory held a forked library. On 2026-07-29 the
+    fork was deleted and its __init__.py became a shim that rebinds __path__ to the canonical
+    checkout, so resolving there is now CORRECT — and a path-based verdict reported 13 false alarms
+    in a row. A probe that cries wolf gets ignored, which would cost us the real signal.
+    So the test is now: is there a library module sitting next to the __init__? That is what a
+    divergent copy looks like, and it is what must fail if one ever reappears.
+    """
     if path is None:
         return "NOT FOUND"
     low = path.replace("\\", "/").lower()
-    if "inspeximus_pypi" in low:
-        return "STALE COPY (1.20.0)"
     if "inspeximus-repo" in low:
         return "LIVE REPO"
+    if "inspeximus_pypi" in low:
+        pkg_dir = os.path.dirname(path)
+        present = [m for m in _LIB_MODULES if os.path.exists(os.path.join(pkg_dir, m))]
+        if present:
+            return f"STALE COPY (divergent library: {', '.join(present)})"
+        return "FORWARDING SHIM -> canonical"
     if "/agora/inspeximus/" in low:
         return "in-agora inspeximus/"
     return path
@@ -89,14 +108,22 @@ for f in uses_copy:
     fl = flavour(got)
     counts[fl] = counts.get(fl, 0) + 1
     print(f"   {f:44s} -> {fl}")
-    if fl == "STALE COPY (1.20.0)":
+    if fl.startswith("STALE COPY"):
         print(f"        {got}")
 
 print("\nsummary:", counts)
-print("\n-> a script resolving to the STALE COPY measured code that predates two erasure fixes and")
-print("   carries a data-loss defect the live library does not. Its numbers describe 1.20.0.")
-print("   A script resolving elsewhere merely carries a dead sys.path entry -- harmless, but it is")
-print("   also what makes the harmful case invisible: the line looks the same in both.")
+_stale = sum(v for k, v in counts.items() if k.startswith("STALE COPY"))
+if _stale:
+    print(f"\n-> FAIL: {_stale} script(s) resolve to a DIVERGENT SECOND COPY of the library. Their")
+    print("   numbers describe that copy, not the product. The copy this replaced predated two erasure")
+    print("   fixes and over-erased on forget_subject (3 of 3 records instead of 1), so a script")
+    print("   resolving there published a measurement of a data-loss bug. Delete the copy and let")
+    print("   inspeximus_pypi/inspeximus/__init__.py forward to the canonical checkout.")
+else:
+    print("\n-> OK: no divergent second copy. inspeximus_pypi/ forwards to the canonical checkout, so a")
+    print("   script with that sys.path entry measures the SHIPPED library. This check stays because the")
+    print("   copy is what silently reappears -- it fails again the moment a library module lands beside")
+    print("   that shim.")
 
 print("\n=== the three behaviours behind one import name (re-measured, not recalled) ===")
 import tempfile
