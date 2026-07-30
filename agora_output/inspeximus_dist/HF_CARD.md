@@ -8,46 +8,50 @@ tags:
   - mcp
   - memory-poisoning
   - agent-security
+  - gdpr
+  - erasure
 ---
 
-# inspeximus — a zero-dependency memory layer for AI agents
+# inspeximus — a zero-dependency Python agent-memory library
 
-`pip install inspeximus` · [PyPI](https://pypi.org/project/inspeximus/) · [GitHub](https://github.com/DanceNitra/inspeximus) · MIT
+**Correct a fact once and it stays corrected. Delete it, and get a signed certificate that it is gone.**
 
-inspeximus is the recall + consolidation core of an autonomous research system, distilled to a **single
-dependency-free Python file** plus an MCP server so any Claude / Cursor / agent can use it as memory.
-Its design rules are **measured, not assumed** (provenance + runnable probes in the repo).
+`pip install inspeximus` · [PyPI](https://pypi.org/project/inspeximus/) · [GitHub](https://github.com/DanceNitra/inspeximus) · MIT · v1.88.1
 
-- **Value-ranked recall** — top-k by relevance × accrued value, not cosine alone.
-- **Per-type decay + capacity-aware consolidation** — the "dream" pass links near-duplicates and marks
-  stale/superseded, never rewriting the raw note.
-- **Lexical + semantic auto-mode** — BM25 + embeddings fused by Reciprocal Rank Fusion.
-- **Contradiction flagging** — mutually-incompatible memories surface for review, never auto-deleted.
-- **Corroboration-gated influence (0.4.0)** — `recall(influence_only=True)` restricts the memories
-  allowed to *drive an action* to those that earned corroboration (a credited good outcome, or ≥2
-  distinct-source links).
+A delete that returns success is not a delete. We measured one that reported success and left the data
+recoverable in **five of six** places the application had put it — the app's own vector index, its cache,
+its logs. inspeximus issues an **erasure certificate**: content-free, signed, and checkable after the
+fact, so "deleted" is something you verify rather than something you are told.
 
-## Why 0.4.0 matters: poison-resistant recall
+No third-party dependencies in the core. An MCP server ships alongside it, so any Claude / Cursor / agent
+can use it as memory. Ten framework adapters (LangGraph, LlamaIndex, Haystack, CrewAI, AutoGen, LangChain,
+Google ADK, OpenAI Agents, pydantic-ai, MemoryAgentBench). 1,797 tests.
 
-We red-teamed inspeximus with a real AgentPoison-style single-instance memory-poisoning attack (Chen et al.,
-NeurIPS 2024; PoisonedRAG, Zou et al., USENIX Security 2025). Findings, all with runnable receipts:
+## What it does that a recall-first memory layer does not
 
-- A **plain-English trigger sentence** in one poisoned memory hijacks raw top-1 retrieval **88–100%**,
-  is **scale-invariant** (60→10 000 memories), and **evades a perplexity filter**.
-- Retrieval-time / embedding-geometry defenses **do not generalize** across encoders.
-- `recall(influence_only=True)` drops the single-instance poison's rank-1 hijack to **0%** on
-  MiniLM / BGE / Contriever and every scale — because it lives in **provenance metadata, not embedding
-  geometry**. Honest cost: a rare-but-true memory that hasn't earned corroboration is filtered too
-  (recall 1.00 corroborated vs 0.08 uncorroborated), so this mode is for adversarial / untrusted
-  ingestion. It **raises** attacker cost (≥3 coordinated records + ≥2 forged independent provenances),
-  it does not make poisoning impossible.
+- **A corrected fact stays corrected.** Deterministic keyed supersession plus `echo_guard`: when the old
+  value is restated later — verbatim or paraphrased — it lands retired instead of resurrecting. No LLM on
+  the write path.
+- **Proof of deletion.** `forget_subject()` erases and `erasure_certificate()` proves it, without
+  restating the erased content. Honest scope: this proves erasure *within this store*, and names the
+  registered app-side targets it cascaded to. It is not a media-level unrecoverability claim.
+- **Influence gating.** `recall(influence_only=True)` lets anything be retrieved but gates what a memory
+  is allowed to *drive* on provenance rather than content. Measured: action-hijack 0.00 across three
+  retrievers, at a stated cost — rare uncorroborated true memories fall to 0.083 (1 of 12, small n).
+- **Tamper-evident receipts.** Hash-chained, optionally Ed25519-signed, so an out-of-band edit to what
+  your agent "remembers" is detectable.
+- **Per-tenant isolation** via `for_tenant()`, and bitemporal `as_of()` / `history()`.
 
-```python
-from inspeximus import Inspeximus
-m = Inspeximus("memory.json")                      # or Inspeximus(..., embed=my_embedder)
-m.remember("Pre-trend tests catch only ~31% of fatal DiD bias.", tags=["causal"], value=3)
-m.recall("difference in differences", k=5)
-m.recall("difference in differences", k=5, influence_only=True)   # only corroborated memory drives actions
-```
+## Honest limits, because they are the point
 
-Part of [Agora](https://github.com/DanceNitra/agora). MIT-licensed.
+The corroboration check counts **distinct source strings** — a string is not an identity, so an attacker
+who can write three times under two labels gets through. The residue scan is a literal, case-sensitive
+byte match: it finds the exact bytes you pass it and misses a lowercased, re-wrapped, base64 or hex copy.
+Both are documented in the code with the measurement next to them.
+
+We also publish our failures. One of our own posts had its headline killed by a control we ran on
+ourselves, and we printed the control.
+
+## Cite
+
+See `CITATION.cff`, or the DOI on the GitHub repository.
