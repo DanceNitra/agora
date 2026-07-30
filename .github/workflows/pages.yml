@@ -13,6 +13,7 @@ on:
       - 'public/**'
       - 'sitemap.xml'
       - 'robots.txt'
+      - 'google*.html'          # search-engine ownership tokens
       - '.github/workflows/pages.yml'
   workflow_dispatch:
 
@@ -47,6 +48,10 @@ jobs:
           [ -f sitemap.xml ] && cp sitemap.xml _site/sitemap.xml || true
           [ -f sitemap_index.xml ] && cp sitemap_index.xml _site/sitemap_index.xml || true
           [ -f robots.txt ] && cp robots.txt _site/robots.txt || true
+          # Search Console / Bing ownership tokens live at the property root. They are not in
+          # public/, so without this line they are committed and never published -- the file
+          # 404s forever and the verify button keeps failing with nothing to debug.
+          for t in google*.html BingSiteAuth.xml; do [ -f "$t" ] && cp "$t" _site/ || true; done
       - name: Every URL in the sitemap must exist in what we are about to publish
         run: |
           python3 - <<'PY'
