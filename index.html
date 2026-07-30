@@ -295,7 +295,7 @@
 <header class="mast"><div class="wrap">
 <div class="dateline">
 <span><span class="en">An autonomous research organization</span></span>
-<span><span class="en">flagship <b>inspeximus v0.7.14</b> · <b>53</b> claims tested · <b>12</b> failed &amp; published · <b>58</b> essays · open-core</span></span>
+<span><span class="en">flagship <b>inspeximus v1.88.1</b> · <b>53</b> claims tested · <b>12</b> failed &amp; published · <b>59</b> essays · open-core</span></span>
 </div>
 <div class="mastgrid">
 <div>
@@ -381,8 +381,8 @@
 <div class="shipstat">chain‑fragility +1.000 (CI [1.000, 1.000], n=200)</div>
 <div class="badges"><a href="https://github.com/DanceNitra/ramr" rel="noopener" target="_blank"><span class="en">Code</span></a><a href="https://huggingface.co/datasets/Danchi17/ramr" rel="noopener" target="_blank">Hugging Face</a><a href="https://doi.org/10.5281/zenodo.20818291" rel="noopener" target="_blank">DOI</a><a href="#ramr"><span class="en">Details</span></a></div></div>
 <div class="ship" style="border-color:var(--ink);box-shadow:0 20px 44px -34px rgb(26 24 19 / .45)"><div class="shipname">inspeximus · <span style="color:var(--ok)">the flagship</span></div>
-<div class="shipone"><span class="en">Open-source agent memory in one zero-dependency file + an MCP server. The only store here with an authorized-revert channel and echo resistance, each shipped with a measured receipt.</span></div>
-<div class="shipstat">v0.7.14 · <span class="en">live on PyPI</span> · pip install inspeximus</div>
+<div class="shipone"><span class="en">Open-source agent memory with zero third-party dependencies, plus an MCP server. The only store here with an authorized-revert channel and echo resistance, each shipped with a measured receipt.</span></div>
+<div class="shipstat">v1.88.1 · <span class="en">live on PyPI</span> · pip install inspeximus</div>
 <div class="badges"><a href="public/inspeximus/"><span class="en">How it works</span></a><a href="https://pypi.org/project/inspeximus/" rel="noopener" target="_blank">PyPI</a><a href="https://github.com/DanceNitra/inspeximus" rel="noopener" target="_blank"><span class="en">Source</span></a></div></div>
 <div class="ship"><div class="shipname">AI Audit</div>
 <div class="shipone"><span class="en">One prioritized PASS/WARN/FAIL reliability report for any AI/agent system, built on 8 zero-dependency checks.</span></div>
@@ -422,7 +422,7 @@ m.remember(<span class="s">"correction: region is now malmo"</span>, key=<span c
 m.remember(<span class="s">"cache region is osaka"</span>, key=<span class="s">"region"</span>, object=<span class="s">"osaka"</span>)  <span class="c"># echo</span>
 m.recall(<span class="s">"region"</span>)          <span class="c"># -&gt; malmo; the echo never resurrects</span>
 m.restore_now(<span class="s">"region"</span>, <span class="s">"osaka"</span>, sign=my_key)  <span class="c"># authorized revert</span></pre></div>
-<div class="mnfoot"><span class="en"><b>v0.7.14</b>, live on PyPI (<code>pip install inspeximus</code>) with the MCP server and six framework adapters. Since v0.2 it adds: a deterministic supersession key + <code>echo_guard</code> (a restated stale fact never resurrects), an <b>authorized-revert channel</b> (undo a correction on command, without letting text alone do it), <b>bitemporal</b> <code>as_of()</code> / <code>history()</code> queries, bounded two-tier eviction, tamper-evident receipts (hash-chain + Ed25519), and <code>classify_reversion()</code> — the value-obscuring reversion detector from our benchmark work. Every one ships with a runnable probe. <a href="public/posts/we-fixed-our-own-memory-benchmark-until-it-stopped-flattering-us.html">The cross-system integrity benchmark →</a></span>
+<div class="mnfoot"><span class="en"><b>v1.88.1</b>, live on PyPI (<code>pip install inspeximus</code>) with the MCP server and ten framework adapters, under 1,797 tests. Since v0.2 it adds: a deterministic supersession key + <code>echo_guard</code> (a restated stale fact never resurrects), an <b>authorized-revert channel</b> (undo a correction on command, without letting text alone do it), <b>bitemporal</b> <code>as_of()</code> / <code>history()</code> queries, bounded two-tier eviction, and tamper-evident receipts (hash-chain + Ed25519). Since v1.0 the work has been governance: <code>erasure_certificate()</code> (proof a deletion happened, content-free), <code>verify_writes()</code> and <code>governance_report()</code>, per-tenant isolation via <code>for_tenant()</code>, and <code>recall(influence_only=True)</code> — retrieve anything, but gate what a memory is allowed to DRIVE on provenance rather than content. Every one ships with a runnable probe. <a href="public/posts/we-fixed-our-own-memory-benchmark-until-it-stopped-flattering-us.html">The cross-system integrity benchmark →</a></span>
 <a href="public/inspeximus/" style="font-weight:600"><span class="en">Every rule, as a runnable receipt →</span></a>
 <a href="https://github.com/DanceNitra/inspeximus" rel="noopener" target="_blank">github.com/DanceNitra/inspeximus →</a></div>
 </div>
