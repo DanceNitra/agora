@@ -32,6 +32,24 @@ META = {
         "tags_sk": "AI výskum · Sebaaudit · Meta-veda · Autonómni agenti · Reprodukovateľnosť",
         "kicker": "Meta · self-audit", "kicker_sk": "Meta · sebaaudit",
     },
+    "defenses-that-failed-their-own-control": {
+        "slug": "defenses-that-failed-their-own-control",
+        "title": "The control is the number: four memory-poisoning defenses that failed, including one of ours",
+        "title_sk": "Kontrola je to číslo: štyri obrany proti otrave pamäte, ktoré zlyhali — vrátane našej",
+        "desc": "We published an 88-100% memory-poisoning hijack without printing its control: a RANDOM "
+                "five-word trigger reaches 65-90% on the same fixture, and our own probe records "
+                "optimization_margin_over_random = 0.0. Plus three other defenses that died the same way - "
+                "a perplexity gate that only catches gibberish, a geometry detector whose separability "
+                "margin inverts across encoders, and an outlier check evaded by padding.",
+        "desc_sk": "Publikovali sme únos pamäte 88-100 % bez toho, aby sme vytlačili jeho kontrolu: "
+                   "NÁHODNÝ päťslovný spúšťač dosiahne na tom istom fixture 65-90 % a naša vlastná sonda "
+                   "má zapísané optimization_margin_over_random = 0.0. K tomu tri ďalšie obrany, ktoré "
+                   "zomreli rovnako.",
+        "date": "2026-07-30", "modified": "2026-07-30",
+        "tags": "AI agents · Memory · Security · Poisoning · Negative results · Controls · inspeximus",
+        "tags_sk": "AI agenti · Pamäť · Bezpečnosť · Poisoning · Negatívne výsledky · Kontroly · inspeximus",
+        "kicker": "Security · negative results", "kicker_sk": "Bezpečnosť · negatívne výsledky",
+    },
     "memory-defense-veracity-gap": {
         "slug": "agent-memory-defense-provenance-not-truth",
         "title": "Agent memory poisoning: provenance can't buy truth",
