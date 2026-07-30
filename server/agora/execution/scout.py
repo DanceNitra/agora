@@ -138,6 +138,14 @@ def find_opportunity() -> dict | None:
                           "age_days": round(age_d, 1)})
     # COMMUNITY GATE: check the top-scoring candidates' repos (bounded API calls) and return the first
     # that clears the real-community bar (stars/forks). Drops 0-star/0-fork solo projects entirely.
+    #
+    # AUDIENCE GATE (added 2026-07-30, after a measured miss): the repo bar is not enough, because it
+    # asks whether the PROJECT is alive, not whether THIS THREAD is reachable. run-llama/llama_index#21666
+    # scored fit 12 and sailed through on the repo's stars -- and the thread turned out to be ten
+    # outsiders talking to each other: 26 comments over 2.5 months, every participant
+    # author_association NONE, no maintainer having touched it once, and the accounts 4-8 months old with
+    # 1-25 followers each while all linking their own projects. A full validate/storm/audit/verify cycle
+    # was spent on a comment nobody would have read. The topic fit was real; the audience did not exist.
     for c in sorted(cands, key=lambda z: -z["score"])[:6]:
         try:
             rp = _api("GET", f"/repos/{c['repo']}")
@@ -145,10 +153,32 @@ def find_opportunity() -> dict | None:
             forks = int(rp.get("forks_count", 0) or 0)
         except Exception:
             continue
-        if stars >= MIN_STARS or forks >= 1:
-            c["stars"] = stars
-            c["forks"] = forks
-            return c
+        if not (stars >= MIN_STARS or forks >= 1):
+            continue
+
+        # Is anyone with authority actually in this thread? One extra call per candidate, same budget
+        # shape as the repo check above.
+        AUTHORITY = {"OWNER", "MEMBER", "COLLABORATOR", "CONTRIBUTOR"}
+        maint = None
+        try:
+            cs = _api("GET", f"/repos/{c['repo']}/issues/{c['issue_number']}/comments?per_page=100")
+            if isinstance(cs, list):
+                maint = sum(1 for x in cs
+                            if (x.get("author_association") or "").upper() in AUTHORITY)
+        except Exception:
+            maint = None          # unknown, not zero -- an API failure must not read as "dead thread"
+
+        # Only judge a thread that has HAD a real discussion. Under 5 comments, no maintainer yet is
+        # normal (nobody has answered, and being first is exactly the opening we want). At 5+ comments
+        # with still nobody from the project, it is a side-conversation, not a place to be heard.
+        if maint == 0 and c["comments"] >= 5:
+            c["rejected"] = f"no maintainer in {c['comments']} comments"
+            continue
+
+        c["stars"] = stars
+        c["forks"] = forks
+        c["maintainer_comments"] = maint
+        return c
     return None
 
 
