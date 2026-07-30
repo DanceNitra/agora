@@ -1,0 +1,143 @@
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1" name="viewport"/>
+<title>LangGraph store: GDPR erasure with a verifiable receipt — inspeximus</title>
+<meta content="Deleting a key from a LangGraph BaseStore is not proof of erasure. A runnable example: erase one user's namespace, keep the other intact, and get a content-free signed certificate." name="description"/>
+<link href="https://dancenitra.github.io/agora/public/langgraph-gdpr-erasure/" rel="canonical"/>
+<meta content="LangGraph store: GDPR erasure with a verifiable receipt" property="og:title"/>
+<meta content="Deleting a key is not proving deletion. Runnable code, real certificate output, and an explicit statement of what it does not prove." property="og:description"/>
+<meta content="article" property="og:type"/>
+<meta content="https://dancenitra.github.io/agora/public/langgraph-gdpr-erasure/" property="og:url"/>
+<meta content="summary_large_image" name="twitter:card"/>
+<script type="application/ld+json">[{"@context":"https://schema.org","@type":"TechArticle","headline":"LangGraph store: GDPR erasure with a verifiable receipt","description":"Erase a user's namespace from a LangGraph BaseStore and produce a content-free, hash-chained erasure certificate. Runnable example with real output, and an explicit statement of what the certificate does not prove.","datePublished":"2026-07-31","dateModified":"2026-07-31","author":{"@type":"Organization","name":"Agora"},"publisher":{"@type":"Organization","name":"Agora"},"proficiencyLevel":"Expert","dependencies":"Python 3.9+, langgraph, inspeximus","url":"https://dancenitra.github.io/agora/public/langgraph-gdpr-erasure/"},{"@context":"https://schema.org","@type":"SoftwareSourceCode","name":"inspeximus LangGraph store — erasure with receipt","programmingLanguage":"Python","codeRepository":"https://github.com/DanceNitra/inspeximus","runtimePlatform":"Python 3.9+","license":"https://opensource.org/licenses/MIT"}]</script>
+<style>
+:root{--paper:#fbf9f4;--ink:#1b1a17;--soft:#54514a;--line:#e6e1d6;--acc:#0a8f68;--plate:#1b1a17}
+*{box-sizing:border-box;margin:0}
+body{background:var(--paper);color:var(--ink);font:17px/1.7 Georgia,"Times New Roman",serif;padding:0 20px}
+main{max-width:760px;margin:0 auto;padding:56px 0 80px}
+h1{font-size:33px;line-height:1.22;letter-spacing:-.01em;margin-bottom:14px}
+h2{font-size:21px;margin:38px 0 12px;letter-spacing:-.005em}
+p,ul{margin:14px 0}ul{padding-left:22px}li{margin:6px 0}
+.lede{font-size:19px;color:var(--soft)}
+pre{background:var(--plate);color:#e8e4d9;padding:15px 17px;border-radius:9px;overflow-x:auto;
+    font:13px/1.55 "JetBrains Mono",ui-monospace,Menlo,Consolas,monospace;margin:16px 0}
+code{font:.9em "JetBrains Mono",ui-monospace,Menlo,Consolas,monospace;background:#f0ece1;padding:1px 5px;border-radius:4px}
+pre code{background:none;padding:0;color:inherit;font-size:inherit}
+.note{border-left:3px solid var(--acc);padding:2px 0 2px 15px;color:var(--soft);margin:20px 0}
+a{color:var(--acc)}
+.meta{font:12.5px "JetBrains Mono",ui-monospace,monospace;color:#8c887e;letter-spacing:.03em;margin-bottom:26px}
+footer{margin-top:52px;padding-top:18px;border-top:1px solid var(--line);font-size:14.5px;color:var(--soft)}
+</style>
+
+<main>
+<div class="meta">inspeximus · reference · updated 2026-07-31</div>
+
+<h1>LangGraph store: GDPR erasure with a verifiable receipt</h1>
+
+<p class="lede">Deleting a key from a <code>BaseStore</code> removes it from your reads. It does not
+give you anything to hand an auditor. This page shows the difference, with code you can run and the
+actual output it produces — including the part where we say what the receipt does <em>not</em> prove.</p>
+
+<h2>The gap</h2>
+
+<p>LangGraph's long-term memory lives behind <code>BaseStore</code>: <code>put</code>, <code>get</code>,
+<code>search</code>, <code>delete</code>. A deletion request under GDPR Article 17 asks for something the
+interface has no word for — evidence, after the fact, that a specific subject's data is gone, produced
+without restating the data you just erased.</p>
+
+<p>There is a second, quieter problem. A namespace is LangGraph's per-user boundary, so "erase this user"
+means "erase this namespace" — but a store that resolves a subject by string matching can take a
+neighbour down with it. That has to be exact, or an erasure becomes an incident.</p>
+
+<h2>Runnable</h2>
+
+<pre><code>pip install "inspeximus[langgraph]"</code></pre>
+
+<pre><code>from inspeximus.integrations.langgraph import InspeximusStore
+
+store = InspeximusStore(path="memories.json", receipts=True)
+
+store.put(("users", "alice"), "profile", {"email": "alice@example.com"})
+store.put(("users", "alice"), "prefs",   {"tone": "concise"})
+store.put(("users", "bob"),   "profile", {"email": "bob@example.com"})
+
+# the DSAR: exact, resolved from the stored namespace rather than a joined string
+store.erase_namespace(("users", "alice"), request_id="dsar-2026-0731")
+
+cert = store.store.erasure_certificate("dsar-2026-0731")   # the REQUEST id, not the subject</code></pre>
+
+<p>It is an ordinary <code>BaseStore</code>: everything LangGraph expects works unchanged, and
+<code>erase_namespace</code> is the addition.</p>
+
+<h2>What actually comes back</h2>
+
+<pre><code>scoped_to      : dsar-2026-0731
+count          : 2
+request_ids    : ['dsar-2026-0731']
+erased ids     : ['23f19e720e', '765d0c7d35']
+self_check     : {"verified": true, "problems": []}
+anchor         : n_writes=3  n_tombstones=2
+tombstones_tip : c84cc0cc46b96dbd7caa938174969321b092c340...
+
+alice gone     : True
+bob intact     : {'email': 'bob@example.com'}
+verify_writes  : (True, [])</code></pre>
+
+<p>Three things are worth reading carefully in that output.</p>
+
+<ul>
+<li><strong>The certificate is content-free.</strong> <code>erased_memory_ids</code> are random surrogate
+ids, not hashes of the data. A hash of an email address is still an email address to anyone holding a
+list of candidates; a certificate that proves erasure by restating what it erased is not one.</li>
+<li><strong>The tombstones are hash-chained</strong>, so removing one is detectable and
+<code>tombstones_tip</code> commits to the whole chain. Anchor that tip somewhere you do not control and
+the operator loses the ability to rewrite history quietly.</li>
+<li><strong>Bob is untouched.</strong> <code>erase_namespace</code> resolves the subject from the
+structured namespace each record carries, not from a joined string, so a neighbouring namespace cannot be
+caught in the blast radius.</li>
+</ul>
+
+<h2>What this does not prove</h2>
+
+<p class="note">This is the part the certificate itself states, and it is the reason to trust the rest of
+it. From the <code>scope</code> field, verbatim: <em>erasure is within this store only — not the app's
+vector store, prompt logs, or backups; it covers the subject plus its <code>derived_from</code>
+lineage.</em> It is a tamper-evident integrity primitive. It is not a legal opinion, and it is not a
+media-level unrecoverability claim.</p>
+
+<p>That distinction is not pedantry. We measured a delete that returned success and left the data
+recoverable in <strong>five of six</strong> places one application had put it — its own vector index, its
+cache, its logs. The store was the one place that had actually erased. If your app copied the value
+anywhere else, this receipt says nothing about that copy, and you should register those stores as erasure
+targets so the manifest names them.</p>
+
+<h2>One limitation of ours, stated</h2>
+
+<p>There are two erasure paths and they are not equivalent. <code>erase_namespace()</code> is exact.
+<code>store.forget_subject("lg::users::alice")</code> resolves by the per-record subject string, which is
+<code>"lg::" + "::".join(namespace)</code> — lossy, so <code>("a","b")</code> and <code>("a::b",)</code>
+share it and a request naming one takes both. We kept the lossy form deliberately, because changing it
+would re-address every record written by an earlier version and make those records invisible to a DSAR;
+the precise path is the new method rather than a silent change to the old one. Use
+<code>erase_namespace()</code> for anything that matters.</p>
+
+<h2>Verifying later</h2>
+
+<pre><code>from inspeximus.audit_bundle import verify_bundle
+# the store's own check, re-run at any time:
+store.store.verify_writes()          # -> (True, [])</code></pre>
+
+<p>The certificate re-derives the chain from genesis, so it can be checked by someone who has the file
+and none of your code. Given the store, it also confirms every id it names is genuinely absent — a
+certificate that lists an id still present in the store fails its own check.</p>
+
+<footer>
+<p><strong>inspeximus</strong> — a zero-dependency Python agent-memory library.
+<code>pip install "inspeximus[langgraph]"</code> ·
+<a href="https://github.com/DanceNitra/inspeximus">source</a> ·
+<a href="https://pypi.org/project/inspeximus/">PyPI</a> · MIT</p>
+<p>Related: <a href="../posts/proving-erasure-agent-memory-deletion-executed-vs-recoverable.html">the six-store
+erasure benchmark</a> · <a href="../posts/does-deleting-agent-memory-actually-erase.html">does deleting agent
+memory actually erase it</a> · <a href="../posts/agent-memory-tenant-isolation-by-construction.html">tenant
+isolation</a> · <a href="../../">Agora</a></p>
+</footer>
+</main>
