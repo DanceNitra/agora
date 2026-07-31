@@ -164,7 +164,11 @@ LEDGERS = {
         decisive=("compatible", "resolved", "bridged", "no honest bridge", "no bridge",
                   "no conflict", "contradiction", "reconciled"),
         inconclusive=("open", "queued", "pending"),
-        ts_fields=("ts",),
+        # `resolved_ts` FIRST -- it is when the dispute was CLOSED. `ts` is when the pair was
+        # shortlisted and can be weeks older. This is the identical defect already found on
+        # .cartography.json, where reading only `ts` dated a ruling made 0.9 h ago at 1057 h and
+        # failed the agent for it. Fixed here BEFORE the field arrives rather than after.
+        ts_fields=("resolved_ts", "ts"),
         actor_fields=("by", "agent", "author", "actor", "who"),
         foreign_text=(),
     ),
@@ -195,7 +199,12 @@ LEDGERS = {
         decisive=("forged", "no honest bridge", "no bridge", "already bridged", "bridged",
                   "rejected", "falsified"),
         inconclusive=("hypothesized", "charted", "queued", "pending", "open"),
-        ts_fields=("resolved_ts", "ts"),
+        # THREE close-stamps, and a forged record carries NONE of the other two. Measured
+        # 2026-07-31: seven records with status "bridged" were stamped `bridged_ts` at 08:52 that
+        # morning and had neither `ts` nor `resolved_ts`, so the gate could not date them at all and
+        # treated every one as ancient. Found by the sweep test, not by eye -- a hand pass over the
+        # last 60 records missed it because the bridged ones sat further back than that.
+        ts_fields=("bridged_ts", "resolved_ts", "ts"),
         actor_fields=("by", "agent", "author", "actor", "who"),
         foreign_text=(),
     ),

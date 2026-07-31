@@ -217,12 +217,31 @@ def open_contradictions(n: int = 5) -> list:
     return [c for c in _load() if c.get("status") == "open"][:n]
 
 
-def set_status(cid: str, status: str) -> None:
+def set_status(cid: str, status: str, evidence: str = "") -> bool:
+    """Close a contradiction, and RECORD WHAT CLOSED IT.
+
+    `evidence` carries the receipt -- the Lab id whose MEASURED/VERDICT lines decided the ruling.
+    Without it the record said a dispute was "resolved" with no trace of on what basis, which is the
+    same defect already fixed on Voss's bounty ledger: a verdict that cannot be checked is
+    indistinguishable from a rubber stamp. Measured 2026-07-31: Dame Elara closed 100 records in 24h
+    and the acceptance gate scored her GROUNDED 0, while her own organ was producing the receipt
+    (lab 6126c3) and putting it only in the contribution text.
+
+    Returns whether anything matched, because the caller cannot otherwise tell: this used to return
+    None on both paths, so a write against a stale id reported success and the record stayed open.
+    """
     items = _load()
+    hit = False
     for c in items:
         if c.get("id") == cid:
             c["status"] = status
-    _save(items)
+            if evidence:
+                c["evidence"] = str(evidence)[:300]
+            c["resolved_ts"] = time.time()
+            hit = True
+    if hit:
+        _save(items)
+    return hit
 
 
 def format_contradictions(n: int = 8) -> str:

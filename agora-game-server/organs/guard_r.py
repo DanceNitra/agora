@@ -560,13 +560,17 @@ async def _cycle(ctx) -> dict:
 
     # ---- 5. record the resolutions -----------------------------------------------------------
     applied, queued, failed = [], [], []
+    # CARRY THE RECEIPT INTO THE LEDGER. The lab id was going into the contribution text only, so
+    # the ledger held 100 closed disputes in 24h with no trace of what closed them and the gate
+    # scored this organ GROUNDED 0 while it was producing the measurement every cycle.
+    _receipt = ("lab %s | %s" % (lab_id, verdict[:180])) if lab_id else verdict[:220]
     for r in to_dissolve:
         ok = await _post(ctx, "/brain/contradictions/status",
-                         {"id": r["id"], "status": "resolved"}, 30.0)
+                         {"id": r["id"], "status": "resolved", "evidence": _receipt}, 30.0)
         (applied if isinstance(ok, dict) and ok.get("status") == "ok" else failed).append(r["id"])
     for r in to_escalate:
         ok = await _post(ctx, "/brain/contradictions/status",
-                         {"id": r["id"], "status": "queued"}, 30.0)
+                         {"id": r["id"], "status": "queued", "evidence": _receipt}, 30.0)
         (queued if isinstance(ok, dict) and ok.get("status") == "ok" else failed).append(r["id"])
 
     # VERIFY THE INTERVENTION, not the instrument. `POST /brain/contradictions/status` returns

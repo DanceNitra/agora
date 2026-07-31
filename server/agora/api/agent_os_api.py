@@ -1754,8 +1754,11 @@ async def brain_contradictions():
 async def brain_contradictions_status(request: Request):
     from agora.execution.contradictions import set_status
     b = await request.json()
-    set_status(b.get("id") or "", b.get("status") or "open")
-    return {"status": "ok"}
+    # REPORT WHETHER IT MATCHED. This returned {"status":"ok"} unconditionally, so a write against a
+    # stale id read as success while the record stayed open -- the caller's own comment says it had
+    # to re-read the open set to find out. `evidence` carries the Lab id that decided the ruling.
+    hit = set_status(b.get("id") or "", b.get("status") or "open", b.get("evidence") or "")
+    return {"status": "ok" if hit else "not_found", "matched": bool(hit)}
 
 
 @router.get("/brain/desk")
