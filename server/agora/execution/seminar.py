@@ -718,13 +718,15 @@ def _run_group_seminar_inner(npcs: list[dict], vault: str) -> dict:
 
     topic = pick_topic(vault)
     contributors, passed, brought = [], [], []
+    read_ids: list[str] = []          # every memory the round actually READ -- the contribution's lineage
     for n in npcs[:8]:
         name = n.get("npc_name") or n.get("npc_id", "agent")
         role = n.get("role") or name
-        can, ctx = inspeximus_bridge.agent_can_contribute(role, topic.get("headline", ""))
+        can, ctx, ids = inspeximus_bridge.agent_can_contribute(role, topic.get("headline", ""))
         if can and ctx:
             contributors.append({"id": n.get("npc_id"), "name": name})
             brought.append(f"{name} brings: {ctx[:200]}")
+            read_ids.extend(ids)
         else:
             passed.append({"agent": name, "why": "no relevant memory"})
     contribution = None
@@ -733,8 +735,15 @@ def _run_group_seminar_inner(npcs: list[dict], vault: str) -> dict:
         transcript = "\n".join(brought)
         contribution = extract_contribution(topic, transcript, [c["name"] for c in contributors])
         if contribution:
-            inspeximus_bridge.remember_contribution(contribution["claim"], contribution.get("evidence", ""),
-                                               tags=[topic.get("headline", "")[:40]])
+            # DECLARE WHAT IT WAS BUILT FROM. The Contribution is a synthesis of exactly the memories
+            # recalled above, and those ids were already in hand and discarded -- which is why
+            # `derived_from` measured 0.00% across the whole live store. Without the edge, retracting a
+            # memory leaves every conclusion drawn from it standing at full trust.
+            inspeximus_bridge.remember_contribution(
+                contribution["claim"], contribution.get("evidence", ""),
+                tags=[topic.get("headline", "")[:40]],
+                derived_from=sorted(set(read_ids)) or None,
+                source_doc="seminar:%s" % (topic.get("id") or topic.get("headline", "")[:40] or "round"))
     log_round(topic, [c["name"] for c in contributors], passed, contribution)
     _record_attempt(topic.get("id"))      # count the round so a saturated topic eventually retires
     return {"topic": topic.get("headline", ""), "contributors": contributors,

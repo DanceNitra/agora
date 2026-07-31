@@ -48,13 +48,18 @@ def seed_recent(db_path: str | None = None, cap: int = 250) -> int:
     try:
         con = sqlite3.connect(f"file:{(_SERVER / 'agora.db').as_posix()}?mode=ro", uri=True)
         rows = con.execute(
-            "SELECT title, content FROM collective_knowledge WHERE knowledge_type='discovery' "
+            "SELECT title, content, contributor_name FROM collective_knowledge "
+            "WHERE knowledge_type='discovery' "
             "AND content LIKE '%Source%' ORDER BY rowid DESC LIMIT ?", (cap,)).fetchall()
         con.close()
-        for title, content in rows:
-            txt = f"{(title or '').strip()}: {(content or '').strip()}"[:500]
+        for title, content, who in rows:
+            # NAME THE WRITER. Seeded without a source, every one of these is unreachable by
+            # slash(scope='source') -- the default scope -- so a discovery later found to be poison
+            # could not have its standing forfeited by the agent that produced it.
+            txt = f"{(title or '').strip()}: {(content or '').strip()}"[:_CONTRIB_MAX_CHARS]
             if len(txt) > 30:
-                m.remember(txt, tags=["seed", "discovery"], value=1.0)
+                m.remember(txt, tags=["seed", "discovery"], value=1.0,
+                           source={"doc": "agent:%s" % who} if who else None)
                 added += 1
     except Exception:
         pass
@@ -65,12 +70,33 @@ def seed_recent(db_path: str | None = None, cap: int = 250) -> int:
     return added
 
 
-def remember_contribution(claim: str, evidence: str = "", tags=None) -> None:
-    """Fold a fresh seminar Contribution back into the shared memory so it compounds."""
+_CONTRIB_MAX_CHARS = 8000
+
+
+def remember_contribution(claim: str, evidence: str = "", tags=None,
+                          derived_from=None, source_doc: str = "") -> None:
+    """Fold a fresh seminar Contribution back into the shared memory so it compounds.
+
+    THREE things this used to drop, all measured on the live store 2026-07-31:
+
+    * `derived_from` -- a Contribution is by construction a synthesis of the memories the contributing
+      agents recalled, and those ids were available at the call site and thrown away. Coverage was
+      0.00% of 3,228 records, so `slash()` had nothing to propagate along and the accountability lever
+      could not reach a single derived conclusion.
+    * `source` -- also 0.00%, which is worse: `slash(scope='source')`, the DEFAULT scope, resolves on
+      exactly this field, so on our own deployment it matched nothing at all. A retraction lever that
+      selects on a field no writer populates reports success and forfeits nothing.
+    * the text past 500 characters. This is the third copy of that truncation found today (the others
+      were in agent_os and mcp_server); it cut every contribution mid-sentence, and a claim cut before
+      its falsifier is a claim that can no longer be tested.
+    """
     try:
-        txt = (claim + (" — " + evidence if evidence else "")).strip()
+        txt = (claim + (" - " + evidence if evidence else "")).strip()
         if len(txt) > 25:
-            _inspeximus().remember(txt[:500], tags=list(tags or []) + ["contribution"], value=1.5)
+            _inspeximus().remember(
+                txt[:_CONTRIB_MAX_CHARS], tags=list(tags or []) + ["contribution"], value=1.5,
+                derived_from=list(derived_from) if derived_from else None,
+                source={"doc": source_doc} if source_doc else None)
     except Exception:
         pass
 
@@ -104,9 +130,17 @@ def consolidate_brain_memory() -> dict:
         return {"error": str(e)[:120]}
 
 
-def agent_can_contribute(role_hint: str, topic: str, min_rel: float = 0.22) -> tuple[bool, str]:
+def agent_can_contribute(role_hint: str, topic: str, min_rel: float = 0.22) -> tuple[bool, str, list]:
     """Can this agent genuinely add to the topic? True only if its memory (shared INSPEXIMUS, or the
-    vault as a bootstrap backstop) surfaces relevant knowledge. Returns (can, context_snippets)."""
+    vault as a bootstrap backstop) surfaces relevant knowledge.
+
+    Returns (can, context_snippets, recalled_ids). The third element is the LINEAGE: the memories this
+    agent actually read to form its contribution. It used to be dropped on the floor, and dropping it is
+    why `derived_from` coverage measured 0.00% across all 3,228 records in the live store on 2026-07-31 --
+    every contribution was written as a fresh primary observation with no parents, so `slash()` had no
+    edges to walk and a retraction could not reach a single conclusion built on the retracted memory.
+    The lever we describe as the moat was inert on our own data because nothing upstream declared what
+    it was built from."""
     query = f"{role_hint} {topic}".strip()
     # 1) shared INSPEXIMUS recall (the team's accumulated knowledge)
     try:
@@ -114,16 +148,18 @@ def agent_can_contribute(role_hint: str, topic: str, min_rel: float = 0.22) -> t
         strong = [h for h in hits if h.get("relevance", 0) >= min_rel]
         if strong:
             ctx = " | ".join(h["text"][:160] for h in strong[:2])
-            return True, ctx
+            return True, ctx, [h["id"] for h in strong if h.get("id")]
     except Exception:
         pass
-    # 2) bootstrap backstop: the user's vault (semantic) — so domain-relevant agents can start
+    # 2) bootstrap backstop: the user's vault (semantic) — so domain-relevant agents can start.
+    # A vault note is NOT an inspeximus record, so it cannot be a `derived_from` parent; it is named as
+    # the SOURCE instead, which is the field slash(scope='source') resolves on.
     try:
         from agora.execution.semantic_index import SemanticIndex
         notes = [h for h in SemanticIndex().search(query, top_k=3) if h.get("score", 0) >= 0.52]
         if notes:
             ctx = "relevant notes: " + "; ".join(f"[[{n['title']}]]" for n in notes[:3])
-            return True, ctx
+            return True, ctx, []
     except Exception:
         pass
-    return False, ""
+    return False, "", []

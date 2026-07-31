@@ -113,7 +113,14 @@ def _store(m, *, key: str, text: str, meta: dict) -> bool:
     """One item. Returns True if it was new to the library."""
     if any((r.get("meta") or {}).get("url") == meta.get("url") for r in m.items):
         return False
-    m.remember(text[:4000], key=key, meta=meta, tags=[meta.get("source", "web"), meta.get("kind", "")])
+    # NAME THE DOCUMENT. This is the most literal use of `source` anywhere in the codebase -- the item
+    # IS an external document -- and it was going in unattributed, so `slash(scope='source')` could not
+    # forfeit a paper that turned out to be retracted, or a repo thread that turned out to be a plant.
+    # The url was already in `meta` and was never promoted to the field the retraction lever resolves on.
+    # Measured 2026-07-31 across every store we run: source coverage 0.000%.
+    doc = meta.get("url") or meta.get("source") or ""
+    m.remember(text[:4000], key=key, meta=meta, tags=[meta.get("source", "web"), meta.get("kind", "")],
+               source={"doc": doc} if doc else None)
     return True
 
 

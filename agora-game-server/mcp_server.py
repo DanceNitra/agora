@@ -573,6 +573,10 @@ except Exception:
     _Store = None
 _AGENT_MEM_DIR = Path(__file__).resolve().parent / ".agent_memory"
 _agent_mem_stores: dict = {}
+# A durable finding must survive whole: its `Source:` line and its falsifier live at the END of the
+# text, which is exactly what a narrow cut removes. Quest chatter decays out and stays narrow.
+_AGENT_MEM_FINDING_CHARS = 2000
+_AGENT_MEM_CHATTER_CHARS = 300
 
 # ── Semantic recall for the agents (dogfood the embedder path) ─────────────────────────────
 # On a single GPU shared with the 30B planner, a live embed costs ~2s (it queues behind qwen). So
@@ -4236,7 +4240,19 @@ async def ambient_life():
                 _saved_embed = getattr(m, "embed", None)
                 m.embed = None
                 try:
-                    m.remember(s[:300], tags=[eid], value=value, mtype=mtype)
+                    # NAME THE WRITER. Measured 2026-07-31 across all eight stores: 261,673 records,
+                    # `source` coverage 0.000%. slash(scope='source') -- the default, and the lever the
+                    # whole accountability story rests on -- resolves on exactly this field, so on our own
+                    # dogfood deployment it matched nothing and forfeited nothing, silently, every time.
+                    # We were running the library with its main mechanism switched off by omission.
+                    # Width by VALUE, not one flat cut. 300 chars is fine for quest chatter and far too
+                    # narrow for a finding: it severs `Source:` lines and falsifiers, which is the same
+                    # defect found today in agent_os (500), the contribution POST (500) and the seminar
+                    # bridge (500). Chatter decays out anyway, so widening only the durable half costs
+                    # almost nothing on a 261k-record store.
+                    _cap = _AGENT_MEM_FINDING_CHARS if (value or 0) >= 2.0 else _AGENT_MEM_CHATTER_CHARS
+                    m.remember(s[:_cap], tags=[eid], value=value, mtype=mtype,
+                               source={"doc": "agent:%s" % eid})
                 finally:
                     m.embed = _saved_embed
             except Exception:
