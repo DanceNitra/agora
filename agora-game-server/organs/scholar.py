@@ -590,8 +590,24 @@ async def _merge(ctx, canon: str, plan: dict, n_artifacts: int) -> dict:
 
     add_only = not drops
     if add_only and len(after) > CANON_BUDGET:
-        return _result("idle", "add-only merge would push the canon to %d chars, over the %d budget "
-                               "-- refusing to grow the canon into an archive" % (len(after), CANON_BUDGET))
+        # THE BUDGET BINDING IS A CURATION DECISION, NOT AN ABSENCE OF ONE. This returned `idle`, so a
+        # canon at capacity with GROUNDED evidence queued behind it looked exactly like a canon with
+        # nothing to curate -- and the evidence went nowhere. Measured 2026-08-01: 13 of the 14 waiting
+        # artifacts carried a receipt and the canon stood at 6,955 of 7,000 chars, so admitting them
+        # would have reached 7,679.
+        #
+        # The robot still must not restructure: CLAUDE.md keeps re-clustering the canon with Claude,
+        # and evicting a standing belief to make room is exactly that. So this does not force a merge.
+        # It records the bind as a JUDGMENT and falls through to the ruling path, which runs the
+        # accretion audit and issues a grounded, decisive ruling naming what could not enter and why.
+        # A refusal that reaches a human is work; a refusal that returns idle is a leak.
+        plan["judgment"].append(
+            "canon is at capacity: %d chars, and %d grounded artifact(s) are waiting. An add-only "
+            "merge reaches %d, over the %d budget, so admitting them requires RETIRING a standing "
+            "belief -- a written merge, not a 6-hourly robot's call. Names: %s"
+            % (plan["chars"], len(admits), len(after), CANON_BUDGET,
+               "; ".join(a["title"][:60] for a in plan["admit"][:3]) or "-"))
+        return await _ruling(ctx, canon, plan, n_artifacts)
 
     rec = await _aw(ctx.lab_run("canon-curation-gate", _gate_code(
         canon, after, retired, len(plan["reject"]), len(plan["judgment"]), n_artifacts)))

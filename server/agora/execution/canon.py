@@ -15,8 +15,28 @@ import time
 from pathlib import Path
 
 _CANON_REL = "04 Resources/Concepts/Agora Agents/Canon — What Agora Currently Believes.md"
+#: Note types that state a CLAIM, and are therefore candidates for the statement of belief.
+#:
+#: MEASURED 2026-08-01, and this is the number that matters: the old tuple matched 103 of the 3,917
+#: notes in the agent directory -- 2.6% -- leaving 3,814 invisible to the curator, of which 3,082 are
+#: GROUNDED and 321 of those landed in the last 30 days. Sage Mira's honest "nothing new landed" was
+#: true only of a 2.6% slice: the intake was aimed at a naming convention the swarm had stopped using.
+#: The types it missed are not marginal. `measured-*` is 224 notes and 224 of them are grounded;
+#: `pipeline-*` is 939 with 836 grounded and its own header reads "Evidence grade: HIGH -- measured
+#: result with a citation/falsifier"; `create-*` is 311 and opens "**Finding:** Vessel et al. (2012)".
+#:
+#: Widening is NOT the same as taking everything. The Canon is a statement of belief with a 7,000-char
+#: budget, so operational note types are excluded by name below -- a digest is a LIST of other notes,
+#: not a belief about the world, and admitting 462 of them would bury the curator in its own logs.
 _ARTIFACT_GLOBS = ("insight*.md", "hypothesis*.md", "dialectic*.md", "dossier*.md",
-                   "paper*.md", "post-mortem*.md")
+                   "paper*.md", "post-mortem*.md",
+                   "measured*.md", "pipeline*.md", "create*.md",
+                   "lab-*.md", "bridge-*.md", "analogy-*.md", "finding*.md", "replication*.md")
+
+#: Operational records that a glob above would otherwise sweep in. Checked against the stem, so a
+#: `pipeline*` glob cannot drag in `pipeline-digest-...` by accident.
+_ARTIFACT_EXCLUDE = ("vault-digest", "scout-fit", "digest-", "-digest-", "telegram-", "inbox-",
+                     "session-", "handoff-", "backup-", "index-")
 
 
 def canon_path(vault_path: str) -> Path:
@@ -130,8 +150,15 @@ def new_artifacts_since_canon(vault_path: str) -> list[dict]:
     out = []
     if not root.is_dir():
         return out
+    seen: set = set()
     for pattern in _ARTIFACT_GLOBS:
         for p in root.rglob(pattern):
+            if p in seen:                     # the widened globs overlap; a note is one candidate
+                continue
+            seen.add(p)
+            stem = p.stem.lower()
+            if any(x in stem for x in _ARTIFACT_EXCLUDE):
+                continue
             try:
                 text = p.read_text(encoding="utf-8", errors="replace")
             except Exception:

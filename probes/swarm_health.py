@@ -299,7 +299,11 @@ def load_repo_parts(code_dirs):
 # here and CHECKED to be literal substrings of the live pattern -- if agent_os_api ever rewrites its
 # regex this raises instead of silently matching nothing (a falsification control aimed at nothing
 # is the failure mode; assert the target exists).
-_LAB_ID_SRC = r"\blab[:_ ]?[0-9a-f]{6}\b"
+# WIDENED with the source pattern it is pinned to. Worth recording what the pin could NOT catch:
+# `check_grounding_patterns` verifies this string is a literal substring of `_G_MEASURED`, so it
+# guarantees the two copies AGREE -- and both were wrong the same way. A consistency control cannot
+# see a shared defect; it can only see divergence.
+_LAB_ID_SRC = r"\blab[:=_\s-]*(?:id\s*)?[:=#]?\s*[0-9a-f]{6}\b"
 _MEAS_SRC = r"MEASURED:|VERDICT:"
 _LAB_ID = re.compile(_LAB_ID_SRC, re.I)
 _MEAS = re.compile(_MEAS_SRC, re.I)

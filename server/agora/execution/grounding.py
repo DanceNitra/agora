@@ -70,7 +70,11 @@ _URL = re.compile(r"https?://\S+", re.I)
 _VAULT_LINK = re.compile(r"\[\[.+?\]\]")
 
 #: A Lab receipt: the 6-hex id `lab.run` mints. Evidence of a measurement having happened.
-_LAB_ID = re.compile(r"\blab[:_\s-]*(?:id\s*)?[:#]?\s*([0-9a-f]{6})\b", re.I)
+#:
+#: `=` is in both separator classes because `lab_id=2b7e05` is a form our own code writes and this
+#: detector missed it, while the LAB-FIRST gate's private copy caught it and missed `Lab: <id>` --
+#: the form the ORGAN DISPATCHER writes. Two regexes for one field, each blind to what the other saw.
+_LAB_ID = re.compile(r"\blab[:=_\s-]*(?:id\s*)?[:=#]?\s*([0-9a-f]{6})\b", re.I)
 
 #: A measured result. Grounding by our own computation rather than by somebody else's paper.
 _MEASURED = re.compile(

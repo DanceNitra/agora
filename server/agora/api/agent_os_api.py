@@ -263,12 +263,23 @@ async def add_collective(request: Request):
         # literature) at the write chokepoint. Reversible: unset the flag.
         import os as _os
         if _os.environ.get("AGORA_REQUIRE_LAB", "0") == "1":
-            import re as _re, json as _json
+            import json as _json
             from pathlib import Path as _Pth
-            _mlab = _re.search(r"[Ll]ab[ _]?(?:id[ =:]*)?([0-9a-f]{6})\b", body["content"] or "")
+            # ONE DETECTOR, and this one had teeth. The private regex here was
+            # `[Ll]ab[ _]?(?:id[ =:]*)?([0-9a-f]{6})` -- after "Lab" it allowed a space or an
+            # underscore and NOT a colon. `_run_organ` appends the receipt as `Lab: <id>`, so the
+            # chokepoint could not read the format the dispatcher itself writes, and REJECTED every
+            # organ result whose lab id arrived that way with "LAB-FIRST: discovery has no
+            # reproducible Lab result". Measured 2026-08-01: Sage Mira's canon ruling, grounded by a
+            # real lab, refused at the door for a colon.
+            #
+            # The two regexes were each blind to what the other saw -- this one caught `lab_id=<id>`
+            # and missed `Lab: <id>`; the shared one did the reverse. Both forms are now in
+            # `grounding.lab_id`, which is the only copy left.
+            from agora.execution.grounding import lab_id as _lab_of
+            _lid = _lab_of(body["content"] or "")
             _ok_lab = False
-            if _mlab:
-                _lid = _mlab.group(1)
+            if _lid:
                 for _ledger in (".lab.json", ".methods.json"):
                     try:
                         _items = _json.load(open(_Pth(__file__).resolve().parents[2] / _ledger, encoding="utf-8"))
@@ -392,8 +403,13 @@ _PROMOTE_STATS = {"promoted": 0, "checked": 0}   # cumulative funnel stats for t
 from pathlib import Path as _Path
 import time as _time
 import re as _grade_re
+# The lab-id branch was `lab[:_ ]?[0-9a-f]{6}` -- ONE optional character after "lab". The organ
+# dispatcher appends its receipt as "Lab: <id>", which is two (colon and space), so this pattern
+# could not read the format our own code writes. Measured 2026-08-01: Sage Mira's canon ruling,
+# carrying lab 8e5669, MEASURED: and VERDICT:, scored ungrounded here AND was refused at the
+# LAB-FIRST door, by two separate copies of this same too-narrow expression.
 _G_MEASURED = _grade_re.compile(
-    r"MEASURED:|VERDICT:|\blab[:_ ]?[0-9a-f]{6}\b|\bn\s*=\s*\d|\d+(?:\.\d+)?\s*%|\bCI\b|p\s*[<=]\s*0?\.\d", _grade_re.I)
+    r"MEASURED:|VERDICT:|\blab[:=_\s-]*(?:id\s*)?[:=#]?\s*[0-9a-f]{6}\b|\bn\s*=\s*\d|\d+(?:\.\d+)?\s*%|\bCI\b|p\s*[<=]\s*0?\.\d", _grade_re.I)
 # Citation detection DELEGATES to the one shared definition (2026-07-31). The regex that used to sit
 # here accepted only the parenthetical author-year form and rejected the narrative one, so a finding
 # citing "Breznau et al. (2022)" was graded LOW for having no external citation while holding one.
