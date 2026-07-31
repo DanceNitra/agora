@@ -52,7 +52,7 @@ async def audit_once(vault_path: str) -> dict:
     import numpy as np
     from agora.execution.belief_revision import list_beliefs
     from agora.execution.semantic_index import _embed_batch
-    from agora.execution.contradictions import _judge_pair
+    from agora.execution.contradictions import _judge_pair, _is_duplicate_body, _norm_body
 
     d = _load()
     audited = set(d.get("audited", []))
@@ -76,6 +76,13 @@ async def audit_once(vault_path: str) -> dict:
             if float(sims[i]) < 0.5:
                 continue
             other = others[int(i)]
+            # Same guard as the vault sweep, for the same reason. This audit excludes a sibling by
+            # TITLE, which misses the copy filed under a different one -- and a belief cannot be in
+            # tension with itself, so the call can only come back COMPATIBLE. The core claims are
+            # already extracted here, so the check costs nothing but the comparison.
+            if _is_duplicate_body(_norm_body(claims[target["title"]]),
+                                  _norm_body(claims[other["title"]])):
+                continue
             r = await asyncio.to_thread(_judge_pair, target["title"], claims[target["title"]],
                                         other["title"], claims[other["title"]])
             if r:
