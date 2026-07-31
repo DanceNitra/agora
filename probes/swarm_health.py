@@ -315,15 +315,65 @@ def check_grounding_patterns(parts) -> None:
                             % name)
 
 
-def grounding_of(text: str, parts) -> str:
+#: Fields whose NAME declares a Lab receipt. A record that puts the id in a dedicated `lab` column is
+#: being MORE explicit than one that mentions "lab 6ba1f0" in prose, and the text scan below cannot
+#: see it: `_LAB_ID` needs the word adjacent to the hex. Measured 2026-07-31 -- every `.theory.json`
+#: record carries `lab: "6ba1f0"` plus a verdict and scored GROUNDED 0, while `.analogies.json`
+#: passed on the same evidence purely because it writes "[Lab 6ba1f0]" into its note text. Same organ,
+#: same run, opposite verdicts, decided by prose style. Third instance this session of a check keyed
+#: to one surface form.
+_LAB_FIELDS = ("lab", "lab_id", "labid")
+_HEX6 = re.compile(r"^[0-9a-f]{6}$", re.I)
+
+
+def declared_lab(rec) -> str:
+    """The Lab id a record names in a dedicated field, or ''."""
+    if not isinstance(rec, dict):
+        return ""
+    for f in _LAB_FIELDS:
+        v = rec.get(f)
+        if isinstance(v, str) and _HEX6.match(v.strip()):
+            return v.strip()
+    return ""
+
+
+def declared_verdict(rec, spec) -> str:
+    """The verdict a record states in a dedicated field, if it is one of THIS ledger's own words.
+
+    The vocabulary check is what keeps this from being a softening: an arbitrary string in a field
+    called `verdict` proves nothing, but "unmodelable" -- a pre-registered outcome of the theory
+    rule -- is the organ declaring its result in the most explicit form available.
+    """
+    if not isinstance(rec, dict):
+        return ""
+    known = [w.lower() for w in tuple(spec.get("decisive") or ()) + tuple(spec.get("inconclusive") or ())]
+    for f in (spec.get("verdict_fields") or ()):
+        v = rec.get(f)
+        if isinstance(v, str) and v.strip() and any(k in v.strip().lower() for k in known):
+            return v.strip()
+    return ""
+
+
+def grounding_of(text: str, parts, rec=None, spec=None) -> str:
     """'' if ungrounded, else the kind of grounding found.
 
-    The bar: a `lab <6-hex>` id PLUS a MEASURED:/VERDICT: marker, OR a real citation.
+    The bar is unchanged: a Lab receipt PLUS a stated outcome, or a real citation. What changed is
+    that BOTH halves may be declared in a FIELD rather than spelled into the prose -- which is the
+    stronger form, not the weaker one.
+
+    Measured 2026-07-31: every `.theory.json` record carries `lab: "1d6e1a"` and
+    `verdict: "unmodelable"` and scored GROUNDED 0, because the text scan wants the literal strings
+    "lab <hex>" and "MEASURED:"/"VERDICT:". `.analogies.json` passed on identical evidence purely
+    because it writes "[Lab 6ba1f0]" into its note text. Same organ, same run, opposite verdicts,
+    decided by prose style. A field named `verdict` holding one of that ledger's own vocabulary words
+    is a verdict; requiring it to also be typed into a sentence measures formatting.
     """
     t = text or ""
     if parts["grounding"].is_cited(t):
         return "citation"
-    if _LAB_ID.search(t) and _MEAS.search(t):
+    has_lab = bool(_LAB_ID.search(t)) or bool(declared_lab(rec))
+    has_verdict = bool(_MEAS.search(t)) or bool(declared_verdict(rec, spec or {}))
+    if has_lab and has_verdict:
         return "lab+measured"
     return ""
 
@@ -587,7 +637,7 @@ def measure_ledgers(server_dir: Path, hours: float, parts) -> dict:
             rows.append({"rec": rec, "ts": ts, "in_window": ts > cutoff,
                          "decisive": is_decisive(rec, spec, parts),
                          "actor": record_actor(rec, spec),
-                         "grounding": grounding_of(record_text(rec, spec), parts)})
+                         "grounding": grounding_of(record_text(rec, spec), parts, rec, spec)})
         no_ts = sum(1 for r in rows if not r["ts"])
         if recs and no_ts == len(recs):
             # Windowing a store with no usable timestamp would silently report every record as
