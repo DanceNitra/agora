@@ -127,8 +127,13 @@ LEDGERS = {
         # live outcomes are free text: "no viable mapping", "viable", "forged", "SURVIVED (lab
         # 3a7e67): ...", "REJECTED as a bridge + FALSIFIED ...". Substring match is required here.
         verdict_fields=("outcome", "verdict", "status"), primary="outcome",
+        # `shipped (lab ...)` is the outcome when an analogy is accepted and written out -- the most
+        # decisive thing this organ does, and the gate did not know the word. Found by sweeping every
+        # ledger's live verdict values against this config rather than by reading it: three ledgers
+        # were writing a verdict the gate scored as neither work nor idleness, so those runs simply
+        # vanished from the agent's row.
         decisive=("survived", "corroborated", "strained", "forged", "mapped", "viable",
-                  "rejected", "falsified", "refuted", "no viable mapping"),
+                  "rejected", "falsified", "refuted", "no viable mapping", "shipped"),
         inconclusive=("hypothesized", "queued", "pending", "open", "charted"),
         ts_fields=("ts",),
         actor_fields=("by", "agent", "author", "actor", "who"),
@@ -138,7 +143,13 @@ LEDGERS = {
         # live verdicts: corroborated 4 / strained 2. Both are decisive -- "strained" is a belief
         # that moved, which is the point of the organ.
         verdict_fields=("verdict", "outcome", "status"), primary="verdict",
-        decisive=("corroborated", "strained", "survived", "refuted", "falsified", "revised"),
+        # `unmodelable` is a PRE-REGISTERED outcome of the theory rule, not a missing answer: it
+        # fires when the falsification control reproduces the signature, i.e. the measurement was
+        # never evidence about the mechanism. Decisive -- it closes the question and forbids the
+        # claim. Measured 2026-07-31: the gate knew neither word, so those runs counted as
+        # neither work nor idleness and simply vanished from the agent's row.
+        decisive=("corroborated", "strained", "survived", "refuted", "falsified", "revised",
+                  "unmodelable", "no viable mapping"),
         inconclusive=("hypothesized", "queued", "pending", "open"),
         ts_fields=("ts",),
         actor_fields=("by", "agent", "author", "actor", "who"),
@@ -198,7 +209,10 @@ LEDGERS = {
         verdict_fields=("outcome", "verdict", "status"), primary="outcome",
         decisive=("forged", "no honest bridge", "no bridge", "already bridged", "bridged",
                   "rejected", "falsified"),
-        inconclusive=("hypothesized", "charted", "queued", "pending", "open"),
+        # `off-board` is a RETIREMENT (retire_off_board), not a research outcome -- the chart was
+        # closed because the consumer's board gate can never pass it. Counting it decisive would
+        # pay an agent for a backlog cleanup someone else ran.
+        inconclusive=("hypothesized", "charted", "queued", "pending", "open", "off-board"),
         # THREE close-stamps, and a forged record carries NONE of the other two. Measured
         # 2026-07-31: seven records with status "bridged" were stamped `bridged_ts` at 08:52 that
         # morning and had neither `ts` nor `resolved_ts`, so the gate could not date them at all and
