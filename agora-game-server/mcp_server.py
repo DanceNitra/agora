@@ -1411,6 +1411,10 @@ def _astar(start: tuple[int, int], goal: tuple[int, int]) -> list[tuple[int, int
 from urllib.parse import quote as _urlquote
 
 _BRAIN_URL = os.environ.get("AGORA_BRAIN_URL", "http://127.0.0.1:8000").rstrip("/")
+#: Router mount for every brain endpoint. `_brain_get_sync` takes a WHOLE path, so anything short of
+#: this prefix 404s. Organ modules are handed `/brain/...` names in their contract and several wrote
+#: exactly that, so `OrganCtx._api` normalises against this constant rather than each author guessing.
+_API_PREFIX = "/api/v1/agent-os"
 # CROSS-WIRED IDENTITY, fixed 2026-07-31. The last two rows were off by one against the authoritative
 # table in server/agora/agent_os/agent_os.py:NPC_UUIDS, which reads ...006 = Artificer Rooke and
 # ...008 = Cartographer Wren. There is no ...009 in that table at all. Consequences measured against
@@ -1770,10 +1774,28 @@ async def _renewable_quests(eid: str, want: int = 3) -> list:
     # deploying it: Orin, Wren and Voss dropped from 3 quests to 1. Rotating each bucket instead means
     # every agent still walks EVERY item, just entering the ring at its own point, so differentiation
     # costs no supply.
-    buckets = buckets[_seat % len(buckets):] + buckets[:_seat % len(buckets)]
-    _off = _seat // len(buckets)
-    if _off:
-        buckets = [(b[_off % len(b):] + b[:_off % len(b)]) if b else b for b in buckets]
+    # COUNT THE BUCKETS THAT ACTUALLY HAVE STOCK. The first version divided by `len(buckets)` -- all
+    # four, stocked or not -- so it assumed every source was supplying. When only ONE bucket is
+    # non-empty, which is the ordinary live case (papers, findings and flywheel run dry while
+    # `directions` refills), rotating the order of four buckets is a no-op and `_seat // 4` yields
+    # just TWO distinct depths across eight agents. Measured 2026-07-31 after deploying it: eight
+    # agents collapsed onto two distinct top picks, and the rejection ledger caught Artificer Rooke
+    # and Dame Elara submitting one identical title in the SAME SECOND. My own fix, with the hole one
+    # level down from where I tested it -- I checked the four-source case and shipped it.
+    #
+    # Dropping the empty buckets first makes the two dials measure what they are for: WHICH source
+    # leads (seat % nz) and HOW DEEP the agent enters it (seat // nz). Empty buckets contribute
+    # nothing to the interleave anyway, so removing them changes no supply, only the arithmetic.
+    # Distinct top picks across the eight seats: 4 stocked sources 8/8, 1 stocked source with 7 items
+    # 7/8 (the ceiling -- eight agents, seven items), a 3-item supply 3/8 (also the ceiling). Every
+    # agent still walks EVERY item, so differentiation costs no supply.
+    buckets = [b for b in buckets if b]
+    if buckets:
+        _nz = len(buckets)
+        buckets = buckets[_seat % _nz:] + buckets[:_seat % _nz]
+        _off = _seat // _nz
+        if _off:
+            buckets = [b[_off % len(b):] + b[:_off % len(b)] for b in buckets]
     interleaved, i = [], 0
     while any(len(b) > i for b in buckets):
         for b in buckets:
@@ -3860,11 +3882,33 @@ class _OrganCtx:
         #: used to rebuild this ~370x/hour and throw it away; it is fetched once per organ cycle now.
         self.mind = mind or ""
 
+    @staticmethod
+    def _api(path: str) -> str:
+        """Accept both spellings of a brain path. THE ORGAN CONTRACT NEVER SAID WHICH.
+
+        `_brain_get_sync` builds `http://127.0.0.1:8000` + path, so a caller must supply the whole
+        `/api/v1/agent-os/brain/...`. The contract handed to the organ authors said "drive endpoints
+        that already exist" and named them the way the docs do -- `/brain/gaps`, `/brain/canon-inputs`
+        -- so half of them wrote the short form and got a 404 on every read.
+
+        Measured 2026-07-31 across the shipped organs: artificer and cartographer prefix correctly;
+        king and thief probe for the prefix at runtime; guard_l is mixed; and guard_r (8 paths),
+        priest (8) and scholar (5) use the bare form exclusively. Those three are Dame Elara, High
+        Priest Orin and Sage Mira -- three of the four agents the acceptance gate scored at zero.
+        Mira's cycle reported "no canon to curate (0 chars)" while `/brain/canon-inputs` was serving
+        6,788 characters; the endpoint was fine and the request never reached it.
+
+        Normalising here rather than in 27 call sites fixes the class, makes both spellings correct
+        for every future organ, and removes the reason king and thief probe at all.
+        """
+        p = path or ""
+        return _API_PREFIX + p if p.startswith("/brain/") or p == "/brain" else p
+
     def brain_get(self, path: str, timeout: int = 8):
-        return _ready(_brain_get_sync(path, timeout))
+        return _ready(_brain_get_sync(self._api(path), timeout))
 
     def brain_post(self, path: str, body: dict | None = None, timeout: int = 8):
-        return _ready(_brain_post_sync(path, body or {}, timeout))
+        return _ready(_brain_post_sync(self._api(path), body or {}, timeout))
 
     def lab_run(self, name: str, code: str):
         """Run a computational falsifier in the brain's Lab. The severe-test rule: a claim ships only

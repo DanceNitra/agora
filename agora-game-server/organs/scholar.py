@@ -541,7 +541,13 @@ async def _merge(ctx, canon: str, plan: dict, n_artifacts: int) -> dict:
         at = _place(plan, a)
         if at is None:
             continue
-        admits.append({"at": at, "lines": _admit_lines(a["title"], a["core"], a["receipt"])})
+        # `kind` decides how the receipt is RENDERED -- a Lab id becomes "Lab `4ae810`", a citation
+        # is printed as written. It was carried in the plan record and never passed, so this raised
+        # TypeError on every cycle that had anything to admit. Measured 2026-07-31 against the live
+        # canon: plan drop=0 admit=1 reject=7, and the organ returned status=error instead of a
+        # merge. Sage Mira's curation arm could only ever complete when it had nothing to do.
+        admits.append({"at": at,
+                       "lines": _admit_lines(a["title"], a["core"], a["receipt"], a.get("kind", ""))})
     drops = [d["block"] for d in plan["drop"]]
     if not drops and not admits:
         return _result("idle", "nothing placeable this cycle")
