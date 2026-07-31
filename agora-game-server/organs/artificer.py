@@ -934,6 +934,11 @@ def _inst_mft(claim: str):
             "code": code,
             "params": {"J": jj, "H": -abs(hh), "REC": rec, "N_SMALL": 240, "N_LARGE": 600},
             "rel_floor": 0.25, "seeds": 3,
+            # The reported figure is NOT seed scatter. It is the systematic spread of the tipping
+            # fraction between N=240 and N=600, which dominates the statistical error by an order of
+            # magnitude here and is the honest thing to price a tolerance on.
+            "uncertainty": "seeds each; the figure is the finite-size spread between N=240 and N=600, "
+                           "not seed scatter",
             "models": "mean-field Ising with a committed +1 minority at coupling J=%.3g and an opposing "
                       "field h=%.3g, with the unstated temperature pinned on the claim's own recovery "
                       "edge so the tipping fraction is a free prediction" % (jj, -abs(hh))}
@@ -1100,6 +1105,7 @@ async def cycle(ctx) -> dict:
                                    "(replication-target returned no target)")
 
         target, claim, source, inst = None, "", "", None
+        fam, sim = [], []          # prior art OF THE SELECTED claim, bound at the break below
         skipped = []
         for cand in cands:
             if not isinstance(cand, dict):
@@ -1119,6 +1125,7 @@ async def cycle(ctx) -> dict:
                 _log(ctx, "no instrument for: %s" % c[:70])
                 continue
             target, claim, source, inst = cand, c, s, i
+            fam, sim = _fam, _sim
             break
 
         if inst is None:
@@ -1196,8 +1203,12 @@ async def cycle(ctx) -> dict:
             "CLAIM: %s" % claim[:200],
             "SOURCE: %s" % source[:160],
             "MODEL: %s [lab %s, stdlib-only Monte Carlo]" % (inst["models"], lab_id),
+            # An instrument whose dominant uncertainty is NOT seed scatter must say so. The committed
+            # tipping row reports a finite-size SPAN between two system sizes, and calling that
+            # "3 independent seeds" would describe a statistical error bar we did not measure -- in an
+            # artifact bound for the public replication ledger.
             "MEASURED: %s = %.5g (SE %.3g, %d %s)" % (inst["label"], measured, se, inst["seeds"],
-                                                      _SEEDS_NOTE),
+                                                      inst.get("uncertainty") or _SEEDS_NOTE),
             "CLAIMED: %s = %.5g" % (inst["label"], inst["claimed"]),
         ]
         if tol is not None:
