@@ -1743,10 +1743,37 @@ async def _renewable_quests(eid: str, want: int = 3) -> list:
     # INTERLEAVE the four sources round-robin, with a shuffled bucket order so the lead source varies
     # each cycle — this is the diversity fix: the top `want` picks now span sources instead of being
     # three flywheel questions every time.
+    # THE 2026-06-19 FIX STOPPED ONE SOURCE MONOPOLISING THE SLOTS. IT DID NOT STOP THE EIGHT AGENTS
+    # ALL TAKING THE SAME ITEMS. Every agent called this with the same four buckets and an independent
+    # `random.shuffle`, which makes each agent's order random but does nothing to make them DIFFER --
+    # the top of a 40-item pool is a small target and they crowd it.
+    #
+    # Measured 2026-07-31, once `_brain_contribute` stopped reporting rejections as landings: 71
+    # rejected writes in ~20 minutes, all eight agents contributing, 45 of them "near-duplicate of a
+    # recent finding" and 25 "vault already covers this". The same title was submitted THIRTEEN times
+    # ("How should a memory system's write-acceptance conservatism scale..."), another twelve, another
+    # ten. The swarm was not idle; it was eight agents grinding the same handful of themes and throwing
+    # the results at a dedup gate, while every rejection logged as a success.
+    #
+    # So: deal the pool DETERMINISTICALLY BY AGENT. Each agent leads with a different bucket and starts
+    # at a different depth, so eight simultaneous callers walk away with eight different top picks from
+    # the same supply. Deterministic, not random: two agents drawing the same card by chance is exactly
+    # what needs to stop, and a shuffle cannot promise it. The per-agent `_recent_intents` then keeps
+    # each one off its OWN recent ground, which is a different guarantee and both are needed.
     buckets = [b_paper, b_find, b_fly, b_dir]
     for b in buckets:
         random.shuffle(b)
-    random.shuffle(buckets)
+    _order = sorted(_AGENT_NAMES)                      # stable, restart-independent seat numbering
+    _seat = _order.index(eid) if eid in _order else 0
+    # ROTATE, do not slice. The first version of this started deep seats at index `_depth`, which SKIPS
+    # that many items and starves an agent whose bucket is shallow -- measured immediately after
+    # deploying it: Orin, Wren and Voss dropped from 3 quests to 1. Rotating each bucket instead means
+    # every agent still walks EVERY item, just entering the ring at its own point, so differentiation
+    # costs no supply.
+    buckets = buckets[_seat % len(buckets):] + buckets[:_seat % len(buckets)]
+    _off = _seat // len(buckets)
+    if _off:
+        buckets = [(b[_off % len(b):] + b[:_off % len(b)]) if b else b for b in buckets]
     interleaved, i = [], 0
     while any(len(b) > i for b in buckets):
         for b in buckets:
