@@ -319,6 +319,37 @@ def box_mark(url: str, status: str = "done") -> bool:
     return hit
 
 
+def box_rule(url: str, verdict: str, by: str = "") -> bool:
+    """Record the Scout's RULING on a lead without touching where the pipeline stands.
+
+    `status` tracks the GATED pipeline -- open -> drafted -> posted -- and a real fit must stay
+    `open` until the owner approves, because nothing goes outward unapproved. `verdict` records what
+    Shadow Kael DECIDED, which is finished work the moment he decides it.
+
+    They were one field, and that made his ledger incoherent: a `no_fit` was marked and counted as a
+    decisive outcome, while a FIT -- strictly more work, measured against the board, the vault and
+    the thread's reachability, and grounded by a Lab run -- was left `open` and scored as nothing.
+    Measured 2026-07-31: 9 box records in the window, every one `open`, and the acceptance gate
+    reported Shadow Kael with 0 decisive outcomes on the same cycle his contribution landed as a
+    grounded discovery. The instrument was crediting him for finding nothing and not for finding
+    something.
+    """
+    v = (verdict or "").strip()[:20]
+    if not url or not v:
+        return False
+    items = box_load()
+    hit = False
+    for x in items:
+        if x.get("url") == url:
+            x["verdict"] = v
+            x["ruled_ts"] = time.time()
+            x.setdefault("by", by or OWNER)
+            hit = True
+    if hit:
+        _box_save(items)
+    return hit
+
+
 def box_stats() -> dict:
     items = box_load()
     open_ = [x for x in items if x.get("status") == "open"]

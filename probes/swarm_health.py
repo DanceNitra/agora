@@ -107,7 +107,10 @@ LEDGERS = {
         verdict_fields=("status", "outcome", "verdict"), primary="status",
         decisive=("drafted", "no_fit", "done", "posted", "declined"),
         inconclusive=("taken", "new", "open", "queued", "pending"),
-        ts_fields=("closed_ts", "taken_ts", "found_ts", "ts"),
+        # `ruled_ts` FIRST: it is when the Scout DECIDED, which is the work being measured. `found_ts`
+        # is when the lead was collected and can be a day older, so a ruling made this cycle on an
+        # older lead would otherwise fall outside the window and read as no work at all.
+        ts_fields=("ruled_ts", "closed_ts", "taken_ts", "found_ts", "ts"),
         actor_fields=("by", "agent", "author", "actor", "who"),
         foreign_text=("body", "title", "url", "repo"),
     ),

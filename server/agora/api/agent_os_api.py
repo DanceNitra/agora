@@ -2222,6 +2222,19 @@ async def brain_scout_box_mark(request: Request):
     return {"status": "ok" if ok else "not_found", "stats": box_stats()}
 
 
+@router.post("/brain/scout/box/rule")
+async def brain_scout_box_rule(request: Request):
+    """Record the Scout's ruling on a lead (drafted | no_fit) WITHOUT closing it.
+
+    Separate from `/box/mark` on purpose: `status` is where the gated pipeline stands and a real fit
+    stays `open` until the owner approves, while `verdict` is the decision the Scout already made.
+    """
+    from agora.execution.scout import box_rule, box_stats
+    b = await request.json()
+    ok = box_rule(b.get("url") or "", b.get("verdict") or "", b.get("by") or "")
+    return {"status": "ok" if ok else "not_found", "stats": box_stats()}
+
+
 @router.get("/brain/scout/box/take")
 async def brain_scout_box_take(kind: str = "contribute", n: int = 1):
     """Hand out the top `n` open leads for triage, highest score first.

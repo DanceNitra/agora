@@ -559,8 +559,18 @@ async def _ledger(ctx, lead: dict, source: str, outcome: str, reason: str, say) 
                     {"url": url, "repo": repo, "issue": issue, "outcome": f"no_fit: {reason}"[:60]})
         say(f"closed {repo}#{issue} as no_fit")
     else:
-        say(f"{repo}#{issue} confirmed as a fit - LEFT OPEN for the gated triage pipeline "
-            f"(Kael does not post)")
+        # RECORD THE RULING, LEAVE THE LEAD OPEN. `status` is where the gated pipeline stands and a
+        # fit must stay `open` until the owner approves -- Kael does not post. But the RULING is
+        # finished work the moment he makes it, and it was going nowhere: measured 2026-07-31, all 9
+        # box records in the window read `open`, so the acceptance gate reported him with 0 decisive
+        # outcomes on the very cycle his contribution landed as a grounded discovery. A `no_fit` was
+        # marked and counted; a fit -- strictly more work, and the valuable answer -- counted as
+        # nothing. The instrument credited him for finding nothing and not for finding something.
+        if source == "box":
+            await _post(ctx, "/brain/scout/box/rule",
+                        {"url": url, "verdict": outcome, "by": ORGAN["agent"]})
+        say(f"{repo}#{issue} confirmed as a fit - ruled '{outcome}', LEFT OPEN for the gated "
+            f"triage pipeline (Kael does not post)")
 
 
 def _compose(lead: dict, source: str, r: dict, hits: list, lab_id, priorities: str) -> str:
