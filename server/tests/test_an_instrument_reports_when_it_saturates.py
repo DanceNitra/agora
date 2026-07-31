@@ -79,17 +79,36 @@ def test_the_derived_bracket_contains_the_true_crossing(phi, zc):
 
 def test_phi_comes_from_the_claim_and_a_claim_without_one_is_refused():
     """Measuring at an assumed threshold and comparing to the claim's mean degree would manufacture
-    a FAILED out of a units mismatch."""
-    # The LIVE claim, verbatim from /brain/replication-target. An invented paraphrase of it is not
-    # the string the matcher sees, and asserting on one tests the paraphrase.
+    a FAILED out of a units mismatch.
+
+    THE FIXTURE CHANGED, AND THE REASON IS A MEASUREMENT, not a convenience. This used to assert on
+    the live claim "in a Watts model with mean degree 6 and threshold 0.1, a 1% seed fraction achieves
+    near-complete cascade", requiring the instrument to FIRE on it. On 2026-08-01 it did, and wrote
+    into the ledger:
+
+        MEASURED cascade_window_upper=13.586 vs CLAIMED 6 -> FAILED   (lab 712068)
+
+    The claim is true. 6 is the operating point at which the cascade the claim describes HAPPENS, and
+    the window closes at 13.66, so 6 sits well inside it. The instrument had read an operating point
+    as an edge -- the units mismatch this very test names -- and the assertion here was pinning that
+    behaviour in place. The claim is now refused outright and that refusal is pinned by
+    test_an_operating_point_reaches_no_instrument_at_all.
+
+    What this test is actually for -- phi is taken from the claim, and a claim without one is refused
+    -- is unchanged, and is now asserted on a claim that really does state a window edge.
+    """
     inst = _inst_ltm(
-        "The tipping threshold for global cascades decreases with greater network connectivity; "
-        "for instance, in a Watts model with mean degree 6 and threshold 0.1, a 1% seed fraction "
-        "achieves near-complete cascade")
+        "On a Poisson random graph the cascade window closes at mean degree 13.7 for a threshold "
+        "of 0.1")
     assert inst is not None and inst["params"]["PHI"] == 0.1
     assert "__PHI__" not in inst["code"] and "= 0.1," in inst["code"]
     assert _inst_ltm("LTM cascade window upper edge z_c = 5.8 on a Poisson random graph") is None, (
         "a claim stating no threshold must be refused, not measured against an assumed one")
+    assert _inst_ltm(
+        "The tipping threshold for global cascades decreases with greater network connectivity; "
+        "for instance, in a Watts model with mean degree 6 and threshold 0.1, a 1% seed fraction "
+        "achieves near-complete cascade") is None, (
+        "the operating-point claim fires again; it produced a FAILED on a true claim once already")
 
 
 def test_the_calibration_row_is_still_documented():

@@ -198,7 +198,11 @@ LEDGERS = {
         verdict_fields=("outcome", "verdict", "status"), primary="outcome",
         decisive=("reproduced", "failed", "not_computable", "not computable"),
         inconclusive=("queued", "pending", "open", "hypothesized", "running"),
-        ts_fields=("ts",),
+        # `retracted_ts` is stamped when a verdict is withdrawn (a wrong FAILED corrected to
+        # NOT_COMPUTABLE). A retraction is the most consequential write this ledger takes, and a
+        # reader that ignores its timestamp lets the corrected record age out of the window
+        # silently -- the exact class this file already documents for Wren.
+        ts_fields=("retracted_ts", "ts"),
         actor_fields=("by", "agent", "author", "actor", "who"),
         foreign_text=(),
     ),
