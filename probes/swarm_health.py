@@ -192,7 +192,7 @@ LEDGERS = {
         decisive=("forged", "no honest bridge", "no bridge", "already bridged", "bridged",
                   "rejected", "falsified"),
         inconclusive=("hypothesized", "charted", "queued", "pending", "open"),
-        ts_fields=("ts",),
+        ts_fields=("resolved_ts", "ts"),
         actor_fields=("by", "agent", "author", "actor", "who"),
         foreign_text=(),
     ),

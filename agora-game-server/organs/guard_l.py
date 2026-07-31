@@ -761,6 +761,13 @@ async def _record(ctx, info, target, title, verdict, measured, riders, lab_id,
             _API + "/brain/belief-revise",
             {"path": target["path"], "verdict": stamp, "by_note": "",
              "reason": reason[:900],
+             # THE RECEIPT, EXPLICITLY. The bounty record used to keep {verdict, kill, target, by, ts}
+             # and nothing else, so a "survived" claimed a belief had been attacked while keeping no
+             # trace of WHAT it survived -- which is indistinguishable from a challenge that could
+             # never have killed anything, the exact failure Voss's own academy lesson names. The
+             # endpoint falls back to `reason`, but hoping the lab id happens to be inside a prose
+             # field is not a guarantee; name it.
+             "evidence": ("lab %s | %s" % (lab_id, reason[:200])) if lab_id else reason[:220],
              # CLAUDE.md gives Voss the bounty ledger; repair_ledger.py:65 says the store's `by`
              # field decides. Writing the name he already holds 31 records under keeps his standing
              # one identity instead of forking it.

@@ -1861,8 +1861,14 @@ async def brain_belief_revise(request: Request):
     res = stamp_belief(b.get("path") or "", b.get("verdict") or "",
                        b.get("by_note") or "", b.get("reason") or "")
     if not res.get("error"):
+        # CARRY THE RECEIPT INTO THE LEDGER. The bounty record held {verdict, kill, target, by, ts}
+        # and nothing else, so a "survived" asserted that a belief had been attacked while keeping no
+        # trace of WHAT it survived -- indistinguishable from a challenge that could never have killed
+        # anything. `reason` is what the caller already sends to stamp the note; a challenger that ran
+        # a falsifier passes its lab id in `evidence`.
         record_challenge(b.get("verdict") or "", Path(b.get("path") or "").stem,
-                         b.get("challenger") or "Sergeant Voss")
+                         b.get("challenger") or "Sergeant Voss",
+                         evidence=(b.get("evidence") or b.get("reason") or ""))
         if (b.get("verdict") or "").lower() in ("revised", "retired"):
             from agora.execution.graveyard import bury
             bury(Path(b.get("path") or "").stem, b.get("reason") or "challenge succeeded",
