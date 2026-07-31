@@ -229,7 +229,11 @@ def _garbage_finding(title: str, content: str):
         return "too short"
     if body.strip(". ") == tl.strip(". "):               # content merely restates the title
         return "content restates title (no real finding)"
-    if _REFUSAL_AT_SOURCE.search(c):
+    # ONE DEFINITION (2026-07-31). The private pattern below required a source noun IMMEDIATELY
+    # after "no", so "No REAL sources were provided" -- the exact wording the corp emits -- walked
+    # past it. Measured on the live inbox: of ten refusals, this caught one.
+    from agora.execution.grounding import is_refusal as _is_refusal
+    if _is_refusal(c) or _REFUSAL_AT_SOURCE.search(c):
         return "refusal / non-finding (no source supports the claim)"
     if len(body) < 80 and _TRIVIAL_COPULA.match(body) and not _SIG_MARK.search(body):
         return "low significance (bare definitional fact, no measured/comparative claim)"

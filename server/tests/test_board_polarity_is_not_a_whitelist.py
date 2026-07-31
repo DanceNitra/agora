@@ -132,6 +132,39 @@ def test_a_refusal_the_stop_list_never_heard_of_is_still_refused():
     assert "erasure" in t, "the positive half of the board stopped contributing"
 
 
+def test_the_boards_own_label_does_not_admit_a_subject():
+    """`frontier` is how the board NAMES its priority, not a subject it names.
+
+    The text opens "frontier: Make inspeximus the #1 agent-memory product", and task templates carry
+    the same word, so it matched work against the board's own stationery. Measured on the live inbox
+    2026-07-31: of 33 pending tasks, ELEVEN were classified on-board solely by this word, every one
+    of them Bayesian-network structure learning -- a third of the queue, none of it on the memory
+    frontier.
+    """
+    off = [
+        "Crucible candidate: On the bnlearn benchmark networks (ALARM, INSURANCE, HEPAR-II)",
+        "Research dossier: Using the Erdos-Renyi DAG generator from Zheng et al.",
+        "Crucible candidate: minimum graph thinness in induced subgraphs",
+    ]
+    t = terms()
+    assert "frontier" not in t, "the board's own label is a priority term again"
+    admitted = [x for x in off if _theme_tokens(x) & t]
+    assert not admitted, "structure-learning work was admitted to the memory frontier: %s" % admitted
+
+
+def test_the_label_fix_does_not_cost_a_real_task():
+    """The control that matters: the words the board names as SUBJECTS must keep admitting work.
+
+    `roadmap` and `quality` each admitted a task on their own in the live measurement, which looks
+    like the same boilerplate shape -- but the board names both as real subjects ("the buyer-facing
+    gap roadmap", "retrieval quality measured vs mem0/Zep/Cognee"), so they stay.
+    """
+    for task in ("Synthesize roadmap: read /brain/roadmap-inputs",
+                 "Measure multi-hop retrieval quality against mem0",
+                 "Predict: bounded context for agents and their memory"):
+        assert _theme_tokens(task) & terms(), "a real on-board task stopped passing: %s" % task
+
+
 def test_the_fixture_would_leak_without_the_filter():
     """A control, because a green suite must not be able to mean 'the fixture has no refusals in it'.
 

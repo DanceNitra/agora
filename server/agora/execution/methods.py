@@ -426,6 +426,7 @@ def _norm_theme(t: str) -> str:
 # ...", "every finding must answer ..."). Without that stop-list the gate matches on the board's own
 # boilerplate and passes everything — the exact bug measured on the quest-pool gate the same day.
 _BOARD_STOP = frozenset("""priority priorities prioritize prioritise research finding findings theme themes
+frontier
 question questions standing owner deprioritize topic topics work make better every answer does that this
 which their they there been more most only very also into from with must should when where what have
 about test tests testing measure measured result results claim claims
@@ -436,6 +437,16 @@ finance financial health longevity physics politics cloud trivia generic meta be
 # headline", "Deprioritize generic meta-science, politics, cloud/trivia"). Naively tokenizing the board
 # text turns those into PRIORITY words, so a finance or cloud theme would pass the gate on the strength of
 # the sentence telling us to deprioritize it. Measured on the real board text before this fix.
+#
+# `frontier` sits in the FIRST group because it is how the board LABELS its priority, not a subject:
+# the text opens "frontier: Make inspeximus the #1 agent-memory product". Both sides carry the word --
+# task templates say "Frontier:" too -- so it matches a task against the board's own stationery.
+# Measured on the live inbox 2026-07-31: of 33 pending tasks, ELEVEN were classified on-board solely by
+# this word, every one of them Bayesian-network structure learning (bnlearn ALARM / HEPAR-II / ANDES,
+# Erdos-Renyi DAGs, NOTEARS) -- a third of the queue, none of it on the memory frontier. Removing it
+# costs nothing legitimate: the four tasks that carry `frontier` AND a real subject term stay on-board
+# on that term, and `roadmap` and `quality` stay in because the board names both as real subjects
+# ("the buyer-facing gap roadmap", "retrieval quality measured vs mem0/Zep/Cognee").
 
 
 def _theme_tokens(t: str) -> set:

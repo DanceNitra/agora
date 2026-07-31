@@ -99,6 +99,43 @@ def is_measured(text: str) -> bool:
     return bool(_MEASURED.search(text or "")) or lab_id(text) is not None
 
 
+#: Nouns that name a SOURCE. The refusal test anchors on these and nowhere else, because the
+#: distinction that matters is between a non-answer and a null result: "no sources were found" is an
+#: unanswered question, while "no significant difference was found (p=0.31)" is science, and a filter
+#: that cannot tell them apart deletes our best material.
+_SOURCE_NOUN = r"(?:papers?|sources?|stud(?:y|ies)|abstracts?|evidence|references?|citations?|literature)"
+
+#: "no <up to three modifiers> <source noun> ... <verb of support>", plus the "none of the ..." form.
+#: The gap for modifiers is the whole point: the previous pattern required the noun IMMEDIATELY after
+#: "no", so a single adjective defeated it. Measured on the live inbox 2026-07-31: ten pending tasks
+#: carried a refusal and the guard caught ONE -- every miss was of the form "No REAL sources were
+#: provided". A guard with 10% recall reports safe.
+_REFUSAL = re.compile(
+    r"\bno(?:ne of the)?\b(?:\s+[a-z-]+){0,3}?\s+" + _SOURCE_NOUN +
+    r"\b[^.\n]{0,70}?\b(?:support|provide|relate|address|mention|match|fit|confirm|ground|report|"
+    r"found|exist|available)\w*"
+    r"|\b(?:cannot|could not|can't) be (?:assessed|evaluated|determined|verified)\b[^.\n]{0,40}"
+    r"\b(?:available|provided|existing)\b"
+    r"|\bdoes not (?:support|fit|apply)\b|\b(?:are|is) unrelated\b"
+    r"|\bcould not find\b|\bunable to (?:find|locate)\b|\bthe closest (?:are|is)\b"
+    r"|\bnot supported by\b|\btotal mismatch\b|\bas an ai\b"
+    r"|\bi (?:cannot|can't|could not|am unable)\b", re.I)
+
+
+def is_refusal(text: str) -> bool:
+    """Is this a NON-ANSWER dressed as research -- "no sources were provided to support the claim"?
+
+    THE ONE DEFINITION, because the same question is asked at two doors and only one was asking it.
+    `_garbage_finding` kept a private copy and used it to keep refusals out of the discovery pool;
+    nothing checked the CORP -> Claude inbox path, so a refusal that could never become a finding
+    still became a task. Measured 2026-07-31: 10 of 33 pending inbox tasks (30%) were refusals, nine
+    of them invisible to the private copy as well.
+
+    A null RESULT is not a refusal. See `_SOURCE_NOUN`.
+    """
+    return bool(_REFUSAL.search(text or ""))
+
+
 def is_grounded(text: str, allow_internal: bool = False) -> bool:
     """The vault-door question: external citation OR our own measurement.
 

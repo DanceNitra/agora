@@ -1171,13 +1171,18 @@ class CorporationWorker:
             from agora.execution.claude_inbox import add_task
             title = (quest.get("title") or "untitled idea")[:90]
             summary = (quest.get("research_summary") or quest.get("goal") or "")[:600]
-            why_refused = self._lead_saturated(title, summary)
-            if why_refused:
-                print(f"[Corp->Claude] dossier REFUSED ({why_refused}): {title[:50]}")
+            # A NON-ANSWER MUST NOT BECOME WORK. The corp packages whatever its research step
+            # returned, and when that step found nothing it returns "No real sources were provided
+            # to support any claim about ...". That is an unanswered question, not a lead. The
+            # discovery door has refused these for months; this door never asked. Measured
+            # 2026-07-31: 10 of 33 pending Claude tasks (30%) were refusals, several days old.
+            from agora.execution.grounding import is_refusal
+            if is_refusal(summary):
+                print(f"[Corp->Claude] ship-review REFUSED (research found no sources): {title[:50]}")
                 return
             why_refused = self._lead_saturated(title, summary)
             if why_refused:
-                print(f"[Corp→Claude] ship-review REFUSED ({why_refused}): {title[:50]}")
+                print(f"[Corp->Claude] ship-review REFUSED ({why_refused}): {title[:50]}")
                 return
             src = quest.get("research_source") or quest.get("findings_path") or ""
             why = (ev.get("ceo_rationale") or ev.get("cto_rationale") or "")[:200]
@@ -1207,6 +1212,16 @@ class CorporationWorker:
             from agora.execution.claude_inbox import add_task
             title = (quest.get("title") or "untitled idea")[:90]
             summary = (quest.get("research_summary") or quest.get("goal") or "")[:600]
+            # Same two guards as the ship-review path. This one had NEITHER: no refusal test and no
+            # saturation test, so a near-miss lead could arrive both unanswerable and duplicated.
+            from agora.execution.grounding import is_refusal
+            if is_refusal(summary):
+                print(f"[Corp->Claude] dossier REFUSED (research found no sources): {title[:50]}")
+                return
+            why_refused = self._lead_saturated(title, summary)
+            if why_refused:
+                print(f"[Corp->Claude] dossier REFUSED ({why_refused}): {title[:50]}")
+                return
             src = quest.get("research_source") or quest.get("findings_path") or ""
             why = (ev.get("cto_rationale") or ev.get("ceo_rationale") or "")[:200]
             text = (
