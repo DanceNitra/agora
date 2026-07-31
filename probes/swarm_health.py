@@ -247,17 +247,21 @@ def load_repo_parts(code_dirs):
         raise GateError("cannot import agora.execution.finding_diversity (%s: %s) -- refusing to "
                         "invent a near-duplicate metric" % (type(e).__name__, e))
     try:
-        from agora.execution.quality_gate import _DOI, _CITES
-        from agora.api.agent_os_api import _G_MEASURED, _G_CITE
-        # finding_diversity._CITE recognises the OTHER citation style: "Mockus et al. (2002)", with
-        # the author OUTSIDE the parens. _G_CITE / _CITES only match the fully-parenthesised
-        # "(Mockus et al., 2002)". Measured while building this gate: the checker returned '' for
-        # "Mockus et al. (2002) measured the same split in Apache" -- a real citation scored as
-        # ungrounded. That error falls AGAINST the agent, which is the direction repair_ledger.py
-        # warns about three times over. Both repo regexes are used; neither is reinvented.
-        from agora.execution.finding_diversity import _CITE as _FD_CITE
-        parts.update(doi=_DOI, cites=_CITES, g_measured=_G_MEASURED, g_cite=_G_CITE,
-                     fd_cite=_FD_CITE)
+        from agora.api.agent_os_api import _G_MEASURED
+        # THE CITATION FORK IS FIXED AT THE ROOT NOW (2026-07-31), so this gate no longer has to
+        # OR two disagreeing regexes together. What this comment used to say still stands as the
+        # evidence: while this gate was being built, the checker returned '' for "Mockus et al.
+        # (2002) measured the same split in Apache" -- a real citation scored as ungrounded, an
+        # error falling AGAINST the agent. The cause was that quality_gate._CITES matched only the
+        # fully-parenthesised "(Mockus et al., 2002)" while finding_diversity._CITE matched only the
+        # narrative "Mockus et al. (2002)": mirror images, each rejecting the other's style. SEVEN
+        # such detectors existed; measured over the 4,000 most recent discoveries, 1,127 (28.2%)
+        # were turned away from the vault while holding a real narrative citation. They now delegate
+        # to agora/execution/grounding.py, so this gate asks the SAME question the vault door asks
+        # instead of approximating it -- which matters, because a gate that grades grounding
+        # differently from the door would pass agents the door rejects, and fail agents it accepts.
+        from agora.execution import grounding as _grounding
+        parts.update(g_measured=_G_MEASURED, grounding=_grounding)
     except Exception as e:                                          # pragma: no cover - env issue
         raise GateError("cannot import the repo grounding regexes (%s: %s) -- refusing to measure "
                         "grounding with a made-up pattern" % (type(e).__name__, e))
@@ -291,8 +295,7 @@ def grounding_of(text: str, parts) -> str:
     The bar: a `lab <6-hex>` id PLUS a MEASURED:/VERDICT: marker, OR a real citation.
     """
     t = text or ""
-    if (parts["g_cite"].search(t) or parts["doi"].search(t) or parts["cites"].search(t)
-            or parts["fd_cite"].search(t)):
+    if parts["grounding"].is_cited(t):
         return "citation"
     if _LAB_ID.search(t) and _MEAS.search(t):
         return "lab+measured"
