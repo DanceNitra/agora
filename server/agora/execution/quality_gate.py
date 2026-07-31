@@ -13,13 +13,12 @@ import json
 import os
 import re
 
+from agora.execution import grounding
 from agora.execution.llm_client import call_llm
 
-_CITES = re.compile(r"\([A-Z][a-zA-Z]+(?: et al\.?)?,? \d{4}\)")
 # Voss science gate (AGORA_SCIENCE_GATE=1): real grounding is a real CITATION SHAPE or a MEASURED number,
 # never just the literal word "Source:" (which an empty note can fake). Lab findings ground in a measured
 # number (not a paper), literature findings ground in a real citation — accept EITHER, reject formatted air.
-_DOI = re.compile(r"\b10\.\d{4,9}/\S+|arxiv[:\s]*\d{4}\.\d{4,5}", re.I)
 _NUM = re.compile(r"MEASURED:|\bn\s*=\s*\d|\d+(?:\.\d+)?\s*%|p\s*[<=]\s*0?\.\d{1,4}|effect size|"
                   r"\bCI\b|95%|bootstrap|risk@|verdict:", re.I)
 _FALS = re.compile(r"falsif|would (?:refute|disprove|be wrong|fail)|refuted if|fails if|would change our mind",
@@ -27,8 +26,18 @@ _FALS = re.compile(r"falsif|would (?:refute|disprove|be wrong|fail)|refuted if|f
 
 
 def _real_grounding(c: str) -> bool:
-    """Grounded = a real external citation (DOI/arXiv/Author-year) OR a measured number — not 'Source:'."""
-    return bool(_DOI.search(c) or _CITES.search(c) or _NUM.search(c))
+    """Grounded = a real external citation (DOI/arXiv/Author-year) OR a measured number — not 'Source:'.
+
+    DELEGATES to the one shared definition (2026-07-31). The `_CITES` regex above accepted only the
+    PARENTHETICAL author-year form, `(Smith, 2024)`, and rejected the narrative form, `Smith (2024)` /
+    `Breznau et al. (2022)` — while `finding_diversity` carried the mirror-image regex that accepted
+    exactly the one this rejected. Six such detectors existed across the repo and disagreed on 8 of 9
+    citation forms. Measured over the 4,000 most recent discoveries: this door passed 2,514 (62.9%) and
+    turned away 1,127 (28.2%) that were carrying a real narrative citation, silently, because a
+    rejection leaves no trace. After delegation: 3,773 (94.3%) pass and **zero** previously-passing
+    findings now fail. See agora/execution/grounding.py for the table.
+    """
+    return grounding.is_grounded(c)
 
 
 def _science_heuristic(title: str, content: str, min_score: int = 6) -> dict:
@@ -57,7 +66,11 @@ def _heuristic(title: str, content: str, min_score: int = 6) -> dict:
     c = (content or "").strip()
     body = c.split("Source:")[0].strip()
     tl = (title or "").lower()
-    grounded = ("Source:" in c) or bool(_CITES.search(c))
+    # A SEVENTH definition lived here, and it was the worst of the set: it accepted the literal word
+    # "Source:" -- which the science gate above explicitly rejects because an empty note can fake it --
+    # while rejecting `Smith (2024)`. This is the fallback the funnel runs on whenever the critic LLM is
+    # down, so the loosest and the narrowest rule in the repo were both active on the same door.
+    grounded = grounding.is_grounded(c)
     nested = tl.count("hypothesize on:") >= 2 or tl.count("pursue direction:") >= 2
     if nested or len(body) < 140 or not grounded:
         return {"pass": False, "score": 3, "reason": "heuristic: short / ungrounded / stub"}

@@ -19,7 +19,10 @@ from pathlib import Path
 # the law (measured in Lab 46f22b / 5a0d6e): phi_c rises with self-reinforcement alpha.
 PHI_C = {1.0: 0.01, 1.5: 0.11, 2.0: 0.18, 3.0: 0.27}
 PHI_C_ALARM = 0.30        # below this, even strong self-reinforcement regimes risk lock-in
-_CITE = re.compile(r"\(20\d\d|\bdoi\b|et al|arxiv", re.I)
+# DELEGATES to the one shared definition (2026-07-31). The regex here was the LOOSEST of the six in the
+# repo: a bare "et al" with no year matched, and so did any "(20xx" fragment, so "as Smith et al. showed"
+# counted as grounded with nothing to look up. See agora/execution/grounding.py for the measured table.
+from agora.execution import grounding as _grounding  # noqa: E402
 _DB = Path(__file__).resolve().parents[2] / "agora.db"
 
 
@@ -39,7 +42,7 @@ def measure_self(vault_path: str = "") -> dict:
         cur = con.cursor()
         tot = cur.execute("SELECT COUNT(*) FROM collective_knowledge WHERE knowledge_type='discovery'").fetchone()[0] or 0
         rows = cur.execute("SELECT content FROM collective_knowledge WHERE knowledge_type='discovery'").fetchall()
-        grounded = sum(1 for (c,) in rows if c and _CITE.search(c))
+        grounded = sum(1 for (c,) in rows if c and _grounding.is_grounded(c))
         m["grounding_phi"] = round(grounded / tot, 3) if tot else None
         m["knowledge"]["discoveries"] = tot
         # hypotheses: count + mean confidence (post-calibration)

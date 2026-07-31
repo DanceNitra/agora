@@ -24,6 +24,8 @@ from __future__ import annotations
 import json
 import re
 import time
+
+from agora.execution import grounding
 from pathlib import Path
 
 _SERVER = Path(__file__).resolve().parents[2]
@@ -627,7 +629,14 @@ def verify_contributions(limit: int = 500) -> dict:
         if checked > limit:
             break
         has_fals = bool((c.get("falsifier") or "").strip())
-        has_src = bool(_SOURCE_RE.search((c.get("evidence") or "") + " " + (c.get("claim") or "")))
+        # DELEGATES to the one shared definition (2026-07-31), with `allow_internal=True` because THIS
+        # tier's question is "can a reader check it", and a [[vault note]] is checkable — unlike the
+        # vault door, which wants external evidence. The two differ on purpose; they used to differ by
+        # regex accident. The change is not purely a widening: `_SOURCE_RE` also matched a bare "et al."
+        # with NO YEAR, so "as Smith et al. showed" counted as a checkable source with nothing to look
+        # up. That now fails, which TIGHTENS this tier. Deliberate. See execution/grounding.py.
+        _txt = (c.get("evidence") or "") + " " + (c.get("claim") or "")
+        has_src = grounding.is_grounded(_txt, allow_internal=True)
         if has_fals and has_src:
             c["verified"] = True
             changed += 1

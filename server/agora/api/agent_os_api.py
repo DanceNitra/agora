@@ -371,7 +371,11 @@ _PROMOTE_STATS = {"promoted": 0, "checked": 0}   # cumulative funnel stats for t
 import re as _grade_re
 _G_MEASURED = _grade_re.compile(
     r"MEASURED:|VERDICT:|\blab[:_ ]?[0-9a-f]{6}\b|\bn\s*=\s*\d|\d+(?:\.\d+)?\s*%|\bCI\b|p\s*[<=]\s*0?\.\d", _grade_re.I)
-_G_CITE = _grade_re.compile(r"10\.\d{4,9}/|arxiv[:\s]*\d{4}\.\d|\([A-Z][a-zA-Z]+(?: et al\.?)?,? \d{4}\)", _grade_re.I)
+# Citation detection DELEGATES to the one shared definition (2026-07-31). The regex that used to sit
+# here accepted only the parenthetical author-year form and rejected the narrative one, so a finding
+# citing "Breznau et al. (2022)" was graded LOW for having no external citation while holding one.
+# Six such detectors existed across the repo and disagreed on 8 of 9 forms. See execution/grounding.py.
+from agora.execution import grounding as _grounding  # noqa: E402
 _G_FALS = _grade_re.compile(r"falsif|would (?:refute|disprove|be wrong)|refuted if", _grade_re.I)
 
 
@@ -380,7 +384,7 @@ def _evidence_grade(content: str):
     vault is honest about confidence per note. HIGH = a measured result + (citation or falsifier);
     MODERATE = one of those; LOW = grounded but no measured result or external citation."""
     c = content or ""
-    meas, cite, fals = bool(_G_MEASURED.search(c)), bool(_G_CITE.search(c)), bool(_G_FALS.search(c))
+    meas, cite, fals = bool(_G_MEASURED.search(c)), _grounding.is_cited(c), bool(_G_FALS.search(c))
     if meas and (cite or fals):
         return "HIGH", "measured result with a citation/falsifier"
     if meas or cite:

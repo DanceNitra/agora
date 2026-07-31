@@ -30,10 +30,16 @@ _DB = _SERVER / "agora.db"
 # OR a measured result / lab receipt (MEASURED:/VERDICT:/lab id / a number+%/CI/n=). NOT the mere WORDS
 # "Hypothesis/Falsifier/Source:" that any activity note can contain — that was Goodhart (the funnel counted
 # text-that-says-Hypothesis as grounded). Aligns with the Voss science gate's _real_grounding.
-_GROUNDED = re.compile(
-    r"10\.\d{4,9}/|arxiv[:\s]*\d{4}\.\d|\([A-Z][a-z]+(?: et al\.?)?,? \d{4}\)|"
-    r"MEASURED:|VERDICT:|\blab[:_ ]?[0-9a-f]{6}\b|\bn\s*=\s*\d|\d+(?:\.\d+)?\s*%|\b95%|\bCI\b|p\s*[<=]\s*0?\.\d",
-    re.I)
+# DELEGATES to the one shared definition (2026-07-31). The comment above says this "aligns with the
+# Voss science gate's _real_grounding" — it did, and that was the problem: both accepted only the
+# PARENTHETICAL author-year form and rejected the narrative one, so the funnel under-counted landed
+# knowledge by the same 28.2% the vault door threw away. Aligning with one of six disagreeing detectors
+# is not alignment. See agora/execution/grounding.py for the measured table.
+from agora.execution import grounding as _grounding  # noqa: E402
+
+
+def _is_grounded(text: str) -> bool:
+    return _grounding.is_grounded(text)
 
 
 def _j(name, default):
@@ -71,7 +77,7 @@ def compute_funnel() -> dict:
     grounded = 0
     for (ct,) in c.execute(
             "SELECT content FROM collective_knowledge WHERE knowledge_type='discovery'"):
-        if ct and _GROUNDED.search(ct):
+        if ct and _is_grounded(ct):
             grounded += 1
     research_findings = _count(c, "SELECT COUNT(*) FROM research_findings")
     quality_ratio = round(grounded / disc_live, 3) if disc_live else 0.0
