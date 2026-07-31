@@ -258,8 +258,22 @@ async def gather_prediction_baseline(theme: str, horizon_days: int = 14) -> dict
 
 def record_prediction(theme: str, metric: str, baseline: int, direction: str,
                       confidence: float, why: str, horizon_days: int = 14) -> dict:
-    """Store a prediction MADE BY CLAUDE (reasoned, high-quality) into the ledger."""
-    pred = {"id": uuid.uuid4().hex[:8], "theme": theme[:120], "metric": metric,
+    """Store a prediction MADE BY CLAUDE (reasoned, high-quality) into the ledger.
+
+    `mode="rate"` IS NOT OPTIONAL HERE. The baseline this receives comes from
+    `gather_prediction_baseline`, which returns a TRAILING 14-DAY WINDOW count. `resolve_due`
+    branches on this field and, without it, falls to `_metric_value` -- the ALL-TIME CUMULATIVE
+    total. A window baseline scored against a cumulative total is not a forecast, it is a rigged
+    scoreboard: measured 2026-07-31 over the 32 resolved records with by="claude", the median
+    resolved/baseline ratio is **51.7x** against 1.0x for every rate-mode record. Any FLAT or DOWN
+    call is dead on arrival and any UP call is free.
+
+    King Aldric's organ found this before I did and REFUSES to record through this path for exactly
+    this reason (`organs/king.py`, rule 4). I then recorded two forecasts through it the same
+    evening without setting the field. Setting it here means the ledger arm cannot make that mistake
+    again, whoever is driving.
+    """
+    pred = {"id": uuid.uuid4().hex[:8], "theme": theme[:120], "metric": metric, "mode": "rate",
             "metric_label": _METRIC_LABEL.get(metric, metric), "baseline": int(baseline),
             "all_baselines": {metric: int(baseline)},
             "direction": str(direction).upper().strip()[:5] if str(direction).upper().strip()[:4] in
