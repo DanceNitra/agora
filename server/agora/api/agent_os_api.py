@@ -2001,7 +2001,10 @@ async def brain_replication_record(request: Request):
     b = await request.json()
     r = record(b.get("claim") or "", b.get("source") or "", b.get("outcome") or "",
                b.get("lab_id") or "", b.get("note") or "",
-               by_construction_checked=bool(b.get("by_construction_checked")))
+               by_construction_checked=bool(b.get("by_construction_checked")),
+               # CARRY THE REPLICATOR THROUGH. The Crucible is a public credibility ledger and every
+               # entry in it was anonymous; the acceptance gate reading it correctly found nobody.
+               by=(b.get("by") or b.get("agent") or b.get("challenger") or ""))
     gated = bool(r and r.get("auto_gated"))
     return {"status": "ok" if r else "invalid", "record": r,
             "gated": gated,

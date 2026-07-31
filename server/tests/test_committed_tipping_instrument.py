@@ -182,9 +182,38 @@ def test_the_size_sensitivity_control_exists_and_can_refuse():
     assert "VERDICT: FAILED" in _MFT_CODE, "the instrument can never rule FAILED, so it cannot fail"
 
 
-def test_the_router_sends_the_cascade_claim_elsewhere():
-    """Two tipping instruments now exist; a mean-degree claim must still reach the cascade window."""
-    conn = ("The tipping threshold for global cascades decreases with greater network connectivity; in "
-            "a Watts model with mean degree 6 and threshold 0.1, a 1% seed fraction achieves cascade")
-    assert (instrument_for(conn) or {}).get("key") == "ltm_cascade_window"
-    assert _inst_mft(conn) is None
+def test_the_router_sends_a_window_edge_claim_to_the_cascade_instrument():
+    """Two tipping instruments now exist; a claim about where the window CLOSES must still reach the
+    cascade-window one, not this one."""
+    edge = ("The tipping threshold for global cascades decreases with greater network connectivity; "
+            "the cascade window closes at mean degree 6.2 for a threshold of 0.18")
+    assert (instrument_for(edge) or {}).get("key") == "ltm_cascade_window"
+    assert _inst_mft(edge) is None
+
+
+def test_an_operating_point_reaches_no_instrument_at_all():
+    """THE FALSE-FAILED REGRESSION, pinned. An earlier version of the test above asserted that this
+    claim SHOULD route to the cascade-window instrument, and it did -- taking "mean degree 6" as the
+    claimed window edge because the pattern's trailing alternation caught the word "threshold" that
+    introduces phi. The true edge at phi=0.1 is 13.66, so the organ recorded
+
+        MEASURED cascade_window_upper=13.586 vs CLAIMED 6 -> FAILED   (lab 712068)
+
+    while the claim was TRUE: a mean degree of 6 sits well inside a window closing at 13.66, which is
+    exactly why the cascade it describes happens. A false FAILED, written into the ledger that feeds
+    the public Crucible, produced by the instrument rather than by the claim -- the failure the
+    instrument's own contract calls "an instrument error wearing a verdict's clothes".
+    """
+    op = ("The tipping threshold for global cascades decreases with greater network connectivity; in "
+          "a Watts model with mean degree 6 and threshold 0.1, a 1% seed fraction achieves cascade")
+    assert instrument_for(op) is None, (
+        "an operating point is being measured against a window edge; that comparison manufactured a "
+        "FAILED on a true claim once already")
+
+
+def test_the_plural_does_not_defeat_the_cascade_instrument():
+    """`\\bcascade\\b` does not match "cascades", so a textbook window-edge claim was refused as
+    inapplicable on the plural alone -- the same one-surface-form class as "falsifier" vs
+    "falsification"."""
+    plural = "On a Poisson random graph cascades stop above mean degree 7.1 at threshold 0.18"
+    assert (instrument_for(plural) or {}).get("key") == "ltm_cascade_window"

@@ -672,7 +672,12 @@ def _inst_ltm(claim: str):
     the nearest thing to hand -- an instrument applied where it is not the right instrument produces
     a FAILED that says nothing about the claim.
     """
-    requires = _rx(r"\b(cascade|tipping|linear threshold model|\bLTM\b|threshold model|contagion)\b")
+    # `cascades?` / `contagions?`: `\bcascade\b` does not match "cascades", so "cascades stop above
+    # mean degree 7.1 at threshold 0.18" -- a textbook window-edge claim -- was refused as
+    # inapplicable on the plural alone. Same one-surface-form class as "falsifier" vs "falsification"
+    # and `## The insight` vs `## The finding`.
+    requires = _rx(r"\b(cascades?|tipping|linear threshold model|\bLTM\b|threshold model"
+                   r"|contagions?)\b")
     excludes = _rx(r"\b(lattice|square|triangular|cubic|hypercub|spatial|geometric|small[- ]world"
                    r"|configuration model|scale[- ]free|power[- ]law|assortativ|clustered|directed"
                    r"|bipartite|multiplex|interdependent|temporal|weighted|multi[- ]?seed"
@@ -689,14 +694,40 @@ def _inst_ltm(claim: str):
     if not re.search(r"\b(mean|average)\s+degree|connectivity|\bz_?c\b|cascade window",
                      claim, re.IGNORECASE):
         return None
+    # AN OPERATING POINT IS NOT AN EDGE, and confusing the two manufactures a verdict out of a units
+    # mismatch -- exactly what this instrument's contract forbids, and it happened. Measured
+    # 2026-08-01: the pattern `mean degree (N) ... (cascade|tipping|threshold)` matched "in a Watts
+    # model with mean degree 6 and threshold 0.1, a 1% seed fraction achieves near-complete cascade",
+    # taking 6 as the claimed window edge because the trailing alternation caught the word "threshold"
+    # that introduces phi. The true edge at phi=0.1 is 13.66, so the organ recorded
+    #   MEASURED cascade_window_upper=13.586 vs CLAIMED 6 -> FAILED
+    # while the claim was TRUE: a mean degree of 6 sits comfortably INSIDE a window that closes at
+    # 13.66, which is why the cascade it describes happens. A false FAILED, in a ledger bound for the
+    # public Crucible, produced by the instrument rather than by the claim.
+    #
+    # So a mean degree counts as the claimed edge ONLY where the sentence says the cascade STOPS
+    # there. A sentence saying a cascade succeeds at that degree is refused, not measured.
+    _CLOSES = (r"(?:cascade window|window)\s+(?:closes?|shuts?|ends?)|"
+               r"(?:closes?|shuts?)\s+at|"
+               r"(?:cascades?|contagion)\s+(?:stop|cease|die|fail|no longer)|"
+               r"no longer\s+(?:trigger|produce|reach|spread)|"
+               r"above\s+which|upper\s+edge|critical\s+(?:mean\s+)?degree")
+    _SUCCEEDS = _rx(r"(?:achieves?|reaches?|triggers?|produces?|yields?|gives?)\s+"
+                    r"(?:a\s+|near-?\s*)?(?:complete|global|full|system-wide)?\s*cascade")
     claimed = _first_float(claim, _rx(
         r"\b(?:z_?c|k_?c)\s*(?:=|is|of|≈|~)\s*(\d+(?:\.\d+)?)",
         r"cascade window[^.\d]{0,40}(\d+(?:\.\d+)?)",
-        r"(?:average|mean)\s+degree[^.\d]{0,25}(\d+(?:\.\d+)?)[^.]{0,60}"
-        r"(?:cascade|tipping|threshold)",
-        r"(?:cascade|tipping)[^.]{0,60}?(?:average|mean)\s+degree[^.\d]{0,25}(\d+(?:\.\d+)?)",
+        # the degree must be introduced OR followed by a closing statement, not merely by any
+        # cascade-adjacent noun
+        r"(?:%s)[^.\d]{0,40}(?:average|mean)\s+degree[^.\d]{0,25}(\d+(?:\.\d+)?)" % _CLOSES,
+        r"(?:average|mean)\s+degree[^.\d]{0,25}(\d+(?:\.\d+)?)[^.]{0,40}(?:%s)" % _CLOSES,
     ), 1.0, 20.0)
     if claimed is None:
+        return None
+    # Belt and braces: even if a pattern matched, a sentence that reports a SUCCESSFUL cascade at that
+    # connectivity is describing an operating point. Refuse rather than rule.
+    if any(rx.search(claim) for rx in _SUCCEEDS) and not re.search(
+            r"(?:cascade window|window)\s+(?:closes?|shuts?)|z_?c", claim, re.IGNORECASE):
         return None
     # THE WINDOW MOVES WITH THE THRESHOLD, so phi must come from the CLAIM, not from a constant.
     # z_c is 5.76 at phi=0.18 but 13.66 at phi=0.10 -- measuring at the wrong phi and comparing to
@@ -1176,8 +1207,14 @@ async def cycle(ctx) -> dict:
                    "%.3g" % abs(measured - inst["claimed"]), ("%.3g" % tol) if tol else "n/a",
                    verdict, lab_id))[:300]
 
+        # SIGN IT. The Crucible is a public replication ledger and every entry in it was anonymous:
+        # the record held no actor field at all, so a real grounded verdict with a Lab id still read
+        # as nobody's work. Measured 2026-08-01 -- Rooke landed NOT_COMPUTABLE on lab e4ec41 and the
+        # acceptance gate scored him unattributed, correctly, because the ledger it reads had no name
+        # in it. `ctx.agent` rather than a literal: the dispatcher owns the roster.
         body = {"claim": claim, "source": source, "outcome": verdict, "lab_id": lab_id, "note": note,
-                "by_construction_checked": checked}
+                "by_construction_checked": checked,
+                "by": str(getattr(ctx, "agent", "") or ORGAN.get("agent") or "")[:40]}
         try:
             resp = await _brain_post(ctx, _RECORD_PATH, body) or {}
         except Exception as e:

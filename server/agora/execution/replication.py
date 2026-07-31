@@ -415,7 +415,16 @@ def by_construction_suspect(outcome: str, note: str) -> bool:
 
 
 def record(claim: str, source: str, outcome: str, lab_id: str = "", note: str = "",
-           by_construction_checked: bool = False) -> dict | None:
+           by_construction_checked: bool = False, by: str = "") -> dict | None:
+    """Ledger one replication. `by` NAMES THE REPLICATOR and is not decoration.
+
+    Measured 2026-08-01: the record held {claim, source, outcome, lab_id, note, ts} and nothing
+    identifying who ran it, so the public replication ledger -- the Crucible, our credibility
+    artifact -- could not say whose work any entry was. Artificer Rooke landed a real, grounded
+    NOT_COMPUTABLE with lab e4ec41 and the acceptance gate still scored him unattributed, correctly:
+    the ledger it reads had no actor field at all. This is the same schema gap the bounty ledger had
+    with `evidence` -- a record that keeps the ruling and drops the ruler.
+    """
     o = (outcome or "").strip().upper()
     if o not in _OUTCOMES or len((claim or "").strip()) < 10:
         return None
@@ -427,7 +436,8 @@ def record(claim: str, source: str, outcome: str, lab_id: str = "", note: str = 
                 "it stands on independent/real data] " + (note or ""))
         gated = True
     rec = {"claim": (claim or "")[:200], "source": (source or "")[:160], "outcome": o,
-           "lab_id": (lab_id or "")[:12], "note": (note or "")[:300], "ts": time.time()}
+           "lab_id": (lab_id or "")[:12], "note": (note or "")[:300],
+           "by": (by or "").strip()[:40], "ts": time.time()}
     if gated:
         rec["auto_gated"] = "by_construction"
     items = _load()
