@@ -1123,6 +1123,36 @@ _PIPELINE_STAGES = [
 ]
 _pipeline = {"item": None, "busy": False, "shipped": 0}   # `shipped` rotates the artifact's byline
 
+# THE REAL CEILING IS 500, NOT 600. `_brain_contribute` posts `content[:600]`, but the brain stores
+# `content[:500]` (server/agora/agent_os/agent_os.py, the INSERT into collective_knowledge). So the last
+# 100 characters of every long contribution are dropped silently, one layer further down than anyone
+# looking at the dungeon would check -- and since the `Source:` line and the chain are appended at the
+# END, the part that vanishes is the attribution. Budget against the cap that actually applies.
+_CONTRIB_CAP = 500
+
+_PIPELINE_STATE_FILE = HERE / ".pipeline_state.json"
+
+
+def _pipeline_shipped_bump() -> int:
+    """Increment and PERSIST the shipped counter that rotates the pipeline byline.
+
+    In memory only, the counter resets to 0 on every restart and the first stage (`thief`) takes the
+    byline again -- on a process the watchdog recycles, that is a permanent over-credit rather than the
+    1/N share the rotation exists to give. `_recent_intents` and the organ schedule are persisted for
+    exactly this reason; this one was not.
+    """
+    n = 0
+    try:
+        n = int(json.loads(_PIPELINE_STATE_FILE.read_text(encoding="utf-8")).get("shipped", 0))
+    except Exception:
+        n = int(_pipeline.get("shipped", 0) or 0)      # first run, or an unreadable file
+    n += 1
+    try:
+        _PIPELINE_STATE_FILE.write_text(json.dumps({"shipped": n}), encoding="utf-8")
+    except Exception:
+        pass                                          # a lost counter must never drop a shipped artifact
+    return n
+
 
 async def _pipeline_tick(hold) -> None:
     """Aldric's assembly line: advance one stage per call; each role builds on the last; the
@@ -1191,11 +1221,27 @@ async def _pipeline_tick(hold) -> None:
                 # byline ROTATES along the chain — each agent carries ~1/N of the pipelines, which is
                 # its true share of the work — and the full chain is named in the body, so no
                 # contribution is anonymous whoever happens to hold the byline.
-                _pipeline["shipped"] += 1
+                # THE CHAIN IS THE GUARANTEE, so it gets its budget FIRST. Written the other way round
+                # -- final[:400] then [:430] on the join -- it left 30 characters for a chain that is
+                # 138 characters long for eight agents, so it truncated to "Chain: Shadow Kael -> High
+                # Pr" and six of the eight contributors were anonymous after all. A comment promising a
+                # guarantee the code does not deliver is worse than no comment: it stops the next
+                # reader from checking. Reserve the chain and the source, give `final` the remainder,
+                # and never cut a name in half.
+                _chain = "\nChain: " + " -> ".join(item["by"])
+                _room = _CONTRIB_CAP - len(_chain) - len(src)
+                if _room < 120:                  # a chain this long leaves no room for the finding
+                    _chain = "\nChain: %d agents, see the world log" % len(item["by"])
+                    _room = _CONTRIB_CAP - len(_chain) - len(src)
+                    logger.info("[pipeline] chain too long to name inline (%d agents)", len(item["by"]))
+                # Persisted, so a restart does not hand the byline back to the first stage every time.
+                # `_recent_intents` and the organ schedule are both persisted for exactly this reason;
+                # leaving one counter in memory would have given `thief` a permanent share of the credit
+                # on a process that the watchdog recycles.
+                _pipeline["shipped"] = _pipeline_shipped_bump()
                 _author = stages[(_pipeline["shipped"] - 1) % len(stages)]
                 await _brain_contribute(_author, f"Pipeline: {item['title']}",
-                                        (final.strip()[:400]
-                                         + f"\nChain: {' -> '.join(item['by'])}")[:430] + src)
+                                        final.strip()[:max(0, _room)] + _chain + src)
                 broadcast({"type": "os_build", "kind": "collab", "who": " → ".join(item["by"]),
                            "text": f"shipped: {item['title'][:40]}"})
             for x in range(len(stages) - 1):            # consecutive handoffs build trust
@@ -1830,13 +1876,27 @@ def _standing_ok(standing: float, roster: dict | None = None) -> tuple[bool, str
     move the date it re-closes. Gate on POSITION IN THE LIVE ROSTER instead, keeping an absolute floor
     so a genuinely collapsed keep still can't write.
 
-    The relative test here is deliberately NOT autolinker's top-half median. There, several curators
-    compete for one curation slot, so picking the better half is the point. Here each organ belongs to
-    exactly ONE agent — nobody else can run Mira's consolidation — so a top-half rule would lock four
-    of eight agents out of their own organ permanently, which is the same permanently-shut door in a
-    new coat. What the gate is actually for is holding back an agent that has fallen BEHIND the keep,
-    so the test is "not in the bottom quarter of the live trust band", normalised exactly the way
-    `_market_won` already normalises standing in this file: lo + 0.25 * (hi - lo).
+    THE RELATIVE TEST IS ADVISORY, NOT A BLOCKER (2026-07-31, second pass). The first version of this
+    fix gated on `standing < lo + 0.25 * (hi - lo)`, and that reintroduced the defect it replaced, one
+    size smaller. ANY threshold expressed as a point inside [lo, hi] excludes the agent sitting AT lo,
+    by construction, whenever hi > lo — moving the constant from 0.25 to 0.1 changes by how much, not
+    whether. There is always a last agent and it always fails. Applied to the live roster it blocked
+    Rooke (0.402), Wren (0.404) and Kael (0.410): the three this whole change exists to bring back.
+    It was only latent because this function gates just two organs, Mira's and Aldric's, and both
+    happen to pass today — one drift and it bites, and a ratchet closes behind it, because a blocked
+    organ produces nothing and standing is fed by production.
+
+    So: the FLOOR blocks, position is reported. That is the honest division. The floor is an absolute
+    bar on a bounded score, which is a thing an absolute constant may legitimately do, and it answers
+    the question the gate actually asks — has the keep collapsed. Being last in a band 0.10 wide is not
+    a collapse; it is arithmetic. The relative standing still travels with the event so an operator can
+    see who is trailing, and nothing silently kills an organ that has exactly one possible owner.
+
+    The relative test here is also deliberately NOT autolinker's top-half median. There, several
+    curators compete for one curation slot, so picking the better half is the point. Here each organ
+    belongs to exactly ONE agent — nobody else can run Mira's consolidation — so a top-half rule would
+    lock four of eight agents out of their own organ permanently. What the gate is actually for is
+    holding back an agent that has fallen BEHIND the keep, and the floor is what measures that.
     """
     if standing < _STANDING_FLOOR:
         return False, f"trust {standing:.2f} below the {_STANDING_FLOOR:.2f} floor"
@@ -1844,10 +1904,11 @@ def _standing_ok(standing: float, roster: dict | None = None) -> tuple[bool, str
     if len(peers) < 4:
         return True, ""            # no live roster to rank against → floor only (brain/trust down)
     lo, hi = min(peers), max(peers)
-    bar = lo + 0.25 * (hi - lo)    # degenerate roster (hi == lo) → bar == lo → everyone passes
-    if standing < bar:
-        return False, f"trust {standing:.2f} in the bottom quarter of the keep ({lo:.2f}-{hi:.2f})"
-    return True, ""
+    rank = 1 + sum(1 for p in peers if p > standing)
+    trailing = standing <= lo and hi > lo
+    # ADVISORY. Reported so a trailing agent is visible, never returned as a block — see the docstring.
+    return True, (f"trailing the keep at {standing:.2f} (rank {rank}/{len(peers)}, band {lo:.2f}-{hi:.2f})"
+                  if trailing else "")
 
 
 _plan_fails: dict = {}    # eid -> consecutive planning failures (for escalation)
@@ -4179,6 +4240,8 @@ async def ambient_life():
             if not _ok:
                 note_event(f"{curator}'s consolidation held for review ({_why})")
                 return
+            if _why:      # advisory: the organ RUNS, but the operator sees who is trailing
+                logger.info("[consolidation] %s is %s", curator, _why)
             ck = await asyncio.to_thread(_brain_get_sync, "/api/v1/agent-os/brain/collective?limit=8")
             disc = [k for k in (ck or {}).get("knowledge", []) if k.get("title")]
             new = [k for k in disc if k["title"] not in consolidation["seen"]]
@@ -4238,6 +4301,8 @@ async def ambient_life():
             if not _ok:
                 note_event(f"{king}'s governance held ({_why})")
                 return
+            if _why:      # advisory: the organ RUNS, but the operator sees who is trailing
+                logger.info("[orchestration] %s is %s", king, _why)
             engine.set_entity_state(eid, "casting")
             engine.set_entity_thought(eid, "» governing the OS…")
             build = await _brain_build_log()
