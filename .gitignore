@@ -76,6 +76,9 @@ server/*.flag
 server/.*.flag
 # database backups
 *.db.bak*
+# tools/backfill_contributor_names.py writes agora.db.backup-<timestamp> next to the
+# DB. Verified that *.db.bak* does NOT cover that name, and the file is ~262 MB.
+*.db.backup-*
 # dungeon supervisor stderr (its .log is already ignored)
 agora-game-server/_supervisor.err
 # tools runtime state + scratch lab scripts (real tools have no leading underscore)
