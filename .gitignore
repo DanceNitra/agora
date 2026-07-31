@@ -35,6 +35,8 @@ agora-game-server/_dungeon.err
 
 # dungeon runtime state (persisted across restarts, not source)
 agora-game-server/.recent_intents.json
+# per-agent organ schedule (eid -> last fire); persisted so a restart does not re-fire the roster
+agora-game-server/.organ_state.json
 
 # NOTE (updated 2026-06-20): public digests under agora_output/ stay TRACKED, but agora_output/lab/ is now
 # treated as SCRATCH and ignored. Rationale: the brain's Lab organ writes experiments there continuously and
