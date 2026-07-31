@@ -136,6 +136,42 @@ def is_refusal(text: str) -> bool:
     return bool(_REFUSAL.search(text or ""))
 
 
+#: A claim states its FALSIFIER when it names the observation that would overturn it. Matched on the
+#: CONCEPT, not on one spelling: the press arm asked for the literal substring "falsifier" while the
+#: Theory Engine writes "falsification control: ...", and "falsifier" is not a substring of
+#: "falsification". Measured 2026-07-31: of the last 40 discoveries, 40 carried a Lab id and 1 was
+#: seen to carry a falsifier, which read as a swarm-wide contract gap. Part of it was the detector.
+#:
+#: The bar is deliberately a NAMED TEST, not the word alone: a bare "falsifiable" adjective is a
+#: claim about the claim, and would let an empty gesture past a gate whose whole job is to demand the
+#: test. Same failure mode as a refusal guard keyed to one word order.
+_FALSIFIER = re.compile(
+    # The noun, then the statement it introduces, within the same sentence. The separator is not
+    # always a colon: the Theory Engine writes "falsification control: ...", the contradiction desk
+    # writes "Falsifier, fixed in the lab script before it computed anything: ...". Requiring ":"
+    # immediately after the word rejected the second one, which is a real falsifier in a live note.
+    # `falsifiABLE` cannot match here -- it contains neither "falsifier" nor "falsification" -- and
+    # that is deliberate: an adjective is a claim ABOUT the claim, not the test.
+    # Separator: a colon, a comma, or a SPACED dash. Spaced on purpose -- an unspaced hyphen lives
+    # inside words ("falsification-aware"), and accepting it would make the noun alone sufficient.
+    r"falsif(?:ier|ication)\b[^.\n]{0,80}?(?:[:,]|\s[-–—]+\s)"
+    r"|\bthis (?:claim|result|finding|model) is (?:wrong|false|refuted) if\b"
+    r"|\bwould (?:kill|refute|falsify|overturn) (?:it|this|the claim|the result|the finding)\b"
+    r"|\b(?:refuted|falsified|overturned) if\b"
+    r"|\bfails? if\b[^.\n]{0,80}\b(?:below|above|exceeds|under|less than|greater than|\d)"
+    r"|\bpre-?registered\s+(?:a\s+|the\s+)?(?:falsifier|threshold|cutoff)\b", re.I)
+
+
+def has_falsifier(text: str) -> bool:
+    """Does `text` name the observation that would overturn its own claim?
+
+    THE ONE DEFINITION. A claim that cannot say what would kill it is an assertion, and the press
+    template refuses it for that reason -- correctly. What it must not do is refuse a claim that
+    DID say so in different words.
+    """
+    return bool(_FALSIFIER.search(text or ""))
+
+
 def is_grounded(text: str, allow_internal: bool = False) -> bool:
     """The vault-door question: external citation OR our own measurement.
 

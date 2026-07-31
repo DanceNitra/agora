@@ -106,6 +106,34 @@ def _load_metric():
 
 _TOKENS, _CONTAINMENT, _SOURCE = _load_metric()
 
+# Same reasoning, same mechanism: "does this note state its falsifier?" must not fork either. The
+# press bar refuses a claim that cannot say what would kill it, and this organ was asking with a
+# literal substring test for "falsifier" while the Theory Engine writes "falsification control:" --
+# so a note that DID state one was refused for not stating one.
+_GROUNDING_PATH = Path(__file__).resolve().parents[2] / "server" / "agora" / "execution" / "grounding.py"
+
+
+def _load_falsifier_test():
+    try:
+        spec = importlib.util.spec_from_file_location("agora_grounding_for_scholar", _GROUNDING_PATH)
+        if spec is None or spec.loader is None:
+            return None
+        mod = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(mod)                       # stdlib-only module, no side effects
+        return mod.has_falsifier
+    except Exception:
+        return None
+
+
+_FALSIFIER_TEST = _load_falsifier_test()
+
+
+def _has_falsifier(text: str) -> bool:
+    """Fail CLOSED. If the shared definition cannot be loaded, no press is drafted -- publishing a
+    claim whose falsifier nobody checked is worse than publishing nothing, and a private fallback
+    would be a second standard drifting away from the one the rest of the repo gates on."""
+    return bool(_FALSIFIER_TEST(text or "")) if _FALSIFIER_TEST else False
+
 
 # ---------------------------------------------------------------------------------------------
 # ctx plumbing -- the dispatcher owns ctx, so every call is defensive about sync/async and shape
@@ -692,7 +720,14 @@ async def _press_arm(ctx) -> dict:
     if kind is None:
         return _result("idle", "source note for '%s' carries no Lab id and no MEASURED/VERDICT"
                        % title[:60])
-    if "falsifier" not in note.lower():
+    # MATCH THE CONCEPT, NOT ONE SPELLING. This was a literal substring test for "falsifier" while
+    # the Theory Engine writes "falsification control: ..." -- and "falsifier" is not a substring of
+    # "falsification", so a note that DID state its falsifier was refused for not stating one.
+    # Measured 2026-07-31: 40 of the last 40 discoveries carried a Lab id and 1 was seen to carry a
+    # falsifier, which read as a swarm-wide contract gap; part of it was this detector.
+    # `grounding.has_falsifier` is the shared definition and still demands a NAMED TEST -- a bare
+    # "falsifiable" is a claim about the claim, and the press bar exists to refuse exactly that.
+    if not _has_falsifier(note):
         return _result("idle", "source note for '%s' has no falsifier -- the press template requires "
                                "the test that would kill the claim" % title[:60])
     if await _already_ruled(ctx, ["press draft " + title[:60], title[:80]], title):
