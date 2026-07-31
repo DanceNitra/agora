@@ -19,6 +19,10 @@ from pathlib import Path
 
 _STORE = Path(__file__).resolve().parents[2] / ".contradictions.json"
 
+#: The agent this organ belongs to. Declared here and asserted against repair_ledger._ORGANS in
+#: tests, so the ledger and the organ map cannot drift into naming different owners.
+OWNER = "Dame Elara"
+
 
 def _load() -> list:
     try:
@@ -108,8 +112,17 @@ async def sweep(vault_path: str, max_judged: int = 8) -> dict:
             continue
         judged += 1
         r = await asyncio.to_thread(_judge_pair, ta, sa.split("---", 2)[-1], tb, sb.split("---", 2)[-1])
+        # NAME THE AGENT WHO DID THE WORK (2026-07-31). This ledger recorded a, b, sim, contradict,
+        # claim, status and ts -- everything except WHO. Dame Elara owns the coherence organ and this
+        # is its ledger (repair_ledger._ORGANS), so every record here is hers, but nothing said so.
+        # Measured consequence: the swarm acceptance gate scored her 94 decisive outcomes in 24h as
+        # "no named actor" and FAILED her, while an earlier vault-side count reported her as idle.
+        # She was the busiest agent in the keep and invisible, for the same reason Rooke and Wren were
+        # invisible: attribution, not absence. An organ that closes work anonymously cannot be credited,
+        # and an agent that cannot be credited reads as one that does nothing.
         rec = {"id": uuid.uuid4().hex[:6], "a": ta, "b": tb, "sim": round(s, 3),
                "contradict": bool(r), "claim": (r or {}).get("claim", ""),
+               "by": OWNER,
                "status": "open" if r else "compatible", "ts": time.time()}
         items.append(rec)
         if r:

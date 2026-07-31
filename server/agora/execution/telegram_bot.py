@@ -156,6 +156,9 @@ async def _save_to_vault(query: str, brief: str, sources: str) -> dict:
         "content": f"{brief}\n\n## Sources\n{sources}",
         "agent": "Agora (kept by Rasto)",
         "tags": ["research", "kept", "agora"],
+        # Say who kept it. Without this the endpoint's default applied, and a note the OWNER chose to
+        # keep was filed under an agent's name -- credit for a judgement no agent made.
+        "agent": "Owner (kept via Telegram)",
         "gate": False,
     }).encode()
     req = urllib.request.Request(

@@ -222,6 +222,10 @@ def format_scout() -> str:
 _BOX = Path(__file__).resolve().parents[2] / ".scout_box.json"
 BOX_CAP = 30
 
+#: The agent this organ belongs to. Declared here and asserted against repair_ledger._ORGANS in tests,
+#: so the ledger and the organ map cannot drift into naming different owners.
+OWNER = "Shadow Kael"
+
 
 def box_load() -> list:
     try:
@@ -274,7 +278,13 @@ def box_add(lead: dict, kind: str = "contribute") -> dict | None:
     if len([x for x in items if x.get("status") == "open"]) >= BOX_CAP:
         return None
     rec = dict(lead)
-    rec.update({"kind": kind, "status": "open", "found_ts": time.time()})
+    # NAME THE AGENT WHO DID THE WORK (2026-07-31). This box recorded repo, url, score, theme, status
+    # and timestamps -- everything except WHO found and ruled on the lead. Shadow Kael owns the scout
+    # organ and this is its ledger (repair_ledger._ORGANS), so every record is his. Measured: the swarm
+    # acceptance gate scored his 3 decisive rulings in 24h as "no named actor" and FAILED him. An organ
+    # that closes work anonymously cannot be credited, and an uncredited agent reads as an idle one --
+    # which is exactly how two of the busiest agents in the keep came to be reported as doing nothing.
+    rec.update({"kind": kind, "status": "open", "by": OWNER, "found_ts": time.time()})
     items.append(rec)
     _box_save(items[-200:])
     return rec
@@ -302,6 +312,7 @@ def box_mark(url: str, status: str = "done") -> bool:
         if x.get("url") == url:
             x["status"] = (status or "done")[:20]
             x["closed_ts"] = time.time()
+            x.setdefault("by", OWNER)      # a record closed before `by` existed still names its owner
             hit = True
     if hit:
         _box_save(items)

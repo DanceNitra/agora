@@ -350,7 +350,12 @@ async def write_vault_note(request: Request):
     path = await writer.write_note(
         title=title, content=content,
         tags=body.get("tags") or ["agora", "consolidation"],
-        agent_name=body.get("agent") or "Sage Mira")
+        # THE SAME LITERAL, ONE DOOR OVER (fixed 2026-07-31). `promote_findings` hardcoded
+        # agent_name="Sage Mira" and made every agent's productivity unmeasurable; this default did the
+        # quieter version of it. The live caller that relies on it is telegram_bot.py, which posts notes
+        # the OWNER chose to keep -- those are not Mira's work, and attributing them to her inflates the
+        # one agent whose apparent output was already an artifact. An unattributed note should say so.
+        agent_name=body.get("agent") or "Agora (unattributed)")
     # Compounding Flywheel: when an INSIGHT or HYPOTHESIS lands, register its falsifier as an open
     # research question so the agents go test the weak point — outputs become the next inputs.
     if {"insight", "hypothesis"} & set(body.get("tags") or []):
