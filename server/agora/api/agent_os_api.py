@@ -3725,6 +3725,18 @@ async def brain_repair_ledger(days: float = 14.0):
             "starvation": starvation_report(), "report": format_repair_ledger(days)}
 
 
+@router.get("/brain/cartography/research-map")
+async def brain_cartography_research_map():
+    """The map of OUR OWN measured work: domains found by clustering the Lab's questions by MEANING,
+    and what bridges them. The vault-taxonomy map (`/brain/cartography/hole`) charts the owner's
+    second brain; this one charts the research, which is what the board asks the swarm to advance.
+    """
+    import asyncio as _aio
+    from agora.execution.cartography import research_map, find_research_hole
+    m = await _aio.to_thread(research_map)
+    return {"status": "ok", "hole": await _aio.to_thread(find_research_hole), **m}
+
+
 @router.get("/brain/cartography/untested")
 async def brain_cartography_untested():
     """The oldest charted bridge still awaiting a verdict — the Cartographer's backlog.
