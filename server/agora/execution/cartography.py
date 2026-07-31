@@ -73,12 +73,33 @@ def find_hole(vault: str, min_cluster: int = 8) -> dict | None:
     _, domain_notes, bridges = _scan(vault)
     big = {d: ns for d, ns in domain_notes.items()
            if len(ns) >= min_cluster and d != "(unfiled)"}
-    charted = {(x.get("a"), x.get("b")) for x in _load() if x.get("status") == "charted"}
+    # DO NOT CHART WHAT THE CONSUMER MUST REFUSE. The dungeon's bridge bench applies a board gate on
+    # "<A> x <B>", so a pair whose two labels share no term with the board can never be worked --
+    # charting it only grows a wall the selector then re-offers forever. Measured 2026-07-31: 68 such
+    # charts accumulated and Wren refused the same eight every cycle. Starving here is the honest
+    # outcome and is visible (find_hole returns None); a growing backlog of dead work is not.
+    try:
+        from agora.execution.board import priorities_text
+        from agora.execution.methods import board_priority_terms, _theme_tokens
+        _prio = board_priority_terms(priorities_text())
+    except Exception:
+        _prio = set()
+
+    def _passes_board(a: str, b: str) -> bool:
+        return (not _prio) or bool(_theme_tokens("%s x %s" % (a, b)) & _prio)
+
+    # `charted` is matched on OUTCOME, not status: an entry recorded as "hypothesized" carries a
+    # different status, so a status-only skip re-charted pairs that were already on the books.
+    charted = {(x.get("a"), x.get("b")) for x in _load()
+               if str(x.get("outcome", "")).strip().lower() in _UNTESTED
+               or x.get("status") == "charted"}
     best = None
     doms = sorted(big)
     for i, a in enumerate(doms):
         for b in doms[i + 1:]:
             if (a, b) in charted or (b, a) in charted:
+                continue
+            if not _passes_board(a, b):
                 continue
             n = bridges.get(tuple(sorted((a, b))), 0)
             score = n / min(len(big[a]), len(big[b]))     # bridges per unit of cluster mass
@@ -118,6 +139,37 @@ def pick_untested_bridge() -> dict | None:
     queue work that can never be closed.
     """
     return (pick_untested_bridges(1) or [None])[0]
+
+
+def retire_off_board(reason: str = "", apply: bool = False) -> dict:
+    """Close charts that the consumer's board gate can never pass, so the backlog can advance.
+
+    A selector that hands out the OLDEST unresolved charts, to a caller allowed to refuse them, needs
+    refusals to be recorded somewhere -- otherwise the same wall is re-offered forever. Measured
+    2026-07-31: all 68 untested charts were off-frontier, the oldest eight were `Business x <domain>`
+    aged 36-41 days, and Cartographer Wren walked and refused the identical eight every cycle.
+
+    They are not badly chosen; they are honestly off-mission. `find_hole` enumerates pairs of the
+    OWNER'S personal vault domains (Business, Physics, Linguistics), and that taxonomy is not the
+    inspeximus frontier. Four ways of asking were measured before concluding it: the domain LABEL
+    matched the board 0/47, the domains' note CONTENT matched 44/47 (noise, not signal -- the board's
+    terms are common words), the note TITLES behind the eight oldest matched 0/8, and our own 3,913
+    agent notes carry no `domain:` frontmatter to substitute (0 domains with >=8 notes).
+
+    Reversible: sets outcome `off-board` and keeps the record. Dry-run by default.
+    """
+    items = _load()
+    hit = [r for r in items
+           if r.get("id") and str(r.get("outcome", "")).strip().lower() in _UNTESTED]
+    if apply:
+        now = time.time()
+        for r in hit:
+            r["outcome"] = "off-board"
+            r["status"] = "off-board"
+            r["resolved_ts"] = now
+            r["note"] = ((r.get("note") or "") + " || RETIRED: " + (reason or "off the board"))[:400]
+        _save(items)
+    return {"retired": len(hit), "applied": bool(apply), "remaining_untested": 0 if apply else len(hit)}
 
 
 def pick_untested_bridges(n: int = 8) -> list[dict]:
