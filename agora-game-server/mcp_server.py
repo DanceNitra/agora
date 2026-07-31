@@ -840,6 +840,53 @@ def _llm_content_sync(system: str, user: str) -> str | None:
         _LLM_SEM.release()
 
 
+#: A press draft is 400-900 words. `_llm_content_sync` caps at 350 tokens and forces a JSON object,
+#: both correct for the one-line world chatter it was written for and both fatal for prose.
+_LLM_PROSE_MAX_TOKENS = int(os.environ.get("DUNGEON_LLM_PROSE_MAX_TOKENS", "3000"))
+
+
+def _llm_prose_sync(system: str, user: str, max_tokens: int = 0) -> str | None:
+    """Blocking LLM call returning PROSE. No `response_format`, a real token budget, a longer timeout.
+
+    Added 2026-08-01 because `_OrganCtx` had no `llm` attribute at all, while Sage Mira's press arm
+    reads `getattr(ctx, "llm", None)` and refuses when it is not callable. The refusal is deliberate
+    and right -- assembling a post out of note fragments and Telegramming it to the owner four times a
+    day is exactly the stream of small notes he told us to stop -- but the capability was never wired,
+    so the arm could not draft on ANY target, ever, and reported a polite idle every cycle. Another
+    check that never saw its target: the organ said "ready but no composer available" and the gate
+    read that as an agent with nothing to do.
+    """
+    if not _LLM_ON:
+        return None
+    body = {
+        "model": _LLM_MODEL,
+        "messages": [{"role": "system", "content": system},
+                     {"role": "user", "content": user}],
+        "temperature": 0.7,
+        "max_tokens": int(max_tokens) if max_tokens and max_tokens > 0 else _LLM_PROSE_MAX_TOKENS,
+    }
+    if _LLM_THINK == "false":
+        body["think"] = False
+    req = _urlreq.Request(_LLM_URL, data=json.dumps(body).encode(), headers={
+        "Authorization": f"Bearer {_LLM_KEY}",
+        "Content-Type": "application/json",
+        "HTTP-Referer": "https://github.com/DanceNitra/agora",
+        "X-Title": "Dungeon OS",
+    })
+    if not _LLM_SEM.acquire(timeout=_LLM_SEM_WAIT):
+        logger.debug("prose LLM call skipped: concurrency gate busy")
+        return None
+    try:
+        with _urlreq.urlopen(req, timeout=300) as r:      # a long local generation, not a chat line
+            data = json.loads(r.read())
+        return data["choices"][0]["message"]["content"]
+    except Exception as e:
+        logger.debug(f"prose LLM call failed: {e}")
+        return None
+    finally:
+        _LLM_SEM.release()
+
+
 def _llm_say_sync(system: str, user: str) -> str | None:
     """OpenRouter call expecting {"line": "..."} → the line, or None."""
     content = _llm_content_sync(system, user)
@@ -3942,6 +3989,17 @@ class _OrganCtx:
         #: this agent's brain-side mind (emotion + recalled memories + a vault insight). The planner
         #: used to rebuild this ~370x/hour and throw it away; it is fetched once per organ cycle now.
         self.mind = mind or ""
+
+    async def llm(self, system: str, user: str, max_tokens: int = 0):
+        """PROSE composition for an organ that needs to write, not to classify.
+
+        The contract listed brain_get / brain_post / lab_run / recall / logger / agent and never a
+        composer, so this was simply absent -- and Sage Mira's press arm, which correctly refuses to
+        assemble a post out of note fragments without one, therefore refused on every target forever.
+        Returns None when the LLM is off, so an organ that cannot compose still idles honestly rather
+        than shipping something mechanical.
+        """
+        return await asyncio.to_thread(_llm_prose_sync, system, user, max_tokens)
 
     @staticmethod
     def _api(path: str) -> str:

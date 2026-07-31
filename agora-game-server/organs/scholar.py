@@ -350,10 +350,16 @@ def _plan(canon: str, artifacts: list, labs: list) -> dict:
         core = str(art.get("core") or "").strip()
         if not title:
             continue
+        # GRADE ON THE WHOLE ARTIFACT, not on the slice that happened to parse. The receipt line is
+        # scanned from anywhere in the note, because a Lab id under "## The test" was invisible to a
+        # grader looking only at title+core, and a fully grounded note was rejected for having no
+        # receipt. Novelty is still measured on title+core alone -- a receipt is evidence, not subject
+        # matter, and folding it into the tokens would make two notes citing one Lab look alike.
         blob = title + " " + core
+        graded = blob + " " + str(art.get("receipt_line") or "")
         atok = _TOKENS(blob)
         near = max(((_CONTAINMENT(atok, t), k) for k, t in enumerate(btok)), default=(0.0, -1))
-        kind, detail = _grounding(blob)
+        kind, detail = _grounding(graded)
         if kind is None:                      # last honest chance: a Lab run whose NAME is this claim
             for t, rec in lab_tok:
                 if _CONTAINMENT(atok, t) >= NOVELTY:
@@ -697,29 +703,53 @@ async def _ruling(ctx, canon: str, plan: dict, n_artifacts: int) -> dict:
 # ---------------------------------------------------------------------------------------------
 async def _press_arm(ctx) -> dict:
     data = await _aw(ctx.brain_get("/brain/press-target"))
-    target = (data or {}).get("target") if isinstance(data, dict) else None
-    if not isinstance(target, dict) or not target.get("title"):
+    data = data if isinstance(data, dict) else {}
+    # WALK THE LIST. This arm applies four gates after receiving a candidate -- score floor, readable
+    # source, Lab grounding, stated falsifier -- and used to terminate on the first refusal, against
+    # an endpoint that offered exactly one candidate. Measured 2026-08-01: it returned idle with
+    # "source note for 'Bridge AI Competitive Moat x Biostatistics...' has no falsifier" while other
+    # eligible notes sat unoffered in the same directory. Four ways to reject, one thing to reject.
+    # Same defect as `belief-challenge-target` (42 days wedged) and `replication.pick_target`.
+    targets = data.get("targets")
+    if not isinstance(targets, list) or not targets:
+        one = data.get("target")
+        targets = [one] if isinstance(one, dict) else []
+    targets = [t for t in targets if isinstance(t, dict) and t.get("title")]
+    if not targets:
         return _result("idle", "no press target")
-    title = str(target.get("title") or "").strip()
-    if _as_int(target.get("score")) < PRESS_MIN_SCORE:
-        return _result("idle", "press target '%s' scores %s -- no measured number to publish"
-                       % (title[:60], target.get("score")))
 
-    note = ""
-    try:
-        p = Path(str(target.get("path") or ""))
-        if p.is_file():
-            note = p.read_text(encoding="utf-8", errors="replace")[:20000]
-    except Exception:
-        note = ""
-    if not note:
-        return _result("idle", "cannot read the source note for '%s' -- refusing to write about a "
-                               "claim whose numbers cannot be re-checked" % title[:60])
+    title, note, target = "", "", None
+    stepped = []
+    for cand in targets:
+        t = str(cand.get("title") or "").strip()
+        if _as_int(cand.get("score")) < PRESS_MIN_SCORE:
+            stepped.append("scores %s" % cand.get("score"))
+            continue
+        try:
+            p = Path(str(cand.get("path") or ""))
+            text = p.read_text(encoding="utf-8", errors="replace")[:20000] if p.is_file() else ""
+        except Exception:
+            text = ""
+        if not text:
+            stepped.append("unreadable")
+            continue
+        if _grounding(text)[0] is None:
+            stepped.append("no Lab id / MEASURED")
+            continue
+        if not _has_falsifier(text):
+            stepped.append("no falsifier")
+            continue
+        title, note, target = t, text, cand
+        break
 
+    if target is None:
+        # Say what was walked and why. A wedge and an empty vault used to look identical from here.
+        return _result("idle", "walked %d press candidate(s), none publishable: %s"
+                       % (len(targets), ", ".join(sorted(set(stepped))) or "none eligible"))
+    if stepped:
+        _log(ctx, "stepped past %d press candidate(s): %s"
+             % (len(stepped), ", ".join(sorted(set(stepped)))))
     kind, detail = _grounding(note)
-    if kind is None:
-        return _result("idle", "source note for '%s' carries no Lab id and no MEASURED/VERDICT"
-                       % title[:60])
     # MATCH THE CONCEPT, NOT ONE SPELLING. This was a literal substring test for "falsifier" while
     # the Theory Engine writes "falsification control: ..." -- and "falsifier" is not a substring of
     # "falsification", so a note that DID state its falsifier was refused for not stating one.

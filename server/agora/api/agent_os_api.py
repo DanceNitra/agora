@@ -2396,12 +2396,19 @@ async def brain_press_draft(request: Request):
 
 @router.get("/brain/press-target")
 async def brain_press_target():
-    """The strongest unpublished artifact awaiting a press draft."""
+    """Unpublished artifacts awaiting a press draft, best first.
+
+    `target` is the head and stays for existing callers. `targets` is the list, because the consumer
+    applies four further gates after receiving a candidate and terminated its whole arm on the first
+    refusal -- one candidate offered, four ways to reject it.
+    """
     import asyncio as _aio
     from agora.config import settings
-    from agora.execution.press import pick_target
+    from agora.execution.press import pick_targets
     vault = settings.vault_path or "C:/Users/Danculus/my-second-brain"
-    return {"status": "ok", "target": await _aio.to_thread(pick_target, vault)}
+    ts = await _aio.to_thread(pick_targets, vault, 8)
+    return {"status": "ok", "target": (ts[0] if ts else None), "targets": ts,
+            "with_falsifier": sum(1 for t in ts if t.get("has_falsifier"))}
 
 
 @router.get("/brain/press")

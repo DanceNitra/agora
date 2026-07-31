@@ -713,16 +713,36 @@ def run_group_seminar(npcs: list[dict], vault: str) -> dict:
         _running = False
 
 
+#: Agents already reported as role-less. A seminar round fires every 20 ticks, so a per-round
+#: warning is noise that gets filtered and a never-warning is a degradation nobody sees.
+_ROLE_WARNED: set = set()
+
+
 def _run_group_seminar_inner(npcs: list[dict], vault: str) -> dict:
     from agora.execution import inspeximus_bridge
 
     topic = pick_topic(vault)
     contributors, passed, brought = [], [], []
     read_ids: list[str] = []          # every memory the round actually READ -- the contribution's lineage
+    role_missing: list[str] = []      # agents that queried memory by their NAME because no role arrived
     for n in npcs[:8]:
         name = n.get("npc_name") or n.get("npc_id", "agent")
-        role = n.get("role") or name
-        can, ctx, ids = inspeximus_bridge.agent_can_contribute(role, topic.get("headline", ""))
+        raw_role = str(n.get("role") or "").strip()
+        # A BLANK ROLE IS A MISSING ROLE. `n.get("role") or name` passed "  " straight through as a
+        # whitespace hint, so the degradation was invisible: the recall ran against nothing useful and
+        # the round still reported success. The fallback to the name is kept -- it is better than
+        # nothing -- but it is now RECORDED, because an eight-agent seminar where every agent queries
+        # by its own name is eight identical queries over one shared store, and that reads as a
+        # working seminar from every metric we have.
+        if not raw_role:
+            role_missing.append(name)
+        role = raw_role or name
+        _res = inspeximus_bridge.agent_can_contribute(role, topic.get("headline", ""))
+        # Tolerant unpack: the bridge grew a third element (the recalled ids, the contribution's
+        # lineage) and a caller that hard-unpacks three cannot survive an older bridge or a test
+        # double written against the older shape. The ids are an enrichment, not a precondition.
+        can, ctx = _res[0], _res[1]
+        ids = _res[2] if len(_res) > 2 else []
         if can and ctx:
             contributors.append({"id": n.get("npc_id"), "name": name})
             brought.append(f"{name} brings: {ctx[:200]}")
@@ -744,10 +764,17 @@ def _run_group_seminar_inner(npcs: list[dict], vault: str) -> dict:
                 tags=[topic.get("headline", "")[:40]],
                 derived_from=sorted(set(read_ids)) or None,
                 source_doc="seminar:%s" % (topic.get("id") or topic.get("headline", "")[:40] or "round"))
+    # SAY IT OUT LOUD, ONCE PER AGENT. A round fires every 20 ticks, so warning per round would drown
+    # the log and get filtered; warning never is how a degraded seminar reports as a healthy one.
+    _fresh = [a for a in role_missing if a not in _ROLE_WARNED]
+    if _fresh:
+        _ROLE_WARNED.update(_fresh)
+        print("[seminar] DEGRADED: no role for %s -- recall falls back to the agent's own NAME, so "
+              "these agents query one shared store with near-identical hints" % ", ".join(_fresh))
     log_round(topic, [c["name"] for c in contributors], passed, contribution)
     _record_attempt(topic.get("id"))      # count the round so a saturated topic eventually retires
     return {"topic": topic.get("headline", ""), "contributors": contributors,
-            "passed": passed, "contribution": contribution}
+            "passed": passed, "contribution": contribution, "role_missing": role_missing}
 
 
 def research_report(hours: int = 3) -> str:

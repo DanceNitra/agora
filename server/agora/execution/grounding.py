@@ -41,13 +41,25 @@ import re
 
 # ── the primitives ───────────────────────────────────────────────────────────────────────────────
 
+#: A capitalised word that is a DATE, not a surname. Measured 2026-08-01: "(January 2026)" was
+#: accepted as a parenthetical author-year citation, so any claim that merely mentions a month and a
+#: year read as externally cited. Every caller of `citation()`/`is_cited()` inherits that -- the
+#: quality gate, the promotion pipeline, the canon receipt scan -- so a note with no source at all
+#: could clear a citation bar by naming the month it was written in.
+_NOT_A_SURNAME = re.compile(
+    r"^(?:Jan(?:uary)?|Feb(?:ruary)?|Mar(?:ch)?|Apr(?:il)?|May|Jun(?:e)?|Jul(?:y)?|Aug(?:ust)?"
+    r"|Sep(?:t|tember)?|Oct(?:ober)?|Nov(?:ember)?|Dec(?:ember)?"
+    r"|Q[1-4]|Spring|Summer|Autumn|Fall|Winter|Version|Release|Issue|Revision)$", re.I)
+
 #: Narrative author-year: `Smith (2024)`, `Smith & Jones (2024)`, `Breznau et al. (2022)`.
 _CITE_NARRATIVE = re.compile(
-    r"[A-Z][A-Za-z\-]+(?:\s+(?:and|&)\s+[A-Z][A-Za-z\-]+|\s+et\s+al\.?)?\s*\((?:19|20)\d{2}[a-z]?\)")
+    r"(?P<lead>[A-Z][A-Za-z\-]+)(?:\s+(?:and|&)\s+[A-Z][A-Za-z\-]+|\s+et\s+al\.?)?\s*"
+    r"\((?:19|20)\d{2}[a-z]?\)")
 
 #: Parenthetical author-year: `(Smith, 2024)`, `(Breznau et al., 2022)`.
 _CITE_PAREN = re.compile(
-    r"\(\s*[A-Z][A-Za-z\-]+(?:\s+(?:and|&)\s+[A-Z][A-Za-z\-]+|\s+et\s+al\.?)?,?\s*(?:19|20)\d{2}[a-z]?\s*\)")
+    r"\(\s*(?P<lead>[A-Z][A-Za-z\-]+)(?:\s+(?:and|&)\s+[A-Z][A-Za-z\-]+|\s+et\s+al\.?)?,?\s*"
+    r"(?:19|20)\d{2}[a-z]?\s*\)")
 
 _DOI = re.compile(r"\b10\.\d{4,9}/\S+", re.I)
 _ARXIV = re.compile(r"\barxiv[:\s]*\d{4}\.\d{4,5}", re.I)
@@ -72,8 +84,15 @@ def citation(text: str) -> str | None:
     """The first EXTERNAL citation in `text`, or None. Returns the match so callers that need the
     source string (source-concentration metrics) use the same detector as callers that need a boolean."""
     for rx in (_DOI, _ARXIV, _CITE_NARRATIVE, _CITE_PAREN, _URL):
-        m = rx.search(text or "")
-        if m:
+        for m in rx.finditer(text or ""):
+            # A month is not an author. Scan ON rather than returning at the first hit, so a note
+            # that says "(January 2026)" early and cites a real paper later is still credited.
+            try:
+                lead = m.group("lead")
+            except (IndexError, re.error):
+                lead = None
+            if lead and _NOT_A_SURNAME.match(lead):
+                continue
             return m.group(0).strip()
     return None
 
@@ -156,7 +175,12 @@ _FALSIFIER = re.compile(
     # inside words ("falsification-aware"), and accepting it would make the noun alone sufficient.
     r"falsif(?:ier|ication)\b[^.\n]{0,80}?(?:[:,]|\s[-–—]+\s)"
     r"|\bthis (?:claim|result|finding|model) is (?:wrong|false|refuted) if\b"
-    r"|\bwould (?:kill|refute|falsify|overturn) (?:it|this|the claim|the result|the finding)\b"
+    # Both tenses. The bounty ledger writes "WOULD HAVE KILLED IT: ..." -- a named killing condition,
+    # and the strongest falsifier in the swarm, since the test was actually run. A pattern that knew
+    # only "would kill it" missed it, which is the same one-surface-form failure this file records
+    # for "falsifier" vs "falsification".
+    r"|\bwould (?:have )?(?:kill(?:ed|s)?|refute[ds]?|falsif(?:y|ied|ies)|overturn(?:ed|s)?) "
+    r"(?:it|this|the claim|the result|the finding|the belief)\b"
     r"|\b(?:refuted|falsified|overturned) if\b"
     r"|\bfails? if\b[^.\n]{0,80}\b(?:below|above|exceeds|under|less than|greater than|\d)"
     r"|\bpre-?registered\s+(?:a\s+|the\s+)?(?:falsifier|threshold|cutoff)\b", re.I)
