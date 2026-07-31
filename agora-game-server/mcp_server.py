@@ -1514,11 +1514,28 @@ _BOARD_BANNED = {"physics", "finance", "health", "politics", "trivia", "cloud", 
 # let "Specification curve correction tool" through on `correction` and "Build Vault Linter ... quality
 # standards" through on `quality`, because the board prose contains those words in passing. A task that
 # names none of these is not about our mission, whatever else it matches.
+#
+# TWO HALVES, ONE LITERAL. This set is the CURATED half: technical terms and competitor names that
+# the owner's prose board cannot express as single words ("supersede", "provenance", "locomo",
+# "graphiti"). The second group is the LIVE half, mirroring what `methods.board_priority_terms`
+# derives from the board text he actually set. They were separate vocabularies and they disagreed on
+# 41 terms: measured 2026-07-31, the curated half alone admitted 1 of Sergeant Voss's 8 challenge
+# targets while the live half admitted 3 -- so his organ, which parses THIS literal with `ast`, was
+# gating on the weaker of the two and refusing real work ("self-refinement plateaus at the critic's
+# competence ceiling", "winner-take-all reinforcement becomes quality-blind").
+#
+# Kept as a literal rather than fetched, because `guard_l._board_vocabulary` reads it statically and
+# must not execute this module (it is `__main__`; importing it would start a second server). The
+# drift that costs is therefore guarded by a test, not by discipline.
 _BOARD_CORE = {"memory", "memories", "inspeximus", "recall", "retrieval", "retrieve", "supersession",
                "supersede", "revert", "erasure", "erase", "forget", "poison", "provenance",
                "embedding", "embeddings", "rag", "vector", "mem0", "zep", "graphiti", "letta",
                "cognee", "memobase", "langmem", "benchmark", "locomo", "memops", "store", "context",
-               "consolidation", "attestation", "tombstone", "receipt", "echo", "agent-memory"}
+               "consolidation", "attestation", "tombstone", "receipt", "echo", "agent-memory",
+               # the live half — see above
+               "agent", "integrity", "moat", "quality", "correction", "product", "provable", "prove",
+               "resistance", "roadmap", "multi", "compounds", "buyer", "competitor", "facing",
+               "numero"}
 
 def _inbox_theme_allowed(text: str) -> bool:
     """THE ONE CHOKE POINT for off-mission work.
