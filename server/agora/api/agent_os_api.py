@@ -454,9 +454,51 @@ async def promote_findings(request: Request, n: int = 16):
     writer = getattr(request.app.state, "vault_writer", None)
     if not writer:
         return {"status": "no-writer", "promoted": 0}
+    # ATTRIBUTION FIX (2026-07-31): this SELECT did not even read contributor_name, and the
+    # write_note() call below hardcoded agent_name="Sage Mira" — so EVERY finding promoted into the
+    # owner's vault carried `author: Sage Mira` in its frontmatter (vault_writer.write_note:96)
+    # regardless of which agent produced it. A vault-side count read "Mira 32 notes, five agents
+    # zero": it was counting a string literal, not the agents. Measured on the live DB the same
+    # 150-row window carries 7 distinct contributor_name values — King Aldric 42, Sergeant Voss 23,
+    # High Priest Orin 20, Dame Elara 19, Sage Mira 18, blank 17, Shadow Kael 11 — plus two MORE
+    # agents hiding inside those blanks (see below), so seven agents' work was credited to an
+    # eighth and per-agent productivity was unmeasurable. Same pattern as
+    # /brain/verify-findings below, which already selects and uses contributor_name.
+    _UNATTRIBUTED = "Agora (unattributed)"   # named sentinel — never an empty `author:` frontmatter
+    # A blank contributor_name is usually RECOVERABLE, so the sentinel must be the last resort, not
+    # the first. Measured: all 1,417 blank-name discovery rows are Cartographer Wren (726) and
+    # Artificer Rooke (691), and for those rows contributor_id holds their literal display name.
+    # Root cause is upstream, in api/dungeon.py: DUNGEON_AGENT_IDS maps only 6 of the 8 agents (no
+    # Rooke, no Wren), so POST /brain/collective falls through to the raw name and the name lookup
+    # then misses. We therefore resolve against dungeon_npcs — the authoritative 8-agent roster —
+    # and NOT against DUNGEON_AGENT_IDS/UUID_TO_NAME, which is the very map that lost these two.
+    # Without this, the sentinel would bury exactly the two agents whose output we cannot currently
+    # see, and _PROMOTE_STATS would report an attribution gap that is actually resolvable.
+    _npc_by_id: dict = {}
+    _npc_names: set = set()
+    try:
+        _nc = await db.execute("SELECT npc_id, npc_name FROM dungeon_npcs")
+        for _n in await _nc.fetchall():
+            _nid, _nnm = (_n["npc_id"] or "").strip(), (_n["npc_name"] or "").strip()
+            if _nid and _nnm:
+                _npc_by_id[_nid] = _nnm
+                _npc_names.add(_nnm)
+    except Exception:
+        pass          # fail-soft: no roster -> only truly unresolvable rows hit the sentinel
+
+    def _author_of(row) -> str:
+        """The agent that actually produced this finding, or '' if genuinely unknowable.
+        contributor_id is accepted as a name ONLY if it matches the real roster, so a stray id can
+        never be promoted into an author."""
+        nm = (row["contributor_name"] or "").strip()
+        if nm:
+            return nm
+        cid = (row["contributor_id"] or "").strip()
+        return _npc_by_id.get(cid) or (cid if cid in _npc_names else "")
+
     cur = await db.execute(
-        "SELECT title, content FROM collective_knowledge WHERE knowledge_type='discovery' "
-        "ORDER BY created_at DESC LIMIT 150")
+        "SELECT title, content, contributor_name, contributor_id FROM collective_knowledge "
+        "WHERE knowledge_type='discovery' ORDER BY created_at DESC LIMIT 150")
     rows = await cur.fetchall()
     import re as _re
     # A vault note must carry a real finding — not a quest PLAN, not a NEGATIVE admission, not a
@@ -479,6 +521,7 @@ async def promote_findings(request: Request, n: int = 16):
     for r in rows:
         title = (r["title"] or "").strip()
         content = (r["content"] or "").strip()
+        author = _author_of(r)              # carried through scoring to the vault note's `author:`
         tl = title.lower()
         # GROUNDED = a real citation ("Source:") OR a Lab-measured result (MEASURED:/VERDICT:) — the
         # latter is grounded by its own measurement, not a paper, and was previously rejected outright
@@ -500,7 +543,7 @@ async def promote_findings(request: Request, n: int = 16):
         if any(_containment(_ct, pt) >= 0.6 for pt in _acc_toks):  # NEW findings — drop near-duplicates of ones
             continue                                       # already accepted this run (containment >= 0.6)
         _acc_toks.append(_ct)
-        cands.append((title, content))
+        cands.append((title, content, author))
         if len(cands) >= 40:                              # wider funnel — more gems reach the vault
             break
 
@@ -524,7 +567,8 @@ async def promote_findings(request: Request, n: int = 16):
         if si:
             try:
                 from agora.execution.semantic_index import _embed_batch
-                cvecs = _embed_batch([(t + " " + c)[:300] for t, c in cands])  # ONE batched embed call
+                # unchanged embedding input — the author rides along in the tuple, it is NOT embedded
+                cvecs = _embed_batch([(t + " " + c)[:300] for t, c, _a in cands])  # ONE batched embed call
                 V = si.vecs
                 for i, cv in enumerate(cvecs):
                     if not cv:
@@ -536,17 +580,21 @@ async def promote_findings(request: Request, n: int = 16):
             except Exception:
                 pass
         scored = []
-        for i, (t, c) in enumerate(cands):
+        for i, (t, c, a) in enumerate(cands):
             spec = 0.3 if _re.search(r"\([A-Z][a-zA-Z]+(?: et al\.?)?,? \d{4}\)", c) else 0.0
-            scored.append((conns[i] + spec, t, c))
+            scored.append((conns[i] + spec, t, c, a))   # author carried, NOT part of the score
         return sorted(scored, key=lambda x: -x[0])
     import asyncio
     ranked = await asyncio.to_thread(_score_all)
 
     # 3) promote the top-valued candidates that pass the quality gate
     promoted, checked, deduped = [], 0, 0
+    # Per-run attribution breakdown — the number that used to be unmeasurable. Same denominator as
+    # `promoted` (promotions attempted that raised no exception); the writer's own near-duplicate
+    # dedup can still skip the file, so read this as "notes credited", not "files created".
+    by_author: dict = {}
     import asyncio as _asyncio
-    for _v, title, content in ranked:
+    for _v, title, content, author in ranked:
         if len(promoted) >= n:
             break
         checked += 1
@@ -587,10 +635,19 @@ async def promote_findings(request: Request, n: int = 16):
             graded = (f"> **Evidence grade: {_g}** — {_gwhy}. (Grades the strength of the evidence, "
                       f"not the claim's importance.)\n\n"
                       + (f"> ⚠ Credibility: {_caveat}\n\n" if _lowcred else "") + content)
+            # Credit the agent that actually produced the finding. Only a row we could NOT resolve
+            # (neither a contributor_name nor a roster-valid contributor_id) gets the sentinel — it
+            # must never write an empty `author:` and must never be silently handed to another
+            # agent. Both counters ride in the /brain/pulse JSON under p["promote"] (they are not
+            # rendered in the Telegram pulse text, which prints only promoted/checked).
+            _author = author or _UNATTRIBUTED
             await writer.write_note(title=title[:70], content=graded,
-                                    tags=_tags, agent_name="Sage Mira")
+                                    tags=_tags, agent_name=_author)
             _PROMOTED.add(title)                      # definitive: landed in the vault
             promoted.append(title[:50])
+            by_author[_author] = by_author.get(_author, 0) + 1
+            if not author:
+                _PROMOTE_STATS["unattributed"] = _PROMOTE_STATS.get("unattributed", 0) + 1
         except Exception as _we:
             # transient (do NOT burn the title — retry next run), and SAY so instead of hiding it
             print(f"[promote] write_note failed for '{title[:60]}': {type(_we).__name__}: {_we}")
@@ -598,7 +655,7 @@ async def promote_findings(request: Request, n: int = 16):
     _PROMOTE_STATS["promoted"] += len(promoted)
     _PROMOTE_STATS["checked"] += checked
     return {"status": "ok", "promoted": len(promoted), "checked": checked,
-            "deduped": deduped, "titles": promoted}
+            "deduped": deduped, "titles": promoted, "by_author": by_author}
 
 
 @router.get("/brain/web-scout")
