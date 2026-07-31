@@ -269,6 +269,16 @@ rate_n = (len(ns) / nn) if nn else 0.0
 # of "no honest bridge" resting on one paper about one domain is an opinion with a number attached.
 if nn < DATA["min_papers"]:
     verdict, cite = "INCONCLUSIVE", None
+elif nj == 0:
+    # NOTHING WAS EXAMINED ON THE JOINT SIDE. The null floor above asks whether we know the ambient
+    # rate; it does not ask whether we ever looked at the pair. With an empty joint corpus every
+    # span test below is vacuously false and control falls through to "NO BRIDGE" -- a verdict that
+    # reads as a structural finding while meaning only "the query returned no papers".
+    # Measured 2026-07-31 on a live note: "joint-query span rate 0/0 (n/a) vs single-domain null
+    # 0/4 (0.000)" shipped as `no honest bridge (NO BRIDGE)` with a lab id attached. A search that
+    # returned nothing is NOT_COMPUTABLE, and cashing it as a finding is the failure the repo's own
+    # rule names: never cash an "I could not find" as novelty.
+    verdict, cite = "INCONCLUSIVE", None
 elif ns and rate_n >= rate_j:
     # Single-domain literature already carries both domains at least as often as the joint query:
     # the connection is ambient, so this was never a structural hole.
