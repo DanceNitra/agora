@@ -76,6 +76,14 @@ on this machine, stdlib only (2026-07-31). The measured systematic bias is what 
     branching_survival      1.0        0.9509    4.91%   1.19%    1.5 s      0.12  <- 3*SE would FAIL
     sir_final_size (R0=2)   0.7968     0.7970    0.03%   0.03%    0.1 s      0.10  <- rounding floor
     ba_degree_exponent      3.0        2.9347    2.18%   0.50%    0.4 s      0.08
+    ltm_cascade_window      5.7647     5.4570    5.34%   0.62%    1.7 s      0.09  <- added 2026-07-31
+
+The LTM row was added because the instrument set and the target queue did not overlap: of the eight
+replication targets on offer that day, FIVE were cascade / tipping / threshold claims and none of the
+four instruments could model one, so Rooke walked all eight and honestly returned `no-instrument`
+every cycle. Its canonical value is DERIVED, not cited -- bisecting the vulnerable-cluster percolation
+condition sum_{k<=floor(1/phi)} k(k-1)P_k(z) = z gives 5.7647 at phi=0.18, which happens to agree with
+the published window. The -5.3% bias is finite-size, the same character as the branching row.
 
 The branching row is the reason a relative floor exists at all: the log-log fit of a finite generation
 window approaches the asymptotic exponent from below and sits ~5% low no matter how many trees are
@@ -427,6 +435,72 @@ else:
 '''
 
 
+_LTM_CODE = '''
+"""MODELS: the UPPER edge of the cascade window in Watts' (2002) linear threshold model on a
+Poisson random graph -- the mean degree above which a single seed can no longer trigger a global
+cascade, because the vulnerable subgraph stops percolating.
+
+The canonical value is DERIVED here, not taken from the paper: a degree-k node is vulnerable under a
+uniform threshold phi iff k <= 1/phi, and the vulnerable cluster percolates while
+sum_{k <= floor(1/phi)} k(k-1) P_k(z) = z with P_k Poisson. Bisecting that gives z_c = 5.7647 for
+phi = 0.18, which agrees with the published window and does not depend on anyone remembering it.
+"""
+import math, random, statistics
+
+PHI, N, TRIALS, RUNS, CUT = 0.18, 3000, 40, 5, 0.01
+
+def _pois(k, z):
+    return math.exp(-z + k * math.log(z) - math.lgamma(k + 1)) if z > 0 else (1.0 if k == 0 else 0.0)
+
+def analytic_zc(phi):
+    def g(z):
+        return sum(k * (k - 1) * _pois(k, z) for k in range(0, int(1.0 / phi) + 1)) - z
+    lo, hi = 1.5, 20.0
+    for _ in range(200):
+        mid = (lo + hi) / 2
+        if g(lo) * g(mid) <= 0: hi = mid
+        else: lo = mid
+    return (lo + hi) / 2
+
+def one_run(n, z, phi, rng):
+    adj = [[] for _ in range(n)]
+    for _ in range(int(n * z / 2)):
+        a, b = rng.randrange(n), rng.randrange(n)
+        if a != b:
+            adj[a].append(b); adj[b].append(a)
+    act = [False] * n; cnt = [0] * n
+    s = rng.randrange(n); act[s] = True; front = [s]
+    while front:
+        nxt = []
+        for u in front:
+            for v in adj[u]:
+                if act[v]: continue
+                cnt[v] += 1
+                if adj[v] and cnt[v] / len(adj[v]) >= phi:
+                    act[v] = True; nxt.append(v)
+        front = nxt
+    return sum(act) / n
+
+def freq(z, rng):
+    return sum(1 for _ in range(TRIALS) if one_run(N, z, PHI, rng) > CUT) / TRIALS
+
+def zc_hat(rng):
+    lo, hi = 4.0, 9.0
+    for _ in range(7):
+        mid = (lo + hi) / 2
+        if freq(mid, rng) >= 0.5: lo = mid
+        else: hi = mid
+    return (lo + hi) / 2
+
+ests = [zc_hat(random.Random(4100 + i)) for i in range(RUNS)]
+mean = statistics.mean(ests)
+print("MEASURED cascade_window_upper = %.4f" % mean)
+print("SE = %.4f" % (statistics.stdev(ests) / math.sqrt(len(ests))))
+print("analytic z_c =", round(analytic_zc(PHI), 4), "phi =", PHI, "N =", N,
+      "runs =", [round(e, 3) for e in ests])
+'''
+
+
 def _rx(*pats):
     return tuple(re.compile(p, re.IGNORECASE) for p in pats)
 
@@ -566,7 +640,49 @@ def _pct_near(claim: str, vocab: str):
     return None
 
 
-_INSTRUMENTS = (_inst_er, _inst_branching, _inst_sir, _inst_ba)
+def _inst_ltm(claim: str):
+    """Upper edge of the cascade window in the linear threshold model. Canonical 5.7647 (phi=0.18).
+
+    ADDED 2026-07-31 because the instrument set and the target queue did not overlap. Measured that
+    day: of the eight replication targets on offer, FIVE were cascade / tipping / threshold claims
+    (Granovetter's LTM, critical seed fraction, minority tipping, hysteresis width, tipping vs
+    connectivity) and Rooke's four instruments modelled giant components, branching, SIR and
+    scale-free exponents. He walked all eight and honestly returned `no-instrument` every cycle --
+    not a defect in him, a capability gap.
+
+    This closes one quantity, not all five: the mean degree at which cascades stop. A claim about a
+    SEED FRACTION is a different measurement and is deliberately refused rather than answered with
+    the nearest thing to hand -- an instrument applied where it is not the right instrument produces
+    a FAILED that says nothing about the claim.
+    """
+    requires = _rx(r"\b(cascade|tipping|linear threshold model|\bLTM\b|threshold model|contagion)\b")
+    excludes = _rx(r"\b(lattice|square|triangular|cubic|hypercub|spatial|geometric|small[- ]world"
+                   r"|configuration model|scale[- ]free|power[- ]law|assortativ|clustered|directed"
+                   r"|bipartite|multiplex|interdependent|temporal|weighted|multi[- ]?seed"
+                   r"|seed fraction|seeded at|initial adopters)\b")
+    if not _applicable(claim, requires, excludes):
+        return None
+    # it must be about CONNECTIVITY, not about how many seeds were used
+    if not re.search(r"\b(mean|average)\s+degree|connectivity|\bz_?c\b|cascade window",
+                     claim, re.IGNORECASE):
+        return None
+    claimed = _first_float(claim, _rx(
+        r"\b(?:z_?c|k_?c)\s*(?:=|is|of|≈|~)\s*(\d+(?:\.\d+)?)",
+        r"cascade window[^.\d]{0,40}(\d+(?:\.\d+)?)",
+        r"(?:average|mean)\s+degree[^.\d]{0,25}(\d+(?:\.\d+)?)[^.]{0,60}"
+        r"(?:cascade|tipping|threshold)",
+        r"(?:cascade|tipping)[^.]{0,60}?(?:average|mean)\s+degree[^.\d]{0,25}(\d+(?:\.\d+)?)",
+    ), 1.0, 20.0)
+    if claimed is None:
+        return None
+    return {"key": "ltm_cascade_window", "label": "cascade_window_upper", "claimed": claimed,
+            "code": _LTM_CODE, "params": {"PHI": 0.18, "N": 3000, "TRIALS": 40, "RUNS": 5},
+            "rel_floor": 0.09, "seeds": 5,
+            "models": "upper edge of the Watts (2002) cascade window on a Poisson random graph -- "
+                      "the mean degree above which one seed can no longer trigger a global cascade"}
+
+
+_INSTRUMENTS = (_inst_er, _inst_branching, _inst_sir, _inst_ba, _inst_ltm)
 
 
 def instrument_for(claim: str):
