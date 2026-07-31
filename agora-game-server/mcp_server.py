@@ -3571,8 +3571,23 @@ async def _brain_contribute(eid: str, title: str, content: str) -> bool:
         _brain_post_sync, "/api/v1/agent-os/brain/collective",
         {"npc": _AGENT_NAMES.get(eid, eid), "title": title[:90],
          "content": content[:600], "knowledge_type": "discovery"})
-    _credit_agent_mem(eid, _subject, bool(r))      # a grounded contribution rewards its grounding
-    return bool(r)
+    # A REJECTION IS NOT A LANDING. `bool(r)` treated EVERY response as success, and the brain answers
+    # a refusal with an ordinary body -- {"status": "rejected", "reason": ...} -- from six separate
+    # gates (garbage, LAB-FIRST, vault dedup, stream dedup, non-finding, quality). bool() of that dict
+    # is True. So every agent and every organ has been reporting "landed" for work the brain threw
+    # away, for as long as those gates have existed. Measured 2026-07-31: Sergeant Voss's organ logged
+    # "ok DECISIVE -> landed lab=c9dbc6", the Lab record c9dbc6 is real and passing, and NOTHING was
+    # written -- his newest row in collective_knowledge was from the previous day. This also poisoned
+    # the credit ledger below, which paid out on the same false signal.
+    _status = str((r or {}).get("status") or "").lower() if isinstance(r, dict) else ""
+    landed = _status == "added"
+    if not landed:
+        logger.info("[contribute] %s REJECTED by the brain (%s): %s",
+                    _AGENT_NAMES.get(eid, eid),
+                    (r or {}).get("reason", "no response") if isinstance(r, dict) else "no response",
+                    title[:60])
+    _credit_agent_mem(eid, _subject, landed)       # a grounded contribution rewards its grounding
+    return landed
 
 
 # Novelty-at-generation gate: ~71% of grounded findings were TRUE restatements of notes the vault

@@ -1817,9 +1817,18 @@ async def brain_graveyard():
 
 @router.get("/brain/replication-target")
 async def brain_replication_target(request: Request):
-    """THE REPLICATION UNIT — the next sourced claim awaiting a minimal computational re-run."""
-    from agora.execution.replication import pick_target
-    return {"status": "ok", "target": await pick_target(request.app.state.db)}
+    """THE REPLICATION UNIT — the next sourced claims awaiting a minimal computational re-run.
+
+    `targets` is the walkable list; `target` stays as its head so existing callers keep working. A
+    caller with its OWN gate MUST walk `targets`: Rooke's instrument set decides what he can honestly
+    model, and with a single head an untestable claim wedged him permanently — measured 2026-07-31,
+    four consecutive calls returned the same empirical claim he had correctly refused, and he produced
+    zero discoveries in the preceding five days. Identical to the wording on belief-challenge-target,
+    whose comment records that head-only cost that sweep 42 days.
+    """
+    from agora.execution.replication import pick_targets
+    ts = await pick_targets(request.app.state.db, n=8)
+    return {"status": "ok", "target": (ts[0] if ts else None), "targets": ts}
 
 
 @router.post("/brain/replication-record")

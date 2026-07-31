@@ -712,30 +712,51 @@ async def cycle(ctx) -> dict:
         if not isinstance(data, dict):
             return _result("error", "replication-target returned %s, not an object"
                            % type(data).__name__)
-        target = data.get("target") or {}
-        if not isinstance(target, dict):
-            return _result("error", "replication-target returned a %s where a target object was "
-                                    "expected" % type(target).__name__)
-        claim = (target.get("claim") or "").strip()
-        source = (target.get("source") or "").strip()
-        if not claim:
+        # WALK THE LIST, DO NOT TAKE THE HEAD. Rooke's instrument set decides what he can honestly
+        # model, so a claim he must refuse has to be steppable. Measured 2026-07-31: with a single head
+        # he was wedged permanently -- four consecutive calls returned the same empirical claim about
+        # Pareto regrets, which no minimal model can settle; he refused it correctly and got it back.
+        # Zero discoveries in the preceding five days. The endpoint now offers `targets`; the same
+        # comment on belief-challenge-target records that head-only cost that sweep 42 days.
+        cands = data.get("targets")
+        if not isinstance(cands, list) or not cands:
+            head = data.get("target") or {}
+            cands = [head] if isinstance(head, dict) and head else []
+        if not cands:
             return _result("idle", "the brain has no sourced claim awaiting a re-run "
                                    "(replication-target returned no target)")
-        if len(claim) < 40 or not source:
-            return _result("idle", "target too thin to replicate honestly (claim %d chars, source %s)"
-                           % (len(claim), "present" if source else "missing"))
 
-        blocked, fam, sim = _prior_art(claim)
-        if blocked:
-            return _result("idle", "the Crucible already holds this claim: %s" % blocked[:160])
+        target, claim, source, inst = None, "", "", None
+        skipped = []
+        for cand in cands:
+            if not isinstance(cand, dict):
+                continue
+            c = (cand.get("claim") or "").strip()
+            s = (cand.get("source") or "").strip()
+            if len(c) < 40 or not s:
+                skipped.append("thin")
+                continue
+            blocked, _fam, _sim = _prior_art(c)
+            if blocked:
+                skipped.append("covered")
+                continue
+            i = instrument_for(c)
+            if not i:
+                skipped.append("no-instrument")
+                _log(ctx, "no instrument for: %s" % c[:70])
+                continue
+            target, claim, source, inst = cand, c, s, i
+            break
 
-        inst = instrument_for(claim)
-        if not inst:
-            _log(ctx, "no instrument for: %s" % claim[:70])
-            return _result("idle", "no minimal model in Rooke's instrument set can honestly test this "
-                                   "claim (it is empirical, a variant outside the canonical model, or "
-                                   "states no value for a quantity the model measures): %s"
-                           % claim[:120])
+        if inst is None:
+            # Honest idle, but now it says how MANY were considered -- a wedge and an empty queue are
+            # different states and used to look identical.
+            return _result("idle", "walked %d replication candidate(s), none testable by Rooke's "
+                                   "instrument set (%s)"
+                           % (len(cands), ", ".join(sorted(set(skipped))) or "none usable"))
+        if skipped:
+            _log(ctx, "stepped past %d unusable candidate(s): %s"
+                 % (len(skipped), ", ".join(sorted(set(skipped)))))
 
         mem = await _memory_note(ctx, claim, inst["key"])
         _log(ctx, "bench: %s claimed %s=%.4g%s"

@@ -281,9 +281,88 @@ def pick_paper_target() -> dict | None:
     return None
 
 
+#: A negative admission the shared `is_non_finding` filter does not catch. Measured on the live pool:
+#: "**Final finding:** None of the provided sources contain any data, analysis, or discussion" passed
+#: it, and that is the most explicit statement of having nothing that the swarm produces.
+_EMPTY_ADMISSION = re.compile(
+    r"none of the (provided|cited|given) (sources?|papers?|abstracts?)|"
+    r"contain no (data|analysis|discussion|evidence)|"
+    r"(no|zero) substantive (claim|finding|result)", re.I)
+
+
+def _is_non_finding(title: str, content: str) -> bool:
+    """True when there is nothing here to reproduce or refute."""
+    try:
+        from agora.execution.non_finding import is_non_finding
+        if is_non_finding(title, content):
+            return True
+    except Exception:
+        pass                                   # the extra pattern below still applies
+    return bool(_EMPTY_ADMISSION.search(content or ""))
+
+
+async def pick_targets(db, n: int = 8) -> list:
+    """SEVERAL replication targets, best first. Rooke's own instrument set decides which it can honestly
+    model, so it must be able to walk PAST one it cannot.
+
+    HEAD-OF-LINE BLOCKING, measured 2026-07-31. `pick_target` returned exactly one candidate and the
+    endpoint offered no list, so a claim outside Rooke's instrument set wedged him permanently: four
+    consecutive calls returned the same untestable claim ("The regrets do not rely on any scalarization
+    functions and reflect Pareto optimality...", an empirical statement about an algorithm, not a
+    quantity a minimal model can settle). He refused it correctly, got it again, refused it again. Over
+    the preceding five days he produced ZERO discoveries, as did High Priest Orin, whose /theory/target
+    has the same single-head shape; Shadow Kael, on single-head /scout-target, produced one. The three
+    agents on head-only endpoints were the three that produced nothing.
+
+    This is the SAME defect `belief-challenge-target` already fixed, and its comment says what it cost:
+    "taking only the head is what wedged the challenge sweep for 42 days". The fix was never carried to
+    the other endpoints. Same shape as the standing gate fixed in tools/autolinker.py and left in
+    mcp_server.py -- a class repaired at one site and left alive at the others.
+    """
+    import asyncio as _aio
+    out, seen = [], set()
+    paper = await _aio.to_thread(pick_paper_target)
+    if paper:
+        out.append(paper)
+        seen.add((paper.get("claim") or "")[:80])
+    attempted = _load()
+    cur = await db.execute(
+        "SELECT title, content FROM collective_knowledge WHERE knowledge_type='discovery' "
+        "AND content LIKE '%Source:%' ORDER BY created_at DESC LIMIT 120")
+    for r in await cur.fetchall():
+        if len(out) >= n:
+            break
+        content = (r["content"] or "").strip()
+        claim = re.split(r"(?<=[.!?])\s", content)[0][:200]
+        if len(claim) < 40 or claim[:80] in seen:
+            continue
+        # DO NOT ASK ROOKE TO REPLICATE OUR OWN NEGATIVE ADMISSIONS. Measured 2026-07-31: of the first
+        # eight candidates this query returned, FIVE were the swarm's own non-findings -- "the provided
+        # sources do not support the claim", "yields no substantive claim beyond restating", "None of
+        # the provided sources contain any data". There is nothing in those to reproduce or refute, so
+        # every one burns a cycle and returns an honest idle that looks like Rooke failing. The
+        # promotion path already filters this exact shape (is_non_finding, and _NEGATIVE_PROMO in
+        # promote_findings); this query read the same table without it.
+        if _is_non_finding(r["title"] or "", content):
+            continue
+        if already_covered(claim, attempted):
+            continue
+        m = re.search(r"Source:\s*(.+)$", content, re.MULTILINE)
+        source = (m.group(1).strip() if m else "")[:160]
+        if not source:
+            continue
+        seen.add(claim[:80])
+        out.append({"claim": claim, "source": source, "title": (r["title"] or "")[:90]})
+    return out
+
+
 async def pick_target(db) -> dict | None:
     """The replication target. PREFER a real arXiv paper with a simulable quantitative claim
-    (Aldric's roadmap: feed Rooke real papers); fall back to a recent sourced internal finding."""
+    (Aldric's roadmap: feed Rooke real papers); fall back to a recent sourced internal finding.
+
+    Kept as the head of `pick_targets` so existing callers keep working. A caller with its OWN gate
+    must walk the list instead -- see pick_targets for what taking only the head cost.
+    """
     import asyncio as _aio
     paper = await _aio.to_thread(pick_paper_target)
     if paper:
