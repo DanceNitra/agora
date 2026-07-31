@@ -718,7 +718,228 @@ def _inst_ltm(claim: str):
                       "seed can no longer trigger a global cascade" % phi}
 
 
-_INSTRUMENTS = (_inst_er, _inst_branching, _inst_sir, _inst_ba, _inst_ltm)
+#: the vocabulary of every quantity this family labels, so "nearest preceding label" can be decided
+_MFT_LABELS = re.compile(
+    r"tipping (?:fraction|point|threshold)|committed (?:minority|fraction)"
+    r"|recovery (?:edge|point|threshold)|reverse (?:sweep|edge)"
+    r"|hysteresis (?:width|loop|gap)|cascade (?:extent|size)|seed fraction", re.IGNORECASE)
+
+
+def _labelled_pct(claim: str, vocab: str):
+    """The percentage whose NEAREST PRECEDING label matches `vocab`, as a fraction, or None.
+
+    Direction and nearness both matter. A sentence like "a tipping fraction of 4.8%, a recovery edge
+    of 4.6%, and a hysteresis width of 0.2%" packs three labelled quantities into sixty characters, so
+    any rule that accepts a label found *near* a number will hand back the same number for all three.
+    Measured on exactly that sentence: a window-based match returned 4.8% for both the tipping and the
+    recovery label. Here the text between a label and its number must contain no OTHER label.
+    """
+    want = re.compile(vocab, re.IGNORECASE)
+    text = claim or ""
+    for m in _PCT.finditer(text):
+        head = text[:m.start()]
+        labels = list(_MFT_LABELS.finditer(head))
+        if not labels:
+            continue
+        last = labels[-1]
+        if m.start() - last.end() > 40:          # the label must actually introduce this number
+            continue
+        if _PCT_NOISE.search(text[max(0, m.start() - 70):m.end() + 45]):
+            continue
+        if want.search(last.group(0)):
+            v = float(m.group(1))
+            if 0.0 < v <= 100.0:
+                return v / 100.0
+    return None
+
+
+_MFT_CODE = r'''
+import math, random, statistics
+
+J, H, REC, TIP = __J__, __H__, __REC__, __TIP__
+N_SMALL, N_LARGE = 240, 600
+
+def fixed_points(p, beta, n=4001):
+    def F(m): return p + (1.0 - p) * math.tanh(beta * (J * m + H)) - m
+    out = []
+    # Endpoint roots are real roots: at p=1 every agent is committed, so m=1 exactly and F(1)=0. A
+    # sign-change scan never sees it because 1.0 has no successor sample. Calibration anchor A2 failed
+    # on exactly this -- the solver reported "never tips" at every temperature.
+    for edge in (-1.0, 1.0):
+        if abs(F(edge)) < 1e-12: out.append(edge)
+    px, pf = -1.0, F(-1.0)
+    for i in range(1, n):
+        x = -1.0 + 2.0 * i / (n - 1); f = F(x)
+        if pf * f < 0:
+            lo, hi = px, x
+            for _ in range(80):
+                mid = 0.5 * (lo + hi)
+                if F(lo) * F(mid) <= 0: hi = mid
+                else: lo = mid
+            out.append(0.5 * (lo + hi))
+        px, pf = x, f
+    return sorted(out)
+
+def branch(p, beta, start):
+    rs = fixed_points(p, beta)
+    if not rs: return None
+    def stable(m):
+        c = math.cosh(beta * (J * m + H))
+        return (1.0 - p) * beta * J / (c * c) < 1.0
+    st = [m for m in rs if stable(m)]
+    if not st: return rs[-1] if start > 0 else rs[0]
+    return max(st) if start > 0 else min(st)
+
+def _edge(beta, start):
+    if branch(1.0, beta, start) is None or branch(1.0, beta, start) <= 0: return None
+    b0 = branch(0.0, beta, start)
+    if b0 is not None and b0 > 0: return 0.0
+    a, b = 0.0, 1.0
+    for _ in range(90):
+        mid = 0.5 * (a + b); m = branch(mid, beta, start)
+        if m is not None and m > 0: b = mid
+        else: a = mid
+    return 0.5 * (a + b)
+
+# PIN the one unstated parameter on the claim's RECOVERY edge, then PREDICT the tipping fraction.
+# The claimed tipping value is never an input to the model -- it is only ever compared against.
+lo, hi = 0.50, 0.999
+for _ in range(70):
+    mid = 0.5 * (lo + hi)
+    r = _edge(1.0 / mid, +1.0)
+    if (r if r is not None else 0.0) < REC: lo = mid
+    else: hi = mid
+T_FIT = 0.5 * (lo + hi)
+PRED = _edge(1.0 / T_FIT, -1.0)
+
+def trial(N, p, beta, horizon, rng):
+    C = int(round(p * N)); F = N - C
+    if F <= 0: return True
+    u = 0
+    for _ in range(int(horizon * N)):
+        m = (C + 2 * u - F) / N
+        fl = J * m + H
+        w_up = (F - u) / (1.0 + math.exp(max(-60.0, min(60.0, -2.0 * beta * fl))))
+        w_dn = u / (1.0 + math.exp(max(-60.0, min(60.0, +2.0 * beta * fl))))
+        tot = w_up + w_dn
+        if tot <= 0: break
+        if rng.random() * tot < w_up: u += 1
+        else: u -= 1
+        if (C + 2 * u - F) / N > 0.05: return True
+    return False
+
+def tip_finite(N, beta, seed, trials=18, horizon=140, hi_p=0.30):
+    rng = random.Random(seed); lo, hi = 0.0, hi_p
+    for _ in range(9):
+        mid = 0.5 * (lo + hi)
+        hits = sum(1 for _ in range(trials) if trial(N, mid, beta, horizon, rng))
+        if hits >= trials / 2.0: hi = mid
+        else: lo = mid
+    return 0.5 * (lo + hi)
+
+beta = 1.0 / T_FIT
+small = statistics.fmean([tip_finite(N_SMALL, beta, 700 + s) for s in range(3)])
+large = statistics.fmean([tip_finite(N_LARGE, beta, 800 + s) for s in range(3)])
+bias_s = (small - PRED) / PRED
+bias_l = (large - PRED) / PRED
+span = abs(bias_s - bias_l)
+
+print("pinned_temperature = %.6f" % T_FIT)
+print("analytic_tipping   = %.6f" % PRED)
+print("finite_N%d = %.6f (bias %+.1f%%)   finite_N%d = %.6f (bias %+.1f%%)"
+      % (N_SMALL, small, 100 * bias_s, N_LARGE, large, 100 * bias_l))
+print("MEASURED committed_tipping_fraction = %.6f" % PRED)
+print("SE = %.6f" % (abs(PRED) * span))
+# THE CONTROL. If the size sensitivity is small, the claim's silence about N is harmless and the
+# NOT_COMPUTABLE below would be manufactured rather than earned. The instrument must say so.
+if span < 0.05:
+    print("VERDICT: size-sensitivity control did NOT fire (span %.3f) -- N is not load-bearing here"
+          % span)
+elif abs(PRED - TIP) / TIP <= span:
+    print("VERDICT: NOT_COMPUTABLE -- claimed %.4f vs analytic %.4f (%.1f%% apart), but the finite-size "
+          "bias spans %.1f%% between N=%d and N=%d and the claim states no system size, so no tolerance "
+          "can be set that is not an assumption"
+          % (TIP, PRED, 100 * abs(PRED - TIP) / TIP, 100 * span, N_SMALL, N_LARGE))
+else:
+    print("VERDICT: FAILED -- claimed %.4f vs analytic %.4f (%.1f%% apart), beyond the %.1f%% finite-size "
+          "span, so the gap is not explained by the unstated system size"
+          % (TIP, PRED, 100 * abs(PRED - TIP) / TIP, 100 * span))
+'''
+
+
+def _inst_mft(claim: str):
+    """Committed-minority tipping in the mean-field Ising model with a field. Closes the second of the
+    five cascade/tipping quantities in Rooke's queue that no instrument could rule.
+
+    THE SEVERE TEST. The claim states four numbers -- coupling J, field h, a tipping fraction and a
+    recovery edge -- and the model has one parameter the claim leaves unstated: temperature. Pinning T
+    on the RECOVERY edge leaves the TIPPING fraction as a free prediction. One knob turned, one number
+    predicted, and the claimed tipping value never enters the model. A claim carrying only one of the
+    two edges is refused: with nothing to pin T on, any verdict would be a verdict about an assumed
+    temperature.
+
+    CALIBRATED before it was trusted, against two anchors DERIVED rather than remembered (both are
+    asserted in the test suite): at p=0, h=0 the model is the textbook mean-field Ising with T_c = J
+    exactly -- measured 1.000000 for J=1.0, error 3.3e-9 -- and as T -> 0 the forward tipping fraction
+    approaches (J - h)/(2J), measured converging 0.2967 -> 0.3704 -> 0.4147 -> 0.4465 at T = 0.20,
+    0.10, 0.05, 0.02 against the analytic 0.475.
+
+    WHY IT USUALLY RULES NOT_COMPUTABLE, and why that is a measurement rather than a shrug. The tipping
+    fraction has an enormous finite-size bias, and it is NEGATIVE: noise carries a finite system over
+    the barrier while the barrier is still there. Measured at the fitted temperature: -56.2% at N=240
+    and -25.1% at N=600. A claim stating no system size is therefore consistent with analytic values
+    spanning tens of percent, and ruling FAILED on a 10% gap would be the instrument's own systematic
+    error wearing a verdict's clothes -- the branching row's lesson. So the script MEASURES that span
+    every run and carries a control that fires only if the span is large; if N turns out not to be
+    load-bearing, the instrument says so instead of ruling.
+    """
+    requires = _rx(r"\b(tipping|committed (?:minority|fraction)|consensus|hysteresis|minority)\b")
+    excludes = _rx(r"\b(cascade window|mean degree|network connectivity|scale[- ]free|small[- ]world"
+                   r"|epidemic|infection|branching|giant component)\b")
+    if not _applicable(claim, requires, excludes):
+        return None
+    # BOTH edges, or there is nothing to pin the temperature on.
+    #
+    # NOT `_pct_near` here, and the reason is measured. That helper accepts a label anywhere in a
+    # +-70/+45 character window around the number, which is fine when a sentence carries one labelled
+    # quantity and a confidence interval. This claim carries THREE labelled percentages inside 60
+    # characters -- "a tipping fraction of 4.8%, a recovery edge of 4.6%, and a hysteresis width of
+    # 0.2%" -- so the window around 4.8% already contains the words "recovery edge", and the helper
+    # returned 4.8 for BOTH labels. The instrument then refused itself on `rec < tip`, which is the
+    # guard working, but it means no verdict could ever be reached on the family this exists for.
+    # A label must therefore be the NEAREST one PRECEDING its number, not merely nearby.
+    tip = _labelled_pct(claim, r"tipping (?:fraction|point|threshold)|committed (?:minority|fraction)")
+    rec = _labelled_pct(claim, r"recovery (?:edge|point|threshold)|reverse (?:sweep|edge)")
+    if tip is None or rec is None or not (0.0 < rec < tip < 0.9):
+        return None
+    # J and h come from the CLAIM. The window moves with both, so measuring at assumed couplings and
+    # comparing to the claim's fractions would manufacture a verdict out of a units mismatch -- the
+    # same trap phi sets for the cascade-window instrument.
+    jj = _first_float(claim, _rx(r"\bJ\s*(?:=|is|of|≈|~)\s*(\d+(?:\.\d+)?)",
+                                 r"coupling\s*(?:strength\s*)?(?:=|is|of|≈|~)?\s*(\d+(?:\.\d+)?)"),
+                      0.05, 20.0)
+    hh = _first_float(claim, _rx(r"\bh\s*(?:=|is|of|≈|~)\s*(\d+(?:\.\d+)?)",
+                                 r"(?:external\s+)?field\s*(?:=|is|of|≈|~)?\s*(\d+(?:\.\d+)?)"),
+                      0.0, 5.0)
+    if jj is None or hh is None:
+        return None
+    code = (_MFT_CODE.replace("__J__", repr(float(jj)))
+                     # the field OPPOSES the committed minority: with h favouring it, the +1 state is
+                     # stable at p=0 and there is no lower edge to pin on at all (measured: recovery
+                     # 0.000 at every temperature on that branch).
+                     .replace("__H__", repr(-abs(float(hh))))
+                     .replace("__REC__", repr(float(rec)))
+                     .replace("__TIP__", repr(float(tip))))
+    return {"key": "mf_committed_tipping", "label": "committed_tipping_fraction", "claimed": tip,
+            "code": code,
+            "params": {"J": jj, "H": -abs(hh), "REC": rec, "N_SMALL": 240, "N_LARGE": 600},
+            "rel_floor": 0.25, "seeds": 3,
+            "models": "mean-field Ising with a committed +1 minority at coupling J=%.3g and an opposing "
+                      "field h=%.3g, with the unstated temperature pinned on the claim's own recovery "
+                      "edge so the tipping fraction is a free prediction" % (jj, -abs(hh))}
+
+
+_INSTRUMENTS = (_inst_er, _inst_branching, _inst_sir, _inst_ba, _inst_ltm, _inst_mft)
 
 
 def instrument_for(claim: str):

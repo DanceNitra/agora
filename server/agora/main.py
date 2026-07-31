@@ -1552,8 +1552,14 @@ async def _brain_ecosystem_tick(app: FastAPI):
     if tick <= 0 or tick % 20 != 0:
         return  # cheapest gate: only do anything on 20-tick boundaries
 
+    # `role` is NOT optional here: the group seminar keys each agent's memory-recall hint off it
+    # (seminar._run_group_seminar_inner). Selecting only (npc_id, npc_name) made n.get("role")
+    # always None, so every agent's hint silently degraded to its own NAME — measured gate
+    # inflation (name-prefixed hint passed 78/80 sampled topics for every agent vs a 67/80
+    # no-prefix baseline), which is why server/.contributions.json shows all present agents
+    # contributing to essentially every round. See the WHY block in seminar.py.
     cursor = await db.execute(
-        "SELECT npc_id, npc_name FROM dungeon_npcs WHERE status='active'")
+        "SELECT npc_id, npc_name, role FROM dungeon_npcs WHERE status='active'")
     npcs = [dict(r) for r in await cursor.fetchall()]
     if not npcs:
         return
@@ -1586,6 +1592,11 @@ async def _brain_ecosystem_tick(app: FastAPI):
                 from agora.config import settings
                 vault = settings.vault_path or "C:/Users/Danculus/my-second-brain"
                 res = await asyncio.to_thread(seminar.run_group_seminar, npcs, vault)
+                if res.get("role_missing"):
+                    # Surface the degradation where the operational log is read; a role-less agent
+                    # falls back to a name-keyed recall hint, which inflates the contribution gate.
+                    print(f"[Seminar] DEGRADED: no role for {res['role_missing']} - "
+                          f"recall hint fell back to the agent name")
                 c = res.get("contribution")
                 if c and res.get("contributors"):
                     # ECONOMY (Layer 4): every agent whose angle fed a real contribution is paid;
