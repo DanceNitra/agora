@@ -606,6 +606,15 @@ def _compose(lead: dict, source: str, r: dict, hits: list, lab_id, priorities: s
                  f"OWNER/MEMBER/COLLABORATOR/CONTRIBUTOR, repo {lead.get('stars')} stars / "
                  f"{lead.get('forks')} forks, thread {lead.get('age_days')}d old")
     lines.append(f"WHY: {r['reason']}")
+    # NAME WHAT WOULD HAVE RULED THE OTHER WAY. A fit is a claim -- "our vault answers this, and the
+    # thread can still hear it" -- and a claim without its kill test is an assertion. Every term here
+    # is one this cycle already measured, so the falsifier is arithmetic rather than rhetoric.
+    lines.append(
+        "Falsifier: this ruling flips to NO_FIT if any one of three measured conditions fails -- "
+        f"the board match ({r['matched'][:4] or 'nothing'}) is empty, the vault's answerable count "
+        f"({len(r['on_topic_hits'])}) drops to zero, or the thread proves unreachable "
+        f"(maintainer comments {lead.get('maintainer_comments')}, age {lead.get('age_days')}d). "
+        "A no_fit needs only one of them; a fit needs all three.")
     if r["fit"]:
         lines.append("NEXT: left OPEN in the scout box for the GATED pipeline (box/take -> Claude "
                      "triage -> correspondent draft -> the owner approves from Telegram). "
