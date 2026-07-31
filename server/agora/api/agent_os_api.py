@@ -861,8 +861,21 @@ async def brain_directions(request: Request, n: int = 14):
     from agora.execution.harvest import synthesize_directions
     d = await synthesize_directions(findings)
     global _DIRECTIONS
-    _DIRECTIONS = {**d, "ts": time.time()}
-    return {"status": "ok", **d}
+    # AN EMPTY HARVEST MUST NOT ERASE THE SUPPLY IT FAILED TO REFILL. This assigned unconditionally,
+    # so one failed LLM call replaced the stored directions with nothing -- and `current_directions`
+    # serves `frontier + _DIRECTIONS["directions"]`, so the harvested half of the swarm's research
+    # supply vanished until some later call happened to succeed. Measured 2026-07-31 during an
+    # account-wide Ollama Cloud outage ("you have reached your weekly usage limit", 429 on cheap,
+    # main and reasoning alike): the harvest returned 0 themes and 0 directions from 14 real
+    # findings, and the stored half was empty while 19 durable frontier directions carried the swarm
+    # alone. A refill that fails should leave the tank where it was, and say so.
+    if d.get("directions") or d.get("themes"):
+        _DIRECTIONS = {**d, "ts": time.time()}
+        return {"status": "ok", **d}
+    kept = _DIRECTIONS.get("directions") or []
+    return {"status": "ok", **d, "harvest_empty": True, "kept_previous": len(kept),
+            "note": "the harvest produced nothing (the model tier is likely down); the %d stored "
+                    "direction(s) were KEPT rather than overwritten" % len(kept)}
 
 
 _DIR_COVER_CACHE: dict = {"ts": 0.0, "cov": {}}
