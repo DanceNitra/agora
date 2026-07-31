@@ -443,6 +443,31 @@ def _theme_tokens(t: str) -> set:
     return {w for w in _re.findall(r"[a-z0-9]+", (t or "").lower()) if len(w) > 3}
 
 
+#: A sentence carrying one of these is the board REFUSING something, and none of its words are a
+#: priority. Matched against whole sentences rather than words on purpose: the word-list above had
+#: to name every noun the owner might refuse, and it already missed one -- `science` was absent, so
+#: "generic meta-science", a phrase lifted verbatim from the deprioritize clause, still passed the
+#: gate on that token. Any hand-maintained list of forbidden nouns silently rots the next time the
+#: owner re-words his priorities; the grammar of a refusal does not.
+_REFUSAL = __import__("re").compile(
+    r"deprioriti[sz]e|never the headline|not the headline|only\s+test[\s-]?bed|"
+    r"off[\s-]?domain|do not |don't |avoid |exclude ", __import__("re").I)
+
+
+def board_priority_terms(text: str) -> set:
+    """The ON-PRIORITY words of a board, with its refusals removed.
+
+    THE ONE DEFINITION. The brain's Lab door and the dungeon's quest gate both gate on this; they
+    used to derive it separately and disagreed. Measured 2026-07-31 against the live board, the
+    dungeon's copy admitted all five subjects the owner had explicitly deprioritized -- politics,
+    generic meta-science, cloud trivia, finance and physics -- each matching on the very word he
+    used to exclude it. `/brain/board` now publishes the result of this function as
+    `priority_terms` so there is nothing left to re-derive.
+    """
+    keep = [s for s in __import__("re").split(r"(?<=[.!?])\s+", text or "") if not _REFUSAL.search(s)]
+    return {w for w in _theme_tokens(" ".join(keep)) if w not in _BOARD_STOP}
+
+
 def _match_cache_get(key: str):
     """Return a fresh cached match decision for this normalized theme, or None."""
     try:
@@ -494,7 +519,7 @@ async def match_and_run(theme: str, requester: str = "") -> dict:
             and not str(requester or "").lower().startswith(("claude", "api", "owner"))):
         try:
             from agora.execution.board import priorities_text
-            _prio = {w for w in _theme_tokens(priorities_text()) if w not in _BOARD_STOP}
+            _prio = board_priority_terms(priorities_text())
             if _prio and not (_theme_tokens(theme) & _prio):
                 try:
                     from agora.execution.gatekeeper import record_skip

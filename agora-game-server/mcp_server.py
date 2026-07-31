@@ -2200,8 +2200,27 @@ async def _gate_refresh() -> None:
     s = await asyncio.to_thread(_brain_get_sync, "/api/v1/agent-os/brain/gatekeeper/skips")
     b = await asyncio.to_thread(_brain_get_sync, "/api/v1/agent-os/brain/board")
     _gate_cache["skips"] = [_theme_words(t) for t in (s or {}).get("themes", [])]
-    pr = (b or {}).get("priorities", "") or ""
-    _gate_cache["prio"] = {w for w in _theme_words(pr) if w not in _PRIO_STOP}
+    # TAKE THE BRAIN'S TERMS. The board text has POLARITY: it ends "Finance/health/physics are ONLY
+    # test-beds, never the headline. Deprioritize generic meta-science, politics, cloud/trivia".
+    # Tokenizing it flat turns that refusal into the whitelist, and `_PRIO_STOP` below never learned
+    # the negative clause the way the brain's `methods._BOARD_STOP` did. Measured 2026-07-31 against
+    # the live board: politics, generic meta-science, cloud trivia, finance AND physics all passed
+    # this gate, each matching on the very word the owner used to exclude it -- five for five. The
+    # door built to hold the swarm on the inspeximus frontier was holding it open.
+    terms = (b or {}).get("priority_terms")
+    if isinstance(terms, list) and terms:
+        _gate_cache["prio"] = {str(w).lower() for w in terms}
+        _gate_cache["prio_src"] = "brain"
+    else:
+        # An older brain, or one that is down. Say so rather than silently reverting to the flat
+        # read: this fallback is the buggy behaviour, and it must be visible while it is in use.
+        pr = (b or {}).get("priorities", "") or ""
+        _gate_cache["prio"] = {w for w in _theme_words(pr) if w not in _PRIO_STOP}
+        _gate_cache["prio_src"] = "local-fallback"
+        if _gate_cache["prio"]:
+            logger.warning("[gate] brain served no priority_terms - falling back to the FLAT read of "
+                           "the board, which admits the owner's own deprioritize words (%d terms)",
+                           len(_gate_cache["prio"]))
     _gate_cache["fetched"] = _time.time()
 
 

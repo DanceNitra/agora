@@ -217,7 +217,14 @@ def _garbage_finding(title: str, content: str):
     # doubled single one — the old check missed mixed nesting. Also reject a doubled prefix in the body.
     if sum(tl.count(p) for p in _PREFIXES) >= 2 or any(cl.count(p) >= 2 for p in _PREFIXES):
         return "nested quest prefix"
-    body = cl.split("source:")[0].strip()
+    # Cut the TRAILING citation block before measuring substance -- and only that. An unanchored
+    # split on "source:" also cuts at an inline parenthetical, which is where a note declares its
+    # provenance in the very first line. Measured 2026-07-31: Shadow Kael's scout verdict opens
+    # "SCOUT FIT - owner/repo#333 (source: github-scan)" and then runs eleven more lines carrying
+    # VERDICT, MEASURED, a lab id, the board match, the vault citations and the reachability audit.
+    # The flat split measured that note at 34 characters and the gate refused it as "too short".
+    # His organ was returning ok DECISIVE with a lab id and being dropped at the door every cycle.
+    body = re.split(r"(?im)^[ \t]*sources?[ \t]*:", cl)[0].strip()
     if len(body) < 50:
         return "too short"
     if body.strip(". ") == tl.strip(". "):               # content merely restates the title
@@ -1544,8 +1551,25 @@ async def brain_board_decide(request: Request):
 
 @router.get("/brain/board")
 async def brain_board():
+    """The owner's standing priorities, plus the ON-PRIORITY TERMS derived from them.
+
+    `priority_terms` is published so nothing downstream has to re-derive it. The board text carries
+    POLARITY -- it ends with "Finance/health/physics are ONLY test-beds, never the headline.
+    Deprioritize generic meta-science, politics, cloud/trivia" -- and a naive tokenizer turns the
+    words of that refusal into the whitelist. `methods._BOARD_STOP` strips them, and the brain's Lab
+    door has been using it since it was measured. The dungeon's own quest gate kept a SECOND,
+    smaller stop-list that never got the fix, so the two doors disagreed: measured 2026-07-31, all
+    five themes the owner explicitly deprioritized (politics, generic meta-science, cloud trivia,
+    finance, physics) passed the dungeon gate, each on the very word he used to exclude it.
+
+    One definition, served over the bridge that already exists. A consumer that cannot reach this
+    field is expected to fall back and say so, not to grow a third copy of the list.
+    """
     from agora.execution.board import format_board, priorities_text
-    return {"status": "ok", "report": format_board(), "priorities": priorities_text()}
+    from agora.execution.methods import board_priority_terms
+    text = priorities_text()
+    return {"status": "ok", "report": format_board(), "priorities": text,
+            "priority_terms": sorted(board_priority_terms(text))}
 
 
 @router.post("/brain/annals/today")
