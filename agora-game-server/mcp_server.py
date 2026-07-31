@@ -960,45 +960,76 @@ _ROLE_CONTRIB = {
 }
 
 
+async def _on_board(text: str) -> bool:
+    """Is this subject on the owner's standing priorities? Same terms the quest gate uses.
+
+    Deliberately permissive when the board is silent: with no priorities set, everything is
+    on-board, because a gate with nothing to gate on must not stop the organism.
+    """
+    await _gate_refresh()
+    prio = _gate_cache.get("prio") or set()
+    return (not prio) or bool(_theme_words(text or "") & prio)
+
+
 async def _pick_collab_seed():
     """Rotate the collab/pipeline seed across REAL RESEARCH only: fresh papers to ground, Agora's own
     claims to test, under-explored thin frontier domains, and recent findings to deepen. Combinatorial
     'bridge' (A <-> B) and 'gap' seeds were removed 2026-06-19 — they produced the low-substance
     'AgentA + AgentB: X <-> Y' filler the owner called a 'gaming party'. No source = skip, never a bridge."""
+    # EVERY SEED PASSES THE BOARD (2026-07-31). Not one of these four slots was filtered, so the
+    # pipeline -- the dominant trust engine, five cooperations every ~57s and seven LLM stages per
+    # artifact -- seeded itself on whatever arXiv happened to deliver. Measured on the live library:
+    # 2 of 12 papers were on-board, so 83% of pipelines opened off-mission. The refusals prove where
+    # they ended up: 16 of 25 post-restart write attempts were refused LAB-FIRST, on subjects like
+    # "Multiplicity of closed Reeb orbits on contact manifolds", "TIME Commissioning Observations II"
+    # and "Polynomial equivalence of the global transverse-field Ising model". The write door was
+    # holding the line and the whole cost had already been paid upstream.
+    #
+    # An off-board slot now falls through to the next rather than seeding, and a cycle with nothing
+    # on-mission opens no pipeline at all. Starvation is logged, never papered over with filler.
     i = _collab_rot["i"] % 4
     _collab_rot["i"] += 1
     try:
         if i == 0:                                        # FRESH PAPER — grounded, novel frontier literature
             d = await asyncio.to_thread(_brain_get_sync, "/api/v1/agent-os/brain/library", 60)
             ps = [p for p in (d or {}).get("papers", []) if (p.get("title") or "").strip()]
-            if ps:
-                p = random.choice(ps)
+            on = [p for p in ps if await _on_board(p["title"])]
+            if ps and not on:
+                logger.info("[collab] %d library paper(s), none on-board - falling through", len(ps))
+            if on:
+                p = random.choice(on)
                 return ("paper", p["title"][:80],
                         f"Ground ONE finding this paper directly supports, naming it (Author Year): {p['title']}")
         if i == 1:                                        # TEST AGORA'S OWN CLAIM (flywheel falsifiers)
             d = await asyncio.to_thread(_brain_get_sync, "/api/v1/agent-os/brain/flywheel/questions?n=4", 60)
-            qs = (d or {}).get("open", [])
+            qs = [q for q in ((d or {}).get("open") or []) if await _on_board(q.get("question", ""))]
             if qs:
                 q = random.choice(qs)
                 return ("claim", q["question"][:80], f"Find real evidence on whether this holds: {q['question']}")
         if i == 2:                                        # FRONTIER — under-explored THIN domains (not combinatorial holes)
             d = await asyncio.to_thread(_brain_get_sync, "/api/v1/agent-os/brain/frontier-seed", 75)
             t = (d or {}).get("target") or {}
-            if t.get("target") and t.get("kind") != "hole":
+            if t.get("target") and t.get("kind") != "hole" and await _on_board(t["target"]):
                 return ("frontier-thin", t["target"][:80], t.get("prompt", "")[:300])
         # i == 3, or any slot whose own source was empty → deepen a recent REAL finding
         d = await asyncio.to_thread(_brain_get_sync, "/api/v1/agent-os/brain/collective?limit=8")
         ks = [k for k in (d or {}).get("knowledge", []) if (k.get("content") or "")]
+        # Judged on the TITLE the seed will carry, not the body: the body of an off-mission note can
+        # still mention "memory" in passing and wave the whole subject through.
+        ks = [k for k in ks
+              if await _on_board((k.get("title") or "").replace("Pipeline: ", ""))]
         if ks:
             k = random.choice(ks)
             title = (k.get("title") or "a recent finding").replace("Pipeline: ", "").strip()
             return ("finding", title[:80], (k.get("content") or "")[:240])
-        # final fallback → a fresh paper (NEVER a bridge)
+        # final fallback → a fresh paper (NEVER a bridge, and never off-board)
         d = await asyncio.to_thread(_brain_get_sync, "/api/v1/agent-os/brain/library", 60)
-        ps = [p for p in (d or {}).get("papers", []) if (p.get("title") or "").strip()]
+        ps = [p for p in (d or {}).get("papers", []) if (p.get("title") or "").strip()
+              and await _on_board(p["title"])]
         if ps:
             p = random.choice(ps)
             return ("paper", p["title"][:80], f"Ground ONE finding this paper supports: {p['title']}")
+        logger.info("[collab] no on-board seed in any slot this cycle - opening no pipeline")
     except Exception:
         pass
     return None
