@@ -2199,8 +2199,18 @@ async def brain_scout_box():
     """
     from agora.execution.scout import box_load, box_stats
     items = box_load()
+    # A LEAD THE SCOUT HAS ALREADY RULED IS NOT AWAITING TRIAGE. `status` stays `open` on a fit by
+    # design -- the owner's approval gate owns it from there -- but a selector that keeps offering it
+    # hands the same lead back every cycle. Measured 2026-07-31: Shadow Kael re-ruled
+    # fmind-ai/fgentic#333 on four consecutive cycles, each with a fresh Lab run, and every resulting
+    # contribution was refused at the vault door as a duplicate of the one before. Same shape as the
+    # cartography backlog re-offering its oldest eight, and as belief-challenge-target before it was
+    # made walkable: a selector must not hand out work that has already been done.
+    unruled = [x for x in items if x.get("status") == "open" and not x.get("verdict")]
     return {"status": "ok", "stats": box_stats(),
-            "open": [x for x in items if x.get("status") == "open"][-40:]}
+            "open": unruled[-40:],
+            "ruled_open": sum(1 for x in items
+                              if x.get("status") == "open" and x.get("verdict"))}
 
 
 @router.post("/brain/scout/box/add")
