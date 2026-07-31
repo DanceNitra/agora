@@ -16,6 +16,13 @@ import uuid
 from datetime import datetime
 
 # ── NPC agent IDs ──
+#: How much of a contribution is KEPT. Was 500 -- a size from when a contribution was one sentence of
+#: flavour text. An organ note runs 1,500-3,000 characters with VERDICT and Falsifier at the END, so
+#: the old cap stored the preamble and deleted the evidence: measured 2026-07-31, all 40 of the last
+#: 40 discoveries sat at exactly 500 chars and none stated a falsifier, against 9.4% lifetime.
+#: 8000 clears the largest organ note measured with room to spare while still bounding a runaway.
+_CONTRIB_MAX_CHARS = 8000
+
 NPC_UUIDS = {
     "Shadow Kael":     "00000000-0000-0000-0000-000000000001",
     "Sage Mira":      "00000000-0000-0000-0000-000000000002",
@@ -1172,12 +1179,30 @@ class AgentOS:
     async def _contribute_to_collective(self, npc_id: str, title: str, content: str,
                                         knowledge_type: str = "observation",
                                         broadcast_fn=None):
-        """An agent contributes knowledge to the shared dungeon 'vault'."""
+        """An agent contributes knowledge to the shared dungeon 'vault'.
+
+        THE 500-CHARACTER CAP WAS EATING THE EVIDENCE. It dates from when a contribution was one
+        sentence of flavour text. The organs write a structured note -- CLAIM, SOURCE, MODEL,
+        MEASURED, TOLERANCE, VERDICT, INDEPENDENCE, Falsifier -- of 1,500 to 3,000 characters, with
+        the verdict and the falsifier at the END, so the cap discarded exactly the parts that make a
+        finding checkable and kept the preamble.
+
+        Measured 2026-07-31: EVERY ONE of the last 40 discoveries was stored at exactly 500 chars,
+        and 0 of 40 stated a falsifier -- against 984 of the 10,437 lifetime rows (9.4%) that do.
+        Dame Elara's note ended mid-word: "...a NUMBER disputed between a note and its own". That
+        reads as a swarm-wide contract gap, and it was a substring operation. Her organ, and Voss's,
+        and Orin's, were all writing the falsifier and having it cut off.
+
+        The new cap is 8000: comfortably above the largest organ note measured (~3,000) while still
+        bounding a runaway. SQLite TEXT has no length limit of its own, so this number is a policy,
+        not a constraint -- and a policy that silently deletes the evidence half of every note is
+        worse than no policy.
+        """
         name = await self._get_npc_name(npc_id)
         await self.db.execute(
             "INSERT INTO collective_knowledge (title, content, contributor_id, "
             "contributor_name, knowledge_type, confidence) VALUES (?, ?, ?, ?, ?, 0.7)",
-            (title, content[:500], npc_id, name or "", knowledge_type),
+            (title, content[:_CONTRIB_MAX_CHARS], npc_id, name or "", knowledge_type),
         )
         await self.db.commit()
         if broadcast_fn:

@@ -948,6 +948,21 @@ async def cycle(ctx) -> dict:
                          "instrument's measured systematic bias against its canonical value"
                          % (tol, inst["rel_floor"] * 100, inst["rel_floor"] * 100))
         lines.append("VERDICT: %s - %s" % (final, reason))
+        # NAME THE TEST THAT WOULD OVERTURN IT. Measured 2026-07-31: 40 of the last 40 discoveries
+        # carried a Lab id and NONE named the observation that would flip it, so the press bar --
+        # which requires exactly that -- had nothing it could publish. Here the falsifier is not
+        # rhetoric, it is arithmetic: the verdict is a comparison of |measured - claimed| against a
+        # stated tolerance, so the band that would reverse it is already computed.
+        if tol is not None and verdict in ("REPRODUCED", "FAILED"):
+            lo, hi = inst["claimed"] - tol, inst["claimed"] + tol
+            if verdict == "REPRODUCED":
+                lines.append("Falsifier: a re-run of this same model that lands outside "
+                             "[%.5g, %.5g] flips this to FAILED. The measurement sits %.3g from the "
+                             "edge of that band." % (lo, hi, max(0.0, tol - abs(measured - inst["claimed"]))))
+            else:
+                lines.append("Falsifier: a re-run of this same model that lands inside "
+                             "[%.5g, %.5g] flips this to REPRODUCED. The measurement sits %.3g "
+                             "outside that band." % (lo, hi, abs(measured - inst["claimed"]) - tol))
         if downgraded:
             lines.append("GATE: the brain's by-construction self-check downgraded %s to %s; recorded "
                          "as the gate ruled, not re-POSTed to override it." % (verdict, final))

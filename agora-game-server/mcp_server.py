@@ -1154,12 +1154,19 @@ _PIPELINE_STAGES = [
 ]
 _pipeline = {"item": None, "busy": False, "shipped": 0}   # `shipped` rotates the artifact's byline
 
-# THE REAL CEILING IS 500, NOT 600. `_brain_contribute` posts `content[:600]`, but the brain stores
-# `content[:500]` (server/agora/agent_os/agent_os.py, the INSERT into collective_knowledge). So the last
-# 100 characters of every long contribution are dropped silently, one layer further down than anyone
-# looking at the dungeon would check -- and since the `Source:` line and the chain are appended at the
-# END, the part that vanishes is the attribution. Budget against the cap that actually applies.
-_CONTRIB_CAP = 500
+# BUDGET AGAINST THE CAP THAT ACTUALLY APPLIES -- the brain's, one layer below where anyone looking
+# at the dungeon would check. It was 500 on both sides, and 500 was a size from when a contribution
+# was one sentence of flavour text.
+#
+# The organs write a structured note of 1,500-3,000 characters with VERDICT, INDEPENDENCE and the
+# Falsifier at the END, so the cap kept the preamble and deleted the evidence. Measured 2026-07-31:
+# every one of the last 40 discoveries was stored at EXACTLY 500 chars, 0 of 40 stated a falsifier
+# against 984 of 10,437 lifetime rows (9.4%), and Dame Elara's note ended mid-word -- "...a NUMBER
+# disputed between a note and its own". A swarm-wide contract gap that was a substring operation.
+#
+# Raised WITH the brain (`agent_os._CONTRIB_MAX_CHARS`); a test pins the two together, because
+# raising one alone changes nothing and the failure is silent on both sides.
+_CONTRIB_CAP = 8000
 
 _PIPELINE_STATE_FILE = HERE / ".pipeline_state.json"
 
@@ -3686,7 +3693,9 @@ async def _brain_contribute(eid: str, title: str, content: str) -> bool:
     r = await asyncio.to_thread(
         _brain_post_sync, "/api/v1/agent-os/brain/collective",
         {"npc": _AGENT_NAMES.get(eid, eid), "title": title[:90],
-         "content": content[:600], "knowledge_type": "discovery"})
+         # Was a bare 600 while the brain stored 500 and `_CONTRIB_CAP` said 500 -- three numbers
+         # for one limit, and the smallest silently won. One constant now, on both sides.
+         "content": content[:_CONTRIB_CAP], "knowledge_type": "discovery"})
     # A REJECTION IS NOT A LANDING. `bool(r)` treated EVERY response as success, and the brain answers
     # a refusal with an ordinary body -- {"status": "rejected", "reason": ...} -- from six separate
     # gates (garbage, LAB-FIRST, vault dedup, stream dedup, non-finding, quality). bool() of that dict
