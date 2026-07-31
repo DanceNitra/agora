@@ -76,14 +76,17 @@ on this machine, stdlib only (2026-07-31). The measured systematic bias is what 
     branching_survival      1.0        0.9509    4.91%   1.19%    1.5 s      0.12  <- 3*SE would FAIL
     sir_final_size (R0=2)   0.7968     0.7970    0.03%   0.03%    0.1 s      0.10  <- rounding floor
     ba_degree_exponent      3.0        2.9347    2.18%   0.50%    0.4 s      0.08
-    ltm_cascade_window      5.7647     5.4570    5.34%   0.62%    1.7 s      0.09  <- added 2026-07-31
+    ltm_cascade_window      5.7647     5.5123    4.38%   0.22%    2.1 s      0.09  <- added 2026-07-31
+                            (phi=0.18; the anchor and the bracket both follow the claim's own phi)
 
 The LTM row was added because the instrument set and the target queue did not overlap: of the eight
 replication targets on offer that day, FIVE were cascade / tipping / threshold claims and none of the
 four instruments could model one, so Rooke walked all eight and honestly returned `no-instrument`
 every cycle. Its canonical value is DERIVED, not cited -- bisecting the vulnerable-cluster percolation
 condition sum_{k<=floor(1/phi)} k(k-1)P_k(z) = z gives 5.7647 at phi=0.18, which happens to agree with
-the published window. The -5.3% bias is finite-size, the same character as the branching row.
+the published window. The -4.4% bias is finite-size, the same character as the branching row,
+and the bracket the bisection searches is derived from phi -- a fixed one SATURATED at
+phi=0.10, returning its own upper bound with SE exactly 0.0000 across every run.
 
 The branching row is the reason a relative floor exists at all: the log-log fit of a finite generation
 window approaches the asymptotic exponent from below and sits ~5% low no matter how many trees are
@@ -447,7 +450,7 @@ phi = 0.18, which agrees with the published window and does not depend on anyone
 """
 import math, random, statistics
 
-PHI, N, TRIALS, RUNS, CUT = 0.18, 3000, 40, 5, 0.01
+PHI, N, TRIALS, RUNS, CUT = __PHI__, 3000, 40, 5, 0.01
 
 def _pois(k, z):
     return math.exp(-z + k * math.log(z) - math.lgamma(k + 1)) if z > 0 else (1.0 if k == 0 else 0.0)
@@ -484,9 +487,17 @@ def one_run(n, z, phi, rng):
 def freq(z, rng):
     return sum(1 for _ in range(TRIALS) if one_run(N, z, PHI, rng) > CUT) / TRIALS
 
+# The search range must follow PHI. A fixed [4, 9] was calibrated at phi=0.18 (z_c 5.76) and
+# SATURATES at phi=0.10 (z_c 13.66): the bisection converges on its own upper bound and reports
+# 8.98 with SE=0.0000 across every run -- five identical answers, which is the signature of a
+# boundary, not of a measurement. Vulnerable degrees run to 1/phi, so the window cannot exceed a
+# few multiples of that; the bracket is set from phi and a run that still ends against either edge
+# reports SE = -1 (the file's convention for "could not resolve") instead of returning the edge.
+_LO, _HI = 1.05, max(9.0, 3.0 / PHI)
+
 def zc_hat(rng):
-    lo, hi = 4.0, 9.0
-    for _ in range(7):
+    lo, hi = _LO, _HI
+    for _ in range(9):
         mid = (lo + hi) / 2
         if freq(mid, rng) >= 0.5: lo = mid
         else: hi = mid
@@ -494,8 +505,14 @@ def zc_hat(rng):
 
 ests = [zc_hat(random.Random(4100 + i)) for i in range(RUNS)]
 mean = statistics.mean(ests)
-print("MEASURED cascade_window_upper = %.4f" % mean)
-print("SE = %.4f" % (statistics.stdev(ests) / math.sqrt(len(ests))))
+_edge = 0.02 * (_HI - _LO)
+if mean >= _HI - _edge or mean <= _LO + _edge:
+    print("MEASURED cascade_window_upper = %.4f" % mean)
+    print("SE = -1")          # saturated against the bracket -- not a measurement
+    print("saturated: bracket [%.3g, %.3g] at phi=%s did not contain the crossing" % (_LO, _HI, PHI))
+else:
+    print("MEASURED cascade_window_upper = %.4f" % mean)
+    print("SE = %.4f" % (statistics.stdev(ests) / math.sqrt(len(ests))))
 print("analytic z_c =", round(analytic_zc(PHI), 4), "phi =", PHI, "N =", N,
       "runs =", [round(e, 3) for e in ests])
 '''
@@ -659,7 +676,13 @@ def _inst_ltm(claim: str):
     excludes = _rx(r"\b(lattice|square|triangular|cubic|hypercub|spatial|geometric|small[- ]world"
                    r"|configuration model|scale[- ]free|power[- ]law|assortativ|clustered|directed"
                    r"|bipartite|multiplex|interdependent|temporal|weighted|multi[- ]?seed"
-                   r"|seed fraction|seeded at|initial adopters)\b")
+                   # `seed fraction` was here and was too broad. Measured 2026-07-31: it killed
+                   # "in a Watts model with mean degree 6 and threshold 0.1, a 1% seed fraction
+                   # achieves near-complete cascade" -- a CONNECTIVITY claim that merely mentions
+                   # the seed it used. What this instrument cannot model is a claim ABOUT a seed
+                   # fraction, and the positive test below already requires a connectivity term,
+                   # so the exclusion was doing nothing except refusing work.
+                   r"|seeded at|initial adopters)\b")
     if not _applicable(claim, requires, excludes):
         return None
     # it must be about CONNECTIVITY, not about how many seeds were used
@@ -675,11 +698,24 @@ def _inst_ltm(claim: str):
     ), 1.0, 20.0)
     if claimed is None:
         return None
+    # THE WINDOW MOVES WITH THE THRESHOLD, so phi must come from the CLAIM, not from a constant.
+    # z_c is 5.76 at phi=0.18 but 13.66 at phi=0.10 -- measuring at the wrong phi and comparing to
+    # the claim's mean degree would manufacture a FAILED out of a units mismatch, which is exactly
+    # the "instrument error wearing a verdict's clothes" this organ's contract forbids. A claim that
+    # states no threshold is refused rather than measured against an assumed one.
+    phi = _first_float(claim, _rx(
+        r"\b(?:threshold|phi|φ)\s*(?:=|is|of|≈|~)?\s*(0?\.\d+)",
+        r"(0?\.\d+)\s*(?:adoption\s*)?threshold",
+    ), 0.02, 0.5)
+    if phi is None:
+        return None
     return {"key": "ltm_cascade_window", "label": "cascade_window_upper", "claimed": claimed,
-            "code": _LTM_CODE, "params": {"PHI": 0.18, "N": 3000, "TRIALS": 40, "RUNS": 5},
+            "code": _LTM_CODE.replace("__PHI__", repr(float(phi))),
+            "params": {"PHI": phi, "N": 3000, "TRIALS": 40, "RUNS": 5},
             "rel_floor": 0.09, "seeds": 5,
-            "models": "upper edge of the Watts (2002) cascade window on a Poisson random graph -- "
-                      "the mean degree above which one seed can no longer trigger a global cascade"}
+            "models": "upper edge of the Watts (2002) cascade window on a Poisson random graph at "
+                      "the threshold the claim states (phi=%.3g) -- the mean degree above which one "
+                      "seed can no longer trigger a global cascade" % phi}
 
 
 _INSTRUMENTS = (_inst_er, _inst_branching, _inst_sir, _inst_ba, _inst_ltm)

@@ -10,8 +10,10 @@ were correct every time.
 `ltm_cascade_window` closes ONE of those five quantities: the mean degree above which a single seed
 can no longer trigger a global cascade. Its canonical value is DERIVED rather than cited -- bisecting
 the vulnerable-cluster percolation condition `sum_{k<=floor(1/phi)} k(k-1) P_k(z) = z` gives 5.7647
-at phi=0.18 -- and it was calibrated on this machine before being trusted: measured 5.4570, bias
--5.34%, SE 0.62%, so rel_floor 0.09. The bias is finite-size, the same character as the branching row.
+at phi=0.18 -- and it was calibrated on this machine before being trusted: measured 5.5123, bias
+-4.38%, SE 0.22%, so rel_floor 0.09. The bias is finite-size, the same character as the branching
+row. phi comes from the CLAIM, never a default: the window is 5.76 at 0.18 and 13.66 at 0.10, so
+measuring at an assumed threshold would manufacture a FAILED out of a units mismatch.
 
 The half of the rule that matters more is the refusals. An instrument applied where it is NOT the
 right instrument produces a FAILED that says nothing about the claim -- a seed FRACTION is a
@@ -30,10 +32,15 @@ sys.path.insert(0, str(REPO / "agora-game-server"))
 
 from organs.artificer import _INSTRUMENTS, _LTM_CODE, _inst_ltm  # noqa: E402
 
+# A claim must state BOTH the connectivity and the THRESHOLD. The window moves with phi -- z_c is
+# 5.76 at phi=0.18 and 13.66 at phi=0.10 -- so measuring at an assumed threshold and comparing to
+# the claim's mean degree would manufacture a FAILED out of a units mismatch. That is the
+# "instrument error wearing a verdict's clothes" this organ's contract forbids, so a claim with no
+# threshold is refused rather than measured against a default.
 SHOULD_MATCH = [
     "The tipping threshold for global cascades decreases with greater network connectivity; the "
-    "cascade window closes at mean degree 6.2",
-    "LTM cascade window upper edge z_c = 5.8 on a Poisson random graph",
+    "cascade window closes at mean degree 6.2 for a threshold of 0.18",
+    "LTM cascade window upper edge z_c = 5.8 at threshold 0.18 on a Poisson random graph",
 ]
 
 SHOULD_REFUSE = [
@@ -45,6 +52,8 @@ SHOULD_REFUSE = [
     "On a scale-free network the cascade window closes at mean degree 7.1",
     # no quantity at all
     "Cascades are more likely in sparse networks than dense ones",
+    # a connectivity claim that never states its threshold: the window is undefined without phi
+    "The cascade window closes at mean degree 6.2 on a Poisson random graph",
 ]
 
 
@@ -85,11 +94,11 @@ def test_the_canonical_value_is_derived_not_remembered():
 def test_the_floor_covers_the_measured_bias():
     """rel_floor must absorb the instrument's own systematic error, or it manufactures FAILEDs.
 
-    Measured bias 5.34%, SE 0.62% -> |bias| + 3*SE = 7.2%, so 0.09 covers it. A 3-sigma rule alone
-    (1.9%) would rule FAILED on a claim the model reproduces -- the lesson the branching row records.
+    Measured bias 4.38%, SE 0.22% -> |bias| + 3*SE = 5.0%, so 0.09 covers it with room. A 3-sigma
+    rule alone (0.7%) would rule FAILED on a claim the model reproduces -- the branching row's lesson.
     """
     inst = _inst_ltm(SHOULD_MATCH[0])
-    assert inst["rel_floor"] >= 0.0534 + 3 * 0.0062, (
+    assert inst["rel_floor"] >= 0.0438 + 3 * 0.0022, (
         "rel_floor %.3f is below the instrument's own bias+3SE" % inst["rel_floor"])
 
 
