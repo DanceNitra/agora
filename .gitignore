@@ -219,3 +219,6 @@ err.log
 err2.log
 *.json.bak
 agora-game-server/_dungeon.err2
+
+# refused writes: what the swarm has already tried and been turned away on (runtime state)
+.rejected_writes.json

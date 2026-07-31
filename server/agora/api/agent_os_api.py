@@ -244,6 +244,7 @@ async def add_collective(request: Request):
                 _PROMOTE_STATS["src_refusal"] = _PROMOTE_STATS.get("src_refusal", 0) + 1
             elif g.startswith("low significance"):
                 _PROMOTE_STATS["src_trivial"] = _PROMOTE_STATS.get("src_trivial", 0) + 1
+            _record_rejection(body.get("npc", ""), body.get("title", ""), str(g))
             return {"status": "rejected", "reason": g}
         # LAB-FIRST gate (2026-06-19, flag AGORA_REQUIRE_LAB): a 'discovery' must be backed by a REAL
         # Lab experiment (a reproducible measured result), not a paraphrase. Require a lab_id that
@@ -267,6 +268,7 @@ async def add_collective(request: Request):
                         pass
             if not _ok_lab:
                 _PROMOTE_STATS["src_no_lab"] = _PROMOTE_STATS.get("src_no_lab", 0) + 1
+                _record_rejection(body.get("npc", ""), body.get("title", ""), str("LAB-FIRST: discovery has no reproducible Lab result (lab_id)"))
                 return {"status": "rejected", "reason": "LAB-FIRST: discovery has no reproducible Lab result (lab_id)"}
         # NOVELTY GATE AT THE SOURCE: if this finding lexically near-duplicates a note the vault
         # already has, don't store it — it would only clog the promotion funnel and be deduped later
@@ -279,6 +281,7 @@ async def add_collective(request: Request):
                 import asyncio as _a
                 if await _a.to_thread(_w._find_duplicate, body["title"], body["content"]):
                     _PROMOTE_STATS["src_deduped"] = _PROMOTE_STATS.get("src_deduped", 0) + 1
+                    _record_rejection(body.get("npc", ""), body.get("title", ""), str("vault already covers this (source dedup)"))
                     return {"status": "rejected", "reason": "vault already covers this (source dedup)"}
             except Exception:
                 pass
@@ -300,6 +303,7 @@ async def add_collective(request: Request):
                     _ex = _tokens((_r["title"] or "") + " " + _claim(_r["content"] or ""))
                     if _ex and _containment(_newtok, _ex) >= 0.6:
                         _PROMOTE_STATS["src_stream_dup"] = _PROMOTE_STATS.get("src_stream_dup", 0) + 1
+                        _record_rejection(body.get("npc", ""), body.get("title", ""), str("near-duplicate of a recent finding (stream dedup)"))
                         return {"status": "rejected", "reason": "near-duplicate of a recent finding (stream dedup)"}
         except Exception:
             pass
@@ -318,6 +322,7 @@ async def add_collective(request: Request):
     from agora.execution.non_finding import is_non_finding
     if is_non_finding(body.get("title"), body.get("content")):
         _PROMOTE_STATS["src_refusal"] = _PROMOTE_STATS.get("src_refusal", 0) + 1
+        _record_rejection(body.get("npc", ""), body.get("title", ""), str("not a finding — a refusal / no-fit statement"))
         return {"status": "rejected", "reason": "not a finding — a refusal / no-fit statement"}
     npc_id = DUNGEON_AGENT_IDS.get(body["npc"]) or body["npc"]
     os_engine = get_os(request)
@@ -373,6 +378,8 @@ _PROMOTED: set = set()   # finding titles already promoted to the vault (avoid d
 _PROMOTE_STATS = {"promoted": 0, "checked": 0}   # cumulative funnel stats for the research-ROI metric
 
 
+from pathlib import Path as _Path
+import time as _time
 import re as _grade_re
 _G_MEASURED = _grade_re.compile(
     r"MEASURED:|VERDICT:|\blab[:_ ]?[0-9a-f]{6}\b|\bn\s*=\s*\d|\d+(?:\.\d+)?\s*%|\bCI\b|p\s*[<=]\s*0?\.\d", _grade_re.I)
@@ -851,14 +858,120 @@ async def brain_directions(request: Request, n: int = 14):
     return {"status": "ok", **d}
 
 
+_DIR_COVER_CACHE: dict = {"ts": 0.0, "cov": {}}
+_DIR_COVER_TTL = 600.0            # the vault moves in minutes, not seconds; 8 agents poll this endpoint
+
+
+async def _direction_coverage(_writer, titles: list) -> dict:
+    """Which directions has the swarm already tried and been REFUSED on? {title: True/False}.
+
+    TWO EARLIER VERSIONS OF THIS MEASURED THE WRONG THING, and both reported ZERO covered on a system
+    refusing 76% of writes:
+      1. `_containment` against collective_knowledge -- but a refused finding is never written there,
+         so the evidence of exhaustion is precisely what is missing from that table;
+      2. `writer._find_duplicate` against the vault -- but a direction is a QUESTION and the vault
+         holds ANSWERS, so a direction title matches nothing by construction.
+
+    The evidence lives in the REJECTIONS, which is why they had to start being recorded at all. A
+    direction is exhausted when findings derived from it keep being turned away. Matched by the same
+    `_containment >= 0.6` the stream-dedup gate uses, so the two answers cannot drift.
+    """
+    from agora.execution.finding_diversity import _containment, _tokens
+    import time as _t
+    now = _t.time()
+    if _DIR_COVER_CACHE["cov"] and now - _DIR_COVER_CACHE["ts"] < _DIR_COVER_TTL:
+        return _DIR_COVER_CACHE["cov"]
+    refused = [_tokens(t) for t in _rejected_titles() if t]
+    out = {}
+    for t in titles:
+        tt = _tokens(t or "")
+        out[t] = bool(tt) and sum(1 for r in refused if r and _containment(tt, r) >= 0.6) >= 2
+    _DIR_COVER_CACHE.update(ts=now, cov=out)
+    return out
+
+
+# ── REJECTION LEDGER ─────────────────────────────────────────────────────────────────────────────
+# The brain refused a write and FORGOT it. Only counters were kept (_PROMOTE_STATS["src_*"]), never
+# the title, so nothing downstream could learn what had already been tried. That is why the 19
+# research directions re-seeded forever: a direction is a QUESTION, the vault holds the ANSWER, so
+# checking a direction's title against the vault finds nothing -- and the findings that WOULD prove
+# it exhausted were rejected, therefore absent from collective_knowledge too. The evidence lived
+# only in a dungeon log line. Measured 2026-07-31: 67 write attempts in ten minutes, 51 refused as
+# "vault already covers this", across 10 distinct titles, repeating for as long as anyone had looked.
+_REJECTED_FILE = _Path(__file__).resolve().parents[3] / ".rejected_writes.json"
+_REJECTED_CAP = 400
+
+
+def _record_rejection(npc: str, title: str, reason: str) -> None:
+    """Append a refused write. Never raises: losing the ledger must not fail the request."""
+    try:
+        import json as _j
+        try:
+            items = _j.loads(_REJECTED_FILE.read_text(encoding="utf-8"))
+            if not isinstance(items, list):
+                items = []
+        except Exception:
+            items = []
+        items.append({"npc": (npc or "")[:40], "title": (title or "")[:120],
+                      "reason": (reason or "")[:90], "ts": _time.time()})
+        _REJECTED_FILE.write_text(_j.dumps(items[-_REJECTED_CAP:]), encoding="utf-8")
+    except Exception:
+        pass
+
+
+def _rejected_titles(max_age_h: float = 168.0) -> list:
+    """Titles refused recently -- what the swarm has already tried and been turned away on."""
+    try:
+        import json as _j
+        items = _j.loads(_REJECTED_FILE.read_text(encoding="utf-8"))
+        cut = _time.time() - max_age_h * 3600.0
+        return [x.get("title", "") for x in items if float(x.get("ts", 0) or 0) >= cut]
+    except Exception:
+        return []
+
+
 @router.get("/brain/directions/current")
-async def current_directions():
+async def current_directions(request: Request):
     """The latest harvested directions — agents pull these to pursue them (closing the loop). Durable
     FRONTIER directions are merged FIRST so the swarm reliably quests on the template-backed frontier
-    questions (the swarm's _renewable_quests interleaves + dedups these, so it rotates through them)."""
+    questions (the swarm's _renewable_quests interleaves + dedups these, so it rotates through them).
+
+    COVERED DIRECTIONS ARE WITHHELD (2026-07-31). This list is described in frontier_harvest.py as "the
+    ONLY RENEWABLE source of research themes", and it did not renew: a direction record carries only
+    {kind, title, why} — no timestamp, no status — and no endpoint has ever existed to mark one
+    researched (unlike the flywheel, which has mark-deepened). So the same 19 re-seeded forever while the
+    vault grew around them. Measured on the live system once `_brain_contribute` stopped reporting
+    rejections as landings: of 67 write attempts in ten minutes, 51 (76%) were refused as "vault already
+    covers this", across only 10 distinct titles. The agents were not idle and not wrong; they were
+    honestly researching questions the vault had already answered, and being refused at the door.
+
+    Coverage is judged by the SAME `_containment >= 0.6` the write path rejects duplicates with, so a
+    direction is withheld exactly when the finding it would produce would be refused. Deriving it a
+    second way would let the two answers drift, which is the defect this repo keeps finding.
+
+    SOFT BY DESIGN: if every direction is covered, the least-covered ones are served anyway. A research
+    supply that can empty itself is worse than a repetitive one, and starvation must be visible rather
+    than silent — the response says how many were withheld and why.
+    """
     frontier = _load_frontier_directions()
-    return {"directions": frontier + _DIRECTIONS.get("directions", []),
-            "themes": _DIRECTIONS.get("themes", [])}
+    all_ds = frontier + _DIRECTIONS.get("directions", [])
+    try:
+        writer = getattr(request.app.state, "vault_writer", None)
+        if writer is None:
+            raise RuntimeError("no vault writer; cannot judge coverage with the write path's own check")
+        cov = await _direction_coverage(writer, [d.get("title", "") for d in all_ds])
+    except Exception as e:                                   # never take the supply down over a metric
+        return {"directions": all_ds, "themes": _DIRECTIONS.get("themes", []),
+                "coverage_error": "%s: %s" % (type(e).__name__, str(e)[:90])}
+    fresh = [d for d in all_ds if not cov.get(d.get("title", ""))]
+    withheld = len(all_ds) - len(fresh)
+    if not fresh and all_ds:                                 # everything covered -> serve the thinnest
+        all_ds = sorted(all_ds, key=lambda d: bool(cov.get(d.get("title", ""))))
+        fresh, withheld = all_ds[:3], len(all_ds) - 3
+    return {"directions": fresh, "themes": _DIRECTIONS.get("themes", []),
+            "withheld_as_covered": withheld, "offered": len(fresh),
+            "note": ("%d direction(s) withheld: the vault already covers them by the same containment "
+                     "bar the write path uses" % withheld) if withheld else ""}
 
 
 _LAST_UPGRADES: list = []   # the last self-upgrade proposals (numbered) — pick one by replying its number
