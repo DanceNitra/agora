@@ -640,9 +640,19 @@ async def _cumulative_baseline(ctx, theme: str):
     r = await _get(ctx, "/brain/empirical-test?q=" + _q(theme), 180)
     if not r:
         return None, "empirical-test returned nothing for %r" % theme
-    if _ascii(r.get("source")) != "Hacker News":
+    # CHECK THE DATUM'S PROVENANCE, NOT THE WRAPPER'S LABEL. The identity condition this gate exists
+    # to enforce is that the number measured here is the SAME field the resolver re-fetches --
+    # `fetch_hackernews(theme)["total_stories_ever"]`. It was testing the top-level `source` string,
+    # which the traction endpoint sets to "Hacker News (traction)" while the payload it wraps carries
+    # `source: "Hacker News"` and the very field in question. Measured 2026-08-01 on the live
+    # endpoint: `data = {"source": "Hacker News", "total_stories_ever": 47, "top": [...]}`. So the
+    # gate refused a correct path over a presentation label, and King Aldric reported an honest idle
+    # on a scoreable forecast, every cycle. A check that reads the wrong layer reports safe.
+    _inner = r.get("data") if isinstance(r.get("data"), dict) else {}
+    _src = _ascii(_inner.get("source") or r.get("source"))
+    if _src != "Hacker News":
         return None, ("empirical-test routed %r to %s, not Hacker News - that count is not the "
-                      "field the resolver re-fetches" % (theme, _ascii(r.get("source"))))
+                      "field the resolver re-fetches" % (theme, _src))
     used = _ascii(r.get("query")).strip().lower()
     if used != theme.strip().lower():
         return None, ("empirical-test measured query %r but the resolver will re-fetch %r - "
@@ -717,7 +727,12 @@ async def _ledger_arm(ctx, pending_themes) -> dict:
             "theme": theme, "metric": "hackernews_stories", "baseline": int(cumulative),
             "direction": pick.get("direction"), "confidence": float(pick.get("confidence", 0.5)),
             "why": why_short, "horizon_days": horizon}, 60)
-        if not rec or rec.get("status") != "ok":
+        # `pending` IS THE SUCCESS STATE for a freshly recorded forecast -- it means the ledger took
+        # it and is waiting for the horizon to elapse. The organ read anything but "ok" as a refusal,
+        # so it filed a real accepted record (id fd222374, with a Lab-measured baseline behind it)
+        # under "brain refused the record" and reported an honest-looking idle. Measured 2026-08-01:
+        # the endpoint answers {"status": "pending", "id": ..., "mode": "rate", ...} on success.
+        if not rec or rec.get("status") not in ("ok", "pending", "recorded"):
             skipped.append("%s: brain refused the record (%s)"
                            % (theme, _ascii((rec or {}).get("status"))))
             continue
