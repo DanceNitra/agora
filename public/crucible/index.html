@@ -6,9 +6,9 @@
 <link rel="icon" type="image/svg+xml" href="https://dancenitra.github.io/agora/favicon.svg">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>The Crucible &middot; a machine that rebuilds claims in code &middot; Agora</title>
-<meta name="description" content="A public ledger of scientific and technical claims rebuilt as minimal computational models and tested in code: 21 reproduced, 12 failed, 20 not-computable (53 verdicts). Every verdict ships runnable code and a measured number.">
+<meta name="description" content="A public ledger of scientific and technical claims rebuilt as minimal computational models and tested in code: 21 reproduced, 14 failed, 23 not-computable (58 verdicts). Every verdict ships runnable code and a measured number.">
 <link rel="canonical" href="https://dancenitra.github.io/agora/public/crucible/">
-<script type="application/ld+json">{"@context":"https://schema.org","@graph":[{"@type":"Dataset","name":"The Crucible — AI-claim replication ledger","description":"A public, machine-readable ledger of scientific and technical claims rebuilt as minimal computational models and tested in code (21 reproduced, 12 failed, 20 not-computable; 53 verdicts). Every verdict ships runnable code and a measured number.","url":"https://dancenitra.github.io/agora/public/crucible/","license":"https://opensource.org/licenses/MIT","creator":{"@type":"Organization","name":"Agora","url":"https://dancenitra.github.io/agora/"},"variableMeasured":["reproduced","failed","not-computable"]},{"@type":"WebSite","name":"Agora","url":"https://dancenitra.github.io/agora/","publisher":{"@type":"Organization","name":"Agora"}}]}</script>
+<script type="application/ld+json">{"@context":"https://schema.org","@graph":[{"@type":"Dataset","name":"The Crucible — AI-claim replication ledger","description":"A public, machine-readable ledger of scientific and technical claims rebuilt as minimal computational models and tested in code (21 reproduced, 14 failed, 23 not-computable; 58 verdicts). Every verdict ships runnable code and a measured number.","url":"https://dancenitra.github.io/agora/public/crucible/","license":"https://opensource.org/licenses/MIT","identifier":"https://doi.org/10.5281/zenodo.21648053","sameAs":"https://doi.org/10.5281/zenodo.21648053","creator":{"@type":"Organization","name":"Agora","url":"https://dancenitra.github.io/agora/"},"variableMeasured":["reproduced","failed","not-computable"]},{"@type":"WebSite","name":"Agora","url":"https://dancenitra.github.io/agora/","publisher":{"@type":"Organization","name":"Agora"}}]}</script>
 <meta property="og:type" content="website">
 <meta property="og:title" content="The Crucible — claims, rebuilt in code and tested">
 <meta property="og:description" content="A machine rebuilds scientific claims as minimal models and publishes the verdict — failures included. Every verdict ships runnable code.">
@@ -17,12 +17,12 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;0,6..72,600;0,6..72,700;1,6..72,400;1,6..72,500&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
-<style>@font-face{font-family:"Newsreader-fallback";src:local("Georgia"),local("Times New Roman");size-adjust:95.18%;ascent-override:77.22%;descent-override:27.84%;line-gap-override:0%}
+<style>
   :root{
     --paper:#faf7f0;--paper2:#f2eee4;--ink:#17150f;--soft:#55514733;--text:#4d493f;--faint:#938d7f;
     --line:#e3ddcf;--line2:#d6cfbd;--acc:#0c7a55;--acc2:#0a8f68;--acc-soft:#e1f1ea;
     --bad:#b1361f;--bad-soft:#f8e6e0;--gold:#9a7b1e;
-    --serif:"Newsreader","Newsreader-fallback",Georgia,"Times New Roman",serif;
+    --serif:"Newsreader",Georgia,"Times New Roman",serif;
     --mono:"JetBrains Mono",ui-monospace,Menlo,Consolas,monospace;
   }
   *{box-sizing:border-box;margin:0}
@@ -177,8 +177,8 @@
   Every verdict ships a measured number and the code that produced it.</p>
   <div class="tally">
     <div class="t ok"><div class="num">21</div><div class="lbl">Reproduced</div></div>
-    <div class="t fail"><div class="num">12</div><div class="lbl">Failed</div></div>
-    <div class="t"><div class="num">20</div><div class="lbl">Not computable</div></div>
+    <div class="t fail"><div class="num">14</div><div class="lbl">Failed</div></div>
+    <div class="t"><div class="num">23</div><div class="lbl">Not computable</div></div>
   </div>
   <div class="dataset">Open data &mdash; <a href="crucible.json">the full ledger as JSON</a> &middot; now a citable dataset on <a href="https://huggingface.co/datasets/Danchi17/folklore-index" target="_blank" rel="noopener">Hugging&nbsp;Face &rarr;</a><br><span class="loadline"><code>datasets.load_dataset("Danchi17/folklore-index")</code></span></div>
 </div></header>
@@ -197,13 +197,33 @@
     </div>
   </section>
 <section class="ledger"><div class="wrap">
-  <div class="sechead"><h2>The ledger</h2><div class="sub">33 claims rebuilt &amp; tested &middot; newest first</div></div>
+  <div class="sechead"><h2>The ledger</h2><div class="sub">35 claims rebuilt &amp; tested &middot; newest first</div></div>
   <div class="filters">
     <button class="on" data-f="all">All</button>
     <button data-f="REPRODUCED">Reproduced</button>
     <button data-f="FAILED">Failed</button>
   </div>
   <div class="grid" id="grid">
+      <article class="card fail" data-v="FAILED" data-reveal>
+        <div class="crail"></div>
+        <div class="cbody">
+          <div class="chead"><span class="cv">FAILED</span>
+            <span class="cfield"></span></div>
+          <h3>A memory&#x27;s support edge -- which earlier record a new write was derived from -- can be rec</h3>
+          <p class="cresult">Measured against constructed ground truth with the negatives that matter: a negative is a same-domain, same-vocabulary write issued right after the SAME recall -- the pair a real store actually contains, not an unrelated document. n=120 per cell, 5 thresholds x 4 retention levels, run against the shipped library (inspeximus 1.89.0) via probes/infer_lineage_precision.py, public at https://github.com/DanceNitra/inspeximus/blob/v1.89.0/probes/infer_lineage_precision.py and in the 1.89.0 sdist -- reproduce with `pip install inspeximus==1.89.0` and run it. Best recall of the inferred edge is 0.133, at the loosest threshold (0.05) and with the derivative retaining 90% of the parent&#x27;s wording; 0.083 at 70%, 0.017 at 50%, 0.000 at 30%. Precision is 1.000 wherever it fires and false positives are zero in every cell, so the failure is RECALL, not confusion: the inference is right when it speaks and almost always silent. Consequence: a retraction that walks declared `derived_from` edges cannot be rescued by inferring the undeclared ones. METHOD NOTE, because it nearly went out wrong: the first model was a hand-written bag-of-words cosine over a 14-word shared vocabulary, which put every pair above threshold and returned recall 1.000 with precision exactly 0.500 -- while its VERDICT line, written in advance as prose, asserted &#x27;recovers at most a small fraction&#x27;. The claim contradicted the data sent to support it. The recorded run executes the shipped probe and COMPUTES the verdict from the parsed table instead of stating it.</p>
+          <div class="cfoot"><span class="cyear">OUR OWN claim, and we shipped it: inspeximus i</span><a class="code" href="https://github.com/DanceNitra/agora/blob/main/agora_output/lab/20260801-122116_infer-lineage-recall-real.py" target="_blank" rel="noopener">runnable model &rarr;</a></div>
+        </div>
+      </article>
+      <article class="card fail" data-v="FAILED" data-reveal>
+        <div class="crail"></div>
+        <div class="cbody">
+          <div class="chead"><span class="cv">FAILED</span>
+            <span class="cfield"></span></div>
+          <h3>world-model-mcp ENFORCES what its trust schema declares (expires_at: &#x27;rows should be dropp</h3>
+          <p class="cresult">Measured with both controls passing (truncate-&gt;REMOVED; encoded store-&gt;NOT_COMPUTABLE). After the PUBLIC delete() the value is on disk in facts.db AND still retrievable. expires_at/influence_state are inert columns; the source itself notes the sweep &#x27;lands in a follow-up&#x27;. IMPORTANT AND SELF-CRITICA</p>
+          <div class="cfoot"><span class="cyear">SaravananJaichandar/world-model-mcp v0.15.5 (P</span></div>
+        </div>
+      </article>
       <article class="card ok" data-v="REPRODUCED" data-reveal>
         <div class="crail"></div>
         <div class="cbody">
@@ -528,10 +548,10 @@
 </div></section>
 
 <section class="passes"><div class="wrap">
-  <div class="sechead"><h2>Honest passes</h2><div class="sub">4 of 20 shown &mdash; no simulable core, on the record anyway</div></div>
+  <div class="sechead"><h2>Honest passes</h2><div class="sub">4 of 23 shown &mdash; no simulable core, on the record anyway</div></div>
   <p class="intro">Not every claim has a computable mechanism. When a claim is descriptive rather
   than mechanistic, the honest verdict is <em>not computable</em> &mdash; recorded, not quietly dropped.
-  20 verdicts fall in this class; 4 are shown here as examples and
+  23 verdicts fall in this class; 4 are shown here as examples and
   <a href="crucible.json">all of them are in the ledger JSON</a>.</p>
   <ul class="plist"><li data-reveal><span class="pclaim">Generative AI is rapidly automating software-engineering tasks</span><span class="preason">trend claim, no mechanism to simulate</span></li><li data-reveal><span class="pclaim">Safe-Sora: invisible watermarking for generative video (Su et al. 2025)</span><span class="preason">engineering system, not a quantitative mechanism</span></li><li data-reveal><span class="pclaim">Glass-transition duration falls exponentially with cooling rate in a metallic alloy</span><span class="preason">claim under-specified for a faithful minimal model</span></li><li data-reveal><span class="pclaim">The AI–biology analogy breaks: brains use local Hebbian synaptic homeostasis</span><span class="preason">conceptual claim, no single simulable quantity</span></li></ul>
 </div></section>
@@ -563,7 +583,7 @@
 
 <footer><div class="wrap">
   <span>Agora &mdash; autonomous research OS &middot; The Crucible</span>
-  <span>updated 2026-07-28 &middot; <a href="https://github.com/DanceNitra/agora" target="_blank" rel="noopener">source</a></span>
+  <span>updated 2026-08-01 &middot; <a href="https://github.com/DanceNitra/agora" target="_blank" rel="noopener">source</a></span>
 </div></footer>
 
 <script>

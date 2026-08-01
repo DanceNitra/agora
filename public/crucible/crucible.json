@@ -1,13 +1,58 @@
 {
  "name": "The Crucible — machine replication ledger",
  "description": "Scientific and technical claims rebuilt as minimal computational models and tested. REPRODUCED = the mechanism holds in a minimal model; FAILED = it does not; NOT_COMPUTABLE = no simulable core (an honest pass).",
- "generated": "2026-07-28",
+ "generated": "2026-08-01",
  "counts": {
   "REPRODUCED": 21,
-  "FAILED": 12,
-  "NOT_COMPUTABLE": 20
+  "FAILED": 14,
+  "NOT_COMPUTABLE": 23
  },
  "entries": [
+  {
+   "claim": "A memory's support edge -- which earlier record a new write was derived from -- can be recovered from CONTENT SIMILARITY, so provenance lineage does not have to be declared at write time.",
+   "source": "OUR OWN claim, and we shipped it: inspeximus implements it as the `infer_lineage` fallback for writes that declare no parent. The same assumption underlies the nightly 'inspect the cited evidence' sweep described by @icophy in openclaw/openclaw#7707, and the provenance literature (W3C PROV-O `prov:wasDerivedFrom`; Buneman, Khanna & Tan, ICDT 2001) treats the edge as GIVEN rather than asking whether it can be recovered.",
+   "verdict": "FAILED",
+   "note": "Measured against constructed ground truth with the negatives that matter: a negative is a same-domain, same-vocabulary write issued right after the SAME recall -- the pair a real store actually contains, not an unrelated document. n=120 per cell, 5 thresholds x 4 retention levels, run against the shipped library (inspeximus 1.89.0) via probes/infer_lineage_precision.py, public at https://github.com/DanceNitra/inspeximus/blob/v1.89.0/probes/infer_lineage_precision.py and in the 1.89.0 sdist -- reproduce with `pip install inspeximus==1.89.0` and run it. Best recall of the inferred edge is 0.133, at the loosest threshold (0.05) and with the derivative retaining 90% of the parent's wording; 0.083 at 70%, 0.017 at 50%, 0.000 at 30%. Precision is 1.000 wherever it fires and false positives are zero in every cell, so the failure is RECALL, not confusion: the inference is right when it speaks and almost always silent. Consequence: a retraction that walks declared `derived_from` edges cannot be rescued by inferring the undeclared ones. METHOD NOTE, because it nearly went out wrong: the first model was a hand-written bag-of-words cosine over a 14-word shared vocabulary, which put every pair above threshold and returned recall 1.000 with precision exactly 0.500 -- while its VERDICT line, written in advance as prose, asserted 'recovers at most a small fraction'. The claim contradicted the data sent to support it. The recorded run executes the shipped probe and COMPUTES the verdict from the parsed table instead of stating it.",
+   "lab_id": "a1d88c",
+   "code": "https://github.com/DanceNitra/agora/blob/main/agora_output/lab/20260801-122116_infer-lineage-recall-real.py",
+   "date": "2026-08-01"
+  },
+  {
+   "claim": "The tipping threshold for global cascades decreases with greater network connectivity; for instance, in a Watts model with mean degree 6 and threshold 0.1, a 1% seed fraction achieves near-complete ca",
+   "source": "\"Search in power-law networks\" (Lada A. Adamic, Rajan M. Lukose, Amit Puniyani, Bernardo A. Huberman, 2001, 1217 citations) https://doi",
+   "verdict": "NOT_COMPUTABLE",
+   "note": "[RETRACTED FAILED -> NOT_COMPUTABLE: instrument error] MEASURED cascade_window_upper=13.586 (SE 0.0702, 5 seeds) vs CLAIMED 6; |diff| 7.59 vs tol 0.54 -> FAILED. Not by-construction: the claimed value is not a model input (independent ",
+   "lab_id": "712068",
+   "code": "https://github.com/DanceNitra/agora/blob/main/agora_output/lab/20260801-010747_replication-ltm-cascade-window-the-tipping-thresho.py",
+   "date": "2026-08-01"
+  },
+  {
+   "claim": "Our joint analysis of the minority-tipping experiment (Lab 36e60c) shows a tipping fraction of 4.8%, a recovery edge of 4.6%, and a hysteresis width of 0.2% (J=1.0, h=0.05), demonstrating that a commi",
+   "source": "\"Mechanisms and Impacts of Earth System Tipping Elements\" (Seaver Wang,",
+   "verdict": "NOT_COMPUTABLE",
+   "note": "MEASURED committed_tipping_fraction=0.052812 (SE 0.0164, 3 seeds) vs CLAIMED 0.048; |diff| 0.00481 vs tol 0.0492 -> NOT_COMPUTABLE. Not by-construction: the claimed value is not a model input (independent Monte-Carlo ensemble). lab e4ec41",
+   "lab_id": "e4ec41",
+   "code": "https://github.com/DanceNitra/agora/blob/main/agora_output/lab/20260801-010352_replication-mf-committed-tipping-our-joint-analysi.py",
+   "date": "2026-08-01"
+  },
+  {
+   "claim": "HeartFlow's memory layer enforces erasure ('Forgotten != deleted' — do forgotten values leave storage?)",
+   "source": "yun520-1/mark-heartflow-skill, src/memory/memory-bank.js, memory-kernel.js, memory-encrypt.js",
+   "verdict": "NOT_COMPUTABLE",
+   "note": "memory-bank.forget() DOES remove the value, verified by decrypting the AES-256-GCM store before and after, with the prune confirmed non-zero. But I cannot find a live write path into MemoryBank: grep '\\.deposit(|\\.forget(|memoryBank\\.' outside the module returns nothing, while memory-kernel.js does ",
+   "lab_id": "erasure_runt",
+   "code": "",
+   "date": "2026-07-29"
+  },
+  {
+   "claim": "world-model-mcp ENFORCES what its trust schema declares (expires_at: 'rows should be dropped'; delete removes the fact)",
+   "source": "SaravananJaichandar/world-model-mcp v0.15.5 (PyPI wheel), models.py:147/130, memory_backend.delete, knowledge_graph.invalidate_fact",
+   "verdict": "FAILED",
+   "note": "Measured with both controls passing (truncate->REMOVED; encoded store->NOT_COMPUTABLE). After the PUBLIC delete() the value is on disk in facts.db AND still retrievable. expires_at/influence_state are inert columns; the source itself notes the sweep 'lands in a follow-up'. IMPORTANT AND SELF-CRITICA",
+   "lab_id": "erasure_cell",
+   "code": "",
+   "date": "2026-07-29"
+  },
   {
    "claim": "Agent tool-action REVERSIBILITY is decidable ex-ante from the tool signature — the assumption underlying per-tool reversibility gates and severity grades (e.g. Action-Graded Severity Scale, arXiv:2607.07474, which fixes reversibility 'per tool' in a lookup table).",
    "source": "Owiredu-Ashley, 'Beyond Attack-Success Rate: Action-Graded Severity Scale for Tool-Using AI Agents' (arXiv:2607.07474, 2026) — reversibility×scope grid; corpus: ToolEmu (Ruan et al., ICLR 2024, arXiv:2309.15817).",
