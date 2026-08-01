@@ -104,7 +104,15 @@ def _save(items: list) -> None:
     os.replace(tmp, LEDGER)
 
 
-def preregister(claim_id: str, probs: dict, rationale: str, task: str) -> dict:
+#: Whose organ this is. Written onto every record, because the swarm acceptance bar credits work by
+#: ACTOR and an unattributed row is either dropped or, worse, credited to whoever the ledger is
+#: rostered to. That second failure already happened once here: rostering a shared ledger to Aldric
+#: made him read as having produced forty records that another writer had made. A ledger with one
+#: writer still has to say so.
+ACTOR = "King Aldric"
+
+
+def preregister(claim_id: str, probs: dict, rationale: str, task: str, actor: str = ACTOR) -> dict:
     """Record the forecast BEFORE the gradient runs. Returns the stored record.
 
     `probs` must carry a probability for each of REAL / WEAK_MODEL_ARTIFACT / REGIME_SPECIFIC and sum
@@ -131,6 +139,7 @@ def preregister(claim_id: str, probs: dict, rationale: str, task: str) -> dict:
         "forecast": {k: round(float(probs[k]), 4) for k in (REAL, WEAK_MODEL_ARTIFACT, REGIME_SPECIFIC)},
         "rationale": rationale.strip(),
         "status": "open",
+        "by": actor,
         "ts": time.time(),
     }
     items = _load()
