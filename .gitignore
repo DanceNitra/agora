@@ -222,3 +222,9 @@ agora-game-server/_dungeon.err2
 
 # refused writes: what the swarm has already tried and been turned away on (runtime state)
 .rejected_writes.json
+
+# Run artifacts from probes/swarm_health.py. Both were tracked on the integration branch: gate.json
+# is a verdict dump that embeds an absolute path from the machine that produced it, and gate.err was
+# an empty file. Neither is referenced by any code.
+gate.json
+gate.err
