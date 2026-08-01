@@ -85,6 +85,12 @@ _MIN_MATERIAL_EDGE = 0.02             # below this, a call carries no informatio
 _ORACLE_BASE_TILT = 0.30              # max relative pull toward the status quo, before shrinkage
 _SCAN_HORIZON_DAYS = 120.0            # oracle.fetch_candidates' own max_days
 
+#: Books this deployment can actually reach. Measured 2026-08-01 across five prediction-market APIs
+#: from this machine: Polymarket BLOCKED (a DNS content filter serves its block page), Manifold 200,
+#: Kalshi 200, Metaculus HTTPError, Adjacent News DNS failure. Empty means "assume all reachable",
+#: so a future deployment with no filter behaves exactly as before.
+_REACHABLE_BOOKS = ("manifold",)
+
 _PRED_WINDOW_DAYS = 14                # gather_prediction_baseline's fixed window
 _PRED_HORIZON_MIN = 7
 _PRED_HORIZON_MAX = 120
@@ -474,8 +480,13 @@ async def _resolution_phase(ctx) -> dict | None:
             beat = bool(p.get("beat_market"))
             n_beat += 1 if beat else 0
             lines.append(
-                "- [Polymarket %s] %s -> outcome %s | Brier agora %s vs market %s | %s"
-                % (_ascii(p.get("market_id")), _ascii(p.get("question"))[:78],
+                # THE RECORD'S OWN BOOK, not a constant. Two sources feed this ledger now and a
+                # resolved position labelled with the wrong one is a false provenance on a
+                # credibility artifact -- the play-money and real-money records are not the same
+                # evidence and a reader cannot tell them apart if every line says Polymarket.
+                "- [%s %s] %s -> outcome %s | Brier agora %s vs market %s | %s"
+                % (_ascii(p.get("source") or "polymarket"),
+                   _ascii(p.get("market_id")), _ascii(p.get("question"))[:78],
                    "YES" if float(p.get("outcome", 0) or 0) > 0.5 else "NO",
                    p.get("brier_agora"), p.get("brier_market"),
                    "BEAT THE MARKET" if beat else "lost to the market"))
@@ -536,7 +547,18 @@ async def _oracle_book(ctx) -> dict:
             overdue.append(p)
     n_res = int(sc.get("resolved", 0) or 0)
     beat = int(sc.get("beat_market", 0) or 0)
-    return {"reachable": bool(d), "open": len(open_ps), "overdue": len(overdue),
+    # A POSITION YOU ARE PREVENTED FROM CLOSING IS NOT A STUCK BOOK. `_ORACLE_MAX_OVERDUE` exists to
+    # stop the arm opening positions faster than it closes them -- a real failure this ledger is meant
+    # to prevent. But all seven overdue positions here are on Polymarket, which a DNS content filter
+    # blocks from this deployment, so they can never be closed by anything the organ does. Counting
+    # them wedges the arm permanently the moment one source goes dark: the guard against hoarding
+    # becomes a guard against forecasting at all. Overdue positions the RESOLVER itself reported as
+    # unreachable are therefore excluded from the stuck-book count, and reported separately so the
+    # condition stays visible instead of being quietly forgiven.
+    stuck = [p for p in overdue
+             if str(p.get("source") or "polymarket") in _REACHABLE_BOOKS or not _REACHABLE_BOOKS]
+    return {"reachable": bool(d), "open": len(open_ps), "overdue": len(stuck),
+            "overdue_unreachable": len(overdue) - len(stuck),
             "n_resolved": n_res, "brier_agora": sc.get("brier_agora"),
             "brier_market": sc.get("brier_market"),
             "beat_rate": (beat / n_res) if n_res else 0.5}
@@ -595,15 +617,29 @@ async def _oracle_arm(ctx, book: dict) -> dict:
     rec = await _post(ctx, "/brain/oracle/call", {
         "market_id": pick["market_id"], "question": pick["question"],
         "market_prob": pick["market_prob"], "ends": pick["ends"],
-        "agora_prob": pick["agora_prob"], "reasoning": reasoning}, 60)
+        "agora_prob": pick["agora_prob"], "reasoning": reasoning,
+        # CARRY THE BOOK. The scan now falls back to Manifold when Polymarket is behind the network
+        # filter, and the two are not interchangeable evidence: one is real money, the other play
+        # money. A Brier record that cannot say which crowd it beat is not a credibility artifact.
+        "source": pick.get("source") or (scan or {}).get("source") or "polymarket"}, 60)
     if not rec or rec.get("status") != "ok":
         return _idle("brain refused the oracle call (%s) - nothing recorded"
                      % _ascii((rec or {}).get("status")))
+    _src = pick.get("source") or (scan or {}).get("source") or "polymarket"
+    # SAID ON THE ARTIFACT, not buried in a field. Calibration against play money is a weaker
+    # claim than calibration against a real-money crowd, and this number must never leave the
+    # organ without that attached. The Baseline line below also named Polymarket unconditionally,
+    # which would have mislabelled the book the moment the fallback fired.
+    _book_note = ([] if _src != "manifold" else
+                  ["BOOK: manifold (PLAY MONEY). Polymarket is unreachable from this deployment"
+                   " -- a DNS content filter serves its block page for it while other HTTPS"
+                   " hosts answer 200 -- so this position is priced against a softer crowd and"
+                   " its Brier score is NOT comparable to a real-money record."])
 
-    content = "\n".join([
+    content = "\n".join(_book_note + [
         "Metric: Brier score vs the resolved market outcome, head to head with the market price.",
-        "Baseline: market %.4f (Polymarket %s). Agora: %.4f (edge %+.4f, %s side)."
-        % (pick["market_prob"], pick["market_id"], pick["agora_prob"], pick["edge"],
+        "Baseline: market %.4f (%s %s). Agora: %.4f (edge %+.4f, %s side)."
+        % (pick["market_prob"], _src, pick["market_id"], pick["agora_prob"], pick["edge"],
            pick["side"]),
         "Horizon: %s days, resolves %s." % (pick.get("days"), pick.get("ends")),
         "Market: %s" % pick["question"],
@@ -620,8 +656,8 @@ async def _oracle_arm(ctx, book: dict) -> dict:
     return {"status": "ok", "decisive": False,
             "title": _ascii("Oracle call: " + pick["question"])[:110],
             "content": _ascii(content), "lab_id": lab_id,
-            "why": _ascii("opened a scored position at %.3f vs market %.3f on Polymarket %s"
-                          % (pick["agora_prob"], pick["market_prob"], pick["market_id"]))}
+            "why": _ascii("opened a scored position at %.3f vs market %.3f on %s %s"
+                          % (pick["agora_prob"], pick["market_prob"], _src, pick["market_id"]))}
 
 
 # ---------------------------------------------------------------------------
@@ -832,6 +868,11 @@ async def cycle(ctx) -> dict:
             _log(ctx, "oracle arm idle (%s) - falling through to the ledger arm" % r["why"][:120])
             return await _ledger_arm(ctx, pending_themes)
 
+        # The excluded ones are SAID, not silently forgiven -- a book nobody can close is a fact the
+        # owner needs, and it is the difference between "the arm is hoarding" and "the network is".
+        if book.get("overdue_unreachable"):
+            _log(ctx, "oracle: %d overdue position(s) are on a book this deployment cannot reach and "
+                      "are excluded from the stuck-book cap" % book["overdue_unreachable"])
         _log(ctx, "arm=ledger (pending %d, oracle open %d overdue %d)"
              % (pending, book["open"], book["overdue"]))
         r = await _ledger_arm(ctx, pending_themes)

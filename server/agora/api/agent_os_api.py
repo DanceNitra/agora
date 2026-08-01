@@ -1425,8 +1425,24 @@ async def brain_metabolism():
 async def brain_oracle_scan():
     """THE ORACLE — open, liquid, in-domain prediction markets worth an independent call."""
     import asyncio as _aio
-    from agora.execution.oracle import fetch_candidates
-    return {"status": "ok", "candidates": await _aio.to_thread(fetch_candidates)}
+    from agora.execution.oracle import fetch_candidates, fetch_candidates_manifold
+    # FALL BACK TO A REACHABLE BOOK. Measured 2026-08-01 across five prediction-market APIs from this
+    # machine: Polymarket is behind a DNS content filter (Whalebone serves its block page), while
+    # Manifold and Kalshi both answer 200 from the same interpreter. The Oracle had been dead for a
+    # month on the one blocked source, reporting an empty candidate list that read as "no market is
+    # worth a call".
+    #
+    # THE SOURCE TRAVELS WITH THE CANDIDATE, and it must keep travelling: Manifold is PLAY MONEY, so
+    # a Brier record built against it is calibration against a softer crowd than Polymarket's
+    # real-money one. Informative, but not the same claim, and never to be quoted as if it were.
+    cands = await _aio.to_thread(fetch_candidates)
+    src = "polymarket"
+    if not cands:
+        cands = await _aio.to_thread(fetch_candidates_manifold)
+        src = "manifold" if cands else "none"
+    return {"status": "ok", "candidates": cands, "source": src,
+            "caveat": ("manifold is play-money: calibration against it is a weaker claim than "
+                       "against a real-money book" if src == "manifold" else None)}
 
 
 @router.post("/brain/oracle/call")
@@ -1436,7 +1452,9 @@ async def brain_oracle_call(request: Request):
     b = await request.json()
     return {"status": "ok", **record_call(
         b.get("market_id") or "", b.get("question") or "", float(b.get("market_prob", 0.5)),
-        b.get("ends") or "", float(b.get("agora_prob", 0.5)), b.get("reasoning") or "")}
+        b.get("ends") or "", float(b.get("agora_prob", 0.5)), b.get("reasoning") or "",
+        # which book priced it; the ledger keeps it so no Brier number is ever quoted without it
+        source=(b.get("source") or "polymarket"))}
 
 
 @router.post("/brain/oracle/resolve")

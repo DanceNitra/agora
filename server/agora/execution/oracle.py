@@ -89,7 +89,7 @@ def fetch_candidates(pages: int = 5, max_days: int = 120) -> list[dict]:
 
 
 def record_call(market_id: str, question: str, market_prob: float, ends: str,
-                agora_prob: float, reasoning: str) -> dict:
+                agora_prob: float, reasoning: str, source: str = "polymarket") -> dict:
     """Log Agora's independent probability as a paper position; the edge is the thesis."""
     p = max(0.01, min(0.99, float(agora_prob)))
     rec = {"id": str(market_id), "market_id": str(market_id), "question": question[:200],
@@ -97,6 +97,10 @@ def record_call(market_id: str, question: str, market_prob: float, ends: str,
            "edge": round(p - float(market_prob), 4),
            "side": "YES" if p > market_prob else "NO",
            "reasoning": (reasoning or "")[:400], "ends": ends,
+           # WHICH BOOK THIS WAS PRICED AGAINST. Two sources now feed the ledger and they are not
+           # interchangeable evidence: Polymarket is real money, Manifold is play money, and a Brier
+           # record built against the softer one has to say so wherever it is quoted.
+           "source": (source or "polymarket"),
            "ts": time.time(), "status": "open"}
     items = _load()
     items.append(rec)
@@ -180,6 +184,29 @@ def resolve_open() -> list[dict]:
             continue
         diag["checked"] += 1
         overdue = bool(p.get("ends")) and str(p.get("ends")) < today
+        if str(p.get("source") or "polymarket") == "manifold":
+            # A source that is reachable resolves through its own endpoint; the failure taxonomy
+            # below is shared so an unreachable Manifold would be reported the same way.
+            try:
+                outcome_m = _resolve_manifold(p)
+            except Exception as e:
+                diag["unreachable"] += 1
+                diag["overdue_unreachable"] += 1 if overdue else 0
+                msg = "manifold %s: %s" % (type(e).__name__, str(e)[:80])
+                if msg not in diag["errors"]:
+                    diag["errors"].append(msg)
+                continue
+            if outcome_m is None:
+                diag["still_open"] += 1          # unresolved, or resolved MKT/CANCEL: not a fact
+                continue
+            p["status"] = "resolved"
+            p["outcome"] = outcome_m
+            p["brier_agora"] = round((p["agora_prob"] - outcome_m) ** 2, 4)
+            p["brier_market"] = round((p["market_prob"] - outcome_m) ** 2, 4)
+            p["beat_market"] = p["brier_agora"] < p["brier_market"]
+            p["resolved_ts"] = time.time()
+            resolved.append(p)
+            continue
         try:
             m = _get(f"{_GAMMA}/{p['market_id']}")
         except Exception as e:
@@ -249,3 +276,86 @@ def format_oracle(n: int = 8) -> str:
         lines.append(f"   market {p['market_prob']:.0%} | agora {p['agora_prob']:.0%} "
                      f"(edge {p['edge']:+.0%}, {p['side']}) · ends {p['ends']}")
     return "\n".join(lines)
+
+
+# ── a second market source, because the first one is behind a network filter ──────────────────────
+#
+# Polymarket is unreachable from this deployment: a DNS content filter (Whalebone) serves its block
+# page for gamma-api.polymarket.com while api.github.com, export.arxiv.org and api.openalex.org all
+# answer 200 from the same interpreter. Measured 2026-08-01 across five prediction-market APIs:
+#
+#     Polymarket      BLOCKED (Whalebone)
+#     Manifold        200
+#     Kalshi          200
+#     Metaculus       HTTPError (genuine cert; auth/shape, not a filter)
+#     Adjacent News   DNS failure
+#
+# So the Oracle is not dead, it is on the one blocked source. Manifold is added ALONGSIDE Polymarket
+# rather than replacing it: when the filter is lifted the original book resolves as before, and a
+# position records which source it was priced against.
+#
+# THE CAVEAT IS METHODOLOGICAL AND MUST TRAVEL WITH ANY NUMBER FROM IT. Manifold is PLAY MONEY.
+# Beating its prices is a materially weaker claim than beating Polymarket's real-money ones, and the
+# Oracle exists to be scored against a crowd with skin in the game. A Brier record built here is
+# evidence of calibration against a softer benchmark, and every public use of it has to say so.
+
+_MANIFOLD = "https://api.manifold.markets/v0/markets"
+
+#: Manifold resolves BINARY markets to YES, NO, MKT (to the market probability) or CANCEL. Only the
+#: first two are a hard outcome; MKT and CANCEL are not something a Brier score can eat.
+_MANIFOLD_HARD = {"YES": 1.0, "NO": 0.0}
+
+
+def fetch_candidates_manifold(limit: int = 200, max_days: int = 120) -> list[dict]:
+    """Open, in-domain, binary Manifold markets resolving within the horizon.
+
+    Same filters as the Polymarket path and for the same reasons: in-domain by `_DOMAIN_RX`, binary
+    only, a probability inside the informative band (a near-settled market carries no information in
+    a call), and a close date inside the horizon.
+    """
+    try:
+        ms = _get(f"{_MANIFOLD}?limit={int(limit)}") or []
+    except Exception:
+        return []
+    held = {p.get("market_id") for p in _load()}
+    now = time.time()
+    out = []
+    for m in ms:
+        if m.get("outcomeType") != "BINARY" or m.get("isResolved"):
+            continue
+        mid = str(m.get("id") or "")
+        q = (m.get("question") or "").strip()
+        if not mid or not q or mid in held or not _DOMAIN_RX.search(q):
+            continue
+        try:
+            prob = float(m.get("probability"))
+        except (TypeError, ValueError):
+            continue
+        if not (0.03 <= prob <= 0.97):
+            continue
+        close_ms = m.get("closeTime")
+        try:
+            ends_ts = float(close_ms) / 1000.0
+        except (TypeError, ValueError):
+            continue
+        if not (now < ends_ts < now + max_days * 86400):
+            continue
+        out.append({"market_id": mid, "question": q[:200],
+                    "market_prob": round(prob, 4),
+                    "ends": time.strftime("%Y-%m-%d", time.localtime(ends_ts)),
+                    "volume24h": round(float(m.get("volume24Hours") or 0)),
+                    "source": "manifold"})
+    return out[:10]
+
+
+def _resolve_manifold(p: dict) -> float | None:
+    """The hard outcome of a resolved Manifold market, or None if it is not one.
+
+    `MKT` resolves to whatever the market believed and `CANCEL` voids: neither is a fact the world
+    settled, so neither is scoreable. Returning None leaves the position open rather than inventing
+    an outcome, which is the whole reason this ledger exists.
+    """
+    m = _get(f"{_MANIFOLD}/{p['market_id']}")
+    if not m.get("isResolved"):
+        return None
+    return _MANIFOLD_HARD.get(str(m.get("resolution") or "").upper())
