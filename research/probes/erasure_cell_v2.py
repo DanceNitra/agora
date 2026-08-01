@@ -101,60 +101,74 @@ def control_encrypted(work):
 
 # ---------------------------------------------------------------- arms
 async def arm_wmm(work):
-    """world-model-mcp through its PUBLIC delete(), plus a retrieval check."""
+    """world-model-mcp through its PUBLIC api only: create() -> delete() / purge().
+
+    THREE HARNESS DEFECTS FIXED HERE, all of which flattered or falsified the result:
+
+      a. FIXTURE BUILT INTERNALLY. Earlier versions created the record with kg.create_fact(). delete()
+         and purge() resolve a record by _normalize_path() + _latest_fact_for(), so a hand-built Fact is
+         not reachable from them: both returned "No memory at hr/x.md" and the arm measured a no-op while
+         reporting a verdict. v2's own defect #1 was calling an internal; the fixture had the same bug one
+         level down.
+      b. TRUTHINESS. Retrievability was read as bool(kg.query_facts(...)). That returns a QueryFactResult
+         object, which is truthy whether it holds one fact or none -- so `retrievable` was True by
+         construction and measured nothing. It now counts result.facts.
+      c. READ CONTAMINATION. Opening sqlite3 connections to facts.db alongside the live KnowledgeGraph
+         made a later query_facts() return a stale snapshot: purge showed 0 rows in both tables AND
+         1 retrievable fact in the same run. Isolated, purge reports 0. No side-channel reads here.
+    """
     try:
         from world_model_server.knowledge_graph import KnowledgeGraph
-        # WorldModelMemoryBackend — the real export name; MemoryBackend was my guess and
-        # cost a NOT_COMPUTABLE row. Read the module, do not assume the name.
         from world_model_server.memory_backend import WorldModelMemoryBackend
-        from world_model_server.models import Fact
     except Exception as e:
         return [row("world-model-mcp", "import", False, None, None, [], [],
                     note=f"import failed: {str(e)[:110]}", verdict="NOT_COMPUTABLE")]
-    d = os.path.join(work, "wmm")
-    os.makedirs(d, exist_ok=True)
-    try:
+
+    async def one(op, sentinel, tag):
+        d = os.path.join(work, f"wmm_{op}")
+        os.makedirs(d, exist_ok=True)
         kg = KnowledgeGraph(d)
-        for init in ("initialize", "init_db", "setup"):
-            if hasattr(kg, init):
-                await getattr(kg, init)()
-                break
-        kw = {"fact_text": f"recovery phrase {SENTINEL}", "evidence_type": "session",
-              "status": "canonical", "evidence_path": "hr/alice.md"}
-        kw = {k: v for k, v in kw.items() if k in Fact.model_fields}
-        for n, f in Fact.model_fields.items():
-            if f.is_required():
-                kw.setdefault(n, "hr/alice.md" if "path" in n else SENTINEL)
-        fact = Fact(**kw)
-        await kg.create_fact(fact)
-
-        async def retrievable():
-            for m in ("search_facts", "query_facts", "get_facts", "find_facts"):
-                if hasattr(kg, m):
-                    try:
-                        r = await getattr(kg, m)(SENTINEL)
-                        return bool(r)
-                    except Exception:
-                        continue
-            return None
-
-        before_r, before_d = await retrievable(), scan(d, SENTINEL)
-        if not before_d:
-            return [row("world-model-mcp", "delete()", False, before_r, None, [], [],
-                        note="PRECONDITION FAILED: never reached disk — our harness")]
+        await kg.initialize()
         mb = WorldModelMemoryBackend(kg)
-        used = "memory_backend.delete()"
-        try:
-            await mb.delete("hr/alice.md")
-        except Exception as e:
-            used = f"memory_backend.delete() unavailable ({str(e)[:60]}) -> kg.invalidate_fact()"
-            await kg.invalidate_fact(fact.id)
-        return [row("world-model-mcp", used, True, before_r, await retrievable(),
-                    before_d, scan(d, SENTINEL))]
-    except Exception as e:
-        return [row("world-model-mcp", "runtime", False, None, None, [], [],
-                    note=f"OUR harness first: {type(e).__name__}: {str(e)[:130]}",
-                    verdict="NOT_COMPUTABLE")]
+        if not hasattr(mb, op):
+            return row("world-model-mcp", f"{op}()", False, None, None, [], [],
+                       note=f"{op}() absent -- pre-0.15.6 wheel", verdict="NOT_COMPUTABLE")
+
+        async def n_facts():
+            r = await kg.query_facts(sentinel)
+            f = getattr(r, "facts", None)
+            return None if f is None else len(f)
+
+        await mb.create("hr/x.md", f"recovery phrase {sentinel}")
+        before_n, before_d = await n_facts(), scan(d, sentinel)
+        if not before_d:
+            return row("world-model-mcp", f"{op}()", False, before_n not in (0, None), None, [], [],
+                       note="PRECONDITION FAILED: never reached disk -- our harness")
+        ret = await getattr(mb, op)("hr/x.md")
+        if isinstance(ret, str) and ret.lower().startswith("no memory at"):
+            return row("world-model-mcp", f"{op}()", False, before_n not in (0, None), None, [], [],
+                       note=f"PRECONDITION FAILED: {op}() did not resolve the path -- our harness",
+                       verdict="NOT_COMPUTABLE")
+        after_n = await n_facts()                     # SAME instance -- the reader that queried first
+        kg2 = KnowledgeGraph(d)
+        await kg2.initialize()
+        r2 = await kg2.query_facts(sentinel)
+        f2 = getattr(r2, "facts", None)
+        fresh_n = None if f2 is None else len(f2)     # a reader that did NOT query before
+
+        # Both read paths, because they DISAGREE for purge and that disagreement is the finding:
+        # KnowledgeGraph caches query results with a TTL and purge_fact()/invalidate_fact()/
+        # supersede_fact() do not call _cache_invalidate() (create_fact() does). So a caller that
+        # searched before erasing keeps getting the erased fact from the same instance, while the row
+        # is genuinely gone from `facts` and `facts_fts`.
+        return row("world-model-mcp", f"memory_backend.{op}()  [{tag}]", True,
+                   before_n not in (0, None), after_n not in (0, None),
+                   before_d, scan(d, sentinel),
+                   note=f'returns: "{str(ret)[:80]}" | same-instance reader: '
+                        f'{after_n} fact(s) | fresh reader: {fresh_n} fact(s)')
+
+    return [await one("delete", SENTINEL[:-3] + "DEL", "soft-invalidate, by design"),
+            await one("purge", SENTINEL[:-3] + "PRG", "hard erase, v0.15.6+")]
 
 
 def arm_inspeximus(work):

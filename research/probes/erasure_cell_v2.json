@@ -1,5 +1,5 @@
 {
- "sentinel": "ZQX657c371f82984QZX",
+ "sentinel": "ZQX657d6b3ef9cf7QZX",
  "controls_passed": true,
  "control_negative": "REMOVED FROM DISK",
  "control_encrypted": "NOT_COMPUTABLE",
@@ -58,7 +58,7 @@
   },
   {
    "system": "world-model-mcp",
-   "operation": "memory_backend.delete()",
+   "operation": "memory_backend.delete()  [soft-invalidate, by design]",
    "stored_at_all": true,
    "retrievable_before": true,
    "retrievable_after": true,
@@ -69,7 +69,22 @@
     "facts.db"
    ],
    "verdict": "ON DISK AFTER DELETE",
-   "note": ""
+   "note": "returns: \"Invalidated memory at hr/x.md (fact remains retrievable; call purge() for row-le\" | same-instance reader: 1 fact(s) | fresh reader: 0 fact(s)"
+  },
+  {
+   "system": "world-model-mcp",
+   "operation": "memory_backend.purge()  [hard erase, v0.15.6+]",
+   "stored_at_all": true,
+   "retrievable_before": true,
+   "retrievable_after": true,
+   "on_disk_before": [
+    "facts.db"
+   ],
+   "on_disk_after": [
+    "facts.db"
+   ],
+   "verdict": "ON DISK AFTER DELETE",
+   "note": "returns: \"Purged memory at hr/x.md (row removed from disk; not retrievable)\" | same-instance reader: 1 fact(s) | fresh reader: 0 fact(s)"
   }
  ],
  "scope_note": "world-model-mcp claims are about the SHIPPED wheel. The repo carries a real DELETE FROM facts in scripts/demo_seed.py, excluded via pyproject packages=['world_model_server']."

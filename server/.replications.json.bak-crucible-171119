@@ -1,0 +1,519 @@
+[
+  {
+    "claim": "The AI-biology analogy breaks because brains use local Hebbian synaptic homeostasis",
+    "source": "internal frontier",
+    "outcome": "NOT_COMPUTABLE",
+    "lab_id": "",
+    "note": "Already resolved by dialectic-where-ai-biology-analogy-breaks.md (breaks at the learning rule; backprop has no measured weight transport, learning survives random feedback). A verbal break-claim with no quantitative model to re-run.",
+    "ts": 1781127184.1147785
+  },
+  {
+    "claim": "Duration of liquid-to-glass transition in a supercooled metallic alloy decreases exponentially with [truncated]",
+    "source": "Thermodynamic model for the glass transition (truncated)",
+    "outcome": "NOT_COMPUTABLE",
+    "lab_id": "",
+    "note": "The claims dependent variable is truncated (decreases exponentially WITH WHAT is cut off) and it is flagged UNCERTAIN/unsettled by the literature - no precise quantitative relationship to re-run. Note: canonical supercooled relaxation is su",
+    "ts": 1781133248.349399
+  },
+  {
+    "claim": "Safe-Sora (Su et al. 2025) addresses invisible generative watermarking for video by embedding graphical watermarks",
+    "source": "A Comprehensive Review (survey)",
+    "outcome": "NOT_COMPUTABLE",
+    "lab_id": "",
+    "note": "Descriptive existence claim (a framework ADDRESSES an area), not a quantitative result - nothing to re-run as a minimal model. Replication needs a measured number (e.g. detection AUC, bit-error rate under compression), which this survey-sou",
+    "ts": 1781144991.2112124
+  },
+  {
+    "claim": "Barato et al. (2009): non-Markovian spreading with heavy-tailed waiting times t^{-1-m} shows anomalous critical exponents (a distinct universality class) at the absorbing transition.",
+    "source": "Barato and Hinrichsen (2009)",
+    "outcome": "NOT_COMPUTABLE",
+    "lab_id": "37ad2a",
+    "note": "Threshold at branching-ratio=1 (survival ~0 for lambda<1, rising for lambda>1, identical for m=0.5 and m=1.5) is textbook Galton-Watson: ultimate survival depends only on the offspring MEAN, not on inter-event timing, so tail-independence of the threshold is BY CONSTRUCTION. The papers non-trivial result -- heavy-tailed non-Markovian return times P(tau)~tau^{-3/2} produce ANOMALOUS critical exponents (a distinct universality class) -- was NOT tested. Reclassified REPRODUCED->NOT_COMPUTABLE (Crucible audit 2026-07-05). Citation corrected: Barato, Bonachela, Fiore, Hinrichsen & Munoz (2009), Phys. Rev. E 79, 041130 (arXiv:0901.0451).",
+    "ts": 1781148994.8535872
+  },
+  {
+    "claim": "Toutanova-Chen (2015): a simple observed-features model matches or beats latent-feature (embedding) models on knowledge-base completion",
+    "source": "Toutanova and Chen (2015)",
+    "outcome": "NOT_COMPUTABLE",
+    "lab_id": "43c007",
+    "note": "The cited result (Toutanova-Chen 2015, W15-4007: observed/path features match or beat latent embeddings on KB completion) is EMPIRICAL on REAL KBs (FB15k, WN18). Our synthetic reproduction PLANTED the r0->r1 compositional structure that path-features are built to detect, so the observed-beats-latent gap (AUC 0.966 vs 0.749) is guaranteed BY CONSTRUCTION -- it illustrates the mechanism (path features read compositional paths low-rank SVD misses) but is NOT an independent replication of the paper's real-data result. Reclassified REPRODUCED->NOT_COMPUTABLE (Crucible audit 2026-07-05). Faithful next step: Node+LinkFeat vs an embedding model on FB15k-237.",
+    "ts": 1781159055.822686
+  },
+  {
+    "claim": "Brynjolfsson & Hitt (2000): organizational investments have a large influence on the value of IT investments (IT/org-capital complementarity).",
+    "source": "Beyond Computation: Information Technology, Organizational Transformation and Business Performance (Brynjolfsson & Hitt, 2000)",
+    "outcome": "NOT_COMPUTABLE",
+    "lab_id": "8256e7",
+    "note": "The cited result (Brynjolfsson-Hitt 2000, JEP 14(4): IT/organizational-capital complementarity) is an EMPIRICAL estimate on real firm data. Our model fit logY=a*IT+b*ORG+g*(IT*ORG) with a PLANTED g~0.06 and correlated regressors, then recovered that omitting ORG inflates the IT coefficient (0.21 vs 0.12) -- but that is the textbook omitted-variable-bias identity, guaranteed once you build the interaction term and correlate the inputs. It ILLUSTRATES the mechanism behind their warning; it does NOT replicate their measured complementarity from data. Reclassified REPRODUCED->NOT_COMPUTABLE (Crucible audit 2026-07-05): tautological simulation of our own assumptions.",
+    "ts": 1781166414.1431863
+  },
+  {
+    "claim": "BA networks N=2000 m=2: removing the top 10% of nodes by degree raises the bond-percolation threshold from p_c=0.174 to 0.776 (severalfold robustness loss under targeted hub removal).",
+    "source": "Simultaneous Degradation of Percolation and Cascade Robustness Under Targeted Hub Removal (Cachero Sanchez, 2026-03-05)",
+    "outcome": "REPRODUCED",
+    "lab_id": "e52111",
+    "note": "Smallest model: BA(N=2000,m=2), Molloy-Reed p_c=<k>/(<k^2>-<k>) on the empirical degree sequence + a direct bond-percolation sweep (union-find, giant>50%). MECHANISM REPRODUCED: targeted top-10% hub removal raises the threshold several-fold",
+    "ts": 1781169834.0005937
+  },
+  {
+    "claim": "SGD is popular for large-scale optimization but has slow asymptotic convergence due to the inherent variance of the stochastic gradient.",
+    "source": "Accelerating Stochastic Gradient Descent using Predictive Variance Reduction (Johnson & Zhang, 2013)",
+    "outcome": "REPRODUCED",
+    "lab_id": "437d20",
+    "note": "Smallest model: minimize a strongly-convex least-squares (scalar w) with label noise. Constant-step SGD stalls at a variance FLOOR (suboptimality ~1.9e-3, never reaches the optimum); full-gradient GD and variance-reduced SVRG both drive sub",
+    "ts": 1781183598.6843836
+  },
+  {
+    "claim": "In scale-free networks the epidemic threshold vanishes as N grows (lambda_c = <k>/<k^2> -> 0 via the <k^2> divergence), unlike homogeneous networks which keep a finite threshold.",
+    "source": "Epidemic spreading in scale-free networks (Pastor-Satorras & Vespignani, 2001)",
+    "outcome": "REPRODUCED",
+    "lab_id": "ef9fe3",
+    "note": "Smallest model: heterogeneous mean-field SIS threshold lambda_c=<k>/<k^2>, BA (scale-free) vs ER (homogeneous) at mean degree ~4. BA <k^2> grows with N (45->63 over N=500->20000) so lambda_c shrinks 0.088->0.064, heading to 0 = threshold VA",
+    "ts": 1781197035.6537304
+  },
+  {
+    "claim": "In the low-data regime you can learn online policies with 2-10x fewer total coefficients with little to no loss of performance.",
+    "source": "Biologically inspired architectures for sample-efficient deep RL (Richemond, Kolbeinsson et al.)",
+    "outcome": "NOT_COMPUTABLE",
+    "lab_id": "7bbc76",
+    "note": "The cited paper (Richemond-Kolbeinsson-Guo, arXiv:1911.11285) tensor-factorizes ONLINE RL policies for 2-10x fewer coefficients. Our reproduction tests none of that: a supervised polynomial fit on 16 points showing K=14 overfits and K=6 is best -- textbook bias-variance, and '2.3x' is engineered by picking an overfitting K (any ratio is manufacturable). Reclassified REPRODUCED->NOT_COMPUTABLE (Crucible audit 2026-07-05): a textbook overfit demo, not a replication of the paper's mechanism.",
+    "ts": 1781199184.604977
+  },
+  {
+    "claim": "Critical systems are associated with fractal or power-law scaling and long-range correlations",
+    "source": "Kitzbichler, Smith, Rahn (2009) Broadband Criticality of Human Brain Network Synchronization",
+    "outcome": "REPRODUCED",
+    "lab_id": "73f90e",
+    "note": "Smallest model = critical branching process (neuronal avalanches). At sigma=1 avalanche-size P(s)~s^-1.42 (mean-field 3/2); off-critical the power law vanishes (sub: cutoff tau 2.45; super: 9.4pct runaway). Mean size diverges 6.7->1586 appr",
+    "ts": 1781205606.663055
+  },
+  {
+    "claim": "Generative AI integration into software engineering is rapidly expanding/automating tasks",
+    "source": "On agent-based software engineering (Jennings 2000)",
+    "outcome": "NOT_COMPUTABLE",
+    "lab_id": "",
+    "note": "Garbled target: the claim is a malformed finding fragment (a vague expansion trend, no mechanism to model), and the cited source (Jennings 2000, agent-based SE) PREDATES and does not support a GenAI claim. No computable core; mismatched cit",
+    "ts": 1781217336.750866
+  },
+  {
+    "claim": "SGD locally converges to a minimum of a non-convex objective with a quantifiable rate",
+    "source": "Fehrman, Gess, Jentzen — Convergence rates for SGD for non-convex objective functions",
+    "outcome": "REPRODUCED",
+    "lab_id": "e0a43a",
+    "note": "Double-well (x^2-1)^2 (non-convex, minima +-1, max at 0). SGD noisy gradient, step c/(t+t0) started in the x*=1 basin: E[(x-1)^2] decays with fitted exponent -1.00 = theory O(1/t); constant step stalls at a variance floor. Local convergence",
+    "ts": 1781225565.217443
+  },
+  {
+    "claim": "Hong-Page (2004): a randomly selected (diverse) team of problem solvers outperforms the team of individually best solvers under relay search (n=2000, l=12, k=3, group 10)",
+    "source": "Hong & Page, PNAS 101(46), 2004 - Groups of diverse problem solvers can outperform groups of high-ability problem solvers",
+    "outcome": "REPRODUCED",
+    "lab_id": "a3ae64",
+    "note": "Reproduced at paper params: random beats best by +1.65 (t=4.1). But the effect is FRAGILE, as critics argued: it shrinks with a narrower heuristic pool (l=6: +0.90) and REVERSES on smoothed landscapes (-0.38, ability wins) -- diversity trumps ability only in the papers specific regime. Cross-ref: the paired STRONG-claim entry (lab b56ae0) rules the general 'random>=best' FAILED in a faithful powered paired model; this REPRODUCED holds only at the paper's specific params and reverses on smoothed landscapes -- the two are consistent, not contradictory.",
+    "ts": 1781267038.0824249
+  },
+  {
+    "claim": "Gilovich, Vallone & Tversky (1985): the basketball hot hand is a cognitive illusion - P(hit | streak of hits) is no higher than P(hit | streak of misses), so streak shooting does not exist",
+    "source": "Gilovich, Vallone & Tversky, Cognitive Psychology 17, 1985 - The hot hand in basketball: On the misperception of random sequences",
+    "outcome": "FAILED",
+    "lab_id": "ebce40",
+    "note": "The canonical method manufactures its own conclusion. An iid shooter with NO hot hand shows P(hit|3H)-P(hit|3M) = -7.9pp (t=-28) under GVT estimator (n=100) - the streak-selection bias of Miller & Sanjurjo (2018). Bias grows to -17pp at k=4",
+    "ts": 1781267934.7776835
+  },
+  {
+    "claim": "Social media platforms enable rapid dissemination of information but also facilitate the spread of misinformation",
+    "source": "internal corp finding (descriptive)",
+    "outcome": "NOT_COMPUTABLE",
+    "lab_id": "",
+    "note": "Descriptive trend claim with no stated mechanism or quantity; the simulable core (false-news cascades spread farther/faster, Vosoughi 2018) is a DIFFERENT, specific claim - queued as a future Crucible target rather than strawmanned here.",
+    "ts": 1781269054.7464564
+  },
+  {
+    "claim": "Evans & Archer (1968) / textbook canon: a portfolio of ~20-30 stocks achieves practically complete diversification - marginal benefit beyond 30 is negligible",
+    "source": "Evans & Archer, Journal of Finance 23(4), 1968 - Diversification and the reduction of dispersion",
+    "outcome": "REPRODUCED",
+    "lab_id": "7656de",
+    "note": "Holds at realistic tails: N=30 captures 95.6-96.9% of achievable vol AND ES99 reduction (normal and t2.5 idio + 1-factor). MEASURED BOUNDARY: near infinite-variance idio tails (t1.8) the canon breaks - only 85.4% of tail-risk reduction capt ATTRIBUTION (Crucible audit 2026-07-05): Evans & Archer's own result was ~10-16 stocks; the '~20-30' is post-Statman (1987) textbook canon.",
+    "ts": 1781270684.1051857
+  },
+  {
+    "claim": "Miller (1957): random typing (letters + space) reproduces the POWER-LAW FORM of Zipf, but random-typing Zipf is statistically DISTINCT from real language (Ferrer-i-Cancho 2010; Piantadosi 2014) -- so 'Zipf proves nothing linguistic' overclaims.",
+    "source": "Miller, American Journal of Psychology 70, 1957 - Some effects of intermittent silence",
+    "outcome": "REPRODUCED",
+    "lab_id": "4779c1",
+    "note": "Random-typing corpus (443k words): rank-frequency exponent -1.24, an approximate power law - the math reproduces. Severe test of a proposed counter (staircase fine-structure discriminator, tie fraction of adjacent ranks): 0.89 vs 0.48 at ma CORRECTED (Crucible audit 2026-07-05): the prior headline 'Zipf carries no linguistic significance' is refuted by Ferrer-i-Cancho & Elvevag 2010 (random texts do NOT exhibit real Zipf) and Piantadosi 2014; our own staircase discriminator (0.89 vs 0.48) SEPARATES real from random, contradicting that headline. The power-law FORM reproduces; the linguistic-insignificance conclusion does not.",
+    "ts": 1781270684.1104088
+  },
+  {
+    "claim": "Dunning & Kruger (1999): the unskilled systematically overestimate their ability - a metacognitive deficit, shown by the quartile plot (bottom quartile +46pp, top -13pp)",
+    "source": "Kruger & Dunning, J Pers Soc Psychol 77(6), 1999 - Unskilled and Unaware of It",
+    "outcome": "FAILED",
+    "lab_id": "e39390",
+    "note": "A null model with ZERO metacognitive deficit (identical self-error at every skill level) reproduces the canonical quartile plot AND its asymmetry: bottom quartile +45.8 (DK: +46), top -14.2 (DK: -13) -- pure regression to the mean on a noisy test plus a UNIFORM better-than-average offset. So the quartile plot does NOT by itself demonstrate a metacognitive deficit (Gignac & Zajenkowski 2020; Nuhfer et al. 2017; Fix 2022 autocorrelation critique). Scope: 'people self-assess imperfectly' broadly survives, and whether a residual metacognitive signal remains after the artifact is separately contested (Comment, Intelligence 2023) -- what FAILS is that the dramatic quartile graph PROVES the deficit.",
+    "ts": 1781285162.381025
+  },
+  {
+    "claim": "BA(N=2000,m=2): removing top-10% nodes by degree raises bond-percolation threshold p_c 0.174 -> 0.776 (~4.5x)",
+    "source": "Simultaneous Degradation of Percolation and Cascade Robustness Under Targeted Hub Removal (Cachero Sanchez, 2026-03-05)",
+    "outcome": "REPRODUCED",
+    "lab_id": "a33457",
+    "note": "MC before/after = 0.150/0.680 (ratio 4.53x) vs claimed ratio 4.46x; absolute values within finite-size tolerance. Cascade claim at phi=0.22 out of scope.",
+    "ts": 1781293420.9407725
+  },
+  {
+    "claim": "LinUCB (Chu et al 2011): linear contextual bandit achieves O(sqrt(Td log^3)) i.e. sublinear ~sqrt(T) regret w.p. 1-delta",
+    "source": "Contextual Bandits with Linear Payoff Functions (Chu, Li, Reyzin, Schapire, 2011)",
+    "outcome": "REPRODUCED",
+    "lab_id": "032cdd",
+    "note": "Empirical regret growth exponent 0.03-0.11 (sub-sqrt(T), well inside the O(sqrt(T)) upper bound); cum regret 3-8 vs linear non-learning regret 1400-2700; d-scaling ~sqrt(d) to d. Computable core holds.",
+    "ts": 1781298311.484877
+  },
+  {
+    "claim": "Systems in the same universality class share the same critical exponents (Lubeck 2004)",
+    "source": "Universal Scaling Behavior of Non-Equilibrium Phase Transitions (Sven Lubeck, 2004)",
+    "outcome": "REPRODUCED",
+    "lab_id": "d3e71e",
+    "note": "Three structurally different Z2 mean-field models (tanh self-consistency, phi^4 free energy, arctan self-consistency) all give order-parameter exponent beta=0.500; a different-class absorbing-state model gives beta=1.000. Same class -> same",
+    "ts": 1781301123.0783846
+  },
+  {
+    "claim": "Berger (2003): conditional-frequentist testing reconciles Fisher/Neyman/Jeffreys - the conditional error probability equals the Bayesian posterior; the naive p-value overstates evidence against H0",
+    "source": "Berger (2003), Could Fisher, Jeffreys and Neyman Have Agreed on Testing?",
+    "outcome": "NOT_COMPUTABLE",
+    "lab_id": "6e4ffc",
+    "note": "Berger (2003, Stat. Sci. 18(1)) is faithfully cited, but 'conditional error probability = Bayesian posterior' is Berger's THEOREM -- an algebraic identity of the conditional test. Re-verifying it on data drawn from the same prior just re-derives Bayes' rule; FAILED impossible -> by construction. Also the cited 0.216/0.041 do not match the canonical Berger-Sellke bound (~0.29 at p=.05). Reclassified REPRODUCED->NOT_COMPUTABLE (Crucible audit 2026-07-05).",
+    "ts": 1781315828.0916147
+  },
+  {
+    "claim": "Derenyi-Palla-Vicsek (2005): k-clique percolation in ER graphs at p_c(k)=[(k-1)N]^(-1/(k-1)); for k=3, p_c ~ 1/sqrt(2N)",
+    "source": "Clique Percolation in Random Networks (Derenyi, Palla, Vicsek, 2005)",
+    "outcome": "REPRODUCED",
+    "lab_id": "d02e5c",
+    "note": "k=3 scaling exponent confirmed: empirical p_c*sqrt(2N) constant across N=400/800/1600 (1.26,1.26,1.19). N^(-1/2) scaling reproduced; prefactor ~1.2x asymptotic formula due to finite-size + 50%-coverage operational threshold.",
+    "ts": 1781322381.4595423
+  },
+  {
+    "claim": "Context-aware AI augmentation (adaptive type/timing/scale) preserves cognitive flow (difficulty-skill match); poorly-timed/scaled interventions disrupt flow and hurt reasoning performance",
+    "source": "Dissanayake & Nanayakkara (2025)",
+    "outcome": "NOT_COMPUTABLE",
+    "lab_id": "1b4d0a",
+    "note": "Design/HCI framework, not a falsifiable empirical claim: a minimal flow model (flow=difficulty-skill match) confirms a gap-closing intervention by construction, so the directional result is near-tautological — no genuine FAILED was possible. Downgraded from a constructed-model REPRODUCED to keep the ledger honest.",
+    "ts": 1781426738.6471457
+  },
+  {
+    "claim": "p-hacking inflates Type I error in the error-statistical (Neyman-Pearson) approach but not in formal/likelihood inference that accounts for the selection",
+    "source": "Rubin (2026)",
+    "outcome": "NOT_COMPUTABLE",
+    "lab_id": "f4136f",
+    "note": "First half SOUND (report-min-p over K=5 forks inflates Type I 0.051->0.227 = Sidak 1-.95^5=0.226). But 'a selection-ACCOUNTED likelihood does not inflate' is TAUTOLOGICAL: feed in the correct best-of-K selection distribution and calibration is guaranteed -- FAILED was never possible. Reclassified REPRODUCED->NOT_COMPUTABLE (Crucible audit 2026-07-05): illustrates Rubin's (2026, arXiv:2602.21792) definitional point, does not TEST it. Prior art: Sidak/Bonferroni multiple comparisons.",
+    "ts": 1781426765.262251
+  },
+  {
+    "claim": "In DiD with FEW treated units and spatially/serially-correlated errors, standard DiD inference under-covers (invalid CIs) while synthetic control is materially better when parallel trends ~holds",
+    "source": "Alvarez & Ferman (2020)",
+    "outcome": "REPRODUCED",
+    "lab_id": "606f02",
+    "note": "N=30,T=12,1 treated,rho=0.7,true effect=0,800 reps: DiD 95% CI coverage=0.305 (severe under-coverage vs nominal 0.95); SC coverage=0.891; SC RMSE=1.017 < DiD RMSE=1.267. DiD inference invalid, SC materially better.",
+    "ts": 1781427581.2737908
+  },
+  {
+    "claim": "Compactness and geometric stability conjectures for scalar curvature convergence (intrinsic flat / GH convergence of Riemannian manifolds)",
+    "source": "Sormani et al., Conjectures on Convergence and Scalar Curvature (2021, arXiv:2103.10093)",
+    "outcome": "NOT_COMPUTABLE",
+    "lab_id": "",
+    "note": "A survey of OPEN conjectures in geometric analysis (convergence of Riemannian manifolds under scalar-curvature bounds, intrinsic flat distance). No single claim with a finite computable mechanism to model; the content is conjectural/abstrac",
+    "ts": 1781471761.7017014
+  },
+  {
+    "claim": "Recursive prompt/self synthesis improves performance ONLY when scored by an EXTERNAL fitness signal (real task accuracy, as in Promptbreeder, Fernando et al. 2023); self-reference without an external anchor does not.",
+    "source": "Promptbreeder (Fernando, Banarse, Michalewski, Osindero, Rocktaschel, 2023, arXiv:2309.16797)",
+    "outcome": "REPRODUCED",
+    "lab_id": "a08981",
+    "note": "Smallest model (lab a08981): a population recursively synthesizes candidates FROM ITSELF each generation; the pivotal variable is the SELECTION signal. With an EXTERNAL fitness anchor (as Promptbreeder has: real task accuracy) recursive synthesis improves; with self-scoring only it does NOT -- so the gain is attributable to external selection, not to self-reference. Claim RESCOPED + unverified '~15%' figure dropped (Crucible audit 2026-07-05): the headline previously mis-credited self-reference.",
+    "ts": 1781487139.7318003
+  },
+  {
+    "claim": "Deep networks have enabled RL to scale to more complex domains, but these methods typically require large quantities of training data.",
+    "source": "Sample-Efficient RL with Maximum Entropy Mellowmax Episodic Control (Sarrico, Arulkumaran, Agostinelli et al.)",
+    "outcome": "NOT_COMPUTABLE",
+    "lab_id": "",
+    "note": "Extracted sentence is a qualitative background premise (deep model-free RL is sample-inefficient) = a textbook fact, no crisp falsifiable mechanism; modelling it would re-derive known sample-inefficiency. The papers real contribution (Mello",
+    "ts": 1781524756.9106197
+  },
+  {
+    "claim": "Cohen's benchmarks (r=.10/.30/.50, d=.20/.50/.80) are used to interpret observed effect sizes; in gerontology observed effects fall below them, so the benchmarks are miscalibrated (Brydges 2019).",
+    "source": "Effect Size Guidelines, Sample Size Calculations, and Statistical Power in Gerontology (Brydges, 2019)",
+    "outcome": "NOT_COMPUTABLE",
+    "lab_id": "",
+    "note": "Cohen's cutoffs are conventions, not empirical predictions, so they cannot be reproduced. Brydges' substantive claim (observed gerontology effect sizes fall below the benchmarks) is an empirical distributional claim requiring his meta-analy",
+    "ts": 1781594576.570135
+  },
+  {
+    "claim": "For BA networks (N=2,000, m=2), removing the top 10% of nodes by degree raises the bond-percolation threshold from p_c=0.174 to 0.776.",
+    "source": "Cachero Sanchez (2026), Simultaneous Degradation of Percolation and Cascade Robustness Under Targeted Hub Removal",
+    "outcome": "REPRODUCED",
+    "lab_id": "20260616-per",
+    "note": "Finite-size susceptibility-peak MC on the actual BA network reproduces it: intact p_c 0.170 (claimed 0.174), hub-removed 0.740 (claimed 0.776), both within ~5% over 6 replicas. Methodology lesson: the Molloy-Reed configuration-model estimat",
+    "ts": 1781603562.2941816
+  },
+  {
+    "claim": "Whether a mouse geroprotector is recorded as extending lifespan can depend on the survival statistic chosen (log-rank vs Gehan-Wilcoxon); and reporting the best of several survival tests inflates the ",
+    "source": "deep-research 2026-06-16 + Jiang et al., GeroScience 2024 (Gehan reanalysis of NIA ITP data)",
+    "outcome": "REPRODUCED",
+    "lab_id": "20260616-ger",
+    "note": "Self-contained sim (weighted log-rank family, n=50/arm, 4000 trials). Age-localized true effect: log-rank power 32.5% vs Gehan 72.3%; the two tests give DISCORDANT verdicts on 39.9% of identical datasets. Under the null, best-of-3 tests inf",
+    "ts": 1781630589.4918208
+  },
+  {
+    "claim": "The survival probability of a branching process obeys finite-size scaling in the control parameter (offspring mean m=1+eps) and the max generations n: P_n(eps) ~ (1/n)*F(eps*n).",
+    "source": "Garcia-Millan, Font-Clos et al. 2015, \"Finite-size scaling of survival probability in branching processes\"",
+    "outcome": "REPRODUCED",
+    "lab_id": "32d07b",
+    "note": "Smallest Galton-Watson model (Poisson offspring), vectorized over 40k realizations. Critical eps=0: n*P_n -> ~2 (Kolmogorov 2/sigma^2, sigma^2=1). Scaling collapse confirmed: n*P_n is a function of x=eps*n alone - within-x spread 0.116 vs a",
+    "ts": 1781717949.0493603
+  },
+  {
+    "claim": "Compactness and geometric stability conjectures for scalar curvature and convergence (Sormani et al., IAS 2018 workshop)",
+    "source": "Conjectures on Convergence and Scalar Curvature (Sormani et al., 2021)",
+    "outcome": "NOT_COMPUTABLE",
+    "lab_id": "",
+    "note": "Open conjectures in geometric analysis (intrinsic-flat / Gromov-Hausdorff convergence under scalar-curvature bounds). No finite computational mechanism to reduce to a smallest model - these are deep manifold-convergence conjectures, not a s",
+    "ts": 1781728238.314712
+  },
+  {
+    "claim": "Diversity trumps ability: a random/diverse group of problem solvers outperforms (>=) a group of the best individual solvers (Hong & Page 2004 PNAS)",
+    "source": "Hong & Page (2004), Groups of diverse problem solvers can outperform groups of high-ability problem solvers, PNAS 101(46)",
+    "outcome": "FAILED",
+    "lab_id": "b56ae0",
+    "note": "STRONG claim (random>=best) NOT reproduced in a faithful, paired, statistically-powered minimal model (n=800 ring, pool=120, group=10, random group averaged over 5 draws, 25 landscapes). Random-minus-best is consistently NEGATIVE across heu",
+    "ts": 1781732999.7463188
+  },
+  {
+    "claim": "Metcalfe's Law: the value of a communications network scales as n^2 (the number of possible pairwise connections)",
+    "source": "Metcalfe's Law (folklore/Gilder 1993); contested by Briscoe, Odlyzko & Tilly (2006), 'Metcalfe's Law is Wrong' (IEEE Spectrum), and Metcalfe (2013) Facebook dat",
+    "outcome": "NOT_COMPUTABLE",
+    "lab_id": "b790af",
+    "note": "Fitting V ~ n^alpha: the strong n^2 law holds only under the (unrealistic) assumption that every pairwise connection has EQUAL value (alpha=2.00); under realistic rank-declining value (Zipf 1/k) the theoretical prediction is ~n*log(n) (Briscoe-Odlyzko-Tilly 2006). BUT the exponent is empirically UNSETTLED: real user/revenue data from Facebook & Tencent fit n^2 better than n*log(n) (Zhang, Liu & Xu 2015; Van Hove 2016 upholds), and later work even fits a cube law. VERDICT NOT_COMPUTABLE (revised from FAILED, Crucible audit 2026-07-05): our lab shows n^2 is not FORCED by first principles once connection value declines, but n^2 does not fail EMPIRICALLY -- the headline data go the other way, so no clean REPRODUCED/FAILED is warranted.",
+    "ts": 1781742171.335951
+  },
+  {
+    "claim": "A Pareto regret that reflects Pareto optimality without relying on scalarization functions can be defined and minimized in multi-objective bandits",
+    "source": "Pareto Regret Analyses in Multi-objective Multi-armed Bandit (Xu & Klabjan, 2022)",
+    "outcome": "REPRODUCED",
+    "lab_id": "ac7232",
+    "note": "Smallest model: 2-objective bandit, known Pareto front (4 optimal + 2 dominated arms). Pareto-UCB1 with the scalarization-free Pareto suboptimality gap achieved sublinear cumulative Pareto regret (avg/step 0.027->0.005, growth factor 1.82 o",
+    "ts": 1781805234.4782288
+  },
+  {
+    "claim": "Degree distribution of competition-induced preferential attachment graphs is a power law up to a finite threshold and decays exponentially above it",
+    "source": "Degree Distribution of Competition-Induced Preferential Attachment Graphs (Berger, Borgs, Chayes, DSouza, 2005)",
+    "outcome": "NOT_COMPUTABLE",
+    "lab_id": "4cf927",
+    "note": "The smallest faithful model of the stated mechanism (1D positions; new vertex connects to earlier vertex minimizing |dx| + alpha*depth) DEGENERATES across alpha to a near-star (max-degree 849->4059 growing with alpha, mean-degree 2, poor po",
+    "ts": 1781809628.74178
+  },
+  {
+    "claim": "Emergent abilities of large language models are genuine, sharp capability transitions - a discontinuous jump in skill above a scale threshold.",
+    "source": "Wei et al. 2022 'Emergent Abilities of Large Language Models' (claim); counter: Schaeffer, Miranda & Koyejo 2023 'Are Emergent Abilities a Mirage?' (NeurIPS).",
+    "outcome": "FAILED",
+    "lab_id": "af4a24",
+    "note": "The canonical SHARP 'emergence' curve is reproduced by a SMOOTH, continuous per-token skill measured with a nonlinear exact-match metric: the same smooth skill gives a per-token transition width 7.0 vs an exact-match (L=100) width 1.05 -- 6.7x sharper PURELY from the metric -- and the apparent onset shifts -0.07 -> +5.58 as answer length grows with NO change in underlying skill. No capability discontinuity is needed, so benchmark sharpness is not evidence for one (Schaeffer et al. 2023 'mirage', NeurIPS Outstanding Paper, reproduces). CONTESTED / scope: shows the metric mechanism is SUFFICIENT to fake sharpness here; it does NOT prove no ability is ever genuinely emergent -- Du et al. 2024 argue downstream abilities track a genuine pretraining-loss threshold. What FAILS is 'benchmark sharpness proves a discontinuity', not all emergence.",
+    "ts": 1781887956.3134706
+  },
+  {
+    "claim": "Real-world networks are scale-free: their degree distributions follow a power law p(k) ~ k^-alpha.",
+    "source": "Barabasi-Albert (1999) framing, widely repeated; rigorous tests: Clauset, Shalizi & Newman 2009; Broido & Clauset 2019 'Scale-Free Networks Are Rare'.",
+    "outcome": "FAILED",
+    "lab_id": "e88ca9",
+    "note": "Under a rigorous Clauset-Shalizi-Newman fit (MLE alpha, KS-selected xmin, bootstrap goodness-of-fit, Vuong likelihood-ratio vs lognormal, n=20,000): a lognormal that 'looks scale-free' on a log-log plot is correctly REFUSED (power-law GOF p=0.01; LR favors lognormal, -17.5); a genuine Pareto power law passes (GOF p=0.92; LR +102); and a real Barabasi-Albert network is only a TIE (LR -0.1) - power law is not even clearly preferred over lognormal for true preferential attachment. So 'looks scale-free' is not 'is scale-free' and the universal claim is not safely inferable (Broido-Clauset reproduces). Power law IS reproduced for true BA graphs. CONTESTED (Crucible audit 2026-07-05): FAILED holds only under the STRICT CSN pure-power-law criterion; under regularly-varying / generalized-power-law definitions many networks pass (Voitalov et al. 2019; Serafino et al. 2021 PNAS: finite-size effects hide true power laws). Open debate, not a closed debunk.",
+    "ts": 1781887956.3134706
+  },
+  {
+    "claim": "A brief growth-mindset intervention improves adolescent achievement at population scale (heterogeneous effects)",
+    "source": "Yeager et al. 2019 Nature - national growth mindset experiment",
+    "outcome": "NOT_COMPUTABLE",
+    "lab_id": "n/a",
+    "note": "Empirical population RCT (effect ~0.03-0.1 GPA SD, concentrated in lower-achievers / supportive norms). No closed computational MECHANISM to reproduce as a minimal model - it is a measured social-science effect, not a derivable dynamic. Rec",
+    "ts": 1782090906.4054518
+  },
+  {
+    "claim": "MemGPT-style paging memory keeps QA accuracy FLAT as the corpus/context scales (0->700 docs)",
+    "source": "MemGPT (Packer et al.) flat-accuracy-vs-corpus claim, via the agent-memory transcript scan",
+    "outcome": "NOT_COMPUTABLE",
+    "lab_id": "f4e22f",
+    "note": "Not a fair adjudication of MemGPT (Packer et al. 2023, arXiv:2310.08560): (1) synthetic corpus + OUR OWN measured reader-accuracy factor (0.95/0.91) is baked in, so the reader ceiling drives the curve; (2) tested only to N=250, but the claim is 0->700 docs; (3) SINGLE-hop QA stayed FLAT -- which CONFIRMS MemGPT's actual paper claim -- and only MULTI-hop synthesis degraded, which the paper never claimed stays flat. Reclassified FAILED->NOT_COMPUTABLE (Crucible audit 2026-07-05): failing a claim the paper did not make. (The multi-hop synthesis collapse is real and lives in the RAG-is-dead marquee.)",
+    "ts": 1782293113.3222578
+  },
+  {
+    "claim": "Episodic memory (Model-Free Episodic Control: store the MAX observed discounted return per state-action) gives sample-efficient RL vs incremental parametric value learning.",
+    "source": "Sarrico, Arulkumaran, Agostinelli et al. - Sample-Efficient Reinforcement Learning with Maximum Entropy Mellowmax Episodic Control",
+    "outcome": "REPRODUCED",
+    "lab_id": "84b6b7",
+    "note": "Smallest model of the mechanism; exploration HELD IDENTICAL (both learners fed the same uniform-random trajectories off-policy, so the only difference is credit assignment). Exp A (deterministic chain + step cost): EC reaches a goal-reachin SCOPED (Crucible audit 2026-07-05): the max-return store is unbiased only in a NOISELESS deterministic env (max=mean); EC beating parametric learning on a tiny deterministic chain is close to textbook (tabular memorization beats function approximation when no generalization is needed). Do not generalize to broad sample-efficiency.",
+    "ts": 1782431545.3249595
+  },
+  {
+    "claim": "Cosine similarity BARELY distinguishes a superseded fact from its replacement (AUROC ~0.61, near chance) so a pure-cosine store serves the stale value ~42% of the time; a deterministic (subject, relation, object) key fixes it.",
+    "source": "Temporal Validity in Retrieval Memory: Eliminating Stale-Fact Errors (Yadav, MemStrata, arXiv:2606.26511)",
+    "outcome": "REPRODUCED",
+    "lab_id": "exp_supersession_replication",
+    "note": "Replicated on local nomic (24 subject-relation-object facts, mean-centered): the cosine 'is-this-a-supersession' classifier scores AUROC 0.613 (chance 0.5; Yadav ~0.59) -- a contradiction is often MORE embedding-similar to the original than a genuine rephrase (10/24 cases). A pure-cosine top-1 store served the stale value 41.7% of the time; a deterministic (subject,relation,object) supersession key drove that to 0% (shipped in inspeximus v0.2.0). Falsifier: if the key did not cut stale below cosine it would be useless -- it did. Honest scope: synthetic, 24 facts, characterizes the mechanism, not a product benchmark. SCOPED (Crucible audit 2026-07-05): AUROC 0.613 is barely ABOVE chance (0.5), not zero -- the honest statement is 'near-useless in practice', carried by the harm number (pure-cosine top-1 served the STALE value 41.7% of the time), not by 'cannot'. n=24 = small-n replication consistent with Yadav 0.59 (arXiv:2606.26511), not a large-n certification.",
+    "ts": 1782600282.710621,
+    "code": "research/probes/supersession_replication.py"
+  },
+  {
+    "claim": "Food-choice nudges are ~2.5x more responsive to choice-architecture interventions than other behavioral domains (between-domain effect-size ratio as evidence of intrinsic domain responsiveness).",
+    "source": "Mertens, Herberz, Hahnel & Brosch (2021), PNAS, doi:10.1073/pnas.2107346118",
+    "outcome": "FAILED",
+    "lab_id": "39737a",
+    "note": "Mechanism replication (we lack their raw per-study data). Smallest model: K domains with IDENTICAL true effect (d=0.20); food studies small-n (per-group ~30, point-of-choice field/lab), other domains large-n (~300); publish iff p<.05 in-dir",
+    "ts": 1782729274.3433585,
+    "code": "research/probes/nudge_pubbias_artifact.py"
+  },
+  {
+    "claim": "The 11 'Good to Great' companies (Collins 2001) achieved sustained greatness via a discoverable shared set of traits (Level 5 leadership, Hedgehog Concept, right-people-on-the-bus, the Flywheel).",
+    "source": "Jim Collins, Good to Great (HarperBusiness 2001)",
+    "outcome": "FAILED",
+    "lab_id": "502d6c",
+    "note": "Zero-skill null (Lab 502d6c): N=1400 firms as geometric random walks with IDENTICAL drift+vol (no firm more skilled than any other); apply Collins selection-on-the-dependent-variable (mediocre 15y, then >=Nx the market 15y). Robust across t",
+    "ts": 1782735147.9083095,
+    "code": "research/probes/good_to_great_null.py"
+  },
+  {
+    "claim": "LLM-as-judge (GPT-4) agrees with human preferences ~80% — on par with human-human agreement — so it is a valid stand-in for human quality evaluation (MT-Bench).",
+    "source": "Zheng et al. 2023, Judging LLM-as-a-Judge with MT-Bench and Chatbot Arena, arXiv:2306.05685",
+    "outcome": "REPRODUCED",
+    "lab_id": "bf7bb9",
+    "note": "Length-confound null on the original released data (lmsys/mt_bench_human_judgments: 3355 human + 2400 GPT-4 pairwise votes). A length-only null (pick the longer answer) agrees with humans 68.1% (words 66.4%), APPARENTLY recovering ~half the judge's above-chance margin (judge=86.3% vs chance 50%). But the pre-registered control -- length-MATCHED pairs (<10% gap) -- REFUTES the 'it's just length' read: GPT-4 still agrees with humans ~80% (79.7%, n=74) while the length-null falls to chance (53.0%). The agreement SURVIVES length-matching, so it is largely semantic (Campbell-Fiske shared-method-variance; 68% is a correlational upper bound, length as a valid PROXY). VERDICT REVISED FAILED->REPRODUCED (Crucible audit 2026-07-05): the folklore holds; length is a real but minority confound, not the driver. Public probe research/probes/llm_judge_length_null.py.",
+    "ts": 1782736303.4258463,
+    "code": "research/probes/llm_judge_length_null.py"
+  },
+  {
+    "claim": "Founder-led firms returned ~3.1x more than other firms (1990-2014); the founders mentality drives superior long-run performance.",
+    "source": "Zook & Allen (Bain), The Founders Mentality (HBR Press 2016)",
+    "outcome": "FAILED",
+    "lab_id": "12b630",
+    "note": "Zero-skill survivorship null (Lab 12b630). Two cohorts with IDENTICAL expected returns; founder-led differs ONLY by higher volatility (~1.8x) + more delisting; apply the same look-ahead index filter (survive to end AND be large enough). MEA",
+    "ts": 1782737310.314142,
+    "code": "research/probes/founder_survivorship_null.py"
+  },
+  {
+    "claim": "Chatbot Arena (LMArena) Elo ranks LLMs by genuine answer quality, so Arena rank is a valid model-selection signal.",
+    "source": "Chiang et al. 2024, Chatbot Arena, arXiv:2403.04132",
+    "outcome": "REPRODUCED",
+    "lab_id": "14c41f",
+    "note": "Style-only null on real public votes (lmarena-ai/arena-human-preference-140k, 28,084 decided battles). Two opposing findings. VOTES: a style-only judge (length+markdown, no model identity/content) predicts the human winner 61.5%, and the longer answer wins ~62% even between the SAME two models (>=50 battles/pair: 63.3%) -- a genuine per-vote length bias. ORDER: style-only rank reproduces Spearman rho=0.74 of the leaderboard, but that is a correlational CEILING (style co-moves with quality) and LMSYS's style-CONTROLLED Elo reorders only modestly -> the leaderboard ORDER is mostly skill. VERDICT REVISED FAILED->REPRODUCED (Crucible audit 2026-07-05): the model-selection use (rank) mostly holds; the style bias is in individual votes, not (mostly) the order. Public probe research/probes/arena_style_only.py.",
+    "ts": 1782738968.074909,
+    "code": "research/probes/arena_style_only.py"
+  },
+  {
+    "claim": "AI coding assistants make developers ~55% faster (the universal reading of the GitHub/Peng vendor stat).",
+    "source": "Peng et al. 2023 (GitHub/Microsoft), arXiv:2302.06590; vs Becker et al./METR 2025 arXiv:2507.09089; Cui/Demirer et al., Management Science 2025 (DOI 10.1287/mns",
+    "outcome": "FAILED",
+    "lab_id": "fc5c22",
+    "note": "The universal '55% faster' claim FAILS; storm-research verified (8/8 citations, 5 corrected, 3 demoted) that the canonical 55.8% is a vendor preprint on ONE greenfield JS task (~95 recruited / ~70 completers, CI [21%,89%]), while the only i",
+    "ts": 1782746821.7784855
+  },
+  {
+    "claim": "Internet AS-level topology follows a power-law degree distribution",
+    "source": "Faloutsos et al. 1999 SIGCOMM; tested vs exponential/log-normal via Clauset-Shalizi-Newman 2009 SIAM Rev., cf. Broido & Clauset 2019 Nat Commun 10:1017",
+    "outcome": "NOT_COMPUTABLE",
+    "lab_id": "4399e9",
+    "note": "Real 2000 AS data (SNAP, 6474 nodes), CSN MLE: power-law alpha=2.15 BEATS exponential (p=0.0002) but TIES lognormal (Vuong p=0.616, NS). A tie means the data CANNOT distinguish power-law from lognormal -- the power law is not rejected, just not uniquely best (CSN 'inconclusive'). Reclassified FAILED->NOT_COMPUTABLE (Crucible audit 2026-07-05): the Faloutsos claim is neither confirmed nor refuted here, so a clean FAILED overclaimed.",
+    "ts": 1782932685.7665844
+  },
+  {
+    "claim": "A big-enough context window replaces retrieval (CAG / \"RAG is dead\"): preload the whole corpus into long context and \"it must be somewhere\" => the model answers correctly.",
+    "source": "CAG / \"long context kills RAG\" viral discourse; CAG paper = Chan et al. 2024 (arXiv:2412.15605), which itself scopes replacement to small constrained knowledge bases.",
+    "outcome": "FAILED",
+    "lab_id": "ragdead",
+    "note": "Judge-free probe on one synthetic structured log at 5k/25k/60k/110k tokens, two task families. NEEDLE (single-fact lookup) = 1.00 at every length incl. 110k; SYNTH (read-everything count/filter aggregation) collapses 0.75->~0.25-0.375 by ~25k and stays there. Verdict FAILED for CAG *on synthesis*; needle lookup survives long context fine, so blanket \"context rot kills recall\" is also too strong. It is the task type, not the length. Replicates lost-in-the-middle (Liu 2023/TACL 2024), RULER (Hsieh/NVIDIA 2024), NoLiMa (2502.05167), Chroma context-rot (2025, non-peer-reviewed). HONEST LIMITS: n=8 synth Qs/length (the 0.75->0.3 drop is Fisher p~0.13, credible mainly by matching the replicated literature); one frontier model (exact model not logged); even at 5k synth is 0.75 so part of the failure is exhaustive arithmetic the model cannot do at any length -> the real fix for count/filter is a TOOL, not retrieval. Probe: research/probes/ragdead (generator + independent gold-re-derivation scorer). Post: public/posts/does-long-context-kill-rag.html.",
+    "ts": 1781725500.0,
+    "code": "research/probes/ragdead/exp_ragdead_A.py"
+  },
+  {
+    "claim": "Attaching provenance to a memory -- a \"source:\" tag, a \"corroborated by N records\" line, an authority claim, even coherence/recency checks -- makes an LLM agent memory safe against poisoning.",
+    "source": "OWASP Agentic Top-10 ASI06 (Memory & Context Poisoning) + widespread agent-memory/RAG guidance to trust records that cite a source or are corroborated; the folk assumption that provenance metadata is an integrity control.",
+    "outcome": "FAILED",
+    "lab_id": "memprov",
+    "note": "Defense-aware attacker vs 4 in-memory defenses (fictional-fact OVERRIDE, so no model prior confounds), 10 targets across 8 families (Anthropic Claude Opus 4.8, Google Gemini-3-flash + Gemma-3-27b, DeepSeek-v4-flash, Moonshot Kimi-k2.7, MiniMax-m3, NVIDIA Nemotron-3, Zhipu GLM-5.2, OpenAI gpt-oss 20b/120b), judge gpt-oss:120b. MEAN attack-success: no defense 1.00; source cited IN the record 0.91; \"corroborated by >=2\" written IN the record 0.95 -- the attacker forges whatever the defense reads, because it controls the content (v5). Even coherence + temporal corroboration gates are theater vs a competent forger who writes on-topic and time-spreads witnesses -- both free (v8). The ONLY signal that holds is metadata the writer CANNOT set: system-assigned write-history / distinct Ed25519 verified keys -- Biba integrity (1977) / Douceur Sybil cost (2002). Enforced in CODE (the memory layer surfaces only what passed the gate, so the poison never reaches the model) the end-to-end attack-success drops 1.00 -> 0.00 on all 10 models, gemma-3 included -- a code gate protects even a model that ignores a \"distrust this memory\" instruction, whereas the SAME rule as a PROMPT leaks (gemma-3 80%). BUT the defense PRICES the attack, it does not CLOSE it: (a) a sleeper who pays the Douceur cost (2 real keypairs, on-topic, time-spread) is indistinguishable from a legit fact -- Cheng & Friedman 2005, no symmetric reputation is sybilproof, confirmed empirically (v8); (b) it rides on outcome-credit being un-self-gradable -- a MINJA-style self-graded outcome (arXiv:2503.03704) collapses it back to 1.00; (c) it is coupled to a freshness cost -- the same >=2-corroboration bar that blocks a single-shot poison blocks a single-witness TRUE update (quickest-change-detection delay-vs-false-alarm; you cannot accept fresh facts fast without also accepting single-shot poison). VERDICT FAILED for \"content-provenance is a memory-poisoning defense\"; the honest replacement is a code-enforced gate on unforgeable, EARNED (un-self-gradable) signals, which prices but does not eliminate the attack. Prior art credited (not claimed): Biba 1977; Douceur 2002; Cheng-Friedman 2005; knowledge-conflict/memory-strength (Mallen PopQA ACL 2023, Li et al. arXiv:2409.10955 ACL 2025); adaptive-attack canon (Carlini-Wagner 2017, Athalye 2018, Tramer 2020, Nasr \"Attacker Moves Second\" arXiv:2510.09023); memory/RAG poisoning (MINJA 2503.03704, AgentPoison NeurIPS 2024 arXiv:2407.12784, PoisonedRAG USENIX Sec 2025 arXiv:2402.07867); PeerTrust signal fusion (Xiong-Liu 2004); quickest-change-detection (Lorden 1971 / CUSUM). HONEST LIMITS: single-turn fictional-fact override (not multi-turn persistent poisoning); one LLM judge (gpt-oss:120b), part self-judging gpt-oss outputs (biases lenient, not toward inflated robustness); attacker = static best-of-battery + a Claude-authored defense-aware battery, NOT an RL optimizer (PISmith arXiv:2603.13026), so ASR is a lower bound vs a stronger attacker; the code-gate GATED=0 is partly BY-CONSTRUCTION (a corroboration gate filters an uncorroborated poison ~tautologically) -- the measured, non-tautological parts are the end-to-end model pass-through, the Cheng-Friedman residual, and the density-dependent utility cost (~51% of legit recalls blocked at ~1x use -> ~6% at ~8x); open-weight/cloud snapshots only (Claude tested via Claude Code, no closed API). Probes: research/probes/memory_defense_layer_probe.py (attack), memory_gate_defense_probe.py (defense end-to-end), memory_corroboration_cost_probe.py (cost/residual/coupling). Post: r/RAG 2026-07-06.",
+    "ts": 1782932686.7665844
+  },
+  {
+    "claim": "A paper's content-generality (rated reference-blind from its abstract) predicts how much it gets genuinely BUILT UPON — beyond raw-citation popularity.",
+    "source": "A plausible science-of-science hypothesis in the lineage of the patent 'generality index' (Trajtenberg, Henderson & Jaffe 1997) and general-purpose-technology theory; operationalized with Semantic Scholar's influentialCitationCount (Valenzuela, Escarcega-Ha & Etzioni 2015, AAAI workshop) as the 'genuine build-on' signal.",
+    "outcome": "FAILED",
+    "code": "research/probes/generality_generativity_metric_dependence_probe.py",
+    "note": "Reference-blind LLM generality ratings (deepseek-v4-flash + kimi-k2.7-code) vs build-on on real Semantic Scholar data (345 ML/CS + 413 Medicine papers, 2015-17). With S2 influentialCitationCount, generality->build-on rank-partial (controlling raw citations) = +0.11/+0.14 in ML/CS (95% CI excludes 0), ~0 in Medicine: a small apparent effect. PRE-REGISTERED domain-neutral swap to a classifier-free build-on proxy (focused-citer = citing papers with short reference lists, field-normalized) erases it: ML partial = -0.02/-0.03 (CI straddles 0). Positive control: focused-citer detects build-on beyond popularity at partial +0.17, so the null is not proxy noise. Verdict: the effect is metric-specific / operationalization-dependent - consistent with (not proof of) the CS-trained influential-citation classifier's home-field advantage. Limits: small magnitudes, one classifier-free proxy, two fields.",
+    "ts": 1783496748.2834516
+  },
+  {
+    "claim": "For T rounds, K actions, d-dim feature vectors, an O(sqrt(T d ln^3(K T ln(T)/delta))) regret bound holds w.p. 1-delta for the simplest known linear-payoff contextual bandit algorithm (LinUCB family; f",
+    "source": "Chu, Li, Reyzin, Schapire (AISTATS 2011), Contextual Bandits with Linear Payoff Functions",
+    "outcome": "REPRODUCED",
+    "lab_id": "ff88bc",
+    "note": "Smallest model: LinUCB w/ Sherman-Morrison ridge, easy + hard small-gap instances, 8 seeds, T up to 65536. Tail log-log slope <= 0.51 everywhere; bound-shape ratio non-growing. HONEST CAVEATS: (1) replicating a PROVEN theorem is textbook-safe (FAILED was live only for the practical-LinUCB-vs-proven-",
+    "ts": 1783523374.4669514
+  },
+  {
+    "claim": "Agent tool-action REVERSIBILITY is decidable ex-ante from the tool signature — the assumption underlying per-tool reversibility gates and severity grades (e.g. Action-Graded Severity Scale, arXiv:2607.07474, which fixes reversibility 'per tool' in a lookup table).",
+    "source": "Owiredu-Ashley, 'Beyond Attack-Success Rate: Action-Graded Severity Scale for Tool-Using AI Agents' (arXiv:2607.07474, 2026) — reversibility×scope grid; corpus: ToolEmu (Ruan et al., ICLR 2024, arXiv:2309.15817).",
+    "outcome": "REPRODUCED",
+    "lab_id": "rev93",
+    "note": "Smallest model: label every tool in the ToolEmu asset file (38 toolkits / 330 tools; paper reports 36/311) for argument-dependence of reversibility with TWO independent LLM labelers, then measure a granted universal executor's realized harm-reach under isolated vs networked assumptions. RESULT: reversibility IS ~93% decidable from the signature alone (arg-dependent 0.07; Cohen's kappa 0.82, 'almost perfect' Landis-Koch) — the per-tool assumption mostly holds. MEASURED FAILURE MODE: the ~7% undecidable residual is verb-polymorphic UNIVERSAL EXECUTORS (shell/SQL/eval; only ~0.3% of tools, cat-agreement 0.94), for which reversibility is undecidable from the signature AND realized harm-reach is ENVIRONMENT-conditional — an ISOLATED shell reaches ~0% of external/API irreversible harms but a realistically-credentialed NETWORKED shell reaches ~0.66 external / ~0.80 local. IMPLICATION (confirming the consensus, not new): the boundary that bounds a memory-poisoned agent's irreversible EXTERNAL harm is executor CONTAINMENT (no ambient network/credentials), NOT per-tool reversibility metadata. HONEST CAVEATS: (1) LLM labelers measure shared model priors, not ground truth (networked-external agreement is only 0.32 — genuinely CLI/credential-dependent); (2) ToolEmu under-weights shell/code-interpreter tools now standard in production (OpenAI CI, Claude computer-use), so the 0.3% universal-executor prevalence is a LOWER bound; (3) the harm-locality map itself is NOT novel — it is arXiv:2607.07474's scope×reversibility grid on a different corpus; the genuinely new, unpublished bits are the measured 93% signature-DECIDABILITY RATE (kappa) and the isolated→networked reach flip.",
+    "ts": 1783971151.740367,
+    "code": "research/probes/reversibility_predictability_probe.py"
+  },
+  {
+    "claim": "LinUCB achieves O~(sqrt(Td)) regret with prob 1-delta for linear-payoff contextual bandits (sublinear in T, sqrt(d) dimension dependence)",
+    "source": "Chu, Li, Reyzin & Schapire, Contextual Bandits with Linear Payoff Functions, AISTATS 2011",
+    "outcome": "REPRODUCED",
+    "lab_id": "7e2ae1",
+    "note": "Simulated the actual LinUCB mechanism (per-arm ridge A,b + UCB alpha*sqrt(x^T Ainv x)); scaling EMERGED, not hardcoded. T-scaling (d=5,K=10): regret 26.9->29.9 as T 500->4000 (8x T, ~11% regret), regret/T -> 0 (0.054->0.0075) -> strictly sublinear, satisfies the O(sqrt(Td)) upper bound (here even fl",
+    "ts": 1784846168.7424436
+  },
+  {
+    "claim": "world-model-mcp ENFORCES what its trust schema declares (expires_at: 'rows should be dropped'; delete removes the fact)",
+    "source": "SaravananJaichandar/world-model-mcp v0.15.5 (PyPI wheel), models.py:147/130, memory_backend.delete, knowledge_graph.invalidate_fact",
+    "outcome": "FAILED",
+    "lab_id": "erasure_cell",
+    "note": "Measured with both controls passing (truncate->REMOVED; encoded store->NOT_COMPUTABLE). After the PUBLIC delete() the value is on disk in facts.db AND still retrievable. expires_at/influence_state are inert columns; the source itself notes the sweep 'lands in a follow-up'. IMPORTANT AND SELF-CRITICA",
+    "ts": 1785347923.6337245
+  },
+  {
+    "claim": "HeartFlow's memory layer enforces erasure ('Forgotten != deleted' — do forgotten values leave storage?)",
+    "source": "yun520-1/mark-heartflow-skill, src/memory/memory-bank.js, memory-kernel.js, memory-encrypt.js",
+    "outcome": "NOT_COMPUTABLE",
+    "lab_id": "erasure_runt",
+    "note": "memory-bank.forget() DOES remove the value, verified by decrypting the AES-256-GCM store before and after, with the prune confirmed non-zero. But I cannot find a live write path into MemoryBank: grep '\\.deposit(|\\.forget(|memoryBank\\.' outside the module returns nothing, while memory-kernel.js does ",
+    "ts": 1785347925.7829173
+  },
+  {
+    "claim": "Our joint analysis of the minority-tipping experiment (Lab 36e60c) shows a tipping fraction of 4.8%, a recovery edge of 4.6%, and a hysteresis width of 0.2% (J=1.0, h=0.05), demonstrating that a commi",
+    "source": "\"Mechanisms and Impacts of Earth System Tipping Elements\" (Seaver Wang,",
+    "outcome": "NOT_COMPUTABLE",
+    "lab_id": "e4ec41",
+    "note": "MEASURED committed_tipping_fraction=0.052812 (SE 0.0164, 3 seeds) vs CLAIMED 0.048; |diff| 0.00481 vs tol 0.0492 -> NOT_COMPUTABLE. Not by-construction: the claimed value is not a model input (independent Monte-Carlo ensemble). lab e4ec41",
+    "ts": 1785539068.894107,
+    "by": "Artificer Rooke"
+  },
+  {
+    "claim": "The tipping threshold for global cascades decreases with greater network connectivity; for instance, in a Watts model with mean degree 6 and threshold 0.1, a 1% seed fraction achieves near-complete ca",
+    "source": "\"Search in power-law networks\" (Lada A. Adamic, Rajan M. Lukose, Amit Puniyani, Bernardo A. Huberman, 2001, 1217 citations) https://doi",
+    "outcome": "NOT_COMPUTABLE",
+    "lab_id": "712068",
+    "note": "[RETRACTED FAILED -> NOT_COMPUTABLE: instrument error] MEASURED cascade_window_upper=13.586 (SE 0.0702, 5 seeds) vs CLAIMED 6; |diff| 7.59 vs tol 0.54 -> FAILED. Not by-construction: the claimed value is not a model input (independent ",
+    "by": "Artificer Rooke",
+    "ts": 1785539296.5199635,
+    "retracted_from": "FAILED",
+    "retracted_ts": 1785539512.392184,
+    "retraction_reason": "INSTRUMENT ERROR, not a failed claim. The extractor took 'mean degree 6' as the claimed cascade-window edge; it is the operating point at which the claim says a cascade DOES occur. The true edge at phi=0.1 is z_c=13.66, so a mean degree of 6 sits inside the window and the claim is consistent with the model. Comparing an operating point against an edge is a units mismatch, which this instrument's contract forbids. Extractor fixed 2026-08-01; the claim now reaches no instrument at all and is pinned by test_an_operating_point_reaches_no_instrument_at_all."
+  },
+  {
+    "claim": "A memory's support edge -- which earlier record a new write was derived from -- can be recovered from CONTENT SIMILARITY, so provenance lineage does not have to be declared at write time.",
+    "source": "OUR OWN claim, and we shipped it: inspeximus implements it as the `infer_lineage` fallback for writes that declare no parent. The same assumption underlies the nightly 'inspect the cited evidence' sweep described by @icophy in openclaw/openclaw#7707, and the provenance literature (W3C PROV-O `prov:wasDerivedFrom`; Buneman, Khanna & Tan, ICDT 2001) treats the edge as GIVEN rather than asking whether it can be recovered.",
+    "outcome": "FAILED",
+    "lab_id": "a1d88c",
+    "note": "Measured against constructed ground truth with the negatives that matter: a negative is a same-domain, same-vocabulary write issued right after the SAME recall -- the pair a real store actually contains, not an unrelated document. n=120 per cell, 5 thresholds x 4 retention levels, run against the shipped library (inspeximus 1.89.0) via probes/infer_lineage_precision.py, public at https://github.com/DanceNitra/inspeximus/blob/v1.89.0/probes/infer_lineage_precision.py and in the 1.89.0 sdist -- reproduce with `pip install inspeximus==1.89.0` and run it. Best recall of the inferred edge is 0.133, at the loosest threshold (0.05) and with the derivative retaining 90% of the parent's wording; 0.083 at 70%, 0.017 at 50%, 0.000 at 30%. Precision is 1.000 wherever it fires and false positives are zero in every cell, so the failure is RECALL, not confusion: the inference is right when it speaks and almost always silent. Consequence: a retraction that walks declared `derived_from` edges cannot be rescued by inferring the undeclared ones. METHOD NOTE, because it nearly went out wrong: the first model was a hand-written bag-of-words cosine over a 14-word shared vocabulary, which put every pair above threshold and returned recall 1.000 with precision exactly 0.500 -- while its VERDICT line, written in advance as prose, asserted 'recovers at most a small fraction'. The claim contradicted the data sent to support it. The recorded run executes the shipped probe and COMPUTES the verdict from the parsed table instead of stating it.",
+    "ts": 1785579816.6378446
+  }
+]

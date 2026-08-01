@@ -1,0 +1,3002 @@
+[
+ {
+  "id": "15c7b8",
+  "a": "orphan_Phase_Transition",
+  "b": "r3_Phase_Transition",
+  "sim": 0.957,
+  "contradict": false,
+  "claim": "",
+  "status": "compatible",
+  "ts": 1785241185.6745026
+ },
+ {
+  "id": "506d81",
+  "a": "bridge1_Default_Mode_Network",
+  "b": "pwback_Default_Mode_Network",
+  "sim": 0.957,
+  "contradict": false,
+  "claim": "",
+  "status": "compatible",
+  "ts": 1785241186.9909065
+ },
+ {
+  "id": "aaac7f",
+  "a": "sergeant-voss-shadow-kael-psychology---software-engineering",
+  "b": "artificer-rooke-shadow-kael-psychology---software-engineerin",
+  "sim": 0.957,
+  "contradict": false,
+  "claim": "",
+  "status": "compatible",
+  "ts": 1785241188.8123474
+ },
+ {
+  "id": "544db4",
+  "a": "cartographer-wren-dame-elara-finance---linguistics",
+  "b": "cartographer-wren-dame-elara-finance---linguistics",
+  "sim": 0.956,
+  "contradict": false,
+  "claim": "",
+  "status": "compatible",
+  "ts": 1785241190.667461
+ },
+ {
+  "id": "af5107",
+  "a": "measured-interaction-of-selection-bias-and-attenuation",
+  "b": "measured-interaction-of-selection-bias-and-attenuation",
+  "sim": 0.966,
+  "contradict": false,
+  "claim": "",
+  "status": "compatible",
+  "ts": 1785247878.134388
+ },
+ {
+  "id": "0d265e",
+  "a": "measured-interaction-of-selection-bias-and-attenuation",
+  "b": "measured-interaction-of-selection-bias-and-attenuation",
+  "sim": 0.963,
+  "contradict": false,
+  "claim": "",
+  "status": "compatible",
+  "ts": 1785247886.4279258
+ },
+ {
+  "id": "205a1e",
+  "a": "r3_Epigenetic_Regulation_—_The_Interface_Between_Envi",
+  "b": "r4_Epigenetic_Regulation_—_The_Interface_Be",
+  "sim": 0.956,
+  "contradict": false,
+  "claim": "",
+  "status": "compatible",
+  "ts": 1785247894.396684
+ },
+ {
+  "id": "048c03",
+  "a": "Production AI System Architecture §3",
+  "b": "Production AI System Architecture §4",
+  "sim": 0.956,
+  "contradict": false,
+  "claim": "",
+  "status": "compatible",
+  "ts": 1785247902.7145247
+ },
+ {
+  "id": "e1424c",
+  "a": "ARI_2026-05-23_Why_Sleep_Neuroscience_Needs_Psychology_The_Missing_Reciprocity",
+  "b": "ARI Why Sleep Neuroscience Needs Psychology The Missing Reci",
+  "sim": 0.956,
+  "contradict": false,
+  "claim": "",
+  "status": "compatible",
+  "ts": 1785247913.520433
+ },
+ {
+  "id": "dd493a",
+  "a": "high-priest-orin-shadow-kael-meta---physics",
+  "b": "shadow-kael-high-priest-orin-meta---physics",
+  "sim": 0.956,
+  "contradict": false,
+  "claim": "",
+  "status": "compatible",
+  "ts": 1785247921.500547
+ },
+ {
+  "id": "53fa73",
+  "a": "sage-mira-cartographer-wren-lecuns-world-model-proposal",
+  "b": "sage-mira-cartographer-wren-lecuns-world-model-proposal",
+  "sim": 0.956,
+  "contradict": false,
+  "claim": "",
+  "status": "compatible",
+  "ts": 1785247933.260085
+ },
+ {
+  "id": "f47ee7",
+  "a": "pipeline-king-aldric-artificer-rooke-polymorphism",
+  "b": "pipeline-king-aldric-artificer-rooke-shadow-kael-cartographe",
+  "sim": 0.956,
+  "contradict": false,
+  "claim": "",
+  "status": "compatible",
+  "ts": 1785247942.008815
+ },
+ {
+  "id": "047a0e",
+  "a": "king-aldric-artificer-rooke-statistics---meta",
+  "b": "king-aldric-artificer-rooke-statistics---meta",
+  "sim": 0.956,
+  "contradict": false,
+  "claim": "",
+  "status": "compatible",
+  "ts": 1785254528.554617
+ },
+ {
+  "id": "e24406",
+  "a": "gdl_Mathematics",
+  "b": "r2_Mathematics",
+  "sim": 0.956,
+  "contradict": false,
+  "claim": "",
+  "status": "compatible",
+  "ts": 1785254568.6503778
+ },
+ {
+  "id": "8659e9",
+  "a": "Stress Response",
+  "b": "bridge1_Stress_Response",
+  "sim": 0.956,
+  "contradict": false,
+  "claim": "",
+  "status": "compatible",
+  "ts": 1785254578.8781207
+ },
+ {
+  "id": "3b6414",
+  "a": "cartographer-wren-king-aldric-genomics---software-engineerin",
+  "b": "king-aldric-cartographer-wren-genomics---software-engineerin",
+  "sim": 0.955,
+  "contradict": false,
+  "claim": "",
+  "status": "compatible",
+  "ts": 1785254591.6559134
+ },
+ {
+  "id": "a1839e",
+  "a": "Digital_Minimalism",
+  "b": "l_final_Digital_Minimalism",
+  "sim": 0.955,
+  "contradict": false,
+  "claim": "",
+  "status": "compatible",
+  "ts": 1785254638.6918752
+ },
+ {
+  "id": "047f42",
+  "a": "ARI_2026-05-21_What_Finance_Knows_About_AI_Systems_Engineering_That_AI_Systems_Engineering_Doesnt_Know_About_Itself",
+  "b": "ARI_2026-05-22_What_Finance_Knows_About_AI_Systems_Engineering_That_AI_Systems_Engineering_Doesnt_Know_About_Itself",
+  "sim": 0.955,
+  "contradict": false,
+  "claim": "",
+  "status": "compatible",
+  "ts": 1785254691.0806384
+ },
+ {
+  "id": "95c881",
+  "a": "vault-digest-2026-06-12-1748",
+  "b": "vault-digest-2026-06-15-2155",
+  "sim": 0.955,
+  "contradict": false,
+  "claim": "",
+  "status": "compatible",
+  "ts": 1785254725.417761
+ },
+ {
+  "id": "9b1989",
+  "a": "pipeline-inflation",
+  "b": "pipeline-inflation",
+  "sim": 0.954,
+  "contradict": false,
+  "claim": "",
+  "status": "compatible",
+  "ts": 1785254750.6248093
+ },
+ {
+  "id": "52ef94",
+  "a": "pipeline-formal-foundations-psychology",
+  "b": "pipeline-formal-foundations-psychology",
+  "sim": 0.97,
+  "contradict": false,
+  "claim": "",
+  "status": "compatible",
+  "ts": 1785261354.414666
+ },
+ {
+  "id": "6a0049",
+  "a": "pipeline-meta-psychology",
+  "b": "pipeline-psychology---meta",
+  "sim": 0.969,
+  "contradict": false,
+  "claim": "",
+  "status": "compatible",
+  "ts": 1785261369.2234743
+ },
+ {
+  "id": "4dd11e",
+  "a": "pipeline-moral-hazard",
+  "b": "pipeline-moral-hazard",
+  "sim": 0.968,
+  "contradict": false,
+  "claim": "",
+  "status": "compatible",
+  "ts": 1785261385.3778954
+ },
+ {
+  "id": "86f628",
+  "a": "pipeline-output202606022227",
+  "b": "pipeline-output202606022227",
+  "sim": 0.968,
+  "contradict": false,
+  "claim": "",
+  "status": "compatible",
+  "ts": 1785261390.3813663
+ },
+ {
+  "id": "10b692",
+  "a": "pipeline-innovation",
+  "b": "pipeline-innovation",
+  "sim": 0.968,
+  "contradict": false,
+  "claim": "",
+  "status": "compatible",
+  "ts": 1785261398.6784077
+ },
+ {
+  "id": "e45f1e",
+  "a": "pipeline-output202606022227",
+  "b": "pipeline-output202606022227",
+  "sim": 0.965,
+  "contradict": false,
+  "claim": "",
+  "status": "compatible",
+  "ts": 1785261408.752867
+ },
+ {
+  "id": "8c3c67",
+  "a": "pipeline-psychology---meta",
+  "b": "pipeline-meta-psychology",
+  "sim": 0.961,
+  "contradict": false,
+  "claim": "",
+  "status": "compatible",
+  "ts": 1785261415.5574274
+ },
+ {
+  "id": "1816ff",
+  "a": "pipeline-innovation",
+  "b": "pipeline-innovation",
+  "sim": 0.958,
+  "contradict": false,
+  "claim": "",
+  "status": "compatible",
+  "ts": 1785261427.4253507
+ },
+ {
+  "id": "a9791d",
+  "a": "ARI_2026-05-21_Why_AI_Systems_Engineering_Needs_Finance_The_Missing_Reciprocity",
+  "b": "ARI_2026-05-22_Why_AI_Systems_Engineering_Needs_Finance_The_Missing_Reciprocity",
+  "sim": 0.97,
+  "contradict": false,
+  "claim": "",
+  "status": "compatible",
+  "ts": 1785268282.0101895
+ },
+ {
+  "id": "042222",
+  "a": "vault-digest-2026-06-10-1008",
+  "b": "vault-digest-2026-06-10-1019",
+  "sim": 0.97,
+  "contradict": true,
+  "claim": "The two notes attribute the same pipeline (Knowledge Observability — Competitive Matrix) to different sources: one to Lee & Yeung (2019) and the other to Toutanova and Chen (2015).",
+  "status": "queued",
+  "ts": 1785268285.293532
+ },
+ {
+  "id": "4c4a52",
+  "a": "ARI_2026-05-26_What_Formal_Foundations_Knows_About_Statistics_That_Statistics_Doesnt_Know_About_Itself",
+  "b": "What_Formal_Foundations_Knows_About_Statistics_That_Statistics_Doesnt_Know_Abou",
+  "sim": 0.97,
+  "contradict": true,
+  "claim": "The number of concepts from Formal Foundations linking to Statistics is both 11 and 22.",
+  "status": "open",
+  "ts": 1785268287.5346787
+ },
+ {
+  "id": "7937d1",
+  "a": "ARI_2026-05-30_What_Formal_Foundations_Knows_About_Causal_Inference_That_Causal_Inference_Doesnt_Know_About_Itself",
+  "b": "ARI What Formal Foundations Knows About Causal Inference That Ca",
+  "sim": 0.97,
+  "contradict": false,
+  "claim": "",
+  "status": "compatible",
+  "ts": 1785268289.7458587
+ },
+ {
+  "id": "61c201",
+  "a": "high-priest-orin-shadow-kael-earth-systems---finance",
+  "b": "high-priest-orin-sage-mira-earth-systems---finance",
+  "sim": 0.955,
+  "contradict": false,
+  "claim": "",
+  "status": "compatible",
+  "ts": 1785268291.2156363
+ },
+ {
+  "id": "884252",
+  "a": "pipeline-education-ai",
+  "b": "pipeline-education-ai",
+  "sim": 0.955,
+  "contradict": false,
+  "claim": "",
+  "status": "compatible",
+  "ts": 1785268293.3944652
+ },
+ {
+  "id": "a7a2fd",
+  "a": "AI Ethics",
+  "b": "Ethics in AI",
+  "sim": 0.955,
+  "contradict": false,
+  "claim": "",
+  "status": "compatible",
+  "ts": 1785268295.5560973
+ },
+ {
+  "id": "4f32a8",
+  "a": "pipeline-systematic-review",
+  "b": "pipeline-systematic-review",
+  "sim": 0.955,
+  "contradict": false,
+  "claim": "",
+  "status": "compatible",
+  "ts": 1785268297.8097293
+ },
+ {
+  "id": "28caf5",
+  "a": "Epidemiology × Agent Failure Analysis",
+  "b": "Epidemiology × Agent Failure Analysis",
+  "sim": 0.97,
+  "contradict": false,
+  "claim": "",
+  "status": "compatible",
+  "ts": 1785275131.4492414
+ },
+ {
+  "id": "e958a1",
+  "a": "bridge1_Allostatic_Load",
+  "b": "l_final_Allostatic_Load",
+  "sim": 0.97,
+  "contradict": false,
+  "claim": "",
+  "status": "compatible",
+  "ts": 1785275132.7586563
+ },
+ {
+  "id": "d09d9c",
+  "a": "pipeline-sleep-neuroscience-cell-biology---statistics",
+  "b": "pipeline-sleep-neuroscience-cell-biology---statistics",
+  "sim": 0.97,
+  "contradict": false,
+  "claim": "",
+  "status": "compatible",
+  "ts": 1785275134.6606276
+ },
+ {
+  "id": "89838d",
+  "a": "r2_Statistics",
+  "b": "r4_Statistics",
+  "sim": 0.97,
+  "contradict": false,
+  "claim": "",
+  "status": "compatible",
+  "ts": 1785275140.7865598
+ },
+ {
+  "id": "febbbe",
+  "a": "pipeline-longevity-and-health",
+  "b": "pipeline-longevity-and-health",
+  "sim": 0.968,
+  "contradict": false,
+  "claim": "",
+  "status": "compatible",
+  "ts": 1785275142.9264822
+ },
+ {
+  "id": "402815",
+  "a": "pipeline-sleep-neuroscience-cell-biology---statistics",
+  "b": "pipeline-sleep-neuroscience-cell-biology---statistics",
+  "sim": 0.967,
+  "contradict": false,
+  "claim": "",
+  "status": "compatible",
+  "ts": 1785275145.0816605
+ },
+ {
+  "id": "b83c91",
+  "a": "create-replication-protocol-for-ai-audit-claims",
+  "b": "create-replication-verification-protocol-for-ai-audit-claims",
+  "sim": 0.967,
+  "contradict": false,
+  "claim": "",
+  "status": "compatible",
+  "ts": 1785275146.77767
+ },
+ {
+  "id": "0111a0",
+  "a": "pipeline-longevity-and-health",
+  "b": "pipeline-longevity-and-health",
+  "sim": 0.965,
+  "contradict": false,
+  "claim": "",
+  "status": "compatible",
+  "ts": 1785275148.2906196
+ },
+ {
+  "id": "e9bdae",
+  "a": "pipeline-finance---physics",
+  "b": "pipeline-finance---physics",
+  "sim": 0.97,
+  "contradict": false,
+  "claim": "",
+  "status": "compatible",
+  "ts": 1785282057.877194
+ },
+ {
+  "id": "ee90d8",
+  "a": "pipeline-philosophy-formal-foundations-psycho",
+  "b": "pipeline-philosophy-formal-foundations-psycho",
+  "sim": 0.97,
+  "contradict": false,
+  "claim": "",
+  "status": "compatible",
+  "ts": 1785282060.3193305
+ },
+ {
+  "id": "c5a1c5",
+  "a": "orphan_Linear_Algebra",
+  "b": "pwback_Linear_Algebra",
+  "sim": 0.97,
+  "contradict": false,
+  "claim": "",
+  "status": "compatible",
+  "ts": 1785282062.084449
+ },
+ {
+  "id": "c576a8",
+  "a": "Epistemic Calculus — The Formal Mathematics of Knowledge Dynamics",
+  "b": "Epistemic Calculus",
+  "sim": 0.97,
+  "contradict": false,
+  "claim": "",
+  "status": "compatible",
+  "ts": 1785282063.7806463
+ },
+ {
+  "id": "df4a17",
+  "a": "Finance",
+  "b": "bridge1_Finance",
+  "sim": 0.97,
+  "contradict": false,
+  "claim": "",
+  "status": "compatible",
+  "ts": 1785282065.7781863
+ },
+ {
+  "id": "ed1bcc",
+  "a": "Cardiovascular Health",
+  "b": "backup_Cardiovascular_Health",
+  "sim": 0.97,
+  "contradict": false,
+  "claim": "",
+  "status": "compatible",
+  "ts": 1785282067.316382
+ },
+ {
+  "id": "90a418",
+  "a": "pipeline-cognitive-science---finance",
+  "b": "pipeline-cognitive-science---finance",
+  "sim": 0.967,
+  "contradict": false,
+  "claim": "",
+  "status": "compatible",
+  "ts": 1785282070.1619105
+ },
+ {
+  "id": "933482",
+  "a": "pipeline-knowledge-observability-unit-economics-business-pla",
+  "b": "pipeline-knowledge-observability-unit-economics-business-pla",
+  "sim": 0.967,
+  "contradict": false,
+  "claim": "",
+  "status": "compatible",
+  "ts": 1785282077.8222744
+ },
+ {
+  "id": "4b7148",
+  "a": "Bias",
+  "b": "l_final_Bias",
+  "sim": 0.969,
+  "contradict": false,
+  "claim": "",
+  "status": "compatible",
+  "ts": 1785288936.2464275
+ },
+ {
+  "id": "37bc3d",
+  "a": "orphan_Differential_Equations",
+  "b": "pwback_Differential_Equations",
+  "sim": 0.969,
+  "contradict": false,
+  "claim": "",
+  "status": "compatible",
+  "ts": 1785288937.820933
+ },
+ {
+  "id": "deb7c2",
+  "a": "bridge1_Concept",
+  "b": "l_final_Concept",
+  "sim": 0.969,
+  "contradict": false,
+  "claim": "",
+  "status": "compatible",
+  "ts": 1785288939.1256633
+ },
+ {
+  "id": "c3f0be",
+  "a": "pipeline-physiology-immunology",
+  "b": "pipeline-physiology-immunology",
+  "sim": 0.965,
+  "contradict": false,
+  "claim": "",
+  "status": "compatible",
+  "ts": 1785288940.4543037
+ },
+ {
+  "id": "d2aa26",
+  "a": "dame-elara-shadow-kael-formal-foundations-ai",
+  "b": "dame-elara-shadow-kael-formal-foundations-ai",
+  "sim": 0.965,
+  "contradict": false,
+  "claim": "",
+  "status": "compatible",
+  "ts": 1785288944.352608
+ },
+ {
+  "id": "83318f",
+  "a": "pipeline-fairness",
+  "b": "pipeline-fairness",
+  "sim": 0.964,
+  "contradict": false,
+  "claim": "",
+  "status": "compatible",
+  "ts": 1785288947.5437493
+ },
+ {
+  "id": "0dc0d4",
+  "a": "pipeline-fairness",
+  "b": "pipeline-fairness",
+  "sim": 0.964,
+  "contradict": false,
+  "claim": "",
+  "status": "compatible",
+  "ts": 1785288949.80245
+ },
+ {
+  "id": "cf0226",
+  "a": "Bridge #82 — The Market Is Not a Random Walk. It's an Agent Loop.",
+  "b": "The Market Is Not a Random Walk. It's an Agent Loop",
+  "sim": 0.955,
+  "contradict": false,
+  "claim": "",
+  "status": "compatible",
+  "ts": 1785288951.3991778
+ },
+ {
+  "id": "ae9a65",
+  "a": "pipeline-ai---sleep-neuroscience-cell-biology",
+  "b": "pipeline-ai---sleep-neuroscience-cell-biology",
+  "sim": 0.969,
+  "contradict": false,
+  "claim": "",
+  "status": "compatible",
+  "ts": 1785295744.4296167
+ },
+ {
+  "id": "9d983b",
+  "a": "bridge1_Drawdown",
+  "b": "pwback_Drawdown",
+  "sim": 0.969,
+  "contradict": false,
+  "claim": "",
+  "status": "compatible",
+  "ts": 1785295745.5837035
+ },
+ {
+  "id": "d410e8",
+  "a": "Stress Response",
+  "b": "pwback_Stress_Response",
+  "sim": 0.969,
+  "contradict": false,
+  "claim": "",
+  "status": "compatible",
+  "ts": 1785295746.9083645
+ },
+ {
+  "id": "c54e09",
+  "a": "l_final_Cardiovascular_Health",
+  "b": "r3_Cardiovascular_Health",
+  "sim": 0.969,
+  "contradict": false,
+  "claim": "",
+  "status": "compatible",
+  "ts": 1785295757.620359
+ },
+ {
+  "id": "9b323b",
+  "a": "pipeline-ai---sleep-neuroscience-cell-biology",
+  "b": "pipeline-ai---sleep-neuroscience-cell-biology",
+  "sim": 0.966,
+  "contradict": false,
+  "claim": "",
+  "status": "compatible",
+  "ts": 1785295759.5917227
+ },
+ {
+  "id": "721695",
+  "a": "pipeline-causality",
+  "b": "pipeline-causality",
+  "sim": 0.965,
+  "contradict": false,
+  "claim": "",
+  "status": "compatible",
+  "ts": 1785295766.6561985
+ },
+ {
+  "id": "32d5cd",
+  "a": "pipeline-systems-thinking",
+  "b": "pipeline-systems-thinking",
+  "sim": 0.963,
+  "contradict": false,
+  "claim": "",
+  "status": "compatible",
+  "ts": 1785295771.0140498
+ },
+ {
+  "id": "0454b2",
+  "a": "pipeline-abc-plan-swarm-hardening-vault",
+  "b": "pipeline-abc-plan-swarm-hardening-vault",
+  "sim": 0.963,
+  "contradict": false,
+  "claim": "",
+  "status": "compatible",
+  "ts": 1785295772.9786003
+ },
+ {
+  "id": "73e787",
+  "a": "artificer-rooke-cartographer-wren-meta-publications",
+  "b": "cartographer-wren-sergeant-voss-meta-publications",
+  "sim": 0.97,
+  "contradict": false,
+  "claim": "",
+  "status": "compatible",
+  "ts": 1785302694.2200296
+ },
+ {
+  "id": "34eccc",
+  "a": "r2_Statistics",
+  "b": "r3_Statistics",
+  "sim": 0.969,
+  "contradict": false,
+  "claim": "",
+  "status": "compatible",
+  "ts": 1785302696.80996
+ },
+ {
+  "id": "2f04b9",
+  "a": "pipeline-ai-deep-learning-economics-philoso",
+  "b": "pipeline-ai-deep-learning-economics-philoso",
+  "sim": 0.965,
+  "contradict": false,
+  "claim": "",
+  "status": "compatible",
+  "ts": 1785302699.3761525
+ },
+ {
+  "id": "677308",
+  "a": "pipeline-ai-deep-learning-economics-philoso",
+  "b": "pipeline-ai-deep-learning-economics-philoso",
+  "sim": 0.964,
+  "contradict": false,
+  "claim": "",
+  "status": "compatible",
+  "ts": 1785302701.8970923
+ },
+ {
+  "id": "0ec574",
+  "a": "pipeline-ai-deep-learning-economics-philoso",
+  "b": "pipeline-ai-deep-learning-economics-philoso",
+  "sim": 0.964,
+  "contradict": false,
+  "claim": "",
+  "status": "compatible",
+  "ts": 1785302703.4603434
+ },
+ {
+  "id": "6cd1bd",
+  "a": "pipeline-meaning-making",
+  "b": "pipeline-meaning-making",
+  "sim": 0.964,
+  "contradict": false,
+  "claim": "",
+  "status": "compatible",
+  "ts": 1785302706.0541396
+ },
+ {
+  "id": "56aa8b",
+  "a": "pipeline-ai-systems-multi-agent-systems-complex",
+  "b": "pipeline-ai-systems-multi-agent-systems-complex",
+  "sim": 0.964,
+  "contradict": false,
+  "claim": "",
+  "status": "compatible",
+  "ts": 1785302708.554293
+ },
+ {
+  "id": "a88b2c",
+  "a": "pipeline-ai-deep-learning-economics-philoso",
+  "b": "pipeline-ai-deep-learning-economics-philoso",
+  "sim": 0.962,
+  "contradict": false,
+  "claim": "",
+  "status": "compatible",
+  "ts": 1785302710.806589
+ },
+ {
+  "id": "f7eb85",
+  "a": "pipeline-machine-learning",
+  "b": "pipeline-machine-learning",
+  "sim": 0.969,
+  "contradict": false,
+  "claim": "",
+  "status": "compatible",
+  "ts": 1785309647.5363028
+ },
+ {
+  "id": "22af3f",
+  "a": "pipeline-psychology-software-engineering",
+  "b": "pipeline-psychology-software-engineering",
+  "sim": 0.969,
+  "contradict": false,
+  "claim": "",
+  "status": "compatible",
+  "ts": 1785309650.829803
+ },
+ {
+  "id": "cdf2ae",
+  "a": "backup_Psychology",
+  "b": "r4_Psychology",
+  "sim": 0.969,
+  "contradict": false,
+  "claim": "",
+  "status": "compatible",
+  "ts": 1785309652.3778715
+ },
+ {
+  "id": "46a3b3",
+  "a": "backup_Augmentation_Symbiosis_—_Systems_That_Augment_Their_Substrates",
+  "b": "l_final_Augmentation_Symbiosis_—_Syste",
+  "sim": 0.969,
+  "contradict": false,
+  "claim": "",
+  "status": "compatible",
+  "ts": 1785309653.8437812
+ },
+ {
+  "id": "0a0986",
+  "a": "pipeline-general-ai-security-linux-science",
+  "b": "pipeline-general-ai-security-linux-science",
+  "sim": 0.969,
+  "contradict": false,
+  "claim": "",
+  "status": "compatible",
+  "ts": 1785309655.9638283
+ },
+ {
+  "id": "858dfc",
+  "a": "pipeline-complexity-science-earth-science-eco",
+  "b": "pipeline-complexity-science-earth-science-eco",
+  "sim": 0.963,
+  "contradict": false,
+  "claim": "",
+  "status": "compatible",
+  "ts": 1785309658.1702816
+ },
+ {
+  "id": "4d6358",
+  "a": "pipeline-research-methods---true-meta",
+  "b": "pipeline-research-methods---true-meta",
+  "sim": 0.962,
+  "contradict": false,
+  "claim": "",
+  "status": "compatible",
+  "ts": 1785309660.1500444
+ },
+ {
+  "id": "f2fa42",
+  "a": "pipeline-general-ai-security-linux-science",
+  "b": "pipeline-general-ai-security-linux-science",
+  "sim": 0.962,
+  "contradict": false,
+  "claim": "",
+  "status": "compatible",
+  "ts": 1785309661.66699
+ },
+ {
+  "id": "308b6a",
+  "a": "pipeline-software-engineering-law",
+  "b": "pipeline-software-engineering-law",
+  "sim": 0.97,
+  "contradict": false,
+  "claim": "",
+  "status": "compatible",
+  "ts": 1785316842.3630729
+ },
+ {
+  "id": "68b5ae",
+  "a": "r3_Concept",
+  "b": "r4_Concept",
+  "sim": 0.969,
+  "contradict": false,
+  "claim": "",
+  "status": "compatible",
+  "ts": 1785316843.9078844
+ },
+ {
+  "id": "9bfbd1",
+  "a": "PUB-83D87F29 — Areas_MOC_↔_Concepts_MOC_—_success_criteria_evaluation",
+  "b": "pw_moc_PUB-83D87F29_—_Areas_MOC_↔_Con",
+  "sim": 0.969,
+  "contradict": false,
+  "claim": "",
+  "status": "compatible",
+  "ts": 1785316846.0833166
+ },
+ {
+  "id": "d6f15e",
+  "a": "l_final_Augmentation_Symbiosis_—_Syste",
+  "b": "orphan_Augmentation_Symbiosis_—_Syste",
+  "sim": 0.969,
+  "contradict": false,
+  "claim": "",
+  "status": "compatible",
+  "ts": 1785316847.3924203
+ },
+ {
+  "id": "8b042f",
+  "a": "pipeline-software-engineering-law",
+  "b": "pipeline-software-engineering-law",
+  "sim": 0.968,
+  "contradict": false,
+  "claim": "",
+  "status": "compatible",
+  "ts": 1785316849.382453
+ },
+ {
+  "id": "9c7573",
+  "a": "pipeline-physics---statistics",
+  "b": "pipeline-physics---statistics",
+  "sim": 0.965,
+  "contradict": false,
+  "claim": "",
+  "status": "compatible",
+  "ts": 1785316852.420674
+ },
+ {
+  "id": "c2f9c4",
+  "a": "pipeline-formal-foundations---health-longevity",
+  "b": "pipeline-formal-foundations---health-longevity",
+  "sim": 0.962,
+  "contradict": false,
+  "claim": "",
+  "status": "compatible",
+  "ts": 1785316854.6247885
+ },
+ {
+  "id": "fa59ba",
+  "a": "pipeline-physics---statistics",
+  "b": "pipeline-physics---statistics",
+  "sim": 0.962,
+  "contradict": false,
+  "claim": "",
+  "status": "compatible",
+  "ts": 1785316861.3462
+ },
+ {
+  "id": "b216e9",
+  "a": "pipeline-sli-slo",
+  "b": "pipeline-sli-slo",
+  "sim": 0.969,
+  "contradict": false,
+  "claim": "",
+  "status": "compatible",
+  "ts": 1785324017.6860232
+ },
+ {
+  "id": "59cb02",
+  "a": "Vault_AGI_Reasoning_2026-06-22",
+  "b": "orphan_Vault_AGI_Reasoning_2026-06-02",
+  "sim": 0.969,
+  "contradict": false,
+  "claim": "",
+  "status": "compatible",
+  "ts": 1785324021.7116055
+ },
+ {
+  "id": "d994a6",
+  "a": "Network_as_Cross-Domain_Convergence",
+  "b": "orphan_Network_as_Cross-Domain_Conver",
+  "sim": 0.969,
+  "contradict": false,
+  "claim": "",
+  "status": "compatible",
+  "ts": 1785324023.393579
+ },
+ {
+  "id": "817e78",
+  "a": "backup_Vault_as_Recursive_Self-Improving_System",
+  "b": "r3_Vault_as_Recursive_Self-Improving_System",
+  "sim": 0.968,
+  "contradict": false,
+  "claim": "",
+  "status": "compatible",
+  "ts": 1785324024.7235544
+ },
+ {
+  "id": "f4a87f",
+  "a": "Reinforcement Learning",
+  "b": "r3_Reinforcement_Learning",
+  "sim": 0.968,
+  "contradict": false,
+  "claim": "",
+  "status": "compatible",
+  "ts": 1785324025.8939831
+ },
+ {
+  "id": "966540",
+  "a": "pwback_Vault_as_Recursive_Self-Improv",
+  "b": "r3_Vault_as_Recursive_Self-Improving_System",
+  "sim": 0.968,
+  "contradict": false,
+  "claim": "",
+  "status": "compatible",
+  "ts": 1785324027.4125314
+ },
+ {
+  "id": "6b6929",
+  "a": "Information Diet",
+  "b": "orphan_Information_Diet",
+  "sim": 0.968,
+  "contradict": false,
+  "claim": "",
+  "status": "compatible",
+  "ts": 1785324029.2050767
+ },
+ {
+  "id": "43788a",
+  "a": "cartographer-wren-artificer-rooke-earth-systems---finance",
+  "b": "cartographer-wren-artificer-rooke-earth-systems---finance",
+  "sim": 0.968,
+  "contradict": false,
+  "claim": "",
+  "status": "compatible",
+  "ts": 1785324032.467556
+ },
+ {
+  "id": "c41a77",
+  "a": "orphan_Scaling_Laws",
+  "b": "pwback_Scaling_Laws",
+  "sim": 0.968,
+  "contradict": false,
+  "claim": "",
+  "status": "compatible",
+  "ts": 1785331150.6713324
+ },
+ {
+  "id": "4409cc",
+  "a": "Regression",
+  "b": "l_final_Regression",
+  "sim": 0.968,
+  "contradict": false,
+  "claim": "",
+  "status": "compatible",
+  "ts": 1785331155.193926
+ },
+ {
+  "id": "e9ba34",
+  "a": "Phase_Transition",
+  "b": "r3_Phase_Transition",
+  "sim": 0.968,
+  "contradict": false,
+  "claim": "",
+  "status": "compatible",
+  "ts": 1785331157.1500301
+ },
+ {
+  "id": "0c80ad",
+  "a": "backup_Dynamical_Systems",
+  "b": "pwback_Dynamical_Systems",
+  "sim": 0.968,
+  "contradict": false,
+  "claim": "",
+  "status": "compatible",
+  "ts": 1785331160.6605928
+ },
+ {
+  "id": "e9aa70",
+  "a": "Control Theory",
+  "b": "l_final_Control_Theory",
+  "sim": 0.968,
+  "contradict": false,
+  "claim": "",
+  "status": "compatible",
+  "ts": 1785331162.0889595
+ },
+ {
+  "id": "eca876",
+  "a": "backup_Physics",
+  "b": "r4_Physics",
+  "sim": 0.968,
+  "contradict": false,
+  "claim": "",
+  "status": "compatible",
+  "ts": 1785331163.6126008
+ },
+ {
+  "id": "dafd76",
+  "a": "Why_Software_Engineering_Is_Biology_The_Structural_Isomorphism_Uncovered_by_th",
+  "b": "Why_Software_Engineering_Is_Cell_Biology_The_Structural_Isomorphism_Uncovered",
+  "sim": 0.968,
+  "contradict": true,
+  "claim": "The vault contains zero concepts from Software Engineering that link to Biology, but also contains four concepts from Software Engineering that link to Cell Biology (a subfield of Biology).",
+  "status": "open",
+  "ts": 1785331168.6019526
+ },
+ {
+  "id": "f794ff",
+  "a": "ARI_2026-05-27_Autonomic_Nervous_System_and_Cognitive_Load_The_Hidden_Connection_Through_Prefrontal_Cortex",
+  "b": "ARI Autonomic Nervous System and Cognitive Load The Hidden Con",
+  "sim": 0.968,
+  "contradict": false,
+  "claim": "",
+  "status": "compatible",
+  "ts": 1785331170.4229321
+ },
+ {
+  "id": "02194c",
+  "a": "Learning",
+  "b": "r3_Learning",
+  "sim": 0.968,
+  "contradict": false,
+  "claim": "",
+  "status": "compatible",
+  "ts": 1785338147.2385116
+ },
+ {
+  "id": "48f086",
+  "a": "cartographer-wren-shadow-kael-philosophy-of-science",
+  "b": "shadow-kael-cartographer-wren-philosophy-of-science",
+  "sim": 0.968,
+  "contradict": false,
+  "claim": "",
+  "status": "compatible",
+  "ts": 1785338148.8114235
+ },
+ {
+  "id": "9a0ba0",
+  "a": "pipeline-cross-domain-synthesis---research-methods",
+  "b": "pipeline-cross-domain-synthesis---research-methods",
+  "sim": 0.968,
+  "contradict": false,
+  "claim": "",
+  "status": "compatible",
+  "ts": 1785338151.0499282
+ },
+ {
+  "id": "757010",
+  "a": "pwback_Chronobiology",
+  "b": "r2_Chronobiology",
+  "sim": 0.967,
+  "contradict": false,
+  "claim": "",
+  "status": "compatible",
+  "ts": 1785338152.375968
+ },
+ {
+  "id": "1a06e7",
+  "a": "pipeline-test-agoras-claim-track-the-vaults-dead-weight-frac",
+  "b": "test-agoras-claim-track-the-vaults-dead-weight-fraction-memo",
+  "sim": 0.967,
+  "contradict": false,
+  "claim": "",
+  "status": "compatible",
+  "ts": 1785338158.2784336
+ },
+ {
+  "id": "28048e",
+  "a": "pipeline-cross-domain-synthesis---research-methods",
+  "b": "pipeline-cross-domain-synthesis---research-methods",
+  "sim": 0.967,
+  "contradict": false,
+  "claim": "",
+  "status": "compatible",
+  "ts": 1785338161.266968
+ },
+ {
+  "id": "75ce3d",
+  "a": "artificer-rooke-dame-elara-earth-systems---finance",
+  "b": "artificer-rooke-dame-elara-earth-systems---finance",
+  "sim": 0.967,
+  "contradict": false,
+  "claim": "",
+  "status": "compatible",
+  "ts": 1785338163.8871977
+ },
+ {
+  "id": "a1799d",
+  "a": "pipeline-formal-foundations-ai",
+  "b": "pipeline-formal-foundations-ai",
+  "sim": 0.962,
+  "contradict": false,
+  "claim": "",
+  "status": "compatible",
+  "ts": 1785338166.1437495
+ },
+ {
+  "id": "b6cda1",
+  "a": "pipeline-formal-foundations-neuroscience",
+  "b": "pipeline-formal-foundations-neuroscience",
+  "sim": 0.967,
+  "contradict": false,
+  "claim": "",
+  "status": "compatible",
+  "ts": 1785344879.9239452
+ },
+ {
+  "id": "7c2666",
+  "a": "Biology",
+  "b": "Molecular Biology",
+  "sim": 0.967,
+  "contradict": false,
+  "claim": "",
+  "status": "compatible",
+  "ts": 1785345003.7438173
+ },
+ {
+  "id": "a8f36a",
+  "a": "pipeline-earth-science-economics-formal-found",
+  "b": "pipeline-earth-science-economics-formal-found",
+  "sim": 0.967,
+  "contradict": false,
+  "claim": "",
+  "status": "compatible",
+  "ts": 1785345007.3304992
+ },
+ {
+  "id": "059122",
+  "a": "Systems Thinking",
+  "b": "bridge1_Systems_Thinking",
+  "sim": 0.967,
+  "contradict": false,
+  "claim": "",
+  "status": "compatible",
+  "ts": 1785345019.9585404
+ },
+ {
+  "id": "5bf6e6",
+  "a": "Renormalization Group",
+  "b": "gdl_Renormalization_Group",
+  "sim": 0.967,
+  "contradict": false,
+  "claim": "",
+  "status": "compatible",
+  "ts": 1785345056.790333
+ },
+ {
+  "id": "503221",
+  "a": "sergeant-voss-shadow-kael-psychology---software-engineering",
+  "b": "shadow-kael-sergeant-voss-psychology---software-engineering",
+  "sim": 0.967,
+  "contradict": false,
+  "claim": "",
+  "status": "compatible",
+  "ts": 1785345091.2938788
+ },
+ {
+  "id": "b130ac",
+  "a": "LLM Operations",
+  "b": "LLM",
+  "sim": 0.967,
+  "contradict": false,
+  "claim": "",
+  "status": "compatible",
+  "ts": 1785345143.2346437
+ },
+ {
+  "id": "76aab6",
+  "a": "high-priest-orin-shadow-kael-meta---physics",
+  "b": "high-priest-orin-dame-elara-meta---physics",
+  "sim": 0.955,
+  "contradict": false,
+  "claim": "",
+  "status": "compatible",
+  "ts": 1785345145.1451108
+ },
+ {
+  "id": "3375fc",
+  "a": "Systems Thinking",
+  "b": "backup_Systems_Thinking",
+  "sim": 0.967,
+  "contradict": false,
+  "claim": "",
+  "status": "compatible",
+  "ts": 1785351584.9515839
+ },
+ {
+  "id": "03bbc9",
+  "a": "Security Dilemma",
+  "b": "orphan_Security_Dilemma",
+  "sim": 0.966,
+  "contradict": false,
+  "claim": "",
+  "status": "compatible",
+  "ts": 1785351586.6480136
+ },
+ {
+  "id": "4cc49b",
+  "a": "hypothesize-on-test-agoras-claim-if-empirical-ransom-amounts",
+  "b": "test-agoras-claim-if-empirical-ransom-amounts-are-explained-",
+  "sim": 0.966,
+  "contradict": false,
+  "claim": "",
+  "status": "compatible",
+  "ts": 1785351588.7203836
+ },
+ {
+  "id": "d8a0b0",
+  "a": "HPA Axis",
+  "b": "bridge1_HPA_Axis",
+  "sim": 0.966,
+  "contradict": false,
+  "claim": "",
+  "status": "compatible",
+  "ts": 1785351590.1624525
+ },
+ {
+  "id": "ad5320",
+  "a": "king-aldric-shadow-kael-meta-infrastructure",
+  "b": "king-aldric-shadow-kael-meta-infrastructure",
+  "sim": 0.966,
+  "contradict": false,
+  "claim": "",
+  "status": "compatible",
+  "ts": 1785351591.9910858
+ },
+ {
+  "id": "df246b",
+  "a": "Auto AI Agents Synthesis 2026-05-18",
+  "b": "Auto AI Agents Synthesis 2026-05-25",
+  "sim": 0.966,
+  "contradict": false,
+  "claim": "",
+  "status": "compatible",
+  "ts": 1785351595.2746608
+ },
+ {
+  "id": "6b00e5",
+  "a": "pipeline-agent-engineering",
+  "b": "pipeline-agent-engineering",
+  "sim": 0.966,
+  "contradict": false,
+  "claim": "",
+  "status": "compatible",
+  "ts": 1785351597.3131325
+ },
+ {
+  "id": "ab1b32",
+  "a": "pipeline-philosophy-of-science",
+  "b": "pipeline-philosophy-of-science",
+  "sim": 0.966,
+  "contradict": false,
+  "claim": "",
+  "status": "compatible",
+  "ts": 1785351599.195901
+ },
+ {
+  "id": "c7d527",
+  "a": "Self-Organization",
+  "b": "bridge1_Self-Organization",
+  "sim": 0.966,
+  "contradict": false,
+  "claim": "",
+  "status": "compatible",
+  "ts": 1785358659.7695563
+ },
+ {
+  "id": "4f6ff7",
+  "a": "Neuroscience",
+  "b": "bridge1_Neuroscience",
+  "sim": 0.966,
+  "contradict": false,
+  "claim": "",
+  "status": "compatible",
+  "ts": 1785358661.0983546
+ },
+ {
+  "id": "96ffc8",
+  "a": "cartographer-wren-shadow-kael-neuroscience---meta",
+  "b": "cartographer-wren-shadow-kael-neuroscience---meta",
+  "sim": 0.966,
+  "contradict": false,
+  "claim": "",
+  "status": "compatible",
+  "ts": 1785358662.621419
+ },
+ {
+  "id": "f7bc8a",
+  "a": "bridge1_Systems_Thinking",
+  "b": "l_final_Systems_Thinking",
+  "sim": 0.966,
+  "contradict": false,
+  "claim": "",
+  "status": "compatible",
+  "ts": 1785358663.9280982
+ },
+ {
+  "id": "bc4598",
+  "a": "ARI_2026-05-19_AI_Systems_Engineering_Is_AI_Engineering_A_Structural_Convergence",
+  "b": "ARI_2026-05-19_Software_Engineering_Is_AI_Engineering_A_Structural_Convergence",
+  "sim": 0.966,
+  "contradict": false,
+  "claim": "",
+  "status": "compatible",
+  "ts": 1785358666.1898334
+ },
+ {
+  "id": "aff2df",
+  "a": "cartographer-wren-artificer-rooke-meta-publications",
+  "b": "cartographer-wren-sergeant-voss-meta-publications",
+  "sim": 0.966,
+  "contradict": false,
+  "claim": "",
+  "status": "compatible",
+  "ts": 1785358667.7271068
+ },
+ {
+  "id": "009cc4",
+  "a": "Dynamical Systems",
+  "b": "backup_Dynamical_Systems",
+  "sim": 0.966,
+  "contradict": false,
+  "claim": "",
+  "status": "compatible",
+  "ts": 1785358669.4042304
+ },
+ {
+  "id": "0ca7f5",
+  "a": "king-aldric-dame-elara-neuroscience---meta",
+  "b": "dame-elara-king-aldric-neuroscience---meta",
+  "sim": 0.966,
+  "contradict": true,
+  "claim": "Cortese et al. (2012) meta-analysis of 55 fMRI studies of ADHD found convergent hypoactivation in fronto-striatal and fronto-cingulate circuits (per Note A) versus fronto-striatal and fronto-parietal ",
+  "status": "open",
+  "ts": 1785358671.3262348
+ },
+ {
+  "id": "599c1b",
+  "a": "r3_Augmentation_Symbiosis_—_Systems_That_Augment_Thei",
+  "b": "r4_Augmentation_Symbiosis_—_Systems_That_Au",
+  "sim": 0.965,
+  "contradict": false,
+  "claim": "",
+  "status": "compatible",
+  "ts": 1785365481.4223104
+ },
+ {
+  "id": "38d9de",
+  "a": "Stress Physiology",
+  "b": "bridge1_Stress_Physiology",
+  "sim": 0.965,
+  "contradict": false,
+  "claim": "",
+  "status": "compatible",
+  "ts": 1785365482.9023628
+ },
+ {
+  "id": "b77a13",
+  "a": "pipeline-mental-health",
+  "b": "pipeline-mental-health",
+  "sim": 0.965,
+  "contradict": false,
+  "claim": "",
+  "status": "compatible",
+  "ts": 1785365485.6601365
+ },
+ {
+  "id": "3e6656",
+  "a": "high-priest-orin-dame-elara-meta---physics",
+  "b": "high-priest-orin-dame-elara-meta---physics",
+  "sim": 0.965,
+  "contradict": false,
+  "claim": "",
+  "status": "compatible",
+  "ts": 1785365487.2859836
+ },
+ {
+  "id": "e73ce6",
+  "a": "artificer-rooke-shadow-kael-meta-infrastructure",
+  "b": "artificer-rooke-shadow-kael-meta-infrastructure",
+  "sim": 0.965,
+  "contradict": false,
+  "claim": "",
+  "status": "compatible",
+  "ts": 1785365488.904188
+ },
+ {
+  "id": "0b8967",
+  "a": "orphan_Artificial_Intelligence",
+  "b": "r2_Artificial_Intelligence",
+  "sim": 0.965,
+  "contradict": false,
+  "claim": "",
+  "status": "compatible",
+  "ts": 1785365490.168092
+ },
+ {
+  "id": "28643e",
+  "a": "Primary Visual Cortex",
+  "b": "Visual Cortex",
+  "sim": 0.965,
+  "contradict": false,
+  "claim": "",
+  "status": "compatible",
+  "ts": 1785365494.8241436
+ },
+ {
+  "id": "7516fd",
+  "a": "artificer-rooke-shadow-kael-meta-infrastructure",
+  "b": "artificer-rooke-shadow-kael-meta-infrastructure",
+  "sim": 0.961,
+  "contradict": false,
+  "claim": "",
+  "status": "compatible",
+  "ts": 1785365497.2318249
+ },
+ {
+  "id": "a933fa",
+  "a": "cartographer-wren-dame-elara-deep-cluster-ai-self-improvemen",
+  "b": "dame-elara-cartographer-wren-deep-cluster-ai-self-improvemen",
+  "sim": 0.965,
+  "contradict": false,
+  "claim": "",
+  "status": "compatible",
+  "ts": 1785372315.2785487
+ },
+ {
+  "id": "a1469f",
+  "a": "Bridge — Biostatistics Is the Applied Mathematics of All Healthcare Evidence",
+  "b": "Bridge_Bridge___Biostatistics_Is_the_Applied_Mathematics_of_All_Healthcare_Evidence",
+  "sim": 0.965,
+  "contradict": false,
+  "claim": "",
+  "status": "compatible",
+  "ts": 1785372317.5136528
+ },
+ {
+  "id": "895a08",
+  "a": "LLM Scaling Laws",
+  "b": "gdl_Scaling_Laws",
+  "sim": 0.965,
+  "contradict": false,
+  "claim": "",
+  "status": "compatible",
+  "ts": 1785372318.7223456
+ },
+ {
+  "id": "895e9f",
+  "a": "The_Vault_AI_Foundation_of_General",
+  "b": "What_Vault_AI_Knows_About_General_That_General_Doesnt_Know_About_Itself",
+  "sim": 0.965,
+  "contradict": true,
+  "claim": "Domain Vault_AI has 8 concepts linking to domain General.",
+  "status": "open",
+  "ts": 1785372345.3437626
+ },
+ {
+  "id": "58b50e",
+  "a": "ARI_2026-05-28_Predictive_Processing_and_Measurement_The_Hidden_Connection_Through_Bias",
+  "b": "ARI Predictive Processing and Measurement The Hidden Connect",
+  "sim": 0.965,
+  "contradict": true,
+  "claim": "The vault's notes on Neuroscience use the keywords \"rates, treatment, between\" and contain 10 concepts linking to Statistics, while also using the keywords \"population, effect, called\" and containing ",
+  "status": "open",
+  "ts": 1785372347.576819
+ },
+ {
+  "id": "73be35",
+  "a": "Learning",
+  "b": "r2_Learning",
+  "sim": 0.965,
+  "contradict": false,
+  "claim": "",
+  "status": "compatible",
+  "ts": 1785372348.833941
+ },
+ {
+  "id": "4057e0",
+  "a": "ARI_2026-05-28_What_Mathematics_Knows_About_Neuroscience_That_Neuroscience_Doesnt_Know_About_Itself",
+  "b": "ARI What Mathematics Knows About Neuroscience That Neuroscience",
+  "sim": 0.965,
+  "contradict": true,
+  "claim": "The vault's notes on Neuroscience use the keywords 'describes, model, differential' and also use the keywords 'describes, canonical, means'.",
+  "status": "open",
+  "ts": 1785372354.392375
+ },
+ {
+  "id": "05fa13",
+  "a": "AI",
+  "b": "r4_AI",
+  "sim": 0.965,
+  "contradict": false,
+  "claim": "",
+  "status": "compatible",
+  "ts": 1785372355.6189597
+ },
+ {
+  "id": "52b1f8",
+  "a": "pipeline-meta---sleep-neuroscience-cell-biology",
+  "b": "pipeline-meta---sleep-neuroscience-cell-biology",
+  "sim": 0.965,
+  "contradict": false,
+  "claim": "",
+  "status": "compatible",
+  "ts": 1785379208.994019
+ },
+ {
+  "id": "e4073d",
+  "a": "orphan_Phase_Transition",
+  "b": "pwback_Phase_Transition",
+  "sim": 0.965,
+  "contradict": false,
+  "claim": "",
+  "status": "compatible",
+  "ts": 1785379210.44803
+ },
+ {
+  "id": "42e26e",
+  "a": "Phase_Transition",
+  "b": "gdl_Phase_Transition",
+  "sim": 0.965,
+  "contradict": false,
+  "claim": "",
+  "status": "compatible",
+  "ts": 1785379211.719761
+ },
+ {
+  "id": "e6a54a",
+  "a": "Flow State",
+  "b": "Flow State",
+  "sim": 0.964,
+  "contradict": false,
+  "claim": "",
+  "status": "compatible",
+  "ts": 1785379213.009417
+ },
+ {
+  "id": "3fdc3d",
+  "a": "Drug Development Pipeline",
+  "b": "pwback_Drug_Development_Pipeline",
+  "sim": 0.964,
+  "contradict": false,
+  "claim": "",
+  "status": "compatible",
+  "ts": 1785379214.379548
+ },
+ {
+  "id": "caef70",
+  "a": "pipeline-business-chronobiology-complexity-sc",
+  "b": "pipeline-business-chronobiology-complexity-sc",
+  "sim": 0.964,
+  "contradict": false,
+  "claim": "",
+  "status": "compatible",
+  "ts": 1785379218.0177743
+ },
+ {
+  "id": "23e46d",
+  "a": "backup_Concept",
+  "b": "bridge1_Concept",
+  "sim": 0.964,
+  "contradict": false,
+  "claim": "",
+  "status": "compatible",
+  "ts": 1785379219.1848462
+ },
+ {
+  "id": "2adadf",
+  "a": "backup_Systems_Thinking",
+  "b": "pwback_Systems_Thinking",
+  "sim": 0.964,
+  "contradict": false,
+  "claim": "",
+  "status": "compatible",
+  "ts": 1785379220.4204586
+ },
+ {
+  "id": "60cf31",
+  "a": "desk-state-capacity",
+  "b": "desk-state-capacity",
+  "sim": 0.964,
+  "contradict": false,
+  "claim": "",
+  "status": "compatible",
+  "ts": 1785386125.3544505
+ },
+ {
+  "id": "30673f",
+  "a": "bridge1_Stress_Physiology",
+  "b": "pwback_Stress_Physiology",
+  "sim": 0.964,
+  "contradict": false,
+  "claim": "",
+  "status": "compatible",
+  "ts": 1785386126.6240044
+ },
+ {
+  "id": "d5a97a",
+  "a": "Emergence",
+  "b": "gdl_Emergence",
+  "sim": 0.964,
+  "contradict": false,
+  "claim": "",
+  "status": "compatible",
+  "ts": 1785386128.1640937
+ },
+ {
+  "id": "da0d32",
+  "a": "king-aldric-dame-elara-meta-infrastructure",
+  "b": "king-aldric-dame-elara-meta-infrastructure",
+  "sim": 0.964,
+  "contradict": false,
+  "claim": "",
+  "status": "compatible",
+  "ts": 1785386130.3682988
+ },
+ {
+  "id": "eff315",
+  "a": "Epigenetic Regulation — The Interface Between Environment and Genome",
+  "b": "pwback_Epigenetic_Regulation_—_The_In",
+  "sim": 0.963,
+  "contradict": false,
+  "claim": "",
+  "status": "compatible",
+  "ts": 1785386131.7105324
+ },
+ {
+  "id": "ee5146",
+  "a": "sage-mira-sergeant-voss-cross-domain---engineering",
+  "b": "sage-mira-sergeant-voss-cross-domain---engineering",
+  "sim": 0.963,
+  "contradict": false,
+  "claim": "",
+  "status": "compatible",
+  "ts": 1785386134.718251
+ },
+ {
+  "id": "c31d14",
+  "a": "high-priest-orin-sage-mira-meta---physics",
+  "b": "high-priest-orin-dame-elara-meta---physics",
+  "sim": 0.954,
+  "contradict": false,
+  "claim": "",
+  "status": "compatible",
+  "ts": 1785386136.8543563
+ },
+ {
+  "id": "c53ca2",
+  "a": "Psychology x Media",
+  "b": "Psychology × Philosophy",
+  "sim": 0.954,
+  "contradict": true,
+  "claim": "The same set of concepts (Media Ecology, Attention Economy, Cognitive Biases, etc.) belongs to both \"Psychology x Media\" and \"Psychology × Philosophy\".",
+  "status": "open",
+  "ts": 1785386140.5732677
+ },
+ {
+  "id": "5dc28f",
+  "a": "pipeline-physiology---research-methods",
+  "b": "pipeline-physiology---research-methods",
+  "sim": 0.968,
+  "contradict": false,
+  "claim": "",
+  "status": "compatible",
+  "ts": 1785393009.272723
+ },
+ {
+  "id": "a29798",
+  "a": "pipeline-physiology---research-methods",
+  "b": "pipeline-physiology---research-methods",
+  "sim": 0.965,
+  "contradict": false,
+  "claim": "",
+  "status": "compatible",
+  "ts": 1785393010.781202
+ },
+ {
+  "id": "b4a05d",
+  "a": "AI",
+  "b": "backup_AI",
+  "sim": 0.963,
+  "contradict": false,
+  "claim": "",
+  "status": "compatible",
+  "ts": 1785393012.061483
+ },
+ {
+  "id": "35a0ac",
+  "a": "sage-mira-high-priest-orin-ai-systems-complex-systems-safety",
+  "b": "high-priest-orin-sage-mira-ai-systems-complex-systems-safety",
+  "sim": 0.963,
+  "contradict": false,
+  "claim": "",
+  "status": "compatible",
+  "ts": 1785393014.1040666
+ },
+ {
+  "id": "634471",
+  "a": "pwback_AI_Agents",
+  "b": "r2_AI_Agents",
+  "sim": 0.963,
+  "contradict": false,
+  "claim": "",
+  "status": "compatible",
+  "ts": 1785393015.5009995
+ },
+ {
+  "id": "98e199",
+  "a": "pipeline-physiology---research-methods",
+  "b": "pipeline-physiology---research-methods",
+  "sim": 0.963,
+  "contradict": false,
+  "claim": "",
+  "status": "compatible",
+  "ts": 1785393017.142719
+ },
+ {
+  "id": "a0a292",
+  "a": "pipeline-v2-deep-research-phase-report",
+  "b": "pipeline-v2-deep-research-phase-report",
+  "sim": 0.963,
+  "contradict": false,
+  "claim": "",
+  "status": "compatible",
+  "ts": 1785393021.1189122
+ },
+ {
+  "id": "0e7c07",
+  "a": "Metabolic Health",
+  "b": "bridge1_Metabolic_Health",
+  "sim": 0.963,
+  "contradict": false,
+  "claim": "",
+  "status": "compatible",
+  "ts": 1785393023.0708942
+ },
+ {
+  "id": "73f717",
+  "a": "pipeline-finance---genomics",
+  "b": "pipeline-finance---genomics",
+  "sim": 0.963,
+  "contradict": false,
+  "claim": "",
+  "status": "compatible",
+  "ts": 1785400211.6516707
+ },
+ {
+  "id": "42035c",
+  "a": "pipeline-developer-experience",
+  "b": "pipeline-developer-experience",
+  "sim": 0.963,
+  "contradict": false,
+  "claim": "",
+  "status": "compatible",
+  "ts": 1785400213.7273722
+ },
+ {
+  "id": "e29632",
+  "a": "ARI What Formal Foundations Knows About Statistics That Statisti",
+  "b": "What_Formal_Foundations_Knows_About_Statistics_That_Statistics_Doesnt_Know_Abou",
+  "sim": 0.963,
+  "contradict": true,
+  "claim": "The number of concepts from Formal Foundations linking to Statistics is both 11 and 22.",
+  "status": "open",
+  "ts": 1785400215.3206043
+ },
+ {
+  "id": "f799ef",
+  "a": "AI",
+  "b": "r3_AI",
+  "sim": 0.963,
+  "contradict": false,
+  "claim": "",
+  "status": "compatible",
+  "ts": 1785400216.7489212
+ },
+ {
+  "id": "813ff0",
+  "a": "ARI_2026-05-23_Missing_Link_Why_Sleep_Neuroscience_Needs_a_Bridge_to_Cell_Biology",
+  "b": "ARI Missing Link Why Sleep Neuroscience Needs a Bridge to Cel",
+  "sim": 0.963,
+  "contradict": false,
+  "claim": "",
+  "status": "compatible",
+  "ts": 1785400218.751896
+ },
+ {
+  "id": "93d543",
+  "a": "backup_Cardiovascular_Health",
+  "b": "l_final_Cardiovascular_Health",
+  "sim": 0.963,
+  "contradict": false,
+  "claim": "",
+  "status": "compatible",
+  "ts": 1785400220.088237
+ },
+ {
+  "id": "3f48c5",
+  "a": "bridge-linear-algebra-to-knowledge-graph-embedding-validatio",
+  "b": "pipeline-bridge-linear-algebra-to-knowledge-graph-embedding-",
+  "sim": 0.963,
+  "contradict": false,
+  "claim": "",
+  "status": "compatible",
+  "ts": 1785400221.7417696
+ },
+ {
+  "id": "93ab75",
+  "a": "bridge1_Neuroscience",
+  "b": "l_final_Neuroscience",
+  "sim": 0.962,
+  "contradict": false,
+  "claim": "",
+  "status": "compatible",
+  "ts": 1785400223.0572681
+ },
+ {
+  "id": "4b3917",
+  "a": "Graph Theory",
+  "b": "gdl_Graph_Theory",
+  "sim": 0.962,
+  "contradict": false,
+  "claim": "",
+  "status": "compatible",
+  "ts": 1785407410.1177406
+ },
+ {
+  "id": "2c8ce0",
+  "a": "AI Self-Learning WEEKLY",
+  "b": "AI Self-Learning",
+  "sim": 0.962,
+  "contradict": false,
+  "claim": "",
+  "status": "compatible",
+  "ts": 1785407411.6573567
+ },
+ {
+  "id": "84d156",
+  "a": "pipeline-longevity-cell-biology",
+  "b": "pipeline-longevity-cell-biology",
+  "sim": 0.962,
+  "contradict": false,
+  "claim": "",
+  "status": "compatible",
+  "ts": 1785407413.7488554
+ },
+ {
+  "id": "e65497",
+  "a": "cartographer-wren-artificer-rooke-earth-systems---finance",
+  "b": "cartographer-wren-sergeant-voss-earth-systems---finance",
+  "sim": 0.962,
+  "contradict": false,
+  "claim": "",
+  "status": "compatible",
+  "ts": 1785407415.1423962
+ },
+ {
+  "id": "206efd",
+  "a": "r3_Learning",
+  "b": "r4_Learning",
+  "sim": 0.962,
+  "contradict": false,
+  "claim": "",
+  "status": "compatible",
+  "ts": 1785407416.7993495
+ },
+ {
+  "id": "90c79a",
+  "a": "Free_Energy_Principle",
+  "b": "l_final_Free_Energy_Principle",
+  "sim": 0.962,
+  "contradict": false,
+  "claim": "",
+  "status": "compatible",
+  "ts": 1785407418.384316
+ },
+ {
+  "id": "55fd02",
+  "a": "bridge1_Finance",
+  "b": "r2_Finance",
+  "sim": 0.962,
+  "contradict": false,
+  "claim": "",
+  "status": "compatible",
+  "ts": 1785407420.2026856
+ },
+ {
+  "id": "104a19",
+  "a": "orphan_Reinforcement_Learning",
+  "b": "r3_Reinforcement_Learning",
+  "sim": 0.962,
+  "contradict": false,
+  "claim": "",
+  "status": "compatible",
+  "ts": 1785407422.2187686
+ },
+ {
+  "id": "3eb91d",
+  "a": "shadow-kael-king-aldric-business---statistics",
+  "b": "shadow-kael-king-aldric-business---statistics",
+  "sim": 0.962,
+  "contradict": false,
+  "claim": "",
+  "status": "compatible",
+  "ts": 1785414648.3020873
+ },
+ {
+  "id": "44d8ac",
+  "a": "r2_Learning",
+  "b": "r4_Learning",
+  "sim": 0.962,
+  "contradict": false,
+  "claim": "",
+  "status": "compatible",
+  "ts": 1785414650.3842106
+ },
+ {
+  "id": "170c4c",
+  "a": "ARI_2026-05-24_What_Statistics_Knows_About_Complexity_Science_That_Complexity_Science_Doesnt_Know_About_Itself",
+  "b": "ARI What Statistics Knows About Complexity Science That Complexi",
+  "sim": 0.962,
+  "contradict": true,
+  "claim": "Statistics has both 6 and 7 concepts linking to Complexity Science.",
+  "status": "open",
+  "ts": 1785414657.713907
+ },
+ {
+  "id": "7e8e8d",
+  "a": "pipeline-software-engineering---meta",
+  "b": "pipeline-software-engineering---meta",
+  "sim": 0.962,
+  "contradict": false,
+  "claim": "",
+  "status": "compatible",
+  "ts": 1785414660.5772994
+ },
+ {
+  "id": "7adf2f",
+  "a": "Free_Energy_Principle",
+  "b": "gdl_Free_Energy_Principle",
+  "sim": 0.962,
+  "contradict": false,
+  "claim": "",
+  "status": "compatible",
+  "ts": 1785414662.5631628
+ },
+ {
+  "id": "e0e2f4",
+  "a": "pipeline-knowledge-trajectory-selekcia-a-product-analysis",
+  "b": "pipeline-knowledge-trajectory-selekcia-a-product-analysis",
+  "sim": 0.962,
+  "contradict": false,
+  "claim": "",
+  "status": "compatible",
+  "ts": 1785414665.2043707
+ },
+ {
+  "id": "28d9e3",
+  "a": "Causal Inference × Statistics",
+  "b": "Statistics Causal Inference Bridge",
+  "sim": 0.962,
+  "contradict": false,
+  "claim": "",
+  "status": "compatible",
+  "ts": 1785414667.0287042
+ },
+ {
+  "id": "21b836",
+  "a": "pipeline-finance---social-sciences",
+  "b": "pipeline-finance---social-sciences",
+  "sim": 0.962,
+  "contradict": false,
+  "claim": "",
+  "status": "compatible",
+  "ts": 1785414668.7977002
+ },
+ {
+  "id": "062858",
+  "a": "pipeline-psychology---sleep-neuroscience-cell-biology",
+  "b": "pipeline-psychology---sleep-neuroscience-cell-biology",
+  "sim": 0.968,
+  "contradict": false,
+  "claim": "",
+  "status": "compatible",
+  "ts": 1785421944.0667984
+ },
+ {
+  "id": "d7821c",
+  "a": "pipeline-psychology---sleep-neuroscience-cell-biology",
+  "b": "pipeline-psychology---sleep-neuroscience-cell-biology",
+  "sim": 0.967,
+  "contradict": false,
+  "claim": "",
+  "status": "compatible",
+  "ts": 1785421946.3235202
+ },
+ {
+  "id": "ff471f",
+  "a": "pipeline-softwareengineering",
+  "b": "pipeline-softwareengineering",
+  "sim": 0.962,
+  "contradict": false,
+  "claim": "",
+  "status": "compatible",
+  "ts": 1785421950.6331291
+ },
+ {
+  "id": "886492",
+  "a": "Emotional Regulation",
+  "b": "Emotional Regulation",
+  "sim": 0.961,
+  "contradict": false,
+  "claim": "",
+  "status": "compatible",
+  "ts": 1785421959.807913
+ },
+ {
+  "id": "926583",
+  "a": "pipeline-reality-di-pompeo-and-tucci-2023-emphasize-that-imp",
+  "b": "pipeline-reality-di-pompeo-and-tucci-2023-identify-that-impr",
+  "sim": 0.961,
+  "contradict": false,
+  "claim": "",
+  "status": "compatible",
+  "ts": 1785421961.4724302
+ },
+ {
+  "id": "76b1a3",
+  "a": "create-validation-module-for-hippocampal-learning",
+  "b": "create-validation-module-for-hippocampal-learning-claims",
+  "sim": 0.961,
+  "contradict": false,
+  "claim": "",
+  "status": "compatible",
+  "ts": 1785421963.273703
+ },
+ {
+  "id": "ce76fe",
+  "a": "artificer-rooke-king-aldric-meta-infrastructure",
+  "b": "king-aldric-dame-elara-meta-infrastructure",
+  "sim": 0.961,
+  "contradict": false,
+  "claim": "",
+  "status": "compatible",
+  "ts": 1785421965.98064
+ },
+ {
+  "id": "1e1629",
+  "a": "Suprachiasmatic Nucleus SCN",
+  "b": "Suprachiasmatic Nucleus (SCN)",
+  "sim": 0.961,
+  "contradict": false,
+  "claim": "",
+  "status": "compatible",
+  "ts": 1785421967.8807676
+ },
+ {
+  "id": "9bc432",
+  "a": "Risk Management",
+  "b": "bridge1_Risk_Management",
+  "sim": 0.961,
+  "contradict": false,
+  "claim": "",
+  "status": "compatible",
+  "ts": 1785429038.8425982
+ },
+ {
+  "id": "9e4d81",
+  "a": "Causal Inference for Trading Strategy Development",
+  "b": "bridge1_Causal_Inference_for_Trading_Strate",
+  "sim": 0.961,
+  "contradict": false,
+  "claim": "",
+  "status": "compatible",
+  "ts": 1785429040.516603
+ },
+ {
+  "id": "48327c",
+  "a": "sergeant-voss-sage-mira-finance---health-medicine",
+  "b": "sergeant-voss-sage-mira-finance---health-medicine",
+  "sim": 0.961,
+  "contradict": false,
+  "claim": "",
+  "status": "compatible",
+  "ts": 1785429042.1804183
+ },
+ {
+  "id": "fa7eee",
+  "a": "pipeline-cross-domain-synthesis---engineering",
+  "b": "pipeline-cross-domain-synthesis---engineering",
+  "sim": 0.959,
+  "contradict": false,
+  "claim": "",
+  "status": "compatible",
+  "ts": 1785429044.2503943
+ },
+ {
+  "id": "eb66c8",
+  "a": "sergeant-voss-shadow-kael-social-sciences---statistics",
+  "b": "sergeant-voss-shadow-kael-social-sciences---statistics",
+  "sim": 0.958,
+  "contradict": false,
+  "claim": "",
+  "status": "compatible",
+  "ts": 1785429046.906623
+ },
+ {
+  "id": "608c00",
+  "a": "proposal-structured-knowledge-base-with-versioning-and-cross",
+  "b": "proposal-structured-knowledge-base-with-versioning-and-cross",
+  "sim": 0.957,
+  "contradict": false,
+  "claim": "",
+  "status": "compatible",
+  "ts": 1785429049.1250684
+ },
+ {
+  "id": "0379fd",
+  "a": "develop-the-gap-software-architecture---the-hard-parts-key-p",
+  "b": "develop-the-gap-software-architecture---the-hard-parts-key-p",
+  "sim": 0.957,
+  "contradict": false,
+  "claim": "",
+  "status": "compatible",
+  "ts": 1785429051.1298597
+ },
+ {
+  "id": "61966f",
+  "a": "ARI_2026-05-20_What_Finance_Knows_About_AI_Systems_Engineering_That_AI_Systems_Engineering_Doesnt_Know_About_Itself",
+  "b": "ARI_2026-05-22_What_Finance_Knows_About_AI_Systems_Engineering_That_AI_Systems_Engineering_Doesnt_Know_About_Itself",
+  "sim": 0.955,
+  "contradict": true,
+  "claim": "The relationship between Finance and AI/Systems Engineering involves a missing concept that needs to be synthesized, versus the two domains already describe the same thing but do not recognize it.",
+  "status": "open",
+  "ts": 1785429056.7249906
+ },
+ {
+  "id": "34c82a",
+  "a": "pipeline-media-attention-business",
+  "b": "pipeline-media-attention-business",
+  "sim": 0.966,
+  "contradict": false,
+  "claim": "",
+  "status": "compatible",
+  "ts": 1785436131.2330854
+ },
+ {
+  "id": "41a18b",
+  "a": "sergeant-voss-high-priest-orin-neuroscience---meta",
+  "b": "high-priest-orin-sergeant-voss-neuroscience---meta",
+  "sim": 0.955,
+  "contradict": false,
+  "claim": "",
+  "status": "compatible",
+  "ts": 1785436133.6478112
+ },
+ {
+  "id": "66885e",
+  "a": "bridge1_Cortisol",
+  "b": "pwback_Cortisol",
+  "sim": 0.955,
+  "contradict": false,
+  "claim": "",
+  "status": "compatible",
+  "ts": 1785436135.1436548
+ },
+ {
+  "id": "78cdd3",
+  "a": "high-priest-orin-dame-elara-healthcare-causal-inference",
+  "b": "sage-mira-high-priest-orin-healthcare-causal-inference",
+  "sim": 0.955,
+  "contradict": false,
+  "claim": "",
+  "status": "compatible",
+  "ts": 1785436137.1069455
+ },
+ {
+  "id": "4dc363",
+  "a": "Research Methods Bridge",
+  "b": "Research Methods Causal Bridge",
+  "sim": 0.955,
+  "contradict": false,
+  "claim": "",
+  "status": "compatible",
+  "ts": 1785436138.877664
+ },
+ {
+  "id": "9f365b",
+  "a": "artificer-rooke-dame-elara-healthcare---software-engineering",
+  "b": "dame-elara-artificer-rooke-healthcare---software-engineering",
+  "sim": 0.954,
+  "contradict": false,
+  "claim": "",
+  "status": "compatible",
+  "ts": 1785436141.9540193
+ },
+ {
+  "id": "c78f9b",
+  "a": "sergeant-voss-artificer-rooke-cross-domain---statistics",
+  "b": "sergeant-voss-king-aldric-cross-domain---statistics",
+  "sim": 0.954,
+  "contradict": false,
+  "claim": "",
+  "status": "compatible",
+  "ts": 1785436143.5156627
+ },
+ {
+  "id": "aefc01",
+  "a": "Bridge — The Grid and the Brain Share the Same Criticality Dynamics",
+  "b": "Bridge_Bridge___The_Grid_and_the_Brain_Share_the_Same_Criticality_Dynamics",
+  "sim": 0.954,
+  "contradict": false,
+  "claim": "",
+  "status": "compatible",
+  "ts": 1785436145.9151413
+ },
+ {
+  "id": "0f7a10",
+  "a": "pipeline-ai-systems-complex-systems-safety",
+  "b": "pipeline-ai-systems-complex-systems-safety",
+  "sim": 0.97,
+  "contradict": false,
+  "claim": "",
+  "status": "compatible",
+  "ts": 1785443426.9598353
+ },
+ {
+  "id": "9c899a",
+  "a": "pipeline-earth-systems---finance",
+  "b": "pipeline-earth-systems---finance",
+  "sim": 0.969,
+  "contradict": false,
+  "claim": "",
+  "status": "compatible",
+  "ts": 1785443429.5746334
+ },
+ {
+  "id": "9d84e7",
+  "a": "pipeline-ai-systems-complex-systems-safety",
+  "b": "pipeline-ai-systems-complex-systems-safety",
+  "sim": 0.967,
+  "contradict": false,
+  "claim": "",
+  "status": "compatible",
+  "ts": 1785443432.3603442
+ },
+ {
+  "id": "04f584",
+  "a": "frontier-test-agoras-claim-when-is-a-randomized-ab-test-stri",
+  "b": "frontier-test-agoras-claim-when-is-a-randomized-ab-test-stri",
+  "sim": 0.966,
+  "contradict": false,
+  "claim": "",
+  "status": "compatible",
+  "ts": 1785443436.682148
+ },
+ {
+  "id": "9155a9",
+  "a": "pipeline-earth-systems---finance",
+  "b": "pipeline-earth-systems---finance",
+  "sim": 0.961,
+  "contradict": false,
+  "claim": "",
+  "status": "compatible",
+  "ts": 1785443440.7621958
+ },
+ {
+  "id": "43b6e9",
+  "a": "pipeline-ai-systems-complex-systems-safety",
+  "b": "pipeline-ai-systems-complex-systems-safety",
+  "sim": 0.959,
+  "contradict": false,
+  "claim": "",
+  "status": "compatible",
+  "ts": 1785443443.087121
+ },
+ {
+  "id": "721764",
+  "a": "pipeline-earth-systems---finance",
+  "b": "pipeline-earth-systems---finance",
+  "sim": 0.959,
+  "contradict": false,
+  "claim": "",
+  "status": "compatible",
+  "ts": 1785443445.9808726
+ },
+ {
+  "id": "ab696e",
+  "a": "pipeline-earth-systems---finance",
+  "b": "pipeline-earth-systems---finance",
+  "sim": 0.959,
+  "contradict": false,
+  "claim": "",
+  "status": "compatible",
+  "ts": 1785443462.703307
+ },
+ {
+  "id": "67b6c3",
+  "a": "pipeline-meta---physics",
+  "b": "pipeline-meta---physics",
+  "sim": 0.97,
+  "contradict": false,
+  "claim": "",
+  "status": "compatible",
+  "ts": 1785450536.5538611
+ },
+ {
+  "id": "4c31b3",
+  "a": "pipeline-cognitive-science---statistics",
+  "b": "pipeline-cognitive-science---statistics",
+  "sim": 0.967,
+  "contradict": false,
+  "claim": "",
+  "status": "compatible",
+  "ts": 1785450538.7734108
+ },
+ {
+  "id": "1ab7b3",
+  "a": "pipeline-cognitive-science---statistics",
+  "b": "pipeline-cognitive-science---statistics",
+  "sim": 0.966,
+  "contradict": false,
+  "claim": "",
+  "status": "compatible",
+  "ts": 1785450540.7772315
+ },
+ {
+  "id": "71e134",
+  "a": "pipeline-meta---physics",
+  "b": "pipeline-meta---physics",
+  "sim": 0.965,
+  "contradict": false,
+  "claim": "",
+  "status": "compatible",
+  "ts": 1785450542.5807076
+ },
+ {
+  "id": "dbe079",
+  "a": "pipeline-cognitive-science---statistics",
+  "b": "pipeline-cognitive-science---statistics",
+  "sim": 0.962,
+  "contradict": false,
+  "claim": "",
+  "status": "compatible",
+  "ts": 1785450544.935338
+ },
+ {
+  "id": "106699",
+  "a": "pipeline-meta---physics",
+  "b": "pipeline-meta---physics",
+  "sim": 0.96,
+  "contradict": false,
+  "claim": "",
+  "status": "compatible",
+  "ts": 1785450547.087199
+ },
+ {
+  "id": "1bec4a",
+  "a": "Cortisol",
+  "b": "bridge1_Cortisol",
+  "sim": 0.955,
+  "contradict": false,
+  "claim": "",
+  "status": "compatible",
+  "ts": 1785450548.4882507
+ },
+ {
+  "id": "ba4925",
+  "a": "cartographer-wren-shadow-kael-business-chronobiology-complex",
+  "b": "shadow-kael-cartographer-wren-business-chronobiology-complex",
+  "sim": 0.954,
+  "contradict": false,
+  "claim": "",
+  "status": "compatible",
+  "ts": 1785450550.2042747
+ },
+ {
+  "id": "93638e",
+  "a": "pipeline-mathematics",
+  "b": "pipeline-mathematics",
+  "sim": 0.969,
+  "contradict": false,
+  "claim": "",
+  "status": "compatible",
+  "ts": 1785457739.915821
+ },
+ {
+  "id": "c7a9ca",
+  "a": "pipeline-healthcare-causal-inference",
+  "b": "pipeline-healthcare-causal-inference",
+  "sim": 0.969,
+  "contradict": false,
+  "claim": "",
+  "status": "compatible",
+  "ts": 1785457741.818079
+ },
+ {
+  "id": "7df568",
+  "a": "pipeline-media-attention---statistics",
+  "b": "pipeline-media-attention---statistics",
+  "sim": 0.969,
+  "contradict": false,
+  "claim": "",
+  "status": "compatible",
+  "ts": 1785457743.5407238
+ },
+ {
+  "id": "42904a",
+  "a": "pipeline-mathematics",
+  "b": "pipeline-mathematics",
+  "sim": 0.967,
+  "contradict": false,
+  "claim": "",
+  "status": "compatible",
+  "ts": 1785457746.4014745
+ },
+ {
+  "id": "4220f2",
+  "a": "pipeline-healthcare-causal-inference",
+  "b": "pipeline-healthcare-causal-inference",
+  "sim": 0.965,
+  "contradict": false,
+  "claim": "",
+  "status": "compatible",
+  "ts": 1785457751.3930597
+ },
+ {
+  "id": "f3d820",
+  "a": "desk-risk-aversion",
+  "b": "desk-risk-aversion",
+  "sim": 0.962,
+  "contradict": false,
+  "claim": "",
+  "status": "compatible",
+  "ts": 1785457753.4599786
+ },
+ {
+  "id": "31f643",
+  "a": "pipeline-media-attention---statistics",
+  "b": "pipeline-media-attention---statistics",
+  "sim": 0.962,
+  "contradict": false,
+  "claim": "",
+  "status": "compatible",
+  "ts": 1785457756.4542418
+ },
+ {
+  "id": "397199",
+  "a": "pipeline-healthcare-causal-inference",
+  "b": "pipeline-healthcare-causal-inference",
+  "sim": 0.962,
+  "contradict": false,
+  "claim": "",
+  "status": "compatible",
+  "ts": 1785457758.9022796
+ },
+ {
+  "id": "fa1a47",
+  "a": "pipeline-linguistics---software-engineering",
+  "b": "pipeline-linguistics---software-engineering",
+  "sim": 0.968,
+  "contradict": false,
+  "claim": "",
+  "status": "compatible",
+  "ts": 1785464961.4132226
+ },
+ {
+  "id": "1d4899",
+  "a": "pipeline-cross-domain---cross-domain",
+  "b": "pipeline-cross-domain---cross-domain",
+  "sim": 0.967,
+  "contradict": false,
+  "claim": "",
+  "status": "compatible",
+  "ts": 1785464963.4896684
+ },
+ {
+  "id": "d63c0f",
+  "a": "pipeline-linguistics---software-engineering",
+  "b": "pipeline-linguistics---software-engineering",
+  "sim": 0.967,
+  "contradict": false,
+  "claim": "",
+  "status": "compatible",
+  "ts": 1785464965.35704
+ },
+ {
+  "id": "67f8fc",
+  "a": "pipeline-finance-philosophy",
+  "b": "pipeline-finance-philosophy",
+  "sim": 0.966,
+  "contradict": false,
+  "claim": "",
+  "status": "compatible",
+  "ts": 1785464974.9392428
+ },
+ {
+  "id": "855300",
+  "a": "pipeline-linguistics---software-engineering",
+  "b": "pipeline-linguistics---software-engineering",
+  "sim": 0.966,
+  "contradict": false,
+  "claim": "",
+  "status": "compatible",
+  "ts": 1785464977.18667
+ },
+ {
+  "id": "840a76",
+  "a": "pipeline-linguistics---software-engineering",
+  "b": "pipeline-linguistics---software-engineering",
+  "sim": 0.966,
+  "contradict": false,
+  "claim": "",
+  "status": "compatible",
+  "ts": 1785464979.3041792
+ },
+ {
+  "id": "739602",
+  "a": "pipeline-meta-publications",
+  "b": "pipeline-meta-publications",
+  "sim": 0.966,
+  "contradict": false,
+  "claim": "",
+  "status": "compatible",
+  "ts": 1785464981.043413
+ },
+ {
+  "id": "f887da",
+  "a": "pipeline-linguistics---software-engineering",
+  "b": "pipeline-linguistics---software-engineering",
+  "sim": 0.965,
+  "contradict": false,
+  "claim": "",
+  "status": "compatible",
+  "ts": 1785464982.6937528
+ },
+ {
+  "id": "29345d",
+  "a": "pipeline-cross-domain-synthesis---cross-domain",
+  "b": "pipeline-cross-domain-synthesis---cross-domain",
+  "sim": 0.969,
+  "contradict": false,
+  "claim": "",
+  "status": "compatible",
+  "ts": 1785472124.9859471
+ },
+ {
+  "id": "4f83ae",
+  "a": "pipeline-cross-domain-synthesis---cross-domain",
+  "b": "pipeline-cross-domain-synthesis---cross-domain",
+  "sim": 0.969,
+  "contradict": false,
+  "claim": "",
+  "status": "compatible",
+  "ts": 1785472128.7641866
+ },
+ {
+  "id": "685ebc",
+  "a": "pipeline-social-sciences---statistics",
+  "b": "pipeline-social-sciences---statistics",
+  "sim": 0.966,
+  "contradict": false,
+  "claim": "",
+  "status": "compatible",
+  "ts": 1785472132.5591729
+ },
+ {
+  "id": "11ad0b",
+  "a": "pipeline-finance---meta",
+  "b": "pipeline-finance---meta",
+  "sim": 0.965,
+  "contradict": false,
+  "claim": "",
+  "status": "compatible",
+  "ts": 1785472134.7062967
+ },
+ {
+  "id": "bc5da4",
+  "a": "pipeline-cross-domain---psychology",
+  "b": "pipeline-cross-domain---psychology",
+  "sim": 0.965,
+  "contradict": false,
+  "claim": "",
+  "status": "compatible",
+  "ts": 1785472136.410809
+ },
+ {
+  "id": "e6d192",
+  "a": "pipeline-social-sciences---statistics",
+  "b": "pipeline-social-sciences---statistics",
+  "sim": 0.964,
+  "contradict": false,
+  "claim": "",
+  "status": "compatible",
+  "ts": 1785472139.4081583
+ },
+ {
+  "id": "ea8032",
+  "a": "pipeline-cross-domain-synthesis---cross-domain",
+  "b": "pipeline-cross-domain-synthesis---cross-domain",
+  "sim": 0.964,
+  "contradict": false,
+  "claim": "",
+  "status": "compatible",
+  "ts": 1785472141.1451683
+ },
+ {
+  "id": "251d01",
+  "a": "pipeline-social-sciences---statistics",
+  "b": "pipeline-social-sciences---statistics",
+  "sim": 0.963,
+  "contradict": false,
+  "claim": "",
+  "status": "compatible",
+  "ts": 1785472148.199098
+ },
+ {
+  "id": "081535",
+  "a": "Falsification 2026-05-30 — dpo-variants — formula",
+  "b": "Falsification 2026-06-01 — dpo-variants — formula opísaný",
+  "sim": 0.968,
+  "contradict": false,
+  "claim": "",
+  "status": "compatible",
+  "ts": 1785479444.3067403
+ },
+ {
+  "id": "d4569d",
+  "a": "pipeline-economics---software-engineering",
+  "b": "pipeline-economics---software-engineering",
+  "sim": 0.962,
+  "contradict": false,
+  "claim": "",
+  "status": "compatible",
+  "ts": 1785479446.8899438
+ },
+ {
+  "id": "f85435",
+  "a": "Differential Equations",
+  "b": "gdl_Differential_Equations",
+  "sim": 0.961,
+  "contradict": false,
+  "claim": "",
+  "status": "compatible",
+  "ts": 1785479448.3445497
+ },
+ {
+  "id": "fca352",
+  "a": "AMOC Collapse",
+  "b": "Atlantic Meridional Overturning Circulation (AMOC)",
+  "sim": 0.961,
+  "contradict": false,
+  "claim": "",
+  "status": "compatible",
+  "ts": 1785479450.1881404
+ },
+ {
+  "id": "39256c",
+  "a": "gdl_Emergence",
+  "b": "l_final_Emergence",
+  "sim": 0.961,
+  "contradict": false,
+  "claim": "",
+  "status": "compatible",
+  "ts": 1785479451.7310197
+ },
+ {
+  "id": "37f150",
+  "a": "Breaktruth #22 — Blooms_2-Sigma_Problem_Is_Solved_-_LLMs_Are_the_First_Scalable_One-on-One_Tutor",
+  "b": "breaktruth_22_newsletter",
+  "sim": 0.961,
+  "contradict": false,
+  "claim": "",
+  "status": "compatible",
+  "ts": 1785479453.7420666
+ },
+ {
+  "id": "514f10",
+  "a": "Breaktruth #22 — Blooms_2-Sigma_Problem_Is_Solved_-_LLMs_Are_the_First_Scalable_One-on-One_Tutor",
+  "b": "breaktruth_22_newsletter",
+  "sim": 0.961,
+  "contradict": false,
+  "claim": "",
+  "status": "compatible",
+  "ts": 1785479453.7430668
+ },
+ {
+  "id": "284d30",
+  "a": "general_x_neuroscience",
+  "b": "mathematics_x_neuroscience",
+  "sim": 0.961,
+  "contradict": true,
+  "claim": "The bridge concept is between General and Neuroscience, and also between Mathematics and Neuroscience.",
+  "status": "open",
+  "ts": 1785479457.5023098
+ },
+ {
+  "id": "79f0f4",
+  "a": "task_market_analysis",
+  "b": "_current_task",
+  "sim": 0.97,
+  "contradict": false,
+  "claim": "",
+  "status": "compatible",
+  "ts": 1785486909.8504467
+ },
+ {
+  "id": "d492d7",
+  "a": "The Addictive Loop — Why Agents Get Stuck and What Neuroscience Teaches Us About Recovery",
+  "b": "The Social Mirror — Agent Theory of Mind as an Architectural Consequence",
+  "sim": 0.962,
+  "contradict": false,
+  "claim": "",
+  "status": "compatible",
+  "ts": 1785486911.3643672
+ },
+ {
+  "id": "fa28cb",
+  "a": "distributed-knowledge-graph-for-agent-coordination-upgrade-p",
+  "b": "distributed-knowledge-graph-for-agent-coordination",
+  "sim": 0.962,
+  "contradict": false,
+  "claim": "",
+  "status": "compatible",
+  "ts": 1785486913.2818007
+ },
+ {
+  "id": "5be89f",
+  "a": "cartographer-wren-high-priest-orin-social-sciences---statist",
+  "b": "cartographer-wren-high-priest-orin-social-sciences---statist",
+  "sim": 0.961,
+  "contradict": false,
+  "claim": "",
+  "status": "compatible",
+  "ts": 1785486915.1990762
+ },
+ {
+  "id": "0da66c",
+  "a": "cartographer-wren-high-priest-orin-linguistics---statistics",
+  "b": "high-priest-orin-cartographer-wren-linguistics---statistics",
+  "sim": 0.961,
+  "contradict": false,
+  "claim": "",
+  "status": "compatible",
+  "ts": 1785486916.8835545
+ },
+ {
+  "id": "7bc511",
+  "a": "Breaktruth #20 — Legal_Causation_Is_the_Original_Causal_Inference_-_Why_the_Law_Predates_Pearl_by",
+  "b": "breaktruth_20_newsletter",
+  "sim": 0.96,
+  "contradict": false,
+  "claim": "",
+  "status": "compatible",
+  "ts": 1785486918.5488203
+ },
+ {
+  "id": "616c56",
+  "a": "Breaktruth #20 — Legal_Causation_Is_the_Original_Causal_Inference_-_Why_the_Law_Predates_Pearl_by",
+  "b": "breaktruth_20_newsletter",
+  "sim": 0.96,
+  "contradict": false,
+  "claim": "",
+  "status": "compatible",
+  "ts": 1785486918.5488203
+ },
+ {
+  "id": "b91280",
+  "a": "Epigenetic Regulation — The Interface Between Environment and Genome",
+  "b": "r3_Epigenetic_Regulation_—_The_Interface_Between_Envi",
+  "sim": 0.96,
+  "contradict": false,
+  "claim": "",
+  "status": "compatible",
+  "ts": 1785486919.8842528
+ },
+ {
+  "id": "111c09",
+  "a": "pipeline-psychology-media-attention",
+  "b": "pipeline-media-attention-psychology",
+  "sim": 0.97,
+  "contradict": false,
+  "claim": "",
+  "status": "compatible",
+  "ts": 1785494307.911642
+ },
+ {
+  "id": "72202c",
+  "a": "pipeline-psychology-media-attention",
+  "b": "pipeline-media-attention-psychology",
+  "sim": 0.963,
+  "contradict": false,
+  "claim": "",
+  "status": "compatible",
+  "ts": 1785494310.1175573
+ },
+ {
+  "id": "fce37c",
+  "a": "gdl_Scaling_Laws",
+  "b": "orphan_Scaling_Laws",
+  "sim": 0.96,
+  "contradict": false,
+  "claim": "",
+  "status": "compatible",
+  "ts": 1785494311.7842865
+ },
+ {
+  "id": "8d1120",
+  "a": "pipeline-cross-domain---statistics",
+  "b": "pipeline-cross-domain---statistics",
+  "sim": 0.96,
+  "contradict": false,
+  "claim": "",
+  "status": "compatible",
+  "ts": 1785494314.4223638
+ },
+ {
+  "id": "8c81e8",
+  "a": "pipeline-business---causal-inference",
+  "b": "pipeline-business---causal-inference",
+  "sim": 0.96,
+  "contradict": false,
+  "claim": "",
+  "status": "compatible",
+  "ts": 1785494316.111741
+ },
+ {
+  "id": "da0e87",
+  "a": "pipeline-cross-domain---engineering",
+  "b": "pipeline-cross-domain---engineering",
+  "sim": 0.96,
+  "contradict": false,
+  "claim": "",
+  "status": "compatible",
+  "ts": 1785494318.94912
+ },
+ {
+  "id": "0e896d",
+  "a": "ARI Sleep Neuroscience and Cell Biology Are the Same System",
+  "b": "ARI What Sleep Neuroscience Knows About Cell Biology That Cell",
+  "sim": 0.959,
+  "contradict": false,
+  "claim": "",
+  "status": "compatible",
+  "ts": 1785494320.5030434
+ },
+ {
+  "id": "ea5e76",
+  "a": "cartographer-wren-sage-mira-general---health-medicine",
+  "b": "cartographer-wren-sage-mira-general---health-medicine",
+  "sim": 0.959,
+  "contradict": false,
+  "claim": "",
+  "status": "compatible",
+  "ts": 1785494321.9321868
+ },
+ {
+  "id": "6981a9",
+  "a": "pipeline-media-attention-psychology",
+  "b": "pipeline-media-attention-psychology",
+  "sim": 0.968,
+  "contradict": false,
+  "claim": "",
+  "status": "compatible",
+  "ts": 1785501760.5934045
+ },
+ {
+  "id": "dbd349",
+  "a": "pipeline-media-attention-psychology",
+  "b": "pipeline-media-attention-psychology",
+  "sim": 0.964,
+  "contradict": false,
+  "claim": "",
+  "status": "compatible",
+  "ts": 1785501762.840565
+ },
+ {
+  "id": "847242",
+  "a": "bridge1_Self-Organization",
+  "b": "pwback_Self-Organization",
+  "sim": 0.959,
+  "contradict": false,
+  "claim": "",
+  "status": "compatible",
+  "ts": 1785501764.798972
+ },
+ {
+  "id": "ff292f",
+  "a": "gdl_Graph_Theory",
+  "b": "orphan_Graph_Theory",
+  "sim": 0.959,
+  "contradict": false,
+  "claim": "",
+  "status": "compatible",
+  "ts": 1785501766.08771
+ },
+ {
+  "id": "ce482d",
+  "a": "backup_Epigenetic_Regulation_—_The_Interface_Between_Environment_and_Genome",
+  "b": "r4_Epigenetic_Regulation_—_The_Interface_Be",
+  "sim": 0.959,
+  "contradict": false,
+  "claim": "",
+  "status": "compatible",
+  "ts": 1785501767.3533204
+ },
+ {
+  "id": "d6aa78",
+  "a": "Bootstrap",
+  "b": "Bootstrapping",
+  "sim": 0.959,
+  "contradict": false,
+  "claim": "",
+  "status": "compatible",
+  "ts": 1785501768.7194881
+ },
+ {
+  "id": "75c025",
+  "a": "gdl_Differential_Equations",
+  "b": "orphan_Differential_Equations",
+  "sim": 0.959,
+  "contradict": false,
+  "claim": "",
+  "status": "compatible",
+  "ts": 1785501771.1775465
+ },
+ {
+  "id": "f17d78",
+  "a": "pipeline-cross-domain-synthesis---mathematics",
+  "b": "pipeline-cross-domain-synthesis---mathematics",
+  "sim": 0.958,
+  "contradict": false,
+  "claim": "",
+  "status": "compatible",
+  "ts": 1785501773.1226406
+ }
+]
