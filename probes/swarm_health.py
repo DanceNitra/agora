@@ -90,8 +90,14 @@ ROSTER = (
     # would have shown him seven decisive outcomes that are the tournament path's. The
     # actor-filtered counter now in evaluate() makes it credit only rows signed with his name.
     # Verified: it changes NOTHING today, because 0 records carry that signature yet.
+    # `.folklore.json` is Aldric's organ as of the 2026-08-01 rework; `.oracle.json` is kept only so
+    # its eight stranded positions stay visible, and it can produce nothing new -- its book is behind
+    # a DNS content filter that returns a sinkhole even when 1.1.1.1 is asked directly. The rework
+    # exists because the Oracle could never satisfy a DAILY bar honestly: its forecasts mature over
+    # 21-120 days, so the bar read the organ as idle exactly when it was working. A folklore assay
+    # resolves in hours, so the daily criterion measures this organ instead of mis-measuring it.
     ("king",          "King Aldric",          "Engineering Lead",
-     (".oracle.json", ".predictions.json")),
+     (".folklore.json", ".oracle.json", ".predictions.json")),
     ("guard_r",       "Dame Elara",           "Bridge Builder",   (".contradictions.json",)),
     ("guard_l",       "Sergeant Voss",        "Quality Assurance", (".bounty.json",)),
     ("artificer",     "Artificer Rooke",      "Replication Unit", (".replications.json",)),
@@ -196,6 +202,36 @@ LEDGERS = {
         ts_fields=("resolved_ts", "made_ts", "ts"),
         actor_fields=("by", "agent", "author", "actor", "who"),
         foreign_text=("why",),
+    ),
+    # The Folklore Assayer. A record opens as a PRE-REGISTRATION (status 'open', no verdict yet) and
+    # closes with one of the organ's four words. Three of them are decisive; INCONCLUSIVE is not, and
+    # that is deliberate -- an assay whose intervals did not separate reports on the experiment, not
+    # on the world, so counting it would let a saturated or noisy run buy the agent a green day.
+    #
+    # primary is `verdict`, and the choice is load-bearing -- I got it wrong first and a test caught
+    # it. `is_decisive` tests the inconclusive PREFIXES against the primary field FIRST, then falls
+    # through to a repo-wide `_is_decisive` safety net. With primary=`status` a resolved INCONCLUSIVE
+    # reads 'resolved', matches no prefix here, matches none of this organ's decisive words either --
+    # and is then scored DECISIVE by that repo-wide net, which knows the word 'resolved' and has never
+    # heard of INCONCLUSIVE. The assay that honestly reported "the intervals did not separate" would
+    # have bought the agent a green day. With primary=`verdict` it reads 'inconclusive' and is refused
+    # in the first step, before any fallback can see it.
+    #
+    # NO `resolved_when` HERE, unlike the Oracle below. That key short-circuits to decisive as soon as
+    # any listed field is non-null, and it is evaluated BEFORE the word check -- so listing `verdict`
+    # or `resolved_ts` would score every INCONCLUSIVE assay as a decisive outcome. The Oracle needs it
+    # because its decisiveness is not a word; this organ's is, so the word check is the honest test.
+    #
+    # `rationale` is named in foreign_text and, more importantly, is NOT in verdict_fields: a
+    # pre-registration's rationale routinely contains the literal word REAL while arguing about it,
+    # and verdict_blob reads only verdict_fields, so that argument can never be mistaken for a result.
+    ".folklore.json": dict(
+        verdict_fields=("verdict", "status"), primary="verdict",
+        decisive=("real", "weak_model_artifact", "regime_specific"),
+        inconclusive=("open", "inconclusive", "queued", "pending"),
+        ts_fields=("resolved_ts", "ts"),
+        actor_fields=("by", "agent", "author", "actor", "who"),
+        foreign_text=("rationale",),
     ),
     ".oracle.json": dict(
         # The one organ whose decisiveness is not a WORD. A forecast becomes decisive when the
@@ -942,6 +978,11 @@ _FIXTURE_LEDGERS = {
                          "note": "fixture", "outcome": "forged", "ts": 0.0}],
     ".theory.json": [{"title": "fixture theory", "verdict": "corroborated", "lab": "672181",
                       "summary": "fixture", "ts": 0.0}],
+    ".folklore.json": [{"id": "fx", "claim_id": "fixture-claim", "task": "fixture",
+                        "forecast": {"REAL": 0.2, "WEAK_MODEL_ARTIFACT": 0.6, "REGIME_SPECIFIC": 0.2},
+                        "rationale": "fixture", "by": "King Aldric", "status": "resolved",
+                        "verdict": "WEAK_MODEL_ARTIFACT", "brier": 0.24, "lab_id": "8e30bb",
+                        "ts": 0.0, "resolved_ts": 0.0}],
     ".oracle.json": [{"id": "fx", "market_id": "fx", "question": "fixture?", "market_prob": 0.5,
                       "agora_prob": 0.6, "edge": 0.1, "side": "YES", "reasoning": "fixture",
                       "ends": "2026-12-31", "ts": 0.0, "status": "resolved", "outcome": 1.0,

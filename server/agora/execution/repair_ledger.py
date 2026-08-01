@@ -111,6 +111,13 @@ _ORGANS: dict[str, Organ] = {
     # Aldric's working arm. Shared with the tournament path, which is why the gate filters on the
     # actor before crediting anyone for a row in it.
     ".predictions.json": Organ("King Aldric", "king", "Engineering Lead"),
+    # Aldric's PRIMARY organ since the 2026-08-01 rework: the Folklore Assayer. `by` is a real actor
+    # field here -- unlike Mira's `.press.json` above, where `source` only looks like one -- because
+    # folklore.preregister writes the organ owner onto every record. `resolved_ts` leads `ts`: `ts` is
+    # when the forecast was PRE-REGISTERED, which is deliberately before the work, so leading with it
+    # would date the assay to the moment we guessed rather than the moment we measured.
+    ".folklore.json": Organ("King Aldric", "king", "Engineering Lead", "by",
+                            ("resolved_ts", "ts")),
 
 
     # --- High Priest Orin (priest) -- Idea Alchemist -------------------------------------------
