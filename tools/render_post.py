@@ -11,6 +11,7 @@ PUBLISH GATE: run /stress-claim (argument) + /verify-claims (facts) on the sourc
 import html
 import json
 import re
+import sys
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -817,17 +818,34 @@ def build_index(entries: list | None = None):
     return dst
 
 
+def _rebuild_sitemap() -> None:
+    """Regenerate the sitemap after rendering. A post that is not in the sitemap is a post crawlers
+    find late or not at all, and rendering one has never added it -- that is a separate generator
+    nobody remembers to run. It was missed for this site's newest post and caught only because a
+    verification script happened to grep the live sitemap for the slug. Chaining it here removes the
+    step that can be forgotten. Failure is reported and non-fatal: a sitemap that did not rebuild
+    must not throw away a render that succeeded."""
+    import subprocess
+    gen = ROOT / "tools" / "render_sitemap.py"
+    if not gen.exists():
+        print("  [sitemap] tools/render_sitemap.py not found -- sitemap NOT rebuilt")
+        return
+    r = subprocess.run([sys.executable, str(gen)], capture_output=True, text=True, cwd=str(ROOT))
+    print("  [sitemap] " + ((r.stdout or r.stderr).strip().splitlines() or ["rebuilt"])[-1])
+
+
 if __name__ == "__main__":
-    import sys
     if len(sys.argv) >= 3 and sys.argv[1] == "--piece":
         # Press auto-publish: render ONE post from a JSON spec, then rebuild the index.
         spec = json.loads(Path(sys.argv[2]).read_text(encoding="utf-8"))
         slug, read = render_piece(spec)
         build_index()
         print(f"wrote {slug}.html  ({read} min) + rebuilt index ({len(_load_manifest())} posts)")
+        _rebuild_sitemap()
     else:
         for key in META:
             name, slug, read, words = render(key)
             print(f"wrote {name}  (slug: {slug}, {words} words, {read} min)")
         build_index()
         print(f"wrote index.html  ({len(_load_manifest())} posts in manifest)")
+        _rebuild_sitemap()
