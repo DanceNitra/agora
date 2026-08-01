@@ -114,7 +114,7 @@ META = {
         "desc_sk": "Slávnych '55% faster' o AI kódení je vendor preprint na jednom greenfield tasku; jediný "
                    "nezávislý RCT na skúsených devoch našiel -19%. Nie sú v spore — model ukazuje junior-zisk/"
                    "expert-strata sign-flip. Univerzálny claim zlyháva. Overené, s falzifikátorom.",
-        "date": "2026-06-29",
+        "date": "2026-06-29", "modified": "2026-07-23",
         "tags": "AI · Future of Work · Developer productivity · Replication",
         "tags_sk": "AI · Future of Work · Produktivita vývojárov · Replikácia",
         "kicker": "The Crucible", "kicker_sk": "Crucible",

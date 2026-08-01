@@ -8,7 +8,7 @@
 
 | Štúdia | Populácia / task | Výsledok | Čo to je |
 |---|---|---|---|
-| Peng et al. 2023 (GitHub/Microsoft + MIT Sloan) | 1 greenfield JS HTTP-server task; 95 prijatých, ~35–70 dokončilo (znenie papiera nejednoznačné) | **+55,8% rýchlejšie** (95% CI 21–89%) | vendor preprint, jeden toy task |
+| Peng et al. 2023 (GitHub/Microsoft + MIT Sloan) | 1 greenfield JS HTTP-server task; 95 prijatých, 95 prijatých; ~63 % úbytok dokončilo (znenie papiera nejednoznačné) | **+55,8% rýchlejšie** (95% CI 21–89%) | vendor preprint, jeden toy task |
 | Cui, Demirer et al. 2025 (*Management Science*) | 4 867 devov, tri field RCT | **+26% dokončených taskov** (väčšie pre juniorov) | peer-reviewed; počíta tasky, nie kvalitu |
 | METR 2025 | 16 skúsených devov, 246 taskov, zrelé repá | **−19% (pomalšie)**; +20% *vnímané* | RCT, preprint, 2025 snapshot |
 
@@ -43,7 +43,7 @@ Takže ten istý nástroj pomáha aj škodí podľa toho, *kde na krivke meriaš
 
 ## FAQ
 
-**Je číslo „55% faster" falošné?** Nie — je to reálny meraný výsledok, ale na jednom greenfield JavaScript tasku vo vendor (GitHub/Microsoft) preprinte s malou completion vzorkou (~35–70) a širokým CI (21–89%). Negeneralizuje na skúsených vývojárov v rozsiahlych známych codebasoch.
+**Je číslo „55% faster" falošné?** Nie — je to reálny meraný výsledok, ale na jednom greenfield JavaScript tasku vo vendor (GitHub/Microsoft) preprinte s malou completion vzorkou (95 prijatých; ~63 % úbytok) a širokým CI (21–89%). Negeneralizuje na skúsených vývojárov v rozsiahlych známych codebasoch.
 
 **Tak pomáhajú AI coding nástroje alebo nie?** Oboje — podľa kontextu. Juniori a greenfield tasky získavajú (peer-reviewed +26% dokončenie); skúsení devi v zrelých repoch môžu strácať (−19% v jednom RCT). Znamienko sa preklopí s expertízou a známosťou codebase.
 
