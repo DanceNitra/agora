@@ -59,6 +59,14 @@ _PROBE_BY_LAB = {
     "ragdead": "research/probes/ragdead/exp_ragdead_A.py",             # RAG-is-dead / CAG
     "exp_supersession_replication": "research/probes/supersession_replication.py",  # cosine supersession
     "rev93": "research/probes/reversibility_predictability_probe.py",  # tool-reversibility signature-decidability
+    # Rebuilt 2026-08-01. Both of these entries cited a lab id the ledger no longer held: it keeps
+    # items[-1000:], about ten days at current volume, and both are older. Neither had a runnable
+    # artifact anywhere in the repo, so two entries in a PUBLIC replication ledger pointed at tests
+    # that could not be produced -- the one state worse than carrying no receipt at all. The models
+    # were rebuilt from each entry's own description and both now resolve here. See the header of
+    # that file for what reproduced and what did not.
+    "ebce40": "probes/crucible_receipt_rebuild.py",                    # hot hand / GVT streak-selection
+    "e39390": "probes/crucible_receipt_rebuild.py",                    # Dunning-Kruger quartile plot
 }
 
 
