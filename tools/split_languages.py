@@ -317,6 +317,29 @@ def _localise_head(soup: BeautifulSoup, keep: str, self_url: str, en_url: str, m
     #  rewrote EVERY url in the block, including Organization's and Blog's.)
 
 
+def _strip_lang_script(soup: BeautifulSoup) -> None:
+    """Remove the language-switching JS. On a split document it does not switch anything -- it BREAKS it.
+
+    The script ends with `localStorage.getItem('agora-lang'); if(s) setLang(s)`, which overwrites the
+    document's own data-lang with whatever the visitor last clicked ANYWHERE on the site. On a combined
+    page that was the point. On a split page the content exists in one language only, wrapped in spans of
+    that language, so forcing the other one hides everything: the reader gets a header, a date, and an
+    empty page. Anyone who ever clicked EN saw every Slovak page blank from then on, and the bug is
+    invisible to a fresh browser or a headless screenshot because both start with no stored preference.
+
+    The progress-bar code sits BEFORE the language block in the same script, so truncating at the language
+    block keeps it. `btns` is already empty here anyway -- _toggle_to_links replaced the buttons with
+    links -- so everything removed was dead except for the line that did the damage.
+    """
+    for script in soup.find_all("script"):
+        if script.get("src") or not script.string:
+            continue
+        s = script.string
+        cut = s.find("var root=document.documentElement")
+        if cut != -1 and "agora-lang" in s:
+            script.string = s[:cut].rstrip()
+
+
 def _toggle_to_links(soup: BeautifulSoup, keep: str, en_url: str, sk_url: str) -> None:
     """The EN/SK control was a pair of buttons flipping a CSS class. With one language per document there
     is nothing left to flip, so it becomes the navigation between the two URLs -- which is also how a
@@ -405,6 +428,7 @@ def split_one(page: pathlib.Path, mirrored: set[str] | None = None) -> bool:
         _set_head(soup, keep, en_url, sk_url)
         _localise_head(soup, keep, sk_url if keep == "sk" else en_url, en_url, mirrored)
         _toggle_to_links(soup, keep, en_url, sk_url)
+        _strip_lang_script(soup)
         if keep == "sk":
             _rewrite_links_for_sk(soup, page, mirrored)
         html = str(soup)
@@ -476,6 +500,7 @@ def main() -> int:
             _set_head(soup, keep, en_url, sk_url)
             _localise_head(soup, keep, sk_url if keep == "sk" else en_url, en_url, mirrored)
             _toggle_to_links(soup, keep, en_url, sk_url)
+            _strip_lang_script(soup)
             dest = page if keep == "en" else SK_DIR / page.relative_to(ROOT)
             if keep == "sk":
                 _rewrite_links_for_sk(soup, page, mirrored)

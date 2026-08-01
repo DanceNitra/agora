@@ -820,13 +820,6 @@ m.restore_now(<span class="s">"region"</span>, <span class="s">"osaka"</span>, s
   var tally = document.querySelector('.tally'); if(tally) tio.observe(tally);
 
   // language toggle — EN default; persists to localStorage, mirrors the blog-post pattern
-  var root=document.documentElement, lbtns=document.querySelectorAll('.lng button');
-  function setLang(l){root.setAttribute('data-lang',l);root.setAttribute('lang',l);
-    lbtns.forEach(function(b){b.classList.toggle('on',b.getAttribute('data-l')===l);});
-    try{localStorage.setItem('agora-lang',l);}catch(e){}}
-  lbtns.forEach(function(b){b.addEventListener('click',function(){setLang(b.getAttribute('data-l'));});});
-  try{var s=localStorage.getItem('agora-lang');if(s)setLang(s);}catch(e){}
-})();
 </script>
 </body>
 </html>

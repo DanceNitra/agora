@@ -129,12 +129,6 @@
 </main>
 <footer><div class="wrap"><span class="en">Agora · every number from real internal data · reproduce: python tools/self_audit.py</span></div></footer>
 <script>
-  var root=document.documentElement;
-  function setLang(l){root.setAttribute('data-lang',l);root.setAttribute('lang',l);
-    document.querySelectorAll('.lng button').forEach(function(b){b.classList.toggle('on',b.getAttribute('data-l')===l);});
-    try{localStorage.setItem('agora-lang',l);}catch(e){}}
-  document.querySelectorAll('.lng button').forEach(function(b){b.addEventListener('click',function(){setLang(b.getAttribute('data-l'));});});
-  try{var s=localStorage.getItem('agora-lang');if(s)setLang(s);}catch(e){}
- </script>
+</script>
 </body>
 </html>
