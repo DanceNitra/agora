@@ -104,8 +104,64 @@ def run_experiment(name: str, code: str) -> dict:
     # Ledger cap 1000 (was 100): at ~100 runs/day the old cap rotated a lab_id out within ~12h, so the
     # LAB-FIRST gate falsely rejected discoveries citing a REAL-but-older experiment (src_no_lab), and
     # audits couldn't find source scripts. 1000 keeps ~1-2 weeks of receipts; file stays ~1 MB.
-    _save(items[-1000:])
+    _save(_prune(items))
     return rec
+
+
+#: Stores that CITE a lab id. A run referenced from any of these is a published receipt and must
+#: never rotate out of the ledger, however old it gets.
+_CITING_STORES = (".press.json", "../public/crucible/crucible.json", ".replications.json")
+
+#: Optional manual pins, for receipts cited OUTSIDE this repo -- a GitHub comment, an email, a paper.
+#: Derived citations cannot see those, so this is the escape hatch. Format: {"lab_id": "why"}.
+_PINS = _STORE.parent / ".lab_pins.json"
+
+#: `lab 2b7e05`, "lab `2b7e05`", '"lab_id": "2b7e05"' -- six hex characters, and NOT part of a longer
+#: hex or decimal run. Without those lookarounds the id 619055 matches inside the float
+#: 0.861905574798584, which is how a first pass at this reported five recoverable receipts that did
+#: not exist. A keyword match with no subject check over-reports, every time.
+_LAB_ID_RE = re.compile(r"(?<![0-9a-fA-F.])(?:lab|lab_id)[\s:=_\"'`]*([0-9a-f]{6})(?![0-9a-fA-F])", re.I)
+
+
+def cited_ids() -> set:
+    """Lab ids referenced by anything we have published or recorded as a receipt.
+
+    DERIVED, never hand-maintained. A manual pin list is a second place to forget, and the failure
+    this exists to prevent IS a forgetting: nine published pieces were found citing lab receipts the
+    ledger no longer held, five of which have no runnable artifact anywhere in the repo -- including
+    two entries in the public Crucible, whose entire premise is that a claim ships with the test that
+    would kill it. A citation is not a receipt if the receipt has been deleted.
+    """
+    found = set()
+    for rel in _CITING_STORES:
+        p = (_STORE.parent / rel).resolve()
+        try:
+            found.update(m.lower() for m in _LAB_ID_RE.findall(p.read_text(encoding="utf-8")))
+        except (OSError, ValueError):
+            continue
+    try:
+        found.update(k.lower() for k in json.loads(_PINS.read_text(encoding="utf-8")))
+    except (OSError, ValueError):
+        pass
+    return found
+
+
+def _prune(items: list, cap: int = 1000) -> list:
+    """Trim to `cap`, but never drop a run whose id is cited by published work.
+
+    The cap exists to bound file size, and it should keep doing that. What it must not do is delete
+    the evidence half of something we have already asserted in public: at ~100 runs/day a receipt
+    rotates out in about ten days, while a published post lives for years, so a lab id in a post is a
+    pointer into a rotating buffer that LOOKS like a receipt.
+    """
+    if len(items) <= cap:
+        return items
+    keep = cited_ids()
+    tail = items[-cap:]
+    tail_ids = {str(r.get("id", "")).lower() for r in tail}
+    rescued = [r for r in items[:-cap]
+               if str(r.get("id", "")).lower() in keep and str(r.get("id", "")).lower() not in tail_ids]
+    return rescued + tail
 
 
 def recent(n: int = 10) -> list:
