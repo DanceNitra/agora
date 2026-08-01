@@ -108,6 +108,10 @@ _ORGANS: dict[str, Organ] = {
     # secondary arm's. A curator whose rulings are unqueryable reads as a curator doing nothing.
     ".canon.json": Organ("Sage Mira", "scholar", "Knowledge Curator"),
 
+    # Aldric's working arm. Shared with the tournament path, which is why the gate filters on the
+    # actor before crediting anyone for a row in it.
+    ".predictions.json": Organ("King Aldric", "king", "Engineering Lead"),
+
 
     # --- High Priest Orin (priest) -- Idea Alchemist -------------------------------------------
     # OWNERSHIP CONFLICT, DECIDED — NOT OVERLOOKED. `agent_activity.py:44` attributes .analogies.json
@@ -193,6 +197,9 @@ _DECISIVE: dict[str, tuple[str, ...]] = {
     # 2026-08-01, so it had no vocabulary either. These are organs/scholar.py ORGAN["decisive"]
     # verbatim -- the organ's own declared words, not a new set invented at the reader.
     ".canon.json": ("merged", "rejected", "retired"),
+
+    # Aldric, prediction ledger: measured over 242 records, `status` closes correct/incorrect.
+    ".predictions.json": ("correct", "incorrect", "beat_market", "resolved"),
 
     # Orin, analogy forge: measured no viable mapping 7, survived 5, viable* 6, forged 2, shipped 1,
     # "rejected as a bridge + falsified" 1 -- 22 of 22 records carry one of these.

@@ -82,14 +82,16 @@ ROSTER = (
     # carried two files here since the start; this is the same shape, not a new allowance.
     ("scholar",       "Sage Mira",            "Knowledge Curator", (".press.json", ".canon.json")),
     ("priest",        "High Priest Orin",     "Idea Alchemist",   (".analogies.json", ".theory.json")),
-    # `.predictions.json` was added here and REVERTED the same hour. Aldric does write to it,
-    # but it is not HIS store: measured over its 242 records the authors are tournament 200,
-    # claude 38, unattributed 4. `evaluate()` counts every decisive row in a rostered ledger
-    # as that agent's -- correct for a single-writer store, and an over-credit here. It would
-    # have shown him 7 decisive outcomes that are the tournament path's work, to move a
-    # number on the file that grades him. His forecasts now carry `by: King Aldric`; when one
-    # of those RESOLVES, crediting him needs an actor-filtered counter, not a wider roster.
-    ("king",          "King Aldric",          "Engineering Lead", (".oracle.json",)),
+    # `.predictions.json` was added here, REVERTED, and re-added once it was SAFE. Aldric has
+    # two arms and only the blocked one was listed: the oracle needs polymarket.com, which a
+    # network filter blocks, while the forecast arm writes to the prediction ledger and works.
+    # The revert was because `evaluate()` credited a rostered ledger's owner for EVERY writer,
+    # and that store is shared -- tournament 200, claude 38, unattributed 4 of 242 -- so it
+    # would have shown him seven decisive outcomes that are the tournament path's. The
+    # actor-filtered counter now in evaluate() makes it credit only rows signed with his name.
+    # Verified: it changes NOTHING today, because 0 records carry that signature yet.
+    ("king",          "King Aldric",          "Engineering Lead",
+     (".oracle.json", ".predictions.json")),
     ("guard_r",       "Dame Elara",           "Bridge Builder",   (".contradictions.json",)),
     ("guard_l",       "Sergeant Voss",        "Quality Assurance", (".bounty.json",)),
     ("artificer",     "Artificer Rooke",      "Replication Unit", (".replications.json",)),
@@ -178,6 +180,22 @@ LEDGERS = {
         ts_fields=("ts",),
         actor_fields=("by", "agent", "author", "actor", "who"),
         foreign_text=(),
+    ),
+    # The prediction ledger, SHARED. `status` closes as correct/incorrect once resolve_due scores a
+    # call; `pending` is recorded-but-unresolved and is deliberately inconclusive -- opening a
+    # position is not an outcome. Safe to roster only because evaluate() now skips rows whose actor
+    # is somebody else: measured over 242 records the writers are tournament 200, claude 38,
+    # unattributed 4, King Aldric 0.
+    ".predictions.json": dict(
+        verdict_fields=("status", "outcome", "verdict"), primary="status",
+        decisive=("correct", "incorrect", "beat_market", "resolved"),
+        inconclusive=("pending", "open", "queued", "voided"),
+        # NOT `resolve_ts`: that is the DUE date, a future timestamp on every pending record, so
+        # including it puts every unresolved forecast inside any window forever. A timestamp
+        # field must say when something HAPPENED, not when it is scheduled to.
+        ts_fields=("resolved_ts", "made_ts", "ts"),
+        actor_fields=("by", "agent", "author", "actor", "who"),
+        foreign_text=("why",),
     ),
     ".oracle.json": dict(
         # The one organ whose decisiveness is not a WORD. A forecast becomes decisive when the
@@ -728,7 +746,16 @@ def evaluate(db_stats: dict, led_stats: dict, hours: float) -> list:
             # producing it anonymously; naming an idle ledger here would misdirect the fix.
             if organ_decisive and not organ_named:
                 by_organ_only.append(f)
-        window_records = sum(1 for f in files for r in led_stats[f]["rows"] if r["in_window"])
+        # SAME FILTER, ONE LEVEL UP. `produced` feeds `agents_with_zero`, the swarm-level check, and
+        # counting a rostered ledger's every in-window row made King Aldric read as having produced 40
+        # records the moment `.predictions.json` was rostered to him -- a store the tournament path
+        # writes 200 of 242 rows to, and where 0 carry his name. It flipped agents_with_zero from 1 to
+        # 0 on somebody else's output. A row whose actor is another agent is not this agent's
+        # production, at either level; an unnamed row still counts, as above.
+        window_records = sum(
+            1 for f in files for r in led_stats[f]["rows"]
+            if r["in_window"] and (not (r["actor"] or "").strip()
+                                   or (r["actor"] or "").strip().lower() == name.lower()))
         attributed = bool(d["named"]) or named_actor
         grounded = d["grounded"] + grounded_led
         produced = d["discoveries"] + window_records
