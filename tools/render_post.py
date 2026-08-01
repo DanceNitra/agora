@@ -546,6 +546,14 @@ TEMPLATE = """<!DOCTYPE html>
   .lng button{{font-family:var(--mono);font-size:11.5px;letter-spacing:.06em;border:0;background:transparent;
     color:var(--soft);padding:6px 12px;cursor:pointer;transition:background .2s,color .2s}}
   .lng button.on{{background:var(--acc);color:#fff}}
+  /* split_languages.py rewrites the button pair into <a hreflang> links once there is one language
+     per document. The rules above only ever matched <button>, so after the split the toggle lost its
+     padding (EN and SK rendered flush as "ENSK") and the active-language highlight never appeared on
+     any post. Two tools each correct, nobody owning the seam between them. */
+  .lng a{{font-family:var(--mono);font-size:11.5px;letter-spacing:.06em;padding:6px 12px;
+    color:var(--soft);text-decoration:none;border:0;line-height:1}}
+  .lng a+a{{border-left:1px solid var(--line)}}
+  .lng a.on{{background:var(--acc);color:#fff}}
   article{{max-width:680px;margin:0 auto;padding:30px 24px 90px}}
   .kicker{{font-family:var(--mono);font-size:12px;letter-spacing:.16em;text-transform:uppercase;color:var(--acc);margin-bottom:18px}}
   h1{{font-weight:500;font-size:clamp(34px,5.2vw,52px);line-height:1.1;letter-spacing:-.018em;margin:0 0 18px}}
@@ -660,6 +668,14 @@ INDEX_TEMPLATE = """<!DOCTYPE html>
   .lng button{{font-family:var(--mono);font-size:11.5px;letter-spacing:.06em;border:0;background:transparent;
     color:var(--soft);padding:6px 12px;cursor:pointer;transition:background .2s,color .2s}}
   .lng button.on{{background:var(--acc);color:#fff}}
+  /* split_languages.py rewrites the button pair into <a hreflang> links once there is one language
+     per document. The rules above only ever matched <button>, so after the split the toggle lost its
+     padding (EN and SK rendered flush as "ENSK") and the active-language highlight never appeared on
+     any post. Two tools each correct, nobody owning the seam between them. */
+  .lng a{{font-family:var(--mono);font-size:11.5px;letter-spacing:.06em;padding:6px 12px;
+    color:var(--soft);text-decoration:none;border:0;line-height:1}}
+  .lng a+a{{border-left:1px solid var(--line)}}
+  .lng a.on{{background:var(--acc);color:#fff}}
   .wrap{{max-width:1080px;margin:0 auto;padding:0 28px}}
   .masthead{{padding:54px 0 34px;border-bottom:1px solid var(--line);margin-bottom:8px}}
   .masthead .eyebrow{{font-family:var(--mono);font-size:12px;letter-spacing:.18em;text-transform:uppercase;color:var(--acc);margin-bottom:18px}}

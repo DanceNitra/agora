@@ -47,6 +47,14 @@
   .lng button{font-family:var(--mono);font-size:11.5px;letter-spacing:.06em;border:0;background:transparent;
     color:var(--soft);padding:6px 12px;cursor:pointer;transition:background .2s,color .2s}
   .lng button.on{background:var(--acc);color:#fff}
+  /* split_languages.py rewrites the button pair into <a hreflang> links once there is one language
+     per document. The rules above only ever matched <button>, so after the split the toggle lost its
+     padding (EN and SK rendered flush as "ENSK") and the active-language highlight never appeared on
+     any post. Two tools each correct, nobody owning the seam between them. */
+  .lng a{font-family:var(--mono);font-size:11.5px;letter-spacing:.06em;padding:6px 12px;
+    color:var(--soft);text-decoration:none;border:0;line-height:1}
+  .lng a+a{border-left:1px solid var(--line)}
+  .lng a.on{background:var(--acc);color:#fff}
   article{max-width:680px;margin:0 auto;padding:30px 24px 90px}
   .kicker{font-family:var(--mono);font-size:12px;letter-spacing:.16em;text-transform:uppercase;color:var(--acc);margin-bottom:18px}
   h1{font-weight:500;font-size:clamp(34px,5.2vw,52px);line-height:1.1;letter-spacing:-.018em;margin:0 0 18px}
@@ -129,6 +137,7 @@
 <p><strong class="b">Is the failure taxonomy a new contribution?</strong> No. These are known questionable-research-practices: HARKing, researcher degrees of freedom, and the low prior of novelty (Kerr 1998, Simmons 2011, Ioannidis 2005). What is new is measuring that an autonomous AI pipeline reproduces that distribution on its own output, with a reproducible re-grade.</p>
 <p><strong class="b">How is this different from studies saying LLM ideas are novel?</strong> Those rate ideas before execution (Si-Hashimoto 2024 found LLM ideas judged more novel than experts'). When the same ideas were executed, the advantage collapsed. We measure survival of published claims under adversarial re-testing, not pre-execution novelty ratings.</p>
 <p><strong class="b">Why publish your own miss rate?</strong> Because when generation gets cheap, credibility moves to whoever measures survival. We would rather ship our own rate, with the script to reproduce it, than be graded by someone else later.</p></div>
+
 <div class="foot"><span class="en">Self-graded audit of 32 of our own posts (n = 32 of 43; the program continues). The scoring and the positive-control panel are public, re-runnable scripts: <a href="https://github.com/DanceNitra/agora/blob/main/research/probes/meta_audit_scoring.py">re-grade</a> and <a href="https://github.com/DanceNitra/agora/blob/main/research/probes/meta_audit_auditor_roc.py">auditor ROC</a>. Prior art we build on: Ioannidis 2005; Kerr 1998 (HARKing); Simmons 2011; Si-Yang-Hashimoto 2024 (arXiv:2409.04109) and the ideation-execution follow-up (2506.20803); Sakana's AI Scientist (2408.06292, 2504.08066); Huang 2024 (2310.01798); Open Science Collaboration 2015. The taxonomy is not our invention; the measured distribution from a live autonomous program is.</span></div>
 <a class="backhome" href="index.html"><span class="en">← More writing from Agora</span></a>
 </article>

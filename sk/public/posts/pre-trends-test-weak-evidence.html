@@ -47,6 +47,14 @@
   .lng button{font-family:var(--mono);font-size:11.5px;letter-spacing:.06em;border:0;background:transparent;
     color:var(--soft);padding:6px 12px;cursor:pointer;transition:background .2s,color .2s}
   .lng button.on{background:var(--acc);color:#fff}
+  /* split_languages.py rewrites the button pair into <a hreflang> links once there is one language
+     per document. The rules above only ever matched <button>, so after the split the toggle lost its
+     padding (EN and SK rendered flush as "ENSK") and the active-language highlight never appeared on
+     any post. Two tools each correct, nobody owning the seam between them. */
+  .lng a{font-family:var(--mono);font-size:11.5px;letter-spacing:.06em;padding:6px 12px;
+    color:var(--soft);text-decoration:none;border:0;line-height:1}
+  .lng a+a{border-left:1px solid var(--line)}
+  .lng a.on{background:var(--acc);color:#fff}
   article{max-width:680px;margin:0 auto;padding:30px 24px 90px}
   .kicker{font-family:var(--mono);font-size:12px;letter-spacing:.16em;text-transform:uppercase;color:var(--acc);margin-bottom:18px}
   h1{font-weight:500;font-size:clamp(34px,5.2vw,52px);line-height:1.1;letter-spacing:-.018em;margin:0 0 18px}
@@ -98,6 +106,7 @@
 <div class="meta"><span>June 11, 2026</span><span>3 min read</span><span class="sk">Kauzálna inferencia · Difference-in-differences · Paralelné trendy</span></div>
 <div class="tldr"><div class="lab"><span class="sk">Zhrnutie</span></div>
 <p><span class="sk">Test pre-trendov v difference-in-differences zachytí len asi jedno zo šiestich porušení, ktoré zničia tvoj odhad (prehliadne ~5 zo 6). Odmerané, so simuláciou aj falzifikátorom.</span></p></div>
+
 <div class="sk"><p><strong class="b">Tvrdenie.</strong> Pri difference-in-differences (DiD) — jednom z najpoužívanejších kauzálnych návrhov v ekonómii, politike a produktovej analytike — znie štandardné ubezpečenie: „skontrolovali sme pre-trendy, sú paralelné." Odmerali sme, akú hodnotu tá kontrola naozaj má. Odpoveď: pri dĺžkach panelov, ktoré ľudia reálne používajú, <strong class="b">nesignifikantný test pre-trendov prehliadne zhruba päť zo šiestich porušení, ktoré by zničili tvoj odhad.</strong> Prejsť ním je slabý dôkaz, nie certifikát čistoty. Je to <strong class="b">etablovaný výsledok</strong> — Jonathan Roth (2022), <em>Pretest with Caution</em>, ukázal, že testy pre-trendov sú poddimenzované práve proti porušeniam, ktoré biasujú odhad; čo pridávame, je spustiteľný receipt špecifický pre dĺžku panelu, ktorý to reprodukuje.</p>
 <p><strong class="b">Nastavenie.</strong> Simulovali sme 2 000 panelov na podmienku — jedna ošetrená jednotka, 20 kontrol, 6 pre-období a 4 post-obdobia, skutočný efekt 2,0 — a vstrekli tri druhy porušenia predpokladu rôznej sily. Pri každom sme odmerali (a) skreslenie, ktoré vnesie do DiD odhadu, a (b) ako často ho štandardný test pre-trendov zachytí.</p>
 <p><strong class="b">Meranie.</strong></p>

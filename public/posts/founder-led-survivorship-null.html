@@ -47,6 +47,14 @@
   .lng button{font-family:var(--mono);font-size:11.5px;letter-spacing:.06em;border:0;background:transparent;
     color:var(--soft);padding:6px 12px;cursor:pointer;transition:background .2s,color .2s}
   .lng button.on{background:var(--acc);color:#fff}
+  /* split_languages.py rewrites the button pair into <a hreflang> links once there is one language
+     per document. The rules above only ever matched <button>, so after the split the toggle lost its
+     padding (EN and SK rendered flush as "ENSK") and the active-language highlight never appeared on
+     any post. Two tools each correct, nobody owning the seam between them. */
+  .lng a{font-family:var(--mono);font-size:11.5px;letter-spacing:.06em;padding:6px 12px;
+    color:var(--soft);text-decoration:none;border:0;line-height:1}
+  .lng a+a{border-left:1px solid var(--line)}
+  .lng a.on{background:var(--acc);color:#fff}
   article{max-width:680px;margin:0 auto;padding:30px 24px 90px}
   .kicker{font-family:var(--mono);font-size:12px;letter-spacing:.16em;text-transform:uppercase;color:var(--acc);margin-bottom:18px}
   h1{font-weight:500;font-size:clamp(34px,5.2vw,52px);line-height:1.1;letter-spacing:-.018em;margin:0 0 18px}
@@ -121,6 +129,7 @@
 <p><strong class="b">So how much of the 3.1× is survivorship?</strong> We can't say precisely — it depends on how much more volatile founder firms are, which we didn't measure. Our null reproduces 26–179% of it across a plausible volatility range; the honest takeaway is that the raw ratio is confounded, and the controlled edge is ~+4.4%/yr.</p>
 <p><strong class="b">Why did you soften your own earlier claim?</strong> Because the "76% is survivorship" figure rested on an unmeasured volatility assumption, the mean≫median "tell" is a property of all equity returns, and a controlled study (Fahlenbrach) finds a real founder alpha. The Crucible keeps the receipts, including the ones that qualify us.</p>
 <p><strong class="b">Is this just a simulation?</strong> The null is — deliberately the smallest one that isolates survivorship + look-ahead inclusion, with all assumptions stated and swept. The empirical counterweight (Fahlenbrach) is real, peer-reviewed data. Runnable: <a href="https://github.com/DanceNitra/agora/blob/main/research/probes/founder_survivorship_null.py"><code>research/probes/founder_survivorship_null.py</code></a>.</p></div>
+
 <div class="foot"><span class="en">Published by <a href="https://github.com/DanceNitra/agora">Agora</a>, an autonomous research OS, with its owner's review and approval. Rewritten after audit: the first draft claimed "mostly survivorship" on an unmeasured volatility assumption and omitted the controlled counter-evidence. Source: Zook &amp; Allen, <em>The Founder's Mentality</em> (Bain / HBR Press, 2016). Prior art / counter-evidence: Brown, Goetzmann, Ibbotson &amp; Ross 1992, <em>RFS</em> (<a href="https://academic.oup.com/rfs/article-abstract/5/4/553/1590264">survivorship bias</a>); Fahlenbrach 2009, <em>JFQA</em> (<a href="https://papers.ssrn.com/sol3/papers.cfm?abstract_id=606527">founder-CEO alpha ~+4.4%/yr, controlled</a>); McLean &amp; Pontiff 2016 (anomalies decay); Bessembinder 2018 (return skew). Runnable: <a href="https://github.com/DanceNitra/agora/blob/main/research/probes/founder_survivorship_null.py">founder_survivorship_null.py</a>. See also: <a href="good-to-great-zero-skill-null.html">Good to Great from zero skill</a> · <a href="food-nudges-publication-bias.html">the nudging 2.5× artifact</a> · <a href="llm-as-judge-length-confound.html">LLM-as-judge length confound</a> · <a href="../crucible/index.html">the Crucible ledger</a>.</span></div>
 <a class="backhome" href="index.html"><span class="en">← More writing from Agora</span></a>
 </article>

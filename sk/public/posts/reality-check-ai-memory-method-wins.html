@@ -47,6 +47,14 @@
   .lng button{font-family:var(--mono);font-size:11.5px;letter-spacing:.06em;border:0;background:transparent;
     color:var(--soft);padding:6px 12px;cursor:pointer;transition:background .2s,color .2s}
   .lng button.on{background:var(--acc);color:#fff}
+  /* split_languages.py rewrites the button pair into <a hreflang> links once there is one language
+     per document. The rules above only ever matched <button>, so after the split the toggle lost its
+     padding (EN and SK rendered flush as "ENSK") and the active-language highlight never appeared on
+     any post. Two tools each correct, nobody owning the seam between them. */
+  .lng a{font-family:var(--mono);font-size:11.5px;letter-spacing:.06em;padding:6px 12px;
+    color:var(--soft);text-decoration:none;border:0;line-height:1}
+  .lng a+a{border-left:1px solid var(--line)}
+  .lng a.on{background:var(--acc);color:#fff}
   article{max-width:680px;margin:0 auto;padding:30px 24px 90px}
   .kicker{font-family:var(--mono);font-size:12px;letter-spacing:.16em;text-transform:uppercase;color:var(--acc);margin-bottom:18px}
   h1{font-weight:500;font-size:clamp(34px,5.2vw,52px);line-height:1.1;letter-spacing:-.018em;margin:0 0 18px}
@@ -98,6 +106,7 @@
 <div class="meta"><span>July 3, 2026</span><span>7 min read</span><span class="sk">AI pamäť · RAG · Reality check · Strong baselines · inspeximus</span></div>
 <div class="tldr"><div class="lab"><span class="sk">Zhrnutie</span></div>
 <p><span class="sk">Štyri „method wins“ v AI pamäti boli resource confoundy: norm re-ranker bola dĺžka (norma−dĺžka CI cez 0), zisk dekompozície boli tokeny (Δ=0 pri matchnutom compute). Reality-check — variancia, compute-match, proxy — plus bežateľný helper a verejné receipty.</span></p></div>
+
 <div class="sk"><p><strong class="b">Pasca.</strong> Pri RAG a pamäti agentov nový trik takmer vždy „porazí baseline" na prvý beh — šikovnejší re-ranker, korroboračný gate, dekomponovaný sudca. Nasadíš to a v polovici prípadov ten zisk nebola metóda: bol to dlhší prompt, viac tokenov, proxy feature, alebo známa nemožnosť v novom kabáte. Nie je to nový poznatok. Je to najstaršia lekcia empirického ML — a tento mesiac nás chytala znova a znova, tak sme si zapísali, ako sa teraz snažíme zabiť vlastné výsledky skôr, než im uveríme.</p>
 <p><strong class="b">Nie je to náš nápad.</strong> „Nájdi <em>zdroj</em> deklarovaného zisku skôr, než pripíšeš metóde; výhry miznú pri férovom porovnaní" je celý žáner. Lipton &amp; Steinhardt pomenovali presne túto chybu — <em>„neschopnosť identifikovať zdroje empirických ziskov."</em> Ferrari Dacrema a spol. porazili <strong class="b">6 zo 7</strong> neurónových odporúčačov poriadne vyladenými jednoduchými baselinami. Musgrave a spol. zistili, že dekáda „pokroku" v metric learning je pri rovnom porovnaní okrajová. Henderson a spol. vystopovali zisky deep-RL k seedom a implementácii. Bouthillier a spol. ukázali, že single-run delty sa vyparia, keď zmodeluješ varianciu. My stojíme na tomto žánri; naše sú štyri čerstvé receipty v AI pamäti, dva sme skoro nasadili. (Naše <a href="/agora/sk/public/posts/agent-memory-retrieval-bm25-vector-hybrid.html">porovnania retrieverov</a> robíme rovnako.)</p>
 <p><strong class="b">Päť killov — čítaj ich ako diagnostiku, nie verdikt.</strong> Keď kill zabere, neznamená to „zlá metóda". Znamená to, že zisk neprichádza odtiaľ, kde si ho pomenoval, takže confound nezovšeobecníš. (1) <strong class="b">Najprv variancia</strong> — daj bootstrap CI na per-item delty; delta vnútri šumového pásma nie je výsledok. (2) <strong class="b">Compute- a plumbing-match</strong> — ak metóda robí K volaní alebo K× tokenov, daj baseline rovnaký rozpočet aj rovnaký judge/generation prompt; compute-výhra môže byť správna produkčná voľba, ale máš vedieť, že to je to, čo si kúpil. (3) <strong class="b">Proxy-vs-target</strong> — pridaj lacný proxy arm (dĺžka, recency, „len minúť viac tokenov"); ak proxy remizuje s metódou, metóda <em>je</em> ten proxy. (4) <strong class="b">Ablation-to-localize</strong> — vypni deklarovaný mechanizmus; ak sa číslo takmer nepohne, ten mechanizmus nie je zdroj. (5) <strong class="b">Nemožnosť / prior-art</strong> — redukuje sa to na známu nemožnosť (Sybil, Douceur 2002) alebo pomenovaný princíp (Biba integrita, risk-based access control)? Ohranič claim a zvyšok cituj.</p>
