@@ -18,6 +18,7 @@ maintained by hand.
 from __future__ import annotations
 
 import json
+import time
 import re
 from pathlib import Path
 
@@ -41,15 +42,20 @@ def gate_ts_fields() -> dict:
     return out
 
 
-def ledger_ts_fields(name: str) -> set:
+def _records(name: str) -> list:
     p = SERVER / name
     if not p.exists():
-        return set()
+        return []
     try:
         d = json.loads(p.read_text(encoding="utf-8"))
     except Exception:
-        return set()
+        return []
     items = d if isinstance(d, list) else next((v for v in d.values() if isinstance(v, list)), [])
+    return items[-200:]
+
+
+def ledger_ts_fields(name: str) -> set:
+    items = _records(name)
     have = set()
     for it in items[-200:]:
         if isinstance(it, dict):
@@ -67,12 +73,38 @@ def test_the_gate_config_was_parsed():
         [k for k, v in CONFIG.items() if not v])
 
 
+def _is_a_schedule(ledger: str, field: str) -> bool:
+    """Is this field a DUE DATE rather than an event stamp? Measured, not declared.
+
+    A timestamp field says when something happened; a schedule field says when something is due.
+    `.predictions.json` carries `resolve_ts`, the date a forecast is to be scored, which is in the
+    FUTURE on every pending record -- so reading it into the window would place every unresolved
+    forecast inside any window, forever. That is the mirror of the failure this file guards: one
+    ignores work that happened, the other counts work that has not.
+
+    The criterion is the data's own and it is crisp: AN EVENT STAMP CANNOT BE IN THE FUTURE. A first
+    cut asked whether values were "predominantly ahead of now" and failed on this very field --
+    209 of the 242 forecasts are already resolved, so most `resolve_ts` values are in the past and
+    the majority rule classified a due date as an event time. One future value is enough, and it is
+    enough for the right reason rather than by tuning a fraction. Nothing is exempted by name.
+    """
+    now = time.time()
+    seen = False
+    for it in _records(ledger):
+        v = it.get(field) if isinstance(it, dict) else None
+        if isinstance(v, (int, float)) and TS_LO < float(v) < TS_HI:
+            seen = True
+            if float(v) > now + 60:            # 60s of clock skew, not a window
+                return True
+    return False
+
+
 @pytest.mark.parametrize("ledger", sorted(CONFIG))
 def test_the_gate_reads_every_timestamp_this_ledger_writes(ledger):
     have = ledger_ts_fields(ledger)
     if not have:
         pytest.skip("%s has no records with a timestamp yet" % ledger)
-    missed = sorted(have - set(CONFIG[ledger]))
+    missed = sorted(f for f in (have - set(CONFIG[ledger])) if not _is_a_schedule(ledger, f))
     assert not missed, (
         "%s records carry %s but the gate reads only %s -- work stamped with a field the reader "
         "ignores ages out of the window silently, which is how Wren read idle on the cycle she "
