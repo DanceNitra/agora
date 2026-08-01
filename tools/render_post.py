@@ -282,6 +282,10 @@ META = {
 _STAT = re.compile(r"^[+\-−]?[\d.,\s]+(?:%|×|x|SD|σ)?$|^\d+[\s,]*(?:[–-]\s*\d+)?\s*%$")
 _MONS = ["", "January", "February", "March", "April", "May", "June", "July", "August",
          "September", "October", "November", "December"]
+#: Slovak months in the GENITIVE, which is the case a day-first date takes ("1. augusta 2026").
+#: The nominative ("august") is wrong here and reads as a typo to a Slovak reader.
+_MONS_SK = ["", "januára", "februára", "marca", "apríla", "mája", "júna", "júla", "augusta",
+            "septembra", "októbra", "novembra", "decembra"]
 
 
 def _inline(s: str) -> str:
@@ -406,6 +410,7 @@ def _emit_html(m: dict, body_en, foot_en, body_sk, foot_sk, read: int, bilingual
     Mono-lingual (bilingual=False) hides the language toggle and shows EN only."""
     y, mo, d = m["date"].split("-")
     datehuman = f"{_MONS[int(mo)]} {int(d)}, {y}"
+    datehuman_sk = f"{int(d)}. {_MONS_SK[int(mo)]} {y}"
     title_sk = m.get("title_sk") or m["title"]
     desc_sk = m.get("desc_sk") or m["desc"]
     tags_sk = m.get("tags_sk") or m["tags"]
@@ -443,7 +448,7 @@ def _emit_html(m: dict, body_en, foot_en, body_sk, foot_sk, read: int, bilingual
         mono="" if bilingual else " data-mono",
         title=html.escape(m["title"]), title_sk=html.escape(title_sk),
         desc=html.escape(m["desc"]), slug=m["slug"], site=SITE, jsonld=jsonld,
-        kicker=m["kicker"], kicker_sk=kicker_sk, datehuman=datehuman, read=read,
+        kicker=m["kicker"], kicker_sk=kicker_sk, datehuman=datehuman, datehuman_sk=datehuman_sk, read=read,
         tags=m["tags"], tags_sk=tags_sk,
         tldr=html.escape(m["desc"]), tldr_sk=html.escape(desc_sk),
         body=body_en, body_sk=body_sk, foot=foot_en, foot_sk=foot_sk)
@@ -602,7 +607,7 @@ TEMPLATE = """<!DOCTYPE html>
 <article>
   <div class="kicker"><span class="en">{kicker}</span><span class="sk">{kicker_sk}</span></div>
   <h1><span class="en">{title}</span><span class="sk">{title_sk}</span></h1>
-  <div class="meta"><span>{datehuman}</span><span>{read} min read</span><span class="en">{tags}</span><span class="sk">{tags_sk}</span></div>
+  <div class="meta"><span class="en">{datehuman}</span><span class="sk">{datehuman_sk}</span><span class="en">{read} min read</span><span class="sk">{read} min čítania</span><span class="en">{tags}</span><span class="sk">{tags_sk}</span></div>
   <div class="tldr"><div class="lab"><span class="en">The takeaway</span><span class="sk">Zhrnutie</span></div>
     <p><span class="en">{tldr}</span><span class="sk">{tldr_sk}</span></p></div>
   <div class="en">{body}</div>
@@ -781,12 +786,13 @@ def build_index(entries: list | None = None):
         return None
     y, mo, d = entries[0]["date"].split("-")
     lead_date = f"{_MONS[int(mo)]} {int(d)}, {y}"
+    lead_date_sk = f"{int(d)}. {_MONS_SK[int(mo)]} {y}"
     f = entries[0]
     feature = f"""<a class="feature wrap" href="{f['slug']}.html">
   <div class="ftag"><span class="en">Latest</span><span class="sk">Najnovšie</span></div>
   <h2><span class="en">{html.escape(f['title'])}</span><span class="sk">{html.escape(f['title_sk'])}</span></h2>
   <p class="ex"><span class="en">{html.escape(f['desc'])}</span><span class="sk">{html.escape(f['desc_sk'])}</span></p>
-  <div class="meta"><span>{lead_date}</span><span>{f['read']} min read</span><span class="en">{html.escape(f['tags'])}</span><span class="sk">{html.escape(f['tags_sk'])}</span></div>
+  <div class="meta"><span class="en">{lead_date}</span><span class="sk">{lead_date_sk}</span><span class="en">{f['read']} min read</span><span class="sk">{f['read']} min čítania</span><span class="en">{html.escape(f['tags'])}</span><span class="sk">{html.escape(f['tags_sk'])}</span></div>
   <div class="arrow"><span class="en">Read the piece →</span><span class="sk">Čítať text →</span><span>→</span></div>
 </a>"""
     cards = []

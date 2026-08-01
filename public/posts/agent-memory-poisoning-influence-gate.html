@@ -103,7 +103,7 @@
 <article>
 <div class="kicker"><span class="en">Agent memory security</span></div>
 <h1><span class="en">One Plain Sentence Hijacks AI-Agent Memory Retrieval — and the Fix Isn't a Better Retriever</span></h1>
-<div class="meta"><span>July 2, 2026</span><span>7 min read</span><span class="en">AI agents · Memory · Security · Poisoning · inspeximus</span></div>
+<div class="meta"><span class="en">July 2, 2026</span><span class="en">7 min read</span><span class="en">AI agents · Memory · Security · Poisoning · inspeximus</span></div>
 <div class="tldr"><div class="lab"><span class="en">The takeaway</span></div>
 <p><span class="en">One poisoned memory with a plain-English trigger hijacks AI-agent retrieval 88–100%, even at 10k. Gating influence by corroboration drops it to 0%.</span></p></div>
 <div class="en"><p><strong class="b">What we did.</strong> We ran a real memory-poisoning attack against our <em>own</em> open-source agent-memory layer, <a href="https://pypi.org/project/inspeximus/">inspeximus</a>, across three different dense retrievers — and then tried to defend it. The attack is easy and it generalizes. The obvious defenses don't. The one thing that held up is not a smarter retriever at all: it's refusing to let an <strong class="b">un-corroborated</strong> memory <em>drive an action</em>. That defense is now shipped as <code>recall(influence_only=True)</code> in inspeximus 0.4.0, and it generalizes precisely because it lives in <strong class="b">provenance metadata, not embedding geometry</strong>.</p>

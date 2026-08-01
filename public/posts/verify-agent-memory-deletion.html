@@ -103,7 +103,7 @@
 <article>
 <div class="kicker"><span class="en">Tools</span></div>
 <h1><span class="en">Verify AI agent memory deletion: can you prove it is gone?</span></h1>
-<div class="meta"><span>August 1, 2026</span><span>6 min read</span><span class="en">Agent memory · GDPR Article 17 · Right to erasure · Verification</span></div>
+<div class="meta"><span class="en">August 1, 2026</span><span class="en">6 min read</span><span class="en">Agent memory · GDPR Article 17 · Right to erasure · Verification</span></div>
 <div class="tldr"><div class="lab"><span class="en">The takeaway</span></div>
 <p><span class="en">Your agent's delete() returns success - that does not mean the data left. Run a free self-check on your own store and see what your delete really removed.</span></p></div>
 <div class="en"><p><strong class="b">The short version.</strong> Your agent's memory has a <code>delete()</code>. It returns success. That tells you the call ran — it does not tell you the data left. In most stacks the value lives in more than one place: the vector, the payload or metadata alongside it, and often a history or audit log. A delete that clears one and not the others returns exactly the same success. <strong class="b"><a href="https://github.com/DanceNitra/ramr/blob/main/integrity/erasure_selfcheck.py">This free self-check</a></strong> plants a unique marker in your own store, calls <em>your</em> backend's own delete and its own compaction, then reads the raw files back and tells you whether the marker's bytes are still there. It makes no claim about anyone's product. It hands you a receipt for your stack.</p>
