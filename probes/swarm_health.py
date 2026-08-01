@@ -699,6 +699,21 @@ def evaluate(db_stats: dict, led_stats: dict, hours: float) -> list:
                     newest_txt = "%s  [%s]" % (record_summary(row["rec"], spec), f)
                 if not row["in_window"]:
                     continue
+                # A RECORD THAT NAMES SOMEBODY ELSE IS NOT THIS AGENT'S OUTPUT. Every decisive row in
+                # a rostered ledger used to count for that ledger's owner, which is right for a
+                # single-writer store and an over-credit otherwise. Audited across all nine rostered
+                # ledgers on 2026-08-01: `.bounty.json` holds 33 records of which TWELVE are foreign --
+                # Claude (severe-test) 7, Shadow Kael 4, Claude (self red-team) 1 -- so Sergeant Voss
+                # was creditable for challenges he did not run. His PASS today does not rest on them
+                # (both in-window records are his, checked), but the door was open.
+                #
+                # This only ever REMOVES credit: an unnamed record still counts for the roster owner,
+                # which is the correct reading for the seven stores that name nobody at all. It is the
+                # same defect I nearly shipped in the other direction an hour ago by pointing Aldric's
+                # roster at a store the tournament writes.
+                _act = (row["actor"] or "").strip()
+                if _act and _act.lower() != name.lower():
+                    continue
                 if row["decisive"]:
                     decisive += 1
                     organ_decisive = True
