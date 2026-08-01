@@ -184,48 +184,6 @@
 </div></section>
 <footer><div class="wrap"><span class="sk">Agora · AI Audit tu beží celé na strane klienta · každá kontrola je odmeraná a open-source</span></div></footer>
 <script>
- var root=document.documentElement;
- function setLang(l){root.setAttribute('data-lang',l);root.setAttribute('lang',l);
-   document.querySelectorAll('.lng button').forEach(function(b){b.classList.toggle('on',b.getAttribute('data-l')===l);});
-   try{localStorage.setItem('agora-lang',l);}catch(e){}}
- document.querySelectorAll('.lng button').forEach(function(b){b.addEventListener('click',function(){setLang(b.getAttribute('data-l'));});});
- try{var s=localStorage.getItem('agora-lang');if(s)setLang(s);}catch(e){}
-
- // ── the audit engine, client-side (faithful to the measured Python tools) ──
- function erfc(x){var z=Math.abs(x),t=1/(1+z/2),r=t*Math.exp(-z*z-1.26551223+t*(1.00002368+t*(0.37409196+t*(0.09678418+t*(-0.18628806+t*(0.27886807+t*(-1.13520398+t*(1.48851587+t*(-0.82215223+t*0.17087277)))))))));return x>=0?r:2-r;}
- var num=function(id){var v=parseFloat(document.getElementById(id).value);return isNaN(v)?null:v;};
- function abTest(ca,na,cb,nb){var ra=ca/na,rb=cb/nb,p0=(ca+cb)/(na+nb);var se=Math.sqrt(Math.max(1e-12,p0*(1-p0)*(1/na+1/nb)));var z=Math.abs(rb-ra)/se;var p=erfc(z/Math.SQRT2);var v=p<0.01?'REAL':p<0.05?'LIKELY REAL':p<0.15?'SUSPECT':'NOISE';var sev=(p<0.05)?'ok':(p<0.15?'warn':'fail');return {sev:sev,find:'lift '+((rb-ra>=0?'+':''))+(rb-ra).toFixed(3)+', p&#8776;'+p.toFixed(3)+' &mdash; '+v,fix:sev==='ok'?null:'collect more data; a no-effect null reproduces this routinely'};}
- function lockFraction(p){var prod=1;for(var n=1;n<8000;n++){prod*=(1-1/Math.pow(n+1,p));if(prod<1e-9)return 0;}return prod;}
- function selfref(ext,p){var collapse=ext<0.02?'fail':ext<0.05?'warn':'ok';var lf=lockFraction(p);var lock=lf<0.01?'ok':lf<0.2?'warn':'fail';var order={ok:0,warn:1,fail:2};var sev=order[collapse]>=order[lock]?collapse:lock;var msg=[];if(collapse!=='ok')msg.push('collapse risk ('+(ext*100).toFixed(0)+'% external data)');if(lock!=='ok')msg.push('bias lock '+(lf*100).toFixed(0)+'% at p='+p);return {sev:sev,find:sev==='ok'?'SAFE &mdash; '+(ext*100).toFixed(0)+'% external, p='+p:msg.join('; ').toUpperCase(),fix:sev==='ok'?null:'keep &ge;5% real/external data; cap self-trust so p&le;1'};}
- function herd(peers,w,disc){var eff=peers*disc;var kc=Math.floor(w)+1;var sev;if(eff>=w+1)sev='fail';else if(eff>w)sev='warn';else sev='ok';return {sev:sev,find:sev==='ok'?'INDEPENDENT &mdash; below k_c=w+1='+(Math.floor(w)+1):(sev==='fail'?'HERDED &mdash; '+peers+' peers &ge; k_c='+kc+'; crowd no wiser than one agent':'DEGRADED &mdash; peer copying eroding the edge'),fix:sev==='ok'?null:'weight own evidence &ge; peers, discount peer signals (<1), or share evidence not verdicts'};}
- function goodhart(g,m){var eff=g/Math.sqrt(Math.max(1,m));var pts=[[0,0.80],[0.5,0.63],[1,0.45],[2,0.29],[4,0.19]];var prec;if(eff<=0)prec=0.80;else if(eff>=4)prec=0.19;else{for(var i=1;i<pts.length;i++){if(eff<=pts[i][0]){var a=pts[i-1],b=pts[i];prec=a[1]+(b[1]-a[1])*(eff-a[0])/(b[0]-a[0]);break;}}}var sev=prec>=0.7?'ok':prec>=0.4?'warn':'fail';return {sev:sev,find:(sev==='fail'?'GAMED':sev==='warn'?'DEGRADED':'SAFE')+' &mdash; selection precision '+(prec*100).toFixed(0)+'%',fix:sev==='ok'?null:'combine more independent metrics, or change what you measure'};}
- function idcheck(role){var bad={collider:1,mediator:1,instrument:1};var sev=bad[role]?'fail':'ok';return {sev:sev,find:sev==='ok'?'ADMISSIBLE &mdash; '+role+' is a good control':'BIASED &mdash; conditioning on a '+role+' injects bias',fix:sev==='ok'?null:'drop the '+role+' from your controls (more controls is not safer)'};}
-
- function runAudit(){
-   var dims=[];
-   var ca=num('ca'),na=num('na'),cb=num('cb'),nb=num('nb');
-   if(ca!==null&&na>0&&cb!==null&&nb>0)dims.push(['A/B result (nullcheck)',abTest(ca,na,cb,nb)]);
-   var ext=num('ext'),stp=num('stp');
-   if(ext!==null&&stp!==null)dims.push(['Self-training (selfref)',selfref(ext>1?ext/100:ext,stp)]);
-   var peers=num('peers'),ow=num('ow'),disc=num('disc');
-   if(peers!==null&&ow!==null)dims.push(['Multi-agent (herdcheck)',herd(peers,ow,disc===null?1:disc)]);
-   var game=num('game'),nm=num('nm');
-   if(game!==null)dims.push(['Metric / reward (goodhart)',goodhart(game,nm===null?1:nm)]);
-   var role=document.getElementById('role').value;
-   if(role)dims.push(['Causal control (idcheck)',idcheck(role)]);
-   var order={ok:0,warn:1,fail:2},icon={ok:'PASS',warn:'WARN',fail:'FAIL'};
-   var nf=dims.filter(function(d){return d[1].sev==='fail';}).length;
-   var nw=dims.filter(function(d){return d[1].sev==='warn';}).length;
-   var no=dims.length-nf-nw;
-   var overall=nf?'FAIL':nw?'WARN':'PASS';
-   var score=dims.length?Math.round(100*(no+0.5*nw)/dims.length):0;
-   dims.sort(function(a,b){return order[b[1].sev]-order[a[1].sev];});
-   var lang=root.getAttribute('data-lang');
-   var h='<div class="rhead">=== AI Audit === <b style="color:'+(overall==='FAIL'?'#e88f78':overall==='WARN'?'#e7c46b':'#7fd1a8')+'">'+overall+'</b> &middot; <span class="score">'+score+'</span>/100 &middot; '+no+' pass / '+nw+' warn / '+nf+' fail</div>';
-   dims.forEach(function(d){h+='<div class="dim"><span class="tag '+d[1].sev+'">'+icon[d[1].sev]+'</span>'+d[0]+': '+d[1].find+(d[1].fix?'<div class="fix">fix: '+d[1].fix+'</div>':'')+'</div>';});
-   document.getElementById('report').innerHTML=h;
- }
- runAudit();
 </script>
 </body>
 </html>
