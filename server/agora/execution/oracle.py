@@ -104,6 +104,39 @@ def record_call(market_id: str, question: str, market_prob: float, ends: str,
     return rec
 
 
+def _who_serves(url: str) -> str:
+    """The subject of the certificate the host actually presents, for diagnosis only.
+
+    Verification is deliberately OFF here and this value is NEVER used to decide whether to trust
+    anything -- it is read, recorded and shown to a human. It exists because the failure message
+    ("certificate verify failed") named the symptom and sent the reader to the certificate store,
+    while the certificate itself named a DNS content filter blocking the domain.
+    """
+    import socket as _sock
+    import ssl as _ssl
+    from urllib.parse import urlparse as _urlparse
+    host = _urlparse(url).hostname or ""
+    if not host:
+        return ""
+    try:
+        ctx = _ssl.create_default_context()
+        ctx.check_hostname = False
+        ctx.verify_mode = _ssl.CERT_NONE          # inspection only; nothing is trusted on this path
+        with _sock.create_connection((host, 443), timeout=10) as sk:
+            with ctx.wrap_socket(sk, server_hostname=host) as ss:
+                der = ss.getpeercert(binary_form=True)
+    except Exception as e:
+        return "could not read the served certificate (%s)" % type(e).__name__
+    try:                                          # decode without a hard dependency on cryptography
+        import re as _re
+        txt = der.decode("latin-1")
+        cn = _re.findall(r"[ -~]{6,}", txt)
+        pick = [c for c in cn if "." in c or c.isalpha()]
+        return " | ".join(pick[-6:])[:200]
+    except Exception:
+        return "certificate served but not decodable"
+
+
 #: Why the last resolve pass could not score the open book. Read by the endpoint so an UNREACHABLE
 #: market is never reported as an unresolved one.
 LAST_RESOLVE_DIAG: dict = {"checked": 0, "unreachable": 0, "still_open": 0, "unparseable": 0,
@@ -118,12 +151,24 @@ def resolve_open() -> list[dict]:
     answered `resolved: 0` for all three and King Aldric reported an honest-looking idle.
 
     Measured 2026-08-01: all 7 overdue positions fail with
-    `SSL: CERTIFICATE_VERIFY_FAILED -- self-signed certificate in certificate chain`. TLS to
-    gamma-api.polymarket.com is being intercepted on this machine and the intercepting root is in
-    neither certifi nor the OS trust store, so the API is genuinely unreachable from here. That is a
-    network condition and it is NOT worked around by disabling verification; what is fixed here is
-    our blindness to it. Seven forecasts sat past their end date, unscoreable and unreported, while
-    every dashboard showed an empty queue.
+    `SSL: CERTIFICATE_VERIFY_FAILED -- self-signed certificate in certificate chain`.
+
+    THE BLOCKER IS NAMED, because "TLS is broken" was the wrong diagnosis and nearly shipped as the
+    right one. Python HTTPS on this machine is fine: api.github.com, export.arxiv.org and
+    api.openalex.org all return 200 from the same interpreter in the same second. Only Polymarket
+    fails, and reading the certificate it actually serves says why:
+
+        CN=sad.certificate.that.cannot.be.valid.com, O=Whalebone, L=Brno, C=CZ
+
+    Whalebone is a DNS-level content filter, and that CN is its block page. api.github.com gets a
+    genuine Sectigo certificate over the same connection path. So this is not a machine-wide
+    interception and not a certificate-store problem: something on the network is blocking
+    polymarket.com by category. It is fixed by allow-listing the domain in that filter -- an owner
+    decision -- or by retiring the Oracle. It is NOT fixed by disabling certificate verification,
+    which would make a number appear while turning the check into decoration.
+
+    What is fixed HERE is our blindness. Seven forecasts sat past their end date, unscoreable and
+    unreported, while every dashboard showed an empty queue.
     """
     items = _load()
     resolved = []
@@ -143,6 +188,12 @@ def resolve_open() -> list[dict]:
             msg = "%s: %s" % (type(e).__name__, str(e)[:90])
             if msg not in diag["errors"]:
                 diag["errors"].append(msg)
+            # NAME THE BLOCKER RATHER THAN THE SYMPTOM. "certificate verify failed" was read as a
+            # broken machine; the certificate actually served identifies a DNS content filter
+            # blocking the domain, while every other HTTPS host on the same interpreter answers 200.
+            # A diagnostic that reports the symptom sends the reader to the wrong repair.
+            if not diag.get("served_by") and "CERTIFICATE_VERIFY" in str(e).upper():
+                diag["served_by"] = _who_serves(_GAMMA)
             continue
         if not (m.get("closed") or m.get("umaResolutionStatus") == "resolved"):
             diag["still_open"] += 1
