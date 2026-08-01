@@ -2,7 +2,7 @@
 
 **What we measured.** We built a null model with **zero** metacognitive deficit: every person — skilled or not — has the *same* self-assessment error, just a uniform "better-than-average" optimism. No skill-dependent self-insight anywhere. Then we drew the exact Dunning–Kruger chart from it.
 
-*Parameters (added 2026-08-01): self-assessment noise 3.5× the spread of true skill, uniform offset +18 percentile points, n = 40,000. An earlier version of this post gave the table without them, and they are load-bearing — at noise equal to the skill spread the bottom quartile gap is roughly +26 and the top quartile does not go negative at all. Runnable receipt: [`probes/crucible_receipt_rebuild.py`](https://github.com/DanceNitra/agora/blob/main/probes/crucible_receipt_rebuild.py).*
+*Receipt status (2026-08-01): NOT_RECOVERED. The original experiment id has rotated out of our ledger and this post recorded no parameters. Parameters can be fitted to the table above — self-assessment noise 3.5× the spread of true skill, uniform offset +18 percentile points — and they reproduce it to 2.1pp, but fitting two free parameters to three published anchors leaves no degrees of freedom, so that match could not have failed and is not evidence. The magnitudes here are neither confirmed nor refuted. What does survive unfitted: with the offset at zero the plot is symmetric (+25.3 / −25.4), so the asymmetry comes from the uniform offset, not from regression to the mean. Rebuild: [`probes/crucible_receipt_rebuild.py`](https://github.com/DanceNitra/agora/blob/main/probes/crucible_receipt_rebuild.py).*
 
 | performance quartile | actual %ile | self-estimate %ile | gap |
 |---|---|---|---|
