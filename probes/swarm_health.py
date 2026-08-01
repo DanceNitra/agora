@@ -77,7 +77,10 @@ from pathlib import Path
 ROSTER = (
     # (eid,            real name,             organ label,        ledger files)
     ("thief",         "Shadow Kael",          "Research Scout",   (".scout_box.json",)),
-    ("scholar",       "Sage Mira",            "Knowledge Curator", (".press.json",)),
+    # `.canon.json` added 2026-08-01. The Canon is Mira's PRIMARY organ per CLAUDE.md and wrote
+    # no ledger at all, so the reader was pointed only at the secondary arm's store. Orin has
+    # carried two files here since the start; this is the same shape, not a new allowance.
+    ("scholar",       "Sage Mira",            "Knowledge Curator", (".press.json", ".canon.json")),
     ("priest",        "High Priest Orin",     "Idea Alchemist",   (".analogies.json", ".theory.json")),
     ("king",          "King Aldric",          "Engineering Lead", (".oracle.json",)),
     ("guard_r",       "Dame Elara",           "Bridge Builder",   (".contradictions.json",)),
@@ -113,6 +116,20 @@ LEDGERS = {
         ts_fields=("ruled_ts", "closed_ts", "taken_ts", "found_ts", "ts"),
         actor_fields=("by", "agent", "author", "actor", "who"),
         foreign_text=("body", "title", "url", "repo"),
+    ),
+    # THE CANON LEDGER. Added 2026-08-01, and it is worth being explicit that this file grades my own
+    # work: what is added here is WHERE to look, not what counts. `decisive` is copied verbatim from
+    # organs/scholar.py ORGAN["decisive"] -- the organ's own declared vocabulary -- exactly as every
+    # other spec in this dict uses its ledger's own words. Before this, Sage Mira's PRIMARY organ
+    # wrote no ledger at all, so her curation rulings were invisible to a reader that counts decisive
+    # outcomes from ledgers. The gap was in the organ, not in the bar.
+    ".canon.json": dict(
+        verdict_fields=("verdict", "outcome", "status"), primary="verdict",
+        decisive=("merged", "rejected", "retired"),
+        inconclusive=("draft", "queued", "pending", "open"),
+        ts_fields=("ts",),
+        actor_fields=("by", "agent", "author", "actor", "who"),
+        foreign_text=(),
     ),
     ".press.json": dict(
         # live counts: published 25 / draft 1.

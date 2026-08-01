@@ -1884,6 +1884,25 @@ async def brain_canon_inputs():
     return {"status": "ok", **gather_canon_inputs(vault)}
 
 
+@router.post("/brain/canon-ruling")
+async def brain_canon_ruling(request: Request):
+    """Ledger one canon curation decision: merged | rejected | retired.
+
+    The Canon is the organ CLAUDE.md calls Sage Mira's PRIMARY, and it was the only one writing no
+    ledger at all -- Rooke has `.replications.json`, Voss `.bounty.json`, Kael `.scout_box.json`. A
+    ruling that eight artifacts were held out for want of a receipt, or that the statement of belief
+    is at capacity and owes a written merge, existed only as prose. A curation decision nobody can
+    query is, to every instrument in this repo, a decision that did not happen.
+    """
+    from agora.execution.canon import record_ruling
+    b = await request.json()
+    rec = record_ruling(b.get("verdict") or "", b.get("summary") or "",
+                        b.get("by") or b.get("agent") or "Sage Mira",
+                        evidence=b.get("evidence") or "",
+                        held_out=b.get("held_out") or 0, escalated=b.get("escalated") or 0)
+    return {"status": "recorded" if rec else "invalid", "record": rec}
+
+
 @router.post("/brain/canon-write")
 async def brain_canon_write(request: Request):
     """Replace the Canon with the merged text (history lives in git)."""

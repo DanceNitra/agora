@@ -104,6 +104,10 @@ _ORGANS: dict[str, Organ] = {
     # (1985)"). Wiring it in as the actor would have invented twenty agents named after notes. Read
     # the store before you trust a field name.
     ".press.json": Organ("Sage Mira", "scholar", "Knowledge Curator"),
+    # The CANON is Mira's primary organ per CLAUDE.md and had no store; `.press.json` is the
+    # secondary arm's. A curator whose rulings are unqueryable reads as a curator doing nothing.
+    ".canon.json": Organ("Sage Mira", "scholar", "Knowledge Curator"),
+
 
     # --- High Priest Orin (priest) -- Idea Alchemist -------------------------------------------
     # OWNERSHIP CONFLICT, DECIDED — NOT OVERLOOKED. `agent_activity.py:44` attributes .analogies.json
@@ -185,6 +189,11 @@ _DECISIVE: dict[str, tuple[str, ...]] = {
     # 2026-07-31 assignment; "rejected" closes a piece that will not ship.
     ".press.json": ("published", "merged", "rejected"),
 
+    # Mira, canon bench. The CANON is her primary organ per CLAUDE.md and had no store until
+    # 2026-08-01, so it had no vocabulary either. These are organs/scholar.py ORGAN["decisive"]
+    # verbatim -- the organ's own declared words, not a new set invented at the reader.
+    ".canon.json": ("merged", "rejected", "retired"),
+
     # Orin, analogy forge: measured no viable mapping 7, survived 5, viable* 6, forged 2, shipped 1,
     # "rejected as a bridge + falsified" 1 -- 22 of 22 records carry one of these.
     ".analogies.json": ("forged", "mapped", "viable", "no viable mapping",
@@ -263,6 +272,7 @@ _CORRECTIVE: tuple[str, ...] = ("failed", "killed", "kill", "retired", "revised"
 #: that writes it; _INCONCLUSIVE_ANY holds only the generic started-words that collide with nothing.
 _INCONCLUSIVE_ANY = ("hypothesized", "charted", "queued", "pending", "open")
 _INCONCLUSIVE: dict[str, tuple[str, ...]] = {
+    ".canon.json": ("deferred", "escalated"),
     ".scout_box.json": ("taken",),   # 28 records: found and picked up, not yet ruled on
     ".press.json": ("draft",),       # 1 record: written, not shipped
 }

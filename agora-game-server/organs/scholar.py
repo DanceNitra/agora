@@ -702,6 +702,21 @@ async def _ruling(ctx, canon: str, plan: dict, n_artifacts: int) -> dict:
              "that /brain/canon-inputs did not surface (it only extracts the 'The insight' / "
              "'Hypothesis' / 'Answer' section -- see execution/canon.py:77). Open the note; if a "
              "Lab id is there, the merge is owed and this ruling should be overturned."]
+    # LEDGER THE DECISION. Every other organ writes its verdicts to a store -- Rooke to
+    # `.replications.json`, Voss to `.bounty.json`, Kael to `.scout_box.json` -- and the Canon, the
+    # organ CLAUDE.md calls Mira's PRIMARY, wrote nowhere. The ruling existed only as prose in a
+    # discovery row, so a real curation decision was, to every instrument that reads ledgers, a
+    # decision that never happened. Same shape as the two schema gaps closed earlier today, one step
+    # further on: the bounty record kept its verdict and dropped the evidence, the replication record
+    # kept its verdict and dropped the actor, and this one had no record at all.
+    await _aw(ctx.brain_post("/brain/canon-ruling", {
+        "verdict": "rejected",
+        "summary": ("%d artifact(s) held out for lack of a receipt, %d escalated for a written "
+                    "merge; canon untouched at %d/%d chars"
+                    % (len(plan["reject"]), len(plan["judgment"]), plan["chars"], CANON_BUDGET)),
+        "by": str(getattr(ctx, "agent", "") or ORGAN.get("agent") or "Sage Mira")[:40],
+        "evidence": ("lab %s | %s" % (lab_id, measured[:160])) if lab_id else measured[:220],
+        "held_out": len(plan["reject"]), "escalated": len(plan["judgment"])}, 60))
     return _result("ok",
                    "rejected: %d artifact(s) held out for lack of a receipt, %d escalated for a "
                    "written merge; canon untouched at %d/%d chars, grounded by lab %s"

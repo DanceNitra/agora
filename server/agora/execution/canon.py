@@ -10,6 +10,7 @@ history lives in git.
 """
 from __future__ import annotations
 
+import json
 import re
 import time
 from pathlib import Path
@@ -183,3 +184,54 @@ def gather_canon_inputs(vault_path: str) -> dict:
     """Everything Claude needs to rewrite the Canon: its current text + the new artifacts."""
     return {"canon": read_canon(vault_path)[:9000],
             "new_artifacts": new_artifacts_since_canon(vault_path)[:14]}
+
+
+# ── the canon ruling ledger ──────────────────────────────────────────────────────────────────────
+#
+# THE CURATOR'S DECISIONS LEFT NO MACHINE-READABLE TRACE. Every other organ writes its verdicts to a
+# store -- Rooke to `.replications.json`, Voss to `.bounty.json`, Kael to `.scout_box.json` -- and
+# the Canon, the organ CLAUDE.md calls Sage Mira's primary, wrote nowhere. A ruling that eight
+# artifacts were held out for lack of a receipt, or that the statement of belief is at capacity and
+# owes a written merge, existed only as prose in a discovery row.
+#
+# That is the same shape as the two schema gaps fixed earlier today, one step further: the bounty
+# record kept its verdict and dropped the EVIDENCE, the replication record kept its verdict and
+# dropped the ACTOR, and this one had no record at all. A curation decision nobody can query is a
+# decision that did not happen, as far as every instrument in this repo is concerned.
+
+_RULING_STORE = Path(__file__).resolve().parents[2] / ".canon.json"
+
+#: Sage Mira's own declared vocabulary (organs/scholar.py ORGAN["decisive"]), not a new one.
+_RULING_VERDICTS = ("merged", "rejected", "retired")
+
+
+def _load_rulings() -> list:
+    try:
+        return json.loads(_RULING_STORE.read_text(encoding="utf-8"))
+    except Exception:
+        return []
+
+
+def record_ruling(verdict: str, summary: str, by_agent: str = "Sage Mira",
+                  evidence: str = "", held_out: int = 0, escalated: int = 0) -> dict | None:
+    """Ledger one canon curation decision. verdict: merged | rejected | retired.
+
+    `evidence` carries the Lab receipt, for the same reason `record_challenge` does: a ruling that
+    cannot say what backed it is indistinguishable from one that was never grounded, and the
+    acceptance gate asks for exactly that.
+    """
+    v = (verdict or "").strip().lower()
+    if v not in _RULING_VERDICTS or len((summary or "").strip()) < 10:
+        return None
+    rec = {"verdict": v, "summary": (summary or "").strip()[:300],
+           "by": (by_agent or "Sage Mira")[:40], "evidence": (evidence or "")[:300],
+           "held_out": int(held_out or 0), "escalated": int(escalated or 0),
+           "ts": time.time()}
+    items = _load_rulings()
+    items.append(rec)
+    try:
+        _RULING_STORE.write_text(json.dumps(items[-200:], ensure_ascii=False, indent=1),
+                                 encoding="utf-8")
+    except Exception:
+        return None
+    return rec
