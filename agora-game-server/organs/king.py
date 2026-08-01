@@ -739,7 +739,11 @@ async def _ledger_arm(ctx, pending_themes) -> dict:
         rec = await _post(ctx, "/brain/predict-record", {
             "theme": theme, "metric": "hackernews_stories", "baseline": int(cumulative),
             "direction": pick.get("direction"), "confidence": float(pick.get("confidence", 0.5)),
-            "why": why_short, "horizon_days": horizon}, 60)
+            "why": why_short, "horizon_days": horizon,
+            # SIGN IT. The ledger record carries a `by` field and this call never set it, so every
+            # forecast this organ made was banked under the endpoint's default. Four resolved
+            # records in that store carry no author at all -- decisive outcomes belonging to nobody.
+            "by": str(getattr(ctx, "agent", "") or ORGAN.get("agent") or "King Aldric")[:40]}, 60)
         # `pending` IS THE SUCCESS STATE for a freshly recorded forecast -- it means the ledger took
         # it and is waiting for the horizon to elapse. The organ read anything but "ok" as a refusal,
         # so it filed a real accepted record (id fd222374, with a Lab-measured baseline behind it)

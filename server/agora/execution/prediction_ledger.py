@@ -257,7 +257,8 @@ async def gather_prediction_baseline(theme: str, horizon_days: int = 14) -> dict
 
 
 def record_prediction(theme: str, metric: str, baseline: int, direction: str,
-                      confidence: float, why: str, horizon_days: int = 14) -> dict:
+                      confidence: float, why: str, horizon_days: int = 14,
+                      by: str = "claude") -> dict:
     """Store a prediction MADE BY CLAUDE (reasoned, high-quality) into the ledger.
 
     `mode="rate"` IS NOT OPTIONAL HERE. The baseline this receives comes from
@@ -278,7 +279,8 @@ def record_prediction(theme: str, metric: str, baseline: int, direction: str,
             "all_baselines": {metric: int(baseline)},
             "direction": str(direction).upper().strip()[:5] if str(direction).upper().strip()[:4] in
             ("UP", "DOWN", "FLAT") else "FLAT",
-            "confidence": max(0.0, min(1.0, float(confidence))), "why": why[:240], "by": "claude",
+            "confidence": max(0.0, min(1.0, float(confidence))), "why": why[:240],
+            "by": (by or "claude")[:40],
             "made_ts": time.time(), "resolve_ts": time.time() + horizon_days * 86400,
             "horizon_days": horizon_days, "status": "pending"}
     preds = _load()

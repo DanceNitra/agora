@@ -2933,7 +2933,12 @@ async def brain_predict_record(request: Request):
     return {"status": "ok", **record_prediction(
         b.get("theme", ""), b.get("metric", "hackernews_stories"), int(b.get("baseline", 0)),
         b.get("direction", "FLAT"), float(b.get("confidence", 0.6)), b.get("why", ""),
-        int(b.get("horizon_days", 14)))}
+        int(b.get("horizon_days", 14)),
+        # SIGN THE FORECAST. The record carries a `by` field and this endpoint never filled it, so
+        # every forecast an ORGAN made was banked under the default. Measured 2026-08-01: 4 resolved
+        # records -- all of them `correct` -- carry no author at all, decisive outcomes belonging to
+        # nobody, and King Aldric's own calls would have joined them.
+        by=(b.get("by") or b.get("agent") or "claude"))}
 
 
 @router.get("/brain/program/start")

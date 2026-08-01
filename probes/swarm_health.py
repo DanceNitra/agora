@@ -82,6 +82,13 @@ ROSTER = (
     # carried two files here since the start; this is the same shape, not a new allowance.
     ("scholar",       "Sage Mira",            "Knowledge Curator", (".press.json", ".canon.json")),
     ("priest",        "High Priest Orin",     "Idea Alchemist",   (".analogies.json", ".theory.json")),
+    # `.predictions.json` was added here and REVERTED the same hour. Aldric does write to it,
+    # but it is not HIS store: measured over its 242 records the authors are tournament 200,
+    # claude 38, unattributed 4. `evaluate()` counts every decisive row in a rostered ledger
+    # as that agent's -- correct for a single-writer store, and an over-credit here. It would
+    # have shown him 7 decisive outcomes that are the tournament path's work, to move a
+    # number on the file that grades him. His forecasts now carry `by: King Aldric`; when one
+    # of those RESOLVES, crediting him needs an actor-filtered counter, not a wider roster.
     ("king",          "King Aldric",          "Engineering Lead", (".oracle.json",)),
     ("guard_r",       "Dame Elara",           "Bridge Builder",   (".contradictions.json",)),
     ("guard_l",       "Sergeant Voss",        "Quality Assurance", (".bounty.json",)),
