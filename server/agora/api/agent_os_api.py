@@ -1443,9 +1443,18 @@ async def brain_oracle_call(request: Request):
 async def brain_oracle_resolve(request: Request):
     """Score open positions whose markets have resolved — Brier vs hard reality, vs the market."""
     import asyncio as _aio
-    from agora.execution.oracle import resolve_open, scorecard
+    from agora.execution.oracle import resolve_open, scorecard, LAST_RESOLVE_DIAG
     resolved = await _aio.to_thread(resolve_open)
-    return {"status": "ok", "resolved": resolved, **scorecard()}
+    # SAY WHY NOTHING SCORED. `resolved: 0` used to cover an unreachable API, a changed response
+    # shape and a market that has simply not closed yet, all three identically. Measured 2026-08-01:
+    # 7 overdue positions, every one failing TLS verification, reported as an empty queue.
+    # `**scorecard()` also carries a "resolved" key -- the LIFETIME int -- which silently shadows the
+    # list of positions resolved by THIS call. King Aldric's organ documents the shadowing and works
+    # around it by snapshotting /brain/oracle either side of the call and diffing. The list is now
+    # also returned under a name nothing overwrites; `resolved` keeps its current meaning so that
+    # workaround, and anything else reading it, is untouched.
+    return {"status": "ok", "resolved": resolved, "resolved_now": resolved,
+            "diagnostic": dict(LAST_RESOLVE_DIAG), **scorecard()}
 
 
 @router.get("/brain/oracle")

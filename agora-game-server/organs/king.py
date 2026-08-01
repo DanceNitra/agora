@@ -449,6 +449,19 @@ async def _resolution_phase(ctx) -> dict | None:
 
     orc = await _post(ctx, "/brain/oracle/resolve", {}, 240)
     if orc is not None:
+        # WHY NOTHING SCORED, when nothing scored. `resolved: 0` covered an unreachable API, a changed
+        # response shape and a market that has simply not closed yet, all three identically -- so a
+        # book of overdue positions read exactly like an empty queue. Measured 2026-08-01: 7 open
+        # positions, all 7 past their end date, all 7 failing TLS verification against
+        # gamma-api.polymarket.com (intercepted certificate, absent from certifi AND the OS store).
+        # Unresolvable here, but it must be SAID rather than swallowed.
+        _dg = orc.get("diagnostic") if isinstance(orc.get("diagnostic"), dict) else {}
+        if _dg.get("unreachable"):
+            lines.append(
+                "ORACLE UNREACHABLE: %d of %d open position(s) could not be checked (%d of them past "
+                "their end date). %s" % (_dg["unreachable"], _dg.get("checked", 0),
+                                         _dg.get("overdue_unreachable", 0),
+                                         "; ".join(_dg.get("errors") or [])[:180]))
         after = await _get(ctx, "/brain/oracle", 45) or {}
         sc = after.get("scorecard") or {}
         n_oracle = max(0, int(sc.get("resolved", 0) or 0) - n_before)

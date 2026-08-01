@@ -104,24 +104,58 @@ def record_call(market_id: str, question: str, market_prob: float, ends: str,
     return rec
 
 
+#: Why the last resolve pass could not score the open book. Read by the endpoint so an UNREACHABLE
+#: market is never reported as an unresolved one.
+LAST_RESOLVE_DIAG: dict = {"checked": 0, "unreachable": 0, "still_open": 0, "unparseable": 0,
+                           "overdue_unreachable": 0, "errors": []}
+
+
 def resolve_open() -> list[dict]:
-    """Check open positions against the market; score resolved ones by Brier, vs the market."""
+    """Check open positions against the market; score resolved ones by Brier, vs the market.
+
+    EVERY FAILURE PATH USED TO BE A SILENT `continue`, so a network error, a changed response shape
+    and a market that has simply not closed yet were indistinguishable from outside: the endpoint
+    answered `resolved: 0` for all three and King Aldric reported an honest-looking idle.
+
+    Measured 2026-08-01: all 7 overdue positions fail with
+    `SSL: CERTIFICATE_VERIFY_FAILED -- self-signed certificate in certificate chain`. TLS to
+    gamma-api.polymarket.com is being intercepted on this machine and the intercepting root is in
+    neither certifi nor the OS trust store, so the API is genuinely unreachable from here. That is a
+    network condition and it is NOT worked around by disabling verification; what is fixed here is
+    our blindness to it. Seven forecasts sat past their end date, unscoreable and unreported, while
+    every dashboard showed an empty queue.
+    """
     items = _load()
     resolved = []
+    diag = {"checked": 0, "unreachable": 0, "still_open": 0, "unparseable": 0,
+            "overdue_unreachable": 0, "errors": []}
+    today = time.strftime("%Y-%m-%d")
     for p in items:
         if p.get("status") != "open":
             continue
+        diag["checked"] += 1
+        overdue = bool(p.get("ends")) and str(p.get("ends")) < today
         try:
             m = _get(f"{_GAMMA}/{p['market_id']}")
-        except Exception:
+        except Exception as e:
+            diag["unreachable"] += 1
+            diag["overdue_unreachable"] += 1 if overdue else 0
+            msg = "%s: %s" % (type(e).__name__, str(e)[:90])
+            if msg not in diag["errors"]:
+                diag["errors"].append(msg)
             continue
         if not (m.get("closed") or m.get("umaResolutionStatus") == "resolved"):
+            diag["still_open"] += 1
             continue
         try:
             prices = json.loads(m.get("outcomePrices") or "[]")
             outcomes = json.loads(m.get("outcomes") or "[]")
             final_yes = float(prices[outcomes.index("Yes")])
-        except Exception:
+        except Exception as e:
+            diag["unparseable"] += 1
+            msg = "outcome parse %s: %s" % (type(e).__name__, str(e)[:70])
+            if msg not in diag["errors"]:
+                diag["errors"].append(msg)
             continue
         outcome = 1.0 if final_yes > 0.5 else 0.0
         p["status"] = "resolved"
@@ -133,6 +167,8 @@ def resolve_open() -> list[dict]:
         resolved.append(p)
     if resolved:
         _save(items)
+    LAST_RESOLVE_DIAG.clear()
+    LAST_RESOLVE_DIAG.update(diag)
     return resolved
 
 
