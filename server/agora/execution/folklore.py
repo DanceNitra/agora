@@ -52,8 +52,20 @@ LEDGER = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(__file__))
 REAL = "REAL"
 WEAK_MODEL_ARTIFACT = "WEAK_MODEL_ARTIFACT"
 REGIME_SPECIFIC = "REGIME_SPECIFIC"
+#: Added 2026-08-01, by the first assay that ran. The original three words all describe WHERE a
+#: mechanism helps, so a mechanism that HURTS had no cell and came back as INCONCLUSIVE -- "we could
+#: not tell" reported over an effect whose interval excluded zero. The classifier had the matching
+#: defect: it only ever asked whether the advantage was positive, so harm and absence were literally
+#: the same measurement to it. A vocabulary that cannot say "this makes things worse" will keep
+#: reporting the field's most useful result as a null.
+HARMFUL = "HARMFUL"
 INCONCLUSIVE = "INCONCLUSIVE"
-VERDICTS = (REAL, WEAK_MODEL_ARTIFACT, REGIME_SPECIFIC, INCONCLUSIVE)
+VERDICTS = (REAL, WEAK_MODEL_ARTIFACT, REGIME_SPECIFIC, HARMFUL, INCONCLUSIVE)
+
+#: The outcomes a forecaster is asked to put mass on. INCONCLUSIVE is excluded because it is a
+#: statement about the EXPERIMENT's resolving power rather than about the world -- forecasting it
+#: would score the forecaster on our sample size.
+FORECASTABLE = (REAL, WEAK_MODEL_ARTIFACT, REGIME_SPECIFIC, HARMFUL)
 
 #: The owner's backlog, verbatim from the 2026-06-24 positioning document. Each entry is one
 #: capability-gradient verdict. `prior_note` records what is already known so a pre-registration is
@@ -123,10 +135,10 @@ def preregister(claim_id: str, probs: dict, rationale: str, task: str, actor: st
     INCONCLUSIVE deliberately takes no prior mass. It is a statement about the EXPERIMENT's resolving
     power, not about the world, so scoring a forecaster on it would score them on our sample size.
     """
-    missing = [k for k in (REAL, WEAK_MODEL_ARTIFACT, REGIME_SPECIFIC) if k not in probs]
+    missing = [k for k in FORECASTABLE if k not in probs]
     if missing:
         raise ValueError("pre-registration is missing a probability for: %s" % ", ".join(missing))
-    total = sum(float(probs[k]) for k in (REAL, WEAK_MODEL_ARTIFACT, REGIME_SPECIFIC))
+    total = sum(float(probs[k]) for k in FORECASTABLE)
     if abs(total - 1.0) > 1e-6:
         raise ValueError("pre-registered probabilities sum to %.6f, not 1.0" % total)
     if not rationale.strip():
@@ -136,7 +148,7 @@ def preregister(claim_id: str, probs: dict, rationale: str, task: str, actor: st
         "id": "%s-%d" % (claim_id, int(time.time())),
         "claim_id": claim_id,
         "task": task,
-        "forecast": {k: round(float(probs[k]), 4) for k in (REAL, WEAK_MODEL_ARTIFACT, REGIME_SPECIFIC)},
+        "forecast": {k: round(float(probs[k]), 4) for k in FORECASTABLE},
         "rationale": rationale.strip(),
         "status": "open",
         "by": actor,
@@ -216,6 +228,13 @@ def classify(frontier_adv: Sequence[float], weak_adv: Sequence[float],
     frontier_real = f_lo > min_effect          # advantage survives capability
     frontier_null = f_hi < min_effect          # advantage is bounded BELOW the threshold, not merely unproven
     weak_real = w_lo > min_effect
+    # THE DIRECTION THIS RULE ORIGINALLY COULD NOT SEE. Every test above asks whether the advantage is
+    # POSITIVE, so a mechanism that actively hurts produced exactly the same answer as one that does
+    # nothing: INCONCLUSIVE, reported as "no separation" over an interval that excluded zero. The first
+    # real assay hit it immediately -- voting at fixed cost measured -0.333 at the top rung with a 95%
+    # interval of [-0.646, -0.021]. A one-directional test turns the most useful result a folklore
+    # meter can produce, "the thing the field recommends makes it worse", into a shrug.
+    frontier_harm = f_hi < -min_effect
 
     if regime_split:
         margins = {}
@@ -224,11 +243,19 @@ def classify(frontier_adv: Sequence[float], weak_adv: Sequence[float],
             margins[label] = {"mean": round(m, 4), "ci95": [round(lo, 4), round(hi, 4)], "n": n}
         detail["regimes"] = margins
         positives = [k for k, v in margins.items() if v["ci95"][0] > min_effect]
-        nulls = [k for k, v in margins.items() if v["ci95"][1] < min_effect]
-        if positives and nulls:
-            detail["why"] = ("advantage present in %s and bounded below threshold in %s"
-                             % (", ".join(sorted(positives)), ", ".join(sorted(nulls))))
+        # The contrast is anything that is NOT a positive effect -- bounded below the threshold OR
+        # actively negative. Comparing helps-here against helps-less-here would miss the sharpest
+        # split there is: helps in one regime, hurts in another.
+        contrast = [k for k, v in margins.items() if v["ci95"][1] < min_effect]
+        if positives and contrast:
+            detail["why"] = ("advantage present in %s and absent or negative in %s"
+                             % (", ".join(sorted(positives)), ", ".join(sorted(contrast))))
             return {"verdict": REGIME_SPECIFIC, "detail": detail}
+
+    if frontier_harm:
+        detail["why"] = ("frontier advantage upper bound %.4f is below -%.4f: the mechanism does not "
+                         "merely fail to help, it costs accuracy" % (f_hi, min_effect))
+        return {"verdict": HARMFUL, "detail": detail}
 
     if frontier_real:
         detail["why"] = "frontier advantage lower bound %.4f exceeds %.4f" % (f_lo, min_effect)
@@ -239,8 +266,26 @@ def classify(frontier_adv: Sequence[float], weak_adv: Sequence[float],
                          "bound %.4f falls below it" % (w_lo, min_effect, f_hi))
         return {"verdict": WEAK_MODEL_ARTIFACT, "detail": detail}
 
-    detail["why"] = ("no separation: frontier ci [%.4f, %.4f], weak ci [%.4f, %.4f] against threshold "
-                     "%.4f" % (f_lo, f_hi, w_lo, w_hi, min_effect))
+    # "No separation" is not one situation but two, and collapsing them is how an underpowered run
+    # gets mistaken for a null one. An interval straddling zero means we cannot tell the sign. An
+    # interval that EXCLUDES zero but reaches into the +/- min_effect band means the sign is settled
+    # and only the magnitude is not -- which calls for more samples, not for a different conclusion,
+    # and certainly not for lowering the threshold until the answer appears. The first assay landed
+    # in the second case at n=15 and the original message called it "no separation", which reads as
+    # "nothing there" over a point estimate of -0.333.
+    if f_hi < 0:
+        detail["why"] = ("UNDERPOWERED, not null: the frontier advantage is negative with 95%% ci "
+                         "[%.4f, %.4f], which excludes zero but reaches inside the +/-%.3f "
+                         "negligible band at n=%d. The sign is settled; the magnitude is not. Add "
+                         "samples -- do not move the threshold." % (f_lo, f_hi, min_effect, f_n))
+    elif f_lo > 0:
+        detail["why"] = ("UNDERPOWERED, not null: the frontier advantage is positive with 95%% ci "
+                         "[%.4f, %.4f], which excludes zero but reaches inside the +/-%.3f "
+                         "negligible band at n=%d." % (f_lo, f_hi, min_effect, f_n))
+    else:
+        detail["why"] = ("no separation: the frontier interval [%.4f, %.4f] straddles zero, so the "
+                         "SIGN is undetermined (weak ci [%.4f, %.4f], threshold %.3f)"
+                         % (f_lo, f_hi, w_lo, w_hi, min_effect))
     return {"verdict": INCONCLUSIVE, "detail": detail}
 
 
@@ -249,16 +294,28 @@ def classify(frontier_adv: Sequence[float], weak_adv: Sequence[float],
 # ---------------------------------------------------------------------------------------------
 
 def brier(forecast: dict, verdict: str) -> float:
-    """Multi-class Brier score: mean squared error over the three forecastable outcomes.
+    """Multi-class Brier score over the forecastable outcomes. Lower is better; 0.0 is perfect.
 
-    Lower is better; 0.0 is a perfect call and 2/3 is what a uniform guess scores. Returns -1.0 for an
-    INCONCLUSIVE verdict, which carries no prior mass and therefore cannot score a forecaster -- an
-    experiment that failed to resolve is a fact about the experiment.
+    Returns -1.0 -- UNSCOREABLE, not "bad" -- in two cases, and the second one is the interesting one:
+
+      * INCONCLUSIVE. The experiment did not resolve; that is a fact about the experiment.
+      * THE VERDICT WAS NOT ON THE BALLOT. A forecast made over a vocabulary that could not express
+        the outcome cannot be scored by it. This is not hypothetical: the first assay run here came
+        back HARMFUL against a pre-registration written when only three words existed, and scoring it
+        anyway would have charged the forecaster 0.375 -- a mediocre-LOOKING number that flatters a
+        forecaster who could not have been right, because spread-out mass over three wrong options
+        scores better than confidence in one. The taxonomy gap was ours, so the cost is ours.
+
+    DECISIVE AND SCOREABLE ARE DIFFERENT PROPERTIES. A HARMFUL verdict is a real result about the
+    world and counts as decisive work; whether it can also grade the forecast is a separate question
+    with a separate answer.
     """
     if verdict == INCONCLUSIVE:
         return -1.0
+    if verdict not in forecast:
+        return -1.0
     total = 0.0
-    for k in (REAL, WEAK_MODEL_ARTIFACT, REGIME_SPECIFIC):
+    for k in FORECASTABLE:
         outcome = 1.0 if k == verdict else 0.0
         total += (float(forecast.get(k, 0.0)) - outcome) ** 2
     return round(total, 4)
