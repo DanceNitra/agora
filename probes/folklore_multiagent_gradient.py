@@ -4,6 +4,27 @@ THE CLAIM. The field's folklore is that running several agents and combining the
 The contrarian version, and the only one worth measuring, holds COST FIXED: three chains of budget B
 against one chain of budget 3B. Anything that does not hold cost fixed is measuring the budget.
 
+KILLED 2026-08-01 AFTER MEASURING, WHICH IS THE WRONG ORDER. This assay re-derives Sharma & Chopra,
+"The Sequential Edge: Inverse-Entropy Voting Beats Parallel Self-Consistency at Matched Compute"
+(arXiv 2511.02309, Nov 2025). That paper opens with our exact question -- at equal token budget, many
+independent chains in parallel or fewer chains that iteratively refine? -- and answers it on 5 open
+models and 3 reasoning benchmarks: parallel self-consistency loses in 95.6% of configurations, gains
+up to 46.7%. We used one task type, three small models, and no refinement arm. Weaker on every axis.
+One honest difference: their sequential chains build on prior attempts; ours is a single longer chain
+with no revision. Not identical -- but the folklore claim we set out to test is refuted by them at
+larger scale, so this adds nothing and ships nowhere.
+
+The measurement itself is sound and is kept as a worked example of the harness: n=40 per tier,
+verdict HARMFUL, frontier 95% CI [-0.530, -0.170], no parse failures, no control tripped. What died
+is the contribution, not the instrument. Note also that the distinguishing angle -- advantage
+shrinking with capability -- came out NULL: monotone at n=15 (-0.133/-0.267/-0.333), inverted at n=40
+(-0.275/-0.200/-0.350).
+
+THE LESSON IS THE ORDER. The section below was written from memory before the run and titled "prior
+art stated up front"; it names Wang, Li and Snell and misses the one paper that answers the question,
+which predates my knowledge cutoff. Writing a prior-art section is not running a prior-art check.
+Search for the QUESTION as a paper would title it ("X at matched compute") BEFORE spending compute.
+
 PRIOR ART, STATED UP FRONT BECAUSE THE BAR HERE FORBIDS RE-DERIVATION. Self-consistency (Wang et al.,
 ICLR 2023) established that sampling several chains and majority-voting beats one chain. "More agents
 is all you need" (Li et al., 2024) scaled that. Sequential-versus-parallel test-time compute at a
@@ -259,8 +280,17 @@ def run_tier(tier, budget, items):
     }
 
 
-def preflight():
-    """Refuse to run unless every tier ANSWERS CORRECTLY. Aborts; it does not warn.
+def preflight(only=None):
+    """Refuse to run unless the tier ANSWERS CORRECTLY. Aborts; it does not warn.
+
+    CALLED PER TIER, JUST BEFORE THAT TIER'S ITEMS, NOT ALL AT ONCE UP FRONT. The all-at-once version
+    was a self-inflicted performance bug: probing every tier in sequence leaves the LAST one -- the
+    30B, 21.7 GB of a 24 GB card -- resident, and the run then starts on the 7B tier, which cannot fit
+    beside it. Every subsequent call paid an eviction and a reload. Measured effect: the cheap tier
+    was 36/40 after 45 minutes and had stopped writing for 16, with ollama answering /api/tags in
+    0.2 s the whole time. Nothing was hung; the card was thrashing, and a 240 s per-call timeout meant
+    it would have crawled to the end rather than failing. Probing each tier immediately before its own
+    block loads each model once, in order, largest last.
 
     The first launch of this file produced a complete, well-formatted results table of zeros because
     every call had failed on missing credentials, and not one of the in-run controls fired -- both of
@@ -271,9 +301,10 @@ def preflight():
     Each tier gets a DIFFERENT arithmetic question, because a 0.0-second reply to a repeated prompt is
     a cache hit and proves only that the cache is alive. The ANSWER is checked, not the liveness.
     """
-    print("PRE-FLIGHT -- every tier must answer a unique question correctly, or nothing runs")
+    print("PRE-FLIGHT -- the tier must answer a unique question correctly, or nothing runs")
     ok = True
-    for idx, (tier, _budget) in enumerate(TIERS):
+    checking = [(t, b) for t, b in TIERS if only is None or t == only]
+    for idx, (tier, _budget) in enumerate(checking):
         a, b = 37 + idx * 11, 8 + idx * 3
         t0 = time.time()
         raw = ask(tier, "A bin holds %d bolts. %d more are added. How many bolts are in the bin?" % (a, b),
@@ -297,6 +328,9 @@ def main():
     preflight()
     results = []
     for tier, budget in TIERS:
+        # Just-in-time: probe this tier, then immediately run it, so each model loads once and the
+        # 30B does not sit resident through the 7B tier evicting it on every call.
+        preflight(only=tier)
         print("tier %s (B=%d per chain; SINGLE gets %d)" % (tier, budget, budget * 3), flush=True)
         results.append(run_tier(tier, budget, items))
         r = results[-1]
