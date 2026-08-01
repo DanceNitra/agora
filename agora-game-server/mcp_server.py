@@ -3729,6 +3729,12 @@ def _credit_agent_mem(eid: str, subject: str, good: bool, k: int = 4, min_rel: f
         pass
 
 
+#: A finding that names a Lab run is a DISCOVERY and must satisfy the severe-test rule at the vault
+#: door. A finding grounded in cited literature is an OBSERVATION -- still grounded, still gated by
+#: the quality filters, but not a claim the Lab is supposed to have measured.
+_LAB_REF_RE = re.compile(r"\blab(?:_id)?[\s:=_`]*([0-9a-f]{6})\b", re.I)
+
+
 async def _brain_contribute(eid: str, title: str, content: str) -> bool:
     _subject = f"{title or ''} {content or ''}".strip()
     if _is_refusal(content) or _is_refusal(title):
@@ -3746,7 +3752,15 @@ async def _brain_contribute(eid: str, title: str, content: str) -> bool:
         {"npc": _AGENT_NAMES.get(eid, eid), "title": title[:90],
          # Was a bare 600 while the brain stored 500 and `_CONTRIB_CAP` said 500 -- three numbers
          # for one limit, and the smallest silently won. One constant now, on both sides.
-         "content": content[:_CONTRIB_CAP], "knowledge_type": "discovery"})
+         "content": content[:_CONTRIB_CAP],
+         # TYPE IT BY WHAT IT ACTUALLY IS, rather than calling everything a discovery. This was
+         # hardcoded to "discovery" for every path, and the vault's LAB-FIRST gate fires ONLY on that
+         # type (agent_os_api.py:251, default "observation"). So a collaboration synthesis grounded in
+         # a cited paper -- which runs no Lab and has no id to offer -- was submitted as the one type
+         # the severe-test rule governs, and refused. Measured 2026-08-01: 231 contributions, 0
+         # accepted, 168 of them refused for LAB-FIRST, while the Lab itself ran 171 times with 171 ok.
+         # The policy is untouched: a discovery still needs a Lab. The label was the error.
+         "knowledge_type": "discovery" if _LAB_REF_RE.search(content or "") else "observation"})
     # A REJECTION IS NOT A LANDING. `bool(r)` treated EVERY response as success, and the brain answers
     # a refusal with an ordinary body -- {"status": "rejected", "reason": ...} -- from six separate
     # gates (garbage, LAB-FIRST, vault dedup, stream dedup, non-finding, quality). bool() of that dict
