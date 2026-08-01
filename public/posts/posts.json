@@ -1,5 +1,19 @@
 [
  {
+  "slug": "verify-agent-memory-deletion",
+  "title": "Verify AI agent memory deletion: can you prove it is gone?",
+  "title_sk": "Overenie mazania v agentovej pamäti: vieš dokázať, že je preč?",
+  "desc": "Your agent's delete() returns success - that does not mean the data left. Run a free self-check on your own store and see what your delete really removed.",
+  "desc_sk": "delete() tvojho agenta vráti úspech - to neznamená, že dáta odišli. Spusti si voľnú kontrolu na vlastnom úložisku a zisti, čo tvoje mazanie naozaj odstránilo.",
+  "date": "2026-08-01",
+  "tags": "Agent memory · GDPR Article 17 · Right to erasure · Verification",
+  "tags_sk": "Agentová pamäť · GDPR článok 17 · Právo na vymazanie · Overovanie",
+  "kicker": "Tools",
+  "kicker_sk": "Nástroje",
+  "read": 6,
+  "bilingual": true
+ },
+ {
   "slug": "defenses-that-failed-their-own-control",
   "title": "The control is the number: four memory-poisoning defenses that failed, including one of ours",
   "title_sk": "Kontrola je to číslo: štyri obrany proti otrave pamäte, ktoré zlyhali — vrátane našej",
