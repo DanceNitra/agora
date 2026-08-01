@@ -296,10 +296,45 @@ _NOT_RATE_WORDS = ("auc", "corr", "rho", "delta", "lift", "edge", "gain", "diff"
 _UNSIGNED_RATE = re.compile(r"^(?:\*\*)?(0?\.\d{1,4}|0|1|1\.0+)(?:\*\*)?$")
 
 
+#: `P(...)` names a PROBABILITY by construction, and no word in _RATE_WORDS appears in it. Measured
+#: 2026-08-01 on the live challenge queue: the winner-take-all belief tabulates
+#: "P(better option wins)" at 0.527 / 0.585 / 0.688 / 0.797 / 0.906 with n=4000 stated, which is
+#: exactly the two-proportion comparison this organ attacks -- and Voss walked past it reporting
+#: "no rate comparison to attack", eight targets in a row.
+#:
+#: The exclusions stay as they are, deliberately. An AUC, a correlation and a delta are NOT binomial
+#: proportions, and putting two AUCs through a two-proportion test would be an instrument error
+#: wearing a verdict's clothes -- the failure that produced a false FAILED in the replication ledger
+#: earlier today. Refusing those is the instrument working.
+_PROB_HEADER = re.compile(r"^\s*p\s*\(", re.IGNORECASE)
+
+
 def _is_rate_header(cell: str) -> bool:
+    """COLUMN-WISE use. Deliberately NOT widened to `P(...)`.
+
+    The column-wise scan compares two rate COLUMNS within one row, which is only a comparison when
+    both columns name the SAME quantity under different arms. Accepting any `P(...)` header made the
+    winner-take-all table offer `P(better option wins)=1.000` against
+    `P(final winner = earliest)=0.730` -- two different outcomes in one row, put through a
+    two-proportion test as though they were two arms. Measured before it shipped. That is the same
+    apples-to-oranges shape that wrote a false FAILED into the replication ledger this morning, so the
+    widening lives only on the transposed path, where one row label fixes the metric.
+    """
     c = " " + cell.strip().lower().strip("*`") + " "
     if any(bad in c for bad in _NOT_RATE_WORDS):
         return False
+    return any(good in c for good in _RATE_WORDS)
+
+
+def _is_rate_label(cell: str) -> bool:
+    """ROW-LABEL use, on the transposed path. Here the label names ONE metric and the cells sweep a
+    parameter, so `P(better wins, alpha=1)` across delta = 0.05..2.0 is a single quantity measured at
+    two operating points -- a real comparison, and the shape the live belief actually uses."""
+    c = " " + cell.strip().lower().strip("*`") + " "
+    if any(bad in c for bad in _NOT_RATE_WORDS):
+        return False
+    if _PROB_HEADER.match(cell.strip().strip("*`")):
+        return True
     return any(good in c for good in _RATE_WORDS)
 
 
@@ -340,6 +375,38 @@ def _rate_pair(text: str) -> dict | None:
                         "col_a": header[a[0]].strip("*` ") or "col%d" % a[0],
                         "col_b": header[b[0]].strip("*` ") or "col%d" % b[0],
                         "row": cells[0].strip("*` ")[:60] or "row 1"}
+    # TRANSPOSED TABLES CARRY THE SAME DATA. A note that sweeps one parameter across the header and
+    # puts the measured rate in a ROW -- header `| δ (quality gap) | 0.05 | 0.2 | 0.5 | 1.0 | 2.0 |`,
+    # row `| P(better wins, α=1) | 0.527 | 0.585 | 0.688 | 0.797 | 0.906 |` -- states a rate
+    # comparison as plainly as a column-wise one, and the column-only scan saw nothing. Measured
+    # 2026-08-01: this is the shape the live winner-take-all belief uses.
+    return _rate_pair_transposed(lines)
+
+
+def _rate_pair_transposed(lines: list) -> dict | None:
+    """A rate comparison written ACROSS a row: the row LABEL names the rate, the cells sweep it."""
+    for i in range(len(lines) - 2):
+        if not lines[i].strip().startswith("|"):
+            continue
+        if not re.match(r"^\s*\|[\s:|-]+\|\s*$", lines[i + 1]):
+            continue
+        header = _split_row(lines[i])
+        for row_line in lines[i + 2:]:
+            if not row_line.strip().startswith("|"):
+                break
+            cells = _split_row(row_line)
+            if not cells or not _is_rate_label(cells[0]):
+                continue
+            vals = [(j, float(m.group(1)))
+                    for j, c in enumerate(cells[1:], start=1)
+                    for m in [_UNSIGNED_RATE.match(c)] if m]
+            if len(vals) >= 2 and abs(vals[0][1] - vals[-1][1]) >= 0.005:
+                a, b = vals[0], vals[-1]
+                lbl = cells[0].strip("*` ")[:60] or "rate"
+                return {"a": a[1], "b": b[1],
+                        "col_a": "%s @ %s" % (lbl, (header[a[0]] if a[0] < len(header) else "col%d" % a[0]).strip("*` ")),
+                        "col_b": "%s @ %s" % (lbl, (header[b[0]] if b[0] < len(header) else "col%d" % b[0]).strip("*` ")),
+                        "row": lbl}
     return None
 
 
