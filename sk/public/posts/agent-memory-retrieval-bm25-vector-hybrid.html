@@ -47,6 +47,14 @@
   .lng button{font-family:var(--mono);font-size:11.5px;letter-spacing:.06em;border:0;background:transparent;
     color:var(--soft);padding:6px 12px;cursor:pointer;transition:background .2s,color .2s}
   .lng button.on{background:var(--acc);color:#fff}
+  /* split_languages.py rewrites the button pair into <a hreflang> links once there is one language
+     per document. The rules above only ever matched <button>, so after the split the toggle lost its
+     padding (EN and SK rendered flush as "ENSK") and the active-language highlight never appeared on
+     any post. Two tools each correct, nobody owning the seam between them. */
+  .lng a{font-family:var(--mono);font-size:11.5px;letter-spacing:.06em;padding:6px 12px;
+    color:var(--soft);text-decoration:none;border:0;line-height:1}
+  .lng a+a{border-left:1px solid var(--line)}
+  .lng a.on{background:var(--acc);color:#fff}
   article{max-width:680px;margin:0 auto;padding:30px 24px 90px}
   .kicker{font-family:var(--mono);font-size:12px;letter-spacing:.16em;text-transform:uppercase;color:var(--acc);margin-bottom:18px}
   h1{font-weight:500;font-size:clamp(34px,5.2vw,52px);line-height:1.1;letter-spacing:-.018em;margin:0 0 18px}
@@ -98,6 +106,7 @@
 <div class="meta"><span>June 30, 2026</span><span>7 min read</span><span class="sk">AI agenti · Pamäť · Retrieval · BM25 vs vektory · Hybrid</span></div>
 <div class="tldr"><div class="lab"><span class="sk">Zhrnutie</span></div>
 <p><span class="sk">Odmerali sme 6 self-hostovateľných retrieverov pre pamäť AI agentov na LoCoMo. Recency (default 'posledných N') dosiahol 0,024 recall@20; samotný vektorový index neporazil zero-dependency BM25 (remíza); lacný BM25+embedder hybrid vyhral.</span></p></div>
+
 <div class="sk"><p><strong class="b">Čo sme odmerali.</strong> Nástroje na „pamäť agenta" potichu zdedili predvolené nastavenie webového RAG: zaembeduj všetko, ulož do vektorovej databázy, vyhľadávaj cez cosine. Lacné, lokálne hostovateľné možnosti sme postavili proti sebe na reálnom benchmarku multi-session pamäte a zmapovali sme, <em>kde každá z nich zlyháva</em>. Tri veci obstáli aj pod štatistikou rešpektujúcou zhlukovanie: <strong class="b">recency / okno „posledných N", ktoré mnohé agentové frameworky reálne dodávajú, je katastrofálne</strong> (recall@20 len <strong class="stat">0,024</strong>); <strong class="b">jeden vektorový index — aj so silným embedderom — neprekoná bezzávislostné BM25</strong> (remizuje s ním); a <strong class="b">lacný hybrid BM25 + embedder robustne prekoná každý samostatný retriever</strong>. Nič z toho nie je nové v information retrieval — reprodukuje to lekciu z BEIR „BM25 je silný baseline" na dátach pamäte agenta — ale spustiteľný receipt a <em>recency</em> číslo stoja za to mať.</p>
 <p><strong class="b">Nastavenie.</strong> <a href="https://github.com/snap-research/locomo">LoCoMo</a> je benchmark veľmi dlhodobej multi-session konverzačnej pamäte. Verejne uvoľnený dataset s 10 konverzáciami má <strong class="b">5 882 dialógových ťahov</strong> a <strong class="b">~1 986 otázok</strong> (841 single-hop, 282 multi-hop (viac-skokových), 321 temporal, 96 open-domain, plus ~446 adversariálnych); skórujeme <strong class="stat">1 531</strong> zodpovedateľných otázok, ktorých zlaté evidence-ťahy sa v prepise nachádzajú. Každá konverzácia je celá multi-session história jedného páru používateľov (~590 ťahov); indexujeme a vyhľadávame <em>v rámci</em> konverzácie — t. j. pamäťový sklad jedného používateľa, vybavujúci si naprieč jeho vlastnými staršími sessions. Pre každú otázku vyhľadáme ťahy a meriame <strong class="b">recall@20</strong> — podiel zlatých evidence-ťahov danej otázky, ktoré skončia v top 20 — a full-evidence recall (všetky zlaté ťahy v top 20). Šesť retrieverov, všetky lokálne hostovateľné, všetky bez vychytávok:</p>
 <ul><li><strong class="b">recency</strong> — 20 najnovších ťahov, slepé voči dopytu (predvolené „len si nechaj posledných N")</li><li><strong class="b">BM25</strong> — bezzávislostné lexikálne usporiadanie (k1=1.5, b=0.75)</li><li><strong class="b">nomic</strong> — <code>nomic-embed-text</code> cosine, spustené <em>správne</em> s povinnými prefixmi <code>search_query:</code> / <code>search_document:</code></li><li><strong class="b">mxbai</strong> — <code>mxbai-embed-large</code> cosine, silný otvorený embedder, s jeho retrieval query promptom</li><li><strong class="b">hybrid_nomic / hybrid_mxbai</strong> — Reciprocal Rank Fusion BM25 s každým embedderom</li></ul>

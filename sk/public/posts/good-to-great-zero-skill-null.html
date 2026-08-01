@@ -47,6 +47,14 @@
   .lng button{font-family:var(--mono);font-size:11.5px;letter-spacing:.06em;border:0;background:transparent;
     color:var(--soft);padding:6px 12px;cursor:pointer;transition:background .2s,color .2s}
   .lng button.on{background:var(--acc);color:#fff}
+  /* split_languages.py rewrites the button pair into <a hreflang> links once there is one language
+     per document. The rules above only ever matched <button>, so after the split the toggle lost its
+     padding (EN and SK rendered flush as "ENSK") and the active-language highlight never appeared on
+     any post. Two tools each correct, nobody owning the seam between them. */
+  .lng a{font-family:var(--mono);font-size:11.5px;letter-spacing:.06em;padding:6px 12px;
+    color:var(--soft);text-decoration:none;border:0;line-height:1}
+  .lng a+a{border-left:1px solid var(--line)}
+  .lng a.on{background:var(--acc);color:#fff}
   article{max-width:680px;margin:0 auto;padding:30px 24px 90px}
   .kicker{font-family:var(--mono);font-size:12px;letter-spacing:.16em;text-transform:uppercase;color:var(--acc);margin-bottom:18px}
   h1{font-weight:500;font-size:clamp(34px,5.2vw,52px);line-height:1.1;letter-spacing:-.018em;margin:0 0 18px}
@@ -98,6 +106,7 @@
 <div class="meta"><span>June 29, 2026</span><span>6 min read</span><span class="sk">Manažment · Survivorship bias · Regresia k priemeru · Replikácia</span></div>
 <div class="tldr"><div class="lab"><span class="sk">Zhrnutie</span></div>
 <p><span class="sk">Good to Great tvrdí, že 11 firiem skočilo k veľkosti cez spoločné vlastnosti. Zero-skill null reprodukuje ten istý skok, potom sa zrúti k trhu (regresia k priemeru). Odmerané, so simuláciou aj falzifikátorom.</span></p></div>
+
 <div class="sk"><p><strong class="b">Krátka odpoveď.</strong> Jim Collins v knihe <em>Good to Great</em> (2001, ~4M kópií) našiel 11 firiem, ktoré skočili z priemeru na 15-ročný beh trojnásobne prekonávajúci trh, a destiloval ich spoločné vlastnosti — Level 5 leadership, Hedgehog Concept, Flywheel — ako objaviteľné príčiny <em>trvalej veľkosti</em>. Postavili sme najmenší model so <strong class="b">schopnosťou vypnutou</strong> — firmy, ktoré sú všetky rovnako (ne)schopné — a reprodukuje celý vzor. Ten „skok" je presne to, ako vyzerá selekcia podľa minulého výkonu plus regresia k priemeru, keď žiadna schopnosť nie je.</p>
 <p><strong class="b">Tvrdenie.</strong> Že konkrétna sada manažérskych vlastností <em>spôsobila</em> trvalý good-to-great prechod, objaviteľná štúdiom víťazov.</p>
 <p><strong class="b">Háčik.</strong> Tých 11 firiem bolo vybraných <em>preto</em>, že skok už spravili — selekcia podľa výsledku. Študuj len víťazov, bez kontroly z neúspešných firiem, a každá vlastnosť, ktorú náhodou zdieľajú, vyzerá kauzálne. A firmy vybrané za extrémny beh sú presne tie, ktoré regresia k priemeru ťahá späť. Takže otázka nie je „zdieľajú vlastnosti?" — ale či dôkaz vie odlíšiť schopnosť od šťastia. To sa dá otestovať priamo.</p>

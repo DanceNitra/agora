@@ -47,6 +47,14 @@
   .lng button{font-family:var(--mono);font-size:11.5px;letter-spacing:.06em;border:0;background:transparent;
     color:var(--soft);padding:6px 12px;cursor:pointer;transition:background .2s,color .2s}
   .lng button.on{background:var(--acc);color:#fff}
+  /* split_languages.py rewrites the button pair into <a hreflang> links once there is one language
+     per document. The rules above only ever matched <button>, so after the split the toggle lost its
+     padding (EN and SK rendered flush as "ENSK") and the active-language highlight never appeared on
+     any post. Two tools each correct, nobody owning the seam between them. */
+  .lng a{font-family:var(--mono);font-size:11.5px;letter-spacing:.06em;padding:6px 12px;
+    color:var(--soft);text-decoration:none;border:0;line-height:1}
+  .lng a+a{border-left:1px solid var(--line)}
+  .lng a.on{background:var(--acc);color:#fff}
   article{max-width:680px;margin:0 auto;padding:30px 24px 90px}
   .kicker{font-family:var(--mono);font-size:12px;letter-spacing:.16em;text-transform:uppercase;color:var(--acc);margin-bottom:18px}
   h1{font-weight:500;font-size:clamp(34px,5.2vw,52px);line-height:1.1;letter-spacing:-.018em;margin:0 0 18px}
@@ -98,6 +106,7 @@
 <div class="meta"><span>July 2, 2026</span><span>7 min read</span><span class="sk">AI agenti · Pamäť · Bezpečnosť · Poisoning · inspeximus</span></div>
 <div class="tldr"><div class="lab"><span class="sk">Zhrnutie</span></div>
 <p><span class="sk">Jedna otrávená spomienka s triggerom z obyčajnej vety unesie retrieval AI agenta na 88–100% aj pri 10k. Gejtovanie vplyvu korroboráciou ho zrazí na 0%.</span></p></div>
+
 <div class="sk"><p><strong class="b">Čo sme spravili.</strong> Spustili sme reálny útok na otrávenie pamäte proti <em>našej vlastnej</em> open-source pamäťovej vrstve pre agentov, <a href="https://pypi.org/project/inspeximus/">inspeximus</a>, naprieč tromi rôznymi dense retrievermi — a potom sme sa ju pokúsili ubrániť. Útok je ľahký a generalizuje. Zjavné obrany nie. Jediné, čo obstálo, nie je vôbec múdrejší retriever: je to odmietnutie nechať <strong class="b">nekorroborovanú</strong> spomienku <em>riadiť akciu</em>. Táto obrana je teraz v mneme 0.4.0 ako <code>recall(influence_only=True)</code> a generalizuje práve preto, že žije v <strong class="b">provenance metadátach, nie v geometrii embeddingu</strong>.</p>
 <p><strong class="b">Threat model, úprimne.</strong> Toto je nastavenie AgentPoison (<a href="https://arxiv.org/abs/2407.12784">Chen, Xiang, Xiao, Song &amp; Li, NeurIPS 2024</a>): útočník vloží jednu otrávenú spomienku a dokáže dostať <strong class="b">trigger</strong> do query — takže neškodne vyzerajúca požiadavka plus trigger, ktorý útočník ovláda, vyretrievuje poison namiesto skutočnej spomienky. AgentPoison ten trigger optimalizuje gradient searchom a <em>coherence</em> lossom, aby čítal prirodzene a prekĺzol cez perplexity filtre; uvádza <strong class="b">81,2% priemernú úspešnosť útoku pri retrievale (ASR-r)</strong> pri <strong class="b">&lt;0,1%</strong> otrávenej pamäti. My meriame tú istú <em>retrieval-hijack</em> fázu (ASR-r), nie end-to-end akciu (ich end-to-end ASR-t je 62,6%). Všetko nižšie má spustiteľný receipt.</p>
 <p><strong class="b">Výsledok 1 — ani nepotrebuješ ten fancy útok.</strong> Na 60-položkovej pamäti <em>jediný</em> otrávený záznam, ktorého triggerom je <strong class="b">obyčajná anglická veta</strong> — doslova <em>"the old lighthouse still guides ships along the rocky coast"</em> — pristane na <strong class="b">1. mieste</strong> pre 88–100% query s triggerom naprieč všetkými tromi retrievermi (<a href="https://huggingface.co/sentence-transformers/all-MiniLM-L6-v2">all-MiniLM-L6-v2</a>, <a href="https://huggingface.co/BAAI/bge-small-en-v1.5">BGE-small-en-v1.5</a>, <a href="https://huggingface.co/facebook/contriever">Contriever</a>). Žiadna gradientová optimalizácia netreba; predradenie distinktívnej vety dominuje embedding query a stiahne ho na poison. (Voľba vety hrá rolu — iná prirodzená veta dala na jednom retrieveri 69% — takže headline čítaj ako 69–100%, spoľahlivo ~100% keď optimalizuješ.)</p>

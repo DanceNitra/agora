@@ -47,6 +47,14 @@
   .lng button{font-family:var(--mono);font-size:11.5px;letter-spacing:.06em;border:0;background:transparent;
     color:var(--soft);padding:6px 12px;cursor:pointer;transition:background .2s,color .2s}
   .lng button.on{background:var(--acc);color:#fff}
+  /* split_languages.py rewrites the button pair into <a hreflang> links once there is one language
+     per document. The rules above only ever matched <button>, so after the split the toggle lost its
+     padding (EN and SK rendered flush as "ENSK") and the active-language highlight never appeared on
+     any post. Two tools each correct, nobody owning the seam between them. */
+  .lng a{font-family:var(--mono);font-size:11.5px;letter-spacing:.06em;padding:6px 12px;
+    color:var(--soft);text-decoration:none;border:0;line-height:1}
+  .lng a+a{border-left:1px solid var(--line)}
+  .lng a.on{background:var(--acc);color:#fff}
   article{max-width:680px;margin:0 auto;padding:30px 24px 90px}
   .kicker{font-family:var(--mono);font-size:12px;letter-spacing:.16em;text-transform:uppercase;color:var(--acc);margin-bottom:18px}
   h1{font-weight:500;font-size:clamp(34px,5.2vw,52px);line-height:1.1;letter-spacing:-.018em;margin:0 0 18px}
@@ -98,6 +106,7 @@
 <div class="meta"><span>July 4, 2026</span><span>11 min read</span><span class="sk">Pamäť agentov · Otrava pamäte · Bezpečnosť · Sybil · inspeximus</span></div>
 <div class="tldr"><div class="lab"><span class="sk">Zhrnutie</span></div>
 <p><span class="sk">Vrstvené obrany proti otrave pamäte agentov sa nevynásobia do steny. Štyri kompozičné tvrdenia overené proti literatúre spoľahlivosti, Sybil a change-point — všetky správne a učebnicové — nechávajú oceniteľné, odvolateľné rezíduum nad provenance, čo prežije transformáciu. Plus päť shipnutých inspeximus primitív, každý limit v kóde.</span></p></div>
+
 <div class="sk"><p><strong class="b">Pasca.</strong> AI agenta, ktorý sa učí z vlastnej pamäte, sa dá otráviť: naservíruj mu fakt dosť často a z dosť uhlov a začne podľa neho konať. Inštinkt je navrstviť obrany — dôveruj hodnote len ak ju potvrdí viac zdrojov, váž pamäť reputáciou agenta, ohranič, čoho sa smie nepreverená pamäť dotknúť, pridaj anomália-monitor — a predpokladať, že sa vrstvy <em>vynásobia</em> do steny. Týždeň sme skladali presne takýto stack proti trpezlivému travičovi a potom každú vrstvu red-teamli do zabitia. Vrstvy sú reálne a každá pomáha. Nevynásobia sa do steny. Proti útočníkovi, čo je ochotný počkať, sa poskladajú do <strong class="b">oceniteľného, odvolateľného rezídua</strong> — a každé tvrdenie o tom, <em>prečo</em> sa skladajú, je učebnicové. To je poctivý výsledok a je užitočnejší než stena, ktorú postaviť nevieme.</p>
 <p><strong class="b">Nie je to náš nápad — a treba to povedať nahlas.</strong> „Redundantné obrany nepadajú nezávisle, takže ich pass-raty nemôžeš vynásobiť" je najstaršia lekcia spoľahlivosti. Eckhardt &amp; Lee (1985) a Littlewood &amp; Miller (1989) formalizovali <em>koincidentné zlyhanie</em>: nezávisle-postavené redundantné kanály padajú závisle, takže nezávislosť nesmieš predpokladať (poraziť ju vie len zámerne vynútená diverzita — a tá tam väčšinou nie je). Reputačná polovica je tiež uzavretá — Cheng &amp; Friedman (2005) dokázali, že žiadna netriviálna <strong class="b">symetrická</strong> reputačná funkcia nie je Sybil-proof, Douceur (2002) je sama Sybil nemožnosť a Friedman &amp; Resnick (2001) ocenili „cheap pseudonyms" whitewashing daň. Capability ceilings sú Saltzer &amp; Schroeder (1975) least-privilege; detekčná podlaha je Page (1954) / Lorden (1971) / Moustakides (1986) CUSUM; deterrence matematika je Becker (1968); a „detektor napojený na signál, ktorý útočník ovláda, padne útočníkovi, čo ten signál dodá" je Carlini &amp; Wagner (2017). Stojíme na tom celom. Naše je len toto: štyri kompozičné tvrdenia overené proti tej literatúre, malý harness, čo ukáže, že tie killy zaberú na reálnej pamäti agenta, a päť bežateľných primitív postavených, keď sme poznali ich limity.</p>
 <p><strong class="b">Štyri nosné tvrdenia sme pustili cez päť-šošovkovú verifikáciu (Storm) skôr, než sme napísali slovo.</strong> Všetky štyri sa vrátili <em>správne — a učebnicové</em>. Ten pár je pointa: to, že je tvrdenie učebnicové, nie je dôvod ho zahodiť, je to dôvod citovať prior art a nikdy ho neobliekať za nové.</p>

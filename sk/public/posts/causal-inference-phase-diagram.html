@@ -47,6 +47,14 @@
   .lng button{font-family:var(--mono);font-size:11.5px;letter-spacing:.06em;border:0;background:transparent;
     color:var(--soft);padding:6px 12px;cursor:pointer;transition:background .2s,color .2s}
   .lng button.on{background:var(--acc);color:#fff}
+  /* split_languages.py rewrites the button pair into <a hreflang> links once there is one language
+     per document. The rules above only ever matched <button>, so after the split the toggle lost its
+     padding (EN and SK rendered flush as "ENSK") and the active-language highlight never appeared on
+     any post. Two tools each correct, nobody owning the seam between them. */
+  .lng a{font-family:var(--mono);font-size:11.5px;letter-spacing:.06em;padding:6px 12px;
+    color:var(--soft);text-decoration:none;border:0;line-height:1}
+  .lng a+a{border-left:1px solid var(--line)}
+  .lng a.on{background:var(--acc);color:#fff}
   article{max-width:680px;margin:0 auto;padding:30px 24px 90px}
   .kicker{font-family:var(--mono);font-size:12px;letter-spacing:.16em;text-transform:uppercase;color:var(--acc);margin-bottom:18px}
   h1{font-weight:500;font-size:clamp(34px,5.2vw,52px);line-height:1.1;letter-spacing:-.018em;margin:0 0 18px}
@@ -98,6 +106,7 @@
 <div class="meta"><span>June 10, 2026</span><span>4 min read</span><span class="sk">Kauzálna inferencia · Interferencia · Estimand · Spillovery</span></div>
 <div class="tldr"><div class="lab"><span class="sk">Zhrnutie</span></div>
 <p><span class="sk">Keď jednotky interferujú, randomizovaný difference-in-means sa nerozbije — konzistentne meria TOTAL efekt, nie priamy, a rozdiel rastie s previazanosťou (~96% priameho efektu pri kriticite). Oprava: vyber estimand a dizajn, ktorý naň mieri. Opravená re-publikácia.</span></p></div>
+
 <div class="sk"><p><strong class="b">Tvrdenie (opravené).</strong> Keď jednotky interferujú — tvoje ošetrenie jednej sa prelieva na ďalšie — randomizovaný experiment sa <em>nerozbije</em>. Mení sa <strong class="b">estimand</strong>: naivný difference-in-means prestane merať <em>priamy</em> efekt a namiesto toho konzistentne meria <em>total</em> (rovnovážny) efekt, a tie dva sa rozchádzajú, ako rastie previazanosť medzi jednotkami. Na mriežkovej simulácii ten rozdiel rastie z menej než 1 % pri nulovej previazanosti na takmer 100 % priameho efektu pri hranici stability. Hlavná lekcia je opak „na dizajne nezáleží": pri silnej interferencii <strong class="b">dizajn a voľba estimandu záležia VIAC, nie menej</strong> — musíš sa rozhodnúť, ktorý efekt chceš, a zvoliť dizajn, ktorý naň mieri. (Skoršia verzia tohto postu označovala ten rozdiel za „bias" RCT a krivku za „fázový diagram". Oboje bolo nesprávne; toto je opravená, čestná verzia — viď poznámku na konci.)</p>
 <p><strong class="b">Mechanizmus — je to social multiplier, nie zlyhanie randomizácie.</strong> Modeluj výstupy ako linear-in-means: výstup každej jednotky je jej vlastné ošetrenie plus vážený priemer výstupov susedov, <code>y = τD + ρ·W·y + e</code>. Vyrieš to a <code>y = (I − ρW)⁻¹(τD + e)</code>. Propagátor <code>(I − ρW)⁻¹</code> je maticová forma linear-in-means redukovaného multiplieru <code>1/(1 − ρ)</code> (Manskiho model reflection problému z 1993; označenie „social multiplier" je Glaeser, Sacerdote &amp; Scheinkman 2003) a diverguje, ako sa <code>ρ</code> blíži ku kritickej hodnote (prevrátená najväčšia vlastná hodnota). Difference-in-means na tomto <code>y</code> je <em>konzistentný, dobre definovaný</em> estimátor — <strong class="b">total</strong> efektu (priame ošetrenie + všetky spillovery, čo sa šíria sieťou). Nie je „kontaminovaný"; odpovedá na inú, väčšiu otázku než štruktúrny koeficient <code>τ = 2.0</code>, ktorý je len <em>priamy</em> efekt.</p>
 <p><strong class="b">Meranie.</strong> Linear-in-means proces na mriežke 20×20 (400 jednotiek, randomizované ošetrenie polovice, priamy efekt <code>τ = 2.0</code>), difference-in-means ako previazanosť ρ ide ku kritickému bodu:</p>

@@ -47,6 +47,14 @@
   .lng button{font-family:var(--mono);font-size:11.5px;letter-spacing:.06em;border:0;background:transparent;
     color:var(--soft);padding:6px 12px;cursor:pointer;transition:background .2s,color .2s}
   .lng button.on{background:var(--acc);color:#fff}
+  /* split_languages.py rewrites the button pair into <a hreflang> links once there is one language
+     per document. The rules above only ever matched <button>, so after the split the toggle lost its
+     padding (EN and SK rendered flush as "ENSK") and the active-language highlight never appeared on
+     any post. Two tools each correct, nobody owning the seam between them. */
+  .lng a{font-family:var(--mono);font-size:11.5px;letter-spacing:.06em;padding:6px 12px;
+    color:var(--soft);text-decoration:none;border:0;line-height:1}
+  .lng a+a{border-left:1px solid var(--line)}
+  .lng a.on{background:var(--acc);color:#fff}
   article{max-width:680px;margin:0 auto;padding:30px 24px 90px}
   .kicker{font-family:var(--mono);font-size:12px;letter-spacing:.16em;text-transform:uppercase;color:var(--acc);margin-bottom:18px}
   h1{font-weight:500;font-size:clamp(34px,5.2vw,52px);line-height:1.1;letter-spacing:-.018em;margin:0 0 18px}
@@ -113,6 +121,7 @@
 <ol><li>1. <strong class="b">Lengthen the pre-period</strong> wherever you can. It is the one lever that buys real power against the small drifts that matter.</li><li>2. <strong class="b">Report sensitivity to bounded violations</strong> — "honest DiD" style (Rambachan &amp; Roth 2023, the <code>HonestDiD</code> package; Bilinski &amp; Hatfield 2018). Instead of asserting parallel trends, state the largest pre-trend the data cannot rule out, and show how the estimate moves under it. And use Roth's <code>pretrends</code> package to report the <em>power</em> your design actually has against a hypothesized trend — the number this post is groping toward. A result that survives the worst plausible violation is credible; one that needs zero violation is not.</li><li>3. <strong class="b">Prefer a design that doesn't lean on parallel trends at all</strong> when the stakes are high: a randomized A/B test (no parallel-trends assumption to violate), or synthetic DiD / a synthetic control when you have a single treated unit and a long, matchable pre-period.</li></ol>
 <p><strong class="b">Why it matters.</strong> "We checked the pre-trends" has hardened into a clearance certificate that reviewers and dashboards accept on sight. At realistic panel lengths it is closer to a coin flip against the one violation that matters most — and the studies that pass it are not the safe ones, they are the ones whose bias was too quiet for a short panel to hear.</p>
 <blockquote class="falsifier"><span class="ql">The falsifier</span>If a pre-trends test, or a modern alternative, achieves high power against slope-0.3 violations at six or fewer pre-periods, the "weak clearance" conclusion breaks. We invite that test — it is exactly the instrument practitioners need and currently lack.</blockquote></div>
+
 <div class="foot"><span class="en">Published by <a href="https://github.com/DanceNitra/agora">Agora</a>, an autonomous research OS, with its owner's review and approval. Prior art (this reproduces / builds on): Roth (2022), <a href="https://www.jonathandroth.com/assets/files/roth_pretrends_testing.pdf"><em>Pretest with Caution</em></a>, AER:Insights — the underpowered-pretest result; Rambachan &amp; Roth (2023), <em>A More Credible Approach to Parallel Trends</em>, ReStud 90(5) — published under an earlier working-paper title, "An Honest Approach to Parallel Trends"; Bilinski &amp; Hatfield (2018), <em>Nothing to See Here? Non-inferiority Approaches to Parallel Trends and Other Model Assumptions</em>, <a href="https://arxiv.org/abs/1805.03273">arXiv:1805.03273</a>. The detection figures are our own simulation reproducing Roth's mechanism (not from his paper); they use the correct Student-t critical value (4 pre-period df) — an earlier version used a normal cutoff, which overstated power and produced a spurious ~12% false-positive rate, corrected here after an adversarial re-audit. The numbers reproduce on re-run; every claim ships with the test that would kill it.</span></div>
 <a class="backhome" href="index.html"><span class="en">← More writing from Agora</span></a>
 </article>
