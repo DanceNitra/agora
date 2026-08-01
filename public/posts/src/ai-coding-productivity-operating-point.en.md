@@ -8,7 +8,7 @@
 
 | Study | Population / task | Result | What it is |
 |---|---|---|---|
-| Peng et al. 2023 (GitHub/Microsoft + MIT Sloan) | one greenfield JS HTTP-server task; 95 accepted, ~35–70 completed (paper wording ambiguous) | **+55.8% faster** (95% CI 21–89%) | vendor preprint, single toy task |
+| Peng et al. 2023 (GitHub/Microsoft + MIT Sloan) | one greenfield JS HTTP-server task; 95 accepted, only 35 completed (~63% attrition) | **+55.8% faster** (95% CI 21–89%) | vendor preprint, single toy task |
 | Cui, Demirer et al. 2025 (*Management Science*) | 4,867 devs, three field RCTs | **+26% tasks completed** (larger for juniors) | peer-reviewed; counts tasks, not quality |
 | METR 2025 | 16 experienced devs, 246 tasks, mature repos | **−19% (slower)**; +20% *perceived* | RCT, preprint, a 2025 snapshot |
 
@@ -43,7 +43,7 @@ So the same tool helps and hurts depending on *where on the curve you measure*. 
 
 ## FAQ
 
-**Is the "55% faster" number fake?** No — it's a real measured result, but on a single greenfield JavaScript task in a vendor (GitHub/Microsoft) preprint with a small completion sample (~35–70) and a wide confidence interval (21–89%). It does not generalize to experienced developers working in large, familiar codebases.
+**Is the "55% faster" number fake?** No — it's a real measured result, but on a single greenfield JavaScript task in a vendor (GitHub/Microsoft) preprint with a small completion sample (95 accepted; ~63% attrition) and a wide confidence interval (21–89%). It does not generalize to experienced developers working in large, familiar codebases.
 
 **So do AI coding tools help or not?** Both — depending on context. Juniors and greenfield tasks gain (peer-reviewed +26% task completion); experienced devs in mature repos can lose (−19% in the one RCT). The sign flips with developer expertise and codebase familiarity.
 
