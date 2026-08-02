@@ -1,7 +1,7 @@
 {
  "name": "The Crucible — machine replication ledger",
  "description": "Scientific and technical claims rebuilt as minimal computational models and tested. REPRODUCED = the mechanism holds in a minimal model; FAILED = it does not; NOT_COMPUTABLE = no simulable core (an honest pass).",
- "generated": "2026-08-01",
+ "generated": "2026-08-02",
  "counts": {
   "REPRODUCED": 21,
   "FAILED": 14,
@@ -95,7 +95,7 @@
    "verdict": "NOT_COMPUTABLE",
    "note": "Real 2000 AS data (SNAP, 6474 nodes), CSN MLE: power-law alpha=2.15 BEATS exponential (p=0.0002) but TIES lognormal (Vuong p=0.616, NS). A tie means the data CANNOT distinguish power-law from lognormal -- the power law is not rejected, just not uniquely best (CSN 'inconclusive'). Reclassified FAILED->NOT_COMPUTABLE (Crucible audit 2026-07-05): the Faloutsos claim is neither confirmed nor refuted here, so a clean FAILED overclaimed.",
    "lab_id": "4399e9",
-   "code": "",
+   "code": "https://github.com/DanceNitra/agora/blob/main/agora_output/lab/20260701_crucible_powerlaw_internet_topology.py",
    "date": "2026-07-01"
   },
   {
@@ -167,7 +167,7 @@
    "verdict": "REPRODUCED",
    "note": "Smallest model of the mechanism; exploration HELD IDENTICAL (both learners fed the same uniform-random trajectories off-policy, so the only difference is credit assignment). Exp A (deterministic chain + step cost): EC reaches a goal-reachin SCOPED (Crucible audit 2026-07-05): the max-return store is unbiased only in a NOISELESS deterministic env (max=mean); EC beating parametric learning on a tiny deterministic chain is close to textbook (tabular memorization beats function approximation when no generalization is needed). Do not generalize to broad sample-efficiency.",
    "lab_id": "84b6b7",
-   "code": "",
+   "code": "https://github.com/DanceNitra/agora/blob/main/agora_output/lab/20260626-015150_mfec-episodic-control-sample-efficiency-vs-brittle.py",
    "date": "2026-06-26"
   },
   {
@@ -176,7 +176,7 @@
    "verdict": "NOT_COMPUTABLE",
    "note": "Not a fair adjudication of MemGPT (Packer et al. 2023, arXiv:2310.08560): (1) synthetic corpus + OUR OWN measured reader-accuracy factor (0.95/0.91) is baked in, so the reader ceiling drives the curve; (2) tested only to N=250, but the claim is 0->700 docs; (3) SINGLE-hop QA stayed FLAT -- which CONFIRMS MemGPT's actual paper claim -- and only MULTI-hop synthesis degraded, which the paper never claimed stays flat. Reclassified FAILED->NOT_COMPUTABLE (Crucible audit 2026-07-05): failing a claim the paper did not make. (The multi-hop synthesis collapse is real and lives in the RAG-is-dead marquee.)",
    "lab_id": "f4e22f",
-   "code": "",
+   "code": "https://github.com/DanceNitra/agora/blob/main/agora_output/lab/exp_memgpt_flatcurve.py",
    "date": "2026-06-24"
   },
   {
@@ -194,7 +194,7 @@
    "verdict": "FAILED",
    "note": "Under a rigorous Clauset-Shalizi-Newman fit (MLE alpha, KS-selected xmin, bootstrap goodness-of-fit, Vuong likelihood-ratio vs lognormal, n=20,000): a lognormal that 'looks scale-free' on a log-log plot is correctly REFUSED (power-law GOF p=0.01; LR favors lognormal, -17.5); a genuine Pareto power law passes (GOF p=0.92; LR +102); and a real Barabasi-Albert network is only a TIE (LR -0.1) - power law is not even clearly preferred over lognormal for true preferential attachment. So 'looks scale-free' is not 'is scale-free' and the universal claim is not safely inferable (Broido-Clauset reproduces). Power law IS reproduced for true BA graphs. CONTESTED (Crucible audit 2026-07-05): FAILED holds only under the STRICT CSN pure-power-law criterion; under regularly-varying / generalized-power-law definitions many networks pass (Voitalov et al. 2019; Serafino et al. 2021 PNAS: finite-size effects hide true power laws). Open debate, not a closed debunk.",
    "lab_id": "e88ca9",
-   "code": "",
+   "code": "https://github.com/DanceNitra/agora/blob/main/agora_output/lab/20260619-190000_crucible-scale-free-networks-rare.py",
    "date": "2026-06-19"
   },
   {
@@ -203,7 +203,7 @@
    "verdict": "FAILED",
    "note": "The canonical SHARP 'emergence' curve is reproduced by a SMOOTH, continuous per-token skill measured with a nonlinear exact-match metric: the same smooth skill gives a per-token transition width 7.0 vs an exact-match (L=100) width 1.05 -- 6.7x sharper PURELY from the metric -- and the apparent onset shifts -0.07 -> +5.58 as answer length grows with NO change in underlying skill. No capability discontinuity is needed, so benchmark sharpness is not evidence for one (Schaeffer et al. 2023 'mirage', NeurIPS Outstanding Paper, reproduces). CONTESTED / scope: shows the metric mechanism is SUFFICIENT to fake sharpness here; it does NOT prove no ability is ever genuinely emergent -- Du et al. 2024 argue downstream abilities track a genuine pretraining-loss threshold. What FAILS is 'benchmark sharpness proves a discontinuity', not all emergence.",
    "lab_id": "af4a24",
-   "code": "",
+   "code": "https://github.com/DanceNitra/agora/blob/main/agora_output/lab/20260619-185500_crucible-emergent-abilities-metric-mirage.py",
    "date": "2026-06-19"
   },
   {
@@ -212,7 +212,7 @@
    "verdict": "NOT_COMPUTABLE",
    "note": "The smallest faithful model of the stated mechanism (1D positions; new vertex connects to earlier vertex minimizing |dx| + alpha*depth) DEGENERATES across alpha to a near-star (max-degree 849->4059 growing with alpha, mean-degree 2, poor po",
    "lab_id": "4cf927",
-   "code": "",
+   "code": "https://github.com/DanceNitra/agora/blob/main/agora_output/lab/20260618-210611_cipa-degree-distribution-replication.py",
    "date": "2026-06-18"
   },
   {
@@ -221,7 +221,7 @@
    "verdict": "REPRODUCED",
    "note": "Smallest model: 2-objective bandit, known Pareto front (4 optimal + 2 dominated arms). Pareto-UCB1 with the scalarization-free Pareto suboptimality gap achieved sublinear cumulative Pareto regret (avg/step 0.027->0.005, growth factor 1.82 o",
    "lab_id": "ac7232",
-   "code": "",
+   "code": "https://github.com/DanceNitra/agora/blob/main/agora_output/lab/20260618-195309_pareto-regret-mo-bandit-replication.py",
    "date": "2026-06-18"
   },
   {
@@ -230,7 +230,7 @@
    "verdict": "NOT_COMPUTABLE",
    "note": "Fitting V ~ n^alpha: the strong n^2 law holds only under the (unrealistic) assumption that every pairwise connection has EQUAL value (alpha=2.00); under realistic rank-declining value (Zipf 1/k) the theoretical prediction is ~n*log(n) (Briscoe-Odlyzko-Tilly 2006). BUT the exponent is empirically UNSETTLED: real user/revenue data from Facebook & Tencent fit n^2 better than n*log(n) (Zhang, Liu & Xu 2015; Van Hove 2016 upholds), and later work even fits a cube law. VERDICT NOT_COMPUTABLE (revised from FAILED, Crucible audit 2026-07-05): our lab shows n^2 is not FORCED by first principles once connection value declines, but n^2 does not fail EMPIRICALLY -- the headline data go the other way, so no clean REPRODUCED/FAILED is warranted.",
    "lab_id": "b790af",
-   "code": "",
+   "code": "https://github.com/DanceNitra/agora/blob/main/agora_output/lab/20260618-022251_metcalfe-law-n2-vs-nlogn-replication.py",
    "date": "2026-06-18"
   },
   {
@@ -239,7 +239,7 @@
    "verdict": "FAILED",
    "note": "STRONG claim (random>=best) NOT reproduced in a faithful, paired, statistically-powered minimal model (n=800 ring, pool=120, group=10, random group averaged over 5 draws, 25 landscapes). Random-minus-best is consistently NEGATIVE across heu",
    "lab_id": "b56ae0",
-   "code": "",
+   "code": "https://github.com/DanceNitra/agora/blob/main/agora_output/lab/20260617-234958_hong-page-diversity-trumps-ability-replication.py",
    "date": "2026-06-17"
   },
   {
@@ -248,7 +248,7 @@
    "verdict": "REPRODUCED",
    "note": "Smallest Galton-Watson model (Poisson offspring), vectorized over 40k realizations. Critical eps=0: n*P_n -> ~2 (Kolmogorov 2/sigma^2, sigma^2=1). Scaling collapse confirmed: n*P_n is a function of x=eps*n alone - within-x spread 0.116 vs a",
    "lab_id": "32d07b",
-   "code": "",
+   "code": "https://github.com/DanceNitra/agora/blob/main/agora_output/lab/20260611-123757_branching-process-survival-probability-finite-size.py",
    "date": "2026-06-17"
   },
   {
@@ -257,7 +257,7 @@
    "verdict": "REPRODUCED",
    "note": "Self-contained sim (weighted log-rank family, n=50/arm, 4000 trials). Age-localized true effect: log-rank power 32.5% vs Gehan 72.3%; the two tests give DISCORDANT verdicts on 39.9% of identical datasets. Under the null, best-of-3 tests inf",
    "lab_id": "20260616-ger",
-   "code": "",
+   "code": "https://github.com/DanceNitra/agora/blob/main/agora_output/lab/20260616-geroprotector-survival-statistic-artifact.py",
    "date": "2026-06-16"
   },
   {
@@ -284,7 +284,7 @@
    "verdict": "REPRODUCED",
    "note": "Smallest model (lab a08981): a population recursively synthesizes candidates FROM ITSELF each generation; the pivotal variable is the SELECTION signal. With an EXTERNAL fitness anchor (as Promptbreeder has: real task accuracy) recursive synthesis improves; with self-scoring only it does NOT -- so the gain is attributable to external selection, not to self-reference. Claim RESCOPED + unverified '~15%' figure dropped (Crucible audit 2026-07-05): the headline previously mis-credited self-reference.",
    "lab_id": "a08981",
-   "code": "",
+   "code": "https://github.com/DanceNitra/agora/blob/main/agora_output/lab/20260615-033219_recursive-synthesis-external-anchor-boundary.py",
    "date": "2026-06-15"
   },
   {
@@ -302,7 +302,7 @@
    "verdict": "REPRODUCED",
    "note": "N=30,T=12,1 treated,rho=0.7,true effect=0,800 reps: DiD 95% CI coverage=0.305 (severe under-coverage vs nominal 0.95); SC coverage=0.891; SC RMSE=1.017 < DiD RMSE=1.267. DiD inference invalid, SC materially better.",
    "lab_id": "606f02",
-   "code": "",
+   "code": "https://github.com/DanceNitra/agora/blob/main/agora_output/lab/20260619-234500_challenge-sc-vs-did-short-clean-prefit.py",
    "date": "2026-06-14"
   },
   {
@@ -320,7 +320,7 @@
    "verdict": "NOT_COMPUTABLE",
    "note": "Design/HCI framework, not a falsifiable empirical claim: a minimal flow model (flow=difficulty-skill match) confirms a gap-closing intervention by construction, so the directional result is near-tautological — no genuine FAILED was possible. Downgraded from a constructed-model REPRODUCED to keep the ledger honest.",
    "lab_id": "1b4d0a",
-   "code": "",
+   "code": "https://github.com/DanceNitra/agora/blob/main/agora_output/lab/20260614-104519_replication-flow-aware-ai-augmentation.py",
    "date": "2026-06-14"
   },
   {
@@ -329,7 +329,7 @@
    "verdict": "REPRODUCED",
    "note": "k=3 scaling exponent confirmed: empirical p_c*sqrt(2N) constant across N=400/800/1600 (1.26,1.26,1.19). N^(-1/2) scaling reproduced; prefactor ~1.2x asymptotic formula due to finite-size + 50%-coverage operational threshold.",
    "lab_id": "d02e5c",
-   "code": "",
+   "code": "https://github.com/DanceNitra/agora/blob/main/agora_output/lab/20260613-054612_clique-percolation-dpv.py",
    "date": "2026-06-13"
   },
   {
@@ -338,7 +338,7 @@
    "verdict": "NOT_COMPUTABLE",
    "note": "Berger (2003, Stat. Sci. 18(1)) is faithfully cited, but 'conditional error probability = Bayesian posterior' is Berger's THEOREM -- an algebraic identity of the conditional test. Re-verifying it on data drawn from the same prior just re-derives Bayes' rule; FAILED impossible -> by construction. Also the cited 0.216/0.041 do not match the canonical Berger-Sellke bound (~0.29 at p=.05). Reclassified REPRODUCED->NOT_COMPUTABLE (Crucible audit 2026-07-05).",
    "lab_id": "6e4ffc",
-   "code": "",
+   "code": "https://github.com/DanceNitra/agora/blob/main/agora_output/lab/20260613-035707_berger-conditional-frequentist-reconciliation.py",
    "date": "2026-06-13"
   },
   {
@@ -347,7 +347,7 @@
    "verdict": "REPRODUCED",
    "note": "Three structurally different Z2 mean-field models (tanh self-consistency, phi^4 free energy, arctan self-consistency) all give order-parameter exponent beta=0.500; a different-class absorbing-state model gives beta=1.000. Same class -> same",
    "lab_id": "d3e71e",
-   "code": "",
+   "code": "https://github.com/DanceNitra/agora/blob/main/agora_output/lab/20260612-235202_universality-critical-exponents.py",
    "date": "2026-06-12"
   },
   {
@@ -356,7 +356,7 @@
    "verdict": "REPRODUCED",
    "note": "Empirical regret growth exponent 0.03-0.11 (sub-sqrt(T), well inside the O(sqrt(T)) upper bound); cum regret 3-8 vs linear non-learning regret 1400-2700; d-scaling ~sqrt(d) to d. Computable core holds.",
    "lab_id": "032cdd",
-   "code": "",
+   "code": "https://github.com/DanceNitra/agora/blob/main/agora_output/lab/20260611-163346_linucb-sublinear-regret-bound-chu-et-al-2011.py",
    "date": "2026-06-12"
   },
   {
@@ -374,7 +374,7 @@
    "verdict": "REPRODUCED",
    "note": "Random-typing corpus (443k words): rank-frequency exponent -1.24, an approximate power law - the math reproduces. Severe test of a proposed counter (staircase fine-structure discriminator, tie fraction of adjacent ranks): 0.89 vs 0.48 at ma CORRECTED (Crucible audit 2026-07-05): the prior headline 'Zipf carries no linguistic significance' is refuted by Ferrer-i-Cancho & Elvevag 2010 (random texts do NOT exhibit real Zipf) and Piantadosi 2014; our own staircase discriminator (0.89 vs 0.48) SEPARATES real from random, contradicting that headline. The power-law FORM reproduces; the linguistic-insignificance conclusion does not.",
    "lab_id": "4779c1",
-   "code": "",
+   "code": "https://github.com/DanceNitra/agora/blob/main/agora_output/lab/20260612-152425_miller-1957-random-typing-zipf-law-fine-structure-.py",
    "date": "2026-06-12"
   },
   {
@@ -383,7 +383,7 @@
    "verdict": "REPRODUCED",
    "note": "Holds at realistic tails: N=30 captures 95.6-96.9% of achievable vol AND ES99 reduction (normal and t2.5 idio + 1-factor). MEASURED BOUNDARY: near infinite-variance idio tails (t1.8) the canon breaks - only 85.4% of tail-risk reduction capt ATTRIBUTION (Crucible audit 2026-07-05): Evans & Archer's own result was ~10-16 stocks; the '~20-30' is post-Statman (1987) textbook canon.",
    "lab_id": "7656de",
-   "code": "",
+   "code": "https://github.com/DanceNitra/agora/blob/main/agora_output/lab/20260612-152357_evans-archer-30-stocks-diversification-vol-vs-tail.py",
    "date": "2026-06-12"
   },
   {
@@ -410,7 +410,7 @@
    "verdict": "REPRODUCED",
    "note": "Reproduced at paper params: random beats best by +1.65 (t=4.1). But the effect is FRAGILE, as critics argued: it shrinks with a narrower heuristic pool (l=6: +0.90) and REVERSES on smoothed landscapes (-0.38, ability wins) -- diversity trumps ability only in the papers specific regime. Cross-ref: the paired STRONG-claim entry (lab b56ae0) rules the general 'random>=best' FAILED in a faithful powered paired model; this REPRODUCED holds only at the paper's specific params and reverses on smoothed landscapes -- the two are consistent, not contradictory.",
    "lab_id": "a3ae64",
-   "code": "",
+   "code": "https://github.com/DanceNitra/agora/blob/main/agora_output/lab/20260612-142343_hong-page-2004-diversity-trumps-ability-relay-sear.py",
    "date": "2026-06-12"
   },
   {
@@ -419,7 +419,7 @@
    "verdict": "REPRODUCED",
    "note": "Double-well (x^2-1)^2 (non-convex, minima +-1, max at 0). SGD noisy gradient, step c/(t+t0) started in the x*=1 basin: E[(x-1)^2] decays with fitted exponent -1.00 = theory O(1/t); constant step stalls at a variance floor. Local convergence",
    "lab_id": "e0a43a",
-   "code": "",
+   "code": "https://github.com/DanceNitra/agora/blob/main/agora_output/lab/20260612-025243_sgd-local-convergence-rate-on-a-non-convex-objecti.py",
    "date": "2026-06-12"
   },
   {
@@ -437,7 +437,7 @@
    "verdict": "REPRODUCED",
    "note": "Smallest model = critical branching process (neuronal avalanches). At sigma=1 avalanche-size P(s)~s^-1.42 (mean-field 3/2); off-critical the power law vanishes (sub: cutoff tau 2.45; super: 9.4pct runaway). Mean size diverges 6.7->1586 appr",
    "lab_id": "73f90e",
-   "code": "",
+   "code": "https://github.com/DanceNitra/agora/blob/main/agora_output/lab/20260611-211807_criticality-power-law-critical-branching-avalanche.py",
    "date": "2026-06-11"
   },
   {
@@ -446,7 +446,7 @@
    "verdict": "NOT_COMPUTABLE",
    "note": "The cited paper (Richemond-Kolbeinsson-Guo, arXiv:1911.11285) tensor-factorizes ONLINE RL policies for 2-10x fewer coefficients. Our reproduction tests none of that: a supervised polynomial fit on 16 points showing K=14 overfits and K=6 is best -- textbook bias-variance, and '2.3x' is engineered by picking an overfitting K (any ratio is manufacturable). Reclassified REPRODUCED->NOT_COMPUTABLE (Crucible audit 2026-07-05): a textbook overfit demo, not a replication of the paper's mechanism.",
    "lab_id": "7bbc76",
-   "code": "",
+   "code": "https://github.com/DanceNitra/agora/blob/main/agora_output/lab/20260611-193252_low-data-regime-2-10x-fewer-coefficients-little-no.py",
    "date": "2026-06-11"
   },
   {
@@ -455,7 +455,7 @@
    "verdict": "REPRODUCED",
    "note": "Smallest model: heterogeneous mean-field SIS threshold lambda_c=<k>/<k^2>, BA (scale-free) vs ER (homogeneous) at mean degree ~4. BA <k^2> grows with N (45->63 over N=500->20000) so lambda_c shrinks 0.088->0.064, heading to 0 = threshold VA",
    "lab_id": "ef9fe3",
-   "code": "",
+   "code": "https://github.com/DanceNitra/agora/blob/main/agora_output/lab/20260611-185703_epidemic-threshold-vanishes-in-scale-free-networks.py",
    "date": "2026-06-11"
   },
   {
@@ -464,7 +464,7 @@
    "verdict": "REPRODUCED",
    "note": "Smallest model: minimize a strongly-convex least-squares (scalar w) with label noise. Constant-step SGD stalls at a variance FLOOR (suboptimality ~1.9e-3, never reaches the optimum); full-gradient GD and variance-reduced SVRG both drive sub",
    "lab_id": "437d20",
-   "code": "",
+   "code": "https://github.com/DanceNitra/agora/blob/main/agora_output/lab/20260611-151308_sgd-variance-floor-vs-gd-svrg-johnson-zhang-2013.py",
    "date": "2026-06-11"
   },
   {
@@ -473,7 +473,7 @@
    "verdict": "REPRODUCED",
    "note": "Smallest model: BA(N=2000,m=2), Molloy-Reed p_c=<k>/(<k^2>-<k>) on the empirical degree sequence + a direct bond-percolation sweep (union-find, giant>50%). MECHANISM REPRODUCED: targeted top-10% hub removal raises the threshold several-fold",
    "lab_id": "e52111",
-   "code": "",
+   "code": "https://github.com/DanceNitra/agora/blob/main/agora_output/lab/20260611-112343_ba-targeted-hub-removal-vs-bond-percolation-thresh.py",
    "date": "2026-06-11"
   },
   {
@@ -482,7 +482,7 @@
    "verdict": "NOT_COMPUTABLE",
    "note": "The cited result (Brynjolfsson-Hitt 2000, JEP 14(4): IT/organizational-capital complementarity) is an EMPIRICAL estimate on real firm data. Our model fit logY=a*IT+b*ORG+g*(IT*ORG) with a PLANTED g~0.06 and correlated regressors, then recovered that omitting ORG inflates the IT coefficient (0.21 vs 0.12) -- but that is the textbook omitted-variable-bias identity, guaranteed once you build the interaction term and correlate the inputs. It ILLUSTRATES the mechanism behind their warning; it does NOT replicate their measured complementarity from data. Reclassified REPRODUCED->NOT_COMPUTABLE (Crucible audit 2026-07-05): tautological simulation of our own assumptions.",
    "lab_id": "8256e7",
-   "code": "",
+   "code": "https://github.com/DanceNitra/agora/blob/main/agora_output/lab/20260611-102502_brynjolfsson-hitt-2000-it-org-complementarity-repl.py",
    "date": "2026-06-11"
   },
   {
@@ -491,7 +491,7 @@
    "verdict": "NOT_COMPUTABLE",
    "note": "The cited result (Toutanova-Chen 2015, W15-4007: observed/path features match or beat latent embeddings on KB completion) is EMPIRICAL on REAL KBs (FB15k, WN18). Our synthetic reproduction PLANTED the r0->r1 compositional structure that path-features are built to detect, so the observed-beats-latent gap (AUC 0.966 vs 0.749) is guaranteed BY CONSTRUCTION -- it illustrates the mechanism (path features read compositional paths low-rank SVD misses) but is NOT an independent replication of the paper's real-data result. Reclassified REPRODUCED->NOT_COMPUTABLE (Crucible audit 2026-07-05). Faithful next step: Node+LinkFeat vs an embedding model on FB15k-237.",
    "lab_id": "43c007",
-   "code": "",
+   "code": "https://github.com/DanceNitra/agora/blob/main/agora_output/lab/20260611-082402_replication-toutanova-chen-2015-observed-features-.py",
    "date": "2026-06-11"
   },
   {

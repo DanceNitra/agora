@@ -341,7 +341,7 @@
             <span class="cfield"></span></div>
           <h3>Episodic memory (Model-Free Episodic Control: store the MAX observed discounted return per</h3>
           <p class="cresult">Smallest model of the mechanism; exploration HELD IDENTICAL (both learners fed the same uniform-random trajectories off-policy, so the only difference is credit assignment). Exp A (deterministic chain + step cost): EC reaches a goal-reachin SCOPED (Crucible audit 2026-07-05): the max-return store is unbiased only in a NOISELESS deterministic env (max=mean); EC beating parametric learning on a tiny deterministic chain is close to textbook (tabular memorization beats function approximation when no generalization is needed). Do not generalize to broad sample-efficiency.</p>
-          <div class="cfoot"><span class="cyear">Sarrico, Arulkumaran, Agostinelli et al. - Sam</span></div>
+          <div class="cfoot"><span class="cyear">Sarrico, Arulkumaran, Agostinelli et al. - Sam</span><a class="code" href="https://github.com/DanceNitra/agora/blob/main/agora_output/lab/20260626-015150_mfec-episodic-control-sample-efficiency-vs-brittle.py" target="_blank" rel="noopener">runnable model &rarr;</a></div>
         </div>
       </article>
       <article class="card fail" data-v="FAILED" data-reveal>
@@ -351,7 +351,7 @@
             <span class="cfield"></span></div>
           <h3>Real-world networks are scale-free: their degree distributions follow a power law p(k) ~ k</h3>
           <p class="cresult">Under a rigorous Clauset-Shalizi-Newman fit (MLE alpha, KS-selected xmin, bootstrap goodness-of-fit, Vuong likelihood-ratio vs lognormal, n=20,000): a lognormal that &#x27;looks scale-free&#x27; on a log-log plot is correctly REFUSED (power-law GOF p=0.01; LR favors lognormal, -17.5); a genuine Pareto power law passes (GOF p=0.92; LR +102); and a real Barabasi-Albert network is only a TIE (LR -0.1) - power law is not even clearly preferred over lognormal for true preferential attachment. So &#x27;looks scale-free&#x27; is not &#x27;is scale-free&#x27; and the universal claim is not safely inferable (Broido-Clauset reproduces). Power law IS reproduced for true BA graphs. CONTESTED (Crucible audit 2026-07-05): FAILED holds only under the STRICT CSN pure-power-law criterion; under regularly-varying / generalized-power-law definitions many networks pass (Voitalov et al. 2019; Serafino et al. 2021 PNAS: finite-size effects hide true power laws). Open debate, not a closed debunk.</p>
-          <div class="cfoot"><span class="cyear">Barabasi-Albert (1999) framing, widely repeate</span></div>
+          <div class="cfoot"><span class="cyear">Barabasi-Albert (1999) framing, widely repeate</span><a class="code" href="https://github.com/DanceNitra/agora/blob/main/agora_output/lab/20260619-190000_crucible-scale-free-networks-rare.py" target="_blank" rel="noopener">runnable model &rarr;</a></div>
         </div>
       </article>
       <article class="card fail" data-v="FAILED" data-reveal>
@@ -361,7 +361,7 @@
             <span class="cfield"></span></div>
           <h3>Emergent abilities of large language models are genuine, sharp capability transitions - a </h3>
           <p class="cresult">The canonical SHARP &#x27;emergence&#x27; curve is reproduced by a SMOOTH, continuous per-token skill measured with a nonlinear exact-match metric: the same smooth skill gives a per-token transition width 7.0 vs an exact-match (L=100) width 1.05 -- 6.7x sharper PURELY from the metric -- and the apparent onset shifts -0.07 -&gt; +5.58 as answer length grows with NO change in underlying skill. No capability discontinuity is needed, so benchmark sharpness is not evidence for one (Schaeffer et al. 2023 &#x27;mirage&#x27;, NeurIPS Outstanding Paper, reproduces). CONTESTED / scope: shows the metric mechanism is SUFFICIENT to fake sharpness here; it does NOT prove no ability is ever genuinely emergent -- Du et al. 2024 argue downstream abilities track a genuine pretraining-loss threshold. What FAILS is &#x27;benchmark sharpness proves a discontinuity&#x27;, not all emergence.</p>
-          <div class="cfoot"><span class="cyear">Wei et al. 2022 &amp;#x27;Emergent Abilities of La</span></div>
+          <div class="cfoot"><span class="cyear">Wei et al. 2022 &amp;#x27;Emergent Abilities of La</span><a class="code" href="https://github.com/DanceNitra/agora/blob/main/agora_output/lab/20260619-185500_crucible-emergent-abilities-metric-mirage.py" target="_blank" rel="noopener">runnable model &rarr;</a></div>
         </div>
       </article>
       <article class="card ok" data-v="REPRODUCED" data-reveal>
@@ -371,7 +371,7 @@
             <span class="cfield"></span></div>
           <h3>A Pareto regret that reflects Pareto optimality without relying on scalarization functions</h3>
           <p class="cresult">Smallest model: 2-objective bandit, known Pareto front (4 optimal + 2 dominated arms). Pareto-UCB1 with the scalarization-free Pareto suboptimality gap achieved sublinear cumulative Pareto regret (avg/step 0.027-&gt;0.005, growth factor 1.82 o</p>
-          <div class="cfoot"><span class="cyear">Pareto Regret Analyses in Multi-objective Mult</span></div>
+          <div class="cfoot"><span class="cyear">Pareto Regret Analyses in Multi-objective Mult</span><a class="code" href="https://github.com/DanceNitra/agora/blob/main/agora_output/lab/20260618-195309_pareto-regret-mo-bandit-replication.py" target="_blank" rel="noopener">runnable model &rarr;</a></div>
         </div>
       </article>
       <article class="card fail" data-v="FAILED" data-reveal>
@@ -381,7 +381,7 @@
             <span class="cfield">Collective intelligence</span></div>
           <h3>…but &quot;diversity trumps ability&quot; is not a general law</h3>
           <p class="cresult">Stress-test of the same claim in a DIFFERENT, faithful problem model (NK landscapes; paired and statistically powered): the best-ability group matches or slightly beats the random/diverse group at every difficulty level. So the Hong-Page advantage is real at the original parameters (companion card) but does NOT generalize — condition-specific, not a universal law, consistent with Thompson (2014). The effect is small; this refutes the universal claim, not the value of diversity in specific regimes.</p>
-          <div class="cfoot"><span class="cyear">Hong &amp; Page · 2004 (contested, Thompson 2014)</span></div>
+          <div class="cfoot"><span class="cyear">Hong &amp; Page · 2004 (contested, Thompson 2014)</span><a class="code" href="https://github.com/DanceNitra/agora/blob/main/agora_output/lab/20260617-234958_hong-page-diversity-trumps-ability-replication.py" target="_blank" rel="noopener">runnable model &rarr;</a></div>
         </div>
       </article>
       <article class="card ok" data-v="REPRODUCED" data-reveal>
@@ -391,7 +391,7 @@
             <span class="cfield"></span></div>
           <h3>The survival probability of a branching process obeys finite-size scaling in the control p</h3>
           <p class="cresult">Smallest Galton-Watson model (Poisson offspring), vectorized over 40k realizations. Critical eps=0: n*P_n -&gt; ~2 (Kolmogorov 2/sigma^2, sigma^2=1). Scaling collapse confirmed: n*P_n is a function of x=eps*n alone - within-x spread 0.116 vs a</p>
-          <div class="cfoot"><span class="cyear">Garcia-Millan, Font-Clos et al. 2015, &amp;quot;Fi</span></div>
+          <div class="cfoot"><span class="cyear">Garcia-Millan, Font-Clos et al. 2015, &amp;quot;Fi</span><a class="code" href="https://github.com/DanceNitra/agora/blob/main/agora_output/lab/20260611-123757_branching-process-survival-probability-finite-size.py" target="_blank" rel="noopener">runnable model &rarr;</a></div>
         </div>
       </article>
       <article class="card ok" data-v="REPRODUCED" data-reveal>
@@ -401,7 +401,7 @@
             <span class="cfield"></span></div>
           <h3>Whether a mouse geroprotector is recorded as extending lifespan can depend on the survival</h3>
           <p class="cresult">Self-contained sim (weighted log-rank family, n=50/arm, 4000 trials). Age-localized true effect: log-rank power 32.5% vs Gehan 72.3%; the two tests give DISCORDANT verdicts on 39.9% of identical datasets. Under the null, best-of-3 tests inf</p>
-          <div class="cfoot"><span class="cyear">deep-research 2026-06-16 + Jiang et al., GeroS</span></div>
+          <div class="cfoot"><span class="cyear">deep-research 2026-06-16 + Jiang et al., GeroS</span><a class="code" href="https://github.com/DanceNitra/agora/blob/main/agora_output/lab/20260616-geroprotector-survival-statistic-artifact.py" target="_blank" rel="noopener">runnable model &rarr;</a></div>
         </div>
       </article>
       <article class="card ok" data-v="REPRODUCED" data-reveal>
@@ -411,7 +411,7 @@
             <span class="cfield"></span></div>
           <h3>Recursive prompt/self synthesis improves performance ONLY when scored by an EXTERNAL fitne</h3>
           <p class="cresult">Smallest model (lab a08981): a population recursively synthesizes candidates FROM ITSELF each generation; the pivotal variable is the SELECTION signal. With an EXTERNAL fitness anchor (as Promptbreeder has: real task accuracy) recursive synthesis improves; with self-scoring only it does NOT -- so the gain is attributable to external selection, not to self-reference. Claim RESCOPED + unverified &#x27;~15%&#x27; figure dropped (Crucible audit 2026-07-05): the headline previously mis-credited self-reference.</p>
-          <div class="cfoot"><span class="cyear">Promptbreeder (Fernando, Banarse, Michalewski,</span></div>
+          <div class="cfoot"><span class="cyear">Promptbreeder (Fernando, Banarse, Michalewski,</span><a class="code" href="https://github.com/DanceNitra/agora/blob/main/agora_output/lab/20260615-033219_recursive-synthesis-external-anchor-boundary.py" target="_blank" rel="noopener">runnable model &rarr;</a></div>
         </div>
       </article>
       <article class="card ok" data-v="REPRODUCED" data-reveal>
@@ -421,7 +421,7 @@
             <span class="cfield"></span></div>
           <h3>In DiD with FEW treated units and spatially/serially-correlated errors, standard DiD infer</h3>
           <p class="cresult">N=30,T=12,1 treated,rho=0.7,true effect=0,800 reps: DiD 95% CI coverage=0.305 (severe under-coverage vs nominal 0.95); SC coverage=0.891; SC RMSE=1.017 &lt; DiD RMSE=1.267. DiD inference invalid, SC materially better.</p>
-          <div class="cfoot"><span class="cyear">Alvarez &amp;amp; Ferman (2020)</span></div>
+          <div class="cfoot"><span class="cyear">Alvarez &amp;amp; Ferman (2020)</span><a class="code" href="https://github.com/DanceNitra/agora/blob/main/agora_output/lab/20260619-234500_challenge-sc-vs-did-short-clean-prefit.py" target="_blank" rel="noopener">runnable model &rarr;</a></div>
         </div>
       </article>
       <article class="card ok" data-v="REPRODUCED" data-reveal>
@@ -431,7 +431,7 @@
             <span class="cfield"></span></div>
           <h3>Derenyi-Palla-Vicsek (2005): k-clique percolation in ER graphs at p_c(k)=[(k-1)N]^(-1/(k-1</h3>
           <p class="cresult">k=3 scaling exponent confirmed: empirical p_c*sqrt(2N) constant across N=400/800/1600 (1.26,1.26,1.19). N^(-1/2) scaling reproduced; prefactor ~1.2x asymptotic formula due to finite-size + 50%-coverage operational threshold.</p>
-          <div class="cfoot"><span class="cyear">Clique Percolation in Random Networks (Derenyi</span></div>
+          <div class="cfoot"><span class="cyear">Clique Percolation in Random Networks (Derenyi</span><a class="code" href="https://github.com/DanceNitra/agora/blob/main/agora_output/lab/20260613-054612_clique-percolation-dpv.py" target="_blank" rel="noopener">runnable model &rarr;</a></div>
         </div>
       </article>
       <article class="card ok" data-v="REPRODUCED" data-reveal>
@@ -441,7 +441,7 @@
             <span class="cfield"></span></div>
           <h3>Systems in the same universality class share the same critical exponents (Lubeck 2004)</h3>
           <p class="cresult">Three structurally different Z2 mean-field models (tanh self-consistency, phi^4 free energy, arctan self-consistency) all give order-parameter exponent beta=0.500; a different-class absorbing-state model gives beta=1.000. Same class -&gt; same</p>
-          <div class="cfoot"><span class="cyear">Universal Scaling Behavior of Non-Equilibrium </span></div>
+          <div class="cfoot"><span class="cyear">Universal Scaling Behavior of Non-Equilibrium </span><a class="code" href="https://github.com/DanceNitra/agora/blob/main/agora_output/lab/20260612-235202_universality-critical-exponents.py" target="_blank" rel="noopener">runnable model &rarr;</a></div>
         </div>
       </article>
       <article class="card ok" data-v="REPRODUCED" data-reveal>
@@ -451,7 +451,7 @@
             <span class="cfield"></span></div>
           <h3>LinUCB (Chu et al 2011): linear contextual bandit achieves O(sqrt(Td log^3)) i.e. sublinea</h3>
           <p class="cresult">Empirical regret growth exponent 0.03-0.11 (sub-sqrt(T), well inside the O(sqrt(T)) upper bound); cum regret 3-8 vs linear non-learning regret 1400-2700; d-scaling ~sqrt(d) to d. Computable core holds.</p>
-          <div class="cfoot"><span class="cyear">Contextual Bandits with Linear Payoff Function</span></div>
+          <div class="cfoot"><span class="cyear">Contextual Bandits with Linear Payoff Function</span><a class="code" href="https://github.com/DanceNitra/agora/blob/main/agora_output/lab/20260611-163346_linucb-sublinear-regret-bound-chu-et-al-2011.py" target="_blank" rel="noopener">runnable model &rarr;</a></div>
         </div>
       </article>
       <article class="card fail" data-v="FAILED" data-reveal>
@@ -471,7 +471,7 @@
             <span class="cfield">Linguistics / statistics</span></div>
           <h3>A monkey at a typewriter really does produce Zipf&#x27;s law</h3>
           <p class="cresult">Random typing yields exponent −1.24; even a natural fine-structure discriminator fails at matched corpus size (1.8× &lt; 2× bar). The deflationary inference survives a severe test.</p>
-          <div class="cfoot"><span class="cyear">Miller · 1957</span></div>
+          <div class="cfoot"><span class="cyear">Miller · 1957</span><a class="code" href="https://github.com/DanceNitra/agora/blob/main/agora_output/lab/20260612-152425_miller-1957-random-typing-zipf-law-fine-structure-.py" target="_blank" rel="noopener">runnable model &rarr;</a></div>
         </div>
       </article>
       <article class="card ok" data-v="REPRODUCED" data-reveal>
@@ -481,7 +481,7 @@
             <span class="cfield">Finance</span></div>
           <h3>Thirty stocks diversify you — until the tails get heavy</h3>
           <p class="cresult">N=30 captures ~96% of achievable risk reduction at realistic tails — but only 85% of tail-risk reduction near infinite-variance tails, where ~100 stocks are needed.</p>
-          <div class="cfoot"><span class="cyear">Evans &amp; Archer · 1968</span></div>
+          <div class="cfoot"><span class="cyear">Evans &amp; Archer · 1968</span><a class="code" href="https://github.com/DanceNitra/agora/blob/main/agora_output/lab/20260612-152357_evans-archer-30-stocks-diversification-vol-vs-tail.py" target="_blank" rel="noopener">runnable model &rarr;</a></div>
         </div>
       </article>
       <article class="card ok" data-v="REPRODUCED" data-reveal>
@@ -491,7 +491,7 @@
             <span class="cfield">Collective intelligence</span></div>
           <h3>Diversity beats ability — but only at Hong &amp; Page&#x27;s exact parameters</h3>
           <p class="cresult">Reproduced in the authors&#x27; own relay model: a random team beats the best-individuals team by +1.65 (t=4.1) at the paper&#x27;s parameters — but the edge is fragile, reversing to −0.38 on a smoother landscape. See the companion FAILED card: the advantage does not survive a different, powered problem model.</p>
-          <div class="cfoot"><span class="cyear">Hong &amp; Page · 2004</span></div>
+          <div class="cfoot"><span class="cyear">Hong &amp; Page · 2004</span><a class="code" href="https://github.com/DanceNitra/agora/blob/main/agora_output/lab/20260612-142343_hong-page-2004-diversity-trumps-ability-relay-sear.py" target="_blank" rel="noopener">runnable model &rarr;</a></div>
         </div>
       </article>
       <article class="card ok" data-v="REPRODUCED" data-reveal>
@@ -501,7 +501,7 @@
             <span class="cfield">Optimization</span></div>
           <h3>SGD finds a real minimum of a non-convex loss</h3>
           <p class="cresult">On a double-well non-convex objective, SGD localizes to a true minimum at the predicted convergence rate.</p>
-          <div class="cfoot"><span class="cyear">Fehrman, Gess &amp; Jentzen</span></div>
+          <div class="cfoot"><span class="cyear">Fehrman, Gess &amp; Jentzen</span><a class="code" href="https://github.com/DanceNitra/agora/blob/main/agora_output/lab/20260612-025243_sgd-local-convergence-rate-on-a-non-convex-objecti.py" target="_blank" rel="noopener">runnable model &rarr;</a></div>
         </div>
       </article>
       <article class="card ok" data-v="REPRODUCED" data-reveal>
@@ -511,7 +511,7 @@
             <span class="cfield">Statistical physics / neuroscience</span></div>
           <h3>Criticality leaves a power-law fingerprint</h3>
           <p class="cresult">At the critical point, fluctuations show power-law scaling and long-range correlations — the signature reproduces cleanly.</p>
-          <div class="cfoot"><span class="cyear">Kitzbichler, Smith, Rahn · 2009</span></div>
+          <div class="cfoot"><span class="cyear">Kitzbichler, Smith, Rahn · 2009</span><a class="code" href="https://github.com/DanceNitra/agora/blob/main/agora_output/lab/20260611-211807_criticality-power-law-critical-branching-avalanche.py" target="_blank" rel="noopener">runnable model &rarr;</a></div>
         </div>
       </article>
       <article class="card ok" data-v="REPRODUCED" data-reveal>
@@ -521,7 +521,7 @@
             <span class="cfield">Network science / epidemiology</span></div>
           <h3>In scale-free networks, the epidemic threshold vanishes</h3>
           <p class="cresult">As N grows, λ_c = ⟨k⟩/⟨k²⟩ → 0: a hub-rich network has effectively no herd-immunity threshold.</p>
-          <div class="cfoot"><span class="cyear">Pastor-Satorras &amp; Vespignani</span></div>
+          <div class="cfoot"><span class="cyear">Pastor-Satorras &amp; Vespignani</span><a class="code" href="https://github.com/DanceNitra/agora/blob/main/agora_output/lab/20260611-185703_epidemic-threshold-vanishes-in-scale-free-networks.py" target="_blank" rel="noopener">runnable model &rarr;</a></div>
         </div>
       </article>
       <article class="card ok" data-v="REPRODUCED" data-reveal>
@@ -531,7 +531,7 @@
             <span class="cfield">Optimization</span></div>
           <h3>SGD&#x27;s slow convergence is a variance floor</h3>
           <p class="cresult">Constant-step SGD stalls at a noise floor; variance-reduced methods keep converging — the slowdown is variance, not curvature.</p>
-          <div class="cfoot"><span class="cyear">Johnson &amp; Zhang · 2013</span></div>
+          <div class="cfoot"><span class="cyear">Johnson &amp; Zhang · 2013</span><a class="code" href="https://github.com/DanceNitra/agora/blob/main/agora_output/lab/20260611-151308_sgd-variance-floor-vs-gd-svrg-johnson-zhang-2013.py" target="_blank" rel="noopener">runnable model &rarr;</a></div>
         </div>
       </article>
       <article class="card ok" data-v="REPRODUCED" data-reveal>
@@ -541,7 +541,7 @@
             <span class="cfield">Network science</span></div>
           <h3>Pulling the hubs shatters the network</h3>
           <p class="cresult">Removing the top 10% of nodes by degree multiplies the bond-percolation threshold several-fold (BA, N=2000).</p>
-          <div class="cfoot"><span class="cyear">Percolation &amp; cascade robustness</span></div>
+          <div class="cfoot"><span class="cyear">Percolation &amp; cascade robustness</span><a class="code" href="https://github.com/DanceNitra/agora/blob/main/agora_output/lab/20260611-112343_ba-targeted-hub-removal-vs-bond-percolation-thresh.py" target="_blank" rel="noopener">runnable model &rarr;</a></div>
         </div>
       </article>
   </div>
@@ -583,7 +583,7 @@
 
 <footer><div class="wrap">
   <span>Agora &mdash; autonomous research OS &middot; The Crucible</span>
-  <span>updated 2026-08-01 &middot; <a href="https://github.com/DanceNitra/agora" target="_blank" rel="noopener">source</a></span>
+  <span>updated 2026-08-02 &middot; <a href="https://github.com/DanceNitra/agora" target="_blank" rel="noopener">source</a></span>
 </div></footer>
 
 <script>
