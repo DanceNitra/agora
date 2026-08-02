@@ -67,6 +67,52 @@ _PROBE_BY_LAB = {
     # that file for what reproduced and what did not.
     "ebce40": "probes/crucible_receipt_rebuild.py",                    # hot hand / GVT streak-selection
     "e39390": "probes/crucible_receipt_rebuild.py",                    # Dunning-Kruger quartile plot
+
+    # Relinked 2026-08-02. These 28 entries carried NO code link and read as "no runnable test shipped"
+    # -- which was wrong, and the wrong reading was mine before I looked. The artifacts were on disk the
+    # whole time; an SEO pass reorganised the tree and the ledger's pointers were never updated, so an
+    # empty `code` field meant "the pointer is stale", not "the evidence does not exist". Recovered by
+    # matching each entry's lab_id against every script in the LIVE tree, then falling back to a
+    # claim-to-header match, and reading every pair before writing it.
+    # NOT written: lab fc5c22. Its id appears inside research/probes/operating_point_memory.py, but that
+    # script is a RAMR memory demo and the claim is the GitHub "55% faster" vendor stat. A substring hit
+    # is not a receipt, and a wrong link is worse than none -- that entry keeps its empty field.
+    "4399e9": "agora_output/lab/20260701_crucible_powerlaw_internet_topology.py",
+    "84b6b7": "agora_output/lab/20260626-015150_mfec-episodic-control-sample-efficiency-vs-brittle.py",
+    "f4e22f": "agora_output/lab/exp_memgpt_flatcurve.py",
+    "e88ca9": "agora_output/lab/20260619-190000_crucible-scale-free-networks-rare.py",
+    "af4a24": "agora_output/lab/20260619-185500_crucible-emergent-abilities-metric-mirage.py",
+    "4cf927": "agora_output/lab/20260618-210611_cipa-degree-distribution-replication.py",
+    "ac7232": "agora_output/lab/20260618-195309_pareto-regret-mo-bandit-replication.py",
+    "b790af": "agora_output/lab/20260618-022251_metcalfe-law-n2-vs-nlogn-replication.py",
+    "b56ae0": "agora_output/lab/20260617-234958_hong-page-diversity-trumps-ability-replication.py",
+    "32d07b": "agora_output/lab/20260611-123757_branching-process-survival-probability-finite-size.py",
+    "a08981": "agora_output/lab/20260615-033219_recursive-synthesis-external-anchor-boundary.py",
+    "606f02": "agora_output/lab/20260619-234500_challenge-sc-vs-did-short-clean-prefit.py",
+    "1b4d0a": "agora_output/lab/20260614-104519_replication-flow-aware-ai-augmentation.py",
+    "d02e5c": "agora_output/lab/20260613-054612_clique-percolation-dpv.py",
+    "6e4ffc": "agora_output/lab/20260613-035707_berger-conditional-frequentist-reconciliation.py",
+    "d3e71e": "agora_output/lab/20260612-235202_universality-critical-exponents.py",
+    "032cdd": "agora_output/lab/20260611-163346_linucb-sublinear-regret-bound-chu-et-al-2011.py",
+    "4779c1": "agora_output/lab/20260612-152425_miller-1957-random-typing-zipf-law-fine-structure-.py",
+    "7656de": "agora_output/lab/20260612-152357_evans-archer-30-stocks-diversification-vol-vs-tail.py",
+    "a3ae64": "agora_output/lab/20260612-142343_hong-page-2004-diversity-trumps-ability-relay-sear.py",
+    "e0a43a": "agora_output/lab/20260612-025243_sgd-local-convergence-rate-on-a-non-convex-objecti.py",
+    "73f90e": "agora_output/lab/20260611-211807_criticality-power-law-critical-branching-avalanche.py",
+    "7bbc76": "agora_output/lab/20260611-193252_low-data-regime-2-10x-fewer-coefficients-little-no.py",
+    "ef9fe3": "agora_output/lab/20260611-185703_epidemic-threshold-vanishes-in-scale-free-networks.py",
+    "437d20": "agora_output/lab/20260611-151308_sgd-variance-floor-vs-gd-svrg-johnson-zhang-2013.py",
+    "e52111": "agora_output/lab/20260611-112343_ba-targeted-hub-removal-vs-bond-percolation-thresh.py",
+    "8256e7": "agora_output/lab/20260611-102502_brynjolfsson-hitt-2000-it-org-complementarity-repl.py",
+    "43c007": "agora_output/lab/20260611-082402_replication-toutanova-chen-2015-observed-features-.py",
+
+    # Same four claims, re-recorded under a second lab_id (the BA hub-removal claim carries three ids,
+    # LinUCB two). They point at the script already mapped above for their twin -- a duplicate ledger
+    # row is not a second experiment, and leaving the twin unlinked would have read as a missing test.
+    "a33457": "agora_output/lab/20260611-112343_ba-targeted-hub-removal-vs-bond-percolation-thresh.py",
+    "20260616-per": "agora_output/lab/20260611-112343_ba-targeted-hub-removal-vs-bond-percolation-thresh.py",
+    "ff88bc": "agora_output/lab/20260611-163346_linucb-sublinear-regret-bound-chu-et-al-2011.py",
+    "20260616-ger": "agora_output/lab/20260616-geroprotector-survival-statistic-artifact.py",
 }
 
 
