@@ -40,7 +40,7 @@ PERMS = 2000
 
 def eta_squared(values, groups):
     """Fraction of variance in `values` explained by group membership. Same scale for every column,
-    which is the point: pert_id and plate have to be comparable."""
+which is the point: pert_id and plate have to be comparable."""
     v = np.asarray(values, dtype=float)
     ok = ~np.isnan(v)
     v, g = v[ok], np.asarray(groups)[ok]
@@ -127,8 +127,7 @@ def main():
           f"{[r[0] for r in rows].index('pert_id') + 1} of {len(rows)}")
 
     # ── D. does the treatment effect survive inside a design level? ────────────────────────────
-    print("
-D  do #4 and #8 still stand out WITHIN a level of each big confounder?")
+    print("\nD  do #4 and #8 still stand out WITHIN a level of each big confounder?")
     print("   (a level is usable only with >=8 treatments and >=100 samples; anything else cannot rank)")
     for conf in ("data_source", "instrument", "Yeast_cell_plate"):
         levels = [(lvl, sub) for lvl, sub in d.groupby(conf)
@@ -141,8 +140,7 @@ D  do #4 and #8 still stand out WITHIN a level of each big confounder?")
             print(f"       {str(lvl)[:22]:<24} n={len(sub):<5} treatments={gg.size:<3} "
                   f"rank of #4: {r4:<3} #8: {r8}")
 
-    print("
-   how confounded is pert_id with each of those?")
+    print("\n   how confounded is pert_id with each of those?")
     for conf in ("Yeast_cell_plate", "instrument", "data_source"):
         ct = pd.crosstab(d["pert_id"], d[conf])
         conc = ct.max(axis=1) / ct.sum(axis=1)
