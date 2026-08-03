@@ -56,6 +56,17 @@ CORPORATION_FLOW = {
 }
 
 
+#: How a lead's SOURCE ORGAN is described to the escalation model. The dict key is the organ
+#: label (`flywheel` = our research-loop organ, `contradiction` = the belief-tension organ,
+#: `frontier` = the vault-gap organ). The VALUE must read as provenance and must not be
+#: mistakable for a research domain -- see the comment in _escalate_lead for what happened
+#: when the bare label was passed through.
+_LEAD_PROVENANCE = {
+    "flywheel": "an unresolved falsifier left open by our own research loop",
+    "contradiction": "a tension between two beliefs we have already recorded",
+    "frontier": "a structural gap found in the owner's own knowledge vault",
+}
+
 class CorporationWorker:
     """Autonomous Corporation worker — runs the full HEAD→PATA→Compound cycle.
 
@@ -413,9 +424,25 @@ class CorporationWorker:
         try:
             import asyncio
             from agora.execution.llm_client import call_llm
+            # PROVENANCE, NOT SUBJECT. `kind` is the SOURCE ORGAN a lead came from -- it is never the
+            # topic. Passing it raw as "KIND: flywheel" made the model read our own research-loop
+            # metaphor as a DOMAIN, and constraint 1 below then REQUIRES a concrete named anchor, so it
+            # invented one to match: "the NASA X-15 flywheel dataset", "flywheel-based energy storage",
+            # and citations to match ("Flywheel Energy Storage for High-Speed Flight (1967)",
+            # "Kumar et al. 2020, r=0.95"). Measured 2026-08-03: 20 of 21 queued Crucible candidates were
+            # mechanical-flywheel questions, 22% of the whole inbox, accelerating 5 -> 13 -> 2 over three
+            # days -- while the organ's ACTUAL open questions were about spaced repetition, interlinking
+            # and memory consolidation and mentioned no flywheel at all. The word was injected here.
+            # The novelty gate could not catch it: these are not textbook results, they are corrupted
+            # ones. Constraint 2 already bans the PREVIOUS instance of this failure by listing its output
+            # words ("phase transition", "self-organized criticality"), which treated the symptom; this
+            # treats the mechanism. Describe the provenance in words that cannot be read as a topic.
+            provenance = _LEAD_PROVENANCE.get(kind, "a lead from one of our own research organs")
             esc_prompt = (
                 "You are a Frontier Scout for an autonomous research organization. Here is a raw research lead:\n"
-                f"KIND: {kind}\nQUESTION: {prompt}\n\n"
+                f"WHERE IT CAME FROM: {provenance} -- this is provenance, NOT subject matter. The domain of "
+                f"the question is whatever the QUESTION itself is about; do not infer a topic from this line.\n"
+                f"QUESTION: {prompt}\n\n"
                 "Treat it as the SHALLOW first draft. Produce the AMBITIOUS version of the SAME underlying "
                 "question — the version that would matter 10x more if answered. HARD CONSTRAINTS:\n"
                 "1. ANCHORED: the question must name the CONCRETE system, dataset, or published literature it "
