@@ -19,6 +19,7 @@ Each 15-min tick:
 
 import json
 import os
+import re
 from datetime import datetime
 from pathlib import Path
 from typing import Optional
@@ -61,6 +62,10 @@ CORPORATION_FLOW = {
 #: `frontier` = the vault-gap organ). The VALUE must read as provenance and must not be
 #: mistakable for a research domain -- see the comment in _escalate_lead for what happened
 #: when the bare label was passed through.
+#: What counts as an EXTERNAL anchor on a research lead: a fetchable URL or a DOI. Anything else
+#: -- most of all our own organ labels like `frontier:flywheel` -- is provenance, not a source.
+_EXTERNAL_ANCHOR = re.compile(r"https?://|\b10\.\d{4,9}/\S+")
+
 _LEAD_PROVENANCE = {
     "flywheel": "an unresolved falsifier left open by our own research loop",
     "contradiction": "a tension between two beliefs we have already recorded",
@@ -1212,6 +1217,23 @@ class CorporationWorker:
                 print(f"[Corp->Claude] ship-review REFUSED ({why_refused}): {title[:50]}")
                 return
             src = quest.get("research_source") or quest.get("findings_path") or ""
+            # THE CRUCIBLE REPLICATES EXTERNAL CLAIMS, so a candidate needs an EXTERNAL anchor. A
+            # frontier-seeded quest carries a LABEL ('frontier:flywheel'), not a fetchable source,
+            # and a label is not evidence that any claim exists to replicate. Measured 2026-08-04:
+            # 19 of 21 queued Crucible candidates carried SOURCE 'frontier:flywheel', and the
+            # research text under them asserted studies that do not exist -- "increasing
+            # interlinking in the Wikipedia Corpus by 10% ... retention improved by 12%, recall
+            # decreased by 3%" returns nothing on any search. The refusal guard cannot catch these:
+            # they are confident INVENTIONS, not non-answers, so `is_refusal` correctly passes them.
+            # The only two candidates carrying a real anchor (an arXiv URL and a DOI) were the only
+            # two real ones, which makes the anchor the discriminator. Route the unanchored ones to
+            # the DOSSIER door, which asks Claude to judge a lead, instead of the Crucible door,
+            # which asks him to replicate a claim that may never have been made.
+            if not _EXTERNAL_ANCHOR.search(src):
+                print(f"[Corp->Claude] ship-review has no external anchor ({src[:40]!r}) "
+                      f"-> filing as a dossier instead: {title[:50]}")
+                self._file_research_dossier(quest, ev)
+                return
             why = (ev.get("ceo_rationale") or ev.get("cto_rationale") or "")[:200]
             text = (
                 f"Crucible candidate: {title} || CORP-RESEARCHED, CEO/CTO approved "
