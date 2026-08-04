@@ -71,15 +71,48 @@ def sz_total(n=N):
     return sum(op_at(SZ, i, n) for i in range(n))
 
 
-def lowest_in_sector(H, Sz, target, tol=1e-6):
-    """Lowest eigenstate whose <S^z> equals `target`. Returns (energy, mean magnetisation)."""
-    w, v = np.linalg.eigh(H)
-    for k in range(v.shape[1]):
-        g = v[:, k]
-        m = float(np.real(g.conj() @ (Sz @ g)))
-        if abs(m - target) < tol:
-            return w[k], m / N
-    return None, None
+def lowest_in_sector(H, Sz, target, tol=1e-9):
+    """Lowest eigenstate INSIDE the S^z = target block. Returns (energy, mean magnetisation).
+
+    This projects onto the block and diagonalises there. The first version did not: it diagonalised
+    the whole space and took the first eigenvector whose MEAN <S^z> matched the target. A mean is not
+    a sector test -- a cross-sector superposition passes it -- and the bond-scale variant is the one
+    case here that keeps full SU(2), so its levels are degenerate multiplets and `eigh` returns an
+    arbitrary basis inside them. Measured: at s = 1.5, 202 of 256 eigenvectors have non-integer <S^z>.
+
+    The consequence was silent, which is why it is worth writing down. Against a true projected
+    diagonalisation the old routine returned the WRONG level from s = 1.0 onward:
+
+        s      true E0        returned      dE
+        0.5   -2.7232091     -2.7232091     2.7e-15
+        1.0   -2.9822405     -2.5037291     4.8e-01
+        2.0   -3.6350268     -2.2781332     1.4e+00
+
+    It still reported the right magnetisation, because <m> is pinned in EVERY level of the sector --
+    so the one observable this file is about could not reveal the defect. Ask it for an energy or a
+    gap and it lies. The 7.55e-08 'spread' the first version reported for bond-scale was degeneracy
+    mixing, not physics; in the true block it is ~1e-16 like the others.
+
+        SECOND correction, and it was worse than the first: the fix above originally returned `target / n`
+    for the magnetisation. That is the answer by construction, not a measurement -- the table would
+    have printed my own assumption back at me and called it evidence. The value is now computed from
+    the eigenvector, and the sector is REFUSED outright when H does not commute with S^z, because
+    projecting onto a block of a Hamiltonian that mixes blocks produces a number with no meaning."""
+    if np.linalg.norm(H @ Sz - Sz @ H) > 1e-9:
+        return None, None                      # not a good quantum number; there is no such sector
+    diag = np.real(np.diag(Sz))
+    idx = np.where(np.abs(diag - target) < 1e-9)[0]
+    if idx.size == 0:
+        return None, None
+    w, v = np.linalg.eigh(H[np.ix_(idx, idx)])
+    g = np.zeros(H.shape[0], dtype=complex)
+    g[idx] = v[:, 0]                           # lift the block eigenvector back to the full space
+    n = int(round(np.log2(H.shape[0])))
+    m = float(np.real(g.conj() @ (Sz @ g))) / n
+    var = float(np.real(g.conj() @ (Sz @ Sz @ g))) - (m * n) ** 2
+    assert abs(var) < 1e-9, f"the returned state is not an S^z eigenstate: Var = {var:.2e}"
+    return w[0], m
+
 
 
 def quantisation_and_robustness():
