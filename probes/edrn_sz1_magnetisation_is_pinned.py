@@ -82,6 +82,67 @@ def lowest_in_sector(H, Sz, target, tol=1e-6):
     return None, None
 
 
+def quantisation_and_robustness():
+    """Two things I asserted without checking, added after being called on it.
+
+    (1) I read the reported 0.1250 as 1/N for N = 8 and called it exact agreement. That is an
+        ASSUMPTION about their chain length. <S^z_total> is quantised in integer steps, so
+        <S^z_total>/N can only ever be k/N -- and the folding runs in the same thread name bonds
+        (7,8) and (8,9), which need N >= 10, where the attainable values are multiples of 0.1 and
+        0.1250 is not among them at all.
+
+    (2) I checked the pinning for ONE way a 'contradiction strength' could enter the Hamiltonian.
+        Whether the mean magnetisation is free to move depends entirely on whether that term commutes
+        with total S^z, so the claim is only as good as the coverage of that question."""
+    print("\n   which N could give a mean magnetisation of exactly 0.1250?")
+    for n in (6, 8, 10, 12, 14):
+        print(f"      N={n:<3} S^z=1 -> {1/n:.4f}   S^z=2 -> {2/n:.4f}   attainable values are multiples of {1/n:.4f}")
+    print("      0.1250 needs N to be a multiple of 8. Bonds (7,8) and (8,9) need N >= 10, and at")
+    print("      N = 10 the attainable values are multiples of 0.1000, which does not include 0.1250.")
+
+    print("\n   is the pinning robust to HOW the contradiction enters?")
+    Sz = sz_total()
+    scan = (0.0, 0.5, 1.0, 1.5, 2.0)
+    for kind in ("bond-scale", "xxz-anisotropy", "dm-z", "ising-x-only", "dm-x"):
+        H = variant(kind, 1.3)
+        comm = np.linalg.norm(H @ Sz - Sz @ H)
+        ms = []
+        for s in scan:
+            _, m = lowest_in_sector(variant(kind, s), Sz, 1.0)
+            ms.append(m)
+        spread = (max(ms) - min(ms)) if all(m is not None for m in ms) else float("nan")
+        verdict = "conserves" if comm < 1e-9 else "BREAKS   "
+        print(f"      {kind:<16} ||[H,S^z]||={comm:9.2e}  {verdict}  <m> spread = {spread:.2e}")
+    print("      -> pinned for every S^z-conserving form; the sector does not exist for the two that")
+    print("         break it. So a rise is possible exactly when the contradiction term breaks S^z.")
+
+
+def variant(kind, s, bond=(3, 4), n=N):
+    """The same chain with `s` entering five different ways -- three conserve S^z, two do not."""
+    d = 2 ** n
+    H = np.zeros((d, d), dtype=complex)
+    for i in range(n - 1):
+        a, b = i, i + 1
+        if (a, b) != bond:
+            for S in (SX, SY, SZ):
+                H += op_at(S, a, n) @ op_at(S, b, n)
+        elif kind == "bond-scale":
+            for S in (SX, SY, SZ):
+                H += s * op_at(S, a, n) @ op_at(S, b, n)
+        elif kind == "xxz-anisotropy":
+            H += (op_at(SX, a, n) @ op_at(SX, b, n) + op_at(SY, a, n) @ op_at(SY, b, n)
+                  + s * op_at(SZ, a, n) @ op_at(SZ, b, n))
+        elif kind == "dm-z":
+            H += sum(op_at(S, a, n) @ op_at(S, b, n) for S in (SX, SY, SZ))
+            H += s * (op_at(SX, a, n) @ op_at(SY, b, n) - op_at(SY, a, n) @ op_at(SX, b, n))
+        elif kind == "ising-x-only":
+            H += s * op_at(SX, a, n) @ op_at(SX, b, n)
+        elif kind == "dm-x":
+            H += sum(op_at(S, a, n) @ op_at(S, b, n) for S in (SX, SY, SZ))
+            H += s * (op_at(SY, a, n) @ op_at(SZ, b, n) - op_at(SZ, a, n) @ op_at(SY, b, n))
+    return H
+
+
 def main():
     Sz = sz_total()
     scan = [0.0, 0.25, 0.5, 0.75, 1.0, 1.25, 1.5, 1.75, 2.0]
@@ -122,6 +183,7 @@ def main():
             moved = True
         prev = m
     print(f"   the probe CAN see movement when the symmetry is broken: {moved}")
+    quantisation_and_robustness()
     if not moved:
         print("   ...it cannot, so the flat lines above measure nothing and must not be cited.")
 
