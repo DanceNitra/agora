@@ -227,7 +227,11 @@ LEDGERS = {
     # and verdict_blob reads only verdict_fields, so that argument can never be mistaken for a result.
     ".folklore.json": dict(
         verdict_fields=("verdict", "status"), primary="verdict",
-        decisive=("real", "weak_model_artifact", "regime_specific"),
+        # folklore.FORECASTABLE verbatim. HARMFUL was added to the organ after this spec was
+        # written and never propagated, so the assayer's one HARMFUL ruling matched neither list
+        # and vanished from Aldric's row instead of failing -- exactly what this file's own
+        # docstring warns about, on the organ that had already been fixed once elsewhere.
+        decisive=("real", "weak_model_artifact", "regime_specific", "harmful"),
         inconclusive=("open", "inconclusive", "queued", "pending"),
         ts_fields=("resolved_ts", "ts"),
         actor_fields=("by", "agent", "author", "actor", "who"),

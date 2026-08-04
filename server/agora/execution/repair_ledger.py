@@ -252,6 +252,15 @@ _DECISIVE: dict[str, tuple[str, ...]] = {
     # structurally in _is_decisive. Listed so the coverage test sees an entry and so the reason is
     # written down rather than inferred from an absence.
     ".contributions.json": ("verified",),
+
+    # Aldric, Folklore Assayer. These are folklore.FORECASTABLE verbatim, lowercased for _blob --
+    # the organ's OWN declared words, per the rule above, not a set invented here. INCONCLUSIVE is
+    # deliberately absent: folklore.py calls it "the honest cell", a verdict the assayer is allowed
+    # to reach when the numbers do not separate, so it belongs in _INCONCLUSIVE below rather than
+    # counting as a ruling. The store had no entry at all, so its one HARMFUL ruling read as
+    # inconclusive and Aldric was on course to be reported to the owner as producing nothing --
+    # the exact failure the note above this map describes, on the ninth organ.
+    ".folklore.json": ("real", "weak_model_artifact", "regime_specific", "harmful"),
 }
 
 #: THE RULE THAT SHOULD HAVE EXISTED BEFORE THE FIRST ENTRY IN THIS FILE.
@@ -289,6 +298,10 @@ _INCONCLUSIVE: dict[str, tuple[str, ...]] = {
     ".canon.json": ("deferred", "escalated"),
     ".scout_box.json": ("taken",),   # 28 records: found and picked up, not yet ruled on
     ".press.json": ("draft",),       # 1 record: written, not shipped
+    # folklore.py: "A VERDICT THAT CANNOT SAY 'I DO NOT KNOW' IS DECORATION." INCONCLUSIVE is the
+    # assayer's honest cell, so it must not be counted as a ruling -- otherwise the organ can never
+    # score below 100% and the count stops measuring anything.
+    ".folklore.json": ("inconclusive",),
 }
 #:
 #: KNOWN UNDER-COUNT, LEFT UNPAPERED: 2 cartography records carry status "bridged" WITH bridges_now
