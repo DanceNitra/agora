@@ -91,12 +91,23 @@ def curves():
 
 
 def main():
-    print("calibrating k on curves whose answer is known, then freezing it\n")
-    for k in (1.0, 2.0, 3.0, 5.0, 8.0):
-        wrong = sum(1 for _, y, want in curves() if is_valley(y, k)[0] != want)
-        print(f"   k={k:<4} misclassified {wrong} of {len(curves())}")
+    # CALIBRATION, corrected 2026-08-05. The first version scored k on the 8 controls ALONE, so every
+    # k >= 2 misclassified nothing and 3.0 was picked out of that tie by nothing in particular. The
+    # controls are 8 curves; the false-positive rate is measured on 2000. Leaving the larger of the
+    # two out of the objective is how this shipped at 10.25% when 0.00% was available in the same
+    # family by turning one dial. Measured across five independent control sets and noise samples:
+    # k=3.0 gives 8/8 (once 7/8) at 9.6-11.8% FP, k=8.0 gives 8/8 at 0.00% every time.
+    # Prompted by Marat Sultanov asking whether the threshold should be adaptive at all. His own
+    # proposal measured far worse here (6/8 controls, 70.7% FP), and the question found this instead.
+    print("calibrating k on BOTH the controls and the false-positive rate\n")
+    CTRL = curves()
+    cal_noise = [RNG.normal(0, s, 41) for s in RNG.choice([0.01, 0.05, 0.1, 0.3], 1000)]
+    for k in (1.0, 2.0, 3.0, 4.0, 6.0, 8.0, 12.0):
+        wrong = sum(1 for _, y, want in CTRL if is_valley(y, k)[0] != want)
+        fp = sum(is_valley(v, k)[0] for v in cal_noise) / len(cal_noise)
+        print(f"   k={k:<5} misclassified {wrong} of {len(CTRL)}   false positives {100 * fp:5.2f}%")
 
-    K = 3.0
+    K = 8.0
     print(f"\nfrozen at k={K}\n")
     print(f"   {'curve':<26}{'expected':>10}{'verdict':>9}   diagnostics")
     ok = True
