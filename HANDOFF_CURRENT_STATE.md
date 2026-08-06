@@ -1,3 +1,11 @@
+# CURRENT STATE — pointer
+
+**Latest handoff: `HANDOFF_2026-08-06.md`** (inbox 100 -> 0; board edited to drop the retrieval axis;
+5 GitHub comments out incl. one public retraction; 4 claims killed at the gate, 1 got stronger; the
+swarm's five silent organs traced to a write path that is never called).
+
+---
+
 # HANDOFF — current state (2026-06-30, late) — READ THIS FIRST on resume
 
 This is the exact resume point. Read it, then `agora_output/publish_audit_tracker.md`, then the
