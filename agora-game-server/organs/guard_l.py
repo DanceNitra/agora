@@ -845,6 +845,32 @@ async def _record(ctx, info, target, title, verdict, measured, riders, lab_id,
         info("[voss] belief-revise POST failed: %s" % _ascii(exc))
     ok = isinstance(posted, dict) and not posted.get("error")
 
+    # THE GRAVEYARD, wired 2026-08-06. `/brain/graveyard/bury` had ZERO callers anywhere in the live
+    # tree — an endpoint, a store and a `resurrect` counterpart, and nothing that ever buried anything,
+    # so the graveyard ledger sat 141 hours cold and read as "no ideas have died here". Ideas were
+    # dying: this function stamps them `retired` on every kill and already computes both fields the
+    # grave wants. Voss is the right and only caller — he is the one who kills beliefs, and CLAUDE.md
+    # gives him the bounty ledger and the graveyard together.
+    #
+    # Kills only. A survival has no cause of death, and burying one would make the graveyard a log of
+    # challenges rather than a record of what died, which is the whole distinction it exists to keep.
+    # Best-effort and never fatal: a belief that was revised but not buried is a thinner record, not a
+    # wrong one, so a graveyard outage must not cost us the verdict we already persisted above.
+    buried = None
+    if is_kill:
+        try:
+            buried = await _maybe(ctx.brain_post(
+                _API + "/brain/graveyard/bury",
+                {"claim": title[:300],
+                 # the cause is the MEASUREMENT plus the bar it failed, not the word "failed"
+                 "cause": ("%s | %s%s" % (measured, killer, (" | lab %s" % lab_id) if lab_id else ""))[:900],
+                 "resurrect_when": resurrect,
+                 "killed_by": ORGAN["agent"]},
+                30))
+        except Exception as exc:
+            info("[voss] graveyard/bury POST failed: %s" % _ascii(exc))
+    grave_ok = isinstance(buried, dict) and buried.get("status") == "ok"
+
     parts = [
         "VERDICT: %s -- Sergeant Voss attacked this belief and %s.\n"
         % (verdict.upper(), "killed it" if is_kill else "failed to kill it"),
@@ -858,6 +884,11 @@ async def _record(ctx, info, target, title, verdict, measured, riders, lab_id,
         parts.append("\nlab %s\n" % lab_id)
     parts.append("\nRecorded as '%s' on the belief note and on the bounty ledger%s.\n"
                  % (stamp, "" if ok else " -- BRAIN WRITE FAILED, verdict NOT persisted"))
+    if is_kill:
+        parts.append("\nBuried in the graveyard with its cause of death and this resurrection "
+                     "condition: %s\n" % resurrect if grave_ok else
+                     "\nNOT buried -- the graveyard write did not land, so this death has a verdict "
+                     "but no grave.\n")
     if not is_kill:
         parts.append("\nA survival is not a consolation prize: this belief was handed a test that "
                      "could have ended it and it did not end. The killing condition above is the "
