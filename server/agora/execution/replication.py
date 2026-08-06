@@ -314,9 +314,16 @@ _NOT_A_CLAIM = (
     # the swarm narrating itself. The agent roster is fixed, so this is exact, not a guess.
     (re.compile(r"\b(Shadow Kael|Sage Mira|High Priest Orin|King Aldric|Dame Elara|Sergeant Voss"
                 r"|Artificer Rooke|Cartographer Wren)\b"), "the swarm's own internal proposal"),
-    # our own organ labels leaking in as if they were a paper's words
-    (re.compile(r"^\s*(Joint Finding|Finding|Insight|Hypothesis|Synthesis|Bridge)\s*[:#]", re.IGNORECASE),
-     "one of our own organ labels, not a source's sentence"),
+    # Our own organ labels leaking in as if they were a paper's words. Two patterns, because
+    # enumerating the labels is a losing game: the first version listed six and the very next queue
+    # was 7/8 "Open frontier (UNCERTAIN):", a seventh label nobody had written down. The second
+    # pattern catches the SHAPE instead -- a short prefix carrying a status marker in parentheses,
+    # which no source sentence has and every one of our own status lines does.
+    (re.compile(r"^\s*(Open frontier|Joint Finding|Finding|Insight|Hypothesis|Synthesis|Bridge"
+                r"|Contribution|Seminar|Verdict|Prediction|Observation)\b[^.]{0,40}?\s*[:—-]",
+                re.IGNORECASE), "one of our own organ labels, not a source's sentence"),
+    (re.compile(r"^\s*[A-Z][A-Za-z ]{2,28}\(\s*(UNCERTAIN|CONFIRMED|OPEN|UNRESOLVED|TENTATIVE|DRAFT)"
+                r"\s*\)\s*:"), "one of our own status lines, not a source's sentence"),
     # a paper's scope sentence. It is real prose from a real paper and still asserts no quantity.
     (re.compile(r"^\s*(We|This paper|This work|In this (paper|work|section))\b.{0,40}\b"
                 r"(focus|present|propose|introduce|describe|review|survey|consider|study)\b",
