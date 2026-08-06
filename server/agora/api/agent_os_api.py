@@ -1707,22 +1707,19 @@ async def brain_crucible_synthesis():
             "n_findings": len(gather_findings()), "proposals": _load(_STORE, [])[-5:]}
 
 
-@router.post("/brain/crucible-synthesis/run")
-async def brain_crucible_synthesis_run(request: Request):
-    """Queue a grand-synthesis task for Claude (the organ gathers the rigorous corpus; Claude
-    produces the unifying thesis — cross-finding synthesis is Claude's job, not a cheap LLM call)."""
-    import asyncio as _aio
-    from agora.execution.synthesis import queue_synthesis
-    return await _aio.to_thread(queue_synthesis)
-
-
-@router.post("/brain/crucible-synthesis/record")
-async def brain_crucible_synthesis_record(request: Request):
-    """Claude writes the synthesized thesis back to the organ's ledger."""
-    from agora.execution.synthesis import record_thesis
-    b = await request.json()
-    return record_thesis(b.get("thesis") or "", b.get("rests_on") or [], b.get("why") or "",
-                         b.get("falsifier") or "", b.get("honest", True), b.get("note_path") or "")
+# REMOVED 2026-08-06: `/brain/crucible-synthesis/run` and `/brain/crucible-synthesis/record`.
+#
+# Measured that day: across the whole live tree, NOTHING called either one. `/run` existed to queue a
+# synthesis task, `/record` to receive the thesis afterwards — a coherent pair with no first mover, so
+# the write path had never executed. A route with no client is not neutral: it reports a capability the
+# system does not have, and it read as "the synthesis organ is wired" in every audit of the swarm's
+# write path, which is exactly the audit that spent five days looking for a defect that was an absence.
+#
+# The GET above SURVIVES deliberately. It is a read surface over `.synthesis.json`, which holds five
+# real theses — including the Consolidation-Gate Coupling and Adaptation–Corruption Separation laws.
+# Deleting a reader because its writer was never wired would orphan real content, which is a different
+# error from the one being fixed here. Synthesis is produced through the standing gate by Claude and
+# recorded there; if a first mover is ever built, restore these two from this commit.
 
 
 @router.get("/brain/methods")
