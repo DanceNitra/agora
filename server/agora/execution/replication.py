@@ -319,11 +319,16 @@ _NOT_A_CLAIM = (
     # was 7/8 "Open frontier (UNCERTAIN):", a seventh label nobody had written down. The second
     # pattern catches the SHAPE instead -- a short prefix carrying a status marker in parentheses,
     # which no source sentence has and every one of our own status lines does.
-    (re.compile(r"^\s*(Open frontier|Joint Finding|Finding|Insight|Hypothesis|Synthesis|Bridge"
+    # `[*_#>\s]*` leads BOTH patterns: the queue that followed the previous fix still leaked
+    # "**Finding:** Gallego (2026) demonstrates..." -- the same label, in markdown bold, so the word
+    # was no longer at the start of the string. Our organs write markdown; anchoring on a bare word
+    # anchors on a formatting choice.
+    (re.compile(r"^[*_#>\s]*(Open frontier|Joint Finding|Finding|Insight|Hypothesis|Synthesis|Bridge"
                 r"|Contribution|Seminar|Verdict|Prediction|Observation)\b[^.]{0,40}?\s*[:—-]",
                 re.IGNORECASE), "one of our own organ labels, not a source's sentence"),
-    (re.compile(r"^\s*[A-Z][A-Za-z ]{2,28}\(\s*(UNCERTAIN|CONFIRMED|OPEN|UNRESOLVED|TENTATIVE|DRAFT)"
-                r"\s*\)\s*:"), "one of our own status lines, not a source's sentence"),
+    (re.compile(r"^[*_#>\s]*[A-Z][A-Za-z ]{2,28}\(\s*"
+                r"(UNCERTAIN|CONFIRMED|OPEN|UNRESOLVED|TENTATIVE|DRAFT)\s*\)\s*:"),
+     "one of our own status lines, not a source's sentence"),
     # a paper's scope sentence. It is real prose from a real paper and still asserts no quantity.
     (re.compile(r"^\s*(We|This paper|This work|In this (paper|work|section))\b.{0,40}\b"
                 r"(focus|present|propose|introduce|describe|review|survey|consider|study)\b",
