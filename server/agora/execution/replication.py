@@ -301,6 +301,62 @@ def _is_non_finding(title: str, content: str) -> bool:
     return bool(_EMPTY_ADMISSION.search(content or ""))
 
 
+#: Shapes that reach this table but are not somebody else's claim to re-run. Measured 2026-08-06: of
+#: the eight candidates the endpoint was serving, SIX were one of these, and Rooke walked all eight and
+#: returned `no-instrument` — correctly, every time. His refusals were read as a capability gap for five
+#: days. The gap was upstream: the query takes the FIRST SENTENCE of any `collective_knowledge` row
+#: carrying a `Source:` line, and a first sentence is not a claim.
+_NOT_A_CLAIM = (
+    # a serialised model reply, sliced mid-JSON: '{ "answer": "The claim about excess discontinuity...'
+    (re.compile(r'^\s*[\{\[]|"\s*answer\s*"\s*:|^\s*```'), "serialised model output, not prose"),
+    # our OWN lab, so re-running it is not a replication of anyone -- it is us marking our own homework
+    (re.compile(r"\bLab\s+[0-9a-f]{6}\b", re.IGNORECASE), "cites one of our own Lab runs"),
+    # the swarm narrating itself. The agent roster is fixed, so this is exact, not a guess.
+    (re.compile(r"\b(Shadow Kael|Sage Mira|High Priest Orin|King Aldric|Dame Elara|Sergeant Voss"
+                r"|Artificer Rooke|Cartographer Wren)\b"), "the swarm's own internal proposal"),
+    # our own organ labels leaking in as if they were a paper's words
+    (re.compile(r"^\s*(Joint Finding|Finding|Insight|Hypothesis|Synthesis|Bridge)\s*[:#]", re.IGNORECASE),
+     "one of our own organ labels, not a source's sentence"),
+    # a paper's scope sentence. It is real prose from a real paper and still asserts no quantity.
+    (re.compile(r"^\s*(We|This paper|This work|In this (paper|work|section))\b.{0,40}\b"
+                r"(focus|present|propose|introduce|describe|review|survey|consider|study)\b",
+                re.IGNORECASE), "a paper's scope sentence, which asserts no quantity"),
+)
+
+
+#: The SOURCE has to be somebody else. Measured 2026-08-06: one candidate carried the claim "a randomly
+#: assembled diverse team outperformed the best-ability team by +1.16 (SE = 0.50)" -- which reads like a
+#: real result -- under the source "Diversity-vs-ability experiment, Lab 52597e; no named paper
+#: provided." That is OUR experiment, saying so in plain words, and a first version of this guard that
+#: only read the claim let it straight through. A replication of our own lab is not a replication.
+_NOT_A_SOURCE = (
+    (re.compile(r"\bLab\s+[0-9a-f]{6}\b", re.IGNORECASE), "the source is one of our own Lab runs"),
+    (re.compile(r"\bno (named )?(paper|source|citation|reference)s? (was |were )?(provided|given|named)"
+                r"|\bnot provided\b|\bunnamed source\b", re.IGNORECASE), "the source names no work"),
+    (re.compile(r"^\s*(OUR OWN|internal|agora|the swarm)\b", re.IGNORECASE), "the source is us"),
+)
+
+
+def not_a_claim(claim: str, source: str = "") -> str:
+    """Why this is not somebody else's claim we could replicate, or "" if it might be. Public for tests.
+
+    Deliberately NOT a quality judgement: a claim Rooke has no instrument for is still a claim, and
+    refusing it is HIS call, not this filter's. This only removes text that is not an external
+    assertion at all. Both ends are read, because the giveaway sits in whichever one you are not
+    looking at -- the first version read only the claim and admitted a target whose source said "no
+    named paper provided" out loud.
+    """
+    text = (claim or "").strip()
+    for rx, why in _NOT_A_CLAIM:
+        if rx.search(text):
+            return why
+    src = (source or "").strip()
+    for rx, why in _NOT_A_SOURCE:
+        if rx.search(src):
+            return why
+    return ""
+
+
 async def pick_targets(db, n: int = 8) -> list:
     """SEVERAL replication targets, best first. Rooke's own instrument set decides which it can honestly
     model, so it must be able to walk PAST one it cannot.
@@ -345,11 +401,14 @@ async def pick_targets(db, n: int = 8) -> list:
         # promote_findings); this query read the same table without it.
         if _is_non_finding(r["title"] or "", content):
             continue
-        if already_covered(claim, attempted):
-            continue
+        # Source is resolved BEFORE the guard, because the guard reads both ends.
         m = re.search(r"Source:\s*(.+)$", content, re.MULTILINE)
         source = (m.group(1).strip() if m else "")[:160]
         if not source:
+            continue
+        if not_a_claim(claim, source):
+            continue
+        if already_covered(claim, attempted):
             continue
         seen.add(claim[:80])
         out.append({"claim": claim, "source": source, "title": (r["title"] or "")[:90]})
