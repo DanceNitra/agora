@@ -1,0 +1,43 @@
+{
+ "probe": "cv_of_two_peaks_is_an_identity",
+ "n_points": 301,
+ "trials": 2000,
+ "seed": 20260806,
+ "by_k": {
+  "2": {
+   "mean_cv": 0.0,
+   "max_cv": 0.0,
+   "trials_at_exactly_zero": 2000,
+   "trials": 2000
+  },
+  "3": {
+   "mean_cv": 0.5058,
+   "max_cv": 0.9923,
+   "trials_at_exactly_zero": 12,
+   "trials": 2000
+  },
+  "4": {
+   "mean_cv": 0.6569,
+   "max_cv": 1.3848,
+   "trials_at_exactly_zero": 0,
+   "trials": 2000
+  },
+  "6": {
+   "mean_cv": 0.7622,
+   "max_cv": 1.7813,
+   "trials_at_exactly_zero": 0,
+   "trials": 2000
+  },
+  "11": {
+   "mean_cv": 0.8569,
+   "max_cv": 1.8104,
+   "trials_at_exactly_zero": 0,
+   "trials": 2000
+  }
+ },
+ "control_not_degenerate_above_k2": true,
+ "control_periodic_pair_cv": 0.0,
+ "noise_k2_all_exactly_zero": true,
+ "scope": "tests the STATISTIC only; does not reimplement or evaluate moire interference",
+ "verdict": "At two peaks the coefficient of variation carries no information: noise and a periodic signal score the same 0.000, necessarily. A control that returned MANY peaks and scored 0.69-2.18 is not matched to it -- that comparison varies k, not regularity."
+}
