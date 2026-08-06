@@ -1,18 +1,19 @@
 {
  "name": "The Crucible — machine replication ledger",
- "description": "Scientific and technical claims rebuilt as minimal computational models and tested. REPRODUCED = the mechanism holds in a minimal model; FAILED = it does not; NOT_COMPUTABLE = no simulable core (an honest pass).",
- "generated": "2026-08-02",
+ "description": "Scientific and technical claims rebuilt as minimal computational models and tested. REPRODUCED = the mechanism holds in a minimal model; FAILED = it does not; NOT_COMPUTABLE = no simulable core (an honest pass); RETRACTED = a verdict we published and then withdrew, kept on the record with the reason.",
+ "generated": "2026-08-06",
  "counts": {
   "REPRODUCED": 21,
-  "FAILED": 14,
-  "NOT_COMPUTABLE": 23
+  "FAILED": 13,
+  "NOT_COMPUTABLE": 23,
+  "RETRACTED": 1
  },
  "entries": [
   {
    "claim": "A memory's support edge -- which earlier record a new write was derived from -- can be recovered from CONTENT SIMILARITY, so provenance lineage does not have to be declared at write time.",
    "source": "OUR OWN claim, and we shipped it: inspeximus implements it as the `infer_lineage` fallback for writes that declare no parent. The same assumption underlies the nightly 'inspect the cited evidence' sweep described by @icophy in openclaw/openclaw#7707, and the provenance literature (W3C PROV-O `prov:wasDerivedFrom`; Buneman, Khanna & Tan, ICDT 2001) treats the edge as GIVEN rather than asking whether it can be recovered.",
-   "verdict": "FAILED",
-   "note": "Measured against constructed ground truth with the negatives that matter: a negative is a same-domain, same-vocabulary write issued right after the SAME recall -- the pair a real store actually contains, not an unrelated document. n=120 per cell, 5 thresholds x 4 retention levels, run against the shipped library (inspeximus 1.89.0) via probes/infer_lineage_precision.py, public at https://github.com/DanceNitra/inspeximus/blob/v1.89.0/probes/infer_lineage_precision.py and in the 1.89.0 sdist -- reproduce with `pip install inspeximus==1.89.0` and run it. Best recall of the inferred edge is 0.133, at the loosest threshold (0.05) and with the derivative retaining 90% of the parent's wording; 0.083 at 70%, 0.017 at 50%, 0.000 at 30%. Precision is 1.000 wherever it fires and false positives are zero in every cell, so the failure is RECALL, not confusion: the inference is right when it speaks and almost always silent. Consequence: a retraction that walks declared `derived_from` edges cannot be rescued by inferring the undeclared ones. METHOD NOTE, because it nearly went out wrong: the first model was a hand-written bag-of-words cosine over a 14-word shared vocabulary, which put every pair above threshold and returned recall 1.000 with precision exactly 0.500 -- while its VERDICT line, written in advance as prose, asserted 'recovers at most a small fraction'. The claim contradicted the data sent to support it. The recorded run executes the shipped probe and COMPUTES the verdict from the parsed table instead of stating it.",
+   "verdict": "RETRACTED",
+   "note": "RETRACTED 2026-08-06 -- the FAILED verdict measured our instrument, not the claim. The null-adjusted overlap this detector thresholds on RANKS derived writes above non-derived at AUC 0.720/0.835/0.915/0.754 (reuse 90/70/50/30%); a held-out threshold, fitted on one seed and scored on three fresh ones, reaches F1 0.738/0.808/0.895/0.764 against the shipped default's 0.211/0.225/0.182/0.062. The default cannot reach it: infer_lineage clamps its threshold to [0,1] while the discriminative region is at -0.111 -- derived writes pile at exactly 0.0000 and non-derived run negative, so all the discrimination sits in the negative tail a positive-only threshold cannot see. Precision 1.000 was not a good detector; it is what a detector that almost never fires always reports. Bounded to our API and this constructed corpus: on real data Moreira et al. (IEEE TIP 27(12), 2018) report directed edge overlap 0.124 even with a PERFECT candidate set.",
    "lab_id": "a1d88c",
    "code": "https://github.com/DanceNitra/agora/blob/main/agora_output/lab/20260801-122116_infer-lineage-recall-real.py",
    "date": "2026-08-01"

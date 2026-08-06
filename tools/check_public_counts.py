@@ -39,8 +39,11 @@ def ledger_counts() -> dict:
     """
     data = json.loads(LEDGER.read_text(encoding="utf-8"))
     entries = data.get("entries", [])
+    # RETRACTED added 2026-08-06 with the state itself (see render_crucible.render). It is counted
+    # here for the same reason it exists there: a withdrawn verdict must not be silently absorbed
+    # into FAILED, and it must not vanish from TOTAL either -- both would restate the ledger.
     counted = {v: sum(1 for e in entries if e.get("verdict") == v)
-               for v in ("REPRODUCED", "FAILED", "NOT_COMPUTABLE")}
+               for v in ("REPRODUCED", "FAILED", "NOT_COMPUTABLE", "RETRACTED")}
     declared = data.get("counts") or {}
     if declared and declared != counted:
         raise SystemExit(f"crucible.json disagrees with ITSELF: counts={declared} but the entries "
