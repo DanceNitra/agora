@@ -73,6 +73,10 @@ CHECKS = [
     # and a Slovak page quietly keeping a stale count is exactly as wrong as an English one.
     ("sk/index.html", r"<b>(\d+)</b>\s+tvrdení testovaných", "TOTAL"),
     ("sk/index.html", r"Všetkých\s+(\d+)\s+tvrdení", "TOTAL"),
+    # ADDED 2026-08-06. The Slovak masthead carries its OWN failed count (`<b>N</b> zlyhaných`) and no
+    # check read it, so it sat at 12 against a ledger of 14 while every English surface was verified.
+    # A bilingual site needs the check on BOTH languages or the unchecked one is where the drift lives.
+    ("sk/index.html", r"<b>(\d+)</b>\s+zlyhaných", "FAILED"),
     ("public/track-record.html", r"(\d+)\s+reproduced", "REPRODUCED"),
     ("public/track-record.html", r"(\d+)\s+failed", "FAILED"),
     ("public/track-record.html", r"(\d+)\s+not[- ]computable", "NOT_COMPUTABLE"),
