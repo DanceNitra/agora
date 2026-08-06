@@ -11,9 +11,11 @@ source of truth. Re-run after any new replication (commit lab scripts so code li
 """
 from __future__ import annotations
 
+import functools
 import html
 import json
 import re
+import subprocess
 import time
 from pathlib import Path
 
@@ -44,7 +46,9 @@ def script_link(lab_rec):
     if "agora_output/lab/" not in sp:
         return None
     rel = "agora_output/lab/" + sp.split("agora_output/lab/")[-1]
-    return f"{REPO}/blob/main/{rel}" if (ROOT / rel).exists() else None
+    # TRACKED, not `.exists()` -- the same defect entry_code carried, and this is the fallback that
+    # feeds it, so fixing only the caller would leave the hole open on the other path.
+    return f"{REPO}/blob/main/{rel}" if rel in _tracked() else None
 
 
 # Durable lab_id -> PUBLIC probe map (tracked here, not in gitignored .replications.json, so the receipt links
@@ -116,13 +120,37 @@ _PROBE_BY_LAB = {
 }
 
 
+@functools.lru_cache(maxsize=1)
+def _tracked() -> frozenset[str]:
+    """Every path git actually carries. Empty set = we could not ask, and then we publish no receipt
+    rather than guess."""
+    try:
+        out = subprocess.run(["git", "-C", str(ROOT), "ls-files"], capture_output=True, text=True,
+                             timeout=60, encoding="utf-8", errors="replace")
+        return frozenset(l.strip() for l in out.stdout.splitlines() if l.strip()) if out.returncode == 0 \
+            else frozenset()
+    except Exception:
+        return frozenset()
+
+
 def entry_code(r, labs):
     """Resolve a runnable-receipt URL for a ledger entry: an explicit repo-relative `code` on the entry, else
     the tracked lab_id->probe map, else the lab-script link. lab scripts live in gitignored agora_output/lab/,
-    so most entries only get a resolvable receipt once a public probe is wired -- return a URL only if the file
-    exists in the repo."""
+    so most entries only get a resolvable receipt once a public probe is wired.
+
+    TRACKED, not `.exists()`. Measured 2026-08-06: two published entries (labs 712068 and e4ec41)
+    linked `agora_output/lab/2026-08-01-*.py`, and both URLs return **404**. The files are real -- they
+    sit on the maintainer's disk -- but `agora_output/lab/` is gitignored, so they were never in the
+    repo the link points at. `.exists()` asked the local filesystem a question only the remote can
+    answer, and on the one machine that renders this page the answer is always yes. That is this
+    repo's recurring shape: a check that cannot see its target reports SAFE.
+
+    It matters more here than almost anywhere, because the page's whole proposition is "every verdict
+    ships runnable code". A dead receipt is worse than an absent one: absent is honest, dead is a
+    claim that fails exactly when a sceptical reader tests it.
+    """
     p = (r.get("code") or _PROBE_BY_LAB.get(r.get("lab_id", ""), "") or "").strip().replace("\\", "/")
-    if p and (ROOT / p).exists():
+    if p and p in _tracked():
         return f"{REPO}/blob/main/{p}"
     return script_link(labs.get(r.get("lab_id")))
 
@@ -237,17 +265,29 @@ def render():
     cur = load(CURATION)
     reps = _dedup_ledger(load(REPS), cur)
     labs = lab_index(load(LAB))
+    # RETRACTED is a FOURTH state, added 2026-08-06 because the ledger could not record its own
+    # correction. Entry a1d88c ruled FAILED on "a support edge can be recovered from content
+    # similarity"; re-measurement showed the score separates the classes (AUC 0.72-0.92) and that the
+    # verdict came from a threshold clamped to [0,1] while the signal sits at -0.111. The three
+    # existing states all lie about that: FAILED is wrong, REPRODUCED overclaims, and NOT_COMPUTABLE
+    # means "no simulable core", which is a different and honest thing. Deleting the row would have
+    # been worse than any of them -- a replication ledger that quietly drops its mistakes is not a
+    # ledger. So a retraction stays ON the page, and it does NOT count as a FAILED: that count is the
+    # one our credibility rests on, and padding it with a verdict we withdrew would corrupt exactly
+    # the number a reader trusts us for.
     by = {o: sum(1 for r in reps if r.get("outcome") == o)
-          for o in ("REPRODUCED", "FAILED", "NOT_COMPUTABLE")}
+          for o in ("REPRODUCED", "FAILED", "NOT_COMPUTABLE", "RETRACTED")}
     tested = [r for r in reps if r.get("outcome") in ("REPRODUCED", "FAILED")][::-1]
     passed = [r for r in reps if r.get("outcome") == "NOT_COMPUTABLE"][::-1]
+    retracted = [r for r in reps if r.get("outcome") == "RETRACTED"][::-1]
 
     # ---- machine-readable dataset ----
     dataset = {
         "name": "The Crucible — machine replication ledger",
         "description": "Scientific and technical claims rebuilt as minimal computational models and "
                        "tested. REPRODUCED = the mechanism holds in a minimal model; FAILED = it does "
-                       "not; NOT_COMPUTABLE = no simulable core (an honest pass).",
+                       "not; NOT_COMPUTABLE = no simulable core (an honest pass); RETRACTED = a verdict "
+                       "we published and then withdrew, kept on the record with the reason.",
         "generated": time.strftime("%Y-%m-%d"),
         "counts": by,
         "entries": [{
@@ -315,6 +355,24 @@ def render():
         </div>
       </article>""")
 
+    # Retractions render FIRST and in full. A correction buried under fifty standing verdicts is a
+    # correction the reader never sees, and the note carries the numbers that replaced the old ones.
+    for r in retracted:
+        c, code, date = meta(r)
+        codeline = (f'<a class="code" href="{code}" target="_blank" rel="noopener">runnable model &rarr;</a>'
+                    if code else "")
+        cards.insert(0, f"""
+      <article class="card retracted" data-v="RETRACTED" data-reveal>
+        <div class="crail"></div>
+        <div class="cbody">
+          <div class="chead"><span class="cv">RETRACTED</span>
+            <span class="cfield">{e(c.get('field') or 'withdrawn by us')}</span></div>
+          <h3>{e(c.get('title') or r.get('claim', '')[:90])}</h3>
+          <p class="cresult">{e(r.get('note', ''))}</p>
+          <div class="cfoot"><span class="cyear">lab {e(r.get('lab_id'))} &middot; {date}</span>{codeline}</div>
+        </div>
+      </article>""")
+
     # honest passes: show ONLY curated entries (keeps the public page clean; the full raw
     # NOT_COMPUTABLE set stays in crucible.json for transparency)
     pass_curation = cur.get("_passes", [])
@@ -336,15 +394,15 @@ def render():
     # share a variable. Verified by tools/check_public_counts.py, which fails the build on any divergence.
     page = TEMPLATE.format(
         site=SITE, repo=REPO, R=by["REPRODUCED"], F=by["FAILED"], NC=nc_shown,
-        NCT=by["NOT_COMPUTABLE"], total=sum(by.values()),
+        NCT=by["NOT_COMPUTABLE"], RT=by["RETRACTED"], total=sum(by.values()),
         tested=len(tested), updated=time.strftime("%Y-%m-%d"),
         featured=featured_html, cards="".join(cards), passes=passes)
 
     OUT_DIR.mkdir(parents=True, exist_ok=True)
     (OUT_DIR / "index.html").write_text(page, encoding="utf-8")
     (OUT_DIR / "crucible.json").write_text(json.dumps(dataset, ensure_ascii=False, indent=1), encoding="utf-8")
-    print(f"rendered {OUT_DIR/'index.html'} — {by['REPRODUCED']}R/{by['FAILED']}F/{by['NOT_COMPUTABLE']}NC, "
-          f"{len(tested)} tested cards, featured={'yes' if feat else 'no'}")
+    print(f"rendered {OUT_DIR/'index.html'} — {by['REPRODUCED']}R/{by['FAILED']}F/{by['NOT_COMPUTABLE']}NC/"
+          f"{by['RETRACTED']}RT, {len(tested)} tested cards, featured={'yes' if feat else 'no'}")
 
 
 TEMPLATE = r"""<!DOCTYPE html>
@@ -355,9 +413,9 @@ TEMPLATE = r"""<!DOCTYPE html>
 <link rel="icon" type="image/svg+xml" href="https://dancenitra.github.io/agora/favicon.svg">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>The Crucible &middot; a machine that rebuilds claims in code &middot; Agora</title>
-<meta name="description" content="A public ledger of scientific and technical claims rebuilt as minimal computational models and tested in code: {R} reproduced, {F} failed, {NCT} not-computable ({total} verdicts). Every verdict ships runnable code and a measured number.">
+<meta name="description" content="A public ledger of scientific and technical claims rebuilt as minimal computational models and tested in code: {R} reproduced, {F} failed, {NCT} not-computable, {RT} retracted by us ({total} verdicts). Every verdict ships runnable code and a measured number.">
 <link rel="canonical" href="{site}/public/crucible/">
-<script type="application/ld+json">{{"@context":"https://schema.org","@graph":[{{"@type":"Dataset","name":"The Crucible — AI-claim replication ledger","description":"A public, machine-readable ledger of scientific and technical claims rebuilt as minimal computational models and tested in code ({R} reproduced, {F} failed, {NCT} not-computable; {total} verdicts). Every verdict ships runnable code and a measured number.","url":"{site}/public/crucible/","license":"https://opensource.org/licenses/MIT","identifier":"https://doi.org/10.5281/zenodo.21648053","sameAs":"https://doi.org/10.5281/zenodo.21648053","creator":{{"@type":"Organization","name":"Agora","url":"{site}/"}},"variableMeasured":["reproduced","failed","not-computable"]}},{{"@type":"WebSite","name":"Agora","url":"{site}/","publisher":{{"@type":"Organization","name":"Agora"}}}}]}}</script>
+<script type="application/ld+json">{{"@context":"https://schema.org","@graph":[{{"@type":"Dataset","name":"The Crucible — AI-claim replication ledger","description":"A public, machine-readable ledger of scientific and technical claims rebuilt as minimal computational models and tested in code ({R} reproduced, {F} failed, {NCT} not-computable, {RT} retracted by us; {total} verdicts). Every verdict ships runnable code and a measured number.","url":"{site}/public/crucible/","license":"https://opensource.org/licenses/MIT","identifier":"https://doi.org/10.5281/zenodo.21648053","sameAs":"https://doi.org/10.5281/zenodo.21648053","creator":{{"@type":"Organization","name":"Agora","url":"{site}/"}},"variableMeasured":["reproduced","failed","not-computable","retracted"]}},{{"@type":"WebSite","name":"Agora","url":"{site}/","publisher":{{"@type":"Organization","name":"Agora"}}}}]}}</script>
 <meta property="og:type" content="website">
 <meta property="og:title" content="The Crucible — claims, rebuilt in code and tested">
 <meta property="og:description" content="A machine rebuilds scientific claims as minimal models and publishes the verdict — failures included. Every verdict ships runnable code.">
@@ -456,11 +514,14 @@ TEMPLATE = r"""<!DOCTYPE html>
   .crail{{width:5px;flex:none}}
   .card.ok .crail{{background:linear-gradient(180deg,var(--acc2),var(--acc))}}
   .card.fail .crail{{background:linear-gradient(180deg,#c9492f,var(--bad))}}
+  .card.retracted .crail{{background:linear-gradient(180deg,#8b5cf6,#6d28d9)}}
+  .t.retracted .num{{color:#7c3aed}}
   .cbody{{padding:26px 26px 20px;display:flex;flex-direction:column;flex:1}}
   .chead{{display:flex;align-items:center;justify-content:space-between;gap:10px;font-family:var(--mono);font-size:10.5px;letter-spacing:.1em;margin-bottom:14px}}
   .cv{{padding:4px 9px;border-radius:6px;font-weight:600;letter-spacing:.12em}}
   .card.ok .cv{{background:var(--acc-soft);color:var(--acc)}}
   .card.fail .cv{{background:var(--bad-soft);color:var(--bad)}}
+  .card.retracted .cv{{background:#f5f3ff;color:#6d28d9}}
   .cfield{{color:var(--faint);text-transform:uppercase}}
   .card h3{{font-weight:500;font-size:21px;line-height:1.24;letter-spacing:-.015em;margin-bottom:12px}}
   .cresult{{font-size:15.5px;line-height:1.58;color:var(--text);flex:1}}
@@ -528,6 +589,7 @@ TEMPLATE = r"""<!DOCTYPE html>
     <div class="t ok"><div class="num">{R}</div><div class="lbl">Reproduced</div></div>
     <div class="t fail"><div class="num">{F}</div><div class="lbl">Failed</div></div>
     <div class="t"><div class="num">{NCT}</div><div class="lbl">Not computable</div></div>
+    <div class="t retracted"><div class="num">{RT}</div><div class="lbl">Retracted by us</div></div>
   </div>
   <div class="dataset">Open data &mdash; <a href="crucible.json">the full ledger as JSON</a> &middot; now a citable dataset on <a href="https://huggingface.co/datasets/Danchi17/folklore-index" target="_blank" rel="noopener">Hugging&nbsp;Face &rarr;</a><br><span class="loadline"><code>datasets.load_dataset("Danchi17/folklore-index")</code></span></div>
 </div></header>
@@ -538,6 +600,7 @@ TEMPLATE = r"""<!DOCTYPE html>
     <button class="on" data-f="all">All</button>
     <button data-f="REPRODUCED">Reproduced</button>
     <button data-f="FAILED">Failed</button>
+    <button data-f="RETRACTED">Retracted</button>
   </div>
   <div class="grid" id="grid">{cards}
   </div>

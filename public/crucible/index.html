@@ -6,9 +6,9 @@
 <link rel="icon" type="image/svg+xml" href="https://dancenitra.github.io/agora/favicon.svg">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>The Crucible &middot; a machine that rebuilds claims in code &middot; Agora</title>
-<meta name="description" content="A public ledger of scientific and technical claims rebuilt as minimal computational models and tested in code: 21 reproduced, 14 failed, 23 not-computable (58 verdicts). Every verdict ships runnable code and a measured number.">
+<meta name="description" content="A public ledger of scientific and technical claims rebuilt as minimal computational models and tested in code: 21 reproduced, 13 failed, 23 not-computable, 1 retracted by us (58 verdicts). Every verdict ships runnable code and a measured number.">
 <link rel="canonical" href="https://dancenitra.github.io/agora/public/crucible/">
-<script type="application/ld+json">{"@context":"https://schema.org","@graph":[{"@type":"Dataset","name":"The Crucible — AI-claim replication ledger","description":"A public, machine-readable ledger of scientific and technical claims rebuilt as minimal computational models and tested in code (21 reproduced, 14 failed, 23 not-computable; 58 verdicts). Every verdict ships runnable code and a measured number.","url":"https://dancenitra.github.io/agora/public/crucible/","license":"https://opensource.org/licenses/MIT","identifier":"https://doi.org/10.5281/zenodo.21648053","sameAs":"https://doi.org/10.5281/zenodo.21648053","creator":{"@type":"Organization","name":"Agora","url":"https://dancenitra.github.io/agora/"},"variableMeasured":["reproduced","failed","not-computable"]},{"@type":"WebSite","name":"Agora","url":"https://dancenitra.github.io/agora/","publisher":{"@type":"Organization","name":"Agora"}}]}</script>
+<script type="application/ld+json">{"@context":"https://schema.org","@graph":[{"@type":"Dataset","name":"The Crucible — AI-claim replication ledger","description":"A public, machine-readable ledger of scientific and technical claims rebuilt as minimal computational models and tested in code (21 reproduced, 13 failed, 23 not-computable, 1 retracted by us; 58 verdicts). Every verdict ships runnable code and a measured number.","url":"https://dancenitra.github.io/agora/public/crucible/","license":"https://opensource.org/licenses/MIT","identifier":"https://doi.org/10.5281/zenodo.21648053","sameAs":"https://doi.org/10.5281/zenodo.21648053","creator":{"@type":"Organization","name":"Agora","url":"https://dancenitra.github.io/agora/"},"variableMeasured":["reproduced","failed","not-computable","retracted"]},{"@type":"WebSite","name":"Agora","url":"https://dancenitra.github.io/agora/","publisher":{"@type":"Organization","name":"Agora"}}]}</script>
 <meta property="og:type" content="website">
 <meta property="og:title" content="The Crucible — claims, rebuilt in code and tested">
 <meta property="og:description" content="A machine rebuilds scientific claims as minimal models and publishes the verdict — failures included. Every verdict ships runnable code.">
@@ -107,11 +107,14 @@
   .crail{width:5px;flex:none}
   .card.ok .crail{background:linear-gradient(180deg,var(--acc2),var(--acc))}
   .card.fail .crail{background:linear-gradient(180deg,#c9492f,var(--bad))}
+  .card.retracted .crail{background:linear-gradient(180deg,#8b5cf6,#6d28d9)}
+  .t.retracted .num{color:#7c3aed}
   .cbody{padding:26px 26px 20px;display:flex;flex-direction:column;flex:1}
   .chead{display:flex;align-items:center;justify-content:space-between;gap:10px;font-family:var(--mono);font-size:10.5px;letter-spacing:.1em;margin-bottom:14px}
   .cv{padding:4px 9px;border-radius:6px;font-weight:600;letter-spacing:.12em}
   .card.ok .cv{background:var(--acc-soft);color:var(--acc)}
   .card.fail .cv{background:var(--bad-soft);color:var(--bad)}
+  .card.retracted .cv{background:#f5f3ff;color:#6d28d9}
   .cfield{color:var(--faint);text-transform:uppercase}
   .card h3{font-weight:500;font-size:21px;line-height:1.24;letter-spacing:-.015em;margin-bottom:12px}
   .cresult{font-size:15.5px;line-height:1.58;color:var(--text);flex:1}
@@ -177,8 +180,9 @@
   Every verdict ships a measured number and the code that produced it.</p>
   <div class="tally">
     <div class="t ok"><div class="num">21</div><div class="lbl">Reproduced</div></div>
-    <div class="t fail"><div class="num">14</div><div class="lbl">Failed</div></div>
+    <div class="t fail"><div class="num">13</div><div class="lbl">Failed</div></div>
     <div class="t"><div class="num">23</div><div class="lbl">Not computable</div></div>
+    <div class="t retracted"><div class="num">1</div><div class="lbl">Retracted by us</div></div>
   </div>
   <div class="dataset">Open data &mdash; <a href="crucible.json">the full ledger as JSON</a> &middot; now a citable dataset on <a href="https://huggingface.co/datasets/Danchi17/folklore-index" target="_blank" rel="noopener">Hugging&nbsp;Face &rarr;</a><br><span class="loadline"><code>datasets.load_dataset("Danchi17/folklore-index")</code></span></div>
 </div></header>
@@ -197,21 +201,22 @@
     </div>
   </section>
 <section class="ledger"><div class="wrap">
-  <div class="sechead"><h2>The ledger</h2><div class="sub">35 claims rebuilt &amp; tested &middot; newest first</div></div>
+  <div class="sechead"><h2>The ledger</h2><div class="sub">34 claims rebuilt &amp; tested &middot; newest first</div></div>
   <div class="filters">
     <button class="on" data-f="all">All</button>
     <button data-f="REPRODUCED">Reproduced</button>
     <button data-f="FAILED">Failed</button>
+    <button data-f="RETRACTED">Retracted</button>
   </div>
   <div class="grid" id="grid">
-      <article class="card fail" data-v="FAILED" data-reveal>
+      <article class="card retracted" data-v="RETRACTED" data-reveal>
         <div class="crail"></div>
         <div class="cbody">
-          <div class="chead"><span class="cv">FAILED</span>
-            <span class="cfield"></span></div>
+          <div class="chead"><span class="cv">RETRACTED</span>
+            <span class="cfield">withdrawn by us</span></div>
           <h3>A memory&#x27;s support edge -- which earlier record a new write was derived from -- can be rec</h3>
-          <p class="cresult">Measured against constructed ground truth with the negatives that matter: a negative is a same-domain, same-vocabulary write issued right after the SAME recall -- the pair a real store actually contains, not an unrelated document. n=120 per cell, 5 thresholds x 4 retention levels, run against the shipped library (inspeximus 1.89.0) via probes/infer_lineage_precision.py, public at https://github.com/DanceNitra/inspeximus/blob/v1.89.0/probes/infer_lineage_precision.py and in the 1.89.0 sdist -- reproduce with `pip install inspeximus==1.89.0` and run it. Best recall of the inferred edge is 0.133, at the loosest threshold (0.05) and with the derivative retaining 90% of the parent&#x27;s wording; 0.083 at 70%, 0.017 at 50%, 0.000 at 30%. Precision is 1.000 wherever it fires and false positives are zero in every cell, so the failure is RECALL, not confusion: the inference is right when it speaks and almost always silent. Consequence: a retraction that walks declared `derived_from` edges cannot be rescued by inferring the undeclared ones. METHOD NOTE, because it nearly went out wrong: the first model was a hand-written bag-of-words cosine over a 14-word shared vocabulary, which put every pair above threshold and returned recall 1.000 with precision exactly 0.500 -- while its VERDICT line, written in advance as prose, asserted &#x27;recovers at most a small fraction&#x27;. The claim contradicted the data sent to support it. The recorded run executes the shipped probe and COMPUTES the verdict from the parsed table instead of stating it.</p>
-          <div class="cfoot"><span class="cyear">OUR OWN claim, and we shipped it: inspeximus i</span><a class="code" href="https://github.com/DanceNitra/agora/blob/main/agora_output/lab/20260801-122116_infer-lineage-recall-real.py" target="_blank" rel="noopener">runnable model &rarr;</a></div>
+          <p class="cresult">RETRACTED 2026-08-06 -- the FAILED verdict measured our instrument, not the claim. The null-adjusted overlap this detector thresholds on RANKS derived writes above non-derived at AUC 0.720/0.835/0.915/0.754 (reuse 90/70/50/30%); a held-out threshold, fitted on one seed and scored on three fresh ones, reaches F1 0.738/0.808/0.895/0.764 against the shipped default&#x27;s 0.211/0.225/0.182/0.062. The default cannot reach it: infer_lineage clamps its threshold to [0,1] while the discriminative region is at -0.111 -- derived writes pile at exactly 0.0000 and non-derived run negative, so all the discrimination sits in the negative tail a positive-only threshold cannot see. Precision 1.000 was not a good detector; it is what a detector that almost never fires always reports. Bounded to our API and this constructed corpus: on real data Moreira et al. (IEEE TIP 27(12), 2018) report directed edge overlap 0.124 even with a PERFECT candidate set.</p>
+          <div class="cfoot"><span class="cyear">lab a1d88c &middot; 2026-08-01</span><a class="code" href="https://github.com/DanceNitra/agora/blob/main/agora_output/lab/20260801-122116_infer-lineage-recall-real.py" target="_blank" rel="noopener">runnable model &rarr;</a></div>
         </div>
       </article>
       <article class="card fail" data-v="FAILED" data-reveal>
@@ -583,7 +588,7 @@
 
 <footer><div class="wrap">
   <span>Agora &mdash; autonomous research OS &middot; The Crucible</span>
-  <span>updated 2026-08-02 &middot; <a href="https://github.com/DanceNitra/agora" target="_blank" rel="noopener">source</a></span>
+  <span>updated 2026-08-06 &middot; <a href="https://github.com/DanceNitra/agora" target="_blank" rel="noopener">source</a></span>
 </div></footer>
 
 <script>

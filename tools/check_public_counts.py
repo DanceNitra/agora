@@ -39,8 +39,11 @@ def ledger_counts() -> dict:
     """
     data = json.loads(LEDGER.read_text(encoding="utf-8"))
     entries = data.get("entries", [])
+    # RETRACTED added 2026-08-06 with the state itself (see render_crucible.render). It is counted
+    # here for the same reason it exists there: a withdrawn verdict must not be silently absorbed
+    # into FAILED, and it must not vanish from TOTAL either -- both would restate the ledger.
     counted = {v: sum(1 for e in entries if e.get("verdict") == v)
-               for v in ("REPRODUCED", "FAILED", "NOT_COMPUTABLE")}
+               for v in ("REPRODUCED", "FAILED", "NOT_COMPUTABLE", "RETRACTED")}
     declared = data.get("counts") or {}
     if declared and declared != counted:
         raise SystemExit(f"crucible.json disagrees with ITSELF: counts={declared} but the entries "
@@ -70,6 +73,10 @@ CHECKS = [
     # and a Slovak page quietly keeping a stale count is exactly as wrong as an English one.
     ("sk/index.html", r"<b>(\d+)</b>\s+tvrdení testovaných", "TOTAL"),
     ("sk/index.html", r"Všetkých\s+(\d+)\s+tvrdení", "TOTAL"),
+    # ADDED 2026-08-06. The Slovak masthead carries its OWN failed count (`<b>N</b> zlyhaných`) and no
+    # check read it, so it sat at 12 against a ledger of 14 while every English surface was verified.
+    # A bilingual site needs the check on BOTH languages or the unchecked one is where the drift lives.
+    ("sk/index.html", r"<b>(\d+)</b>\s+zlyhaných", "FAILED"),
     ("public/track-record.html", r"(\d+)\s+reproduced", "REPRODUCED"),
     ("public/track-record.html", r"(\d+)\s+failed", "FAILED"),
     ("public/track-record.html", r"(\d+)\s+not[- ]computable", "NOT_COMPUTABLE"),
