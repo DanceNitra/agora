@@ -48,13 +48,36 @@ def _note_title(text: str, fallback: str) -> str:
     return (m.group(1) if m else fallback).strip()
 
 
+#: The ledger's `mechanism` field is capped, so the cap is part of the dedup key. ONE function for
+#: both ends of it, because the two ends disagreeing is what wedged the forge.
+#
+# Measured 2026-08-06: `record_forged` stored the mechanism truncated to 120 while `pick_mechanism`
+# asked whether the UNTRUNCATED title was in that set. The highest-scoring concept note
+# ("Bridge - The Bifurcation of Everything: ...", score 36) has a 145-character title, so the ledger
+# held its 120-character prefix and the lookup asked for all 145 -- never equal, so the note was
+# never skipped and `analogy-inputs` served it on every cycle for 5.5 days.
+#
+# The organ on the far side was not broken and did not crash: Orin ran the full Lab discrimination
+# each time and then refused at his own novelty guard (token containment >= 0.6, which DOES match the
+# truncation) with "this forging repeats ledger entry". So the write that advances the cursor was
+# blocked by the cursor not having advanced. Nothing logged an error, because nothing was in error.
+#
+# Head-of-line, too: pick_mechanism returns the single best-scoring note, so one 145-character title
+# stalled the whole forge rather than one entry in it.
+_TITLE_CAP = 120
+
+
+def _forged_key(s: str | None) -> str:
+    return (s or "")[:_TITLE_CAP].strip().lower()
+
+
 def pick_mechanism(vault: str) -> dict | None:
     """The most mechanism-dense concept note not yet forged — title, path, excerpt, score.
     Owner concepts only (the Agora Agents subtree is the system's own output)."""
     base = Path(vault) / "04 Resources" / "Concepts"
     if not base.is_dir():
         return None
-    used = {(x.get("mechanism") or "").lower() for x in _load()}
+    used = {_forged_key(x.get("mechanism")) for x in _load()}
     best = None
     for p in base.rglob("*.md"):
         if "Agora Agents" in str(p):
@@ -64,19 +87,19 @@ def pick_mechanism(vault: str) -> dict | None:
         except Exception:
             continue
         title = _note_title(text, p.stem)
-        if title.lower() in used:
+        if _forged_key(title) in used:
             continue
         low = text.lower()
         score = sum(low.count(m) for m in _MARKERS)
         if score >= 4 and (best is None or score > best["score"]):
             body = re.sub(r"^---.*?---\s*", "", text, flags=re.DOTALL)
-            best = {"title": title[:120], "path": str(p), "score": score,
+            best = {"title": title[:_TITLE_CAP], "path": str(p), "score": score,
                     "excerpt": body[:700]}
     return best
 
 
 def record_forged(mechanism: str, target: str, note: str = "", outcome: str = "") -> dict:
-    rec = {"mechanism": (mechanism or "")[:120], "target": (target or "")[:120],
+    rec = {"mechanism": (mechanism or "")[:_TITLE_CAP], "target": (target or "")[:120],
            "note": (note or "")[:200], "outcome": (outcome or "")[:200], "ts": time.time()}
     items = _load()
     items.append(rec)
