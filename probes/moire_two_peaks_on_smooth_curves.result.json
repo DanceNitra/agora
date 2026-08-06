@@ -1,0 +1,13 @@
+{
+ "probe": "moire_two_peaks_on_smooth_curves",
+ "n": 3000,
+ "peak_count_histogram": {
+  "0": 1197,
+  "1": 1803
+ },
+ "two_peak_curves": 0,
+ "retracts": "the 'smoothed V leaves two shoulders' explanation posted as edrn-dmrg-verification#2 comment 5205068081",
+ "does_not_explain": "his two peaks on tree_explore.csv remain unexplained",
+ "smoothness_warrant": "constructional, not metric -- four metric checks were refused by the pre-flight gate",
+ "gate": "passed"
+}
