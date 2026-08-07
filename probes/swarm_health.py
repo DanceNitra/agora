@@ -275,10 +275,17 @@ LEDGERS = {
         foreign_text=(),
     ),
     ".replications.json": dict(
-        # live counts: REPRODUCED 25 / NOT_COMPUTABLE 22 / FAILED 13. All three are decisive --
-        # NOT_COMPUTABLE is a ruling about the claim, not an absence of one.
+        # live counts: REPRODUCED 25 / NOT_COMPUTABLE 24 / FAILED 13 / RETRACTED 1. All four are
+        # decisive -- NOT_COMPUTABLE is a ruling about the claim, not an absence of one, and
+        # RETRACTED is a ruling about our own earlier ruling.
+        #
+        # RETRACTED was added to the LEDGER on 2026-08-06 and to both public renderers the same day
+        # (render_crucible, check_public_counts) -- and to NEITHER credit reader. So the one record
+        # scored as nothing in both, and withdrawing a wrong verdict silently cost the Artificer the
+        # credit he had while the verdict was still wrong. Retracting must never be the move that
+        # pays worse than leaving an error standing.
         verdict_fields=("outcome", "verdict", "status"), primary="outcome",
-        decisive=("reproduced", "failed", "not_computable", "not computable"),
+        decisive=("reproduced", "failed", "not_computable", "not computable", "retracted"),
         inconclusive=("queued", "pending", "open", "hypothesized", "running"),
         # `retracted_ts` is stamped when a verdict is withdrawn (a wrong FAILED corrected to
         # NOT_COMPUTABLE). A retraction is the most consequential write this ledger takes, and a

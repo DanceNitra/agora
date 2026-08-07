@@ -243,7 +243,12 @@ _DECISIVE: dict[str, tuple[str, ...]] = {
 
     # Rooke, Crucible: measured REPRODUCED 25, NOT_COMPUTABLE 22, FAILED 13 -- 60 of 60. "reproduced"
     # was absent, so 25 completed replications read as idle volume.
-    ".replications.json": ("reproduced", "failed", "not_computable"),
+    # "retracted" added 2026-08-08: the ledger gained the state on 08-06, both PUBLIC renderers were
+    # updated the same day, and both CREDIT readers were missed -- so the record scored as neither
+    # decisive nor inconclusive, i.e. as nothing. Measured: Rooke 5 rows / 4 decisive, the missing
+    # one being the retraction. Note that `note` is not in _BLOB_FIELDS, so the word "FAILED" inside
+    # the retraction text does NOT rescue it; the verdict field is genuinely all there is to read.
+    ".replications.json": ("reproduced", "failed", "not_computable", "retracted"),
 
     # Wren, cartography: a refusal to bridge is a finding, not an absence of one.
     ".cartography.json": ("forged", "no honest bridge", "no bridge", "already bridged", "bridged"),
@@ -279,10 +284,13 @@ _ANY_DECISIVE: tuple[str, ...] = tuple(sorted({w for ws in _DECISIVE.values() fo
 #: Without this split, adding "reproduced"/"survived"/"compatible" to the vocabulary (which had to
 #: happen -- they are real verdicts) would quietly erase the distinction the ledger was built on: a
 #: stream of confirmations is not the same contribution as one refutation.
+#: "retracted" belongs here for the same reason "revised" and "retired" do: it REMOVES a claim that
+#: was standing, and the claim it removes is our own published verdict -- the scarcest correction
+#: this organ makes, not the cheapest.
 _CORRECTIVE: tuple[str, ...] = ("failed", "killed", "kill", "retired", "revised", "rejected",
                                 "falsified", "dead", "buried", "not_computable", "unmodelable",
                                 "strained", "incorrect", "no_fit", "no viable mapping",
-                                "no honest bridge", "no bridge")
+                                "no honest bridge", "no bridge", "retracted")
 
 #: Outcomes that record only that work STARTED. Counted as repairs, never as decisive — 69 of Wren's
 #: 80 entries end here (68 "hypothesized" + 1 "charted"), which is the real defect: a hypothesis
@@ -302,6 +310,12 @@ _INCONCLUSIVE: dict[str, tuple[str, ...]] = {
     # assayer's honest cell, so it must not be counted as a ruling -- otherwise the organ can never
     # score below 100% and the count stops measuring anything.
     ".folklore.json": ("inconclusive",),
+    # Wren: 68 of 82 records. A RETIREMENT, not a research outcome -- counting it decisive would pay
+    # the Map-maker a day's credit for one batch cleanup, which is why swarm_health already files it
+    # here. Declared 2026-08-08: it was already non-decisive, but only because no vocabulary knew the
+    # word at all. Resting 68 of 82 records on an ACCIDENT is not the same as ruling on them, and the
+    # accident flips the moment "off-board" happens to contain a future decisive word.
+    ".cartography.json": ("off-board",),
 }
 #:
 #: KNOWN UNDER-COUNT, LEFT UNPAPERED: 2 cartography records carry status "bridged" WITH bridges_now
