@@ -17,6 +17,8 @@ import urllib.parse
 import urllib.request
 from pathlib import Path
 
+from agora.execution.competitor_watch import is_competitor_repo
+
 _STORE = Path(__file__).resolve().parents[2] / ".scout.json"
 
 # Agora's areas of genuine, evidenced strength — the Scout only pitches where we have real notes.
@@ -110,6 +112,11 @@ def find_opportunity() -> dict | None:
         repo = m.group(1)
         # never pitch our own repo (no audience there) — that is announcing, not engaging
         if repo.lower().startswith("dancenitra/"):
+            continue
+        # and never pitch a COMPETITOR's repo (owner's rule, 2026-08-07). Our strength themes are
+        # their issue trackers' subject matter, so a theme search ranks them high by construction.
+        # find_learning() below is deliberately NOT filtered — reading them is how we stay honest.
+        if is_competitor_repo(repo):
             continue
         title, body = it.get("title", ""), (it.get("body") or "")[:1200]
         reactions = (it.get("reactions") or {}).get("total_count", 0)
@@ -269,6 +276,11 @@ def box_add(lead: dict, kind: str = "contribute") -> dict | None:
     if not url:
         return None
     if not _about_memory(lead):
+        return None
+    # Chokepoint backstop for the no-competitors rule: every path that offers help drains through
+    # this box, so a future finder that forgets the filter still cannot queue a competitor lead.
+    # Scoped to "contribute" — a "learn" lead from a competitor repo is intel, not support.
+    if kind == "contribute" and is_competitor_repo(lead.get("repo") or ""):
         return None
     items = box_load()
     if any(x.get("url") == url for x in items):

@@ -83,9 +83,11 @@ def _score(item: dict, offers: list) -> int:
 
 
 def find(limit: int = 25) -> dict:
+    from agora.execution.competitor_watch import is_competitor_repo
     from agora.execution.external_library import _inspeximus
     m = _inspeximus()
     out = []
+    dropped = []
     for r in m.items:
         meta = r.get("meta") or {}
         blob = ((r.get("text") or "") + " " + str(meta.get("title") or "")).lower()
@@ -93,6 +95,15 @@ def find(limit: int = 25) -> dict:
             continue
         offers = [name for name, (words, _) in OFFERS.items() if any(w in blob for w in words)]
         if not offers:
+            continue
+        # WE DO NOT HELP COMPETITORS (owner's rule, 2026-08-07). A finder that looks for "who needs
+        # exactly what we ship" finds competitors most precisely of all -- their issue trackers are
+        # full of people asking for supersession, revert and erasure. Measured on the 40-candidate
+        # shortlist of 2026-07-21: 6 were competitor threads (5x mem0, 1x memanto), one of them at
+        # rank 4. Reported rather than silently dropped, so the count stays auditable.
+        if is_competitor_repo(meta.get("repo", "")):
+            dropped.append({"repo": meta.get("repo", ""), "title": (meta.get("title") or "")[:140],
+                            "url": meta.get("url", "")})
             continue
         item = {"title": (meta.get("title") or "")[:140], "url": meta.get("url", ""),
                 "repo": meta.get("repo", ""), "kind": meta.get("kind", ""),
@@ -108,4 +119,5 @@ def find(limit: int = 25) -> dict:
         for o in it["offers"]:
             by_offer[o] = by_offer.get(o, 0) + 1
     return {"candidates": out[:limit], "total_matching": len(out), "library_scanned": len(m.items),
-            "demand_by_offer": dict(sorted(by_offer.items(), key=lambda kv: -kv[1]))}
+            "demand_by_offer": dict(sorted(by_offer.items(), key=lambda kv: -kv[1])),
+            "competitors_excluded": dropped}

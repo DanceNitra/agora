@@ -34,7 +34,36 @@ COMPETITORS = [
     ("Supermemory", "supermemoryai/supermemory", ""),
     ("MemOS / MemTensor", "MemTensor/MemOS", "memoryos"),
     ("txtai", "neuml/txtai", "txtai"),
+    ("Memanto", "moorcheh-ai/memanto", ""),
 ]
+
+# Orgs that ship a competing memory product AND things we partner with. Their competitor repo is
+# excluded by exact name; the rest of the org is NOT. langchain-ai is the live case: langmem competes
+# with us, while langgraph is a partner that merged our integration docs (langchain-ai/docs#5019) and
+# whose InMemoryStore we pass an operation-by-operation parity audit against. An org-wide rule here
+# would have blacklisted the single best distribution channel we have.
+_MIXED_ORGS = {"langchain-ai"}
+
+
+def is_competitor_repo(repo: str) -> bool:
+    """True when a GitHub repo belongs to a competing memory product.
+
+    Used to keep competitors OUT of anywhere we offer help — the contribution shortlist and the
+    scout's outreach candidates. Reading them is fine and this does not gate that: competitor_watch
+    itself exists to learn from them, and scout.find_learning() is deliberately left unfiltered.
+    What the owner rules out is HELPING them.
+
+    Matches on the exact `owner/repo`, plus the whole org for single-product owners (so mem0ai/mem0-ts
+    is caught, not just mem0ai/mem0). Orgs in _MIXED_ORGS match on the exact repo only.
+    """
+    r = (repo or "").strip().lower().strip("/")
+    if not r or "/" not in r:
+        return False
+    known = {c[1].lower() for c in COMPETITORS if c[1]}
+    if r in known:
+        return True
+    owner = r.split("/", 1)[0]
+    return owner in {k.split("/", 1)[0] for k in known} - _MIXED_ORGS
 
 # Words that mean "this release is on our axis" — the moat, not the feature list.
 ON_OUR_AXIS = ("revert", "rollback", "undo", "supersede", "superseded", "correction", "correct a",
