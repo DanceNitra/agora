@@ -1737,6 +1737,18 @@ _RECENT_INTENTS_FILE = Path(__file__).resolve().parent / ".recent_intents.json"
 _RECENT_INTENTS_MAX = 50          # per agent
 
 
+def _dedup_keep_last(seq) -> list:
+    """Distinct values, keeping each at its MOST RECENT position.
+
+    The budget is a RECENCY window, so a repeat must move an entry, never add one. Without this,
+    `append` spends a slot per pick and the 50-entry history degenerates: measured 2026-08-08, all
+    eight agents held 50 entries carrying 5-7 DISTINCT intents -- roughly eight copies apiece. The
+    memory that exists to prevent repetition was being consumed by the repetition, so it remembered
+    ~6 topics instead of 50 and every agent was permanently saturated.
+    """
+    return list(dict.fromkeys(list(seq)[::-1]))[::-1]
+
+
 def _load_recent_intents() -> dict:
     """eid -> that agent's recently-issued intents. Accepts the legacy flat list on disk."""
     try:
@@ -1746,9 +1758,12 @@ def _load_recent_intents() -> dict:
     if isinstance(raw, list):
         # MIGRATION from the single shared list: seed every agent with it, so the first cycle after
         # the upgrade dedups exactly as before and the per-agent histories diverge from there.
-        return {e: list(raw)[-_RECENT_INTENTS_MAX:] for e in _AGENT_NAMES}
+        return {e: _dedup_keep_last(raw)[-_RECENT_INTENTS_MAX:] for e in _AGENT_NAMES}
     if isinstance(raw, dict):
-        return {k: list(v)[-_RECENT_INTENTS_MAX:] for k, v in raw.items() if isinstance(v, list)}
+        # Dedup ON LOAD, so the saturated state already on disk heals at the next restart instead of
+        # having to churn 50 picks per agent before the fix can take effect.
+        return {k: _dedup_keep_last(v)[-_RECENT_INTENTS_MAX:]
+                for k, v in raw.items() if isinstance(v, list)}
     return {}
 
 
@@ -1774,7 +1789,8 @@ _recent_intents: dict = _load_recent_intents()
 def _save_recent_intents() -> None:
     try:
         _RECENT_INTENTS_FILE.write_text(
-            json.dumps({k: list(v)[-_RECENT_INTENTS_MAX:] for k, v in _recent_intents.items()}),
+            json.dumps({k: _dedup_keep_last(v)[-_RECENT_INTENTS_MAX:]
+                        for k, v in _recent_intents.items()}),
             encoding="utf-8")
     except Exception:
         pass
@@ -1800,6 +1816,9 @@ def _strip_quest_prefix(title: str) -> str:
 #: Why an agent ended a planning cycle with nothing — so the escalation tells the owner the truth.
 #: "off_priority" (the board is narrower than the pool) is a DIFFERENT condition from an unreachable
 #: brain, and reporting the first as the second sends "the brain may be down" while it is serving fine.
+#: "exhausted" (every on-priority candidate has already been pursued by THIS agent) is a third: it
+#: names a SUPPLY problem, and it is the honest reading of what the `(fresh or interleaved)` fallback
+#: used to hide by re-serving work the brain then refused. Both are normal; neither is a blocker.
 _plan_reason: dict = {}
 
 
@@ -1949,8 +1968,24 @@ async def _renewable_quests(eid: str, want: int = 3) -> list:
     # cross-restart dups) without one agent's picks silencing the topic for the other seven.
     _seen = _recent_intents.setdefault(eid, [])
     fresh = [x for x in interleaved if x[0] not in _seen]
-    chosen = (fresh or interleaved)[:want]
+    # NO FALLBACK. This used to read `(fresh or interleaved)`, and the 2026-07-31 note above already
+    # named what that does -- "the fallback INVERTS the guard ... a dedup that produces duplicates
+    # precisely when it is working hardest" -- but only the per-agent half of that fix was applied.
+    # This is the other half. Measured 2026-08-08 while it was still in place: 400 refusals in 17.9 h
+    # (22.4/h) carrying just 28 distinct titles, one of them submitted 53 times by all eight agents,
+    # every one refused by the brain as a near-duplicate. Exhausted now means exhausted: the agent
+    # takes a wander thought instead, which is the correct cost of having nothing new to pursue.
+    # STARVATION IS THE SIGNAL, not the bug -- it says the SUPPLY is thin, and hiding it behind a
+    # fallback is what turned a supply problem into 1,435 guaranteed-reject writes.
+    chosen = fresh[:want]
+    if interleaved and not chosen:
+        _plan_reason[eid] = "exhausted"
+        logger.info("[plan] %s: all %d on-priority candidate(s) already pursued -> no research this "
+                    "cycle (supply is %d deep)", _AGENT_NAMES.get(eid, eid), len(interleaved),
+                    len(interleaved))
     for x in chosen:
+        if x[0] in _seen:            # a repeat MOVES the entry, it never spends a second slot
+            _seen.remove(x[0])
         _seen.append(x[0])
     del _seen[:-_RECENT_INTENTS_MAX]
     if chosen:
@@ -4702,10 +4737,14 @@ async def ambient_life():
                         _AGENT_NAMES.get(eid, eid), len(quests.get(eid, [])))
             if quests.get(eid):
                 _plan_fails[eid] = 0
-            elif _plan_reason.get(eid) == "off_priority":
+            elif _plan_reason.get(eid) in ("off_priority", "exhausted"):
                 # NOT a blocker: the sources delivered, the BOARD is narrower than what they delivered.
                 # Counting this as a plan failure escalated "the brain may be down" while the brain was
                 # serving perfectly — an alarm that names the wrong system trains everyone to ignore it.
+                # "exhausted" joins it 2026-08-08 with the no-fallback fix: an agent that has already
+                # pursued every on-priority candidate legitimately plans nothing, and routing that into
+                # the escalation below would fire "the brain may be down" at the owner three cycles
+                # later — the SAME false alarm this branch exists to prevent, re-created by the fix.
                 _plan_fails[eid] = 0
             else:
                 # even gaps/bridges/findings were empty → the brain is likely unreachable: a REAL blocker
