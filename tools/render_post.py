@@ -14,6 +14,9 @@ import re
 import sys
 from pathlib import Path
 
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+import publish_gate  # noqa: E402  (repo-root tool, imported by path)
+
 ROOT = Path(__file__).resolve().parents[1]
 SITE = "https://dancenitra.github.io/agora/public"
 
@@ -472,11 +475,29 @@ def _emit_html(m: dict, body_en, foot_en, body_sk, foot_sk, read: int, bilingual
                       "kicker_sk": kicker_sk, "read": read, "bilingual": bilingual})
 
 
+def _construction_gate(md: str, label: str) -> None:
+    """Audit every runnable model this post offers the reader, before it is rendered.
+
+    The post's own links are the target list — whatever it tells the reader to go read is what gets
+    audited, so the gate cannot be satisfied by an artifact the publication does not actually cite.
+
+    require_nonempty is False HERE and only here. A post is prose and may legitimately cite no
+    runnable model (8 of our 18 link none); refusing those would break the publish path for pieces
+    that never made a measured claim. The Crucible, where every entry is supposed to ship code, keeps
+    the empty-set refusal. This is a stated limit, not a silent one: a post that DOES carry numbers
+    while linking nothing is not caught here, and that gap is real.
+    """
+    local, unresolved, external = publish_gate.links_in_text(md)
+    publish_gate.enforce(local, label, unresolved=unresolved, external=external,
+                         require_nonempty=False)
+
+
 def render(key: str):
     """Render a hand-curated bilingual post from public/posts/src/{key}.{en,sk}.md + META[key]."""
     m = dict(META[key])
     src = ROOT / "public" / "posts" / "src"
     _en_md = (src / f"{key}.en.md").read_text(encoding="utf-8")
+    _construction_gate(_en_md, f"post {key}")
     m["faq"] = _extract_faq(_en_md)
     _, body_en, foot_en, words = md_to_html(_en_md)
     _, body_sk, foot_sk, _ = md_to_html((src / f"{key}.sk.md").read_text(encoding="utf-8"))
@@ -488,6 +509,7 @@ def render(key: str):
 def render_piece(d: dict):
     """Render ONE post from an inline spec (the Press organ's auto-publish path). EN markdown in
     d['body']; optional d['body_sk'] makes it bilingual, else it renders English-only."""
+    _construction_gate(d["body"] + "\n" + (d.get("body_sk") or ""), f"press piece {d.get('slug', '?')}")
     _, body_en, foot_en, words = md_to_html(d["body"])
     read = max(1, round(words / 200))
     bilingual = bool(d.get("body_sk"))

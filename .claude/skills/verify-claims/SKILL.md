@@ -36,6 +36,34 @@ Read the target. Pull EVERY independently-checkable assertion:
 List them. Our OWN measured numbers count too — re-check them against `server/.lab.json` / the lab script /
 re-run, not against a vault note (a number in a note is NOT verified).
 
+### 1b. Run the CONSTRUCTION gate on every artifact behind one of OUR numbers (mandatory, blocking)
+
+```bash
+python -X utf8 tools/publish_gate.py <draft.md>        # audits every runnable model the draft links
+python -X utf8 tools/publish_gate.py <probe.py> ...    # or name the artifacts directly
+```
+
+Read the exit code directly — **not through a pipe** (`tail` at the end of a pipe returns its own
+status; that misread "exit 0" three times in one session). Non-zero = **blocked**, and the finding is
+the deliverable, not a nuisance.
+
+This step exists because steps 3–5 below cannot find this class of defect *even when performed
+perfectly*. They check that a number matches its artifact. They never ask whether the artifact could
+have produced a different number. On 2026-08-08 we posted "poison earns standing 100% of the time"
+from a probe calling `measure(..., minja_p=1.0)`, where `random() < 1.0` is always true, so the
+poisoned record never accrued `bad`, so the guard requiring `bad > good` could never fire. Verify
+passed it correctly: the number *did* match the artifact. It was a definition wearing the clothes of
+a measurement, and re-running it — exactly what validate asks — only made us more confident.
+
+Outreach and correspondence replies are the reason this lives in the skill and not only in the
+renderers: `render_post.py` and `render_crucible.py` call the gate themselves and refuse to write, but
+a GitHub comment never touches either. **#7707 was a GitHub comment.**
+
+Rules: a finding is fixed or waived **in writing** in `tools/construction_waivers.json` (with a reason
+and a date) before the piece moves on. An empty target set is a refusal, not a pass — if the gate
+audited nothing, you have not run it. And if a number's artifact cannot be named at all, that number
+does not go out.
+
 ### 2. Cluster (group related claims so one verifier handles a coherent set; ~4-6 clusters).
 
 ### 3. Fan out independent verifiers (parallel, one per cluster, in a single message)

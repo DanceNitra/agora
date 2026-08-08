@@ -54,6 +54,18 @@ A post that carries a headline figure with no linked runnable probe is a NEEDS-F
 is exactly the gap the re-audit skeptic caught on #20. Consolidate one probe that reproduces the whole
 number set (naive result + every correction + the sensitivity sweep), not a scatter of throwaway scripts.
 
+**Then gate the artifact you just re-ran — re-running is not enough on its own:**
+```bash
+python -X utf8 tools/publish_gate.py public/posts/src/<key>.en.md   # audits every model the post links
+```
+Read the exit code directly, never off the end of a pipe. Re-running proves the number is
+REPRODUCIBLE; it cannot tell you the probe could have produced any other number. A construction defect
+reproduces perfectly, forever — on #7707 `minja_p=1.0` made `random() < 1.0` always true, so the
+counter a guard needed could never move, and "100% of the time" was a definition. Every re-run made it
+look stronger. Fix any finding, or waive it in `tools/construction_waivers.json` with a reason and a
+date. `render_post.py` runs this gate itself and refuses to write, so a post cannot be published
+around it — but do it here, where there is still time to fix the probe.
+
 ### 3. STORM — /storm-research on the post's core claim  ← MANDATORY, run this before stress-claim
 Run the full `storm-research` skill (5 expert lenses + contradiction map + its own Phase-4 verification)
 on the post's central claim/topic. This is NOT optional and NOT interchangeable with stress-claim's

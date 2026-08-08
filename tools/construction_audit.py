@@ -22,8 +22,11 @@ confident and wrong):
 
   1. BOUNDARY PROBABILITY  — `rng.random() < p` where some call site passes p = 0.0 or 1.0.
      At the boundary the comparison is constant and the branch it guards is dead.
-  2. DEAD GUARD           — a dict/counter key that is only ever read in a guard and never
-     incremented on some path, so the guard cannot fire.
+  2. DEAD-COUNTER-GUARD   — a key INITIALISED to a number and then compared by an ordering guard
+     (`bad > good`) that no path in the file ever advances, so the guard cannot fire. The numeric
+     initialiser is what separates a counter from a data field read off a corpus row; without that
+     split the rule was wrong on all 5 of the real artifacts it spoke about (measured 2026-08-08),
+     and a checker that is wrong every time it speaks is one somebody switches off.
   3. UNSWEPT KNOB         — `os.environ.get("NAME", default)` exposed by the probe. An exposed knob
      that the published run never varied is an undisclosed degree of freedom. Ours was ROD_THETA:
      at theta=1 the headline statistic crosses the line it was quoted for.
@@ -55,6 +58,19 @@ class Finding:
 def _is_rng_call(node: ast.AST) -> bool:
     return (isinstance(node, ast.Call) and isinstance(node.func, ast.Attribute)
             and node.func.attr in RNG_FUNCS and not node.args)
+
+
+def _show(node: ast.AST) -> str:
+    """Render a default for display. It is NOT always a literal — `os.environ.get("TE_CORPUS",
+    os.path.join(HERE, "data", "x.json"))` puts a Call there, and reading `.value` off it raised
+    AttributeError on 2 of the 39 Crucible artifacts. A gate that crashes on the input it was pointed
+    at has not passed; it has failed to run, which is the one outcome that looks like neither."""
+    if isinstance(node, ast.Constant):
+        return str(node.value)
+    try:
+        return ast.unparse(node)
+    except Exception:
+        return "<%s>" % type(node).__name__
 
 
 def _literal(node: ast.AST):
@@ -135,13 +151,31 @@ def audit(path: Path) -> list[Finding]:
                             "a default at the boundary means the UNSWEPT path is the degenerate one"))
 
     # ── 2. counters read by a guard but never incremented on a branch ───────────────────────────
+    # ONLY ordering comparisons (< > <= >=) count as a counter guard. Membership and equality
+    # (`if r["winner"] in ("model_a","model_b")`, `rater in r["gen"]`) are reads of a DATA FIELD that
+    # arrives from a loaded corpus — no file "increments" it, so the unwritten-key test flags every
+    # one of them. Measured across the 39 Crucible artifacts that resolve to local code: with equality
+    # and membership included the rule fired 3 times and was wrong all 3 times, and a gate that is
+    # wrong every time it speaks is a gate someone turns off. The defect this rule is FOR is a counter
+    # that a guard compares and no path advances.
+    ORDER_OPS = (ast.Lt, ast.Gt, ast.LtE, ast.GtE)
     guarded: dict[str, int] = {}
     for node in ast.walk(tree):
-        if isinstance(node, ast.Compare):
+        if isinstance(node, ast.Compare) and node.ops and all(isinstance(o, ORDER_OPS) for o in node.ops):
             for side in [node.left] + list(node.comparators):
                 if (isinstance(side, ast.Subscript) and isinstance(side.slice, ast.Constant)
                         and isinstance(side.slice.value, str)):
                     guarded.setdefault(side.slice.value, node.lineno)
+    # A counter is a key INITIALISED to a number in this file and then advanced by some path. That
+    # split is the whole rule. Treating the initialiser as a write (the first version did) means
+    # `store = {"good": 0, "bad": 0}` with nothing ever incrementing `bad` reads as maintained -- which
+    # is the canonical dead counter, the exact shape of the guard that could not fire on #7707.
+    # Requiring numeric initialisation is also what keeps DATA fields out: `r["winner"]` and
+    # `res[kind] = a` arrive from a corpus or a variable key, are never initialised to a number here,
+    # and every one of the 5 false positives this rule produced on real artifacts was one of those.
+    init_numeric: dict[str, int] = {}
+    advanced: set[str] = set()
+    opaque_advance = False
     written: set[str] = set()
     # ANY write counts, not just `+=`. The first version only looked at AugAssign and therefore
     # flagged four result-dict keys that are plainly assigned with `=` — 4 false positives out of 9,
@@ -153,23 +187,52 @@ def audit(path: Path) -> list[Finding]:
                     if isinstance(sub, ast.Subscript) and isinstance(sub.slice, ast.Constant)                             and isinstance(sub.slice.value, str):
                         written.add(sub.slice.value)
         if isinstance(node, ast.Dict):
-            for k in node.keys:
+            for k, v in zip(node.keys, node.values):
                 if isinstance(k, ast.Constant) and isinstance(k.value, str):
                     written.add(k.value)
+                    if _literal(v) is not None:
+                        init_numeric.setdefault(k.value, node.lineno)
+        # `f(good=0.0, bad=0.0)` -- the shipped probe builds its records as dict(f, good=0.0, bad=0.0)
+        if isinstance(node, ast.Call):
+            for kw in node.keywords:
+                if kw.arg and _literal(kw.value) is not None:
+                    init_numeric.setdefault(kw.arg, node.lineno)
+        # `d["k"] = 0` initialises; `d["k"] = d["k"] + 1` or anything mentioning itself ADVANCES
+        if isinstance(node, ast.Assign):
+            for t in node.targets:
+                if isinstance(t, ast.Subscript) and isinstance(t.slice, ast.Constant) \
+                        and isinstance(t.slice.value, str):
+                    key = t.slice.value
+                    if _literal(node.value) is not None:
+                        init_numeric.setdefault(key, node.lineno)
+                    for sub in ast.walk(node.value):
+                        if isinstance(sub, ast.Subscript) and isinstance(sub.slice, ast.Constant) \
+                                and sub.slice.value == key:
+                            advanced.add(key)
         if isinstance(node, ast.AugAssign) and isinstance(node.target, ast.Subscript):
             sl = node.target.slice
             if isinstance(sl, ast.Constant) and isinstance(sl.value, str):
                 written.add(sl.value)
+                advanced.add(sl.value)
             elif isinstance(sl, ast.IfExp):                       # d["a" if c else "b"] += 1
                 for br in (sl.body, sl.orelse):
                     if isinstance(br, ast.Constant) and isinstance(br.value, str):
                         written.add(br.value)
-    for key, ln in guarded.items():
-        if key not in written and key not in ("poison",):
-            out.append(Finding("GUARD-ON-UNWRITTEN-KEY", ln,
-                               "guard reads [%r] but nothing in this file increments it" % key,
-                               "a guard whose input never moves cannot fire; it reports SAFE by "
-                               "construction"))
+                        advanced.add(br.value)
+            else:
+                # `d[k] += 1` with a variable key advances SOMETHING this file cannot name. Calling
+                # any counter dead from here would be a guess, so the rule stands down.
+                opaque_advance = True
+
+    for key, ln in sorted(guarded.items()):
+        if opaque_advance or key in advanced or key not in init_numeric:
+            continue
+        out.append(Finding(
+            "DEAD-COUNTER-GUARD", ln,
+            "guard compares [%r], initialised to a number at line %d, and no path in this file "
+            "advances it" % (key, init_numeric[key]),
+            "a guard whose input never moves cannot fire — it reports SAFE by construction, which "
+            "is how a poison record that can never accrue `bad` passes a `bad > good` check"))
 
     # ── 3. environment knobs the probe exposes ──────────────────────────────────────────────────
     for node in ast.walk(tree):
@@ -179,9 +242,8 @@ def audit(path: Path) -> list[Finding]:
                 and node.func.value.attr == "environ"):
             if node.args and isinstance(node.args[0], ast.Constant):
                 knob = node.args[0].value
-                dflt = _literal(node.args[1]) if len(node.args) > 1 else None
                 out.append(Finding("UNSWEPT-KNOB", node.lineno,
-                                   "%s (default %s)" % (knob, node.args[1].value
+                                   "%s (default %s)" % (knob, _show(node.args[1])
                                                         if len(node.args) > 1 else "none"),
                                    "an exposed knob the published run never varied is an "
                                    "undisclosed degree of freedom — sweep it or state its value "
