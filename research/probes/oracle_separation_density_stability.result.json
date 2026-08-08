@@ -1,0 +1,107 @@
+{
+ "scenario": "oracle_separation_density_stability",
+ "published_ratio": {
+  "1": 0.9313090418353577,
+  "2": 0.9177939646201874,
+  "4": 0.7690924041525333,
+  "8": 0.9434746954076854
+ },
+ "published_seeds": 6,
+ "arms": {
+  "theta2_seeds24": {
+   "1": {
+    "ratio": 0.9306511196316333,
+    "ci": {
+     "lo": 0.8970805369127518,
+     "hi": 0.9679830148619958,
+     "n_boot": 2000
+    },
+    "earn": 1.0,
+    "published_inside_ci": true
+   },
+   "2": {
+    "ratio": 0.9128808290964756,
+    "ci": {
+     "lo": 0.8812436289500509,
+     "hi": 0.943484065710803,
+     "n_boot": 2000
+    },
+    "earn": 1.0,
+    "published_inside_ci": true
+   },
+   "4": {
+    "ratio": 0.8496628461083249,
+    "ci": {
+     "lo": 0.7756259417890838,
+     "hi": 0.9440263586105135,
+     "n_boot": 2000
+    },
+    "earn": 1.0,
+    "published_inside_ci": false
+   },
+   "8": {
+    "ratio": 0.8748532808299555,
+    "ci": {
+     "lo": 0.7952186473693617,
+     "hi": 0.9574784418673808,
+     "n_boot": 2000
+    },
+    "earn": 1.0,
+    "published_inside_ci": true
+   }
+  },
+  "theta1": {
+   "1": {
+    "ratio_6": 1.0223325062034736,
+    "ratio_24": 0.9671876104943071,
+    "ci_24": {
+     "lo": 0.9100561474229771,
+     "hi": 1.026433691756272,
+     "n_boot": 2000
+    },
+    "earn": 1.0
+   },
+   "2": {
+    "ratio_6": 0.8524827836172528,
+    "ratio_24": 0.9524414726548586,
+    "ci_24": {
+     "lo": 0.8711162255466053,
+     "hi": 1.0465425531914894,
+     "n_boot": 2000
+    },
+    "earn": 1.0
+   },
+   "4": {
+    "ratio_6": 0.7697121401752188,
+    "ratio_24": 0.8385745674265317,
+    "ci_24": {
+     "lo": 0.7194051407855233,
+     "hi": 0.9803619909502241,
+     "n_boot": 2000
+    },
+    "earn": 1.0
+   },
+   "8": {
+    "ratio_6": 1.0510771780303023,
+    "ratio_24": 0.8806871712698139,
+    "ci_24": {
+     "lo": 0.7749529609871745,
+     "hi": 0.9844063609695849,
+     "n_boot": 2000
+    },
+    "earn": 1.0
+   }
+  }
+ },
+ "control": {
+  "passed": true,
+  "tol": 1e-09
+ },
+ "checks": {
+  "published_range_is_monotone": false,
+  "a_published_point_falls_outside_its_own_ci": true,
+  "below_1_survives_theta1": false,
+  "earn_is_pinned_at_1": true
+ },
+ "verdict": "The published sentence does not survive its own free parameters."
+}
