@@ -102,6 +102,49 @@ def test_exhaustion_is_not_reported_as_a_broken_brain():
         "an exhausted agent falls through to the escalation branch and will alarm the owner")
 
 
+def _load_stripper():
+    """The real `_strip_quest_prefix` plus the two regexes and the roster it is built from."""
+    ns: dict = {"re": __import__("re")}
+    i = SRC.index("_AGENT_NAMES = {")
+    exec(SRC[i:SRC.index("\n\n", SRC.index("}", i))], ns)          # noqa: S102
+    i = SRC.index("_QUEST_PREFIX_RE = re.compile")
+    exec(SRC[i:SRC.index("def _strip_quest_prefix", i)], ns)       # noqa: S102
+    i = SRC.index("def _strip_quest_prefix")
+    exec(SRC[i:SRC.index("\n\n#: Why an agent ended", i)], ns)     # noqa: S102
+    return ns["_strip_quest_prefix"]
+
+
+def test_the_author_pair_prefix_is_not_part_of_the_subject():
+    """One subject reached the pool once per author pair that had touched it. Measured on the live
+    top-8: 8 rows, 7 distinct strings, TWO real subjects."""
+    strip = _load_stripper()
+    # the AUTHOR pair goes; "MemOps:" is the SUBJECT and must survive -- a peeler that took it too
+    # would merge unrelated findings into one topic, which is the opposite failure
+    assert strip("King Aldric + Sage Mira: MemOps: Benchmarking") == "MemOps: Benchmarking"
+    assert strip("Cartographer Wren + Artificer Rooke: MemOps: X") == "MemOps: X"
+    assert strip("Pipeline: QVal: Cheaply Evaluating") == "QVal: Cheaply Evaluating"
+
+
+def test_the_stripper_does_not_eat_ordinary_prose():
+    """THE CONTROL that matters for a prefix-peeler: it must key on the ROSTER, not on 'any words
+    then a colon', or it silently truncates real subjects."""
+    strip = _load_stripper()
+    for kept in ("Poison resistance under echo attack",
+                 "King Aldric walked into the hall: a story",
+                 "Supersession: what a correction retires"):
+        assert strip(kept) == kept, "the stripper ate %r" % kept
+
+
+def test_findings_are_sampled_by_topic_not_by_row():
+    assert "_topics: dict[str, str] = {}" in CODE
+    assert "random.sample(list(_topics.values())" in CODE, (
+        "sampling rows again: the top-8 is an author-pair cross-product of a couple of subjects, so "
+        "row-sampling returns copies of one topic and calls them separate quests")
+    assert "topic.lower()[:40]" in CODE, (
+        "exact-string keying cannot merge titles stored ALREADY TRUNCATED, where a longer author "
+        "prefix leaves a shorter remainder of the same subject")
+
+
 def test_the_live_intents_file_if_present_is_not_still_saturated():
     """Real data. Skips rather than passing vacuously when the file is absent."""
     p = HERE / ".recent_intents.json"

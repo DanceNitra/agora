@@ -1801,12 +1801,27 @@ _QUEST_PREFIX_RE = re.compile(
     r"\s*:?\s*", re.I)
 
 
+#: A finding is titled with the pair who produced it -- "King Aldric + Sage Mira: MemOps: ...". That
+#: prefix is AUTHORSHIP, not subject, and leaving it on makes one topic look like as many distinct
+#: topics as there are pairs who touched it. Measured 2026-08-08: the top-8 findings carried EIGHT
+#: distinct strings over TWO real subjects (MemOps x6, QVal x2), and `b_find` sampled three of them
+#: expecting three topics. Built from the live roster so it cannot over-match ordinary prose.
+_ACTOR_PREFIX_RE = re.compile(
+    r"^(?:(?:%s)(?:\s*\+\s*(?:%s))*)\s*:\s*" % ((("|".join(re.escape(n) for n in _AGENT_NAMES.values())),) * 2),
+    re.I) if _AGENT_NAMES else None
+
+
 def _strip_quest_prefix(title: str) -> str:
     """Peel any stacked quest/finding prefix so new intents don't nest into garbage like
-    'Hypothesize on: Hypothesize on: Pursue direction: ...' (wastes LLM calls + pollutes titles)."""
+    'Hypothesize on: Hypothesize on: Pursue direction: ...' (wastes LLM calls + pollutes titles).
+
+    Also peels the AUTHOR pair prefix, for the same reason and with the same effect on supply.
+    """
     t = (title or "").strip()
     for _ in range(4):
         new = _QUEST_PREFIX_RE.sub("", t).strip()
+        if _ACTOR_PREFIX_RE is not None:
+            new = _ACTOR_PREFIX_RE.sub("", new).strip()
         if new == t:
             break
         t = new
@@ -1859,12 +1874,25 @@ async def _renewable_quests(eid: str, want: int = 3) -> list:
                                 "create"))
         fd = await asyncio.to_thread(_brain_get_sync, "/api/v1/agent-os/brain/collective?limit=8")
         finds = [k for k in (fd or {}).get("knowledge", []) if (k.get("content") or "")]
-        for k in random.sample(finds, min(3, len(finds))):
+        # SAMPLE DISTINCT TOPICS, NOT DISTINCT ROWS. The top-8 is an author-pair cross-product of a
+        # couple of subjects, so sampling rows returned three copies of one topic and called it three
+        # quests. Measured 2026-08-08: 8 rows -> 2 real subjects. Dedup FIRST, then sample, so the
+        # bucket's depth is the number of things to think about rather than the number of rows.
+        # Key on a SHORT prefix, not the whole string: titles are stored already truncated, so a
+        # longer author prefix leaves a shorter remainder and the same subject ends "...Operations in
+        # Lon" under one pair and "...in L" under another. Measured: exact-string dedup left those as
+        # two topics; a 40-char key merges them and still separates MemOps from QVal. Keep the LONGEST
+        # variant, which carries the most subject.
+        _topics: dict[str, str] = {}
+        for k in finds:
+            topic = _strip_quest_prefix(k.get("title") or "")[:55].strip()
+            if topic:
+                _key = topic.lower()[:40]
+                if len(topic) > len(_topics.get(_key, "")):
+                    _topics[_key] = topic
+        for topic in random.sample(list(_topics.values()), min(3, len(_topics))):
             # findings → HYPOTHESIZE quests: form + test a new hypothesis that deepens the finding
             # (the self-deepening engine — each finding raises the next testable question).
-            topic = _strip_quest_prefix(k.get("title") or "")[:55]
-            if not topic:
-                continue
             b_find.append((f"Hypothesize on: {topic}",
                            "Form + test a new hypothesis that deepens this finding", "hypothesize"))
     except Exception as e:
