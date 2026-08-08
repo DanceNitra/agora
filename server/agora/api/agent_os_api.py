@@ -2649,9 +2649,20 @@ async def brain_library_record(request: Request):
 
 
 @router.get("/brain/library")
-async def brain_library():
+async def brain_library(n: int = 40):
+    """The reading log. `papers` is NEWEST-FIRST and deep enough to choose from.
+
+    It used to be `_load()[-12:]` — the INSERTION-ORDER tail, which is not the newest and is not
+    anything else in particular. Measured 2026-08-08: of the 12 it served, NINE were a stale
+    2026-07-03 block (image synthesis, Reeb orbits, an Ising model) while 205 papers were stored and
+    161 on-mission ones sat queued unread. The dungeon's paper bucket reads this endpoint and takes
+    the first six, so the swarm's only EXTERNAL anchor was six month-old off-mission titles, of which
+    the board gate then passed exactly one. The supply was never missing; it was unreachable.
+    """
     from agora.execution.library import format_library, _load
-    return {"status": "ok", "report": format_library(), "papers": _load()[-12:]}
+    papers = sorted(_load(), key=lambda p: float(p.get("ts") or 0), reverse=True)
+    return {"status": "ok", "report": format_library(),
+            "papers": papers[:max(1, min(200, n))]}
 
 
 @router.get("/brain/experiments")

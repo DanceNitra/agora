@@ -1851,8 +1851,19 @@ async def _renewable_quests(eid: str, want: int = 3) -> list:
         # weak points), so the system's outputs become its next research + knowledge deepens.
         fw = await asyncio.to_thread(_brain_get_sync, "/api/v1/agent-os/brain/flywheel/questions?n=3")
         for q in (fw or {}).get("open", []):
-            b_fly.append((f"Test Agora's claim: {q['question'][:55]}",
-                          f"Find real evidence on whether this holds: {q['question']}", "hypothesize"))
+            # THE FALSIFIER IS THE CRITERION, NOT THE SUBJECT. `question` holds an insight's
+            # falsifier by design ("test the weak point"), but a falsifier reads "SUPPORTED if the
+            # fitted quadratic term is negative and statistically significant (p<0.05)..." — it names
+            # a test, never what is being tested. Two costs, measured 2026-08-08: the quest title
+            # told the agent nothing to research, and the board gate passed 0 of 3 because the
+            # subject's vocabulary is not in the criterion. The SUBJECT is in `origin`.
+            _crit = (q.get("question") or "").strip()
+            _subj = re.sub(r"^(?:hypothesis|insight|contradiction)\s*:\s*", "",
+                           (q.get("origin") or "").strip(), flags=re.I) or _crit
+            b_fly.append((f"Test Agora's claim: {_subj[:55]}",
+                          f"Test this claim with real evidence: {_subj}. "
+                          f"It is decided against its PRE-REGISTERED criterion — {_crit}",
+                          "hypothesize"))
         # HARVESTED DIRECTIONS — so research follows the synthesis and COMPOUNDS.
         dd = await asyncio.to_thread(_brain_get_sync, "/api/v1/agent-os/brain/directions/current")
         for d in (dd or {}).get("directions", []):
@@ -1864,14 +1875,26 @@ async def _renewable_quests(eid: str, want: int = 3) -> list:
         # replaces the old "Connect A<->B" bridges and vague "Develop the gap" quests, which were
         # combinatorial filler (the "gaming party"): they recombined existing notes and produced
         # low-substance notes. Real research = grounded in a real paper, on the frontier.
-        lib = await asyncio.to_thread(_brain_get_sync, "/api/v1/agent-os/brain/library")
-        for p in (lib or {}).get("papers", [])[:6]:
+        lib = await asyncio.to_thread(_brain_get_sync, "/api/v1/agent-os/brain/library?n=60")
+        # RANK, DO NOT SLICE. Papers are the swarm's ONLY external anchor -- everything else in this
+        # function is our own canon fed back to us -- so taking the first six off a list is how the
+        # frontier gets crowded out by whatever happens to sit at the front. Measured 2026-08-08: the
+        # first six were nine-tenths of a stale off-mission block and the board gate passed 1 of 6,
+        # while the same gate passed our own findings 8 of 8. A word-overlap gate CANNOT tell
+        # "on-mission" from "written by us in the board's words", so it structurally prefers the
+        # canon; ranking the external bucket on the same terms is what puts the frontier back on
+        # equal footing instead of loosening the gate (the gate is correct -- see the dedup work).
+        await _gate_refresh()
+        _prio = _gate_cache.get("prio") or set()
+        _papers = [p for p in (lib or {}).get("papers", []) if (p.get("title") or "").strip()]
+        _papers.sort(key=lambda p: (-len(_theme_words(p.get("title") or "") & _prio),
+                                    -float(p.get("ts") or 0)))
+        for p in _papers[:6]:
             ttl = (p.get("title") or "").strip()
-            if ttl:
-                b_paper.append((f"Ground a finding from: {ttl[:60]}",
-                                f"State ONE research finding this paper directly supports, "
-                                f"paraphrasing its actual result and naming it (Author Year): {ttl}",
-                                "create"))
+            b_paper.append((f"Ground a finding from: {ttl[:60]}",
+                            f"State ONE research finding this paper directly supports, "
+                            f"paraphrasing its actual result and naming it (Author Year): {ttl}",
+                            "create"))
         fd = await asyncio.to_thread(_brain_get_sync, "/api/v1/agent-os/brain/collective?limit=8")
         finds = [k for k in (fd or {}).get("knowledge", []) if (k.get("content") or "")]
         # SAMPLE DISTINCT TOPICS, NOT DISTINCT ROWS. The top-8 is an author-pair cross-product of a

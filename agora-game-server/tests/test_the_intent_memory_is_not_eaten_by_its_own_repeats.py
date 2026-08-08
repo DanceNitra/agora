@@ -145,6 +145,32 @@ def test_findings_are_sampled_by_topic_not_by_row():
         "prefix leaves a shorter remainder of the same subject")
 
 
+def test_papers_are_ranked_on_mission_not_sliced():
+    """Papers are the ONLY source in `_renewable_quests` that is not our own canon fed back to us.
+    Taking the first six off a list is how the frontier gets crowded out. Measured 2026-08-08: the
+    first six passed the board gate 1/6 while our own findings passed 8/8; ranked, 6/6."""
+    assert "brain/library?n=60" in CODE, "the bucket must ask for depth to rank over"
+    assert "_papers.sort(key=lambda p: (-len(_theme_words(p.get(\"title\") or \"\") & _prio)," in CODE
+    assert "for p in _papers[:6]" in CODE
+    assert "(lib or {}).get(\"papers\", [])[:6]" not in CODE, "back to slicing the front of the list"
+
+
+def test_the_flywheel_quest_names_its_subject_not_its_criterion():
+    """`question` holds an insight's FALSIFIER by design -- 'SUPPORTED if the fitted quadratic term
+    is negative...'. That names a test, never what is being tested, so the quest told the agent
+    nothing and the board gate passed 0 of 3. The subject is in `origin`."""
+    assert 'q.get("origin")' in CODE, "the subject is still being taken from the falsifier"
+    assert "PRE-REGISTERED criterion" in CODE, "the falsifier must survive as the acceptance bar"
+    assert 'b_fly.append((f"Test Agora\'s claim: {q[\'question\'][:55]}"' not in CODE
+
+    # and the fallback: a question with no origin must still produce a quest, not vanish
+    import re as _re
+    i = CODE.index("_subj = re.sub(")
+    assert 'or _crit' in CODE[i:i + 260], "no origin -> the falsifier must still be used"
+    strip = _re.sub(r"^(?:hypothesis|insight|contradiction)\s*:\s*", "", "hypothesis: X holds", flags=_re.I)
+    assert strip == "X holds"
+
+
 def test_the_live_intents_file_if_present_is_not_still_saturated():
     """Real data. Skips rather than passing vacuously when the file is absent."""
     p = HERE / ".recent_intents.json"
