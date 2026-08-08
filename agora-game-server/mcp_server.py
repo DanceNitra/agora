@@ -1564,6 +1564,18 @@ _INBOX_ALWAYS = ("learn from outcomes", "forge ideas", "synthesize roadmap", "sc
 # Subjects the board explicitly refuses, kept separate from what it asks for. Derived from the tail of
 # the standing priorities ("ONLY test-beds, never the headline" + "Deprioritize ...") — these are the
 # words a naive tokenizer turned into permissions.
+def _light_stem(w: str) -> str:
+    """Fold a simple English plural, and nothing else. MUST match `methods.light_stem` in the brain.
+
+    This was `w.rstrip("s")`, which strips EVERY trailing s and therefore turned "inspeximus" into
+    "inspeximu" -- the one term the board most needs to match, mangled by the matcher, while the
+    brain published the term unstemmed. The two ends never met. Measured 2026-08-08.
+    """
+    if len(w) > 4 and w.endswith("s") and not w.endswith(("ss", "us", "is")):
+        return w[:-1]
+    return w
+
+
 _BOARD_BANNED = {"physics", "finance", "health", "politics", "trivia", "cloud", "meta", "science",
                  "statistics", "neuroscience", "adhd", "longevity", "trading", "crypto", "fmri",
                  "psychology", "biology", "climate", "economics"}
@@ -1593,7 +1605,18 @@ _BOARD_CORE = {"memory", "memories", "inspeximus", "recall", "retrieval", "retri
                # the live half — see above
                "agent", "integrity", "moat", "quality", "correction", "product", "provable", "prove",
                "resistance", "roadmap", "multi", "compounds", "buyer", "competitor", "facing",
-               "numero"}
+               # "operations" added 2026-08-08: the live board names it and this literal did not, so
+               # `_inbox_theme_allowed` refused MemOps-shaped work -- the exact drift this list's
+               # test exists to catch, sitting red and unread.
+               "numero", "operations"}
+
+#: The two literals above, folded through the SAME stem `_theme_words` applies, so the comparison in
+#: `_inbox_theme_allowed` is stemmed-to-stemmed. Written out rather than stemming the literals in
+#: place, because the source forms ("memories", "embeddings", "compounds") are what a human reading
+#: the list expects to see.
+_BOARD_CORE_STEM = {_light_stem(w) for w in _BOARD_CORE}
+_BOARD_BANNED_STEM = {_light_stem(w) for w in _BOARD_BANNED}
+
 
 def _inbox_theme_allowed(text: str) -> bool:
     """THE ONE CHOKE POINT for off-mission work.
@@ -1620,12 +1643,17 @@ def _inbox_theme_allowed(text: str) -> bool:
     # REFUSED beats matched. The board names what it does NOT want in the same breath as what it
     # does ("Finance/health/physics are ONLY test-beds"; "Deprioritize generic meta-science,
     # politics, cloud/trivia"), and reading the text flat turned those into PASS tokens.
-    banned = words & _BOARD_BANNED
+    # STEM BOTH SIDES. `words` comes from `_theme_words`, which stems; these two literals are
+    # hand-written in whatever form read naturally ("compounds", "memories", "embeddings"). Comparing
+    # a stemmed set against an unstemmed one drops every plural entry in the literal -- the same
+    # mismatch that made the brain and the dungeon disagree about "agents", one layer over. Stemmed
+    # once at module import, not per call.
+    banned = words & _BOARD_BANNED_STEM
     if banned:
         logger.info("[gate] inbox task dropped, deprioritised subject %s: %s",
                     sorted(banned), theme.strip()[:80])
         return False
-    if words & _BOARD_CORE:
+    if words & _BOARD_CORE_STEM:
         return True
     logger.info("[gate] inbox task dropped, names no subject of ours: %s", theme.strip()[:90])
     return False
@@ -2268,7 +2296,7 @@ _THEME_STOP = frozenset({
 
 def _theme_words(text: str) -> set[str]:
     """Significant, lightly-stemmed words of a theme (or note slug) for overlap matching."""
-    return {w.rstrip("s") for w in re.findall(r"[a-z]+", text.lower())
+    return {_light_stem(w) for w in re.findall(r"[a-z]+", text.lower())
             if len(w) > 3 and w not in _THEME_STOP}
 
 

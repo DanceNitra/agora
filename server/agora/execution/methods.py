@@ -465,6 +465,25 @@ _REFUSAL = __import__("re").compile(
     r"off[\s-]?domain|do not |don't |avoid |exclude ", __import__("re").I)
 
 
+def light_stem(w: str) -> str:
+    """Fold a simple English plural, and NOTHING else.
+
+    `w.rstrip("s")` -- what the dungeon used -- is not this. It strips every trailing `s`, so
+    **"inspeximus" becomes "inspeximu"**: our own product name, the single term the board most needs
+    to match, mangled by the matcher. It also eats "class" -> "cla". The dungeon has been doing that
+    the whole time, and because the published board terms were UNSTEMMED the two ends disagreed
+    ("inspeximu" vs "inspeximus") and quietly never matched at all.
+
+    So: drop a trailing `s` only when what remains is still a word, and never after `ss`/`us`/`is`,
+    which are not plural endings. agents->agent, operations->operation, compounds->compound;
+    inspeximus, class and analysis are left alone.
+    """
+    w = (w or "")
+    if len(w) > 4 and w.endswith("s") and not w.endswith(("ss", "us", "is")):
+        return w[:-1]
+    return w
+
+
 def board_priority_terms(text: str) -> set:
     """The ON-PRIORITY words of a board, with its refusals removed.
 
@@ -474,9 +493,21 @@ def board_priority_terms(text: str) -> set:
     generic meta-science, cloud trivia, finance and physics -- each matching on the very word he
     used to exclude it. `/brain/board` now publishes the result of this function as
     `priority_terms` so there is nothing left to re-derive.
+
+    STEMMED, since 2026-08-08, and that is not cosmetic. The claim above -- one definition, nothing
+    left to re-derive -- was still false one layer down: this function returned EXACT tokens while
+    the dungeon's `_theme_words` lightly stems (`w.rstrip("s")`), so the two gates disagreed on
+    every plural. Measured on the live board: "LLM agents" scored NONE here and `agent` there, on
+    the same text, at the same moment. `agent` is the commonest word in our domain, so the brain was
+    filing on-mission work as off-board -- and the error runs in the EXCLUDING direction, which is
+    the expensive one: it does not add noise, it silently withholds real work.
+
+    Found while triaging the inbox with this very function, one step before six tasks would have
+    been skipped on its verdict. Both sides now stem, so `stem(text) & stem(board)` is the same
+    comparison wherever it is made.
     """
     keep = [s for s in __import__("re").split(r"(?<=[.!?])\s+", text or "") if not _REFUSAL.search(s)]
-    return {w for w in _theme_tokens(" ".join(keep)) if w not in _BOARD_STOP}
+    return {light_stem(w) for w in _theme_tokens(" ".join(keep)) if w not in _BOARD_STOP}
 
 
 def _match_cache_get(key: str):

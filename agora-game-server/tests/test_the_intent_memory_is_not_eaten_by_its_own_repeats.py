@@ -171,6 +171,48 @@ def test_the_flywheel_quest_names_its_subject_not_its_criterion():
     assert strip == "X holds"
 
 
+def _load_theme_words():
+    """The real `_light_stem` + `_theme_words`, exec'd from source (mcp_server cannot be imported)."""
+    ns: dict = {"re": __import__("re"), "frozenset": frozenset}
+    i = SRC.index("def _light_stem(")
+    exec(SRC[i:SRC.index("_BOARD_BANNED = {", i)], ns)              # noqa: S102
+    i = SRC.index("_THEME_STOP = frozenset({")
+    exec(SRC[i:SRC.index("})", i) + 2], ns)                         # noqa: S102
+    i = SRC.index("def _theme_words(")
+    exec(SRC[i:SRC.index("\ndef ", i + 10)], ns)                    # noqa: S102
+    return ns["_theme_words"], ns["_light_stem"]
+
+
+def test_the_dungeon_matcher_stems_and_spares_our_product_name():
+    """Two mutants survived an earlier version of this file because it only asserted on SOURCE TEXT.
+    A text assertion cannot see behaviour, so these call the functions."""
+    theme_words, stem = _load_theme_words()
+    assert "agent" in theme_words("LLM agents with o")
+    assert "operation" in theme_words("memory operations")
+    # `rstrip("s")` -- what this used to be -- turns our own product name into "inspeximu"
+    assert "inspeximus" in theme_words("inspeximus supersession")
+    assert stem("inspeximus") == "inspeximus" and stem("agents") == "agent"
+
+
+def test_the_inbox_gate_compares_stemmed_literals():
+    """`_theme_words` stems; the hand-written literals hold plurals ("compounds", "memories"). A
+    stemmed set intersected with an unstemmed one silently drops every plural entry."""
+    ns: dict = {"re": __import__("re")}
+    i = SRC.index("def _light_stem(")
+    exec(SRC[i:SRC.index("def _inbox_theme_allowed(", i)], ns)      # noqa: S102
+    assert "_BOARD_CORE_STEM" in ns and "_BOARD_BANNED_STEM" in ns, "the stemmed sets are gone"
+    core, stem = ns["_BOARD_CORE_STEM"], ns["_light_stem"]
+    assert "compound" in core, "a plural literal entry did not survive stemming"
+    assert "inspeximus" in core, "the product name was mangled in the literal"
+    assert "operations" in ns["_BOARD_CORE"], "the live board names it; the literal must too"
+    theme_words, _ = _load_theme_words()
+    assert theme_words("memory operations benchmark") & core, "a plural theme misses the literal"
+    # and the gate must actually consult the stemmed set
+    i = SRC.index("def _inbox_theme_allowed(")
+    body = SRC[i:i + 2500]
+    assert "_BOARD_CORE_STEM" in body and "_BOARD_BANNED_STEM" in body
+
+
 def test_the_live_intents_file_if_present_is_not_still_saturated():
     """Real data. Skips rather than passing vacuously when the file is absent."""
     p = HERE / ".recent_intents.json"
