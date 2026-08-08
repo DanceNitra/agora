@@ -1,0 +1,26 @@
+{
+  "_README": [
+    "Dated exceptions to the construction gate (tools/publish_gate.py). A waiver is not a way to make",
+    "a finding quiet: every one is PRINTED on every publish run with its reason and its date. If a",
+    "reason cannot be written down, the artifact is not ready to back a public number.",
+    "Keys are repo-relative paths; 'kinds' are construction_audit.py finding kinds.",
+    "UNSWEPT-KNOB is the disclosure class: an exposed env knob the published run never varied. The",
+    "waiver must either say why the knob cannot change a measured value (an output or cache location)",
+    "or state the value the published run actually used."
+  ],
+  "research/probes/ragdead/exp_ragdead_A.py": {
+    "kinds": ["UNSWEPT-KNOB"],
+    "reason": "RAGDEAD_OUT names the directory the result JSON is written to. A destination cannot change a measured value; there is no other knob in this file.",
+    "dated": "2026-08-08"
+  },
+  "research/probes/reversibility_predictability_probe.py": {
+    "kinds": ["UNSWEPT-KNOB"],
+    "reason": "TE_CORPUS selects the input corpus and CAN change the numbers, so it is disclosed rather than dismissed: the published run used the default, research/probes/data/toolemu_all_toolkits.json.",
+    "dated": "2026-08-08"
+  },
+  "research/probes/locomo_retrieval_map.py": {
+    "kinds": ["UNSWEPT-KNOB"],
+    "reason": "Four knobs. LOCOMO_CACHE and LOCOMO_OUT are a memoisation file and an output file — neither can change a value. LOCOMO_PATH and OLLAMA_EMBED_URL can, and are disclosed: the published run used agora_output/lab/data/locomo10.json with nomic-embed-text at http://localhost:11434/api/embed.",
+    "dated": "2026-08-08"
+  }
+}

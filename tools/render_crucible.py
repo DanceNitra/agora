@@ -1,5 +1,7 @@
 """
-    PUBLISH GATE: run /stress-claim (argument) + /verify-claims (facts) on the source BEFORE rendering.
+    PUBLISH GATE: /stress-claim (argument) + /verify-claims (facts) on the source BEFORE rendering.
+    The CONSTRUCTION gate is not on that list because it is not a reminder — render() calls
+    publish_gate.enforce() itself and refuses to write the page if it fails.
 The Crucible — render the public replication ledger.
 
 Reads server/.replications.json (verdict ledger) + server/.lab.json (experiment scripts/output)
@@ -10,6 +12,12 @@ source of truth. Re-run after any new replication (commit lab scripts so code li
     python -X utf8 tools/render_crucible.py
 """
 from __future__ import annotations
+
+import sys as _sys
+from pathlib import Path as _Path
+
+_sys.path.insert(0, str(_Path(__file__).resolve().parent))
+import publish_gate  # noqa: E402  (repo-root tool, imported by path)
 
 import html
 import json
@@ -237,6 +245,18 @@ def render():
     cur = load(CURATION)
     reps = _dedup_ledger(load(REPS), cur)
     labs = lab_index(load(LAB))
+
+    # CONSTRUCTION GATE — runs before a single byte is written. Every entry's runnable model is
+    # audited for a result forced by its own construction (tools/publish_gate.py). This used to be a
+    # line in the docstring above telling a human to remember; on 2026-08-08 that produced a public
+    # number that could not have come out otherwise. The resolver here is entry_code()'s own, so the
+    # gate audits exactly the files the page will offer the reader as receipts.
+    _gate_paths = set()
+    for r in reps:
+        p = (r.get("code") or _PROBE_BY_LAB.get(r.get("lab_id", ""), "") or "").strip().replace("\\", "/")
+        if p and (ROOT / p).exists():
+            _gate_paths.add(ROOT / p)
+    publish_gate.enforce(_gate_paths, "Crucible ledger (%d entries)" % len(reps))
     # RETRACTED is a FOURTH state, added 2026-08-06 because the ledger could not record its own
     # correction. Entry a1d88c ruled FAILED on "a support edge can be recovered from content
     # similarity"; re-measurement showed the score separates the classes (AUC 0.72-0.92) and that the
