@@ -30,7 +30,7 @@ def find(m, mid):
     return next(r for r in m.items if r["id"] == mid)
 
 
-def episodic_at(m, mid, value=1.0):
+def episodic_at(m, mid, value=6.0):   # _GRADUATE_VALUE is 5.0; the fixture pinned 1.0 and went stale
     r = find(m, mid); r["mtype"] = "episodic"; r["value"] = value
     return mid
 
@@ -43,7 +43,10 @@ def pump(m, mid, query, n=30):
 
 
 def main():
-    fd, path = tempfile.mkstemp(suffix=".json"); os.close(fd)
+    # mkstemp CREATES the file, and since 2.x the library refuses to open an unparseable/empty store
+    # rather than overwrite it -- a good guard that made this probe stop running. Hand it a path that
+    # does not exist yet.
+    fd, path = tempfile.mkstemp(suffix=".json"); os.close(fd); os.unlink(path)
     m = Inspeximus(path=path)  # no embedder -> lexical recall
 
     # POISON: self-asserted, never earned an outcome
@@ -66,6 +69,14 @@ def main():
     y2 = m.remember("sybil note two", source={"doc": "https://www.wikipedia.org/wiki/Foo", "span": [0, 1]})
     sid = episodic_at(m, m.remember("vorn metal sybtoken floats on mercury", tags=["s"]))
     find(m, sid)["links"] = [y1, y2]
+
+    # Graduation is applied by consolidate(), NOT by recall. This probe pumped 30 recalls and
+
+    # read the verdict, so it silently reported FAIL once that trigger stopped being the recall
+
+    # path -- an artifact we publicly offered to share, no longer reproducing its own result.
+
+    m.consolidate()
 
     pm, pv = pump(m, pid, "poisontoken vermillion sky zog")
     lm, lv = pump(m, lid, "legittoken gravity quarn spacetime")
