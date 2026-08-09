@@ -122,6 +122,31 @@ def test_discovery_actually_finds_the_publicly_linked_artifacts():
 
 
 # --------------------------------------------------------------------------------------- waivers
+def test_the_receipt_gate_is_actually_STARTED_not_merely_defined():
+    """The whole point, applied to this gate itself.
+
+    `construction_audit.py` was built, tested, and shipped with a docstring telling a human to wire it
+    into the publish path — and then lived in someone's memory for a day. A gate nobody calls is
+    indistinguishable from a gate that does not exist, and `async def ... _loop` sitting in a module
+    reads exactly like a running organ to anyone skimming.
+
+    So this asserts BOTH halves: the organ is defined, AND `lifespan` creates a task for it.
+    """
+    main_py = (ROOT / "server" / "agora" / "main.py").read_text(encoding="utf-8", errors="replace")
+    assert "async def receipt_rot_loop" in main_py, "the receipt organ is gone"
+    assert "loop.create_task(receipt_rot_loop(app))" in main_py, (
+        "receipt_rot_loop is DEFINED but never STARTED — a gate nobody calls is not a gate")
+
+
+def test_the_organ_reports_only_state_changes_not_a_daily_all_clear():
+    """A daily 'all good' is a message nobody reads by week three, and then the one that matters
+    arrives in the same shape as the noise. Pin that it speaks on transitions."""
+    main_py = (ROOT / "server" / "agora" / "main.py").read_text(encoding="utf-8", errors="replace")
+    organ = main_py.split("async def receipt_rot_loop", 1)[1].split("\nasync def ", 1)[0]
+    assert "if broke or healed:" in organ, "the organ would message on every run, not on change"
+    assert "prev.get(" in organ, "no previous state is consulted, so nothing can be a transition"
+
+
 def test_every_waiver_states_a_reason_and_a_date():
     p = ROOT / "tools" / "receipt_waivers.json"
     if not p.exists():

@@ -1047,6 +1047,89 @@ async def scout_digest_loop(app: FastAPI):
         await _aio.sleep(window)                              # every ~8h
 
 
+async def receipt_rot_loop(app: FastAPI):
+    """Re-RUN the artifacts we publicly offered, daily, and speak only when a receipt CHANGES state.
+
+    Why this is a timed organ and not a publish-time check: rot does not arrive when we publish, it
+    arrives in between. `corroboration_poison.py` — linked from openclaw#35203 under the words "happy
+    to share the runnable replications" — was broken by three unrelated upstream changes over months
+    (a new guard against opening an empty store, _GRADUATE_VALUE 1.0 -> 5.0, and graduation moving to
+    consolidate()). Nobody published anything on those days. It printed FAIL and exited 0, so an
+    exit-code check would have called it green, and it stayed that way until someone ran it.
+
+    Why it reports only TRANSITIONS: a daily "all good" message is a message nobody reads by week
+    three, and then the one that matters arrives in the same shape as the noise. It speaks when a
+    receipt leaves PASS, and when one comes back.
+
+    tools/public_receipts.py is the gate; this is the thing that calls it. Building the gate and
+    leaving it for someone to remember is the exact failure it exists to catch — and the reason
+    construction_audit.py sat unwired for a day.
+    """
+    import asyncio as _aio, json as _json, subprocess as _sp, sys as _sys, time as _t
+    from pathlib import Path as _P
+    _root = _P(__file__).resolve().parents[2]
+    _tool = _root / "tools" / "public_receipts.py"
+    _state = _root / "server" / ".receipt_rot_state.json"
+    _INTERVAL = 24 * 3600
+
+    def _last_fire() -> float:
+        try:
+            return float(_json.loads(_state.read_text(encoding="utf-8")).get("ts", 0) or 0)
+        except Exception:
+            return 0.0                       # no marker yet -> run once shortly after startup
+
+    await _aio.sleep(2400)                                     # let startup settle
+    while True:
+        try:
+            if not _tool.exists():
+                print(f"[ReceiptRot] tool missing at {_tool} — not silently skipping, saying so")
+            elif (_t.time() - _last_fire()) > _INTERVAL:
+                # locomo needs two embedding models and ~20 minutes; it carries a dated waiver and is
+                # excluded here so a daily organ never holds the GPU. Its cost is stated in its own
+                # preflight, which is where a reader meets it.
+                r = await _aio.to_thread(
+                    lambda: _sp.run([_sys.executable, "-X", "utf8", str(_tool), "--timeout", "180"],
+                                    capture_output=True, text=True, timeout=1500, cwd=str(_root)))
+                out = (r.stdout or "") + (r.stderr or "")
+                now = {}
+                for line in out.splitlines():
+                    parts = line.split()
+                    if len(parts) >= 2 and parts[0] in (
+                            "PASS", "FAIL", "CRASHED", "TIMEOUT", "UNKNOWN", "NEEDS-RESOURCE",
+                            "INFRA", "waived"):
+                        now[parts[1]] = parts[0]
+                prev = {}
+                try:
+                    prev = _json.loads(_state.read_text(encoding="utf-8")).get("verdicts", {}) or {}
+                except Exception:
+                    pass
+
+                broke = [k for k, v in now.items() if v not in ("PASS", "waived")
+                         and prev.get(k) in ("PASS", "waived")]
+                healed = [k for k, v in now.items() if v in ("PASS", "waived")
+                          and prev.get(k) not in ("PASS", "waived", None)]
+                if not now:
+                    print("[ReceiptRot] the run produced NO verdict lines — treating as a fault, "
+                          "not as 'nothing changed'")
+                _state.write_text(_json.dumps({"ts": _t.time(), "verdicts": now}, indent=1),
+                                  encoding="utf-8")
+                print(f"[ReceiptRot] {sum(1 for v in now.values() if v == 'PASS')}/{len(now)} pass, "
+                      f"{len(broke)} newly broken, {len(healed)} recovered")
+                if broke or healed:
+                    from agora.execution.telegram_bot import send as _tg
+                    msg = []
+                    if broke:
+                        msg.append("Public receipts BROKE: " + ", ".join(
+                            f"{k.split('/')[-1]} -> {now[k]}" for k in broke[:6]))
+                        msg.append("We told readers these are runnable. Fix or stop citing.")
+                    if healed:
+                        msg.append("Recovered: " + ", ".join(k.split("/")[-1] for k in healed[:6]))
+                    await _tg(" | ".join(msg)[:900])
+        except Exception as e:
+            print(f"[ReceiptRot] loop error: {e}")
+        await _aio.sleep(3600)                                 # check hourly, fire daily
+
+
 async def self_audit_loop(app: FastAPI):
     """THE SELF-AUDIT — Agora keeps its own house in order with its own tools, and tracks its health
     over time. Every ~12h: (1) consolidate the brain's inspeximus store (link near-duplicates, drop
@@ -1167,6 +1250,7 @@ async def lifespan(app: FastAPI):
         print(f"[Exaptation] scan loop not started: {_e}")
     try:
         loop.create_task(db_retention_loop(app))   # daily: keep agora.db bounded (anti-lag)
+        loop.create_task(receipt_rot_loop(app))    # daily: re-RUN the receipts we publicly offered
     except Exception as _e:
         print(f"[Retention] not started: {_e}")
     try:
