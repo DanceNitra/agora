@@ -175,9 +175,9 @@ def test_an_unresolvable_writer_store_is_refused(tmp_path, monkeypatch, capsys):
 
 
 def test_freshness_is_reported_separately_from_corpus_coverage(tmp_path, monkeypatch, capsys):
-    """A corpus of legacy records can never be retro-signed, so one signed write pins coverage above
-    zero forever — and the gate would stay green straight through a signing outage. The recent-writes
-    line is the number that can still fall."""
+    """A corpus of legacy records can never be retro-filled, so one populated write pins coverage above
+    zero forever — and the gate would stay green straight through an outage. The recent-writes line is
+    the number that can still fall."""
     recs = [{"id": str(i), "text": "t", "source": "s", "key": "k", "good_warranted": 1.0,
              "ts": float(i)} for i in range(200)]
     recs[0]["attested_key"] = "ff" * 32          # oldest record signed, nothing since
@@ -188,7 +188,28 @@ def test_freshness_is_reported_separately_from_corpus_coverage(tmp_path, monkeyp
     assert mc.main() == 0, "the write path does exist; this line informs, it does not gate"
     out = capsys.readouterr().out
     assert "most recent writer-store records: 0" in out
-    assert "signing is not reaching new writes" in out
+    assert "not reaching new writes" in out
+
+
+def test_every_new_write_only_field_gets_a_freshness_line(tmp_path, monkeypatch, capsys):
+    """The freshness denominator was applied to `attested_key` and NOT to `good_warranted`, so the
+    corpus zero for the second field read as "nothing writes this" when the truth was "every record
+    predates the writer that can". Caught in review 2026-08-09 — the defect this file is about, inside
+    the tool, one field over from where it had just been fixed. Fixing the instance is not fixing the
+    class, so this asserts the LIST, not one member of it."""
+    recs = [{"id": str(i), "text": "t", "source": "s", "key": "k",
+             "attested_key": "ee" * 32, "good_warranted": 1.0, "ts": float(i)} for i in range(10)]
+    writer = _store(tmp_path, recs, "writer.json")
+    monkeypatch.setattr(mc, "STORES", [writer])
+    monkeypatch.setattr(mc, "_writer_store", lambda: writer)
+    monkeypatch.setattr(sys, "argv", ["mechanism_coverage.py"])
+    mc.main()
+    out = capsys.readouterr().out
+    assert mc.NEW_WRITE_ONLY, "the list is empty; this test would pass vacuously"
+    for field in mc.NEW_WRITE_ONLY:
+        assert ("%s " % field) in out and "most recent writer-store records" in out, (
+            "%s is declared new-write-only but gets no freshness line, so its corpus zero is "
+            "indistinguishable from an outage" % field)
 
 
 # ------------------------------------------------------------------- discovery, and its false positives

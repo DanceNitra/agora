@@ -87,6 +87,16 @@ DISCOVER_SKIP = (".tombstones.json",)
 # How many of the newest writer-store records the freshness line looks at.
 FRESH_N = 100
 
+# Fields only a NEW write can carry, so a corpus percentage is the wrong denominator for them: legacy
+# records can never be retro-filled, and one populated write pins the corpus figure above zero forever.
+#
+# `good_warranted` was missing from this list and it cost a real misreading. On 2026-08-09 the write path
+# for it shipped, and the corpus number stayed 0 of 220,415 -- which reads as "nothing writes this" when
+# the truth was "every record predates the writer that can". A reviewer called that zero structurally
+# guaranteed, and they were right: the same defect this tool exists to catch, inside this tool, one field
+# over from where it had already been fixed. Fixing the instance is not fixing the class.
+NEW_WRITE_ONLY = ("attested_key", "good_warranted")
+
 
 def _writer_store():
     """The store THIS deployment's MCP server writes -- the only one a writer key can sign.
@@ -223,10 +233,12 @@ def main() -> int:
     fresh = sorted((r for r in writer_recs if isinstance(r.get("ts"), (int, float))),
                    key=lambda r: r["ts"])[-FRESH_N:]
     if fresh:
-        n = sum(1 for r in fresh if _populated(r, "attested_key"))
-        print("\nattested_key on the %d most recent writer-store records: %d (%.1f%%)%s"
-              % (len(fresh), n, 100.0 * n / len(fresh),
-                 "   <-- signing is not reaching new writes" if not n else ""))
+        print("")
+        for field in NEW_WRITE_ONLY:
+            n = sum(1 for r in fresh if _populated(r, field))
+            print("%-16s on the %d most recent writer-store records: %d (%.1f%%)%s"
+                  % (field, len(fresh), n, 100.0 * n / len(fresh),
+                     "   <-- not reaching new writes" if not n else ""))
 
     if dead:
         print("\nREFUSED — %d mechanism(s) read a field nothing in production writes:" % len(dead))
