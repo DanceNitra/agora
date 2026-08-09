@@ -11,10 +11,17 @@ Run: python research/probes/evidence_grade_ratchet.py    MIT. Part of Agora / in
 """
 import importlib.util, os
 
-_core = os.path.join(os.path.dirname(__file__), "..", "inspeximus.py")
-_spec = importlib.util.spec_from_file_location("inspeximus_core", _core)
-_m = importlib.util.module_from_spec(_spec); _spec.loader.exec_module(_m)
-Inspeximus = _m.Inspeximus
+# inspeximus was a single vendored file at research/inspeximus.py when this probe was written; it is a
+# pip package now, and that path stopped existing in a repo reorganisation. Anyone who cloned the repo
+# and ran this got FileNotFoundError -- on an artifact we publicly offered as runnable. Import the
+# package, and fall back to the old vendored file so an older checkout still works.
+try:
+    from inspeximus import Inspeximus
+except ImportError:                                    # pragma: no cover - legacy checkout
+    _core = os.path.join(os.path.dirname(__file__), "..", "inspeximus.py")
+    _spec = importlib.util.spec_from_file_location("inspeximus_core", _core)
+    _m = importlib.util.module_from_spec(_spec); _spec.loader.exec_module(_m)
+    Inspeximus = _m.Inspeximus
 
 _score = os.path.join(os.path.dirname(__file__), "meta_audit_scoring.py")
 _ss = importlib.util.spec_from_file_location("mas", _score)
@@ -111,4 +118,4 @@ if __name__ == "__main__":
     test_ratchet_property()
     test_forge_cost()
     test_replay_32()
-    print("inspeximus", _m.__version__, "-- evidence-grade ratchet green.")
+    print("inspeximus", __import__("inspeximus").__version__, "-- evidence-grade ratchet green.")
