@@ -64,9 +64,10 @@ TOTAL_ROUNDS = COOPERATION_ROUNDS + INVASION_ROUNDS
 
 BASELINE = TrustEngine.BASELINE_TRUST  # 0.3
 
-# NOTE: this used to read ../storage/schema.sql. It no longer does — that file is not what builds any
-# real database (see _make_db), and it had drifted from the ORM on 20 of 23 tables. Leaving a constant
-# pointing at it would be a breadcrumb to the wrong schema.
+# NOTE: this used to read ../storage/schema.sql, which has since been DELETED. It never built any real
+# database (ORM create_all does), it had drifted from the models on 20 of 23 tables, and six of its
+# tables were defined three times over with IF NOT EXISTS so two thirds of those definitions were dead
+# text. agora/storage/models.py is the schema. See _make_db.
 
 
 # ── Agent factories ────────────────────────────────
