@@ -21,11 +21,9 @@ def db_path(tmp_path):
     return str(p)
 
 
-@pytest.fixture
-def schema_sql():
-    """Load the schema SQL."""
-    p = Path(__file__).parent.parent / "agora" / "storage" / "schema.sql"
-    return p.read_text(encoding="utf-8")
+# The `schema_sql` fixture lived here and is gone: nothing builds a database from schema.sql any more
+# (see the `db` fixture), and a fixture still handing out that file would be an invitation back to a
+# schema which drifted from the ORM on 20 of 23 tables and exists in no running system.
 
 
 @pytest.fixture

@@ -34,8 +34,9 @@ NOTE — deviations from the original handoff code (all deliberate, see DONE han
         - TFT↔TFT trust stays at/above baseline (not destabilised below it), AND
         - TFT→defector trust collapses near 0, AND
         - the gap between them is large (defectors are clearly distinguished).
-  5. schema.sql is opened with encoding="utf-8" (it contains non-ASCII; Windows
-     defaults to cp1250 and would crash).
+  5. The tables come from the ORM models, not from schema.sql. That file is not applied
+     at runtime and had drifted from the models on 20 of 23 tables, which made this
+     experiment unrunnable (datatype mismatch on trust_scores.id). See _make_db.
 """
 
 import json
@@ -63,7 +64,9 @@ TOTAL_ROUNDS = COOPERATION_ROUNDS + INVASION_ROUNDS
 
 BASELINE = TrustEngine.BASELINE_TRUST  # 0.3
 
-SCHEMA_PATH = os.path.join(os.path.dirname(__file__), "..", "storage", "schema.sql")
+# NOTE: this used to read ../storage/schema.sql. It no longer does — that file is not what builds any
+# real database (see _make_db), and it had drifted from the ORM on 20 of 23 tables. Leaving a constant
+# pointing at it would be a breadcrumb to the wrong schema.
 
 
 # ── Agent factories ────────────────────────────────
@@ -233,11 +236,33 @@ def print_report(all_metrics: list[dict]) -> dict:
 # ── Experiment driver ──────────────────────────────
 
 async def _make_db():
-    conn = await aiosqlite.connect(":memory:")
+    """Build the tables from the ORM MODELS — what actually creates every real database.
+
+    Was `executescript(schema.sql)`. But main.py states it plainly: "schema.sql is not auto-applied at
+    runtime (ORM create_all is used)", and measured 2026-08-09 the two had DRIFTED on 20 of the 23
+    tables they share. The one that mattered here: schema.sql declares `trust_scores.id INTEGER
+    PRIMARY KEY AUTOINCREMENT`, every real database has `VARCHAR(36)`. TrustEngine._persist writes a
+    uuid — correct against production, `sqlite3.IntegrityError: datatype mismatch` against
+    schema.sql — so this entire ESS stability experiment could not run at all, against a database
+    that exists nowhere.
+
+    A temp FILE rather than `:memory:`: create_all needs its own connection, and a :memory: database
+    is private to the connection that opened it.
+    """
+    import os as _os
+    import tempfile
+    from sqlalchemy.ext.asyncio import create_async_engine
+    from agora.storage.models import Base
+
+    fd, path = tempfile.mkstemp(suffix="-ess.db")
+    _os.close(fd)
+    eng = create_async_engine("sqlite+aiosqlite:///%s" % path)
+    async with eng.begin() as c:
+        await c.run_sync(Base.metadata.create_all)
+    await eng.dispose()
+    conn = await aiosqlite.connect(path)
     conn.row_factory = aiosqlite.Row
-    with open(SCHEMA_PATH, encoding="utf-8") as f:
-        await conn.executescript(f.read())
-    await conn.commit()
+    conn._ess_temp_path = path          # so the caller can clean up after closing
     return conn
 
 
