@@ -57,7 +57,19 @@ async def app(db_path):
     _app.state.active_connections = []
     _app.state.tick_count = 0
     await init_db(_app)
-    return _app
+    yield _app
+    # CLOSE IT. aiosqlite runs every connection on a NON-DAEMON thread parked on `self._tx.get()`,
+    # so an unclosed connection keeps the interpreter alive after the last test. This fixture is
+    # function-scoped and opened one per test, and `return` meant none of them were ever closed:
+    # measured 2026-08-09, the suite printed "500 passed" in ~42s and then simply never exited, so
+    # every run — CI included — could only end by timeout (exit 124). Ten stuck aiosqlite threads,
+    # ten tests using this fixture. The failure looked like a hang and was a leak.
+    try:
+        if getattr(_app.state, "db", None) is not None:
+            await _app.state.db.close()
+            _app.state.db = None
+    except Exception:
+        pass
 
 
 @pytest.fixture
