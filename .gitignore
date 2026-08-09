@@ -161,6 +161,12 @@ agora_output/dmrg/_*.log
 
 # probe embedding caches + run logs (derived)
 research/probes/*_embcache_v1.json
+# Embedding caches, ANYWHERE and at ANY version. The v1 pattern was pinned to research/probes/, but
+# the probe's CACHE default is relative to the CWD, so running it from the repo root drops a 127 MB
+# `locomo_embcache_v2.json` beside .gitignore -- untracked, unignored, and one `git add -A` from being
+# committed. Measured 2026-08-09.
+*_embcache_v*.json
+**/*_embcache*.json
 research/probes/membench_*.json
 research/probes/_stress_*.log
 
