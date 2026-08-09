@@ -21,7 +21,13 @@ class TaskPost(BaseModel):
 
 
 class TaskResponse(BaseModel):
-    id: int
+    # A TASK ID IS A uuid STRING, not an integer. The ORM (Base.metadata.create_all, which is what
+    # actually builds every database) declares String(36) and all 65,210 live rows are text. Declaring
+    # int here made this model raise ValidationError on the way OUT: measured 2026-08-09,
+    # GET /api/v1/tasks/ returned 500 on the running brain. The two tests that would have caught it
+    # were @skip-ed with a reason blaming a schema.sql/ORM mismatch, so the failure was read as a known
+    # cosmetic drift and nobody looked at the endpoint for as long as that marker had been there.
+    id: str
     title: str
     description: Optional[str]
     priority: int
@@ -95,7 +101,7 @@ async def post_task(body: TaskPost, db=Depends(get_db)):
 
 
 @router.get("/{task_id}", response_model=TaskResponse)
-async def get_task_status(task_id: int, db=Depends(get_db)):
+async def get_task_status(task_id: str, db=Depends(get_db)):
     """Get a single task by ID."""
     cursor = await db.execute(
         "SELECT id, title, description, priority, status, assignee_id, created_at, updated_at "
@@ -118,7 +124,7 @@ async def get_task_status(task_id: int, db=Depends(get_db)):
 
 
 @router.post("/{task_id}/assign/{agent_id}", response_model=TaskResponse)
-async def assign_task(task_id: int, agent_id: str, db=Depends(get_db)):
+async def assign_task(task_id: str, agent_id: str, db=Depends(get_db)):
     """Assign an open task to an agent."""
     cursor = await db.execute("SELECT status FROM tasks WHERE id=?", (task_id,))
     row = await cursor.fetchone()
@@ -155,7 +161,7 @@ async def assign_task(task_id: int, agent_id: str, db=Depends(get_db)):
 
 
 @router.post("/{task_id}/complete", response_model=TaskResponse)
-async def complete_task(task_id: int, db=Depends(get_db)):
+async def complete_task(task_id: str, db=Depends(get_db)):
     """Mark a task as completed."""
     cursor = await db.execute("SELECT status FROM tasks WHERE id=?", (task_id,))
     row = await cursor.fetchone()

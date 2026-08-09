@@ -80,23 +80,48 @@ def test_the_store_uses_the_constant_not_a_literal():
     assert "content[:500]" not in src
 
 
-def test_the_history_still_shows_the_truncation():
-    """The control. These assertions must not be able to pass because the defect never existed --
-    the stored rows still carry it, and if that stops being true the fixture has drifted."""
-    import sqlite3
+def _discovery_lengths(limit=None, newest_first=True):
+    import sqlite3, pytest
     db = REPO / "server" / "agora.db"
     if not db.exists():
-        import pytest
         pytest.skip("no local database")
     con = sqlite3.connect("file:%s?mode=ro" % db.as_posix(), uri=True)
-    rows = con.execute("SELECT length(content) FROM collective_knowledge "
-                       "WHERE knowledge_type='discovery' AND content IS NOT NULL "
-                       "ORDER BY created_at DESC LIMIT 40").fetchall()
+    rows = con.execute(
+        "SELECT length(content) FROM collective_knowledge "
+        "WHERE knowledge_type='discovery' AND content IS NOT NULL "
+        "ORDER BY created_at %s%s" % ("DESC" if newest_first else "ASC",
+                                      (" LIMIT %d" % limit) if limit else "")).fetchall()
     con.close()
     if not rows:
-        import pytest
         pytest.skip("no discoveries recorded")
-    at_cap = sum(1 for (n,) in rows if n == 500)
-    assert at_cap >= len(rows) // 2, (
-        "only %d of the last %d discoveries sit at exactly 500 chars; the truncation this file "
-        "documents is no longer visible in the data" % (at_cap, len(rows)))
+    return [n for (n,) in rows]
+
+
+def test_the_history_still_shows_the_truncation():
+    """The control: these assertions must not be able to pass because the defect never existed.
+
+    It used to read the LAST 40 discoveries and require half of them to sit at exactly 500 chars —
+    an instrument that necessarily decays as the fix works. Measured 2026-08-09 it was down to 12 of
+    40 (new rows run to 1,638 chars) and the suite read that as a failure. It was the opposite: the
+    truncated rows were scrolling out of a rolling window. The evidence the defect was real is
+    PERMANENT and lives in the whole table, so look there instead of at the moving edge.
+    """
+    lens = _discovery_lengths()
+    at_cap = sum(1 for n in lens if n == 500)
+    assert at_cap >= 5, (
+        "only %d discovery rows in the entire table sit at exactly 500 chars; the truncation this "
+        "file documents is no longer evidenced anywhere, so every assertion above is vacuous"
+        % at_cap)
+
+
+def test_recent_discoveries_are_no_longer_pinned_at_the_old_cap():
+    """The other half, and the one that says the fix is LIVE rather than merely committed. Together
+    with the control above: the truncation happened, and it stopped happening."""
+    recent = _discovery_lengths(limit=40)
+    at_cap = sum(1 for n in recent if n == 500)
+    assert at_cap < len(recent) // 2, (
+        "%d of the last %d discoveries are still exactly 500 chars — the cap is back on the write "
+        "path" % (at_cap, len(recent)))
+    assert max(recent) > 500, (
+        "no recent discovery exceeds 500 chars; the cap may be gone from the source and still "
+        "enforced somewhere the source does not show")
