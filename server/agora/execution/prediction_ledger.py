@@ -320,7 +320,11 @@ async def resolve_due(force: bool = False) -> list:
         # brain-memories most relevant to this theme by whether the call was RIGHT.
         try:
             from agora.execution.inspeximus_bridge import credit_outcome
-            credit_outcome(f"{p.get('theme', '')} {p.get('metric_label', '')}".strip(), good=correct)
+            # The warrant names the LEDGER ENTRY that carries resolved_value / actual / brier — an
+            # artifact a reader can re-open and re-check. The outcome came from a measured metric, not
+            # from the memories being credited, so this credit is exogenous and may say so.
+            credit_outcome(f"{p.get('theme', '')} {p.get('metric_label', '')}".strip(), good=correct,
+                           warrant=(f"prediction:{p['id']}" if p.get("id") else None))
         except Exception:
             pass
         resolved.append(p)

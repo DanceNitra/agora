@@ -3831,7 +3831,15 @@ def _credit_agent_mem(eid: str, subject: str, good: bool, k: int = 4, min_rel: f
     """Agent-side accuracy loop (stage 3, dungeon edition). When an agent's contribution LANDS
     (grounded) or is REJECTED (refusal / quest-intent), credit/debit the agent's OWN memories most
     relevant to the subject it was contributing on — so each agent's recall sharpens by WAS-IT-RIGHT,
-    not just by use. Strong-relevance only; gentle (bounded Beta), so one miss can't erase a memory."""
+    not just by use. Strong-relevance only; gentle (bounded Beta), so one miss can't erase a memory.
+
+    DELIBERATELY UNWARRANTED — do not "fix" this by passing a warrant. The verdict here is OUR OWN
+    quality gate (_is_refusal / _is_intent / _GROUNDED_RE) judging the agent's own output: a
+    self-graded outcome with no external ground truth, which is precisely the MINJA loop
+    `credit_requires_warrant` exists to block. So this path raises `good` and must never raise
+    `good_warranted`. The brain's credit_outcome() DOES warrant, because a resolved forecast and a Lab
+    run are artifacts outside the memory being credited. The 0% here is the guard working, not a gap
+    in it — an audit that reads coverage alone cannot tell those apart, so it is written down."""
     try:
         m = _agent_store(eid)
         if m is None or not hasattr(m, "credit"):

@@ -101,20 +101,37 @@ def remember_contribution(claim: str, evidence: str = "", tags=None,
         pass
 
 
-def credit_outcome(subject: str, good: bool, k: int = 5, min_rel: float = 0.30) -> dict:
+def credit_outcome(subject: str, good: bool, k: int = 5, min_rel: float = 0.30,
+                   warrant: str | None = None) -> dict:
     """Stage 3 of the accuracy loop (the one big bet): when an EXTERNAL verdict lands — a forecast
     resolves correct/wrong, a replication is ruled REPRODUCED/FAILED — credit the brain-memories most
     relevant to that subject by the outcome, so the substrate re-ranks by WAS-IT-RIGHT (knowledge tied
     to verified results rises; knowledge tied to debunked claims fades). Recall-at-resolution with a
     STRONG relevance floor (0.30, above the contribution gate) so only clearly-on-subject memories take
-    the signal — a defensible proxy for the exact grounding without creation-time recall-set stamping."""
+    the signal — a defensible proxy for the exact grounding without creation-time recall-set stamping.
+
+    `warrant` NAMES THE EXOGENOUS ARTIFACT that produced the verdict — `prediction:<id>` for a resolved
+    ledger entry, `lab:<lab_id>` for a Lab run. It is what separates a verdict the world handed us from
+    a grade we handed ourselves, and it is the sole input to `good_warranted`, which
+    `credit_requires_warrant` reads to block the MINJA self-graded-outcome loop.
+
+    Measured 2026-08-09 and the reason this parameter now exists: across 220,213 records in this
+    deployment, `good` was populated on 470 and `good_warranted` on **0**. The credit loop was live and
+    every single good credit was unwarranted — not because our verdicts are self-graded (these two are
+    genuinely external) but because no caller could say so. A guard whose input no caller can supply
+    reports SAFE forever.
+
+    PASS A WARRANT ONLY FOR A RE-CHECKABLE ARTIFACT. `None` is the correct value when the outcome was
+    graded by our own heuristics; forging a token to make coverage non-zero would fake the exact signal
+    the guard exists to test, and would be worse than the 0% it replaces.
+    """
     try:
         m = _inspeximus()
         hits = m.recall(subject or "", k=k)
         ids = [h["id"] for h in hits if h.get("relevance", 0) >= min_rel]
         if not ids:
             return {"updated": [], "reason": "no strongly-relevant memory"}
-        return m.credit(ids, "good" if good else "bad")
+        return m.credit(ids, "good" if good else "bad", warrant=warrant)
     except Exception as e:
         return {"error": str(e)[:100]}
 

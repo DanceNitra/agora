@@ -529,7 +529,12 @@ def record(claim: str, source: str, outcome: str, lab_id: str = "", note: str = 
     if o in ("REPRODUCED", "FAILED"):
         try:
             from agora.execution.inspeximus_bridge import credit_outcome
-            credit_outcome(claim, good=(o == "REPRODUCED"))
+            # The warrant names the LAB RUN that produced the verdict — the strongest exogenous anchor
+            # we have, because it is re-runnable. NO lab_id, NO warrant: a replication without a
+            # runnable artifact fails the severe-test rule, and a token invented to fill the field
+            # would warrant a verdict nobody can re-check.
+            credit_outcome(claim, good=(o == "REPRODUCED"),
+                           warrant=(f"lab:{lab_id}" if lab_id else None))
         except Exception:
             pass
     return rec
