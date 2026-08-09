@@ -130,3 +130,9 @@ if __name__ == "__main__":
     print("(strict_corroboration + attestation + the 0.6.0 ratchet) -- which RAISES cost (Douceur) but only")
     print("BOUNDS the attack, and authenticates the SOURCE not the TRUTH (MINJA rides genuine provenance).")
     print("Provenance is a floor, not a fix; pricing veracity is the open problem. inspeximus", __import__("inspeximus").__version__)
+    # A publicly-offered receipt has to state a machine-readable conclusion. This probe reached one and
+    # printed it as prose, so tools/public_receipts.py could only report UNKNOWN -- "it ran and asserted
+    # nothing". The line below is that same conclusion, not a new claim.
+    print("\nVERDICT: every content-computable defense (value, capacity, similarity, self-graded trust) "
+          "falls to whoever writes the memory; retreating to a forge-costly PROVENANCE anchor BOUNDS the "
+          "attack but authenticates the SOURCE, not the TRUTH. Provenance is a floor, not a fix.")
