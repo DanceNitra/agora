@@ -43,6 +43,38 @@ PREFIX = {
 }
 VEC_MODELS = {"nomic": "nomic-embed-text", "mxbai": "mxbai-embed-large"}
 
+def _preflight():
+    """State this receipt's real cost BEFORE spending twenty minutes discovering it.
+
+    We link this probe from a published post as runnable. It is runnable — but it needs the LoCoMo
+    dataset (which lives under a gitignored path, so a fresh clone does NOT have it), a local embedder
+    serving TWO models, and roughly twenty minutes: the mxbai warm-up alone is ~3,760 uncached
+    embeddings at ~64 per 11s. Measured 2026-08-09, when the receipt runner reported only `TIMEOUT`
+    after 200s and said nothing about why. A reader deserves that sentence in the first second, not a
+    silent wall of time.
+    """
+    missing = []
+    if not os.path.exists(DATA):
+        missing.append("the LoCoMo dataset at %s (set LOCOMO_PATH; it is not in the repo)" % DATA)
+    try:
+        urllib.request.urlopen(urllib.request.Request(
+            EMB_URL, data=json.dumps({"model": list(VEC_MODELS.values())[0], "input": ["ping"]}).encode(),
+            headers={"Content-Type": "application/json"}), timeout=10)
+    except Exception as e:
+        missing.append("an embedder answering at %s (%s: %s) serving %s"
+                       % (EMB_URL, type(e).__name__, e, " and ".join(VEC_MODELS.values())))
+    if missing:
+        print("PRECONDITION NOT MET — this receipt needs:")
+        for m in missing:
+            print("  * %s" % m)
+        print("\nWith everything present it still takes roughly 20 minutes on a warm cache; the mxbai\n"
+              "warm-up alone is ~3,760 embeddings. This is a fact about the receipt, not a failure.")
+        raise SystemExit(2)
+    print("preflight OK: dataset present, embedder answering. Expect ~20 minutes.", flush=True)
+
+
+_preflight()
+
 # ---------- model+prefix-aware embedding cache ----------
 _cache = json.load(open(CACHE)) if os.path.exists(CACHE) else {}
 def _key(model, role, text): return hashlib.sha1(f"{model}|{role}|{text[:2000]}".encode("utf-8")).hexdigest()

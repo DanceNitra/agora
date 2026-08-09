@@ -1,0 +1,13 @@
+{
+  "_README": [
+    "Dated exceptions for tools/public_receipts.py. A waiver is not a way to make a verdict quiet:",
+    "every one is PRINTED on every run with its reason and date, and a test asserts each carries both.",
+    "The bar: a waiver states a FACT ABOUT THE RECEIPT that a reader would also hit. If the honest",
+    "sentence cannot be written, the receipt is not ready to be offered publicly."
+  ],
+  "research/probes/locomo_retrieval_map.py": {
+    "verdicts": ["TIMEOUT"],
+    "reason": "Genuinely long, not broken: it needs the LoCoMo dataset (external, and under a gitignored path so a fresh clone lacks it), a local embedder serving BOTH nomic-embed-text and mxbai-embed-large, and ~20 minutes — the mxbai warm-up alone is ~3,760 uncached embeddings at ~64 per 11s (measured 2026-08-09). The probe now states all of this in a preflight and exits 2 immediately when a precondition is missing, so a reader gets the sentence in the first second instead of a silent wall of time. Waived as TIMEOUT rather than raising the global budget, because a 20-minute default would make every other receipt's timeout meaningless.",
+    "dated": "2026-08-09"
+  }
+}
