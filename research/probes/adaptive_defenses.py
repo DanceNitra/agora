@@ -37,10 +37,17 @@ Run: python research/probes/adaptive_defenses.py    MIT. Part of Agora / inspexi
 import importlib.util, os
 import numpy as np
 
-_core = os.path.join(os.path.dirname(__file__), "..", "inspeximus.py")
-_spec = importlib.util.spec_from_file_location("inspeximus_core", _core)
-_m = importlib.util.module_from_spec(_spec); _spec.loader.exec_module(_m)
-Inspeximus, attest, new_source_keypair = _m.Inspeximus, _m.attest, _m.new_source_keypair
+# inspeximus was a single vendored file at research/inspeximus.py when this probe was written; it is a
+# pip package now, and that path stopped existing in a repo reorganisation. Anyone who cloned the repo
+# and ran this got FileNotFoundError -- on an artifact we publicly offered as runnable. Import the
+# package, and fall back to the old vendored file so an older checkout still works.
+try:
+    from inspeximus import Inspeximus, attest, new_source_keypair
+except ImportError:                                    # pragma: no cover - legacy checkout
+    _core = os.path.join(os.path.dirname(__file__), "..", "inspeximus.py")
+    _spec = importlib.util.spec_from_file_location("inspeximus_core", _core)
+    _m = importlib.util.module_from_spec(_spec); _spec.loader.exec_module(_m)
+    Inspeximus, attest, new_source_keypair = _m.Inspeximus, _m.attest, _m.new_source_keypair
 
 
 def d1_eviction():
@@ -122,4 +129,4 @@ if __name__ == "__main__":
     print("fall to whoever writes the memory. The retreat is to an external forge-costly PROVENANCE anchor")
     print("(strict_corroboration + attestation + the 0.6.0 ratchet) -- which RAISES cost (Douceur) but only")
     print("BOUNDS the attack, and authenticates the SOURCE not the TRUTH (MINJA rides genuine provenance).")
-    print("Provenance is a floor, not a fix; pricing veracity is the open problem. inspeximus", _m.__version__)
+    print("Provenance is a floor, not a fix; pricing veracity is the open problem. inspeximus", __import__("inspeximus").__version__)
