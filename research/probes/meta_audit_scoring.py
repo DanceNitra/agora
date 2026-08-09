@@ -132,5 +132,16 @@ def main():
     print(f"          rate among all generated candidates is different and lower.")
 
 
+def _verdict():
+    # A publicly-offered receipt has to state a machine-readable conclusion. This probe reached one and
+    # printed it as prose under "LIMITS:", so tools/public_receipts.py could only report UNKNOWN --
+    # "it ran and asserted nothing". The line below is that same conclusion, not a new claim.
+    print("\nVERDICT: across the audited posts the LABELS failed more often than the MEASUREMENTS "
+          "(over-framed-but-true outnumbers substantive-wrong); only ~1 in 8 was honestly framed from "
+          "the start. Self-graded, and on posts we chose to PUBLISH -- the base rate over all candidates "
+          "is lower.")
+
+
 if __name__ == "__main__":
     main()
+    _verdict()

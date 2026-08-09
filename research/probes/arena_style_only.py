@@ -135,5 +135,14 @@ def main():
     print("MODESTLY (top stays), so the leaderboard ORDER is mostly skill. Bias the votes, not (mostly) the order.")
 
 
+def _verdict():
+    # A publicly-offered receipt has to state a machine-readable conclusion. This probe reached one and
+    # printed it as prose under "READING:", so tools/public_receipts.py could only report UNKNOWN --
+    # "it ran and asserted nothing". The line below is that same conclusion, not a new claim.
+    print("\nVERDICT: individual VOTES carry a real length bias, but the leaderboard ORDER is mostly "
+          "skill -- style-CONTROLLED Elo reorders only modestly. Bias the votes, not (mostly) the order.")
+
+
 if __name__ == "__main__":
     main()
+    _verdict()
