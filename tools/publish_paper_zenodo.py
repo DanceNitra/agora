@@ -9,8 +9,15 @@ import os, re, sys, json, urllib.request, urllib.error
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 COLLAB = os.path.join(ROOT, "agora_output", "collab")
-PDF = os.path.join(COLLAB, "value_obscuring_reversion_MERGED_v1.pdf")
-META = os.path.join(COLLAB, ".zenodo.json")
+# GENERALISED 2026-08-10: the paths were hard-coded to the first paper this tool ever published, so
+# the second one could not use it without editing the tool. `--pdf` / `--meta` override; the original
+# defaults stay, so the first paper's command line still works unchanged.
+def _arg(flag, default):
+    return sys.argv[sys.argv.index(flag) + 1] if flag in sys.argv else default
+
+
+PDF = os.path.abspath(_arg("--pdf", os.path.join(COLLAB, "value_obscuring_reversion_MERGED_v1.pdf")))
+META = os.path.abspath(_arg("--meta", os.path.join(COLLAB, ".zenodo.json")))
 SANDBOX = "--sandbox" in sys.argv
 BASE = "https://sandbox.zenodo.org" if SANDBOX else "https://zenodo.org"
 
@@ -44,11 +51,28 @@ def main():
     tok = _token()
     print("target:", BASE, "(SANDBOX)" if SANDBOX else "(PRODUCTION)")
 
-    st, dep = _req("POST", BASE + "/api/deposit/depositions", tok, data=b"{}")
-    dep_id = dep["id"]; bucket = dep["links"]["bucket"]
-    print("created deposition:", dep_id)
+    # NEVER CREATE A DEPOSITION WHILE PUBLISHING. Measured 2026-08-10: `--publish` started a SECOND
+    # deposition instead of publishing the draft that had just been reviewed, so the same paper was one
+    # successful upload away from two permanent DOIs. A Zenodo 504 is the only reason it did not happen.
+    # `--publish` now requires `--deposition <id>` -- the id printed by the draft run -- and refuses to
+    # mint a record it has not been pointed at.
+    existing = _arg("--deposition", None)
+    if "--publish" in sys.argv and not existing:
+        sys.exit("--publish needs --deposition <id>: publishing must target the draft you reviewed, "
+                 "never a fresh one. Run without --publish first, then pass the id it prints.")
+    if existing:
+        st, dep = _req("GET", BASE + "/api/deposit/depositions/%s" % existing, tok)
+        if dep.get("submitted"):
+            sys.exit("deposition %s is already published (DOI %s). Refusing to touch it."
+                     % (existing, dep.get("doi")))
+        dep_id = int(dep["id"]); bucket = dep["links"]["bucket"]
+        print("reusing deposition:", dep_id)
+    else:
+        st, dep = _req("POST", BASE + "/api/deposit/depositions", tok, data=b"{}")
+        dep_id = dep["id"]; bucket = dep["links"]["bucket"]
+        print("created deposition:", dep_id)
 
-    fname = "value_obscuring_reversion.pdf"
+    fname = os.path.basename(PDF)
     with open(PDF, "rb") as f:
         _req("PUT", "%s/%s" % (bucket, fname), tok, data=f.read(), ctype="application/octet-stream")
     print("uploaded:", fname)
@@ -69,7 +93,7 @@ def main():
     if "--publish" not in sys.argv:
         print("\nDRAFT ready (not published). Review at:",
               (dep.get("links") or {}).get("html", BASE + "/deposit/%d" % dep_id))
-        print("Re-run with --publish to mint the DOI.")
+        print("Re-run with --publish --deposition %d to mint the DOI." % dep_id)
         return
 
     st, pub = _req("POST", "%s/api/deposit/depositions/%d/actions/publish" % (BASE, dep_id), tok)

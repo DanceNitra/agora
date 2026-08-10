@@ -1,0 +1,33 @@
+{
+  "title": "Observational Convergence Across Independent Diagnostic Frameworks: Three Coincidences, the Nulls They Survive, and the Boundary They Do Not Cross",
+  "upload_type": "publication",
+  "publication_type": "preprint",
+  "description": "<p>Four independent AI-diagnostic frameworks (TAT-7, Cophy, HeartFlow, U/D/A/H) were run on the same test document and converged on three things: a detection threshold of 0.3 within 0.02 across three frameworks, a correlation of r = 0.985 between two frameworks' drift trajectories over 31 ordered steps, and five flip points at identical positions across four frameworks.</p><p>This report states each convergence against its own null, and is explicit about what they do not establish. The three results are deliberately <strong>not</strong> combined into a joint probability: they are computed on one shared dataset, so they are not independent events and their product bounds nothing. The correlation null remains conditional on a drift estimated from the trajectories themselves, which is marked as pending rather than claimed. And the sample for the field-health claim is one document, so 31 steps are 31 measurements of a single object rather than 31 tests of the hypothesis; separating &quot;field health&quot; from &quot;shared text&quot; requires an experiment that varies the stimulus while holding the instruments fixed.</p><p>What survives is the observation itself, which is substantial: a driftless null gives P(|r| &ge; 0.985) of about one in a million at n = 31, so the correlation is not an artefact of autocorrelation alone. The paper also records its own open questions rather than resolving them, including the measurement-model assumption of independent per-framework noise, which four readers of one document do not obviously satisfy.</p><p>Version 1. The drift-conditional analysis, once run on the real trajectories rather than on a synthetic reconstruction, is intended for a later version.</p>",
+  "creators": [
+    {"name": "Li, Guanghao", "affiliation": "Member, Chinese Association for Ethics; Member, Anhui Provincial Association for Ethics"},
+    {"name": "Sultanov, Marat", "affiliation": "Independent Researcher, TAT Framework"},
+    {"name": "icophy", "affiliation": "Cophy Framework, Persistent Memory Systems"},
+    {"name": "Hu, Zuxiong", "affiliation": "Independent Researcher"},
+    {"name": "Drahos, Rastislav", "affiliation": "Independent Researcher, Slovakia"}
+  ],
+  "keywords": [
+    "cross-framework validation",
+    "AI diagnostics",
+    "model drift",
+    "observational convergence",
+    "spurious correlation",
+    "null models",
+    "agent memory",
+    "multi-position observation"
+  ],
+  "license": "cc-by-4.0",
+  "access_right": "open",
+  "language": "eng",
+  "related_identifiers": [
+    {"identifier": "https://github.com/deepseek-ai/DeepSeek-V3/issues/1466", "relation": "isSupplementTo", "scheme": "url"},
+    {"identifier": "https://github.com/DanceNitra/agora/blob/b682860/agora_output/cf1466_latex_v2_cut.txt", "relation": "isSupplementedBy", "scheme": "url"},
+    {"identifier": "https://github.com/DanceNitra/agora/blob/280ff97/research/probes/spurious_correlation_n31.py", "relation": "isSupplementedBy", "scheme": "url"},
+    {"identifier": "https://github.com/DanceNitra/agora/blob/089d005/research/probes/shuffled_residuals_break_the_null.py", "relation": "isSupplementedBy", "scheme": "url"}
+  ],
+  "notes": "Collaboration originating in DeepSeek-V3 Community Issue #1466. The two runnable null models linked above are the receipts behind the statistical claims in the text: the first measures how often independent series reach |r| >= 0.985 at n = 31 under drift, and the second measures the false-positive rate of an i.i.d. residual permutation against a block permutation. Both carry their own controls and fail loudly if their conclusions invert."
+}
