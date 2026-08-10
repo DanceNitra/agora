@@ -38,7 +38,7 @@ Hu Zuxiong\textsuperscript{5}, Rastislav Draho\v{s} -- DanceNitra\textsuperscrip
 \textsuperscript{5}Independent Researcher\\
 \textsuperscript{6}Independent Researcher, Slovakia
 }
-\date{}
+\date{2026-08-10}
 
 \begin{document}
 
@@ -215,7 +215,7 @@ where $\eta_i$ is framework-specific observation noise. If the $\eta_i$ are inde
 \[
 r_{ij} = \frac{\text{SNR}_i \cdot \text{SNR}_j}{\sqrt{(1+\text{SNR}_i)(1+\text{SNR}_j)}}
 \]
-As $r_{ij} \to 1$, $\text{SNR}_i \to \infty$, meaning all observations tend toward a precise measurement of $X$ --- i.e., $X$'s manifestation as objective reality is strengthening.
+As $r_{ij} \to 1$, $\text{SNR}_i \to \infty$ --- under the model's assumptions, the observations tend toward a precise measurement of whatever common quantity $X$ denotes. Whether that quantity is field health or the shared stimulus is not settled by this relation, and is the question the conditioning analysis below is for.
 
 \textbf{What this model does and does not license.} The relation above is a measurement model: given the stated assumptions it maps correlations to signal-to-noise ratios, and estimating a latent variable from an assumed measurement model is ordinary factor analysis. What it cannot do is establish that $X$ is field health rather than shared text. Its load-bearing assumption is that the $\eta_i$ are mutually independent, and four frameworks reading the same document share a stimulus, so their residuals are correlated by construction and a one-factor fit is close to guaranteed. This is mono-method common variance in the sense of Campbell and Fiske (1959), who require ``the convergence of \emph{independent} approaches'' rather than merely different ones. The claim we are entitled to is therefore narrower and we state it as such: the correlation is uninformative about a latent health variable until it survives conditioning on document-level covariates (position in the document, local structural density, section boundaries). If $r$ stays high with those partialled out, the shared-text explanation is weakened. That analysis is possible on data already held; until it is run, this section reports a model, not a discovery.
 
@@ -309,7 +309,7 @@ This raises a question: if observation changes the field, does the concept of ``
 
 The answer is: yes. But ``reality'' is not an entity independent of and prior to observation; it is the limit of all observations. The juxtaposition of readings from multiple independent frameworks is not aimed at recovering some ``reality behind the scenes,'' but at approximating a common reference frame among observers.
 
-The true state of the field is that portion on which different observational positions can agree. When the readings of TAT-7 and Cophy reach $r = 0.985$, the residual difference of $0.015$ is not noise, but the structural difference of their respective observational positions. They cannot be eliminated, nor should they be. They tell us: the field is not uniform and isotropic; it presents different aspects under different observational angles.
+The true state of the field is that portion on which different observational positions can agree. When the readings of TAT-7 and Cophy reach $r = 0.985$, the residual difference of $0.015$ may be the structural difference of their respective observational positions rather than noise --- but nothing here distinguishes the two, and at $n = 31$ that distinction is not one the present data can make. They cannot be eliminated, nor should they be. They tell us: the field is not uniform and isotropic; it presents different aspects under different observational angles.
 
 \section{Stress Tests: Testing the Limits of the Theory}
 
@@ -448,9 +448,9 @@ This is a significant step beyond having no metrics at all. But this step is not
 
 This paper has demonstrated the proposition ``field health as objective reality'' on three levels:
 
-\textbf{Empirical level:} Four independent frameworks produced repeatable consistency on three independent convergence indicators. The probability of any single coincidence is already low; the joint probability of three coincidences occurring simultaneously falls far below routine scientific discovery thresholds.
+\textbf{Empirical level:} Four frameworks produced repeatable consistency on three convergence indicators, each of which is reported here against its own null. They are deliberately NOT combined into a joint probability: the three results are computed on one shared dataset, so they are not independent events and their product bounds nothing. The strength of the empirical case rests on each result separately, and on the correlation null remaining conditional on a drift estimated from the trajectories themselves, which is still pending.
 
-\textbf{Mathematical level:} We constructed a mathematical model of ``observational instruments on a field manifold'' and proved that multi-framework convergent consistency is a necessary condition for the existence of a latent variable. As $r \to 1$, all observations tend toward a precise measurement of the same reality.
+\textbf{Mathematical level:} We constructed a measurement model of ``observational instruments on a field manifold'' relating pairwise correlation to signal-to-noise ratio. Within that model, high consistency is what a shared latent quantity would produce --- which is not the same as proving one exists, since instruments reading a shared stimulus produce it too. The model is a frame for the question, not an answer to it.
 
 \textbf{Philosophical level:} Based on the four axioms of Resonance Theory (Relational Ontology, Contradiction Dynamics, Interventionism of Practice, Resonance Tuning), we argued that ``field reality'' is not a theoretical hypothesis of some framework, but the intersection point to which all frameworks jointly point.
 
@@ -553,6 +553,6 @@ We thank YING-SHI-XI for providing the G0--G4 layered audit system design of the
 \vspace{1cm}
 \noindent\textbf{Date of submission}: 2026-07-06\\
 \textbf{Corresponding author}: Li Guanghao\\
-\textbf{Email}: 448798112@qq.com
+\textbf{Contact}: via the project thread (deepseek-ai/DeepSeek-V3 issue \#1466)
 
 \end{document}
