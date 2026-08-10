@@ -78,6 +78,13 @@ CHECKS = [
     # A bilingual site needs the check on BOTH languages or the unchecked one is where the drift lives.
     ("sk/index.html", r"<b>(\d+)</b>\s+zlyhaných", "FAILED"),
     ("public/track-record.html", r"(\d+)\s+reproduced", "REPRODUCED"),
+    # THE .md IS SERVED TOO, AND IT WAS NOT IN THIS LIST. Measured 2026-08-10: the html said
+    # 21/13/23 over 58 verdicts while public/track-record.md said 20/10/20 over 50, was live at
+    # 200, and this gate printed "31 published numbers all agree with the ledger". A checker
+    # whose target list omits a live artifact reports SAFE about a file it never opened.
+    ("public/track-record.md", r"(\d+)\s+reproduced", "REPRODUCED"),
+    ("public/track-record.md", r"(\d+)\s+failed", "FAILED"),
+    ("public/track-record.md", r"(\d+)\s+not computable", "NOT_COMPUTABLE"),
     ("public/track-record.html", r"(\d+)\s+failed", "FAILED"),
     ("public/track-record.html", r"(\d+)\s+not[- ]computable", "NOT_COMPUTABLE"),
     ("public/track-record.html", r"\((\d+)\s+verdicts\)", "TOTAL"),
