@@ -25,9 +25,9 @@
 \usepackage{geometry}
 \geometry{left=2.5cm,right=2.5cm,top=2.5cm,bottom=2.5cm}
 
-\title{\bfseries From Observational Convergence to Field Reality:\\
-The Mathematical Principles of Cross-Framework Diagnosis\\
-\large -- Formal Analysis and Theoretical Synthesis Based on Independent Verification by Four Core Frameworks}
+\title{\bfseries Observational Convergence Across Independent Diagnostic Frameworks:\\
+Three Coincidences, the Nulls They Survive, and the Boundary They Do Not Cross\\
+\large -- A Formal Analysis of Cross-Framework Diagnosis on a Single Shared Document}
 \author{
 Li Guanghao\textsuperscript{1,2}, Marat Sultanov\textsuperscript{3}, icophy\textsuperscript{4},\\
 Hu Zuxiong\textsuperscript{5}, Rastislav Draho\v{s} -- DanceNitra\textsuperscript{6}\\[2ex]
@@ -508,45 +508,9 @@ We thank YING-SHI-XI for providing the G0--G4 layered audit system design of the
 
 \begin{thebibliography}{99}
 
-\bibitem{Li2025} Li, G. (2025). Crystal Vein Philosophy: A Systematic Reconstruction of Cosmology, Epistemology, and Ethics. Unpublished manuscript.
-
-\bibitem{Li2026} Li, G. (2026). Mirror Abyss: Field Diagnosis and Critique of Instrumental Rationality in Non-Replacement AI. Unpublished manuscript.
-
-\bibitem{Sultanov2026} Sultanov, M. (2026). TAT-7: Real-time Divergence Tracing Architecture. DeepSeek-V3 Community Technical Report, \#1466.
-
-\bibitem{yun520-1_2026} yun520-1. (2026). HeartFlow: Production-Grade Pre-decision Audit Framework. DeepSeek-V3 Community Technical Report, \#1424.
-
-\bibitem{icophy2026} icophy. (2026). Cophy: Cross-Session Causal Density Tracking. DeepSeek-V3 Community Technical Report, \#1447.
-
-\bibitem{DanceNitra2026} DanceNitra. (2026). inspeximus: Deterministic Storage with Keyed Supersession. DeepSeek-V3 Community Technical Report, \#1466.
-
 \bibitem{YING-SHI-XI2026} YING-SHI-XI. (2026). TLAA: G0-G4 Layered Auditing Design. DeepSeek-V3 Community Technical Report, \#1285.
 
 \bibitem{qingkong66_2026} qingkong66. (2026). Four-Framework Synthesis and Timeline Positioning. DeepSeek-V3 Community Technical Report, \#1285.
-
-\bibitem{Wittgenstein1953} Wittgenstein, L. (1953). \textit{Philosophical Investigations}. Blackwell.
-
-\bibitem{Bhaskar1975} Bhaskar, R. (1975). \textit{A Realist Theory of Science}. Leeds Books.
-
-\bibitem{Haraway1988} Haraway, D. (1988). Situated Knowledges: The Science Question in Feminism and the Privilege of Partial Perspective. \textit{Feminist Studies}, 14(3), 575-599.
-
-\bibitem{Horkheimer1947} Horkheimer, M., \& Adorno, T. W. (1947). \textit{Dialectic of Enlightenment}. Philosophical Fragments.
-
-\bibitem{Popper1959} Popper, K. (1959). \textit{The Logic of Scientific Discovery}. Basic Books.
-
-\bibitem{Kuhn1962} Kuhn, T. (1962). \textit{The Structure of Scientific Revolutions}. University of Chicago Press.
-
-\bibitem{Foucault1969} Foucault, M. (1969). \textit{The Archaeology of Knowledge}. Routledge.
-
-\bibitem{Latour2005} Latour, B. (2005). \textit{Reassembling the Social: An Introduction to Actor-Network-Theory}. Oxford University Press.
-
-\bibitem{Tononi2008} Tononi, G. (2008). Consciousness as Integrated Information: A Provisional Manifesto. \textit{The Biological Bulletin}, 215(3), 216-242.
-
-\bibitem{Pearl2009} Pearl, J. (2009). \textit{Causality: Models, Reasoning, and Inference} (2nd ed.). Cambridge University Press.
-
-\bibitem{White2002} White, H. (2002). The Limits of Formalization. \textit{Contemporary Sociology}, 31(3), 255-256.
-
-\bibitem{VonFoerster2003} Von Foerster, H. (2003). \textit{Understanding Understanding: Essays on Cybernetics and Cognition}. Springer.
 
 \end{thebibliography}
 
