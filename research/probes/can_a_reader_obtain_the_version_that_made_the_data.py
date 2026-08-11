@@ -35,6 +35,7 @@ an absence).
 """
 import base64
 import json
+import os
 import sys
 import urllib.error
 import urllib.request
@@ -59,8 +60,14 @@ CONTROL_HISTORY = ["5.5.2"]      # never tagged, never on npm; only a commit car
 
 
 def _get(url):
-    req = urllib.request.Request(url, headers={"User-Agent": "agora-probe",
-                                               "Accept": "application/vnd.github+json"})
+    # GITHUB_TOKEN is OPTIONAL and only raises the rate limit -- it grants no access a reader lacks,
+    # because every endpoint here is public. Without it the hourly budget is 60 and one run costs about
+    # 40, so a second run inside the hour is refused as UNRESOLVED rather than reported as an absence.
+    headers = {"User-Agent": "agora-probe", "Accept": "application/vnd.github+json"}
+    token = os.environ.get("GITHUB_TOKEN") or os.environ.get("GH_TOKEN")
+    if token and "api.github.com" in url:
+        headers["Authorization"] = "Bearer " + token
+    req = urllib.request.Request(url, headers=headers)
     with urllib.request.urlopen(req, timeout=45) as r:
         return json.loads(r.read().decode("utf-8")), r.headers
 
@@ -106,6 +113,26 @@ def history_versions():
         if v:
             found.setdefault(v, sha)
     return found, len(commits)
+
+
+#: A branch whose HEAD must NOT read as an ancestor of main -- the negative control for the reachability
+#: test below. This repository carries an `archive/old-history` branch and two lineages with IDENTICAL
+#: trees under DIFFERENT parents (tree d66c6dd0 at both 901183ef and 4ac2eea3), which is the signature of
+#: a history reorganisation. That is exactly the condition under which "just cite the commit" quietly
+#: stops working, so the probe measures reachability instead of assuming it.
+NEGATIVE_CONTROL_BRANCH = "archive%2Fold-history"
+
+
+def reachable_from_main(sha):
+    """Is this commit an ANCESTOR of main, or merely fetchable?
+
+    Not the same question. GitHub serves unreachable commits by SHA for a long time, so `git cat-file`
+    succeeding proves the object is there TODAY, not that anything points at it. `compare/main...<sha>`
+    answers the real one: an ancestor reads `behind` (or `identical`), anything off the line reads
+    `diverged`.
+    """
+    d, _ = _get(GH + "/compare/main..." + sha)
+    return d.get("status")
 
 
 def main():
@@ -162,6 +189,25 @@ def main():
         print("them resolves ONLY through a commit SHA -- absent from npm and untagged:")
         for v, w in obtainable:
             print("    %-7s  %s" % (v, ", ".join(w)))
+
+        # Fetchable is not reachable. Run the negative control FIRST: if a branch head known to be off
+        # the main line also reads as an ancestor, the test cannot tell the two apart and reports nothing.
+        print()
+        try:
+            control = reachable_from_main(_get(GH + "/branches/" + NEGATIVE_CONTROL_BRANCH)[0]["commit"]["sha"])
+        except Exception as e:
+            control = "unavailable (%s)" % e
+        if control != "diverged":
+            print("REACHABILITY NOT REPORTED: the negative control read %r, not 'diverged', so this test" % control)
+            print("                           cannot distinguish an ancestor from an orphan.")
+        else:
+            print("control: the head of archive/old-history reads 'diverged'  [OK]")
+            for v, w in obtainable:
+                sha = hist.get(v)
+                st = reachable_from_main(sha) if sha else None
+                anc = st in ("behind", "identical")
+                print("    %-7s %s  main-ancestor: %-5s (status=%s)" % (v, sha[:8], anc, st))
+            print("  -- so these are on the main line today, not orphans GitHub merely still serves.")
     if len(obtainable) < len(rows):
         print()
         print("%d of %d were in none of the three channels. Absence from PUBLIC channels is not evidence"
