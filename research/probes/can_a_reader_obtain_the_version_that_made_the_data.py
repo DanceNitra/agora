@@ -79,7 +79,10 @@ def npm_versions():
     return sorted(d.get("versions", {})), (d.get("dist-tags") or {}).get("latest")
 
 
-def _paginated(url, cap=20):
+_PAGE_CAP = 20
+
+
+def _paginated(url, cap=_PAGE_CAP):
     out, pages = [], 0
     while url and pages < cap:
         page, headers = _get(url)
@@ -99,19 +102,30 @@ def git_tags():
 
 
 def history_versions():
-    """{version: commit sha} read from package.json at every commit that touched it in the window."""
-    commits, _ = _paginated(
+    """{version: [(sha, date), ...]} from package.json at every commit touching it in the window.
+
+    A LIST, not one sha. The first cut kept `setdefault(v, sha)` over a newest-first API, so it silently
+    kept the LAST commit carrying each version -- the state just before the next bump, not the change
+    that produced anything -- and printed it as though it were "the commit for" that version. Measured:
+    5.7.6 is carried by FOUR commits here, so that phrase is not even well formed. And `version` is a
+    DECLARATION: bumps land in a release commit after the code, or a "prepare vX" commit before it. A
+    version therefore resolves to a NEIGHBOURHOOD of commits, and saying otherwise oversells the pointer
+    this probe exists to examine.
+    """
+    commits, pages = _paginated(
         GH + "/commits?path=package.json&per_page=100&since=%s&until=%s" % (SINCE, UNTIL))
+    if pages >= _PAGE_CAP:
+        raise RuntimeError("hit the %d-page cap; the commit list is TRUNCATED and any absence below "
+                           "would be an artefact of the cap, not a finding" % _PAGE_CAP)
     found = {}
     for c in commits:
-        sha = c["sha"]
         try:
-            blob, _ = _get(GH + "/contents/package.json?ref=" + sha)
+            blob, _ = _get(GH + "/contents/package.json?ref=" + c["sha"])
             v = json.loads(base64.b64decode(blob["content"]).decode("utf-8")).get("version")
         except Exception:
             continue                      # one unreadable commit is not an absent version
         if v:
-            found.setdefault(v, sha)
+            found.setdefault(v, []).append((c["sha"], c["commit"]["author"]["date"][:19]))
     return found, len(commits)
 
 
@@ -171,7 +185,7 @@ def main():
         if ("v" + v) in tags or v in tags:
             where.append("tag")
         if v in hist:
-            where.append("commit " + hist[v][:8])
+            where.append("%d commit(s) %s..%s" % (len(hist[v]), hist[v][-1][0][:8], hist[v][0][0][:8]))
         rows.append((v, where))
         print("  %-7s -> %s" % (v, ", ".join(where) if where else "NOT FOUND in any of the three"))
 
@@ -186,9 +200,12 @@ def main():
     if obtainable:
         print("THE ANNEX IS BUILDABLE, but not from npm. %d of %d named versions resolve, and every one of"
               % (len(obtainable), len(rows)))
-        print("them resolves ONLY through a commit SHA -- absent from npm and untagged:")
+        print("them resolves ONLY through commit history -- absent from npm and untagged.")
+        print("A version spans a NEIGHBOURHOOD of commits, so both ends are printed; naming one SHA as")
+        print("'the' commit for a version would oversell exactly the pointer under examination:")
         for v, w in obtainable:
-            print("    %-7s  %s" % (v, ", ".join(w)))
+            for sha, when in hist.get(v, []):
+                print("    %-7s %s  %s" % (v, sha[:8], when))
 
         # Fetchable is not reachable. Run the negative control FIRST: if a branch head known to be off
         # the main line also reads as an ancestor, the test cannot tell the two apart and reports nothing.
@@ -202,20 +219,32 @@ def main():
             print("                           cannot distinguish an ancestor from an orphan.")
         else:
             print("control: the head of archive/old-history reads 'diverged'  [OK]")
-            for v, w in obtainable:
-                sha = hist.get(v)
-                st = reachable_from_main(sha) if sha else None
-                anc = st in ("behind", "identical")
-                print("    %-7s %s  main-ancestor: %-5s (status=%s)" % (v, sha[:8], anc, st))
-            print("  -- so these are on the main line today, not orphans GitHub merely still serves.")
+            for v, _w in obtainable:
+                for sha, _when in hist.get(v, []):
+                    try:
+                        st = reachable_from_main(sha)
+                    except Exception as e:      # a fork SHA 404s; that is a reading, not a crash
+                        st = "unreadable (%s)" % e
+                    print("    %-7s %s  main-ancestor: %-5s (status=%s)"
+                          % (v, sha[:8], st in ("behind", "identical"), st))
+            print("  -- on the main line TODAY. A snapshot, not a durability claim: squash and rebase")
+            print("     merges make an original SHA read 'diverged' even though its content shipped.")
     if len(obtainable) < len(rows):
         print()
         print("%d of %d were in none of the three channels. Absence from PUBLIC channels is not evidence"
               % (len(rows) - len(obtainable), len(rows)))
         print("they never existed -- an internal deployment leaves no trace here by design.")
     print()
-    print("So `npm install @yun520-1/heartflow` cannot reproduce these runs at ANY pin: it serves %s," % latest)
-    print("a different major line. A commit SHA can, for the versions that are in history.")
+    print("WHAT THIS DOES AND DOES NOT SHOW. It shows `npm install @yun520-1/heartflow` cannot reach these")
+    print("versions at ANY pin: it serves %s, a different major line, and none of the three was ever" % latest)
+    print("published there (npm's own time map lists 24 versions and 24 timestamps, with no unpublish")
+    print("record, so 'never published' rather than 'published then withdrawn').")
+    print()
+    print("It does NOT show a commit SHA reproduces the runs. It shows a SHA is a BETTER-FORMED pointer:")
+    print("a version spans several commits, package.json's version is a declaration rather than a record")
+    print("of what was deployed, and source pins no lockfile, runtime or model endpoint. Whether any of")
+    print("these commits is the software that produced the data is a question only its author can")
+    print("answer -- this probe resolves version STRINGS, and a string is not a provenance claim.")
     return 0
 
 
