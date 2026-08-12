@@ -1,0 +1,42 @@
+{
+  "his_grid": "0.0, 3.0, 13",
+  "his_summary": {
+    "N": 6,
+    "total_tests": 15,
+    "valley_count": 15
+  },
+  "null_rates": {
+    "pure white noise": 1.0,
+    "flat + tiny noise": 1.0,
+    "smooth random walk": 0.9875,
+    "monotone + noise": 0.7525,
+    "a genuine V (control)": 1.0
+  },
+  "real": {
+    "path N=7": {
+      "valley": true,
+      "position": 0.76,
+      "depth": 0.13291667643769672,
+      "depth_over_sd": 2.6795703296564093
+    },
+    "star N=7": {
+      "valley": true,
+      "position": 1.0,
+      "depth": 0.13404637326911967,
+      "depth_over_sd": 2.8021537684217055
+    }
+  },
+  "coercion_bug": {
+    "fine_at_0": 0.24470519910469976,
+    "fine_at_1": 0.24470519910469932,
+    "fine_at_1e-9": 0.12831706932048267,
+    "identical": true
+  },
+  "seeded": {
+    "star_tree": false,
+    "binary_tree": false,
+    "path_graph_tree": false,
+    "random_tree": true,
+    "random_labeled_tree": true
+  }
+}
