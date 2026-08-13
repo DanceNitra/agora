@@ -21,6 +21,23 @@ ROOT = Path(__file__).resolve().parents[1]
 SITE = "https://dancenitra.github.io/agora/public"
 
 META = {
+    "a-green-suite-that-never-ran": {
+        "slug": "a-green-suite-that-never-ran",
+        "title": "A green test suite that never ran 156 of its tests",
+        "title_sk": "Zelená testovacia suita, ktorá 156 svojich testov nikdy nespustila",
+        "desc": "Our suite reported 2813 passed while 156 test functions had never been collected in the "
+                "CI base image. A module-level pytest.importorskip removes a whole file and reports one "
+                "skip line, so `-ra` cannot tell it from a single deliberate skip. Script, controls, and "
+                "the two ways we measured it wrong first.",
+        "desc_sk": "Suita hlásila 2813 passed, kým 156 testovacích funkcií sa v CI base image nikdy "
+                   "nezozbieralo. `pytest.importorskip` na úrovni modulu odstráni celý súbor a nahlási "
+                   "jeden riadok, takže `-ra` ho nerozlíši od jedného zámerného preskočenia. Skript, "
+                   "kontroly a dve chyby, ktoré sme pri meraní spravili najprv.",
+        "date": "2026-08-13", "modified": "2026-08-13",
+        "tags": "Testing · pytest · CI · Reproducibility · Measurement",
+        "tags_sk": "Testovanie · pytest · CI · Reprodukovateľnosť · Meranie",
+        "kicker": "Engineering · measurement", "kicker_sk": "Inžinierstvo · meranie",
+    },
     "self-audit-32": {
         "slug": "labels-failed-more-than-measurements",
         "title": "Labels failed more than measurements: severe-testing our AI's 32 confident findings",
@@ -321,6 +338,24 @@ def md_to_html(md: str):
         if ln.startswith("# "):
             title = ln[2:].strip(); i += 1; continue
         st = ln.strip()
+        if st.startswith("```"):
+            # FENCED CODE. This has to run BEFORE the heading, table and blockquote branches, because
+            # code routinely contains `#`, `|` and `>` at the start of a line and would otherwise be
+            # parsed as markup. Until 2026-08-13 there was no branch at all: the fence fell through to
+            # the paragraph writer, `_inline` ate the third backtick into an inline <code>, and the body
+            # was flattened into <p> with whitespace collapsed. 19 published posts carried code that way
+            # and 0 of 64 pages had a <pre>, which is why nobody noticed: it looked like prose, not like
+            # an error.
+            lang = st[3:].strip()
+            i += 1
+            buf = []
+            while i < len(lines) and not lines[i].strip().startswith("```"):
+                buf.append(lines[i]); i += 1
+            i += 1                                              # consume the closing fence
+            cls = f' class="language-{html.escape(lang)}"' if lang else ""
+            code = html.escape(chr(10).join(buf))
+            out.append(f"<pre><code{cls}>{code}</code></pre>")
+            continue
         if st.startswith("<figure") or st.startswith("<svg"):   # raw-HTML figure passthrough (no escaping/wrapping)
             close = "</figure>" if st.startswith("<figure") else "</svg>"
             raw = [ln]

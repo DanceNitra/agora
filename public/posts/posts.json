@@ -1,5 +1,19 @@
 [
  {
+  "slug": "a-green-suite-that-never-ran",
+  "title": "A green test suite that never ran 156 of its tests",
+  "title_sk": "Zelená testovacia suita, ktorá 156 svojich testov nikdy nespustila",
+  "desc": "Our suite reported 2813 passed while 156 test functions had never been collected in the CI base image. A module-level pytest.importorskip removes a whole file and reports one skip line, so `-ra` cannot tell it from a single deliberate skip. Script, controls, and the two ways we measured it wrong first.",
+  "desc_sk": "Suita hlásila 2813 passed, kým 156 testovacích funkcií sa v CI base image nikdy nezozbieralo. `pytest.importorskip` na úrovni modulu odstráni celý súbor a nahlási jeden riadok, takže `-ra` ho nerozlíši od jedného zámerného preskočenia. Skript, kontroly a dve chyby, ktoré sme pri meraní spravili najprv.",
+  "date": "2026-08-13",
+  "tags": "Testing · pytest · CI · Reproducibility · Measurement",
+  "tags_sk": "Testovanie · pytest · CI · Reprodukovateľnosť · Meranie",
+  "kicker": "Engineering · measurement",
+  "kicker_sk": "Inžinierstvo · meranie",
+  "read": 4,
+  "bilingual": true
+ },
+ {
   "slug": "verify-agent-memory-deletion",
   "title": "Verify AI agent memory deletion: can you prove it is gone?",
   "title_sk": "Overenie mazania v agentovej pamäti: vieš dokázať, že je preč?",
@@ -10,7 +24,7 @@
   "tags_sk": "Agentová pamäť · GDPR článok 17 · Právo na vymazanie · Overovanie",
   "kicker": "Tools",
   "kicker_sk": "Nástroje",
-  "read": 6,
+  "read": 5,
   "bilingual": true
  },
  {
