@@ -132,8 +132,12 @@ def run_feed_cases(manifest, tracer):
         expected = case["outcome"]
         with tracer as t:
             try:
-                verify_feed(errata, owner=_schedule(case, signers), roots=roots)
-                actual, detail = "accept", ""
+                got = verify_feed(errata, owner=_schedule(case, signers), roots=roots)
+                # "no exception raised" is a vacuous acceptance: a no-op verify_feed returning its
+                # input unchanged satisfies it, and an audit of this harness confirmed the accept
+                # cases passed against exactly such a stub. An acceptance must return every event.
+                actual = "accept" if len(got) == len(errata) else "accept-but-dropped-events"
+                detail = "returned %d of %d events" % (len(got), len(errata))
             except FeedError as exc:
                 actual, detail = "reject", str(exc)
         ok = actual == expected
@@ -258,6 +262,15 @@ def run_semantic(probes_doc, obs_doc, config_doc, tracer):
         rows.append({"id": "semantic:%s" % name, "expected": expected, "actual": actual,
                      "pass": actual == expected, "detail": detail[:160],
                      "inspeximus_frames": sorted(t.hits), "any_adapter_frames": sorted(t.adapter_hits)})
+
+    # Five of the eight cases expect `unknown`, so an aggregator hard-wired to return `unknown` scores
+    # 5/8 here and the section still looks mostly healthy. Requiring the outcomes to DISCRIMINATE is
+    # what makes the five meaningful: a collapsed aggregator cannot produce three distinct verdicts.
+    distinct = {r["actual"] for r in rows}
+    assert len(distinct) >= 3, (
+        "SEMANTIC DISCRIMINATION CONTROL FAILED: every case returned one of %s. An aggregator that "
+        "answers the same thing regardless of evidence passes the five `unknown` cases for free, so "
+        "this section measures nothing." % sorted(distinct))
     return rows
 
 
@@ -290,9 +303,39 @@ def run_confidentiality(case, tracer, inspeximus_dir):
         receipt = imp.repair(err)
         blob = json.dumps(receipt.to_dict(), default=str)
     leaked = case["forbidden_value"] in blob
-    return [{"id": case["id"], "expected": "erased content absent from the receipt",
-             "actual": "LEAKED" if leaked else "absent", "pass": not leaked,
-             "detail": "searched %d serialised bytes for %r" % (len(blob), case["forbidden_value"]),
+
+    # WHY THESE FOUR EXTRA ASSERTIONS EXIST. "absent" on its own is a vacuous pass: an importer whose
+    # repair returned an empty object would satisfy it perfectly, and an adversarial audit of this
+    # harness demonstrated exactly that -- stubbing repair() to return {} scored 28/28 with no abort.
+    # Reporting a vacuous-pass finding from a harness that accepts vacuous passes is not a position I
+    # can hold, so absence now has to be absence FROM a receipt that did the work.
+    # HOW MUCH OF THE ADAPTER CONTRACT THIS ONE CASE ACTUALLY DRIVES. Worth measuring rather than
+    # asserting, because it cuts against the headline: the case reaches most of the protocol surface,
+    # so "the vectors give no adapter coverage" would be an overstatement. It drives many methods and
+    # asserts one property, which is a different and more precise thing to say.
+    import inspect
+    surface = sorted(n for n, _ in inspect.getmembers(InspeximusErrataAdapter, inspect.isfunction)
+                     if not n.startswith("_"))
+    called = sorted(set(h.split(":", 1)[1] for h in t.hits) & set(surface))
+
+    texts = [r.get("text") for r in m.items if r.get("status") == "active"]
+    evidence = {
+        "receipt names our store": "inspeximus" in blob,
+        "receipt is non-trivial": len(blob) > 200,
+        "the erased fact is gone from the store": "is vegetarian" not in texts,
+        "the preserved fact survived": "prefers quiet restaurants" in texts,
+    }
+    ok = (not leaked) and all(evidence.values())
+    return [{"id": case["id"], "expected": "erased content absent from a receipt that did the work",
+             "actual": "LEAKED" if leaked else ("absent" if ok else "absent but vacuous"),
+             "pass": ok,
+             "adapter_methods_driven": called,
+             "adapter_methods_total": len(surface),
+             "adapter_methods_not_driven": sorted(set(surface) - set(called)),
+             "properties_asserted": sorted(evidence) + ["erased content absent from receipt"],
+             "detail": "searched %d serialised bytes for %r; drives %d/%d adapter methods; %s" % (
+                 len(blob), case["forbidden_value"], len(called), len(surface),
+                 "; ".join("%s=%s" % (k, v) for k, v in evidence.items())),
              "inspeximus_frames": sorted(t.hits), "any_adapter_frames": sorted(t.adapter_hits)}]
 
 

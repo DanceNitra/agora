@@ -8,7 +8,7 @@
         "expected": "accept",
         "actual": "accept",
         "pass": true,
-        "detail": "",
+        "detail": "returned 2 of 2 events",
         "inspeximus_frames": [],
         "any_adapter_frames": []
       },
@@ -54,10 +54,36 @@
     "protocol-manifest / confidentiality": [
       {
         "id": "erasure-evidence-content-free",
-        "expected": "erased content absent from the receipt",
+        "expected": "erased content absent from a receipt that did the work",
         "actual": "absent",
         "pass": true,
-        "detail": "searched 824 serialised bytes for 'is vegetarian'",
+        "adapter_methods_driven": [
+          "coverage",
+          "dispositions",
+          "enumerate",
+          "is_quarantined",
+          "lineage_complete",
+          "quarantine",
+          "quarantine_coverage",
+          "recall",
+          "repair_inputs",
+          "retire",
+          "snapshot",
+          "source_artifact"
+        ],
+        "adapter_methods_total": 14,
+        "adapter_methods_not_driven": [
+          "coverage_detail",
+          "rebuild"
+        ],
+        "properties_asserted": [
+          "receipt is non-trivial",
+          "receipt names our store",
+          "the erased fact is gone from the store",
+          "the preserved fact survived",
+          "erased content absent from receipt"
+        ],
+        "detail": "searched 824 serialised bytes for 'is vegetarian'; drives 12/14 adapter methods; receipt names our store=True; receipt is non-trivial=True; the erased fact is gone from the store=True; the preserved fact survived=True",
         "inspeximus_frames": [
           "core.py:_save",
           "core.py:items",
