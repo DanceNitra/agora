@@ -9,7 +9,8 @@
         "actual": "accept",
         "pass": true,
         "detail": "",
-        "inspeximus_frames": []
+        "inspeximus_frames": [],
+        "any_adapter_frames": []
       },
       {
         "id": "rotated-key-reuse-invalid",
@@ -17,7 +18,8 @@
         "actual": "reject",
         "pass": true,
         "detail": "err_0002: signing key 'owner-v1' is not the active key 'owner-v2' at sequence 2.",
-        "inspeximus_frames": []
+        "inspeximus_frames": [],
+        "any_adapter_frames": []
       },
       {
         "id": "concurrent-sequence-conflict-invalid",
@@ -25,7 +27,8 @@
         "actual": "reject",
         "pass": true,
         "detail": "sequence 1 conflict: 'err_concurrent_a' and 'err_concurrent_b' both claim it. The owner has equivocated within this observed view, or the feed was spliced.",
-        "inspeximus_frames": []
+        "inspeximus_frames": [],
+        "any_adapter_frames": []
       },
       {
         "id": "invalid-target-invalid",
@@ -33,7 +36,8 @@
         "actual": "reject",
         "pass": true,
         "detail": "err_unknown_target: unknown target root 'mem_unregistered'. An erratum must name a root this importer accepted.",
-        "inspeximus_frames": []
+        "inspeximus_frames": [],
+        "any_adapter_frames": []
       }
     ],
     "protocol-manifest / split-view": [
@@ -43,7 +47,8 @@
         "actual": "accept-each-view; fingerprints differ; no local detector",
         "pass": true,
         "detail": "views accepted=[True, True] distinct_fingerprints=2/2",
-        "inspeximus_frames": []
+        "inspeximus_frames": [],
+        "any_adapter_frames": []
       }
     ],
     "protocol-manifest / confidentiality": [
@@ -75,6 +80,29 @@
           "llm_errata.py:retire",
           "llm_errata.py:snapshot",
           "llm_errata.py:source_artifact"
+        ],
+        "any_adapter_frames": [
+          "inspeximus:<genexpr>",
+          "inspeximus:__init__",
+          "inspeximus:_coverage",
+          "inspeximus:_flush",
+          "inspeximus:_names_root",
+          "inspeximus:_own_source",
+          "inspeximus:_records",
+          "inspeximus:_save",
+          "inspeximus:coverage",
+          "inspeximus:dispositions",
+          "inspeximus:enumerate",
+          "inspeximus:is_quarantined",
+          "inspeximus:items",
+          "inspeximus:lineage_complete",
+          "inspeximus:quarantine",
+          "inspeximus:quarantine_coverage",
+          "inspeximus:recall",
+          "inspeximus:repair_inputs",
+          "inspeximus:retire",
+          "inspeximus:snapshot",
+          "inspeximus:source_artifact"
         ]
       }
     ],
@@ -85,7 +113,8 @@
         "actual": "signature fails",
         "pass": true,
         "detail": "bound",
-        "inspeximus_frames": []
+        "inspeximus_frames": [],
+        "any_adapter_frames": []
       },
       {
         "id": "receipt-field:erratum_id",
@@ -93,7 +122,8 @@
         "actual": "signature fails",
         "pass": true,
         "detail": "bound",
-        "inspeximus_frames": []
+        "inspeximus_frames": [],
+        "any_adapter_frames": []
       },
       {
         "id": "receipt-field:sequence",
@@ -101,7 +131,8 @@
         "actual": "signature fails",
         "pass": true,
         "detail": "bound",
-        "inspeximus_frames": []
+        "inspeximus_frames": [],
+        "any_adapter_frames": []
       },
       {
         "id": "receipt-field:target_root",
@@ -109,7 +140,8 @@
         "actual": "signature fails",
         "pass": true,
         "detail": "bound",
-        "inspeximus_frames": []
+        "inspeximus_frames": [],
+        "any_adapter_frames": []
       },
       {
         "id": "receipt-field:operation",
@@ -117,7 +149,8 @@
         "actual": "signature fails",
         "pass": true,
         "detail": "bound",
-        "inspeximus_frames": []
+        "inspeximus_frames": [],
+        "any_adapter_frames": []
       },
       {
         "id": "receipt-field:pre_state_root",
@@ -125,7 +158,8 @@
         "actual": "signature fails",
         "pass": true,
         "detail": "bound",
-        "inspeximus_frames": []
+        "inspeximus_frames": [],
+        "any_adapter_frames": []
       },
       {
         "id": "receipt-field:post_state_root",
@@ -133,7 +167,8 @@
         "actual": "signature fails",
         "pass": true,
         "detail": "bound",
-        "inspeximus_frames": []
+        "inspeximus_frames": [],
+        "any_adapter_frames": []
       },
       {
         "id": "receipt-field:stores",
@@ -141,7 +176,8 @@
         "actual": "signature fails",
         "pass": true,
         "detail": "bound",
-        "inspeximus_frames": []
+        "inspeximus_frames": [],
+        "any_adapter_frames": []
       },
       {
         "id": "receipt-field:dispositions",
@@ -149,7 +185,8 @@
         "actual": "signature fails",
         "pass": true,
         "detail": "bound",
-        "inspeximus_frames": []
+        "inspeximus_frames": [],
+        "any_adapter_frames": []
       },
       {
         "id": "receipt-field:triad",
@@ -157,7 +194,8 @@
         "actual": "signature fails",
         "pass": true,
         "detail": "bound",
-        "inspeximus_frames": []
+        "inspeximus_frames": [],
+        "any_adapter_frames": []
       },
       {
         "id": "receipt-field:aggregate",
@@ -165,7 +203,8 @@
         "actual": "signature fails",
         "pass": true,
         "detail": "bound",
-        "inspeximus_frames": []
+        "inspeximus_frames": [],
+        "any_adapter_frames": []
       },
       {
         "id": "receipt-field:limitations",
@@ -173,7 +212,8 @@
         "actual": "signature fails",
         "pass": true,
         "detail": "bound",
-        "inspeximus_frames": []
+        "inspeximus_frames": [],
+        "any_adapter_frames": []
       },
       {
         "id": "receipt-field:history_retained",
@@ -181,7 +221,8 @@
         "actual": "signature fails",
         "pass": true,
         "detail": "bound",
-        "inspeximus_frames": []
+        "inspeximus_frames": [],
+        "any_adapter_frames": []
       },
       {
         "id": "receipt-field:adapter_versions",
@@ -189,7 +230,8 @@
         "actual": "signature fails",
         "pass": true,
         "detail": "bound",
-        "inspeximus_frames": []
+        "inspeximus_frames": [],
+        "any_adapter_frames": []
       }
     ],
     "semantic fixtures": [
@@ -199,7 +241,8 @@
         "actual": "verified",
         "pass": true,
         "detail": "3 probes, 3 observations",
-        "inspeximus_frames": []
+        "inspeximus_frames": [],
+        "any_adapter_frames": []
       },
       {
         "id": "semantic:failed-supersession",
@@ -207,7 +250,8 @@
         "actual": "failed",
         "pass": true,
         "detail": "3 probes, 3 observations",
-        "inspeximus_frames": []
+        "inspeximus_frames": [],
+        "any_adapter_frames": []
       },
       {
         "id": "semantic:unknown-erasure",
@@ -215,7 +259,8 @@
         "actual": "unknown",
         "pass": true,
         "detail": "2 probes, 2 observations",
-        "inspeximus_frames": []
+        "inspeximus_frames": [],
+        "any_adapter_frames": []
       },
       {
         "id": "semantic:provider-error",
@@ -223,7 +268,8 @@
         "actual": "unknown",
         "pass": true,
         "detail": "3 probes, 3 observations",
-        "inspeximus_frames": []
+        "inspeximus_frames": [],
+        "any_adapter_frames": []
       },
       {
         "id": "semantic:missing-response",
@@ -231,7 +277,8 @@
         "actual": "unknown",
         "pass": true,
         "detail": "3 probes, 2 observations",
-        "inspeximus_frames": []
+        "inspeximus_frames": [],
+        "any_adapter_frames": []
       },
       {
         "id": "semantic:duplicate-response",
@@ -239,7 +286,8 @@
         "actual": "unknown",
         "pass": true,
         "detail": "3 probes, 4 observations",
-        "inspeximus_frames": []
+        "inspeximus_frames": [],
+        "any_adapter_frames": []
       },
       {
         "id": "semantic:configuration-drift",
@@ -247,7 +295,8 @@
         "actual": "unknown",
         "pass": true,
         "detail": "3 probes, 3 observations",
-        "inspeximus_frames": []
+        "inspeximus_frames": [],
+        "any_adapter_frames": []
       },
       {
         "id": "semantic:nonconforming-output",
@@ -255,14 +304,36 @@
         "actual": "unknown",
         "pass": true,
         "detail": "3 probes, 3 observations",
-        "inspeximus_frames": []
+        "inspeximus_frames": [],
+        "any_adapter_frames": []
       }
+    ]
+  },
+  "controls": {
+    "reference_adapter_scope_positive_control": [
+      "reference:<genexpr>",
+      "reference:acknowledge",
+      "reference:coverage",
+      "reference:dispositions",
+      "reference:enumerate",
+      "reference:is_quarantined",
+      "reference:lineage_complete",
+      "reference:quarantine",
+      "reference:quarantine_coverage",
+      "reference:rebuild",
+      "reference:recall",
+      "reference:repair_inputs",
+      "reference:retire",
+      "reference:snapshot",
+      "reference:source_artifact",
+      "reference:source_of"
     ]
   },
   "totals": {
     "cases": 28,
     "passed": 28,
     "cases_executing_inspeximus": 1,
-    "cases_reference_only": 27
+    "cases_executing_any_store_adapter": 1,
+    "cases_touching_no_adapter": 27
   }
 }

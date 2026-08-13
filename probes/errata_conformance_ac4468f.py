@@ -52,21 +52,35 @@ class Tracer:
 
     Returns None from the trace callback so only `call` events fire: we want the set of functions
     entered, not a line profile, and line tracing on a signature loop is needlessly slow.
+
+    THE DENOMINATOR OBJECTION, answered by measuring both ways. Counting only OUR frames invites the
+    fair reply "an adapter is called BY the controller, so a case driving the reference MarkdownAdapter
+    IS exercising the adapter contract -- you just did not write that adapter." So the tracer records
+    two scopes: inspeximus, and the reference adapter module. The weaker claim (cases touching OUR
+    code) and the stronger one (cases touching ANY store adapter) are both reported, and it is the
+    stronger number that decides whether the vectors can grade an adapter at all.
     """
 
-    def __init__(self, root):
+    def __init__(self, root, adapter_module):
         self.root = os.path.normcase(os.path.abspath(root))
+        self.adapter_module = os.path.normcase(os.path.abspath(adapter_module))
         self.hits = set()
+        self.adapter_hits = set()
 
     def _trace(self, frame, event, arg):
         if event == "call":
             path = os.path.normcase(os.path.abspath(frame.f_code.co_filename))
+            name = frame.f_code.co_name
             if path.startswith(self.root):
-                self.hits.add("%s:%s" % (os.path.basename(path), frame.f_code.co_name))
+                self.hits.add("%s:%s" % (os.path.basename(path), name))
+                self.adapter_hits.add("inspeximus:%s" % name)
+            elif path == self.adapter_module and not name.startswith("_"):
+                self.adapter_hits.add("reference:%s" % name)
         return None
 
     def __enter__(self):
         self.hits = set()
+        self.adapter_hits = set()
         sys.settrace(self._trace)
         return self
 
@@ -128,7 +142,7 @@ def run_feed_cases(manifest, tracer):
         if ok and expected == "reject" and case.get("error_contains"):
             ok = case["error_contains"].lower() in detail.lower()
         rows.append({"id": case["id"], "expected": expected, "actual": actual, "pass": ok,
-                     "detail": detail[:160], "inspeximus_frames": sorted(t.hits)})
+                     "detail": detail[:160], "inspeximus_frames": sorted(t.hits), "any_adapter_frames": sorted(t.adapter_hits)})
     return rows
 
 
@@ -159,7 +173,7 @@ def run_split_view(manifest, tracer):
                                if ok else "unexpected",
                      "pass": ok, "detail": "views accepted=%s distinct_fingerprints=%d/%d"
                      % (accepted, len(set(prints)), len(prints)),
-                     "inspeximus_frames": sorted(t.hits)})
+                     "inspeximus_frames": sorted(t.hits), "any_adapter_frames": sorted(t.adapter_hits)})
     return rows
 
 
@@ -202,7 +216,7 @@ def run_receipt_binding(mutations, tracer):
                      "actual": "signature still verifies" if still_verifies else "signature fails",
                      "pass": not still_verifies,
                      "detail": "UNBOUND FIELD" if still_verifies else "bound",
-                     "inspeximus_frames": sorted(t.hits)})
+                     "inspeximus_frames": sorted(t.hits), "any_adapter_frames": sorted(t.adapter_hits)})
     return rows
 
 
@@ -243,7 +257,7 @@ def run_semantic(probes_doc, obs_doc, config_doc, tracer):
                 actual, detail = "error", "%s: %s" % (type(exc).__name__, exc)
         rows.append({"id": "semantic:%s" % name, "expected": expected, "actual": actual,
                      "pass": actual == expected, "detail": detail[:160],
-                     "inspeximus_frames": sorted(t.hits)})
+                     "inspeximus_frames": sorted(t.hits), "any_adapter_frames": sorted(t.adapter_hits)})
     return rows
 
 
@@ -279,7 +293,31 @@ def run_confidentiality(case, tracer, inspeximus_dir):
     return [{"id": case["id"], "expected": "erased content absent from the receipt",
              "actual": "LEAKED" if leaked else "absent", "pass": not leaked,
              "detail": "searched %d serialised bytes for %r" % (len(blob), case["forbidden_value"]),
-             "inspeximus_frames": sorted(t.hits)}]
+             "inspeximus_frames": sorted(t.hits), "any_adapter_frames": sorted(t.adapter_hits)}]
+
+
+def positive_control_reference_adapter(tracer):
+    """Prove the reference-adapter scope can register a hit AT ALL, before trusting a zero from it.
+
+    Without this, "no vector case invokes the reference adapter" is indistinguishable from "the second
+    tracer scope is pointed at the wrong file and can never fire" -- a guard that never sees its target
+    reporting safe. This is not a vector case and is not scored; it is the fixture that makes the zero
+    mean something. It drives the reference importer with its OWN default adapters, so `reference:`
+    frames must appear.
+    """
+    from prototype.errata import Erratum, Operation
+    from prototype.scenario import build_importer
+    from prototype.signing import Ed25519Signer
+    owner = Ed25519Signer(b"\x02" * 32, key_id="key-1")
+    imp = build_importer(owner)
+    err = owner.sign_erratum(Erratum(
+        erratum_id="ctl", sequence=1, target_root="mem_01HX", operation=Operation.SUPERSEDE,
+        valid_from="2026-08-01T00:00:00Z", replacement="eats meat again",
+        postconditions={"negative": "vegetarian", "positive": "eats meat again",
+                        "preserve": "quiet restaurants"}))
+    with tracer as t:
+        imp.repair(err)
+    return sorted(t.adapter_hits)
 
 
 def main(argv=None):
@@ -303,7 +341,8 @@ def main(argv=None):
     obs_doc = load("spec/semantic/observations.json")
     config_doc = load("spec/semantic/verifier-config.json")
 
-    tracer = Tracer(os.path.join(a.inspeximus, "inspeximus"))
+    tracer = Tracer(os.path.join(a.inspeximus, "inspeximus"),
+                    os.path.join(a.pkg, "prototype", "adapters.py"))
     sections = [
         ("protocol-manifest / feed", run_feed_cases(manifest, tracer)),
         ("protocol-manifest / split-view", run_split_view(manifest, tracer)),
@@ -314,7 +353,7 @@ def main(argv=None):
     ]
 
     out = {"spec_commit": SPEC, "g2_digest": DIGEST, "sections": {}}
-    total = passed = touching = 0
+    total = passed = touching = any_adapter = 0
     print("LLM Errata conformance vectors at %s\n" % SPEC[:12])
     for title, rows in sections:
         ours = sum(1 for r in rows if r["inspeximus_frames"])
@@ -329,6 +368,7 @@ def main(argv=None):
         total += len(rows)
         passed += sum(1 for r in rows if r["pass"])
         touching += ours
+        any_adapter += sum(1 for r in rows if r["any_adapter_frames"])
         print()
 
     # THE CONTROLS. An attribution table is exactly the artifact that looks authoritative while
@@ -337,15 +377,29 @@ def main(argv=None):
     assert touching < total, (
         "CONTROL 2 FAILED: the tracer claims every case runs inspeximus code, including pure "
         "signature checks that cannot. It is matching on the wrong directory.")
+    ctl = positive_control_reference_adapter(tracer)
+    ref_frames = [f for f in ctl if f.startswith("reference:")]
+    print("CONTROL 3 (positive): driving the reference importer with its own adapters recorded "
+          "%d reference frame(s): %s" % (len(ref_frames), ", ".join(ref_frames[:5]) or "NONE"))
+    assert ref_frames, (
+        "CONTROL 3 FAILED: the reference-adapter scope never fires even when the reference adapters "
+        "ARE running, so every zero it reported above is an artifact of a mis-aimed path, not a "
+        "measurement. Do not quote the adapter numbers.")
+    out["controls"] = {"reference_adapter_scope_positive_control": ref_frames}
 
     out["totals"] = {"cases": total, "passed": passed,
                      "cases_executing_inspeximus": touching,
-                     "cases_reference_only": total - touching}
-    print("TOTAL          : %d/%d cases pass" % (passed, total))
-    print("OURS (measured): %d of %d cases execute inspeximus code; %d exercise the reference"
-          % (touching, total, total - touching))
-    print("               : so %d/%d is NOT an inspeximus conformance score, and this run says so."
+                     "cases_executing_any_store_adapter": any_adapter,
+                     "cases_touching_no_adapter": total - any_adapter}
+    print("TOTAL             : %d/%d cases pass" % (passed, total))
+    print("OURS (measured)   : %d of %d cases execute inspeximus code" % (touching, total))
+    print("ANY store adapter : %d of %d cases invoke ANY adapter, ours or the reference's"
+          % (any_adapter, total))
+    print("                  : %d cases never reach an adapter at all, so they cannot grade one."
+          % (total - any_adapter))
+    print("                  : %d/%d is therefore not an adapter conformance score. A clean-room"
           % (passed, total))
+    print("                  : adapter author scoring it would be measuring the controller.")
     io.open(RESULT, "w", encoding="utf-8", newline="\n").write(json.dumps(out, indent=2) + "\n")
     print("\nwrote %s" % os.path.basename(RESULT))
     return 0 if passed == total else 1
