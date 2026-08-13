@@ -1,4 +1,49 @@
-"""A falsification gate for the silent-detuning valley that CAN fail, built from Guanghao's own data.
+"""WITHDRAWN 2026-08-13. This gate does not work. Kept because what killed it is worth keeping.
+
+Read this header before the original one below, which overstates the file on every point.
+
+1. IT IS TEXTBOOK. "Reproducibility across independent replicates in place of a within-sample magnitude
+   threshold" is the IDR criterion (Li, Brown, Huang, Bickel, Ann. Appl. Stat. 5(3):1752-1779, 2011,
+   the ENCODE standard) and Meinshausen-Buhlmann stability selection (arXiv:0809.2932), which carries a
+   false-positive bound this has none of. For a valley POSITION the right tool is cube-root asymptotics
+   (Cattaneo, Jansson, Nagasawa, arXiv:1704.08066), not a gate.
+
+2. THE NULLS WERE PERTURBED 20x HARDER THAN THE SIGNAL, so the comparison was rigged without my
+   noticing. Nulls are redrawn from scratch per repeat; the physical system is re-run with only a
+   Lanczos seed change. Match the perturbation and the headline inverts (151 points, 400 trials):
+
+       perturbation per repeat    white noise    random walk
+       0 (deterministic)              97.5%          91.5%
+       1.0 x std (as published)        0.2%           0.0%
+
+   A deterministic re-run reproduces ANY argmin. All the discrimination came from the INTERIORITY
+   clause, which needs no reseeds at all.
+
+3. THE 0% WAS ARITHMETIC, NOT EVIDENCE. P(5 iid argmins land within one grid step) = (3/151)^4 =
+   1.6e-7, so 0/200 was guaranteed before the run. I measured a quantity whose value was fixed in
+   advance, which is the same defect this repository exists to catch in other people's code.
+
+4. DROPPING THE MAGNITUDE CLAUSE MADE IT WORSE THAN THE GATE IT REPLACED. A parabola of depth 1e-10,
+   numerically meaningless, passes 100% of the time.
+
+5. AND ITS ONE TRUE POSITIVE ON REAL PHYSICS WAS THE TRIVIAL CASE. It certified star N=7 at s*=1.000
+   five times out of five. A star is edge-transitive; at s=1.0 the contradiction edge is restored, the
+   graph has one distinct edge weight, every nearest-neighbour correlation is equal, and the dispersion
+   observable is zero BY SYMMETRY (measured: 8.2e-17). Five reseeds per topology:
+
+       star_tree(7)        [1.0 x5]                     8.2e-17   <- machine zero
+       path_graph_tree(7)  [0.76 x5]                    1.25e-01
+       path_graph_tree(6)  [0.14 x5]                    1.13e-01
+       binary_tree(2)      [1.12,1.10,1.12,1.10,1.10]   5.18e-02
+
+   The last three are the control: the phenomenon survives, the flagship example does not.
+
+That finding is the only thing here worth having, and it came out of building the wrong instrument.
+Reported to the author: luoxuejian000/edrn-dmrg-verification#2, issuecomment-5280760296.
+
+--- the original header follows, and it is wrong ---
+
+A falsification gate for the silent-detuning valley that CAN fail, built from Guanghao's own data.
 
 THE PROBLEM. `detect_valley` fires when the dip exceeds `0.2 * np.std(fine_values)`, a fraction of the
 curve's own spread. Measured previously (guanghao_tree_valley_audit.py): it declares a valley in white
