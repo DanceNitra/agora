@@ -1,0 +1,67 @@
+{
+  "repeats": 5,
+  "points": 151,
+  "trials": 200,
+  "genuine V (noiseless)": 100.0,
+  "white noise": 0.0,
+  "random walk": 0.0,
+  "monotone + noise": 1.0,
+  "monotone, perfectly stable": 0.0,
+  "his_gate_white noise": 100.0,
+  "his_gate_random walk": 93.0,
+  "his_gate_monotone + noise": 82.0,
+  "real_shipped": {
+    "passed": false,
+    "argmins": [
+      0,
+      0,
+      0,
+      50,
+      50
+    ],
+    "all_interior": false,
+    "spread_steps": 50,
+    "n": 151,
+    "argmin_s": [
+      0.0,
+      0.0,
+      0.0,
+      1.0,
+      1.0
+    ],
+    "depths": [
+      0.1891,
+      0.1843,
+      0.1911,
+      0.1988,
+      0.1801
+    ]
+  },
+  "real_fixed": {
+    "passed": true,
+    "argmins": [
+      50,
+      50,
+      50,
+      50,
+      50
+    ],
+    "all_interior": true,
+    "spread_steps": 0,
+    "n": 151,
+    "argmin_s": [
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0
+    ],
+    "depths": [
+      0.2051,
+      0.2233,
+      0.1923,
+      0.1915,
+      0.1871
+    ]
+  }
+}
