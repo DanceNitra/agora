@@ -1,0 +1,145 @@
+{
+  "description": "Candidate stateful conformance cases for the StoreAdapter surface. The published vectors at ac4468f grade the wire schema, the feed authenticator, the receipt signer and the semantic aggregator; measured under sys.settrace, 1 of 28 executable cases reaches a store adapter at all. These cases exercise adapter BEHAVIOUR instead, and each one names the flattering implementation it exists to catch.",
+  "status": "CANDIDATE. Proposed, not accepted. Being proposed or merged does not make these G2 or G4 evidence.",
+  "authored_by": {
+    "implementation": "inspeximus",
+    "author": "Rastislav Drahos",
+    "disclosure": "inspeximus is itself a G4 adapter candidate, so these cases are authored by an interested party. A separate producer must validate both implementations AND this fixture. Nothing here is independent evidence about inspeximus.",
+    "coupling": "Cases describe store state and expected receipt outcomes abstractly. No case names an inspeximus API. Binding an implementation is one function, `build_adapter(records)`, described in the runner."
+  },
+  "how_a_case_is_stated": {
+    "normative": "Where the expected outcome is written down in the specification. Expectations are quoted from the contract, never inferred from the case name. The runner refuses to score a case whose `normative` block is missing, because a case whose expectation nobody wrote down is a case that scores an opinion.",
+    "positive_control": "The adapter methods this case must actually reach. Verified by tracing the run. A case that never reaches the surface it claims to test passes for the wrong reason, which is the defect these cases exist to find.",
+    "mutation": "The flattering implementation this case must catch. The runner applies it and REQUIRES the case to fail. A fixture that has never been shown to fail is a fixture nobody has tested."
+  },
+
+  "adapter_cases": [
+    {
+      "id": "undeclared-derivative-must-not-reach-verified",
+      "why": "A store holding a derived artifact whose inputs were never declared cannot know what that artifact descends from, so it cannot know whether the retired proposition survives inside it. Reporting `verified` there is the difference between an honest receipt and a comfortable one.",
+      "normative": {
+        "source": "IDEA.md",
+        "quote": "No silent completeness: missing lineage, inaccessible stores, backups, provider logs, model weights, screenshots, and copied prose with severed lineage remain `partial` or `unknown`."
+      },
+      "store": {
+        "records": [
+          {"id": "diet", "text": "is vegetarian", "root": "fact:diet"},
+          {"id": "rest", "text": "prefers quiet restaurants", "root": "fact:rest"},
+          {"id": "budget", "text": "moderate budget", "root": "fact:budget"},
+          {"id": "summary", "text": "is vegetarian; prefers quiet restaurants; moderate budget", "derived": true, "derived_from": ["diet", "rest", "budget"]},
+          {"id": "orphan", "text": "digest whose summariser dropped its lineage", "derived": true, "derived_from": null}
+        ]
+      },
+      "erratum": {"operation": "supersede", "target_root": "fact:diet", "replacement": "eats meat again", "postconditions": {"negative": "vegetarian", "positive": "eats meat again", "preserve": "quiet restaurants|moderate budget"}},
+      "expect": {"checkpoint_coverage": "unknown", "aggregate": "unknown", "triad": {"negative": "pass", "positive": "pass", "preserve": "pass"}},
+      "note": "The triad passes and the aggregate is still `unknown`. That combination is the whole point: passing probes must not upgrade unresolved lineage.",
+      "positive_control": {"adapter_methods_required": ["lineage_complete", "quarantine_coverage", "enumerate", "coverage"]},
+      "mutation": {"target": "lineage_complete", "flattering_behaviour": "return True unconditionally", "must_produce": {"aggregate": "verified"}, "why": "This is a real shipped defect, not a hypothetical: inspeximus 2.8.0 answered `verified` for exactly this store and had to be fixed. An adapter cannot be trusted to report incompleteness it has no incentive to report."}
+    },
+    {
+      "id": "complete-lineage-does-reach-verified",
+      "why": "The discrimination twin of the case above, and the reason that one means anything. An adapter hard-wired to answer `unknown` passes every honesty case ever written while being useless. Without this case the suite rewards permanent pessimism exactly as much as honesty.",
+      "normative": {
+        "source": "prototype/receipts.py, aggregate_coverage",
+        "quote": "Aggregate success requires every required store to be `verified`."
+      },
+      "store": {
+        "records": [
+          {"id": "diet", "text": "is vegetarian", "root": "fact:diet"},
+          {"id": "rest", "text": "prefers quiet restaurants", "root": "fact:rest"},
+          {"id": "budget", "text": "moderate budget", "root": "fact:budget"},
+          {"id": "summary", "text": "is vegetarian; prefers quiet restaurants; moderate budget", "derived": true, "derived_from": ["diet", "rest", "budget"]}
+        ]
+      },
+      "erratum": {"operation": "supersede", "target_root": "fact:diet", "replacement": "eats meat again", "postconditions": {"negative": "vegetarian", "positive": "eats meat again", "preserve": "quiet restaurants|moderate budget"}},
+      "expect": {"checkpoint_coverage": "verified", "aggregate": "verified", "triad": {"negative": "pass", "positive": "pass", "preserve": "pass"}},
+      "positive_control": {"adapter_methods_required": ["lineage_complete", "quarantine_coverage", "enumerate", "coverage"]},
+      "mutation": {"target": "quarantine_coverage", "flattering_behaviour": "return unknown unconditionally", "must_produce": {"checkpoint_coverage": "unknown"}, "why": "Catches the constant-pessimist adapter that would otherwise score full marks on every honesty case in this file."}
+    },
+    {
+      "id": "repair-must-not-duplicate-a-preserved-proposition",
+      "why": "A repair that re-asserts inputs it never gated leaves the store asserting the same fact twice. The receipt cannot see it: preservation asks whether a term is recallable, and a duplicated fact is recallable exactly as well as a single one. This is a defect class the triad is structurally blind to, so it needs a case that reads the store.",
+      "normative": {
+        "source": "prototype/adapters.py, StoreAdapter.rebuild",
+        "quote": "rebuild(self, artifact_id, *, inputs: tuple[str, ...], replacement: str | None) -> str -- the rebuild is over the named inputs, so an input that was never gated is not part of what is being rebuilt."
+      },
+      "store": {
+        "records": [
+          {"id": "diet", "text": "is vegetarian", "root": "fact:diet"},
+          {"id": "rest", "text": "prefers quiet restaurants", "root": "fact:rest"},
+          {"id": "budget", "text": "moderate budget", "root": "fact:budget"},
+          {"id": "summary", "text": "is vegetarian; prefers quiet restaurants; moderate budget", "derived": true, "derived_from": ["diet", "rest", "budget"]}
+        ]
+      },
+      "erratum": {"operation": "supersede", "target_root": "fact:diet", "replacement": "eats meat again", "postconditions": {"negative": "vegetarian", "positive": "eats meat again", "preserve": "quiet restaurants|moderate budget"}},
+      "expect": {"aggregate": "verified", "store_property": {"duplicate_active_assertions": 0}},
+      "positive_control": {"adapter_methods_required": ["rebuild", "repair_inputs", "retire"]},
+      "mutation": {"target": "rebuild", "flattering_behaviour": "re-assert every named input, including inputs that were never gated and are still active", "must_produce": {"store_property": {"duplicate_active_assertions": 2}}, "why": "Our own defect. It survived a passing triad and was visible only by reading the store."}
+    },
+    {
+      "id": "erasure-evidence-must-be-content-free-and-non-trivial",
+      "why": "The published confidentiality case asks only whether a forbidden value is absent from the receipt. An importer whose repair returns an empty receipt satisfies that perfectly. Absence has to be absence FROM a receipt that did the work.",
+      "normative": {
+        "source": "spec/README.md",
+        "quote": "Erasure fixtures carry only fixed content-free protocol labels, timestamps, verdicts, and digests. They never contain a retired value or raw provider response."
+      },
+      "store": {
+        "records": [
+          {"id": "diet", "text": "is vegetarian", "root": "fact:diet"},
+          {"id": "rest", "text": "prefers quiet restaurants", "root": "fact:rest"}
+        ]
+      },
+      "erratum": {"operation": "erase", "target_root": "fact:diet", "postconditions": {"negative": "vegetarian", "preserve": "quiet restaurants"}},
+      "expect": {"receipt_property": {"forbidden_value_absent": "is vegetarian", "names_the_store": true, "is_non_trivial": true}, "store_property": {"erased_text_absent": "is vegetarian", "preserved_text_present": "prefers quiet restaurants"}},
+      "positive_control": {"adapter_methods_required": ["retire", "recall", "snapshot", "dispositions"]},
+      "mutation": {"target": "repair", "flattering_behaviour": "return a receipt whose serialised form is empty", "must_produce": {"receipt_property": {"names_the_store": false, "is_non_trivial": false}}, "why": "Measured on our own harness before this file existed: the empty-receipt stub scored a full pass on the published confidentiality case."}
+    },
+    {
+      "id": "collateral-must-survive-a-supersession",
+      "why": "A repair that satisfies the negative postcondition by deleting everything reachable is the cheapest possible cheat and passes any check that only asks whether the retired proposition is gone.",
+      "normative": {
+        "source": "IDEA.md",
+        "quote": "`summary:dining` mixes all three, so a repair that deletes it destroys retained memory and a repair that leaves it destroys the correction."
+      },
+      "store": {
+        "records": [
+          {"id": "diet", "text": "is vegetarian", "root": "fact:diet"},
+          {"id": "rest", "text": "prefers quiet restaurants", "root": "fact:rest"},
+          {"id": "budget", "text": "moderate budget", "root": "fact:budget"},
+          {"id": "pet", "text": "has a cat", "root": "fact:pet"}
+        ]
+      },
+      "erratum": {"operation": "supersede", "target_root": "fact:diet", "replacement": "eats meat again", "postconditions": {"negative": "vegetarian", "positive": "eats meat again", "preserve": "quiet restaurants|moderate budget"}},
+      "expect": {"triad": {"preserve": "pass"}, "store_property": {"unrelated_text_present": "has a cat", "preserved_text_present": "prefers quiet restaurants"}},
+      "positive_control": {"adapter_methods_required": ["recall", "retire", "enumerate"]},
+      "mutation": {"target": "retire", "flattering_behaviour": "retire every record in the store rather than the gated ones", "must_produce": {"triad": {"preserve": "fail"}}, "why": "Confirms the preservation arm can actually fail. A preservation check that never fails is a demonstration."}
+    }
+  ],
+
+  "validator_anti_vacuity_cases": [
+    {
+      "id": "empty-receipt-must-not-pass",
+      "why": "Not a claim about any adapter: a check on the VALIDATOR. Any pass condition of the form 'the forbidden value is not present' is satisfied perfectly by a receipt containing nothing.",
+      "applies_to": "validator",
+      "harness_mutation": "repair() returns an object whose serialised form is empty",
+      "must_produce": "the validator reports FAIL for the confidentiality case",
+      "measured": "Before this fixture existed, our own runner scored 28/28 against exactly this stub."
+    },
+    {
+      "id": "no-op-feed-verification-must-not-count-as-acceptance",
+      "why": "A check on the VALIDATOR. When an accept-side case passes on 'no exception was raised', a verify_feed that returns its input unchanged satisfies every accept case in the suite.",
+      "applies_to": "validator",
+      "harness_mutation": "verify_feed returns its input unchanged and never raises",
+      "must_produce": "the validator reports FAIL for every accept-side feed case, not only for the reject-side ones",
+      "measured": "Our runner passed key-rotation-valid and the split-view case against this stub until an acceptance was required to return every event."
+    },
+    {
+      "id": "constant-unknown-aggregator-must-not-pass",
+      "why": "A check on the VALIDATOR. Where most cases in a section legitimately expect `unknown`, an aggregator hard-wired to `unknown` scores most of that section without evaluating anything.",
+      "applies_to": "validator",
+      "harness_mutation": "the semantic aggregator returns `unknown` regardless of evidence",
+      "must_produce": "the validator reports FAIL, because the section must produce at least three distinct verdicts",
+      "measured": "Five of the eight published semantic cases passed against this stub in our runner."
+    }
+  ]
+}
