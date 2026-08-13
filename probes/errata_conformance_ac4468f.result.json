@@ -1,0 +1,268 @@
+{
+  "spec_commit": "ac4468faf73c2cc7949dd29b2a2a151f5bd23116",
+  "g2_digest": "7e0d6c88c1ca3a87743ac70ba2a3dfea0b350d112d2d3c59a3c6cbb537568f12",
+  "sections": {
+    "protocol-manifest / feed": [
+      {
+        "id": "key-rotation-valid",
+        "expected": "accept",
+        "actual": "accept",
+        "pass": true,
+        "detail": "",
+        "inspeximus_frames": []
+      },
+      {
+        "id": "rotated-key-reuse-invalid",
+        "expected": "reject",
+        "actual": "reject",
+        "pass": true,
+        "detail": "err_0002: signing key 'owner-v1' is not the active key 'owner-v2' at sequence 2.",
+        "inspeximus_frames": []
+      },
+      {
+        "id": "concurrent-sequence-conflict-invalid",
+        "expected": "reject",
+        "actual": "reject",
+        "pass": true,
+        "detail": "sequence 1 conflict: 'err_concurrent_a' and 'err_concurrent_b' both claim it. The owner has equivocated within this observed view, or the feed was spliced.",
+        "inspeximus_frames": []
+      },
+      {
+        "id": "invalid-target-invalid",
+        "expected": "reject",
+        "actual": "reject",
+        "pass": true,
+        "detail": "err_unknown_target: unknown target root 'mem_unregistered'. An erratum must name a root this importer accepted.",
+        "inspeximus_frames": []
+      }
+    ],
+    "protocol-manifest / split-view": [
+      {
+        "id": "owner-split-view-not-locally-detectable",
+        "expected": "accept-each-view-with-global-non-equivocation-unproven",
+        "actual": "accept-each-view; fingerprints differ; no local detector",
+        "pass": true,
+        "detail": "views accepted=[True, True] distinct_fingerprints=2/2",
+        "inspeximus_frames": []
+      }
+    ],
+    "protocol-manifest / confidentiality": [
+      {
+        "id": "erasure-evidence-content-free",
+        "expected": "erased content absent from the receipt",
+        "actual": "absent",
+        "pass": true,
+        "detail": "searched 824 serialised bytes for 'is vegetarian'",
+        "inspeximus_frames": [
+          "core.py:_save",
+          "core.py:items",
+          "llm_errata.py:<genexpr>",
+          "llm_errata.py:__init__",
+          "llm_errata.py:_coverage",
+          "llm_errata.py:_flush",
+          "llm_errata.py:_names_root",
+          "llm_errata.py:_own_source",
+          "llm_errata.py:_records",
+          "llm_errata.py:coverage",
+          "llm_errata.py:dispositions",
+          "llm_errata.py:enumerate",
+          "llm_errata.py:is_quarantined",
+          "llm_errata.py:lineage_complete",
+          "llm_errata.py:quarantine",
+          "llm_errata.py:quarantine_coverage",
+          "llm_errata.py:recall",
+          "llm_errata.py:repair_inputs",
+          "llm_errata.py:retire",
+          "llm_errata.py:snapshot",
+          "llm_errata.py:source_artifact"
+        ]
+      }
+    ],
+    "receipt-binding-mutations": [
+      {
+        "id": "receipt-field:importer",
+        "expected": "signature fails",
+        "actual": "signature fails",
+        "pass": true,
+        "detail": "bound",
+        "inspeximus_frames": []
+      },
+      {
+        "id": "receipt-field:erratum_id",
+        "expected": "signature fails",
+        "actual": "signature fails",
+        "pass": true,
+        "detail": "bound",
+        "inspeximus_frames": []
+      },
+      {
+        "id": "receipt-field:sequence",
+        "expected": "signature fails",
+        "actual": "signature fails",
+        "pass": true,
+        "detail": "bound",
+        "inspeximus_frames": []
+      },
+      {
+        "id": "receipt-field:target_root",
+        "expected": "signature fails",
+        "actual": "signature fails",
+        "pass": true,
+        "detail": "bound",
+        "inspeximus_frames": []
+      },
+      {
+        "id": "receipt-field:operation",
+        "expected": "signature fails",
+        "actual": "signature fails",
+        "pass": true,
+        "detail": "bound",
+        "inspeximus_frames": []
+      },
+      {
+        "id": "receipt-field:pre_state_root",
+        "expected": "signature fails",
+        "actual": "signature fails",
+        "pass": true,
+        "detail": "bound",
+        "inspeximus_frames": []
+      },
+      {
+        "id": "receipt-field:post_state_root",
+        "expected": "signature fails",
+        "actual": "signature fails",
+        "pass": true,
+        "detail": "bound",
+        "inspeximus_frames": []
+      },
+      {
+        "id": "receipt-field:stores",
+        "expected": "signature fails",
+        "actual": "signature fails",
+        "pass": true,
+        "detail": "bound",
+        "inspeximus_frames": []
+      },
+      {
+        "id": "receipt-field:dispositions",
+        "expected": "signature fails",
+        "actual": "signature fails",
+        "pass": true,
+        "detail": "bound",
+        "inspeximus_frames": []
+      },
+      {
+        "id": "receipt-field:triad",
+        "expected": "signature fails",
+        "actual": "signature fails",
+        "pass": true,
+        "detail": "bound",
+        "inspeximus_frames": []
+      },
+      {
+        "id": "receipt-field:aggregate",
+        "expected": "signature fails",
+        "actual": "signature fails",
+        "pass": true,
+        "detail": "bound",
+        "inspeximus_frames": []
+      },
+      {
+        "id": "receipt-field:limitations",
+        "expected": "signature fails",
+        "actual": "signature fails",
+        "pass": true,
+        "detail": "bound",
+        "inspeximus_frames": []
+      },
+      {
+        "id": "receipt-field:history_retained",
+        "expected": "signature fails",
+        "actual": "signature fails",
+        "pass": true,
+        "detail": "bound",
+        "inspeximus_frames": []
+      },
+      {
+        "id": "receipt-field:adapter_versions",
+        "expected": "signature fails",
+        "actual": "signature fails",
+        "pass": true,
+        "detail": "bound",
+        "inspeximus_frames": []
+      }
+    ],
+    "semantic fixtures": [
+      {
+        "id": "semantic:verified-correction",
+        "expected": "verified",
+        "actual": "verified",
+        "pass": true,
+        "detail": "3 probes, 3 observations",
+        "inspeximus_frames": []
+      },
+      {
+        "id": "semantic:failed-supersession",
+        "expected": "failed",
+        "actual": "failed",
+        "pass": true,
+        "detail": "3 probes, 3 observations",
+        "inspeximus_frames": []
+      },
+      {
+        "id": "semantic:unknown-erasure",
+        "expected": "unknown",
+        "actual": "unknown",
+        "pass": true,
+        "detail": "2 probes, 2 observations",
+        "inspeximus_frames": []
+      },
+      {
+        "id": "semantic:provider-error",
+        "expected": "unknown",
+        "actual": "unknown",
+        "pass": true,
+        "detail": "3 probes, 3 observations",
+        "inspeximus_frames": []
+      },
+      {
+        "id": "semantic:missing-response",
+        "expected": "unknown",
+        "actual": "unknown",
+        "pass": true,
+        "detail": "3 probes, 2 observations",
+        "inspeximus_frames": []
+      },
+      {
+        "id": "semantic:duplicate-response",
+        "expected": "unknown",
+        "actual": "unknown",
+        "pass": true,
+        "detail": "3 probes, 4 observations",
+        "inspeximus_frames": []
+      },
+      {
+        "id": "semantic:configuration-drift",
+        "expected": "unknown",
+        "actual": "unknown",
+        "pass": true,
+        "detail": "3 probes, 3 observations",
+        "inspeximus_frames": []
+      },
+      {
+        "id": "semantic:nonconforming-output",
+        "expected": "unknown",
+        "actual": "unknown",
+        "pass": true,
+        "detail": "3 probes, 3 observations",
+        "inspeximus_frames": []
+      }
+    ]
+  },
+  "totals": {
+    "cases": 28,
+    "passed": 28,
+    "cases_executing_inspeximus": 1,
+    "cases_reference_only": 27
+  }
+}
