@@ -21,6 +21,23 @@ ROOT = Path(__file__).resolve().parents[1]
 SITE = "https://dancenitra.github.io/agora/public"
 
 META = {
+    "a-green-suite-that-never-ran": {
+        "slug": "a-green-suite-that-never-ran",
+        "title": "A green test suite that never ran 156 of its tests",
+        "title_sk": "Zelená testovacia suita, ktorá 156 svojich testov nikdy nespustila",
+        "desc": "Our suite reported 2813 passed while 156 test functions had never been collected in the "
+                "CI base image. A module-level pytest.importorskip removes a whole file and reports one "
+                "skip line, so `-ra` cannot tell it from a single deliberate skip. Script, controls, and "
+                "the two ways we measured it wrong first.",
+        "desc_sk": "Suita hlásila 2813 passed, kým 156 testovacích funkcií sa v CI base image nikdy "
+                   "nezozbieralo. `pytest.importorskip` na úrovni modulu odstráni celý súbor a nahlási "
+                   "jeden riadok, takže `-ra` ho nerozlíši od jedného zámerného preskočenia. Skript, "
+                   "kontroly a dve chyby, ktoré sme pri meraní spravili najprv.",
+        "date": "2026-08-13", "modified": "2026-08-13",
+        "tags": "Testing · pytest · CI · Reproducibility · Measurement",
+        "tags_sk": "Testovanie · pytest · CI · Reprodukovateľnosť · Meranie",
+        "kicker": "Engineering · measurement", "kicker_sk": "Inžinierstvo · meranie",
+    },
     "self-audit-32": {
         "slug": "labels-failed-more-than-measurements",
         "title": "Labels failed more than measurements: severe-testing our AI's 32 confident findings",
