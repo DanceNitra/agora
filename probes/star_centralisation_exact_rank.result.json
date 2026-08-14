@@ -1,0 +1,107 @@
+{
+  "n": 7,
+  "s": 1.5,
+  "shapes": 11,
+  "labeled_total": 16807,
+  "star_mean_pairwise_mi": 0.3938439783672394,
+  "star_exact_rank": 1,
+  "labeled_strictly_above": 0,
+  "monotone_in_max_degree": true,
+  "mean_mi_by_max_degree": {
+    "2": 0.1909417845111916,
+    "3": 0.2149876970062349,
+    "4": 0.24491642196301655,
+    "5": 0.29165984773941506,
+    "6": 0.3938439783672394
+  },
+  "rows": [
+    {
+      "max_degree": 6,
+      "count": 7,
+      "gap": 0.4715247637144313,
+      "mean_pairwise_mi": 0.3938439783672394,
+      "degenerate": false,
+      "is_star": true
+    },
+    {
+      "max_degree": 5,
+      "count": 210,
+      "gap": 0.46543542479446876,
+      "mean_pairwise_mi": 0.29165984773941506,
+      "degenerate": false,
+      "is_star": false
+    },
+    {
+      "max_degree": 4,
+      "count": 840,
+      "gap": 0.45383455240633586,
+      "mean_pairwise_mi": 0.26638358979981935,
+      "degenerate": false,
+      "is_star": false
+    },
+    {
+      "max_degree": 3,
+      "count": 630,
+      "gap": 0.18416219540793577,
+      "mean_pairwise_mi": 0.2638321012745945,
+      "degenerate": false,
+      "is_star": false
+    },
+    {
+      "max_degree": 4,
+      "count": 420,
+      "gap": 0.16075939117054494,
+      "mean_pairwise_mi": 0.25869250847947145,
+      "degenerate": false,
+      "is_star": false
+    },
+    {
+      "max_degree": 4,
+      "count": 1260,
+      "gap": 0.5867138272530759,
+      "mean_pairwise_mi": 0.20967316760975885,
+      "degenerate": false,
+      "is_star": false
+    },
+    {
+      "max_degree": 3,
+      "count": 2520,
+      "gap": 0.5407136060275106,
+      "mean_pairwise_mi": 0.20898889052118388,
+      "degenerate": false,
+      "is_star": false
+    },
+    {
+      "max_degree": 3,
+      "count": 2520,
+      "gap": 0.42780640063825803,
+      "mean_pairwise_mi": 0.20853784352977267,
+      "degenerate": false,
+      "is_star": false
+    },
+    {
+      "max_degree": 3,
+      "count": 5040,
+      "gap": 0.5525826776272451,
+      "mean_pairwise_mi": 0.1994595423155744,
+      "degenerate": false,
+      "is_star": false
+    },
+    {
+      "max_degree": 3,
+      "count": 840,
+      "gap": 0.7342200718211682,
+      "mean_pairwise_mi": 0.19412010739004912,
+      "degenerate": false,
+      "is_star": false
+    },
+    {
+      "max_degree": 2,
+      "count": 2520,
+      "gap": 0.518599938179618,
+      "mean_pairwise_mi": 0.1909417845111916,
+      "degenerate": false,
+      "is_star": false
+    }
+  ]
+}
