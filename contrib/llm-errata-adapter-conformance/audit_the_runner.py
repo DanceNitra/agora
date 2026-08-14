@@ -62,19 +62,22 @@ def main(argv=None):
                      rc != 0 and "is NOT a caught mutation" in out))
         restore()
 
-        # GUARD 2 -- the positive control must bind to the adapter INSTANCE, not a function name.
-        # `sign` exists in the process (the signer) but is never called on the adapter, so a
-        # name-matching tracer accepts it and an instance-bound one does not.
+        # GUARD 2 -- the positive control must be able to call a declared method INERT.
+        # The old guard tested a name-matching tracer and stopped applying when the control became a
+        # stub test; it reported DOES NOT FIRE, which is the audit working. `coverage_detail` is on
+        # the adapter but the repair path never consults it, so declaring it must be caught. Then the
+        # control loop is forced to mark everything load-bearing and the same case must go green,
+        # which is what proves the guard is reading the control rather than the weather.
         fx = json.loads(orig_fx)
-        fx["adapter_cases"][0]["positive_control"]["adapter_methods_required"].append("sign")
+        fx["adapter_cases"][0]["positive_control"]["adapter_methods_required"].append("coverage_detail")
         io.open(FIXTURE, "w", encoding="utf-8", newline="\n").write(json.dumps(fx, indent=2))
-        patch_runner("        self.target = target", "        self.target = None  # MUTANT")
-        _, lax_out = run()
-        io.open(RUNNER, "w", encoding="utf-8", newline="\n").write(orig_py)
-        _, strict_out = run()
-        lax_accepts = "MISSING" not in lax_out.split("complete-lineage")[0]
-        strict_rejects = "MISSING ['sign']" in strict_out
-        rows.append(("tracing is bound to the target instance", lax_accepts and strict_rejects))
+        _, honest = run()
+        catches_inert = "coverage_detail" in honest and "INERT" in honest
+        patch_runner("            (load_bearing if noticed else inert).append(method)",
+                     "            (load_bearing).append(method)  # MUTANT: nothing is ever inert")
+        _, blind = run()
+        misses_inert = "INERT" not in blind
+        rows.append(("an inert declared method is caught", catches_inert and misses_inert))
         restore()
 
         # GUARD 3 -- an unbound source tree must be refused, not scored.

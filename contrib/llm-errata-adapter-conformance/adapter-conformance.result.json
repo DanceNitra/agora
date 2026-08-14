@@ -198,8 +198,8 @@
       "pass": false,
       "expectation_met": false,
       "failures": [
-        "aggregate: expected one of ['verified'], got failed",
-        "triad.positive: expected pass, got fail"
+        "unspecified triad.positive = fail (case did not declare it; it must still conform)",
+        "unspecified aggregate = failed (case did not declare it; it must still conform)"
       ],
       "normative_source": "IDEA.md",
       "methods_required": [

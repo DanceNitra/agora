@@ -5,7 +5,7 @@
       "fires": true
     },
     {
-      "guard": "tracing is bound to the target instance",
+      "guard": "an inert declared method is caught",
       "fires": true
     },
     {
