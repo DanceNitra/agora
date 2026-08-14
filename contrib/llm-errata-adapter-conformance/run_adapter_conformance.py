@@ -28,7 +28,7 @@ TO RUN IT AGAINST YOUR OWN STORE, implement one class (see `InspeximusBinding` a
         name = "your-store"
         def build(self, records):   # -> (StoreAdapter, handle)
         def active_texts(self, handle):  # -> list[str] of currently-asserted propositions
-        def raw_dump(self, handle):      # -> str, EVERYTHING persisted, ensure_ascii=False
+        def persisted_paths(self, handle):   # -> [str] files the store writes; the runner reads them
 
     python run_adapter_conformance.py --pkg <dir with prototype/> --binding your.module:YourBinding
 """
@@ -220,7 +220,7 @@ def evaluate(case, binding, pkg, mutate=False, stub_method=None):
     # above. Measured: such an adapter scored a full PASS on the erasure case while the store still
     # held "is vegetarian" verbatim. Erasure has to be checked against the PERSISTED state, so the
     # binding must hand over everything it wrote.
-    raw = binding.raw_dump(handle) if hasattr(binding, "raw_dump") else None
+    raw, channel_note = read_channel(binding, handle, adapter)
 
     # SELF-ATTESTATION. `active_texts` is written by the implementation under test; a binding that
     # returns a hard-coded list is never contradicted. Cross-check each answer against the adapter's
@@ -249,6 +249,7 @@ def evaluate(case, binding, pkg, mutate=False, stub_method=None):
         "state_roots_differ": (receipt.to_dict().get("pre_state_root")
                                != receipt.to_dict().get("post_state_root"))}
     observed["_raw"] = raw
+    observed["channel"] = channel_note
     observed["_texts"] = texts
     observed["_blob"] = blob
     observed["methods_reached"] = sorted(t.hits)
@@ -274,6 +275,53 @@ def _present(needle, haystack):
         return needle in haystack.encode("ascii", "ignore").decode("unicode_escape")
     except Exception:
         return False
+
+
+def read_channel(binding, handle, adapter):
+    """Read what the store PERSISTED, through a channel the implementation cannot narrate.
+
+    WHY THIS REPLACED `raw_dump()`. Three audit rounds found 6, 10 and 10 defects and the rate never
+    fell, because every fix patched the reported hole while the class survived: the suite asked the
+    implementation under test to describe itself. Each round then produced a new way to answer
+    dishonestly -- an empty dump, a `{}` dump, a hard-coded text list, a self-declared name. Adding a
+    fourth check of the same kind was never going to work.
+
+    So the binding no longer hands us a string. It declares WHERE it persists, via
+    `persisted_paths(handle)`, and this function reads those bytes itself.
+
+    A path can be lied about too, which is why the channel carries its own positive control. A unique
+    sentinel is written through the adapter's own `rebuild()` -- protocol surface, nothing
+    implementation-specific -- and must then appear in the bytes read back. If it does not, the
+    declared path is not where this store writes, and every conclusion drawn from those bytes would
+    be about the wrong file. That case fails CLOSED and says so, rather than reporting a clean
+    erasure over a file nobody is writing to.
+
+    Returns (text, note). `text` is None when the channel could not be established.
+    """
+    paths = []
+    if hasattr(binding, "persisted_paths"):
+        paths = [p for p in (binding.persisted_paths(handle) or []) if p]
+    if not paths:
+        return None, "the binding declares no persisted_paths(), so nothing can be read independently"
+
+    sentinel = "conformance-channel-canary-%s" % abs(hash(tuple(paths))) 
+    try:
+        adapter.rebuild("__channel_probe__", inputs=(), replacement=sentinel)
+    except Exception as exc:
+        return None, "could not write a canary through rebuild(): %s" % type(exc).__name__
+
+    blob = []
+    for path in paths:
+        try:
+            blob.append(io.open(path, "r", encoding="utf-8", errors="replace").read())
+        except Exception as exc:
+            return None, "declared path %r is unreadable: %s" % (path, type(exc).__name__)
+    text = "\n".join(blob)
+
+    if not _present(sentinel, text):
+        return None, ("the canary written through rebuild() does not appear in the declared "
+                      "persisted_paths, so those files are not where this store writes")
+    return text, "channel verified via canary across %d file(s)" % len(paths)
 
 
 def compare(case, observed, strict=True):
@@ -329,14 +377,13 @@ def compare(case, observed, strict=True):
             raw = observed.get("_raw")
             texts = observed.get("_texts") or []
             if not raw:
-                fails.append("raw_dump() returned nothing, so erasure cannot be distinguished from "
-                             "concealment. Absent evidence is not evidence of absence and this case "
-                             "fails closed.")
-            elif not all(t in raw for t in texts if t):
-                # The dump must at least contain what the store admits is active, or it is not a
-                # dump of the store: a binding could otherwise return "{}" and satisfy any search.
-                fails.append("raw_dump() does not contain the store's own active propositions, so it "
-                             "is not a faithful dump and cannot be searched for a retained value")
+                fails.append("no verified persistence channel (%s), so erasure cannot be "
+                             "distinguished from concealment. Absent evidence is not evidence of "
+                             "absence and this case fails closed."
+                             % observed.get("channel", "unknown"))
+            elif not all(_present(t, raw) for t in texts if t):
+                fails.append("the persisted bytes do not contain the store's own active "
+                             "propositions, so the declared files are not a faithful record of it")
             elif _present(want, raw):
                 fails.append("CONCEALED, not erased: %r survives in the persisted state" % want)
     for prop, want in (exp.get("receipt_property") or {}).items():
@@ -597,13 +644,15 @@ class InspeximusBinding:
     def active_texts(self, handle):
         return [r.get("text") for r in handle.items if r.get("status") == "active"]
 
-    def raw_dump(self, handle):
-        """EVERYTHING this store persisted, not just what it will admit to recalling.
+    def persisted_paths(self, handle):
+        """WHERE this store writes, so the runner can read the bytes itself.
 
-        Without this an erasure case cannot tell erasure from concealment: an adapter that moves
-        the value into a side field and demotes the record satisfies every present-tense check.
+        Deliberately not a dump. A dump is the implementation's account of itself, and three audit
+        rounds showed every such account can be made to lie -- empty, `{}`, or hard-coded. A path
+        can be lied about too, so the runner writes a canary through the protocol and requires it to
+        appear here before trusting anything read from these files.
         """
-        return json.dumps(handle.items, default=str, ensure_ascii=False)
+        return [getattr(handle, "path", None)]
 
 
 if __name__ == "__main__":

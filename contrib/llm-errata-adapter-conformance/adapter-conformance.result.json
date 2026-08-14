@@ -47,6 +47,7 @@
           "snapshot_is_non_empty": true,
           "state_roots_differ": true
         },
+        "channel": "channel verified via canary across 1 file(s)",
         "methods_reached": [
           "_assert",
           "_flush",
@@ -112,6 +113,7 @@
           "snapshot_is_non_empty": true,
           "state_roots_differ": true
         },
+        "channel": "channel verified via canary across 1 file(s)",
         "methods_reached": [
           "_assert",
           "_flush",
@@ -174,6 +176,7 @@
           "snapshot_is_non_empty": true,
           "state_roots_differ": true
         },
+        "channel": "channel verified via canary across 1 file(s)",
         "methods_reached": [
           "_flush",
           "_names_root",
@@ -198,8 +201,8 @@
       "pass": false,
       "expectation_met": false,
       "failures": [
-        "unspecified triad.positive = fail (case did not declare it; it must still conform)",
-        "unspecified aggregate = failed (case did not declare it; it must still conform)"
+        "aggregate: expected one of ['verified'], got failed",
+        "triad.positive: expected pass, got fail"
       ],
       "normative_source": "IDEA.md",
       "methods_required": [
@@ -238,6 +241,7 @@
           "snapshot_is_non_empty": true,
           "state_roots_differ": false
         },
+        "channel": "channel verified via canary across 1 file(s)",
         "methods_reached": [
           "_flush",
           "_names_root",
