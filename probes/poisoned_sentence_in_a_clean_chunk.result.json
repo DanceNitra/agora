@@ -1,0 +1,118 @@
+{
+  "isolation": {
+    "whole_chunk_clean_sentences_surviving": 0,
+    "split_clean_sentences_surviving": 4,
+    "clean_sentences_total": 4,
+    "poison_gone_whole": true,
+    "poison_gone_split": true
+  },
+  "split_error": {
+    "cases": 10,
+    "wrong": 3,
+    "rows": [
+      {
+        "text": "The dose was approx. 3.5 mg. The patient tolerated it.",
+        "expected": 2,
+        "got": 2,
+        "ok": true,
+        "pieces": [
+          "The dose was approx. 3.5 mg.",
+          "The patient tolerated it."
+        ]
+      },
+      {
+        "text": "Dr. Smith reviewed the chart. She signed off at 4 p.m. today.",
+        "expected": 2,
+        "got": 3,
+        "ok": false,
+        "pieces": [
+          "Dr.",
+          "Smith reviewed the chart.",
+          "She signed off at 4 p.m. today."
+        ]
+      },
+      {
+        "text": "He said \"this is fine. really.\" Then he left.",
+        "expected": 2,
+        "got": 1,
+        "ok": false,
+        "pieces": [
+          "He said \"this is fine. really.\" Then he left."
+        ]
+      },
+      {
+        "text": "See https://example.com/a.b.c for details. It is current.",
+        "expected": 2,
+        "got": 2,
+        "ok": true,
+        "pieces": [
+          "See https://example.com/a.b.c for details.",
+          "It is current."
+        ]
+      },
+      {
+        "text": "J. R. R. Tolkien wrote it. The edition is from 1954.",
+        "expected": 2,
+        "got": 5,
+        "ok": false,
+        "pieces": [
+          "J.",
+          "R.",
+          "R.",
+          "Tolkien wrote it.",
+          "The edition is from 1954."
+        ]
+      },
+      {
+        "text": "The ratio is 1.5 to 2.0. That is within tolerance.",
+        "expected": 2,
+        "got": 2,
+        "ok": true,
+        "pieces": [
+          "The ratio is 1.5 to 2.0.",
+          "That is within tolerance."
+        ]
+      },
+      {
+        "text": "Wait... he actually said that? Yes.",
+        "expected": 2,
+        "got": 2,
+        "ok": true,
+        "pieces": [
+          "Wait... he actually said that?",
+          "Yes."
+        ]
+      },
+      {
+        "text": "It costs 4.99 USD. Shipping is extra.",
+        "expected": 2,
+        "got": 2,
+        "ok": true,
+        "pieces": [
+          "It costs 4.99 USD.",
+          "Shipping is extra."
+        ]
+      },
+      {
+        "text": "The meeting is on Jan. 5. Bring the report.",
+        "expected": 2,
+        "got": 2,
+        "ok": true,
+        "pieces": [
+          "The meeting is on Jan. 5.",
+          "Bring the report."
+        ]
+      },
+      {
+        "text": "She works at Acme Inc. and lives nearby.",
+        "expected": 1,
+        "got": 1,
+        "ok": true,
+        "pieces": [
+          "She works at Acme Inc. and lives nearby."
+        ]
+      }
+    ]
+  },
+  "split_error_rate": 0.3
+}
