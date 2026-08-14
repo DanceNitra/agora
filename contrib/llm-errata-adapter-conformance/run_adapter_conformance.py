@@ -45,14 +45,23 @@ RESULT = os.path.join(HERE, "adapter-conformance.result.json")
 
 
 class Tracer:
-    """Record which adapter methods a case actually reached, for the positive controls."""
+    """Record which adapter methods ran ON THE TARGET INSTANCE.
 
-    def __init__(self):
+    The first version recorded `frame.f_code.co_name` globally, so a positive control asking for
+    `coverage`, `retire` or `rebuild` was satisfied by ANY function of that name anywhere in the
+    process -- the reference adapters, the controller, the standard library. Reported upstream as a
+    false-pass gap and it was correct: a name is not a call on the object under test. Binding to
+    `frame.f_locals['self'] is adapter` makes the control mean what it says.
+    """
+
+    def __init__(self, target=None):
         self.hits = set()
+        self.target = target
 
     def _trace(self, frame, event, arg):
         if event == "call":
-            self.hits.add(frame.f_code.co_name)
+            if self.target is None or frame.f_locals.get("self") is self.target:
+                self.hits.add(frame.f_code.co_name)
         return None
 
     def __enter__(self):
@@ -150,7 +159,7 @@ def evaluate(case, binding, pkg, mutate=False):
                        case["erratum"]["target_root"])
 
     observed = {}
-    with Tracer() as t:
+    with Tracer(target=adapter) as t:
         checkpoint = importer.quarantine(err)
         rows = [r for r in checkpoint.adapters if r.name == getattr(adapter, "name", "")]
         observed["checkpoint_coverage"] = str(getattr(rows[0].coverage, "value", rows[0].coverage)) \
@@ -173,9 +182,25 @@ def evaluate(case, binding, pkg, mutate=False):
     return observed
 
 
-def compare(case, observed):
-    """Compare observation to the case's stated expectation. Returns (ok, failures)."""
+def compare(case, observed, strict=True):
+    """Compare observation to the case's stated expectation. Returns (ok, failures).
+
+    STRICT means an outcome the case did not mention must still be conforming. Without it, a case
+    declaring only `triad.preserve` reported PASS while its own baseline carried `aggregate=failed`
+    and `triad.positive=fail`: preservation was observed, the repair was not conforming, and the
+    partial expectation hid it. Reported upstream, correct, and it led to a real finding -- see
+    probes/rebuildstrategy_loses_the_replacement_without_a_descendant.py. An unmentioned outcome is
+    now required to be clean rather than assumed to be irrelevant.
+    """
     exp, fails = case["expect"], []
+    if strict:
+        for arm, got in observed.get("triad", {}).items():
+            if arm not in (exp.get("triad") or {}) and got != "pass":
+                fails.append("unspecified triad.%s = %s (case did not declare it; it must still "
+                             "conform)" % (arm, got))
+        if "aggregate" not in exp and observed.get("aggregate") not in (None, "verified"):
+            fails.append("unspecified aggregate = %s (case did not declare it; it must still "
+                         "conform)" % observed.get("aggregate"))
     for key in ("checkpoint_coverage", "aggregate"):
         if key in exp and observed.get(key) != exp[key]:
             fails.append("%s: expected %s, got %s" % (key, exp[key], observed.get(key)))
@@ -204,10 +229,80 @@ def compare(case, observed):
     return (not fails), fails
 
 
+def check_must_produce(wanted, observed):
+    """Did the mutation produce the exact counter-result the case declared? Returns failures."""
+    bad = []
+    for key, want in wanted.items():
+        if key == "triad":
+            for arm, val in want.items():
+                if observed.get("triad", {}).get(arm) != val:
+                    bad.append("triad.%s expected %s, got %s"
+                               % (arm, val, observed.get("triad", {}).get(arm)))
+        elif key in ("store_property", "receipt_property"):
+            for prop, val in want.items():
+                if observed.get(key, {}).get(prop) != val:
+                    bad.append("%s.%s expected %s, got %s"
+                               % (key, prop, val, observed.get(key, {}).get(prop)))
+        elif observed.get(key) != want:
+            bad.append("%s expected %s, got %s" % (key, want, observed.get(key)))
+    return bad
+
+
+def verify_citation(case, pkg):
+    """The quote must actually appear in the file the case names, inside the pinned source tree.
+
+    A non-empty string was previously enough, so a citation could name any file and say anything.
+    Reported upstream as a source-binding gap. Checking the text against the tree makes a wrong or
+    invented citation a run failure instead of a formatting detail.
+    """
+    src = case["normative"]["source"].split(",")[0].strip()
+    path = os.path.join(pkg, src)
+    if not os.path.exists(path):
+        return "cited source %r does not exist in the pinned tree" % src
+    body = io.open(path, encoding="utf-8", errors="replace").read()
+    # Normalise FORMATTING only, never content: collapse whitespace, because the sources wrap their
+    # prose and a correct quote can differ from the file by a newline, and drop markdown emphasis and
+    # code ticks, because `**No silent completeness:**` and "No silent completeness:" are the same
+    # sentence. That second case is not hypothetical -- it is what this check caught on its first run
+    # against the full tree, on our own citation.
+    def norm(text):
+        # `**` and backticks only. Stripping a bare `*` turned a quoted signature's keyword-only
+        # marker into nothing and made a correct citation look wrong.
+        return " ".join(text.replace("**", "").replace("`", "").split())
+
+    quote = norm(case["normative"]["quote"])
+    hay = norm(body)
+    core = quote.split(" -- ")[0].strip().strip('"')
+    if core not in hay:
+        return "quoted text is not present in %s: %r" % (src, core[:70])
+    return None
+
+
+def source_digest(pkg):
+    """A deterministic digest of the source tree actually scored, so `--pkg` cannot be arbitrary."""
+    import hashlib
+    h = hashlib.sha256()
+    roots = [os.path.join(pkg, "prototype"), os.path.join(pkg, "spec")]
+    files = []
+    for root in roots:
+        for base, _dirs, names in os.walk(root):
+            if "__pycache__" in base:
+                continue
+            for n in sorted(names):
+                if n.endswith((".py", ".json", ".md")):
+                    files.append(os.path.join(base, n))
+    for path in sorted(files):
+        h.update(os.path.relpath(path, pkg).replace("\\", "/").encode("utf-8"))
+        h.update(io.open(path, "rb").read())
+    return h.hexdigest(), len(files)
+
+
 def main(argv=None):
     ap = argparse.ArgumentParser()
     ap.add_argument("--pkg", required=True, help="directory containing prototype/")
     ap.add_argument("--binding", default=None, help="module:Class implementing build/active_texts")
+    ap.add_argument("--pkg-digest", default=None,
+                    help="refuse to run unless the scored tree hashes to this")
     ap.add_argument("--inspeximus", default=r"C:/Users/Danculus/inspeximus-repo")
     a = ap.parse_args(argv)
     sys.path.insert(0, a.pkg)
@@ -221,8 +316,29 @@ def main(argv=None):
         binding = InspeximusBinding()
 
     fixture = json.load(io.open(FIXTURE, encoding="utf-8"))
-    out = {"fixture_status": fixture["status"], "binding": binding.name, "cases": []}
+
+    # SOURCE BINDING. The target commit and digest used to appear only in prose, so any tree handed
+    # to --pkg could be scored and reported under this fixture's name. Reported upstream as a
+    # source-binding gap. The adapter's own pin is asserted, the scored tree is digested, and
+    # --pkg-digest makes that binding enforceable rather than merely recorded.
+    from inspeximus.integrations.llm_errata import SPEC_COMMIT, SPEC_G2_DIGEST
+    target = fixture.get("target", {})
+    if target.get("commit") and SPEC_COMMIT != target["commit"]:
+        raise AssertionError("the adapter is bound to %s but the fixture targets %s"
+                             % (SPEC_COMMIT[:12], target["commit"][:12]))
+    if target.get("g2_digest") and SPEC_G2_DIGEST != target["g2_digest"]:
+        raise AssertionError("the adapter carries a different G2 digest than the fixture targets")
+    tree_digest, n_files = source_digest(a.pkg)
+    if a.pkg_digest and a.pkg_digest.strip().lower() != tree_digest:
+        raise AssertionError("REFUSED: --pkg does not match the declared source digest.\n"
+                             "  declared : %s\n  scored   : %s" % (a.pkg_digest.strip(), tree_digest))
+
+    out = {"fixture_status": fixture["status"], "binding": binding.name,
+           "spec_commit": SPEC_COMMIT, "g2_digest": SPEC_G2_DIGEST,
+           "scored_tree_digest": tree_digest, "scored_files": n_files, "cases": []}
     print("Candidate adapter conformance -- binding: %s" % binding.name)
+    print("adapter bound to %s | scored tree %s (%d files)"
+          % (SPEC_COMMIT[:12], tree_digest[:16], n_files))
     print("%s\n" % fixture["status"])
 
     passed = 0
@@ -230,6 +346,9 @@ def main(argv=None):
         # RULE 1: an expectation nobody wrote down is an opinion, not a conformance requirement.
         if not case.get("normative", {}).get("quote"):
             raise AssertionError("case %r has no normative citation; refusing to score it" % case["id"])
+        bad_cite = verify_citation(case, a.pkg)
+        if bad_cite:
+            raise AssertionError("case %r: %s" % (case["id"], bad_cite))
 
         observed = evaluate(case, binding, a.pkg, mutate=False)
         ok, fails = compare(case, observed)
@@ -241,13 +360,32 @@ def main(argv=None):
         missing = sorted(required - reached)
 
         # RULE 3: the case must fail against the flattering implementation it names.
+        # An exception is NOT a caught mutation. The first version credited any raise, so a mutation
+        # that simply crashed on installation earned the same score as one that produced the semantic
+        # counter-result it declared. Reported upstream as a false-pass and it was right: a broken
+        # mutation proves nothing about the case. A raise now fails the case unless the case names the
+        # exception it expects.
+        expects_raise = case["mutation"].get("expected_exception")
         try:
             mutated = evaluate(case, binding, a.pkg, mutate=True)
             mut_ok, _ = compare(case, mutated)
             mutation_caught = not mut_ok
             mut_note = "case failed as required" if mutation_caught else "CASE STILL PASSED"
+            # The mutation must produce the SPECIFIC counter-result it declared, not merely any
+            # failure: a mutation that breaks the case for an unrelated reason is not evidence.
+            wanted = case["mutation"].get("must_produce") or {}
+            if mutation_caught and wanted:
+                bad = check_must_produce(wanted, mutated)
+                if bad:
+                    mutation_caught = False
+                    mut_note = "failed, but not as declared: %s" % "; ".join(bad)
         except Exception as exc:
-            mutation_caught, mut_note = True, "raised %s" % type(exc).__name__
+            if expects_raise and type(exc).__name__ == expects_raise:
+                mutation_caught, mut_note = True, "raised %s as declared" % expects_raise
+            else:
+                mutation_caught = False
+                mut_note = ("raised %s, which is NOT a caught mutation: a crash is not the declared "
+                            "counter-result" % type(exc).__name__)
 
         good = ok and control_ok and mutation_caught
         passed += bool(good)
