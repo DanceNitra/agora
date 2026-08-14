@@ -17,9 +17,28 @@ remains was computed from the secret, so nothing that remains can differ. If any
 retained copy, a fragment, a gzip member, an XOR, a hash of the content, a length-revealing index --
 the state is a function of the secret, and the secret is not gone.
 
-This is indistinguishability, borrowed from where it belongs, and it is sound against transforms this
-file knows nothing about. It cannot be defeated by inventing an encoding, because it never tries to
-read anything.
+THAT CLAIM WAS TOO STRONG AND AN INDEPENDENT PASS BROKE IT. Twelve ways, including two that store
+the secret as UNENCODED PLAINTEXT. The method does not read the value, but the NORMALISERS do, and
+three of them replace a VALUE rather than a shape: `{"trace_id": "<the secret>"}` and
+`{"links": ["<the secret>"]}` are rewritten to placeholders, so the plaintext survives on disk while
+both runs look identical. The `<HEX>` rule hides a reversible hexlified copy. And `errors="replace"`
+collapses distinct byte sequences to the same U+FFFD, which is not a rule that can be widened -- it
+is the decode step itself.
+
+So the honest position: this trades one unbounded list for another. Searching required enumerating
+ENCODINGS; this requires enumerating NORMALISERS and a SCAN SURFACE, and the surface leaks too --
+writes outside the walked root, NTFS alternate data streams, file mtimes, and a locked file that
+`except OSError: pass` drops from BOTH states so even its name disappears.
+
+THE POSITIVE CONTROL BELOW DOES NOT CERTIFY THE NORMALISERS, which is what it was written to do.
+`control_fires` is `ctl_a != ctl_b`, and the control states contain all ordinary residue, so any
+residue makes it fire: it is vacuously true in every RESIDUE run, and it reported "caught" in all
+eight false-negative runs while plaintext sat in the store.
+
+WHAT REMAINS TRUE AND USEFUL. It catches everything the content search caught plus the three attacks
+that beat it (split-across-files, bz2, XOR), it is stable across ten runs, and it needs no knowledge
+of an encoding to do so. It is a better smoke test. It is not a proof of erasure, and no black-box
+inspection of a store appears to be one.
 
 WHAT IT COSTS. It cannot say WHERE the residue is, only that there is some. It needs the two runs to
 be otherwise deterministic, so anything legitimately variable -- ids, timestamps, paths, nonces --
@@ -44,7 +63,7 @@ RESULT = os.path.join(HERE, "erasure-indistinguishability.result.json")
 #: it erased would otherwise be indistinguishable here for the wrong reason, and we would be
 #: measuring our own fixture rather than the store.
 SECRET_A = "the patient is HIV positive"
-SECRET_B = "the patient is left handed"
+SECRET_B = "the patient is left-handed!"   # 27, matching A; it was 26 and unchecked
 COLLATERAL = "prefers appointments in the morning"
 
 
@@ -184,8 +203,10 @@ def main(argv=None):
     if not indistinguishable:
         print("\nVERDICT: RESIDUE. What remains after erasure is a function of what was erased.")
         return 1
-    print("\nVERDICT: INDISTINGUISHABLE. Nothing remaining depends on which secret was erased, and "
-          "the control shows a planted secret would have been caught.")
+    print("\nVERDICT: INDISTINGUISHABLE UNDER THESE NORMALISERS. That is not a proof of erasure.")
+    print("  An independent pass defeated this twelve ways, two of them storing the secret as")
+    print("  unencoded PLAINTEXT in a field a normaliser rewrites. Treat a clean result as a smoke")
+    print("  test that the store is not lazily broken, which is what it caught in our own adapter.")
     return 0
 
 
