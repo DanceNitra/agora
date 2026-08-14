@@ -234,3 +234,8 @@ agora-game-server/_dungeon.err2
 # an empty file. Neither is referenced by any code.
 gate.json
 gate.err
+
+# Compressed log archives (tools/log_archive.py). NEVER committed: git history is permanent, and
+# a 2.4 GB pile of logs put into it cannot be taken back out without rewriting history for every
+# clone. They are backed up as GitHub RELEASE ASSETS, which live outside the object store.
+agora_output/log_archive/

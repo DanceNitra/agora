@@ -44,11 +44,15 @@ _MAX_BYTES = 25 * 1024 * 1024
 
 
 def _roll(p: Path) -> None:
+    """Delegates to tools/logroll.py — the same implementation the dungeon's launcher now uses.
+
+    It lived only here, so `_dungeon.err` grew to 1,021 MB while `_brain.log` stayed at 25. A
+    rotation policy that exists in one of two launchers is a rotation policy for one of two logs.
+    """
     try:
-        if p.exists() and p.stat().st_size > _MAX_BYTES:
-            prev = p.with_suffix(p.suffix + ".1")
-            prev.unlink(missing_ok=True)
-            p.rename(prev)
+        sys.path.insert(0, str(Path(__file__).resolve().parent.parent / "tools"))
+        from logroll import roll_if_big
+        roll_if_big(p, _MAX_BYTES)
     except Exception:
         pass                                   # a rotation failure must never block the start
 
