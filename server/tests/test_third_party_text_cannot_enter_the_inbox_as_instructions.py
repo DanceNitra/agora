@@ -136,3 +136,43 @@ def test_the_shield_is_reached_only_through_the_chokepoint():
         if "wrap_as_data(" in src:
             callers.append(str(p.relative_to(ROOT)))
     assert callers == [], f"wrap_as_data is called outside add_task: {callers}"
+
+
+# ------------------------------------------------- the destination an outreach draft may point at
+# The Scout files leads with "POST /brain/correspondent/draft {title, body, repo, issue_number}" and
+# those parameters are FREE, while the lead text is a stranger's issue body — so an injection could
+# name a thread the Scout never surfaced, and one `approve` would post there under our identity.
+#
+# The first version of this guard REFUSED an unrecorded destination. Tested against reality it
+# refused deepseek-ai/DeepSeek-V3#1466 — a thread carrying 47 of our own comments — because we
+# joined it by hand rather than through the Scout. So did llm-errata, edrn and hermes: every
+# collaboration that matters was hand-initiated. A refusal would have blocked exactly those while
+# leaving the automated leads working, which is the same shape as a sender check that locks the
+# owner out of his own control plane. It reports now, loudly, and the owner's approval stays the
+# gate.
+def _prov():
+    import importlib
+    sys.path.insert(0, str(ROOT / "server"))
+    return importlib.import_module("agora.api.agent_os_api")._outreach_destination_provenance
+
+
+def test_a_thread_from_no_record_is_flagged_not_refused():
+    known, why = _prov()("attacker/evil-repo", 42)
+    assert known is False and why == "no record"
+
+
+def test_a_new_issue_with_no_thread_is_normal():
+    assert _prov()("", 0)[0] is True
+
+
+def test_a_thread_the_scout_ruled_on_is_recognised():
+    """openclaw#7707 is in .scout.json — the ledger the first version forgot, which is what made it
+    reject threads we had engaged with by hand."""
+    known, why = _prov()("openclaw/openclaw", 7707)
+    assert known is True and "Scout" in why
+
+
+def test_the_endpoint_warns_rather_than_refusing():
+    src = (ROOT / "server/agora/api/agent_os_api.py").read_text(encoding="utf-8", errors="replace")
+    assert "DESTINATION NOT FROM ANY RECORD" in src, "the warning line is gone"
+    assert "refused_destination" not in src, "the refusal is back — it blocks our real threads"

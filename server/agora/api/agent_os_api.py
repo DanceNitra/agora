@@ -1219,6 +1219,81 @@ async def brain_memory_economy(n: int = 12):
             "report": format_economy(notes, cands)}
 
 
+def _outreach_destination_provenance(repo: str, issue_no: int) -> tuple[bool, str]:
+    """Where did this destination come from? -> (backed by a record, which record).
+
+    IT REPORTS, IT DOES NOT REFUSE — and that reversal is the finding, not a softening.
+
+    WHY THIS EXISTS. The Scout files its leads into the Claude inbox with the instruction
+    "POST /brain/correspondent/draft {title, body, repo, issue_number}" -- parameters left FREE,
+    unlike the envoy and harvest paths, which hardcode repo and issue from the record they came
+    from. The lead text is a stranger's GitHub issue title and body. So an injection inside a lead
+    could name a destination the Scout never surfaced, and the outreach would be composed, proposed
+    and (on one `approve`) posted there under our GitHub identity.
+
+    The inbox envelope (add_task's `untrusted=`) makes that harder to say; this makes it impossible
+    to act on. A destination is allowed only when we can point at the record that put it in front of
+    us:
+
+      * a lead the Scout actually found and filed in .scout_box.json, or
+      * a thread we already hold a correspondence record for (replying into our own thread), or
+      * a thread the Scout has RULED ON in .scout.json -- which is how a thread we engaged with by
+        hand is still recognised. The first version of this guard missed that store and refused
+        deepseek-ai/DeepSeek-V3#1466, a thread carrying 47 of our own comments, because those went
+        out through tools/send_approved.py rather than the correspondent. A guard that blocks the
+        conversation we are actually having is worse than the redirect it prevents, or
+      * no thread at all -- a new issue on our own public repo, which is the pre-existing default.
+
+    The first version REFUSED anything outside those records, and testing it against reality killed
+    that design: deepseek-ai/DeepSeek-V3#1466 came back unknown -- a thread carrying 47 of our own
+    comments -- because we found and joined it by hand, outside the Scout pipeline. So did
+    llm-errata, edrn, hermes and the Guanghao thread. Every collaboration that actually matters was
+    hand-initiated, so a refusal would have blocked exactly those and left the automated leads
+    working. That is the same shape as a sender check that locks the owner out of his own control
+    plane.
+
+    The real gate is the owner's approval, and the injection risk was never that he cannot see the
+    destination -- it is that an unremarkable line does not make him LOOK. So an unrecorded
+    destination is proposed with a loud warning naming it. That cannot cause an outage and an
+    injection cannot make itself quiet, which a refusal-based version bought at the price of
+    blocking our real work.
+
+    Errs toward "known" when a store cannot be read: a momentarily unreadable JSON file must not
+    turn every proposal into a false alarm, or the warning stops being read.
+    """
+    if not repo or not issue_no:
+        return True, "new issue on our own repo"
+    try:
+        from agora.execution.scout import box_load
+        for x in box_load() or []:
+            if (x.get("repo") or "").strip().lower() == repo.lower() \
+                    and int(x.get("issue_number") or 0) == issue_no:
+                return True, "a lead the Scout filed"
+    except Exception:
+        # unreadable store: do not turn a guard into a false alarm on every proposal
+        return True, "unverified (scout box unreadable)"
+    try:
+        from agora.execution.correspondent import _load as _corr_load
+        for c in _corr_load() or []:
+            if (c.get("target_repo") or "").strip().lower() == repo.lower() \
+                    and int(c.get("target_issue") or 0) == issue_no:
+                return True, "an existing correspondence of ours"
+    except Exception:
+        return True, "unverified (correspondence store unreadable)"
+    try:
+        import json as _json
+        from pathlib import Path as _P
+        p = _P(__file__).resolve().parents[2] / ".scout.json"
+        if p.exists():
+            for r in _json.loads(p.read_text(encoding="utf-8")) or []:
+                if (r.get("repo") or "").strip().lower() == repo.lower() \
+                        and int(r.get("issue") or 0) == issue_no:
+                    return True, "a lead the Scout has ruled on"
+    except Exception:
+        return True, "unverified (scout ledger unreadable)"
+    return False, "no record"
+
+
 @router.post("/brain/correspondent/draft")
 async def brain_correspondent_draft(request: Request):
     """THE CORRESPONDENT — store Claude's composed outreach and propose the GATED action.
@@ -1232,17 +1307,29 @@ async def brain_correspondent_draft(request: Request):
     if any(x.get("kind") == "outreach" for x in pending_approvals()):
         return {"status": "already_pending"}
     repo, issue_no = (b.get("repo") or "").strip(), int(b.get("issue_number") or 0)
+    known, provenance = _outreach_destination_provenance(repo, issue_no)
     rec = save_draft(title, body, repo, issue_no)
     nov = novelty_report(body, exclude_id=rec["id"])     # catch templated repetition BEFORE it posts
     where = f"comment on {repo}#{issue_no}" if repo and issue_no else "new public GitHub issue"
     act = propose_action("outreach", f"Post public outreach ({where}): {title[:60]}",
                          body[:300], {"corr_id": rec["id"]})
     nov_line = format_novelty(nov)
+    # An unrecorded destination is named LOUDLY rather than refused. The Scout files its leads with
+    # "POST /brain/correspondent/draft {title, body, repo, issue_number}" and those parameters are
+    # free, while the lead text is a stranger's issue body — so an injection could name a thread the
+    # Scout never surfaced. The owner's approval is the gate; the risk was that an unremarkable
+    # destination line does not make him look at it.
+    dest_line = ("" if known else
+                 f"⚠️ DESTINATION NOT FROM ANY RECORD: `{repo}#{issue_no}`. Neither the Scout box, "
+                 f"the scout ledger nor our correspondences know this thread — check it is the one "
+                 f"you mean before approving.\n")
     await _send_telegram(f"✉️ Correspondent proposal `{act['id']}`: {where}\n"
-                         f"*{title[:80]}*\n_{body[:180]}…_\n"
+                         + dest_line
+                         + f"*{title[:80]}*\n_{body[:180]}…_\n"
                          + (nov_line + "\n" if nov_line else "")
                          + f"Reply `approve {act['id']}` or `reject {act['id']}`.")
-    return {"status": "proposed", "draft": rec, "action": act, "novelty": nov}
+    return {"status": "proposed", "draft": rec, "action": act, "novelty": nov,
+            "destination_known": known, "destination_provenance": provenance}
 
 
 @router.post("/brain/correspondent/harvest")
