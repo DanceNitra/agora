@@ -1189,7 +1189,12 @@ if (!renderer.getContext()) {
   };
 
   // Shared Event-Log helper — real activity (conversations, builds), not just trust deltas
-  const _esc = (s) => (s || '').replace(/[<>&]/g, c => ({'<':'&lt;','>':'&gt;','&':'&amp;'}[c]));
+  // Quotes are escaped too: _esc is used inside double-quoted attribute values (the title= badges
+  // below), where a bare " closes the attribute and an onmouseover= can be appended without ever
+  // needing a < . An escaper that is safe for text nodes and unsafe for attributes is worse than
+  // none, because every call site reads as protected.
+  const _esc = (s) => (s || '').replace(/[<>&"']/g,
+    c => ({'<':'&lt;','>':'&gt;','&':'&amp;','"':'&quot;',"'":'&#39;'}[c]));
   const _shortNm = (n) => (n || '').split(' ').pop();
   function logEvent(html, cls) {
     const el = document.getElementById('hud-log-lines');
@@ -1437,7 +1442,11 @@ if (!renderer.getContext()) {
       if (empty) empty.remove();
       const div = document.createElement('div');
       div.className = 'os-line k-' + (it.kind || '');
-      div.innerHTML = `${icon[it.kind] || '•'} <span class="who">${it.who || ''}</span> — ${it.text}`;
+      // _esc on both: it.text is the quest `intent`, and one of the intent builders is
+      // "Ground a finding from: {paper title}" where the title comes from the arXiv/OpenAlex
+      // harvest -- i.e. attacker-authored text from the open internet, rendered into this page.
+      // This origin (:5174) is trusted by the brain's CORS regex, so script here reaches :8000.
+      div.innerHTML = `${icon[it.kind] || '•'} <span class="who">${_esc(it.who || '')}</span> — ${_esc(it.text || '')}`;
       wrap.prepend(div);
       while (wrap.children.length > 12) wrap.lastChild.remove();
       if (flash) { void div.offsetWidth; div.classList.add('flash'); }

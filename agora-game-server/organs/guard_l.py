@@ -459,6 +459,20 @@ for rho in RHOS:
 '''
 
 
+def _doc_safe(s, cap: int = 120) -> str:
+    """Make a string safe to sit inside the Lab script's leading docstring.
+
+    Only `belief_title` was escaped here. `col_a`, `col_b` and `row` come from markdown table cells
+    of a vault note -- and a vault note is agent-authored, i.e. model output shaped by whatever
+    paper abstract or GitHub issue the swarm ingested. A cell carrying a triple quote closes the
+    module docstring, and everything after it on that line is parsed as top-level Python by the
+    interpreter lab.py:84 launches on the file. Escaping one of four interpolated fields is not a
+    partial defence; it is the defence tested on the one field somebody thought of.
+    """
+    return (str(s).replace('"""', "'''").replace("\\", "/")
+            .replace("\r", " ").replace("\n", " ")[:cap])
+
+
 def _lab_code(belief_title: str, pair: dict, n: int) -> str:
     """Assemble the experiment. The docstring comes FIRST and says what is modelled.
 
@@ -478,8 +492,8 @@ def _lab_code(belief_title: str, pair: dict, n: int) -> str:
         "Verdict rule: survived if p < 0.05 at RHO = 0.0 (widest band); killed if p >= 0.05 at\n"
         "RHO = 0.8 (tightest band); otherwise the verdict turns on a design detail the note does not\n"
         "state and no verdict is recorded."
-        % (belief_title.replace('"""', "'''")[:180], pair["col_a"], pair["a"],
-           pair["col_b"], pair["b"], n, pair["row"])
+        % (_doc_safe(belief_title, 180), _doc_safe(pair["col_a"]), pair["a"],
+           _doc_safe(pair["col_b"]), pair["b"], n, _doc_safe(pair["row"]))
     )
     params = ("N = %d\nP_A = %.6f\nP_B = %.6f\nRHOS = %r\nTRIALS = %d\nSEED = %d\n"
               % (n, pair["a"], pair["b"], list(_RHOS), _TRIALS, _SEED))

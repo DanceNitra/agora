@@ -5,8 +5,25 @@ The system reads (literature) and watches (live data); now it COMPUTES. When a c
 falsifier needs numbers — a Monte Carlo, a decay curve, statistics over Agora's own ledgers —
 Claude writes a small script and this runner executes it deterministically: in
 agora_output/lab, with a hard timeout, stdout capped, results recorded to a ledger with
-source "simulation". Scripts are written ONLY by Claude (who already maintains the codebase),
-never by the flash model — the trust boundary stays exactly where it already was.
+source "simulation".
+
+WHO ACTUALLY WRITES THESE SCRIPTS. This docstring used to say "Scripts are written ONLY by Claude
+(who already maintains the codebase), never by the flash model — the trust boundary stays exactly
+where it already was." That was false, and it was corrected on 2026-08-14 after an adversarial
+review. EIGHT dungeon organs compose lab scripts and post them here through `ctx.lab_run`
+(thief, scholar x2, guard_l, guard_r, priest, cartographer, king, artificer), and their inputs are
+flash-model output, vault-note text and paper abstracts. The same review found guard_l splicing
+unescaped vault-note table cells into a script's docstring, which is exactly the hole the sentence
+above claimed could not exist.
+
+The REAL boundary, stated so a new organ author can honour it: this runner executes whatever it is
+given, unsandboxed, as your user, with your environment inherited (there is no `env=` on the
+subprocess call below, and `server/.env` is two directories up from the cwd). That is deliberate and
+documented — SECURITY.md §"POST /brain/lab/run" accepts it for a single-user loopback box. What is
+NOT deliberate is untrusted text reaching an executable position. So the rule an organ must follow
+is: every datum goes in as DATA — `repr(json.dumps(..., ensure_ascii=True))`, or a `_safe_doc`-style
+strip for anything landing in a docstring — never spliced into the script body. Seven of the eight
+organs do this correctly; the eighth did not, and nothing in code stops the ninth.
 """
 from __future__ import annotations
 
