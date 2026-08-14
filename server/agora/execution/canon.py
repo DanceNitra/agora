@@ -52,10 +52,40 @@ def read_canon(vault_path: str) -> str:
         return ""
 
 
-def write_canon(vault_path: str, content: str) -> str:
-    """Replace the Canon wholesale (Claude supplies the merged text). Stamps updated:."""
+def write_canon(vault_path: str, content: str, force: bool = False) -> str | dict:
+    """Replace the Canon wholesale (Claude supplies the merged text). Stamps updated:.
+
+    A SHRINK BOUND guards it, because the only check was `len(content) < 200` at the endpoint — an
+    absolute constant never compared against the document it replaces. It cannot tell a complete
+    ~7,000-character merge from a model that emitted the header and the first cluster and stopped.
+    Empty is caught by the 200 floor; truncated-at-500 is not, and truncated is the likelier of the
+    two (CLAUDE.md records this deployment's reasoning tier returning success-shaped partial
+    content under a tight cap). A 500-character reply would have replaced ~93% of the accumulated
+    Canon — and the stamp below writes a fresh `updated:`, so the next intake would not re-offer
+    what had just been lost.
+
+    The organ path is separately protected by a Lab gate. The exposed path is Claude working the
+    "merge into Canon" inbox task, where this is the whole defence.
+    """
     p = canon_path(vault_path)
     p.parent.mkdir(parents=True, exist_ok=True)
+    try:
+        prev = p.read_text(encoding="utf-8") if p.exists() else ""
+    except Exception:
+        prev = ""
+    if prev and not force and len(content) < 0.6 * len(prev):
+        return {"error": "refused: the merge is %d chars against an existing %d (%.0f%%). A Canon "
+                         "merge does not shrink by a third unless the model stopped early. Pass "
+                         "force=true if the shrink is deliberate."
+                         % (len(content), len(prev), 100.0 * len(content) / len(prev))}
+    if prev:
+        # Keep the outgoing version beside the file. Recovery should not depend on a push having
+        # happened: safe_vault_push sees a truncated Canon as an ordinary modification, so the
+        # 0-deletion guard passes and only git log would hold the good text.
+        try:
+            p.with_suffix(p.suffix + ".prev").write_text(prev, encoding="utf-8")
+        except Exception:
+            pass
     today = time.strftime("%Y-%m-%d %H:%M")
     if not content.lstrip().startswith("---"):
         content = (f"---\ntitle: Canon — What Agora Currently Believes\n"

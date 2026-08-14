@@ -60,7 +60,29 @@ logger = logging.getLogger("dungeon.mcp_server")
 
 HERE = Path(__file__).parent
 STATIC_DIR = HERE / "static"
-_HEARTBEAT_FILE = HERE / ".dungeon_heartbeat"   # life-loop liveness, watched by dungeon_supervisor.py
+_HEARTBEAT_FILE = HERE / ".dungeon_heartbeat"   # life-loop liveness, watched by tools/dungeon_canary.py
+
+
+def _atomic_write(path, data: str) -> None:
+    """Write via a temp file in the same directory, then os.replace (atomic on NTFS).
+
+    Every durable file this process keeps was written with a bare `Path.write_text`, which truncates
+    at open and then writes — so a kill between those two steps leaves a truncated or empty file.
+    That is not a rare event here: the brain's watchdog relaunches this process with p.kill()
+    (TerminateProcess, no graceful stop) after two missed HTTP checks, and an unclean host shutdown
+    can journal the new size without the data.
+
+    Every reader catches the parse error and resets to empty, silently. The cost is recorded in this
+    file's own comments: losing `_recent_intents` produced the "8x-duplicate output monoculture",
+    and a lost `loop_n` restarts every `% N` task generator's countdown — the comment at the startup
+    restore says that starved the Claude inbox for hours. A truncated state file is therefore a
+    silent, self-inflicted outage, which is why this is worth four lines even though the window is
+    tens of microseconds wide.
+    """
+    p = Path(path)
+    tmp = p.with_suffix(p.suffix + ".tmp")
+    tmp.write_text(data, encoding="utf-8")
+    os.replace(tmp, p)
 
 
 def _load_dotenv() -> None:
@@ -292,23 +314,36 @@ async def ws_handler(reader: asyncio.StreamReader, writer: asyncio.StreamWriter)
         writer.write(frame)
         await writer.drain()
 
-        # Stream events
-        try:
-            while True:
-                msg = await asyncio.wait_for(queue.get(), timeout=30)
-                frame = _make_ws_frame(msg)
-                writer.write(frame)
-                await writer.drain()
-        except asyncio.TimeoutError:
-            # Ping / keepalive
+        # Stream events. The keepalive lives INSIDE the loop: the `except asyncio.TimeoutError`
+        # used to sit outside it, so the first 30-second idle window pinged once and then fell
+        # through to `finally`, which discarded the queue and closed the connection. It was labelled
+        # "Ping / keepalive" and kept nothing alive — there was no path back into the stream.
+        #
+        # Normal operation hid it (publish_goals broadcasts about every 1.7 s, so the window is
+        # never reached). It fired precisely when the ambient loop had stalled — turning an
+        # invisible stall into every open tab reconnecting every ~32 s, each reconnect rebuilding
+        # the whole Three.js scene and clearing the HUD log, destroying the last events visible
+        # before the stall. The symptom was worst exactly when diagnosis mattered most.
+        missed_pongs = 0
+        while True:
             try:
-                frame = _make_ws_frame("", opcode=0x9)  # ping
-                writer.write(frame)
-                await writer.drain()
-                # Wait for pong
-                await asyncio.wait_for(reader.readexactly(2), timeout=5)
-            except Exception:
-                pass
+                msg = await asyncio.wait_for(queue.get(), timeout=30)
+            except asyncio.TimeoutError:
+                try:
+                    writer.write(_make_ws_frame("", opcode=0x9))      # ping
+                    await writer.drain()
+                    # Two raw bytes, not a parsed frame: any client frame satisfies this, so treat
+                    # it as "the socket is alive", never as a verified pong.
+                    await asyncio.wait_for(reader.readexactly(2), timeout=5)
+                    missed_pongs = 0
+                except asyncio.TimeoutError:
+                    missed_pongs += 1
+                    if missed_pongs >= 3:
+                        break                                          # ~105 s silent -> give up
+                continue
+            frame = _make_ws_frame(msg)
+            writer.write(frame)
+            await writer.drain()
 
     except (asyncio.IncompleteReadError, ConnectionError, ConnectionResetError):
         pass
@@ -1237,7 +1272,7 @@ def _pipeline_shipped_bump() -> int:
         n = int(_pipeline.get("shipped", 0) or 0)      # first run, or an unreadable file
     n += 1
     try:
-        _PIPELINE_STATE_FILE.write_text(json.dumps({"shipped": n}), encoding="utf-8")
+        _atomic_write(_PIPELINE_STATE_FILE, json.dumps({"shipped": n}))
     except Exception:
         pass                                          # a lost counter must never drop a shipped artifact
     return n
@@ -1816,7 +1851,7 @@ _recent_intents: dict = _load_recent_intents()
 
 def _save_recent_intents() -> None:
     try:
-        _RECENT_INTENTS_FILE.write_text(
+        _atomic_write(_RECENT_INTENTS_FILE,
             json.dumps({k: _dedup_keep_last(v)[-_RECENT_INTENTS_MAX:]
                         for k, v in _recent_intents.items()}),
             encoding="utf-8")
@@ -3760,7 +3795,7 @@ async def _broadcast_trust_graph():
     try:
         import json as _json
         by_name = {_AGENT_NAMES[e]: standing.get(e, 0.5) for e in _AGENT_NAMES}
-        (Path(__file__).parent / "agent_standing.json").write_text(
+        _atomic_write(Path(__file__).parent / "agent_standing.json",
             _json.dumps({"standing": by_name, "updated": _time.time()}))
     except Exception:
         pass
@@ -4197,7 +4232,7 @@ def _organ_state() -> dict:
 
 def _organ_state_save(state: dict) -> None:
     try:
-        _ORGAN_STATE_FILE.write_text(json.dumps(state), encoding="utf-8")
+        _atomic_write(_ORGAN_STATE_FILE, json.dumps(state))
     except Exception:
         pass
 
@@ -4651,6 +4686,14 @@ async def ambient_life():
                  "tags": ["digest", "consolidation"]})
             for k in new[:6]:
                 consolidation["seen"].add(k["title"])   # don't re-process this material either way
+            # Bounded like its sibling forty lines up (agent_activity["seen"]), which applies the
+            # identical idiom to the identical kind of dedup set. This one had no trim, so in a
+            # process designed to run for days it grew for the lifetime of the process — and
+            # "recently consolidated" quietly came to mean "ever consolidated", so material that
+            # became relevant again could never be re-consolidated. The growth rate is small
+            # (~40 distinct titles/day in real production); this is hygiene, not an incident.
+            if len(consolidation["seen"]) > 500:
+                consolidation["seen"] = set(sorted(consolidation["seen"])[-200:])
             if resp and resp.get("status") == "written":
                 note_event(f"{curator} consolidated {len(new[:6])} discoveries into a vault note")
                 _os_build("curation", curator,
@@ -4868,7 +4911,7 @@ async def ambient_life():
         # the QuestBoard) and restart us. Cheap, throttled to ~once/4s, never raises into the loop.
         if loop_n % 5 == 0:
             try:
-                _HEARTBEAT_FILE.write_text(f"{int(_time.time())} {loop_n}", encoding="utf-8")
+                _atomic_write(_HEARTBEAT_FILE, f"{int(_time.time())} {loop_n}")
             except Exception:
                 pass
         ents = engine.state.entities

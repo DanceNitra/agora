@@ -1930,7 +1930,13 @@ async def brain_canon_write(request: Request):
     content = (b.get("content") or "").strip()
     if len(content) < 200:
         return {"status": "too_short"}
-    return {"status": "written", "path": write_canon(vault, content)}
+    # 200 is an absolute floor and cannot see the document it would replace; write_canon adds the
+    # relative one. `force` is explicit so a deliberate shrink stays possible and a truncated model
+    # reply does not silently become the Canon.
+    r = write_canon(vault, content, force=bool(b.get("force")))
+    if isinstance(r, dict) and r.get("error"):
+        return {"status": "refused", "error": r["error"]}
+    return {"status": "written", "path": r}
 
 
 @router.get("/brain/canon")
