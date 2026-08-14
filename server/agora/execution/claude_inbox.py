@@ -90,7 +90,41 @@ def _save(items: list) -> None:
     INBOX.write_text(json.dumps(items, indent=2, ensure_ascii=False), encoding="utf-8")
 
 
-def add_task(text: str) -> str:
+def add_task(text: str, untrusted: str = "", source: str = "") -> str:
+    """Queue a task for Claude Code.
+
+    `text` is OUR instruction. `untrusted` is third-party content — a stranger's GitHub issue body,
+    a harvested reply, a web-search snippet, a paper abstract — and it is sanitized and enveloped
+    HERE rather than by the caller.
+
+    WHY THE SIGNATURE CHANGED. `input_shield.wrap_as_data` exists precisely for this flow; its own
+    docstring says "The Correspondent harvests replies from strangers on the public web straight
+    toward Claude's task inbox." A repo-wide grep on 2026-08-14 found it called at exactly ONE site,
+    while three others fed the same class of text in raw:
+
+      * server/agora/main.py — the envoy loop, which is the one that actually fires (registered in
+        lifespan, every 30 min), while the guarded copy was the on-demand endpoint. Same data, two
+        doors, one guard, and the guard was on the door used less.
+      * agora-game-server/mcp_server.py — Scout triage, interpolating a stranger's issue title and
+        body[:320] into a task whose next instruction is "draft a gated reply".
+      * server/agora/execution/web_search.py — third-party title and snippet.
+
+    Sanitizing the WHOLE string here would be wrong: a task mixes our operational instructions with
+    the third-party span, and defanging our own text would corrupt legitimate tasks. So the split is
+    the fix — the caller cannot concatenate untrusted content into `text` without going out of its
+    way, and every caller added later inherits the envelope for free. That is the difference between
+    closing a class and patching three instances; the sibling gate `_inbox_theme_allowed` records
+    the same drift in its own docstring (31 queueing functions, 5 gate calls).
+
+    This does NOT make injection impossible. The mechanical half of the shield (zero-width and bidi
+    stripping, control chars, collapsing code fences that could re-open an instruction block) is a
+    real and deterministic win; the prose envelope is weaker and a determined injection walks past
+    it. The point is that the mechanical half now runs on every path.
+    """
+    if untrusted:
+        from agora.execution.input_shield import wrap_as_data
+        text = (text or "").rstrip() + "\n\n" + wrap_as_data(source or "an external source",
+                                                             untrusted)
     items = _load()
     now = time.time()
     dup = _is_duplicate(_signature(text), items, now)

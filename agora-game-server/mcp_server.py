@@ -3256,12 +3256,19 @@ async def _queue_scout() -> None:
     if not leads and not learn:
         return
 
-    def _one(x, i):
-        return (f"[{i}] {x['repo']}#{x['issue_number']} (fit {x.get('score')}) {x['url']} || "
-                f"TITLE: {x.get('title','')} || BODY: {(x.get('body') or '')[:320]}")
+    # The lead's IDENTITY (repo, issue, score, url) is ours and stays in the instruction. Its TITLE
+    # and BODY are written by a stranger on the public web, so they travel in `untrusted` and are
+    # sanitized + enveloped inside add_task. Before this they were interpolated straight into a task
+    # whose very next line tells the reader to draft outward content with a free repo/issue_number.
+    def _ident(x, i):
+        return f"[{i}] {x['repo']}#{x['issue_number']} (fit {x.get('score')}) {x['url']}"
 
-    body = " ||| ".join(_one(x, i + 1) for i, x in enumerate(leads))
-    learn_body = " ||| ".join(_one(x, i + 1) for i, x in enumerate(learn))
+    def _content(x, i):
+        return f"[{i}] TITLE: {x.get('title','')} || BODY: {(x.get('body') or '')[:320]}"
+
+    body = " ||| ".join(_ident(x, i + 1) for i, x in enumerate(leads))
+    learn_body = " ||| ".join(_ident(x, i + 1) for i, x in enumerate(learn))
+    lead_text = " ||| ".join(_content(x, i + 1) for i, x in enumerate(leads + learn))
     await asyncio.to_thread(
         _brain_post_sync, "/api/v1/agent-os/brain/claude-inbox",
         {"text": f"Scout triage: {len(leads)} leads to answer + {len(learn)} to learn from. "
@@ -3273,7 +3280,9 @@ async def _queue_scout() -> None:
                  f"specific, no overselling. Where no, say so and move on; reputation dies on a bad "
                  f"pitch. CLOSE EVERY LEAD either way: POST /brain/scout/box/mark {{url, status: "
                  f"'done'|'no_fit'}}, and POST /brain/scout-record {{url, repo, issue, outcome}} for "
-                 f"the ones you judged. An unclosed lead is the only thing that holds a box slot."})
+                 f"the ones you judged. An unclosed lead is the only thing that holds a box slot.",
+         "untrusted": lead_text,
+         "source": "GitHub issue authors (strangers on the public web)"})
     broadcast({"type": "os_build", "kind": "discovery", "who": "Shadow Kael",
                "text": f"filed {len(leads)} leads + {len(learn)} to learn from"})
     _mind_spark("#8fd3ff")        # cyan — a lead spotted outside the walls

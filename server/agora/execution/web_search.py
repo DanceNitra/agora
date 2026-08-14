@@ -277,13 +277,15 @@ def web_scout_pass(add_task, n_themes: int = 2, n_leads: int = 2) -> dict:
         if u in seen:
             continue
         seen.add(u)
-        text = (f"External lead (web-scout/{r.get('source')}): {(r.get('title') or '')[:110]} || "
-                f"QUERY: {q} | URL: {u} | {(r.get('snippet') or '')[:200]} || Claude: judge for the "
-                f"Crucible/frontier — if it is a testable, novel claim on our agenda "
+        # Title and snippet are third-party text off the open web — they go through `untrusted=`,
+        # never interpolated into our instruction.
+        text = (f"External lead (web-scout/{r.get('source')}). QUERY: {q} | URL: {u} || Claude: "
+                f"judge for the Crucible/frontier — if it is a testable, novel claim on our agenda "
                 f"(agent-memory / RAG / reasoning), DEVELOP it (Lab + falsifier) or REPLICATE it; "
                 f"otherwise SKIP with a one-line reason. Do NOT make a small note from a thin lead.")
+        lead = f"{(r.get('title') or '')[:110]} | {(r.get('snippet') or '')[:200]}"
         try:
-            add_task(text)
+            add_task(text, untrusted=lead, source=f"web search result ({r.get('source')})")
             filed.append(f"{r.get('source')}:{(r.get('title') or '')[:50]}")
         except Exception:
             pass

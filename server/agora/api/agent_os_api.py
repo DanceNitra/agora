@@ -1251,16 +1251,18 @@ async def brain_correspondent_harvest(request: Request):
     import asyncio as _aio
     from agora.execution.correspondent import harvest_replies
     fresh = await _aio.to_thread(harvest_replies)
-    from agora.execution.input_shield import wrap_as_data
     for c in fresh[:3]:
         from agora.execution.claude_inbox import add_task
-        safe = wrap_as_data(f"GitHub user {c['by']}", c["text"])
+        # Was the ONE site that called wrap_as_data directly. It now goes through the same
+        # `untrusted=` parameter as every other caller, so there is one way to do this rather than
+        # a convention three of four callers did not follow.
         add_task(f"Correspondence reply by {c['by']} on '{c['title'][:50]}' "
-                 f"(corr {c['corr_id']}, thread {c['repo']}#{c['issue']}). {safe}\n"
+                 f"(corr {c['corr_id']}, thread {c['repo']}#{c['issue']}).\n"
                  f"If (and only if) a substantive reply is warranted, draft one back into the "
                  f"SAME thread via POST /brain/correspondent/draft "
                  f"{{title, body, repo: '{c['repo']}', issue_number: {c['issue']}}} — "
-                 f"gated by owner approval, never automatic.")
+                 f"gated by owner approval, never automatic.",
+                 untrusted=c["text"], source=f"GitHub user {c['by']}")
     return {"status": "ok", "new_replies": len(fresh)}
 
 
@@ -3346,7 +3348,12 @@ async def claude_inbox_add(request: Request):
     text = (body.get("text") or "").strip()
     if not text:
         return {"status": "empty"}
-    return {"status": "queued", "id": add_task(text)}
+    # `untrusted` carries third-party content (a stranger's issue body, a harvested reply). It is
+    # sanitized and enveloped inside add_task, so a remote caller cannot smuggle it in as
+    # instructions by concatenating it into `text` — the dungeon's Scout triage does exactly this.
+    return {"status": "queued",
+            "id": add_task(text, untrusted=(body.get("untrusted") or ""),
+                           source=(body.get("source") or ""))}
 
 
 @router.get("/brain/claude-inbox")

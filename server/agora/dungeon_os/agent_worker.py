@@ -1238,14 +1238,20 @@ class CorporationWorker:
             text = (
                 f"Crucible candidate: {title} || CORP-RESEARCHED, CEO/CTO approved "
                 f"(CEO {ev.get('ceo_score', 0):.0f}/CTO {ev.get('cto_score', 0):.0f}). "
-                f"RESEARCH: {summary} WHY: {why} SOURCE: {src} "
                 f"|| Claude: judge HONESTLY whether this claim deserves the Crucible bench. If yes, "
                 f"REPLICATE it: build the smallest computational model of its mechanism via "
                 f"/brain/lab/run, record REPRODUCED|FAILED|NOT_COMPUTABLE via /brain/replication-record, "
                 f"add curation + re-render the Crucible. A potential FAILED of a famous claim is the "
                 f"highest-value outcome. If the claim is thin/unmeasurable, skip with reason."
             )
-            tid = add_task(text)
+            # title/summary/why/src derive from a paper title or a GitHub scan finding (see
+            # _process_head, which builds quest_title from paper['title'] and from the horizon
+            # scan) and from LLM output. Two sites in this file were missed by the review that
+            # found the other three — which is the argument for the chokepoint over per-site
+            # patching, not against it.
+            tid = add_task(text, untrusted=f"TITLE: {title} || RESEARCH: {summary} || WHY: {why} "
+                                           f"|| SOURCE: {src}",
+                           source="a paper or GitHub lead, via the corporation researcher")
             self._stats["ship_reviews_filed"] = self._stats.get("ship_reviews_filed", 0) + 1
             print(f"[Corp→Claude] filed ship-review {tid}: {title[:50]}")
         except Exception as e:
@@ -1274,14 +1280,16 @@ class CorporationWorker:
             src = quest.get("research_source") or quest.get("findings_path") or ""
             why = (ev.get("cto_rationale") or ev.get("ceo_rationale") or "")[:200]
             text = (
-                f"Research dossier: {title} || CORP-RESEARCHED, board near-miss "
-                f"(CEO {ev.get('ceo_score', 0):.0f}/CTO {ev.get('cto_score', 0):.0f} — not ship-approved, "
-                f"surfaced as a lead). RESEARCH: {summary} BOARD NOTE: {why} SOURCE: {src} "
+                f"Research dossier (CORP-RESEARCHED, board near-miss: CEO "
+                f"{ev.get('ceo_score', 0):.0f}/CTO {ev.get('cto_score', 0):.0f} — not ship-approved, "
+                f"surfaced as a lead). "
                 f"|| Claude: judge HONESTLY against the RAISED BAR. If it is a hard, original, testable "
                 f"question, DEVELOP it into rigorous work (Lab + falsifier, real data where possible); "
                 f"otherwise ARCHIVE with a one-line reason. Do NOT manufacture a small note from a thin lead."
             )
-            tid = add_task(text)
+            tid = add_task(text, untrusted=f"TITLE: {title} || RESEARCH: {summary} "
+                                           f"|| BOARD NOTE: {why} || SOURCE: {src}",
+                           source="a paper or GitHub lead, via the corporation researcher")
             self._stats["ship_reviews_filed"] = self._stats.get("ship_reviews_filed", 0) + 1
             print(f"[Corp→Claude] filed research dossier {tid}: {title[:50]}")
         except Exception as e:
