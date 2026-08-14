@@ -28,7 +28,7 @@ TO RUN IT AGAINST YOUR OWN STORE, implement one class (see `InspeximusBinding` a
         name = "your-store"
         def build(self, records):   # -> (StoreAdapter, handle)
         def active_texts(self, handle):  # -> list[str] of currently-asserted propositions
-        def persisted_paths(self, handle):   # -> [str] files the store writes; the runner reads them
+        def persisted_root(self, handle):    # -> str, the directory it persists into
 
     python run_adapter_conformance.py --pkg <dir with prototype/> --binding your.module:YourBinding
 """
@@ -185,6 +185,8 @@ def evaluate(case, binding, pkg, mutate=False, stub_method=None):
 
     owner = Ed25519Signer(b"\x01" * 32, key_id="key-1")
     adapter, handle = binding.build(case["store"]["records"])
+    channel_root = binding.persisted_root(handle) if hasattr(binding, "persisted_root") else None
+    before = _scan(channel_root) if channel_root and os.path.isdir(channel_root) else {}
     importer = build_importer(owner)
     importer.adapters = [adapter]
     importer.roots = (case["erratum"]["target_root"],)
@@ -220,7 +222,7 @@ def evaluate(case, binding, pkg, mutate=False, stub_method=None):
     # above. Measured: such an adapter scored a full PASS on the erasure case while the store still
     # held "is vegetarian" verbatim. Erasure has to be checked against the PERSISTED state, so the
     # binding must hand over everything it wrote.
-    raw, channel_note = read_channel(binding, handle, adapter)
+    # deliberately not read yet -- see below
 
     # SELF-ATTESTATION. `active_texts` is written by the implementation under test; a binding that
     # returns a hard-coded list is never contradicted. Cross-check each answer against the adapter's
@@ -248,6 +250,10 @@ def evaluate(case, binding, pkg, mutate=False, stub_method=None):
         "snapshot_is_non_empty": bool(adapter.snapshot()),
         "state_roots_differ": (receipt.to_dict().get("pre_state_root")
                                != receipt.to_dict().get("post_state_root"))}
+    # READ LAST. A store that re-persists the value on the next `recall()` -- a call this runner
+    # itself makes for the cross-check -- would slip past a channel read any earlier. Everything
+    # that touches the store has happened by this point.
+    raw, channel_note = read_channel(binding, handle, before)
     observed["_raw"] = raw
     observed["channel"] = channel_note
     observed["_texts"] = texts
@@ -277,51 +283,63 @@ def _present(needle, haystack):
         return False
 
 
-def read_channel(binding, handle, adapter):
-    """Read what the store PERSISTED, through a channel the implementation cannot narrate.
+def _scan(root):
+    """Every file under `root` with its size and mtime. The observation primitive."""
+    out = {}
+    for base, _dirs, names in os.walk(root):
+        for n in names:
+            fp = os.path.join(base, n)
+            try:
+                st = os.stat(fp)
+                out[fp] = (st.st_size, st.st_mtime_ns)
+            except OSError:
+                pass
+    return out
 
-    WHY THIS REPLACED `raw_dump()`. Three audit rounds found 6, 10 and 10 defects and the rate never
-    fell, because every fix patched the reported hole while the class survived: the suite asked the
-    implementation under test to describe itself. Each round then produced a new way to answer
-    dishonestly -- an empty dump, a `{}` dump, a hard-coded text list, a self-declared name. Adding a
-    fourth check of the same kind was never going to work.
 
-    So the binding no longer hands us a string. It declares WHERE it persists, via
-    `persisted_paths(handle)`, and this function reads those bytes itself.
+def read_channel(binding, handle, before):
+    """Read what the store persisted, over a surface DISCOVERED rather than declared.
 
-    A path can be lied about too, which is why the channel carries its own positive control. A unique
-    sentinel is written through the adapter's own `rebuild()` -- protocol surface, nothing
-    implementation-specific -- and must then appear in the bytes read back. If it does not, the
-    declared path is not where this store writes, and every conclusion drawn from those bytes would
-    be about the wrong file. That case fails CLOSED and says so, rather than reporting a clean
-    erasure over a file nobody is writing to.
+    THIS IS THE FOURTH DESIGN AND THE FIRST THAT DOES NOT ASK THE SUBJECT ANYTHING.
 
-    Returns (text, note). `text` is None when the channel could not be established.
+    v1 asked the binding for a dump; a dump can be empty, `{}`, or hard-coded. v2 added a canary the
+    binding had to reproduce, and it fell three ways in one audit round:
+
+      - the sentinel was `hash(tuple(paths))`, a pure function of paths the BINDING chooses,
+        computed in the same process. A binding computed it and wrote it to a decoy, with no store
+        write at all. A canary derived from data the adversary controls is not a canary.
+      - an honest declared path plus an undeclared sibling passed cleanly. The canary proves a
+        declared file is A place the store writes, never the ONLY one -- and the reference store
+        writes three files while the binding declared one, so a PASS was measured over a third of
+        the persistence surface.
+      - writing the canary through `rebuild()` polluted the subject: it made `snapshot()` non-empty,
+        which is a property the same run then checked. The instrument supplied the evidence.
+
+    So nothing is declared and no canary is written. The runner scans the store's directory before
+    the case and again after, and the files that CHANGED are the persistence surface -- discovered
+    from the store's own behaviour, over any sibling it touched, with no write of ours to pollute
+    it. A store that wrote nothing at all during a repair is itself the finding, and fails closed.
     """
-    paths = []
-    if hasattr(binding, "persisted_paths"):
-        paths = [p for p in (binding.persisted_paths(handle) or []) if p]
-    if not paths:
-        return None, "the binding declares no persisted_paths(), so nothing can be read independently"
+    root = None
+    if hasattr(binding, "persisted_root"):
+        root = binding.persisted_root(handle)
+    if not root or not os.path.isdir(root):
+        return None, "the binding declares no persisted_root(), so nothing can be observed"
 
-    sentinel = "conformance-channel-canary-%s" % abs(hash(tuple(paths))) 
-    try:
-        adapter.rebuild("__channel_probe__", inputs=(), replacement=sentinel)
-    except Exception as exc:
-        return None, "could not write a canary through rebuild(): %s" % type(exc).__name__
+    after = _scan(root)
+    touched = [f for f, meta in after.items() if before.get(f) != meta]
+    if not touched:
+        return None, ("no file under the store's own directory changed during the repair, so either "
+                      "nothing was persisted or the observed directory is not the store's")
 
     blob = []
-    for path in paths:
+    for fp in sorted(set(touched) | set(after)):
         try:
-            blob.append(io.open(path, "r", encoding="utf-8", errors="replace").read())
-        except Exception as exc:
-            return None, "declared path %r is unreadable: %s" % (path, type(exc).__name__)
-    text = "\n".join(blob)
-
-    if not _present(sentinel, text):
-        return None, ("the canary written through rebuild() does not appear in the declared "
-                      "persisted_paths, so those files are not where this store writes")
-    return text, "channel verified via canary across %d file(s)" % len(paths)
+            blob.append(io.open(fp, "r", encoding="utf-8", errors="replace").read())
+        except OSError:
+            pass
+    return "\n".join(blob), "%d file(s) changed, %d read under %s" % (
+        len(touched), len(after), os.path.basename(root.rstrip("/\\")))
 
 
 def compare(case, observed, strict=True):
@@ -336,6 +354,11 @@ def compare(case, observed, strict=True):
     """
     exp, fails = case["expect"], []
     if strict:
+        if not (observed.get("_texts") or []):
+            # `all([])` is True, so an empty list satisfied the faithfulness and cross-check tests
+            # at once. A store that claims to assert nothing after a repair is a finding, not a pass.
+            fails.append("the store reports no active propositions at all, so every check that reads "
+                         "them is vacuous")
         if observed.get("store_property", {}).get("binding_disagrees_with_recall"):
             fails.append("the binding's active_texts disagrees with the adapter's own recall() for "
                          "%s; a self-reported store state is not evidence"
@@ -644,15 +667,15 @@ class InspeximusBinding:
     def active_texts(self, handle):
         return [r.get("text") for r in handle.items if r.get("status") == "active"]
 
-    def persisted_paths(self, handle):
-        """WHERE this store writes, so the runner can read the bytes itself.
+    def persisted_root(self, handle):
+        """The DIRECTORY this store persists into. Not a file list, and not a dump.
 
-        Deliberately not a dump. A dump is the implementation's account of itself, and three audit
-        rounds showed every such account can be made to lie -- empty, `{}`, or hard-coded. A path
-        can be lied about too, so the runner writes a canary through the protocol and requires it to
-        appear here before trusting anything read from these files.
+        The runner scans it before and after the case and reads whatever changed, so sidecars this
+        binding never mentions -- receipts, tombstones, indexes -- are covered without either side
+        having to enumerate them. Declaring one file was how a previous version measured an erasure
+        over a third of the persistence surface.
         """
-        return [getattr(handle, "path", None)]
+        return os.path.dirname(os.path.abspath(getattr(handle, "path", "") or "."))
 
 
 if __name__ == "__main__":

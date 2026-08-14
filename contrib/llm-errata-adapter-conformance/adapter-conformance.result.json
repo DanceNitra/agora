@@ -47,7 +47,7 @@
           "snapshot_is_non_empty": true,
           "state_roots_differ": true
         },
-        "channel": "channel verified via canary across 1 file(s)",
+        "channel": "2 file(s) changed, 2 read under tmp9c42eftr",
         "methods_reached": [
           "_assert",
           "_flush",
@@ -113,7 +113,7 @@
           "snapshot_is_non_empty": true,
           "state_roots_differ": true
         },
-        "channel": "channel verified via canary across 1 file(s)",
+        "channel": "2 file(s) changed, 2 read under tmpfpwilyyr",
         "methods_reached": [
           "_assert",
           "_flush",
@@ -176,7 +176,7 @@
           "snapshot_is_non_empty": true,
           "state_roots_differ": true
         },
-        "channel": "channel verified via canary across 1 file(s)",
+        "channel": "2 file(s) changed, 3 read under tmpqfir86fb",
         "methods_reached": [
           "_flush",
           "_names_root",
@@ -201,8 +201,8 @@
       "pass": false,
       "expectation_met": false,
       "failures": [
-        "aggregate: expected one of ['verified'], got failed",
-        "triad.positive: expected pass, got fail"
+        "unspecified triad.positive = fail (case did not declare it; it must still conform)",
+        "unspecified aggregate = failed (case did not declare it; it must still conform)"
       ],
       "normative_source": "IDEA.md",
       "methods_required": [
@@ -241,7 +241,7 @@
           "snapshot_is_non_empty": true,
           "state_roots_differ": false
         },
-        "channel": "channel verified via canary across 1 file(s)",
+        "channel": "no file under the store's own directory changed during the repair, so either nothing was persisted or the observed directory is not the store's",
         "methods_reached": [
           "_flush",
           "_names_root",
