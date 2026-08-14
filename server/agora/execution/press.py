@@ -121,21 +121,37 @@ def publish_piece(pid: str) -> dict:
                            capture_output=True, text=True, timeout=120)
         tmp.unlink(missing_ok=True)
         rendered = r.returncode == 0
-    except Exception:
-        rendered = False
+        if not rendered:
+            # FAIL CLOSED. render_post.py runs publish_gate.enforce(), which signals a construction
+            # refusal by raising SystemExit(1) -- deliberately, "because a caller that forgets to
+            # check a return value is exactly the failure this file exists to remove". This caller
+            # turned that refusal into `rendered = False` and then committed and pushed `rel_md`
+            # anyway: the gate's verdict changed the FORM of the publication (markdown instead of
+            # HTML) and not WHETHER it published. A number whose probe could not have contradicted
+            # it went out as raw markdown, and the owner was told "published".
+            #
+            # There is no safe way to tell a gate refusal from a renderer crash by exit code alone,
+            # so BOTH now stop the publish. A piece that cannot be rendered is not a piece that is
+            # ready to go out.
+            dst.unlink(missing_ok=True)
+            return {"error": ("render/gate refused (exit %d) — nothing was committed or pushed. "
+                              "Fix the finding it reports, then re-propose.\n%s"
+                              % (r.returncode, (r.stdout or "")[-600:]))}
+    except Exception as e:
+        dst.unlink(missing_ok=True)
+        return {"error": f"render failed: {str(e)[:200]} — nothing was committed or pushed"}
 
     def _git(*args):
         return subprocess.run(["git", "-C", str(AGORA_REPO), *args],
                               capture_output=True, text=True, timeout=60)
     add = [rel_md] + ([html_rel, f"{POSTS_REL}/index.html", f"{POSTS_REL}/posts.json"]
                       if rendered else [])
-    _git("add", *add)
-    c = _git("commit", "-m", f"Press: {rec['title'][:60]}")
-    if "nothing to commit" in (c.stdout + c.stderr):
+    from agora.execution.public_repo import commit_and_push
+    g = commit_and_push(AGORA_REPO, add, f"Press: {rec['title'][:60]}")
+    if g.get("error"):
+        return {"error": g["error"]}
+    if g.get("note"):
         return {"error": "nothing to commit (identical piece already published?)"}
-    p = _git("push", "origin", "main")
-    if p.returncode != 0:
-        return {"error": ("push failed: " + (p.stderr or p.stdout))[:200]}
     rec["status"] = "published"
     rec["url"] = (f"https://dancenitra.github.io/agora/{html_rel}" if rendered
                   else f"{_REPO_URL}/{rel_md}")
