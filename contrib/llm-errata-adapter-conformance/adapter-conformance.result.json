@@ -9,7 +9,7 @@
   "implementation": {
     "binding_class": "__main__.InspeximusBinding",
     "source_digests": {
-      "run_adapter_conformance.py": "2788c32d8fee7b60",
+      "run_adapter_conformance.py": "b5a3b2d3a76430e5",
       "inspeximus.__version__": "2.9.0"
     }
   },
