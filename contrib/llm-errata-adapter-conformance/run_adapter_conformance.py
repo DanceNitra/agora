@@ -28,6 +28,7 @@ TO RUN IT AGAINST YOUR OWN STORE, implement one class (see `InspeximusBinding` a
         name = "your-store"
         def build(self, records):   # -> (StoreAdapter, handle)
         def active_texts(self, handle):  # -> list[str] of currently-asserted propositions
+        def raw_dump(self, handle):      # -> str, EVERYTHING persisted (erasure cannot be faked)
 
     python run_adapter_conformance.py --pkg <dir with prototype/> --binding your.module:YourBinding
 """
@@ -143,7 +144,41 @@ def apply_mutation(adapter, importer, mutation, binding, handle, root):
                          "cannot install, which means the case has never been shown to fail" % target)
 
 
-def evaluate(case, binding, pkg, mutate=False):
+def _stub(adapter, method):
+    """Replace one protocol method with an inert but well-formed answer.
+
+    Inert, not broken: returning a plausible empty value is what a lazy implementation does, and it
+    is the case that must notice. Raising would prove only that the call happens.
+    """
+    from prototype.adapters import Coverage
+    stands_in = {
+        "enumerate": [lambda *a, **k: ()],
+        "repair_inputs": [lambda *a, **k: ()],
+        "snapshot": [lambda *a, **k: {}],
+        "dispositions": [lambda *a, **k: {}],
+        "recall": [lambda *a, **k: ()],
+        "is_quarantined": [lambda *a, **k: False, lambda *a, **k: True],
+        "quarantine": [lambda *a, **k: None],
+        "retire": [lambda *a, **k: None],
+        "source_artifact": [lambda x, *a, **k: x],
+        "rebuild": [lambda *a, **k: ""],
+        "coverage_detail": [lambda *a, **k: {}],
+        # BOTH DIRECTIONS. A single stand-in that happens to agree with the case's expected outcome
+        # changes nothing, and the method then reads as inert when it is simply un-probed. Measured:
+        # `lineage_complete -> True` left a case expecting `verified` untouched and was reported
+        # INERT; `-> False` flips it immediately.
+        "lineage_complete": [lambda *a, **k: True, lambda *a, **k: False],
+        "coverage": [lambda *a, **k: Coverage.VERIFIED, lambda *a, **k: Coverage.UNKNOWN],
+        "quarantine_coverage": [lambda *a, **k: Coverage.VERIFIED,
+                                lambda *a, **k: Coverage.UNKNOWN],
+    }
+    options = stands_in.get(method)
+    if not options:
+        return None
+    return options
+
+
+def evaluate(case, binding, pkg, mutate=False, stub_method=None):
     """Run one case and return what was observed. Never decides pass/fail; the caller compares."""
     from prototype.scenario import build_importer
     from prototype.signing import Ed25519Signer
@@ -157,6 +192,15 @@ def evaluate(case, binding, pkg, mutate=False):
     if mutate:
         apply_mutation(adapter, importer, case["mutation"], binding, handle,
                        case["erratum"]["target_root"])
+    if stub_method:
+        options = _stub(adapter, stub_method[0] if isinstance(stub_method, tuple) else stub_method)
+        if options is None:
+            raise ValueError("no stand-in defined for %r" % (stub_method,))
+        idx = stub_method[1] if isinstance(stub_method, tuple) else 0
+        if idx >= len(options):
+            raise IndexError("no variant %d" % idx)
+        setattr(adapter, stub_method[0] if isinstance(stub_method, tuple) else stub_method,
+                options[idx])
 
     observed = {}
     with Tracer(target=adapter) as t:
@@ -170,12 +214,41 @@ def evaluate(case, binding, pkg, mutate=False):
         observed["triad"] = {k: str(v) for k, v in dict(receipt.triad).items()}
 
     texts = list(binding.active_texts(handle))
+
+    # CONCEALMENT. `active_texts` only says what is in present-tense recall, so an adapter whose
+    # retire() copies the value into a side field and demotes the record satisfies every check
+    # above. Measured: such an adapter scored a full PASS on the erasure case while the store still
+    # held "is vegetarian" verbatim. Erasure has to be checked against the PERSISTED state, so the
+    # binding must hand over everything it wrote.
+    raw = binding.raw_dump(handle) if hasattr(binding, "raw_dump") else None
+
+    # SELF-ATTESTATION. `active_texts` is written by the implementation under test; a binding that
+    # returns a hard-coded list is never contradicted. Cross-check each answer against the adapter's
+    # own recall(), which is the protocol's surface rather than the binding's.
+    disagreements = []
+    for term in set(texts):
+        try:
+            hits = adapter.recall(term)
+        except Exception:
+            continue
+        if term and not any(term in getattr(h, "content", "") for h in hits):
+            disagreements.append(term)
+
     observed["store_property"] = {
         "duplicate_active_assertions": len(texts) - len(set(texts)),
-        "erased_text_absent": None, "preserved_text_present": None, "unrelated_text_present": None}
+        "erased_text_absent": None, "preserved_text_present": None, "unrelated_text_present": None,
+        "erased_text_absent_from_persisted_state": None,
+        "binding_disagrees_with_recall": disagreements}
     observed["receipt_property"] = {
         "names_the_store": getattr(adapter, "name", "") in blob,
-        "is_non_trivial": len(blob) > 200, "forbidden_value_absent": None}
+        "is_non_trivial": len(blob) > 200, "forbidden_value_absent": None,
+        # An empty snapshot() makes pre_state_root == post_state_root while coverage still reads
+        # `verified` and no limitation is recorded, so the receipt attests state roots that bind
+        # nothing. Both are now observable.
+        "snapshot_is_non_empty": bool(adapter.snapshot()),
+        "state_roots_differ": (receipt.to_dict().get("pre_state_root")
+                               != receipt.to_dict().get("post_state_root"))}
+    observed["_raw"] = raw
     observed["_texts"] = texts
     observed["_blob"] = blob
     observed["methods_reached"] = sorted(t.hits)
@@ -194,6 +267,10 @@ def compare(case, observed, strict=True):
     """
     exp, fails = case["expect"], []
     if strict:
+        if observed.get("store_property", {}).get("binding_disagrees_with_recall"):
+            fails.append("the binding's active_texts disagrees with the adapter's own recall() for "
+                         "%s; a self-reported store state is not evidence"
+                         % observed["store_property"]["binding_disagrees_with_recall"][:3])
         for arm, got in observed.get("triad", {}).items():
             if arm not in (exp.get("triad") or {}) and got != "pass":
                 fails.append("unspecified triad.%s = %s (case did not declare it; it must still "
@@ -202,8 +279,16 @@ def compare(case, observed, strict=True):
             fails.append("unspecified aggregate = %s (case did not declare it; it must still "
                          "conform)" % observed.get("aggregate"))
     for key in ("checkpoint_coverage", "aggregate"):
-        if key in exp and observed.get(key) != exp[key]:
-            fails.append("%s: expected %s, got %s" % (key, exp[key], observed.get(key)))
+        if key not in exp:
+            continue
+        want = exp[key]
+        # A contract that permits a SET must be scored as a set. Our first version pinned `unknown`
+        # where IDEA.md says "remain `partial` or `unknown`" -- the single value inspeximus happens
+        # to emit -- so a conforming adapter answering `partial` would have failed our fixture. His
+        # own reference test expects `partial` for a related shape.
+        allowed = want if isinstance(want, list) else [want]
+        if observed.get(key) not in allowed:
+            fails.append("%s: expected one of %s, got %s" % (key, allowed, observed.get(key)))
     for arm, want in (exp.get("triad") or {}).items():
         got = observed["triad"].get(arm)
         if got != want:
@@ -219,6 +304,13 @@ def compare(case, observed, strict=True):
         elif prop in ("preserved_text_present", "unrelated_text_present"):
             if want not in observed["_texts"]:
                 fails.append("%s: %r is not asserted" % (prop, want))
+        elif prop == "erased_text_absent_from_persisted_state":
+            raw = observed.get("_raw")
+            if raw is None:
+                fails.append("the binding exposes no raw_dump(), so erasure cannot be distinguished "
+                             "from concealment and this case cannot be scored")
+            elif want in raw:
+                fails.append("CONCEALED, not erased: %r survives in the persisted state" % want)
     for prop, want in (exp.get("receipt_property") or {}).items():
         if prop == "forbidden_value_absent":
             if want in observed["_blob"]:
@@ -321,19 +413,31 @@ def main(argv=None):
     # to --pkg could be scored and reported under this fixture's name. Reported upstream as a
     # source-binding gap. The adapter's own pin is asserted, the scored tree is digested, and
     # --pkg-digest makes that binding enforceable rather than merely recorded.
-    from inspeximus.integrations.llm_errata import SPEC_COMMIT, SPEC_G2_DIGEST
+    # The target is the FIXTURE's, not any implementation's. An earlier version imported
+    # inspeximus here unconditionally, so a third party with their own binding got an ImportError
+    # on line one of main() while the README promised nothing above InspeximusBinding named us.
+    # It also meant the "source binding" compared two inspeximus-authored constants against an
+    # inspeximus-authored fixture, which is a mirror, not a check.
     target = fixture.get("target", {})
-    if target.get("commit") and SPEC_COMMIT != target["commit"]:
-        raise AssertionError("the adapter is bound to %s but the fixture targets %s"
-                             % (SPEC_COMMIT[:12], target["commit"][:12]))
-    if target.get("g2_digest") and SPEC_G2_DIGEST != target["g2_digest"]:
-        raise AssertionError("the adapter carries a different G2 digest than the fixture targets")
+    SPEC_COMMIT = target.get("commit", "(declared by the fixture only)")
+    SPEC_G2_DIGEST = target.get("g2_digest", "")
+    declared = getattr(binding, "spec_commit", None)
+    if declared and target.get("commit") and declared != target["commit"]:
+        raise AssertionError("the binding declares spec commit %s but the fixture targets %s"
+                             % (declared[:12], target["commit"][:12]))
     tree_digest, n_files = source_digest(a.pkg)
-    if a.pkg_digest and a.pkg_digest.strip().lower() != tree_digest:
+    expected_tree = a.pkg_digest or target.get("source_tree_digest")
+    if expected_tree and expected_tree.strip().lower() != tree_digest:
+        a.pkg_digest = expected_tree
+    if expected_tree and expected_tree.strip().lower() != tree_digest:
         raise AssertionError("REFUSED: --pkg does not match the declared source digest.\n"
                              "  declared : %s\n  scored   : %s" % (a.pkg_digest.strip(), tree_digest))
 
-    out = {"fixture_status": fixture["status"], "binding": binding.name,
+    out = {"fixture_status": fixture["status"],
+           "binding": binding.name,
+           # `binding.name` is self-declared: every adversarial binding in our own validation wrote
+           # "inspeximus" into this file. Record the class that actually ran.
+           "binding_class": "%s.%s" % (type(binding).__module__, type(binding).__name__),
            "spec_commit": SPEC_COMMIT, "g2_digest": SPEC_G2_DIGEST,
            "scored_tree_digest": tree_digest, "scored_files": n_files, "cases": []}
     print("Candidate adapter conformance -- binding: %s" % binding.name)
@@ -353,11 +457,34 @@ def main(argv=None):
         observed = evaluate(case, binding, a.pkg, mutate=False)
         ok, fails = compare(case, observed)
 
-        # RULE 2: the case must have reached the surface it claims to test.
-        required = set(case["positive_control"]["adapter_methods_required"])
-        reached = required & set(observed["methods_reached"])
-        control_ok = reached == required
-        missing = sorted(required - reached)
+        # RULE 2: each declared method must be LOAD-BEARING, proven by stubbing it and requiring
+        # the case to stop passing.
+        #
+        # The first version asked whether a function of that name was entered on the adapter. That
+        # cannot fail: the controller drives 12 to 13 of the adapter's 14 methods on every run while
+        # a case declares 3 or 4, so every case satisfied it automatically. The tell was in our own
+        # audit, which had to require `sign` -- a method that is not on the adapter at all -- to make
+        # the guard fire. It also had the opposite error: a real method supplied as a lambda reports
+        # its code name as `<lambda>` and was scored MISSING despite running.
+        required = list(case["positive_control"]["adapter_methods_required"])
+        load_bearing, inert = [], []
+        for method in required:
+            noticed = False
+            for variant in range(2):
+                try:
+                    stubbed = evaluate(case, binding, a.pkg, stub_method=(method, variant))
+                    passes, _ = compare(case, stubbed)
+                    if not passes:
+                        noticed = True
+                        break
+                except IndexError:
+                    break
+                except Exception:
+                    noticed = True   # the case cannot even run without it: load-bearing
+                    break
+            (load_bearing if noticed else inert).append(method)
+        control_ok = not inert
+        missing = inert
 
         # RULE 3: the case must fail against the flattering implementation it names.
         # An exception is NOT a caught mutation. The first version credited any raise, so a mutation
@@ -391,13 +518,15 @@ def main(argv=None):
         passed += bool(good)
         print("[%s] %s" % ("PASS" if good else "FAIL", case["id"]))
         print("      expectation : %s" % ("met" if ok else "; ".join(fails)))
-        print("      control     : reached %d/%d declared methods%s"
-              % (len(reached), len(required), "" if control_ok else " -- MISSING %s" % missing))
+        print("      control     : %d/%d declared methods are load-bearing%s"
+              % (len(load_bearing), len(required),
+                 "" if control_ok else " -- INERT (stubbing them changes nothing): %s" % inert))
         print("      mutation    : %s (%s)" % (case["mutation"]["flattering_behaviour"], mut_note))
         out["cases"].append({
             "id": case["id"], "pass": good, "expectation_met": ok, "failures": fails,
             "normative_source": case["normative"]["source"],
-            "methods_required": sorted(required), "methods_reached": sorted(reached),
+            "methods_required": sorted(required), "methods_load_bearing": sorted(load_bearing),
+            "methods_inert": sorted(inert),
             "positive_control_ok": control_ok, "mutation_caught": mutation_caught,
             "observed": {k: v for k, v in observed.items() if not k.startswith("_")}})
 
@@ -439,6 +568,14 @@ class InspeximusBinding:
 
     def active_texts(self, handle):
         return [r.get("text") for r in handle.items if r.get("status") == "active"]
+
+    def raw_dump(self, handle):
+        """EVERYTHING this store persisted, not just what it will admit to recalling.
+
+        Without this an erasure case cannot tell erasure from concealment: an adapter that moves
+        the value into a side field and demotes the record satisfies every present-tense check.
+        """
+        return json.dumps(handle.items, default=str)
 
 
 if __name__ == "__main__":

@@ -1,6 +1,7 @@
 {
   "fixture_status": "CANDIDATE. Proposed, not accepted. Being proposed or merged does not make these G2 or G4 evidence.",
   "binding": "inspeximus",
+  "binding_class": "__main__.InspeximusBinding",
   "spec_commit": "ac4468faf73c2cc7949dd29b2a2a151f5bd23116",
   "g2_digest": "7e0d6c88c1ca3a87743ac70ba2a3dfea0b350d112d2d3c59a3c6cbb537568f12",
   "scored_tree_digest": "3c334d751ca75a6e8af7b138258a3cdc67a39f9e813fc14c3750e8570c9c4a03",
@@ -13,17 +14,14 @@
       "failures": [],
       "normative_source": "IDEA.md",
       "methods_required": [
-        "coverage",
         "enumerate",
-        "lineage_complete",
-        "quarantine_coverage"
+        "lineage_complete"
       ],
-      "methods_reached": [
-        "coverage",
+      "methods_load_bearing": [
         "enumerate",
-        "lineage_complete",
-        "quarantine_coverage"
+        "lineage_complete"
       ],
+      "methods_inert": [],
       "positive_control_ok": true,
       "mutation_caught": true,
       "observed": {
@@ -38,12 +36,16 @@
           "duplicate_active_assertions": 0,
           "erased_text_absent": null,
           "preserved_text_present": null,
-          "unrelated_text_present": null
+          "unrelated_text_present": null,
+          "erased_text_absent_from_persisted_state": null,
+          "binding_disagrees_with_recall": []
         },
         "receipt_property": {
           "names_the_store": true,
           "is_non_trivial": true,
-          "forbidden_value_absent": null
+          "forbidden_value_absent": null,
+          "snapshot_is_non_empty": true,
+          "state_roots_differ": true
         },
         "methods_reached": [
           "_assert",
@@ -78,12 +80,13 @@
         "lineage_complete",
         "quarantine_coverage"
       ],
-      "methods_reached": [
+      "methods_load_bearing": [
         "coverage",
         "enumerate",
         "lineage_complete",
         "quarantine_coverage"
       ],
+      "methods_inert": [],
       "positive_control_ok": true,
       "mutation_caught": true,
       "observed": {
@@ -98,12 +101,16 @@
           "duplicate_active_assertions": 0,
           "erased_text_absent": null,
           "preserved_text_present": null,
-          "unrelated_text_present": null
+          "unrelated_text_present": null,
+          "erased_text_absent_from_persisted_state": null,
+          "binding_disagrees_with_recall": []
         },
         "receipt_property": {
           "names_the_store": true,
           "is_non_trivial": true,
-          "forbidden_value_absent": null
+          "forbidden_value_absent": null,
+          "snapshot_is_non_empty": true,
+          "state_roots_differ": true
         },
         "methods_reached": [
           "_assert",
@@ -133,17 +140,16 @@
       "failures": [],
       "normative_source": "spec/README.md",
       "methods_required": [
-        "dispositions",
         "recall",
         "retire",
         "snapshot"
       ],
-      "methods_reached": [
-        "dispositions",
+      "methods_load_bearing": [
         "recall",
         "retire",
         "snapshot"
       ],
+      "methods_inert": [],
       "positive_control_ok": true,
       "mutation_caught": true,
       "observed": {
@@ -157,12 +163,16 @@
           "duplicate_active_assertions": 0,
           "erased_text_absent": null,
           "preserved_text_present": null,
-          "unrelated_text_present": null
+          "unrelated_text_present": null,
+          "erased_text_absent_from_persisted_state": null,
+          "binding_disagrees_with_recall": []
         },
         "receipt_property": {
           "names_the_store": true,
           "is_non_trivial": true,
-          "forbidden_value_absent": null
+          "forbidden_value_absent": null,
+          "snapshot_is_non_empty": true,
+          "state_roots_differ": true
         },
         "methods_reached": [
           "_flush",
@@ -188,8 +198,8 @@
       "pass": false,
       "expectation_met": false,
       "failures": [
-        "unspecified triad.positive = fail (case did not declare it; it must still conform)",
-        "unspecified aggregate = failed (case did not declare it; it must still conform)"
+        "aggregate: expected one of ['verified'], got failed",
+        "triad.positive: expected pass, got fail"
       ],
       "normative_source": "IDEA.md",
       "methods_required": [
@@ -197,11 +207,12 @@
         "recall",
         "retire"
       ],
-      "methods_reached": [
+      "methods_load_bearing": [
         "enumerate",
         "recall",
         "retire"
       ],
+      "methods_inert": [],
       "positive_control_ok": true,
       "mutation_caught": true,
       "observed": {
@@ -216,12 +227,16 @@
           "duplicate_active_assertions": 0,
           "erased_text_absent": null,
           "preserved_text_present": null,
-          "unrelated_text_present": null
+          "unrelated_text_present": null,
+          "erased_text_absent_from_persisted_state": null,
+          "binding_disagrees_with_recall": []
         },
         "receipt_property": {
           "names_the_store": true,
           "is_non_trivial": true,
-          "forbidden_value_absent": null
+          "forbidden_value_absent": null,
+          "snapshot_is_non_empty": true,
+          "state_roots_differ": false
         },
         "methods_reached": [
           "_flush",

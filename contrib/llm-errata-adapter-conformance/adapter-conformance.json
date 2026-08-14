@@ -66,22 +66,27 @@
         }
       },
       "expect": {
-        "checkpoint_coverage": "unknown",
-        "aggregate": "unknown",
+        "checkpoint_coverage": [
+          "partial",
+          "unknown"
+        ],
+        "aggregate": [
+          "partial",
+          "unknown"
+        ],
         "triad": {
           "negative": "pass",
           "positive": "pass",
           "preserve": "pass"
         }
       },
-      "note": "The triad passes and the aggregate is still `unknown`. That combination is the whole point: passing probes must not upgrade unresolved lineage.",
+      "note": "The contract permits `partial` OR `unknown` here, so both are accepted. Pinning the single value our own implementation emits would have failed a conforming adapter that chose the other, and the reference's own test expects `partial` for a related shape.",
       "positive_control": {
         "adapter_methods_required": [
           "lineage_complete",
-          "quarantine_coverage",
-          "enumerate",
-          "coverage"
-        ]
+          "enumerate"
+        ],
+        "note": "Only methods measured to be load-bearing for THIS case are declared. The runner stubs each one in both directions and requires the case to notice; listing a method the case does not actually depend on makes the control a decoration."
       },
       "mutation": {
         "target": "lineage_complete",
@@ -197,31 +202,32 @@
         "receipt_property": {
           "forbidden_value_absent": "is vegetarian",
           "names_the_store": true,
-          "is_non_trivial": true
+          "is_non_trivial": true,
+          "snapshot_is_non_empty": true
         },
         "store_property": {
           "erased_text_absent": "is vegetarian",
-          "preserved_text_present": "prefers quiet restaurants"
+          "preserved_text_present": "prefers quiet restaurants",
+          "erased_text_absent_from_persisted_state": "is vegetarian"
         }
       },
       "positive_control": {
         "adapter_methods_required": [
           "retire",
           "recall",
-          "snapshot",
-          "dispositions"
-        ]
+          "snapshot"
+        ],
+        "note": "Only methods measured to be load-bearing for THIS case are declared. The runner stubs each one in both directions and requires the case to notice; listing a method the case does not actually depend on makes the control a decoration."
       },
       "mutation": {
-        "target": "repair",
-        "flattering_behaviour": "return a receipt whose serialised form is empty",
+        "target": "retire",
+        "flattering_behaviour": "conceal instead of erase: keep the value verbatim in a side field and demote the record out of present-tense recall",
         "must_produce": {
-          "receipt_property": {
-            "names_the_store": false,
-            "is_non_trivial": false
+          "store_property": {
+            "erased_text_absent_from_persisted_state": null
           }
         },
-        "why": "Measured on our own harness before this file existed: the empty-receipt stub scored a full pass on the published confidentiality case."
+        "why": "Measured: an adapter doing exactly this scored a full PASS on the earlier version of this case while the store still held the erased value verbatim."
       }
     },
     {
@@ -395,6 +401,7 @@
   "target": {
     "commit": "ac4468faf73c2cc7949dd29b2a2a151f5bd23116",
     "g2_digest": "7e0d6c88c1ca3a87743ac70ba2a3dfea0b350d112d2d3c59a3c6cbb537568f12",
-    "note": "The runner asserts the bound adapter matches these and digests the tree it scores, so an arbitrary --pkg cannot be reported under this fixture's name."
+    "note": "The runner asserts the bound adapter matches these and digests the tree it scores, so an arbitrary --pkg cannot be reported under this fixture's name.",
+    "source_tree_digest": "3c334d751ca75a6e8af7b138258a3cdc67a39f9e813fc14c3750e8570c9c4a03"
   }
 }
