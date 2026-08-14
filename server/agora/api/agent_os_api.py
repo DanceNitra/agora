@@ -3164,7 +3164,7 @@ async def _send_telegram(text: str) -> bool:
     import asyncio
     import json
     import os
-    import subprocess
+    import urllib.request
     from agora.execution.claude_inbox import feed_append
     feed_append(text)                               # so Claude Code reads the same feed the user sees
     token, chat = os.getenv("HERMES_TELEGRAM_BOT_TOKEN", ""), os.getenv("HERMES_TELEGRAM_CHAT_ID", "")
@@ -3172,13 +3172,25 @@ async def _send_telegram(text: str) -> bool:
         return False
 
     def _s():
-        payload = json.dumps({"chat_id": chat, "text": text[:4000], "parse_mode": "Markdown"})
-        r = subprocess.run(
-            ["curl", "-s", "--max-time", "12", "-X", "POST",
-             f"https://api.telegram.org/bot{token}/sendMessage",
-             "-H", "Content-Type: application/json", "-d", payload],
-            capture_output=True, text=True, timeout=15)
-        return '"ok":true' in (r.stdout or "")
+        # urllib, not a curl subprocess: keeps the bot token out of the process argument list, where
+        # `ps` (or Get-CimInstance Win32_Process on Windows) hands it to any local process without
+        # elevation. Whoever holds the token can read the owner's whole control-plane chat via
+        # getUpdates and send messages that look like ours. real_action_engine.py:139 was fixed for
+        # this in 2026-07 and carried the comment; this call site and hermes.py kept the defect
+        # because the fix was applied to the instance and not to the class.
+        payload = json.dumps({"chat_id": chat, "text": text[:4000],
+                              "parse_mode": "Markdown"}).encode()
+        req = urllib.request.Request(f"https://api.telegram.org/bot{token}/sendMessage",
+                                     data=payload,
+                                     headers={"Content-Type": "application/json"})
+        try:
+            return '"ok":true' in urllib.request.urlopen(req, timeout=12).read().decode(
+                "utf-8", "replace")
+        except Exception:
+            # A notifier that raises into its awaiter turns a failed notice into a failed request.
+            # The curl version could not raise on an API error (curl exits 0 and prints ok:false);
+            # urlopen raises HTTPError, so the equivalence has to be restored here.
+            return False
     return await asyncio.to_thread(_s)
 
 
