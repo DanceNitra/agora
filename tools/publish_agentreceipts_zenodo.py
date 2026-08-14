@@ -91,6 +91,17 @@ def main():
          data=json.dumps(_zenodo_metadata()).encode("utf-8"))
     print("metadata set")
 
+    # A DOI cannot be retracted, and `--sandbox` is opt-IN, so a bare run of this script -- the
+    # command in its own usage docstring -- used to mint a permanent production record with no
+    # confirmation. publish_crucible_zenodo.py and publish_paper_zenodo.py have staged a draft and
+    # required an explicit --publish since 2026-08-10; the pattern was never ported here. Extra
+    # reason it matters in this file: a missing input only prints "SKIP (missing)" and the run
+    # continues, so a bare invocation could mint a DOI over a deposit with nothing in it.
+    if "--publish" not in sys.argv:
+        print("\nDRAFT ready, NOT published: %s/deposit/%d" % (BASE, dep_id))
+        print("Check the files and metadata there, then re-run with --publish to mint the DOI.")
+        print("Minting is IRREVERSIBLE -- Zenodo does not delete a published record.")
+        return 0
     st, pub = _req("POST", "%s/api/deposit/depositions/%d/actions/publish" % (BASE, dep_id), tok)
     doi = pub.get("doi") or (pub.get("metadata") or {}).get("doi")
     print("\nPUBLISHED. DOI:", doi)

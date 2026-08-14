@@ -122,6 +122,16 @@ def main():
          data=json.dumps(_zenodo_metadata()).encode("utf-8"))
     print("metadata set")
 
+    # A DOI cannot be retracted, and `--sandbox` is opt-IN, so a bare run of this script minted a
+    # permanent production record with no confirmation. The existing `_existing_inspeximus` guard
+    # only stops a third CONCEPT doi -- on the normal path it proceeds to publish a new VERSION,
+    # which is equally permanent. publish_crucible_zenodo.py and publish_paper_zenodo.py have
+    # required an explicit --publish since 2026-08-10; the pattern was never ported here.
+    if "--publish" not in sys.argv:
+        print("\nDRAFT ready, NOT published: %s/deposit/%d" % (BASE, dep_id))
+        print("Check the files and metadata there, then re-run with --publish to mint the DOI.")
+        print("Minting is IRREVERSIBLE -- Zenodo does not delete a published record.")
+        return 0
     st, pub = _req("POST", "%s/api/deposit/depositions/%d/actions/publish" % (BASE, dep_id), tok)
     doi = pub.get("doi") or (pub.get("metadata") or {}).get("doi")
     print("\nPUBLISHED. DOI:", doi)
