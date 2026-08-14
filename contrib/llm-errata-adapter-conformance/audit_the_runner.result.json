@@ -1,0 +1,34 @@
+{
+  "guards": [
+    {
+      "guard": "exception is not a caught mutation",
+      "fires": true
+    },
+    {
+      "guard": "tracing is bound to the target instance",
+      "fires": true
+    },
+    {
+      "guard": "--pkg-digest refuses a mismatched tree",
+      "fires": true
+    },
+    {
+      "guard": "must_produce is evaluated",
+      "fires": true
+    },
+    {
+      "guard": "a case without a citation is refused",
+      "fires": true
+    },
+    {
+      "guard": "an invented citation is refused",
+      "fires": true
+    },
+    {
+      "guard": "dropping an expectation does not hide a failure",
+      "fires": true
+    }
+  ],
+  "fired": 7,
+  "total": 7
+}
