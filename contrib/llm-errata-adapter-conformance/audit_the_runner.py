@@ -161,15 +161,33 @@ def main(argv=None):
         # `good = ok and control_ok and mutation_caught` with `good = ok` still printed 7/7 and
         # "every one noticed". An audit that cannot notice its subject ignoring its own controls is
         # measuring narration.
-        patch_runner("        good = ok and control_ok and mutation_caught",
-                     "        good = ok  # MUTANT: controls no longer reach the verdict")
+        # EACH LINK IS BROKEN SEPARATELY. The first version patched only the final expression, so
+        # rewriting the COMPUTATION -- `control_ok = not inert` to `control_ok = True` -- left all
+        # eight guards firing. The audit certified exactly the property it existed to stop
+        # certifying, and only an outside pass noticed. A chain is pinned at every link or nowhere.
+        links = [
+            ("final verdict", "        good = ok and control_ok and mutation_caught",
+             "        good = ok  # MUTANT"),
+            ("control_ok computation", "        control_ok = not inert",
+             "        control_ok = True  # MUTANT"),
+            ("inert bookkeeping", "            (load_bearing if noticed else inert).append(method)",
+             "            (load_bearing).append(method)  # MUTANT"),
+        ]
         fx = json.loads(orig_fx)
         fx["adapter_cases"][0]["positive_control"]["adapter_methods_required"].append("coverage_detail")
-        io.open(FIXTURE, "w", encoding="utf-8", newline="\n").write(json.dumps(fx, indent=2))
-        _, _o, gutted = run()
-        rows.append(("the controls reach the verdict",
-                     gutted.get(C1, {}).get("pass") is True
-                     and bool(gutted.get(C1, {}).get("methods_inert"))))
+        unpinned = []
+        for label, old_src, new_src in links:
+            io.open(FIXTURE, "w", encoding="utf-8", newline="\n").write(json.dumps(fx, indent=2))
+            patch_runner(old_src, new_src)
+            _, _o, gutted = run()
+            # With coverage_detail declared, the honest runner FAILS this case. A mutant that makes
+            # it pass has severed the controls from the verdict at that link.
+            if gutted.get(C1, {}).get("pass") is not True:
+                unpinned.append(label)
+            restore()
+        if unpinned:
+            print("      links NOT pinned: %s" % unpinned)
+        rows.append(("the controls reach the verdict at every link", not unpinned))
         restore()
     finally:
         restore()

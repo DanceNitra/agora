@@ -29,7 +29,7 @@
       "fires": true
     },
     {
-      "guard": "the controls reach the verdict",
+      "guard": "the controls reach the verdict at every link",
       "fires": true
     }
   ],

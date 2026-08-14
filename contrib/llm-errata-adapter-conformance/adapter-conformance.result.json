@@ -9,7 +9,7 @@
   "implementation": {
     "binding_class": "__main__.InspeximusBinding",
     "source_digests": {
-      "run_adapter_conformance.py": "0f38a4cd8433833e",
+      "run_adapter_conformance.py": "abfa5d09a77a024e",
       "inspeximus.__version__": "2.9.0"
     }
   },
@@ -54,7 +54,7 @@
           "snapshot_is_non_empty": true,
           "state_roots_differ": true
         },
-        "channel": "2 file(s) changed, 2 read under tmpdm9kys0j",
+        "channel": "2 file(s) changed, 2 read under tmpf8wwyvom",
         "methods_reached": [
           "_assert",
           "_flush",
@@ -120,7 +120,7 @@
           "snapshot_is_non_empty": true,
           "state_roots_differ": true
         },
-        "channel": "2 file(s) changed, 2 read under tmpdk90v7z5",
+        "channel": "2 file(s) changed, 2 read under tmpru8owhgs",
         "methods_reached": [
           "_assert",
           "_flush",
@@ -183,7 +183,7 @@
           "snapshot_is_non_empty": true,
           "state_roots_differ": true
         },
-        "channel": "2 file(s) changed, 3 read under tmpey5z3a1u",
+        "channel": "2 file(s) changed, 3 read under tmp2ldhy9m7",
         "methods_reached": [
           "_flush",
           "_names_root",

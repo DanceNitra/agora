@@ -174,7 +174,7 @@ def _stub(adapter, method):
     }
     options = stands_in.get(method)
     if not options:
-        return None
+        raise ValueError("no stand-in for %r" % method)
     return options
 
 
@@ -196,8 +196,6 @@ def evaluate(case, binding, pkg, mutate=False, stub_method=None):
                        case["erratum"]["target_root"])
     if stub_method:
         options = _stub(adapter, stub_method[0] if isinstance(stub_method, tuple) else stub_method)
-        if options is None:
-            raise ValueError("no stand-in defined for %r" % (stub_method,))
         idx = stub_method[1] if isinstance(stub_method, tuple) else 0
         if idx >= len(options):
             raise IndexError("no variant %d" % idx)
@@ -367,6 +365,10 @@ def compare(case, observed, strict=True):
             if arm not in (exp.get("triad") or {}) and got != "pass":
                 fails.append("unspecified triad.%s = %s (case did not declare it; it must still "
                              "conform)" % (arm, got))
+        if ("checkpoint_coverage" not in exp
+                and observed.get("checkpoint_coverage") not in (None, "verified", "(absent)")):
+            fails.append("unspecified checkpoint_coverage = %s (case did not declare it; it must "
+                         "still conform)" % observed.get("checkpoint_coverage"))
         if "aggregate" not in exp and observed.get("aggregate") not in (None, "verified"):
             fails.append("unspecified aggregate = %s (case did not declare it; it must still "
                          "conform)" % observed.get("aggregate"))
@@ -613,6 +615,14 @@ def main(argv=None):
                         break
                 except IndexError:
                     break
+                except ValueError:
+                    # No stand-in exists for this name. That is not evidence of anything: it means
+                    # the case declared a method this runner cannot probe, and crediting it was how
+                    # `sign` and `absolutely_not_a_method` scored "load-bearing". Refuse the case.
+                    raise AssertionError(
+                        "case %r declares %r, which has no stand-in and therefore cannot be shown "
+                        "load-bearing. A method the runner cannot probe must not be credited."
+                        % (case["id"], method))
                 except Exception:
                     noticed = True   # the case cannot even run without it: load-bearing
                     break
