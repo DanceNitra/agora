@@ -184,9 +184,18 @@ def evaluate(case, binding, pkg, mutate=False, stub_method=None):
     from prototype.signing import Ed25519Signer
 
     owner = Ed25519Signer(b"\x01" * 32, key_id="key-1")
-    adapter, handle = binding.build(case["store"]["records"])
-    channel_root = binding.persisted_root(handle) if hasattr(binding, "persisted_root") else None
-    before = _scan(channel_root) if channel_root and os.path.isdir(channel_root) else {}
+    # THE RUNNER ALLOCATES THE OBSERVED DIRECTORY. Pointing `tempfile.tempdir` here for the duration
+    # of build() means a store creating its files the ordinary way lands inside it whether or not the
+    # binding admits where it writes. The previous design scanned a directory the BINDING named, so a
+    # copy one level above it, or a decoy sub-root holding only a view file, was never looked at.
+    channel_root = tempfile.mkdtemp(prefix="conformance-observed-")
+    prior_tmp = tempfile.tempdir
+    tempfile.tempdir = channel_root
+    try:
+        before = _scan(channel_root)
+        adapter, handle = binding.build(case["store"]["records"])
+    finally:
+        tempfile.tempdir = prior_tmp
     importer = build_importer(owner)
     importer.adapters = [adapter]
     importer.roots = (case["erratum"]["target_root"],)
@@ -251,13 +260,67 @@ def evaluate(case, binding, pkg, mutate=False, stub_method=None):
     # READ LAST. A store that re-persists the value on the next `recall()` -- a call this runner
     # itself makes for the cross-check -- would slip past a channel read any earlier. Everything
     # that touches the store has happened by this point.
-    raw, channel_note = read_channel(binding, handle, before)
+    raw, channel_note = read_channel(channel_root, before)
     observed["_raw"] = raw
     observed["channel"] = channel_note
     observed["_texts"] = texts
     observed["_blob"] = blob
     observed["methods_reached"] = sorted(t.hits)
     return observed
+
+
+def _needle_forms(needle):
+    """Every byte form a store might plausibly have written this proposition in.
+
+    The previous search decoded files as utf-8 with errors="replace" and looked for a string. That is
+    blind to anything not stored as readable utf-8 text: a gzip side copy, utf-16, base64. Since the
+    check exists to prove a value is GONE, every form it cannot see is a false clean bill. Erasure
+    requests are names and addresses, so the encodings involved are not exotic.
+    """
+    import base64
+    forms = set()
+    for enc in ("utf-8", "utf-16-le", "utf-16-be", "latin-1"):
+        try:
+            forms.add(needle.encode(enc))
+        except Exception:
+            pass
+    raw = needle.encode("utf-8")
+    forms.add(base64.b64encode(raw))
+    forms.add(base64.b64encode(raw).rstrip(b"="))
+    forms.add(needle.encode("unicode_escape"))          # the ensure_ascii=True case
+    forms.add(json.dumps(needle)[1:-1].encode("utf-8"))  # as JSON would embed it
+    return {f for f in forms if f}
+
+
+def _decompressed_views(data):
+    """`data` plus anything it decompresses to, so a gzipped copy is not invisible."""
+    import gzip
+    import zlib
+    views = [data]
+    for opener in (gzip.decompress, zlib.decompress,
+                   lambda d: zlib.decompress(d, -zlib.MAX_WBITS)):
+        try:
+            views.append(opener(data))
+        except Exception:
+            pass
+    # a gzip member embedded inside a larger file
+    idx = data.find(bytes((0x1F, 0x8B)))
+    if idx > 0:
+        try:
+            views.append(gzip.decompress(data[idx:]))
+        except Exception:
+            pass
+    return views
+
+
+def present_in_bytes(needle, data):
+    """Is this proposition present in these bytes, in ANY plausible encoding or container?"""
+    forms = _needle_forms(needle)
+    for view in _decompressed_views(data):
+        for form in forms:
+            if form in view:
+                return True
+    return False
 
 
 def _present(needle, haystack):
@@ -295,49 +358,129 @@ def _scan(root):
     return out
 
 
-def read_channel(binding, handle, before):
-    """Read what the store persisted, over a surface DISCOVERED rather than declared.
+def read_channel(root, before):
+    """Read every byte written under a root THE RUNNER CHOSE, not one the binding named.
 
-    THIS IS THE FOURTH DESIGN AND THE FIRST THAT DOES NOT ASK THE SUBJECT ANYTHING.
+    THE FIFTH DESIGN. Each earlier one asked the subject something and was answered dishonestly:
 
-    v1 asked the binding for a dump; a dump can be empty, `{}`, or hard-coded. v2 added a canary the
-    binding had to reproduce, and it fell three ways in one audit round:
+      v1  `raw_dump()` -- returned "", or "{}", or a hard-coded list.
+      v2  a canary the binding had to reproduce -- the sentinel was `hash(tuple(paths))`, a function
+          of paths the BINDING chooses, computed in the same process, so a binding forged it, wrote
+          it to a decoy, and passed with no store write at all.
+      v3  `persisted_root()` plus a before/after scan -- the diff proves LIVENESS and never SCOPE, so
+          a copy one directory above the declared root, or a decoy sub-root holding only a view file,
+          was never looked at. And reading with errors="replace" was blind to a gzip side copy.
 
-      - the sentinel was `hash(tuple(paths))`, a pure function of paths the BINDING chooses,
-        computed in the same process. A binding computed it and wrote it to a decoy, with no store
-        write at all. A canary derived from data the adversary controls is not a canary.
-      - an honest declared path plus an undeclared sibling passed cleanly. The canary proves a
-        declared file is A place the store writes, never the ONLY one -- and the reference store
-        writes three files while the binding declared one, so a PASS was measured over a third of
-        the persistence surface.
-      - writing the canary through `rebuild()` polluted the subject: it made `snapshot()` non-empty,
-        which is a property the same run then checked. The instrument supplied the evidence.
+    So nothing about the location is asked. The runner allocates a private directory and points
+    `tempfile.tempdir` at it while the store is built, so a store creating files the ordinary way
+    lands inside it whether or not the binding admits where it writes. Files are read as BYTES and
+    matched against every plausible encoding and container, because a value the reader cannot decode
+    is a value it will certify as erased.
 
-    So nothing is declared and no canary is written. The runner scans the store's directory before
-    the case and again after, and the files that CHANGED are the persistence surface -- discovered
-    from the store's own behaviour, over any sibling it touched, with no write of ours to pollute
-    it. A store that wrote nothing at all during a repair is itself the finding, and fails closed.
+    THE GAP THAT REMAINS, stated rather than papered over: a write after this returns -- an atexit
+    hook, a finalizer, a lazy flush -- is still missed. Closing it needs the case in a subprocess.
     """
-    root = None
-    if hasattr(binding, "persisted_root"):
-        root = binding.persisted_root(handle)
-    if not root or not os.path.isdir(root):
-        return None, "the binding declares no persisted_root(), so nothing can be observed"
-
     after = _scan(root)
+    if not after:
+        return None, "nothing was written under the runner-allocated root at all"
     touched = [f for f, meta in after.items() if before.get(f) != meta]
-    if not touched:
-        return None, ("no file under the store's own directory changed during the repair, so either "
-                      "nothing was persisted or the observed directory is not the store's")
-
-    blob = []
-    for fp in sorted(set(touched) | set(after)):
+    chunks = []
+    for fp in sorted(after):
         try:
-            blob.append(io.open(fp, "r", encoding="utf-8", errors="replace").read())
+            chunks.append(io.open(fp, "rb").read())
         except OSError:
             pass
-    return "\n".join(blob), "%d file(s) changed, %d read under %s" % (
-        len(touched), len(after), os.path.basename(root.rstrip("/\\")))
+    return chunks, "%d file(s) present, %d changed, read as bytes under a runner-allocated root" % (
+        len(after), len(touched))
+
+
+def _needle_forms(needle):
+    """Every byte form a store might plausibly have written this proposition in.
+
+    The previous search decoded files as utf-8 with errors="replace" and looked for a string. That is
+    blind to anything not stored as readable utf-8 text: a gzip side copy, utf-16, base64. Since the
+    check exists to prove a value is GONE, every form it cannot see is a false clean bill. Erasure
+    requests are names and addresses, so the encodings involved are not exotic.
+    """
+    import base64
+    forms = set()
+    for enc in ("utf-8", "utf-16-le", "utf-16-be", "latin-1"):
+        try:
+            forms.add(needle.encode(enc))
+        except Exception:
+            pass
+    raw = needle.encode("utf-8")
+    forms.add(base64.b64encode(raw))
+    forms.add(base64.b64encode(raw).rstrip(b"="))
+    forms.add(needle.encode("unicode_escape"))          # the ensure_ascii=True case
+    forms.add(json.dumps(needle)[1:-1].encode("utf-8"))  # as JSON would embed it
+    return {f for f in forms if f}
+
+
+def _decompressed_views(data):
+    """`data` plus anything it decompresses to, so a gzipped copy is not invisible."""
+    import gzip
+    import zlib
+    views = [data]
+    for opener in (gzip.decompress, zlib.decompress,
+                   lambda d: zlib.decompress(d, -zlib.MAX_WBITS)):
+        try:
+            views.append(opener(data))
+        except Exception:
+            pass
+    # a gzip member embedded inside a larger file
+    idx = data.find(bytes((0x1F, 0x8B)))
+    if idx > 0:
+        try:
+            views.append(gzip.decompress(data[idx:]))
+        except Exception:
+            pass
+    return views
+
+
+def present_in_bytes(needle, data):
+    """Is this proposition present in these bytes, in ANY plausible encoding or container?"""
+    forms = _needle_forms(needle)
+    for view in _decompressed_views(data):
+        for form in forms:
+            if form in view:
+                return True
+    return False
+
+
+def _present(needle, haystack):
+    """Is `needle` in `haystack`, whatever encoding the binding chose to dump in?
+
+    A binding is free to serialise with `json.dumps(..., ensure_ascii=True)`, which turns
+    "je vegetarian" with an accent into "je vegetari\u00e1n". A plain substring search then misses
+    it, and the runner reports a clean erasure over a store that kept the value verbatim. Erasure
+    requests are overwhelmingly names and addresses, so the values most likely to be searched for
+    are exactly the ones that carry non-ASCII characters. The runner cannot dictate a third party's
+    encoding, so it searches for both forms.
+    """
+    if needle in haystack:
+        return True
+    escaped = needle.encode("unicode_escape").decode("ascii")
+    if escaped != needle and escaped in haystack:
+        return True
+    try:                                    # and the reverse: an escaped dump decoded back
+        return needle in haystack.encode("ascii", "ignore").decode("unicode_escape")
+    except Exception:
+        return False
+
+
+def _scan(root):
+    """Every file under `root` with its size and mtime. The observation primitive."""
+    out = {}
+    for base, _dirs, names in os.walk(root):
+        for n in names:
+            fp = os.path.join(base, n)
+            try:
+                st = os.stat(fp)
+                out[fp] = (st.st_size, st.st_mtime_ns)
+            except OSError:
+                pass
+    return out
 
 
 def compare(case, observed, strict=True):
@@ -402,14 +545,13 @@ def compare(case, observed, strict=True):
             raw = observed.get("_raw")
             texts = observed.get("_texts") or []
             if not raw:
-                fails.append("no verified persistence channel (%s), so erasure cannot be "
-                             "distinguished from concealment. Absent evidence is not evidence of "
-                             "absence and this case fails closed."
-                             % observed.get("channel", "unknown"))
-            elif not all(_present(t, raw) for t in texts if t):
-                fails.append("the persisted bytes do not contain the store's own active "
-                             "propositions, so the declared files are not a faithful record of it")
-            elif _present(want, raw):
+                fails.append("no persistence observed (%s), so erasure cannot be distinguished from "
+                             "concealment. Absent evidence is not evidence of absence and this case "
+                             "fails closed." % observed.get("channel", "unknown"))
+            elif not all(any(present_in_bytes(t, c) for c in raw) for t in texts if t):
+                fails.append("the observed bytes do not contain the store's own active propositions, "
+                             "so what was scanned is not a faithful record of it")
+            elif any(present_in_bytes(want, c) for c in raw):
                 fails.append("CONCEALED, not erased: %r survives in the persisted state" % want)
     for prop, want in (exp.get("receipt_property") or {}).items():
         if prop == "forbidden_value_absent":
