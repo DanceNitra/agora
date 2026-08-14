@@ -17,16 +17,151 @@ So approval is bound to bytes here instead. Two steps:
 
 Editing after approval is exactly the failure mode, so an edit invalidates the approval by construction
 rather than by my remembering that it should.
+
+SECOND GATE, added 2026-08-14: WHAT WE ALREADY SAID IN THAT THREAD. Approval binds the bytes; it says
+nothing about whether the claim inside them is refuted by our own earlier comment. On 2026-08-14 the
+draft "80.7/4.1 appears nowhere in the package" was aimed at a thread where WE had computed 80.7/4.1
+two days earlier. `tools/prior_statement_check.py` reads our own history in the target thread and this
+path refuses on an overlap unless `--ack-prior` says a human read it. Wired here, not remembered --
+that is the half of the construction-gate lesson that repeats.
 """
 import argparse
 import hashlib
 import io
 import subprocess
 import sys
+from pathlib import Path
+
+# Direct-script runs put tools/ on sys.path automatically; an import from a test does not.
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+import prior_statement_check as psc  # noqa: E402
 
 
 def digest(path: str) -> str:
     return hashlib.sha256(io.open(path, "rb").read()).hexdigest()
+
+
+def _thread_in(cmd) -> str | None:
+    """The github thread this command posts to, canonicalised. See psc.thread_from_command."""
+    return psc.thread_from_command(cmd)[0]
+
+
+def _gh_exe(cmd) -> bool:
+    return bool(cmd) and Path(cmd[0]).name.lower().removesuffix(".exe") == "gh"
+
+
+def bind_payload(draft: str, cmd: list) -> tuple[list, bytes] | str:
+    """Rewrite the publish command so the bytes it sends ARE the bytes that were hashed.
+
+    WHY THIS EXISTS, and it is the second half of this file's own lesson. Until 2026-08-14 the
+    digest bound the FILE and nothing bound the PAYLOAD: nothing between the hash check and
+    `subprocess.run(cmd)` asserted that `cmd` had anything to do with `a.file`. So
+
+        post draft.md --sha <correct digest of draft.md> -- gh issue comment N -R o/r --body "..."
+
+    printed "approved digest matches; publishing" and posted text nobody had hashed. That is not an
+    exotic attack — `--body` is the most idiomatic gh form, and the argv here is composed by a
+    model, so the binding failed exactly when nobody was trying to defeat it. The docstring above
+    promised "approval is bound to bytes here instead". It was bound to a filename.
+
+    The fix is to stop letting the command source its own body: we read the approved bytes ONCE,
+    into memory, refuse every command shape that could get a body from anywhere else, and hand the
+    bytes to gh on stdin. That also closes the read-again window (the file was re-read by the
+    prior-statement gate and again by gh, with two `gh api --paginate` calls in between).
+
+    Flag shapes verified against `gh help issue comment` and `gh api --help` on 2026-08-14, not
+    from memory -- note the collision: `-F` is `--body-file` for `issue comment`/`pr comment` and
+    `--field` for `gh api`.
+
+    Returns (rewritten_cmd, stdin_bytes), or a refusal string explaining what to do instead.
+    """
+    if not _gh_exe(cmd):
+        return ("only a `gh` command can be bound to the approved bytes; got %r. Another transport "
+                "may source its body anywhere, so the digest would guarantee nothing." % (cmd[:1],))
+
+    is_api = "api" in cmd
+    want = Path(draft).resolve()
+    body_flags = ("--input",) if is_api else ("--body-file", "-F")
+    stdin_token = "-"
+
+    # 1. An inline body cannot be bound to anything. Refuse before looking further.
+    for i, arg in enumerate(cmd):
+        if arg in ("--body", "-b") or arg.startswith("--body="):
+            return ("the command carries an inline body (%s). An inline body is never the approved "
+                    "file, so the digest cannot bind it. Use --body-file %s instead." % (arg, draft))
+        if is_api and arg in ("-f", "-F", "--raw-field", "--field") and i + 1 < len(cmd):
+            v = cmd[i + 1]
+            if v.startswith("body=") and not v.startswith("body=@"):
+                return ("the command carries an inline body (%s %s). Use `--input %s` or "
+                        "`-F body=@%s`." % (arg, v, draft, draft))
+
+    # 2. Find the one flag that sources the body from a file, and check it IS the approved file.
+    out = list(cmd)
+    found = None
+    for i, arg in enumerate(cmd):
+        if arg in body_flags and i + 1 < len(cmd):
+            found, out[i + 1] = cmd[i + 1], stdin_token
+            break
+        if any(arg.startswith(f + "=") for f in body_flags):
+            f, v = arg.split("=", 1)
+            found, out[i] = v, f + "=" + stdin_token
+            break
+        if is_api and arg in ("-f", "-F", "--raw-field", "--field") and i + 1 < len(cmd):
+            v = cmd[i + 1]
+            if v.startswith("body=@"):
+                found, out[i + 1] = v[len("body=@"):], "body=@-"
+                break
+    if found is None:
+        return ("the command names no body file, so there is nothing to bind the approved bytes to."
+                " Use `--body-file %s`%s." % (draft, " or `--input <file>`" if is_api else ""))
+    if found != stdin_token and Path(found).resolve() != want:
+        return ("the command sends %s but the approved digest is of %s. Approve the file you are "
+                "actually sending." % (found, draft))
+
+    return out, Path(draft).read_bytes()
+
+
+def _prior_gate(path: str, cmd: list, declared: str | None, ack: bool) -> int | None:
+    """Run the prior-statement check. Returns an exit code to refuse with, or None to proceed.
+
+    The thread is derived from the COMMAND. A `--thread` given on our own argv is treated as an
+    assertion to cross-check, never as an override: the first version preferred the declared value,
+    so a caller could aim the check at a quiet thread while the command posted to a loud one, and
+    get a green report naming the thread it did not post to.
+    """
+    from_cmd, posts = psc.thread_from_command(cmd)
+    if declared and from_cmd:
+        d = psc.parse_thread(declared)
+        if not d or psc.canonical(d) != from_cmd:
+            print("REFUSED: --thread %s does not match the thread this command posts to (%s)."
+                  % (declared, from_cmd))
+            print("  These must agree; the check is worthless if it can be aimed elsewhere.")
+            return 2
+    thread = from_cmd or declared
+    if not thread:
+        if posts:
+            # Fail CLOSED on a publish path. "I could not tell where this goes" must not read as
+            # "nothing of ours is there" -- that is the shape this whole file exists against.
+            print("REFUSED: this command posts to github but no thread could be determined from it.")
+            print("  Pass --thread <issue url> so the check has a target, or use a command form")
+            print("  that names the thread. A thread we cannot read is not a thread we cleared.")
+            return 2
+        print("prior-statement check: NOT RUN -- this command does not post to a github thread.")
+        print("  Reported, not assumed clean.")
+        return None
+    code, report = psc.check(Path(path).read_text(encoding="utf-8", errors="replace"), thread)
+    print(report)
+    print("")
+    if code in (0, 3):
+        return None
+    if ack:
+        print("--ack-prior given: a human states they have read the comments above. Proceeding.")
+        return None
+    print("REFUSED: %s" % ("our own words in this thread touch this claim" if code == 1
+                           else "the thread could not be read"))
+    print("  Read them, then either fix the draft (which changes the hash, so it is re-approved) or")
+    print("  pass --ack-prior to record that they were read and are not a contradiction.")
+    return 1 if code == 1 else 2
 
 
 def main(argv=None):
@@ -34,6 +169,10 @@ def main(argv=None):
     ap.add_argument("action", choices=("show", "post"))
     ap.add_argument("file")
     ap.add_argument("--sha", help="the digest the owner approved (post only)")
+    ap.add_argument("--thread", help="github issue/PR url, so `show` can run the prior-statement "
+                                     "check while the owner is deciding")
+    ap.add_argument("--ack-prior", action="store_true",
+                    help="record that a human read our own prior comments in that thread")
     # The publish command is split off BEFORE argparse sees it. `nargs=REMAINDER` after a positional
     # swallows later options too, so `post f --sha X -- gh ...` lost the --sha and the tool refused a
     # correctly approved draft. A gate that fails closed on its own argument parsing is still a gate
@@ -52,6 +191,9 @@ def main(argv=None):
         print("sha256 : %s" % now)
         print("bytes  : %d" % len(body.encode("utf-8")))
         print("words  : %d" % len(body.split()))
+        if a.thread:
+            print("")
+            print(psc.check(body, a.thread)[1])
         print("\nShow the owner this draft together with the hash above, and pass it back as --sha.")
         return 0
 
@@ -70,8 +212,23 @@ def main(argv=None):
     if not cmd:
         print("REFUSED: no publish command given after --")
         return 2
-    print("approved digest matches; publishing")
-    return subprocess.run(cmd).returncode
+
+    # Bind the payload BEFORE the prior-statement check: the check costs two network calls, and
+    # refusing afterwards would mean the operator waits for a gate to run against a draft the
+    # command was never going to send.
+    bound = bind_payload(a.file, cmd)
+    if isinstance(bound, str):
+        print("REFUSED: %s" % bound)
+        return 2
+    cmd, stdin = bound
+
+    refuse = _prior_gate(a.file, cmd, a.thread, a.ack_prior)
+    if refuse is not None:
+        return refuse
+
+    print("approved digest matches; publishing %d bytes from memory (stdin), not from the file"
+          % len(stdin))
+    return subprocess.run(cmd, input=stdin).returncode
 
 
 if __name__ == "__main__":
