@@ -25,13 +25,13 @@ wrote. These cases are the missing half.
 
 | File | What it is |
 |---|---|
-| `adapter-conformance.json` | Five adapter behaviour cases and three validator anti-vacuity cases. |
+| `adapter-conformance.json` | Four scored adapter cases, one awaiting a specification change, three validator anti-vacuity cases. |
 | `run_adapter_conformance.py` | The runner. Enforces three rules on the fixture itself, below. |
 | `adapter-conformance.result.json` | Raw output of the last run. |
 
-The five adapter cases: an undeclared derivative must not reach `verified`; complete lineage must reach
-`verified`; a repair must not assert the same proposition twice; erasure evidence must be content-free
-*and* non-trivial; collateral must survive a supersession.
+The four scored cases: an undeclared derivative must not reach `verified`; complete lineage must reach
+`verified`; erasure evidence must be content-free *and* non-trivial; collateral must survive a
+supersession. A fifth, on duplicate assertions after a rebuild, is held in `awaiting_specification`.
 
 The second case is there because of the first. An adapter hard-wired to answer `unknown` passes every
 honesty case ever written while being useless, so a suite without the positive twin rewards permanent
@@ -49,8 +49,9 @@ Each comes from a defect we shipped or nearly shipped while building this.
    run traces whether it reached them. A case that never touches the surface it claims to test passes
    for the wrong reason.
 3. **No fixture that has never failed.** Each case names a flattering implementation; the runner installs
-   it and the case must fail. Two mutations in this suite silently no-opped when first written, and rule
-   3 is the only reason that was caught rather than shipped.
+   it, the case must fail, and it must fail with the counter-result the case declared. Two mutations in
+   this suite silently no-opped when first written, and rule 3 is the only reason that was caught rather
+   than shipped.
 
 Every mutation goes through the protocol surface or the binding, never through private attributes. The
 first version reached for `adapter._store`, which does not exist, and an `except` swallowed the error:
