@@ -22,6 +22,7 @@ import publish_gate  # noqa: E402  (repo-root tool, imported by path)
 import html
 import json
 import re
+import subprocess
 import time
 from pathlib import Path
 
@@ -124,15 +125,62 @@ _PROBE_BY_LAB = {
 }
 
 
-def entry_code(r, labs):
-    """Resolve a runnable-receipt URL for a ledger entry: an explicit repo-relative `code` on the entry, else
-    the tracked lab_id->probe map, else the lab-script link. lab scripts live in gitignored agora_output/lab/,
-    so most entries only get a resolvable receipt once a public probe is wired -- return a URL only if the file
-    exists in the repo."""
+_TRACKED: set[str] | None = None
+
+
+def tracked_files() -> set[str]:
+    """Every path git actually tracks, read once.
+
+    The receipt link is a `blob/main/<path>` URL, so the reader can only open a file that is IN THE
+    PUSHED REPO. The old test was `(ROOT / p).exists()` — a LOCAL DISK check. `.gitignore` has
+    excluded `agora_output/lab/` since 2026-06-20, so a lab script written after that date exists
+    here, passes the check, and ships a URL that 404s. Measured 2026-08-14: 2 of 43 published
+    receipt links were in exactly that state. Same shape publish_gate.py was written against — a
+    check that never sees its real target reporting SAFE.
+    """
+    global _TRACKED
+    if _TRACKED is None:
+        try:
+            out = subprocess.run(["git", "-C", str(ROOT), "ls-files", "-z"],
+                                 capture_output=True, text=True, encoding="utf-8", timeout=60)
+            _TRACKED = {p for p in out.stdout.split("\0") if p}
+        except Exception:
+            _TRACKED = set()
+    return _TRACKED
+
+
+def entry_code_rel(r, labs):
+    """(repo-relative receipt path the page will LINK, declared-but-unresolvable path).
+
+    ONE resolver, used by the renderer and by the construction gate, because they diverged: the
+    gate re-implemented only the first two of the three branches below, so every entry whose
+    receipt came from the lab-script fallback was linked to the reader as a runnable model and
+    never audited for a result forced by its own construction. The comment beside the gate claimed
+    "the resolver here is entry_code()'s own"; it was a copy that had lost a branch.
+
+    Second return value feeds publish_gate's `unresolved=` channel: a DECLARED artifact (an explicit
+    `code`, or a `_PROBE_BY_LAB` entry) that does not resolve is a refusal, per that module's own
+    rule. The old code silently dropped it through an `if p and exists()` filter. The lab-script
+    fallback is opportunistic rather than declared, so an unresolvable one simply yields no link.
+    """
     p = (r.get("code") or _PROBE_BY_LAB.get(r.get("lab_id", ""), "") or "").strip().replace("\\", "/")
-    if p and (ROOT / p).exists():
-        return f"{REPO}/blob/main/{p}"
-    return script_link(labs.get(r.get("lab_id")))
+    if p:
+        if p in tracked_files():
+            return p, None
+        return None, p                      # declared and not in the repo -> the gate must refuse
+    lab_rec = labs.get(r.get("lab_id"))
+    sp = (lab_rec.get("script") or "").replace("\\", "/") if lab_rec else ""
+    if "agora_output/lab/" in sp:
+        rel = "agora_output/lab/" + sp.split("agora_output/lab/")[-1]
+        if rel in tracked_files():
+            return rel, None
+    return None, None
+
+
+def entry_code(r, labs):
+    """The runnable-receipt URL for a ledger entry, or None."""
+    rel, _ = entry_code_rel(r, labs)
+    return f"{REPO}/blob/main/{rel}" if rel else None
 
 
 def e(s):
@@ -249,14 +297,22 @@ def render():
     # CONSTRUCTION GATE — runs before a single byte is written. Every entry's runnable model is
     # audited for a result forced by its own construction (tools/publish_gate.py). This used to be a
     # line in the docstring above telling a human to remember; on 2026-08-08 that produced a public
-    # number that could not have come out otherwise. The resolver here is entry_code()'s own, so the
-    # gate audits exactly the files the page will offer the reader as receipts.
-    _gate_paths = set()
+    # number that could not have come out otherwise.
+    #
+    # The set below is now built by CALLING entry_code_rel, not by re-deriving it. The previous
+    # version copied the resolver and dropped its third branch, so the comment that used to sit here
+    # ("the gate audits exactly the files the page will offer the reader as receipts") was false:
+    # every entry whose receipt came from the lab-script fallback was published as a runnable model
+    # and never audited. A copy of a resolver is a resolver that will drift.
+    _gate_paths, _unresolved = set(), []
     for r in reps:
-        p = (r.get("code") or _PROBE_BY_LAB.get(r.get("lab_id", ""), "") or "").strip().replace("\\", "/")
-        if p and (ROOT / p).exists():
-            _gate_paths.add(ROOT / p)
-    publish_gate.enforce(_gate_paths, "Crucible ledger (%d entries)" % len(reps))
+        rel, missing = entry_code_rel(r, labs)
+        if rel:
+            _gate_paths.add(ROOT / rel)
+        if missing:
+            _unresolved.append(f"DanceNitra/agora/{missing}")
+    publish_gate.enforce(_gate_paths, "Crucible ledger (%d entries)" % len(reps),
+                         unresolved=_unresolved)
     # RETRACTED is a FOURTH state, added 2026-08-06 because the ledger could not record its own
     # correction. Entry a1d88c ruled FAILED on "a support edge can be recovered from content
     # similarity"; re-measurement showed the score separates the classes (AUC 0.72-0.92) and that the
