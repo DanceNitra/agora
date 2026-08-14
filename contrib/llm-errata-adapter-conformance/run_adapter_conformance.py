@@ -28,7 +28,7 @@ TO RUN IT AGAINST YOUR OWN STORE, implement one class (see `InspeximusBinding` a
         name = "your-store"
         def build(self, records):   # -> (StoreAdapter, handle)
         def active_texts(self, handle):  # -> list[str] of currently-asserted propositions
-        def raw_dump(self, handle):      # -> str, EVERYTHING persisted (erasure cannot be faked)
+        def raw_dump(self, handle):      # -> str, EVERYTHING persisted, ensure_ascii=False
 
     python run_adapter_conformance.py --pkg <dir with prototype/> --binding your.module:YourBinding
 """
@@ -255,6 +255,27 @@ def evaluate(case, binding, pkg, mutate=False, stub_method=None):
     return observed
 
 
+def _present(needle, haystack):
+    """Is `needle` in `haystack`, whatever encoding the binding chose to dump in?
+
+    A binding is free to serialise with `json.dumps(..., ensure_ascii=True)`, which turns
+    "je vegetarian" with an accent into "je vegetari\u00e1n". A plain substring search then misses
+    it, and the runner reports a clean erasure over a store that kept the value verbatim. Erasure
+    requests are overwhelmingly names and addresses, so the values most likely to be searched for
+    are exactly the ones that carry non-ASCII characters. The runner cannot dictate a third party's
+    encoding, so it searches for both forms.
+    """
+    if needle in haystack:
+        return True
+    escaped = needle.encode("unicode_escape").decode("ascii")
+    if escaped != needle and escaped in haystack:
+        return True
+    try:                                    # and the reverse: an escaped dump decoded back
+        return needle in haystack.encode("ascii", "ignore").decode("unicode_escape")
+    except Exception:
+        return False
+
+
 def compare(case, observed, strict=True):
     """Compare observation to the case's stated expectation. Returns (ok, failures).
 
@@ -306,10 +327,17 @@ def compare(case, observed, strict=True):
                 fails.append("%s: %r is not asserted" % (prop, want))
         elif prop == "erased_text_absent_from_persisted_state":
             raw = observed.get("_raw")
-            if raw is None:
-                fails.append("the binding exposes no raw_dump(), so erasure cannot be distinguished "
-                             "from concealment and this case cannot be scored")
-            elif want in raw:
+            texts = observed.get("_texts") or []
+            if not raw:
+                fails.append("raw_dump() returned nothing, so erasure cannot be distinguished from "
+                             "concealment. Absent evidence is not evidence of absence and this case "
+                             "fails closed.")
+            elif not all(t in raw for t in texts if t):
+                # The dump must at least contain what the store admits is active, or it is not a
+                # dump of the store: a binding could otherwise return "{}" and satisfy any search.
+                fails.append("raw_dump() does not contain the store's own active propositions, so it "
+                             "is not a faithful dump and cannot be searched for a retained value")
+            elif _present(want, raw):
                 fails.append("CONCEALED, not erased: %r survives in the persisted state" % want)
     for prop, want in (exp.get("receipt_property") or {}).items():
         if prop == "forbidden_value_absent":
@@ -575,7 +603,7 @@ class InspeximusBinding:
         Without this an erasure case cannot tell erasure from concealment: an adapter that moves
         the value into a side field and demotes the record satisfies every present-tense check.
         """
-        return json.dumps(handle.items, default=str)
+        return json.dumps(handle.items, default=str, ensure_ascii=False)
 
 
 if __name__ == "__main__":
