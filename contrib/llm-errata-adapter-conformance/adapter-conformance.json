@@ -12,7 +12,6 @@
     "positive_control": "The adapter methods this case must actually reach. Verified by tracing the run. A case that never reaches the surface it claims to test passes for the wrong reason, which is the defect these cases exist to find.",
     "mutation": "The flattering implementation this case must catch. The runner applies it and REQUIRES the case to fail. A fixture that has never been shown to fail is a fixture nobody has tested."
   },
-
   "adapter_cases": [
     {
       "id": "undeclared-derivative-must-not-reach-verified",
@@ -23,18 +22,75 @@
       },
       "store": {
         "records": [
-          {"id": "diet", "text": "is vegetarian", "root": "fact:diet"},
-          {"id": "rest", "text": "prefers quiet restaurants", "root": "fact:rest"},
-          {"id": "budget", "text": "moderate budget", "root": "fact:budget"},
-          {"id": "summary", "text": "is vegetarian; prefers quiet restaurants; moderate budget", "derived": true, "derived_from": ["diet", "rest", "budget"]},
-          {"id": "orphan", "text": "digest whose summariser dropped its lineage", "derived": true, "derived_from": null}
+          {
+            "id": "diet",
+            "text": "is vegetarian",
+            "root": "fact:diet"
+          },
+          {
+            "id": "rest",
+            "text": "prefers quiet restaurants",
+            "root": "fact:rest"
+          },
+          {
+            "id": "budget",
+            "text": "moderate budget",
+            "root": "fact:budget"
+          },
+          {
+            "id": "summary",
+            "text": "is vegetarian; prefers quiet restaurants; moderate budget",
+            "derived": true,
+            "derived_from": [
+              "diet",
+              "rest",
+              "budget"
+            ]
+          },
+          {
+            "id": "orphan",
+            "text": "digest whose summariser dropped its lineage",
+            "derived": true,
+            "derived_from": null
+          }
         ]
       },
-      "erratum": {"operation": "supersede", "target_root": "fact:diet", "replacement": "eats meat again", "postconditions": {"negative": "vegetarian", "positive": "eats meat again", "preserve": "quiet restaurants|moderate budget"}},
-      "expect": {"checkpoint_coverage": "unknown", "aggregate": "unknown", "triad": {"negative": "pass", "positive": "pass", "preserve": "pass"}},
+      "erratum": {
+        "operation": "supersede",
+        "target_root": "fact:diet",
+        "replacement": "eats meat again",
+        "postconditions": {
+          "negative": "vegetarian",
+          "positive": "eats meat again",
+          "preserve": "quiet restaurants|moderate budget"
+        }
+      },
+      "expect": {
+        "checkpoint_coverage": "unknown",
+        "aggregate": "unknown",
+        "triad": {
+          "negative": "pass",
+          "positive": "pass",
+          "preserve": "pass"
+        }
+      },
       "note": "The triad passes and the aggregate is still `unknown`. That combination is the whole point: passing probes must not upgrade unresolved lineage.",
-      "positive_control": {"adapter_methods_required": ["lineage_complete", "quarantine_coverage", "enumerate", "coverage"]},
-      "mutation": {"target": "lineage_complete", "flattering_behaviour": "return True unconditionally", "must_produce": {"aggregate": "verified"}, "why": "This is a real shipped defect, not a hypothetical: inspeximus 2.8.0 answered `verified` for exactly this store and had to be fixed. An adapter cannot be trusted to report incompleteness it has no incentive to report."}
+      "positive_control": {
+        "adapter_methods_required": [
+          "lineage_complete",
+          "quarantine_coverage",
+          "enumerate",
+          "coverage"
+        ]
+      },
+      "mutation": {
+        "target": "lineage_complete",
+        "flattering_behaviour": "return True unconditionally",
+        "must_produce": {
+          "aggregate": "verified"
+        },
+        "why": "This is a real shipped defect, not a hypothetical: inspeximus 2.8.0 answered `verified` for exactly this store and had to be fixed. An adapter cannot be trusted to report incompleteness it has no incentive to report."
+      }
     },
     {
       "id": "complete-lineage-does-reach-verified",
@@ -45,36 +101,68 @@
       },
       "store": {
         "records": [
-          {"id": "diet", "text": "is vegetarian", "root": "fact:diet"},
-          {"id": "rest", "text": "prefers quiet restaurants", "root": "fact:rest"},
-          {"id": "budget", "text": "moderate budget", "root": "fact:budget"},
-          {"id": "summary", "text": "is vegetarian; prefers quiet restaurants; moderate budget", "derived": true, "derived_from": ["diet", "rest", "budget"]}
+          {
+            "id": "diet",
+            "text": "is vegetarian",
+            "root": "fact:diet"
+          },
+          {
+            "id": "rest",
+            "text": "prefers quiet restaurants",
+            "root": "fact:rest"
+          },
+          {
+            "id": "budget",
+            "text": "moderate budget",
+            "root": "fact:budget"
+          },
+          {
+            "id": "summary",
+            "text": "is vegetarian; prefers quiet restaurants; moderate budget",
+            "derived": true,
+            "derived_from": [
+              "diet",
+              "rest",
+              "budget"
+            ]
+          }
         ]
       },
-      "erratum": {"operation": "supersede", "target_root": "fact:diet", "replacement": "eats meat again", "postconditions": {"negative": "vegetarian", "positive": "eats meat again", "preserve": "quiet restaurants|moderate budget"}},
-      "expect": {"checkpoint_coverage": "verified", "aggregate": "verified", "triad": {"negative": "pass", "positive": "pass", "preserve": "pass"}},
-      "positive_control": {"adapter_methods_required": ["lineage_complete", "quarantine_coverage", "enumerate", "coverage"]},
-      "mutation": {"target": "quarantine_coverage", "flattering_behaviour": "return unknown unconditionally", "must_produce": {"checkpoint_coverage": "unknown"}, "why": "Catches the constant-pessimist adapter that would otherwise score full marks on every honesty case in this file."}
-    },
-    {
-      "id": "repair-must-not-duplicate-a-preserved-proposition",
-      "why": "A repair that re-asserts inputs it never gated leaves the store asserting the same fact twice. The receipt cannot see it: preservation asks whether a term is recallable, and a duplicated fact is recallable exactly as well as a single one. This is a defect class the triad is structurally blind to, so it needs a case that reads the store.",
-      "normative": {
-        "source": "prototype/adapters.py, StoreAdapter.rebuild",
-        "quote": "rebuild(self, artifact_id, *, inputs: tuple[str, ...], replacement: str | None) -> str -- the rebuild is over the named inputs, so an input that was never gated is not part of what is being rebuilt."
+      "erratum": {
+        "operation": "supersede",
+        "target_root": "fact:diet",
+        "replacement": "eats meat again",
+        "postconditions": {
+          "negative": "vegetarian",
+          "positive": "eats meat again",
+          "preserve": "quiet restaurants|moderate budget"
+        }
       },
-      "store": {
-        "records": [
-          {"id": "diet", "text": "is vegetarian", "root": "fact:diet"},
-          {"id": "rest", "text": "prefers quiet restaurants", "root": "fact:rest"},
-          {"id": "budget", "text": "moderate budget", "root": "fact:budget"},
-          {"id": "summary", "text": "is vegetarian; prefers quiet restaurants; moderate budget", "derived": true, "derived_from": ["diet", "rest", "budget"]}
+      "expect": {
+        "checkpoint_coverage": "verified",
+        "aggregate": "verified",
+        "triad": {
+          "negative": "pass",
+          "positive": "pass",
+          "preserve": "pass"
+        }
+      },
+      "positive_control": {
+        "adapter_methods_required": [
+          "lineage_complete",
+          "quarantine_coverage",
+          "enumerate",
+          "coverage"
         ]
       },
-      "erratum": {"operation": "supersede", "target_root": "fact:diet", "replacement": "eats meat again", "postconditions": {"negative": "vegetarian", "positive": "eats meat again", "preserve": "quiet restaurants|moderate budget"}},
-      "expect": {"aggregate": "verified", "store_property": {"duplicate_active_assertions": 0}},
-      "positive_control": {"adapter_methods_required": ["rebuild", "repair_inputs", "retire"]},
-      "mutation": {"target": "rebuild", "flattering_behaviour": "re-assert every named input, including inputs that were never gated and are still active", "must_produce": {"store_property": {"duplicate_active_assertions": 2}}, "why": "Our own defect. It survived a passing triad and was visible only by reading the store."}
+      "mutation": {
+        "target": "quarantine_coverage",
+        "flattering_behaviour": "return unknown unconditionally",
+        "must_produce": {
+          "checkpoint_coverage": "unknown"
+        },
+        "why": "Catches the constant-pessimist adapter that would otherwise score full marks on every honesty case in this file."
+      }
     },
     {
       "id": "erasure-evidence-must-be-content-free-and-non-trivial",
@@ -85,37 +173,130 @@
       },
       "store": {
         "records": [
-          {"id": "diet", "text": "is vegetarian", "root": "fact:diet"},
-          {"id": "rest", "text": "prefers quiet restaurants", "root": "fact:rest"}
+          {
+            "id": "diet",
+            "text": "is vegetarian",
+            "root": "fact:diet"
+          },
+          {
+            "id": "rest",
+            "text": "prefers quiet restaurants",
+            "root": "fact:rest"
+          }
         ]
       },
-      "erratum": {"operation": "erase", "target_root": "fact:diet", "postconditions": {"negative": "vegetarian", "preserve": "quiet restaurants"}},
-      "expect": {"receipt_property": {"forbidden_value_absent": "is vegetarian", "names_the_store": true, "is_non_trivial": true}, "store_property": {"erased_text_absent": "is vegetarian", "preserved_text_present": "prefers quiet restaurants"}},
-      "positive_control": {"adapter_methods_required": ["retire", "recall", "snapshot", "dispositions"]},
-      "mutation": {"target": "repair", "flattering_behaviour": "return a receipt whose serialised form is empty", "must_produce": {"receipt_property": {"names_the_store": false, "is_non_trivial": false}}, "why": "Measured on our own harness before this file existed: the empty-receipt stub scored a full pass on the published confidentiality case."}
+      "erratum": {
+        "operation": "erase",
+        "target_root": "fact:diet",
+        "postconditions": {
+          "negative": "vegetarian",
+          "preserve": "quiet restaurants"
+        }
+      },
+      "expect": {
+        "receipt_property": {
+          "forbidden_value_absent": "is vegetarian",
+          "names_the_store": true,
+          "is_non_trivial": true
+        },
+        "store_property": {
+          "erased_text_absent": "is vegetarian",
+          "preserved_text_present": "prefers quiet restaurants"
+        }
+      },
+      "positive_control": {
+        "adapter_methods_required": [
+          "retire",
+          "recall",
+          "snapshot",
+          "dispositions"
+        ]
+      },
+      "mutation": {
+        "target": "repair",
+        "flattering_behaviour": "return a receipt whose serialised form is empty",
+        "must_produce": {
+          "receipt_property": {
+            "names_the_store": false,
+            "is_non_trivial": false
+          }
+        },
+        "why": "Measured on our own harness before this file existed: the empty-receipt stub scored a full pass on the published confidentiality case."
+      }
     },
     {
       "id": "collateral-must-survive-a-supersession",
       "why": "A repair that satisfies the negative postcondition by deleting everything reachable is the cheapest possible cheat and passes any check that only asks whether the retired proposition is gone.",
       "normative": {
         "source": "IDEA.md",
-        "quote": "`summary:dining` mixes all three, so a repair that deletes it destroys retained memory and a repair that leaves it destroys the correction."
+        "quote": "Probes supply behavioral evidence: the stale belief did not reappear in a declared sample, the replacement activated, and collateral facts survived."
       },
       "store": {
         "records": [
-          {"id": "diet", "text": "is vegetarian", "root": "fact:diet"},
-          {"id": "rest", "text": "prefers quiet restaurants", "root": "fact:rest"},
-          {"id": "budget", "text": "moderate budget", "root": "fact:budget"},
-          {"id": "pet", "text": "has a cat", "root": "fact:pet"}
+          {
+            "id": "diet",
+            "text": "is vegetarian",
+            "root": "fact:diet"
+          },
+          {
+            "id": "rest",
+            "text": "prefers quiet restaurants",
+            "root": "fact:rest"
+          },
+          {
+            "id": "budget",
+            "text": "moderate budget",
+            "root": "fact:budget"
+          },
+          {
+            "id": "pet",
+            "text": "has a cat",
+            "root": "fact:pet"
+          }
         ]
       },
-      "erratum": {"operation": "supersede", "target_root": "fact:diet", "replacement": "eats meat again", "postconditions": {"negative": "vegetarian", "positive": "eats meat again", "preserve": "quiet restaurants|moderate budget"}},
-      "expect": {"triad": {"preserve": "pass"}, "store_property": {"unrelated_text_present": "has a cat", "preserved_text_present": "prefers quiet restaurants"}},
-      "positive_control": {"adapter_methods_required": ["recall", "retire", "enumerate"]},
-      "mutation": {"target": "retire", "flattering_behaviour": "retire every record in the store rather than the gated ones", "must_produce": {"triad": {"preserve": "fail"}}, "why": "Confirms the preservation arm can actually fail. A preservation check that never fails is a demonstration."}
+      "erratum": {
+        "operation": "supersede",
+        "target_root": "fact:diet",
+        "replacement": "eats meat again",
+        "postconditions": {
+          "negative": "vegetarian",
+          "positive": "eats meat again",
+          "preserve": "quiet restaurants|moderate budget"
+        }
+      },
+      "expect": {
+        "aggregate": "verified",
+        "triad": {
+          "negative": "pass",
+          "positive": "pass",
+          "preserve": "pass"
+        },
+        "store_property": {
+          "unrelated_text_present": "has a cat",
+          "preserved_text_present": "prefers quiet restaurants"
+        }
+      },
+      "positive_control": {
+        "adapter_methods_required": [
+          "recall",
+          "retire",
+          "enumerate"
+        ]
+      },
+      "mutation": {
+        "target": "retire",
+        "flattering_behaviour": "retire every record in the store rather than the gated ones",
+        "must_produce": {
+          "triad": {
+            "preserve": "fail"
+          }
+        },
+        "why": "Confirms the preservation arm can actually fail. A preservation check that never fails is a demonstration."
+      },
+      "known_result": "FAILS for both inspeximus and the reference MarkdownAdapter, and the cause is neither adapter. RebuildStrategy introduces the replacement only through rebuild() of a mixed descendant, so a superseded root with no mixed descendant is retired while the correction is never asserted. Measured four ways in probes/rebuildstrategy_loses_the_replacement_without_a_descendant.py: both implementations fail without a descendant and both succeed with one. The receipt stays honest (aggregate=failed), so this is a repair that cannot succeed for this store shape, not one that claims falsely to have succeeded."
     }
   ],
-
   "validator_anti_vacuity_cases": [
     {
       "id": "empty-receipt-must-not-pass",
@@ -141,5 +322,79 @@
       "must_produce": "the validator reports FAIL, because the section must produce at least three distinct verdicts",
       "measured": "Five of the eight published semantic cases passed against this stub in our runner."
     }
-  ]
+  ],
+  "awaiting_specification": [
+    {
+      "id": "repair-must-not-duplicate-a-preserved-proposition",
+      "why": "A repair that re-asserts inputs it never gated leaves the store asserting the same fact twice. The receipt cannot see it: preservation asks whether a term is recallable, and a duplicated fact is recallable exactly as well as a single one. This is a defect class the triad is structurally blind to, so it needs a case that reads the store.",
+      "store": {
+        "records": [
+          {
+            "id": "diet",
+            "text": "is vegetarian",
+            "root": "fact:diet"
+          },
+          {
+            "id": "rest",
+            "text": "prefers quiet restaurants",
+            "root": "fact:rest"
+          },
+          {
+            "id": "budget",
+            "text": "moderate budget",
+            "root": "fact:budget"
+          },
+          {
+            "id": "summary",
+            "text": "is vegetarian; prefers quiet restaurants; moderate budget",
+            "derived": true,
+            "derived_from": [
+              "diet",
+              "rest",
+              "budget"
+            ]
+          }
+        ]
+      },
+      "erratum": {
+        "operation": "supersede",
+        "target_root": "fact:diet",
+        "replacement": "eats meat again",
+        "postconditions": {
+          "negative": "vegetarian",
+          "positive": "eats meat again",
+          "preserve": "quiet restaurants|moderate budget"
+        }
+      },
+      "expect": {
+        "aggregate": "verified",
+        "store_property": {
+          "duplicate_active_assertions": 0
+        }
+      },
+      "positive_control": {
+        "adapter_methods_required": [
+          "rebuild",
+          "repair_inputs",
+          "retire"
+        ]
+      },
+      "mutation": {
+        "target": "rebuild",
+        "flattering_behaviour": "re-assert every named input, including inputs that were never gated and are still active",
+        "must_produce": {
+          "store_property": {
+            "duplicate_active_assertions": 2
+          }
+        },
+        "why": "Our own defect. It survived a passing triad and was visible only by reading the store."
+      },
+      "not_scored_because": "StoreAdapter.rebuild names parameters; the specification does not yet define provider-neutral proposition identity, multiplicity or cardinality. The maintainer asked that a candidate fixture not manufacture that normative rule by quotation, and he is right. Our own citation check reached the same verdict independently and refused to score the case: the source it named was a function signature plus our interpretation, which is not a contract. The underlying blind spot is real -- a duplicated proposition is recallable exactly as well as a single one, so the preservation arm cannot see it -- and it stays here as a specification request rather than a conformance case."
+    }
+  ],
+  "target": {
+    "commit": "ac4468faf73c2cc7949dd29b2a2a151f5bd23116",
+    "g2_digest": "7e0d6c88c1ca3a87743ac70ba2a3dfea0b350d112d2d3c59a3c6cbb537568f12",
+    "note": "The runner asserts the bound adapter matches these and digests the tree it scores, so an arbitrary --pkg cannot be reported under this fixture's name."
+  }
 }

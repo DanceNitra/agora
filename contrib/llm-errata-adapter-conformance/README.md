@@ -83,8 +83,40 @@ reading that class, the case is coupled to our implementation and should be refu
 
 ## Last run
 
-`5/5` adapter cases for the inspeximus binding, every positive control reaching its declared methods and
-every case demonstrated to fail against the flattering implementation it names. The three validator
-anti-vacuity cases are stated in the fixture as requirements on a validator, not on an adapter, and are
-not scored here: all three were measured against our own runner, which failed all three before they were
-fixed.
+`3/4` adapter cases for the inspeximus binding.
+
+`collateral-must-survive-a-supersession` FAILS, and the cause is neither adapter. `RebuildStrategy`
+introduces the replacement only through `rebuild()` of a mixed descendant, so a superseded root with no
+mixed descendant is retired while the correction is never asserted anywhere. Measured four ways in
+`probes/rebuildstrategy_loses_the_replacement_without_a_descendant.py`: both inspeximus and the
+reference `MarkdownAdapter` fail without a descendant, and both succeed with one. The receipt stays
+honest in every failing arm (`aggregate=failed`), so this is a repair that cannot succeed for that store
+shape, not one that claims falsely to have succeeded.
+
+`repair-must-not-duplicate-a-preserved-proposition` moved to `awaiting_specification` and is not scored.
+`StoreAdapter.rebuild` names parameters; the specification does not yet define provider-neutral
+proposition identity, multiplicity or cardinality, and the maintainer asked that a candidate fixture not
+manufacture that rule by quotation. Our own citation check reached the same verdict independently and
+refused to score it. The blind spot is real and stays recorded as a specification request.
+
+## Six gaps the maintainer found in the first version, all fixed
+
+Every one was a false pass or an unbound source, and all six are closed here.
+
+1. A mutated run that raised any exception counted as "mutation caught". A crash is not the declared
+   counter-result; a raise now fails the case unless the case names the exception it expects.
+2. `sys.settrace` recorded function names globally, so a control asking for `coverage` or `retire` was
+   satisfied by any function of that name anywhere. Calls are now bound to the target instance.
+3. The target commit and digest lived in prose. The runner now asserts the bound adapter matches the
+   fixture's target and digests the tree it scores; `--pkg-digest` makes that binding enforceable.
+4. A citation counted as valid when the quote was merely non-empty. Quotes are now checked against the
+   named file in the pinned tree. That check immediately caught three of our own citations: a missing
+   file, a markdown-formatting mismatch, and one attributed to the wrong source entirely.
+5. `must_produce` was declarative. Each mutation's declared counter-result is now evaluated, so a
+   mutation that breaks a case for an unrelated reason no longer earns credit.
+6. Expectations were partial, so `collateral-must-survive-a-supersession` reported PASS while its own
+   baseline carried `aggregate=failed` and `triad.positive=fail`. An outcome a case does not mention
+   must still conform. Fixing this is what surfaced the `RebuildStrategy` finding above.
+
+The three validator anti-vacuity cases remain declarative here and are not scored. They belong in an
+executable validator contract, which is where the maintainer has moved them.

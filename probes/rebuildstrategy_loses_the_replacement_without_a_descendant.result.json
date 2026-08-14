@@ -1,0 +1,29 @@
+{
+  "arms": {
+    "reference/no mixed descendant": {
+      "positive": "fail",
+      "aggregate": "failed"
+    },
+    "reference/with mixed descendant": {
+      "positive": "pass",
+      "aggregate": "verified"
+    },
+    "inspeximus/no mixed descendant": {
+      "positive": "fail",
+      "aggregate": "failed",
+      "replacement_asserted": false,
+      "active_records": [
+        "prefers quiet restaurants"
+      ]
+    },
+    "inspeximus/with mixed descendant": {
+      "positive": "pass",
+      "aggregate": "verified",
+      "replacement_asserted": true,
+      "active_records": [
+        "prefers quiet restaurants",
+        "eats meat again"
+      ]
+    }
+  }
+}
