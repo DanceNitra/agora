@@ -27,8 +27,12 @@
     {
       "guard": "dropping an expectation does not hide a failure",
       "fires": true
+    },
+    {
+      "guard": "the controls reach the verdict",
+      "fires": true
     }
   ],
-  "fired": 7,
-  "total": 7
+  "fired": 8,
+  "total": 8
 }

@@ -468,12 +468,43 @@ def verify_citation(case, pkg):
     return None
 
 
-def source_digest(pkg):
-    """A deterministic digest of the source tree actually scored, so `--pkg` cannot be arbitrary."""
+def _implementation_identity(binding):
+    """Digest the code actually graded. The spec tree was pinned to hex; the subject was anonymous.
+
+    A conformance result that names its specification precisely and its implementation not at all
+    cannot be re-checked by anyone, which is most of what a conformance result is for.
+    """
+    import hashlib
+    out = {"binding_class": "%s.%s" % (type(binding).__module__, type(binding).__name__)}
+    seen = {}
+    for obj in (type(binding),):
+        mod = sys.modules.get(obj.__module__)
+        path = getattr(mod, "__file__", None)
+        if path and os.path.exists(path):
+            seen[os.path.basename(path)] = hashlib.sha256(
+                io.open(path, "rb").read()).hexdigest()[:16]
+    try:
+        import inspeximus
+        seen["inspeximus.__version__"] = getattr(inspeximus, "__version__", "unknown")
+    except Exception:
+        pass
+    out["source_digests"] = seen
+    return out
+
+
+def source_digest(pkg, cited=()):
+    """A deterministic digest of the source tree actually scored, so `--pkg` cannot be arbitrary.
+
+    THE CITED FILES ARE PART OF THE TREE. An earlier version walked `prototype/` and `spec/` only,
+    which left `IDEA.md` -- the normative source two of four cases quote -- outside the digest. A
+    sentence forged into it was quoted by a case and the run went green with the digest UNCHANGED,
+    so "a tampered tree is REFUSED" was false as published. Anything a case cites is now covered,
+    wherever it lives, and the citation check reads the same bytes the digest binds.
+    """
     import hashlib
     h = hashlib.sha256()
     roots = [os.path.join(pkg, "prototype"), os.path.join(pkg, "spec")]
-    files = []
+    files = [os.path.join(pkg, c) for c in cited if os.path.exists(os.path.join(pkg, c))]
     for root in roots:
         for base, _dirs, names in os.walk(root):
             if "__pycache__" in base:
@@ -481,7 +512,7 @@ def source_digest(pkg):
             for n in sorted(names):
                 if n.endswith((".py", ".json", ".md")):
                     files.append(os.path.join(base, n))
-    for path in sorted(files):
+    for path in sorted(set(files)):
         h.update(os.path.relpath(path, pkg).replace("\\", "/").encode("utf-8"))
         h.update(io.open(path, "rb").read())
     return h.hexdigest(), len(files)
@@ -491,6 +522,8 @@ def main(argv=None):
     ap = argparse.ArgumentParser()
     ap.add_argument("--pkg", required=True, help="directory containing prototype/")
     ap.add_argument("--binding", default=None, help="module:Class implementing build/active_texts")
+    ap.add_argument("--result", default=None,
+                    help="write the result JSON here instead of beside the fixture")
     ap.add_argument("--pkg-digest", default=None,
                     help="refuse to run unless the scored tree hashes to this")
     ap.add_argument("--inspeximus", default=r"C:/Users/Danculus/inspeximus-repo")
@@ -523,7 +556,9 @@ def main(argv=None):
     if declared and target.get("commit") and declared != target["commit"]:
         raise AssertionError("the binding declares spec commit %s but the fixture targets %s"
                              % (declared[:12], target["commit"][:12]))
-    tree_digest, n_files = source_digest(a.pkg)
+    cited = sorted({c["normative"]["source"].split(",")[0].strip()
+                    for c in fixture["adapter_cases"] if c.get("normative", {}).get("source")})
+    tree_digest, n_files = source_digest(a.pkg, cited)
     expected_tree = a.pkg_digest or target.get("source_tree_digest")
     if expected_tree and expected_tree.strip().lower() != tree_digest:
         a.pkg_digest = expected_tree
@@ -537,7 +572,8 @@ def main(argv=None):
            # "inspeximus" into this file. Record the class that actually ran.
            "binding_class": "%s.%s" % (type(binding).__module__, type(binding).__name__),
            "spec_commit": SPEC_COMMIT, "g2_digest": SPEC_G2_DIGEST,
-           "scored_tree_digest": tree_digest, "scored_files": n_files, "cases": []}
+           "scored_tree_digest": tree_digest, "scored_files": n_files,
+           "implementation": _implementation_identity(binding), "cases": []}
     print("Candidate adapter conformance -- binding: %s" % binding.name)
     print("adapter bound to %s | scored tree %s (%d files)"
           % (SPEC_COMMIT[:12], tree_digest[:16], n_files))
@@ -632,8 +668,11 @@ def main(argv=None):
     print("\n%d/%d candidate adapter cases pass for %s" % (passed, total, binding.name))
     print("This is not G2 or G4 evidence. %s" % fixture["authored_by"]["disclosure"])
     out["totals"] = {"cases": total, "passed": passed}
-    io.open(RESULT, "w", encoding="utf-8", newline="\n").write(json.dumps(out, indent=2) + "\n")
-    print("wrote %s" % os.path.basename(RESULT))
+    # The audit runs with `--result` pointing at a throwaway file. Without that it overwrote the
+    # PUBLISHED result, so the artifact we shipped was a mutant run from inside the audit.
+    dest = a.result or RESULT
+    io.open(dest, "w", encoding="utf-8", newline="\n").write(json.dumps(out, indent=2) + "\n")
+    print("wrote %s" % os.path.basename(dest))
     return 0 if passed == total else 1
 
 

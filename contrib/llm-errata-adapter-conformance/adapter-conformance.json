@@ -402,6 +402,7 @@
     "commit": "ac4468faf73c2cc7949dd29b2a2a151f5bd23116",
     "g2_digest": "7e0d6c88c1ca3a87743ac70ba2a3dfea0b350d112d2d3c59a3c6cbb537568f12",
     "note": "The runner asserts the bound adapter matches these and digests the tree it scores, so an arbitrary --pkg cannot be reported under this fixture's name.",
-    "source_tree_digest": "3c334d751ca75a6e8af7b138258a3cdc67a39f9e813fc14c3750e8570c9c4a03"
+    "source_tree_digest": "94ed3adaf3d8791c826e812cff39a80dc6ea72ad2a23ce69db93740cfaa1498c",
+    "digest_covers": "prototype/, spec/, and every file any case cites normatively"
   }
 }

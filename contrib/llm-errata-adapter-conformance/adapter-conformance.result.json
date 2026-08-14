@@ -4,8 +4,15 @@
   "binding_class": "__main__.InspeximusBinding",
   "spec_commit": "ac4468faf73c2cc7949dd29b2a2a151f5bd23116",
   "g2_digest": "7e0d6c88c1ca3a87743ac70ba2a3dfea0b350d112d2d3c59a3c6cbb537568f12",
-  "scored_tree_digest": "3c334d751ca75a6e8af7b138258a3cdc67a39f9e813fc14c3750e8570c9c4a03",
-  "scored_files": 72,
+  "scored_tree_digest": "94ed3adaf3d8791c826e812cff39a80dc6ea72ad2a23ce69db93740cfaa1498c",
+  "scored_files": 75,
+  "implementation": {
+    "binding_class": "__main__.InspeximusBinding",
+    "source_digests": {
+      "run_adapter_conformance.py": "0f38a4cd8433833e",
+      "inspeximus.__version__": "2.9.0"
+    }
+  },
   "cases": [
     {
       "id": "undeclared-derivative-must-not-reach-verified",
@@ -47,7 +54,7 @@
           "snapshot_is_non_empty": true,
           "state_roots_differ": true
         },
-        "channel": "2 file(s) changed, 2 read under tmp9c42eftr",
+        "channel": "2 file(s) changed, 2 read under tmpdm9kys0j",
         "methods_reached": [
           "_assert",
           "_flush",
@@ -113,7 +120,7 @@
           "snapshot_is_non_empty": true,
           "state_roots_differ": true
         },
-        "channel": "2 file(s) changed, 2 read under tmpfpwilyyr",
+        "channel": "2 file(s) changed, 2 read under tmpdk90v7z5",
         "methods_reached": [
           "_assert",
           "_flush",
@@ -176,7 +183,7 @@
           "snapshot_is_non_empty": true,
           "state_roots_differ": true
         },
-        "channel": "2 file(s) changed, 3 read under tmpqfir86fb",
+        "channel": "2 file(s) changed, 3 read under tmpey5z3a1u",
         "methods_reached": [
           "_flush",
           "_names_root",
@@ -201,8 +208,8 @@
       "pass": false,
       "expectation_met": false,
       "failures": [
-        "unspecified triad.positive = fail (case did not declare it; it must still conform)",
-        "unspecified aggregate = failed (case did not declare it; it must still conform)"
+        "aggregate: expected one of ['verified'], got failed",
+        "triad.positive: expected pass, got fail"
       ],
       "normative_source": "IDEA.md",
       "methods_required": [
