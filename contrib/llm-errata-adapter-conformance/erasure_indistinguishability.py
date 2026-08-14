@@ -2,11 +2,29 @@
 
 WHY SEARCHING CANNOT WORK, established over six audit rounds and not worth a seventh. A check of the
 form "the erased value must not appear in the store" is defeated by anything that transforms or
-fragments it. Measured against our own suite: bz2, utf-32-le, a one-byte XOR, and -- with no encoding
-trick whatsoever -- the plain UTF-8 value written across two files as "is veg" and "etarian". Every
+fragments it. Measured against our own suite: bz2, a one-byte XOR, utf-32 (which the search does NOT cover -- an
+earlier version of this docstring listed it among the handled forms, which was false and is exactly
+the kind of unchecked capability claim this file exists to argue against), and, with no encoding
+trick whatsoever, the plain UTF-8 value written across two files as "is veg" and "etarian". Every
 fix widened the list of recognised encodings, and the list is unbounded, so the rate of new escapes
 never fell. The same limit applies to the specification's own confidentiality vector, which asserts
 `forbidden_value not in evidence`.
+
+NONE OF THIS IS NEW, AND THE FILE SHIPPED WITH NO CITATIONS AT ALL. Credit where it belongs:
+
+  Ippolito et al., "Preventing Generation of Verbatim Memorization in Language Models Gives a False
+  Sense of Privacy", INLG 2023 (2023.inlg-main.3) -- verbatim matching is not sufficient, and
+  anticipating transforms is "an innumerable problem".
+  Shu, Yao et al., CODASPY 2015 -- "none of the existing techniques is adequate for detecting
+  transformed data leaks", in a storage setting closer to ours.
+  NIST SP 800-88r1 (WITHDRAWN, superseded by r2, Sept 2025), sec. 4.7.3 -- already ranks
+  compare-before-and-after above string search; r2 drops content inspection entirely.
+  Garg, Goldwasser, Vasudevan, EUROCRYPT 2020 -- "perfect deletion-compliance", Def 2.2, which is
+  the formal version of what this file gropes toward, and is STRICTLY STRONGER: it compares
+  present-then-deleted against never-present, where this compares two different secrets and so
+  cannot see residue that is identical for every secret yet still reveals that a deletion occurred.
+  Naor and Teague, STOC 2001 -- history independence, the structural twin.
+  Thudi et al., USENIX Security 2022 -- absence cannot be proven; only algorithmic definitions audit.
 
 THE TEST THAT DOES WORK asks a different question. Not "is the value there?", which requires
 recognising it, but "does the store's state DEPEND on it?", which does not.
@@ -66,6 +84,12 @@ SECRET_A = "the patient is HIV positive"
 SECRET_B = "the patient is left-handed!"   # 27, matching A; it was 26 and unchecked
 COLLATERAL = "prefers appointments in the morning"
 
+#: A DERIVED record holding both. Its absence is why this file first reported our own store clean:
+#: `forget()` removes the record it is given, not a summariser's verbatim copy of the same text, so a
+#: two-record fixture is precisely the shape that passes. Measured: without it the secret is gone
+#: from disk, with it the secret is still there. The fixture that flatters is not the fixture to use.
+INCLUDE_DERIVED = True
+
 
 def _normalise(blob, root):
     """Remove differences that CANNOT carry the secret, and nothing else.
@@ -112,6 +136,9 @@ def _run_erasure(binding_cls, secret, plant=False):
             {"id": "secret", "text": secret, "root": "fact:secret"},
             {"id": "keep", "text": COLLATERAL, "root": "fact:keep"},
         ])
+        if INCLUDE_DERIVED:
+            handle.remember("%s; %s" % (secret, COLLATERAL), derived=True,
+                            derived_from=[r["id"] for r in handle.items][:2])
         target = next(r["id"] for r in handle.items if r.get("key") == "secret")
         if plant:
             # POSITIVE CONTROL: a store that keeps the secret somewhere the normaliser does not

@@ -1,6 +1,12 @@
 {
-  "indistinguishable": true,
+  "indistinguishable": false,
   "control_fires": true,
   "binding": "InspeximusBinding",
-  "residue_sample": []
+  "residue_sample": [
+    {
+      "line": 3,
+      "erasing_A": " {\"<IDKEY>\": \"<ID>\",\"text\":\"the patient is HIV positive; prefers appointments in the morning\",\"tags\":[],\"value\":1.0,\"ts\":<EPOCH>,\"iso\":\"<TS>\",\"valid_from\":<EPOC",
+      "erasing_B": " {\"<IDKEY>\": \"<ID>\",\"text\":\"the patient is left-handed!; prefers appointments in the morning\",\"tags\":[],\"value\":1.0,\"ts\":<EPOCH>,\"iso\":\"<TS>\",\"valid_from\":<EPOC"
+    }
+  ]
 }
