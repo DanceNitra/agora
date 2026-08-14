@@ -360,130 +360,24 @@ async def action_implement(config: dict, quest: dict, params: dict) -> dict:
     }
 
 
-def _generate_fallback_code(title: str, research: str, target_dir: str) -> dict:
-    """Generate a reasonable code file without LLM."""
-    safe_name = "".join(c if c.isalnum() or c == '_' else '_' for c in title.split(':')[-1].strip().lower().replace(' ', '_'))[:30]
-    filename = f"phase4_{safe_name}.py"
-    full_path = os.path.join(target_dir, filename)
-
-    content = (
-        f'"""Phase 4 implementation: {title}\n\n'
-        f'Generated from research:\n{research}\n'
-        f'"""\n\n'
-        f'import logging\n'
-        f'from typing import Any, Optional\n\n\n'
-        f'logger = logging.getLogger(__name__)\n\n\n'
-        f'class {safe_name.title().replace("_", "")}:\n'
-        f'    """Implementation for {title}."""\n\n'
-        f'    def __init__(self, config: Optional[dict] = None):\n'
-        f'        self.config = config or {{}}\n'
-        f'        logger.info(f"Initialized {{self.__class__.__name__}}")\n\n'
-        f'    async def execute(self) -> dict:\n'
-        f'        """Execute the implementation."""\n'
-        f'        return {{"status": "ok", "message": "Phase 4 implementation placeholder"}}\n'
-    )
-
-    os.makedirs(os.path.dirname(full_path), exist_ok=True)
-    with open(full_path, 'w') as f:
-        f.write(content)
-
-    print(f"[Developer] Fallback: wrote {full_path}")
-    return {
-        "status": "ok",
-        "files": [full_path],
-        "description": f"Fallback implementation for {title}",
-    }
-
-
-async def _generate_code_via_llm(
-    title: str,
-    research: str,
-    interface: str,
-    subsystem: str,
-    target_dir: str,
-    criteria: list,
-) -> dict:
-    """Use LLM to generate actual Python code for the implementation."""
-    from agora.execution.llm_client import call_llm
-
-    criteria_str = "\n".join(f"- {c}" for c in criteria[:3])
-
-    prompt = (
-        f"You are a Senior Backend Developer writing Python for an agent-based system.\n\n"
-        f"**Task:** Implement code for: {title}\n"
-        f"**Subsystem:** {subsystem}\n"
-        f"**Context:** {research[:600]}\n"
-        f"**Success criteria:**\n{criteria_str}\n\n"
-        f"**Target directory:** {target_dir}\n"
-    )
-    if interface:
-        prompt += f"\n**Interface/Design:**\n{interface[:1000]}\n"
-
-    prompt += (
-        f"\nGenerate production-ready Python code. "
-        f"Respond with JSON format:\n"
-        f'{{\n'
-        f'  "files": [\n'
-        f'    {{\n'
-        f'      "path": "relative/path/from/target_dir/filename.py",\n'
-        f'      "content": "the full Python source code",\n'
-        f'    }}\n'
-        f'  ],\n'
-        f'  "description": "what this code does"\n'
-        f'}}\n\n'
-        f"IMPORTANT: Only include valid Python code. "
-        f"Use existing patterns from the codebase. "
-        f"Include proper imports, docstrings, and type hints."
-    )
-
-    try:
-        import asyncio
-        raw = await asyncio.wait_for(
-            asyncio.to_thread(
-                call_llm,
-                system_prompt=prompt,
-                user_prompt=f"Generate implementation for: {title}",
-                tier="cheap",
-                temperature=0.3,
-                max_tokens=2000,
-                response_format={"type": "json_object"},
-            ),
-            timeout=120.0,
-        )
-
-        parsed = json.loads(raw)
-        files_data = parsed.get("files", [])
-        created_files = []
-
-        for file_spec in files_data:
-            rel_path = file_spec.get("path", "")
-            content = file_spec.get("content", "")
-            full_path = os.path.join(target_dir, rel_path)
-
-            # Create subdirectories if needed
-            os.makedirs(os.path.dirname(full_path), exist_ok=True)
-
-            with open(full_path, "w") as f:
-                f.write(content)
-
-            created_files.append(full_path)
-            print(f"[Developer] Wrote {full_path} ({len(content)} chars)")
-
-        return {
-            "status": "ok" if created_files else "skipped",
-            "files": created_files,
-            "description": parsed.get("description", ""),
-        }
-
-    except asyncio.TimeoutError:
-        print(f"[Developer] LLM code generation timed out for '{title}'")
-        return _generate_fallback_code(title, research[:300], target_dir)
-
-    except Exception as e:
-        print(f"[Developer] LLM code gen failed: {e}")
-        traceback.print_exc()
-        return {"status": "error", "files": [], "description": f"LLM error: {e}"}
-
+# REMOVED 2026-08-14: `_generate_fallback_code` and `_generate_code_via_llm`.
+#
+# The LLM path asked the model for a JSON list of {path, content} pairs and wrote each with
+#     full_path = os.path.join(target_dir, rel_path)
+# with no normalisation and no containment -- os.path.join DISCARDS target_dir when rel_path is
+# absolute, and ../ traverses freely. Both the path and the content came straight from model JSON,
+# and the model is steered by the quest text, which agent_worker builds verbatim from a paper
+# claim or a GitHub scan finding.
+#
+# It had no caller: action_implement takes the template path unconditionally (no branch, no config
+# flag), and _generate_fallback_code existed only to serve the LLM path. The docstring advertising
+# it as "available but config-dependent" described a path no config could select.
+#
+# Deleted rather than fixed, because path containment alone would not have been enough: the
+# developer step git-commits whatever it produced into server/agora/**, so LLM-authored content
+# landing anywhere inside target_dir becomes imported code on the next brain restart. If the
+# capability is ever wanted back, it needs BOTH containment and a quarantine directory outside the
+# import path, in the same commit.
 
 def _run_syntax_checks(files: list[str]) -> dict:
     """Run python -m py_compile on generated files."""

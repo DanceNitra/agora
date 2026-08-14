@@ -69,66 +69,24 @@ The following success criteria must be met:
     }
 
 
-async def action_run_script(config: dict, quest: dict, params: dict) -> dict:
-    """Run a shell command or script, or generate a meaningful report.
-
-    Security: only runs if command is explicitly provided in params.
-    If no explicit command, generates a report file about the quest instead.
-    """
-    command = params.get("command", "").strip()
-
-    if not command:
-        # Generate a report about the quest instead of running arbitrary text
-        return await _generate_quest_report(config, quest, params)
-
-    # Safety: only allow non-destructive commands
-    dangerous = ["rm -rf", "mkfs", "dd if=", "> /dev/", ":(){"]
-    for d in dangerous:
-        if d in command.lower():
-            return {
-                "status": "error",
-                "output": f"Blocked dangerous command pattern: {d}",
-                "simulated": True,
-            }
-
-    # Run in temp directory for safety
-    sandbox = config.get("sandbox_dir") or tempfile.mkdtemp(prefix="forge_")
-    cwd = params.get("cwd") or sandbox
-
-    try:
-        result = subprocess.run(
-            command,
-            shell=True,
-            capture_output=True,
-            text=True,
-            timeout=30,
-            cwd=cwd,
-        )
-        stdout = result.stdout[-1000:] if result.stdout else ""
-        stderr = result.stderr[-500:] if result.stderr else ""
-
-        return {
-            "status": "ok" if result.returncode == 0 else "error",
-            "output": stdout[:500] or "(no output)",
-            "exit_code": result.returncode,
-            "stderr": stderr[:200] if stderr else None,
-            "cwd": cwd,
-        }
-    except subprocess.TimeoutExpired:
-        return {"status": "error", "output": "Command timed out (30s)", "simulated": True}
-    except Exception as e:
-        return {"status": "error", "output": f"Execution failed: {e}", "simulated": True}
-
-
-async def action_build(config: dict, quest: dict, params: dict) -> dict:
-    """Run a build command."""
-    command = params.get("command") or quest.get("goal", "").strip()
-    if not command:
-        command = "echo 'Build station complete' && mkdir -p /tmp/forge-builds && date > /tmp/forge-builds/last-build.txt"
-    return await action_run_script(
-        config, quest, {"command": command, **params}
-    )
-
+# REMOVED 2026-08-14: `action_run_script` and `action_build`.
+#
+# action_run_script executed subprocess.run(command, shell=True) behind a denylist of five
+# substrings (rm -rf, mkfs, dd if=, > /dev/, :(){), which "rm  -rf", "curl x | sh" or
+# "powershell -e <b64>" walk straight past, and it took cwd from the caller. action_build fed it
+#     command = params.get("command") or quest.get("goal", "").strip()
+# -- a research goal, built by agent_worker from a paper claim or a GitHub scan finding. A quest
+# goal is prose; it is never a command.
+#
+# Both were registered and neither was reachable: the nine registry.execute call sites all pass
+# string literals and none names "forge", and the `*:<skill>` wildcard resolves to `*:run_script`,
+# which was never registered (only *:wait and *:move are). POST /{npc_name}/action takes a
+# free-form npc name but a CLOSED action set, and lands in RealActionEngine, not here.
+#
+# Deleted rather than hardened because the capability already exists, done correctly:
+# real_action_engine._run_script uses shlex.split, shell=False, a metacharacter rejection and a
+# 21-command read-only allowlist. Keeping a shell=True denylist beside it is a landmine, not a
+# spare tire -- one line in registry.py would have made it live with untrusted input on day one.
 
 async def action_request_resources(config: dict, quest: dict, params: dict) -> dict:
     """Log a resource request (for Ledger to process later)."""
