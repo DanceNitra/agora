@@ -1,0 +1,19 @@
+{
+ "verdict": "FIXED",
+ "flip_clean": false,
+ "exfil_served": true,
+ "control_committed_field_caught": true,
+ "control_insertion_caught": true,
+ "before": {
+  "verify_writes": "(True, [])",
+  "verify_attribution": "True",
+  "verify_bundle": "True",
+  "bind_content": "True"
+ },
+ "after": {
+  "verify_writes": "(False, ['memory 25e94d7246: stored content no longer matches its write receipt (edited after write)'])",
+  "verify_attribution": "True",
+  "verify_bundle": "False",
+  "bind_content": "False"
+ }
+}
