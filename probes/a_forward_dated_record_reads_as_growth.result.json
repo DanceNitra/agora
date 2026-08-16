@@ -1,0 +1,9 @@
+{
+ "verdict": "CLOSED (store-editor)",
+ "forward_dated_injection_passes": false,
+ "back_dated_injection_caught": true,
+ "ordinary_growth_still_passes": true,
+ "post_export_rollback_caught": true,
+ "sidecar_forgery_passes_unsigned": true,
+ "sidecar_forgery_passes_signed": false
+}
