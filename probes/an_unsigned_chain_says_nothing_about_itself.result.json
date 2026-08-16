@@ -1,0 +1,8 @@
+{
+ "verdict": "STATED",
+ "unsigned_verify_ok": true,
+ "unsigned_mentions_signing": false,
+ "unsigned_stated_on_request": true,
+ "signed_verify_ok": false,
+ "key_location_matters": true
+}
