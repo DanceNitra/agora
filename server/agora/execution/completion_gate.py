@@ -41,6 +41,37 @@ _OWED = {
     "Read paper": (
         "the library ledger", "agora.execution.library",
         "POST /brain/library-record with the arxiv_id and note path, so it is not re-read"),
+    # THE GATE WAS BUILT FOR THE THREE LEDGERS THAT HAD ALREADY FAILED, AND THE CLASS OUTLIVED IT.
+    # Measured 2026-08-17 by running check_completion over every pending inbox family: of the 25 kinds
+    # waiting, exactly three were held to a ledger -- bounty, replication, library -- the three named in
+    # the outage this file documents. Meanwhile the roadmap panel reported five idle organs, and the
+    # two it named that were NOT covered here could be closed with no entry at all: Cartography
+    # (373.3h since its last row) and the Analogy Forge (345.6h). So 'Chart the external map', 'Test
+    # bridge' and 'Forge analogy' could be marked done forever while their organs read dead -- the
+    # identical failure, one ledger over, which is the shape this repository keeps re-finding.
+    #
+    # Added only where all three preconditions hold, checked rather than assumed: the ledger exists,
+    # its module exposes `_load` so `_newest_ts` can actually read it (a guard that cannot read fails
+    # OPEN and would be decorative), and an endpoint exists to write it. 'Learn from outcomes' is
+    # deliberately NOT here: its store is .lessons.json and `agora.execution.learning` has no `_load`,
+    # so the rule would be unenforceable. 'Model belief' and 'Grade exam' are not here either, because
+    # their work does not obviously owe any ledger a row, and a requirement invented for a family that
+    # legitimately produces nothing strands the task instead of protecting the organ.
+    "Chart the external map": (
+        "the cartography ledger", "agora.execution.cartography",
+        "POST /brain/cartography-record with the charted claim and its receipts"),
+    "Test bridge": (
+        "the cartography ledger", "agora.execution.cartography",
+        "POST /brain/cartography-record with the verdict on whether the mechanism connects"),
+    # NOT `agora.execution.forge`. That is the GAP forge (.forge.json, feeding `forge_open_gaps`); the
+    # Analogy Forge organ the roadmap panel reports on is `analogy_forge` (.analogies.json). The first
+    # version of this entry named the wrong one, which would have demanded a gap row for an analogy and
+    # stranded exactly the family it was added to protect. Caught by reading the panel that publishes
+    # the number: it imports analogy_forge, and the two ledgers' ages differ by 96h (250.0h vs 345.7h),
+    # which is what made the mistake visible.
+    "Forge analogy": (
+        "the analogy ledger", "agora.execution.analogy_forge",
+        "POST /brain/analogy-record with the mechanism, the target domain and the transfer claim"),
 }
 
 #: How recently the ledger must have grown for the close to count as landed. Generous, because a long

@@ -44,10 +44,31 @@ def _signature(text: str) -> frozenset:
 
 
 def _is_duplicate(sig: frozenset, items: list, now: float) -> str:
+    """The window applies to DONE tasks only. A PENDING twin is a duplicate at any age.
+
+    THE WINDOW AND THE ORGAN RELEASE VALVE WERE SET TO THE SAME 36 HOURS, and the valve always won.
+    Every organ opens with the dungeon's `_task_already_pending`, which deliberately RELEASES the organ
+    once its task has sat unprocessed for `_PENDING_GUARD_MAX_H = 36.0` -- an expiry added because one
+    stuck task had kept the Replication Unit shut for four days. The organ then calls add_task again,
+    and by that moment the original had just fallen out of this window, so the copy was appended.
+    Deterministic, once every 36 hours, for as long as nobody drains the task.
+
+    Measured 2026-08-17 on the live inbox: 86 pending items, 7 exact-duplicate groups, 24 surplus
+    copies. The intervals between copies were 36, 36, 36, 37 h ("Chart the external map"), 40, 40, 40,
+    40 h ("Replicate claim") and 73, 36, 36, 37, 37 h ("Challenge belief") -- the release deadline,
+    beating verbatim.
+
+    So the age test now only guards re-picking something already FINISHED, which is what the comment
+    above it always described. A pending twin is refused regardless of age, which is what
+    `_task_already_pending` says in its own words: "a second copy adds nothing, Claude would just
+    editorial-skip it". The valve keeps working -- the organ is released, calls here, receives the
+    existing id and carries on -- so nothing that was fixed in July is undone.
+    """
     if not sig:
         return ""
     for t in items:
-        if now - t.get("ts", 0) > _DEDUP_WINDOW_S:
+        _done = str(t.get("status", "")).lower() == "done"
+        if _done and now - t.get("ts", 0) > _DEDUP_WINDOW_S:
             continue
         other = _signature(t.get("text", ""))
         if not other:
