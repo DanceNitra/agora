@@ -28,7 +28,10 @@ checked before any score is reported:
      these cases exist to find, and a suite that cannot tell "the property holds" from "the case never
      arose" has measured nothing.
 
-TO RUN AGAINST YOUR OWN STORE, implement six methods:
+TO RUN AGAINST YOUR OWN STORE, implement eight methods. (This said "six" and then listed seven,
+omitting `collector_stops` -- which case T5 exercises and which both bindings had to implement. A
+verification pass counted the AST rather than reading the prose. An interface described by hand and
+never counted is the same defect one layer up from the ones this fixture is about.)
 
     class YourBinding:
         name = "your-store"
@@ -37,6 +40,7 @@ TO RUN AGAINST YOUR OWN STORE, implement six methods:
         def write(self, h, *, key, text, source, session): -> None
         def mutate_source(self, h, *, doc, bytes_):    -> None   # the world moves
         def delete_source(self, h, *, doc):            -> None
+        def collector_stops(self, h):                  -> None   # the observation collector dies
         def verify(self, h, *, key, session):          -> None   # pin/checkpoint, if you have one
         def assess(self, h, *, key, window, session):  -> {"admissible": bool, "reason": str|None,
                                                            "consulted": [str]}

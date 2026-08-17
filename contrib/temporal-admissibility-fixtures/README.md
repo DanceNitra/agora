@@ -81,7 +81,7 @@ exists because of that.
 
 ## Running it against your own store
 
-Implement six methods. No inheritance, no dependency, no import of anything here.
+Implement eight methods. No inheritance, no dependency, no import of anything here.
 
 ```python
 class YourBinding:
@@ -91,6 +91,7 @@ class YourBinding:
     def write(self, h, *, key, text, source, session): ...
     def mutate_source(self, h, *, doc, bytes_):        ...  # the world moves
     def delete_source(self, h, *, doc):                ...
+    def collector_stops(self, h):                      ...  # the observation collector dies
     def verify(self, h, *, key, session):              ...  # your pin/checkpoint, if you have one
     def assess(self, h, *, key, window, session):      ...  # -> {admissible, reason, consulted}
 ```
