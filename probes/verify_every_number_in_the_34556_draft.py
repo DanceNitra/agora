@@ -81,10 +81,6 @@ else:
 sys.path.insert(0, REPO)
 from inspeximus import Inspeximus                                    # noqa: E402
 
-# THESE STORES ARE LIVE AND GROW WHILE YOU WORK. Between writing the draft and verifying it they
-# moved 11,501 -> 11,630 keys, which is not drift to be tolerated: a published figure has to match
-# the run behind it. So the rule is the one in the failure message -- update the DRAFT to whatever
-# this measures, immediately before sending, and never the other way round.
 # The two stores the draft cites. Paths are OVERRIDABLE and default to this repo / the user's home
 # rather than one machine's absolute path -- the same portability fix the probes next door needed,
 # for the same reason: an artifact offered publicly should run somewhere other than where it was
@@ -92,11 +88,11 @@ from inspeximus import Inspeximus                                    # noqa: E40
 _HERE = Path(__file__).resolve().parent.parent
 EXPECT = {
     os.environ.get("AGORA_CODING_STORE", str(_HERE / ".inspeximus" / "coding_memory.json")):
-        {"keys": 11600, "tol": 100, "pct": 12, "pct_tol": 1.0, "groups": 610, "grp_tol": 25,
+        {"floor": 11000, "pct": 12, "pct_tol": 1.0, "groups": 610, "grp_tol": 25,
          "label": "coding store"},
     os.environ.get("AGORA_DECISION_STORE",
                    os.path.expanduser("~/.inspeximus/mcp_memory.json")):
-        {"keys": 436, "tol": 15, "pct": 95, "pct_tol": 2.0, "groups": 1, "grp_tol": 0,
+        {"floor": 400, "pct": 95, "pct_tol": 2.0, "groups": 1, "grp_tol": 0,
          "label": "decision store"},
 }
 for path, e in EXPECT.items():
@@ -105,19 +101,19 @@ for path, e in EXPECT.items():
         continue
     c = Inspeximus(path=path, embed=False).identifier_contract()
     assert c["keys"] > 0, f"COVER: {path} produced no keys, so every comparison below is vacuous"
-    # EVERY figure here drifts, and finding that out is why the draft publishes PROPORTIONS.
+    # EVERY figure here drifts, which took three tries to accept and is why the draft publishes a
+    # PROPORTION and a FLOOR rather than counts.
     #
-    # First attempt pinned exact integers. They failed within the hour -- these are live stores and
-    # every hook write adds a row: 11,501 -> 11,630 -> 11,642 keys, and with them 1,373 -> 1,392 ->
-    # 1,394 keys lost to prefix_8. Second attempt granted tolerance to the key TOTAL only, on the
-    # stated grounds that the fold figures "did not move across any of those runs". That comment was
-    # false one run later. So the tolerance is not a concession to noise, it is the correct shape for
-    # a measurement of a moving population, and the DRAFT was rewritten to publish "about 12%" rather
-    # than a number with an expiry date nobody printed on it.
+    #   1. exact integers        failed within the hour: 11,501 -> 11,630 -> 11,642 keys, and with
+    #                            them 1,373 -> 1,392 -> 1,394 -> 1,400 keys lost to prefix_8.
+    #   2. tolerance on the      granted on the stated grounds that the fold figures "did not move
+    #      key total only        across any of those runs" -- a comment falsified one run later.
+    #   3. rounding (~11.6k)     drifted 11,600 -> 11,647 -> 11,680, i.e. toward its own edge. A
+    #                            slower expiry is still an expiry.
     #
-    # What is checked, therefore, is the proportion the draft actually states. A drifting integer
-    # would have quietly falsified a published claim; a proportion holds while the shape holds, and
-    # this fails loudly the moment the shape changes -- which is the event worth hearing about.
+    # What survives: the PROPORTION, which holds while the shape holds and fails loudly when the
+    # shape changes -- the event actually worth hearing about -- and a LOWER BOUND, which is the only
+    # exact figure that cannot go stale in the direction a growing population moves.
     lost8 = c["measured"]["prefix_8"]["keys_that_would_be_lost"]
     pct = 100.0 * lost8 / c["keys"]
     check(f"{e['label']}: prefix_8 collapses ~{e['pct']}% of keys",
@@ -127,9 +123,8 @@ for path, e in EXPECT.items():
     check(f"{e['label']}: ~{e['groups']} colliding groups",
           abs(groups - e["groups"]) <= e["grp_tol"],
           f"{groups} groups; draft says ~{e['groups']} (+-{e['grp_tol']})")
-    drift = abs(c["keys"] - e["keys"])
-    check(f"{e['label']}: key total within its published rounding", drift <= e["tol"],
-          f"{c['keys']} live vs ~{e['keys']} published (drift {drift}, tolerance {e['tol']})")
+    check(f"{e['label']}: at least {e['floor']:,} keys (a bound, not a snapshot)",
+          c["keys"] >= e["floor"], f"{c['keys']:,} live; draft claims over {e['floor']:,}")
     check(f"{e['label']}: casefold reported invertible",
           c["measured"]["casefold"]["invertible_on_this_store"] is True,
           "0 keys lost to casefold, as the draft's table says")
@@ -195,6 +190,19 @@ else:
         mutated = run_tests()
     finally:
         core_p.write_text(orig, encoding="utf-8")          # ALWAYS restore, even on exception
+
+    # POST-CONDITION, because the pre-check above is TOCTOU and cannot be made otherwise. It reads
+    # git status at one instant; another harness can apply its own mutant a millisecond later, and
+    # then OUR saved `orig` -- captured before that -- writes THEIR mutant back as if it were the
+    # source. That is exactly how `policy="trusting"` came to be sitting in a tree about to be
+    # tagged. A timing window cannot be closed by looking earlier; it can be closed by CHECKING
+    # AFTERWARDS against the one authority that does not move, which is git.
+    if subprocess.run(["git", "diff", "--quiet", "--", "inspeximus/"], cwd=REPO).returncode != 0:
+        subprocess.run(["git", "checkout", "--", "inspeximus/"], cwd=REPO)       # self-heal
+        check("the mutation leg left the tree as it found it", False,
+              "the tree differed from HEAD after restore -- another process was mutating the same "
+              "files. Restored from git; this leg is UNVERIFIED and the run must be repeated alone.")
+        raise SystemExit(1)
     restored = run_tests()
     check("the groups/lost mutant is KILLED", mutated.returncode != 0,
           "the suite fails when keys-lost is conflated with group-count"
