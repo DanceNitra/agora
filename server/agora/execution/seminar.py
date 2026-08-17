@@ -650,6 +650,24 @@ def verify_contributions(limit: int = 500) -> dict:
         # with NO YEAR, so "as Smith et al. showed" counted as a checkable source with nothing to look
         # up. That now fails, which TIGHTENS this tier. Deliberate. See execution/grounding.py.
         _txt = (c.get("evidence") or "") + " " + (c.get("claim") or "")
+        # DELIBERATELY NOT WIDENED TO `links`, AND THE REASON IS THE INTERESTING PART.
+        # The verified rate fell from 79% (2026-W31) to 44% (W32) and stayed there, and this tier's
+        # source test reads only the prose -- so the obvious repair was to also accept a `links` entry
+        # naming a note that exists on disk. `grounding.names_existing_note` was built for exactly that
+        # and it works. Wiring it in here promoted 497 records: the ledger went 79% -> 93% overall and
+        # W32/W33 went 44% -> 100%. That is the tell, not the win. A tier that passes essentially
+        # everything is not measuring anything.
+        #
+        # The reason it passes everything: `links` is populated by the MACHINERY, not earned by the
+        # work -- 0% of post-cliff records have zero links, mean 2.81. A source the system attaches for
+        # you is not the same evidence as a source the reasoning cites, and "verified" feeds the public
+        # track record. So the widening was measured, reverted, and left here as a comment instead.
+        #
+        # What the measurement DID settle: the cliff is not the 2026-07-31 grounding tightening (that
+        # accounts for 3% of the rejections -- the OLD regex drops from 78% to 38% at the same moment),
+        # it is a drop in the model's citing-in-prose behaviour dated to the same day, with `links`
+        # unchanged across it. The honest reading of the 44% is "the reasoning stopped naming its
+        # sources", which is a real thing to fix upstream rather than to reclassify here.
         has_src = grounding.is_grounded(_txt, allow_internal=True)
         if has_fals and has_src:
             c["verified"] = True

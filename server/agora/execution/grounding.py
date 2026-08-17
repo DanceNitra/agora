@@ -111,6 +111,67 @@ def is_internal_ref(text: str) -> bool:
     return bool(_VAULT_LINK.search(text or ""))
 
 
+#: Vault-note index for `names_existing_note`. Rebuilt at most every _NOTE_INDEX_TTL_S; a bare glob over
+#: the vault measured 0.18s for 8,907 notes, so this is cheap per run and unaffordable per call.
+_NOTE_INDEX_TTL_S = 900.0
+_note_index: dict = {"stems": frozenset(), "prefixes": frozenset(), "built": 0.0, "n": 0}
+#: Below this length a slug is not distinctive enough to identify a note ("Consistency", "Exercise"),
+#: and a prefix match on it would credit almost anything.
+_MIN_SLUG = 12
+
+
+def _slug(s: str) -> str:
+    return re.sub(r"[^a-z0-9]+", "-", str(s or "").strip().strip("[]").lower()).strip("-")
+
+
+def _note_stems() -> tuple:
+    """(stems, 40-char prefixes) of every note in the vault. FAILS CLOSED to empty sets.
+
+    An unreadable vault must not lift anything: this primitive exists to grant credit for a reference,
+    and granting it when the evidence cannot be examined is the failure mode this repo keeps recording.
+    Empty sets mean `names_existing_note` answers False for everything, which is the safe direction.
+    """
+    import glob
+    import os
+    import time as _t
+    if _note_index["stems"] and (_t.time() - _note_index["built"]) < _NOTE_INDEX_TTL_S:
+        return _note_index["stems"], _note_index["prefixes"]
+    try:
+        vault = os.environ.get("AGORA_VAULT_PATH", "C:/Users/Danculus/my-second-brain")
+        stems = {os.path.splitext(os.path.basename(p))[0].lower()
+                 for p in glob.glob(os.path.join(vault, "**", "*.md"), recursive=True)}
+    except Exception:                                                  # noqa: BLE001
+        stems = set()
+    slugs = {_slug(s) for s in stems if s}
+    _note_index.update(stems=frozenset(slugs), prefixes=frozenset(s[:40] for s in slugs),
+                       built=_t.time(), n=len(slugs))
+    return _note_index["stems"], _note_index["prefixes"]
+
+
+def names_existing_note(s: str) -> bool:
+    """Does `s` name a note that ACTUALLY EXISTS in the vault, bracketed or not?
+
+    THE SEMINAR'S VERIFIED TIER WAS READING THE PROSE FOR A FACT THE RECORD ALREADY CARRIED.
+    `verify_contributions` requires a checkable source, and it looked only at the evidence and claim
+    text -- so a `[[bracketed]]` mention counted while the same reference sitting in the record's own
+    `links` field did not. Measured 2026-08-17 over the whole ledger: of the 174 post-2026-07-31
+    contributions the prose test rejected, ALL 174 carried at least one link, 171 of 502 link strings
+    resolved to a real file among 8,907 vault notes, and 102 of the 174 records (59%) had at least one
+    link that exists on disk. Counting those moves the verified rate for 2026-W32/W33 from 44% to 72%,
+    against 94% in W31 -- so roughly 13 points of a 35-point "collapse" were this blind spot, and the
+    remaining ~22 are a real drop in the model's citing-in-prose behaviour dated to the same day.
+
+    Deliberately checks the FILESYSTEM rather than the string's shape. A slug is not evidence that a
+    note exists; the note existing is. Short slugs are refused because a prefix match on "Consistency"
+    would credit half the vault, and a fabricated slug must not lift anything -- pinned by test.
+    """
+    n = _slug(s)
+    if len(n) < _MIN_SLUG:
+        return False
+    stems, prefixes = _note_stems()
+    return n in stems or n[:40] in prefixes
+
+
 def lab_id(text: str) -> str | None:
     """The Lab receipt id in `text`, or None."""
     m = _LAB_ID.search(text or "")
