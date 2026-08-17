@@ -26,8 +26,11 @@ path refuses on an overlap unless `--ack-prior` says a human read it. Wired here
 that is the half of the construction-gate lesson that repeats.
 """
 import argparse
+import datetime as dt
 import hashlib
 import io
+import json
+import re
 import subprocess
 import sys
 from pathlib import Path
@@ -164,7 +167,116 @@ def _prior_gate(path: str, cmd: list, declared: str | None, ack: bool) -> int | 
     return 1 if code == 1 else 2
 
 
+def _survive_a_narrow_console() -> None:
+    """A console that cannot render a character must not silence the gate that protects a send.
+
+    MEASURED 2026-08-17, and it is the fourth instance of this class in one day. `show --thread`
+    printed the sha256, then raised UnicodeEncodeError on a U+2192 in the draft -- crashing INSIDE
+    the prior-statement check, after the hash and before the verdict. So the one output that says
+    "we already contradicted this upthread" never appeared, and the run still looked like it had
+    produced its answer.
+
+    That is worse than the CLI instance this repo fixed earlier today. There the crash followed a
+    successful write; here it replaces a SAFETY VERDICT with silence, on the exact path that exists
+    because I once sent something the owner had not approved.
+
+    backslashreplace rather than replace: a mangled draft digest or a mangled quote from our own
+    prior comment would be a wrong answer instead of an unreadable one.
+    """
+    for stream in (sys.stdout, sys.stderr):
+        try:
+            if (getattr(stream, "encoding", "") or "").lower() not in ("utf-8", "utf8"):
+                stream.reconfigure(errors="backslashreplace")
+        except Exception:
+            pass
+
+
+def _thread_url_from(cmd, thread):
+    """The thread we are ACTUALLY posting to, taken from the publish command when possible.
+
+    Not from --thread: that argument is optional and describes the thread the operator MEANT. The
+    command is what the network will do. `gh issue comment <n> --repo <owner/name>` and
+    `gh pr comment` both carry the real destination.
+    """
+    if thread:
+        m = re.search(r"github\.com/([^/]+)/([^/]+)/(?:issues|pull)/(\d+)", thread)
+        if m:
+            return f"{m.group(1)}/{m.group(2)}", m.group(3)
+    parts = list(cmd)
+    if "gh" in parts[0] and len(parts) > 2 and parts[1] in ("issue", "pr") and parts[2] == "comment":
+        num = parts[3] if len(parts) > 3 else None
+        repo = parts[parts.index("--repo") + 1] if "--repo" in parts else None
+        if num and repo:
+            return repo, num
+    return None, None
+
+
+def _thread_moved_gate(path, cmd, thread, acked):
+    """HAS THE CONVERSATION MOVED SINCE THIS DRAFT WAS WRITTEN?
+
+    MEASURED 2026-08-17, and this gate exists because it was missing. A draft was approved, gated on
+    its bytes, gated against our own prior comments -- and posted into an issue a maintainer had
+    CLOSED four hours and thirty-eight minutes earlier, after two substantial comments from another
+    participant that the draft therefore answered none of. Every existing check passed. They were all
+    checks on US: our hash, our history, our numbers. Nothing read the room.
+
+    A reply is a claim about a conversation, so the conversation's current state is part of what has
+    to be true for the claim to hold. Two things are checked here, both cheap:
+
+      * the thread is still OPEN -- posting into a closed thread is sometimes right and always a
+        decision, never a default;
+      * no comment by anyone else has landed since this draft was last written.
+
+    The draft's own mtime is the reference point rather than a stored timestamp, because that is the
+    moment the text stopped being able to account for anything new.
+    """
+    repo, num = _thread_url_from(cmd, thread)
+    if not repo or not num:
+        print("NOTE: no github thread could be identified, so the thread-state gate did not run.")
+        print("      That is UNVERIFIED, not clear. Pass --thread if this is a reply.")
+        return None
+
+    try:
+        raw = subprocess.run(
+            ["gh", "issue", "view", num, "--repo", repo, "--json", "state,closedAt,comments"],
+            capture_output=True, text=True, encoding="utf-8", errors="replace", timeout=60)
+        data = json.loads(raw.stdout)
+    except Exception as ex:                                        # noqa: BLE001
+        print("REFUSED: could not read the thread's state (%s). A gate that cannot see its target "
+              "must not pass it." % type(ex).__name__)
+        return 2
+
+    drafted = dt.datetime.fromtimestamp(Path(path).stat().st_mtime, dt.timezone.utc)
+    me = subprocess.run(["gh", "api", "user", "--jq", ".login"], capture_output=True, text=True
+                        ).stdout.strip()
+    newer = [c for c in data.get("comments", [])
+             if c.get("author", {}).get("login") != me
+             and dt.datetime.fromisoformat(c["createdAt"].replace("Z", "+00:00")) > drafted]
+
+    problems = []
+    if data.get("state") == "CLOSED":
+        problems.append("the thread is CLOSED (since %s)" % data.get("closedAt"))
+    if newer:
+        problems.append("%d comment(s) by others landed after this draft was written:" % len(newer))
+        for c in newer[-4:]:
+            problems.append("    %s  %s  %s" % (c["createdAt"], c["author"]["login"], c["url"]))
+
+    if not problems:
+        return None
+    print("\nTHREAD-STATE GATE")
+    for p in problems:
+        print("  " + p)
+    if acked:
+        print("  --ack-thread given: a human states they have read the above and still want this "
+              "text sent as written. Proceeding.")
+        return None
+    print("  REFUSED. Read them, then either revise the draft (which invalidates the approved hash,")
+    print("  as it should) or pass --ack-thread to send it unchanged deliberately.")
+    return 3
+
+
 def main(argv=None):
+    _survive_a_narrow_console()
     ap = argparse.ArgumentParser()
     ap.add_argument("action", choices=("show", "post"))
     ap.add_argument("file")
@@ -173,6 +285,9 @@ def main(argv=None):
                                      "check while the owner is deciding")
     ap.add_argument("--ack-prior", action="store_true",
                     help="record that a human read our own prior comments in that thread")
+    ap.add_argument("--ack-thread", action="store_true",
+                    help="record that a human read what happened in the thread SINCE this draft was "
+                         "written, including a close, and still wants it sent unchanged")
     # The publish command is split off BEFORE argparse sees it. `nargs=REMAINDER` after a positional
     # swallows later options too, so `post f --sha X -- gh ...` lost the --sha and the tool refused a
     # correctly approved draft. A gate that fails closed on its own argument parsing is still a gate
@@ -221,6 +336,10 @@ def main(argv=None):
         print("REFUSED: %s" % bound)
         return 2
     cmd, stdin = bound
+
+    refuse = _thread_moved_gate(a.file, cmd, a.thread, a.ack_thread)
+    if refuse is not None:
+        return refuse
 
     refuse = _prior_gate(a.file, cmd, a.thread, a.ack_prior)
     if refuse is not None:
