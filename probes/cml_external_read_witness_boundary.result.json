@@ -1,0 +1,316 @@
+{
+  "cml_ref": "0a324faaa498dc79f86c933aa5a8e0f3c233bd49",
+  "sha256": {
+    "cml/external_read_witness.py": "1688dc353ecef924a78aaa217571f9be73066017fa0709a79309afa8851076c1",
+    "cml/admissibility_preconditions.py": "492045443656dc8f79492e2508639717333ad88ff3cd55aaccd73a8ef1893bc4",
+    "cml/integrations/vcml_ebpf_external_witness.py": "1e5df5847b752cbccd618f6e41a2fad227753e43090cd95e4b9ad241150d487d",
+    "tests/test_external_read_witness.py": "cad9a75b50d7b5c56fad0baaae857e5cf74c6c27782152f3ff7599e2947a9012",
+    "tests/test_vcml_ebpf_external_witness.py": "d46817baff160dda1e4733e2caffb8998bfe9abc07a8282a99dbe4b3433abd47",
+    "vcml/linux-ebpf/file_monitor.py": "e9533149f3d817cc6a71f712108f926034f46f7ad05d785fb5f330854176207a"
+  },
+  "controls": {
+    "C0_build_identity": {
+      "imported_from": "C:\\Users\\Danculus\\AppData\\Local\\Temp\\cml_witness_v2_5l9ajn1p\\cml\\admissibility_preconditions.py",
+      "expected_under": "C:\\Users\\Danculus\\AppData\\Local\\Temp\\cml_witness_v2_5l9ajn1p",
+      "ok": true
+    },
+    "P1_dead_collector_is_caught": {
+      "reasons": [
+        "observation_channel_missing"
+      ],
+      "ok": true
+    },
+    "P2_unavailable_witness_is_inapplicable": {
+      "reasons": [
+        "external_witness_unavailable"
+      ],
+      "ok": true
+    },
+    "P4_their_suite_is_green_before_we_touch_it": {
+      "exit_passed_failed_errors": [
+        0,
+        12,
+        0,
+        0
+      ],
+      "ok": true
+    },
+    "P5_suite_green_again_after_restore": {
+      "exit_passed_failed_errors": [
+        0,
+        12,
+        0,
+        0
+      ],
+      "ok": true
+    },
+    "P6_the_293_suite_is_green_with_the_monitor_present": {
+      "exit_passed_failed_errors": [
+        0,
+        22,
+        0,
+        0
+      ],
+      "ok": true
+    },
+    "P7_293_suite_green_after_restore": {
+      "exit_passed_failed_errors": [
+        0,
+        22,
+        0,
+        0
+      ],
+      "ok": true
+    }
+  },
+  "claims": {
+    "B1_zero_reads_returns_a_pass": {
+      "sketched_in_289": "external witness available, reads == 0 -> applicable: false",
+      "measured": [
+        {
+          "ledger_observations": 0,
+          "applicable": true,
+          "holds": true,
+          "allows_applicability": true,
+          "reasons": []
+        },
+        {
+          "ledger_observations": 5,
+          "applicable": true,
+          "holds": true,
+          "allows_applicability": true,
+          "reasons": []
+        }
+      ],
+      "holds": true
+    },
+    "B2_guard_relaxed_to_ge_survives_their_suite": {
+      "anchor_unique": true,
+      "baseline_exit_passed_failed_errors": [
+        0,
+        12,
+        0,
+        0
+      ],
+      "with_mutant_exit_passed_failed_errors": [
+        0,
+        12,
+        0,
+        0
+      ],
+      "holds": true,
+      "read_this_as": "the case is unexercised -- a test gap, not a code defect"
+    },
+    "B3_implementing_the_sketched_row_survives_their_suite": {
+      "anchor_unique": true,
+      "baseline_exit_passed_failed_errors": [
+        0,
+        12,
+        0,
+        0
+      ],
+      "with_mutant_exit_passed_failed_errors": [
+        0,
+        12,
+        0,
+        0
+      ],
+      "holds": true,
+      "read_this_as": "the case is unexercised -- a test gap, not a code defect"
+    },
+    "B4_that_row_fails_a_quiet_scope_even_with_a_healthy_ledger": {
+      "measured": [
+        {
+          "ledger_observations": 0,
+          "applicable": false,
+          "holds": false,
+          "allows_applicability": false
+        },
+        {
+          "ledger_observations": 5,
+          "applicable": false,
+          "holds": false,
+          "allows_applicability": false
+        }
+      ],
+      "holds": true,
+      "read_this_as": "why we are NOT asking for that row: near-zero precision on idle windows"
+    },
+    "B5_unfiltered_capture_gives_a_silent_false_credit": {
+      "reads_counted": 2,
+      "all_reads_belong_to_pid": 999,
+      "scope_stamped": "sess",
+      "measured": [
+        {
+          "ledger_observations": 0,
+          "allows": false,
+          "reasons": [
+            "observation_channel_missing"
+          ]
+        },
+        {
+          "ledger_observations": 1,
+          "allows": true,
+          "reasons": []
+        }
+      ],
+      "adapter_contract": "docstring: read events \"for the supplied scope\" -- so this is a CALLER obligation, not an adapter defect",
+      "holds": true
+    },
+    "B6_contract_has_no_window_and_no_loss_count": {
+      "fields": [
+        "source_id",
+        "scope_id",
+        "reads_count",
+        "available"
+      ],
+      "holds": true
+    },
+    "B7_our_own_untested_count_was_wrong": {
+      "published": "Five probes against 24 surfaces; the other 19 are untested",
+      "probes": 5,
+      "surfaces": [
+        "check_sources",
+        "verify_writes"
+      ],
+      "available": 24,
+      "untested_measured": 22,
+      "untested_published": 19,
+      "holds": true
+    },
+    "T1_no_pid_or_comm_filter": {
+      "asserts": "the monitor emits every process's events; nothing filters by pid or comm",
+      "detector_fires_on_the_real_source": false,
+      "plant_changed_the_source": true,
+      "detector_fires_on_the_plant": true,
+      "holds": true
+    },
+    "T2_no_cgroup_id_emitted": {
+      "asserts": "no cgroup id is captured, so events cannot be bound to a container scope",
+      "detector_fires_on_the_real_source": false,
+      "plant_changed_the_source": true,
+      "detector_fires_on_the_plant": true,
+      "holds": true
+    },
+    "T3_no_perf_loss_callback": {
+      "asserts": "open_perf_buffer is called without lost_cb, so dropped samples are silent",
+      "detector_fires_on_the_real_source": false,
+      "plant_changed_the_source": true,
+      "detector_fires_on_the_plant": true,
+      "holds": true
+    },
+    "T4_emitted_record_keys": {
+      "keys": [
+        "__main__",
+        "action",
+        "actor",
+        "cause_id",
+        "classification",
+        "comm",
+        "count",
+        "fd",
+        "flags",
+        "id",
+        "object",
+        "parent_cause",
+        "path",
+        "permitted_by",
+        "pid",
+        "ppid",
+        "timestamp",
+        "uid"
+      ],
+      "note": "v1 published this list without pid/ppid/comm because its regex was line-anchored",
+      "silent_loss_path_v1_missed": "_evict_pid: FIFO eviction at _MAX_PID_CACHE = 10_000 drops the open-path context for the oldest pid, unreported",
+      "holds": null
+    },
+    "D1_the_two_layers_disagree_on_not_exercised": {
+      "count_based": {
+        "applicable": true,
+        "holds": true,
+        "allows": true,
+        "reasons": []
+      },
+      "per_read": {
+        "applicable": false,
+        "holds": false,
+        "reasons": [
+          "coverage_not_exercised"
+        ]
+      },
+      "holds": true
+    },
+    "D2_per_read_catches_what_count_equality_cannot": {
+      "per_read": {
+        "holds": false,
+        "missing": [
+          "r2"
+        ],
+        "duplicate_ledger": [
+          "r1"
+        ]
+      },
+      "count_path_same_shape": {
+        "applicable": true,
+        "holds": true
+      },
+      "holds": true
+    },
+    "D3_an_unobserved_read_id_now_fails_closed": {
+      "holds": true,
+      "missing": [
+        "foreign-999"
+      ],
+      "unexpected": [
+        "r1"
+      ]
+    },
+    "D4_ret_lt_0_excluded_and_EOF_required": {
+      "failed_read": {
+        "applicable": false,
+        "reasons": [
+          "coverage_not_exercised"
+        ]
+      },
+      "eof_read": {
+        "applicable": true,
+        "holds": false,
+        "missing": [
+          "r-eof"
+        ]
+      },
+      "holds": true
+    },
+    "D5_the_count_guard_mutant_survives_the_293_suite": {
+      "anchor_unique": true,
+      "baseline": [
+        0,
+        22,
+        0,
+        0
+      ],
+      "with_mutant": [
+        0,
+        22,
+        0,
+        0
+      ],
+      "holds": true
+    }
+  },
+  "sha256_pr293": {
+    "cml/external_read_witness.py": "1688dc353ecef924a78aaa217571f9be73066017fa0709a79309afa8851076c1",
+    "cml/admissibility_preconditions.py": "492045443656dc8f79492e2508639717333ad88ff3cd55aaccd73a8ef1893bc4",
+    "cml/integrations/vcml_ebpf_external_witness.py": "1e5df5847b752cbccd618f6e41a2fad227753e43090cd95e4b9ad241150d487d",
+    "cml/integrations/vcml_read_id_coverage.py": "b7692991976aae8bf6963583bb42b576b171f0a9613b575ef651af077e7172f4",
+    "tests/test_external_read_witness.py": "cad9a75b50d7b5c56fad0baaae857e5cf74c6c27782152f3ff7599e2947a9012",
+    "tests/test_vcml_ebpf_external_witness.py": "d46817baff160dda1e4733e2caffb8998bfe9abc07a8282a99dbe4b3433abd47",
+    "tests/test_vcml_read_id_coverage.py": "62bfa1513876ed00ac9c47cf704d256849e271b069b9bd7039fcbbefd1f3cdf8",
+    "vcml/linux-ebpf/file_monitor.py": "53d5eee4efcdd1cdddb27f3955b28949aeb7b367c027edb0af3f0e533622e894"
+  },
+  "cml_ref_pr293": "7a9893235d770ce67cd7042e703a3136ad70f000",
+  "admissibility_unchanged_by_293": true,
+  "controls_all_passed": true,
+  "every_text_detector_tripped_its_plant": true,
+  "verdict": "USABLE"
+}
