@@ -18,14 +18,31 @@ both the implementations and this fixture.
 
 The implementations can stay completely different — the systems that produced these failures include
 a Python store, a JS hook ledger and a hook-based collector. **What should interoperate is the
-falsification surface**, so that is the only thing specified here: a closed vocabulary of reasons, a
-closed vocabulary of surfaces, and six histories expressed as plain data.
+falsification surface.**
+
+**These cases use CML's vocabulary, not a new one.** Statuses are @safal207's six, unchanged, with his
+precedence `REJECT > UNRESOLVABLE > ORPHAN > DRIFT > REVALIDATE > MATCH`. The finding is that **his six
+statuses need no additions** to carry all six boundaries — what they need is **four reasons**, because
+two pairs of cases currently share a status while wanting opposite remedies.
+
+| proposed reason | under | why it is not the same as its neighbour |
+|---|---|---|
+| `source_observation_foreign_session` | REVALIDATE | expressible today via `actor`, which means who *applies* the memory, not who *observed* the source |
+| `source_drift_after_verification` | DRIFT | verified-then-moved wants revalidation; never-verified wants re-derivation |
+| `observation_collector_silent` | UNRESOLVABLE | an outage that ends when a process restarts, vs a writer label that is unresolvable forever |
+| `identifier_written_not_identifier_queried` | REVALIDATE | cannot be posed to a per-record evaluator at all: its inputs describe a record already *found* |
+
+The first draft of this file invented its own reason codes. That was wrong twice: @safal207 asked for a
+*shared* surface, and inspeximus had already implemented his six outcomes and his precedence on
+2026-08-11, reported in that thread at 15/15 against his frozen fixture. Shipping a second vocabulary
+from the codebase that had just adopted his is the opposite of the request. A red-team pass caught it
+before it went anywhere.
 
 ## What is in here
 
 | File | What it is |
 |---|---|
-| `admissibility-cases.json` | Six failure cases, each with a paired non-failure control; one also carries a discrimination case. Plus the reason vocabulary, the surface vocabulary, and the degradations each case must fail under. |
+| `admissibility-cases.json` | Six failure cases, each with a paired non-failure control; one also carries a discrimination case. Plus CML's status vocabulary, the four reasons this set proposes, the surface vocabulary, and the degradations each case must fail under. |
 | `run_admissibility.py` | The runner. Enforces five rules on the fixture itself before reporting any score. |
 | `inspeximus_binding.py` | Our adapter — about 100 lines, all of it translation. |
 | `naive_binding.py` | An ordinary store with no temporal admissibility. It **must** score 0/6. |

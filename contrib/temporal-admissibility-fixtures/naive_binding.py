@@ -68,7 +68,7 @@ class NaiveBinding:
     def assess(self, h, *, key, window, session):
         rec = h.records.get(key)
         if not rec:
-            return {"admissible": False, "reason": None, "consulted": []}
+            return {"status": "UNRESOLVABLE", "reason": None, "consulted": []}
         # "We stored a digest, so we have provenance." The record exists, the digest is on it, and
         # the answer is yes. Every boundary in the fixture is invisible from here.
-        return {"admissible": True, "reason": None, "consulted": []}
+        return {"status": "MATCH", "reason": None, "consulted": []}

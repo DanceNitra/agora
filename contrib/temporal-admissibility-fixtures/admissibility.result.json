@@ -6,14 +6,14 @@
       "id": "T1-same-locator-different-bytes",
       "pass": true,
       "case": {
-        "admissible": false,
-        "reason": "SOURCE_DRIFTED",
+        "status": "DRIFT",
+        "reason": null,
         "consulted": [
           "source_re_read"
         ]
       },
       "control": {
-        "admissible": true,
+        "status": "MATCH",
         "reason": null,
         "consulted": [
           "source_re_read"
@@ -27,15 +27,15 @@
       "id": "T2-same-digest-different-session",
       "pass": true,
       "case": {
-        "admissible": false,
-        "reason": "OBSERVATION_FOREIGN_SESSION",
+        "status": "REVALIDATE",
+        "reason": "source_observation_foreign_session",
         "consulted": [
           "observation_session_attribution",
           "identifier_equality_write_vs_read"
         ]
       },
       "control": {
-        "admissible": true,
+        "status": "MATCH",
         "reason": null,
         "consulted": [
           "observation_session_attribution",
@@ -50,22 +50,22 @@
       "id": "T3-capture-then-source-drift",
       "pass": true,
       "case": {
-        "admissible": false,
-        "reason": "SOURCE_DRIFTED",
+        "status": "DRIFT",
+        "reason": null,
         "consulted": [
           "source_re_read"
         ]
       },
       "control": {
-        "admissible": true,
+        "status": "MATCH",
         "reason": null,
         "consulted": [
           "source_re_read"
         ]
       },
       "discriminates": {
-        "admissible": false,
-        "reason": "SOURCE_ORPHANED",
+        "status": "ORPHAN",
+        "reason": null,
         "consulted": [
           "source_re_read"
         ]
@@ -77,14 +77,14 @@
       "id": "T4-verified-then-changed-before-use",
       "pass": true,
       "case": {
-        "admissible": false,
-        "reason": "STALE_AT_USE",
+        "status": "DRIFT",
+        "reason": "source_drift_after_verification",
         "consulted": [
           "re_read_at_point_of_use"
         ]
       },
       "control": {
-        "admissible": true,
+        "status": "MATCH",
         "reason": null,
         "consulted": [
           "re_read_at_point_of_use"
@@ -98,14 +98,14 @@
       "id": "T5-collector-stopped-coverage-healthy",
       "pass": true,
       "case": {
-        "admissible": false,
-        "reason": "COLLECTOR_SILENT",
+        "status": "UNRESOLVABLE",
+        "reason": "observation_collector_silent",
         "consulted": [
           "collector_liveness"
         ]
       },
       "control": {
-        "admissible": true,
+        "status": "MATCH",
         "reason": null,
         "consulted": [
           "observation_session_attribution",
@@ -120,15 +120,15 @@
       "id": "T6-writer-query-identifier-mismatch",
       "pass": true,
       "case": {
-        "admissible": false,
-        "reason": "OBSERVATION_FOREIGN_SESSION",
+        "status": "REVALIDATE",
+        "reason": "source_observation_foreign_session",
         "consulted": [
           "observation_session_attribution",
           "identifier_equality_write_vs_read"
         ]
       },
       "control": {
-        "admissible": true,
+        "status": "MATCH",
         "reason": null,
         "consulted": [
           "observation_session_attribution",

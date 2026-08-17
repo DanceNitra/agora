@@ -77,20 +77,20 @@ def degrade(verdict: dict, how: str, question: dict) -> dict:
     """
     v = dict(verdict)
     if how == "always_admissible":
-        return {**v, "admissible": True, "reason": None}
+        return {**v, "status": "MATCH", "reason": None}
     if how == "cries_wolf":
-        return {**v, "admissible": False, "reason": v.get("reason") or "SOURCE_DRIFTED"}
-    ignore = {
-        "ignores_session": {"OBSERVATION_FOREIGN_SESSION"},
-        "ignores_drift": {"SOURCE_DRIFTED", "SOURCE_ORPHANED"},
-        "ignores_use_time": {"STALE_AT_USE"},
-        "ignores_collector_liveness": {"COLLECTOR_SILENT"},
-        "normalises_identifiers": {"OBSERVATION_FOREIGN_SESSION", "IDENTIFIER_MISMATCH"},
+        return {**v, "status": "DRIFT", "reason": v.get("reason")}
+    ignore = {                       # (status, reason) pairs a degradation would flatten to MATCH
+        "ignores_session": {("REVALIDATE", "source_observation_foreign_session")},
+        "ignores_drift": {("DRIFT", None), ("ORPHAN", None)},
+        "ignores_use_time": {("DRIFT", "source_drift_after_verification")},
+        "ignores_collector_liveness": {("UNRESOLVABLE", "observation_collector_silent")},
+        "normalises_identifiers": {("REVALIDATE", "source_observation_foreign_session")},
     }.get(how)
     if ignore is None:
         raise KeyError(f"unknown degradation {how!r}")
-    if v.get("reason") in ignore:
-        return {**v, "admissible": True, "reason": None}
+    if (v.get("status"), v.get("reason")) in ignore:
+        return {**v, "status": "MATCH", "reason": None}
     return v
 
 
@@ -121,14 +121,15 @@ def ask(binding, history, question, workdir):
     replay(binding, h, history)
     v = binding.assess(h, key=question["key"], window=question["window"],
                        session=question["session"])
-    return {"admissible": bool(v.get("admissible")), "reason": v.get("reason"),
+    return {"status": v.get("status"), "reason": v.get("reason"),
             "consulted": list(v.get("consulted") or [])}
 
 
 # ─────────────────────────────────────────────── the four rules, before any score
 def audit_the_fixture(fx) -> list:
     problems = []
-    vocab = set(fx["reason_vocabulary"])
+    vocab = {k for k in fx["reasons_this_set_proposes"] if not k.startswith("_")} | {None}
+    statuses = {k for k in fx["status_vocabulary"] if not k.startswith("_")}
     known = set(fx["flattering_implementations"])
     seen = set()
     for c in fx["cases"]:
@@ -140,15 +141,15 @@ def audit_the_fixture(fx) -> list:
             problems.append(f"{cid}: no citation -- refused, not scored")
         if "control" not in c:                                               # RULE 2
             problems.append(f"{cid}: no paired control")
-        elif (c["control"].get("expect") or {}).get("admissible") is not True:
+        elif (c["control"].get("expect") or {}).get("status") != "MATCH":
             # RULE 5, and it caught two of the first six. A "control" that expects INADMISSIBLE is a
             # second failure case wearing the control's name: `cries_wolf` passes the pair, which is
             # the exact thing @safal207 asked for paired NON-failure controls to prevent. Such a
             # scenario is still useful -- it becomes `discriminates`, which is scored separately.
-            problems.append(f"{cid}: the control expects inadmissible, so it is a second failure "
+            problems.append(f"{cid}: the control must expect MATCH, so it is a second failure "
                             f"case, not a control. Move it to `discriminates` and add a real one.")
-        if not (c.get("expect") or {}).get("admissible") is False:            # RULE 5b
-            problems.append(f"{cid}: the CASE must expect inadmissible; a case whose expectation is "
+        if (c.get("expect") or {}).get("status") == "MATCH":                  # RULE 5b
+            problems.append(f"{cid}: the CASE must not expect MATCH; a case whose expectation is "
                             f"already the flattering answer cannot be broken by a degradation.")
         if c.get("reaches") and c["reaches"] not in fx.get("surface_vocabulary", {}):
             problems.append(f"{cid}: reaches {c['reaches']!r} is not in surface_vocabulary, so no "
@@ -161,11 +162,12 @@ def audit_the_fixture(fx) -> list:
         if not c.get("reaches", "").strip():                                 # RULE 4
             problems.append(f"{cid}: does not declare what it reaches")
         for where, blk in (("case", c), ("control", c.get("control", {}))):
-            r = (blk.get("expect") or {}).get("reason")
-            if r is not None and r not in vocab:
-                problems.append(f"{cid} [{where}]: reason {r!r} is outside the vocabulary")
-            if (blk.get("expect") or {}).get("admissible") is None:
-                problems.append(f"{cid} [{where}]: expect.admissible missing")
+            e = blk.get("expect") or {}
+            if e.get("reason") not in vocab:
+                problems.append(f"{cid} [{where}]: reason {e.get('reason')!r} is not one this set "
+                                f"proposes; a new reason needs a rationale beside the others")
+            if e.get("status") not in statuses:
+                problems.append(f"{cid} [{where}]: status {e.get('status')!r} is not one of CML's six")
     return problems
 
 
@@ -199,23 +201,23 @@ def main(argv=None) -> int:
         with tempfile.TemporaryDirectory() as d:
             got = ask(binding, c["history"], c["question"], d)
         want = c["expect"]
-        ok = got["admissible"] == want["admissible"] and got["reason"] == want["reason"]
+        ok = got["status"] == want["status"] and got["reason"] == want["reason"]
 
         with tempfile.TemporaryDirectory() as d:
             cgot = ask(binding, c["control"]["history"], c["control"]["question"], d)
         cwant = c["control"]["expect"]
-        cok = cgot["admissible"] == cwant["admissible"] and cgot["reason"] == cwant["reason"]
+        cok = cgot["status"] == cwant["status"] and cgot["reason"] == cwant["reason"]
 
         # RULE 4 -- did the binding actually consult the surface this case names?
         reached = c["reaches"] in got["consulted"]
 
         # RULE 3 -- every named degradation must break the case, and cries_wolf must break the control.
         survived = [d for d in c["must_fail_under"]
-                    if degrade(got, d, c["question"]) == {"admissible": want["admissible"],
+                    if degrade(got, d, c["question"]) == {"status": want["status"],
                                                           "reason": want["reason"],
                                                           "consulted": got["consulted"]}]
         wolf = degrade(cgot, "cries_wolf", c["control"]["question"])
-        wolf_caught = not (wolf["admissible"] == cwant["admissible"] and wolf["reason"] == cwant["reason"])
+        wolf_caught = not (wolf["status"] == cwant["status"] and wolf["reason"] == cwant["reason"])
 
         # OPTIONAL discrimination: does the detector tell two adjacent failure modes apart, or
         # report them identically? Same-verdict-different-remedy is the quiet way a report stops
@@ -225,18 +227,18 @@ def main(argv=None) -> int:
             with tempfile.TemporaryDirectory() as d:
                 dgot = ask(binding, c["discriminates"]["history"], c["discriminates"]["question"], d)
             dwant = c["discriminates"]["expect"]
-            dok = dgot["admissible"] == dwant["admissible"] and dgot["reason"] == dwant["reason"]
+            dok = dgot["status"] == dwant["status"] and dgot["reason"] == dwant["reason"]
 
         good = ok and cok and dok and reached and not survived and wolf_caught
         fails += 0 if good else 1
         print(f"[{'PASS' if good else 'FAIL'}] {c['id']}")
-        print(f"        case    : {got['admissible']}/{got['reason']}   want "
-              f"{want['admissible']}/{want['reason']}" + ("" if ok else "   <-- MISMATCH"))
-        print(f"        control : {cgot['admissible']}/{cgot['reason']}   want "
-              f"{cwant['admissible']}/{cwant['reason']}" + ("" if cok else "   <-- CRIES WOLF"))
+        print(f"        case    : {got['status']}/{got['reason']}   want "
+              f"{want['status']}/{want['reason']}" + ("" if ok else "   <-- MISMATCH"))
+        print(f"        control : {cgot['status']}/{cgot['reason']}   want "
+              f"{cwant['status']}/{cwant['reason']}" + ("" if cok else "   <-- CRIES WOLF"))
         if dgot is not None:
-            print(f"        discrim : {dgot['admissible']}/{dgot['reason']}   want "
-                  f"{dwant['admissible']}/{dwant['reason']}" + ("" if dok else "   <-- LUMPED"))
+            print(f"        discrim : {dgot['status']}/{dgot['reason']}   want "
+                  f"{dwant['status']}/{dwant['reason']}" + ("" if dok else "   <-- LUMPED"))
         if not reached:
             print(f"        REACH   : never consulted {c['reaches']!r} -- consulted "
                   f"{got['consulted']}. A pass here would be for the wrong reason.")
