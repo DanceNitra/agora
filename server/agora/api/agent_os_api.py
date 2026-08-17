@@ -3450,10 +3450,82 @@ async def claude_inbox_add(request: Request):
 
 
 @router.get("/brain/claude-inbox")
-async def claude_inbox_list():
-    """Claude Code reads its pending tasks here on each wake."""
+async def claude_inbox_list(check_threads: int = 0):
+    """Claude Code reads its pending tasks here on each wake.
+
+    `check_threads=1` annotates every task carrying a GitHub issue link with that thread's CURRENT
+    state, because a lead can die between being queued and being worked. Measured 2026-08-17 over the
+    14 distinct issue links then pending: 7 open, 5 closed, and the split matters -- only 2 were
+    already closed when the Scout queued them, while 3 CLOSED WHILE THEY SAT in a queue whose oldest
+    item was 9.8 days old. So the dominant cause is our latency, not the Scout's blindness, and a check
+    at scoring time would have caught fewer than half of them. This is the point where a human decides
+    what to work on, so it is the point where the room gets read.
+
+    OPT-IN, deliberately. The dungeon hits this endpoint on every organ cycle (`_task_already_pending`),
+    and a network call per lead there would be a self-inflicted stall. It annotates rather than filters:
+    a closed thread is still worth seeing -- it may be worth a fresh issue -- and silently dropping a
+    task is how a queue lies about what it is holding.
+    """
     from agora.execution.claude_inbox import pending
-    return {"pending": pending()}
+    items = pending()
+    if not check_threads:
+        return {"pending": items}
+
+    # `json` is NOT imported at this module's top level -- 5 other uses in this file each import it
+    # locally. Omitting it here raised NameError inside the try below, my own `except Exception`
+    # swallowed it, and every thread came back UNKNOWN: a checker that measured nothing while
+    # reporting "0 not open". It failed SAFE only because UNKNOWN is deliberately not OPEN.
+    import json as _json
+    import re as _re
+    import subprocess as _sp
+    seen: dict = {}
+    checked = closed = 0
+    for t in items:
+        m = _re.search(r"https://github\.com/([\w.-]+/[\w.-]+)/issues/(\d+)", t.get("text") or "")
+        if not m:
+            continue
+        key = (m.group(1), m.group(2))
+        if key not in seen:
+            # REST, not `gh issue view`, which goes through GraphQL. Measured 2026-08-17: GraphQL was
+            # intermittently 503 all day (a comment took four attempts, a PR five) while REST answered,
+            # and the first version of this check inherited that flakiness -- two runs minutes apart
+            # disagreed about a thread I already knew was closed. One retry on top, because a transient
+            # 503 is exactly what this is.
+            info = {"state": "UNKNOWN", "error": "not attempted"}
+            for _attempt in (1, 2):
+                try:
+                    r = _sp.run(["gh", "api", "repos/%s/issues/%s" % (key[0], key[1]),
+                                 "--jq", "{state:.state,closed_at:.closed_at}"],
+                                capture_output=True, text=True, timeout=25,
+                                encoding="utf-8", errors="replace")
+                    if r.stdout.strip():
+                        d = _json.loads(r.stdout)
+                        info = {"state": (d.get("state") or "unknown").upper(),
+                                "closedAt": d.get("closed_at")}
+                        break
+                    err = (r.stderr or "").strip().splitlines()[-1:] or ["empty response"]
+                    info = {"state": "UNKNOWN", "error": err[0][:90]}
+                except Exception as e:                                 # noqa: BLE001
+                    # UNKNOWN, never OPEN: a lead we could not look at must not read as live.
+                    info = {"state": "UNKNOWN", "error": type(e).__name__}
+            seen[key] = info
+        st = seen[key]
+        # The failure REASON travels with UNKNOWN. Without it an unreadable lead and a genuinely
+        # unresolvable one look identical, and "4 of 7 unknown" gives a reader nothing to act on --
+        # which is the same shape as the 0.000 ROI this system published for a year.
+        t["thread"] = {"repo": key[0], "number": key[1], "state": st.get("state"),
+                       "closed_at": st.get("closedAt"),
+                       **({"why_unknown": st["error"]} if st.get("error") else {})}
+        checked += 1
+        if st.get("state") not in ("OPEN", "UNKNOWN"):
+            closed += 1
+    unknown = sum(1 for v in seen.values() if v.get("state") == "UNKNOWN")
+    # DEGRADED travels with the split. Without it "5 open, 2 closed" reads as a complete picture while
+    # three threads were never actually looked at, which is the failure this endpoint exists to stop.
+    return {"pending": items,
+            "thread_check": {"links_checked": checked, "not_open": closed,
+                             "distinct_threads": len(seen), "unknown": unknown,
+                             "degraded": bool(unknown)}}
 
 
 @router.post("/brain/claude-inbox/done")
