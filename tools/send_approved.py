@@ -191,6 +191,68 @@ def _survive_a_narrow_console() -> None:
             pass
 
 
+def _creates_a_thread(cmd) -> bool:
+    """`gh issue create` / `gh pr create` -- a destination that does not exist yet."""
+    p = list(cmd)
+    return (bool(p) and Path(p[0]).name.lower().removesuffix(".exe") == "gh"
+            and len(p) > 2 and p[1] in ("issue", "pr") and p[2] == "create")
+
+
+def _new_thread_gate(path, cmd, acked):
+    """FOR A NEW ISSUE, the question is not "what did we already say here" -- nothing was said here,
+    the thread does not exist. It is "is there already a thread for this".
+
+    This exists because the gate refused an issue creation outright: the prior-statement check needs
+    a thread to aim at, could not find one, and failed closed. Failing closed was right for a reply
+    and wrong for a creation, and the difference is not a special case to wave through -- it is that
+    the same worry (are we talking into a conversation we have not read) takes a different form when
+    the conversation is the thing being started. Here it is duplicate detection.
+
+    Non-blocking by design where it cannot be sure: it PRINTS the candidates and requires
+    --ack-thread only when something looks like a real duplicate, because a title-word overlap is a
+    weaker signal than a closed thread and a gate that cries wolf gets waived by reflex.
+    """
+    if not _creates_a_thread(cmd):
+        return None
+    p = list(cmd)
+    repo = p[p.index("--repo") + 1] if "--repo" in p else None
+    title = p[p.index("--title") + 1] if "--title" in p else ""
+    if not repo:
+        print("REFUSED: `gh issue create` without --repo; the destination must be explicit.")
+        return 2
+
+    words = {w.lower().strip("`(),:") for w in title.split() if len(w) > 4}
+    try:
+        raw = subprocess.run(["gh", "issue", "list", "--repo", repo, "--state", "all",
+                              "--limit", "60", "--json", "number,title,state,url"],
+                             capture_output=True, text=True, encoding="utf-8",
+                             errors="replace", timeout=60)
+        issues = json.loads(raw.stdout)
+    except Exception as ex:                                        # noqa: BLE001
+        print(f"REFUSED: could not list issues on {repo} ({type(ex).__name__}). A duplicate check "
+              "that cannot see the tracker has not run.")
+        return 2
+
+    scored = []
+    for i in issues:
+        overlap = words & {w.lower().strip("`(),:") for w in i["title"].split() if len(w) > 4}
+        if len(overlap) >= 2:
+            scored.append((len(overlap), i, sorted(overlap)))
+    print(f"\nNEW-THREAD GATE -- {repo}: {len(issues)} issue(s) read, "
+          f"{len(scored)} sharing 2+ title words")
+    for n, i, ov in sorted(scored, reverse=True, key=lambda t: t[0])[:5]:
+        print(f"  [{i['state']}] #{i['number']}  {i['title'][:64]}")
+        print(f"        shared: {', '.join(ov)}  {i['url']}")
+    if scored and not acked:
+        print("  REFUSED. Read them. If none is a duplicate, pass --ack-thread.")
+        return 3
+    if scored:
+        print("  --ack-thread given: a human states none of the above is a duplicate. Proceeding.")
+    else:
+        print("  no candidate duplicate found.")
+    return None
+
+
 def _thread_url_from(cmd, thread):
     """The thread we are ACTUALLY posting to, taken from the publish command when possible.
 
@@ -302,9 +364,14 @@ def main(argv=None):
 
     now = digest(a.file)
     if a.action == "show":
+        raw = Path(a.file).read_bytes()
         body = io.open(a.file, encoding="utf-8").read()
+        # RAW bytes, because that is what digest() hashes and what bind_payload sends. This line
+        # used to re-encode the TEXT, which on Windows silently dropped every CR: it showed the
+        # owner 5,911 for a payload of 5,994. The digest was never wrong -- the number printed
+        # beside it was, and a figure shown next to a hash is read as describing that hash.
         print("sha256 : %s" % now)
-        print("bytes  : %d" % len(body.encode("utf-8")))
+        print("bytes  : %d" % len(raw))
         print("words  : %d" % len(body.split()))
         if a.thread:
             print("")
@@ -336,6 +403,18 @@ def main(argv=None):
         print("REFUSED: %s" % bound)
         return 2
     cmd, stdin = bound
+
+    refuse = _new_thread_gate(a.file, cmd, a.ack_thread)
+    if refuse is not None:
+        return refuse
+    if _creates_a_thread(cmd):
+        # The prior-statement and thread-state gates below both need a thread to aim at, and a
+        # thread being CREATED does not have one. Refusing here was the gate failing closed on a
+        # question that cannot apply -- correct for a reply, wrong for a new issue. The duplicate
+        # check above is the form those questions take when the destination does not exist yet.
+        print("approved digest matches; publishing %d bytes from memory (stdin), not from the file"
+              % len(stdin))
+        return subprocess.run(cmd, input=stdin).returncode
 
     refuse = _thread_moved_gate(a.file, cmd, a.thread, a.ack_thread)
     if refuse is not None:
