@@ -106,6 +106,12 @@ def gather() -> dict:
         "bottleneck": bottleneck, "bottleneck_kind": bottleneck_kind,
         "waiting_on_claude_total": waiting_total,
         "total_ktok": rr["total_ktok"],
+        # Carried through so the CFO line can state its own coverage. Without these the warning below
+        # simply never fires, which is the failure it exists to prevent.
+        "value_coverage": rr.get("value_coverage"),
+        "organs_with_value": rr.get("organs_with_value", 0),
+        "organs_total": rr.get("organs_total", 0),
+        "unmetered_total": rr.get("unmetered_total", 0),
         "best_roi": {"organ": best_roi[0], **best_roi[1]} if best_roi else None,
         "worst_roi": {"organ": worst_roi[0], **worst_roi[1]} if worst_roi else None,
     }
@@ -130,9 +136,16 @@ def format_roadmap() -> str:
     lines.append(f"⛔ _longest-idle organ:_ {g['bottleneck']} — {g['bottleneck_kind']}"
                  + (f" ({g['waiting_on_claude_total']} organ task(s) queued to Claude in total)"
                     if g.get("waiting_on_claude_total") else ""))
+    # The best/worst pair is only a ranking if the value side is connected. Measured 2026-08-17: it was
+    # connected for 1 of 17 organs, so "worst: frontier-seed 0.000" was reporting a naming drift as a
+    # verdict on the biggest spender in the system. The coverage now travels WITH the ranking.
+    cov = g.get("value_coverage")
     lines.append(f"\n💰 _CFO:_ {g['total_ktok']}k tok metered"
                  + (f" · best ROI: {g['best_roi']['organ']} ({g['best_roi']['roi']}/ktok)"
                     if g.get("best_roi") else "")
                  + (f" · worst: {g['worst_roi']['organ']} ({g['worst_roi']['roi']}/ktok)"
-                    if g.get("worst_roi") else ""))
+                    if g.get("worst_roi") else "")
+                 + (f" · ⚠️ value resolves for {g['organs_with_value']}/{g['organs_total']} organs "
+                    f"({100 * (1 - cov):.0f}% of value unattributed) — a 0.000 means UNMEASURED"
+                    if cov is not None and cov < 0.95 else ""))
     return "\n".join(lines)
