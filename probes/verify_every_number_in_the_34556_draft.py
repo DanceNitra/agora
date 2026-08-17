@@ -27,7 +27,22 @@ import urllib.error
 import urllib.request
 from pathlib import Path
 
-REPO = os.environ.get("INSPEXIMUS_REPO", "C:/Users/Danculus/inspeximus-repo")
+def _find_the_repo() -> str:
+    """$INSPEXIMUS_REPO, else a sibling checkout, else the installed package -- the same resolution
+    order the probes next door use, so this file runs off the machine it was written on."""
+    env = os.environ.get("INSPEXIMUS_REPO")
+    if env and os.path.isdir(env):
+        return env
+    here = Path(__file__).resolve().parent.parent
+    for sib in ("inspeximus-repo", "inspeximus"):
+        cand = here.parent / sib
+        if (cand / "inspeximus" / "cli.py").is_file():
+            return str(cand)
+    import inspeximus as _i
+    return str(Path(_i.__file__).resolve().parent.parent)
+
+
+REPO = _find_the_repo()
 DRAFT = Path(__file__).resolve().parent.parent / "agora_output" / "drafts" / \
     "claude_code_34556_the_instrument_had_the_defect.md"
 LINKS_MUST_RESOLVE = os.environ.get("CHECK_LINKS", "0") == "1"
@@ -70,11 +85,17 @@ from inspeximus import Inspeximus                                    # noqa: E40
 # moved 11,501 -> 11,630 keys, which is not drift to be tolerated: a published figure has to match
 # the run behind it. So the rule is the one in the failure message -- update the DRAFT to whatever
 # this measures, immediately before sending, and never the other way round.
+# The two stores the draft cites. Paths are OVERRIDABLE and default to this repo / the user's home
+# rather than one machine's absolute path -- the same portability fix the probes next door needed,
+# for the same reason: an artifact offered publicly should run somewhere other than where it was
+# written. A missing store is reported as a missing store, never silently skipped.
+_HERE = Path(__file__).resolve().parent.parent
 EXPECT = {
-    "C:/Users/Danculus/agora/.inspeximus/coding_memory.json":
+    os.environ.get("AGORA_CODING_STORE", str(_HERE / ".inspeximus" / "coding_memory.json")):
         {"keys": 11600, "tol": 100, "pct": 12, "pct_tol": 1.0, "groups": 610, "grp_tol": 25,
          "label": "coding store"},
-    "C:/Users/Danculus/.inspeximus/mcp_memory.json":
+    os.environ.get("AGORA_DECISION_STORE",
+                   os.path.expanduser("~/.inspeximus/mcp_memory.json")):
         {"keys": 436, "tol": 15, "pct": 95, "pct_tol": 2.0, "groups": 1, "grp_tol": 0,
          "label": "decision store"},
 }
