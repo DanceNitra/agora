@@ -1,4 +1,28 @@
-"""Is a DEFAULTED valid_from distinguishable from an ASSERTED one, and can it ever be repaired?
+"""WITHDRAWN 2026-08-17, same day, BEFORE it was cited anywhere. Superseded by
+`popoto_valid_from_hash_and_index_disagree.py` in this directory.
+
+ITS CENTRAL CLAIM IS FALSE. This script defined "stored" as `ValidityField.get_all_keys()` -- the six
+derived index keys -- and concluded that nothing records whether `valid_from` was declared or
+substituted. One `HGETALL` refutes it: popoto persists the field value in the model hash, so a
+defaulted record reads back `.validity is None` and a declared one reads back the float, across a
+reload. The provenance was there the whole time, in the obvious place, and the criterion was narrower
+than the property it claimed to measure.
+
+M5 was also a tautology: it compared a record declared to be true EARLIER against one substituted to
+ingest time, so the query separated them because the values differ, not because anything was
+conflated. And M4 overreached -- valid-from cannot be amended IN PLACE, which is append-only design
+working as intended; superseding with a new record carrying the corrected value lands correctly.
+
+What survived, and what the replacement measures instead: the marker is written by the save path and
+not by `execute_supersede`, and a corrected re-save leaves the hash and the index disagreeing by the
+size of the correction with no error raised.
+
+Kept in the tree rather than deleted, because a withdrawn measurement that leaves no trace teaches
+nobody why it was wrong. Do not cite anything below.
+
+---- original docstring follows ----
+
+Is a DEFAULTED valid_from distinguishable from an ASSERTED one, and can it ever be repaired?
 
 Target: tomcounsell/popoto, `ValidityField` (issue #580 "V0 validity primitives"), merged
 2026-08-17 as a4f7fbf4. Measured against a live Redis, not read off the page.
