@@ -1606,6 +1606,12 @@ def _light_stem(w: str) -> str:
     "inspeximu" -- the one term the board most needs to match, mangled by the matcher, while the
     brain published the term unstemmed. The two ends never met. Measured 2026-08-08.
     """
+    # -ies -> -y, 2026-08-17, and it MUST land here in the same commit as `methods.light_stem`. The
+    # docstring above records what a one-sided change costs: the two ends disagreed on every plural and
+    # "agent" scored differently on the same text at the same moment. Rationale, measurements and the
+    # rejected -ing variant are written out once, in the brain's copy; this is the mirror.
+    if len(w) > 4 and w.endswith("ies"):
+        return w[:-3] + "y"
     if len(w) > 4 and w.endswith("s") and not w.endswith(("ss", "us", "is")):
         return w[:-1]
     return w

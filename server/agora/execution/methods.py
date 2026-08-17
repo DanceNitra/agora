@@ -479,6 +479,24 @@ def light_stem(w: str) -> str:
     inspeximus, class and analysis are left alone.
     """
     w = (w or "")
+    # -ies -> -y, ADDED 2026-08-17. The trailing-s rule alone cannot fold an -ies plural, so
+    # "memories" stemmed to "memorie" and never met the board's "memory" -- the single most important
+    # word in this domain. Measured cost of that: a flywheel question reading "Uniform consolidation of
+    # agent MEMORIES reduces the diversity..." scored off-board and was never offered as a quest, while
+    # the pool it sits in had ZERO on-frontier items by any other term.
+    #
+    # Scoped by measurement over the 3,929 distinct words the gate actually sees: this rule changes 39
+    # of them, unlocks exactly ONE board match (memories -> memory, 8 occurrences) and loses none. It
+    # also mis-stems "series" -> "sery" and "species" -> "specy", which are wrong and harmless -- what
+    # matters is that they collide with no board term, checked, and that BOTH ends stem identically.
+    #
+    # An -ing rule was measured at the same time and REJECTED: 286 words changed for 2 new matches
+    # (poisoning, compounding), with 67 mangled below five characters -- trading->trad, writing->writ,
+    # running->runn. `_theme_words` also feeds skip-ledger coverage, the inbox dedup signature and
+    # cartography, all of which compare word SETS, so that much noise would move similarity everywhere
+    # for two words.
+    if len(w) > 4 and w.endswith("ies"):
+        return w[:-3] + "y"
     if len(w) > 4 and w.endswith("s") and not w.endswith(("ss", "us", "is")):
         return w[:-1]
     return w
