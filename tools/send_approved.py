@@ -259,17 +259,26 @@ def _thread_url_from(cmd, thread):
     Not from --thread: that argument is optional and describes the thread the operator MEANT. The
     command is what the network will do. `gh issue comment <n> --repo <owner/name>` and
     `gh pr comment` both carry the real destination.
+
+    MEASURED 2026-08-17, on a real send. This function used to re-implement the parse, and knew only
+    the long `--repo`; the send used `-R`, so it returned (None, None) and the gate printed "no
+    github thread could be identified" and did not run -- on the most idiomatic gh form there is.
+    A gate defeated by a short flag is the same defect it was built to prevent: a check that never
+    sees its target reports safe. `prior_statement_check.thread_from_command` already handles every
+    posting form (`--repo`, `-R`, `--repo=`, a full url, a REST path) and is tested against them, so
+    the duplicate is deleted rather than patched -- two derivations of one fact, where one is a
+    subset of the other, is the bug.
+
+    The command is also consulted FIRST now. The old code returned the declared `--thread` when it
+    was present, which contradicted this docstring; `_prior_gate` refuses a mismatch before we get
+    here, but the order should say what it means.
     """
-    if thread:
-        m = re.search(r"github\.com/([^/]+)/([^/]+)/(?:issues|pull)/(\d+)", thread)
+    for candidate in (psc.thread_from_command(list(cmd))[0], thread):
+        if not candidate:
+            continue
+        m = re.search(r"github\.com/([^/]+)/([^/]+)/(?:issues|pull)/(\d+)", candidate)
         if m:
             return f"{m.group(1)}/{m.group(2)}", m.group(3)
-    parts = list(cmd)
-    if "gh" in parts[0] and len(parts) > 2 and parts[1] in ("issue", "pr") and parts[2] == "comment":
-        num = parts[3] if len(parts) > 3 else None
-        repo = parts[parts.index("--repo") + 1] if "--repo" in parts else None
-        if num and repo:
-            return repo, num
     return None, None
 
 
