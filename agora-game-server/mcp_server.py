@@ -1899,6 +1899,47 @@ def _strip_quest_prefix(title: str) -> str:
 #: used to hide by re-serving work the brain then refused. Both are normal; neither is a blocker.
 _plan_reason: dict = {}
 
+# STARVATION MUST STAY VISIBLE -- AND HALF A MILLION IDENTICAL LINES A DAY IS NOT VISIBLE.
+# The two "[plan] ... no research this cycle" / "0 grounded quest(s) from the renewable pool" lines
+# below are deliberate, and the comments beside them are right: hiding a thin supply behind a fallback
+# is what produced 1,435 guaranteed-reject writes, so the starvation gets logged rather than papered
+# over. What was missed is that the logging itself has a legibility budget. Measured 2026-08-17: ONE
+# dungeon process had written "no research this cycle" 1,505,267 times in three days -- ~500k/day, one
+# per agent every 1.3 s -- and `_dungeon.err` had reached 409 MB. The dungeon had been research-starved
+# continuously since it started, and that was invisible, because a line repeated half a million times
+# is wallpaper. Grepping the log for the problem returns the problem 1.5 million times, which is the
+# same as returning nothing.
+#
+# So these two now log every STATE CHANGE, plus one line per _IDLE_SUMMARY_EVERY repeats carrying the
+# repeat count. Strictly louder than before: an operator sees "entered starvation at T" and
+# "unchanged for 5,000 cycles" instead of a wall.
+_IDLE_SUMMARY_EVERY = 500
+_idle_state: dict = {}      # (eid, tag) -> [normalised message shape, consecutive repeats]
+_DIGITS_RE = re.compile(r"\d+")
+
+
+def _log_plan_state(eid: str, tag: str, msg: str, *args) -> None:
+    """Log a per-agent planning state, collapsing repeats into counted summaries.
+
+    The state is compared with DIGITS NORMALISED AWAY, and that is not tidiness -- it is the whole
+    fix. The first version compared the rendered string verbatim, and measured over the 90 seconds
+    after deployment it still wrote ~18 MB/day, because the supply count oscillates ("all 8 ..." then
+    "all 9 ..." then "all 8 ..."), so every flip read as a new state. Starvation with a supply of 8 and
+    starvation with a supply of 9 are the same operational condition; the count belongs in the message,
+    not in the identity of the state.
+    """
+    rendered = msg % args if args else msg
+    key = (eid, tag)
+    shape = _DIGITS_RE.sub("N", rendered)
+    prev = _idle_state.get(key)
+    if prev is None or prev[0] != shape:
+        _idle_state[key] = [shape, 1]
+        logger.info("%s", rendered)
+        return
+    prev[1] += 1
+    if prev[1] % _IDLE_SUMMARY_EVERY == 0:
+        logger.info("%s  [unchanged for %d cycles]", rendered, prev[1])
+
 
 async def _renewable_quests(eid: str, want: int = 3) -> list:
     """A GUARANTEED supply of REAL RESEARCH (no combinatorial filler): test Agora's own claims
@@ -2094,9 +2135,10 @@ async def _renewable_quests(eid: str, want: int = 3) -> list:
     chosen = fresh[:want]
     if interleaved and not chosen:
         _plan_reason[eid] = "exhausted"
-        logger.info("[plan] %s: all %d on-priority candidate(s) already pursued -> no research this "
-                    "cycle (supply is %d deep)", _AGENT_NAMES.get(eid, eid), len(interleaved),
-                    len(interleaved))
+        _log_plan_state(eid, "exhausted",
+                        "[plan] %s: all %d on-priority candidate(s) already pursued -> no research "
+                        "this cycle (supply is %d deep)", _AGENT_NAMES.get(eid, eid),
+                        len(interleaved), len(interleaved))
     for x in chosen:
         if x[0] in _seen:            # a repeat MOVES the entry, it never spends a second slot
             _seen.remove(x[0])
@@ -4872,8 +4914,9 @@ async def ambient_life():
             # actually reach an output.
             for q in await _renewable_quests(eid, 3):
                 quests.setdefault(eid, []).append(q)
-            logger.info("[plan] %s: %d grounded quest(s) from the renewable pool",
-                        _AGENT_NAMES.get(eid, eid), len(quests.get(eid, [])))
+            _log_plan_state(eid, "renewable",
+                            "[plan] %s: %d grounded quest(s) from the renewable pool",
+                            _AGENT_NAMES.get(eid, eid), len(quests.get(eid, [])))
             if quests.get(eid):
                 _plan_fails[eid] = 0
             elif _plan_reason.get(eid) in ("off_priority", "exhausted"):
