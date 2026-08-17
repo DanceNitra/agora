@@ -584,8 +584,22 @@ def record_contribution(topic: dict, partners: list[str], claim: str, evidence: 
          # never once skipped by agent_can_contribute. The cap was truncating by NPC order, so it
          # always cut the same four, and two of them (Wren, Rooke) carry the lowest trust scores in
          # the roster. Contributor lists are bounded by the 8-agent seminar anyway.
-         "partners": list(partners), "claim": claim[:400], "evidence": evidence[:300],
-         "falsifier": falsifier[:300], "links": [str(x)[:80] for x in links][:5],
+         # AND THE OTHER THREE CAPS ON THIS LINE WERE LEFT IN PLACE WHEN `partners` WAS FIXED.
+         # The comment above learned that a truncating cap silently destroys what it cuts, applied it
+         # to one field, and left its three neighbours at 300/300/400. Measured 2026-08-17 over the
+         # whole ledger: evidence sat exactly at the cap in 3,326 of 3,344 records (99%), and in the
+         # last week 121 of 137 capped strings ended mid-WORD. falsifier 1,013/3,339 (30%), claim
+         # 571/3,414 (17%). The evidence field is the reasoning that grounds the claim, so a 300-char
+         # cap was deleting most of the justification for almost every contribution we have.
+         #
+         # Scoped deliberately: the same `[:300]` appears in bounty, canon, contradictions, forge,
+         # insight_engine and scientist, and in NONE of them does it fire -- their stores top out at
+         # 49-264 chars because those writers are terse. The class is in the source; the damage was in
+         # exactly one place, and a seven-file change would have been a no-op in six of them.
+         # Nothing downstream reads these lengths: the only length test anywhere is `len(claim) < 25`,
+         # a minimum.
+         "partners": list(partners), "claim": claim[:1200], "evidence": evidence[:2000],
+         "falsifier": falsifier[:2000], "links": [str(x)[:300] for x in links][:5],
          "basis": basis,
          "grounded": bool(evidence and not _REFUSAL.search(evidence)), "verified": False}
     contribs.append(c)
