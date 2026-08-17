@@ -221,6 +221,32 @@ log(f"    after mode='open'  {after!r}   error={err}")
 log(f"    after plain save   {after_save!r}")
 log(f"    -> silently ignored: {silently_ignored}")
 
+# ---------------------------------------------------------------- M5 does a CONSUMER read it?
+# The fair objection to everything above is "no bit was destroyed -- the caller supplied nothing,
+# and ingest time is a sound upper bound, so this is an unstated bound, not fabricated data."
+# That objection is answerable only by showing a consumer that reads the substituted value and
+# gets an answer meaning two different things. popoto's own exclusion rule is the consumer, and
+# the doc states it as a question about PROOF: "is this record provably closed or provably not
+# yet started?" A defaulted valid_from answers that question with a proof nobody supplied.
+POPOTO_REDIS_DB.flushdb()
+t_query = time.time() - 3600.0                  # one hour ago
+declared = fresh("m5-declared", validity=t_query - 60.0)   # asserted: true since 61 min ago
+defaulted = fresh("m5-defaulted")                          # nobody said; gets ingest time
+as_of_hit = {f.fact_id for f in Fact.query.filter(validity__as_of=t_query)}
+declared_in = declared.fact_id in as_of_hit
+defaulted_in = defaulted.fact_id in as_of_hit
+results["M5_as_of"] = {
+    "query_at": t_query, "declared_included": declared_in, "defaulted_included": defaulted_in,
+}
+log("")
+log("M5  a consumer reads it: filter(validity__as_of=<1 hour ago>)")
+log(f"    declared valid_from 61 min ago -> included: {declared_in}")
+log(f"    defaulted (nobody asserted)    -> included: {defaulted_in}")
+log("    -> the excluded record is excluded as 'provably not yet started'. Nothing was")
+log("       proved: the exclusion rule asks for evidence and on_save manufactured it.")
+log("       'we never knew when this became true' and 'this was demonstrably not true")
+log("       yet' are returned as the same answer, and the caller cannot tell them apart.")
+
 # ---------------------------------------------------------------- MUT1 must-fail: drop NX
 original_lua = VF.SUPERSEDE_LUA
 mutant_lua = original_lua.replace(

@@ -3,13 +3,13 @@
   "sha256": "329619713f13a4f024294d7548b1c7cef9ea05c375a7678b26cd305ddc25528d",
   "C1_positive_control": true,
   "M1_defaulted_state": {
-    "valid_from": 1786991816.598612,
-    "ingested_at": 1786991816.598612,
+    "valid_from": 1786992144.0903995,
+    "ingested_at": 1786992144.0903995,
     "invalid_at": Infinity
   },
   "M2_asserted_state": {
-    "valid_from": 1786991816.5970907,
-    "ingested_at": 1786991816.6001596,
+    "valid_from": 1786992144.0893998,
+    "ingested_at": 1786992144.0929065,
     "invalid_at": Infinity
   },
   "M1_valid_from_equals_ingested_at": true,
@@ -21,8 +21,8 @@
     "valid_from"
   ],
   "M2b_asserted_batch_state": {
-    "valid_from": 1786991816.6071799,
-    "ingested_at": 1786991816.6071799,
+    "valid_from": 1786992144.0998516,
+    "ingested_at": 1786992144.0998516,
     "invalid_at": Infinity
   },
   "M2b_discriminator_defeated": true,
@@ -38,12 +38,17 @@
     }
   },
   "M4_repair": {
-    "before": 1786991816.6141937,
-    "attempted": 1784399816.6141937,
-    "after_supersede_open": 1786991816.6141937,
-    "after_resave": 1786991816.6141937,
+    "before": 1786992144.1078966,
+    "attempted": 1784400144.1078966,
+    "after_supersede_open": 1786992144.1078966,
+    "after_resave": 1786992144.1078966,
     "error_raised": null,
     "silently_ignored": true
+  },
+  "M5_as_of": {
+    "query_at": 1786988544.1170166,
+    "declared_included": true,
+    "defaulted_included": false
   },
   "MUT1_probe_is_sensitive": true,
   "MUT2_probe_is_sensitive": true,
