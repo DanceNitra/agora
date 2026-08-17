@@ -1,0 +1,51 @@
+{
+  "ref": "a4f7fbf432e487a29cd4868fb9c1fb59956067c0",
+  "sha256": "329619713f13a4f024294d7548b1c7cef9ea05c375a7678b26cd305ddc25528d",
+  "C1_positive_control": true,
+  "M1_defaulted_state": {
+    "valid_from": 1786991816.598612,
+    "ingested_at": 1786991816.598612,
+    "invalid_at": Infinity
+  },
+  "M2_asserted_state": {
+    "valid_from": 1786991816.5970907,
+    "ingested_at": 1786991816.6001596,
+    "invalid_at": Infinity
+  },
+  "M1_valid_from_equals_ingested_at": true,
+  "stored_keys": [
+    "chain_fwd",
+    "chain_rev",
+    "ingested_at",
+    "invalid_at",
+    "valid_from"
+  ],
+  "M2b_asserted_batch_state": {
+    "valid_from": 1786991816.6071799,
+    "ingested_at": 1786991816.6071799,
+    "invalid_at": Infinity
+  },
+  "M2b_discriminator_defeated": true,
+  "M3_malformed": {
+    "datetime": {
+      "raised": "ModelException"
+    },
+    "iso_string": {
+      "raised": "ValueError"
+    },
+    "date_string": {
+      "raised": "ValueError"
+    }
+  },
+  "M4_repair": {
+    "before": 1786991816.6141937,
+    "attempted": 1784399816.6141937,
+    "after_supersede_open": 1786991816.6141937,
+    "after_resave": 1786991816.6141937,
+    "error_raised": null,
+    "silently_ignored": true
+  },
+  "MUT1_probe_is_sensitive": true,
+  "MUT2_probe_is_sensitive": true,
+  "all_controls_passed": true
+}
