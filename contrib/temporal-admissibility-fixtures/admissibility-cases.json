@@ -1,0 +1,576 @@
+{
+  "description": "Candidate vendor-neutral fixtures for temporal admissibility of stored evidence. Six failure cases, each with a paired non-failure control, over the invariant that historical evidence may remain VALID without being ADMISSIBLE for the current session, the current world-state, or the current point of use. Implementations stay completely different; what interoperates is the falsification surface.",
+  "status": "CANDIDATE. Drafted from the six boundaries named by @safal207 on anthropics/claude-code#34556 (2026-08-17), which folded in the two @Stratogain proposed. Not accepted by anyone. Being proposed, or merged, makes no output here independent evidence.",
+  "authored_by": "inspeximus, which is one of the implementations these cases grade. An interested party wrote them. A separate producer must validate both the implementations and this fixture; nothing here is independent evidence about inspeximus.",
+  "provenance": {
+    "invariant_stated_by": "@safal207, anthropics/claude-code#34556, 2026-08-17T01:34:42Z — 'historical evidence may remain valid without being admissible evidence for the current session, current world-state, or current use.'",
+    "cases_5_and_6_proposed_by": "@Stratogain, anthropics/claude-code#34556, 2026-08-16T19:41:28Z — 'collector stopped, coverage unchanged' and 'the identifier the store writes and the identifier the store queries are the same identifier'. @safal207 folded both into the six.",
+    "each_case_below_names_the_participant_whose_measurement_produced_it": true
+  },
+  "how_a_case_is_stated": {
+    "history": "An ordered list of steps the binding must replay. Step kinds: write, observe, mutate_source, delete_source, advance_session, advance_clock. Every field is data; no step names a function in any implementation.",
+    "question": "What is asked at the end: {key, window, session}. window is OBSERVE_TO_CAPTURE, CAPTURE_TO_VERIFY or VERIFY_TO_USE — the boundary the answer is about, because admissibility is a property of the (evidence, window) pair and not of the record.",
+    "expect": "{admissible, reason}. `reason` is drawn from the closed vocabulary below and is null when admissible. An implementation may return richer detail; it must be mappable onto exactly one of these.",
+    "control": "The paired NON-FAILURE case: same shape, honest history, expect admissible true. A detector that fires on this is crying wolf, and a field that always fires is noise inside a week.",
+    "must_fail_under": "A named degradation from `flattering_implementations`. The runner applies it and the case MUST then fail. A fixture nobody has watched fail is a fixture nobody has tested.",
+    "reaches": "One key of `surface_vocabulary`. The binding returns the surfaces it consulted using those exact keys, and the runner checks the named one is among them. It was free text in the first draft, which made the rule unenforceable for anyone who had not read our binding.",
+    "discriminates": "OPTIONAL third scenario, for cases where two failure modes are easy to lump together. It carries its own expectation and asserts the detector tells them APART. It is not the control: a control must be a NON-failure, or a detector that answers inadmissible to everything passes the pair."
+  },
+  "reason_vocabulary": {
+    "SOURCE_DRIFTED": "The locator still resolves and the bytes behind it differ from those the record was derived from.",
+    "OBSERVATION_FOREIGN_SESSION": "An observation backing this record exists but belongs to another session, so it does not establish that this agent saw these bytes.",
+    "NEVER_OBSERVED": "No read-time observation exists; any digest present was computed at write time and cannot speak for what was read.",
+    "STALE_AT_USE": "The evidence was verified, and the world moved between that verification and the point of use.",
+    "SOURCE_ORPHANED": "The locator no longer resolves at all. Distinct from drift: the remedy is to re-source, not to revalidate.",
+    "COLLECTOR_SILENT": "The out-of-band collector that supplies observations has produced none while reads continued, so coverage is unchanged for a reason unrelated to health.",
+    "IDENTIFIER_MISMATCH": "The identifier under which the record was written is not the identifier under which it is queried, so its evidence is unreachable and silently degrades."
+  },
+  "flattering_implementations": {
+    "always_admissible": "Return admissible for everything. The floor: any case it survives is measuring nothing.",
+    "ignores_session": "Accept any observation for the locator regardless of which session produced it.",
+    "ignores_drift": "Trust the recorded digest and never re-read the source.",
+    "ignores_use_time": "Answer from the state at verification time and never re-check at use.",
+    "ignores_collector_liveness": "Report coverage from the ratio alone, never asking whether the collector still runs.",
+    "normalises_identifiers": "Fold identifiers (casefold or an 8-character prefix) on the query path but not on the write path.",
+    "cries_wolf": "Return inadmissible for everything. Passes every failure case and must fail every control — the check that keeps the six from being satisfied by a broken detector."
+  },
+  "cases": [
+    {
+      "id": "T1-same-locator-different-bytes",
+      "title": "Same locator, different observed bytes",
+      "from": "@safal207 boundary 1; the class @SinghAbhinav04 and @Stratogain both found in their own ledgers.",
+      "why": "The locator is stable, so a check keyed on the locator reports FRESH forever. What changed is the thing the locator points at.",
+      "reaches": "source_re_read",
+      "history": [
+        {
+          "step": "observe",
+          "doc": "policy.txt",
+          "bytes": "two approvers",
+          "session": "S1"
+        },
+        {
+          "step": "write",
+          "key": "policy",
+          "text": "deployment needs two approvers",
+          "source": {
+            "doc": "policy.txt"
+          },
+          "session": "S1"
+        },
+        {
+          "step": "mutate_source",
+          "doc": "policy.txt",
+          "bytes": "ONE approver"
+        }
+      ],
+      "question": {
+        "key": "policy",
+        "window": "CAPTURE_TO_VERIFY",
+        "session": "S1"
+      },
+      "expect": {
+        "admissible": false,
+        "reason": "SOURCE_DRIFTED"
+      },
+      "control": {
+        "why": "The same history without the mutation. If this reports drift, the field is noise and every case above it is measuring a constant.",
+        "history": [
+          {
+            "step": "observe",
+            "doc": "policy.txt",
+            "bytes": "two approvers",
+            "session": "S1"
+          },
+          {
+            "step": "write",
+            "key": "policy",
+            "text": "deployment needs two approvers",
+            "source": {
+              "doc": "policy.txt"
+            },
+            "session": "S1"
+          }
+        ],
+        "question": {
+          "key": "policy",
+          "window": "CAPTURE_TO_VERIFY",
+          "session": "S1"
+        },
+        "expect": {
+          "admissible": true,
+          "reason": null
+        }
+      },
+      "must_fail_under": [
+        "always_admissible",
+        "ignores_drift"
+      ]
+    },
+    {
+      "id": "T2-same-digest-different-session",
+      "title": "Same locator and digest, different session",
+      "from": "@Stratogain, who measured `verdict: OBSERVED_FRESH | observed: true` on a file the current session had never read.",
+      "why": "A day-old observation from another session stands in as proof that this agent read these bytes. The digest matches, which is exactly why it is convincing.",
+      "reaches": "observation_session_attribution",
+      "history": [
+        {
+          "step": "observe",
+          "doc": "policy.txt",
+          "bytes": "two approvers",
+          "session": "S1"
+        },
+        {
+          "step": "advance_session",
+          "to": "S2"
+        },
+        {
+          "step": "write",
+          "key": "policy",
+          "text": "deployment needs two approvers",
+          "source": {
+            "doc": "policy.txt"
+          },
+          "session": "S2"
+        }
+      ],
+      "question": {
+        "key": "policy",
+        "window": "OBSERVE_TO_CAPTURE",
+        "session": "S2"
+      },
+      "expect": {
+        "admissible": false,
+        "reason": "OBSERVATION_FOREIGN_SESSION"
+      },
+      "control": {
+        "why": "Same file, same digest, OWN session. @Stratogain's own control, and the one that separates 'we filter by session' from 'we wiped the ledger'.",
+        "history": [
+          {
+            "step": "observe",
+            "doc": "policy.txt",
+            "bytes": "two approvers",
+            "session": "S2"
+          },
+          {
+            "step": "write",
+            "key": "policy",
+            "text": "deployment needs two approvers",
+            "source": {
+              "doc": "policy.txt"
+            },
+            "session": "S2"
+          }
+        ],
+        "question": {
+          "key": "policy",
+          "window": "OBSERVE_TO_CAPTURE",
+          "session": "S2"
+        },
+        "expect": {
+          "admissible": true,
+          "reason": null
+        }
+      },
+      "must_fail_under": [
+        "always_admissible",
+        "ignores_session"
+      ]
+    },
+    {
+      "id": "T3-capture-then-source-drift",
+      "title": "Honest capture, later source drift",
+      "from": "@safal207 boundary 3.",
+      "why": "Distinguishes a capture that was WRONG from one that was RIGHT and has since been overtaken. Same present-tense symptom, different remedy: one is a bug, the other is revalidation. An implementation that reports them identically has lost the information a maintainer needs.",
+      "reaches": "source_re_read",
+      "history": [
+        {
+          "step": "observe",
+          "doc": "rate.txt",
+          "bytes": "rate is 4.5",
+          "session": "S1"
+        },
+        {
+          "step": "write",
+          "key": "rate",
+          "text": "the rate is 4.5",
+          "source": {
+            "doc": "rate.txt"
+          },
+          "session": "S1"
+        },
+        {
+          "step": "advance_clock",
+          "days": 30
+        },
+        {
+          "step": "mutate_source",
+          "doc": "rate.txt",
+          "bytes": "rate is 5.25"
+        }
+      ],
+      "question": {
+        "key": "rate",
+        "window": "CAPTURE_TO_VERIFY",
+        "session": "S1"
+      },
+      "expect": {
+        "admissible": false,
+        "reason": "SOURCE_DRIFTED"
+      },
+      "control": {
+        "why": "Honest capture, nothing moved. The non-failure control this case was missing.",
+        "history": [
+          {
+            "step": "observe",
+            "doc": "rate.txt",
+            "bytes": "rate is 4.5",
+            "session": "S1"
+          },
+          {
+            "step": "write",
+            "key": "rate",
+            "text": "the rate is 4.5",
+            "source": {
+              "doc": "rate.txt"
+            },
+            "session": "S1"
+          },
+          {
+            "step": "advance_clock",
+            "days": 30
+          }
+        ],
+        "question": {
+          "key": "rate",
+          "window": "CAPTURE_TO_VERIFY",
+          "session": "S1"
+        },
+        "expect": {
+          "admissible": true,
+          "reason": null
+        }
+      },
+      "must_fail_under": [
+        "always_admissible",
+        "ignores_drift"
+      ],
+      "discriminates": {
+        "why": "A vanished source must NOT come back as drift: re-source and revalidate are different jobs. Kept from the first draft, where it was mislabelled as the control -- which is how it hid that this case had no non-failure control at all.",
+        "history": [
+          {
+            "step": "observe",
+            "doc": "rate.txt",
+            "bytes": "rate is 4.5",
+            "session": "S1"
+          },
+          {
+            "step": "write",
+            "key": "rate",
+            "text": "the rate is 4.5",
+            "source": {
+              "doc": "rate.txt"
+            },
+            "session": "S1"
+          },
+          {
+            "step": "delete_source",
+            "doc": "rate.txt"
+          }
+        ],
+        "question": {
+          "key": "rate",
+          "window": "CAPTURE_TO_VERIFY",
+          "session": "S1"
+        },
+        "expect": {
+          "admissible": false,
+          "reason": "SOURCE_ORPHANED"
+        }
+      }
+    },
+    {
+      "id": "T4-verified-then-changed-before-use",
+      "title": "Verified state, changed before use",
+      "from": "@safal207 boundary 4, the VERIFY → USE window; built independently by inspeximus 2.11.0 and by @Stratogain the same evening.",
+      "why": "The store did not change, so every store-side integrity answer is correctly clean. Nothing carries the verification forward to the moment the memory is acted on, so the check that would catch it is the one nobody re-runs.",
+      "reaches": "re_read_at_point_of_use",
+      "history": [
+        {
+          "step": "observe",
+          "doc": "policy.txt",
+          "bytes": "two approvers",
+          "session": "S1"
+        },
+        {
+          "step": "write",
+          "key": "policy",
+          "text": "deployment needs two approvers",
+          "source": {
+            "doc": "policy.txt"
+          },
+          "session": "S1"
+        },
+        {
+          "step": "verify",
+          "key": "policy",
+          "session": "S1"
+        },
+        {
+          "step": "mutate_source",
+          "doc": "policy.txt",
+          "bytes": "ONE approver"
+        }
+      ],
+      "question": {
+        "key": "policy",
+        "window": "VERIFY_TO_USE",
+        "session": "S1"
+      },
+      "expect": {
+        "admissible": false,
+        "reason": "STALE_AT_USE"
+      },
+      "control": {
+        "why": "Verified, and nothing moved. The store's own integrity answer is clean in BOTH cases, which is the point: an implementation that answers this window from store state alone passes the control and fails the case.",
+        "history": [
+          {
+            "step": "observe",
+            "doc": "policy.txt",
+            "bytes": "two approvers",
+            "session": "S1"
+          },
+          {
+            "step": "write",
+            "key": "policy",
+            "text": "deployment needs two approvers",
+            "source": {
+              "doc": "policy.txt"
+            },
+            "session": "S1"
+          },
+          {
+            "step": "verify",
+            "key": "policy",
+            "session": "S1"
+          }
+        ],
+        "question": {
+          "key": "policy",
+          "window": "VERIFY_TO_USE",
+          "session": "S1"
+        },
+        "expect": {
+          "admissible": true,
+          "reason": null
+        }
+      },
+      "must_fail_under": [
+        "always_admissible",
+        "ignores_use_time"
+      ]
+    },
+    {
+      "id": "T5-collector-stopped-coverage-healthy",
+      "title": "Collector stops while coverage stays healthy",
+      "from": "@Stratogain, folded in by @safal207 as boundary 5.",
+      "why": "Any provenance resting on something outside the store needs a liveness check on that thing, and the check cannot live inside the thing. Coverage is a ratio over records that HAVE observations; when the collector dies the ratio does not move, because no new records get one either. Reads continue and the number stays reassuring.",
+      "reaches": "collector_liveness",
+      "history": [
+        {
+          "step": "observe",
+          "doc": "a.txt",
+          "bytes": "alpha",
+          "session": "S1"
+        },
+        {
+          "step": "write",
+          "key": "a",
+          "text": "alpha",
+          "source": {
+            "doc": "a.txt"
+          },
+          "session": "S1"
+        },
+        {
+          "step": "collector_stops"
+        },
+        {
+          "step": "write",
+          "key": "b",
+          "text": "beta",
+          "source": {
+            "doc": "b.txt"
+          },
+          "session": "S1"
+        },
+        {
+          "step": "write",
+          "key": "c",
+          "text": "gamma",
+          "source": {
+            "doc": "c.txt"
+          },
+          "session": "S1"
+        }
+      ],
+      "question": {
+        "key": "c",
+        "window": "OBSERVE_TO_CAPTURE",
+        "session": "S1"
+      },
+      "expect": {
+        "admissible": false,
+        "reason": "COLLECTOR_SILENT"
+      },
+      "control": {
+        "why": "The collector keeps running and every write gets its observation. Without this the case is satisfiable by an implementation that reports COLLECTOR_SILENT whenever any record lacks an observation, which is a different and much noisier claim.",
+        "history": [
+          {
+            "step": "observe",
+            "doc": "a.txt",
+            "bytes": "alpha",
+            "session": "S1"
+          },
+          {
+            "step": "write",
+            "key": "a",
+            "text": "alpha",
+            "source": {
+              "doc": "a.txt"
+            },
+            "session": "S1"
+          },
+          {
+            "step": "observe",
+            "doc": "b.txt",
+            "bytes": "beta",
+            "session": "S1"
+          },
+          {
+            "step": "write",
+            "key": "b",
+            "text": "beta",
+            "source": {
+              "doc": "b.txt"
+            },
+            "session": "S1"
+          },
+          {
+            "step": "observe",
+            "doc": "c.txt",
+            "bytes": "gamma",
+            "session": "S1"
+          },
+          {
+            "step": "write",
+            "key": "c",
+            "text": "gamma",
+            "source": {
+              "doc": "c.txt"
+            },
+            "session": "S1"
+          }
+        ],
+        "question": {
+          "key": "c",
+          "window": "OBSERVE_TO_CAPTURE",
+          "session": "S1"
+        },
+        "expect": {
+          "admissible": true,
+          "reason": null
+        }
+      },
+      "must_fail_under": [
+        "always_admissible",
+        "ignores_collector_liveness"
+      ]
+    },
+    {
+      "id": "T6-writer-query-identifier-mismatch",
+      "title": "The identifier written is not the identifier queried",
+      "from": "@Stratogain, who found their hook storing `session_id.slice(0, 8)` while the lookup compared the full id; folded in by @safal207 as boundary 6.",
+      "why": "Sounds trivial and is not. Two sessions differing only after the eighth character: an implementation that truncates on the query path finds the OTHER session's observation and reports the capture as its own. A session cannot find its own observations either, so honest captures degrade silently to write-time hashes while a verdict is produced every time -- it passes every test that only checks whether a verdict came back. Measured on one real store: an 8-character prefix fold would collapse about 12% of over 11,000 keys.",
+      "reaches": "identifier_equality_write_vs_read",
+      "history": [
+        {
+          "step": "observe",
+          "doc": "policy.txt",
+          "bytes": "two approvers",
+          "session": "session-abcdefgh-0002"
+        },
+        {
+          "step": "write",
+          "key": "policy",
+          "text": "deployment needs two approvers",
+          "source": {
+            "doc": "policy.txt"
+          },
+          "session": "session-abcdefgh-0001"
+        }
+      ],
+      "question": {
+        "key": "policy",
+        "window": "OBSERVE_TO_CAPTURE",
+        "session": "session-abcdefgh-0001"
+      },
+      "expect": {
+        "admissible": false,
+        "reason": "OBSERVATION_FOREIGN_SESSION"
+      },
+      "control": {
+        "why": "The record's OWN session observed the doc, and another session's near-identical id is present as a distractor. A correct implementation says admissible; one that truncates says admissible too -- but it fails the case above, which is where the pair does its work.",
+        "history": [
+          {
+            "step": "observe",
+            "doc": "policy.txt",
+            "bytes": "two approvers",
+            "session": "session-abcdefgh-0001"
+          },
+          {
+            "step": "observe",
+            "doc": "other.txt",
+            "bytes": "other",
+            "session": "session-abcdefgh-0002"
+          },
+          {
+            "step": "write",
+            "key": "policy",
+            "text": "deployment needs two approvers",
+            "source": {
+              "doc": "policy.txt"
+            },
+            "session": "session-abcdefgh-0001"
+          }
+        ],
+        "question": {
+          "key": "policy",
+          "window": "OBSERVE_TO_CAPTURE",
+          "session": "session-abcdefgh-0001"
+        },
+        "expect": {
+          "admissible": true,
+          "reason": null
+        }
+      },
+      "must_fail_under": [
+        "always_admissible",
+        "normalises_identifiers"
+      ]
+    }
+  ],
+  "runner_rules": [
+    "NO EXPECTATION WITHOUT A CITATION. Every case names the participant and measurement it came from. A case whose `from` is empty is refused, not scored.",
+    "NO CASE WITHOUT A PAIRED CONTROL. @safal207's condition, and the one that keeps a detector from passing by firing on everything. `cries_wolf` must fail every control.",
+    "NO FIXTURE THAT HAS NEVER FAILED. Each case names degradations that must break it, and the runner applies them. A case that survives `always_admissible` is measuring nothing.",
+    "NO CASE THAT NEVER REACHED ITS SUBJECT. `reaches` is checked, because a case satisfiable without touching the surface it names is the exact defect this set exists to find.",
+    "NO CONTROL THAT IS SECRETLY A SECOND FAILURE CASE. A control must expect admissible=true. Two of the six shipped without one in the first draft and the runner caught both on its first run: cries_wolf passed them, which is the whole reason @safal207 asked for paired NON-failure controls."
+  ],
+  "surface_vocabulary": {
+    "source_re_read": "The implementation re-read the source at assessment time.",
+    "observation_session_attribution": "It checked WHICH session an observation belongs to.",
+    "re_read_at_point_of_use": "It re-read at the moment of use, not only at verification.",
+    "collector_liveness": "It asked whether the observation collector is still running.",
+    "identifier_equality_write_vs_read": "It compared identifiers without normalising on one side."
+  }
+}

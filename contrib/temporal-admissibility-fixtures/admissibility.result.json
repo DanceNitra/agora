@@ -1,0 +1,143 @@
+{
+  "binding": "inspeximus",
+  "fixture": "admissibility-cases.json",
+  "rows": [
+    {
+      "id": "T1-same-locator-different-bytes",
+      "pass": true,
+      "case": {
+        "admissible": false,
+        "reason": "SOURCE_DRIFTED",
+        "consulted": [
+          "source_re_read"
+        ]
+      },
+      "control": {
+        "admissible": true,
+        "reason": null,
+        "consulted": [
+          "source_re_read"
+        ]
+      },
+      "discriminates": null,
+      "reached": true,
+      "survived_degradations": []
+    },
+    {
+      "id": "T2-same-digest-different-session",
+      "pass": true,
+      "case": {
+        "admissible": false,
+        "reason": "OBSERVATION_FOREIGN_SESSION",
+        "consulted": [
+          "observation_session_attribution",
+          "identifier_equality_write_vs_read"
+        ]
+      },
+      "control": {
+        "admissible": true,
+        "reason": null,
+        "consulted": [
+          "observation_session_attribution",
+          "identifier_equality_write_vs_read"
+        ]
+      },
+      "discriminates": null,
+      "reached": true,
+      "survived_degradations": []
+    },
+    {
+      "id": "T3-capture-then-source-drift",
+      "pass": true,
+      "case": {
+        "admissible": false,
+        "reason": "SOURCE_DRIFTED",
+        "consulted": [
+          "source_re_read"
+        ]
+      },
+      "control": {
+        "admissible": true,
+        "reason": null,
+        "consulted": [
+          "source_re_read"
+        ]
+      },
+      "discriminates": {
+        "admissible": false,
+        "reason": "SOURCE_ORPHANED",
+        "consulted": [
+          "source_re_read"
+        ]
+      },
+      "reached": true,
+      "survived_degradations": []
+    },
+    {
+      "id": "T4-verified-then-changed-before-use",
+      "pass": true,
+      "case": {
+        "admissible": false,
+        "reason": "STALE_AT_USE",
+        "consulted": [
+          "re_read_at_point_of_use"
+        ]
+      },
+      "control": {
+        "admissible": true,
+        "reason": null,
+        "consulted": [
+          "re_read_at_point_of_use"
+        ]
+      },
+      "discriminates": null,
+      "reached": true,
+      "survived_degradations": []
+    },
+    {
+      "id": "T5-collector-stopped-coverage-healthy",
+      "pass": true,
+      "case": {
+        "admissible": false,
+        "reason": "COLLECTOR_SILENT",
+        "consulted": [
+          "collector_liveness"
+        ]
+      },
+      "control": {
+        "admissible": true,
+        "reason": null,
+        "consulted": [
+          "observation_session_attribution",
+          "identifier_equality_write_vs_read"
+        ]
+      },
+      "discriminates": null,
+      "reached": true,
+      "survived_degradations": []
+    },
+    {
+      "id": "T6-writer-query-identifier-mismatch",
+      "pass": true,
+      "case": {
+        "admissible": false,
+        "reason": "OBSERVATION_FOREIGN_SESSION",
+        "consulted": [
+          "observation_session_attribution",
+          "identifier_equality_write_vs_read"
+        ]
+      },
+      "control": {
+        "admissible": true,
+        "reason": null,
+        "consulted": [
+          "observation_session_attribution",
+          "identifier_equality_write_vs_read"
+        ]
+      },
+      "discriminates": null,
+      "reached": true,
+      "survived_degradations": []
+    }
+  ]
+}
