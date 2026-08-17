@@ -30,6 +30,42 @@ from datetime import datetime, timezone
 from pathlib import Path
 
 HERE = Path(__file__).resolve().parent
+PIN = "18e3bee21cedd8249bd5634da37fb3a551d3b342"
+RAW = "https://raw.githubusercontent.com/safal207/Causal-Memory-Layer/" + PIN + "/"
+
+# Their code is FETCHED, not vendored. Two reasons, and the second is the one that matters:
+#   1. Their repository is MIT, so copying would be permitted -- but a copy in our tree can drift
+#      from theirs while still looking authoritative, and a reader checking our claim would then be
+#      checking our copy of their code.
+#   2. A commit ref pins a NAME. These digests pin the BYTES. If upstream ever force-pushes over the
+#      sha, or a proxy serves something else, this fails loudly instead of measuring the wrong file.
+WANT = {
+    "cml/integrations/memory_applicability.py":
+        "44af33be15cfe78d9b386fb0619ac5bc8d7d3d50587134386d80291b58bb27af",
+    "tests/fixtures/memory_applicability_v0.1.json":
+        "e6c4ac9b9a23d787c39223dad6ca6a75b64148fb3730972c51b99a5a3c0cfd7b",
+}
+
+
+def fetch_pinned(path: str) -> bytes:
+    import hashlib
+    import urllib.request
+    local = HERE / Path(path).name
+    body = local.read_bytes() if local.exists() else None
+    if body is None or hashlib.sha256(body).hexdigest() != WANT[path]:
+        with urllib.request.urlopen(RAW + path, timeout=30) as r:
+            body = r.read()
+        local.write_bytes(body)
+    got = hashlib.sha256(body).hexdigest()
+    if got != WANT[path]:
+        raise SystemExit(
+            f"REFUSED: {path} at {PIN[:12]} hashes {got[:16]}, expected {WANT[path][:16]}. "
+            "The bytes are not the ones these results were measured against, so the run is void.")
+    return body
+
+
+for _p in WANT:
+    fetch_pinned(_p)
 sys.path.insert(0, str(HERE))
 import memory_applicability as ma  # noqa: E402
 
