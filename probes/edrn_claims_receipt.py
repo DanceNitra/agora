@@ -107,6 +107,21 @@ check("valley present exactly where the degeneracy jumps (SU(2)-invariant observ
       "fractal %.6f->%.6f->%.6f ; ring %.6f->%.6f->%.6f (exact zero at the uniform point)"
       % (frE[0.95], frE[1.0], frE[1.05], rgE[0.95], rgE[1.0], rgE[1.05]))
 
+# 6c -- the two implementations are bound by isotropy: averaging <sz sz> over a full spin multiplet
+# must equal (1/3)<sigma.sigma>. One is computed in the full 32768 space, the other in the 6435-state
+# Sz sector by a different routine. If they agree to 6 s.f. at many points, neither is improvising.
+worst, npts = 0.0, 0
+for gname in ("fractal_L2", "ring15"):
+    proj = {r_["s"]: r_["E"] for r_ in rows if r_["kind"] == "scan" and r_["graph"] == gname}
+    inv = dict(zip(SU2[gname]["s"], SU2[gname]["E"]))
+    for sv in sorted(set(proj) & set(inv)):
+        if abs(sv - 1.0) < 1e-9:
+            continue                      # at the degenerate point the ground space spans two multiplets
+        worst = max(worst, abs(proj[sv] - inv[sv] / 3.0)); npts += 1
+check("isotropy binds the two independent implementations: <sz sz>_multiplet == (1/3)<sigma.sigma>",
+      worst < 1e-6 and npts > 80,
+      "max deviation %.2e over %d shared scan points, two different state spaces and routines" % (worst, npts))
+
 # 7 -- structure: no two tips adjacent, verified by two isomorphic constructions
 g = nx.Graph(e)
 tips = [v for v in g if g.degree(v) == 2]
