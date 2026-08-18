@@ -117,16 +117,44 @@ def _iso_to_ts(iso: str) -> float:
 MIN_STARS = 3   # a real-community bar: drop solo/0-star repos (keyword match != engagement target)
 
 
-def find_opportunity() -> dict | None:
+THEME_TRIES = 5   # how many themes one firing may try before giving up (see find_opportunity)
+
+
+def find_opportunity(theme: str | None = None, tries: int | None = None) -> dict | None:
     """Search GitHub open issues across a rotating strength-theme; return the best-fit candidate
     not already contacted, with a fit score and its text for Claude to judge. Quality-gated: skip
     self-authored 'issues-as-notebook' entries and require a real-community repo (stars/forks), so a
-    mere keyword match on a solo personal project is not surfaced as an outreach target."""
+    mere keyword match on a solo personal project is not surfaced as an outreach target.
+
+    ONE DRY THEME NO LONGER WASTES A WHOLE FIRING. The theme used to be a single hourly rotation, so
+    if that theme happened to have nothing, the firing found nothing and the next one was 2.5 hours
+    away. Measured 2026-08-18: 6 of the 16 live themes had an offerable lead at that moment, so
+    roughly three firings in five were guaranteed to come back empty while leads were sitting there.
+    The rotation still decides where to START -- so the themes stay evenly covered over time -- and a
+    firing now walks forward until one yields or `tries` themes are spent.
+
+    `tries=1` restores the old single-theme cost, and READ-ONLY CALLERS MUST USE IT. /scout/status
+    calls this to show a live candidate, so walking five themes turned a status read into five
+    GitHub searches and hung it past any sane timeout -- measured immediately after this change went
+    in. A visibility surface may not pay for discovery."""
+    if theme is None:
+        live = _live_themes()
+        if not live:
+            return None
+        start = int(time.time() // 3600) % len(live)
+        err = None
+        for k in range(min(tries or THEME_TRIES, len(live))):
+            r = find_opportunity(live[(start + k) % len(live)])
+            if r and not r.get("error"):
+                return r
+            if r and r.get("error"):
+                err = r          # remember an API failure; an empty theme is not one
+        return err
     from agora.execution.correspondent import _api
-    seen = {x.get("url") for x in _load()}
-    _live = _live_themes()
-    rot = int(time.time() // 3600) % len(_live)
-    theme = _live[rot]
+    # SKIP WHAT THE BOX HAS SEEN, NOT ONLY WHAT THE LEDGER HAS. box_add() dedups against the box AND
+    # the ledger; this used to read the ledger alone, so 93 URLs the box already held were re-findable
+    # forever. Measured 2026-08-18 during a 30.8-hour discovery stall.
+    seen = {x.get("url") for x in _load()} | {x.get("url") for x in box_load()}
     theme_words = _words(theme)
     q = urllib.parse.quote(f'{theme} is:issue is:open')
     try:
@@ -187,6 +215,15 @@ def find_opportunity() -> dict | None:
     # 1-25 followers each while all linking their own projects. A full validate/storm/audit/verify cycle
     # was spent on a comment nobody would have read. The topic fit was real; the audience did not exist.
     for c in sorted(cands, key=lambda z: -z["score"])[:6]:
+        # SUBJECT GATE, and it must be the SAME test box_add() applies. The fit score measures overlap
+        # with a rotating theme; box_add() asks whether the thread is about memory at all. They can
+        # disagree, and when they do the finder proposes a lead the box will always refuse, learns
+        # nothing from the refusal, and offers it again on the next firing. Measured 2026-08-18:
+        # langchain-ai/langgraph#5672 scored 15 and failed _about_memory, and the contribute half of
+        # the Scout had been a silent no-op for 30.8 hours across roughly twelve firings. Checked here
+        # because it is free, before the two API calls below.
+        if not _about_memory(c):
+            continue
         try:
             rp = _api("GET", f"/repos/{c['repo']}")
             stars = int(rp.get("stargazers_count", 0) or 0)

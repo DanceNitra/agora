@@ -2470,7 +2470,9 @@ async def brain_scout_status():
                "ts": x.get("ts", 0), "iso": _iso(x.get("ts", 0))} for x in items[-12:][::-1]]
     cur_theme = _THEMES[int(_t.time() // 3600) % len(_THEMES)]
     try:
-        target = await _aio.to_thread(find_opportunity)
+        # tries=1: a status read may not pay for discovery. Walking every theme here turned
+        # this endpoint into five GitHub searches and hung it past any sane timeout.
+        target = await _aio.to_thread(find_opportunity, None, 1)
     except Exception as e:
         target = {"error": str(e)[:120]}
     # DISCOVERY, measured where discovery actually lands: the box. `last_scan*` keeps its old name and
