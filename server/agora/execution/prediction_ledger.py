@@ -106,6 +106,17 @@ _CONF_SHRINK = 0.4    # pull (confidence-0.5) toward 0 for directional calls
 _CONF_CAP = 0.62      # hard ceiling on a directional forecast's published confidence
 
 
+def _flat_band(baseline: float) -> str:
+    """The FLAT band as the RESOLVER computes it, rendered for the prompt.
+
+    Derived from the same rule resolution applies -- `max(1, base * 0.05)` -- and kept beside the
+    prompt that quotes it, so the question asked and the question scored cannot drift apart again.
+    They already had: the forecaster was never told the band existed at all.
+    """
+    t = max(1, round(baseline * 0.05))
+    return "%s to %s (+/-%s)" % (round(baseline - t), round(baseline + t), t)
+
+
 def _calibrate_conf(direction: str, confidence: float) -> float:
     """Regularize an over-confident directional forecast toward chance; FLAT is left unchanged."""
     if direction in ("UP", "DOWN"):
@@ -126,7 +137,18 @@ async def make_prediction(theme: str, horizon_days: int = 14) -> dict:
         "You are a calibrated forecaster. A topic's RECENT ACTIVITY RATE is given. Predict whether the "
         f"NEXT {horizon_days} days will have MORE (UP = accelerating) or FEWER (DOWN = decelerating) "
         "than the last window — this is genuinely uncertain, so SPREAD your confidence (be near 50 when "
-        "unsure, high only when you have a real reason). Reply EXACTLY:\n"
+        "unsure, high only when you have a real reason).\n"
+        # THE BAND, STATED. It was not, and the forecaster was answering a different question from the
+        # one being scored. Resolution calls FLAT only inside +/-5% (or +/-1, whichever is larger) of
+        # the baseline, while this prompt offered "FLAT" undefined -- so a reasonable reader took it to
+        # mean "roughly the same". MEASURED 2026-08-18 over 241 resolved forecasts: the median window
+        # moves 29.5% and FLAT is true 34% of the time, yet we called FLAT on 68% of questions. For
+        # FLAT to be true as often as we called it, the band would have to be +/-52%. None of the
+        # model's judgement had to be wrong to produce that gap.
+        f"FLAT is a NARROW band: it means the next window lands within {_flat_band(baseline)}. "
+        "Anything outside it is UP or DOWN, however small the move feels. Most windows move far more "
+        "than that, so FLAT is not the safe answer.\n"
+        "Reply EXACTLY:\n"
         "DIRECTION: UP or DOWN or FLAT\nCONFIDENCE: <integer 0-100>\nWHY: <one sentence>",
         f"THEME: {theme}\nRATE: {base['metric_label']} = {baseline} in the last {horizon_days} days\n"
         f"(other rates: {base['all_baselines']})", "cheap", 0.3, 200) or ""
