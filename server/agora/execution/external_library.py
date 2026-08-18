@@ -229,10 +229,22 @@ def stats() -> dict:
 # recur across unrelated projects, and which of them nobody has built. A hole in that map is a market
 # gap; a hole in the vault map was just a gap in our reading.
 AXIS = {
-    "correction/update": ("correct", "update", "stale", "outdated", "supersede", "overwrite"),
-    "forget/erasure": ("forget", "delete", "erasure", "gdpr", "right to be forgotten", "purge", "wipe"),
+    # THE WORDS MUST CARRY THE CONCEPT, NOT MERELY CO-OCCUR WITH IT. Measured 2026-08-18 over the
+    # 392-record corpus: `provenance/trust` was the loudest need at 108 distinct projects and the
+    # bucket was held up by `source`, which admitted 94 records on its own -- "fyxer or like api
+    # sourceforge?" among them. Only 16 projects actually said provenance or attribution. The same
+    # shape ran through three more buckets: bare `update` admitted 67 alone ("Action for dynamic
+    # badges"), bare `correct` 21 ("Bun parity ... test-suite", the adjective), bare `delete` 16 (an
+    # mlflow tracing integration). Removing those six words re-ranks the map, and the map is what
+    # tells the organs which need is worth work -- so a generic word here becomes a quarter's
+    # research direction. Every word below was checked against the records it uniquely admits.
+    "correction/update": ("supersede", "superseded", "stale", "outdated", "overwrite",
+                          "correction", "contradict"),
+    "forget/erasure": ("forget", "erasure", "gdpr", "right to be forgotten", "purge", "wipe",
+                       "deletion request", "delete my data"),
     "revert/undo": ("revert", "undo", "rollback", "restore previous"),
-    "provenance/trust": ("provenance", "trust", "source", "attribution", "verify", "audit"),
+    "provenance/trust": ("provenance", "attribution", "audit trail", "chain of custody",
+                         "verifiable"),
     "poisoning/safety": ("poison", "injection", "malicious", "adversarial", "tamper"),
     "determinism/cost": ("deterministic", "non-deterministic", "llm cost", "expensive", "latency"),
     "dedup/conflict": ("duplicate", "dedupe", "conflict", "contradiction"),
