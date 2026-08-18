@@ -1,0 +1,185 @@
+{
+ "gate": "TAT v0.2 v2 -- record-level vs in-pair units",
+ "operating_point": {
+  "csv": "tat_predictions_v02_detailed_v2.csv",
+  "json": "TAT_RAMR_v0.2_report_v2.json",
+  "rows": 2400,
+  "in_pair_rows": 648,
+  "planted_key": "is_planted",
+  "pred_key": "predicted_v09"
+ },
+ "result": {
+  "csv_sha256": "1554c47c3294d123e4a5ea9843435f1b018382973c09961f2969d4d568aa6d05",
+  "json_sha256": "d038fbbf1c668502f5ca50a00c72823c62099642affa06c23a35aee730776183",
+  "record_level": {
+   "TP": 242,
+   "FP": 86,
+   "FN": 58,
+   "TN": 2014,
+   "n": 2400,
+   "precision": 0.7378048780487805,
+   "recall": 0.8066666666666666,
+   "f1": 0.7707006369426751,
+   "fp_rate": 0.040952380952380955
+  },
+  "in_pair_level": {
+   "TP": 242,
+   "FP": 86,
+   "FN": 58,
+   "TN": 262,
+   "n": 648,
+   "precision": 0.7378048780487805,
+   "recall": 0.8066666666666666,
+   "f1": 0.7707006369426751,
+   "fp_rate": 0.2471264367816092
+  },
+  "in_pair_rows": 648,
+  "in_pair_planted": 300,
+  "in_pair_not_planted": 348,
+  "pairs_from_column": 324.0,
+  "report_pair_level": {
+   "total_pairs_approx": 324,
+   "TP": 242,
+   "FP": 86,
+   "FN": 58,
+   "detection_rate": 80.67
+  },
+  "tokens_absent_from_report_v2": [
+   "305",
+   "186",
+   "119",
+   "61.0"
+  ],
+  "outside_pairs": {
+   "TP": 0,
+   "FP": 0,
+   "FN": 0,
+   "TN": 1752,
+   "n": 1752,
+   "precision": 0.0,
+   "recall": 0.0,
+   "f1": 0.0,
+   "fp_rate": 0.0
+  },
+  "group_structure": {
+   "groups": 300,
+   "sizes": {
+    "2": 274,
+    "3": 7,
+    "4": 17,
+    "5": 1,
+    "6": 1
+   },
+   "planted_per_group": {
+    "1": 300
+   },
+   "groups_without_planted": 0
+  },
+  "margins_two_member": {
+   "two_member_groups": 274,
+   "distribution": {
+    "-2": 1,
+    "-1": 5,
+    "0": 97,
+    "1": 164,
+    "2": 7
+   },
+   "ties_at_zero": 97,
+   "tie_fraction": 0.354014598540146,
+   "gold_greater": 171,
+   "gold_less": 6
+  },
+  "margin_on_support": {
+   "0": 274
+  },
+  "tie_break": {
+   "tied_pairs": 97,
+   "sign_agrees": 177,
+   "sign_disagrees": 0,
+   "flagged_planted_only": 52,
+   "flagged_gold_only": 45,
+   "flagged_both": 0,
+   "flagged_neither": 0,
+   "rank_split": {
+    "planted_earlier": 52,
+    "gold_earlier": 45
+   },
+   "fn_from_ties": 45,
+   "fp_from_ties": 45
+  }
+ },
+ "checks": [
+  {
+   "label": "LANDED: both artefacts hash to a stated sha256",
+   "passed": true
+  },
+  {
+   "label": "DENOMINATOR",
+   "passed": true
+  },
+  {
+   "label": "LANDED: in-pair cells sum to the in-pair rows",
+   "passed": true
+  },
+  {
+   "label": "CONTROL: report_v2 TP matches the CSV",
+   "passed": true
+  },
+  {
+   "label": "CONTROL: report_v2 FP matches the CSV",
+   "passed": true
+  },
+  {
+   "label": "CONTROL: report_v2 FN matches the CSV",
+   "passed": true
+  },
+  {
+   "label": "CONTROL: report_v2 TN matches the CSV",
+   "passed": true
+  },
+  {
+   "label": "CONTROL: report_v2 f1_corrected matches the CSV",
+   "passed": true
+  },
+  {
+   "label": "LANDED: in_pair takes both values and is not constant",
+   "passed": true
+  },
+  {
+   "label": "LANDED: every planted record is in a pair (else 'same TP/FN' would not follow)",
+   "passed": true
+  },
+  {
+   "label": "LANDED: group structure is measured, not inferred from 648/2",
+   "passed": true
+  },
+  {
+   "label": "CAN FAIL: a group with no planted record would be counted if one existed",
+   "passed": true
+  },
+  {
+   "label": "DENOMINATOR",
+   "passed": true
+  },
+  {
+   "label": "CAN FAIL: `support` is degenerate as a score (margin 0 everywhere), so it is not the field",
+   "passed": true
+  },
+  {
+   "label": "CONTROL: sign of the connectivity margin agrees with predicted_v09 on every signed pair",
+   "passed": true
+  },
+  {
+   "label": "LANDED: tie outcomes and the rank split account for every tied pair",
+   "passed": true
+  },
+  {
+   "label": "CAN FAIL: forcing is_planted=False degenerates the matrix",
+   "passed": true
+  },
+  {
+   "label": "CAN FAIL: the absence detector flags its own plant",
+   "passed": true
+  }
+ ]
+}
