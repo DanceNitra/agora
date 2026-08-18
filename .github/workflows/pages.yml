@@ -52,6 +52,16 @@ jobs:
           # public/, so without this line they are committed and never published -- the file
           # 404s forever and the verify button keeps failing with nothing to debug.
           for t in google*.html BingSiteAuth.xml; do [ -f "$t" ] && cp "$t" _site/ || true; done
+      - name: A new published document may not carry numbers nothing can re-derive
+        run: |
+          # Measured 2026-08-18: of 221 measurements across our published documents, exactly five had
+          # code that re-derives them. One figure -- an "exact L2 local valley depth 0.1902" cited by
+          # a co-authored manuscript -- had stood for weeks with its definition unrecorded, and could
+          # not be reproduced when we finally tried. This is a ratchet, not a sweep: everything that
+          # already existed is grandfathered in tools/number_lock.baseline.json, and only NEW
+          # documents must arrive with a receipt or a declaration of what their figures are.
+          python3 tools/number_lock.py --self-test
+          python3 tools/number_lock.py --ratchet
       - name: Every URL in the sitemap must exist in what we are about to publish
         run: |
           python3 - <<'PY'

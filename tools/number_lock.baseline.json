@@ -1,0 +1,29 @@
+{
+ "uncovered": [
+  "public/memops-headroom/prereg.md",
+  "public/memops-headroom/result.md",
+  "public/posts/2026-06-10-causal-inference-has-a-phase-diagram-even-randomized-experim.md",
+  "public/posts/2026-06-14-a-95-confidence-interval-that-covers-31-of-the-time-differen.md",
+  "public/posts/2026-06-14-more-data-more-wrong-a-bayesian-credible-interval-is-not-cov.md",
+  "public/posts/2026-06-15-your-ai-might-be-training-on-itself-and-we-measured-the-two-.md",
+  "public/posts/2026-06-18-robustness-checks-arent-ritual---theyre-a-measurable-filter-.md",
+  "public/posts/2026-06-18-we-looked-for-the-grounding-tipping-point-in-ai-self-trainin.md",
+  "public/posts/2026-06-19-we-built-a-firewall-for-ai-confidently-wrong-answers---and-i.md",
+  "public/posts/2026-07-25-knowledge-decay-may-not-be-a-slope-it-may-be-a-cliff-you-can.md",
+  "public/posts/src/agent-memory-poisoning-influence-gate.en.md",
+  "public/posts/src/agent-memory-retrieval.en.md",
+  "public/posts/src/agent-memory-retrieval.sk.md",
+  "public/posts/src/ai-coding-productivity-operating-point.en.md",
+  "public/posts/src/chatbot-arena-style-not-skill.en.md",
+  "public/posts/src/defenses-that-failed-their-own-control.en.md",
+  "public/posts/src/founder-led-survivorship-null.en.md",
+  "public/posts/src/good-to-great-zero-skill-null.en.md",
+  "public/posts/src/llm-as-judge-length-confound.en.md",
+  "public/posts/src/memory-defense-veracity-gap.en.md",
+  "public/posts/src/phase-diagram.en.md",
+  "public/posts/src/provenance-vs-inference.en.md",
+  "public/posts/src/reality-check-ai-memory-method-wins.en.md",
+  "public/posts/src/supersession-footgun.en.md",
+  "public/posts/src/verify-agent-memory-deletion.en.md"
+ ]
+}

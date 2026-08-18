@@ -117,6 +117,19 @@ def occurs(value: str, blob: str) -> bool:
     return False
 
 
+# A document may declare that its figures are not ours to re-derive. Some are not: the Crucible
+# procedure notes quote a collaborator's own attached data as illustrations of a method, and no
+# receipt we could write would reproduce numbers we neither measured nor publish. Demanding one
+# would make the tool ask for the impossible, which is how a check gets ignored. So a document can
+# say so, once, and be counted as DECLARED rather than uncovered -- but it has to say it.
+DECLARED = re.compile(r"<!--\s*numbers:\s*(.+?)\s*-->", re.I | re.S)
+
+
+def declaration(text: str) -> str | None:
+    m = DECLARED.search(text)
+    return m.group(1).strip() if m else None
+
+
 def receipt_for(doc: pathlib.Path) -> list[str]:
     """STRONG. Is there code that READS this document and asserts its numbers?
 
@@ -180,6 +193,10 @@ def main(argv) -> int:
     ap.add_argument("--unlocked", action="store_true", help="list only what nothing can reproduce")
     ap.add_argument("--self-test", action="store_true")
     ap.add_argument("--json", action="store_true")
+    ap.add_argument("--ratchet", action="store_true",
+                    help="fail if a document NOT in the baseline publishes numbers with neither a "
+                         "receipt nor a declaration")
+    ap.add_argument("--write-baseline", action="store_true")
     a = ap.parse_args(argv[1:])
     if a.self_test:
         return self_test()
@@ -196,28 +213,64 @@ def main(argv) -> int:
             continue
         uniq = sorted(set(vals))
         rec = receipt_for(f)
+        dec = declaration(text)
         rows.append({"doc": str(f.relative_to(ROOT)).replace("\\", "/"),
                      "measurements": len(uniq),
                      "absent_from_every_artifact": [v for v in uniq if not occurs(v, blob)],
-                     "receipt": rec})
+                     "receipt": rec, "declared": dec})
+
+    # A ratchet, not a big bang. 197 measurements sit in posts written before any of this existed;
+    # demanding receipts for all of them at once would stall and then be switched off, which is how
+    # a gate dies. The baseline freezes what is already there and refuses anything NEW that is
+    # neither re-derivable nor declared.
+    base_path = ROOT / "tools" / "number_lock.baseline.json"
+    uncovered = sorted(r["doc"] for r in rows if not r["receipt"] and not r["declared"])
+    if a.write_baseline:
+        base_path.write_text(json.dumps({"uncovered": uncovered}, indent=1) + "\n", encoding="utf-8")
+        print("baseline written: %d documents grandfathered" % len(uncovered))
+        return 0
+    if a.ratchet:
+        if not base_path.exists():
+            print("no baseline at %s -- run --write-baseline once" % base_path.relative_to(ROOT))
+            return 1
+        old = set(json.loads(base_path.read_text(encoding="utf-8"))["uncovered"])
+        fresh = [d for d in uncovered if d not in old]
+        for d in fresh:
+            print("FAIL %s publishes measurements with neither a receipt nor a declaration." % d)
+        if fresh:
+            print("\nAdd a receipt that opens the document and re-derives its figures, or declare "
+                  "what they are with an HTML comment: <!-- numbers: ... -->")
+            return 1
+        gone = sorted(old - set(uncovered))
+        print("ratchet: %d new document(s) checked, %d still grandfathered%s"
+              % (len(rows) - len(old), len(uncovered),
+                 "; %d newly covered: %s" % (len(gone), ", ".join(gone)) if gone else ""))
+        return 0
 
     tot = sum(r["measurements"] for r in rows)
     with_rec = [r for r in rows if r["receipt"]]
+    with_dec = [r for r in rows if not r["receipt"] and r["declared"]]
     covered = sum(r["measurements"] for r in with_rec)
+    declared_n = sum(r["measurements"] for r in with_dec)
     if a.json:
-        print(json.dumps({"total": tot, "docs_with_receipt": len(with_rec), "docs": rows}, indent=1))
+        print(json.dumps({"total": tot, "docs_with_receipt": len(with_rec),
+                          "docs_declared": len(with_dec), "docs": rows}, indent=1))
         return 0
 
     print("Can anything RE-DERIVE the numbers in our published documents?\n")
-    print("%-56s %6s  %s" % ("document", "meas.", "receipt that reads it and asserts its numbers"))
-    for r in sorted(rows, key=lambda x: (bool(x["receipt"]), -x["measurements"])):
-        if a.unlocked and r["receipt"]:
+    print("%-52s %6s  %s" % ("document", "meas.", "receipt, or a declaration of what they are"))
+    for r in sorted(rows, key=lambda x: (bool(x["receipt"]) or bool(x["declared"]), -x["measurements"])):
+        if a.unlocked and (r["receipt"] or r["declared"]):
             continue
-        print("%-56s %6d  %s" % (r["doc"][-56:], r["measurements"],
-                                 ", ".join(r["receipt"]) if r["receipt"] else "-- none --"))
+        state = (", ".join(r["receipt"]) if r["receipt"]
+                 else ("declared: " + r["declared"][:46]) if r["declared"] else "-- none --")
+        print("%-52s %6d  %s" % (r["doc"][-52:], r["measurements"], state))
     print("\n%d distinct measurements across %d documents." % (tot, len(rows)))
-    print("%d documents (%d of the measurements, %.0f%%) have a receipt that re-derives them."
+    print("%d documents (%d measurements, %.0f%%) have a receipt that re-derives them."
           % (len(with_rec), covered, 100.0 * covered / tot if tot else 0))
+    print("%d documents (%d measurements, %.0f%%) declare their figures are not ours to re-derive."
+          % (len(with_dec), declared_n, 100.0 * declared_n / tot if tot else 0))
+    print("%d measurements are neither." % (tot - covered - declared_n))
     print("\nThe weaker question -- does the digit string occur anywhere in a committed artifact --")
     print("says %d of %d are missing. Do not read that as reassurance: 0.1902, the figure we proved"
           % (sum(len(r["absent_from_every_artifact"]) for r in rows), tot))

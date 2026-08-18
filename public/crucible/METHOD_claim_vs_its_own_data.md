@@ -1,5 +1,8 @@
 # Checking a claim against the data that is supposed to support it
 
+<!-- numbers: illustrative, from the collaborator's own attached files in the rounds described. They are quoted to show what the checks find, are not our measurements, and are not ours to publish or re-derive. -->
+
+
 A Crucible procedure. Written 2026-07-29 from four consecutive rounds on a live collaboration, where
 every round produced a claim contradicted by the author's own attached file.
 
