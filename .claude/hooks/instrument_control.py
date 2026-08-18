@@ -36,6 +36,17 @@ MAX_LINES = 3
 # (name, does the COMMAND look like this, does the OUTPUT look like this, what to do instead)
 RULES = [
     (
+        "draft-is-not-a-send-record",
+        # "." rather than a character class, so it matches either path separator
+        re.compile(r"\b(cat|head|tail|sed|less|type|Get-Content)\b[^|]*agora_output.drafts.", re.I),
+        lambda out: True,
+        "you are reading a DRAFT. Nothing deletes a draft when it is posted, so the folder records "
+        "what was WRITTEN, never what was SENT. On 2026-08-18 a retraction sitting in drafts/ was "
+        "reported to the owner as unsent; it had been public on DeepSeek-V3#1466 for two days "
+        "(comment 5309136671) and an entire briefing was built on that. Ask the destination: "
+        "`python tools/draft_sent_check.py <file>` (exit 1 = already public).",
+    ),
+    (
         "absence",
         re.compile(r"\b(grep|rg|find|ls)\b(?!.*\|\s*(wc|sort|uniq|head|tail)\b.*\|)", re.I),
         lambda out: _looks_empty(out),
