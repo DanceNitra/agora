@@ -122,6 +122,17 @@ check("isotropy binds the two independent implementations: <sz sz>_multiplet == 
       worst < 1e-6 and npts > 80,
       "max deviation %.2e over %d shared scan points, two different state spaces and routines" % (worst, npts))
 
+# 6d -- the feature does not survive a CONTINUOUS observable. The ground space at s=1 contains the
+# state that continues from either side; the value it carries equals both one-sided limits, so the
+# continuous continuation of E through s=1 has no feature at all.
+DISC = json.loads((HERE / "edrn_the_observable_is_discontinuous_at_s1.result.json").read_text())
+check("the continuous continuation of E through s=1 shows NO feature",
+      DISC["continuous_continuation_has_no_feature"] and DISC["gap_max_vs_limits"] < 5e-4,
+      "one-sided limits ~0.159660 vs attainable max at s=1 %.8f (differ by %.1e); the symmetric "
+      "mixture over the enlarged space gives %.8f, and the manuscript's own default-control table "
+      "reports 0.159658 -- i.e. its other calculation already lands on the continuous value"
+      % (DISC["attainable_max"], DISC["gap_max_vs_limits"], DISC["at_s1_symmetric"]))
+
 # 7 -- structure: no two tips adjacent, verified by two isomorphic constructions
 g = nx.Graph(e)
 tips = [v for v in g if g.degree(v) == 2]
