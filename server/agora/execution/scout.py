@@ -28,11 +28,17 @@ _STORE = Path(__file__).resolve().parents[2] / ".scout.json"
 # inspeximus can answer a real open GitHub issue with EVIDENCE (a measured receipt or a competitor-gap the
 # vault documents). Off-mission themes (generic causal-inference, forecasting, KG-completion, CSD, multi-
 # agent orchestration) were removed — they diluted the hourly rotation onto low-fit, off-inspeximus repos.
+# THE BOARD DEPRIORITISES THE RETRIEVAL AXIS IN ITS OWN WORDS: "RAG chunking, reranking,
+# long-context comparisons and multi-hop retrieval quality are a measured dead end for us and must
+# never admit work on their own." Two themes here contradicted that -- "RAG memory retrieval
+# forgetting" and "multi-hop retrieval memory" -- and this rotation is hourly, so 2 of 18 meant
+# ~11% of every day's scanning fed the dead end. Measured 2026-08-18: 13 of one inbox's 59 tasks
+# were external leads on that axis, every one triaged away again at the far end. Removed here,
+# which is where they were produced.
 _THEMES = [
     # core agent-memory
     "agent memory consolidation",
     "LLM long-term memory",
-    "RAG memory retrieval forgetting",
     "vector store memory pruning",
     "personal knowledge management note decay",
     "experience replay catastrophic forgetting",
@@ -44,7 +50,6 @@ _THEMES = [
     "agent memory undo revert correction",
     "temporal validity bitemporal agent memory",
     "agent memory poisoning defense",
-    "multi-hop retrieval memory",
     # ecosystem / product wedge (where an inspeximus adapter or the MCP server is a concrete fit)
     "LangChain agent memory",
     "CrewAI agent memory",
@@ -54,6 +59,33 @@ _THEMES = [
 ]
 _STOP = frozenset("the a an of for to in on and or is are how do does can with this that your you "
                   "what when where why who which from into our we us it its as be by at".split())
+
+
+
+def _live_themes() -> list[str]:
+    """`_THEMES` minus any theme the gatekeeper has explicitly refused.
+
+    The skip list was consumed only by the dungeon's quest filter (dungeon_os/agent_worker.py:1186);
+    the Scout rotated a hard-coded list and never read it. Measured 2026-08-18: two skips were
+    recorded for the retrieval axis that morning and the Scout was still sitting on
+    "multi-hop retrieval memory" that evening.
+
+    EXACT match, deliberately. The skip store holds free text -- whole hypothesis sentences among
+    them -- and a fuzzy matcher between that and a fixed theme list is the "criterion wider than the
+    property" trap: it would silently refuse themes nobody skipped. An exact skip is a precise
+    instruction and is honoured precisely; anything else is left alone and stays visible in the list.
+
+    FAILS OPEN. If the store is unreadable, or if every theme were somehow refused, the rotation is
+    returned unchanged rather than empty -- a scout scanning nothing looks identical to a dead organ,
+    and is worse than one scanning the wrong thing.
+    """
+    try:
+        from agora.execution.gatekeeper import skipped_themes
+        refused = {str(t).strip().lower() for t in (skipped_themes() or [])}
+    except Exception:                                                   # noqa: BLE001
+        return list(_THEMES)
+    live = [t for t in _THEMES if t.strip().lower() not in refused]
+    return live or list(_THEMES)
 
 
 def _load() -> list:
@@ -92,8 +124,9 @@ def find_opportunity() -> dict | None:
     mere keyword match on a solo personal project is not surfaced as an outreach target."""
     from agora.execution.correspondent import _api
     seen = {x.get("url") for x in _load()}
-    rot = int(time.time() // 3600) % len(_THEMES)
-    theme = _THEMES[rot]
+    _live = _live_themes()
+    rot = int(time.time() // 3600) % len(_live)
+    theme = _live[rot]
     theme_words = _words(theme)
     q = urllib.parse.quote(f'{theme} is:issue is:open')
     try:
@@ -383,8 +416,9 @@ def find_learning() -> dict | None:
     """
     from agora.execution.correspondent import _api
     seen = {x.get("url") for x in box_load()} | {x.get("url") for x in _load()}
-    rot = int(time.time() // 3600) % len(_THEMES)
-    theme = _THEMES[rot]
+    _live = _live_themes()
+    rot = int(time.time() // 3600) % len(_live)
+    theme = _live[rot]
     q = urllib.parse.quote(f"{theme} is:pr is:merged")
     try:
         res = _api("GET", f"/search/issues?q={q}&sort=updated&order=desc&per_page=15")
