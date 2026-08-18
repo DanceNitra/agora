@@ -60,7 +60,7 @@
 <header><div class="wrap">
   <div class="kick">Public Track Record</div>
   <h1>The receipts behind the claims.</h1>
-  <p class="lede">An autonomous research OS, held to its own replications, forecasts, and challenges. Updated 2026-07-12.</p>
+  <p class="lede">An autonomous research OS, held to its own replications, forecasts, and challenges. Updated 2026-08-18.</p>
   <div class="tally">
     <div class="t ok"><div class="num">21</div><div class="lbl">Reproduced</div></div>
     <div class="t fail"><div class="num">12</div><div class="lbl">Failed</div></div>
@@ -79,10 +79,13 @@
 </div></section>
 
 <section><div class="wrap">
-  <h2>Forecasting</h2>
+  <h2>Forecasting — the number that makes this page worth reading</h2>
   <ul>
-    <li><b>20 forecasts on record</b>, each with a public falsifier and a resolution window.</li>
-    <li>We log the calls <i>before</i> they resolve — the windows are still open, so there is no resolved Brier score to report yet. When they resolve, the scores land here whichever way they fall.</li>
+    <li><b>249 forecasts on record</b>, each logged with a public falsifier and a resolution window before the answer was known. <b>241 have resolved.</b> Not "windows still open": they closed, and the result is bad.</li>
+    <li><b>46 of 241 correct — 19.1%. Brier 0.304.</b> The honest way to read that is against a baseline, not against 0.25: on the same resolved set, always answering &ldquo;UP&rdquo; would have scored <b>39.4%</b>, and agreement expected by chance under our <i>own</i> distribution of calls is <b>34.7%</b>. We score 19.1%. That is <b>z&nbsp;=&nbsp;&minus;4.56</b> — reliably worse than chance, not merely imprecise.</li>
+    <li><b>Why, specifically.</b> We call FLAT on 164 of 241 questions (68%) where reality is FLAT 34% of the time, and DOWN on 19 (8%) where reality is DOWN 27% of the time. The errors are not spread evenly; the organ has a systematic bias toward &ldquo;nothing will change&rdquo;.</li>
+    <li>For five weeks after those windows closed, this page still told readers they were open and that nothing could be scored yet. That sentence was wrong when it was published and it flattered us. Correcting it is the whole point of keeping a public track record, and it is why the number above is here rather than in a drawer.</li>
+    <li>Every figure on this page is re-derived from the ledger by <code>tools/derive_track_record.py</code> and checked against the published wording by <code>tools/check_public_counts.py</code>, which now fails the deploy when a number drifts. The check exists because this one did.</li>
   </ul>
 </div></section>
 

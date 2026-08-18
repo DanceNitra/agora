@@ -52,6 +52,13 @@ jobs:
           # public/, so without this line they are committed and never published -- the file
           # 404s forever and the verify button keeps failing with nothing to debug.
           for t in google*.html BingSiteAuth.xml; do [ -f "$t" ] && cp "$t" _site/ || true; done
+      - name: Every published number must equal its ledger
+        # This check has existed since 2026-07-28 with "wire it into CI" in its own docstring, and was
+        # wired into nothing. Measured 2026-08-18: it was reporting two real drifts that nobody saw,
+        # while the track-record page told the world we had 20 forecasts and no score to report -- the
+        # ledger held 241 resolved and a Brier of 0.304. A guard nothing invokes is not a guard.
+        run: python3 tools/check_public_counts.py
+
       - name: Every URL in the sitemap must exist in what we are about to publish
         run: |
           python3 - <<'PY'
