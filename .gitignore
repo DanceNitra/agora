@@ -242,3 +242,6 @@ agora_output/log_archive/
 
 # a dry-run copy of the private auto-memory index -- never publish it
 probes/an_index_that_fits_the_window.candidate.md
+
+# pinned copies of the PRIVATE auto-memory index; the probes need them, the public repo must not have them
+probes/fixtures/
