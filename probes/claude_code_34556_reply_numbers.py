@@ -57,23 +57,29 @@ ck("the four verdict names", *says("COST_MEASURED", "NOT_YET_MEASURABLE", "ZERO_
 ck("the model-free companion", *says("collides_at_length", "headroom_chars", "positions_saturated"))
 
 # ---------------------------------------------------------------- the positive control we quote
-keys = [uuid.uuid4().hex for _ in range(4000)]
-got, want = [], []
-for length in (4, 6, 8):
-    got.append(_prefix_collision_threshold(keys, length))
-    want.append(math.ceil(math.sqrt(2 * (16 ** length) * math.log(1 / 0.99))))
-worst = max(abs(g - w) / w for g, w in zip(got, want))
-ck("measured thresholds track the analytic ones", worst < 0.02, "worst %.3f%%" % (100 * worst))
+# THE ESTIMATOR IS STOCHASTIC, so one draw cannot establish a tolerance and a gate built on one
+# draw would flap. Measured over 20 draws while writing this: worst-per-draw 0.60%..1.04%, median
+# 0.74%. The draft quotes 1.5%; this re-measures over several draws and holds it to that.
+want = [math.ceil(math.sqrt(2 * (16 ** L) * math.log(1 / 0.99))) for L in (4, 6, 8)]
+per_draw = []
+for _ in range(6):
+    ks = [uuid.uuid4().hex for _ in range(4000)]
+    got = [_prefix_collision_threshold(ks, L) for L in (4, 6, 8)]
+    per_draw.append(max(abs(g - w) / w for g, w in zip(got, want)))
+worst = max(per_draw)
+ck("measured thresholds track the analytic ones across draws", worst < 0.015,
+   "worst of %d draws %.3f%%" % (len(per_draw), 100 * worst))
 ck("the analytic triple is quoted", *says("37 / 581 /", "9,292"))
 # The measured triple is STOCHASTIC -- 4,000 fresh UUIDs give a different third figure every run --
 # so the draft must quote the tolerance and not the sample. This check is what caught the draft
 # quoting 9,233, a number that had already stopped being reproducible when it was written.
 ck("draft quotes no sampled threshold",
    not any(str(g) in TEXT or "{:,}".format(g) in TEXT for g in got if g not in want),
-   "sampled %s" % got)
-ck("agreement is inside the tolerance the draft claims", worst < 0.007,
-   "draft says 0.7%%, measured %.3f%%" % (100 * worst))
-ck("draft says 0.7%", *says("0.7%"))
+   "last draw %s" % got)
+ck("agreement is inside the bound the draft claims", worst < 0.015,
+   "draft says 1.5%%, worst of %d draws %.3f%%" % (len(per_draw), 100 * worst))
+ck("draft quotes the bound and the spread it came from",
+   *says("20 independent draws", "0.60% to 1.04%", "median 0.74%", "within 1.5%"))
 
 # path-like keys must collapse the threshold, which is the case a hex bound gets wrong
 ck("path-like keys collapse to 1",
@@ -139,8 +145,19 @@ ck("both detectors fire on planted mirrors", fired_l and fired_t)
 ck("draft claims the control", *says("Both detectors fire on planted mirrors"))
 
 # ---------------------------------------------------------------- claims we must NOT make
-ck("does not claim PyPI, which has not been published",
-   "on PyPI" not in TEXT, "the draft must not say PyPI until a tag has shipped")
+# THE CLAIM FLIPPED once v2.15.0 was tagged and CI published it, so the check flips with it: the
+# draft may now say PyPI, and this asserts the package really is installable at that version from
+# the index rather than merely that a workflow went green. The first install attempt after the
+# workflow reported success returned "No matching distribution found" -- the upload had not
+# propagated -- which is precisely why the green tick is not the evidence.
+import json as _json
+import urllib.request as _url
+with _url.urlopen("https://pypi.org/pypi/inspeximus/json", timeout=30) as r:
+    _pypi = _json.load(r)
+ck("2.15.0 is really on PyPI", "2.15.0" in _pypi["releases"] and _pypi["info"]["version"] == "2.15.0",
+   "index says latest=%s" % _pypi["info"]["version"])
+ck("draft claims PyPI and says how it was verified",
+   *says("on PyPI", "installing it from PyPI into a clean environment"))
 
 bad = [c for c in checks if not c[1]]
 w = max(len(c[0]) for c in checks)
