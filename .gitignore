@@ -239,3 +239,6 @@ gate.err
 # a 2.4 GB pile of logs put into it cannot be taken back out without rewriting history for every
 # clone. They are backed up as GitHub RELEASE ASSETS, which live outside the object store.
 agora_output/log_archive/
+
+# a dry-run copy of the private auto-memory index -- never publish it
+probes/an_index_that_fits_the_window.candidate.md

@@ -1,0 +1,276 @@
+{
+ "results": {
+  "S0  this morning, crowded": {
+   "opaque": {
+    "bytes": 20020,
+    "lines": 122,
+    "fits": true,
+    "complete": true,
+    "reachable": 230,
+    "questions": 0.2,
+    "searchbox": 0.2916666666666667
+   },
+   "split": {
+    "bytes": 20020,
+    "lines": 122,
+    "fits": true,
+    "complete": true,
+    "reachable": 230,
+    "questions": 0.2916666666666667,
+    "searchbox": 0.425
+   }
+  },
+  "S1  tonight, written lines (LIVE)": {
+   "opaque": {
+    "bytes": 42666,
+    "lines": 249,
+    "fits": false,
+    "complete": true,
+    "reachable": 134,
+    "questions": 0.3416666666666667,
+    "searchbox": 0.38333333333333336
+   },
+   "split": {
+    "bytes": 42666,
+    "lines": 249,
+    "fits": false,
+    "complete": true,
+    "reachable": 134,
+    "questions": 0.3333333333333333,
+    "searchbox": 0.425
+   }
+  },
+  "T3  every hook cut to 3 words": {
+   "opaque": {
+    "bytes": 23389,
+    "lines": 200,
+    "fits": true,
+    "complete": true,
+    "reachable": 230,
+    "questions": 0.4083333333333333,
+    "searchbox": 0.5166666666666667
+   },
+   "split": {
+    "bytes": 23389,
+    "lines": 200,
+    "fits": true,
+    "complete": true,
+    "reachable": 230,
+    "questions": 0.44166666666666665,
+    "searchbox": 0.5833333333333334
+   }
+  },
+  "T4  every hook cut to 4 words": {
+   "opaque": {
+    "bytes": 25151,
+    "lines": 200,
+    "fits": false,
+    "complete": true,
+    "reachable": 229,
+    "questions": 0.43333333333333335,
+    "searchbox": 0.5416666666666666
+   },
+   "split": {
+    "bytes": 25151,
+    "lines": 200,
+    "fits": false,
+    "complete": true,
+    "reachable": 229,
+    "questions": 0.45,
+    "searchbox": 0.6
+   }
+  },
+  "T5  every hook cut to 5 words": {
+   "opaque": {
+    "bytes": 26761,
+    "lines": 200,
+    "fits": false,
+    "complete": true,
+    "reachable": 212,
+    "questions": 0.4083333333333333,
+    "searchbox": 0.5166666666666667
+   },
+   "split": {
+    "bytes": 26761,
+    "lines": 200,
+    "fits": false,
+    "complete": true,
+    "reachable": 212,
+    "questions": 0.44166666666666665,
+    "searchbox": 0.5916666666666667
+   }
+  },
+  "T6  every hook cut to 6 words": {
+   "opaque": {
+    "bytes": 28419,
+    "lines": 200,
+    "fits": false,
+    "complete": true,
+    "reachable": 198,
+    "questions": 0.375,
+    "searchbox": 0.48333333333333334
+   },
+   "split": {
+    "bytes": 28419,
+    "lines": 200,
+    "fits": false,
+    "complete": true,
+    "reachable": 198,
+    "questions": 0.39166666666666666,
+    "searchbox": 0.55
+   }
+  },
+  "L6    the sentence IS the link, 6 words": {
+   "opaque": {
+    "bytes": 21970,
+    "lines": 200,
+    "fits": true,
+    "complete": true,
+    "reachable": 230,
+    "questions": 0.38333333333333336,
+    "searchbox": 0.5166666666666667
+   },
+   "split": {
+    "bytes": 21970,
+    "lines": 200,
+    "fits": true,
+    "complete": true,
+    "reachable": 230,
+    "questions": 0.45,
+    "searchbox": 0.6166666666666667
+   }
+  },
+  "L8    the sentence IS the link, 8 words": {
+   "opaque": {
+    "bytes": 25204,
+    "lines": 200,
+    "fits": false,
+    "complete": true,
+    "reachable": 228,
+    "questions": 0.44166666666666665,
+    "searchbox": 0.5666666666666667
+   },
+   "split": {
+    "bytes": 25204,
+    "lines": 200,
+    "fits": false,
+    "complete": true,
+    "reachable": 228,
+    "questions": 0.5083333333333333,
+    "searchbox": 0.65
+   }
+  },
+  "L10   the sentence IS the link, 10 words": {
+   "opaque": {
+    "bytes": 28432,
+    "lines": 200,
+    "fits": false,
+    "complete": true,
+    "reachable": 200,
+    "questions": 0.4166666666666667,
+    "searchbox": 0.525
+   },
+   "split": {
+    "bytes": 28432,
+    "lines": 200,
+    "fits": false,
+    "complete": true,
+    "reachable": 200,
+    "questions": 0.44166666666666665,
+    "searchbox": 0.5833333333333334
+   }
+  },
+  "L12   the sentence IS the link, 12 words": {
+   "opaque": {
+    "bytes": 31216,
+    "lines": 200,
+    "fits": false,
+    "complete": true,
+    "reachable": 183,
+    "questions": 0.43333333333333335,
+    "searchbox": 0.4666666666666667
+   },
+   "split": {
+    "bytes": 31216,
+    "lines": 200,
+    "fits": false,
+    "complete": true,
+    "reachable": 183,
+    "questions": 0.44166666666666665,
+    "searchbox": 0.5416666666666666
+   }
+  },
+  "L14   the sentence IS the link, 14 words": {
+   "opaque": {
+    "bytes": 33612,
+    "lines": 200,
+    "fits": false,
+    "complete": true,
+    "reachable": 171,
+    "questions": 0.39166666666666666,
+    "searchbox": 0.43333333333333335
+   },
+   "split": {
+    "bytes": 33612,
+    "lines": 200,
+    "fits": false,
+    "complete": true,
+    "reachable": 171,
+    "questions": 0.425,
+    "searchbox": 0.49166666666666664
+   }
+  },
+  "L18   the sentence IS the link, 18 words": {
+   "opaque": {
+    "bytes": 35686,
+    "lines": 200,
+    "fits": false,
+    "complete": true,
+    "reachable": 161,
+    "questions": 0.39166666666666666,
+    "searchbox": 0.43333333333333335
+   },
+   "split": {
+    "bytes": 35686,
+    "lines": 200,
+    "fits": false,
+    "complete": true,
+    "reachable": 161,
+    "questions": 0.4166666666666667,
+    "searchbox": 0.48333333333333334
+   }
+  },
+  "L-    the sentence IS the link, all words": {
+   "opaque": {
+    "bytes": 36180,
+    "lines": 200,
+    "fits": false,
+    "complete": true,
+    "reachable": 159,
+    "questions": 0.39166666666666666,
+    "searchbox": 0.43333333333333335
+   },
+   "split": {
+    "bytes": 36180,
+    "lines": 200,
+    "fits": false,
+    "complete": true,
+    "reachable": 159,
+    "questions": 0.4166666666666667,
+    "searchbox": 0.48333333333333334
+   }
+  }
+ },
+ "n_entries": 230,
+ "line_cap": 200,
+ "byte_cap": 25000,
+ "winner_opaque": [
+  "T3  every hook cut to 3 words",
+  "L6    the sentence IS the link, 6 words"
+ ],
+ "winner_split": [
+  "L6    the sentence IS the link, 6 words",
+  "T3  every hook cut to 3 words"
+ ],
+ "instrument_agrees": false
+}

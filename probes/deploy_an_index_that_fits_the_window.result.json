@@ -1,0 +1,21 @@
+{
+ "entries": 230,
+ "human_hooks": 36,
+ "sentences_kept": 42,
+ "bare": 152,
+ "pair_from": 130,
+ "bytes": 24923,
+ "lines": 200,
+ "reachable": 231,
+ "controls": {
+  "every link present, identical, in order": true,
+  "every link title unchanged": true,
+  "every hand-written hook survives verbatim": true,
+  "every heading and non-entry line verbatim": true,
+  "no bracket introduced into any kept hook": true,
+  "fits the 200-line cap": true,
+  "fits the 25,000-byte cap as it lands on disk": true,
+  "EVERY entry is inside the window that loads": true
+ },
+ "all_pass": true
+}
