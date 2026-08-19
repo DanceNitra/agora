@@ -53,6 +53,19 @@ def lost_at(keys, L):
 
 ck("the library is 2.17.0", inspeximus.__version__ == "2.17.0", inspeximus.__version__)
 ck("draft names it", *says("2.17.0"))
+# The claim that it is installable is checked against the index, not against a green workflow: the
+# first install after each of the last two releases returned "No matching distribution found" while
+# the publish job was already reporting success.
+# THE SIMPLE INDEX, not the JSON API: pip reads the former, and the two do not update together.
+# Measured minutes apart today -- `pip install inspeximus==2.17.0` succeeded while the JSON API still
+# named 2.16.0 as latest and did not list the release at all. The claim is that a user can install
+# it, so the check is the file list a user's installer resolves against.
+import urllib.request as _url
+with _url.urlopen("https://pypi.org/simple/inspeximus/", timeout=30) as _r:
+    _index = _r.read().decode("utf-8", "replace")
+ck("2.17.0 is on the index pip reads", "inspeximus-2.17.0-py3-none-any.whl" in _index,
+   "the JSON API can lag this by minutes in either direction")
+ck("draft says how that was verified", *says("installing it from the index into a clean environment"))
 
 # ---------------------------------------------------------------- his two populations, as run
 rng = random.Random(20260819)
