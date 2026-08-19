@@ -101,7 +101,7 @@ class BM25:
 
 # ---------------------------------------------------------------- the fixtures, asserted
 STATES = {"01-crowded": 20020, "02-uncrowded": 19990, "03-written-lines": 42664,
-          "04-window-fitted": 24923}
+          "04-window-fitted": 23959}
 raw = {}
 for name, size in STATES.items():
     p = FIX / ("MEMORY.md." + name)
@@ -115,15 +115,27 @@ ARCH = (FIX / "MEMORY_ARCHIVE.md").read_text(encoding="utf-8")
 
 
 def lines_of(txt, with_archive=True):
+    """file -> its index line. THE FOOTER'S POINTER TO THE ARCHIVE IS A LINK, NOT AN ENTRY, and
+    counting it inflated reach by one on files whose footer still loads and not on files where it
+    was truncated away -- an off-by-one that moves with the very truncation it is measuring."""
     src = txt + ("\n" + ARCH if with_archive else "")
     d = {}
     for line in src.splitlines():
         for fn in re.findall(r"\]\(([^)]+\.md)\)", line):
-            d.setdefault(fn, line.strip())
+            if fn != "MEMORY_ARCHIVE.md":
+                d.setdefault(fn, line.strip())
     return d
 
 
-def loaded(txt, byte_cap=25000, line_cap=200):
+# TWO DIFFERENT CONSTANTS, and conflating them silently re-scores history. RUNTIME_CAP is what the
+# product loads and is the only figure the ladder may use -- changing it to our own, more
+# conservative deploy target moved "96 entries outside the window" to 101 and +0.092 to +0.075, which
+# would have described a truncation that never happened. DEPLOY_TARGET is where WE choose to sit,
+# below both readings of the stated "24.4KB", and it belongs only to the rebuilt file.
+RUNTIME_CAP, DEPLOY_TARGET = 25000, 24000
+
+
+def loaded(txt, byte_cap=RUNTIME_CAP, line_cap=200):
     kept, total = [], 0
     for line in txt.split("\n"):
         b = len(line.encode("utf-8")) + 2
@@ -223,59 +235,87 @@ for lab, txt in (("crowded", raw["01-crowded"]), ("uncrowded", raw["02-uncrowded
                  ("written", raw["03-written-lines"]), ("fitted", raw["04-window-fitted"])):
     idx = lines_of(loaded(txt), with_archive=False)
     rows[lab] = (rec(ranks(idx, qa6), 3), rec(ranks(idx, qb), 3), len(idx))
-ck("at what LOADS, the un-crowding gave q +0.050 / sb +0.092",
-   abs(rows["uncrowded"][0] - rows["crowded"][0] - 0.050) < .005
+ck("at what LOADS, the un-crowding gave q +0.042 / sb +0.092",
+   abs(rows["uncrowded"][0] - rows["crowded"][0] - 0.042) < .005
    and abs(rows["uncrowded"][1] - rows["crowded"][1] - 0.092) < .005,
    "q %+.3f sb %+.3f" % (rows["uncrowded"][0] - rows["crowded"][0],
                          rows["uncrowded"][1] - rows["crowded"][1]))
-ck("draft says it", *says("q +0.050 · sb +0.092"))
+ck("draft says it", *says("q +0.042 · sb +0.092"))
 ck("at what LOADS, the written lines gave q +0.092 / sb +0.000",
    abs(rows["written"][0] - rows["uncrowded"][0] - 0.092) < .005
    and abs(rows["written"][1] - rows["uncrowded"][1]) < .005,
    "q %+.3f sb %+.3f" % (rows["written"][0] - rows["uncrowded"][0],
                          rows["written"][1] - rows["uncrowded"][1]))
 ck("draft says it", *says("q +0.092 · sb +0.000"))
-ck("net for the day at what loads, 0.200 -> 0.342 and 0.292 -> 0.383",
-   abs(rows["crowded"][0] - 0.200) < .005 and abs(rows["written"][0] - 0.342) < .005
+ck("net for the day at what loads, 0.208 -> 0.342 and 0.292 -> 0.383",
+   abs(rows["crowded"][0] - 0.208) < .005 and abs(rows["written"][0] - 0.342) < .005
    and abs(rows["crowded"][1] - 0.292) < .005 and abs(rows["written"][1] - 0.383) < .005,
    "q %.3f->%.3f sb %.3f->%.3f" % (rows["crowded"][0], rows["written"][0],
                                    rows["crowded"][1], rows["written"][1]))
-ck("draft says it", *says("0.200 → 0.342", "0.292 →\n0.383"))
-ck("96 of 230 entries were outside the window",
-   len(lines_of(raw["03-written-lines"], False)) - rows["written"][2] == 96,
+ck("draft says it", *says("0.208 → 0.342", "0.292 → 0.383"))
+ck("95 of 229 entries were outside the window",
+   len(lines_of(raw["03-written-lines"], False)) - rows["written"][2] == 95,
    "%d outside" % (len(lines_of(raw["03-written-lines"], False)) - rows["written"][2]))
-ck("draft says it", *says("96 of 230 entries were outside the window"))
+ck("draft says it", *says("95 of its 229 entries — 41% — were outside the window"))
 ck("the written-lines file was 42,666 bytes / 248 lines -- as DEPLOYED",
    *says("42,666 bytes, 248 lines"))
 ck("the pinned reconstruction is within 2 bytes of that",
    abs(len(raw["03-written-lines"].replace("\n", "\r\n").encode("utf-8")) - 42666) <= 2,
    "%d B" % len(raw["03-written-lines"].replace("\n", "\r\n").encode("utf-8")), "control")
-ck("the rebuild: 24,923 bytes, 200 lines, 231 of 231 inside",
-   len(raw["04-window-fitted"].replace("\n", "\r\n").encode("utf-8")) == 24923
+ck("the rebuild: 23,959 bytes, 200 lines, 230 of 230 inside",
+   len(raw["04-window-fitted"].replace("\n", "\r\n").encode("utf-8")) == 23959
    and len(raw["04-window-fitted"].splitlines()) == 200
-   and rows["fitted"][2] == len(lines_of(raw["04-window-fitted"], False)) == 231,
+   and rows["fitted"][2] == len(lines_of(raw["04-window-fitted"], False)) == 230,
    "%d B, %d lines, %d reachable" % (
        len(raw["04-window-fitted"].replace("\n", "\r\n").encode("utf-8")),
        len(raw["04-window-fitted"].splitlines()), rows["fitted"][2]))
-ck("draft says it", *says("24,923 bytes, 200 lines, 231 of 231 entries inside the window"))
+ck("draft says it", *says("23,959 bytes, 200 lines, 230 of 230 entries inside the window"))
 ck("the rebuild beats the deployed file on both registers",
    rows["fitted"][0] >= rows["written"][0] and rows["fitted"][1] >= rows["written"][1],
    "q %.3f vs %.3f, sb %.3f vs %.3f" % (rows["fitted"][0], rows["written"][0],
                                         rows["fitted"][1], rows["written"][1]))
-ck("draft's rebuild figures", *says("0.342 → **0.367**", "0.383 → **0.458**"))
+ck("draft's rebuild figures, and it calls the tie a tie",
+   *says("0.342 → **0.358**, a margin too small to lean on", "0.383 → **0.442**"))
 ck("they are what the fixtures give ON THE SAME DENOMINATOR AS THE ROWS ABOVE",
-   abs(rows["fitted"][0] - 0.367) < .005 and abs(rows["fitted"][1] - 0.458) < .005,
+   abs(rows["fitted"][0] - 0.358) < .005 and abs(rows["fitted"][1] - 0.442) < .005,
    "q %.3f sb %.3f" % (rows["fitted"][0], rows["fitted"][1]))
-ck("the draft no longer carries the mixed-denominator pair",
-   "0.342 → 0.358" not in TEXT and "0.383 → 0.450" not in TEXT)
-ck("the ~71-byte scaffolding figure", *says("~71 bytes per entry on scaffolding"))
+# Check the superseded PHRASES, not the bare digits: "0.350" is also the score of an unrelated
+# variant in the section-4 table, and a substring test on a number cannot tell those apart.
+ck("no superseded rebuild figure survives in the draft",
+   "0.342 → **0.367**" not in TEXT and "0.383 → **0.458**" not in TEXT
+   and "0.342 → **0.350**" not in TEXT)
+ck("the 68-byte scaffolding figure", *says("median **68 bytes per entry** on"))
+# THE STORE WAS ALREADY AT THE EDGE two days before any of this, which is what separates a finding
+# from a self-inflicted wound. Re-derived from the 08-17 backup rather than asserted.
+_aug17 = FIX / "MEMORY.md.05-2026-08-17"
+if _aug17.exists():
+    _r = _aug17.read_bytes()
+    _t = _aug17.read_text(encoding="utf-8")
+    _links = re.findall(r"\]\(([^)]+\.md)\)", _t)
+    _costs = sorted(len(ch.encode("utf-8")) + 3 for line in _t.splitlines()
+                    if line.strip().startswith("- ") and "](" in line
+                    for ch in re.split(r"\s+·\s+", line.strip()[2:]) if "](" in ch)
+    _med = _costs[len(_costs) // 2]
+    _head = 25000 - len(_r)
+    ck("on 2026-08-17 the index was 24,015 B, 96.1%% of the cap, 254 entries, all loading",
+       len(_r) == 24015 and len(_links) == 254 and abs(100 * len(_r) / 25000 - 96.1) < 0.1,
+       "%d B, %d entries" % (len(_r), len(_links)))
+    ck("an entry cost a median 71 B there, so 10-13 more would have truncated it",
+       _med == 71 and 10 <= _head // _med <= 13, "median %d B, room for %d" % (_med, _head // _med))
+    ck("draft says it", *says("24,015 bytes — 96.1% of the cap — with 254 entries",
+                              "ten to thirteen memories away"))
+    ck("the draft separates the arithmetic claim from the instrument-dependent one",
+       *says("arithmetic on bytes and lines", "still has to accept the 96"))
+else:
+    ck("the 2026-08-17 fixture is pinned", False, "missing -- pin it before quoting the figure",
+       "fixture")
 sc = 0
 for f, line in lines_of(raw["03-written-lines"], False).items():
     m = re.search(r"\[([^\]]*)\]\(([^)]+\.md)\)", line)
     if m:
         sc += len(m.group(1)) + len(m.group(2)) + 6
-ck("scaffolding really is ~71 B/entry",
-   68 <= sc / len(lines_of(raw["03-written-lines"], False)) <= 74,
+ck("scaffolding really is ~68-71 B/entry",
+   66 <= sc / len(lines_of(raw["03-written-lines"], False)) <= 74,
    "%.1f B" % (sc / len(lines_of(raw["03-written-lines"], False))))
 
 # ---------------------------------------------------------------- READ from committed artifacts

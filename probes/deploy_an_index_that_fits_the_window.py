@@ -48,7 +48,12 @@ BACKUP = MEM / "MEMORY.md.bak-20260819-prewindowfit"
 HERE = pathlib.Path(__file__).parent
 OUT = HERE / "deploy_an_index_that_fits_the_window.result.json"
 
-LINE_CAP, BYTE_CAP = 200, 25000
+# 24,000 rather than 25,000. Claude Code's own warning names the cap as "24.4KB", which is 24,986
+# bytes read as KiB and 24,400 read as KB -- and a file sitting between those two readings loads
+# completely under one and loses entries under the other. Measured: at 24,923 bytes this index kept
+# all 231 entries under the binary reading and lost 8 under the decimal one. So the target is set
+# below both, and the ambiguity in someone else's units stops being our problem.
+LINE_CAP, BYTE_CAP = 200, 24000
 ENTRY = re.compile(r"^\[([^\]]*)\]\(([^)]+\.md)\)(?:\s*[\u2014-]\s*(.*))?$")
 
 
@@ -172,7 +177,7 @@ def main(argv) -> int:
     ck("no bracket introduced into any kept hook",
        not any("[" in h or "]" in h for h in kept_hooks.values()))
     ck("fits the 200-line cap", len(text.splitlines()) <= LINE_CAP, "%d lines" % len(text.splitlines()))
-    ck("fits the 25,000-byte cap as it lands on disk", len(on_disk(text)) <= BYTE_CAP,
+    ck("fits the 24,000-byte target as it lands on disk", len(on_disk(text)) <= BYTE_CAP,
        "%d B" % len(on_disk(text)))
     # the control that matters: EVERY entry is inside the loaded window, not merely inside the file
     kept_b, loaded = 0, []
