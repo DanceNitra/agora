@@ -1,0 +1,71 @@
+{
+ "rows": {
+  "1500": {
+   "tokens": 1706,
+   "over": 206,
+   "questions": 0.5,
+   "searchbox": 0.625,
+   "words_per_line": 4.0
+  },
+  "1918": {
+   "tokens": 1706,
+   "over": 0,
+   "questions": 0.5,
+   "searchbox": 0.625,
+   "words_per_line": 4.0
+  },
+  "2500": {
+   "tokens": 2133,
+   "over": 0,
+   "questions": 0.5083333333333333,
+   "searchbox": 0.6166666666666667,
+   "words_per_line": 5.0
+  },
+  "3063": {
+   "tokens": 2986,
+   "over": 0,
+   "questions": 0.5416666666666666,
+   "searchbox": 0.7333333333333333,
+   "words_per_line": 7.0
+  },
+  "4000": {
+   "tokens": 3839,
+   "over": 0,
+   "questions": 0.625,
+   "searchbox": 0.775,
+   "words_per_line": 9.0
+  },
+  "5000": {
+   "tokens": 4683,
+   "over": 0,
+   "questions": 0.65,
+   "searchbox": 0.8166666666666667,
+   "words_per_line": 10.977848101265822
+  },
+  "6484": {
+   "tokens": 6393,
+   "over": 0,
+   "questions": 0.6666666666666666,
+   "searchbox": 0.8416666666666667,
+   "words_per_line": 14.987341772151899
+  },
+  "None": {
+   "tokens": 6936,
+   "over": 0,
+   "questions": 0.6916666666666667,
+   "searchbox": 0.8416666666666667,
+   "words_per_line": 16.259493670886076
+  }
+ },
+ "hand": {
+  "tokens": 3063,
+  "questions": 0.3333333333333333,
+  "searchbox": 0.5083333333333333
+ },
+ "ceiling": {
+  "questions": 0.8583333333333333,
+  "searchbox": 0.9666666666666667
+ },
+ "control_ok": true,
+ "kept_fraction": 0.6749999999999998
+}
