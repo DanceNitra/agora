@@ -1,0 +1,1683 @@
+{
+ "n_candidates": 315,
+ "index_bytes": 30706,
+ "tier": "cheap",
+ "control_verbatim": "20/20",
+ "rows": [
+  {
+   "file": "reddit-watch-walk-reply-tree.md",
+   "query": "Why did my Reddit watch flag new replies when we already replied?",
+   "overlap_with_line": 1,
+   "rank_line": 12,
+   "rank_body": 1,
+   "pick": [
+    "reddit-watch-walk-reply-tree.md",
+    "reddit-replies-must-be-human-short.md",
+    "reddit-radar-read-only.md"
+   ],
+   "pick_rank": 1,
+   "raw": "reddit-watch-walk-reply-tree.md\nreddit-replies-must-be-human-short.md\nreddit-radar-read-only.md"
+  },
+  {
+   "file": "overnight-telegram-only-breakthroughs.md",
+   "query": "When running the overnight loop, should I send a Telegram message every cycle or only for major breakthroughs?",
+   "overlap_with_line": 1,
+   "rank_line": 9,
+   "rank_body": 1,
+   "pick": [
+    "overnight-telegram-only-breakthroughs.md"
+   ],
+   "pick_rank": 1,
+   "raw": "overnight-telegram-only-breakthroughs.md"
+  },
+  {
+   "file": "substring-metrics-corrupt-nested-and-reverting-values.md",
+   "query": "Why did my metric for detecting inversions fail when values are nested and chains revert?",
+   "overlap_with_line": 0,
+   "rank_line": 276,
+   "rank_body": 1,
+   "pick": [
+    "substring-metrics-corrupt-nested-and-reverting-values.md",
+    "a-true-boolean-whose-truth-expires.md",
+    "unnamed-revert-differentiator-and-recall-gap.md"
+   ],
+   "pick_rank": 1,
+   "raw": "substring-metrics-corrupt-nested-and-reverting-values.md\na-true-boolean-whose-truth-expires.md\nunnamed-revert-differentiator-and-recall-gap.md"
+  },
+  {
+   "file": "an-author-summary-can-contradict-its-own-saved-output.md",
+   "query": "How did I catch that the TAT proteomics metrics were just reading the treatment index?",
+   "overlap_with_line": 0,
+   "rank_line": 83,
+   "rank_body": 1,
+   "pick": [
+    "marat-tat-edrn-collaboration-live.md",
+    "edrn-dmrg-crossover-gate-caught-wrong-refutation.md"
+   ],
+   "pick_rank": null,
+   "raw": "marat-tat-edrn-collaboration-live.md\nedrn-dmrg-crossover-gate-caught-wrong-refutation.md"
+  },
+  {
+   "file": "grounding-meter-capstone.md",
+   "query": "How did we measure if an AI is grounded or just confident?",
+   "overlap_with_line": 0,
+   "rank_line": 170,
+   "rank_body": 27,
+   "pick": [
+    "grounding-meter-capstone.md",
+    "layer2-veracity-frontier-to-bedrock.md",
+    "veracity-gap-post-shipped.md"
+   ],
+   "pick_rank": 1,
+   "raw": "grounding-meter-capstone.md\nlayer2-veracity-frontier-to-bedrock.md\nveracity-gap-post-shipped.md"
+  },
+  {
+   "file": "never-suggest-stopping-push-forward.md",
+   "query": "Why does my assistant keep suggesting we stop or withdraw, when I want it to push forward?",
+   "overlap_with_line": 0,
+   "rank_line": 212,
+   "rank_body": 9,
+   "pick": [
+    "never-suggest-stopping-push-forward.md",
+    "no-idle-cycles-be-proactive.md",
+    "build-until-groundbreaking.md"
+   ],
+   "pick_rank": 1,
+   "raw": "never-suggest-stopping-push-forward.md\nno-idle-cycles-be-proactive.md\nbuild-until-groundbreaking.md"
+  },
+  {
+   "file": "audit-publish-full-procedure-never-shorten.md",
+   "query": "Why can't I skip the full audit procedure on some posts?",
+   "overlap_with_line": 2,
+   "rank_line": 1,
+   "rank_body": 1,
+   "pick": [
+    "audit-publish-full-procedure-never-shorten.md",
+    "never-truncate-never-claim-complete.md",
+    "the-skeptic-runs-before-the-draft-exists.md"
+   ],
+   "pick_rank": 1,
+   "raw": "audit-publish-full-procedure-never-shorten.md\nnever-truncate-never-claim-complete.md\nthe-skeptic-runs-before-the-draft-exists.md"
+  },
+  {
+   "file": "match-organ-is-cost-of-rigor-not-leak.md",
+   "query": "Is the match organ a leak?",
+   "overlap_with_line": 2,
+   "rank_line": 4,
+   "rank_body": 1,
+   "pick": [
+    "match-organ-is-cost-of-rigor-not-leak.md"
+   ],
+   "pick_rank": 1,
+   "raw": "match-organ-is-cost-of-rigor-not-leak.md"
+  },
+  {
+   "file": "a-self-graded-coherence-signal-promotes-a-poison-cluster.md",
+   "query": "Why does the poison defense gate block legitimate recalls more often than poisoned ones?",
+   "overlap_with_line": 2,
+   "rank_line": 1,
+   "rank_body": 1,
+   "pick": [
+    "reddit-watch-walk-reply-tree.md",
+    "reddit-replies-must-be-human-short.md",
+    "reddit-radar-read-only.md"
+   ],
+   "pick_rank": null,
+   "raw": "reddit-watch-walk-reply-tree.md\nreddit-replies-must-be-human-short.md\nreddit-radar-read-only.md"
+  },
+  {
+   "file": "a-demotion-at-exactly-zero-encodes-the-principle-only-at-its-boundary.md",
+   "query": "Why did erasure audit mark records with zero declared lineage as unaudited?",
+   "overlap_with_line": 1,
+   "rank_line": 16,
+   "rank_body": 1,
+   "pick": [
+    "reddit-watch-walk-reply-tree.md",
+    "reddit-replies-must-be-human-short.md",
+    "reddit-radar-read-only.md"
+   ],
+   "pick_rank": null,
+   "raw": "reddit-watch-walk-reply-tree.md\nreddit-replies-must-be-human-short.md\nreddit-radar-read-only.md"
+  },
+  {
+   "file": "agora-architecture.md",
+   "query": "How do I start the Agora dungeon with its supervisor?",
+   "overlap_with_line": 0,
+   "rank_line": 62,
+   "rank_body": 1,
+   "pick": [
+    "reddit-watch-walk-reply-tree.md",
+    "reddit-replies-must-be-human-short.md",
+    "reddit-radar-read-only.md"
+   ],
+   "pick_rank": null,
+   "raw": "reddit-watch-walk-reply-tree.md\nreddit-replies-must-be-human-short.md\nreddit-radar-read-only.md"
+  },
+  {
+   "file": "an-until-loop-with-no-exit-is-a-leak-not-patience.md",
+   "query": "Why does my script hang waiting for a file that never gets the expected content?",
+   "overlap_with_line": 0,
+   "rank_line": 123,
+   "rank_body": 1,
+   "pick": [
+    "reddit-watch-walk-reply-tree.md",
+    "reddit-replies-must-be-human-short.md",
+    "reddit-radar-read-only.md"
+   ],
+   "pick_rank": null,
+   "raw": "reddit-watch-walk-reply-tree.md\nreddit-replies-must-be-human-short.md\nreddit-radar-read-only.md"
+  },
+  {
+   "file": "the-corpus-could-not-exercise-the-mechanism.md",
+   "query": "Why did the delete/suppress/recover experiment show no difference?",
+   "overlap_with_line": 0,
+   "rank_line": 283,
+   "rank_body": 2,
+   "pick": [
+    "reddit-watch-walk-reply-tree.md",
+    "reddit-replies-must-be-human-short.md",
+    "reddit-radar-read-only.md"
+   ],
+   "pick_rank": null,
+   "raw": "reddit-watch-walk-reply-tree.md\nreddit-replies-must-be-human-short.md\nreddit-radar-read-only.md"
+  },
+  {
+   "file": "gate-on-work-counters-when-the-clock-is-noise.md",
+   "query": "Why did we base the perf regression gate on work counters instead of wall-clock time, and how do we handle the byte drift?",
+   "overlap_with_line": 3,
+   "rank_line": 2,
+   "rank_body": 1,
+   "pick": [
+    "reddit-watch-walk-reply-tree.md",
+    "reddit-replies-must-be-human-short.md",
+    "reddit-radar-read-only.md"
+   ],
+   "pick_rank": null,
+   "raw": "reddit-watch-walk-reply-tree.md\nreddit-replies-must-be-human-short.md\nreddit-radar-read-only.md"
+  },
+  {
+   "file": "fix-the-class-not-the-instance-reaudit-always.md",
+   "query": "When should I stop patching the same bug at every call site and move the fix deeper?",
+   "overlap_with_line": 1,
+   "rank_line": 9,
+   "rank_body": 1,
+   "pick": [
+    "reddit-watch-walk-reply-tree.md",
+    "reddit-replies-must-be-human-short.md",
+    "reddit-radar-read-only.md"
+   ],
+   "pick_rank": null,
+   "raw": "reddit-watch-walk-reply-tree.md\nreddit-replies-must-be-human-short.md\nreddit-radar-read-only.md"
+  },
+  {
+   "file": "a-gate-whose-run-spans-two-trees-reports-a-blended-verdict.md",
+   "query": "Why did my release check pass and fail on the same run when the code changed?",
+   "overlap_with_line": 0,
+   "rank_line": 51,
+   "rank_body": 1,
+   "pick": [
+    "reddit-watch-walk-reply-tree.md",
+    "reddit-replies-must-be-human-short.md",
+    "reddit-radar-read-only.md"
+   ],
+   "pick_rank": null,
+   "raw": "reddit-watch-walk-reply-tree.md\nreddit-replies-must-be-human-short.md\nreddit-radar-read-only.md"
+  },
+  {
+   "file": "a-control-that-recomputes-the-answer-tests-arithmetic.md",
+   "query": "Why did my test for the bias-corrected standard deviation still pass after I removed the correction from the shipping code?",
+   "overlap_with_line": 1,
+   "rank_line": 5,
+   "rank_body": 1,
+   "pick": [
+    "reddit-watch-walk-reply-tree.md",
+    "reddit-replies-must-be-human-short.md",
+    "reddit-radar-read-only.md"
+   ],
+   "pick_rank": null,
+   "raw": "reddit-watch-walk-reply-tree.md\nreddit-replies-must-be-human-short.md\nreddit-radar-read-only.md"
+  },
+  {
+   "file": "capstone-prior-art-lesson.md",
+   "query": "Why did we kill the majority-vote-beats-single-reasoner capstone?",
+   "overlap_with_line": 1,
+   "rank_line": 1,
+   "rank_body": 1,
+   "pick": [
+    "reddit-watch-walk-reply-tree.md",
+    "reddit-replies-must-be-human-short.md",
+    "reddit-radar-read-only.md"
+   ],
+   "pick_rank": null,
+   "raw": "reddit-watch-walk-reply-tree.md\nreddit-replies-must-be-human-short.md\nreddit-radar-read-only.md"
+  },
+  {
+   "file": "twelve-instrument-failures-became-a-hook.md",
+   "query": "How did we stop the same command mistakes from happening again?",
+   "overlap_with_line": 0,
+   "rank_line": 293,
+   "rank_body": 302,
+   "pick": [
+    "reddit-watch-walk-reply-tree.md",
+    "reddit-replies-must-be-human-short.md",
+    "reddit-radar-read-only.md"
+   ],
+   "pick_rank": null,
+   "raw": "reddit-watch-walk-reply-tree.md\nreddit-replies-must-be-human-short.md\nreddit-radar-read-only.md"
+  },
+  {
+   "file": "fixing-a-class-can-ship-a-fresh-instance-of-it.md",
+   "query": "Why does the CLI's --strict flag reference a non-existent 'witness bootstrap' command?",
+   "overlap_with_line": 3,
+   "rank_line": 1,
+   "rank_body": 1,
+   "pick": [
+    "reddit-watch-walk-reply-tree.md",
+    "reddit-replies-must-be-human-short.md",
+    "reddit-radar-read-only.md"
+   ],
+   "pick_rank": null,
+   "raw": "reddit-watch-walk-reply-tree.md\nreddit-replies-must-be-human-short.md\nreddit-radar-read-only.md"
+  },
+  {
+   "file": "a-recipe-can-carry-the-defect-it-warns-about.md",
+   "query": "How do I red-team a test I'm giving to someone else to make sure it actually catches the bug?",
+   "overlap_with_line": 1,
+   "rank_line": 8,
+   "rank_body": 1,
+   "pick": [
+    "reddit-watch-walk-reply-tree.md",
+    "reddit-replies-must-be-human-short.md",
+    "reddit-radar-read-only.md"
+   ],
+   "pick_rank": null,
+   "raw": "reddit-watch-walk-reply-tree.md\nreddit-replies-must-be-human-short.md\nreddit-radar-read-only.md"
+  },
+  {
+   "file": "no-overclaim-cite-prior-art-strong-baseline.md",
+   "query": "Why did we have to fix that LoCoMo post that claimed 3.9x improvement?",
+   "overlap_with_line": 0,
+   "rank_line": 221,
+   "rank_body": 3,
+   "pick": [
+    "reddit-watch-walk-reply-tree.md",
+    "reddit-replies-must-be-human-short.md",
+    "reddit-radar-read-only.md"
+   ],
+   "pick_rank": null,
+   "raw": "reddit-watch-walk-reply-tree.md\nreddit-replies-must-be-human-short.md\nreddit-radar-read-only.md"
+  },
+  {
+   "file": "separability-ceiling-synthesis.md",
+   "query": "What is the common formula for value from diversification, gating, pooling, and selection?",
+   "overlap_with_line": 0,
+   "rank_line": 268,
+   "rank_body": 1,
+   "pick": [
+    "reddit-watch-walk-reply-tree.md",
+    "reddit-replies-must-be-human-short.md",
+    "reddit-radar-read-only.md"
+   ],
+   "pick_rank": null,
+   "raw": "reddit-watch-walk-reply-tree.md\nreddit-replies-must-be-human-short.md\nreddit-radar-read-only.md"
+  },
+  {
+   "file": "use-the-whole-machine-parallel-by-default.md",
+   "query": "Why was I told to always saturate the machine (all cores, GPU) before any long batch?",
+   "overlap_with_line": 1,
+   "rank_line": 5,
+   "rank_body": 1,
+   "pick": [
+    "reddit-watch-walk-reply-tree.md",
+    "reddit-replies-must-be-human-short.md",
+    "reddit-radar-read-only.md"
+   ],
+   "pick_rank": null,
+   "raw": "reddit-watch-walk-reply-tree.md\nreddit-replies-must-be-human-short.md\nreddit-radar-read-only.md"
+  },
+  {
+   "file": "inspeximus-mcp-caches-store-and-clobbers-external-writes.md",
+   "query": "Why does my MCP server silently overwrite my memory file even after restarting it?",
+   "overlap_with_line": 1,
+   "rank_line": 1,
+   "rank_body": 2,
+   "pick": [
+    "reddit-watch-walk-reply-tree.md",
+    "reddit-replies-must-be-human-short.md",
+    "reddit-radar-read-only.md"
+   ],
+   "pick_rank": null,
+   "raw": "reddit-watch-walk-reply-tree.md\nreddit-replies-must-be-human-short.md\nreddit-radar-read-only.md"
+  },
+  {
+   "file": "a-caution-i-cannot-measure-is-a-caution-i-must-not-send.md",
+   "query": "What was that time I made a false claim about detector agreement and had to withdraw it?",
+   "overlap_with_line": 1,
+   "rank_line": 9,
+   "rank_body": 9,
+   "pick": [
+    "reddit-watch-walk-reply-tree.md",
+    "reddit-replies-must-be-human-short.md",
+    "reddit-radar-read-only.md"
+   ],
+   "pick_rank": null,
+   "raw": "reddit-watch-walk-reply-tree.md\nreddit-replies-must-be-human-short.md\nreddit-radar-read-only.md"
+  },
+  {
+   "file": "agora-keepalive-scheduled-task-is-a-third-restart-mechanism.md",
+   "query": "Why does my GPU memory get used up again after I stop all processes?",
+   "overlap_with_line": 2,
+   "rank_line": 1,
+   "rank_body": 1,
+   "pick": [
+    "reddit-watch-walk-reply-tree.md",
+    "reddit-replies-must-be-human-short.md",
+    "reddit-radar-read-only.md"
+   ],
+   "pick_rank": null,
+   "raw": "reddit-watch-walk-reply-tree.md\nreddit-replies-must-be-human-short.md\nreddit-radar-read-only.md"
+  },
+  {
+   "file": "gh-run-list-hides-failed-attempts.md",
+   "query": "How can I check if a GitHub Actions run had a failed attempt that was re-run and passed?",
+   "overlap_with_line": 1,
+   "rank_line": 20,
+   "rank_body": 1,
+   "pick": [
+    "reddit-watch-walk-reply-tree.md",
+    "reddit-replies-must-be-human-short.md",
+    "reddit-radar-read-only.md"
+   ],
+   "pick_rank": null,
+   "raw": "reddit-watch-walk-reply-tree.md\nreddit-replies-must-be-human-short.md\nreddit-radar-read-only.md"
+  },
+  {
+   "file": "github-pages-root-robots-and-indexing.md",
+   "query": "Why do I need a separate root site for robots.txt on GitHub Pages?",
+   "overlap_with_line": 3,
+   "rank_line": 4,
+   "rank_body": 1,
+   "pick": [
+    "reddit-watch-walk-reply-tree.md",
+    "reddit-replies-must-be-human-short.md",
+    "reddit-radar-read-only.md"
+   ],
+   "pick_rank": null,
+   "raw": "reddit-watch-walk-reply-tree.md\nreddit-replies-must-be-human-short.md\nreddit-radar-read-only.md"
+  },
+  {
+   "file": "swarm-output-is-100-percent-rejected-at-the-vault-door.md",
+   "query": "Why are contributions rejected for LAB-FIRST when lab runs are succeeding?",
+   "overlap_with_line": 1,
+   "rank_line": 8,
+   "rank_body": 1,
+   "pick": [
+    "reddit-watch-walk-reply-tree.md",
+    "reddit-replies-must-be-human-short.md",
+    "reddit-radar-read-only.md"
+   ],
+   "pick_rank": null,
+   "raw": "reddit-watch-walk-reply-tree.md\nreddit-replies-must-be-human-short.md\nreddit-radar-read-only.md"
+  },
+  {
+   "file": "gate-distinction-product-push-vs-outreach.md",
+   "query": "When can I push a validated update to our own repo without waiting for explicit approval?",
+   "overlap_with_line": 0,
+   "rank_line": 158,
+   "rank_body": 1,
+   "pick": [
+    "reddit-watch-walk-reply-tree.md",
+    "reddit-replies-must-be-human-short.md",
+    "reddit-radar-read-only.md"
+   ],
+   "pick_rank": null,
+   "raw": "reddit-watch-walk-reply-tree.md\nreddit-replies-must-be-human-short.md\nreddit-radar-read-only.md"
+  },
+  {
+   "file": "one-realisation-cannot-establish-a-trend.md",
+   "query": "Is the drop in median prominence from N=12 to N=14 real, given the spread across seeds?",
+   "overlap_with_line": 1,
+   "rank_line": 5,
+   "rank_body": 1,
+   "pick": [
+    "reddit-watch-walk-reply-tree.md",
+    "reddit-replies-must-be-human-short.md",
+    "reddit-radar-read-only.md"
+   ],
+   "pick_rank": null,
+   "raw": "reddit-watch-walk-reply-tree.md\nreddit-replies-must-be-human-short.md\nreddit-radar-read-only.md"
+  },
+  {
+   "file": "every-fixture-used-the-case-where-two-fields-coincide.md",
+   "query": "Why did my mutation test pass when I changed the code to count groups instead of keys?",
+   "overlap_with_line": 0,
+   "rank_line": 147,
+   "rank_body": 1,
+   "pick": [
+    "reddit-watch-walk-reply-tree.md",
+    "reddit-replies-must-be-human-short.md",
+    "reddit-radar-read-only.md"
+   ],
+   "pick_rank": null,
+   "raw": "reddit-watch-walk-reply-tree.md\nreddit-replies-must-be-human-short.md\nreddit-radar-read-only.md"
+  },
+  {
+   "file": "agora-scout-status-semantics.md",
+   "query": "Why does the scout idle alert fire even when the scout is healthy?",
+   "overlap_with_line": 1,
+   "rank_line": 1,
+   "rank_body": 1,
+   "pick": [
+    "reddit-watch-walk-reply-tree.md",
+    "reddit-replies-must-be-human-short.md",
+    "reddit-radar-read-only.md"
+   ],
+   "pick_rank": null,
+   "raw": "reddit-watch-walk-reply-tree.md\nreddit-replies-must-be-human-short.md\nreddit-radar-read-only.md"
+  },
+  {
+   "file": "veracity-gap-post-shipped.md",
+   "query": "What was the final thesis on provenance and truth in the agent memory post?",
+   "overlap_with_line": 0,
+   "rank_line": 302,
+   "rank_body": 1,
+   "pick": [
+    "reddit-watch-walk-reply-tree.md",
+    "reddit-replies-must-be-human-short.md",
+    "reddit-radar-read-only.md"
+   ],
+   "pick_rank": null,
+   "raw": "reddit-watch-walk-reply-tree.md\nreddit-replies-must-be-human-short.md\nreddit-radar-read-only.md"
+  },
+  {
+   "file": "never-git-add-all-while-a-mutation-run-is-in-flight.md",
+   "query": "What problems can occur if you commit during a mutation run?",
+   "overlap_with_line": 2,
+   "rank_line": 1,
+   "rank_body": 1,
+   "pick": [
+    "reddit-watch-walk-reply-tree.md",
+    "reddit-replies-must-be-human-short.md",
+    "reddit-radar-read-only.md"
+   ],
+   "pick_rank": null,
+   "raw": "reddit-watch-walk-reply-tree.md\nreddit-replies-must-be-human-short.md\nreddit-radar-read-only.md"
+  },
+  {
+   "file": "a-transcript-grep-is-not-provenance.md",
+   "query": "Why is grepping my own transcript not enough to verify a collaborator's claim?",
+   "overlap_with_line": 1,
+   "rank_line": 1,
+   "rank_body": 1,
+   "pick": [
+    "reddit-watch-walk-reply-tree.md",
+    "reddit-replies-must-be-human-short.md",
+    "reddit-radar-read-only.md"
+   ],
+   "pick_rank": null,
+   "raw": "reddit-watch-walk-reply-tree.md\nreddit-replies-must-be-human-short.md\nreddit-radar-read-only.md"
+  },
+  {
+   "file": "publish-a-bound-on-a-growing-quantity-not-a-snapshot.md",
+   "query": "How do I quote a number that keeps changing without it becoming stale?",
+   "overlap_with_line": 0,
+   "rank_line": 240,
+   "rank_body": 24,
+   "pick": [
+    "reddit-watch-walk-reply-tree.md",
+    "reddit-replies-must-be-human-short.md",
+    "reddit-radar-read-only.md"
+   ],
+   "pick_rank": null,
+   "raw": "reddit-watch-walk-reply-tree.md\nreddit-replies-must-be-human-short.md\nreddit-radar-read-only.md"
+  },
+  {
+   "file": "deepseek-1462-suppression-reply-posted.md",
+   "query": "How does Cophy handle governance constraints that have lower weight as principled limits?",
+   "overlap_with_line": 0,
+   "rank_line": 126,
+   "rank_body": 1,
+   "pick": [
+    "reddit-watch-walk-reply-tree.md",
+    "reddit-replies-must-be-human-short.md",
+    "reddit-radar-read-only.md"
+   ],
+   "pick_rank": null,
+   "raw": "reddit-watch-walk-reply-tree.md\nreddit-replies-must-be-human-short.md\nreddit-radar-read-only.md"
+  },
+  {
+   "file": "locomo-zero-llm-multihop-bridge-killed.md",
+   "query": "Did the hybrid RRF k=30 win for multi-hop retrieval survive the skeptic check?",
+   "overlap_with_line": 1,
+   "rank_line": 8,
+   "rank_body": 1,
+   "pick": [
+    "reddit-watch-walk-reply-tree.md",
+    "reddit-replies-must-be-human-short.md",
+    "reddit-radar-read-only.md"
+   ],
+   "pick_rank": null,
+   "raw": "reddit-watch-walk-reply-tree.md\nreddit-replies-must-be-human-short.md\nreddit-radar-read-only.md"
+  },
+  {
+   "file": "saturate-the-machine-before-any-long-batch.md",
+   "query": "Why is my Python loop using only one core and taking 50 minutes?",
+   "overlap_with_line": 0,
+   "rank_line": 263,
+   "rank_body": 1,
+   "pick": [
+    "reddit-watch-walk-reply-tree.md",
+    "reddit-replies-must-be-human-short.md",
+    "reddit-radar-read-only.md"
+   ],
+   "pick_rank": null,
+   "raw": "reddit-watch-walk-reply-tree.md\nreddit-replies-must-be-human-short.md\nreddit-radar-read-only.md"
+  },
+  {
+   "file": "keyword-match-without-subject-check.md",
+   "query": "Why did my filters keep matching irrelevant things like a wallet, GPU benchmark, and bounty, and what was the real fix?",
+   "overlap_with_line": 0,
+   "rank_line": 195,
+   "rank_body": 1,
+   "pick": [
+    "reddit-watch-walk-reply-tree.md",
+    "reddit-replies-must-be-human-short.md",
+    "reddit-radar-read-only.md"
+   ],
+   "pick_rank": null,
+   "raw": "reddit-watch-walk-reply-tree.md\nreddit-replies-must-be-human-short.md\nreddit-radar-read-only.md"
+  },
+  {
+   "file": "prior-art-check-BEFORE-the-measurement-not-after.md",
+   "query": "What prior art made my multi-agent vs single-agent test redundant?",
+   "overlap_with_line": 0,
+   "rank_line": 232,
+   "rank_body": 1,
+   "pick": [
+    "reddit-watch-walk-reply-tree.md",
+    "reddit-replies-must-be-human-short.md",
+    "reddit-radar-read-only.md"
+   ],
+   "pick_rank": null,
+   "raw": "reddit-watch-walk-reply-tree.md\nreddit-replies-must-be-human-short.md\nreddit-radar-read-only.md"
+  },
+  {
+   "file": "collaboration-fair-never-snub.md",
+   "query": "What's the rule for deciding whether to build a collaborator's offered feature or ask to interop?",
+   "overlap_with_line": 0,
+   "rank_line": 123,
+   "rank_body": 1,
+   "pick": [
+    "reddit-watch-walk-reply-tree.md",
+    "reddit-replies-must-be-human-short.md",
+    "reddit-radar-read-only.md"
+   ],
+   "pick_rank": null,
+   "raw": "reddit-watch-walk-reply-tree.md\nreddit-replies-must-be-human-short.md\nreddit-radar-read-only.md"
+  },
+  {
+   "file": "a-badge-number-lives-in-a-url-where-the-scanner-does-not-look.md",
+   "query": "Why did the test count badge in README not match the actual test count?",
+   "overlap_with_line": 1,
+   "rank_line": 8,
+   "rank_body": 1,
+   "pick": [
+    "reddit-watch-walk-reply-tree.md",
+    "reddit-replies-must-be-human-short.md",
+    "reddit-radar-read-only.md"
+   ],
+   "pick_rank": null,
+   "raw": "reddit-watch-walk-reply-tree.md\nreddit-replies-must-be-human-short.md\nreddit-radar-read-only.md"
+  },
+  {
+   "file": "tenant-filtered-view-persisted-drops-everyone-elses-rows.md",
+   "query": "Why does saving a tenant-scoped handle erase other tenants' data?",
+   "overlap_with_line": 1,
+   "rank_line": 14,
+   "rank_body": 5,
+   "pick": [
+    "reddit-watch-walk-reply-tree.md",
+    "reddit-replies-must-be-human-short.md",
+    "reddit-radar-read-only.md"
+   ],
+   "pick_rank": null,
+   "raw": "reddit-watch-walk-reply-tree.md\nreddit-replies-must-be-human-short.md\nreddit-radar-read-only.md"
+  },
+  {
+   "file": "llm-errata-adapter-and-what-the-protocol-omits.md",
+   "query": "Which conformance vectors should RAMR be scored against?",
+   "overlap_with_line": 0,
+   "rank_line": 190,
+   "rank_body": 1,
+   "pick": [
+    "reddit-watch-walk-reply-tree.md",
+    "reddit-replies-must-be-human-short.md",
+    "reddit-radar-read-only.md"
+   ],
+   "pick_rank": null,
+   "raw": "reddit-watch-walk-reply-tree.md\nreddit-replies-must-be-human-short.md\nreddit-radar-read-only.md"
+  },
+  {
+   "file": "consolidation-gate-coupling-breaktruth.md",
+   "query": "Why does corroboration gating only help for unbounded magnitudes, not bounded embeddings?",
+   "overlap_with_line": 0,
+   "rank_line": 119,
+   "rank_body": 1,
+   "pick": [
+    "reddit-watch-walk-reply-tree.md",
+    "reddit-replies-must-be-human-short.md",
+    "reddit-radar-read-only.md"
+   ],
+   "pick_rank": null,
+   "raw": "reddit-watch-walk-reply-tree.md\nreddit-replies-must-be-human-short.md\nreddit-radar-read-only.md"
+  },
+  {
+   "file": "a-code-comment-is-not-evidence-the-defect-is-live.md",
+   "query": "How do I verify a comment claiming a bug is still open before acting on it?",
+   "overlap_with_line": 1,
+   "rank_line": 18,
+   "rank_body": 10,
+   "pick": [
+    "reddit-watch-walk-reply-tree.md",
+    "reddit-replies-must-be-human-short.md",
+    "reddit-radar-read-only.md"
+   ],
+   "pick_rank": null,
+   "raw": "reddit-watch-walk-reply-tree.md\nreddit-replies-must-be-human-short.md\nreddit-radar-read-only.md"
+  },
+  {
+   "file": "local-gpu-switch-after-cloud-quota-exhausted.md",
+   "query": "What local models did we assign to cheap, main, and reasoning after the cloud rate limit?",
+   "overlap_with_line": 2,
+   "rank_line": 2,
+   "rank_body": 1,
+   "pick": [
+    "reddit-watch-walk-reply-tree.md",
+    "reddit-replies-must-be-human-short.md",
+    "reddit-radar-read-only.md"
+   ],
+   "pick_rank": null,
+   "raw": "reddit-watch-walk-reply-tree.md\nreddit-replies-must-be-human-short.md\nreddit-radar-read-only.md"
+  },
+  {
+   "file": "integrity-conditioned-recall-benchmark.md",
+   "query": "Why did our memory poisoning defense only work when we used the trusted-only mode?",
+   "overlap_with_line": 0,
+   "rank_line": 185,
+   "rank_body": 39,
+   "pick": [
+    "reddit-watch-walk-reply-tree.md",
+    "reddit-replies-must-be-human-short.md",
+    "reddit-radar-read-only.md"
+   ],
+   "pick_rank": null,
+   "raw": "reddit-watch-walk-reply-tree.md\nreddit-replies-must-be-human-short.md\nreddit-radar-read-only.md"
+  },
+  {
+   "file": "stop-brain-and-dungeon-before-any-gpu-measurement.md",
+   "query": "Why do my local models interfere and give wrong results when running measurements on a single GPU?",
+   "overlap_with_line": 1,
+   "rank_line": 6,
+   "rank_body": 22,
+   "pick": [
+    "reddit-watch-walk-reply-tree.md",
+    "reddit-replies-must-be-human-short.md",
+    "reddit-radar-read-only.md"
+   ],
+   "pick_rank": null,
+   "raw": "reddit-watch-walk-reply-tree.md\nreddit-replies-must-be-human-short.md\nreddit-radar-read-only.md"
+  },
+  {
+   "file": "inspeximus-pro-scope-two-pillars.md",
+   "query": "What's the cheap paid feature that makes the free erasure certificate trustworthy?",
+   "overlap_with_line": 0,
+   "rank_line": 177,
+   "rank_body": 1,
+   "pick": [
+    "reddit-watch-walk-reply-tree.md",
+    "reddit-replies-must-be-human-short.md",
+    "reddit-radar-read-only.md"
+   ],
+   "pick_rank": null,
+   "raw": "reddit-watch-walk-reply-tree.md\nreddit-replies-must-be-human-short.md\nreddit-radar-read-only.md"
+  },
+  {
+   "file": "flipped-default-audit-every-door.md",
+   "query": "How to catch a default change that didn't actually apply when the switch and report both show success?",
+   "overlap_with_line": 1,
+   "rank_line": 15,
+   "rank_body": 1,
+   "pick": [
+    "reddit-watch-walk-reply-tree.md",
+    "reddit-replies-must-be-human-short.md",
+    "reddit-radar-read-only.md"
+   ],
+   "pick_rank": null,
+   "raw": "reddit-watch-walk-reply-tree.md\nreddit-replies-must-be-human-short.md\nreddit-radar-read-only.md"
+  },
+  {
+   "file": "we-post-finished-reports-and-nothing-comes-back.md",
+   "query": "Why did people stop replying to my comments after I was accused of being condescending?",
+   "overlap_with_line": 1,
+   "rank_line": 6,
+   "rank_body": 1,
+   "pick": [
+    "reddit-watch-walk-reply-tree.md",
+    "reddit-replies-must-be-human-short.md",
+    "reddit-radar-read-only.md"
+   ],
+   "pick_rank": null,
+   "raw": "reddit-watch-walk-reply-tree.md\nreddit-replies-must-be-human-short.md\nreddit-radar-read-only.md"
+  },
+  {
+   "file": "verify-own-computed-numbers-before-out.md",
+   "query": "Why do I need to independently re-derive my own lab numbers before posting them anywhere?",
+   "overlap_with_line": 1,
+   "rank_line": 5,
+   "rank_body": 1,
+   "pick": [
+    "reddit-watch-walk-reply-tree.md",
+    "reddit-replies-must-be-human-short.md",
+    "reddit-radar-read-only.md"
+   ],
+   "pick_rank": null,
+   "raw": "reddit-watch-walk-reply-tree.md\nreddit-replies-must-be-human-short.md\nreddit-radar-read-only.md"
+  },
+  {
+   "file": "new-artifact-must-check-existing-products-first.md",
+   "query": "Why did we almost create a separate benchmark tool instead of adding it to RAMR?",
+   "overlap_with_line": 0,
+   "rank_line": 218,
+   "rank_body": 2,
+   "pick": [
+    "reddit-watch-walk-reply-tree.md",
+    "reddit-replies-must-be-human-short.md",
+    "reddit-radar-read-only.md"
+   ],
+   "pick_rank": null,
+   "raw": "reddit-watch-walk-reply-tree.md\nreddit-replies-must-be-human-short.md\nreddit-radar-read-only.md"
+  },
+  {
+   "file": "refetchable-is-not-observation-bound.md",
+   "query": "Why does provenance report fresh when the file changed between the agent reading it and recording memory?",
+   "overlap_with_line": 0,
+   "rank_line": 254,
+   "rank_body": 1,
+   "pick": [
+    "reddit-watch-walk-reply-tree.md",
+    "reddit-replies-must-be-human-short.md",
+    "reddit-radar-read-only.md"
+   ],
+   "pick_rank": null,
+   "raw": "reddit-watch-walk-reply-tree.md\nreddit-replies-must-be-human-short.md\nreddit-radar-read-only.md"
+  },
+  {
+   "file": "hybrid-rrf-no-win-with-good-embedder.md",
+   "query": "When does hybrid search (BM25+vector) actually beat pure semantic or BM25?",
+   "overlap_with_line": 1,
+   "rank_line": 2,
+   "rank_body": 1,
+   "pick": [
+    "reddit-watch-walk-reply-tree.md",
+    "reddit-replies-must-be-human-short.md",
+    "reddit-radar-read-only.md"
+   ],
+   "pick_rank": null,
+   "raw": "reddit-watch-walk-reply-tree.md\nreddit-replies-must-be-human-short.md\nreddit-radar-read-only.md"
+  },
+  {
+   "file": "agora-idea-forge.md",
+   "query": "What happened to the idea-forge skill?",
+   "overlap_with_line": 0,
+   "rank_line": 62,
+   "rank_body": 1,
+   "pick": [
+    "reddit-watch-walk-reply-tree.md",
+    "reddit-replies-must-be-human-short.md",
+    "reddit-radar-read-only.md"
+   ],
+   "pick_rank": null,
+   "raw": "reddit-watch-walk-reply-tree.md\nreddit-replies-must-be-human-short.md\nreddit-radar-read-only.md"
+  },
+  {
+   "file": "audit-the-construction-before-spending-the-budget.md",
+   "query": "Why did I waste 440 cloud calls on the noise vs contradiction experiment?",
+   "overlap_with_line": 0,
+   "rank_line": 93,
+   "rank_body": 1,
+   "pick": [
+    "reddit-watch-walk-reply-tree.md",
+    "reddit-replies-must-be-human-short.md",
+    "reddit-radar-read-only.md"
+   ],
+   "pick_rank": null,
+   "raw": "reddit-watch-walk-reply-tree.md\nreddit-replies-must-be-human-short.md\nreddit-radar-read-only.md"
+  },
+  {
+   "file": "measurement-denominator-and-fair-comparison-before-out.md",
+   "query": "What's the checklist to run before reporting any measured number about our system?",
+   "overlap_with_line": 0,
+   "rank_line": 208,
+   "rank_body": 1,
+   "pick": [
+    "reddit-watch-walk-reply-tree.md",
+    "reddit-replies-must-be-human-short.md",
+    "reddit-radar-read-only.md"
+   ],
+   "pick_rank": null,
+   "raw": "reddit-watch-walk-reply-tree.md\nreddit-replies-must-be-human-short.md\nreddit-radar-read-only.md"
+  },
+  {
+   "file": "graphshift-orthogonal-gate-poison-defense.md",
+   "query": "Why does graph-shift fail as a prompt injection defense, and how does an unforgeable gate fix it?",
+   "overlap_with_line": 1,
+   "rank_line": 4,
+   "rank_body": 1,
+   "pick": [
+    "reddit-watch-walk-reply-tree.md",
+    "reddit-replies-must-be-human-short.md",
+    "reddit-radar-read-only.md"
+   ],
+   "pick_rank": null,
+   "raw": "reddit-watch-walk-reply-tree.md\nreddit-replies-must-be-human-short.md\nreddit-radar-read-only.md"
+  },
+  {
+   "file": "a-guard-on-one-of-two-copies-of-one-decision.md",
+   "query": "Why did we have two implementations of the same rule, one with safety checks and one without?",
+   "overlap_with_line": 0,
+   "rank_line": 25,
+   "rank_body": 59,
+   "pick": [
+    "reddit-watch-walk-reply-tree.md",
+    "reddit-replies-must-be-human-short.md",
+    "reddit-radar-read-only.md"
+   ],
+   "pick_rank": null,
+   "raw": "reddit-watch-walk-reply-tree.md\nreddit-replies-must-be-human-short.md\nreddit-radar-read-only.md"
+  },
+  {
+   "file": "probe-cache-shared-file-corruption-lesson.md",
+   "query": "Why did my probe script hang and leave a corrupted cache file?",
+   "overlap_with_line": 2,
+   "rank_line": 2,
+   "rank_body": 1,
+   "pick": [
+    "reddit-watch-walk-reply-tree.md",
+    "reddit-replies-must-be-human-short.md",
+    "reddit-radar-read-only.md"
+   ],
+   "pick_rank": null,
+   "raw": "reddit-watch-walk-reply-tree.md\nreddit-replies-must-be-human-short.md\nreddit-radar-read-only.md"
+  },
+  {
+   "file": "a-cursor-advanced-by-the-write-it-blocks.md",
+   "query": "Why did the analogy forge stop advancing when a note title was too long?",
+   "overlap_with_line": 0,
+   "rank_line": 26,
+   "rank_body": 1,
+   "pick": [
+    "reddit-watch-walk-reply-tree.md",
+    "reddit-replies-must-be-human-short.md",
+    "reddit-radar-read-only.md"
+   ],
+   "pick_rank": null,
+   "raw": "reddit-watch-walk-reply-tree.md\nreddit-replies-must-be-human-short.md\nreddit-radar-read-only.md"
+  },
+  {
+   "file": "competitor-zero-score-is-our-bug-until-proven.md",
+   "query": "Why did mem0 score zero in our MemOps pilot?",
+   "overlap_with_line": 0,
+   "rank_line": 123,
+   "rank_body": 1,
+   "pick": [
+    "reddit-watch-walk-reply-tree.md",
+    "reddit-replies-must-be-human-short.md",
+    "reddit-radar-read-only.md"
+   ],
+   "pick_rank": null,
+   "raw": "reddit-watch-walk-reply-tree.md\nreddit-replies-must-be-human-short.md\nreddit-radar-read-only.md"
+  },
+  {
+   "file": "a-record-could-vouch-for-itself-canonicalization-mismatch.md",
+   "query": "Why does my credit guard allow a record to vouch for itself?",
+   "overlap_with_line": 3,
+   "rank_line": 1,
+   "rank_body": 1,
+   "pick": [
+    "reddit-watch-walk-reply-tree.md",
+    "reddit-replies-must-be-human-short.md",
+    "reddit-radar-read-only.md"
+   ],
+   "pick_rank": null,
+   "raw": "reddit-watch-walk-reply-tree.md\nreddit-replies-must-be-human-short.md\nreddit-radar-read-only.md"
+  },
+  {
+   "file": "the-drafts-folder-is-not-a-send-record.md",
+   "query": "How do I know if a draft in the drafts folder was actually sent?",
+   "overlap_with_line": 2,
+   "rank_line": 1,
+   "rank_body": 1,
+   "pick": [
+    "reddit-watch-walk-reply-tree.md",
+    "reddit-replies-must-be-human-short.md",
+    "reddit-radar-read-only.md"
+   ],
+   "pick_rank": null,
+   "raw": "reddit-watch-walk-reply-tree.md\nreddit-replies-must-be-human-short.md\nreddit-radar-read-only.md"
+  },
+  {
+   "file": "flagship-publish-credibility-audit.md",
+   "query": "What steps should I take before publishing a research result to ensure it's credible and auditable?",
+   "overlap_with_line": 0,
+   "rank_line": 145,
+   "rank_body": 1,
+   "pick": [
+    "reddit-watch-walk-reply-tree.md",
+    "reddit-replies-must-be-human-short.md",
+    "reddit-radar-read-only.md"
+   ],
+   "pick_rank": null,
+   "raw": "reddit-watch-walk-reply-tree.md\nreddit-replies-must-be-human-short.md\nreddit-radar-read-only.md"
+  },
+  {
+   "file": "never-cash-an-unfindable-as-novelty-report-registered-primary-first.md",
+   "query": "What were the two fatal flaws in my paper: the unfalsifiable gap and the outcome switch?",
+   "overlap_with_line": 0,
+   "rank_line": 207,
+   "rank_body": 1,
+   "pick": [
+    "reddit-watch-walk-reply-tree.md",
+    "reddit-replies-must-be-human-short.md",
+    "reddit-radar-read-only.md"
+   ],
+   "pick_rank": null,
+   "raw": "reddit-watch-walk-reply-tree.md\nreddit-replies-must-be-human-short.md\nreddit-radar-read-only.md"
+  },
+  {
+   "file": "without-a-key-there-is-no-overturn-to-detect.md",
+   "query": "What is the default supersession behavior in Inspeximus for keyed vs unkeyed writes?",
+   "overlap_with_line": 0,
+   "rank_line": 312,
+   "rank_body": 12,
+   "pick": [
+    "reddit-watch-walk-reply-tree.md",
+    "reddit-replies-must-be-human-short.md",
+    "reddit-radar-read-only.md"
+   ],
+   "pick_rank": null,
+   "raw": "reddit-watch-walk-reply-tree.md\nreddit-replies-must-be-human-short.md\nreddit-radar-read-only.md"
+  },
+  {
+   "file": "inspeximus-2-10-2-security-release.md",
+   "query": "What security issues did we find when we attacked our own product?",
+   "overlap_with_line": 0,
+   "rank_line": 165,
+   "rank_body": 73,
+   "pick": [
+    "reddit-watch-walk-reply-tree.md",
+    "reddit-replies-must-be-human-short.md",
+    "reddit-radar-read-only.md"
+   ],
+   "pick_rank": null,
+   "raw": "reddit-watch-walk-reply-tree.md\nreddit-replies-must-be-human-short.md\nreddit-radar-read-only.md"
+  },
+  {
+   "file": "agent-receipts-project.md",
+   "query": "What did we do about the 'zero proof ai mcp receipts' search query?",
+   "overlap_with_line": 1,
+   "rank_line": 12,
+   "rank_body": 1,
+   "pick": [
+    "reddit-watch-walk-reply-tree.md",
+    "reddit-replies-must-be-human-short.md",
+    "reddit-radar-read-only.md"
+   ],
+   "pick_rank": null,
+   "raw": "reddit-watch-walk-reply-tree.md\nreddit-replies-must-be-human-short.md\nreddit-radar-read-only.md"
+  },
+  {
+   "file": "never-read-gmail-via-tool.md",
+   "query": "Why can't I use Gmail MCP tools to read email content anymore?",
+   "overlap_with_line": 2,
+   "rank_line": 6,
+   "rank_body": 1,
+   "pick": [
+    "reddit-watch-walk-reply-tree.md",
+    "reddit-replies-must-be-human-short.md",
+    "reddit-radar-read-only.md"
+   ],
+   "pick_rank": null,
+   "raw": "reddit-watch-walk-reply-tree.md\nreddit-replies-must-be-human-short.md\nreddit-radar-read-only.md"
+  },
+  {
+   "file": "contribute-spec-not-product-to-wrong-audience.md",
+   "query": "What's the lesson about promoting my library to DeepSeek users?",
+   "overlap_with_line": 0,
+   "rank_line": 126,
+   "rank_body": 1,
+   "pick": [
+    "reddit-watch-walk-reply-tree.md",
+    "reddit-replies-must-be-human-short.md",
+    "reddit-radar-read-only.md"
+   ],
+   "pick_rank": null,
+   "raw": "reddit-watch-walk-reply-tree.md\nreddit-replies-must-be-human-short.md\nreddit-radar-read-only.md"
+  },
+  {
+   "file": "breaktruth-candidates-liveness-replay-and-behavior-integrity.md",
+   "query": "What was the key insight about memory consolidation and recency of mention?",
+   "overlap_with_line": 1,
+   "rank_line": 20,
+   "rank_body": 5,
+   "pick": [
+    "reddit-watch-walk-reply-tree.md",
+    "reddit-replies-must-be-human-short.md",
+    "reddit-radar-read-only.md"
+   ],
+   "pick_rank": null,
+   "raw": "reddit-watch-walk-reply-tree.md\nreddit-replies-must-be-human-short.md\nreddit-radar-read-only.md"
+  },
+  {
+   "file": "open-world-forge-field-distance-lesson.md",
+   "query": "Why did our open-world-forge generate ideas that were already known in the literature?",
+   "overlap_with_line": 1,
+   "rank_line": 5,
+   "rank_body": 2,
+   "pick": [
+    "reddit-watch-walk-reply-tree.md",
+    "reddit-replies-must-be-human-short.md",
+    "reddit-radar-read-only.md"
+   ],
+   "pick_rank": null,
+   "raw": "reddit-watch-walk-reply-tree.md\nreddit-replies-must-be-human-short.md\nreddit-radar-read-only.md"
+  },
+  {
+   "file": "reddit-replies-must-be-human-short.md",
+   "query": "What are the rules for replying on Reddit to avoid sounding like an AI?",
+   "overlap_with_line": 1,
+   "rank_line": 5,
+   "rank_body": 2,
+   "pick": [
+    "reddit-watch-walk-reply-tree.md",
+    "reddit-replies-must-be-human-short.md",
+    "reddit-radar-read-only.md"
+   ],
+   "pick_rank": 2,
+   "raw": "reddit-watch-walk-reply-tree.md\nreddit-replies-must-be-human-short.md\nreddit-radar-read-only.md"
+  },
+  {
+   "file": "a-guard-that-skips-private-names-misses-where-it-bit.md",
+   "query": "Why did my guard for unclassified methods miss a private method that reaches tenant-aware code transitively?",
+   "overlap_with_line": 2,
+   "rank_line": 1,
+   "rank_body": 1,
+   "pick": [
+    "reddit-watch-walk-reply-tree.md",
+    "reddit-replies-must-be-human-short.md",
+    "reddit-radar-read-only.md"
+   ],
+   "pick_rank": null,
+   "raw": "reddit-watch-walk-reply-tree.md\nreddit-replies-must-be-human-short.md\nreddit-radar-read-only.md"
+  },
+  {
+   "file": "with-no-audience-ship-a-script-they-run-not-an-essay.md",
+   "query": "What kind of Reddit post works for a new account with no followers?",
+   "overlap_with_line": 0,
+   "rank_line": 311,
+   "rank_body": 1,
+   "pick": [
+    "reddit-watch-walk-reply-tree.md",
+    "reddit-replies-must-be-human-short.md",
+    "reddit-radar-read-only.md"
+   ],
+   "pick_rank": null,
+   "raw": "reddit-watch-walk-reply-tree.md\nreddit-replies-must-be-human-short.md\nreddit-radar-read-only.md"
+  },
+  {
+   "file": "a-history-rewrite-does-not-remove-data-from-github.md",
+   "query": "How to permanently delete a file from GitHub after git filter-repo and force push?",
+   "overlap_with_line": 1,
+   "rank_line": 14,
+   "rank_body": 1,
+   "pick": [
+    "reddit-watch-walk-reply-tree.md",
+    "reddit-replies-must-be-human-short.md",
+    "reddit-radar-read-only.md"
+   ],
+   "pick_rank": null,
+   "raw": "reddit-watch-walk-reply-tree.md\nreddit-replies-must-be-human-short.md\nreddit-radar-read-only.md"
+  },
+  {
+   "file": "cross-family-and-self-before-killing.md",
+   "query": "Why did we need to test across model families before refuting the atomic decomposition law?",
+   "overlap_with_line": 0,
+   "rank_line": 128,
+   "rank_body": 2,
+   "pick": [
+    "reddit-watch-walk-reply-tree.md",
+    "reddit-replies-must-be-human-short.md",
+    "reddit-radar-read-only.md"
+   ],
+   "pick_rank": null,
+   "raw": "reddit-watch-walk-reply-tree.md\nreddit-replies-must-be-human-short.md\nreddit-radar-read-only.md"
+  },
+  {
+   "file": "a-cap-on-the-write-path-deletes-the-evidence-half.md",
+   "query": "Why did all my notes have no falsifier and were exactly 500 characters?",
+   "overlap_with_line": 0,
+   "rank_line": 4,
+   "rank_body": 1,
+   "pick": [
+    "reddit-watch-walk-reply-tree.md",
+    "reddit-replies-must-be-human-short.md",
+    "reddit-radar-read-only.md"
+   ],
+   "pick_rank": null,
+   "raw": "reddit-watch-walk-reply-tree.md\nreddit-replies-must-be-human-short.md\nreddit-radar-read-only.md"
+  },
+  {
+   "file": "inspeximus-market-gap-dropin-then-hosting.md",
+   "query": "Why did we remove the mem0-compatible drop-in from inspeximus?",
+   "overlap_with_line": 0,
+   "rank_line": 173,
+   "rank_body": 1,
+   "pick": [
+    "reddit-watch-walk-reply-tree.md",
+    "reddit-replies-must-be-human-short.md",
+    "reddit-radar-read-only.md"
+   ],
+   "pick_rank": null,
+   "raw": "reddit-watch-walk-reply-tree.md\nreddit-replies-must-be-human-short.md\nreddit-radar-read-only.md"
+  },
+  {
+   "file": "the-second-anthropic-gap-hunt-also-found-nothing.md",
+   "query": "Why didn't the gap about corrected memories in Claude Code auto-memory get filed?",
+   "overlap_with_line": 1,
+   "rank_line": 6,
+   "rank_body": 1,
+   "pick": [
+    "reddit-watch-walk-reply-tree.md",
+    "reddit-replies-must-be-human-short.md",
+    "reddit-radar-read-only.md"
+   ],
+   "pick_rank": null,
+   "raw": "reddit-watch-walk-reply-tree.md\nreddit-replies-must-be-human-short.md\nreddit-radar-read-only.md"
+  },
+  {
+   "file": "land-result-verify-3x-before-building-next.md",
+   "query": "Why did I wrongly think Marat's model was cheating when the shortcut was in our own test set?",
+   "overlap_with_line": 0,
+   "rank_line": 185,
+   "rank_body": 1,
+   "pick": [
+    "reddit-watch-walk-reply-tree.md",
+    "reddit-replies-must-be-human-short.md",
+    "reddit-radar-read-only.md"
+   ],
+   "pick_rank": null,
+   "raw": "reddit-watch-walk-reply-tree.md\nreddit-replies-must-be-human-short.md\nreddit-radar-read-only.md"
+  },
+  {
+   "file": "a-gate-that-runs-only-here-cannot-see-there.md",
+   "query": "Why did my CI gate pass but tests fail on main?",
+   "overlap_with_line": 1,
+   "rank_line": 29,
+   "rank_body": 6,
+   "pick": [
+    "reddit-watch-walk-reply-tree.md",
+    "reddit-replies-must-be-human-short.md",
+    "reddit-radar-read-only.md"
+   ],
+   "pick_rank": null,
+   "raw": "reddit-watch-walk-reply-tree.md\nreddit-replies-must-be-human-short.md\nreddit-radar-read-only.md"
+  },
+  {
+   "file": "arxiv-author-search-is-token-and-of-not-exact.md",
+   "query": "Why did my arXiv author search with initials return zero for a real author?",
+   "overlap_with_line": 0,
+   "rank_line": 102,
+   "rank_body": 1,
+   "pick": [
+    "reddit-watch-walk-reply-tree.md",
+    "reddit-replies-must-be-human-short.md",
+    "reddit-radar-read-only.md"
+   ],
+   "pick_rank": null,
+   "raw": "reddit-watch-walk-reply-tree.md\nreddit-replies-must-be-human-short.md\nreddit-radar-read-only.md"
+  },
+  {
+   "file": "seo-program-setup.md",
+   "query": "How did we set up SEO to get #1 on Google and cited in AI for the storefront?",
+   "overlap_with_line": 1,
+   "rank_line": 8,
+   "rank_body": 1,
+   "pick": [
+    "reddit-watch-walk-reply-tree.md",
+    "reddit-replies-must-be-human-short.md",
+    "reddit-radar-read-only.md"
+   ],
+   "pick_rank": null,
+   "raw": "reddit-watch-walk-reply-tree.md\nreddit-replies-must-be-human-short.md\nreddit-radar-read-only.md"
+  },
+  {
+   "file": "two-channel-freshness-poison-pareto.md",
+   "query": "What was the prior-art verdict on the two-channel escape?",
+   "overlap_with_line": 1,
+   "rank_line": 5,
+   "rank_body": 1,
+   "pick": [
+    "reddit-watch-walk-reply-tree.md",
+    "reddit-replies-must-be-human-short.md",
+    "reddit-radar-read-only.md"
+   ],
+   "pick_rank": null,
+   "raw": "reddit-watch-walk-reply-tree.md\nreddit-replies-must-be-human-short.md\nreddit-radar-read-only.md"
+  },
+  {
+   "file": "a-revert-leaves-the-abandoned-value-active.md",
+   "query": "Why did revert probes show 85% stale values?",
+   "overlap_with_line": 1,
+   "rank_line": 9,
+   "rank_body": 1,
+   "pick": [
+    "reddit-watch-walk-reply-tree.md",
+    "reddit-replies-must-be-human-short.md",
+    "reddit-radar-read-only.md"
+   ],
+   "pick_rank": null,
+   "raw": "reddit-watch-walk-reply-tree.md\nreddit-replies-must-be-human-short.md\nreddit-radar-read-only.md"
+  },
+  {
+   "file": "a-falsy-sentinel-read-two-ways-in-one-class.md",
+   "query": "Why does passing embed=False instead of None cause index coherence to fail and drop vectors?",
+   "overlap_with_line": 3,
+   "rank_line": 1,
+   "rank_body": 1,
+   "pick": [
+    "reddit-watch-walk-reply-tree.md",
+    "reddit-replies-must-be-human-short.md",
+    "reddit-radar-read-only.md"
+   ],
+   "pick_rank": null,
+   "raw": "reddit-watch-walk-reply-tree.md\nreddit-replies-must-be-human-short.md\nreddit-radar-read-only.md"
+  },
+  {
+   "file": "inspeximus-real-moat-is-determinism-not-accuracy.md",
+   "query": "What were the four artifacts caught by the stress-claim gate?",
+   "overlap_with_line": 0,
+   "rank_line": 188,
+   "rank_body": 3,
+   "pick": [
+    "reddit-watch-walk-reply-tree.md",
+    "reddit-replies-must-be-human-short.md",
+    "reddit-radar-read-only.md"
+   ],
+   "pick_rank": null,
+   "raw": "reddit-watch-walk-reply-tree.md\nreddit-replies-must-be-human-short.md\nreddit-radar-read-only.md"
+  },
+  {
+   "file": "lab-receipts-rotate-out-drafts-outlive-their-evidence.md",
+   "query": "Lab ID rotated out, but I have the script and data \u2013 can I re-run to verify?",
+   "overlap_with_line": 2,
+   "rank_line": 2,
+   "rank_body": 1,
+   "pick": [
+    "reddit-watch-walk-reply-tree.md",
+    "reddit-replies-must-be-human-short.md",
+    "reddit-radar-read-only.md"
+   ],
+   "pick_rank": null,
+   "raw": "reddit-watch-walk-reply-tree.md\nreddit-replies-must-be-human-short.md\nreddit-radar-read-only.md"
+  },
+  {
+   "file": "be-warm-and-generous-with-people-brief-the-owner-on-strategy.md",
+   "query": "Why did I become so cold and unhelpful to people after that one complaint?",
+   "overlap_with_line": 1,
+   "rank_line": 1,
+   "rank_body": 3,
+   "pick": [
+    "reddit-watch-walk-reply-tree.md",
+    "reddit-replies-must-be-human-short.md",
+    "reddit-radar-read-only.md"
+   ],
+   "pick_rank": null,
+   "raw": "reddit-watch-walk-reply-tree.md\nreddit-replies-must-be-human-short.md\nreddit-radar-read-only.md"
+  },
+  {
+   "file": "reversibility-gate-frontier-reframe.md",
+   "query": "Did the reversibility gate approach to memory poisoning defense ever work?",
+   "overlap_with_line": 0,
+   "rank_line": 265,
+   "rank_body": 10,
+   "pick": [
+    "reddit-watch-walk-reply-tree.md",
+    "reddit-replies-must-be-human-short.md",
+    "reddit-radar-read-only.md"
+   ],
+   "pick_rank": null,
+   "raw": "reddit-watch-walk-reply-tree.md\nreddit-replies-must-be-human-short.md\nreddit-radar-read-only.md"
+  },
+  {
+   "file": "re-measure-both-ends-of-a-delta.md",
+   "query": "Why did my reported improvements turn out to be wrong when I re-measured the baseline?",
+   "overlap_with_line": 0,
+   "rank_line": 244,
+   "rank_body": 1,
+   "pick": [
+    "reddit-watch-walk-reply-tree.md",
+    "reddit-replies-must-be-human-short.md",
+    "reddit-radar-read-only.md"
+   ],
+   "pick_rank": null,
+   "raw": "reddit-watch-walk-reply-tree.md\nreddit-replies-must-be-human-short.md\nreddit-radar-read-only.md"
+  },
+  {
+   "file": "a-false-confession-is-worse-than-no-confession.md",
+   "query": "Why did my apology for not contributing cases get flagged as a tic?",
+   "overlap_with_line": 1,
+   "rank_line": 1,
+   "rank_body": 1,
+   "pick": [
+    "reddit-watch-walk-reply-tree.md",
+    "reddit-replies-must-be-human-short.md",
+    "reddit-radar-read-only.md"
+   ],
+   "pick_rank": null,
+   "raw": "reddit-watch-walk-reply-tree.md\nreddit-replies-must-be-human-short.md\nreddit-radar-read-only.md"
+  },
+  {
+   "file": "temporal-bitemporal-parity-not-win.md",
+   "query": "How did inspeximus compare to Zep and Graphiti on bitemporal queries?",
+   "overlap_with_line": 1,
+   "rank_line": 6,
+   "rank_body": 1,
+   "pick": [
+    "reddit-watch-walk-reply-tree.md",
+    "reddit-replies-must-be-human-short.md",
+    "reddit-radar-read-only.md"
+   ],
+   "pick_rank": null,
+   "raw": "reddit-watch-walk-reply-tree.md\nreddit-replies-must-be-human-short.md\nreddit-radar-read-only.md"
+  },
+  {
+   "file": "a-consistency-control-cannot-see-a-shared-defect.md",
+   "query": "Why did the lab result get rejected even though the regex patterns were consistent?",
+   "overlap_with_line": 0,
+   "rank_line": 14,
+   "rank_body": 1,
+   "pick": [
+    "reddit-watch-walk-reply-tree.md",
+    "reddit-replies-must-be-human-short.md",
+    "reddit-radar-read-only.md"
+   ],
+   "pick_rank": null,
+   "raw": "reddit-watch-walk-reply-tree.md\nreddit-replies-must-be-human-short.md\nreddit-radar-read-only.md"
+  },
+  {
+   "file": "frontier-generativity-predictability-ceiling.md",
+   "query": "Was the finding that general ideas get built on more real or just a biased metric artifact?",
+   "overlap_with_line": 0,
+   "rank_line": 159,
+   "rank_body": 1,
+   "pick": [
+    "reddit-watch-walk-reply-tree.md",
+    "reddit-replies-must-be-human-short.md",
+    "reddit-radar-read-only.md"
+   ],
+   "pick_rank": null,
+   "raw": "reddit-watch-walk-reply-tree.md\nreddit-replies-must-be-human-short.md\nreddit-radar-read-only.md"
+  },
+  {
+   "file": "a-guard-that-builds-its-target-by-string-mangling.md",
+   "query": "Why did my mutation test not actually mutate the code due to YAML indentation?",
+   "overlap_with_line": 0,
+   "rank_line": 46,
+   "rank_body": 1,
+   "pick": [
+    "reddit-watch-walk-reply-tree.md",
+    "reddit-replies-must-be-human-short.md",
+    "reddit-radar-read-only.md"
+   ],
+   "pick_rank": null,
+   "raw": "reddit-watch-walk-reply-tree.md\nreddit-replies-must-be-human-short.md\nreddit-radar-read-only.md"
+  },
+  {
+   "file": "verify-on-the-deployed-site-not-in-the-commit.md",
+   "query": "Why does my site not update after deploy even though CI passes?",
+   "overlap_with_line": 0,
+   "rank_line": 303,
+   "rank_body": 1,
+   "pick": [
+    "reddit-watch-walk-reply-tree.md",
+    "reddit-replies-must-be-human-short.md",
+    "reddit-radar-read-only.md"
+   ],
+   "pick_rank": null,
+   "raw": "reddit-watch-walk-reply-tree.md\nreddit-replies-must-be-human-short.md\nreddit-radar-read-only.md"
+  },
+  {
+   "file": "lead-with-constructive-fix-not-diagnosis-handback.md",
+   "query": "When a collaborator's experiment fails, should I lead with the fix instead of just diagnosing and asking for more data?",
+   "overlap_with_line": 1,
+   "rank_line": 4,
+   "rank_body": 1,
+   "pick": [
+    "reddit-watch-walk-reply-tree.md",
+    "reddit-replies-must-be-human-short.md",
+    "reddit-radar-read-only.md"
+   ],
+   "pick_rank": null,
+   "raw": "reddit-watch-walk-reply-tree.md\nreddit-replies-must-be-human-short.md\nreddit-radar-read-only.md"
+  },
+  {
+   "file": "always-paste-drafts-in-chat.md",
+   "query": "How do I ensure that a draft approved by the owner is not changed before posting?",
+   "overlap_with_line": 0,
+   "rank_line": 76,
+   "rank_body": 1,
+   "pick": [
+    "reddit-watch-walk-reply-tree.md",
+    "reddit-replies-must-be-human-short.md",
+    "reddit-radar-read-only.md"
+   ],
+   "pick_rank": null,
+   "raw": "reddit-watch-walk-reply-tree.md\nreddit-replies-must-be-human-short.md\nreddit-radar-read-only.md"
+  },
+  {
+   "file": "real-vector-sampling-cannot-see-a-degeneracy.md",
+   "query": "Why did my spread measurement on the degenerate space only show variation with complex vectors?",
+   "overlap_with_line": 2,
+   "rank_line": 1,
+   "rank_body": 1,
+   "pick": [
+    "reddit-watch-walk-reply-tree.md",
+    "reddit-replies-must-be-human-short.md",
+    "reddit-radar-read-only.md"
+   ],
+   "pick_rank": null,
+   "raw": "reddit-watch-walk-reply-tree.md\nreddit-replies-must-be-human-short.md\nreddit-radar-read-only.md"
+  },
+  {
+   "file": "noise-was-carrying-a-policy.md",
+   "query": "Why did my search results vary and what was the noise actually deciding?",
+   "overlap_with_line": 1,
+   "rank_line": 3,
+   "rank_body": 1,
+   "pick": [
+    "reddit-watch-walk-reply-tree.md",
+    "reddit-replies-must-be-human-short.md",
+    "reddit-radar-read-only.md"
+   ],
+   "pick_rank": null,
+   "raw": "reddit-watch-walk-reply-tree.md\nreddit-replies-must-be-human-short.md\nreddit-radar-read-only.md"
+  },
+  {
+   "file": "pairwise-interval-overlap-is-not-a-trend-test.md",
+   "query": "Why did we conclude no decline in the small-world data when a trend test shows a significant drop?",
+   "overlap_with_line": 3,
+   "rank_line": 1,
+   "rank_body": 1,
+   "pick": [
+    "reddit-watch-walk-reply-tree.md",
+    "reddit-replies-must-be-human-short.md",
+    "reddit-radar-read-only.md"
+   ],
+   "pick_rank": null,
+   "raw": "reddit-watch-walk-reply-tree.md\nreddit-replies-must-be-human-short.md\nreddit-radar-read-only.md"
+  },
+  {
+   "file": "ramr-outreach-candidates.md",
+   "query": "What was the outreach strategy for RAMR to other memory eval projects?",
+   "overlap_with_line": 2,
+   "rank_line": 5,
+   "rank_body": 1,
+   "pick": [
+    "reddit-watch-walk-reply-tree.md",
+    "reddit-replies-must-be-human-short.md",
+    "reddit-radar-read-only.md"
+   ],
+   "pick_rank": null,
+   "raw": "reddit-watch-walk-reply-tree.md\nreddit-replies-must-be-human-short.md\nreddit-radar-read-only.md"
+  },
+  {
+   "file": "an-other-directed-question-predicted-our-agents-own-drift.md",
+   "query": "Did the control show that self-report was just reading the conversation, not introspection?",
+   "overlap_with_line": 0,
+   "rank_line": 87,
+   "rank_body": 1,
+   "pick": [
+    "reddit-watch-walk-reply-tree.md",
+    "reddit-replies-must-be-human-short.md",
+    "reddit-radar-read-only.md"
+   ],
+   "pick_rank": null,
+   "raw": "reddit-watch-walk-reply-tree.md\nreddit-replies-must-be-human-short.md\nreddit-radar-read-only.md"
+  },
+  {
+   "file": "scarce-memory-eviction-regime-law.md",
+   "query": "How to design a cache eviction policy that works well across different workload patterns?",
+   "overlap_with_line": 1,
+   "rank_line": 8,
+   "rank_body": 1,
+   "pick": [
+    "reddit-watch-walk-reply-tree.md",
+    "reddit-replies-must-be-human-short.md",
+    "reddit-radar-read-only.md"
+   ],
+   "pick_rank": null,
+   "raw": "reddit-watch-walk-reply-tree.md\nreddit-replies-must-be-human-short.md\nreddit-radar-read-only.md"
+  },
+  {
+   "file": "which-decision-is-in-force-is-a-scan-not-a-search.md",
+   "query": "Why does my current decision query return null even though the record is active?",
+   "overlap_with_line": 0,
+   "rank_line": 309,
+   "rank_body": 1,
+   "pick": [
+    "reddit-watch-walk-reply-tree.md",
+    "reddit-replies-must-be-human-short.md",
+    "reddit-radar-read-only.md"
+   ],
+   "pick_rank": null,
+   "raw": "reddit-watch-walk-reply-tree.md\nreddit-replies-must-be-human-short.md\nreddit-radar-read-only.md"
+  },
+  {
+   "file": "a-verifier-of-consistency-passes-vacuously-on-an-empty-scope.md",
+   "query": "Why does my erasure certificate attest to a deletion that never happened?",
+   "overlap_with_line": 0,
+   "rank_line": 87,
+   "rank_body": 3,
+   "pick": [
+    "reddit-watch-walk-reply-tree.md",
+    "reddit-replies-must-be-human-short.md",
+    "reddit-radar-read-only.md"
+   ],
+   "pick_rank": null,
+   "raw": "reddit-watch-walk-reply-tree.md\nreddit-replies-must-be-human-short.md\nreddit-radar-read-only.md"
+  },
+  {
+   "file": "marintkael-valued-contact.md",
+   "query": "What was that phrase about recency of mention vs truth?",
+   "overlap_with_line": 0,
+   "rank_line": 192,
+   "rank_body": 1,
+   "pick": [
+    "reddit-watch-walk-reply-tree.md",
+    "reddit-replies-must-be-human-short.md",
+    "reddit-radar-read-only.md"
+   ],
+   "pick_rank": null,
+   "raw": "reddit-watch-walk-reply-tree.md\nreddit-replies-must-be-human-short.md\nreddit-radar-read-only.md"
+  },
+  {
+   "file": "know-before-act-preflight-general.md",
+   "query": "Why must I always check state before acting, not just for GPU?",
+   "overlap_with_line": 0,
+   "rank_line": 196,
+   "rank_body": 4,
+   "pick": [
+    "reddit-watch-walk-reply-tree.md",
+    "reddit-replies-must-be-human-short.md",
+    "reddit-radar-read-only.md"
+   ],
+   "pick_rank": null,
+   "raw": "reddit-watch-walk-reply-tree.md\nreddit-replies-must-be-human-short.md\nreddit-radar-read-only.md"
+  },
+  {
+   "file": "audit-of-the-claim-not-the-code.md",
+   "query": "How did you find the verification functions that were lying?",
+   "overlap_with_line": 0,
+   "rank_line": 89,
+   "rank_body": 32,
+   "pick": [
+    "reddit-watch-walk-reply-tree.md",
+    "reddit-replies-must-be-human-short.md",
+    "reddit-radar-read-only.md"
+   ],
+   "pick_rank": null,
+   "raw": "reddit-watch-walk-reply-tree.md\nreddit-replies-must-be-human-short.md\nreddit-radar-read-only.md"
+  },
+  {
+   "file": "agent-memory-observatory-frontier.md",
+   "query": "Why did the agent memory audit report get shelved and pivot to erasure fan-out?",
+   "overlap_with_line": 2,
+   "rank_line": 1,
+   "rank_body": 1,
+   "pick": [
+    "reddit-watch-walk-reply-tree.md",
+    "reddit-replies-must-be-human-short.md",
+    "reddit-radar-read-only.md"
+   ],
+   "pick_rank": null,
+   "raw": "reddit-watch-walk-reply-tree.md\nreddit-replies-must-be-human-short.md\nreddit-radar-read-only.md"
+  },
+  {
+   "file": "two-published-files-came-from-two-generations.md",
+   "query": "Why can't I join the trace files on record_id?",
+   "overlap_with_line": 1,
+   "rank_line": 1,
+   "rank_body": 1,
+   "pick": [
+    "reddit-watch-walk-reply-tree.md",
+    "reddit-replies-must-be-human-short.md",
+    "reddit-radar-read-only.md"
+   ],
+   "pick_rank": null,
+   "raw": "reddit-watch-walk-reply-tree.md\nreddit-replies-must-be-human-short.md\nreddit-radar-read-only.md"
+  },
+  {
+   "file": "appendix-tables-must-come-from-data-not-figures.md",
+   "query": "Why did the EDRN manuscript tables have numbers that didn't match the data files?",
+   "overlap_with_line": 0,
+   "rank_line": 107,
+   "rank_body": 1,
+   "pick": [
+    "reddit-watch-walk-reply-tree.md",
+    "reddit-replies-must-be-human-short.md",
+    "reddit-radar-read-only.md"
+   ],
+   "pick_rank": null,
+   "raw": "reddit-watch-walk-reply-tree.md\nreddit-replies-must-be-human-short.md\nreddit-radar-read-only.md"
+  }
+ ]
+}
