@@ -197,11 +197,21 @@ def main(argv) -> int:
     bad = [c for c in checks if not c[1]]
     print("\n%d/%d pre-write controls pass" % (len(checks) - len(bad), len(checks)))
 
-    live_reach = len(re.findall(r"\]\(([^)]+\.md)\)", "\n".join(
-        (lambda t: t)(live).split("\n")[:LINE_CAP])))
+    # MEASURE the incoming file against BOTH caps. This line once printed a hard-coded 134 and
+    # would have reported it for any file at all; it also counted by lines only, so a file over
+    # the byte cap but under 200 lines read as fully loaded.
+    _kept, _bytes = [], 0
+    for _line in live.split("\n"):
+        _n = len(_line.encode("utf-8")) + 2
+        if len(_kept) >= LINE_CAP or _bytes + _n > BYTE_CAP:
+            break
+        _kept.append(_line)
+        _bytes += _n
+    live_reach = len([x for x in re.findall(r"\]\(([^)]+\.md)\)", "\n".join(_kept))
+                      if x != "MEMORY_ARCHIVE.md"])
     print("\n%-22s %9s %6s %s" % ("", "bytes", "lines", "entries a session loads"))
     print("%-22s %9d %6d %d of %d" % ("live now", len(on_disk(live)), len(live.splitlines()),
-                                      134, len(order)))
+                                      live_reach, len(order)))
     print("%-22s %9d %6d %d of %d" % ("this rebuild", len(on_disk(text)), len(text.splitlines()),
                                       len(reach), len(order)))
 

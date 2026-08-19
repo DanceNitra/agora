@@ -101,7 +101,7 @@ class BM25:
 
 # ---------------------------------------------------------------- the fixtures, asserted
 STATES = {"01-crowded": 20020, "02-uncrowded": 19990, "03-written-lines": 42664,
-          "04-window-fitted": 23959}
+          "04-window-fitted": 23979}
 raw = {}
 for name, size in STATES.items():
     p = FIX / ("MEMORY.md." + name)
@@ -262,14 +262,14 @@ ck("the written-lines file was 42,666 bytes / 248 lines -- as DEPLOYED",
 ck("the pinned reconstruction is within 2 bytes of that",
    abs(len(raw["03-written-lines"].replace("\n", "\r\n").encode("utf-8")) - 42666) <= 2,
    "%d B" % len(raw["03-written-lines"].replace("\n", "\r\n").encode("utf-8")), "control")
-ck("the rebuild: 23,959 bytes, 200 lines, 230 of 230 inside",
-   len(raw["04-window-fitted"].replace("\n", "\r\n").encode("utf-8")) == 23959
+ck("the rebuild: 23,979 bytes, 200 lines, 230 of 230 inside",
+   len(raw["04-window-fitted"].replace("\n", "\r\n").encode("utf-8")) == 23979
    and len(raw["04-window-fitted"].splitlines()) == 200
    and rows["fitted"][2] == len(lines_of(raw["04-window-fitted"], False)) == 230,
    "%d B, %d lines, %d reachable" % (
        len(raw["04-window-fitted"].replace("\n", "\r\n").encode("utf-8")),
        len(raw["04-window-fitted"].splitlines()), rows["fitted"][2]))
-ck("draft says it", *says("23,959 bytes, 200 lines, 230 of 230 entries inside the window"))
+ck("draft says it", *says("23,979 bytes, 200 lines, 230 of 230 entries inside the window"))
 ck("the rebuild beats the deployed file on both registers",
    rows["fitted"][0] >= rows["written"][0] and rows["fitted"][1] >= rows["written"][1],
    "q %.3f vs %.3f, sb %.3f vs %.3f" % (rows["fitted"][0], rows["written"][0],
@@ -305,7 +305,7 @@ if _aug17.exists():
     ck("draft says it", *says("24,015 bytes — 96.1% of the cap — with 254 entries",
                               "ten to thirteen memories away"))
     ck("the draft separates the arithmetic claim from the instrument-dependent one",
-       *says("arithmetic on bytes and lines", "still has to accept the 96"))
+       *says("arithmetic on bytes and lines", "still has to accept the 95"))
 else:
     ck("the 2026-08-17 fixture is pinned", False, "missing -- pin it before quoting the figure",
        "fixture")
