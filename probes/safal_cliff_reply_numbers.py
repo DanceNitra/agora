@@ -143,9 +143,13 @@ for name, path in live.items():
         fired.append(name)
 ck("four live stores were reachable", len(sizes) == 4, str(sizes))
 ck("it fires on none of them", not fired, str(fired))
-ck("draft quotes their sizes", *says("14,112, 917, 374"))
-ck("the sizes are still right (they grow)", sorted(sizes, reverse=True)[0] >= 14112,
-   "largest now %d" % max(sizes))
+# A BOUND, because the store grows while the message is written: the draft first said 14,112 and by
+# the time it was ready that store held 14,141. The same correction, for the fourth time today.
+ck("draft quotes a bound rather than a stale count", *says("over 14,000 keys", "917, 374 and 6"))
+ck("the bound holds and the small ones are exact",
+   max(sizes) > 14000 and sorted(sizes) == sorted([max(sizes), 917, 374, 6]),
+   "sizes now %s" % sorted(sizes, reverse=True))
+ck("no stale exact count survives in the draft", "14,112" not in TEXT)
 
 bad = [c for c in checks if not c[1]]
 w = max(len(c[0]) for c in checks)
