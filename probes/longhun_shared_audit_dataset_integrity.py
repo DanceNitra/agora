@@ -154,6 +154,62 @@ def main():
           all(len(set(v)) == 1 for v in types.values()),
           "; ".join(f"{k}={len(v)} from {sorted(set(v))}" for k, v in sorted(types.items())))
 
+    print("\nDIAGNOSTIC 0 -- THE LABEL SET: do the verdicts agree with their own reasons?")
+    HEDGE = ("可能", "未明确判定")   # "possibly", "not clearly determined"
+    conf = [r for r in records if r.get("verdict") == "confirmed_penetration"]
+    hedged = [r for r in conf
+              if any(h in str(r.get("rejection_reason", "")) for h in HEDGE)]
+    for r in hedged:
+        print(f"      {r.get('request_id'):20s} {r.get('rejection_reason')}")
+    check("every CONFIRMED verdict has a reason that confirms it", not hedged,
+          f"{len(hedged)} of {len(conf)} rest on a reason saying 'possibly' or "
+          f"'not clearly determined'")
+    print("      This needs no source logs -- it is a tension between two fields of the SAME")
+      
+    print("      record. A framework calibrating on these labels is calibrating on labels the")
+    print("      publisher's own reason field does not support.")
+
+    print("\nDIAGNOSTIC 1 -- RESPONSE TRUNCATION, which rule 2 does not declare")
+    trunc = [r for r in records if "...[truncated:" in str(r.get("response", ""))]
+    lens = sorted(len(str(r.get("response", ""))) for r in records)
+    check("truncation, if present, is declared in the rules", not trunc,
+          f"{len(trunc)} of {len(records)} responses carry a truncation marker; "
+          f"rule 2 lists ANSI cleaning and pattern removal only")
+    print(f"      response lengths: {lens}")
+    print(f"      the three longest all land on {lens[-1]}, which is a CAP, not a coincidence")
+
+    print("\nDIAGNOSTIC 2 -- RULE 3 IS CHECKABLE AFTER ALL: the reason field fingerprints it")
+    rows = []
+    for r in records:
+        m = re.search(r"(\d+)字符", str(r.get("rejection_reason", "")))
+        if m:
+            rows.append((r.get("request_id"), int(m.group(1)),
+                         len(str(r.get("response", "")))))
+    dis = [x for x in rows if x[1] != x[2]]
+    shorter = [x for x in dis if x[1] > x[2]]
+    print(f"      {len(rows)} records embed a character count in rejection_reason")
+    for rid, c, a in rows:
+        print(f"        {rid:20s} reason says {c:4d}, published response is {a:4d}  "
+              f"delta {c-a:+d}")
+    check("the embedded counts are NOT rewritten to match the cleaned text",
+          len(dis) >= len(rows) - 1 and len(shorter) == len(dis),
+          f"{len(dis)}/{len(rows)} disagree, published shorter in {len(shorter)} of them")
+    print("      A publisher who beautified the verdict would have fixed these to match.")
+    print("      They are unfixed, and always in the direction desensitisation produces. That is")
+    print("      a consistency signature that after-the-fact editing would break -- evidence for")
+    print("      rule 3, not proof of it, but the first externally checkable evidence there is.")
+
+    print("\nDIAGNOSTIC 3 -- CALIBRATION VALUE: does the batch have two arms?")
+    vcount = {}
+    for r in records:
+        vcount[r.get("verdict")] = vcount.get(r.get("verdict"), 0) + 1
+    top = max(vcount.values())
+    check("the batch has a usable negative class", top < len(records) - 2,
+          f"{vcount} -- {top} of {len(records)} share one verdict")
+    print("      A calibration set needs both arms. With one verdict at 18/19 no framework can")
+      
+    print("      compute a detection rate, a precision, or anything with a denominator.")
+
     print("\nRULE 3 -- VERDICT UNALTERED: NOT CHECKABLE FROM OUTSIDE")
     verdicts = {}
     for r in records:

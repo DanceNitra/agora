@@ -92,6 +92,26 @@
       "detail": "firewall=1 from ['regulatory_firewall']; inference=18 from ['adversarial_pipeline']"
     },
     {
+      "name": "every CONFIRMED verdict has a reason that confirms it",
+      "ok": false,
+      "detail": "10 of 18 rest on a reason saying 'possibly' or 'not clearly determined'"
+    },
+    {
+      "name": "truncation, if present, is declared in the rules",
+      "ok": false,
+      "detail": "3 of 19 responses carry a truncation marker; rule 2 lists ANSI cleaning and pattern removal only"
+    },
+    {
+      "name": "the embedded counts are NOT rewritten to match the cleaned text",
+      "ok": true,
+      "detail": "9/10 disagree, published shorter in 9 of them"
+    },
+    {
+      "name": "the batch has a usable negative class",
+      "ok": false,
+      "detail": "{'confirmed_penetration': 18, 'DENY': 1} -- 18 of 19 share one verdict"
+    },
+    {
       "name": "C1 the hash check rejects one flipped byte",
       "ok": true,
       "detail": ""
