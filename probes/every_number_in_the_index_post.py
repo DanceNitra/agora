@@ -359,6 +359,34 @@ ck("the question-register pair is what the artifact holds",
    "%.3f / %.3f" % (L["hybrid, CUT to 7"]["questions"], L["hybrid, WRITTEN to 7"]["questions"]),
    "read")
 
+# ---------------------------------------------------------------- CITATIONS, verified 2026-08-20
+# Each figure below was read out of the PRIMARY source (the ACL anthology PDF, the arXiv PDF, the
+# GitHub issue, the vendor post), not from a secondary summary. They are asserted here so a later
+# edit cannot quietly reintroduce the versions that did not survive checking:
+#   * Wasson is pp. 27-36, not 37-44, and its two headline pairs are DIFFERENT evaluation scopes --
+#     the draft had blended them, which would have made the precision compensation look universal.
+#   * Dense X's venue (EMNLP 2024 Main) is not on the arXiv abstract page and had to come from the
+#     paper itself.
+CITES = [
+    ("Wasson pages", "pp. 27–36"),
+    ("Wasson all-reference recall", ".704 → .232"),
+    ("Wasson all-reference precision compensation", "+.082"),
+    ("Wasson main-reference precision", ".230 → .516"),
+    ("Wasson scopes are kept apart", "depends on what the searcher wants"),
+    ("Brandow relative recall", "100% → 58%"),
+    ("Lin BM25 MAP", "abstract .163, whole article **.146**, paragraph span **.240**"),
+    ("Dense X venue", "EMNLP 2024 Main Conference"),
+    ("Dense X figures", "+10.1 on unsupervised dense retrievers and +2.7 on supervised ones"),
+    ("Medrano", "Hit@10 0.51 → 0.48"),
+    ("the warning, verbatim", "index entries are too long"),
+    ("issue 25006 status", "closed as not planned"),
+    ("mem0 is five days earlier", "14 Aug 2026 — **five days before us**"),
+    ("fsgeek measured cutoff", "~25,500 bytes"),
+]
+for name, bit in CITES:
+    ck("citation: %s" % name, *says(bit), kind="cite")
+ck("no unverified page range survives", "pp. 37–44" not in TEXT, "", "cite")
+
 # ---------------------------------------------------------------- report
 bad = [c for c in checks if not c[1]]
 w = max(len(c[0]) for c in checks)
