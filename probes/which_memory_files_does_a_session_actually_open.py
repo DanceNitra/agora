@@ -451,13 +451,51 @@ def main():
     inside = [n for n, p in in_index.items() if p <= 200]
     outside = [n for n, p in in_index.items() if p > 200]
 
+    # ---------------- C7: can this instrument SEE a harness injection at all? ----------------
+    # The first version of this probe concluded "nothing is retrieved mid-session" from the absence
+    # of any memory-recall attachment sub-type. That was scoped wrong: the auto-memory block does not
+    # arrive as an attachment. This control tests the instrument against a KNOWN POSITIVE -- every
+    # session provably receives the index in its opening context -- and asks whether the transcript
+    # records it. If it does not, absence in the transcript proves nothing about the context.
+    marker = "One line per memory"
+    via_tool = free_text = 0
+    for fn in sorted(os.listdir(STORE)):
+        if not fn.endswith(".jsonl"):
+            continue
+        for line in open(os.path.join(STORE, fn), encoding="utf-8", errors="replace"):
+            if marker not in line:
+                continue
+            try:
+                rec = json.loads(line)
+            except Exception:
+                continue
+            msg = rec.get("message") or {}
+            content = msg.get("content") if isinstance(msg, dict) else None
+            if not isinstance(content, list):
+                continue
+            for c in content:
+                if not isinstance(c, dict) or marker not in json.dumps(c):
+                    continue
+                if c.get("type") in ("tool_use", "tool_result"):
+                    via_tool += 1
+                elif c.get("type") == "text":
+                    free_text += 1
+    print(f"\nC7 BLIND SPOT  index text in transcripts: {via_tool} via our own tool calls, "
+          f"{free_text} as harness free text")
+    blind = free_text == 0
+    print("   Every session receives the index in its opening context. It appears in ZERO transcripts"
+          if blind else "   The harness injection IS persisted, so absence is evidence.")
+
     print("\n" + "=" * 78)
     print("RESULT")
     print()
-    print("1. NOTHING is retrieved mid-session. Across 24 attachment sub-types in this corpus there")
-    print("   is no memory-recall injection of any kind: the index in the system prompt is the")
-    print("   entire always-on payload, at startup AND for the rest of the session. That extends")
-    print("   @yacb2's startup-composition result to the whole session lifetime.")
+    print("1. No fact file is ever FETCHED BY A TOOL CALL mid-session beyond an authoring loop, and")
+    print("   no persisted harness record (24 attachment sub-types, 113 system-reminder blocks)")
+    print("   carries one. But this cannot be stated as 'nothing is retrieved': see C7 -- the")
+    print("   auto-memory injection every session provably receives appears in NO transcript, so")
+    print("   the transcript cannot rule out a silent injection. That gap is itself a finding for")
+    print("   #82056: a session's own transcript does not record what memory it was given, so the")
+    print("   load receipt that thread is asking for cannot be reconstructed after the fact either.")
     print()
     print(f"2. Fact files ARE opened -- {len(read_in)} of {len(population)} -- but {same_only} of them")
     print("   only inside their own authoring loop (write it, read it back, edit it). Genuine")
@@ -466,13 +504,22 @@ def main():
     if cf:
         print("3. THE FRONTIER QUESTION. The Zipfian worry was that entries past the window might be")
         print("   the low-value tail, so weighting entries equally overstates the loss. Measured")
-        print("   against the 08-19 overflow index, it runs the other way: of the genuinely")
-        print(f"   cross-session-recalled memories listed there, {cf['recalled_hidden']}/{cf['recalled_listed']} "
-              f"({100.0*cf['recalled_hidden']/max(1,cf['recalled_listed']):.0f}%) sat below the cut,")
-        print(f"   against a {100*cf['lost_fraction']:.0f}% base rate "
-              f"(p={cf.get('binomial_one_sided_p')}); excluding our own index-maintenance")
-        print(f"   sessions, {cf['recalled_hidden_excl_maintenance']}/{cf['recalled_listed_excl_maintenance']} "
-              f"(p={cf.get('binomial_one_sided_p_excl_maintenance')}).")
+        print("   against the 08-19 overflow index, it runs the other way.")
+        print()
+        print(f"   PRIMARY, no exclusions -- the implementation-independent number to quote:")
+        print(f"      {cf['recalled_hidden']}/{cf['recalled_listed']} "
+              f"({100.0*cf['recalled_hidden']/max(1,cf['recalled_listed']):.0f}%) of genuinely "
+              f"cross-session-recalled memories sat below the cut,")
+        print(f"      against a {100*cf['lost_fraction']:.0f}% base rate. one-sided exact "
+              f"p = {cf.get('binomial_one_sided_p')} -- MARGINAL, and it is the headline.")
+        print()
+        print("   SENSITIVITY: excluding our own index-maintenance sessions raises it, but the exact")
+        print("   figure depends on how a 'maintenance session' is counted -- two implementations of")
+        print("   the same idea give 17/25 and 18/28. Quote the RANGE, never one draw from it:")
+        print("      across every threshold, share 56%-86%, p between 0.012 and 0.066, and the")
+        print("      direction holds at EVERY threshold including no exclusion at all")
+        print("      (probes/round_k_attacking_our_own_window_result.py, A2).")
+        print()
         print("   The window does not drop the tail. It drops the durable reference layer, which")
         print("   sits at the BOTTOM of the file because it is old, and is fetched precisely")
         print("   because it is durable. The conclusion does not soften -- it hardens.")

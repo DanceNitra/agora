@@ -1,0 +1,64 @@
+{
+  "verdicts": [
+    {
+      "attack": "A1",
+      "survives": true,
+      "note": "41/48 targeted"
+    },
+    {
+      "attack": "A2",
+      "survives": true,
+      "note": "6/6 thresholds above base rate"
+    },
+    {
+      "attack": "A3",
+      "survives": true,
+      "note": "worst rho +1.000"
+    },
+    {
+      "attack": "A4",
+      "survives": true,
+      "note": "1 of 231 entries vanished"
+    }
+  ],
+  "threshold_sweep": [
+    [
+      "none",
+      32,
+      18,
+      0.06578017565249944
+    ],
+    [
+      "100",
+      32,
+      18,
+      0.06578017565249944
+    ],
+    [
+      "50",
+      28,
+      18,
+      0.012540027445173515
+    ],
+    [
+      "20",
+      28,
+      18,
+      0.012540027445173515
+    ],
+    [
+      "10",
+      11,
+      8,
+      0.03688749399379711
+    ],
+    [
+      "5",
+      7,
+      6,
+      0.022992890807547985
+    ]
+  ],
+  "cut_rank": 135,
+  "entries": 231
+}
