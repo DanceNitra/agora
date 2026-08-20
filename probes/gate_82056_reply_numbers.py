@@ -196,8 +196,10 @@ def main():
     if hj is None or not hj:
         check("@hjqcan comment located", False, "cannot verify the attribution we make")
     else:
-        check("@hjqcan really has an 'item 1' about store identity/observability",
-              ("1." in hj or "item 1" in hj) and "observability" in hj.lower())
+        check("@hjqcan attribution: only required if we actually make it",
+              ("hjqcan" not in draft)
+              or (("1." in hj or "item 1" in hj) and "observability" in hj.lower()),
+              "draft no longer attributes to him, so this is vacuously satisfied")
 
     print("")
     print("TOKENS -- re-derived from the tokenizer receipt (rewritten after the red-team panel)")
@@ -255,8 +257,61 @@ def main():
           "on disk, CRLF included" in draft and "`wc -c` reproduces it" in draft)
     check("the unprovable universal is gone",
           "every session demonstrably receives it" not in draft
-          and "the session I am writing from is receiving it right now" in draft,
+          and "the session I am writing from is receiving that index right now" in draft,
           "one demonstrated case, not a claim about 17 transcripts")
+
+    print("")
+    print("STORM FIXES -- three things the external pass caught that would have embarrassed us")
+
+    # S1: the mechanism. Our index is TOPIC-BUCKETED, not recency-ordered. Re-derived live from
+    # the overflow backup, not asserted: every recalled-but-cut entry must fall in the bottom
+    # sections, and none in the top two.
+    overflow_p = os.path.join(MEMORY_DIR, "MEMORY.md.bak-20260819-prewrittenlines")
+    hidden_files = set(cf.get("hidden_files", []))
+    sec_of, order_secs = {}, []
+    cur = None
+    for line in open(overflow_p, encoding="utf-8", errors="replace"):
+        if line.startswith("##"):
+            cur = line.strip("# ").strip()
+            order_secs.append(cur)
+        for n in re.findall(r"\]\(([A-Za-z0-9_.-]+\.md)\)", line):
+            sec_of.setdefault(n, cur)
+    top2 = set(order_secs[:2])
+    bottom4 = set(order_secs[-4:])
+    in_top = [n for n in hidden_files if sec_of.get(n) in top2]
+    in_bottom = [n for n in hidden_files if sec_of.get(n) in bottom4]
+    check("S1 the index really is topic-bucketed, not recency-ordered",
+          len(order_secs) >= 6 and "Standing rules" in order_secs,
+          f"{len(order_secs)} sections: {', '.join(order_secs[:3])}...")
+    check("S1 all recalled-but-cut entries sit in the bottom four sections",
+          len(in_bottom) == len(hidden_files) and not in_top,
+          f"{len(in_bottom)}/{len(hidden_files)} bottom, {len(in_top)} top")
+    check("S1 the recency explanation is RETRACTED in the draft",
+          "not recency-ordered" in draft and "it selected *my own layout*" in draft
+          and "position is a proxy for category" in draft,
+          "we tell him the mechanism we had ready was wrong")
+
+    # S2: the receipt exists. We were about to say it did not.
+    check("S2 /context and InstructionsLoaded are acknowledged",
+          "/context" in draft and "InstructionsLoaded" in draft
+          and '"there is no receipt" is wrong' in draft)
+    check("S2 the surviving claim is narrowed to truncation state",
+          "which files** loaded, not **how much of a file**" in draft
+          and "Neither surfaces truncation state" in draft)
+    check("S2 the documented limit is quoted, and the unit confusion resolved",
+          "whichever comes first" in draft and "24.4 KiB *is* 25 KB" in draft)
+
+    # S3: prior art we were about to miss
+    check("S3 arXiv:2606.12945 cited with its verified numbers",
+          "arXiv:2606.12945" in draft and "36.8%" in draft
+          and "65.7%" in draft and "77.0%" in draft)
+    check("S3 the mechanism distinction is drawn, not blurred",
+          "consolidation policy choosing what to keep" in draft
+          and "fixed window truncating a file" in draft)
+    check("S3 novelty is claimed narrowly",
+          "the only novelty I would claim here" in draft)
+    check("S3 unverified sub-figure NOT cited (0.518 was not in the abstract)",
+          "0.518" not in draft, "verifier could not confirm it")
 
     print("")
     print("RED-TEAM FIXES -- each panel finding must be visible in the draft")
@@ -297,7 +352,7 @@ def main():
           "Anthropic's own tokenizer was not available" in draft
           and "not an absolute rate for Claude" in draft,
           "ratio asserted, absolute rate explicitly not")
-    check("length is in our register (< 6,600 chars)", len(draft) < 6600, f"{len(draft)} chars")
+    check("length is in our register (< 8,000 chars)", len(draft) < 8000, f"{len(draft)} chars")
 
     n = len(checks)
     bad = [c for c in checks if not c[1]]
