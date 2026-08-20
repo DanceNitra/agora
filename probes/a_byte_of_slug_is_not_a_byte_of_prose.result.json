@@ -1,0 +1,64 @@
+{
+  "instrument_note": "authoritative tokenizer UNAVAILABLE (BadRequestError: credit balance is zero)",
+  "tokenizers": [
+    "o200k_base",
+    "cl100k_base",
+    "p50k_base",
+    "r50k_base"
+  ],
+  "bytes": {
+    "slug": 6019,
+    "title": 3722,
+    "prose": 5961,
+    "body prose": 22522
+  },
+  "tok_per_byte": {
+    "slug": {
+      "o200k_base": 0.2728027911613225,
+      "cl100k_base": 0.2716398072769563,
+      "p50k_base": 0.40338926732015284,
+      "r50k_base": 0.40338926732015284
+    },
+    "title": {
+      "o200k_base": 0.2506716818914562,
+      "cl100k_base": 0.2528210639441161,
+      "p50k_base": 0.27431488447071467,
+      "r50k_base": 0.27431488447071467
+    },
+    "prose": {
+      "o200k_base": 0.23100150981378964,
+      "cl100k_base": 0.23217580942794833,
+      "p50k_base": 0.24693843314880054,
+      "r50k_base": 0.24693843314880054
+    },
+    "body prose": {
+      "o200k_base": 0.2381671254773111,
+      "cl100k_base": 0.23905514607938905,
+      "p50k_base": 0.24673652428736348,
+      "r50k_base": 0.24673652428736348
+    }
+  },
+  "whole_states": {
+    "live index (mixed)": {
+      "o200k_base": 0.26603495472731103,
+      "cl100k_base": 0.26616129711518216,
+      "p50k_base": 0.33316487681617185,
+      "r50k_base": 0.33316487681617185,
+      "_bytes": 23745
+    },
+    "08-19 (slug-heavy)": {
+      "o200k_base": 0.27545334819167255,
+      "cl100k_base": 0.27565596190862124,
+      "p50k_base": 0.35584034039104445,
+      "r50k_base": 0.35584034039104445,
+      "_bytes": 19742
+    }
+  },
+  "slug_over_prose": {
+    "o200k_base": 1.1809567451798426,
+    "cl100k_base": 1.1699746323540003,
+    "p50k_base": 1.6335621076735265,
+    "r50k_base": 1.6335621076735265
+  },
+  "controls_failed": []
+}

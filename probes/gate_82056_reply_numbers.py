@@ -29,6 +29,7 @@ REPO = os.path.dirname(HERE)
 DRAFT = os.path.join(REPO, "agora_output", "drafts", "reply_82056_the_window_drops_the_durable_layer.md")
 MAIN = os.path.join(HERE, "which_memory_files_does_a_session_actually_open.result.json")
 ATTACK = os.path.join(HERE, "round_k_attacking_our_own_window_result.result.json")
+TOK = os.path.join(HERE, "a_byte_of_slug_is_not_a_byte_of_prose.result.json")
 MEMORY_DIR = os.path.join(os.path.expanduser("~"), ".claude", "projects",
                           "C--Users-Danculus-agora", "memory")
 VAULT = os.path.join(os.path.expanduser("~"), "agora-vault")
@@ -59,11 +60,12 @@ def main():
     if not os.path.exists(DRAFT):
         sys.exit("FAIL: draft missing " + DRAFT)
     draft = open(DRAFT, encoding="utf-8").read()
-    for p in (MAIN, ATTACK):
+    for p in (MAIN, ATTACK, TOK):
         if not os.path.exists(p):
             sys.exit("FAIL: receipt missing (re-run the probe, do not skip) " + p)
     main_r = json.load(open(MAIN, encoding="utf-8"))
     atk = json.load(open(ATTACK, encoding="utf-8"))
+    tok = json.load(open(TOK, encoding="utf-8"))
     cf = main_r["counterfactual_overflow_index"]
 
     print("OURS -- re-derived from receipts in this repo")
@@ -197,6 +199,45 @@ def main():
         check("@hjqcan really has an 'item 1' about store identity/observability",
               ("1." in hj or "item 1" in hj) and "observability" in hj.lower())
 
+    print("")
+    print("TOKENS -- re-derived from the tokenizer receipt")
+    r = tok["tok_per_byte"]
+    ratios_t = tok["slug_over_prose"]
+    live = tok["whole_states"]["live index (mixed)"]
+    sluggy = tok["whole_states"]["08-19 (slug-heavy)"]
+    check("tokenizer probe's own controls passed", not tok["controls_failed"],
+          f"failed={tok['controls_failed'] or 'none'}")
+    check("1.18x modern slug:prose", "**1.18x**" in draft
+          and abs(ratios_t["o200k_base"] - 1.18) < 0.02, f"o200k={ratios_t['o200k_base']:.2f}")
+    check("1.63x older slug:prose", "1.63x on the older ones" in draft
+          and abs(ratios_t["r50k_base"] - 1.63) < 0.02, f"r50k={ratios_t['r50k_base']:.2f}")
+    check("0.275 -> 0.266 between two real states",
+          "0.275 to 0.266 tokens/byte" in draft
+          and abs(sluggy["o200k_base"] - 0.275) < 0.002
+          and abs(live["o200k_base"] - 0.266) < 0.002,
+          f"{sluggy['o200k_base']:.3f} -> {live['o200k_base']:.3f}")
+    check("3.5% whole-file movement is arithmetic", "**3.5%**" in draft
+          and abs((sluggy["o200k_base"] / live["o200k_base"] - 1) * 100 - 3.5) < 0.2,
+          f"{100*(sluggy['o200k_base']/live['o200k_base']-1):.1f}%")
+    densest_any = max(v for arm in r.values() for v in arm.values())
+    densest_mod = max(arm[k] for arm in r.values() for k in ("o200k_base", "cl100k_base"))
+    check("0.403 densest arm on any vocabulary", "is 0.403" in draft
+          and abs(densest_any - 0.403) < 0.002, f"{densest_any:.3f}")
+    check("0.273 densest on the modern two", "it is 0.273" in draft
+          and abs(densest_mod - 0.273) < 0.002, f"{densest_mod:.3f}")
+    nb = live["_bytes"]
+    pred = 108 + 0.44 * nb
+    ours = live["o200k_base"] * nb
+    check("23,745 index bytes", "23,745" in draft and nb == 23745, f"bytes={nb}")
+    check("10,556 predicted by his model", "10,556 tokens" in draft and abs(pred - 10556) < 2,
+          f"pred={pred:.0f}")
+    check("6,317 tokens of actual text", "6,317" in draft and abs(ours - 6317) < 3,
+          f"ours={ours:.0f}")
+    check("0.179 tok/byte gap", "0.179 tokens/byte" in draft
+          and abs((pred - ours) / nb - 0.179) < 0.002, f"{(pred-ours)/nb:.3f}")
+    check("~18 tokens/entry over the WHOLE 235-entry index",
+          "18 tokens per entry" in draft and abs((pred - ours) / 235 - 18) < 1.5,
+          f"{(pred-ours)/235:.1f} over 235 entries")
     print("\nTHE ROOM")
     state = gh(f"repos/anthropics/claude-code/issues/{ISSUE}", ".state")
     check("issue is OPEN", state == "open", f"state={state}")
@@ -208,10 +249,11 @@ def main():
     print("\nHYGIENE")
     check("draft is ASCII-safe apart from known typography",
           all(ord(ch) < 128 or ch in "—–…‘’“”" for ch in draft))
-    check("no unverifiable tokenizer claim asserted",
-          "tokenize far worse" not in draft and "do not know whether" in draft,
-          "posed as a question, not a claim")
-    check("length is in our register (< 4,500 chars)", len(draft) < 4500, f"{len(draft)} chars")
+    check("tokenizer limitation is disclosed, not buried",
+          "Anthropic's own tokenizer was not available" in draft
+          and "not an absolute rate for Claude" in draft,
+          "ratio asserted, absolute rate explicitly not")
+    check("length is in our register (< 5,600 chars)", len(draft) < 5600, f"{len(draft)} chars")
 
     n = len(checks)
     bad = [c for c in checks if not c[1]]
