@@ -173,6 +173,34 @@ lim = " ".join(store([A, B]).identifier_contract()["limits"])
 ck("and the limits say it in the product too",
    "cannot tell you what it lost" in lim and "does NOT bind the writer policy" in lim)
 
+# ---------------------------------------------------------------- the speedup we quote is OURS
+# The reply quotes two pairs: his (1.65ms -> 0.49ms on 562 paths, HIS measurement, attributed) and
+# ours. Only ours is ours to verify, and it must be re-derived rather than remembered.
+import time as _time                                                   # noqa: E402
+_big = ["c:/a/" + "d" * 142 + "/f%05d.ts" % i for i in range(14000)]
+
+
+def _lost(L):
+    g = {}
+    for k in _big:
+        g.setdefault(k[:L], []).append(k)
+    return sum(len({*v}) - 1 for v in g.values() if len({*v}) > 1)
+
+
+_t0 = _time.perf_counter()
+_lo, _hi = 0, max(len(k) for k in _big)
+while _lo < _hi:
+    _m = (_lo + _hi + 1) // 2
+    if _lost(_m):
+        _lo = _m
+    else:
+        _hi = _m - 1
+_t_bin = _time.perf_counter() - _t0
+ck("the binary search really is sub-0.1s on 14,000 path keys", _t_bin < 0.1, "%.3fs" % _t_bin)
+ck("reply quotes our pair and attributes his to him",
+   *says("0.404 s to 0.027 s on 14,000 of mine", "1.65 ms to 0.49 ms on your 562 paths"))
+ck("and says the two were independent", *says("without knowing"))
+
 # ---------------------------------------------------------------- no-overclaim guard
 # NOVELTY PHRASINGS, not the bare word: the draft legitimately says "my first run" and "your
 # first", and a substring guard on "first" flagged those. A guard that fires on correct prose gets
