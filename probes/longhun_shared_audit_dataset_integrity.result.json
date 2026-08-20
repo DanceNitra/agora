@@ -1,0 +1,121 @@
+{
+  "sha256_measured": "b1a8a650b8038b21505396ea869911008781b26a3adf39ad730edc3d99a2e7f3",
+  "sha256_published": "b1a8a650b8038b21505396ea869911008781b26a3adf39ad730edc3d99a2e7f3",
+  "records": 19,
+  "bytes": 12370,
+  "distinct_keys": [
+    "attack_category",
+    "dna_sig",
+    "model",
+    "prompt",
+    "record_type",
+    "rejection_reason",
+    "request_id",
+    "response",
+    "source",
+    "timestamp",
+    "verdict"
+  ],
+  "extra_fields": [],
+  "forbidden_present": [],
+  "verdicts": {
+    "confirmed_penetration": 18,
+    "DENY": 1
+  },
+  "record_types": {
+    "inference": [
+      "adversarial_pipeline"
+    ],
+    "firewall": [
+      "regulatory_firewall"
+    ]
+  },
+  "checks": [
+    {
+      "name": "SHA-256 matches the value published in the issue",
+      "ok": true,
+      "detail": "b1a8a650b8038b21505396ea..."
+    },
+    {
+      "name": "every line is valid JSON",
+      "ok": true,
+      "detail": "19/19 parsed"
+    },
+    {
+      "name": "record count is the 19 he states",
+      "ok": true,
+      "detail": "19 records"
+    },
+    {
+      "name": "no field outside the 11 declared ones",
+      "ok": true,
+      "detail": "11 distinct keys"
+    },
+    {
+      "name": "every record carries all 11 declared fields",
+      "ok": true,
+      "detail": "all complete"
+    },
+    {
+      "name": "none of the uncollected fields he names appear",
+      "ok": true,
+      "detail": "checked inference_time_ms, tokens_used, latency_ms, ..."
+    },
+    {
+      "name": "no ANSI escape sequences remain",
+      "ok": true,
+      "detail": "19 records scanned"
+    },
+    {
+      "name": "no residual secret / PII patterns in prompt/response/reason",
+      "ok": true,
+      "detail": "6 pattern classes over 3 content fields"
+    },
+    {
+      "name": "request_id is unique",
+      "ok": true,
+      "detail": "19/19"
+    },
+    {
+      "name": "dna_sig is unique",
+      "ok": true,
+      "detail": "19/19"
+    },
+    {
+      "name": "timestamps are ISO 8601 as declared",
+      "ok": true,
+      "detail": "all parse"
+    },
+    {
+      "name": "record_type and source agree",
+      "ok": true,
+      "detail": "firewall=1 from ['regulatory_firewall']; inference=18 from ['adversarial_pipeline']"
+    },
+    {
+      "name": "C1 the hash check rejects one flipped byte",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "C2 the field-lock check sees an injected tokens_used",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "C3 the ANSI check sees an injected escape",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "C4 the PII check sees an injected email",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "C5 a long digit run injected into response is still caught",
+      "ok": true,
+      "detail": "narrowing the scope did not blind the check"
+    }
+  ],
+  "rule3_verdict_unaltered": "UNVERIFIABLE without the source logs"
+}
