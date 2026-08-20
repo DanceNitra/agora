@@ -1,0 +1,175 @@
+{
+ "version": "2.17.1",
+ "shipped": {
+  "A  session keys (hash-shaped)": {
+   "at_cliff_edge": [],
+   "folds": {
+    "prefix_8": {
+     "verdict": "NOT_YET_MEASURABLE",
+     "headroom": 8,
+     "collides_at": 0,
+     "lost": 0
+    },
+    "prefix_12": {
+     "verdict": "NOT_YET_MEASURABLE",
+     "headroom": 12,
+     "collides_at": 0,
+     "lost": 0
+    }
+   }
+  },
+  "B  paths (structured)": {
+   "at_cliff_edge": [],
+   "folds": {
+    "prefix_8": {
+     "verdict": "COST_MEASURED",
+     "headroom": 1,
+     "collides_at": 7,
+     "lost": 3
+    },
+    "prefix_12": {
+     "verdict": "COST_MEASURED",
+     "headroom": 1,
+     "collides_at": 11,
+     "lost": 3
+    }
+   }
+  },
+  "C  planted cliff (his control)": {
+   "at_cliff_edge": [
+    "prefix_8"
+   ],
+   "folds": {
+    "prefix_8": {
+     "verdict": "ZERO_AT_SCALE",
+     "headroom": 1,
+     "collides_at": 7,
+     "lost": 0
+    },
+    "prefix_12": {
+     "verdict": "ZERO_AT_SCALE",
+     "headroom": 5,
+     "collides_at": 7,
+     "lost": 0
+    }
+   }
+  },
+  "D  unstructured (his control)": {
+   "at_cliff_edge": [],
+   "folds": {
+    "prefix_8": {
+     "verdict": "NOT_YET_MEASURABLE",
+     "headroom": 6,
+     "collides_at": 2,
+     "lost": 0
+    },
+    "prefix_12": {
+     "verdict": "NOT_YET_MEASURABLE",
+     "headroom": 10,
+     "collides_at": 2,
+     "lost": 0
+    }
+   }
+  }
+ },
+ "reachability": {
+  "A  session keys (hash-shaped)": {
+   "scanned": 8,
+   "verdicts": {
+    "NOT_YET_MEASURABLE": 8
+   },
+   "zero_at_scale_lengths": [],
+   "reachable": false
+  },
+  "B  paths (structured)": {
+   "scanned": 166,
+   "verdicts": {
+    "COST_MEASURED": 148,
+    "NOT_YET_MEASURABLE": 18
+   },
+   "zero_at_scale_lengths": [],
+   "reachable": false
+  },
+  "C  planted cliff (his control)": {
+   "scanned": 8,
+   "verdicts": {
+    "COST_MEASURED": 7,
+    "ZERO_AT_SCALE": 1
+   },
+   "zero_at_scale_lengths": [
+    8
+   ],
+   "reachable": true
+  },
+  "D  unstructured (his control)": {
+   "scanned": 20,
+   "verdicts": {
+    "COST_MEASURED": 2,
+    "ZERO_AT_SCALE": 2,
+    "NOT_YET_MEASURABLE": 16
+   },
+   "zero_at_scale_lengths": [
+    3,
+    4
+   ],
+   "reachable": true
+  }
+ },
+ "cliffs": {
+  "A  session keys (hash-shaped)": {
+   "collides_at": 0,
+   "first_clean_fold": 1,
+   "threshold_there": 1,
+   "verdict_there": "NOT_YET_MEASURABLE",
+   "keys": 3
+  },
+  "B  paths (structured)": {
+   "collides_at": 148,
+   "first_clean_fold": 149,
+   "threshold_there": 223165344018939325446094848,
+   "verdict_there": "NOT_YET_MEASURABLE",
+   "keys": 516
+  },
+  "C  planted cliff (his control)": {
+   "collides_at": 7,
+   "first_clean_fold": 8,
+   "threshold_there": 3,
+   "verdict_there": "ZERO_AT_SCALE",
+   "keys": 400
+  },
+  "D  unstructured (his control)": {
+   "collides_at": 2,
+   "first_clean_fold": 3,
+   "threshold_there": 29,
+   "verdict_there": "ZERO_AT_SCALE",
+   "keys": 400
+  }
+ },
+ "proposal": {
+  "A  session keys (hash-shaped)": {
+   "shipped_fires": false,
+   "at_fixed_folds": false,
+   "at_cliff_fold": false,
+   "cliff_fold": 1
+  },
+  "B  paths (structured)": {
+   "shipped_fires": false,
+   "at_fixed_folds": false,
+   "at_cliff_fold": true,
+   "cliff_fold": 149
+  },
+  "C  planted cliff (his control)": {
+   "shipped_fires": true,
+   "at_fixed_folds": true,
+   "at_cliff_fold": true,
+   "cliff_fold": 8
+  },
+  "D  unstructured (his control)": {
+   "shipped_fires": false,
+   "at_fixed_folds": false,
+   "at_cliff_fold": true,
+   "cliff_fold": 3
+  }
+ },
+ "control_fires": true
+}
