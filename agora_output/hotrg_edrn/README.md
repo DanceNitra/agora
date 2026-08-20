@@ -7,10 +7,37 @@ limit (L3 = 42 spins and beyond). Shared so anyone with a GPU can pick up the L3
 
 ## Honest status (what's solid, what stops)
 
+> **CORRECTIONS, 2026-08-18.** Three things below were stated without the qualifications they needed.
+> None of them is a computational error; all three are things this file failed to record, which is
+> the same defect one level up.
+>
+> **The model is not the manuscript's.** `hotrg.py:40` builds `SX_i SX_j + SZ_i SZ_j` and
+> `dmrg_valley.py` adds `Sigmax Sigmax` and `Sigmaz Sigmaz`. There is no `YY`: this is the XY model
+> in a rotated frame, not the isotropic `sx sx + sy sy + sz sz` that `edrn-dmrg-verification#2`
+> studies. Measured on the same graph and edge, the two agree to **0.7%** on the global valley depth
+> (0.144542 vs 0.143538) and differ by **5%** locally (0.276416 vs 0.263346). A cross-check between
+> them is therefore not a same-model check, and cannot agree "to the digit".
+>
+> **The defect bond was not an edge of the gasket.** Both this toolchain and `dmrg_valley.py` used
+> `(0,2)`, and 0 and 2 are two of the three tips, which sit at graph distance 4 — no tip-tip pair is
+> an edge at any level. The coupling was therefore APPENDED as a 28th bond rather than varying one of
+> the 27, and the minimum sits near s=0.60 because s=1 is not a special point for an added bond.
+> `dmrg_valley.py` now defaults to the real tip-to-interior edge `(0,6)` and refuses a non-edge;
+> `scan_guard.py` carries the same check for anyone else.
+>
+> **The "L2 local valley depth 0.1902" is not reproducible from what this file records.** "Local" is
+> never defined here. Under the definition the impurity code implies — the two tip sub-gaskets, 18 of
+> the 27 edges, with the added `(0,2)` bond — the depth comes out **0.200462** in XX+ZZ and
+> **0.181144** isotropically. The published figure sits between them without matching either, so the
+> neighbourhood and the defect placement have to be stated before the number means anything. Until
+> they are, treat 0.1902 as unverified.
+
+
 **Solid (reproduced to the digit):**
 - Energy RG is exact through **L2**: L1 ground energy −6.000000, L2 −16.921463; it converges the **L3** (42-spin)
   ground energy to **≈ −49.3** (truncation corrections halve geometrically).
-- The **impurity-explicit** RG reproduces the exact **L2 local valley depth 0.1902** to the digit, and a
+- The **impurity-explicit** RG reproduces the L2 local valley depth quoted below as 0.1902 (see the
+  correction above: the definition is not recorded, and reconstruction brackets rather than matches it), and a
   controlled test confirms the physics: truncating *only* the far bath (a tip sub-gasket) to a single state
   already recovers ~86% of the valley, whereas a *uniform* truncation destroys it (~20%). So the valley is a
   genuinely localized defect mode, and finite ramification lets the far bath decouple.

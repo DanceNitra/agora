@@ -1,0 +1,10525 @@
+{
+ "control_ring_uniform_E": 4.745040042316086e-16,
+ "fractal_L2_edges": [
+  [
+   0,
+   1
+  ],
+  [
+   0,
+   5
+  ],
+  [
+   1,
+   2
+  ],
+  [
+   1,
+   5
+  ],
+  [
+   1,
+   6
+  ],
+  [
+   2,
+   3
+  ],
+  [
+   2,
+   6
+  ],
+  [
+   2,
+   7
+  ],
+  [
+   3,
+   4
+  ],
+  [
+   3,
+   7
+  ],
+  [
+   3,
+   8
+  ],
+  [
+   4,
+   8
+  ],
+  [
+   5,
+   6
+  ],
+  [
+   5,
+   9
+  ],
+  [
+   6,
+   9
+  ],
+  [
+   7,
+   8
+  ],
+  [
+   7,
+   11
+  ],
+  [
+   8,
+   11
+  ],
+  [
+   9,
+   10
+  ],
+  [
+   9,
+   12
+  ],
+  [
+   10,
+   11
+  ],
+  [
+   10,
+   12
+  ],
+  [
+   10,
+   13
+  ],
+  [
+   11,
+   13
+  ],
+  [
+   12,
+   13
+  ],
+  [
+   12,
+   14
+  ],
+  [
+   13,
+   14
+  ]
+ ],
+ "rows": [
+  {
+   "kind": "ratio",
+   "graph": "fractal_L2",
+   "edge": [
+    0,
+    1
+   ],
+   "edge_index": 0,
+   "s": 0.5,
+   "j0": 1.0,
+   "ratio": 0.5,
+   "energy": -25.168530447206532,
+   "degeneracy": 2,
+   "E": 0.24843283995380347
+  },
+  {
+   "kind": "ratio",
+   "graph": "fractal_L2",
+   "edge": [
+    0,
+    1
+   ],
+   "edge_index": 0,
+   "s": 0.52,
+   "j0": 1.0,
+   "ratio": 0.52,
+   "energy": -25.15499412523422,
+   "degeneracy": 2,
+   "E": 0.24836507387145093
+  },
+  {
+   "kind": "ratio",
+   "graph": "fractal_L2",
+   "edge": [
+    0,
+    1
+   ],
+   "edge_index": 0,
+   "s": 0.54,
+   "j0": 1.0,
+   "ratio": 0.54,
+   "energy": -25.141667446218808,
+   "degeneracy": 2,
+   "E": 0.24826840529214486
+  },
+  {
+   "kind": "ratio",
+   "graph": "fractal_L2",
+   "edge": [
+    0,
+    1
+   ],
+   "edge_index": 0,
+   "s": 0.56,
+   "j0": 1.0,
+   "ratio": 0.56,
+   "energy": -25.128560724045016,
+   "degeneracy": 2,
+   "E": 0.24813804187677072
+  },
+  {
+   "kind": "ratio",
+   "graph": "fractal_L2",
+   "edge": [
+    0,
+    1
+   ],
+   "edge_index": 0,
+   "s": 0.58,
+   "j0": 1.0,
+   "ratio": 0.58,
+   "energy": -25.115685074770056,
+   "degeneracy": 2,
+   "E": 0.24796827540784397
+  },
+  {
+   "kind": "ratio",
+   "graph": "fractal_L2",
+   "edge": [
+    0,
+    1
+   ],
+   "edge_index": 0,
+   "s": 0.6,
+   "j0": 1.0,
+   "ratio": 0.6,
+   "energy": -25.103052530010245,
+   "degeneracy": 2,
+   "E": 0.24775226278569124
+  },
+  {
+   "kind": "ratio",
+   "graph": "fractal_L2",
+   "edge": [
+    0,
+    1
+   ],
+   "edge_index": 0,
+   "s": 0.62,
+   "j0": 1.0,
+   "ratio": 0.62,
+   "energy": -25.09067617781414,
+   "degeneracy": 2,
+   "E": 0.24748174198015774
+  },
+  {
+   "kind": "ratio",
+   "graph": "fractal_L2",
+   "edge": [
+    0,
+    1
+   ],
+   "edge_index": 0,
+   "s": 0.64,
+   "j0": 1.0,
+   "ratio": 0.64,
+   "energy": -25.078570340319704,
+   "degeneracy": 2,
+   "E": 0.2471466595276288
+  },
+  {
+   "kind": "ratio",
+   "graph": "fractal_L2",
+   "edge": [
+    0,
+    1
+   ],
+   "edge_index": 0,
+   "s": 0.66,
+   "j0": 1.0,
+   "ratio": 0.66,
+   "energy": -25.066750801393635,
+   "degeneracy": 2,
+   "E": 0.2467346761892348
+  },
+  {
+   "kind": "ratio",
+   "graph": "fractal_L2",
+   "edge": [
+    0,
+    1
+   ],
+   "edge_index": 0,
+   "s": 0.68,
+   "j0": 1.0,
+   "ratio": 0.68,
+   "energy": -25.05523510326242,
+   "degeneracy": 2,
+   "E": 0.24623050247921754
+  },
+  {
+   "kind": "ratio",
+   "graph": "fractal_L2",
+   "edge": [
+    0,
+    1
+   ],
+   "edge_index": 0,
+   "s": 0.7,
+   "j0": 1.0,
+   "ratio": 0.7,
+   "energy": -25.044042940008406,
+   "degeneracy": 2,
+   "E": 0.24561499315035945
+  },
+  {
+   "kind": "ratio",
+   "graph": "fractal_L2",
+   "edge": [
+    0,
+    1
+   ],
+   "edge_index": 0,
+   "s": 0.72,
+   "j0": 1.0,
+   "ratio": 0.72,
+   "energy": -25.033196689541803,
+   "degeneracy": 2,
+   "E": 0.24486389485005705
+  },
+  {
+   "kind": "ratio",
+   "graph": "fractal_L2",
+   "edge": [
+    0,
+    1
+   ],
+   "edge_index": 0,
+   "s": 0.74,
+   "j0": 1.0,
+   "ratio": 0.74,
+   "energy": -25.022722147432592,
+   "degeneracy": 2,
+   "E": 0.24394608654636732
+  },
+  {
+   "kind": "ratio",
+   "graph": "fractal_L2",
+   "edge": [
+    0,
+    1
+   ],
+   "edge_index": 0,
+   "s": 0.76,
+   "j0": 1.0,
+   "ratio": 0.76,
+   "energy": -25.012649561268226,
+   "degeneracy": 2,
+   "E": 0.2428210654832217
+  },
+  {
+   "kind": "ratio",
+   "graph": "fractal_L2",
+   "edge": [
+    0,
+    1
+   ],
+   "edge_index": 0,
+   "s": 0.78,
+   "j0": 1.0,
+   "ratio": 0.78,
+   "energy": -25.003015122794174,
+   "degeneracy": 2,
+   "E": 0.24143529148874227
+  },
+  {
+   "kind": "ratio",
+   "graph": "fractal_L2",
+   "edge": [
+    0,
+    1
+   ],
+   "edge_index": 0,
+   "s": 0.8,
+   "j0": 1.0,
+   "ratio": 0.8,
+   "energy": -24.993863174981684,
+   "degeneracy": 2,
+   "E": 0.23971677494195823
+  },
+  {
+   "kind": "ratio",
+   "graph": "fractal_L2",
+   "edge": [
+    0,
+    1
+   ],
+   "edge_index": 0,
+   "s": 0.82,
+   "j0": 1.0,
+   "ratio": 0.82,
+   "energy": -24.98524956635623,
+   "degeneracy": 2,
+   "E": 0.2375669240844903
+  },
+  {
+   "kind": "ratio",
+   "graph": "fractal_L2",
+   "edge": [
+    0,
+    1
+   ],
+   "edge_index": 0,
+   "s": 0.84,
+   "j0": 1.0,
+   "ratio": 0.84,
+   "energy": -24.977246901307254,
+   "degeneracy": 2,
+   "E": 0.23484808070355845
+  },
+  {
+   "kind": "ratio",
+   "graph": "fractal_L2",
+   "edge": [
+    0,
+    1
+   ],
+   "edge_index": 0,
+   "s": 0.86,
+   "j0": 1.0,
+   "ratio": 0.86,
+   "energy": -24.969953023865305,
+   "degeneracy": 2,
+   "E": 0.2313643160381393
+  },
+  {
+   "kind": "ratio",
+   "graph": "fractal_L2",
+   "edge": [
+    0,
+    1
+   ],
+   "edge_index": 0,
+   "s": 0.88,
+   "j0": 1.0,
+   "ratio": 0.88,
+   "energy": -24.96350519846264,
+   "degeneracy": 2,
+   "E": 0.22683214182005534
+  },
+  {
+   "kind": "ratio",
+   "graph": "fractal_L2",
+   "edge": [
+    0,
+    1
+   ],
+   "edge_index": 0,
+   "s": 0.9,
+   "j0": 1.0,
+   "ratio": 0.9,
+   "energy": -24.95810464616258,
+   "degeneracy": 2,
+   "E": 0.22083839992182405
+  },
+  {
+   "kind": "ratio",
+   "graph": "fractal_L2",
+   "edge": [
+    0,
+    1
+   ],
+   "edge_index": 0,
+   "s": 0.92,
+   "j0": 1.0,
+   "ratio": 0.92,
+   "energy": -24.95406035225145,
+   "degeneracy": 2,
+   "E": 0.21279242735293702
+  },
+  {
+   "kind": "ratio",
+   "graph": "fractal_L2",
+   "edge": [
+    0,
+    1
+   ],
+   "edge_index": 0,
+   "s": 0.94,
+   "j0": 1.0,
+   "ratio": 0.94,
+   "energy": -24.951868716778158,
+   "degeneracy": 2,
+   "E": 0.20193172423320607
+  },
+  {
+   "kind": "ratio",
+   "graph": "fractal_L2",
+   "edge": [
+    0,
+    1
+   ],
+   "edge_index": 0,
+   "s": 0.96,
+   "j0": 1.0,
+   "ratio": 0.96,
+   "energy": -24.952355139648507,
+   "degeneracy": 2,
+   "E": 0.18766043775873514
+  },
+  {
+   "kind": "ratio",
+   "graph": "fractal_L2",
+   "edge": [
+    0,
+    1
+   ],
+   "edge_index": 0,
+   "s": 0.98,
+   "j0": 1.0,
+   "ratio": 0.98,
+   "energy": -24.95689028411845,
+   "degeneracy": 2,
+   "E": 0.1711915759675743
+  },
+  {
+   "kind": "ratio",
+   "graph": "fractal_L2",
+   "edge": [
+    0,
+    1
+   ],
+   "edge_index": 0,
+   "s": 1.0,
+   "j0": 1.0,
+   "ratio": 1.0,
+   "energy": -24.967536579519088,
+   "degeneracy": 4,
+   "E": 0.11026913715112562
+  },
+  {
+   "kind": "ratio",
+   "graph": "fractal_L2",
+   "edge": [
+    0,
+    1
+   ],
+   "edge_index": 0,
+   "s": 1.02,
+   "j0": 1.0,
+   "ratio": 1.02,
+   "energy": -25.0050780323719,
+   "degeneracy": 2,
+   "E": 0.16171178722408588
+  },
+  {
+   "kind": "ratio",
+   "graph": "fractal_L2",
+   "edge": [
+    0,
+    1
+   ],
+   "edge_index": 0,
+   "s": 1.04,
+   "j0": 1.0,
+   "ratio": 1.04,
+   "energy": -25.045612695808043,
+   "degeneracy": 2,
+   "E": 0.16699606263782651
+  },
+  {
+   "kind": "ratio",
+   "graph": "fractal_L2",
+   "edge": [
+    0,
+    1
+   ],
+   "edge_index": 0,
+   "s": 1.06,
+   "j0": 1.0,
+   "ratio": 1.06,
+   "energy": -25.089512761848496,
+   "degeneracy": 2,
+   "E": 0.17815910666655355
+  },
+  {
+   "kind": "ratio",
+   "graph": "fractal_L2",
+   "edge": [
+    0,
+    1
+   ],
+   "edge_index": 0,
+   "s": 1.08,
+   "j0": 1.0,
+   "ratio": 1.08,
+   "energy": -25.136797296395592,
+   "degeneracy": 2,
+   "E": 0.19471879109141826
+  },
+  {
+   "kind": "ratio",
+   "graph": "fractal_L2",
+   "edge": [
+    0,
+    1
+   ],
+   "edge_index": 0,
+   "s": 1.1,
+   "j0": 1.0,
+   "ratio": 1.1,
+   "energy": -25.187026712411484,
+   "degeneracy": 2,
+   "E": 0.21255136117691603
+  },
+  {
+   "kind": "ratio",
+   "graph": "fractal_L2",
+   "edge": [
+    0,
+    1
+   ],
+   "edge_index": 0,
+   "s": 1.12,
+   "j0": 1.0,
+   "ratio": 1.12,
+   "energy": -25.239533392786374,
+   "degeneracy": 2,
+   "E": 0.22820293360852828
+  },
+  {
+   "kind": "ratio",
+   "graph": "fractal_L2",
+   "edge": [
+    0,
+    1
+   ],
+   "edge_index": 0,
+   "s": 1.14,
+   "j0": 1.0,
+   "ratio": 1.14,
+   "energy": -25.29369286861352,
+   "degeneracy": 2,
+   "E": 0.24065097061985913
+  },
+  {
+   "kind": "ratio",
+   "graph": "fractal_L2",
+   "edge": [
+    0,
+    1
+   ],
+   "edge_index": 0,
+   "s": 1.16,
+   "j0": 1.0,
+   "ratio": 1.16,
+   "energy": -25.349030765293918,
+   "degeneracy": 2,
+   "E": 0.25022227692757376
+  },
+  {
+   "kind": "ratio",
+   "graph": "fractal_L2",
+   "edge": [
+    0,
+    1
+   ],
+   "edge_index": 0,
+   "s": 1.18,
+   "j0": 1.0,
+   "ratio": 1.18,
+   "energy": -25.405215780784257,
+   "degeneracy": 2,
+   "E": 0.2575694040666739
+  },
+  {
+   "kind": "ratio",
+   "graph": "fractal_L2",
+   "edge": [
+    0,
+    1
+   ],
+   "edge_index": 0,
+   "s": 1.2,
+   "j0": 1.0,
+   "ratio": 1.2,
+   "energy": -25.46202181627614,
+   "degeneracy": 2,
+   "E": 0.2632785181401095
+  },
+  {
+   "kind": "ratio",
+   "graph": "fractal_L2",
+   "edge": [
+    0,
+    1
+   ],
+   "edge_index": 0,
+   "s": 1.22,
+   "j0": 1.0,
+   "ratio": 1.22,
+   "energy": -25.519293790984836,
+   "degeneracy": 2,
+   "E": 0.2677919541368679
+  },
+  {
+   "kind": "ratio",
+   "graph": "fractal_L2",
+   "edge": [
+    0,
+    1
+   ],
+   "edge_index": 0,
+   "s": 1.24,
+   "j0": 1.0,
+   "ratio": 1.24,
+   "energy": -25.576923525569985,
+   "degeneracy": 2,
+   "E": 0.27142582240473045
+  },
+  {
+   "kind": "ratio",
+   "graph": "fractal_L2",
+   "edge": [
+    0,
+    1
+   ],
+   "edge_index": 0,
+   "s": 1.26,
+   "j0": 1.0,
+   "ratio": 1.26,
+   "energy": -25.634833953438964,
+   "degeneracy": 2,
+   "E": 0.2744032565844903
+  },
+  {
+   "kind": "ratio",
+   "graph": "fractal_L2",
+   "edge": [
+    0,
+    1
+   ],
+   "edge_index": 0,
+   "s": 1.28,
+   "j0": 1.0,
+   "ratio": 1.28,
+   "energy": -25.6929689676553,
+   "degeneracy": 2,
+   "E": 0.27688254525944445
+  },
+  {
+   "kind": "ratio",
+   "graph": "fractal_L2",
+   "edge": [
+    0,
+    1
+   ],
+   "edge_index": 0,
+   "s": 1.3,
+   "j0": 1.0,
+   "ratio": 1.3,
+   "energy": -25.75128685927274,
+   "degeneracy": 2,
+   "E": 0.27897736697458736
+  },
+  {
+   "kind": "ratio",
+   "graph": "fractal_L2",
+   "edge": [
+    0,
+    1
+   ],
+   "edge_index": 0,
+   "s": 1.32,
+   "j0": 1.0,
+   "ratio": 1.32,
+   "energy": -25.80975601435218,
+   "degeneracy": 2,
+   "E": 0.2807706106983649
+  },
+  {
+   "kind": "ratio",
+   "graph": "fractal_L2",
+   "edge": [
+    0,
+    1
+   ],
+   "edge_index": 0,
+   "s": 1.34,
+   "j0": 1.0,
+   "ratio": 1.34,
+   "energy": -25.868352039884638,
+   "degeneracy": 2,
+   "E": 0.28232368566217225
+  },
+  {
+   "kind": "ratio",
+   "graph": "fractal_L2",
+   "edge": [
+    0,
+    1
+   ],
+   "edge_index": 0,
+   "s": 1.36,
+   "j0": 1.0,
+   "ratio": 1.36,
+   "energy": -25.927055806517792,
+   "degeneracy": 2,
+   "E": 0.2836828066430422
+  },
+  {
+   "kind": "ratio",
+   "graph": "fractal_L2",
+   "edge": [
+    0,
+    1
+   ],
+   "edge_index": 0,
+   "s": 1.38,
+   "j0": 1.0,
+   "ratio": 1.38,
+   "energy": -25.98585208987347,
+   "degeneracy": 2,
+   "E": 0.28488327784031536
+  },
+  {
+   "kind": "ratio",
+   "graph": "fractal_L2",
+   "edge": [
+    0,
+    1
+   ],
+   "edge_index": 0,
+   "s": 1.4,
+   "j0": 1.0,
+   "ratio": 1.4,
+   "energy": -26.044728609971028,
+   "degeneracy": 2,
+   "E": 0.2859524502463587
+  },
+  {
+   "kind": "ratio",
+   "graph": "fractal_L2",
+   "edge": [
+    0,
+    1
+   ],
+   "edge_index": 0,
+   "s": 1.42,
+   "j0": 1.0,
+   "ratio": 1.42,
+   "energy": -26.103675340327683,
+   "degeneracy": 2,
+   "E": 0.28691179224795005
+  },
+  {
+   "kind": "ratio",
+   "graph": "fractal_L2",
+   "edge": [
+    0,
+    1
+   ],
+   "edge_index": 0,
+   "s": 1.44,
+   "j0": 1.0,
+   "ratio": 1.44,
+   "energy": -26.162684002991313,
+   "degeneracy": 2,
+   "E": 0.28777836034462895
+  },
+  {
+   "kind": "ratio",
+   "graph": "fractal_L2",
+   "edge": [
+    0,
+    1
+   ],
+   "edge_index": 0,
+   "s": 1.46,
+   "j0": 1.0,
+   "ratio": 1.46,
+   "energy": -26.2217476939362,
+   "degeneracy": 2,
+   "E": 0.2885658586284357
+  },
+  {
+   "kind": "ratio",
+   "graph": "fractal_L2",
+   "edge": [
+    0,
+    1
+   ],
+   "edge_index": 0,
+   "s": 1.48,
+   "j0": 1.0,
+   "ratio": 1.48,
+   "energy": -26.280860601304827,
+   "degeneracy": 2,
+   "E": 0.28928541245205913
+  },
+  {
+   "kind": "ratio",
+   "graph": "fractal_L2",
+   "edge": [
+    0,
+    1
+   ],
+   "edge_index": 0,
+   "s": 1.5,
+   "j0": 1.0,
+   "ratio": 1.5,
+   "energy": -26.340017790765145,
+   "degeneracy": 2,
+   "E": 0.28994614073441954
+  },
+  {
+   "kind": "ratio",
+   "graph": "fractal_L2",
+   "edge": [
+    0,
+    1
+   ],
+   "edge_index": 0,
+   "s": 0.3,
+   "j0": 0.6,
+   "ratio": 0.5,
+   "energy": -15.101118268324011,
+   "degeneracy": 2,
+   "E": 0.24843283995380297
+  },
+  {
+   "kind": "ratio",
+   "graph": "fractal_L2",
+   "edge": [
+    0,
+    1
+   ],
+   "edge_index": 0,
+   "s": 0.312,
+   "j0": 0.6,
+   "ratio": 0.52,
+   "energy": -15.09299647514056,
+   "degeneracy": 2,
+   "E": 0.2483650738714519
+  },
+  {
+   "kind": "ratio",
+   "graph": "fractal_L2",
+   "edge": [
+    0,
+    1
+   ],
+   "edge_index": 0,
+   "s": 0.324,
+   "j0": 0.6,
+   "ratio": 0.54,
+   "energy": -15.085000467731286,
+   "degeneracy": 2,
+   "E": 0.24826840529214556
+  },
+  {
+   "kind": "ratio",
+   "graph": "fractal_L2",
+   "edge": [
+    0,
+    1
+   ],
+   "edge_index": 0,
+   "s": 0.336,
+   "j0": 0.6,
+   "ratio": 0.56,
+   "energy": -15.077136434427084,
+   "degeneracy": 2,
+   "E": 0.24813804187677213
+  },
+  {
+   "kind": "ratio",
+   "graph": "fractal_L2",
+   "edge": [
+    0,
+    1
+   ],
+   "edge_index": 0,
+   "s": 0.348,
+   "j0": 0.6,
+   "ratio": 0.58,
+   "energy": -15.069411044862004,
+   "degeneracy": 2,
+   "E": 0.24796827540784455
+  },
+  {
+   "kind": "ratio",
+   "graph": "fractal_L2",
+   "edge": [
+    0,
+    1
+   ],
+   "edge_index": 0,
+   "s": 0.36,
+   "j0": 0.6,
+   "ratio": 0.6,
+   "energy": -15.061831518006176,
+   "degeneracy": 2,
+   "E": 0.24775226278569085
+  },
+  {
+   "kind": "ratio",
+   "graph": "fractal_L2",
+   "edge": [
+    0,
+    1
+   ],
+   "edge_index": 0,
+   "s": 0.372,
+   "j0": 0.6,
+   "ratio": 0.62,
+   "energy": -15.05440570668852,
+   "degeneracy": 2,
+   "E": 0.24748174198015774
+  },
+  {
+   "kind": "ratio",
+   "graph": "fractal_L2",
+   "edge": [
+    0,
+    1
+   ],
+   "edge_index": 0,
+   "s": 0.384,
+   "j0": 0.6,
+   "ratio": 0.64,
+   "energy": -15.047142204191948,
+   "degeneracy": 2,
+   "E": 0.24714665952763182
+  },
+  {
+   "kind": "ratio",
+   "graph": "fractal_L2",
+   "edge": [
+    0,
+    1
+   ],
+   "edge_index": 0,
+   "s": 0.396,
+   "j0": 0.6,
+   "ratio": 0.66,
+   "energy": -15.04005048083622,
+   "degeneracy": 2,
+   "E": 0.24673467618923745
+  },
+  {
+   "kind": "ratio",
+   "graph": "fractal_L2",
+   "edge": [
+    0,
+    1
+   ],
+   "edge_index": 0,
+   "s": 0.408,
+   "j0": 0.6,
+   "ratio": 0.68,
+   "energy": -15.033141061957586,
+   "degeneracy": 2,
+   "E": 0.24623050247922057
+  },
+  {
+   "kind": "ratio",
+   "graph": "fractal_L2",
+   "edge": [
+    0,
+    1
+   ],
+   "edge_index": 0,
+   "s": 0.42,
+   "j0": 0.6,
+   "ratio": 0.7,
+   "energy": -15.026425764005163,
+   "degeneracy": 2,
+   "E": 0.24561499315035837
+  },
+  {
+   "kind": "ratio",
+   "graph": "fractal_L2",
+   "edge": [
+    0,
+    1
+   ],
+   "edge_index": 0,
+   "s": 0.432,
+   "j0": 0.6,
+   "ratio": 0.72,
+   "energy": -15.019918013725079,
+   "degeneracy": 2,
+   "E": 0.24486389485005794
+  },
+  {
+   "kind": "ratio",
+   "graph": "fractal_L2",
+   "edge": [
+    0,
+    1
+   ],
+   "edge_index": 0,
+   "s": 0.444,
+   "j0": 0.6,
+   "ratio": 0.74,
+   "energy": -15.013633288459532,
+   "degeneracy": 2,
+   "E": 0.24394608654636588
+  },
+  {
+   "kind": "ratio",
+   "graph": "fractal_L2",
+   "edge": [
+    0,
+    1
+   ],
+   "edge_index": 0,
+   "s": 0.456,
+   "j0": 0.6,
+   "ratio": 0.76,
+   "energy": -15.007589736760927,
+   "degeneracy": 2,
+   "E": 0.2428210654832215
+  },
+  {
+   "kind": "ratio",
+   "graph": "fractal_L2",
+   "edge": [
+    0,
+    1
+   ],
+   "edge_index": 0,
+   "s": 0.468,
+   "j0": 0.6,
+   "ratio": 0.78,
+   "energy": -15.001809073676348,
+   "degeneracy": 2,
+   "E": 0.2414352914887414
+  },
+  {
+   "kind": "ratio",
+   "graph": "fractal_L2",
+   "edge": [
+    0,
+    1
+   ],
+   "edge_index": 0,
+   "s": 0.48,
+   "j0": 0.6,
+   "ratio": 0.8,
+   "energy": -14.99631790498901,
+   "degeneracy": 2,
+   "E": 0.23971677494195753
+  },
+  {
+   "kind": "ratio",
+   "graph": "fractal_L2",
+   "edge": [
+    0,
+    1
+   ],
+   "edge_index": 0,
+   "s": 0.492,
+   "j0": 0.6,
+   "ratio": 0.82,
+   "energy": -14.991149739813773,
+   "degeneracy": 2,
+   "E": 0.237566924084491
+  },
+  {
+   "kind": "ratio",
+   "graph": "fractal_L2",
+   "edge": [
+    0,
+    1
+   ],
+   "edge_index": 0,
+   "s": 0.504,
+   "j0": 0.6,
+   "ratio": 0.84,
+   "energy": -14.986348140784425,
+   "degeneracy": 2,
+   "E": 0.2348480807035594
+  },
+  {
+   "kind": "ratio",
+   "graph": "fractal_L2",
+   "edge": [
+    0,
+    1
+   ],
+   "edge_index": 0,
+   "s": 0.516,
+   "j0": 0.6,
+   "ratio": 0.86,
+   "energy": -14.981971814319154,
+   "degeneracy": 2,
+   "E": 0.23136431603814359
+  },
+  {
+   "kind": "ratio",
+   "graph": "fractal_L2",
+   "edge": [
+    0,
+    1
+   ],
+   "edge_index": 0,
+   "s": 0.528,
+   "j0": 0.6,
+   "ratio": 0.88,
+   "energy": -14.97810311907765,
+   "degeneracy": 2,
+   "E": 0.22683214182006153
+  },
+  {
+   "kind": "ratio",
+   "graph": "fractal_L2",
+   "edge": [
+    0,
+    1
+   ],
+   "edge_index": 0,
+   "s": 0.54,
+   "j0": 0.6,
+   "ratio": 0.9,
+   "energy": -14.974862787697546,
+   "degeneracy": 2,
+   "E": 0.22083839992181745
+  },
+  {
+   "kind": "ratio",
+   "graph": "fractal_L2",
+   "edge": [
+    0,
+    1
+   ],
+   "edge_index": 0,
+   "s": 0.552,
+   "j0": 0.6,
+   "ratio": 0.92,
+   "energy": -14.97243621135097,
+   "degeneracy": 2,
+   "E": 0.21279242735294424
+  },
+  {
+   "kind": "ratio",
+   "graph": "fractal_L2",
+   "edge": [
+    0,
+    1
+   ],
+   "edge_index": 0,
+   "s": 0.564,
+   "j0": 0.6,
+   "ratio": 0.94,
+   "energy": -14.971121230066966,
+   "degeneracy": 2,
+   "E": 0.20193172423320194
+  },
+  {
+   "kind": "ratio",
+   "graph": "fractal_L2",
+   "edge": [
+    0,
+    1
+   ],
+   "edge_index": 0,
+   "s": 0.576,
+   "j0": 0.6,
+   "ratio": 0.96,
+   "energy": -14.971413083789248,
+   "degeneracy": 2,
+   "E": 0.1876604377587399
+  },
+  {
+   "kind": "ratio",
+   "graph": "fractal_L2",
+   "edge": [
+    0,
+    1
+   ],
+   "edge_index": 0,
+   "s": 0.588,
+   "j0": 0.6,
+   "ratio": 0.98,
+   "energy": -14.974134170471057,
+   "degeneracy": 2,
+   "E": 0.1711915759675713
+  },
+  {
+   "kind": "ratio",
+   "graph": "fractal_L2",
+   "edge": [
+    0,
+    1
+   ],
+   "edge_index": 0,
+   "s": 0.6,
+   "j0": 0.6,
+   "ratio": 1.0,
+   "energy": -14.980521947711432,
+   "degeneracy": 4,
+   "E": 0.110269137151126
+  },
+  {
+   "kind": "ratio",
+   "graph": "fractal_L2",
+   "edge": [
+    0,
+    1
+   ],
+   "edge_index": 0,
+   "s": 0.612,
+   "j0": 0.6,
+   "ratio": 1.02,
+   "energy": -15.003046819423117,
+   "degeneracy": 2,
+   "E": 0.16171178722408616
+  },
+  {
+   "kind": "ratio",
+   "graph": "fractal_L2",
+   "edge": [
+    0,
+    1
+   ],
+   "edge_index": 0,
+   "s": 0.624,
+   "j0": 0.6,
+   "ratio": 1.04,
+   "energy": -15.027367617484773,
+   "degeneracy": 2,
+   "E": 0.1669960626377982
+  },
+  {
+   "kind": "ratio",
+   "graph": "fractal_L2",
+   "edge": [
+    0,
+    1
+   ],
+   "edge_index": 0,
+   "s": 0.636,
+   "j0": 0.6,
+   "ratio": 1.06,
+   "energy": -15.053707657109216,
+   "degeneracy": 2,
+   "E": 0.17815910666655946
+  },
+  {
+   "kind": "ratio",
+   "graph": "fractal_L2",
+   "edge": [
+    0,
+    1
+   ],
+   "edge_index": 0,
+   "s": 0.648,
+   "j0": 0.6,
+   "ratio": 1.08,
+   "energy": -15.082078377837336,
+   "degeneracy": 2,
+   "E": 0.19471879109142218
+  },
+  {
+   "kind": "ratio",
+   "graph": "fractal_L2",
+   "edge": [
+    0,
+    1
+   ],
+   "edge_index": 0,
+   "s": 0.66,
+   "j0": 0.6,
+   "ratio": 1.1,
+   "energy": -15.11221602744685,
+   "degeneracy": 2,
+   "E": 0.21255136117690301
+  },
+  {
+   "kind": "ratio",
+   "graph": "fractal_L2",
+   "edge": [
+    0,
+    1
+   ],
+   "edge_index": 0,
+   "s": 0.672,
+   "j0": 0.6,
+   "ratio": 1.12,
+   "energy": -15.143720035671727,
+   "degeneracy": 2,
+   "E": 0.22820293360852584
+  },
+  {
+   "kind": "ratio",
+   "graph": "fractal_L2",
+   "edge": [
+    0,
+    1
+   ],
+   "edge_index": 0,
+   "s": 0.684,
+   "j0": 0.6,
+   "ratio": 1.14,
+   "energy": -15.176215721168047,
+   "degeneracy": 2,
+   "E": 0.24065097061985233
+  },
+  {
+   "kind": "ratio",
+   "graph": "fractal_L2",
+   "edge": [
+    0,
+    1
+   ],
+   "edge_index": 0,
+   "s": 0.696,
+   "j0": 0.6,
+   "ratio": 1.16,
+   "energy": -15.209418459176343,
+   "degeneracy": 2,
+   "E": 0.25022227692757626
+  },
+  {
+   "kind": "ratio",
+   "graph": "fractal_L2",
+   "edge": [
+    0,
+    1
+   ],
+   "edge_index": 0,
+   "s": 0.708,
+   "j0": 0.6,
+   "ratio": 1.18,
+   "energy": -15.243129468470512,
+   "degeneracy": 2,
+   "E": 0.25756940406666756
+  },
+  {
+   "kind": "ratio",
+   "graph": "fractal_L2",
+   "edge": [
+    0,
+    1
+   ],
+   "edge_index": 0,
+   "s": 0.72,
+   "j0": 0.6,
+   "ratio": 1.2,
+   "energy": -15.277213089765732,
+   "degeneracy": 2,
+   "E": 0.2632785181401214
+  },
+  {
+   "kind": "ratio",
+   "graph": "fractal_L2",
+   "edge": [
+    0,
+    1
+   ],
+   "edge_index": 0,
+   "s": 0.732,
+   "j0": 0.6,
+   "ratio": 1.22,
+   "energy": -15.311576274590987,
+   "degeneracy": 2,
+   "E": 0.26779195413686363
+  },
+  {
+   "kind": "ratio",
+   "graph": "fractal_L2",
+   "edge": [
+    0,
+    1
+   ],
+   "edge_index": 0,
+   "s": 0.744,
+   "j0": 0.6,
+   "ratio": 1.24,
+   "energy": -15.346154115341964,
+   "degeneracy": 2,
+   "E": 0.27142582240472524
+  },
+  {
+   "kind": "ratio",
+   "graph": "fractal_L2",
+   "edge": [
+    0,
+    1
+   ],
+   "edge_index": 0,
+   "s": 0.756,
+   "j0": 0.6,
+   "ratio": 1.26,
+   "energy": -15.380900372063378,
+   "degeneracy": 2,
+   "E": 0.27440325658450093
+  },
+  {
+   "kind": "ratio",
+   "graph": "fractal_L2",
+   "edge": [
+    0,
+    1
+   ],
+   "edge_index": 0,
+   "s": 0.768,
+   "j0": 0.6,
+   "ratio": 1.28,
+   "energy": -15.41578138059325,
+   "degeneracy": 2,
+   "E": 0.2768825452594457
+  },
+  {
+   "kind": "ratio",
+   "graph": "fractal_L2",
+   "edge": [
+    0,
+    1
+   ],
+   "edge_index": 0,
+   "s": 0.78,
+   "j0": 0.6,
+   "ratio": 1.3,
+   "energy": -15.450772115563684,
+   "degeneracy": 2,
+   "E": 0.2789773669745904
+  },
+  {
+   "kind": "ratio",
+   "graph": "fractal_L2",
+   "edge": [
+    0,
+    1
+   ],
+   "edge_index": 0,
+   "s": 0.792,
+   "j0": 0.6,
+   "ratio": 1.32,
+   "energy": -15.485853608611228,
+   "degeneracy": 2,
+   "E": 0.28077061069836495
+  },
+  {
+   "kind": "ratio",
+   "graph": "fractal_L2",
+   "edge": [
+    0,
+    1
+   ],
+   "edge_index": 0,
+   "s": 0.804,
+   "j0": 0.6,
+   "ratio": 1.34,
+   "energy": -15.52101122393081,
+   "degeneracy": 2,
+   "E": 0.28232368566217175
+  },
+  {
+   "kind": "ratio",
+   "graph": "fractal_L2",
+   "edge": [
+    0,
+    1
+   ],
+   "edge_index": 0,
+   "s": 0.816,
+   "j0": 0.6,
+   "ratio": 1.36,
+   "energy": -15.556233483910605,
+   "degeneracy": 2,
+   "E": 0.28368280664304335
+  },
+  {
+   "kind": "ratio",
+   "graph": "fractal_L2",
+   "edge": [
+    0,
+    1
+   ],
+   "edge_index": 0,
+   "s": 0.828,
+   "j0": 0.6,
+   "ratio": 1.38,
+   "energy": -15.591511253923926,
+   "degeneracy": 2,
+   "E": 0.28488327784031914
+  },
+  {
+   "kind": "ratio",
+   "graph": "fractal_L2",
+   "edge": [
+    0,
+    1
+   ],
+   "edge_index": 0,
+   "s": 0.84,
+   "j0": 0.6,
+   "ratio": 1.4,
+   "energy": -15.626837165982687,
+   "degeneracy": 2,
+   "E": 0.28595245024635907
+  },
+  {
+   "kind": "ratio",
+   "graph": "fractal_L2",
+   "edge": [
+    0,
+    1
+   ],
+   "edge_index": 0,
+   "s": 0.852,
+   "j0": 0.6,
+   "ratio": 1.42,
+   "energy": -15.66220520419655,
+   "degeneracy": 2,
+   "E": 0.28691179224794916
+  },
+  {
+   "kind": "ratio",
+   "graph": "fractal_L2",
+   "edge": [
+    0,
+    1
+   ],
+   "edge_index": 0,
+   "s": 0.864,
+   "j0": 0.6,
+   "ratio": 1.44,
+   "energy": -15.697610401794915,
+   "degeneracy": 2,
+   "E": 0.28777836034462834
+  },
+  {
+   "kind": "ratio",
+   "graph": "fractal_L2",
+   "edge": [
+    0,
+    1
+   ],
+   "edge_index": 0,
+   "s": 0.876,
+   "j0": 0.6,
+   "ratio": 1.46,
+   "energy": -15.733048616361668,
+   "degeneracy": 2,
+   "E": 0.2885658586284374
+  },
+  {
+   "kind": "ratio",
+   "graph": "fractal_L2",
+   "edge": [
+    0,
+    1
+   ],
+   "edge_index": 0,
+   "s": 0.888,
+   "j0": 0.6,
+   "ratio": 1.48,
+   "energy": -15.7685163607828,
+   "degeneracy": 2,
+   "E": 0.2892854124520585
+  },
+  {
+   "kind": "ratio",
+   "graph": "fractal_L2",
+   "edge": [
+    0,
+    1
+   ],
+   "edge_index": 0,
+   "s": 0.9,
+   "j0": 0.6,
+   "ratio": 1.5,
+   "energy": -15.804010674459096,
+   "degeneracy": 2,
+   "E": 0.2899461407344205
+  },
+  {
+   "kind": "ratio",
+   "graph": "fractal_L2",
+   "edge": [
+    0,
+    1
+   ],
+   "edge_index": 0,
+   "s": 0.7,
+   "j0": 1.4,
+   "ratio": 0.5,
+   "energy": -35.23594262608935,
+   "degeneracy": 2,
+   "E": 0.24843283995380389
+  },
+  {
+   "kind": "ratio",
+   "graph": "fractal_L2",
+   "edge": [
+    0,
+    1
+   ],
+   "edge_index": 0,
+   "s": 0.728,
+   "j0": 1.4,
+   "ratio": 0.52,
+   "energy": -35.21699177532805,
+   "degeneracy": 2,
+   "E": 0.24836507387145046
+  },
+  {
+   "kind": "ratio",
+   "graph": "fractal_L2",
+   "edge": [
+    0,
+    1
+   ],
+   "edge_index": 0,
+   "s": 0.756,
+   "j0": 1.4,
+   "ratio": 0.54,
+   "energy": -35.19833442470632,
+   "degeneracy": 2,
+   "E": 0.24826840529214575
+  },
+  {
+   "kind": "ratio",
+   "graph": "fractal_L2",
+   "edge": [
+    0,
+    1
+   ],
+   "edge_index": 0,
+   "s": 0.784,
+   "j0": 1.4,
+   "ratio": 0.56,
+   "energy": -35.179985013663135,
+   "degeneracy": 2,
+   "E": 0.248138041876771
+  },
+  {
+   "kind": "ratio",
+   "graph": "fractal_L2",
+   "edge": [
+    0,
+    1
+   ],
+   "edge_index": 0,
+   "s": 0.812,
+   "j0": 1.4,
+   "ratio": 0.58,
+   "energy": -35.16195910467825,
+   "degeneracy": 2,
+   "E": 0.2479682754078457
+  },
+  {
+   "kind": "ratio",
+   "graph": "fractal_L2",
+   "edge": [
+    0,
+    1
+   ],
+   "edge_index": 0,
+   "s": 0.84,
+   "j0": 1.4,
+   "ratio": 0.6,
+   "energy": -35.144273542014425,
+   "degeneracy": 2,
+   "E": 0.24775226278569104
+  },
+  {
+   "kind": "ratio",
+   "graph": "fractal_L2",
+   "edge": [
+    0,
+    1
+   ],
+   "edge_index": 0,
+   "s": 0.868,
+   "j0": 1.4,
+   "ratio": 0.62,
+   "energy": -35.12694664893961,
+   "degeneracy": 2,
+   "E": 0.24748174198015632
+  },
+  {
+   "kind": "ratio",
+   "graph": "fractal_L2",
+   "edge": [
+    0,
+    1
+   ],
+   "edge_index": 0,
+   "s": 0.896,
+   "j0": 1.4,
+   "ratio": 0.64,
+   "energy": -35.109998476447544,
+   "degeneracy": 2,
+   "E": 0.24714665952763046
+  },
+  {
+   "kind": "ratio",
+   "graph": "fractal_L2",
+   "edge": [
+    0,
+    1
+   ],
+   "edge_index": 0,
+   "s": 0.924,
+   "j0": 1.4,
+   "ratio": 0.66,
+   "energy": -35.09345112195162,
+   "degeneracy": 2,
+   "E": 0.2467346761892374
+  },
+  {
+   "kind": "ratio",
+   "graph": "fractal_L2",
+   "edge": [
+    0,
+    1
+   ],
+   "edge_index": 0,
+   "s": 0.952,
+   "j0": 1.4,
+   "ratio": 0.68,
+   "energy": -35.07732914456728,
+   "degeneracy": 2,
+   "E": 0.24623050247921902
+  },
+  {
+   "kind": "ratio",
+   "graph": "fractal_L2",
+   "edge": [
+    0,
+    1
+   ],
+   "edge_index": 0,
+   "s": 0.98,
+   "j0": 1.4,
+   "ratio": 0.7,
+   "energy": -35.06166011601197,
+   "degeneracy": 2,
+   "E": 0.2456149931503594
+  },
+  {
+   "kind": "ratio",
+   "graph": "fractal_L2",
+   "edge": [
+    0,
+    1
+   ],
+   "edge_index": 0,
+   "s": 1.008,
+   "j0": 1.4,
+   "ratio": 0.72,
+   "energy": -35.046475365358596,
+   "degeneracy": 2,
+   "E": 0.24486389485005758
+  },
+  {
+   "kind": "ratio",
+   "graph": "fractal_L2",
+   "edge": [
+    0,
+    1
+   ],
+   "edge_index": 0,
+   "s": 1.036,
+   "j0": 1.4,
+   "ratio": 0.74,
+   "energy": -35.031811006405526,
+   "degeneracy": 2,
+   "E": 0.24394608654636712
+  },
+  {
+   "kind": "ratio",
+   "graph": "fractal_L2",
+   "edge": [
+    0,
+    1
+   ],
+   "edge_index": 0,
+   "s": 1.064,
+   "j0": 1.4,
+   "ratio": 0.76,
+   "energy": -35.01770938577554,
+   "degeneracy": 2,
+   "E": 0.24282106548322122
+  },
+  {
+   "kind": "ratio",
+   "graph": "fractal_L2",
+   "edge": [
+    0,
+    1
+   ],
+   "edge_index": 0,
+   "s": 1.092,
+   "j0": 1.4,
+   "ratio": 0.78,
+   "energy": -35.00422117191177,
+   "degeneracy": 2,
+   "E": 0.24143529148874276
+  },
+  {
+   "kind": "ratio",
+   "graph": "fractal_L2",
+   "edge": [
+    0,
+    1
+   ],
+   "edge_index": 0,
+   "s": 1.12,
+   "j0": 1.4,
+   "ratio": 0.8,
+   "energy": -34.99140844497417,
+   "degeneracy": 2,
+   "E": 0.23971677494195617
+  },
+  {
+   "kind": "ratio",
+   "graph": "fractal_L2",
+   "edge": [
+    0,
+    1
+   ],
+   "edge_index": 0,
+   "s": 1.148,
+   "j0": 1.4,
+   "ratio": 0.82,
+   "energy": -34.97934939289871,
+   "degeneracy": 2,
+   "E": 0.23756692408449548
+  },
+  {
+   "kind": "ratio",
+   "graph": "fractal_L2",
+   "edge": [
+    0,
+    1
+   ],
+   "edge_index": 0,
+   "s": 1.176,
+   "j0": 1.4,
+   "ratio": 0.84,
+   "energy": -34.96814566183028,
+   "degeneracy": 2,
+   "E": 0.23484808070356034
+  },
+  {
+   "kind": "ratio",
+   "graph": "fractal_L2",
+   "edge": [
+    0,
+    1
+   ],
+   "edge_index": 0,
+   "s": 1.204,
+   "j0": 1.4,
+   "ratio": 0.86,
+   "energy": -34.9579342334113,
+   "degeneracy": 2,
+   "E": 0.23136431603814353
+  },
+  {
+   "kind": "ratio",
+   "graph": "fractal_L2",
+   "edge": [
+    0,
+    1
+   ],
+   "edge_index": 0,
+   "s": 1.232,
+   "j0": 1.4,
+   "ratio": 0.88,
+   "energy": -34.94890727784802,
+   "degeneracy": 2,
+   "E": 0.22683214182005204
+  },
+  {
+   "kind": "ratio",
+   "graph": "fractal_L2",
+   "edge": [
+    0,
+    1
+   ],
+   "edge_index": 0,
+   "s": 1.26,
+   "j0": 1.4,
+   "ratio": 0.9,
+   "energy": -34.94134650462748,
+   "degeneracy": 2,
+   "E": 0.2208383999218153
+  },
+  {
+   "kind": "ratio",
+   "graph": "fractal_L2",
+   "edge": [
+    0,
+    1
+   ],
+   "edge_index": 0,
+   "s": 1.288,
+   "j0": 1.4,
+   "ratio": 0.92,
+   "energy": -34.93568449315206,
+   "degeneracy": 2,
+   "E": 0.2127924273529414
+  },
+  {
+   "kind": "ratio",
+   "graph": "fractal_L2",
+   "edge": [
+    0,
+    1
+   ],
+   "edge_index": 0,
+   "s": 1.316,
+   "j0": 1.4,
+   "ratio": 0.94,
+   "energy": -34.93261620348967,
+   "degeneracy": 2,
+   "E": 0.20193172423320696
+  },
+  {
+   "kind": "ratio",
+   "graph": "fractal_L2",
+   "edge": [
+    0,
+    1
+   ],
+   "edge_index": 0,
+   "s": 1.344,
+   "j0": 1.4,
+   "ratio": 0.96,
+   "energy": -34.933297195508146,
+   "degeneracy": 2,
+   "E": 0.1876604377587397
+  },
+  {
+   "kind": "ratio",
+   "graph": "fractal_L2",
+   "edge": [
+    0,
+    1
+   ],
+   "edge_index": 0,
+   "s": 1.372,
+   "j0": 1.4,
+   "ratio": 0.98,
+   "energy": -34.939646397765735,
+   "degeneracy": 2,
+   "E": 0.1711915759675788
+  },
+  {
+   "kind": "ratio",
+   "graph": "fractal_L2",
+   "edge": [
+    0,
+    1
+   ],
+   "edge_index": 0,
+   "s": 1.4,
+   "j0": 1.4,
+   "ratio": 1.0,
+   "energy": -34.95455121132673,
+   "degeneracy": 4,
+   "E": 0.11026913715112663
+  },
+  {
+   "kind": "ratio",
+   "graph": "fractal_L2",
+   "edge": [
+    0,
+    1
+   ],
+   "edge_index": 0,
+   "s": 1.428,
+   "j0": 1.4,
+   "ratio": 1.02,
+   "energy": -35.00710924532083,
+   "degeneracy": 2,
+   "E": 0.16171178722408835
+  },
+  {
+   "kind": "ratio",
+   "graph": "fractal_L2",
+   "edge": [
+    0,
+    1
+   ],
+   "edge_index": 0,
+   "s": 1.456,
+   "j0": 1.4,
+   "ratio": 1.04,
+   "energy": -35.063857774130994,
+   "degeneracy": 2,
+   "E": 0.1669960626378111
+  },
+  {
+   "kind": "ratio",
+   "graph": "fractal_L2",
+   "edge": [
+    0,
+    1
+   ],
+   "edge_index": 0,
+   "s": 1.484,
+   "j0": 1.4,
+   "ratio": 1.06,
+   "energy": -35.12531786658801,
+   "degeneracy": 2,
+   "E": 0.17815910666655144
+  },
+  {
+   "kind": "ratio",
+   "graph": "fractal_L2",
+   "edge": [
+    0,
+    1
+   ],
+   "edge_index": 0,
+   "s": 1.512,
+   "j0": 1.4,
+   "ratio": 1.08,
+   "energy": -35.191516214954206,
+   "degeneracy": 2,
+   "E": 0.1947187910914222
+  },
+  {
+   "kind": "ratio",
+   "graph": "fractal_L2",
+   "edge": [
+    0,
+    1
+   ],
+   "edge_index": 0,
+   "s": 1.54,
+   "j0": 1.4,
+   "ratio": 1.1,
+   "energy": -35.26183739737609,
+   "degeneracy": 2,
+   "E": 0.21255136117692086
+  },
+  {
+   "kind": "ratio",
+   "graph": "fractal_L2",
+   "edge": [
+    0,
+    1
+   ],
+   "edge_index": 0,
+   "s": 1.568,
+   "j0": 1.4,
+   "ratio": 1.12,
+   "energy": -35.33534674990095,
+   "degeneracy": 2,
+   "E": 0.22820293360853414
+  },
+  {
+   "kind": "ratio",
+   "graph": "fractal_L2",
+   "edge": [
+    0,
+    1
+   ],
+   "edge_index": 0,
+   "s": 1.596,
+   "j0": 1.4,
+   "ratio": 1.14,
+   "energy": -35.41117001605908,
+   "degeneracy": 2,
+   "E": 0.2406509706198668
+  },
+  {
+   "kind": "ratio",
+   "graph": "fractal_L2",
+   "edge": [
+    0,
+    1
+   ],
+   "edge_index": 0,
+   "s": 1.624,
+   "j0": 1.4,
+   "ratio": 1.16,
+   "energy": -35.48864307141165,
+   "degeneracy": 2,
+   "E": 0.2502222769275843
+  },
+  {
+   "kind": "ratio",
+   "graph": "fractal_L2",
+   "edge": [
+    0,
+    1
+   ],
+   "edge_index": 0,
+   "s": 1.652,
+   "j0": 1.4,
+   "ratio": 1.18,
+   "energy": -35.567302093097965,
+   "degeneracy": 2,
+   "E": 0.25756940406666734
+  },
+  {
+   "kind": "ratio",
+   "graph": "fractal_L2",
+   "edge": [
+    0,
+    1
+   ],
+   "edge_index": 0,
+   "s": 1.68,
+   "j0": 1.4,
+   "ratio": 1.2,
+   "energy": -35.64683054278668,
+   "degeneracy": 2,
+   "E": 0.26327851814010533
+  },
+  {
+   "kind": "ratio",
+   "graph": "fractal_L2",
+   "edge": [
+    0,
+    1
+   ],
+   "edge_index": 0,
+   "s": 1.708,
+   "j0": 1.4,
+   "ratio": 1.22,
+   "energy": -35.72701130737878,
+   "degeneracy": 2,
+   "E": 0.2677919541368675
+  },
+  {
+   "kind": "ratio",
+   "graph": "fractal_L2",
+   "edge": [
+    0,
+    1
+   ],
+   "edge_index": 0,
+   "s": 1.736,
+   "j0": 1.4,
+   "ratio": 1.24,
+   "energy": -35.8076929357982,
+   "degeneracy": 2,
+   "E": 0.27142582240472946
+  },
+  {
+   "kind": "ratio",
+   "graph": "fractal_L2",
+   "edge": [
+    0,
+    1
+   ],
+   "edge_index": 0,
+   "s": 1.764,
+   "j0": 1.4,
+   "ratio": 1.26,
+   "energy": -35.88876753481492,
+   "degeneracy": 2,
+   "E": 0.2744032565844939
+  },
+  {
+   "kind": "ratio",
+   "graph": "fractal_L2",
+   "edge": [
+    0,
+    1
+   ],
+   "edge_index": 0,
+   "s": 1.792,
+   "j0": 1.4,
+   "ratio": 1.28,
+   "energy": -35.97015655471755,
+   "degeneracy": 2,
+   "E": 0.276882545259447
+  },
+  {
+   "kind": "ratio",
+   "graph": "fractal_L2",
+   "edge": [
+    0,
+    1
+   ],
+   "edge_index": 0,
+   "s": 1.82,
+   "j0": 1.4,
+   "ratio": 1.3,
+   "energy": -36.05180160298202,
+   "degeneracy": 2,
+   "E": 0.2789773669745931
+  },
+  {
+   "kind": "ratio",
+   "graph": "fractal_L2",
+   "edge": [
+    0,
+    1
+   ],
+   "edge_index": 0,
+   "s": 1.848,
+   "j0": 1.4,
+   "ratio": 1.32,
+   "energy": -36.13365842009303,
+   "degeneracy": 2,
+   "E": 0.28077061069836085
+  },
+  {
+   "kind": "ratio",
+   "graph": "fractal_L2",
+   "edge": [
+    0,
+    1
+   ],
+   "edge_index": 0,
+   "s": 1.876,
+   "j0": 1.4,
+   "ratio": 1.34,
+   "energy": -36.21569285583838,
+   "degeneracy": 2,
+   "E": 0.2823236856621716
+  },
+  {
+   "kind": "ratio",
+   "graph": "fractal_L2",
+   "edge": [
+    0,
+    1
+   ],
+   "edge_index": 0,
+   "s": 1.904,
+   "j0": 1.4,
+   "ratio": 1.36,
+   "energy": -36.297878129124896,
+   "degeneracy": 2,
+   "E": 0.28368280664304657
+  },
+  {
+   "kind": "ratio",
+   "graph": "fractal_L2",
+   "edge": [
+    0,
+    1
+   ],
+   "edge_index": 0,
+   "s": 1.932,
+   "j0": 1.4,
+   "ratio": 1.38,
+   "energy": -36.380192925822996,
+   "degeneracy": 2,
+   "E": 0.2848832778403171
+  },
+  {
+   "kind": "ratio",
+   "graph": "fractal_L2",
+   "edge": [
+    0,
+    1
+   ],
+   "edge_index": 0,
+   "s": 1.96,
+   "j0": 1.4,
+   "ratio": 1.4,
+   "energy": -36.46262005395944,
+   "degeneracy": 2,
+   "E": 0.2859524502463603
+  },
+  {
+   "kind": "ratio",
+   "graph": "fractal_L2",
+   "edge": [
+    0,
+    1
+   ],
+   "edge_index": 0,
+   "s": 1.988,
+   "j0": 1.4,
+   "ratio": 1.42,
+   "energy": -36.5451454764586,
+   "degeneracy": 2,
+   "E": 0.28691179224794783
+  },
+  {
+   "kind": "ratio",
+   "graph": "fractal_L2",
+   "edge": [
+    0,
+    1
+   ],
+   "edge_index": 0,
+   "s": 2.016,
+   "j0": 1.4,
+   "ratio": 1.44,
+   "energy": -36.62775760418796,
+   "degeneracy": 2,
+   "E": 0.2877783603446265
+  },
+  {
+   "kind": "ratio",
+   "graph": "fractal_L2",
+   "edge": [
+    0,
+    1
+   ],
+   "edge_index": 0,
+   "s": 2.044,
+   "j0": 1.4,
+   "ratio": 1.46,
+   "energy": -36.71044677151072,
+   "degeneracy": 2,
+   "E": 0.28856585862843664
+  },
+  {
+   "kind": "ratio",
+   "graph": "fractal_L2",
+   "edge": [
+    0,
+    1
+   ],
+   "edge_index": 0,
+   "s": 2.072,
+   "j0": 1.4,
+   "ratio": 1.48,
+   "energy": -36.79320484182646,
+   "degeneracy": 2,
+   "E": 0.2892854124520561
+  },
+  {
+   "kind": "ratio",
+   "graph": "fractal_L2",
+   "edge": [
+    0,
+    1
+   ],
+   "edge_index": 0,
+   "s": 2.1,
+   "j0": 1.4,
+   "ratio": 1.5,
+   "energy": -36.87602490707131,
+   "degeneracy": 2,
+   "E": 0.28994614073442154
+  },
+  {
+   "kind": "scan",
+   "graph": "fractal_L2",
+   "edge": [
+    0,
+    1
+   ],
+   "edge_index": 0,
+   "s": 0.0,
+   "j0": 1.0,
+   "ratio": 0.0,
+   "energy": -25.554721270767896,
+   "degeneracy": 2,
+   "E": 0.24673114075776484
+  },
+  {
+   "kind": "scan",
+   "graph": "fractal_L2",
+   "edge": [
+    0,
+    1
+   ],
+   "edge_index": 0,
+   "s": 0.05,
+   "j0": 1.0,
+   "ratio": 0.05,
+   "energy": -25.513069204402907,
+   "degeneracy": 2,
+   "E": 0.24699009659221885
+  },
+  {
+   "kind": "scan",
+   "graph": "fractal_L2",
+   "edge": [
+    0,
+    1
+   ],
+   "edge_index": 0,
+   "s": 0.1,
+   "j0": 1.0,
+   "ratio": 0.1,
+   "energy": -25.471933210849443,
+   "degeneracy": 2,
+   "E": 0.2472477792097901
+  },
+  {
+   "kind": "scan",
+   "graph": "fractal_L2",
+   "edge": [
+    0,
+    1
+   ],
+   "edge_index": 0,
+   "s": 0.15,
+   "j0": 1.0,
+   "ratio": 0.15,
+   "energy": -25.431360328274998,
+   "degeneracy": 2,
+   "E": 0.24750078641664836
+  },
+  {
+   "kind": "scan",
+   "graph": "fractal_L2",
+   "edge": [
+    0,
+    1
+   ],
+   "edge_index": 0,
+   "s": 0.2,
+   "j0": 1.0,
+   "ratio": 0.2,
+   "energy": -25.391403272791568,
+   "degeneracy": 2,
+   "E": 0.247744499566537
+  },
+  {
+   "kind": "scan",
+   "graph": "fractal_L2",
+   "edge": [
+    0,
+    1
+   ],
+   "edge_index": 0,
+   "s": 0.25,
+   "j0": 1.0,
+   "ratio": 0.25,
+   "energy": -25.352121320292408,
+   "degeneracy": 2,
+   "E": 0.2479726405498931
+  },
+  {
+   "kind": "scan",
+   "graph": "fractal_L2",
+   "edge": [
+    0,
+    1
+   ],
+   "edge_index": 0,
+   "s": 0.3,
+   "j0": 1.0,
+   "ratio": 0.3,
+   "energy": -25.313581373178465,
+   "degeneracy": 2,
+   "E": 0.24817663904786
+  },
+  {
+   "kind": "scan",
+   "graph": "fractal_L2",
+   "edge": [
+    0,
+    1
+   ],
+   "edge_index": 0,
+   "s": 0.35,
+   "j0": 1.0,
+   "ratio": 0.35,
+   "energy": -25.275859270461286,
+   "degeneracy": 2,
+   "E": 0.2483447106808112
+  },
+  {
+   "kind": "scan",
+   "graph": "fractal_L2",
+   "edge": [
+    0,
+    1
+   ],
+   "edge_index": 0,
+   "s": 0.4,
+   "j0": 1.0,
+   "ratio": 0.4,
+   "energy": -25.239041429001023,
+   "degeneracy": 2,
+   "E": 0.24846048259117623
+  },
+  {
+   "kind": "scan",
+   "graph": "fractal_L2",
+   "edge": [
+    0,
+    1
+   ],
+   "edge_index": 0,
+   "s": 0.45,
+   "j0": 1.0,
+   "ratio": 0.45,
+   "energy": -25.203226953940217,
+   "degeneracy": 2,
+   "E": 0.24850088830788888
+  },
+  {
+   "kind": "scan",
+   "graph": "fractal_L2",
+   "edge": [
+    0,
+    1
+   ],
+   "edge_index": 0,
+   "s": 0.5,
+   "j0": 1.0,
+   "ratio": 0.5,
+   "energy": -25.168530447206532,
+   "degeneracy": 2,
+   "E": 0.24843283995380347
+  },
+  {
+   "kind": "scan",
+   "graph": "fractal_L2",
+   "edge": [
+    0,
+    1
+   ],
+   "edge_index": 0,
+   "s": 0.55,
+   "j0": 1.0,
+   "ratio": 0.55,
+   "energy": -25.13508591578717,
+   "degeneracy": 2,
+   "E": 0.24820776844128672
+  },
+  {
+   "kind": "scan",
+   "graph": "fractal_L2",
+   "edge": [
+    0,
+    1
+   ],
+   "edge_index": 0,
+   "s": 0.6,
+   "j0": 1.0,
+   "ratio": 0.6,
+   "energy": -25.103052530010245,
+   "degeneracy": 2,
+   "E": 0.24775226278569124
+  },
+  {
+   "kind": "scan",
+   "graph": "fractal_L2",
+   "edge": [
+    0,
+    1
+   ],
+   "edge_index": 0,
+   "s": 0.65,
+   "j0": 1.0,
+   "ratio": 0.65,
+   "energy": -25.07262373241291,
+   "degeneracy": 2,
+   "E": 0.2469511576938188
+  },
+  {
+   "kind": "scan",
+   "graph": "fractal_L2",
+   "edge": [
+    0,
+    1
+   ],
+   "edge_index": 0,
+   "s": 0.7,
+   "j0": 1.0,
+   "ratio": 0.7,
+   "energy": -25.044042940008453,
+   "degeneracy": 2,
+   "E": 0.2456149931503573
+  },
+  {
+   "kind": "scan",
+   "graph": "fractal_L2",
+   "edge": [
+    0,
+    1
+   ],
+   "edge_index": 0,
+   "s": 0.75,
+   "j0": 1.0,
+   "ratio": 0.75,
+   "energy": -25.017633508748624,
+   "degeneracy": 2,
+   "E": 0.2434124653719582
+  },
+  {
+   "kind": "scan",
+   "graph": "fractal_L2",
+   "edge": [
+    0,
+    1
+   ],
+   "edge_index": 0,
+   "s": 0.8,
+   "j0": 1.0,
+   "ratio": 0.8,
+   "energy": -24.99386317498164,
+   "degeneracy": 2,
+   "E": 0.23971677494195884
+  },
+  {
+   "kind": "scan",
+   "graph": "fractal_L2",
+   "edge": [
+    0,
+    1
+   ],
+   "edge_index": 0,
+   "s": 0.85,
+   "j0": 1.0,
+   "ratio": 0.85,
+   "energy": -24.97350393026875,
+   "degeneracy": 2,
+   "E": 0.2332170509862317
+  },
+  {
+   "kind": "scan",
+   "graph": "fractal_L2",
+   "edge": [
+    0,
+    1
+   ],
+   "edge_index": 0,
+   "s": 0.9,
+   "j0": 1.0,
+   "ratio": 0.9,
+   "energy": -24.958104646162404,
+   "degeneracy": 2,
+   "E": 0.22083839992181892
+  },
+  {
+   "kind": "scan",
+   "graph": "fractal_L2",
+   "edge": [
+    0,
+    1
+   ],
+   "edge_index": 0,
+   "s": 0.95,
+   "j0": 1.0,
+   "ratio": 0.95,
+   "energy": -24.951707165450323,
+   "degeneracy": 2,
+   "E": 0.19522495130050407
+  },
+  {
+   "kind": "scan",
+   "graph": "fractal_L2",
+   "edge": [
+    0,
+    1
+   ],
+   "edge_index": 0,
+   "s": 1.0,
+   "j0": 1.0,
+   "ratio": 1.0,
+   "energy": -24.967536579519162,
+   "degeneracy": 4,
+   "E": 0.11026913715112599
+  },
+  {
+   "kind": "scan",
+   "graph": "fractal_L2",
+   "edge": [
+    0,
+    1
+   ],
+   "edge_index": 0,
+   "s": 1.05,
+   "j0": 1.0,
+   "ratio": 1.05,
+   "energy": -25.067129460512543,
+   "degeneracy": 2,
+   "E": 0.17175581342604807
+  },
+  {
+   "kind": "scan",
+   "graph": "fractal_L2",
+   "edge": [
+    0,
+    1
+   ],
+   "edge_index": 0,
+   "s": 1.1,
+   "j0": 1.0,
+   "ratio": 1.1,
+   "energy": -25.187026712411452,
+   "degeneracy": 2,
+   "E": 0.21255136117691567
+  },
+  {
+   "kind": "scan",
+   "graph": "fractal_L2",
+   "edge": [
+    0,
+    1
+   ],
+   "edge_index": 0,
+   "s": 1.15,
+   "j0": 1.0,
+   "ratio": 1.15,
+   "energy": -25.321238150765822,
+   "degeneracy": 2,
+   "E": 0.2457561242930728
+  },
+  {
+   "kind": "scan",
+   "graph": "fractal_L2",
+   "edge": [
+    0,
+    1
+   ],
+   "edge_index": 0,
+   "s": 1.2,
+   "j0": 1.0,
+   "ratio": 1.2,
+   "energy": -25.462021816276454,
+   "degeneracy": 2,
+   "E": 0.2632785181401111
+  },
+  {
+   "kind": "scan",
+   "graph": "fractal_L2",
+   "edge": [
+    0,
+    1
+   ],
+   "edge_index": 0,
+   "s": 1.25,
+   "j0": 1.0,
+   "ratio": 1.25,
+   "energy": -25.60584756024709,
+   "degeneracy": 2,
+   "E": 0.27298545432315285
+  },
+  {
+   "kind": "scan",
+   "graph": "fractal_L2",
+   "edge": [
+    0,
+    1
+   ],
+   "edge_index": 0,
+   "s": 1.3,
+   "j0": 1.0,
+   "ratio": 1.3,
+   "energy": -25.751286859272813,
+   "degeneracy": 2,
+   "E": 0.2789773669745889
+  },
+  {
+   "kind": "scan",
+   "graph": "fractal_L2",
+   "edge": [
+    0,
+    1
+   ],
+   "edge_index": 0,
+   "s": 1.35,
+   "j0": 1.0,
+   "ratio": 1.35,
+   "energy": -25.89769148578212,
+   "degeneracy": 2,
+   "E": 0.2830250680319519
+  },
+  {
+   "kind": "scan",
+   "graph": "fractal_L2",
+   "edge": [
+    0,
+    1
+   ],
+   "edge_index": 0,
+   "s": 1.4,
+   "j0": 1.0,
+   "ratio": 1.4,
+   "energy": -26.04472860997096,
+   "degeneracy": 2,
+   "E": 0.28595245024636123
+  },
+  {
+   "kind": "scan",
+   "graph": "fractal_L2",
+   "edge": [
+    0,
+    1
+   ],
+   "edge_index": 0,
+   "s": 1.45,
+   "j0": 1.0,
+   "ratio": 1.45,
+   "energy": -26.192209355974846,
+   "degeneracy": 2,
+   "E": 0.2881812449657813
+  },
+  {
+   "kind": "scan",
+   "graph": "fractal_L2",
+   "edge": [
+    0,
+    1
+   ],
+   "edge_index": 0,
+   "s": 1.5,
+   "j0": 1.0,
+   "ratio": 1.5,
+   "energy": -26.340017790765117,
+   "degeneracy": 2,
+   "E": 0.2899461407344203
+  },
+  {
+   "kind": "scan",
+   "graph": "fractal_L2",
+   "edge": [
+    0,
+    1
+   ],
+   "edge_index": 0,
+   "s": 1.55,
+   "j0": 1.0,
+   "ratio": 1.55,
+   "energy": -26.48807819941917,
+   "degeneracy": 2,
+   "E": 0.2913870659287001
+  },
+  {
+   "kind": "scan",
+   "graph": "fractal_L2",
+   "edge": [
+    0,
+    1
+   ],
+   "edge_index": 0,
+   "s": 1.6,
+   "j0": 1.0,
+   "ratio": 1.6,
+   "energy": -26.63633860671178,
+   "degeneracy": 2,
+   "E": 0.29259231066856206
+  },
+  {
+   "kind": "scan",
+   "graph": "fractal_L2",
+   "edge": [
+    0,
+    1
+   ],
+   "edge_index": 0,
+   "s": 1.65,
+   "j0": 1.0,
+   "ratio": 1.65,
+   "energy": -26.784761853384445,
+   "degeneracy": 2,
+   "E": 0.2936202546237866
+  },
+  {
+   "kind": "scan",
+   "graph": "fractal_L2",
+   "edge": [
+    0,
+    1
+   ],
+   "edge_index": 0,
+   "s": 1.7,
+   "j0": 1.0,
+   "ratio": 1.7,
+   "energy": -26.933320463929515,
+   "degeneracy": 2,
+   "E": 0.29451104214444557
+  },
+  {
+   "kind": "scan",
+   "graph": "fractal_L2",
+   "edge": [
+    0,
+    1
+   ],
+   "edge_index": 0,
+   "s": 1.75,
+   "j0": 1.0,
+   "ratio": 1.75,
+   "energy": -27.081993542534335,
+   "degeneracy": 2,
+   "E": 0.29529320805865855
+  },
+  {
+   "kind": "scan",
+   "graph": "fractal_L2",
+   "edge": [
+    0,
+    1
+   ],
+   "edge_index": 0,
+   "s": 1.8,
+   "j0": 1.0,
+   "ratio": 1.8,
+   "energy": -27.230764813883667,
+   "degeneracy": 2,
+   "E": 0.2959876175040586
+  },
+  {
+   "kind": "scan",
+   "graph": "fractal_L2",
+   "edge": [
+    0,
+    1
+   ],
+   "edge_index": 0,
+   "s": 1.85,
+   "j0": 1.0,
+   "ratio": 1.85,
+   "energy": -27.37962134054221,
+   "degeneracy": 2,
+   "E": 0.29660990459000003
+  },
+  {
+   "kind": "scan",
+   "graph": "fractal_L2",
+   "edge": [
+    0,
+    1
+   ],
+   "edge_index": 0,
+   "s": 1.9,
+   "j0": 1.0,
+   "ratio": 1.9,
+   "energy": -27.528552656291524,
+   "degeneracy": 2,
+   "E": 0.29717203536533926
+  },
+  {
+   "kind": "scan",
+   "graph": "fractal_L2",
+   "edge": [
+    0,
+    1
+   ],
+   "edge_index": 0,
+   "s": 1.95,
+   "j0": 1.0,
+   "ratio": 1.95,
+   "energy": -27.677550164130643,
+   "degeneracy": 2,
+   "E": 0.29768334051759726
+  },
+  {
+   "kind": "scan",
+   "graph": "fractal_L2",
+   "edge": [
+    0,
+    1
+   ],
+   "edge_index": 0,
+   "s": 2.0,
+   "j0": 1.0,
+   "ratio": 2.0,
+   "energy": -27.826606707834124,
+   "degeneracy": 2,
+   "E": 0.2981512162616363
+  },
+  {
+   "kind": "scan",
+   "graph": "fractal_L2",
+   "edge": [
+    0,
+    1
+   ],
+   "edge_index": 0,
+   "s": 2.05,
+   "j0": 1.0,
+   "ratio": 2.05,
+   "energy": -27.975716260390918,
+   "degeneracy": 2,
+   "E": 0.29858161148608253
+  },
+  {
+   "kind": "scan",
+   "graph": "fractal_L2",
+   "edge": [
+    0,
+    1
+   ],
+   "edge_index": 0,
+   "s": 2.1,
+   "j0": 1.0,
+   "ratio": 2.1,
+   "energy": -28.124873693049754,
+   "degeneracy": 2,
+   "E": 0.2989793736091976
+  },
+  {
+   "kind": "scan",
+   "graph": "fractal_L2",
+   "edge": [
+    0,
+    1
+   ],
+   "edge_index": 0,
+   "s": 2.15,
+   "j0": 1.0,
+   "ratio": 2.15,
+   "energy": -28.27407460114506,
+   "degeneracy": 2,
+   "E": 0.29934849885064063
+  },
+  {
+   "kind": "scan",
+   "graph": "fractal_L2",
+   "edge": [
+    0,
+    1
+   ],
+   "edge_index": 0,
+   "s": 2.2,
+   "j0": 1.0,
+   "ratio": 2.2,
+   "energy": -28.423315170690632,
+   "degeneracy": 2,
+   "E": 0.29969231647840927
+  },
+  {
+   "kind": "scan",
+   "graph": "fractal_L2",
+   "edge": [
+    0,
+    1
+   ],
+   "edge_index": 0,
+   "s": 2.25,
+   "j0": 1.0,
+   "ratio": 2.25,
+   "energy": -28.572592074757637,
+   "degeneracy": 2,
+   "E": 0.3000136265812064
+  },
+  {
+   "kind": "scan",
+   "graph": "fractal_L2",
+   "edge": [
+    0,
+    1
+   ],
+   "edge_index": 0,
+   "s": 2.3,
+   "j0": 1.0,
+   "ratio": 2.3,
+   "energy": -28.721902391954643,
+   "degeneracy": 2,
+   "E": 0.3003148045620533
+  },
+  {
+   "kind": "scan",
+   "graph": "fractal_L2",
+   "edge": [
+    0,
+    1
+   ],
+   "edge_index": 0,
+   "s": 2.35,
+   "j0": 1.0,
+   "ratio": 2.35,
+   "energy": -28.871243541549106,
+   "degeneracy": 2,
+   "E": 0.3005978814266824
+  },
+  {
+   "kind": "scan",
+   "graph": "fractal_L2",
+   "edge": [
+    0,
+    1
+   ],
+   "edge_index": 0,
+   "s": 2.4,
+   "j0": 1.0,
+   "ratio": 2.4,
+   "energy": -29.02061323127785,
+   "degeneracy": 2,
+   "E": 0.3008646062120832
+  },
+  {
+   "kind": "scan",
+   "graph": "fractal_L2",
+   "edge": [
+    0,
+    1
+   ],
+   "edge_index": 0,
+   "s": 2.45,
+   "j0": 1.0,
+   "ratio": 2.45,
+   "energy": -29.170009414959406,
+   "degeneracy": 2,
+   "E": 0.30111649506250476
+  },
+  {
+   "kind": "scan",
+   "graph": "fractal_L2",
+   "edge": [
+    0,
+    1
+   ],
+   "edge_index": 0,
+   "s": 2.5,
+   "j0": 1.0,
+   "ratio": 2.5,
+   "energy": -29.31943025775322,
+   "degeneracy": 2,
+   "E": 0.30135487020052915
+  },
+  {
+   "kind": "scan",
+   "graph": "fractal_L2",
+   "edge": [
+    0,
+    1
+   ],
+   "edge_index": 0,
+   "s": 2.55,
+   "j0": 1.0,
+   "ratio": 2.55,
+   "energy": -29.468874107453118,
+   "degeneracy": 2,
+   "E": 0.3015808911646073
+  },
+  {
+   "kind": "scan",
+   "graph": "fractal_L2",
+   "edge": [
+    0,
+    1
+   ],
+   "edge_index": 0,
+   "s": 2.6,
+   "j0": 1.0,
+   "ratio": 2.6,
+   "energy": -29.618339470584182,
+   "degeneracy": 2,
+   "E": 0.30179558006575474
+  },
+  {
+   "kind": "scan",
+   "graph": "fractal_L2",
+   "edge": [
+    0,
+    1
+   ],
+   "edge_index": 0,
+   "s": 2.65,
+   "j0": 1.0,
+   "ratio": 2.65,
+   "energy": -29.76782499235704,
+   "degeneracy": 2,
+   "E": 0.3019998421739681
+  },
+  {
+   "kind": "scan",
+   "graph": "fractal_L2",
+   "edge": [
+    0,
+    1
+   ],
+   "edge_index": 0,
+   "s": 2.7,
+   "j0": 1.0,
+   "ratio": 2.7,
+   "energy": -29.917329439748876,
+   "degeneracy": 2,
+   "E": 0.30219448282444994
+  },
+  {
+   "kind": "scan",
+   "graph": "fractal_L2",
+   "edge": [
+    0,
+    1
+   ],
+   "edge_index": 0,
+   "s": 2.75,
+   "j0": 1.0,
+   "ratio": 2.75,
+   "energy": -30.066851687134946,
+   "degeneracy": 2,
+   "E": 0.30238022139936965
+  },
+  {
+   "kind": "scan",
+   "graph": "fractal_L2",
+   "edge": [
+    0,
+    1
+   ],
+   "edge_index": 0,
+   "s": 2.8,
+   "j0": 1.0,
+   "ratio": 2.8,
+   "energy": -30.21639070401329,
+   "degeneracy": 2,
+   "E": 0.30255770296719525
+  },
+  {
+   "kind": "scan",
+   "graph": "fractal_L2",
+   "edge": [
+    0,
+    1
+   ],
+   "edge_index": 0,
+   "s": 2.85,
+   "j0": 1.0,
+   "ratio": 2.85,
+   "energy": -30.36594554446908,
+   "degeneracy": 2,
+   "E": 0.30272750803184745
+  },
+  {
+   "kind": "scan",
+   "graph": "fractal_L2",
+   "edge": [
+    0,
+    1
+   ],
+   "edge_index": 0,
+   "s": 2.9,
+   "j0": 1.0,
+   "ratio": 2.9,
+   "energy": -30.515515338079183,
+   "degeneracy": 2,
+   "E": 0.3028901607459151
+  },
+  {
+   "kind": "scan",
+   "graph": "fractal_L2",
+   "edge": [
+    0,
+    1
+   ],
+   "edge_index": 0,
+   "s": 2.95,
+   "j0": 1.0,
+   "ratio": 2.95,
+   "energy": -30.665099282029,
+   "degeneracy": 2,
+   "E": 0.3030461358676308
+  },
+  {
+   "kind": "scan",
+   "graph": "fractal_L2",
+   "edge": [
+    0,
+    1
+   ],
+   "edge_index": 0,
+   "s": 3.0,
+   "j0": 1.0,
+   "ratio": 3.0,
+   "energy": -30.814696634246616,
+   "degeneracy": 2,
+   "E": 0.30319586468395776
+  },
+  {
+   "kind": "scan",
+   "graph": "ring15",
+   "edge": [
+    0,
+    1
+   ],
+   "edge_index": 0,
+   "s": 0.0,
+   "j0": 1.0,
+   "ratio": 0.0,
+   "energy": -25.66768196717457,
+   "degeneracy": 2,
+   "E": 0.20805150967842007
+  },
+  {
+   "kind": "scan",
+   "graph": "ring15",
+   "edge": [
+    0,
+    1
+   ],
+   "edge_index": 0,
+   "s": 0.05,
+   "j0": 1.0,
+   "ratio": 0.05,
+   "energy": -25.662617003150825,
+   "degeneracy": 2,
+   "E": 0.20622250305998346
+  },
+  {
+   "kind": "scan",
+   "graph": "ring15",
+   "edge": [
+    0,
+    1
+   ],
+   "edge_index": 0,
+   "s": 0.1,
+   "j0": 1.0,
+   "ratio": 0.1,
+   "energy": -25.659820049826322,
+   "degeneracy": 2,
+   "E": 0.2042195304262647
+  },
+  {
+   "kind": "scan",
+   "graph": "ring15",
+   "edge": [
+    0,
+    1
+   ],
+   "edge_index": 0,
+   "s": 0.15,
+   "j0": 1.0,
+   "ratio": 0.15,
+   "energy": -25.659413596154735,
+   "degeneracy": 2,
+   "E": 0.20202934958455857
+  },
+  {
+   "kind": "scan",
+   "graph": "ring15",
+   "edge": [
+    0,
+    1
+   ],
+   "edge_index": 0,
+   "s": 0.2,
+   "j0": 1.0,
+   "ratio": 0.2,
+   "energy": -25.661523368799955,
+   "degeneracy": 2,
+   "E": 0.1996387815083831
+  },
+  {
+   "kind": "scan",
+   "graph": "ring15",
+   "edge": [
+    0,
+    1
+   ],
+   "edge_index": 0,
+   "s": 0.25,
+   "j0": 1.0,
+   "ratio": 0.25,
+   "energy": -25.666277582213024,
+   "degeneracy": 2,
+   "E": 0.1970350299754445
+  },
+  {
+   "kind": "scan",
+   "graph": "ring15",
+   "edge": [
+    0,
+    1
+   ],
+   "edge_index": 0,
+   "s": 0.3,
+   "j0": 1.0,
+   "ratio": 0.3,
+   "energy": -25.673806015799098,
+   "degeneracy": 2,
+   "E": 0.1942060729100814
+  },
+  {
+   "kind": "scan",
+   "graph": "ring15",
+   "edge": [
+    0,
+    1
+   ],
+   "edge_index": 0,
+   "s": 0.35,
+   "j0": 1.0,
+   "ratio": 0.35,
+   "energy": -25.68423890967759,
+   "degeneracy": 2,
+   "E": 0.19114112818641216
+  },
+  {
+   "kind": "scan",
+   "graph": "ring15",
+   "edge": [
+    0,
+    1
+   ],
+   "edge_index": 0,
+   "s": 0.4,
+   "j0": 1.0,
+   "ratio": 0.4,
+   "energy": -25.697705676639686,
+   "degeneracy": 2,
+   "E": 0.1878311929624626
+  },
+  {
+   "kind": "scan",
+   "graph": "ring15",
+   "edge": [
+    0,
+    1
+   ],
+   "edge_index": 0,
+   "s": 0.45,
+   "j0": 1.0,
+   "ratio": 0.45,
+   "energy": -25.71433343588277,
+   "degeneracy": 2,
+   "E": 0.1842696508192014
+  },
+  {
+   "kind": "scan",
+   "graph": "ring15",
+   "edge": [
+    0,
+    1
+   ],
+   "edge_index": 0,
+   "s": 0.5,
+   "j0": 1.0,
+   "ratio": 0.5,
+   "energy": -25.734245383911954,
+   "degeneracy": 2,
+   "E": 0.1804529352039206
+  },
+  {
+   "kind": "scan",
+   "graph": "ring15",
+   "edge": [
+    0,
+    1
+   ],
+   "edge_index": 0,
+   "s": 0.55,
+   "j0": 1.0,
+   "ratio": 0.55,
+   "energy": -25.757559029280998,
+   "degeneracy": 2,
+   "E": 0.17638123124219274
+  },
+  {
+   "kind": "scan",
+   "graph": "ring15",
+   "edge": [
+    0,
+    1
+   ],
+   "edge_index": 0,
+   "s": 0.6,
+   "j0": 1.0,
+   "ratio": 0.6,
+   "energy": -25.78438433006956,
+   "degeneracy": 2,
+   "E": 0.17205919140530776
+  },
+  {
+   "kind": "scan",
+   "graph": "ring15",
+   "edge": [
+    0,
+    1
+   ],
+   "edge_index": 0,
+   "s": 0.65,
+   "j0": 1.0,
+   "ratio": 0.65,
+   "energy": -25.814821785209173,
+   "degeneracy": 2,
+   "E": 0.16749663449357188
+  },
+  {
+   "kind": "scan",
+   "graph": "ring15",
+   "edge": [
+    0,
+    1
+   ],
+   "edge_index": 0,
+   "s": 0.7,
+   "j0": 1.0,
+   "ratio": 0.7,
+   "energy": -25.848960541900876,
+   "degeneracy": 2,
+   "E": 0.16270919270387613
+  },
+  {
+   "kind": "scan",
+   "graph": "ring15",
+   "edge": [
+    0,
+    1
+   ],
+   "edge_index": 0,
+   "s": 0.75,
+   "j0": 1.0,
+   "ratio": 0.75,
+   "energy": -25.886876590025913,
+   "degeneracy": 2,
+   "E": 0.15771886891465867
+  },
+  {
+   "kind": "scan",
+   "graph": "ring15",
+   "edge": [
+    0,
+    1
+   ],
+   "edge_index": 0,
+   "s": 0.8,
+   "j0": 1.0,
+   "ratio": 0.8,
+   "energy": -25.928631119347276,
+   "degeneracy": 2,
+   "E": 0.15255446619576127
+  },
+  {
+   "kind": "scan",
+   "graph": "ring15",
+   "edge": [
+    0,
+    1
+   ],
+   "edge_index": 0,
+   "s": 0.85,
+   "j0": 1.0,
+   "ratio": 0.85,
+   "energy": -25.974269115250095,
+   "degeneracy": 2,
+   "E": 0.14725185388199807
+  },
+  {
+   "kind": "scan",
+   "graph": "ring15",
+   "edge": [
+    0,
+    1
+   ],
+   "edge_index": 0,
+   "s": 0.9,
+   "j0": 1.0,
+   "ratio": 0.9,
+   "energy": -26.02381826300629,
+   "degeneracy": 2,
+   "E": 0.1418540385789995
+  },
+  {
+   "kind": "scan",
+   "graph": "ring15",
+   "edge": [
+    0,
+    1
+   ],
+   "edge_index": 0,
+   "s": 0.95,
+   "j0": 1.0,
+   "ratio": 0.95,
+   "energy": -26.077288218931486,
+   "degeneracy": 2,
+   "E": 0.13641101264976524
+  },
+  {
+   "kind": "scan",
+   "graph": "ring15",
+   "edge": [
+    0,
+    1
+   ],
+   "edge_index": 0,
+   "s": 1.0,
+   "j0": 1.0,
+   "ratio": 1.0,
+   "energy": -26.13467028986313,
+   "degeneracy": 4,
+   "E": 4.745040042316086e-16
+  },
+  {
+   "kind": "scan",
+   "graph": "ring15",
+   "edge": [
+    0,
+    1
+   ],
+   "edge_index": 0,
+   "s": 1.05,
+   "j0": 1.0,
+   "ratio": 1.05,
+   "energy": -26.250603617843286,
+   "degeneracy": 2,
+   "E": 0.1361381486485524
+  },
+  {
+   "kind": "scan",
+   "graph": "ring15",
+   "edge": [
+    0,
+    1
+   ],
+   "edge_index": 0,
+   "s": 1.1,
+   "j0": 1.0,
+   "ratio": 1.1,
+   "energy": -26.36850218560911,
+   "degeneracy": 2,
+   "E": 0.14106694279171858
+  },
+  {
+   "kind": "scan",
+   "graph": "ring15",
+   "edge": [
+    0,
+    1
+   ],
+   "edge_index": 0,
+   "s": 1.15,
+   "j0": 1.0,
+   "ratio": 1.15,
+   "energy": -26.488223457983413,
+   "degeneracy": 2,
+   "E": 0.14576216937074304
+  },
+  {
+   "kind": "scan",
+   "graph": "ring15",
+   "edge": [
+    0,
+    1
+   ],
+   "edge_index": 0,
+   "s": 1.2,
+   "j0": 1.0,
+   "ratio": 1.2,
+   "energy": -26.609635425741768,
+   "degeneracy": 2,
+   "E": 0.1502253795887605
+  },
+  {
+   "kind": "scan",
+   "graph": "ring15",
+   "edge": [
+    0,
+    1
+   ],
+   "edge_index": 0,
+   "s": 1.25,
+   "j0": 1.0,
+   "ratio": 1.25,
+   "energy": -26.732616114805158,
+   "degeneracy": 2,
+   "E": 0.1544616641561193
+  },
+  {
+   "kind": "scan",
+   "graph": "ring15",
+   "edge": [
+    0,
+    1
+   ],
+   "edge_index": 0,
+   "s": 1.3,
+   "j0": 1.0,
+   "ratio": 1.3,
+   "energy": -26.857053023662587,
+   "degeneracy": 2,
+   "E": 0.15847848541651804
+  },
+  {
+   "kind": "scan",
+   "graph": "ring15",
+   "edge": [
+    0,
+    1
+   ],
+   "edge_index": 0,
+   "s": 1.35,
+   "j0": 1.0,
+   "ratio": 1.35,
+   "energy": -26.982842522353312,
+   "degeneracy": 2,
+   "E": 0.1622848188203062
+  },
+  {
+   "kind": "scan",
+   "graph": "ring15",
+   "edge": [
+    0,
+    1
+   ],
+   "edge_index": 0,
+   "s": 1.4,
+   "j0": 1.0,
+   "ratio": 1.4,
+   "energy": -27.10988923803388,
+   "degeneracy": 2,
+   "E": 0.16589052622660735
+  },
+  {
+   "kind": "scan",
+   "graph": "ring15",
+   "edge": [
+    0,
+    1
+   ],
+   "edge_index": 0,
+   "s": 1.45,
+   "j0": 1.0,
+   "ratio": 1.45,
+   "energy": -27.238105445357974,
+   "degeneracy": 2,
+   "E": 0.16930590260189948
+  },
+  {
+   "kind": "scan",
+   "graph": "ring15",
+   "edge": [
+    0,
+    1
+   ],
+   "edge_index": 0,
+   "s": 1.5,
+   "j0": 1.0,
+   "ratio": 1.5,
+   "energy": -27.367410474470525,
+   "degeneracy": 2,
+   "E": 0.17254135214662245
+  },
+  {
+   "kind": "scan",
+   "graph": "ring15",
+   "edge": [
+    0,
+    1
+   ],
+   "edge_index": 0,
+   "s": 1.55,
+   "j0": 1.0,
+   "ratio": 1.55,
+   "energy": -27.497730145179855,
+   "degeneracy": 2,
+   "E": 0.17560716078635497
+  },
+  {
+   "kind": "scan",
+   "graph": "ring15",
+   "edge": [
+    0,
+    1
+   ],
+   "edge_index": 0,
+   "s": 1.6,
+   "j0": 1.0,
+   "ratio": 1.6,
+   "energy": -27.628996232649843,
+   "degeneracy": 2,
+   "E": 0.17851334017146017
+  },
+  {
+   "kind": "scan",
+   "graph": "ring15",
+   "edge": [
+    0,
+    1
+   ],
+   "edge_index": 0,
+   "s": 1.65,
+   "j0": 1.0,
+   "ratio": 1.65,
+   "energy": -27.761145967530325,
+   "degeneracy": 2,
+   "E": 0.18126952450547215
+  },
+  {
+   "kind": "scan",
+   "graph": "ring15",
+   "edge": [
+    0,
+    1
+   ],
+   "edge_index": 0,
+   "s": 1.7,
+   "j0": 1.0,
+   "ratio": 1.7,
+   "energy": -27.894121571686956,
+   "degeneracy": 2,
+   "E": 0.18388490617270048
+  },
+  {
+   "kind": "scan",
+   "graph": "ring15",
+   "edge": [
+    0,
+    1
+   ],
+   "edge_index": 0,
+   "s": 1.75,
+   "j0": 1.0,
+   "ratio": 1.75,
+   "energy": -28.027869829433154,
+   "degeneracy": 2,
+   "E": 0.1863681996390701
+  },
+  {
+   "kind": "scan",
+   "graph": "ring15",
+   "edge": [
+    0,
+    1
+   ],
+   "edge_index": 0,
+   "s": 1.8,
+   "j0": 1.0,
+   "ratio": 1.8,
+   "energy": -28.162341693306537,
+   "degeneracy": 2,
+   "E": 0.1887276257412762
+  },
+  {
+   "kind": "scan",
+   "graph": "ring15",
+   "edge": [
+    0,
+    1
+   ],
+   "edge_index": 0,
+   "s": 1.85,
+   "j0": 1.0,
+   "ratio": 1.85,
+   "energy": -28.297491922859574,
+   "degeneracy": 2,
+   "E": 0.19097091047091658
+  },
+  {
+   "kind": "scan",
+   "graph": "ring15",
+   "edge": [
+    0,
+    1
+   ],
+   "edge_index": 0,
+   "s": 1.9,
+   "j0": 1.0,
+   "ratio": 1.9,
+   "energy": -28.433278754588244,
+   "degeneracy": 2,
+   "E": 0.19310529386213643
+  },
+  {
+   "kind": "scan",
+   "graph": "ring15",
+   "edge": [
+    0,
+    1
+   ],
+   "edge_index": 0,
+   "s": 1.95,
+   "j0": 1.0,
+   "ratio": 1.95,
+   "energy": -28.56966360093125,
+   "degeneracy": 2,
+   "E": 0.19513754572367065
+  },
+  {
+   "kind": "scan",
+   "graph": "ring15",
+   "edge": [
+    0,
+    1
+   ],
+   "edge_index": 0,
+   "s": 2.0,
+   "j0": 1.0,
+   "ratio": 2.0,
+   "energy": -28.706610776200254,
+   "degeneracy": 2,
+   "E": 0.1970739858092153
+  },
+  {
+   "kind": "scan",
+   "graph": "ring15",
+   "edge": [
+    0,
+    1
+   ],
+   "edge_index": 0,
+   "s": 2.05,
+   "j0": 1.0,
+   "ratio": 2.05,
+   "energy": -28.844087247309204,
+   "degeneracy": 2,
+   "E": 0.19892050666224664
+  },
+  {
+   "kind": "scan",
+   "graph": "ring15",
+   "edge": [
+    0,
+    1
+   ],
+   "edge_index": 0,
+   "s": 2.1,
+   "j0": 1.0,
+   "ratio": 2.1,
+   "energy": -28.98206240722548,
+   "degeneracy": 2,
+   "E": 0.20068259785379122
+  },
+  {
+   "kind": "scan",
+   "graph": "ring15",
+   "edge": [
+    0,
+    1
+   ],
+   "edge_index": 0,
+   "s": 2.15,
+   "j0": 1.0,
+   "ratio": 2.15,
+   "energy": -29.120507869171792,
+   "degeneracy": 2,
+   "E": 0.20236537069362232
+  },
+  {
+   "kind": "scan",
+   "graph": "ring15",
+   "edge": [
+    0,
+    1
+   ],
+   "edge_index": 0,
+   "s": 2.2,
+   "j0": 1.0,
+   "ratio": 2.2,
+   "energy": -29.259397279714953,
+   "degeneracy": 2,
+   "E": 0.20397358276585195
+  },
+  {
+   "kind": "scan",
+   "graph": "ring15",
+   "edge": [
+    0,
+    1
+   ],
+   "edge_index": 0,
+   "s": 2.25,
+   "j0": 1.0,
+   "ratio": 2.25,
+   "energy": -29.398706149013712,
+   "degeneracy": 2,
+   "E": 0.20551166184151107
+  },
+  {
+   "kind": "scan",
+   "graph": "ring15",
+   "edge": [
+    0,
+    1
+   ],
+   "edge_index": 0,
+   "s": 2.3,
+   "j0": 1.0,
+   "ratio": 2.3,
+   "energy": -29.53841169662485,
+   "degeneracy": 2,
+   "E": 0.20698372887021957
+  },
+  {
+   "kind": "scan",
+   "graph": "ring15",
+   "edge": [
+    0,
+    1
+   ],
+   "edge_index": 0,
+   "s": 2.35,
+   "j0": 1.0,
+   "ratio": 2.35,
+   "energy": -29.67849271140085,
+   "degeneracy": 2,
+   "E": 0.20839361986315966
+  },
+  {
+   "kind": "scan",
+   "graph": "ring15",
+   "edge": [
+    0,
+    1
+   ],
+   "edge_index": 0,
+   "s": 2.4,
+   "j0": 1.0,
+   "ratio": 2.4,
+   "energy": -29.818929424139824,
+   "degeneracy": 2,
+   "E": 0.20974490656015374
+  },
+  {
+   "kind": "scan",
+   "graph": "ring15",
+   "edge": [
+    0,
+    1
+   ],
+   "edge_index": 0,
+   "s": 2.45,
+   "j0": 1.0,
+   "ratio": 2.45,
+   "energy": -29.959703391765245,
+   "degeneracy": 2,
+   "E": 0.21104091583178777
+  },
+  {
+   "kind": "scan",
+   "graph": "ring15",
+   "edge": [
+    0,
+    1
+   ],
+   "edge_index": 0,
+   "s": 2.5,
+   "j0": 1.0,
+   "ratio": 2.5,
+   "energy": -30.10079739193073,
+   "degeneracy": 2,
+   "E": 0.21228474780916223
+  },
+  {
+   "kind": "scan",
+   "graph": "ring15",
+   "edge": [
+    0,
+    1
+   ],
+   "edge_index": 0,
+   "s": 2.55,
+   "j0": 1.0,
+   "ratio": 2.55,
+   "energy": -30.242195327050293,
+   "degeneracy": 2,
+   "E": 0.21347929276271974
+  },
+  {
+   "kind": "scan",
+   "graph": "ring15",
+   "edge": [
+    0,
+    1
+   ],
+   "edge_index": 0,
+   "s": 2.6,
+   "j0": 1.0,
+   "ratio": 2.6,
+   "energy": -30.383882136842107,
+   "degeneracy": 2,
+   "E": 0.2146272467714013
+  },
+  {
+   "kind": "scan",
+   "graph": "ring15",
+   "edge": [
+    0,
+    1
+   ],
+   "edge_index": 0,
+   "s": 2.65,
+   "j0": 1.0,
+   "ratio": 2.65,
+   "energy": -30.525843718577278,
+   "degeneracy": 2,
+   "E": 0.21573112623616422
+  },
+  {
+   "kind": "scan",
+   "graph": "ring15",
+   "edge": [
+    0,
+    1
+   ],
+   "edge_index": 0,
+   "s": 2.7,
+   "j0": 1.0,
+   "ratio": 2.7,
+   "energy": -30.668066854291354,
+   "degeneracy": 2,
+   "E": 0.21679328129960607
+  },
+  {
+   "kind": "scan",
+   "graph": "ring15",
+   "edge": [
+    0,
+    1
+   ],
+   "edge_index": 0,
+   "s": 2.75,
+   "j0": 1.0,
+   "ratio": 2.75,
+   "energy": -30.810539144297536,
+   "degeneracy": 2,
+   "E": 0.2178159082375628
+  },
+  {
+   "kind": "scan",
+   "graph": "ring15",
+   "edge": [
+    0,
+    1
+   ],
+   "edge_index": 0,
+   "s": 2.8,
+   "j0": 1.0,
+   "ratio": 2.8,
+   "energy": -30.953248946404813,
+   "degeneracy": 2,
+   "E": 0.21880106088989504
+  },
+  {
+   "kind": "scan",
+   "graph": "ring15",
+   "edge": [
+    0,
+    1
+   ],
+   "edge_index": 0,
+   "s": 2.85,
+   "j0": 1.0,
+   "ratio": 2.85,
+   "energy": -31.09618532030298,
+   "degeneracy": 2,
+   "E": 0.2197506611972618
+  },
+  {
+   "kind": "scan",
+   "graph": "ring15",
+   "edge": [
+    0,
+    1
+   ],
+   "edge_index": 0,
+   "s": 2.9,
+   "j0": 1.0,
+   "ratio": 2.9,
+   "energy": -31.239337976627674,
+   "degeneracy": 2,
+   "E": 0.22066650890888084
+  },
+  {
+   "kind": "scan",
+   "graph": "ring15",
+   "edge": [
+    0,
+    1
+   ],
+   "edge_index": 0,
+   "s": 2.95,
+   "j0": 1.0,
+   "ratio": 2.95,
+   "energy": -31.38269723027488,
+   "degeneracy": 2,
+   "E": 0.2215502905237153
+  },
+  {
+   "kind": "scan",
+   "graph": "ring15",
+   "edge": [
+    0,
+    1
+   ],
+   "edge_index": 0,
+   "s": 3.0,
+   "j0": 1.0,
+   "ratio": 3.0,
+   "energy": -31.526253957568308,
+   "degeneracy": 2,
+   "E": 0.22240358752429604
+  },
+  {
+   "kind": "scan",
+   "graph": "tree15",
+   "edge": [
+    0,
+    1
+   ],
+   "edge_index": 0,
+   "s": 0.0,
+   "j0": 1.0,
+   "ratio": 0.0,
+   "energy": -21.688883045133654,
+   "degeneracy": 5,
+   "E": 0.20044230981772126
+  },
+  {
+   "kind": "scan",
+   "graph": "tree15",
+   "edge": [
+    0,
+    1
+   ],
+   "edge_index": 0,
+   "s": 0.05,
+   "j0": 1.0,
+   "ratio": 0.05,
+   "energy": -21.70243213448253,
+   "degeneracy": 5,
+   "E": 0.17771306723526323
+  },
+  {
+   "kind": "scan",
+   "graph": "tree15",
+   "edge": [
+    0,
+    1
+   ],
+   "edge_index": 0,
+   "s": 0.1,
+   "j0": 1.0,
+   "ratio": 0.1,
+   "energy": -21.71953685965013,
+   "degeneracy": 5,
+   "E": 0.17750857900250244
+  },
+  {
+   "kind": "scan",
+   "graph": "tree15",
+   "edge": [
+    0,
+    1
+   ],
+   "edge_index": 0,
+   "s": 0.15,
+   "j0": 1.0,
+   "ratio": 0.15,
+   "energy": -21.740341271663354,
+   "degeneracy": 5,
+   "E": 0.16800817262122586
+  },
+  {
+   "kind": "scan",
+   "graph": "tree15",
+   "edge": [
+    0,
+    1
+   ],
+   "edge_index": 0,
+   "s": 0.2,
+   "j0": 1.0,
+   "ratio": 0.2,
+   "energy": -21.764977617553257,
+   "degeneracy": 5,
+   "E": 0.162551356965839
+  },
+  {
+   "kind": "scan",
+   "graph": "tree15",
+   "edge": [
+    0,
+    1
+   ],
+   "edge_index": 0,
+   "s": 0.25,
+   "j0": 1.0,
+   "ratio": 0.25,
+   "energy": -21.793563323284264,
+   "degeneracy": 5,
+   "E": 0.1566187675488002
+  },
+  {
+   "kind": "scan",
+   "graph": "tree15",
+   "edge": [
+    0,
+    1
+   ],
+   "edge_index": 0,
+   "s": 0.3,
+   "j0": 1.0,
+   "ratio": 0.3,
+   "energy": -21.82619813801272,
+   "degeneracy": 5,
+   "E": 0.15307933163860213
+  },
+  {
+   "kind": "scan",
+   "graph": "tree15",
+   "edge": [
+    0,
+    1
+   ],
+   "edge_index": 0,
+   "s": 0.35,
+   "j0": 1.0,
+   "ratio": 0.35,
+   "energy": -21.862961595963323,
+   "degeneracy": 5,
+   "E": 0.14605344338922996
+  },
+  {
+   "kind": "scan",
+   "graph": "tree15",
+   "edge": [
+    0,
+    1
+   ],
+   "edge_index": 0,
+   "s": 0.4,
+   "j0": 1.0,
+   "ratio": 0.4,
+   "energy": -21.903910946353317,
+   "degeneracy": 5,
+   "E": 0.14141966041768353
+  },
+  {
+   "kind": "scan",
+   "graph": "tree15",
+   "edge": [
+    0,
+    1
+   ],
+   "edge_index": 0,
+   "s": 0.45,
+   "j0": 1.0,
+   "ratio": 0.45,
+   "energy": -21.94907968038196,
+   "degeneracy": 5,
+   "E": 0.13638449912695494
+  },
+  {
+   "kind": "scan",
+   "graph": "tree15",
+   "edge": [
+    0,
+    1
+   ],
+   "edge_index": 0,
+   "s": 0.5,
+   "j0": 1.0,
+   "ratio": 0.5,
+   "energy": -21.998476748536024,
+   "degeneracy": 6,
+   "E": 0.1318413090459162
+  },
+  {
+   "kind": "scan",
+   "graph": "tree15",
+   "edge": [
+    0,
+    1
+   ],
+   "edge_index": 0,
+   "s": 0.55,
+   "j0": 1.0,
+   "ratio": 0.55,
+   "energy": -22.052086514912272,
+   "degeneracy": 6,
+   "E": 0.1271751813508689
+  },
+  {
+   "kind": "scan",
+   "graph": "tree15",
+   "edge": [
+    0,
+    1
+   ],
+   "edge_index": 0,
+   "s": 0.6,
+   "j0": 1.0,
+   "ratio": 0.6,
+   "energy": -22.109869443496134,
+   "degeneracy": 6,
+   "E": 0.12292329003740662
+  },
+  {
+   "kind": "scan",
+   "graph": "tree15",
+   "edge": [
+    0,
+    1
+   ],
+   "edge_index": 0,
+   "s": 0.65,
+   "j0": 1.0,
+   "ratio": 0.65,
+   "energy": -22.171763460840623,
+   "degeneracy": 6,
+   "E": 0.11917229929570447
+  },
+  {
+   "kind": "scan",
+   "graph": "tree15",
+   "edge": [
+    0,
+    1
+   ],
+   "edge_index": 0,
+   "s": 0.7,
+   "j0": 1.0,
+   "ratio": 0.7,
+   "energy": -22.23768589651919,
+   "degeneracy": 5,
+   "E": 0.1157736563106099
+  },
+  {
+   "kind": "scan",
+   "graph": "tree15",
+   "edge": [
+    0,
+    1
+   ],
+   "edge_index": 0,
+   "s": 0.75,
+   "j0": 1.0,
+   "ratio": 0.75,
+   "energy": -22.30753587174629,
+   "degeneracy": 6,
+   "E": 0.11346086526581915
+  },
+  {
+   "kind": "scan",
+   "graph": "tree15",
+   "edge": [
+    0,
+    1
+   ],
+   "edge_index": 0,
+   "s": 0.8,
+   "j0": 1.0,
+   "ratio": 0.8,
+   "energy": -22.381196990147192,
+   "degeneracy": 6,
+   "E": 0.11159983501073335
+  },
+  {
+   "kind": "scan",
+   "graph": "tree15",
+   "edge": [
+    0,
+    1
+   ],
+   "edge_index": 0,
+   "s": 0.85,
+   "j0": 1.0,
+   "ratio": 0.85,
+   "energy": -22.458540182854406,
+   "degeneracy": 6,
+   "E": 0.11043098887209209
+  },
+  {
+   "kind": "scan",
+   "graph": "tree15",
+   "edge": [
+    0,
+    1
+   ],
+   "edge_index": 0,
+   "s": 0.9,
+   "j0": 1.0,
+   "ratio": 0.9,
+   "energy": -22.539426570923606,
+   "degeneracy": 6,
+   "E": 0.10994591882151661
+  },
+  {
+   "kind": "scan",
+   "graph": "tree15",
+   "edge": [
+    0,
+    1
+   ],
+   "edge_index": 0,
+   "s": 0.95,
+   "j0": 1.0,
+   "ratio": 0.95,
+   "energy": -22.62371022815009,
+   "degeneracy": 6,
+   "E": 0.11011355839622615
+  },
+  {
+   "kind": "scan",
+   "graph": "tree15",
+   "edge": [
+    0,
+    1
+   ],
+   "edge_index": 0,
+   "s": 1.0,
+   "j0": 1.0,
+   "ratio": 1.0,
+   "energy": -22.711240752852866,
+   "degeneracy": 6,
+   "E": 0.11088400866580707
+  },
+  {
+   "kind": "scan",
+   "graph": "tree15",
+   "edge": [
+    0,
+    1
+   ],
+   "edge_index": 0,
+   "s": 1.05,
+   "j0": 1.0,
+   "ratio": 1.05,
+   "energy": -22.80186558440698,
+   "degeneracy": 6,
+   "E": 0.11219377649259107
+  },
+  {
+   "kind": "scan",
+   "graph": "tree15",
+   "edge": [
+    0,
+    1
+   ],
+   "edge_index": 0,
+   "s": 1.1,
+   "j0": 1.0,
+   "ratio": 1.1,
+   "energy": -22.895432026255634,
+   "degeneracy": 6,
+   "E": 0.1139714677544225
+  },
+  {
+   "kind": "scan",
+   "graph": "tree15",
+   "edge": [
+    0,
+    1
+   ],
+   "edge_index": 0,
+   "s": 1.15,
+   "j0": 1.0,
+   "ratio": 1.15,
+   "energy": -22.991788959787577,
+   "degeneracy": 6,
+   "E": 0.1161430679098846
+  },
+  {
+   "kind": "scan",
+   "graph": "tree15",
+   "edge": [
+    0,
+    1
+   ],
+   "edge_index": 0,
+   "s": 1.2,
+   "j0": 1.0,
+   "ratio": 1.2,
+   "energy": -23.090788251700577,
+   "degeneracy": 6,
+   "E": 0.11863623205795655
+  },
+  {
+   "kind": "scan",
+   "graph": "tree15",
+   "edge": [
+    0,
+    1
+   ],
+   "edge_index": 0,
+   "s": 1.25,
+   "j0": 1.0,
+   "ratio": 1.25,
+   "energy": -23.192285870974896,
+   "degeneracy": 6,
+   "E": 0.12138334718962908
+  },
+  {
+   "kind": "scan",
+   "graph": "tree15",
+   "edge": [
+    0,
+    1
+   ],
+   "edge_index": 0,
+   "s": 1.3,
+   "j0": 1.0,
+   "ratio": 1.3,
+   "energy": -23.296142740623132,
+   "degeneracy": 6,
+   "E": 0.12432340430133225
+  },
+  {
+   "kind": "scan",
+   "graph": "tree15",
+   "edge": [
+    0,
+    1
+   ],
+   "edge_index": 0,
+   "s": 1.35,
+   "j0": 1.0,
+   "ratio": 1.35,
+   "energy": -23.402225354553252,
+   "degeneracy": 6,
+   "E": 0.12740288016259874
+  },
+  {
+   "kind": "scan",
+   "graph": "tree15",
+   "edge": [
+    0,
+    1
+   ],
+   "edge_index": 0,
+   "s": 1.4,
+   "j0": 1.0,
+   "ratio": 1.4,
+   "energy": -23.510406191983844,
+   "degeneracy": 6,
+   "E": 0.1305758868582791
+  },
+  {
+   "kind": "scan",
+   "graph": "tree15",
+   "edge": [
+    0,
+    1
+   ],
+   "edge_index": 0,
+   "s": 1.45,
+   "j0": 1.0,
+   "ratio": 1.45,
+   "energy": -23.620563961647132,
+   "degeneracy": 6,
+   "E": 0.13380383626585254
+  },
+  {
+   "kind": "scan",
+   "graph": "tree15",
+   "edge": [
+    0,
+    1
+   ],
+   "edge_index": 0,
+   "s": 1.5,
+   "j0": 1.0,
+   "ratio": 1.5,
+   "energy": -23.732583706247333,
+   "degeneracy": 6,
+   "E": 0.13705482177067965
+  },
+  {
+   "kind": "scan",
+   "graph": "tree15",
+   "edge": [
+    0,
+    1
+   ],
+   "edge_index": 0,
+   "s": 1.55,
+   "j0": 1.0,
+   "ratio": 1.55,
+   "energy": -23.846356794900988,
+   "degeneracy": 6,
+   "E": 0.14030286592050706
+  },
+  {
+   "kind": "scan",
+   "graph": "tree15",
+   "edge": [
+    0,
+    1
+   ],
+   "edge_index": 0,
+   "s": 1.6,
+   "j0": 1.0,
+   "ratio": 1.6,
+   "energy": -23.96178082805162,
+   "degeneracy": 5,
+   "E": 0.14251526762282238
+  },
+  {
+   "kind": "scan",
+   "graph": "tree15",
+   "edge": [
+    0,
+    1
+   ],
+   "edge_index": 0,
+   "s": 1.65,
+   "j0": 1.0,
+   "ratio": 1.65,
+   "energy": -24.07875947595365,
+   "degeneracy": 5,
+   "E": 0.14637590705484418
+  },
+  {
+   "kind": "scan",
+   "graph": "tree15",
+   "edge": [
+    0,
+    1
+   ],
+   "edge_index": 0,
+   "s": 1.7,
+   "j0": 1.0,
+   "ratio": 1.7,
+   "energy": -24.197202268520343,
+   "degeneracy": 6,
+   "E": 0.1498422274478095
+  },
+  {
+   "kind": "scan",
+   "graph": "tree15",
+   "edge": [
+    0,
+    1
+   ],
+   "edge_index": 0,
+   "s": 1.75,
+   "j0": 1.0,
+   "ratio": 1.75,
+   "energy": -24.3170243512514,
+   "degeneracy": 5,
+   "E": 0.15355179951574863
+  },
+  {
+   "kind": "scan",
+   "graph": "tree15",
+   "edge": [
+    0,
+    1
+   ],
+   "edge_index": 0,
+   "s": 1.8,
+   "j0": 1.0,
+   "ratio": 1.8,
+   "energy": -24.43814621919292,
+   "degeneracy": 6,
+   "E": 0.15590910496018703
+  },
+  {
+   "kind": "scan",
+   "graph": "tree15",
+   "edge": [
+    0,
+    1
+   ],
+   "edge_index": 0,
+   "s": 1.85,
+   "j0": 1.0,
+   "ratio": 1.85,
+   "energy": -24.56049343847105,
+   "degeneracy": 6,
+   "E": 0.15883266282193684
+  },
+  {
+   "kind": "scan",
+   "graph": "tree15",
+   "edge": [
+    0,
+    1
+   ],
+   "edge_index": 0,
+   "s": 1.9,
+   "j0": 1.0,
+   "ratio": 1.9,
+   "energy": -24.683996362873657,
+   "degeneracy": 5,
+   "E": 0.16087505952887418
+  },
+  {
+   "kind": "scan",
+   "graph": "tree15",
+   "edge": [
+    0,
+    1
+   ],
+   "edge_index": 0,
+   "s": 1.95,
+   "j0": 1.0,
+   "ratio": 1.95,
+   "energy": -24.808589851227485,
+   "degeneracy": 5,
+   "E": 0.1661152837483527
+  },
+  {
+   "kind": "scan",
+   "graph": "tree15",
+   "edge": [
+    0,
+    1
+   ],
+   "edge_index": 0,
+   "s": 2.0,
+   "j0": 1.0,
+   "ratio": 2.0,
+   "energy": -24.93421298986975,
+   "degeneracy": 5,
+   "E": 0.1662694925120903
+  },
+  {
+   "kind": "scan",
+   "graph": "tree15",
+   "edge": [
+    0,
+    1
+   ],
+   "edge_index": 0,
+   "s": 2.05,
+   "j0": 1.0,
+   "ratio": 2.05,
+   "energy": -25.060808823369417,
+   "degeneracy": 5,
+   "E": 0.16941527962585837
+  },
+  {
+   "kind": "scan",
+   "graph": "tree15",
+   "edge": [
+    0,
+    1
+   ],
+   "edge_index": 0,
+   "s": 2.1,
+   "j0": 1.0,
+   "ratio": 2.1,
+   "energy": -25.18832409569807,
+   "degeneracy": 6,
+   "E": 0.1722483460552425
+  },
+  {
+   "kind": "scan",
+   "graph": "tree15",
+   "edge": [
+    0,
+    1
+   ],
+   "edge_index": 0,
+   "s": 2.15,
+   "j0": 1.0,
+   "ratio": 2.15,
+   "energy": -25.31670900331137,
+   "degeneracy": 5,
+   "E": 0.17384526037235
+  },
+  {
+   "kind": "scan",
+   "graph": "tree15",
+   "edge": [
+    0,
+    1
+   ],
+   "edge_index": 0,
+   "s": 2.2,
+   "j0": 1.0,
+   "ratio": 2.2,
+   "energy": -25.445916961026057,
+   "degeneracy": 5,
+   "E": 0.17661208706961914
+  },
+  {
+   "kind": "scan",
+   "graph": "tree15",
+   "edge": [
+    0,
+    1
+   ],
+   "edge_index": 0,
+   "s": 2.25,
+   "j0": 1.0,
+   "ratio": 2.25,
+   "energy": -25.575904381121823,
+   "degeneracy": 5,
+   "E": 0.17914784366126676
+  },
+  {
+   "kind": "scan",
+   "graph": "tree15",
+   "edge": [
+    0,
+    1
+   ],
+   "edge_index": 0,
+   "s": 2.3,
+   "j0": 1.0,
+   "ratio": 2.3,
+   "energy": -25.70663046576161,
+   "degeneracy": 5,
+   "E": 0.180791424465627
+  },
+  {
+   "kind": "scan",
+   "graph": "tree15",
+   "edge": [
+    0,
+    1
+   ],
+   "edge_index": 0,
+   "s": 2.35,
+   "j0": 1.0,
+   "ratio": 2.35,
+   "energy": -25.83805701256832,
+   "degeneracy": 5,
+   "E": 0.18291515954728743
+  },
+  {
+   "kind": "scan",
+   "graph": "tree15",
+   "edge": [
+    0,
+    1
+   ],
+   "edge_index": 0,
+   "s": 2.4,
+   "j0": 1.0,
+   "ratio": 2.4,
+   "energy": -25.970148233015685,
+   "degeneracy": 5,
+   "E": 0.1848136247000188
+  },
+  {
+   "kind": "scan",
+   "graph": "tree15",
+   "edge": [
+    0,
+    1
+   ],
+   "edge_index": 0,
+   "s": 2.45,
+   "j0": 1.0,
+   "ratio": 2.45,
+   "energy": -26.102870583158587,
+   "degeneracy": 5,
+   "E": 0.18706734174964826
+  },
+  {
+   "kind": "scan",
+   "graph": "tree15",
+   "edge": [
+    0,
+    1
+   ],
+   "edge_index": 0,
+   "s": 2.5,
+   "j0": 1.0,
+   "ratio": 2.5,
+   "energy": -26.236192606145757,
+   "degeneracy": 5,
+   "E": 0.18930783811242513
+  },
+  {
+   "kind": "scan",
+   "graph": "tree15",
+   "edge": [
+    0,
+    1
+   ],
+   "edge_index": 0,
+   "s": 2.55,
+   "j0": 1.0,
+   "ratio": 2.55,
+   "energy": -26.370084785902247,
+   "degeneracy": 5,
+   "E": 0.19174057951814197
+  },
+  {
+   "kind": "scan",
+   "graph": "tree15",
+   "edge": [
+    0,
+    1
+   ],
+   "edge_index": 0,
+   "s": 2.6,
+   "j0": 1.0,
+   "ratio": 2.6,
+   "energy": -26.504519411344276,
+   "degeneracy": 5,
+   "E": 0.19275397119616566
+  },
+  {
+   "kind": "scan",
+   "graph": "tree15",
+   "edge": [
+    0,
+    1
+   ],
+   "edge_index": 0,
+   "s": 2.65,
+   "j0": 1.0,
+   "ratio": 2.65,
+   "energy": -26.639470450477337,
+   "degeneracy": 5,
+   "E": 0.1946167738249179
+  },
+  {
+   "kind": "scan",
+   "graph": "tree15",
+   "edge": [
+    0,
+    1
+   ],
+   "edge_index": 0,
+   "s": 2.7,
+   "j0": 1.0,
+   "ratio": 2.7,
+   "energy": -26.774913433738547,
+   "degeneracy": 5,
+   "E": 0.19694634349044263
+  },
+  {
+   "kind": "scan",
+   "graph": "tree15",
+   "edge": [
+    0,
+    1
+   ],
+   "edge_index": 0,
+   "s": 2.75,
+   "j0": 1.0,
+   "ratio": 2.75,
+   "energy": -26.91082534595107,
+   "degeneracy": 5,
+   "E": 0.19808804687703252
+  },
+  {
+   "kind": "scan",
+   "graph": "tree15",
+   "edge": [
+    0,
+    1
+   ],
+   "edge_index": 0,
+   "s": 2.8,
+   "j0": 1.0,
+   "ratio": 2.8,
+   "energy": -27.047184526294465,
+   "degeneracy": 5,
+   "E": 0.2000591680690001
+  },
+  {
+   "kind": "scan",
+   "graph": "tree15",
+   "edge": [
+    0,
+    1
+   ],
+   "edge_index": 0,
+   "s": 2.85,
+   "j0": 1.0,
+   "ratio": 2.85,
+   "energy": -27.183970575707967,
+   "degeneracy": 5,
+   "E": 0.2013466287036452
+  },
+  {
+   "kind": "scan",
+   "graph": "tree15",
+   "edge": [
+    0,
+    1
+   ],
+   "edge_index": 0,
+   "s": 2.9,
+   "j0": 1.0,
+   "ratio": 2.9,
+   "energy": -27.32116427118261,
+   "degeneracy": 5,
+   "E": 0.20241157932093043
+  },
+  {
+   "kind": "scan",
+   "graph": "tree15",
+   "edge": [
+    0,
+    1
+   ],
+   "edge_index": 0,
+   "s": 2.95,
+   "j0": 1.0,
+   "ratio": 2.95,
+   "energy": -27.45874748642878,
+   "degeneracy": 5,
+   "E": 0.20431167054931118
+  },
+  {
+   "kind": "scan",
+   "graph": "tree15",
+   "edge": [
+    0,
+    1
+   ],
+   "edge_index": 0,
+   "s": 3.0,
+   "j0": 1.0,
+   "ratio": 3.0,
+   "energy": -27.596703118434473,
+   "degeneracy": 5,
+   "E": 0.20596480081785565
+  },
+  {
+   "kind": "scan",
+   "graph": "random15",
+   "edge": [
+    0,
+    1
+   ],
+   "edge_index": 0,
+   "s": 0.0,
+   "j0": 1.0,
+   "ratio": 0.0,
+   "energy": -28.159400902622885,
+   "degeneracy": 4,
+   "E": 0.24818701716170075
+  },
+  {
+   "kind": "scan",
+   "graph": "random15",
+   "edge": [
+    0,
+    1
+   ],
+   "edge_index": 0,
+   "s": 0.05,
+   "j0": 1.0,
+   "ratio": 0.05,
+   "energy": -28.165885176443535,
+   "degeneracy": 4,
+   "E": 0.24931686325206873
+  },
+  {
+   "kind": "scan",
+   "graph": "random15",
+   "edge": [
+    0,
+    1
+   ],
+   "edge_index": 0,
+   "s": 0.1,
+   "j0": 1.0,
+   "ratio": 0.1,
+   "energy": -28.174899492180046,
+   "degeneracy": 4,
+   "E": 0.25044408954895847
+  },
+  {
+   "kind": "scan",
+   "graph": "random15",
+   "edge": [
+    0,
+    1
+   ],
+   "edge_index": 0,
+   "s": 0.15,
+   "j0": 1.0,
+   "ratio": 0.15,
+   "energy": -28.186532717345663,
+   "degeneracy": 4,
+   "E": 0.251561822673089
+  },
+  {
+   "kind": "scan",
+   "graph": "random15",
+   "edge": [
+    0,
+    1
+   ],
+   "edge_index": 0,
+   "s": 0.2,
+   "j0": 1.0,
+   "ratio": 0.2,
+   "energy": -28.200870799070046,
+   "degeneracy": 4,
+   "E": 0.25266298574713125
+  },
+  {
+   "kind": "scan",
+   "graph": "random15",
+   "edge": [
+    0,
+    1
+   ],
+   "edge_index": 0,
+   "s": 0.25,
+   "j0": 1.0,
+   "ratio": 0.25,
+   "energy": -28.217995879929006,
+   "degeneracy": 4,
+   "E": 0.2537404382617246
+  },
+  {
+   "kind": "scan",
+   "graph": "random15",
+   "edge": [
+    0,
+    1
+   ],
+   "edge_index": 0,
+   "s": 0.3,
+   "j0": 1.0,
+   "ratio": 0.3,
+   "energy": -28.237985395324028,
+   "degeneracy": 4,
+   "E": 0.25478713054944335
+  },
+  {
+   "kind": "scan",
+   "graph": "random15",
+   "edge": [
+    0,
+    1
+   ],
+   "edge_index": 0,
+   "s": 0.35,
+   "j0": 1.0,
+   "ratio": 0.35,
+   "energy": -28.260911172405656,
+   "degeneracy": 4,
+   "E": 0.2557962675870126
+  },
+  {
+   "kind": "scan",
+   "graph": "random15",
+   "edge": [
+    0,
+    1
+   ],
+   "edge_index": 0,
+   "s": 0.4,
+   "j0": 1.0,
+   "ratio": 0.4,
+   "energy": -28.286838552691417,
+   "degeneracy": 4,
+   "E": 0.25676147569428026
+  },
+  {
+   "kind": "scan",
+   "graph": "random15",
+   "edge": [
+    0,
+    1
+   ],
+   "edge_index": 0,
+   "s": 0.45,
+   "j0": 1.0,
+   "ratio": 0.45,
+   "energy": -28.31582556185511,
+   "degeneracy": 4,
+   "E": 0.2576769648765292
+  },
+  {
+   "kind": "scan",
+   "graph": "random15",
+   "edge": [
+    0,
+    1
+   ],
+   "edge_index": 0,
+   "s": 0.5,
+   "j0": 1.0,
+   "ratio": 0.5,
+   "energy": -28.34792215047635,
+   "degeneracy": 4,
+   "E": 0.258537679183337
+  },
+  {
+   "kind": "scan",
+   "graph": "random15",
+   "edge": [
+    0,
+    1
+   ],
+   "edge_index": 0,
+   "s": 0.55,
+   "j0": 1.0,
+   "ratio": 0.55,
+   "energy": -28.383169528690473,
+   "degeneracy": 4,
+   "E": 0.25933942761784684
+  },
+  {
+   "kind": "scan",
+   "graph": "random15",
+   "edge": [
+    0,
+    1
+   ],
+   "edge_index": 0,
+   "s": 0.6,
+   "j0": 1.0,
+   "ratio": 0.6,
+   "energy": -28.42159961564482,
+   "degeneracy": 4,
+   "E": 0.26007898886100933
+  },
+  {
+   "kind": "scan",
+   "graph": "random15",
+   "edge": [
+    0,
+    1
+   ],
+   "edge_index": 0,
+   "s": 0.65,
+   "j0": 1.0,
+   "ratio": 0.65,
+   "energy": -28.463234621446418,
+   "degeneracy": 4,
+   "E": 0.260754184351935
+  },
+  {
+   "kind": "scan",
+   "graph": "random15",
+   "edge": [
+    0,
+    1
+   ],
+   "edge_index": 0,
+   "s": 0.7,
+   "j0": 1.0,
+   "ratio": 0.7,
+   "energy": -28.50808677506516,
+   "degeneracy": 4,
+   "E": 0.26136391600175995
+  },
+  {
+   "kind": "scan",
+   "graph": "random15",
+   "edge": [
+    0,
+    1
+   ],
+   "edge_index": 0,
+   "s": 0.75,
+   "j0": 1.0,
+   "ratio": 0.75,
+   "energy": -28.556158206622946,
+   "degeneracy": 4,
+   "E": 0.2619081668720441
+  },
+  {
+   "kind": "scan",
+   "graph": "random15",
+   "edge": [
+    0,
+    1
+   ],
+   "edge_index": 0,
+   "s": 0.8,
+   "j0": 1.0,
+   "ratio": 0.8,
+   "energy": -28.607440986998284,
+   "degeneracy": 4,
+   "E": 0.2623879653381947
+  },
+  {
+   "kind": "scan",
+   "graph": "random15",
+   "edge": [
+    0,
+    1
+   ],
+   "edge_index": 0,
+   "s": 0.85,
+   "j0": 1.0,
+   "ratio": 0.85,
+   "energy": -28.66191732202077,
+   "degeneracy": 4,
+   "E": 0.2628053153849247
+  },
+  {
+   "kind": "scan",
+   "graph": "random15",
+   "edge": [
+    0,
+    1
+   ],
+   "edge_index": 0,
+   "s": 0.9,
+   "j0": 1.0,
+   "ratio": 0.9,
+   "energy": -28.719559893112272,
+   "degeneracy": 4,
+   "E": 0.2631630975542862
+  },
+  {
+   "kind": "scan",
+   "graph": "random15",
+   "edge": [
+    0,
+    1
+   ],
+   "edge_index": 0,
+   "s": 0.95,
+   "j0": 1.0,
+   "ratio": 0.95,
+   "energy": -28.780332331359883,
+   "degeneracy": 4,
+   "E": 0.2634649465299629
+  },
+  {
+   "kind": "scan",
+   "graph": "random15",
+   "edge": [
+    0,
+    1
+   ],
+   "edge_index": 0,
+   "s": 1.0,
+   "j0": 1.0,
+   "ratio": 1.0,
+   "energy": -28.844189807976793,
+   "degeneracy": 4,
+   "E": 0.2637151122882314
+  },
+  {
+   "kind": "scan",
+   "graph": "random15",
+   "edge": [
+    0,
+    1
+   ],
+   "edge_index": 0,
+   "s": 1.05,
+   "j0": 1.0,
+   "ratio": 1.05,
+   "energy": -28.91107972111047,
+   "degeneracy": 4,
+   "E": 0.26391831213151884
+  },
+  {
+   "kind": "scan",
+   "graph": "random15",
+   "edge": [
+    0,
+    1
+   ],
+   "edge_index": 0,
+   "s": 1.1,
+   "j0": 1.0,
+   "ratio": 1.1,
+   "energy": -28.980942457089174,
+   "degeneracy": 4,
+   "E": 0.26407958076189875
+  },
+  {
+   "kind": "scan",
+   "graph": "random15",
+   "edge": [
+    0,
+    1
+   ],
+   "edge_index": 0,
+   "s": 1.15,
+   "j0": 1.0,
+   "ratio": 1.15,
+   "energy": -29.053712203492065,
+   "degeneracy": 4,
+   "E": 0.26420412491964873
+  },
+  {
+   "kind": "scan",
+   "graph": "random15",
+   "edge": [
+    0,
+    1
+   ],
+   "edge_index": 0,
+   "s": 1.2,
+   "j0": 1.0,
+   "ratio": 1.2,
+   "energy": -29.12931779177169,
+   "degeneracy": 4,
+   "E": 0.26429718811542713
+  },
+  {
+   "kind": "scan",
+   "graph": "random15",
+   "edge": [
+    0,
+    1
+   ],
+   "edge_index": 0,
+   "s": 1.25,
+   "j0": 1.0,
+   "ratio": 1.25,
+   "energy": -29.20768354845088,
+   "degeneracy": 4,
+   "E": 0.26436392975373285
+  },
+  {
+   "kind": "scan",
+   "graph": "random15",
+   "edge": [
+    0,
+    1
+   ],
+   "edge_index": 0,
+   "s": 1.3,
+   "j0": 1.0,
+   "ratio": 1.3,
+   "energy": -29.288730135926127,
+   "degeneracy": 4,
+   "E": 0.2644093216125905
+  },
+  {
+   "kind": "scan",
+   "graph": "random15",
+   "edge": [
+    0,
+    1
+   ],
+   "edge_index": 0,
+   "s": 1.35,
+   "j0": 1.0,
+   "ratio": 1.35,
+   "energy": -29.37237536646116,
+   "degeneracy": 4,
+   "E": 0.2644380633302046
+  },
+  {
+   "kind": "scan",
+   "graph": "random15",
+   "edge": [
+    0,
+    1
+   ],
+   "edge_index": 0,
+   "s": 1.4,
+   "j0": 1.0,
+   "ratio": 1.4,
+   "energy": -29.458534975803225,
+   "degeneracy": 4,
+   "E": 0.2644545173503439
+  },
+  {
+   "kind": "scan",
+   "graph": "random15",
+   "edge": [
+    0,
+    1
+   ],
+   "edge_index": 0,
+   "s": 1.45,
+   "j0": 1.0,
+   "ratio": 1.45,
+   "energy": -29.547123345832038,
+   "degeneracy": 4,
+   "E": 0.2644626627624881
+  },
+  {
+   "kind": "scan",
+   "graph": "random15",
+   "edge": [
+    0,
+    1
+   ],
+   "edge_index": 0,
+   "s": 1.5,
+   "j0": 1.0,
+   "ratio": 1.5,
+   "energy": -29.638054168555804,
+   "degeneracy": 4,
+   "E": 0.26446606667820294
+  },
+  {
+   "kind": "scan",
+   "graph": "random15",
+   "edge": [
+    0,
+    1
+   ],
+   "edge_index": 0,
+   "s": 1.55,
+   "j0": 1.0,
+   "ratio": 1.55,
+   "energy": -29.73124104650613,
+   "degeneracy": 4,
+   "E": 0.2644678712229246
+  },
+  {
+   "kind": "scan",
+   "graph": "random15",
+   "edge": [
+    0,
+    1
+   ],
+   "edge_index": 0,
+   "s": 1.6,
+   "j0": 1.0,
+   "ratio": 1.6,
+   "energy": -29.826598027017194,
+   "degeneracy": 4,
+   "E": 0.264470793881416
+  },
+  {
+   "kind": "scan",
+   "graph": "random15",
+   "edge": [
+    0,
+    1
+   ],
+   "edge_index": 0,
+   "s": 1.65,
+   "j0": 1.0,
+   "ratio": 1.65,
+   "energy": -29.924040069983707,
+   "degeneracy": 4,
+   "E": 0.2644771387895701
+  },
+  {
+   "kind": "scan",
+   "graph": "random15",
+   "edge": [
+    0,
+    1
+   ],
+   "edge_index": 0,
+   "s": 1.7,
+   "j0": 1.0,
+   "ratio": 1.7,
+   "energy": -30.023483450420574,
+   "degeneracy": 4,
+   "E": 0.2644888165795415
+  },
+  {
+   "kind": "scan",
+   "graph": "random15",
+   "edge": [
+    0,
+    1
+   ],
+   "edge_index": 0,
+   "s": 1.75,
+   "j0": 1.0,
+   "ratio": 1.75,
+   "energy": -30.12484609851972,
+   "degeneracy": 4,
+   "E": 0.2645073705209427
+  },
+  {
+   "kind": "scan",
+   "graph": "random15",
+   "edge": [
+    0,
+    1
+   ],
+   "edge_index": 0,
+   "s": 1.8,
+   "j0": 1.0,
+   "ratio": 1.8,
+   "energy": -30.228047880910797,
+   "degeneracy": 4,
+   "E": 0.2645340069199565
+  },
+  {
+   "kind": "scan",
+   "graph": "random15",
+   "edge": [
+    0,
+    1
+   ],
+   "edge_index": 0,
+   "s": 1.85,
+   "j0": 1.0,
+   "ratio": 1.85,
+   "energy": -30.333010827540736,
+   "degeneracy": 4,
+   "E": 0.26456962800707257
+  },
+  {
+   "kind": "scan",
+   "graph": "random15",
+   "edge": [
+    0,
+    1
+   ],
+   "edge_index": 0,
+   "s": 1.9,
+   "j0": 1.0,
+   "ratio": 1.9,
+   "energy": -30.439659309012526,
+   "degeneracy": 4,
+   "E": 0.2646148658342
+  },
+  {
+   "kind": "scan",
+   "graph": "random15",
+   "edge": [
+    0,
+    1
+   ],
+   "edge_index": 0,
+   "s": 1.95,
+   "j0": 1.0,
+   "ratio": 1.95,
+   "energy": -30.547920169427158,
+   "degeneracy": 4,
+   "E": 0.2646701159913406
+  },
+  {
+   "kind": "scan",
+   "graph": "random15",
+   "edge": [
+    0,
+    1
+   ],
+   "edge_index": 0,
+   "s": 2.0,
+   "j0": 1.0,
+   "ratio": 2.0,
+   "energy": -30.657722819784077,
+   "degeneracy": 4,
+   "E": 0.2647355702259047
+  },
+  {
+   "kind": "scan",
+   "graph": "random15",
+   "edge": [
+    0,
+    1
+   ],
+   "edge_index": 0,
+   "s": 2.05,
+   "j0": 1.0,
+   "ratio": 2.05,
+   "energy": -30.768999296869183,
+   "degeneracy": 4,
+   "E": 0.2648112472937711
+  },
+  {
+   "kind": "scan",
+   "graph": "random15",
+   "edge": [
+    0,
+    1
+   ],
+   "edge_index": 0,
+   "s": 2.1,
+   "j0": 1.0,
+   "ratio": 2.1,
+   "energy": -30.88168429232826,
+   "degeneracy": 4,
+   "E": 0.2648970215848471
+  },
+  {
+   "kind": "scan",
+   "graph": "random15",
+   "edge": [
+    0,
+    1
+   ],
+   "edge_index": 0,
+   "s": 2.15,
+   "j0": 1.0,
+   "ratio": 2.15,
+   "energy": -30.99571515631181,
+   "degeneracy": 4,
+   "E": 0.2649926492448449
+  },
+  {
+   "kind": "scan",
+   "graph": "random15",
+   "edge": [
+    0,
+    1
+   ],
+   "edge_index": 0,
+   "s": 2.2,
+   "j0": 1.0,
+   "ratio": 2.2,
+   "energy": -31.111031879731748,
+   "degeneracy": 4,
+   "E": 0.26509779166013175
+  },
+  {
+   "kind": "scan",
+   "graph": "random15",
+   "edge": [
+    0,
+    1
+   ],
+   "edge_index": 0,
+   "s": 2.25,
+   "j0": 1.0,
+   "ratio": 2.25,
+   "energy": -31.227577058790366,
+   "degeneracy": 4,
+   "E": 0.26521203628598744
+  },
+  {
+   "kind": "scan",
+   "graph": "random15",
+   "edge": [
+    0,
+    1
+   ],
+   "edge_index": 0,
+   "s": 2.3,
+   "j0": 1.0,
+   "ratio": 2.3,
+   "energy": -31.345295845062687,
+   "degeneracy": 4,
+   "E": 0.26533491488392674
+  },
+  {
+   "kind": "scan",
+   "graph": "random15",
+   "edge": [
+    0,
+    1
+   ],
+   "edge_index": 0,
+   "s": 2.35,
+   "j0": 1.0,
+   "ratio": 2.35,
+   "energy": -31.464135884033524,
+   "degeneracy": 4,
+   "E": 0.2654659192948595
+  },
+  {
+   "kind": "scan",
+   "graph": "random15",
+   "edge": [
+    0,
+    1
+   ],
+   "edge_index": 0,
+   "s": 2.4,
+   "j0": 1.0,
+   "ratio": 2.4,
+   "energy": -31.58404724463898,
+   "degeneracy": 4,
+   "E": 0.26560451491581155
+  },
+  {
+   "kind": "scan",
+   "graph": "random15",
+   "edge": [
+    0,
+    1
+   ],
+   "edge_index": 0,
+   "s": 2.45,
+   "j0": 1.0,
+   "ratio": 2.45,
+   "energy": -31.704982342013853,
+   "degeneracy": 4,
+   "E": 0.2657501520725033
+  },
+  {
+   "kind": "scan",
+   "graph": "random15",
+   "edge": [
+    0,
+    1
+   ],
+   "edge_index": 0,
+   "s": 2.5,
+   "j0": 1.0,
+   "ratio": 2.5,
+   "energy": -31.82689585534719,
+   "degeneracy": 4,
+   "E": 0.2659022754919392
+  },
+  {
+   "kind": "scan",
+   "graph": "random15",
+   "edge": [
+    0,
+    1
+   ],
+   "edge_index": 0,
+   "s": 2.55,
+   "j0": 1.0,
+   "ratio": 2.55,
+   "energy": -31.949744642451886,
+   "degeneracy": 4,
+   "E": 0.26606033208122
+  },
+  {
+   "kind": "scan",
+   "graph": "random15",
+   "edge": [
+    0,
+    1
+   ],
+   "edge_index": 0,
+   "s": 2.6,
+   "j0": 1.0,
+   "ratio": 2.6,
+   "energy": -32.07348765241433,
+   "degeneracy": 4,
+   "E": 0.2662237772138394
+  },
+  {
+   "kind": "scan",
+   "graph": "random15",
+   "edge": [
+    0,
+    1
+   ],
+   "edge_index": 0,
+   "s": 2.65,
+   "j0": 1.0,
+   "ratio": 2.65,
+   "energy": -32.198085837449014,
+   "degeneracy": 4,
+   "E": 0.2663920797147478
+  },
+  {
+   "kind": "scan",
+   "graph": "random15",
+   "edge": [
+    0,
+    1
+   ],
+   "edge_index": 0,
+   "s": 2.7,
+   "j0": 1.0,
+   "ratio": 2.7,
+   "energy": -32.323502064896324,
+   "degeneracy": 4,
+   "E": 0.26656472572236195
+  },
+  {
+   "kind": "scan",
+   "graph": "random15",
+   "edge": [
+    0,
+    1
+   ],
+   "edge_index": 0,
+   "s": 2.75,
+   "j0": 1.0,
+   "ratio": 2.75,
+   "energy": -32.44970103011877,
+   "degeneracy": 4,
+   "E": 0.26674122159067665
+  },
+  {
+   "kind": "scan",
+   "graph": "random15",
+   "edge": [
+    0,
+    1
+   ],
+   "edge_index": 0,
+   "s": 2.8,
+   "j0": 1.0,
+   "ratio": 2.8,
+   "energy": -32.57664917090756,
+   "degeneracy": 4,
+   "E": 0.26692109597882996
+  },
+  {
+   "kind": "scan",
+   "graph": "random15",
+   "edge": [
+    0,
+    1
+   ],
+   "edge_index": 0,
+   "s": 2.85,
+   "j0": 1.0,
+   "ratio": 2.85,
+   "energy": -32.704314583873334,
+   "degeneracy": 4,
+   "E": 0.2671039012595777
+  },
+  {
+   "kind": "scan",
+   "graph": "random15",
+   "edge": [
+    0,
+    1
+   ],
+   "edge_index": 0,
+   "s": 2.9,
+   "j0": 1.0,
+   "ratio": 2.9,
+   "energy": -32.83266694319508,
+   "degeneracy": 4,
+   "E": 0.2672892143627361
+  },
+  {
+   "kind": "scan",
+   "graph": "random15",
+   "edge": [
+    0,
+    1
+   ],
+   "edge_index": 0,
+   "s": 2.95,
+   "j0": 1.0,
+   "ratio": 2.95,
+   "energy": -32.96167742199802,
+   "degeneracy": 4,
+   "E": 0.2674766371550555
+  },
+  {
+   "kind": "scan",
+   "graph": "random15",
+   "edge": [
+    0,
+    1
+   ],
+   "edge_index": 0,
+   "s": 3.0,
+   "j0": 1.0,
+   "ratio": 3.0,
+   "energy": -33.091318616557515,
+   "degeneracy": 4,
+   "E": 0.26766579644447414
+  },
+  {
+   "kind": "edges",
+   "graph": "fractal_L2",
+   "edge": [
+    0,
+    1
+   ],
+   "edge_index": 0,
+   "s": 0.0,
+   "j0": 1.0,
+   "ratio": 0.0,
+   "energy": -25.554721270767896,
+   "degeneracy": 2,
+   "E": 0.24673114075776484
+  },
+  {
+   "kind": "edges",
+   "graph": "fractal_L2",
+   "edge": [
+    0,
+    1
+   ],
+   "edge_index": 0,
+   "s": 0.1,
+   "j0": 1.0,
+   "ratio": 0.1,
+   "energy": -25.471933210849443,
+   "degeneracy": 2,
+   "E": 0.2472477792097901
+  },
+  {
+   "kind": "edges",
+   "graph": "fractal_L2",
+   "edge": [
+    0,
+    1
+   ],
+   "edge_index": 0,
+   "s": 0.2,
+   "j0": 1.0,
+   "ratio": 0.2,
+   "energy": -25.391403272791568,
+   "degeneracy": 2,
+   "E": 0.247744499566537
+  },
+  {
+   "kind": "edges",
+   "graph": "fractal_L2",
+   "edge": [
+    0,
+    1
+   ],
+   "edge_index": 0,
+   "s": 0.3,
+   "j0": 1.0,
+   "ratio": 0.3,
+   "energy": -25.313581373178465,
+   "degeneracy": 2,
+   "E": 0.24817663904786
+  },
+  {
+   "kind": "edges",
+   "graph": "fractal_L2",
+   "edge": [
+    0,
+    1
+   ],
+   "edge_index": 0,
+   "s": 0.4,
+   "j0": 1.0,
+   "ratio": 0.4,
+   "energy": -25.239041429001023,
+   "degeneracy": 2,
+   "E": 0.24846048259117623
+  },
+  {
+   "kind": "edges",
+   "graph": "fractal_L2",
+   "edge": [
+    0,
+    1
+   ],
+   "edge_index": 0,
+   "s": 0.5,
+   "j0": 1.0,
+   "ratio": 0.5,
+   "energy": -25.168530447206532,
+   "degeneracy": 2,
+   "E": 0.24843283995380347
+  },
+  {
+   "kind": "edges",
+   "graph": "fractal_L2",
+   "edge": [
+    0,
+    1
+   ],
+   "edge_index": 0,
+   "s": 0.6,
+   "j0": 1.0,
+   "ratio": 0.6,
+   "energy": -25.103052530010245,
+   "degeneracy": 2,
+   "E": 0.24775226278569124
+  },
+  {
+   "kind": "edges",
+   "graph": "fractal_L2",
+   "edge": [
+    0,
+    1
+   ],
+   "edge_index": 0,
+   "s": 0.7,
+   "j0": 1.0,
+   "ratio": 0.7,
+   "energy": -25.044042940008453,
+   "degeneracy": 2,
+   "E": 0.2456149931503573
+  },
+  {
+   "kind": "edges",
+   "graph": "fractal_L2",
+   "edge": [
+    0,
+    1
+   ],
+   "edge_index": 0,
+   "s": 0.8,
+   "j0": 1.0,
+   "ratio": 0.8,
+   "energy": -24.99386317498164,
+   "degeneracy": 2,
+   "E": 0.23971677494195884
+  },
+  {
+   "kind": "edges",
+   "graph": "fractal_L2",
+   "edge": [
+    0,
+    1
+   ],
+   "edge_index": 0,
+   "s": 0.9,
+   "j0": 1.0,
+   "ratio": 0.9,
+   "energy": -24.958104646162404,
+   "degeneracy": 2,
+   "E": 0.22083839992181892
+  },
+  {
+   "kind": "edges",
+   "graph": "fractal_L2",
+   "edge": [
+    0,
+    1
+   ],
+   "edge_index": 0,
+   "s": 1.0,
+   "j0": 1.0,
+   "ratio": 1.0,
+   "energy": -24.967536579519162,
+   "degeneracy": 4,
+   "E": 0.11026913715112599
+  },
+  {
+   "kind": "edges",
+   "graph": "fractal_L2",
+   "edge": [
+    0,
+    5
+   ],
+   "edge_index": 1,
+   "s": 0.0,
+   "j0": 1.0,
+   "ratio": 0.0,
+   "energy": -25.554721270767786,
+   "degeneracy": 2,
+   "E": 0.24673114075776373
+  },
+  {
+   "kind": "edges",
+   "graph": "fractal_L2",
+   "edge": [
+    0,
+    5
+   ],
+   "edge_index": 1,
+   "s": 0.1,
+   "j0": 1.0,
+   "ratio": 0.1,
+   "energy": -25.47193321084936,
+   "degeneracy": 2,
+   "E": 0.24724777920978816
+  },
+  {
+   "kind": "edges",
+   "graph": "fractal_L2",
+   "edge": [
+    0,
+    5
+   ],
+   "edge_index": 1,
+   "s": 0.2,
+   "j0": 1.0,
+   "ratio": 0.2,
+   "energy": -25.391403272791532,
+   "degeneracy": 2,
+   "E": 0.2477444995665338
+  },
+  {
+   "kind": "edges",
+   "graph": "fractal_L2",
+   "edge": [
+    0,
+    5
+   ],
+   "edge_index": 1,
+   "s": 0.3,
+   "j0": 1.0,
+   "ratio": 0.3,
+   "energy": -25.31358137317852,
+   "degeneracy": 2,
+   "E": 0.24817663904786003
+  },
+  {
+   "kind": "edges",
+   "graph": "fractal_L2",
+   "edge": [
+    0,
+    5
+   ],
+   "edge_index": 1,
+   "s": 0.4,
+   "j0": 1.0,
+   "ratio": 0.4,
+   "energy": -25.239041429001222,
+   "degeneracy": 2,
+   "E": 0.2484604825911761
+  },
+  {
+   "kind": "edges",
+   "graph": "fractal_L2",
+   "edge": [
+    0,
+    5
+   ],
+   "edge_index": 1,
+   "s": 0.5,
+   "j0": 1.0,
+   "ratio": 0.5,
+   "energy": -25.16853044720663,
+   "degeneracy": 2,
+   "E": 0.24843283995380433
+  },
+  {
+   "kind": "edges",
+   "graph": "fractal_L2",
+   "edge": [
+    0,
+    5
+   ],
+   "edge_index": 1,
+   "s": 0.6,
+   "j0": 1.0,
+   "ratio": 0.6,
+   "energy": -25.103052530010274,
+   "degeneracy": 2,
+   "E": 0.24775226278568965
+  },
+  {
+   "kind": "edges",
+   "graph": "fractal_L2",
+   "edge": [
+    0,
+    5
+   ],
+   "edge_index": 1,
+   "s": 0.7,
+   "j0": 1.0,
+   "ratio": 0.7,
+   "energy": -25.044042940008495,
+   "degeneracy": 2,
+   "E": 0.2456149931503564
+  },
+  {
+   "kind": "edges",
+   "graph": "fractal_L2",
+   "edge": [
+    0,
+    5
+   ],
+   "edge_index": 1,
+   "s": 0.8,
+   "j0": 1.0,
+   "ratio": 0.8,
+   "energy": -24.993863174981716,
+   "degeneracy": 2,
+   "E": 0.23971677494195778
+  },
+  {
+   "kind": "edges",
+   "graph": "fractal_L2",
+   "edge": [
+    0,
+    5
+   ],
+   "edge_index": 1,
+   "s": 0.9,
+   "j0": 1.0,
+   "ratio": 0.9,
+   "energy": -24.958104646162475,
+   "degeneracy": 2,
+   "E": 0.22083839992182344
+  },
+  {
+   "kind": "edges",
+   "graph": "fractal_L2",
+   "edge": [
+    0,
+    5
+   ],
+   "edge_index": 1,
+   "s": 1.0,
+   "j0": 1.0,
+   "ratio": 1.0,
+   "energy": -24.967536579519162,
+   "degeneracy": 4,
+   "E": 0.11026913715112599
+  },
+  {
+   "kind": "edges",
+   "graph": "fractal_L2",
+   "edge": [
+    1,
+    2
+   ],
+   "edge_index": 2,
+   "s": 0.0,
+   "j0": 1.0,
+   "ratio": 0.0,
+   "energy": -25.385154480804577,
+   "degeneracy": 2,
+   "E": 0.24616168500365507
+  },
+  {
+   "kind": "edges",
+   "graph": "fractal_L2",
+   "edge": [
+    1,
+    2
+   ],
+   "edge_index": 2,
+   "s": 0.1,
+   "j0": 1.0,
+   "ratio": 0.1,
+   "energy": -25.314014002438665,
+   "degeneracy": 2,
+   "E": 0.2518479948053857
+  },
+  {
+   "kind": "edges",
+   "graph": "fractal_L2",
+   "edge": [
+    1,
+    2
+   ],
+   "edge_index": 2,
+   "s": 0.2,
+   "j0": 1.0,
+   "ratio": 0.2,
+   "energy": -25.246371646646928,
+   "degeneracy": 2,
+   "E": 0.25522952130086746
+  },
+  {
+   "kind": "edges",
+   "graph": "fractal_L2",
+   "edge": [
+    1,
+    2
+   ],
+   "edge_index": 2,
+   "s": 0.3,
+   "j0": 1.0,
+   "ratio": 0.3,
+   "energy": -25.182666569864548,
+   "degeneracy": 2,
+   "E": 0.2566749801564705
+  },
+  {
+   "kind": "edges",
+   "graph": "fractal_L2",
+   "edge": [
+    1,
+    2
+   ],
+   "edge_index": 2,
+   "s": 0.4,
+   "j0": 1.0,
+   "ratio": 0.4,
+   "energy": -25.123485639910378,
+   "degeneracy": 2,
+   "E": 0.25638440064334006
+  },
+  {
+   "kind": "edges",
+   "graph": "fractal_L2",
+   "edge": [
+    1,
+    2
+   ],
+   "edge_index": 2,
+   "s": 0.5,
+   "j0": 1.0,
+   "ratio": 0.5,
+   "energy": -25.06959718327021,
+   "degeneracy": 2,
+   "E": 0.2542854437155449
+  },
+  {
+   "kind": "edges",
+   "graph": "fractal_L2",
+   "edge": [
+    1,
+    2
+   ],
+   "edge_index": 2,
+   "s": 0.6,
+   "j0": 1.0,
+   "ratio": 0.6,
+   "energy": -25.0220242430624,
+   "degeneracy": 2,
+   "E": 0.24986163197697286
+  },
+  {
+   "kind": "edges",
+   "graph": "fractal_L2",
+   "edge": [
+    1,
+    2
+   ],
+   "edge_index": 2,
+   "s": 0.7,
+   "j0": 1.0,
+   "ratio": 0.7,
+   "energy": -24.98222623861624,
+   "degeneracy": 2,
+   "E": 0.24157993915082954
+  },
+  {
+   "kind": "edges",
+   "graph": "fractal_L2",
+   "edge": [
+    1,
+    2
+   ],
+   "edge_index": 2,
+   "s": 0.8,
+   "j0": 1.0,
+   "ratio": 0.8,
+   "energy": -24.95269870057375,
+   "degeneracy": 2,
+   "E": 0.22451099363231602
+  },
+  {
+   "kind": "edges",
+   "graph": "fractal_L2",
+   "edge": [
+    1,
+    2
+   ],
+   "edge_index": 2,
+   "s": 0.9,
+   "j0": 1.0,
+   "ratio": 0.9,
+   "energy": -24.94012830809754,
+   "degeneracy": 2,
+   "E": 0.1805121592736718
+  },
+  {
+   "kind": "edges",
+   "graph": "fractal_L2",
+   "edge": [
+    1,
+    2
+   ],
+   "edge_index": 2,
+   "s": 1.0,
+   "j0": 1.0,
+   "ratio": 1.0,
+   "energy": -24.967536579519162,
+   "degeneracy": 4,
+   "E": 0.11026913715112599
+  },
+  {
+   "kind": "edges",
+   "graph": "fractal_L2",
+   "edge": [
+    1,
+    5
+   ],
+   "edge_index": 3,
+   "s": 0.0,
+   "j0": 1.0,
+   "ratio": 0.0,
+   "energy": -25.744350752587877,
+   "degeneracy": 2,
+   "E": 0.19347616301244722
+  },
+  {
+   "kind": "edges",
+   "graph": "fractal_L2",
+   "edge": [
+    1,
+    5
+   ],
+   "edge_index": 3,
+   "s": 0.1,
+   "j0": 1.0,
+   "ratio": 0.1,
+   "energy": -25.653916319738872,
+   "degeneracy": 2,
+   "E": 0.19240928381934774
+  },
+  {
+   "kind": "edges",
+   "graph": "fractal_L2",
+   "edge": [
+    1,
+    5
+   ],
+   "edge_index": 3,
+   "s": 0.2,
+   "j0": 1.0,
+   "ratio": 0.2,
+   "energy": -25.56476994767122,
+   "degeneracy": 2,
+   "E": 0.19118416812513359
+  },
+  {
+   "kind": "edges",
+   "graph": "fractal_L2",
+   "edge": [
+    1,
+    5
+   ],
+   "edge_index": 3,
+   "s": 0.3,
+   "j0": 1.0,
+   "ratio": 0.3,
+   "energy": -25.477198725472093,
+   "degeneracy": 2,
+   "E": 0.18975707644346934
+  },
+  {
+   "kind": "edges",
+   "graph": "fractal_L2",
+   "edge": [
+    1,
+    5
+   ],
+   "edge_index": 3,
+   "s": 0.4,
+   "j0": 1.0,
+   "ratio": 0.4,
+   "energy": -25.39158243695125,
+   "degeneracy": 2,
+   "E": 0.18806305113840363
+  },
+  {
+   "kind": "edges",
+   "graph": "fractal_L2",
+   "edge": [
+    1,
+    5
+   ],
+   "edge_index": 3,
+   "s": 0.5,
+   "j0": 1.0,
+   "ratio": 0.5,
+   "energy": -25.308433071128103,
+   "degeneracy": 2,
+   "E": 0.18600113301123009
+  },
+  {
+   "kind": "edges",
+   "graph": "fractal_L2",
+   "edge": [
+    1,
+    5
+   ],
+   "edge_index": 3,
+   "s": 0.6,
+   "j0": 1.0,
+   "ratio": 0.6,
+   "energy": -25.22845450396828,
+   "degeneracy": 2,
+   "E": 0.18340820650941456
+  },
+  {
+   "kind": "edges",
+   "graph": "fractal_L2",
+   "edge": [
+    1,
+    5
+   ],
+   "edge_index": 3,
+   "s": 0.7,
+   "j0": 1.0,
+   "ratio": 0.7,
+   "energy": -25.152633008143138,
+   "degeneracy": 2,
+   "E": 0.1800152128889197
+  },
+  {
+   "kind": "edges",
+   "graph": "fractal_L2",
+   "edge": [
+    1,
+    5
+   ],
+   "edge_index": 3,
+   "s": 0.8,
+   "j0": 1.0,
+   "ratio": 0.8,
+   "energy": -25.08237333462665,
+   "degeneracy": 2,
+   "E": 0.17538452231166698
+  },
+  {
+   "kind": "edges",
+   "graph": "fractal_L2",
+   "edge": [
+    1,
+    5
+   ],
+   "edge_index": 3,
+   "s": 0.9,
+   "j0": 1.0,
+   "ratio": 0.9,
+   "energy": -25.01969854412293,
+   "degeneracy": 2,
+   "E": 0.16885810164229062
+  },
+  {
+   "kind": "edges",
+   "graph": "fractal_L2",
+   "edge": [
+    1,
+    5
+   ],
+   "edge_index": 3,
+   "s": 1.0,
+   "j0": 1.0,
+   "ratio": 1.0,
+   "energy": -24.967536579519162,
+   "degeneracy": 4,
+   "E": 0.11026913715112599
+  },
+  {
+   "kind": "edges",
+   "graph": "fractal_L2",
+   "edge": [
+    1,
+    6
+   ],
+   "edge_index": 4,
+   "s": 0.0,
+   "j0": 1.0,
+   "ratio": 0.0,
+   "energy": -25.54774880442658,
+   "degeneracy": 2,
+   "E": 0.27198741986713176
+  },
+  {
+   "kind": "edges",
+   "graph": "fractal_L2",
+   "edge": [
+    1,
+    6
+   ],
+   "edge_index": 4,
+   "s": 0.1,
+   "j0": 1.0,
+   "ratio": 0.1,
+   "energy": -25.460394484066196,
+   "degeneracy": 2,
+   "E": 0.27293380651931226
+  },
+  {
+   "kind": "edges",
+   "graph": "fractal_L2",
+   "edge": [
+    1,
+    6
+   ],
+   "edge_index": 4,
+   "s": 0.2,
+   "j0": 1.0,
+   "ratio": 0.2,
+   "energy": -25.374456989165395,
+   "degeneracy": 2,
+   "E": 0.27390965098120906
+  },
+  {
+   "kind": "edges",
+   "graph": "fractal_L2",
+   "edge": [
+    1,
+    6
+   ],
+   "edge_index": 4,
+   "s": 0.3,
+   "j0": 1.0,
+   "ratio": 0.3,
+   "energy": -25.290184018197323,
+   "degeneracy": 2,
+   "E": 0.2749079404491856
+  },
+  {
+   "kind": "edges",
+   "graph": "fractal_L2",
+   "edge": [
+    1,
+    6
+   ],
+   "edge_index": 4,
+   "s": 0.4,
+   "j0": 1.0,
+   "ratio": 0.4,
+   "energy": -25.207885865135484,
+   "degeneracy": 2,
+   "E": 0.2759214827850274
+  },
+  {
+   "kind": "edges",
+   "graph": "fractal_L2",
+   "edge": [
+    1,
+    6
+   ],
+   "edge_index": 4,
+   "s": 0.5,
+   "j0": 1.0,
+   "ratio": 0.5,
+   "energy": -25.127961005703767,
+   "degeneracy": 2,
+   "E": 0.2769515193956665
+  },
+  {
+   "kind": "edges",
+   "graph": "fractal_L2",
+   "edge": [
+    1,
+    6
+   ],
+   "edge_index": 4,
+   "s": 0.6,
+   "j0": 1.0,
+   "ratio": 0.6,
+   "energy": -25.050947790364997,
+   "degeneracy": 2,
+   "E": 0.27804648707342766
+  },
+  {
+   "kind": "edges",
+   "graph": "fractal_L2",
+   "edge": [
+    1,
+    6
+   ],
+   "edge_index": 4,
+   "s": 0.7,
+   "j0": 1.0,
+   "ratio": 0.7,
+   "energy": -24.977690823349413,
+   "degeneracy": 2,
+   "E": 0.27952584154251847
+  },
+  {
+   "kind": "edges",
+   "graph": "fractal_L2",
+   "edge": [
+    1,
+    6
+   ],
+   "edge_index": 4,
+   "s": 0.8,
+   "j0": 1.0,
+   "ratio": 0.8,
+   "energy": -24.91087453128576,
+   "degeneracy": 2,
+   "E": 0.28399483335185816
+  },
+  {
+   "kind": "edges",
+   "graph": "fractal_L2",
+   "edge": [
+    1,
+    6
+   ],
+   "edge_index": 4,
+   "s": 0.9,
+   "j0": 1.0,
+   "ratio": 0.9,
+   "energy": -24.904923378640092,
+   "degeneracy": 2,
+   "E": 0.16760968964105233
+  },
+  {
+   "kind": "edges",
+   "graph": "fractal_L2",
+   "edge": [
+    1,
+    6
+   ],
+   "edge_index": 4,
+   "s": 1.0,
+   "j0": 1.0,
+   "ratio": 1.0,
+   "energy": -24.967536579519162,
+   "degeneracy": 4,
+   "E": 0.11026913715112599
+  },
+  {
+   "kind": "edges",
+   "graph": "fractal_L2",
+   "edge": [
+    2,
+    3
+   ],
+   "edge_index": 5,
+   "s": 0.0,
+   "j0": 1.0,
+   "ratio": 0.0,
+   "energy": -25.385154480804754,
+   "degeneracy": 2,
+   "E": 0.2461616850034869
+  },
+  {
+   "kind": "edges",
+   "graph": "fractal_L2",
+   "edge": [
+    2,
+    3
+   ],
+   "edge_index": 5,
+   "s": 0.1,
+   "j0": 1.0,
+   "ratio": 0.1,
+   "energy": -25.31401400243875,
+   "degeneracy": 2,
+   "E": 0.2518479948054256
+  },
+  {
+   "kind": "edges",
+   "graph": "fractal_L2",
+   "edge": [
+    2,
+    3
+   ],
+   "edge_index": 5,
+   "s": 0.2,
+   "j0": 1.0,
+   "ratio": 0.2,
+   "energy": -25.246371646646963,
+   "degeneracy": 2,
+   "E": 0.25522952130087256
+  },
+  {
+   "kind": "edges",
+   "graph": "fractal_L2",
+   "edge": [
+    2,
+    3
+   ],
+   "edge_index": 5,
+   "s": 0.3,
+   "j0": 1.0,
+   "ratio": 0.3,
+   "energy": -25.182666569864647,
+   "degeneracy": 2,
+   "E": 0.2566749801564293
+  },
+  {
+   "kind": "edges",
+   "graph": "fractal_L2",
+   "edge": [
+    2,
+    3
+   ],
+   "edge_index": 5,
+   "s": 0.4,
+   "j0": 1.0,
+   "ratio": 0.4,
+   "energy": -25.123485639910648,
+   "degeneracy": 2,
+   "E": 0.256384400643405
+  },
+  {
+   "kind": "edges",
+   "graph": "fractal_L2",
+   "edge": [
+    2,
+    3
+   ],
+   "edge_index": 5,
+   "s": 0.5,
+   "j0": 1.0,
+   "ratio": 0.5,
+   "energy": -25.06959718327043,
+   "degeneracy": 2,
+   "E": 0.25428544371550327
+  },
+  {
+   "kind": "edges",
+   "graph": "fractal_L2",
+   "edge": [
+    2,
+    3
+   ],
+   "edge_index": 5,
+   "s": 0.6,
+   "j0": 1.0,
+   "ratio": 0.6,
+   "energy": -25.022024243062432,
+   "degeneracy": 2,
+   "E": 0.24986163197696776
+  },
+  {
+   "kind": "edges",
+   "graph": "fractal_L2",
+   "edge": [
+    2,
+    3
+   ],
+   "edge_index": 5,
+   "s": 0.7,
+   "j0": 1.0,
+   "ratio": 0.7,
+   "energy": -24.982226238616153,
+   "degeneracy": 2,
+   "E": 0.24157993915090814
+  },
+  {
+   "kind": "edges",
+   "graph": "fractal_L2",
+   "edge": [
+    2,
+    3
+   ],
+   "edge_index": 5,
+   "s": 0.8,
+   "j0": 1.0,
+   "ratio": 0.8,
+   "energy": -24.952698700573663,
+   "degeneracy": 2,
+   "E": 0.22451099363208574
+  },
+  {
+   "kind": "edges",
+   "graph": "fractal_L2",
+   "edge": [
+    2,
+    3
+   ],
+   "edge_index": 5,
+   "s": 0.9,
+   "j0": 1.0,
+   "ratio": 0.9,
+   "energy": -24.94012830809752,
+   "degeneracy": 2,
+   "E": 0.1805121592736911
+  },
+  {
+   "kind": "edges",
+   "graph": "fractal_L2",
+   "edge": [
+    2,
+    3
+   ],
+   "edge_index": 5,
+   "s": 1.0,
+   "j0": 1.0,
+   "ratio": 1.0,
+   "energy": -24.967536579519162,
+   "degeneracy": 4,
+   "E": 0.11026913715112599
+  },
+  {
+   "kind": "edges",
+   "graph": "fractal_L2",
+   "edge": [
+    2,
+    6
+   ],
+   "edge_index": 6,
+   "s": 0.0,
+   "j0": 1.0,
+   "ratio": 0.0,
+   "energy": -25.39644309527501,
+   "degeneracy": 2,
+   "E": 0.21728640162771556
+  },
+  {
+   "kind": "edges",
+   "graph": "fractal_L2",
+   "edge": [
+    2,
+    6
+   ],
+   "edge_index": 6,
+   "s": 0.1,
+   "j0": 1.0,
+   "ratio": 0.1,
+   "energy": -25.32199975867316,
+   "degeneracy": 2,
+   "E": 0.2134259261977437
+  },
+  {
+   "kind": "edges",
+   "graph": "fractal_L2",
+   "edge": [
+    2,
+    6
+   ],
+   "edge_index": 6,
+   "s": 0.2,
+   "j0": 1.0,
+   "ratio": 0.2,
+   "energy": -25.25084892582934,
+   "degeneracy": 2,
+   "E": 0.2085832429492511
+  },
+  {
+   "kind": "edges",
+   "graph": "fractal_L2",
+   "edge": [
+    2,
+    6
+   ],
+   "edge_index": 6,
+   "s": 0.3,
+   "j0": 1.0,
+   "ratio": 0.3,
+   "energy": -25.18370829091163,
+   "degeneracy": 2,
+   "E": 0.2025220071290306
+  },
+  {
+   "kind": "edges",
+   "graph": "fractal_L2",
+   "edge": [
+    2,
+    6
+   ],
+   "edge_index": 6,
+   "s": 0.4,
+   "j0": 1.0,
+   "ratio": 0.4,
+   "energy": -25.12154732453767,
+   "degeneracy": 2,
+   "E": 0.195136494501622
+  },
+  {
+   "kind": "edges",
+   "graph": "fractal_L2",
+   "edge": [
+    2,
+    6
+   ],
+   "edge_index": 6,
+   "s": 0.5,
+   "j0": 1.0,
+   "ratio": 0.5,
+   "energy": -25.065710432227547,
+   "degeneracy": 2,
+   "E": 0.1868442618761928
+  },
+  {
+   "kind": "edges",
+   "graph": "fractal_L2",
+   "edge": [
+    2,
+    6
+   ],
+   "edge_index": 6,
+   "s": 0.6,
+   "j0": 1.0,
+   "ratio": 0.6,
+   "energy": -25.0180685183703,
+   "degeneracy": 2,
+   "E": 0.17909489857932498
+  },
+  {
+   "kind": "edges",
+   "graph": "fractal_L2",
+   "edge": [
+    2,
+    6
+   ],
+   "edge_index": 6,
+   "s": 0.7,
+   "j0": 1.0,
+   "ratio": 0.7,
+   "energy": -24.981095767715548,
+   "degeneracy": 2,
+   "E": 0.17361088939663102
+  },
+  {
+   "kind": "edges",
+   "graph": "fractal_L2",
+   "edge": [
+    2,
+    6
+   ],
+   "edge_index": 6,
+   "s": 0.8,
+   "j0": 1.0,
+   "ratio": 0.8,
+   "energy": -24.957780709625283,
+   "degeneracy": 2,
+   "E": 0.16986392674220685
+  },
+  {
+   "kind": "edges",
+   "graph": "fractal_L2",
+   "edge": [
+    2,
+    6
+   ],
+   "edge_index": 6,
+   "s": 0.9,
+   "j0": 1.0,
+   "ratio": 0.9,
+   "energy": -24.951693109488623,
+   "degeneracy": 2,
+   "E": 0.16552386950192896
+  },
+  {
+   "kind": "edges",
+   "graph": "fractal_L2",
+   "edge": [
+    2,
+    6
+   ],
+   "edge_index": 6,
+   "s": 1.0,
+   "j0": 1.0,
+   "ratio": 1.0,
+   "energy": -24.967536579519162,
+   "degeneracy": 4,
+   "E": 0.11026913715112599
+  },
+  {
+   "kind": "edges",
+   "graph": "fractal_L2",
+   "edge": [
+    2,
+    7
+   ],
+   "edge_index": 7,
+   "s": 0.0,
+   "j0": 1.0,
+   "ratio": 0.0,
+   "energy": -25.39644309527504,
+   "degeneracy": 2,
+   "E": 0.21728640162775387
+  },
+  {
+   "kind": "edges",
+   "graph": "fractal_L2",
+   "edge": [
+    2,
+    7
+   ],
+   "edge_index": 7,
+   "s": 0.1,
+   "j0": 1.0,
+   "ratio": 0.1,
+   "energy": -25.32199975867325,
+   "degeneracy": 2,
+   "E": 0.2134259261977965
+  },
+  {
+   "kind": "edges",
+   "graph": "fractal_L2",
+   "edge": [
+    2,
+    7
+   ],
+   "edge_index": 7,
+   "s": 0.2,
+   "j0": 1.0,
+   "ratio": 0.2,
+   "energy": -25.250848925829263,
+   "degeneracy": 2,
+   "E": 0.20858324294924033
+  },
+  {
+   "kind": "edges",
+   "graph": "fractal_L2",
+   "edge": [
+    2,
+    7
+   ],
+   "edge_index": 7,
+   "s": 0.3,
+   "j0": 1.0,
+   "ratio": 0.3,
+   "energy": -25.183708290911653,
+   "degeneracy": 2,
+   "E": 0.20252200712903023
+  },
+  {
+   "kind": "edges",
+   "graph": "fractal_L2",
+   "edge": [
+    2,
+    7
+   ],
+   "edge_index": 7,
+   "s": 0.4,
+   "j0": 1.0,
+   "ratio": 0.4,
+   "energy": -25.121547324537694,
+   "degeneracy": 2,
+   "E": 0.1951364945016382
+  },
+  {
+   "kind": "edges",
+   "graph": "fractal_L2",
+   "edge": [
+    2,
+    7
+   ],
+   "edge_index": 7,
+   "s": 0.5,
+   "j0": 1.0,
+   "ratio": 0.5,
+   "energy": -25.065710432227675,
+   "degeneracy": 2,
+   "E": 0.1868442618762131
+  },
+  {
+   "kind": "edges",
+   "graph": "fractal_L2",
+   "edge": [
+    2,
+    7
+   ],
+   "edge_index": 7,
+   "s": 0.6,
+   "j0": 1.0,
+   "ratio": 0.6,
+   "energy": -25.01806851837053,
+   "degeneracy": 2,
+   "E": 0.17909489857932534
+  },
+  {
+   "kind": "edges",
+   "graph": "fractal_L2",
+   "edge": [
+    2,
+    7
+   ],
+   "edge_index": 7,
+   "s": 0.7,
+   "j0": 1.0,
+   "ratio": 0.7,
+   "energy": -24.981095767715484,
+   "degeneracy": 2,
+   "E": 0.17361088939663166
+  },
+  {
+   "kind": "edges",
+   "graph": "fractal_L2",
+   "edge": [
+    2,
+    7
+   ],
+   "edge_index": 7,
+   "s": 0.8,
+   "j0": 1.0,
+   "ratio": 0.8,
+   "energy": -24.957780709625187,
+   "degeneracy": 2,
+   "E": 0.169863926742206
+  },
+  {
+   "kind": "edges",
+   "graph": "fractal_L2",
+   "edge": [
+    2,
+    7
+   ],
+   "edge_index": 7,
+   "s": 0.9,
+   "j0": 1.0,
+   "ratio": 0.9,
+   "energy": -24.951693109488502,
+   "degeneracy": 2,
+   "E": 0.16552386950193193
+  },
+  {
+   "kind": "edges",
+   "graph": "fractal_L2",
+   "edge": [
+    2,
+    7
+   ],
+   "edge_index": 7,
+   "s": 1.0,
+   "j0": 1.0,
+   "ratio": 1.0,
+   "energy": -24.967536579519162,
+   "degeneracy": 4,
+   "E": 0.11026913715112599
+  },
+  {
+   "kind": "edges",
+   "graph": "fractal_L2",
+   "edge": [
+    3,
+    4
+   ],
+   "edge_index": 8,
+   "s": 0.0,
+   "j0": 1.0,
+   "ratio": 0.0,
+   "energy": -25.554721270767896,
+   "degeneracy": 2,
+   "E": 0.24673114075776428
+  },
+  {
+   "kind": "edges",
+   "graph": "fractal_L2",
+   "edge": [
+    3,
+    4
+   ],
+   "edge_index": 8,
+   "s": 0.1,
+   "j0": 1.0,
+   "ratio": 0.1,
+   "energy": -25.471933210849397,
+   "degeneracy": 2,
+   "E": 0.24724777920978835
+  },
+  {
+   "kind": "edges",
+   "graph": "fractal_L2",
+   "edge": [
+    3,
+    4
+   ],
+   "edge_index": 8,
+   "s": 0.2,
+   "j0": 1.0,
+   "ratio": 0.2,
+   "energy": -25.391403272791482,
+   "degeneracy": 2,
+   "E": 0.2477444995665369
+  },
+  {
+   "kind": "edges",
+   "graph": "fractal_L2",
+   "edge": [
+    3,
+    4
+   ],
+   "edge_index": 8,
+   "s": 0.3,
+   "j0": 1.0,
+   "ratio": 0.3,
+   "energy": -25.3135813731785,
+   "degeneracy": 2,
+   "E": 0.2481766390478602
+  },
+  {
+   "kind": "edges",
+   "graph": "fractal_L2",
+   "edge": [
+    3,
+    4
+   ],
+   "edge_index": 8,
+   "s": 0.4,
+   "j0": 1.0,
+   "ratio": 0.4,
+   "energy": -25.239041429000928,
+   "degeneracy": 2,
+   "E": 0.24846048259117426
+  },
+  {
+   "kind": "edges",
+   "graph": "fractal_L2",
+   "edge": [
+    3,
+    4
+   ],
+   "edge_index": 8,
+   "s": 0.5,
+   "j0": 1.0,
+   "ratio": 0.5,
+   "energy": -25.168530447206557,
+   "degeneracy": 2,
+   "E": 0.24843283995380233
+  },
+  {
+   "kind": "edges",
+   "graph": "fractal_L2",
+   "edge": [
+    3,
+    4
+   ],
+   "edge_index": 8,
+   "s": 0.6,
+   "j0": 1.0,
+   "ratio": 0.6,
+   "energy": -25.10305253001035,
+   "degeneracy": 2,
+   "E": 0.24775226278569157
+  },
+  {
+   "kind": "edges",
+   "graph": "fractal_L2",
+   "edge": [
+    3,
+    4
+   ],
+   "edge_index": 8,
+   "s": 0.7,
+   "j0": 1.0,
+   "ratio": 0.7,
+   "energy": -25.044042940008502,
+   "degeneracy": 2,
+   "E": 0.24561499315035817
+  },
+  {
+   "kind": "edges",
+   "graph": "fractal_L2",
+   "edge": [
+    3,
+    4
+   ],
+   "edge_index": 8,
+   "s": 0.8,
+   "j0": 1.0,
+   "ratio": 0.8,
+   "energy": -24.993863174981637,
+   "degeneracy": 2,
+   "E": 0.23971677494195923
+  },
+  {
+   "kind": "edges",
+   "graph": "fractal_L2",
+   "edge": [
+    3,
+    4
+   ],
+   "edge_index": 8,
+   "s": 0.9,
+   "j0": 1.0,
+   "ratio": 0.9,
+   "energy": -24.958104646162504,
+   "degeneracy": 2,
+   "E": 0.22083839992182272
+  },
+  {
+   "kind": "edges",
+   "graph": "fractal_L2",
+   "edge": [
+    3,
+    4
+   ],
+   "edge_index": 8,
+   "s": 1.0,
+   "j0": 1.0,
+   "ratio": 1.0,
+   "energy": -24.967536579519162,
+   "degeneracy": 4,
+   "E": 0.11026913715112599
+  },
+  {
+   "kind": "edges",
+   "graph": "fractal_L2",
+   "edge": [
+    3,
+    7
+   ],
+   "edge_index": 9,
+   "s": 0.0,
+   "j0": 1.0,
+   "ratio": 0.0,
+   "energy": -25.54774880442665,
+   "degeneracy": 2,
+   "E": 0.27198741986712954
+  },
+  {
+   "kind": "edges",
+   "graph": "fractal_L2",
+   "edge": [
+    3,
+    7
+   ],
+   "edge_index": 9,
+   "s": 0.1,
+   "j0": 1.0,
+   "ratio": 0.1,
+   "energy": -25.46039448406598,
+   "degeneracy": 2,
+   "E": 0.2729338065193118
+  },
+  {
+   "kind": "edges",
+   "graph": "fractal_L2",
+   "edge": [
+    3,
+    7
+   ],
+   "edge_index": 9,
+   "s": 0.2,
+   "j0": 1.0,
+   "ratio": 0.2,
+   "energy": -25.374456989165388,
+   "degeneracy": 2,
+   "E": 0.2739096509812096
+  },
+  {
+   "kind": "edges",
+   "graph": "fractal_L2",
+   "edge": [
+    3,
+    7
+   ],
+   "edge_index": 9,
+   "s": 0.3,
+   "j0": 1.0,
+   "ratio": 0.3,
+   "energy": -25.29018401819723,
+   "degeneracy": 2,
+   "E": 0.27490794044918626
+  },
+  {
+   "kind": "edges",
+   "graph": "fractal_L2",
+   "edge": [
+    3,
+    7
+   ],
+   "edge_index": 9,
+   "s": 0.4,
+   "j0": 1.0,
+   "ratio": 0.4,
+   "energy": -25.2078858651352,
+   "degeneracy": 2,
+   "E": 0.27592148278502626
+  },
+  {
+   "kind": "edges",
+   "graph": "fractal_L2",
+   "edge": [
+    3,
+    7
+   ],
+   "edge_index": 9,
+   "s": 0.5,
+   "j0": 1.0,
+   "ratio": 0.5,
+   "energy": -25.12796100570379,
+   "degeneracy": 2,
+   "E": 0.2769515193956699
+  },
+  {
+   "kind": "edges",
+   "graph": "fractal_L2",
+   "edge": [
+    3,
+    7
+   ],
+   "edge_index": 9,
+   "s": 0.6,
+   "j0": 1.0,
+   "ratio": 0.6,
+   "energy": -25.050947790364948,
+   "degeneracy": 2,
+   "E": 0.27804648707342666
+  },
+  {
+   "kind": "edges",
+   "graph": "fractal_L2",
+   "edge": [
+    3,
+    7
+   ],
+   "edge_index": 9,
+   "s": 0.7,
+   "j0": 1.0,
+   "ratio": 0.7,
+   "energy": -24.977690823349494,
+   "degeneracy": 2,
+   "E": 0.27952584154251664
+  },
+  {
+   "kind": "edges",
+   "graph": "fractal_L2",
+   "edge": [
+    3,
+    7
+   ],
+   "edge_index": 9,
+   "s": 0.8,
+   "j0": 1.0,
+   "ratio": 0.8,
+   "energy": -24.9108745312856,
+   "degeneracy": 2,
+   "E": 0.28399483335185693
+  },
+  {
+   "kind": "edges",
+   "graph": "fractal_L2",
+   "edge": [
+    3,
+    7
+   ],
+   "edge_index": 9,
+   "s": 0.9,
+   "j0": 1.0,
+   "ratio": 0.9,
+   "energy": -24.904923378640113,
+   "degeneracy": 2,
+   "E": 0.16760968964106526
+  },
+  {
+   "kind": "edges",
+   "graph": "fractal_L2",
+   "edge": [
+    3,
+    7
+   ],
+   "edge_index": 9,
+   "s": 1.0,
+   "j0": 1.0,
+   "ratio": 1.0,
+   "energy": -24.967536579519162,
+   "degeneracy": 4,
+   "E": 0.11026913715112599
+  },
+  {
+   "kind": "edges",
+   "graph": "fractal_L2",
+   "edge": [
+    3,
+    8
+   ],
+   "edge_index": 10,
+   "s": 0.0,
+   "j0": 1.0,
+   "ratio": 0.0,
+   "energy": -25.744350752587682,
+   "degeneracy": 2,
+   "E": 0.19347616301244833
+  },
+  {
+   "kind": "edges",
+   "graph": "fractal_L2",
+   "edge": [
+    3,
+    8
+   ],
+   "edge_index": 10,
+   "s": 0.1,
+   "j0": 1.0,
+   "ratio": 0.1,
+   "energy": -25.653916319738734,
+   "degeneracy": 2,
+   "E": 0.19240928381934472
+  },
+  {
+   "kind": "edges",
+   "graph": "fractal_L2",
+   "edge": [
+    3,
+    8
+   ],
+   "edge_index": 10,
+   "s": 0.2,
+   "j0": 1.0,
+   "ratio": 0.2,
+   "energy": -25.56476994767109,
+   "degeneracy": 2,
+   "E": 0.19118416812513372
+  },
+  {
+   "kind": "edges",
+   "graph": "fractal_L2",
+   "edge": [
+    3,
+    8
+   ],
+   "edge_index": 10,
+   "s": 0.3,
+   "j0": 1.0,
+   "ratio": 0.3,
+   "energy": -25.47719872547202,
+   "degeneracy": 2,
+   "E": 0.18975707644346618
+  },
+  {
+   "kind": "edges",
+   "graph": "fractal_L2",
+   "edge": [
+    3,
+    8
+   ],
+   "edge_index": 10,
+   "s": 0.4,
+   "j0": 1.0,
+   "ratio": 0.4,
+   "energy": -25.391582436951236,
+   "degeneracy": 2,
+   "E": 0.1880630511384089
+  },
+  {
+   "kind": "edges",
+   "graph": "fractal_L2",
+   "edge": [
+    3,
+    8
+   ],
+   "edge_index": 10,
+   "s": 0.5,
+   "j0": 1.0,
+   "ratio": 0.5,
+   "energy": -25.308433071127936,
+   "degeneracy": 2,
+   "E": 0.18600113301122875
+  },
+  {
+   "kind": "edges",
+   "graph": "fractal_L2",
+   "edge": [
+    3,
+    8
+   ],
+   "edge_index": 10,
+   "s": 0.6,
+   "j0": 1.0,
+   "ratio": 0.6,
+   "energy": -25.228454503968297,
+   "degeneracy": 2,
+   "E": 0.18340820650941492
+  },
+  {
+   "kind": "edges",
+   "graph": "fractal_L2",
+   "edge": [
+    3,
+    8
+   ],
+   "edge_index": 10,
+   "s": 0.7,
+   "j0": 1.0,
+   "ratio": 0.7,
+   "energy": -25.152633008143113,
+   "degeneracy": 2,
+   "E": 0.18001521288891884
+  },
+  {
+   "kind": "edges",
+   "graph": "fractal_L2",
+   "edge": [
+    3,
+    8
+   ],
+   "edge_index": 10,
+   "s": 0.8,
+   "j0": 1.0,
+   "ratio": 0.8,
+   "energy": -25.082373334626645,
+   "degeneracy": 2,
+   "E": 0.17538452231166884
+  },
+  {
+   "kind": "edges",
+   "graph": "fractal_L2",
+   "edge": [
+    3,
+    8
+   ],
+   "edge_index": 10,
+   "s": 0.9,
+   "j0": 1.0,
+   "ratio": 0.9,
+   "energy": -25.019698544122807,
+   "degeneracy": 2,
+   "E": 0.16885810164229148
+  },
+  {
+   "kind": "edges",
+   "graph": "fractal_L2",
+   "edge": [
+    3,
+    8
+   ],
+   "edge_index": 10,
+   "s": 1.0,
+   "j0": 1.0,
+   "ratio": 1.0,
+   "energy": -24.967536579519162,
+   "degeneracy": 4,
+   "E": 0.11026913715112599
+  },
+  {
+   "kind": "edges",
+   "graph": "fractal_L2",
+   "edge": [
+    4,
+    8
+   ],
+   "edge_index": 11,
+   "s": 0.0,
+   "j0": 1.0,
+   "ratio": 0.0,
+   "energy": -25.55472127076791,
+   "degeneracy": 2,
+   "E": 0.2467311407577658
+  },
+  {
+   "kind": "edges",
+   "graph": "fractal_L2",
+   "edge": [
+    4,
+    8
+   ],
+   "edge_index": 11,
+   "s": 0.1,
+   "j0": 1.0,
+   "ratio": 0.1,
+   "energy": -25.471933210849418,
+   "degeneracy": 2,
+   "E": 0.24724777920978813
+  },
+  {
+   "kind": "edges",
+   "graph": "fractal_L2",
+   "edge": [
+    4,
+    8
+   ],
+   "edge_index": 11,
+   "s": 0.2,
+   "j0": 1.0,
+   "ratio": 0.2,
+   "energy": -25.391403272791603,
+   "degeneracy": 2,
+   "E": 0.2477444995665362
+  },
+  {
+   "kind": "edges",
+   "graph": "fractal_L2",
+   "edge": [
+    4,
+    8
+   ],
+   "edge_index": 11,
+   "s": 0.3,
+   "j0": 1.0,
+   "ratio": 0.3,
+   "energy": -25.313581373178476,
+   "degeneracy": 2,
+   "E": 0.24817663904786008
+  },
+  {
+   "kind": "edges",
+   "graph": "fractal_L2",
+   "edge": [
+    4,
+    8
+   ],
+   "edge_index": 11,
+   "s": 0.4,
+   "j0": 1.0,
+   "ratio": 0.4,
+   "energy": -25.239041429001023,
+   "degeneracy": 2,
+   "E": 0.24846048259117307
+  },
+  {
+   "kind": "edges",
+   "graph": "fractal_L2",
+   "edge": [
+    4,
+    8
+   ],
+   "edge_index": 11,
+   "s": 0.5,
+   "j0": 1.0,
+   "ratio": 0.5,
+   "energy": -25.16853044720647,
+   "degeneracy": 2,
+   "E": 0.24843283995380433
+  },
+  {
+   "kind": "edges",
+   "graph": "fractal_L2",
+   "edge": [
+    4,
+    8
+   ],
+   "edge_index": 11,
+   "s": 0.6,
+   "j0": 1.0,
+   "ratio": 0.6,
+   "energy": -25.103052530010316,
+   "degeneracy": 2,
+   "E": 0.2477522627856911
+  },
+  {
+   "kind": "edges",
+   "graph": "fractal_L2",
+   "edge": [
+    4,
+    8
+   ],
+   "edge_index": 11,
+   "s": 0.7,
+   "j0": 1.0,
+   "ratio": 0.7,
+   "energy": -25.044042940008563,
+   "degeneracy": 2,
+   "E": 0.24561499315035965
+  },
+  {
+   "kind": "edges",
+   "graph": "fractal_L2",
+   "edge": [
+    4,
+    8
+   ],
+   "edge_index": 11,
+   "s": 0.8,
+   "j0": 1.0,
+   "ratio": 0.8,
+   "energy": -24.99386317498173,
+   "degeneracy": 2,
+   "E": 0.23971677494195662
+  },
+  {
+   "kind": "edges",
+   "graph": "fractal_L2",
+   "edge": [
+    4,
+    8
+   ],
+   "edge_index": 11,
+   "s": 0.9,
+   "j0": 1.0,
+   "ratio": 0.9,
+   "energy": -24.95810464616252,
+   "degeneracy": 2,
+   "E": 0.2208383999218217
+  },
+  {
+   "kind": "edges",
+   "graph": "fractal_L2",
+   "edge": [
+    4,
+    8
+   ],
+   "edge_index": 11,
+   "s": 1.0,
+   "j0": 1.0,
+   "ratio": 1.0,
+   "energy": -24.967536579519162,
+   "degeneracy": 4,
+   "E": 0.11026913715112599
+  },
+  {
+   "kind": "edges",
+   "graph": "fractal_L2",
+   "edge": [
+    5,
+    6
+   ],
+   "edge_index": 12,
+   "s": 0.0,
+   "j0": 1.0,
+   "ratio": 0.0,
+   "energy": -25.547748804426536,
+   "degeneracy": 2,
+   "E": 0.2719874198671308
+  },
+  {
+   "kind": "edges",
+   "graph": "fractal_L2",
+   "edge": [
+    5,
+    6
+   ],
+   "edge_index": 12,
+   "s": 0.1,
+   "j0": 1.0,
+   "ratio": 0.1,
+   "energy": -25.460394484066178,
+   "degeneracy": 2,
+   "E": 0.2729338065193109
+  },
+  {
+   "kind": "edges",
+   "graph": "fractal_L2",
+   "edge": [
+    5,
+    6
+   ],
+   "edge_index": 12,
+   "s": 0.2,
+   "j0": 1.0,
+   "ratio": 0.2,
+   "energy": -25.374456989165246,
+   "degeneracy": 2,
+   "E": 0.27390965098120845
+  },
+  {
+   "kind": "edges",
+   "graph": "fractal_L2",
+   "edge": [
+    5,
+    6
+   ],
+   "edge_index": 12,
+   "s": 0.3,
+   "j0": 1.0,
+   "ratio": 0.3,
+   "energy": -25.2901840181973,
+   "degeneracy": 2,
+   "E": 0.27490794044918276
+  },
+  {
+   "kind": "edges",
+   "graph": "fractal_L2",
+   "edge": [
+    5,
+    6
+   ],
+   "edge_index": 12,
+   "s": 0.4,
+   "j0": 1.0,
+   "ratio": 0.4,
+   "energy": -25.20788586513538,
+   "degeneracy": 2,
+   "E": 0.27592148278502615
+  },
+  {
+   "kind": "edges",
+   "graph": "fractal_L2",
+   "edge": [
+    5,
+    6
+   ],
+   "edge_index": 12,
+   "s": 0.5,
+   "j0": 1.0,
+   "ratio": 0.5,
+   "energy": -25.12796100570379,
+   "degeneracy": 2,
+   "E": 0.2769515193956702
+  },
+  {
+   "kind": "edges",
+   "graph": "fractal_L2",
+   "edge": [
+    5,
+    6
+   ],
+   "edge_index": 12,
+   "s": 0.6,
+   "j0": 1.0,
+   "ratio": 0.6,
+   "energy": -25.05094779036509,
+   "degeneracy": 2,
+   "E": 0.27804648707342666
+  },
+  {
+   "kind": "edges",
+   "graph": "fractal_L2",
+   "edge": [
+    5,
+    6
+   ],
+   "edge_index": 12,
+   "s": 0.7,
+   "j0": 1.0,
+   "ratio": 0.7,
+   "energy": -24.977690823349295,
+   "degeneracy": 2,
+   "E": 0.27952584154251703
+  },
+  {
+   "kind": "edges",
+   "graph": "fractal_L2",
+   "edge": [
+    5,
+    6
+   ],
+   "edge_index": 12,
+   "s": 0.8,
+   "j0": 1.0,
+   "ratio": 0.8,
+   "energy": -24.9108745312856,
+   "degeneracy": 2,
+   "E": 0.2839948333518549
+  },
+  {
+   "kind": "edges",
+   "graph": "fractal_L2",
+   "edge": [
+    5,
+    6
+   ],
+   "edge_index": 12,
+   "s": 0.9,
+   "j0": 1.0,
+   "ratio": 0.9,
+   "energy": -24.90492337864008,
+   "degeneracy": 2,
+   "E": 0.16760968964106923
+  },
+  {
+   "kind": "edges",
+   "graph": "fractal_L2",
+   "edge": [
+    5,
+    6
+   ],
+   "edge_index": 12,
+   "s": 1.0,
+   "j0": 1.0,
+   "ratio": 1.0,
+   "energy": -24.967536579519162,
+   "degeneracy": 4,
+   "E": 0.11026913715112599
+  },
+  {
+   "kind": "edges",
+   "graph": "fractal_L2",
+   "edge": [
+    5,
+    9
+   ],
+   "edge_index": 13,
+   "s": 0.0,
+   "j0": 1.0,
+   "ratio": 0.0,
+   "energy": -25.385154480804353,
+   "degeneracy": 2,
+   "E": 0.24616168500349286
+  },
+  {
+   "kind": "edges",
+   "graph": "fractal_L2",
+   "edge": [
+    5,
+    9
+   ],
+   "edge_index": 13,
+   "s": 0.1,
+   "j0": 1.0,
+   "ratio": 0.1,
+   "energy": -25.314014002438867,
+   "degeneracy": 2,
+   "E": 0.2518479948053749
+  },
+  {
+   "kind": "edges",
+   "graph": "fractal_L2",
+   "edge": [
+    5,
+    9
+   ],
+   "edge_index": 13,
+   "s": 0.2,
+   "j0": 1.0,
+   "ratio": 0.2,
+   "energy": -25.24637164664699,
+   "degeneracy": 2,
+   "E": 0.2552295213009037
+  },
+  {
+   "kind": "edges",
+   "graph": "fractal_L2",
+   "edge": [
+    5,
+    9
+   ],
+   "edge_index": 13,
+   "s": 0.3,
+   "j0": 1.0,
+   "ratio": 0.3,
+   "energy": -25.182666569864484,
+   "degeneracy": 2,
+   "E": 0.2566749801565023
+  },
+  {
+   "kind": "edges",
+   "graph": "fractal_L2",
+   "edge": [
+    5,
+    9
+   ],
+   "edge_index": 13,
+   "s": 0.4,
+   "j0": 1.0,
+   "ratio": 0.4,
+   "energy": -25.123485639910513,
+   "degeneracy": 2,
+   "E": 0.2563844006434123
+  },
+  {
+   "kind": "edges",
+   "graph": "fractal_L2",
+   "edge": [
+    5,
+    9
+   ],
+   "edge_index": 13,
+   "s": 0.5,
+   "j0": 1.0,
+   "ratio": 0.5,
+   "energy": -25.069597183270314,
+   "degeneracy": 2,
+   "E": 0.2542854437154976
+  },
+  {
+   "kind": "edges",
+   "graph": "fractal_L2",
+   "edge": [
+    5,
+    9
+   ],
+   "edge_index": 13,
+   "s": 0.6,
+   "j0": 1.0,
+   "ratio": 0.6,
+   "energy": -25.02202424306228,
+   "degeneracy": 2,
+   "E": 0.24986163197696581
+  },
+  {
+   "kind": "edges",
+   "graph": "fractal_L2",
+   "edge": [
+    5,
+    9
+   ],
+   "edge_index": 13,
+   "s": 0.7,
+   "j0": 1.0,
+   "ratio": 0.7,
+   "energy": -24.98222623861604,
+   "degeneracy": 2,
+   "E": 0.24157993915091514
+  },
+  {
+   "kind": "edges",
+   "graph": "fractal_L2",
+   "edge": [
+    5,
+    9
+   ],
+   "edge_index": 13,
+   "s": 0.8,
+   "j0": 1.0,
+   "ratio": 0.8,
+   "energy": -24.952698700573766,
+   "degeneracy": 2,
+   "E": 0.22451099363215657
+  },
+  {
+   "kind": "edges",
+   "graph": "fractal_L2",
+   "edge": [
+    5,
+    9
+   ],
+   "edge_index": 13,
+   "s": 0.9,
+   "j0": 1.0,
+   "ratio": 0.9,
+   "energy": -24.940128308097517,
+   "degeneracy": 2,
+   "E": 0.18051215927364156
+  },
+  {
+   "kind": "edges",
+   "graph": "fractal_L2",
+   "edge": [
+    5,
+    9
+   ],
+   "edge_index": 13,
+   "s": 1.0,
+   "j0": 1.0,
+   "ratio": 1.0,
+   "energy": -24.967536579519162,
+   "degeneracy": 4,
+   "E": 0.11026913715112599
+  },
+  {
+   "kind": "edges",
+   "graph": "fractal_L2",
+   "edge": [
+    6,
+    9
+   ],
+   "edge_index": 14,
+   "s": 0.0,
+   "j0": 1.0,
+   "ratio": 0.0,
+   "energy": -25.396443095274865,
+   "degeneracy": 2,
+   "E": 0.21728640162772497
+  },
+  {
+   "kind": "edges",
+   "graph": "fractal_L2",
+   "edge": [
+    6,
+    9
+   ],
+   "edge_index": 14,
+   "s": 0.1,
+   "j0": 1.0,
+   "ratio": 0.1,
+   "energy": -25.32199975867317,
+   "degeneracy": 2,
+   "E": 0.21342592619778053
+  },
+  {
+   "kind": "edges",
+   "graph": "fractal_L2",
+   "edge": [
+    6,
+    9
+   ],
+   "edge_index": 14,
+   "s": 0.2,
+   "j0": 1.0,
+   "ratio": 0.2,
+   "energy": -25.250848925829352,
+   "degeneracy": 2,
+   "E": 0.20858324294912844
+  },
+  {
+   "kind": "edges",
+   "graph": "fractal_L2",
+   "edge": [
+    6,
+    9
+   ],
+   "edge_index": 14,
+   "s": 0.3,
+   "j0": 1.0,
+   "ratio": 0.3,
+   "energy": -25.183708290911625,
+   "degeneracy": 2,
+   "E": 0.20252200712899873
+  },
+  {
+   "kind": "edges",
+   "graph": "fractal_L2",
+   "edge": [
+    6,
+    9
+   ],
+   "edge_index": 14,
+   "s": 0.4,
+   "j0": 1.0,
+   "ratio": 0.4,
+   "energy": -25.121547324537673,
+   "degeneracy": 2,
+   "E": 0.19513649450165788
+  },
+  {
+   "kind": "edges",
+   "graph": "fractal_L2",
+   "edge": [
+    6,
+    9
+   ],
+   "edge_index": 14,
+   "s": 0.5,
+   "j0": 1.0,
+   "ratio": 0.5,
+   "energy": -25.065710432227487,
+   "degeneracy": 2,
+   "E": 0.18684426187620157
+  },
+  {
+   "kind": "edges",
+   "graph": "fractal_L2",
+   "edge": [
+    6,
+    9
+   ],
+   "edge_index": 14,
+   "s": 0.6,
+   "j0": 1.0,
+   "ratio": 0.6,
+   "energy": -25.018068518370388,
+   "degeneracy": 2,
+   "E": 0.17909489857932875
+  },
+  {
+   "kind": "edges",
+   "graph": "fractal_L2",
+   "edge": [
+    6,
+    9
+   ],
+   "edge_index": 14,
+   "s": 0.7,
+   "j0": 1.0,
+   "ratio": 0.7,
+   "energy": -24.98109576771551,
+   "degeneracy": 2,
+   "E": 0.1736108893966355
+  },
+  {
+   "kind": "edges",
+   "graph": "fractal_L2",
+   "edge": [
+    6,
+    9
+   ],
+   "edge_index": 14,
+   "s": 0.8,
+   "j0": 1.0,
+   "ratio": 0.8,
+   "energy": -24.95778070962533,
+   "degeneracy": 2,
+   "E": 0.1698639267422114
+  },
+  {
+   "kind": "edges",
+   "graph": "fractal_L2",
+   "edge": [
+    6,
+    9
+   ],
+   "edge_index": 14,
+   "s": 0.9,
+   "j0": 1.0,
+   "ratio": 0.9,
+   "energy": -24.951693109488794,
+   "degeneracy": 2,
+   "E": 0.16552386950193532
+  },
+  {
+   "kind": "edges",
+   "graph": "fractal_L2",
+   "edge": [
+    6,
+    9
+   ],
+   "edge_index": 14,
+   "s": 1.0,
+   "j0": 1.0,
+   "ratio": 1.0,
+   "energy": -24.967536579519162,
+   "degeneracy": 4,
+   "E": 0.11026913715112599
+  },
+  {
+   "kind": "edges",
+   "graph": "fractal_L2",
+   "edge": [
+    7,
+    8
+   ],
+   "edge_index": 15,
+   "s": 0.0,
+   "j0": 1.0,
+   "ratio": 0.0,
+   "energy": -25.54774880442669,
+   "degeneracy": 2,
+   "E": 0.2719874198671299
+  },
+  {
+   "kind": "edges",
+   "graph": "fractal_L2",
+   "edge": [
+    7,
+    8
+   ],
+   "edge_index": 15,
+   "s": 0.1,
+   "j0": 1.0,
+   "ratio": 0.1,
+   "energy": -25.460394484065983,
+   "degeneracy": 2,
+   "E": 0.27293380651931054
+  },
+  {
+   "kind": "edges",
+   "graph": "fractal_L2",
+   "edge": [
+    7,
+    8
+   ],
+   "edge_index": 15,
+   "s": 0.2,
+   "j0": 1.0,
+   "ratio": 0.2,
+   "energy": -25.37445698916511,
+   "degeneracy": 2,
+   "E": 0.2739096509812076
+  },
+  {
+   "kind": "edges",
+   "graph": "fractal_L2",
+   "edge": [
+    7,
+    8
+   ],
+   "edge_index": 15,
+   "s": 0.3,
+   "j0": 1.0,
+   "ratio": 0.3,
+   "energy": -25.29018401819752,
+   "degeneracy": 2,
+   "E": 0.2749079404491868
+  },
+  {
+   "kind": "edges",
+   "graph": "fractal_L2",
+   "edge": [
+    7,
+    8
+   ],
+   "edge_index": 15,
+   "s": 0.4,
+   "j0": 1.0,
+   "ratio": 0.4,
+   "energy": -25.207885865135136,
+   "degeneracy": 2,
+   "E": 0.27592148278502565
+  },
+  {
+   "kind": "edges",
+   "graph": "fractal_L2",
+   "edge": [
+    7,
+    8
+   ],
+   "edge_index": 15,
+   "s": 0.5,
+   "j0": 1.0,
+   "ratio": 0.5,
+   "energy": -25.127961005703746,
+   "degeneracy": 2,
+   "E": 0.27695151939567025
+  },
+  {
+   "kind": "edges",
+   "graph": "fractal_L2",
+   "edge": [
+    7,
+    8
+   ],
+   "edge_index": 15,
+   "s": 0.6,
+   "j0": 1.0,
+   "ratio": 0.6,
+   "energy": -25.050947790364827,
+   "degeneracy": 2,
+   "E": 0.2780464870734263
+  },
+  {
+   "kind": "edges",
+   "graph": "fractal_L2",
+   "edge": [
+    7,
+    8
+   ],
+   "edge_index": 15,
+   "s": 0.7,
+   "j0": 1.0,
+   "ratio": 0.7,
+   "energy": -24.977690823349334,
+   "degeneracy": 2,
+   "E": 0.27952584154251775
+  },
+  {
+   "kind": "edges",
+   "graph": "fractal_L2",
+   "edge": [
+    7,
+    8
+   ],
+   "edge_index": 15,
+   "s": 0.8,
+   "j0": 1.0,
+   "ratio": 0.8,
+   "energy": -24.91087453128554,
+   "degeneracy": 2,
+   "E": 0.2839948333518568
+  },
+  {
+   "kind": "edges",
+   "graph": "fractal_L2",
+   "edge": [
+    7,
+    8
+   ],
+   "edge_index": 15,
+   "s": 0.9,
+   "j0": 1.0,
+   "ratio": 0.9,
+   "energy": -24.904923378640063,
+   "degeneracy": 2,
+   "E": 0.16760968964105952
+  },
+  {
+   "kind": "edges",
+   "graph": "fractal_L2",
+   "edge": [
+    7,
+    8
+   ],
+   "edge_index": 15,
+   "s": 1.0,
+   "j0": 1.0,
+   "ratio": 1.0,
+   "energy": -24.967536579519162,
+   "degeneracy": 4,
+   "E": 0.11026913715112599
+  },
+  {
+   "kind": "edges",
+   "graph": "fractal_L2",
+   "edge": [
+    7,
+    11
+   ],
+   "edge_index": 16,
+   "s": 0.0,
+   "j0": 1.0,
+   "ratio": 0.0,
+   "energy": -25.39644309527483,
+   "degeneracy": 2,
+   "E": 0.21728640162772242
+  },
+  {
+   "kind": "edges",
+   "graph": "fractal_L2",
+   "edge": [
+    7,
+    11
+   ],
+   "edge_index": 16,
+   "s": 0.1,
+   "j0": 1.0,
+   "ratio": 0.1,
+   "energy": -25.321999758673183,
+   "degeneracy": 2,
+   "E": 0.2134259261977883
+  },
+  {
+   "kind": "edges",
+   "graph": "fractal_L2",
+   "edge": [
+    7,
+    11
+   ],
+   "edge_index": 16,
+   "s": 0.2,
+   "j0": 1.0,
+   "ratio": 0.2,
+   "energy": -25.250848925829313,
+   "degeneracy": 2,
+   "E": 0.20858324294920674
+  },
+  {
+   "kind": "edges",
+   "graph": "fractal_L2",
+   "edge": [
+    7,
+    11
+   ],
+   "edge_index": 16,
+   "s": 0.3,
+   "j0": 1.0,
+   "ratio": 0.3,
+   "energy": -25.1837082909117,
+   "degeneracy": 2,
+   "E": 0.20252200712901947
+  },
+  {
+   "kind": "edges",
+   "graph": "fractal_L2",
+   "edge": [
+    7,
+    11
+   ],
+   "edge_index": 16,
+   "s": 0.4,
+   "j0": 1.0,
+   "ratio": 0.4,
+   "energy": -25.121547324537698,
+   "degeneracy": 2,
+   "E": 0.19513649450162526
+  },
+  {
+   "kind": "edges",
+   "graph": "fractal_L2",
+   "edge": [
+    7,
+    11
+   ],
+   "edge_index": 16,
+   "s": 0.5,
+   "j0": 1.0,
+   "ratio": 0.5,
+   "energy": -25.065710432227565,
+   "degeneracy": 2,
+   "E": 0.18684426187617964
+  },
+  {
+   "kind": "edges",
+   "graph": "fractal_L2",
+   "edge": [
+    7,
+    11
+   ],
+   "edge_index": 16,
+   "s": 0.6,
+   "j0": 1.0,
+   "ratio": 0.6,
+   "energy": -25.018068518370455,
+   "degeneracy": 2,
+   "E": 0.17909489857933392
+  },
+  {
+   "kind": "edges",
+   "graph": "fractal_L2",
+   "edge": [
+    7,
+    11
+   ],
+   "edge_index": 16,
+   "s": 0.7,
+   "j0": 1.0,
+   "ratio": 0.7,
+   "energy": -24.981095767715733,
+   "degeneracy": 2,
+   "E": 0.17361088939663252
+  },
+  {
+   "kind": "edges",
+   "graph": "fractal_L2",
+   "edge": [
+    7,
+    11
+   ],
+   "edge_index": 16,
+   "s": 0.8,
+   "j0": 1.0,
+   "ratio": 0.8,
+   "energy": -24.957780709625183,
+   "degeneracy": 2,
+   "E": 0.16986392674220974
+  },
+  {
+   "kind": "edges",
+   "graph": "fractal_L2",
+   "edge": [
+    7,
+    11
+   ],
+   "edge_index": 16,
+   "s": 0.9,
+   "j0": 1.0,
+   "ratio": 0.9,
+   "energy": -24.951693109488648,
+   "degeneracy": 2,
+   "E": 0.16552386950193654
+  },
+  {
+   "kind": "edges",
+   "graph": "fractal_L2",
+   "edge": [
+    7,
+    11
+   ],
+   "edge_index": 16,
+   "s": 1.0,
+   "j0": 1.0,
+   "ratio": 1.0,
+   "energy": -24.967536579519162,
+   "degeneracy": 4,
+   "E": 0.11026913715112599
+  },
+  {
+   "kind": "edges",
+   "graph": "fractal_L2",
+   "edge": [
+    8,
+    11
+   ],
+   "edge_index": 17,
+   "s": 0.0,
+   "j0": 1.0,
+   "ratio": 0.0,
+   "energy": -25.385154480804584,
+   "degeneracy": 2,
+   "E": 0.24616168500348268
+  },
+  {
+   "kind": "edges",
+   "graph": "fractal_L2",
+   "edge": [
+    8,
+    11
+   ],
+   "edge_index": 17,
+   "s": 0.1,
+   "j0": 1.0,
+   "ratio": 0.1,
+   "energy": -25.31401400243866,
+   "degeneracy": 2,
+   "E": 0.2518479948054342
+  },
+  {
+   "kind": "edges",
+   "graph": "fractal_L2",
+   "edge": [
+    8,
+    11
+   ],
+   "edge_index": 17,
+   "s": 0.2,
+   "j0": 1.0,
+   "ratio": 0.2,
+   "energy": -25.246371646647123,
+   "degeneracy": 2,
+   "E": 0.25522952130089743
+  },
+  {
+   "kind": "edges",
+   "graph": "fractal_L2",
+   "edge": [
+    8,
+    11
+   ],
+   "edge_index": 17,
+   "s": 0.3,
+   "j0": 1.0,
+   "ratio": 0.3,
+   "energy": -25.18266656986464,
+   "degeneracy": 2,
+   "E": 0.2566749801564412
+  },
+  {
+   "kind": "edges",
+   "graph": "fractal_L2",
+   "edge": [
+    8,
+    11
+   ],
+   "edge_index": 17,
+   "s": 0.4,
+   "j0": 1.0,
+   "ratio": 0.4,
+   "energy": -25.12348563991045,
+   "degeneracy": 2,
+   "E": 0.2563844006434255
+  },
+  {
+   "kind": "edges",
+   "graph": "fractal_L2",
+   "edge": [
+    8,
+    11
+   ],
+   "edge_index": 17,
+   "s": 0.5,
+   "j0": 1.0,
+   "ratio": 0.5,
+   "energy": -25.0695971832702,
+   "degeneracy": 2,
+   "E": 0.2542854437154848
+  },
+  {
+   "kind": "edges",
+   "graph": "fractal_L2",
+   "edge": [
+    8,
+    11
+   ],
+   "edge_index": 17,
+   "s": 0.6,
+   "j0": 1.0,
+   "ratio": 0.6,
+   "energy": -25.022024243062496,
+   "degeneracy": 2,
+   "E": 0.24986163197696895
+  },
+  {
+   "kind": "edges",
+   "graph": "fractal_L2",
+   "edge": [
+    8,
+    11
+   ],
+   "edge_index": 17,
+   "s": 0.7,
+   "j0": 1.0,
+   "ratio": 0.7,
+   "energy": -24.982226238616136,
+   "degeneracy": 2,
+   "E": 0.24157993915086196
+  },
+  {
+   "kind": "edges",
+   "graph": "fractal_L2",
+   "edge": [
+    8,
+    11
+   ],
+   "edge_index": 17,
+   "s": 0.8,
+   "j0": 1.0,
+   "ratio": 0.8,
+   "energy": -24.952698700573777,
+   "degeneracy": 2,
+   "E": 0.22451099363211796
+  },
+  {
+   "kind": "edges",
+   "graph": "fractal_L2",
+   "edge": [
+    8,
+    11
+   ],
+   "edge_index": 17,
+   "s": 0.9,
+   "j0": 1.0,
+   "ratio": 0.9,
+   "energy": -24.940128308097584,
+   "degeneracy": 2,
+   "E": 0.18051215927364658
+  },
+  {
+   "kind": "edges",
+   "graph": "fractal_L2",
+   "edge": [
+    8,
+    11
+   ],
+   "edge_index": 17,
+   "s": 1.0,
+   "j0": 1.0,
+   "ratio": 1.0,
+   "energy": -24.967536579519162,
+   "degeneracy": 4,
+   "E": 0.11026913715112599
+  },
+  {
+   "kind": "edges",
+   "graph": "fractal_L2",
+   "edge": [
+    9,
+    10
+   ],
+   "edge_index": 18,
+   "s": 0.0,
+   "j0": 1.0,
+   "ratio": 0.0,
+   "energy": -25.396443095274915,
+   "degeneracy": 2,
+   "E": 0.2172864016277075
+  },
+  {
+   "kind": "edges",
+   "graph": "fractal_L2",
+   "edge": [
+    9,
+    10
+   ],
+   "edge_index": 18,
+   "s": 0.1,
+   "j0": 1.0,
+   "ratio": 0.1,
+   "energy": -25.32199975867312,
+   "degeneracy": 2,
+   "E": 0.21342592619780013
+  },
+  {
+   "kind": "edges",
+   "graph": "fractal_L2",
+   "edge": [
+    9,
+    10
+   ],
+   "edge_index": 18,
+   "s": 0.2,
+   "j0": 1.0,
+   "ratio": 0.2,
+   "energy": -25.250848925829196,
+   "degeneracy": 2,
+   "E": 0.20858324294919783
+  },
+  {
+   "kind": "edges",
+   "graph": "fractal_L2",
+   "edge": [
+    9,
+    10
+   ],
+   "edge_index": 18,
+   "s": 0.3,
+   "j0": 1.0,
+   "ratio": 0.3,
+   "energy": -25.18370829091166,
+   "degeneracy": 2,
+   "E": 0.20252200712901594
+  },
+  {
+   "kind": "edges",
+   "graph": "fractal_L2",
+   "edge": [
+    9,
+    10
+   ],
+   "edge_index": 18,
+   "s": 0.4,
+   "j0": 1.0,
+   "ratio": 0.4,
+   "energy": -25.12154732453761,
+   "degeneracy": 2,
+   "E": 0.1951364945016671
+  },
+  {
+   "kind": "edges",
+   "graph": "fractal_L2",
+   "edge": [
+    9,
+    10
+   ],
+   "edge_index": 18,
+   "s": 0.5,
+   "j0": 1.0,
+   "ratio": 0.5,
+   "energy": -25.065710432227554,
+   "degeneracy": 2,
+   "E": 0.18684426187615347
+  },
+  {
+   "kind": "edges",
+   "graph": "fractal_L2",
+   "edge": [
+    9,
+    10
+   ],
+   "edge_index": 18,
+   "s": 0.6,
+   "j0": 1.0,
+   "ratio": 0.6,
+   "energy": -25.01806851837054,
+   "degeneracy": 2,
+   "E": 0.1790948985793687
+  },
+  {
+   "kind": "edges",
+   "graph": "fractal_L2",
+   "edge": [
+    9,
+    10
+   ],
+   "edge_index": 18,
+   "s": 0.7,
+   "j0": 1.0,
+   "ratio": 0.7,
+   "energy": -24.98109576771551,
+   "degeneracy": 2,
+   "E": 0.17361088939662764
+  },
+  {
+   "kind": "edges",
+   "graph": "fractal_L2",
+   "edge": [
+    9,
+    10
+   ],
+   "edge_index": 18,
+   "s": 0.8,
+   "j0": 1.0,
+   "ratio": 0.8,
+   "energy": -24.95778070962541,
+   "degeneracy": 2,
+   "E": 0.16986392674220574
+  },
+  {
+   "kind": "edges",
+   "graph": "fractal_L2",
+   "edge": [
+    9,
+    10
+   ],
+   "edge_index": 18,
+   "s": 0.9,
+   "j0": 1.0,
+   "ratio": 0.9,
+   "energy": -24.95169310948862,
+   "degeneracy": 2,
+   "E": 0.1655238695019353
+  },
+  {
+   "kind": "edges",
+   "graph": "fractal_L2",
+   "edge": [
+    9,
+    10
+   ],
+   "edge_index": 18,
+   "s": 1.0,
+   "j0": 1.0,
+   "ratio": 1.0,
+   "energy": -24.967536579519162,
+   "degeneracy": 4,
+   "E": 0.11026913715112599
+  },
+  {
+   "kind": "edges",
+   "graph": "fractal_L2",
+   "edge": [
+    9,
+    12
+   ],
+   "edge_index": 19,
+   "s": 0.0,
+   "j0": 1.0,
+   "ratio": 0.0,
+   "energy": -25.385154480804342,
+   "degeneracy": 2,
+   "E": 0.24616168500347518
+  },
+  {
+   "kind": "edges",
+   "graph": "fractal_L2",
+   "edge": [
+    9,
+    12
+   ],
+   "edge_index": 19,
+   "s": 0.1,
+   "j0": 1.0,
+   "ratio": 0.1,
+   "energy": -25.31401400243867,
+   "degeneracy": 2,
+   "E": 0.25184799480543457
+  },
+  {
+   "kind": "edges",
+   "graph": "fractal_L2",
+   "edge": [
+    9,
+    12
+   ],
+   "edge_index": 19,
+   "s": 0.2,
+   "j0": 1.0,
+   "ratio": 0.2,
+   "energy": -25.246371646646914,
+   "degeneracy": 2,
+   "E": 0.25522952130087756
+  },
+  {
+   "kind": "edges",
+   "graph": "fractal_L2",
+   "edge": [
+    9,
+    12
+   ],
+   "edge_index": 19,
+   "s": 0.3,
+   "j0": 1.0,
+   "ratio": 0.3,
+   "energy": -25.182666569864587,
+   "degeneracy": 2,
+   "E": 0.2566749801564361
+  },
+  {
+   "kind": "edges",
+   "graph": "fractal_L2",
+   "edge": [
+    9,
+    12
+   ],
+   "edge_index": 19,
+   "s": 0.4,
+   "j0": 1.0,
+   "ratio": 0.4,
+   "energy": -25.123485639910577,
+   "degeneracy": 2,
+   "E": 0.2563844006434177
+  },
+  {
+   "kind": "edges",
+   "graph": "fractal_L2",
+   "edge": [
+    9,
+    12
+   ],
+   "edge_index": 19,
+   "s": 0.5,
+   "j0": 1.0,
+   "ratio": 0.5,
+   "energy": -25.069597183270137,
+   "degeneracy": 2,
+   "E": 0.25428544371550493
+  },
+  {
+   "kind": "edges",
+   "graph": "fractal_L2",
+   "edge": [
+    9,
+    12
+   ],
+   "edge_index": 19,
+   "s": 0.6,
+   "j0": 1.0,
+   "ratio": 0.6,
+   "energy": -25.022024243062525,
+   "degeneracy": 2,
+   "E": 0.24986163197696507
+  },
+  {
+   "kind": "edges",
+   "graph": "fractal_L2",
+   "edge": [
+    9,
+    12
+   ],
+   "edge_index": 19,
+   "s": 0.7,
+   "j0": 1.0,
+   "ratio": 0.7,
+   "energy": -24.982226238616278,
+   "degeneracy": 2,
+   "E": 0.24157993915087278
+  },
+  {
+   "kind": "edges",
+   "graph": "fractal_L2",
+   "edge": [
+    9,
+    12
+   ],
+   "edge_index": 19,
+   "s": 0.8,
+   "j0": 1.0,
+   "ratio": 0.8,
+   "energy": -24.952698700574008,
+   "degeneracy": 2,
+   "E": 0.22451099363211666
+  },
+  {
+   "kind": "edges",
+   "graph": "fractal_L2",
+   "edge": [
+    9,
+    12
+   ],
+   "edge_index": 19,
+   "s": 0.9,
+   "j0": 1.0,
+   "ratio": 0.9,
+   "energy": -24.940128308097655,
+   "degeneracy": 2,
+   "E": 0.18051215927373848
+  },
+  {
+   "kind": "edges",
+   "graph": "fractal_L2",
+   "edge": [
+    9,
+    12
+   ],
+   "edge_index": 19,
+   "s": 1.0,
+   "j0": 1.0,
+   "ratio": 1.0,
+   "energy": -24.967536579519162,
+   "degeneracy": 4,
+   "E": 0.11026913715112599
+  },
+  {
+   "kind": "edges",
+   "graph": "fractal_L2",
+   "edge": [
+    10,
+    11
+   ],
+   "edge_index": 20,
+   "s": 0.0,
+   "j0": 1.0,
+   "ratio": 0.0,
+   "energy": -25.39644309527483,
+   "degeneracy": 2,
+   "E": 0.2172864016277386
+  },
+  {
+   "kind": "edges",
+   "graph": "fractal_L2",
+   "edge": [
+    10,
+    11
+   ],
+   "edge_index": 20,
+   "s": 0.1,
+   "j0": 1.0,
+   "ratio": 0.1,
+   "energy": -25.321999758673098,
+   "degeneracy": 2,
+   "E": 0.21342592619780185
+  },
+  {
+   "kind": "edges",
+   "graph": "fractal_L2",
+   "edge": [
+    10,
+    11
+   ],
+   "edge_index": 20,
+   "s": 0.2,
+   "j0": 1.0,
+   "ratio": 0.2,
+   "energy": -25.250848925829317,
+   "degeneracy": 2,
+   "E": 0.20858324294922467
+  },
+  {
+   "kind": "edges",
+   "graph": "fractal_L2",
+   "edge": [
+    10,
+    11
+   ],
+   "edge_index": 20,
+   "s": 0.3,
+   "j0": 1.0,
+   "ratio": 0.3,
+   "energy": -25.183708290911508,
+   "degeneracy": 2,
+   "E": 0.20252200712903434
+  },
+  {
+   "kind": "edges",
+   "graph": "fractal_L2",
+   "edge": [
+    10,
+    11
+   ],
+   "edge_index": 20,
+   "s": 0.4,
+   "j0": 1.0,
+   "ratio": 0.4,
+   "energy": -25.121547324537705,
+   "degeneracy": 2,
+   "E": 0.19513649450161316
+  },
+  {
+   "kind": "edges",
+   "graph": "fractal_L2",
+   "edge": [
+    10,
+    11
+   ],
+   "edge_index": 20,
+   "s": 0.5,
+   "j0": 1.0,
+   "ratio": 0.5,
+   "energy": -25.065710432227398,
+   "degeneracy": 2,
+   "E": 0.1868442618762117
+  },
+  {
+   "kind": "edges",
+   "graph": "fractal_L2",
+   "edge": [
+    10,
+    11
+   ],
+   "edge_index": 20,
+   "s": 0.6,
+   "j0": 1.0,
+   "ratio": 0.6,
+   "energy": -25.018068518370505,
+   "degeneracy": 2,
+   "E": 0.17909489857934927
+  },
+  {
+   "kind": "edges",
+   "graph": "fractal_L2",
+   "edge": [
+    10,
+    11
+   ],
+   "edge_index": 20,
+   "s": 0.7,
+   "j0": 1.0,
+   "ratio": 0.7,
+   "energy": -24.98109576771574,
+   "degeneracy": 2,
+   "E": 0.173610889396633
+  },
+  {
+   "kind": "edges",
+   "graph": "fractal_L2",
+   "edge": [
+    10,
+    11
+   ],
+   "edge_index": 20,
+   "s": 0.8,
+   "j0": 1.0,
+   "ratio": 0.8,
+   "energy": -24.957780709625336,
+   "degeneracy": 2,
+   "E": 0.16986392674221154
+  },
+  {
+   "kind": "edges",
+   "graph": "fractal_L2",
+   "edge": [
+    10,
+    11
+   ],
+   "edge_index": 20,
+   "s": 0.9,
+   "j0": 1.0,
+   "ratio": 0.9,
+   "energy": -24.95169310948854,
+   "degeneracy": 2,
+   "E": 0.16552386950193423
+  },
+  {
+   "kind": "edges",
+   "graph": "fractal_L2",
+   "edge": [
+    10,
+    11
+   ],
+   "edge_index": 20,
+   "s": 1.0,
+   "j0": 1.0,
+   "ratio": 1.0,
+   "energy": -24.967536579519162,
+   "degeneracy": 4,
+   "E": 0.11026913715112599
+  },
+  {
+   "kind": "edges",
+   "graph": "fractal_L2",
+   "edge": [
+    10,
+    12
+   ],
+   "edge_index": 21,
+   "s": 0.0,
+   "j0": 1.0,
+   "ratio": 0.0,
+   "energy": -25.547748804426615,
+   "degeneracy": 2,
+   "E": 0.2719874198671288
+  },
+  {
+   "kind": "edges",
+   "graph": "fractal_L2",
+   "edge": [
+    10,
+    12
+   ],
+   "edge_index": 21,
+   "s": 0.1,
+   "j0": 1.0,
+   "ratio": 0.1,
+   "energy": -25.460394484066136,
+   "degeneracy": 2,
+   "E": 0.27293380651931265
+  },
+  {
+   "kind": "edges",
+   "graph": "fractal_L2",
+   "edge": [
+    10,
+    12
+   ],
+   "edge_index": 21,
+   "s": 0.2,
+   "j0": 1.0,
+   "ratio": 0.2,
+   "energy": -25.37445698916524,
+   "degeneracy": 2,
+   "E": 0.27390965098120873
+  },
+  {
+   "kind": "edges",
+   "graph": "fractal_L2",
+   "edge": [
+    10,
+    12
+   ],
+   "edge_index": 21,
+   "s": 0.3,
+   "j0": 1.0,
+   "ratio": 0.3,
+   "energy": -25.290184018197255,
+   "degeneracy": 2,
+   "E": 0.27490794044918493
+  },
+  {
+   "kind": "edges",
+   "graph": "fractal_L2",
+   "edge": [
+    10,
+    12
+   ],
+   "edge_index": 21,
+   "s": 0.4,
+   "j0": 1.0,
+   "ratio": 0.4,
+   "energy": -25.207885865135317,
+   "degeneracy": 2,
+   "E": 0.27592148278502765
+  },
+  {
+   "kind": "edges",
+   "graph": "fractal_L2",
+   "edge": [
+    10,
+    12
+   ],
+   "edge_index": 21,
+   "s": 0.5,
+   "j0": 1.0,
+   "ratio": 0.5,
+   "energy": -25.127961005703998,
+   "degeneracy": 2,
+   "E": 0.2769515193956714
+  },
+  {
+   "kind": "edges",
+   "graph": "fractal_L2",
+   "edge": [
+    10,
+    12
+   ],
+   "edge_index": 21,
+   "s": 0.6,
+   "j0": 1.0,
+   "ratio": 0.6,
+   "energy": -25.050947790364862,
+   "degeneracy": 2,
+   "E": 0.2780464870734242
+  },
+  {
+   "kind": "edges",
+   "graph": "fractal_L2",
+   "edge": [
+    10,
+    12
+   ],
+   "edge_index": 21,
+   "s": 0.7,
+   "j0": 1.0,
+   "ratio": 0.7,
+   "energy": -24.977690823349473,
+   "degeneracy": 2,
+   "E": 0.27952584154251786
+  },
+  {
+   "kind": "edges",
+   "graph": "fractal_L2",
+   "edge": [
+    10,
+    12
+   ],
+   "edge_index": 21,
+   "s": 0.8,
+   "j0": 1.0,
+   "ratio": 0.8,
+   "energy": -24.910874531285756,
+   "degeneracy": 2,
+   "E": 0.2839948333518575
+  },
+  {
+   "kind": "edges",
+   "graph": "fractal_L2",
+   "edge": [
+    10,
+    12
+   ],
+   "edge_index": 21,
+   "s": 0.9,
+   "j0": 1.0,
+   "ratio": 0.9,
+   "energy": -24.904923378639975,
+   "degeneracy": 2,
+   "E": 0.16760968964107048
+  },
+  {
+   "kind": "edges",
+   "graph": "fractal_L2",
+   "edge": [
+    10,
+    12
+   ],
+   "edge_index": 21,
+   "s": 1.0,
+   "j0": 1.0,
+   "ratio": 1.0,
+   "energy": -24.967536579519162,
+   "degeneracy": 4,
+   "E": 0.11026913715112599
+  },
+  {
+   "kind": "edges",
+   "graph": "fractal_L2",
+   "edge": [
+    10,
+    13
+   ],
+   "edge_index": 22,
+   "s": 0.0,
+   "j0": 1.0,
+   "ratio": 0.0,
+   "energy": -25.54774880442671,
+   "degeneracy": 2,
+   "E": 0.27198741986713126
+  },
+  {
+   "kind": "edges",
+   "graph": "fractal_L2",
+   "edge": [
+    10,
+    13
+   ],
+   "edge_index": 22,
+   "s": 0.1,
+   "j0": 1.0,
+   "ratio": 0.1,
+   "energy": -25.460394484066253,
+   "degeneracy": 2,
+   "E": 0.2729338065193127
+  },
+  {
+   "kind": "edges",
+   "graph": "fractal_L2",
+   "edge": [
+    10,
+    13
+   ],
+   "edge_index": 22,
+   "s": 0.2,
+   "j0": 1.0,
+   "ratio": 0.2,
+   "energy": -25.374456989165246,
+   "degeneracy": 2,
+   "E": 0.27390965098120823
+  },
+  {
+   "kind": "edges",
+   "graph": "fractal_L2",
+   "edge": [
+    10,
+    13
+   ],
+   "edge_index": 22,
+   "s": 0.3,
+   "j0": 1.0,
+   "ratio": 0.3,
+   "energy": -25.290184018197085,
+   "degeneracy": 2,
+   "E": 0.2749079404491837
+  },
+  {
+   "kind": "edges",
+   "graph": "fractal_L2",
+   "edge": [
+    10,
+    13
+   ],
+   "edge_index": 22,
+   "s": 0.4,
+   "j0": 1.0,
+   "ratio": 0.4,
+   "energy": -25.20788586513524,
+   "degeneracy": 2,
+   "E": 0.2759214827850264
+  },
+  {
+   "kind": "edges",
+   "graph": "fractal_L2",
+   "edge": [
+    10,
+    13
+   ],
+   "edge_index": 22,
+   "s": 0.5,
+   "j0": 1.0,
+   "ratio": 0.5,
+   "energy": -25.12796100570384,
+   "degeneracy": 2,
+   "E": 0.27695151939567003
+  },
+  {
+   "kind": "edges",
+   "graph": "fractal_L2",
+   "edge": [
+    10,
+    13
+   ],
+   "edge_index": 22,
+   "s": 0.6,
+   "j0": 1.0,
+   "ratio": 0.6,
+   "energy": -25.050947790364965,
+   "degeneracy": 2,
+   "E": 0.27804648707342655
+  },
+  {
+   "kind": "edges",
+   "graph": "fractal_L2",
+   "edge": [
+    10,
+    13
+   ],
+   "edge_index": 22,
+   "s": 0.7,
+   "j0": 1.0,
+   "ratio": 0.7,
+   "energy": -24.97769082334953,
+   "degeneracy": 2,
+   "E": 0.27952584154251975
+  },
+  {
+   "kind": "edges",
+   "graph": "fractal_L2",
+   "edge": [
+    10,
+    13
+   ],
+   "edge_index": 22,
+   "s": 0.8,
+   "j0": 1.0,
+   "ratio": 0.8,
+   "energy": -24.91087453128564,
+   "degeneracy": 2,
+   "E": 0.28399483335185316
+  },
+  {
+   "kind": "edges",
+   "graph": "fractal_L2",
+   "edge": [
+    10,
+    13
+   ],
+   "edge_index": 22,
+   "s": 0.9,
+   "j0": 1.0,
+   "ratio": 0.9,
+   "energy": -24.904923378640103,
+   "degeneracy": 2,
+   "E": 0.16760968964105058
+  },
+  {
+   "kind": "edges",
+   "graph": "fractal_L2",
+   "edge": [
+    10,
+    13
+   ],
+   "edge_index": 22,
+   "s": 1.0,
+   "j0": 1.0,
+   "ratio": 1.0,
+   "energy": -24.967536579519162,
+   "degeneracy": 4,
+   "E": 0.11026913715112599
+  },
+  {
+   "kind": "edges",
+   "graph": "fractal_L2",
+   "edge": [
+    11,
+    13
+   ],
+   "edge_index": 23,
+   "s": 0.0,
+   "j0": 1.0,
+   "ratio": 0.0,
+   "energy": -25.385154480804406,
+   "degeneracy": 2,
+   "E": 0.24616168500344965
+  },
+  {
+   "kind": "edges",
+   "graph": "fractal_L2",
+   "edge": [
+    11,
+    13
+   ],
+   "edge_index": 23,
+   "s": 0.1,
+   "j0": 1.0,
+   "ratio": 0.1,
+   "energy": -25.314014002438714,
+   "degeneracy": 2,
+   "E": 0.25184799480546544
+  },
+  {
+   "kind": "edges",
+   "graph": "fractal_L2",
+   "edge": [
+    11,
+    13
+   ],
+   "edge_index": 23,
+   "s": 0.2,
+   "j0": 1.0,
+   "ratio": 0.2,
+   "energy": -25.24637164664688,
+   "degeneracy": 2,
+   "E": 0.2552295213008915
+  },
+  {
+   "kind": "edges",
+   "graph": "fractal_L2",
+   "edge": [
+    11,
+    13
+   ],
+   "edge_index": 23,
+   "s": 0.3,
+   "j0": 1.0,
+   "ratio": 0.3,
+   "energy": -25.18266656986459,
+   "degeneracy": 2,
+   "E": 0.2566749801564375
+  },
+  {
+   "kind": "edges",
+   "graph": "fractal_L2",
+   "edge": [
+    11,
+    13
+   ],
+   "edge_index": 23,
+   "s": 0.4,
+   "j0": 1.0,
+   "ratio": 0.4,
+   "energy": -25.123485639910605,
+   "degeneracy": 2,
+   "E": 0.25638440064342155
+  },
+  {
+   "kind": "edges",
+   "graph": "fractal_L2",
+   "edge": [
+    11,
+    13
+   ],
+   "edge_index": 23,
+   "s": 0.5,
+   "j0": 1.0,
+   "ratio": 0.5,
+   "energy": -25.069597183270208,
+   "degeneracy": 2,
+   "E": 0.2542854437155048
+  },
+  {
+   "kind": "edges",
+   "graph": "fractal_L2",
+   "edge": [
+    11,
+    13
+   ],
+   "edge_index": 23,
+   "s": 0.6,
+   "j0": 1.0,
+   "ratio": 0.6,
+   "energy": -25.02202424306237,
+   "degeneracy": 2,
+   "E": 0.24986163197696284
+  },
+  {
+   "kind": "edges",
+   "graph": "fractal_L2",
+   "edge": [
+    11,
+    13
+   ],
+   "edge_index": 23,
+   "s": 0.7,
+   "j0": 1.0,
+   "ratio": 0.7,
+   "energy": -24.98222623861612,
+   "degeneracy": 2,
+   "E": 0.24157993915086576
+  },
+  {
+   "kind": "edges",
+   "graph": "fractal_L2",
+   "edge": [
+    11,
+    13
+   ],
+   "edge_index": 23,
+   "s": 0.8,
+   "j0": 1.0,
+   "ratio": 0.8,
+   "energy": -24.95269870057367,
+   "degeneracy": 2,
+   "E": 0.22451099363209434
+  },
+  {
+   "kind": "edges",
+   "graph": "fractal_L2",
+   "edge": [
+    11,
+    13
+   ],
+   "edge_index": 23,
+   "s": 0.9,
+   "j0": 1.0,
+   "ratio": 0.9,
+   "energy": -24.94012830809754,
+   "degeneracy": 2,
+   "E": 0.18051215927345524
+  },
+  {
+   "kind": "edges",
+   "graph": "fractal_L2",
+   "edge": [
+    11,
+    13
+   ],
+   "edge_index": 23,
+   "s": 1.0,
+   "j0": 1.0,
+   "ratio": 1.0,
+   "energy": -24.967536579519162,
+   "degeneracy": 4,
+   "E": 0.11026913715112599
+  },
+  {
+   "kind": "edges",
+   "graph": "fractal_L2",
+   "edge": [
+    12,
+    13
+   ],
+   "edge_index": 24,
+   "s": 0.0,
+   "j0": 1.0,
+   "ratio": 0.0,
+   "energy": -25.74435075258783,
+   "degeneracy": 2,
+   "E": 0.19347616301245074
+  },
+  {
+   "kind": "edges",
+   "graph": "fractal_L2",
+   "edge": [
+    12,
+    13
+   ],
+   "edge_index": 24,
+   "s": 0.1,
+   "j0": 1.0,
+   "ratio": 0.1,
+   "energy": -25.653916319738705,
+   "degeneracy": 2,
+   "E": 0.19240928381934744
+  },
+  {
+   "kind": "edges",
+   "graph": "fractal_L2",
+   "edge": [
+    12,
+    13
+   ],
+   "edge_index": 24,
+   "s": 0.2,
+   "j0": 1.0,
+   "ratio": 0.2,
+   "energy": -25.56476994767112,
+   "degeneracy": 2,
+   "E": 0.19118416812513223
+  },
+  {
+   "kind": "edges",
+   "graph": "fractal_L2",
+   "edge": [
+    12,
+    13
+   ],
+   "edge_index": 24,
+   "s": 0.3,
+   "j0": 1.0,
+   "ratio": 0.3,
+   "energy": -25.477198725472167,
+   "degeneracy": 2,
+   "E": 0.18975707644346712
+  },
+  {
+   "kind": "edges",
+   "graph": "fractal_L2",
+   "edge": [
+    12,
+    13
+   ],
+   "edge_index": 24,
+   "s": 0.4,
+   "j0": 1.0,
+   "ratio": 0.4,
+   "energy": -25.39158243695128,
+   "degeneracy": 2,
+   "E": 0.18806305113840666
+  },
+  {
+   "kind": "edges",
+   "graph": "fractal_L2",
+   "edge": [
+    12,
+    13
+   ],
+   "edge_index": 24,
+   "s": 0.5,
+   "j0": 1.0,
+   "ratio": 0.5,
+   "energy": -25.308433071128256,
+   "degeneracy": 2,
+   "E": 0.1860011330112344
+  },
+  {
+   "kind": "edges",
+   "graph": "fractal_L2",
+   "edge": [
+    12,
+    13
+   ],
+   "edge_index": 24,
+   "s": 0.6,
+   "j0": 1.0,
+   "ratio": 0.6,
+   "energy": -25.22845450396831,
+   "degeneracy": 2,
+   "E": 0.18340820650941425
+  },
+  {
+   "kind": "edges",
+   "graph": "fractal_L2",
+   "edge": [
+    12,
+    13
+   ],
+   "edge_index": 24,
+   "s": 0.7,
+   "j0": 1.0,
+   "ratio": 0.7,
+   "energy": -25.15263300814316,
+   "degeneracy": 2,
+   "E": 0.18001521288890907
+  },
+  {
+   "kind": "edges",
+   "graph": "fractal_L2",
+   "edge": [
+    12,
+    13
+   ],
+   "edge_index": 24,
+   "s": 0.8,
+   "j0": 1.0,
+   "ratio": 0.8,
+   "energy": -25.082373334626798,
+   "degeneracy": 2,
+   "E": 0.1753845223116672
+  },
+  {
+   "kind": "edges",
+   "graph": "fractal_L2",
+   "edge": [
+    12,
+    13
+   ],
+   "edge_index": 24,
+   "s": 0.9,
+   "j0": 1.0,
+   "ratio": 0.9,
+   "energy": -25.019698544122814,
+   "degeneracy": 2,
+   "E": 0.16885810164229098
+  },
+  {
+   "kind": "edges",
+   "graph": "fractal_L2",
+   "edge": [
+    12,
+    13
+   ],
+   "edge_index": 24,
+   "s": 1.0,
+   "j0": 1.0,
+   "ratio": 1.0,
+   "energy": -24.967536579519162,
+   "degeneracy": 4,
+   "E": 0.11026913715112599
+  },
+  {
+   "kind": "edges",
+   "graph": "fractal_L2",
+   "edge": [
+    12,
+    14
+   ],
+   "edge_index": 25,
+   "s": 0.0,
+   "j0": 1.0,
+   "ratio": 0.0,
+   "energy": -25.554721270767953,
+   "degeneracy": 2,
+   "E": 0.24673114075776686
+  },
+  {
+   "kind": "edges",
+   "graph": "fractal_L2",
+   "edge": [
+    12,
+    14
+   ],
+   "edge_index": 25,
+   "s": 0.1,
+   "j0": 1.0,
+   "ratio": 0.1,
+   "energy": -25.471933210849556,
+   "degeneracy": 2,
+   "E": 0.24724777920978838
+  },
+  {
+   "kind": "edges",
+   "graph": "fractal_L2",
+   "edge": [
+    12,
+    14
+   ],
+   "edge_index": 25,
+   "s": 0.2,
+   "j0": 1.0,
+   "ratio": 0.2,
+   "energy": -25.391403272791546,
+   "degeneracy": 2,
+   "E": 0.24774449956653774
+  },
+  {
+   "kind": "edges",
+   "graph": "fractal_L2",
+   "edge": [
+    12,
+    14
+   ],
+   "edge_index": 25,
+   "s": 0.3,
+   "j0": 1.0,
+   "ratio": 0.3,
+   "energy": -25.313581373178465,
+   "degeneracy": 2,
+   "E": 0.2481766390478603
+  },
+  {
+   "kind": "edges",
+   "graph": "fractal_L2",
+   "edge": [
+    12,
+    14
+   ],
+   "edge_index": 25,
+   "s": 0.4,
+   "j0": 1.0,
+   "ratio": 0.4,
+   "energy": -25.23904142900117,
+   "degeneracy": 2,
+   "E": 0.24846048259117393
+  },
+  {
+   "kind": "edges",
+   "graph": "fractal_L2",
+   "edge": [
+    12,
+    14
+   ],
+   "edge_index": 25,
+   "s": 0.5,
+   "j0": 1.0,
+   "ratio": 0.5,
+   "energy": -25.16853044720655,
+   "degeneracy": 2,
+   "E": 0.24843283995380283
+  },
+  {
+   "kind": "edges",
+   "graph": "fractal_L2",
+   "edge": [
+    12,
+    14
+   ],
+   "edge_index": 25,
+   "s": 0.6,
+   "j0": 1.0,
+   "ratio": 0.6,
+   "energy": -25.10305253001014,
+   "degeneracy": 2,
+   "E": 0.24775226278568924
+  },
+  {
+   "kind": "edges",
+   "graph": "fractal_L2",
+   "edge": [
+    12,
+    14
+   ],
+   "edge_index": 25,
+   "s": 0.7,
+   "j0": 1.0,
+   "ratio": 0.7,
+   "energy": -25.044042940008445,
+   "degeneracy": 2,
+   "E": 0.2456149931503583
+  },
+  {
+   "kind": "edges",
+   "graph": "fractal_L2",
+   "edge": [
+    12,
+    14
+   ],
+   "edge_index": 25,
+   "s": 0.8,
+   "j0": 1.0,
+   "ratio": 0.8,
+   "energy": -24.99386317498177,
+   "degeneracy": 2,
+   "E": 0.23971677494196345
+  },
+  {
+   "kind": "edges",
+   "graph": "fractal_L2",
+   "edge": [
+    12,
+    14
+   ],
+   "edge_index": 25,
+   "s": 0.9,
+   "j0": 1.0,
+   "ratio": 0.9,
+   "energy": -24.95810464616258,
+   "degeneracy": 2,
+   "E": 0.2208383999218182
+  },
+  {
+   "kind": "edges",
+   "graph": "fractal_L2",
+   "edge": [
+    12,
+    14
+   ],
+   "edge_index": 25,
+   "s": 1.0,
+   "j0": 1.0,
+   "ratio": 1.0,
+   "energy": -24.967536579519162,
+   "degeneracy": 4,
+   "E": 0.11026913715112599
+  },
+  {
+   "kind": "edges",
+   "graph": "fractal_L2",
+   "edge": [
+    13,
+    14
+   ],
+   "edge_index": 26,
+   "s": 0.0,
+   "j0": 1.0,
+   "ratio": 0.0,
+   "energy": -25.55472127076793,
+   "degeneracy": 2,
+   "E": 0.24673114075776498
+  },
+  {
+   "kind": "edges",
+   "graph": "fractal_L2",
+   "edge": [
+    13,
+    14
+   ],
+   "edge_index": 26,
+   "s": 0.1,
+   "j0": 1.0,
+   "ratio": 0.1,
+   "energy": -25.471933210849304,
+   "degeneracy": 2,
+   "E": 0.2472477792097874
+  },
+  {
+   "kind": "edges",
+   "graph": "fractal_L2",
+   "edge": [
+    13,
+    14
+   ],
+   "edge_index": 26,
+   "s": 0.2,
+   "j0": 1.0,
+   "ratio": 0.2,
+   "energy": -25.39140327279147,
+   "degeneracy": 2,
+   "E": 0.24774449956653558
+  },
+  {
+   "kind": "edges",
+   "graph": "fractal_L2",
+   "edge": [
+    13,
+    14
+   ],
+   "edge_index": 26,
+   "s": 0.3,
+   "j0": 1.0,
+   "ratio": 0.3,
+   "energy": -25.313581373178376,
+   "degeneracy": 2,
+   "E": 0.2481766390478586
+  },
+  {
+   "kind": "edges",
+   "graph": "fractal_L2",
+   "edge": [
+    13,
+    14
+   ],
+   "edge_index": 26,
+   "s": 0.4,
+   "j0": 1.0,
+   "ratio": 0.4,
+   "energy": -25.23904142900098,
+   "degeneracy": 2,
+   "E": 0.248460482591174
+  },
+  {
+   "kind": "edges",
+   "graph": "fractal_L2",
+   "edge": [
+    13,
+    14
+   ],
+   "edge_index": 26,
+   "s": 0.5,
+   "j0": 1.0,
+   "ratio": 0.5,
+   "energy": -25.168530447206518,
+   "degeneracy": 2,
+   "E": 0.24843283995380414
+  },
+  {
+   "kind": "edges",
+   "graph": "fractal_L2",
+   "edge": [
+    13,
+    14
+   ],
+   "edge_index": 26,
+   "s": 0.6,
+   "j0": 1.0,
+   "ratio": 0.6,
+   "energy": -25.10305253001027,
+   "degeneracy": 2,
+   "E": 0.24775226278568832
+  },
+  {
+   "kind": "edges",
+   "graph": "fractal_L2",
+   "edge": [
+    13,
+    14
+   ],
+   "edge_index": 26,
+   "s": 0.7,
+   "j0": 1.0,
+   "ratio": 0.7,
+   "energy": -25.04404294000848,
+   "degeneracy": 2,
+   "E": 0.24561499315036087
+  },
+  {
+   "kind": "edges",
+   "graph": "fractal_L2",
+   "edge": [
+    13,
+    14
+   ],
+   "edge_index": 26,
+   "s": 0.8,
+   "j0": 1.0,
+   "ratio": 0.8,
+   "energy": -24.99386317498156,
+   "degeneracy": 2,
+   "E": 0.23971677494195723
+  },
+  {
+   "kind": "edges",
+   "graph": "fractal_L2",
+   "edge": [
+    13,
+    14
+   ],
+   "edge_index": 26,
+   "s": 0.9,
+   "j0": 1.0,
+   "ratio": 0.9,
+   "energy": -24.95810464616242,
+   "degeneracy": 2,
+   "E": 0.22083839992181667
+  },
+  {
+   "kind": "edges",
+   "graph": "fractal_L2",
+   "edge": [
+    13,
+    14
+   ],
+   "edge_index": 26,
+   "s": 1.0,
+   "j0": 1.0,
+   "ratio": 1.0,
+   "energy": -24.967536579519162,
+   "degeneracy": 4,
+   "E": 0.11026913715112599
+  }
+ ]
+}

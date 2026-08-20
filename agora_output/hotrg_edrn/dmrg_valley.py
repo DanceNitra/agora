@@ -1,11 +1,32 @@
-"""DMRG (TeNPy, MPS/MPO) valley on the Sierpinski Heisenberg contradiction model.
-VALIDATE at L2 vs ED (valley bottom min_std 0.0628 at s=0.50 must reproduce), report bond dimension,
-then extend to L3 (42 sites, out of ED reach). Model = XX+ZZ in PAULI: H=sum_edge w*(SigX_i SigX_j +
-SigZ_i SigZ_j). Observable = std over base edges of <SigZ_i SigZ_j>.
-DMRG returns ONE ground vector; ED showed single==manifold AT the valley bottom (sigma^z sigma^z is
-Z2-invariant there), so DMRG is valid THROUGH the valley. High-degeneracy endpoints are flagged.
-Ordering: reverse Cuthill-McKee to make graph edges MPS-local (bounds bond dimension via finite
-ramification of the gasket).
+"""DMRG (TeNPy, MPS/MPO) valley on the Sierpinski contradiction model.
+
+CORRECTED 2026-08-18, twice, and both corrections change what earlier runs of this file MEANT.
+
+1. THE DEFECT EDGE WAS NOT AN EDGE. This scanned `(0,2)`, and in this file's own labelling 0 and 2
+   are two of the three TIPS, which sit at graph distance 4 -- no tip-tip pair is an edge of the
+   gasket at any level. `edge_w = base + [(0,2,s)]` therefore APPENDED a 28th bond rather than
+   varying one of the 27, while the observable ran over `base` only. Every earlier curve from this
+   file is for gasket-plus-an-extra-bond, and its minimum sits near s=0.60 because s=1 is not a
+   special point for an added bond. The default is now the real tip-to-interior edge (0,6), and
+   `assert_real_edge` refuses anything that is not in the graph.
+
+2. THE DEGENERACY ARGUMENT WAS WRONG. This used to say ED showed "single == manifold at the valley
+   bottom, so DMRG is valid THROUGH the valley". That was measured by sampling REAL vectors inside
+   the ground space, and a real-arithmetic eigensolver returns real vectors, so the test could not
+   fail. Complex states are physical and they span a range: at the uniform point of the L2 gasket a
+   single ground state gives anywhere in [0.110269, 0.159658], and on a 15-ring the complex
+   translation eigenstates give exactly 0 where real sampling reports 0.130979. DMRG returns ONE
+   vector, so wherever the ground space is not one-dimensional this file reports an arbitrary member
+   of it. It now prints the ground-space dimension so that is visible rather than assumed.
+
+MODEL, and it is NOT the manuscript's. H = sum_edge w*(SigX_i SigX_j + SigZ_i SigZ_j) in PAULI --
+XX+ZZ, which is the XY model in a rotated frame. The manuscript studies the isotropic
+sx sx + sy sy + sz sz. Measured on the same graph and edge, the two agree to 0.7% on the global
+valley depth (0.144542 vs 0.143538) but differ by 5% locally (0.276416 vs 0.263346), so a
+cross-check between them is not a same-model check and cannot agree "to the digit".
+
+Observable = std over base edges of <SigZ_i SigZ_j>. Ordering: reverse Cuthill-McKee to make graph
+edges MPS-local (bounds bond dimension via finite ramification of the gasket).
 """
 import os, logging, sys, time
 os.environ["OMP_NUM_THREADS"]="12"
@@ -65,18 +86,35 @@ def ground_state(model, lat, N, chi, psi0=None):
     terr=float(np.max(eng.trunc_err_list)) if getattr(eng,'trunc_err_list',None) else float('nan')
     return E,psi,terr
 
-def valley_curve(level, chi=200, strengths=None):
+def assert_real_edge(G, pair):
+    """A scan of a pair that is not an edge is a no-op, and a no-op returns a flat curve that reads
+    as a clean null result. On this graph the three tips are pairwise at distance 4, so (0,1), (0,2)
+    and (1,2) are all non-edges -- and both the old defect edge here and the control edge reported
+    as `range 0.000000` in the manuscript were among them."""
+    u, v = tuple(sorted(pair))
+    if not G.has_edge(u, v):
+        import networkx as _nx
+        raise ValueError(
+            "(%s,%s) is NOT an edge of this graph. deg(%s)=%d neighbours %s ; deg(%s)=%d neighbours %s ; "
+            "graph distance %d. Scanning it would append a new bond, not vary an existing one."
+            % (u, v, u, G.degree(u), sorted(G[u]), v, G.degree(v), sorted(G[v]),
+               _nx.shortest_path_length(G, u, v)))
+    return (u, v)
+
+
+def valley_curve(level, chi=200, strengths=None, defect=(0, 6)):
     # Skip the pathological s=0 (bare gasket, high degeneracy: single-vector arbitrary + max bond dim).
     # Scan s in [0.25, 3.0]; define depth vs the RIGHT SHOULDER (large s, deg=2, single==manifold, clean).
     if strengths is None: strengths=STR[1:]
     G=sierpinski_graph(level); N=G.number_of_nodes(); base=list(G.edges())
+    assert_real_edge(G, defect)
     pos=rcm_order(G)
     # scan LARGE s -> small s: large s is near-product (low entanglement, fast); warm-start each next
     order=list(range(len(strengths)))[::-1]
     res={}; psi_prev=None
     for k in order:
         s=float(strengths[k])
-        edge_w=[(i,j,1.0) for (i,j) in base]+[(0,2,s)]
+        edge_w=[(i,j,s if tuple(sorted((i,j)))==tuple(sorted(defect)) else 1.0) for (i,j) in base]
         model,lat=build_model(N, edge_w, pos)
         E,psi,terr=ground_state(model,lat,N,chi,psi0=psi_prev)
         psi_prev=psi.copy()
