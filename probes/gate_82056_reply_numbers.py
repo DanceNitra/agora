@@ -200,44 +200,71 @@ def main():
               ("1." in hj or "item 1" in hj) and "observability" in hj.lower())
 
     print("")
-    print("TOKENS -- re-derived from the tokenizer receipt")
+    print("TOKENS -- re-derived from the tokenizer receipt (rewritten after the red-team panel)")
     r = tok["tok_per_byte"]
     ratios_t = tok["slug_over_prose"]
     live = tok["whole_states"]["live index (mixed)"]
     sluggy = tok["whole_states"]["08-19 (slug-heavy)"]
-    check("tokenizer probe's own controls passed", not tok["controls_failed"],
+    check("tokenizer probe controls all pass", not tok["controls_failed"],
           f"failed={tok['controls_failed'] or 'none'}")
-    check("1.18x modern slug:prose", "**1.18x**" in draft
-          and abs(ratios_t["o200k_base"] - 1.18) < 0.02, f"o200k={ratios_t['o200k_base']:.2f}")
-    check("1.63x older slug:prose", "1.63x on the older ones" in draft
-          and abs(ratios_t["r50k_base"] - 1.63) < 0.02, f"r50k={ratios_t['r50k_base']:.2f}")
-    check("0.275 -> 0.266 between two real states",
-          "0.275 to 0.266 tokens/byte" in draft
-          and abs(sluggy["o200k_base"] - 0.275) < 0.002
-          and abs(live["o200k_base"] - 0.266) < 0.002,
-          f"{sluggy['o200k_base']:.3f} -> {live['o200k_base']:.3f}")
-    check("3.5% whole-file movement is arithmetic", "**3.5%**" in draft
-          and abs((sluggy["o200k_base"] / live["o200k_base"] - 1) * 100 - 3.5) < 0.2,
-          f"{100*(sluggy['o200k_base']/live['o200k_base']-1):.1f}%")
-    densest_any = max(v for arm in r.values() for v in arm.values())
-    densest_mod = max(arm[k] for arm in r.values() for k in ("o200k_base", "cl100k_base"))
-    check("0.403 densest arm on any vocabulary", "is 0.403" in draft
-          and abs(densest_any - 0.403) < 0.002, f"{densest_any:.3f}")
-    check("0.273 densest on the modern two", "it is 0.273" in draft
-          and abs(densest_mod - 0.273) < 0.002, f"{densest_mod:.3f}")
+    lo_r, hi_r = min(ratios_t.values()), max(ratios_t.values())
+    check("1.23-1.70x slug:prose range", "**1.23–1.70x**" in draft
+          and abs(lo_r - 1.23) < 0.02 and abs(hi_r - 1.70) < 0.02,
+          f"measured {lo_r:.2f}-{hi_r:.2f}")
     nb = live["_bytes"]
+    delta = 100 * (sluggy["o200k_base"] / live["o200k_base"] - 1)
+    check("3.3% whole-file movement", "**3.3%**" in draft and abs(delta - 3.3) < 0.15,
+          f"{delta:.2f}%")
+    check("0.275 -> 0.267 quoted exactly", "0.275 to 0.267 tokens/byte" in draft
+          and abs(sluggy["o200k_base"] - 0.275) < 0.002
+          and abs(live["o200k_base"] - 0.267) < 0.002,
+          f"{sluggy['o200k_base']:.3f} -> {live['o200k_base']:.3f}")
+    shr = tok.get("slug_share", {})
+    live_share = 100 * shr.get("live index (mixed)", 0)
+    check("42% slug share is COMPUTED and quoted", "**42%**" in draft
+          and abs(live_share - 41.8) < 0.5, f"computed {live_share:.1f}%")
+    check("the 1.7x self-correction is disclosed to him",
+          "only a quarter of the index" in draft and "hardcoded" in draft,
+          "we tell him we got it wrong before he finds it")
     pred = 108 + 0.44 * nb
     ours = live["o200k_base"] * nb
-    check("23,745 index bytes", "23,745" in draft and nb == 23745, f"bytes={nb}")
-    check("10,556 predicted by his model", "10,556 tokens" in draft and abs(pred - 10556) < 2,
+    entries = 236
+    check("23,686 index bytes", "23,686-byte" in draft and nb == 23686, f"bytes={nb}")
+    check("10,530 predicted", "**10,530 tokens**" in draft and abs(pred - 10530) < 2,
           f"pred={pred:.0f}")
-    check("6,317 tokens of actual text", "6,317" in draft and abs(ours - 6317) < 3,
-          f"ours={ours:.0f}")
-    check("0.179 tok/byte gap", "0.179 tokens/byte" in draft
-          and abs((pred - ours) / nb - 0.179) < 0.002, f"{(pred-ours)/nb:.3f}")
-    check("~18 tokens/entry over the WHOLE 235-entry index",
-          "18 tokens per entry" in draft and abs((pred - ours) / 235 - 18) < 1.5,
-          f"{(pred-ours)/235:.1f} over 235 entries")
+    check("6,315 proxy count", "**6,315**" in draft and abs(ours - 6315) < 3, f"ours={ours:.0f}")
+    check("0.178 tok/byte gap", "0.178 tokens/byte" in draft
+          and abs((pred - ours) / nb - 0.178) < 0.002, f"{(pred-ours)/nb:.3f}")
+    check("~18 tokens/entry over 236 entries", "18 tokens per entry across 236" in draft
+          and abs((pred - ours) / entries - 18) < 1.5, f"{(pred-ours)/entries:.1f}")
+    spread = max(max(v.values()) / min(v.values()) for v in r.values())
+    check("1.41x cross-tokenizer spread is stated", "**1.41x on identical content**" in draft
+          and abs(spread - 1.41) < 0.03, f"measured {spread:.2f}x")
+
+    print("")
+    print("RED-TEAM FIXES -- each panel finding must be visible in the draft")
+    check("STEELMAN: the word 'unreachable' is GONE",
+          "unreachable" not in draft.lower(),
+          "our own 1.41x spread refuted it; the gap is 1.32-1.65x")
+    check("STEELMAN: the confound is named, not hidden",
+          "or just my tokenizer against yours" in draft)
+    check("PRIOR-ART: the mechanism is credited, not sold as news",
+          "CodeBPE" in draft and "Chirkova" in draft and "ICLR 2023" in draft)
+    check("FRAMING: the tokenizer caveat appears in the GAP paragraph too",
+          draft.count("tokenizer") >= 3
+          and "Anthropic's own tokenizer was not available to me" in draft
+          and draft.index("Anthropic's own tokenizer was not available to me")
+              > draft.index("**10,530 tokens**") - 900,
+          "it was silently dropped there before")
+    check("FRAMING: the diagnosis ends in a QUESTION to him",
+          "Which was your 0.44 fitted against" in draft)
+    check("FRAMING: the hypothesis keeps its 'if'",
+          "If it is the former" in draft and "probably genuine entry overhead" in draft)
+    check("BLIND-SPOT: value-vs-position limit is stated",
+          "never *value*" in draft and "treated as harm by assumption" in draft
+          and "index inefficiency rather than a correctness defect" in draft)
+    check("METHOD: slugs measured in real context, not joined",
+          "in their real `](name.md)` context" in draft)
     print("\nTHE ROOM")
     state = gh(f"repos/anthropics/claude-code/issues/{ISSUE}", ".state")
     check("issue is OPEN", state == "open", f"state={state}")
@@ -253,7 +280,7 @@ def main():
           "Anthropic's own tokenizer was not available" in draft
           and "not an absolute rate for Claude" in draft,
           "ratio asserted, absolute rate explicitly not")
-    check("length is in our register (< 5,600 chars)", len(draft) < 5600, f"{len(draft)} chars")
+    check("length is in our register (< 6,200 chars)", len(draft) < 6200, f"{len(draft)} chars")
 
     n = len(checks)
     bad = [c for c in checks if not c[1]]

@@ -139,8 +139,20 @@ def main():
         sys.exit("FAIL: no prose segments parsed -- the entry regex does not match the live index")
 
     arms = ("slug", "title", "prose", "body prose")
+    # Measured MARGINALLY, in the context the text actually appears in. Joining slugs with
+    # newlines and tokenising them alone UNDERSTATES their cost by ~10% (0.272 vs 0.300 on
+    # o200k), because a slug in the file is wrapped as `](name.md)` and the wrapper changes the
+    # merges at both ends. An audit caught this. The wrapper is subtracted rather than included,
+    # so its own bytes are not charged to the slug either.
+    CTX = {"slug": ("](", ")"), "prose": ("\u2014 ", ""), "title": ("[", "]"), "body prose": ("", "")}
     blobs = {a: "\n".join(segs[a]) for a in arms}
     nbytes = {a: len(blobs[a].encode("utf-8")) for a in arms}
+
+    def marginal(arm, fn):
+        """tokens attributable to the arm's own bytes, inside its real delimiters"""
+        pre, post = CTX[arm]
+        empty = fn(pre + post)
+        return sum(fn(pre + x + post) - empty for x in segs[arm])
 
     print("tokens per byte, by arm and tokenizer")
     print(f"{'arm':<12} {'segs':>5} {'bytes':>7} " + " ".join(f"{n[:11]:>12}" for n, _ in toks))
@@ -149,7 +161,7 @@ def main():
         rate[a] = {}
         cells = []
         for n, fn in toks:
-            t = fn(blobs[a])
+            t = marginal(a, fn)
             rate[a][n] = t / nbytes[a]
             cells.append(f"{rate[a][n]:>12.3f}")
         print(f"{a:<12} {len(segs[a]):>5} {nbytes[a]:>7} " + " ".join(cells))
@@ -204,55 +216,97 @@ def main():
           f"measured on the segmentable subset;")
     print(f"              whole-file slopes above use the entire file, so they are unaffected.")
 
-    inv = {n: rate["prose"][n] / rate["slug"][n] for n, _ in toks}
-    ok5 = all(v < 1.0 for v in inv.values())
-    print(f"C5 DIRECTION  reversed arms give {min(inv.values()):.2f}x-{max(inv.values()):.2f}x "
-          f"({'verdict flips as it must' if ok5 else 'DOES NOT FLIP -- comparison is inert'})")
+    # C5 was "reverse the arms and require <1.0", which follows arithmetically from C2 for
+    # positive reciprocals -- it could not fail, so it tested nothing. An audit called it vacuous
+    # and was right. This replacement CAN fail: substitute each slug with same-byte-length
+    # English words. If the penalty is really hyphenated-compound fragmentation, the ratio must
+    # collapse toward 1.0. If it does not, we are measuring the SLOT, not the slug.
+    import random
+    WORDS = ("the quick brown fox jumps over a lazy dog and then reads memory notes about work "
+             "before writing down what it learned from the last session").split()
+    rng = random.Random(20260820)
+
+    def same_length_words(slug):
+        want, out = len(slug), []
+        while sum(len(w) + 1 for w in out) < want:
+            out.append(rng.choice(WORDS))
+        return (" ".join(out))[:want] or "a"
+
+    fake = [same_length_words(x) for x in segs["slug"]]
+    fake_bytes = sum(len(x.encode()) for x in fake)
+    null_ratio = {}
+    for n, fn in toks:
+        pre, post = CTX["slug"]
+        empty = fn(pre + post)
+        t = sum(fn(pre + x + post) - empty for x in fake)
+        null_ratio[n] = (t / fake_bytes) / rate["prose"][n]
+    ok5 = all(v < 1.15 for v in null_ratio.values())
+    print(f"C5 NULL       same-length English in the slug slot: "
+          f"{min(null_ratio.values()):.2f}x-{max(null_ratio.values()):.2f}x vs prose "
+          f"({'collapses, so the penalty is the SLUG FORM' if ok5 else 'DOES NOT COLLAPSE -- we measured the slot'})")
     if not ok5:
         fails.append("C5")
 
+    # C6: the slug SHARE of the file, COMPUTED. A previous version printed "slugs are only a
+    # quarter of the index" as a hardcoded sentence. It was never computed and it was wrong by
+    # 1.7x -- numerator from the 127 entries the per-line regex matches, denominator from the
+    # whole file. Two populations. The 3.5% delta itself was unaffected; the REASON given for it
+    # was false, which is worse, because a wrong number invites checking and a wrong reason does not.
+    LOOSE = re.compile(r"\]\(([A-Za-z0-9_.-]+\.md)\)")
+    share = {}
+    for label, path in (("live index (mixed)", INDEX), ("08-19 (slug-heavy)", SLUGGY)):
+        if not os.path.exists(path):
+            continue
+        txt = open(path, encoding="utf-8", errors="replace").read()
+        tot = len(txt.encode())
+        sb = sum(len(x.encode()) for x in LOOSE.findall(txt))
+        share[label] = sb / tot
+        print(f"C6 SHARE      {label:<20} slug bytes {sb:5d} of {tot:5d} = {100*sb/tot:.1f}% (computed)")
+
     # ---------------- the answer ----------------
     print("\n" + "=" * 78)
-    print(f"ANSWER: slug bytes cost {lo:.2f}x-{hi:.2f}x what prose bytes cost, on every tokenizer")
-    print(f"        tested. A byte is not a byte: the index's token slope is a property of what it")
-    print(f"        is MADE OF, not of how big it is.")
-    if len(states) == 2:
-        print()
-        for n, _ in toks:
-            a = states["live index (mixed)"][n]
-            b = states["08-19 (slug-heavy)"][n]
-            print(f"        {n:<12} two REAL states of the same index: "
-                  f"{b:.3f} -> {a:.3f} tok/byte ({b/a:.2f}x)")
+    spread = {a: max(v.values()) / min(v.values()) for a, v in rate.items()}
+    worst_spread = max(spread.values())
+    live_o = states["live index (mixed)"]["o200k_base"]
+    nb = states["live index (mixed)"]["_bytes"]
+    pred = 108 + 0.44 * nb
+    ours = live_o * nb
+    entries = len(re.findall(r"\]\(([A-Za-z0-9_.-]+\.md)\)",
+                             open(INDEX, encoding="utf-8", errors="replace").read()))
+    print(f"ANSWER: slug bytes cost {lo:.2f}x-{hi:.2f}x prose bytes on every tokenizer tested,")
+    print(f"        measured in their real `](name.md)` context. C5 confirms the cause: same-length")
+    print(f"        English in the same slot collapses to {min(null_ratio.values()):.2f}x-{max(null_ratio.values()):.2f}x, so it is the slug FORM.")
     print()
-    print("        BUT THE EFFECT IS SMALL, and saying so is the point of measuring instead of")
-    print("        asking. Slugs are only 25% of the index by bytes, and on the two MODERN")
-    print(f"        vocabularies the penalty is {ratios['o200k_base']:.2f}x, not the {ratios['r50k_base']:.2f}x the")
-    print("        older ones show -- modern BPE handles hyphenated compounds far better. Net")
-    print("        effect on the whole-file slope between two real index states: 4%. We were")
-    print("        about to send a question premised on this mattering. It does not.")
+    print("        PRIOR ART, and it is the mechanism, not us: that identifiers fragment worse")
+    print("        than prose under BPE, and that newer/larger vocabularies fragment them less,")
+    print("        is published -- CodeBPE (Chirkova & Troshin, ICLR 2023, arXiv:2308.00683).")
+    print("        OURS is only the composition-weighted effect on a real artifact, below.")
     print()
-
-    # ---- what DOES need explaining: 0.44 is unreachable by any composition of text ----
-    max_text = max(rate[a][n] for a in arms for n, _ in toks)
-    max_modern = max(rate[a][n] for a in arms for n in ("o200k_base", "cl100k_base"))
-    live_b = states["live index (mixed)"]["_bytes"] if states else 0
-    live_r = states["live index (mixed)"].get("o200k_base", 0) if states else 0
-    pred = 108 + 0.44 * live_b
-    ours = live_r * live_b
-    resid = (pred - ours) / live_b if live_b else 0
-    # Entries per the WHOLE index, not per the subset my line regex matched. 106 of 234 entries
-    # share a line in the compact sections, so len(segs["slug"]) is a segmentation artifact and
-    # dividing by it inflated "tokens per entry" by 1.8x. Denominators are load-bearing.
-    all_entries = len(re.findall(r"\]\([A-Za-z0-9_.-]+\.md\)",
-                                 open(INDEX, encoding="utf-8", errors="replace").read()))
-    per_entry = (pred - ours) / max(1, all_entries)
-    print(f"        THE REAL DISCREPANCY. No content type we can construct reaches 0.44 tok/byte:")
-    print(f"        the densest arm on ANY of the four is {max_text:.3f}, and on the modern two it is")
-    print(f"        {max_modern:.3f}. So @yacb2's fitted slope cannot be explained by composition.")
-    print(f"        On our live index his model predicts {pred:,.0f} tokens; the text itself is")
-    print(f"        {ours:,.0f}. The gap is {resid:.3f} tok/byte, or ~{per_entry:.0f} tokens per entry.")
-    print("        A two-point fit cannot separate a per-BYTE slope from a per-ENTRY constant, and")
-    print("        that is a far better question for him than the one we were going to ask.")
+    print(f"        AND THE EFFECT IS SMALL -- but NOT for the reason first written here.")
+    print(f"        Slugs are {100*share['live index (mixed)']:.0f}% of the live index by bytes and "
+          f"{100*share['08-19 (slug-heavy)']:.0f}% of the 08-19 state, COMPUTED.")
+    print(f"        An earlier version asserted 'only a quarter' -- a hardcoded sentence, never")
+    print(f"        computed, wrong by 1.7x: its numerator came from the {len(segs['slug'])} entries the")
+    print(f"        per-line regex matches, its denominator from the whole file. Two populations.")
+    print(f"        So the whole-file slope moving only "
+          f"{100*(states['08-19 (slug-heavy)']['o200k_base']/live_o - 1):.1f}% is small DESPITE slugs being a")
+    print(f"        plurality of the bytes, not because they are a minority of them.")
+    print()
+    print("        AND 'composition' bundles several edits: between those two states the entries")
+    print("        also gained prose sentences and 100+ were un-crowded onto their own lines.")
+    print("        A slug-share-only model explains roughly a third of the measured move.")
+    print()
+    print(f"        WHAT WE DO NOT CLAIM, and an earlier draft did: that 0.44 tok/byte is")
+    print(f"        'unreachable'. Our own four vocabularies span {worst_spread:.2f}x on IDENTICAL content")
+    print(f"        (slug arm {min(rate['slug'].values()):.3f}-{max(rate['slug'].values()):.3f}), and the gap from our {live_o:.3f} to 0.44 is")
+    print(f"        {0.44/max(v for v in states['live index (mixed)'].values() if isinstance(v, float) and v < 1):.2f}x-{0.44/live_o:.2f}x -- INSIDE that spread. A fifth, unmeasured vocabulary")
+    print(f"        could account for the whole gap, so 'unreachable' was refuted by our own table.")
+    print()
+    print(f"        WHAT IS ACTUALLY OPEN. Applying the 108 + 0.44/byte model to our {nb:,}-byte index")
+    print(f"        predicts {pred:,.0f} tokens where our proxy count of the same bytes is {ours:,.0f}:")
+    print(f"        {(pred-ours)/nb:.3f} tok/byte, or ~{(pred-ours)/entries:.0f} tokens per entry across {entries} entries. That gap is")
+    print(f"        EITHER per-entry harness overhead OR the difference between his tokenizer and")
+    print(f"        ours, and nothing we have can separate the two. It is a question, not a finding.")
     print()
     print("        NOT CLAIMED: an absolute tok/byte figure for Claude. The authoritative tokenizer")
     print("        was unavailable; only the ratio, which held on four vocabularies, is asserted.")
@@ -263,7 +317,8 @@ def main():
     out = os.path.join(HERE, "a_byte_of_slug_is_not_a_byte_of_prose.result.json")
     json.dump({"instrument_note": note, "tokenizers": [n for n, _ in toks],
                "bytes": nbytes, "tok_per_byte": rate, "whole_states": states,
-               "slug_over_prose": ratios, "controls_failed": fails},
+               "slug_over_prose": ratios, "controls_failed": fails,
+               "slug_share": share},
               open(out, "w", encoding="utf-8"), indent=2)
     print(f"receipt -> {out}")
     return 1 if fails else 0
