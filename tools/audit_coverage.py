@@ -154,7 +154,7 @@ def main():
     print("=" * 78)
     print(f"COVERAGE  {len(hit)}/{len(nums)} = {pct:.0f}%")
     print()
-    if miss:
+    if miss or quoted_only:
         print(f"NEVER TOUCHED BY US ({len(miss)}) -- we have no basis for an opinion on these:")
         vals = [n for n, _ in miss]
         for i in range(0, len(vals), 7):
@@ -163,7 +163,8 @@ def main():
         print("  Sending a correction while this list is non-empty is what produces the next round.")
         print("  Finish the audit, then send ONCE.")
     else:
-        print("Every asserted number has been touched. A single consolidated send is defensible.")
+        print("Every asserted number has been COMPUTED by us. A single consolidated send"
+              " is defensible.")
     print("=" * 78)
 
     if a.ledger:
