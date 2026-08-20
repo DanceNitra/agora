@@ -31,16 +31,47 @@ limit (L3 = 42 spins and beyond). Shared so anyone with a GPU can pick up the L3
 > **0.181144** isotropically. The published figure sits between them without matching either, so the
 > neighbourhood and the defect placement have to be stated before the number means anything. Until
 > they are, treat 0.1902 as unverified.
+>
+> **AMENDMENT, 2026-08-20 — the paragraph above is now superseded, and 0.1902 IS reproducible.**
+> The definition of "local" was recorded all along, in code rather than in prose:
+> `hotrg_obs.defect_bonds(blk, R=2)` — the radius-2 neighbourhood of the two defect corners, 18 of
+> the 27 edges. Run untruncated with the strengths grid `linspace(0.25, 3.0, 12)` and the depth
+> convention `mean(curve[-3:]) - min(curve)`, `hotrg_obs.valley(2, chi=None)` returns **0.1902** in
+> 25 seconds. The ED reconstruction above could not reach it because ED was the wrong instrument,
+> not because the number was wrong. Receipt: `probes/edrn_the_recovery_percentages_we_published.py`.
+> The `(0,2)` caveat still stands and is now stated where it belongs, in the bullet below.
 
 
 **Solid (reproduced to the digit):**
 - Energy RG is exact through **L2**: L1 ground energy −6.000000, L2 −16.921463; it converges the **L3** (42-spin)
   ground energy to **≈ −49.3** (truncation corrections halve geometrically).
-- The **impurity-explicit** RG reproduces the L2 local valley depth quoted below as 0.1902 (see the
-  correction above: the definition is not recorded, and reconstruction brackets rather than matches it), and a
-  controlled test confirms the physics: truncating *only* the far bath (a tip sub-gasket) to a single state
-  already recovers ~86% of the valley, whereas a *uniform* truncation destroys it (~20%). So the valley is a
-  genuinely localized defect mode, and finite ramification lets the far bath decouple.
+- The **impurity-explicit** RG reproduces the L2 local valley depth **0.1902** exactly, on the 18-bond
+  radius-2 neighbourhood defined by `defect_bonds`. **Read the defect placement before using this
+  number:** the RG's defect is the corner0–corner2 bond, and corners 0 and 2 are two of the three
+  tips, at graph distance 4 — so this is the *appended 28th bond*, not the tip-to-interior edge
+  `(0,6)` that `edrn-dmrg-verification#2` reports. The truncation control below is evidence about
+  that appended defect, and does not transfer to `(0,6)` without being re-run there.
+
+- **Truncation control, re-measured 2026-08-20 — the earlier "~86% vs ~20%" was a mismatched pair.**
+  Both arms now measured with one depth convention, one strengths grid and one bond set:
+
+  | χ | far bath only | uniform |
+  |---|---|---|
+  | 1 | 0.1648 = **87%** | 0.0000 = **0%** |
+  | 2 | 0.1834 = 96% | 0.0041 = 2% |
+  | 4 | 0.1736 = 91% | 0.0238 = 13% |
+  | 8 | 0.1902 = 100% | 0.0447 = 24% |
+
+  The old `~20%` was uniform truncation at **χ=8**, not at a single state, so the published sentence
+  compared χ_B=1 against χ=8 and *understated its own case*. At matched χ=1 the contrast is **87% vs
+  0%** — the far bath can be thrown away entirely and the valley survives; truncate everything the
+  same way and it is gone. That is the localized-defect-mode claim, and it holds at every χ.
+
+  **The single-state far-bath figure is a range, not a number: 87%–95% over four runs (0.1648,
+  0.1723, 0.1769, 0.1816).** Cause measured, not assumed: the L1 ground manifold is **4-fold
+  degenerate** (E0 = −16.921463), so χ_B=1 keeps one arbitrary vector out of it and the depth moves
+  with whatever basis the solver returns. Quote the range, or quote χ_B=2 where it is stable.
+  For scale, the untruncated L2 block dimension is **4096**, so even χ=8 is a 512× truncation.
 
 **Where it stops (marked, not papered over):** the **L3 valley *depth*** does not converge on this hardware —
 across the truncation dimension it wanders (≈0.24 / 0.08 / 0.20) and the V-curve degrades toward a step. This is

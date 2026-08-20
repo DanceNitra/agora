@@ -47,13 +47,19 @@ spec.loader.exec_module(SG)
 OUT_OF_REACH = {
     "−49.3": "an L3 (42-spin) RG extrapolation. Beyond exact diagonalisation; only the RG produces "
              "it, and the README already marks its convergence as the open question.",
-    "0.1902": "the figure whose definition of 'local' was never recorded. Marked unverified in the "
-              "README on 2026-08-18; reconstruction brackets it at 0.181144 / 0.200462 without "
-              "reaching it. It stays out of reach BY DESIGN until the definition is stated.",
     "0.24 / 0.08 / 0.20": "the L3 truncation wander. Requires the impurity RG at three bond "
                           "dimensions on hardware that did not converge it.",
-    "~86% / ~20%": "far-bath vs uniform truncation recovery, both impurity-RG runs, not ED.",
 }
+
+# Figures this receipt does not compute ITSELF, but which are re-derived by a committed probe with
+# its own receipt. 0.1902 and the truncation-recovery pair sat in OUT_OF_REACH until 2026-08-20, on
+# the belief that "local" had never been defined. It had -- in code, as defect_bonds(blk, R=2) --
+# and the RG reproduces 0.1902 in 25s. ED was simply the wrong instrument. Delegated rather than
+# duplicated, because re-running the RG here would add minutes to every run of this receipt.
+DELEGATED = {
+    "0.1902": ("probes/edrn_the_recovery_percentages_we_published.result.json", "reference_depth"),
+}
+RECOVERY_RECEIPT = "probes/edrn_the_recovery_percentages_we_published.result.json"
 
 checks: list[tuple[str, bool, str]] = []
 
@@ -170,10 +176,44 @@ def main(argv) -> int:
     l18 = [edges.index(x) for x in sorted(sub[own[0]] | sub[own[2]])]
     _, d18x = depths(False, edges, None, l18, extra=(0, 2))
     _, d18i = depths(True, edges, None, l18, extra=(0, 2))
-    ck("the bracket around our unverified 0.1902 (18-edge local set, added (0,2) bond)",
+    # 3b -- the delegated figures, checked against the probe's receipt rather than recomputed
+    import json as _json
+    for fig, (relpath, key) in DELEGATED.items():
+        rp = ROOT / relpath
+        if not rp.exists():
+            ck("delegated figure %s has a receipt on disk" % fig, False,
+               "missing %s -- run the probe" % relpath)
+            continue
+        got = _json.load(open(rp, encoding="utf-8")).get(key)
+        ck("delegated figure %s matches its probe receipt" % fig,
+           got is not None and abs(float(got) - float(fig)) < 5e-4 and fig in text,
+           "%s = %.6f from %s" % (fig, float(got or 0), relpath))
+
+    # 3c -- the truncation-recovery table the README now carries. It replaced a mismatched pair
+    # (far-bath at chi_B=1 against uniform at chi=8, quoted as if both were single-state), so it
+    # gets a receipt rather than a second unchecked sentence.
+    rp = ROOT / RECOVERY_RECEIPT
+    if rp.exists():
+        rec = _json.load(open(rp, encoding="utf-8"))
+        lo, hi = rec.get("far_range_pct", [0, 0])
+        uni1 = rec.get("single_state_uniform_pct", -1)
+        uni8 = 100 * rec["uniform"]["8"]["depth"] / rec["reference_depth"]
+        ck("uniform truncation to a SINGLE state removes the valley entirely",
+           abs(uni1) < 0.5 and "0.0000 = **0%**" in text,
+           "measured %.1f%% at chi=1" % uni1)
+        ck("the old ~20% is uniform at chi=8, and the README now says so",
+           20 <= uni8 <= 27 and "uniform truncation at **χ=8**" in text,
+           "chi=8 gives %.1f%%, which is what ~20%% was" % uni8)
+        ck("the single-state far-bath figure is published as a RANGE, not a number",
+           hi - lo > 1.0 and "87%–95%" in text and "4-fold" in text,
+           "measured %.0f%%-%.0f%% over %d runs" % (lo, hi, len(rec.get("far_repeats", []))))
+    else:
+        ck("recovery receipt present", False, "missing " + RECOVERY_RECEIPT)
+
+    ck("the bracket around the reconstructed 0.1902 (18-edge local set, added (0,2) bond)",
        len(l18) == 18 and abs(d18x - 0.200462) < 5e-6 and abs(d18i - 0.181144) < 5e-6
-       and d18i < 0.1902 < d18x and "treat 0.1902 as unverified" in text,
-       "XX+ZZ %.6f, isotropic %.6f ; 0.1902 lies between and is marked unverified" % (d18x, d18i))
+       and d18i < 0.1902 < d18x and "0.1902 IS reproducible" in text,
+       "XX+ZZ %.6f, isotropic %.6f ; ED brackets it, the RG reaches it" % (d18x, d18i))
 
     # 4 -- the document must still SAY it cannot reach the rest
     ck("the figures this receipt cannot reach are named in the document, not silently skipped",
