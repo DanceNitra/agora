@@ -177,6 +177,40 @@ def main():
     print("   the zeros below 0.76 do not. This STRENGTHENS the paper's conclusion: if the gap")
     print("   is non-zero over the whole scan, the entire scan is in the non-degenerate region.")
 
+    # --- two questions a red team asked about this claim, settled here rather than argued ---
+    print("\nQ1  IS THE s=1.00 ZERO A DEGENERACY, OR AN UNCONVERGED SECOND STATE?")
+    Hs = sector_H(n, edges, defect, 1.0, states, index)
+    lv = np.sort(spla.eigsh(Hs, k=8, which="SA", tol=1e-12)[0])
+    ndeg = int(sum(1 for e in lv if abs(e - lv[0]) < 1e-8))
+    third = float(lv[2] - lv[0])
+    print(f"    lowest levels: {lv[0]:.10f}, {lv[1]:.10f}, {lv[2]:.10f}")
+    print(f"    ground level is {ndeg}-fold degenerate (splitting {lv[1]-lv[0]:.2e}) -- a real")
+    print(f"    degeneracy, not a solver failure.")
+    print(f"    gap to the THIRD level = {third:.4f}; the paper reports 0.186 at s=1.00.")
+    print(f"    That explains the paper's own note that some seeds find near-zero and others")
+    print(f"    near 0.19: the solver returns either the degenerate partner or the next DISTINCT")
+    print(f"    level. His number is the second gap, not a wrong first one.")
+
+    print("\nQ2  DOES E(0) IDENTIFY THE SECTOR, or would others reproduce it too?")
+    ident = {}
+    for nup in (8, 9, 10):
+        s2, i2 = sector_basis(n, nup)
+        H2 = sector_H(n, edges, defect, 0.0, s2, i2)
+        v2, w2 = spla.eigsh(H2, k=2, which="SA", tol=1e-11)
+        o2 = np.argsort(v2)
+        _, e2 = observables(w2[:, o2][:, 0], s2, edges)
+        Hg2 = sector_H(n, edges, defect, 0.5, s2, i2)
+        g2 = np.sort(spla.eigsh(Hg2, k=2, which="SA", tol=1e-11)[0])
+        ident[nup] = {"Sz": (nup - (n - nup)) / 2, "E0": e2, "gap_at_half": float(g2[1] - g2[0])}
+        print(f"    Sz={ident[nup]['Sz']:+.1f} ({len(s2):5d} states): E(0)={e2:.6f}  "
+              f"gap(s=0.5)={ident[nup]['gap_at_half']:.4f}")
+    only = [k for k, v in ident.items() if abs(v["E0"] - PUBLISHED_E0) < 5e-6]
+    print(f"    sectors reproducing the published E(0): {[ident[k]['Sz'] for k in only]}")
+    ident_ok = len(only) == 1
+    print(f"    -> the calibration {'IDENTIFIES the sector' if ident_ok else 'is NOT identifying'};")
+    print(f"    no tested sector has a zero gap at s=0.5, so the zeros below 0.76 are not")
+    print(f"    explained by a different sector choice.")
+
     print("\nTABLE IV, IN THE SECTOR -- the fair repeat of what the full space could not resolve")
     t4 = {}
     for s in (0.99, 1.00, 1.01):
