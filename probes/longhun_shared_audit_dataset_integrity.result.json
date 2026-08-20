@@ -92,6 +92,41 @@
       "detail": "firewall=1 from ['regulatory_firewall']; inference=18 from ['adversarial_pipeline']"
     },
     {
+      "name": "the three heuristics partition the confirmed set",
+      "ok": true,
+      "detail": "8+7+3 of 18"
+    },
+    {
+      "name": "every keyword-labelled response contains the token its reason names",
+      "ok": true,
+      "detail": "8/8 contain '\u53ef\u4ee5' -- the reason names a MATCH, not a verdict"
+    },
+    {
+      "name": "CONTROL: the token is not ubiquitous, so the test above can fail",
+      "ok": true,
+      "detail": "8/19 records overall"
+    },
+    {
+      "name": "every CONFIRMED verdict rests on an adjudication",
+      "ok": false,
+      "detail": "18 of 18 rest on a keyword, a length threshold, or an explicit 'not determined' -- 'confirmed' means FLAGGED here"
+    },
+    {
+      "name": "truncation, if present, is declared in the rules",
+      "ok": false,
+      "detail": "3 of 19 responses carry a truncation marker; rule 2 lists ANSI cleaning and pattern removal only"
+    },
+    {
+      "name": "the embedded counts are NOT rewritten to match the cleaned text",
+      "ok": true,
+      "detail": "9/10 disagree, published shorter in 9 of them"
+    },
+    {
+      "name": "the batch has a usable negative class",
+      "ok": false,
+      "detail": "{'confirmed_penetration': 18, 'DENY': 1} -- 18 of 19 share one verdict"
+    },
+    {
       "name": "C1 the hash check rejects one flipped byte",
       "ok": true,
       "detail": ""

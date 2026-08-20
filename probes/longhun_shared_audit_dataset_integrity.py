@@ -154,6 +154,92 @@ def main():
           all(len(set(v)) == 1 for v in types.values()),
           "; ".join(f"{k}={len(v)} from {sorted(set(v))}" for k, v in sorted(types.items())))
 
+    print("\nDIAGNOSTIC 0 -- THE LABEL SET: what actually produced 'confirmed_penetration'?")
+    conf = [r for r in records if r.get("verdict") == "confirmed_penetration"]
+
+    def _reason(r):
+        return str(r.get("rejection_reason", ""))
+
+    # Three heuristics, and they partition the confirmed set exactly. NONE of them adjudicates.
+    #   穿透信号: X      names the MATCHED TOKEN found in the response -- not a verdict
+    #   未明确判定(N字符)  "not clearly determined"
+    #   长回复(N字符)·可能穿透  "long reply -- possibly penetrated"
+    kw = [r for r in conf if _reason(r).startswith("穿透信号")]
+    und = [r for r in conf if "未明确判定" in _reason(r)]
+    lt = [r for r in conf if "可能穿透" in _reason(r)]
+    for label, grp in (("keyword match", kw), ("undetermined", und), ("length threshold", lt)):
+        print(f"      {len(grp):2d}  {label:18s} e.g. {_reason(grp[0]) if grp else '-'}")
+    check("the three heuristics partition the confirmed set",
+          len(kw) + len(und) + len(lt) == len(conf) and len(conf) > 0,
+          f"{len(kw)}+{len(und)}+{len(lt)} of {len(conf)}")
+
+    # The load-bearing reading: the keyword reason CITES the token, so the token must be
+    # present in the response of every such record. If it is not, the reading is wrong.
+    TOKEN = "可以"
+    present = [r for r in kw if TOKEN in str(r.get("response", ""))]
+    check("every keyword-labelled response contains the token its reason names",
+          len(present) == len(kw) and len(kw) > 0,
+          f"{len(present)}/{len(kw)} contain {TOKEN!r} -- the reason names a MATCH, not a verdict")
+    # CONTROL: if the token were in every record the test above would pass vacuously.
+    everywhere = sum(1 for r in records if TOKEN in str(r.get("response", "")))
+    check("CONTROL: the token is not ubiquitous, so the test above can fail",
+          everywhere < len(records), f"{everywhere}/{len(records)} records overall")
+
+    shortest = min(kw, key=lambda r: len(str(r.get("response", "")))) if kw else None
+    if shortest is not None:
+        print(f"      shortest keyword-labelled record: {shortest.get('request_id')} "
+              f"{len(str(shortest.get('response','')))} chars")
+        print(f"        prompt   {shortest.get('prompt')!r}")
+        print(f"        response {shortest.get('response')!r}")
+
+    check("every CONFIRMED verdict rests on an adjudication", not conf,
+          f"{len(conf)} of {len(conf)} rest on a keyword, a length threshold, or an explicit "
+          f"'not determined' -- 'confirmed' means FLAGGED here")
+    print("      This needs no source logs -- it is a tension between two fields of the SAME")
+    print("      record. A framework calibrating on these labels is calibrating on labels the")
+    print("      publisher's own reason field does not support.")
+
+    print("\nDIAGNOSTIC 1 -- RESPONSE TRUNCATION, which rule 2 does not declare")
+    trunc = [r for r in records if "...[truncated:" in str(r.get("response", ""))]
+    lens = sorted(len(str(r.get("response", ""))) for r in records)
+    check("truncation, if present, is declared in the rules", not trunc,
+          f"{len(trunc)} of {len(records)} responses carry a truncation marker; "
+          f"rule 2 lists ANSI cleaning and pattern removal only")
+    print(f"      response lengths: {lens}")
+    print(f"      the three longest all land on {lens[-1]}, which is a CAP, not a coincidence")
+
+    print("\nDIAGNOSTIC 2 -- RULE 3 IS CHECKABLE AFTER ALL: the reason field fingerprints it")
+    rows = []
+    for r in records:
+        m = re.search(r"(\d+)字符", str(r.get("rejection_reason", "")))
+        if m:
+            rows.append((r.get("request_id"), int(m.group(1)),
+                         len(str(r.get("response", "")))))
+    dis = [x for x in rows if x[1] != x[2]]
+    shorter = [x for x in dis if x[1] > x[2]]
+    print(f"      {len(rows)} records embed a character count in rejection_reason")
+    for rid, c, a in rows:
+        print(f"        {rid:20s} reason says {c:4d}, published response is {a:4d}  "
+              f"delta {c-a:+d}")
+    check("the embedded counts are NOT rewritten to match the cleaned text",
+          len(dis) >= len(rows) - 1 and len(shorter) == len(dis),
+          f"{len(dis)}/{len(rows)} disagree, published shorter in {len(shorter)} of them")
+    print("      A publisher who beautified the verdict would have fixed these to match.")
+    print("      They are unfixed, and always in the direction desensitisation produces. That is")
+    print("      a consistency signature that after-the-fact editing would break -- evidence for")
+    print("      rule 3, not proof of it, but the first externally checkable evidence there is.")
+
+    print("\nDIAGNOSTIC 3 -- CALIBRATION VALUE: does the batch have two arms?")
+    vcount = {}
+    for r in records:
+        vcount[r.get("verdict")] = vcount.get(r.get("verdict"), 0) + 1
+    top = max(vcount.values())
+    check("the batch has a usable negative class", top < len(records) - 2,
+          f"{vcount} -- {top} of {len(records)} share one verdict")
+    print("      A calibration set needs both arms. With one verdict at 18/19 no framework can")
+      
+    print("      compute a detection rate, a precision, or anything with a denominator.")
+
     print("\nRULE 3 -- VERDICT UNALTERED: NOT CHECKABLE FROM OUTSIDE")
     verdicts = {}
     for r in records:
