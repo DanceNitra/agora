@@ -3,9 +3,9 @@
  "cases": {
   "1 same count, different population": {
    "must_invalidate": true,
-   "shipped_report_changes": false,
+   "shipped_report_changes": true,
    "candidate_commitment_changes": true,
-   "shipped_correct": false,
+   "shipped_correct": true,
    "candidate_correct": true,
    "keys_before": 3,
    "keys_after": 3,
@@ -51,9 +51,8 @@
   }
  },
  "writer_policy_machine_checkable": false,
- "scope_attributable": false,
+ "scope_attributable": true,
  "blind_classes": [
-  "same count, different population",
   "collision -> delete -> clean scan"
  ]
 }
