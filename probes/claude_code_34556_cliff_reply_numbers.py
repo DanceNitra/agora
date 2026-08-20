@@ -197,8 +197,9 @@ while _lo < _hi:
         _hi = _m - 1
 _t_bin = _time.perf_counter() - _t0
 ck("the binary search really is sub-0.1s on 14,000 path keys", _t_bin < 0.1, "%.3fs" % _t_bin)
-ck("reply quotes our pair and attributes his to him",
-   *says("0.404 s to 0.027 s on 14,000 of mine", "1.65 ms to 0.49 ms on your 562 paths"))
+ck("reply quotes a MEDIAN over repeats, not one draw",
+   *says("median 0.65 s to 0.05 s over five repeats", "1.65 ms to 0.49 ms on your 562 paths"))
+ck("and no single-draw timing survives", "0.404 s to" not in TEXT)
 ck("and says the two were independent", *says("without knowing"))
 
 # ---------------------------------------------------------------- no-overclaim guard
