@@ -72,9 +72,9 @@ def main():
     check("draft quotes 17 transcripts", "17 transcripts" in draft,
           f"corpus={len(main_r['corpus'])}") and check(
         "  and the corpus really is 17", len(main_r["corpus"]) == 17)
-    check("population 415 matches receipt", "of 415" in draft and main_r["population"] == 415,
+    check("population 416 matches receipt", "of 416" in draft and main_r["population"] == 416,
           f"population={main_r['population']}")
-    check("161 opened matches receipt", "161 of 415" in draft and main_r["fact_files_read"] == 161,
+    check("161 opened matches receipt", "161 of 416" in draft and main_r["fact_files_read"] == 161,
           f"read={main_r['fact_files_read']}")
     check("113 authoring-loop matches receipt",
           "113 of those" in draft and main_r["read_in_own_authoring_loop_only"] == 113,
@@ -114,7 +114,7 @@ def main():
 
     # C7 blind spot
     check("24 via tool calls / 0 harness content",
-          "24 times via our own tool calls and 0 times as harness-emitted content" in draft)
+          "17 times via our own tool calls and 0 times as harness-emitted content" in draft)
 
     # index history -- re-derived from the vault backup repo and the local backups
     def vault_show(commit):
@@ -208,38 +208,55 @@ def main():
     check("tokenizer probe controls all pass", not tok["controls_failed"],
           f"failed={tok['controls_failed'] or 'none'}")
     lo_r, hi_r = min(ratios_t.values()), max(ratios_t.values())
-    check("1.23-1.70x slug:prose range", "**1.23–1.70x**" in draft
-          and abs(lo_r - 1.23) < 0.02 and abs(hi_r - 1.70) < 0.02,
+    check("1.22-1.69x slug:prose range", "**1.22–1.69x**" in draft
+          and abs(lo_r - 1.22) < 0.02 and abs(hi_r - 1.69) < 0.02,
           f"measured {lo_r:.2f}-{hi_r:.2f}")
     nb = live["_bytes"]
     delta = 100 * (sluggy["o200k_base"] / live["o200k_base"] - 1)
-    check("3.3% whole-file movement", "**3.3%**" in draft and abs(delta - 3.3) < 0.15,
+    check("2.8% whole-file movement", "**2.8%**" in draft and abs(delta - 2.8) < 0.15,
           f"{delta:.2f}%")
-    check("0.275 -> 0.267 quoted exactly", "0.275 to 0.267 tokens/byte" in draft
-          and abs(sluggy["o200k_base"] - 0.275) < 0.002
-          and abs(live["o200k_base"] - 0.267) < 0.002,
+    check("0.272 -> 0.265 quoted exactly", "0.272 to 0.265 tokens/byte" in draft
+          and abs(sluggy["o200k_base"] - 0.272) < 0.002
+          and abs(live["o200k_base"] - 0.265) < 0.002,
           f"{sluggy['o200k_base']:.3f} -> {live['o200k_base']:.3f}")
     shr = tok.get("slug_share", {})
     live_share = 100 * shr.get("live index (mixed)", 0)
-    check("42% slug share is COMPUTED and quoted", "**42%**" in draft
-          and abs(live_share - 41.8) < 0.5, f"computed {live_share:.1f}%")
+    check("41% slug share is COMPUTED and quoted", "**41%**" in draft
+          and abs(live_share - 41.4) < 0.5, f"computed {live_share:.1f}%")
     check("the 1.7x self-correction is disclosed to him",
           "only a quarter of the index" in draft and "hardcoded" in draft,
           "we tell him we got it wrong before he finds it")
     pred = 108 + 0.44 * nb
     ours = live["o200k_base"] * nb
     entries = 236
-    check("23,686 index bytes", "23,686-byte" in draft and nb == 23686, f"bytes={nb}")
-    check("10,530 predicted", "**10,530 tokens**" in draft and abs(pred - 10530) < 2,
+    check("23,921 index bytes", "23,921-byte" in draft and nb == 23921, f"bytes={nb}")
+    check("10,633 predicted", "**10,633 tokens**" in draft and abs(pred - 10633) < 2,
           f"pred={pred:.0f}")
-    check("6,315 proxy count", "**6,315**" in draft and abs(ours - 6315) < 3, f"ours={ours:.0f}")
-    check("0.178 tok/byte gap", "0.178 tokens/byte" in draft
-          and abs((pred - ours) / nb - 0.178) < 0.002, f"{(pred-ours)/nb:.3f}")
+    check("6,332 proxy count", "**6,332**" in draft and abs(ours - 6332) < 3, f"ours={ours:.0f}")
+    check("0.180 tok/byte gap", "0.180 tokens/byte" in draft
+          and abs((pred - ours) / nb - 0.180) < 0.002, f"{(pred-ours)/nb:.3f}")
     check("~18 tokens/entry over 236 entries", "18 tokens per entry across 236" in draft
           and abs((pred - ours) / entries - 18) < 1.5, f"{(pred-ours)/entries:.1f}")
     spread = max(max(v.values()) / min(v.values()) for v in r.values())
     check("1.41x cross-tokenizer spread is stated", "**1.41x on identical content**" in draft
           and abs(spread - 1.41) < 0.03, f"measured {spread:.2f}x")
+
+    pop_now = len([f for f in os.listdir(MEMORY_DIR) if f.endswith(".md")
+                   and not f.startswith("MEMORY.md.bak")])
+    check("FRESHNESS: population matches the live memory directory",
+          main_r["population"] == pop_now,
+          f"receipt {main_r['population']} vs on disk {pop_now} -- writing a memory invalidates this")
+    live_index = os.path.join(MEMORY_DIR, "MEMORY.md")
+    on_disk = os.path.getsize(live_index)
+    check("FRESHNESS: receipt matches the LIVE index, byte for byte",
+          nb == on_disk,
+          f"receipt {nb} vs on disk {on_disk} -- re-run the probe if these differ")
+    check("byte convention is stated, since 'a byte' is the ambiguity",
+          "on disk, CRLF included" in draft and "`wc -c` reproduces it" in draft)
+    check("the unprovable universal is gone",
+          "every session demonstrably receives it" not in draft
+          and "the session I am writing from is receiving it right now" in draft,
+          "one demonstrated case, not a claim about 17 transcripts")
 
     print("")
     print("RED-TEAM FIXES -- each panel finding must be visible in the draft")
@@ -254,7 +271,7 @@ def main():
           draft.count("tokenizer") >= 3
           and "Anthropic's own tokenizer was not available to me" in draft
           and draft.index("Anthropic's own tokenizer was not available to me")
-              > draft.index("**10,530 tokens**") - 900,
+              > draft.index("**10,633 tokens**") - 900,
           "it was silently dropped there before")
     check("FRAMING: the diagnosis ends in a QUESTION to him",
           "Which was your 0.44 fitted against" in draft)
@@ -280,7 +297,7 @@ def main():
           "Anthropic's own tokenizer was not available" in draft
           and "not an absolute rate for Claude" in draft,
           "ratio asserted, absolute rate explicitly not")
-    check("length is in our register (< 6,200 chars)", len(draft) < 6200, f"{len(draft)} chars")
+    check("length is in our register (< 6,600 chars)", len(draft) < 6600, f"{len(draft)} chars")
 
     n = len(checks)
     bad = [c for c in checks if not c[1]]

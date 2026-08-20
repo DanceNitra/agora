@@ -460,7 +460,10 @@ def main():
     marker = "One line per memory"
     via_tool = free_text = 0
     for fn in sorted(os.listdir(STORE)):
-        if not fn.endswith(".jsonl"):
+        # Exclude the session doing the counting. Including it added 7 hits that were this
+        # session's own greps FOR THIS VERY STRING -- 24 became 17. Grepping our own transcripts
+        # has produced exactly this contamination before (12 warnings counted as 22).
+        if not fn.endswith(".jsonl") or CURRENT_SESSION in fn:
             continue
         for line in open(os.path.join(STORE, fn), encoding="utf-8", errors="replace"):
             if marker not in line:

@@ -171,8 +171,11 @@ def main():
     for label, path in (("live index (mixed)", INDEX), ("08-19 (slug-heavy)", SLUGGY)):
         if not os.path.exists(path):
             continue
-        blob = open(path, encoding="utf-8", errors="replace").read()
-        nb = len(blob.encode("utf-8"))
+        raw = open(path, "rb").read()          # EXACT on-disk bytes: a CRLF file read with
+        blob = raw.decode("utf-8", "replace")  # universal newlines loses 1 byte per line
+        nb = len(raw)                          # 23,921 on disk vs 23,721 translated -- 0.8%,
+        #                                      immaterial to the ratio, but a reader running
+        #                                      `wc -c` must get the number we publish.
         states[label] = {n: fn(blob) / nb for n, fn in toks}
         states[label]["_bytes"] = nb
         cells = " ".join(f"{states[label][n]:>12.3f}" for n, _ in toks)
@@ -257,8 +260,9 @@ def main():
     for label, path in (("live index (mixed)", INDEX), ("08-19 (slug-heavy)", SLUGGY)):
         if not os.path.exists(path):
             continue
-        txt = open(path, encoding="utf-8", errors="replace").read()
-        tot = len(txt.encode())
+        rawb = open(path, "rb").read()
+        txt = rawb.decode("utf-8", "replace")
+        tot = len(rawb)
         sb = sum(len(x.encode()) for x in LOOSE.findall(txt))
         share[label] = sb / tot
         print(f"C6 SHARE      {label:<20} slug bytes {sb:5d} of {tot:5d} = {100*sb/tot:.1f}% (computed)")
