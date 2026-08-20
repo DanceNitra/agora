@@ -1,0 +1,69 @@
+{
+  "reference_depth": 0.19023755049346425,
+  "reference_bonds": 18,
+  "published_reference": 0.1902,
+  "far_bath_only": {
+    "1": {
+      "depth": 0.16483277792783513,
+      "min_at": 0.5,
+      "bonds": 18
+    },
+    "2": {
+      "depth": 0.18341047118311438,
+      "min_at": 0.25,
+      "bonds": 18
+    },
+    "4": {
+      "depth": 0.17357567333218504,
+      "min_at": 0.5,
+      "bonds": 18
+    },
+    "8": {
+      "depth": 0.19023755049346522,
+      "min_at": 0.5,
+      "bonds": 18
+    }
+  },
+  "uniform": {
+    "1": {
+      "depth": 4.440892098500626e-16,
+      "min_at": 1.75,
+      "bonds": 18
+    },
+    "2": {
+      "depth": 0.00405913370713884,
+      "min_at": 0.75,
+      "bonds": 18
+    },
+    "4": {
+      "depth": 0.023844327441332663,
+      "min_at": 0.25,
+      "bonds": 18
+    },
+    "8": {
+      "depth": 0.04473759138712037,
+      "min_at": 1.0,
+      "bonds": 18
+    }
+  },
+  "single_state_far_pct": 86.6457634154084,
+  "single_state_uniform_pct": 2.3343930191390874e-13,
+  "published_far_pct": 86,
+  "published_uniform_pct": 20,
+  "far_range_pct": [
+    86.6457634154084,
+    95.47417406397207
+  ],
+  "far_repeats": [
+    0.17692119495637765,
+    0.17225675481974626,
+    0.1816277300931668,
+    0.16483277792783513
+  ],
+  "l1_manifold_dim": 4,
+  "far_reproduces": true,
+  "uniform_reproduces": false,
+  "controls_failed": [
+    "C5"
+  ]
+}
