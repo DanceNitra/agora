@@ -154,18 +154,48 @@ def main():
           all(len(set(v)) == 1 for v in types.values()),
           "; ".join(f"{k}={len(v)} from {sorted(set(v))}" for k, v in sorted(types.items())))
 
-    print("\nDIAGNOSTIC 0 -- THE LABEL SET: do the verdicts agree with their own reasons?")
-    HEDGE = ("可能", "未明确判定")   # "possibly", "not clearly determined"
+    print("\nDIAGNOSTIC 0 -- THE LABEL SET: what actually produced 'confirmed_penetration'?")
     conf = [r for r in records if r.get("verdict") == "confirmed_penetration"]
-    hedged = [r for r in conf
-              if any(h in str(r.get("rejection_reason", "")) for h in HEDGE)]
-    for r in hedged:
-        print(f"      {r.get('request_id'):20s} {r.get('rejection_reason')}")
-    check("every CONFIRMED verdict has a reason that confirms it", not hedged,
-          f"{len(hedged)} of {len(conf)} rest on a reason saying 'possibly' or "
-          f"'not clearly determined'")
+
+    def _reason(r):
+        return str(r.get("rejection_reason", ""))
+
+    # Three heuristics, and they partition the confirmed set exactly. NONE of them adjudicates.
+    #   穿透信号: X      names the MATCHED TOKEN found in the response -- not a verdict
+    #   未明确判定(N字符)  "not clearly determined"
+    #   长回复(N字符)·可能穿透  "long reply -- possibly penetrated"
+    kw = [r for r in conf if _reason(r).startswith("穿透信号")]
+    und = [r for r in conf if "未明确判定" in _reason(r)]
+    lt = [r for r in conf if "可能穿透" in _reason(r)]
+    for label, grp in (("keyword match", kw), ("undetermined", und), ("length threshold", lt)):
+        print(f"      {len(grp):2d}  {label:18s} e.g. {_reason(grp[0]) if grp else '-'}")
+    check("the three heuristics partition the confirmed set",
+          len(kw) + len(und) + len(lt) == len(conf) and len(conf) > 0,
+          f"{len(kw)}+{len(und)}+{len(lt)} of {len(conf)}")
+
+    # The load-bearing reading: the keyword reason CITES the token, so the token must be
+    # present in the response of every such record. If it is not, the reading is wrong.
+    TOKEN = "可以"
+    present = [r for r in kw if TOKEN in str(r.get("response", ""))]
+    check("every keyword-labelled response contains the token its reason names",
+          len(present) == len(kw) and len(kw) > 0,
+          f"{len(present)}/{len(kw)} contain {TOKEN!r} -- the reason names a MATCH, not a verdict")
+    # CONTROL: if the token were in every record the test above would pass vacuously.
+    everywhere = sum(1 for r in records if TOKEN in str(r.get("response", "")))
+    check("CONTROL: the token is not ubiquitous, so the test above can fail",
+          everywhere < len(records), f"{everywhere}/{len(records)} records overall")
+
+    shortest = min(kw, key=lambda r: len(str(r.get("response", "")))) if kw else None
+    if shortest is not None:
+        print(f"      shortest keyword-labelled record: {shortest.get('request_id')} "
+              f"{len(str(shortest.get('response','')))} chars")
+        print(f"        prompt   {shortest.get('prompt')!r}")
+        print(f"        response {shortest.get('response')!r}")
+
+    check("every CONFIRMED verdict rests on an adjudication", not conf,
+          f"{len(conf)} of {len(conf)} rest on a keyword, a length threshold, or an explicit "
+          f"'not determined' -- 'confirmed' means FLAGGED here")
     print("      This needs no source logs -- it is a tension between two fields of the SAME")
-      
     print("      record. A framework calibrating on these labels is calibrating on labels the")
     print("      publisher's own reason field does not support.")
 

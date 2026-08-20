@@ -54,19 +54,46 @@ def main():
 
     print("OURS -- re-derived from the dataset, not from the receipt's summary")
     conf = [r for r in recs if r.get("verdict") == "confirmed_penetration"]
-    hedge = ("可能", "未明确判定")
-    hedged = [r for r in conf if any(h in str(r.get("rejection_reason", "")) for h in hedge)]
-    check("10 of 18 confirmed verdicts have a hedging reason",
-          len(hedged) == 10 and len(conf) == 18 and "Ten of your eighteen" in draft,
-          f"{len(hedged)}/{len(conf)}")
-    kinds = {}
-    for r in conf:
-        kinds[re.sub(r"\d+", "N", str(r.get("rejection_reason", "")))] = \
-            kinds.get(re.sub(r"\d+", "N", str(r.get("rejection_reason", ""))), 0) + 1
-    check("the 8 / 7 / 3 breakdown is correct",
-          sorted(kinds.values(), reverse=True) == [8, 7, 3]
-          and "| 8 |" in draft and "| **7** |" in draft and "| **3** |" in draft,
-          str(sorted(kinds.values(), reverse=True)))
+
+    def reason(r):
+        return str(r.get("rejection_reason", ""))
+
+    kw = [r for r in conf if reason(r).startswith("\u7a7f\u900f\u4fe1\u53f7")]
+    und = [r for r in conf if "\u672a\u660e\u786e\u5224\u5b9a" in reason(r)]
+    lt = [r for r in conf if "\u53ef\u80fd\u7a7f\u900f" in reason(r)]
+    check("the three heuristics PARTITION the 18 confirmed verdicts",
+          len(conf) == 18 and len(kw) == 8 and len(und) == 7 and len(lt) == 3
+          and len({id(r) for r in kw + und + lt}) == 18,
+          f"{len(kw)}+{len(und)}+{len(lt)}={len(kw) + len(und) + len(lt)} of {len(conf)}")
+    check("the 8 / 7 / 3 breakdown is quoted in the draft",
+          "| 8 |" in draft and "| **7** |" in draft and "| **3** |" in draft)
+
+    # The headline correction. The reason field NAMES THE MATCHED TOKEN; it is not a verdict.
+    # Every one of the eight must contain that literal token in its own response, or the
+    # reading is wrong and this reply must not go out.
+    tok = "\u53ef\u4ee5"
+    check("all 8 keyword records contain the matched token in the response",
+          all(tok in str(r.get("response", "")) for r in kw) and "in all eight" in draft,
+          f"{sum(tok in str(r.get('response', '')) for r in kw)}/8")
+    check("CONTROL: the token is NOT ubiquitous -- it can distinguish",
+          sum(tok in str(r.get("response", "")) for r in recs) < len(recs),
+          f"{sum(tok in str(r.get('response', '')) for r in recs)}/{len(recs)} records overall")
+    six = [r for r in kw if len(str(r.get("response", ""))) == 6]
+    check("the 6-character confirmed_penetration record is quoted verbatim",
+          len(six) == 1 and six[0]["response"] in draft and six[0]["prompt"] in draft,
+          repr(six[0]["response"]) if six else "not found")
+    refuse = [r for r in kw if "\u4f46\u6211\u53ef\u4ee5" in str(r.get("response", ""))]
+    check("the refuse-then-offer record exists and its phrase is quoted",
+          len(refuse) >= 1 and "\u4f46\u6211\u53ef\u4ee5" in draft, f"{len(refuse)} such")
+    check("the 3 length-threshold records ARE the 3 truncated ones",
+          {r["request_id"] for r in lt}
+          == {r["request_id"] for r in recs if "...[truncated:" in str(r.get("response", ""))},
+          "identical sets")
+    check("we do NOT repeat the mistranslation we caught",
+          "penetration signal: yes" not in draft.lower(),
+          "the reason names a token, not a verdict")
+    check("we do not call the heuristic stupid",
+          "reasonable cheap signal" in draft and "fair to the heuristic" in draft)
 
     lens = sorted(len(str(r.get("response", ""))) for r in recs)
     check("the response-length list is quoted exactly",
@@ -122,7 +149,7 @@ def main():
 
     print("\nRED-TEAM AND STORM FIXES")
     check("RT1 the label-set finding LEADS, not the hash check",
-          draft.index("Ten of your eighteen") < draft.index("SHA-256"),
+          draft.index("None of your eighteen") < draft.index("SHA-256"),
           "the load-bearing finding is first")
     check("RT2 the false positive leads with OUR error",
           "A defect in my check, not in your data" in draft
@@ -142,9 +169,30 @@ def main():
           "evidence rather than proof" in draft)
 
     print("\nTHE LINK AND THE ROOM")
-    code = subprocess.run(["curl", "-sL", "-o", os.devnull, "-w", "%{http_code}", PROBE_URL],
+    # HTTP 200 says a file is there; it does not say the file carries the claim. The version
+    # on main verified the hash and stopped -- it did not contain the finding this reply
+    # leads with, and an earlier gate passed on the 200 alone. So: check the URL the DRAFT
+    # actually links (not a different one we happen to have in a constant), and read the
+    # bytes git serves for it rather than the CDN copy, which lags a push by minutes.
+    linked = re.findall(r"\]\((https://github\.com/[^)]+/blob/main/([^)]+))\)", draft)
+    check("the draft links a receipt at all", len(linked) == 1, f"{len(linked)} link(s)")
+    url, path = linked[0] if linked else ("", "")
+    code = subprocess.run(["curl", "-sL", "-o", os.devnull, "-w", "%{http_code}", url],
                           capture_output=True, text=True).stdout.strip()
-    check("the receipt link resolves", code == "200", f"HTTP {code}")
+    check("the linked receipt page resolves", code == "200", f"HTTP {code} {path}")
+    blob = subprocess.run(["gh", "api", f"repos/DanceNitra/agora/contents/{path}",
+                           "--jq", ".content"], capture_output=True, text=True).stdout
+    import base64
+    live = base64.b64decode(blob) if blob.strip() else b""
+    local = open(os.path.join(REPO, path.replace("/", os.sep)), "rb").read()
+    norm = lambda b: b.replace(b"\r\n", b"\n")
+    check("the receipt ON MAIN is byte-identical to the one we ran",
+          len(live) > 0 and norm(live) == norm(local),
+          f"main {len(norm(live)):,} vs local {len(norm(local)):,}")
+    for needle, label in ((b"DIAGNOSTIC 0", "the label-set diagnostic"),
+                          ("穿透信号".encode(), "the keyword reason it reads"),
+                          (b"CONTROL: the token is not ubiquitous", "the control that can fail")):
+        check(f"the receipt ON MAIN contains {label}", needle in live)
     state = gh(f"repos/{ISSUE}", ".state")
     ncom = gh(f"repos/{ISSUE}", ".comments")
     check("issue is open", state == "open", f"state={state}")

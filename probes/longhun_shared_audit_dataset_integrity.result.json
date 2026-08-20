@@ -92,9 +92,24 @@
       "detail": "firewall=1 from ['regulatory_firewall']; inference=18 from ['adversarial_pipeline']"
     },
     {
-      "name": "every CONFIRMED verdict has a reason that confirms it",
+      "name": "the three heuristics partition the confirmed set",
+      "ok": true,
+      "detail": "8+7+3 of 18"
+    },
+    {
+      "name": "every keyword-labelled response contains the token its reason names",
+      "ok": true,
+      "detail": "8/8 contain '\u53ef\u4ee5' -- the reason names a MATCH, not a verdict"
+    },
+    {
+      "name": "CONTROL: the token is not ubiquitous, so the test above can fail",
+      "ok": true,
+      "detail": "8/19 records overall"
+    },
+    {
+      "name": "every CONFIRMED verdict rests on an adjudication",
       "ok": false,
-      "detail": "10 of 18 rest on a reason saying 'possibly' or 'not clearly determined'"
+      "detail": "18 of 18 rest on a keyword, a length threshold, or an explicit 'not determined' -- 'confirmed' means FLAGGED here"
     },
     {
       "name": "truncation, if present, is declared in the rules",
