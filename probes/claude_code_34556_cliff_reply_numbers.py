@@ -182,6 +182,25 @@ for bad_s in ("the first to", "first implementation", "first measurement", "nobo
     ck("no overclaim: %r absent" % bad_s, bad_s.lower() not in TEXT.lower())
 ck("it ends on questions, not on a result", *says("does\nanything in your fixtures distinguish"))
 
+# THE RELEASE CLAIM MUST BE TRUE AT SEND TIME. The draft names a version; naming one implies a
+# reader can install it. An earlier draft said "shipped" while 2.18.0 sat on main and nowhere else,
+# which is our own "PUBLISHED = on main AND verified live" broken in the sentence that asserts it.
+# Checked against the SIMPLE INDEX pip resolves against, not the JSON API, which lags it.
+import urllib.request as _url                                          # noqa: E402
+_named = sorted(set(re.findall(r"2\.\d+\.\d+", TEXT)))
+ck("the reply names exactly one version", len(_named) == 1, ", ".join(_named) or "none")
+if _named:
+    _v = _named[0]
+    try:
+        with _url.urlopen("https://pypi.org/simple/inspeximus/", timeout=30) as _r:
+            _index = _r.read().decode("utf-8", "replace")
+        _live = ("inspeximus-%s-py3-none-any.whl" % _v) in _index
+    except Exception as _e:                                            # noqa: BLE001
+        _live = False
+        print("could not reach the index: %s" % type(_e).__name__)
+    ck("that version is installable from PyPI -- BLOCKS the send until it is", _live,
+       "%s %s on the simple index" % (_v, "is" if _live else "is NOT"))
+
 bad = [c_ for c_ in checks if not c_[1]]
 w = max(len(c_[0]) for c_ in checks)
 for name, ok, detail in checks:
