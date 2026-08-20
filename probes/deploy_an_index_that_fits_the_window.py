@@ -187,9 +187,21 @@ def main(argv) -> int:
             break
         loaded.append(line)
         kept_b += b
-    reach = re.findall(r"\]\(([^)]+\.md)\)", "\n".join(loaded))
-    ck("EVERY entry is inside the window that loads", len(reach) == len(all_links_before),
-       "%d of %d reachable" % (len(reach), len(all_links_before)))
+    # count ENTRIES, not links: the footer's pointer to the archive is a link and not a
+    # memory, and counting it printed "232 of 231".
+    # count ENTRIES, not links: the footer pointer to the archive is a link and not a
+    # memory, and counting it printed "232 of 231".
+    # count ENTRIES, not links: the footer pointer to the archive is a link and not a memory,
+    # and counting it printed "232 of 231".
+    _joined = "\n".join(loaded)
+    reach = [x for x in re.findall(r"\]\(([^)]+\.md)\)", _joined)
+             if x != "MEMORY_ARCHIVE.md"]
+    # compare ENTRIES with ENTRIES. all_links_before includes the footer pointer to the
+    # archive, which is a link and not a memory; comparing the two counts differed by one
+    # in whichever direction the pointer happened to fall.
+    _entries_before = [x for x in all_links_before if x != "MEMORY_ARCHIVE.md"]
+    ck("EVERY entry is inside the window that loads", len(reach) == len(_entries_before),
+       "%d of %d reachable" % (len(reach), len(_entries_before)))
 
     w = max(len(c[0]) for c in checks)
     for name, ok, detail in checks:
