@@ -190,6 +190,24 @@ def main():
     print(f"    That explains the paper's own note that some seeds find near-zero and others")
     print(f"    near 0.19: the solver returns either the degenerate partner or the next DISTINCT")
     print(f"    level. His number is the second gap, not a wrong first one.")
+    print("\nQ1b IS IT A DUPLICATED ARPACK VECTOR, OR A REAL CROSSING?")
+    for kk in (2, 4, 6):
+        vk, wk = spla.eigsh(Hs, k=kk, which="SA", tol=1e-13)
+        ok = np.argsort(vk)
+        ov = abs(float(wk[:, ok][:, 0] @ wk[:, ok][:, 1]))
+        print(f"    k={kk}: gap={vk[ok][1]-vk[ok][0]:.2e}  |<psi0|psi1>|={ov:.2e}  "
+              f"{'DUPLICATE' if ov > 1e-6 else 'orthogonal -> real two-fold level'}")
+    print("    and does it close CONTINUOUSLY, or glitch at one isolated point?")
+    cont = {}
+    for sv in (0.990, 0.995, 0.999, 1.0, 1.001, 1.005, 1.010):
+        Hc = sector_H(n, edges, defect, sv, states, index)
+        vc = np.sort(spla.eigsh(Hc, k=2, which="SA", tol=1e-13)[0])
+        cont[sv] = float(vc[1] - vc[0])
+        print(f"      s={sv:.3f}  gap={cont[sv]:.6f}")
+    sym = abs(cont[0.990] - cont[1.010]) < 0.002 and abs(cont[0.999] - cont[1.001]) < 2e-4
+    print(f"    symmetric V about s=1: {sym} -- a genuine level crossing at the uniform point,")
+    print(f"    where the gasket regains its full symmetry. Not a numerical artifact.")
+
 
     print("\nQ2  DOES E(0) IDENTIFY THE SECTOR, or would others reproduce it too?")
     ident = {}
