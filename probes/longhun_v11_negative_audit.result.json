@@ -1,0 +1,150 @@
+{
+  "probe": "longhun_v11_negative_audit",
+  "sha256": "156d3ebb59ec22500b8851be14b1db6aea1963b8754fcd7b6b9e4080361c7378",
+  "records": 19,
+  "models_negative": {
+    "qwen2.5:7b": 2,
+    "deepseek-r1:7b": 3,
+    "longhun-v4.0:q4": 4,
+    "longhun-v41:q4": 2,
+    "longhun-v43-v2:q4": 2,
+    "longhun-v43:q4": 6
+  },
+  "models_positive": {
+    "longhun-v1.8:latest": 10,
+    "longhun-v1.7:latest": 8,
+    "regulatory-firewall-v2.0": 1
+  },
+  "models_shared": [],
+  "dna_distinct": 12,
+  "leak_marker_hits": [],
+  "prompts_in_both_classes": 8,
+  "removed_ids_still_present": [],
+  "checks": [
+    {
+      "pass": true,
+      "label": "both datasets fetched",
+      "detail": "neg=13852B pos=12370B"
+    },
+    {
+      "pass": true,
+      "label": "SHA-256 is the r2 value he published, not the retracted r1",
+      "detail": "156d3ebb59ec2250"
+    },
+    {
+      "pass": true,
+      "label": "and the superseded r1 hash is genuinely gone",
+      "detail": ""
+    },
+    {
+      "pass": true,
+      "label": "19 records, as stated",
+      "detail": "19"
+    },
+    {
+      "pass": true,
+      "label": "every record carries exactly the 11 declared fields",
+      "detail": "no extras"
+    },
+    {
+      "pass": true,
+      "label": "every verdict is 'rejected', as stated",
+      "detail": "Counter({'rejected': 19})"
+    },
+    {
+      "pass": true,
+      "label": "request_id unique, which is what he says guarantees uniqueness",
+      "detail": "19/19"
+    },
+    {
+      "pass": true,
+      "label": "all four records he says he removed are absent",
+      "detail": "none present"
+    },
+    {
+      "pass": true,
+      "label": "the model he dropped entirely (longhun-v42-sys:q4) contributes nothing",
+      "detail": "['qwen2.5:7b', 'deepseek-r1:7b', 'longhun-v4.0:q4', 'longhun-v41:q4', 'longhun-v43-v2:q4', 'longhun-v43:q4']"
+    },
+    {
+      "pass": true,
+      "label": "six models, as he states after the drop",
+      "detail": "6"
+    },
+    {
+      "pass": true,
+      "label": "NO surviving record carries a leak marker he named in the four he removed",
+      "detail": "0 of 19"
+    },
+    {
+      "pass": true,
+      "label": "CONTROL: the leak search finds a planted marker, so the clean result can fail",
+      "detail": ""
+    },
+    {
+      "pass": true,
+      "label": "no ANSI escapes survive, as rule 2 requires",
+      "detail": ""
+    },
+    {
+      "pass": true,
+      "label": "no residual secret or PII patterns",
+      "detail": "clean"
+    },
+    {
+      "pass": true,
+      "label": "any truncation present is declared in the docs",
+      "detail": "1 truncated records"
+    },
+    {
+      "pass": true,
+      "label": "dna_sig does repeat across records, exactly as he warns it will",
+      "detail": "12 distinct over 19 records"
+    },
+    {
+      "pass": true,
+      "label": "and SCHEMA.md documents dna_sig, where he says he wrote the explanation",
+      "detail": ""
+    },
+    {
+      "pass": true,
+      "label": "every repeated dna_sig really does correspond to one attack prompt, which is the reason he gives for the repeats",
+      "detail": ""
+    },
+    {
+      "pass": true,
+      "label": "MEASUREMENT positive-class models",
+      "detail": "['longhun-v1.7:latest', 'longhun-v1.8:latest', 'regulatory-firewall-v2.0']"
+    },
+    {
+      "pass": true,
+      "label": "MEASUREMENT negative-class models",
+      "detail": "['deepseek-r1:7b', 'longhun-v4.0:q4', 'longhun-v41:q4', 'longhun-v43-v2:q4', 'longhun-v43:q4', 'qwen2.5:7b']"
+    },
+    {
+      "pass": true,
+      "label": "MEASUREMENT models shared by both classes",
+      "detail": "[]  (0 of 9)"
+    },
+    {
+      "pass": true,
+      "label": "MEASUREMENT source field, positive class",
+      "detail": "{'adversarial_pipeline': 18, 'regulatory_firewall': 1}"
+    },
+    {
+      "pass": true,
+      "label": "MEASUREMENT source field, negative class",
+      "detail": "{'adversarial_pipeline': 19}"
+    },
+    {
+      "pass": true,
+      "label": "MEASUREMENT attack prompts appearing in BOTH classes",
+      "detail": "8 of 19 positive prompts"
+    },
+    {
+      "pass": true,
+      "label": "the detached GPG signature is published beside the data",
+      "detail": "833B — NOT verified here: we do not hold his public key"
+    }
+  ]
+}
