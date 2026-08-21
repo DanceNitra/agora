@@ -121,7 +121,7 @@ class Ledger:
             pinned[sid] = entry
         return ("what the runbook said when last read",
                 {"sources": pinned, "commitment_scope": PROFILES[self.profile]["scope"],
-                 "verifies": self.profile})
+                 "verifies": PROFILES[self.profile]["verifies"], "profile": self.profile})
 
     def verify_receipt(self, receipt):
         for sid, pin in receipt["sources"].items():
@@ -321,12 +321,21 @@ def _run(make, observe, answer, verify):
 # generation, because append order IS the generation. It is one more field in the receipt, not a
 # different storage model. Measured below rather than granted -- the `ledger` adapter derives its
 # generation from the record index it already keeps.
+# `verifies` IS A LIST HERE TOO. @Stratogain caught the asymmetry on anthropics/claude-code#34556:
+# inspeximus's `identifier_contract()` declares `verifies` as a list while this receipt declared it
+# as a string (the profile name), so a consumer holding both had to branch on TYPE to read one field
+# name. Defensible as stated -- a receipt is minted under one profile, an artifact can serve several
+# -- but the branch costs the consumer and a one-element list costs nothing. The profile name moved
+# to its own field rather than being smuggled through `verifies`, which was the deeper version of
+# the same complaint: one field carrying two kinds of thing.
 PROFILES = {
     "content_continuity":    {"scope": ["source_id", "digest"],
-                              "verifies": "the answer is still backed by the same bytes",
+                              "verifies": ["answer_still_evidenced"],
+                              "means": "the answer is still backed by the same bytes",
                               "S5": "VALID"},
     "transition_continuity": {"scope": ["source_id", "digest", "generation"],
-                              "verifies": "the source has not moved since the answer was bound",
+                              "verifies": ["answer_still_evidenced", "source_never_moved"],
+                              "means": "and the source has not moved since the answer was bound",
                               "S5": "STALE"},
 }
 
@@ -383,7 +392,30 @@ def main(argv):
     # was declared: under content continuity the return IS valid, under transition continuity it is
     # not, and the same store gives both. If the two ever agree, the `generation` field has stopped
     # doing anything and the declaration has become decoration.
-    bad_profiles = []
+    # TYPE CONSISTENCY, checked rather than agreed. The asymmetry @Stratogain found existed because
+    # two artifacts used one field name for two shapes and nothing objected. "Pick one and write it
+    # down" only survives if something fails when it drifts back.
+    shape = []
+    for name, prof in PROFILES.items():
+        for field in ("scope", "verifies"):
+            if not isinstance(prof.get(field), list) or not prof[field]:
+                shape.append(f"PROFILES[{name}][{field}] is {type(prof.get(field)).__name__}, "
+                             f"must be a non-empty list")
+    probe_root = _mkroot()
+    lg = Ledger(probe_root, "content_continuity")
+    lg.observe(BOUND)
+    _, rcpt = lg.answer_with_receipt([BOUND])
+    for field in ("commitment_scope", "verifies"):
+        if not isinstance(rcpt.get(field), list):
+            shape.append(f"a minted receipt's `{field}` is {type(rcpt.get(field)).__name__}, "
+                         f"must be a list -- a consumer should never branch on type to read a field")
+    if not isinstance(rcpt.get("profile"), str):
+        shape.append("the profile name must travel in its own field, not inside `verifies`")
+    print("\nshape: " + ("`commitment_scope` and `verifies` are lists on every artifact, and the "
+                          "profile name has its own field" if not shape
+                          else "BROKEN -- " + "; ".join(shape)))
+
+    bad_profiles = list(shape)
     a, b_ = rows.get("ledger"), rows.get("ledger+gen")
     if isinstance(a, dict) and isinstance(b_, dict) and "error" not in a and "error" not in b_:
         for name, r in (("content_continuity", a), ("transition_continuity", b_)):
