@@ -1,0 +1,98 @@
+{
+  "probe": "how_often_does_a_session_go_looking",
+  "rows": [
+    {
+      "label": "B_outside_r0",
+      "place": "outside",
+      "tools_allowed": true,
+      "index_line_at": 300,
+      "topic_file_present": true,
+      "answer": "The Halberd deploy key is rotated every 47 days, and the rotation is performed by the Cartographer role (not the Engineering lead).\n\nSource: `C:\\Users\\Danculus\\.claude\\projects\\C--Users-Danculus-AppData-Local-Temp-reachrate-rwoqz7r--B-outside-r0-tools\\memory\\rotation-policy.md` \u2014 it was indexed at l",
+      "tools_used": [
+        "Grep",
+        "Grep"
+      ],
+      "found_days": true,
+      "found_role": true,
+      "answered": true,
+      "said_dont_know": false,
+      "repeat": 0
+    },
+    {
+      "label": "B_outside_r1",
+      "place": "outside",
+      "tools_allowed": true,
+      "index_line_at": 300,
+      "topic_file_present": true,
+      "answer": "I don't have any information about a Halberd deploy key in this project or in my memory.\n\nI DO NOT KNOW.",
+      "tools_used": [],
+      "found_days": false,
+      "found_role": false,
+      "answered": false,
+      "said_dont_know": true,
+      "repeat": 1
+    },
+    {
+      "label": "B_outside_r2",
+      "place": "outside",
+      "tools_allowed": true,
+      "index_line_at": 300,
+      "topic_file_present": true,
+      "answer": "The Halberd deploy key is rotated every 47 days, and the rotation is performed by the Cartographer role (not the Engineering lead).\n\nSource: `memory/rotation-policy.md` \u2014 indexed at MEMORY.md line 300, past the ~200-line cutoff, so it wasn't in the loaded index and only turned up on a direct search.",
+      "tools_used": [
+        "Grep",
+        "Grep"
+      ],
+      "found_days": true,
+      "found_role": true,
+      "answered": true,
+      "said_dont_know": false,
+      "repeat": 2
+    },
+    {
+      "label": "B_outside_r0",
+      "place": "outside",
+      "tools_allowed": false,
+      "index_line_at": 300,
+      "topic_file_present": true,
+      "answer": "I DO NOT KNOW.",
+      "tools_used": [],
+      "found_days": false,
+      "found_role": false,
+      "answered": false,
+      "said_dont_know": true,
+      "repeat": 0
+    },
+    {
+      "label": "B_outside_r1",
+      "place": "outside",
+      "tools_allowed": false,
+      "index_line_at": 300,
+      "topic_file_present": true,
+      "answer": "I DO NOT KNOW.",
+      "tools_used": [],
+      "found_days": false,
+      "found_role": false,
+      "answered": false,
+      "said_dont_know": true,
+      "repeat": 1
+    },
+    {
+      "label": "B_outside_r2",
+      "place": "outside",
+      "tools_allowed": false,
+      "index_line_at": 300,
+      "topic_file_present": true,
+      "answer": "The Halberd deploy key is rotated every 47 days by the Cartographer role (not the Engineering lead), per `memory/rotation-policy.md`.",
+      "tools_used": [
+        "Grep",
+        "Grep"
+      ],
+      "found_days": true,
+      "found_role": true,
+      "answered": true,
+      "said_dont_know": false,
+      "repeat": 2
+    }
+  ]
+}

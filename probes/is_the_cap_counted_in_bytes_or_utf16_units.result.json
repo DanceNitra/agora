@@ -1,0 +1,41 @@
+{
+  "probe": "is_the_cap_counted_in_bytes_or_utf16_units",
+  "rows": [
+    {
+      "label": "ascii_200x125",
+      "bytes": 25200,
+      "chars": 25200,
+      "utf16_units": 25200,
+      "warned": true,
+      "last_line": 198,
+      "answer": "LAST=CANARY-L0198 || WARNING=> WARNING: MEMORY.md is 24.6KB (limit: 24.4KB) \u2014 index entries are too long. Only part of it was loaded. Keep index entries to one line under ~200 chars; move detail into "
+    },
+    {
+      "label": "cjk_200x125",
+      "bytes": 61600,
+      "chars": 25200,
+      "utf16_units": 25200,
+      "warned": true,
+      "last_line": 198,
+      "answer": "LAST=CANARY-L0198 || WARNING=> WARNING: MEMORY.md is 24.6KB (limit: 24.4KB) \u2014 index entries are too long. Only part of it was loaded. Keep index entries to one line under ~200 chars; move detail into "
+    },
+    {
+      "label": "cjk_200x60",
+      "bytes": 22600,
+      "chars": 12200,
+      "utf16_units": 12200,
+      "warned": false,
+      "last_line": 200,
+      "answer": "LAST=CANARY-L0200 || WARNING=NO-INDICATOR"
+    },
+    {
+      "label": "emoji_200x125",
+      "bytes": 79800,
+      "chars": 25200,
+      "utf16_units": 43400,
+      "warned": true,
+      "last_line": 115,
+      "answer": "LAST=CANARY-L0115 || WARNING=> WARNING: MEMORY.md is 42.4KB (limit: 24.4KB) \u2014 index entries are too long. Only part of it was loaded. Keep index entries to one line under ~200 chars; move detail into "
+    }
+  ]
+}

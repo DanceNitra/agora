@@ -1,0 +1,108 @@
+{
+  "probe": "is_an_entry_past_the_cut_unreachable_or_merely_unindexed",
+  "question": "How often is the Halberd deploy key rotated, and who performs the rotation? Answer in one short sentence. If you do not know, reply exactly: I DO NOT KNOW.",
+  "fact_file": "rotation-policy.md",
+  "claude_version": "2.1.238 (Claude Code)",
+  "verdicts": {
+    "with_tools__negative_control_clean": true,
+    "with_tools__inside_answers": true,
+    "with_tools__outside_answers": true,
+    "with_tools__membership_loss_is_knowledge_loss": false,
+    "without_tools__negative_control_clean": true,
+    "without_tools__inside_answers": true,
+    "without_tools__outside_answers": false,
+    "without_tools__membership_loss_is_knowledge_loss": true
+  },
+  "rows": [
+    {
+      "label": "A_inside_window",
+      "place": "inside",
+      "tools_allowed": true,
+      "index_line_at": 50,
+      "topic_file_present": true,
+      "answer": "The Halberd deploy key is rotated every 47 days by the Cartographer role (not the Engineering lead).",
+      "tools_used": [
+        "Read"
+      ],
+      "found_days": true,
+      "found_role": true,
+      "answered": true,
+      "said_dont_know": false
+    },
+    {
+      "label": "B_outside_window",
+      "place": "outside",
+      "tools_allowed": true,
+      "index_line_at": 300,
+      "topic_file_present": true,
+      "answer": "The Halberd deploy key is rotated every 47 days by the Cartographer role (not the Engineering lead).",
+      "tools_used": [
+        "Grep",
+        "Grep"
+      ],
+      "found_days": true,
+      "found_role": true,
+      "answered": true,
+      "said_dont_know": false
+    },
+    {
+      "label": "C_no_file_at_all",
+      "place": null,
+      "tools_allowed": true,
+      "index_line_at": null,
+      "topic_file_present": false,
+      "answer": "I DO NOT KNOW",
+      "tools_used": [
+        "Grep",
+        "Grep"
+      ],
+      "found_days": false,
+      "found_role": false,
+      "answered": false,
+      "said_dont_know": true
+    },
+    {
+      "label": "A_inside_window",
+      "place": "inside",
+      "tools_allowed": false,
+      "index_line_at": 50,
+      "topic_file_present": true,
+      "answer": "The Halberd deploy key is rotated every 47 days by the Cartographer role (not the Engineering lead).",
+      "tools_used": [
+        "Read"
+      ],
+      "found_days": true,
+      "found_role": true,
+      "answered": true,
+      "said_dont_know": false
+    },
+    {
+      "label": "B_outside_window",
+      "place": "outside",
+      "tools_allowed": false,
+      "index_line_at": 300,
+      "topic_file_present": true,
+      "answer": "I DO NOT KNOW.",
+      "tools_used": [],
+      "found_days": false,
+      "found_role": false,
+      "answered": false,
+      "said_dont_know": true
+    },
+    {
+      "label": "C_no_file_at_all",
+      "place": null,
+      "tools_allowed": false,
+      "index_line_at": null,
+      "topic_file_present": false,
+      "answer": "I DO NOT KNOW.",
+      "tools_used": [
+        "Grep"
+      ],
+      "found_days": false,
+      "found_role": false,
+      "answered": false,
+      "said_dont_know": true
+    }
+  ]
+}
