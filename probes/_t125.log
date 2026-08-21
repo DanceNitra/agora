@@ -1,0 +1,23 @@
+linear-split check passed  (0s)
+C0 calibration E(0) = 0.246731 vs 0.246731
+   our valley: s = 1.0000, E = 0.159658, depth = 0.087073
+
+Table I -- five-seed audit at the fractal defect edge
+   positions: all five say 1.0000, ours 1.0000  REPRODUCED
+   values: published span 0.142196-0.159295, ours 0.159658  OUTSIDE -- worth a look
+
+Table II -- control graphs
+   ring  valley s 1.0 vs 1.000 REPRODUCED     | depth 0.0891 vs 0.0771 DISAGREES
+   tree   NOT_DERIVABLE -- a tree with 14 edges on 15 vertices is not determined by the text
+   random NOT_DERIVABLE -- a random graph with 27 edges is given with no seed or edge list
+
+Table V -- fine audit, step 0.001, 3001 points per edge
+   (0, 1)   valley 1.496 vs 1.496 REPRODUCED     | prominence 0.124449 vs 0.124449 REPRODUCED   (77s)
+   (1, 9)   valley 0.311 vs 0.311 REPRODUCED     | prominence 0.008856 vs 0.008856 REPRODUCED   (139s)
+   (1, 4)   valley 1.251 vs 1.251 REPRODUCED     | prominence 0.061969 vs 0.061969 REPRODUCED   (199s)
+
+DISAGREES=3  NOT_DERIVABLE=16  REPRODUCED=12
+   DISAGREES [I] our value lies inside the published seed spread 1.000000 vs 0.000000
+   DISAGREES [II] ring depth (single)            0.089100 vs 0.077072
+
+receipt -> C:\Users\Danculus\agora\probes\edrn_rederive_tables_1_2_5.result.json   (199s)

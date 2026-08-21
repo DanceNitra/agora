@@ -1,0 +1,166 @@
+[
+  {
+    "sha": "6aa23b9fbe4ad027bbc9620ec131a583f1354d03",
+    "node_id": "C_kwDOT8HvItoAKDZhYTIzYjlmYmU0YWQwMjdiYmM5NjIwZWMxMzFhNTgzZjEzNTRkMDM",
+    "commit": {
+      "author": {
+        "name": "UID9622",
+        "email": "uid9622@petalmail.com",
+        "date": "2026-08-21T04:42:41Z"
+      },
+      "committer": {
+        "name": "UID9622",
+        "email": "uid9622@petalmail.com",
+        "date": "2026-08-21T04:42:41Z"
+      },
+      "message": "fix(shared-audit): v1.1-negative r2 - purge 4 leak-type records (post-review)\n\nIndependent review flagged leak-type rejections (refusal that spills\ninternal system-prompt rules). Full re-audit found 4, not 2:\n- REQ-NEG-dc712c22-009 (v42-sys): leaked '家法第一条' rule text\n- REQ-NEG-4a41a796-013 (v43-v2): leaked P0-meltdown reason phrase\n- REQ-NEG-d2c047bf-015 (v43-v2): leaked system-prompt structure\n- REQ-NEG-25890147-027 (v43): leaked training-time instruction fragment\n\nPurged all 4, added 4 clean refusals from candidate pool (qwen academic,\nv43 morse-您/safety-audit/startup-flow). v42-sys had no remaining clean\nrejection -> honestly dropped (7->6 models). dna_sig uniqueness clarified\nin SCHEMA.md §6 (identity by request_id, dna_sig inherits prompt DNA so\ncross-model repeats are expected).\n\n- Dataset SHA-256: 156d3ebb...7378 (was b78c9509)\n- SCHEMA.md rev2 + README + MANIFEST updated\n- All 6 files GPG re-signed: A2D0092CEE2E5BA87035600924C3704A8CC26D5F\n\nDNA: #龍芯⚡️2026-08-21-V1.1-NEG-R2-PURGE-v1.0",
+      "tree": {
+        "sha": "65d0d4b1cfcc1bd1159303e4de74a72b223db7c0",
+        "url": "https://api.github.com/repos/UID9622/longhun-financial-deep-seek/git/trees/65d0d4b1cfcc1bd1159303e4de74a72b223db7c0"
+      },
+      "url": "https://api.github.com/repos/UID9622/longhun-financial-deep-seek/git/commits/6aa23b9fbe4ad027bbc9620ec131a583f1354d03",
+      "comment_count": 0,
+      "verification": {
+        "verified": true,
+        "reason": "valid",
+        "signature": "-----BEGIN PGP SIGNATURE-----\n\niQIzBAABCAAdFiEEotAJLO4uW6hwNWAJJMNwSozCbV8FAmqH12AACgkQJMNwSozC\nbV8InQ//W/K2TrN/n+wqCpW/SoVKtezmZ1qs0hhQ3abecGYMmbtZ4vzgr+k/4jcR\n8JWOdaz1Ca2f4je0yjfL4ZnQGTbRwH2zkW9NoSZdBoPX5Dy82EyhHSm3f8M9BvpP\nVoXaa/mkKFOXeb752p/qSk9L1Fbl7E/aK9yyfdwjGw7e5byE+nibVbZ8UYrnzOrC\nBMhSM8hO1F+DEf3Yx4bbw84Nx8ZbQVSVGi6QyWaLMfUl5FjWyzPY6V89/Qy/CVtH\nNYOoKqArUMK13qQ1inC45bXH5VodaCHuMstSQ87Di0YoiUTNn2pE5ZLzbGuUZV3Y\nMZivSV781AOe4kLhXJiRH4GT178kQs9XHFR4S4uJ+px8FTYVuufb8DCL4in2pAJu\nZ16FiIt4QP7Vu00qe5sIXVgeihZ+jame21RFENnv7bWgUYsE84K7OMkVeP7lcnzK\nGOiOMf8BmkZknCz1zczOPGur1ZnktlPTjn2YfrIX0xf7gV+3IKDAC8Vux6O38LEs\n4YZ/SYESsXt3HJiCdNRid80yfdCJojjuIIDwV6dK1JBIlS504XkKIwOikK+EEZI9\nyEMGFQX8f/43We8NjwwnkMzcTsL83iJU/coGSWV/vZ1FdnTRZ4VjNzP614t6AeA3\nY/rNvQh6RpCvBSGU+a02nct1+xX+EzOSZ661ij4u4t6A0KXOSQU=\n=ATTs\n-----END PGP SIGNATURE-----",
+        "payload": "tree 65d0d4b1cfcc1bd1159303e4de74a72b223db7c0\nparent fb267b626740ec6e9a75571aedab28b344258197\nauthor UID9622 <uid9622@petalmail.com> 1787287361 +0800\ncommitter UID9622 <uid9622@petalmail.com> 1787287361 +0800\n\nfix(shared-audit): v1.1-negative r2 - purge 4 leak-type records (post-review)\n\nIndependent review flagged leak-type rejections (refusal that spills\ninternal system-prompt rules). Full re-audit found 4, not 2:\n- REQ-NEG-dc712c22-009 (v42-sys): leaked '家法第一条' rule text\n- REQ-NEG-4a41a796-013 (v43-v2): leaked P0-meltdown reason phrase\n- REQ-NEG-d2c047bf-015 (v43-v2): leaked system-prompt structure\n- REQ-NEG-25890147-027 (v43): leaked training-time instruction fragment\n\nPurged all 4, added 4 clean refusals from candidate pool (qwen academic,\nv43 morse-您/safety-audit/startup-flow). v42-sys had no remaining clean\nrejection -> honestly dropped (7->6 models). dna_sig uniqueness clarified\nin SCHEMA.md §6 (identity by request_id, dna_sig inherits prompt DNA so\ncross-model repeats are expected).\n\n- Dataset SHA-256: 156d3ebb...7378 (was b78c9509)\n- SCHEMA.md rev2 + README + MANIFEST updated\n- All 6 files GPG re-signed: A2D0092CEE2E5BA87035600924C3704A8CC26D5F\n\nDNA: #龍芯⚡️2026-08-21-V1.1-NEG-R2-PURGE-v1.0\n",
+        "verified_at": "2026-08-21T04:43:55Z"
+      }
+    },
+    "url": "https://api.github.com/repos/UID9622/longhun-financial-deep-seek/commits/6aa23b9fbe4ad027bbc9620ec131a583f1354d03",
+    "html_url": "https://github.com/UID9622/longhun-financial-deep-seek/commit/6aa23b9fbe4ad027bbc9620ec131a583f1354d03",
+    "comments_url": "https://api.github.com/repos/UID9622/longhun-financial-deep-seek/commits/6aa23b9fbe4ad027bbc9620ec131a583f1354d03/comments",
+    "author": {
+      "login": "UID9622",
+      "id": 228023117,
+      "node_id": "U_kgDODZdbTQ",
+      "avatar_url": "https://avatars.githubusercontent.com/u/228023117?v=4",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/UID9622",
+      "html_url": "https://github.com/UID9622",
+      "followers_url": "https://api.github.com/users/UID9622/followers",
+      "following_url": "https://api.github.com/users/UID9622/following{/other_user}",
+      "gists_url": "https://api.github.com/users/UID9622/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/UID9622/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/UID9622/subscriptions",
+      "organizations_url": "https://api.github.com/users/UID9622/orgs",
+      "repos_url": "https://api.github.com/users/UID9622/repos",
+      "events_url": "https://api.github.com/users/UID9622/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/UID9622/received_events",
+      "type": "User",
+      "user_view_type": "public",
+      "site_admin": false
+    },
+    "committer": {
+      "login": "UID9622",
+      "id": 228023117,
+      "node_id": "U_kgDODZdbTQ",
+      "avatar_url": "https://avatars.githubusercontent.com/u/228023117?v=4",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/UID9622",
+      "html_url": "https://github.com/UID9622",
+      "followers_url": "https://api.github.com/users/UID9622/followers",
+      "following_url": "https://api.github.com/users/UID9622/following{/other_user}",
+      "gists_url": "https://api.github.com/users/UID9622/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/UID9622/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/UID9622/subscriptions",
+      "organizations_url": "https://api.github.com/users/UID9622/orgs",
+      "repos_url": "https://api.github.com/users/UID9622/repos",
+      "events_url": "https://api.github.com/users/UID9622/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/UID9622/received_events",
+      "type": "User",
+      "user_view_type": "public",
+      "site_admin": false
+    },
+    "parents": [
+      {
+        "sha": "fb267b626740ec6e9a75571aedab28b344258197",
+        "url": "https://api.github.com/repos/UID9622/longhun-financial-deep-seek/commits/fb267b626740ec6e9a75571aedab28b344258197",
+        "html_url": "https://github.com/UID9622/longhun-financial-deep-seek/commit/fb267b626740ec6e9a75571aedab28b344258197"
+      }
+    ]
+  },
+  {
+    "sha": "fb267b626740ec6e9a75571aedab28b344258197",
+    "node_id": "C_kwDOT8HvItoAKGZiMjY3YjYyNjc0MGVjNmU5YTc1NTcxYWVkYWIyOGIzNDQyNTgxOTc",
+    "commit": {
+      "author": {
+        "name": "UID9622",
+        "email": "uid9622@petalmail.com",
+        "date": "2026-08-21T04:24:31Z"
+      },
+      "committer": {
+        "name": "UID9622",
+        "email": "uid9622@petalmail.com",
+        "date": "2026-08-21T04:24:31Z"
+      },
+      "message": "feat(shared-audit): add v1.1-negative dataset (19 real rejection records)\n\n- v1.1-negative.jsonl: 19 records, all verdict=rejected, same 11-field schema\n- Real adversarial test: 37 real attack prompts x 7 local models, responses\n  are real-time model output, human-reviewed (pseudo-rejections removed)\n- lh_negative_collector.py / lh_negative_merge.py: reproducible pipeline\n- MANIFEST.md: v1.1-negative SHA-256 appended\n- README.md: files list, honesty statement, roadmap updated\n- All GPG-signed: A2D0092CEE2E5BA87035600924C3704A8CC26D5F\n\nCloses #1591 action items (DanceNitra review response)\nDNA: #龍芯⚡️2026-08-21-V1.1-NEG-DELIVERY-v1.0",
+      "tree": {
+        "sha": "216fe76300e7eef0c47c2089c58e87a157ba1979",
+        "url": "https://api.github.com/repos/UID9622/longhun-financial-deep-seek/git/trees/216fe76300e7eef0c47c2089c58e87a157ba1979"
+      },
+      "url": "https://api.github.com/repos/UID9622/longhun-financial-deep-seek/git/commits/fb267b626740ec6e9a75571aedab28b344258197",
+      "comment_count": 0,
+      "verification": {
+        "verified": true,
+        "reason": "valid",
+        "signature": "-----BEGIN PGP SIGNATURE-----\n\niQIzBAABCAAdFiEEotAJLO4uW6hwNWAJJMNwSozCbV8FAmqH0xwACgkQJMNwSozC\nbV/erQ/+JOPHR6NHinZuD0K2RbEzFW1xtTN+p85VG6cTXT0xinZX4YMqkAb3AOyj\n/yhSvnFA2zfTk3LstEOLBO1SDQiOT05H0yoxe1Il3oK1pUkBonbtgOZqxHn7rYEt\n2ZOETZvMbK5duG7NI7x1+8UaX+RjPE9cHqUHE8nHf8cCmceyJI0vFiFyA0QaKqDo\n4VbCSr7O1IvT9ZepyyLWeRDIrs7Ef1FPE0QgB3hmt75Cjx8DlrRWye/olqb9oY+t\nq3Q5WhYy+airajE20RDCBm66LTcq8RESG/HVdeiiaccVs5Ngn6jdki/1cXK0VSyi\n215PMxEM9kJ2EuRGmuaMYohZZDtohWTqw+2Dv3t3alFn33TAjSEeSvsgljGvONe/\nRJRF30IUVnjhOlYCZlRXP3LRtUDF3LkIAauIZLoFd9QGXVCRw6gC3Rzg5YXHqimD\nIUaH4/GUuBjiJg+l0M9DZzuBr21vhPf2mygM/42OYHIbDPfh+37qIYI2zOkI95yS\nmfCa3IaR1mMIpp2jFTPp7xMJROfxOJVyvySXsHWUH78/Rq/0MzATWPQBcPwDrTEp\nhbGKpAS5KW0Z/QQLIVCaIvF8w0BndBTpX0Qx4HhMQIYluBLYar7aoNC5BdMGjcUh\nyGx8x0hrrle8bkVBbV1+Ym3fgaQJUsusiRegDnl7hdhrWBPXLIo=\n=6Ycj\n-----END PGP SIGNATURE-----",
+        "payload": "tree 216fe76300e7eef0c47c2089c58e87a157ba1979\nparent 3054dc234b8405ab39d8af3ab99c50904dd96118\nauthor UID9622 <uid9622@petalmail.com> 1787286271 +0800\ncommitter UID9622 <uid9622@petalmail.com> 1787286271 +0800\n\nfeat(shared-audit): add v1.1-negative dataset (19 real rejection records)\n\n- v1.1-negative.jsonl: 19 records, all verdict=rejected, same 11-field schema\n- Real adversarial test: 37 real attack prompts x 7 local models, responses\n  are real-time model output, human-reviewed (pseudo-rejections removed)\n- lh_negative_collector.py / lh_negative_merge.py: reproducible pipeline\n- MANIFEST.md: v1.1-negative SHA-256 appended\n- README.md: files list, honesty statement, roadmap updated\n- All GPG-signed: A2D0092CEE2E5BA87035600924C3704A8CC26D5F\n\nCloses #1591 action items (DanceNitra review response)\nDNA: #龍芯⚡️2026-08-21-V1.1-NEG-DELIVERY-v1.0\n",
+        "verified_at": "2026-08-21T04:25:06Z"
+      }
+    },
+    "url": "https://api.github.com/repos/UID9622/longhun-financial-deep-seek/commits/fb267b626740ec6e9a75571aedab28b344258197",
+    "html_url": "https://github.com/UID9622/longhun-financial-deep-seek/commit/fb267b626740ec6e9a75571aedab28b344258197",
+    "comments_url": "https://api.github.com/repos/UID9622/longhun-financial-deep-seek/commits/fb267b626740ec6e9a75571aedab28b344258197/comments",
+    "author": {
+      "login": "UID9622",
+      "id": 228023117,
+      "node_id": "U_kgDODZdbTQ",
+      "avatar_url": "https://avatars.githubusercontent.com/u/228023117?v=4",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/UID9622",
+      "html_url": "https://github.com/UID9622",
+      "followers_url": "https://api.github.com/users/UID9622/followers",
+      "following_url": "https://api.github.com/users/UID9622/following{/other_user}",
+      "gists_url": "https://api.github.com/users/UID9622/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/UID9622/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/UID9622/subscriptions",
+      "organizations_url": "https://api.github.com/users/UID9622/orgs",
+      "repos_url": "https://api.github.com/users/UID9622/repos",
+      "events_url": "https://api.github.com/users/UID9622/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/UID9622/received_events",
+      "type": "User",
+      "user_view_type": "public",
+      "site_admin": false
+    },
+    "committer": {
+      "login": "UID9622",
+      "id": 228023117,
+      "node_id": "U_kgDODZdbTQ",
+      "avatar_url": "https://avatars.githubusercontent.com/u/228023117?v=4",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/UID9622",
+      "html_url": "https://github.com/UID9622",
+      "followers_url": "https://api.github.com/users/UID9622/followers",
+      "following_url": "https://api.github.com/users/UID9622/following{/other_user}",
+      "gists_url": "https://api.github.com/users/UID9622/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/UID9622/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/UID9622/subscriptions",
+      "organizations_url": "https://api.github.com/users/UID9622/orgs",
+      "repos_url": "https://api.github.com/users/UID9622/repos",
+      "events_url": "https://api.github.com/users/UID9622/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/UID9622/received_events",
+      "type": "User",
+      "user_view_type": "public",
+      "site_admin": false
+    },
+    "parents": [
+      {
+        "sha": "3054dc234b8405ab39d8af3ab99c50904dd96118",
+        "url": "https://api.github.com/repos/UID9622/longhun-financial-deep-seek/commits/3054dc234b8405ab39d8af3ab99c50904dd96118",
+        "html_url": "https://github.com/UID9622/longhun-financial-deep-seek/commit/3054dc234b8405ab39d8af3ab99c50904dd96118"
+      }
+    ]
+  }
+]

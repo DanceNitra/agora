@@ -1,0 +1,38 @@
+tables found: ['tab:l2_valley', 'tab:control_graphs', 'tab:default_control', 'tab:sw_full', 'tab:sw_multiseed']
+C0 calibration  E(0) = 0.246731 vs published 0.246731  OK
+
+Table III -- default observable, edge (0,6), s = 0.99 / 1.00 / 1.01
+   s=0.99  D 0.953270 vs 0.953270 REPRODUCED     | E 0.164032 vs 0.164032 REPRODUCED
+   s=1.0   D 0.954210 vs 0.957830 DISAGREES      | E 0.159658 vs 0.159658 REPRODUCED
+   s=1.01  D 0.940725 vs 0.940725 REPRODUCED     | E 0.160451 vs 0.160451 REPRODUCED
+
+Table IV -- small-world, 20 edges, N=10 (1s so far)
+   (0, 1)   range 0.176842 vs 0.176842 REPRODUCED     | valley 1.500 vs 1.500 REPRODUCED
+   (0, 9)   range 0.078783 vs 0.078783 REPRODUCED     | valley 0.110 vs 0.110 REPRODUCED
+   (0, 2)   range 0.083366 vs 0.083366 REPRODUCED     | valley 1.020 vs 1.020 REPRODUCED
+   (0, 8)   range 0.065437 vs 0.065437 REPRODUCED     | valley 0.860 vs 0.860 REPRODUCED
+   (1, 9)   range 0.113332 vs 0.113332 REPRODUCED     | valley 0.310 vs 0.310 REPRODUCED
+   (1, 4)   range 0.103002 vs 0.103002 REPRODUCED     | valley 1.250 vs 1.250 REPRODUCED
+   (1, 8)   range 0.085229 vs 0.085229 REPRODUCED     | valley 0.720 vs 0.720 REPRODUCED
+   (1, 6)   range 0.089372 vs 0.089372 REPRODUCED     | valley 0.800 vs 0.800 REPRODUCED
+   (2, 3)   range 0.085424 vs 0.085424 REPRODUCED     | valley 1.090 vs 1.090 REPRODUCED
+   (2, 4)   range 0.077994 vs 0.077994 REPRODUCED     | valley 0.940 vs 0.940 REPRODUCED
+   (2, 5)   range 0.119505 vs 0.119505 REPRODUCED     | valley 0.750 vs 0.750 REPRODUCED
+   (3, 4)   range 0.100840 vs 0.100840 REPRODUCED     | valley 0.840 vs 0.840 REPRODUCED
+   (3, 5)   range 0.073179 vs 0.073179 REPRODUCED     | valley 0.980 vs 0.980 REPRODUCED
+   (4, 5)   range 0.087107 vs 0.087107 REPRODUCED     | valley 1.100 vs 1.100 REPRODUCED
+   (4, 6)   range 0.089948 vs 0.089948 REPRODUCED     | valley 0.910 vs 0.910 REPRODUCED
+   (5, 6)   range 0.082213 vs 0.082213 REPRODUCED     | valley 1.080 vs 1.080 REPRODUCED
+   (6, 7)   range 0.104364 vs 0.104364 REPRODUCED     | valley 0.470 vs 0.470 REPRODUCED
+   (6, 8)   range 0.157596 vs 0.157596 REPRODUCED     | valley 1.380 vs 1.380 REPRODUCED
+   (7, 8)   range 0.107895 vs 0.107895 REPRODUCED     | valley 0.000 vs 0.000 REPRODUCED
+   (7, 9)   range 0.081416 vs 0.081416 REPRODUCED     | valley 2.140 vs 2.140 REPRODUCED
+
+C1 can-fail control: DISAGREES
+
+DISAGREES=2  REPRODUCED=45
+
+1 cells disagree:
+   [III] D_default(s=1.0)             published 0.954210  recomputed 0.957830
+
+receipt -> C:\Users\Danculus\agora\probes\edrn_rederive_the_tables.result.json   (152s)
