@@ -91,36 +91,62 @@ def _write(root, name, body):
 # anyway, which is the point of the cell.
 # --------------------------------------------------------------------------------------------------
 class Ledger:
-    def __init__(self, root):
-        self.root, self.records = root, []
+    """`profile` selects which predicate this store's receipts claim to support. Nothing about the
+    STORAGE changes between the two -- the generation is the count of observations already recorded
+    for that source, which an append-only ledger has for free."""
+
+    def __init__(self, root, profile="content_continuity"):
+        self.root, self.records, self.profile = root, [], profile
 
     def observe(self, source_id):
         raw = open(os.path.join(self.root, source_id), "rb").read()
         self.records.append({"source_id": source_id, "digest": hashlib.sha256(raw).hexdigest(),
                              "seq": len(self.records)})
 
+    def _generation(self, sid):
+        return sum(1 for r in self.records if r["source_id"] == sid)
+
     def answer_with_receipt(self, source_ids):
-        """The answer is 'what these files said when last read'. The receipt binds it to exactly those."""
+        """The answer is 'what these files said when last read'. The receipt binds it to exactly
+        those, and -- under the stronger profile -- to how many times they had been read by then."""
+        want = set(PROFILES[self.profile]["scope"])
         pinned = {}
         for sid in source_ids:
-            last = [r for r in self.records if r["source_id"] == sid]
-            if last:
-                pinned[sid] = last[-1]["digest"]
-        return "what the runbook said when last read", {"sources": pinned}
+            seen = [r for r in self.records if r["source_id"] == sid]
+            if not seen:
+                continue
+            entry = {"digest": seen[-1]["digest"]}
+            if "generation" in want:
+                entry["generation"] = self._generation(sid)
+            pinned[sid] = entry
+        return ("what the runbook said when last read",
+                {"sources": pinned, "commitment_scope": PROFILES[self.profile]["scope"],
+                 "verifies": self.profile})
 
     def verify_receipt(self, receipt):
-        for sid, dig in receipt["sources"].items():
+        for sid, pin in receipt["sources"].items():
             raw = open(os.path.join(self.root, sid), "rb").read()
-            if hashlib.sha256(raw).hexdigest() != dig:
+            now = hashlib.sha256(raw).hexdigest()
+            # re-observe, because verifying IS a read and an append-only ledger records its reads
+            self.records.append({"source_id": sid, "digest": now, "seq": len(self.records)})
+            if now != pin["digest"]:
+                return "STALE"
+            if "generation" in pin and self._generation(sid) - 1 != pin["generation"]:
+                # same bytes, but the ledger saw the source move in between: content continuity
+                # holds and transition continuity does not. Same event, opposite verdicts.
                 return "STALE"
         return "VALID"
 
 
-def check_ledger():
-    return _run(lambda root: Ledger(root), observe=lambda b, sid: b.observe(sid),
-                answer=lambda b, sids: b.answer_with_receipt(sids),
-                verify=lambda b, r: b.verify_receipt(r))
-CHECKS["ledger"] = check_ledger
+def _ledger(profile):
+    return lambda: _run(lambda root: Ledger(root, profile),
+                        observe=lambda b, sid: b.observe(sid),
+                        answer=lambda b, sids: b.answer_with_receipt(sids),
+                        verify=lambda b, r: b.verify_receipt(r))
+
+
+CHECKS["ledger"] = _ledger("content_continuity")
+CHECKS["ledger+gen"] = _ledger("transition_continuity")
 
 
 # --------------------------------------------------------------------------------------------------
@@ -262,18 +288,47 @@ def _run(make, observe, answer, verify):
         ("S2_bound_changed", lambda root: _write(root, BOUND, BOUND_V2)),
         ("S3_unbound_changed", lambda root: _write(root, UNBOUND, UNBOUND_V2)),
         ("S4_semantic_noop", lambda root: _write(root, BOUND, BOUND_SEMANTIC_NOOP)),
-        ("S5_returned_to_original", lambda root: (_write(root, BOUND, BOUND_V2),
-                                                  _write(root, BOUND, BOUND_V1))),
+        # S5 hands the backend to the mutation, because a read ledger only knows what it READ.
+        # The first version wrote B then A with nobody looking in between, and every backend
+        # correctly said VALID -- there was no transition to detect, only a file that ends where it
+        # started. That is the fixture failing to instantiate its own case, not the store missing
+        # it. A tool reads the file while it is B, which is exactly the world @Stratogain measured:
+        # 226 of 634 paths changed BECAUSE the same path is re-read over months.
+        ("S5_returned_to_original", lambda root, b: (_write(root, BOUND, BOUND_V2),
+                                                     observe(b, BOUND),
+                                                     _write(root, BOUND, BOUND_V1))),
     ):
         root = _mkroot()
         b = make(root)
         observe(b, BOUND)
         observe(b, UNBOUND)
         _, receipt = answer(b, [BOUND])        # bound to the runbook ONLY
-        mutate(root)
+        try:
+            mutate(root, b)
+        except TypeError:
+            mutate(root)
         out[name] = verify(b, receipt)
     return out
 
+
+# TWO PROFILES, and S5 is the whole reason they have to be declared rather than inferred.
+# @Stratogain's framing on anthropics/claude-code#34556: making S5 required would silently change
+# the predicate from CONTENT continuity to TRANSITION continuity, and those need different fields.
+# The two are indistinguishable from outside while returning opposite verdicts on the same event,
+# which is precisely why `verifies` has to be in the artifact.
+#
+# And his observation that makes the stronger profile cheap: an append-only ledger ALREADY has the
+# generation, because append order IS the generation. It is one more field in the receipt, not a
+# different storage model. Measured below rather than granted -- the `ledger` adapter derives its
+# generation from the record index it already keeps.
+PROFILES = {
+    "content_continuity":    {"scope": ["source_id", "digest"],
+                              "verifies": "the answer is still backed by the same bytes",
+                              "S5": "VALID"},
+    "transition_continuity": {"scope": ["source_id", "digest", "generation"],
+                              "verifies": "the source has not moved since the answer was bound",
+                              "S5": "STALE"},
+}
 
 REQUIRED = {"S1_no_change": "VALID", "S2_bound_changed": "STALE",
             "S3_unbound_changed": "VALID", "S4_semantic_noop": "STALE"}
@@ -324,13 +379,40 @@ def main(argv):
         got = {k for k, v in REQUIRED.items() if r.get(k) != v}
         if got != expect_fail:
             bad.append(f"{name} fails {sorted(got) or ['nothing']}, must fail exactly {sorted(expect_fail)}")
+    # S5 IS NOW REQUIRED -- per profile. It stopped being an open question the moment the predicate
+    # was declared: under content continuity the return IS valid, under transition continuity it is
+    # not, and the same store gives both. If the two ever agree, the `generation` field has stopped
+    # doing anything and the declaration has become decoration.
+    bad_profiles = []
+    a, b_ = rows.get("ledger"), rows.get("ledger+gen")
+    if isinstance(a, dict) and isinstance(b_, dict) and "error" not in a and "error" not in b_:
+        for name, r in (("content_continuity", a), ("transition_continuity", b_)):
+            want = PROFILES[name]["S5"]
+            if r.get("S5_returned_to_original") != want:
+                bad_profiles.append(f"{name} S5 = {r.get('S5_returned_to_original')}, wants {want}")
+        if a.get("S5_returned_to_original") == b_.get("S5_returned_to_original"):
+            bad_profiles.append("the two profiles AGREE on S5 -- `generation` is doing nothing")
+        for k in ("S1_no_change", "S2_bound_changed", "S3_unbound_changed", "S4_semantic_noop"):
+            if a.get(k) != b_.get(k):
+                bad_profiles.append(f"the profiles differ on {k}; they must differ ONLY on S5")
+    else:
+        bad_profiles.append("one of the two profiles did not run")
+    print("\nprofiles: " + ("the same store returns opposite S5 verdicts under the two declared "
+                            "predicates and agrees everywhere else -- which is why `verifies` has "
+                            "to be in the receipt" if not bad_profiles
+                            else "BROKEN -- " + "; ".join(bad_profiles)))
+
     print("\ncontrols: " + ("all three adversarial backends fail exactly the scenario they should"
                             if not bad else "BROKEN -- " + "; ".join(bad)))
 
-    print("\nS1-S4 are required. S5 is reported, not required: a pure digest check calls a return to the")
-    print("original bytes VALID, and whether a consumer should be told the source moved and came back is")
-    print("a policy question. A repeated old digest is a new observation of previous bytes; a revert")
-    print("command in a store is an operation on an assertion. The cell measures; it does not settle it.")
+    print("\nS1-S4 are required of every backend. S5 is required PER PROFILE, and it is the reason")
+    print("the profiles exist: the same ledger returns VALID under content continuity and STALE")
+    print("under transition continuity for the same event. Making S5 universally required would")
+    print("silently change which predicate the cell tests -- and the field it needs is `generation`,")
+    print("which an append-only ledger already has, because append order IS the generation. One")
+    print("extra field in the receipt, not a different storage model.")
+    print("A repeated old digest is a new observation of previous bytes; a revert command in a store")
+    print("is an operation on an assertion. The cell now tells them apart instead of declining to.")
 
     out = {"fixture": "receipt_binding", "bound_source": BOUND, "unbound_source": UNBOUND,
            "query": QUERY, "required": REQUIRED,
@@ -340,7 +422,7 @@ def main(argv):
     p = os.path.join(d, "receipt_binding.json")
     json.dump(out, open(p, "w", encoding="utf-8"), indent=2)
     print(f"\nreceipt -> {p}")
-    return 0 if not bad else 1
+    return 0 if not (bad or bad_profiles) else 1
 
 
 if __name__ == "__main__":
