@@ -1,0 +1,176 @@
+{
+ "spearman_fit_vs_relevance": 0.1001,
+ "n": 18,
+ "top_fit": "neomjs/neo#16706",
+ "most_on_axis": "MythologIQ-Labs-LLC/agent-memory#161",
+ "ram_sense_scored_10_plus": [
+  "memgraph/memgraph#3607",
+  "openclaw/openclaw#115424",
+  "gosuda/bitcoin-rs#39",
+  "openai/codex#31793"
+ ],
+ "rows": [
+  {
+   "slug": "neomjs/neo#16706",
+   "fit": 14,
+   "task": "689453",
+   "state": "open",
+   "ram": 0,
+   "agent": 8,
+   "title": "An external plane cannot recover itself: it breaks, we see it, and (47"
+  },
+  {
+   "slug": "semantica-agi/semantica#375",
+   "fit": 12,
+   "task": "689453",
+   "state": "closed",
+   "ram": 0,
+   "agent": 9,
+   "title": "[FEATURE]: CrewAI Agentic Framework \u00e2\u20ac\u201d Decision Intelligence, Con (5c"
+  },
+  {
+   "slug": "MythologIQ-Labs-LLC/agent-memory#161",
+   "fit": 12,
+   "task": "1bcbf3",
+   "state": "closed",
+   "ram": 0,
+   "agent": 20,
+   "title": "Map peer compatibility across the AI governance ecosystem without (7c)"
+  },
+  {
+   "slug": "memgraph/memgraph#3607",
+   "fit": 12,
+   "task": "689453",
+   "state": "open",
+   "ram": 3,
+   "agent": 0,
+   "title": "Data persistence issue when deploying Memgraph with Docker on Rail (5c"
+  },
+  {
+   "slug": "Significant-Gravitas/AutoGPT#13458",
+   "fit": 12,
+   "task": "689453",
+   "state": "open",
+   "ram": 0,
+   "agent": 8,
+   "title": "Memory backend: Dakera \u00e2\u20ac\u201d decay-weighted persistent memory for Au (13"
+  },
+  {
+   "slug": "Gentleman-Programming/gentle-ai#2471",
+   "fit": 12,
+   "task": "5d2adb",
+   "state": "open",
+   "ram": 0,
+   "agent": 0,
+   "title": "meta: the 20 roots behind ~250 open issues, and what done means (65c)"
+  },
+  {
+   "slug": "langchain-ai/langgraph#6491",
+   "fit": 12,
+   "task": "350918",
+   "state": "open",
+   "ram": 0,
+   "agent": 3,
+   "title": "Invalid state saved to checkpoint without validation, causing perm (5c"
+  },
+  {
+   "slug": "voku/agent-loop#205",
+   "fit": 11,
+   "task": "5ff405",
+   "state": "closed",
+   "ram": 1,
+   "agent": 7,
+   "title": "roadmap: collapse workflow choreography into the enter/finish life (14"
+  },
+  {
+   "slug": "JasperHG90/memex#233",
+   "fit": 11,
+   "task": "350918",
+   "state": "open",
+   "ram": 0,
+   "agent": 14,
+   "title": "[RFC]: Memory Conflict Detection & Resolution \u00e2\u20ac\u201d Handling Legitim (4c"
+  },
+  {
+   "slug": "openclaw/openclaw#115424",
+   "fit": 11,
+   "task": "350918",
+   "state": "open",
+   "ram": 37,
+   "agent": 0,
+   "title": "[Bug]: Gateway V8 heap OOM during main-session turn; restart-recov (5c"
+  },
+  {
+   "slug": "gosuda/bitcoin-rs#39",
+   "fit": 11,
+   "task": "350918",
+   "state": "open",
+   "ram": 3,
+   "agent": 0,
+   "title": "Attribute every measured product hot path exhaustively (3c)"
+  },
+  {
+   "slug": "daveshap/nexus2#18",
+   "fit": 11,
+   "task": "5ff405",
+   "state": "open",
+   "ram": 0,
+   "agent": 1,
+   "title": "Build a minimal social-epistemic slice: belief trajectories the mo (1c"
+  },
+  {
+   "slug": "xXKillerNoobYT/Weird-Part-Run-2#1681",
+   "fit": 10,
+   "task": "1bcbf3",
+   "state": "open",
+   "ram": 0,
+   "agent": 2,
+   "title": "[Ops][Tracker] WiredPart standing state \u00e2\u20ac\u201d read me first on every (79"
+  },
+  {
+   "slug": "heavy-duty/crew#327",
+   "fit": 10,
+   "task": "1bcbf3",
+   "state": "open",
+   "ram": 0,
+   "agent": 0,
+   "title": "0.1.3 \u00e2\u20ac\u201d telemetry: the box stops being a black box (56c)"
+  },
+  {
+   "slug": "openai/codex#31793",
+   "fit": 10,
+   "task": "350918",
+   "state": "open",
+   "ram": 10,
+   "agent": 0,
+   "title": "Codex Desktop main process leaks memory in Chromium PartitionAlloc (0c"
+  },
+  {
+   "slug": "Verified-zkEVM/evm-asm#12585",
+   "fit": 10,
+   "task": "5ff405",
+   "state": "open",
+   "ram": 0,
+   "agent": 0,
+   "title": "standing lane: glm3 drives EEST false rejects to zero \u00e2\u20ac\u201d fix, the (26"
+  },
+  {
+   "slug": "escoffier-labs/brigade#978",
+   "fit": 9,
+   "task": "5ff405",
+   "state": "open",
+   "ram": 0,
+   "agent": 4,
+   "title": "center: v3 backlog for temporal/care-state dashboard patterns from (1c"
+  },
+  {
+   "slug": "weijunswj/ai-agent-toolkit#299",
+   "fit": 8,
+   "task": "5ff405",
+   "state": "open",
+   "ram": 0,
+   "agent": 1,
+   "title": "TK-032 \u00e2\u20ac\u201d Rolling GitHub issue governance for Toolkit-governed re (23"
+  }
+ ]
+}
