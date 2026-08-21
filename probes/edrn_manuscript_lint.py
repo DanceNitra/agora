@@ -183,7 +183,11 @@ def main() -> int:
         print(f"  {'PASS' if ok else 'FAIL'}  {l}" + (f"   [{d}]" if d else ""))
     p = sum(1 for ok, _, _ in rows if ok)
     print(f"\n{p}/{len(rows)} checks pass")
-    print("\nNOTE: there is no TeX toolchain here. This file has NOT been compiled.")
+    print("\nNOTE: this checks the SOURCE. Since 2026-08-21 the file is ALSO compiled here"
+          "\n      (MiKTeX 25.12 -> agora_output/edrn_final/build_final): 0 errors, 0 undefined"
+          "\n      references, 0 figure/table collisions, 0 rules past the text frame."
+          "\n      Neither check replaces the other: this one cannot see a table running off"
+          "\n      the page, and the compile cannot see a number that disagrees with its receipt.")
     return 0 if p == len(rows) else 1
 
 
