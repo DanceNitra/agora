@@ -53,7 +53,20 @@ OUT = HERE / "deploy_an_index_that_fits_the_window.result.json"
 # completely under one and loses entries under the other. Measured: at 24,923 bytes this index kept
 # all 231 entries under the binary reading and lost 8 under the decimal one. So the target is set
 # below both, and the ambiguity in someone else's units stops being our problem.
-LINE_CAP, BYTE_CAP = 200, 24000
+# CORRECTED 2026-08-21: the cap does not count BYTES. Measured black-box on v2.1.238 --
+# a 200x125 CJK index is 61,600 UTF-8 bytes and cuts exactly where a 25,200-unit ASCII index
+# cuts, and a same-code-point emoji index cuts 83 lines earlier -- the quantity capped is
+# UTF-16 code units (`trimmed.length` in the loader, against a constant NAMED
+# MAX_ENTRYPOINT_BYTES). This file measured UTF-8 bytes, which over-reports on every
+# non-ASCII character and would prune entries that actually load: 2.44x on a CJK index.
+# The 24,000 target stays: it is a margin under 25,000, not a unit claim.
+LINE_CAP, UNIT_CAP = 200, 24000
+
+
+def units(s):
+    """UTF-16 code units, the quantity the loader actually caps. Astral characters count 2."""
+    return sum(2 if ord(c) > 0xFFFF else 1 for c in s)
+
 ENTRY = re.compile(r"^\[([^\]]*)\]\(([^)]+\.md)\)(?:\s*[\u2014-]\s*(.*))?$")
 
 
@@ -74,7 +87,11 @@ def parse(text):
 
 
 def on_disk(text):
-    return text.replace("\r\n", "\n").replace("\n", "\r\n").encode("utf-8")
+    """The exact text as it lands on disk. CRLF is not cosmetic: each CR is one more UTF-16
+    unit against the cap, and a reader using universal newlines silently deletes 198 of them
+    on this index -- which is how a published figure came out 198 characters light. Returns
+    TEXT; take units() of it, or .encode() when a byte count is what you want."""
+    return text.replace("\r\n", "\n").replace("\n", "\r\n")
 
 
 def assemble(blocks, keep_sentence, pair_from):
@@ -139,7 +156,7 @@ def main(argv) -> int:
         if pf is None:
             continue
         text = assemble(blocks, keep, pf)
-        if len(on_disk(text)) <= BYTE_CAP:
+        if units(on_disk(text)) <= UNIT_CAP:
             best = (k, pf, keep, text)
             break
     if best is None:
@@ -177,13 +194,13 @@ def main(argv) -> int:
     ck("no bracket introduced into any kept hook",
        not any("[" in h or "]" in h for h in kept_hooks.values()))
     ck("fits the 200-line cap", len(text.splitlines()) <= LINE_CAP, "%d lines" % len(text.splitlines()))
-    ck("fits the 24,000-byte target as it lands on disk", len(on_disk(text)) <= BYTE_CAP,
-       "%d B" % len(on_disk(text)))
+    ck("fits the 24,000-unit target as it lands on disk", units(on_disk(text)) <= UNIT_CAP,
+       "%d units / %d bytes" % (units(on_disk(text)), len(on_disk(text).encode("utf-8"))))
     # the control that matters: EVERY entry is inside the loaded window, not merely inside the file
     kept_b, loaded = 0, []
     for line in text.split("\n"):
-        b = len(line.encode("utf-8")) + 2
-        if len(loaded) >= LINE_CAP or kept_b + b > BYTE_CAP:
+        b = units(line) + 2                      # +2: CR and LF, one unit each
+        if len(loaded) >= LINE_CAP or kept_b + b > UNIT_CAP:
             break
         loaded.append(line)
         kept_b += b
@@ -214,17 +231,17 @@ def main(argv) -> int:
     # the byte cap but under 200 lines read as fully loaded.
     _kept, _bytes = [], 0
     for _line in live.split("\n"):
-        _n = len(_line.encode("utf-8")) + 2
-        if len(_kept) >= LINE_CAP or _bytes + _n > BYTE_CAP:
+        _n = units(_line) + 2
+        if len(_kept) >= LINE_CAP or _bytes + _n > UNIT_CAP:
             break
         _kept.append(_line)
         _bytes += _n
     live_reach = len([x for x in re.findall(r"\]\(([^)]+\.md)\)", "\n".join(_kept))
                       if x != "MEMORY_ARCHIVE.md"])
-    print("\n%-22s %9s %6s %s" % ("", "bytes", "lines", "entries a session loads"))
-    print("%-22s %9d %6d %d of %d" % ("live now", len(on_disk(live)), len(live.splitlines()),
+    print("\n%-22s %9s %6s %s" % ("", "units", "lines", "entries a session loads"))
+    print("%-22s %9d %6d %d of %d" % ("live now", units(on_disk(live)), len(live.splitlines()),
                                       live_reach, len(order)))
-    print("%-22s %9d %6d %d of %d" % ("this rebuild", len(on_disk(text)), len(text.splitlines()),
+    print("%-22s %9d %6d %d of %d" % ("this rebuild", units(on_disk(text)), len(text.splitlines()),
                                       len(reach), len(order)))
 
     OUT.write_text(json.dumps(dict(entries=len(order), human_hooks=len(human), sentences_kept=k,
