@@ -20,31 +20,43 @@ That contract needs `observe`, `answer_with_receipt`, `verify_receipt` and nothi
 ledgers, audit logs, content-addressed caches and assertion-based memory systems can all satisfy it
 without being forced into one storage model.
 
-THE SCENARIOS ARE THE CONTROLS. A receipt checker that always says STALE is not a checker, and one that
-fires on any change anywhere is not *binding* — it is "did the world move", which the consumer already
-knows. So four of the five scenarios have a required answer, and a backend earns the row only by getting
-all four right:
+THE SCENARIOS ARE THE CONTROLS. A receipt checker that always says STALE is not a checker; one that
+fires on any change anywhere is not *binding* but alarming; and one that binds nothing at all
+reassures. Five scenarios have a required answer, and a backend earns the row only by getting all
+five right:
 
     S1  nothing changes                          -> VALID    (it can say VALID at all)
     S2  a source the answer was BOUND to changes -> STALE    (it detects what it exists to detect)
-    S3  a source it was NOT bound to changes     -> VALID    (it is bound, not merely alarmed)
+    S3  a source it was NOT bound to changes     -> VALID    (bound, not merely alarmed)
     S4  a bound source is rewritten to different
         bytes with the same meaning              -> STALE    (evidence-bound, not meaning-bound)
+    S6  the answer cites a source that was
+        never observed                           -> NOT VALID (a receipt over nothing is not a pass)
 
-S3 is the discriminating one. S4 is @safal207's boundary made executable: a checker that returns VALID
-there has started judging semantics, which is the thing the contract forbids.
+S3 and S6 are the two discriminating ones and they are mirrors. S3 catches a receipt bound to MORE
+than the answer used; S6 catches one bound to LESS, down to nothing. Only the first made a scenario
+fail before @Stratogain reported the second (DanceNitra/ramr#3) against the row built for his own
+store — an answer citing an unobserved file produced `{"sources": {}}` and verified VALID off an
+empty loop. S4 is @safal207's boundary made executable: a checker returning VALID there has started
+judging semantics, which the contract forbids.
+
+S6 is also the fail-closed rule of inspeximus 2.19.0 one level down. There, an artifact that
+declares no scope is sufficient for nothing. Here, a receipt that binds nothing is sufficient for
+nothing. The same statement about the same object at two granularities, and we shipped the first
+while leaving the second open.
 
     S5  a bound source changes and then RETURNS
-        to its original bytes                    -> reported, not required
+        to its original bytes                    -> required PER PROFILE, and that is the point
 
-S5 is open on purpose, and it is where the two contributions meet. @Stratogain measured that on an
-append-only read ledger of 634 paths over 1,855 records, 226 paths changed content and none returned to
-a previous digest — and then, asked whether the return was even available, found it was: 181 of the 266
-changed paths were under git control. So the zero described a working pattern, not a property of files.
-A pure digest check calls the return VALID, because the bytes the answer was bound to are the bytes
-there now. A ledger *knows* it moved and came back. Whether the consumer should be told is a policy
-question this cell measures rather than settles: **a repeated old digest in the source is a new
-observation of previous bytes; a revert command in a store is an operation on an assertion.**
+S5 is where the two contributions meet. On an append-only read ledger of 862 paths over 2,443
+records, 288 paths changed content and none returned to a previous digest; asked whether the return
+was even available, 194 of those 288 sit under git control, and 35 live in temp directories where it
+cannot happen at all. So the zero describes a working pattern rather than a property of files.
+Under `content_continuity` the return is VALID -- the bytes the answer was bound to are the bytes
+there now. Under `transition_continuity` it is STALE. Same ledger, same event, opposite verdicts,
+which is why `verifies` has to travel in the receipt. The stronger profile needs one extra field,
+`generation`, and an append-only ledger has it for free: **a repeated old digest in the source is a
+new observation of previous bytes; a revert command in a store is an operation on an assertion.**
 
 HONEST SCOPE. Minimal fixture, real files on disk as the sources, one query. It tells you whether the
 failure mode is POSSIBLE in your stack, not how often it happens. A backend reporting `unsupported` is
@@ -109,21 +121,45 @@ class Ledger:
     def answer_with_receipt(self, source_ids):
         """The answer is 'what these files said when last read'. The receipt binds it to exactly
         those, and -- under the stronger profile -- to how many times they had been read by then."""
+        # NAME WHAT WAS NOT SEEN. The first version dropped an unobserved source silently, so an
+        # answer citing a file the ledger had never read produced `{"sources": {}}` and verified
+        # VALID off an empty loop -- @Stratogain, DanceNitra/ramr#3. It is `_unscoped` in the
+        # mirror: that one binds MORE than the answer used and alarms, this one binds LESS, down to
+        # nothing, and reassures. Both are the same sentence -- a check that never reaches its
+        # target reports something reassuring -- and only the alarming one made a scenario fail.
+        #
+        # It is also the fail-closed rule of inspeximus 2.19.0 one level down: an artifact that
+        # declares no scope is sufficient for nothing, so a receipt that binds nothing is
+        # sufficient for nothing. We built that rule for the artifact and left the receipt open.
+        #
+        # Raising would be the other fix and discards information the consumer wants. The unbound
+        # ids travel in the receipt instead.
         want = set(PROFILES[self.profile]["scope"])
-        pinned = {}
+        pinned, unobserved = {}, []
         for sid in source_ids:
             seen = [r for r in self.records if r["source_id"] == sid]
             if not seen:
+                unobserved.append(sid)
                 continue
             entry = {"digest": seen[-1]["digest"]}
             if "generation" in want:
                 entry["generation"] = self._generation(sid)
             pinned[sid] = entry
         return ("what the runbook said when last read",
-                {"sources": pinned, "commitment_scope": PROFILES[self.profile]["scope"],
+                {"sources": pinned, "unobserved": unobserved,
+                 "commitment_scope": PROFILES[self.profile]["scope"],
                  "verifies": PROFILES[self.profile]["verifies"], "profile": self.profile})
 
     def verify_receipt(self, receipt):
+        # A receipt that binds nothing, or that omits a source the answer cited, cannot support the
+        # predicate it declares. Checked BEFORE the loop, because an empty loop returns VALID and
+        # that is the whole defect.
+        if receipt.get("unobserved") or not receipt.get("sources"):
+            # verifying is a read, and an append-only ledger records its reads even when the
+            # verdict is a refusal -- otherwise the store cannot show that a check happened.
+            self.records.append({"source_id": "__verify__", "digest": "unsupported",
+                                 "seq": len(self.records)})
+            return "UNSUPPORTED"
         for sid, pin in receipt["sources"].items():
             raw = open(os.path.join(self.root, sid), "rb").read()
             now = hashlib.sha256(raw).hexdigest()
@@ -181,12 +217,19 @@ def check_inspeximus():
             # "no receipt primitive" (source passed through meta), then a failed S3.
             want = {self.ids[sid] for sid in sids if sid in self.ids}
             hits = [h for h in (self.m.recall(QUERY, k=50) or []) if h.get("id") in want]
-            if not hits:                       # never silently fall back to a store-wide witness:
-                raise RuntimeError(            # that is the defect this scoping exists to avoid
-                    "could not scope the witness to the bound records; refusing to pin the whole store")
-            return "what the runbook said when last read", self.m.witness(records=hits, bind_sources=True)
+            missing = [sid for sid in sids if sid not in self.ids]
+            if missing or not hits:
+                # Never fall back to a store-wide witness -- that is the defect the scoping exists
+                # to avoid -- and never mint a receipt over sources this store has no record of.
+                return ("what the runbook said when last read",
+                        {"unobserved": missing or list(sids), "_refuse": True})
+            w = self.m.witness(records=hits, bind_sources=True)
+            w["unobserved"] = []
+            return "what the runbook said when last read", w
 
         def verify_receipt(self, w):
+            if w.get("_refuse") or w.get("unobserved"):
+                return "UNSUPPORTED"
             v = self.m.verify_witness(w)
             # The two answers are kept separate on purpose: digest_match is about the STORE,
             # sources_match is about the WORLD. This cell asks only the second question, so a
@@ -252,6 +295,35 @@ CHECKS["_always_valid"] = _constant("VALID")     # must fail S2 and S4, and only
 CHECKS["_always_stale"] = _constant("STALE")     # must fail S1 and S3, and only those
 
 
+def check_underbound():
+    """@Stratogain's control, and the mirror of `_unscoped`. This is the ledger EXACTLY as it was
+    written before his review: it pins the sources it happens to have observed and drops the rest
+    without saying so, so an answer citing an unobserved file yields an empty receipt that verifies
+    VALID off a loop with nothing in it. It passes S1-S5 identically to `ledger` and fails S6 alone,
+    which is what makes it a control rather than a straw backend -- the shipped row had this hole."""
+    class Adapter(Ledger):
+        def answer_with_receipt(self, source_ids):
+            pinned = {}
+            for sid in source_ids:
+                seen = [r for r in self.records if r["source_id"] == sid]
+                if seen:
+                    pinned[sid] = {"digest": seen[-1]["digest"]}
+            return "", {"sources": pinned, "commitment_scope": PROFILES[self.profile]["scope"],
+                        "verifies": PROFILES[self.profile]["verifies"], "profile": self.profile}
+
+        def verify_receipt(self, receipt):
+            for sid, pin in receipt["sources"].items():
+                raw = open(os.path.join(self.root, sid), "rb").read()
+                if hashlib.sha256(raw).hexdigest() != pin["digest"]:
+                    return "STALE"
+            return "VALID"
+    return _run(lambda root: Adapter(root, "content_continuity"),
+                observe=lambda b, s: b.observe(s),
+                answer=lambda b, s: b.answer_with_receipt(s),
+                verify=lambda b, r: b.verify_receipt(r))
+CHECKS["_underbound"] = check_underbound       # must fail S6 and ONLY S6
+
+
 def check_unscoped():
     """The trap, checked in rather than remembered: a receipt bound to EVERY source in the store
     instead of the ones the answer came from. It looks right on S1, S2 and S4 and is wrong about what
@@ -297,12 +369,22 @@ def _run(make, observe, answer, verify):
         ("S5_returned_to_original", lambda root, b: (_write(root, BOUND, BOUND_V2),
                                                      observe(b, BOUND),
                                                      _write(root, BOUND, BOUND_V1))),
+        # S6 is @Stratogain's, and it is the mirror of S3. S3 catches a receipt bound to MORE than
+        # the answer used, which alarms. S6 catches one bound to LESS -- down to nothing -- which
+        # reassures, and nothing in S1-S5 could reach it because every scenario observed every
+        # source before answering. On his store this is the ordinary case rather than the edge:
+        # the witness sits on 33.4% of tool calls, so an answer routinely cites files it never saw.
+        ("S6_cites_an_unobserved_source", lambda root: None),
     ):
         root = _mkroot()
         b = make(root)
         observe(b, BOUND)
         observe(b, UNBOUND)
-        _, receipt = answer(b, [BOUND])        # bound to the runbook ONLY
+        if name == "S6_cites_an_unobserved_source":
+            _write(root, "never_read.md", b"A file the witness never saw\n")
+            _, receipt = answer(b, [BOUND, "never_read.md"])
+        else:
+            _, receipt = answer(b, [BOUND])    # bound to the runbook ONLY
         try:
             mutate(root, b)
         except TypeError:
@@ -341,6 +423,9 @@ PROFILES = {
 
 REQUIRED = {"S1_no_change": "VALID", "S2_bound_changed": "STALE",
             "S3_unbound_changed": "VALID", "S4_semantic_noop": "STALE"}
+# S6 has no single right answer, only a wrong one: a silent pass. STALE or UNSUPPORTED both say
+# "do not treat this as freshly evidenced", which is the whole contract.
+NOT_ALLOWED = {"S6_cites_an_unobserved_source": "VALID"}
 
 
 def main(argv):
@@ -359,39 +444,92 @@ def main(argv):
             rows[n] = {"error": f"{type(e).__name__}: {e}"[:200]}
 
     hdr = ["S1_no_change", "S2_bound_changed", "S3_unbound_changed", "S4_semantic_noop",
-           "S5_returned_to_original"]
+           "S5_returned_to_original", "S6_cites_an_unobserved_source"]
+    regressed = []
     print(f"{'backend':12} " + " ".join(f"{h.split('_',1)[0]:>6}" for h in hdr) + "   honours the contract?")
     for n, r in rows.items():
         if "skipped" in r or "error" in r:
             print(f"{n:12} {r.get('skipped') or r.get('error')}")
             continue
-        ok = all(r.get(k) == v for k, v in REQUIRED.items())
+        ok = (all(r.get(k) == v for k, v in REQUIRED.items())
+              and all(r.get(k) != v for k, v in NOT_ALLOWED.items()))
         unsup = all(v == "UNSUPPORTED" for v in r.values())
         verdict = ("no receipt primitive (correctly declined)" if unsup
                    else ("yes" if ok else "NO -- " + ", ".join(
-                       f"{k.split('_',1)[0]} said {r.get(k)}, wants {v}"
-                       for k, v in REQUIRED.items() if r.get(k) != v)))
+                       [f"{k.split('_',1)[0]} said {r.get(k)}, wants {v}"
+                        for k, v in REQUIRED.items() if r.get(k) != v]
+                       + [f"{k.split('_',1)[0]} said {v}, which is a silent pass"
+                          for k, v in NOT_ALLOWED.items() if r.get(k) == v])))
+        # ASSERT the honest rows, do not merely print them. A live mutation that reverted the S6
+        # fix left every control green and the run exiting 0, because only the underscore backends
+        # were ever checked -- the regression showed up as the word "NO" in a table nobody diffs.
+        if not n.startswith("_") and not unsup and not ok:
+            regressed.append(f"{n}: {verdict}")
         print(f"{n:12} " + " ".join(f"{str(r.get(h))[:6]:>6}" for h in hdr) + f"   {verdict}")
 
     # The controls are ASSERTED, not merely displayed. A cell that prints a failing control and exits 0
     # has reported nothing. Each adversarial backend must be caught by its OWN scenario -- if two of
     # them fail on the same one, the other scenarios are not doing any work.
-    ctl = {"_always_valid": {"S2_bound_changed", "S4_semantic_noop"},
+    # What each mutant ACTUALLY breaks, not what would be tidy. Adding S6 made two of them fail a
+    # second scenario, and both are true: `_always_valid` says VALID to everything by construction,
+    # and `_unscoped` carries the under-binding hole as well because it never names an unobserved
+    # source either. The property that matters survives -- `_underbound` fails S6 and NOTHING else,
+    # which is what separates it from `_unscoped`, exactly as S3 separates `_unscoped` from the
+    # honest ledger.
+    ctl = {"_always_valid": {"S2_bound_changed", "S4_semantic_noop",
+                             "S6_cites_an_unobserved_source"},
            "_always_stale": {"S1_no_change", "S3_unbound_changed"},
-           "_unscoped": {"S3_unbound_changed"}}
+           "_unscoped": {"S3_unbound_changed", "S6_cites_an_unobserved_source"},
+           "_underbound": {"S6_cites_an_unobserved_source"}}
     bad = []
     for name, expect_fail in ctl.items():
         r = rows.get(name)
         if not isinstance(r, dict) or "error" in r or "skipped" in r:
             bad.append(f"{name}: did not run")
             continue
-        got = {k for k, v in REQUIRED.items() if r.get(k) != v}
+        got = ({k for k, v in REQUIRED.items() if r.get(k) != v}
+               | {k for k, v in NOT_ALLOWED.items() if r.get(k) == v})
         if got != expect_fail:
             bad.append(f"{name} fails {sorted(got) or ['nothing']}, must fail exactly {sorted(expect_fail)}")
     # S5 IS NOW REQUIRED -- per profile. It stopped being an open question the moment the predicate
     # was declared: under content continuity the return IS valid, under transition continuity it is
     # not, and the same store gives both. If the two ever agree, the `generation` field has stopped
     # doing anything and the declaration has become decoration.
+    # SOURCE IDENTITY, because source_id IS the identity in this contract and a fold on it merges
+    # two files into one receipt entry. @Stratogain: his path fold is toLowerCase(), correct on
+    # Windows and wrong on Linux the moment the same ledger runs there. SloNN reported the Unicode
+    # half at basicmachines-co/basic-memory#1275 -- NFC and NFD forms of one visible filename
+    # minting two entities, or one where there should be two. Tested on the NFC/NFD pair because
+    # both forms can coexist on disk, where two case variants cannot on Windows.
+    import unicodedata
+    idroot = _mkroot()
+    nfc = unicodedata.normalize("NFC", "café.md")
+    nfd = unicodedata.normalize("NFD", "café.md")
+    ident, demo = [], False
+    if nfc != nfd:
+        _write(idroot, nfc, b"one\n")
+        _write(idroot, nfd, b"two\n")
+        lg2 = Ledger(idroot)
+        try:
+            lg2.observe(nfc)
+            lg2.observe(nfd)
+            _, rc = lg2.answer_with_receipt([nfc, nfd])
+            # (1) a DEFECT if it fires: this cell must never fold a source id.
+            if len(rc["sources"]) != 2:
+                ident.append(f"two distinct source ids collapsed to {len(rc['sources'])}")
+            # (2) a DEMONSTRATION, not a defect: an adapter that normalises WOULD merge these two,
+            # so the trap is real for every adapter rather than hypothetical. Reported separately,
+            # because printing it as a failure makes a true statement look like our bug.
+            demo = len({unicodedata.normalize("NFC", k) for k in rc["sources"]}) == 1
+        except OSError:
+            demo = False
+            ident.append("SKIPPED: this filesystem will not hold both forms")
+    print("\nidentity: "
+          + ("the cell keeps two distinct source ids distinct" if not ident
+             else "BROKEN -- " + "; ".join(ident))
+          + ("   (an NFC-normalising adapter would merge exactly these two: "
+             "basicmachines-co/basic-memory#1275, reported by SloNN)" if demo else ""))
+
     # TYPE CONSISTENCY, checked rather than agreed. The asymmetry @Stratogain found existed because
     # two artifacts used one field name for two shapes and nothing objected. "Pick one and write it
     # down" only survives if something fails when it drifts back.
@@ -434,6 +572,9 @@ def main(argv):
                             "to be in the receipt" if not bad_profiles
                             else "BROKEN -- " + "; ".join(bad_profiles)))
 
+    print("\nbackends: " + ("every non-adversarial backend honours the contract"
+                            if not regressed else "REGRESSED -- " + "; ".join(regressed)))
+
     print("\ncontrols: " + ("all three adversarial backends fail exactly the scenario they should"
                             if not bad else "BROKEN -- " + "; ".join(bad)))
 
@@ -454,7 +595,7 @@ def main(argv):
     p = os.path.join(d, "receipt_binding.json")
     json.dump(out, open(p, "w", encoding="utf-8"), indent=2)
     print(f"\nreceipt -> {p}")
-    return 0 if not (bad or bad_profiles) else 1
+    return 0 if not (bad or bad_profiles or regressed or ident) else 1
 
 
 if __name__ == "__main__":
