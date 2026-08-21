@@ -166,5 +166,5 @@
       "numbers_in_warning": []
     }
   ],
-  "_note": "absolute paths redacted to <HOME>; nothing else altered"
+  "_note": "absolute paths and the local username redacted; no measured value altered"
 }

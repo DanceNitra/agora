@@ -6,7 +6,7 @@
     "lines": 200,
     "bytes": 25000
   },
-  "workspace": "C:\\Users\\Danculus\\AppData\\Local\\Temp\\idxcost_38z5lcwl",
+  "workspace": "<HOME>\\AppData\\Local\\Temp\\idxcost_38z5lcwl",
   "claude_version": "2.1.238 (Claude Code)",
   "rows": [
     {
@@ -17,7 +17,7 @@
       "arm": "r0_byte_20x400c10",
       "baseline_total": 38938,
       "baseline_hook_bytes": 0,
-      "store_path": "C:\\Users\\Danculus\\.claude\\projects\\C--Users-Danculus-AppData-Local-Temp-idxcost-38z5lcwl-r0-byte-20x400c10\\memory\\",
+      "store_path": "<HOME>\\.claude\\projects\\C--Users-<USER>-AppData-Local-Temp-idxcost-38z5lcwl-r0-byte-20x400c10\\memory\\",
       "index_bytes": 8000,
       "index_lines": 20,
       "canary_lines": [
@@ -56,7 +56,7 @@
       "arm": "r1_byte_20x400c10",
       "baseline_total": 38938,
       "baseline_hook_bytes": 0,
-      "store_path": "C:\\Users\\Danculus\\.claude\\projects\\C--Users-Danculus-AppData-Local-Temp-idxcost-38z5lcwl-r1-byte-20x400c10\\memory\\",
+      "store_path": "<HOME>\\.claude\\projects\\C--Users-<USER>-AppData-Local-Temp-idxcost-38z5lcwl-r1-byte-20x400c10\\memory\\",
       "index_bytes": 8000,
       "index_lines": 20,
       "canary_lines": [
@@ -95,7 +95,7 @@
       "arm": "r0_byte_40x400c10",
       "baseline_total": 38938,
       "baseline_hook_bytes": 0,
-      "store_path": "C:\\Users\\Danculus\\.claude\\projects\\C--Users-Danculus-AppData-Local-Temp-idxcost-38z5lcwl-r0-byte-40x400c10\\memory\\",
+      "store_path": "<HOME>\\.claude\\projects\\C--Users-<USER>-AppData-Local-Temp-idxcost-38z5lcwl-r0-byte-40x400c10\\memory\\",
       "index_bytes": 16000,
       "index_lines": 40,
       "canary_lines": [
@@ -136,7 +136,7 @@
       "arm": "r1_byte_40x400c10",
       "baseline_total": 38938,
       "baseline_hook_bytes": 0,
-      "store_path": "C:\\Users\\Danculus\\.claude\\projects\\C--Users-Danculus-AppData-Local-Temp-idxcost-38z5lcwl-r1-byte-40x400c10\\memory\\",
+      "store_path": "<HOME>\\.claude\\projects\\C--Users-<USER>-AppData-Local-Temp-idxcost-38z5lcwl-r1-byte-40x400c10\\memory\\",
       "index_bytes": 16000,
       "index_lines": 40,
       "canary_lines": [
@@ -177,7 +177,7 @@
       "arm": "r0_byte_60x400c10",
       "baseline_total": 38938,
       "baseline_hook_bytes": 0,
-      "store_path": "C:\\Users\\Danculus\\.claude\\projects\\C--Users-Danculus-AppData-Local-Temp-idxcost-38z5lcwl-r0-byte-60x400c10\\memory\\",
+      "store_path": "<HOME>\\.claude\\projects\\C--Users-<USER>-AppData-Local-Temp-idxcost-38z5lcwl-r0-byte-60x400c10\\memory\\",
       "index_bytes": 24000,
       "index_lines": 60,
       "canary_lines": [
@@ -220,7 +220,7 @@
       "arm": "r1_byte_60x400c10",
       "baseline_total": 38938,
       "baseline_hook_bytes": 0,
-      "store_path": "C:\\Users\\Danculus\\.claude\\projects\\C--Users-Danculus-AppData-Local-Temp-idxcost-38z5lcwl-r1-byte-60x400c10\\memory\\",
+      "store_path": "<HOME>\\.claude\\projects\\C--Users-<USER>-AppData-Local-Temp-idxcost-38z5lcwl-r1-byte-60x400c10\\memory\\",
       "index_bytes": 24000,
       "index_lines": 60,
       "canary_lines": [
@@ -263,7 +263,7 @@
       "arm": "r0_byte_80x400c10",
       "baseline_total": 38938,
       "baseline_hook_bytes": 0,
-      "store_path": "C:\\Users\\Danculus\\.claude\\projects\\C--Users-Danculus-AppData-Local-Temp-idxcost-38z5lcwl-r0-byte-80x400c10\\memory\\",
+      "store_path": "<HOME>\\.claude\\projects\\C--Users-<USER>-AppData-Local-Temp-idxcost-38z5lcwl-r0-byte-80x400c10\\memory\\",
       "index_bytes": 32000,
       "index_lines": 80,
       "canary_lines": [
@@ -308,7 +308,7 @@
       "arm": "r1_byte_80x400c10",
       "baseline_total": 38938,
       "baseline_hook_bytes": 0,
-      "store_path": "C:\\Users\\Danculus\\.claude\\projects\\C--Users-Danculus-AppData-Local-Temp-idxcost-38z5lcwl-r1-byte-80x400c10\\memory\\",
+      "store_path": "<HOME>\\.claude\\projects\\C--Users-<USER>-AppData-Local-Temp-idxcost-38z5lcwl-r1-byte-80x400c10\\memory\\",
       "index_bytes": 32000,
       "index_lines": 80,
       "canary_lines": [
@@ -353,7 +353,7 @@
       "arm": "r0_byte_100x400c10",
       "baseline_total": 38938,
       "baseline_hook_bytes": 0,
-      "store_path": "C:\\Users\\Danculus\\.claude\\projects\\C--Users-Danculus-AppData-Local-Temp-idxcost-38z5lcwl-r0-byte-100x400c10\\memory\\",
+      "store_path": "<HOME>\\.claude\\projects\\C--Users-<USER>-AppData-Local-Temp-idxcost-38z5lcwl-r0-byte-100x400c10\\memory\\",
       "index_bytes": 40000,
       "index_lines": 100,
       "canary_lines": [
@@ -400,7 +400,7 @@
       "arm": "r1_byte_100x400c10",
       "baseline_total": 38938,
       "baseline_hook_bytes": 0,
-      "store_path": "C:\\Users\\Danculus\\.claude\\projects\\C--Users-Danculus-AppData-Local-Temp-idxcost-38z5lcwl-r1-byte-100x400c10\\memory\\",
+      "store_path": "<HOME>\\.claude\\projects\\C--Users-<USER>-AppData-Local-Temp-idxcost-38z5lcwl-r1-byte-100x400c10\\memory\\",
       "index_bytes": 40000,
       "index_lines": 100,
       "canary_lines": [
@@ -447,7 +447,7 @@
       "arm": "r0_byte_140x400c10",
       "baseline_total": 38938,
       "baseline_hook_bytes": 0,
-      "store_path": "C:\\Users\\Danculus\\.claude\\projects\\C--Users-Danculus-AppData-Local-Temp-idxcost-38z5lcwl-r0-byte-140x400c10\\memory\\",
+      "store_path": "<HOME>\\.claude\\projects\\C--Users-<USER>-AppData-Local-Temp-idxcost-38z5lcwl-r0-byte-140x400c10\\memory\\",
       "index_bytes": 56000,
       "index_lines": 140,
       "canary_lines": [
@@ -498,7 +498,7 @@
       "arm": "r1_byte_140x400c10",
       "baseline_total": 38938,
       "baseline_hook_bytes": 0,
-      "store_path": "C:\\Users\\Danculus\\.claude\\projects\\C--Users-Danculus-AppData-Local-Temp-idxcost-38z5lcwl-r1-byte-140x400c10\\memory\\",
+      "store_path": "<HOME>\\.claude\\projects\\C--Users-<USER>-AppData-Local-Temp-idxcost-38z5lcwl-r1-byte-140x400c10\\memory\\",
       "index_bytes": 56000,
       "index_lines": 140,
       "canary_lines": [
@@ -549,7 +549,7 @@
       "arm": "r0_line_50x60c10",
       "baseline_total": 38936,
       "baseline_hook_bytes": 0,
-      "store_path": "C:\\Users\\Danculus\\.claude\\projects\\C--Users-Danculus-AppData-Local-Temp-idxcost-38z5lcwl-r0-line-50x60c10\\memory\\",
+      "store_path": "<HOME>\\.claude\\projects\\C--Users-<USER>-AppData-Local-Temp-idxcost-38z5lcwl-r0-line-50x60c10\\memory\\",
       "index_bytes": 3000,
       "index_lines": 50,
       "canary_lines": [
@@ -591,7 +591,7 @@
       "arm": "r1_line_50x60c10",
       "baseline_total": 38936,
       "baseline_hook_bytes": 0,
-      "store_path": "C:\\Users\\Danculus\\.claude\\projects\\C--Users-Danculus-AppData-Local-Temp-idxcost-38z5lcwl-r1-line-50x60c10\\memory\\",
+      "store_path": "<HOME>\\.claude\\projects\\C--Users-<USER>-AppData-Local-Temp-idxcost-38z5lcwl-r1-line-50x60c10\\memory\\",
       "index_bytes": 3000,
       "index_lines": 50,
       "canary_lines": [
@@ -633,7 +633,7 @@
       "arm": "r0_line_100x60c10",
       "baseline_total": 38936,
       "baseline_hook_bytes": 0,
-      "store_path": "C:\\Users\\Danculus\\.claude\\projects\\C--Users-Danculus-AppData-Local-Temp-idxcost-38z5lcwl-r0-line-100x60c10\\memory\\",
+      "store_path": "<HOME>\\.claude\\projects\\C--Users-<USER>-AppData-Local-Temp-idxcost-38z5lcwl-r0-line-100x60c10\\memory\\",
       "index_bytes": 6000,
       "index_lines": 100,
       "canary_lines": [
@@ -680,7 +680,7 @@
       "arm": "r1_line_100x60c10",
       "baseline_total": 38936,
       "baseline_hook_bytes": 0,
-      "store_path": "C:\\Users\\Danculus\\.claude\\projects\\C--Users-Danculus-AppData-Local-Temp-idxcost-38z5lcwl-r1-line-100x60c10\\memory\\",
+      "store_path": "<HOME>\\.claude\\projects\\C--Users-<USER>-AppData-Local-Temp-idxcost-38z5lcwl-r1-line-100x60c10\\memory\\",
       "index_bytes": 6000,
       "index_lines": 100,
       "canary_lines": [
@@ -727,7 +727,7 @@
       "arm": "r0_line_150x60c10",
       "baseline_total": 38936,
       "baseline_hook_bytes": 0,
-      "store_path": "C:\\Users\\Danculus\\.claude\\projects\\C--Users-Danculus-AppData-Local-Temp-idxcost-38z5lcwl-r0-line-150x60c10\\memory\\",
+      "store_path": "<HOME>\\.claude\\projects\\C--Users-<USER>-AppData-Local-Temp-idxcost-38z5lcwl-r0-line-150x60c10\\memory\\",
       "index_bytes": 9000,
       "index_lines": 150,
       "canary_lines": [
@@ -779,7 +779,7 @@
       "arm": "r1_line_150x60c10",
       "baseline_total": 38936,
       "baseline_hook_bytes": 0,
-      "store_path": "C:\\Users\\Danculus\\.claude\\projects\\C--Users-Danculus-AppData-Local-Temp-idxcost-38z5lcwl-r1-line-150x60c10\\memory\\",
+      "store_path": "<HOME>\\.claude\\projects\\C--Users-<USER>-AppData-Local-Temp-idxcost-38z5lcwl-r1-line-150x60c10\\memory\\",
       "index_bytes": 9000,
       "index_lines": 150,
       "canary_lines": [
@@ -831,7 +831,7 @@
       "arm": "r0_line_200x60c10",
       "baseline_total": 38936,
       "baseline_hook_bytes": 0,
-      "store_path": "C:\\Users\\Danculus\\.claude\\projects\\C--Users-Danculus-AppData-Local-Temp-idxcost-38z5lcwl-r0-line-200x60c10\\memory\\",
+      "store_path": "<HOME>\\.claude\\projects\\C--Users-<USER>-AppData-Local-Temp-idxcost-38z5lcwl-r0-line-200x60c10\\memory\\",
       "index_bytes": 12000,
       "index_lines": 200,
       "canary_lines": [
@@ -888,7 +888,7 @@
       "arm": "r1_line_200x60c10",
       "baseline_total": 38936,
       "baseline_hook_bytes": 0,
-      "store_path": "C:\\Users\\Danculus\\.claude\\projects\\C--Users-Danculus-AppData-Local-Temp-idxcost-38z5lcwl-r1-line-200x60c10\\memory\\",
+      "store_path": "<HOME>\\.claude\\projects\\C--Users-<USER>-AppData-Local-Temp-idxcost-38z5lcwl-r1-line-200x60c10\\memory\\",
       "index_bytes": 12000,
       "index_lines": 200,
       "canary_lines": [
@@ -945,7 +945,7 @@
       "arm": "r0_line_250x60c10",
       "baseline_total": 38936,
       "baseline_hook_bytes": 0,
-      "store_path": "C:\\Users\\Danculus\\.claude\\projects\\C--Users-Danculus-AppData-Local-Temp-idxcost-38z5lcwl-r0-line-250x60c10\\memory\\",
+      "store_path": "<HOME>\\.claude\\projects\\C--Users-<USER>-AppData-Local-Temp-idxcost-38z5lcwl-r0-line-250x60c10\\memory\\",
       "index_bytes": 15000,
       "index_lines": 250,
       "canary_lines": [
@@ -1007,7 +1007,7 @@
       "arm": "r1_line_250x60c10",
       "baseline_total": 38936,
       "baseline_hook_bytes": 0,
-      "store_path": "C:\\Users\\Danculus\\.claude\\projects\\C--Users-Danculus-AppData-Local-Temp-idxcost-38z5lcwl-r1-line-250x60c10\\memory\\",
+      "store_path": "<HOME>\\.claude\\projects\\C--Users-<USER>-AppData-Local-Temp-idxcost-38z5lcwl-r1-line-250x60c10\\memory\\",
       "index_bytes": 15000,
       "index_lines": 250,
       "canary_lines": [
@@ -1069,7 +1069,7 @@
       "arm": "r0_line_300x60c10",
       "baseline_total": 38936,
       "baseline_hook_bytes": 0,
-      "store_path": "C:\\Users\\Danculus\\.claude\\projects\\C--Users-Danculus-AppData-Local-Temp-idxcost-38z5lcwl-r0-line-300x60c10\\memory\\",
+      "store_path": "<HOME>\\.claude\\projects\\C--Users-<USER>-AppData-Local-Temp-idxcost-38z5lcwl-r0-line-300x60c10\\memory\\",
       "index_bytes": 18000,
       "index_lines": 300,
       "canary_lines": [
@@ -1136,7 +1136,7 @@
       "arm": "r1_line_300x60c10",
       "baseline_total": 38936,
       "baseline_hook_bytes": 0,
-      "store_path": "C:\\Users\\Danculus\\.claude\\projects\\C--Users-Danculus-AppData-Local-Temp-idxcost-38z5lcwl-r1-line-300x60c10\\memory\\",
+      "store_path": "<HOME>\\.claude\\projects\\C--Users-<USER>-AppData-Local-Temp-idxcost-38z5lcwl-r1-line-300x60c10\\memory\\",
       "index_bytes": 18000,
       "index_lines": 300,
       "canary_lines": [
@@ -1203,7 +1203,7 @@
       "arm": "r0_line_400x60c10",
       "baseline_total": 117570,
       "baseline_hook_bytes": 0,
-      "store_path": "C:\\Users\\Danculus\\.claude\\projects\\C--Users-Danculus-AppData-Local-Temp-idxcost-38z5lcwl-r0-line-400x60c10\\memory\\",
+      "store_path": "<HOME>\\.claude\\projects\\C--Users-<USER>-AppData-Local-Temp-idxcost-38z5lcwl-r0-line-400x60c10\\memory\\",
       "index_bytes": 24000,
       "index_lines": 400,
       "canary_lines": [
@@ -1281,7 +1281,7 @@
       "arm": "r1_line_400x60c10",
       "baseline_total": 38936,
       "baseline_hook_bytes": 0,
-      "store_path": "C:\\Users\\Danculus\\.claude\\projects\\C--Users-Danculus-AppData-Local-Temp-idxcost-38z5lcwl-r1-line-400x60c10\\memory\\",
+      "store_path": "<HOME>\\.claude\\projects\\C--Users-<USER>-AppData-Local-Temp-idxcost-38z5lcwl-r1-line-400x60c10\\memory\\",
       "index_bytes": 24000,
       "index_lines": 400,
       "canary_lines": [
@@ -1359,7 +1359,7 @@
       "arm": "r0_shape_210x200c2",
       "baseline_total": 38938,
       "baseline_hook_bytes": 0,
-      "store_path": "C:\\Users\\Danculus\\.claude\\projects\\C--Users-Danculus-AppData-Local-Temp-idxcost-38z5lcwl-r0-shape-210x200c2\\memory\\",
+      "store_path": "<HOME>\\.claude\\projects\\C--Users-<USER>-AppData-Local-Temp-idxcost-38z5lcwl-r0-shape-210x200c2\\memory\\",
       "index_bytes": 42000,
       "index_lines": 210,
       "canary_lines": [
@@ -1502,7 +1502,7 @@
       "arm": "r0_shape_210x400c2",
       "baseline_total": 38938,
       "baseline_hook_bytes": 0,
-      "store_path": "C:\\Users\\Danculus\\.claude\\projects\\C--Users-Danculus-AppData-Local-Temp-idxcost-38z5lcwl-r0-shape-210x400c2\\memory\\",
+      "store_path": "<HOME>\\.claude\\projects\\C--Users-<USER>-AppData-Local-Temp-idxcost-38z5lcwl-r0-shape-210x400c2\\memory\\",
       "index_bytes": 84000,
       "index_lines": 210,
       "canary_lines": [
@@ -1645,7 +1645,7 @@
       "arm": "r1_shape_210x200c2",
       "baseline_total": 38938,
       "baseline_hook_bytes": 0,
-      "store_path": "C:\\Users\\Danculus\\.claude\\projects\\C--Users-Danculus-AppData-Local-Temp-idxcost-38z5lcwl-r1-shape-210x200c2\\memory\\",
+      "store_path": "<HOME>\\.claude\\projects\\C--Users-<USER>-AppData-Local-Temp-idxcost-38z5lcwl-r1-shape-210x200c2\\memory\\",
       "index_bytes": 42000,
       "index_lines": 210,
       "canary_lines": [
@@ -1788,7 +1788,7 @@
       "arm": "r1_shape_210x400c2",
       "baseline_total": 38938,
       "baseline_hook_bytes": 0,
-      "store_path": "C:\\Users\\Danculus\\.claude\\projects\\C--Users-Danculus-AppData-Local-Temp-idxcost-38z5lcwl-r1-shape-210x400c2\\memory\\",
+      "store_path": "<HOME>\\.claude\\projects\\C--Users-<USER>-AppData-Local-Temp-idxcost-38z5lcwl-r1-shape-210x400c2\\memory\\",
       "index_bytes": 84000,
       "index_lines": 210,
       "canary_lines": [
@@ -1931,7 +1931,7 @@
       "arm": "r0_shape_240x150c2",
       "baseline_total": 38938,
       "baseline_hook_bytes": 0,
-      "store_path": "C:\\Users\\Danculus\\.claude\\projects\\C--Users-Danculus-AppData-Local-Temp-idxcost-38z5lcwl-r0-shape-240x150c2\\memory\\",
+      "store_path": "<HOME>\\.claude\\projects\\C--Users-<USER>-AppData-Local-Temp-idxcost-38z5lcwl-r0-shape-240x150c2\\memory\\",
       "index_bytes": 36000,
       "index_lines": 240,
       "canary_lines": [
@@ -2089,7 +2089,7 @@
       "arm": "r1_shape_240x150c2",
       "baseline_total": 38938,
       "baseline_hook_bytes": 0,
-      "store_path": "C:\\Users\\Danculus\\.claude\\projects\\C--Users-Danculus-AppData-Local-Temp-idxcost-38z5lcwl-r1-shape-240x150c2\\memory\\",
+      "store_path": "<HOME>\\.claude\\projects\\C--Users-<USER>-AppData-Local-Temp-idxcost-38z5lcwl-r1-shape-240x150c2\\memory\\",
       "index_bytes": 36000,
       "index_lines": 240,
       "canary_lines": [
@@ -2247,7 +2247,7 @@
       "arm": "r0_shape_288x125c2",
       "baseline_total": 38938,
       "baseline_hook_bytes": 0,
-      "store_path": "C:\\Users\\Danculus\\.claude\\projects\\C--Users-Danculus-AppData-Local-Temp-idxcost-38z5lcwl-r0-shape-288x125c2\\memory\\",
+      "store_path": "<HOME>\\.claude\\projects\\C--Users-<USER>-AppData-Local-Temp-idxcost-38z5lcwl-r0-shape-288x125c2\\memory\\",
       "index_bytes": 36000,
       "index_lines": 288,
       "canary_lines": [
@@ -2429,7 +2429,7 @@
       "arm": "r1_shape_288x125c2",
       "baseline_total": 38938,
       "baseline_hook_bytes": 0,
-      "store_path": "C:\\Users\\Danculus\\.claude\\projects\\C--Users-Danculus-AppData-Local-Temp-idxcost-38z5lcwl-r1-shape-288x125c2\\memory\\",
+      "store_path": "<HOME>\\.claude\\projects\\C--Users-<USER>-AppData-Local-Temp-idxcost-38z5lcwl-r1-shape-288x125c2\\memory\\",
       "index_bytes": 36000,
       "index_lines": 288,
       "canary_lines": [
@@ -2611,7 +2611,7 @@
       "arm": "r0_shape_360x100c2",
       "baseline_total": 38938,
       "baseline_hook_bytes": 0,
-      "store_path": "C:\\Users\\Danculus\\.claude\\projects\\C--Users-Danculus-AppData-Local-Temp-idxcost-38z5lcwl-r0-shape-360x100c2\\memory\\",
+      "store_path": "<HOME>\\.claude\\projects\\C--Users-<USER>-AppData-Local-Temp-idxcost-38z5lcwl-r0-shape-360x100c2\\memory\\",
       "index_bytes": 36000,
       "index_lines": 360,
       "canary_lines": [
@@ -2829,7 +2829,7 @@
       "arm": "r1_shape_360x100c2",
       "baseline_total": 38938,
       "baseline_hook_bytes": 0,
-      "store_path": "C:\\Users\\Danculus\\.claude\\projects\\C--Users-Danculus-AppData-Local-Temp-idxcost-38z5lcwl-r1-shape-360x100c2\\memory\\",
+      "store_path": "<HOME>\\.claude\\projects\\C--Users-<USER>-AppData-Local-Temp-idxcost-38z5lcwl-r1-shape-360x100c2\\memory\\",
       "index_bytes": 36000,
       "index_lines": 360,
       "canary_lines": [
@@ -3047,7 +3047,7 @@
       "arm": "r0_shape_600x60c2",
       "baseline_total": 38938,
       "baseline_hook_bytes": 0,
-      "store_path": "C:\\Users\\Danculus\\.claude\\projects\\C--Users-Danculus-AppData-Local-Temp-idxcost-38z5lcwl-r0-shape-600x60c2\\memory\\",
+      "store_path": "<HOME>\\.claude\\projects\\C--Users-<USER>-AppData-Local-Temp-idxcost-38z5lcwl-r0-shape-600x60c2\\memory\\",
       "index_bytes": 36000,
       "index_lines": 600,
       "canary_lines": [
@@ -3385,7 +3385,7 @@
       "arm": "r1_shape_600x60c2",
       "baseline_total": 38938,
       "baseline_hook_bytes": 0,
-      "store_path": "C:\\Users\\Danculus\\.claude\\projects\\C--Users-Danculus-AppData-Local-Temp-idxcost-38z5lcwl-r1-shape-600x60c2\\memory\\",
+      "store_path": "<HOME>\\.claude\\projects\\C--Users-<USER>-AppData-Local-Temp-idxcost-38z5lcwl-r1-shape-600x60c2\\memory\\",
       "index_bytes": 36000,
       "index_lines": 600,
       "canary_lines": [
@@ -3715,5 +3715,5 @@
       "delta_vs_median": 6111
     }
   ],
-  "_note": "absolute paths redacted to <HOME>; nothing else altered"
+  "_note": "absolute paths and the local username redacted; no measured value altered"
 }

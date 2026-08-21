@@ -35,5 +35,5 @@
     "warn": true,
     "ans": "WARNING=> WARNING: MEMORY.md is 202 lines and 24.7KB. Only part of it was loaded. Keep index entries to one line under ~200 chars; move detail into topic files."
   },
-  "_note": "absolute paths redacted to <HOME>; nothing else altered"
+  "_note": "absolute paths and the local username redacted; no measured value altered"
 }
