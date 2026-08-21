@@ -1,6 +1,6 @@
 # Agora — Public Track Record
 
-_Updated 2026-08-18 · the receipts behind the claims. An autonomous research OS held to
+_Updated 2026-08-10 · the receipts behind the claims. An autonomous research OS held to
 its own replications, forecasts, and challenges._
 
 ## Replication — the Crucible (re-running published claims as runnable code)
@@ -17,26 +17,19 @@ its own replications, forecasts, and challenges._
   demoted. We audit a REPRODUCED with the same suspicion as a FAILED.
 
 ## Forecasting — the number that makes this page worth reading
-- **249 forecasts on record; 241 resolved.** Not "windows still open": they closed,
+- **248 forecasts on record; 234 resolved.** Not "windows still open": they closed,
   and the result is bad.
-- **46 of 241 correct — 19.1%. Brier 0.304.** Read against a baseline rather than
-  against 0.250: on the same resolved set, always answering "UP" scores **39.4%**,
-  and agreement expected by chance under our *own* distribution of calls is
-  **34.7%**. We score 19.1%, which is **z = −4.56** — reliably worse than chance,
-  not merely imprecise.
-- **Where the bias is.** We call FLAT on 164 of 241 questions (68%) where reality is
-  FLAT 34% of the time, and DOWN on 19 (8%) where reality is DOWN 27% of the time.
-  The organ leans systematically toward "nothing will change".
-- For five weeks after those windows closed, this page still told readers they were
-  open and that nothing could be scored yet. That was wrong when it was published
-  and it flattered us. Correcting it is the point of publishing a track record at
-  all, and it is why the number above is here rather than in a drawer.
+- **Brier score 0.305.** A forecaster who says "50/50" to every question scores
+  **0.250**. Ours is worse than that — the calls are not merely imprecise, they are
+  **worse than uninformative**, and mean stated confidence (0.563) exceeds the hit
+  rate (46 of 234 correct).
+- The previous version of this page said the windows were still open and no score
+  could be reported. They had closed. Correcting that is the point of publishing a
+  track record at all, and it is the reason the number above is here rather than in
+  a drawer.
 - What we are doing about it: the forecast organ is on the list to be either
-  recalibrated against its own base rates or retired. A ledger reliably worse than
-  chance is not a capability, and we are not going to describe it as one.
-- Every figure here is re-derived from the ledger by `tools/derive_track_record.py`
-  and held to the published wording by `tools/check_public_counts.py`, which fails
-  the deploy when a number drifts. That check exists because this one did.
+  recalibrated against its own base rates or retired. A ledger that is reliably
+  worse than a coin is not a capability, and we are not going to describe it as one.
 
 ## Publications
 - **Observational Convergence Across Independent Diagnostic Frameworks: Three
@@ -63,6 +56,11 @@ its own replications, forecasts, and challenges._
 - Measured on our own memory stores, 2026-08-10: **210,499 records, `source` coverage
   98.3%, sources that resolve to something re-checkable 0.01%.** We could not detect
   index staleness in our own system, and we found that out by trying.
+- Re-measured 2026-08-21, before quoting that line to a collaborator: **234,557 records
+  across 11 stores, `source` coverage 92.7%, re-checkable zero.** The hundredth of a
+  percent that used to resolve was scratchpad paths; the files are gone and the records
+  still carry them. The number got worse, and we would not have known without re-running
+  it ([receipt](https://github.com/DanceNitra/agora/blob/main/probes/the_published_zero_is_still_a_measured_zero.py)).
 
 ## Product
 - **inspeximus** (`inspeximus`, open-source on PyPI) — the recall + consolidation
