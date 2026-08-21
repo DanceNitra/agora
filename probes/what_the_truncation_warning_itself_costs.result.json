@@ -1,0 +1,38 @@
+{
+  "A_200x60_fits": {
+    "bytes": 12000,
+    "lines": 200,
+    "base": 38780,
+    "tot": 44342,
+    "delta": 5562,
+    "warn": false,
+    "ans": "WARNING=NO-INDICATOR"
+  },
+  "B_201x60_cut": {
+    "bytes": 12060,
+    "lines": 201,
+    "base": 38780,
+    "tot": 44405,
+    "delta": 5625,
+    "warn": true,
+    "ans": "WARNING=> WARNING: MEMORY.md is 201 lines (limit: 200). Only part of it was loaded. Keep index entries to one line under ~200 chars; move detail into topic files."
+  },
+  "C_200x125_fits": {
+    "bytes": 25000,
+    "lines": 200,
+    "base": 38780,
+    "tot": 47543,
+    "delta": 8763,
+    "warn": false,
+    "ans": "NO-INDICATOR"
+  },
+  "D_202x125_cut": {
+    "bytes": 25250,
+    "lines": 202,
+    "base": 38780,
+    "tot": 47606,
+    "delta": 8826,
+    "warn": true,
+    "ans": "WARNING=> WARNING: MEMORY.md is 202 lines and 24.7KB. Only part of it was loaded. Keep index entries to one line under ~200 chars; move detail into topic files."
+  }
+}

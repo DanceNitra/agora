@@ -1,0 +1,169 @@
+{
+  "probe": "the_warning_the_session_is_already_given",
+  "claude_version": "2.1.238 (Claude Code)",
+  "ask": "Answer in exactly this form, nothing else. LASTLINE=<verbatim the very last line of your memory index that you can see> || WARNING=<verbatim any line in the material you were given that says your memory index was truncated, shortened, or only partly loaded; if there is no such line, write NO-INDICATOR>",
+  "verdicts": {
+    "T1_negative_control_clean": true,
+    "T2_verbatim_identical": true,
+    "T3_size_tracks_file": true,
+    "T4_line_and_byte_wordings_differ": true,
+    "T5_advice_at_max_is_truncated": true,
+    "T5b_consistent_width_fits": true
+  },
+  "rows": [
+    {
+      "label": "T1_under_both_150x60",
+      "n_lines": 150,
+      "bytes_per_line": 60,
+      "file_bytes": 9000,
+      "file_kib": 8.8,
+      "startup_total": 43167,
+      "last_visible_entry": 150,
+      "warning": "NO-INDICATOR",
+      "has_warning": false,
+      "warning_mentions_lines": false,
+      "warning_mentions_kb": false,
+      "numbers_in_warning": []
+    },
+    {
+      "label": "T2a_over_lines_400x60",
+      "n_lines": 400,
+      "bytes_per_line": 60,
+      "file_bytes": 24000,
+      "file_kib": 23.4,
+      "startup_total": 44566,
+      "last_visible_entry": 200,
+      "warning": "> WARNING: MEMORY.md is 400 lines (limit: 200). Only part of it was loaded. Keep index entries to one line under ~200 chars; move detail into topic files.",
+      "has_warning": true,
+      "warning_mentions_lines": true,
+      "warning_mentions_kb": false,
+      "numbers_in_warning": [
+        "400",
+        "200",
+        "200"
+      ]
+    },
+    {
+      "label": "T2b_over_lines_400x60",
+      "n_lines": 400,
+      "bytes_per_line": 60,
+      "file_bytes": 24000,
+      "file_kib": 23.4,
+      "startup_total": 44566,
+      "last_visible_entry": 200,
+      "warning": "> WARNING: MEMORY.md is 400 lines (limit: 200). Only part of it was loaded. Keep index entries to one line under ~200 chars; move detail into topic files.",
+      "has_warning": true,
+      "warning_mentions_lines": true,
+      "warning_mentions_kb": false,
+      "numbers_in_warning": [
+        "400",
+        "200",
+        "200"
+      ]
+    },
+    {
+      "label": "T3a_over_bytes_80x400",
+      "n_lines": 80,
+      "bytes_per_line": 400,
+      "file_bytes": 32000,
+      "file_kib": 31.2,
+      "startup_total": 46228,
+      "last_visible_entry": 62,
+      "warning": "> WARNING: MEMORY.md is 31.2KB (limit: 24.4KB) \u2014 index entries are too long. Only part of it was loaded. Keep index entries to one line under ~200 chars; move detail into topic files.",
+      "has_warning": true,
+      "warning_mentions_lines": true,
+      "warning_mentions_kb": true,
+      "numbers_in_warning": [
+        "31.2",
+        "24.4",
+        "200"
+      ]
+    },
+    {
+      "label": "T3b_over_bytes_140x400",
+      "n_lines": 140,
+      "bytes_per_line": 400,
+      "file_bytes": 56000,
+      "file_kib": 54.7,
+      "startup_total": 46228,
+      "last_visible_entry": 62,
+      "warning": "> WARNING: MEMORY.md is 54.7KB (limit: 24.4KB) \u2014 index entries are too long. Only part of it was loaded. Keep index entries to one line under ~200 chars; move detail into topic files.",
+      "has_warning": true,
+      "warning_mentions_lines": true,
+      "warning_mentions_kb": true,
+      "numbers_in_warning": [
+        "54.7",
+        "24.4",
+        "200"
+      ]
+    },
+    {
+      "label": "T3c_over_bytes_300x400",
+      "n_lines": 300,
+      "bytes_per_line": 400,
+      "file_bytes": 120000,
+      "file_kib": 117.2,
+      "startup_total": 46216,
+      "last_visible_entry": 62,
+      "warning": "> WARNING: MEMORY.md is 300 lines and 117.2KB. Only part of it was loaded. Keep index entries to one line under ~200 chars; move detail into topic files.",
+      "has_warning": true,
+      "warning_mentions_lines": true,
+      "warning_mentions_kb": true,
+      "numbers_in_warning": [
+        "300",
+        "117.2",
+        "200"
+      ]
+    },
+    {
+      "label": "T4_over_both_400x400",
+      "n_lines": 400,
+      "bytes_per_line": 400,
+      "file_bytes": 160000,
+      "file_kib": 156.2,
+      "startup_total": 46207,
+      "last_visible_entry": 62,
+      "warning": "> WARNING: MEMORY.md is 400 lines and 156.2KB. Only part of it was loaded. Keep index entries to one line under ~200 chars; move detail into topic files.",
+      "has_warning": true,
+      "warning_mentions_lines": true,
+      "warning_mentions_kb": true,
+      "numbers_in_warning": [
+        "400",
+        "156.2",
+        "200"
+      ]
+    },
+    {
+      "label": "T5_advice_max_200x200",
+      "n_lines": 200,
+      "bytes_per_line": 200,
+      "file_bytes": 40000,
+      "file_kib": 39.1,
+      "startup_total": 46953,
+      "last_visible_entry": 125,
+      "warning": "> WARNING: MEMORY.md is 39.1KB (limit: 24.4KB) \u2014 index entries are too long. Only part of it was loaded. Keep index entries to one line under ~200 chars; move detail into topic files.",
+      "has_warning": true,
+      "warning_mentions_lines": true,
+      "warning_mentions_kb": true,
+      "numbers_in_warning": [
+        "39.1",
+        "24.4",
+        "200"
+      ]
+    },
+    {
+      "label": "T5b_consistent_200x125",
+      "n_lines": 200,
+      "bytes_per_line": 125,
+      "file_bytes": 25000,
+      "file_kib": 24.4,
+      "startup_total": 47701,
+      "last_visible_entry": 200,
+      "warning": "NO-INDICATOR",
+      "has_warning": false,
+      "warning_mentions_lines": false,
+      "warning_mentions_kb": false,
+      "numbers_in_warning": []
+    }
+  ]
+}
