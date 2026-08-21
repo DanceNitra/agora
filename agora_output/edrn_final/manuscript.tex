@@ -226,7 +226,7 @@ The control edge $(0,1)$---connecting two tip vertices, making the two subgraphs
 
 To test whether the valley is specific to the fractal and small-world geometries, we performed single-edge scans on three additional $N=15$ graphs: a ring (15 edges), a tree (14 edges), and a random graph (27 edges). For each graph, a single contradiction edge was chosen and scanned over $s\in[0,3]$ with 13 points; light multi-seed audits (three seeds) were also performed. Table~\ref{tab:control_graphs} summarizes the results.
 
-\begin{table}[h]
+\begin{table*}[t]
 \centering
 \caption{Control-graph scans at $N=15$. Ring shows a clear valley at $s=1.0$; tree shows a very flat valley near $s=0.92$ with depth about $0.1000$; random graph shows no stable valley.}
 \label{tab:control_graphs}
@@ -239,7 +239,7 @@ Tree & 0.92 (flat) & 0.1000 & 0.1000 & N/A & Yes (flat) \\
 Random & 1.25 (unstable) & 0.0026 & 0.0014$\pm$0.0013 & 1.561 & No \\
 \bottomrule
 \end{tabular}
-\end{table}
+\end{table*}
 
 The ring valley occurs at $s=1.0$, where the contradiction edge strength equals the uniform coupling, similar to the fractal-graph edge $(0,6)$. The tree valley is very flat: its depth is about $0.1000$, but the position is not sharply resolved and is only approximately $s=0.92$. The random graph does not exhibit a stable valley; its multi-seed valley position standard deviation is 1.56, indicating noise rather than a reproducible feature.
 
@@ -353,7 +353,7 @@ Edge & Fine range & Valley $s$ & Valley gap \\
 
 Three representative edges were selected for high-resolution multi-seed audit (step $0.001$, five seeds), with exact cross-seed reproducibility of valley positions at non-degenerate ground states (Table~\ref{tab:sw_multiseed}).
 
-\begin{table}[h]
+\begin{table*}[t]
 \centering
 \caption{Multi-seed audit at three small-world edges, $N=10$, five seeds. The topographic prominence is defined as the drop below the lower of the two maxima flanking the valley over the full scan range. This definition avoids the need for a local baseline and is directly comparable across edges. Note that it differs from the depth convention of Table~\ref{tab:l2_valley} and Table~\ref{tab:control_graphs}, which use the scan-endpoint baseline $E(0)-E(\min)$; the two are close where both apply---for the tree, prominence $0.096864$ against endpoint depth $0.100030$---but they are not the same quantity and should not be compared across tables.}
 \label{tab:sw_multiseed}
@@ -366,7 +366,7 @@ Edge & Valley $s$ & Topographic prominence & Cross-seed std.\ of position \\
 (1,4) & 1.251 & 0.061969 & 0.000000 \\
 \bottomrule
 \end{tabular}
-\end{table}
+\end{table*}
 
 \section{Mechanism and limitations}
 
