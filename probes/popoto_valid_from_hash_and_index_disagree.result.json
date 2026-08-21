@@ -1,0 +1,42 @@
+{
+  "ref": "a4f7fbf432e487a29cd4868fb9c1fb59956067c0",
+  "C1_positive_control": true,
+  "M1_provenance_is_recorded": {
+    "defaulted_hash": null,
+    "asserted_hash": 1786993097.0987787
+  },
+  "C2_surfaces_agree_normally": {
+    "hash": 1786993097.0987787,
+    "index": 1786993097.0987787,
+    "agree": true
+  },
+  "M2_supersede_leaves_hash_nil": {
+    "hash": null,
+    "asserted": 1786129097.1058214
+  },
+  "M3_divergence": {
+    "index_before": 1786993097.10985,
+    "hash_before": null,
+    "corrected_to": 1784401097.10985,
+    "index_after": 1786993097.10985,
+    "hash_after": 1784401097.10985,
+    "gap_days": 30.0,
+    "diverged": true
+  },
+  "M4_consumer": {
+    "as_of": 1784401157.10985,
+    "returned": [],
+    "hash_says_true_then": true
+  },
+  "M5_documented_idiom_works": {
+    "as_of_hit": [
+      "idiom-new"
+    ],
+    "ok": true
+  },
+  "MUT1_probe_is_sensitive": {
+    "gap_seconds": 0.0,
+    "divergence_vanished": true
+  },
+  "all_controls_passed": true
+}

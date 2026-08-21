@@ -1,0 +1,10 @@
+{
+ "verdict": "OPERATOR-HELD",
+ "refusals_recorded": 3,
+ "strip_caught_with_allowlist": true,
+ "strip_passes_without_allowlist": true,
+ "witness_has_signed_statement": false,
+ "witness_has_refusal_log": false,
+ "staleness_visible": false,
+ "honest_export_ok": true
+}

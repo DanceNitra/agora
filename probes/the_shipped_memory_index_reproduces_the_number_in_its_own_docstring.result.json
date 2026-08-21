@@ -1,0 +1,23 @@
+{
+ "n_notes": 316,
+ "n_qa": 120,
+ "n_qb": 120,
+ "report": {
+  "fallback (no summariser)": {
+   "questions": 0.44166666666666665,
+   "searchbox": 0.525,
+   "tokens": 8359
+  },
+  "written (via set_index_line)": {
+   "questions": 0.6916666666666667,
+   "searchbox": 0.8416666666666667,
+   "tokens": 7789
+  },
+  "the live hand-written index": {
+   "questions": 0.3333333333333333,
+   "searchbox": 0.5083333333333333,
+   "tokens": 3063
+  }
+ },
+ "matches_docstring": true
+}
