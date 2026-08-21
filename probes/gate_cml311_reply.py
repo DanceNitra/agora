@@ -81,7 +81,12 @@ def figures(text):
         g["records"] = int(m.group(1).replace(",", ""))
         g["stores"] = int(m.group(2))
         g["source_pct"] = float(m.group(3))
-    g["claims_zero"] = ("zero " + DASH + " not 0.01%, zero " + DASH + " resolving") in t
+    # PROPERTY, NOT SPELLING. The first version of this line pinned one exact phrasing, and a
+    # humanizer pass that kept the claim intact ("zero re-fetchable. Not 0.01%. Zero.") turned the
+    # check red -- a gate that fails on rewording is measuring prose, not truth. What the draft has
+    # to do is state the zero AND deny the stale 0.01%, in whatever words.
+    g["claims_zero"] = (re.search("[^a-z]zero[^a-z]", t, re.I) is not None
+                        and re.search("[Nn]ot 0[.]01[ ]*%", t) is not None)
     g["published_date"] = "2026-08-10" in t
     g["published_pct"] = "0.01% on 2026-08-10" in t
     return g
@@ -158,8 +163,8 @@ def main() -> int:
         "record count": ("%s records" % f"{receipt['records']:,}", "999,999 records"),
         "store count": ("across 11 live stores", "across 4 live stores"),
         "source percent": ("92.7% carrying", "98.3% carrying"),
-        "the zero": ("zero " + DASH + " not 0.01%, zero " + DASH + " resolving",
-                     "0.01% resolving"),
+        "the zero": ("and zero re-fetchable. Not 0.01%. Zero.",
+                     "and 0.01% re-fetchable."),
         "four/two split": ("**Four** already returned `None`",
                            "**Five** already returned `None`"),
         "surviving prop": ("`ok` is still `False` on an empty store",
@@ -172,10 +177,19 @@ def main() -> int:
         caught = bool(check_draft(text.replace(find, repl, 1), receipt, before, after))
         ck(caught, "mutation '%s' is caught" % name)
 
-    low = " ".join(text.split()).lower()
-    for w in ("however", "moreover", "furthermore", "delve", "leverage", "crucial",
-              "load-bearing", "honest", "it is worth noting"):
-        ck(w not in low, "humanizer: no '%s'" % w)
+    # The tell list lives in tools/humanizer_tells.py, not here. Twelve gates had twelve
+    # hand-typed copies and they had already drifted apart; @jason-sachs's reading on
+    # claude-code#34556 also moved "honest" from a banned WORD to a banned CONSTRUCTION
+    # ("the honest X"), which a per-gate word list cannot express.
+    sys.path.insert(0, ROOT)
+    from tools.humanizer_tells import find_tells, em_dash_rate, contraction_rate
+    tells = find_tells(text)
+    ck(not tells, "humanizer: no tells (shared list)",
+       "; ".join("%s=%r" % (n, g) for n, g, _ in tells[:4]) or "clean")
+    ck(em_dash_rate(text) < 0.8, "em-dash rate under our long-comment baseline of 1.4-1.8",
+       "%.2f per 100w" % em_dash_rate(text))
+    ck(contraction_rate(text) > 1.0, "contractions present -- zero is our strongest tell",
+       "%.2f per 100w" % contraction_rate(text))
     ck(len(text) < 3000, "length is inside the range of our recent replies",
        "%s chars" % len(text))
 
