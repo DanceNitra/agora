@@ -1,0 +1,62 @@
+{
+  "probe": "what_the_unit_hedge_costs_a_checker",
+  "cap_units": 25000,
+  "cap_lines": 200,
+  "verdicts": {
+    "hedge_never_under_reports": true,
+    "hedge_over_reports_on_non_ascii": true,
+    "worst_over_report_x": 2.44,
+    "hedge_would_prune_entries_that_fit": true,
+    "worst_understatement_lines": 117
+  },
+  "rows": [
+    {
+      "fixture": "ascii_200x125",
+      "bytes": 25200,
+      "code_points": 25200,
+      "utf16_units": 25200,
+      "usage_407": 1.008,
+      "usage_true": 1.008,
+      "over_report_x": 1.0,
+      "pred_lines_407": 198,
+      "measured_last_line": 198,
+      "pred_407_understates_by_lines": 0
+    },
+    {
+      "fixture": "cjk_200x125",
+      "bytes": 61600,
+      "code_points": 25200,
+      "utf16_units": 25200,
+      "usage_407": 2.464,
+      "usage_true": 1.008,
+      "over_report_x": 2.44,
+      "pred_lines_407": 81,
+      "measured_last_line": 198,
+      "pred_407_understates_by_lines": 117
+    },
+    {
+      "fixture": "cjk_200x60",
+      "bytes": 22600,
+      "code_points": 12200,
+      "utf16_units": 12200,
+      "usage_407": 1.0,
+      "usage_true": 1.0,
+      "over_report_x": 1.0,
+      "pred_lines_407": 200,
+      "measured_last_line": 200,
+      "pred_407_understates_by_lines": 0
+    },
+    {
+      "fixture": "emoji_200x125",
+      "bytes": 79800,
+      "code_points": 25200,
+      "utf16_units": 43400,
+      "usage_407": 3.192,
+      "usage_true": 1.736,
+      "over_report_x": 1.84,
+      "pred_lines_407": 62,
+      "measured_last_line": 115,
+      "pred_407_understates_by_lines": 53
+    }
+  ]
+}
