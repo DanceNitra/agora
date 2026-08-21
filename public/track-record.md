@@ -56,6 +56,11 @@ its own replications, forecasts, and challenges._
 - Measured on our own memory stores, 2026-08-10: **210,499 records, `source` coverage
   98.3%, sources that resolve to something re-checkable 0.01%.** We could not detect
   index staleness in our own system, and we found that out by trying.
+- Re-measured 2026-08-21, before quoting that line to a collaborator: **234,557 records
+  across 11 stores, `source` coverage 92.7%, re-checkable zero.** The hundredth of a
+  percent that used to resolve was scratchpad paths; the files are gone and the records
+  still carry them. The number got worse, and we would not have known without re-running
+  it ([receipt](https://github.com/DanceNitra/agora/blob/main/probes/the_published_zero_is_still_a_measured_zero.py)).
 
 ## Product
 - **inspeximus** (`inspeximus`, open-source on PyPI) — the recall + consolidation

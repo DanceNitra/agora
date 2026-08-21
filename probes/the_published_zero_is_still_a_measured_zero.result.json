@@ -1,0 +1,88 @@
+{
+ "measured_at": "2026-08-21",
+ "stores": 11,
+ "records": 234557,
+ "with_source": 217546,
+ "recheckable": 0,
+ "source_pct": 92.75,
+ "recheckable_pct": 0.0,
+ "published_2026_08_10": {
+  "records": 210499,
+  "source_pct": 98.3,
+  "recheckable_pct": 0.01
+ },
+ "control": {
+  "records": 2,
+  "with_source": 2,
+  "recheckable": 2
+ },
+ "unreadable": [],
+ "per_store": [
+  {
+   "records": 15822,
+   "with_source": 102,
+   "recheckable": 0,
+   "store": ".inspeximus/coding_memory.json"
+  },
+  {
+   "records": 917,
+   "with_source": 0,
+   "recheckable": 0,
+   "store": "server/.inspeximus/coding_memory.json"
+  },
+  {
+   "records": 374,
+   "with_source": 0,
+   "recheckable": 0,
+   "store": "agora-game-server/.inspeximus/coding_memory.json"
+  },
+  {
+   "records": 27261,
+   "with_source": 27261,
+   "recheckable": 0,
+   "store": "agora-game-server/.agent_memory/artificer.json"
+  },
+  {
+   "records": 27234,
+   "with_source": 27234,
+   "recheckable": 0,
+   "store": "agora-game-server/.agent_memory/cartographer.json"
+  },
+  {
+   "records": 27195,
+   "with_source": 27195,
+   "recheckable": 0,
+   "store": "agora-game-server/.agent_memory/guard_l.json"
+  },
+  {
+   "records": 27281,
+   "with_source": 27281,
+   "recheckable": 0,
+   "store": "agora-game-server/.agent_memory/guard_r.json"
+  },
+  {
+   "records": 27109,
+   "with_source": 27109,
+   "recheckable": 0,
+   "store": "agora-game-server/.agent_memory/king.json"
+  },
+  {
+   "records": 27279,
+   "with_source": 27279,
+   "recheckable": 0,
+   "store": "agora-game-server/.agent_memory/priest.json"
+  },
+  {
+   "records": 26915,
+   "with_source": 26915,
+   "recheckable": 0,
+   "store": "agora-game-server/.agent_memory/scholar.json"
+  },
+  {
+   "records": 27170,
+   "with_source": 27170,
+   "recheckable": 0,
+   "store": "agora-game-server/.agent_memory/thief.json"
+  }
+ ]
+}
