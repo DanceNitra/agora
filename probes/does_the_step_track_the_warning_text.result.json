@@ -1,0 +1,68 @@
+{
+  "probe": "does_the_step_track_the_warning_text",
+  "claude_version": "2.1.238 (Claude Code)",
+  "verdicts": {
+    "every_cut_arm_quoted_its_warning": true,
+    "baselines_carry_no_warning": true,
+    "every_cut_arm_warns": true,
+    "step_is_small_and_positive": true,
+    "step_tracks_the_wording": true
+  },
+  "steps": {
+    "cut_201x60": 64,
+    "cut_1005x60": 67,
+    "cut_202x125": 64
+  },
+  "arms": {
+    "base_200x60": {
+      "lines": 200,
+      "width": 60,
+      "baseline_total": 38784,
+      "index_total": 44362,
+      "delta": 5578,
+      "warned": false,
+      "warning": "NO-INDICATOR",
+      "warning_chars": 0
+    },
+    "cut_201x60": {
+      "lines": 201,
+      "width": 60,
+      "baseline_total": 38786,
+      "index_total": 44428,
+      "delta": 5642,
+      "warned": true,
+      "warning": "> WARNING: MEMORY.md is 201 lines (limit: 200). Only part of it was loaded. Keep index entries to one line under ~200 chars; move detail into topic files.",
+      "warning_chars": 154
+    },
+    "cut_1005x60": {
+      "lines": 1005,
+      "width": 60,
+      "baseline_total": 38788,
+      "index_total": 44433,
+      "delta": 5645,
+      "warned": true,
+      "warning": "> WARNING: MEMORY.md is 1005 lines and 58.9KB. Only part of it was loaded. Keep index entries to one line under ~200 chars; move detail into topic files.",
+      "warning_chars": 153
+    },
+    "base_200x125": {
+      "lines": 200,
+      "width": 125,
+      "baseline_total": 38784,
+      "index_total": 47563,
+      "delta": 8779,
+      "warned": false,
+      "warning": "NO-INDICATOR",
+      "warning_chars": 0
+    },
+    "cut_202x125": {
+      "lines": 202,
+      "width": 125,
+      "baseline_total": 38786,
+      "index_total": 47629,
+      "delta": 8843,
+      "warned": true,
+      "warning": "> WARNING: MEMORY.md is 202 lines and 24.7KB. Only part of it was loaded. Keep index entries to one line under ~200 chars; move detail into topic files.",
+      "warning_chars": 152
+    }
+  }
+}
