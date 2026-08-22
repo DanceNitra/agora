@@ -1,0 +1,102 @@
+{
+ "orbit_sizes": [
+  6,
+  6,
+  6,
+  6,
+  3
+ ],
+ "automorphisms": 6,
+ "his_published_s1": 0.159658,
+ "reproduced_s1": 0.15965824381448432,
+ "seed_spread_s1": 2.9976021664879227e-15,
+ "start_vector_hypothesis": "REFUTED: 10 seeds agree to 3.0e-15",
+ "degeneracy_uniform": 2,
+ "gap_uniform": 0.1857087248489222,
+ "degeneracy_by_s": [
+  {
+   "s": 0.0,
+   "degeneracy": 1,
+   "gap": 0.6176096045908608
+  },
+  {
+   "s": 0.25,
+   "degeneracy": 1,
+   "gap": 0.586805672998107
+  },
+  {
+   "s": 0.5,
+   "degeneracy": 1,
+   "gap": 0.522571475152354
+  },
+  {
+   "s": 0.75,
+   "degeneracy": 1,
+   "gap": 0.34581536796707013
+  },
+  {
+   "s": 1.0,
+   "degeneracy": 2,
+   "gap": 0.1857087248489222
+  },
+  {
+   "s": 1.25,
+   "degeneracy": 1,
+   "gap": 0.14940835743279024
+  },
+  {
+   "s": 1.5,
+   "degeneracy": 1,
+   "gap": 0.26231134787653687
+  },
+  {
+   "s": 2.0,
+   "degeneracy": 1,
+   "gap": 0.3764474577902952
+  },
+  {
+   "s": 3.0,
+   "degeneracy": 1,
+   "gap": 0.4628003941788208
+  }
+ ],
+ "degenerate_only_at_s1": true,
+ "rot_global_width_real_only": 6.661338147750939e-16,
+ "rot_global_width": 0.04938910666336105,
+ "rot_local_width": 0.1403454663935647,
+ "rot_global_min": 0.11026913715112552,
+ "rot_global_max": 0.15965824381448657,
+ "rot_local_min": 0.07745325397888397,
+ "rot_local_max": 0.21779872037244868,
+ "tip_local_single": [
+  0.12054344888030553,
+  0.0856214023280377,
+  0.2177842984284781,
+  0.21766919801103884,
+  0.12178021246249764,
+  0.0876404158781168
+ ],
+ "tip_local_mixture": [
+  0.10570642016052145,
+  0.1057064201605205,
+  0.10570642016052365,
+  0.1057064201605245,
+  0.10570642016052252,
+  0.1057064201605212
+ ],
+ "tip_orbit_spread_single": 0.1321628961004404,
+ "tip_orbit_spread_mixture": 4.010680676458378e-15,
+ "within_orbit_spread_single": 0.42199802668923264,
+ "within_orbit_spread_mixture": 1.0375034165122088e-13,
+ "ring_value": 6.312995352117186e-16,
+ "ring_degeneracy": 2,
+ "s15_single": 0.2899461407344126,
+ "s15_mixture": 0.28994614073442304,
+ "degeneracy_s15": 1,
+ "global_s1_single": 0.15965824381448432,
+ "global_s1_mixture": 0.11026913715112523,
+ "smallest_reported_range": 0.077438,
+ "energy_per_bond": -0.23118089425480615,
+ "published_energy_per_bond": -0.231181,
+ "all_controls_pass": true
+}

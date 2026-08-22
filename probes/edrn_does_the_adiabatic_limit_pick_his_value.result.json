@@ -1,0 +1,83 @@
+{
+ "approach": [
+  {
+   "s": 0.9,
+   "deg": 1,
+   "gap": 0.1445582549119493,
+   "e_local": 0.2500222765546473,
+   "e_global": 0.22083839992183102
+  },
+  {
+   "s": 0.99,
+   "deg": 1,
+   "gap": 0.011549356751793027,
+   "e_local": 0.1046904969920407,
+   "e_global": 0.16403207451189208
+  },
+  {
+   "s": 0.999,
+   "deg": 1,
+   "gap": 0.001092183316153239,
+   "e_local": 0.0862716108721961,
+   "e_global": 0.1599199151448361
+  },
+  {
+   "s": 0.9999,
+   "deg": 1,
+   "gap": 0.0001085578620312333,
+   "e_local": 0.08497630258030035,
+   "e_global": 0.1596824325854343
+  },
+  {
+   "s": 1.1,
+   "deg": 1,
+   "gap": 0.05953870257905436,
+   "e_local": 0.2556417257894495,
+   "e_global": 0.21255136117681941
+  },
+  {
+   "s": 1.01,
+   "deg": 1,
+   "gap": 0.010084159792295821,
+   "e_local": 0.19112001163110798,
+   "e_global": 0.1604511817555878
+  },
+  {
+   "s": 1.001,
+   "deg": 1,
+   "gap": 0.001077434849467096,
+   "e_local": 0.19313816529374203,
+   "e_global": 0.15972343043006743
+  },
+  {
+   "s": 1.0001,
+   "deg": 1,
+   "gap": 0.00010841036757369693,
+   "e_local": 0.19334120568610225,
+   "e_global": 0.15966464945911782
+  }
+ ],
+ "limit_local_below": 0.08497630258030035,
+ "limit_local_above": 0.19334120568610225,
+ "limit_global_below": 0.1596824325854343,
+ "limit_global_above": 0.15966464945911782,
+ "candidates": {
+  "his published": 0.120543,
+  "adiabatic from below": 0.08497630258030035,
+  "adiabatic from above": 0.19334120568610225,
+  "ground-space average": 0.105706
+ },
+ "two_sided_limits_agree": false,
+ "his_value_is_an_adiabatic_limit": false,
+ "verdict": "NO adiabatic prescription exists at s=1 either: the two one-sided limits disagree by 0.108365. The local quantity is genuinely ambiguous there.",
+ "implied_spin": [
+  0.4999999999999951,
+  0.5000000000000018
+ ],
+ "s2_ground_doublet": [
+  0.7499999999999902,
+  0.7500000000000036
+ ],
+ "degeneracy_is_spatial": true,
+ "all_controls_pass": true
+}
