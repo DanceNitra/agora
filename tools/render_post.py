@@ -21,6 +21,31 @@ ROOT = Path(__file__).resolve().parents[1]
 SITE = "https://dancenitra.github.io/agora/public"
 
 META = {
+    "a-status-nobody-earned": {
+        "slug": "a-status-nobody-earned",
+        "title": "Our claims table certified five rows it had never run, and the number it "
+                 "certified was a draw from a distribution",
+        "title_sk": "Nasa tabulka tvrdeni certifikovala pat riadkov, ktore nikdy nespustila, a "
+                    "cislo, ktore certifikovala, bolo losom z rozdelenia",
+        "desc": "An outside reader ran the command five rows of our published claims table cite "
+                "and it died before argument handling, under a status promising it needed only "
+                "dependencies. Nothing checked whether a REPRODUCIBLE command could start. Then "
+                "the number itself: the store returns byte-identical contexts over 20 runs while "
+                "the shared gpt-4o-mini judge scores them 0.75 x26, 0.70 x2, 0.80 x2 at "
+                "temperature 0.0. Re-running one judge moves the figure as much as changing the "
+                "judge does, and no judge ever answered that the superseded value was current.",
+        "desc_sk": "Externy citatel spustil prikaz, ktory cituje pat riadkov nasej publikovanej "
+                   "tabulky tvrdeni, a spadol este pred spracovanim argumentov -- pod statusom, "
+                   "ktory slubuje, ze staci doinstalovat zavislosti. Nic neoverovalo, ci sa "
+                   "REPRODUCIBLE prikaz vobec da spustit. Potom to cislo: ulozisko vrati "
+                   "bajt-identicke kontexty v 20 behoch, kym zdielany sudca gpt-4o-mini im da "
+                   "0,75 x26, 0,70 x2, 0,80 x2 pri temperature 0,0. Opakovany beh jedneho sudcu "
+                   "posunie cislo rovnako ako vymena sudcu.",
+        "date": "2026-08-22", "modified": "2026-08-22",
+        "tags": "Benchmarks · LLM-as-judge · Measurement · Reproducibility · Agent memory",
+        "tags_sk": "Benchmarky · LLM ako sudca · Meranie · Reprodukovatelnost · Agentska pamat",
+        "kicker": "Measurement · self-audit", "kicker_sk": "Meranie · sebaaudit",
+    },
     "provenance-field-one-value": {
         "slug": "provenance-field-one-value",
         "title": "Two stores, one product: a provenance field at 100% coverage with 8 distinct "
