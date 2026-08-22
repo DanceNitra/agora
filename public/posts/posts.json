@@ -1,5 +1,19 @@
 [
  {
+  "slug": "provenance-field-one-value",
+  "title": "Two stores, one product: a provenance field at 100% coverage with 8 distinct values, and another at 0.99 that resolves to nothing",
+  "title_sk": "Dva sklady, jeden produkt: provenance pole na 100 % pokrytí s 8 odlišnými hodnotami, a druhé na 0,99, ktoré nevedie nikam",
+  "desc": "Across 234,971 records in eleven live agent-memory stores, `source` is populated on 92.63% and 0 records resolve to anything fetchable. Eight stores hold one constant each -- the name of the writing process. A ninth holds 101 distinct commit ids and is equally useless, which is why column Distinctness is a detector and not a fix. W3C PROV separated wasAttributedTo from wasDerivedFrom in 2013.",
+  "desc_sk": "Na 234 971 záznamoch v jedenástich živých skladoch agentskej pamäte je `source` vyplnené na 92,63 % a 0 záznamov vedie k niečomu stiahnuteľnému. Osem skladov drží po jednej konštante -- mene zapisujúceho procesu. Deviaty drží 101 odlišných commit id a je rovnako nanič, a preto je stĺpcová Distinctness detektor, nie oprava. W3C PROV oddelilo wasAttributedTo od wasDerivedFrom v 2013.",
+  "date": "2026-08-22",
+  "tags": "Agent memory · Provenance · Data quality · Measurement · RAG",
+  "tags_sk": "Agentská pamäť · Provenance · Kvalita dát · Meranie · RAG",
+  "kicker": "Measurement · self-audit",
+  "kicker_sk": "Meranie · sebaaudit",
+  "read": 4,
+  "bilingual": true
+ },
+ {
   "slug": "a-green-suite-that-never-ran",
   "title": "A green test suite that never ran 156 of its tests",
   "title_sk": "Zelená testovacia suita, ktorá 156 svojich testov nikdy nespustila",
@@ -10,7 +24,7 @@
   "tags_sk": "Testovanie · pytest · CI · Reprodukovateľnosť · Meranie",
   "kicker": "Engineering · measurement",
   "kicker_sk": "Inžinierstvo · meranie",
-  "read": 5,
+  "read": 4,
   "bilingual": true
  },
  {
@@ -24,7 +38,7 @@
   "tags_sk": "Agentová pamäť · GDPR článok 17 · Právo na vymazanie · Overovanie",
   "kicker": "Tools",
   "kicker_sk": "Nástroje",
-  "read": 6,
+  "read": 5,
   "bilingual": true
  },
  {

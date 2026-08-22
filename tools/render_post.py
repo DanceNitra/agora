@@ -338,6 +338,24 @@ def md_to_html(md: str):
         if ln.startswith("# "):
             title = ln[2:].strip(); i += 1; continue
         st = ln.strip()
+        if st.startswith("```"):
+            # FENCED CODE. This has to run BEFORE the heading, table and blockquote branches, because
+            # code routinely contains `#`, `|` and `>` at the start of a line and would otherwise be
+            # parsed as markup. Until 2026-08-13 there was no branch at all: the fence fell through to
+            # the paragraph writer, `_inline` ate the third backtick into an inline <code>, and the body
+            # was flattened into <p> with whitespace collapsed. 19 published posts carried code that way
+            # and 0 of 64 pages had a <pre>, which is why nobody noticed: it looked like prose, not like
+            # an error.
+            lang = st[3:].strip()
+            i += 1
+            buf = []
+            while i < len(lines) and not lines[i].strip().startswith("```"):
+                buf.append(lines[i]); i += 1
+            i += 1                                              # consume the closing fence
+            cls = f' class="language-{html.escape(lang)}"' if lang else ""
+            code = html.escape(chr(10).join(buf))
+            out.append(f"<pre><code{cls}>{code}</code></pre>")
+            continue
         if st.startswith("<figure") or st.startswith("<svg"):   # raw-HTML figure passthrough (no escaping/wrapping)
             close = "</figure>" if st.startswith("<figure") else "</svg>"
             raw = [ln]

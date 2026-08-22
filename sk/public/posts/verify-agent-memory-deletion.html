@@ -103,7 +103,7 @@
 <article>
 <div class="kicker"><span class="sk">Nástroje</span></div>
 <h1><span class="sk">Overenie mazania v agentovej pamäti: vieš dokázať, že je preč?</span></h1>
-<div class="meta"><span class="sk">1. augusta 2026</span><span class="sk">6 min čítania</span><span class="sk">Agentová pamäť · GDPR článok 17 · Právo na vymazanie · Overovanie</span></div>
+<div class="meta"><span class="sk">1. augusta 2026</span><span class="sk">5 min čítania</span><span class="sk">Agentová pamäť · GDPR článok 17 · Právo na vymazanie · Overovanie</span></div>
 <div class="tldr"><div class="lab"><span class="sk">Zhrnutie</span></div>
 <p><span class="sk">delete() tvojho agenta vráti úspech - to neznamená, že dáta odišli. Spusti si voľnú kontrolu na vlastnom úložisku a zisti, čo tvoje mazanie naozaj odstránilo.</span></p></div>
 
@@ -119,9 +119,17 @@
 <p>Nič z toho neznamená, že tvoj stack je pokazený. Znamená to, že otázka „zabralo to mazanie?" má odpoveď, ktorú si nezmeral.</p>
 <h2>Spusti si to na vlastnom úložisku</h2>
 <p>Kontrola je jeden súbor, štandardná knižnica plus tie backendy, ktoré už máš nainštalované. Nájde si ich sama.</p>
-<p>``<code>bash curl -O https://raw.githubusercontent.com/DanceNitra/ramr/main/integrity/erasure_selfcheck.py python erasure_selfcheck.py </code>``</p>
+<pre><code class="language-bash">curl -O https://raw.githubusercontent.com/DanceNitra/ramr/main/integrity/erasure_selfcheck.py
+python erasure_selfcheck.py</code></pre>
 <p>Do každého nájdeného backendu zapíše značku, zavolá jeho dokumentované <code>delete</code>, spustí jeho dokumentovanú kompakciu a potom prehľadá surové súbory úložiska na bajty tej značky. Výstup vyzerá takto:</p>
-<p>``<code> ========================================================================== agent-memory erasure self-check - YOUR stack ==========================================================================   inspeximus   absent   your-store   PRESENT        somefile.sqlite3 -------------------------------------------------------------------------- 'PRESENT' = the marker's bytes are still in the store's files after its own delete + compaction (logical residue). </code>``</p>
+<pre><code>==========================================================================
+agent-memory erasure self-check - YOUR stack
+==========================================================================
+  inspeximus   absent
+  your-store   PRESENT        somefile.sqlite3
+--------------------------------------------------------------------------
+'PRESENT' = the marker's bytes are still in the store's files after its own
+delete + compaction (logical residue).</code></pre>
 <p><code>absent</code> znamená, že bajty sú po vlastnom upratovaní úložiska preč. <code>PRESENT</code> znamená, že nie sú — a súbor, ktorý ich stále drží, je pomenovaný, aby si sa mohol pozrieť sám.</p>
 <p>Publikujeme nástroj, nie rebríček. Ak ťa nejaký výsledok prekvapí, správny ďalší krok je issue tracker toho backendu cez bežné koordinované zverejnenie — nie blogový článok, a nie tento.</p>
 <h2>Ako výsledok čítať poctivo</h2>

@@ -1,29 +1,44 @@
-"""Our provenance field is at 100% coverage and holds one distinct value across 217,000 records.
+"""Our provenance field is 100% populated, holds 8 distinct values over 217,549 records, and 0 resolve.
 
-We publish a source-coverage figure. Re-measured today across eleven live stores it is 92.75%, and
-that number is an average over two populations that have nothing to do with each other:
+We publish a source-coverage figure. Re-measured across eleven live stores it is ~92.6%, and that is
+an average over two populations with nothing to do with each other:
 
-    eight agent stores   217,444 records   source coverage 100.0%
-    three coding stores   17,113 records   source coverage 0.6% / 0.0% / 0.0%
+    eight agent stores   217,549 records   source populated on 100.0%
+    three coding stores   17,418 records   source populated on 0.6% / 0.0% / 0.0%
 
-The 100.0% is the part worth looking at. In `scholar.json`, 26,928 records carry a `source` field and
-the field holds the literal string `agent:scholar` in every one of them. One distinct value. It is
-the name of the process that did the writing, not the origin of what was written.
+The 100.0% is the part worth looking at. `scholar.json` carries a `source` field on all 26,928 of its
+records and the field holds the literal string `agent:scholar` in every one. One distinct value, and
+it is the name of the process that did the writing.
 
-So the coverage number measures that a field is POPULATED. Nothing in it measures whether anything is
-traceable, and the two are reported with the same word.
+W3C PROV has separated these since 2013: `wasAttributedTo` is the agent responsible,
+`wasDerivedFrom` is the entity it came from. We recorded attribution and read it as derivation.
 
-THE ONE-LINE CHECK, which is the point of publishing this: **distinct source values divided by
-records.** At 1/26,928 a coverage figure is a schema check wearing the clothes of a guarantee. This
-probe computes it for every store it can find and prints the distribution, so a reader can run the
-same thing on their own store and get a number to compare.
+WHAT THIS PROBE IS NOT. `distinct / records` is **not a new check and not a fix**. It is column
+Distinctness -- Abedjan, Golab & Naumann's profiling survey defines uniqueness as distinct values over
+rows; AWS Deequ ships it as `Distinctness`; Great Expectations ships
+`expect_column_proportion_of_unique_values_to_be_between`; ydata-profiling raises CONSTANT
+automatically when distinct = 1. A profiler would have caught this in one pass and nobody ran one.
 
-CONTROLS, because a scan that reads nothing reports a clean 100%:
-  * a store that fails to parse is REPORTED, never counted as clean;
-  * a synthetic control store with three genuinely distinct sources must read 3 distinct / 3 records,
-    so a distinct-count of 1 elsewhere means the corpus, not the counter;
-  * re-checkability is measured beside coverage, because a locator that resolves is the property
-    coverage is assumed to imply.
+And it does not measure traceability either. Fill `source` with a fresh UUID per record and
+distinctness reads a perfect 1.0 at zero traceability -- the same success-shaped nothing, one field
+over. That objection is the reason the headline here is the **zero**, not the ratio:
+
+    re-checkable = 0, over every record in every store.
+
+That number can fail, and it is measured against a resolver this probe proves can succeed.
+
+CONTROLS, both required, because each covers what the other cannot see:
+  * DISTINCTNESS -- three distinct sources must read 3 over 3 records, or a counter stuck at 1 makes
+    every store look like ours;
+  * RESOLVER -- a real file written to disk, plus an https URL, must read as re-checkable. Without
+    this the headline zero is unpublishable: a resolver returning False on everything reports zero
+    over any corpus and is indistinguishable from a corpus with none. This probe shipped without it
+    until a method audit asked for it.
+  * a store that fails to parse is REPORTED, never counted as clean.
+
+BOTH DENOMINATORS ARE PRINTED. Dividing by ALL records silently multiplies distinctness by coverage
+and reports neither; doing that turned a ~27,000x difference into "170x" in a draft. The ratio that
+matches the shipped `distinct_source_ratio` field is `/sourced`.
 
 Run:  python probes/a_provenance_field_at_100_percent_with_one_distinct_value.py
 """
@@ -92,17 +107,21 @@ def scan(path):
             if recheckable(s):
                 rech += 1
     return {"records": n, "with_source": with_src, "recheckable": rech,
-            "distinct_sources": len(vals), "top": vals.most_common(2)}
+            "distinct_sources": len(vals), "top": vals.most_common(2),
+            "ratio_over_sourced": round(len(vals) / with_src, 6) if with_src else None,
+            "ratio_over_all": round(len(vals) / n, 6) if n else None}
 
 
 def control():
-    """Three genuinely distinct sources must read 3 distinct over 3 records."""
     d = tempfile.mkdtemp()
+    real = os.path.join(d, "runbook.md")
+    with open(real, "w", encoding="utf-8") as fh:
+        fh.write("host is db-old")
     p = os.path.join(d, "c.json")
-    json.dump({"items": [{"text": "a", "source": "doc-one.md"},
-                         {"text": "b", "source": "doc-two.md"},
-                         {"text": "c", "source": "https://example.org/three"}]},
-              open(p, "w", encoding="utf-8"))
+    with open(p, "w", encoding="utf-8") as fh:
+        json.dump({"items": [{"text": "a", "source": real},
+                             {"text": "b", "source": "no-such-doc.md"},
+                             {"text": "c", "source": "https://example.org/three"}]}, fh)
     return scan(p)
 
 
@@ -113,11 +132,16 @@ def main() -> int:
         pass
 
     c = control()
-    ok = c and c["records"] == 3 and c["distinct_sources"] == 3
-    print("CONTROL  3 distinct sources over 3 records -> %d distinct  %s\n"
-          % (c["distinct_sources"] if c else -1, "PASS" if ok else "FAIL"))
-    if not ok:
-        print("the counter is broken, not the corpus")
+    ok_d = bool(c and c["records"] == 3 and c["distinct_sources"] == 3)
+    ok_r = bool(c and c["recheckable"] == 2)      # the real file, and the https URL
+    print("CONTROL  distinctness   3 distinct over 3 records  -> %d   %s"
+          % (c["distinct_sources"] if c else -1, "PASS" if ok_d else "FAIL"))
+    print("CONTROL  resolver       a real file + an https URL -> %d   %s"
+          % (c["recheckable"] if c else -1, "PASS" if ok_r else "FAIL"))
+    print()
+    if not (ok_d and ok_r):
+        print("ABORT -- the instrument is broken, not the corpus. A resolver that cannot see a file")
+        print("         it just wrote reports 0 over any store, which is exactly the headline.")
         return 1
 
     rows, unreadable = [], []
@@ -137,18 +161,19 @@ def main() -> int:
     if unreadable:
         print("UNREADABLE (reported, never counted as clean):")
         for s, why in unreadable:
-            print("   %-52s %s" % (s, why))
+            print("   %-48s %s" % (s, why))
         print()
-
     if not rows:
         print("FAIL -- no stores read; nothing was measured")
         return 1
 
-    print("%-52s %8s %7s %9s %11s" % ("store", "records", "src %", "distinct", "re-checkable"))
+    print("%-46s %8s %7s %8s %10s %10s %7s"
+          % ("store", "records", "src %", "distinct", "/sourced", "/all", "re-chk"))
     for r in sorted(rows, key=lambda x: -x["records"]):
         pct = 100.0 * r["with_source"] / r["records"] if r["records"] else 0.0
-        print("%-52s %8d %6.1f%% %9d %11d"
-              % (r["store"], r["records"], pct, r["distinct_sources"], r["recheckable"]))
+        print("%-46s %8d %6.2f%% %8d %10s %10s %7d"
+              % (r["store"], r["records"], pct, r["distinct_sources"],
+                 r["ratio_over_sourced"], r["ratio_over_all"], r["recheckable"]))
 
     tot = sum(r["records"] for r in rows)
     src = sum(r["with_source"] for r in rows)
@@ -157,24 +182,25 @@ def main() -> int:
     fn = sum(r["records"] for r in full)
     fd = sum(r["distinct_sources"] for r in full)
 
-    print("\n" + "=" * 92)
-    print("ALL STORES        %d records   source %.2f%%   re-checkable %d" % (tot, 100.0 * src / tot, rec))
-    print("AT 100%% COVERAGE  %d records across %d stores   %d distinct source values in total"
-          % (fn, len(full), fd))
-    if fn:
-        print("                  distinct-per-record = %d / %d = %.6f" % (fd, fn, fd / fn))
-    for r in full[:3]:
-        print("                  %-40s top value %r x%d"
-              % (r["store"], r["top"][0][0][:32], r["top"][0][1]))
-    print("=" * 92)
+    print("\n" + "=" * 100)
+    print("ALL STORES        %d records   source %.2f%%   RE-CHECKABLE %d" % (tot, 100.0 * src / tot, rec))
+    print("AT 100%% COVERAGE  %d records across %d stores   %d distinct values   ratio %.6f"
+          % (fn, len(full), fd, fd / fn if fn else 0.0))
+    for r in sorted(full, key=lambda x: -x["records"])[:3]:
+        print("                  %-42s %r x%d" % (r["store"], r["top"][0][0][:30], r["top"][0][1]))
+    print("=" * 100)
+    print("The ratio is column Distinctness (Deequ, Great Expectations, ydata-profiling), not a new")
+    print("check, and it does not measure traceability -- a UUID per record scores 1.0 at zero.")
+    print("The number that can fail is RE-CHECKABLE, and the resolver control above proves it can.")
 
     out = os.path.join(HERE, "a_provenance_field_at_100_percent_with_one_distinct_value.result.json")
-    json.dump({"records": tot, "source_pct": round(100.0 * src / tot, 2), "recheckable": rec,
-               "full_coverage_stores": len(full), "full_coverage_records": fn,
-               "full_coverage_distinct_sources": fd,
-               "control": c, "unreadable": unreadable, "per_store": rows},
-              open(out, "w", encoding="utf-8"), indent=1)
-    print("receipt -> " + out)
+    with open(out, "w", encoding="utf-8") as fh:
+        json.dump({"records": tot, "source_pct": round(100.0 * src / tot, 2), "recheckable": rec,
+                   "full_coverage_stores": len(full), "full_coverage_records": fn,
+                   "full_coverage_distinct_sources": fd,
+                   "full_coverage_ratio": round(fd / fn, 6) if fn else None,
+                   "control": c, "unreadable": unreadable, "per_store": rows}, fh, indent=1)
+    print("\nreceipt -> " + out)
     return 0
 
 
