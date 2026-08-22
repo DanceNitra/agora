@@ -6,7 +6,7 @@ edge by edge, and the conclusion drawn is that the phenomenon is "a structural p
 graph".
 
 THE COMPUTATION IS RIGHT and the labelling is right. The 27 global ranges take exactly five values
--- 0.143538 x6, 0.158573 x6, 0.172919 x6, 0.121280 x6, 0.077438 x3 -- and this probe confirms
+-- 0.143538 x6, 0.158574 x6, 0.172919 x6, 0.121280 x6, 0.077438 x3 -- and this probe confirms
 independently that SG(2) has |Aut| = 6 with edge orbits of sizes 6, 6, 6, 6, 3. The arithmetic
 reproduces here to the last published digit, and our earlier disagreement about (0,1) was two
 labellings of the same graph.
@@ -36,10 +36,28 @@ symmetry: correlations that must be equal within an orbit differ by 0.42.
     His published 0.159658 is the MAXIMUM of the global range, and the ground-multiplet average --
     the prescription his own lattice's canonical ED paper uses -- is its MINIMUM.
 
-  * Schur's lemma covers a SUM over a complete orbit and would make such a sum invariant. A standard
-    DEVIATION is nonlinear in the per-edge values, so it is preserved only under the discrete C3v
-    action, not under arbitrary rotations inside the two-dimensional space. That is why the real
-    sweep looked flat and was not.
+  * THE MECHANISM WE FIRST GAVE FOR THE FLAT REAL SWEEP WAS ALSO WRONG. We wrote that rotating
+    inside the space permutes edges within their orbits, so the multiset of 27 correlations cannot
+    move. Measured: at t = 0.3 the sorted multiset moves by 1.086e-01. It is invariant only at
+    t = pi/3, which is the actual C3 element. What the real circle preserves is the MEAN
+    (-0.308241192) and the standard deviation, not the values.
+
+  * The real reason is exact and worth stating, because it also gives the remedy. Write the density
+    of a general ground state as (A+B)/2 + u (A-B)/2 + t C with u = cos(2t), t = sin(2t) cos(phi).
+    Those (u, t) fill the unit disc: real states are its BOUNDARY, complex ones its interior. The
+    diagnostic then depends on nothing but the Bloch radius r = sqrt(u^2 + t^2):
+
+        E_global(r) = sqrt(0.110269137^2 + r^2 * 0.115461995^2)
+
+    verified to 1.055e-15 over 325 interior states. Real superpositions all sit at r = 1 and give
+    the MAXIMUM, 0.159658244, which is his published value. The centre r = 0 gives the MINIMUM,
+    0.110269137.
+
+  * AND THE CENTRE IS A PURE STATE, not a statistical convention. The chiral combination
+    (|v0> + i|v1>)/sqrt(2) is an ordinary ground state -- residual ||(H-E0)psi|| = 4.8e-14 -- and it
+    is the one that respects the graph: it scores all six tip edges 0.105706 with a spread of
+    4.0e-15, and its within-orbit correlation spread is 1.0e-13. So the symmetric answer does not
+    require averaging over a multiplet; a single legitimate eigenstate delivers it.
 
 PRIOR ART, and it is decisive for how any of this may be said. Voigt, Richter & Tomczak, "The quantum
 Heisenberg antiferromagnet on the Sierpinski gasket: an exact diagonalization study", Physica A 299,
