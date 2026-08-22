@@ -704,8 +704,9 @@
    "deg": 1,
    "width": 0.0
   },
+  "nondegenerate_seed_spread": 3.497202527569243e-15,
   "gasket_E0_measured_vs_published_0.246731": 0.2467311407577656,
   "random15_all_orbits_size_1": true
  },
- "elapsed_s": 143.62379813194275
+ "elapsed_s": 143.12283325195312
 }

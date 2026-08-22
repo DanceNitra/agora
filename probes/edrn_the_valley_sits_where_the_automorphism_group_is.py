@@ -237,6 +237,20 @@ spc = sp_table(bc, edges)
 _, Vc, dc = ground_manifold(Hc)
 a, b, _ = manifold_E_range(Vc, spc)
 OUT["controls"]["nondegenerate_point_width"] = {"s": 0.5, "deg": dc, "width": b - a}
+# The line above is COMPUTED, not a literal -- but at deg=1 the manifold is one vector, so the width
+# is zero by construction and the check cannot fail. The sibling probe shipped the same weakness as
+# an actual hardcoded 0.0 and an adversarial pass caught it there; fixing the class, not the instance.
+# The control that CAN fail: at a non-degenerate point independent real start vectors must agree.
+_sv = []
+for _s in range(8):
+    _r = np.random.default_rng(2000 + _s)
+    _, _ev = eigsh(Hc, k=1, which="SA", v0=_r.standard_normal(Hc.shape[0]))
+    _sv.append(E_of(_ev[:, 0], spc))
+_spread = float(max(_sv) - min(_sv))
+OUT["controls"]["nondegenerate_seed_spread"] = _spread
+print("  CONTROL s=0.5 (deg %d): 8 independent seeds spread = %.2e" % (dc, _spread), flush=True)
+assert _spread < 1e-12, ("a NON-degenerate point is state-dependent (%.2e): every state-selection "
+                         "reading in this file is void" % _spread)
 OUT["controls"]["gasket_E0_measured_vs_published_0.246731"] = OUT["graphs"]["gasketL2"]["s0"]["E"]
 OUT["controls"]["random15_all_orbits_size_1"] = all(
     k == 1 for k in OUT["graphs"]["random15"]["edge_orbit_sizes"])
