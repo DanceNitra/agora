@@ -12,12 +12,22 @@ standard deviation over five points the paper has just declared not to be a samp
 has the same origin, then "40% vs 6.4%" compares two manifold widths while calling both uncertainties,
 and shrinking either one is a matter of picking a state, not of running more seeds.
 
+CORRECTION TO OUR OWN SENT COMMENT (5380781829, 2026-08-22 13:58Z) -- READ THIS FIRST.
+We told him his five Table I values "are five points on one curve, and the spread is telling you
+which state each seed converged to". THE INTERVAL IS RIGHT AND THE MECHANISM IS WRONG. H is real
+symmetric, so ARPACK returns real Ritz vectors, and every real vector in that 2D space sits at
+r = 1: 24 seeds give E = 0.15965824381 with spread 9.1e-15, and both k=2 vectors give the same
+value. His seed 0 (0.159295) is near that; the other four (0.142196, 0.142707, 0.143544, 0.146785)
+are NOT REACHABLE from the ground manifold by any real solver. So Table I's scatter has some other
+source, in whatever code produced it, and the honest statement is that we do not know what it is.
+Our own sibling probe already carried the evidence -- edrn_his_valley_bottom_is_a_start_vector
+records "REFUTED: 10 seeds agree to 3.0e-15" -- and we built a mechanism on top of it anyway.
+
 WHAT THIS MEASURES
 
   1. L2, edge (0,6): reproduce the Bloch law E(r) = sqrt(a^2 + r^2 b^2) on the two-fold ground space
-     at s=1, and place each of his five Table I valley values on it as a radius. If they are five
-     points on one curve, the standard deviation of the five is a property of which states the solver
-     returned, not of the physics.
+     at s=1, confirm the interval, and then ask the question the first version skipped: which points
+     of that interval can a real solver actually REACH? (Answer: exactly one.)
 
   2. L1, edge (0,3) (N=6, 9 edges): is the ground state at the valley degenerate at all? If it is
      NOT, the +/- 0.1478 is something else and this whole reading is wrong -- that is the control
@@ -112,16 +122,24 @@ def ground_multiplet(H, tol=1e-8, k=8):
 
 
 def manifold_interval(v0, v1, sp, n_phi=181, n_theta=181):
-    """Every state cos(t)|v0> + e^{i.phi} sin(t)|v1>: the full range of E over the Bloch sphere."""
-    lo, hi = np.inf, -np.inf
-    a2, b2 = v0 ** 2, v1 ** 2
-    cross = v0 * v1
-    for t in np.linspace(0.0, np.pi / 2, n_theta):
-        c2, s2, s2t = np.cos(t) ** 2, np.sin(t) ** 2, np.sin(2 * t)
-        for ph in np.linspace(0.0, np.pi, n_phi):
-            dens = c2 * a2 + s2 * b2 + s2t * np.cos(ph) * cross
-            e = E_of_density(dens, sp)
-            lo, hi = min(lo, e), max(hi, e)
+    """Every state cos(t)|v0> + e^{i.phi} sin(t)|v1>: the full range of E over the Bloch sphere.
+
+    A 181x181 grid is used only to seed the search; the endpoints come from Nelder-Mead. The grid
+    alone reported L1 as [0.001202, 0.471400] when the true endpoints are 0 exactly and
+    sqrt(2)/3 = 0.471404520791 -- small absolutely, but the lower one decides whether the depth
+    interval reaches its maximum, which is the number this probe exists to quote.
+    """
+    from scipy.optimize import minimize
+    def f(x):
+        t, ph = x
+        dens = (np.cos(t) ** 2 * v0 ** 2 + np.sin(t) ** 2 * v1 ** 2
+                + np.sin(2 * t) * np.cos(ph) * v0 * v1)
+        return E_of_density(dens, sp)
+    seeds = [(t, p) for t in np.linspace(0, np.pi / 2, 9) for p in np.linspace(0, np.pi, 9)]
+    opt = dict(xatol=1e-12, fatol=1e-14)
+    lo = min(minimize(f, s0, method="Nelder-Mead", options=opt).fun for s0 in seeds)
+    hi = -min(minimize(lambda x: -f(x), s0, method="Nelder-Mead", options=opt).fun
+              for s0 in seeds)
     return lo, hi
 
 
@@ -358,6 +376,55 @@ def main():
           % (time.time() - t0, d0l, w0l[1] - w0l[0],
              "well defined" if d0l == 1 else "ALSO STATE-DEPENDENT"), flush=True)
     out["L1"]["degeneracy_at_s0"] = d0l
+
+    # ---- REACHABILITY: which points of the interval can a REAL solver return? ----------------
+    # This is the control the first version of this probe omitted, and omitting it is how we sent
+    # a wrong mechanism to a co-author. A manifold being wide says nothing about which of its
+    # states an actual solver hands you.
+    print("\n[%.1fs] REACHABILITY by real Lanczos" % (time.time() - t0), flush=True)
+    for tag, Hx, spx, n_seed in (("L2", H1, sp1, 24), ("L1", HL1, spL1, 40)):
+        vs = []
+        for seed in range(n_seed):
+            rng2 = np.random.default_rng(seed)
+            _, ev = eigsh(Hx, k=1, which="SA", v0=rng2.standard_normal(Hx.shape[0]))
+            vs.append(E_of_density(np.abs(ev[:, 0]) ** 2, spx))
+        vs = np.array(vs)
+        print("[%.1fs]   %s: %d real seeds -> E in [%.11f, %.11f], spread %.2e"
+              % (time.time() - t0, tag, n_seed, vs.min(), vs.max(), vs.max() - vs.min()),
+              flush=True)
+        out[tag]["real_seed_E_min"] = float(vs.min())
+        out[tag]["real_seed_E_max"] = float(vs.max())
+        out[tag]["real_seed_spread"] = float(vs.max() - vs.min())
+        if tag == "L2":
+            unreachable = [x for x in HIS_TABLE_I if abs(vs - x).min() > 1e-4]
+            print("[%.1fs]   L2: of his 5 Table I values, %d are NOT reachable: %s"
+                  % (time.time() - t0, len(unreachable),
+                     ", ".join("%.6f" % u for u in unreachable)), flush=True)
+            out["L2"]["his_values_unreachable"] = unreachable
+        else:
+            d = curve[0] - vs
+            print("[%.1fs]   L1: depths from those seeds: min %.4f max %.4f mean %.4f sd %.4f"
+                  "  NEGATIVE %d of %d"
+                  % (time.time() - t0, d.min(), d.max(), d.mean(), d.std(ddof=1),
+                     int((d < 0).sum()), n_seed), flush=True)
+            out["L1"]["real_seed_depths"] = dict(
+                min=float(d.min()), max=float(d.max()), mean=float(d.mean()),
+                sd=float(d.std(ddof=1)), n_negative=int((d < 0).sum()), n=n_seed)
+
+    # ---- GLOBAL degeneracy, not just the sector -----------------------------------------------
+    # "Two-fold" is a statement about n_up=7. N=15 is half-integer, so the level is a pair of
+    # S=1/2 doublets and the GLOBAL degeneracy is 4. Saying "two-fold" unqualified is wrong.
+    tot, sects = 0, []
+    for nup in range(1, L2_N):
+        Hn, _ = build_hamiltonian(L2_N, L2_EDGES, np.ones(len(L2_EDGES)), nup)
+        wn, _v, dn = ground_multiplet(Hn, k=6)
+        if abs(wn[0] - w1[0]) < 1e-9:
+            tot += dn
+            sects.append(nup)
+    print("[%.1fs]   L2 GLOBAL ground degeneracy = %d (sectors %s); 'two-fold' is sector-scoped"
+          % (time.time() - t0, tot, sects), flush=True)
+    out["L2"]["global_degeneracy"] = tot
+    out["L2"]["global_sectors"] = sects
 
     out["elapsed_s"] = time.time() - t0
     p = os.path.join(HERE, os.path.basename(__file__).replace(".py", ".result.json"))
