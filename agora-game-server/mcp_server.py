@@ -3729,6 +3729,33 @@ async def _queue_analogy_forge() -> None:
     mech = (d or {}).get("mechanism") or {}
     if not mech.get("title"):
         return
+
+    # THE SKIP LIST WAS NEVER ON THIS PATH, so skipping a forged analogy is what RELEASES the next
+    # one: `_task_already_pending` asks only whether a copy is WAITING. Measured 2026-08-22 -- four
+    # 'Phase Transitions' analogies were gatekeeper-skipped at 23:50 and a fifth was queued at
+    # 03:35, onto a YouTube transcript id like the three before it. `_lead_saturated` does consult
+    # the skip list, but it is only called on the Scout's lead path in agent_worker.py, so this
+    # organ has been re-offering a mechanism Claude already refused, with nothing able to see it.
+    #
+    # Match on the MECHANISM, not the whole line: the domain varies every emission, so a
+    # whole-string check can never fire on a template that only repeats its head.
+    #
+    # HONEST LIMIT, measured before shipping this: the head-match fires on the live case
+    # ('Phase Transitions', repeats=4) and stays silent on an unskipped mechanism, but a REWORDED
+    # title slips through -- 'Phase transitions in knowledge dynamics' reads repeats=0 against the
+    # same four records. The forge takes its title from the vault note, so a reword means a
+    # different note, and the alternative (token overlap, as _lead_saturated does) risks blocking
+    # unrelated mechanisms that share a common word. Narrow and visible beats wide and silent.
+    skips = await asyncio.to_thread(_brain_get_sync, "/api/v1/agent-os/brain/gatekeeper/skips", 30)
+    themes = [t for t in ((skips or {}).get("themes") or []) if isinstance(t, str)]
+    mech_head = str(mech["title"])[:40].lower()
+    repeats = sum(1 for t in themes if mech_head and mech_head in t.lower())
+    if repeats >= 2:
+        broadcast({"type": "os_build", "kind": "collab", "who": "Sage Mira",
+                   "text": f"the forge stays cold: '{mech['title'][:32]}' was refused "
+                           f"{repeats}x already"})
+        return
+
     targets = [g["title"] for g in (await _brain_gaps())]
     bd = await asyncio.to_thread(_brain_get_sync, "/api/v1/agent-os/brain/board")
     m = re.search(r"Priority:\s*([^;]+)", (bd or {}).get("priorities") or "")
