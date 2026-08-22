@@ -14,14 +14,38 @@ and shrinking either one is a matter of picking a state, not of running more see
 
 CORRECTION TO OUR OWN SENT COMMENT (5380781829, 2026-08-22 13:58Z) -- READ THIS FIRST.
 We told him his five Table I values "are five points on one curve, and the spread is telling you
-which state each seed converged to". THE INTERVAL IS RIGHT AND THE MECHANISM IS WRONG. H is real
-symmetric, so ARPACK returns real Ritz vectors, and every real vector in that 2D space sits at
-r = 1: 24 seeds give E = 0.15965824381 with spread 9.1e-15, and both k=2 vectors give the same
-value. His seed 0 (0.159295) is near that; the other four (0.142196, 0.142707, 0.143544, 0.146785)
-are NOT REACHABLE from the ground manifold by any real solver. So Table I's scatter has some other
-source, in whatever code produced it, and the honest statement is that we do not know what it is.
-Our own sibling probe already carried the evidence -- edrn_his_valley_bottom_is_a_start_vector
-records "REFUTED: 10 seeds agree to 3.0e-15" -- and we built a mechanism on top of it anyway.
+which state each seed converged to". The interval is right; the mechanism is not. On L2, 24 real
+seeds give E = 0.15965824381 with spread 9.1e-15, and both k=2 vectors agree, so a real solver
+reaches exactly ONE point of that interval and his other four values do not come from state
+selection.
+
+AND THE REASON WE FIRST GAVE FOR *THAT* WAS ALSO WRONG -- the third bad mechanism in one day, so it
+is written down rather than quietly fixed. A draft said: "H is real symmetric, so ARPACK returns
+real Ritz vectors, and every real vector in that 2D space sits at r = 1." That is stated as a
+consequence of real symmetry, and it is not one. Measured, same solver, same symmetry:
+
+    L2 real states (phi = 0) span width 7.77e-16   <- one value
+    L1 real states (phi = 0) span width 4.71e-01   <- the whole manifold
+
+So "real implies r = 1" is a property of L2's particular doublet, not a principle. State it as
+measured or not at all. Our own sibling probe already recorded the L2 half --
+edrn_his_valley_bottom_is_a_start_vector says "REFUTED: 10 seeds agree to 3.0e-15" -- and we built
+a mechanism on top of it twice.
+
+A MIXTURE IS NOT A COMPETING EXPLANATION. An adversarial pass proposed DMRG-style mixed states,
+fitting all five of his values to ~1e-6. That fit is vacuous: dens = p*v0^2 + (1-p)*v1^2 is exactly
+the Bloch radius r = |2p-1| (checked here to 1.9e-16), so it sweeps the SAME interval with one free
+parameter per number. Reproducing a value inside an interval by choosing a point in that interval
+is not evidence about the pipeline.
+
+THE PRESCRIPTION IS TEXTBOOK, AND THE SOURCE PAPER ALREADY APPLIES IT. Voigt, Richter and Tomczak,
+Physica A 299, 107 (2001) -- the canonical ED study of this lattice, which the manuscript already
+cites -- writes (arXiv cond-mat/0108472): "Furthermore the degeneracy of the GS for s=1/2 and
+s=3/2 was taken into account by an additional averaging over the two degenerated states." That
+average has density (|v0|^2+|v1|^2)/2, which is EXACTLY the chiral state's density (the cross term
+carries the i and vanishes) -- asserted here to 1.7e-18 on L2 and 6.9e-17 on L1. So the "r = 0"
+state is not our proposal; it is the standard prescription for this lattice. Presenting it as a
+finding would be claiming a discovery the source already handled.
 
 WHAT THIS MEASURES
 
@@ -425,6 +449,60 @@ def main():
           % (time.time() - t0, tot, sects), flush=True)
     out["L2"]["global_degeneracy"] = tot
     out["L2"]["global_sectors"] = sects
+
+    # ---- THE PRESCRIPTION IS TEXTBOOK, AND THE SOURCE PAPER ALREADY APPLIES IT -------------
+    # Voigt, Richter & Tomczak, Physica A 299, 107 (2001) -- the canonical ED paper for this
+    # lattice, and the one the manuscript already cites -- says verbatim (arXiv cond-mat/0108472,
+    # section on spin-spin correlations): "Furthermore the degeneracy of the GS for s=1/2 and
+    # s=3/2 was taken into account by an additional averaging over the two degenerated states."
+    #
+    # That multiplet average has density (|v0|^2 + |v1|^2)/2 -- which is EXACTLY the density of the
+    # chiral state (|v0> + i|v1>)/sqrt(2), because the cross term carries the i and vanishes. So the
+    # "r = 0" state we recommended is not our invention: it is the standard prescription, and it is
+    # what the paper being critiqued already cites. This block computes both and asserts they agree.
+    print("\n[%.1fs] MULTIPLET AVERAGE == CHIRAL STATE (Voigt et al., Physica A 299, 107)"
+          % (time.time() - t0), flush=True)
+    for tag, vecs, spx, edges, nn, e_zero_x in (("L2", v1m, sp1, L2_EDGES, L2_N, e_zero),
+                                                ("L1", vL1, spL1, L1_EDGES, L1_N, curve[0])):
+        d_avg = 0.5 * (vecs[:, 0] ** 2 + vecs[:, 1] ** 2)          # incoherent multiplet average
+        psi = (vecs[:, 0] + 1j * vecs[:, 1]) / np.sqrt(2.0)         # the chiral pure state
+        d_chi = np.abs(psi) ** 2
+        agree = float(np.max(np.abs(d_avg - d_chi)))
+        e_avg = E_of_density(d_avg, spx)
+        spread, _naut, _orb = orbit_spread(edges, nn, d_avg, spx)
+        print("[%.1fs]   %s: |avg - chiral| = %.1e ; E = %.6f ; orbit spread %.1e ; depth %.6f"
+              % (time.time() - t0, tag, agree, e_avg, spread, e_zero_x - e_avg), flush=True)
+        out[tag]["multiplet_avg_equals_chiral"] = agree
+        out[tag]["E_multiplet_avg"] = e_avg
+        out[tag]["orbit_spread_multiplet_avg"] = spread
+        out[tag]["depth_at_multiplet_avg"] = e_zero_x - e_avg
+        assert agree < 1e-15, "%s: the multiplet average is not the chiral density" % tag
+
+    # ---- "REAL => r=1" IS AN L2 ACCIDENT, NOT A CONSEQUENCE OF REAL SYMMETRY ----------------
+    # A draft of the reply stated it as a principle ("H is real symmetric, so ARPACK returns real
+    # Ritz vectors, and every real vector in that 2D space sits at r=1"). True on L2, false on L1,
+    # same symmetry and same solver. Measured rather than argued, because the argument was wrong.
+    print("[%.1fs] REAL-STATE-ONLY width (phi = 0), the correction to our own stated reason"
+          % (time.time() - t0), flush=True)
+    for tag, vecs, spx in (("L2", v1m, sp1), ("L1", vL1, spL1)):
+        vv = [E_of_density((np.cos(t) * vecs[:, 0] + np.sin(t) * vecs[:, 1]) ** 2, spx)
+              for t in np.linspace(0, np.pi, 2001)]
+        print("[%.1fs]   %s: real states span [%.9f, %.9f], width %.2e"
+              % (time.time() - t0, tag, min(vv), max(vv), max(vv) - min(vv)), flush=True)
+        out[tag]["real_state_width"] = float(max(vv) - min(vv))
+
+    # ---- A MIXTURE IS NOT A SEPARATE EXPLANATION: p*v0^2 + (1-p)*v1^2 IS r = |2p-1| ---------
+    # An adversarial pass proposed DMRG-style mixed states as the source of his Table I scatter,
+    # fitting all five to ~1e-6. That fit is vacuous: the mixture family sweeps exactly the same
+    # interval as the Bloch radius, with one free parameter per number. Asserted, not argued.
+    ps = np.linspace(0, 1, 501)
+    mix = [E_of_density(p * v1m[:, 0] ** 2 + (1 - p) * v1m[:, 1] ** 2, sp1) for p in ps]
+    pred = [np.sqrt(a ** 2 + abs(2 * p - 1) ** 2 * b ** 2) for p in ps]
+    mix_err = float(np.max(np.abs(np.array(mix) - np.array(pred))))
+    print("[%.1fs]   mixture family == Bloch radius |2p-1|: max deviation %.2e"
+          % (time.time() - t0, mix_err), flush=True)
+    out["controls"]["mixture_is_the_same_interval"] = mix_err
+    assert mix_err < 1e-12, "the mixture family is NOT the same one-parameter interval"
 
     out["elapsed_s"] = time.time() - t0
     p = os.path.join(HERE, os.path.basename(__file__).replace(".py", ".result.json"))

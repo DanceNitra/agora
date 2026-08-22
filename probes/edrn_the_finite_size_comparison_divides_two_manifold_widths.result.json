@@ -3,7 +3,8 @@
  "controls": {
   "bloch_law_max_err": 6.661338147750939e-16,
   "E0_state_independent": true,
-  "negative_control_width": 0.0
+  "negative_control_width": 0.0,
+  "mixture_is_the_same_interval": 1.942890293094024e-16
  },
  "L2": {
   "degeneracy_at_s1": 2,
@@ -55,7 +56,12 @@
   "global_sectors": [
    7,
    8
-  ]
+  ],
+  "multiplet_avg_equals_chiral": 1.734723475976807e-18,
+  "E_multiplet_avg": 0.11026913715112595,
+  "orbit_spread_multiplet_avg": 8.662515149637784e-14,
+  "depth_at_multiplet_avg": 0.1364620036066419,
+  "real_state_width": 7.771561172376096e-16
  },
  "L1": {
   "degeneracy_at_s1": 2,
@@ -86,7 +92,12 @@
    "sd": 0.12370614832728274,
    "n_negative": 18,
    "n": 40
-  }
+  },
+  "multiplet_avg_equals_chiral": 6.938893903907228e-17,
+  "E_multiplet_avg": 0.18856180831641267,
+  "orbit_spread_multiplet_avg": 3.885780586188048e-16,
+  "depth_at_multiplet_avg": 0.24459206478315332,
+  "real_state_width": 0.47113457420180044
  },
- "elapsed_s": 18.67287850379944
+ "elapsed_s": 19.67500638961792
 }
