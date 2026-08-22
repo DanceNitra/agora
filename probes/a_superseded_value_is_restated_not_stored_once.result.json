@@ -1,0 +1,477 @@
+{
+ "scenarios": 30,
+ "unreadable": [
+  [
+   "A01_reflect.json",
+   "chains=0 texts=24"
+  ],
+  [
+   "A01_remember.json",
+   "chains=0 texts=24"
+  ],
+  [
+   "A02_forget.json",
+   "chains=0 texts=24"
+  ],
+  [
+   "A02_reflect.json",
+   "chains=0 texts=24"
+  ],
+  [
+   "A02_remember.json",
+   "chains=0 texts=24"
+  ],
+  [
+   "A04_forget.json",
+   "chains=0 texts=24"
+  ],
+  [
+   "A04_reflect.json",
+   "chains=0 texts=24"
+  ],
+  [
+   "A04_remember.json",
+   "chains=0 texts=24"
+  ],
+  [
+   "A05_forget.json",
+   "chains=0 texts=24"
+  ],
+  [
+   "A05_reflect.json",
+   "chains=0 texts=24"
+  ],
+  [
+   "A05_remember.json",
+   "chains=0 texts=24"
+  ],
+  [
+   "A06_forget.json",
+   "chains=0 texts=24"
+  ],
+  [
+   "A06_reflect.json",
+   "chains=0 texts=24"
+  ],
+  [
+   "A06_remember.json",
+   "chains=0 texts=24"
+  ],
+  [
+   "A07_forget.json",
+   "chains=0 texts=24"
+  ],
+  [
+   "A07_reflect.json",
+   "chains=0 texts=24"
+  ],
+  [
+   "A07_remember.json",
+   "chains=0 texts=24"
+  ],
+  [
+   "A11_forget.json",
+   "chains=0 texts=24"
+  ]
+ ],
+ "superseded": {
+  "n": 36,
+  "mean": 4.25,
+  "median": 4,
+  "max": 10,
+  "share_gt_1": 0.806
+ },
+ "current": {
+  "n": 12,
+  "mean": 4.417,
+  "median": 6,
+  "max": 8,
+  "share_gt_1": 0.75
+ },
+ "rows": [
+  {
+   "scenario": "A01_trajectory_ops.json",
+   "chain": "title_chain",
+   "kind": "superseded",
+   "value": "Junior Data Analyst",
+   "restatements": 4,
+   "loose": 4
+  },
+  {
+   "scenario": "A01_trajectory_ops.json",
+   "chain": "title_chain",
+   "kind": "superseded",
+   "value": "Data Analyst",
+   "restatements": 4,
+   "loose": 14
+  },
+  {
+   "scenario": "A01_trajectory_ops.json",
+   "chain": "title_chain",
+   "kind": "superseded",
+   "value": "Senior Data Analyst",
+   "restatements": 9,
+   "loose": 9
+  },
+  {
+   "scenario": "A01_trajectory_ops.json",
+   "chain": "title_chain",
+   "kind": "current",
+   "value": "Lead Data Analyst",
+   "restatements": 2,
+   "loose": 2
+  },
+  {
+   "scenario": "A01_update.json",
+   "chain": "title_chain",
+   "kind": "superseded",
+   "value": "Junior Data Analyst",
+   "restatements": 10,
+   "loose": 10
+  },
+  {
+   "scenario": "A01_update.json",
+   "chain": "title_chain",
+   "kind": "superseded",
+   "value": "Data Analyst",
+   "restatements": 2,
+   "loose": 14
+  },
+  {
+   "scenario": "A01_update.json",
+   "chain": "title_chain",
+   "kind": "superseded",
+   "value": "Senior Data Analyst",
+   "restatements": 10,
+   "loose": 10
+  },
+  {
+   "scenario": "A01_update.json",
+   "chain": "title_chain",
+   "kind": "current",
+   "value": "Lead Data Analyst",
+   "restatements": 3,
+   "loose": 3
+  },
+  {
+   "scenario": "A02_trajectory_ops.json",
+   "chain": "floor_chain",
+   "kind": "superseded",
+   "value": "4th floor",
+   "restatements": 9,
+   "loose": 9
+  },
+  {
+   "scenario": "A02_trajectory_ops.json",
+   "chain": "floor_chain",
+   "kind": "superseded",
+   "value": "7th floor",
+   "restatements": 8,
+   "loose": 8
+  },
+  {
+   "scenario": "A02_trajectory_ops.json",
+   "chain": "floor_chain",
+   "kind": "superseded",
+   "value": "9th floor",
+   "restatements": 4,
+   "loose": 4
+  },
+  {
+   "scenario": "A02_trajectory_ops.json",
+   "chain": "floor_chain",
+   "kind": "current",
+   "value": "7th floor",
+   "restatements": 8,
+   "loose": 8
+  },
+  {
+   "scenario": "A02_update.json",
+   "chain": "dept_chain",
+   "kind": "superseded",
+   "value": "Strategy & Insights",
+   "restatements": 5,
+   "loose": 5
+  },
+  {
+   "scenario": "A02_update.json",
+   "chain": "dept_chain",
+   "kind": "superseded",
+   "value": "Strategic Analytics",
+   "restatements": 8,
+   "loose": 8
+  },
+  {
+   "scenario": "A02_update.json",
+   "chain": "dept_chain",
+   "kind": "superseded",
+   "value": "Applied Strategy & Analytics",
+   "restatements": 2,
+   "loose": 2
+  },
+  {
+   "scenario": "A02_update.json",
+   "chain": "dept_chain",
+   "kind": "current",
+   "value": "Strategic Analytics",
+   "restatements": 8,
+   "loose": 8
+  },
+  {
+   "scenario": "A04_trajectory_ops.json",
+   "chain": "apartment_location",
+   "kind": "superseded",
+   "value": "SE Division Street near 26th Avenue, Por",
+   "restatements": 0,
+   "loose": 0
+  },
+  {
+   "scenario": "A04_trajectory_ops.json",
+   "chain": "apartment_location",
+   "kind": "superseded",
+   "value": "SE Division Street near 28th Avenue, Por",
+   "restatements": 0,
+   "loose": 0
+  },
+  {
+   "scenario": "A04_trajectory_ops.json",
+   "chain": "apartment_location",
+   "kind": "superseded",
+   "value": "SE Division Street near 26th Avenue, Por",
+   "restatements": 0,
+   "loose": 0
+  },
+  {
+   "scenario": "A04_trajectory_ops.json",
+   "chain": "apartment_location",
+   "kind": "current",
+   "value": "SE Division Street near 30th Avenue, Por",
+   "restatements": 0,
+   "loose": 0
+  },
+  {
+   "scenario": "A05_trajectory_ops.json",
+   "chain": "unit_number_chain",
+   "kind": "superseded",
+   "value": "Unit 3B",
+   "restatements": 5,
+   "loose": 5
+  },
+  {
+   "scenario": "A05_trajectory_ops.json",
+   "chain": "unit_number_chain",
+   "kind": "superseded",
+   "value": "Unit 3A",
+   "restatements": 7,
+   "loose": 7
+  },
+  {
+   "scenario": "A05_trajectory_ops.json",
+   "chain": "unit_number_chain",
+   "kind": "superseded",
+   "value": "Unit 3C",
+   "restatements": 2,
+   "loose": 2
+  },
+  {
+   "scenario": "A05_trajectory_ops.json",
+   "chain": "unit_number_chain",
+   "kind": "current",
+   "value": "Unit 3A",
+   "restatements": 7,
+   "loose": 7
+  },
+  {
+   "scenario": "A05_update.json",
+   "chain": "unit_number_chain",
+   "kind": "superseded",
+   "value": "Unit 3B",
+   "restatements": 2,
+   "loose": 2
+  },
+  {
+   "scenario": "A05_update.json",
+   "chain": "unit_number_chain",
+   "kind": "superseded",
+   "value": "Unit 3A",
+   "restatements": 5,
+   "loose": 5
+  },
+  {
+   "scenario": "A05_update.json",
+   "chain": "unit_number_chain",
+   "kind": "superseded",
+   "value": "Unit 4A",
+   "restatements": 5,
+   "loose": 5
+  },
+  {
+   "scenario": "A05_update.json",
+   "chain": "unit_number_chain",
+   "kind": "current",
+   "value": "Unit 3A",
+   "restatements": 5,
+   "loose": 5
+  },
+  {
+   "scenario": "A06_trajectory_ops.json",
+   "chain": "dog_breed_chain",
+   "kind": "superseded",
+   "value": "Basenji",
+   "restatements": 4,
+   "loose": 6
+  },
+  {
+   "scenario": "A06_trajectory_ops.json",
+   "chain": "dog_breed_chain",
+   "kind": "superseded",
+   "value": "Shiba Inu",
+   "restatements": 6,
+   "loose": 7
+  },
+  {
+   "scenario": "A06_trajectory_ops.json",
+   "chain": "dog_breed_chain",
+   "kind": "superseded",
+   "value": "Portuguese Water Dog",
+   "restatements": 0,
+   "loose": 4
+  },
+  {
+   "scenario": "A06_trajectory_ops.json",
+   "chain": "dog_breed_chain",
+   "kind": "current",
+   "value": "Shiba Inu",
+   "restatements": 6,
+   "loose": 7
+  },
+  {
+   "scenario": "A06_update.json",
+   "chain": "dog_breed_chain",
+   "kind": "superseded",
+   "value": "Shiba Inu",
+   "restatements": 5,
+   "loose": 6
+  },
+  {
+   "scenario": "A06_update.json",
+   "chain": "dog_breed_chain",
+   "kind": "superseded",
+   "value": "Basenji",
+   "restatements": 7,
+   "loose": 7
+  },
+  {
+   "scenario": "A06_update.json",
+   "chain": "dog_breed_chain",
+   "kind": "superseded",
+   "value": "Whippet",
+   "restatements": 1,
+   "loose": 4
+  },
+  {
+   "scenario": "A06_update.json",
+   "chain": "dog_breed_chain",
+   "kind": "current",
+   "value": "Basenji",
+   "restatements": 7,
+   "loose": 7
+  },
+  {
+   "scenario": "A07_trajectory_ops.json",
+   "chain": "daniel_theatre_role",
+   "kind": "superseded",
+   "value": "stage manager",
+   "restatements": 5,
+   "loose": 5
+  },
+  {
+   "scenario": "A07_trajectory_ops.json",
+   "chain": "daniel_theatre_role",
+   "kind": "superseded",
+   "value": "production coordinator",
+   "restatements": 6,
+   "loose": 6
+  },
+  {
+   "scenario": "A07_trajectory_ops.json",
+   "chain": "daniel_theatre_role",
+   "kind": "superseded",
+   "value": "assistant director",
+   "restatements": 4,
+   "loose": 4
+  },
+  {
+   "scenario": "A07_trajectory_ops.json",
+   "chain": "daniel_theatre_role",
+   "kind": "current",
+   "value": "production coordinator",
+   "restatements": 6,
+   "loose": 6
+  },
+  {
+   "scenario": "A11_update.json",
+   "chain": "metformin_schedule",
+   "kind": "superseded",
+   "value": "500mg with breakfast and 500mg with dinn",
+   "restatements": 3,
+   "loose": 3
+  },
+  {
+   "scenario": "A11_update.json",
+   "chain": "metformin_schedule",
+   "kind": "superseded",
+   "value": "500mg with breakfast and 500mg with late",
+   "restatements": 0,
+   "loose": 0
+  },
+  {
+   "scenario": "A11_update.json",
+   "chain": "metformin_schedule",
+   "kind": "superseded",
+   "value": "500mg with breakfast and 500mg with dinn",
+   "restatements": 3,
+   "loose": 3
+  },
+  {
+   "scenario": "A11_update.json",
+   "chain": "metformin_schedule",
+   "kind": "current",
+   "value": "1000mg extended-release at bedtime",
+   "restatements": 0,
+   "loose": 0
+  },
+  {
+   "scenario": "A13_update.json",
+   "chain": "metformin_dosage",
+   "kind": "superseded",
+   "value": "500mg twice daily",
+   "restatements": 1,
+   "loose": 1
+  },
+  {
+   "scenario": "A13_update.json",
+   "chain": "metformin_dosage",
+   "kind": "superseded",
+   "value": "750mg twice daily",
+   "restatements": 2,
+   "loose": 2
+  },
+  {
+   "scenario": "A13_update.json",
+   "chain": "metformin_dosage",
+   "kind": "superseded",
+   "value": "1000mg twice daily",
+   "restatements": 5,
+   "loose": 5
+  },
+  {
+   "scenario": "A13_update.json",
+   "chain": "metformin_dosage",
+   "kind": "current",
+   "value": "850mg extended-release once daily",
+   "restatements": 1,
+   "loose": 1
+  }
+ ]
+}
