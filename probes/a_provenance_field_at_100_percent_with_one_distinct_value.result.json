@@ -1,0 +1,189 @@
+{
+ "records": 235055,
+ "source_pct": 92.6,
+ "recheckable": 0,
+ "full_coverage_stores": 8,
+ "full_coverage_records": 217549,
+ "full_coverage_distinct_sources": 8,
+ "full_coverage_ratio": 3.7e-05,
+ "control": {
+  "records": 3,
+  "with_source": 3,
+  "recheckable": 2,
+  "distinct_sources": 3,
+  "top": [
+   [
+    "C:\\Users\\Danculus\\AppData\\Local\\Temp\\tmp32ycv035\\runbook.md",
+    1
+   ],
+   [
+    "no-such-doc.md",
+    1
+   ]
+  ],
+  "ratio_over_sourced": 1.0,
+  "ratio_over_all": 1.0
+ },
+ "unreadable": [],
+ "per_store": [
+  {
+   "records": 16215,
+   "with_source": 102,
+   "recheckable": 0,
+   "distinct_sources": 101,
+   "top": [
+    [
+     "git:162de50e1702",
+     2
+    ],
+    [
+     "git:9e4973400d34",
+     1
+    ]
+   ],
+   "ratio_over_sourced": 0.990196,
+   "ratio_over_all": 0.006229,
+   "store": ".inspeximus/coding_memory.json"
+  },
+  {
+   "records": 917,
+   "with_source": 0,
+   "recheckable": 0,
+   "distinct_sources": 0,
+   "top": [],
+   "ratio_over_sourced": null,
+   "ratio_over_all": 0.0,
+   "store": "server/.inspeximus/coding_memory.json"
+  },
+  {
+   "records": 374,
+   "with_source": 0,
+   "recheckable": 0,
+   "distinct_sources": 0,
+   "top": [],
+   "ratio_over_sourced": null,
+   "ratio_over_all": 0.0,
+   "store": "agora-game-server/.inspeximus/coding_memory.json"
+  },
+  {
+   "records": 27274,
+   "with_source": 27274,
+   "recheckable": 0,
+   "distinct_sources": 1,
+   "top": [
+    [
+     "agent:artificer",
+     27274
+    ]
+   ],
+   "ratio_over_sourced": 3.7e-05,
+   "ratio_over_all": 3.7e-05,
+   "store": "agora-game-server/.agent_memory/artificer.json"
+  },
+  {
+   "records": 27247,
+   "with_source": 27247,
+   "recheckable": 0,
+   "distinct_sources": 1,
+   "top": [
+    [
+     "agent:cartographer",
+     27247
+    ]
+   ],
+   "ratio_over_sourced": 3.7e-05,
+   "ratio_over_all": 3.7e-05,
+   "store": "agora-game-server/.agent_memory/cartographer.json"
+  },
+  {
+   "records": 27208,
+   "with_source": 27208,
+   "recheckable": 0,
+   "distinct_sources": 1,
+   "top": [
+    [
+     "agent:guard_l",
+     27208
+    ]
+   ],
+   "ratio_over_sourced": 3.7e-05,
+   "ratio_over_all": 3.7e-05,
+   "store": "agora-game-server/.agent_memory/guard_l.json"
+  },
+  {
+   "records": 27294,
+   "with_source": 27294,
+   "recheckable": 0,
+   "distinct_sources": 1,
+   "top": [
+    [
+     "agent:guard_r",
+     27294
+    ]
+   ],
+   "ratio_over_sourced": 3.7e-05,
+   "ratio_over_all": 3.7e-05,
+   "store": "agora-game-server/.agent_memory/guard_r.json"
+  },
+  {
+   "records": 27122,
+   "with_source": 27122,
+   "recheckable": 0,
+   "distinct_sources": 1,
+   "top": [
+    [
+     "agent:king",
+     27122
+    ]
+   ],
+   "ratio_over_sourced": 3.7e-05,
+   "ratio_over_all": 3.7e-05,
+   "store": "agora-game-server/.agent_memory/king.json"
+  },
+  {
+   "records": 27292,
+   "with_source": 27292,
+   "recheckable": 0,
+   "distinct_sources": 1,
+   "top": [
+    [
+     "agent:priest",
+     27292
+    ]
+   ],
+   "ratio_over_sourced": 3.7e-05,
+   "ratio_over_all": 3.7e-05,
+   "store": "agora-game-server/.agent_memory/priest.json"
+  },
+  {
+   "records": 26928,
+   "with_source": 26928,
+   "recheckable": 0,
+   "distinct_sources": 1,
+   "top": [
+    [
+     "agent:scholar",
+     26928
+    ]
+   ],
+   "ratio_over_sourced": 3.7e-05,
+   "ratio_over_all": 3.7e-05,
+   "store": "agora-game-server/.agent_memory/scholar.json"
+  },
+  {
+   "records": 27184,
+   "with_source": 27184,
+   "recheckable": 0,
+   "distinct_sources": 1,
+   "top": [
+    [
+     "agent:thief",
+     27184
+    ]
+   ],
+   "ratio_over_sourced": 3.7e-05,
+   "ratio_over_all": 3.7e-05,
+   "store": "agora-game-server/.agent_memory/thief.json"
+  }
+ ]
+}
