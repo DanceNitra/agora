@@ -16,15 +16,27 @@ literals are never touched: a comparison flipped (`>` to `<`, `==` to `!=`), a n
 doubled, `True` to `False`, `and` to `or`. Mutants are taken in token order, not sampled, so the run
 is reproducible.
 
-WHAT KILLED MEANS. The probe's OUTPUT SIGNATURE is (exit code, the multiset of PASS / FAIL / verdict
-words it printed). A mutant is KILLED if the signature moves. It SURVIVES if the probe reports
-exactly what it reported before, while measuring something different -- which is the finding.
+WHAT COUNTS AS CAUGHT, AND THE FIRST ANSWER WAS WRONG. Each mutant lands in one of four buckets:
 
-A LOW SCORE IS NOT AUTOMATICALLY A BUG, and saying otherwise would be the same overreach this file is
-about. Some mutants are equivalent (a doubled constant inside a print width), and a probe that
-deliberately reports a number rather than a verdict has nothing to flip. The score is a POINTER at
-where to look, and the per-probe surviving-mutant list is the part worth reading. This file prints
-the list, not just the number.
+    GUARDED    an AssertionError fired, or the PASS/FAIL words the probe prints changed.
+               This, and only this, is a control doing its job.
+    CRASHED    the interpreter fell over -- TypeError, ValueError -- on mutated arithmetic.
+               Nothing caught anything; the code simply broke.
+    UNNOTICED  the probe printed different numbers and reported exactly the same thing.
+    INERT      nothing moved at all: an equivalent mutant, or a line not on the executed path.
+
+The first version of this file counted ANY change of exit status as caught and labelled four probes
+GATE, "it asserts something, and the assertion is live". That sentence was false and it was published
+before it was checked. Measured afterwards over 96 mutants on these 8 files: 28 of the 31 exit changes
+were CRASHES, 6 were an AssertionError (all in one file) and 3 were a verdict flip. A crash is not a
+gate. Correcting it moved the result from "GATE 4, REPORT-ONLY 1" to GATE 1, REPORT-ONLY 7.
+
+A REPORT-ONLY VERDICT IS NOT AN ACCUSATION. Seven of our eight published probes compute numbers and
+print them; they assert nothing and exit 0 whatever they find. That is what our posts actually claim
+for them -- they are described as "runnable", "every number is re-runnable", "re-run it or break it",
+never as tests that pass -- and those descriptions were checked against the published prose. The
+finding is not that the prose overclaims. It is that a runnable receipt and a check that can fail are
+two different things, and only one of the eight is the second kind.
 
 CONTROLS, both required, because a harness that reports everything broken is indistinguishable from a
 broken harness:
@@ -59,6 +71,8 @@ TIMEOUT = 150
 DEFAULT_LIMIT = 12
 VERDICT_RE = re.compile(r"\b(PASS|FAIL|OK|GREEN|RED|REPRODUCED|NOT_COMPUTABLE|KILLED|SURVIVED|"
                         r"CONFIRMED|REFUTED|UNVERIFIABLE|VOID)\b")
+
+EXC_RE = re.compile(r"^(\w*Error|\w*Exception|SystemExit)\b", re.M)
 
 NUM_RE = re.compile(r"-?\d+\.?\d*(?:[eE][-+]?\d+)?")
 
@@ -107,7 +121,7 @@ def signature(workdir, name):
         p = subprocess.run([sys.executable, name], cwd=workdir, capture_output=True, text=True,
                            encoding="utf-8", errors="replace", timeout=TIMEOUT)
     except subprocess.TimeoutExpired:
-        return dict(verdict=("timeout", ()), numeric=(0, 0))
+        return dict(verdict=("timeout", ()), numeric=(0, 0), asserted=False, crashed=False)
     out = (p.stdout or "") + (p.stderr or "")
     # The signature must include what the probe actually reports. The first version used the exit
     # code plus verdict words only, and every published probe here returned base=(0, ()) -- they
@@ -127,8 +141,11 @@ def signature(workdir, name):
     # computed inside separate pool workers, so the same output would have compared UNEQUAL across
     # processes and every mutant would have looked killed. Caught by a shell error, not by a test.
     digest = hashlib.sha256("|".join(nums).encode()).hexdigest()[:16]
+    exc = EXC_RE.findall(out)
     return dict(verdict=(p.returncode, tuple(sorted(VERDICT_RE.findall(out)))),
-                numeric=(digest, len(nums)))
+                numeric=(digest, len(nums)),
+                asserted="AssertionError" in exc,
+                crashed=bool(exc) and "AssertionError" not in exc)
 
 
 def _run_one(args):
@@ -150,25 +167,33 @@ def score_probe(name, src, deps, limit, pool):
     if not ms:
         return dict(name=name, base=list(base), n=0, killed=0, survived=[], note="no mutable sites")
     jobs = [(name, code, label, deps) for label, code in ms]
-    caught, unnoticed, inert = 0, [], 0
+    # CORRECTED. The first version counted any change of exit status as "caught" and called the
+    # probe a GATE. Measured afterwards: across 96 mutants on these 8 files, 28 of the 31 exit
+    # changes were the INTERPRETER FALLING OVER on mutated arithmetic -- TypeError, ValueError --
+    # which no control noticed and which says nothing about whether the probe asserts anything.
+    # Only 6 were an AssertionError and 3 a change in the PASS/FAIL words. A crash is not a gate.
+    guarded, crashed, unnoticed, inert = 0, 0, [], 0
     for label, sig in pool.map(_run_one, jobs):
-        if sig["verdict"] != base["verdict"]:
-            caught += 1                      # the probe's own verdict moved: a real gate fired
+        moved_verdict = sig["verdict"][1] != base["verdict"][1]
+        if sig["asserted"] or moved_verdict:
+            guarded += 1                     # an assertion fired, or the stated verdict changed
+        elif sig["crashed"]:
+            crashed += 1                     # the interpreter fell over; nothing caught anything
         elif sig["numeric"] != base["numeric"]:
-            unnoticed.append(label)          # it measured something different and said nothing
+            unnoticed.append(label)          # measured something different and said nothing
         else:
             inert += 1                       # equivalent mutant / dead code -- not evidence
-    live = caught + len(unnoticed)
+    live = guarded + crashed + len(unnoticed)
     return dict(name=name, base=[list(base["verdict"][1]), base["verdict"][0]], n=len(ms),
-                caught=caught, unnoticed=unnoticed, inert=inert,
+                guarded=guarded, crashed=crashed, caught=guarded, unnoticed=unnoticed, inert=inert,
                 # A RATIO, not "caught at least one". The negative fixture -- a control assigned a
                 # literal 0.0 -- caught exactly one mutant (the one that flipped its exit) and let
                 # five through including `0.0 -> 1.0`, and a boolean rule labelled it a GATE. What
                 # separates a real gate from a decorative one is what FRACTION of live changes its
                 # verdict notices: the positive fixture 6/6, the negative 1/6.
                 kind=("INERT" if not live else
-                      "GATE" if caught / live >= 0.5 else
-                      "WEAK-GATE" if caught else "REPORT-ONLY"))
+                      "GATE" if guarded / live >= 0.5 else
+                      "WEAK-GATE" if guarded else "REPORT-ONLY"))
 
 
 POS_FIXTURE = '''
@@ -243,9 +268,9 @@ def main():
                                      io.open(full, encoding="utf-8", errors="replace").read()))
             r = score_probe(name, src, deps, limit, pool)
             rows.append(r)
-            print("  %-52s %-11s caught %2d   unnoticed %2d   inert %2d"
-                  % (name[:52], r["kind"], r["caught"], len(r["unnoticed"]), r["inert"]),
-                  flush=True)
+            print("  %-52s %-11s guarded %2d  crashed %2d  unnoticed %2d  inert %2d"
+                  % (name[:52], r["kind"], r["guarded"], r["crashed"],
+                     len(r["unnoticed"]), r["inert"]), flush=True)
 
     gates = [r for r in rows if r["kind"] == "GATE"]
     reports = [r for r in rows if r["kind"] == "REPORT-ONLY"]
@@ -256,8 +281,8 @@ def main():
     print("  GATE %d   WEAK-GATE %d   REPORT-ONLY %d   INERT %d   of %d published probes"
           % (len(gates), len(weak), len(reports), len(inert), len(rows)))
     print()
-    print("  GATE         some mutation moved the probe's own exit status or PASS/FAIL. It asserts")
-    print("               something, and the assertion is live.")
+    print("  GATE         an ASSERTION fired or the stated verdict changed. A crash does not count:")
+    print("               the interpreter falling over on mutated arithmetic caught nothing.")
     print("  REPORT-ONLY  every mutation changed the numbers it printed and NONE changed its")
     print("               verdict. Not a bug: it is a report, not a gate. But it cannot fail, so")
     print("               citing it as a check is a claim the artifact does not support.")
