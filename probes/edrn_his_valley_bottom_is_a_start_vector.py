@@ -16,22 +16,40 @@ WHAT THIS FILE WAS WRITTEN TO SHOW, AND FAILED TO. The diagnostic takes ONE Lanc
 published numbers move with the seed. They do not: ten seeds agree to 3e-15. The file keeps its name
 so the refutation stays attached to it.
 
-WHAT IS ACTUALLY THERE, and it splits the result in two.
+WHAT IS ACTUALLY THERE, and it cost two corrections of our own reading before it settled.
 
 At s = 1.0 every coupling equals 1, so setting the scanned edge to 1.0 changes nothing: the
 Hamiltonian is the SAME MATRIX for all 27 edges. And at that one point of the grid -- at no other --
 the ground state is TWO-FOLD DEGENERATE. Any single ground vector then breaks the graph's own
 symmetry: correlations that must be equal within an orbit differ by 0.42.
 
-  * The GLOBAL diagnostic SURVIVES this, and that is a real result rather than a failed control.
-    Rotating inside the two-dimensional ground space acts like the graph's 3-fold rotation, which
-    permutes edges within their orbits, so the multiset of 27 correlations -- and hence its standard
-    deviation -- cannot move. Measured across 181 directions: width below 1e-9. The global number is
-    a property of H.
+  * BOTH diagnostics move, and finding that took a second correction of our own work. A sweep over
+    REAL combinations cos(t)|v0> + sin(t)|v1> reports the global one as INVARIANT to 6.7e-16, and
+    that reading is wrong: the density of a general superposition is
+    cos^2(t) v0^2 + sin^2(t) v1^2 + sin(2t) cos(phi) v0 v1, so the phase phi scales the cross term
+    independently of the weights. Real vectors only ever reach cos(phi) = +/-1, the two endpoints.
+    Sweeping phi as well:
 
-  * The LOCAL diagnostic DOES NOT. A radius-2 neighbourhood is not closed under that rotation, so it
-    reads a symmetry-broken state through a window the symmetry moves, and returns whatever the
-    eigensolver's arbitrary direction happens to place inside it.
+        E_global   0.110269 .. 0.159658   width 0.049
+        E_local    0.077484 .. 0.217799   width 0.140
+
+    His published 0.159658 is the MAXIMUM of the global range, and the ground-multiplet average --
+    the prescription his own lattice's canonical ED paper uses -- is its MINIMUM.
+
+  * Schur's lemma covers a SUM over a complete orbit and would make such a sum invariant. A standard
+    DEVIATION is nonlinear in the per-edge values, so it is preserved only under the discrete C3v
+    action, not under arbitrary rotations inside the two-dimensional space. That is why the real
+    sweep looked flat and was not.
+
+PRIOR ART, and it is decisive for how any of this may be said. Voigt, Richter & Tomczak, "The quantum
+Heisenberg antiferromagnet on the Sierpinski gasket: an exact diagonalization study", Physica A 299,
+107-120 (2001), arXiv:cond-mat/0108472, is the canonical ED paper for exactly this lattice. Its
+Table 2 reports the N=15, s=1/2 ground state with degeneracy D = 2, with the trivial S^z degeneracy
+explicitly excluded, and its Section IV states that "the degeneracy of the GS for s=1/2 and s=3/2 was
+taken into account by an additional averaging over the two degenerated states". The degeneracy and
+the remedy are both twenty-five years old and published for his exact system. Nothing here is a
+discovery; the only new thing is the MEASURED SIZE of what the choice costs on his diagnostics.
+
 
 THE TELL IS IN THE POSTED DATA FILE, before any re-run. The six tip edges are one orbit, and E_local
 at s = 1.00 reads 0.120543 / 0.085621 / 0.217784 / 0.217669 for the first four of them. Four
@@ -42,8 +60,10 @@ CONTROLS, because a probe that cannot fail has measured nothing:
     same computation and nothing below is about that result;
   * NEGATIVE: a uniform 15-ring is edge-transitive, so its ground-space-averaged diagnostic must be
     0 to machine precision -- if it is not, the averaging is wrong and its verdict is void;
-  * TWO-SIDED: under rotation inside the ground space the global width must be ~0 AND the local
-    width must be non-zero. Either one passing alone would prove nothing;
+  * TWO-SIDED: the REAL sweep must report the global width as ~0 (it is the trap) AND the COMPLEX
+    sweep must report it as non-zero. Either alone proves nothing, and the pair is what shows the
+    real-only sweep is blind rather than reassuring;
+
   * DISCRIMINATING: at a NON-degenerate point (s = 1.5) the single-vector and averaged diagnostics
     must coincide, or the averaging measures something else and its verdict at s = 1 means nothing.
 
@@ -222,30 +242,53 @@ def main() -> int:
     print("  degenerate at s = 1 and nowhere else on his grid: %s" % only_at_one, flush=True)
     res["degenerate_only_at_s1"] = bool(only_at_one)
 
-    # ---- 2. TWO-SIDED control: rotate inside the ground space -----------------------------------
+    # ---- 2. TWO-SIDED control: rotate inside the ground space, REAL then COMPLEX ---------------
+    # The real sweep is kept because it is the trap, not because it is the answer. Its flat global
+    # width is what a probe sees when it can only reach cos(phi) = +/-1.
     q_mix = mixture_density(vecs)
     thetas = np.linspace(0.0, np.pi, 181)
     sp_loc0 = _sp_table(basis, local_edges_r2(HIS_EDGES[0]))
-    g_sweep, l_sweep = [], []
+    g_real = []
     for th in thetas:
         psi = np.cos(th) * vecs[:, 0] + np.sin(th) * vecs[:, 1]
         psi /= np.linalg.norm(psi)
-        q = psi ** 2
-        g_sweep.append(float(np.std(sp @ q)))
-        l_sweep.append(float(np.std(sp_loc0 @ q)))
-    gw, lw = max(g_sweep) - min(g_sweep), max(l_sweep) - min(l_sweep)
-    print("\nrotating inside the %d-fold ground space (181 directions, every one a ground state):"
-          % d, flush=True)
-    print("  E_global %.6f .. %.6f   width %.3e  -> INVARIANT, a property of H"
-          % (min(g_sweep), max(g_sweep), gw), flush=True)
-    print("  E_local  %.6f .. %.6f   width %.6f  -> NOT invariant"
-          % (min(l_sweep), max(l_sweep), lw), flush=True)
-    c_glob, c_loc = gw < 1e-9, lw > 1e-3
-    print("  CONTROL global invariant: %s    CONTROL local moves: %s"
-          % ("PASS" if c_glob else "FAIL", "PASS" if c_loc else "FAIL"), flush=True)
-    ok = ok and c_glob and c_loc
+        g_real.append(float(np.std(sp @ (psi ** 2))))
+    gw_real = max(g_real) - min(g_real)
+
+    # The density of cos(t)|v0> + e^{i phi} sin(t)|v1> is
+    #   cos^2 v0^2 + sin^2 v1^2 + sin(2t) cos(phi) v0 v1,
+    # so phi scales the cross term independently of the weights. Every (t, phi) is a ground state.
+    phis = np.linspace(0.0, np.pi, 91)
+    v0, v1 = vecs[:, 0], vecs[:, 1]
+    g_cplx, l_cplx = [], []
+    for th in thetas:
+        c2, s2t, x = np.cos(th) ** 2, np.sin(th) ** 2, np.sin(2 * th)
+        for ph in phis:
+            q = c2 * v0 ** 2 + s2t * v1 ** 2 + x * np.cos(ph) * v0 * v1
+            q = q / q.sum()
+            g_cplx.append(float(np.std(sp @ q)))
+            l_cplx.append(float(np.std(sp_loc0 @ q)))
+    gw, lw = max(g_cplx) - min(g_cplx), max(l_cplx) - min(l_cplx)
+
+    print("%srotating inside the %d-fold ground space, every direction a legitimate ground state:"
+          % ("\n", d), flush=True)
+    print("  REAL directions only  : E_global width %.3e  <- the blind reading" % gw_real,
+          flush=True)
+    print("  with the PHASE swept  : E_global %.6f .. %.6f  width %.6f"
+          % (min(g_cplx), max(g_cplx), gw), flush=True)
+    print("                          E_local  %.6f .. %.6f  width %.6f"
+          % (min(l_cplx), max(l_cplx), lw), flush=True)
+    c_real_flat = gw_real < 1e-9
+    c_glob = gw > 1e-3
+    c_loc = lw > 1e-3
+    print("  CONTROL real sweep looks flat: %s   CONTROL phase sweep moves it: %s   local: %s"
+          % ("PASS" if c_real_flat else "FAIL", "PASS" if c_glob else "FAIL",
+             "PASS" if c_loc else "FAIL"), flush=True)
+    ok = ok and c_real_flat and c_glob and c_loc
+    res["rot_global_width_real_only"] = gw_real
     res["rot_global_width"], res["rot_local_width"] = gw, lw
-    res["rot_local_min"], res["rot_local_max"] = min(l_sweep), max(l_sweep)
+    res["rot_global_min"], res["rot_global_max"] = min(g_cplx), max(g_cplx)
+    res["rot_local_min"], res["rot_local_max"] = min(l_cplx), max(l_cplx)
 
     # ---- 3. the six tip edges are ONE orbit: one state must score them alike --------------------
     tip = [e for e in HIS_EDGES if min(e) < 3]
@@ -305,13 +348,27 @@ def main() -> int:
     res["smallest_reported_range"] = SMALLEST_REPORTED_RANGE
 
     print("\n" + "=" * 92)
-    print("GLOBAL at s = 1: single vector %.6f, ground-space average %.6f. Both well defined --"
-          % (e_single, e_mix1))
-    print("  two different states, not two different solvers. The global claim stands.")
-    print("LOCAL at s = 1: spans %.6f across ground states that are all legitimate, and scores"
-          % lw)
-    print("  six symmetry-equivalent edges %.6f apart. That is not a property of the graph," % orb_s)
-    print("  and the local-vs-global comparison is the half that rests on it.")
+    # ---- 6. CONTROL: reproduce the 2001 published ground-state energy per bond -----------------
+    # His Hamiltonian is 4x the standard Heisenberg one (he uses si = +/-1 rather than S^z = +/-1/2),
+    # so E0 / 4 / 27 bonds must land on the value in Table II of Voigt, Richter & Tomczak (2001),
+    # the canonical ED study of this exact lattice: s = 1/2, S = 1/2, e_b = -0.231181, D = 2.
+    e_b = e_gs / 4.0 / len(HIS_EDGES)
+    pub_ok = abs(e_b - (-0.231181)) < 5e-7 and d == 2
+    print("CONTROL vs Voigt/Richter/Tomczak 2001 Table II: e_b = %.6f (published -0.231181), "
+          "D = %d (published 2)  %s" % (e_b, d, "PASS" if pub_ok else "FAIL"), flush=True)
+    res["energy_per_bond"], res["published_energy_per_bond"] = e_b, -0.231181
+    ok = ok and pub_ok
+
+    print("\n" + "=" * 92)
+    print("GLOBAL at s = 1: real-vector sweep says invariant (%.1e) and it is WRONG; with the"
+          % gw_real)
+    print("  phase swept it spans %.6f .. %.6f. His %.6f is the MAXIMUM of that range."
+          % (min(g_cplx), max(g_cplx), e_single))
+    print("LOCAL at s = 1: spans %.6f, and scores six symmetry-equivalent edges %.6f apart."
+          % (lw, orb_s))
+    print("NEITHER is invariant. What separates them is measured in the adiabatic probe beside")
+    print("  this one: the global limit is CONTINUOUS through s=1 and lands on his value, while")
+    print("  the local one has left and right limits 0.108365 apart and no value at all.")
     print("=" * 92)
 
     res["all_controls_pass"] = bool(ok)

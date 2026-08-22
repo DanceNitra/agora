@@ -61,9 +61,12 @@
   }
  ],
  "degenerate_only_at_s1": true,
- "rot_global_width": 6.661338147750939e-16,
- "rot_local_width": 0.13402474695830474,
- "rot_local_min": 0.08377397341414394,
+ "rot_global_width_real_only": 6.661338147750939e-16,
+ "rot_global_width": 0.04938910666336105,
+ "rot_local_width": 0.1403454663935647,
+ "rot_global_min": 0.11026913715112552,
+ "rot_global_max": 0.15965824381448657,
+ "rot_local_min": 0.07745325397888397,
  "rot_local_max": 0.21779872037244868,
  "tip_local_single": [
   0.12054344888030553,
@@ -93,5 +96,7 @@
  "global_s1_single": 0.15965824381448432,
  "global_s1_mixture": 0.11026913715112523,
  "smallest_reported_range": 0.077438,
+ "energy_per_bond": -0.23118089425480615,
+ "published_energy_per_bond": -0.231181,
  "all_controls_pass": true
 }
