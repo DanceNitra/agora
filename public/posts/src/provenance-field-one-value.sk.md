@@ -3,13 +3,13 @@
 Robím pamäťovú vrstvu pre agentov. Má pole `source` a jeho pokrytie som už verejne citoval. Minulý
 týždeň som ho pred ďalším citovaním premeral a číslo sa posunulo, tak som sa išiel pozrieť prečo.
 
-Jedenásť živých skladov, 234 971 záznamov, `source` vyplnené na 92,63 %. Ten priemer skrýva dve
+Jedenásť živých skladov, 235 055 záznamov, `source` vyplnené na 92,63 %. Sú to živé sklady, ktoré rastú aj počas merania, takže súčty sú snímka a receipt je opečiatkovaný; čísla, na ktorých tu záleží, sú tie, ktoré sa nehýbu. Ten priemer skrýva dve
 zapisovacie cesty, ktoré zlyhávajú opačným smerom.
 
 ```
 skupina skladov        záznamov   src %  odlišné  odlišné/zdrojované  dohľadateľné
 osem agentských        217 549  100,00%        8            0,000037             0
-jeden coding sklad      16 131    0,63%      101            0,990196             0
+jeden coding sklad      16 215    0,63%      101            0,990196             0
 ```
 
 **Agentské sklady** zapisuje jeden automat. `agent:scholar` je vo všetkých 26 928 záznamoch jedného
@@ -19,7 +19,7 @@ sklad, a každá je meno procesu, ktorý zapisoval.
 **Coding sklad** vyzerá presne opačne a oveľa zdravšie: 101 odlišných zdrojov na 102 zdrojovaných
 záznamov, odlišnosť 0,99. Skoro každý záznam ukazuje inam.
 
-Oba stĺpce vedú k **nule**. Nie „k málu". K nule, naprieč všetkými 234 971 záznamami, proti resolveru,
+Oba stĺpce vedú k **nule**. Nie „k málu". K nule, naprieč všetkými 235 055 záznamami, proti resolveru,
 o ktorom viem dokázať, že funguje.
 
 ## Prečo zjavná metrika nepomôže, a dôkaz mám vo vlastných dátach
@@ -56,7 +56,7 @@ Slovník, ktorý tomu mal zabrániť, je normatívny trinásť rokov, a aj tak s
 Nie pokrytie a nie odlišnosť. **Koľko záznamov má zdroj, ktorý vedie k niečomu, čo si čitateľ vie
 naozaj stiahnuť.**
 
-U mňa je to 0 z 234 971.
+U mňa je to 0 z 235 055.
 
 To číslo vie zlyhať, a v tom je celý jeho zmysel. Preto potrebuje kontrolu — a to je časť, ktorú som
 najprv spravil zle: resolver, ktorý na všetko vráti `False`, nahlási nulu dohľadateľných nad

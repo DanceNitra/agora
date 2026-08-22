@@ -3,13 +3,13 @@
 I ship an agent memory layer. It has a `source` field, and I have quoted its coverage in public. Last
 week I re-measured before citing it to someone and the number had moved, so I went looking.
 
-Eleven live stores, 234,971 records, `source` populated on 92.63%. That aggregate hides two write
+Eleven live stores, 235,055 records, `source` populated on 92.63%. These are live stores that grow while you measure them, so the totals are a snapshot and the receipt is stamped; the figures that matter here are the ones that do not move. That aggregate hides two write
 paths that fail in opposite directions.
 
 ```
 store group          records   src %  distinct  distinct/sourced  re-checkable
 eight agent stores   217,549  100.00%        8          0.000037             0
-one coding store      16,131    0.63%      101          0.990196             0
+one coding store      16,215    0.63%      101          0.990196             0
 ```
 
 **The agent stores** are stamped by one automated writer. `agent:scholar` appears in all 26,928
@@ -19,7 +19,7 @@ one each, and each is the name of the process that did the writing.
 **The coding store** looks like the opposite and much healthier: 101 distinct sources over 102 sourced
 records, distinctness 0.99. Nearly every record points somewhere different.
 
-Both columns resolve to **zero**. Not "few". Zero, across all 234,971 records, against a resolver I
+Both columns resolve to **zero**. Not "few". Zero, across all 235,055 records, against a resolver I
 can demonstrate works.
 
 ## Why the obvious metric doesn't save you, and I have the proof in my own data
@@ -55,7 +55,7 @@ The vocabulary to avoid this has been normative for thirteen years, and I still 
 Not coverage, and not distinctness. **How many records have a source that resolves to something a
 reader can actually fetch.**
 
-For me that is 0 of 234,971.
+For me that is 0 of 235,055.
 
 That number can fail, which is the whole point of it. So it needs a control, and this is the part I
 got wrong first: a resolver that returns `False` on everything reports zero re-checkable over any

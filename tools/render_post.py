@@ -27,13 +27,13 @@ META = {
                  "values, and another at 0.99 that resolves to nothing",
         "title_sk": "Dva sklady, jeden produkt: provenance pole na 100 % pokrytí s 8 odlišnými "
                     "hodnotami, a druhé na 0,99, ktoré nevedie nikam",
-        "desc": "Across 234,971 records in eleven live agent-memory stores, `source` is populated "
+        "desc": "Across 235,055 records in eleven live agent-memory stores, `source` is populated "
                 "on 92.63% and 0 records resolve to anything fetchable. Eight stores hold one "
                 "constant each -- the name of the writing process. A ninth holds 101 distinct "
                 "commit ids and is equally useless, which is why column Distinctness is a "
                 "detector and not a fix. W3C PROV separated wasAttributedTo from wasDerivedFrom "
                 "in 2013.",
-        "desc_sk": "Na 234 971 záznamoch v jedenástich živých skladoch agentskej pamäte je "
+        "desc_sk": "Na 235 055 záznamoch v jedenástich živých skladoch agentskej pamäte je "
                    "`source` vyplnené na 92,63 % a 0 záznamov vedie k niečomu stiahnuteľnému. "
                    "Osem skladov drží po jednej konštante -- mene zapisujúceho procesu. Deviaty "
                    "drží 101 odlišných commit id a je rovnako nanič, a preto je stĺpcová "
