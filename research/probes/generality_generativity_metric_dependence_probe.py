@@ -49,8 +49,23 @@ import os
 import random
 
 
+DATA = "generality_generativity_rescue_data.json"
+DATA_URL = "https://raw.githubusercontent.com/DanceNitra/agora/main/research/probes/data/" + DATA
+
+
 def load():
-    p = os.path.join(os.path.dirname(__file__), "data", "generality_generativity_rescue_data.json")
+    p = os.path.join(os.path.dirname(__file__), "data", DATA)
+    if not os.path.exists(p):
+        # A reader who downloads only this file used to get a bare FileNotFoundError. The
+        # ratings are public; the probe simply never said so. Name the file and the url.
+        import sys
+        sys.stderr.write(
+            "\n"
+            "This probe needs its ratings file, and it is not here.\n"
+            "  expected: " + p + "\n"
+            "  get it:   mkdir -p data && curl -o data/" + DATA + " " + DATA_URL + "\n"
+            "Then run this file again from the same directory.\n\n")
+        raise SystemExit(2)
     return json.load(open(p, encoding="utf-8"))
 
 
