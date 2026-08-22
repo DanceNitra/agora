@@ -154,6 +154,11 @@ def manifold_interval(v0, v1, sp, n_phi=181, n_theta=181):
     interval reaches its maximum, which is the number this probe exists to quote.
     """
     from scipy.optimize import minimize
+    # The two vectors MUST span a degenerate level. Handed a ground/first-excited pair at a
+    # non-degenerate point this function returns a perfectly plausible width (0.0914 on L2 at s=0)
+    # that means nothing. Callers pass a checked multiplet; this records the requirement.
+    if not np.isclose(np.dot(v0, v1), 0.0, atol=1e-8):
+        raise ValueError("manifold_interval needs an ORTHONORMAL degenerate pair")
     def f(x):
         t, ph = x
         dens = (np.cos(t) ** 2 * v0 ** 2 + np.sin(t) ** 2 * v1 ** 2
@@ -201,6 +206,14 @@ def main():
     out["L2"]["E_ground"] = float(w1[0])
 
     assert d1 == 2, "expected the two-fold orbital doublet at s=1; got %d" % d1
+    # CONVENTION PIN. An adversarial mutation changed the exchange term from 2*J to 1*J: every
+    # assert still passed, the Bloch control still read 6.7e-16, and the headline flipped from
+    # "18 of 40 negative" to "0 of 40". Nothing in this file bound the physics. These two energies
+    # do: they are the uniform-gasket ground energies in the sigma convention, and the L2 value is
+    # the one the manuscript itself publishes.
+    assert abs(w1[0] - (-24.9675365795)) < 1e-8, (
+        "L2 uniform ground energy is %.10f, not -24.9675365795 -- the exchange convention has "
+        "changed and every number below is in different units" % w1[0])
     a, b = bloch_ab(v1m[:, 0], v1m[:, 1], sp1)
     lo, hi = manifold_interval(v1m[:, 0], v1m[:, 1], sp1)
     print("[%.1fs]   Bloch law  a=%.9f  b=%.9f   ->  E in [%.6f, %.6f]  width %.6f"
@@ -247,12 +260,27 @@ def main():
     out["L2"]["degeneracy_at_s0"] = d0
     out["controls"]["E0_state_independent"] = (d0 == 1)
 
-    # NEGATIVE CONTROL: manifold width at a NON-degenerate point must be zero.
+    # NEGATIVE CONTROL. The first version of this block PRINTED A LITERAL 0.0 and called it a
+    # measurement -- a check that cannot fail, inside the probe written to catch checks that cannot
+    # fail. An adversarial pass found it. The honest control is state-independence where the level is
+    # NON-degenerate: independent real start vectors must agree, and if they do not, every
+    # "state selection" reading in this file is wrong.
+    #
+    # Note what the control must NOT be: manifold_interval(ground, first_excited) at a non-degenerate
+    # point returns a width of 0.0914 on L2 -- the function will happily build a "manifold" out of any
+    # two vectors. That is why it is now guarded below, and why the control measures seeds instead.
     if d0 == 1:
-        w_neg = 0.0
-        print("[%.1fs]   NEGATIVE CONTROL at s=0 (non-degenerate): manifold width = %.1e"
+        seed_vals = []
+        for _s in range(8):
+            _r = np.random.default_rng(1000 + _s)
+            _, _ev = eigsh(H0, k=1, which="SA", v0=_r.standard_normal(H0.shape[0]))
+            seed_vals.append(E_of_density(np.abs(_ev[:, 0]) ** 2, sp0))
+        w_neg = float(max(seed_vals) - min(seed_vals))
+        print("[%.1fs]   NEGATIVE CONTROL at s=0 (non-degenerate): 8 seeds spread = %.2e"
               % (time.time() - t0, w_neg), flush=True)
-        out["controls"]["negative_control_width"] = w_neg
+        out["controls"]["negative_control_seed_spread"] = w_neg
+        assert w_neg < 1e-12, ("a non-degenerate point is state-DEPENDENT (%.2e): the whole "
+                               "state-selection reading in this file is void" % w_neg)
 
     depth_lo, depth_hi = e_zero - hi, e_zero - lo
     print("[%.1fs]   => L2 DEPTH INTERVAL over the manifold: [%.6f, %.6f]  (his 5: %.6f..%.6f)"
@@ -280,6 +308,9 @@ def main():
     print("[%.1fs]   s=1.0 ground degeneracy = %d  (E = %.10f, split %.1e)"
           % (time.time() - t0, dL1, wL1[0], wL1[1] - wL1[0]), flush=True)
     out["L1"]["degeneracy_at_s1"] = dL1
+    assert dL1 == 2, "L1 uniform ground level is %d-fold, not 2 -- the claim under test" % dL1
+    assert abs(wL1[0] - (-9.0)) < 1e-9, (
+        "L1 uniform ground energy is %.10f, not -9 -- convention changed" % wL1[0])
     out["L1"]["E_ground"] = float(wL1[0])
 
     # scan to locate the valley the way he does
@@ -427,13 +458,32 @@ def main():
             out["L2"]["his_values_unreachable"] = unreachable
         else:
             d = curve[0] - vs
-            print("[%.1fs]   L1: depths from those seeds: min %.4f max %.4f mean %.4f sd %.4f"
+            # 40 draws put the negative fraction at 45%, 95% CI [30%, 60%]. Quoting "about 45%"
+            # from 40 draws is a point estimate dressed as a rate, so it is re-measured at 400 and
+            # compared with the geometric answer (uniform on the real-state circle), which needs no
+            # solver at all. An adversarial pass caught the 45%.
+            big = []
+            for seed in range(400):
+                r3 = np.random.default_rng(10_000 + seed)
+                _, ev3 = eigsh(Hx, k=1, which="SA", v0=r3.standard_normal(Hx.shape[0]))
+                big.append(curve[0] - E_of_density(np.abs(ev3[:, 0]) ** 2, spx))
+            big = np.array(big)
+            geo = [curve[0] - E_of_density((np.cos(t) * vL1[:, 0] + np.sin(t) * vL1[:, 1]) ** 2,
+                                           spL1) for t in np.linspace(0, np.pi, 20001)]
+            geo_frac = float(np.mean(np.array(geo) < 0))
+            print("[%.1fs]   L1: depths, %d seeds: min %.4f max %.4f mean %.4f sd %.4f"
                   "  NEGATIVE %d of %d"
-                  % (time.time() - t0, d.min(), d.max(), d.mean(), d.std(ddof=1),
+                  % (time.time() - t0, n_seed, d.min(), d.max(), d.mean(), d.std(ddof=1),
                      int((d < 0).sum()), n_seed), flush=True)
+            print("[%.1fs]   L1: 400 seeds -> NEGATIVE %d of 400 = %.1f%% ; geometric "
+                  "(uniform on the real circle, no solver) = %.1f%%"
+                  % (time.time() - t0, int((big < 0).sum()), 100 * (big < 0).mean(),
+                     100 * geo_frac), flush=True)
             out["L1"]["real_seed_depths"] = dict(
                 min=float(d.min()), max=float(d.max()), mean=float(d.mean()),
-                sd=float(d.std(ddof=1)), n_negative=int((d < 0).sum()), n=n_seed)
+                sd=float(d.std(ddof=1)), n_negative=int((d < 0).sum()), n=n_seed,
+                n_negative_400=int((big < 0).sum()), frac_400=float((big < 0).mean()),
+                frac_geometric=geo_frac)
 
     # ---- GLOBAL degeneracy, not just the sector -----------------------------------------------
     # "Two-fold" is a statement about n_up=7. N=15 is half-integer, so the level is a pair of
