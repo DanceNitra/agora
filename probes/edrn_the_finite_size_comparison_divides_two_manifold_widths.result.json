@@ -1,0 +1,66 @@
+{
+ "probe": "edrn_the_finite_size_comparison_divides_two_manifold_widths.py",
+ "controls": {
+  "bloch_law_max_err": 6.661338147750939e-16,
+  "E0_state_independent": true,
+  "negative_control_width": 0.0
+ },
+ "L2": {
+  "degeneracy_at_s1": 2,
+  "E_ground": -24.967536579519074,
+  "a": 0.11026913715112595,
+  "b": 0.1154619946556964,
+  "E_min": 0.11026913715112598,
+  "E_max": 0.1596582438144868,
+  "width": 0.04938910666336081,
+  "his_values": [
+   0.159295,
+   0.142707,
+   0.143544,
+   0.142196,
+   0.146785
+  ],
+  "his_radii": [
+   0.9956452442847882,
+   0.7845612227553455,
+   0.7959323007472613,
+   0.7775704987047644,
+   0.8391005905876492
+  ],
+  "all_inside": true,
+  "E_at_zero": 0.24673114075776786,
+  "degeneracy_at_s0": 1,
+  "depth_interval": [
+   0.08707289694328108,
+   0.1364620036066419
+  ],
+  "depth_at_chiral_r0": 0.1364620036066419,
+  "his_depth_mean": 0.0998256,
+  "his_depth_sd": 0.006397197905333238,
+  "his_depth_rel_pct": 6.408374109780696,
+  "orbit_spread_r0": 8.662515149637784e-14,
+  "orbit_spread_r1": 0.4187556843985323,
+  "n_automorphisms": 6
+ },
+ "L1": {
+  "degeneracy_at_s1": 2,
+  "E_ground": -9.000000000000007,
+  "valley_s": 1.0,
+  "valley_E": 0.23899721494605317,
+  "E_at_zero": 0.433153873099566,
+  "degeneracy_at_valley": 2,
+  "degenerate_points_on_grid": 1,
+  "manifold_E_interval": [
+   0.00120191472852063,
+   0.4714002623233186
+  ],
+  "depth_interval": [
+   -0.03824638922375262,
+   0.4319519583710454
+  ],
+  "orbit_spread_at_Emin": 0.0007519915647590802,
+  "n_automorphisms_uniform": 6,
+  "degeneracy_at_s0": 1
+ },
+ "elapsed_s": 8.9218909740448
+}

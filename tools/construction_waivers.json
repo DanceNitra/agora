@@ -1,26 +1,60 @@
 {
-  "_README": [
-    "Dated exceptions to the construction gate (tools/publish_gate.py). A waiver is not a way to make",
-    "a finding quiet: every one is PRINTED on every publish run with its reason and its date. If a",
-    "reason cannot be written down, the artifact is not ready to back a public number.",
-    "Keys are repo-relative paths; 'kinds' are construction_audit.py finding kinds.",
-    "UNSWEPT-KNOB is the disclosure class: an exposed env knob the published run never varied. The",
-    "waiver must either say why the knob cannot change a measured value (an output or cache location)",
-    "or state the value the published run actually used."
+ "_README": [
+  "Dated exceptions to the construction gate (tools/publish_gate.py). A waiver is not a way to make",
+  "a finding quiet: every one is PRINTED on every publish run with its reason and its date. If a",
+  "reason cannot be written down, the artifact is not ready to back a public number.",
+  "Keys are repo-relative paths; 'kinds' are construction_audit.py finding kinds.",
+  "UNSWEPT-KNOB is the disclosure class: an exposed env knob the published run never varied. The",
+  "waiver must either say why the knob cannot change a measured value (an output or cache location)",
+  "or state the value the published run actually used."
+ ],
+ "research/probes/ragdead/exp_ragdead_A.py": {
+  "kinds": [
+   "UNSWEPT-KNOB"
   ],
-  "research/probes/ragdead/exp_ragdead_A.py": {
-    "kinds": ["UNSWEPT-KNOB"],
-    "reason": "RAGDEAD_OUT names the directory the result JSON is written to. A destination cannot change a measured value; there is no other knob in this file.",
-    "dated": "2026-08-08"
-  },
-  "research/probes/reversibility_predictability_probe.py": {
-    "kinds": ["UNSWEPT-KNOB"],
-    "reason": "TE_CORPUS selects the input corpus and CAN change the numbers, so it is disclosed rather than dismissed: the published run used the default, research/probes/data/toolemu_all_toolkits.json.",
-    "dated": "2026-08-08"
-  },
-  "research/probes/locomo_retrieval_map.py": {
-    "kinds": ["UNSWEPT-KNOB"],
-    "reason": "Four knobs. LOCOMO_CACHE and LOCOMO_OUT are a memoisation file and an output file — neither can change a value. LOCOMO_PATH and OLLAMA_EMBED_URL can, and are disclosed: the published run used agora_output/lab/data/locomo10.json with nomic-embed-text at http://localhost:11434/api/embed.",
-    "dated": "2026-08-08"
-  }
+  "reason": "RAGDEAD_OUT names the directory the result JSON is written to. A destination cannot change a measured value; there is no other knob in this file.",
+  "dated": "2026-08-08"
+ },
+ "research/probes/reversibility_predictability_probe.py": {
+  "kinds": [
+   "UNSWEPT-KNOB"
+  ],
+  "reason": "TE_CORPUS selects the input corpus and CAN change the numbers, so it is disclosed rather than dismissed: the published run used the default, research/probes/data/toolemu_all_toolkits.json.",
+  "dated": "2026-08-08"
+ },
+ "research/probes/locomo_retrieval_map.py": {
+  "kinds": [
+   "UNSWEPT-KNOB"
+  ],
+  "reason": "Four knobs. LOCOMO_CACHE and LOCOMO_OUT are a memoisation file and an output file — neither can change a value. LOCOMO_PATH and OLLAMA_EMBED_URL can, and are disclosed: the published run used agora_output/lab/data/locomo10.json with nomic-embed-text at http://localhost:11434/api/embed.",
+  "dated": "2026-08-08"
+ },
+ "C:/Users/Danculus/ramr-pub/ramr_trace_export.py": {
+  "kinds": [
+   "UNSWEPT-KNOB"
+  ],
+  "reason": "TRACES sets how many chains are exported and CAN change a measured value, so it is swept rather than dismissed: ramr_traces_knob_sweep.py runs it at 50/150/300/600 and records ramr_traces_knob_sweep_result.json. The positional invariant Marat Sultanov found is 100% at every size, so it is a property of the generator and not of the sample. The published run used TRACES=300 (the corpus holds exactly 300 chains). The sweep also found a real defect the intuition would have missed -- TRACES=600 silently produced 300 -- and the export now prints a NOTE when the corpus is exhausted.",
+  "dated": "2026-08-12"
+ },
+ "agora_output/lab/memops/pilot.py": {
+  "kinds": [
+   "UNSWEPT-KNOB"
+  ],
+  "reason": "Scoped to the ORACLE arms only (oracle_state / oracle_evidence / oracle_evidence_neutral / oracle_current), which are the arms any public number from this file cites. Those arms build their context from the probe's own gold record (ctx_oracle_* at lines 313-367) and never call recall(), so MEMOPS_TOPK -- used solely at line 206 inside m.recall(k=TOPK), and documented at line 34 as 'the retrieval depth of the turn-level arms' -- is outside their causal path. MEMOPS_CONCURRENCY is a ThreadPoolExecutor width (line 562) and changes wall-clock, not accuracy; the observable that would catch a concurrency-induced loss is dropped rows, and the run records zero drops over 216. MEMOPS_MEM0_MODEL (line 220) selects the model for the mem0 comparison arm, which is not an oracle arm. Values as run are stated beside the numbers wherever they are quoted: TOPK=20, CONCURRENCY=8, MEM0_MODEL=glm-5.2. This waiver does NOT cover the turn-level or mem0 arms -- citing those requires sweeping TOPK first.",
+  "dated": "2026-08-18"
+ },
+ "C:/Users/Danculus/inspeximus-repo/probes/does_the_headline_number_depend_on_who_judges_it.py": {
+  "kinds": [
+   "UNSWEPT-KNOB"
+  ],
+  "reason": "OPENAI_API_KEY is a credential, not an experimental parameter: it selects WHO is billed, never what is measured, and the probe refuses with exit 2 when it is absent rather than silently producing a number. The degree of freedom this gate is right to worry about here is the JUDGE, and that one is swept explicitly -- five models, with the temperature recorded per model because two of them refuse 0.0 -- which is the subject of the probe rather than an undisclosed knob.",
+  "dated": "2026-08-22"
+ },
+ "C:/Users/Danculus/inspeximus-repo/probes/the_judge_is_not_deterministic_at_temperature_zero.py": {
+  "kinds": [
+   "UNSWEPT-KNOB"
+  ],
+  "reason": "OPENAI_API_KEY is a credential and cannot change a measured value; the probe exits 2 without it. Every knob that CAN move the number is pinned and printed beside it: judge_model gpt-4o-mini, judge_temperature 0.0, n 20, runs 30, and the fixture is committed in the file. The whole point of the probe is that the remaining variation is the model's own non-determinism, so there is no unswept parameter left to blame.",
+  "dated": "2026-08-22"
+ }
 }
