@@ -55,6 +55,21 @@ def run(seed, sig_found, include_pct):
     inc_p, inc_f = prof[sp & (prof >= cutoff)], found[sf & (found >= cutoff)]
     if len(inc_p) == 0 or len(inc_f) == 0:
         return None
+    # The column header prints "top N%". Reversing this comparison selects the BOTTOM N%
+    # instead, the gap goes 1.55x -> 6.29x, and the header still says "top". The survival
+    # assert added above does not reach this: survival stays 1.00/1.00 either way, which is
+    # how a fix aimed at the wrong invariant looks when you actually test it. What separates
+    # top from bottom is the mean, so that is what is checked.
+    # Against its OWN cohort, not the pooled mean. The first version of this assert compared with
+    # pooled and failed on clean data: the founder cohort has the fatter right tail, so it drags the
+    # pooled mean above the professional cohort's own top half (13.512 vs 13.830) with nothing wrong.
+    # Selecting the top of a distribution always raises THAT distribution's mean, and reversing the
+    # comparison always lowers it, which is the property that separates "top" from "bottom".
+    assert inc_p.mean() >= prof[sp].mean() and inc_f.mean() >= found[sf].mean(), (
+        "the included subset is below its own cohort mean (%.3f vs %.3f | %.3f vs %.3f) while the "
+        "table is labelled top-N%%" % (inc_p.mean(), prof[sp].mean(), inc_f.mean(), found[sf].mean()))
+    if False:
+        return None
     return {"sp": float(sp.mean()), "sf": float(sf.mean()),
             "gap": float(np.mean(inc_f) / np.mean(inc_p)),
             "gap_med": float(np.median(inc_f) / np.median(inc_p))}
@@ -73,6 +88,12 @@ def main():
             gapm = st.mean(x["gap_med"] for x in res)
             sp = st.mean(x["sp"] for x in res)
             sf = st.mean(x["sf"] for x in res)
+            # Reversing the ruin filter takes both survival rates to 0.00 and this loop
+            # still prints a confident gap from what is left. An empty cohort is guarded
+            # for; a technically-non-empty and substantively-nothing one was not.
+            assert 0.5 < sp <= 1.0 and 0.5 < sf <= 1.0, (
+                "survival collapsed to %.2f / %.2f -- the gap below would be computed on a "
+                "degenerate cohort" % (sp, sf))
             rows[(sig_f, inc)] = (gap, gapm)
             print("   %.2fx   |     %.2f / %.2f      |  top %d%%  |   %.2fx  (%4.0f%%)    |   %.2fx"
                   % (sig_f / SIG_PROF, sp, sf, 100 - inc, gap, (gap - 1) / 2.1 * 100, gapm))
