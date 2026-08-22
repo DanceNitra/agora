@@ -7,8 +7,16 @@ an average over two populations with nothing to do with each other:
     three coding stores   17,418 records   source populated on 0.6% / 0.0% / 0.0%
 
 The 100.0% is the part worth looking at. `scholar.json` carries a `source` field on all 26,928 of its
-records and the field holds the literal string `agent:scholar` in every one. One distinct value, and
-it is the name of the process that did the writing.
+records, holding one distinct value: the name of the process that did the writing.
+
+CORRECTED 2026-08-22, and the truth is worse than the error. This file said the field "holds the
+literal string `agent:scholar`". It does not. It holds a STRUCTURED OBJECT, `{"doc": "agent:scholar"}`
+-- and in the coding store `{"doc": "git:9e4973400d34"}`, with `None` on the other 17,020 records. So
+the shape is not a lazy string that a reviewer would squint at; it is a source object with a named
+key, which is exactly what a provenance field is supposed to look like. It passes a schema check, it
+passes a type check, it would pass a reviewer, and it still resolves to nothing. A wrong statement
+about our own field type, inside the file arguing that fields lie, is the fourth instance of this
+class today.
 
 W3C PROV has separated these since 2013: `wasAttributedTo` is the agent responsible,
 `wasDerivedFrom` is the entity it came from. We recorded attribution and read it as derivation.
@@ -26,6 +34,24 @@ over. That objection is the reason the headline here is the **zero**, not the ra
     re-checkable = 0, over every record in every store.
 
 That number can fail, and it is measured against a resolver this probe proves can succeed.
+
+THE TIERS, AND THERE ARE FOUR OF THEM. u/Terrible_Front_583 on r/RAG proposed splitting "source
+coverage" into field presence, semantic provenance and fetchability, which is a better decomposition
+than the two integers this probe shipped with -- it separates the two failures we had merged. Checked
+against our own stores it splits once more, because FIELD PRESENCE is itself two numbers:
+
+    tier 1a  the key exists                .inspeximus/coding_memory.json  100.00%   (17,122)
+    tier 1b  the key carries a value                                         0.62%   (106)
+    tier 2   distinct values                                                 105
+    tier 3   fetchable                                                         0
+
+A schema check answers 1a. A coverage check answers 1b. Neither is provenance, and the gap between
+them here is 99.4 percentage points inside a single store.
+
+His fuller gate -- a resolvable source object plus snapshot/version, owner, and an access check -- we
+cannot score at all: `version`, `snapshot`, `owner`, `access`, `retrieved_at`, `url` and `sha256` are
+absent from every record in both schemas. That tier is not zero for us, it is UNMEASURABLE, and a
+probe that printed 0 for it would be the same success-shaped nothing this file is about.
 
 CONTROLS, both required, because each covers what the other cannot see:
   * DISTINCTNESS -- three distinct sources must read 3 over 3 records, or a counter stuck at 1 makes
